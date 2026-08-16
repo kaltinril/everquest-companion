@@ -61,15 +61,16 @@
 import { CLASS_ABBRS, MAX_COMBO_SLOTS, type ClassAbbr } from '../../../../shared/classCombo'
 import { ITEM_UPGRADE_BASE, normalizeUpgradeState, type ItemUpgradeState } from '../../../../shared/itemUpgrade'
 import { EQUIP_SLOTS, type EquipSlot, type SocketType } from '../../../../shared/planner/types'
-import { WEAPON_PICKS, type WeaponPick } from '../../../../shared/planner/weaponType'
 import { PICKABLE_COLUMNS } from './gearColumns'
 import {
   DEFAULT_GEAR_FILTERS,
   DEFAULT_GEAR_SORT,
+  GEAR_WEAPON_PICKS,
   type EffectFilter,
   type GearFilters,
   type GearSort,
-  type GearSortKey
+  type GearSortKey,
+  type GearWeaponPick
 } from './gearFilter'
 
 // ---- the tier table ---------------------------------------------------------------------------
@@ -194,7 +195,7 @@ function sanitizeSlot(raw: unknown, fallback: EquipSlot | null): EquipSlot | nul
  * fields over it on every render, so writing them here would persist a value that is overwritten
  * before anything reads it.
  */
-export type GearFormMemory = Pick<GearFilters, 'slots' | 'weaponTypes' | 'effect' | 'eraOnly' | 'ownedOnly'>
+export type GearFormMemory = Pick<GearFilters, 'slots' | 'weaponTypes' | 'effect' | 'eraOnly' | 'ownedOnly' | 'ignoreHaste'>
 
 /** What the bar opens on when nothing is stored — the shipped defaults, projected. */
 export const DEFAULT_GEAR_FORM: GearFormMemory = {
@@ -202,7 +203,8 @@ export const DEFAULT_GEAR_FORM: GearFormMemory = {
   weaponTypes: DEFAULT_GEAR_FILTERS.weaponTypes,
   effect: DEFAULT_GEAR_FILTERS.effect,
   eraOnly: DEFAULT_GEAR_FILTERS.eraOnly,
-  ownedOnly: DEFAULT_GEAR_FILTERS.ownedOnly
+  ownedOnly: DEFAULT_GEAR_FILTERS.ownedOnly,
+  ignoreHaste: DEFAULT_GEAR_FILTERS.ignoreHaste
 }
 
 const EFFECT_FILTERS: readonly EffectFilter[] = ['any', 'has', 'proc', 'worn', 'focus', 'click']
@@ -217,12 +219,13 @@ export function sanitizeGearForm(raw: unknown): GearFormMemory {
   if (o === null) return DEFAULT_GEAR_FORM
   return {
     slots: sanitizeList<EquipSlot>(o.slots, EQUIP_SLOTS),
-    weaponTypes: sanitizeList<WeaponPick>(o.weaponTypes, WEAPON_PICKS),
+    weaponTypes: sanitizeList<GearWeaponPick>(o.weaponTypes, GEAR_WEAPON_PICKS),
     effect: sanitizeOne<EffectFilter>(o.effect, EFFECT_FILTERS, DEFAULT_GEAR_FORM.effect),
     // Era ships ON, so an unreadable value must come back ON — `sanitizeFlag`'s fallback, never a
     // bare `=== true`, which would silently turn the default filter off for a corrupted store.
     eraOnly: sanitizeFlag(o.eraOnly, DEFAULT_GEAR_FORM.eraOnly),
-    ownedOnly: sanitizeFlag(o.ownedOnly, DEFAULT_GEAR_FORM.ownedOnly)
+    ownedOnly: sanitizeFlag(o.ownedOnly, DEFAULT_GEAR_FORM.ownedOnly),
+    ignoreHaste: sanitizeFlag(o.ignoreHaste, DEFAULT_GEAR_FORM.ignoreHaste)
   }
 }
 

@@ -25,26 +25,35 @@
 // row stating NEITHER HP nor STA reads `undefined`, while a row stating just one reads that one —
 // silence is not a zero, and a stated number is not silence.
 //
-// THERE IS NO NUMERIC FILTER LEFT IN THIS FILE (owner ruling 2026-08-13, JOS-302, fourth ask:
-// *drop the min-ratio and stat-at-least filters completely - sorting services that need without
-// spending toolbar real estate*). The stat-threshold chips (`hp 50`, `sv magic >= 20`), their
-// parser and their `minRatio` companion are DELETED, not hidden. Their whole job was "show me the
-// items that reach a number", and clicking a column header answers that better: a sort puts the
-// best at the top and still shows you what the next ten look like, where a threshold makes you
-// guess the cutoff and re-type it when you guessed wrong. What used to be a threshold's other job —
-// putting the stat's COLUMN on the table — is the columns picker's now (JOS-297, gearColumns.ts):
-// you ask for the column by name and then you sort it.
+// THE NUMERIC FILTER LEFT THIS FILE ONCE AND CAME BACK BY A DIFFERENT DOOR. JOS-302 (owner ruling
+// 2026-08-13, fourth ask: *drop the min-ratio and stat-at-least filters completely - sorting
+// services that need without spending toolbar real estate*) deleted the toolbar's stat-threshold
+// chips and `minRatio` box outright. On 2026-08-15 the user asked to be able to FILTER BY ANY
+// COLUMN, which partially overrules that — and the shape of the return honours what the ruling was
+// actually about, which was TOOLBAR REAL ESTATE: thresholds now ride the search box as tokens
+// (`ac>=20`, `str>5`, `ratio>=1`, `bis>40` — `parseGearQuery` below), so they cost no toolbar
+// control at all. They read the SCALED vector through `sortValue`, the same derivation every cell
+// and every sort reads, so "ratio>=1 at +5" means at +5. A word that is not a threshold token is
+// search text exactly as before, and the two compose in one box. The threshold's OLD other job —
+// conjuring the stat's column — stays with the columns picker (JOS-297, gearColumns.ts).
 //
-// WHAT SURVIVES IS FIVE CLOSED QUESTIONS ABOUT WHO A ROW IS — its name, its slots, its weapon kind,
-// its classes, its effect kind — plus the two injected verdicts (era, ownership). Every one of them
-// is a set membership rather than a number, which is why none of them needs the plus-state to mean
-// anything and why the whole filter is now cheaper than the scale that precedes it.
+// THE STRUCTURED FILTERS ARE STILL CLOSED QUESTIONS ABOUT WHO A ROW IS — its name, its slots, its
+// weapon kind, its classes, its effect kind, and (2026-08-15) whether it reads as a shield — plus
+// the two injected verdicts (era, ownership). Every one of them is a set membership rather than a
+// number; the numbers live in the search text.
 
 import type { ClassAbbr } from '../../../../shared/classCombo'
 import type { ItemUpgradeState } from '../../../../shared/itemUpgrade'
-import type { GearRow, GearStatKey } from '../../../../shared/planner/gear'
-import { gearEffectiveHp, gearRatio, scaleGearRow } from '../../../../shared/planner/gearScale'
-import { weaponPicksMatch, type WeaponPick } from '../../../../shared/planner/weaponType'
+import { GEAR_STAT_KEYS, type GearRow, type GearStatKey } from '../../../../shared/planner/gear'
+import {
+  gearBisValue,
+  gearEffectiveDamage,
+  gearEffectiveHp,
+  gearRatio,
+  scaleGearRow,
+  type GearDerivedOpts
+} from '../../../../shared/planner/gearScale'
+import { WEAPON_PICKS, normalizeSkillToken, weaponPicksMatch, type WeaponPick } from '../../../../shared/planner/weaponType'
 import type { EquipSlot, SocketType } from '../../../../shared/planner/types'
 
 // ---- the filter model ---------------------------------------------------------------------
@@ -67,7 +76,11 @@ export type EffectFilter = 'any' | 'has' | SocketType
  * can wear" is one question, not three modes.
  */
 export interface GearFilters {
-  /** the DEFERRED search text (the standing search law — the view owns the `useDeferredValue`) */
+  /**
+   * The DEFERRED search text (the standing search law — the view owns the `useDeferredValue`).
+   * Since 2026-08-15 it carries the numeric filter too: threshold tokens (`ac>=20`) are lifted out
+   * by `parseGearQuery` and the rest matches the search key as it always did.
+   */
   text: string
   /**
    * The equip slots asked for. `[]` = every slot; several = the UNION (JOS-302, the owner's second
@@ -94,14 +107,24 @@ export interface GearFilters {
    */
   classes: ClassAbbr[]
   /**
-   * Weapon skills and the categories that union several of them (JOS-302, the owner's third ask).
-   * `[]` = every kind, non-weapons included; anything picked keeps only rows whose `Skill:` line
-   * folds into the pick list (`shared/planner/weaponType.ts` owns that fold and its census).
+   * Weapon skills, the categories that union several of them (JOS-302, the owner's third ask), and
+   * — since 2026-08-15, the user's ruling — `'shield'` as one more pick in the same dropdown: a
+   * shield is a kind of held item, so it lives beside the weapon kinds rather than as its own
+   * toggle. `[]` = every kind, non-weapons included; anything picked keeps only rows matching ANY
+   * pick — the skill fold for weapon picks (`shared/planner/weaponType.ts`), `isShieldLike` for the
+   * shield pick, ORed inside the one control exactly as the categories already union.
    */
-  weaponTypes: WeaponPick[]
+  weaponTypes: GearWeaponPick[]
   effect: EffectFilter
   /** hide rows the era join places outside the current expansion */
   eraOnly: boolean
+  /**
+   * LEAVE WORN HASTE OUT OF THE DERIVED SCORES (user ruling, 2026-08-15): haste items do not stack
+   * in this game, so for a player who already wears one, a second haste item's EFF DMG credit is a
+   * lie. When true, `sortValue` computes EFF DMG and BIS with the HASTE term dropped — the HASTE
+   * column itself still shows the stated number, because the item does state it (law 1).
+   */
+  ignoreHaste: boolean
   /**
    * THE OWNER'S CHECKBOX (JOS-285): keep only what this character owns or has looted.
    *
@@ -128,10 +151,58 @@ export const DEFAULT_GEAR_FILTERS: GearFilters = {
   // the corpus drops in expansions this server has not opened, and a plan built on them is a wish
   // list. `plannerData.eraHides` is the one verdict; this flag only says whether to apply it.
   eraOnly: true,
+  // OFF by default: the first haste item IS a real upgrade, so the score credits haste until the
+  // player says they already have one.
+  ignoreHaste: false,
   // OFF by default, and that is the search-first ruling again: the tab opens on the CORPUS, which
   // is the question a planner asks first ("what is out there"). "What do I already have" is the
   // second question and it is one click away.
   ownedOnly: false
+}
+
+/** The name spellings that read as a shield. A closed list, so a false positive is one word away. */
+const SHIELD_WORDS = ['shield', 'buckler', 'aegis', 'targe', 'bulwark'] as const
+
+/**
+ * DOES THIS ROW READ AS A SHIELD? (user ask, 2026-08-15: *filter by shields specifically*.)
+ *
+ * The corpus states no item-type field, so the answer is a heuristic over what the page DOES state,
+ * and it says so: a SECONDARY-slot item whose name speaks one of the shield words, or whose
+ * `Skill:` line reads SHIELD. The slot gate is what keeps a "Shield of…" cloak or a held tome out;
+ * the word list is what a miss or a false positive gets corrected in. ONE function, exported, so
+ * the search word `gearData.toRow` folds into the haystack and the pure filter below can never
+ * disagree about what a shield is. The skill read goes through `normalizeSkillToken` — the same
+ * fold every other `Skill:` comparison uses — so editor residue on the page cannot slip past it.
+ */
+export function isShieldLike(row: Pick<GearRow, 'slots' | 'name' | 'skill'>): boolean {
+  if (!row.slots.includes('SECONDARY')) return false
+  const name = row.name.toLowerCase()
+  if (SHIELD_WORDS.some((w) => name.includes(w))) return true
+  return normalizeSkillToken(row.skill ?? '') === 'SHIELD'
+}
+
+/**
+ * The Weapon type control's pick vocabulary ON THIS SURFACE: the shared weapon picks, plus
+ * `'shield'` (user ruling, 2026-08-15 — a shield belongs in the held-kind dropdown, not its own
+ * toggle). It is a GEAR type rather than a widening of `WeaponPick` because the shared fold cannot
+ * answer it: a shield is read off the slot and the name (`isShieldLike`), not off a `Skill:` line —
+ * the corpus states `SHIELD` as a skill on exactly ONE page (weaponType.ts's census, point 4).
+ */
+export type GearWeaponPick = WeaponPick | 'shield'
+
+/**
+ * The whole pick vocabulary, stated ONCE beside the type it enumerates: the dropdown's options
+ * (GearFilterBar) and the sanitizer's allowlist (areaMemory) both read this list, so a future pick
+ * cannot be offered by one and silently dropped on load by the other.
+ */
+export const GEAR_WEAPON_PICKS: readonly GearWeaponPick[] = [...WEAPON_PICKS, 'shield']
+
+/** Does the row match ANY pick — the control's union, with the shield pick answered its own way. */
+export function matchesHeldKind(row: GearRow, picks: readonly GearWeaponPick[]): boolean {
+  if (picks.length === 0) return true
+  const weapon = picks.filter((p): p is WeaponPick => p !== 'shield')
+  if (weapon.length > 0 && weaponPicksMatch(row.skill, weapon)) return true
+  return picks.includes('shield') && isShieldLike(row)
 }
 
 /** What the pure model cannot answer for itself — see the header. */
@@ -149,6 +220,111 @@ export interface GearFilterDeps {
    * a control that lies about being on.
    */
   ownedOrLooted?: (row: GearRow) => boolean
+}
+
+// ---- the search text, parsed (the 2026-08-15 numeric-filter return — see the header) --------
+
+export interface StatThreshold {
+  key: GearSortKey
+  op: '>=' | '<=' | '>' | '<' | '='
+  value: number
+}
+
+/** The search box's text, split into its two jobs: words to match, and numbers to reach. */
+export interface GearQuery {
+  /** what is left after the threshold tokens are lifted out, matched as ONE substring as before */
+  needle: string
+  thresholds: StatThreshold[]
+}
+
+/**
+ * Every spelling a threshold token may name a key by: the key itself and its underscore-free
+ * fold (`sv_magic` and `svmagic`), case-insensitive, plus the derived keys — a threshold may ask
+ * for a ratio, an effective HP, the damage score or the BIS score exactly as it asks for a stat.
+ */
+const THRESHOLD_KEYS: ReadonlyMap<string, GearSortKey> = new Map([
+  ...(['RATIO', 'EFF_HP', 'EFF_DMG', 'BIS', ...GEAR_STAT_KEYS] as const).flatMap(
+    (key): [string, GearSortKey][] => [
+      [key.toLowerCase(), key],
+      [key.toLowerCase().replace(/_/g, ''), key]
+    ]
+  ),
+  // The column's DISPLAYED word (columnLabel spells `BIS` as `BEST` — user ruling, 2026-08-15), so
+  // the token a reader types off the header they can see is a real spelling too.
+  ['best', 'BIS']
+])
+
+/** `key op number`, NO SPACES — `ac>=20`, `str>5`, `weight<2.5`. The search hint states the shape. */
+const THRESHOLD_TOKEN = /^([a-z_]+)(>=|<=|>|<|=)(-?\d+(?:\.\d+)?)$/
+
+/**
+ * Split the search text into words and thresholds. A token that LOOKS like a threshold but names
+ * no known key stays a WORD — `foo>=3` searches for the string `foo>=3` rather than silently
+ * filtering on nothing, so a typo shows an empty table with the typo visible in the box.
+ */
+export function parseGearQuery(text: string): GearQuery {
+  const thresholds: StatThreshold[] = []
+  const words: string[] = []
+  for (const token of text.trim().toLowerCase().split(/\s+/)) {
+    if (token === '') continue
+    const m = THRESHOLD_TOKEN.exec(token)
+    const key = m === null ? undefined : THRESHOLD_KEYS.get(m[1])
+    if (m !== null && key !== undefined) {
+      thresholds.push({ key, op: m[2] as StatThreshold['op'], value: Number(m[3]) })
+    } else {
+      words.push(token)
+    }
+  }
+  return { needle: words.join(' '), thresholds }
+}
+
+// ONE-ENTRY CACHE, not a memo library: the filter asks the same question 6,814 times per keystroke
+// and the text only changes between keystrokes. Pure in effect — same text, same answer. Exported
+// for the view's per-render reads (the haste-chip gate), which want the cache for the same reason.
+let lastQueryText: string | null = null
+let lastQuery: GearQuery = { needle: '', thresholds: [] }
+export function queryOf(text: string): GearQuery {
+  if (text !== lastQueryText) {
+    lastQueryText = text
+    lastQuery = parseGearQuery(text)
+  }
+  return lastQuery
+}
+
+/**
+ * Does the row's number reach the threshold? Reads `sortValue`, so a threshold on a derived key
+ * and a threshold on a vector key are the same code path — and reads the SCALED vector, because
+ * the pipeline filters after it scales. ABSENT FAILS EVERY OPERATOR, `<` included: an item that
+ * states no HASTE line is not an item with less than 41% haste, it is an item that said nothing
+ * (law 1), and a filter question about a number it never stated has no yes in it.
+ */
+function meetsThreshold(row: GearRow, t: StatThreshold, opts: GearDerivedOpts): boolean {
+  const v = sortValue(row, t.key, opts)
+  if (v === undefined) return false
+  if (t.op === '>=') return v >= t.value
+  if (t.op === '<=') return v <= t.value
+  if (t.op === '>') return v > t.value
+  if (t.op === '<') return v < t.value
+  return v === t.value
+}
+
+// ONE-ENTRY CACHE, the `queryOf` shape: the filter asks per row, the inputs change per click. The
+// IDENTITY is stable while the filters are, which is also what lets React trees depend on it.
+let lastOptsHaste: boolean | null = null
+let lastOptsClasses: readonly ClassAbbr[] | null = null
+let lastOpts: GearDerivedOpts = {}
+
+/** The derived-score knobs a filter object implies: the haste knob, and WHO is asking (the class
+ *  picks — gearScale's BEST reads them so a casting stat nobody picked can use scores nothing). */
+export function derivedOpts(filters: Pick<GearFilters, 'ignoreHaste' | 'classes'>): GearDerivedOpts {
+  if (filters.ignoreHaste !== lastOptsHaste || filters.classes !== lastOptsClasses) {
+    lastOptsHaste = filters.ignoreHaste
+    lastOptsClasses = filters.classes
+    lastOpts = {}
+    if (filters.ignoreHaste) lastOpts.ignoreHaste = true
+    if (filters.classes.length > 0) lastOpts.classes = filters.classes
+  }
+  return lastOpts
 }
 
 // ---- the predicates ------------------------------------------------------------------------
@@ -188,24 +364,25 @@ export function effectMatches(row: GearRow, effect: EffectFilter): boolean {
 }
 
 /**
- * WHO THIS ROW IS — the whole local half of the filter since the numeric one was dropped: the name,
- * the slots, the kind of weapon, the class combo and the effect kind.
+ * WHO THIS ROW IS — the local half of the filter: the search words, the thresholds those words
+ * carried (2026-08-15 — see the header), the slots, the kind of weapon, the class combo and the
+ * effect kind.
  *
- * All five AND, and all five are inert while empty — see `GearFilters`. Two of them are UNIONS
- * inside (slots, weapon types), which is the JOS-302 shape: several answers to one question,
- * ANDed against the answers to the others.
+ * Everything ANDs, and everything is inert while empty — see `GearFilters`. Two are UNIONS inside
+ * (slots, weapon types), which is the JOS-302 shape: several answers to one question, ANDed against
+ * the answers to the others.
  *
- * NONE OF THE FIVE READS THE SCALED VECTOR, and that is worth noticing rather than exploiting: the
- * pipeline still scales BEFORE it filters, because the SORT downstream reads the scaled numbers and
- * the memo split (GearView) is what keeps a keystroke from re-scaling 6,814 rows. Reordering the
- * stages to save the scale would trade a correct order for an optimisation nobody has measured a
- * need for.
+ * THE THRESHOLDS ARE THE ONE PART THAT READS THE SCALED VECTOR — the pipeline scales before it
+ * filters, so `ratio>=1` under a +5 slider keeps the weapons that reach 1.0 AT +5, which is the
+ * question the token exists to ask. The word half still never reads a number.
  */
 function matchesIdentity(row: GearRow, filters: GearFilters): boolean {
-  const needle = filters.text.trim().toLowerCase()
-  if (needle !== '' && !row.searchKey.includes(needle)) return false
+  const query = queryOf(filters.text)
+  if (query.needle !== '' && !row.searchKey.includes(query.needle)) return false
+  const opts = derivedOpts(filters)
+  if (!query.thresholds.every((t) => meetsThreshold(row, t, opts))) return false
   if (!slotMatches(row, filters.slots)) return false
-  if (!weaponPicksMatch(row.skill, filters.weaponTypes)) return false
+  if (!matchesHeldKind(row, filters.weaponTypes)) return false
   if (!effectMatches(row, filters.effect)) return false
   return !classMismatch(row.classes, filters.classes)
 }
@@ -242,7 +419,7 @@ export function filterGearRows<T extends GearRow>(
  * never will. Nothing indexes it, nothing scales it, and nothing stores it — it is computed from the
  * vector at the moment somebody asks, which is exactly why the plus-state moves it for free.
  */
-export type GearSortKey = 'name' | 'RATIO' | 'EFF_HP' | GearStatKey
+export type GearSortKey = 'name' | 'RATIO' | 'EFF_HP' | 'EFF_DMG' | 'BIS' | GearStatKey
 
 export interface GearSort {
   key: GearSortKey
@@ -261,11 +438,23 @@ export const DEFAULT_GEAR_SORT: GearSort = { key: 'AC', dir: 'desc' }
  * property that lets `GearTable` render every column with `statText(sortValue(row, key), key)` and
  * never learn that two of the keys are not vector fields.
  */
-export function sortValue(row: GearRow, key: GearSortKey): number | undefined {
+export function sortValue(row: GearRow, key: GearSortKey, opts: GearDerivedOpts = {}): number | undefined {
   if (key === 'name') return undefined
   if (key === 'RATIO') return gearRatio(row.stats)
   if (key === 'EFF_HP') return gearEffectiveHp(row.stats)
+  if (key === 'EFF_DMG') return gearEffectiveDamage(row.stats, opts)
+  if (key === 'BIS') return gearBisValue(row.stats, opts)
   return row.stats[key]
+}
+
+/**
+ * Does this key READ the derived-score knobs — is it one of the two arms above that take `opts`?
+ * Exported so the view's "is anything on screen reading the scores" question (the Ignore-haste
+ * chip's honest-hide gate) states the set HERE, beside the dispatch that makes it true, instead of
+ * restating the two keys as literals a third arm would silently miss.
+ */
+export function readsDerivedOpts(key: GearSortKey): boolean {
+  return key === 'EFF_DMG' || key === 'BIS'
 }
 
 /**
@@ -276,19 +465,24 @@ export function sortValue(row: GearRow, key: GearSortKey): number | undefined {
  * otherwise re-shuffle on every re-sort (`Array.prototype.sort` is stable, but the array reaching
  * it is a fresh filter each time), and a windowed list whose rows swap under the scrollbar is the
  * bug that looks like a rendering fault.
+ *
+ * THE VALUE IS COMPUTED ONCE PER ROW, NEVER PER COMPARISON. A vector key is a field read, but the
+ * derived keys are not: BIS walks the whole stat vector (gearScale.ts), and a comparator that
+ * called it n·log n times paid ~25 evaluations per row per keystroke on the 6,814-row corpus.
+ * Decorating first makes every key one evaluation per row, and the comparator a number compare.
  */
-export function sortGearRows<T extends GearRow>(rows: readonly T[], sort: GearSort): T[] {
+export function sortGearRows<T extends GearRow>(rows: readonly T[], sort: GearSort, opts: GearDerivedOpts = {}): T[] {
   const sign = sort.dir === 'asc' ? 1 : -1
-  return [...rows].sort((a, b) => {
-    if (sort.key === 'name') return sign * a.name.localeCompare(b.name)
-    const av = sortValue(a, sort.key)
-    const bv = sortValue(b, sort.key)
+  if (sort.key === 'name') return [...rows].sort((a, b) => sign * a.name.localeCompare(b.name))
+  const decorated = rows.map((row) => ({ row, value: sortValue(row, sort.key, opts) }))
+  decorated.sort(({ row: a, value: av }, { row: b, value: bv }) => {
     if (av === undefined || bv === undefined) {
       if (av === bv) return a.name.localeCompare(b.name)
       return av === undefined ? 1 : -1
     }
     return av === bv ? a.name.localeCompare(b.name) : sign * (av - bv)
   })
+  return decorated.map(({ row }) => row)
 }
 
 // ---- the plus-state stage -------------------------------------------------------------------
@@ -317,5 +511,5 @@ export function gearTableRows<T extends GearRow>(
   opts: { filters: GearFilters; sort?: GearSort; deps?: GearFilterDeps }
 ): T[] {
   const scaled = scaleAll(rows, state)
-  return sortGearRows(filterGearRows(scaled, opts.filters, opts.deps), opts.sort ?? DEFAULT_GEAR_SORT)
+  return sortGearRows(filterGearRows(scaled, opts.filters, opts.deps), opts.sort ?? DEFAULT_GEAR_SORT, derivedOpts(opts.filters))
 }

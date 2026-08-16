@@ -123,9 +123,8 @@
 // third filter can now be the reason the table is empty (`emptyText`, and the pass that counts it).
 
 import { type JSX, useCallback, useDeferredValue, useMemo, useRef } from 'react'
-import { Box, Stack, Typography } from '@mui/material'
+import { Box, Chip, Stack, Typography } from '@mui/material'
 import { ITEM_UPGRADE_BASE, type ItemUpgradeState } from '@shared/itemUpgrade'
-import type { GearRow } from '@shared/planner/gear'
 import OutputKindLine from '../../components/OutputKindLine'
 import { useWindowedRows } from '../../lib/useWindowedRows'
 import GearFilterBar from './GearFilterBar'
@@ -147,6 +146,7 @@ import {
 import { PICKABLE_COLUMNS, columnLabel, columnsFor, sortWithin, type GearColumn } from './gearColumns'
 import {
   useEraHidden,
+  type GearViewRow,
   useGearClasses,
   useGearCompare,
   useGearIndex,
@@ -157,7 +157,10 @@ import {
 import { uncountedNote, type GearOwnershipMap } from './gearOwnership'
 import {
   DEFAULT_GEAR_FILTERS,
+  derivedOpts,
   filterGearRows,
+  queryOf,
+  readsDerivedOpts,
   scaleAll,
   sortGearRows,
   type GearFilterDeps,
@@ -186,7 +189,7 @@ function nextSort(sort: GearSort, key: GearSortKey): GearSort {
 }
 
 interface TableState {
-  rows: GearRow[]
+  rows: GearViewRow[]
   columns: GearColumn[]
   /**
    * The sort actually in force — the requested one, unless the column it names is no longer drawn
@@ -210,7 +213,7 @@ interface TableState {
  * then confined to what came out. Reversing them would be a cycle.
  */
 function useTableRows(
-  rows: readonly GearRow[],
+  rows: readonly GearViewRow[],
   state: ItemUpgradeState,
   filters: GearFilters,
   opts: { sort: GearSort; deps: GearFilterDeps; chosen: GearSortKey[] | null }
@@ -220,7 +223,8 @@ function useTableRows(
   const filtered = useMemo(() => filterGearRows(scaled, filters, deps), [scaled, filters, deps])
   const columns = useMemo(() => columnsFor(chosen, sort), [chosen, sort])
   const inForce = useMemo(() => sortWithin(sort, columns), [sort, columns])
-  const sorted = useMemo(() => sortGearRows(filtered, inForce), [filtered, inForce])
+  // `derivedOpts` returns one of two constants, so this memo moves only when the flag actually flips.
+  const sorted = useMemo(() => sortGearRows(filtered, inForce, derivedOpts(filters)), [filtered, inForce, filters])
   // WHY THE LIST IS EMPTY, when it is (the JOS-67 law: a filter that can hide everything must be
   // able to admit it). THREE filters can do it without the user having chosen them in the moment:
   // the era one, which is on by DEFAULT rather than by choice; the Owned one, which is one click
@@ -314,6 +318,18 @@ function ShapePickers({ prefs, columns }: { prefs: GearPrefs; columns: readonly 
         toggle={toggleControl}
         onChange={prefs.setControls}
       />
+      {/* The Zone / Level / Mob trio's switch (user ask, 2026-08-15) — beside the other two shape
+          chips because it is a shape choice too: it narrows nothing, it only draws or does not. */}
+      <Chip
+        size="small"
+        label="Drop columns"
+        data-testid="gear-drops-toggle"
+        title="Show where each item drops - the Zone, Level and Mob columns. The item's own page (click its name) always has the full story."
+        color={prefs.dropCols ? 'primary' : 'default'}
+        variant={prefs.dropCols ? 'filled' : 'outlined'}
+        onClick={() => prefs.setDropCols(!prefs.dropCols)}
+        sx={{ flexShrink: 0 }}
+      />
     </>
   )
 }
@@ -391,20 +407,32 @@ function CountLine({
  */
 function useGearWishes(): {
   wished: ReadonlySet<string>
-  onToggleWish?: (row: GearRow, wished: boolean) => void
+  onToggleWish?: (row: GearViewRow, wished: boolean) => void
 } {
   const wishlist = useWishlist()
   const entries = wishlist.list.entries
   const wished = useMemo(() => new Set(entries.map((e) => e.itemKey)), [entries])
   const { add, remove } = wishlist
   const onToggleWish = useCallback(
-    (row: GearRow, wasWished: boolean) => {
+    (row: GearViewRow, wasWished: boolean) => {
       if (wasWished) remove(row.key)
       else add(wishFromGear(row, Date.now()))
     },
     [add, remove]
   )
   return { wished, onToggleWish: wishlist.ready ? onToggleWish : undefined }
+}
+
+/**
+ * Is anything on screen reading the derived scores? Drawn columns, or a search threshold naming
+ * one — the token half is what keeps hiding the chip honest (GearFilterBarProps.hasteRelevant).
+ * WHICH keys read the knobs is `gearFilter.readsDerivedOpts`'s to say, beside the dispatch that
+ * makes it true — a third opts-reading key added there is counted here without a second edit. The
+ * text goes through `queryOf`'s cache, so the per-render call never re-parses an unchanged query
+ * (the view renders on every scroll tick).
+ */
+function readsDerivedScores(columns: readonly GearColumn[], text: string): boolean {
+  return columns.some((c) => readsDerivedOpts(c.key)) || queryOf(text).thresholds.some((t) => readsDerivedOpts(t.key))
 }
 
 export interface GearViewProps {
@@ -446,14 +474,8 @@ export default function GearView({ onOpenLoot }: GearViewProps = {}): JSX.Elemen
    */
   const own = useMemo<GearFilters>(() => ({ ...DEFAULT_GEAR_FILTERS, ...form }), [form])
   const setOwn = useCallback(
-    (next: GearFilters) => {
-      setForm({
-        slots: next.slots,
-        weaponTypes: next.weaponTypes,
-        effect: next.effect,
-        eraOnly: next.eraOnly,
-        ownedOnly: next.ownedOnly
-      })
+    ({ slots, weaponTypes, effect, eraOnly, ownedOnly, ignoreHaste }: GearFilters) => {
+      setForm({ slots, weaponTypes, effect, eraOnly, ownedOnly, ignoreHaste })
     },
     [setForm]
   )
@@ -493,6 +515,11 @@ export default function GearView({ onOpenLoot }: GearViewProps = {}): JSX.Elemen
     () => ownedHint(ownership.map, uncountedNote(ownership.payload.uncounted)),
     [ownership.map, ownership.payload.uncounted]
   )
+  // STABLE while the sort is, so `GearHead`'s memo holds across scroll ticks — an inline arrow
+  // would hand the header a fresh identity every frame. The base is the sort IN FORCE, not the
+  // requested one: after a picker removed the sorted column, clicking the header that took over
+  // must FLIP it rather than re-open it.
+  const onSort = useCallback((key: GearSortKey) => setSort(nextSort(table.sort, key)), [table.sort, setSort])
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }} data-testid="gear-view">
@@ -504,6 +531,7 @@ export default function GearView({ onOpenLoot }: GearViewProps = {}): JSX.Elemen
         classes={classes}
         upgrade={upgrade}
         visible={visible}
+        hasteRelevant={readsDerivedScores(table.columns, deferredText)}
       />
 
       <CountLine
@@ -539,15 +567,21 @@ export default function GearView({ onOpenLoot }: GearViewProps = {}): JSX.Elemen
           sort={table.sort}
           ownership={ownership.map}
           ownedHint={hint}
-          // The base is the sort IN FORCE, not the requested one: after a picker removed the
-          // sorted column, clicking the header that took over must FLIP it rather than re-open it.
-          onSort={(key) => setSort(nextSort(table.sort, key))}
+          onSort={onSort}
           onOpenLoot={onOpenLoot}
           // JOS-335, JOS-343 — the per-row wish gesture (add, and click again to remove) and the
           // added state it reads. UNDEFINED until the document has loaded (`useGearWishes`), which
           // is what draws no control at all rather than one lying about what is already on the list.
           onToggleWish={wishes.onToggleWish}
           wished={wishes.wished}
+          // The dragged column widths (2026-08-15) — a view choice like the columns themselves.
+          widths={prefs.widths}
+          onWidths={prefs.setWidths}
+          // The derived-score knobs (2026-08-15): the drawn EFF DMG / BEST cells read the same
+          // options the sort just ranked by — the haste opt-out AND the class picks, so a casting
+          // stat nobody picked can use scores nothing (the 1000-INT-warrior case).
+          derived={derivedOpts(filters)}
+          showDrops={prefs.dropCols}
           // JOS-338 — hovering a row opens the comparison card. Passed always: the card is useful
           // with no dump at all (the item half plus the command that fills the other half), and
           // `GearCompareData.ready` is what keeps it from claiming anything before the first read.
