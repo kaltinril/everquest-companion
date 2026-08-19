@@ -25,6 +25,7 @@ import GearView from './features/gear/GearView'
 // plainly rather than lazily: it is a heading and two sentences, which is cheaper than the code
 // that would defer it.
 import WishlistView from './features/wishlist/WishlistView'
+import PlanView from './features/plan/PlanView'
 import BossView from './features/bosses/BossView'
 import MobsView from './features/mobs/MobsView'
 import MapsView from './features/maps/MapsView'
@@ -163,6 +164,10 @@ function PlainView({
           headings and camp mobs open the Maps tab and the mob's page, the drop trio's doors. */}
       {view === 'wishlist' && <WishlistView key={viewKey} {...doors} />}
       {view === 'buffs' && <BuffsView key={viewKey} />}
+      {/* The Plan tab (its place in the gear area's tab bar comes from appViews, not this list).
+          Its routes out (user rulings, 2026-08-18): item names to the Loot drill-down, zone chips
+          and run headings to the Maps tab, and a named witness mob's name to the mob's own page. */}
+      {view === 'plan' && <PlanView key={viewKey} {...doors} />}
       {/* Respawn clocks (JOS-194). Character-scoped like the rest: the remount `key` is the
           whole contract, since the watch list lives in the store and the clocks are re-derived
           by the fold the character switch kicks off. */}
