@@ -38,6 +38,7 @@ import type { MobEntry } from '@shared/types'
 // RELATIVE value imports, the repo-wide rule for node-tested pure modules (mobSearch.ts:33):
 // the `@shared/*` alias exists only inside the vite build, and tests/mapMobPane.test.mts drives
 // this module — against the REAL catalog — under plain `node --import tsx --test`.
+import { sourceItemKey } from '../../lib/itemSources'
 import { mobsInZone } from '../mobs/mobZone'
 import { mapFromLoc } from './mapGeometry'
 
@@ -51,6 +52,22 @@ const LEGEND_LAYER = 2
 
 /** How many pins the surface will draw at once. See `pinsForRows`. */
 export const MAX_PINS = 400
+
+/**
+ * `a skeleton` / `an orc pawn` — the game's own convention for a COMMON spawn is the leading
+ * article, and the named mobs worth walking to go without one (`skeleton Lrodd`, `the ghoul
+ * lord`, Baron Telyx V`Zher). The catalog carries no rarity field (mobTypes.ts keeps it
+ * compact on purpose), so the article is the one signal the data itself states.
+ *
+ * Case-insensitive because the wiki capitalizes some articles (`A Chokidai Growler`). MEASURED
+ * over the committed catalog, 2026-08-16: 2,137 of 7,872 pages are articled.
+ */
+const COMMON_NAME_RE = /^(a|an)\s/i
+
+/** True for the trash spawns the map pane does not list. Exported for its own test. */
+export function isCommonMob(name: string): boolean {
+  return COMMON_NAME_RE.test(name)
+}
 
 /** One spawn point, already in MAP coordinates — ready for `vp.toScreen`. */
 export interface MobPin {
@@ -79,6 +96,8 @@ export interface MobPaneRow {
    * corpus, and every one of them would otherwise be a pin in the wrong zone half the time.
    */
   unattributable: boolean
+  /** The catalog row itself — pins the mob-page deep link's identity, and carries the drops. */
+  entry: MobEntry
   /** Lowercased haystack, computed once per data change (AGENTS.md "Search"). */
   searchKey: string
 }
@@ -113,22 +132,48 @@ export function mobPins(entry: MobEntry): MobPin[] {
  * nothing on the page says which zone the numbers describe, so attributing them to the map on
  * screen would be a coin flip dressed as knowledge. Those rows are LISTED — the mob does live
  * here — and the pane states why they carry no pin (world-model law 1).
+ *
+ * COMMON SPAWNS ARE NOT LISTED AT ALL (owner call, 2026-08-16): the map pane exists for the
+ * mobs worth walking to, and a zone's forty `a skeleton`s bury its nameds. `isCommonMob` is the
+ * gate; the Mobs tab and the cross-zone search still answer for commons — this is the MAP's
+ * filter, not the app's.
  */
 export function mobRows(zoneRaw: string, catalog: MobEntry[]): MobPaneRow[] {
-  return mobsInZone(zoneRaw, catalog).map((m) => {
-    const zoneCount = m.zones?.length ?? 0
-    const ambiguous = zoneCount > 1
-    return {
-      kind: 'mob' as const,
-      id: m.page,
-      name: m.name,
-      ...(m.level === undefined ? {} : { level: m.level }),
-      pins: ambiguous ? [] : mobPins(m),
-      zoneCount,
-      unattributable: ambiguous && (m.loc?.length ?? 0) > 0,
-      searchKey: `${m.name} ${m.level ?? ''}`.toLowerCase()
-    }
-  })
+  return mobsInZone(zoneRaw, catalog)
+    .filter((m) => !isCommonMob(m.name))
+    .map((m) => {
+      const zoneCount = m.zones?.length ?? 0
+      const ambiguous = zoneCount > 1
+      return {
+        kind: 'mob' as const,
+        id: m.page,
+        name: m.name,
+        ...(m.level === undefined ? {} : { level: m.level }),
+        pins: ambiguous ? [] : mobPins(m),
+        zoneCount,
+        unattributable: ambiguous && (m.loc?.length ?? 0) > 0,
+        entry: m,
+        searchKey: `${m.name} ${m.level ?? ''}`.toLowerCase()
+      }
+    })
+}
+
+/**
+ * The drop names on this page that the wish list asks for. Keyed through `sourceItemKey` — the
+ * wish list stores canonical keys and ~1,900 catalog drop names carry a `+N` suffix — and deduped
+ * per key ("Ghoulbane" / "Ghoulbane +1" are one item).
+ */
+export function wishedDrops(entry: MobEntry, wished: ReadonlySet<string>): string[] {
+  if (wished.size === 0) return []
+  const seen = new Set<string>()
+  const out: string[] = []
+  for (const drop of entry.drops ?? []) {
+    const key = sourceItemKey(drop)
+    if (!wished.has(key) || seen.has(key)) continue
+    seen.add(key)
+    out.push(drop)
+  }
+  return out
 }
 
 /**

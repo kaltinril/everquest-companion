@@ -19,6 +19,7 @@ import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'rea
 import type { MapData, MapPackPrefs, MapPoint, MapSearchHit, ZoneShort } from '@shared/maps'
 import type { MobEntry } from '@shared/types'
 import { MOB_CATALOG } from '../mobs/mobSearch'
+import { useWishlist } from '../wishlist/useWishlist'
 import { CROSS_ZONE_LIMIT, crossZoneRows, type CrossZoneRow } from './crossZone'
 import { loadPaneOpen, savePaneOpen } from './useMapData'
 import type { MapViewport } from './useMapViewport'
@@ -29,6 +30,7 @@ import {
   paneCounts,
   pinsForRows,
   rowTarget,
+  wishedDrops,
   type LabelPaneRow,
   type MapPaneRow,
   type MobPaneRow,
@@ -60,10 +62,14 @@ export interface MapPaneState {
   pins: PlacedPin[]
   /** The drawn set hit `MAX_PINS`. Stated in the pane rather than silently trimmed. */
   pinsCapped: boolean
+  /** Row id → the wish-list drops that mob carries. Derived once, read by pane rows AND pins. */
+  wishes: ReadonlyMap<string, readonly string[]>
   selectedId: string | null
   /** Where the selected row is, in map coordinates — the ring's position. */
   selectedAt: { x: number; y: number } | null
-  select: (row: MapPaneRow) => void
+  /** `at` overrides the row's own first-pin target — the surface passes the SPECIFIC pin that
+   *  was clicked, so a row with several spawn points rings the one under the cursor. */
+  select: (row: MapPaneRow, at?: { x: number; y: number }) => void
 }
 
 export function useMapPane({ zoneName, points, catalog, mapId, onCenter }: MapPaneArgs): MapPaneState {
@@ -76,6 +82,18 @@ export function useMapPane({ zoneName, points, catalog, mapId, onCenter }: MapPa
     () => (zoneName == null ? [] : mobRows(zoneName, catalog)),
     [zoneName, catalog]
   )
+  // The wish-list join — walks the zone's rows, not the catalog, so an edit re-derives cheaply.
+  const wishlist = useWishlist().list
+  const wishedKeys = useMemo(() => new Set(wishlist.entries.map((e) => e.itemKey)), [wishlist.entries])
+  const wishes = useMemo(() => {
+    const m = new Map<string, readonly string[]>()
+    if (wishedKeys.size > 0)
+      for (const row of allMobs) {
+        const hits = wishedDrops(row.entry, wishedKeys)
+        if (hits.length > 0) m.set(row.id, hits)
+      }
+    return m
+  }, [allMobs, wishedKeys])
   const allLabels = useMemo<LabelPaneRow[]>(() => labelRows(points), [points])
   const mobs = useMemo(() => filterPaneRows(allMobs, q), [allMobs, q])
   const labels = useMemo(() => filterPaneRows(allLabels, q), [allLabels, q])
@@ -88,13 +106,13 @@ export function useMapPane({ zoneName, points, catalog, mapId, onCenter }: MapPa
   }, [mapId])
 
   const select = useCallback(
-    (row: MapPaneRow) => {
-      const at = rowTarget(row)
+    (row: MapPaneRow, at?: { x: number; y: number }) => {
+      const target = at ?? rowTarget(row)
       // Unlocatable rows are already disabled in the pane; this is the belt-and-braces half, so
       // no caller can ever produce a ring floating at a position nothing stated.
-      if (at == null) return
-      setSelected({ id: row.id, x: at.x, y: at.y })
-      onCenter(at.x, at.y)
+      if (target == null) return
+      setSelected({ id: row.id, x: target.x, y: target.y })
+      onCenter(target.x, target.y)
     },
     [onCenter]
   )
@@ -107,6 +125,7 @@ export function useMapPane({ zoneName, points, catalog, mapId, onCenter }: MapPa
     counts,
     pins: drawn.pins,
     pinsCapped: drawn.capped,
+    wishes,
     selectedId: selected?.id ?? null,
     selectedAt: selected ? { x: selected.x, y: selected.y } : null,
     select
@@ -265,14 +284,23 @@ export function useZonePane(args: {
   return { ...pane, open, setOpen, hits }
 }
 
-/** What the surface needs from the pane: the pins and the selection. Null ⇒ draw nothing. */
+/** What the surface needs from the pane: the pins, the selection, the wish-list join, and the one
+ *  `select` a clicked pin routes through (MapMobPins.tsx). Null ⇒ draw nothing. */
 export interface PaneOverlay {
   pins: readonly PlacedPin[]
   selectedId: string | null
   selectedAt: { x: number; y: number } | null
+  wishes: ReadonlyMap<string, readonly string[]>
+  select: (row: MapPaneRow, at?: { x: number; y: number }) => void
 }
 
 export function paneOverlay(pane: ZonePaneState): PaneOverlay | null {
   if (!pane.open) return null
-  return { pins: pane.pins, selectedId: pane.selectedId, selectedAt: pane.selectedAt }
+  return {
+    pins: pane.pins,
+    selectedId: pane.selectedId,
+    selectedAt: pane.selectedAt,
+    wishes: pane.wishes,
+    select: pane.select
+  }
 }
