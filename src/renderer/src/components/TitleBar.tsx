@@ -391,7 +391,7 @@ export default function TitleBar({
       }}
     >
       <Typography variant="subtitle2" sx={{ color: 'primary.main', fontWeight: 700, whiteSpace: 'nowrap' }}>
-        EQ Legends Companion
+        EQ Legends Companion TEST
       </Typography>
 
       {/* Drag spacer between brand and the right-hand controls. */}

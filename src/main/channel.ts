@@ -42,15 +42,32 @@ import { logConsoleError, logInfo } from './errorLog'
 
 export type AppChannel = 'prod' | 'dev' | 'e2e'
 
+/**
+ * TEST BUILD (local_all_changes_testing only — never merges to a PR branch). One flag, read
+ * by updater.ts to keep a PACKAGED test build from touching the official update feed. The
+ * identity changes ride in electron-builder.yml; the userData split rides in PROD_DIR_NAME
+ * below; this constant is the one thing runtime code needs to know.
+ */
+export const TEST_BUILD = true
+
 /** userData dir names, relative to `app.getPath('appData')` (%APPDATA% on Windows). */
-const PROD_DIR_NAME = 'everquest-companion'
+// `-test`, NOT the official 'everquest-companion': a distinct dir is what gives the test
+// install its own store, caches and — because Chromium keys the single-instance lock off
+// the user-data dir — the ability to RUN BESIDE the official app instead of focusing it.
+const PROD_DIR_NAME = 'everquest-companion-test'
 const DEV_DIR_NAME = 'everquest-companion-dev'
-/** Pre-rename shared dir (product was "eq-tools"); source of the one-time seed. */
-const LEGACY_DIR_NAME = 'eq-tools'
+/**
+ * Source of the one-time seed: the OFFICIAL install's userData (upstream seeds from the
+ * pre-rename 'eq-tools' here). First launch of the test build copies the user's real
+ * settings, learned overlay and soundpacks out of it — copy, never move — so the two
+ * installs start identical and then diverge freely.
+ */
+const LEGACY_DIR_NAME = 'everquest-companion'
 
 /** electron-store file base name → `<userData>/everquest-companion-progress.json`. */
 export const STORE_NAME = 'everquest-companion-progress'
-const LEGACY_STORE_FILE = 'eq-tools-progress.json'
+/** The official install's store file — same base name; the seed keeps it unchanged. */
+const LEGACY_STORE_FILE = 'everquest-companion-progress.json'
 
 /**
  * State worth carrying across a rename, in copy order. Everything else in a userData dir

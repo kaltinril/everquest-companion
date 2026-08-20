@@ -157,14 +157,14 @@ test('a malformed bucket or region can never produce a match', () => {
 // pinned literally — re-applying the root mints a new one, and a test that fails on a redeploy
 // teaches people to edit tests.
 
-test('the compiled endpoint is https on our own API, in our own region', () => {
-  assert.equal(feedbackEndpointConfigured(), true)
-  const u = new URL(net.FEEDBACK_API_URL)
-  assert.equal(u.protocol, 'https:')
-  assert.match(u.hostname, /^[a-z0-9]+\.execute-api\.us-east-1\.amazonaws\.com$/)
-  assert.equal(u.pathname, '/v1/feedback')
-  assert.equal(u.username, '')
-  assert.equal(u.search, '')
+test('the compiled endpoint is DARK on this branch — the test build has nowhere to send', () => {
+  // Upstream pins the lit endpoint here. On local_all_changes_testing (the neutered
+  // friend-test build) COMPILED_FEEDBACK_API_URL is '' so a report filed from a fork test
+  // install can never land in the creator's triage queue; the pin flips with it. The S3
+  // constants are untouched — `allowedUploadUrl` still refuses every foreign host below,
+  // and with no ingest URL there is no presign leg to reach the bucket anyway.
+  assert.equal(feedbackEndpointConfigured(), false)
+  assert.equal(net.FEEDBACK_API_URL, '')
   assert.equal(net.FEEDBACK_S3_REGION, 'us-east-1')
   assert.match(net.FEEDBACK_S3_BUCKET, /^eqcompanion-logs-[0-9a-f]+$/)
 })
