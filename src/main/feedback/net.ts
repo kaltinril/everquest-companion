@@ -63,8 +63,12 @@ import { E2E } from '../e2e'
  * failing. This is the only value a packaged build can ever use.
  *
  * e.g. 'https://<apiId>.execute-api.us-east-1.amazonaws.com/v1/feedback'
+ *
+ * EMPTIED IN THE TEST BUILD (local_all_changes_testing): a report filed from a fork test
+ * install would land in the creator's triage queue describing code he has never seen. ''
+ * is the dark-build state — the dialog says so honestly and the queue never drains.
  */
-const COMPILED_FEEDBACK_API_URL = 'https://pcy0z3xjp9.execute-api.us-east-1.amazonaws.com/v1/feedback'
+const COMPILED_FEEDBACK_API_URL = ''
 
 /**
  * The S3 bucket the presigned POST must target, and its region. EMPTY alongside the API URL:

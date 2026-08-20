@@ -1,5 +1,9 @@
-appId: com.jmoyers.everquest-companion
-productName: EQ Legends Companion
+# TEST BUILD IDENTITY (local_all_changes_testing only — never merges to a PR branch). A
+# different appId + productName means the NSIS installer registers as a SEPARATE app: it
+# installs beside the official EQ Legends Companion instead of replacing it, gets its own
+# uninstall entry, its own %LOCALAPPDATA%\Programs folder and its own taskbar identity.
+appId: com.kaltinril.everquest-companion.test
+productName: EQ Legends Companion TEST
 copyright: Copyright © 2026 Josh Moyers
 
 directories:
@@ -112,13 +116,11 @@ asarUnpack:
 # `electron-builder install-app-deps`), or it would ship built against the wrong ABI.
 npmRebuild: false
 
-# Auto-update + release hosting: electron-updater pulls from GitHub Releases of
-# this repo. The CI workflows (.github/workflows) publish here; the app reads
-# latest*.yml from the same owner/repo. `channel` is per-release (main vs latest).
-publish:
-  provider: github
-  owner: jmoyers
-  repo: everquest-companion
+# NO `publish` BLOCK IN THE TEST BUILD — deliberately. With one, electron-builder writes
+# app-update.yml pointing at jmoyers/everquest-companion and the packaged app would find the
+# official release, stage it, and `autoInstallOnAppQuit` would silently REPLACE this test
+# install with the official app on quit. Without it no update feed exists at all; updater.ts
+# is also guarded off by TEST_BUILD (channel.ts) so the chip honestly reads "disabled".
 
 win:
   target:
@@ -127,14 +129,11 @@ win:
         - x64
   # Brand the exe + installer with our generated mark (scripts/gen-icon.mts).
   icon: build/icon.ico
-  # We sign+edit the exe so it carries the icon + version metadata (rcedit). This
-  # needs winCodeSign extracted into the electron-builder cache; on Windows that
-  # requires either Developer Mode (symlink privilege) OR the manual cache-seed
-  # workaround (see scripts/seed-wincodesign.ps1). CI builds are SIGNED via Azure
-  # Artifact Signing (account jmoyers-eqtools, profile eq-companion-public — the
-  # azureSignOptions args are injected by build.yml when the AZURE_* secrets
-  # exist); local `npm run dist` builds stay unsigned.
-  signAndEditExecutable: true
+  # OFF in the test build: rcedit/signing needs winCodeSign extracted into the
+  # electron-builder cache (Developer Mode or scripts/seed-wincodesign.ps1), which is
+  # friction a local test build doesn't need — and an unbranded exe is one more way to
+  # tell the two installs apart. The official yml keeps `true` with the full rationale.
+  signAndEditExecutable: false
   # `sign` and `publisherName` MOVED UNDER signtoolOptions in electron-builder 26 —
   # they are no longer valid keys directly on `win` and the build refuses to start
   # ("configuration.win should be one of these: null") if they are left there.
@@ -170,5 +169,5 @@ nsis:
   deleteAppDataOnUninstall: false
   createDesktopShortcut: true
   createStartMenuShortcut: true
-  shortcutName: EQ Legends Companion
-  artifactName: everquest-companion-Setup-${version}.${ext}
+  shortcutName: EQ Legends Companion TEST
+  artifactName: everquest-companion-test-Setup-${version}.${ext}

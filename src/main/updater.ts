@@ -151,6 +151,7 @@ import {
   nextCheckDelayMs,
   shouldRetryCheck
 } from '../shared/update'
+import { TEST_BUILD } from './channel'
 import { logError, logInfo, logWarn } from './errorLog'
 import {
   UPDATER_LIBRARY_SOURCE,
@@ -554,7 +555,10 @@ export function initUpdater(
   ipcMain.handle(IPC.getAppVersion, () => app.getVersion())
   ipcMain.handle(IPC.getUpdateStatus, () => lastStatus)
 
-  if (!app.isPackaged) {
+  // TEST_BUILD takes the same early-out as dev: a packaged test build ships no app-update.yml
+  // (electron-builder.yml dropped `publish`), and even with one, checking the official feed
+  // would stage the creator's release and silently replace this install on quit.
+  if (!app.isPackaged || TEST_BUILD) {
     // Say so in the status itself: without the flag the chip renders "not checked yet"
     // forever (dev never checks), which reads as a broken updater rather than an absent one.
     // No checkedAt — a stamp inherited from the store would claim a check this process
@@ -562,7 +566,7 @@ export function initUpdater(
     lastStatus = { state: 'idle', disabled: true }
     ipcMain.handle(IPC.installUpdate, noInstallInDev)
     ipcMain.handle(IPC.checkForUpdates, () => lastStatus)
-    logInfo('[everquest-companion] Auto-update disabled (dev / not packaged).')
+    logInfo('[everquest-companion] Auto-update disabled (dev / not packaged / test build).')
     return
   }
 

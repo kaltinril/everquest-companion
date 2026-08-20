@@ -34,8 +34,12 @@ import type { TelemetryBatch, TelemetryPrefs } from '../../shared/telemetry'
  * uses (docs/plans/usage-analytics.md T5), in our own AWS account.
  *
  * This is the only value any build can ever use. It is a constant, not a setting.
+ *
+ * EMPTIED IN THE TEST BUILD (local_all_changes_testing): a fork test install must not mix its
+ * usage counts into the creator's fleet data. '' is the dark-build state every gate below
+ * already honors — nothing transmits, structurally. The official URL lives on main.
  */
-export const TELEMETRY_API_URL = 'https://pcy0z3xjp9.execute-api.us-east-1.amazonaws.com/v1/telemetry'
+export const TELEMETRY_API_URL = ''
 
 /** JSON POST budget. A batch is counters, not a log slice — feedback's submit budget is plenty. */
 export const TELEMETRY_TIMEOUT_MS = 15_000
