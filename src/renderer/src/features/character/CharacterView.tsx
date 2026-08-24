@@ -51,7 +51,7 @@
 // separately asserts that the WINDOW itself never scrolls, which is the half of the law that has no
 // carve-outs anywhere.
 
-import { type JSX } from 'react'
+import { useMemo, type JSX } from 'react'
 import { Box, Paper, Stack, Typography } from '@mui/material'
 import type { SheetCellView } from '@shared/characterSheet'
 // The `/outputfile` registry (JOS-44) owns the command string and — since JOS-185 — the steps
@@ -62,7 +62,12 @@ import CarryAll from './CarryAll'
 import CharacterIdentity from './CharacterIdentity'
 import GearStats from './GearStats'
 import SlotGrid from './SlotGrid'
+// The per-slot exaltation join (owner ask 2026-08-23): the wish list's donor rows and the gear
+// corpus, folded once per change into "which wished effect belongs to which worn slot".
+import { wishesBySlot } from './slotSockets'
 import { useCharacterSheet } from './useCharacterSheet'
+import { useGearIndex } from '../gear/gearData'
+import { useWishlist } from '../wishlist/useWishlist'
 
 /** The dump this tab is fed by, as the registry states it. */
 const INVENTORY = outputKind('inventory')
@@ -102,6 +107,14 @@ function Unplaced({ cells }: { cells: SheetCellView[] }): JSX.Element | null {
 
 export default function CharacterView(): JSX.Element {
   const { sheet, ready } = useCharacterSheet()
+  const wishes = useWishlist()
+  const gear = useGearIndex()
+  // Keyed on the rows array (stable for the window's life - `useGearIndex` caches) and the entries
+  // array (a new list identity per wish edit), the `usePlanCorpora` precedent.
+  const slotWishes = useMemo(() => {
+    const byKey = new Map(gear.rows.map((row) => [row.key, row]))
+    return wishesBySlot(wishes.list.entries, byKey)
+  }, [gear.rows, wishes.list.entries])
 
   return (
     // `minHeight` rather than `height` — see the layout note in the header. It still FILLS the
@@ -138,7 +151,7 @@ export default function CharacterView(): JSX.Element {
           data-testid="character-sheet"
         >
           <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-            <SlotGrid cells={sheet.cells} />
+            <SlotGrid cells={sheet.cells} slotWishes={slotWishes} />
           </Box>
           <Stack spacing={1} sx={{ width: { xs: '100%', lg: 340 }, flexShrink: 0 }}>
             <GearStats totals={sheet.totals} />
