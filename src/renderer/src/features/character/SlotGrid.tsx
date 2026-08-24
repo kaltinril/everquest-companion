@@ -34,7 +34,10 @@
 
 import type { JSX } from 'react'
 import { Box, Chip, Paper, Stack, Typography } from '@mui/material'
+import Tooltip from '../../lib/Tooltip'
 import type { SheetCellView, SheetColumn } from '@shared/characterSheet'
+import type { EquipSlot } from '@shared/planner/types'
+import { slotOfCell, socketStates, type SlotWish } from './slotSockets'
 import { EQ_ITEM_COLORS, itemIconUrl } from '../../lib/ItemWindow'
 import { KnownItemTooltip } from '../../lib/KnownItemTooltip'
 
@@ -111,8 +114,68 @@ function ExaltationChips({ names }: { names: readonly string[] }): JSX.Element |
   )
 }
 
+/**
+ * THE SOCKET LINE (owner ask, 2026-08-23): which of the four transferable sockets this item's
+ * ` +N` has unlocked, off the wiki's own unlock table (`slotSockets.socketStates` — including the
+ * base floor for a name that stated no tier). A filled chip is an OPEN socket; a dimmed one names
+ * the tier that opens it, so the line doubles as "merge to +3 and Worn opens". What is IN a socket
+ * is the row above this one — the client's own chips — because the dump names contents and this
+ * line names capacity, and the two are different facts from different sources.
+ */
+function SocketLine({ tier }: { tier: number | undefined }): JSX.Element {
+  return (
+    <Box data-testid="character-sockets" sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.3, mt: 0.3 }}>
+      {socketStates(tier).map((s) => (
+        <Chip
+          key={s.type}
+          label={s.unlocked ? s.type : `${s.type} @+${String(s.unlocksAt)}`}
+          size="small"
+          variant={s.unlocked ? 'filled' : 'outlined'}
+          data-testid={`character-socket-${s.type.toLowerCase()}`}
+          title={s.what}
+          sx={{
+            height: 16,
+            opacity: s.unlocked ? 1 : 0.5,
+            '& .MuiChip-label': { px: 0.5, fontSize: 10, lineHeight: 1.6 }
+          }}
+        />
+      ))}
+    </Box>
+  )
+}
+
+/**
+ * THE WISHES THAT BELONG HERE — donor wishes whose corpus row fits this cell's slot
+ * (`slotSockets.wishesBySlot`, the R2 transfer rule read for display). Drawn on EMPTY cells too:
+ * "what I want for each slot" is exactly as much a fact about a bare wrist as a full one. The chip
+ * names the EFFECT (what the wish was about); the donor item and its merge cost ride in the hover;
+ * the route to go get it stays the Wish list tab's job.
+ */
+function SlotWishChips({ wishes }: { wishes: readonly SlotWish[] }): JSX.Element | null {
+  if (wishes.length === 0) return null
+  return (
+    <Box data-testid="character-slot-wishes" sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.3, mt: 0.3 }}>
+      {wishes.map((w, i) => (
+        <Tooltip
+          key={`${w.name}#${String(i)}`}
+          title={`${w.name}${w.tierRequired === undefined ? '' : ` - +${String(w.tierRequired)} to extract`} - on your wish list`}
+        >
+          <Chip
+            label={w.effect}
+            size="small"
+            color="warning"
+            variant="outlined"
+            data-testid="character-slot-wish"
+            sx={{ height: 16, maxWidth: '100%', '& .MuiChip-label': { px: 0.5, fontSize: 10, lineHeight: 1.6 } }}
+          />
+        </Tooltip>
+      ))}
+    </Box>
+  )
+}
+
 /** One cell: icon, slot label, the item name (hoverable) with its exaltations, or a quiet empty line. */
-function SlotCell({ cell }: { cell: SheetCellView }): JSX.Element {
+function SlotCell({ cell, wishes }: { cell: SheetCellView; wishes: readonly SlotWish[] }): JSX.Element {
   const item = cell.item
   return (
     <Paper
@@ -146,23 +209,29 @@ function SlotCell({ cell }: { cell: SheetCellView }): JSX.Element {
               </Box>
             </KnownItemTooltip>
             <ExaltationChips names={item.exaltations} />
+            <SocketLine tier={item.tier} />
           </>
         ) : (
           <Typography variant="caption" color="text.disabled" sx={{ display: 'block', opacity: 0.6 }}>
             empty
           </Typography>
         )}
+        <SlotWishChips wishes={wishes} />
       </Box>
     </Paper>
   )
 }
 
-function Column({ cells }: { cells: SheetCellView[] }): JSX.Element {
+/** The empty default: a grid with no wish map draws exactly what it drew before this feature. */
+const NO_WISHES: ReadonlyMap<EquipSlot, readonly SlotWish[]> = new Map()
+
+function Column({ cells, slotWishes }: { cells: SheetCellView[]; slotWishes: ReadonlyMap<EquipSlot, readonly SlotWish[]> }): JSX.Element {
   return (
     <Stack spacing={0.6} sx={{ flex: 1, minWidth: 190 }}>
-      {cells.map((c) => (
-        <SlotCell key={c.id} cell={c} />
-      ))}
+      {cells.map((c) => {
+        const slot = slotOfCell(c.location)
+        return <SlotCell key={c.id} cell={c} wishes={(slot && slotWishes.get(slot)) ?? []} />
+      })}
     </Stack>
   )
 }
@@ -170,19 +239,30 @@ function Column({ cells }: { cells: SheetCellView[] }): JSX.Element {
 const inColumn = (cells: SheetCellView[], column: SheetColumn): SheetCellView[] =>
   cells.filter((c) => c.column === column)
 
-export default function SlotGrid({ cells }: { cells: SheetCellView[] }): JSX.Element {
+export default function SlotGrid({
+  cells,
+  slotWishes = NO_WISHES
+}: {
+  cells: SheetCellView[]
+  /** donor wishes placed by slot (`slotSockets.wishesBySlot`); absent draws the pre-feature grid */
+  slotWishes?: ReadonlyMap<EquipSlot, readonly SlotWish[]>
+}): JSX.Element {
   const bottom = inColumn(cells, 'bottom')
+  const wishesFor = (c: SheetCellView): readonly SlotWish[] => {
+    const slot = slotOfCell(c.location)
+    return (slot && slotWishes.get(slot)) ?? []
+  }
   return (
     <Stack spacing={0.6} data-testid="character-slot-grid">
       <Stack direction={{ xs: 'column', md: 'row' }} spacing={0.6} alignItems="stretch">
-        <Column cells={inColumn(cells, 'left')} />
-        <Column cells={inColumn(cells, 'right')} />
+        <Column cells={inColumn(cells, 'left')} slotWishes={slotWishes} />
+        <Column cells={inColumn(cells, 'right')} slotWishes={slotWishes} />
       </Stack>
       {/* The bottom row wraps rather than shrinking — a weapon name is world-supplied text. */}
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
         {bottom.map((c) => (
           <Box key={c.id} sx={{ flex: '1 1 190px', minWidth: 190 }}>
-            <SlotCell cell={c} />
+            <SlotCell cell={c} wishes={wishesFor(c)} />
           </Box>
         ))}
       </Box>
