@@ -58,6 +58,12 @@ const SHEET = '[data-testid="character-sheet"]'
 const SLOT_GRID = '[data-testid="character-slot-grid"]'
 /** JOS-327: the chips under a worn item's name, one per socketed exaltation. */
 const EXALTATION = '[data-testid="character-exaltation"]'
+/** The socket line (owner ask 2026-08-23): four chips under a worn item whose name states a `+N`. */
+const SOCKETS = '[data-testid="character-sockets"]'
+const SOCKET = '[data-testid^="character-socket-"]'
+/** …of which the OPEN ones are MUI's filled variant; the locked ones are outlined and dimmed. */
+const SOCKET_OPEN = `${SOCKET}.MuiChip-filled`
+const cellOf = (id: string): string => `[data-testid="character-slot-${id}"]`
 
 /** JOS-327: everything you carry. */
 const CARRY = '[data-testid="character-carry"]'
@@ -79,6 +85,12 @@ const CELLS = 24
 const WORN = 22
 /** Six `(Exaltation)`-suffixed child rows hang off the WORN items (bag sockets are not drawn here). */
 const EXALTATIONS = 6
+/**
+ * All but one of the worn items state a ` +N` (Pauldrons of Power is the base-name one), and the
+ * socket line is drawn for exactly those. Head is `Valorium Helmet +1`; Hands is `Gauntlets of
+ * Fiery Might +5`.
+ */
+const TIERED = 21
 /** Every non-empty row of every table in the dump. */
 const CARRIED = 123
 /** The key rings' 37 rows — the lane chip's own count, and what clicking it must leave on screen. */
@@ -214,6 +226,35 @@ async function stepSheet(page: Page): Promise<void> {
     drawn === EXALTATIONS,
     `${String(drawn)} chips under ${String(await countOf(page, SLOT_GRID))} grid(s)`
   )
+}
+
+// ── the socket line (owner ask 2026-08-23) ─────────────────────────────────────────────────
+
+/**
+ * The unlock ladder under a worn item is the wiki's table at the tier the dump's own name stated —
+ * and ONLY where the name stated one. Both halves are asserted, the JOS-327 exaltation-chip shape:
+ * the line exists where it must, is absent where it must not, and the filled count is the tier.
+ */
+async function stepSockets(page: Page): Promise<void> {
+  const lines = await countOf(page, SOCKETS)
+  check(
+    `every worn item whose name states a +N draws a socket line (${String(TIERED)})`,
+    lines === TIERED,
+    `${String(lines)} lines`
+  )
+  check(
+    '…and the one worn item with no +N in its name draws none - an unstated tier is a silence, not "all locked"',
+    (await countOf(page, `${cellOf('shoulders')} ${SOCKETS}`)) === 0
+  )
+  const headAll = await countOf(page, `${cellOf('head')} ${SOCKET}`)
+  const headOpen = await countOf(page, `${cellOf('head')} ${SOCKET_OPEN}`)
+  check(
+    'a +1 helmet shows four sockets with exactly one of them open',
+    headAll === 4 && headOpen === 1,
+    `${String(headOpen)} open of ${String(headAll)}`
+  )
+  const handsOpen = await countOf(page, `${cellOf('hands')} ${SOCKET_OPEN}`)
+  check('…and +5 gauntlets show all four open', handsOpen === 4, `${String(handsOpen)} open`)
 }
 
 // ── everything you carry ───────────────────────────────────────────────────────────────────
@@ -393,6 +434,7 @@ async function main(): Promise<void> {
 
     if (await stepReleased(page)) {
       await stepSheet(page)
+      await stepSockets(page)
       await stepCarry(page)
       await stepLayout(page)
       await stepSearch(page)
