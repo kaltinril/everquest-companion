@@ -31,17 +31,37 @@
 // on the body and nobody wears a backpack in an ear. The general case is left to
 // `looksLikeContainer()`, which is an opt-in guess with its evidence attached; this surface never
 // needs it. None of that reaches the screen: there is no "probably" chip and no footnote.
+//
+// ---------------------------------------------------------------------------
+// AND TWO MORE ROWS SINCE THE OWNER ASK OF 2026-08-23 (slotSockets.ts owns the join)
+// ---------------------------------------------------------------------------
+// Under the socketed chips, the SOCKET LINE — which of the four transferable sockets the item's
+// ` +N` has opened — and, last, the WISH CHIPS: every wish on this character's list whose corpus row
+// fits the cell's slot, gear wishes and donor wishes alike. Both rows are read, never inferred: the
+// socket line is the wiki's unlock table at the tier the dump's own name stated, and a wish chip is
+// a line the user already wrote. The grid closes with a one-line legend for the two rows, because a
+// filled chip and a dimmed chip are a code, and a code with no key is a guess.
 
 import type { JSX } from 'react'
 import { Box, Chip, Paper, Stack, Typography } from '@mui/material'
 import Tooltip from '../../lib/Tooltip'
 import type { SheetCellView, SheetColumn } from '@shared/characterSheet'
 import type { EquipSlot } from '@shared/planner/types'
-import { slotOfCell, socketStates, type SlotWish } from './slotSockets'
+import { cellsShowingWishes, slotOfCell, socketStates, type SlotWish } from './slotSockets'
 import { EQ_ITEM_COLORS, itemIconUrl } from '../../lib/ItemWindow'
 import { KnownItemTooltip } from '../../lib/KnownItemTooltip'
 
 const ICON = 28
+
+/** The one chip geometry every row under an item name shares. */
+const SMALL_CHIP = {
+  height: 16,
+  maxWidth: '100%',
+  '& .MuiChip-label': { px: 0.5, fontSize: 10, lineHeight: 1.6 }
+}
+
+/** The one row geometry those chips wrap in. */
+const CHIP_ROW = { display: 'flex', flexWrap: 'wrap', gap: 0.3, mt: 0.3 } as const
 
 /** The item's icon, or a same-sized empty frame so every cell lines up. */
 function SlotIcon({ cell }: { cell: SheetCellView }): JSX.Element {
@@ -89,10 +109,7 @@ function SlotIcon({ cell }: { cell: SheetCellView }): JSX.Element {
 function ExaltationChips({ names }: { names: readonly string[] }): JSX.Element | null {
   if (names.length === 0) return null
   return (
-    <Box
-      data-testid="character-exaltations"
-      sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.3, mt: 0.3 }}
-    >
+    <Box data-testid="character-exaltations" sx={CHIP_ROW}>
       {names.map((name, i) => (
         <Chip
           // The same exaltation can legitimately be socketed twice into one item, so the name is
@@ -102,12 +119,7 @@ function ExaltationChips({ names }: { names: readonly string[] }): JSX.Element |
           size="small"
           variant="outlined"
           data-testid="character-exaltation"
-          sx={{
-            height: 16,
-            maxWidth: '100%',
-            borderColor: EQ_ITEM_COLORS.border,
-            '& .MuiChip-label': { px: 0.5, fontSize: 10, lineHeight: 1.6 }
-          }}
+          sx={{ ...SMALL_CHIP, borderColor: EQ_ITEM_COLORS.border }}
         />
       ))}
     </Box>
@@ -116,57 +128,30 @@ function ExaltationChips({ names }: { names: readonly string[] }): JSX.Element |
 
 /**
  * THE SOCKET LINE (owner ask, 2026-08-23): which of the four transferable sockets this item's
- * ` +N` has unlocked, off the wiki's own unlock table (`slotSockets.socketStates` — including the
- * base floor for a name that stated no tier). A filled chip is an OPEN socket; a dimmed one names
- * the tier that opens it, so the line doubles as "merge to +3 and Worn opens". What is IN a socket
- * is the row above this one — the client's own chips — because the dump names contents and this
- * line names capacity, and the two are different facts from different sources.
+ * ` +N` has unlocked, off the wiki's own unlock table (`slotSockets.socketStates`). A filled chip
+ * is an OPEN socket; a dimmed one names the tier that opens it, so the line doubles as "merge to
+ * +3 and Worn opens". NOTHING AT ALL for a name that stated no tier — `socketStates` returns no
+ * rows and the line does not mount — because four locked chips under a quest token would promise
+ * a ladder the dump never mentioned. What is IN a socket is the row above this one — the client's
+ * own chips — because the dump names contents and this line names capacity, and the two are
+ * different facts from different sources.
+ *
+ * The hover is the wiki's one-line description of the socket type, through `lib/Tooltip` like
+ * every other hover in the app (the hand-cursor rule); the tier lives on the chip's own label.
  */
-function SocketLine({ tier }: { tier: number | undefined }): JSX.Element {
+function SocketLine({ tier }: { tier: number | undefined }): JSX.Element | null {
+  const states = socketStates(tier)
+  if (states.length === 0) return null
   return (
-    <Box data-testid="character-sockets" sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.3, mt: 0.3 }}>
-      {socketStates(tier).map((s) => (
-        <Chip
-          key={s.type}
-          label={s.unlocked ? s.type : `${s.type} @+${String(s.unlocksAt)}`}
-          size="small"
-          variant={s.unlocked ? 'filled' : 'outlined'}
-          data-testid={`character-socket-${s.type.toLowerCase()}`}
-          title={s.what}
-          sx={{
-            height: 16,
-            opacity: s.unlocked ? 1 : 0.5,
-            '& .MuiChip-label': { px: 0.5, fontSize: 10, lineHeight: 1.6 }
-          }}
-        />
-      ))}
-    </Box>
-  )
-}
-
-/**
- * THE WISHES THAT BELONG HERE — donor wishes whose corpus row fits this cell's slot
- * (`slotSockets.wishesBySlot`, the R2 transfer rule read for display). Drawn on EMPTY cells too:
- * "what I want for each slot" is exactly as much a fact about a bare wrist as a full one. The chip
- * names the EFFECT (what the wish was about); the donor item and its merge cost ride in the hover;
- * the route to go get it stays the Wish list tab's job.
- */
-function SlotWishChips({ wishes }: { wishes: readonly SlotWish[] }): JSX.Element | null {
-  if (wishes.length === 0) return null
-  return (
-    <Box data-testid="character-slot-wishes" sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.3, mt: 0.3 }}>
-      {wishes.map((w, i) => (
-        <Tooltip
-          key={`${w.name}#${String(i)}`}
-          title={`${w.name}${w.tierRequired === undefined ? '' : ` - +${String(w.tierRequired)} to extract`} - on your wish list`}
-        >
+    <Box data-testid="character-sockets" sx={CHIP_ROW}>
+      {states.map((s) => (
+        <Tooltip key={s.type} title={s.what}>
           <Chip
-            label={w.effect}
+            label={s.unlocked ? s.type : `${s.type} @+${String(s.unlocksAt)}`}
             size="small"
-            color="warning"
-            variant="outlined"
-            data-testid="character-slot-wish"
-            sx={{ height: 16, maxWidth: '100%', '& .MuiChip-label': { px: 0.5, fontSize: 10, lineHeight: 1.6 } }}
+            variant={s.unlocked ? 'filled' : 'outlined'}
+            data-testid={`character-socket-${s.type.toLowerCase()}`}
+            sx={{ ...SMALL_CHIP, opacity: s.unlocked ? 1 : 0.5 }}
           />
         </Tooltip>
       ))}
@@ -174,7 +159,50 @@ function SlotWishChips({ wishes }: { wishes: readonly SlotWish[] }): JSX.Element
   )
 }
 
-/** One cell: icon, slot label, the item name (hoverable) with its exaltations, or a quiet empty line. */
+/**
+ * One clause per hover, and the clause is the thing the chip's own label does not say: a donor
+ * chip is labelled by EFFECT, so its hover names the item it comes out of (and the merge tier that
+ * lets it out); a gear chip is labelled by ITEM, so its hover says only why it is here. The route
+ * to go and get either is the Wish list tab's, and the legend under the grid says so once rather
+ * than every chip saying it.
+ */
+function wishHover(w: SlotWish): string {
+  if (w.kind === 'gear') return 'On your wish list'
+  return w.tierRequired === undefined ? `From ${w.name}` : `From ${w.name} at +${String(w.tierRequired)}`
+}
+
+/**
+ * THE WISHES THAT BELONG HERE — every wish whose corpus row fits this cell's slot
+ * (`slotSockets.wishesBySlot`, the R2 transfer rule read for display). Drawn on EMPTY cells too:
+ * "what I want for each slot" is exactly as much a fact about a bare wrist as a full one. A DONOR
+ * chip names the effect (what the wish was about) and a GEAR chip names the item (the wish IS the
+ * item); the two wear different colours so a cell that carries both reads as two questions.
+ */
+function SlotWishChips({ wishes }: { wishes: readonly SlotWish[] }): JSX.Element | null {
+  if (wishes.length === 0) return null
+  return (
+    <Box data-testid="character-slot-wishes" sx={CHIP_ROW}>
+      {wishes.map((w, i) => (
+        <Tooltip key={`${w.name}#${String(i)}`} title={wishHover(w)}>
+          <Chip
+            label={w.effect ?? w.name}
+            size="small"
+            color={w.kind === 'donor' ? 'warning' : 'info'}
+            variant="outlined"
+            data-testid={`character-slot-wish-${w.kind}`}
+            sx={SMALL_CHIP}
+          />
+        </Tooltip>
+      ))}
+    </Box>
+  )
+}
+
+/**
+ * One cell: icon, slot label, then — for a worn item — the item name (hoverable), its socketed
+ * exaltations and its socket line, or a quiet empty line; and last, filled or not, the wishes
+ * placed at this cell's slot.
+ */
 function SlotCell({ cell, wishes }: { cell: SheetCellView; wishes: readonly SlotWish[] }): JSX.Element {
   const item = cell.item
   return (
@@ -224,15 +252,49 @@ function SlotCell({ cell, wishes }: { cell: SheetCellView; wishes: readonly Slot
 
 /** The empty default: a grid with no wish map draws exactly what it drew before this feature. */
 const NO_WISHES: ReadonlyMap<EquipSlot, readonly SlotWish[]> = new Map()
+const NONE: readonly SlotWish[] = []
 
-function Column({ cells, slotWishes }: { cells: SheetCellView[]; slotWishes: ReadonlyMap<EquipSlot, readonly SlotWish[]> }): JSX.Element {
+type WishesOf = (cell: SheetCellView) => readonly SlotWish[]
+
+/**
+ * The one lookup every cell goes through: nothing unless this cell is the one of its slot's pair
+ * that carries the wishes (`cellsShowingWishes`), else the slot's list.
+ */
+function wishLookup(
+  slotWishes: ReadonlyMap<EquipSlot, readonly SlotWish[]>,
+  showing: ReadonlySet<string>
+): WishesOf {
+  return (cell) => {
+    if (!showing.has(cell.id)) return NONE
+    const slot = slotOfCell(cell.location)
+    return (slot && slotWishes.get(slot)) ?? NONE
+  }
+}
+
+function Column({ cells, wishesOf }: { cells: SheetCellView[]; wishesOf: WishesOf }): JSX.Element {
   return (
     <Stack spacing={0.6} sx={{ flex: 1, minWidth: 190 }}>
-      {cells.map((c) => {
-        const slot = slotOfCell(c.location)
-        return <SlotCell key={c.id} cell={c} wishes={(slot && slotWishes.get(slot)) ?? []} />
-      })}
+      {cells.map((c) => (
+        <SlotCell key={c.id} cell={c} wishes={wishesOf(c)} />
+      ))}
     </Stack>
+  )
+}
+
+/**
+ * The key to the two coded rows, in one caption, shown only while there is something on the grid
+ * for it to explain. It is also where "where to get them" is answered, once: the chips are dead
+ * ends by construction (this tab takes no router), so the legend names the tab that has the route.
+ */
+function Legend({ sockets, wishes }: { sockets: boolean; wishes: boolean }): JSX.Element | null {
+  if (!sockets && !wishes) return null
+  const parts: string[] = []
+  if (sockets) parts.push('Sockets: a filled chip is open, a dimmed one opens at the +N it names.')
+  if (wishes) parts.push('Wish chips are your wish list - the Wish list tab has the route.')
+  return (
+    <Typography variant="caption" color="text.secondary" data-testid="character-slot-legend">
+      {parts.join(' ')}
+    </Typography>
   )
 }
 
@@ -244,28 +306,29 @@ export default function SlotGrid({
   slotWishes = NO_WISHES
 }: {
   cells: SheetCellView[]
-  /** donor wishes placed by slot (`slotSockets.wishesBySlot`); absent draws the pre-feature grid */
+  /** wishes placed by slot (`slotSockets.wishesBySlot`); absent draws the pre-feature grid */
   slotWishes?: ReadonlyMap<EquipSlot, readonly SlotWish[]>
 }): JSX.Element {
   const bottom = inColumn(cells, 'bottom')
-  const wishesFor = (c: SheetCellView): readonly SlotWish[] => {
-    const slot = slotOfCell(c.location)
-    return (slot && slotWishes.get(slot)) ?? []
-  }
+  const wishesOf = wishLookup(slotWishes, cellsShowingWishes(cells))
   return (
     <Stack spacing={0.6} data-testid="character-slot-grid">
       <Stack direction={{ xs: 'column', md: 'row' }} spacing={0.6} alignItems="stretch">
-        <Column cells={inColumn(cells, 'left')} slotWishes={slotWishes} />
-        <Column cells={inColumn(cells, 'right')} slotWishes={slotWishes} />
+        <Column cells={inColumn(cells, 'left')} wishesOf={wishesOf} />
+        <Column cells={inColumn(cells, 'right')} wishesOf={wishesOf} />
       </Stack>
       {/* The bottom row wraps rather than shrinking — a weapon name is world-supplied text. */}
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
         {bottom.map((c) => (
           <Box key={c.id} sx={{ flex: '1 1 190px', minWidth: 190 }}>
-            <SlotCell cell={c} wishes={wishesFor(c)} />
+            <SlotCell cell={c} wishes={wishesOf(c)} />
           </Box>
         ))}
       </Box>
+      <Legend
+        sockets={cells.some((c) => c.item?.tier !== undefined)}
+        wishes={cells.some((c) => wishesOf(c).length > 0)}
+      />
     </Stack>
   )
 }
