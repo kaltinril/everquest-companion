@@ -12,7 +12,6 @@
 // Pure and node-tested (tests/characterSlotSockets.test.mts): relative value imports, no React.
 
 import {
-  EXALTATION_SLOT_TYPES,
   unlockedExaltationSlots,
   type ExaltationSlotType
 } from '../../../../shared/itemStats'
@@ -40,13 +39,12 @@ export interface SocketState extends ExaltationSlotType {
  * dump said — it said nothing. The item window's own tier ladder is the surface that answers for
  * a base-name item.
  */
+/** The four transferable sockets: everything a +4 unlocks minus Ornamentation, which sits first at 0. */
+const TRANSFERABLE: readonly ExaltationSlotType[] = unlockedExaltationSlots(4).slice(1)
+
 export function socketStates(tier: number | undefined): SocketState[] {
   if (tier === undefined) return []
-  const open = new Set(unlockedExaltationSlots(tier).map((s) => s.type))
-  return EXALTATION_SLOT_TYPES.filter((s) => s.unlocksAt > 0).map((s) => ({
-    ...s,
-    unlocked: open.has(s.type)
-  }))
+  return TRANSFERABLE.map((s) => ({ ...s, unlocked: tier >= s.unlocksAt }))
 }
 
 /** One wish, placed at a slot: what to say on the chip and in its hover. */
