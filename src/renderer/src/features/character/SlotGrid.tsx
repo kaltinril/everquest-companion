@@ -299,6 +299,7 @@ function Legend({ sockets, wishes }: { sockets: boolean; wishes: boolean }): JSX
 }
 
 const inColumn = (cells: SheetCellView[], column: SheetColumn): SheetCellView[] =>
+  // eslint-disable-next-line eqc/no-domain-munging -- JOS-459 cutover ledger item 3: no served view source answers this yet, so the renderer still derives SheetCellView. Becomes a view descriptor when the source lands.
   cells.filter((c) => c.column === column)
 
 export default function SlotGrid({
