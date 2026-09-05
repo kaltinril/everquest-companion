@@ -224,8 +224,11 @@ const SAVE_KEYS: readonly GearStatKey[] = GEAR_STAT_KEYS.filter((k) => k.startsW
  *   * HASTE — a straight multiplier on swings, and WORN HASTE DOES NOT STACK, so `roleValue`
  *     credits it only above what the player already owns (the 2026-08-22 ruling, below) — and on
  *     a WEAPON row it prices at NOTHING (fork ruling 2026-09-05, the Fangol case, argued at the
- *     term in `roleValue`): the loadout's haste lives in belts and capes, weapons compete on
- *     damage, and the owned-haste ceiling likewise reads only NON-weapon sources (`planOwned`).
+ *     term in `roleValue`): the loadout's haste lives in belts and capes and weapons compete on
+ *     damage. The weight is 0.3 because haste MULTIPLIES the weapon term: 41% of a ~27-point
+ *     weapon is ~11 points, and the flat 4 this table carried priced one haste belt at SIX
+ *     weapons — the whole-corpus audit (2026-09-05) had haste gear as the top of every glass-
+ *     cannon list, above every actual weapon.
  *   * DMG_BONUS — a flat add per hit, applied AFTER the multiplied roll. It rides through the
  *     ratio (`gearEffectiveRatio`, at its measured 1/17th-of-a-DMG-point worth) and appears in NO
  *     `stats` row (fork decision, kaltinril 2026-09-04): weighted flat at 3 it outranked eight
@@ -311,7 +314,7 @@ const MELEE_STATS: Partial<Record<GearStatKey, number>> = {
   MANA_REGEN: 1,
   END_REGEN: 1,
   ATTACK: 2,
-  HASTE: 4
+  HASTE: 0.3
 }
 const ONE_HAND_DPS: RoleWeights = {
   stats: { ...MELEE_STATS, BACKSTAB: 2 },
@@ -329,13 +332,14 @@ const TWO_HAND_DPS: RoleWeights = { ...ONE_HAND_DPS, stats: { ...MELEE_STATS } }
  * so it is the one attribute a ranged focus weighs ABOVE the melee's (2 to their 1), and STR falls
  * to 0.8 because a bow does not read it the way a sword does. ATTACK still counts (the ranged
  * rolls read it too), haste applies to ranged delay (2, below the melee's 4 — a ranged fight is
- * rarely a sustained swing), and the damage bonus is the one-hander's 3. Everything else is the
+ * rarely a sustained swing — it inherits the melee weight), and the damage bonus rides the
+ * ratio. Everything else is the
  * melee profile: a ranger takes hits, drinks, and has a bar. The weapon RATIO is the same 20 and
  * reads DMG/DELAY off a bow exactly as off an axe — the corpus states both for every bow and
  * throwing weapon, so nothing here is a ranged-only invention.
  */
 const RANGED: RoleWeights = {
-  stats: { ...MELEE_STATS, STR: 0.8, DEX: 2, HASTE: 2 },
+  stats: { ...MELEE_STATS, STR: 0.8, DEX: 2 },
   manaStat: 0.1,
   ehp: 0.1,
   ratio: 40,
@@ -469,11 +473,14 @@ export function readsSurvivability(role: GearRole): boolean {
 
 /** `[glass cannon, wooden sword]` per defense row; the table's stated value sits at the midpoint. */
 const DEFENSE_SPANS = {
-  AC: [0.5, 1.5],
+  // AC slides from ZERO like the other pure-defense rows (fork, kaltinril 2026-09-05: "so at
+  // glass cannon AC has more power than HP?" — it did, as a leftover 0.5 floor from the old
+  // table, and a 25-AC shield was outbidding stat items at the damage end on mitigation alone).
+  AC: [0, 2],
   AGI: [0.1, 0.3],
   DEX: [0.2, 0.6],
   STA: [0.2, 0.6],
-  HP_REGEN: [3, 9],
+  HP_REGEN: [0, 12],
   ehp: [0, 0.2],
   saves: [0, 0.2]
 } as const

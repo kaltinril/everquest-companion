@@ -275,9 +275,10 @@ test('what you OWN but do not WEAR that beats what you wear is called out — th
   const scope = { role: 'dps' as const, classes: ['WAR' as const] }
   const ups = ownedUpgrades(keys, byKey, ownedSide(keys, byKey, scope), scope)
   assert.deepEqual(ups.map((u) => `${u.name}:${u.slot}`).sort(), ['Fine Tunic:CHEST', 'Haste Sword:PRIMARY'])
-  // Sorted best-first — and the sword's 36% haste buys it NOTHING here (the Fangol ruling: haste
-  // prices at zero on a weapon row), so the chest's AC outranks the sword's plain ratio.
-  assert.equal(ups[0].name, 'Fine Tunic')
+  // Sorted best-first: the sword's plain RATIO leads — its 36% haste buys it nothing (the Fangol
+  // ruling), and since the 2026-09-05 audit AC slides from zero, so the chest's 30 AC at the
+  // damage-leaning default is worth less than a real weapon's white damage.
+  assert.equal(ups[0].name, 'Haste Sword')
   // Nothing worn, nothing advised about it: the worn tunic itself never appears.
   assert.equal(ups.some((u) => u.key === 'plain tunic'), false)
 })
