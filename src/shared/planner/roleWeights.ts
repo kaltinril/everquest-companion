@@ -480,7 +480,12 @@ const DEFENSE_SPANS = {
   AGI: [0.1, 0.3],
   DEX: [0.2, 0.6],
   STA: [0.2, 0.6],
-  HP_REGEN: [0, 12],
+  // Regen keeps a FLOOR at the glass end, unlike the mitigation rows beside it (fork ruling,
+  // kaltinril 2026-09-05: "regen should mean something more than nothing" — with the floor at
+  // zero, every 3-STA necklace in the corpus 'beat' the worn regen talisman and flooded NECK).
+  // The principle: AC and resists only matter while being hit; regen is UPTIME — back to swinging
+  // sooner — which a pure damage lens still values.
+  HP_REGEN: [2, 10],
   ehp: [0, 0.2],
   saves: [0, 0.2]
 } as const
