@@ -38,39 +38,27 @@ import {
   type GearRole,
   type OwnedHaste
 } from '../../../../shared/planner/progressionPlan'
-import { scaleGearRow } from '../../../../shared/planner/gearScale'
-import type { GearOwnershipMap, OwnedFact } from '../gear/gearOwnership'
+import type { GearOwnershipMap } from '../gear/gearOwnership'
 
-/** The two collections — see the header for why they differ. */
+/** The two sets — see the header for why they differ. */
 export interface OwnedKeys {
   /** excluded as targets: you do not farm what has passed through your hands */
   held: ReadonlySet<string>
-  /** sets the bars and states the owned haste: what the dump files as EQUIPPED, nothing else —
-   *  each key carrying the ` +N` its worn copy's name stated. `undefined` is a name that stated
-   *  none (never `+0`, phase 1's rule). The bar is scored AT this plus (fork decision, kaltinril
-   *  2026-09-04): a +7 blade scored at +0 set a bar a third under what the player actually
-   *  swings, and a level-20 drop cleared it. */
-  worn: ReadonlyMap<string, number | undefined>
-}
-
-/** Fold one dump fact into the worn map: worn at all, and at the best stated plus among copies. */
-function noteEquipped(worn: Map<string, number | undefined>, key: string, fact: OwnedFact): void {
-  if (fact.place !== 'equipped') return
-  const held = worn.get(key)
-  if (!worn.has(key) || (fact.tier !== undefined && fact.tier > (held ?? -1))) worn.set(key, fact.tier)
+  /** sets the bars and states the owned haste: what the dump files as EQUIPPED, nothing else */
+  worn: ReadonlySet<string>
 }
 
 /**
- * One pass over the ownership map, both collections. `null` (no dump, no loot) is two empty ones.
+ * One pass over the ownership map, both sets. `null` (no dump, no loot) is two empty sets.
  * A key is WORN when any of its dump facts sits at an equipped location — a copy worn AND a copy
  * banked is still worn — and HELD when the dump, the log or an exaltation names it anywhere.
  */
 export function ownedKeysOf(map: GearOwnershipMap | null): OwnedKeys {
   const held = new Set<string>()
-  const worn = new Map<string, number | undefined>()
+  const worn = new Set<string>()
   if (map !== null) {
     for (const [key, o] of map) {
-      for (const fact of o.facts) noteEquipped(worn, key, fact)
+      if (o.facts.some((fact) => fact.place === 'equipped')) worn.add(key)
       if (o.owned || o.looted || o.exaltations > 0) held.add(key)
     }
   }
@@ -116,19 +104,16 @@ export interface OwnedSide {
  * and the bars are scored afterwards because a bar's haste term needs every source known first.
  */
 export function ownedSide(
-  worn: ReadonlyMap<string, number | undefined>,
+  worn: ReadonlySet<string>,
   byKey: ReadonlyMap<string, GearRow>,
   role: GearRole,
   classes: readonly ClassAbbr[]
 ): OwnedSide {
   const rows: GearRow[] = []
   const haste: OwnedHaste[] = []
-  for (const [key, plus] of worn) {
-    const base = byKey.get(key)
-    if (base === undefined) continue
-    // The bar is what the player actually swings: the corpus row scaled to the worn ` +N`
-    // (fork decision, kaltinril 2026-09-04). No plus stated is the base row, never `+0` invented.
-    const row = plus === undefined ? base : scaleGearRow(base, { full: plus, fraction: 0 })
+  for (const key of worn) {
+    const row = byKey.get(key)
+    if (row === undefined) continue
     rows.push(row)
     if (row.stats.HASTE !== undefined && row.stats.HASTE > 0) haste.push({ haste: row.stats.HASTE, slots: row.slots })
   }

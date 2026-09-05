@@ -58,9 +58,9 @@ import { isShieldLike } from './shield'
  *
  * THE MELEE MEMBERS SHARE ONE PROFILE EXCEPT WHERE THE GAME ITSELF DIFFERS (owner ruling
  * 2026-08-22, *"stats need to be weighted based on the type of focus"*): the same 8 STR is the
- * same 8 STR in either hand, but a two-hander cannot backstab at all, so `dps2h` does not read
- * BACKSTAB. (The damage bonus stopped being a weights cell 2026-09-04 — it rides the ratio now,
- * `gearEffectiveRatio`.) Everything else the builds disagree on is WEAPON-SLOT POLICY
+ * same 8 STR in either hand, but a two-hander's DAMAGE BONUS scales with its delay where a
+ * one-hander's does not, so `dps2h` weighs that one stat higher — and cannot backstab at all, so
+ * it does not read BACKSTAB. Everything else the builds disagree on is WEAPON-SLOT POLICY
  * (`ROLE_WEAPON_POLICY` below), the SHAPE of a loadout, kept in its own table.
  *
  * `range` (owner, 2026-08-22: *"I don't see ranger/throwing ... like bows and rock and stuff"*):
@@ -211,10 +211,8 @@ const SAVE_KEYS: readonly GearStatKey[] = GEAR_STAT_KEYS.filter((k) => k.startsW
  *
  * WHAT EACH ROW MEANS IN THE GAME, so a number can be argued with rather than guessed at:
  *   * `ratio` (weapons only) — effective DMG over DELAY, the foundation of melee damage; nothing
- *     on a glove competes with it, hence 30 on the melee focuses. (20 until 2026-09-04, tuned when
- *     the flat bonus rode beside it at ×3: with the bonus folded in, 20 let ten points of DEX
- *     outrank a third of a real blade's white damage, and the measured field case — a +7 11/24
- *     against a 12/36 wearing 10 DEX — ranked upside down.)
+ *     on a glove competes with it, hence 30 on the melee focuses (20 until 2026-09-04, tuned when
+ *     the flat bonus rode beside it at ×3 — see the DMG_BONUS and DEX rows).
  *   * HASTE — a straight multiplier on swings, and WORN HASTE DOES NOT STACK, so `roleValue`
  *     credits it only above what the player already owns (the 2026-08-22 ruling, below).
  *   * DMG_BONUS — a flat add per hit, applied AFTER the multiplied roll. It rides through the
@@ -224,8 +222,9 @@ const SAVE_KEYS: readonly GearStatKey[] = GEAR_STAT_KEYS.filter((k) => k.startsW
  *   * ATTACK — the number the hit and damage rolls actually read; STR feeds it by proxy, so ATTACK
  *     outweighs STR per point.
  *   * DEX — proc rate, and the accuracy stat for archery and throwing. It does NOT raise melee hit
- *     chance in this era, so it is moderate for every melee and special for none of them: a dual
- *     wielder with two proc weapons gets twice the value, but the table cannot see procs.
+ *     chance in this era, so the melee focuses read it SMALL (0.2 since 2026-09-04, down from 1 —
+ *     ten DEX on a slow blade outvoted a third of a real weapon's white damage, the other half of
+ *     the Cursed Blade case). Ranged keeps its 2: there DEX is the accuracy stat itself.
  *   * AGI — a sliver of AC above 75 and a little avoidance; "basically useless" at item
  *     magnitudes (owner) and weighted like it.
  *   * AC and `ehp` (HP + STA) — staying alive; every focus reads them, the tank reads them big.
@@ -242,9 +241,9 @@ const SAVE_KEYS: readonly GearStatKey[] = GEAR_STAT_KEYS.filter((k) => k.startsW
  *   * HP and STA. They ride through `ehp` (`gearEffectiveHp`), so listing them in `stats` too would
  *     count them twice — and the derived key is the one that already answers "what if only one of
  *     them is stated".
- *   * DMG and DELAY. They ride through `ratio` (`gearEffectiveRatio` → `damageRatio`), which is
- *     undefined for anything that is not a weapon. A raw DMG weight would rank 6,000 non-weapons at
- *     zero on a key they never state.
+ *   * DMG and DELAY. They ride through `ratio` (`gearRatio` → `damageRatio`), which is undefined for
+ *     anything that is not a weapon. A raw DMG weight would rank 6,000 non-weapons at zero on a key
+ *     they never state.
  *   * WEIGHT, CHARGES-like per-item facts, and RANGE. Weight is a COST, not worth, and this repo has
  *     no measured strength-to-encumbrance model to price it with; the other two are facts about an
  *     item, not comparisons between items (`gear.ts`'s own census reasoning).
@@ -271,7 +270,7 @@ const MELEE_STATS: Partial<Record<GearStatKey, number>> = {
   AC: 0.5,
   STR: 1.5,
   AGI: 0.1,
-  DEX: 1,
+  DEX: 0.2,
   MP: 0.05,
   HP_REGEN: 3,
   MANA_REGEN: 1,
@@ -294,7 +293,7 @@ const TWO_HAND_DPS: RoleWeights = { ...ONE_HAND_DPS, stats: { ...MELEE_STATS } }
  * so it is the one attribute a ranged focus weighs ABOVE the melee's (2 to their 1), and STR falls
  * to 0.8 because a bow does not read it the way a sword does. ATTACK still counts (the ranged
  * rolls read it too), haste applies to ranged delay (2, below the melee's 4 — a ranged fight is
- * rarely a sustained swing). Everything else is the
+ * rarely a sustained swing), and the damage bonus is the one-hander's 3. Everything else is the
  * melee profile: a ranger takes hits, drinks, and has a bar. The weapon RATIO is the same 20 and
  * reads DMG/DELAY off a bow exactly as off an axe — the corpus states both for every bow and
  * throwing weapon, so nothing here is a ranged-only invention.

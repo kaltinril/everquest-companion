@@ -343,9 +343,10 @@ test('RANGED takes a bow or a throwing weapon in the RANGE slot, nothing else th
   assert.equal(policyAdmits(ROLE_WEAPON_POLICY.dps2h, 'PRIMARY', bow), false)
   assert.equal(policyAdmits(ROLE_WEAPON_POLICY.dualwield, 'PRIMARY', bow), false)
   // THE WEIGHTS: DEX is the ranged accuracy stat and the one attribute this focus weighs above the
-  // melee's; STR falls below theirs; the bow's ratio reads exactly as an axe's would.
+  // melee's — tenfold since 2026-09-04, when melee DEX fell to 0.2 (the Cursed Blade case: proc
+  // garnish must not outvote white damage). STR falls below theirs; a bow's ratio reads as an axe's.
   assert.equal(roleValue({ DEX: 10 }, 'range'), 20)
-  assert.equal(roleValue({ DEX: 10 }, 'dps'), 10)
+  assert.equal(roleValue({ DEX: 10 }, 'dps'), 2)
   assert.equal(roleValue({ STR: 10 }, 'range') < roleValue({ STR: 10 }, 'dps'), true)
   assert.equal(roleValue({ DMG: 30, DELAY: 50 }, 'range'), roleValue({ DMG: 30, DELAY: 50 }, 'dps'))
 })
