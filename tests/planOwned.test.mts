@@ -332,3 +332,21 @@ test('the advisory obeys the weapon-slot policy: a banked 2H is not main-hand ad
   const ups2 = ownedUpgrades(keys, byKey, ownedSide(keys, byKey, twoHand), twoHand)
   assert.deepEqual(ups2.map((u) => u.name), ['Monsoon, Sword of the Swiftwind'])
 })
+
+test('a 3-STA necklace does not beat the worn regen talisman: regen keeps a glass floor', () => {
+  // The seventh field case (fork, 2026-09-05: "regen should mean something more than nothing") —
+  // when regen slid from zero like the mitigation rows, every trinket with a scrap of garnish
+  // cleared the 2-regen talisman's collapsed bar and flooded NECK. Regen is UPTIME, not
+  // mitigation, so it floors at 2 even at full Glass cannon.
+  const TALISMAN = row({ key: 'talisman of kejaar kerrath', name: 'Talisman of Kejaar Kerrath', slots: ['NECK'], stats: { HP_REGEN: 2 } })
+  const BEARTOOTH = { STA: 3, HP: 10 }
+  const byKey = new Map([[TALISMAN.key, TALISMAN]])
+  const keys = ownedKeysOf(new Map([[TALISMAN.key, own({ facts: [at('equipped')] })]]))
+  for (const survivability of [0, 0.3, 0.5]) {
+    const scope = { role: 'dps' as const, classes: ['SHM' as const], survivability }
+    const bar = ownedSide(keys, byKey, scope).bars.get('NECK')
+    assert.ok(bar !== undefined)
+    const challenger = roleValue(BEARTOOTH, 'dps', { classes: scope.classes, survivability })
+    assert.ok(challenger < bar, `at dial ${String(survivability)} the trinket (${challenger.toFixed(1)}) must not clear the regen bar (${bar.toFixed(1)})`)
+  }
+})
