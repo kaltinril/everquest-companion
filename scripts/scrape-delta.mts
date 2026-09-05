@@ -128,6 +128,38 @@ function main(): void {
   void run()
 }
 
+/** Items: the newest revision simply replaces what the key held — a delta has no older rival. */
+function foldItems(itemsFile: ItemDbFile, wikitext: Map<string, string>): number {
+  let touched = 0
+  for (const [title, wt] of wikitext) {
+    if (!isItemPage(wt)) continue
+    const entry = toEntry(title, wt)
+    if (!entry) continue
+    for (const k of [itemKey(entry.page), entry.name ? itemKey(entry.name) : null]) {
+      if (k) itemsFile.items[k] = entry
+    }
+    touched++
+  }
+  return touched
+}
+
+/** Mobs: the same fold, keyed by page over the committed sorted list. */
+function foldMobs(
+  mobs: { page: string }[],
+  wikitext: Map<string, string>
+): { byPage: Map<string, { page: string }>; mobsTouched: number } {
+  const byPage = new Map(mobs.map((m) => [m.page, m]))
+  let mobsTouched = 0
+  for (const [title, wt] of wikitext) {
+    if (!isMobPage(wt)) continue
+    const entry = parseMobPage(title, wt)
+    if (!entry) continue
+    byPage.set(title, entry)
+    mobsTouched++
+  }
+  return { byPage, mobsTouched }
+}
+
 async function run(): Promise<void> {
   const itemsFile = JSON.parse(readFileSync(ITEMS_PATH, 'utf8')) as ItemDbFile
   const mobsFile = JSON.parse(readFileSync(MOBS_PATH, 'utf8')) as {
@@ -154,17 +186,7 @@ async function run(): Promise<void> {
 
   const wikitext = await fetchWikitext(changed)
 
-  // Items: the newest revision simply replaces what the key held — a delta has no older rival.
-  let itemsTouched = 0
-  for (const [title, wt] of wikitext) {
-    if (!isItemPage(wt)) continue
-    const entry = toEntry(title, wt)
-    if (!entry) continue
-    for (const k of [itemKey(entry.page), entry.name ? itemKey(entry.name) : null]) {
-      if (k) itemsFile.items[k] = entry
-    }
-    itemsTouched++
-  }
+  const itemsTouched = foldItems(itemsFile, wikitext)
   const distinctPages = new Set(Object.values(itemsFile.items).map((e) => e.page)).size
   const itemsOut: ItemDbFile = {
     scrapedAt: new Date().toISOString(),
@@ -177,16 +199,7 @@ async function run(): Promise<void> {
     )
   }
 
-  // Mobs: same fold over the sorted list.
-  const byPage = new Map(mobsFile.mobs.map((m) => [m.page, m]))
-  let mobsTouched = 0
-  for (const [title, wt] of wikitext) {
-    if (!isMobPage(wt)) continue
-    const entry = parseMobPage(title, wt)
-    if (!entry) continue
-    byPage.set(title, entry as unknown as { page: string })
-    mobsTouched++
-  }
+  const { byPage, mobsTouched } = foldMobs(mobsFile.mobs, wikitext)
   const mobsOut = {
     scrapedAt: new Date().toISOString(),
     source: mobsFile.source.includes('delta')
