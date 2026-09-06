@@ -17,7 +17,7 @@ import type { RaceUnlockClaim } from '@shared/outputs/achievements'
 import type { HeldCounts, ProgressState } from '@shared/types'
 import { applyEvidence, type FactionEvidence, type FactionEvidenceReport } from '@shared/factionLog'
 import { CONSIDER_FACTION_COLOR, CONSIDER_FACTION_LABEL } from '@shared/considerFaction'
-import { factionTier } from './factionTiers'
+import { FACTION_TIER_FLOORS, factionTier } from './factionTiers'
 import { factionWorkIndex, type FactionWork } from './factionQuests'
 
 /** The dump's floor — the far end every bar is measured from (measured ±2000, factions.ts). */
@@ -40,8 +40,13 @@ export interface FactionRowVm {
   toMax: number
   label: string
   color: string
+  /** the rung's position on the ladder, friendliest first (0 = ally) — the Regard sort's axis */
+  tierRank: number
   /** the bar, 0–100 from the scale floor to this faction's cap */
   pct: number
+  /** everything a search may match, lowercased: the name plus every quest name, giver, zone,
+   *  turn-in and reward on this faction's work — "Talisman of Kejaar" finds Kerra Isle */
+  searchText: string
   /** the quests on record that move this faction (factionQuests.ts), null when none name it */
   work: FactionWork | null
   raiseCount: number
@@ -78,6 +83,20 @@ interface RowJoins {
   unlocksByName: Map<string, string[]>
 }
 
+/** The ladder as ranks, friendliest first — computed once from the one tier table. */
+const TIER_RANK = new Map(FACTION_TIER_FLOORS.map((t, i) => [t.faction, i]))
+
+/** The search haystack: the name plus every string the work panel would draw. */
+function searchTextOf(name: string, w: FactionWork | null): string {
+  const parts = [name]
+  for (const q of [...(w?.raise ?? []), ...(w?.nearby ?? []), ...(w?.lower ?? [])]) {
+    parts.push(q.name, q.giver ?? '', q.startZone ?? '')
+    for (const n of q.items) parts.push(n)
+    for (const n of q.rewards) parts.push(n)
+  }
+  return parts.join('\n').toLowerCase()
+}
+
 function toRowVm(r: FactionStanding, joins: RowJoins): FactionRowVm {
   const ev = joins.evidence.get(r.name.toLowerCase())
   const cap = r.standing + r.toMax
@@ -98,7 +117,9 @@ function toRowVm(r: FactionStanding, joins: RowJoins): FactionRowVm {
     toMax: cap - live.value,
     label: CONSIDER_FACTION_LABEL[tier],
     color: CONSIDER_FACTION_COLOR[tier],
+    tierRank: TIER_RANK.get(tier) ?? FACTION_TIER_FLOORS.length,
     pct: Math.max(0, Math.min(100, ((live.value - SCALE_FLOOR) / (cap - SCALE_FLOOR)) * 100)),
+    searchText: searchTextOf(r.name, w),
     work: w,
     raiseCount: w?.raise.length ?? 0,
     unlocks: joins.unlocksByName.get(r.name.toLowerCase()) ?? []
