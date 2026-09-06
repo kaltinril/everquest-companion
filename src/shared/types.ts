@@ -465,6 +465,21 @@ export interface PoskyData {
 // items (Dwarven Ale, Guard Bracelet, …) look quest-less from the item side. The linkage
 // actually lives on the QUEST pages, which this catalog indexes item-first.
 
+/**
+ * ONE FACTION HIT a quest page's walkthrough quotes — the wiki convention is to paste the game's
+ * own receipt lines, in one of two dialects (both measured against the cached corpus 2026-09-05):
+ * `faction standing with [[X]] got better/worse` (direction only) and `…has been adjusted by N`
+ * (a signed number, sometimes parenthesised). `amount` is carried only when the page said one.
+ */
+export interface QuestFactionHit {
+  /** the faction's wiki page title — matches the `/outputfile faction` dump's Name column */
+  name: string
+  /** the direction: raised (true) or lowered */
+  up: boolean
+  /** the signed per-turn-in delta, only when the page stated a number */
+  amount?: number
+}
+
 /** One quest scraped from an eqlwiki quest page (Category:Quests + quest subcategories). */
 export interface QuestEntry {
   /** display name (the wiki page title) */
@@ -489,6 +504,8 @@ export interface QuestEntry {
   requiredItems?: string[]
   /** page carries an experience-reward marker */
   expReward?: boolean
+  /** the faction hits the walkthrough quotes, deduped per faction (see QuestFactionHit) */
+  factions?: QuestFactionHit[]
 }
 
 export interface QuestData {
