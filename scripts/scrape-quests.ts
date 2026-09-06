@@ -294,6 +294,7 @@ function toQuestEntry(parsed: ParsedQuestPage): QuestEntry {
   if (parsed.rewards.length) entry.rewards = parsed.rewards.map((name) => ({ name }))
   if (parsed.requiredItems.length) entry.requiredItems = parsed.requiredItems
   if (parsed.expReward) entry.expReward = true
+  if (parsed.factions.length) entry.factions = parsed.factions
   return entry
 }
 

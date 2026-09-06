@@ -20,21 +20,26 @@ import { type JSX, Suspense, lazy } from 'react'
 import { CircularProgress } from '@mui/material'
 import { UNRELEASED } from './devFlags'
 import type { View } from './appViews'
+import type { AppRouting } from './appRouting'
 
 const LazyFactionsView = UNRELEASED ? lazy(() => import('./features/factions/FactionsView')) : null
 
-/** The Factions tab — nothing at all in a build without the flag, or on any other view. */
+/** The Factions tab — nothing at all in a build without the flag, or on any other view. It takes
+ *  the app's router whole (the SpellDrill contract) and hands the tab the two drill-downs its
+ *  names link out to: an item's Loot page and a giver's Mobs page. */
 export default function UnreleasedFactionsView({
   view,
-  viewKey
+  viewKey,
+  routing
 }: {
   view: View
   viewKey: string
+  routing: AppRouting
 }): JSX.Element | null {
   if (!LazyFactionsView || view !== 'factions') return null
   return (
     <Suspense fallback={<CircularProgress size={20} />}>
-      <LazyFactionsView key={viewKey} />
+      <LazyFactionsView key={viewKey} onOpenLoot={routing.openLoot} onOpenMob={routing.openMob} />
     </Suspense>
   )
 }

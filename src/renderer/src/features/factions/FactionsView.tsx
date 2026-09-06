@@ -31,6 +31,7 @@ import { type JSX, useEffect, useMemo, useState } from 'react'
 import {
   Box,
   Chip,
+  Collapse,
   FormControlLabel,
   LinearProgress,
   Stack,
@@ -44,11 +45,15 @@ import {
   Typography
 } from '@mui/material'
 import HandshakeIcon from '@mui/icons-material/Handshake'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import type { FactionStanding } from '@shared/outputs/factions'
 import type { ProgressState } from '@shared/types'
 import { CONSIDER_FACTION_COLOR, CONSIDER_FACTION_LABEL } from '@shared/considerFaction'
 import OutputKindLine from '../../components/OutputKindLine'
 import { factionTier } from './factionTiers'
+import { factionWorkIndex, type FactionWork } from './factionQuests'
+import FactionWorkPanel from './FactionWorkPanel'
 
 /** The dump's floor — the far end every bar is measured from (measured cap ±2000, factions.ts). */
 const SCALE_FLOOR = -2000
@@ -70,11 +75,16 @@ interface FactionRowVm {
   color: string
   /** the bar, 0–100 from the scale floor to this faction's cap */
   pct: number
+  /** the quests on record that move this faction (factionQuests.ts), null when none name it */
+  work: FactionWork | null
+  /** how many quests RAISE it — the collapsed row's "there is work here" count */
+  raiseCount: number
 }
 
-function toRowVm(r: FactionStanding): FactionRowVm {
+function toRowVm(r: FactionStanding, work: Map<string, FactionWork>): FactionRowVm {
   const tier = factionTier(r.standing)
   const cap = r.standing + r.toMax
+  const w = work.get(r.name.toLowerCase()) ?? null
   return {
     id: r.id,
     name: r.name,
@@ -83,7 +93,9 @@ function toRowVm(r: FactionStanding): FactionRowVm {
     toMax: r.toMax,
     label: CONSIDER_FACTION_LABEL[tier],
     color: CONSIDER_FACTION_COLOR[tier],
-    pct: Math.max(0, Math.min(100, ((r.standing - SCALE_FLOOR) / (cap - SCALE_FLOOR)) * 100))
+    pct: Math.max(0, Math.min(100, ((r.standing - SCALE_FLOOR) / (cap - SCALE_FLOOR)) * 100)),
+    work: w,
+    raiseCount: w?.raise.length ?? 0
   }
 }
 
@@ -111,7 +123,10 @@ function useFactionRows(): FactionsProgress {
     }
   }, [])
   const standings = progress?.factionStandings
-  const rows = useMemo(() => (standings === undefined ? null : standings.map(toRowVm)), [standings])
+  const rows = useMemo(
+    () => (standings === undefined ? null : standings.map((r) => toRowVm(r, factionWorkIndex()))),
+    [standings]
+  )
   return { rows, readAt: progress?.factionsSource?.readAt ?? null }
 }
 
@@ -127,37 +142,87 @@ function visibleRows(rows: readonly FactionRowVm[], query: string, hideUntouched
     .sort((a, b) => b.standing - a.standing || a.name.localeCompare(b.name))
 }
 
-/** One faction's row: name, the rung chip, the number, and the bar from floor to this cap. */
-function FactionRow({ row }: { row: FactionRowVm }): JSX.Element {
+/** The link handlers the work panel forwards into the app's standing drill-downs. */
+interface WorkLinks {
+  onOpenLoot?: (item?: string) => void
+  onOpenMob?: (t: { mob: string }) => void
+}
+
+/**
+ * One faction: the standing row, and — expanded — the work panel beneath it. EVERY row expands
+ * (a faction with nothing on record answers with that fact rather than refusing the click); the
+ * collapsed row's quest count is what says where the work is before anyone clicks.
+ */
+function FactionRow({
+  row,
+  expanded,
+  onToggle,
+  links
+}: {
+  row: FactionRowVm
+  expanded: boolean
+  onToggle: () => void
+  links: WorkLinks
+}): JSX.Element {
   return (
-    <TableRow hover data-testid={`factions-row-${String(row.id)}`}>
-      <TableCell sx={{ py: 0.5 }}>{row.name}</TableCell>
-      <TableCell sx={{ py: 0.5, width: 130 }}>
-        <Chip
-          size="small"
-          label={row.label}
-          sx={{ height: 20, fontSize: 11, color: row.color, borderColor: row.color }}
-          variant="outlined"
-        />
-      </TableCell>
-      <TableCell align="right" sx={{ py: 0.5, width: 90, fontVariantNumeric: 'tabular-nums' }}>
-        {row.standing}
-      </TableCell>
-      <TableCell sx={{ py: 0.5, width: 180 }}>
-        {/* The exact arithmetic on hover, the Stamp idiom: coarse on the row, precise one hover away. */}
-        <LinearProgress
-          variant="determinate"
-          value={row.pct}
-          title={`${String(row.standing)} of ${String(row.cap)} (${String(row.toMax)} to max)`}
-          sx={{
-            height: 6,
-            borderRadius: 3,
-            bgcolor: 'action.hover',
-            '& .MuiLinearProgress-bar': { bgcolor: row.color }
-          }}
-        />
-      </TableCell>
-    </TableRow>
+    <>
+      <TableRow
+        hover
+        data-testid={`factions-row-${String(row.id)}`}
+        onClick={onToggle}
+        sx={{ cursor: 'pointer', '& > td': { borderBottom: expanded ? 'none' : undefined } }}
+      >
+        <TableCell sx={{ py: 0.5 }}>
+          {expanded ? (
+            <KeyboardArrowUpIcon sx={{ fontSize: 16, verticalAlign: 'text-bottom', mr: 0.5 }} />
+          ) : (
+            <KeyboardArrowDownIcon
+              sx={{ fontSize: 16, verticalAlign: 'text-bottom', mr: 0.5, opacity: 0.5 }}
+            />
+          )}
+          {row.name}
+          {row.raiseCount > 0 && (
+            <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+              {row.raiseCount} quest{row.raiseCount === 1 ? '' : 's'}
+            </Typography>
+          )}
+        </TableCell>
+        <TableCell sx={{ py: 0.5, width: 130 }}>
+          <Chip
+            size="small"
+            label={row.label}
+            sx={{ height: 20, fontSize: 11, color: row.color, borderColor: row.color }}
+            variant="outlined"
+          />
+        </TableCell>
+        <TableCell align="right" sx={{ py: 0.5, width: 90, fontVariantNumeric: 'tabular-nums' }}>
+          {row.standing}
+        </TableCell>
+        <TableCell sx={{ py: 0.5, width: 180 }}>
+          {/* The exact arithmetic on hover, the Stamp idiom: coarse on the row, precise one hover away. */}
+          <LinearProgress
+            variant="determinate"
+            value={row.pct}
+            title={`${String(row.standing)} of ${String(row.cap)} (${String(row.toMax)} to max)`}
+            sx={{
+              height: 6,
+              borderRadius: 3,
+              bgcolor: 'action.hover',
+              '& .MuiLinearProgress-bar': { bgcolor: row.color }
+            }}
+          />
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell colSpan={4} sx={{ py: 0, borderBottom: expanded ? undefined : 'none' }}>
+          <Collapse in={expanded} unmountOnExit>
+            <Box sx={{ pl: 3 }}>
+              <FactionWorkPanel work={row.work} onOpenLoot={links.onOpenLoot} onOpenMob={links.onOpenMob} />
+            </Box>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </>
   )
 }
 
@@ -175,10 +240,12 @@ function NoDump(): JSX.Element {
   )
 }
 
-export default function FactionsView(): JSX.Element {
+export default function FactionsView({ onOpenLoot, onOpenMob }: WorkLinks): JSX.Element {
   const { rows: all, readAt } = useFactionRows()
   const [query, setQuery] = useState('')
   const [hideUntouched, setHideUntouched] = useState(true)
+  const [expandedId, setExpandedId] = useState<number | null>(null)
+  const links = useMemo(() => ({ onOpenLoot, onOpenMob }), [onOpenLoot, onOpenMob])
   const rows = useMemo(
     () => (all === null ? [] : visibleRows(all, query, hideUntouched)),
     [all, query, hideUntouched]
@@ -236,7 +303,15 @@ export default function FactionsView(): JSX.Element {
               </TableHead>
               <TableBody>
                 {rows.map((row) => (
-                  <FactionRow key={row.id} row={row} />
+                  <FactionRow
+                    key={row.id}
+                    row={row}
+                    expanded={expandedId === row.id}
+                    onToggle={() => {
+                      setExpandedId((cur) => (cur === row.id ? null : row.id))
+                    }}
+                    links={links}
+                  />
                 ))}
               </TableBody>
             </Table>

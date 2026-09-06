@@ -20,6 +20,7 @@ import {
   dedupe,
   isEmptyParse,
   linkTargets,
+  parseFactionHits,
   parseQuestPage,
   parseTopTable,
   splitSections,
@@ -315,5 +316,54 @@ test('quest metadata survives the scrape (givers, zones, levels are real values)
   for (const q of data.quests) {
     if (q.minLevel != null) assert.ok(q.minLevel >= 0 && q.minLevel <= 100, `sane minLevel on ${q.page}`)
     for (const z of q.relatedZones ?? []) assert.ok(!/^none$/i.test(z))
+  }
+})
+
+// --- faction receipt lines (the factions tab's data, 2026-09-05) -----------------
+
+test('parseFactionHits reads both wiki dialects and dedupes per faction', () => {
+  const wt = [
+    "''Your faction standing with [[Clerics of Underfoot]] has been adjusted by 10.''",
+    "''Your faction standing with [[Miners Guild 249]] has been adjusted by 7.''",
+    "''Your faction standing with [[Kerra Isle]] got better.''",
+    "''Your faction standing with [[Heretics]] got worse.''",
+    "''Your faction standing with [[High Guard of Erudin]] has been adjusted by -300.''",
+    "''Your faction standing with [[Deepwater Knights]] has been adjusted by (+7).''",
+    "''Your faction standing with [[Kerra Isle]] got better.''", // repeat: deduped
+    // a later numeric line upgrades an earlier direction-only one for the same faction
+    "''Your faction standing with [[Heretics]] has been adjusted by -1.''"
+  ].join('\n')
+  assert.deepEqual(parseFactionHits(wt), [
+    { name: 'Clerics of Underfoot', up: true, amount: 10 },
+    { name: 'Miners Guild 249', up: true, amount: 7 },
+    { name: 'Kerra Isle', up: true },
+    { name: 'Heretics', up: false, amount: -1 },
+    { name: 'High Guard of Erudin', up: false, amount: -300 },
+    { name: 'Deepwater Knights', up: true, amount: 7 }
+  ])
+})
+
+test('parseFactionHits takes the link TARGET when the line labels it, and skips junk', () => {
+  const wt = "Your faction standing with [[Guards of Qeynos|the Qeynos guards]] got better.\n" +
+    'Your faction standing with nobody got worse.\n' // no link: not a receipt line
+    + 'faction standing with [[Category:Quests]] got better.' // namespaced: never a faction
+  assert.deepEqual(parseFactionHits(wt), [{ name: 'Guards of Qeynos', up: true }])
+})
+
+test('the committed catalog carries the faction hits, and known rows read back exactly', () => {
+  const withFactions = data.quests.filter((q) => q.factions?.length)
+  assert.ok(withFactions.length > 400, `expected hundreds of quests with faction hits, got ${withFactions.length}`)
+  const byName = new Map(data.quests.map((q) => [q.name, q]))
+  assert.deepEqual(byName.get('Bone Chips (Kaladim)')?.factions, [
+    { name: 'Clerics of Underfoot', up: true, amount: 10 },
+    { name: 'Kazon Stormhammer', up: true, amount: 10 },
+    { name: 'Miners Guild 249', up: true, amount: 7 }
+  ])
+  assert.deepEqual(byName.get('Rat Teeth')?.factions, [{ name: 'Kerra Isle', up: true }])
+  for (const q of withFactions) {
+    for (const f of q.factions ?? []) {
+      assert.ok(f.name.length > 1 && !f.name.includes('[['), `clean faction name on ${q.page}`)
+      if (f.amount !== undefined) assert.equal(f.up, f.amount >= 0, `direction matches sign on ${q.page}`)
+    }
   }
 })

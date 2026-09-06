@@ -169,7 +169,7 @@ function PlainView({
       <SpellDrill view={view} viewKey={viewKey} routing={routing} />
       {/* FACTIONS (UNRELEASED). Its view check and its gate live in unreleasedFactions.tsx for
           the SpellDrill's reason — and because the gate's own deletion is how the tab graduates. */}
-      <UnreleasedFactionsView view={view} viewKey={viewKey} />
+      <UnreleasedFactionsView view={view} viewKey={viewKey} routing={routing} />
     </>
   )
 }
