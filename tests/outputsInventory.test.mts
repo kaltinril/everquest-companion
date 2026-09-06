@@ -472,13 +472,13 @@ test('looksLikeContainer separates bags from socketed items across the whole dum
 // THE REGISTRY
 // ---------------------------------------------------------------------------
 
-test('registry: inventory and achievements are the graduated kinds; the rest refuse typed', () => {
-  // TWO KINDS SINCE JOS-429, and the list is asserted rather than counted so a kind cannot
-  // graduate without somebody editing this line. `achievements` earned it the same way `inventory`
-  // did: a real dump read, its format written down, a fixture committed (see
-  // tests/outputsAchievements.test.mts, which owns that kind's own claims).
+test('registry: inventory, faction and achievements are the graduated kinds; the rest refuse typed', () => {
+  // THREE KINDS SINCE 2026-09-05, and the list is asserted rather than counted so a kind cannot
+  // graduate without somebody editing this line. Each earned it the same way: a real dump read,
+  // its format written down, a fixture committed (tests/outputsAchievements.test.mts and
+  // tests/outputsFactions.test.mts own those kinds' claims).
   const supported = OUTPUT_KINDS.filter((k) => k.status === 'supported').map((k) => k.id)
-  assert.deepEqual(supported, ['inventory', 'achievements'])
+  assert.deepEqual(supported, ['inventory', 'faction', 'achievements'])
 
   const res = parseOutput('inventory', REAL_DUMP)
   assert.equal(res.ok, true)

@@ -266,7 +266,7 @@ test('parseOutput routes the achievements kind to the real parser', () => {
 
 test('the kinds that have NOT graduated still refuse in a typed way', () => {
   const waiting = OUTPUT_KINDS.filter((k) => k.status === 'awaiting-sample')
-  assert.equal(waiting.length, 5, 'inventory and achievements are the graduated pair')
+  assert.equal(waiting.length, 4, 'inventory, achievements and faction are the graduated three')
   for (const def of waiting) {
     assert.equal(def.fileKindVerified, false, `${def.id} has no observed file`)
     const res = parseOutput(def.id, 'anything at all')

@@ -28,16 +28,26 @@
 // half-parsed object, and it never falls back to "well, it's tab-separated, so…".
 //
 // `fileKindVerified` is a SECOND, separate honesty flag on the same idea: the filename suffix
-// itself is knowledge. `Inventory` and `Achievements` are MEASURED (the real dumps on the dev
-// machine are `Primitive_freeport-Inventory.txt` and `Primitive_freeport-Achievements.txt`). Every
-// other suffix below is the community/client spelling as best we know it and has NOT been observed
-// on disk — an unverified suffix simply never matches a real file, which is a quiet miss rather
-// than a wrong parse, and it gets corrected the moment someone runs the command and looks.
+// itself is knowledge. `Inventory`, `Achievements` and `Factions` are MEASURED (the real dumps on
+// dev machines are `Primitive_freeport-Inventory.txt`, `Primitive_freeport-Achievements.txt` and
+// `Drywrought_oggok-WAR-Factions.txt`). Every other suffix below is the community/client spelling
+// as best we know it and has NOT been observed on disk — an unverified suffix simply never matches
+// a real file, which is a quiet miss rather than a wrong parse, and it gets corrected the moment
+// someone runs the command and looks.
 //
-// TWO KINDS HAVE GRADUATED, and the second one shows the law working exactly as written: JOS-429's
+// THREE KINDS HAVE GRADUATED, and the later two show the law working exactly as written: JOS-429's
 // brief was investigation-first, the owner exported the real file, its format was characterized and
 // written down (shared/outputs/achievements.ts's header) and the fixture committed BEFORE a line of
-// parser existed. The five kinds still `awaiting-sample` below are waiting for the same thing.
+// parser existed. `factions` repeated that ritual on 2026-09-05 (shared/outputs/factions.ts) — and
+// its sample corrected TWO guesses this registry had been holding: the command is `/outputfile
+// faction`, SINGULAR (the plural errors in game; the file suffix stays plural), and the file the
+// game writes carries a CLASS TOKEN no other kind's does — `Drywrought_oggok-WAR-Factions.txt`,
+// i.e. `<Character>_<server>-<CLASS>-Factions.txt`. The suffix match below was always token-
+// agnostic; `preferredOutputFile` grew a prefix rule so a multi-character machine still resolves
+// the right character's dump. The kinds still `awaiting-sample` are waiting for the same thing —
+// and the same sample's usage line says the server also knows `guildbank`, `guildhall`,
+// `missingspells`, `realestate` and `recipes`, and does NOT list `alternateadv` (its entry below
+// keeps the community spelling until someone tries it and looks).
 
 /** Every `/outputfile` kind this app knows the name of. */
 export type OutputKindId =
@@ -45,7 +55,10 @@ export type OutputKindId =
   | 'guild'
   | 'raid'
   | 'spellbook'
-  | 'factions'
+  // Singular, matching the command it spells (`/outputfile faction` — measured; the plural
+  // errors in game). The FILE suffix stays `Factions`: id and command are one namespace, the
+  // filename is the client's own spelling and is a separate fact.
+  | 'faction'
   | 'achievements'
   | 'alternateadv'
 
@@ -138,13 +151,20 @@ export const OUTPUT_KINDS: readonly OutputKindDef[] = [
     steps: []
   },
   {
-    id: 'factions',
-    command: '/outputfile factions',
-    why: 'Dumps your faction standings as the game currently sees them.',
+    id: 'faction',
+    // SINGULAR, measured 2026-09-05: the game's usage line lists `faction` and the plural errors
+    // out. The id spells the command (the registry-wide invariant outputsRegistry.test.mts pins);
+    // the SUFFIX stays plural because that is what the client actually wrote
+    // (`Drywrought_oggok-WAR-Factions.txt`).
+    command: '/outputfile faction',
+    why: 'Type it in game to see your real standing with every faction the server tracks.',
     fileKind: 'Factions',
-    fileKindVerified: false,
-    status: 'awaiting-sample',
-    note: 'Faction standings dump - no verified sample; run /outputfile factions and commit a fixture.',
+    fileKindVerified: true,
+    status: 'supported',
+    note: 'Absolute standing per faction, ±2000 - the number the log’s better/worse lines never say.',
+    // No preconditions, and the empty list is a measured claim (the achievements entry's argument
+    // verbatim): the server already knows your standings, no window has to be open, and the
+    // command can be typed anywhere.
     steps: []
   },
   {
@@ -258,10 +278,18 @@ export function isOutputFileName(def: OutputKindDef, file: string): boolean {
 
 /**
  * Pick a character's dump out of a kind's candidate files, `filesNewestFirst` ordered by mtime
- * descending. The preferred names win in order; failing all of them the newest file does, which
- * is what a one-character machine always lands on (verified on the dev machine, where only the
- * `_server` form exists). On a machine with several characters the first rule is what stops one
+ * descending. The preferred names win in order; failing those, a file that is provably this
+ * character's under a longer name does; failing everything the newest file wins, which is what a
+ * one-character machine always lands on (verified on the dev machine, where only the `_server`
+ * form exists). On a machine with several characters the first two rules are what stop one
  * character's dump from being read as another's.
+ *
+ * THE PREFIX RULE IS THE FACTIONS KIND'S (measured 2026-09-05): that dump is named
+ * `<Character>_<server>-<CLASS>-Factions.txt` — a class token between the server and the suffix —
+ * so no exact name this function could construct will ever match it (the class is not known here,
+ * and a character's class can change on Legends, so there may be several). A file that starts
+ * with `<Character>_<server>-` and ends with the kind's own suffix is that character's dump
+ * whatever sits between; newest wins among them because `filesNewestFirst` already ordered them.
  *
  * PURE, and separated from `discovery.ts` for exactly that reason: this is the whole preference
  * rule, and it is testable without a filesystem.
@@ -276,6 +304,13 @@ export function preferredOutputFile(
   for (const want of outputFileNames(def, characterName, server)) {
     const match = filesNewestFirst.find((f) => f.toLowerCase() === want.toLowerCase())
     if (match !== undefined) return match
+  }
+  if (characterName && server) {
+    const prefix = `${characterName}_${server}-`.toLowerCase()
+    const own = filesNewestFirst.find(
+      (f) => f.toLowerCase().startsWith(prefix) && isOutputFileName(def, f)
+    )
+    if (own !== undefined) return own
   }
   return filesNewestFirst[0]
 }
