@@ -44,8 +44,9 @@ function FactionChip({
   )
 }
 
-/** One still-closed race: its name and the factions it still wants at maximum. */
-function ClosedRace({
+/** One race — open or not: its name (checked when open) and the factions it wants at maximum.
+ *  Open races keep their rows because a FRIEND's unlock still runs through the same factions. */
+function RaceRow({
   claim,
   byName,
   onFind
@@ -55,15 +56,19 @@ function ClosedRace({
   onFind?: (name: string) => void
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={0.75} alignItems="center" flexWrap="wrap" useFlexGap data-testid="factions-race-closed">
-      <Typography variant="caption" sx={{ fontWeight: 600, minWidth: 118 }}>
+    <Stack direction="row" spacing={0.75} alignItems="center" flexWrap="wrap" useFlexGap data-testid="factions-race-row">
+      <Typography
+        variant="caption"
+        sx={{ fontWeight: 600, minWidth: 118, color: claim.complete ? 'success.main' : undefined }}
+      >
+        {claim.complete ? '✓ ' : ''}
         {claim.race}
       </Typography>
       {claim.factions.map((f) => (
         <FactionChip
           key={f.name}
           name={f.name}
-          complete={f.complete}
+          complete={f.complete || claim.complete}
           row={byName.get(f.name.toLowerCase())}
           onFind={onFind}
         />
@@ -95,6 +100,9 @@ export default function RaceUnlocksPanel({
   const done: RaceUnlockClaim[] = []
   const todo: RaceUnlockClaim[] = []
   for (const c of races) (c.complete ? done : todo).push(c)
+  // Pending races first — they are the work — then the open ones, each still carrying its
+  // faction chips for the friend who has not earned it yet.
+  const ordered = [...todo, ...done]
   return (
     <Box sx={{ mb: 1 }} data-testid="factions-races">
       <Typography
@@ -114,13 +122,8 @@ export default function RaceUnlocksPanel({
       </Typography>
       <Collapse in={open} unmountOnExit>
         <Stack spacing={0.5} sx={{ pl: 2.5, pt: 0.5 }}>
-          {done.length > 0 && (
-            <Typography variant="caption" color="text.secondary" data-testid="factions-races-open">
-              Open: {done.map((c) => c.race).join(', ')}
-            </Typography>
-          )}
-          {todo.map((c) => (
-            <ClosedRace key={c.race} claim={c} byName={byName} onFind={onFind} />
+          {ordered.map((c) => (
+            <RaceRow key={c.race} claim={c} byName={byName} onFind={onFind} />
           ))}
         </Stack>
       </Collapse>

@@ -152,6 +152,45 @@ function FilterSwitch({
   )
 }
 
+/** The race-gate pair: the hunt switch (disabled with its reason until an achievements dump
+ *  exists) and — only while it is on — the still-needed refinement that drops settled gates.
+ *  Split out of `FilterBar` at the 100-line function ceiling. */
+function RaceGateSwitches({
+  toggles,
+  unlockers,
+  unlocksKnown
+}: {
+  toggles: { unlocksOnly: boolean; onUnlocksOnly: (on: boolean) => void; unlocksPending: boolean; onUnlocksPending: (on: boolean) => void }
+  unlockers: number
+  unlocksKnown: boolean
+}): JSX.Element {
+  return (
+    <>
+      <FilterSwitch
+        label={`Unlocks a race (${String(unlockers)})`}
+        checked={toggles.unlocksOnly}
+        onChange={toggles.onUnlocksOnly}
+        disabledHint={
+          unlocksKnown
+            ? undefined
+            : 'The race requirements come from the achievements export - type /outputfile achievements in game and this lights up.'
+        }
+        testId="factions-unlocks-only"
+      />
+      {/* The refinement, offered only while the gate hunt is on: drop the gates this character
+          has already settled (the ✓ ones stay visible by default for the friend case). */}
+      {toggles.unlocksOnly && (
+        <FilterSwitch
+          label="Still needed"
+          checked={toggles.unlocksPending}
+          onChange={toggles.onUnlocksPending}
+          testId="factions-unlocks-pending"
+        />
+      )}
+    </>
+  )
+}
+
 /** The row controls: search, the two hide-toggles, and the shown-of-total count on the far end. */
 export function FilterBar({
   query,
@@ -171,6 +210,8 @@ export function FilterBar({
     onHideMaxed: (on: boolean) => void
     unlocksOnly: boolean
     onUnlocksOnly: (on: boolean) => void
+    unlocksPending: boolean
+    onUnlocksPending: (on: boolean) => void
     rewardsOnly: boolean
     onRewardsOnly: (on: boolean) => void
   }
@@ -216,17 +257,7 @@ export function FilterBar({
       {/* Only the factions still GATING a race unlock — each row's chip says which race. The
           count is 0 without an achievements dump, and the switch is honest about that: it shows
           an empty table rather than pretending to know. */}
-      <FilterSwitch
-        label={`Unlocks a race (${String(counts.unlockers)})`}
-        checked={toggles.unlocksOnly}
-        onChange={toggles.onUnlocksOnly}
-        disabledHint={
-          unlocksKnown
-            ? undefined
-            : 'The race requirements come from the achievements export - type /outputfile achievements in game and this lights up.'
-        }
-        testId="factions-unlocks-only"
-      />
+      <RaceGateSwitches toggles={toggles} unlockers={counts.unlockers} unlocksKnown={unlocksKnown} />
       <Box sx={{ flexGrow: 1 }} />
       {expandedCount > 0 && (
         <Button

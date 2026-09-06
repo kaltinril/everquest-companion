@@ -9,7 +9,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import type { HeldCounts } from '@shared/types'
 import FactionWorkPanel, { type WorkPanelLinks } from './FactionWorkPanel'
 import type { RowDerived } from './factionDerive'
-import type { FactionRowVm } from './useFactionRows'
+import type { FactionRowVm, RaceGate } from './useFactionRows'
 
 /** The work panel's link handlers plus the held counts its turn-in lists draw with. */
 export interface WorkLinks extends WorkPanelLinks {
@@ -51,20 +51,22 @@ function QuestCounts({ work }: { work: RowDerived['work'] }): JSX.Element | null
 }
 
 /** The name cell's trailing signals: quest tallies, the race gate, gear value, the wishlist chip. */
-function NameSignals({ derived, unlocks }: { derived: RowDerived; unlocks: readonly string[] }): JSX.Element {
+function NameSignals({ derived, unlocks }: { derived: RowDerived; unlocks: readonly RaceGate[] }): JSX.Element {
   return (
     <>
       <QuestCounts work={derived.work} />
-      {/* THE RACE GATE: this faction must reach maximum before these races open. */}
+      {/* THE RACE GATE: this faction must reach maximum before these races open. A gate you have
+          already settled stays on the row wearing its check — a friend's Kerran still runs
+          through Kerra Isle — and only a row with something PENDING keeps the loud color. */}
       {unlocks.length > 0 && (
         <Chip
           size="small"
-          color="info"
+          color={unlocks.some((u) => !u.done) ? 'info' : undefined}
           variant="outlined"
-          label={`unlocks ${unlocks.join(', ')}`}
-          title="needed at maximum for these Race Unlock achievements"
+          label={`unlocks ${unlocks.map((u) => (u.done ? `${u.race} ✓` : u.race)).join(', ')}`}
+          title="needed at maximum for these Race Unlock achievements (✓ = already settled on this character)"
           data-testid="factions-unlocks"
-          sx={{ ml: 1, height: 20, fontSize: 11, maxWidth: 280 }}
+          sx={{ ml: 1, height: 20, fontSize: 11, maxWidth: 320 }}
         />
       )}
       {derived.gear.length > 0 && (
