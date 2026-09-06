@@ -24,11 +24,15 @@ import questsJson from '../../data/eqlegends/quests.json'
 export interface FactionQuestRef {
   /** the quest's display name (also its wiki page title) */
   name: string
+  /** the wiki page title, for the external link (`wikiPageUrl`) — the item dialog's Source idiom */
+  page: string
   /** who takes the turn-in, when the page said */
   giver?: string
   /** where the quest starts, when the page said — text only (no zone deep link exists yet) */
   startZone?: string
   minLevel?: number
+  /** the classes the page lists, verbatim wiki tokens — factionFilters.ts owns the reading */
+  classes?: string[]
   /** the items to hand in — the "save these" list, each linkable to its Loot drill-down */
   items: string[]
   /** the reward items, linkable the same way */
@@ -46,11 +50,13 @@ export interface FactionWork {
 function toRef(q: QuestEntry, amount: number | undefined): FactionQuestRef {
   const ref: FactionQuestRef = {
     name: q.name,
+    page: q.page,
     items: q.requiredItems ?? [],
     rewards: [],
     ...(q.giver === undefined ? {} : { giver: q.giver }),
     ...(q.startZone === undefined ? {} : { startZone: q.startZone }),
     ...(q.minLevel === undefined ? {} : { minLevel: q.minLevel }),
+    ...(q.classes === undefined ? {} : { classes: q.classes }),
     ...(amount === undefined ? {} : { amount })
   }
   for (const r of q.rewards ?? []) ref.rewards.push(r.name)
