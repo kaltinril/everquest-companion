@@ -17,7 +17,7 @@
 
 import type { ComboProgress } from './classCombo'
 import type { ItemCountOverride } from './itemOverrides'
-import type { AchievementsSource, ClassUnlockClaim } from './outputs/achievements'
+import type { AchievementsSource, ClassUnlockClaim, RaceUnlockClaim } from './outputs/achievements'
 import type { FactionStanding, FactionsSource } from './outputs/factions'
 import type { InventorySource } from './outputs/baseline'
 import type { ExaltPlan } from './planner/types'
@@ -116,6 +116,15 @@ export interface ProgressState {
    * one written here still opens in a build that predates the achievements reader.
    */
   achievementUnlocks?: ClassUnlockClaim[]
+  /**
+   * THE RACE UNLOCKS the same dump states (2026-09-05) — each race's open/closed status and the
+   * factions the server requires at maximum, written in the same `setAchievements` write as the
+   * class half so neither can describe a different dump. Display-only (the Factions tab joins the
+   * required factions to the standings); nothing here feeds quest crediting.
+   *
+   * ADDITIVE and OPTIONAL — no schema bump and no migration, the `exaltPlans` precedent.
+   */
+  raceUnlocks?: RaceUnlockClaim[]
   /** metadata about the last achievements load — the file's mtime and when we read it (JOS-429). */
   achievementsSource?: AchievementsSource
   /**

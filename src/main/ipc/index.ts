@@ -23,6 +23,7 @@ import { registerCharacterSheetIpc } from './characterSheet'
 import { registerClipboardIpc } from './clipboard'
 import { registerComboIpc } from './combo'
 import { registerDevIpc } from './dev'
+import { registerFactionsIpc } from './factions'
 import { registerFeedbackIpc } from './feedback'
 import { registerGraphicsIpc } from './graphics'
 import { registerKnowledgeIpc } from './knowledge'
@@ -80,6 +81,10 @@ export function registerIpc(): void {
   // (../unreleased.ts explains what it is for and how to adopt it).
   registerCharacterSheetIpc()
   registerOutputsIpc()
+  // GATED on the review-gate door INSIDE the register (ipc/factions.ts) — the UNRELEASED
+  // Factions tab's log-evidence channel, adopting exactly the arrangement the comment above
+  // describes the character sheet having outgrown.
+  registerFactionsIpc()
   registerWorldIpc()
   registerComboIpc()
   registerRosterIpc()

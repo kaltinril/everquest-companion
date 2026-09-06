@@ -24,6 +24,7 @@ import {
   CLASS_UNLOCK_CATEGORY,
   CLASS_UNLOCK_PREFIX,
   classUnlockClaims,
+  raceUnlockClaims,
   parseAchievementsDump
 } from '../src/shared/outputs/achievements'
 import { OUTPUT_KINDS, isOutputFileName, outputKind, parseOutput } from '../src/main/outputs/kinds'
@@ -272,5 +273,35 @@ test('the kinds that have NOT graduated still refuse in a typed way', () => {
     const res = parseOutput(def.id, 'anything at all')
     assert.equal(res.ok, false)
     assert.equal(res.ok === false && res.reason, 'unsupported')
+  }
+})
+
+// --- the race-unlock half (the Factions tab, 2026-09-05) --------------------------
+
+test('race unlocks read as faction checklists, pinned against the real fixture', () => {
+  const races = raceUnlockClaims(DUMP)
+  assert.equal(races.length, 16, 'sixteen Race Unlock achievements')
+  const byRace = new Map(races.map((r) => [r.race, r]))
+  // The owner's fixture has exactly Froglok and Ogre open.
+  assert.deepEqual(
+    races.filter((r) => r.complete).map((r) => r.race).sort(),
+    ['Froglok', 'Ogre']
+  )
+  // A closed race carries its required factions, each a real dump Name.
+  const barbarian = byRace.get('Barbarian')
+  assert.ok(barbarian)
+  assert.deepEqual(barbarian.factions, [
+    { name: 'Rogues of the White Rose', complete: false },
+    { name: 'Wolves of the North', complete: false },
+    { name: 'Merchants of Halas', complete: false }
+  ])
+  // The city-suffixed unlocks stay distinct races.
+  assert.ok(byRace.has('Human (Freeport)'))
+  assert.ok(byRace.has('Human (Qeynos)'))
+  // The pseudo-rows ("created as…", "Race Unlock Token") never leak into a faction list.
+  for (const r of races) {
+    for (const f of r.factions) {
+      assert.ok(!/achievement|token/i.test(f.name), `${r.race}: ${f.name}`)
+    }
   }
 })

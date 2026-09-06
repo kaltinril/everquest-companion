@@ -21,8 +21,10 @@ import { readFileSync } from 'fs'
 import type { InventoryDump } from '../../shared/outputs/inventory'
 import {
   classUnlockClaims,
+  raceUnlockClaims,
   type AchievementsSource,
-  type ClassUnlockClaim
+  type ClassUnlockClaim,
+  type RaceUnlockClaim
 } from '../../shared/outputs/achievements'
 import type { FactionStanding, FactionsSource } from '../../shared/outputs/factions'
 import type { OutputKindId } from '../../shared/outputs/kinds'
@@ -123,6 +125,8 @@ export interface LoadedAchievements {
   path: string
   /** The earned `Obtain <Item>` rows — the flat artifact that gets persisted (JOS-429). */
   unlocks: ClassUnlockClaim[]
+  /** The race unlocks and their required factions — the Factions tab's half (2026-09-05). */
+  races: RaceUnlockClaim[]
   /** Exactly what gets persisted as `ProgressState.achievementsSource`. */
   source: AchievementsSource
 }
@@ -151,6 +155,7 @@ export function loadAchievements(
   return {
     path: loaded.path,
     unlocks: classUnlockClaims(result.data.dump),
+    races: raceUnlockClaims(result.data.dump),
     // `loadedAt` is the FILE's mtime (when the player typed the command) and `readAt` is ours —
     // the JOS-253 pair, kept because a single timestamp cannot answer both questions.
     source: { path: loaded.path, loadedAt: loaded.loadedAt, readAt: now() }
