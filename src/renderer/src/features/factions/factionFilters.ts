@@ -102,6 +102,8 @@ export interface WorkFilters {
   /** empty = any class */
   classes: readonly ClassAbbr[]
   slot: SlotFilter
+  /** only the pure DONATION quests: a stated coin turn-in and no items to collect at all */
+  coinOnly: boolean
   /**
    * The EFFECTIVE search inside one faction's work, lowercased — '' when the panel should show
    * everything. The caller (factionDerive.deriveRows) blanks it for a faction whose NAME matched
@@ -109,23 +111,34 @@ export interface WorkFilters {
    * narrows the quests to the ones that carried the match.
    */
   query: string
+  /**
+   * Search REWARDS only: "soulfire" then finds the quest that GRANTS SoulFire — the chain's
+   * final step — instead of every quest that consumes one as a turn-in.
+   */
+  rewardsOnly: boolean
 }
 
 /** Is any narrowing actually selected? The QUERY is deliberately not counted: it already decides
  *  row visibility through the search haystack, and a name-matched faction with no work must not
  *  vanish for having none. */
 export function filtersActive(f: WorkFilters): boolean {
-  return f.classes.length > 0 || f.slot !== 'ANY'
+  return f.classes.length > 0 || f.slot !== 'ANY' || f.coinOnly
 }
 
-/** Does one quest carry the search — in its name, giver, zone, turn-ins or rewards? */
-function matchesQuery(ref: FactionQuestRef, q: string): boolean {
+/** The gold-only reading: money changes hands and nothing has to be farmed first. */
+function matchesCoinOnly(ref: FactionQuestRef, on: boolean): boolean {
+  return !on || (ref.coin !== undefined && ref.items.length === 0)
+}
+
+/** Does one quest carry the search — everywhere, or (rewards-only) in what it GRANTS? */
+function matchesQuery(ref: FactionQuestRef, q: string, rewardsOnly: boolean): boolean {
   if (q === '') return true
+  for (const n of ref.rewards) if (n.toLowerCase().includes(q)) return true
+  if (rewardsOnly) return false
   if (ref.name.toLowerCase().includes(q)) return true
   if (ref.giver?.toLowerCase().includes(q) === true) return true
   if (ref.startZone?.toLowerCase().includes(q) === true) return true
   for (const n of ref.items) if (n.toLowerCase().includes(q)) return true
-  for (const n of ref.rewards) if (n.toLowerCase().includes(q)) return true
   return false
 }
 
@@ -164,13 +177,22 @@ export function filterWork(
   slotsByKey: ReadonlyMap<string, readonly EquipSlot[]>
 ): FactionWork {
   const hunts = (q: FactionQuestRef): boolean =>
-    matchesQuery(q, f.query) && matchesClasses(q, f.classes) && matchesSlot(q, f.slot, slotsByKey)
+    matchesQuery(q, f.query, f.rewardsOnly) &&
+    matchesClasses(q, f.classes) &&
+    matchesSlot(q, f.slot, slotsByKey) &&
+    matchesCoinOnly(q, f.coinOnly)
   return {
     raise: work.raise.filter(hunts),
-    // The LOWER list takes the query and the class filter, never the slot: a cost is a cost
-    // whatever slot its rewards fill — but a search for an item must narrow it like the rest
-    // (the Pestilence Scythe report: a matched COST quest kept its whole faction's list around).
-    lower: work.lower.filter((q) => matchesQuery(q, f.query) && matchesClasses(q, f.classes)),
+    // The LOWER list takes the query, the class filter and the gold-only reading, never the
+    // slot: a cost is a cost whatever slot its rewards fill — but a search for an item must
+    // narrow it like the rest (the Pestilence Scythe report), and a donation hunt has no use
+    // for costs that demand farmed items.
+    lower: work.lower.filter(
+      (q) =>
+        matchesQuery(q, f.query, f.rewardsOnly) &&
+        matchesClasses(q, f.classes) &&
+        matchesCoinOnly(q, f.coinOnly)
+    ),
     ...(work.homeZone === undefined ? {} : { homeZone: work.homeZone }),
     nearby: work.nearby.filter(hunts)
   }

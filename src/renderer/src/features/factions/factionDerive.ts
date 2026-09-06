@@ -17,12 +17,20 @@ export interface GearMaps {
   slots: ReadonlyMap<string, readonly EquipSlot[]>
 }
 
+/**
+ * The stat keys that describe an item's PHYSICS rather than its virtue: every rusty weapon has a
+ * damage and a delay, and everything on Norrath weighs something. Counting them made a 21-piece
+ * newbie junk pile read as "21 gear rewards" (the Emerald Warriors' Items report); an item is
+ * GEAR here only for what it adds — a stat, an AC, a save, an effect.
+ */
+const PHYSICAL_KEYS: ReadonlySet<string> = new Set(['DMG', 'DELAY', 'RANGE', 'WEIGHT'])
+
 export function gearMaps(rows: readonly GearRow[]): GearMaps {
   const worthy = new Set<string>()
   const slots = new Map<string, readonly EquipSlot[]>()
   for (const r of rows) {
     slots.set(r.key, r.slots)
-    const statful = Object.values(r.stats).some((v) => (v ?? 0) !== 0)
+    const statful = Object.entries(r.stats).some(([k, v]) => (v ?? 0) !== 0 && !PHYSICAL_KEYS.has(k))
     if (statful || r.effects.length > 0) worthy.add(r.key)
   }
   return { worthy, slots }
@@ -97,6 +105,8 @@ export interface RowFilters {
   hideMaxed: boolean
   /** only factions that still GATE a race unlock (`FactionRowVm.unlocks`, the achievements dump) */
   unlocksOnly: boolean
+  /** the search reads REWARDS only — the find-the-chain's-final-quest scope */
+  rewardsOnly: boolean
 }
 
 /** The three sortable columns. Regard sorts the ladder's RANKS, so ties inside one rung stay
@@ -127,7 +137,10 @@ export function visibleRows(rows: readonly FactionRowVm[], f: RowFilters, sort: 
       // finds Kerra Isle without anyone knowing which faction owns the quest. A live search also
       // OVERRIDES the hide-toggles: the one faction holding the match may be untouched or maxed,
       // and a search whose only answer is hidden reads as no answer at all.
-      if (q !== '') return r.searchText.includes(q) && !(f.unlocksOnly && r.unlocks.length === 0)
+      if (q !== '') {
+        const hay = f.rewardsOnly ? r.rewardText : r.searchText
+        return hay.includes(q) && !(f.unlocksOnly && r.unlocks.length === 0)
+      }
       // The unlocks hunt OVERRIDES the hide-toggles too: a race-gating faction is usually
       // untouched, which is exactly what the default view hides — the race-chip reveal's trap.
       if (f.unlocksOnly) return r.unlocks.length > 0

@@ -5,6 +5,7 @@
 import { type JSX } from 'react'
 import {
   Box,
+  Button,
   FormControlLabel,
   MenuItem,
   Stack,
@@ -63,12 +64,16 @@ export function WorkFilterControls({
   classes,
   onClasses,
   slot,
-  onSlot
+  onSlot,
+  coinOnly,
+  onCoinOnly
 }: {
   classes: ClassAbbr[]
   onClasses: (v: ClassAbbr[]) => void
   slot: SlotFilter
   onSlot: (v: SlotFilter) => void
+  coinOnly: boolean
+  onCoinOnly: (on: boolean) => void
 }): JSX.Element {
   return (
     <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 1 }}>
@@ -100,24 +105,37 @@ export function WorkFilterControls({
           </MenuItem>
         ))}
       </TextField>
+      {/* The pure DONATION quests — a stated coin turn-in and nothing to farm first: the
+          walk-up-with-2-gold faction work the guard quests are famous for. */}
+      <FilterSwitch
+        label="Gold only"
+        checked={coinOnly}
+        onChange={onCoinOnly}
+        testId="factions-coin-only"
+      />
     </Stack>
   )
 }
 
-/** One filter switch: a small labelled toggle with its own count. */
+/** One filter switch: a small labelled toggle with its own count. A `disabledHint` renders it
+ *  inert with the reason on hover — a control that cannot work says why, never just (0). */
 function FilterSwitch({
   label,
   checked,
   onChange,
+  disabledHint,
   testId
 }: {
   label: string
   checked: boolean
   onChange: (on: boolean) => void
+  disabledHint?: string
   testId: string
 }): JSX.Element {
   return (
     <FormControlLabel
+      title={disabledHint}
+      disabled={disabledHint !== undefined}
       control={
         <Switch
           size="small"
@@ -139,7 +157,10 @@ export function FilterBar({
   query,
   onQuery,
   toggles,
-  counts
+  counts,
+  unlocksKnown,
+  expandedCount,
+  onCollapseAll
 }: {
   query: string
   onQuery: (q: string) => void
@@ -150,8 +171,15 @@ export function FilterBar({
     onHideMaxed: (on: boolean) => void
     unlocksOnly: boolean
     onUnlocksOnly: (on: boolean) => void
+    rewardsOnly: boolean
+    onRewardsOnly: (on: boolean) => void
   }
   counts: { untouched: number; maxed: number; unlockers: number; shown: number; total: number }
+  /** false until an achievements dump has been loaded — the race filter's whole data source */
+  unlocksKnown: boolean
+  /** how many rows are expanded — the collapse-all affordance shows only while any are */
+  expandedCount: number
+  onCollapseAll: () => void
 }): JSX.Element {
   return (
     <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 1 }}>
@@ -164,6 +192,14 @@ export function FilterBar({
         }}
         slotProps={{ htmlInput: { 'data-testid': 'factions-search' } }}
         sx={{ width: 260 }}
+      />
+      {/* The search's SCOPE, beside the box it scopes: rewards-only finds the quest that GRANTS
+          an item (the chain's final step) instead of everything that consumes one. */}
+      <FilterSwitch
+        label="Rewards only"
+        checked={toggles.rewardsOnly}
+        onChange={toggles.onRewardsOnly}
+        testId="factions-rewards-only"
       />
       <FilterSwitch
         label={`Hide untouched (${String(counts.untouched)})`}
@@ -184,9 +220,25 @@ export function FilterBar({
         label={`Unlocks a race (${String(counts.unlockers)})`}
         checked={toggles.unlocksOnly}
         onChange={toggles.onUnlocksOnly}
+        disabledHint={
+          unlocksKnown
+            ? undefined
+            : 'The race requirements come from the achievements export - type /outputfile achievements in game and this lights up.'
+        }
         testId="factions-unlocks-only"
       />
       <Box sx={{ flexGrow: 1 }} />
+      {expandedCount > 0 && (
+        <Button
+          size="small"
+          variant="text"
+          onClick={onCollapseAll}
+          data-testid="factions-collapse-all"
+          sx={{ minWidth: 0, px: 0.75, py: 0, textTransform: 'none', color: 'text.secondary' }}
+        >
+          Collapse all ({expandedCount})
+        </Button>
+      )}
       <Typography variant="caption" color="text.secondary" data-testid="factions-count">
         {counts.shown} of {counts.total}
       </Typography>
