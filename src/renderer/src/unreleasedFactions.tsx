@@ -39,7 +39,12 @@ export default function UnreleasedFactionsView({
   if (!LazyFactionsView || view !== 'factions') return null
   return (
     <Suspense fallback={<CircularProgress size={20} />}>
-      <LazyFactionsView key={viewKey} onOpenLoot={routing.openLoot} onOpenMob={routing.openMob} />
+      <LazyFactionsView
+        key={viewKey}
+        onOpenLoot={routing.openLoot}
+        onOpenMob={routing.openMob}
+        onSelectView={routing.selectView}
+      />
     </Suspense>
   )
 }

@@ -17,15 +17,18 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import type { RaceUnlockClaim } from '@shared/outputs/achievements'
 import type { FactionRowVm } from './useFactionRows'
 
-/** One required faction as a chip: live standing over cap, green once the server calls it done. */
+/** One required faction as a chip: live standing over cap, green once the server calls it done.
+ *  A click REVEALS that faction's row in the table below (the caller clears its hide-toggles). */
 function FactionChip({
   name,
   complete,
-  row
+  row,
+  onFind
 }: {
   name: string
   complete: boolean
   row: FactionRowVm | undefined
+  onFind?: (name: string) => void
 }): JSX.Element {
   const label =
     row === undefined ? name : `${name} ${String(row.standing)}/${String(row.cap)}`
@@ -35,6 +38,7 @@ function FactionChip({
       label={label}
       variant="outlined"
       color={complete ? 'success' : undefined}
+      onClick={onFind === undefined ? undefined : () => onFind(name)}
       sx={{ height: 20, fontSize: 11, '& .MuiChip-label': { px: 0.75 } }}
     />
   )
@@ -43,10 +47,12 @@ function FactionChip({
 /** One still-closed race: its name and the factions it still wants at maximum. */
 function ClosedRace({
   claim,
-  byName
+  byName,
+  onFind
 }: {
   claim: RaceUnlockClaim
   byName: Map<string, FactionRowVm>
+  onFind?: (name: string) => void
 }): JSX.Element {
   return (
     <Stack direction="row" spacing={0.75} alignItems="center" flexWrap="wrap" useFlexGap data-testid="factions-race-closed">
@@ -54,7 +60,13 @@ function ClosedRace({
         {claim.race}
       </Typography>
       {claim.factions.map((f) => (
-        <FactionChip key={f.name} name={f.name} complete={f.complete} row={byName.get(f.name.toLowerCase())} />
+        <FactionChip
+          key={f.name}
+          name={f.name}
+          complete={f.complete}
+          row={byName.get(f.name.toLowerCase())}
+          onFind={onFind}
+        />
       ))}
       {claim.factions.length === 0 && (
         <Typography variant="caption" color="text.secondary">
@@ -68,10 +80,13 @@ function ClosedRace({
 /** The panel. `races` undefined ⇒ no achievements dump on record ⇒ nothing at all. */
 export default function RaceUnlocksPanel({
   races,
-  rows
+  rows,
+  onFind
 }: {
   races?: RaceUnlockClaim[]
   rows: readonly FactionRowVm[]
+  /** reveal a required faction's row in the table below */
+  onFind?: (name: string) => void
 }): JSX.Element | null {
   const [open, setOpen] = useState(false)
   if (races === undefined || races.length === 0) return null
@@ -105,7 +120,7 @@ export default function RaceUnlocksPanel({
             </Typography>
           )}
           {todo.map((c) => (
-            <ClosedRace key={c.race} claim={c} byName={byName} />
+            <ClosedRace key={c.race} claim={c} byName={byName} onFind={onFind} />
           ))}
         </Stack>
       </Collapse>
