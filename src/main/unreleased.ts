@@ -40,9 +40,13 @@
 
 import { app } from 'electron'
 import { E2E } from './e2e'
+// TEST-BUILD NEUTERING (this branch only, never a PR): the friend build is the review audience
+// for the UNRELEASED Factions tab, so the branch's own TEST switch (src/main/channel.ts) opens
+// this door in the packaged installer — matching the renderer half's forcing in devFlags.ts.
+import { TEST_BUILD } from './channel'
 
 /** An explicit opt-in for a production-shaped build. Read once — env is fixed at launch. */
 const FORCED = process.env.EQ_UNRELEASED === '1'
 
 /** Main-side door for surfaces that have not passed the owner's review gate. */
-export const UNRELEASED = FORCED || (!app.isPackaged && !E2E)
+export const UNRELEASED = FORCED || TEST_BUILD || (!app.isPackaged && !E2E)

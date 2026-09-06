@@ -125,4 +125,8 @@ export const OWNER_TOOLS: boolean = DEV_TOOLS && ownerToolsGranted(ownerToolsBri
 // A store-backed flag was considered and rejected: a persisted boolean cannot be structurally
 // absent — the feature would still be compiled into every installer, one flipped key away from a
 // user who was never meant to see it. The review gate asked for absence, not for a switch.
-export const UNRELEASED: boolean = import.meta.env.DEV
+// TEST-BUILD NEUTERING (this branch only, never a PR): forced OPEN so the packaged friend build
+// draws the UNRELEASED Factions tab — the whole point of test.8. The strip argument above stands
+// for real releases; a TEST install is the review audience, and `src/main/unreleased.ts` takes
+// the same forcing through `TEST_BUILD` so both halves of the gate agree.
+export const UNRELEASED: boolean = true
