@@ -50,11 +50,23 @@ function QuestCounts({ work }: { work: RowDerived['work'] }): JSX.Element | null
   )
 }
 
-/** The name cell's trailing signals: quest tallies, the gear-value count, the loud wishlist chip. */
-function NameSignals({ derived }: { derived: RowDerived }): JSX.Element {
+/** The name cell's trailing signals: quest tallies, the race gate, gear value, the wishlist chip. */
+function NameSignals({ derived, unlocks }: { derived: RowDerived; unlocks: readonly string[] }): JSX.Element {
   return (
     <>
       <QuestCounts work={derived.work} />
+      {/* THE RACE GATE: this faction must reach maximum before these races open. */}
+      {unlocks.length > 0 && (
+        <Chip
+          size="small"
+          color="info"
+          variant="outlined"
+          label={`unlocks ${unlocks.join(', ')}`}
+          title="needed at maximum for these Race Unlock achievements"
+          data-testid="factions-unlocks"
+          sx={{ ml: 1, height: 20, fontSize: 11, maxWidth: 280 }}
+        />
+      )}
       {derived.gear.length > 0 && (
         <Typography
           component="span"
@@ -118,7 +130,7 @@ export default function FactionRow({
             />
           )}
           {row.name}
-          <NameSignals derived={derived} />
+          <NameSignals derived={derived} unlocks={row.unlocks} />
         </TableCell>
         <TableCell sx={{ py: 0.5, width: 130 }}>
           <Chip

@@ -90,16 +90,19 @@ export interface RowFilters {
   hideUntouched: boolean
   /** hide rows at their own cap (LIVE `toMax <= 0` — the dump's fact plus the log's): done is done */
   hideMaxed: boolean
+  /** only factions that still GATE a race unlock (`FactionRowVm.unlocks`, the achievements dump) */
+  unlocksOnly: boolean
 }
 
 export function visibleRows(rows: readonly FactionRowVm[], f: RowFilters): FactionRowVm[] {
   const q = f.query.trim().toLowerCase()
   return rows
-    .filter(
-      (r) =>
-        (q === '' || r.name.toLowerCase().includes(q)) &&
-        !(f.hideUntouched && r.standing === 0) &&
-        !(f.hideMaxed && r.toMax <= 0)
-    )
+    .filter((r) => {
+      if (q !== '' && !r.name.toLowerCase().includes(q)) return false
+      // The unlocks hunt OVERRIDES the hide-toggles: a race-gating faction is usually untouched,
+      // which is exactly what the default view hides — the same trap the race-chip reveal clears.
+      if (f.unlocksOnly) return r.unlocks.length > 0
+      return !(f.hideUntouched && r.standing === 0) && !(f.hideMaxed && r.toMax <= 0)
+    })
     .sort((a, b) => b.standing - a.standing || a.name.localeCompare(b.name))
 }

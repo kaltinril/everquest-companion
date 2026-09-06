@@ -56,33 +56,40 @@ function NoDump(): JSX.Element {
   )
 }
 
-/** The two row-level actions, split out of `FactionsView` at the 100-line function ceiling. */
-function useRowActions(deps: {
-  onSelectView?: (v: View) => void
-  setQuery: (q: string) => void
-  setHideUntouched: (on: boolean) => void
-  setHideMaxed: (on: boolean) => void
-}): { onOpenZone: (stem: ZoneShort) => void; onFind: (name: string) => void } {
-  const { onSelectView, setQuery, setHideUntouched, setHideMaxed } = deps
-  const onOpenZone = useCallback(
-    (stem: ZoneShort) => {
-      saveZoneSelection(onPick(stem))
-      onSelectView?.('maps')
-    },
-    [onSelectView]
-  )
+/** The row-filter STATE — the search, the three toggles, and the race-chip reveal — as one hook,
+ *  split out of `FactionsView` at the 100-line function ceiling. */
+function useRowFilterState(): {
+  rowFilters: RowFilters
+  onQuery: (q: string) => void
+  toggles: Parameters<typeof FilterBar>[0]['toggles']
+  /** the race-chip reveal: search for the faction and clear the hide-toggles that would bury it */
+  reveal: (name: string) => void
+} {
+  const [query, setQuery] = useState('')
+  const [hideUntouched, setHideUntouched] = useState(true)
+  const [hideMaxed, setHideMaxed] = useState(true)
+  const [unlocksOnly, setUnlocksOnly] = useState(false)
   // A race chip's click REVEALS its faction row: the search finds it, and both hide-toggles come
   // off — a race's missing faction is usually untouched, which is exactly what the default view
   // hides, and a reveal that landed on an empty table would read as a broken link.
-  const onFind = useCallback(
-    (name: string) => {
-      setQuery(name)
-      setHideUntouched(false)
-      setHideMaxed(false)
+  const reveal = useCallback((name: string) => {
+    setQuery(name)
+    setHideUntouched(false)
+    setHideMaxed(false)
+  }, [])
+  return {
+    rowFilters: { query, hideUntouched, hideMaxed, unlocksOnly },
+    onQuery: setQuery,
+    toggles: {
+      hideUntouched,
+      onHideUntouched: setHideUntouched,
+      hideMaxed,
+      onHideMaxed: setHideMaxed,
+      unlocksOnly,
+      onUnlocksOnly: setUnlocksOnly
     },
-    [setQuery, setHideUntouched, setHideMaxed]
-  )
-  return { onOpenZone, onFind }
+    reveal
+  }
 }
 
 /** The table's rows once every filter has spoken — split out at the 100-line function ceiling. */
@@ -116,13 +123,17 @@ export default function FactionsView({
   onSelectView?: (v: View) => void
 }): JSX.Element {
   const { rows: all, readAt, held, raceUnlocks } = useFactionData()
-  const [query, setQuery] = useState('')
-  const [hideUntouched, setHideUntouched] = useState(true)
-  const [hideMaxed, setHideMaxed] = useState(true)
+  const { rowFilters, onQuery, toggles, reveal } = useRowFilterState()
   const [classSel, setClassSel] = useState<ClassAbbr[]>([])
   const [slot, setSlot] = useState<SlotFilter>('ANY')
   const [expandedId, setExpandedId] = useState<number | null>(null)
-  const { onOpenZone, onFind } = useRowActions({ onSelectView, setQuery, setHideUntouched, setHideMaxed })
+  const onOpenZone = useCallback(
+    (stem: ZoneShort) => {
+      saveZoneSelection(onPick(stem))
+      onSelectView?.('maps')
+    },
+    [onSelectView]
+  )
   const gearIndex = useGearIndex()
   const wishlist = useWishlist()
   const wishKeys = useMemo(
@@ -139,9 +150,10 @@ export default function FactionsView({
     () => deriveRows(all, workFilters, maps, wishKeys),
     [all, workFilters, maps, wishKeys]
   )
-  const rows = useTableRows(all, { query, hideUntouched, hideMaxed }, workFilters, derivedById)
+  const rows = useTableRows(all, rowFilters, workFilters, derivedById)
   const untouched = useMemo(() => (all ?? []).filter((r) => r.standing === 0).length, [all])
   const maxed = useMemo(() => (all ?? []).filter((r) => r.toMax <= 0).length, [all])
+  const unlockers = useMemo(() => (all ?? []).filter((r) => r.unlocks.length > 0).length, [all])
   return (
     <Box
       data-testid="factions-view"
@@ -152,13 +164,13 @@ export default function FactionsView({
         <NoDump />
       ) : (
         <>
-          <RaceUnlocksPanel races={raceUnlocks} rows={all} onFind={onFind} />
+          <RaceUnlocksPanel races={raceUnlocks} rows={all} onFind={reveal} />
           <WorkFilterControls classes={classSel} onClasses={setClassSel} slot={slot} onSlot={setSlot} />
           <FilterBar
-            query={query}
-            onQuery={setQuery}
-            toggles={{ hideUntouched, onHideUntouched: setHideUntouched, hideMaxed, onHideMaxed: setHideMaxed }}
-            counts={{ untouched, maxed, shown: rows.length, total: all.length }}
+            query={rowFilters.query}
+            onQuery={onQuery}
+            toggles={toggles}
+            counts={{ untouched, maxed, unlockers, shown: rows.length, total: all.length }}
           />
           <Box sx={{ flexGrow: 1, minHeight: 0, overflow: 'auto' }}>
             <Table size="small" stickyHeader data-testid="factions-table">

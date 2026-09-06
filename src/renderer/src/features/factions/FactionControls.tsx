@@ -101,8 +101,10 @@ export function FilterBar({
     onHideUntouched: (on: boolean) => void
     hideMaxed: boolean
     onHideMaxed: (on: boolean) => void
+    unlocksOnly: boolean
+    onUnlocksOnly: (on: boolean) => void
   }
-  counts: { untouched: number; maxed: number; shown: number; total: number }
+  counts: { untouched: number; maxed: number; unlockers: number; shown: number; total: number }
 }): JSX.Element {
   return (
     <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 1 }}>
@@ -127,6 +129,15 @@ export function FilterBar({
         checked={toggles.hideMaxed}
         onChange={toggles.onHideMaxed}
         testId="factions-hide-maxed"
+      />
+      {/* Only the factions still GATING a race unlock — each row's chip says which race. The
+          count is 0 without an achievements dump, and the switch is honest about that: it shows
+          an empty table rather than pretending to know. */}
+      <FilterSwitch
+        label={`Unlocks a race (${String(counts.unlockers)})`}
+        checked={toggles.unlocksOnly}
+        onChange={toggles.onUnlocksOnly}
+        testId="factions-unlocks-only"
       />
       <Box sx={{ flexGrow: 1 }} />
       <Typography variant="caption" color="text.secondary" data-testid="factions-count">
