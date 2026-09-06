@@ -51,7 +51,9 @@ import type { ClassAbbr, ComboDelta, ComboSnap } from '../shared/classCombo'
 import type { CharacterSheet } from '../shared/characterSheet'
 // The `/outputfile` registry's one IPC shape (JOS-44) — command, why-clause, and the dump's own
 // mtime, per kind. Every surface fed by an export command reads this and nothing else.
-import type { OutputFileStatus } from '../shared/outputs/kinds'
+// The `/outputfile` registry's slice (status line + the Factions tab's log evidence) — split for
+// file mass, planner.ts's arrangement.
+import { outputsApi } from './outputs'
 import type {
   MapGetResult,
   MapPackListResult,
@@ -360,12 +362,8 @@ const api = {
   },
   getProgress: (): Promise<ProgressState> => ipcRenderer.invoke(IPC.getProgress),
   reloadInventory: (): Promise<ReloadInventoryResult> => ipcRenderer.invoke(IPC.reloadInventory),
-  /**
-   * Every `/outputfile` kind the app knows, joined to the active character's file on disk
-   * (JOS-44). `updatedAt` is the FILE's mtime — when the player dumped, never when we read —
-   * and null means the command has never been run here.
-   */
-  outputsStatus: (): Promise<OutputFileStatus[]> => ipcRenderer.invoke(IPC.outputsStatus),
+  // ---- the `/outputfile` registry's slice, in its own file (src/preload/outputs.ts) ----
+  ...outputsApi,
   /**
    * State this quest's turn-ins: the epoch-ms instants it was handed in, ascending (JOS-131).
    * An empty list means "never turned in" and clears a pre-JOS-131 completion too. Main

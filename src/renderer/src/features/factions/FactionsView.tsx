@@ -1,33 +1,24 @@
 // factions/FactionsView.tsx — THE FACTION STANDINGS TAB (UNRELEASED; the third graduated
 // `/outputfile` kind, 2026-09-05).
 //
-// WHAT THIS TAB IS. The `/outputfile faction` dump, drawn: one row per faction the server tracks,
-// each carrying the ABSOLUTE standing the game will state nowhere else — the log's faction lines
-// say only better/worse, and `/con` samples one mob at one instant. Main loads the dump at
-// session start and follows it for rewrites (session.ts, the inventory/achievements twins), so
-// typing the command in game fills this tab with no click anywhere; the store write lands on
-// `ProgressState.factionStandings` and `onProgress` is the whole delivery.
+// WHAT THIS TAB IS. The `/outputfile faction` dump, drawn LIVE: one row per faction the server
+// tracks, the dump's absolute number corrected by the log's own receipts since the file was
+// written (`adjusted by N` sums on; a "could not possibly get any better/worse" line PINS the
+// value at the cap whatever a stale file said — useFactionRows.ts / shared/factionLog.ts). A row
+// that moved since the dump wears its drift beside the number, with the dump's own value one
+// hover away.
 //
-// TWO READINGS PER ROW, deliberately: the NUMBER (precision — "1815, 185 short of the cap") and
-// the /con RUNG (meaning — "kindly"). The rung chip wears the app's one con ladder and palette
-// (shared/considerFaction.ts), and the floors it is derived from are ASSUMED community values —
-// factionTiers.ts's header carries exactly what is unmeasured and what would settle it.
+// Race unlocks head the tab because the server defines them AS faction work ("Get maximum
+// faction with …" — RaceUnlocksPanel.tsx); each faction row expands into the quests that move it
+// (FactionWorkPanel.tsx), with the turn-in items carrying "you have N" from the inventory dump.
 //
-// PROJECT FIRST, ARRANGE SECOND (owner ruling 4). The dump rows are domain data, and the ruling's
-// boundary is that a renderer never filters/sorts a domain collection — so the ONE thing done to
-// `FactionStanding[]` here is a `.map` into this file's own row model (a projection is what a
-// renderer is for; the rule's header says so in those words), and the search box, the untouched
-// toggle and the ordering all operate on that view model. No exemption needed, none taken.
-//
-// THE ROSTER INCLUDES FACTIONS THE CHARACTER HAS NEVER MET (a measured fact of the dump — the
-// server's table, not a diary), so the default view hides the untouched 0-rows behind a toggle:
-// 185 rows where ~50 have ever moved is a table whose signal is drowned by its own long tail.
-// A 0 can also be a real return to neutral; the toggle is a filter, never a claim.
+// THE ROSTER INCLUDES FACTIONS THE CHARACTER HAS NEVER MET (the server's table, not a diary), so
+// untouched 0-rows and capped rows hide behind toggles, both ON by default.
 //
 // THE LIST IS ITS OWN SCROLLER (AGENTS.md UI conventions): the view fills its height and the
 // table scrolls in a bounded box rather than growing the page.
 
-import { type JSX, useEffect, useMemo, useState } from 'react'
+import { type JSX, useMemo, useState } from 'react'
 import {
   Box,
   Chip,
@@ -47,99 +38,17 @@ import {
 import HandshakeIcon from '@mui/icons-material/Handshake'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
-import type { FactionStanding } from '@shared/outputs/factions'
-import type { ProgressState } from '@shared/types'
-import { CONSIDER_FACTION_COLOR, CONSIDER_FACTION_LABEL } from '@shared/considerFaction'
+import type { HeldCounts } from '@shared/types'
 import OutputKindLine from '../../components/OutputKindLine'
-import { factionTier } from './factionTiers'
-import { factionWorkIndex, type FactionWork } from './factionQuests'
 import FactionWorkPanel from './FactionWorkPanel'
+import RaceUnlocksPanel from './RaceUnlocksPanel'
+import { useFactionData, type FactionRowVm } from './useFactionRows'
 
-/** The dump's floor — the far end every bar is measured from (measured cap ±2000, factions.ts). */
-const SCALE_FLOOR = -2000
-
-/**
- * ONE ROW AS THIS TAB DRAWS IT — the projection of a `FactionStanding` plus everything the render
- * derives from it once (the rung, its colour, the bar geometry), declared HERE because it is this
- * view's own shape, not the dump's.
- */
-interface FactionRowVm {
-  id: number
-  name: string
-  standing: number
-  /** `standing + toMax` — the file's own ceiling for THIS faction (today always 2000), so the bar
-   *  still tells the truth the day a faction caps elsewhere. */
-  cap: number
-  toMax: number
-  label: string
-  color: string
-  /** the bar, 0–100 from the scale floor to this faction's cap */
-  pct: number
-  /** the quests on record that move this faction (factionQuests.ts), null when none name it */
-  work: FactionWork | null
-  /** how many quests RAISE it — the collapsed row's "there is work here" count */
-  raiseCount: number
-}
-
-function toRowVm(r: FactionStanding, work: Map<string, FactionWork>): FactionRowVm {
-  const tier = factionTier(r.standing)
-  const cap = r.standing + r.toMax
-  const w = work.get(r.name.toLowerCase()) ?? null
-  return {
-    id: r.id,
-    name: r.name,
-    standing: r.standing,
-    cap,
-    toMax: r.toMax,
-    label: CONSIDER_FACTION_LABEL[tier],
-    color: CONSIDER_FACTION_COLOR[tier],
-    pct: Math.max(0, Math.min(100, ((r.standing - SCALE_FLOOR) / (cap - SCALE_FLOOR)) * 100)),
-    work: w,
-    raiseCount: w?.raise.length ?? 0
-  }
-}
-
-interface FactionsProgress {
-  /** null until the first read lands AND while no dump has ever been loaded for this character */
-  rows: FactionRowVm[] | null
-  /** when this app last read the dump — `OutputKindLine`'s second slot */
-  readAt: number | null
-}
-
-/** The standings as persisted, live on the same push every progress consumer rides. */
-function useFactionRows(): FactionsProgress {
-  const [progress, setProgress] = useState<ProgressState | null>(null)
-  useEffect(() => {
-    let alive = true
-    void window.eq.getProgress().then((p) => {
-      if (alive) setProgress(p)
-    })
-    const off = window.eq.onProgress((p) => {
-      setProgress(p)
-    })
-    return () => {
-      alive = false
-      off()
-    }
-  }, [])
-  const standings = progress?.factionStandings
-  const rows = useMemo(
-    () => (standings === undefined ? null : standings.map((r) => toRowVm(r, factionWorkIndex()))),
-    [standings]
-  )
-  return { rows, readAt: progress?.factionsSource?.readAt ?? null }
-}
-
-/**
- * The rows worth drawing, decided per read: filter first, then sort by standing descending with
- * the name as the tiebreak — the factions you have actually worked are the top of the table, the
- * ones working against you the bottom, and the alphabetical middle stays stable between renders.
- */
 interface RowFilters {
   query: string
   /** hide the 0-rows the character has never touched */
   hideUntouched: boolean
-  /** hide rows at their own cap (`toMax <= 0` — the dump's fact, not a rung guess): done is done */
+  /** hide rows at their own cap (LIVE `toMax <= 0` — the dump's fact plus the log's): done is done */
   hideMaxed: boolean
 }
 
@@ -155,10 +64,17 @@ function visibleRows(rows: readonly FactionRowVm[], f: RowFilters): FactionRowVm
     .sort((a, b) => b.standing - a.standing || a.name.localeCompare(b.name))
 }
 
-/** The link handlers the work panel forwards into the app's standing drill-downs. */
+/** The link handlers and held counts the work panel draws with. */
 interface WorkLinks {
   onOpenLoot?: (item?: string) => void
   onOpenMob?: (t: { mob: string }) => void
+  held: HeldCounts
+}
+
+/** The hover behind a drifted number: both halves of the correction, and how sure it is. */
+function driftTitle(row: FactionRowVm): string {
+  const base = `dump said ${String(row.dumpStanding)}; the log moved it ${row.drift > 0 ? '+' : ''}${String(row.drift)} since`
+  return row.exact ? base : `${base} (log window did not reach the dump - at least this much)`
 }
 
 /**
@@ -208,11 +124,24 @@ function FactionRow({
             variant="outlined"
           />
         </TableCell>
-        <TableCell align="right" sx={{ py: 0.5, width: 90, fontVariantNumeric: 'tabular-nums' }}>
+        <TableCell align="right" sx={{ py: 0.5, width: 130, fontVariantNumeric: 'tabular-nums' }}>
+          {/* The LIVE number; a row the log moved wears its drift, dump value on the hover. */}
+          {row.drift !== 0 && (
+            <Typography
+              component="span"
+              variant="caption"
+              title={driftTitle(row)}
+              data-testid="factions-drift"
+              sx={{ color: row.drift > 0 ? 'success.main' : 'error.main', mr: 0.75 }}
+            >
+              {row.drift > 0 ? '+' : ''}
+              {row.drift}
+              {row.exact ? '' : '?'}
+            </Typography>
+          )}
           {row.standing}
         </TableCell>
         <TableCell sx={{ py: 0.5, width: 180 }}>
-          {/* The exact arithmetic on hover, the Stamp idiom: coarse on the row, precise one hover away. */}
           <LinearProgress
             variant="determinate"
             value={row.pct}
@@ -230,7 +159,12 @@ function FactionRow({
         <TableCell colSpan={4} sx={{ py: 0, borderBottom: expanded ? undefined : 'none' }}>
           <Collapse in={expanded} unmountOnExit>
             <Box sx={{ pl: 3 }}>
-              <FactionWorkPanel work={row.work} onOpenLoot={links.onOpenLoot} onOpenMob={links.onOpenMob} />
+              <FactionWorkPanel
+                work={row.work}
+                held={links.held}
+                onOpenLoot={links.onOpenLoot}
+                onOpenMob={links.onOpenMob}
+              />
             </Box>
           </Collapse>
         </TableCell>
@@ -246,7 +180,7 @@ function NoDump(): JSX.Element {
       <HandshakeIcon sx={{ fontSize: 44, opacity: 0.6 }} />
       <Typography variant="body2" data-testid="factions-empty" sx={{ maxWidth: 460, textAlign: 'center' }}>
         Type <code>/outputfile faction</code> in game and this becomes your real standing with
-        every faction the server tracks - the number the better/worse lines never say. The app
+        every faction the server tracks - the number the adjustment lines never total up. The app
         notices the file by itself; re-type the command any time to refresh.
       </Typography>
     </Stack>
@@ -333,13 +267,19 @@ function FilterBar({
   )
 }
 
-export default function FactionsView({ onOpenLoot, onOpenMob }: WorkLinks): JSX.Element {
-  const { rows: all, readAt } = useFactionRows()
+export default function FactionsView({
+  onOpenLoot,
+  onOpenMob
+}: {
+  onOpenLoot?: (item?: string) => void
+  onOpenMob?: (t: { mob: string }) => void
+}): JSX.Element {
+  const { rows: all, readAt, held, raceUnlocks } = useFactionData()
   const [query, setQuery] = useState('')
   const [hideUntouched, setHideUntouched] = useState(true)
   const [hideMaxed, setHideMaxed] = useState(true)
   const [expandedId, setExpandedId] = useState<number | null>(null)
-  const links = useMemo(() => ({ onOpenLoot, onOpenMob }), [onOpenLoot, onOpenMob])
+  const links = useMemo(() => ({ onOpenLoot, onOpenMob, held }), [onOpenLoot, onOpenMob, held])
   const rows = useMemo(
     () => (all === null ? [] : visibleRows(all, { query, hideUntouched, hideMaxed })),
     [all, query, hideUntouched, hideMaxed]
@@ -356,6 +296,7 @@ export default function FactionsView({ onOpenLoot, onOpenMob }: WorkLinks): JSX.
         <NoDump />
       ) : (
         <>
+          <RaceUnlocksPanel races={raceUnlocks} rows={all} />
           <FilterBar
             query={query}
             onQuery={setQuery}

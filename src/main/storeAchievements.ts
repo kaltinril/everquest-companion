@@ -27,16 +27,27 @@
 // electron-store rewrites the whole parsed object so both survive a round trip through an older
 // build.
 
-import type { AchievementsSource, ClassUnlockClaim } from '../shared/outputs/achievements'
+import type {
+  AchievementsSource,
+  ClassUnlockClaim,
+  RaceUnlockClaim
+} from '../shared/outputs/achievements'
 import type { ProgressState } from '../shared/types'
 import { getProgress, setProgress } from './store'
 
-/** Record the achievements dump's earned class-unlock rewards and where they came from. */
+/** Record the achievements dump's earned class-unlock rewards, its race unlocks, and where they
+ *  came from — one write, so no half can describe a different dump than the others. */
 export function setAchievements(
   charId: string,
   unlocks: ClassUnlockClaim[],
+  races: RaceUnlockClaim[],
   source: AchievementsSource
 ): ProgressState {
   const p = getProgress(charId)
-  return setProgress(charId, { ...p, achievementUnlocks: unlocks, achievementsSource: source })
+  return setProgress(charId, {
+    ...p,
+    achievementUnlocks: unlocks,
+    raceUnlocks: races,
+    achievementsSource: source
+  })
 }

@@ -15,21 +15,30 @@
 
 import { type JSX } from 'react'
 import { Box, Stack, Typography } from '@mui/material'
+import type { HeldCounts } from '@shared/types'
 import { DonorName } from '../planner/PlannerChips'
 import type { FactionQuestRef, FactionWork } from './factionQuests'
 
 /** How many linked names a list shows before folding the rest into a "+N more" hover. */
 const LIST_CAP = 4
 
-/** A linked, capped item-name list: `label: A, B, C, D +3 more`. Nothing when the list is empty. */
+/**
+ * A linked, capped item-name list: `label: A (have 14), B, +3 more`. Nothing when empty. `held`
+ * is the inventory dump's counts (`ProgressState.inventory`, lowercased names) — passed only for
+ * the TURN-IN list, because "do I already have the thing to save" is that list's question; a
+ * silent name simply is not in the dump, which is not a claim of zero (the dump only covers what
+ * was open when it was generated — CountSource's own caveat).
+ */
 function ItemLinks({
   label,
   names,
+  held,
   onOpenLoot,
   testId
 }: {
   label: string
   names: readonly string[]
+  held?: HeldCounts
   onOpenLoot?: (item?: string) => void
   testId?: string
 }): JSX.Element | null {
@@ -39,12 +48,21 @@ function ItemLinks({
   return (
     <Typography variant="caption" color="text.secondary" data-testid={testId} sx={{ display: 'block' }}>
       {label}{' '}
-      {shown.map((n, i) => (
-        <Box component="span" key={n}>
-          {i > 0 && ', '}
-          <DonorName name={n} onOpen={onOpenLoot} />
-        </Box>
-      ))}
+      {shown.map((n, i) => {
+        const have = held?.[n.toLowerCase()] ?? 0
+        return (
+          <Box component="span" key={n}>
+            {i > 0 && ', '}
+            <DonorName name={n} onOpen={onOpenLoot} />
+            {have > 0 && (
+              <Box component="span" title="in your last inventory dump" sx={{ color: 'success.main' }}>
+                {' '}
+                (have {have})
+              </Box>
+            )}
+          </Box>
+        )
+      })}
       {rest.length > 0 && (
         <Box component="span" title={rest.join(', ')} sx={{ cursor: 'help' }}>
           {' '}
@@ -88,11 +106,13 @@ function payoutLabel(ref: FactionQuestRef, up: boolean): string {
 function QuestLine({
   quest,
   up,
+  held,
   onOpenLoot,
   onOpenMob
 }: {
   quest: FactionQuestRef
   up: boolean
+  held?: HeldCounts
   onOpenLoot?: (item?: string) => void
   onOpenMob?: (t: { mob: string }) => void
 }): JSX.Element {
@@ -118,7 +138,13 @@ function QuestLine({
         </Typography>
       </Typography>
       <Box sx={{ pl: 3 }}>
-        <ItemLinks label="turn in:" names={quest.items} onOpenLoot={onOpenLoot} testId="factions-quest-items" />
+        <ItemLinks
+          label="turn in:"
+          names={quest.items}
+          held={held}
+          onOpenLoot={onOpenLoot}
+          testId="factions-quest-items"
+        />
         <ItemLinks label="rewards:" names={quest.rewards} onOpenLoot={onOpenLoot} testId="factions-quest-rewards" />
       </Box>
     </Box>
@@ -132,10 +158,12 @@ function QuestLine({
  */
 export default function FactionWorkPanel({
   work,
+  held,
   onOpenLoot,
   onOpenMob
 }: {
   work: FactionWork | null
+  held?: HeldCounts
   onOpenLoot?: (item?: string) => void
   onOpenMob?: (t: { mob: string }) => void
 }): JSX.Element {
@@ -150,7 +178,7 @@ export default function FactionWorkPanel({
   return (
     <Stack spacing={0.5} sx={{ py: 1 }} data-testid="factions-work">
       {work.raise.map((q) => (
-        <QuestLine key={q.name} quest={q} up onOpenLoot={onOpenLoot} onOpenMob={onOpenMob} />
+        <QuestLine key={q.name} quest={q} up held={held} onOpenLoot={onOpenLoot} onOpenMob={onOpenMob} />
       ))}
       {work.lower.length > 0 && (
         <Box sx={{ pt: work.raise.length > 0 ? 1 : 0 }}>
@@ -158,7 +186,14 @@ export default function FactionWorkPanel({
             Costs this faction:
           </Typography>
           {work.lower.map((q) => (
-            <QuestLine key={q.name} quest={q} up={false} onOpenLoot={onOpenLoot} onOpenMob={onOpenMob} />
+            <QuestLine
+              key={q.name}
+              quest={q}
+              up={false}
+              held={held}
+              onOpenLoot={onOpenLoot}
+              onOpenMob={onOpenMob}
+            />
           ))}
         </Box>
       )}
