@@ -1,0 +1,186 @@
+ID	Name	StandingValue	PointsToMax
+65	Brownies of Faydwer	0	2000
+106	Pixies of Faydwer	0	2000
+121	Qeynos Citizens	0	2000
+128	Erudin Citizens	0	2000
+138	Clockworks of Ak`Anon	0	2000
+144	Kaladim Citizens	0	2000
+217	Allize Volew	2000	0
+1717	Lorekeepers of Gukta	2000	0
+218	Allize Taeew	-2000	4000
+1718	Guktan Elders	2000	0
+219	Antonius Bayle	-1	2001
+1719	Citizens of Gukta	0	2000
+220	Arcane Scientists	-50	2050
+1720	Guktan Suppliers	2000	0
+221	Bloodsabers	0	2000
+222	Broken Skull Clan	0	2000
+722	New Sebilisian Expedition	100	1900
+1722	Exiled Frogloks	0	2000
+223	Circle of Unseen Hands	5	1995
+225	Clan Runnyeye	-377	2377
+226	Clerics of Tunare	2000	0
+227	Clerics of Underfoot	690	1310
+228	Clurg	-50	2050
+229	Coalition of Tradefolk	-1	2001
+230	Corrupt Qeynos Guards	5	1995
+231	Craftkeepers	535	1465
+232	Craknek Warriors	0	2000
+1732	Tribe Vrodak	0	2000
+233	Crimson Hands	535	1465
+234	Crushbone Orcs	-2000	4000
+235	DaBashers	0	2000
+236	Dark Bargainers	2000	0
+237	Dark Ones	0	2000
+238	Dark Reflection	0	2000
+239	The Dead	0	2000
+240	Deepmuses	0	2000
+241	Deeppockets	0	2000
+242	Deepwater Knights	535	1465
+243	Drafling	0	2000
+244	Ebon Mask	0	2000
+245	Eldritch Collective	0	2000
+246	Faydarks Champions	2000	0
+249	Nagafen	-2000	4000
+251	Frogloks of Guk	1815	185
+254	Gate Callers	535	1465
+255	Gem Choppers	141	1859
+258	Goblins of Fire Peak	0	2000
+261	Green Blood Knights	-100	2100
+262	Guards of Qeynos	1772	228
+263	Guardians of the Vale	1820	180
+264	Whistling Fist Brotherhood	0	2000
+265	Heretics	-271	2271
+266	High Council of Erudin	-45	2045
+267	High Guard of Erudin	-295	2295
+269	Kithicor Residents	0	2000
+270	Indigo Brotherhood	-1150	3150
+271	Dismal Rage	0	2000
+272	Jaggedpine Treefolk	1635	365
+273	Kane Bayle	0	2000
+274	Kazon Stormhammer	690	1310
+275	Keepers of the Art	0	2000
+276	Kelethin Merchants	2000	0
+277	Kerra of Barren Coast	45	1955
+278	King Naythox Thex	0	2000
+279	King Tearis Thex	2000	0
+280	Knights of Thunder	0	2000
+281	Knights of Truth	42	1958
+282	Kobolds of Fire Pit	-248	2248
+284	League of Antonican Bards	2000	0
+285	Mayong Mistmoore	-2000	4000
+286	Mayor Gubbin	0	2000
+287	Meldrath	-140	2140
+288	Merchants of Ak`Anon	0	2000
+289	Merchants of Erudin	-225	2225
+290	Merchants of Kaladim	0	2000
+291	Merchants of Qeynos	1625	375
+292	Merchants of Rivervale	0	2000
+293	Miners Guild 249	483	1517
+296	Opal Darkbriar	7	1993
+297	Paladins of Underfoot	0	2000
+298	Peace Keepers	0	2000
+299	Phinigel Autropos	-184	2184
+300	Priests of Mischief	5	1995
+302	Protectors of Pine	0	2000
+303	Queen Cristanos Thex	0	2000
+304	Ring of Scale	2000	0
+305	Rogues of the White Rose	0	2000
+306	Sabertooths of Blackburrow	-2000	4000
+308	Shadowknights of Night Keep	15	1985
+309	Silent Fist Clan	1635	365
+310	Soldiers of Tunare	2000	0
+311	Steel Warriors	35	1965
+312	Storm Guard	2000	0
+316	Tunare's Scouts	0	2000
+317	Undead Frogloks of Guk	-2000	4000
+319	Vox	-2000	4000
+320	Wolves of the North	0	2000
+321	Split Paw Clan	-345	2345
+322	Miners Guild 628	0	2000
+323	Solusek Mining Co.	1840	160
+324	Unkempt Druids	0	2000
+325	Merchants of Felwithe	2000	0
+326	Emerald Warriors	2000	0
+327	Shamen of Justice	0	2000
+328	Merchants of Halas	0	2000
+329	Carson McCabe	0	2000
+330	The Freeport Militia	12	1988
+331	Merchants of Highpass	0	2000
+332	Highpass Guards	0	2000
+333	King Ak`Anon	140	1860
+334	Dreadguard Outer	2000	0
+336	Coalition of Tradefolk Underground	0	2000
+337	Oggok Guards	0	2000
+338	Merchants of Oggok	0	2000
+340	Priests of Innoruuk	0	2000
+341	Priests of Life	0	2000
+342	Order of Three	0	2000
+343	Surefall Protected Animals	0	2000
+345	Karana Residents	140	1860
+346	Commons Residents	55	1945
+353	Neriak Ogre	0	2000
+354	Neriak Troll	0	2000
+355	Storm Reapers	320	1680
+361	Ashen Order	55	1945
+362	Priests of Marr	0	2000
+363	The Spurned	0	2000
+364	Shralok Orcs	0	2000
+365	Pickclaw Goblins	-2000	4000
+366	Karana Bandits	0	2000
+367	Donovon	0	2000
+368	Dervish Cutthroats	0	2000
+370	Dreadguard Inner	2000	0
+371	Neriak Ghoul	0	2000
+372	Najena	0	2000
+373	Mucktail Gnolls	0	2000
+374	Oggok Resident	0	2000
+375	Death Fist Orcs	-25	2025
+376	Grobb Merchants	0	2000
+377	Grobb Guard	0	2000
+378	Stone Hive Bixies	0	2000
+379	Butcherblock Bandits	0	2000
+382	Kerra Isle	2000	0
+385	Defective Clockwork	-4	2004
+387	Befallen Inhabitants	-2000	4000
+388	Faerie	-2	2002
+394	Shamen of War	0	2000
+397	Sky Talons	0	2000
+398	Riptide Goblins	-202	2202
+401	Song Weavers	0	2000
+402	Oracle of K`Arnon	0	2000
+412	Krag	-30	2030
+415	Temple of Solusek Ro	-55	2055
+416	Shadowed Men	55	1945
+417	Ankhefenmut	-50	2050
+418	Zazamoukh	12	1988
+420	Fallen of Bloody Kithicor	0	2000
+421	Aggressors of Kithicor	0	2000
+422	Defenders of Kithicor	0	2000
+423	Verish Mal	0	2000
+425	Inhabitants of Hate	-2000	4000
+426	Agents of Mistmoore	-2000	4000
+428	Minions of Underfoot	-2000	4000
+471	Clan Kolbok	-5	2005
+473	Kejek Village	0	2000
+474	Sporali	-1356	3356
+475	King Xorbb	1681	319
+1005	Qeynos Elite Watch	2000	0
+1522	Primordial Malice	1200	800
+1597	Residents of Jaggedpine	0	2000
+1598	Anchorites of Brell Serilis	0	2000
+1599	Darkpaws of Jaggedpine	0	2000
+1600	Guardians of the Hatchling	0	2000
+1601	Pirates of the Pine	0	2000
+1603	Dryads of the Grove	0	2000
+1620	Treants of Jaggedpine	0	2000
+1622	Arboreans of the Faydark	0	2000
+1630	Burning Dead	-1385	3385
+1704	Cursed Frogloks of Gukta	0	2000
+1709	Protectors of Gukta	2000	0
+1711	Clerics of Gutka	0	2000
+1712	Warriors of Gukta	0	2000
+1713	Paladins of Gukta	0	2000
+1714	Wizards of Gukta	0	2000
+1715	Shaman of Gukta	0	2000
+1716	High Council of Gukta	2000	0

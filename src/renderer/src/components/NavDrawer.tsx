@@ -17,8 +17,11 @@ import FeedbackIcon from '@mui/icons-material/Feedback'
 // Dev-only, and its import goes with it: MUI's icon packages declare `sideEffects: false`, so
 // an icon whose only use sits inside a `false &&` branch is tree-shaken out with the branch.
 import RuleFolderIcon from '@mui/icons-material/RuleFolder'
+// UNRELEASED-only today, tree-shaken from builds on the same argument as the icon above: its only
+// use sits inside the Factions row's `UNRELEASED &&` branch below.
+import HandshakeIcon from '@mui/icons-material/Handshake'
 import UpdateChip from './UpdateChip'
-import { OWNER_TOOLS } from '../devFlags'
+import { OWNER_TOOLS, UNRELEASED } from '../devFlags'
 import type { PrefsRouting } from '../appRouting'
 import { GEAR_AREA_VIEWS, VIEW_LABELS, loadGearTab, type View } from '../appViews'
 
@@ -178,6 +181,21 @@ export default function NavDrawer({
         {ROWS.map((row) => (
           <NavRowButton key={row.view} row={row} view={view} onSelect={onSelect} />
         ))}
+        {/* UNRELEASED (the review-gate mechanism the character sheet used from JOS-45 to
+            JOS-327): the Factions tab draws the `/outputfile faction` dump's standings and has
+            not passed the owner's review gate. `UNRELEASED` is `import.meta.env.DEV`, a literal
+            `false` in every `electron-vite build`, so rollup deletes the row, its label and its
+            icon from packaged bytes — the same strip the triage row below gets from `DEV_TOOLS`.
+            Built INSIDE the branch rather than hoisted, for the reason that row's comment gives:
+            a top-level `jsx()` call is not provably side-effect free and would keep the strings
+            alive. */}
+        {UNRELEASED && (
+          <NavRowButton
+            row={{ view: 'factions', icon: <HandshakeIcon /> }}
+            view={view}
+            onSelect={onSelect}
+          />
+        )}
         {/* UNRELEASED (JOS-45) USED TO HAVE A ROW HERE, and JOS-324 moved it INTO the gear area:
             the character sheet is now the area's last TAB, gated by the same `UNRELEASED` flag in
             the same way (appViews.ts drops `character` from `KNOWN_VIEWS` in a build without it,

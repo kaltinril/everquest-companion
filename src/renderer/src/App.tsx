@@ -59,6 +59,10 @@ import DevTriageView from './devTriage'
 // keep the tree out of packaged bytes. The owner released the tab, so that file is gone and this is
 // an ordinary static import like the eleven views above it.
 import CharacterView from './features/character/CharacterView'
+// The FACTIONS TAB, behind the review gate (`UNRELEASED`) — a `devTriage`-style strip whose view
+// check lives in the gate file (the SpellDrill arrangement), so packaged builds carry none of it
+// and this switch pays no branch for it. See unreleasedFactions.tsx.
+import UnreleasedFactionsView from './unreleasedFactions'
 import { SpellDrill } from './features/spells/SpellPage'
 import { SpellLinkProvider } from './lib/spellLink'
 import { OWNER_TOOLS } from './devFlags'
@@ -163,6 +167,9 @@ function PlainView({
           file, not here: this switch is one branch per view and a branch needing both would have
           cost `PlainView` two points of the measured complexity ceiling. */}
       <SpellDrill view={view} viewKey={viewKey} routing={routing} />
+      {/* FACTIONS (UNRELEASED). Its view check and its gate live in unreleasedFactions.tsx for
+          the SpellDrill's reason — and because the gate's own deletion is how the tab graduates. */}
+      <UnreleasedFactionsView view={view} viewKey={viewKey} />
     </>
   )
 }
