@@ -40,7 +40,55 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import type { HeldCounts } from '@shared/types'
 import type { ZoneShort } from '@shared/maps'
+import { ownershipKey } from '@shared/planner/ownership'
 import type { View } from '../../appViews'
+// WHICH FACTIONS ARE WORTH THE GRIND: a faction's value is what its quests reward, and the gear
+// index (the corpus the Gear tab searches, fetched once over IPC and cached) is the judge — a
+// reward that appears there with any stat or effect is gear, and the row wears the count.
+import { useGearIndex } from '../gear/gearData'
+import type { GearRow } from '@shared/planner/gear'
+import type { FactionWork } from './factionQuests'
+
+/** Every corpus key with any stat or effect — the gear-worthiness judge, built once per fetch. */
+function gearWorthySet(rows: readonly GearRow[]): Set<string> {
+  const s = new Set<string>()
+  for (const r of rows) {
+    const statful = Object.values(r.stats).some((v) => (v ?? 0) !== 0)
+    if (statful || r.effects.length > 0) s.add(r.key)
+  }
+  return s
+}
+
+/** Keep `n` when the corpus calls it gear and it has not been kept yet. Split from the loops
+ *  below at the measured max-depth ceiling. `ownershipKey` folds a name the way the index keys. */
+function addGearReward(n: string, worthy: Set<string>, seen: Set<string>, names: string[]): void {
+  const bare = n.replace(/\*+$/, '').trim()
+  const key = ownershipKey(bare)
+  if (seen.has(key) || !worthy.has(key)) return
+  seen.add(key)
+  names.push(bare)
+}
+
+/** The distinct gear items one faction's RAISING quests reward. */
+function factionGearRewards(work: FactionWork, worthy: Set<string>): string[] {
+  const seen = new Set<string>()
+  const names: string[] = []
+  for (const q of work.raise) {
+    for (const n of q.rewards) addGearReward(n, worthy, seen, names)
+  }
+  return names
+}
+
+/** Per faction id → its gear-reward names; absent when a faction's quests reward none. */
+function gearRewardsById(all: readonly FactionRowVm[] | null, worthy: Set<string>): Map<number, string[]> {
+  const m = new Map<number, string[]>()
+  for (const row of all ?? []) {
+    if (row.work === null) continue
+    const names = factionGearRewards(row.work, worthy)
+    if (names.length > 0) m.set(row.id, names)
+  }
+  return m
+}
 import OutputKindLine from '../../components/OutputKindLine'
 // The Maps tab's own pin is the zone deep link: write the selection it persists, then switch
 // tabs — MapsView reads it on mount, exactly as if the zone had been picked in its selector.
@@ -87,11 +135,14 @@ function driftTitle(row: FactionRowVm): string {
  */
 function FactionRow({
   row,
+  gear,
   expanded,
   onToggle,
   links
 }: {
   row: FactionRowVm
+  /** the distinct gear items this faction's quests reward, when any (names for the hover) */
+  gear?: string[]
   expanded: boolean
   onToggle: () => void
   links: WorkLinks
@@ -116,6 +167,19 @@ function FactionRow({
           {row.raiseCount > 0 && (
             <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 1 }}>
               {row.raiseCount} quest{row.raiseCount === 1 ? '' : 's'}
+            </Typography>
+          )}
+          {/* The value signal: how many distinct GEAR items this faction's quests reward — the
+              names on hover, the cards on the names once the row is expanded. */}
+          {gear !== undefined && (
+            <Typography
+              component="span"
+              variant="caption"
+              title={gear.join(', ')}
+              data-testid="factions-gear-count"
+              sx={{ ml: 1, color: 'primary.main' }}
+            >
+              · {gear.length} gear reward{gear.length === 1 ? '' : 's'}
             </Typography>
           )}
         </TableCell>
@@ -265,6 +329,35 @@ function FilterBar({
   )
 }
 
+/** The two row-level actions, split out of `FactionsView` at the 100-line function ceiling. */
+function useRowActions(deps: {
+  onSelectView?: (v: View) => void
+  setQuery: (q: string) => void
+  setHideUntouched: (on: boolean) => void
+  setHideMaxed: (on: boolean) => void
+}): { onOpenZone: (stem: ZoneShort) => void; onFind: (name: string) => void } {
+  const { onSelectView, setQuery, setHideUntouched, setHideMaxed } = deps
+  const onOpenZone = useCallback(
+    (stem: ZoneShort) => {
+      saveZoneSelection(onPick(stem))
+      onSelectView?.('maps')
+    },
+    [onSelectView]
+  )
+  // A race chip's click REVEALS its faction row: the search finds it, and both hide-toggles come
+  // off — a race's missing faction is usually untouched, which is exactly what the default view
+  // hides, and a reveal that landed on an empty table would read as a broken link.
+  const onFind = useCallback(
+    (name: string) => {
+      setQuery(name)
+      setHideUntouched(false)
+      setHideMaxed(false)
+    },
+    [setQuery, setHideUntouched, setHideMaxed]
+  )
+  return { onOpenZone, onFind }
+}
+
 export default function FactionsView({
   onOpenLoot,
   onOpenMob,
@@ -280,25 +373,19 @@ export default function FactionsView({
   const [hideUntouched, setHideUntouched] = useState(true)
   const [hideMaxed, setHideMaxed] = useState(true)
   const [expandedId, setExpandedId] = useState<number | null>(null)
-  const onOpenZone = useCallback(
-    (stem: ZoneShort) => {
-      saveZoneSelection(onPick(stem))
-      onSelectView?.('maps')
-    },
-    [onSelectView]
-  )
-  // A race chip's click REVEALS its faction row: the search finds it, and both hide-toggles come
-  // off — a race's missing faction is usually untouched, which is exactly what the default view
-  // hides, and a reveal that landed on an empty table would read as a broken link.
-  const onFind = useCallback((name: string) => {
-    setQuery(name)
-    setHideUntouched(false)
-    setHideMaxed(false)
-  }, [])
+  const { onOpenZone, onFind } = useRowActions({
+    onSelectView,
+    setQuery,
+    setHideUntouched,
+    setHideMaxed
+  })
   const links = useMemo(
     () => ({ onOpenLoot, onOpenMob, onOpenZone, held }),
     [onOpenLoot, onOpenMob, onOpenZone, held]
   )
+  const gearIndex = useGearIndex()
+  const gearWorthy = useMemo(() => gearWorthySet(gearIndex.rows), [gearIndex.rows])
+  const gearById = useMemo(() => gearRewardsById(all, gearWorthy), [all, gearWorthy])
   const rows = useMemo(
     () => (all === null ? [] : visibleRows(all, { query, hideUntouched, hideMaxed })),
     [all, query, hideUntouched, hideMaxed]
@@ -342,6 +429,7 @@ export default function FactionsView({
                   <FactionRow
                     key={row.id}
                     row={row}
+                    gear={gearById.get(row.id)}
                     expanded={expandedId === row.id}
                     onToggle={() => {
                       setExpandedId((cur) => (cur === row.id ? null : row.id))
