@@ -132,26 +132,31 @@ function matchesSlot(
 }
 
 /**
- * One faction's work, narrowed. The RAISE list takes both filters (it is the reward hunt); the
- * LOWER list takes only the class filter — a cost you cannot incur is noise, but a cost is a
- * cost whatever slot its rewards fill.
+ * One faction's work, narrowed. The RAISE and NEARBY lists take both filters (they are the
+ * reward hunt); the LOWER list takes only the class filter — a cost you cannot incur is noise,
+ * but a cost is a cost whatever slot its rewards fill.
  */
 export function filterWork(
   work: FactionWork,
   f: WorkFilters,
   slotsByKey: ReadonlyMap<string, readonly EquipSlot[]>
 ): FactionWork {
+  const hunts = (q: FactionQuestRef): boolean =>
+    matchesClasses(q, f.classes) && matchesSlot(q, f.slot, slotsByKey)
   return {
-    raise: work.raise.filter((q) => matchesClasses(q, f.classes) && matchesSlot(q, f.slot, slotsByKey)),
-    lower: work.lower.filter((q) => matchesClasses(q, f.classes))
+    raise: work.raise.filter(hunts),
+    lower: work.lower.filter((q) => matchesClasses(q, f.classes)),
+    ...(work.homeZone === undefined ? {} : { homeZone: work.homeZone }),
+    nearby: work.nearby.filter(hunts)
   }
 }
 
-/** The distinct wished reward names a work list grants — the row's loud indicator. */
+/** The distinct wished reward names a work list grants (raising AND home-zone quests — a wished
+ *  item is worth shouting about whichever page failed to quote its receipt). */
 export function wishedRewards(work: FactionWork, wishKeys: ReadonlySet<string>): string[] {
   const seen = new Set<string>()
   const out: string[] = []
-  for (const q of work.raise) {
+  for (const q of [...work.raise, ...work.nearby]) {
     for (const n of q.rewards) {
       const key = rewardKey(n)
       if (seen.has(key) || !wishKeys.has(key)) continue

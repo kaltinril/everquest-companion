@@ -45,21 +45,48 @@ export interface FactionRowVm {
   /** the quests on record that move this faction (factionQuests.ts), null when none name it */
   work: FactionWork | null
   raiseCount: number
+  /**
+   * The still-locked races this faction gates — from the achievements dump's race-unlock
+   * requirements ("Get maximum faction with <this>"), kept only while BOTH the race and this
+   * faction's own requirement are incomplete: a met requirement no longer unlocks anything.
+   * Empty without an achievements dump, which is the honest reading of "we don't know".
+   */
+  unlocks: string[]
 }
 
-function toRowVm(
-  r: FactionStanding,
-  work: Map<string, FactionWork>,
-  ev: FactionEvidence | undefined,
+/** Lowercased faction name → the still-locked races that need it at maximum. */
+function unlockNeeds(races: readonly RaceUnlockClaim[] | undefined): Map<string, string[]> {
+  const m = new Map<string, string[]>()
+  for (const race of races ?? []) {
+    if (race.complete) continue
+    for (const f of race.factions) {
+      if (f.complete) continue
+      const key = f.name.toLowerCase()
+      const list = m.get(key)
+      if (list === undefined) m.set(key, [race.race])
+      else list.push(race.race)
+    }
+  }
+  return m
+}
+
+/** Everything a row is joined against, bundled once per fold (max-params, and it IS one thing). */
+interface RowJoins {
+  work: Map<string, FactionWork>
+  evidence: Map<string, FactionEvidence>
   windowComplete: boolean
-): FactionRowVm {
+  unlocksByName: Map<string, string[]>
+}
+
+function toRowVm(r: FactionStanding, joins: RowJoins): FactionRowVm {
+  const ev = joins.evidence.get(r.name.toLowerCase())
   const cap = r.standing + r.toMax
   const live =
     ev === undefined
       ? { value: r.standing, drift: 0, exact: true }
-      : applyEvidence(r.standing, cap, ev, windowComplete)
+      : applyEvidence(r.standing, cap, ev, joins.windowComplete)
   const tier = factionTier(live.value)
-  const w = work.get(r.name.toLowerCase()) ?? null
+  const w = joins.work.get(r.name.toLowerCase()) ?? null
   return {
     id: r.id,
     name: r.name,
@@ -73,7 +100,8 @@ function toRowVm(
     color: CONSIDER_FACTION_COLOR[tier],
     pct: Math.max(0, Math.min(100, ((live.value - SCALE_FLOOR) / (cap - SCALE_FLOOR)) * 100)),
     work: w,
-    raiseCount: w?.raise.length ?? 0
+    raiseCount: w?.raise.length ?? 0,
+    unlocks: joins.unlocksByName.get(r.name.toLowerCase()) ?? []
   }
 }
 
@@ -129,15 +157,19 @@ export function useFactionData(): FactionsData {
   }, [])
   const evidence = useFactionEvidence(progress)
   const standings = progress?.factionStandings
+  const races = progress?.raceUnlocks
   const rows = useMemo(() => {
     if (standings === undefined) return null
-    const work = factionWorkIndex()
     const byName = new Map<string, FactionEvidence>()
     for (const ev of evidence?.rows ?? []) byName.set(ev.name.toLowerCase(), ev)
-    return standings.map((r) =>
-      toRowVm(r, work, byName.get(r.name.toLowerCase()), evidence?.complete ?? false)
-    )
-  }, [standings, evidence])
+    const joins: RowJoins = {
+      work: factionWorkIndex(),
+      evidence: byName,
+      windowComplete: evidence?.complete ?? false,
+      unlocksByName: unlockNeeds(races)
+    }
+    return standings.map((r) => toRowVm(r, joins))
+  }, [standings, evidence, races])
   return {
     rows,
     readAt: progress?.factionsSource?.readAt ?? null,

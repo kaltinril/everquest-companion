@@ -22,15 +22,50 @@ function driftTitle(row: FactionRowVm): string {
   return row.exact ? base : `${base} (log window did not reach the dump - at least this much)`
 }
 
-/** The name cell's trailing signals: quest count, the gear-value count, the loud wishlist chip. */
-function NameSignals({ derived }: { derived: RowDerived }): JSX.Element {
-  const raiseCount = derived.work?.raise.length ?? 0
+/** The quest tallies: the attributed count, and the home zone's silent count beside it. Its own
+ *  component to keep `NameSignals` inside the measured complexity ceiling. */
+function QuestCounts({ work }: { work: RowDerived['work'] }): JSX.Element | null {
+  const raiseCount = work?.raise.length ?? 0
+  const nearbyCount = work?.nearby.length ?? 0
+  if (raiseCount === 0 && nearbyCount === 0) return null
   return (
     <>
       {raiseCount > 0 && (
         <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 1 }}>
           {raiseCount} quest{raiseCount === 1 ? '' : 's'}
         </Typography>
+      )}
+      {nearbyCount > 0 && (
+        <Typography
+          component="span"
+          variant="caption"
+          title={`quests in ${work?.homeZone ?? 'the home zone'} whose wiki pages state no faction effect`}
+          data-testid="factions-nearby-count"
+          sx={{ ml: 0.75, color: 'text.disabled' }}
+        >
+          +{nearbyCount} in zone
+        </Typography>
+      )}
+    </>
+  )
+}
+
+/** The name cell's trailing signals: quest tallies, the race gate, gear value, the wishlist chip. */
+function NameSignals({ derived, unlocks }: { derived: RowDerived; unlocks: readonly string[] }): JSX.Element {
+  return (
+    <>
+      <QuestCounts work={derived.work} />
+      {/* THE RACE GATE: this faction must reach maximum before these races open. */}
+      {unlocks.length > 0 && (
+        <Chip
+          size="small"
+          color="info"
+          variant="outlined"
+          label={`unlocks ${unlocks.join(', ')}`}
+          title="needed at maximum for these Race Unlock achievements"
+          data-testid="factions-unlocks"
+          sx={{ ml: 1, height: 20, fontSize: 11, maxWidth: 280 }}
+        />
       )}
       {derived.gear.length > 0 && (
         <Typography
@@ -95,7 +130,7 @@ export default function FactionRow({
             />
           )}
           {row.name}
-          <NameSignals derived={derived} />
+          <NameSignals derived={derived} unlocks={row.unlocks} />
         </TableCell>
         <TableCell sx={{ py: 0.5, width: 130 }}>
           <Chip
