@@ -56,6 +56,8 @@ export interface ParsedQuestPage extends QuestTopTable {
   expReward: boolean
   /** the faction hits the walkthrough quotes (see parseFactionHits) */
   factions: QuestFactionHit[]
+  /** the coin turn-in the page states ("2 gold"), when it states one (see parseCoinCost) */
+  coin?: string
   /** true when the page is a disambiguation hub, not a quest */
   disambiguation: boolean
   /** true when the page has a questTopTable header block */
@@ -234,6 +236,41 @@ const FACTION_HIT_RE =
   /faction standing (?:with|for) \[\[\s*([^\]|]+?)\s*(?:\|[^\]]*)?\]\]\s*(?:got\s+(better|worse)|(?:has been|was)\s+adjusted\s+by\s*\(?\s*([+-]?\d+)\s*\)?)/gi
 
 /**
+ * THE COIN TURN-IN (measured 2026-09-05: 48 cached quest pages carry one). The classic guard
+ * donation quests take money, not items — "Give him 2 gold" ×15 across the corpus, "hand him
+ * 1000pp", "Hand him 1 platinum" — and an item-link parser is structurally blind to them, so a
+ * money quest read as having NO turn-in at all. One pattern covers the measured spellings:
+ * give/hand/donate, an optional pronoun, a NUMBER, a coin unit (word or the gp/pp/sp/cp short
+ * forms). Word-numbers ("give him two sapphires") stay unmatched on purpose: every measured coin
+ * line uses digits, and "two sapphires" is an item.
+ */
+const COIN_RE =
+  /\b(?:give|hand|donate)\s+(?:him|her|them|it)?\s*(?:a\s+donation\s+of\s+)?(\d[\d,]*)\s*(gold|platinum|silver|copper|gp|pp|sp|cp)\b/i
+
+const COIN_UNIT: Record<string, string> = {
+  gp: 'gold',
+  pp: 'platinum',
+  sp: 'silver',
+  cp: 'copper'
+}
+
+/** `parseCoinCost` as a spreadable field — split so `parseQuestPage` stays inside the measured
+ *  complexity ceiling (the ternary is a branch wherever it sits). */
+function coinField(wikitext: string): { coin?: string } {
+  const coin = parseCoinCost(wikitext)
+  return coin === undefined ? {} : { coin }
+}
+
+/** The page's coin turn-in as words ("2 gold"), or undefined when it states none. First
+ *  occurrence wins — a page hosting several turn-in variants repeats the same donation line. */
+export function parseCoinCost(wikitext: string): string | undefined {
+  const m = COIN_RE.exec(wikitext)
+  if (m === null) return undefined
+  const unit = m[2].toLowerCase()
+  return `${m[1].replace(/,/g, '')} ${COIN_UNIT[unit] ?? unit}`
+}
+
+/**
  * Every faction the page's receipt lines name, deduped per faction (first occurrence wins —
  * a page hosting several turn-in variants repeats the same receipts, and summing them would
  * claim one hand-in pays the whole page). A numeric line beats an earlier direction-only line
@@ -305,6 +342,7 @@ export function parseQuestPage(
     requiredItems,
     expReward: EXP_MARKER.test(wikitext),
     factions: parseFactionHits(wikitext),
+    ...coinField(wikitext),
     disambiguation: /\{\{\s*disambig/i.test(wikitext),
     hasTopTable: top !== null
   }

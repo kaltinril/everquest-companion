@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-09-06T01:33:04.880Z",
+  "scrapedAt": "2026-09-06T03:13:20.569Z",
   "source": "eqlwiki.com — Category:Quests + quest subcategories",
   "quests": [
     {
@@ -535,7 +535,8 @@
           "name": "Heretics",
           "up": false
         }
-      ]
+      ],
+      "coin": "2 gold"
     },
     {
       "name": "Armor of the Priest Quests",
@@ -1112,7 +1113,8 @@
         "Undead Dragongut Strings",
         "Mystical Lute"
       ],
-      "expReward": true
+      "expReward": true,
+      "coin": "50 platinum"
     },
     {
       "name": "Bard Kael Armor Quests",
@@ -1213,7 +1215,8 @@
         "Sapphire",
         "Ruby"
       ],
-      "expReward": true
+      "expReward": true,
+      "coin": "550 gold"
     },
     {
       "name": "Bard Mail",
@@ -2408,7 +2411,8 @@
           "name": "Kane Bayle",
           "up": true
         }
-      ]
+      ],
+      "coin": "2 gold"
     },
     {
       "name": "Blessed Oil",
@@ -3016,7 +3020,8 @@
           "name": "Oracle Of Marud",
           "up": false
         }
-      ]
+      ],
+      "coin": "70 gold"
     },
     {
       "name": "Bottle of Red Wine",
@@ -7495,7 +7500,8 @@
       "giver": "Ulazia W`Selo",
       "classes": [
         "All"
-      ]
+      ],
+      "coin": "10 gold"
     },
     {
       "name": "Dragon Heads",
@@ -9245,7 +9251,8 @@
           "name": "Mayong Mistmoore (Faction)",
           "up": false
         }
-      ]
+      ],
+      "coin": "1 copper"
     },
     {
       "name": "Faerie Dragon Wings",
@@ -16244,7 +16251,8 @@
           "up": false,
           "amount": -1
         }
-      ]
+      ],
+      "coin": "5 platinum"
     },
     {
       "name": "Incandescent Mask quest",
@@ -18076,7 +18084,8 @@
           "name": "Heretics",
           "up": false
         }
-      ]
+      ],
+      "coin": "2 gold"
     },
     {
       "name": "Lion Meat Shipment Quest",
@@ -20216,7 +20225,8 @@
         "Coppernickel Key",
         "A Bronze Key"
       ],
-      "expReward": true
+      "expReward": true,
+      "coin": "5 gold"
     },
     {
       "name": "Monk Skyshrine Armor Quests",
@@ -20728,7 +20738,8 @@
         "Slime Blood of Cazic Thule",
         "Tome of Instruction"
       ],
-      "expReward": true
+      "expReward": true,
+      "coin": "10 gold"
     },
     {
       "name": "Necromancer Kael Armor Quests",
@@ -24878,7 +24889,8 @@
           "name": "Shadowed Men",
           "up": false
         }
-      ]
+      ],
+      "coin": "30 gold"
     },
     {
       "name": "Ratskin Gloves Quest",
@@ -24958,7 +24970,8 @@
         {
           "name": "Prayer Beads"
         }
-      ]
+      ],
+      "coin": "100 gold"
     },
     {
       "name": "Red Dragonscale Armor Quest",
@@ -25447,7 +25460,8 @@
           "name": "Shadowed Men",
           "up": false
         }
-      ]
+      ],
+      "coin": "50 gold"
     },
     {
       "name": "Ridossan's Spirit",
@@ -25578,7 +25592,8 @@
           "up": false,
           "amount": -1
         }
-      ]
+      ],
+      "coin": "5 platinum"
     },
     {
       "name": "Rognarog's Head",
@@ -25721,7 +25736,8 @@
           "name": "Fallen of Bloody Kithicor",
           "up": false
         }
-      ]
+      ],
+      "coin": "100 platinum"
     },
     {
       "name": "Rogue Errands",
@@ -27180,7 +27196,8 @@
         "Glohnor wrappings",
         "Heart of the Innocent"
       ],
-      "expReward": true
+      "expReward": true,
+      "coin": "1000 platinum"
     },
     {
       "name": "ShadowBound Armor Quests",
@@ -27402,7 +27419,8 @@
       ],
       "requiredItems": [
         "Torn Parchment"
-      ]
+      ],
+      "coin": "20 gold"
     },
     {
       "name": "Shakey's Stuffing",
@@ -28772,7 +28790,8 @@
         "The Icy Mug Souvenir",
         "The Velium Keg Collectors Mug",
         "Fool's Gold Stein"
-      ]
+      ],
+      "coin": "1 platinum"
     },
     {
       "name": "Sparring Armor",
@@ -30130,7 +30149,8 @@
           "name": "Heretics",
           "up": false
         }
-      ]
+      ],
+      "coin": "2 gold"
     },
     {
       "name": "The Acolyte",
@@ -30330,7 +30350,8 @@
       "page": "The Bread Shipment",
       "requiredItems": [
         "Bag of Bread Loaves"
-      ]
+      ],
+      "coin": "2 gold"
     },
     {
       "name": "The Bread Shipment (East Freeport)",
@@ -30368,7 +30389,8 @@
           "name": "Coalition of Tradefolk Ill",
           "up": true
         }
-      ]
+      ],
+      "coin": "2 gold"
     },
     {
       "name": "The Bread Shipment (Erudin)",
@@ -30403,7 +30425,8 @@
           "name": "High Guard of Erudin",
           "up": true
         }
-      ]
+      ],
+      "coin": "2 gold"
     },
     {
       "name": "The Bread Shipment (Feerrott)",
@@ -30437,7 +30460,8 @@
           "name": "Oggok Guards",
           "up": true
         }
-      ]
+      ],
+      "coin": "2 gold"
     },
     {
       "name": "The Bread Shipment (Halas)",
@@ -30471,7 +30495,8 @@
           "name": "Shamen of Justice",
           "up": true
         }
-      ]
+      ],
+      "coin": "2 gold"
     },
     {
       "name": "The Bread Shipment (Kaladim)",
@@ -30514,7 +30539,8 @@
           "name": "Kazon Stormhammer",
           "up": true
         }
-      ]
+      ],
+      "coin": "2 gold"
     },
     {
       "name": "The Bread Shipment (Kelethin)",
@@ -30552,7 +30578,8 @@
           "name": "Anti-Mage",
           "up": true
         }
-      ]
+      ],
+      "coin": "2 gold"
     },
     {
       "name": "The Bread Shipment (N Karana)",
@@ -30594,7 +30621,8 @@
           "name": "Guards of Qeynos",
           "up": true
         }
-      ]
+      ],
+      "coin": "2 gold"
     },
     {
       "name": "The Bread Shipment (Neriak)",
@@ -30628,7 +30656,8 @@
           "name": "Dreadguard Inner",
           "up": true
         }
-      ]
+      ],
+      "coin": "2 gold"
     },
     {
       "name": "The Bread Shipment (Qeynos)",
@@ -30670,7 +30699,8 @@
           "name": "Guards of Qeynos",
           "up": true
         }
-      ]
+      ],
+      "coin": "2 gold"
     },
     {
       "name": "The Bread Shipment (W Karana Danin)",
@@ -30712,7 +30742,8 @@
           "name": "Guards of Qeynos",
           "up": true
         }
-      ]
+      ],
+      "coin": "2 gold"
     },
     {
       "name": "The Bread Shipment (W Karana Rislarn)",
@@ -30754,7 +30785,8 @@
           "name": "Guards of Qeynos",
           "up": true
         }
-      ]
+      ],
+      "coin": "2 gold"
     },
     {
       "name": "The Bridge",
@@ -31271,7 +31303,8 @@
         "Uncut Hyacinth",
         "Faceted Hyacinth Telesm",
         "Monstrous Zombie Heart"
-      ]
+      ],
+      "coin": "2000 platinum"
     },
     {
       "name": "The Falchion",
@@ -33125,7 +33158,8 @@
         "Blade core-5th fold",
         "Small Block of Clay",
         "Water Flask"
-      ]
+      ],
+      "coin": "50 platinum"
     },
     {
       "name": "The Summoning of Dread",
@@ -33327,7 +33361,8 @@
       ],
       "requiredItems": [
         "Velium Torque"
-      ]
+      ],
+      "coin": "500 gold"
     },
     {
       "name": "The Supply Run - Great Divide",
@@ -33378,7 +33413,8 @@
         "Giant Sack of Supplies",
         "Kromrif Battle Totem"
       ],
-      "expReward": true
+      "expReward": true,
+      "coin": "500 gold"
     },
     {
       "name": "The Sword of Nobility",
@@ -33468,7 +33504,8 @@
           "name": "Kane Bayle",
           "up": true
         }
-      ]
+      ],
+      "coin": "3 gold"
     },
     {
       "name": "The Telescope",
@@ -33677,7 +33714,8 @@
           "up": false,
           "amount": -112
         }
-      ]
+      ],
+      "coin": "5 gold"
     },
     {
       "name": "The Traitor",
@@ -33886,7 +33924,8 @@
         "Scroll of Flayed Goblin Skin",
         "Star Ruby",
         "Vial of Noble's Blood"
-      ]
+      ],
+      "coin": "75 platinum"
     },
     {
       "name": "The Waylaid Courier",
@@ -34770,7 +34809,8 @@
       "minLevel": 1,
       "classes": [
         "All"
-      ]
+      ],
+      "coin": "10 gold"
     },
     {
       "name": "Tribunal Initiate",
@@ -35832,7 +35872,8 @@
           "name": "Kromzek",
           "up": false
         }
-      ]
+      ],
+      "coin": "50 platinum"
     },
     {
       "name": "Vengeance for Frenway",
@@ -36863,7 +36904,8 @@
           "name": "Truespirit",
           "up": true
         }
-      ]
+      ],
+      "coin": "1000 platinum"
     },
     {
       "name": "Wizard Kael Armor Quests",
@@ -37104,7 +37146,8 @@
         {
           "name": "Wolfskin Gloves"
         }
-      ]
+      ],
+      "coin": "13 gold"
     },
     {
       "name": "Wooly Fungus Quest",

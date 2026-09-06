@@ -19,7 +19,9 @@
 
 import type { ClassAbbr } from '@shared/classCombo'
 import type { EquipSlot } from '@shared/planner/types'
-import { ownershipKey } from '@shared/planner/ownership'
+// RELATIVE value import — the node-testable-logic rule (gearOwnership.ts's header): the `@shared`
+// alias is vite's and only type imports (which erase) may use it in a module a node test drives.
+import { ownershipKey } from '../../../../shared/planner/ownership'
 import type { FactionQuestRef, FactionWork } from './factionQuests'
 
 /** Every spelling of a class the catalog has been measured to use, folded to the model's abbr. */
@@ -100,11 +102,31 @@ export interface WorkFilters {
   /** empty = any class */
   classes: readonly ClassAbbr[]
   slot: SlotFilter
+  /**
+   * The EFFECTIVE search inside one faction's work, lowercased — '' when the panel should show
+   * everything. The caller (factionDerive.deriveRows) blanks it for a faction whose NAME matched
+   * the search, which is the user's own rule: a name hit shows the whole faction, anything else
+   * narrows the quests to the ones that carried the match.
+   */
+  query: string
 }
 
-/** Is any narrowing actually selected? (What decides whether workless rows hide.) */
+/** Is any narrowing actually selected? The QUERY is deliberately not counted: it already decides
+ *  row visibility through the search haystack, and a name-matched faction with no work must not
+ *  vanish for having none. */
 export function filtersActive(f: WorkFilters): boolean {
   return f.classes.length > 0 || f.slot !== 'ANY'
+}
+
+/** Does one quest carry the search — in its name, giver, zone, turn-ins or rewards? */
+function matchesQuery(ref: FactionQuestRef, q: string): boolean {
+  if (q === '') return true
+  if (ref.name.toLowerCase().includes(q)) return true
+  if (ref.giver?.toLowerCase().includes(q) === true) return true
+  if (ref.startZone?.toLowerCase().includes(q) === true) return true
+  for (const n of ref.items) if (n.toLowerCase().includes(q)) return true
+  for (const n of ref.rewards) if (n.toLowerCase().includes(q)) return true
+  return false
 }
 
 function matchesClasses(ref: FactionQuestRef, selected: readonly ClassAbbr[]): boolean {
@@ -142,10 +164,13 @@ export function filterWork(
   slotsByKey: ReadonlyMap<string, readonly EquipSlot[]>
 ): FactionWork {
   const hunts = (q: FactionQuestRef): boolean =>
-    matchesClasses(q, f.classes) && matchesSlot(q, f.slot, slotsByKey)
+    matchesQuery(q, f.query) && matchesClasses(q, f.classes) && matchesSlot(q, f.slot, slotsByKey)
   return {
     raise: work.raise.filter(hunts),
-    lower: work.lower.filter((q) => matchesClasses(q, f.classes)),
+    // The LOWER list takes the query and the class filter, never the slot: a cost is a cost
+    // whatever slot its rewards fill — but a search for an item must narrow it like the rest
+    // (the Pestilence Scythe report: a matched COST quest kept its whole faction's list around).
+    lower: work.lower.filter((q) => matchesQuery(q, f.query) && matchesClasses(q, f.classes)),
     ...(work.homeZone === undefined ? {} : { homeZone: work.homeZone }),
     nearby: work.nearby.filter(hunts)
   }

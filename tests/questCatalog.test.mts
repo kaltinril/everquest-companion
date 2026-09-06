@@ -20,6 +20,7 @@ import {
   dedupe,
   isEmptyParse,
   linkTargets,
+  parseCoinCost,
   parseFactionHits,
   parseQuestPage,
   parseTopTable,
@@ -366,4 +367,27 @@ test('the committed catalog carries the faction hits, and known rows read back e
       if (f.amount !== undefined) assert.equal(f.up, f.amount >= 0, `direction matches sign on ${q.page}`)
     }
   }
+})
+
+// --- the coin turn-in (the guard-donation quests, 2026-09-05) ---------------------
+
+test('parseCoinCost reads the measured donation spellings, first occurrence wins', () => {
+  assert.equal(parseCoinCost('Give him 2 gold to raise your standing.'), '2 gold')
+  assert.equal(parseCoinCost('hand him 1000pp for the turn-in'), '1000 platinum')
+  assert.equal(parseCoinCost('Hand him 1 platinum.'), '1 platinum')
+  assert.equal(parseCoinCost('Give her 10 gold. Later, give her 10 gold again.'), '10 gold')
+  assert.equal(parseCoinCost('donate 5 gp at the temple'), '5 gold')
+  // Word-numbers are items, not coin ("give him two sapphires"), and stay unmatched.
+  assert.equal(parseCoinCost('give him two sapphires'), undefined)
+  assert.equal(parseCoinCost('no donations here at all'), undefined)
+})
+
+test('the committed catalog carries the coin costs, and a known donation quest reads back', () => {
+  const coined = data.quests.filter((q) => q.coin !== undefined)
+  assert.ok(coined.length >= 40, `expected the measured ~43 coin quests, got ${coined.length}`)
+  const scrolls = data.quests.find((q) => q.name === 'Blank Scrolls')
+  assert.ok(scrolls)
+  assert.equal(scrolls.coin, '2 gold')
+  assert.ok((scrolls.factions?.length ?? 0) > 0, 'a faction quest whose whole cost is coin')
+  for (const q of coined) assert.match(q.coin ?? '', /^\d+ (gold|platinum|silver|copper)$/)
 })

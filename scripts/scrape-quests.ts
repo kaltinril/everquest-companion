@@ -295,6 +295,7 @@ function toQuestEntry(parsed: ParsedQuestPage): QuestEntry {
   if (parsed.requiredItems.length) entry.requiredItems = parsed.requiredItems
   if (parsed.expReward) entry.expReward = true
   if (parsed.factions.length) entry.factions = parsed.factions
+  if (parsed.coin !== undefined) entry.coin = parsed.coin
   return entry
 }
 

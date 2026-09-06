@@ -166,7 +166,10 @@ export default function FactionsView({
     [onOpenLoot, onOpenMob, onOpenZone, held, wishKeys]
   )
   const maps = useMemo(() => gearMaps(gearIndex.rows), [gearIndex.rows])
-  const workFilters = useMemo<WorkFilters>(() => ({ classes: classSel, slot }), [classSel, slot])
+  const workFilters = useMemo<WorkFilters>(
+    () => ({ classes: classSel, slot, query: rowFilters.query }),
+    [classSel, slot, rowFilters.query]
+  )
   const derivedById = useMemo(
     () => deriveRows(all, workFilters, maps, wishKeys),
     [all, workFilters, maps, wishKeys]
