@@ -17,12 +17,15 @@ import { type JSX } from 'react'
 import { Box, Stack, Typography } from '@mui/material'
 import type { HeldCounts } from '@shared/types'
 import type { ZoneShort } from '@shared/maps'
+import { wikiPageUrl } from '@shared/wiki'
 import { zoneShortName, zoneShortNameFromCatalog } from '@shared/zones'
 import Tooltip from '../../lib/Tooltip'
 import { KnownItemTooltip } from '../../lib/KnownItemTooltip'
 import { EQ_ITEM_COLORS } from '../../lib/ItemWindow'
 import { MOB_CARD_SLOT_PROPS, MobCard } from '../../lib/hoverCards'
 import { mainMobLookup } from '../timers/mobLookup'
+// The reward-name fold (`*` off, corpus key) — the same one the filters and the wishlist use.
+import { rewardKey as rewardKeyOf } from './factionFilters'
 import type { FactionQuestRef, FactionWork } from './factionQuests'
 
 /** The links a quest line can offer — threaded once rather than as four props per level. */
@@ -31,6 +34,8 @@ export interface WorkPanelLinks {
   onOpenMob?: (t: { mob: string }) => void
   /** open the Maps tab pinned at a zone (the stem is resolved HERE; unresolvable stays text) */
   onOpenZone?: (zone: ZoneShort) => void
+  /** wishlist item keys (`rewardKey` fold) — a wished reward name wears the heart */
+  wished?: ReadonlySet<string>
 }
 
 /**
@@ -41,7 +46,15 @@ export interface WorkPanelLinks {
  * names) is stripped for the LOOKUP and the CLICK — the item DB keys the bare name — and kept in
  * the display, because it is the page's own claim about variance.
  */
-function ItemName({ name, onOpen }: { name: string; onOpen?: (item?: string) => void }): JSX.Element {
+function ItemName({
+  name,
+  onOpen,
+  bold = false
+}: {
+  name: string
+  onOpen?: (item?: string) => void
+  bold?: boolean
+}): JSX.Element {
   const bare = name.replace(/\*+$/, '').trim()
   return (
     <KnownItemTooltip name={bare}>
@@ -51,6 +64,7 @@ function ItemName({ name, onOpen }: { name: string; onOpen?: (item?: string) => 
         onClick={onOpen === undefined ? undefined : () => onOpen(bare)}
         sx={{
           color: EQ_ITEM_COLORS.name,
+          fontWeight: bold ? 700 : 400,
           textDecoration: 'underline dotted',
           textUnderlineOffset: 2,
           cursor: onOpen === undefined ? 'default' : 'pointer'
@@ -61,6 +75,7 @@ function ItemName({ name, onOpen }: { name: string; onOpen?: (item?: string) => 
     </KnownItemTooltip>
   )
 }
+
 
 /**
  * A start zone: a Maps link when the name resolves to an installed map stem (the log-name table
@@ -97,12 +112,15 @@ function ItemLinks({
   label,
   names,
   held,
+  wished,
   onOpenLoot,
   testId
 }: {
   label: string
   names: readonly string[]
   held?: HeldCounts
+  /** wishlist keys — a wished name is drawn loud (♥, bold, the warning color) */
+  wished?: ReadonlySet<string>
   onOpenLoot?: (item?: string) => void
   testId?: string
 }): JSX.Element | null {
@@ -114,10 +132,16 @@ function ItemLinks({
       {label}{' '}
       {shown.map((n, i) => {
         const have = held?.[n.toLowerCase()] ?? 0
+        const hot = wished?.has(rewardKeyOf(n)) === true
         return (
           <Box component="span" key={n}>
             {i > 0 && ', '}
-            <ItemName name={n} onOpen={onOpenLoot} />
+            {hot && (
+              <Box component="span" title="on your wishlist" sx={{ color: 'warning.main', fontWeight: 700 }}>
+                {'♥ '}
+              </Box>
+            )}
+            <ItemName name={n} onOpen={onOpenLoot} bold={hot} />
             {have > 0 && (
               <Box component="span" title="in your last inventory dump" sx={{ color: 'success.main' }}>
                 {' '}
@@ -201,7 +225,24 @@ function QuestLine({
         >
           {payoutLabel(quest, up)}
         </Box>
-        {quest.name}
+        {/* The quest NAME opens its eqlwiki page in the system browser — the item dialog's Source
+            idiom exactly: `target="_blank"` becomes `shell.openExternal` through main's
+            allowlisted open handler (src/main/security.ts), and eqlwiki.com is on the list. */}
+        <Box
+          component="a"
+          href={wikiPageUrl(quest.page)}
+          target="_blank"
+          rel="noreferrer"
+          data-testid="factions-quest-wiki"
+          title="open on eqlwiki.com"
+          sx={{
+            color: 'inherit',
+            textDecoration: 'underline dotted',
+            textUnderlineOffset: 2
+          }}
+        >
+          {quest.name}
+        </Box>
         <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 1 }}>
           {quest.giver !== undefined && <GiverLink giver={quest.giver} onOpenMob={links.onOpenMob} />}
           {quest.startZone !== undefined && (
@@ -218,10 +259,17 @@ function QuestLine({
           label="turn in:"
           names={quest.items}
           held={held}
+          wished={links.wished}
           onOpenLoot={links.onOpenLoot}
           testId="factions-quest-items"
         />
-        <ItemLinks label="rewards:" names={quest.rewards} onOpenLoot={links.onOpenLoot} testId="factions-quest-rewards" />
+        <ItemLinks
+          label="rewards:"
+          names={quest.rewards}
+          wished={links.wished}
+          onOpenLoot={links.onOpenLoot}
+          testId="factions-quest-rewards"
+        />
       </Box>
     </Box>
   )
