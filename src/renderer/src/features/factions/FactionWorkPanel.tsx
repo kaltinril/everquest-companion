@@ -111,6 +111,7 @@ const LIST_CAP = 4
 function ItemLinks({
   label,
   names,
+  coin,
   held,
   wished,
   onOpenLoot,
@@ -118,13 +119,15 @@ function ItemLinks({
 }: {
   label: string
   names: readonly string[]
+  /** a coin cost beside (or instead of) the items — the guard-donation quests' "2 gold" */
+  coin?: string
   held?: HeldCounts
   /** wishlist keys — a wished name is drawn loud (♥, bold, the warning color) */
   wished?: ReadonlySet<string>
   onOpenLoot?: (item?: string) => void
   testId?: string
 }): JSX.Element | null {
-  if (names.length === 0) return null
+  if (names.length === 0 && coin === undefined) return null
   const shown = names.slice(0, LIST_CAP)
   const rest = names.slice(LIST_CAP)
   return (
@@ -155,6 +158,12 @@ function ItemLinks({
         <Box component="span" title={rest.join(', ')} sx={{ cursor: 'help' }}>
           {' '}
           +{rest.length} more
+        </Box>
+      )}
+      {coin !== undefined && (
+        <Box component="span" data-testid="factions-coin" sx={{ color: 'primary.main' }}>
+          {names.length > 0 ? ' + ' : ''}
+          {coin}
         </Box>
       )}
     </Typography>
@@ -270,6 +279,7 @@ function QuestLine({
         <ItemLinks
           label="turn in:"
           names={quest.items}
+          coin={quest.coin}
           held={held}
           wished={links.wished}
           onOpenLoot={links.onOpenLoot}

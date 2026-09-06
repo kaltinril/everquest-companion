@@ -69,12 +69,17 @@ export function deriveRows(
   wishKeys: ReadonlySet<string>
 ): Map<number, RowDerived> {
   const m = new Map<number, RowDerived>()
+  const q = f.query.trim().toLowerCase()
   for (const row of all ?? []) {
     if (row.work === null) {
       m.set(row.id, NO_DERIVED)
       continue
     }
-    const work = filterWork(row.work, f, maps.slots)
+    // THE USER'S OWN RULE: a search that matched the FACTION NAME shows the whole faction; any
+    // other match narrows the panel to the quests that carried it (turn-in, reward, quest name,
+    // giver, zone) — so "Pestilence Scythe" expands to exactly the scythe's quest.
+    const effective = q !== '' && row.name.toLowerCase().includes(q) ? '' : q
+    const work = filterWork(row.work, { ...f, query: effective }, maps.slots)
     m.set(row.id, {
       work,
       gear: factionGearRewards(work, maps.worthy),
@@ -119,10 +124,12 @@ export function visibleRows(rows: readonly FactionRowVm[], f: RowFilters, sort: 
     .filter((r) => {
       // The query searches EVERYTHING the row's work would draw — faction, quest names, givers,
       // zones, turn-in items, rewards (`FactionRowVm.searchText`) — so "Talisman of Kejaar"
-      // finds Kerra Isle without anyone knowing which faction owns the quest.
-      if (q !== '' && !r.searchText.includes(q)) return false
-      // The unlocks hunt OVERRIDES the hide-toggles: a race-gating faction is usually untouched,
-      // which is exactly what the default view hides — the same trap the race-chip reveal clears.
+      // finds Kerra Isle without anyone knowing which faction owns the quest. A live search also
+      // OVERRIDES the hide-toggles: the one faction holding the match may be untouched or maxed,
+      // and a search whose only answer is hidden reads as no answer at all.
+      if (q !== '') return r.searchText.includes(q) && !(f.unlocksOnly && r.unlocks.length === 0)
+      // The unlocks hunt OVERRIDES the hide-toggles too: a race-gating faction is usually
+      // untouched, which is exactly what the default view hides — the race-chip reveal's trap.
       if (f.unlocksOnly) return r.unlocks.length > 0
       return !(f.hideUntouched && r.standing === 0) && !(f.hideMaxed && r.toMax <= 0)
     })

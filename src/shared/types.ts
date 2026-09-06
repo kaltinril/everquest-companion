@@ -506,6 +506,9 @@ export interface QuestEntry {
   expReward?: boolean
   /** the faction hits the walkthrough quotes, deduped per faction (see QuestFactionHit) */
   factions?: QuestFactionHit[]
+  /** the coin turn-in the page states, as words ("2 gold") — the guard-donation quests' cost,
+   *  which an item-link parser is structurally blind to (questPage.ts parseCoinCost) */
+  coin?: string
 }
 
 export interface QuestData {

@@ -33,6 +33,8 @@ export interface FactionQuestRef {
   minLevel?: number
   /** the classes the page lists, verbatim wiki tokens — factionFilters.ts owns the reading */
   classes?: string[]
+  /** the coin turn-in ("2 gold") — the guard-donation quests' whole cost (QuestEntry.coin) */
+  coin?: string
   /** the items to hand in — the "save these" list, each linkable to its Loot drill-down */
   items: string[]
   /** the reward items, linkable the same way */
@@ -74,6 +76,7 @@ function toRef(q: QuestEntry, amount: number | undefined): FactionQuestRef {
     ...(q.startZone === undefined ? {} : { startZone: q.startZone }),
     ...(q.minLevel === undefined ? {} : { minLevel: q.minLevel }),
     ...(q.classes === undefined ? {} : { classes: q.classes }),
+    ...(q.coin === undefined ? {} : { coin: q.coin }),
     ...(amount === undefined ? {} : { amount })
   }
   for (const r of q.rewards ?? []) ref.rewards.push(r.name)
