@@ -64,4 +64,14 @@ test('the real catalog answers the questions the tab was built for', () => {
   assert.ok(kerra)
   assert.ok(kerra.raise.some((q) => q.name === 'Rat Teeth'))
   assert.ok(kerra.raise.some((q) => q.name === 'Gnomish Toy'))
+
+  // THE SILENT HOME-ZONE QUESTS: the wiki attributes 2 of Kerra Island's quests; the regen
+  // necklace the user actually quested (This Means Warrr → Talisman of Kejaar Kerrath) is on a
+  // page with no receipt line, and the home-zone inference is what surfaces it.
+  assert.equal(kerra.homeZone, 'Kerra Island')
+  const warrr = kerra.nearby.find((q) => q.name === 'This Means Warrr')
+  assert.ok(warrr, 'the silent Kerra Island quests ride the nearby list')
+  assert.deepEqual(warrr.rewards, ['Talisman of Kejaar Kerrath'])
+  // A quest with a stated faction effect is never ALSO a nearby candidate.
+  assert.ok(!kerra.nearby.some((q) => q.name === 'Rat Teeth'))
 })

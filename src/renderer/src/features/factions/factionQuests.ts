@@ -41,10 +41,27 @@ export interface FactionQuestRef {
   amount?: number
 }
 
-/** Everything on record for one faction: the quests that raise it, and the ones that cost it. */
+/** Everything on record for one faction: the quests that raise it, the ones that cost it, and
+ *  the home-zone quests whose pages state no faction effect at all (the `nearby` candidates). */
 export interface FactionWork {
   raise: FactionQuestRef[]
   lower: FactionQuestRef[]
+  /**
+   * THE FACTION'S HOME ZONE, derived: the most frequent start zone among its RAISING quests.
+   * Kerra Isle's two attributed raisers both start on Kerra Island, and that inference is what
+   * lets the fourteen other Kerra Island quest pages — none of which quote a receipt line —
+   * reach the panel at all.
+   */
+  homeZone?: string
+  /**
+   * Quests starting in `homeZone` whose pages state NO faction effect — candidates, not claims
+   * (the panel labels them exactly that way). They exist because wiki authors quote receipts
+   * inconsistently: the measured Kerra Island page set attributes 2 of 16 quests, and the
+   * regen-necklace quest (This Means Warrr → Talisman of Kejaar Kerrath) is among the silent 14.
+   * A turn-in to a home-zone NPC almost certainly moves the faction; "almost certainly" is not
+   * a receipt, so these are shown labeled rather than merged into `raise`.
+   */
+  nearby: FactionQuestRef[]
 }
 
 function toRef(q: QuestEntry, amount: number | undefined): FactionQuestRef {
@@ -70,27 +87,66 @@ function byPayout(a: FactionQuestRef, b: FactionQuestRef): number {
   return bv - av || a.name.localeCompare(b.name)
 }
 
+/** The most frequent start zone among the raising quests, or nothing when none states one. */
+function homeZoneOf(raise: readonly FactionQuestRef[]): string | undefined {
+  const counts = new Map<string, number>()
+  let best: string | undefined
+  let bestN = 0
+  for (const r of raise) {
+    if (r.startZone === undefined) continue
+    const n = (counts.get(r.startZone) ?? 0) + 1
+    counts.set(r.startZone, n)
+    if (n > bestN) {
+      bestN = n
+      best = r.startZone
+    }
+  }
+  return best
+}
+
 /**
  * The whole index, built once per process from the committed catalog (904 quests is a
  * milliseconds-scale walk) — keyed by LOWERCASED faction name.
  */
+/** File one silent quest (no stated faction effect) under its start zone. */
+function fileSilent(q: QuestEntry, silentByZone: Map<string, FactionQuestRef[]>): void {
+  if ((q.factions?.length ?? 0) > 0 || q.startZone === undefined) return
+  let list = silentByZone.get(q.startZone)
+  if (list === undefined) {
+    list = []
+    silentByZone.set(q.startZone, list)
+  }
+  list.push(toRef(q, undefined))
+}
+
+/** Sort a faction's lists and attach its home zone's silent quests. Split from the builder at
+ *  the measured complexity ceiling. */
+function finishWork(work: FactionWork, silentByZone: ReadonlyMap<string, FactionQuestRef[]>): void {
+  work.raise.sort(byPayout)
+  work.lower.sort(byPayout)
+  const home = homeZoneOf(work.raise)
+  if (home === undefined) return
+  work.homeZone = home
+  work.nearby = [...(silentByZone.get(home) ?? [])].sort((a, b) => a.name.localeCompare(b.name))
+}
+
 export function buildFactionWorkIndex(quests: readonly QuestEntry[]): Map<string, FactionWork> {
   const index = new Map<string, FactionWork>()
+  // The silent half: zone → the quests whose pages state no faction effect at all.
+  const silentByZone = new Map<string, FactionQuestRef[]>()
   for (const q of quests) {
+    fileSilent(q, silentByZone)
     for (const hit of q.factions ?? []) {
       const key = hit.name.toLowerCase()
       let work = index.get(key)
       if (work === undefined) {
-        work = { raise: [], lower: [] }
+        work = { raise: [], lower: [], nearby: [] }
         index.set(key, work)
       }
       ;(hit.up ? work.raise : work.lower).push(toRef(q, hit.amount))
     }
   }
-  for (const work of index.values()) {
-    work.raise.sort(byPayout)
-    work.lower.sort(byPayout)
-  }
+  for (const work of index.values()) finishWork(work, silentByZone)
   return index
 }
 

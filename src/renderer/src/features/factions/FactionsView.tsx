@@ -38,7 +38,7 @@ import { useWishlist } from '../wishlist/useWishlist'
 import { FilterBar, WorkFilterControls } from './FactionControls'
 import FactionRow, { type WorkLinks } from './FactionRow'
 import RaceUnlocksPanel from './RaceUnlocksPanel'
-import { NO_DERIVED, deriveRows, gearMaps, visibleRows } from './factionDerive'
+import { NO_DERIVED, deriveRows, gearMaps, visibleRows, type RowDerived, type RowFilters } from './factionDerive'
 import { filtersActive, type SlotFilter, type WorkFilters } from './factionFilters'
 import { useFactionData } from './useFactionRows'
 
@@ -85,6 +85,26 @@ function useRowActions(deps: {
   return { onOpenZone, onFind }
 }
 
+/** The table's rows once every filter has spoken — split out at the 100-line function ceiling. */
+function useTableRows(
+  all: ReturnType<typeof useFactionData>['rows'],
+  rowFilters: RowFilters,
+  workFilters: WorkFilters,
+  derivedById: ReadonlyMap<number, RowDerived>
+): ReturnType<typeof visibleRows> {
+  return useMemo(() => {
+    if (all === null) return []
+    const base = visibleRows(all, rowFilters)
+    // A narrowing filter is a reward hunt: a faction with no matching quest — attributed OR
+    // home-zone — is not an answer to it, however interesting its standing is.
+    if (!filtersActive(workFilters)) return base
+    return base.filter((r) => {
+      const w = derivedById.get(r.id)?.work
+      return (w?.raise.length ?? 0) > 0 || (w?.nearby.length ?? 0) > 0
+    })
+  }, [all, rowFilters, workFilters, derivedById])
+}
+
 export default function FactionsView({
   onOpenLoot,
   onOpenMob,
@@ -119,14 +139,7 @@ export default function FactionsView({
     () => deriveRows(all, workFilters, maps, wishKeys),
     [all, workFilters, maps, wishKeys]
   )
-  const rows = useMemo(() => {
-    if (all === null) return []
-    const base = visibleRows(all, { query, hideUntouched, hideMaxed })
-    // A narrowing filter is a reward hunt: a faction with no matching raising quest is not an
-    // answer to it, however interesting its standing is.
-    if (!filtersActive(workFilters)) return base
-    return base.filter((r) => (derivedById.get(r.id)?.work?.raise.length ?? 0) > 0)
-  }, [all, query, hideUntouched, hideMaxed, workFilters, derivedById])
+  const rows = useTableRows(all, { query, hideUntouched, hideMaxed }, workFilters, derivedById)
   const untouched = useMemo(() => (all ?? []).filter((r) => r.standing === 0).length, [all])
   const maxed = useMemo(() => (all ?? []).filter((r) => r.toMax <= 0).length, [all])
   return (

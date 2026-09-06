@@ -37,11 +37,13 @@ function addGearReward(n: string, worthy: ReadonlySet<string>, seen: Set<string>
   names.push(n.replace(/\*+$/, '').trim())
 }
 
-/** The distinct gear items one faction's RAISING quests reward. */
+/** The distinct gear items one faction's raising AND home-zone quests reward — the value
+ *  question is "is working this faction's area worth it", and a Kerra Island page that forgot
+ *  to quote its receipt still pays out on Kerra Island. */
 function factionGearRewards(work: FactionWork, worthy: ReadonlySet<string>): string[] {
   const seen = new Set<string>()
   const names: string[] = []
-  for (const q of work.raise) {
+  for (const q of [...work.raise, ...work.nearby]) {
     for (const n of q.rewards) addGearReward(n, worthy, seen, names)
   }
   return names

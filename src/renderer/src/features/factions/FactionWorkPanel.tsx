@@ -193,21 +193,33 @@ function GiverLink({
   )
 }
 
-/** The signed payout badge: an exact number when the page stated one, a bare arrow otherwise. */
-function payoutLabel(ref: FactionQuestRef, up: boolean): string {
-  if (ref.amount === undefined) return up ? '+' : '−'
+/** How a quest line speaks about the faction: a stated raise, a stated cost, or — the home-zone
+ *  candidates — no statement at all. */
+type QuestTone = 'up' | 'down' | 'plain'
+
+/** The signed payout badge: an exact number when the page stated one, a bare arrow otherwise,
+ *  and a neutral dot for a quest whose page stated nothing. */
+function payoutLabel(ref: FactionQuestRef, tone: QuestTone): string {
+  if (tone === 'plain') return '·'
+  if (ref.amount === undefined) return tone === 'up' ? '+' : '−'
   return ref.amount > 0 ? `+${String(ref.amount)}` : String(ref.amount)
+}
+
+const TONE_COLOR: Record<QuestTone, string> = {
+  up: 'success.main',
+  down: 'error.main',
+  plain: 'text.disabled'
 }
 
 /** One quest's line: payout, name, who and where (both linked), then the item lists. */
 function QuestLine({
   quest,
-  up,
+  tone,
   held,
   links
 }: {
   quest: FactionQuestRef
-  up: boolean
+  tone: QuestTone
   held?: HeldCounts
   links: WorkPanelLinks
 }): JSX.Element {
@@ -217,13 +229,13 @@ function QuestLine({
         <Box
           component="span"
           sx={{
-            color: up ? 'success.main' : 'error.main',
+            color: TONE_COLOR[tone],
             fontVariantNumeric: 'tabular-nums',
             fontWeight: 600,
             mr: 0.75
           }}
         >
-          {payoutLabel(quest, up)}
+          {payoutLabel(quest, tone)}
         </Box>
         {/* The quest NAME opens its eqlwiki page in the system browser — the item dialog's Source
             idiom exactly: `target="_blank"` becomes `shell.openExternal` through main's
@@ -300,15 +312,29 @@ export default function FactionWorkPanel({
   return (
     <Stack spacing={0.5} sx={{ py: 1 }} data-testid="factions-work">
       {work.raise.map((q) => (
-        <QuestLine key={q.name} quest={q} up held={held} links={links} />
+        <QuestLine key={q.name} quest={q} tone="up" held={held} links={links} />
       ))}
+      {/* THE SILENT HOME-ZONE QUESTS — candidates, said as exactly that. The wiki attributes a
+          fraction of a zone's quests (Kerra Island: 2 of 16), and the ones it misses include the
+          rewards a player remembers the zone FOR; hiding them made the tab look wrong about the
+          user's own necklace. The label keeps the claim honest: same neighborhood, no receipt. */}
+      {work.nearby.length > 0 && work.homeZone !== undefined && (
+        <Box sx={{ pt: work.raise.length > 0 ? 1 : 0 }} data-testid="factions-nearby">
+          <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+            Also in {work.homeZone} (faction effect unstated on the wiki):
+          </Typography>
+          {work.nearby.map((q) => (
+            <QuestLine key={q.name} quest={q} tone="plain" held={held} links={links} />
+          ))}
+        </Box>
+      )}
       {work.lower.length > 0 && (
-        <Box sx={{ pt: work.raise.length > 0 ? 1 : 0 }}>
+        <Box sx={{ pt: 1 }}>
           <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
             Costs this faction:
           </Typography>
           {work.lower.map((q) => (
-            <QuestLine key={q.name} quest={q} up={false} held={held} links={links} />
+            <QuestLine key={q.name} quest={q} tone="down" held={held} links={links} />
           ))}
         </Box>
       )}

@@ -22,9 +22,12 @@ function driftTitle(row: FactionRowVm): string {
   return row.exact ? base : `${base} (log window did not reach the dump - at least this much)`
 }
 
-/** The name cell's trailing signals: quest count, the gear-value count, the loud wishlist chip. */
-function NameSignals({ derived }: { derived: RowDerived }): JSX.Element {
-  const raiseCount = derived.work?.raise.length ?? 0
+/** The quest tallies: the attributed count, and the home zone's silent count beside it. Its own
+ *  component to keep `NameSignals` inside the measured complexity ceiling. */
+function QuestCounts({ work }: { work: RowDerived['work'] }): JSX.Element | null {
+  const raiseCount = work?.raise.length ?? 0
+  const nearbyCount = work?.nearby.length ?? 0
+  if (raiseCount === 0 && nearbyCount === 0) return null
   return (
     <>
       {raiseCount > 0 && (
@@ -32,6 +35,26 @@ function NameSignals({ derived }: { derived: RowDerived }): JSX.Element {
           {raiseCount} quest{raiseCount === 1 ? '' : 's'}
         </Typography>
       )}
+      {nearbyCount > 0 && (
+        <Typography
+          component="span"
+          variant="caption"
+          title={`quests in ${work?.homeZone ?? 'the home zone'} whose wiki pages state no faction effect`}
+          data-testid="factions-nearby-count"
+          sx={{ ml: 0.75, color: 'text.disabled' }}
+        >
+          +{nearbyCount} in zone
+        </Typography>
+      )}
+    </>
+  )
+}
+
+/** The name cell's trailing signals: quest tallies, the gear-value count, the loud wishlist chip. */
+function NameSignals({ derived }: { derived: RowDerived }): JSX.Element {
+  return (
+    <>
+      <QuestCounts work={derived.work} />
       {derived.gear.length > 0 && (
         <Typography
           component="span"
