@@ -16,8 +16,72 @@
 import { type JSX } from 'react'
 import { Box, Stack, Typography } from '@mui/material'
 import type { HeldCounts } from '@shared/types'
-import { DonorName } from '../planner/PlannerChips'
+import type { ZoneShort } from '@shared/maps'
+import { zoneShortName, zoneShortNameFromCatalog } from '@shared/zones'
+import Tooltip from '../../lib/Tooltip'
+import { KnownItemTooltip } from '../../lib/KnownItemTooltip'
+import { EQ_ITEM_COLORS } from '../../lib/ItemWindow'
+import { MOB_CARD_SLOT_PROPS, MobCard } from '../../lib/hoverCards'
+import { mainMobLookup } from '../timers/mobLookup'
 import type { FactionQuestRef, FactionWork } from './factionQuests'
+
+/** The links a quest line can offer — threaded once rather than as four props per level. */
+export interface WorkPanelLinks {
+  onOpenLoot?: (item?: string) => void
+  onOpenMob?: (t: { mob: string }) => void
+  /** open the Maps tab pinned at a zone (the stem is resolved HERE; unresolvable stays text) */
+  onOpenZone?: (zone: ZoneShort) => void
+}
+
+/**
+ * An item name: the EQ-style hover card (the Sky tab's `KnownItemTooltip` — stats, icon, what
+ * it's for), a click through to the Loot drill-down. Its own anchor rather than the planner's
+ * `DonorName` because that one carries a native `title`, and a browser tooltip under a hover
+ * card is two answers to one hover. The wiki's trailing `*` (its stats-vary marker on reward
+ * names) is stripped for the LOOKUP and the CLICK — the item DB keys the bare name — and kept in
+ * the display, because it is the page's own claim about variance.
+ */
+function ItemName({ name, onOpen }: { name: string; onOpen?: (item?: string) => void }): JSX.Element {
+  const bare = name.replace(/\*+$/, '').trim()
+  return (
+    <KnownItemTooltip name={bare}>
+      <Box
+        component="span"
+        data-testid="factions-item-name"
+        onClick={onOpen === undefined ? undefined : () => onOpen(bare)}
+        sx={{
+          color: EQ_ITEM_COLORS.name,
+          textDecoration: 'underline dotted',
+          textUnderlineOffset: 2,
+          cursor: onOpen === undefined ? 'default' : 'pointer'
+        }}
+      >
+        {name}
+      </Box>
+    </KnownItemTooltip>
+  )
+}
+
+/**
+ * A start zone: a Maps link when the name resolves to an installed map stem (the log-name table
+ * first, the mob catalog's spellings second — shared/zones.ts owns both), plain text when it does
+ * not. A fake link would be worse than a plain word; an unresolved zone is simply a zone this
+ * install has no map name for.
+ */
+function ZoneLink({ zone, onOpenZone }: { zone: string; onOpenZone?: (z: ZoneShort) => void }): JSX.Element {
+  const stem = zoneShortName(zone) ?? zoneShortNameFromCatalog(zone)
+  if (stem === null || onOpenZone === undefined) return <>{zone}</>
+  return (
+    <Box
+      component="span"
+      data-testid="factions-zone-link"
+      onClick={() => onOpenZone(stem)}
+      sx={{ textDecoration: 'underline dotted', textUnderlineOffset: 2, cursor: 'pointer' }}
+    >
+      {zone}
+    </Box>
+  )
+}
 
 /** How many linked names a list shows before folding the rest into a "+N more" hover. */
 const LIST_CAP = 4
@@ -53,7 +117,7 @@ function ItemLinks({
         return (
           <Box component="span" key={n}>
             {i > 0 && ', '}
-            <DonorName name={n} onOpen={onOpenLoot} />
+            <ItemName name={n} onOpen={onOpenLoot} />
             {have > 0 && (
               <Box component="span" title="in your last inventory dump" sx={{ color: 'success.main' }}>
                 {' '}
@@ -73,7 +137,8 @@ function ItemLinks({
   )
 }
 
-/** The giver's name as a Mobs-tab link — the con-card / Raid Targets contract. */
+/** The giver's name: the app's mob hover card (the Timers rows' own — drops, your kill counts),
+ *  a click through to the Mobs tab. Card and click together, the respawn rows' exact contract. */
 function GiverLink({
   giver,
   onOpenMob
@@ -82,17 +147,25 @@ function GiverLink({
   onOpenMob?: (t: { mob: string }) => void
 }): JSX.Element {
   return (
-    <Box
-      component="span"
-      onClick={onOpenMob === undefined ? undefined : () => onOpenMob({ mob: giver })}
-      sx={{
-        textDecoration: 'underline dotted',
-        textUnderlineOffset: 2,
-        cursor: onOpenMob === undefined ? 'default' : 'pointer'
-      }}
+    <Tooltip
+      title={<MobCard mob={giver} lookup={mainMobLookup} />}
+      slotProps={MOB_CARD_SLOT_PROPS}
+      disableInteractive
+      placement="top-start"
     >
-      {giver}
-    </Box>
+      <Box
+        component="span"
+        data-testid="factions-giver"
+        onClick={onOpenMob === undefined ? undefined : () => onOpenMob({ mob: giver })}
+        sx={{
+          textDecoration: 'underline dotted',
+          textUnderlineOffset: 2,
+          cursor: onOpenMob === undefined ? 'default' : 'pointer'
+        }}
+      >
+        {giver}
+      </Box>
+    </Tooltip>
   )
 }
 
@@ -102,19 +175,17 @@ function payoutLabel(ref: FactionQuestRef, up: boolean): string {
   return ref.amount > 0 ? `+${String(ref.amount)}` : String(ref.amount)
 }
 
-/** One quest's line: payout, name, who and where, then the save-these and rewards lists. */
+/** One quest's line: payout, name, who and where (both linked), then the item lists. */
 function QuestLine({
   quest,
   up,
   held,
-  onOpenLoot,
-  onOpenMob
+  links
 }: {
   quest: FactionQuestRef
   up: boolean
   held?: HeldCounts
-  onOpenLoot?: (item?: string) => void
-  onOpenMob?: (t: { mob: string }) => void
+  links: WorkPanelLinks
 }): JSX.Element {
   return (
     <Box sx={{ py: 0.5 }} data-testid="factions-quest">
@@ -132,8 +203,13 @@ function QuestLine({
         </Box>
         {quest.name}
         <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-          {quest.giver !== undefined && <GiverLink giver={quest.giver} onOpenMob={onOpenMob} />}
-          {quest.startZone !== undefined && ` · ${quest.startZone}`}
+          {quest.giver !== undefined && <GiverLink giver={quest.giver} onOpenMob={links.onOpenMob} />}
+          {quest.startZone !== undefined && (
+            <>
+              {' · '}
+              <ZoneLink zone={quest.startZone} onOpenZone={links.onOpenZone} />
+            </>
+          )}
           {quest.minLevel !== undefined && ` · lvl ${String(quest.minLevel)}+`}
         </Typography>
       </Typography>
@@ -142,10 +218,10 @@ function QuestLine({
           label="turn in:"
           names={quest.items}
           held={held}
-          onOpenLoot={onOpenLoot}
+          onOpenLoot={links.onOpenLoot}
           testId="factions-quest-items"
         />
-        <ItemLinks label="rewards:" names={quest.rewards} onOpenLoot={onOpenLoot} testId="factions-quest-rewards" />
+        <ItemLinks label="rewards:" names={quest.rewards} onOpenLoot={links.onOpenLoot} testId="factions-quest-rewards" />
       </Box>
     </Box>
   )
@@ -159,13 +235,11 @@ function QuestLine({
 export default function FactionWorkPanel({
   work,
   held,
-  onOpenLoot,
-  onOpenMob
+  links
 }: {
   work: FactionWork | null
   held?: HeldCounts
-  onOpenLoot?: (item?: string) => void
-  onOpenMob?: (t: { mob: string }) => void
+  links: WorkPanelLinks
 }): JSX.Element {
   if (work === null) {
     return (
@@ -178,7 +252,7 @@ export default function FactionWorkPanel({
   return (
     <Stack spacing={0.5} sx={{ py: 1 }} data-testid="factions-work">
       {work.raise.map((q) => (
-        <QuestLine key={q.name} quest={q} up held={held} onOpenLoot={onOpenLoot} onOpenMob={onOpenMob} />
+        <QuestLine key={q.name} quest={q} up held={held} links={links} />
       ))}
       {work.lower.length > 0 && (
         <Box sx={{ pt: work.raise.length > 0 ? 1 : 0 }}>
@@ -186,14 +260,7 @@ export default function FactionWorkPanel({
             Costs this faction:
           </Typography>
           {work.lower.map((q) => (
-            <QuestLine
-              key={q.name}
-              quest={q}
-              up={false}
-              held={held}
-              onOpenLoot={onOpenLoot}
-              onOpenMob={onOpenMob}
-            />
+            <QuestLine key={q.name} quest={q} up={false} held={held} links={links} />
           ))}
         </Box>
       )}

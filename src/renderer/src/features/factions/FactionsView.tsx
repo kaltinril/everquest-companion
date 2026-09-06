@@ -18,7 +18,7 @@
 // THE LIST IS ITS OWN SCROLLER (AGENTS.md UI conventions): the view fills its height and the
 // table scrolls in a bounded box rather than growing the page.
 
-import { type JSX, useMemo, useState } from 'react'
+import { type JSX, useCallback, useMemo, useState } from 'react'
 import {
   Box,
   Chip,
@@ -39,8 +39,13 @@ import HandshakeIcon from '@mui/icons-material/Handshake'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import type { HeldCounts } from '@shared/types'
+import type { ZoneShort } from '@shared/maps'
+import type { View } from '../../appViews'
 import OutputKindLine from '../../components/OutputKindLine'
-import FactionWorkPanel from './FactionWorkPanel'
+// The Maps tab's own pin is the zone deep link: write the selection it persists, then switch
+// tabs — MapsView reads it on mount, exactly as if the zone had been picked in its selector.
+import { onPick, saveZoneSelection } from '../maps/zoneFollow'
+import FactionWorkPanel, { type WorkPanelLinks } from './FactionWorkPanel'
 import RaceUnlocksPanel from './RaceUnlocksPanel'
 import { useFactionData, type FactionRowVm } from './useFactionRows'
 
@@ -64,10 +69,8 @@ function visibleRows(rows: readonly FactionRowVm[], f: RowFilters): FactionRowVm
     .sort((a, b) => b.standing - a.standing || a.name.localeCompare(b.name))
 }
 
-/** The link handlers and held counts the work panel draws with. */
-interface WorkLinks {
-  onOpenLoot?: (item?: string) => void
-  onOpenMob?: (t: { mob: string }) => void
+/** The work panel's link handlers plus the held counts its turn-in lists draw with. */
+interface WorkLinks extends WorkPanelLinks {
   held: HeldCounts
 }
 
@@ -159,12 +162,7 @@ function FactionRow({
         <TableCell colSpan={4} sx={{ py: 0, borderBottom: expanded ? undefined : 'none' }}>
           <Collapse in={expanded} unmountOnExit>
             <Box sx={{ pl: 3 }}>
-              <FactionWorkPanel
-                work={row.work}
-                held={links.held}
-                onOpenLoot={links.onOpenLoot}
-                onOpenMob={links.onOpenMob}
-              />
+              <FactionWorkPanel work={row.work} held={links.held} links={links} />
             </Box>
           </Collapse>
         </TableCell>
@@ -269,17 +267,38 @@ function FilterBar({
 
 export default function FactionsView({
   onOpenLoot,
-  onOpenMob
+  onOpenMob,
+  onSelectView
 }: {
   onOpenLoot?: (item?: string) => void
   onOpenMob?: (t: { mob: string }) => void
+  /** the app's MANUAL navigator — how a zone link becomes the Maps tab */
+  onSelectView?: (v: View) => void
 }): JSX.Element {
   const { rows: all, readAt, held, raceUnlocks } = useFactionData()
   const [query, setQuery] = useState('')
   const [hideUntouched, setHideUntouched] = useState(true)
   const [hideMaxed, setHideMaxed] = useState(true)
   const [expandedId, setExpandedId] = useState<number | null>(null)
-  const links = useMemo(() => ({ onOpenLoot, onOpenMob, held }), [onOpenLoot, onOpenMob, held])
+  const onOpenZone = useCallback(
+    (stem: ZoneShort) => {
+      saveZoneSelection(onPick(stem))
+      onSelectView?.('maps')
+    },
+    [onSelectView]
+  )
+  // A race chip's click REVEALS its faction row: the search finds it, and both hide-toggles come
+  // off — a race's missing faction is usually untouched, which is exactly what the default view
+  // hides, and a reveal that landed on an empty table would read as a broken link.
+  const onFind = useCallback((name: string) => {
+    setQuery(name)
+    setHideUntouched(false)
+    setHideMaxed(false)
+  }, [])
+  const links = useMemo(
+    () => ({ onOpenLoot, onOpenMob, onOpenZone, held }),
+    [onOpenLoot, onOpenMob, onOpenZone, held]
+  )
   const rows = useMemo(
     () => (all === null ? [] : visibleRows(all, { query, hideUntouched, hideMaxed })),
     [all, query, hideUntouched, hideMaxed]
@@ -296,7 +315,7 @@ export default function FactionsView({
         <NoDump />
       ) : (
         <>
-          <RaceUnlocksPanel races={raceUnlocks} rows={all} />
+          <RaceUnlocksPanel races={raceUnlocks} rows={all} onFind={onFind} />
           <FilterBar
             query={query}
             onQuery={setQuery}
