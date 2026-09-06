@@ -22,7 +22,7 @@
 // table scrolls in a bounded box rather than growing the page.
 
 import { type JSX, useCallback, useMemo, useState } from 'react'
-import { Box, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
+import { Box, Stack, Table, TableBody, Typography } from '@mui/material'
 import HandshakeIcon from '@mui/icons-material/Handshake'
 import type { ClassAbbr } from '@shared/classCombo'
 import type { ZoneShort } from '@shared/maps'
@@ -35,10 +35,20 @@ import { useGearIndex } from '../gear/gearData'
 // THE LOUD WISHLIST JOIN: a faction whose quests reward something you have DECIDED you want is
 // the most valuable row on the table, and it says so before anyone expands anything.
 import { useWishlist } from '../wishlist/useWishlist'
-import { FilterBar, WorkFilterControls } from './FactionControls'
+import { FactionTableHead, FilterBar, WorkFilterControls } from './FactionControls'
 import FactionRow, { type WorkLinks } from './FactionRow'
 import RaceUnlocksPanel from './RaceUnlocksPanel'
-import { NO_DERIVED, deriveRows, gearMaps, visibleRows, type RowDerived, type RowFilters } from './factionDerive'
+import {
+  DEFAULT_SORT,
+  NO_DERIVED,
+  deriveRows,
+  gearMaps,
+  visibleRows,
+  type RowDerived,
+  type RowFilters,
+  type RowSort,
+  type SortKey
+} from './factionDerive'
 import { filtersActive, type SlotFilter, type WorkFilters } from './factionFilters'
 import { useFactionData } from './useFactionRows'
 
@@ -95,13 +105,13 @@ function useRowFilterState(): {
 /** The table's rows once every filter has spoken — split out at the 100-line function ceiling. */
 function useTableRows(
   all: ReturnType<typeof useFactionData>['rows'],
-  rowFilters: RowFilters,
-  workFilters: WorkFilters,
+  filters: { rows: RowFilters; sort: RowSort; work: WorkFilters },
   derivedById: ReadonlyMap<number, RowDerived>
 ): ReturnType<typeof visibleRows> {
+  const { rows: rowFilters, sort, work: workFilters } = filters
   return useMemo(() => {
     if (all === null) return []
-    const base = visibleRows(all, rowFilters)
+    const base = visibleRows(all, rowFilters, sort)
     // A narrowing filter is a reward hunt: a faction with no matching quest — attributed OR
     // home-zone — is not an answer to it, however interesting its standing is.
     if (!filtersActive(workFilters)) return base
@@ -109,7 +119,14 @@ function useTableRows(
       const w = derivedById.get(r.id)?.work
       return (w?.raise.length ?? 0) > 0 || (w?.nearby.length ?? 0) > 0
     })
-  }, [all, rowFilters, workFilters, derivedById])
+  }, [all, rowFilters, sort, workFilters, derivedById])
+}
+
+/** A repeat click flips the direction; a new column starts at its natural reading — names
+ *  ascending, everything numeric biggest-first. */
+function nextSort(s: RowSort, key: SortKey): RowSort {
+  if (s.key === key) return { key, dir: s.dir === 'asc' ? 'desc' : 'asc' }
+  return { key, dir: key === 'name' ? 'asc' : 'desc' }
 }
 
 export default function FactionsView({
@@ -126,7 +143,11 @@ export default function FactionsView({
   const { rowFilters, onQuery, toggles, reveal } = useRowFilterState()
   const [classSel, setClassSel] = useState<ClassAbbr[]>([])
   const [slot, setSlot] = useState<SlotFilter>('ANY')
+  const [sort, setSort] = useState<RowSort>(DEFAULT_SORT)
   const [expandedId, setExpandedId] = useState<number | null>(null)
+  const onSort = useCallback((key: SortKey) => {
+    setSort((s) => nextSort(s, key))
+  }, [])
   const onOpenZone = useCallback(
     (stem: ZoneShort) => {
       saveZoneSelection(onPick(stem))
@@ -150,7 +171,7 @@ export default function FactionsView({
     () => deriveRows(all, workFilters, maps, wishKeys),
     [all, workFilters, maps, wishKeys]
   )
-  const rows = useTableRows(all, rowFilters, workFilters, derivedById)
+  const rows = useTableRows(all, { rows: rowFilters, sort, work: workFilters }, derivedById)
   const untouched = useMemo(() => (all ?? []).filter((r) => r.standing === 0).length, [all])
   const maxed = useMemo(() => (all ?? []).filter((r) => r.toMax <= 0).length, [all])
   const unlockers = useMemo(() => (all ?? []).filter((r) => r.unlocks.length > 0).length, [all])
@@ -174,14 +195,7 @@ export default function FactionsView({
           />
           <Box sx={{ flexGrow: 1, minHeight: 0, overflow: 'auto' }}>
             <Table size="small" stickyHeader data-testid="factions-table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Faction</TableCell>
-                  <TableCell>Regard</TableCell>
-                  <TableCell align="right">Standing</TableCell>
-                  <TableCell>Toward max</TableCell>
-                </TableRow>
-              </TableHead>
+              <FactionTableHead sort={sort} onSort={onSort} />
               <TableBody>
                 {rows.map((row) => (
                   <FactionRow

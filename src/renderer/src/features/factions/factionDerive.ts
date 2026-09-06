@@ -94,15 +94,37 @@ export interface RowFilters {
   unlocksOnly: boolean
 }
 
-export function visibleRows(rows: readonly FactionRowVm[], f: RowFilters): FactionRowVm[] {
+/** The three sortable columns. Regard sorts the ladder's RANKS, so ties inside one rung stay
+ *  grouped and fall back to the name; Standing sorts the live number. */
+export type SortKey = 'name' | 'regard' | 'standing'
+
+export interface RowSort {
+  key: SortKey
+  dir: 'asc' | 'desc'
+}
+
+export const DEFAULT_SORT: RowSort = { key: 'standing', dir: 'desc' }
+
+/** One column's natural (ascending) comparison; `visibleRows` applies the direction. */
+function compareBy(a: FactionRowVm, b: FactionRowVm, key: SortKey): number {
+  if (key === 'name') return a.name.localeCompare(b.name)
+  if (key === 'regard') return a.tierRank - b.tierRank || b.standing - a.standing || a.name.localeCompare(b.name)
+  return a.standing - b.standing || a.name.localeCompare(b.name)
+}
+
+export function visibleRows(rows: readonly FactionRowVm[], f: RowFilters, sort: RowSort): FactionRowVm[] {
   const q = f.query.trim().toLowerCase()
+  const sign = sort.dir === 'asc' ? 1 : -1
   return rows
     .filter((r) => {
-      if (q !== '' && !r.name.toLowerCase().includes(q)) return false
+      // The query searches EVERYTHING the row's work would draw — faction, quest names, givers,
+      // zones, turn-in items, rewards (`FactionRowVm.searchText`) — so "Talisman of Kejaar"
+      // finds Kerra Isle without anyone knowing which faction owns the quest.
+      if (q !== '' && !r.searchText.includes(q)) return false
       // The unlocks hunt OVERRIDES the hide-toggles: a race-gating faction is usually untouched,
       // which is exactly what the default view hides — the same trap the race-chip reveal clears.
       if (f.unlocksOnly) return r.unlocks.length > 0
       return !(f.hideUntouched && r.standing === 0) && !(f.hideMaxed && r.toMax <= 0)
     })
-    .sort((a, b) => b.standing - a.standing || a.name.localeCompare(b.name))
+    .sort((a, b) => sign * compareBy(a, b, sort.key))
 }

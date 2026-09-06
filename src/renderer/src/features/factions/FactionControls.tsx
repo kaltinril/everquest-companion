@@ -3,12 +3,59 @@
 // of FactionsView.tsx at the measured file ceiling (split, never ratchet).
 
 import { type JSX } from 'react'
-import { Box, FormControlLabel, MenuItem, Stack, Switch, TextField, Typography } from '@mui/material'
+import {
+  Box,
+  FormControlLabel,
+  MenuItem,
+  Stack,
+  Switch,
+  TableCell,
+  TableHead,
+  TableRow,
+  TableSortLabel,
+  TextField,
+  Typography
+} from '@mui/material'
 import { CLASS_ABBRS, type ClassAbbr } from '@shared/classCombo'
 import { classDisplayName } from '@shared/spellLevels'
 import { EQUIP_SLOTS } from '@shared/planner/types'
 import ChipMultiSelect from '../../components/ChipMultiSelect'
+import type { RowSort, SortKey } from './factionDerive'
 import type { SlotFilter } from './factionFilters'
+
+/** The table's header: three sortable columns (Faction, Regard, Standing) and the bar's. */
+export function FactionTableHead({
+  sort,
+  onSort
+}: {
+  sort: RowSort
+  onSort: (key: SortKey) => void
+}): JSX.Element {
+  const cell = (key: SortKey, label: string, align?: 'right'): JSX.Element => (
+    <TableCell align={align} sortDirection={sort.key === key ? sort.dir : false}>
+      <TableSortLabel
+        active={sort.key === key}
+        direction={sort.key === key ? sort.dir : 'asc'}
+        onClick={() => {
+          onSort(key)
+        }}
+        data-testid={`factions-sort-${key}`}
+      >
+        {label}
+      </TableSortLabel>
+    </TableCell>
+  )
+  return (
+    <TableHead>
+      <TableRow>
+        {cell('name', 'Faction')}
+        {cell('regard', 'Regard')}
+        {cell('standing', 'Standing', 'right')}
+        <TableCell>Toward max</TableCell>
+      </TableRow>
+    </TableHead>
+  )
+}
 
 /** The WORK filters: which class the quests must serve, which slot their gear rewards must fill.
  *  `ANY` on the slot deliberately keeps quests with no gear rewards at all (factionFilters.ts). */
@@ -110,7 +157,7 @@ export function FilterBar({
     <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 1 }}>
       <TextField
         size="small"
-        placeholder="Filter factions…"
+        placeholder="Search factions, quests, items…"
         value={query}
         onChange={(e) => {
           onQuery(e.target.value)
