@@ -135,10 +135,23 @@ function useFactionRows(): FactionsProgress {
  * the name as the tiebreak — the factions you have actually worked are the top of the table, the
  * ones working against you the bottom, and the alphabetical middle stays stable between renders.
  */
-function visibleRows(rows: readonly FactionRowVm[], query: string, hideUntouched: boolean): FactionRowVm[] {
-  const q = query.trim().toLowerCase()
+interface RowFilters {
+  query: string
+  /** hide the 0-rows the character has never touched */
+  hideUntouched: boolean
+  /** hide rows at their own cap (`toMax <= 0` — the dump's fact, not a rung guess): done is done */
+  hideMaxed: boolean
+}
+
+function visibleRows(rows: readonly FactionRowVm[], f: RowFilters): FactionRowVm[] {
+  const q = f.query.trim().toLowerCase()
   return rows
-    .filter((r) => (q === '' || r.name.toLowerCase().includes(q)) && !(hideUntouched && r.standing === 0))
+    .filter(
+      (r) =>
+        (q === '' || r.name.toLowerCase().includes(q)) &&
+        !(f.hideUntouched && r.standing === 0) &&
+        !(f.hideMaxed && r.toMax <= 0)
+    )
     .sort((a, b) => b.standing - a.standing || a.name.localeCompare(b.name))
 }
 
@@ -240,17 +253,99 @@ function NoDump(): JSX.Element {
   )
 }
 
+/** One filter switch: a small labelled toggle with its own count. */
+function FilterSwitch({
+  label,
+  checked,
+  onChange,
+  testId
+}: {
+  label: string
+  checked: boolean
+  onChange: (on: boolean) => void
+  testId: string
+}): JSX.Element {
+  return (
+    <FormControlLabel
+      control={
+        <Switch
+          size="small"
+          checked={checked}
+          onChange={(e) => {
+            onChange(e.target.checked)
+          }}
+          data-testid={testId}
+        />
+      }
+      label={label}
+      slotProps={{ typography: { variant: 'caption', color: 'text.secondary' } }}
+    />
+  )
+}
+
+/** The controls row: search, the two hide-toggles, and the shown-of-total count on the far end.
+ *  Split out of `FactionsView` at the measured 100-line function ceiling (split, never ratchet). */
+function FilterBar({
+  query,
+  onQuery,
+  toggles,
+  counts
+}: {
+  query: string
+  onQuery: (q: string) => void
+  toggles: {
+    hideUntouched: boolean
+    onHideUntouched: (on: boolean) => void
+    hideMaxed: boolean
+    onHideMaxed: (on: boolean) => void
+  }
+  counts: { untouched: number; maxed: number; shown: number; total: number }
+}): JSX.Element {
+  return (
+    <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 1 }}>
+      <TextField
+        size="small"
+        placeholder="Filter factions…"
+        value={query}
+        onChange={(e) => {
+          onQuery(e.target.value)
+        }}
+        slotProps={{ htmlInput: { 'data-testid': 'factions-search' } }}
+        sx={{ width: 260 }}
+      />
+      <FilterSwitch
+        label={`Hide untouched (${String(counts.untouched)})`}
+        checked={toggles.hideUntouched}
+        onChange={toggles.onHideUntouched}
+        testId="factions-hide-untouched"
+      />
+      <FilterSwitch
+        label={`Hide maxed (${String(counts.maxed)})`}
+        checked={toggles.hideMaxed}
+        onChange={toggles.onHideMaxed}
+        testId="factions-hide-maxed"
+      />
+      <Box sx={{ flexGrow: 1 }} />
+      <Typography variant="caption" color="text.secondary" data-testid="factions-count">
+        {counts.shown} of {counts.total}
+      </Typography>
+    </Stack>
+  )
+}
+
 export default function FactionsView({ onOpenLoot, onOpenMob }: WorkLinks): JSX.Element {
   const { rows: all, readAt } = useFactionRows()
   const [query, setQuery] = useState('')
   const [hideUntouched, setHideUntouched] = useState(true)
+  const [hideMaxed, setHideMaxed] = useState(true)
   const [expandedId, setExpandedId] = useState<number | null>(null)
   const links = useMemo(() => ({ onOpenLoot, onOpenMob }), [onOpenLoot, onOpenMob])
   const rows = useMemo(
-    () => (all === null ? [] : visibleRows(all, query, hideUntouched)),
-    [all, query, hideUntouched]
+    () => (all === null ? [] : visibleRows(all, { query, hideUntouched, hideMaxed })),
+    [all, query, hideUntouched, hideMaxed]
   )
   const untouched = useMemo(() => (all ?? []).filter((r) => r.standing === 0).length, [all])
+  const maxed = useMemo(() => (all ?? []).filter((r) => r.toMax <= 0).length, [all])
   return (
     <Box
       data-testid="factions-view"
@@ -261,36 +356,17 @@ export default function FactionsView({ onOpenLoot, onOpenMob }: WorkLinks): JSX.
         <NoDump />
       ) : (
         <>
-          <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 1 }}>
-            <TextField
-              size="small"
-              placeholder="Filter factions…"
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value)
-              }}
-              slotProps={{ htmlInput: { 'data-testid': 'factions-search' } }}
-              sx={{ width: 260 }}
-            />
-            <FormControlLabel
-              control={
-                <Switch
-                  size="small"
-                  checked={hideUntouched}
-                  onChange={(e) => {
-                    setHideUntouched(e.target.checked)
-                  }}
-                  data-testid="factions-hide-untouched"
-                />
-              }
-              label={`Hide untouched (${String(untouched)})`}
-              slotProps={{ typography: { variant: 'caption', color: 'text.secondary' } }}
-            />
-            <Box sx={{ flexGrow: 1 }} />
-            <Typography variant="caption" color="text.secondary" data-testid="factions-count">
-              {rows.length} of {all.length}
-            </Typography>
-          </Stack>
+          <FilterBar
+            query={query}
+            onQuery={setQuery}
+            toggles={{
+              hideUntouched,
+              onHideUntouched: setHideUntouched,
+              hideMaxed,
+              onHideMaxed: setHideMaxed
+            }}
+            counts={{ untouched, maxed, shown: rows.length, total: all.length }}
+          />
           <Box sx={{ flexGrow: 1, minHeight: 0, overflow: 'auto' }}>
             <Table size="small" stickyHeader data-testid="factions-table">
               <TableHead>
