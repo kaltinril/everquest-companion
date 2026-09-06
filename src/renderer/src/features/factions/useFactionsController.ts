@@ -58,6 +58,7 @@ function useRowFilterState(): {
   const [hideUntouched, setHideUntouched] = useState(true)
   const [hideMaxed, setHideMaxed] = useState(true)
   const [unlocksOnly, setUnlocksOnly] = useState(false)
+  const [unlocksPending, setUnlocksPending] = useState(false)
   const [rewardsOnly, setRewardsOnly] = useState(false)
   // A race chip's click REVEALS its faction row: the search finds it, and both hide-toggles come
   // off — a race's missing faction is usually untouched, which is exactly what the default view
@@ -68,7 +69,7 @@ function useRowFilterState(): {
     setHideMaxed(false)
   }, [])
   return {
-    rowFilters: { query, hideUntouched, hideMaxed, unlocksOnly, rewardsOnly },
+    rowFilters: { query, hideUntouched, hideMaxed, unlocksOnly, unlocksPending, rewardsOnly },
     onQuery: setQuery,
     toggles: {
       hideUntouched,
@@ -77,6 +78,8 @@ function useRowFilterState(): {
       onHideMaxed: setHideMaxed,
       unlocksOnly,
       onUnlocksOnly: setUnlocksOnly,
+      unlocksPending,
+      onUnlocksPending: setUnlocksPending,
       rewardsOnly,
       onRewardsOnly: setRewardsOnly
     },

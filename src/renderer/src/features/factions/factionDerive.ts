@@ -103,8 +103,11 @@ export interface RowFilters {
   hideUntouched: boolean
   /** hide rows at their own cap (LIVE `toMax <= 0` — the dump's fact plus the log's): done is done */
   hideMaxed: boolean
-  /** only factions that still GATE a race unlock (`FactionRowVm.unlocks`, the achievements dump) */
+  /** only factions that GATE a race unlock (`FactionRowVm.unlocks`, the achievements dump) —
+   *  settled gates included, because a friend's unlock runs through the same factions */
   unlocksOnly: boolean
+  /** …narrowed to gates THIS character has not settled yet (only read while `unlocksOnly`) */
+  unlocksPending: boolean
   /** the search reads REWARDS only — the find-the-chain's-final-quest scope */
   rewardsOnly: boolean
 }
@@ -137,13 +140,14 @@ export function visibleRows(rows: readonly FactionRowVm[], f: RowFilters, sort: 
       // finds Kerra Isle without anyone knowing which faction owns the quest. A live search also
       // OVERRIDES the hide-toggles: the one faction holding the match may be untouched or maxed,
       // and a search whose only answer is hidden reads as no answer at all.
+      const gates = f.unlocksPending ? r.unlocks.filter((u) => !u.done) : r.unlocks
       if (q !== '') {
         const hay = f.rewardsOnly ? r.rewardText : r.searchText
-        return hay.includes(q) && !(f.unlocksOnly && r.unlocks.length === 0)
+        return hay.includes(q) && !(f.unlocksOnly && gates.length === 0)
       }
       // The unlocks hunt OVERRIDES the hide-toggles too: a race-gating faction is usually
       // untouched, which is exactly what the default view hides — the race-chip reveal's trap.
-      if (f.unlocksOnly) return r.unlocks.length > 0
+      if (f.unlocksOnly) return gates.length > 0
       return !(f.hideUntouched && r.standing === 0) && !(f.hideMaxed && r.toMax <= 0)
     })
     .sort((a, b) => sign * compareBy(a, b, sort.key))

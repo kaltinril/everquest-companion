@@ -53,25 +53,31 @@ export interface FactionRowVm {
   work: FactionWork | null
   raiseCount: number
   /**
-   * The still-locked races this faction gates — from the achievements dump's race-unlock
-   * requirements ("Get maximum faction with <this>"), kept only while BOTH the race and this
-   * faction's own requirement are incomplete: a met requirement no longer unlocks anything.
-   * Empty without an achievements dump, which is the honest reading of "we don't know".
+   * EVERY race this faction gates — from the achievements dump's race-unlock requirements
+   * ("Get maximum faction with <this>"). A gate is a fact about the FACTION, so it stays on the
+   * row after you have earned it (`done`) — a friend's Kerran still runs through Kerra Isle
+   * whatever your own achievements say. Empty without an achievements dump ("we don't know").
    */
-  unlocks: string[]
+  unlocks: RaceGate[]
 }
 
-/** Lowercased faction name → the still-locked races that need it at maximum. */
-function unlockNeeds(races: readonly RaceUnlockClaim[] | undefined): Map<string, string[]> {
-  const m = new Map<string, string[]>()
+/** One race a faction gates, and whether YOUR side of it is already settled (the race is open,
+ *  or this faction's requirement is marked complete). */
+export interface RaceGate {
+  race: string
+  done: boolean
+}
+
+/** Lowercased faction name → every race gated on it, done or still pending. */
+function unlockNeeds(races: readonly RaceUnlockClaim[] | undefined): Map<string, RaceGate[]> {
+  const m = new Map<string, RaceGate[]>()
   for (const race of races ?? []) {
-    if (race.complete) continue
     for (const f of race.factions) {
-      if (f.complete) continue
       const key = f.name.toLowerCase()
+      const gate: RaceGate = { race: race.race, done: race.complete || f.complete }
       const list = m.get(key)
-      if (list === undefined) m.set(key, [race.race])
-      else list.push(race.race)
+      if (list === undefined) m.set(key, [gate])
+      else list.push(gate)
     }
   }
   return m
@@ -82,7 +88,7 @@ interface RowJoins {
   work: Map<string, FactionWork>
   evidence: Map<string, FactionEvidence>
   windowComplete: boolean
-  unlocksByName: Map<string, string[]>
+  unlocksByName: Map<string, RaceGate[]>
 }
 
 /** The ladder as ranks, friendliest first — computed once from the one tier table. */
