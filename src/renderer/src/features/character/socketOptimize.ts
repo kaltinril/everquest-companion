@@ -160,7 +160,17 @@ function match(claims: readonly FamilyClaim[], adj: readonly number[][], seatCou
   return placed
 }
 
-function placementOf(claim: FamilyClaim, socket: SocketHostCell): Placement {
+/** The seat's placement names the donor that actually FITS it (user catch 2026-09-10: a claim
+ *  carried by several donors printed its FIRST donor's name, which read as a SECONDARY-only
+ *  shield gem being sent to the neck - the matching had legally seated a different, neck-slot
+ *  donor of the same effect, and the label lied about which). */
+function placementOf(
+  claim: FamilyClaim,
+  socket: SocketHostCell,
+  rowByKey: ReadonlyMap<string, GearRow>
+): Placement {
+  const hostRow = rowByKey.get(socket.itemKey)
+  const donor = claim.donors.find((d) => d.type === socket.type && fits(d.row, socket, hostRow))
   return {
     cellId: socket.cellId,
     cellLabel: socket.cellLabel,
@@ -169,7 +179,7 @@ function placementOf(claim: FamilyClaim, socket: SocketHostCell): Placement {
     family: claim.family,
     effect: claim.eff.effect,
     tier: claim.eff.tier,
-    gemName: claim.gemName
+    gemName: donor === undefined ? claim.gemName : donor.row.name
   }
 }
 
@@ -250,7 +260,7 @@ export function planBoard(
   const placed = match(claims, adj, sockets.length)
   const placements: Placement[] = []
   for (let u = 0; u < claims.length; u++) {
-    if (placed[u] !== -1) placements.push(placementOf(claims[u], sockets[placed[u]]))
+    if (placed[u] !== -1) placements.push(placementOf(claims[u], sockets[placed[u]], rowByKey))
   }
   return {
     placements,
