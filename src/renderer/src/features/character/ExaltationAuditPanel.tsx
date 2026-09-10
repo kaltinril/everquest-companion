@@ -16,6 +16,7 @@ import { Paper, Stack, Typography } from '@mui/material'
 import { KnownItemTooltip } from '../../lib/KnownItemTooltip'
 import type { DuplicateFinding, ExaltationAudit } from './exaltationAudit'
 import type { Recommendations } from './socketRecommend'
+import type { BoardPlan } from './socketOptimize'
 
 /** An item name that opens the same hover card every other item name in the app opens. */
 function Name({ children }: { children: string }): JSX.Element {
@@ -92,6 +93,32 @@ function scrapLines(audit: ExaltationAudit): JSX.Element[] {
     ))
 }
 
+/** The whole-board plan: the moves to reach it, and the contests only a player can judge. */
+function planLines(plan: BoardPlan): JSX.Element[] {
+  const out: JSX.Element[] = plan.moves.map((m, i) => (
+    <Typography key={`p${String(i)}`} variant="body2" color="text.secondary" data-testid="exaltation-plan-move">
+      {`${m.cellLabel} ${m.type}: socket `}
+      <Name>{m.gemName}</Name>
+      {` (${m.effect})`}
+      {m.replacesName === null
+        ? ' into the empty socket'
+        : ` - replaces ${m.replacesEffect ?? m.replacesName}`}
+    </Typography>
+  ))
+  for (const [i, c] of plan.contested.entries()) {
+    out.push(
+      <Typography key={`c${String(i)}`} variant="body2" color="text.secondary" data-testid="exaltation-plan-contested">
+        {`${c.effect} (`}
+        <Name>{c.gemName}</Name>
+        {c.noSeat
+          ? `) has no legal socket on what you wear`
+          : `) stays benched: ${c.options.map((o) => `${o.cellLabel} ${o.type} holds ${o.heldBy}`).join('; ')} - your call which you value more`}
+      </Typography>
+    )
+  }
+  return out
+}
+
 function copyLine(f: DuplicateFinding): JSX.Element {
   return (
     <Typography key={f.name} variant="caption" color="text.secondary" data-testid="exaltation-duplicate">
@@ -103,22 +130,26 @@ function copyLine(f: DuplicateFinding): JSX.Element {
 
 export default function ExaltationAuditPanel({
   recs,
-  audit
+  audit,
+  plan
 }: {
   recs: Recommendations | null
   audit: ExaltationAudit | null
+  plan: BoardPlan | null
 }): JSX.Element | null {
   if (recs === null || audit === null) return null
+  const board = plan === null ? [] : planLines(plan)
   const swaps = swapLines(recs)
   const fills = fillLines(recs)
   const redundant = redundantLines(recs)
   const scrap = scrapLines(audit)
   const copies = audit.duplicates.map(copyLine)
-  if (swaps.length + fills.length + redundant.length + scrap.length + copies.length === 0) return null
+  if (board.length + swaps.length + fills.length + redundant.length + scrap.length + copies.length === 0) return null
   return (
     <Paper variant="outlined" data-testid="exaltation-audit" sx={{ p: 1.5 }}>
       <Stack spacing={0.5}>
         <Typography variant="subtitle2">Exaltation cleanup</Typography>
+        <Section title="Best layout (max distinct effects - a provable maximum, not a guess)" lines={board} />
         <Section title="Swap (the red cards)" lines={swaps} />
         <Section title="Dead sockets (same effect twice - it does not stack)" lines={redundant} />
         <Section title="Fill an empty socket" lines={fills} />
