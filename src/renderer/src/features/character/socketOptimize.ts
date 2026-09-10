@@ -27,6 +27,7 @@ import type { GearRow } from '../../../../shared/planner/gear'
 import type { OwnedExaltation } from '../../../../shared/characterSheet'
 import { bestEffectFor, usable, type KindEffect } from './exaltationAudit'
 import type { SocketHostCell } from './socketRecommend'
+import { slotFits } from '../../../../shared/planner/rules'
 
 /** One family's claim: its best owned tier, the donor gems that carry it, and how many copies. */
 interface FamilyClaim {
@@ -141,9 +142,17 @@ function currentSeatExists(
   })
 }
 
-/** R2 + type for one donor row against one seat. */
+/**
+ * R2 + type for one donor row against one seat.
+ *
+ * THE SLOT HALF IS `donor ∩ hostItem`, WITH THE CELL AS A SECOND CONSTRAINT (fix, 2026-09-10) - so
+ * an `Any Slot` seat is a real seat whose HOST decides what fits it, rather than a seat nothing can
+ * ever fill. `shared/planner/rules.ts slotFits` carries the rule and the report behind it.
+ */
 function fits(row: GearRow, socket: SocketHostCell, hostRow: GearRow | undefined): boolean {
-  if (socket.slot === null || !row.slots.includes(socket.slot)) return false
+  const hostSlots = hostRow?.slots ?? []
+  if (socket.slot === null && hostSlots.length === 0) return false
+  if (!slotFits(row.slots, hostSlots, socket.slot)) return false
   if (hostRow !== undefined && row.classes.length > 0 && hostRow.classes.length > 0) {
     return row.classes.some((c) => hostRow.classes.includes(c))
   }
