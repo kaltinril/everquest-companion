@@ -656,16 +656,32 @@ Each wave is mergeable and leaves the app working. Branch `spell-upgrades`, work
 branch and merge into `local_all_changes_testing`, never the reverse. **This branch never touches
 `shared/releaseNotes.ts`.**
 
-| wave | what lands | gate |
+| wave | status | what landed |
 |---|---|---|
-| **0** | This doc. | — |
-| **1** | `spellUpgrade.ts` + `spellStats.ts`, pure, fully tested. No UI. The §3.1 DoT-rate question put to the owner. | `npm test` |
-| **2** | The area shell: `AreaTabs` generalization, three view ids in the `UNRELEASED` splice, nav row, labels, tab memory. Spellbook tab with search + tier slider, no payoff column yet. | e2e: nav → area → each tab mounts |
-| **3** | Spell page sections 5 and 6 (grants, upgrades). Donor-index inversion + planner op → section 7. Link audit (§4.5). | e2e: spell page states a grant and a tier |
-| **4** | `spellsUsParse.ts` slot widening, cache **v6**, `spellStack.ts` + fixtures. Component-size measurement written into §3.3. **No UI.** Rust twin deferred (§3.4). | cache size measured and recorded |
-| **5** | Upgrades tab, all three panels. Payoff column joins Spellbook. | e2e: the dead-ends panel names a `buff`-category spell |
-| **6** | Loadout tab, both sides, upgrade tail. Buffs-tab conflict chip. | e2e: a conflict is stated with its reason |
-| **7** | Graduation, owner-sequenced: `TELEMETRY_VIEWS` widened **server first** (ingest Lambda deploy), then the `UNRELEASED` splice deleted. Beta chip decision. | the Character sheet's own path, JOS-45 → JOS-327 |
+| **0** | **DONE** | This doc. |
+| **1** | **DONE** `d3329b27` | `spellUpgrade.ts` + `spellStats.ts`, fully tested. AND the DoT damage rate corrected 6% → 3% tree-wide, measured on the owner's log (§0.9). |
+| **2** | **DONE** `bbf35432` `92b2e668` | The area shell: three view ids behind `UNRELEASED`, the nav row, `GearAreaTabs` → shared `AreaTabs`, main-side grant fold, `spellbook.ts`, and the Spellbook tab. Strip verified by grep on the build. |
+| **3** | **DONE** `f839ce54` | Spell page sections 5-7: grants, the whole mote ladder, and the donor-index inversion for "what carries it". The planner index memo moved to `planner/indexCurrent.ts` so one walk of the item corpus serves both handlers. |
+| **4** | **DONE** `bfe8eb21` | `spellsUsParse.ts` slot widening, cache **v6**, `good_effect` identified by measurement (field 126, 96.7% over 2,697 rows), `spellStack.ts` + 26 fixtures, and `conflictComponents`. Rust twin DEFERRED with a stated reason (§3.4). |
+| **5** | **DONE** `2a1d9d71` | The Upgrades tab: your own ladder ranked by value per mote, the dead-ends panel, and the unranked count. |
+| **6** | **DONE** `df5893b6` | The Loadout tab, `spellLoadout.ts`, and the `spells:stackViews` door. Scoring is caller-supplied pending `roleWeights.ts` (§3.5). |
+| **7** | **PARTIAL - blocked on the owner** | `tests/e2e/spells-gate.e2e.mts` lands and passes (14 checks on a real launch). **The gate is NOT flipped**, and must not be by an executor - see below. |
+
+### 5.1 What graduation still needs, and why it was not done here
+
+Two steps, in this order, and the ORDER is the whole point:
+
+1. **`TELEMETRY_VIEWS` (shared/telemetry.ts) widened, and the ingest Lambda DEPLOYED FIRST.** That
+   enum is validated server-side, so a client that reports a view the schema does not carry **400s
+   the whole batch and drops every counter in it** - not just the new tab's. `dwellView` already
+   fails closed for an unknown id, which is what makes the current gated state safe.
+2. **Then** the `KNOWN_VIEWS` splice in `appViews.ts` and the `UNRELEASED &&` guards in
+   `NavDrawer.tsx` / `MainColumn.tsx` become unconditional, and `unreleasedSpells.tsx` collapses to
+   plain imports the way `unreleasedCharacter.tsx` did.
+
+A server deploy is not an executor's call, and neither is deciding a surface is ready for players.
+So the gate stays up and `spells-gate.e2e.mts` guards it until the owner sequences the release -
+which is exactly the path the character sheet took (JOS-45 → JOS-327).
 
 ---
 
