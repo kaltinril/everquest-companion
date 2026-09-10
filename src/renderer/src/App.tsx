@@ -19,7 +19,7 @@ import AppCelebrations from './components/AppCelebrations'
 // element and no state. Main guarantees it can ask at most once per candidate log per app session.
 import LogSwitchNudge from './components/LogSwitchNudge'
 import NoLogsEmptyState from './components/NoLogsEmptyState'
-import { VIEW_KEY, loadView, rememberGearTab, type View } from './appViews'
+import { VIEW_KEY, loadView, rememberGearTab, rememberSpellTab, type View } from './appViews'
 // The app's navigation MODEL — the deep-link routers and their nonce contract. See appRouting.ts.
 import { useAppRouting, usePrefsRouting, type AppRouting, type PrefsRouting } from './appRouting'
 // The mouse's Back button (JOS-201): the app-level answer, behind whatever drill is on screen.
@@ -60,6 +60,10 @@ import DevTriageView from './devTriage'
 // an ordinary static import like the eleven views above it.
 import CharacterView from './features/character/CharacterView'
 import { SpellDrill } from './features/spells/SpellPage'
+// THE SPELLS AREA (docs/plans/spell-upgrades-and-loadout.md), behind the review gate. One import
+// and one branch for three views - `unreleasedSpells.tsx` holds the `UNRELEASED ? lazy(…) : null`
+// trio and the view test, the `devTriage` shape, so this file gains a line rather than nine.
+import UnreleasedSpellsView from './unreleasedSpells'
 import { SpellLinkProvider } from './lib/spellLink'
 import { OWNER_TOOLS } from './devFlags'
 import { useFeedbackDialog, type FeedbackPrefill } from './features/feedback/useFeedback'
@@ -163,6 +167,10 @@ function PlainView({
           file, not here: this switch is one branch per view and a branch needing both would have
           cost `PlainView` two points of the measured complexity ceiling. */}
       <SpellDrill view={view} viewKey={viewKey} routing={routing} />
+      {/* THE SPELLS AREA. Its own view test lives in the feature file for `SpellDrill`'s reason -
+          three branches here would cost `PlainView` three points of the measured complexity
+          ceiling, and this file is at its line ceiling already. */}
+      <UnreleasedSpellsView view={view} viewKey={viewKey} />
     </>
   )
 }
@@ -435,6 +443,9 @@ export default function App(): JSX.Element {
   useEffect(() => {
     localStorage.setItem(VIEW_KEY, view)
     rememberGearTab(view)
+    // …and the same for the Spells area. Two areas, two keys, one effect: both answer "which door
+    // does this nav row open", and both have to survive visits to every other tab in the app.
+    rememberSpellTab(view)
   }, [view])
 
   // How long each tab was on screen, reported ON SWITCH (plan §2). `View` and the schema's
