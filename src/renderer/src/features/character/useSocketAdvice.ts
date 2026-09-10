@@ -14,12 +14,15 @@ import { ownershipKey } from '@shared/planner/ownership'
 import type { SocketAdvice } from './SlotGrid'
 import { auditExaltations, bestEffectFor, type ExaltationAudit } from './exaltationAudit'
 import { recommendSockets, socketHosts, type Recommendations } from './socketRecommend'
+import { planBoard, type BoardPlan } from './socketOptimize'
 
 export interface SocketAdviceState {
   /** what the grid wears — undefined until the corpus settles, which draws the pre-advice grid */
   advice?: SocketAdvice
   /** what the panel lists — null on no sheet or an unsettled corpus */
   recs: Recommendations | null
+  /** the whole-board maximum matching (socketOptimize.ts) — the "best layout" the panel leads with */
+  plan: BoardPlan | null
   audit: ExaltationAudit | null
   classes: readonly ClassAbbr[]
   rows: readonly GearRow[]
@@ -39,6 +42,10 @@ export function useSocketAdvice(sheet: CharacterSheet | null): SocketAdviceState
   )
   const audit = useMemo(
     () => (settled ? auditExaltations(sheet.exaltations, gear.rows, classes) : null),
+    [settled, sheet, gear.rows, classes]
+  )
+  const plan = useMemo(
+    () => (settled ? planBoard(sheet.exaltations, gear.rows, classes, socketHosts(sheet.cells)) : null),
     [settled, sheet, gear.rows, classes]
   )
   const advice = useMemo<SocketAdvice | undefined>(() => {
@@ -75,5 +82,5 @@ export function useSocketAdvice(sheet: CharacterSheet | null): SocketAdviceState
       fillHintOf: (cellId, type) => fillHints.get(`${cellId}|${type}`)
     }
   }, [recs, rowByKey])
-  return { advice, recs, audit, classes, rows: gear.rows }
+  return { advice, recs, plan, audit, classes, rows: gear.rows }
 }

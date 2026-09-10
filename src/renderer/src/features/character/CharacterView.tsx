@@ -178,7 +178,7 @@ export default function CharacterView(): JSX.Element {
             <GearStats totals={sheet.totals} />
             {/* The cleanup advisor (fork ask 2026-09-09): swaps, fills, scrap and copies,
                 the same recommender the grid's red cards read. Renders nothing when tidy. */}
-            <ExaltationAuditPanel recs={socket.recs} audit={socket.audit} />
+            <ExaltationAuditPanel recs={socket.recs} audit={socket.audit} plan={socket.plan} />
             <Unplaced cells={sheet.unplaced} />
           </Stack>
         </Stack>
