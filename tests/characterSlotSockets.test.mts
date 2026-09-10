@@ -14,7 +14,9 @@ import assert from 'node:assert/strict'
 import {
   cellsShowingWishes,
   slotOfCell,
+  socketChips,
   socketStates,
+  unplacedExaltations,
   wishesBySlot
 } from '../src/renderer/src/features/character/slotSockets'
 import { SHEET_SLOTS } from '../src/shared/characterSheet'
@@ -86,6 +88,49 @@ test('the socket line is the wiki unlock table at this tier — no Ornamentation
   // An UNSTATED tier draws NO line: the dump's name carried no ` +N`, and "all locked" is a claim
   // the dump never made.
   assert.deepEqual(socketStates(undefined), [])
+})
+
+test('the merged socket row: stated rows on the file`s word, unstated ones off the tier, silence for neither', () => {
+  // A +5 weapon with Focus filled, Proc filled, Click stated Empty and Worn unstated: the two
+  // filled chips carry `Type: Name`, the stated-Empty and the tier-open one both read open.
+  const chips = socketChips({
+    tier: 5,
+    sockets: [
+      { type: 'Focus', name: 'Bloodmoon' },
+      { type: 'Click', name: null },
+      { type: 'Proc', name: 'Short Sword of the Ykesha' }
+    ]
+  })
+  assert.deepEqual(
+    chips.map((c) => [c.type, c.state, c.label]),
+    [
+      ['Focus', 'filled', 'Focus: Bloodmoon'],
+      ['Click', 'open', 'Click'],
+      ['Worn', 'open', 'Worn'],
+      ['Proc', 'filled', 'Proc: Short Sword of the Ykesha']
+    ]
+  )
+  // A stated `Empty` row is an OPEN socket whatever the tier says — the file outranks the table.
+  const overridden = socketChips({ tier: 1, sockets: [{ type: 'Proc', name: null }] })
+  assert.deepEqual(
+    overridden.map((c) => [c.type, c.state]),
+    [
+      ['Focus', 'open'],
+      ['Click', 'locked'],
+      ['Worn', 'locked'],
+      ['Proc', 'open']
+    ]
+  )
+  // An unstated tier with no stated rows draws NOTHING (socketStates' own silence)…
+  assert.deepEqual(socketChips({ sockets: [] }), [])
+  // …but a stated FILLED socket is a fact and draws even then.
+  const factOnly = socketChips({ sockets: [{ type: 'Worn', name: 'Fishbone Earring' }] })
+  assert.deepEqual(factOnly.map((c) => [c.type, c.state]), [['Worn', 'filled']])
+})
+
+test('an exaltation at a socket index the measured map cannot name still reaches the surface', () => {
+  assert.deepEqual(unplacedExaltations(['A', 'B'], [{ name: 'A' }, { name: null }]), ['B'])
+  assert.deepEqual(unplacedExaltations(['A'], [{ name: 'A' }]), [])
 })
 
 test('a wish of either kind places at every slot its corpus row states, resolved as the Wish list tab resolves it', () => {

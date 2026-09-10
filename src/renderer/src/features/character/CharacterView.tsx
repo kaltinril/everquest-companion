@@ -64,6 +64,7 @@ import { outputKind } from '@shared/outputs/kinds'
 import OutputFileLine from '../../components/OutputFileLine'
 import CarryAll from './CarryAll'
 import CharacterIdentity from './CharacterIdentity'
+import ExaltationAudit from './ExaltationAuditPanel'
 import GearStats from './GearStats'
 import SlotGrid from './SlotGrid'
 // The per-slot exaltation join (owner ask 2026-08-23): the wish list against the two corpus
@@ -172,6 +173,9 @@ export default function CharacterView(): JSX.Element {
           </Box>
           <Stack spacing={1} sx={{ width: { xs: '100%', lg: 340 }, flexShrink: 0 }}>
             <GearStats totals={sheet.totals} />
+            {/* The cleanup advisor (fork ask 2026-09-09): outclassed tiers and spare copies,
+                joined renderer-side against the gear index. Renders nothing when tidy. */}
+            <ExaltationAudit exaltations={sheet.exaltations} />
             <Unplaced cells={sheet.unplaced} />
           </Stack>
         </Stack>

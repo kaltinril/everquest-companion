@@ -47,7 +47,14 @@ import { Box, Chip, Paper, Stack, Typography } from '@mui/material'
 import Tooltip from '../../lib/Tooltip'
 import type { SheetCellView, SheetColumn } from '@shared/characterSheet'
 import type { EquipSlot } from '@shared/planner/types'
-import { cellsShowingWishes, slotOfCell, socketStates, type SlotWish } from './slotSockets'
+import {
+  cellsShowingWishes,
+  slotOfCell,
+  socketChips,
+  unplacedExaltations,
+  type SlotWish,
+  type SocketedItem
+} from './slotSockets'
 import { EQ_ITEM_COLORS, itemIconUrl } from '../../lib/ItemWindow'
 import { KnownItemTooltip } from '../../lib/KnownItemTooltip'
 
@@ -97,20 +104,37 @@ function SlotIcon({ cell }: { cell: SheetCellView }): JSX.Element {
 }
 
 /**
- * What is socketed into this cell's item, as the client named it — nothing at all when the item
- * carries none, which is most of them.
- *
- * The names are printed with the ` (Exaltation)` suffix ALREADY REMOVED: `SheetItem.exaltations`
- * holds `parsedName.base`, so the chip reads `Golden Efreeti Boots` rather than repeating a word
- * that the row of chips is already saying by existing. The chips wrap; a cell with four of them is
- * two lines tall, which is fine here because this grid is not windowed and no hook is assuming a
- * row height.
+ * THE MERGED SOCKET ROW (fork ask, kaltinril 2026-09-09 — replacing the two rows this file used
+ * to draw). One chip per socket, in the item window's own order, each saying its state AND its
+ * content: `Proc: Short Sword of the Ykesha` filled, a dimmed bare `Worn` open-and-empty, a
+ * dimmed `Click @+2` locked until that merge. `slotSockets.socketChips` decides every word
+ * (pure, node-pinned); this component only wears them. A name the dump filed at a socket index
+ * the measured map cannot name still renders, as the old unlabelled chip — nothing the client
+ * said is dropped (`unplacedExaltations`).
  */
-function ExaltationChips({ names }: { names: readonly string[] }): JSX.Element | null {
-  if (names.length === 0) return null
+function SocketRow({ item }: { item: SocketedItem & { exaltations: readonly string[] } }): JSX.Element | null {
+  const chips = socketChips(item)
+  const leftover = unplacedExaltations(item.exaltations, item.sockets)
+  if (chips.length === 0 && leftover.length === 0) return null
   return (
-    <Box data-testid="character-exaltations" sx={CHIP_ROW}>
-      {names.map((name, i) => (
+    <Box data-testid="character-sockets" sx={CHIP_ROW}>
+      {chips.map((c) => (
+        <Tooltip key={c.type} title={c.hover}>
+          <Chip
+            label={c.label}
+            size="small"
+            variant={c.state === 'filled' ? 'filled' : 'outlined'}
+            data-state={c.state}
+            data-testid={`character-socket-${c.type.toLowerCase()}`}
+            sx={{
+              ...SMALL_CHIP,
+              opacity: c.state === 'filled' ? 1 : 0.5,
+              ...(c.state === 'filled' ? { borderColor: EQ_ITEM_COLORS.border } : {})
+            }}
+          />
+        </Tooltip>
+      ))}
+      {leftover.map((name, i) => (
         <Chip
           // The same exaltation can legitimately be socketed twice into one item, so the name is
           // not a key — the position is.
@@ -121,39 +145,6 @@ function ExaltationChips({ names }: { names: readonly string[] }): JSX.Element |
           data-testid="character-exaltation"
           sx={{ ...SMALL_CHIP, borderColor: EQ_ITEM_COLORS.border }}
         />
-      ))}
-    </Box>
-  )
-}
-
-/**
- * THE SOCKET LINE (owner ask, 2026-08-23): which of the four transferable sockets this item's
- * ` +N` has unlocked, off the wiki's own unlock table (`slotSockets.socketStates`). A filled chip
- * is an OPEN socket; a dimmed one names the tier that opens it, so the line doubles as "merge to
- * +3 and Worn opens". NOTHING AT ALL for a name that stated no tier — `socketStates` returns no
- * rows and the line does not mount — because four locked chips under a quest token would promise
- * a ladder the dump never mentioned. What is IN a socket is the row above this one — the client's
- * own chips — because the dump names contents and this line names capacity, and the two are
- * different facts from different sources.
- *
- * The hover is the wiki's one-line description of the socket type, through `lib/Tooltip` like
- * every other hover in the app (the hand-cursor rule); the tier lives on the chip's own label.
- */
-function SocketLine({ tier }: { tier: number | undefined }): JSX.Element | null {
-  const states = socketStates(tier)
-  if (states.length === 0) return null
-  return (
-    <Box data-testid="character-sockets" sx={CHIP_ROW}>
-      {states.map((s) => (
-        <Tooltip key={s.type} title={s.what}>
-          <Chip
-            label={s.unlocked ? s.type : `${s.type} @+${String(s.unlocksAt)}`}
-            size="small"
-            variant={s.unlocked ? 'filled' : 'outlined'}
-            data-testid={`character-socket-${s.type.toLowerCase()}`}
-            sx={{ ...SMALL_CHIP, opacity: s.unlocked ? 1 : 0.5 }}
-          />
-        </Tooltip>
       ))}
     </Box>
   )
@@ -236,8 +227,7 @@ function SlotCell({ cell, wishes }: { cell: SheetCellView; wishes: readonly Slot
                 {item.name}
               </Box>
             </KnownItemTooltip>
-            <ExaltationChips names={item.exaltations} />
-            <SocketLine tier={item.tier} />
+            <SocketRow item={item} />
           </>
         ) : (
           <Typography variant="caption" color="text.disabled" sx={{ display: 'block', opacity: 0.6 }}>
@@ -289,7 +279,10 @@ function Column({ cells, wishesOf }: { cells: SheetCellView[]; wishesOf: WishesO
 function Legend({ sockets, wishes }: { sockets: boolean; wishes: boolean }): JSX.Element | null {
   if (!sockets && !wishes) return null
   const parts: string[] = []
-  if (sockets) parts.push('Sockets: a filled chip is open, a dimmed one opens at the +N it names.')
+  if (sockets)
+    parts.push(
+      'Sockets: "Type: name" is what is socketed there, a dimmed bare type is open and empty, "@+N" opens at that merge.'
+    )
   if (wishes) parts.push('Wish chips are your wish list - the Wish list tab has the route.')
   return (
     <Typography variant="caption" color="text.secondary" data-testid="character-slot-legend">

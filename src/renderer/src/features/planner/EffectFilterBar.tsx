@@ -35,7 +35,7 @@ import { type JSX, useState } from 'react'
 import { Chip, MenuItem, Stack, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material'
 import { EQUIP_SLOTS, type EquipSlot, type SocketType } from '@shared/planner/types'
 import ItemFilterPicker from './ItemFilterPicker'
-import { CURRENT_ERA_LABEL, type DonorFilters } from './plannerData'
+import { CURRENT_ERA_LABEL, type DonorFilters, type OwnedMode } from './plannerData'
 import { AXIS_LABEL, SOCKET_LABEL, axesFor, type GroupAxis } from './plannerGroups'
 import type { ItemFocus } from './plannerPreset'
 
@@ -158,6 +158,43 @@ function ItemNarrowing({
   )
 }
 
+/**
+ * The owned tri-state (fork ask 2026-09-09). A SELECT rather than a fourth chip because it has
+ * three states, and a chip that cycles three states reads as broken twice per cycle. Ownership is
+ * the Gear tab's own reading: the dump, the loot log, or an exaltation copy. Split out of the bar
+ * at the 100-line function ceiling.
+ */
+function OwnedSelect({
+  owned,
+  known
+}: {
+  owned: [OwnedMode, (v: OwnedMode) => void]
+  known: boolean
+}): JSX.Element {
+  const [mode, setMode] = owned
+  return (
+    <TextField
+      select
+      size="small"
+      label="Owned"
+      value={mode}
+      disabled={!known}
+      title={
+        known
+          ? undefined
+          : 'Ownership comes from the inventory export - type /outputfile inventory in game and this lights up.'
+      }
+      onChange={(e) => setMode(e.target.value as OwnedMode)}
+      slotProps={{ htmlInput: { 'data-testid': 'planner-owned-filter' } }}
+      sx={{ minWidth: 120, flexShrink: 0 }}
+    >
+      <MenuItem value="all">All</MenuItem>
+      <MenuItem value="hide">Hide owned</MenuItem>
+      <MenuItem value="only">Only owned</MenuItem>
+    </TextField>
+  )
+}
+
 export interface EffectFilterBarProps {
   filters: DonorFilters
   /** every control BUT the socket tabs — a write here hands the browser back (see `setSocket`) */
@@ -170,6 +207,11 @@ export interface EffectFilterBarProps {
   era: [boolean, (v: boolean) => void]
   nonEquip: [boolean, (v: boolean) => void]
   groupBy: [GroupAxis, (v: GroupAxis) => void]
+  /** the owned tri-state (fork ask 2026-09-09) — mount-local, like the search box */
+  owned: [OwnedMode, (v: OwnedMode) => void]
+  /** false while no inventory dump exists: the control renders disabled with the reason on hover,
+   *  because a filter that silently does nothing is worse than one that says why it cannot */
+  ownedKnown: boolean
   /** the item the browser is narrowed to, from either door, or null */
   focus?: ItemFocus | null
   /** pick one by hand, or clear whatever is there (`null`) */
@@ -185,11 +227,11 @@ export default function EffectFilterBar({
   era,
   nonEquip,
   groupBy,
+  owned,
+  ownedKnown,
   focus = null,
   setFocus
 }: EffectFilterBarProps): JSX.Element {
-  const [eraOnly, setEraOnly] = era
-  const [showNonEquip, setShowNonEquip] = nonEquip
   const [axis, setAxis] = groupBy
   return (
     <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'nowrap', mb: 1 }}>
@@ -263,6 +305,25 @@ export default function EffectFilterBar({
         hint="Hide donors none of the classes in the filter can use"
       />
 
+      <ViewToggles era={era} nonEquip={nonEquip} />
+
+      <OwnedSelect owned={owned} known={ownedKnown} />
+    </Stack>
+  )
+}
+
+/** The two persisted view chips, split out of the bar at the 100-line function ceiling. */
+function ViewToggles({
+  era,
+  nonEquip
+}: {
+  era: [boolean, (v: boolean) => void]
+  nonEquip: [boolean, (v: boolean) => void]
+}): JSX.Element {
+  const [eraOnly, setEraOnly] = era
+  const [showNonEquip, setShowNonEquip] = nonEquip
+  return (
+    <>
       <ToggleChip
         label="Current era"
         testId="planner-era-toggle"
@@ -270,7 +331,6 @@ export default function EffectFilterBar({
         onToggle={() => setEraOnly(!eraOnly)}
         hint={`Hide donors from outside ${CURRENT_ERA_LABEL}`}
       />
-
       <ToggleChip
         label="Non-equippable"
         testId="planner-nonequip-toggle"
@@ -278,6 +338,6 @@ export default function EffectFilterBar({
         onToggle={() => setShowNonEquip(!showNonEquip)}
         hint="Show items whose page states no equipment slot"
       />
-    </Stack>
+    </>
   )
 }

@@ -76,10 +76,14 @@ import { scaleStatBlock, upgradeStateForTier } from './itemUpgrade'
 import {
   parseItemName,
   PRIMARY_ITEM_SECTION,
+  splitLocationPath,
+  walkEntries,
   type EquipLocationToken,
   type InventoryDump,
   type InventoryEntry
 } from './outputs/inventory'
+import { SOCKET_TYPE_OF_INDEX } from './planner/inventorySlots'
+import { ownershipKey } from './planner/ownership'
 
 // ---- the grid ------------------------------------------------------------------------
 
@@ -150,6 +154,18 @@ export interface SheetItem {
   itemId: number
   /** the names of the exaltations socketed into this item, as the client spelled them */
   exaltations: string[]
+  /** the four transferable sockets, AS THE DUMP STATES THEM — one row per `-Slot<n>` child whose
+   *  index the measured map names (`SOCKET_TYPE_OF_INDEX`). `name: null` is a socket the file
+   *  printed as `Empty`; a socket the file printed no row for at all is simply absent here, and
+   *  the surface reads its open/locked state off the item's ` +N` instead. */
+  sockets: SheetSocket[]
+}
+
+/** One transferable socket of a worn item: which socket, and what the client says is in it. */
+export interface SheetSocket {
+  type: 'Focus' | 'Click' | 'Worn' | 'Proc'
+  /** the socketed exaltation's base name, or null when the row said `Empty` */
+  name: string | null
 }
 
 /** One cell of the grid: a place, and what is in it. */
@@ -182,13 +198,75 @@ function exaltationsOf(entry: InventoryEntry): string[] {
   return entry.children.filter((c) => !c.empty && c.parsedName.exaltation).map((c) => c.parsedName.base)
 }
 
+/**
+ * The row's `-Slot<n>` children read through the measured socket numbering (JOS-452,
+ * `SOCKET_TYPE_OF_INDEX`) — one `SheetSocket` per child the map can name, in the map's own
+ * Focus/Click/Worn/Proc order rather than file order, so every cell captions its sockets the way
+ * the item window lists them. A child at an index the map does not name (Ornamentation's 2, or a
+ * numbering this app has never measured) contributes nothing HERE and still reaches the surface
+ * through `exaltations` — claim only what was measured, drop nothing on the floor.
+ */
+function socketsOf(entry: InventoryEntry): SheetSocket[] {
+  const out: SheetSocket[] = []
+  for (const child of entry.children) {
+    const index = child.path[child.path.length - 1]
+    const type = index === undefined ? undefined : SOCKET_TYPE_OF_INDEX[index]
+    if (type === undefined) continue
+    out.push({ type, name: child.empty ? null : child.parsedName.base })
+  }
+  const order = ['Focus', 'Click', 'Worn', 'Proc']
+  return out.sort((a, b) => order.indexOf(a.type) - order.indexOf(b.type))
+}
+
+/** One `(Exaltation)` row of the dump: which gem, and where the file says it sits. */
+export interface OwnedExaltation {
+  /** the donor item's base name, ` (Exaltation)` already split off */
+  name: string
+  /** `ownershipKey(name)` — the gear-index join the renderer's audit makes */
+  key: string
+  /** where the row sits, in the file's own vocabulary: `socketed in Primary`, `General 8`, … */
+  where: string
+  /** true when it sits in a socket of a WORN item — in force, not spare */
+  socketed: boolean
+}
+
+/**
+ * Every exaltation copy the dump names, wherever it names one: worn sockets, bags, the bank, and
+ * any other section that spells the ` (Exaltation)` suffix (the real dump has an `Augmentation`
+ * table). Sections outside the Location table keep their section name as the `where`, because
+ * this fold reports the file rather than interpreting it. Computed main-side (the dump is in
+ * hand there) and shipped on `CharacterSheet` for the cleanup advisor to join against the gear
+ * index — the advisor itself lives renderer-side (`features/character/exaltationAudit.ts`).
+ */
+export function ownedExaltations(dump: InventoryDump): OwnedExaltation[] {
+  const out: OwnedExaltation[] = []
+  for (const entry of walkEntries(dump.items)) {
+    if (entry.empty || !entry.parsedName.exaltation) continue
+    const name = entry.parsedName.base
+    if (entry.section !== PRIMARY_ITEM_SECTION) {
+      out.push({ name, key: ownershipKey(name), where: entry.section, socketed: false })
+      continue
+    }
+    const socketed = entry.place.kind === 'equip' && entry.path.length === 1
+    const base = splitLocationPath(entry.location).base
+    out.push({
+      name,
+      key: ownershipKey(name),
+      where: socketed ? `socketed in ${base}` : base,
+      socketed
+    })
+  }
+  return out
+}
+
 function sheetItem(entry: InventoryEntry): SheetItem {
   const parsed = parseItemName(entry.name)
   const item: SheetItem = {
     name: entry.name,
     baseName: parsed.base,
     itemId: entry.itemId,
-    exaltations: exaltationsOf(entry)
+    exaltations: exaltationsOf(entry),
+    sockets: socketsOf(entry)
   }
   if (parsed.tier !== undefined) item.tier = parsed.tier
   return item
@@ -278,6 +356,8 @@ export interface CharacterSheet {
    * than merely unlikely. It needs no item-DB join, so nothing about it costs what the cells cost.
    */
   carry: CarryAll
+  /** every `(Exaltation)` row of the same dump, for the cleanup advisor (`ownedExaltations`) */
+  exaltations: OwnedExaltation[]
 }
 
 // ---- the gear sum --------------------------------------------------------------------
