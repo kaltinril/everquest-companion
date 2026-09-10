@@ -181,3 +181,28 @@ test('a vacated seat is a CLEAR: the plan names the gem to pull and where its ef
   assert.equal(plan.clears.length, 0)
   assert.equal(plan.placements.length, 2)
 })
+
+test('the user`s exact belt board: tier-I incumbency elsewhere must not lend Summoning Haste the belt', () => {
+  // SH I is socketed in a RING; SH III's only donor is belt-only and loose; BA III is socketed
+  // in the belt. "The family is socketed somewhere" made SH III an incumbent and it evicted BA
+  // on the tie - but SH III cannot keep the ring seat, so it is no incumbent at the belt.
+  const rows = [
+    row('ba gem', 'BA Gem', worn('BA Gem', 'Burning Affliction III'), ['WAIST']),
+    row('sh3 gem', 'SH3 Gem', worn('SH3 Gem', 'Summoning Haste III'), ['WAIST']),
+    row('sh1 gem', 'SH1 Gem', worn('SH1 Gem', 'Summoning Haste I'), ['FINGER'])
+  ]
+  const plan = planBoard(
+    [
+      gem('SH3 Gem', 'General 2'),
+      gem('BA Gem', 'socketed in Waist', true),
+      gem('SH1 Gem', 'socketed in Fingers', true)
+    ],
+    rows,
+    [],
+    [seat('waist', 'Worn', 'WAIST', 'BA Gem'), seat('finger1', 'Worn', 'FINGER', 'SH1 Gem')]
+  )
+  const waist = plan.placements.find((p) => p.cellLabel === 'waist')
+  assert.equal(waist?.effect, 'Burning Affliction III', 'the belt keeps its incumbent')
+  assert.ok(plan.contested.some((c) => c.effect === 'Summoning Haste III'))
+  assert.equal(plan.moves.filter((m) => m.cellLabel === 'waist').length, 0)
+})
