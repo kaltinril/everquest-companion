@@ -23,7 +23,9 @@
 
 import type { ClassAbbr } from '../../../../shared/classCombo'
 import type { GearRow } from '../../../../shared/planner/gear'
-import type { OwnedExaltation } from '../../../../shared/characterSheet'
+import type { OwnedExaltation, SheetCellView } from '../../../../shared/characterSheet'
+import { ownershipKey } from '../../../../shared/planner/ownership'
+import { socketTypeOf } from '../../../../shared/planner/normalize'
 
 /** One exaltation owned in more copies than are socketed — stated, never commanded. */
 export interface DuplicateFinding {
@@ -87,6 +89,51 @@ export function rankedEffects(row: GearRow): RankedEffect[] {
 function usable(row: GearRow, classes: readonly ClassAbbr[]): boolean {
   if (row.classes.length === 0 || classes.length === 0) return true
   return row.classes.some((c) => classes.includes(c))
+}
+
+/** One effect ranked for comparison — an UNRANKED effect keeps tier 0: socketable, never "better". */
+export interface KindEffect {
+  family: string
+  tier: number
+  effect: string
+  detail?: string
+}
+
+/**
+ * The donor's best effect FOR ONE SOCKET TYPE — the effect the gem grants when it sits in that
+ * socket (the JOS-452 numbering read forward: a gem in the Proc socket gives its combat line).
+ * Null when the corpus row states no effect of that kind, or the corpus does not know the donor.
+ */
+export function bestEffectFor(row: GearRow | undefined, type: string): KindEffect | null {
+  if (row === undefined) return null
+  const want = type.toLowerCase()
+  let best: KindEffect | null = null
+  for (const e of row.effects) {
+    if (socketTypeOf(e.kind) !== want) continue
+    const k = kindEffectOf(e)
+    if (best === null || k.tier > best.tier) best = k
+  }
+  return best
+}
+
+/** One effect line as a comparable: the corpus rank first, the roman fallback, tier 0 last. */
+function kindEffectOf(e: GearRow['effects'][number]): KindEffect {
+  const ranked =
+    e.family !== undefined && e.familyTier !== undefined
+      ? { family: e.family.toLowerCase(), tier: e.familyTier }
+      : romanRank(e.name)
+  return {
+    family: ranked?.family ?? e.name.trim().toLowerCase(),
+    tier: ranked?.tier ?? 0,
+    effect: e.name,
+    ...(e.detail === undefined ? {} : { detail: e.detail })
+  }
+}
+
+function romanRank(name: string): { family: string; tier: number } | null {
+  const m = /^(.+?)\s+([IVX]+)$/.exec(name.trim())
+  const tier = m ? ROMAN[m[2]] : undefined
+  return m && tier !== undefined ? { family: m[1].toLowerCase(), tier } : null
 }
 
 /** The audit's own copy shape — the `.map` projection out of the domain type (ruling 4's
@@ -180,6 +227,197 @@ function supersededFindings(
  * `rows` is the served gear index; a refused or empty index yields only the duplicate half,
  * because tiers are a corpus fact and the corpus is not there to state them.
  */
+// ---- the recommender (the "best with what we have" ask) ----------------------------------------
+//
+// NOT a proven optimum, and the panel must never claim one. Sockets are scarce and effects are
+// not comparable ACROSS families (is Improved Damage III worth more than 41% haste? the corpus
+// states no exchange rate), so this is deliberately two honest greedy passes rather than an
+// assignment solver over an invented value function:
+//
+//   SWAPS — a socketed gem is replaced only by a LOOSE copy of the SAME family at a strictly
+//   higher tier, usable by the loadout. Same family is what makes "better" a fact instead of a
+//   taste; loose is what makes the swap free (a copy socketed elsewhere is already in force).
+//
+//   FILLS — an open empty socket takes the best remaining loose gem that grants an effect of its
+//   kind. Unranked effects fill at tier 0: an effect beats an empty socket, and claims no more.
+//
+// The pool decrements per physical copy, so one loose gem is never recommended twice.
+
+/** One socket of one WORN item, as the sheet states it — the recommender's board. */
+export interface SocketHostCell {
+  cellId: string
+  cellLabel: string
+  item: string
+  type: string
+  currentKey: string | null
+  currentName: string | null
+}
+
+export interface SwapRec {
+  cellId: string
+  cellLabel: string
+  item: string
+  type: string
+  fromName: string
+  fromEffect: string
+  toName: string
+  toEffect: string
+  /** where the better loose copy sits, in the dump's own words */
+  toWhere: string
+}
+
+export interface FillRec {
+  cellId: string
+  cellLabel: string
+  item: string
+  type: string
+  gemName: string
+  effect: string
+  where: string
+}
+
+export interface Recommendations {
+  swaps: SwapRec[]
+  fills: FillRec[]
+  /** cellId → the socketed donor keys a swap wants OUT — the red flag the grid draws */
+  flaggedByCell: ReadonlyMap<string, ReadonlySet<string>>
+}
+
+/**
+ * The recommender's board off the sheet's own cells: one host per STATED socket of every worn
+ * item. Iteration, not array combinators, so the domain rows are only ever read (ruling 4).
+ */
+export function socketHosts(cells: readonly SheetCellView[]): SocketHostCell[] {
+  const out: SocketHostCell[] = []
+  for (const cell of cells) {
+    const item = cell.item
+    if (!item) continue
+    for (const s of item.sockets) {
+      out.push({
+        cellId: cell.id,
+        cellLabel: cell.label,
+        item: item.baseName,
+        type: s.type,
+        currentKey: s.name === null ? null : ownershipKey(s.name),
+        currentName: s.name
+      })
+    }
+  }
+  return out
+}
+
+/** The spendable pool: loose copies per key, counted, with one representative place each. */
+interface LoosePool {
+  take: (key: string) => string | undefined
+  keys: () => string[]
+}
+
+function loosePool(owned: readonly OwnedExaltation[]): LoosePool {
+  const counts = new Map<string, { n: number; where: string }>()
+  for (const o of owned) {
+    if (o.socketed) continue
+    const held = counts.get(o.key)
+    if (held) held.n += 1
+    else counts.set(o.key, { n: 1, where: o.where })
+  }
+  return {
+    take: (key) => {
+      const held = counts.get(key)
+      if (!held || held.n === 0) return undefined
+      held.n -= 1
+      return held.where
+    },
+    keys: () => [...counts.entries()].filter(([, v]) => v.n > 0).map(([k]) => k)
+  }
+}
+
+/** The best loose candidate for one socket, under a predicate on its effect. */
+/** The recommender's fixed context, bundled once so the lookups keep four parameters. */
+interface RecContext {
+  pool: LoosePool
+  rowByKey: ReadonlyMap<string, GearRow>
+  classes: readonly ClassAbbr[]
+}
+
+function bestLoose(
+  ctx: RecContext,
+  type: string,
+  accept: (eff: KindEffect) => boolean
+): { key: string; row: GearRow; eff: KindEffect } | null {
+  let best: { key: string; row: GearRow; eff: KindEffect } | null = null
+  for (const key of ctx.pool.keys()) {
+    const row = ctx.rowByKey.get(key)
+    if (row === undefined || !usable(row, ctx.classes)) continue
+    const eff = bestEffectFor(row, type)
+    if (eff === null || !accept(eff)) continue
+    if (best === null || eff.tier > best.eff.tier) best = { key, row, eff }
+  }
+  return best
+}
+
+function flag(map: Map<string, Set<string>>, cellId: string, key: string): void {
+  const held = map.get(cellId)
+  if (held) held.add(key)
+  else map.set(cellId, new Set([key]))
+}
+
+/**
+ * The two greedy passes over the worn board. Hosts arrive in sheet order and are answered in it,
+ * so the same dump always yields the same advice.
+ */
+export function recommendSockets(
+  owned: readonly OwnedExaltation[],
+  rows: readonly GearRow[],
+  classes: readonly ClassAbbr[],
+  hosts: readonly SocketHostCell[]
+): Recommendations {
+  const rowByKey = new Map(rows.map((r) => [r.key, r]))
+  const pool = loosePool(owned)
+  const ctx: RecContext = { pool, rowByKey, classes }
+  const swaps: SwapRec[] = []
+  const fills: FillRec[] = []
+  const flagged = new Map<string, Set<string>>()
+  for (const host of hosts) {
+    if (host.currentKey === null) continue
+    // A current gem the corpus cannot rank is left alone: "better" would be a guess.
+    const cur = bestEffectFor(rowByKey.get(host.currentKey), host.type)
+    if (cur === null) continue
+    const better = bestLoose(ctx, host.type, (e) => e.family === cur.family && e.tier > cur.tier)
+    if (better === null) continue
+    const where = pool.take(better.key)
+    if (where === undefined) continue
+    swaps.push({
+      cellId: host.cellId,
+      cellLabel: host.cellLabel,
+      item: host.item,
+      type: host.type,
+      fromName: host.currentName ?? host.currentKey,
+      fromEffect: cur.effect,
+      toName: better.row.name,
+      toEffect: better.eff.effect,
+      toWhere: where
+    })
+    flag(flagged, host.cellId, host.currentKey)
+  }
+  for (const host of hosts) {
+    if (host.currentKey !== null) continue
+    const best = bestLoose(ctx, host.type, () => true)
+    if (best === null) continue
+    const where = pool.take(best.key)
+    if (where === undefined) continue
+    fills.push({
+      cellId: host.cellId,
+      cellLabel: host.cellLabel,
+      item: host.item,
+      type: host.type,
+      gemName: best.row.name,
+      effect: best.eff.effect,
+      where
+    })
+  }
+  return { swaps, fills, flaggedByCell: flagged }
+}
+
 export function auditExaltations(
   owned: readonly OwnedExaltation[],
   rows: readonly GearRow[],

@@ -18,7 +18,9 @@ import type { GearRow } from '../src/shared/planner/gear'
 import type { OwnedExaltation } from '../src/shared/characterSheet'
 import {
   auditExaltations,
-  rankedEffects
+  rankedEffects,
+  recommendSockets,
+  type SocketHostCell
 } from '../src/renderer/src/features/character/exaltationAudit'
 
 function row(key: string, name: string, effects: GearRow['effects'], classes: GearRow['classes'] = []): GearRow {
@@ -100,4 +102,71 @@ test('duplicates are counted with their places, and a worn copy is called socket
   })
   // No corpus at all: the tier half stays silent rather than guessing.
   assert.equal(audit.superseded.length, 0)
+})
+
+function host(cellId: string, type: string, currentName: string | null, item = 'Host Item'): SocketHostCell {
+  return {
+    cellId,
+    cellLabel: cellId,
+    item,
+    type,
+    currentKey: currentName === null ? null : currentName.toLowerCase(),
+    currentName
+  }
+}
+
+test('the recommender swaps a socketed gem only for a strictly better LOOSE copy of the same family', () => {
+  const rows = [
+    row('weak belt', 'Weak Belt', [{ name: 'Burning Affliction I', kind: 'worn' }]),
+    row('strong belt', 'Strong Belt', [{ name: 'Burning Affliction III', kind: 'worn' }]),
+    // A higher tier of a DIFFERENT family must never be offered as a swap: no exchange rate.
+    row('other gem', 'Other Gem', [{ name: 'Enhancement Haste V', kind: 'worn' }])
+  ]
+  const recs = recommendSockets(
+    [
+      { name: 'Weak Belt', key: 'weak belt', where: 'socketed in Waist', socketed: true },
+      { name: 'Strong Belt', key: 'strong belt', where: 'Bank 2', socketed: false },
+      { name: 'Other Gem', key: 'other gem', where: 'Bank 2', socketed: false }
+    ],
+    rows,
+    [],
+    [host('waist', 'Worn', 'Weak Belt')]
+  )
+  assert.equal(recs.swaps.length, 1)
+  assert.equal(recs.swaps[0].toName, 'Strong Belt')
+  assert.equal(recs.swaps[0].toWhere, 'Bank 2')
+  // …and the cell is flagged for the grid to paint red.
+  assert.deepEqual([...(recs.flaggedByCell.get('waist') ?? [])], ['weak belt'])
+})
+
+test('an empty socket takes the best remaining loose gem, and one physical copy is never spent twice', () => {
+  const rows = [
+    row('gem a', 'Gem A', [{ name: 'Improved Damage II', kind: 'worn' }]),
+    row('gem b', 'Gem B', [{ name: 'See Invisible', kind: 'worn' }])
+  ]
+  const recs = recommendSockets(
+    [{ name: 'Gem A', key: 'gem a', where: 'General 1', socketed: false },
+     { name: 'Gem B', key: 'gem b', where: 'General 2', socketed: false }],
+    rows,
+    [],
+    [host('ear1', 'Worn', null), host('ear2', 'Worn', null), host('neck', 'Worn', null)]
+  )
+  // Two gems, three empty sockets: the ranked one first, the unranked one second, nothing third.
+  assert.equal(recs.fills.length, 2)
+  assert.equal(recs.fills[0].gemName, 'Gem A')
+  assert.equal(recs.fills[1].gemName, 'Gem B')
+})
+
+test('a socketed gem the corpus cannot rank is left alone - "better" would be a guess', () => {
+  const recs = recommendSockets(
+    [
+      { name: 'Mystery Gem', key: 'mystery gem', where: 'socketed in Head', socketed: true },
+      { name: 'Strong Belt', key: 'strong belt', where: 'Bank 2', socketed: false }
+    ],
+    [row('strong belt', 'Strong Belt', [{ name: 'Burning Affliction III', kind: 'worn' }])],
+    [],
+    [host('head', 'Worn', 'Mystery Gem')]
+  )
+  assert.equal(recs.swaps.length, 0)
+  assert.equal(recs.flaggedByCell.size, 0)
 })
