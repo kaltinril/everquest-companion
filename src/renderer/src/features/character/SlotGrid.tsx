@@ -187,8 +187,15 @@ function SocketRow({
  * than every chip saying it.
  */
 function wishHover(w: SlotWish): string {
-  if (w.kind === 'gear') return 'On your wish list'
-  return w.tierRequired === undefined ? `From ${w.name}` : `From ${w.name} at +${String(w.tierRequired)}`
+  if (w.kind === 'gear') return 'On your wish list - an item you want for this slot, not one you own.'
+  // "From X" read as "you have an X" (user report, kaltinril 2026-09-09 - it sent him searching
+  // his bank for a bracelet he never owned). The hover now says the whole sentence: this is a
+  // wish, the donor is the FARM TARGET, and the tier is the merge that lets the effect out.
+  const source =
+    w.tierRequired === undefined
+      ? `extracted from a ${w.name}`
+      : `extracted from a ${w.name} merged to +${String(w.tierRequired)}`
+  return `On your wish list - this effect is ${source}. You do not own it yet; the Wish list tab has the route.`
 }
 
 /**
@@ -205,7 +212,7 @@ function SlotWishChips({ wishes }: { wishes: readonly SlotWish[] }): JSX.Element
       {wishes.map((w, i) => (
         <Tooltip key={`${w.name}#${String(i)}`} title={wishHover(w)}>
           <Chip
-            label={w.effect ?? w.name}
+            label={`♥ ${w.effect ?? w.name}`}
             size="small"
             color={w.kind === 'donor' ? 'warning' : 'info'}
             variant="outlined"
