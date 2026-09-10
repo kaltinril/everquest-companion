@@ -27,6 +27,40 @@ import { spellItemIndex } from '../planner/indexCurrent'
 // `spellTable()` is the load promise itself; it settles once per run and every later await is
 // already-resolved, so the wait is paid exactly where the race was.
 import { spellTable } from '../resist/spellTable'
+import { spellCanonKey } from '../../shared/spellKey'
+import type { StackSource } from '../../shared/spellStack'
+import type { SpellResistTable } from '../../shared/resistTypes'
+
+/**
+ * The stacking rows for a validated list of names, keyed by the name AS ASKED.
+ *
+ * Its own function so the handler above stays a door - validate, resolve the table, delegate - which
+ * is also what keeps it under the tree's complexity ceiling. Keyed as asked so a caller can look its
+ * own strings back up without re-folding a key.
+ */
+function stackViewsFor(table: SpellResistTable, names: readonly unknown[]): Record<string, StackSource> {
+  const out: Record<string, StackSource> = {}
+  for (const raw of names) {
+    if (typeof raw !== 'string' || raw.length === 0 || raw.length > 128) continue
+    const row = table[spellCanonKey(raw)]
+    // Only rows the parser kept slots for - which is rows with a DURATION, the only ones a stacking
+    // question is ever about (`SpellResistInfo.slots` states the filter and why).
+    if (!row?.slots) continue
+    out[raw] = {
+      name: raw,
+      goodEffect: row.goodEffect ?? false,
+      targetType: row.targetType,
+      durationFormula: row.durationFormula ?? 0,
+      durationValue: row.durationValue ?? 0,
+      song: row.song ?? false,
+      slots: row.slots
+    }
+  }
+  return out
+}
+
+/** The most spell names one `spells:stackViews` call may ask about. See the handler. */
+const MAX_STACK_VIEW_NAMES = 400
 import type { AlertsSnap } from '../../shared/alertTypes'
 import { resolvedClasses, type ClassAbbr, type ComboSnap } from '../../shared/classCombo'
 import {
@@ -172,6 +206,24 @@ export function registerKnowledgeIpc(): void {
       // never disagree about what is on an item.
       itemIndex: spellItemIndex()
     })
+  })
+
+  /**
+   * THE STACKING VIEWS for a bounded list of spell names (§3.5).
+   *
+   * Reads the player's OWN parsed `spells_us.txt` (`spellTable`), so it answers nothing at all on a
+   * machine with no EverQuest install - which is a supported state, not a failure: the caller reads
+   * an empty map as "no exact verdicts available" and falls back to its flagged tier.
+   *
+   * VALIDATED AT THE DOOR, the `sounds:getData` rule: a non-array, a non-string entry and an
+   * over-long list are all refused here rather than trusted downstream. The cap is generous against
+   * the real question (a trio's castable buffs is tens of spells) and mean against a caller that
+   * has lost track of what it is asking for.
+   */
+  ipcMain.handle(IPC.spellsStackViews, async (_e, names: unknown) => {
+    if (!Array.isArray(names) || names.length > MAX_STACK_VIEW_NAMES) return {}
+    const table = await spellTable()
+    return table ? stackViewsFor(table, names) : {}
   })
 
   // ---- item knowledge ("what's this lore/quest item for", Task #53) ----
