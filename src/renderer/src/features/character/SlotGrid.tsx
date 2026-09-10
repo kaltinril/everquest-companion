@@ -117,28 +117,34 @@ function SlotIcon({ cell }: { cell: SheetCellView }): JSX.Element {
  */
 function SocketRow({
   item,
-  effectOf,
-  flagged
+  cellId,
+  advice
 }: {
   item: SocketedItem & { exaltations: readonly string[] }
-  effectOf?: (key: string, type: string) => KindEffect | null
-  flagged?: ReadonlySet<string>
+  cellId: string
+  advice?: SocketAdvice
 }): JSX.Element | null {
   const chips = socketChips(item)
   const leftover = unplacedExaltations(item.exaltations, item.sockets)
   if (chips.length === 0 && leftover.length === 0) return null
+  // A filled chip self-describes its socket (user review 2026-09-09: a wrapped row left “Serpent
+  // Sight” floating between two bare type words), and its hover carries THE REASON it is red —
+  // the same sentence the cleanup panel prints — rather than pointing at the panel. An empty
+  // chip's hover carries its FILL suggestion when the recommender has one.
   const dress = (c: SocketChip): { label: string; hover: string; bad: boolean } => {
-    if (c.state !== 'filled') return { label: c.label, hover: c.hover, bad: false }
+    if (c.state !== 'filled') {
+      const hint = advice?.fillHintOf(cellId, c.type)
+      return { label: c.label, hover: hint === undefined ? c.hover : `${c.hover} ${hint}`, bad: false }
+    }
     const name = c.label.slice(c.type.length + 2)
-    const eff = effectOf?.(ownershipKey(name), c.type) ?? null
-    const bad = flagged?.has(ownershipKey(name)) ?? false
-    const label = eff === null ? c.label : eff.effect
+    const reason = advice?.reasonOf(cellId, ownershipKey(name))
+    const eff = advice?.effectOf(ownershipKey(name), c.type) ?? null
+    const label = eff === null ? c.label : `${c.type}: ${eff.effect}`
     const detail = eff?.detail === undefined ? '' : ` ${eff.detail}`
-    const swapNote = bad ? ' Flagged - see the Exaltation cleanup panel for the reason.' : ''
     return {
       label,
-      hover: `${c.type} socket - ${name}${eff === null ? '' : `: ${eff.effect}${detail}`}.${swapNote}`,
-      bad
+      hover: `${c.type} socket - ${name}${eff === null ? '' : `: ${eff.effect}${detail}`}.${reason === undefined ? '' : ` ${reason}`}`,
+      bad: reason !== undefined
     }
   }
   return (
@@ -284,7 +290,7 @@ function SlotCell({
                 {item.name}
               </Box>
             </KnownItemTooltip>
-            <SocketRow item={item} effectOf={advice?.effectOf} flagged={advice?.flaggedByCell.get(cell.id)} />
+            <SocketRow item={item} cellId={cell.id} advice={advice} />
           </>
         ) : (
           <Typography variant="caption" color="text.disabled" sx={{ display: 'block', opacity: 0.6 }}>
@@ -360,10 +366,13 @@ const inColumn = (cells: SheetCellView[], column: SheetColumn): SheetCellView[] 
   // eslint-disable-next-line eqc/no-domain-munging -- JOS-459 cutover ledger item 3: no served view source answers this yet, so the renderer still derives SheetCellView. Becomes a view descriptor when the source lands.
   cells.filter((c) => c.column === column)
 
-/** What the advisor hands the grid: the effect lookup and the per-cell red flags. */
+/** What the advisor hands the grid: the effect lookup, the per-gem reason a chip is red (the
+ *  cleanup panel's own sentence), and the fill suggestion an empty socket's hover can carry. */
 export interface SocketAdvice {
   effectOf: (key: string, type: string) => KindEffect | null
   flaggedByCell: ReadonlyMap<string, ReadonlySet<string>>
+  reasonOf: (cellId: string, key: string) => string | undefined
+  fillHintOf: (cellId: string, type: string) => string | undefined
 }
 
 export default function SlotGrid({

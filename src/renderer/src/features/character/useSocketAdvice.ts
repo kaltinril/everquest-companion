@@ -10,6 +10,7 @@ import type { CharacterSheet } from '@shared/characterSheet'
 import { useComboSnap } from '../profiles/ClassComboData'
 import { useGearIndex } from '../gear/gearData'
 import type { GearRow } from '@shared/planner/gear'
+import { ownershipKey } from '@shared/planner/ownership'
 import type { SocketAdvice } from './SlotGrid'
 import {
   auditExaltations,
@@ -46,12 +47,39 @@ export function useSocketAdvice(sheet: CharacterSheet | null): SocketAdviceState
     () => (settled ? auditExaltations(sheet.exaltations, gear.rows, classes) : null),
     [settled, sheet, gear.rows, classes]
   )
-  const advice = useMemo<SocketAdvice | undefined>(
-    () =>
-      recs === null
-        ? undefined
-        : { effectOf: (key, type) => bestEffectFor(rowByKey.get(key), type), flaggedByCell: recs.flaggedByCell },
-    [recs, rowByKey]
-  )
+  const advice = useMemo<SocketAdvice | undefined>(() => {
+    if (recs === null) return undefined
+    // The chip hovers carry the panel's OWN sentences (user review 2026-09-09: “put the messages
+    // on the hover instead of see-the-panel”) — built once per recommendation set, keyed by
+    // (cell, gem) for reds and (cell, socket type) for empties, so the two surfaces can never
+    // word the same finding two ways.
+    const reasons = new Map<string, string>()
+    for (const w of recs.swaps) {
+      reasons.set(
+        `${w.cellId}|${ownershipKey(w.fromName)}`,
+        `Swap it: a ${w.toName} copy in ${w.toWhere} grants ${w.toEffect}.`
+      )
+    }
+    for (const r of recs.redundant) {
+      const repl =
+        r.replaceWith === undefined
+          ? ''
+          : ` Replace it with ${r.replaceWith.name} (${r.replaceWith.effect}) from ${r.replaceWith.where}.`
+      reasons.set(
+        `${r.cellId}|${ownershipKey(r.name)}`,
+        `Grants nothing - ${r.effect} is already in force in ${r.keptIn}, and same-name effects do not stack.${repl}`
+      )
+    }
+    const fillHints = new Map<string, string>()
+    for (const f of recs.fills) {
+      fillHints.set(`${f.cellId}|${f.type}`, `Suggestion: socket ${f.gemName} (${f.effect}) from ${f.where}.`)
+    }
+    return {
+      effectOf: (key, type) => bestEffectFor(rowByKey.get(key), type),
+      flaggedByCell: recs.flaggedByCell,
+      reasonOf: (cellId, key) => reasons.get(`${cellId}|${key}`),
+      fillHintOf: (cellId, type) => fillHints.get(`${cellId}|${type}`)
+    }
+  }, [recs, rowByKey])
   return { advice, recs, audit, classes, rows: gear.rows }
 }
