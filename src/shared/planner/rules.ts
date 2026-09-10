@@ -62,6 +62,31 @@ const OK: SocketCompatibility = { ok: true }
  * UI says which fact is absent. The one deliberate exception is an empty `planClasses` — a set
  * that has not chosen a trio yet is asking for no class filter, not for zero classes.
  */
+/**
+ * RACE IS NOT CHECKED, AND THAT IS MEASURED RATHER THAN FORGOTTEN (audit, 2026-09-10).
+ *
+ * The game's rule has three dimensions, not two: a fork player states it as *"if a target item does
+ * not contain at least 1 matching CLASS, RACE, and SLOT, then the exaltation can not be put into
+ * that item"*. This function checks class and slot and says nothing about race. It was audited on
+ * the committed corpus rather than left as a hole somebody rediscovers:
+ *
+ *   * 1,249 of the 1,250 EFFECT-BEARING items - every possible donor - state `ALL`.
+ *   * 6,827 of the 6,850 gear rows - every possible host - state `ALL`.
+ *   * Cross-multiplying donor against host is 8,562,500 pairs. Treating `ALL` as universal, the
+ *     number a race rule would block is **ZERO**.
+ *
+ * AND THE CORPUS COULD NOT EXPRESS ONE ANYWAY. The only non-`ALL` shapes are `NONE` (17 hosts) and
+ * a TRUNCATED `['ALL', 'EXCEPT']` (6 rows, e.g. Theurgist) - an exclusion with no race after the
+ * `EXCEPT`. `GearRow.races` says why it stays verbatim: there is no measured closed race table in
+ * this repo, and inventing the sixteen-race complement from a 12-token census is the fuzzy join law
+ * 12 refuses. So a race rule written today would be arithmetic over data that cannot state the
+ * fact, which is worse than an honest gap.
+ *
+ * WHAT WOULD CHANGE THIS: a rescrape whose `EXCEPT` rows carry their race, or any real population of
+ * race-restricted exaltation donors. The check then belongs right here beside the class half, in
+ * `slotFits`' shape - `donor ∩ host`, with `ALL` as the universal set - and `PlannerDonor` grows a
+ * `races` field to carry it. Re-run the census before writing a line of it.
+ */
 export function socketCompatibility(
   donor: PlannerDonor,
   hostSlots: readonly EquipSlot[],
