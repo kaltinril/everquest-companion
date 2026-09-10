@@ -256,7 +256,8 @@ function clearsOf(
       item: s.item,
       gemName: s.currentName,
       effect: occ.effect,
-      movedTo: seat.cellLabel
+      // The item disambiguates the paired cells: 'Ear (Earring of Bashing)', not 'Ear' twice.
+      movedTo: `${seat.cellLabel} (${seat.item})`
     })
   }
   return out
@@ -308,7 +309,20 @@ export function planBoard(
   sockets: readonly SocketHostCell[]
 ): BoardPlan {
   const rowByKey = new Map(rows.map((r) => [r.key, r]))
-  const claims = familyClaims(copyCounts(owned), rowByKey, classes, TYPES)
+  // Which families are ALREADY IN FORCE somewhere on the body — the belt case (user report
+  // 2026-09-10, twice): Summoning Haste III (loose) and Burning Affliction III (socketed) tie on
+  // tier and both fit only the belt; processed first, the loose one took the seat and the
+  // incumbent was evicted for zero gain. Incumbents are seated first at equal tier, so a loose
+  // family can only win a contested seat by OUTRANKING the family that holds it.
+  const incumbent = new Set<string>()
+  for (const s of sockets) {
+    if (s.currentKey === null) continue
+    const eff = bestEffectFor(rowByKey.get(s.currentKey), s.type)
+    if (eff !== null) incumbent.add(eff.family)
+  }
+  const claims = familyClaims(copyCounts(owned), rowByKey, classes, TYPES).sort(
+    (a, b) => b.eff.tier - a.eff.tier || Number(incumbent.has(b.family)) - Number(incumbent.has(a.family))
+  )
   const adj = edges(claims, sockets, rowByKey)
   const placed = match(claims, adj, sockets.length)
   const placements: Placement[] = []

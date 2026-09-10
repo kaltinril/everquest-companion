@@ -294,6 +294,29 @@ export interface EffectBrowserProps {
   onOpenLoot?: (item: string) => void
 }
 
+// The two mount-local hide filters and the ownership key set they read (split out of the
+// component at the 100-line ceiling). Ownership is the Gear tab's own join, folded to a set.
+function useOwnedFilterState(): {
+  ownedMode: OwnedMode
+  setOwnedMode: (v: OwnedMode) => void
+  hideCharged: boolean
+  setHideCharged: (v: boolean) => void
+  ownedKeys: ReadonlySet<string> | undefined
+} {
+  const [ownedMode, setOwnedMode] = useState<OwnedMode>('all')
+  const [hideCharged, setHideCharged] = useState(false)
+  const ownership = useGearOwnership()
+  const ownedKeys = useMemo<ReadonlySet<string> | undefined>(() => {
+    if (ownership.map === null) return undefined
+    const out = new Set<string>()
+    for (const [key, o] of ownership.map) {
+      if (o.owned || o.looted || o.exaltations > 0) out.add(key)
+    }
+    return out
+  }, [ownership.map])
+  return { ownedMode, setOwnedMode, hideCharged, setHideCharged, ownedKeys }
+}
+
 export default function EffectBrowser({
   classes,
   wished,
@@ -348,21 +371,13 @@ export default function EffectBrowser({
   // THE OWNED TRI-STATE (fork ask 2026-09-09). Mount-local like the search box, and its evidence
   // is the Gear tab's own ownership join: the dump plus the loot log, exaltation copies counted
   // (`useOwnedOrLooted`'s reading, folded to a key set here so the pure filter takes no hook).
-  const [ownedMode, setOwnedMode] = useState<OwnedMode>('all')
-  const ownership = useGearOwnership()
-  const ownedKeys = useMemo<ReadonlySet<string> | undefined>(() => {
-    if (ownership.map === null) return undefined
-    const out = new Set<string>()
-    for (const [key, o] of ownership.map) {
-      if (o.owned || o.looted || o.exaltations > 0) out.add(key)
-    }
-    return out
-  }, [ownership.map])
+  const ownedFilter = useOwnedFilterState()
+  const { ownedMode, setOwnedMode, hideCharged, setHideCharged, ownedKeys } = ownedFilter
   // Read out of the tuples so the memo's dependency list names the VALUES: the setter half of
   // each tuple is a fresh identity nothing here depends on.
   const view = useMemo<DonorView>(
-    () => ({ eraOnly: era[0], nonEquip: nonEquip[0], owned: ownedMode, ownedKeys }),
-    [era, nonEquip, ownedMode, ownedKeys]
+    () => ({ eraOnly: era[0], nonEquip: nonEquip[0], owned: ownedMode, ownedKeys, hideCharged }),
+    [era, nonEquip, ownedMode, ownedKeys, hideCharged]
   )
   const { rows, hidden } = useVisibleRows({
     donors,
@@ -413,6 +428,7 @@ export default function EffectBrowser({
         nonEquip={nonEquip}
         groupBy={groupBy}
         owned={[ownedMode, setOwnedMode]}
+        charged={[hideCharged, setHideCharged]}
         ownedKnown={ownedKeys !== undefined}
         focus={focus}
         setFocus={pickItem}

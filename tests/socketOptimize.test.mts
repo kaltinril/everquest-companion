@@ -152,7 +152,9 @@ test('incumbency breaks ties: the belt keeps its socketed Burning Affliction III
     row('sh gem', 'SH Gem', worn('SH Gem', 'Summoning Haste III'), ['WAIST'])
   ]
   const plan = planBoard(
-    [gem('BA Gem', 'socketed in Waist', true), gem('SH Gem', 'General 2')],
+    // The loose gem deliberately FIRST: processing order must not decide the seat (the bug's
+    // second appearance - the claim list happened to seat Summoning Haste before the incumbent).
+    [gem('SH Gem', 'General 2'), gem('BA Gem', 'socketed in Waist', true)],
     rows,
     [],
     [seat('waist', 'Worn', 'WAIST', 'BA Gem')]
