@@ -209,6 +209,9 @@ export interface EffectFilterBarProps {
   groupBy: [GroupAxis, (v: GroupAxis) => void]
   /** the owned tri-state (fork ask 2026-09-09) — mount-local, like the search box */
   owned: [OwnedMode, (v: OwnedMode) => void]
+  /** hide donors with a stated finite `Charges:` (fork ask 2026-09-10) — drawn on the Click tab,
+   *  where a charged item is a consumable rather than a clicky */
+  charged: [boolean, (v: boolean) => void]
   /** false while no inventory dump exists: the control renders disabled with the reason on hover,
    *  because a filter that silently does nothing is worse than one that says why it cannot */
   ownedKnown: boolean
@@ -228,6 +231,7 @@ export default function EffectFilterBar({
   nonEquip,
   groupBy,
   owned,
+  charged,
   ownedKnown,
   focus = null,
   setFocus
@@ -306,6 +310,17 @@ export default function EffectFilterBar({
       />
 
       <ViewToggles era={era} nonEquip={nonEquip} />
+
+      {/* Click effects only: elsewhere charges are rare enough that the chip would be dead UI. */}
+      {filters.socket === 'click' && (
+        <ToggleChip
+          label="No charges"
+          testId="planner-charged-toggle"
+          on={charged[0]}
+          onToggle={() => charged[1](!charged[0])}
+          hint="Hide items whose page states a finite Charges count - a charged click is a consumable"
+        />
+      )}
 
       <OwnedSelect owned={owned} known={ownedKnown} />
     </Stack>

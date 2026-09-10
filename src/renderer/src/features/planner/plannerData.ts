@@ -65,6 +65,9 @@ export interface DonorView {
   nonEquip: boolean
   /** the owned tri-state (fork ask, kaltinril 2026-09-09): absent = `'all'`, the pre-feature list */
   owned?: OwnedMode
+  /** hide donors whose page states a FINITE `Charges:` (fork ask 2026-09-10) - a charged click
+   *  is a consumable. Unstated charges stay shown (law 1: not stated is not "limited"). */
+  hideCharged?: boolean
   /** which donor keys this character owns (item, loot, or an exaltation copy — the Gear tab's own
    *  `ownedOrLooted` reading). ABSENT means ownership is UNKNOWN — no dump was ever written — and
    *  the tri-state then filters NOTHING: hiding "owned" rows on no evidence would hide none and
@@ -475,6 +478,12 @@ export function classFit(donor: PlannerDonor, planClasses: readonly ClassAbbr[])
   return classesMismatch(donor.classes, planClasses) ? 'no' : 'fits'
 }
 
+/** A stated, finite `Charges:` under the hide-charged toggle. "Unlimited" is never hidden. */
+function chargedHides(view: DonorView, charges: string | undefined): boolean {
+  if (view.hideCharged !== true || charges === undefined) return false
+  return !/unlimited/i.test(charges)
+}
+
 /** The owned tri-state's one clause — a no-op without `ownedKeys` (the DonorView field says why). */
 function ownedFilterHides(view: DonorView, key: string): boolean {
   if (view.ownedKeys === undefined || view.owned === undefined || view.owned === 'all') return false
@@ -504,6 +513,7 @@ export function filterDonors(
     if (filters.trioOnly && classFit(d, planClasses) === 'no') return false
     if (eraHides(d, view.eraOnly)) return false
     if (ownedFilterHides(view, d.key)) return false
+    if (chargedHides(view, d.charges)) return false
     return needle === '' || d.searchKey.includes(needle)
   })
 }
