@@ -63,7 +63,17 @@ export interface DonorView {
   eraOnly: boolean
   /** show donors with NO equipment slot — the R2 escape hatch. Default OFF. */
   nonEquip: boolean
+  /** the owned tri-state (fork ask, kaltinril 2026-09-09): absent = `'all'`, the pre-feature list */
+  owned?: OwnedMode
+  /** which donor keys this character owns (item, loot, or an exaltation copy — the Gear tab's own
+   *  `ownedOrLooted` reading). ABSENT means ownership is UNKNOWN — no dump was ever written — and
+   *  the tri-state then filters NOTHING: hiding "owned" rows on no evidence would hide none and
+   *  "only owned" would empty the list, both of them answers about a file that does not exist. */
+  ownedKeys?: ReadonlySet<string>
 }
+
+/** The owned tri-state: everything, hide what you own, or only what you own. */
+export type OwnedMode = 'all' | 'hide' | 'only'
 
 export const DEFAULT_VIEW: DonorView = { eraOnly: true, nonEquip: false }
 
@@ -465,9 +475,15 @@ export function classFit(donor: PlannerDonor, planClasses: readonly ClassAbbr[])
   return classesMismatch(donor.classes, planClasses) ? 'no' : 'fits'
 }
 
+/** The owned tri-state's one clause — a no-op without `ownedKeys` (the DonorView field says why). */
+function ownedFilterHides(view: DonorView, key: string): boolean {
+  if (view.ownedKeys === undefined || view.owned === undefined || view.owned === 'all') return false
+  return view.ownedKeys.has(key) !== (view.owned === 'only')
+}
+
 /**
  * The browser's filter: equippability, then socket type, then slot, then trio compatibility, then
- * era, then the text match.
+ * era, then the owned tri-state, then the text match.
  *
  * `trioOnly` keeps UNKNOWN rows. Hiding a donor whose page never stated a class list would be the
  * planner asserting a fact the wiki declined to state; the row is shown and chipped instead. The
@@ -487,6 +503,7 @@ export function filterDonors(
     if (filters.slot !== null && !d.slots.includes(filters.slot)) return false
     if (filters.trioOnly && classFit(d, planClasses) === 'no') return false
     if (eraHides(d, view.eraOnly)) return false
+    if (ownedFilterHides(view, d.key)) return false
     return needle === '' || d.searchKey.includes(needle)
   })
 }

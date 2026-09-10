@@ -35,6 +35,7 @@ import { EQUIP_LOCATIONS } from '../src/shared/outputs/inventory'
 import { parseInventoryDump } from '../src/main/outputs/inventoryParse'
 import {
   SHEET_SLOTS,
+  ownedExaltations,
   sheetCells,
   statInteger,
   sumGear,
@@ -113,6 +114,42 @@ test('socket rows are NOT items — they are exaltations of the row above them',
   // A socket may hold a DIFFERENT item than its host — the second ring's does.
   assert.deepEqual(cell('finger2').item?.exaltations, ['Moonstone Ring'])
   assert.deepEqual(cell('chest').item?.exaltations, [], 'empty sockets are not exaltations')
+})
+
+test('sockets carry WHICH socket each exaltation occupies, off the measured index map', () => {
+  // Face-Slot7 is the FOCUS socket (JOS-452's numbering); Slot8/9 are stated Empty.
+  assert.deepEqual(cell('face').item?.sockets, [
+    { type: 'Focus', name: 'Polished Mithril Mask' },
+    { type: 'Click', name: null },
+    { type: 'Worn', name: null }
+  ])
+  // Primary-Slot10 is the PROC socket, with the three below it stated Empty.
+  assert.deepEqual(cell('primary').item?.sockets, [
+    { type: 'Focus', name: null },
+    { type: 'Click', name: null },
+    { type: 'Worn', name: null },
+    { type: 'Proc', name: 'Thelvorn, Blade of Light' }
+  ])
+  // Ornamentation (Slot2) never appears: the map deliberately does not name it.
+  assert.ok(cell('primary').item?.sockets.every((s) => s.type !== 'Ornamentation'))
+})
+
+test('ownedExaltations walks the WHOLE dump: worn sockets, bag sockets, everything the suffix names', () => {
+  const owned = ownedExaltations(dump)
+  // Measured on the fixture: 14 `(Exaltation)` rows in the whole file.
+  assert.equal(owned.length, 14)
+  // A worn-socket row is `socketed`, and says which cell in the file's own token…
+  const face = owned.find((o) => o.name === 'Polished Mithril Mask')
+  assert.deepEqual(face, {
+    name: 'Polished Mithril Mask',
+    key: 'polished mithril mask',
+    where: 'socketed in Face',
+    socketed: true
+  })
+  // …and a copy inside a bagged item is NOT: it sits in a bag, in force for nobody.
+  const bagged = owned.filter((o) => o.where.startsWith('General'))
+  assert.equal(bagged.length, 8)
+  assert.ok(bagged.every((o) => !o.socketed))
 })
 
 // ---- the sum -------------------------------------------------------------------------

@@ -47,6 +47,76 @@ export function socketStates(tier: number | undefined): SocketState[] {
   return TRANSFERABLE.map((s) => ({ ...s, unlocked: tier >= s.unlocksAt }))
 }
 
+// ---- the merged socket row (fork ask, kaltinril 2026-09-09) -------------------------------------
+//
+// The sheet used to draw WHAT IS SOCKETED (the client's own `-Slot<n>` chips) and WHAT CAN BE
+// (the bare `Focus Click Worn Proc` line) as two unrelated rows, and the user report read them
+// exactly as that renders: "randomly showing some of the focus, click and worn abilities, but not
+// all". One row now says both, per socket, the way the item window itself lists them:
+// `Proc: Short Sword of the Ykesha` filled, `Worn` dimmed-open, `Proc @+4` dimmed-locked.
+
+/** One chip of the merged row: the socket, its state, and the words the chip and its hover wear. */
+export interface SocketChip {
+  type: string
+  label: string
+  state: 'filled' | 'open' | 'locked'
+  hover: string
+}
+
+/** The slice of `SheetItem` the row reads — structural, so the node test needs no dump. */
+export interface SocketedItem {
+  tier?: number
+  sockets: readonly { type: string; name: string | null }[]
+}
+
+/**
+ * The merged row's chips, in the window's socket order.
+ *
+ * THE TWO SOURCES KEEP THEIR OWN AUTHORITY. A socket the dump STATED (a `-Slot<n>` row, filled or
+ * `Empty`) is drawn on the file's word alone — an `Empty` row is an open socket whatever the
+ * ` +N` says. A socket the dump printed NO row for falls back to the wiki's unlock table at the
+ * item's stated tier (open, or `@+N` locked) — and when the name stated no tier either, that
+ * socket draws NOTHING, the same silence `socketStates` keeps: a promise the data cannot back.
+ */
+export function socketChips(item: SocketedItem): SocketChip[] {
+  const stated = new Map(item.sockets.map((s) => [s.type, s.name]))
+  const out: SocketChip[] = []
+  for (const s of TRANSFERABLE) {
+    const name = stated.get(s.type)
+    if (name != null) {
+      out.push({
+        type: s.type,
+        label: `${s.type}: ${name}`,
+        state: 'filled',
+        hover: `${s.what} - ${name} is socketed here.`
+      })
+    } else if (name === null || (item.tier !== undefined && item.tier >= s.unlocksAt)) {
+      out.push({ type: s.type, label: s.type, state: 'open', hover: `${s.what} - this socket is open and empty.` })
+    } else if (item.tier !== undefined) {
+      out.push({
+        type: s.type,
+        label: `${s.type} @+${String(s.unlocksAt)}`,
+        state: 'locked',
+        hover: `${s.what} - unlocks at +${String(s.unlocksAt)}.`
+      })
+    }
+  }
+  return out
+}
+
+/**
+ * The exaltation names the merged row could NOT place — a child at an index the measured map does
+ * not name. Drawn as the old unlabelled chips so nothing the file said is dropped; empty for
+ * every dump measured so far.
+ */
+export function unplacedExaltations(
+  exaltations: readonly string[],
+  sockets: readonly { name: string | null }[]
+): string[] {
+  const placed = new Set(sockets.map((s) => s.name).filter((n): n is string => n !== null))
+  return exaltations.filter((n) => !placed.has(n))
+}
+
 /** One wish, placed at a slot: what to say on the chip and in its hover. */
 export interface SlotWish {
   /** which chip style — a donor chip names its effect, a gear chip names the item */

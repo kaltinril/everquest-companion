@@ -27,6 +27,7 @@ import { ipcMain } from 'electron'
 import { IPC } from '../../shared/ipc'
 import { carryAll } from '../../shared/carryAll'
 import {
+  ownedExaltations,
   sheetCells,
   sumGear,
   type CharacterSheet,
@@ -91,7 +92,9 @@ export function registerCharacterSheetIpc(): void {
       totals: sumGear(worn.map(wornOf)),
       // …and the SAME parse, flattened (JOS-327). No DB join and no second read of the file: the
       // ledger the carry-all table draws is by construction the same bytes the grid above it drew.
-      carry: carryAll(loaded.dump)
+      carry: carryAll(loaded.dump),
+      // …and the same parse's `(Exaltation)` rows, for the renderer's cleanup advisor.
+      exaltations: ownedExaltations(loaded.dump)
     }
   })
 }
