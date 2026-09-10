@@ -26,6 +26,12 @@ import { aeHits, aeMaxTargets } from '../../shared/aoeSpells'
 import { spellEffectClasses } from './spellEffectClass'
 import { normalizeSpellRank } from '../../shared/spellScale'
 import { spellNature, type SpellDb } from './spellDb'
+// THE GRANT READER, THE UPGRADE CLASSIFIER and the ladder (docs/plans/spell-upgrades-and-loadout.md).
+// Separable overlays over the same scrape, like `spellEffectClass.ts`: delete them and the catalog
+// is unchanged. They run HERE because the renderer may not parse domain text (ruling 4).
+import { spellStatGrants } from '../../shared/spellStats'
+import { classifyUpgrade, spellTierLadder, upgradePayoff, type SpellTierBase } from '../../shared/spellUpgrade'
+import { itemsForSpell, type SpellItemIndex } from '../planner/spellItemIndex'
 // THE UPGRADE LADDER (JOS-508). A second join beside the rank lineage above, and a DIFFERENT
 // question — see `spellLinePath.ts`'s header for why the two must never be folded together.
 // `dbRowFor` moved there so this file can import it without the dependency pointing both ways.
@@ -34,6 +40,17 @@ import type { ClassAbbr } from '../../shared/classCombo'
 
 /** The outside witnesses the join consults when the caller has them. All optional, all default off. */
 export interface SpellDetailSources {
+  /**
+   * THE ITEMS THAT CARRY SPELLS, inverted from the planner's donor index
+   * (docs/plans/spell-upgrades-and-loadout.md §4.4 item 7).
+   *
+   * Threaded in rather than imported for `client`'s reason exactly: the donor index is built from
+   * the 8.6 MB item corpus in the IPC layer, and this module is node-tested and must not pull that
+   * in. Absent means "nobody handed one over", which draws no section - distinct from an index that
+   * answered an empty list, which draws the section saying no item carries it.
+   */
+  itemIndex?: SpellItemIndex
+
   /** the parsed `spells_us.txt` table, or null/absent - a FALLBACK inside `spellMetricsAt`. */
   client?: SpellResistTable | null
   /** the mote rank this character has been observed holding for the line (JOS-446). */
@@ -162,6 +179,7 @@ export function buildSpellDetail(
     illusion: entry.illusion,
     classLevels,
     effectClasses: spellEffectClasses(entry),
+    ...upgradeFields(entry, classLevels, sources),
     lineage: buildLineage(name, db, observedRanks, entry),
     // THE LADDER (JOS-508), asked about the ROW'S OWN NAME rather than the queried one: the
     // research table files `Celestial Remedy`, and a hover on `Celestial Remedy III` has to reach
@@ -300,5 +318,94 @@ function messageFields(e: SpellEntry): Partial<SpellDetail> {
   if (e.msgCastOnYou !== undefined) out.msgCastOnYou = e.msgCastOnYou
   if (e.msgCastOnOther !== undefined) out.msgCastOnOther = e.msgCastOnOther
   if (e.msgWearsOff !== undefined) out.msgWearsOff = e.msgWearsOff
+  return out
+}
+
+
+/**
+ * A stated, positive figure or nothing - `SpellTierBase`'s absent-means-nothing rule, spelled once.
+ *
+ * Zero and absent collapse deliberately: a bard song's zero mana and a page that omitted the field
+ * are both "there is no mana row to reduce".
+ */
+function statedPositive<K extends string>(
+  key: K,
+  v: number | null | undefined
+): Partial<Record<K, number>> {
+  // NULL IS A THIRD SPELLING OF ABSENT here, and it is the scrape's: `SpellEntry.durationMs` is
+  // `number | null` because the wiki states "Instant" and "Permanent" as words, and the parse
+  // answers null rather than inventing a zero. All three collapse to "no row".
+  return v !== null && v !== undefined && v > 0 ? ({ [key]: v } as Record<K, number>) : {}
+}
+
+/**
+ * The spell's base figures, filed under its upgrade category.
+ *
+ * THE PAGE'S BASE IS FULLER THAN THE SPELLBOOK'S, and that is the difference between a table and a
+ * row: this one states the re-use timer, so the page's ladder can show every column the game's own
+ * spell window does. `shared/spellbook.ts tierBase` records why the row's deliberately does not.
+ *
+ * THE SIX CLASSIFICATION FACTS ARE READ OFF THE PAGE'S OWN WORDS. Five come from fields; the sixth,
+ * `permanent`, is the wiki's own adjective in `durationText`, which is the only place it is stated.
+ */
+function tierBaseFor(e: SpellEntry): SpellTierBase {
+  const effects = e.effects ?? []
+  const has = (re: RegExp): boolean => effects.some((x) => re.test(x))
+  return {
+    category: classifyUpgrade({
+      beneficial: spellNature(e.spellType) === 'beneficial',
+      hasDuration: (e.durationMs ?? 0) > 0,
+      permanent: /permanent/i.test(e.durationText ?? ''),
+      damage: has(/^Decrease (Hit ?points|HP|Current HP)/i),
+      heal: has(/^Increase (Hit ?points|HP|Current HP)/i),
+      charm: has(/^(Charm|Mesmeriz)/i),
+      pet: has(/^Summon Pet/i)
+    }),
+    ...statedPositive('mana', e.mana),
+    ...statedPositive('castSeconds', e.castTimeMs === undefined ? undefined : e.castTimeMs / 1000),
+    ...statedPositive('reuseSeconds', e.recastMs === undefined ? undefined : e.recastMs / 1000),
+    ...statedPositive(
+      'durationTicks',
+      e.durationMs === null || e.durationMs === undefined ? undefined : Math.round(e.durationMs / 6000)
+    )
+  }
+}
+
+/**
+ * WHAT IT GRANTS, WHAT A TIER BUYS, AND WHAT CARRIES IT
+ * (docs/plans/spell-upgrades-and-loadout.md §4.4, sections 5 to 7).
+ *
+ * Three answers in one pass because they share every input: the effect list, the spell's own type
+ * and duration, and the level the record is read at. Splitting them into three functions would mean
+ * three walks of the same strings for no gain, and `worthFields` next door already set the shape.
+ *
+ * THE LEVEL IS `worthFields`' LEVEL, deliberately - the lowest level any class gains the line - so
+ * the grants and the metrics on one card are read at one level. A card printing a level-19 AC beside
+ * a level-44 damage figure would be two spells' worth of numbers under one name.
+ *
+ * THE LADDER IS SENT WHOLE (eleven small rows) rather than derived at the far end: drawing a table
+ * is a map and deriving one is not, which is ruling 4 read literally, and it also means the page and
+ * the Spellbook cannot disagree about what tier 7 costs.
+ */
+function upgradeFields(
+  e: SpellEntry,
+  classLevels: readonly { level: number }[],
+  sources: SpellDetailSources
+): Partial<SpellDetail> {
+  const level = classLevels.length > 0 ? Math.min(...classLevels.map((c) => c.level)) : 1
+  const out: Partial<SpellDetail> = {}
+  const grants = spellStatGrants(e.effects, level)
+  if (grants.length > 0) {
+    out.grants = grants
+    out.grantsLevel = level
+  }
+  const base = tierBaseFor(e)
+  out.upgradeCategory = base.category
+  out.tierLadder = spellTierLadder(base)
+  out.payoff = upgradePayoff(base)
+  // The DISPLAY name, not the queried one: an item's effect is written the way the spell's own page
+  // titles it, so a hover on `Clarity II` has to look the row's own name up rather than the string
+  // the user clicked. Same rule `linePath` follows two lines above.
+  if (sources.itemIndex !== undefined) out.itemSources = itemsForSpell(sources.itemIndex, e.name)
   return out
 }

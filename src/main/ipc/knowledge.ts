@@ -16,6 +16,9 @@ import { appSpellDb } from '../appSpellDb'
 // put an await and nothing has to be cached. See `moduleState` below.
 import { serveMobDropsSeen, serveModuleSnapshot } from '../dataServer/serveShim'
 import { currentWornFocus } from '../planner/wornFocusCurrent'
+// The donor index, grouped by spell - the same memo the Exaltation board's handler reads, so one
+// walk of the item corpus serves both (planner/indexCurrent.ts says why it lives out there).
+import { spellItemIndex } from '../planner/indexCurrent'
 // THE CLIENT'S SPELL TABLE, AWAITED AT THE HANDLER (JOS-396, inverted 2026-08-23). This imported
 // `spellTableNow()` — the already-resolved table or null, so nothing waited on the parse — and the
 // laziness was the bug once the renderer began pulling once-per-window datasets folded FROM the
@@ -162,7 +165,12 @@ export function registerKnowledgeIpc(): void {
       // JOS-452 — the same worn-focus answer the planner's inventory payload carries, from the same
       // memoized resolution, so the card and the leveling table can never credit a different item.
       focus: currentWornFocus(),
-      combo
+      combo,
+      // WHICH ITEMS CARRY THIS SPELL (docs/plans/spell-upgrades-and-loadout.md §4.4 item 7) - the
+      // planner's own donor rows, grouped by the spell each one names. It is the SAME index the
+      // Exaltation board reads, asked the other way round, so a spell page and a socket row can
+      // never disagree about what is on an item.
+      itemIndex: spellItemIndex()
     })
   })
 
