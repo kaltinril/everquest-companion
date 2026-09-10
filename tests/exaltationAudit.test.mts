@@ -16,12 +16,11 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import type { GearRow } from '../src/shared/planner/gear'
 import type { OwnedExaltation } from '../src/shared/characterSheet'
+import { auditExaltations, rankedEffects } from '../src/renderer/src/features/character/exaltationAudit'
 import {
-  auditExaltations,
-  rankedEffects,
   recommendSockets,
   type SocketHostCell
-} from '../src/renderer/src/features/character/exaltationAudit'
+} from '../src/renderer/src/features/character/socketRecommend'
 
 function row(key: string, name: string, effects: GearRow['effects'], classes: GearRow['classes'] = []): GearRow {
   return {
@@ -110,6 +109,9 @@ function host(cellId: string, type: string, currentName: string | null, item = '
     cellLabel: cellId,
     item,
     type,
+    // The test rows all state WAIST (the `row` helper), so the default host fits them under R2.
+    slot: 'WAIST',
+    itemKey: item.toLowerCase(),
     currentKey: currentName === null ? null : currentName.toLowerCase(),
     currentName
   }
@@ -220,4 +222,48 @@ test('the redundancy pass judges POST-swap effects, so a swap does not create a 
   )
   assert.equal(recs.swaps.length, 1)
   assert.equal(recs.redundant.length, 0)
+})
+
+test('R2: a gem fits only a host sharing its donor SLOT, and only a host sharing a CLASS', () => {
+  const rows = [
+    row('belt gem', 'Belt Gem', [{ name: 'Burning Affliction III', kind: 'worn' }]),
+    row('mnk gem', 'Mnk Gem', [{ name: 'Improved Damage III', kind: 'worn' }], ['MNK']),
+    row('war host', 'War Host', [], ['WAR'])
+  ]
+  const looseBoth = [
+    { name: 'Belt Gem', key: 'belt gem', where: 'Bank 1', socketed: false },
+    { name: 'Mnk Gem', key: 'mnk gem', where: 'Bank 1', socketed: false }
+  ]
+  // A WAIST-slot gem is never offered to a FINGER cell...
+  const fingerHost = { ...host('finger1', 'Worn', null), slot: 'FINGER' as const }
+  assert.equal(recommendSockets(looseBoth, rows, [], [fingerHost]).fills.length, 0)
+  // ...and a MNK-only gem is never offered to a WAR-only host item, even at the right slot -
+  // socketing it would re-restrict an item its own wearer could not use.
+  const warHost = { ...host('waist', 'Worn', null, 'War Host'), itemKey: 'war host' }
+  const fills = recommendSockets(looseBoth, rows, [], [warHost]).fills
+  assert.equal(fills.length, 1)
+  assert.equal(fills[0].gemName, 'Belt Gem')
+})
+
+test('keeper-first: a socket called dead is never also offered an upgrade (the Summoning Haste case)', () => {
+  // Fingers holds tier I, Waist holds tier III of the same family, a loose tier III exists:
+  // the old order swapped the ring UP and then called it dead. Now the waist is the keeper
+  // (nothing to upgrade - the loose copy does not beat III), and the ring is ONLY dead.
+  const rows = [
+    row('ring gem', 'Ring Gem', [{ name: 'Summoning Haste I', kind: 'worn' }]),
+    row('belt gem', 'Belt Gem', [{ name: 'Summoning Haste III', kind: 'worn' }])
+  ]
+  const recs = recommendSockets(
+    [
+      { name: 'Ring Gem', key: 'ring gem', where: 'socketed in Fingers', socketed: true },
+      { name: 'Belt Gem', key: 'belt gem', where: 'socketed in Waist', socketed: true },
+      { name: 'Belt Gem', key: 'belt gem', where: 'General 6', socketed: false }
+    ],
+    rows,
+    [],
+    [host('finger1', 'Worn', 'Ring Gem'), host('waist', 'Worn', 'Belt Gem')]
+  )
+  assert.equal(recs.swaps.length, 0, 'the keeper already holds III; the loose III upgrades nothing')
+  assert.equal(recs.redundant.length, 1)
+  assert.equal(recs.redundant[0].cellId, 'finger1')
 })

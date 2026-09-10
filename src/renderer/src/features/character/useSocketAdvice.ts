@@ -12,14 +12,8 @@ import { useGearIndex } from '../gear/gearData'
 import type { GearRow } from '@shared/planner/gear'
 import { ownershipKey } from '@shared/planner/ownership'
 import type { SocketAdvice } from './SlotGrid'
-import {
-  auditExaltations,
-  bestEffectFor,
-  recommendSockets,
-  socketHosts,
-  type ExaltationAudit,
-  type Recommendations
-} from './exaltationAudit'
+import { auditExaltations, bestEffectFor, type ExaltationAudit } from './exaltationAudit'
+import { recommendSockets, socketHosts, type Recommendations } from './socketRecommend'
 
 export interface SocketAdviceState {
   /** what the grid wears — undefined until the corpus settles, which draws the pre-advice grid */
@@ -57,7 +51,7 @@ export function useSocketAdvice(sheet: CharacterSheet | null): SocketAdviceState
     for (const w of recs.swaps) {
       reasons.set(
         `${w.cellId}|${ownershipKey(w.fromName)}`,
-        `Swap it: a ${w.toName} copy in ${w.toWhere} grants ${w.toEffect}.`
+        `Swap it: put the loose ${w.toName} gem from ${w.toWhere} into THIS socket - it grants ${w.toEffect}. (Gems are named after their source item; nothing you are wearing is touched.)`
       )
     }
     for (const r of recs.redundant) {
