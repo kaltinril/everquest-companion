@@ -267,6 +267,33 @@ export interface SpellDurationSpec {
  * What the estimator needs to know about a spell, derived from the CLIENT'S `spells_us.txt` at
  * runtime. Never committed to this repo — see `src/main/resist/spellTable.ts`.
  */
+/**
+ * ONE EFFECT SLOT of `spells_us.txt`, field 172, as the file writes it:
+ * `slot | effectId | base | limit | calc | max`.
+ *
+ * THE SLOT INDEX AND THE LIMIT ARE BOTH CARRIED, and both are new: the resist estimator's older
+ * readers (`hpSlot`, `debuffSlots`) needed neither, so `parseSlots` used to drop them. The stacking
+ * engine needs both - the index because `CheckStackConflict` compares position against position,
+ * and `limit` because the two stacking DIRECTIVES (SPA 148 block, 149 overwrite) encode their
+ * target slot in it.
+ *
+ * `slot` IS THE FILE'S OWN NUMBER, not the array position. Gaps exist, and a reader that inferred
+ * the index from an array index would silently shift every effect after a gap into the wrong
+ * position - which for a positional algorithm is a wrong answer rather than a missing one.
+ */
+export interface SpellEffectSlot {
+  /** The file's own slot number, 0-based. */
+  slot: number
+  /** The SPA id (`effect_id`): 0 hitpoints, 3 movement, 11 haste, 100 HoT, 148/149 directives. */
+  effect: number
+  base: number
+  /** `limit` - a qualifier for most effects, and the TARGET SLOT for the two directives. */
+  limit: number
+  /** The magnitude formula (`calc`). */
+  calc: number
+  max: number
+}
+
 export interface SpellResistInfo {
   axis: ResistAxis | null
   resistAdj: number
@@ -323,6 +350,55 @@ export interface SpellResistInfo {
   hpDuration?: SpellDurationSpec
   /** Present only on resist debuffs (tash/malo). */
   debuffSlots?: ResistDebuffSlot[]
+  /**
+   * EVERY EFFECT SLOT, IN FILE ORDER, for the buff-stacking engine
+   * (docs/plans/spell-upgrades-and-loadout.md §3.3, `shared/spellStack.ts`).
+   *
+   * `hpSlot` and `hp` above are the resist estimator's and the spell card's narrow readings of the
+   * same field, and both stay exactly as they were. This is the WHOLE list, because EQEmu's
+   * `CheckStackConflict` is positional: it compares slot 3 against slot 3, and it reads directives
+   * whose meaning is "the effect in MY slot N blocks yours". A filtered list cannot answer it.
+   *
+   * ── WRITTEN ONLY ON ROWS WITH A DURATION, and that is a semantic filter before it is a size one.
+   *
+   * Stacking is a question about what can be ON you at once. An instant nuke occupies nothing and
+   * conflicts with nothing, and the algorithm's own premises say so. So a row whose duration
+   * formula is 0 carries no slots here, and the engine never asks about one.
+   *
+   * MEASURED on the owner's install (2026-09-10, 73,975 rows / 48,256 stored keys): slots on every
+   * stored key would add 7.23 MiB of JSON to a 6.13 MiB cache; on the 28,306 keys with a duration
+   * it adds 5.58 MiB, for a cache of ~11.7 MiB. Restricting to PLAYER-CASTABLE rows instead would
+   * have cost only 3.02 MiB and was REJECTED: an item's clicky haste is a row no class can cast and
+   * is exactly the kind of buff a player needs a stacking answer about.
+   */
+  slots?: SpellEffectSlot[]
+  /**
+   * FIELD 126 — `good_effect`: 1 for a beneficial spell, 0 for a detrimental one.
+   *
+   * MEASURED rather than taken from a struct listing, the way fields 10, 14 and 143 were. Every
+   * column from 70 to 129 was scored against the committed catalog's own `spell_type` verdict over
+   * the 2,697 rows the two corpora share, under the hypothesis "0 is detrimental": field 126 agrees
+   * on 96.7% of them and reads only {0, 1}; the next best column manages 69.4%. Spot-checked on ten
+   * named spells, where it is right on all ten - Odium and Envenomed Bolt read 0, Form of the Bear,
+   * Spirit of Wolf, Celerity and Complete Heal read 1.
+   *
+   * The residual 3.3% is this measurement's own coarse reading of the wiki's ~30 `spell_type`
+   * strings, not a disagreement about the column.
+   *
+   * Present on every row that carries `slots`; the stacking engine needs it on both sides of a
+   * comparison, and a missing verdict there would silently change which spell wins a tie.
+   */
+  goodEffect?: boolean
+  /**
+   * The buff duration formula (field 11) and its cap (field 12), for rows that carry `slots`.
+   *
+   * `hpDuration` above states the same two numbers and is written ONLY on rows with a hitpoint
+   * slot, which is a small minority of the buffs a stacking question is about. Rather than widen
+   * that field's meaning - it is the duration `hp` runs over, and the resist ledger reads it - this
+   * is the general one, written under the same condition `slots` is.
+   */
+  durationFormula?: number
+  durationValue?: number
   /**
    * A hard level cap the game enforces independently of `rc` (mez "up to L55", charm "up to
    * L37"). A resist above the cap says nothing about the mob's resist stat and is filed nowhere.

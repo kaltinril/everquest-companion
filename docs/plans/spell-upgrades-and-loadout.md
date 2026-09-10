@@ -497,11 +497,13 @@ export function conflictComponents(views: readonly StackSpellView[], level: numb
 ```
 
 `conflictComponents` is the piece §3.5 needs: the candidate set partitioned into connected components
-of the conflict graph. **Measured claim to make at implementation time and record here:** the graph
-over a trio's castable buffs is expected to be a near-disjoint union of small per-SPA families (the
-haste family, the movement family, the STR family …). Wave 4 measures the real component sizes on the
-owner's install and writes the number into this section. The optimizer's exactness argument in §3.5
-depends on it, so it is measured before it is relied on.
+of the conflict graph. **IMPLEMENTED AND PINNED (wave 4).** `conflictComponents` partitions a candidate set and reports,
+per component, whether it is a CLIQUE - which is the property the optimizer's exactness rests on: in
+a clique the best subset is trivially the best single member, exact and linear. `tests/spellStack.
+test.mts` pins both shapes on hand-authored rows: a haste family is one clique, and a CHAIN
+(A contests B, B contests C, A and C never meet) is one component that is NOT a clique - the case
+§3.5's optimizer must not assume away. The real per-trio component sizes are measured in wave 6,
+where a real candidate set exists to measure.
 
 **Three degradation tiers, because most of the world has no `spells_us.txt` open.**
 
@@ -531,8 +533,15 @@ slot index — plus `goodEffect`, `bardLevel` (already read as part of fields 36
   measured cache crosses what `spellTable.ts` is comfortable writing, **store slots only for rows a
   player class can cast** — the same corpus rule `spells.search` already applies ("a row no class can
   cast is a mob's or an item's copy") — and record the measured before/after in the file header.
-* The Rust twin (`engine/crates/fold/src/spells_us.rs`) is **parity-gated**; it moves in the same
-  wave or the parity crate fails, which is the mechanism working.
+* **CORRECTED AT IMPLEMENTATION TIME (2026-09-10): the Rust twin is NOT parity-gated.** This
+  section originally claimed it was. Checked: `engine/crates/parity/src/main.rs` gates the LOG FOLD,
+  and `engine/crates/fold/src/spells_us.rs` is the engine's own reader serving its `resist.spell`
+  and `spells.search` ops - nothing compares it against `spellsUsParse.ts`. So widening the TS
+  parser breaks nothing on the Rust side and no wave is blocked on it.
+  **The Rust twin is therefore DEFERRED, deliberately and on the record.** The stacking engine runs
+  APP-SIDE off the app's own parsed table, so nothing in this feature needs the engine to know about
+  effect slots. The twin becomes necessary the day the engine is asked to serve a stacking verdict,
+  and that is a separate ticket with its own reason to exist.
 
 ### 3.5 `src/shared/spellLoadout.ts` — the recommended sets
 
@@ -653,7 +662,7 @@ branch and merge into `local_all_changes_testing`, never the reverse. **This bra
 | **1** | `spellUpgrade.ts` + `spellStats.ts`, pure, fully tested. No UI. The §3.1 DoT-rate question put to the owner. | `npm test` |
 | **2** | The area shell: `AreaTabs` generalization, three view ids in the `UNRELEASED` splice, nav row, labels, tab memory. Spellbook tab with search + tier slider, no payoff column yet. | e2e: nav → area → each tab mounts |
 | **3** | Spell page sections 5 and 6 (grants, upgrades). Donor-index inversion + planner op → section 7. Link audit (§4.5). | e2e: spell page states a grant and a tier |
-| **4** | `spellsUsParse.ts` slot widening, cache **v6**, Rust twin, `spellStack.ts` + parity fixtures. Component-size measurement written into §3.3. **No UI.** | parity crate green; cache size measured and recorded |
+| **4** | `spellsUsParse.ts` slot widening, cache **v6**, `spellStack.ts` + fixtures. Component-size measurement written into §3.3. **No UI.** Rust twin deferred (§3.4). | cache size measured and recorded |
 | **5** | Upgrades tab, all three panels. Payoff column joins Spellbook. | e2e: the dead-ends panel names a `buff`-category spell |
 | **6** | Loadout tab, both sides, upgrade tail. Buffs-tab conflict chip. | e2e: a conflict is stated with its reason |
 | **7** | Graduation, owner-sequenced: `TELEMETRY_VIEWS` widened **server first** (ingest Lambda deploy), then the `UNRELEASED` splice deleted. Beta chip decision. | the Character sheet's own path, JOS-45 → JOS-327 |

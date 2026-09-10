@@ -51,8 +51,16 @@ import type { ResistTableWorkerReply } from '../resistTableWorker'
  *      `Ethereal Cleansing`, so the client curve that fixes his 40-instead-of-400 heal-over-time
  *      would simply not be there to read. Bumped in the SAME commit as the parser change, which is
  *      the whole lesson of 4.
+ *   6  2026-09-10 - the EFFECT SLOTS, the good/bad verdict and the buff duration, for the
+ *      stacking engine (docs/plans/spell-upgrades-and-loadout.md §3.4). The same argument as every
+ *      bump before it: a version-5 cache was written before anything read those columns, so the
+ *      only way to get them is the re-parse this forces - one launch's worth of worker time per
+ *      install, once. JOS-449's lesson is on the record two entries up and was not repeated.
+ *      MEASURED cost on the owner's install: +5.58 MiB of JSON on a 6.13 MiB cache, for ~11.7 MiB.
+ *      Slots are written only on rows WITH A DURATION, which is a semantic filter before it is a
+ *      size one - see `SpellResistInfo.slots`.
  */
-export const SPELL_RESIST_CACHE_VERSION = 5
+export const SPELL_RESIST_CACHE_VERSION = 6
 
 interface CacheFile {
   version: number
