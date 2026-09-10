@@ -72,9 +72,21 @@ export interface ContestedFamily {
   noSeat: boolean
 }
 
+/** A seat the plan VACATES: its gem's family now lives elsewhere, so leaving it would keep a
+ *  duplicate in force (user catch 2026-09-10 — the plan seated a family at a new spot and said
+ *  nothing about the old copy still sitting where it was). */
+export interface PlanClear {
+  cellLabel: string
+  item: string
+  gemName: string
+  effect: string
+  movedTo: string
+}
+
 export interface BoardPlan {
   placements: Placement[]
   moves: PlanMove[]
+  clears: PlanClear[]
   contested: ContestedFamily[]
 }
 
@@ -85,7 +97,9 @@ function copyCounts(owned: readonly OwnedExaltation[]): Map<string, number> {
   return out
 }
 
-/** Every family's best owned claim, per socket TYPE it can serve (family+type is the unit). */
+/** Every family's best owned claim. ONE claim per family (user catch 2026-09-10: keyed by
+ *  family-and-type, a family could be seated twice through two socket types); its donors carry
+ *  the type each serves, and the tier is the best across all of them. */
 function familyClaims(
   counts: ReadonlyMap<string, number>,
   rowByKey: ReadonlyMap<string, GearRow>,
@@ -99,11 +113,10 @@ function familyClaims(
     for (const type of types) {
       const eff = bestEffectFor(row, type)
       if (eff === null) continue
-      const id = `${eff.family}|${type}`
-      const held = best.get(id)
+      const held = best.get(eff.family)
       if (held === undefined || eff.tier > held.eff.tier) {
-        best.set(id, { family: id, eff, donors: [{ key, row, type }], copies, gemName: row.name })
-      } else if (eff.tier === held.eff.tier && held.eff.family === eff.family) {
+        best.set(eff.family, { family: eff.family, eff, donors: [{ key, row, type }], copies, gemName: row.name })
+      } else if (eff.tier === held.eff.tier) {
         held.donors.push({ key, row, type })
         held.copies += copies
       }
@@ -122,18 +135,31 @@ function fits(row: GearRow, socket: SocketHostCell, hostRow: GearRow | undefined
   return true
 }
 
-/** The eligible seat indexes per claim — the bipartite graph's edges. */
+/** The eligible seat indexes per claim — the bipartite graph's edges, CURRENT SEATS FIRST.
+ *  Kuhn tries edges in order, so listing the seats a family already occupies ahead of the rest
+ *  makes the matching stable: nothing moves unless moving buys another family a seat (user
+ *  review 2026-09-10 — the plan reseated Serpent Sight across the board for no gain). */
 function edges(
   claims: readonly FamilyClaim[],
   sockets: readonly SocketHostCell[],
   rowByKey: ReadonlyMap<string, GearRow>
 ): number[][] {
-  return claims.map((c) =>
-    sockets.flatMap((s, i) => {
+  return claims.map((c) => {
+    const current: number[] = []
+    const empty: number[] = []
+    const occupied: number[] = []
+    sockets.forEach((s, i) => {
       const hostRow = rowByKey.get(s.itemKey)
-      return c.donors.some((d) => d.type === s.type && fits(d.row, s, hostRow)) ? [i] : []
+      if (!c.donors.some((d) => d.type === s.type && fits(d.row, s, hostRow))) return
+      const occupant = s.currentKey === null ? null : bestEffectFor(rowByKey.get(s.currentKey), s.type)
+      if (occupant !== null && occupant.family === c.family) current.push(i)
+      else if (s.currentKey === null) empty.push(i)
+      else occupied.push(i)
     })
-  )
+    // Current seats, then EMPTY seats, then seats somebody else holds: an augmenting path only
+    // displaces an incumbent when no free seat serves, so the plan never shuffles for nothing.
+    return [...current, ...empty, ...occupied]
+  })
 }
 
 /** Kuhn's augmenting path: can claim `u` be seated, evicting and reseating others as needed? */
@@ -209,6 +235,33 @@ function movesOf(
   return out
 }
 
+/** Seats holding a gem whose family the plan put SOMEWHERE ELSE: pull these, or the family is
+ *  in force twice and the seat is dead. A seat whose family the plan left in place, or whose
+ *  family went unseated entirely, is not a clear. */
+function clearsOf(
+  placements: readonly Placement[],
+  sockets: readonly SocketHostCell[],
+  rowByKey: ReadonlyMap<string, GearRow>
+): PlanClear[] {
+  const seatOfFamily = new Map(placements.map((p) => [p.family, p]))
+  const out: PlanClear[] = []
+  for (const s of sockets) {
+    if (s.currentKey === null || s.currentName === null) continue
+    const occ = bestEffectFor(rowByKey.get(s.currentKey), s.type)
+    if (occ === null) continue
+    const seat = seatOfFamily.get(occ.family)
+    if (seat === undefined || (seat.cellId === s.cellId && seat.type === s.type)) continue
+    out.push({
+      cellLabel: s.cellLabel,
+      item: s.item,
+      gemName: s.currentName,
+      effect: occ.effect,
+      movedTo: seat.cellLabel
+    })
+  }
+  return out
+}
+
 /** The unseated claims, each with the seats it could have taken and who holds them in the plan. */
 /** The matching's outcome, bundled once so the reporters keep four parameters. */
 interface MatchOutcome {
@@ -265,6 +318,7 @@ export function planBoard(
   return {
     placements,
     moves: movesOf(placements, sockets, rowByKey),
+    clears: clearsOf(placements, sockets, rowByKey),
     contested: contestedOf({ claims, placed, adj, sockets }, placements)
   }
 }

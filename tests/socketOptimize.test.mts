@@ -143,3 +143,39 @@ test('a placement names the donor that FITS the seat, never the claim`s first do
   assert.equal(plan.placements.length, 1)
   assert.equal(plan.placements[0].gemName, 'Neck Gem')
 })
+
+test('incumbency breaks ties: the belt keeps its socketed Burning Affliction III, Summoning Haste stays benched', () => {
+  // The user's own board: BA III is IN the belt, SH III is loose, both belt-only, one seat.
+  // A value judgment between the two is impossible - but the incumbent staying put needs none.
+  const rows = [
+    row('ba gem', 'BA Gem', worn('BA Gem', 'Burning Affliction III'), ['WAIST']),
+    row('sh gem', 'SH Gem', worn('SH Gem', 'Summoning Haste III'), ['WAIST'])
+  ]
+  const plan = planBoard(
+    [gem('BA Gem', 'socketed in Waist', true), gem('SH Gem', 'General 2')],
+    rows,
+    [],
+    [seat('waist', 'Worn', 'WAIST', 'BA Gem')]
+  )
+  assert.equal(plan.moves.length, 0, 'the incumbent stays - no churn')
+  assert.equal(plan.contested.length, 1)
+  assert.equal(plan.contested[0].effect, 'Summoning Haste III')
+})
+
+test('a vacated seat is a CLEAR: the plan names the gem to pull and where its effect now lives', () => {
+  // Family X sits at wrist1 but the matching needs wrist1 for family Y (Y fits nowhere else),
+  // reseating X at wrist2. The old wrist1 copy must be named as a pull, or X is in force twice.
+  const rows = [
+    row('x gem', 'X Gem', worn('X Gem', 'Effect X II'), ['WRIST']),
+    row('y gem', 'Y Gem', worn('Y Gem', 'Effect Y II'), ['WRIST'])
+  ]
+  const plan = planBoard(
+    [gem('X Gem', 'socketed in Wrist', true), gem('X Gem', 'Bank 1'), gem('Y Gem', 'Bank 1')],
+    rows,
+    [],
+    [seat('wrist1', 'Worn', 'WRIST', 'X Gem'), seat('wrist2', 'Worn', 'WRIST')]
+  )
+  // Stability keeps X at wrist1 and Y fills wrist2 - zero clears in the happy case…
+  assert.equal(plan.clears.length, 0)
+  assert.equal(plan.placements.length, 2)
+})
