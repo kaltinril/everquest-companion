@@ -14,7 +14,8 @@
 import { type JSX } from 'react'
 import { Paper, Stack, Typography } from '@mui/material'
 import { KnownItemTooltip } from '../../lib/KnownItemTooltip'
-import type { DuplicateFinding, ExaltationAudit, Recommendations } from './exaltationAudit'
+import type { DuplicateFinding, ExaltationAudit } from './exaltationAudit'
+import type { Recommendations } from './socketRecommend'
 
 /** An item name that opens the same hover card every other item name in the app opens. */
 function Name({ children }: { children: string }): JSX.Element {
