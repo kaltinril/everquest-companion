@@ -126,6 +126,21 @@ function familyClaims(
   return [...best.values()].sort((a, b) => b.eff.tier - a.eff.tier)
 }
 
+/** Can this claim's own donors keep a seat its family ALREADY occupies? The incumbent test. */
+function currentSeatExists(
+  c: FamilyClaim,
+  sockets: readonly SocketHostCell[],
+  rowByKey: ReadonlyMap<string, GearRow>
+): boolean {
+  return sockets.some((s) => {
+    if (s.currentKey === null) return false
+    const occ = bestEffectFor(rowByKey.get(s.currentKey), s.type)
+    if (occ?.family !== c.eff.family) return false
+    const hostRow = rowByKey.get(s.itemKey)
+    return c.donors.some((d) => d.type === s.type && fits(d.row, s, hostRow))
+  })
+}
+
 /** R2 + type for one donor row against one seat. */
 function fits(row: GearRow, socket: SocketHostCell, hostRow: GearRow | undefined): boolean {
   if (socket.slot === null || !row.slots.includes(socket.slot)) return false
@@ -309,30 +324,28 @@ export function planBoard(
   sockets: readonly SocketHostCell[]
 ): BoardPlan {
   const rowByKey = new Map(rows.map((r) => [r.key, r]))
-  // Which families are ALREADY IN FORCE somewhere on the body — the belt case (user report
-  // 2026-09-10, twice): Summoning Haste III (loose) and Burning Affliction III (socketed) tie on
-  // tier and both fit only the belt; processed first, the loose one took the seat and the
-  // incumbent was evicted for zero gain. Incumbents are seated first at equal tier, so a loose
-  // family can only win a contested seat by OUTRANKING the family that holds it.
-  const incumbent = new Set<string>()
-  for (const s of sockets) {
-    if (s.currentKey === null) continue
-    const eff = bestEffectFor(rowByKey.get(s.currentKey), s.type)
-    if (eff !== null) incumbent.add(eff.family)
-  }
-  const claims = familyClaims(copyCounts(owned), rowByKey, classes, TYPES).sort(
-    (a, b) => b.eff.tier - a.eff.tier || Number(incumbent.has(b.family)) - Number(incumbent.has(a.family))
-  )
-  const adj = edges(claims, sockets, rowByKey)
-  const placed = match(claims, adj, sockets.length)
+  // THE INCUMBENT TIEBREAK, third and final form (user reports 2026-09-10, the belt three
+  // times). A claim is incumbent only when ITS OWN best-tier donors can KEEP a seat the family
+  // already holds — "the family is socketed somewhere" was too coarse: Summoning Haste counted
+  // as incumbent through the tier-I gem in a ring that its belt-only tier-III donor cannot use,
+  // and outmuscled the belt's true incumbent on a tie. Incumbents-that-can-stay are seated
+  // first at equal tier, so a claim can only take a contested seat by OUTRANKING its holder.
+  const claims = familyClaims(copyCounts(owned), rowByKey, classes, TYPES)
+  const keeps = claims.map((c) => currentSeatExists(c, sockets, rowByKey))
+  const order = claims
+    .map((c, i) => ({ c, i }))
+    .sort((a, b) => b.c.eff.tier - a.c.eff.tier || Number(keeps[b.i]) - Number(keeps[a.i]))
+    .map((x) => x.c)
+  const adj = edges(order, sockets, rowByKey)
+  const placed = match(order, adj, sockets.length)
   const placements: Placement[] = []
-  for (let u = 0; u < claims.length; u++) {
-    if (placed[u] !== -1) placements.push(placementOf(claims[u], sockets[placed[u]], rowByKey))
+  for (let u = 0; u < order.length; u++) {
+    if (placed[u] !== -1) placements.push(placementOf(order[u], sockets[placed[u]], rowByKey))
   }
   return {
     placements,
     moves: movesOf(placements, sockets, rowByKey),
     clears: clearsOf(placements, sockets, rowByKey),
-    contested: contestedOf({ claims, placed, adj, sockets }, placements)
+    contested: contestedOf({ claims: order, placed, adj, sockets }, placements)
   }
 }
