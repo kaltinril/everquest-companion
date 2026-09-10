@@ -147,7 +147,7 @@ function mobText(target: GearTarget): string {
 /** The pointer, worded: `quest: <name> — <giver>` for the quest lane, the mob witness otherwise. */
 function witnessText(target: GearTarget): string {
   if (target.quest === undefined) return mobText(target)
-  return `quest: ${target.quest}${target.mob === '' ? '' : ` — ${target.mob}`}`
+  return `quest: ${target.quest}${target.mob === '' ? '' : ` - ${target.mob}`}`
 }
 
 /**
