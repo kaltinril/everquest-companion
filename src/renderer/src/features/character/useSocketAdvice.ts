@@ -67,7 +67,7 @@ export function useSocketAdvice(sheet: CharacterSheet | null): SocketAdviceState
           : ` Replace it with ${r.replaceWith.name} (${r.replaceWith.effect}) from ${r.replaceWith.where}.`
       reasons.set(
         `${r.cellId}|${ownershipKey(r.name)}`,
-        `Grants nothing - ${r.effect} is already in force in ${r.keptIn}, and same-name effects do not stack.${repl}`
+        `Grants nothing - ${r.keptEffect} in ${r.keptIn} outranks it, and same-name effects do not stack.${repl}`
       )
     }
     const fillHints = new Map<string, string>()

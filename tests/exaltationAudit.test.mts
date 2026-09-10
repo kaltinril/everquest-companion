@@ -192,6 +192,8 @@ test('a family socketed twice is a DEAD socket: the lesser copy is flagged and o
   // The tier-II copy is kept; the tier-I ear is the dead socket, replaced cross-family.
   assert.equal(r.cellId, 'ear1')
   assert.equal(r.keptIn, 'ear2')
+  // The sentence must name the KEPT copy's tier, never the dead one's (user report 2026-09-10).
+  assert.equal(r.keptEffect, 'Affliction Efficiency II')
   assert.equal(r.replaceWith?.name, 'Other')
   // …and the dead cell is flagged for the grid.
   assert.ok(recs.flaggedByCell.get('ear1')?.has('aff gem'))

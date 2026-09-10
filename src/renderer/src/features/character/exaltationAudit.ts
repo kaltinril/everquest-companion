@@ -285,8 +285,10 @@ export interface RedundantRec {
   type: string
   name: string
   effect: string
-  /** where the copy that actually counts sits */
+  /** where the copy that actually counts sits, and the effect IT grants (the higher tier -
+   *  naming the dead copy's own tier here read as a wrong claim, user report 2026-09-10) */
   keptIn: string
+  keptEffect: string
   /** the best loose gem of a family NOT already in force — anything beats a dead socket */
   replaceWith?: { name: string; effect: string; where: string }
 }
@@ -464,6 +466,7 @@ function redundantRec(
     name: e.name,
     effect: e.eff.effect,
     keptIn: keptHost === undefined ? '' : keptHost.host.cellLabel,
+    keptEffect: keptHost === undefined ? e.eff.effect : keptHost.eff.effect,
     ...(repl === null || where === undefined
       ? {}
       : { replaceWith: { name: repl.row.name, effect: repl.eff.effect, where } })

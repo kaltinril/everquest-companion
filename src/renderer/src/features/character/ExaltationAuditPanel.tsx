@@ -65,7 +65,7 @@ function fillLines(recs: Recommendations): JSX.Element[] {
 function redundantLines(recs: Recommendations): JSX.Element[] {
   return recs.redundant.map((r, i) => (
     <Typography key={`r${String(i)}`} variant="body2" color="text.secondary" data-testid="exaltation-redundant">
-      {`${r.cellLabel} ${r.type}: ${r.effect} grants nothing (already in force in ${r.keptIn})`}
+      {`${r.cellLabel} ${r.type}: ${r.effect} grants nothing (${r.keptEffect} in ${r.keptIn} outranks it)`}
       {r.replaceWith === undefined ? null : (
         <>
           {` → socket `}
