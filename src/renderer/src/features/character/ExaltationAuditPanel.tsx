@@ -62,6 +62,21 @@ function fillLines(recs: Recommendations): JSX.Element[] {
   ))
 }
 
+function redundantLines(recs: Recommendations): JSX.Element[] {
+  return recs.redundant.map((r, i) => (
+    <Typography key={`r${String(i)}`} variant="body2" color="text.secondary" data-testid="exaltation-redundant">
+      {`${r.cellLabel} ${r.type}: ${r.effect} grants nothing (already in force in ${r.keptIn})`}
+      {r.replaceWith === undefined ? null : (
+        <>
+          {` → socket `}
+          <Name>{r.replaceWith.name}</Name>
+          {` (${r.replaceWith.effect}) from ${r.replaceWith.where}`}
+        </>
+      )}
+    </Typography>
+  ))
+}
+
 /** Loose lower tiers only - the socketed ones are the SWAP list's and the red cards' job. */
 function scrapLines(audit: ExaltationAudit): JSX.Element[] {
   return audit.superseded
@@ -95,20 +110,22 @@ export default function ExaltationAuditPanel({
   if (recs === null || audit === null) return null
   const swaps = swapLines(recs)
   const fills = fillLines(recs)
+  const redundant = redundantLines(recs)
   const scrap = scrapLines(audit)
   const copies = audit.duplicates.map(copyLine)
-  if (swaps.length + fills.length + scrap.length + copies.length === 0) return null
+  if (swaps.length + fills.length + redundant.length + scrap.length + copies.length === 0) return null
   return (
     <Paper variant="outlined" data-testid="exaltation-audit" sx={{ p: 1.5 }}>
       <Stack spacing={0.5}>
         <Typography variant="subtitle2">Exaltation cleanup</Typography>
         <Section title="Swap (the red cards)" lines={swaps} />
+        <Section title="Dead sockets (same effect twice - it does not stack)" lines={redundant} />
         <Section title="Fill an empty socket" lines={fills} />
         <Section title="Scrap candidates" lines={scrap} />
         <Section title="Copies" lines={copies} />
         <Typography variant="caption" color="text.disabled">
-          Same-effect upgrades only - nothing here compares one effect against another, and
-          nothing is changed for you.
+          Assumes same-name effects do not stack (only the highest applies). Upgrades compare
+          within one effect family only; nothing is changed for you.
         </Typography>
       </Stack>
     </Paper>

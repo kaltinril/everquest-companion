@@ -134,7 +134,7 @@ function SocketRow({
     const bad = flagged?.has(ownershipKey(name)) ?? false
     const label = eff === null ? c.label : eff.effect
     const detail = eff?.detail === undefined ? '' : ` ${eff.detail}`
-    const swapNote = bad ? ' A better loose copy exists - see Exaltation cleanup.' : ''
+    const swapNote = bad ? ' Flagged - see the Exaltation cleanup panel for the reason.' : ''
     return {
       label,
       hover: `${c.type} socket - ${name}${eff === null ? '' : `: ${eff.effect}${detail}`}.${swapNote}`,
