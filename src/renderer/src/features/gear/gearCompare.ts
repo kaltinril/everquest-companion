@@ -218,8 +218,10 @@ export function compareDirection(entry: StatCompare): SwapDirection {
  */
 export function arrowText(entry: StatCompare): string {
   const label = entry.key.replace(/_/g, ' ')
-  const worn = entry.equipped === undefined ? '—' : statText(entry.equipped, entry.key)
-  const mine = entry.item === undefined ? '—' : statText(entry.item, entry.key)
+  // The UNSTATED placeholder is a normal dash, never U+2014 - AGENTS.md holds the glyph-as-data
+  // placeholder to the same rule as prose copy.
+  const worn = entry.equipped === undefined ? '-' : statText(entry.equipped, entry.key)
+  const mine = entry.item === undefined ? '-' : statText(entry.item, entry.key)
   return `${label} ${worn}→${mine}`
 }
 
@@ -246,7 +248,7 @@ export const NO_BASE_CHANGE = 'no stat differs, base to base'
 export function swapSections(item: GearStats, host: PlannerInventoryHost | null, worn: GearRow | undefined): SwapSection[] {
   if (host === null || worn === undefined) return []
   const tier = host.tier ?? 0
-  const label = tier === 0 ? undefined : `base vs base — you wear it merged to +${String(tier)}`
+  const label = tier === 0 ? undefined : `base vs base - you wear it merged to +${String(tier)}`
   return [{ label, changes: compareStats(item, worn.stats) }]
 }
 
