@@ -2,7 +2,7 @@
 // persisted "which tab was I on" key all agree on. Lives outside App.tsx so the nav drawer
 // can import it without importing the app itself.
 
-import { OWNER_TOOLS } from './devFlags'
+import { OWNER_TOOLS, UNRELEASED } from './devFlags'
 
 export type View =
   | 'overview'
@@ -56,6 +56,31 @@ export type View =
   // error thrown here is attributed to the tab you came from, which for a drill is the honest
   // answer anyway. Widening either enum is a separate, owner-sequenced change.
   | 'spell'
+  // ============================================================================================
+  // THE SPELLS AREA (docs/plans/spell-upgrades-and-loadout.md §2) — three tabs behind one nav row
+  // ============================================================================================
+  //
+  // The gear area's shape, for the reason the gear area has that shape: these are three faces of
+  // ONE question a player brings to a spell bar. `spells` is the corpus ("what is out there, and
+  // what does it actually do"), `spellUpgrades` is the mote decision ("what do I spend on"), and
+  // `spellLoadout` is the answer ("what should I have up"). Three nav rows would have put three
+  // parts of one question in a vertical list where nothing said they belonged together, which is
+  // precisely the mistake JOS-324 corrected for Gear.
+  //
+  // THE FOURTH FACE IS `spell` ABOVE, AND IT IS DELIBERATELY NOT A TAB. A drilldown is reached by
+  // clicking a spell name and left by Back; a tab that opened it would have to invent a spell to
+  // open it on.
+  //
+  // ALL THREE ARE UNRELEASED (devFlags.ts) — the review gate, and the exact path the character
+  // sheet took to release (JOS-45 -> JOS-327). They are spliced into `KNOWN_VIEWS` behind the flag,
+  // their nav row is gated the same way in NavDrawer.tsx, and they are ABSENT from
+  // `TELEMETRY_VIEWS` (shared/telemetry.ts): that enum is validated by the ingest Lambda, so
+  // widening it is a server deploy before it is a client change, and `lib/telemetry.ts dwellView`
+  // already fails closed for a view the schema does not carry. Graduation is one word moved here
+  // plus a server deploy, owner-sequenced, and the plan doc's wave 7 is where that is written down.
+  | 'spells'
+  | 'spellUpgrades'
+  | 'spellLoadout'
 
 export const VIEW_KEY = 'eq.view'
 export const DEFAULT_VIEW: View = 'overview'
@@ -96,8 +121,19 @@ export const VIEW_LABELS: Record<View, string> = {
   // Named even though no nav row draws it: this table is also what a drill's Back button reads
   // (navOrigin.ts), so the day a spell page links onward to something else, that something's Back
   // says "Back to Spell" without anybody remembering to come here.
-  spell: 'Spell'
+  spell: 'Spell',
+  // THE SPELLS AREA. `spells` carries the nav row's name, so the row reads "Spells" while the tab
+  // bar under it reads "Spellbook" for the same view - the gear area's own arrangement, where the
+  // row says Gear and its first tab says Gear too. The word a player uses for the corpus is
+  // "spellbook", and the word for the whole area is "spells"; naming them separately is what lets
+  // both be right.
+  spells: 'Spellbook',
+  spellUpgrades: 'Upgrades',
+  spellLoadout: 'Loadout'
 }
+
+/** The Spells nav row's own name, which is the AREA's name and not its first tab's. */
+export const SPELL_AREA_LABEL = 'Spells'
 
 // Every member of `View` this BUILD can actually render. A view missing here is silently
 // bounced to the default on the next launch, so the two lists are edited together — always.
@@ -120,6 +156,14 @@ const KNOWN_VIEWS: View[] = [
   // JOS-327: `character` used to be spliced in behind `UNRELEASED` right here, beside the
   // owner-tools splice below. It is a plain member now — every build draws it.
   'character',
+  // THE SPELLS AREA, in the review-gate splice the character sheet occupied until JOS-327. It is
+  // compile-time in a BUILD (`UNRELEASED` folds to `false`, taking the three literals with it) and
+  // live on a dev server — so a packaged build bounces a persisted 'spells' to the default view
+  // instead of routing to a tab it will not draw, and `SPELL_AREA_VIEWS` below derives its roster
+  // from THIS list rather than re-spelling the gate, so the bar can never offer a tab that mounts
+  // nothing. The contract test reads the splice and exempts its tenants from `TELEMETRY_VIEWS`
+  // (tests/telemetryContract.test.mts).
+  ...(UNRELEASED ? (['spells', 'spellUpgrades', 'spellLoadout'] as const) : []),
   // Compile-time in a BUILD (`false ? [...] : []` folds away, taking the literal with it) and a
   // runtime read of the opt-in on a dev server — so a contributor's checkout, which has no
   // `EQ_OWNER_TOOLS`, bounces a persisted 'triage' to the default view instead of routing to a
@@ -203,4 +247,68 @@ export function loadGearTab(): View {
  */
 export function rememberGearTab(view: View): void {
   if (isGearAreaView(view)) localStorage.setItem(GEAR_TAB_KEY, view)
+}
+
+// ============================================================================
+// THE SPELLS AREA — one nav row, three tabs
+// (docs/plans/spell-upgrades-and-loadout.md §2)
+// ============================================================================
+//
+// THE SECOND AREA, AND IT IS THE GEAR AREA'S CONTRACT WITHOUT A LINE OF NEW MACHINERY. Everything
+// below is the shape JOS-324 settled on, keyed differently: the view ids are ordinary members of
+// the union, App still renders exactly ONE view at a time, and every tab switch travels the same
+// `selectView` a nav row travels. So deep links land, `viewKey` unmounts the outgoing view on a
+// switch, and the Back stack keeps its semantics to the letter - a tab click is MANUAL navigation
+// and clears the parked trail. A bespoke in-area router would have had to re-earn all three.
+//
+// THE ORDER IS THE TAB BAR'S ORDER, and it is the order the questions arrive in. Spellbook is what
+// exists; Upgrades is what to spend on; Loadout is what to have up. Loadout is LAST because it is
+// the only one of the three that is an answer rather than a question, which is the same reason the
+// gear area puts Character and Wish list at its end.
+
+/** Where the area remembers which tab you were last on. Renderer-only, like `GEAR_TAB_KEY`. */
+export const SPELL_TAB_KEY = 'eq.spells.tab'
+
+/** The tab the nav row opens when nothing has been remembered - the area's front door. */
+export const DEFAULT_SPELL_TAB: View = 'spells'
+
+/**
+ * The faces, in tab order - FILTERED BY WHAT THIS BUILD CAN RENDER.
+ *
+ * Derived from `KNOWN_VIEWS` rather than re-spelling the `UNRELEASED` gate, which is what keeps the
+ * two lists from disagreeing: a tab appears exactly when the build can draw the view behind it.
+ * While the gate is up this is the EMPTY ARRAY in a packaged build, and every function below
+ * answers correctly for that - `isSpellAreaView` is false for everything, so no bar is drawn and no
+ * row reads selected. Graduating the area is one word moved in `KNOWN_VIEWS` and no edit down here,
+ * which is exactly how the Character tab graduated in JOS-327.
+ */
+export const SPELL_AREA_VIEWS: readonly View[] = (
+  ['spells', 'spellUpgrades', 'spellLoadout'] as const
+).filter((v) => (KNOWN_VIEWS as readonly View[]).includes(v))
+
+/** Is this view drawn inside the Spells area? (=> the nav row reads selected, the tab bar is up.) */
+export function isSpellAreaView(view: View): boolean {
+  return SPELL_AREA_VIEWS.includes(view)
+}
+
+/**
+ * Which tab the Spells nav row opens: last-used, defaulting to Spellbook.
+ *
+ * Validated against `SPELL_AREA_VIEWS`, so a value written by a dev server (where the gate is down
+ * and all three exist) cannot strand a packaged user on a tab their build does not draw. With the
+ * gate up that array is empty and this answers `DEFAULT_SPELL_TAB` - a view `loadView` will bounce,
+ * which is the correct end state for a row that is not drawn either.
+ */
+export function loadSpellTab(): View {
+  const v = localStorage.getItem(SPELL_TAB_KEY)
+  return v && (SPELL_AREA_VIEWS as readonly string[]).includes(v) ? (v as View) : DEFAULT_SPELL_TAB
+}
+
+/**
+ * Remember the area tab, if this view is one. Called on EVERY view change rather than from the tab
+ * bar's click handler, for `rememberGearTab`'s reason: "last-used tab" has to mean the tab you were
+ * last standing on however you got there, and a deep link and a Back both count.
+ */
+export function rememberSpellTab(view: View): void {
+  if (isSpellAreaView(view)) localStorage.setItem(SPELL_TAB_KEY, view)
 }

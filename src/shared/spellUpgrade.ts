@@ -106,6 +106,46 @@
 // amount of log arithmetic could.
 //
 // ============================================================================
+// A RECORDED DISAGREEMENT: FORM OF THE BEAR IS FILED `hot`, AND THE OWNER SAYS ITS REGEN DOES NOT
+// SCALE (2026-09-10) - UNRESOLVED, AND A SCREENSHOT SETTLES IT
+// ============================================================================
+// The owner's report, verbatim: *"some spells upgraded don't give a benefit beyond reduced mana cost
+// and cast time like Bear Form. It doesn't increase the regen rate or amount, nor does it increase
+// the amount of wisdom when upgraded."*
+//
+// HALF OF THAT IS WHAT THIS FILE ALREADY SAYS, and it is the half nothing disputes: NO category
+// scales a stat grant, so the WIS 5 is WIS 5 at every tier. `spellStats.ts` reads it, nothing here
+// touches it, and `tests/spellbook.test.mts` pins it unchanged from tier 0 to tier 8.
+//
+// THE OTHER HALF IS A CONFLICT AND IT IS NOT PAPERED OVER. Form of the Bear's regen is
+// `Increase Hit points by 1 per tick` on a spell with a duration - which is SPA 100, and both the
+// community model's classifier and `classifyUpgrade` below therefore file it as `hot`, not `buff`.
+// The `hot` rates claim +3% a tier on the tick. The owner says the tick does not move.
+//
+// IT IS STRUCTURALLY IDENTICAL TO A REAL HOT, which is why no classifier can separate them:
+//
+//     Form of the Bear   Beneficial  2h 24m  ["Increase Hit points by 1 per tick", "Increase Wisdom by 5"]
+//     Regeneration       Beneficial  16 Min  ["Increase Hitpoints by 5 per tick"]
+//
+// Nothing in the catalog distinguishes "a form buff that happens to regen" from "a regen spell".
+//
+// WHY THE MODEL IS LEFT ALONE FOR NOW. Reclassifying Form of the Bear to `buff` would need a rule,
+// and the only rules available are inventions - "a spell with a stat grant beside its regen is a
+// buff", "a regen under 2 a tick is a buff" - each of which would silently re-file a set of spells
+// nobody has checked. That is the taxonomy mistake `spellEffectClass.ts`'s header warns about, and
+// the awaiting-sample law says the same thing: an unobserved shape gets no invented rule.
+//
+// SO THE CONFLICT IS DISPLAYED RATHER THAN DECIDED. The `hot` magnitude rate is `'reported'` and
+// the community source itself calls its HoT figure a community table with a single datapoint behind
+// the instant-heal rate it is derived from. A reader looking at Form of the Bear sees a `reported`
+// mark on the one number in dispute, and the surfaces say what that word means.
+//
+// WHAT SETTLES IT, and it is one image: Form of the Bear's in-game tooltip at base and at any tier
+// above it, side by side. If the tick is unchanged, `hot` is wrong for this spell and probably for
+// its whole family, and the fix is a measured rule rather than a guessed one. If the tick moved,
+// the model is right and the owner's recollection was about the WIS.
+
+// ============================================================================
 // AND THE ONE CLAIM THE WHOLE FEATURE HANGS ON
 // ============================================================================
 // A BUFF'S MAGNITUDES DO NOT SCALE. Form of the Bear grants `Increase Hit points by 1 per tick` and
