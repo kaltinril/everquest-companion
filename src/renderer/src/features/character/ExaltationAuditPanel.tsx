@@ -1,20 +1,20 @@
-// character/ExaltationAudit.tsx — the cleanup advisor's panel (fork ask, kaltinril 2026-09-09).
+// character/ExaltationAuditPanel.tsx - the cleanup advisor's panel (fork asks, kaltinril
+// 2026-09-09, revised the same night: terse and actionable). Four short lists, each a verb:
 //
-// Renders `exaltationAudit.ts`'s two finding lists and NOTHING when both are empty — a sheet with
-// tidy sockets should not carry an empty card congratulating it. Every sentence is advice over
-// the player's own dump; the panel deletes nothing and links nothing (the Wish list precedent:
-// this tab takes no router). The class gate behind the "outclassed" rows is the character's
-// CURRENT loadout (the same detected trio the Gear tab reads), and the caption says so, because
-// a swap to a caster loadout changes which higher tiers count as usable.
+//   SWAP  - a socketed gem with a strictly better LOOSE copy of the same effect family, usable
+//           by the current loadout. These are also the RED cards on the grid.
+//   FILL  - an open empty socket and the best remaining loose gem that fits it.
+//   SCRAP - a loose lower tier whose better copy is also owned; safe to feed to a merge.
+//   COPIES - duplicates, counted and never commanded (a spare may be for a second item).
+//
+// The greedy honesty clause lives on the recommender (exaltationAudit.ts): same-family swaps
+// only, no invented cross-family exchange rate, one physical copy never recommended twice. This
+// panel renders nothing when there is nothing to do.
 
-import { useMemo, type JSX } from 'react'
-import { Chip, Paper, Stack, Typography } from '@mui/material'
-import { resolvedClasses } from '@shared/classCombo'
-import type { OwnedExaltation } from '@shared/characterSheet'
+import { type JSX } from 'react'
+import { Paper, Stack, Typography } from '@mui/material'
 import { KnownItemTooltip } from '../../lib/KnownItemTooltip'
-import { useComboSnap } from '../profiles/ClassComboData'
-import { useGearIndex } from '../gear/gearData'
-import { auditExaltations, type DuplicateFinding, type SupersededFinding } from './exaltationAudit'
+import type { DuplicateFinding, ExaltationAudit, Recommendations } from './exaltationAudit'
 
 /** An item name that opens the same hover card every other item name in the app opens. */
 function Name({ children }: { children: string }): JSX.Element {
@@ -27,69 +27,89 @@ function Name({ children }: { children: string }): JSX.Element {
   )
 }
 
-function DuplicateRow({ f }: { f: DuplicateFinding }): JSX.Element {
-  const loose = f.copies - f.socketed
+/** One list under one verb - nothing at all when the list is empty. */
+function Section({ title, lines }: { title: string; lines: JSX.Element[] }): JSX.Element | null {
+  if (lines.length === 0) return null
   return (
-    <Typography variant="body2" color="text.secondary" data-testid="exaltation-duplicate">
+    <>
+      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+        {title}
+      </Typography>
+      {lines}
+    </>
+  )
+}
+
+function swapLines(recs: Recommendations): JSX.Element[] {
+  return recs.swaps.map((s, i) => (
+    <Typography key={`s${String(i)}`} variant="body2" color="text.secondary" data-testid="exaltation-swap">
+      {`${s.cellLabel} ${s.type}: `}
+      <Name>{s.fromName}</Name>
+      {` (${s.fromEffect}) → `}
+      <Name>{s.toName}</Name>
+      {` (${s.toEffect}), copy in ${s.toWhere}`}
+    </Typography>
+  ))
+}
+
+function fillLines(recs: Recommendations): JSX.Element[] {
+  return recs.fills.map((f, i) => (
+    <Typography key={`f${String(i)}`} variant="body2" color="text.secondary" data-testid="exaltation-fill">
+      {`${f.cellLabel} ${f.type} is empty: socket `}
+      <Name>{f.gemName}</Name>
+      {` (${f.effect}) from ${f.where}`}
+    </Typography>
+  ))
+}
+
+/** Loose lower tiers only - the socketed ones are the SWAP list's and the red cards' job. */
+function scrapLines(audit: ExaltationAudit): JSX.Element[] {
+  return audit.superseded
+    .filter((f) => !f.socketed)
+    .map((f, i) => (
+      <Typography key={`x${String(i)}`} variant="body2" color="text.secondary" data-testid="exaltation-scrap">
+        <Name>{f.name}</Name>
+        {` (${f.effect}) in ${f.wheres.join(', ')} - outclassed by `}
+        <Name>{f.betterName}</Name>
+        {` (${f.betterEffect})`}
+      </Typography>
+    ))
+}
+
+function copyLine(f: DuplicateFinding): JSX.Element {
+  return (
+    <Typography key={f.name} variant="caption" color="text.secondary" data-testid="exaltation-duplicate">
       <Name>{f.name}</Name>
-      {` - ${String(f.copies)} copies (${String(f.socketed)} socketed, ${String(loose)} loose): ${f.wheres.join(', ')}`}
+      {` x${String(f.copies)} (${String(f.socketed)} socketed): ${f.wheres.join(', ')}`}
     </Typography>
   )
 }
 
-function SupersededRow({ f }: { f: SupersededFinding }): JSX.Element {
-  return (
-    <Stack direction="row" spacing={0.75} alignItems="center" data-testid="exaltation-superseded">
-      {/* A WORN worse tier is the finding worth a loud chip - you are using the weaker one. */}
-      {f.socketed && <Chip size="small" color="warning" label="worn" sx={{ height: 16 }} />}
-      <Typography variant="body2" color="text.secondary">
-        {`${f.effect} (`}
-        <Name>{f.name}</Name>
-        {`) - outclassed by ${f.betterEffect} (`}
-        <Name>{f.betterName}</Name>
-        {`). In: ${f.wheres.join(', ')}`}
-      </Typography>
-    </Stack>
-  )
-}
-
-export default function ExaltationAudit({ exaltations }: { exaltations: OwnedExaltation[] }): JSX.Element | null {
-  const gear = useGearIndex()
-  const combo = useComboSnap()
-  // Read once so the memo keys on the VALUE (the gearData precedent - `combo.current` itself is
-  // mutable and not a valid dependency).
-  const current = combo.current
-  const classes = useMemo(() => (current === null ? [] : resolvedClasses(current)), [current])
-  const audit = useMemo(
-    () => auditExaltations(exaltations, gear.rows, classes),
-    [exaltations, gear.rows, classes]
-  )
-  if (audit.duplicates.length === 0 && audit.superseded.length === 0) return null
+export default function ExaltationAuditPanel({
+  recs,
+  audit
+}: {
+  recs: Recommendations | null
+  audit: ExaltationAudit | null
+}): JSX.Element | null {
+  if (recs === null || audit === null) return null
+  const swaps = swapLines(recs)
+  const fills = fillLines(recs)
+  const scrap = scrapLines(audit)
+  const copies = audit.duplicates.map(copyLine)
+  if (swaps.length + fills.length + scrap.length + copies.length === 0) return null
   return (
     <Paper variant="outlined" data-testid="exaltation-audit" sx={{ p: 1.5 }}>
-      <Stack spacing={0.75}>
+      <Stack spacing={0.5}>
         <Typography variant="subtitle2">Exaltation cleanup</Typography>
-        {audit.superseded.length > 0 && (
-          <>
-            <Typography variant="caption" color="text.secondary">
-              Outclassed tiers - a better copy of the same effect is in your dump and usable by
-              this loadout:
-            </Typography>
-            {audit.superseded.map((f, i) => (
-              <SupersededRow key={`${f.name}#${String(i)}`} f={f} />
-            ))}
-          </>
-        )}
-        {audit.duplicates.length > 0 && (
-          <>
-            <Typography variant="caption" color="text.secondary">
-              Multiple copies - spares may be for a second item, so nothing here says destroy:
-            </Typography>
-            {audit.duplicates.map((f) => (
-              <DuplicateRow key={f.name} f={f} />
-            ))}
-          </>
-        )}
+        <Section title="Swap (the red cards)" lines={swaps} />
+        <Section title="Fill an empty socket" lines={fills} />
+        <Section title="Scrap candidates" lines={scrap} />
+        <Section title="Copies" lines={copies} />
+        <Typography variant="caption" color="text.disabled">
+          Same-effect upgrades only - nothing here compares one effect against another, and
+          nothing is changed for you.
+        </Typography>
       </Stack>
     </Paper>
   )
