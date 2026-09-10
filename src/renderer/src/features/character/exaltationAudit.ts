@@ -276,10 +276,26 @@ export interface FillRec {
   where: string
 }
 
+/** A socketed gem whose effect family is ALREADY IN FORCE at a higher (or equal, earlier) tier
+ *  elsewhere on the body — same-name effects do not stack, so this socket grants NOTHING. */
+export interface RedundantRec {
+  cellId: string
+  cellLabel: string
+  item: string
+  type: string
+  name: string
+  effect: string
+  /** where the copy that actually counts sits */
+  keptIn: string
+  /** the best loose gem of a family NOT already in force — anything beats a dead socket */
+  replaceWith?: { name: string; effect: string; where: string }
+}
+
 export interface Recommendations {
   swaps: SwapRec[]
   fills: FillRec[]
-  /** cellId → the socketed donor keys a swap wants OUT — the red flag the grid draws */
+  redundant: RedundantRec[]
+  /** cellId → the socketed donor keys advice wants OUT — the red flag the grid draws */
   flaggedByCell: ReadonlyMap<string, ReadonlySet<string>>
 }
 
@@ -361,32 +377,33 @@ function flag(map: Map<string, Set<string>>, cellId: string, key: string): void 
   else map.set(cellId, new Set([key]))
 }
 
-/**
- * The two greedy passes over the worn board. Hosts arrive in sheet order and are answered in it,
- * so the same dump always yields the same advice.
- */
-export function recommendSockets(
-  owned: readonly OwnedExaltation[],
-  rows: readonly GearRow[],
-  classes: readonly ClassAbbr[],
-  hosts: readonly SocketHostCell[]
-): Recommendations {
-  const rowByKey = new Map(rows.map((r) => [r.key, r]))
-  const pool = loosePool(owned)
-  const ctx: RecContext = { pool, rowByKey, classes }
-  const swaps: SwapRec[] = []
-  const fills: FillRec[] = []
-  const flagged = new Map<string, Set<string>>()
+/** One filled host with the effect it will grant AFTER the swap pass — the redundancy board. */
+interface EffectiveHost {
+  host: SocketHostCell
+  eff: KindEffect
+  name: string
+}
+
+/** Pass 1 — same-family upgrades from the loose pool. Returns each filled host's EFFECTIVE
+ *  effect (post-swap), which is what the redundancy pass must judge. */
+function swapPass(
+  ctx: RecContext,
+  hosts: readonly SocketHostCell[],
+  out: { swaps: SwapRec[]; flagged: Map<string, Set<string>> }
+): EffectiveHost[] {
+  const effective: EffectiveHost[] = []
   for (const host of hosts) {
     if (host.currentKey === null) continue
     // A current gem the corpus cannot rank is left alone: "better" would be a guess.
-    const cur = bestEffectFor(rowByKey.get(host.currentKey), host.type)
+    const cur = bestEffectFor(ctx.rowByKey.get(host.currentKey), host.type)
     if (cur === null) continue
     const better = bestLoose(ctx, host.type, (e) => e.family === cur.family && e.tier > cur.tier)
-    if (better === null) continue
-    const where = pool.take(better.key)
-    if (where === undefined) continue
-    swaps.push({
+    const where = better === null ? undefined : ctx.pool.take(better.key)
+    if (better === null || where === undefined) {
+      effective.push({ host, eff: cur, name: host.currentName ?? host.currentKey })
+      continue
+    }
+    out.swaps.push({
       cellId: host.cellId,
       cellLabel: host.cellLabel,
       item: host.item,
@@ -397,13 +414,69 @@ export function recommendSockets(
       toEffect: better.eff.effect,
       toWhere: where
     })
-    flag(flagged, host.cellId, host.currentKey)
+    flag(out.flagged, host.cellId, host.currentKey)
+    effective.push({ host, eff: better.eff, name: better.row.name })
   }
+  return effective
+}
+
+/**
+ * Pass 2 — DUPLICATE FAMILIES IN FORCE (user ruling, kaltinril 2026-09-09: exaltations do not
+ * stack, so we only want a single one of each at the highest level). Same-name effects apply
+ * once — the worn-haste precedent, and the classic focus rule — so of every family socketed
+ * more than once, only the best copy counts and every other one is a DEAD socket. That is the
+ * one place a cross-family suggestion is objective: a duplicate grants nothing, so the best
+ * loose gem of any family NOT already in force beats it by construction.
+ */
+function redundancyPass(
+  ctx: RecContext,
+  effective: readonly EffectiveHost[],
+  out: { redundant: RedundantRec[]; flagged: Map<string, Set<string>> }
+): void {
+  const kept = new Map<string, EffectiveHost>()
+  for (const e of effective) {
+    const held = kept.get(e.eff.family)
+    if (held === undefined || e.eff.tier > held.eff.tier) kept.set(e.eff.family, e)
+  }
+  const inForce = new Set(kept.keys())
+  for (const e of effective) {
+    if (kept.get(e.eff.family) === e) continue
+    out.redundant.push(redundantRec(ctx, e, kept.get(e.eff.family), inForce))
+    if (e.host.currentKey !== null) flag(out.flagged, e.host.cellId, e.host.currentKey)
+  }
+}
+
+/** One dead socket's row: the kept copy's place, and a cross-family replacement when one is loose. */
+function redundantRec(
+  ctx: RecContext,
+  e: EffectiveHost,
+  keptHost: EffectiveHost | undefined,
+  inForce: Set<string>
+): RedundantRec {
+  const repl = bestLoose(ctx, e.host.type, (x) => !inForce.has(x.family))
+  const where = repl === null ? undefined : ctx.pool.take(repl.key)
+  if (repl !== null && where !== undefined) inForce.add(repl.eff.family)
+  return {
+    cellId: e.host.cellId,
+    cellLabel: e.host.cellLabel,
+    item: e.host.item,
+    type: e.host.type,
+    name: e.name,
+    effect: e.eff.effect,
+    keptIn: keptHost === undefined ? '' : keptHost.host.cellLabel,
+    ...(repl === null || where === undefined
+      ? {}
+      : { replaceWith: { name: repl.row.name, effect: repl.eff.effect, where } })
+  }
+}
+
+/** Pass 3 — the best remaining loose gems into open empty sockets. */
+function fillPass(ctx: RecContext, hosts: readonly SocketHostCell[], fills: FillRec[]): void {
   for (const host of hosts) {
     if (host.currentKey !== null) continue
     const best = bestLoose(ctx, host.type, () => true)
     if (best === null) continue
-    const where = pool.take(best.key)
+    const where = ctx.pool.take(best.key)
     if (where === undefined) continue
     fills.push({
       cellId: host.cellId,
@@ -415,7 +488,32 @@ export function recommendSockets(
       where
     })
   }
-  return { swaps, fills, flaggedByCell: flagged }
+}
+
+/**
+ * The three greedy passes over the worn board — swaps, then dead-socket redundancy, then
+ * fills. Hosts arrive in sheet order and are answered in it, so the same dump always yields the
+ * same advice.
+ */
+export function recommendSockets(
+  owned: readonly OwnedExaltation[],
+  rows: readonly GearRow[],
+  classes: readonly ClassAbbr[],
+  hosts: readonly SocketHostCell[]
+): Recommendations {
+  const ctx: RecContext = {
+    pool: loosePool(owned),
+    rowByKey: new Map(rows.map((r) => [r.key, r])),
+    classes
+  }
+  const swaps: SwapRec[] = []
+  const fills: FillRec[] = []
+  const redundant: RedundantRec[] = []
+  const flagged = new Map<string, Set<string>>()
+  const effective = swapPass(ctx, hosts, { swaps, flagged })
+  redundancyPass(ctx, effective, { redundant, flagged })
+  fillPass(ctx, hosts, fills)
+  return { swaps, fills, redundant, flaggedByCell: flagged }
 }
 
 export function auditExaltations(

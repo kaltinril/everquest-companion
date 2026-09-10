@@ -170,3 +170,52 @@ test('a socketed gem the corpus cannot rank is left alone - "better" would be a 
   assert.equal(recs.swaps.length, 0)
   assert.equal(recs.flaggedByCell.size, 0)
 })
+
+test('a family socketed twice is a DEAD socket: the lesser copy is flagged and offered a different family', () => {
+  const rows = [
+    row('aff gem', 'Aff Gem', [{ name: 'Affliction Efficiency I', kind: 'focus', family: 'Affliction Efficiency', familyTier: 1 }]),
+    row('aff gem 2', 'Aff Gem 2', [{ name: 'Affliction Efficiency II', kind: 'focus', family: 'Affliction Efficiency', familyTier: 2 }]),
+    row('other', 'Other', [{ name: 'Improved Damage I', kind: 'focus', family: 'Improved Damage', familyTier: 1 }])
+  ]
+  const recs = recommendSockets(
+    [
+      { name: 'Aff Gem', key: 'aff gem', where: 'socketed in Ear', socketed: true },
+      { name: 'Aff Gem 2', key: 'aff gem 2', where: 'socketed in Ear', socketed: true },
+      { name: 'Other', key: 'other', where: 'Bank 1', socketed: false }
+    ],
+    rows,
+    [],
+    [host('ear1', 'Focus', 'Aff Gem'), host('ear2', 'Focus', 'Aff Gem 2')]
+  )
+  assert.equal(recs.redundant.length, 1)
+  const r = recs.redundant[0]
+  // The tier-II copy is kept; the tier-I ear is the dead socket, replaced cross-family.
+  assert.equal(r.cellId, 'ear1')
+  assert.equal(r.keptIn, 'ear2')
+  assert.equal(r.replaceWith?.name, 'Other')
+  // …and the dead cell is flagged for the grid.
+  assert.ok(recs.flaggedByCell.get('ear1')?.has('aff gem'))
+  assert.equal(recs.flaggedByCell.get('ear2'), undefined)
+})
+
+test('the redundancy pass judges POST-swap effects, so a swap does not create a phantom duplicate', () => {
+  // One ear holds tier I, a loose tier II exists: the swap upgrades the ear, and the OTHER ear
+  // holding an unrelated family stays unflagged.
+  const rows = [
+    row('aff gem', 'Aff Gem', [{ name: 'Affliction Efficiency I', kind: 'focus', family: 'Affliction Efficiency', familyTier: 1 }]),
+    row('aff gem 2', 'Aff Gem 2', [{ name: 'Affliction Efficiency II', kind: 'focus', family: 'Affliction Efficiency', familyTier: 2 }]),
+    row('other', 'Other', [{ name: 'Improved Damage I', kind: 'focus', family: 'Improved Damage', familyTier: 1 }])
+  ]
+  const recs = recommendSockets(
+    [
+      { name: 'Aff Gem', key: 'aff gem', where: 'socketed in Ear', socketed: true },
+      { name: 'Other', key: 'other', where: 'socketed in Ear', socketed: true },
+      { name: 'Aff Gem 2', key: 'aff gem 2', where: 'Bank 1', socketed: false }
+    ],
+    rows,
+    [],
+    [host('ear1', 'Focus', 'Aff Gem'), host('ear2', 'Focus', 'Other')]
+  )
+  assert.equal(recs.swaps.length, 1)
+  assert.equal(recs.redundant.length, 0)
+})
