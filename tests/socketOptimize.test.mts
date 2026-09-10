@@ -125,3 +125,21 @@ test('a move names what it replaces, and the higher tier takes the family seat',
   assert.equal(plan.moves[0].gemName, 'Tier3')
   assert.equal(plan.moves[0].replacesName, 'Tier1')
 })
+
+test('a placement names the donor that FITS the seat, never the claim`s first donor', () => {
+  // Two donors of the same effect and tier: a SECONDARY-only shield gem and a NECK torque.
+  // The neck seat must be labelled with the torque - naming the shield gem here is the bug the
+  // user read as "put my secondary-only exaltation into the neck slot".
+  const rows = [
+    row('shield gem', 'Shield Gem', worn('Shield Gem', 'Spell Guard II'), ['SECONDARY']),
+    row('neck gem', 'Neck Gem', worn('Neck Gem', 'Spell Guard II'), ['NECK'])
+  ]
+  const plan = planBoard(
+    [gem('Shield Gem'), gem('Neck Gem')],
+    rows,
+    [],
+    [seat('neck', 'Worn', 'NECK')]
+  )
+  assert.equal(plan.placements.length, 1)
+  assert.equal(plan.placements[0].gemName, 'Neck Gem')
+})
