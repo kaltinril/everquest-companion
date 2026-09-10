@@ -99,14 +99,23 @@ function scrapLines(audit: ExaltationAudit): JSX.Element[] {
 function planLines(plan: BoardPlan): JSX.Element[] {
   const out: JSX.Element[] = plan.moves.map((m, i) => (
     <Typography key={`p${String(i)}`} variant="body2" color="text.secondary" data-testid="exaltation-plan-move">
-      {`${m.cellLabel} ${m.type}: socket `}
+      {`${m.cellLabel}: socket `}
       <Name>{m.gemName}</Name>
       {` (${m.effect})`}
       {m.replacesName === null
-        ? ' into the empty socket'
+        ? ''
         : ` - replaces ${m.replacesEffect ?? m.replacesName}`}
     </Typography>
   ))
+  for (const [i, c] of plan.clears.entries()) {
+    out.push(
+      <Typography key={`cl${String(i)}`} variant="body2" color="text.secondary" data-testid="exaltation-plan-clear">
+        {`${c.cellLabel}: pull `}
+        <Name>{c.gemName}</Name>
+        {` (${c.effect}) - it now lives in ${c.movedTo}`}
+      </Typography>
+    )
+  }
   for (const [i, c] of plan.contested.entries()) {
     out.push(
       <Typography key={`c${String(i)}`} variant="body2" color="text.secondary" data-testid="exaltation-plan-contested">
@@ -114,7 +123,7 @@ function planLines(plan: BoardPlan): JSX.Element[] {
         <Name>{c.gemName}</Name>
         {c.noSeat
           ? `) has no legal socket on what you wear`
-          : `) stays benched: ${c.options.map((o) => `${o.cellLabel} ${o.type} holds ${o.heldBy}`).join('; ')} - your call which you value more`}
+          : `) stays benched: ${c.options.map((o) => `${o.cellLabel} holds ${o.heldBy}`).join('; ')} - your call which you value more`}
       </Typography>
     )
   }
