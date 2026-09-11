@@ -390,3 +390,30 @@ test('the Classes column narrows to the filter, and the row keeps the whole list
   const [unfiltered] = spellbookRows([many], {}, 0)
   assert.deepEqual(unfiltered.shownAt, unfiltered.at, 'no filter means no narrowing')
 })
+
+test('the Lasts column is absent for an instant and GROWS with the tier', () => {
+  // Malkil's ask (2026-09-10): *"it would be nice to see a Duration column as well for any spell
+  // that has a duration other than Permanent or Instant"*. Absent is exactly those two cases - an
+  // instant has no ticks and a permanent has no end - so the column claims nothing rather than
+  // printing a zero (law 1).
+  const instant = spellbookRow(spell({ name: 'Zap', upgradeCategory: 'nuke', damage: 100 }), 0)
+  assert.equal(instant.durationTicks, undefined, 'a nuke states no duration')
+
+  // …and it is READ AT THE TIER, which matters because duration is one of the few things a mote
+  // rank genuinely moves. It is the column where the slider does visible work on a buff, while the
+  // stats beside it never budge.
+  const buff = spell({ name: 'Long Buff', upgradeCategory: 'buff', durationMs: 660_000 })
+  const base = spellbookRow(buff, 0).durationTicks
+  const top = spellbookRow(buff, SPELL_MAX_RANK).durationTicks
+  assert.equal(base, 110, '11 minutes is 110 ticks')
+  assert.ok(top !== undefined && top > base, `tier ${String(SPELL_MAX_RANK)} lasts longer: ${String(top)}`)
+})
+
+test('the real corpus states a duration on the spells that have one, and not on the rest', () => {
+  const rows = spellbookRows(REAL, {}, 0)
+  const stated = rows.filter((r) => r.durationTicks !== undefined)
+  assert.ok(stated.length > 500, `only ${String(stated.length)} rows state a duration`)
+  assert.ok(stated.length < rows.length, 'and the instants and permanents state none')
+  // Nothing states a zero or a negative - the placeholder is what says "no duration here".
+  for (const r of stated) assert.ok(r.durationTicks !== undefined && r.durationTicks > 0, r.name)
+})

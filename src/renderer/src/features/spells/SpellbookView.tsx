@@ -76,7 +76,15 @@ import { useWindowedRows } from '../../lib/useWindowedRows'
 import SpellbookToolbar from './SpellbookToolbar'
 import SpellIcon from './SpellIcon'
 import { SPELL_ROW_HEIGHT } from './SpellsTypography'
-import { classesText, grantsText, headlineFigure, seconds, whole, UNSTATED } from './spellbookFormat'
+import {
+  classesText,
+  grantsText,
+  headlineFigure,
+  seconds,
+  ticksText,
+  whole,
+  UNSTATED
+} from './spellbookFormat'
 
 /**
  * Dense row height (px) - the number the windowing hook is handed.
@@ -101,7 +109,7 @@ const FIXED_ROW = {
 } as const
 
 /** How many columns a spacer has to span. */
-const COLUMN_COUNT = 9
+const COLUMN_COUNT = 10
 
 /** The spacer rows that reserve the full scroll height - see `useWindowedRows`. */
 function PadRow({ height }: { height: number }): JSX.Element | null {
@@ -243,6 +251,12 @@ replaces ${row.replaces.join(', ')}`
       <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>
         <Typography variant="body2">{seconds(row.castSeconds)}</Typography>
       </TableCell>
+      {/* DURATION AT THE TIER - one of the few columns the slider genuinely moves on a buff. */}
+      <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>
+        <Typography variant="body2" data-testid="spellbook-duration">
+          {ticksText(row.durationTicks)}
+        </Typography>
+      </TableCell>
       <TableCell>
         <PayoffCell row={row} />
       </TableCell>
@@ -353,6 +367,13 @@ export default function SpellbookView(): JSX.Element {
                 <SortCell id="figure" label="Dmg / heal" query={query} onQuery={setQuery} align="right" />
                 <SortCell id="mana" label="Mana" query={query} onQuery={setQuery} align="right" />
                 <SortCell id="cast" label="Cast" query={query} onQuery={setQuery} align="right" />
+                <SortCell
+                  id="duration"
+                  label="Lasts"
+                  query={query}
+                  onQuery={setQuery}
+                  align="right"
+                />
                 <TableCell title={PAYOFF_HEADER_TITLE}>Upgrade</TableCell>
               </TableRow>
             </TableHead>
