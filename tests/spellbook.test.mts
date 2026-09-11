@@ -332,3 +332,61 @@ test('an empty class filter still folds the ladders, and a narrow one folds only
   const everyone = spellbookRows(REAL, { newestOnly: true }, 0)
   assert.ok(everyone.length < REAL.length, 'an empty filter shows every class, so every rung counts')
 })
+
+// =================================================================================================
+// THE FIELDS THAT RIDE ALONG (regression, 2026-09-10)
+// =================================================================================================
+
+test('a row carries the icon, the line and what it replaces - all three, off one source row', () => {
+  // THE ICON WENT MISSING TWICE IN ONE EVENING, both times in a refactor rather than a decision:
+  // the assignments for these three fields sat as three hand-written `!== undefined` guards, and a
+  // change that replaced two of them dropped the third. The owner saw it within the hour -
+  // *"spells lost icons?"* - and this test is why it cannot happen a third time quietly.
+  //
+  // They are one fragment now (`lineFields`), which is the same argument `positive` makes about the
+  // tier base: a guard per field is a chance to lose one.
+  const row = spellbookRow(
+    spell({
+      name: 'Test Ladder',
+      upgradeCategory: 'buff',
+      iconId: 165,
+      line: 'Test line',
+      replaces: [
+        { name: 'Older Thing', cls: 'ENC' },
+        // The catalog states one entry PER CLASS, so a multi-class line repeats its predecessor.
+        { name: 'Older Thing', cls: 'CLR' }
+      ]
+    }),
+    0
+  )
+  assert.equal(row.iconId, 165, 'the gem icon survives the fold')
+  assert.equal(row.line, 'Test line', 'and so does the spell line - the game`s stacking group')
+  assert.deepEqual(row.replaces, ['Older Thing'], 'deduped across the classes that state it')
+})
+
+test('a source row stating none of the three leaves all three ABSENT, never zero or empty', () => {
+  // Law 1 at the field level: an absent icon is not icon 0, and no line is not an empty string.
+  const row = spellbookRow(spell({ name: 'Bare', upgradeCategory: 'buff' }), 0)
+  assert.equal(row.iconId, undefined)
+  assert.equal(row.line, undefined)
+  assert.equal(row.replaces, undefined)
+})
+
+test('the Classes column narrows to the filter, and the row keeps the whole list', () => {
+  // Malkil's declutter ask. `shownAt` is what the cell draws and `at` is what its hover draws, so
+  // the narrowing must never destroy the full list - and with NO filter the two are the same.
+  const many = spell({
+    name: 'Widely Known',
+    upgradeCategory: 'buff',
+    at: [
+      { cls: 'SHM', level: 1 },
+      { cls: 'DRU', level: 4 },
+      { cls: 'CLR', level: 9 }
+    ]
+  })
+  const [narrowed] = spellbookRows([many], { classes: ['SHM'] }, 0)
+  assert.deepEqual(narrowed.shownAt, [{ cls: 'SHM', level: 1 }], 'the cell shows only what you asked')
+  assert.equal(narrowed.at.length, 3, 'and the row still knows every class that gains it')
+  const [unfiltered] = spellbookRows([many], {}, 0)
+  assert.deepEqual(unfiltered.shownAt, unfiltered.at, 'no filter means no narrowing')
+})

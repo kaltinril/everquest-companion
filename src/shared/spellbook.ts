@@ -228,10 +228,15 @@ function gainLevel(s: UnlockSpell): number {
  * Split out for `positive`'s reason: `spellbookRow` is at this tree's complexity ceiling and every
  * optional field written inline costs it a branch.
  */
-function lineFields(s: UnlockSpell): Pick<SpellbookRow, 'line' | 'replaces'> {
+function lineFields(s: UnlockSpell): Pick<SpellbookRow, 'iconId' | 'line' | 'replaces'> {
   // The catalog states one entry per CLASS, so a six-class line repeats its predecessor six times.
   const replaces = [...new Set((s.replaces ?? []).map((r) => r.name))]
   return {
+    // THE ICON RIDES HERE because the block this replaced was writing it, and dropping it took the
+    // gems off every row (reported within the hour, 2026-09-10). Three optional fields read off the
+    // same source row is one fragment, not three - `positive`'s shape, and the reason that rule
+    // exists: a hand-written `!== undefined` guard per field is a chance to lose one in a refactor.
+    ...(s.iconId === undefined ? {} : { iconId: s.iconId }),
     ...(s.line === undefined ? {} : { line: s.line }),
     ...(replaces.length === 0 ? {} : { replaces })
   }

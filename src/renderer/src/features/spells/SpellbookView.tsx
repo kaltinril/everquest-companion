@@ -190,8 +190,14 @@ function SpellRow({ row }: { row: SpellbookRow }): JSX.Element {
         </Stack>
       </TableCell>
       <TableCell>
-        <Typography variant="body2" color="text.secondary" noWrap title={classesText(row.shownAt)}>
-          {classesText(row.at)}
+        {/* THE CELL SHOWS THE CLASSES YOU PICKED, the hover shows every class that gains it. */}
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          noWrap
+          title={classesText(row.at, row.at.length)}
+        >
+          {classesText(row.shownAt)}
         </Typography>
       </TableCell>
       <TableCell>
