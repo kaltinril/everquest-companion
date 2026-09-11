@@ -113,6 +113,19 @@ export interface SpellbookRow {
   /** Mana and cast AT THE REQUESTED TIER. Absent where the page states none. */
   mana?: number
   castSeconds?: number
+  /**
+   * HOW LONG IT LASTS, in ticks, AT THE REQUESTED TIER.
+   *
+   * Malkil, 2026-09-10: *"it would be nice to see a Duration column as well for any spell that has
+   * a duration other than Permanent or Instant"*. Absent is exactly those two cases - an instant
+   * has no ticks to state and a permanent has no end - so the column draws the placeholder and
+   * claims nothing, which is the same rule every other figure on this row follows (law 1).
+   *
+   * READ AT THE TIER, unlike almost everything else here: duration is one of the few things a mote
+   * rank genuinely moves (`UPGRADE_RATES`), so this column is where the slider does visible work on
+   * a buff. The stats beside it never budge, which the Loadout tab says out loud.
+   */
+  durationTicks?: number
   /** Damage and healing at the requested tier, from `metrics` where main computed one. */
   damage?: number
   heal?: number
@@ -123,7 +136,15 @@ export interface SpellbookRow {
 }
 
 /** Which column the list is ordered by. */
-export type SpellbookSort = 'name' | 'level' | 'mana' | 'damage' | 'heal' | 'figure' | 'cast'
+export type SpellbookSort =
+  | 'name'
+  | 'level'
+  | 'mana'
+  | 'damage'
+  | 'heal'
+  | 'figure'
+  | 'cast'
+  | 'duration'
 
 /** What the view asks for. Every field is AND-ed; an absent one filters nothing. */
 export interface SpellbookQuery {
@@ -264,6 +285,7 @@ export function spellbookRow(s: UnlockSpell, tier: number): SpellbookRow {
   if (s.grantsLevel !== undefined) row.grantsLevel = s.grantsLevel
   if (reading.mana !== undefined) row.mana = reading.mana
   if (reading.castSeconds !== undefined) row.castSeconds = reading.castSeconds
+  if (reading.durationTicks !== undefined) row.durationTicks = reading.durationTicks
   if (reading.damage !== undefined) row.damage = reading.damage
   if (reading.heal !== undefined) row.heal = reading.heal
   // `true` or absent, never false - the era sidecar's own shape (law 1).
@@ -376,6 +398,7 @@ const SORT_VALUE: Readonly<Record<SpellbookSort, (row: SpellbookRow) => number |
   level: (r) => r.level,
   mana: (r) => r.mana ?? null,
   cast: (r) => r.castSeconds ?? null,
+  duration: (r) => r.durationTicks ?? null,
   damage: (r) => r.damage ?? null,
   heal: (r) => r.heal ?? null,
   figure: (r) => r.damage ?? r.heal ?? null
