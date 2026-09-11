@@ -154,9 +154,15 @@
 // taxonomy mistake `spellEffectClass.ts` warns about. So it is recorded on the ONE spell it was
 // reported for (`MEASURED_STATIC_MAGNITUDE`), and the `hot` rate is left alone elsewhere.
 //
-// WHAT IS STILL OPEN: whether Chloroplast and Harnessing of Spirit - real HoTs, and the other rows
-// the Upgrades tab ranks on the `hot` rate - behave like Form of the Bear or like the community
-// table. If they match Bear, the rate is wrong for the category rather than for one spell.
+// AND CHLOROPLAST ANSWERED IT THE SAME DAY, which is why the exception list has two members and
+// why the `hot` rate should now be read as suspect for the whole category rather than as a rate
+// with two odd spells in it. Bear Form's regen is 1 a tick and could never have moved under any
+// rate; Chloroplast's is 16, the rate predicts 19 at rank VIII, and the owner's character sheet
+// does not budge. Two spells, one of them decisive.
+//
+// WHAT IS STILL OPEN: the rate is left in place for the DAMAGE half of `hot` and for the spells
+// nobody has read a sheet for. Turning it off wholesale would be an invention in the other
+// direction - and `magnitudeCanMove` already stops it promising anything for a small base.
 
 // ============================================================================
 // AND THE ONE CLAIM THE WHOLE FEATURE HANGS ON
@@ -697,7 +703,13 @@ export function spellTierLadder(base: SpellTierBase): SpellTierReading[] {
 const MEASURED_STATIC_MAGNITUDE: ReadonlySet<string> = new Set([
   // Owner-reported at two ranks, and measured at one: Stats window reads 94 regen / 168 WIS with
   // Bear IV up against 93 / 163 with it down, and he reports the same pair at rank V. See above.
-  'form of the bear'
+  'form of the bear',
+  // CHLOROPLAST IS THE ONE THAT SETTLES THE CATEGORY, 2026-09-10: *"why does HP regen not change
+  // when i level up chloroplast in the game, does it not affect the hp regen at all??"* Its regen
+  // is 16 a tick at level 50 (his character sheet, 88 -> 104), and 16 is large enough to
+  // discriminate where Form of the Bear's 1 was not: the `hot` rate's own prediction at rank VIII
+  // is `floor(16 * 1.24) = 19`, which his character sheet would show and does not.
+  'chloroplast'
 ])
 
 /** Has this spell been MEASURED not to gain magnitude, overriding its category's rate? */

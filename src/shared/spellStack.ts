@@ -216,7 +216,30 @@ function levelStep(formula: number, level: number): number | null {
   if (formula >= 102 && formula <= 105) return level * (formula - 101)
   if (formula >= 107 && formula <= 110) return Math.floor(level / (112 - formula))
   if (formula >= 111 && formula <= 114) return level * (formula - 108)
-  return null
+  const measured = MEASURED_STEPS[formula]
+  return measured === undefined ? null : Math.floor(level / measured)
+}
+
+/**
+ * FORMULAS THIS TREE HAS MEASURED RATHER THAN READ OFF A LIST, as `level / divisor`.
+ *
+ * The table above is EQEmu's own and covers the formulas EQEmu documents. This client uses others,
+ * and an unmodelled formula reads as its bare base - which is silent, wrong, and exactly what the
+ * owner caught (2026-09-10): *"when i cast mine it goes from 88 to 104, that's 16 not 11"*.
+ * Chloroplast's hitpoint row is base 6, formula 139, cap 19, and he is level 50. `6 + 50/5 = 16`.
+ *
+ * ONE DATAPOINT PER ENTRY, AND THE ENTRY SAYS SO. A single reading cannot separate `level / 5` from
+ * several other curves that also pass through 16 at level 50; what it does establish is that the
+ * bare base (6) is wrong by ten. `level / 5` is the shape the rest of this table already uses, so
+ * it is the least invented answer available - and a second reading at any other level would pin it
+ * outright. Until one arrives this is the honest state: measured at one point, shaped by analogy.
+ */
+const MEASURED_STEPS: Readonly<Record<number, number>> = {
+  // Chloroplast, owner's character sheet at level 50: Combat HP Regen 88 -> 104, so 16 a tick over
+  // a base of 6. CORROBORATED BY THE CATALOG, which states the ramp outright - `Increase Hitpoints
+  // by 10 (L39) to 16 (L50) per tick` - and puts a second point on the curve: +4 over eleven levels
+  // is the same `level / 5` the character sheet gives at 50.
+  139: 5
 }
 
 export function calcSpellValue(base: number, formula: number, max: number, level: number): number {
