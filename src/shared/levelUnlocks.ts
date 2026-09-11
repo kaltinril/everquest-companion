@@ -56,6 +56,21 @@ export interface UnlockSpell {
    * Absent for a spell the shipped ladders do not place, which is most one-offs.
    */
   line?: string
+  /**
+   * THIS BENEFICIAL SPELL IMMOBILISES WHOEVER IT LANDS ON.
+   *
+   * Malkil, 2026-09-10: *"It recommended that I use Treeform. On paper, it almost makes sense, but
+   * it roots the caster."* He is right, and it is the one cost in this vocabulary that no amount of
+   * stats can outweigh - a buff you cannot walk under is not a buff you keep up.
+   *
+   * The catalog states it outright: Treeform's effect list reads `Illusion (race #143)`, `Root`,
+   * `Increase Hitpoints by 3 per tick...`, `Decrease Fire Resist by 10`. So this is a field read,
+   * not an inference, and it needs no client install. 19 beneficial spells in the owner's client
+   * carry the root effect; the committed catalog names it on the ones it carries.
+   *
+   * `true` or ABSENT, never false - law 1, like every other verdict on this row.
+   */
+  roots?: true
   /** the (class, level) pairs `shared/spellLevels.ts` read out of the wiki's bullet list */
   at: { cls: ClassAbbr; level: number }[]
   /** cast time in ms, when the page states one */

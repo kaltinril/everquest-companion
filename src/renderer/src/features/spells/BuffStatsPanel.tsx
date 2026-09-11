@@ -38,7 +38,9 @@ const TINY_CHIP = { height: 18, fontSize: 10, '& .MuiChip-label': { px: 0.6 } } 
  * left to be discovered.
  */
 export default function BuffStatsPanel({ totals, tier }: { totals: BuffTotals; tier: number }): JSX.Element {
-  const rows = [...totals.points, ...totals.percents]
+  // ONE READING ORDER, points and percents interleaved - `buffTotals` states it (the fold keeps the
+  // two KINDS apart for the arithmetic, which is a different claim from how they are drawn).
+  const rows = totals.rows
   return (
     <Paper variant="outlined" sx={{ p: 1.25, position: 'sticky', top: 8 }} data-testid="buff-stats">
       <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 0.75 }}>

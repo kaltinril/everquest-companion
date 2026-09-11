@@ -358,6 +358,17 @@ function writeInputs(
  *
  * Its own function because `unlockSpells` sits at this tree's complexity ceiling.
  */
+/**
+ * Does this spell immobilise whoever it lands on?
+ *
+ * A ROOT ON A BENEFICIAL SPELL IS A COST THE STATS CANNOT OUTWEIGH - `UnlockSpell.roots` carries
+ * the report. The wiki writes it as its own bare effect line, which is what makes this a field read
+ * rather than an inference; its own function because `unlockSpells` sits at the complexity ceiling.
+ */
+function rootsTarget(effects: readonly string[] | undefined): boolean {
+  return (effects ?? []).some((line) => line.trim().toLowerCase() === 'root')
+}
+
 function writeLineage(spell: UnlockSpell, at: readonly { cls: ClassAbbr; level: number }[]): void {
   const replaces = replacesFor(spell.name, at)
   if (replaces) spell.replaces = replaces
@@ -390,6 +401,7 @@ function unlockSpells(client: SpellResistTable | null): UnlockSpell[] {
     if (s.illusion) spell.illusion = true
     writeFigures(spell, s, at, client)
     writeLineage(spell, at)
+    if (rootsTarget(s.effects)) spell.roots = true
     out.push({
       spell,
       ...(s.msgCastOnYou === undefined ? {} : { you: s.msgCastOnYou }),
