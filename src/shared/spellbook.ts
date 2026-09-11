@@ -123,6 +123,25 @@ export interface SpellbookQuery {
    * Upgrades tab's "dead ends" panel, which is the same question asked the other way round.
    */
   payoffMagnitudeOnly?: boolean
+  /**
+   * ONLY THE NEWEST RUNG OF EACH SPELL LINE.
+   *
+   * The owner's ask, verbatim (2026-09-10): *"can we get a 'latest level' or 'highest version'
+   * toggle chip on the spellbook tab also? I don't need to see 5 different versions of regeneration
+   * or poison resist etc"*.
+   *
+   * IT READS THE SHIPPED SPELL LINES RATHER THAN GUESSING FROM NAMES. `UnlockSpell.replaces` is the
+   * ladder JOS-391 joined main-side, per class - so "Chloroplast replaces Regeneration (SHM)" is a
+   * fact the corpus states, not a prefix match on a word. A name-based rule would fold `Resist
+   * Fire` into `Resist Cold` on the shared word and would miss every line whose rungs are named
+   * differently (Regeneration -> Chloroplast -> Quiescence), which is most of them.
+   *
+   * IT IS SCOPED TO THE CLASSES ON SCREEN, which is the half that makes it honest. A spell is only
+   * hidden when the newer rung belongs to a class the current filter is SHOWING: a Shaman's
+   * Regeneration being superseded is no reason to hide it from a reader browsing Druid spells, and
+   * hiding a rung whose replacement the reader cannot see would make the list lie about what exists.
+   */
+  newestOnly?: boolean
   sort?: SpellbookSort
   /** Descending, when the column reads better that way. Name always reads ascending. */
   desc?: boolean
@@ -227,6 +246,38 @@ function makeKeysUnique(rows: SpellbookRow[]): void {
   }
 }
 
+/**
+ * Every spell a SURVIVING later rung of its own line replaces, for the classes on screen.
+ *
+ * THE REPLACEMENT HAS TO BE ON SCREEN TOO, and that is the whole subtlety. The first cut of this
+ * hid anything the corpus said was superseded by anything, and it deleted whole lines: a MNK/SHM/WAR
+ * reader lost Regeneration AND Chloroplast, because something replaces Chloroplast too - a rung his
+ * trio cannot cast. 208 rows became 78 and the lines he asked to see the newest of vanished
+ * entirely, which is the opposite of what the chip promises.
+ *
+ * So the set is built from the rows that already SURVIVED every other filter. A rung is hidden only
+ * when the thing that supersedes it is right there in the same list, which makes "show me the
+ * newest" true by construction: the highest VISIBLE rung of every line always stays.
+ *
+ * Built once per fold rather than asked per row - it is a property of the whole result, and a
+ * per-row answer would be a scan inside a scan. See `SpellbookQuery.newestOnly` for why it reads
+ * `replaces` rather than matching names.
+ */
+function supersededNames(
+  survivors: readonly UnlockSpell[],
+  classes: readonly ClassAbbr[] | undefined
+): Set<string> {
+  const shown = classes !== undefined && classes.length > 0 ? new Set(classes) : null
+  const out = new Set<string>()
+  for (const s of survivors) {
+    for (const r of s.replaces ?? []) {
+      // An empty class filter shows every class, so every replacement counts.
+      if (shown === null || shown.has(r.cls)) out.add(r.name)
+    }
+  }
+  return out
+}
+
 /** Does this spell survive the query's filters? Split out to keep the fold under the ceiling. */
 function admits(s: UnlockSpell, q: SpellbookQuery, text: string): boolean {
   // AN EMPTY LIST FILTERS NOTHING, which is the show-all state and not a filter that excludes
@@ -271,9 +322,13 @@ export function spellbookRows(
   tier: number
 ): SpellbookRow[] {
   const text = (q.text ?? '').trim().toLowerCase()
+  // TWO PASSES WHEN THE CHIP IS ON: everything that survives the ordinary filters, then the rungs
+  // a SURVIVOR replaces. See `supersededNames` for why the replacement has to survive too.
+  const admitted = spells.filter((s) => admits(s, q, text))
+  const superseded = q.newestOnly === true ? supersededNames(admitted, q.classes) : null
   const out: SpellbookRow[] = []
-  for (const s of spells) {
-    if (!admits(s, q, text)) continue
+  for (const s of admitted) {
+    if (superseded?.has(s.name) === true) continue
     const row = spellbookRow(s, tier)
     if (q.payoffMagnitudeOnly !== undefined && row.payoff.magnitude !== q.payoffMagnitudeOnly) {
       continue

@@ -7,6 +7,7 @@
 
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
+import type { ClassAbbr } from '../src/shared/classCombo'
 import type { UnlockSpell } from '../src/shared/levelUnlocks'
 import {
   PAYOFF_MARKS,
@@ -254,4 +255,73 @@ test('a real query narrows the real corpus', () => {
   const clr = spellbookRows(REAL, { classes: ['CLR'] }, 0)
   assert.ok(clr.length > 50 && clr.length < REAL.length, `CLR: ${String(clr.length)} rows`)
   for (const r of clr) assert.ok(r.at.some((p) => p.cls === 'CLR'), r.name)
+})
+
+// =================================================================================================
+// NEWEST RANK ONLY (owner ask 2026-09-10)
+// =================================================================================================
+//
+// *"can we get a 'latest level' or 'highest version' toggle chip on the spellbook tab also? I don't
+// need to see 5 different versions of regeneration or poison resist etc"*.
+
+test('the chip hides lower rungs and keeps the top of each line', () => {
+  const trio: ClassAbbr[] = ['MNK', 'SHM', 'WAR']
+  const all = spellbookRows(REAL, { classes: trio }, 0)
+  const top = spellbookRows(REAL, { classes: trio, newestOnly: true }, 0)
+  assert.ok(top.length < all.length, 'it has to actually hide something')
+  const kept = new Set(top.map((r) => r.name))
+  // The regen ladder for this trio is Regeneration -> Chloroplast -> Regrowth. Only the last stands.
+  assert.ok(kept.has('Regrowth'), 'the newest rung stays')
+  assert.ok(!kept.has('Chloroplast'), 'the middle rung goes')
+  assert.ok(!kept.has('Regeneration'), 'and so does the bottom one')
+  // …and it is the SHIPPED ladder doing it, not a name match: none of those three share a word.
+})
+
+test('NO SPELL LINE DISAPPEARS - the invariant that makes the chip honest', () => {
+  // THE FIRST CUT OF THIS FAILED HERE, and it is the failure worth a test rather than a comment: it
+  // hid anything the corpus said was superseded by anything at all, including by rungs this trio
+  // cannot cast. Whole ladders vanished - a reader asking for "the newest Regeneration" was shown
+  // no Regeneration at all, which is worse than the five rows he was complaining about.
+  const trio: ClassAbbr[] = ['MNK', 'SHM', 'WAR']
+  const visible = new Set(spellbookRows(REAL, { classes: trio }, 0).map((r) => r.name))
+  const kept = new Set(spellbookRows(REAL, { classes: trio, newestOnly: true }, 0).map((r) => r.name))
+
+  // Union-find over `replaces`, restricted to what this trio can see - one component per line.
+  const parent = new Map<string, string>()
+  for (const n of visible) parent.set(n, n)
+  const find = (x: string): string => {
+    let r = x
+    for (;;) {
+      const up = parent.get(r)
+      if (up === undefined || up === r) return r
+      r = up
+    }
+  }
+  for (const s of REAL) {
+    if (!visible.has(s.name)) continue
+    for (const r of s.replaces ?? []) {
+      if (!visible.has(r.name)) continue
+      const a = find(s.name)
+      const b = find(r.name)
+      if (a !== b) parent.set(a, b)
+    }
+  }
+  const lines = new Map<string, string[]>()
+  for (const n of visible) {
+    const root = find(n)
+    const members = lines.get(root)
+    if (members) members.push(n)
+    else lines.set(root, [n])
+  }
+  const dead = [...lines.values()].filter((members) => !members.some((m) => kept.has(m)))
+  assert.deepEqual(dead, [], 'every line must still show at least its highest visible rung')
+})
+
+test('an empty class filter still folds the ladders, and a narrow one folds only its own', () => {
+  // The scoping rule: a rung is hidden only when its replacement belongs to a class ON SCREEN.
+  // Filtered to WIZ, a Shaman's ladders are none of this filter's business.
+  const wiz = spellbookRows(REAL, { classes: ['WIZ'], newestOnly: true }, 0)
+  assert.ok(wiz.every((r) => r.at.some((p) => p.cls === 'WIZ')), 'the class filter still holds')
+  const everyone = spellbookRows(REAL, { newestOnly: true }, 0)
+  assert.ok(everyone.length < REAL.length, 'an empty filter shows every class, so every rung counts')
 })
