@@ -151,6 +151,8 @@ interface PageCtx {
   wikiSources?: ItemDropSource[]
   /** the page-top `{{X Era}}` banner's token; absent when the page opened with none */
   eraTag?: string
+  /** the `Charges:` stat row, verbatim; absent when the block stated none */
+  charges?: string
   /** the page TITLE keys to the item name — this is the item's own page, not a variant of it */
   canonical: boolean
   /** nothing on this item can be donated (V9) — its effects are counted and never emitted */
@@ -307,6 +309,7 @@ function pageContext(
       // independent witnesses and the join belongs where both are in hand (design §4.2).
       wikiSources: k.dropsFrom,
       eraTag: k.eraTag,
+      charges: k.stats?.stats.find((r) => r.key.trim().toUpperCase() === 'CHARGES')?.value,
       canonical: itemKey(entry.page) === key,
       excluded: excludedDonor(k.name, k.research)
     },
@@ -348,7 +351,8 @@ function donorRow(
     // Copied per row (donors are denormalized by effect) so a consumer never has to hold a
     // second index to answer "where does this one drop".
     wikiSources: ctx.wikiSources ? ctx.wikiSources.map((s) => ({ ...s })) : undefined,
-    eraTag: ctx.eraTag
+    eraTag: ctx.eraTag,
+    charges: ctx.charges
   }
 }
 

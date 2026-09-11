@@ -62,7 +62,7 @@
 // result now counts what the two view toggles are holding back and names them, because a filter
 // that can hide everything must be able to admit it (`hiddenByView`, plannerData.ts).
 
-import { type JSX, useCallback, useDeferredValue, useEffect, useMemo, useRef } from 'react'
+import { type JSX, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { Box, Typography } from '@mui/material'
 import type { ClassAbbr } from '@shared/classCombo'
 import type { SocketType } from '@shared/planner/types'
@@ -81,7 +81,9 @@ import {
   useNonEquip,
   type DonorFilters,
   type DonorRow,
-  type HiddenByView
+  type DonorView,
+  type HiddenByView,
+  type OwnedMode
 } from './plannerData'
 import { browserRows, groupDonors, type BrowserRow, type GroupAxis } from './plannerGroups'
 import { itemFits, type ItemFocus } from './plannerPreset'
@@ -99,7 +101,7 @@ import { useRemembered, useRememberedSearch } from '../gear/useAreaMemory'
 // JOS-344 — the donor names get the Gear tab's comparison pair. Same two hooks the Gear tab calls,
 // across the same seam the four lines above already cross; see `compare` in the component.
 import { ITEM_UPGRADE_BASE } from '@shared/itemUpgrade'
-import { useGearCompare, useGearIndex, type GearCompareData } from '../gear/gearData'
+import { useGearCompare, useGearIndex, useGearOwnership, type GearCompareData } from '../gear/gearData'
 
 // ---- the row pipeline ------------------------------------------------------------------
 
@@ -109,7 +111,7 @@ interface RowsInput {
   /** the DEFERRED search text (the standing search law) */
   text: string
   planClasses: readonly ClassAbbr[]
-  view: { eraOnly: boolean; nonEquip: boolean }
+  view: DonorView
   /**
    * The ITEM the browser is narrowed to (V8's preset host, or one picked by hand since JOS-210),
    * or null for the free browser. It is R2 and R3 in one object: only effects that can legally be
@@ -292,6 +294,29 @@ export interface EffectBrowserProps {
   onOpenLoot?: (item: string) => void
 }
 
+// The two mount-local hide filters and the ownership key set they read (split out of the
+// component at the 100-line ceiling). Ownership is the Gear tab's own join, folded to a set.
+function useOwnedFilterState(): {
+  ownedMode: OwnedMode
+  setOwnedMode: (v: OwnedMode) => void
+  hideCharged: boolean
+  setHideCharged: (v: boolean) => void
+  ownedKeys: ReadonlySet<string> | undefined
+} {
+  const [ownedMode, setOwnedMode] = useState<OwnedMode>('all')
+  const [hideCharged, setHideCharged] = useState(false)
+  const ownership = useGearOwnership()
+  const ownedKeys = useMemo<ReadonlySet<string> | undefined>(() => {
+    if (ownership.map === null) return undefined
+    const out = new Set<string>()
+    for (const [key, o] of ownership.map) {
+      if (o.owned || o.looted || o.exaltations > 0) out.add(key)
+    }
+    return out
+  }, [ownership.map])
+  return { ownedMode, setOwnedMode, hideCharged, setHideCharged, ownedKeys }
+}
+
 export default function EffectBrowser({
   classes,
   wished,
@@ -343,9 +368,17 @@ export default function EffectBrowser({
 
   // The input echoes instantly; the FILTER runs on the deferred value (the standing search law).
   const deferredText = useDeferredValue(text)
+  // THE OWNED TRI-STATE (fork ask 2026-09-09). Mount-local like the search box, and its evidence
+  // is the Gear tab's own ownership join: the dump plus the loot log, exaltation copies counted
+  // (`useOwnedOrLooted`'s reading, folded to a key set here so the pure filter takes no hook).
+  const ownedFilter = useOwnedFilterState()
+  const { ownedMode, setOwnedMode, hideCharged, setHideCharged, ownedKeys } = ownedFilter
   // Read out of the tuples so the memo's dependency list names the VALUES: the setter half of
   // each tuple is a fresh identity nothing here depends on.
-  const view = useMemo(() => ({ eraOnly: era[0], nonEquip: nonEquip[0] }), [era, nonEquip])
+  const view = useMemo<DonorView>(
+    () => ({ eraOnly: era[0], nonEquip: nonEquip[0], owned: ownedMode, ownedKeys, hideCharged }),
+    [era, nonEquip, ownedMode, ownedKeys, hideCharged]
+  )
   const { rows, hidden } = useVisibleRows({
     donors,
     filters,
@@ -394,6 +427,9 @@ export default function EffectBrowser({
         era={era}
         nonEquip={nonEquip}
         groupBy={groupBy}
+        owned={[ownedMode, setOwnedMode]}
+        charged={[hideCharged, setHideCharged]}
+        ownedKnown={ownedKeys !== undefined}
         focus={focus}
         setFocus={pickItem}
       />

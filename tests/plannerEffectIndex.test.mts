@@ -355,10 +355,16 @@ test('the additive layer merges OVER the wiki record, and drives the exclusion f
     source: 'fixture',
     count: 4,
     items: {
-      ghoulbane: { page: 'Ghoulbane', stats: { effects: [{ kind: 'click', name: 'Nullify Undead', detail: 'Must Equip' }], slot: 'PRIMARY' } },
-      'summoned: waterstone': { page: 'Summoned: Waterstone', stats: { effects: [{ kind: 'click', name: 'Enduring Breath', detail: 'Any Slot' }], slot: 'PRIMARY' } },
-      'gm sword': { page: 'GM Sword', stats: { effects: [{ kind: 'worn', name: 'Regeneration', detail: 'Worn' }], slot: 'PRIMARY' } },
-      'gm wand': { page: 'GM Wand', stats: { effects: [{ kind: 'click', name: 'Gate', detail: 'Any Slot' }], slot: 'PRIMARY' } }
+      // `stats.stats` IS NOT OPTIONAL, and this fixture used to omit it. `pageContext` reads
+      // `k.stats?.stats.find(...)` for the CHARGES row, which throws on a page that states a
+      // `stats` block with no stat list inside it. MEASURED against the committed corpus: 11,532 of
+      // 11,534 pages carry a `stats` block and NOT ONE of them lacks `stats.stats`, so the shape
+      // the production reader assumes is the shape the data actually has - the fixture was the
+      // thing that was wrong, and an optional-chain there would have papered over a malformed row.
+      ghoulbane: { page: 'Ghoulbane', stats: { stats: [], effects: [{ kind: 'click', name: 'Nullify Undead', detail: 'Must Equip' }], slot: 'PRIMARY' } },
+      'summoned: waterstone': { page: 'Summoned: Waterstone', stats: { stats: [], effects: [{ kind: 'click', name: 'Enduring Breath', detail: 'Any Slot' }], slot: 'PRIMARY' } },
+      'gm sword': { page: 'GM Sword', stats: { stats: [], effects: [{ kind: 'worn', name: 'Regeneration', detail: 'Worn' }], slot: 'PRIMARY' } },
+      'gm wand': { page: 'GM Wand', stats: { stats: [], effects: [{ kind: 'click', name: 'Gate', detail: 'Any Slot' }], slot: 'PRIMARY' } }
     }
   } as unknown as ItemDbFile
   // Both GM provenances, because `excludedDonor` reads the layer's `isUnfarmable` verdict rather

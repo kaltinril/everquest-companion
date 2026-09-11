@@ -56,13 +56,12 @@ const TAB = '[data-testid="tab-character"]'
 
 const SHEET = '[data-testid="character-sheet"]'
 const SLOT_GRID = '[data-testid="character-slot-grid"]'
-/** JOS-327: the chips under a worn item's name, one per socketed exaltation. */
-const EXALTATION = '[data-testid="character-exaltation"]'
-/** The socket line (owner ask 2026-08-23): four chips under a worn item whose name states a `+N`. */
+/** The MERGED socket row (fork, 2026-09-09): one chip per socket, labelled with its content. */
 const SOCKETS = '[data-testid="character-sockets"]'
 const SOCKET = '[data-testid^="character-socket-"]'
-/** …of which the OPEN ones are MUI's filled variant; the locked ones are outlined and dimmed. */
-const SOCKET_OPEN = `${SOCKET}.MuiChip-filled`
+/** The three states the row encodes — `data-state` exists for exactly this spec's benefit. */
+const SOCKET_FILLED = `${SOCKET}[data-state="filled"]`
+const SOCKET_OPEN = `${SOCKET}[data-state="open"]`
 const cellOf = (id: string): string => `[data-testid="character-slot-${id}"]`
 
 /** JOS-327: everything you carry. */
@@ -220,11 +219,13 @@ async function stepSheet(page: Page): Promise<void> {
     s.exaltations.every((n) => !n.includes('(Exaltation)')),
     s.exaltations.join(' · ')
   )
-  const drawn = await countOf(page, EXALTATION)
+  // The merged row (fork, 2026-09-09): a socketed exaltation is a FILLED socket chip now,
+  // labelled `Type: Name`, so the count moves from the retired plain-chip row to `data-state`.
+  const drawn = await countOf(page, SOCKET_FILLED)
   check(
-    `…and the grid DRAWS one chip per socket (${String(EXALTATIONS)})`,
+    `…and the grid DRAWS one filled socket chip per socketed exaltation (${String(EXALTATIONS)})`,
     drawn === EXALTATIONS,
-    `${String(drawn)} chips under ${String(await countOf(page, SLOT_GRID))} grid(s)`
+    `${String(drawn)} filled chips under ${String(await countOf(page, SLOT_GRID))} grid(s)`
   )
 }
 
@@ -249,10 +250,11 @@ async function stepSockets(page: Page): Promise<void> {
   const headAll = await countOf(page, `${cellOf('head')} ${SOCKET}`)
   const headOpen = await countOf(page, `${cellOf('head')} ${SOCKET_OPEN}`)
   check(
-    'a +1 helmet shows four sockets with exactly one of them open',
+    'a +1 helmet shows four sockets with exactly one of them open-and-empty',
     headAll === 4 && headOpen === 1,
     `${String(headOpen)} open of ${String(headAll)}`
   )
+  // The staged gauntlets carry no exaltations, so at +5 all four sockets read open-and-empty.
   const handsOpen = await countOf(page, `${cellOf('hands')} ${SOCKET_OPEN}`)
   check('…and +5 gauntlets show all four open', handsOpen === 4, `${String(handsOpen)} open`)
 }

@@ -10,11 +10,13 @@ import {
   extractionCost,
   extractionTier,
   narrowedClasses,
+  narrowedSlots,
   planWarnings,
+  slotFits,
   socketCompatibility,
   type DonorIndex
 } from '../src/shared/planner/rules'
-import type { ExaltPlan, PlannerDonor, SocketType } from '../src/shared/planner/types'
+import type { EquipSlot, ExaltPlan, PlannerDonor, SocketType } from '../src/shared/planner/types'
 import { EXALTATION_SLOT_TYPES, expToNextTier } from '../src/shared/itemStats'
 
 function donor(over: Partial<PlannerDonor> = {}): PlannerDonor {
@@ -301,4 +303,77 @@ test('a donor key that carries several effects resolves by effect name', () => {
     slots: { PRIMARY: { hostKey: 'host', sockets: { proc: { effect: 'Lifetap', donorKey: 'multi' } } } }
   })
   assert.deepEqual(planWarnings(wrong, index(multi)).map((w) => w.kind), ['unknown-donor'])
+})
+
+// =================================================================================================
+// R2's SLOT HALF, CORRECTED (user report via a fork player, 2026-09-10)
+// =================================================================================================
+//
+// The report, near-verbatim: *"Exaltation Slot restrictions must MATCH AT LEAST ONE OF THE ITEM
+// Slot restrictions. The resulting combination may further restrict what slots the combined Item
+// and Exaltation can be placed in. An Any slot can take any valid Item + Exaltation combination."*
+// followed by the symptom: *"Right now it thinks that there's no exaltations that can be used in
+// the Any slots because there are no 'Any slot' exaltations."*
+//
+// Three facts, and the old code conflated two: the DONOR's slots, the HOST ITEM's slots, and the
+// CELL. See `shared/planner/rules.ts slotFits`.
+
+test('the pair is legal when donor and ITEM share a slot, whatever the cell is called', () => {
+  // A SECONDARY-only gem into a sword that can go in either hand: legal, and the pair is then
+  // secondary-only.
+  assert.equal(slotFits(['SECONDARY'], ['PRIMARY', 'SECONDARY'], 'SECONDARY'), true)
+  // …and it may NOT then be worn in the primary hand, which is the "further restricts" half.
+  assert.equal(slotFits(['SECONDARY'], ['PRIMARY', 'SECONDARY'], 'PRIMARY'), false)
+  // No shared slot at all: illegal wherever you put it.
+  assert.equal(slotFits(['HEAD'], ['PRIMARY', 'SECONDARY'], null), false)
+})
+
+test('AN ANY CELL TAKES ANY VALID PAIR - the reported bug, pinned', () => {
+  // The owner's own dump: two `Any Slot` cells holding ordinary SECONDARY items with seven empty
+  // sockets between them. Every one of these used to answer false, because the cell names no equip
+  // slot and no exaltation is ever stated as `Any Slot`.
+  const bladestopper: readonly EquipSlot[] = ['SECONDARY']
+  assert.equal(slotFits(['SECONDARY'], bladestopper, null), true, 'a SECONDARY gem in a SECONDARY item')
+  assert.equal(slotFits(['PRIMARY', 'SECONDARY'], bladestopper, null), true, 'an either-hand gem')
+  // …and an any-cell is still not a permit: a gem that shares NO slot with the host is refused.
+  assert.equal(slotFits(['HEAD'], bladestopper, null), false, 'a HEAD gem in a SECONDARY item')
+})
+
+test('a donor stating no slot fails everywhere - law 1, unchanged', () => {
+  assert.equal(slotFits([], ['PRIMARY'], 'PRIMARY'), false)
+  assert.equal(slotFits([], ['PRIMARY'], null), false)
+  assert.equal(slotFits([], [], null), false)
+})
+
+test('an unknown HOST is our ignorance, not the item`s, and does not veto', () => {
+  // An item the corpus lacks has no slots to intersect. The CELL then decides alone, which is
+  // exactly what every caller did before this fix - so a corpus miss is no worse off.
+  assert.equal(slotFits(['PRIMARY'], [], 'PRIMARY'), true)
+  assert.equal(slotFits(['PRIMARY'], [], 'CHEST'), false)
+  // …and under an ANY cell nothing known contradicts the pair, so the LINT passes it. A
+  // RECOMMENDER wants the opposite bar and keeps its own guard - see the function's header.
+  assert.equal(slotFits(['PRIMARY'], [], null), true)
+})
+
+test('socketCompatibility carries the cell through as a fourth fact', () => {
+  const d = donor() // PRIMARY only
+  // The host can hold either hand; the cell decides which the PAIR ends up restricted to.
+  assert.deepEqual(socketCompatibility(d, ['PRIMARY', 'SECONDARY'], ['PAL'], 'PRIMARY'), { ok: true })
+  assert.deepEqual(socketCompatibility(d, ['PRIMARY', 'SECONDARY'], ['PAL'], 'SECONDARY'), {
+    ok: false,
+    reason: 'slot'
+  })
+  // An any-cell (null) constrains nothing, so the pair alone decides.
+  assert.deepEqual(socketCompatibility(d, ['PRIMARY', 'SECONDARY'], ['PAL'], null), { ok: true })
+  assert.deepEqual(socketCompatibility(d, ['HEAD'], ['PAL'], null), { ok: false, reason: 'slot' })
+})
+
+test('narrowedSlots states what the COMBINED item is restricted to', () => {
+  // The display twin of the test above, and the report's "may further restrict" half.
+  assert.deepEqual(narrowedSlots(['PRIMARY', 'SECONDARY'], ['SECONDARY']), ['SECONDARY'])
+  assert.deepEqual(narrowedSlots(['FINGER'], ['FINGER']), ['FINGER'])
+  // Unknown on either side returns the other unchanged - never an empty list, which would read as
+  // "wearable nowhere". Same rule `narrowedClasses` follows, and deliberately NOT `slotFits`'s.
+  assert.deepEqual(narrowedSlots([], ['SECONDARY']), ['SECONDARY'])
+  assert.deepEqual(narrowedSlots(['SECONDARY'], []), ['SECONDARY'])
 })

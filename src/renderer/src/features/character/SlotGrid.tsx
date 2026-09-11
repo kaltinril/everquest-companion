@@ -47,7 +47,17 @@ import { Box, Chip, Paper, Stack, Typography } from '@mui/material'
 import Tooltip from '../../lib/Tooltip'
 import type { SheetCellView, SheetColumn } from '@shared/characterSheet'
 import type { EquipSlot } from '@shared/planner/types'
-import { cellsShowingWishes, slotOfCell, socketStates, type SlotWish } from './slotSockets'
+import {
+  cellsShowingWishes,
+  slotOfCell,
+  socketChips,
+  unplacedExaltations,
+  type SlotWish,
+  type SocketChip,
+  type SocketedItem
+} from './slotSockets'
+import { ownershipKey } from '@shared/planner/ownership'
+import type { KindEffect } from './exaltationAudit'
 import { EQ_ITEM_COLORS, itemIconUrl } from '../../lib/ItemWindow'
 import { KnownItemTooltip } from '../../lib/KnownItemTooltip'
 
@@ -97,20 +107,69 @@ function SlotIcon({ cell }: { cell: SheetCellView }): JSX.Element {
 }
 
 /**
- * What is socketed into this cell's item, as the client named it — nothing at all when the item
- * carries none, which is most of them.
- *
- * The names are printed with the ` (Exaltation)` suffix ALREADY REMOVED: `SheetItem.exaltations`
- * holds `parsedName.base`, so the chip reads `Golden Efreeti Boots` rather than repeating a word
- * that the row of chips is already saying by existing. The chips wrap; a cell with four of them is
- * two lines tall, which is fine here because this grid is not windowed and no hook is assuming a
- * row height.
+ * THE MERGED SOCKET ROW (fork asks, kaltinril 2026-09-09, revised same night: "too wordy"). One
+ * chip per socket, and a FILLED chip now leads with the EFFECT the gem grants — `Improved Healing
+ * III` — because the effect is what the player socketed it for; the donor's name and the socket
+ * type move to the hover, with the corpus's own detail line. Where the corpus does not know the
+ * donor (or states no effect of that kind) the chip falls back to `Type: Name`, the honest
+ * pre-revision spelling. `slotSockets.socketChips` still decides state; a gem a swap wants OUT
+ * (`flagged`) wears the error colour, and its hover says where the better copy sits.
  */
-function ExaltationChips({ names }: { names: readonly string[] }): JSX.Element | null {
-  if (names.length === 0) return null
+function SocketRow({
+  item,
+  cellId,
+  advice
+}: {
+  item: SocketedItem & { exaltations: readonly string[] }
+  cellId: string
+  advice?: SocketAdvice
+}): JSX.Element | null {
+  const chips = socketChips(item)
+  const leftover = unplacedExaltations(item.exaltations, item.sockets)
+  if (chips.length === 0 && leftover.length === 0) return null
+  // A filled chip self-describes its socket (user review 2026-09-09: a wrapped row left “Serpent
+  // Sight” floating between two bare type words), and its hover carries THE REASON it is red —
+  // the same sentence the cleanup panel prints — rather than pointing at the panel. An empty
+  // chip's hover carries its FILL suggestion when the recommender has one.
+  const dress = (c: SocketChip): { label: string; hover: string; bad: boolean } => {
+    if (c.state !== 'filled') {
+      const hint = advice?.fillHintOf(cellId, c.type)
+      return { label: c.label, hover: hint === undefined ? c.hover : `${c.hover} ${hint}`, bad: false }
+    }
+    const name = c.label.slice(c.type.length + 2)
+    const reason = advice?.reasonOf(cellId, ownershipKey(name))
+    const eff = advice?.effectOf(ownershipKey(name), c.type) ?? null
+    const label = eff === null ? c.label : `${c.type}: ${eff.effect}`
+    const detail = eff?.detail === undefined ? '' : ` ${eff.detail}`
+    return {
+      label,
+      hover: `${c.type} socket - ${name}${eff === null ? '' : `: ${eff.effect}${detail}`}.${reason === undefined ? '' : ` ${reason}`}`,
+      bad: reason !== undefined
+    }
+  }
   return (
-    <Box data-testid="character-exaltations" sx={CHIP_ROW}>
-      {names.map((name, i) => (
+    <Box data-testid="character-sockets" sx={CHIP_ROW}>
+      {chips.map((c) => {
+        const d = dress(c)
+        return (
+          <Tooltip key={c.type} title={d.hover}>
+            <Chip
+              label={d.label}
+              size="small"
+              color={d.bad ? 'error' : 'default'}
+              variant={c.state === 'filled' ? 'filled' : 'outlined'}
+              data-state={c.state}
+              data-testid={`character-socket-${c.type.toLowerCase()}`}
+              sx={{
+                ...SMALL_CHIP,
+                opacity: c.state === 'filled' ? 1 : 0.5,
+                ...(c.state === 'filled' && !d.bad ? { borderColor: EQ_ITEM_COLORS.border } : {})
+              }}
+            />
+          </Tooltip>
+        )
+      })}
+      {leftover.map((name, i) => (
         <Chip
           // The same exaltation can legitimately be socketed twice into one item, so the name is
           // not a key — the position is.
@@ -127,39 +186,6 @@ function ExaltationChips({ names }: { names: readonly string[] }): JSX.Element |
 }
 
 /**
- * THE SOCKET LINE (owner ask, 2026-08-23): which of the four transferable sockets this item's
- * ` +N` has unlocked, off the wiki's own unlock table (`slotSockets.socketStates`). A filled chip
- * is an OPEN socket; a dimmed one names the tier that opens it, so the line doubles as "merge to
- * +3 and Worn opens". NOTHING AT ALL for a name that stated no tier — `socketStates` returns no
- * rows and the line does not mount — because four locked chips under a quest token would promise
- * a ladder the dump never mentioned. What is IN a socket is the row above this one — the client's
- * own chips — because the dump names contents and this line names capacity, and the two are
- * different facts from different sources.
- *
- * The hover is the wiki's one-line description of the socket type, through `lib/Tooltip` like
- * every other hover in the app (the hand-cursor rule); the tier lives on the chip's own label.
- */
-function SocketLine({ tier }: { tier: number | undefined }): JSX.Element | null {
-  const states = socketStates(tier)
-  if (states.length === 0) return null
-  return (
-    <Box data-testid="character-sockets" sx={CHIP_ROW}>
-      {states.map((s) => (
-        <Tooltip key={s.type} title={s.what}>
-          <Chip
-            label={s.unlocked ? s.type : `${s.type} @+${String(s.unlocksAt)}`}
-            size="small"
-            variant={s.unlocked ? 'filled' : 'outlined'}
-            data-testid={`character-socket-${s.type.toLowerCase()}`}
-            sx={{ ...SMALL_CHIP, opacity: s.unlocked ? 1 : 0.5 }}
-          />
-        </Tooltip>
-      ))}
-    </Box>
-  )
-}
-
-/**
  * One clause per hover, and the clause is the thing the chip's own label does not say: a donor
  * chip is labelled by EFFECT, so its hover names the item it comes out of (and the merge tier that
  * lets it out); a gear chip is labelled by ITEM, so its hover says only why it is here. The route
@@ -167,8 +193,15 @@ function SocketLine({ tier }: { tier: number | undefined }): JSX.Element | null 
  * than every chip saying it.
  */
 function wishHover(w: SlotWish): string {
-  if (w.kind === 'gear') return 'On your wish list'
-  return w.tierRequired === undefined ? `From ${w.name}` : `From ${w.name} at +${String(w.tierRequired)}`
+  if (w.kind === 'gear') return 'On your wish list - an item you want for this slot, not one you own.'
+  // "From X" read as "you have an X" (user report, kaltinril 2026-09-09 - it sent him searching
+  // his bank for a bracelet he never owned). The hover now says the whole sentence: this is a
+  // wish, the donor is the FARM TARGET, and the tier is the merge that lets the effect out.
+  const source =
+    w.tierRequired === undefined
+      ? `extracted from a ${w.name}`
+      : `extracted from a ${w.name} merged to +${String(w.tierRequired)}`
+  return `On your wish list - this effect is ${source}. You do not own it yet; the Wish list tab has the route.`
 }
 
 /**
@@ -185,7 +218,7 @@ function SlotWishChips({ wishes }: { wishes: readonly SlotWish[] }): JSX.Element
       {wishes.map((w, i) => (
         <Tooltip key={`${w.name}#${String(i)}`} title={wishHover(w)}>
           <Chip
-            label={w.effect ?? w.name}
+            label={`♥ ${w.effect ?? w.name}`}
             size="small"
             color={w.kind === 'donor' ? 'warning' : 'info'}
             variant="outlined"
@@ -203,13 +236,34 @@ function SlotWishChips({ wishes }: { wishes: readonly SlotWish[] }): JSX.Element
  * exaltations and its socket line, or a quiet empty line; and last, filled or not, the wishes
  * placed at this cell's slot.
  */
-function SlotCell({ cell, wishes }: { cell: SheetCellView; wishes: readonly SlotWish[] }): JSX.Element {
+function SlotCell({
+  cell,
+  wishes,
+  advice
+}: {
+  cell: SheetCellView
+  wishes: readonly SlotWish[]
+  advice?: SocketAdvice
+}): JSX.Element {
   const item = cell.item
+  const flagged = advice?.flaggedByCell.get(cell.id)
   return (
     <Paper
       variant="outlined"
       data-testid={`character-slot-${cell.id}`}
-      sx={{ p: 0.6, display: 'flex', gap: 0.75, alignItems: 'center', minWidth: 0 }}
+      data-flagged={flagged !== undefined && flagged.size > 0 ? 'true' : undefined}
+      sx={{
+        p: 0.6,
+        display: 'flex',
+        gap: 0.75,
+        alignItems: 'center',
+        minWidth: 0,
+        // The red card (fork ask 2026-09-09): a cell whose socketed gem has a strictly better
+        // loose copy wears the warning on the CARD, and the chip's hover carries the sentence.
+        ...(flagged !== undefined && flagged.size > 0
+          ? { borderColor: 'error.main', bgcolor: 'rgba(244,67,54,0.08)' }
+          : {})
+      }}
     >
       <SlotIcon cell={cell} />
       <Box sx={{ minWidth: 0, flexGrow: 1 }}>
@@ -236,8 +290,7 @@ function SlotCell({ cell, wishes }: { cell: SheetCellView; wishes: readonly Slot
                 {item.name}
               </Box>
             </KnownItemTooltip>
-            <ExaltationChips names={item.exaltations} />
-            <SocketLine tier={item.tier} />
+            <SocketRow item={item} cellId={cell.id} advice={advice} />
           </>
         ) : (
           <Typography variant="caption" color="text.disabled" sx={{ display: 'block', opacity: 0.6 }}>
@@ -271,11 +324,19 @@ function wishLookup(
   }
 }
 
-function Column({ cells, wishesOf }: { cells: SheetCellView[]; wishesOf: WishesOf }): JSX.Element {
+function Column({
+  cells,
+  wishesOf,
+  advice
+}: {
+  cells: SheetCellView[]
+  wishesOf: WishesOf
+  advice?: SocketAdvice
+}): JSX.Element {
   return (
     <Stack spacing={0.6} sx={{ flex: 1, minWidth: 190 }}>
       {cells.map((c) => (
-        <SlotCell key={c.id} cell={c} wishes={wishesOf(c)} />
+        <SlotCell key={c.id} cell={c} wishes={wishesOf(c)} advice={advice} />
       ))}
     </Stack>
   )
@@ -289,7 +350,10 @@ function Column({ cells, wishesOf }: { cells: SheetCellView[]; wishesOf: WishesO
 function Legend({ sockets, wishes }: { sockets: boolean; wishes: boolean }): JSX.Element | null {
   if (!sockets && !wishes) return null
   const parts: string[] = []
-  if (sockets) parts.push('Sockets: a filled chip is open, a dimmed one opens at the +N it names.')
+  if (sockets)
+    parts.push(
+      'Sockets: a filled chip names the effect socketed there (hover for the gem), a dimmed bare type is open and empty, "@+N" opens at that merge, red wants a swap.'
+    )
   if (wishes) parts.push('Wish chips are your wish list - the Wish list tab has the route.')
   return (
     <Typography variant="caption" color="text.secondary" data-testid="character-slot-legend">
@@ -302,27 +366,39 @@ const inColumn = (cells: SheetCellView[], column: SheetColumn): SheetCellView[] 
   // eslint-disable-next-line eqc/no-domain-munging -- JOS-459 cutover ledger item 3: no served view source answers this yet, so the renderer still derives SheetCellView. Becomes a view descriptor when the source lands.
   cells.filter((c) => c.column === column)
 
+/** What the advisor hands the grid: the effect lookup, the per-gem reason a chip is red (the
+ *  cleanup panel's own sentence), and the fill suggestion an empty socket's hover can carry. */
+export interface SocketAdvice {
+  effectOf: (key: string, type: string) => KindEffect | null
+  flaggedByCell: ReadonlyMap<string, ReadonlySet<string>>
+  reasonOf: (cellId: string, key: string) => string | undefined
+  fillHintOf: (cellId: string, type: string) => string | undefined
+}
+
 export default function SlotGrid({
   cells,
-  slotWishes = NO_WISHES
+  slotWishes = NO_WISHES,
+  advice
 }: {
   cells: SheetCellView[]
   /** wishes placed by slot (`slotSockets.wishesBySlot`); absent draws the pre-feature grid */
   slotWishes?: ReadonlyMap<EquipSlot, readonly SlotWish[]>
+  /** the recommender's output (`exaltationAudit.recommendSockets`); absent draws no flags */
+  advice?: SocketAdvice
 }): JSX.Element {
   const bottom = inColumn(cells, 'bottom')
   const wishesOf = wishLookup(slotWishes, cellsShowingWishes(cells))
   return (
     <Stack spacing={0.6} data-testid="character-slot-grid">
       <Stack direction={{ xs: 'column', md: 'row' }} spacing={0.6} alignItems="stretch">
-        <Column cells={inColumn(cells, 'left')} wishesOf={wishesOf} />
-        <Column cells={inColumn(cells, 'right')} wishesOf={wishesOf} />
+        <Column cells={inColumn(cells, 'left')} wishesOf={wishesOf} advice={advice} />
+        <Column cells={inColumn(cells, 'right')} wishesOf={wishesOf} advice={advice} />
       </Stack>
       {/* The bottom row wraps rather than shrinking — a weapon name is world-supplied text. */}
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.6 }}>
         {bottom.map((c) => (
           <Box key={c.id} sx={{ flex: '1 1 190px', minWidth: 190 }}>
-            <SlotCell cell={c} wishes={wishesOf(c)} />
+            <SlotCell cell={c} wishes={wishesOf(c)} advice={advice} />
           </Box>
         ))}
       </Box>

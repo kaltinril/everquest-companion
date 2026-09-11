@@ -177,6 +177,20 @@ function cellsForLocation(entry: InventoryEntry): readonly PlanSlotId[] {
  */
 export const FOCUS_SOCKET_INDEX = 7
 
+/**
+ * The WHOLE measured numbering above, as one lookup — socket index → the item window's own label
+ * for that socket. The character sheet reads it to caption each socketed exaltation with the
+ * socket it occupies (`Proc: Short Sword of the Ykesha`), which the bare donor name cannot say.
+ * Ornamentation (index 2) is deliberately absent on the standing precedent (planner/types.ts:
+ * cosmetic, token-gated): every reader of this map is asking about the four TRANSFERABLE sockets.
+ */
+export const SOCKET_TYPE_OF_INDEX: Readonly<Record<number, 'Focus' | 'Click' | 'Worn' | 'Proc'>> = {
+  7: 'Focus',
+  8: 'Click',
+  9: 'Worn',
+  10: 'Proc'
+}
+
 /** An item whose focus effect is IN FORCE: worn on the body, or socketed in a focus slot. */
 export interface FocusBearer {
   /** the item's own name, ` +N` / `*` / ` (Exaltation)` already split off - the corpus join key */

@@ -328,6 +328,10 @@ export interface PlannerDonor extends EffectFacts {
    */
   familyTier?: number
   /** which socket this effect occupies; `combat` folded to `proc` (D2) */
+  /** the `Charges:` line the item page stated, verbatim ("5", "Unlimited"); absent when the
+   *  page stated none. A stated FINITE value marks a consumable click - the "hide charged"
+   *  filter's whole evidence (fork ask, kaltinril 2026-09-10). */
+  charges?: string
   socket: SocketType
   /** merge tier required to extract it (R1: focus +1, click +2, worn +3, proc +4) */
   tierRequired: ExtractTier
