@@ -68,10 +68,17 @@ import { SpellTooltip } from '../../lib/SpellCard'
 import { useWindowedRows } from '../../lib/useWindowedRows'
 import SpellbookToolbar from './SpellbookToolbar'
 import SpellIcon from './SpellIcon'
+import { SPELL_ROW_HEIGHT } from './SpellsTypography'
 import { classesText, grantsText, headlineFigure, seconds, whole, UNSTATED } from './spellbookFormat'
 
-/** Dense row height (px), MUI `size="small"` - the number the windowing hook is handed. */
-const ROW_HEIGHT = 37
+/**
+ * Dense row height (px) - the number the windowing hook is handed.
+ *
+ * IT LIVES WITH THE TYPE SCALE, not here: the area reads a size up (`SpellsTypography`) and a row
+ * whose height did not follow would wrap, which desyncs the scroll offset of every row below it.
+ * The two numbers are one decision, so they sit in one file.
+ */
+const ROW_HEIGHT = SPELL_ROW_HEIGHT
 
 /** The fixed-height contract, as one style. See the header. */
 const FIXED_ROW = {
@@ -163,9 +170,9 @@ function SpellRow({ row }: { row: SpellbookRow }): JSX.Element {
           <SpellIcon iconId={row.iconId} />
           <SpellTooltip name={row.name} placement="right">
             <Typography
-              variant="body2"
+              variant="body1"
               noWrap
-              sx={{ fontWeight: 500 }}
+              sx={{ fontWeight: 600 }}
               color={era ? 'warning.main' : undefined}
               title={era ? 'the wiki places this spell out of era' : undefined}
               data-testid={era ? 'spellbook-out-of-era' : undefined}

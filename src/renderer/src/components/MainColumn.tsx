@@ -32,6 +32,7 @@
 import type { JSX } from 'react'
 import { Box } from '@mui/material'
 import AreaTabs from './AreaTabs'
+import SpellsTypography from '../features/spells/SpellsTypography'
 import { EngineLaunchBanner } from './EngineLaunchBanner'
 import { UNRELEASED } from '../devFlags'
 import {
@@ -85,7 +86,18 @@ export default function MainColumn({
             named `overview` / `combat` / … in the app's own vocabulary. It counts the SCROLLER's
             contents only: the launch banner and the area tabs above are fixed bands and belong to
             the app-wide row, not to the view's. */}
-        {import.meta.env.DEV ? <RenderProfiler id={view}>{children}</RenderProfiler> : children}
+        {/* THE SPELLS AREA READS A SIZE UP (owner, 2026-09-10). Wrapped HERE rather than inside each
+            of its views so the three tabs and anything added beside them are covered by one line,
+            and so nothing outside the area is touched - see `SpellsTypography`. */}
+        {UNRELEASED && isSpellAreaView(view) ? (
+          <SpellsTypography>
+            {import.meta.env.DEV ? <RenderProfiler id={view}>{children}</RenderProfiler> : children}
+          </SpellsTypography>
+        ) : import.meta.env.DEV ? (
+          <RenderProfiler id={view}>{children}</RenderProfiler>
+        ) : (
+          children
+        )}
       </Box>
     </Box>
   )
