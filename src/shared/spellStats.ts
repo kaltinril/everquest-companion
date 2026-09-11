@@ -448,6 +448,73 @@ export function spellStatText(g: SpellStatGrant): string {
 }
 
 /**
+ * THE ORDER STATS ARE READ IN, once, for every surface that lists several.
+ *
+ * The owner's ask (2026-09-10): *"can we standardize the order of these stats to like AC, HP, MP,
+ * END, STATS next like these (STR, STA, AGI, DEX, INT, WIS, CHA), resists, haste, regens"* - his
+ * grouping, in his order, because a panel sorted by MAGNITUDE puts a different stat at the top of
+ * every spell and there is nothing to scan down.
+ *
+ * IT IS NOT `GEAR_STAT_KEYS` EVEN THOUGH IT OVERLAPS IT. That list is the order the gear TABLE
+ * draws its columns, fixed by a table nobody is re-arranging; this is the order a READER wants a
+ * list of grants in, and he named it. Two orders because they answer to two people.
+ *
+ * A key absent here sorts after everything present, alphabetically - so a stat this table forgets
+ * still draws, at the end, rather than vanishing or throwing.
+ */
+export const SPELL_STAT_ORDER: readonly SpellStatKey[] = [
+  // the pools and the armour first: what a buff does to your bars
+  'AC',
+  'HP',
+  'HP_ON_CAST',
+  'MP',
+  'END',
+  // the seven attributes, in his order rather than the gear table's
+  'STR',
+  'STA',
+  'AGI',
+  'DEX',
+  'INT',
+  'WIS',
+  'CHA',
+  // every save, with the catch-all last
+  'SV_FIRE',
+  'SV_COLD',
+  'SV_MAGIC',
+  'SV_DISEASE',
+  'SV_POISON',
+  'SV_VOID',
+  'SV_CORRUPTION',
+  'SV_CHROMATIC',
+  'SV_PRISMATIC',
+  'SV_ALL',
+  // the combat percentages
+  'ATTACK',
+  'HASTE',
+  'HASTE_V2',
+  'SPELL_HASTE',
+  'MOVEMENT_SPEED',
+  // and the regens last, as he asked
+  'HP_REGEN',
+  'MANA_REGEN',
+  'END_REGEN'
+]
+
+const STAT_RANK: ReadonlyMap<SpellStatKey, number> = new Map(
+  SPELL_STAT_ORDER.map((key, i) => [key, i])
+)
+
+/**
+ * Compare two stat keys by that order. Anything unlisted sorts after everything listed, by name,
+ * so a stat the table forgets is still drawn - at the end - rather than dropped.
+ */
+export function compareStatKeys(a: SpellStatKey, b: SpellStatKey): number {
+  const ra = STAT_RANK.get(a) ?? Number.MAX_SAFE_INTEGER
+  const rb = STAT_RANK.get(b) ?? Number.MAX_SAFE_INTEGER
+  return ra - rb || a.localeCompare(b)
+}
+
+/**
  * DO TWO GRANTS COMPETE FOR THE SAME SLOT?
  *
  * The cheap half of the stacking question, and the ONLY half answerable without the player's own

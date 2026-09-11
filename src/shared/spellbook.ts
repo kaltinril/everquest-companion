@@ -44,7 +44,7 @@
 import type { ClassAbbr } from './classCombo'
 import type { UnlockSpell } from './levelUnlocks'
 import { SPELL_MAX_RANK, normalizeSpellRank } from './spellScale'
-import type { SpellStatGrant } from './spellStats'
+import { compareStatKeys, type SpellStatGrant } from './spellStats'
 import {
   UPGRADE_RATES,
   spellTierLadder,
@@ -253,7 +253,9 @@ export function spellbookRow(s: UnlockSpell, tier: number): SpellbookRow {
     shownAt: s.at,
     level: gainLevel(s),
     category: base.category,
-    grants: s.grants ?? [],
+    // THE ONE ORDER (owner, 2026-09-10), so a row's chips and the Loadout panel's rows read down
+    // the same way. Copied before sorting - `s.grants` belongs to the shared dataset.
+    grants: [...(s.grants ?? [])].sort((a, b) => compareStatKeys(a.key, b.key)),
     payoff: upgradePayoff(base),
     tier: t
   }

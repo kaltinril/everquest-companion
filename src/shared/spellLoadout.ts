@@ -49,7 +49,7 @@ import type { UnlockSpell } from './levelUnlocks'
 import type { ClassAbbr } from './classCombo'
 import type { BestSpellTab } from './bestSpells'
 import type { SpellMetrics } from './spellMetrics'
-import { grantsShareASlot, type SpellStatGrant, type SpellStatKey } from './spellStats'
+import { compareStatKeys, grantsShareASlot, type SpellStatGrant, type SpellStatKey } from './spellStats'
 import { parseHpLine } from './spellMetrics'
 import {
   conflictComponents,
@@ -333,6 +333,10 @@ function regenGrant(s: UnlockSpell, level: number): SpellStatGrant | null {
 }
 
 function admitsBuff(s: UnlockSpell, query: CandidateQuery, minMs: number): boolean {
+  // A BUFF YOU CANNOT WALK UNDER IS NOT A BUFF YOU KEEP UP (Malkil, 2026-09-10, on being told to
+  // cast Treeform). It is refused outright rather than scored down: no quantity of AC makes being
+  // rooted to the floor worth a gem, so there is no weight that would express it honestly.
+  if (s.roots === true) return false
   if (!isKeepUp(s, minMs)) return false
   // A STATED duration below the floor is a sprint, not a buff - see `minDurationMs`.
   if (s.durationMs !== undefined && s.durationMs < minMs) return false
@@ -747,6 +751,16 @@ export interface BuffTotals {
   points: BuffStatTotal[]
   /** Percent stats - haste, run speed. Summed only within their own key, never across kinds. */
   percents: BuffStatTotal[]
+  /**
+   * BOTH HALVES IN ONE READING ORDER - what a panel actually draws.
+   *
+   * The split above is about ARITHMETIC: a percent and a point are never summed. Drawing them apart
+   * is a different claim, and it was the wrong one - it put the regens above the haste when the
+   * owner had asked for resists, then haste, then regens. So the fold states the order too
+   * (`SPELL_STAT_ORDER`), because ruling 4 is right that a view sorting domain data is a second
+   * opinion nobody can see. The arithmetic is untouched; only the sequence is stated here.
+   */
+  rows: BuffStatTotal[]
 }
 
 /**
@@ -778,11 +792,15 @@ export function buffTotals(keep: readonly LoadoutCandidate[]): BuffTotals {
   for (const c of keep) {
     for (const g of c.grants) addGrant(byKey, g, c.name)
   }
-  const order = (a: BuffStatTotal, b: BuffStatTotal): number =>
-    Math.abs(b.amount) - Math.abs(a.amount) || a.key.localeCompare(b.key)
+  // A FIXED ORDER, NOT A MAGNITUDE ONE (owner, 2026-09-10). Sorting by size put a different stat at
+  // the top of every set, so there was nothing to scan down - the panel read as a different shape
+  // each time it was drawn. `SPELL_STAT_ORDER` is the one order, shared with every other surface
+  // that lists grants.
+  const order = (a: BuffStatTotal, b: BuffStatTotal): number => compareStatKeys(a.key, b.key)
   const all = [...byKey.values()]
   return {
     points: all.filter((r) => !r.percent).sort(order),
-    percents: all.filter((r) => r.percent).sort(order)
+    percents: all.filter((r) => r.percent).sort(order),
+    rows: [...all].sort(order)
   }
 }
