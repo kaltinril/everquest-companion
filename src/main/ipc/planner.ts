@@ -16,7 +16,7 @@
 import { ipcMain } from 'electron'
 import { IPC } from '../../shared/ipc'
 import { equippedHosts, type PlannerInventory } from '../../shared/planner/inventorySlots'
-import { buildPlannerIndex, searchPlannerItems, type PlannerIndex } from '../planner/effectIndex'
+import { searchPlannerItems } from '../planner/effectIndex'
 import { buildGearIndex } from '../planner/gearIndex'
 import type { GearIndexPayload } from '../../shared/planner/gear'
 import { NO_OWNERSHIP, ownershipPayload, type OwnershipPayload } from '../../shared/planner/ownership'
@@ -33,15 +33,12 @@ import itemsJson from '../data/items.json'
 // JOS-452 — the worn-focus resolution, memoized on the dump's identity in its own module because
 // the spell card's handler reads the same answer (src/main/planner/wornFocusCurrent.ts says why).
 import { currentWornFocus } from '../planner/wornFocusCurrent'
+// The donor/item index memo used to live in this file. It moved to its own module the day the spell
+// page became a SECOND handler that needs the donor rows - which is the duplicate 8.6 MB walk the
+// gear memo's own comment below warns about. See planner/indexCurrent.ts.
+import { plannerIndex } from '../planner/indexCurrent'
 
-let index: PlannerIndex | null = null
 let gear: GearIndexPayload | null = null
-
-/** The donor + item indices, built on first use. */
-function plannerIndex(): PlannerIndex {
-  index ??= buildPlannerIndex(itemsJson as unknown as ItemDbFile)
-  return index
-}
 
 /**
  * The GEAR candidate index (JOS-283), memoized the same way and for the same reason. It lives in

@@ -28,6 +28,9 @@
 import type { SpellMetrics } from './spellMetrics'
 import type { FocusKind } from './wornFocus'
 import type { ClassAbbr } from './classCombo'
+import type { SpellStatGrant } from './spellStats'
+import type { SpellTierReading, UpgradeCategory, UpgradePayoff } from './spellUpgrade'
+import type { SocketType } from './planner/types'
 
 // ── THE LINE, WHICH IS NOT THE RANK (JOS-508) ──────────────────────────────────────────────────
 //
@@ -123,6 +126,41 @@ export interface SpellLineage {
  * `found: false` is its own answer and is not the same as an empty record: it means no row of the
  * spell DB carries that name, so the card says that rather than drawing a blank window.
  */
+/**
+ * ONE ITEM THAT CARRIES A SPELL, as the spell page draws it.
+ *
+ * A projection of `PlannerDonor` rather than the donor itself, and the trim is deliberate: a donor
+ * row carries the whole exaltation vocabulary (extraction tiers, haste locks, focus families, era
+ * tags, drop witnesses) because the Board needs it, and a spell page needs the item's name, where
+ * the effect sits on it, and a way to open it. Sending the rest would put twenty fields on screen
+ * that answer a question this page is not asking.
+ */
+export interface SpellItemSource {
+  /** The item's display name, as the corpus spells it. */
+  name: string
+  /** `itemKey(name)` - the canonical key, so a click can open the Loot drill without re-folding. */
+  key: string
+  /** Which socket the effect occupies: worn, click, focus or proc. */
+  socket: SocketType
+  /** The effect name AS WRITTEN on the item, which may carry a rank the spell name does not. */
+  effect: string
+  /** The parenthetical the page wrote beside it ("Combat, Casting Time: Instant"), when it did. */
+  detail?: string
+  iconId?: number
+}
+
+/**
+ * The items carrying one spell in ONE socket, ready to draw.
+ *
+ * A group is only present when it has rows - there is no empty `click` group stating that nothing
+ * clicks it, because a heading over nothing reads as a claim and this is a corpus that is silent
+ * far more often than it is empty.
+ */
+export interface SpellItemGroup {
+  socket: SocketType
+  items: SpellItemSource[]
+}
+
 export interface SpellDetail {
   /** the name that was asked for, verbatim. */
   queried: string
@@ -229,6 +267,56 @@ export interface SpellDetail {
    * distinguish that from "we do not know your classes yet".
    */
   combo: ClassAbbr[]
+  /**
+   * WHAT THIS SPELL GRANTS (docs/plans/spell-upgrades-and-loadout.md §3.2) - the parse the owner's
+   * "it just says the name" report asked for, read main-side off the effect list above.
+   *
+   * Absent when the page states no readable stat line, which is most detrimental spells and every
+   * summon. ABSENT IS NOT AN EMPTY GRANT (law 1): a grant we could not read is a grant we cannot
+   * state, not a spell that grants nothing.
+   */
+  grants?: SpellStatGrant[]
+  /** The level `grants` was read at - `metricsLevel`'s twin, and stated for the same reason. */
+  grantsLevel?: number
+  /**
+   * WHICH UPGRADE CATEGORY THIS SPELL IS IN, and therefore what a mote tier buys for it.
+   *
+   * Present on every found record - every spell is in exactly one category, `other` included.
+   * Absent only on a `found: false` one, which has no spell to file.
+   */
+  upgradeCategory?: UpgradeCategory
+  /**
+   * THE WHOLE MOTE LADDER, tier 0 through 10, for the page's own table.
+   *
+   * ELEVEN SMALL ROWS, SENT WHOLE rather than recomputed at the far end, which is `metrics`' own
+   * arrangement one step further: the figures cross the wire and the arithmetic stays behind. It
+   * also keeps the page honest about ruling 4 - drawing a table is a map, and deriving one is not.
+   *
+   * Tier 0 is byte-identical to the spell's base figures, which is what lets the table be drawn
+   * unconditionally and lets the reader see his own spell in the first column.
+   */
+  tierLadder?: SpellTierReading[]
+  /** What upgrading actually BUYS for this spell - the Bear Form verdict. Absent when not found. */
+  payoff?: UpgradePayoff
+  /**
+   * EVERY ITEM THAT CARRIES THIS SPELL, as a worn effect, a click, a focus or a proc (§4.4 item 7),
+   * ALREADY GROUPED BY SOCKET AND ORDERED.
+   *
+   * The owner's ask: from a spell, see what grants it. It is the planner's donor index INVERTED -
+   * that index is keyed by item because the Exaltation board asks "what is on this sword", and this
+   * asks the same corpus the other way round. No new data and no new scrape; one index and one op.
+   *
+   * IT ARRIVES GROUPED BECAUSE RULING 4 SAYS IT MUST, and the rule caught the first cut of this:
+   * the section drew a flat list and filtered it four times for its four headings, which is exactly
+   * the client-side munging `eslint.domainMunging.mjs` fails the build on. Grouping in main is also
+   * the better answer - "which socket is this in" is a fact about the donor row, and deciding it at
+   * the far end would put a second opinion about socket order in a component.
+   *
+   * Empty (rather than absent) when the corpus carries no item for this spell, which is the common
+   * case: ~1,500 effect-bearing items against ~1,900 spells, and the two sets overlap only partly.
+   */
+  itemSources?: SpellItemGroup[]
+
   /**
    * THE WIKI BADGES THIS SPELL'S PAGE OUT OF ERA (JOS-393) — `true` or absent, never `false`, the
    * law `SpellEntry.outOfEra` states in full.

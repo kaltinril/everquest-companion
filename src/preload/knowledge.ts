@@ -19,6 +19,7 @@ import type { ResistPrefs } from '../shared/resistPrefs'
 import type { LevelUnlockData } from '../shared/levelUnlocks'
 // The rich spell card's record (JOS-293) — one definition for main's join, this bridge and the card.
 import type { SpellDetail } from '../shared/spellDetail'
+import type { StackSource } from '../shared/spellStack'
 
 export const knowledgeBridge = {
   /** Suggested-alerts wizard (Task #38): the searchable spell catalog + live usage. */
@@ -32,6 +33,16 @@ export const knowledgeBridge = {
    * about one row. See `getLevelUnlocks` below for the arrangement this one is deliberately not.
    */
   lookupSpell: (name: string): Promise<SpellDetail> => ipcRenderer.invoke(IPC.spellsDetail, name),
+  /**
+   * THE STACKING VIEWS for a bounded list of spells (docs/plans/spell-upgrades-and-loadout.md §3.5).
+   *
+   * Keyed by the name as ASKED, so a caller can look its own strings back up without re-folding a
+   * key. A name the player's client file does not carry is simply absent, and an install with no
+   * `spells_us.txt` answers an empty object - both of which the Loadout tab reads as "no exact
+   * verdict here" rather than as an error.
+   */
+  getSpellStackViews: (names: readonly string[]): Promise<Record<string, StackSource>> =>
+    ipcRenderer.invoke(IPC.spellsStackViews, names),
   /**
    * "What's new at this level" (docs/plans/levelup-whats-new.md): every (class, level) unlock the
    * committed DBs state — spells from spells.json, skills/discs/innates from classes.json.

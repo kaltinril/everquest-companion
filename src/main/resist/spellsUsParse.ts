@@ -76,7 +76,7 @@
 // the con card are reading, for no gain: neither a HoT nor a bard pulse is a spell the estimator
 // fits a resist from.
 
-import { axisFromResistType, type ResistAxis, type ResistDebuffSlot, type SpellHpSlot, type SpellResistInfo, type SpellResistTable } from '../../shared/resistTypes'
+import { axisFromResistType, type ResistAxis, type ResistDebuffSlot, type SpellEffectSlot, type SpellHpSlot, type SpellResistInfo, type SpellResistTable } from '../../shared/resistTypes'
 import { spellCanonKey } from '../../shared/spellKey'
 
 const F_ID = 0
@@ -96,6 +96,13 @@ const CLASS_BARD = 7
 const F_RESIST_ADJ = 78
 /** `aemaxtargets` (JOS-449) — see `aeTargetsField` for the measurement behind the index. */
 const F_AE_MAX_TARGETS = 143
+/**
+ * Field 126, `good_effect` - MEASURED, not taken from a struct listing. The method and the numbers
+ * are in `SpellResistInfo.goodEffect`'s own header: every column from 70 to 129 scored against the
+ * committed catalog's beneficial/detrimental verdict, and this one agrees on 96.7% of the 2,697
+ * shared rows and reads only {0, 1} where the runner-up manages 69.4%.
+ */
+const F_GOOD_EFFECT = 126
 const F_SLOTS = 172
 
 const EFFECT_HITPOINTS = 0
@@ -123,12 +130,13 @@ const RESIST_EFFECTS: Record<number, ResistAxis> = {
  */
 const MIN_DEBUFF_MAGNITUDE = 5
 
-interface Slot {
-  effect: number
-  base: number
-  calc: number
-  max: number
-}
+/**
+ * One slot. It gained `slot` and `limit` for the stacking engine (2026-09-10) - see
+ * `SpellEffectSlot`'s own header for why a positional algorithm cannot use an array index, and why
+ * the directives need the limit. The four older fields are untouched, so every reader below this
+ * point reads exactly what it read before.
+ */
+type Slot = SpellEffectSlot
 
 function parseSlots(field: string | undefined): Slot[] {
   if (!field) return []
@@ -137,7 +145,14 @@ function parseSlots(field: string | undefined): Slot[] {
     if (!chunk) continue
     const p = chunk.split('|')
     if (p.length < 6) continue
-    out.push({ effect: Number(p[1]), base: Number(p[2]), calc: Number(p[4]), max: Number(p[5]) })
+    out.push({
+      slot: Number(p[0]),
+      effect: Number(p[1]),
+      base: Number(p[2]),
+      limit: Number(p[3]),
+      calc: Number(p[4]),
+      max: Number(p[5])
+    })
   }
   return out
 }
@@ -250,6 +265,31 @@ function manaField(f: readonly string[]): { mana?: number } {
   return n > 0 ? { mana: n } : {}
 }
 
+/**
+ * The stacking fields: every slot, the good/bad verdict, and the duration the buff runs for
+ * (docs/plans/spell-upgrades-and-loadout.md §3.4).
+ *
+ * A spreadable fragment for `recastField`'s reason - `rowInfo` sits at the complexity ceiling and
+ * every optional field it grows costs it two branches.
+ *
+ * WRITTEN ONLY WHERE THE ROW HAS A DURATION, which is the semantic filter before it is the size
+ * one: stacking is a question about what can be ON you at once, and an instant occupies nothing.
+ * `SpellResistInfo.slots` carries the measurement behind the alternatives that were rejected.
+ */
+function stackingFields(
+  f: readonly string[],
+  slots: readonly Slot[],
+  formula: number
+): Pick<SpellResistInfo, 'slots' | 'goodEffect' | 'durationFormula' | 'durationValue'> {
+  if (formula === 0 || slots.length === 0) return {}
+  return {
+    slots: [...slots],
+    goodEffect: (Number(f[F_GOOD_EFFECT]) || 0) !== 0,
+    durationFormula: formula,
+    durationValue: Number(f[F_DURATION]) || 0
+  }
+}
+
 function rowInfo(f: readonly string[]): SpellResistInfo {
   const slots = parseSlots(f[F_SLOTS])
   const { bardOnly } = classLevels(f)
@@ -265,6 +305,7 @@ function rowInfo(f: readonly string[]): SpellResistInfo {
   const hp = hpSlotOf(slots)
   if (hp) info.hpSlot = hp
   const formula = Number(f[F_DURATION_FORMULA]) || 0
+  Object.assign(info, stackingFields(f, slots, formula))
   const hpSlots = hpSlotsOf(slots, formula !== 0)
   if (hpSlots) {
     info.hp = hpSlots
