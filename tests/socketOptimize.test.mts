@@ -17,7 +17,16 @@ import type { OwnedExaltation } from '../src/shared/characterSheet'
 import { planBoard } from '../src/renderer/src/features/character/socketOptimize'
 import type { SocketHostCell } from '../src/renderer/src/features/character/socketRecommend'
 
-function row(key: string, name: string, effects: GearRow['effects'], slots: GearRow['slots'], classes: GearRow['classes'] = []): GearRow {
+/** The identity half of a row, bundled so the builder stays inside the tree's four-parameter bar. */
+interface RowSpec {
+  key: string
+  name: string
+  effects: GearRow['effects']
+  slots: GearRow['slots']
+  classes?: GearRow['classes']
+}
+
+function row({ key, name, effects, slots, classes = [] }: RowSpec): GearRow {
   return {
     key,
     name,
@@ -33,7 +42,16 @@ function row(key: string, name: string, effects: GearRow['effects'], slots: Gear
   }
 }
 
-function seat(cellId: string, type: string, slot: SocketHostCell['slot'], currentName: string | null = null, item = 'Host'): SocketHostCell {
+/** One seat's facts, bundled for `RowSpec`'s reason. */
+interface SeatSpec {
+  cellId: string
+  type: string
+  slot: SocketHostCell['slot']
+  currentName?: string | null
+  item?: string
+}
+
+function seat({ cellId, type, slot, currentName = null, item = 'Host' }: SeatSpec): SocketHostCell {
   return {
     cellId,
     cellLabel: cellId,
@@ -54,10 +72,10 @@ const worn = (name: string, eff: string): GearRow['effects'] => [{ name: eff, ki
 
 test('the belt contest: two belt-only families, one belt seat - one placed, the other reported with the holder named', () => {
   const rows = [
-    row('ba gem', 'BA Gem', worn('BA Gem', 'Burning Affliction III'), ['WAIST']),
-    row('sh gem', 'SH Gem', worn('SH Gem', 'Summoning Haste III'), ['WAIST'])
+    row({ key: 'ba gem', name: 'BA Gem', effects: worn('BA Gem', 'Burning Affliction III'), slots: ['WAIST'] }),
+    row({ key: 'sh gem', name: 'SH Gem', effects: worn('SH Gem', 'Summoning Haste III'), slots: ['WAIST'] })
   ]
-  const plan = planBoard([gem('BA Gem'), gem('SH Gem')], rows, [], [seat('waist', 'Worn', 'WAIST')])
+  const plan = planBoard([gem('BA Gem'), gem('SH Gem')], rows, [], [seat({ cellId: 'waist', type: 'Worn', slot: 'WAIST' })])
   assert.equal(plan.placements.length, 1)
   assert.equal(plan.contested.length, 1)
   const c = plan.contested[0]
@@ -72,14 +90,14 @@ test('the reseat rule: a gem that fits two slots yields the contested seat to th
   // Flexible fits WAIST and WRIST; Rigid fits only WAIST. A greedy that seats Flexible at WAIST
   // first would bench Rigid; the augmenting path reseats Flexible at WRIST and both are in force.
   const rows = [
-    row('flexible', 'Flexible', worn('Flexible', 'Effect A III'), ['WAIST', 'WRIST']),
-    row('rigid', 'Rigid', worn('Rigid', 'Effect B III'), ['WAIST'])
+    row({ key: 'flexible', name: 'Flexible', effects: worn('Flexible', 'Effect A III'), slots: ['WAIST', 'WRIST'] }),
+    row({ key: 'rigid', name: 'Rigid', effects: worn('Rigid', 'Effect B III'), slots: ['WAIST'] })
   ]
   const plan = planBoard(
     [gem('Flexible'), gem('Rigid')],
     rows,
     [],
-    [seat('waist', 'Worn', 'WAIST'), seat('wrist1', 'Worn', 'WRIST')]
+    [seat({ cellId: 'waist', type: 'Worn', slot: 'WAIST' }), seat({ cellId: 'wrist1', type: 'Worn', slot: 'WRIST' })]
   )
   assert.equal(plan.placements.length, 2, 'both families in force')
   assert.equal(plan.contested.length, 0)
@@ -90,17 +108,17 @@ test('the reseat rule: a gem that fits two slots yields the contested seat to th
 
 test('R2 holds inside the plan, and a seat already holding its target is not a move', () => {
   const rows = [
-    row('belt gem', 'Belt Gem', worn('Belt Gem', 'Effect A III'), ['WAIST']),
-    row('mnk gem', 'Mnk Gem', worn('Mnk Gem', 'Effect B III'), ['WRIST'], ['MNK']),
-    row('war host', 'War Host', [], ['WRIST'], ['WAR'])
+    row({ key: 'belt gem', name: 'Belt Gem', effects: worn('Belt Gem', 'Effect A III'), slots: ['WAIST'] }),
+    row({ key: 'mnk gem', name: 'Mnk Gem', effects: worn('Mnk Gem', 'Effect B III'), slots: ['WRIST'], classes: ['MNK'] }),
+    row({ key: 'war host', name: 'War Host', effects: [], slots: ['WRIST'], classes: ['WAR'] })
   ]
   const plan = planBoard(
     [gem('Belt Gem', 'socketed in Waist', true), gem('Mnk Gem')],
     rows,
     [],
     [
-      seat('waist', 'Worn', 'WAIST', 'Belt Gem'),
-      seat('wrist1', 'Worn', 'WRIST', null, 'War Host')
+      seat({ cellId: 'waist', type: 'Worn', slot: 'WAIST', currentName: 'Belt Gem' }),
+      seat({ cellId: 'wrist1', type: 'Worn', slot: 'WRIST', currentName: null, item: 'War Host' })
     ]
   )
   // Belt Gem already sits where the plan wants it: no move. Mnk Gem cannot enter the WAR-only
@@ -112,14 +130,14 @@ test('R2 holds inside the plan, and a seat already holding its target is not a m
 
 test('a move names what it replaces, and the higher tier takes the family seat', () => {
   const rows = [
-    row('tier1', 'Tier1', worn('Tier1', 'Effect A I'), ['WAIST']),
-    row('tier3', 'Tier3', worn('Tier3', 'Effect A III'), ['WAIST'])
+    row({ key: 'tier1', name: 'Tier1', effects: worn('Tier1', 'Effect A I'), slots: ['WAIST'] }),
+    row({ key: 'tier3', name: 'Tier3', effects: worn('Tier3', 'Effect A III'), slots: ['WAIST'] })
   ]
   const plan = planBoard(
     [gem('Tier1', 'socketed in Waist', true), gem('Tier3', 'General 2')],
     rows,
     [],
-    [seat('waist', 'Worn', 'WAIST', 'Tier1')]
+    [seat({ cellId: 'waist', type: 'Worn', slot: 'WAIST', currentName: 'Tier1' })]
   )
   assert.equal(plan.moves.length, 1)
   assert.equal(plan.moves[0].gemName, 'Tier3')
@@ -131,14 +149,14 @@ test('a placement names the donor that FITS the seat, never the claim`s first do
   // The neck seat must be labelled with the torque - naming the shield gem here is the bug the
   // user read as "put my secondary-only exaltation into the neck slot".
   const rows = [
-    row('shield gem', 'Shield Gem', worn('Shield Gem', 'Spell Guard II'), ['SECONDARY']),
-    row('neck gem', 'Neck Gem', worn('Neck Gem', 'Spell Guard II'), ['NECK'])
+    row({ key: 'shield gem', name: 'Shield Gem', effects: worn('Shield Gem', 'Spell Guard II'), slots: ['SECONDARY'] }),
+    row({ key: 'neck gem', name: 'Neck Gem', effects: worn('Neck Gem', 'Spell Guard II'), slots: ['NECK'] })
   ]
   const plan = planBoard(
     [gem('Shield Gem'), gem('Neck Gem')],
     rows,
     [],
-    [seat('neck', 'Worn', 'NECK')]
+    [seat({ cellId: 'neck', type: 'Worn', slot: 'NECK' })]
   )
   assert.equal(plan.placements.length, 1)
   assert.equal(plan.placements[0].gemName, 'Neck Gem')
@@ -148,8 +166,8 @@ test('incumbency breaks ties: the belt keeps its socketed Burning Affliction III
   // The user's own board: BA III is IN the belt, SH III is loose, both belt-only, one seat.
   // A value judgment between the two is impossible - but the incumbent staying put needs none.
   const rows = [
-    row('ba gem', 'BA Gem', worn('BA Gem', 'Burning Affliction III'), ['WAIST']),
-    row('sh gem', 'SH Gem', worn('SH Gem', 'Summoning Haste III'), ['WAIST'])
+    row({ key: 'ba gem', name: 'BA Gem', effects: worn('BA Gem', 'Burning Affliction III'), slots: ['WAIST'] }),
+    row({ key: 'sh gem', name: 'SH Gem', effects: worn('SH Gem', 'Summoning Haste III'), slots: ['WAIST'] })
   ]
   const plan = planBoard(
     // The loose gem deliberately FIRST: processing order must not decide the seat (the bug's
@@ -157,7 +175,7 @@ test('incumbency breaks ties: the belt keeps its socketed Burning Affliction III
     [gem('SH Gem', 'General 2'), gem('BA Gem', 'socketed in Waist', true)],
     rows,
     [],
-    [seat('waist', 'Worn', 'WAIST', 'BA Gem')]
+    [seat({ cellId: 'waist', type: 'Worn', slot: 'WAIST', currentName: 'BA Gem' })]
   )
   assert.equal(plan.moves.length, 0, 'the incumbent stays - no churn')
   assert.equal(plan.contested.length, 1)
@@ -168,14 +186,14 @@ test('a vacated seat is a CLEAR: the plan names the gem to pull and where its ef
   // Family X sits at wrist1 but the matching needs wrist1 for family Y (Y fits nowhere else),
   // reseating X at wrist2. The old wrist1 copy must be named as a pull, or X is in force twice.
   const rows = [
-    row('x gem', 'X Gem', worn('X Gem', 'Effect X II'), ['WRIST']),
-    row('y gem', 'Y Gem', worn('Y Gem', 'Effect Y II'), ['WRIST'])
+    row({ key: 'x gem', name: 'X Gem', effects: worn('X Gem', 'Effect X II'), slots: ['WRIST'] }),
+    row({ key: 'y gem', name: 'Y Gem', effects: worn('Y Gem', 'Effect Y II'), slots: ['WRIST'] })
   ]
   const plan = planBoard(
     [gem('X Gem', 'socketed in Wrist', true), gem('X Gem', 'Bank 1'), gem('Y Gem', 'Bank 1')],
     rows,
     [],
-    [seat('wrist1', 'Worn', 'WRIST', 'X Gem'), seat('wrist2', 'Worn', 'WRIST')]
+    [seat({ cellId: 'wrist1', type: 'Worn', slot: 'WRIST', currentName: 'X Gem' }), seat({ cellId: 'wrist2', type: 'Worn', slot: 'WRIST' })]
   )
   // Stability keeps X at wrist1 and Y fills wrist2 - zero clears in the happy case…
   assert.equal(plan.clears.length, 0)
@@ -187,9 +205,9 @@ test('the user`s exact belt board: tier-I incumbency elsewhere must not lend Sum
   // in the belt. "The family is socketed somewhere" made SH III an incumbent and it evicted BA
   // on the tie - but SH III cannot keep the ring seat, so it is no incumbent at the belt.
   const rows = [
-    row('ba gem', 'BA Gem', worn('BA Gem', 'Burning Affliction III'), ['WAIST']),
-    row('sh3 gem', 'SH3 Gem', worn('SH3 Gem', 'Summoning Haste III'), ['WAIST']),
-    row('sh1 gem', 'SH1 Gem', worn('SH1 Gem', 'Summoning Haste I'), ['FINGER'])
+    row({ key: 'ba gem', name: 'BA Gem', effects: worn('BA Gem', 'Burning Affliction III'), slots: ['WAIST'] }),
+    row({ key: 'sh3 gem', name: 'SH3 Gem', effects: worn('SH3 Gem', 'Summoning Haste III'), slots: ['WAIST'] }),
+    row({ key: 'sh1 gem', name: 'SH1 Gem', effects: worn('SH1 Gem', 'Summoning Haste I'), slots: ['FINGER'] })
   ]
   const plan = planBoard(
     [
@@ -199,7 +217,7 @@ test('the user`s exact belt board: tier-I incumbency elsewhere must not lend Sum
     ],
     rows,
     [],
-    [seat('waist', 'Worn', 'WAIST', 'BA Gem'), seat('finger1', 'Worn', 'FINGER', 'SH1 Gem')]
+    [seat({ cellId: 'waist', type: 'Worn', slot: 'WAIST', currentName: 'BA Gem' }), seat({ cellId: 'finger1', type: 'Worn', slot: 'FINGER', currentName: 'SH1 Gem' })]
   )
   const waist = plan.placements.find((p) => p.cellLabel === 'waist')
   assert.equal(waist?.effect, 'Burning Affliction III', 'the belt keeps its incumbent')
