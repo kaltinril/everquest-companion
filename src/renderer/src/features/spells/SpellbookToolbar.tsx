@@ -21,7 +21,7 @@
 // filtered set has no magnitudes to move.
 
 import type { JSX } from 'react'
-import { Box, Chip, Slider, Stack, TextField, Typography } from '@mui/material'
+import { Chip, Stack, TextField, Typography } from '@mui/material'
 import { CLASS_ABBRS } from '@shared/classCombo'
 import type { GearClasses } from '../gear/gearData'
 import { classDisplayName } from '@shared/spellLevels'
@@ -31,21 +31,11 @@ import {
   type UpgradeCategory
 } from '@shared/spellUpgrade'
 import { magnitudeRatePercent, type SpellbookQuery } from '@shared/spellbook'
-import { SPELL_MAX_RANK, romanRank } from './spellbookFormat'
 import ChipMultiSelect from '../../components/ChipMultiSelect'
+import SpellTierSlider, { tierLabel } from './SpellTierSlider'
 
-/** One stop per tier, base included - the ladder `spellUpgrade` states. */
-const TIER_MARKS = Array.from({ length: SPELL_MAX_RANK + 1 }, (_, i) => ({ value: i }))
-
-/**
- * What the slider's label says at a position.
- *
- * BASE IS A REAL ANSWER AND GETS WORDS OF ITS OWN (`SpellRankSlider`'s rule), so the label is drawn
- * at every stop rather than appearing once you move it.
- */
-export function tierLabel(tier: number): string {
-  return tier <= 0 ? 'base ranks' : `every spell at ${romanRank(tier)}`
-}
+// Re-exported: it moved to the shared control and this module was its home.
+export { tierLabel }
 
 /**
  * What the slider is DOING to the visible list, in one clause.
@@ -206,39 +196,17 @@ function TierRow({
   total: number
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1.5} alignItems="center" useFlexGap flexWrap="wrap">
-      <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
-        Simulate upgrade
-      </Typography>
-      <Box sx={{ width: 200, flexShrink: 0, px: 1 }}>
-        <Slider
-          size="small"
-          min={0}
-          max={SPELL_MAX_RANK}
-          step={1}
-          marks={TIER_MARKS}
-          value={tier}
-          data-testid="spellbook-tier-slider"
-          aria-label="Simulated mote tier"
-          onChange={(_e, v) => onTier(typeof v === 'number' ? v : v[0])}
-        />
-      </Box>
-      <Typography
-        variant="caption"
-        data-testid="spellbook-tier-label"
-        color={tier > 0 ? 'primary.main' : 'text.secondary'}
-        sx={{ flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}
-      >
-        {tierLabel(tier)}
-      </Typography>
-      <Typography variant="caption" color="text.secondary" data-testid="spellbook-tier-note">
-        {tierEffectNote(categories)}
-      </Typography>
-      <Box sx={{ flexGrow: 1 }} />
-      <Typography variant="caption" color="text.secondary" data-testid="spellbook-count">
-        {shown === total ? `${String(total)} spells` : `${String(shown)} of ${String(total)} spells`}
-      </Typography>
-    </Stack>
+    <SpellTierSlider
+      tier={tier}
+      onTier={onTier}
+      note={tierEffectNote(categories)}
+      testId="spellbook-tier-slider"
+      trailing={
+        <Typography variant="caption" color="text.secondary" data-testid="spellbook-count">
+          {shown === total ? `${String(total)} spells` : `${String(shown)} of ${String(total)} spells`}
+        </Typography>
+      }
+    />
   )
 }
 

@@ -40,27 +40,27 @@
 // NOTHING HERE FILTERS OR SORTS (ruling 4): `loadoutCandidates`, `buildLoadout` and `combatSet` do
 // all of it, in `src/shared`, node-tested and with no React anywhere near them.
 
-import { type JSX, useMemo, useState } from 'react'
+import { type JSX, useCallback, useMemo, useState } from 'react'
 import { Alert, Box, Chip, Divider, Stack, Tab, Tabs, Typography } from '@mui/material'
-import { spellStatText } from '@shared/spellStats'
 import {
   DEFAULT_STAT_WEIGHTS,
   buildLoadout,
   COMBAT_TABLES,
+  buffTotals,
   combatSet,
   loadoutCandidates,
-  type CombatPick,
   type CombatSet,
-  type LoadoutCandidate,
-  type LoadoutRejection,
   type LoadoutSet
 } from '@shared/spellLoadout'
-import { TAB_LABEL, bestSpellsAt, defaultSorts } from '@shared/bestSpells'
+import { bestSpellsAt, defaultSorts } from '@shared/bestSpells'
+import { observedRankRow } from '@shared/spellRanks'
 import type { CharacterSnap } from '@shared/characterTypes'
 import { useCurrentComboClasses, useLevelUnlocks } from '../leveling/useLevelUnlocks'
 import { useModule } from '../../lib/useModule'
-import { SpellTooltip } from '../../lib/SpellCard'
-import SpellIcon from './SpellIcon'
+import SpellTierSlider from './SpellTierSlider'
+import { CastSection, KeepRow, RejectRow, TINY_CHIP } from './LoadoutRows'
+import BuffStatsPanel from './BuffStatsPanel'
+import { useObservedSpellRanks } from '../../lib/useObservedSpellRanks'
 import { useLoadoutViews } from './useLoadoutViews'
 
 /** A player has eight gems. Neither set trims to fit; they report what they want. */
@@ -76,121 +76,6 @@ const GEMS = 8
  * strength of a figure the app guessed low.
  */
 const ASSUMED_LEVEL = 50
-
-/** A chip that fits on a dense line. One style, so a row of them never wobbles. */
-const TINY_CHIP = { height: 18, fontSize: 10, '& .MuiChip-label': { px: 0.6 } } as const
-
-/** One buff in the recommended set. */
-function KeepRow({ c }: { c: LoadoutCandidate }): JSX.Element {
-  return (
-    <Stack
-      direction="row"
-      spacing={1}
-      alignItems="center"
-      useFlexGap
-      flexWrap="wrap"
-      data-testid="loadout-keep"
-      data-spell={c.name}
-      sx={{ py: 0.35 }}
-    >
-      <SpellIcon iconId={c.iconId} />
-      <SpellTooltip name={c.name} placement="right">
-        <Typography variant="body2" sx={{ fontWeight: 500, minWidth: 170 }}>
-          {c.name}
-        </Typography>
-      </SpellTooltip>
-      {c.grants.map((g, i) => (
-        <Chip
-          key={`${g.key}-${String(i)}`}
-          size="small"
-          variant="outlined"
-          label={spellStatText(g)}
-          sx={TINY_CHIP}
-        />
-      ))}
-    </Stack>
-  )
-}
-
-/** One buff that lost its slot, and what that cost. */
-function RejectRow({ r }: { r: LoadoutRejection }): JSX.Element {
-  return (
-    <Stack
-      direction="row"
-      spacing={1}
-      alignItems="center"
-      useFlexGap
-      flexWrap="wrap"
-      data-testid="loadout-rejected"
-      data-spell={r.name}
-      sx={{ py: 0.25, opacity: 0.85 }}
-    >
-      <SpellTooltip name={r.name} placement="right">
-        <Typography variant="body2" sx={{ minWidth: 170 }}>
-          {r.name}
-        </Typography>
-      </SpellTooltip>
-      <Typography variant="caption" color="text.secondary" data-testid="loadout-beaten-by">
-        {r.certainty === 'exact' ? 'loses its slot to' : 'probably contests'} {r.beatenBy}
-      </Typography>
-      {/* THE HALF WORTH PRINTING: what you give up by taking the winner. */}
-      {r.loses.length > 0 && (
-        <>
-          <Typography variant="caption" color="warning.main" data-testid="loadout-loses">
-            you lose
-          </Typography>
-          {r.loses.map((g, i) => (
-            <Chip
-              key={`${g.key}-${String(i)}`}
-              size="small"
-              color="warning"
-              variant="outlined"
-              label={spellStatText(g)}
-              sx={TINY_CHIP}
-            />
-          ))}
-        </>
-      )}
-    </Stack>
-  )
-}
-
-/** A whole number, or the placeholder every figure in this area uses for "the source says nothing". */
-function figure(v: number | undefined | null): string {
-  return v === undefined || v === null ? '-' : String(Math.round(v))
-}
-
-/** One damage spell in the combat set. */
-function CombatRow({ p }: { p: CombatPick }): JSX.Element {
-  return (
-    <Stack
-      direction="row"
-      spacing={1}
-      alignItems="center"
-      useFlexGap
-      flexWrap="wrap"
-      data-testid="combat-pick"
-      data-spell={p.name}
-      data-tab={p.tab}
-      sx={{ py: 0.35 }}
-    >
-      <SpellIcon iconId={p.iconId} />
-      <SpellTooltip name={p.name} placement="right">
-        <Typography variant="body2" sx={{ fontWeight: 500, minWidth: 170 }}>
-          {p.name}
-        </Typography>
-      </SpellTooltip>
-      <Chip size="small" variant="outlined" label={TAB_LABEL[p.tab]} sx={TINY_CHIP} />
-      <Typography
-        variant="caption"
-        color="text.secondary"
-        sx={{ fontVariantNumeric: 'tabular-nums' }}
-      >
-        {figure(p.metrics.damage)} dmg · {figure(p.metrics.dps)} dps · {figure(p.mana)} mana
-      </Typography>
-    </Stack>
-  )
-}
 
 /**
  * THE BUFF HEADER, AND THE SENTENCE THAT DECIDES WHETHER THIS TAB IS HONEST.
@@ -233,7 +118,16 @@ function SetHeader({ set, classes }: { set: LoadoutSet; classes: string }): JSX.
 }
 
 /** The buff half: the set, its two honesty chips, and every rejection with its cost. */
-function BuffSection({ set, classes }: { set: LoadoutSet; classes: string }): JSX.Element {
+function BuffSection({
+  set,
+  classes,
+  rankOf
+}: {
+  set: LoadoutSet
+  classes: string
+  /** `max(observed, simulated)` for one spell - see `KeepRow`. */
+  rankOf: (name: string) => number
+}): JSX.Element {
   return (
     <>
       <SetHeader set={set} classes={classes} />
@@ -272,7 +166,7 @@ function BuffSection({ set, classes }: { set: LoadoutSet; classes: string }): JS
           </Stack>
           <Stack>
             {set.keep.map((c) => (
-              <KeepRow key={c.name} c={c} />
+              <KeepRow key={c.name} c={c} rank={rankOf(c.name)} />
             ))}
           </Stack>
         </Box>
@@ -300,53 +194,61 @@ function BuffSection({ set, classes }: { set: LoadoutSet; classes: string }): JS
 /** Which set is on screen. Local to this view - see the tab bar for why it is not an app View. */
 type LoadoutPane = 'buffs' | 'combat' | 'heals'
 
+/** The three sets, as one value - they travel together into `Pane` and never apart. */
+interface LoadoutSets {
+  buffs: LoadoutSet
+  combat: CombatSet
+  heals: CombatSet
+}
+
 /**
- * A CAST SET - combat or heals. One component for both because they differ only in their words:
- * the spend policy, the row and the "nothing here contests anything" reasoning are identical.
+ * WHICH SET IS DRAWN. Its own component because `SpellLoadoutView` is at this tree's
+ * 100-line-per-function ceiling and the seam is the honest one: everything above it is wiring -
+ * the level, the ranks, the three folds - and this is the one decision about what to show.
  */
-function CastSection({
-  title,
-  set,
+function Pane({
+  pane,
+  sets,
   level,
-  blurb,
-  empty,
-  testId
+  classes,
+  rankOf
 }: {
-  title: string
-  set: CombatSet
+  pane: LoadoutPane
+  sets: LoadoutSets
   level: number
-  blurb: string
-  empty: string
-  testId: string
+  classes: string
+  rankOf: (name: string) => number
 }): JSX.Element {
+  if (pane === 'buffs') return <BuffSection set={sets.buffs} classes={classes} rankOf={rankOf} />
+  if (pane === 'combat') {
+    return (
+      <CastSection
+        title="Combat set"
+        set={sets.combat}
+        level={level}
+        blurb="Ranked by the Leveling tab, then spent one table at a time: the best nuke, the best damage over time and the best area spell before any second pick. Three tables because they answer three different fights, and eight of one of them can only fight one."
+        empty="None of your classes has a damage spell this app can put a figure on yet."
+        testId="combat-set"
+      />
+    )
+  }
   return (
-    <Box data-testid={testId}>
-      <Stack direction="row" spacing={1} alignItems="baseline">
-        <Typography variant="h6">{title}</Typography>
-        <Typography variant="caption" color="text.secondary">
-          {String(set.picks.length)} of {String(set.gems)} gems, read at level {String(level)}
-        </Typography>
-      </Stack>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-        {blurb}
-      </Typography>
-      {set.picks.length === 0 ? (
-        <Alert severity="info" data-testid={`${testId}-empty`}>
-          {empty}
-        </Alert>
-      ) : (
-        <Stack>
-          {set.picks.map((p) => (
-            <CombatRow key={p.name} p={p} />
-          ))}
-        </Stack>
-      )}
-    </Box>
+    <CastSection
+      title="Heal set"
+      set={sets.heals}
+      level={level}
+      blurb="The same spend, over the healing tables: the best direct heal and the best heal over time before any second pick. A heal occupies no slot on you, so nothing here contests anything - unlike the buffs, which do."
+      empty="None of your classes has a healing spell this app can put a figure on yet."
+      testId="heal-set"
+    />
   )
 }
 
 export default function SpellLoadoutView(): JSX.Element {
   const [pane, setPane] = useState<LoadoutPane>('buffs')
+  // THE SIMULATE SLIDER (owner, 2026-09-10). It is the Spellbook's control, shared
+  // (`SpellTierSlider`), and it means the same thing here: every spell read at AT LEAST this rank.
+  const [tier, setTier] = useState(0)
   const data = useLevelUnlocks()
   const combo = useCurrentComboClasses()
   const who = useModule<CharacterSnap>('character')
@@ -359,6 +261,13 @@ export default function SpellLoadoutView(): JSX.Element {
   const candidates = useMemo(
     () => loadoutCandidates(data.spells, combo.resolved, DEFAULT_STAT_WEIGHTS, { level }),
     [data.spells, combo.resolved, level]
+  )
+  // THE RANK YOU ACTUALLY HAVE, off the log (JOS-446), lifted to whatever the slider asks for -
+  // `max(observed, simulated)`, which is the Leveling tab's own rule so the two cannot disagree.
+  const ranks = useObservedSpellRanks()
+  const rankOf = useCallback(
+    (name: string) => Math.max(observedRankRow(ranks, name)?.rank ?? 0, tier, 1),
+    [ranks, tier]
   )
   const names = useMemo(() => candidates.map((c) => c.name), [candidates])
   const views = useLoadoutViews(names)
@@ -375,12 +284,16 @@ export default function SpellLoadoutView(): JSX.Element {
   // which nuke is better. `defaultSorts()` is that tab's "best first" on every table, and
   // `bestSpellsAt` already applies the level and splits the era off - so these two have always had
   // the filter the buff half was missing.
+  // The cast sets read the SAME two rank inputs, through the field `bestSpellsAt` already has for
+  // them - so a nuke on the Combat pane and a buff on the Buffs pane are at the same rank.
   const ranked = useMemo(
-    () => bestSpellsAt(data, combo, level, { sorts: defaultSorts() }),
-    [data, combo, level]
+    () => bestSpellsAt(data, combo, level, { sorts: defaultSorts(), observed: ranks, simulate: tier }),
+    [data, combo, level, ranks, tier]
   )
   const combat = useMemo(() => combatSet(ranked.tabs, GEMS, COMBAT_TABLES.combat), [ranked])
   const heals = useMemo(() => combatSet(ranked.tabs, GEMS, COMBAT_TABLES.heals), [ranked])
+  const totals = useMemo(() => buffTotals(set.keep), [set.keep])
+  const sets = useMemo<LoadoutSets>(() => ({ buffs: set, combat, heals }), [set, combat, heals])
 
   if (combo.resolved.length === 0) {
     return (
@@ -419,28 +332,28 @@ export default function SpellLoadoutView(): JSX.Element {
         <Tab value="heals" label={`Heals (${String(heals.picks.length)})`} data-testid="loadout-pane-heals" />
       </Tabs>
 
-      <Stack spacing={2} sx={{ pb: 4 }}>
-        {pane === 'buffs' && <BuffSection set={set} classes={combo.resolved.join(' / ')} />}
-        {pane === 'combat' && (
-          <CastSection
-            title="Combat set"
-            set={combat}
-            level={level}
-            blurb="Ranked by the Leveling tab, then spent one table at a time: the best nuke, the best damage over time and the best area spell before any second pick. Three tables because they answer three different fights, and eight of one of them can only fight one."
-            empty="None of your classes has a damage spell this app can put a figure on yet."
-            testId="combat-set"
-          />
-        )}
-        {pane === 'heals' && (
-          <CastSection
-            title="Heal set"
-            set={heals}
-            level={level}
-            blurb="The same spend, over the healing tables: the best direct heal and the best heal over time before any second pick. A heal occupies no slot on you, so nothing here contests anything - unlike the buffs, which do."
-            empty="None of your classes has a healing spell this app can put a figure on yet."
-            testId="heal-set"
-          />
-        )}
+      {/* THE SLIDER, and a caption that says what it does NOT do - see `BuffStatsPanel`. */}
+      <SpellTierSlider
+        tier={tier}
+        onTier={setTier}
+        testId="loadout-tier-slider"
+        note={
+          pane === 'buffs'
+            ? 'a buff set gains mana, duration and cast time - never bigger stats'
+            : 'damage and healing move; mana, duration and cast time move with them'
+        }
+      />
+
+      <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ pb: 4, mt: 1 }}>
+        <Stack spacing={2} sx={{ flexGrow: 1, minWidth: 0 }}>
+          <Pane pane={pane} sets={sets} level={level} classes={combo.resolved.join(' / ')} rankOf={rankOf} />
+        </Stack>
+        {/* THE SUMMARY RIDES BESIDE ALL THREE PANES. "What am I getting from my buffs" is the
+            standing question whichever set you are reading, and it is the panel the slider is
+            there to be dragged next to. */}
+        <Box sx={{ width: 220, flexShrink: 0 }}>
+          <BuffStatsPanel totals={totals} tier={tier} />
+        </Box>
       </Stack>
     </Stack>
   )
