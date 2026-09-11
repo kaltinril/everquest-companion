@@ -22,6 +22,9 @@ import { ownershipKey } from '../../../../shared/planner/ownership'
 import { SLOT_OF_LOCATION } from '../../../../shared/planner/inventorySlots'
 import type { EquipLocationToken } from '../../../../shared/outputs/inventory'
 import type { EquipSlot } from '../../../../shared/planner/types'
+// R2's slot half, corrected 2026-09-10: `donor ∩ hostItem` first, the cell second. Its header
+// carries the report and the measurement behind it.
+import { slotFits } from '../../../../shared/planner/rules'
 import { bestEffectFor, usable, type KindEffect } from './exaltationAudit'
 
 // ---- the recommender (the "best with what we have" ask) ----------------------------------------
@@ -46,9 +49,16 @@ export interface SocketHostCell {
   cellLabel: string
   item: string
   type: string
-  /** the cell's planner slot — R2's destination: a gem fits only where its donor's slots
-   *  include this. Null for the two client tokens the wiki cannot name (Any Slot, Held), and a
-   *  null-slot host takes NO suggestions, because R2 cannot be checked there. */
+  /**
+   * The cell's planner slot, or NULL for the two client tokens the wiki cannot name
+   * (`Any Slot`, `Held`).
+   *
+   * A NULL SLOT NO LONGER MEANS "NO SUGGESTIONS" (slot-rule fix, 2026-09-10). R2's slot half is
+   * `donor ∩ hostItem`, and the cell is a second constraint on top of it - so an `Any Slot` cell
+   * constrains nothing and its HOST still decides. The owner's own dump is the case: two `Any Slot`
+   * cells holding ordinary SECONDARY items with seven empty sockets between them, which used to be
+   * offered nothing at all. See `shared/planner/rules.ts slotFits`.
+   */
   slot: EquipSlot | null
   /** `ownershipKey(item)` — the host item's corpus row, for R2's CLASS half: socketing a
    *  class-restricted gem narrows the host to the donor's classes, so the two must overlap
@@ -170,20 +180,44 @@ function bestLoose(
   host: Pick<SocketHostCell, 'type' | 'slot' | 'itemKey'>,
   accept: (eff: KindEffect) => boolean
 ): { key: string; row: GearRow; eff: KindEffect } | null {
-  // R2: no destination slot the wiki can name, no suggestion at all.
-  if (host.slot === null) return null
   const hostRow = ctx.rowByKey.get(host.itemKey)
+  const hostSlots = hostRow?.slots ?? []
+  // R2's slot half needs SOMETHING to check against. An any-cell whose host the corpus does not
+  // know is genuinely unanswerable - there is no slot on either side - and stays silent.
+  if (host.slot === null && hostSlots.length === 0) return null
+  const seat: SeatFacts = { cell: host.slot, hostRow, hostSlots }
   let best: { key: string; row: GearRow; eff: KindEffect } | null = null
   for (const key of ctx.pool.keys()) {
     const row = ctx.rowByKey.get(key)
-    if (row === undefined || !usable(row, ctx.classes)) continue
-    if (!row.slots.includes(host.slot)) continue
-    if (!classesOverlap(row, hostRow)) continue
+    if (row === undefined || !socketable(row, ctx.classes, seat)) continue
     const eff = bestEffectFor(row, host.type)
     if (eff === null || !accept(eff)) continue
     if (best === null || eff.tier > best.eff.tier) best = { key, row, eff }
   }
   return best
+}
+
+/**
+ * Can this loose gem legally go in this seat at all - R2's two halves, before any question of
+ * whether it is a good idea.
+ *
+ * Its own function because `bestLoose` crossed the tree's complexity ceiling when the slot half
+ * grew its third fact (the host item's own slots), and the seam is the honest one: everything here
+ * is about LEGALITY and everything left behind is about RANKING.
+ */
+interface SeatFacts {
+  /** the cell's equip slot, or null for an `Any Slot` / `Held` cell */
+  cell: EquipSlot | null
+  /** the HOST item's corpus row, for R2's class half; undefined when the corpus lacks it */
+  hostRow: GearRow | undefined
+  /** the HOST item's own equip slots - the half R2's slot test was missing until 2026-09-10 */
+  hostSlots: readonly EquipSlot[]
+}
+
+function socketable(row: GearRow, classes: readonly ClassAbbr[], seat: SeatFacts): boolean {
+  if (!usable(row, classes)) return false
+  if (!slotFits(row.slots, seat.hostSlots, seat.cell)) return false
+  return classesOverlap(row, seat.hostRow)
 }
 
 /** R2's class half: the gem re-restricts the host to the donor's classes, so they must share

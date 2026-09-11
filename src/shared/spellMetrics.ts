@@ -665,8 +665,16 @@ interface Fold {
 function foldLine(side: Side, line: HpLine, durationTicks: number, fold: Fold): void {
   // THE ONE PLACE A MOTE RANK TOUCHES A NUMBER (JOS-447). Both paths - the wiki's own lines and the
   // client's slots - fold through here, so one scaling happens once rather than twice in agreement.
-  // Each direction scales by its own measured rate: six percent a rank for damage, three for
-  // healing (owner ruling 2026-08-23 shipped the healing half; spellScale.ts holds both fits).
+  // Each direction scales by its own measured rate (owner ruling 2026-08-23 shipped the healing
+  // half; spellScale.ts holds every fit and its evidence):
+  //
+  //     direct damage  6% a rank      per-tick damage  3% a rank      healing  3% a rank
+  //
+  // THE DAMAGE SIDE SPLIT IN TWO ON 2026-09-10, and `line.perTick` is the whole of the new rule. The
+  // original fit was made on nukes with no DoT in its sample, so its six percent was the one rate it
+  // had rather than a measurement of a tick; three DoT ladders in the owner's own log then read
+  // 2.6-3.0% a rank, with six percent missing every one of them by 10-15%. A DD+DoT hybrid's direct
+  // hit stays at six, and that falls out of the same flag rather than needing a rule of its own.
   //
   // AND THE WAVES MULTIPLY WHAT THE RANK PRODUCED (JOS-449), in that order and damage-side only -
   // `SpellMetricsInput.hits` states why.
@@ -677,7 +685,8 @@ function foldLine(side: Side, line: HpLine, durationTicks: number, fold: Fold): 
   // never lift a healing line, and the two are resolved separately against the same spell.
   const amount =
     line.direction === 'down'
-      ? applyFocusPct(scaleSpellDamage(line.amount, fold.rank), fold.focusDamagePct) * fold.hits
+      ? applyFocusPct(scaleSpellDamage(line.amount, fold.rank, line.perTick), fold.focusDamagePct) *
+        fold.hits
       : applyFocusPct(scaleSpellHeal(line.amount, fold.rank), fold.focusHealPct)
   if (!line.perTick) {
     side.total += amount

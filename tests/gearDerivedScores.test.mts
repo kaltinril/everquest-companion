@@ -117,12 +117,16 @@ test('BIS ranks breadth over one tall stat - the fork example, verbatim', () => 
   assert.equal(statText(undefined, 'BIS'), '')
 })
 
-test('haste is credited only ABOVE what is worn, and the chip is an infinite worn haste', () => {
+test('haste counts only for a player who owns NONE, and the chip is an infinite worn haste', () => {
   const hasteWeight = roleValue({ HASTE: 1 }, 'dps')
   assert.ok(hasteWeight > 0)
-  // Nothing worn: the whole 20% counts. Wearing 15%: five points of it. Wearing 20% or more: none.
-  assert.equal(gearEffectiveDamage({ HASTE: 20 }), 20 * hasteWeight)
-  assert.equal(gearEffectiveDamage({ HASTE: 20 }, { ownedHaste: 15 }), 5 * hasteWeight)
+  // OWNER RULING 2026-09-10: *"the only way we should ever include haste is if they have zero haste
+  // on their items already"*. This spec used to assert the MARGIN rule - wearing 15% credited five
+  // points of a 20% item - and that is what the ruling replaced: the same percentage is available
+  // from a belt, a cape or gloves, so a second source is worth nothing to a player who has one.
+  assert.equal(gearEffectiveDamage({ HASTE: 20 }), 20 * hasteWeight, 'none owned: the whole 20%')
+  assert.equal(gearEffectiveDamage({ HASTE: 20 }, { ownedHaste: 1 }), 0, 'one point owned is enough')
+  assert.equal(gearEffectiveDamage({ HASTE: 20 }, { ownedHaste: 15 }), 0, 'no margin is credited')
   assert.equal(gearEffectiveDamage({ HASTE: 20 }, { ownedHaste: 20 }), 0)
   assert.equal(gearEffectiveDamage({ HASTE: 20 }, { ownedHaste: 41 }), 0)
   // The chip drops the credit whatever is worn - and only the CREDIT: a stated penalty is a stated

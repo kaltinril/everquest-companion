@@ -15,12 +15,13 @@
 //       is worth 2^n (D0=1 … D4=16) AND arrives pre-plussed at +n.
 
 import { EXALTATION_SLOT_TYPES, expToNextTier } from '../itemStats'
-import { hostSlotsOf, planSlotLabel } from './types'
+import { equipSlotOf, planSlotLabel } from './types'
 import type { ClassAbbr } from '../classCombo'
 import type {
   EquipSlot,
   ExaltPlan,
   ExtractTier,
+  PlanSlot,
   PlanSlotId,
   PlanSocket,
   PlannerDonor,
@@ -61,16 +62,140 @@ const OK: SocketCompatibility = { ok: true }
  * UI says which fact is absent. The one deliberate exception is an empty `planClasses` — a set
  * that has not chosen a trio yet is asking for no class filter, not for zero classes.
  */
+/**
+ * RACE IS NOT CHECKED, AND THAT IS MEASURED RATHER THAN FORGOTTEN (audit, 2026-09-10).
+ *
+ * The game's rule has three dimensions, not two: a fork player states it as *"if a target item does
+ * not contain at least 1 matching CLASS, RACE, and SLOT, then the exaltation can not be put into
+ * that item"*. This function checks class and slot and says nothing about race. It was audited on
+ * the committed corpus rather than left as a hole somebody rediscovers:
+ *
+ *   * 1,249 of the 1,250 EFFECT-BEARING items - every possible donor - state `ALL`.
+ *   * 6,827 of the 6,850 gear rows - every possible host - state `ALL`.
+ *   * Cross-multiplying donor against host is 8,562,500 pairs. Treating `ALL` as universal, the
+ *     number a race rule would block is **ZERO**.
+ *
+ * AND THE CORPUS COULD NOT EXPRESS ONE ANYWAY. The only non-`ALL` shapes are `NONE` (17 hosts) and
+ * a TRUNCATED `['ALL', 'EXCEPT']` (6 rows, e.g. Theurgist) - an exclusion with no race after the
+ * `EXCEPT`. `GearRow.races` says why it stays verbatim: there is no measured closed race table in
+ * this repo, and inventing the sixteen-race complement from a 12-token census is the fuzzy join law
+ * 12 refuses. So a race rule written today would be arithmetic over data that cannot state the
+ * fact, which is worse than an honest gap.
+ *
+ * WHAT WOULD CHANGE THIS: a rescrape whose `EXCEPT` rows carry their race, or any real population of
+ * race-restricted exaltation donors. The check then belongs right here beside the class half, in
+ * `slotFits`' shape - `donor ∩ host`, with `ALL` as the universal set - and `PlannerDonor` grows a
+ * `races` field to carry it. Re-run the census before writing a line of it.
+ */
 export function socketCompatibility(
   donor: PlannerDonor,
   hostSlots: readonly EquipSlot[],
-  planClasses: readonly ClassAbbr[]
+  planClasses: readonly ClassAbbr[],
+  cell?: EquipSlot | null
 ): SocketCompatibility {
   if (donor.hasteLocked) return { ok: false, reason: 'haste' }
-  if (!donor.slots.some((s) => hostSlots.includes(s))) return { ok: false, reason: 'slot' }
+  if (!slotFits(donor.slots, hostSlots, cell ?? null)) return { ok: false, reason: 'slot' }
   if (planClasses.length === 0) return OK
   if (!donor.classes.some((c) => planClasses.includes(c))) return { ok: false, reason: 'class' }
   return OK
+}
+
+/**
+ * R2's SLOT HALF, corrected (user report via a fork player, 2026-09-10).
+ *
+ * ── WHAT THE RULE ACTUALLY IS ─────────────────────────────────────────────────────────────────
+ *
+ * The report, near-verbatim: *"We told it that Slot restrictions must be followed. We should have
+ * told it that Exaltation Slot restrictions must MATCH AT LEAST ONE OF THE ITEM Slot restrictions.
+ * The resulting combination may further restrict what slots the combined Item and Exaltation can be
+ * placed in. An Any slot can take any valid Item + Exaltation combination."*
+ *
+ * So there are three facts and the old code conflated two of them:
+ *
+ *   1. the EXALTATION's slots, 2. the HOST ITEM's slots, and 3. the CELL you are putting it in.
+ *
+ * The rule is `donor ∩ item ≠ ∅` FIRST - that is what makes the pair legal at all - and the cell is
+ * a SECOND, separate constraint on where the combined thing may then be worn.
+ *
+ * ── WHAT WAS BROKEN, AND WHY IT ONLY SHOWED ON `Any Slot` ─────────────────────────────────────
+ *
+ * Every caller was testing the donor against the CELL and never against the ITEM. For a NAMED cell
+ * those give the same answer by accident: the host item is being worn in that cell, so the cell is
+ * necessarily one of the item's own slots, and `donor ∋ cell` is exactly `cell ∈ donor ∩ item`.
+ *
+ * `Any Slot` is where the accident stops working. It names no equip slot at all (the client's own
+ * token; `planner/inventorySlots.ts` maps it to null because there is no wiki slot to name), so a
+ * caller asking "is the cell in the donor's slots" is asking about a slot that does not exist - and
+ * since no exaltation is ever stated as `Any Slot`, the answer was always no. MEASURED on the
+ * owner's own dump: his two `Any Slot` cells hold `Bladestopper +5` and `Shield of Rainbow Hues +6`,
+ * both plain SECONDARY items the corpus knows, with SEVEN empty sockets between them - and the
+ * advisor offered nothing for any of them. Re-measured after the fix: **288 effect-bearing donors
+ * in the committed corpus fit each of those two items**, against 0 before.
+ *
+ * ── THE UNKNOWN RULES, WHICH ARE LAW 1 IN BOTH DIRECTIONS ─────────────────────────────────────
+ *
+ * A donor that states NO slot fails, here as everywhere: it shares a slot with nothing, and an
+ * unproven claim is not a pass.
+ *
+ * An unknown HOST (`hostSlots` empty - not in the corpus, or a page that stated no slot) is a
+ * different kind of silence: it is a fact about our data rather than about the item, so it does not
+ * get to veto. The cell then decides alone, which is precisely the behaviour every caller had
+ * before this fix - so a corpus miss is no worse off than it was, and a corpus HIT gains the whole
+ * rule. An unknown host under an ANY cell stays unanswerable and returns false: nothing is known
+ * about where the pair could go, and inventing a yes there is what the report was complaining about
+ * in reverse.
+ */
+export function slotFits(
+  donorSlots: readonly EquipSlot[],
+  hostSlots: readonly EquipSlot[],
+  /** The equip slot of the cell, or NULL for an `Any Slot` cell, which constrains nothing. */
+  cell: EquipSlot | null
+): boolean {
+  // 1. THE PAIR. Deliberately NOT `narrowedSlots`, which is the DISPLAY twin and is tolerant of an
+  //    unknown on either side - right for "what is this pair restricted to", wrong for "is this
+  //    pair legal". Here the donor must have stated slots (law 1: an unproven claim is not a pass)
+  //    while an unknown HOST is our ignorance and does not get to veto.
+  if (donorSlots.length === 0) return false
+  const combined =
+    hostSlots.length === 0 ? donorSlots : donorSlots.filter((sl) => hostSlots.includes(sl))
+  if (combined.length === 0) return false
+  // 2. THE PLACE. An any-cell constrains nothing, so a legal pair is legal there - which is the
+  //    whole of the reported fix. A named cell has to survive the narrowing.
+  //
+  //    AN UNKNOWN HOST UNDER AN ANY-CELL ANSWERS TRUE, and the reason is what this function IS:
+  //    "does anything we know contradict this pair, here". Nothing does - we simply have no row
+  //    for the host - so the honest answer is yes, and JOS-104's own regression test is the case
+  //    that says so out loud (a player reported the any-cells refusing the chest piece he was
+  //    wearing in one; a cell that does that is worse than no cell).
+  //
+  //    A SUGGESTER WANTS THE OPPOSITE and must not rely on this. "Nothing contradicts it" is the
+  //    right bar for a LINT, which must never cry wolf on missing data, and the wrong bar for a
+  //    RECOMMENDER, which must not offer what it cannot verify. `socketRecommend.ts` and
+  //    `socketOptimize.ts` therefore keep their own explicit guard and stay silent on an any-cell
+  //    whose host the corpus does not know.
+  if (cell === null) return true
+  return combined.includes(cell)
+}
+
+/**
+ * R2's OTHER side effect: socketing narrows the HOST's equip slots to the overlap with the donor's.
+ *
+ * The twin of `narrowedClasses` below, and the report named it explicitly - *"the resulting
+ * combination may further restrict what slots the combined Item and Exaltation can be placed in"*.
+ * A SECONDARY-or-PRIMARY sword taking a SECONDARY-only gem becomes a secondary-only sword, and a
+ * player who was moving it between hands needs to be told.
+ *
+ * An empty list means UNKNOWN on either side, so narrowing against one returns the other unchanged
+ * rather than claiming an intersection nobody stated - identical to `narrowedClasses`, and for the
+ * identical reason: an empty result would read as "wearable nowhere".
+ */
+export function narrowedSlots(
+  hostSlots: readonly EquipSlot[],
+  donorSlots: readonly EquipSlot[]
+): EquipSlot[] {
+  if (hostSlots.length === 0) return [...donorSlots]
+  if (donorSlots.length === 0) return [...hostSlots]
+  return hostSlots.filter((sl) => donorSlots.includes(sl))
 }
 
 /**
@@ -150,10 +275,20 @@ export interface PlanWarning {
 export type DonorIndex = ReadonlyMap<string, readonly PlannerDonor[]>
 
 interface WarnCtx {
-  /** the cell being linted; `hostSlotsOf` is what R2 is actually asked about */
+  /** the cell being linted */
   cell: PlanSlotId
   classes: readonly ClassAbbr[]
   donors: DonorIndex
+  /**
+   * The HOST item's own equip slots, when the corpus knows them.
+   *
+   * R2's slot half is `donor ∩ item`, and the cell is a second constraint on top (see `slotFits`) -
+   * so the lint has to know what the host IS, not only where it sits. Empty when the plan has
+   * picked no host, or when the host carries no effect and therefore has no donor row to read its
+   * slots off; `slotFits` treats that as our ignorance rather than the item's, and lets the cell
+   * decide alone exactly as this lint did before the fix.
+   */
+  hostSlots: readonly EquipSlot[]
 }
 
 const REASON_MESSAGE: Record<IncompatibleReason, (donor: PlannerDonor, ctx: WarnCtx) => string> = {
@@ -175,10 +310,13 @@ function socketWarning(ctx: WarnCtx, socket: SocketType, planned: PlanSocket): P
       message: `${planned.effect} - no donor item in the database`
     }
   }
-  // `hostSlotsOf`, not the cell's own slot: an any-cell (JOS-104) constrains no slot, so it hands
-  // R2 all eighteen and the slot half simply cannot fail there. The class half is untouched — an
-  // any-slot is a place to wear something, never a permit to socket a Ranger proc into a robe.
-  const compat = socketCompatibility(donor, hostSlotsOf(ctx.cell), ctx.classes)
+  // THE HOST ITEM'S slots and the CELL, as two separate facts (the 2026-09-10 slot-rule fix). The
+  // old call passed `hostSlotsOf(ctx.cell)` for both, which made an any-cell hand R2 all eighteen -
+  // permissive rather than wrong here, but it meant the lint never once asked what the host WAS.
+  // `equipSlotOf` answers null for an any-cell, which is exactly what `slotFits` wants. The class
+  // half is untouched: an any-slot is a place to wear something, never a permit to socket a Ranger
+  // proc into a robe.
+  const compat = socketCompatibility(donor, ctx.hostSlots, ctx.classes, equipSlotOf(ctx.cell))
   if (compat.ok) return null
   return {
     slot: ctx.cell,
@@ -194,13 +332,32 @@ function socketWarning(ctx: WarnCtx, socket: SocketType, planned: PlanSocket): P
  * set's trio, wrong slot, haste-locked, or absent from the DB), plus slots that plan sockets with
  * no host item picked. Decoration-free — this reads the PLAN, never the user's inventory.
  */
+/**
+ * The host item's own equip slots, read off any donor row the corpus holds for it.
+ *
+ * A DonorIndex is keyed by item and every row of one item repeats that item's slots, so the first
+ * row answers. Empty when no host is picked or when the host bears no effect at all - an item with
+ * nothing to donate has no row here, which is a gap in what we can see rather than a fact about the
+ * item, and `slotFits` is written to treat it that way.
+ */
+function hostSlotsFromPlan(planSlot: PlanSlot, donors: DonorIndex): readonly EquipSlot[] {
+  const key = planSlot.hostKey
+  if (key == null) return []
+  return donors.get(key)?.[0]?.slots ?? []
+}
+
 export function planWarnings(plan: ExaltPlan, donorsByKey: DonorIndex): PlanWarning[] {
   const out: PlanWarning[] = []
   for (const [slotName, planSlot] of Object.entries(plan.slots)) {
     if (!planSlot) continue
     const cell = slotName as PlanSlotId
     const entries = Object.entries(planSlot.sockets) as [SocketType, PlanSocket | undefined][]
-    const ctx: WarnCtx = { cell, classes: plan.classes, donors: donorsByKey }
+    const ctx: WarnCtx = {
+      cell,
+      classes: plan.classes,
+      donors: donorsByKey,
+      hostSlots: hostSlotsFromPlan(planSlot, donorsByKey)
+    }
     if (planSlot.hostKey == null && entries.some(([, s]) => s != null)) {
       out.push({ slot: cell, kind: 'no-host', message: 'No host item picked' })
     }

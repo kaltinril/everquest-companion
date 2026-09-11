@@ -90,12 +90,43 @@
 export const SPELL_MAX_RANK = 10
 
 /**
- * Percent of the base amount ONE rank adds to a damage line. Measured, not ported — see the header.
- * It is a whole number so the arithmetic below stays in integers until one division.
+ * Percent of the base amount ONE rank adds to a DIRECT damage line. Measured, not ported — see the
+ * header. It is a whole number so the arithmetic below stays in integers until one division.
  */
 export const SPELL_DAMAGE_RANK_PERCENT = 6
 
-/** Percent ONE rank adds to a healing line: half the damage rate, measured the same way. */
+/**
+ * …and the rate for a PER-TICK damage line, which is HALF of it (2026-09-10).
+ *
+ * ── WHY THIS NUMBER IS NOT SIX ────────────────────────────────────────────────────────────────
+ *
+ * The fit above was made on NUKES — Garrison's Mighty Mana Shock and Discordant Mind — and no DoT
+ * ladder was in its sample. So six percent for a DoT was never a measurement: it was the one rate
+ * the fit had, applied everywhere, because nothing had asked the question.
+ *
+ * The spell-upgrade ticket asked it, and the owner's own log answers it. A DoT's tick line states
+ * the rank ON ITSELF — `<mob> has taken 468 damage from your Odium VII.` — where a nuke hit does
+ * not, so rank, level and damage arrive together and the worn factor cancels in a same-level ratio.
+ * Three ladders, each read inside one level and one day (docs/plans/spell-upgrades-and-loadout.md
+ * §0.9; `tests/spellUpgrade.test.mts` keeps the fixtures):
+ *
+ *     Odium           387 -> 445 at V     floor(387 x 1.15) = 445    EXACT
+ *     Odium           387 -> 468 at VII   floor(387 x 1.21) = 468    EXACT
+ *     Envenomed Bolt  422 -> 473 at IV    3.02% a rank
+ *     Plague          180 -> 199 at IV    2.64% a rank
+ *
+ * At six percent those four would read 503, 549, 523 and 223 — wrong by 10-15% on every one, far
+ * outside the noise on ceilings this tight (Odium at VII reads 468 on four of its top four ticks).
+ *
+ * THE CONFOUNDS WERE CHECKED AND NONE OF THEM REACHES THIS NUMBER (owner's caution, 2026-09-10).
+ * Death, dispels, an accidental click-off and a manual recast all decide WHETHER a tick happens and
+ * never what number is on one that does; the 1,928 stance changes and the two cast-time AAs in that
+ * log move cast time, not tick magnitude; and the two DoT crit AAs bought mid-window are ruled out
+ * by shape, since a crit is a large multiplier and the histograms carry no 2x values at all.
+ */
+export const SPELL_DOT_DAMAGE_RANK_PERCENT = 3
+
+/** Percent ONE rank adds to a healing line: half the direct-damage rate, measured the same way. */
 export const SPELL_HEAL_RANK_PERCENT = 3
 
 /**
@@ -117,7 +148,7 @@ export function normalizeSpellRank(rank: number | null | undefined): number {
 }
 
 /**
- * ONE DAMAGE MAGNITUDE AT A RANK: `amount + floor(amount * 6 * N / 100)`.
+ * ONE DAMAGE MAGNITUDE AT A RANK: `amount + floor(amount * pct * N / 100)`.
  *
  * Spelled as `amount + floor(...)` rather than `floor(amount * (1 + 0.06N))` to mirror
  * `itemUpgrade.scaleDamage`, and multiplied before it is divided so the percentage never becomes a
@@ -125,11 +156,26 @@ export function normalizeSpellRank(rank: number | null | undefined): number {
  *
  * A non-positive amount is returned untouched: the wiki's ramps can read zero at a level below a
  * spell's band, and an upgrade does not turn nothing into something.
+ *
+ * `perTick` PICKS THE RATE, and it is the honest discriminator rather than a convenient one: a
+ * per-tick damage line IS a damage-over-time tick, and a line that is not per-tick is a direct hit —
+ * including the direct hit of a DD+DoT hybrid, which the community model likewise puts at the full
+ * six percent while its ticks scale at three. `HpLine.perTick` is already on every line both the
+ * wiki path and the client path fold through (`spellMetrics.ts foldLine`), so no caller has to
+ * classify anything to get this right.
+ *
+ * DEFAULTS TO THE DIRECT RATE, so a caller that states nothing gets byte-for-byte what this function
+ * returned before 2026-09-10.
  */
-export function scaleSpellDamage(amount: number, rank: number | null | undefined): number {
+export function scaleSpellDamage(
+  amount: number,
+  rank: number | null | undefined,
+  perTick = false
+): number {
   const n = normalizeSpellRank(rank)
   if (n === 0 || amount <= 0) return amount
-  return amount + Math.floor((amount * SPELL_DAMAGE_RANK_PERCENT * n) / 100)
+  const pct = perTick ? SPELL_DOT_DAMAGE_RANK_PERCENT : SPELL_DAMAGE_RANK_PERCENT
+  return amount + Math.floor((amount * pct * n) / 100)
 }
 
 /** ONE HEALING MAGNITUDE AT A RANK: the damage rule at half the rate (see the header's evidence). */

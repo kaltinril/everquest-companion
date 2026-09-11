@@ -40,6 +40,12 @@ import type { AppRouting, NavBack } from '../../appRouting'
 import type { View } from '../../appViews'
 import { SpellCardBody, SpellTooltip, useSpellDetail } from '../../lib/SpellCard'
 import { useBackTarget } from '../../appBack'
+// SECTIONS 5 TO 7 (docs/plans/spell-upgrades-and-loadout.md §4.4), in their own files because this
+// one is at the 400-code-line factoring ceiling and because they are a different subject: the three
+// sections above are the spell's IDENTITY - what it is, what line it sits on, who casts it - and
+// these are what it DOES, what upgrading buys, and what carries it.
+import { GrantsSection, UpgradeSection } from './SpellUpgradePanel'
+import SpellItemsSection from './SpellItemsSection'
 
 /**
  * THE ONE RUNG OF THE LADDER, as a row: the level its class gains it at, the name, and when YOU
@@ -192,6 +198,44 @@ function StatStrip({ detail }: { detail: SpellDetail }): JSX.Element | null {
   )
 }
 
+
+/**
+ * SECTIONS 2 THROUGH 7, under one null check.
+ *
+ * ITS OWN COMPONENT BECAUSE THE PAGE CROSSED THE COMPLEXITY CEILING when sections 5 to 7 landed
+ * (eslint.config.mjs, 12). Every section is conditional on the record being present and most are
+ * conditional again on their own field, so six sections cost twelve branches in one function - and
+ * `SpellPage` above still has to hold the Back contract, the loading state and the card. Lifting the
+ * null check to one place turns twelve branches into six, which is what the ceiling was pointing at.
+ *
+ * THE ORDER IS THE READER'S QUESTION ORDER, and it changed when these three arrived. Grants sits
+ * DIRECTLY UNDER THE RECORD, above the ladder and the class list, because it is the answer to the
+ * report that produced this whole feature - *"it just says the name of the spell"* - and a reader
+ * who came to find out what a spell does should not scroll past a research ladder to reach it.
+ */
+function PageSections({ detail }: { detail: SpellDetail }): JSX.Element {
+  return (
+    <>
+      {/* SECTION 5 - what it grants, at the level main read it. */}
+      {detail.grants !== undefined && <Divider />}
+      <GrantsSection detail={detail} />
+      {/* SECTION 2 - the research line this spell sits on. */}
+      {detail.linePath !== null && <Divider />}
+      <LineSection detail={detail} />
+      {/* SECTION 3 - every class that gets it, and at what level. */}
+      <Divider />
+      <ClassSection detail={detail} />
+      {/* SECTION 6 - the mote ladder, drawn WHOLE rather than behind a slider: this is one spell
+          and every rung between base and X is part of a 1,023-mote decision. */}
+      {detail.tierLadder !== undefined && <Divider />}
+      <UpgradeSection detail={detail} />
+      {/* SECTION 7 - what carries it, worn / click / focus / proc. */}
+      {detail.itemSources !== undefined && <Divider />}
+      <SpellItemsSection sources={detail.itemSources} />
+    </>
+  )
+}
+
 /**
  * THE SPELL DRILLDOWN.
  *
@@ -251,10 +295,7 @@ export function SpellPage({
           <Box data-testid="spell-page-record">
             <SpellCardBody name={name} data={detail} loading={loading} />
           </Box>
-          {detail?.linePath != null && <Divider />}
-          {detail !== null && <LineSection detail={detail} />}
-          <Divider />
-          {detail !== null && <ClassSection detail={detail} />}
+          {detail !== null && <PageSections detail={detail} />}
         </Stack>
       </Box>
     </Stack>

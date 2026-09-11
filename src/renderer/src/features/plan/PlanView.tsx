@@ -395,7 +395,7 @@ export default function PlanView({ onOpenLoot, onOpenMapZone, onOpenMob }: PlanV
           data-testid="plan-owned-upgrades"
           sx={{ mb: 1, px: 0.5, flexShrink: 0 }}
         >
-          You already own upgrades — equip:{' '}
+          You already own upgrades - equip:{' '}
           {ownedUps.slice(0, 5).map((u) => `${u.name} (${u.slot.charAt(0) + u.slot.slice(1).toLowerCase()})`).join(' · ')}
           {ownedUps.length > 5 ? ` · +${String(ownedUps.length - 5)} more` : ''}
         </Typography>

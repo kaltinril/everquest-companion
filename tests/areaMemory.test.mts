@@ -396,6 +396,22 @@ test('…and the sanitizer is `normalizeUpgradeState` rather than a second opini
   }
 })
 
+})
+
+test('class pins are PER CHARACTER, and the legacy single pin becomes the every-character fallback', () => {
+  // Fork ask, kaltinril 2026-09-04: "i have to keep manually changing it back to SHM since i'm on
+  // a twink DRU" — one shared pin made every character switch a hand edit.
+  assert.deepEqual(sanitizeGearClassPins({ classes: ['WAR', 'MNK'] }), { '*': ['WAR', 'MNK'] })
+  assert.deepEqual(sanitizeGearClassPins({ Drywrought: ['WAR', 'MNK', 'SHM'], Twink: ['DRU'] }), {
+    Drywrought: ['WAR', 'MNK', 'SHM'],
+    Twink: ['DRU']
+  })
+  // The allowlist still stands per entry — localStorage is a file the user can edit.
+  assert.deepEqual(sanitizeGearClassPins({ Drywrought: ['WAR', 'nonsense'] }), { Drywrought: ['WAR'] })
+  assert.equal(sanitizeGearClassPins(null), null)
+  assert.equal(sanitizeGearClassPins({}), null, 'an object with no pins has said nothing')
+})
+
 test('the Plan tab`s two picks round-trip, and their vocabularies come from the fold`s own unions', () => {
   // EVERY member of each vocabulary survives, which is the half a "garbage defaults" sweep cannot
   // see: a sanitizer that returned its fallback for everything would pass that test and silently
@@ -476,4 +492,6 @@ test('class pins are PER CHARACTER, and the legacy single pin becomes the every-
   assert.deepEqual(sanitizeGearClassPins({ Drywrought: ['WAR', 'nonsense'] }), { Drywrought: ['WAR'] })
   assert.equal(sanitizeGearClassPins(null), null)
   assert.equal(sanitizeGearClassPins({}), null, 'an object with no pins has said nothing')
+})
+
 })

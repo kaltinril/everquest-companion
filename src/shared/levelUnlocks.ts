@@ -26,6 +26,8 @@
 import { CLASS_ABBRS, resolvedClasses, type ClassAbbr, type ComboInterval } from './classCombo'
 import { comboAt } from './comboIndex'
 import type { ClientHpFacts, SpellMetrics } from './spellMetrics'
+import type { SpellStatGrant } from './spellStats'
+import type { UpgradeCategory } from './spellUpgrade'
 
 /** What kind of thing unlocked. `skill`/`disc`/`innate` are classes.json's own words. */
 export type UnlockKind = 'spell' | 'skill' | 'disc' | 'innate'
@@ -114,6 +116,37 @@ export interface UnlockSpell {
    * the reason it is 4; the second case never asks.
    */
   aeMaxTargets?: number
+  /**
+   * WHAT THE SPELL GRANTS, parsed main-side (docs/plans/spell-upgrades-and-loadout.md §3.2).
+   *
+   * Absent where the page states no readable stat line, which is most detrimental spells and every
+   * summon. ABSENT IS NOT AN EMPTY GRANT: a spell whose grant we could not read is a spell we can
+   * say nothing about, which is a different claim from one that grants nothing (law 1).
+   *
+   * WHY IT IS PARSED HERE AND NOT AT THE FAR END. The renderer is forbidden from munging domain
+   * text (ruling 4, enforced by eslint.domainMunging.mjs), and this is the same seam `metrics`
+   * already uses: main reads `spells.json`'s effect strings, and the NUMBERS cross the wire while
+   * the strings stay behind. A second parser in the renderer would be a second opinion about what
+   * `Increase Attack Speed by 47%` means.
+   *
+   * READ AT THE ROW'S OWN LEVEL, the same level `metrics` is read at — the lowest any class gains
+   * it — so a ramp is evaluated where the row is about. `grantsLevel` states which level that was,
+   * because a reader browsing at 50 needs to know the figure in front of him is a level-19 reading
+   * before he compares it to anything.
+   */
+  grants?: SpellStatGrant[]
+  /** The level `grants` was read at. Present exactly when `grants` is. */
+  grantsLevel?: number
+  /**
+   * WHICH UPGRADE CATEGORY THIS SPELL IS IN, and therefore what a mote tier buys for it
+   * (docs/plans/spell-upgrades-and-loadout.md §3.1).
+   *
+   * Classified main-side for `grants`'s reason: the six facts `classifyUpgrade` needs are read off
+   * the catalog's own effect strings and `spellType`, and those strings do not cross the wire.
+   * Present on every row — every spell is in exactly one category, `other` included.
+   */
+  upgradeCategory?: UpgradeCategory
+
   /**
    * The spell THIS one replaces, per class that gains it (JOS-391) — the shipped spell-line
    * research, joined main-side (`src/main/data/spellLineLookup.ts`).

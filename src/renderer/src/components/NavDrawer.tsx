@@ -20,10 +20,21 @@ import RuleFolderIcon from '@mui/icons-material/RuleFolder'
 // UNRELEASED-only today, tree-shaken from builds on the same argument as the icon above: its only
 // use sits inside the Factions row's `UNRELEASED &&` branch below.
 import HandshakeIcon from '@mui/icons-material/Handshake'
+// UNRELEASED-only today, tree-shaken from a build on the icon argument above: its only use sits
+// inside the Spells row's `UNRELEASED &&` branch below.
+import AutoStoriesIcon from '@mui/icons-material/AutoStories'
 import UpdateChip from './UpdateChip'
 import { OWNER_TOOLS, UNRELEASED } from '../devFlags'
 import type { PrefsRouting } from '../appRouting'
-import { GEAR_AREA_VIEWS, VIEW_LABELS, loadGearTab, type View } from '../appViews'
+import {
+  GEAR_AREA_VIEWS,
+  SPELL_AREA_LABEL,
+  SPELL_AREA_VIEWS,
+  VIEW_LABELS,
+  loadGearTab,
+  loadSpellTab,
+  type View
+} from '../appViews'
 
 export const DRAWER_WIDTH = 220
 
@@ -47,6 +58,18 @@ interface NavRow {
    * that answer is read from localStorage at CLICK time, not at module load.
    */
   opens?: () => View
+  /**
+   * What the ROW is called, when that is not what its landing view is called.
+   *
+   * Absent for every row but one, and the exception earns it: the Spells area's first tab is the
+   * Spellbook, so `VIEW_LABELS.spells` reads "Spellbook" — the right word for a tab and the wrong
+   * one for a row that also leads to Upgrades and Loadout. The gear row does not need this because
+   * its area and its first tab happen to share a word.
+   *
+   * It is NOT a licence to rename tabs from here: `VIEW_LABELS` is still the one place a VIEW is
+   * named, and this names an AREA, which is a different thing that had no home until now.
+   */
+  label?: string
 }
 
 /* State, not process: this tab is newer than the rest, and the chip says exactly how much.
@@ -78,7 +101,7 @@ const BETA = (
 // (Exaltations) and what am I wearing right now (the dev-only Character sheet). Two of them sat
 // consecutively here and the third hung off the bottom behind a flag, and nothing in a vertical
 // list said any of them had anything to do with the others. They are now ONE row — Gear — over an
-// in-area tab bar (components/GearAreaTabs.tsx) that also carries the fourth face the list had no
+// in-area tab bar (components/AreaTabs.tsx) that also carries the fourth face the list had no
 // room to grow, a Wish list. The row reads `selected` while any of the four is on screen, and it
 // opens the one you last used. The law that survives is the one that mattered: a row is a
 // DESTINATION, and clicking it takes you somewhere real.
@@ -104,6 +127,28 @@ const ROWS: NavRow[] = [
   { view: 'posky', icon: <ShieldMoonIcon /> },
   { view: 'alerts', icon: <NotificationsActiveIcon /> },
   { view: 'leveling', icon: <TrendingUpIcon /> },
+  // THE SPELLS AREA sits immediately BEFORE Buffs, and the adjacency is the argument: the two are
+  // the same subject at two moments. Buffs is what is on you RIGHT NOW, read off the log; Spells is
+  // what exists, what a mote buys and what you ought to have up. A player checking one is usually
+  // about to check the other, exactly as Timers sits beside Buffs below for its own version of that
+  // reason.
+  //
+  // GATED (devFlags.ts UNRELEASED — a compile-time literal in a build, so the row and its icon fold
+  // away with the branch), matching the `KNOWN_VIEWS` splice in appViews.ts. The two are edited
+  // together, always: a row that opens a view the build will bounce is a row that appears to do
+  // nothing. The row is named for the AREA rather than for its landing view — see `NavRow.label`.
+  ...(UNRELEASED
+    ? [
+        {
+          view: 'spells' as View,
+          icon: <AutoStoriesIcon />,
+          badge: BETA,
+          label: SPELL_AREA_LABEL,
+          area: SPELL_AREA_VIEWS,
+          opens: loadSpellTab
+        }
+      ]
+    : []),
   { view: 'buffs', icon: <AutoFixHighIcon /> },
   // Respawn clocks (JOS-194) sit beside Buffs because both tabs are the same shape of answer —
   // a list of things counting down — and a player checking one is usually checking the other.
@@ -130,7 +175,7 @@ function NavRowButton({
       onClick={() => onSelect(row.opens ? row.opens() : row.view)}
     >
       <ListItemIcon>{row.icon}</ListItemIcon>
-      <ListItemText primary={VIEW_LABELS[row.view]} />
+      <ListItemText primary={row.label ?? VIEW_LABELS[row.view]} />
       {row.badge}
     </ListItemButton>
   )

@@ -31,9 +31,16 @@
 
 import type { JSX } from 'react'
 import { Box } from '@mui/material'
-import GearAreaTabs from './GearAreaTabs'
+import AreaTabs from './AreaTabs'
 import { EngineLaunchBanner } from './EngineLaunchBanner'
-import { isGearAreaView, type View } from '../appViews'
+import { UNRELEASED } from '../devFlags'
+import {
+  GEAR_AREA_VIEWS,
+  SPELL_AREA_VIEWS,
+  isGearAreaView,
+  isSpellAreaView,
+  type View
+} from '../appViews'
 // THE PER-VIEW COMMIT COUNTER (JOS-513). Dev-only; the gate below is spelled inline because that
 // is the form vite folds at transform time — see lib/renderMeter.tsx's header for the measurement.
 import { RenderProfiler } from '../lib/renderMeter'
@@ -56,13 +63,27 @@ export default function MainColumn({
       sx={{ flexGrow: 1, minWidth: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
     >
       <EngineLaunchBanner onReport={onReport} />
-      {isGearAreaView(view) && <GearAreaTabs view={view} onSelect={onSelect} />}
+      {/* AT MOST ONE BAR IS EVER UP: the areas are disjoint sets of views and exactly one view is
+          mounted, so these two tests cannot both pass. Written as two independent lines rather than
+          a lookup because that is what a third area should also be - one line, obvious to add. */}
+      {isGearAreaView(view) && (
+        <AreaTabs views={GEAR_AREA_VIEWS} view={view} onSelect={onSelect} testId="gear-area-tabs" />
+      )}
+      {/* `UNRELEASED &&` FIRST, and the order is the strip (devFlags.ts's own rule for OWNER_TOOLS,
+          applied here). It folds to a literal `false` in every `electron-vite build`, so rollup
+          deletes this branch and the `spell-area-tabs` string with it - proven by grep on the build,
+          not assumed. `isSpellAreaView` alone would be correct at RUNTIME, since the area's roster
+          is empty in a packaged build, but it is a function call and cannot fold, so the testid
+          would ship. */}
+      {UNRELEASED && isSpellAreaView(view) && (
+        <AreaTabs views={SPELL_AREA_VIEWS} view={view} onSelect={onSelect} testId="spell-area-tabs" />
+      )}
       <Box data-testid="app-content" sx={{ flexGrow: 1, overflow: 'auto', p: 2 }}>
         {/* THE VIEWCONTENT SEAM (JOS-513). `children` IS `App`'s `ViewContent`, so this is that
             seam measured from one component up — which is what lets the render meter mount without
             touching App.tsx at all. The id is the mounted view, so the panel's per-surface row is
             named `overview` / `combat` / … in the app's own vocabulary. It counts the SCROLLER's
-            contents only: the launch banner and the gear tabs above are fixed bands and belong to
+            contents only: the launch banner and the area tabs above are fixed bands and belong to
             the app-wide row, not to the view's. */}
         {import.meta.env.DEV ? <RenderProfiler id={view}>{children}</RenderProfiler> : children}
       </Box>

@@ -143,6 +143,22 @@ export const IPC = {
   // it is a separate channel rather than another flag because it takes an argument and answers
   // about one row. Arg: the display name (VALIDATED at the handler). Never rejects.
   spellsDetail: 'spells:detail',
+  // THE STACKING VIEWS FOR A NAMED SET OF SPELLS (docs/plans/spell-upgrades-and-loadout.md §3.5).
+  //
+  // The Loadout tab needs the twelve effect slots for the buffs one class trio can cast, so it can
+  // answer "can these two both stand" with the game's own rules rather than with a guess. It takes
+  // a BOUNDED LIST of names and answers about those, which is deliberate on both counts:
+  //
+  //   * NOT the whole table. The parsed client table is ~48k entries and megabytes of JSON; the
+  //     standing no-bulk ruling applies to any door, not only the engine's frames.
+  //   * NOT one spell per call. The set is tens of spells and they are all wanted at once, so a
+  //     per-spell channel would be a round trip apiece for an answer that is a few hundred bytes
+  //     each - the same argument `conCardBatch` makes for creature names.
+  //
+  // A spell the client file does not carry is simply ABSENT from the reply, and the caller reads
+  // that as "no exact verdict for this one" rather than as an error: a machine with no EverQuest
+  // install answers an empty map, and the tab degrades to its flagged tier and says so.
+  spellsStackViews: 'spells:stackViews',
 
   // ---- voice alerts / TTS (docs/plans/voice-alerts.md §3) ----
   // The 'system' engine tier needs NO channel at all: Chromium's own `speechSynthesis` lives in

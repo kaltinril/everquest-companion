@@ -230,6 +230,37 @@ test('nothing is scaled up out of nothing', () => {
   assert.equal(scaleSpellDamage(8.5, 2), 9.5)
 })
 
+// ---- the per-tick rate (2026-09-10) ------------------------------------------------------------
+//
+// The fit above is a NUKE fit - Garrison's and Discordant Mind, with no DoT in its sample - so its
+// six percent was the one rate it had rather than a measurement of a tick. Three DoT ladders in the
+// owner's own log put a tick at three percent instead, and this file's own module header carries
+// the numbers and the confound analysis. These pin the widening; `tests/spellUpgrade.test.mts`
+// keeps the raw ladders as fixtures.
+
+test('a PER-TICK damage line scales at three percent, not six', () => {
+  // Odium's tick ceiling: 387 at base, 445 at V and 468 at VII - both EXACT under the three-percent
+  // rule, and both a long way from what six percent predicts.
+  assert.equal(scaleSpellDamage(387, 5, true), 445)
+  assert.equal(scaleSpellDamage(387, 7, true), 468)
+  assert.equal(scaleSpellDamage(387, 5, false), 503)
+  assert.equal(scaleSpellDamage(387, 7, false), 549)
+})
+
+test('the direct rate is the DEFAULT, so every pre-existing caller is byte-identical', () => {
+  // The whole safety argument for widening a function that has already shipped: a caller stating
+  // nothing gets exactly what it got before the third parameter existed.
+  for (const rank of [0, 1, 2, 5, 8, 10]) {
+    assert.equal(scaleSpellDamage(333, rank), scaleSpellDamage(333, rank, false), String(rank))
+  }
+})
+
+test('a per-tick line at base is still the base spell', () => {
+  assert.equal(scaleSpellDamage(180, 0, true), 180)
+  assert.equal(scaleSpellDamage(180, 1, true), 180)
+  assert.equal(scaleSpellDamage(0, 7, true), 0)
+})
+
 test('the effective rank is the HIGHER of observed and simulated, never the slider alone', () => {
   assert.equal(effectiveSpellRank(8, 4), 8, 'a slider below what you own must not pull you down')
   assert.equal(effectiveSpellRank(2, 6), 6)

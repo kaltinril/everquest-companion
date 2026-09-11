@@ -51,6 +51,7 @@ import {
   parseHpLine,
   resolveSpellMana,
   spellMetricsAt,
+  type SpellMetrics,
   type ClientHpFacts
 } from '../../shared/spellMetrics'
 // The CLIENT'S hitpoint slots (JOS-396), threaded in from the IPC handler rather than imported:
@@ -61,6 +62,16 @@ import { clientHpFor } from './clientSpellHp'
 import { rainWaves } from './rainSpells'
 import { aeHits, aeMaxTargets } from '../../shared/aoeSpells'
 import { replacedBy } from './spellLineLookup'
+// THE GRANT READER and the UPGRADE CLASSIFIER (docs/plans/spell-upgrades-and-loadout.md). Both are
+// separable overlays over the same scrape, the `spellEffectClass.ts` / `rainSpells.ts` family:
+// delete either and the catalog is unchanged. They run HERE rather than at the far end because the
+// renderer may not parse domain text (ruling 4) - see `writeSpellFacts`.
+import { spellStatGrants } from '../../shared/spellStats'
+import { classifyUpgrade } from '../../shared/spellUpgrade'
+// The beneficial/detrimental verdict, imported rather than re-derived from `spellType`: `spellDb.ts`
+// owns that vocabulary (it enumerates every type the scrape states) and a second opinion here would
+// file a whole class of spells under the wrong upgrade rates.
+import { spellNature } from './spellDb'
 import type { SpellResistTable } from '../../shared/resistTypes'
 import type { SpellDbFile } from '../../shared/types'
 
@@ -229,13 +240,63 @@ function writeFigures(
   const waves = rainWaves(s.name)
   const cap = aeMaxTargets(clientHp?.aeMaxTargets)
   const input = { ...s, hits: aeHits(waves, 1, cap) }
-  const metrics = spellMetricsAt(input, Math.min(...at.map((p) => p.level)), clientHp)
+  const level = Math.min(...at.map((p) => p.level))
+  const metrics = spellMetricsAt(input, level, clientHp)
   if (metrics) spell.metrics = metrics
   writeInputs(spell, s, clientHp)
+  writeSpellFacts(spell, s, level, metrics)
   // Only when they SAY something: a 1 and the default would be two fields on ~1,900 rows restating
   // what their absence already states (`UnlockSpell.waves` / `aeMaxTargets`).
   if (waves > 1) spell.waves = waves
   if (clientHp?.aeMaxTargets !== undefined) spell.aeMaxTargets = clientHp.aeMaxTargets
+}
+
+/**
+ * WHAT THE SPELL GRANTS, AND WHAT A MOTE TIER WOULD BUY FOR IT
+ * (docs/plans/spell-upgrades-and-loadout.md §3.1 / §3.2).
+ *
+ * The owner's report, verbatim: spells *"just say the name of the spell which isn't helpful on how
+ * much stats or what it does"*. This is the half of that fix that has to happen main-side, and the
+ * reason it does is ruling 4: `spells.json`'s effect strings are domain text, the renderer may not
+ * parse them, and `spellStatGrants` is exactly the sort of parse that would need a lint exemption
+ * to live at the far end. Same seam `metrics` above already uses — the numbers cross, the strings
+ * stay.
+ *
+ * READ AT THE ROW'S OWN LEVEL, which is the level `metrics` is read at and for the same reason:
+ * "New at this level" introduces a spell where it becomes yours, so a ramp evaluated anywhere else
+ * describes a spell you cannot cast. The level rides along (`grantsLevel`) so a reader browsing at
+ * 50 can see that the AC in front of him is a level-19 reading before he compares it to anything.
+ *
+ * THE CATEGORY IS DERIVED FROM WHAT THE ROW ALREADY STATES, never from a second scrape. Five of the
+ * six facts `classifyUpgrade` wants are on the page (`spellType`, a parsed duration, and the effect
+ * lines' own verbs); the sixth, `permanent`, is the wiki's own word in `durationText`. A spell the
+ * catalog places in no type at all is `beneficial: false`, which files it under `debuff` - the
+ * cautious end, since a debuff's rates are the conservative ones and nothing about the fold claims
+ * more confidence than that.
+ */
+function writeSpellFacts(
+  spell: UnlockSpell,
+  s: SpellDbFile['spells'][number],
+  level: number,
+  metrics: SpellMetrics | undefined
+): void {
+  const grants = spellStatGrants(s.effects, level)
+  if (grants.length > 0) {
+    spell.grants = grants
+    spell.grantsLevel = level
+  }
+  const duration = s.durationText ?? ''
+  spell.upgradeCategory = classifyUpgrade({
+    beneficial: spellNature(s.spellType) === 'beneficial',
+    hasDuration: (s.durationMs ?? 0) > 0,
+    permanent: /permanent/i.test(duration),
+    // `metrics` has already reconciled the wiki's lines with the client's slots, so asking it is
+    // asking the one reader that saw both - and it costs no second parse of anything.
+    damage: (metrics?.damage ?? 0) > 0,
+    heal: (metrics?.heal ?? 0) > 0,
+    charm: (s.effects ?? []).some((e) => /^(Charm|Mesmeriz|Mesmerize)/i.test(e)),
+    pet: (s.effects ?? []).some((e) => /^Summon Pet/i.test(e))
+  })
 }
 
 /**

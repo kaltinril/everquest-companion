@@ -103,14 +103,20 @@ export const OWNER_TOOLS: boolean = DEV_TOOLS && ownerToolsGranted(ownerToolsBri
 // futures are: an unreleased surface graduates by DELETING its gate, and folding it into the
 // dev-tools flag would make that deletion look like shipping a dev tool.
 //
-// THE PREDICTION CAME TRUE AND THE FLAG HAS NO READERS TODAY (JOS-327). The character sheet
-// graduated on 2026-08-13 exactly as described — `unreleasedCharacter.tsx` deleted, the
-// `KNOWN_VIEWS` splice made unconditional, the App branch made ordinary — and nothing in the
-// renderer reads `UNRELEASED` any more. It stays because it is the MECHANISM, not the tenant
-// (src/main/unreleased.ts says the same about its half): the next surface that has to land before
-// the owner can look at it should adopt a strip that has already been argued through, and the
-// argument is the twenty lines below. A reader wondering whether this is dead code: it is unused,
-// which is a different thing, and the day it is used again nobody has to re-derive any of this.
+// THE PREDICTION CAME TRUE TWICE. The character sheet graduated on 2026-08-13 exactly as described
+// (JOS-327) — `unreleasedCharacter.tsx` deleted, the `KNOWN_VIEWS` splice made unconditional, the
+// App branch made ordinary — and for a while nothing in the renderer read this flag at all. It was
+// kept anyway, because it is the MECHANISM and not the tenant (src/main/unreleased.ts says the same
+// about its half), on the argument that the next surface needing to land before the owner could
+// look at it should inherit a strip already argued through rather than invent one.
+//
+// THE SPELLS AREA IS THAT NEXT TENANT (2026-09-10, docs/plans/spell-upgrades-and-loadout.md). Its
+// three views — `spells`, `spellUpgrades`, `spellLoadout` — are spliced into `KNOWN_VIEWS` behind
+// this flag and its nav row is gated by it, so a packaged build contains none of them and
+// `SPELL_AREA_VIEWS` derives an EMPTY roster rather than offering a tab that mounts nothing. It
+// graduates the way the character sheet did: delete the gate, widen `TELEMETRY_VIEWS` server-first,
+// owner-sequenced. Nobody had to re-derive a line of the argument below, which is what it was kept
+// for.
 //
 // IT USES THE SAME MECHANISM, WHICH IS THE POINT — `import.meta.env.DEV` is a literal `false` in
 // every `electron-vite build`, so `UNRELEASED && …` folds and rollup deletes the nav row, the

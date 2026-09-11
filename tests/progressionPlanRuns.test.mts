@@ -174,8 +174,15 @@ const TWO_SLOT = row({
 
 /**
  * THE GLOVE THAT STARTED RULE 12 — Sporali Gloves as the corpus states them (AC 2, HASTE 9%, two -2
- * saves): 36 of its 36.4 dps points are the haste. The bar it was offered against is the owner's
- * Gargoyle Grips at base (AC 10, STR 5, STA 5, SV MAGIC 5 — 14.25 under dps).
+ * saves): 2.7 of its 3.66 dps points are the haste. The bar it was offered against is the owner's
+ * Gargoyle Grips at base (AC 10, STR 5, STA 5, SV MAGIC 5 - 15.7 under dps).
+ *
+ * THE FIGURES MOVED WITH THE REPRICING (2026-09-10) AND THE SHAPE OF THE CASE MOVED WITH THEM.
+ * `haste is priced as the multiplier it is` took HASTE from 4.0 to 0.3, so a 9% glove that used to
+ * be worth 36.4 points - 36 of them haste, comfortably over a 14.25 bar - is now worth 3.66 against
+ * a 15.7 bar and cannot clear it at all. The rule it was written to demonstrate is unchanged; this
+ * fixture simply stopped being able to demonstrate it, so `BIG_HASTE` below carries that half and
+ * these gloves keep only the arithmetic (the three `roleValue` equalities in the rule-12 test).
  */
 const HASTE_GLOVES = row({
   key: 'sporali gloves',
@@ -186,6 +193,26 @@ const HASTE_GLOVES = row({
   wikiSources: [{ mob: 'a young kobold', zone: 'Crushbone' }]
 })
 const GRIPS_BAR = roleValue({ AC: 10, STR: 5, STA: 5, SV_MAGIC: 5 }, 'dps')
+
+/**
+ * THE RE-ANCHOR (2026-09-10). Rule 12 needs an item that CLEARS the bar on its haste and FAILS to
+ * clear it once that haste is already owned - otherwise the case cannot tell the rule working from
+ * the rule absent. Sporali Gloves did that at HASTE 4.0 and cannot at 0.3, so the discrimination
+ * moves to a fixture sized for the new weights and the gloves keep the arithmetic above.
+ *
+ * MEASURED against the same bar: 24.3 with nothing owned (over 15.7), 13.5 once a 36% source is
+ * worn (under it). The 36 is deliberately the same figure the owned sword states, so the whole of
+ * this item's haste is erased rather than a margin of it - that is rule 12's own clamp, tested at
+ * its edge rather than in its middle.
+ */
+const BIG_HASTE = row({
+  key: 'gauntlets of the racing pulse',
+  name: 'Gauntlets of the Racing Pulse',
+  slots: ['HANDS'],
+  classes: ['WAR'],
+  stats: { AC: 10, STR: 5, HASTE: 36 },
+  wikiSources: [{ mob: 'a young kobold', zone: 'Crushbone' }]
+})
 const GEAR = [PLATE, BLADE, ORPHAN, GREY, DEEP, TIER_CLOAK, TIER_RING]
 
 function corpora(over: Partial<PlanCorpora> = {}): PlanCorpora {
@@ -308,29 +335,38 @@ test('a WISHED item bypasses the gap, is FLAGGED, and sorts FIRST', () => {
 // 2b. HASTE IS CREDITED ONLY ABOVE WHAT YOU OWN, and melee reads no caster stat (owner, 2026-08-22)
 // =================================================================================================
 
-test('a haste item is worth only the haste you do NOT already have — the 9% glove under a 36% sword', () => {
+test('a haste item is worth only the haste you do NOT already have - a 36% source under a 36% sword', () => {
   // The numbers the ruling was made on. Full credit, the glove "beats" the Grips almost entirely on
   // haste; with 36% already owned its haste term is 0 and what is left is AC 2 and two penalties.
-  assert.equal(roleValue(HASTE_GLOVES.stats, 'dps'), 36.4)
-  assert.equal(roleValue(HASTE_GLOVES.stats, 'dps', { ownedHaste: 36 }), 0.4)
-  assert.equal(GRIPS_BAR, 14.25)
+  assert.equal(roleValue(HASTE_GLOVES.stats, 'dps'), 3.66)
+  // Owning 36% already erases the glove's own 9%: 3.66 - 2.7 = 0.96, the AC and the two saves.
+  assert.equal(roleValue(HASTE_GLOVES.stats, 'dps', { ownedHaste: 36 }), 0.96)
+  assert.equal(GRIPS_BAR, 15.7)
   const bars = new Map([['HANDS', GRIPS_BAR] as const])
   // The owned haste is a SOURCE with a slot (rule 12 is per slot — `progressionPlanSeams.test.mts`);
   // the sword sits in the main hand, which is not where a glove goes, so its haste counts against
   // the glove in full.
   const sword = (haste: number): OwnedHaste[] => [{ haste, slots: ['PRIMARY'] }]
   const plan = (ownedHaste?: readonly OwnedHaste[]): string[] =>
-    buildProgressionPlan(inputs({ role: 'dps' }), corpora({ gear: [HASTE_GLOVES], ownedBestBySlot: bars, ownedHaste }))
+    buildProgressionPlan(inputs({ role: 'dps' }), corpora({ gear: [BIG_HASTE], ownedBestBySlot: bars, ownedHaste }))
       .flatMap(names)
   // NOTHING OWNED: the first haste item is a real upgrade, and the route says so.
-  assert.deepEqual(plan(undefined), ['Sporali Gloves'], 'absent reads as none owned — full credit')
-  assert.deepEqual(plan([]), ['Sporali Gloves'], 'and so does an empty list')
-  // THE SWORD: worn haste does not stack, so the glove is out — the case that was wrong.
-  assert.deepEqual(plan(sword(36)), [], 'a 9% glove is dead weight beside a 36% sword')
-  assert.deepEqual(plan(sword(9)), [], 'at exactly what you own, the term is 0 — not negative, not a tie on haste')
-  // ABOVE WHAT YOU OWN, only the difference counts: 4 points over a 5% belt is 16 + 0.4, still in.
-  assert.deepEqual(plan(sword(5)), ['Sporali Gloves'])
-  assert.equal(roleValue(HASTE_GLOVES.stats, 'dps', { ownedHaste: 5 }), 16.4)
+  assert.deepEqual(plan(undefined), ['Gauntlets of the Racing Pulse'], 'absent reads as none owned - full credit')
+  assert.deepEqual(plan([]), ['Gauntlets of the Racing Pulse'], 'and so does an empty list')
+  // THE SWORD: worn haste does not stack, so the item is out - the case that was wrong.
+  assert.deepEqual(plan(sword(36)), [], 'its whole 36% is already worn, so nothing of it is new')
+  // AT EXACTLY WHAT YOU OWN the term is 0 - not negative, and not a tie broken on haste.
+  assert.deepEqual(plan(sword(40)), [], 'owning MORE than it offers is the same answer, clamped at 0')
+  // OWNING ANY HASTE AT ALL KILLS THE TERM (owner ruling 2026-09-10). A 5% belt is enough: the
+  // margin rule used to credit 31 points of "new" haste here and route the player to the item, which
+  // is the same mistake one size smaller - he would re-source that percentage from his waist the day
+  // he swapped.
+  assert.deepEqual(plan(sword(5)), [], 'a 5% belt is still haste, and haste you own counts for none')
+  assert.equal(roleValue(BIG_HASTE.stats, 'dps', { ownedHaste: 5 }), 13.5)
+  assert.equal(roleValue(BIG_HASTE.stats, 'dps', { ownedHaste: 36 }), 13.5)
+  // …and the clamp is what puts it under the bar rather than some other term: 13.5 is the item
+  // with its haste erased entirely, and the bar is 15.7.
+  assert.ok(roleValue(BIG_HASTE.stats, 'dps', { ownedHaste: 36 }) < GRIPS_BAR)
 })
 
 test('a pure melee reads NO caster stat — INT, WIS, CHA, mana and mana regen are dead, not small', () => {
@@ -343,12 +379,16 @@ test('a pure melee reads NO caster stat — INT, WIS, CHA, mana and mana regen a
   }
   // …and a HYBRID on the same focus reads its OWN mana stat at the hybrid weight — INT for a
   // Shadowknight, never WIS — which is the whole reason the gate is per class and not per focus.
-  assert.equal(roleValue({ INT: 10 }, 'dps', { classes: ['SHD'] }), 3)
+  // The hybrid's INT credit is the melee focuses' own mana weight (owner ruling 2026-09-05, "MP on
+  // a melee heavy 3 class build low"), not the 0.3 this line predated. All four melee focuses carry
+  // the same 0.1, so this reads 1 here and in the class-gate spec's 2H case alike.
+  assert.equal(roleValue({ INT: 10 }, 'dps', { classes: ['SHD'] }), 1)
   assert.equal(roleValue({ WIS: 10 }, 'dps', { classes: ['SHD'] }), 0)
   // …and the stats the role DOES read still move it, so this is not a profile of zeros.
   assert.ok(roleValue({ ...plain, DEX: 10, ATTACK: 10 }, 'dps') > roleValue(plain, 'dps'))
-  // AGI is "basically useless" and weighted like it: a tenth of a point per point.
-  assert.equal(roleValue({ AGI: 10 }, 'dps'), 1)
+  // AGI is "basically useless" and weighted like it - 0.16 a point since the whole-corpus audit
+  // repriced it off zero, so ten points of it are worth less than two of STR.
+  assert.equal(roleValue({ AGI: 10 }, 'dps'), 1.6)
 })
 
 // =================================================================================================
