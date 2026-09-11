@@ -541,14 +541,20 @@ export interface RoleContext {
  * states no relevant stat scores exactly `0`, never `NaN`, and an item that states a PENALTY
  * (`STR: -5`) scores that penalty, because a stated negative is a stated number.
  *
- * HASTE IS CREDITED ONLY ABOVE WHAT YOU ALREADY OWN (owner ruling, 2026-08-22: *"haste should be
- * an afterthought, only added in if haste doesn't exist"*). Worn haste does not stack in this game —
- * one item's percentage applies, the rest are dead weight — so a 9% glove is worth nothing to a
- * player swinging a 36% sword, and a score that kept crediting it routed exactly that player to
- * Sporali Gloves over his Gargoyle Grips (36 of the gloves' 36.4 points were haste). The term
- * counts only the part of the item's haste ABOVE `ctx.ownedHaste`, which is 0 for anything at or
- * below — the same line `gearScale.ts ignoreHaste` draws, made automatic here instead of a toggle.
- * The same weight table reads it, so "afterthought" is the credit rule, not a quieter coefficient.
+ * HASTE COUNTS ONLY FOR A PLAYER WHO HAS NONE (owner ruling, 2026-09-10: *"the only way we should
+ * ever include haste is if they have zero haste on their items already"*). Worn haste does not
+ * stack in this game — one item's percentage applies and the rest are dead weight — and the same
+ * percentage is available from a belt, a cape or a pair of gloves, so haste is a property of the
+ * LOADOUT rather than of any one item. Once a player owns ANY of it, a second source is worth
+ * nothing to him and the term is zero.
+ *
+ * THIS REPLACES THE MARGIN RULE, and the difference is the whole point. The 2026-08-22 ruling
+ * (*"haste should be an afterthought, only added in if haste doesn't exist"*) was implemented as
+ * `max(0, stated - owned)` — credit the part ABOVE what you own. That still routed a player wearing
+ * 5% to a 36% item on 31 points of "new" haste, which is the same mistake one size smaller: he
+ * would re-source that percentage from his waist the day he swapped. Zero-or-nothing is what the
+ * words always meant.
+ *
  * A NEGATIVE stated haste is a penalty and scores as one, whatever is owned (`hasteCredit`).
  *
  * THE CLASS GATE (the file header): INT and WIS count at the focus's `manaStat` weight only for the
@@ -602,13 +608,17 @@ function hasteTerm(stats: GearStats, weights: RoleWeights, gate: LiveGate, owned
 }
 
 /**
- * THE HASTE TERM: only the part ABOVE what you already own counts, and a stated PENALTY counts in
- * full. The clamp is on the positive margin alone — `-5` haste beside a 36% sword is still a stated
- * negative number, and rounding it up to 0 would be the one place `roleValue` quietly improved on
- * what the page said (the "a stated penalty scores that penalty" clause above).
+ * THE HASTE TERM: ALL of it for a player who owns none, NONE of it for a player who owns any, and a
+ * stated PENALTY in full either way.
+ *
+ * The penalty arm is not symmetry for its own sake — `-5` haste beside a 36% sword is still a
+ * stated negative number, and rounding it up to 0 would be the one place `roleValue` quietly
+ * improved on what the page said (the "a stated penalty scores that penalty" clause above). What
+ * owning haste cancels is the BENEFIT of more of it, never the cost of an item that takes it away.
  */
 function hasteCredit(stated: number, ownedHaste: number): number {
-  return stated < 0 ? stated : Math.max(0, stated - ownedHaste)
+  if (stated < 0) return stated
+  return ownedHaste > 0 ? 0 : stated
 }
 
 /** The mana-stat row, landed on whichever attribute(s) the trio casts from. */
