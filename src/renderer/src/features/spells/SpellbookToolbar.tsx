@@ -102,6 +102,7 @@ function FilterRow({
 }: RowProps & { classes: GearClasses }): JSX.Element {
   const categories = query.categories ?? []
   const worth = query.payoffMagnitudeOnly === true
+  const newest = query.newestOnly === true
   return (
     <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
       <TextField
@@ -164,6 +165,19 @@ function FilterRow({
         />
       )}
       {/* The owner's question 2, as one click: hide everything a tier does not improve. */}
+      {/* THE OWNER'S THIRD ONE-CLICK QUESTION (2026-09-10): *"I don't need to see 5 different
+          versions of regeneration or poison resist"*. It hides a rung whose own line has a later
+          one for the classes on screen - `SpellbookQuery.newestOnly` states why that is read off
+          the shipped ladders rather than matched on names. */}
+      <Chip
+        size="small"
+        label="Newest rank only"
+        title="Hide the lower rungs of a spell line - show only the newest version each class gets. Reads the shipped spell ladders, so Regeneration hides behind Chloroplast rather than behind a similar name."
+        data-testid="spellbook-newest-only"
+        color={newest ? 'primary' : 'default'}
+        variant={newest ? 'filled' : 'outlined'}
+        onClick={() => onQuery({ ...query, newestOnly: newest ? undefined : true })}
+      />
       <Chip
         size="small"
         label="Worth upgrading"

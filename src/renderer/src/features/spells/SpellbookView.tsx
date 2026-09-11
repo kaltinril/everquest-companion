@@ -37,6 +37,10 @@
 //     `ROW_HEIGHT` with one clipped line per cell, or the spacer arithmetic desyncs as you scroll.
 //     That is why the out-of-era CHIP became a coloured name with a `title` - a chip inside a dense
 //     cell is what makes a row two lines tall.
+//   * AND THE SAME TYPE SIZE. Every cell here wore `variant="caption"` (0.75rem) while the Gear
+//     table puts its text straight in a `TableCell`, which is 0.875rem at `size="small"` - two
+//     sizes for one kind of row, three tabs apart, which is what the owner saw when he said the
+//     font "seems smaller on the spells pages" and kept saying it after the first fix.
 //   * NATIVE `title` FOR EVERY EXPLANATION. The one exception is the spell NAME, which keeps the
 //     app's spell card for the reason the gear tab kept its compare card (JOS-338): it is the whole
 //     point of this surface, it is one popper rather than one per cell, and it opens on a 250ms
@@ -123,7 +127,7 @@ function PayoffCell({ row }: { row: SpellbookRow }): JSX.Element {
         return (
           <Typography
             key={m.glyph}
-            variant="caption"
+            variant="body2"
             component="span"
             data-testid="spellbook-payoff-mark"
             data-mark={m.key}
@@ -172,33 +176,33 @@ function SpellRow({ row }: { row: SpellbookRow }): JSX.Element {
         </Stack>
       </TableCell>
       <TableCell>
-        <Typography variant="caption" color="text.secondary" noWrap title={classesText(row.at)}>
+        <Typography variant="body2" color="text.secondary" noWrap title={classesText(row.at)}>
           {classesText(row.at)}
         </Typography>
       </TableCell>
       <TableCell>
-        <Typography variant="caption" color="text.secondary" noWrap data-testid="spellbook-category">
+        <Typography variant="body2" color="text.secondary" noWrap data-testid="spellbook-category">
           {UPGRADE_CATEGORY_LABEL[row.category]}
         </Typography>
       </TableCell>
       {/* THE COLUMN THE OWNER ASKED FOR: what it actually does, in the row itself. */}
       <TableCell data-testid="spellbook-grants">
-        <Typography variant="caption" noWrap title={row.grants.map((g) => g.line).join('\n')}>
+        <Typography variant="body2" noWrap title={row.grants.map((g) => g.line).join('\n')}>
           {grantsText(row.grants)}
         </Typography>
       </TableCell>
       <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-        <Typography variant="caption" data-testid="spellbook-figure" data-kind={figure.label}>
+        <Typography variant="body2" data-testid="spellbook-figure" data-kind={figure.label}>
           {figure.value}
         </Typography>
       </TableCell>
       <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-        <Typography variant="caption" data-testid="spellbook-mana">
+        <Typography variant="body2" data-testid="spellbook-mana">
           {whole(row.mana)}
         </Typography>
       </TableCell>
       <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-        <Typography variant="caption">{seconds(row.castSeconds)}</Typography>
+        <Typography variant="body2">{seconds(row.castSeconds)}</Typography>
       </TableCell>
       <TableCell>
         <PayoffCell row={row} />
