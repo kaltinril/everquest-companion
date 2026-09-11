@@ -123,35 +123,56 @@ const names = (route: readonly { targets: readonly { name: string }[] }[]): stri
 // 1. THE HASTE RULE IS PER SLOT, ON BOTH SIDES OF THE GAP (rule 12, corrected 2026-08-25)
 // =================================================================================================
 
-test('a strictly better haste weapon IS an upgrade for the slot holding the haste source; a hasteless one is not', () => {
-  // THE BAR IS SCORED UNDER THE SAME RULE AS ITS CHALLENGERS: for the sword's own slot the haste
-  // you would still own after a swap is 0, so the sword's bar keeps FULL credit for its 36 — and so
-  // does anything offered for that slot. The first cut scored the bar at full credit and the
-  // candidates above the global 36, which no replacement could ever clear (it had to beat 36 haste
-  // points with none of its own).
+test('a weapon`s haste prices at NOTHING, so weapons compete on damage alone', () => {
+  // THIS TEST USED TO ASSERT THE OPPOSITE, and the rule changed under it (fork ruling, kaltinril
+  // 2026-09-05: *"i'd obviously put a haste belt or cape on when i get the fangol"*). Worn haste
+  // does not stack and the same percentage lives on belts, capes and gloves, so it is a property of
+  // the LOADOUT rather than of the blade. `roleWeights.ts` prices a weapon row on its damage ratio
+  // and drops the haste term entirely; the old per-slot dance below it exists to stop a 36%
+  // incumbent setting a bar no hasteless weapon could ever clear, and pricing haste out of weapons
+  // removes the problem at the source instead.
+  //
+  // So the claim this file pins is now the ruling itself: the sword's own 36% is worth the same as
+  // no haste at all, and a strictly better blade wins on DAMAGE.
   const sources: OwnedHaste[] = [{ haste: 36, slots: ['PRIMARY'] }]
   const bar = roleValue(OWNED_HASTE_SWORD, 'dps', { ownedHaste: 0 })
-  assert.ok(bar > roleValue(OWNED_HASTE_SWORD, 'dps', { ownedHaste: 36 }), 'the bar credits its own haste')
+  assert.equal(
+    bar,
+    roleValue(OWNED_HASTE_SWORD, 'dps', { ownedHaste: 36 }),
+    'a weapon scores the same whether or not its haste is already owned - it never counted'
+  )
+  // …and the same is true of the challenger, which is what makes the comparison a damage one.
+  assert.equal(
+    roleValue(QUICKBLADE.stats, 'dps'),
+    roleValue(QUICKBLADE.stats, 'dps', { ownedHaste: 36 })
+  )
+
   const route = buildProgressionPlan(
     inputs(),
     corpora({ gear: [QUICKBLADE, KEEN_SWORD], ownedBestBySlot: new Map([['PRIMARY', bar]]), ownedHaste: sources })
   )
-  assert.deepEqual(names(route), ['Quickblade'])
-  // …and it is ranked at its full worth, not at four points of haste over the sword it replaces.
+  // BOTH blades are upgrades now, and that is the ruling's own consequence rather than a slip.
+  // Quickblade is DMG 12 / DELAY 20 and Keen Sword DMG 11 / DELAY 20, against the incumbent's
+  // 10 / 20 - two better ratios, ranked by damage. The old spec asserted that the HASTELESS blade
+  // was NOT an upgrade, which was only ever true because a flat-priced 36% set a bar no hasteless
+  // weapon could clear; that is the exact distortion the ruling removed.
+  assert.deepEqual(names(route), ['Quickblade', 'Keen Sword'])
   assert.equal(route[0].targets[0].score, roleValue(QUICKBLADE.stats, 'dps'))
 
-  // THE OTHER SLOTS STILL READ THE SWORD: the same 40% blade offered as an OFFHAND is credited only
-  // above 36, because swapping the offhand keeps the sword.
+  // AND THE SLOT NO LONGER CHANGES THE ANSWER for a weapon: offered as an OFFHAND the same blade
+  // scores identically, because there is no haste term to credit above what the sword carries.
   const offhand = row({ ...QUICKBLADE, key: 'offhand quickblade', name: 'Offhand Quickblade', slots: ['SECONDARY'] })
   const asOffhand = buildProgressionPlan(inputs(), corpora({ gear: [offhand], ownedHaste: sources }))
-  assert.equal(asOffhand[0].targets[0].score, roleValue(QUICKBLADE.stats, 'dps', { ownedHaste: 36 }))
+  assert.equal(asOffhand[0].targets[0].score, roleValue(QUICKBLADE.stats, 'dps'))
 })
 
 test('a stated haste PENALTY scores as one, whatever is owned — only the positive margin is clamped', () => {
   // -5% haste under the dps weight of 4 is -20, with nothing owned and with a 36% sword alike. The
   // old clamp rounded it up to 0, which was the one place the score improved on what the page said.
-  assert.equal(roleValue({ HASTE: -5 }, 'dps'), -20)
-  assert.equal(roleValue({ HASTE: -5 }, 'dps', { ownedHaste: 36 }), -20)
+  // -5% at the repriced 0.3 a point. A PENALTY is never clamped by what you own: owning 36%
+  // elsewhere does not make a -5% item harmless, it makes it -5% off a bigger number.
+  assert.equal(roleValue({ HASTE: -5 }, 'dps'), -1.5)
+  assert.equal(roleValue({ HASTE: -5 }, 'dps', { ownedHaste: 36 }), -1.5)
   // …and the clamp still holds on the way up: 9 under 36 is 0, never -27.
   assert.equal(roleValue({ HASTE: 9 }, 'dps', { ownedHaste: 36 }), 0)
 })
