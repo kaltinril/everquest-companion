@@ -5,49 +5,52 @@
 // ============================================================================
 // The owner read the Loadout tab's recommended buff set and did not believe it (2026-09-10):
 // *"are you sure all these spells are not going to overlap each-other?"* He was right not to, and
-// then he did the thing that settles it - he went and cast them:
+// then he did the thing that settles it - twice, from both directions.
 //
-//     "i just went and cast a whole bunch of spells so you can see that most of them are blocked,
-//      read the logs from the last 30+ spells i cast"
-//
-// EverQuest names both halves when it refuses a buff:
+// FIRST HE CAST HIS BAR AT HIMSELF. EverQuest names both halves when it refuses a buff:
 //
 //     Your Dexterity spell did not take hold. (Blocked by Harnessing of Spirit.)
 //
-// So his log holds 40 distinct pairs that the GAME says cannot both stand, with no inference, no
-// wiki, and no model in between. That is the strongest evidence this repo has about stacking, and
-// it is worth more than any amount of reasoning about EQEmu's source - which is what it overturned.
+// which is 40 distinct pairs the GAME says cannot both stand, with no inference and no model in
+// between.
+//
+// THEN HE CAST THIRTEEN OF THEM ON HIS PET, all of which landed: *"i just finished recasting them
+// all on my pet who already had them and none failed"*. That is 78 pairs the game demonstrably
+// runs TOGETHER - and it is the half that matters most, because a rule that simply called
+// everything a conflict would have scored 40 out of 40 on the first half alone.
 //
 // ============================================================================
-// WHAT IT CAUGHT
+// WHAT THE TWO HALVES TOGETHER OVERTURNED - TWICE IN ONE EVENING
 // ============================================================================
-// `checkStackConflict` was a faithful port of EQEmu's lockstep slot walk: slot i against slot i.
-// Against these 40 pairs it scored badly, because two spells from different lines keep the same
-// effect in different slots - Celerity's haste is in slot 1 and Spirit Quickening's in slot 4, so
-// the two were never compared and the engine called them compatible. The Loadout tab was
-// recommending two haste buffs, two run speeds and four separate STR buffs at once.
+// `checkStackConflict` is a port of EQEmu's `CheckStackConflict`, which walks the slots in LOCKSTEP
+// and compares slot i against slot i.
 //
-// `contestPass` now matches BY EFFECT wherever it sits, and that rule catches all 40 of these.
+//   ROUND ONE. Lockstep appeared to miss nearly every conflict anyone would ask about - Celerity
+//   keeps its haste in slot 1 and Spirit Quickening keeps its in slot 4, so the two were never
+//   compared - and the pass was replaced with one that matched BY EFFECT wherever it sat. That
+//   caught all 40 blocks. It was still wrong.
 //
-// ============================================================================
-// AND WHAT IT DOES NOT CATCH, WHICH IS WHY THIS FILE ALSO HOLDS NEGATIVES
-// ============================================================================
-// Effect-matching is an OVER-approximation, and the same session proves it: Guardian blocks
-// Protect, Turtle Skin and Shifting Shield - the shaman AC line - but Inner Fire, which also
-// carries AC, landed while Guardian was up. So "both spells state AC" is not sufficient, and the
-// real discriminator is a spell line this client file does not appear to state anywhere (field 85
-// is each spell's own id, not a shared group; checked 2026-09-10).
+//   ROUND TWO. The pet session proved it wrong within the hour: effect-matching calls
+//   `Strength + Infusion of Spirit` and `Dexterity + Infusion of Spirit` conflicts, and the game
+//   ran both pairs together. Lockstep was never the problem.
 //
-// THE ERROR DIRECTION IS THE SAFE ONE AND THAT IS THE WHOLE ARGUMENT FOR SHIPPING IT. A false
-// positive makes the Loadout tab recommend FEWER buffs than a player could really run. A false
-// negative - what the lockstep walk produced - tells him to keep up a buff the game will refuse,
-// and rejects a real buff in its favour. The first is a missed opportunity; the second is wrong
-// advice. `KNOWN_FALSE_POSITIVES` pins the one we know about so it cannot grow silently.
+// THE DIRECTIVE PASS WAS. `directiveVerdict` looks up the 148/149 stacking commands - the things
+// that make one buff refuse another from a different LINE - and it was searching for its target at
+// a slot number no row in this client uses that way, so it never fired at all. Harnessing of Spirit
+// carries `BLOCK{STR below 67}` and `BLOCK{DEX below 50}`, which is exactly why that one spell
+// refuses nine different stat buffs in the log, and the engine could not see it.
+//
+// With lockstep restored and the directives actually working, the model is exact on both halves:
+// 40 of 40 blocks reproduced, 81 of 81 coexisting pairs left alone. `spellStack.ts contestPass` and
+// `directiveBites` carry the two halves of that argument.
+//
+// THE MORAL, WRITTEN DOWN BECAUSE IT COST TWO WRONG TURNS: a corpus of things that MUST conflict
+// cannot validate a conflict rule on its own. Ask for the pairs that stack in the same breath.
 //
 // ============================================================================
 // IT NEEDS THE CLIENT FILE, AND SKIPS WITHOUT IT
 // ============================================================================
-// `resistBaseline.test.mts`' arrangement exactly, including the env override. The PAIRS below are
+// `resistBaseline.test.mts`' arrangement exactly, including the env override. The pairs below are
 // game text out of the owner's own log and are committed; `spells_us.txt` is Daybreak's file, is
 // never committed, and is read from whatever install the machine running the tests has.
 
@@ -135,30 +138,55 @@ const BLOCKED: readonly (readonly [string, string])[] = [
 ]
 
 /**
- * Pairs the game demonstrably RAN TOGETHER in the same session.
+ * SPELLS THE GAME RAN TOGETHER, as every pair of them.
  *
- * A negative is only admitted when the log proves BOTH halves: the second spell announced itself
- * landing, and the first was blocking something else within the minute, so it was certainly still
- * up. `Scale Skin` looked like a negative and is not in this list - it was INTERRUPTED, not
- * refused, which the log says in as many words and which is exactly the trap a careless reading of
- * "no block message" falls into.
+ * The owner cast these thirteen in sequence on his pet at 19:49:27-19:50:40 with not one "did not
+ * take hold" between them (*"i just finished recasting them all on my pet who already had them and
+ * none failed"*), so all 78 pairs must be compatible. It is the half of the evidence that was
+ * missing when this file was written, and it immediately overturned the rule the file had just
+ * shipped: `Strength + Infusion of Spirit` and `Dexterity + Infusion of Spirit` are both in here.
+ *
+ * A NEGATIVE IS ONLY ADMITTED WHEN THE LOG PROVES IT. `Scale Skin` looked like one and is not - it
+ * was INTERRUPTED, not refused, which the log says in as many words and which is exactly the trap a
+ * careless reading of "no block message" falls into.
  */
-const STACKED: readonly (readonly [string, string])[] = [
-  // Harnessing of Spirit was refusing nine stat buffs on either side of these two landing.
-  ['Harnessing of Spirit', 'Glamour'],
-  ['Harnessing of Spirit', 'Spirit of Bih`Li']
+const COEXIST: readonly string[] = [
+  'Infusion of Spirit',
+  'Talisman of Altuna',
+  'Resist Cold',
+  'Resist Fire',
+  'Talisman of Jasinth',
+  'Resist Poison',
+  'Resist Magic',
+  'Spirit of Bih`Li',
+  'Health',
+  'Dexterity',
+  'Agility',
+  'Strength',
+  'Guardian'
 ]
 
-/**
- * KNOWN, MEASURED OVER-REPORTS - pairs the game ran together that effect-matching still calls a
- * conflict. See the header: the list exists so the number cannot grow without somebody saying so.
- */
-const KNOWN_FALSE_POSITIVES: readonly (readonly [string, string])[] = [
-  // Both carry AC. Guardian blocks the shaman AC LINE (Protect, Turtle Skin, Shifting Shield) and
-  // Inner Fire is not in it - a distinction that needs a spell line, which this client file does
-  // not state. `Inner Fire` landed at 18:58:17 with Guardian up.
-  ['Guardian', 'Inner Fire']
+/** Pairs measured earlier in the same log, each with both halves proven on their own line. */
+const ALSO_STACKED: readonly (readonly [string, string])[] = [
+  // Harnessing of Spirit was refusing nine stat buffs on either side of these two landing.
+  ['Harnessing of Spirit', 'Glamour'],
+  ['Harnessing of Spirit', 'Spirit of Bih`Li'],
+  // Inner Fire landed at 18:58:17 with Guardian up, though both carry AC. This was a KNOWN
+  // over-report of the effect-matching rule for one evening; the directive model gets it right.
+  ['Guardian', 'Inner Fire'],
+  // 19:35:09 "You are infused with power", 19:35:19 "You feel strong" - ten seconds apart.
+  ['Strength', 'Infusion of Spirit']
 ]
+
+/** Every pair that must NOT be reported as a conflict. */
+function stackedPairs(): [string, string][] {
+  const out: [string, string][] = []
+  for (let i = 0; i < COEXIST.length; i++) {
+    for (let j = i + 1; j < COEXIST.length; j++) out.push([COEXIST[i], COEXIST[j]])
+  }
+  for (const pair of ALSO_STACKED) out.push([pair[0], pair[1]])
+  return out
+}
 
 test('every block the GAME issued is a conflict the engine sees', { skip }, () => {
   const missed: string[] = []
@@ -176,30 +204,13 @@ test('every block the GAME issued is a conflict the engine sees', { skip }, () =
   assert.deepEqual(missed, [], 'the game refused these; the engine must not call them compatible')
 })
 
-test('…and the pairs it ran together are not reported as conflicts', { skip }, () => {
-  for (const [worn, cast] of STACKED) {
+test('…and every pair it ran together is left alone', { skip }, () => {
+  const wrong: string[] = []
+  for (const [worn, cast] of stackedPairs()) {
     const a = view(worn)
     const b = view(cast)
-    assert.ok(a !== null && b !== null, `${worn} / ${cast} should resolve`)
-    assert.equal(
-      spellsConflict(a, b, LEVELS),
-      false,
-      `${cast} landed with ${worn} up, so they must not be called a conflict`
-    )
+    if (a === null || b === null) continue
+    if (spellsConflict(a, b, LEVELS)) wrong.push(`${cast} + ${worn}`)
   }
-})
-
-test('the known over-reports are STILL over-reports - this test fails when one is fixed', { skip }, () => {
-  // Deliberately asserts the WRONG answer, so the day somebody narrows the rule this goes red and
-  // makes them move the pair into `STACKED` rather than leaving a stale comment behind.
-  for (const [worn, cast] of KNOWN_FALSE_POSITIVES) {
-    const a = view(worn)
-    const b = view(cast)
-    assert.ok(a !== null && b !== null, `${worn} / ${cast} should resolve`)
-    assert.equal(
-      spellsConflict(a, b, LEVELS),
-      true,
-      `${worn} + ${cast} is a known over-report; if it now stacks, move it to STACKED`
-    )
-  }
+  assert.deepEqual(wrong, [], 'the game ran these together; the engine must not call them a conflict')
 })

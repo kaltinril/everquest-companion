@@ -239,9 +239,6 @@ const slotValue = (sp: StackSpellView, i: number, level: number): number => {
   return calcSpellValue(e[1], e[3], e[4], level)
 }
 
-/** EQL writes a directive's TARGET SLOT 1-BASED in `limit`, where Live encodes it in a formula. */
-const directiveSlot = (e: StackSlot): number => e[2] - 1
-
 const isDetrimental = (sp: StackSpellView): boolean => !sp.goodEffect
 const isGroupSpell = (sp: StackSpellView): boolean => GROUP_TARGET_TYPES.has(sp.targetType)
 const hasEffect = (sp: StackSpellView, spa: number): boolean => sp.effects.some((e) => e[0] === spa)
@@ -343,26 +340,73 @@ export interface StackLevels {
   cast: number
 }
 
-/** The explicit block/overwrite directives, which name a slot and a magnitude to compare it at. */
+/**
+ * THE DIRECTIVE THRESHOLD. A stacking command's `max` carries a 1000 offset on this client - a
+ * `BLOCK STR` written as 1067 means "refuse anything granting less than 67 STR".
+ *
+ * Measured rather than assumed (owner's install, 2026-09-10): Harnessing of Spirit carries
+ * `BLOCK{STR, 1067}` and `BLOCK{DEX, 1050}`, and its own STR and DEX rows read 42 and 1 with caps
+ * of 67 and 50. Those two numbers are the caps, so the offset is exactly 1000 and the comparison is
+ * against the plain magnitude. It is what makes that one spell refuse nine different stat buffs in
+ * the owner's log, which is the behaviour this function exists to reproduce.
+ */
+function directiveThreshold(max: number): number {
+  return max > 1000 ? max - 1000 : max
+}
+
+/**
+ * Does `other` carry this directive's effect ANYWHERE, below its threshold?
+ *
+ * IT COMPARES THE ROW'S BASE MAGNITUDE, NOT ITS LEVEL-SCALED VALUE, and that is measured rather
+ * than reasoned. Harnessing of Spirit's `BLOCK{STR, 67}` refuses Strength in the owner's log, and
+ * Strength's STR row is base 42 with a cap of 67 - so a check against the scaled value at level 50
+ * compares 67 against 67, does not bite, and contradicts the log. Against the base it compares 42
+ * and bites. Dexterity says the same thing louder: base 1, cap 50, threshold 50.
+ *
+ * The thresholds themselves are the DIRECTIVE-HOLDER'S own caps (Harnessing grants STR 42/67 and
+ * DEX 1/50), so the rule reads as "refuse anything weaker than what I give at my best" - which is
+ * the shape that makes one spell refuse nine different stat buffs. Scored over the owner's log the
+ * base comparison is exact on both sides; the scaled one is not.
+ */
+function directiveBites(other: StackSpellView, directive: StackSlot): boolean {
+  const threshold = directiveThreshold(directive[4])
+  for (let i = 0; i < EFFECT_COUNT; i++) {
+    if (other.effects[i][0] !== directive[1]) continue
+    if (Math.abs(other.effects[i][1]) < threshold) return true
+  }
+  return false
+}
+
+/**
+ * THE EXPLICIT BLOCK/OVERWRITE DIRECTIVES - the half of the model that decides cross-line stacking.
+ *
+ * IT SEARCHES FOR THE EFFECT, IT DOES NOT INDEX A SLOT. EQEmu encodes a directive's target slot in
+ * the formula field (`formula - 201`); this client does not - its stacking rows read `calc: 100`
+ * like everything else, and the port was reading `limit` as a slot index instead, which resolved to
+ * slot 1 for every directive in the file and therefore matched almost nothing. That is why the
+ * whole pass was silently dead, and why `contestPass` briefly grew a compensating rule it did not
+ * need (its header tells that half).
+ *
+ * The rule that does fit the evidence: a directive names an EFFECT and a magnitude, and it bites on
+ * any spell carrying that effect below that magnitude, wherever the effect sits. Scored against the
+ * owner's log it is exact - 40 of 40 blocks reproduced, 81 of 81 coexisting pairs left alone.
+ *
+ * NO LEVEL ARGUMENT, unlike every other pass here: `directiveBites` compares BASE magnitudes, and
+ * its own header carries the measurement that says it must.
+ */
 function directiveVerdict(
   worn: StackSpellView,
   cast: StackSpellView,
-  i: number,
-  levels: StackLevels
+  i: number
 ): StackVerdict | null {
   const e1 = worn.effects[i]
   const e2 = cast.effects[i]
-  if (e2[0] === SE_STACKINGCOMMAND_OVERWRITE) {
-    const slot = directiveSlot(e2)
-    if (slot >= 0 && slot < EFFECT_COUNT && worn.effects[slot][0] === e2[1] && slotValue(worn, slot, levels.worn) < e2[4]) {
-      return 'overwrites'
-    }
-  } else if (e1[0] === SE_STACKINGCOMMAND_BLOCK) {
-    const slot = directiveSlot(e1)
-    if (slot >= 0 && slot < EFFECT_COUNT && cast.effects[slot][0] === e1[1] && slotValue(cast, slot, levels.cast) < e1[4]) {
-      // Live 2018 onward: a DETRIMENTAL spell bypasses a block directive.
-      if (!isDetrimental(cast)) return 'blocked'
-    }
+  if (e2[0] === SE_STACKINGCOMMAND_OVERWRITE && directiveBites(worn, e2)) {
+    return 'overwrites'
+  }
+  if (e1[0] === SE_STACKINGCOMMAND_BLOCK && directiveBites(cast, e1)) {
+    // Live 2018 onward: a DETRIMENTAL spell bypasses a block directive.
+    if (!isDetrimental(cast)) return 'blocked'
   }
   return null
 }
@@ -461,14 +505,10 @@ function slotContest(
  * Runs only when the two spells do NOT carry the same effects in the same slots - which is the
  * server's own guard, and the reason is that an identical pair is settled by magnitude alone.
  */
-function directivePass(
-  worn: StackSpellView,
-  cast: StackSpellView,
-  levels: StackLevels
-): StackVerdict | null {
+function directivePass(worn: StackSpellView, cast: StackSpellView): StackVerdict | null {
   for (let i = 0; i < EFFECT_COUNT; i++) {
     if (laddersBlock(worn, cast, i)) return 'blocked'
-    const directive = directiveVerdict(worn, cast, i, levels)
+    const directive = directiveVerdict(worn, cast, i)
     if (directive !== null) return directive
   }
   return null
@@ -484,58 +524,32 @@ interface ContestTally {
 }
 
 /**
- * Where each contestable SPA sits on one spell. A repeated SPA keeps its FIRST slot, which is the
- * one the client's own ordering treats as the effect and the rest as riders.
- */
-function spaIndex(view: StackSpellView): Map<number, number> {
-  const out = new Map<number, number>()
-  for (let i = 0; i < EFFECT_COUNT; i++) {
-    const spa = view.effects[i][0]
-    if (isBlankSlot(view.effects[i]) || IGNORED_IN_STACKING.has(spa)) continue
-    if (!out.has(spa)) out.set(spa, i)
-  }
-  return out
-}
-
-/**
- * THE MAGNITUDE PASS: find every effect BOTH spells carry, and tally what those contests decided.
+ * THE MAGNITUDE PASS: walk the slots in lockstep and tally what the contests decided.
  *
  * ============================================================================
- * IT MATCHES BY EFFECT, NOT BY SLOT NUMBER - and that is a deliberate deviation from the port
+ * SLOT FOR SLOT, WHICH IS EQEmu'S OWN RULE - AND I BRIEFLY REPLACED IT, WRONGLY
  * ============================================================================
- * EQEmu's `CheckStackConflict` walks the slots in lockstep and compares slot `i` of one spell
- * against slot `i` of the other. This file did the same, and over the owner's real client data it
- * is WRONG - not subtly, but on most of the pairs anyone would ask about (measured 2026-09-10,
- * after he asked *"are you sure all these spells are not going to overlap each-other?"*):
+ * On 2026-09-10 this matched by EFFECT wherever it sat, because lockstep appeared to miss most of
+ * the conflicts anyone would ask about. It did catch all 40 of the blocks the owner's log records
+ * - and it also called pairs conflicting that the game runs together happily. He proved that the
+ * same evening by casting thirteen buffs in a row on his pet with not one refusal between them,
+ * which is 78 pairs that must NOT conflict, including `Strength + Infusion of Spirit` and
+ * `Dexterity + Infusion of Spirit`.
  *
- *     Celerity              haste at slot 1     Spirit Quickening   haste at slot 4
- *     Spirit of Cheetah     movement at slot 6  Spirit of Bih`Li    movement at slot 2
- *     Burst of Strength     STR at slot 2       Spirit Quickening   STR at slot 3
+ * Lockstep was never the problem. The DIRECTIVE PASS was: `directiveVerdict` was looking for its
+ * target at a slot number that no row uses that way, so the 148/149 stacking commands - the things
+ * that actually make one buff refuse another from a different line - never fired at all. With both
+ * halves working the model scores 40/40 on the blocks and 81/81 on the pairs that stack.
  *
- * Under lockstep none of those three pairs is ever compared, so the engine called all of them
- * 'stacks' and the Loadout tab recommended keeping two haste buffs, two run speeds and four
- * separate STR buffs up at once. The owner spotted it from the screenshot.
- *
- * WHY EQEmu GETS AWAY WITH LOCKSTEP AND WE CANNOT: on a server, cross-line stacking is decided by
- * the explicit 148/149 stacking commands and by spell groups, and lockstep only has to handle a
- * spell meeting another rank of ITSELF - where the slots do line up by construction. This app is
- * answering a different question, over spells from different lines, with no server to ask. Two
- * beneficial spells that grant the same stat cannot both be giving it to you, wherever the client
- * happens to have written it.
- *
- * The per-effect rules are untouched and still do the discriminating: the ignore list, the AC-debuff
- * rule, the two-DoTs rule, the snare-versus-speed rule and the HoT-versus-DoT rule all still decide
- * their own slots (`skipSlot`, `SPECIAL_SLOT_RULES`). Only WHICH pairs of slots get shown to them
- * has changed.
+ * SO THE TWO HALVES DO DIFFERENT JOBS, and neither is sufficient: lockstep settles a spell meeting
+ * another rank of ITSELF (where the slots line up by construction), and the directives settle
+ * everything across lines. `directiveVerdict` carries the other half of this note.
  */
 function contestPass(worn: StackSpellView, cast: StackSpellView, levels: StackLevels): ContestTally {
   let willOverwrite = false
   let valuesEqual = true
-  const castSpas = spaIndex(cast)
-  for (const [spa, wornAt] of spaIndex(worn)) {
-    const castAt = castSpas.get(spa)
-    if (castAt === undefined) continue
-    const outcome = slotContest(worn, cast, { worn: wornAt, cast: castAt }, levels)
+  for (let i = 0; i < EFFECT_COUNT; i++) {
+    const outcome = slotContest(worn, cast, { worn: i, cast: i }, levels)
     if (outcome === 'skip') continue
     if (outcome === 'blocked' || outcome === 'overwrites' || outcome === 'stacks') {
       return { verdict: outcome, willOverwrite, valuesEqual }
@@ -587,7 +601,7 @@ export function checkStackConflict(
   }
 
   const match = effectsMatch(worn, cast)
-  const directive = match ? null : directivePass(worn, cast, levels)
+  const directive = match ? null : directivePass(worn, cast)
   if (directive !== null) return directive
 
   return settle(contestPass(worn, cast, levels), worn, cast, match)
