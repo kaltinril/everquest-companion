@@ -142,6 +142,18 @@ export function CombatRow({ p }: { p: CombatPick }): JSX.Element {
           {p.name}
         </Typography>
       </SpellTooltip>
+      {p.rank > 1 && (
+        <Chip
+          size="small"
+          color="primary"
+          variant="outlined"
+          data-testid="combat-rank"
+          data-rank={p.rank}
+          label={romanRank(p.rank)}
+          title="The rank these figures are read at: the highest your log has seen, lifted to the slider."
+          sx={TINY_CHIP}
+        />
+      )}
       <Chip size="small" variant="outlined" label={TAB_LABEL[p.tab]} sx={TINY_CHIP} />
       <Typography
         variant="caption"

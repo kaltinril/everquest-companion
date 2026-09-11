@@ -50,6 +50,7 @@ import type { ClassAbbr } from './classCombo'
 import type { BestSpellTab } from './bestSpells'
 import type { SpellMetrics } from './spellMetrics'
 import { grantsShareASlot, type SpellStatGrant, type SpellStatKey } from './spellStats'
+import { parseHpLine } from './spellMetrics'
 import {
   conflictComponents,
   spellsConflict,
@@ -263,6 +264,12 @@ export interface CandidateQuery {
   minDurationMs?: number
 }
 
+/**
+ * The level a magnitude is read at when the caller states none. 50 is this server's cap, and the
+ * same choice `SpellLoadoutView.ASSUMED_LEVEL` makes for the same reason.
+ */
+const ASSUMED_CASTER_LEVEL = 50
+
 /** Three minutes - long enough to outlive a fight, short enough to keep every real buff. */
 export const DEFAULT_MIN_BUFF_MS = 180_000
 
@@ -286,22 +293,36 @@ function isKeepUp(s: UnlockSpell, minMs: number): boolean {
 }
 
 /**
- * THE REGEN A HEAL-OVER-TIME BUFF GRANTS, per tick, as a stat.
+ * THE REGEN A HEAL-OVER-TIME BUFF GRANTS, PER TICK, at the caster's level.
  *
- * `spellStats.parseStatLine` REFUSES `... per tick` lines on purpose - `spellMetrics.ts` owns regen
- * and states it in its own units, and reading it in both places would double-count. So this reads
- * the metrics rather than the words: the total healing over the duration, divided by the ticks it
- * runs over, which is the number the character sheet's `Combat HP Regen` row moves by.
+ * ============================================================================
+ * IT READS THE EFFECT LINE, because dividing a total is not the same arithmetic
+ * ============================================================================
+ * The first cut took the catalog's total healing and divided it by the ticks it runs over. That is
+ * wrong twice, and the owner caught it with one reading: *"when i cast mine it goes from 88 to 104,
+ * that's 16 not 11"*.
  *
- * Absent unless the metrics state BOTH halves, because a per-tick figure derived from a total with
- * no duration would be arithmetic on an assumption.
+ *   THE TOTAL IS TAKEN AT THE GAIN LEVEL, not at yours. Chloroplast's catalog total is 1600 over
+ *   160 ticks, which divides to 10 - the figure for the level a Shaman first gets it, not the level
+ *   he is.
+ *   AND A DIVISION CANNOT RECOVER A RAMP. The per-tick figure climbs with caster level, and a total
+ *   that was rounded once already cannot be un-rounded back into the band it came from.
+ *
+ * THE CATALOG STATES IT OUTRIGHT AND ALWAYS DID: Chloroplast's line reads `Increase Hitpoints by 10
+ * (L39) to 16 (L50) per tick`, which is his 16 exactly. `UnlockSpell.hpLines` carries those lines
+ * verbatim and `parseHpLine` evaluates one at a level - the same reader `spellMetrics.ts` uses, so a
+ * figure here and a figure on the Leveling tab cannot disagree. No client install is needed for any
+ * of it, which is the other reason this beats reading `clientHp`: it answers on every machine.
+ *
+ * `perTick` and `direction` are the filters. An instant heal has a hitpoint line too and is not
+ * regen; a `Decrease` line is damage.
  */
-function regenGrant(s: UnlockSpell): SpellStatGrant | null {
-  const m = s.metrics
-  if (m?.hot !== true || m.heal === undefined || m.overSec === undefined || m.overSec <= 0) return null
-  const ticks = Math.round(m.overSec / 6)
-  if (ticks <= 0) return null
-  const perTick = Math.round(m.heal / ticks)
+function regenGrant(s: UnlockSpell, level: number): SpellStatGrant | null {
+  let perTick = 0
+  for (const line of s.hpLines ?? []) {
+    const hp = parseHpLine(line, level)
+    if (hp?.perTick === true && hp.direction === 'up') perTick += hp.amount
+  }
   if (perTick <= 0) return null
   return {
     key: 'HP_REGEN',
@@ -311,13 +332,6 @@ function regenGrant(s: UnlockSpell): SpellStatGrant | null {
   }
 }
 
-/**
- * Is this spell one the trio can actually keep up - category, era, duration and level?
- *
- * Its own function because `loadoutCandidates` sits at this tree's complexity ceiling and every
- * question it asks costs a branch. This is the whole of "may it be considered"; the caller is left
- * with "what is it worth".
- */
 function admitsBuff(s: UnlockSpell, query: CandidateQuery, minMs: number): boolean {
   if (!isKeepUp(s, minMs)) return false
   // A STATED duration below the floor is a sprint, not a buff - see `minDurationMs`.
@@ -363,7 +377,7 @@ export function loadoutCandidates(
     const at = s.at.filter((p) => classes.includes(p.cls) && (level === undefined || p.level <= level))
     if (at.length === 0) continue
     // The catalog's own grants, plus the per-tick regen it states in another vocabulary.
-    const regen = regenGrant(s)
+    const regen = regenGrant(s, level ?? ASSUMED_CASTER_LEVEL)
     const grants = regen === null ? (s.grants ?? []) : [...(s.grants ?? []), regen]
     const score = scoreGrants(grants, weights)
     // A buff worth nothing under the weights in force is not a recommendation. It is still a real
@@ -593,6 +607,12 @@ function pushNeighbours(
 /** One spell in the combat set, with the table it was the best of. */
 export interface CombatPick {
   name: string
+  /**
+   * THE RANK THE FIGURES WERE READ AT - `max(observed, simulated)`, the same number the buff rows
+   * wear (owner, 2026-09-10: *"you forgot to display the level on the other spell tabs"*). The
+   * damage already moved with it; only the row was silent about why.
+   */
+  rank: number
   /** `dd`, `dot` or `aoe` - which question this spell is the answer to. */
   tab: BestSpellTab
   /** Where it placed in its own table. 1 is that table's best. */
@@ -657,6 +677,7 @@ export function combatSet(
       picks.push({
         name: row.name,
         tab,
+        rank: row.rank,
         place: place + 1,
         ...(row.iconId === undefined ? {} : { iconId: row.iconId }),
         metrics: row.metrics,
@@ -672,6 +693,8 @@ export function combatSet(
 /** The fields `combatSet` reads off a ranked row. Structural, so `bestSpells.ts` need not be imported. */
 export interface CombatSource {
   name: string
+  /** `BestSpellRow.rank` - what `bestSpellsAt` evaluated the metrics at. */
+  rank: number
   metrics: SpellMetrics
   mana: number | null
   gainedAt: number
