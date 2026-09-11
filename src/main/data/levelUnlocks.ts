@@ -64,7 +64,7 @@ import { clientHpFor } from './clientSpellHp'
 // the scrape, like `spellEffectClass.ts`: delete either and the catalog is unchanged.
 import { rainWaves } from './rainSpells'
 import { aeHits, aeMaxTargets } from '../../shared/aoeSpells'
-import { replacedBy } from './spellLineLookup'
+import { lineContaining, replacedBy } from './spellLineLookup'
 // THE GRANT READER and the UPGRADE CLASSIFIER (docs/plans/spell-upgrades-and-loadout.md). Both are
 // separable overlays over the same scrape, the `spellEffectClass.ts` / `rainSpells.ts` family:
 // delete either and the catalog is unchanged. They run HERE rather than at the far end because the
@@ -349,9 +349,25 @@ function writeInputs(
  * The snapshot above stays exactly as it was — it is the level the unlock row is about — and the
  * far end recomputes only when it wants another one.
  */
+/**
+ * WHAT LINE THIS SPELL IS ON, and what it supersedes.
+ *
+ * THE LINE IS PER CLASS in the shipped file, and a row is drawn once - so the first class that
+ * places it names it. Every class that files a spell files it under the same family name (the
+ * generator builds them from one index), so "first" is a tie-break rather than a choice.
+ *
+ * Its own function because `unlockSpells` sits at this tree's complexity ceiling.
+ */
+function writeLineage(spell: UnlockSpell, at: readonly { cls: ClassAbbr; level: number }[]): void {
+  const replaces = replacesFor(spell.name, at)
+  if (replaces) spell.replaces = replaces
+  const line = at.map((p) => lineContaining(spell.name, p.cls)?.line.name).find((n) => n !== undefined)
+  if (line !== undefined) spell.line = line
+}
+
 function unlockSpells(client: SpellResistTable | null): UnlockSpell[] {
   const file = spellsJson as SpellDbFile
-  const out: UnlockSpell[] = []
+  const out: NamedRow[] = []
   for (const s of applySpellCorrections(applySpellEra(applySpellRemovals(file.spells).spells).spells).spells) {
     const at = parseSpellClasses(s.classes)
     if (at.length === 0) continue
@@ -373,9 +389,12 @@ function unlockSpells(client: SpellResistTable | null): UnlockSpell[] {
     spell.searchText = searchTextFor(s, undefined)
     if (s.illusion) spell.illusion = true
     writeFigures(spell, s, at, client)
-    const replaces = replacesFor(s.name, at)
-    if (replaces) spell.replaces = replaces
-    out.push(spell)
+    writeLineage(spell, at)
+    out.push({
+      spell,
+      ...(s.msgCastOnYou === undefined ? {} : { you: s.msgCastOnYou }),
+      ...(s.msgCastOnOther === undefined ? {} : { other: s.msgCastOnOther })
+    })
   }
   return dedupeByName(out, client).sort((a, b) => a.name.localeCompare(b.name))
 }
@@ -423,8 +442,55 @@ function clientAgreement(spell: UnlockSpell, row: SpellResistInfo | undefined): 
 }
 
 /** Are these two rows the same page scraped twice - every field this dataset carries identical? */
-function structurallyIdentical(a: UnlockSpell, b: UnlockSpell): boolean {
-  return JSON.stringify(a) === JSON.stringify(b)
+function structurallyIdentical(a: NamedRow, b: NamedRow): boolean {
+  return JSON.stringify(a.spell) === JSON.stringify(b.spell)
+}
+
+/**
+ * COULD THESE TWO ROWS BE THE SAME SPELL AT ALL?
+ *
+ * ============================================================================
+ * THE GUARD THAT WAS MISSING, AND IT DELETED A SPELL (report 2026-09-10)
+ * ============================================================================
+ * *"Spells isn't listing all spells. For example, Healing Water is missing"* - a friend's druid,
+ * and he was right. The scrape stores that spell under the WRONG NAME: it is filed as a second
+ * `Greater Healing`, Druid 34, whose own message reads `Healing water flows over you.` The client
+ * knows it properly as `Healing Water`, id 3834, mana 150, cast 750 - which is the catalog row
+ * exactly.
+ *
+ * So `pickAmong` saw two rows named `Greater Healing`, asked the client which one it agreed with,
+ * got a clean answer for the Cleric line (mana 115), and DROPPED THE OTHER. A real spell, gone from
+ * the catalog, silently. The block above this one says folding those "would DELETE a spell, which
+ * is worse than showing two rows" - and then the client tiebreak did it anyway, because agreeing
+ * with the client is not the same question as being the same spell.
+ *
+ * THE MESSAGES ARE WHAT SEPARATE THEM, and they separate them cleanly. Two scrapes of one page
+ * carry the same `msgCastOnYou`; two different spells filed under one name do not. Measured over
+ * the committed catalog: of the 33 colliding names, 25 agree on their messages and 8 disagree - and
+ * all 8 are plainly two spells (Greater Healing, Healing, Poison, Shock of Frost, Aria of
+ * Asceticism, Illusion: Air Elemental, Rain of Molten LAva, Ring of South Ro). Burst of Flame, the
+ * re-tune this fold exists for, is in the agreeing 25 and still folds.
+ *
+ * A ROW THAT STATES NO MESSAGE AGREES WITH ANYTHING, which is law 1 doing its ordinary work: silence
+ * is not a different sentence, and refusing to fold on an absence would strand the identical pairs.
+ */
+function couldBeOneSpell(a: NamedRow, b: NamedRow): boolean {
+  const same = (x: string | undefined, y: string | undefined): boolean =>
+    x === undefined || y === undefined || x === y
+  return same(a.you, b.you) && same(a.other, b.other)
+}
+
+/**
+ * One folded row, with the two sentences the fold needs and `UnlockSpell` does not carry.
+ *
+ * The messages are a property of the SCRAPE rather than of the dataset - nothing downstream draws
+ * them, and putting them on the wire for ~1,450 rows to serve one fold would be bytes saying
+ * nothing. So they ride beside the row for the length of the fold and are dropped at the end.
+ */
+interface NamedRow {
+  spell: UnlockSpell
+  you?: string
+  other?: string
 }
 
 /**
@@ -433,13 +499,17 @@ function structurallyIdentical(a: UnlockSpell, b: UnlockSpell): boolean {
  * Returns every row it cannot choose between, so a caller is never handed fewer spells than the
  * catalog states unless something measured said so.
  */
-function pickAmong(group: readonly UnlockSpell[], row: SpellResistInfo | undefined): UnlockSpell[] {
-  const distinct: UnlockSpell[] = []
+function pickAmong(group: readonly NamedRow[], row: SpellResistInfo | undefined): NamedRow[] {
+  const distinct: NamedRow[] = []
   for (const s of group) {
     if (!distinct.some((d) => structurallyIdentical(d, s))) distinct.push(s)
   }
   if (distinct.length === 1) return distinct
-  const scores = distinct.map((s) => clientAgreement(s, row))
+  // THE CLIENT ONLY GETS TO PICK BETWEEN ROWS THAT COULD BE ONE SPELL. Two rows whose own messages
+  // disagree are two spells, and no amount of agreement with a client row makes one of them a
+  // stale scrape of the other - see `couldBeOneSpell` for the spell this cost.
+  if (!distinct.every((x) => couldBeOneSpell(x, distinct[0]))) return distinct
+  const scores = distinct.map((s) => clientAgreement(s.spell, row))
   const best = Math.max(...scores)
   // A tie at the top is not a verdict, and neither is a top score of zero - both mean the client
   // did not separate them, and both rows stay.
@@ -448,17 +518,18 @@ function pickAmong(group: readonly UnlockSpell[], row: SpellResistInfo | undefin
 }
 
 /** Fold same-named rows wherever the client file can say which is current. */
-function dedupeByName(spells: readonly UnlockSpell[], client: SpellResistTable | null): UnlockSpell[] {
-  const groups = new Map<string, UnlockSpell[]>()
-  for (const s of spells) {
-    const key = spellCanonKey(s.name)
+function dedupeByName(rows: readonly NamedRow[], client: SpellResistTable | null): UnlockSpell[] {
+  const groups = new Map<string, NamedRow[]>()
+  for (const r of rows) {
+    const key = spellCanonKey(r.spell.name)
     const group = groups.get(key)
-    if (group) group.push(s)
-    else groups.set(key, [s])
+    if (group) group.push(r)
+    else groups.set(key, [r])
   }
   const out: UnlockSpell[] = []
   for (const [key, group] of groups) {
-    out.push(...(group.length === 1 ? group : pickAmong(group, client?.[key])))
+    const kept = group.length === 1 ? group : pickAmong(group, client?.[key])
+    for (const r of kept) out.push(r.spell)
   }
   return out
 }

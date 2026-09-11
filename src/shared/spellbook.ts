@@ -75,6 +75,16 @@ export interface SpellbookRow {
   key: string
   /** The client's gem icon, when this machine's install answered. See `UnlockSpell.iconId`. */
   iconId?: number
+  /**
+   * THE SPELL LINE - which is the game's own STACKING GROUP for this spell.
+   *
+   * `UnlockSpell.line` carries the whole argument. Drawn as a column because two readers asked for
+   * it on the same day for two different reasons, and both are about making a claim legible rather
+   * than adding one: what a spell collides with, and why the newest-rank chip hid its neighbour.
+   */
+  line?: string
+  /** What this row supersedes, by name, deduped - the other half of that answer. */
+  replaces?: string[]
   /** Every class that gains it, with the level, in the order main sorted them. */
   at: readonly { cls: ClassAbbr; level: number }[]
   /** The lowest level any class gains it at - what the row sorts and filters by. */
@@ -200,6 +210,21 @@ function gainLevel(s: UnlockSpell): number {
  * whole corpus through a query, and a second copy of this mapping is how two surfaces come to state
  * different mana for one spell.
  */
+/**
+ * The spell-line pair, as a spreadable fragment.
+ *
+ * Split out for `positive`'s reason: `spellbookRow` is at this tree's complexity ceiling and every
+ * optional field written inline costs it a branch.
+ */
+function lineFields(s: UnlockSpell): Pick<SpellbookRow, 'line' | 'replaces'> {
+  // The catalog states one entry per CLASS, so a six-class line repeats its predecessor six times.
+  const replaces = [...new Set((s.replaces ?? []).map((r) => r.name))]
+  return {
+    ...(s.line === undefined ? {} : { line: s.line }),
+    ...(replaces.length === 0 ? {} : { replaces })
+  }
+}
+
 export function spellbookRow(s: UnlockSpell, tier: number): SpellbookRow {
   const t = normalizeSpellRank(tier)
   const base = tierBase(s)
@@ -214,7 +239,7 @@ export function spellbookRow(s: UnlockSpell, tier: number): SpellbookRow {
     payoff: upgradePayoff(base),
     tier: t
   }
-  if (s.iconId !== undefined) row.iconId = s.iconId
+  Object.assign(row, lineFields(s))
   if (s.spellType !== undefined) row.spellType = s.spellType
   if (s.grantsLevel !== undefined) row.grantsLevel = s.grantsLevel
   if (reading.mana !== undefined) row.mana = reading.mana
@@ -270,6 +295,19 @@ function supersededNames(
   const shown = classes !== undefined && classes.length > 0 ? new Set(classes) : null
   const out = new Set<string>()
   for (const s of survivors) {
+    // A SPELL THAT IS NOT IN THE GAME YET SUPERSEDES NOTHING (Malkil, 2026-09-10: *"The spells not
+    // available yet is definitely messing with Newest Version, though."* He is right, and this is
+    // the bug his two reports meet in: the fold hid a rung because a LATER rung existed, without
+    // asking whether that later rung is obtainable. On a server that has not opened the era it
+    // belongs to, it is not - so the reader lost the spell he can cast in favour of one that does
+    // not exist, which is the worst possible answer for a chip whose whole promise is "show me the
+    // one to use".
+    //
+    // It holds WHATEVER THE ERA TOGGLE SAYS, and that is deliberate: the toggle decides what is
+    // DRAWN, and this decides what may HIDE something. A reader browsing the future still sees it;
+    // it just no longer deletes his present. `outOfEra` is `true` or absent and never false, so
+    // silence keeps a rung eligible - law 1, and the same reading `admits` takes.
+    if (s.outOfEra === true) continue
     for (const r of s.replaces ?? []) {
       // An empty class filter shows every class, so every replacement counts.
       if (shown === null || shown.has(r.cls)) out.add(r.name)
@@ -285,7 +323,17 @@ function admits(s: UnlockSpell, q: SpellbookQuery, text: string): boolean {
   // untouched toolbar show the whole corpus.
   const anyOf = <T,>(picked: readonly T[] | undefined, has: (v: T) => boolean): boolean =>
     picked === undefined || picked.length === 0 || picked.some(has)
-  if (text.length > 0 && !s.name.toLowerCase().includes(text)) return false
+  // THE SEARCH READS THE SPELL'S OWN SENTENCES, NOT ONLY ITS NAME.
+  //
+  // `UnlockSpell.searchText` is the haystack `searchTextFor` already builds for every row - the
+  // name, the ranks a source lists, and the three sentences the game prints when it lands, fades
+  // and hits somebody else. This filter looked at the name alone and therefore could not find a
+  // spell the SCRAPE has mis-titled, which is a real and reported shape (2026-09-10): a druid's
+  // `Healing Water` is filed under the name `Greater Healing`, and the only place the words
+  // "healing water" appear is in its own message. Searching them found nothing.
+  //
+  // Falls back to the name when a row carries no haystack, so nothing becomes unfindable.
+  if (text.length > 0 && !(s.searchText ?? s.name.toLowerCase()).includes(text)) return false
   if (!anyOf(q.classes, (c) => s.at.some((p) => p.cls === c))) return false
   if (!anyOf(q.categories, (c) => (s.upgradeCategory ?? 'other') === c)) return false
   if (q.maxLevel !== undefined && gainLevel(s) > q.maxLevel) return false

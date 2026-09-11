@@ -43,6 +43,19 @@ export interface UnlockSpell {
    * <iconId>` turns it into pixels, out of that same install and never off a network.
    */
   iconId?: number
+  /**
+   * THE SPELL LINE this row belongs to - the shipped ladder's own name for the family.
+   *
+   * Asked for twice from two directions on 2026-09-10. The owner, reading a DoT row: *"i also don't
+   * see that curse stacks and debuffs, it only says damage"* - and the client's own tooltip for that
+   * spell reads `Spell Line: Curse / Stacking Group: Curse`, so the line IS the stacking group, and
+   * naming it is what tells a reader what a spell collides with. And his friend, reading the
+   * newest-rank chip: *"I'm not quite sure what Newest Rank Only is supposed to do. It seems pretty
+   * arbitrary... Maybe if it showed the spell line it would make sense."* One field answers both.
+   *
+   * Absent for a spell the shipped ladders do not place, which is most one-offs.
+   */
+  line?: string
   /** the (class, level) pairs `shared/spellLevels.ts` read out of the wiki's bullet list */
   at: { cls: ClassAbbr; level: number }[]
   /** cast time in ms, when the page states one */
