@@ -130,6 +130,16 @@ export const AREA_FORM_TIER = {
   'eq.plan.reach': 'restart',
   /** the dps focuses' Glass cannon ↔ Wooden sword defense dial — a pick like the two above */
   'eq.plan.survivability': 'restart',
+  // ---- the Spells tab ----
+  /**
+   * The Spellbook's PINNED class trio, or absent while the filter is still following detection.
+   *
+   * ITS OWN KEY, not the Gear tab's, and that is the same ruling `useGearClasses` already makes
+   * about `eq.planner.classes`: two surfaces, two questions. "Who am I reading the gear table for"
+   * and "whose spells am I looking at" are different, and one key would make a click on either tab
+   * silently re-filter the other. The SHAPE is shared (`useFollowingClasses`) - the state is not.
+   */
+  'eq.spells.classes': 'restart',
   // ---- the Wish list tab ----
   'eq.wishlist.search': 'session',
   // ---- the Character tab ----
@@ -281,6 +291,8 @@ export function sanitizeGearSort(raw: unknown): GearSort {
  * `MAX_COMBO_SLOTS` cap are `useBrowseClasses`' own, applied here for the same reason it applies
  * them: `localStorage` is a file the user can edit and this build is the only thing checking it.
  */
+// It sanitises ONE trio. `sanitizeGearClassPins` is what the two stored keys actually go through
+// (the Gear tab's and, since 2026-09-10, the Spellbook's), and it calls this per character.
 export function sanitizeGearClasses(raw: unknown): ClassAbbr[] | null {
   const o = asRecord(raw)
   if (o === null || !Array.isArray(o.classes)) return null

@@ -22,7 +22,8 @@
 
 import type { JSX } from 'react'
 import { Box, Chip, Slider, Stack, TextField, Typography } from '@mui/material'
-import { CLASS_ABBRS, type ClassAbbr } from '@shared/classCombo'
+import { CLASS_ABBRS } from '@shared/classCombo'
+import type { GearClasses } from '../gear/gearData'
 import { classDisplayName } from '@shared/spellLevels'
 import {
   UPGRADE_CATEGORIES,
@@ -70,8 +71,15 @@ export interface SpellbookToolbarProps {
   onQuery: (next: SpellbookQuery) => void
   tier: number
   onTier: (next: number) => void
-  /** The loadout's classes, offered as a one-click filter. Empty when the app cannot name them. */
-  combo: readonly ClassAbbr[]
+  /**
+   * The class filter's whole state - the pinned list, what the app detects, and the two writers.
+   *
+   * The SAME hook the Gear tab runs (`useFollowingClasses`), under this tab's own storage key. It
+   * is passed in rather than called here because a toolbar that owned it would hold a second copy
+   * of the same key, and only one of the two would re-read storage after the other wrote it -
+   * `useBrowseClasses`' own mount-once rule.
+   */
+  classes: GearClasses
   /** How many rows survived, so the toolbar can say what it did. */
   shown: number
   total: number
@@ -90,12 +98,9 @@ type RowProps = Pick<SpellbookToolbarProps, 'query' | 'onQuery'>
 function FilterRow({
   query,
   onQuery,
-  combo
-}: RowProps & { combo: readonly ClassAbbr[] }): JSX.Element {
-  const classes = query.classes ?? []
+  classes
+}: RowProps & { classes: GearClasses }): JSX.Element {
   const categories = query.categories ?? []
-  const mine =
-    combo.length > 0 && classes.length === combo.length && combo.every((c) => classes.includes(c))
   const worth = query.payoffMagnitudeOnly === true
   return (
     <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
@@ -107,20 +112,26 @@ function FilterRow({
         slotProps={{ htmlInput: { 'data-testid': 'spellbook-search' } }}
         sx={{ minWidth: 200 }}
       />
-      {/* THE GEAR TAB'S CLASS PICKER, WITH THE GEAR TAB'S WORDS (owner, 2026-09-10: *"why are you
-          not reusing controls like the class picker thing with little pills"*). The control was
-          always the shared one; what was not shared was `classDisplayName`, so this filter said
-          `SHD` where the Gear tab three tabs over said `Shadow Knight`. Same closed list, same
-          tokens stored, read in the words a player uses - `ChipMultiSelect`'s `optionLabel` header
-          states that trade and JOS-402 already made it for both class filters on the gear side. */}
+      {/* THE GEAR TAB'S CLASS FILTER, WHOLE (owner, 2026-09-10: *"the class thing isn't letting me
+          pick and chose like the gear is, this should be shared control so we don't reinvent the
+          wheel"*).
+
+          The CONTROL was always the shared `ChipMultiSelect`; what was not shared was everything
+          around it. This tab drove it from a query field that started EMPTY, with a separate chip
+          that swapped the whole selection in and out - so it opened showing no pills, and there was
+          no way to drop just the Warrior and keep the other two. The Gear tab has had the right
+          arrangement since JOS-302: the picker holds the real list and shows it as removable pills,
+          it FOLLOWS detection until you touch it, and a separate chip offers today's detected trio
+          when the two disagree. `useFollowingClasses` is that state, now shared by key. */}
       <ChipMultiSelect
         options={CLASS_ABBRS}
-        value={[...classes]}
-        onChange={(next) => onQuery({ ...query, classes: next })}
+        value={classes.classes}
+        onChange={classes.set}
         label="Classes"
         placeholder="every class"
         optionLabel={classDisplayName}
         minWidth={190}
+        testId="spellbook-classes"
       />
       <ChipMultiSelect
         options={UPGRADE_CATEGORIES}
@@ -135,15 +146,21 @@ function FilterRow({
           because a browser that opened pre-filtered to your trio would answer a question the reader
           had not asked yet - and the owner's standing ask was explicitly to be able to look OUTSIDE
           his classes in order to compare. */}
-      {combo.length > 0 && (
+      {/* THE OFFER, not a toggle - the Gear tab's `gear-class-offer` chip, same words and same
+          behaviour. It appears only when you have PINNED a list that disagrees with what the app
+          currently infers, and one click adopts today's trio into the picker above, where it is
+          then editable like anything else you typed. A filter following detection shows no chip,
+          because there is nothing to offer it. */}
+      {classes.offer !== null && (
         <Chip
           size="small"
-          label={`My classes (${combo.join('/')})`}
-          title={`Show only what ${combo.map(classDisplayName).join(', ')} can cast`}
-          data-testid="spellbook-mine"
-          color={mine ? 'primary' : 'default'}
-          variant={mine ? 'filled' : 'outlined'}
-          onClick={() => onQuery({ ...query, classes: mine ? [] : [...combo] })}
+          color="warning"
+          variant="outlined"
+          label={`detected: ${classes.offer.map(classDisplayName).join(', ')}`}
+          data-testid="spellbook-class-offer"
+          title="What the app currently infers you are running. Click to read the list for it."
+          onClick={classes.adopt}
+          sx={{ flexShrink: 0 }}
         />
       )}
       {/* The owner's question 2, as one click: hide everything a tier does not improve. */}
@@ -216,13 +233,13 @@ export default function SpellbookToolbar({
   onQuery,
   tier,
   onTier,
-  combo,
+  classes,
   shown,
   total
 }: SpellbookToolbarProps): JSX.Element {
   return (
     <Stack spacing={1} sx={{ mb: 1 }} data-testid="spellbook-toolbar">
-      <FilterRow query={query} onQuery={onQuery} combo={combo} />
+      <FilterRow query={query} onQuery={onQuery} classes={classes} />
       <TierRow
         categories={query.categories ?? []}
         tier={tier}

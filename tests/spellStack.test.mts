@@ -189,15 +189,36 @@ test('an AC DEBUFF does not contest an AC buff`s slot', () => {
 // POSITION, WHICH IS THE WHOLE REASON THE SLOT NUMBER IS CARRIED
 // =================================================================================================
 
-test('slots are POSITIONAL - the same effect in different slots does not contest', () => {
-  // A packed array would compare these two and call them a conflict. The file's own slot number is
-  // what keeps position exact, which is why `SpellEffectSlot` carries it.
+test('the same effect CONTESTS wherever it sits - matching is by effect, not by slot number', () => {
+  // THIS TEST USED TO ASSERT THE OPPOSITE, and the owner's own loadout is what overturned it
+  // (2026-09-10: *"are you sure all these spells are not going to overlap each-other?"*). It is
+  // worth reading the old claim, because it was a faithful port and still wrong here: EQEmu's
+  // `CheckStackConflict` walks the slots in lockstep, comparing slot i against slot i, so a STR
+  // buff in slot 1 and a STR buff in slot 4 were never compared at all.
+  //
+  // Over his real client data that is wrong on most pairs anyone would ask about. Celerity keeps
+  // its haste in slot 1 and Spirit Quickening keeps its in slot 4; Spirit of Cheetah's movement is
+  // in slot 6 and Spirit of Bih`Li's in slot 2. The engine called every one of those pairs
+  // 'stacks', and the Loadout tab recommended keeping two haste buffs and two run speeds up at
+  // once. `contestPass` carries the full argument, including why lockstep is enough on a server
+  // and is not enough here.
   const a = spell({ slots: [slot(0, STR, 20)] })
   const b = spell({ slots: [slot(3, STR, 25)] })
-  assert.equal(checkStackConflict(a, b, L), 'stacks')
-  // …and in the SAME slot they do.
+  assert.equal(checkStackConflict(a, b, L), 'overwrites', 'the stronger STR takes the slot')
+  assert.equal(checkStackConflict(b, a, L), 'blocked', 'and the weaker one cannot displace it')
+  // …and in the SAME slot the answer is unchanged, which is the half that did always work.
   const c = spell({ slots: [slot(0, STR, 25)] })
   assert.equal(checkStackConflict(a, c, L), 'overwrites')
+})
+
+test('DIFFERENT effects still stack, wherever they sit - the change is about matching, not about conflicting more', () => {
+  // The counterweight to the test above: matching by effect must not turn every pair into a
+  // conflict. Two resist buffs on different axes are the owner's own control case - Resist Cold and
+  // Talisman of Jasinth (cold and disease) share no effect and stack in game and here.
+  const cold = spell({ slots: [slot(0, 47, 40)] })
+  const disease = spell({ slots: [slot(5, 49, 45)] })
+  assert.equal(checkStackConflict(cold, disease, L), 'stacks')
+  assert.equal(checkStackConflict(disease, cold, L), 'stacks')
 })
 
 test('a gap becomes a blank rather than shifting the effects after it', () => {

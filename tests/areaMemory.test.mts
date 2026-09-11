@@ -108,10 +108,10 @@ const BROWSE_FALLBACK: BrowseFormMemory = { socket: 'proc', slot: null, trioOnly
 test('the restart split is a table, and every key in it is on one of exactly two tiers', () => {
   const keys = Object.keys(AREA_FORM_TIER) as AreaFormKey[]
   // Eleven fields arrived with JOS-329; the progression planner's two picks (`eq.plan.role`,
-  // `eq.plan.reach`) made thirteen, and its survivability dial makes fourteen. The number is here
-  // so a key added without a row in `READERS` below fails TWICE — once on the count, once on the
-  // coverage sweep.
-  assert.equal(keys.length, 14, 'fourteen fields are stored — update this test when a fifteenth is')
+  // `eq.plan.reach`) made thirteen, its survivability dial makes fourteen, and the Spellbook's own
+  // class trio (`eq.spells.classes`, 2026-09-10) makes fifteen. The number is here so a key added
+  // without a row in `READERS` below fails TWICE — once on the count, once on the coverage sweep.
+  assert.equal(keys.length, 15, 'fifteen fields are stored — update this test when a sixteenth is')
   for (const key of keys) {
     const tier = tierOf(key)
     assert.ok(tier === 'restart' || tier === 'session', `${key} is on an unknown tier ${tier}`)
@@ -144,7 +144,10 @@ test('WHAT YOU CHOSE IS RESTART-SCOPED — including the slider, whose old law s
     // this area. The survivability dial rides with them: a Glass cannon plans glass next launch.
     'eq.plan.role',
     'eq.plan.reach',
-    'eq.plan.survivability'
+    'eq.plan.survivability',
+    // The Spellbook's own trio. Same shape and same tier as the Gear tab's, a DIFFERENT key on
+    // purpose - `useFollowingClasses` states why two surfaces must not re-filter each other.
+    'eq.spells.classes'
   ]
   for (const key of chosen) assert.equal(tierOf(key), 'restart', `${key} must survive a restart`)
 })
@@ -186,6 +189,9 @@ const READERS: Reader[] = [
   { key: 'eq.gear.filters', read: sanitizeGearForm, fallback: DEFAULT_GEAR_FORM },
   { key: 'eq.gear.sort', read: sanitizeGearSort, fallback: DEFAULT_GEAR_SORT },
   { key: 'eq.gear.classes', read: sanitizeGearClassPins, fallback: null },
+  // One sanitizer, two keys: the stored shape - a per-character map of pinned trios - is identical
+  // and only the surface differs. `useFollowingClasses` takes the key as its parameter.
+  { key: 'eq.spells.classes', read: sanitizeGearClassPins, fallback: null },
   { key: 'eq.gear.upgrade', read: sanitizeUpgrade, fallback: ITEM_UPGRADE_BASE },
   { key: 'eq.gear.search', read: sanitizeSearch, fallback: '', legal: anyString },
   { key: 'eq.planner.filters', read: (r) => sanitizeBrowseForm(r, BROWSE_FALLBACK), fallback: BROWSE_FALLBACK },

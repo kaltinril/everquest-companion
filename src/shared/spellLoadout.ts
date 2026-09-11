@@ -216,16 +216,48 @@ export interface LoadoutSet {
  * for the same reason a heal is: it is a healing tool rather than a standing buff, and a recommender
  * that put Regeneration in a stat set would be answering a question nobody asked.
  */
+export interface CandidateQuery {
+  /** The client's stacking rows, when the player's own spell file has answered. */
+  views?: ReadonlyMap<string, StackSpellView>
+  /**
+   * THE CHARACTER'S LEVEL. A spell no class in the trio has reached is not a recommendation.
+   *
+   * Added 2026-09-10 after the owner read the tab and asked *"are you also sure the spells are
+   * A) In our ERA B) available at my level?"*. They were not. At level 50 the set it handed him
+   * was 8 spells he could not cast out of 17, headed by Focus of Spirit, which is SHM 60 - so the
+   * single most prominent recommendation on the tab was unreachable, and every buff it beat had
+   * been rejected in its favour.
+   *
+   * Absent means no level filter, which is the reading every other absent field here takes and the
+   * right one for a caller that genuinely does not know the level yet.
+   */
+  level?: number
+  /**
+   * KEEP THE SPELLS THE ERA SIDECAR PLACES OUT OF ERA. Default false - they are dropped.
+   *
+   * Same report. 4 of those 17 were flagged out of era, which on this server means the spell is not
+   * obtainable, and a "what should I keep up" list is exactly the surface where that matters. The
+   * flag is `true` or ABSENT and never false (law 1), so silence is not a verdict and a spell the
+   * sidecar never judged is kept.
+   */
+  includeOutOfEra?: boolean
+}
+
 export function loadoutCandidates(
   spells: readonly UnlockSpell[],
   classes: readonly ClassAbbr[],
   weights: StatWeights,
-  views?: ReadonlyMap<string, StackSpellView>
+  query: CandidateQuery = {}
 ): LoadoutCandidate[] {
+  const { views, level, includeOutOfEra } = query
   const out: LoadoutCandidate[] = []
   for (const s of spells) {
     if (s.upgradeCategory !== 'buff') continue
-    const at = s.at.filter((p) => classes.includes(p.cls))
+    if (s.outOfEra === true && includeOutOfEra !== true) continue
+    // THE LEVEL IS PART OF "CAN I CAST IT", and it is applied to the (class, level) pairs rather
+    // than to the row: a spell a Shaman gets at 60 and a Warrior at 45 is castable by a level-50
+    // trio through the Warrior alone, and the surviving pairs are what the row then reports.
+    const at = s.at.filter((p) => classes.includes(p.cls) && (level === undefined || p.level <= level))
     if (at.length === 0) continue
     const grants = s.grants ?? []
     const score = scoreGrants(grants, weights)
@@ -485,8 +517,18 @@ export interface CombatSet {
   gems: number
 }
 
-/** The three damage tables, in the order a round visits them. */
-const COMBAT_TABS: readonly BestSpellTab[] = ['dd', 'dot', 'aoe']
+/**
+ * THE TABLES EACH SET SPENDS ITS GEMS ON, in the order a round visits them.
+ *
+ * Two sets, because they are two jobs and a player carries gems for both (owner, 2026-09-10: *"the
+ * loadout tab should have tabs for buff combat heals"*). The breadth-before-depth argument above is
+ * per set: the best nuke, DoT and AE before any second damage pick, and the best direct heal before
+ * a second heal-over-time.
+ */
+export const COMBAT_TABLES: Readonly<Record<'combat' | 'heals', readonly BestSpellTab[]>> = {
+  combat: ['dd', 'dot', 'aoe'],
+  heals: ['heal', 'hot']
+}
 
 /**
  * SPEND `gems` ON THE DAMAGE TABLES, breadth first. See the block above for the policy.
@@ -500,11 +542,12 @@ const COMBAT_TABS: readonly BestSpellTab[] = ['dd', 'dot', 'aoe']
  */
 export function combatSet(
   tables: Readonly<Record<BestSpellTab, { shown: readonly CombatSource[] }>>,
-  gems: number
+  gems: number,
+  which: readonly BestSpellTab[] = COMBAT_TABLES.combat
 ): CombatSet {
   const picks: CombatPick[] = []
   const taken = new Set<string>()
-  const tabsUsed = COMBAT_TABS.filter((t) => tables[t].shown.length > 0)
+  const tabsUsed = which.filter((t) => tables[t].shown.length > 0)
   const deepest = Math.max(0, ...tabsUsed.map((t) => tables[t].shown.length))
   for (let place = 0; place < deepest && picks.length < gems; place++) {
     for (const tab of tabsUsed) {
