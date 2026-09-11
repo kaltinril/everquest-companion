@@ -56,7 +56,10 @@ import {
 } from '@mui/material'
 import { UPGRADE_CATEGORY_LABEL } from '@shared/spellUpgrade'
 import { PAYOFF_MARKS, spellbookRows, type SpellbookQuery, type SpellbookRow } from '@shared/spellbook'
-import { useCurrentComboClasses, useLevelUnlocks } from '../leveling/useLevelUnlocks'
+import { useLevelUnlocks } from '../leveling/useLevelUnlocks'
+// THE GEAR TAB'S CLASS-FILTER STATE, under this tab's own key (owner, 2026-09-10). See
+// `useFollowingClasses` for why the shape is shared and the storage deliberately is not.
+import { useFollowingClasses } from '../gear/gearData'
 import { SpellTooltip } from '../../lib/SpellCard'
 import { useWindowedRows } from '../../lib/useWindowedRows'
 import SpellbookToolbar from './SpellbookToolbar'
@@ -209,12 +212,21 @@ const PAYOFF_HEADER_TITLE =
 
 export default function SpellbookView(): JSX.Element {
   const data = useLevelUnlocks()
-  const combo = useCurrentComboClasses()
+  // Mounted HERE and passed down, never inside the toolbar: two mounts of one storage key would
+  // each hold their own copy and only one would re-read after the other wrote.
+  const classes = useFollowingClasses('eq.spells.classes')
   const [query, setQuery] = useState<SpellbookQuery>({ sort: 'level' })
   const [tier, setTier] = useState(0)
   // THE STANDING SEARCH LAW: the controls echo instantly and the LIST follows. The gear tab's own
   // slider header states the same rule - the thumb is never waiting on a re-sort of a corpus.
-  const deferredQuery = useDeferredValue(query)
+  // THE CLASS FILTER IS PART OF THE QUERY, and it lives outside `query` because it is remembered
+  // across restarts while the rest of the form is not. Joined here, once, so `spellbookRows` still
+  // receives one whole question - the renderer composes the query, it never filters the corpus.
+  const asked = useMemo<SpellbookQuery>(
+    () => ({ ...query, classes: classes.classes }),
+    [query, classes.classes]
+  )
+  const deferredQuery = useDeferredValue(asked)
   const deferredTier = useDeferredValue(tier)
   const rows = useMemo(
     () => spellbookRows(data.spells, deferredQuery, deferredTier),
@@ -229,7 +241,7 @@ export default function SpellbookView(): JSX.Element {
         onQuery={setQuery}
         tier={tier}
         onTier={setTier}
-        combo={combo.resolved}
+        classes={classes}
         shown={rows.length}
         total={data.spells.length}
       />

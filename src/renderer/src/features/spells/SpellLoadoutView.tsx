@@ -40,15 +40,17 @@
 // NOTHING HERE FILTERS OR SORTS (ruling 4): `loadoutCandidates`, `buildLoadout` and `combatSet` do
 // all of it, in `src/shared`, node-tested and with no React anywhere near them.
 
-import { type JSX, useMemo } from 'react'
-import { Alert, Box, Chip, Divider, Stack, Typography } from '@mui/material'
+import { type JSX, useMemo, useState } from 'react'
+import { Alert, Box, Chip, Divider, Stack, Tab, Tabs, Typography } from '@mui/material'
 import { spellStatText } from '@shared/spellStats'
 import {
   DEFAULT_STAT_WEIGHTS,
   buildLoadout,
+  COMBAT_TABLES,
   combatSet,
   loadoutCandidates,
   type CombatPick,
+  type CombatSet,
   type LoadoutCandidate,
   type LoadoutRejection,
   type LoadoutSet
@@ -295,7 +297,56 @@ function BuffSection({ set, classes }: { set: LoadoutSet; classes: string }): JS
   )
 }
 
+/** Which set is on screen. Local to this view - see the tab bar for why it is not an app View. */
+type LoadoutPane = 'buffs' | 'combat' | 'heals'
+
+/**
+ * A CAST SET - combat or heals. One component for both because they differ only in their words:
+ * the spend policy, the row and the "nothing here contests anything" reasoning are identical.
+ */
+function CastSection({
+  title,
+  set,
+  level,
+  blurb,
+  empty,
+  testId
+}: {
+  title: string
+  set: CombatSet
+  level: number
+  blurb: string
+  empty: string
+  testId: string
+}): JSX.Element {
+  return (
+    <Box data-testid={testId}>
+      <Stack direction="row" spacing={1} alignItems="baseline">
+        <Typography variant="h6">{title}</Typography>
+        <Typography variant="caption" color="text.secondary">
+          {String(set.picks.length)} of {String(set.gems)} gems, read at level {String(level)}
+        </Typography>
+      </Stack>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+        {blurb}
+      </Typography>
+      {set.picks.length === 0 ? (
+        <Alert severity="info" data-testid={`${testId}-empty`}>
+          {empty}
+        </Alert>
+      ) : (
+        <Stack>
+          {set.picks.map((p) => (
+            <CombatRow key={p.name} p={p} />
+          ))}
+        </Stack>
+      )}
+    </Box>
+  )
+}
+
 export default function SpellLoadoutView(): JSX.Element {
+  const [pane, setPane] = useState<LoadoutPane>('buffs')
   const data = useLevelUnlocks()
   const combo = useCurrentComboClasses()
   const who = useModule<CharacterSnap>('character')
@@ -303,9 +354,11 @@ export default function SpellLoadoutView(): JSX.Element {
   // number. Absent until the log has seen a level-up or your own `/who` row, which is the ordinary
   // state of a fresh log - see `ASSUMED_LEVEL`.
   const level = who?.level?.level ?? ASSUMED_LEVEL
+  // LEVEL AND ERA ARE PART OF THE QUESTION (owner, 2026-09-10). Without them the tab recommended
+  // spells he could not cast - see `CandidateQuery.level` for the count.
   const candidates = useMemo(
-    () => loadoutCandidates(data.spells, combo.resolved, DEFAULT_STAT_WEIGHTS),
-    [data.spells, combo.resolved]
+    () => loadoutCandidates(data.spells, combo.resolved, DEFAULT_STAT_WEIGHTS, { level }),
+    [data.spells, combo.resolved, level]
   )
   const names = useMemo(() => candidates.map((c) => c.name), [candidates])
   const views = useLoadoutViews(names)
@@ -318,12 +371,16 @@ export default function SpellLoadoutView(): JSX.Element {
     })
     return buildLoadout(withViews, { worn: level, cast: level })
   }, [candidates, views, level])
-  // THE COMBAT HALF, over the Leveling tab's own ranking so the two surfaces can never disagree
-  // about which nuke is better. `defaultSorts()` is that tab's "best first" on every table.
-  const combat = useMemo(() => {
-    const best = bestSpellsAt(data, combo, level, { sorts: defaultSorts() })
-    return combatSet(best.tabs, GEMS)
-  }, [data, combo, level])
+  // THE TWO CAST SETS, over the Leveling tab's own ranking so the surfaces can never disagree about
+  // which nuke is better. `defaultSorts()` is that tab's "best first" on every table, and
+  // `bestSpellsAt` already applies the level and splits the era off - so these two have always had
+  // the filter the buff half was missing.
+  const ranked = useMemo(
+    () => bestSpellsAt(data, combo, level, { sorts: defaultSorts() }),
+    [data, combo, level]
+  )
+  const combat = useMemo(() => combatSet(ranked.tabs, GEMS, COMBAT_TABLES.combat), [ranked])
+  const heals = useMemo(() => combatSet(ranked.tabs, GEMS, COMBAT_TABLES.heals), [ranked])
 
   if (combo.resolved.length === 0) {
     return (
@@ -338,35 +395,53 @@ export default function SpellLoadoutView(): JSX.Element {
   }
 
   return (
-    <Stack spacing={2} sx={{ maxWidth: 900, pb: 4 }} data-testid="spell-loadout-view">
-      <BuffSection set={set} classes={combo.resolved.join(' / ')} />
+    <Stack sx={{ maxWidth: 900 }} data-testid="spell-loadout-view">
+      {/* THREE SETS, THREE TABS (owner, 2026-09-10: *"the loadout tab should have tabs for buff
+          combat heals"*). They were stacked down one page, which put the combat set below a
+          fifty-row rejection list nobody scrolls to. MUI `Tabs` directly rather than
+          `components/AreaTabs`: that component routes the APP's views through `selectView`, and
+          these three are one view's internal state. Same styling, so the two bars read alike. */}
+      <Tabs
+        value={pane}
+        onChange={(_e, v: LoadoutPane) => setPane(v)}
+        variant="standard"
+        data-testid="loadout-panes"
+        sx={{
+          minHeight: 36,
+          mb: 1.5,
+          borderBottom: 1,
+          borderColor: 'divider',
+          '& .MuiTab-root': { minHeight: 36, py: 0, textTransform: 'none' }
+        }}
+      >
+        <Tab value="buffs" label={`Buffs (${String(set.gems)})`} data-testid="loadout-pane-buffs" />
+        <Tab value="combat" label={`Combat (${String(combat.picks.length)})`} data-testid="loadout-pane-combat" />
+        <Tab value="heals" label={`Heals (${String(heals.picks.length)})`} data-testid="loadout-pane-heals" />
+      </Tabs>
 
-      <Divider />
-
-      <Box data-testid="combat-set">
-        <Stack direction="row" spacing={1} alignItems="baseline">
-          <Typography variant="h6">Combat set</Typography>
-          <Typography variant="caption" color="text.secondary">
-            {String(combat.picks.length)} of {String(GEMS)} gems, read at level {String(level)}
-          </Typography>
-        </Stack>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-          Ranked by the Leveling tab, then spent one table at a time: the best nuke, the best damage
-          over time and the best area spell before any second pick. Three tables because they answer
-          three different fights, and eight of one of them can only fight one.
-        </Typography>
-        {combat.picks.length === 0 ? (
-          <Alert severity="info" data-testid="combat-empty">
-            None of your classes has a damage spell this app can put a figure on yet.
-          </Alert>
-        ) : (
-          <Stack>
-            {combat.picks.map((p) => (
-              <CombatRow key={p.name} p={p} />
-            ))}
-          </Stack>
+      <Stack spacing={2} sx={{ pb: 4 }}>
+        {pane === 'buffs' && <BuffSection set={set} classes={combo.resolved.join(' / ')} />}
+        {pane === 'combat' && (
+          <CastSection
+            title="Combat set"
+            set={combat}
+            level={level}
+            blurb="Ranked by the Leveling tab, then spent one table at a time: the best nuke, the best damage over time and the best area spell before any second pick. Three tables because they answer three different fights, and eight of one of them can only fight one."
+            empty="None of your classes has a damage spell this app can put a figure on yet."
+            testId="combat-set"
+          />
         )}
-      </Box>
+        {pane === 'heals' && (
+          <CastSection
+            title="Heal set"
+            set={heals}
+            level={level}
+            blurb="The same spend, over the healing tables: the best direct heal and the best heal over time before any second pick. A heal occupies no slot on you, so nothing here contests anything - unlike the buffs, which do."
+            empty="None of your classes has a healing spell this app can put a figure on yet."
+            testId="heal-set"
+          />
+        )}
+      </Stack>
     </Stack>
   )
 }

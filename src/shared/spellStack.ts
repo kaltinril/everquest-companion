@@ -374,10 +374,16 @@ function sameContestableEffect(e1: StackSlot, e2: StackSlot): boolean {
   return !IGNORED_IN_STACKING.has(e1[0])
 }
 
+/** WHERE one contested effect sits on each of the two spells. See `contestPass`. */
+interface SlotPair {
+  worn: number
+  cast: number
+}
+
 /** Should this pair of same-SPA slots be skipped rather than compared on magnitude? */
-function skipSlot(worn: StackSpellView, cast: StackSpellView, i: number): boolean {
-  const e1 = worn.effects[i]
-  const e2 = cast.effects[i]
+function skipSlot(worn: StackSpellView, cast: StackSpellView, at: SlotPair): boolean {
+  const e1 = worn.effects[at.worn]
+  const e2 = cast.effects[at.cast]
   if (!sameContestableEffect(e1, e2)) return true
   // Two SONGS may both carry the bard's pulsing damage.
   if (BARD_ONLY_STACK_EFFECTS.has(e1[0]) && worn.isBardSong && cast.isBardSong) return true
@@ -434,13 +440,13 @@ function comparedMagnitude(spa: number, value: number): number {
 function slotContest(
   worn: StackSpellView,
   cast: StackSpellView,
-  i: number,
+  at: SlotPair,
   levels: StackLevels
 ): SlotOutcome {
-  if (skipSlot(worn, cast, i)) return 'skip'
-  const spa = worn.effects[i][0]
-  const raw1 = slotValue(worn, i, levels.worn)
-  const raw2 = slotValue(cast, i, levels.cast)
+  if (skipSlot(worn, cast, at)) return 'skip'
+  const spa = worn.effects[at.worn][0]
+  const raw1 = slotValue(worn, at.worn, levels.worn)
+  const raw2 = slotValue(cast, at.cast, levels.cast)
   const special = SPECIAL_SLOT_RULES[spa]?.(raw1, raw2, worn, cast)
   if (special != null) return special
   const v1 = comparedMagnitude(spa, raw1)
@@ -477,12 +483,59 @@ interface ContestTally {
   valuesEqual: boolean
 }
 
-/** THE MAGNITUDE PASS: walk the twelve slots and tally what the contests decided. */
+/**
+ * Where each contestable SPA sits on one spell. A repeated SPA keeps its FIRST slot, which is the
+ * one the client's own ordering treats as the effect and the rest as riders.
+ */
+function spaIndex(view: StackSpellView): Map<number, number> {
+  const out = new Map<number, number>()
+  for (let i = 0; i < EFFECT_COUNT; i++) {
+    const spa = view.effects[i][0]
+    if (isBlankSlot(view.effects[i]) || IGNORED_IN_STACKING.has(spa)) continue
+    if (!out.has(spa)) out.set(spa, i)
+  }
+  return out
+}
+
+/**
+ * THE MAGNITUDE PASS: find every effect BOTH spells carry, and tally what those contests decided.
+ *
+ * ============================================================================
+ * IT MATCHES BY EFFECT, NOT BY SLOT NUMBER - and that is a deliberate deviation from the port
+ * ============================================================================
+ * EQEmu's `CheckStackConflict` walks the slots in lockstep and compares slot `i` of one spell
+ * against slot `i` of the other. This file did the same, and over the owner's real client data it
+ * is WRONG - not subtly, but on most of the pairs anyone would ask about (measured 2026-09-10,
+ * after he asked *"are you sure all these spells are not going to overlap each-other?"*):
+ *
+ *     Celerity              haste at slot 1     Spirit Quickening   haste at slot 4
+ *     Spirit of Cheetah     movement at slot 6  Spirit of Bih`Li    movement at slot 2
+ *     Burst of Strength     STR at slot 2       Spirit Quickening   STR at slot 3
+ *
+ * Under lockstep none of those three pairs is ever compared, so the engine called all of them
+ * 'stacks' and the Loadout tab recommended keeping two haste buffs, two run speeds and four
+ * separate STR buffs up at once. The owner spotted it from the screenshot.
+ *
+ * WHY EQEmu GETS AWAY WITH LOCKSTEP AND WE CANNOT: on a server, cross-line stacking is decided by
+ * the explicit 148/149 stacking commands and by spell groups, and lockstep only has to handle a
+ * spell meeting another rank of ITSELF - where the slots do line up by construction. This app is
+ * answering a different question, over spells from different lines, with no server to ask. Two
+ * beneficial spells that grant the same stat cannot both be giving it to you, wherever the client
+ * happens to have written it.
+ *
+ * The per-effect rules are untouched and still do the discriminating: the ignore list, the AC-debuff
+ * rule, the two-DoTs rule, the snare-versus-speed rule and the HoT-versus-DoT rule all still decide
+ * their own slots (`skipSlot`, `SPECIAL_SLOT_RULES`). Only WHICH pairs of slots get shown to them
+ * has changed.
+ */
 function contestPass(worn: StackSpellView, cast: StackSpellView, levels: StackLevels): ContestTally {
   let willOverwrite = false
   let valuesEqual = true
-  for (let i = 0; i < EFFECT_COUNT; i++) {
-    const outcome = slotContest(worn, cast, i, levels)
+  const castSpas = spaIndex(cast)
+  for (const [spa, wornAt] of spaIndex(worn)) {
+    const castAt = castSpas.get(spa)
+    if (castAt === undefined) continue
+    const outcome = slotContest(worn, cast, { worn: wornAt, cast: castAt }, levels)
     if (outcome === 'skip') continue
     if (outcome === 'blocked' || outcome === 'overwrites' || outcome === 'stacks') {
       return { verdict: outcome, willOverwrite, valuesEqual }

@@ -108,6 +108,16 @@ export const AREA_FORM_TIER = {
   'eq.planner.item': 'session',
   'eq.planner.open': 'session',
   'eq.planner.search': 'session',
+  // ---- the Spells tab ----
+  /**
+   * The Spellbook's PINNED class trio, or absent while the filter is still following detection.
+   *
+   * ITS OWN KEY, not the Gear tab's, and that is the same ruling `useGearClasses` already makes
+   * about `eq.planner.classes`: two surfaces, two questions. "Who am I reading the gear table for"
+   * and "whose spells am I looking at" are different, and one key would make a click on either tab
+   * silently re-filter the other. The SHAPE is shared (`useFollowingClasses`) - the state is not.
+   */
+  'eq.spells.classes': 'restart',
   // ---- the Wish list tab ----
   'eq.wishlist.search': 'session',
   // ---- the Character tab ----
@@ -257,6 +267,9 @@ export function sanitizeGearSort(raw: unknown): GearSort {
  * `MAX_COMBO_SLOTS` cap are `useBrowseClasses`' own, applied here for the same reason it applies
  * them: `localStorage` is a file the user can edit and this build is the only thing checking it.
  */
+// TWO CALLERS SINCE 2026-09-10 - the Gear tab and the Spellbook, under their own keys and one
+// stored shape. The name is the Gear tab's because that is where the shape was designed; what it
+// sanitises is any "following, or pinned to this list" class filter.
 export function sanitizeGearClasses(raw: unknown): ClassAbbr[] | null {
   const o = asRecord(raw)
   if (o === null || !Array.isArray(o.classes)) return null

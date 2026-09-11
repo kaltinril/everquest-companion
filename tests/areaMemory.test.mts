@@ -97,7 +97,9 @@ const BROWSE_FALLBACK: BrowseFormMemory = { socket: 'proc', slot: null, trioOnly
 
 test('the restart split is a table, and every key in it is on one of exactly two tiers', () => {
   const keys = Object.keys(AREA_FORM_TIER) as AreaFormKey[]
-  assert.equal(keys.length, 11, 'eleven fields were added by JOS-329 — update this test when a twelfth is')
+  // 11 from JOS-329, plus `eq.spells.classes` (2026-09-10) when the Spellbook's class filter
+  // stopped being a bespoke chip and started running the Gear tab's own state under its own key.
+  assert.equal(keys.length, 12, 'update this count when a key is added - that is what it is for')
   for (const key of keys) {
     const tier = tierOf(key)
     assert.ok(tier === 'restart' || tier === 'session', `${key} is on an unknown tier ${tier}`)
@@ -124,7 +126,10 @@ test('WHAT YOU CHOSE IS RESTART-SCOPED — including the slider, whose old law s
     'eq.gear.sort',
     'eq.gear.classes',
     'eq.gear.upgrade',
-    'eq.planner.filters'
+    'eq.planner.filters',
+    // The Spellbook's own trio. Same shape and same tier as the Gear tab's, a DIFFERENT key on
+    // purpose - `useFollowingClasses` states why two surfaces must not re-filter each other.
+    'eq.spells.classes'
   ]
   for (const key of chosen) assert.equal(tierOf(key), 'restart', `${key} must survive a restart`)
 })
@@ -166,6 +171,8 @@ const READERS: Reader[] = [
   { key: 'eq.gear.filters', read: sanitizeGearForm, fallback: DEFAULT_GEAR_FORM },
   { key: 'eq.gear.sort', read: sanitizeGearSort, fallback: DEFAULT_GEAR_SORT },
   { key: 'eq.gear.classes', read: sanitizeGearClasses, fallback: null },
+  // One sanitizer, two keys: the stored shape is identical and only the surface differs.
+  { key: 'eq.spells.classes', read: sanitizeGearClasses, fallback: null },
   { key: 'eq.gear.upgrade', read: sanitizeUpgrade, fallback: ITEM_UPGRADE_BASE },
   { key: 'eq.gear.search', read: sanitizeSearch, fallback: '', legal: anyString },
   { key: 'eq.planner.filters', read: (r) => sanitizeBrowseForm(r, BROWSE_FALLBACK), fallback: BROWSE_FALLBACK },

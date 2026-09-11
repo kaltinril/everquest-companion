@@ -384,12 +384,33 @@ export interface GearClasses {
 }
 
 export function useGearClasses(): GearClasses {
+  return useFollowingClasses('eq.gear.classes')
+}
+
+/**
+ * THE SAME CONTROL'S STATE, FOR ANY TAB THAT ASKS "WHICH CLASSES AM I READING FOR".
+ *
+ * Lifted out of `useGearClasses` on 2026-09-10, when the owner pointed at the Spellbook's class
+ * filter and said it plainly: *"the class thing isn't letting me pick and chose like the gear is,
+ * this should be shared control so we don't reinvent the wheel"*. He was right, and the Spellbook's
+ * version was not a variant of this - it was a chip that replaced the whole selection at once, so
+ * there were no pills to remove and no way to ask "what can a Shaman cast" without hand-building
+ * the list. Now both tabs run this hook and draw the same `ChipMultiSelect` plus the same offer
+ * chip, so the pills, the narrowing and the detected-trio handshake behave identically.
+ *
+ * THE KEY IS THE PARAMETER, AND THAT IS THE WHOLE POINT OF PASSING IT. The shape is shared; the
+ * STATE deliberately is not, which is the ruling this hook's own header already makes about
+ * `eq.planner.classes` and applies unchanged to `eq.spells.classes`. Two surfaces asking two
+ * questions must not answer each other: narrowing the gear table to your Warrior should not also
+ * hide every Shaman spell in the Spellbook.
+ */
+export function useFollowingClasses(key: 'eq.gear.classes' | 'eq.spells.classes'): GearClasses {
   const combo = useComboSnap()
   const current = combo.current
   // An unresolved slot contributes nothing, so a half-known combo yields the classes it does know
   // and nothing it does not (law 1) — the same read PlannerView makes.
   const detected = useMemo(() => (current === null ? [] : resolvedClasses(current)), [current])
-  const [pinned, setPinned] = useRemembered<ClassAbbr[] | null>('eq.gear.classes', sanitizeGearClasses)
+  const [pinned, setPinned] = useRemembered<ClassAbbr[] | null>(key, sanitizeGearClasses)
 
   const set = useCallback(
     (next: ClassAbbr[]) => {
