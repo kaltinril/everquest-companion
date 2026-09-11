@@ -99,6 +99,12 @@ export const DEFAULT_STAT_WEIGHTS: StatWeights = {
   SV_ALL: 2,
   DAMAGE_SHIELD: 2,
   HP_ON_CAST: 0.25,
+  // A POINT OF REGEN IS WORTH MANY POINTS OF HP, because it arrives every six seconds forever. 20
+  // is the roundest number that puts a 5-a-tick regen buff (100) in the same league as a 238-point
+  // HP buff without swamping it - a fight lasting a minute takes ten ticks, so 5 a tick is 50 HP
+  // of healing in it and more in a long one. It is a weight, not a measurement, like every other
+  // number in this table.
+  HP_REGEN: 20,
   ABSORB_DAMAGE: 0.5,
   // The percent-valued stats. They are scored on their PERCENT, which is a different unit from a
   // point of STR - the weights below are what makes them comparable, and they are the roundest
@@ -241,6 +247,103 @@ export interface CandidateQuery {
    * sidecar never judged is kept.
    */
   includeOutOfEra?: boolean
+  /**
+   * THE SHORTEST DURATION THAT COUNTS AS A BUFF YOU KEEP UP. Default three minutes.
+   *
+   * The owner's report (2026-09-10): *"spirit of cheetah is a short duration spell/buff, it's not
+   * worth making it a primary buff spell"*. He is right and the optimizer had no way to know: it
+   * scored Spirit of Cheetah over Spirit of Bih`Li purely on 75% run speed against 55%, and never
+   * looked at the fact that one lasts 48 SECONDS and the other 36 minutes. A gem spent on a sprint
+   * is not a gem spent on a buff.
+   *
+   * ONLY A STATED DURATION IS JUDGED. A spell whose page states none (Rage is one) is kept: silence
+   * is not a short duration (law 1), and dropping the rows nobody wrote a number for would quietly
+   * delete good buffs.
+   */
+  minDurationMs?: number
+}
+
+/** Three minutes - long enough to outlive a fight, short enough to keep every real buff. */
+export const DEFAULT_MIN_BUFF_MS = 180_000
+
+/**
+ * IS THIS A BUFF YOU KEEP UP?
+ *
+ * `buff` always, and `hot` WHEN IT LASTS - which is the second half of the same 2026-09-10 report,
+ * from the other direction: *"you're also missing HP Regen in the stats"*. Regeneration, Chloroplast
+ * and Regrowth are filed `hot` and were excluded outright, on the reasoning that a recommender
+ * putting Regeneration in a stat set would be answering a question nobody asked. Over a 16-minute
+ * buff that reasoning is simply wrong - it is exactly the question, and the owner keeps those up.
+ *
+ * The duration is what separates them from the heals: Superior Healing is `hot` too and lasts
+ * moments, so the same floor that drops Spirit of Cheetah drops it, and Form of the Bear (144
+ * minutes) comes in where it belongs.
+ */
+function isKeepUp(s: UnlockSpell, minMs: number): boolean {
+  if (s.upgradeCategory === 'buff') return true
+  if (s.upgradeCategory !== 'hot') return false
+  return s.durationMs !== undefined && s.durationMs >= minMs
+}
+
+/**
+ * THE REGEN A HEAL-OVER-TIME BUFF GRANTS, per tick, as a stat.
+ *
+ * `spellStats.parseStatLine` REFUSES `... per tick` lines on purpose - `spellMetrics.ts` owns regen
+ * and states it in its own units, and reading it in both places would double-count. So this reads
+ * the metrics rather than the words: the total healing over the duration, divided by the ticks it
+ * runs over, which is the number the character sheet's `Combat HP Regen` row moves by.
+ *
+ * Absent unless the metrics state BOTH halves, because a per-tick figure derived from a total with
+ * no duration would be arithmetic on an assumption.
+ */
+function regenGrant(s: UnlockSpell): SpellStatGrant | null {
+  const m = s.metrics
+  if (m?.hot !== true || m.heal === undefined || m.overSec === undefined || m.overSec <= 0) return null
+  const ticks = Math.round(m.overSec / 6)
+  if (ticks <= 0) return null
+  const perTick = Math.round(m.heal / ticks)
+  if (perTick <= 0) return null
+  return {
+    key: 'HP_REGEN',
+    amount: perTick,
+    percent: false,
+    line: `Increase Hit points by ${String(perTick)} per tick`
+  }
+}
+
+/**
+ * Is this spell one the trio can actually keep up - category, era, duration and level?
+ *
+ * Its own function because `loadoutCandidates` sits at this tree's complexity ceiling and every
+ * question it asks costs a branch. This is the whole of "may it be considered"; the caller is left
+ * with "what is it worth".
+ */
+function admitsBuff(s: UnlockSpell, query: CandidateQuery, minMs: number): boolean {
+  if (!isKeepUp(s, minMs)) return false
+  // A STATED duration below the floor is a sprint, not a buff - see `minDurationMs`.
+  if (s.durationMs !== undefined && s.durationMs < minMs) return false
+  return !(s.outOfEra === true && query.includeOutOfEra !== true)
+}
+
+/** What one candidate row is built from, beyond the spell itself. */
+interface CandidateParts {
+  at: LoadoutCandidate['at']
+  grants: readonly SpellStatGrant[]
+  score: number
+  view: StackSpellView | undefined
+}
+
+/** One candidate row, with the two optional fields spread rather than branched. */
+function candidate(s: UnlockSpell, parts: CandidateParts): LoadoutCandidate {
+  const { at, grants, score, view } = parts
+  return {
+    name: s.name,
+    ...(s.iconId === undefined ? {} : { iconId: s.iconId }),
+    at,
+    grants,
+    score,
+    ...(view === undefined ? {} : { view })
+  }
 }
 
 export function loadoutCandidates(
@@ -249,28 +352,24 @@ export function loadoutCandidates(
   weights: StatWeights,
   query: CandidateQuery = {}
 ): LoadoutCandidate[] {
-  const { views, level, includeOutOfEra } = query
+  const { views, level } = query
+  const minMs = query.minDurationMs ?? DEFAULT_MIN_BUFF_MS
   const out: LoadoutCandidate[] = []
   for (const s of spells) {
-    if (s.upgradeCategory !== 'buff') continue
-    if (s.outOfEra === true && includeOutOfEra !== true) continue
+    if (!admitsBuff(s, query, minMs)) continue
     // THE LEVEL IS PART OF "CAN I CAST IT", and it is applied to the (class, level) pairs rather
     // than to the row: a spell a Shaman gets at 60 and a Warrior at 45 is castable by a level-50
     // trio through the Warrior alone, and the surviving pairs are what the row then reports.
     const at = s.at.filter((p) => classes.includes(p.cls) && (level === undefined || p.level <= level))
     if (at.length === 0) continue
-    const grants = s.grants ?? []
+    // The catalog's own grants, plus the per-tick regen it states in another vocabulary.
+    const regen = regenGrant(s)
+    const grants = regen === null ? (s.grants ?? []) : [...(s.grants ?? []), regen]
     const score = scoreGrants(grants, weights)
     // A buff worth nothing under the weights in force is not a recommendation. It is still a real
     // spell and the Spellbook still lists it; this tab is about a SET worth keeping up.
     if (score <= 0) continue
-    const view = views?.get(s.name)
-    const icon = s.iconId === undefined ? {} : { iconId: s.iconId }
-    out.push(
-      view === undefined
-        ? { name: s.name, ...icon, at, grants, score }
-        : { name: s.name, ...icon, at, grants, score, view }
-    )
+    out.push(candidate(s, { at, grants, score, view: views?.get(s.name) }))
   }
   out.sort((a, b) => b.score - a.score || a.name.localeCompare(b.name))
   return out
