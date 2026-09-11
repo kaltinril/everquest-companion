@@ -23,6 +23,7 @@
 import type { JSX } from 'react'
 import { Box, Chip, Slider, Stack, TextField, Typography } from '@mui/material'
 import { CLASS_ABBRS, type ClassAbbr } from '@shared/classCombo'
+import { classDisplayName } from '@shared/spellLevels'
 import {
   UPGRADE_CATEGORIES,
   UPGRADE_CATEGORY_LABEL,
@@ -31,7 +32,6 @@ import {
 import { magnitudeRatePercent, type SpellbookQuery } from '@shared/spellbook'
 import { SPELL_MAX_RANK, romanRank } from './spellbookFormat'
 import ChipMultiSelect from '../../components/ChipMultiSelect'
-import { Tooltip } from '../../lib/Tooltip'
 
 /** One stop per tier, base included - the ladder `spellUpgrade` states. */
 const TIER_MARKS = Array.from({ length: SPELL_MAX_RANK + 1 }, (_, i) => ({ value: i }))
@@ -107,13 +107,20 @@ function FilterRow({
         slotProps={{ htmlInput: { 'data-testid': 'spellbook-search' } }}
         sx={{ minWidth: 200 }}
       />
+      {/* THE GEAR TAB'S CLASS PICKER, WITH THE GEAR TAB'S WORDS (owner, 2026-09-10: *"why are you
+          not reusing controls like the class picker thing with little pills"*). The control was
+          always the shared one; what was not shared was `classDisplayName`, so this filter said
+          `SHD` where the Gear tab three tabs over said `Shadow Knight`. Same closed list, same
+          tokens stored, read in the words a player uses - `ChipMultiSelect`'s `optionLabel` header
+          states that trade and JOS-402 already made it for both class filters on the gear side. */}
       <ChipMultiSelect
         options={CLASS_ABBRS}
         value={[...classes]}
         onChange={(next) => onQuery({ ...query, classes: next })}
         label="Classes"
         placeholder="every class"
-        minWidth={150}
+        optionLabel={classDisplayName}
+        minWidth={190}
       />
       <ChipMultiSelect
         options={UPGRADE_CATEGORIES}
@@ -132,6 +139,7 @@ function FilterRow({
         <Chip
           size="small"
           label={`My classes (${combo.join('/')})`}
+          title={`Show only what ${combo.map(classDisplayName).join(', ')} can cast`}
           data-testid="spellbook-mine"
           color={mine ? 'primary' : 'default'}
           variant={mine ? 'filled' : 'outlined'}
@@ -139,16 +147,15 @@ function FilterRow({
         />
       )}
       {/* The owner's question 2, as one click: hide everything a tier does not improve. */}
-      <Tooltip title="Only spells whose damage or healing actually rises with a mote tier. Everything else buys duration, mana and cast time only.">
-        <Chip
-          size="small"
-          label="Worth upgrading"
-          data-testid="spellbook-worth-upgrading"
-          color={worth ? 'primary' : 'default'}
-          variant={worth ? 'filled' : 'outlined'}
-          onClick={() => onQuery({ ...query, payoffMagnitudeOnly: worth ? undefined : true })}
-        />
-      </Tooltip>
+      <Chip
+        size="small"
+        label="Worth upgrading"
+        title="Only spells whose damage or healing actually rises with a mote tier. Everything else buys duration, mana and cast time only."
+        data-testid="spellbook-worth-upgrading"
+        color={worth ? 'primary' : 'default'}
+        variant={worth ? 'filled' : 'outlined'}
+        onClick={() => onQuery({ ...query, payoffMagnitudeOnly: worth ? undefined : true })}
+      />
     </Stack>
   )
 }

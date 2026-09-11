@@ -239,6 +239,8 @@ export const COLUMN_TITLE: Record<BestSpellColumn, string> = {
 /** One ranked spell. `metrics` is read AT THE VIEWED LEVEL - the whole point of the file. */
 export interface BestSpellRow {
   name: string
+  /** The client's gem icon, when this machine's install answered. See `UnlockSpell.iconId`. */
+  iconId?: number
   /** The LOWEST level a class in the loadout gained it at - when it became yours. */
   gainedAt: number
   /** The loadout classes that have it at or below the viewed level, sorted. */
@@ -617,6 +619,7 @@ function buildRow(
   if (!metrics) return null
   return {
     name: spell.name,
+    ...(spell.iconId === undefined ? {} : { iconId: spell.iconId }),
     gainedAt: owned.gainedAt,
     classes: owned.classes,
     mana: catalogMana(spell),

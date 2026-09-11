@@ -44,6 +44,9 @@ import { applySpellEra } from './spellEra'
 // makes about the query side.
 import { searchTextFor } from './spellDb'
 import { parseSpellClasses } from '../../shared/spellLevels'
+// The canon fold every spell join in this app uses - here so `dedupeByName` groups two pages of
+// one name the same way the client table keys them.
+import { spellCanonKey } from '../../shared/spellKey'
 import { isClassAbbr, type ClassAbbr } from '../../shared/classCombo'
 import type { LevelUnlockData, UnlockSkill, UnlockSpell } from '../../shared/levelUnlocks'
 import {
@@ -72,7 +75,7 @@ import { classifyUpgrade } from '../../shared/spellUpgrade'
 // owns that vocabulary (it enumerates every type the scrape states) and a second opinion here would
 // file a whole class of spells under the wrong upgrade rates.
 import { spellNature } from './spellDb'
-import type { SpellResistTable } from '../../shared/resistTypes'
+import type { SpellResistInfo, SpellResistTable } from '../../shared/resistTypes'
 import type { SpellDbFile } from '../../shared/types'
 
 /**
@@ -249,6 +252,11 @@ function writeFigures(
   // what their absence already states (`UnlockSpell.waves` / `aeMaxTargets`).
   if (waves > 1) spell.waves = waves
   if (clientHp?.aeMaxTargets !== undefined) spell.aeMaxTargets = clientHp.aeMaxTargets
+  // THE GEM ICON, straight off the client row (owner ask 2026-09-10: "spells need icons next to
+  // them"). Absent on a machine with no install, which is what draws a blank box rather than an
+  // error - `spellIcons.ts` states the whole arrangement.
+  const icon = client?.[spellCanonKey(s.name)]?.icon
+  if (icon !== undefined) spell.iconId = icon
 }
 
 /**
@@ -369,7 +377,90 @@ function unlockSpells(client: SpellResistTable | null): UnlockSpell[] {
     if (replaces) spell.replaces = replaces
     out.push(spell)
   }
-  return out.sort((a, b) => a.name.localeCompare(b.name))
+  return dedupeByName(out, client).sort((a, b) => a.name.localeCompare(b.name))
+}
+
+// =================================================================================================
+// TWO ROWS, ONE NAME (owner report 2026-09-10: "duplicates of burst of flame with different mana
+// costs? why?")
+// =================================================================================================
+//
+// `spells.json` is a SCRAPE OF PAGES, not a spell table, so one name can reach it twice. 33 names
+// do, 66 rows between them (measured over the committed file, 2026-09-10), and they are not one
+// phenomenon but three:
+//
+//   4 names are BYTE-IDENTICAL PAIRS - Divine Might Effect, Dustdevil, Envenomed Heal, Wind of
+//     Tashani. One page scraped twice. Nothing is lost by folding them and nothing can be.
+//
+//   6 names are ONE SPELL SCRAPED AT TWO DIFFERENT TIMES, where the pages disagree about the
+//     numbers. Burst of Flame is the owner's example and the shape is plain once both rows are on
+//     screen: 4 mana / 1.5s re-use with `(Autogranted)` beside two of its classes, against 7 mana /
+//     2.5s re-use without it. A re-tune, and one of the two pages predates it.
+//
+//   23 names are GENUINELY TWO SPELLS - Aria of Asceticism is a Bard 45 cure AND a Bard 39 proc
+//     buff; Greater Healing is the Cleric line AND a Druid 34 spell with its own message. Folding
+//     those would DELETE a spell from the catalog, which is worse than showing two rows.
+//
+// SO THE CLIENT FILE ADJUDICATES, and nothing else does. It is the same instrument this tree
+// already trusts over the wiki for a re-tune (`spellsUsParse.ts` field 14's own note: "two positive
+// numbers that differ - a re-tune"), it is the player's own install, and it is CURRENT in a way no
+// scrape can promise. Burst of Flame reads mana 4, re-use 1500 in the owner's file - so the
+// 7-mana page is the stale one and the fold is a measurement rather than a preference.
+//
+// AND IT ONLY EVER DROPS A ROW IT CAN NAME A WINNER FOR. No client install, no client row, or a
+// client row that matches both rows or neither, and BOTH survive - which is the answer for all 23
+// of the genuine pairs, because two different spells cannot both match one client row's mana. The
+// cost of being wrong is then a duplicate row rather than a missing spell.
+
+/** How well one catalog row agrees with the client's row for the same name. Higher wins. */
+function clientAgreement(spell: UnlockSpell, row: SpellResistInfo | undefined): number {
+  if (row === undefined) return 0
+  let score = 0
+  if (row.mana !== undefined && spell.mana === row.mana) score += 2
+  if (row.castMs > 0 && spell.castTimeMs === row.castMs) score += 1
+  if (row.recastMs !== undefined && spell.recastMs === row.recastMs) score += 1
+  return score
+}
+
+/** Are these two rows the same page scraped twice - every field this dataset carries identical? */
+function structurallyIdentical(a: UnlockSpell, b: UnlockSpell): boolean {
+  return JSON.stringify(a) === JSON.stringify(b)
+}
+
+/**
+ * ONE GROUP OF SAME-NAMED ROWS, reduced as far as the evidence allows. See the block above.
+ *
+ * Returns every row it cannot choose between, so a caller is never handed fewer spells than the
+ * catalog states unless something measured said so.
+ */
+function pickAmong(group: readonly UnlockSpell[], row: SpellResistInfo | undefined): UnlockSpell[] {
+  const distinct: UnlockSpell[] = []
+  for (const s of group) {
+    if (!distinct.some((d) => structurallyIdentical(d, s))) distinct.push(s)
+  }
+  if (distinct.length === 1) return distinct
+  const scores = distinct.map((s) => clientAgreement(s, row))
+  const best = Math.max(...scores)
+  // A tie at the top is not a verdict, and neither is a top score of zero - both mean the client
+  // did not separate them, and both rows stay.
+  if (best === 0 || scores.filter((v) => v === best).length !== 1) return distinct
+  return [distinct[scores.indexOf(best)]]
+}
+
+/** Fold same-named rows wherever the client file can say which is current. */
+function dedupeByName(spells: readonly UnlockSpell[], client: SpellResistTable | null): UnlockSpell[] {
+  const groups = new Map<string, UnlockSpell[]>()
+  for (const s of spells) {
+    const key = spellCanonKey(s.name)
+    const group = groups.get(key)
+    if (group) group.push(s)
+    else groups.set(key, [s])
+  }
+  const out: UnlockSpell[] = []
+  for (const [key, group] of groups) {
+    out.push(...(group.length === 1 ? group : pickAmong(group, client?.[key])))
+  }
+  return out
 }
 
 let cached: LevelUnlockData | null = null

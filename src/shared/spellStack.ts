@@ -85,8 +85,18 @@ const SE_IMPROVEDTAUNT = 444
 /** The four "A beats B beats C beats D" ladders. Order is the ladder and is load-bearing. */
 const STACKERS = [446, 447, 448, 449]
 
-/** The game compares twelve slots, always. Gaps are blanks so positions stay exact. */
-export const EFFECT_COUNT = 12
+/**
+ * HOW MANY EFFECT SLOTS THE ENGINE COMPARES. Gaps are blanks so positions stay exact.
+ *
+ * EQEmu's own constant is twelve and this port carried that number over. THE OWNER'S CLIENT FILE
+ * DOES NOT AGREE, measured 2026-09-10 over his 73,975 slot-bearing rows: the highest slot a row
+ * uses runs to 67, and 2,160 rows use one above 12 - so a twelve-slot array silently dropped every
+ * effect past the twelfth, including slot 12 itself on 2,430 rows (see the 1-based reading in
+ * `stackView`, which is the other half of that same bug). Sized to the measurement plus one so the
+ * highest slot observed has an index; anything beyond is still dropped rather than clamped, for
+ * `stackView`'s stated reason.
+ */
+export const EFFECT_COUNT = 68
 
 /** Target types the server treats as a GROUP spell, for the tie rule at the very end. */
 const GROUP_TARGET_TYPES: ReadonlySet<number> = new Set([0x03, 0x28, 0x29])
@@ -108,7 +118,12 @@ const BLANK_SLOT: StackSlot = [SE_BLANK, 0, 0, 100, 0]
  * of them.
  */
 export interface StackSpellView {
-  /** The client's spell id, or any stable identity. Two views with one id are ONE spell. */
+  /**
+   * The client's spell id. Two views with one id are ONE spell.
+   *
+   * ZERO MEANS UNKNOWN and never matches another unknown - see `sameIdentity`, which records what
+   * treating it as an ordinary value cost.
+   */
   id: number
   name: string
   /** True for a beneficial spell (`good_effect`). */
@@ -143,17 +158,25 @@ export interface StackSource {
  * Build a view from a parsed client row.
  *
  * GAPS BECOME BLANKS AND POSITIONS STAY EXACT, which is the whole reason `SpellEffectSlot` carries
- * the file's own slot number: a row with effects in slots 0 and 3 must read blank at 1 and 2, and a
- * reader that packed the array would compare slot 3 of one spell against slot 1 of another.
+ * the file's own slot number: a row with effects in slots 1 and 4 must read blank between them, and
+ * a reader that packed the array would compare slot 4 of one spell against slot 1 of another.
  *
- * A slot number outside 0..11 is DROPPED rather than clamped - a clamp would silently overwrite a
- * real effect with an out-of-range one.
+ * THE FILE NUMBERS ITS SLOTS FROM ONE, and this used to index the array with that number directly
+ * (measured 2026-09-10: slot 0 occurs on none of the owner's 73,975 slot-bearing rows, slot 1 on
+ * 26,347 of them). Two costs, and the second is the one that bit: index 0 was permanently blank on
+ * every spell in the game, and the LAST slot of a full row fell off the end of the array. Both
+ * sides of a comparison shifted together, so the pairwise verdicts survived it - which is exactly
+ * why it sat here unnoticed. `slot - 1` is the whole fix.
+ *
+ * A slot number outside the array is DROPPED rather than clamped - a clamp would silently overwrite
+ * a real effect with an out-of-range one.
  */
 export function stackView(row: StackSource): StackSpellView {
   const effects: StackSlot[] = Array.from({ length: EFFECT_COUNT }, () => BLANK_SLOT)
   for (const e of row.slots ?? []) {
-    if (e.slot >= 0 && e.slot < EFFECT_COUNT) {
-      effects[e.slot] = [e.effect, e.base, e.limit, e.calc, e.max]
+    const i = e.slot - 1
+    if (i >= 0 && i < EFFECT_COUNT) {
+      effects[i] = [e.effect, e.base, e.limit, e.calc, e.max]
     }
   }
   return {
@@ -244,8 +267,34 @@ function isStackableDot(sp: StackSpellView): boolean {
 // =================================================================================================
 
 /** The same spell cast over itself, or null when this is not that case. */
+/**
+ * ARE THESE TWO VIEWS THE SAME SPELL?
+ *
+ * ============================================================================
+ * IDENTITY IS NOT A DEFAULTABLE FIELD, and defaulting it is what broke the Loadout tab
+ * ============================================================================
+ * `stackView` writes `id: row.id ?? 0`, and the IPC that feeds it reads the parsed client table,
+ * which carried no spell id at all. So EVERY view arrived with `id: 0`, `worn.id === cast.id` held
+ * for every pair in the game, and `sameSpell` answered `'overwrites'` for all of them - the verdict
+ * for recasting a spell over itself. The Loadout tab therefore believed all 76 buffs a MNK/SHM/WAR
+ * trio can cast contested each other, collapsed them into one component, and recommended a set of
+ * ONE (owner report, 2026-09-10, with the screenshot: thirty-five rejections every one of which
+ * read "probably contests Focus of Spirit", including Spirit of Cheetah, which shares not one stat
+ * with it).
+ *
+ * The id is now carried end to end (`SpellResistInfo.id`), so the ordinary path is an id match. The
+ * guard below is the part that makes the class of bug impossible rather than fixed: a ZERO id means
+ * UNKNOWN, never "spell number zero", so two unknowns are not each other. Name is the fallback
+ * identity - it is what the wiki catalog joins on anyway - and two views with neither are simply
+ * different spells, which is the answer that lets a set stand rather than the one that collapses it.
+ */
+function sameIdentity(a: StackSpellView, b: StackSpellView): boolean {
+  if (a.id !== 0 && b.id !== 0) return a.id === b.id
+  return a.name !== '' && a.name === b.name
+}
+
 function sameSpell(worn: StackSpellView, cast: StackSpellView, wornLevel: number, castLevel: number): StackVerdict | null {
-  if (worn.id !== cast.id) return null
+  if (!sameIdentity(worn, cast)) return null
   if (!isStackableDot(worn) && !hasEffect(worn, SE_MANABURN)) {
     // A higher-level copy of the same spell is not replaced by a lower one - except a taunt, where
     // the server lets the newer one win.
@@ -257,7 +306,7 @@ function sameSpell(worn: StackSpellView, cast: StackSpellView, wornLevel: number
 
 /** Do the two spells carry the SAME effect in every slot? Drives the group-tie rule at the end. */
 function effectsMatch(worn: StackSpellView, cast: StackSpellView): boolean {
-  if (worn.id === cast.id) return true
+  if (sameIdentity(worn, cast)) return true
   for (let i = 0; i < EFFECT_COUNT; i++) {
     if (worn.effects[i][0] !== cast.effects[i][0] || worn.effects[i][0] === SE_MANABURN) return false
   }
@@ -335,7 +384,7 @@ function skipSlot(worn: StackSpellView, cast: StackSpellView, i: number): boolea
   // An AC DEBUFF never contests an AC buff's slot.
   if ((e1[0] === SE_ARMORCLASS || e1[0] === SE_ACV2) && e2[1] < 0) return true
   // Two different DoTs both ticking hitpoints are two DoTs, not a conflict.
-  return e1[0] === SE_CURRENTHP && worn.id !== cast.id && isDetrimental(worn) && isDetrimental(cast)
+  return e1[0] === SE_CURRENTHP && !sameIdentity(worn, cast) && isDetrimental(worn) && isDetrimental(cast)
 }
 
 /** What one slot's magnitude contest decided: a verdict, or how it left the running totals. */

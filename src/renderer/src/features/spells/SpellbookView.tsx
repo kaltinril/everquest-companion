@@ -11,9 +11,6 @@
 // healing. This one is the CORPUS: every spell any class gains, filterable, with what it grants and
 // what a mote tier buys beside each row. `shared/spellbook.ts`'s header sets the two side by side.
 //
-// A reader who wants a ranking is one click from it; a reader who wants to know what Talisman of
-// Altuna actually gives has, until now, had nowhere in this app to find out.
-//
 // ── NOTHING HERE FILTERS OR SORTS (ruling 4) ──────────────────────────────────────────────────
 //
 // `spellbookRows` does all of it, in `src/shared`, and this file maps its answer to rows. That is
@@ -21,18 +18,33 @@
 // empty-filter reading (an untouched picker filters nothing) are decisions with tests on them, and
 // a component that re-derived either would be a second opinion nobody could see.
 //
-// ── THE LIST IS VIRTUALIZED-BY-CAP, NOT BY WINDOW ─────────────────────────────────────────────
+// ============================================================================
+// IT IS THE GEAR TAB'S TABLE NOW, AND THAT IS ONE FIX FOR TWO COMPLAINTS
+// ============================================================================
+// The owner, 2026-09-10: *"spellbook takes a long time to load for some reason why?"* and *"the
+// tabs look like crap compared to the gear tab, why are you not reusing controls"*. One cause.
 //
-// ~1,900 rows is small enough to fold on every keystroke (the gear tab's own measurement puts three
-// times that at ~18 ms) and far too many to DRAW. So the fold is complete and the draw is capped,
-// with the cap stated in the footer rather than silently applied - a reader who cannot find a spell
-// must be able to see that the list stopped, and a count that says `showing 200 of 1,431` tells him
-// to type rather than to scroll.
+// THIS FILE USED TO CAP THE DRAW AT 200 ROWS AND HANG A MUI TOOLTIP ON NEARLY EVERY CELL - five on
+// the payoff column alone, plus the name card and the grants line, which is about 1,400 poppers
+// mounted synchronously before the first paint. `GearTable.tsx` has carried the rule against
+// exactly that since JOS-143 (*"NO MUI TOOLTIP ANYWHERE... these are dense rows under a toolbar
+// full of selects and a slider"*), and it draws 6,766 rows without a cap because it WINDOWS them.
+//
+// So this is the same shape now, for the same reasons and under the same contract:
+//   * `useWindowedRows` over the whole result, so the DOM holds a screenful whatever the filter
+//     matches - and the 200-row cap, with the footer that had to apologise for it, is gone.
+//   * THE FIXED-HEIGHT CONTRACT (`GearTable.tsx`'s header states it in full): every row is exactly
+//     `ROW_HEIGHT` with one clipped line per cell, or the spacer arithmetic desyncs as you scroll.
+//     That is why the out-of-era CHIP became a coloured name with a `title` - a chip inside a dense
+//     cell is what makes a row two lines tall.
+//   * NATIVE `title` FOR EVERY EXPLANATION. The one exception is the spell NAME, which keeps the
+//     app's spell card for the reason the gear tab kept its compare card (JOS-338): it is the whole
+//     point of this surface, it is one popper rather than one per cell, and it opens on a 250ms
+//     hover intent rather than on mount.
 
-import { type JSX, useDeferredValue, useMemo, useState } from 'react'
+import { type JSX, useDeferredValue, useMemo, useRef, useState } from 'react'
 import {
   Box,
-  Chip,
   Stack,
   Table,
   TableBody,
@@ -46,12 +58,39 @@ import { UPGRADE_CATEGORY_LABEL } from '@shared/spellUpgrade'
 import { PAYOFF_MARKS, spellbookRows, type SpellbookQuery, type SpellbookRow } from '@shared/spellbook'
 import { useCurrentComboClasses, useLevelUnlocks } from '../leveling/useLevelUnlocks'
 import { SpellTooltip } from '../../lib/SpellCard'
-import { Tooltip } from '../../lib/Tooltip'
+import { useWindowedRows } from '../../lib/useWindowedRows'
 import SpellbookToolbar from './SpellbookToolbar'
+import SpellIcon from './SpellIcon'
 import { classesText, grantsText, headlineFigure, seconds, whole, UNSTATED } from './spellbookFormat'
 
-/** How many rows are DRAWN. See the header: the fold is complete, the draw is capped. */
-const DRAW_CAP = 200
+/** Dense row height (px), MUI `size="small"` - the number the windowing hook is handed. */
+const ROW_HEIGHT = 37
+
+/** The fixed-height contract, as one style. See the header. */
+const FIXED_ROW = {
+  height: ROW_HEIGHT,
+  maxHeight: ROW_HEIGHT,
+  '& td': {
+    py: 0,
+    maxHeight: ROW_HEIGHT,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
+  }
+} as const
+
+/** How many columns a spacer has to span. */
+const COLUMN_COUNT = 8
+
+/** The spacer rows that reserve the full scroll height - see `useWindowedRows`. */
+function PadRow({ height }: { height: number }): JSX.Element | null {
+  if (height <= 0) return null
+  return (
+    <TableRow style={{ height }}>
+      <TableCell colSpan={COLUMN_COUNT} sx={{ p: 0, border: 0 }} />
+    </TableRow>
+  )
+}
 
 /**
  * The payoff column: which of the five things a mote tier moves for this row.
@@ -60,72 +99,90 @@ const DRAW_CAP = 200
  * a page cannot do for you. A lit glyph is a gain; an unlit one is a gain this spell does not get.
  * Both are drawn, because "M C" with nothing beside it reads as missing data, while a dim `N` beside
  * a bright `M` reads as the fact it is: upgrading this buys mana and not numbers.
+ *
+ * ONE `title` FOR THE WHOLE CELL rather than one per glyph. Five poppers a row was most of this
+ * tab's first paint (see the header), and the legend a reader wants is all five lines anyway.
  */
 function PayoffCell({ row }: { row: SpellbookRow }): JSX.Element {
+  const legend = PAYOFF_MARKS.map(
+    (m) => `${m.glyph}  ${row.payoff[m.key] === true ? m.title : `no change: ${m.title}`}`
+  ).join('\n')
   return (
-    <Stack direction="row" spacing={0.25} data-testid="spellbook-payoff" data-spell={row.name}>
+    <Stack
+      direction="row"
+      spacing={0.25}
+      title={legend}
+      data-testid="spellbook-payoff"
+      data-spell={row.name}
+    >
       {PAYOFF_MARKS.map((m) => {
         const on = row.payoff[m.key] === true
         return (
-          <Tooltip key={m.glyph} title={on ? m.title : `no change: ${m.title}`}>
-            <Typography
-              variant="caption"
-              component="span"
-              data-testid="spellbook-payoff-mark"
-              data-mark={m.key}
-              data-on={on ? 'yes' : 'no'}
-              sx={{
-                fontFamily: 'monospace',
-                fontWeight: on ? 700 : 400,
-                color: on ? 'primary.main' : 'text.disabled'
-              }}
-            >
-              {m.glyph}
-            </Typography>
-          </Tooltip>
+          <Typography
+            key={m.glyph}
+            variant="caption"
+            component="span"
+            data-testid="spellbook-payoff-mark"
+            data-mark={m.key}
+            data-on={on ? 'yes' : 'no'}
+            sx={{
+              fontFamily: 'monospace',
+              fontWeight: on ? 700 : 400,
+              color: on ? 'primary.main' : 'text.disabled'
+            }}
+          >
+            {m.glyph}
+          </Typography>
         )
       })}
     </Stack>
   )
 }
 
-/** One spell. The name is a `SpellTooltip` like every other spell name in the app, so it links. */
+/** One spell. The name keeps the app's spell card; everything else explains itself with `title`. */
 function SpellRow({ row }: { row: SpellbookRow }): JSX.Element {
   const figure = headlineFigure(row)
+  const era = row.outOfEra === true
   return (
-    <TableRow hover data-testid="spellbook-row" data-spell={row.name} data-tier={row.tier}>
+    <TableRow
+      hover
+      sx={FIXED_ROW}
+      data-testid="spellbook-row"
+      data-spell={row.name}
+      data-tier={row.tier}
+    >
       <TableCell>
-        <SpellTooltip name={row.name} placement="right">
-          <Typography variant="body2" sx={{ fontWeight: 500 }}>
-            {row.name}
-          </Typography>
-        </SpellTooltip>
-        {row.outOfEra === true && (
-          <Chip
-            size="small"
-            variant="outlined"
-            color="warning"
-            label="out of era"
-            data-testid="spellbook-out-of-era"
-            sx={{ height: 16, fontSize: 10, ml: 0.5, '& .MuiChip-label': { px: 0.5 } }}
-          />
-        )}
+        <Stack direction="row" spacing={0.75} alignItems="center">
+          <SpellIcon iconId={row.iconId} />
+          <SpellTooltip name={row.name} placement="right">
+            <Typography
+              variant="body2"
+              noWrap
+              sx={{ fontWeight: 500 }}
+              color={era ? 'warning.main' : undefined}
+              title={era ? 'the wiki places this spell out of era' : undefined}
+              data-testid={era ? 'spellbook-out-of-era' : undefined}
+            >
+              {row.name}
+            </Typography>
+          </SpellTooltip>
+        </Stack>
       </TableCell>
       <TableCell>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" color="text.secondary" noWrap title={classesText(row.at)}>
           {classesText(row.at)}
         </Typography>
       </TableCell>
       <TableCell>
-        <Typography variant="caption" color="text.secondary" data-testid="spellbook-category">
+        <Typography variant="caption" color="text.secondary" noWrap data-testid="spellbook-category">
           {UPGRADE_CATEGORY_LABEL[row.category]}
         </Typography>
       </TableCell>
       {/* THE COLUMN THE OWNER ASKED FOR: what it actually does, in the row itself. */}
       <TableCell data-testid="spellbook-grants">
-        <Tooltip title={row.grants.map((g) => g.line).join('\n')}>
-          <Typography variant="caption">{grantsText(row.grants)}</Typography>
-        </Tooltip>
+        <Typography variant="caption" noWrap title={row.grants.map((g) => g.line).join('\n')}>
+          {grantsText(row.grants)}
+        </Typography>
       </TableCell>
       <TableCell align="right" sx={{ fontVariantNumeric: 'tabular-nums' }}>
         <Typography variant="caption" data-testid="spellbook-figure" data-kind={figure.label}>
@@ -147,6 +204,9 @@ function SpellRow({ row }: { row: SpellbookRow }): JSX.Element {
   )
 }
 
+const PAYOFF_HEADER_TITLE =
+  'What a mote tier buys: N numbers, T duration, M mana, C cast time, R resist. A dim letter is a gain this spell does not get.'
+
 export default function SpellbookView(): JSX.Element {
   const data = useLevelUnlocks()
   const combo = useCurrentComboClasses()
@@ -160,7 +220,8 @@ export default function SpellbookView(): JSX.Element {
     () => spellbookRows(data.spells, deferredQuery, deferredTier),
     [data.spells, deferredQuery, deferredTier]
   )
-  const drawn = rows.slice(0, DRAW_CAP)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const win = useWindowedRows({ count: rows.length, rowHeight: ROW_HEIGHT, scrollRef })
   return (
     <Stack sx={{ height: '100%', minHeight: 0 }} data-testid="spellbook-view">
       <SpellbookToolbar
@@ -177,7 +238,7 @@ export default function SpellbookView(): JSX.Element {
           the spell catalogue has not loaded yet
         </Typography>
       ) : (
-        <TableContainer sx={{ flexGrow: 1, minHeight: 0 }}>
+        <TableContainer ref={scrollRef} sx={{ flexGrow: 1, minHeight: 0 }}>
           <Table size="small" stickyHeader>
             <TableHead>
               <TableRow>
@@ -188,31 +249,21 @@ export default function SpellbookView(): JSX.Element {
                 <TableCell align="right">Dmg / heal</TableCell>
                 <TableCell align="right">Mana</TableCell>
                 <TableCell align="right">Cast</TableCell>
-                <Tooltip title="What a mote tier buys: N numbers, T duration, M mana, C cast time, R resist. A dim letter is a gain this spell does not get.">
-                  <TableCell>Upgrade</TableCell>
-                </Tooltip>
+                <TableCell title={PAYOFF_HEADER_TITLE}>Upgrade</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {drawn.map((r) => (
-                <SpellRow key={r.name} row={r} />
+              <PadRow height={win.topPad} />
+              {rows.slice(win.start, win.end).map((r) => (
+                <SpellRow key={r.key} row={r} />
               ))}
+              <PadRow height={win.bottomPad} />
             </TableBody>
           </Table>
           {rows.length === 0 && (
             <Box sx={{ p: 2 }}>
               <Typography variant="body2" color="text.secondary" data-testid="spellbook-no-hits">
                 no spell matches those filters
-              </Typography>
-            </Box>
-          )}
-          {/* STATED, NEVER SILENT (see the header): a reader who cannot find a spell has to be able
-              to see that the list stopped rather than that the spell does not exist. */}
-          {rows.length > DRAW_CAP && (
-            <Box sx={{ p: 1 }}>
-              <Typography variant="caption" color="text.secondary" data-testid="spellbook-capped">
-                showing the first {String(DRAW_CAP)} of {String(rows.length)} matches - narrow the
-                search to see the rest
               </Typography>
             </Box>
           )}

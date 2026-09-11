@@ -19,7 +19,8 @@
 //   14   mana (JOS-451)
 //   29   resist type (see axisFromResistType)
 //   30   target type                    36..51  class levels, WAR..BER (255 = cannot use)
-//   78   resist adjust                  143  aemaxtargets (JOS-449)
+//   75   spell gem icon                 78   resist adjust
+//   143  aemaxtargets (JOS-449)
 //   172  effect slots, `$`-separated
 //
 // FIELD 14 IS THE MANA COST, verified the way 10 and 143 were — against the committed catalog rather
@@ -103,6 +104,17 @@ const F_AE_MAX_TARGETS = 143
  * shared rows and reads only {0, 1} where the runner-up manages 69.4%.
  */
 const F_GOOD_EFFECT = 126
+/**
+ * THE SPELL GEM ICON, field 75 - measured, not read off a struct listing (owner's install,
+ * 2026-09-10), the way fields 10, 14 and 143 were.
+ *
+ * The check is visual and it is the only one that settles it, because field 76 holds a number of
+ * the same shape and range. Rendering the tile each column names against the gem the game draws:
+ * field 75 gives Togor's Insects 17 = the BOOT (a slow, and the boot is the slow icon), Odium 165 =
+ * the skull, and both match the client's own tooltip; field 76 gives 311 and 183, which render
+ * cleanly and are a boot and a skull for neither of them.
+ */
+const F_ICON = 75
 const F_SLOTS = 172
 
 const EFFECT_HITPOINTS = 0
@@ -290,10 +302,24 @@ function stackingFields(
   }
 }
 
+/**
+ * WHAT THIS ROW IS: its id, and the gem the client draws for it.
+ *
+ * One fragment for both because `rowInfo` sits at the complexity ceiling and every optional field
+ * it grows inline costs it a branch - `recastField`'s reason, and the shape it already uses. The id
+ * is unconditional (a row without an identity is not one this table should answer about); the icon
+ * is written only where the row states a positive one.
+ */
+function identityFields(f: readonly string[]): Pick<SpellResistInfo, 'id' | 'icon'> {
+  const icon = Number(f[F_ICON]) || 0
+  return { id: Number(f[F_ID]) || 0, ...(icon > 0 ? { icon } : {}) }
+}
+
 function rowInfo(f: readonly string[]): SpellResistInfo {
   const slots = parseSlots(f[F_SLOTS])
   const { bardOnly } = classLevels(f)
   const info: SpellResistInfo = {
+    ...identityFields(f),
     axis: axisFromResistType(Number(f[F_RESIST_TYPE])),
     resistAdj: Number(f[F_RESIST_ADJ]) || 0,
     castMs: Number(f[F_CAST_MS]) || 0,

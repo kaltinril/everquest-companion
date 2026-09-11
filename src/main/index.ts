@@ -38,6 +38,8 @@ import { flushRingSync, startTelemetry, stopTelemetry } from './telemetry'
 import { registerAppSchemes } from './appSchemes'
 import { applyGraphicsCompatibilityFlags, applyGraphicsSafeMode } from './graphics'
 import { installImageCacheProtocol } from './imageCache'
+// The install root, for the `eqimg://spell/<id>` route - see the `eqRoot` option below.
+import { effectiveEqRoot } from './log/config'
 // The wiki art this build SHIPS (JOS-198). Pure path probing — Electron's three path facts are
 // passed in below, so the module itself imports nothing from electron.
 import { bundledImageRoots, findBundledImagesDir } from './bundledImages'
@@ -269,6 +271,10 @@ if (!gotSingleInstanceLock) {
     installImageCacheProtocol(protocol, {
       userData: USER_DATA,
       bundledDir,
+      // The one caller that HAS Electron supplies the install root, so `spellIcons.ts` and
+      // `imageCache.ts` both stay importable without it. Read per request, never captured: the
+      // player can repoint the app at another install without a restart.
+      eqRoot: effectiveEqRoot,
       onError: (msg, err) => logError('main:imageCache', { message: msg, err })
     })
     // …and `eqspeech://<hash>` from <userData>/speech-cache, beside it and for the same

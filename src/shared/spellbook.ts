@@ -62,6 +62,19 @@ import {
 /** One spell, as the Spellbook draws it. Every figure already read at the requested tier. */
 export interface SpellbookRow {
   name: string
+  /**
+   * A STABLE, UNIQUE ROW KEY - the name, plus a discriminator where the catalog holds two spells
+   * under one name.
+   *
+   * The name alone was the key and it was not unique: 14 names survive `dedupeByName` as two
+   * genuinely different spells (Aria of Asceticism is a Bard 45 cure AND a Bard 39 proc buff), so a
+   * React list keyed on the name had colliding siblings and reconciled the wrong row into the wrong
+   * place. `spellbookRows` assigns it, because uniqueness is a property of the LIST rather than of
+   * any row - one spell asked about on its own is always just its name.
+   */
+  key: string
+  /** The client's gem icon, when this machine's install answered. See `UnlockSpell.iconId`. */
+  iconId?: number
   /** Every class that gains it, with the level, in the order main sorted them. */
   at: readonly { cls: ClassAbbr; level: number }[]
   /** The lowest level any class gains it at - what the row sorts and filters by. */
@@ -141,6 +154,9 @@ function positive<K extends string>(key: K, value: number | undefined): Partial<
  */
 function tierBase(s: UnlockSpell): SpellTierBase {
   return {
+    // The name is carried for ONE reader: `MEASURED_STATIC_MAGNITUDE`, the list of spells measured
+    // not to gain magnitude whatever their category's rate says. Nothing else here keys on it.
+    name: s.name,
     category: s.upgradeCategory ?? 'other',
     ...positive('mana', s.mana),
     ...positive('castSeconds', s.castTimeMs === undefined ? undefined : s.castTimeMs / 1000),
@@ -171,6 +187,7 @@ export function spellbookRow(s: UnlockSpell, tier: number): SpellbookRow {
   const reading = spellTierLadder(base)[t]
   const row: SpellbookRow = {
     name: s.name,
+    key: s.name,
     at: s.at,
     level: gainLevel(s),
     category: base.category,
@@ -178,6 +195,7 @@ export function spellbookRow(s: UnlockSpell, tier: number): SpellbookRow {
     payoff: upgradePayoff(base),
     tier: t
   }
+  if (s.iconId !== undefined) row.iconId = s.iconId
   if (s.spellType !== undefined) row.spellType = s.spellType
   if (s.grantsLevel !== undefined) row.grantsLevel = s.grantsLevel
   if (reading.mana !== undefined) row.mana = reading.mana
@@ -187,6 +205,26 @@ export function spellbookRow(s: UnlockSpell, tier: number): SpellbookRow {
   // `true` or absent, never false - the era sidecar's own shape (law 1).
   if (s.outOfEra === true) row.outOfEra = true
   return row
+}
+
+/**
+ * Give every row a key nothing else in this list holds.
+ *
+ * `dedupeByName` folds the same-named rows the client file can adjudicate and deliberately KEEPS
+ * the ones it cannot - two different spells under one name is a real thing the catalog contains,
+ * and deleting one would be worse than showing both. So the list can carry repeats, and the draw
+ * needs to tell them apart: the second occurrence becomes `name#2`, the third `name#3`.
+ *
+ * In place, after the filter rather than during it, because the discriminator has to count the rows
+ * that SURVIVED - a key that depended on the whole corpus would change as you typed.
+ */
+function makeKeysUnique(rows: SpellbookRow[]): void {
+  const seen = new Map<string, number>()
+  for (const row of rows) {
+    const n = (seen.get(row.name) ?? 0) + 1
+    seen.set(row.name, n)
+    if (n > 1) row.key = `${row.name}#${String(n)}`
+  }
 }
 
 /** Does this spell survive the query's filters? Split out to keep the fold under the ceiling. */
@@ -242,6 +280,7 @@ export function spellbookRows(
     }
     out.push(row)
   }
+  makeKeysUnique(out)
   const by = q.sort ?? 'level'
   const dir = q.desc === true ? -1 : 1
   out.sort((a, b) => {
