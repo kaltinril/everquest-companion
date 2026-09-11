@@ -93,6 +93,7 @@ function FilterRow({
   const categories = query.categories ?? []
   const worth = query.payoffMagnitudeOnly === true
   const newest = query.newestOnly === true
+  const inEra = query.inEraOnly === true
   return (
     <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
       <TextField
@@ -159,10 +160,25 @@ function FilterRow({
           versions of regeneration or poison resist"*. It hides a rung whose own line has a later
           one for the classes on screen - `SpellbookQuery.newestOnly` states why that is read off
           the shipped ladders rather than matched on names. */}
+      {/* MALKIL'S ASK (2026-09-10): *"It's also showing spells that are not yet available in EQL.
+          This wouldn't be a problem if it could be toggled to not show them."* The fold has had
+          `inEraOnly` since it was written; what it never had was a control. OFF by default, and
+          the hint says why: he also reports that *"there are some 'out of era' spells and items
+          that are available in EQL"*, so this narrows on a verdict that is the wiki's rather than
+          the game's, and defaulting it on would hide spells he can really buy. */}
+      <Chip
+        size="small"
+        label="In era only"
+        title="Hide spells the wiki places outside the current era. The verdict is the wiki's, not the game's, and it is wrong about a few - so this is a filter you turn on, not a default."
+        data-testid="spellbook-era-only"
+        color={inEra ? 'primary' : 'default'}
+        variant={inEra ? 'filled' : 'outlined'}
+        onClick={() => onQuery({ ...query, inEraOnly: inEra ? undefined : true })}
+      />
       <Chip
         size="small"
         label="Newest rank only"
-        title="Hide the lower rungs of a spell line - show only the newest version each class gets. Reads the shipped spell ladders, so Regeneration hides behind Chloroplast rather than behind a similar name."
+        title="Show only the top rung of each SPELL LINE - the Line column names it, and hovering a row says what it replaces. It reads the shipped ladders rather than matching names, which is why Regeneration hides behind Regrowth. Scoped to the classes you are showing: a rung is only hidden when its replacement is on screen too."
         data-testid="spellbook-newest-only"
         color={newest ? 'primary' : 'default'}
         variant={newest ? 'filled' : 'outlined'}

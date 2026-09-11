@@ -270,10 +270,17 @@ test('the chip hides lower rungs and keeps the top of each line', () => {
   const top = spellbookRows(REAL, { classes: trio, newestOnly: true }, 0)
   assert.ok(top.length < all.length, 'it has to actually hide something')
   const kept = new Set(top.map((r) => r.name))
-  // The regen ladder for this trio is Regeneration -> Chloroplast -> Regrowth. Only the last stands.
-  assert.ok(kept.has('Regrowth'), 'the newest rung stays')
-  assert.ok(!kept.has('Chloroplast'), 'the middle rung goes')
-  assert.ok(!kept.has('Regeneration'), 'and so does the bottom one')
+  // The regen ladder for this trio is Regeneration -> Chloroplast -> Regrowth, and REGROWTH IS OUT
+  // OF ERA - so the top OBTAINABLE rung is Chloroplast, and that is the one that stands.
+  //
+  // This test asserted the opposite until 2026-09-10, when Malkil read the chip and said so:
+  // *"The spells not available yet is definitely messing with Newest Version."* He was right. The
+  // fold hid a rung whenever a later one existed, without asking whether the later one is in the
+  // game - so a shaman lost the regen he can cast in favour of one that does not exist yet, which
+  // is the worst possible answer for a chip whose promise is "show me the one to use".
+  assert.ok(kept.has('Chloroplast'), 'the top OBTAINABLE rung stays')
+  assert.ok(!kept.has('Regeneration'), 'the rung below it still goes')
+  assert.ok(kept.has('Regrowth'), 'and the out-of-era rung is still DRAWN - it just hides nothing')
   // …and it is the SHIPPED ladder doing it, not a name match: none of those three share a word.
 })
 

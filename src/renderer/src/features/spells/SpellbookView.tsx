@@ -94,7 +94,7 @@ const FIXED_ROW = {
 } as const
 
 /** How many columns a spacer has to span. */
-const COLUMN_COUNT = 8
+const COLUMN_COUNT = 9
 
 /** The spacer rows that reserve the full scroll height - see `useWindowedRows`. */
 function PadRow({ height }: { height: number }): JSX.Element | null {
@@ -192,6 +192,25 @@ function SpellRow({ row }: { row: SpellbookRow }): JSX.Element {
           {UPGRADE_CATEGORY_LABEL[row.category]}
         </Typography>
       </TableCell>
+      {/* THE LINE IS THE GAME'S OWN STACKING GROUP (Malkil, 2026-09-10: *"Maybe if it showed the
+          spell line it would make sense. Possibly have a way to show what spells it replaces as
+          well."*). The `title` is the second half of his ask, and it is also what makes the
+          newest-rank chip stop looking arbitrary: the row that survived says what it superseded. */}
+      <TableCell data-testid="spellbook-line">
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          noWrap
+          title={
+            row.replaces === undefined
+              ? row.line
+              : `${row.line ?? 'no line'}
+replaces ${row.replaces.join(', ')}`
+          }
+        >
+          {row.line ?? UNSTATED}
+        </Typography>
+      </TableCell>
       {/* THE COLUMN THE OWNER ASKED FOR: what it actually does, in the row itself. */}
       <TableCell data-testid="spellbook-grants">
         <Typography variant="body2" noWrap title={row.grants.map((g) => g.line).join('\n')}>
@@ -268,6 +287,9 @@ export default function SpellbookView(): JSX.Element {
                 <TableCell>Spell</TableCell>
                 <TableCell>Classes</TableCell>
                 <TableCell>Kind</TableCell>
+                <TableCell title="The spell line, which is the game's own stacking group: two spells on one line never both stand. Hover a row to see what it replaces.">
+                  Line
+                </TableCell>
                 <TableCell>Grants</TableCell>
                 <TableCell align="right">Dmg / heal</TableCell>
                 <TableCell align="right">Mana</TableCell>
