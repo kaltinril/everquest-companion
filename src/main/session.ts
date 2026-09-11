@@ -35,7 +35,7 @@ import { serveCharacterList } from './dataServer/serveLogs'
 import { pushLogDir } from './dataServer/definePush'
 import { baseName } from '../shared/outputs/baseline'
 import { loadInventory } from './inventory/parseInventory'
-import { loadAchievements, watchOutputKind, type OutputKindWatch } from './outputs'
+import { loadAchievements, loadFactions, watchOutputKind, type OutputKindWatch } from './outputs'
 import { sendWorldRebuilt } from './worldRebuilt'
 import {
   getActiveLogPath,
@@ -47,6 +47,12 @@ import {
 // The achievements dump's write pair (JOS-429) — a split-out store accessor, same reason the tail
 // mark below is one: store.ts is at the factoring ceiling.
 import { setAchievements } from './storeAchievements'
+// The factions dump's write pair (the third graduated kind) — the same split, the same reason.
+import { setFactions } from './storeFactions'
+// The factions follow is gated on the owner's review-gate mechanism (src/main/unreleased.ts): the
+// tab that reads the key is UNRELEASED-stripped from packaged builds, and a packaged build should
+// not run two watchers and write a store key for a surface it cannot draw.
+import { UNRELEASED } from './unreleased'
 // The clean-shutdown tail mark (JOS-57 scope addition) — a split-out store accessor, for the
 // reason its own header gives: store.ts is at the factoring ceiling.
 import { markFunnelStep } from './telemetry'
@@ -70,6 +76,9 @@ let inventoryWatch: OutputKindWatch | null = null
 // independently and each is armed for its own character — and because the day a third kind
 // graduates, a list would hide which one failed to close.
 let achievementsWatch: OutputKindWatch | null = null
+// The third kind's slot (factions), on the sentence above's own terms. Armed only under
+// `UNRELEASED` (see `tailCharacter`), so in a packaged build it stays null for the process's life.
+let factionsWatch: OutputKindWatch | null = null
 // Wall-clock heartbeat (Task #30): drives module onTick so real-time deadlines (the
 // buffs 15s cast-landing timeout) fire even when the log is idle. Started once the
 // live tail is running (never during replay), cleared on quit / character switch.
@@ -195,6 +204,8 @@ export async function applyEqDirChange(): Promise<EqConfig> {
     inventoryWatch = null
     achievementsWatch?.close()
     achievementsWatch = null
+    factionsWatch?.close()
+    factionsWatch = null
     character = null
     // Every window that folds a module, not just the main one (JOS-172): an overlay left open
     // over an install whose log went away must empty with everything else.
@@ -423,6 +434,14 @@ export async function tailCharacter(ref: CharacterRef): Promise<boolean> {
   loadAchievementsNow(ref, 'startup')
   startAchievementsWatch(ref)
 
+  // The third graduated kind (factions), same two steps — GATED on the review-gate door
+  // (src/main/unreleased.ts): the Factions tab is UNRELEASED-stripped from packaged builds, and a
+  // build that cannot draw the surface should not run its watchers or write its store keys.
+  if (UNRELEASED) {
+    loadFactionsNow(ref, 'startup')
+    startFactionsWatch(ref)
+  }
+
   // THE ATTACH RIDES THIS CALL, and that is the whole of what "tailing a character" means now.
   //
   // `sendWorldRebuilt` tells every window that folds a module to re-hydrate, and — through the one
@@ -562,7 +581,7 @@ function loadAchievementsNow(ref: CharacterRef, why: 'startup' | 'watch'): void 
   timeSeam('achievementsLoad', () => {
     const res = loadAchievements(who.name, who.server)
     if (!res) return
-    setAchievements(activeCharId(), res.unlocks, res.source)
+    setAchievements(activeCharId(), res.unlocks, res.races, res.source)
     logInfo(
       `[everquest-companion] Achievements ${
         why === 'startup' ? 'loaded at startup' : 'auto-reloaded'
@@ -584,6 +603,49 @@ function startAchievementsWatch(ref: CharacterRef): void {
       },
       onError: (err) => {
         logConsoleError('[everquest-companion] achievements watch error', err)
+      },
+      active: () => character?.logPath === ref.logPath
+    }
+  )
+}
+
+/**
+ * THE FACTIONS DUMP'S TWO STEPS, on `loadAchievementsNow`'s terms exactly: read + follow, one
+ * function for both halves, a missing file is silence, and `onProgress` is the whole delivery —
+ * the store write lands on `ProgressState` and the Factions tab derives everything from it on
+ * every read, so no channel of its own (OutputKindLine's header carries that argument).
+ *
+ * NOT A TIMED SEAM, unlike its two elders, and deliberately: seam names are a closed schema that
+ * rides telemetry (shared/perfSeams.ts → telemetryLive), so a seam for an UNRELEASED surface
+ * would be the enum-widening this feature's gate exists to avoid. It gets its seam when the tab
+ * graduates, in the same owner-sequenced change that widens `TELEMETRY_VIEWS`.
+ */
+function loadFactionsNow(ref: CharacterRef, why: 'startup' | 'watch'): void {
+  const who = character
+  if (who?.logPath !== ref.logPath) return
+  const res = loadFactions(who.name, who.server)
+  if (!res) return
+  setFactions(activeCharId(), res.standings, res.source)
+  logInfo(
+    `[everquest-companion] Factions ${
+      why === 'startup' ? 'loaded at startup' : 'auto-reloaded'
+    }: ${res.path} (${String(res.standings.length)} factions)`
+  )
+  sendToMain(IPC.onProgress, getProgress(activeCharId()))
+}
+
+/** Follow the factions dump — the third twin, same registry, same staleness guard. */
+function startFactionsWatch(ref: CharacterRef): void {
+  factionsWatch?.close()
+  factionsWatch = watchOutputKind(
+    'faction',
+    { name: ref.name, server: ref.server },
+    {
+      onChange: () => {
+        loadFactionsNow(ref, 'watch')
+      },
+      onError: (err) => {
+        logConsoleError('[everquest-companion] factions watch error', err)
       },
       active: () => character?.logPath === ref.logPath
     }
@@ -630,6 +692,7 @@ export function stopSession(): void {
   // no offset of ours to write.
   inventoryWatch?.close()
   achievementsWatch?.close()
+  factionsWatch?.close()
   stopWatchingForFirstLog()
   stopWatchingForQuietSwitch()
 }

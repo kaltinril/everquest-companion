@@ -29,6 +29,10 @@
  * what turns prose links into a trustworthy required-item list.
  */
 
+import type { QuestFactionHit } from '../../src/shared/types'
+
+export type { QuestFactionHit }
+
 /** The `{| class="questTopTable"` header block, verbatim label → value cells. */
 export interface QuestTopTable {
   startZone?: string
@@ -50,6 +54,10 @@ export interface ParsedQuestPage extends QuestTopTable {
   requiredItems: string[]
   /** page carries a {{YouGainExperience}} / {{exp}} marker */
   expReward: boolean
+  /** the faction hits the walkthrough quotes (see parseFactionHits) */
+  factions: QuestFactionHit[]
+  /** the coin turn-in the page states ("2 gold"), when it states one (see parseCoinCost) */
+  coin?: string
   /** true when the page is a disambiguation hub, not a quest */
   disambiguation: boolean
   /** true when the page has a questTopTable header block */
@@ -218,6 +226,74 @@ const REWARD_HEADING = /^rewards?\b/i
 const EXP_MARKER = /\{\{\s*(yougainexperience|exp)\s*\}\}|you gain experience/i
 
 /**
+ * THE FACTION RECEIPT LINES (measured against the cached corpus, 2026-09-05: 755 of 933 cached
+ * quest pages carry at least one). Wiki authors paste the game's own lines in two dialects —
+ * direction-only (`…with [[X]] got better`) and numeric (`…with [[X]] has been adjusted by 10`,
+ * the number sometimes parenthesised and sometimes signed: `by (+7)`, `by -300`). One pattern
+ * matches both so a page mixing dialects reads consistently.
+ */
+const FACTION_HIT_RE =
+  /faction standing (?:with|for) \[\[\s*([^\]|]+?)\s*(?:\|[^\]]*)?\]\]\s*(?:got\s+(better|worse)|(?:has been|was)\s+adjusted\s+by\s*\(?\s*([+-]?\d+)\s*\)?)/gi
+
+/**
+ * THE COIN TURN-IN (measured 2026-09-05: 48 cached quest pages carry one). The classic guard
+ * donation quests take money, not items — "Give him 2 gold" ×15 across the corpus, "hand him
+ * 1000pp", "Hand him 1 platinum" — and an item-link parser is structurally blind to them, so a
+ * money quest read as having NO turn-in at all. One pattern covers the measured spellings:
+ * give/hand/donate, an optional pronoun, a NUMBER, a coin unit (word or the gp/pp/sp/cp short
+ * forms). Word-numbers ("give him two sapphires") stay unmatched on purpose: every measured coin
+ * line uses digits, and "two sapphires" is an item.
+ */
+const COIN_RE =
+  /\b(?:give|hand|donate)\s+(?:him|her|them|it)?\s*(?:a\s+donation\s+of\s+)?(\d[\d,]*)\s*(gold|platinum|silver|copper|gp|pp|sp|cp)\b/i
+
+const COIN_UNIT: Record<string, string> = {
+  gp: 'gold',
+  pp: 'platinum',
+  sp: 'silver',
+  cp: 'copper'
+}
+
+/** `parseCoinCost` as a spreadable field — split so `parseQuestPage` stays inside the measured
+ *  complexity ceiling (the ternary is a branch wherever it sits). */
+function coinField(wikitext: string): { coin?: string } {
+  const coin = parseCoinCost(wikitext)
+  return coin === undefined ? {} : { coin }
+}
+
+/** The page's coin turn-in as words ("2 gold"), or undefined when it states none. First
+ *  occurrence wins — a page hosting several turn-in variants repeats the same donation line. */
+export function parseCoinCost(wikitext: string): string | undefined {
+  const m = COIN_RE.exec(wikitext)
+  if (m === null) return undefined
+  const unit = m[2].toLowerCase()
+  return `${m[1].replace(/,/g, '')} ${COIN_UNIT[unit] ?? unit}`
+}
+
+/**
+ * Every faction the page's receipt lines name, deduped per faction (first occurrence wins —
+ * a page hosting several turn-in variants repeats the same receipts, and summing them would
+ * claim one hand-in pays the whole page). A numeric line beats an earlier direction-only line
+ * for the same faction, because it carries strictly more of the same fact.
+ */
+export function parseFactionHits(wikitext: string): QuestFactionHit[] {
+  const byName = new Map<string, QuestFactionHit>()
+  let m: RegExpExecArray | null
+  FACTION_HIT_RE.lastIndex = 0
+  while ((m = FACTION_HIT_RE.exec(wikitext)) !== null) {
+    const name = m[1].replace(/\s+/g, ' ').trim()
+    if (!name || NAMESPACED.test(name)) continue
+    const amount = m[3] === undefined ? undefined : Number(m[3])
+    const up = amount === undefined ? m[2].toLowerCase() === 'better' : amount >= 0
+    const key = name.toLowerCase()
+    const prev = byName.get(key)
+    if (prev === undefined) byName.set(key, { name, up, ...(amount === undefined ? {} : { amount }) })
+    else if (prev.amount === undefined && amount !== undefined) byName.set(key, { name, up, amount })
+  }
+  return [...byName.values()]
+}
+
+/**
  * Parse one quest page. `isItem(title)` decides whether a prose link names an item page
  * (built from the wiki's item-title set); without it every link would be kept, dragging
  * in NPCs and zones.
@@ -265,6 +341,8 @@ export function parseQuestPage(
     rewards,
     requiredItems,
     expReward: EXP_MARKER.test(wikitext),
+    factions: parseFactionHits(wikitext),
+    ...coinField(wikitext),
     disambiguation: /\{\{\s*disambig/i.test(wikitext),
     hasTopTable: top !== null
   }

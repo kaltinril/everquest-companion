@@ -40,6 +40,12 @@ export const IPC = {
   // Read on demand (a readdir + a stat); the renderer re-asks on `inventory:autoReloaded` so a
   // dump written in game ages back to "just now" without a click.
   outputsStatus: 'outputs:status',
+  // renderer -> main: the LOG's faction receipts since the active character's factions dump was
+  // written, folded per faction (shared/factionLog.ts). Returns FactionEvidenceReport | null —
+  // null means no log/dump to fold from, which the Factions tab renders as the dump alone. A
+  // bounded read-only tail read on demand (main/factionsEvidence.ts); the engine's tail is
+  // untouched. UNRELEASED-gated at the handler like the surface it feeds.
+  factionsEvidence: 'factions:evidence',
 
   // ---- character selection ----
   getCharacter: 'character:get',

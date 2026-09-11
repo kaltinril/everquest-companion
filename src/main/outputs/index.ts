@@ -21,9 +21,12 @@ import { readFileSync } from 'fs'
 import type { InventoryDump } from '../../shared/outputs/inventory'
 import {
   classUnlockClaims,
+  raceUnlockClaims,
   type AchievementsSource,
-  type ClassUnlockClaim
+  type ClassUnlockClaim,
+  type RaceUnlockClaim
 } from '../../shared/outputs/achievements'
+import type { FactionStanding, FactionsSource } from '../../shared/outputs/factions'
 import type { OutputKindId } from '../../shared/outputs/kinds'
 import { parseOutput, type OutputParseResult } from './kinds'
 import { outputStatus, type OutputCharacter } from './registry'
@@ -47,6 +50,7 @@ export {
   parseOutput,
   preferredOutputFile,
   type AchievementsOutput,
+  type FactionsOutput,
   type InventoryOutput,
   type OutputData,
   type OutputFileStatus,
@@ -121,6 +125,8 @@ export interface LoadedAchievements {
   path: string
   /** The earned `Obtain <Item>` rows — the flat artifact that gets persisted (JOS-429). */
   unlocks: ClassUnlockClaim[]
+  /** The race unlocks and their required factions — the Factions tab's half (2026-09-05). */
+  races: RaceUnlockClaim[]
   /** Exactly what gets persisted as `ProgressState.achievementsSource`. */
   source: AchievementsSource
 }
@@ -149,8 +155,41 @@ export function loadAchievements(
   return {
     path: loaded.path,
     unlocks: classUnlockClaims(result.data.dump),
+    races: raceUnlockClaims(result.data.dump),
     // `loadedAt` is the FILE's mtime (when the player typed the command) and `readAt` is ours —
     // the JOS-253 pair, kept because a single timestamp cannot answer both questions.
+    source: { path: loaded.path, loadedAt: loaded.loadedAt, readAt: now() }
+  }
+}
+
+/** The factions dump's standings, plus the record of where they came from. */
+export interface LoadedFactions {
+  path: string
+  /** Every faction row the dump states — the flat artifact that gets persisted. */
+  standings: FactionStanding[]
+  /** Exactly what gets persisted as `ProgressState.factionsSource`. */
+  source: FactionsSource
+}
+
+/**
+ * Load + parse the character's factions dump (the third graduated kind, 2026-09-05).
+ *
+ * Here the flat artifact IS the parse — 185 rows of four scalars, nothing to project — so unlike
+ * the two loads above there is no second step between the file and the model. `now` is injected
+ * for `loadAchievements`' reason: a test that pins the record should not have to pin a clock.
+ */
+export function loadFactions(
+  characterName?: string,
+  server?: string,
+  now: () => number = Date.now
+): LoadedFactions | null {
+  const loaded = loadOutput('faction', characterName, server)
+  if (!loaded) return null
+  const { result } = loaded
+  if (!result.ok || result.data.kind !== 'faction') return null
+  return {
+    path: loaded.path,
+    standings: result.data.standings,
     source: { path: loaded.path, loadedAt: loaded.loadedAt, readAt: now() }
   }
 }

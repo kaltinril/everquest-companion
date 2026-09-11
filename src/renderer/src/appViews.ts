@@ -2,7 +2,7 @@
 // persisted "which tab was I on" key all agree on. Lives outside App.tsx so the nav drawer
 // can import it without importing the app itself.
 
-import { OWNER_TOOLS } from './devFlags'
+import { OWNER_TOOLS, UNRELEASED } from './devFlags'
 
 export type View =
   | 'overview'
@@ -33,6 +33,15 @@ export type View =
   | 'wishlist'
   | 'buffs'
   | 'timers'
+  // FACTION STANDINGS (the third graduated `/outputfile` kind, 2026-09-05) — the tab that draws
+  // `ProgressState.factionStandings`. UNRELEASED (the review-gate mechanism, devFlags.ts): it is
+  // in `KNOWN_VIEWS` only behind the flag's splice below, its nav row is gated the same way in
+  // NavDrawer.tsx, and it is deliberately ABSENT from `TELEMETRY_VIEWS` — that enum is validated
+  // by the ingest Lambda, so widening it is a server deploy before it is a client change
+  // (shared/telemetry.ts), and a gated view reports no dwell by construction (`dwellView` fails
+  // closed). Graduation is the character sheet's exact path: delete the gate, widen the enum,
+  // owner-sequenced.
+  | 'factions'
   | 'preferences'
   // OWNER-ONLY view (src/renderer/src/features/triage/**). It stays in the union
   // unconditionally because a union member is a TYPE and types are erased — nothing of it
@@ -103,6 +112,7 @@ export const VIEW_LABELS: Record<View, string> = {
   wishlist: 'Wish list',
   buffs: 'Buffs',
   timers: 'Timers',
+  factions: 'Factions',
   preferences: 'Preferences',
   triage: 'Triage',
   character: 'Character',
@@ -130,6 +140,13 @@ const KNOWN_VIEWS: View[] = [
   'wishlist',
   'buffs',
   'timers',
+  // The review-gate splice (devFlags.ts UNRELEASED — a compile-time literal in a build, so the
+  // string folds away with the branch): a dev server draws the Factions tab, a packaged build
+  // bounces a persisted 'factions' to the default view instead of routing to a tab it will not
+  // draw. The character sheet lived in this exact splice from JOS-45 until its release in
+  // JOS-327; the telemetry contract test reads the splice and exempts its tenants from
+  // `TELEMETRY_VIEWS` (tests/telemetryContract.test.mts).
+  ...(UNRELEASED ? (['factions'] as const) : []),
   'preferences',
   // JOS-327: `character` used to be spliced in behind `UNRELEASED` right here, beside the
   // owner-tools splice below. It is a plain member now — every build draws it.

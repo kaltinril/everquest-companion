@@ -17,7 +17,8 @@
 
 import type { ComboProgress } from './classCombo'
 import type { ItemCountOverride } from './itemOverrides'
-import type { AchievementsSource, ClassUnlockClaim } from './outputs/achievements'
+import type { AchievementsSource, ClassUnlockClaim, RaceUnlockClaim } from './outputs/achievements'
+import type { FactionStanding, FactionsSource } from './outputs/factions'
 import type { InventorySource } from './outputs/baseline'
 import type { ExaltPlan } from './planner/types'
 import type { GearSet } from './planner/gearSet'
@@ -115,8 +116,34 @@ export interface ProgressState {
    * one written here still opens in a build that predates the achievements reader.
    */
   achievementUnlocks?: ClassUnlockClaim[]
+  /**
+   * THE RACE UNLOCKS the same dump states (2026-09-05) — each race's open/closed status and the
+   * factions the server requires at maximum, written in the same `setAchievements` write as the
+   * class half so neither can describe a different dump. Display-only (the Factions tab joins the
+   * required factions to the standings); nothing here feeds quest crediting.
+   *
+   * ADDITIVE and OPTIONAL — no schema bump and no migration, the `exaltPlans` precedent.
+   */
+  raceUnlocks?: RaceUnlockClaim[]
   /** metadata about the last achievements load — the file's mtime and when we read it (JOS-429). */
   achievementsSource?: AchievementsSource
+  /**
+   * THE FACTION STANDINGS the last `/outputfile faction` dump stated (the third graduated kind,
+   * 2026-09-05) — one row per faction the server tracks, each carrying the ABSOLUTE standing the
+   * log's better/worse lines never say (shared/outputs/factions.ts carries the measured format).
+   *
+   * THE WHOLE DUMP, not a projection, and that is not a departure from the achievements key
+   * above: 185 rows of four scalars IS the flat artifact, there is nothing to project out of it,
+   * and a subset would be this app deciding which factions matter — a question the surface
+   * answers per read, not the store.
+   *
+   * ADDITIVE and OPTIONAL — no schema bump and no migration, the `exaltPlans` precedent exactly:
+   * every reader defaults on a missing key, so a store written by any older build loads unchanged
+   * and one written here still opens in a build that predates the factions reader.
+   */
+  factionStandings?: FactionStanding[]
+  /** metadata about the last factions load — the file's mtime and when we read it. */
+  factionsSource?: FactionsSource
   /**
    * HAND-STATED HELD COUNTS (JOS-186) — the escape hatch for an item the witnesses cannot see the
    * truth about: one destroyed, given away, or otherwise gone in a way no log line and no dump
