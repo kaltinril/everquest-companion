@@ -87,6 +87,18 @@ export interface SpellbookRow {
   replaces?: string[]
   /** Every class that gains it, with the level, in the order main sorted them. */
   at: readonly { cls: ClassAbbr; level: number }[]
+  /**
+   * THE CLASSES THE READER ASKED ABOUT - `at` narrowed to the query's class filter.
+   *
+   * Malkil, 2026-09-10: *"Only listing current classes in the Class column could be good too to
+   * help declutter things."* With a trio picked, a row reading `BST 4 / CLR 4 / DRU 4 +5` spends
+   * its whole column on classes you are not playing and hides the one level you wanted.
+   *
+   * IT IS THE FOLD'S JOB, not the view's (ruling 4). Equal to `at` when no filter is set, so the
+   * unfiltered corpus still reports every class that gains the spell - which is what makes the
+   * Spellbook a corpus browser rather than a loadout.
+   */
+  shownAt: readonly { cls: ClassAbbr; level: number }[]
   /** The lowest level any class gains it at - what the row sorts and filters by. */
   level: number
   category: UpgradeCategory
@@ -111,7 +123,7 @@ export interface SpellbookRow {
 }
 
 /** Which column the list is ordered by. */
-export type SpellbookSort = 'name' | 'level' | 'mana' | 'damage' | 'heal'
+export type SpellbookSort = 'name' | 'level' | 'mana' | 'damage' | 'heal' | 'figure' | 'cast'
 
 /** What the view asks for. Every field is AND-ed; an absent one filters nothing. */
 export interface SpellbookQuery {
@@ -233,6 +245,7 @@ export function spellbookRow(s: UnlockSpell, tier: number): SpellbookRow {
     name: s.name,
     key: s.name,
     at: s.at,
+    shownAt: s.at,
     level: gainLevel(s),
     category: base.category,
     grants: s.grants ?? [],
@@ -343,12 +356,26 @@ function admits(s: UnlockSpell, q: SpellbookQuery, text: string): boolean {
 }
 
 /** The value a sort reads, or null - and a null always sorts LAST, in both directions. */
+/**
+ * What each sortable column compares on. A TABLE rather than a chain, which is this tree's own
+ * preference for a dispatch (eslint.config.mjs's words) and what keeps it under the ceiling now
+ * that there are seven of them.
+ *
+ * `figure` is the headline column, which holds whichever of damage and healing a row states - so
+ * its order has to read the same way `headlineFigure` draws it: one column, one number, one order.
+ */
+const SORT_VALUE: Readonly<Record<SpellbookSort, (row: SpellbookRow) => number | string | null>> = {
+  name: (r) => r.name.toLowerCase(),
+  level: (r) => r.level,
+  mana: (r) => r.mana ?? null,
+  cast: (r) => r.castSeconds ?? null,
+  damage: (r) => r.damage ?? null,
+  heal: (r) => r.heal ?? null,
+  figure: (r) => r.damage ?? r.heal ?? null
+}
+
 function sortValue(row: SpellbookRow, by: SpellbookSort): number | string | null {
-  if (by === 'name') return row.name.toLowerCase()
-  if (by === 'level') return row.level
-  if (by === 'mana') return row.mana ?? null
-  if (by === 'damage') return row.damage ?? null
-  return row.heal ?? null
+  return SORT_VALUE[by](row)
 }
 
 /**
@@ -364,6 +391,12 @@ function sortValue(row: SpellbookRow, by: SpellbookSort): number | string | null
  * `heal`, which is not the claim `heal: 0`; it sorts LAST on that column in both directions rather
  * than being read as the worst answer.
  */
+/** `shownAt` = the classes the reader asked about. See `SpellbookRow.shownAt`. */
+function narrowClasses(row: SpellbookRow, picked: ReadonlySet<ClassAbbr> | null): void {
+  if (picked === null) return
+  row.shownAt = row.at.filter((p) => picked.has(p.cls))
+}
+
 export function spellbookRows(
   spells: readonly UnlockSpell[],
   q: SpellbookQuery,
@@ -374,6 +407,7 @@ export function spellbookRows(
   // a SURVIVOR replaces. See `supersededNames` for why the replacement has to survive too.
   const admitted = spells.filter((s) => admits(s, q, text))
   const superseded = q.newestOnly === true ? supersededNames(admitted, q.classes) : null
+  const picked = q.classes !== undefined && q.classes.length > 0 ? new Set(q.classes) : null
   const out: SpellbookRow[] = []
   for (const s of admitted) {
     if (superseded?.has(s.name) === true) continue
@@ -381,6 +415,7 @@ export function spellbookRows(
     if (q.payoffMagnitudeOnly !== undefined && row.payoff.magnitude !== q.payoffMagnitudeOnly) {
       continue
     }
+    narrowClasses(row, picked)
     out.push(row)
   }
   makeKeysUnique(out)

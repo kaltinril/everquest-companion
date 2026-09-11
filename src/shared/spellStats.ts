@@ -394,6 +394,9 @@ export const SPELL_STAT_LABEL: Partial<Record<SpellStatKey, string>> = {
   SPELL_DURATION: 'Spell duration',
   SPELL_RANGE: 'Spell range',
   CASTING_LEVEL: 'Casting level',
+  // THE COUNTER KEYS READ IN TWO DIRECTIONS and the label here is only the CURE half - see
+  // `spellStatText`, which picks the word from the sign. A cure DECREASES counters; a detrimental
+  // spell INCREASES them, and calling that a cure is backwards.
   POISON_COUNTER: 'Poison cure',
   DISEASE_COUNTER: 'Disease cure',
   CURSE_COUNTER: 'Curse cure',
@@ -420,7 +423,26 @@ export function spellStatLabel(key: SpellStatKey): string {
  *
  * NO EM DASHES and a normal minus sign (AGENTS.md, UI conventions) - this is user-facing copy.
  */
+/**
+ * A COUNTER STAT MEANS THE OPPOSITE THING IN EACH DIRECTION, so it gets its own word each way.
+ *
+ * `Decrease Poison Counter by 36` is a CURE stripping 36. `Increase Curse Counter by 8` is a DoT
+ * hanging 8 on you, and the label table's `Curse cure` is flatly wrong for it. Reported from a
+ * screenshot (2026-09-10): Vengeance of the Wild, a druid DoT, read `Curse cure +8`.
+ *
+ * The sign is the whole test, and it is already carried faithfully - `parseStatLine` writes
+ * `Decrease` as a negative. Null for every other key, whose one label reads correctly both ways.
+ */
+function counterWord(key: SpellStatKey, amount: number): string | null {
+  const cure = SPELL_STAT_LABEL[key]
+  if (cure?.endsWith(' cure') !== true) return null
+  const kind = cure.slice(0, -' cure'.length)
+  return amount < 0 ? `${kind} cure ${String(Math.abs(amount))}` : `${kind} counters +${String(amount)}`
+}
+
 export function spellStatText(g: SpellStatGrant): string {
+  const counter = counterWord(g.key, g.amount)
+  if (counter !== null) return counter
   const sign = g.amount >= 0 ? '+' : '-'
   return `${spellStatLabel(g.key)} ${sign}${String(Math.abs(g.amount))}${g.percent ? '%' : ''}`
 }

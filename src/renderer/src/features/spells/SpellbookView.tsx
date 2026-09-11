@@ -56,10 +56,17 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TableSortLabel,
   Typography
 } from '@mui/material'
 import { UPGRADE_CATEGORY_LABEL } from '@shared/spellUpgrade'
-import { PAYOFF_MARKS, spellbookRows, type SpellbookQuery, type SpellbookRow } from '@shared/spellbook'
+import {
+  PAYOFF_MARKS,
+  spellbookRows,
+  type SpellbookQuery,
+  type SpellbookRow,
+  type SpellbookSort
+} from '@shared/spellbook'
 import { useLevelUnlocks } from '../leveling/useLevelUnlocks'
 // THE GEAR TAB'S CLASS-FILTER STATE, under this tab's own key (owner, 2026-09-10). See
 // `useFollowingClasses` for why the shape is shared and the storage deliberately is not.
@@ -183,7 +190,7 @@ function SpellRow({ row }: { row: SpellbookRow }): JSX.Element {
         </Stack>
       </TableCell>
       <TableCell>
-        <Typography variant="body2" color="text.secondary" noWrap title={classesText(row.at)}>
+        <Typography variant="body2" color="text.secondary" noWrap title={classesText(row.shownAt)}>
           {classesText(row.at)}
         </Typography>
       </TableCell>
@@ -237,6 +244,52 @@ replaces ${row.replaces.join(', ')}`
   )
 }
 
+/**
+ * A COLUMN YOU CAN SORT BY, which is the Gear tab's idiom brought over (Malkil, 2026-09-10:
+ * *"clicking on a column to sort like you can in the Gear tab would be nice"*).
+ *
+ * `spellbookRows` has taken a `sort` and a `desc` since it was written; nothing ever set them. The
+ * five sortable columns are the ones holding a single comparable value - Kind, Line, Grants and
+ * Upgrade are sets and lists, and an order over those would be an invention rather than a sort.
+ *
+ * FIRST CLICK ON A NEW COLUMN PICKS THE USEFUL DIRECTION rather than always ascending: a name reads
+ * A to Z, and every figure reads biggest first, because "which is the best" is the question a
+ * reader clicks a damage column to ask. Clicking the column you are already on flips it.
+ */
+function SortCell({
+  id,
+  label,
+  query,
+  onQuery,
+  align
+}: {
+  id: SpellbookSort
+  label: string
+  query: SpellbookQuery
+  onQuery: (next: SpellbookQuery) => void
+  align?: 'right'
+}): JSX.Element {
+  const active = (query.sort ?? 'level') === id
+  const desc = query.desc === true
+  return (
+    <TableCell
+      align={align}
+      sortDirection={active ? (desc ? 'desc' : 'asc') : false}
+      data-testid={`spellbook-sort-${id}`}
+    >
+      <TableSortLabel
+        active={active}
+        direction={active && desc ? 'desc' : 'asc'}
+        onClick={() =>
+          onQuery({ ...query, sort: id, desc: active ? !desc : id !== 'name' && id !== 'level' })
+        }
+      >
+        {label}
+      </TableSortLabel>
+    </TableCell>
+  )
+}
+
 const PAYOFF_HEADER_TITLE =
   'What a mote tier buys: N numbers, T duration, M mana, C cast time, R resist. A dim letter is a gain this spell does not get.'
 
@@ -284,16 +337,16 @@ export default function SpellbookView(): JSX.Element {
           <Table size="small" stickyHeader>
             <TableHead>
               <TableRow>
-                <TableCell>Spell</TableCell>
-                <TableCell>Classes</TableCell>
+                <SortCell id="name" label="Spell" query={query} onQuery={setQuery} />
+                <SortCell id="level" label="Classes" query={query} onQuery={setQuery} />
                 <TableCell>Kind</TableCell>
                 <TableCell title="The spell line, which is the game's own stacking group: two spells on one line never both stand. Hover a row to see what it replaces.">
                   Line
                 </TableCell>
                 <TableCell>Grants</TableCell>
-                <TableCell align="right">Dmg / heal</TableCell>
-                <TableCell align="right">Mana</TableCell>
-                <TableCell align="right">Cast</TableCell>
+                <SortCell id="figure" label="Dmg / heal" query={query} onQuery={setQuery} align="right" />
+                <SortCell id="mana" label="Mana" query={query} onQuery={setQuery} align="right" />
+                <SortCell id="cast" label="Cast" query={query} onQuery={setQuery} align="right" />
                 <TableCell title={PAYOFF_HEADER_TITLE}>Upgrade</TableCell>
               </TableRow>
             </TableHead>
