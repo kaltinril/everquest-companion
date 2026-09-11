@@ -579,3 +579,88 @@ export interface CombatSource {
   classes: ClassAbbr[]
   iconId?: number
 }
+
+// =================================================================================================
+// WHAT THE SET ADDS UP TO - the owner's ask, 2026-09-10
+// =================================================================================================
+//
+// *"do a summary for the stats on the right side panel, showing all the stats total combined next
+// to the character, sort of like the gear tab has that stats for gear, but this will be stats from
+// buffs and lets me imagine what it would look like for each individual spell updated"*.
+//
+// `character/GearStats.tsx` is the counterpart and its header is worth reading first: it sums what
+// your ITEMS say and states in three words that that is all it knows, with no lecture about buffs.
+// This is the other half of the sentence it refused to write, and it obeys the same two laws.
+//
+// ── A PERCENT AND A POINT ARE NEVER SUMMED (GearStats' law 6) ─────────────────────────────────
+//
+// `SpellStatGrant.percent` is a field, so the two never meet by accident: `Haste +34%` and
+// `STR +51` are different kinds of number and a total that mixed them would be arithmetic nobody
+// asked for. They are separated here rather than in the view, so every surface that draws these
+// totals separates them the same way.
+//
+// ── AND THE TOTALS DO NOT MOVE WITH THE UPGRADE SLIDER, WHICH IS THE ANSWER RATHER THAN A GAP ──
+//
+// The reason to build this panel beside a 0-to-10 slider is to see what upgrading buys. For a BUFF
+// SET the answer is nothing: no category scales a stat grant (`spellUpgrade.ts` states that claim
+// and what it rests on), so every number below reads the same at rank 0 and at rank X. That is the
+// owner's question 2 - *"which spells are important to upgrade"* - answered for a whole set at
+// once, and a panel that sat still while the slider moved WITHOUT saying so would read as broken.
+// The surface drawing it has to say it out loud; `buffTotals` just makes the stillness true.
+
+/** One line of the summary. */
+export interface BuffStatTotal {
+  key: SpellStatKey
+  /** The sum across the kept set, sign included. */
+  amount: number
+  /** True where every contributing grant was a percent - see the header, they never mix. */
+  percent: boolean
+  /** Which buffs contributed, in set order, so a row can say where it came from. */
+  from: string[]
+}
+
+/** The whole summary, split the way the two kinds of number have to be drawn. */
+export interface BuffTotals {
+  /** Point stats - HP, AC, STR, resists. Summed. */
+  points: BuffStatTotal[]
+  /** Percent stats - haste, run speed. Summed only within their own key, never across kinds. */
+  percents: BuffStatTotal[]
+}
+
+/**
+ * WHAT A KEPT SET GRANTS, ALL TOGETHER.
+ *
+ * Ordered by magnitude within each half so the biggest contributions read first, with the key as
+ * the tiebreak so the order is stable while the slider moves and rows never jump about.
+ *
+ * A KEY APPEARS AT MOST ONCE PER HALF and that is a property of the input rather than of this
+ * function: `buildLoadout` only keeps buffs that do not contest each other, and two buffs granting
+ * the same stat DO contest under `contestPass`. The sum is written as a sum anyway, because relying
+ * on that here would couple this fold to the optimizer's internals for no gain.
+ */
+function addGrant(into: Map<string, BuffStatTotal>, g: SpellStatGrant, from: string): void {
+  // THE PERCENT FLAG IS PART OF THE IDENTITY: a stat stated both ways is two rows, which is the
+  // honest answer rather than a merge of two kinds of number (see the header).
+  const id = `${g.key}|${g.percent ? '%' : 'n'}`
+  const row = into.get(id)
+  if (row === undefined) {
+    into.set(id, { key: g.key, amount: g.amount, percent: g.percent, from: [from] })
+    return
+  }
+  row.amount += g.amount
+  if (!row.from.includes(from)) row.from.push(from)
+}
+
+export function buffTotals(keep: readonly LoadoutCandidate[]): BuffTotals {
+  const byKey = new Map<string, BuffStatTotal>()
+  for (const c of keep) {
+    for (const g of c.grants) addGrant(byKey, g, c.name)
+  }
+  const order = (a: BuffStatTotal, b: BuffStatTotal): number =>
+    Math.abs(b.amount) - Math.abs(a.amount) || a.key.localeCompare(b.key)
+  const all = [...byKey.values()]
+  return {
+    points: all.filter((r) => !r.percent).sort(order),
+    percents: all.filter((r) => r.percent).sort(order)
+  }
+}
