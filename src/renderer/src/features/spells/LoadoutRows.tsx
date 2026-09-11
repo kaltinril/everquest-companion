@@ -5,6 +5,10 @@
 // what one line of a set looks like. Every claim they make is read off a value the shared folds
 // produced - nothing here computes, ranks or filters anything (ruling 4).
 
+// THE SPELL NAME IS WHAT YOU SCAN FOR, so it is the one thing in these rows drawn at `body1` and
+// weight 600 (owner, 2026-09-10: *"the spell names are hard to read"*). Everything beside it is a
+// figure or a chip and stays a step down, which is what makes the name findable rather than merely
+// bigger - a row where every word is the same size has no shape to scan.
 import type { JSX } from 'react'
 import { Alert, Box, Chip, Stack, Typography } from '@mui/material'
 import { spellStatText } from '@shared/spellStats'
@@ -45,7 +49,7 @@ export function KeepRow({ c, rank }: { c: LoadoutCandidate; rank: number }): JSX
     >
       <SpellIcon iconId={c.iconId} />
       <SpellTooltip name={c.name} placement="right">
-        <Typography variant="body2" sx={{ fontWeight: 500, minWidth: 170 }}>
+        <Typography variant="body1" sx={{ fontWeight: 600, minWidth: 190 }}>
           {c.name}
         </Typography>
       </SpellTooltip>
@@ -88,7 +92,7 @@ export function RejectRow({ r }: { r: LoadoutRejection }): JSX.Element {
       sx={{ py: 0.25, opacity: 0.85 }}
     >
       <SpellTooltip name={r.name} placement="right">
-        <Typography variant="body2" sx={{ minWidth: 170 }}>
+        <Typography variant="body2" sx={{ fontWeight: 500, minWidth: 190 }}>
           {r.name}
         </Typography>
       </SpellTooltip>
@@ -138,7 +142,7 @@ export function CombatRow({ p }: { p: CombatPick }): JSX.Element {
     >
       <SpellIcon iconId={p.iconId} />
       <SpellTooltip name={p.name} placement="right">
-        <Typography variant="body2" sx={{ fontWeight: 500, minWidth: 170 }}>
+        <Typography variant="body1" sx={{ fontWeight: 600, minWidth: 190 }}>
           {p.name}
         </Typography>
       </SpellTooltip>
