@@ -396,8 +396,6 @@ test('…and the sanitizer is `normalizeUpgradeState` rather than a second opini
   }
 })
 
-})
-
 test('class pins are PER CHARACTER, and the legacy single pin becomes the every-character fallback', () => {
   // Fork ask, kaltinril 2026-09-04: "i have to keep manually changing it back to SHM since i'm on
   // a twink DRU" — one shared pin made every character switch a hand edit.
@@ -492,6 +490,4 @@ test('class pins are PER CHARACTER, and the legacy single pin becomes the every-
   assert.deepEqual(sanitizeGearClassPins({ Drywrought: ['WAR', 'nonsense'] }), { Drywrought: ['WAR'] })
   assert.equal(sanitizeGearClassPins(null), null)
   assert.equal(sanitizeGearClassPins({}), null, 'an object with no pins has said nothing')
-})
-
 })
