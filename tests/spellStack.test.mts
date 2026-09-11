@@ -189,36 +189,39 @@ test('an AC DEBUFF does not contest an AC buff`s slot', () => {
 // POSITION, WHICH IS THE WHOLE REASON THE SLOT NUMBER IS CARRIED
 // =================================================================================================
 
-test('the same effect CONTESTS wherever it sits - matching is by effect, not by slot number', () => {
-  // THIS TEST USED TO ASSERT THE OPPOSITE, and the owner's own loadout is what overturned it
-  // (2026-09-10: *"are you sure all these spells are not going to overlap each-other?"*). It is
-  // worth reading the old claim, because it was a faithful port and still wrong here: EQEmu's
-  // `CheckStackConflict` walks the slots in lockstep, comparing slot i against slot i, so a STR
-  // buff in slot 1 and a STR buff in slot 4 were never compared at all.
+test('slots are POSITIONAL - the same effect in different slots does not contest', () => {
+  // THIS TEST WAS BRIEFLY REWRITTEN TO ASSERT THE OPPOSITE, and it is back, which is worth the
+  // paragraph (2026-09-10). The lockstep walk looked wrong because it missed nearly every conflict
+  // anyone would ask about; matching by EFFECT wherever it sat caught all 40 blocks in the owner's
+  // log, so the rule changed. Then he cast thirteen buffs on his pet and none of them failed, which
+  // is 78 pairs that must NOT conflict - and effect-matching calls two of them conflicts
+  // (`Strength + Infusion of Spirit`, `Dexterity + Infusion of Spirit`, whose STR and DEX rows sit
+  // in different slots). Lockstep was right all along.
   //
-  // Over his real client data that is wrong on most pairs anyone would ask about. Celerity keeps
-  // its haste in slot 1 and Spirit Quickening keeps its in slot 4; Spirit of Cheetah's movement is
-  // in slot 6 and Spirit of Bih`Li's in slot 2. The engine called every one of those pairs
-  // 'stacks', and the Loadout tab recommended keeping two haste buffs and two run speeds up at
-  // once. `contestPass` carries the full argument, including why lockstep is enough on a server
-  // and is not enough here.
+  // What was actually broken was the DIRECTIVE pass, which is what settles cross-line stacking and
+  // had never once fired - see `directiveBites` and `tests/stackGroundTruth.test.mts`.
   const a = spell({ slots: [slot(0, STR, 20)] })
   const b = spell({ slots: [slot(3, STR, 25)] })
-  assert.equal(checkStackConflict(a, b, L), 'overwrites', 'the stronger STR takes the slot')
-  assert.equal(checkStackConflict(b, a, L), 'blocked', 'and the weaker one cannot displace it')
-  // …and in the SAME slot the answer is unchanged, which is the half that did always work.
+  assert.equal(checkStackConflict(a, b, L), 'stacks')
+  // …and in the SAME slot they do.
   const c = spell({ slots: [slot(0, STR, 25)] })
   assert.equal(checkStackConflict(a, c, L), 'overwrites')
 })
 
-test('DIFFERENT effects still stack, wherever they sit - the change is about matching, not about conflicting more', () => {
-  // The counterweight to the test above: matching by effect must not turn every pair into a
-  // conflict. Two resist buffs on different axes are the owner's own control case - Resist Cold and
-  // Talisman of Jasinth (cold and disease) share no effect and stack in game and here.
-  const cold = spell({ slots: [slot(0, 47, 40)] })
-  const disease = spell({ slots: [slot(5, 49, 45)] })
-  assert.equal(checkStackConflict(cold, disease, L), 'stacks')
-  assert.equal(checkStackConflict(disease, cold, L), 'stacks')
+test('a BLOCK directive finds its effect ANYWHERE on the other spell, not at a named slot', () => {
+  // The half that was dead. Harnessing of Spirit is the shape: it grants STR itself and carries
+  // `BLOCK{STR, 67}`, which is why it refuses nine separate stat buffs in the owner's log even
+  // though their STR rows sit in slots its own does not.
+  const BLOCK_DIR = 148
+  const blocker = spell({
+    slots: [slot(0, STR, 42, { max: 67 }), slot(7, BLOCK_DIR, STR, { limit: 1, max: 1067 })]
+  })
+  // A weaker STR buff, in a DIFFERENT slot - lockstep alone would never compare them.
+  const weaker = spell({ slots: [slot(3, STR, 50)] })
+  assert.equal(checkStackConflict(blocker, weaker, L), 'blocked')
+  // …and something the directive does not name is untouched by it.
+  const unrelated = spell({ slots: [slot(3, 6 /* AGI */, 50)] })
+  assert.equal(checkStackConflict(blocker, unrelated, L), 'stacks')
 })
 
 test('a gap becomes a blank rather than shifting the effects after it', () => {
