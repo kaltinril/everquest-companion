@@ -100,8 +100,13 @@ function factsOfGear(row: GearRow): ItemFacts {
  * one that knows the effect, and a different effect's row for the same item would state the wrong
  * merge tier. Anything the donor corpus cannot place falls through to the gear index, which knows
  * the item even when it does not know why you want it, and then to the honest unknown.
+ *
+ * EXPORTED, WITH `tierFor`, so the Character tab's per-slot chips (character/slotSockets.ts)
+ * resolve a wish through the SAME two-index order this route does: one wish, one answer, on both
+ * tabs. A second resolver that read the gear index first would file a donor wish at the slots of
+ * a different row and quietly disagree with the route beside it.
  */
-function factsFor(entry: WishEntry, index: WishIndices): ItemFacts {
+export function factsFor(entry: WishEntry, index: WishIndices): ItemFacts {
   if (entry.kind === 'donor' && entry.effect !== undefined) {
     const donor = donorFor(index.donors, entry.itemKey, entry.effect)
     if (donor !== null) return factsOfDonor(donor)
@@ -117,7 +122,7 @@ function factsFor(entry: WishEntry, index: WishIndices): ItemFacts {
  * absent for a donor wish that somehow carries no socket, because a tier nobody stated is not a
  * tier to print.
  */
-function tierFor(entry: WishEntry, index: WishIndices): ExtractTier | undefined {
+export function tierFor(entry: WishEntry, index: WishIndices): ExtractTier | undefined {
   if (entry.kind !== 'donor') return undefined
   const donor = entry.effect === undefined ? null : donorFor(index.donors, entry.itemKey, entry.effect)
   if (donor !== null) return donor.tierRequired

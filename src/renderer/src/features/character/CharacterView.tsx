@@ -33,14 +33,18 @@
 // ---------------------------------------------------------------------------
 // THE LAYOUT: A SHEET ON TOP, A LEDGER UNDERNEATH, AND A MEASURED REASON THE PAGE SCROLLS
 // ---------------------------------------------------------------------------
-// MEASURED at the default window (1280x860, windowState.ts): identity + freshness line + the slot
-// grid + the gear panel come to about 656px of the ~740px content area. The sheet is not a growing
-// list — it is twenty-four cells and it is that tall on every character — so a ledger sharing the
-// remaining height with `flexGrow` alone got EIGHTY-FIVE PIXELS, which is one row and a scrollbar.
-// That is a worse surface than the one this ticket set out to build, so this tab is a naturally
-// tall page: the root asks for `minHeight: 100%` rather than `height: 100%`, and `CarryAll` takes a
-// FLOOR (`minHeight`) plus `flexGrow`, so it fills a tall window and still gets a usable box on a
-// short one. The app shell scrolls the difference.
+// MEASURED at the default window (1280x860, windowState.ts) when JOS-327 shipped: identity +
+// freshness line + the slot grid + the gear panel came to about 656px of the ~740px content area,
+// and the cells have only GROWN since — each worn ` +N` item now carries a socket line, and a cell
+// with wishes placed at its slot carries a chip row under that (owner ask 2026-08-23, SlotGrid.tsx).
+// The exact pixel count is not the law and is not re-measured; what holds is the shape. The sheet
+// is not a growing list — it is twenty-four cells, taller or shorter by what is WORN, never by
+// what is carried — so a ledger sharing the remaining height with `flexGrow` alone got EIGHTY-FIVE
+// PIXELS, which is one row and a scrollbar. That is a worse surface than the one this ticket set
+// out to build, so this tab is a naturally tall page: the root asks for `minHeight: 100%` rather
+// than `height: 100%`, and `CarryAll` takes a FLOOR (`minHeight`) plus `flexGrow`, so it fills a
+// tall window and still gets a usable box on a short one. The app shell scrolls the difference,
+// and the height-identity step in `tests/e2e/character-sheet.e2e.mts` is what pins the rest.
 //
 // THE GROWING-LIST LAW IS KEPT, AND KEPT WHERE IT MATTERS. What that law protects against is a page
 // whose height is a function of the DATA — an append-only panel that squeezes its siblings to 0px
@@ -51,7 +55,7 @@
 // separately asserts that the WINDOW itself never scrolls, which is the half of the law that has no
 // carve-outs anywhere.
 
-import { type JSX } from 'react'
+import { useMemo, type JSX } from 'react'
 import { Box, Paper, Stack, Typography } from '@mui/material'
 import type { SheetCellView } from '@shared/characterSheet'
 // The `/outputfile` registry (JOS-44) owns the command string and — since JOS-185 — the steps
@@ -62,7 +66,15 @@ import CarryAll from './CarryAll'
 import CharacterIdentity from './CharacterIdentity'
 import GearStats from './GearStats'
 import SlotGrid from './SlotGrid'
+// The per-slot exaltation join (owner ask 2026-08-23): the wish list against the two corpus
+// indices the Wish list tab resolves it with, folded once per change into "which wish belongs to
+// which slot".
+import { wishesBySlot } from './slotSockets'
 import { useCharacterSheet } from './useCharacterSheet'
+import { useGearIndex } from '../gear/gearData'
+import { indexDonors, useDonors } from '../planner/plannerData'
+import { indexGear, type WishIndices } from '../wishlist/wishFarm'
+import { useWishlist } from '../wishlist/useWishlist'
 
 /** The dump this tab is fed by, as the registry states it. */
 const INVENTORY = outputKind('inventory')
@@ -102,6 +114,24 @@ function Unplaced({ cells }: { cells: SheetCellView[] }): JSX.Element | null {
 
 export default function CharacterView(): JSX.Element {
   const { sheet, ready } = useCharacterSheet()
+  const wishes = useWishlist()
+  const gear = useGearIndex()
+  const donors = useDonors()
+  // The SAME two keyed indices WishlistView builds, so a wish resolves here exactly as it does
+  // there. Keyed on the row arrays (stable for the window's life - both hooks cache).
+  const index: WishIndices = useMemo(
+    () => ({ donors: indexDonors(donors.donors), gear: indexGear(gear.rows) }),
+    [donors.donors, gear.rows]
+  )
+  // NOTHING UNTIL EVERYTHING HAS SETTLED, the WishlistView gate: a chip drawn off a half-loaded
+  // corpus would land on the wrong cells and then jump, and a wish list that has not loaded is a
+  // default, not an answer (useWishlist.ts). A REFUSED gear index draws nothing too - that is the
+  // state the grid was already in, and a build that cannot read its corpus should not half-answer.
+  const settled = wishes.ready && gear.ready && donors.ready && !gear.refused
+  const slotWishes = useMemo(
+    () => (settled ? wishesBySlot(wishes.list.entries, index) : undefined),
+    [settled, wishes.list.entries, index]
+  )
 
   return (
     // `minHeight` rather than `height` — see the layout note in the header. It still FILLS the
@@ -138,7 +168,7 @@ export default function CharacterView(): JSX.Element {
           data-testid="character-sheet"
         >
           <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-            <SlotGrid cells={sheet.cells} />
+            <SlotGrid cells={sheet.cells} slotWishes={slotWishes} />
           </Box>
           <Stack spacing={1} sx={{ width: { xs: '100%', lg: 340 }, flexShrink: 0 }}>
             <GearStats totals={sheet.totals} />
