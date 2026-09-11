@@ -106,44 +106,57 @@
 // amount of log arithmetic could.
 //
 // ============================================================================
-// A RECORDED DISAGREEMENT: FORM OF THE BEAR IS FILED `hot`, AND THE OWNER SAYS ITS REGEN DOES NOT
-// SCALE (2026-09-10) - UNRESOLVED, AND A SCREENSHOT SETTLES IT
+// FORM OF THE BEAR: THE OWNER'S CLAIM STANDS, AND TWO OF ITS THREE LEGS ARE NOW MEASURED
 // ============================================================================
-// The owner's report, verbatim: *"some spells upgraded don't give a benefit beyond reduced mana cost
-// and cast time like Bear Form. It doesn't increase the regen rate or amount, nor does it increase
-// the amount of wisdom when upgraded."*
+// This block used to record an open disagreement and say a tooltip pair would settle it. Neither
+// half of that survived 2026-09-10, so both are rewritten here rather than amended.
 //
-// HALF OF THAT IS WHAT THIS FILE ALREADY SAYS, and it is the half nothing disputes: NO category
-// scales a stat grant, so the WIS 5 is WIS 5 at every tier. `spellStats.ts` reads it, nothing here
-// touches it, and `tests/spellbook.test.mts` pins it unchanged from tier 0 to tier 8.
+// WHAT IS MEASURED, from the owner's own character Stats window, buff OFF then Form of the Bear IV
+// ON - one rank against no rank, which is the comparison the screenshots actually make:
 //
-// THE OTHER HALF IS A CONFLICT AND IT IS NOT PAPERED OVER. Form of the Bear's regen is
-// `Increase Hit points by 1 per tick` on a spell with a duration - which is SPA 100, and both the
-// community model's classifier and `classifyUpgrade` below therefore file it as `hot`, not `buff`.
-// The `hot` rates claim +3% a tier on the tick. The owner says the tick does not move.
+//                        buff off      Bear IV
+//     Combat HP Regen      93            94
+//     Wisdom              163           168
+//     Max mana           2208          2287     (the +5 WIS, downstream)
 //
-// IT IS STRUCTURALLY IDENTICAL TO A REAL HOT, which is why no classifier can separate them:
+// So the spell's whole contribution is +1 regen and +5 WIS, and it is REAL - the old block's worry
+// that the owner might be describing a buff that grants nothing is answered and was never the
+// claim anyway.
 //
-//     Form of the Bear   Beneficial  2h 24m  ["Increase Hit points by 1 per tick", "Increase Wisdom by 5"]
-//     Regeneration       Beneficial  16 Min  ["Increase Hitpoints by 5 per tick"]
+// AND THE ARITHMETIC CLOSES IT WITHOUT A SECOND RANK, which the owner's own argument points
+// straight at: *"at a +4 (IV) it should have done more than that if it was going to have any
+// impact at all on stats."* The catalog's base figures for this spell are `Increase Hit points by
+// 1 per tick` and `Increase Wisdom by 5`. Rank IV reads 1 and 5. So base and rank IV agree.
 //
-// Nothing in the catalog distinguishes "a form buff that happens to regen" from "a regen spell".
+// A 1 CANNOT MOVE, AND THAT IS A FACT ABOUT THE NUMBER RATHER THAN ABOUT THE RATE. Every magnitude
+// in this model is `floor(base * (1 + rate * tier))`, so the `hot` rate's own prediction for a base
+// of 1 is `floor(1 * 1.12) = 1` at rank IV and `floor(1 * 1.30) = 1` at rank X, the top of the
+// ladder. The measurement and the disputed rate agree for this spell at every rank there is. The
+// owner's conclusion - upgrading Bear Form buys nothing but mana and duration - is therefore true
+// under BOTH models, and no second Stats-window reading could separate them.
 //
-// WHY THE MODEL IS LEFT ALONE FOR NOW. Reclassifying Form of the Bear to `buff` would need a rule,
-// and the only rules available are inventions - "a spell with a stat grant beside its regen is a
-// buff", "a regen under 2 a tick is a buff" - each of which would silently re-file a set of spells
-// nobody has checked. That is the taxonomy mistake `spellEffectClass.ts`'s header warns about, and
-// the awaiting-sample law says the same thing: an unobserved shape gets no invented rule.
+// THAT GENERALISES, and `magnitudeCanMove` below is the general form: a magnitude the top of the
+// ladder leaves unchanged is not a payoff, whatever the category claims. It is arithmetic over the
+// model's own rate rather than a taxonomy guess, which is what makes it admissible where a rule
+// like "a regen under 2 a tick is a buff" is not.
 //
-// SO THE CONFLICT IS DISPLAYED RATHER THAN DECIDED. The `hot` magnitude rate is `'reported'` and
-// the community source itself calls its HoT figure a community table with a single datapoint behind
-// the instant-heal rate it is derived from. A reader looking at Form of the Bear sees a `reported`
-// mark on the one number in dispute, and the surfaces say what that word means.
+// AND THE TOOLTIP IS NOT AN INSTRUMENT, which is the part that invalidates the obvious check the
+// old block asked for. The owner: *"the tooltips in game never update for damage but the damage of
+// spells like this one DOES go up."* His Odium VII tooltip prints `between 317 and 325 damage every
+// six seconds` - base figures - while the mana, cast and re-use lines beside them show live green
+// values. A tooltip pair therefore proves nothing about a magnitude in either direction. Read the
+// Stats window, or a log line.
 //
-// WHAT SETTLES IT, and it is one image: Form of the Bear's in-game tooltip at base and at any tier
-// above it, side by side. If the tick is unchanged, `hot` is wrong for this spell and probably for
-// its whole family, and the fix is a measured rule rather than a guessed one. If the tick moved,
-// the model is right and the owner's recollection was about the WIS.
+// WHY THIS IS AN EXCEPTION AND NOT A NEW RULE. The taxonomy argument is unchanged: Form of the Bear
+// is `Increase Hit points by 1 per tick` on a spell with a duration, which is SPA 100, and nothing
+// in the catalog distinguishes it from Regeneration. The available rules are still inventions ("a
+// regen under 2 a tick is a buff") and would silently re-file spells nobody has checked - the
+// taxonomy mistake `spellEffectClass.ts` warns about. So it is recorded on the ONE spell it was
+// reported for (`MEASURED_STATIC_MAGNITUDE`), and the `hot` rate is left alone elsewhere.
+//
+// WHAT IS STILL OPEN: whether Chloroplast and Harnessing of Spirit - real HoTs, and the other rows
+// the Upgrades tab ranks on the `hot` rate - behave like Form of the Bear or like the community
+// table. If they match Bear, the rate is wrong for the category rather than for one spell.
 
 // ============================================================================
 // AND THE ONE CLAIM THE WHOLE FEATURE HANGS ON
@@ -481,6 +494,14 @@ export function classifyUpgrade(facts: UpgradeFacts): UpgradeCategory {
  */
 export interface SpellTierBase {
   category: UpgradeCategory
+  /**
+   * The spell's name, when the caller has it.
+   *
+   * Read ONLY by `MEASURED_STATIC_MAGNITUDE`, which is the one place this file is allowed to know
+   * about a particular spell rather than about a category. Absent is a supported state and means
+   * "no exception can apply", which is the category's own answer.
+   */
+  name?: string
   /** Mana cost. Absent, or zero for a spell that genuinely costs none - both mean "no mana row". */
   mana?: number
   /** Cast time in SECONDS. */
@@ -620,10 +641,13 @@ function benefitRowsAt(
   if (base.resistAdjust !== undefined && categoryIsOffensive(base.category)) {
     row.resistAdjust = base.resistAdjust - UNIVERSAL_RATES.resistPerTier * tier
   }
+  // A MEASURED EXCEPTION READS AS NO RATE AT ALL, so the ladder prints the base figure at every
+  // rung rather than a climb the game was measured not to give.
+  const rate = magnitudeIsMeasuredStatic(base) ? { damage: null, heal: null } : rates
   const damage = stated(base.damage)
-  if (damage !== undefined) row.damage = magnitudeAt(damage, rates.damage, tier)
+  if (damage !== undefined) row.damage = magnitudeAt(damage, rate.damage, tier)
   const heal = stated(base.heal)
-  if (heal !== undefined) row.heal = magnitudeAt(heal, rates.heal, tier)
+  if (heal !== undefined) row.heal = magnitudeAt(heal, rate.heal, tier)
   return row
 }
 
@@ -657,6 +681,53 @@ export function spellTierLadder(base: SpellTierBase): SpellTierReading[] {
 // =================================================================================================
 // THE PAYOFF - the owner's question 2, answered as a property of the category
 // =================================================================================================
+
+/**
+ * SPELLS MEASURED TO GAIN NO MAGNITUDE FROM A TIER, whatever their category's rate claims.
+ *
+ * An EXCEPTION LIST rather than a rule, and it is deliberately hard to add to: an entry needs a
+ * reading of the APPLIED stat - the Stats window, or a log line - and never a tooltip, which prints
+ * base figures at every rank (see the Form of the Bear block above for the measurement that shows
+ * it). An entry whose two-rank half rests on the owner's report rather than on a second reading
+ * says so at the entry, as the one below does.
+ *
+ * Keyed by the name as the catalog spells it, folded the way every other spell join in this app
+ * folds one, so a rank suffix and a stray case never miss.
+ */
+const MEASURED_STATIC_MAGNITUDE: ReadonlySet<string> = new Set([
+  // Owner-reported at two ranks, and measured at one: Stats window reads 94 regen / 168 WIS with
+  // Bear IV up against 93 / 163 with it down, and he reports the same pair at rank V. See above.
+  'form of the bear'
+])
+
+/** Has this spell been MEASURED not to gain magnitude, overriding its category's rate? */
+function magnitudeIsMeasuredStatic(base: SpellTierBase): boolean {
+  const name = base.name
+  return name !== undefined && MEASURED_STATIC_MAGNITUDE.has(name.trim().toLowerCase())
+}
+
+/**
+ * COULD THE TOP OF THE LADDER MOVE THIS NUMBER AT ALL?
+ *
+ * Every magnitude here is `floor(base * (1 + rate * tier))`, so a small enough base is unmovable:
+ * a 1 stays a 1 at rank X under the `hot` rate, and so does a 2 (`floor(2.6)`). Answering "the
+ * numbers get bigger" for those is a promise the model's own arithmetic does not keep, and the
+ * Upgrades tab would rank a spell for motes that buy nothing.
+ *
+ * Asked at `SPELL_MAX_RANK` rather than at the next rung on purpose: the question a payoff mark
+ * answers is "is this worth upgrading AT ALL", and a base that moves only at rank VII is still a
+ * spell whose numbers get bigger. See the Form of the Bear block above for the case that named it.
+ */
+function magnitudeCanMove(value: number | undefined, rate: number | null): boolean {
+  if (rate === null || value === undefined || value <= 0) return false
+  return magnitudeAt(value, rate, SPELL_MAX_RANK) > value
+}
+
+/** `magnitudeCanMove` for a DURATION, asked through the rounding the tick ladder actually uses. */
+function durationCanMove(ticks: number | undefined, rate: number | null): boolean {
+  if (rate === null || ticks === undefined || ticks <= 0) return false
+  return Math.round(scaled(ticks, rate * 100, SPELL_MAX_RANK, true)) > ticks
+}
 
 /**
  * WHAT UPGRADING THIS SPELL ACTUALLY MOVES.
@@ -696,11 +767,16 @@ export function upgradePayoff(base: SpellTierBase): UpgradePayoff {
   // BOTH HALVES MATTER, and this is the whole subtlety of the function: a category with a mana rate
   // buys nothing for a spell that costs no mana, and a spell stating 300 damage gains nothing if its
   // category's magnitudes do not scale. The payoff is what YOU get, not what the table offers.
-  const live = (rate: number | null, figure: number | undefined): boolean =>
-    rate !== null && stated(figure) !== undefined
+  const staticMagnitude = magnitudeIsMeasuredStatic(base)
   const flags = {
-    magnitude: live(rates.damage, base.damage) || live(rates.heal, base.heal),
-    duration: live(rates.duration, base.durationTicks),
+    magnitude:
+      !staticMagnitude &&
+      (magnitudeCanMove(stated(base.damage), rates.damage) ||
+        magnitudeCanMove(stated(base.heal), rates.heal)),
+    // DURATION IS ASKED THROUGH ITS OWN SCALER, not the magnitude one: the ladder ROUNDS ticks and
+    // FLOORS magnitudes, and a flag computed with the wrong one of those would tell a reader his
+    // duration moves on a spell whose printed tick count never changes.
+    duration: durationCanMove(stated(base.durationTicks), rates.duration),
     mana: stated(base.mana) !== undefined,
     cast: stated(base.castSeconds) !== undefined,
     resist: base.resistAdjust !== undefined && categoryIsOffensive(base.category)

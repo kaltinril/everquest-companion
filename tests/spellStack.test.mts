@@ -32,7 +32,15 @@ const COMPLETE_HEAL = 101
 const STR = 4
 const BLOCK_DIRECTIVE = 148
 
-/** A slot as the parser emits one. */
+/**
+ * A slot as the parser emits one, from the ARRAY INDEX the test wants it to land at.
+ *
+ * The `+ 1` is the file's own numbering and not an off-by-one: `spells_us.txt` numbers its slots
+ * from 1, measured over the owner's install 2026-09-10 (slot 0 occurs on none of its 73,975
+ * slot-bearing rows, slot 1 on 26,347), and `stackView` subtracts it back off. Writing the
+ * translation HERE rather than in every case keeps each test saying what it means - "an effect in
+ * the first slot" - instead of restating the file format once per fixture.
+ */
 function slot(
   slotIndex: number,
   effect: number,
@@ -40,7 +48,7 @@ function slot(
   extra: { limit?: number; calc?: number; max?: number } = {}
 ): NonNullable<StackSource['slots']>[number] {
   return {
-    slot: slotIndex,
+    slot: slotIndex + 1,
     effect,
     base,
     limit: extra.limit ?? 0,
@@ -202,8 +210,10 @@ test('a gap becomes a blank rather than shifting the effects after it', () => {
   assert.equal(view.effects[2][0], 254)
 })
 
-test('a slot number outside the twelve is dropped, never clamped', () => {
-  // A clamp would silently overwrite a real effect with an out-of-range one.
+test('a slot number outside the array is dropped, never clamped', () => {
+  // A clamp would silently overwrite a real effect with an out-of-range one. `EFFECT_COUNT` is 68
+  // rather than EQEmu's 12 because the owner's client file uses slots up to 67 - `spellStack.ts`
+  // carries that measurement - so the case below is 99, which is out of range under either.
   const view = stackView({ slots: [slot(0, HP, 5), slot(99, STR, 10), slot(-1, AC, 3)] })
   assert.equal(view.effects[0][0], HP)
   assert.equal(view.effects.filter((e) => e[0] === STR).length, 0)

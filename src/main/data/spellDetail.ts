@@ -352,6 +352,8 @@ function tierBaseFor(e: SpellEntry): SpellTierBase {
   const effects = e.effects ?? []
   const has = (re: RegExp): boolean => effects.some((x) => re.test(x))
   return {
+    // See `shared/spellbook.ts tierBase`: carried for the measured-exception list alone.
+    name: e.name,
     category: classifyUpgrade({
       beneficial: spellNature(e.spellType) === 'beneficial',
       hasDuration: (e.durationMs ?? 0) > 0,

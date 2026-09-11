@@ -282,7 +282,11 @@ export interface SpellDurationSpec {
  * position - which for a positional algorithm is a wrong answer rather than a missing one.
  */
 export interface SpellEffectSlot {
-  /** The file's own slot number, 0-based. */
+  /**
+   * The file's own slot number, which is ONE-BASED (measured 2026-09-10: slot 0 occurs on none of
+   * the owner's 73,975 slot-bearing rows). `stackView` is the one place that turns it into an array
+   * index, and its header records what reading it as 0-based used to drop.
+   */
   slot: number
   /** The SPA id (`effect_id`): 0 hitpoints, 3 movement, 11 haste, 100 HoT, 148/149 directives. */
   effect: number
@@ -295,6 +299,27 @@ export interface SpellEffectSlot {
 }
 
 export interface SpellResistInfo {
+  /**
+   * THE CLIENT'S OWN SPELL ID, field 0.
+   *
+   * Identity, and it is here because its ABSENCE was a bug rather than a gap: the stacking engine
+   * keys "is this the same spell" on an id, the table carried none, and every view it built
+   * therefore claimed to be spell zero (see `shared/spellStack.ts sameIdentity` for what that cost
+   * the Loadout tab). Unconditional, unlike every optional below it - a row without an identity is
+   * not a row this table should be answering about.
+   */
+  id: number
+  /**
+   * THE SPELL GEM ICON, field 75 - an index into the client's own `uifiles/default/Spells*.tga`
+   * sheets, which are 6x6 grids of 40px tiles, 36 to a sheet (`eqimg://spell/<id>` serves them).
+   *
+   * Present only when the row states a positive one. Measured rather than read off a struct listing
+   * (owner's install, 2026-09-10) the way fields 10, 14 and 143 were: Togor's Insects reads 17,
+   * which is the BOOT at sheet 1 index 17 and is the icon the game draws on its gem; Odium reads
+   * 165, the skull on sheet 5. Field 76 is the neighbouring number that looks like this one and is
+   * not it - it renders a plausible tile for every spell and the WRONG one for all four checked.
+   */
+  icon?: number
   axis: ResistAxis | null
   resistAdj: number
   castMs: number

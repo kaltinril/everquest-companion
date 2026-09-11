@@ -14,6 +14,7 @@
 // one handler, one cache:
 //
 //     <img src="eqimg://item/1234">                    an eqlwiki item icon, by file id
+//     <img src="eqimg://spell/165">                    a SPELL GEM, cut from the local install
 //     <img src="eqimg://url/https%3A%2F%2Fwiki…png">   any allowlisted absolute image URL
 //        └► protocol.handle('eqimg')     main process, ONE handler for every window
 //             ├► <userData>/image-cache/<name> exists ⇒ serve the bytes, no network
@@ -71,6 +72,7 @@
 // passes `protocol` and the userData dir), so the tests need no Electron and never skip —
 // the storeMigrations.ts / overlayLayout.ts precedent.
 
+import { spellIconPng } from './spellIcons'
 import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync } from 'node:fs'
 import { readFile, rename, unlink, writeFile } from 'node:fs/promises'
@@ -180,6 +182,20 @@ export type EqImgRequest =
       readonly id: string
     }
   | {
+      /**
+       * A SPELL GEM ICON, cut out of the player's own EverQuest install (`spellIcons.ts`).
+       *
+       * It shares this scheme because `<img src>` is the same idiom and the renderer should not
+       * have to learn a second one - and it shares NOTHING else. No wiki hosts this art, so there
+       * is no upstream to fetch, nothing to cache on disk and nothing to ship; the handler answers
+       * it before any of that machinery and never reaches the network. A machine with no install
+       * gets a 404 and the caller draws a blank box.
+       */
+      readonly kind: 'spell'
+      /** Digits only, length-capped. `spellIconPng` range-checks it against the real sheets. */
+      readonly id: string
+    }
+  | {
       readonly kind: 'url'
       /** The NORMALIZED, allowlisted upstream URL — safe to fetch. */
       readonly url: string
@@ -207,6 +223,18 @@ export type EqImgRequest =
  * re-encode. Query/hash on the OUTER url are ignored; everything else must be exactly two
  * segments.
  */
+/**
+ * The two DIGIT-KEYED routes, which differ only in the word.
+ *
+ * One function for both because the validation is the claim - digits only, length-capped - and two
+ * copies of a claim is one chance for them to drift. It is also what keeps `parseEqImgUrl` inside
+ * this tree's complexity ceiling now that there are three routes rather than two.
+ */
+function idRoute(kind: 'item' | 'spell', payload: string): EqImgRequest | null {
+  if (!/^\d+$/.test(payload) || payload.length > MAX_ID_LEN) return null
+  return { kind, id: payload }
+}
+
 export function parseEqImgUrl(raw: string): EqImgRequest | null {
   if (typeof raw !== 'string') return null
   const prefix = `${EQIMG_SCHEME}://`
@@ -219,10 +247,10 @@ export function parseEqImgUrl(raw: string): EqImgRequest | null {
   if (segments.length !== 2) return null
   const [kind, payload] = segments
   switch (kind.toLowerCase()) {
-    case 'item': {
-      if (!/^\d+$/.test(payload) || payload.length > MAX_ID_LEN) return null
-      return { kind: 'item', id: payload }
-    }
+    case 'item':
+      return idRoute('item', payload)
+    case 'spell':
+      return idRoute('spell', payload)
     case 'url': {
       if (payload.length > MAX_ENCODED_URL_LEN) return null
       let decoded: string
@@ -243,6 +271,9 @@ export function parseEqImgUrl(raw: string): EqImgRequest | null {
 
 /** The upstream URL a validated request resolves to. The ONLY thing that ever gets fetched. */
 export function upstreamUrlFor(req: EqImgRequest): string {
+  // `spell` never reaches here - the handler answers it before any of this - and the assertion is
+  // the cheapest way to keep that true if somebody adds a step above.
+  if (req.kind === 'spell') throw new Error('spell icons are served locally, never fetched')
   return req.kind === 'item' ? wikiItemIconUrl(req.id) : req.url
 }
 
@@ -257,6 +288,7 @@ export function imageCacheDir(userData: string): string {
  * child of the cache dir no matter what the renderer sent. Also the in-flight dedupe key.
  */
 export function cacheStem(req: EqImgRequest): string {
+  if (req.kind === 'spell') return `spell-${req.id}`
   return req.kind === 'item' ? `item-${req.id}` : `url-${req.hash}`
 }
 
@@ -298,12 +330,14 @@ export function extForMime(mime: string): string {
  * pile; four stats on a local directory is not a cost worth that.
  */
 export function cacheFileName(req: EqImgRequest, mime: string): string {
+  if (req.kind === 'spell') return `${cacheStem(req)}.png`
   return req.kind === 'item' ? `${cacheStem(req)}.png` : `${cacheStem(req)}.${extForMime(mime)}`
 }
 
 /** Every name a cached entry for `req` could be sitting under, in probe order. */
 export function cacheCandidateNames(req: EqImgRequest): string[] {
   const stem = cacheStem(req)
+  if (req.kind === 'spell') return []
   return req.kind === 'item' ? [`${stem}.png`] : CACHE_EXTENSIONS.map((e) => `${stem}.${e}`)
 }
 
@@ -395,6 +429,15 @@ export interface ImageCacheOptions {
    * runtime cache exactly as it did before JOS-198.
    */
   readonly bundledDir?: string | null
+  /**
+   * The EverQuest install root, for `eqimg://spell/<id>` (`spellIcons.ts`).
+   *
+   * A THUNK, and injected rather than imported: `effectiveEqRoot()` reaches Electron's `app`, this
+   * module is node-tested without it, and the root can change at runtime when the player points the
+   * app at a different install. Absent or `''` means no spell icons, which is the same answer a
+   * machine with no EverQuest gives.
+   */
+  readonly eqRoot?: () => string
   /** Override for tests; defaults to global fetch. */
   readonly fetchImpl?: typeof fetch
   /** Override for tests; defaults to console.log. */
@@ -648,6 +691,24 @@ async function healUnreadableEntry(
  * and before any window loads a page that references an icon (creating the window in the
  * same tick is fine — the handler is registered synchronously here).
  */
+/**
+ * SPELL GEMS ARE LOCAL AND ARE ANSWERED BEFORE EVERYTHING ELSE.
+ *
+ * They come out of the player's own client install, so none of the handler's four steps apply:
+ * there is no shipped copy (this is Daybreak's art and the app never redistributes it), no disk
+ * cache worth keeping (the sheets are already on disk, and `spellIcons.ts` memoises the decode),
+ * and above all no upstream to fetch - a new wiki fetch is an owner decision on this fork and this
+ * feature does not need one. No install means a 404 and a blank box, the same shape the absence of
+ * `spells_us.txt` already takes everywhere else.
+ *
+ * Module level rather than inside the handler's closure only because `installImageCacheProtocol`
+ * is at this tree's 100-line ceiling; it reads the root through the thunk either way.
+ */
+function serveSpellGem(eqRoot: (() => string) | undefined, id: string): Response {
+  const png = spellIconPng(eqRoot?.() ?? '', Number(id))
+  return png ? imageResponse(png, 'image/png') : NOT_FOUND()
+}
+
 export function installImageCacheProtocol(protocol: ProtocolLike, opts: ImageCacheOptions): void {
   const dir = imageCacheDir(opts.userData)
   const bundledDir = opts.bundledDir ?? null
@@ -769,6 +830,7 @@ export function installImageCacheProtocol(protocol: ProtocolLike, opts: ImageCac
   protocol.handle(EQIMG_SCHEME, async (request) => {
     const req = parseEqImgUrl(request.url)
     if (!req) return NOT_FOUND()
+    if (req.kind === 'spell') return serveSpellGem(opts.eqRoot, req.id)
 
     // 1. SHIPPED bytes (JOS-198) — the path a normal install takes for every image it will ever
     //    show. No network, ever, and no dependence on what a previous version happened to have

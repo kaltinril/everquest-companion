@@ -78,7 +78,10 @@ test('parseEqImgUrl rejects every traversal / escape shape', () => {
     'eqimg://item/', // no id
     'eqimg://item', // no id at all
     'eqimg://', // nothing
-    'eqimg://spell/7', // unknown kind
+    'eqimg://spellz/7', // unknown kind
+    'eqimg://spell/7a', // the spell route is digits-only too
+    'eqimg://spell/-7',
+    'eqimg://spell/', // no id
     'eqimg://item/7/extra', // too many segments
     `eqimg://item/${'9'.repeat(64)}`, // absurd id, length-capped
     'https://eqlwiki.com/index.php?title=Special:Redirect/file/Item_7.png', // wrong scheme
@@ -89,6 +92,16 @@ test('parseEqImgUrl rejects every traversal / escape shape', () => {
   for (const url of hostile) {
     assert.equal(parseEqImgUrl(url), null, `should reject: ${url}`)
   }
+})
+
+test('the spell route parses, and is digits-only like the item one', () => {
+  // `eqimg://spell/<id>` (2026-09-10) serves a gem cut out of the player's own EverQuest install -
+  // `src/main/spellIcons.ts` carries the arrangement, including why it never touches the network.
+  // It is named here because it used to be in the hostile list above as an "unknown kind".
+  assert.deepEqual(parseEqImgUrl('eqimg://spell/165'), { kind: 'spell', id: '165' })
+  assert.deepEqual(parseEqImgUrl('eqimg://spell/0'), { kind: 'spell', id: '0' })
+  // Derived, never taken: nothing but digits ever reaches a file name. The rejections are in the
+  // hostile list above beside the item route's, which is the one place that claim is tested.
 })
 
 test('parseEqImgUrl is total over junk input', () => {

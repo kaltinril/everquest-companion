@@ -35,6 +35,14 @@ export type UnlockKind = 'spell' | 'skill' | 'disc' | 'innate'
 /** One spell, with every (class, level) statement the DB makes about it and its card fields. */
 export interface UnlockSpell {
   name: string
+  /**
+   * THE SPELL GEM ICON the client draws for this spell (`SpellResistInfo.icon`, field 75).
+   *
+   * Present only on a machine whose `spells_us.txt` was read and whose row states one - the same
+   * "the client answered" condition every other client-sourced field here carries. `eqimg://spell/
+   * <iconId>` turns it into pixels, out of that same install and never off a network.
+   */
+  iconId?: number
   /** the (class, level) pairs `shared/spellLevels.ts` read out of the wiki's bullet list */
   at: { cls: ClassAbbr; level: number }[]
   /** cast time in ms, when the page states one */

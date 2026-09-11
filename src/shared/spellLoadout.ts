@@ -47,6 +47,8 @@
 
 import type { UnlockSpell } from './levelUnlocks'
 import type { ClassAbbr } from './classCombo'
+import type { BestSpellTab } from './bestSpells'
+import type { SpellMetrics } from './spellMetrics'
 import { grantsShareASlot, type SpellStatGrant, type SpellStatKey } from './spellStats'
 import {
   conflictComponents,
@@ -128,6 +130,8 @@ export function scoreGrants(grants: readonly SpellStatGrant[], weights: StatWeig
 /** One buff the trio could keep up, and what it is worth. */
 export interface LoadoutCandidate {
   name: string
+  /** The client's gem icon, when this machine's install answered. See `UnlockSpell.iconId`. */
+  iconId?: number
   /** The classes in the trio that can cast it, with the level each gets it. */
   at: readonly { cls: ClassAbbr; level: number }[]
   grants: readonly SpellStatGrant[]
@@ -150,7 +154,10 @@ export interface LoadoutRejection {
    * ATK. A recommender that said only "these conflict" would have hidden the interesting part.
    */
   loses: readonly SpellStatGrant[]
-  /** How the verdict was reached - see `LoadoutSet.certainty`. */
+  /**
+   * How THIS pair's verdict was reached - `exact` when the client file answered for both spells,
+   * `flagged` when it could not answer for one of them. Never `mixed`: a pair is two spells.
+   */
   certainty: LoadoutCertainty
 }
 
@@ -158,13 +165,29 @@ export interface LoadoutRejection {
  * HOW SURE THE CONFLICT VERDICTS ARE (§3.3's three tiers).
  *
  *   `exact`   - the player's `spells_us.txt` answered, and the verdicts are the game's own rules.
+ *   `mixed`   - it answered for most of them. See below: this tier exists because the old
+ *               all-or-nothing reading threw away 75 good answers over 1 missing one.
  *   `flagged` - no client file, so two spells were called conflicting because they state the SAME
  *               STAT in the committed catalog. That is a true statement about the wiki's own words
  *               and it is NOT a stacking verdict: it cannot say which wins, cannot see a blocking
  *               directive, does not know a bard song stacks alongside a spell, and will flag pairs
  *               the game runs together happily. The copy that draws it must say so.
+ *
+ * ============================================================================
+ * CERTAINTY IS A PROPERTY OF A PAIR, NOT OF THE WHOLE SET
+ * ============================================================================
+ * This was `candidates.every(c => c.view !== undefined)` - one unanswerable name and the entire
+ * tab dropped to its weakest tier and SAID SO on every row. The owner's own trio hit it: 75 of his
+ * 76 candidates resolved against his client file and the 76th, `Manicial Strength`, is a misspelling
+ * in the scraped catalog that no client row can ever match. One typo, and every verdict on screen
+ * was labelled a guess.
+ *
+ * `conflicts()` was already per-pair and always had been, so the labels were the only thing lying.
+ * A REJECTION now carries the certainty of ITS OWN pair - both spells answered, or they did not -
+ * and the set carries the tally, so the header can say "74 of 76 read from your spell file" rather
+ * than picking one word for a mixed answer.
  */
-export type LoadoutCertainty = 'exact' | 'flagged'
+export type LoadoutCertainty = 'exact' | 'mixed' | 'flagged'
 
 /** The recommendation. */
 export interface LoadoutSet {
@@ -173,6 +196,8 @@ export interface LoadoutSet {
   /** The sum of what `keep` is worth. */
   score: number
   certainty: LoadoutCertainty
+  /** How many candidates the client file answered for, out of how many there were. */
+  read: { exact: number; total: number }
   /**
    * FALSE when any component was too big to search exhaustively and took a greedy answer.
    *
@@ -208,7 +233,12 @@ export function loadoutCandidates(
     // spell and the Spellbook still lists it; this tab is about a SET worth keeping up.
     if (score <= 0) continue
     const view = views?.get(s.name)
-    out.push(view === undefined ? { name: s.name, at, grants, score } : { name: s.name, at, grants, score, view })
+    const icon = s.iconId === undefined ? {} : { iconId: s.iconId }
+    out.push(
+      view === undefined
+        ? { name: s.name, ...icon, at, grants, score }
+        : { name: s.name, ...icon, at, grants, score, view }
+    )
   }
   out.sort((a, b) => b.score - a.score || a.name.localeCompare(b.name))
   return out
@@ -289,8 +319,14 @@ export function buildLoadout(
   candidates: readonly LoadoutCandidate[],
   levels: StackLevels
 ): LoadoutSet {
-  const exact = candidates.length > 0 && candidates.every((c) => c.view !== undefined)
-  const certainty: LoadoutCertainty = exact ? 'exact' : 'flagged'
+  const withView = candidates.filter((c) => c.view !== undefined).length
+  const read = { exact: withView, total: candidates.length }
+  const certainty: LoadoutCertainty =
+    candidates.length > 0 && withView === candidates.length
+      ? 'exact'
+      : withView === 0
+        ? 'flagged'
+        : 'mixed'
   const keep: LoadoutCandidate[] = []
   let provenOptimal = true
 
@@ -319,7 +355,9 @@ export function buildLoadout(
       score: c.score,
       beatenBy: winner.name,
       loses: c.grants.filter((g) => !winner.grants.some((w) => w.key === g.key)),
-      certainty
+      // THIS pair's tier, not the set's: `conflicts()` used the engine here exactly when both of
+      // these two carried a client view, so that is what the row is entitled to claim.
+      certainty: winner.view !== undefined && c.view !== undefined ? 'exact' : 'flagged'
     })
   }
   rejected.sort((a, b) => b.score - a.score || a.name.localeCompare(b.name))
@@ -328,6 +366,7 @@ export function buildLoadout(
     rejected,
     score: keep.reduce((sum, c) => sum + c.score, 0),
     certainty,
+    read,
     provenOptimal,
     gems: keep.length
   }
@@ -386,4 +425,114 @@ function pushNeighbours(
     walk.seen[j] = true
     walk.stack.push(j)
   }
+}
+
+// =================================================================================================
+// THE COMBAT SET - the fork user's goal 5, which the buff half above never answered
+// =================================================================================================
+//
+// The ask, verbatim: *"recommend a DMG/combat set"*, beside the buff set this file already built.
+// The owner's report that it was missing is blunt (2026-09-10): *"loadout tab is ugly, and it's
+// missing the damage set it only shows buff?"*
+//
+// ── IT IS A DIFFERENT QUESTION AND IT GETS A DIFFERENT ENGINE ─────────────────────────────────
+//
+// The buff set is a CONFLICT problem: buffs occupy slots on your character, they contest each
+// other, and the interesting work is deciding which of two that cannot both stand is worth more.
+// Damage spells contest nothing - you cast a nuke and it is gone - so none of the machinery above
+// applies to them and forcing it to would be a lie dressed as rigour.
+//
+// What a damage set is instead is a RANKING problem, and this app already has the ranker: the
+// Leveling tab's `bestSpellsAt`, which folds the same corpus into dd / dot / aoe tables ordered by
+// the figure that matters for each. So this function does not rank anything. It takes that answer
+// and spends eight gems on it, which is the only part `bestSpellsAt` cannot do, because gems are a
+// budget and a ranking is not.
+//
+// ── WHY IT BUYS BREADTH BEFORE DEPTH, STATED SO IT CAN BE ARGUED WITH ─────────────────────────
+//
+// The third-best nuke is a worse answer than the best DoT, because the three tables solve different
+// fights: a nuke is burst on a single target, a DoT is throughput on something that lives, and an
+// AE is a pack. A set of eight nukes can only fight one of those. So the budget is spent in rounds
+// - the best of each table, then the second of each, and so on - which fills the first three gems
+// with one of each and only then doubles up.
+//
+// It is a POLICY and not a measurement, and the surface that draws it says so rather than
+// presenting eight spells as a computed optimum.
+
+/** One spell in the combat set, with the table it was the best of. */
+export interface CombatPick {
+  name: string
+  /** `dd`, `dot` or `aoe` - which question this spell is the answer to. */
+  tab: BestSpellTab
+  /** Where it placed in its own table. 1 is that table's best. */
+  place: number
+  /** The client's gem icon, when this machine's install answered. */
+  iconId?: number
+  /** The figure its own table ranks on, already worded by the caller's formatter. */
+  metrics: SpellMetrics
+  mana: number | null
+  /** The lowest level a class in the trio gains it at. */
+  gainedAt: number
+  classes: readonly ClassAbbr[]
+}
+
+/** The combat half of a loadout: what to keep memmed, and what it could not fit. */
+export interface CombatSet {
+  picks: CombatPick[]
+  /** Which tables had anything at all. An empty one is an honest answer about a class trio. */
+  tabsUsed: BestSpellTab[]
+  /** How many gems the set was given to spend. */
+  gems: number
+}
+
+/** The three damage tables, in the order a round visits them. */
+const COMBAT_TABS: readonly BestSpellTab[] = ['dd', 'dot', 'aoe']
+
+/**
+ * SPEND `gems` ON THE DAMAGE TABLES, breadth first. See the block above for the policy.
+ *
+ * Takes the already-ranked tables rather than the corpus, so this file never re-ranks a spell the
+ * Leveling tab has already ordered - two surfaces disagreeing about which nuke is better is exactly
+ * the failure `spellbookRow`'s header warns about.
+ *
+ * A SPELL APPEARS ONCE. A spell that is in two tables (a rain is a DD and an AOE) is taken for the
+ * first one that reaches it and skipped by the other, so eight gems buy eight spells.
+ */
+export function combatSet(
+  tables: Readonly<Record<BestSpellTab, { shown: readonly CombatSource[] }>>,
+  gems: number
+): CombatSet {
+  const picks: CombatPick[] = []
+  const taken = new Set<string>()
+  const tabsUsed = COMBAT_TABS.filter((t) => tables[t].shown.length > 0)
+  const deepest = Math.max(0, ...tabsUsed.map((t) => tables[t].shown.length))
+  for (let place = 0; place < deepest && picks.length < gems; place++) {
+    for (const tab of tabsUsed) {
+      if (picks.length >= gems) break
+      const row = tables[tab].shown[place]
+      if (row === undefined || taken.has(row.name)) continue
+      taken.add(row.name)
+      picks.push({
+        name: row.name,
+        tab,
+        place: place + 1,
+        ...(row.iconId === undefined ? {} : { iconId: row.iconId }),
+        metrics: row.metrics,
+        mana: row.mana,
+        gainedAt: row.gainedAt,
+        classes: row.classes
+      })
+    }
+  }
+  return { picks, tabsUsed, gems }
+}
+
+/** The fields `combatSet` reads off a ranked row. Structural, so `bestSpells.ts` need not be imported. */
+export interface CombatSource {
+  name: string
+  metrics: SpellMetrics
+  mana: number | null
+  gainedAt: number
+  classes: ClassAbbr[]
+  iconId?: number
 }

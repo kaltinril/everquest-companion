@@ -59,8 +59,14 @@ import type { ResistTableWorkerReply } from '../resistTableWorker'
  *      MEASURED cost on the owner's install: +5.58 MiB of JSON on a 6.13 MiB cache, for ~11.7 MiB.
  *      Slots are written only on rows WITH A DURATION, which is a semantic filter before it is a
  *      size one - see `SpellResistInfo.slots`.
+ *   7  2026-09-10 - the spell ID (field 0) and the GEM ICON (field 75). The id is a bug fix and not
+ *      a feature: the stacking engine decides "is this the same spell" on it, the table had never
+ *      carried one, and `stackView`'s `?? 0` therefore made every spell in the game identical to
+ *      every other (see `shared/spellStack.ts sameIdentity`). A version-6 cache cannot answer for
+ *      either field, and the owner's Loadout tab is wrong until it is re-parsed, so this is a bump
+ *      rather than an in-place upgrade for the same reason versions 3 through 6 were.
  */
-export const SPELL_RESIST_CACHE_VERSION = 6
+export const SPELL_RESIST_CACHE_VERSION = 7
 
 interface CacheFile {
   version: number

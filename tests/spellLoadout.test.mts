@@ -163,7 +163,9 @@ test('with client views on every candidate the verdicts are EXACT', () => {
   const view = (base: number): StackSpellView =>
     stackView({
       id: base,
-      slots: [{ slot: 0, effect: HASTE, base, limit: 0, calc: 100, max: 0 }],
+      // Slot 1, not 0: the file numbers its slots from one and `stackView` reads them that
+      // way (measured 2026-09-10). A 0 here is out of range and silently carries no effect.
+      slots: [{ slot: 1, effect: HASTE, base, limit: 0, calc: 100, max: 0 }],
       durationFormula: 3,
       goodEffect: true,
       targetType: 5
@@ -183,7 +185,7 @@ test('OVERHASTE survives beside haste under the exact engine - the flagged tier 
   const mk = (id: number, effect: number, base: number): StackSpellView =>
     stackView({
       id,
-      slots: [{ slot: 0, effect, base, limit: 0, calc: 100, max: 0 }],
+      slots: [{ slot: 1, effect, base, limit: 0, calc: 100, max: 0 }],
       durationFormula: 3,
       goodEffect: true,
       targetType: 5

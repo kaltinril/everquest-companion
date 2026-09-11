@@ -47,6 +47,10 @@ function stackViewsFor(table: SpellResistTable, names: readonly unknown[]): Reco
     // question is ever about (`SpellResistInfo.slots` states the filter and why).
     if (!row?.slots) continue
     out[raw] = {
+      // THE ID IS NOT OPTIONAL DECORATION. Without it every view the renderer builds claims to be
+      // spell zero and the stacking engine reads all of them as one spell - the 2026-09-10 Loadout
+      // collapse. `shared/spellStack.ts sameIdentity` carries the report.
+      id: row.id,
       name: raw,
       goodEffect: row.goodEffect ?? false,
       targetType: row.targetType,
