@@ -24,7 +24,7 @@
 // states no levels draws NO card at all rather than a row of blanks.
 
 import type { JSX } from 'react'
-import { Box, Chip, Paper, Stack, Typography } from '@mui/material'
+import { Box, Chip, Link, Paper, Stack, Typography } from '@mui/material'
 import type { ZonePort } from '@shared/zoneTravel'
 import type { ZoneLevelBand } from '@shared/zoneLevels'
 import { MAX_HOPS, type PortRoute } from '@shared/zoneTravel'
@@ -65,7 +65,7 @@ function LevelLine({ band }: { band: ZoneLevelBand | null }): JSX.Element | null
   )
 }
 
-/** The walk after landing, in the reader's words: "then on foot via West Commonlands to Befallen". */
+/** The walk as one string, for the row's hover - `Walk` below draws it with the zones as links. */
 function walkText(route: PortRoute): string {
   const { path } = route
   if (path.length === 0) return 'lands here'
@@ -78,8 +78,62 @@ function walkText(route: PortRoute): string {
     : `lands in ${route.port.zoneName}, then ${how} via ${via.join(', ')} to ${end}`
 }
 
+/**
+ * A zone name that opens that zone's map (owner, 2026-09-12: *"i should be able to click on the
+ * name of the 'lands in' portal to jump to the map for that"*). Inert text when the card was
+ * mounted without an opener, the `onOpenLoot` rule: no control rather than a dead one.
+ */
+function ZoneLink({ zone, name, onPick }: { zone: string; name: string; onPick?: (zone: string) => void }): JSX.Element {
+  if (onPick === undefined) return <>{name}</>
+  return (
+    <Link
+      component="button"
+      variant="caption"
+      underline="hover"
+      data-testid="map-travel-zone"
+      onClick={() => {
+        onPick(zone)
+      }}
+      sx={{ verticalAlign: 'baseline', color: 'text.secondary' }}
+    >
+      {name}
+    </Link>
+  )
+}
+
+/** The walk after landing, with every zone named a link to its map. */
+function Walk({ route, onPick }: { route: PortRoute; onPick?: (zone: string) => void }): JSX.Element {
+  const { port, path } = route
+  if (path.length === 0) return <>lands here</>
+  const kinds = new Set(path.map((p) => p.kind))
+  const how = kinds.size === 1 && kinds.has('walk') ? 'on foot' : 'on foot and by translocator'
+  const via = path.slice(0, -1)
+  const end = path[path.length - 1]
+  return (
+    <>
+      {'lands in '}
+      <ZoneLink zone={port.zone} name={port.zoneName} onPick={onPick} />
+      {`, then ${how} `}
+      {via.length > 0 && (
+        <>
+          {'via '}
+          {via.map((step, i) => (
+            <span key={step.zone}>
+              {i > 0 && ', '}
+              <ZoneLink zone={step.zone} name={step.name} onPick={onPick} />
+            </span>
+          ))}
+          {' '}
+        </>
+      )}
+      {'to '}
+      <ZoneLink zone={end.zone} name={end.name} onPick={onPick} />
+    </>
+  )
+}
+
 /** One way in: the spell, who casts it, and the walk after landing. */
-function OptionRow({ route }: { route: PortRoute }): JSX.Element {
+function OptionRow({ route, onPick }: { route: PortRoute; onPick?: (zone: string) => void }): JSX.Element {
   const { port } = route
   return (
     <Stack direction="row" spacing={0.75} alignItems="center" data-testid="map-travel-option" data-hops={route.path.length}>
@@ -90,8 +144,8 @@ function OptionRow({ route }: { route: PortRoute }): JSX.Element {
           {port.level !== undefined && ` (${String(port.level)})`}
         </Typography>
       </SpellTooltip>
-      <Typography variant="caption" color="text.secondary" noWrap sx={{ minWidth: 0 }} title={walkText(route)}>
-        {walkText(route)}
+      <Typography variant="caption" component="span" color="text.secondary" noWrap sx={{ minWidth: 0 }} title={walkText(route)}>
+        <Walk route={route} onPick={onPick} />
       </Typography>
       {port.item !== undefined && (
         <KnownItemTooltip name={port.item} clickThrough>
@@ -111,7 +165,14 @@ function OptionRow({ route }: { route: PortRoute }): JSX.Element {
  */
 const SHOWN = 3
 
-export default function MapTravelCard({ travel }: { travel: ZoneTravel }): JSX.Element | null {
+export default function MapTravelCard({
+  travel,
+  onPick
+}: {
+  travel: ZoneTravel
+  /** open a zone's map by stem - the view's own `pick`; absent, the zone names are plain text */
+  onPick?: (zone: string) => void
+}): JSX.Element | null {
   const { band, exits, rides, routes, ready } = travel
   // Until the port table has crossed from main, drawing "no ports" would be a claim about the
   // corpus rather than about the wait (law 1). A card with only a level line is still worth having.
@@ -134,7 +195,7 @@ export default function MapTravelCard({ travel }: { travel: ZoneTravel }): JSX.E
           </Stack>
         ))}
         {shown.map((route, i) => (
-          <OptionRow key={`${route.port.spell}-${route.port.item ?? ''}-${String(i)}`} route={route} />
+          <OptionRow key={`${route.port.spell}-${route.port.item ?? ''}-${String(i)}`} route={route} onPick={onPick} />
         ))}
         {ready && routes.length === 0 && (
           <Typography variant="caption" color="text.disabled">
