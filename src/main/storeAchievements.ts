@@ -39,15 +39,30 @@ import { getProgress, setProgress } from './store'
  *  came from — one write, so no half can describe a different dump than the others. */
 export function setAchievements(
   charId: string,
-  unlocks: ClassUnlockClaim[],
-  races: RaceUnlockClaim[],
-  source: AchievementsSource
+  /**
+   * EVERYTHING ONE READ OF THE FILE VOUCHES FOR, as one object.
+   *
+   * A MERGE-ONLY SHAPE, and deliberately so: `faction-tab` added the race unlocks and
+   * `exaltation-clarity` added the deity, each taking the signature to the measured four-parameter
+   * ceiling on its own branch and past it together. Bundling is the resolution that keeps both
+   * without widening the bar, and it is the better shape anyway - these four are one read of one
+   * file and were always going to travel together.
+   */
+  read: {
+    unlocks: ClassUnlockClaim[]
+    races: RaceUnlockClaim[]
+    source: AchievementsSource
+    /** the game's own spelling, or null when the dump does not state one - then the key is LEFT AS
+     *  IT WAS rather than cleared, because a file that says nothing is not a file that says none */
+    deity: string | null
+  }
 ): ProgressState {
   const p = getProgress(charId)
   return setProgress(charId, {
     ...p,
-    achievementUnlocks: unlocks,
-    raceUnlocks: races,
-    achievementsSource: source
+    achievementUnlocks: read.unlocks,
+    raceUnlocks: read.races,
+    achievementsSource: read.source,
+    ...(read.deity === null ? {} : { deity: read.deity })
   })
 }

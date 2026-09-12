@@ -25,6 +25,7 @@ import type { ClassAbbr } from '../../../../shared/classCombo'
 import type { GearRow } from '../../../../shared/planner/gear'
 import type { OwnedExaltation } from '../../../../shared/characterSheet'
 import { socketTypeOf } from '../../../../shared/planner/normalize'
+import { deityFits } from '../../../../shared/planner/deity'
 
 /** One exaltation owned in more copies than are socketed — stated, never commanded. */
 export interface DuplicateFinding {
@@ -84,10 +85,30 @@ export function rankedEffects(row: GearRow): RankedEffect[] {
   return out
 }
 
-/** Can any of this character's classes use the donor? Unstated classes pass (law 1). */
-export function usable(row: GearRow, classes: readonly ClassAbbr[]): boolean {
-  if (row.classes.length === 0 || classes.length === 0) return true
-  return row.classes.some((c) => classes.includes(c))
+/**
+ * WHO THIS CHARACTER IS, for the three engines that ask — bundled rather than passed loose because
+ * deity arrived as R2's FOURTH condition (owner report 2026-09-11) and `recommendSockets`,
+ * `planBoard` and `auditExaltations` were all already at the measured four-parameter ceiling.
+ * A second scalar would have widened three signatures; one noun keeps them and reads better.
+ */
+export interface Loadout {
+  classes: readonly ClassAbbr[]
+  /** the FOLDED deity key (`planner/deity.deityKey`), or null when nothing has stated one */
+  deity: string | null
+}
+
+/**
+ * Can this character use the donor at all? CLASS and DEITY, the two halves that are about WHO YOU
+ * ARE rather than about the seat (`socketRecommend.seatFits` owns slot and host-class).
+ *
+ * Every unknown passes, and they are four different unknowns with one answer (law 1): an item
+ * stating no class, a loadout with no class chosen, an item stating no deity, and a character
+ * whose deity nothing has told us. `planner/deity.deityFits` argues the last two.
+ */
+export function usable(row: GearRow, loadout: Loadout): boolean {
+  if (!deityFits(row.deities ?? [], loadout.deity)) return false
+  if (row.classes.length === 0 || loadout.classes.length === 0) return true
+  return row.classes.some((c) => loadout.classes.includes(c))
 }
 
 /** One effect ranked for comparison — an UNRANKED effect keeps tier 0: socketable, never "better". */
@@ -186,14 +207,14 @@ interface Holder {
 function supersededFindings(
   groups: Map<string, KeyGroup>,
   rowByKey: ReadonlyMap<string, GearRow>,
-  classes: readonly ClassAbbr[]
+  loadout: Loadout
 ): SupersededFinding[] {
   const families = new Map<string, Holder[]>()
   for (const [key, g] of groups) {
     const row = rowByKey.get(key)
     if (!row) continue
     for (const r of rankedEffects(row)) {
-      const holder: Holder = { key, name: g.name, tier: r.tier, effect: r.effect, usable: usable(row, classes) }
+      const holder: Holder = { key, name: g.name, tier: r.tier, effect: r.effect, usable: usable(row, loadout) }
       const held = families.get(r.family)
       if (held) held.push(holder)
       else families.set(r.family, [holder])
@@ -229,7 +250,7 @@ function supersededFindings(
 export function auditExaltations(
   owned: readonly OwnedExaltation[],
   rows: readonly GearRow[],
-  classes: readonly ClassAbbr[]
+  loadout: Loadout
 ): ExaltationAudit {
   // The one projection out of the domain shape (ruling 4): every fold below is feature-local.
   const copies = owned.map(
@@ -239,6 +260,6 @@ export function auditExaltations(
   const rowByKey = new Map(rows.map((r) => [r.key, r]))
   return {
     duplicates: duplicateFindings(groups),
-    superseded: supersededFindings(groups, rowByKey, classes)
+    superseded: supersededFindings(groups, rowByKey, loadout)
   }
 }

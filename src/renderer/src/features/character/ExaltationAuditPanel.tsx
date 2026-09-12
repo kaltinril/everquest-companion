@@ -172,11 +172,14 @@ function copyLine(f: DuplicateFinding): JSX.Element {
 export default function ExaltationAuditPanel({
   recs,
   audit,
-  plan
+  plan,
+  deity
 }: {
   recs: Recommendations | null
   audit: ExaltationAudit | null
   plan: BoardPlan | null
+  /** the folded deity key, or null when nothing has stated one - see the caption at the foot */
+  deity: string | null
 }): JSX.Element | null {
   if (recs === null || audit === null) return null
   const board = plan === null ? [] : planLines(plan)
@@ -200,6 +203,16 @@ export default function ExaltationAuditPanel({
           Assumes same-name effects do not stack (only the highest applies). Upgrades compare
           within one effect family only; nothing is changed for you.
         </Typography>
+        {/* R2's fourth condition is off until the one file that states a deity has been read
+            (owner report 2026-09-11). Saying so is the difference between advice that is narrowed
+            and advice that merely looks narrowed - `planner/deity.deityFits` passes on a null and
+            a reader has no way to know that from the lists above. */}
+        {deity === null && (
+          <Typography variant="caption" color="text.disabled" data-testid="exaltation-deity-unknown">
+            Deity is not checked yet: type /outputfile achievements in game and this list will stop
+            offering gems your deity cannot use.
+          </Typography>
+        )}
       </Stack>
     </Paper>
   )

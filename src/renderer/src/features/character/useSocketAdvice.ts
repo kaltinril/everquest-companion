@@ -12,7 +12,8 @@ import { useGearIndex } from '../gear/gearData'
 import type { GearRow } from '@shared/planner/gear'
 import { ownershipKey } from '@shared/planner/ownership'
 import type { SocketAdvice } from './SlotGrid'
-import { auditExaltations, bestEffectFor, type ExaltationAudit } from './exaltationAudit'
+import { auditExaltations, bestEffectFor, type ExaltationAudit, type Loadout } from './exaltationAudit'
+import { useDeity } from './useDeity'
 import { recommendSockets, socketHosts, type Recommendations } from './socketRecommend'
 import { planBoard, type BoardPlan } from './socketOptimize'
 
@@ -25,6 +26,8 @@ export interface SocketAdviceState {
   plan: BoardPlan | null
   audit: ExaltationAudit | null
   classes: readonly ClassAbbr[]
+  /** the FOLDED deity key, or null when no achievements dump has ever been read */
+  deity: string | null
   rows: readonly GearRow[]
 }
 
@@ -34,19 +37,22 @@ export function useSocketAdvice(sheet: CharacterSheet | null): SocketAdviceState
   // Read once so the memos key on the VALUE (the gearData precedent).
   const current = combo.current
   const classes = useMemo(() => (current === null ? [] : resolvedClasses(current)), [current])
+  // R2's fourth condition. Null until an achievements dump has been read, and null filters nothing.
+  const deity = useDeity()
+  const loadout = useMemo<Loadout>(() => ({ classes, deity }), [classes, deity])
   const rowByKey = useMemo(() => new Map(gear.rows.map((r) => [r.key, r])), [gear.rows])
   const settled = sheet !== null && gear.ready && !gear.refused
   const recs = useMemo(
-    () => (settled ? recommendSockets(sheet.exaltations, gear.rows, classes, socketHosts(sheet.cells)) : null),
-    [settled, sheet, gear.rows, classes]
+    () => (settled ? recommendSockets(sheet.exaltations, gear.rows, loadout, socketHosts(sheet.cells)) : null),
+    [settled, sheet, gear.rows, loadout]
   )
   const audit = useMemo(
-    () => (settled ? auditExaltations(sheet.exaltations, gear.rows, classes) : null),
-    [settled, sheet, gear.rows, classes]
+    () => (settled ? auditExaltations(sheet.exaltations, gear.rows, loadout) : null),
+    [settled, sheet, gear.rows, loadout]
   )
   const plan = useMemo(
-    () => (settled ? planBoard(sheet.exaltations, gear.rows, classes, socketHosts(sheet.cells)) : null),
-    [settled, sheet, gear.rows, classes]
+    () => (settled ? planBoard(sheet.exaltations, gear.rows, loadout, socketHosts(sheet.cells)) : null),
+    [settled, sheet, gear.rows, loadout]
   )
   const advice = useMemo<SocketAdvice | undefined>(() => {
     if (recs === null) return undefined
@@ -84,5 +90,5 @@ export function useSocketAdvice(sheet: CharacterSheet | null): SocketAdviceState
       fillHintOf: (cellId, type) => fillHints.get(`${cellId}|${type}`)
     }
   }, [recs, rowByKey])
-  return { advice, recs, plan, audit, classes, rows: gear.rows }
+  return { advice, recs, plan, audit, classes, deity, rows: gear.rows }
 }

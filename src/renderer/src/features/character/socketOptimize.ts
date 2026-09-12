@@ -22,10 +22,9 @@
 //
 // Pure and node-tested (tests/socketOptimize.test.mts).
 
-import type { ClassAbbr } from '../../../../shared/classCombo'
 import type { GearRow } from '../../../../shared/planner/gear'
 import type { OwnedExaltation } from '../../../../shared/characterSheet'
-import { bestEffectFor, usable, type KindEffect } from './exaltationAudit'
+import { bestEffectFor, usable, type KindEffect, type Loadout } from './exaltationAudit'
 // R2 lives THERE, not here (owner catch 2026-09-11). This file's header has always said "the rules
 // are the recommender's"; until now it said so while carrying its own copy of them.
 import { seatFits, seatIsLive, type SocketHostCell } from './socketRecommend'
@@ -105,13 +104,13 @@ function copyCounts(owned: readonly OwnedExaltation[]): Map<string, number> {
 function familyClaims(
   counts: ReadonlyMap<string, number>,
   rowByKey: ReadonlyMap<string, GearRow>,
-  classes: readonly ClassAbbr[],
+  loadout: Loadout,
   types: readonly string[]
 ): FamilyClaim[] {
   const best = new Map<string, FamilyClaim>()
   for (const [key, copies] of counts) {
     const row = rowByKey.get(key)
-    if (row === undefined || !usable(row, classes)) continue
+    if (row === undefined || !usable(row, loadout)) continue
     for (const type of types) {
       const eff = bestEffectFor(row, type)
       if (eff === null) continue
@@ -316,7 +315,7 @@ const TYPES = ['Focus', 'Click', 'Worn', 'Proc']
 export function planBoard(
   owned: readonly OwnedExaltation[],
   rows: readonly GearRow[],
-  classes: readonly ClassAbbr[],
+  loadout: Loadout,
   sockets: readonly SocketHostCell[]
 ): BoardPlan {
   const rowByKey = new Map(rows.map((r) => [r.key, r]))
@@ -326,7 +325,7 @@ export function planBoard(
   // as incumbent through the tier-I gem in a ring that its belt-only tier-III donor cannot use,
   // and outmuscled the belt's true incumbent on a tie. Incumbents-that-can-stay are seated
   // first at equal tier, so a claim can only take a contested seat by OUTRANKING its holder.
-  const claims = familyClaims(copyCounts(owned), rowByKey, classes, TYPES)
+  const claims = familyClaims(copyCounts(owned), rowByKey, loadout, TYPES)
   const keeps = claims.map((c) => currentSeatExists(c, sockets, rowByKey))
   const order = claims
     .map((c, i) => ({ c, i }))

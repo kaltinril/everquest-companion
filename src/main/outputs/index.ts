@@ -21,6 +21,7 @@ import { readFileSync } from 'fs'
 import type { InventoryDump } from '../../shared/outputs/inventory'
 import {
   classUnlockClaims,
+  confirmedDeity,
   raceUnlockClaims,
   type AchievementsSource,
   type ClassUnlockClaim,
@@ -129,6 +130,8 @@ export interface LoadedAchievements {
   races: RaceUnlockClaim[]
   /** Exactly what gets persisted as `ProgressState.achievementsSource`. */
   source: AchievementsSource
+  /** The character's deity, the game's spelling, or null when the file does not say. */
+  deity: string | null
 }
 
 /**
@@ -156,6 +159,10 @@ export function loadAchievements(
     path: loaded.path,
     unlocks: classUnlockClaims(result.data.dump),
     races: raceUnlockClaims(result.data.dump),
+    // R2's fourth condition (owner report 2026-09-11). Taken here with the unlocks because this is
+    // the one place the file becomes the model, and for the same reason: the 1,857 parsed rows do
+    // not outlive this call.
+    deity: confirmedDeity(result.data.dump),
     // `loadedAt` is the FILE's mtime (when the player typed the command) and `readAt` is ours —
     // the JOS-253 pair, kept because a single timestamp cannot answer both questions.
     source: { path: loaded.path, loadedAt: loaded.loadedAt, readAt: now() }
