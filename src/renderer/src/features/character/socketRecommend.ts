@@ -300,12 +300,11 @@ function redundancyPass(
   ctx: RecContext,
   effective: readonly EffectiveHost[],
   keepers: ReadonlyMap<string, EffectiveHost>,
-  out: { redundant: RedundantRec[]; flagged: Map<string, Set<string>> }
+  out: { redundant: RedundantRec[]; flagged: Map<string, Set<string>>; inForce: Set<string> }
 ): void {
-  const inForce = new Set(keepers.keys())
   for (const e of effective) {
     if (keepers.get(e.eff.family) === e) continue
-    out.redundant.push(redundantRec(ctx, e, keepers.get(e.eff.family), inForce))
+    out.redundant.push(redundantRec(ctx, e, keepers.get(e.eff.family), out.inForce))
     if (e.host.currentKey !== null) flag(out.flagged, e.host.cellId, e.host.currentKey)
   }
 }
@@ -334,15 +333,34 @@ function redundantRec(
   }
 }
 
-/** Pass 3 — the best remaining loose gems into open empty sockets. */
-function fillPass(ctx: RecContext, hosts: readonly SocketHostCell[], fills: FillRec[]): void {
+/**
+ * Pass 3 — the best remaining loose gems into open empty sockets, SKIPPING ANY FAMILY THE BOARD
+ * ALREADY GRANTS.
+ *
+ * The in-force gate is the fix for a tester's report (Malkil via kaltinril, 2026-09-11): the panel
+ * offered him `socket Adamantite Band (Summoning Haste I)` into an empty Fingers Focus while, four
+ * lines down, calling that same gem outclassed by a Summoning Haste III he already holds. It was
+ * right about the III and wrong to offer the I - same-name effects DO NOT STACK, so that socket
+ * would have granted him exactly nothing, which is the very condition the pass above reports as a
+ * DEAD SOCKET. This pass was the only one of the three that took `() => true` and asked nothing.
+ *
+ * THE LEDGER IS SHARED AND IT GROWS, which is the second half of the same bug: two empty sockets
+ * used to be offered two different copies of one family, and the second of those is dead on
+ * arrival for the same reason. Each fill adds its family before the next host is answered.
+ */
+function fillPass(
+  ctx: RecContext,
+  hosts: readonly SocketHostCell[],
+  out: { fills: FillRec[]; inForce: Set<string> }
+): void {
   for (const host of hosts) {
     if (host.currentKey !== null) continue
-    const best = bestLoose(ctx, host, () => true)
+    const best = bestLoose(ctx, host, (x) => !out.inForce.has(x.family))
     if (best === null) continue
     const where = ctx.pool.take(best.key)
     if (where === undefined) continue
-    fills.push({
+    out.inForce.add(best.eff.family)
+    out.fills.push({
       cellId: host.cellId,
       cellLabel: host.cellLabel,
       item: host.item,
@@ -376,9 +394,14 @@ export function recommendSockets(
   const flagged = new Map<string, Set<string>>()
   const effective = filledHosts(ctx, hosts)
   const keepers = keepersByFamily(effective)
+  // ONE in-force ledger for the whole run: the families the board already grants, plus every family
+  // this run places. Shared so the three passes cannot contradict each other about what is live -
+  // a swap keeps its family in force, a dead socket's replacement claims a new one, and a fill may
+  // claim only what neither of them has.
+  const inForce = new Set(keepers.keys())
   swapPass(ctx, keepers, { swaps, flagged })
-  redundancyPass(ctx, effective, keepers, { redundant, flagged })
-  fillPass(ctx, hosts, fills)
+  redundancyPass(ctx, effective, keepers, { redundant, flagged, inForce })
+  fillPass(ctx, hosts, { fills, inForce })
   return { swaps, fills, redundant, flaggedByCell: flagged }
 }
 
