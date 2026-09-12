@@ -1,5 +1,15 @@
-import type { JSX } from 'react'
-import { Box, Chip, Divider, Drawer, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material'
+import { Fragment, type JSX } from 'react'
+import {
+  Box,
+  Chip,
+  Divider,
+  Drawer,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  ListSubheader
+} from '@mui/material'
 import SettingsIcon from '@mui/icons-material/Settings'
 import ShieldMoonIcon from '@mui/icons-material/ShieldMoon'
 import BarChartIcon from '@mui/icons-material/BarChart'
@@ -61,13 +71,23 @@ const BETA = (
   />
 )
 
-// Row ORDER is the nav's order. Overview leads: it is the at-a-glance landing surface.
+/** A heading over a run of rows. `id` is the testid suffix (`nav-group-<id>`), stable while the
+ *  heading copy is free to change. */
+interface NavGroup {
+  id: string
+  heading: string
+  rows: NavRow[]
+}
+
+// Row ORDER is the nav's order. Overview leads, ungrouped: it is the at-a-glance landing surface.
 //
-// LOOT SITS BESIDE MOBS (owner decision, 2026-08-04) and everything else keeps its place. The
-// two tabs answer halves of one question — what drops it, and what did I get — and they link
-// into each other constantly (a mob page's drop rows open an item, the Overview's drop rows open
-// the loot detail). Loot's old home at the bottom of the list put five unrelated tabs between
-// them.
+// THE REST SIT UNDER THREE HEADINGS (owner ask, 2026-09-12): Research is what the game holds,
+// Stats/Data is what your own log says, Config is what the app does for you. The headings are
+// presentational only - no routing, gating or testid changes - and exist because a dozen rows in
+// one column read as one undifferentiated list. Where a tab could go either way it follows the
+// question it answers: Loot is what YOU got, so it is data; Mobs is what the game HAS, so it is
+// research. That separates the two rows an earlier decision (2026-08-04) put side by side; the
+// links between them are unchanged, and each is now the first row under its own heading.
 //
 // AND ONE ROW IS NOT ONE VIEW ANY MORE (JOS-324, owner ruling 2026-08-13). The drawer's old law —
 // exactly one row per view, no exceptions — held right up until three of the rows turned out to be
@@ -79,35 +99,63 @@ const BETA = (
 // room to grow, a Wish list. The row reads `selected` while any of the four is on screen, and it
 // opens the one you last used. The law that survives is the one that mattered: a row is a
 // DESTINATION, and clicking it takes you somewhere real.
-const ROWS: NavRow[] = [
-  { view: 'overview', icon: <SpaceDashboardIcon /> },
-  { view: 'combat', icon: <BarChartIcon /> },
-  { view: 'mobs', icon: <PetsIcon /> },
-  { view: 'loot', icon: <ReceiptLongIcon /> },
-  // THE GEAR AREA follows Loot for the same reason Loot follows Mobs: it is the far side of one
-  // question — what drops it, what did I get, and then what should I wear, farm for and want. It
-  // reads the same committed corpus and links back into the same Loot drill-down. The row keeps
-  // Gear's icon, Gear's testid (`nav-gear`) and Gear's beta chip; the tabs behind it are named by
-  // `VIEW_LABELS`, the one place any of this app's tabs is named.
+const OVERVIEW: NavRow = { view: 'overview', icon: <SpaceDashboardIcon /> }
+
+const GROUPS: NavGroup[] = [
   {
-    view: 'gear',
-    icon: <CheckroomIcon />,
-    badge: BETA,
-    area: GEAR_AREA_VIEWS,
-    opens: loadGearTab
+    id: 'research',
+    heading: 'Research',
+    rows: [
+      { view: 'mobs', icon: <PetsIcon /> },
+      // THE GEAR AREA follows Mobs: what drops it, and then what should I wear, farm for and want.
+      // It reads the same committed corpus and links back into the Loot drill-down. The row keeps
+      // Gear's icon, Gear's testid (`nav-gear`) and Gear's beta chip; the tabs behind it are named
+      // by `VIEW_LABELS`, the one place any of this app's tabs is named.
+      {
+        view: 'gear',
+        icon: <CheckroomIcon />,
+        badge: BETA,
+        area: GEAR_AREA_VIEWS,
+        opens: loadGearTab
+      },
+      { view: 'maps', icon: <MapIcon /> },
+      { view: 'bosses', icon: <EmojiEventsIcon /> },
+      { view: 'posky', icon: <ShieldMoonIcon /> }
+    ]
   },
-  { view: 'maps', icon: <MapIcon /> },
-  { view: 'bosses', icon: <EmojiEventsIcon /> },
-  { view: 'posky', icon: <ShieldMoonIcon /> },
-  { view: 'alerts', icon: <NotificationsActiveIcon /> },
-  { view: 'leveling', icon: <TrendingUpIcon /> },
-  { view: 'buffs', icon: <AutoFixHighIcon /> },
-  // Respawn clocks (JOS-194) sit beside Buffs because both tabs are the same shape of answer —
-  // a list of things counting down — and a player checking one is usually checking the other.
-  { view: 'timers', icon: <TimerIcon /> }
+  {
+    id: 'stats',
+    heading: 'Stats/Data',
+    rows: [
+      { view: 'combat', icon: <BarChartIcon /> },
+      { view: 'loot', icon: <ReceiptLongIcon /> },
+      { view: 'buffs', icon: <AutoFixHighIcon /> },
+      { view: 'leveling', icon: <TrendingUpIcon /> }
+    ]
+  },
+  {
+    id: 'config',
+    heading: 'Config',
+    rows: [
+      { view: 'alerts', icon: <NotificationsActiveIcon /> },
+      // Respawn clocks (JOS-194): a list of things counting down, like Buffs, but it is the tab
+      // where you SET them, so it sits with the app's other configuration rather than the data.
+      { view: 'timers', icon: <TimerIcon /> }
+    ]
+  }
 ]
 
-/** Bottom-aligned, outside ROWS — it is not a feature view and never moves. */
+/** Compact, non-sticky, and quiet: a heading is orientation for the rows under it, never a row. */
+const GROUP_HEADING_SX = {
+  lineHeight: '28px',
+  mt: 0.5,
+  fontSize: 11,
+  letterSpacing: 1,
+  textTransform: 'uppercase',
+  bgcolor: 'transparent'
+} as const
+
+/** Bottom-aligned, outside GROUPS — it is not a feature view and never moves. */
 const PREFERENCES: NavRow = { view: 'preferences', icon: <SettingsIcon /> }
 
 /** One nav row. `data-testid="nav-<view>"` is the stable handle the e2e clicks. */
@@ -135,7 +183,7 @@ function NavRowButton({
 
 /**
  * The permanent left nav: one row per destination — usually a view, and since JOS-324 once an
- * AREA of four (see `ROWS`) — with Preferences bottom-aligned and the ambient update chip beneath
+ * AREA of four (see `GROUPS`) — with Preferences bottom-aligned and the ambient update chip beneath
  * it.
  *
  * Frameless: the drawer is a normal in-flow child (no fixed OS bar above it), so it fills
@@ -175,8 +223,16 @@ export default function NavDrawer({
       }}
     >
       <List>
-        {ROWS.map((row) => (
-          <NavRowButton key={row.view} row={row} view={view} onSelect={onSelect} />
+        <NavRowButton row={OVERVIEW} view={view} onSelect={onSelect} />
+        {GROUPS.map((group) => (
+          <Fragment key={group.id}>
+            <ListSubheader disableSticky data-testid={`nav-group-${group.id}`} sx={GROUP_HEADING_SX}>
+              {group.heading}
+            </ListSubheader>
+            {group.rows.map((row) => (
+              <NavRowButton key={row.view} row={row} view={view} onSelect={onSelect} />
+            ))}
+          </Fragment>
         ))}
         {/* UNRELEASED (JOS-45) USED TO HAVE A ROW HERE, and JOS-324 moved it INTO the gear area:
             the character sheet is now the area's last TAB, gated by the same `UNRELEASED` flag in
