@@ -65,8 +65,14 @@ import type { ResistTableWorkerReply } from '../resistTableWorker'
  *      every other (see `shared/spellStack.ts sameIdentity`). A version-6 cache cannot answer for
  *      either field, and the owner's Loadout tab is wrong until it is re-parsed, so this is a bump
  *      rather than an in-place upgrade for the same reason versions 3 through 6 were.
+ *   8  2026-09-12 - the KEYS. `spellCanonKey` now drops apostrophes (spellKey.ts), so a version-7
+ *      cache is keyed `o\`keil's radiation` where every lookup now asks `okeils radiation`: the
+ *      rows are all right and none of them can be found. The owner saw it as 26 spells with no
+ *      icon after the fix that was meant to give them one. Not upgradeable in place for the
+ *      opposite reason to the bumps above - the data is complete, the index is stale - and a
+ *      re-key on read would be a second copy of the key rule to keep byte-identical.
  */
-export const SPELL_RESIST_CACHE_VERSION = 7
+export const SPELL_RESIST_CACHE_VERSION = 8
 
 interface CacheFile {
   version: number
