@@ -329,3 +329,49 @@ export function nearestPorts(
   }
   return out
 }
+
+// ---- one line per landing zone -----------------------------------------------------------------
+//
+// Owner (2026-09-12), reading two rows that differed only by spell: *"if there is a SOLO and GROUP
+// port and alternate class, combine them to 1 line ... the point is to show the top 2-3 closest
+// zones that you can port into"*. The unit of the answer is the ZONE you land in, not the spell
+// that lands you; the spells are how, and they fold onto the line.
+
+/** Everything that lands you in one zone, and the walk from there to where you are. */
+export interface Landing {
+  zone: ZoneShort
+  zoneName: string
+  /** the walk after landing - identical for every port landing here, so stated once */
+  path: RouteStep[]
+  /** druid casts that land here, cheapest level first */
+  druid: ZonePort[]
+  /** wizard casts that land here, cheapest level first */
+  wizard: ZonePort[]
+  /** item clicks that land here, in table order */
+  items: ZonePort[]
+}
+
+/**
+ * `nearestPorts` output folded to one entry per landing zone, in the order zones were first
+ * reached - which is nearest first, because the routes already are.
+ *
+ * A pure fold on purpose: the card that draws this is a renderer and the renderer never groups a
+ * domain collection (ruling 4). The walk is taken from the first route into the zone; the search
+ * found one shortest way there and every port landing there shares it.
+ */
+export function landings(routes: readonly PortRoute[]): Landing[] {
+  const out: Landing[] = []
+  const byZone = new Map<ZoneShort, Landing>()
+  for (const route of routes) {
+    let landing = byZone.get(route.port.zone)
+    if (landing === undefined) {
+      landing = { zone: route.port.zone, zoneName: route.port.zoneName, path: route.path, druid: [], wizard: [], items: [] }
+      byZone.set(route.port.zone, landing)
+      out.push(landing)
+    }
+    if (route.port.via === 'druid') landing.druid.push(route.port)
+    else if (route.port.via === 'wizard') landing.wizard.push(route.port)
+    else landing.items.push(route.port)
+  }
+  return out
+}

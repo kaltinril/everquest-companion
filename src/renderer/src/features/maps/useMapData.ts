@@ -56,6 +56,31 @@ export function savePaneOpen(open: boolean): void {
   else localStorage.setItem(PANE_OPEN_KEY, '0')
 }
 
+/**
+ * Whether the "Closest port" strip under the toolbar is open — the pane's twin (owner,
+ * 2026-09-12: *"be collapsible so someone doesn't have to use up much space on the map page if
+ * they don't want to"*). Same shape, same tier, same default: open until you close it, and only the
+ * closed state is stored, so a cleared key means the default rather than a wrong reading.
+ */
+export const TRAVEL_OPEN_KEY = 'eq.maps.travel'
+
+export function loadTravelOpen(): boolean {
+  try {
+    return localStorage.getItem(TRAVEL_OPEN_KEY) !== '0'
+  } catch {
+    return true
+  }
+}
+
+export function saveTravelOpen(open: boolean): void {
+  try {
+    if (open) localStorage.removeItem(TRAVEL_OPEN_KEY)
+    else localStorage.setItem(TRAVEL_OPEN_KEY, '0')
+  } catch {
+    // Storage refused (private window, quota): the toggle still works for this session.
+  }
+}
+
 function nonEmpty(value: unknown): string | undefined {
   return typeof value === 'string' && value.length > 0 ? value : undefined
 }

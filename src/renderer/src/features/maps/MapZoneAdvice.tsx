@@ -1,93 +1,39 @@
-// maps/MapZoneAdvice — "where should I be", for one level and one reason.
+// maps/MapZoneAdvice — "where should I be", for one level and one reason, as a table.
 //
 // Owner asks (kaltinril 2026-09-11, -12): *"somewhere it shows recommendation for where to level,
-// where to get motes"* and then *"why not expand this new tab inside maps to give different level
-// ranges for different stuff - D4 mote farming, or best EXP or best gear, or most wishlist items in
-// a single zone"*. `shared/zoneAdvice.ts` carries the three rankings, the measurements behind them,
-// and why "best gear" is not one of them yet; this draws whichever is picked and lets you open a
-// zone.
+// where to get motes"*, then *"different level ranges for different stuff - D4 mote farming, or
+// best EXP or best gear, or most wishlist items in a single zone"*, then, of the first table:
+// *"this is a horrible gridview ... need filters/search/sort"*.
 //
-// ── THE LEVEL IS TYPED, NOT DETECTED, AND THAT IS THE POINT ──────────────────────────────────
+// `shared/zoneAdvice.ts` carries the three rankings, the measurements behind them, and why "best
+// gear" is not one of them yet. This file owns the state and composes two neighbours in the Gear
+// tab's arrangement: `MapZoneAdviceBar` (level, goal, search, fit filter) over
+// `MapZoneAdviceTable` (sortable heads, windowed fixed-height rows).
 //
-// The app can often infer a level, and this control deliberately does not use it. Half the reason
-// anybody opens this list is to plan for someone ELSE - the level you will be next week, the
-// friend you are about to group with, the alt. A field that answers for any level answers for all
-// of those; one that locks to the logged-in character answers for one.
+// ── NOTHING IS FILTERED OR SORTED HERE (ruling 4) ────────────────────────────────────────────
+//
+// The bar's search and fit chips go INTO `rankZones` as options and the header's sort goes into
+// `sortAdvice`; this file asks for the rows it wants and windows what comes back. That is the
+// same seam `GearView` keeps with `filterGearRows` / `sortGearRows`, and it is what lets the
+// ranking be tested without a renderer.
 //
 // ── THE RIGHT-HAND COLUMN IS THE GOAL'S, AND SOMETIMES THERE ISN'T ONE ───────────────────────
 //
 // The first version printed the mote rate on every row, and the owner's screenshot showed why
-// that was noise: at one level, every listed zone cons the same and every row said 8.5. So the
-// column is now the goal's own driver - the rate for experience (where green's 3.1 against 8.5 is
-// the whole point), the wished-item count for the wish list - and for the mote goal there is NO
-// extra number, because its driver is the fit chip and the band already on the row. A constant
-// column is a column that should not be there.
-//
-// WHAT IS SHOWN IS A RATE, NEVER A TOTAL. "8.5 per 100 kills" is honest; "300 motes an hour" would
-// need a kill speed nothing here measures.
+// that was noise: at one level every listed zone cons the same and every row said 8.5. So the
+// column is the goal's own driver - the rate for experience (where green's 3.1 against 8.5 is
+// the whole point), the wished-item count for the wish list - and the mote goal has NO extra
+// number, because its driver is the fit chip and the band already on the row.
 
-import { useMemo, useState, type JSX } from 'react'
-import { Box, Chip, List, ListItemButton, Paper, Stack, TextField, Typography } from '@mui/material'
-import { rankZones, moteGradeCap, type ZoneAdvice, type ZoneGoal } from '@shared/zoneAdvice'
-import type { ZoneFit } from '@shared/zoneLevels'
-import { zoneShortNameFromCatalog } from '@shared/zones'
+import { useMemo, useRef, useState, type JSX } from 'react'
+import { Paper, Typography } from '@mui/material'
+import { nextAdviceSort, rankZones, sortAdvice, type AdviceSort, type ZoneGoal } from '@shared/zoneAdvice'
+import { useWindowedRows } from '../../lib/useWindowedRows'
 import { useWishlist } from '../wishlist/useWishlist'
+import MapZoneAdviceBar, { DEFAULT_QUERY, type AdviceQuery } from './MapZoneAdviceBar'
+import MapZoneAdviceTable, { ROW_HEIGHT } from './MapZoneAdviceTable'
 import { wishedByZone, zoneBands } from './zoneBands'
-
-const TINY = { height: 18, fontSize: 10, '& .MuiChip-label': { px: 0.6 } } as const
-
-/** How the fit reads, and how loudly. `deadly` only ever appears on the wish-list goal. */
-const FIT: Readonly<Record<ZoneFit, { label: string; color: 'success' | 'warning' | 'error' | 'default' }>> = {
-  even: { label: 'on level', color: 'success' },
-  hard: { label: 'a reach', color: 'warning' },
-  green: { label: 'easy', color: 'default' },
-  deadly: { label: 'deadly', color: 'error' }
-}
-
-/** The goal's own right-hand column, or none — see the header. */
-interface GoalColumn {
-  head: string
-  title: string
-  value: (row: ZoneAdvice) => number
-}
-
-interface GoalSpec {
-  label: string
-  /** the one sentence the chip's hover states about what this ranking is for */
-  hint: string
-  column: GoalColumn | null
-}
-
-const GOALS: Readonly<Record<ZoneGoal, GoalSpec>> = {
-  exp: {
-    label: 'Experience',
-    hint: 'Zones that con even or a little above you first, then the easy ones. Con drives experience and mote drops alike.',
-    column: {
-      head: 'motes / 100 kills',
-      title: 'Motes per 100 kills at this con, measured from this app`s own logged fights. A rate, not a total: it says nothing about how fast you clear a zone.',
-      value: (row) => row.motesPer100
-    }
-  },
-  motes: {
-    label: 'Mote grade',
-    hint: 'Harder zones first: the grade floor rises with difficulty, and Superior-and-better come from harder content rather than luckier kills. Easy zones are left off. Which zones offer which instance tier (D0 to D4) is stated in no data this app holds, so this ranks by the band alone.',
-    column: null
-  },
-  wish: {
-    label: 'Wish list',
-    hint: 'Zones by how many different items on your wish list can drop there. The one list that keeps a deadly zone, because the item is where it is.',
-    column: {
-      head: 'wished',
-      title: 'How many different items on your wish list the bestiary says can drop in this zone.',
-      value: (row) => row.wished
-    }
-  }
-}
-
-const GOAL_ORDER: readonly ZoneGoal[] = ['exp', 'motes', 'wish']
-
-/** How many rows before the list stops being a glance. */
-const SHOWN = 12
+import { GOALS } from './zoneAdviceUi'
 
 /**
  * Zones the catalog knows through fewer than this many mobs are held back.
@@ -98,111 +44,10 @@ const SHOWN = 12
  */
 const MIN_EVIDENCE = 8
 
-/** The column heads, mirroring `AdviceRow`'s Stack so the words sit over their numbers. */
-function AdviceHead({ column }: { column: GoalColumn | null }): JSX.Element {
-  return (
-    <Stack direction="row" spacing={0.75} alignItems="center" sx={{ px: 1, pb: 0.25, width: '100%', minWidth: 0 }}>
-      <Box sx={{ width: 62, flexShrink: 0 }} />
-      <Typography variant="caption" color="text.disabled">
-        Zone
-      </Typography>
-      <Typography variant="caption" color="text.disabled">
-        levels
-      </Typography>
-      <Box sx={{ flexGrow: 1 }} />
-      {column !== null && (
-        <Typography variant="caption" color="text.disabled" title={column.title} sx={{ flexShrink: 0 }}>
-          {column.head}
-        </Typography>
-      )}
-      <Typography
-        variant="caption"
-        color="text.disabled"
-        title="How many catalog mobs the level band rests on. A band drawn from a handful is a weaker claim than one drawn from a hundred."
-        sx={{ flexShrink: 0 }}
-      >
-        mobs
-      </Typography>
-    </Stack>
-  )
-}
-
-function AdviceRow({
-  row,
-  column,
-  onPick
-}: {
-  row: ZoneAdvice
-  column: GoalColumn | null
-  onPick?: (zone: string) => void
-}): JSX.Element {
-  const fit = FIT[row.fit]
-  const [low, high] = row.band.typical
-  // A zone whose map we cannot name is still worth READING; it just cannot be opened.
-  const stem = zoneShortNameFromCatalog(row.zone)
-  return (
-    <ListItemButton
-      dense
-      disabled={stem === null || onPick === undefined}
-      data-testid="zone-advice-row"
-      data-fit={row.fit}
-      onClick={() => {
-        if (stem !== null) onPick?.(stem)
-      }}
-      sx={{ py: 0.25, px: 1, borderRadius: 1 }}
-    >
-      <Stack direction="row" spacing={0.75} alignItems="center" sx={{ width: '100%', minWidth: 0 }}>
-        <Chip size="small" variant="outlined" color={fit.color} label={fit.label} sx={TINY} />
-        <Typography variant="caption" noWrap sx={{ color: 'text.primary', minWidth: 0, flexShrink: 1 }}>
-          {row.zone}
-        </Typography>
-        <Typography variant="caption" color="text.secondary" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-          {low === high ? low : `${String(low)}-${String(high)}`}
-        </Typography>
-        <Box sx={{ flexGrow: 1 }} />
-        {column !== null && (
-          <Typography variant="caption" color="text.disabled" sx={{ flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
-            {column.value(row)}
-          </Typography>
-        )}
-        <Typography
-          variant="caption"
-          color="text.disabled"
-          sx={{ flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}
-          title={`${String(row.n)} catalog mobs carry a level in this zone`}
-        >
-          {row.n}
-        </Typography>
-      </Stack>
-    </ListItemButton>
-  )
-}
-
-/** The three goals as the app's one-lit-chip idiom (the Exaltations bar's `ToggleChip`). */
-function GoalChips({ goal, onGoal }: { goal: ZoneGoal; onGoal: (g: ZoneGoal) => void }): JSX.Element {
-  return (
-    <Stack direction="row" spacing={0.5}>
-      {GOAL_ORDER.map((g) => (
-        <Chip
-          key={g}
-          size="small"
-          label={GOALS[g].label}
-          title={GOALS[g].hint}
-          data-testid={`zone-advice-goal-${g}`}
-          color={g === goal ? 'primary' : 'default'}
-          variant={g === goal ? 'filled' : 'outlined'}
-          onClick={() => {
-            onGoal(g)
-          }}
-        />
-      ))}
-    </Stack>
-  )
-}
-
-/** What an empty list means depends on which list it is. */
-function emptyText(goal: ZoneGoal, level: number, haveWishes: boolean): string {
+/** What an empty table means depends on which table it is. */
+function emptyText(goal: ZoneGoal, level: number, haveWishes: boolean, narrowed: boolean): string {
   if (!Number.isFinite(level) || level <= 0) return 'Type a level to see the zones the bestiary can describe for it.'
+  if (narrowed) return 'Nothing matches the search and filters.'
   if (goal === 'wish') {
     return haveWishes
       ? 'Nothing on your wish list drops in a zone the bestiary documents.'
@@ -212,9 +57,11 @@ function emptyText(goal: ZoneGoal, level: number, haveWishes: boolean): string {
 }
 
 export default function MapZoneAdvice({ onPick }: { onPick?: (zone: string) => void }): JSX.Element {
-  const [text, setText] = useState('20')
-  const [goal, setGoal] = useState<ZoneGoal>('exp')
-  const level = Number.parseInt(text, 10)
+  const [query, setQuery] = useState<AdviceQuery>(DEFAULT_QUERY)
+  // null = the goal's own order, which is the honest default and lights no column.
+  const [sort, setSort] = useState<AdviceSort | null>(null)
+  const level = Number.parseInt(query.level, 10)
+
   // The wish list is the one input that is the PLAYER's rather than the catalog's; the per-zone
   // count is one walk of the bestiary, redone only when the list itself changes.
   const wishlist = useWishlist().list
@@ -222,54 +69,46 @@ export default function MapZoneAdvice({ onPick }: { onPick?: (zone: string) => v
     () => wishedByZone(new Set(wishlist.entries.map((e) => e.itemKey))),
     [wishlist.entries]
   )
-  const rows = useMemo(
-    () =>
-      Number.isFinite(level) && level > 0
-        ? rankZones(zoneBands(), level, { goal, min: MIN_EVIDENCE, wished })
-        : [],
-    [level, goal, wished]
-  )
-  const column = GOALS[goal].column
+
+  const rows = useMemo(() => {
+    if (!Number.isFinite(level) || level <= 0) return []
+    const ranked = rankZones(zoneBands(), level, {
+      goal: query.goal,
+      min: MIN_EVIDENCE,
+      wished,
+      fits: query.fits,
+      search: query.search
+    })
+    return sort === null ? ranked : sortAdvice(ranked, sort)
+  }, [level, query.goal, query.fits, query.search, wished, sort])
+
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const win = useWindowedRows({ count: rows.length, rowHeight: ROW_HEIGHT, scrollRef })
+  const narrowed = query.search.trim() !== '' || query.fits.size > 0
+
   return (
-    <Paper variant="outlined" data-testid="zone-advice" sx={{ p: 1 }}>
-      <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap" sx={{ mb: 0.75 }}>
-        <Typography variant="caption" color="text.secondary">
-          Worth your time at level
-        </Typography>
-        <TextField
-          size="small"
-          value={text}
-          onChange={(e) => {
-            setText(e.target.value.replace(/\D/g, '').slice(0, 2))
-          }}
-          slotProps={{ htmlInput: { 'data-testid': 'zone-advice-level', inputMode: 'numeric' } }}
-          sx={{ width: 64 }}
-        />
-        <GoalChips goal={goal} onGoal={setGoal} />
-        {rows.length > 0 && goal !== 'wish' && (
-          <Typography variant="caption" color="text.disabled">
-            {`motes cap at grade ${String(moteGradeCap(level))}`}
-          </Typography>
-        )}
-      </Stack>
+    <Paper
+      variant="outlined"
+      data-testid="zone-advice"
+      sx={{ p: 1, display: 'flex', flexDirection: 'column', flexGrow: 1, minHeight: 0 }}
+    >
+      <MapZoneAdviceBar query={query} onChange={setQuery} count={rows.length} />
       {rows.length === 0 ? (
-        <Typography variant="caption" color="text.disabled" data-testid="zone-advice-empty">
-          {emptyText(goal, level, wishlist.entries.length > 0)}
+        <Typography variant="body2" color="text.disabled" data-testid="zone-advice-empty" sx={{ p: 2 }}>
+          {emptyText(query.goal, level, wishlist.entries.length > 0, narrowed)}
         </Typography>
       ) : (
-        <>
-          <AdviceHead column={column} />
-          <List dense disablePadding>
-            {rows.slice(0, SHOWN).map((row) => (
-              <AdviceRow key={row.zone} row={row} column={column} onPick={onPick} />
-            ))}
-          </List>
-          {rows.length > SHOWN && (
-            <Typography variant="caption" color="text.disabled" sx={{ px: 1 }}>
-              {`and ${String(rows.length - SHOWN)} more`}
-            </Typography>
-          )}
-        </>
+        <MapZoneAdviceTable
+          rows={rows}
+          win={win}
+          sort={sort}
+          column={GOALS[query.goal].column}
+          scrollRef={scrollRef}
+          onSort={(key) => {
+            setSort(nextAdviceSort(sort, key))
+          }}
+          onPick={onPick}
+        />
       )}
     </Paper>
   )

@@ -30,10 +30,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { MapData } from '@shared/maps'
 import {
+  landings,
   nearestPorts,
   travelSeams,
   zoneExits,
-  type PortRoute,
+  type Landing,
   type ZoneExit,
   type ZoneGraph,
   type ZonePort
@@ -62,8 +63,8 @@ export interface ZoneTravel {
    * direction, which is why these are drawn as arrivals rather than departures.
    */
   rides: ZoneExit[]
-  /** ports landing here first, then the nearest through the graph, each with its walk */
-  routes: PortRoute[]
+  /** one entry per zone a port lands in - here first, then nearest - with its casts and its walk */
+  landings: Landing[]
   /** false until the port table has crossed from main; the card draws nothing rather than "none" */
   ready: boolean
 }
@@ -127,14 +128,14 @@ export function useZoneTravel(stem: string | null, zoneName: string | null, data
     return zoneLevelBand(rows.map((m) => Number.parseInt(String(m.level), 10)))
   }, [zoneName])
 
-  const routes = useMemo(() => {
+  const landed = useMemo(() => {
     if (ports === null || stem === null) return []
     // The map on screen is the seed graph until the full one lands; either way, one search.
     const seed: ZoneGraph = graph ?? new Map([[stem, exits]])
-    return nearestPorts(seed, ports, stem)
+    return landings(nearestPorts(seed, ports, stem))
   }, [stem, exits, ports, graph])
 
   const rides = useMemo(() => travelSeams(exits), [exits])
 
-  return { band, exits, rides, routes, ready: ports !== null }
+  return { band, exits, rides, landings: landed, ready: ports !== null }
 }

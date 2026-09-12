@@ -10,7 +10,7 @@
 
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { MOTES_PER_100, moteGradeCap, rankZones } from '../src/shared/zoneAdvice'
+import { MOTES_PER_100, moteGradeCap, nextAdviceSort, rankZones, sortAdvice } from '../src/shared/zoneAdvice'
 import { zoneLevelBand, type ZoneLevelBand } from '../src/shared/zoneLevels'
 import mobsJson from '../src/renderer/src/data/eqlegends/mobs.json'
 
@@ -109,4 +109,25 @@ test('the committed bestiary yields real advice for a real level, for both con g
     // A level 20's best zones are not level 50 zones.
     assert.ok(ranked[0].band.typical[0] <= 25, `${goal}: led with ${ranked[0].zone} ${String(ranked[0].band.typical)}`)
   }
+})
+
+// ---- search, fit filter, column sort (owner, 2026-09-12: "need filters/search/sort") -----------
+
+test('search and the fit filter narrow the list, and both are the ranker`s to do', () => {
+  const bands = new Map([['easy', band(5, 10)], ['even', band(18, 24)], ['reach', band(24, 29)]])
+  assert.deepEqual(rankZones(bands, 22, { search: 'EA' }).map((r) => r.zone), ['reach', 'easy'], 'case-folded substring')
+  assert.deepEqual(rankZones(bands, 22, { fits: new Set(['green']) }).map((r) => r.zone), ['easy'])
+  assert.equal(rankZones(bands, 22, { fits: new Set() }).length, 3, 'an empty filter is no filter')
+})
+
+test('a column sort runs over the goal`s rows and flips on a second click', () => {
+  const bands = new Map([['easy', band(5, 10)], ['even', band(18, 24)], ['reach', band(24, 29)]])
+  const rows = rankZones(bands, 22)
+  const byLow = sortAdvice(rows, { key: 'low', dir: 'asc' })
+  assert.deepEqual(byLow.map((r) => r.zone), ['easy', 'even', 'reach'])
+  assert.deepEqual(sortAdvice(rows, { key: 'zone', dir: 'asc' }).map((r) => r.zone), ['easy', 'even', 'reach'])
+  // First click on a number descends, on a name ascends; the same column again flips.
+  assert.deepEqual(nextAdviceSort(null, 'n'), { key: 'n', dir: 'desc' })
+  assert.deepEqual(nextAdviceSort(null, 'zone'), { key: 'zone', dir: 'asc' })
+  assert.deepEqual(nextAdviceSort({ key: 'n', dir: 'desc' }, 'n'), { key: 'n', dir: 'asc' })
 })

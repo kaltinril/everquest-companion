@@ -410,11 +410,12 @@ export default function MapsView({
 
   return (
     <Stack spacing={1.5} sx={{ height: '100%' }}>
-      <MapsHeader title={headerTitle(zone, raw)} zone={zone} data={data} />
-      {/* THE MAP TAB HOLDS EVERYTHING BELOW; the advice list is the other tab (owner, 2026-09-12:
-          it was taking the map's own space). `MapsTabs` owns the tab so this view stays under
-          its complexity ceiling. */}
+      {/* THE MAP TAB HOLDS EVERYTHING BELOW, the header included (owner, 2026-09-12: *"shouldn't
+          the top section be inside the map subtab and not above the tab names?"* - it names the
+          zone on the map, so it is the map's). The advice list is the other tab. `MapsTabs` owns
+          the tab so this view stays under its complexity ceiling. */}
       <MapsTabs onPick={pick}>
+        <MapsHeader title={headerTitle(zone, raw)} zone={zone} data={data} />
         {/* ALWAYS RENDERED, because the Zone selector inside it is how you leave the map you are
             on. Everything else in the bar is gated on `hasMap`. */}
         <MapToolbar

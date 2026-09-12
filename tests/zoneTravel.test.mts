@@ -15,7 +15,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
-import { nearestPorts, zoneExits, type ZoneGraph, type ZonePort } from '../src/shared/zoneTravel'
+import { landings, nearestPorts, zoneExits, type ZoneGraph, type ZonePort } from '../src/shared/zoneTravel'
 import { parseMapText } from '../src/main/maps/parseMap'
 import { splitMapFileName } from '../src/main/maps/packs'
 import type { MapPoint } from '../src/shared/maps'
@@ -170,4 +170,32 @@ test('a port is offered once, through its nearest landing, and a dock crossing k
   const routes = nearestPorts(two, [port('isle', 'Isle Gate', 5)], 'freportw')
   assert.equal(routes.length, 1)
   assert.deepEqual(routes[0].path.map((s) => s.kind), ['translocator', 'walk'], 'the dock NPC that replaced the boat')
+})
+
+// ---- one line per landing zone (owner, 2026-09-12) --------------------------------------------
+//
+// *"if there is a SOLO and GROUP port and alternate class, combine them to 1 line ... the point is
+// to show the top 2-3 closest zones that you can port into"*.
+
+
+test('every port into one zone folds onto one line, nearest zone first, cheapest cast first', () => {
+  const routes = nearestPorts(
+    CHAIN,
+    [
+      port('commons', 'Circle of Commons', 29),
+      port('commons', 'Ring of Commons', 19),
+      { ...port('commons', 'Common Gate', 24), via: 'wizard' },
+      port('commons', 'Ring of Commons'),
+      port('befallen', 'Befallen Gate', 40)
+    ],
+    'befallen'
+  )
+  const lines = landings(routes)
+  assert.deepEqual(lines.map((l) => l.zone), ['befallen', 'commons'], 'here first, then one hop')
+  const commons = lines[1]
+  assert.deepEqual(commons.druid.map((p) => p.level), [19, 29], 'druid casts, cheapest first')
+  assert.deepEqual(commons.wizard.map((p) => p.spell), ['Common Gate'])
+  assert.equal(commons.items.length, 1, 'the item click lands here too')
+  assert.deepEqual(commons.path.map((s) => s.zone), ['befallen'], 'the walk, stated once for the zone')
+  assert.deepEqual(lines[0].path, [], 'and none for where you stand')
 })
