@@ -27,6 +27,12 @@ import { Box, Chip, Paper, Stack, Typography } from '@mui/material'
 import type { ZonePort } from '@shared/zoneTravel'
 import type { ZoneLevelBand } from '@shared/zoneLevels'
 import type { TravelOption, ZoneTravel } from './useZoneTravel'
+// The two hover-and-drill seams the rest of the app already uses for these nouns. Wrapping the
+// names here is the whole of "link them": `SpellTooltip` carries its own click-through to the
+// spell page (lib/spellLink.tsx publishes the opener app-wide), and `KnownItemTooltip` is the
+// same card every other item name in the app opens.
+import { SpellTooltip } from '../../lib/SpellCard'
+import { KnownItemTooltip } from '../../lib/KnownItemTooltip'
 
 const TINY = { height: 18, fontSize: 10, '& .MuiChip-label': { px: 0.6 } } as const
 
@@ -63,10 +69,12 @@ function OptionRow({ option }: { option: TravelOption }): JSX.Element {
   return (
     <Stack direction="row" spacing={0.75} alignItems="center" data-testid="map-travel-option">
       <Chip size="small" variant="outlined" label={VIA_LABEL[port.via]} sx={TINY} />
-      <Typography variant="caption" sx={{ color: 'text.primary' }}>
-        {port.spell}
-        {port.level !== undefined && ` (${String(port.level)})`}
-      </Typography>
+      <SpellTooltip name={port.spell}>
+        <Typography variant="caption" component="span" sx={{ color: 'text.primary' }}>
+          {port.spell}
+          {port.level !== undefined && ` (${String(port.level)})`}
+        </Typography>
+      </SpellTooltip>
       <Typography variant="caption" color="text.secondary" noWrap sx={{ minWidth: 0 }}>
         {then === null
           ? 'lands here'
@@ -74,16 +82,22 @@ function OptionRow({ option }: { option: TravelOption }): JSX.Element {
             `to ${then.name}, then ${then.kind === 'walk' ? 'on foot' : 'by translocator'}`}
       </Typography>
       {port.item !== undefined && (
-        <Typography variant="caption" color="text.disabled" noWrap sx={{ minWidth: 0 }}>
-          {port.item}
-        </Typography>
+        <KnownItemTooltip name={port.item} clickThrough>
+          <Typography variant="caption" component="span" color="text.disabled" noWrap sx={{ minWidth: 0 }}>
+            {port.item}
+          </Typography>
+        </KnownItemTooltip>
       )}
     </Stack>
   )
 }
 
-/** How many ways in to draw before the list stops being a glance. */
-const SHOWN = 4
+/**
+ * How many ways in to draw before the card starts costing the map its space (owner, 2026-09-12:
+ * *"do you see how the map is now so small"*). Three: the cheapest cast, the next, and one more;
+ * the count line says how many were held back.
+ */
+const SHOWN = 3
 
 export default function MapTravelCard({ travel }: { travel: ZoneTravel }): JSX.Element | null {
   const { band, exits, rides, options, ready } = travel

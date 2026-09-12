@@ -51,6 +51,51 @@ const SHOWN = 8
  */
 const MIN_EVIDENCE = 8
 
+/**
+ * THE COLUMN HEADS (owner, 2026-09-12: *"the stats on the far right have no column header, just
+ * add a motes per 100 mobs or something"*). Two bare numbers at the end of a row are a puzzle, and
+ * the right-hand one is the whole point of the list.
+ *
+ * It mirrors `AdviceRow`'s own Stack rather than using a table, because the rows are buttons and a
+ * table row that is also a button fights both idioms. The padding matches the row's so the four
+ * columns line up under their words.
+ */
+function AdviceHead(): JSX.Element {
+  return (
+    <Stack
+      direction="row"
+      spacing={0.75}
+      alignItems="center"
+      sx={{ px: 1, pb: 0.25, width: '100%', minWidth: 0 }}
+    >
+      <Box sx={{ width: 62, flexShrink: 0 }} />
+      <Typography variant="caption" color="text.disabled">
+        Zone
+      </Typography>
+      <Typography variant="caption" color="text.disabled">
+        levels
+      </Typography>
+      <Box sx={{ flexGrow: 1 }} />
+      <Typography
+        variant="caption"
+        color="text.disabled"
+        title="Motes per 100 kills at this con, measured from this app's own logged fights. A rate, not a total: it says nothing about how fast you clear a zone."
+        sx={{ flexShrink: 0 }}
+      >
+        motes / 100 kills
+      </Typography>
+      <Typography
+        variant="caption"
+        color="text.disabled"
+        title="How many catalog mobs the level band rests on. A band drawn from a handful is a weaker claim than one drawn from a hundred."
+        sx={{ flexShrink: 0 }}
+      >
+        mobs
+      </Typography>
+    </Stack>
+  )
+}
+
 function AdviceRow({ row, onPick }: { row: ZoneAdvice; onPick?: (zone: string) => void }): JSX.Element {
   const fit = FIT[row.fit]
   const [low, high] = row.band.typical
@@ -81,10 +126,15 @@ function AdviceRow({ row, onPick }: { row: ZoneAdvice; onPick?: (zone: string) =
           title={`About ${String(row.motesPer100)} motes per 100 kills at this con, measured from this app's own logged fights. A rate, not a total - it says nothing about how fast you clear.`}
           sx={{ flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}
         >
-          {`${String(row.motesPer100)}/100`}
+          {row.motesPer100}
         </Typography>
-        <Typography variant="caption" color="text.disabled" sx={{ flexShrink: 0 }} title={`${String(row.n)} catalog mobs`}>
-          {`n${String(row.n)}`}
+        <Typography
+          variant="caption"
+          color="text.disabled"
+          sx={{ flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}
+          title={`${String(row.n)} catalog mobs carry a level in this zone`}
+        >
+          {row.n}
         </Typography>
       </Stack>
     </ListItemButton>
@@ -124,11 +174,14 @@ export default function MapZoneAdvice({ onPick }: { onPick?: (zone: string) => v
           Type a level to see the zones the bestiary can describe for it.
         </Typography>
       ) : (
-        <List dense disablePadding>
-          {rows.slice(0, SHOWN).map((row) => (
-            <AdviceRow key={row.zone} row={row} onPick={onPick} />
-          ))}
-        </List>
+        <>
+          <AdviceHead />
+          <List dense disablePadding>
+            {rows.slice(0, SHOWN).map((row) => (
+              <AdviceRow key={row.zone} row={row} onPick={onPick} />
+            ))}
+          </List>
+        </>
       )}
     </Paper>
   )

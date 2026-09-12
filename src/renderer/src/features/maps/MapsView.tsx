@@ -60,7 +60,7 @@ import { zoneLabel } from './zoneOptions'
 import { loadPackPrefs, savePackPrefs, useMapData, useMapPacks } from './useMapData'
 import { useLocMarker } from './useLocMarker'
 import MapTravelCard from './MapTravelCard'
-import MapZoneAdvice from './MapZoneAdvice'
+import MapsTabs from './MapsTabs'
 import { useZoneTravel } from './useZoneTravel'
 import {
   loadZoneSelection,
@@ -411,67 +411,69 @@ export default function MapsView({
   return (
     <Stack spacing={1.5} sx={{ height: '100%' }}>
       <MapsHeader title={headerTitle(zone, raw)} zone={zone} data={data} />
-      {/* ALWAYS RENDERED, because the Zone selector inside it is how you leave the map you are
-          on. Everything else in the bar is gated on `hasMap`. */}
-      <MapToolbar
-        zones={zones}
-        zone={zone}
-        onPick={pick}
-        mode={mode}
-        onFollowCurrent={followCurrent}
-        hasMap={data != null}
-        // A map could still be drawn here ⇒ the bar holds the row its drawing controls will need,
-        // so the pane below does not move when they arrive (JOS-205; `DrawnRow` measured it).
-        reserve={reserve}
-        layers={layers}
-        onLayers={setLayers}
-        bands={bands}
-        floor={floor}
-        onFloor={setFloor}
-        packs={packs}
-        prefs={prefs}
-        onPrefs={(p) => {
-          setPrefs(p)
-          savePackPrefs(p)
-        }}
-        locMarker={loc.marker}
-        onPlaceLoc={loc.place}
-        onShowLoc={loc.show}
-        onClearLoc={loc.clear}
-        zoomedIn={vp.zoomedIn}
-        onZoom={vp.zoomBy}
-        onFit={vp.fit}
-      />
-      {/* HOW YOU GET HERE, AND WHAT FOR (owner ask 2026-09-11). Under the toolbar rather than in
-          the sidebar: it is about the zone itself, not about finding something in it, and the
-          sidebar is the finder. Draws nothing at all when neither witness has anything to say. */}
-      <MapTravelCard travel={travel} />
-      {/* WHERE SHOULD I BE (owner ask 2026-09-11) — level-scoped, and clicking a row opens that
-          zone's map, which is what makes it a map-tab feature rather than a report. */}
-      <MapZoneAdvice onPick={pick} />
-      <MapBody
-        data={data}
-        // Nothing is claimed before the pack listing and the first fetch have answered — a
-        // panel that flashes up and vanishes reads as a bug, not as a load.
-        empty={
-          ready && !loading && <MapsEmpty raw={raw} auto={auto} zones={zones} zone={zone} error={error} />
-        }
-        vp={vp}
-        hostRef={hostRef}
-        layers={layers}
-        bands={bands}
-        floor={floor}
-        pane={pane}
-        zoneName={zoneName}
-        marker={marker}
-        locMarker={loc.marker}
-        onJump={onJump}
-        zones={zones}
-        onOpenMob={onOpenMob}
-        onOpenLoot={onOpenLoot}
-      />
-      {/* Reserved for the same reason and on the same condition as the toolbar's row (JOS-205). */}
-      <MapCredits data={data} reserve={reserve} />
+      {/* THE MAP TAB HOLDS EVERYTHING BELOW; the advice list is the other tab (owner, 2026-09-12:
+          it was taking the map's own space). `MapsTabs` owns the tab so this view stays under
+          its complexity ceiling. */}
+      <MapsTabs onPick={pick}>
+        {/* ALWAYS RENDERED, because the Zone selector inside it is how you leave the map you are
+            on. Everything else in the bar is gated on `hasMap`. */}
+        <MapToolbar
+          zones={zones}
+          zone={zone}
+          onPick={pick}
+          mode={mode}
+          onFollowCurrent={followCurrent}
+          hasMap={data != null}
+          // A map could still be drawn here ⇒ the bar holds the row its drawing controls will need,
+          // so the pane below does not move when they arrive (JOS-205; `DrawnRow` measured it).
+          reserve={reserve}
+          layers={layers}
+          onLayers={setLayers}
+          bands={bands}
+          floor={floor}
+          onFloor={setFloor}
+          packs={packs}
+          prefs={prefs}
+          onPrefs={(p) => {
+            setPrefs(p)
+            savePackPrefs(p)
+          }}
+          locMarker={loc.marker}
+          onPlaceLoc={loc.place}
+          onShowLoc={loc.show}
+          onClearLoc={loc.clear}
+          zoomedIn={vp.zoomedIn}
+          onZoom={vp.zoomBy}
+          onFit={vp.fit}
+        />
+        {/* HOW YOU GET HERE, AND WHAT FOR (owner ask 2026-09-11). Under the toolbar rather than in
+            the sidebar: it is about the zone itself, not about finding something in it, and the
+            sidebar is the finder. Draws nothing at all when neither witness has anything to say. */}
+        <MapTravelCard travel={travel} />
+        <MapBody
+          data={data}
+          // Nothing is claimed before the pack listing and the first fetch have answered — a
+          // panel that flashes up and vanishes reads as a bug, not as a load.
+          empty={
+            ready && !loading && <MapsEmpty raw={raw} auto={auto} zones={zones} zone={zone} error={error} />
+          }
+          vp={vp}
+          hostRef={hostRef}
+          layers={layers}
+          bands={bands}
+          floor={floor}
+          pane={pane}
+          zoneName={zoneName}
+          marker={marker}
+          locMarker={loc.marker}
+          onJump={onJump}
+          zones={zones}
+          onOpenMob={onOpenMob}
+          onOpenLoot={onOpenLoot}
+        />
+        {/* Reserved for the same reason and on the same condition as the toolbar's row (JOS-205). */}
+        <MapCredits data={data} reserve={reserve} />
+      </MapsTabs>
     </Stack>
   )
 }
