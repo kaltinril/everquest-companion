@@ -1,15 +1,18 @@
-import { Fragment, type JSX } from 'react'
+import type { JSX } from 'react'
 import {
   Box,
   Chip,
+  Collapse,
   Divider,
   Drawer,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  ListSubheader
+  Typography
 } from '@mui/material'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import SettingsIcon from '@mui/icons-material/Settings'
 import ShieldMoonIcon from '@mui/icons-material/ShieldMoon'
 import BarChartIcon from '@mui/icons-material/BarChart'
@@ -28,6 +31,7 @@ import FeedbackIcon from '@mui/icons-material/Feedback'
 // an icon whose only use sits inside a `false &&` branch is tree-shaken out with the branch.
 import RuleFolderIcon from '@mui/icons-material/RuleFolder'
 import UpdateChip from './UpdateChip'
+import { useBoolPref } from '../features/combat/useCombatPrefs'
 import { OWNER_TOOLS } from '../devFlags'
 import type { PrefsRouting } from '../appRouting'
 import { GEAR_AREA_VIEWS, VIEW_LABELS, loadGearTab, type View } from '../appViews'
@@ -71,8 +75,8 @@ const BETA = (
   />
 )
 
-/** A heading over a run of rows. `id` is the testid suffix (`nav-group-<id>`), stable while the
- *  heading copy is free to change. */
+/** A heading over a run of rows. `id` is the testid suffix (`nav-group-<id>`) and the tail of the
+ *  fold's storage key, stable while the heading copy is free to change. */
 interface NavGroup {
   id: string
   heading: string
@@ -145,15 +149,12 @@ const GROUPS: NavGroup[] = [
   }
 ]
 
-/** Compact, non-sticky, and quiet: a heading is orientation for the rows under it, never a row. */
-const GROUP_HEADING_SX = {
-  lineHeight: '28px',
-  mt: 0.5,
-  fontSize: 11,
-  letterSpacing: 1,
-  textTransform: 'uppercase',
-  bgcolor: 'transparent'
-} as const
+/** Compact and quiet: a heading is orientation for the rows under it, never a destination. */
+const GROUP_HEADING_SX = { minHeight: 28, mt: 0.5, py: 0, pr: 1 } as const
+const GROUP_HEADING_TEXT_SX = { fontSize: 11, letterSpacing: 1, textTransform: 'uppercase' } as const
+
+/** The fold's key. '1'/'0' via `useBoolPref`; absent means OPEN, the state a new user starts in. */
+const groupOpenKey = (id: string): string => `eq.nav.open.${id}`
 
 /** Bottom-aligned, outside GROUPS — it is not a feature view and never moves. */
 const PREFERENCES: NavRow = { view: 'preferences', icon: <SettingsIcon /> }
@@ -178,6 +179,56 @@ function NavRowButton({
       <ListItemText primary={VIEW_LABELS[row.view]} />
       {row.badge}
     </ListItemButton>
+  )
+}
+
+/**
+ * One heading and the rows it folds. THE FOLD IS THE USER'S (owner ask, 2026-09-12: "maybe I
+ * don't care about stats or config so I don't want to see it"): it persists per group across
+ * restarts and, through `useBoolPref`, across windows. A collapsed group is never forced open by
+ * navigation - a deep link into a hidden row would otherwise undo a choice the user made on
+ * purpose - so instead the heading itself reads `selected` while one of its hidden rows is the
+ * view on screen, and the drawer still agrees with the screen.
+ *
+ * `Collapse` keeps the rows mounted, so every `nav-<view>` testid exists whether or not it is
+ * visible; the e2e clicks land on a fresh userData where every group is open.
+ */
+function NavGroupSection({
+  group,
+  view,
+  onSelect
+}: {
+  group: NavGroup
+  view: View
+  onSelect: (v: View) => void
+}): JSX.Element {
+  const [open, setOpen] = useBoolPref(groupOpenKey(group.id), true)
+  const holdsView = group.rows.some((r) => (r.area ? r.area.includes(view) : r.view === view))
+  return (
+    <>
+      <ListItemButton
+        dense
+        data-testid={`nav-group-${group.id}`}
+        aria-expanded={open}
+        selected={!open && holdsView}
+        onClick={() => setOpen(!open)}
+        sx={GROUP_HEADING_SX}
+      >
+        <Typography color="text.secondary" sx={GROUP_HEADING_TEXT_SX}>
+          {group.heading}
+        </Typography>
+        <Box sx={{ ml: 'auto', display: 'flex', color: 'text.secondary' }}>
+          {open ? <ExpandMoreIcon fontSize="small" /> : <ChevronRightIcon fontSize="small" />}
+        </Box>
+      </ListItemButton>
+      <Collapse in={open}>
+        <List component="div" disablePadding>
+          {group.rows.map((row) => (
+            <NavRowButton key={row.view} row={row} view={view} onSelect={onSelect} />
+          ))}
+        </List>
+      </Collapse>
+    </>
   )
 }
 
@@ -225,14 +276,7 @@ export default function NavDrawer({
       <List>
         <NavRowButton row={OVERVIEW} view={view} onSelect={onSelect} />
         {GROUPS.map((group) => (
-          <Fragment key={group.id}>
-            <ListSubheader disableSticky data-testid={`nav-group-${group.id}`} sx={GROUP_HEADING_SX}>
-              {group.heading}
-            </ListSubheader>
-            {group.rows.map((row) => (
-              <NavRowButton key={row.view} row={row} view={view} onSelect={onSelect} />
-            ))}
-          </Fragment>
+          <NavGroupSection key={group.id} group={group} view={view} onSelect={onSelect} />
         ))}
         {/* UNRELEASED (JOS-45) USED TO HAVE A ROW HERE, and JOS-324 moved it INTO the gear area:
             the character sheet is now the area's last TAB, gated by the same `UNRELEASED` flag in
