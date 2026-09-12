@@ -26,8 +26,9 @@ import type { ClassAbbr } from '../../../../shared/classCombo'
 import type { GearRow } from '../../../../shared/planner/gear'
 import type { OwnedExaltation } from '../../../../shared/characterSheet'
 import { bestEffectFor, usable, type KindEffect } from './exaltationAudit'
-import type { SocketHostCell } from './socketRecommend'
-import { slotFits } from '../../../../shared/planner/rules'
+// R2 lives THERE, not here (owner catch 2026-09-11). This file's header has always said "the rules
+// are the recommender's"; until now it said so while carrying its own copy of them.
+import { seatFits, type SocketHostCell } from './socketRecommend'
 
 /** One family's claim: its best owned tier, the donor gems that carry it, and how many copies. */
 interface FamilyClaim {
@@ -138,25 +139,8 @@ function currentSeatExists(
     const occ = bestEffectFor(rowByKey.get(s.currentKey), s.type)
     if (occ?.family !== c.eff.family) return false
     const hostRow = rowByKey.get(s.itemKey)
-    return c.donors.some((d) => d.type === s.type && fits(d.row, s, hostRow))
+    return c.donors.some((d) => d.type === s.type && seatFits(d.row, s, hostRow))
   })
-}
-
-/**
- * R2 + type for one donor row against one seat.
- *
- * THE SLOT HALF IS `donor ∩ hostItem`, WITH THE CELL AS A SECOND CONSTRAINT (fix, 2026-09-10) - so
- * an `Any Slot` seat is a real seat whose HOST decides what fits it, rather than a seat nothing can
- * ever fill. `shared/planner/rules.ts slotFits` carries the rule and the report behind it.
- */
-function fits(row: GearRow, socket: SocketHostCell, hostRow: GearRow | undefined): boolean {
-  const hostSlots = hostRow?.slots ?? []
-  if (socket.slot === null && hostSlots.length === 0) return false
-  if (!slotFits(row.slots, hostSlots, socket.slot)) return false
-  if (hostRow !== undefined && row.classes.length > 0 && hostRow.classes.length > 0) {
-    return row.classes.some((c) => hostRow.classes.includes(c))
-  }
-  return true
 }
 
 /** The eligible seat indexes per claim — the bipartite graph's edges, CURRENT SEATS FIRST.
@@ -174,7 +158,7 @@ function edges(
     const occupied: number[] = []
     sockets.forEach((s, i) => {
       const hostRow = rowByKey.get(s.itemKey)
-      if (!c.donors.some((d) => d.type === s.type && fits(d.row, s, hostRow))) return
+      if (!c.donors.some((d) => d.type === s.type && seatFits(d.row, s, hostRow))) return
       const occupant = s.currentKey === null ? null : bestEffectFor(rowByKey.get(s.currentKey), s.type)
       if (occupant !== null && occupant.family === c.family) current.push(i)
       else if (s.currentKey === null) empty.push(i)
@@ -220,7 +204,7 @@ function placementOf(
   rowByKey: ReadonlyMap<string, GearRow>
 ): Placement {
   const hostRow = rowByKey.get(socket.itemKey)
-  const donor = claim.donors.find((d) => d.type === socket.type && fits(d.row, socket, hostRow))
+  const donor = claim.donors.find((d) => d.type === socket.type && seatFits(d.row, socket, hostRow))
   return {
     cellId: socket.cellId,
     cellLabel: socket.cellLabel,
