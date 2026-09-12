@@ -26,7 +26,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import type { MapData } from '@shared/maps'
-import { zoneExits, type ZoneExit, type ZonePort } from '@shared/zoneTravel'
+import { travelSeams, zoneExits, type ZoneExit, type ZonePort } from '@shared/zoneTravel'
 import { zoneLevelBand, type ZoneLevelBand } from '@shared/zoneLevels'
 import { mobsInZone } from '../mobs/mobZone'
 // The one committed bestiary the whole app reads — the same export the mob search and the pins on
@@ -43,8 +43,21 @@ export interface TravelOption {
 export interface ZoneTravel {
   /** what the zone's own mobs say it is for, or null when the bestiary states no level here */
   band: ZoneLevelBand | null
-  /** every seam this map labels — walk, boat and portal alike */
+  /** every seam this map labels — walk, dock crossing and portal alike */
   exits: ZoneExit[]
+  /**
+   * THE SEAMS THAT ARE THEMSELVES TRAVEL — dock crossings and portals, which the owner's ask
+   * named beside the spells ("druid, wizard, boat, or item port"). In Legends the dock is served
+   * by a TRANSLOCATOR NPC rather than a boat (owner, 2026-09-11); `shared/zoneTravel.travelSeams`
+   * translates the map file's older wording once, and nothing downstream repeats it.
+   *
+   * A walk is not in here and that is the distinction: every zone touches something on foot, so
+   * listing walks as ways to arrive would bury the crossings that matter under the ordinary.
+   *
+   * THE SEAM IS READ BOTH WAYS. This map states the dock; a translocator takes you either
+   * direction, which is why these are drawn as arrivals rather than departures.
+   */
+  rides: ZoneExit[]
   /** ports landing here first, then ports landing one labelled hop away */
   options: TravelOption[]
   /** false until the port table has crossed from main; the card draws nothing rather than "none" */
@@ -99,5 +112,7 @@ export function useZoneTravel(zone: string | null, data: MapData | null): ZoneTr
     [zone, exits, ports]
   )
 
-  return { band, exits, options, ready: ports !== null }
+  const rides = useMemo(() => travelSeams(exits), [exits])
+
+  return { band, exits, rides, options, ready: ports !== null }
 }
