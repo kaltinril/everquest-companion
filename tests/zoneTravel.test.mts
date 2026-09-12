@@ -33,9 +33,11 @@ test('a to_ label is a walk, and it folds onto the catalog`s own zone', () => {
   assert.equal(exits[0].label, 'to_West_Commonlands', 'the map`s own words survive for display')
 })
 
-test('the client names its own boats, and a destination the catalog lacks is still not invented', () => {
+test('a dock crossing is a translocator, and a destination the catalog lacks is not invented', () => {
   const exits = zoneExits([point("to_Erud's_Crossing_or_Freeport_(boat_or_translocator)")])
-  assert.equal(exits[0].kind, 'boat', 'the client says which crossings are not walks')
+  // Legends has no boats - translocator NPCs stand at the docks (owner, 2026-09-11). The map file
+  // still prints the old word and nothing this app draws repeats it.
+  assert.equal(exits[0].kind, 'translocator', 'the client says which crossings are not walks')
   assert.equal(exits[0].name, "Erud's Crossing")
   // AND ONLY ONE EXIT, because the catalog has no plain `Freeport` - it has East, West and North.
   // The boat really does land in East Freeport and mapping it there would be a GUESS (law 12), so

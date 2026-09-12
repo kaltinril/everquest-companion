@@ -34,7 +34,7 @@ import { ZONES, zoneEntryFor, type ZoneEntry } from './zones'
 import type { MapPoint, ZoneShort } from './maps'
 
 /** How the map says you make this crossing. */
-export type ExitKind = 'walk' | 'boat' | 'portal'
+export type ExitKind = 'walk' | 'translocator' | 'portal'
 
 /** One way out of the zone whose map this is. */
 export interface ZoneExit {
@@ -76,8 +76,13 @@ export interface ZonePort {
 /**
  * The parenthetical the client uses when a crossing is not a walk. Measured: every non-walk `to_`
  * label in the default pack carries `(boat_or_translocator)`, and no other parenthetical appears.
+ *
+ * THE CLIENT'S OWN HEDGE IS THE ANSWER. The label offers both words because the maps predate the
+ * change; the owner settled which one Legends uses (2026-09-11): *"there are no boats, there are
+ * teleport NPCs at the docks now"*. So the pattern still matches the boat spelling - that is what
+ * the file says - and nothing this app draws calls it a boat.
  */
-const BOAT = /\(.*(boat|translocat|ferry).*\)/i
+const DOCK = /\(.*(boat|translocat|ferry).*\)/i
 
 /**
  * `to_West_Commonlands` → `West Commonlands`, and
@@ -137,7 +142,7 @@ function exitsOfPoint(point: MapPoint): ZoneExit[] {
   const portal = /^(.+?)[_\s]+portal$/i.exec(raw)
   const body = to?.[1] ?? portal?.[1]
   if (body === undefined) return []
-  const kind: ExitKind = portal !== null && to === null ? 'portal' : BOAT.test(raw) ? 'boat' : 'walk'
+  const kind: ExitKind = portal !== null && to === null ? 'portal' : DOCK.test(raw) ? 'translocator' : 'walk'
   const out: ZoneExit[] = []
   for (const candidate of destinationsOf(body)) {
     // A label naming something the catalog does not know is DROPPED rather than guessed at: the
@@ -167,5 +172,26 @@ export function zoneExits(points: readonly MapPoint[]): ZoneExit[] {
       out.push(exit)
     }
   }
+  return out
+}
+
+/**
+ * THE SEAMS THAT ARE THEMSELVES TRAVEL — boats and portals, out of a zone's exits.
+ *
+ * The owner's ask named four ways in and one of them is not a spell: *"the closest druid, wizard,
+ * boat, or item port"*. In EQ Legends that crossing is a TRANSLOCATOR NPC standing at the dock
+ * rather than a boat you ride (owner, 2026-09-11) - the map files still print the old word, and
+ * this app does not. A WALK is not in here: every zone touches something on foot, and listing
+ * those would bury the crossings that matter under the ordinary.
+ *
+ * READ BOTH WAYS ON PURPOSE. The map states the dock as a way OUT; a translocator at a dock takes
+ * you either direction, so the surface draws these as arrivals too.
+ *
+ * It lives here rather than in the view because ruling 4 is exactly about this: the renderer is
+ * handed collections already filtered, never a corpus to sift.
+ */
+export function travelSeams(exits: readonly ZoneExit[]): ZoneExit[] {
+  const out: ZoneExit[] = []
+  for (const exit of exits) if (exit.kind !== 'walk') out.push(exit)
   return out
 }

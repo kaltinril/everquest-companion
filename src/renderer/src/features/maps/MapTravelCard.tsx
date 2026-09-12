@@ -3,6 +3,10 @@
 // Two owner asks in one strip (kaltinril 2026-09-11): the nearest druid / wizard / boat / item
 // port, and the zone's level range. `useZoneTravel` gathers the three witnesses; this only draws.
 //
+// IT NEVER SAYS "BOAT". Legends replaced the boats with translocator NPCs at the docks (owner,
+// 2026-09-11) and the map files still print the old word; `zoneTravel.ts` translates it once, and
+// the copy here says dock and translocator because that is what the player walks up to.
+//
 // ── IT LEADS WITH THE PORT THAT LANDS HERE ───────────────────────────────────────────────────
 //
 // A port INTO the zone beats a port one hop away, always, and the hop is spelled out rather than
@@ -67,7 +71,7 @@ function OptionRow({ option }: { option: TravelOption }): JSX.Element {
         {then === null
           ? 'lands here'
           : /* The client's own label, so the reader can find the seam on the map. */
-            `to ${then.name}, then ${then.kind === 'boat' ? 'by boat' : 'on foot'}`}
+            `to ${then.name}, then ${then.kind === 'walk' ? 'on foot' : 'by translocator'}`}
       </Typography>
       {port.item !== undefined && (
         <Typography variant="caption" color="text.disabled" noWrap sx={{ minWidth: 0 }}>
@@ -82,7 +86,7 @@ function OptionRow({ option }: { option: TravelOption }): JSX.Element {
 const SHOWN = 4
 
 export default function MapTravelCard({ travel }: { travel: ZoneTravel }): JSX.Element | null {
-  const { band, exits, options, ready } = travel
+  const { band, exits, rides, options, ready } = travel
   // Until the port table has crossed from main, drawing "no ports" would be a claim about the
   // corpus rather than about the wait (law 1). A card with only a level line is still worth having.
   const shown = ready ? options.slice(0, SHOWN) : []
@@ -91,6 +95,18 @@ export default function MapTravelCard({ travel }: { travel: ZoneTravel }): JSX.E
     <Paper variant="outlined" data-testid="map-travel-card" sx={{ p: 1, mb: 1 }}>
       <Stack spacing={0.5}>
         <LevelLine band={band} />
+        {/* The crossings somebody built, read as arrivals - what the ask called the "boat". */}
+        {rides.map((ride) => (
+          <Stack key={`${ride.kind}-${ride.zone}`} direction="row" spacing={0.75} alignItems="center" data-testid="map-travel-ride">
+            <Chip size="small" variant="outlined" label={ride.kind === 'translocator' ? 'dock' : 'portal'} sx={TINY} />
+            <Typography variant="caption" sx={{ color: 'text.primary' }}>
+              {ride.name}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" noWrap sx={{ minWidth: 0 }}>
+              {ride.kind === 'translocator' ? 'translocator at the dock' : 'portal from here'}
+            </Typography>
+          </Stack>
+        ))}
         {shown.map((option, i) => (
           <OptionRow key={`${option.port.spell}-${option.then?.zone ?? 'here'}-${String(i)}`} option={option} />
         ))}
