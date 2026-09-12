@@ -111,8 +111,9 @@ interface NavGroup {
 
 // Row ORDER is the nav's order. Overview leads, ungrouped: it is the at-a-glance landing surface.
 //
-// THE REST SIT UNDER THREE HEADINGS (owner ask, 2026-09-12): Research is what the game holds,
-// Stats/Data is what your own log says, Config is what the app does for you. The headings are
+// THE REST SIT UNDER THREE HEADINGS (owner ask, 2026-09-12): Stats/Data is what your own log says,
+// Research is what the game holds, Config is what the app does for you - in that order, the log
+// first (owner, same day: "put stats/data first"). The headings are
 // presentational only - no routing, gating or testid changes - and exist because a dozen rows in
 // one column read as one undifferentiated list. Where a tab could go either way it follows the
 // question it answers: Loot is what YOU got, so it is data; Mobs is what the game HAS, so it is
@@ -132,7 +133,17 @@ interface NavGroup {
 const OVERVIEW: NavRow = { view: 'overview', icon: <SpaceDashboardIcon /> }
 
 const GROUPS: NavGroup[] = [
-  {
+{
+    id: 'stats',
+    heading: 'Stats/Data',
+    rows: [
+      { view: 'combat', icon: <BarChartIcon /> },
+      { view: 'loot', icon: <ReceiptLongIcon /> },
+      { view: 'buffs', icon: <AutoFixHighIcon /> },
+      { view: 'leveling', icon: <TrendingUpIcon /> }
+    ]
+  },
+{
     id: 'research',
     heading: 'Research',
     rows: [
@@ -180,17 +191,7 @@ const GROUPS: NavGroup[] = [
       ...(UNRELEASED ? [{ view: 'factions' as View, icon: <HandshakeIcon /> }] : [])
     ]
   },
-  {
-    id: 'stats',
-    heading: 'Stats/Data',
-    rows: [
-      { view: 'combat', icon: <BarChartIcon /> },
-      { view: 'loot', icon: <ReceiptLongIcon /> },
-      { view: 'buffs', icon: <AutoFixHighIcon /> },
-      { view: 'leveling', icon: <TrendingUpIcon /> }
-    ]
-  },
-  {
+{
     id: 'config',
     heading: 'Config',
     rows: [
