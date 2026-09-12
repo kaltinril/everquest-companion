@@ -106,3 +106,34 @@ test('a genuine miss reports nothing hidden — the honest empty state stays hon
   const filters = { ...FILTERS, text: 'no such thing' }
   assert.deepEqual(hiddenByView(ROWS, filters, [], DEFAULT_VIEW), { era: 0, nonEquip: 0 })
 })
+
+// ---- the owned tri-state (fork ask 2026-09-09, reworded to two chips 2026-09-11) -------------
+//
+// It shipped without a test, which is how `'hide'` and `'only'` survived long enough to become the
+// names the UI had to translate. The modes say what the player asked for now — `missing` and
+// `owned` — and the three cases below are the whole of the rule, including the one that does
+// NOTHING.
+
+/** Everything visible, so the only filter under test is the ownership one. */
+const OPEN: DonorView = { eraOnly: false, nonEquip: true }
+const HELD = new Set(['plain wand'])
+
+test('missing shows what you do not have, owned shows what you do', () => {
+  assert.deepEqual(names({ ...OPEN, ownedKeys: HELD, owned: 'missing' }), [
+    'Slotless Potion',
+    'Later Wand',
+    'Later Potion'
+  ])
+  assert.deepEqual(names({ ...OPEN, ownedKeys: HELD, owned: 'owned' }), ['Plain Wand'])
+  // The third state has no chip of its own — it is neither chip lit — and it filters nothing.
+  assert.equal(names({ ...OPEN, ownedKeys: HELD, owned: 'all' }).length, ROWS.length)
+})
+
+test('with no inventory dump the filter does nothing at all, in either direction', () => {
+  // World-model law 1 at the filter: an absent dump is not "you own none of these". Hiding owned
+  // rows would hide none and claim a clean list; showing only owned rows would empty the browser.
+  // Both are answers about a file that was never written, so neither is given.
+  for (const mode of ['missing', 'owned'] as const) {
+    assert.equal(names({ ...OPEN, owned: mode }).length, ROWS.length, `${mode}: no dump, no filter`)
+  }
+})

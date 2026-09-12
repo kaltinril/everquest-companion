@@ -173,6 +173,12 @@ interface RowListProps {
   onOpenLoot?: (item: string) => void
   /** the comparison seam behind the donor-name hover (JOS-344) — a STABLE object, see below */
   compare: GearCompareData
+  /**
+   * The keys this character owns, or ABSENT when no inventory dump exists (fork ask 2026-09-11).
+   * The same set the owned filter reads, handed to the rows so each one can say which side of it
+   * it fell on — `PlannerChips.OwnedChip` states why absent must draw nothing.
+   */
+  ownedKeys?: ReadonlySet<string>
 }
 
 /**
@@ -200,6 +206,7 @@ function emptyText(ready: boolean, hidden: HiddenByView, item: string | null): s
 /** The bounded scroll box (AGENTS.md UI conventions) and the window of rows inside it. */
 function RowList(props: RowListProps): JSX.Element {
   const { rows, win, planClasses, wished, ready, hidden, item, onToggle, onToggleWish, onOpenLoot, compare } = props
+  const { ownedKeys } = props
   return (
     <>
       <Box sx={{ height: win.topPad }} />
@@ -215,6 +222,7 @@ function RowList(props: RowListProps): JSX.Element {
             best={row.best}
             namesEffect={row.namesEffect}
             namesSays={row.namesSays}
+            owned={ownedKeys === undefined ? undefined : ownedKeys.has(row.donor.key)}
             onToggleWish={onToggleWish}
             onOpenLoot={onOpenLoot}
             compare={compare}
@@ -451,6 +459,7 @@ export default function EffectBrowser({
           onToggleWish={onToggleWish}
           onOpenLoot={onOpenLoot}
           compare={compare}
+          ownedKeys={ownedKeys}
         />
       </Box>
     </Box>
