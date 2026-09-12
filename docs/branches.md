@@ -27,6 +27,7 @@ re-reads them. Last taken 2026-09-11.
 | `faction-tab` | `C:/git/eqc-faction-tab` | 0 / 13 | `/outputfile faction` graduated to a third supported kind, the UNRELEASED Factions tab, and the race-unlock claims read out of the achievements dump. |
 | `character-slot-sockets` | *(none)* | 11 / 12 | The socket board's foundation — the base `exaltation-clarity` sits on. Nothing new lands here; it exists so the exaltation branch has an honest base. |
 | `scrape-delta-tool` | `C:/git/eqc-scrape` | 0 / 1 | `scripts/scrape-delta.mts`: the wiki-DB top-up that reads MediaWiki `recentchanges` since `items.json`'s `scrapedAt` and re-fetches only changed pages, at the creator's 1 req/s etiquette. Running it is an owner decision, never automatic. |
+| `sidebar-groups` | `C:/git/eqc-sidebar` | 0 / 1 | The nav drawer's tabs under three headings - Research, Stats/Data, Config - with Overview on top, ungrouped (owner ask, 2026-09-12). One file, presentational only, every testid unchanged. On the testing merge the gated Spells and Factions rows joined Research; a branch that adds a tab places it in a group at merge time. |
 
 ## Local only — never a PR
 
