@@ -562,7 +562,7 @@ function loadAchievementsNow(ref: CharacterRef, why: 'startup' | 'watch'): void 
   timeSeam('achievementsLoad', () => {
     const res = loadAchievements(who.name, who.server)
     if (!res) return
-    setAchievements(activeCharId(), res.unlocks, res.source)
+    setAchievements(activeCharId(), res.unlocks, res.source, res.deity)
     logInfo(
       `[everquest-companion] Achievements ${
         why === 'startup' ? 'loaded at startup' : 'auto-reloaded'

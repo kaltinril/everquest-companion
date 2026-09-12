@@ -29,6 +29,7 @@
 // `GearBuildStats` — so a rescrape that spells a stat a new way turns the suite red instead of
 // quietly dropping a column out of the gear table (law 1).
 
+import { deitiesOf, isDeity } from '../../shared/planner/deity'
 import { itemKey, type ItemDbEntry, type ItemDbFile } from '../itemsDb'
 import { renamedItems } from '../../shared/itemRenames'
 import {
@@ -198,11 +199,15 @@ interface Acc {
   rows: Map<string, GearRow>
   fromCanonical: Set<string>
   unknownSlots: Set<string>
+  unknownDeities: Set<string>
   unindexed: Map<string, number>
   unreadable: Map<string, number>
   /** LAYER 3, built once for the whole file before the walk (`eraDerive.ts`) — itemKey → the edge */
   derived: ReadonlyMap<string, EraDerivation>
-  stats: Omit<GearBuildStats, 'unindexedStatKeys' | 'unreadableStatKeys' | 'unknownSlotTokens'>
+  stats: Omit<
+    GearBuildStats,
+    'unindexedStatKeys' | 'unreadableStatKeys' | 'unknownSlotTokens' | 'unknownDeityTokens'
+  >
 }
 
 function newAcc(derived: ReadonlyMap<string, EraDerivation>): Acc {
@@ -211,6 +216,7 @@ function newAcc(derived: ReadonlyMap<string, EraDerivation>): Acc {
     rows: new Map(),
     fromCanonical: new Set(),
     unknownSlots: new Set(),
+    unknownDeities: new Set(),
     unindexed: new Map(),
     unreadable: new Map(),
     derived,
@@ -339,6 +345,8 @@ function pageRow(
 
   const read = readGearStats(block)
   foldReading(acc, read)
+  const deities = deitiesOf(entry.statsBlock)
+  for (const d of deities) if (!isDeity(d)) acc.unknownDeities.add(d)
   // LAYER 3 is keyed by the PAGE's canonical key (`eraDerive.ts` walks pages, not alias keys), while
   // the row's key comes from the item NAME. They differ on the 196 `|itemname` alias pages, and the
   // page is the thing the derivation walked, so the page is what it is looked up by.
@@ -349,6 +357,10 @@ function pageRow(
     slots,
     classes: normalizeClasses(block.classes),
     races: normalizeRaces(block.races),
+    // R2's fourth condition, read from the RAW block rather than the parsed flags - the scrape-time
+    // parser shreds the comma-separated deity list into bare flag entries, so the line is only
+    // whole here. `planner/deity.deitiesOf` states the measurement.
+    ...(deities.length === 0 ? {} : { deities }),
     flags: [...block.flags],
     quest: k.quest,
     playerCrafted: k.playerCrafted === true,
@@ -411,7 +423,8 @@ export function buildGearIndex(
       ...acc.stats,
       unindexedStatKeys: Object.fromEntries([...acc.unindexed].sort((a, b) => b[1] - a[1])),
       unreadableStatKeys: Object.fromEntries([...acc.unreadable].sort((a, b) => b[1] - a[1])),
-      unknownSlotTokens: [...acc.unknownSlots]
+      unknownSlotTokens: [...acc.unknownSlots],
+      unknownDeityTokens: [...acc.unknownDeities]
     }
   }
 }

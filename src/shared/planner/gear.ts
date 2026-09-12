@@ -170,6 +170,17 @@ export interface GearRow {
    * be exactly the fuzzy join law 12 refuses.
    */
   races: string[]
+  /**
+   * DEITY TOKENS this item restricts itself to, folded through `planner/deity.deityKey` — absent
+   * on the 11,161 pages that state no deity line, which is the ordinary case and means NO
+   * RESTRICTION rather than "nobody" (law 1).
+   *
+   * Unlike `races` above, this one is CHECKED, and `planner/deity.ts` carries the whole argument
+   * for why the two are different situations: the vocabulary here is closed and measured (the
+   * game's own achievements file names all seventeen), the player's own answer is stated by that
+   * same file, and the item's half is already committed in `statsBlock`. Race has none of those.
+   */
+  deities?: string[]
   /** the page-top `{{X Era}}` banner's token, VERBATIM — `shared/planner/era.ts` decides meaning */
   eraTag?: string
   /**
@@ -256,6 +267,12 @@ export interface GearBuildStats {
   unreadableStatKeys: Record<string, number>
   /** slot tokens `normalizeSlotTokens` did not recognize, verbatim — must stay empty */
   unknownSlotTokens: string[]
+  /**
+   * Deity tokens the game has never named, folded, verbatim — the same law-1 census as the slot
+   * tokens above and for a sharper reason: an unrecognised deity BLOCKS rather than passes, so a
+   * wiki page that spells one a new way would quietly make an item unusable. Must stay empty.
+   */
+  unknownDeityTokens: string[]
 }
 
 /** The one answer `IPC.gearIndex` serves. Built once in main, fetched once by the renderer. */

@@ -15,7 +15,6 @@
 //
 // Pure and node-tested (tests/exaltationAudit.test.mts drives both modules).
 
-import type { ClassAbbr } from '../../../../shared/classCombo'
 import type { GearRow } from '../../../../shared/planner/gear'
 import type { OwnedExaltation, SheetCellView } from '../../../../shared/characterSheet'
 import { ownershipKey } from '../../../../shared/planner/ownership'
@@ -25,7 +24,7 @@ import type { EquipSlot } from '../../../../shared/planner/types'
 // R2's slot half, corrected 2026-09-10: `donor ∩ hostItem` first, the cell second. Its header
 // carries the report and the measurement behind it.
 import { slotFits } from '../../../../shared/planner/rules'
-import { bestEffectFor, usable, type KindEffect } from './exaltationAudit'
+import { bestEffectFor, usable, type KindEffect, type Loadout } from './exaltationAudit'
 
 // ---- the recommender (the "best with what we have" ask) ----------------------------------------
 //
@@ -241,7 +240,7 @@ export function seatFits(
 interface RecContext {
   pool: LoosePool
   rowByKey: ReadonlyMap<string, GearRow>
-  classes: readonly ClassAbbr[]
+  loadout: Loadout
 }
 
 function bestLoose(
@@ -255,7 +254,7 @@ function bestLoose(
   for (const key of ctx.pool.keys()) {
     const row = ctx.rowByKey.get(key)
     // The loadout gate is this engine's own; the seat gate is the one both engines share.
-    if (row === undefined || !usable(row, ctx.classes) || !seatFits(row, host, hostRow)) continue
+    if (row === undefined || !usable(row, ctx.loadout) || !seatFits(row, host, hostRow)) continue
     const eff = bestEffectFor(row, host.type)
     if (eff === null || !accept(eff)) continue
     if (best === null || eff.tier > best.eff.tier) best = { key, row, eff }
@@ -416,13 +415,13 @@ function fillPass(
 export function recommendSockets(
   owned: readonly OwnedExaltation[],
   rows: readonly GearRow[],
-  classes: readonly ClassAbbr[],
+  loadout: Loadout,
   hosts: readonly SocketHostCell[]
 ): Recommendations {
   const ctx: RecContext = {
     pool: loosePool(owned),
     rowByKey: new Map(rows.map((r) => [r.key, r])),
-    classes
+    loadout
   }
   const swaps: SwapRec[] = []
   const fills: FillRec[] = []

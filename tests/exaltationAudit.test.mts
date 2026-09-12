@@ -16,11 +16,19 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import type { GearRow } from '../src/shared/planner/gear'
 import type { OwnedExaltation } from '../src/shared/characterSheet'
-import { auditExaltations, rankedEffects } from '../src/renderer/src/features/character/exaltationAudit'
+import {
+  auditExaltations,
+  rankedEffects,
+  type Loadout
+} from '../src/renderer/src/features/character/exaltationAudit'
 import {
   recommendSockets,
   type SocketHostCell
 } from '../src/renderer/src/features/character/socketRecommend'
+
+/** No class filter and no deity stated - the pre-R2-fourth-condition loadout, and the one most
+ *  of these fixtures want: every gate below open so the rule under test is the only one acting. */
+const NOBODY: Loadout = { classes: [], deity: null }
 
 function row(key: string, name: string, effects: GearRow['effects'], classes: GearRow['classes'] = []): GearRow {
   return {
@@ -65,7 +73,7 @@ test('a lower owned tier is flagged when a higher owned tier is usable by the lo
   const audit = auditExaltations(
     [owned('Weak Belt', 'General 1'), owned('Strong Belt', 'Bank 2')],
     rows,
-    ['WAR', 'MNK', 'SHM']
+    { classes: ['WAR', 'MNK', 'SHM'], deity: null }
   )
   assert.equal(audit.superseded.length, 1)
   const f = audit.superseded[0]
@@ -77,7 +85,7 @@ test('a lower owned tier is flagged when a higher owned tier is usable by the lo
   const gated = auditExaltations(
     [owned('Weak Belt', 'General 1'), owned('Strong Belt', 'Bank 2')],
     [rows[0], row('strong belt', 'Strong Belt', [{ name: 'Burning Affliction III', kind: 'worn' }], ['NEC'])],
-    ['WAR', 'MNK', 'SHM']
+    { classes: ['WAR', 'MNK', 'SHM'], deity: null }
   )
   assert.equal(gated.superseded.length, 0, 'an unusable higher tier supersedes nothing')
 })
@@ -131,7 +139,7 @@ test('the recommender swaps a socketed gem only for a strictly better LOOSE copy
       { name: 'Other Gem', key: 'other gem', where: 'Bank 2', socketed: false }
     ],
     rows,
-    [],
+    NOBODY,
     [host('waist', 'Worn', 'Weak Belt')]
   )
   assert.equal(recs.swaps.length, 1)
@@ -150,7 +158,7 @@ test('an empty socket takes the best remaining loose gem, and one physical copy 
     [{ name: 'Gem A', key: 'gem a', where: 'General 1', socketed: false },
      { name: 'Gem B', key: 'gem b', where: 'General 2', socketed: false }],
     rows,
-    [],
+    NOBODY,
     [host('ear1', 'Worn', null), host('ear2', 'Worn', null), host('neck', 'Worn', null)]
   )
   // Two gems, three empty sockets: the ranked one first, the unranked one second, nothing third.
@@ -166,7 +174,7 @@ test('a socketed gem the corpus cannot rank is left alone - "better" would be a 
       { name: 'Strong Belt', key: 'strong belt', where: 'Bank 2', socketed: false }
     ],
     [row('strong belt', 'Strong Belt', [{ name: 'Burning Affliction III', kind: 'worn' }])],
-    [],
+    NOBODY,
     [host('head', 'Worn', 'Mystery Gem')]
   )
   assert.equal(recs.swaps.length, 0)
@@ -186,7 +194,7 @@ test('a family socketed twice is a DEAD socket: the lesser copy is flagged and o
       { name: 'Other', key: 'other', where: 'Bank 1', socketed: false }
     ],
     rows,
-    [],
+    NOBODY,
     [host('ear1', 'Focus', 'Aff Gem'), host('ear2', 'Focus', 'Aff Gem 2')]
   )
   assert.equal(recs.redundant.length, 1)
@@ -217,7 +225,7 @@ test('the redundancy pass judges POST-swap effects, so a swap does not create a 
       { name: 'Aff Gem 2', key: 'aff gem 2', where: 'Bank 1', socketed: false }
     ],
     rows,
-    [],
+    NOBODY,
     [host('ear1', 'Focus', 'Aff Gem'), host('ear2', 'Focus', 'Other')]
   )
   assert.equal(recs.swaps.length, 1)
@@ -236,11 +244,11 @@ test('R2: a gem fits only a host sharing its donor SLOT, and only a host sharing
   ]
   // A WAIST-slot gem is never offered to a FINGER cell...
   const fingerHost = { ...host('finger1', 'Worn', null), slot: 'FINGER' as const }
-  assert.equal(recommendSockets(looseBoth, rows, [], [fingerHost]).fills.length, 0)
+  assert.equal(recommendSockets(looseBoth, rows, NOBODY, [fingerHost]).fills.length, 0)
   // ...and a MNK-only gem is never offered to a WAR-only host item, even at the right slot -
   // socketing it would re-restrict an item its own wearer could not use.
   const warHost = { ...host('waist', 'Worn', null, 'War Host'), itemKey: 'war host' }
-  const fills = recommendSockets(looseBoth, rows, [], [warHost]).fills
+  const fills = recommendSockets(looseBoth, rows, NOBODY, [warHost]).fills
   assert.equal(fills.length, 1)
   assert.equal(fills[0].gemName, 'Belt Gem')
 })
@@ -260,7 +268,7 @@ test('keeper-first: a socket called dead is never also offered an upgrade (the S
       { name: 'Belt Gem', key: 'belt gem', where: 'General 6', socketed: false }
     ],
     rows,
-    [],
+    NOBODY,
     [host('finger1', 'Worn', 'Ring Gem'), host('waist', 'Worn', 'Belt Gem')]
   )
   assert.equal(recs.swaps.length, 0, 'the keeper already holds III; the loose III upgrades nothing')
@@ -291,7 +299,7 @@ test('a fill never offers a family the board already grants - the Summoning Hast
       { name: 'Other Gem', key: 'other gem', where: 'General 3', socketed: false }
     ],
     rows,
-    [],
+    NOBODY,
     [host('waist', 'Worn', 'Belt Gem'), host('finger1', 'Worn', null)]
   )
   // The empty finger takes the OTHER family. The loose Summoning Haste I is left where it is: the
@@ -312,7 +320,7 @@ test('…and two empty sockets are never filled from one family, which is the sa
       { name: 'Small Gem', key: 'small gem', where: 'General 2', socketed: false }
     ],
     rows,
-    [],
+    NOBODY,
     [host('ear1', 'Worn', null), host('ear2', 'Worn', null)]
   )
   // Two loose copies of one family, two open sockets: the better one is placed and the second
@@ -343,12 +351,12 @@ test('a Proc seat is only offered where a weapon is actually swung', () => {
 
   // An `Any Slot` cell (slot null) holding that weapon: R2 passes, the proc rule does not.
   const anySlot: SocketHostCell = { ...host('any1', 'Proc', null, 'Bladestopper'), slot: null }
-  const idle = recommendSockets(gem, rows, [], [anySlot])
+  const idle = recommendSockets(gem, rows, NOBODY, [anySlot])
   assert.equal(idle.fills.length, 0, 'nothing swings an Any Slot, so its proc socket is not a seat')
 
   // The same gem into the hand that swings - the one place a proc can fire.
   const primary: SocketHostCell = { ...anySlot, cellId: 'primary', slot: 'PRIMARY' }
-  const armed = recommendSockets(gem, rows, [], [primary])
+  const armed = recommendSockets(gem, rows, NOBODY, [primary])
   assert.equal(armed.fills.length, 1)
   assert.equal(armed.fills[0].gemName, 'Sword Gem')
 
@@ -358,7 +366,7 @@ test('a Proc seat is only offered where a weapon is actually swung', () => {
   const still = recommendSockets(
     focusGem,
     [weapon('focus gem', 'Focus Gem', [{ name: 'Improved Damage II', kind: 'focus' }]), rows[1]],
-    [],
+    NOBODY,
     [focus]
   )
   assert.equal(still.fills.length, 1, 'an Any Slot is a real seat for everything but a proc')

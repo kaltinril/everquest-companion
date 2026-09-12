@@ -35,8 +35,16 @@ import { getProgress, setProgress } from './store'
 export function setAchievements(
   charId: string,
   unlocks: ClassUnlockClaim[],
-  source: AchievementsSource
+  source: AchievementsSource,
+  /** the game's own spelling, or null when the dump does not state one - then the key is LEFT AS
+   *  IT WAS rather than cleared, because a file that says nothing is not a file that says none */
+  deity: string | null
 ): ProgressState {
   const p = getProgress(charId)
-  return setProgress(charId, { ...p, achievementUnlocks: unlocks, achievementsSource: source })
+  return setProgress(charId, {
+    ...p,
+    achievementUnlocks: unlocks,
+    achievementsSource: source,
+    ...(deity === null ? {} : { deity })
+  })
 }

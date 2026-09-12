@@ -115,6 +115,13 @@ export interface ProgressState {
    * one written here still opens in a build that predates the achievements reader.
    */
   achievementUnlocks?: ClassUnlockClaim[]
+  /**
+   * THE CHARACTER'S DEITY, in the GAME's own spelling, from the same dump
+   * (`outputs/achievements.confirmedDeity`). R2's fourth condition needs it and no other output
+   * file states it. Absent until an achievements dump has been read, and absent means UNKNOWN -
+   * every reader passes rather than filters on it (`planner/deity.deityFits`).
+   */
+  deity?: string
   /** metadata about the last achievements load — the file's mtime and when we read it (JOS-429). */
   achievementsSource?: AchievementsSource
   /**

@@ -356,3 +356,53 @@ export function classUnlockClaims(dump: AchievementsDump): ClassUnlockClaim[] {
   }
   return out
 }
+
+// ---- the deity block (owner report, kaltinril 2026-09-11) ------------------------------------
+
+/** The category holding the deity-unlock achievements — one per deity the game names. */
+export const DEITY_UNLOCK_CATEGORY = 'Untapped Potential: Deity'
+
+/** What every deity-unlock achievement's name starts with; the rest is the deity. */
+export const DEITY_UNLOCK_PREFIX = 'Deity Unlock - '
+
+/**
+ * The deity-confirmation pseudo-row, up to the name — `C` on the deity the player was CREATED
+ * with or has since confirmed. The class block's twin (`CLASS_UNLOCK_CONFIRM_PREFIX`) and read the
+ * same way, minus its article: the class row says "as a Wizard", this one says "as Cazic Thule".
+ */
+export const DEITY_CONFIRM_PREFIX =
+  'This achievement will autocomplete if you chose to confirm your Deity as '
+
+/**
+ * THE CHARACTER'S OWN DEITY, or null when the file does not say.
+ *
+ * WHY THIS IS HERE AT ALL. Deity is R2's fourth condition (`shared/planner/deity.ts` carries the
+ * report and the census), and this file is the only witness in the game that states it: the
+ * inventory dump has no deity line, `/who` has none, and the log never prints one. What it does
+ * have is seventeen `Deity Unlock - X` achievements of which exactly one carries a COMPLETE
+ * confirm row. Measured on the owner's dump, 2026-09-11: sixteen `I`, one `C`, Cazic Thule.
+ *
+ * THE CONFIRM ROW AND NOT THE ACHIEVEMENT ROW. The achievement itself going `C` means the deity is
+ * UNLOCKED, which a Deity Unlock Token can also do and which says nothing about who you follow.
+ * The confirm row's own words are the claim we want - "if you chose to confirm your Deity as X".
+ *
+ * TWO WOULD BE A CONTRADICTION AND ANSWERS NULL. Nobody follows two gods; a file saying so is a
+ * format we have not understood, and guessing which one is meant is worse than saying we do not
+ * know (law 1). Every consumer already treats null as "do not filter".
+ *
+ * THE GAME'S OWN SPELLING, VERBATIM, exactly as `ClassUnlockClaim` keeps class names — the file
+ * writes `Tribunal` and `Cazic Thule` where the wiki writes `[[The Tribunal]]` and `Cazic-Thule`,
+ * and neither is more correct. `planner/deity.deityKey` folds the two together at the join.
+ */
+export function confirmedDeity(dump: AchievementsDump): string | null {
+  const found = new Set<string>()
+  for (const row of dump.rows) {
+    if (row.category !== DEITY_UNLOCK_CATEGORY) continue
+    if (!row.achievement.startsWith(DEITY_UNLOCK_PREFIX)) continue
+    if (row.component === undefined || row.status !== 'complete') continue
+    if (!row.component.startsWith(DEITY_CONFIRM_PREFIX)) continue
+    const name = row.component.slice(DEITY_CONFIRM_PREFIX.length).trim().replace(/\.$/, '')
+    if (name !== '') found.add(name)
+  }
+  return found.size === 1 ? [...found][0] : null
+}
