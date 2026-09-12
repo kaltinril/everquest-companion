@@ -67,7 +67,7 @@ export interface ZonePort {
   spell: string
   /** the caster level the class line states; absent on an item port, which needs none */
   level?: number
-  /** the item you click, on an item port only */
+  /** the item you click, by its PAGE TITLE (not the corpus key), on an item port only */
   item?: string
   /** true when the spell takes the whole group rather than only the caster */
   group: boolean

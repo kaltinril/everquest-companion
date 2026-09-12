@@ -115,7 +115,11 @@ interface RawItemEffect {
 function itemPorts(castable: ReadonlyMap<string, ZonePort>): ZonePort[] {
   const out: ZonePort[] = []
   const seen = new Set<string>()
-  const items = (itemsJson as unknown as { items: Record<string, { stats?: { effects?: RawItemEffect[] } }> }).items
+  const items = (
+    itemsJson as unknown as {
+      items: Record<string, { page?: string; stats?: { effects?: RawItemEffect[] } }>
+    }
+  ).items
   for (const [key, entry] of Object.entries(items)) {
     for (const effect of entry.stats?.effects ?? []) {
       if (effect.kind !== 'click' || effect.name === undefined) continue
@@ -126,7 +130,9 @@ function itemPorts(castable: ReadonlyMap<string, ZonePort>): ZonePort[] {
       const dedupe = `${key}|${port.zone}`
       if (seen.has(dedupe)) continue
       seen.add(dedupe)
-      out.push({ ...port, via: 'item', spell: effect.name, item: key, level: undefined })
+      // The PAGE TITLE, not the corpus key: the key is lowercased for joining and the reader
+      // wants the item's own name, which is also what `KnownItemTooltip` looks itself up by.
+      out.push({ ...port, via: 'item', spell: effect.name, item: entry.page ?? key, level: undefined })
     }
   }
   return out
