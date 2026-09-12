@@ -168,6 +168,41 @@ function loosePool(owned: readonly OwnedExaltation[]): LoosePool {
 }
 
 /**
+ * IS THIS SEAT LIVE AT ALL — the proc rule (owner ruling, kaltinril 2026-09-11).
+ *
+ * His report: *"it's recommending PROCS in the any slot. I don't think any slot can proc????"*
+ *
+ * ── WHY R2 LET IT THROUGH, WHICH IS NOT A BUG ─────────────────────────────────────────────────
+ *
+ * His two `Any Slot` cells hold `Bladestopper +5` and `Shield of Rainbow Hues +6`, both plain
+ * SECONDARY items, and `Gold Plated Koshigatana` is a Primary/Secondary weapon - so the pair
+ * shares SECONDARY and `seatFits` passes honestly. The client agrees: his dump enumerates a
+ * `-Slot10` proc socket on EVERY worn item, ear and face included, so the socket is the game's
+ * own and not something this app invented.
+ *
+ * ── WHY IT IS STILL WRONG ADVICE ──────────────────────────────────────────────────────────────
+ *
+ * A proc needs something to SWING. An `Any Slot` is a real equipment position, but nothing ever
+ * attacks with it - his Bladestopper is a secondary-slot item that is not in his secondary hand
+ * (Whitened Treant Fists is). The same argument covers the ear and the chest. So a proc seated
+ * anywhere but the two weapon cells can never fire, and offering one spends a gem on nothing.
+ *
+ * ── THIS IS A RULING, NOT A MEASUREMENT, AND IT SAYS SO ────────────────────────────────────────
+ *
+ * Nothing in this repo's data states it and his own dump cannot test it: he has only ever socketed
+ * procs into Primary and Secondary (Earthshaker and Cherista's Fangs), so there is no non-weapon
+ * proc in his log to watch for. He was asked and he ruled. WHAT WOULD OVERTURN IT: socket a proc
+ * into an `Any Slot` item and watch for its line in the log - one cast settles it either way.
+ *
+ * IT GATES WHAT WE OFFER, NOT WHAT HE HAS. A proc already socketed in a non-weapon is left alone
+ * rather than called dead; that is a claim about his board and this is a rule about our advice.
+ */
+export function seatIsLive(seat: Pick<SocketHostCell, 'type' | 'slot'>): boolean {
+  if (seat.type !== 'Proc') return true
+  return seat.slot === 'PRIMARY' || seat.slot === 'SECONDARY'
+}
+
+/**
  * CAN THIS DONOR LEGALLY SIT IN THIS SEAT — R2's two halves and the unanswerable-seat guard, in
  * ONE place, for BOTH engines that ask.
  *
@@ -214,6 +249,7 @@ function bestLoose(
   host: Pick<SocketHostCell, 'type' | 'slot' | 'itemKey'>,
   accept: (eff: KindEffect) => boolean
 ): { key: string; row: GearRow; eff: KindEffect } | null {
+  if (!seatIsLive(host)) return null
   const hostRow = ctx.rowByKey.get(host.itemKey)
   let best: { key: string; row: GearRow; eff: KindEffect } | null = null
   for (const key of ctx.pool.keys()) {

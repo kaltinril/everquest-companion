@@ -320,3 +320,46 @@ test('…and two empty sockets are never filled from one family, which is the sa
   assert.equal(recs.fills.length, 1)
   assert.equal(recs.fills[0].gemName, 'Big Gem')
 })
+
+// ---- the proc rule (owner ruling, kaltinril 2026-09-11) --------------------------------------
+//
+// "it's recommending PROCS in the any slot. I don't think any slot can proc????" - and R2 had let
+// it through honestly: his Any Slot cells hold SECONDARY items, the offered gems are
+// Primary/Secondary weapons, and the pair shares SECONDARY. The client even enumerates a proc
+// socket on every worn item. A proc still needs something to SWING, and nothing attacks with an
+// Any Slot. `socketRecommend.seatIsLive` carries the ruling and what would overturn it.
+
+test('a Proc seat is only offered where a weapon is actually swung', () => {
+  // The donor is a Primary/Secondary weapon gem - the shape of Gold Plated Koshigatana. The HOST
+  // is a Primary/Secondary item too, so R2 passes on both seats below and the proc rule is the
+  // only thing that can separate them.
+  const weapon = (key: string, name: string, effects: GearRow['effects']): GearRow => ({
+    ...row(key, name, effects),
+    slots: ['PRIMARY', 'SECONDARY']
+  })
+  const rows = [weapon('sword gem', 'Sword Gem', [{ name: 'Dismiss Summoned', kind: 'proc' }]),
+                weapon('bladestopper', 'Bladestopper', [])]
+  const gem = [{ name: 'Sword Gem', key: 'sword gem', where: 'Bank 12', socketed: false }]
+
+  // An `Any Slot` cell (slot null) holding that weapon: R2 passes, the proc rule does not.
+  const anySlot: SocketHostCell = { ...host('any1', 'Proc', null, 'Bladestopper'), slot: null }
+  const idle = recommendSockets(gem, rows, [], [anySlot])
+  assert.equal(idle.fills.length, 0, 'nothing swings an Any Slot, so its proc socket is not a seat')
+
+  // The same gem into the hand that swings - the one place a proc can fire.
+  const primary: SocketHostCell = { ...anySlot, cellId: 'primary', slot: 'PRIMARY' }
+  const armed = recommendSockets(gem, rows, [], [primary])
+  assert.equal(armed.fills.length, 1)
+  assert.equal(armed.fills[0].gemName, 'Sword Gem')
+
+  // …and a FOCUS seat on that same Any Slot item is untouched: the rule is about procs only.
+  const focus: SocketHostCell = { ...anySlot, cellId: 'any1f', type: 'Focus' }
+  const focusGem = [{ name: 'Focus Gem', key: 'focus gem', where: 'Bank 12', socketed: false }]
+  const still = recommendSockets(
+    focusGem,
+    [weapon('focus gem', 'Focus Gem', [{ name: 'Improved Damage II', kind: 'focus' }]), rows[1]],
+    [],
+    [focus]
+  )
+  assert.equal(still.fills.length, 1, 'an Any Slot is a real seat for everything but a proc')
+})
