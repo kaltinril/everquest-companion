@@ -13,32 +13,36 @@
 //   THE PORTS come from main, once (`getZonePorts`), because they are derived from the spell and
 //   item corpora that live there.
 //
-// ── WHY "CLOSEST" IS ONE HOP AND NOT A SEARCH ────────────────────────────────────────────────
+// ── "CLOSEST" IS A SEARCH, SINCE THE OWNER ASKED FOR ONE ────────────────────────────────────
 //
-// The owner's example is the whole specification: Befallen has no port of its own, West Commons
-// does, and Befallen's map states `to_West_Commonlands`. That is one hop, and one hop is what a
-// player can act on - "cast Ring of Commons, then run east". A two-hop answer would be a route,
-// which is a different feature and needs a graph this hook deliberately does not build: it reads
-// only the map it was handed, so it costs nothing and can never disagree with what is on screen.
+// The first version read only the map on screen - one hop - on the argument that two hops is a
+// route. The owner disagreed the moment he stood in a zone whose neighbours had no port either
+// (2026-09-12: *"it should show the closest zone that has a port right?"*), and he is right that
+// "no port within one hop" is not an answer to "where is the closest port". So main builds the
+// whole graph once from every map's labels (`main/zoneGraph.ts`) and `shared/zoneTravel.nearestPorts`
+// walks it breadth-first, up to `MAX_HOPS`. Until the graph arrives the search runs over the one
+// map in hand, which is the old behaviour as an interim rather than a blank.
 //
-// A ZONE WITH NO LABELLED SEAMS ANSWERS NOTHING, and the card says so rather than implying the
-// zone is isolated. Map packs vary; 90 of the default pack's 213 files label their lines.
+// A ZONE WITH NO LABELLED SEAMS STILL ANSWERS NOTHING OF ITS OWN, and the card says so rather than
+// implying the zone is isolated - but the reverse edges the search adds mean a neighbour that
+// labelled the shared seam still reaches it. Map packs vary; 93 of the default 213 label theirs.
 
 import { useEffect, useMemo, useState } from 'react'
 import type { MapData } from '@shared/maps'
-import { travelSeams, zoneExits, type ZoneExit, type ZonePort } from '@shared/zoneTravel'
+import {
+  nearestPorts,
+  travelSeams,
+  zoneExits,
+  type PortRoute,
+  type ZoneExit,
+  type ZoneGraph,
+  type ZonePort
+} from '@shared/zoneTravel'
 import { zoneLevelBand, type ZoneLevelBand } from '@shared/zoneLevels'
 import { mobsInZone } from '../mobs/mobZone'
 // The one committed bestiary the whole app reads — the same export the mob search and the pins on
 // this map use, so no second copy of "which mobs are here" can drift from it.
 import { MOB_CATALOG } from '../mobs/mobSearch'
-
-/** One way in, with the exit you take after landing — absent when the port lands here. */
-export interface TravelOption {
-  port: ZonePort
-  /** null when the port lands in THIS zone; otherwise the seam you walk after arriving */
-  then: ZoneExit | null
-}
 
 export interface ZoneTravel {
   /** what the zone's own mobs say it is for, or null when the bestiary states no level here */
@@ -58,8 +62,8 @@ export interface ZoneTravel {
    * direction, which is why these are drawn as arrivals rather than departures.
    */
   rides: ZoneExit[]
-  /** ports landing here first, then ports landing one labelled hop away */
-  options: TravelOption[]
+  /** ports landing here first, then the nearest through the graph, each with its walk */
+  routes: PortRoute[]
   /** false until the port table has crossed from main; the card draws nothing rather than "none" */
   ready: boolean
 }
@@ -75,22 +79,38 @@ function allPorts(): Promise<ZonePort[]> {
   return pending
 }
 
-/** Ports that land in `zone`, then ports that land in a zone this map names a seam to. */
-function optionsFor(zone: string, exits: readonly ZoneExit[], ports: readonly ZonePort[]): TravelOption[] {
-  const out: TravelOption[] = []
-  for (const port of ports) if (port.zone === zone) out.push({ port, then: null })
-  for (const exit of exits) {
-    for (const port of ports) if (port.zone === exit.zone) out.push({ port, then: exit })
-  }
-  return out
+/**
+ * The whole graph, fetched once and kept - the port table's arrangement. Until it arrives the
+ * search runs over the one map on screen, which is exactly what the first version did and is the
+ * honest interim: one hop, from labels already in hand, rather than nothing.
+ */
+let pendingGraph: Promise<ZoneGraph> | null = null
+function allGraph(): Promise<ZoneGraph> {
+  pendingGraph ??= window.eq
+    .getZoneGraph()
+    .then((rows) => new Map(rows))
+    .catch(() => new Map())
+  return pendingGraph
 }
 
-export function useZoneTravel(zone: string | null, data: MapData | null): ZoneTravel {
+/**
+ * `stem` is the map-file stem (`commons`) and `zoneName` the bestiary's long name
+ * (`West Commonlands`). They are the SAME ZONE in two dialects and this hook needs both: ports and
+ * exits are keyed by stem, the mob catalog by long name. The first version passed only the long
+ * name and compared it against port stems, so "does a port land HERE" never matched - Befallen
+ * listed the Commons ports one hop away while Commons itself said none landed (owner, 2026-09-12:
+ * *"this is wrong, you can port to west commons as a druid"*). He was right; the join was.
+ */
+export function useZoneTravel(stem: string | null, zoneName: string | null, data: MapData | null): ZoneTravel {
   const [ports, setPorts] = useState<ZonePort[] | null>(null)
+  const [graph, setGraph] = useState<ZoneGraph | null>(null)
   useEffect(() => {
     let alive = true
     void allPorts().then((rows) => {
       if (alive) setPorts(rows)
+    })
+    void allGraph().then((g) => {
+      if (alive) setGraph(g)
     })
     return () => {
       alive = false
@@ -100,19 +120,21 @@ export function useZoneTravel(zone: string | null, data: MapData | null): ZoneTr
   const exits = useMemo(() => (data === null ? [] : zoneExits(data.points)), [data])
 
   const band = useMemo(() => {
-    if (zone === null || zone === '') return null
+    if (zoneName === null || zoneName === '') return null
     // The mob pins on this very map make the same join; reusing it is what stops the caption and
     // the pins ever describing two different sets of inhabitants.
-    const rows = mobsInZone(zone, MOB_CATALOG)
+    const rows = mobsInZone(zoneName, MOB_CATALOG)
     return zoneLevelBand(rows.map((m) => Number.parseInt(String(m.level), 10)))
-  }, [zone])
+  }, [zoneName])
 
-  const options = useMemo(
-    () => (ports === null || zone === null ? [] : optionsFor(zone, exits, ports)),
-    [zone, exits, ports]
-  )
+  const routes = useMemo(() => {
+    if (ports === null || stem === null) return []
+    // The map on screen is the seed graph until the full one lands; either way, one search.
+    const seed: ZoneGraph = graph ?? new Map([[stem, exits]])
+    return nearestPorts(seed, ports, stem)
+  }, [stem, exits, ports, graph])
 
   const rides = useMemo(() => travelSeams(exits), [exits])
 
-  return { band, exits, rides, options, ready: ports !== null }
+  return { band, exits, rides, routes, ready: ports !== null }
 }

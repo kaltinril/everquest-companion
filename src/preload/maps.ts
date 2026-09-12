@@ -17,7 +17,7 @@ import type {
   MapSearchOpts,
   ZoneShort
 } from '../shared/maps'
-import type { ZonePort } from '../shared/zoneTravel'
+import type { ZoneExit, ZonePort } from '../shared/zoneTravel'
 
 export const mapsBridge = {
   /** The installed map packs. Empty list + `error` prose on a machine with no EQ maps dir. */
@@ -37,5 +37,7 @@ export const mapsBridge = {
     ipcRenderer.invoke(IPC.mapsSearch, q, opts),
 
   /** Every druid, wizard and item port the corpora state — a static table, fetched once. */
-  getZonePorts: (): Promise<ZonePort[]> => ipcRenderer.invoke(IPC.mapsPorts)
+  getZonePorts: (): Promise<ZonePort[]> => ipcRenderer.invoke(IPC.mapsPorts),
+  /** Every zone's stated exits, as entries (a Map does not cross IPC) — fetched once, kept. */
+  getZoneGraph: (): Promise<[ZoneShort, ZoneExit[]][]> => ipcRenderer.invoke(IPC.mapsGraph)
 }
