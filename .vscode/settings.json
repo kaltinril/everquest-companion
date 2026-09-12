@@ -1,0 +1,14 @@
+{
+  // A faint blue cast so this window is tellable from other VS Code windows at a glance.
+  // Workspace-scoped: it changes nothing outside this folder.
+  "workbench.colorCustomizations": {
+    "titleBar.activeBackground": "#22303c",
+    "titleBar.activeForeground": "#c9d6e2",
+    "titleBar.inactiveBackground": "#1e2831",
+    "titleBar.inactiveForeground": "#8494a3",
+    "activityBar.background": "#1e2832",
+    "statusBar.background": "#22303c",
+    "statusBar.foreground": "#c9d6e2",
+    "sideBar.background": "#1b242d"
+  }
+}

@@ -21,6 +21,7 @@ import { IPC } from '../../shared/ipc'
 import { mapLibrary } from '../maps'
 import { isSafePackId } from '../security'
 import type { MapGetResult, MapPackPrefs, MapSearchOpts } from '../../shared/maps'
+import { zonePorts } from '../zonePorts'
 
 /** Narrow the renderer's `prefs` to validated pack ids. `false` = something unsafe was sent. */
 function safePrefs(raw: unknown): MapPackPrefs | false {
@@ -58,6 +59,10 @@ export function registerMapsIpc(): void {
     if (safe === false) return { ok: false, error: 'invalid pack id' }
     return mapLibrary().get(zone.toLowerCase(), safe)
   })
+
+  // NO ARGUMENT, so nothing to validate: the table is derived from two committed corpora and is
+  // the same for every caller. Memoized in `zonePorts()`, so a second call costs a return.
+  ipcMain.handle(IPC.mapsPorts, () => zonePorts())
 
   // `prefs` goes through the SAME `safePrefs` gate as `maps:get` — an in-zone search parses the
   // zone under the caller's preference, so both pack ids reach the same `join()` they do there.
