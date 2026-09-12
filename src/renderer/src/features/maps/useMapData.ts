@@ -196,3 +196,27 @@ export function useMapData(zone: ZoneShort | null, prefs: MapPackPrefs): MapLoad
   }, [zone, geometry, labels])
   return load
 }
+
+/**
+ * Whether the "Closest port" search is limited to zones the current era has - ON by default
+ * (owner, 2026-09-12: *"we need a limit to era that's on by default"*). The fold's twin: only the
+ * lifted state is stored, so a cleared key means the default.
+ */
+export const TRAVEL_ERA_KEY = 'eq.maps.travelEra'
+
+export function loadTravelEra(): boolean {
+  try {
+    return localStorage.getItem(TRAVEL_ERA_KEY) !== '0'
+  } catch {
+    return true
+  }
+}
+
+export function saveTravelEra(on: boolean): void {
+  try {
+    if (on) localStorage.removeItem(TRAVEL_ERA_KEY)
+    else localStorage.setItem(TRAVEL_ERA_KEY, '0')
+  } catch {
+    // Storage refused: the toggle still works for this session.
+  }
+}
