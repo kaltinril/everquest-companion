@@ -75,8 +75,15 @@ export interface DonorView {
   ownedKeys?: ReadonlySet<string>
 }
 
-/** The owned tri-state: everything, hide what you own, or only what you own. */
-export type OwnedMode = 'all' | 'hide' | 'only'
+/**
+ * The owned tri-state: everything, only what you are still missing, or only what you own.
+ *
+ * THE NAMES ARE THE PLAYER'S QUESTION, not the filter's mechanism. They were `'hide'` and `'only'`
+ * while the control was a select reading "Hide owned"; the bar draws two chips now
+ * (`EffectFilterBar.OwnedChips`) and a chip that says MISSING beside one that says OWNED cannot be
+ * backed by a mode called `hide` without the reader having to translate at every use.
+ */
+export type OwnedMode = 'all' | 'missing' | 'owned'
 
 export const DEFAULT_VIEW: DonorView = { eraOnly: true, nonEquip: false }
 
@@ -488,7 +495,7 @@ function chargedHides(view: DonorView, charges: string | undefined): boolean {
 /** The owned tri-state's one clause — a no-op without `ownedKeys` (the DonorView field says why). */
 function ownedFilterHides(view: DonorView, key: string): boolean {
   if (view.ownedKeys === undefined || view.owned === undefined || view.owned === 'all') return false
-  return view.ownedKeys.has(key) !== (view.owned === 'only')
+  return view.ownedKeys.has(key) !== (view.owned === 'owned')
 }
 
 /**

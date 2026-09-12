@@ -117,6 +117,43 @@ export function EraChip({ subject }: { subject: EraSubject }): JSX.Element | nul
 }
 
 /**
+ * WHETHER YOU ALREADY HAVE ONE (fork ask 2026-09-11) — the row's own answer to the question the
+ * `Missing` chip on the filter bar asks of the whole list.
+ *
+ * NOTHING AT ALL WHEN `owned` IS UNDEFINED, which is the ordinary state until an inventory dump has
+ * been written. That is world-model law 1 doing real work here rather than ceremony: a row drawn
+ * silent among rows marked `missing` reads as "you own this", and the truthful reading of an absent
+ * dump is that NOBODY HAS SAID. The filter bar's pair greys out on the same fact and names the
+ * command that fixes it, so the two controls are never telling different stories.
+ *
+ * BOTH ANSWERS ARE DRAWN, not just the missing one. The whole value of a per-row badge over the
+ * filter is seeing the one you have sitting between two you do not — a list where only absences
+ * speak makes the reader count silences.
+ *
+ * `owned` IS LOUD AND `missing` IS LOUDER by one step of colour, because only one of them is a
+ * thing to go and do.
+ */
+export function OwnedChip({ owned }: { owned?: boolean }): JSX.Element | null {
+  if (owned === undefined) return null
+  return (
+    <Chip
+      size="small"
+      label={owned ? 'owned' : 'missing'}
+      title={
+        owned
+          ? 'You own a copy - worn, in a bag, in the bank, or already socketed.'
+          : 'No copy of this item anywhere in your last inventory export.'
+      }
+      data-testid="planner-owned-chip"
+      data-owned={owned ? 'yes' : 'no'}
+      color={owned ? 'success' : 'warning'}
+      variant="outlined"
+      sx={CHIP_SX}
+    />
+  )
+}
+
+/**
  * THE CROWN (V5) — this row carries the highest tier of its focus family that the current filters
  * left visible.
  *

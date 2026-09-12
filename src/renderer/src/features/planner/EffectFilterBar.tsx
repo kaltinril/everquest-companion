@@ -32,7 +32,7 @@
 // `title`s now: same words, no DOM node, no hit area.
 
 import { type JSX, useState } from 'react'
-import { Chip, MenuItem, Stack, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { Box, Chip, MenuItem, Stack, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material'
 import { EQUIP_SLOTS, type EquipSlot, type SocketType } from '@shared/planner/types'
 import ItemFilterPicker from './ItemFilterPicker'
 import { CURRENT_ERA_LABEL, type DonorFilters, type OwnedMode } from './plannerData'
@@ -52,15 +52,18 @@ function ToggleChip({
   hint,
   on,
   onToggle,
-  testId
+  testId,
+  disabled = false
 }: {
   label: string
   hint: string
   on: boolean
   onToggle: () => void
   testId?: string
+  /** the filter has nothing to read yet — the chip greys out and `hint` says why (see `OwnedChips`) */
+  disabled?: boolean
 }): JSX.Element {
-  return (
+  const chip = (
     <Chip
       size="small"
       label={label}
@@ -68,9 +71,18 @@ function ToggleChip({
       title={hint}
       color={on ? 'primary' : 'default'}
       variant={on ? 'filled' : 'outlined'}
+      disabled={disabled}
       onClick={onToggle}
       sx={{ flexShrink: 0 }}
     />
+  )
+  // A disabled MUI chip takes NO pointer events, so its own `title` never opens - and the reason a
+  // control is dead is the one thing the reader most needs. The span above it catches the hover.
+  if (!disabled) return chip
+  return (
+    <Box component="span" title={hint} sx={{ display: 'inline-flex', flexShrink: 0 }}>
+      {chip}
+    </Box>
   )
 }
 
@@ -158,13 +170,28 @@ function ItemNarrowing({
   )
 }
 
+/** Why the pair is dead: one sentence naming the command that brings it to life. */
+const OWNED_UNKNOWN =
+  'Ownership comes from the inventory export - type /outputfile inventory in game and this lights up.'
+
 /**
- * The owned tri-state (fork ask 2026-09-09). A SELECT rather than a fourth chip because it has
- * three states, and a chip that cycles three states reads as broken twice per cycle. Ownership is
- * the Gear tab's own reading: the dump, the loot log, or an exaltation copy. Split out of the bar
- * at the 100-line function ceiling.
+ * THE OWNERSHIP PAIR (fork ask 2026-09-11). Ownership is the Gear tab's own reading: the dump, the
+ * loot log, or an exaltation copy. Split out of the bar at the 100-line function ceiling.
+ *
+ * IT WAS A SELECT, and the comment that stood here defended the select against A CHIP because the
+ * state is a tri-state and one chip cycling three states reads as broken twice per cycle. That
+ * argument is right, and it is an argument about ONE chip. TWO mutually exclusive chips carry the
+ * same three states with no cycle in them at all, because the third state is NEITHER LIT - so the
+ * bar loses the only dropdown on it that answered a yes/no question, and ownership reads in the
+ * same idiom as the three toggles beside it.
+ *
+ * "MISSING", NOT "HIDE OWNED". Same filter, and the word is the question the player arrived with -
+ * what am I still farming for - rather than its negation. The owner asked for that word by name.
+ *
+ * A LIT CHIP CLICKED AGAIN GOES BACK TO ALL, which is how the third state stays reachable without
+ * a control of its own.
  */
-function OwnedSelect({
+function OwnedChips({
   owned,
   known
 }: {
@@ -172,26 +199,28 @@ function OwnedSelect({
   known: boolean
 }): JSX.Element {
   const [mode, setMode] = owned
+  const pick = (v: OwnedMode) => () => {
+    setMode(mode === v ? 'all' : v)
+  }
   return (
-    <TextField
-      select
-      size="small"
-      label="Owned"
-      value={mode}
-      disabled={!known}
-      title={
-        known
-          ? undefined
-          : 'Ownership comes from the inventory export - type /outputfile inventory in game and this lights up.'
-      }
-      onChange={(e) => setMode(e.target.value as OwnedMode)}
-      slotProps={{ htmlInput: { 'data-testid': 'planner-owned-filter' } }}
-      sx={{ minWidth: 120, flexShrink: 0 }}
-    >
-      <MenuItem value="all">All</MenuItem>
-      <MenuItem value="hide">Hide owned</MenuItem>
-      <MenuItem value="only">Only owned</MenuItem>
-    </TextField>
+    <>
+      <ToggleChip
+        label="Missing"
+        testId="planner-owned-missing"
+        on={mode === 'missing'}
+        disabled={!known}
+        onToggle={pick('missing')}
+        hint={known ? 'Show only donors you do not own a copy of anywhere' : OWNED_UNKNOWN}
+      />
+      <ToggleChip
+        label="Owned"
+        testId="planner-owned-owned"
+        on={mode === 'owned'}
+        disabled={!known}
+        onToggle={pick('owned')}
+        hint={known ? 'Show only donors you already own - worn, in a bag, in the bank, or socketed' : OWNED_UNKNOWN}
+      />
+    </>
   )
 }
 
@@ -322,7 +351,7 @@ export default function EffectFilterBar({
         />
       )}
 
-      <OwnedSelect owned={owned} known={ownedKnown} />
+      <OwnedChips owned={owned} known={ownedKnown} />
     </Stack>
   )
 }

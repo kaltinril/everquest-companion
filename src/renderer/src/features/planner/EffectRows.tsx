@@ -36,7 +36,7 @@ import { GearRowCompare } from '../gear/GearCompareCard'
 import type { GearCompareData } from '../gear/gearData'
 import { classFit, isNonEquippable, type DonorRow } from './plannerData'
 import { SOCKET_LABEL, type DonorGroup } from './plannerGroups'
-import { BestChip, DonorName, EraChip, NoSlotChip } from './PlannerChips'
+import { BestChip, DonorName, EraChip, NoSlotChip, OwnedChip } from './PlannerChips'
 import { sourcesFor } from './sourceIndex'
 // JOS-343 — the one control both this row and the gear search row draw. It used to be a local
 // `AddButton` here and a heart over there; the owner ruled them into one on 2026-08-13.
@@ -134,6 +134,14 @@ export interface DonorLineProps {
   namesEffect: boolean
   /** the header above did not take this effect's one-liner, so the row still carries it (JOS-42) */
   namesSays: boolean
+  /**
+   * Whether the last inventory export held a copy of this item (fork ask 2026-09-11).
+   *
+   * UNDEFINED IS THE THIRD ANSWER AND THE COMMON ONE — no dump has ever been written, so the row
+   * draws no badge at all rather than a wrong one. `PlannerChips.OwnedChip` argues why that matters
+   * more here than on most rows.
+   */
+  owned?: boolean
   /**
    * PUT THIS DONOR ON THE WISH LIST, OR TAKE IT OFF (JOS-343). It was `onAdd` until the owner
    * overruled the one-way version on 2026-08-13; the host reads `wished` back out of the argument
@@ -276,6 +284,7 @@ export function DonorLine({
   best,
   namesEffect,
   namesSays,
+  owned,
   onToggleWish,
   onOpenLoot,
   compare
@@ -351,6 +360,9 @@ export function DonorLine({
       <EraChip subject={donor} />
       <Box sx={{ flexGrow: 1, minWidth: 8 }} />
       <SourceLine src={src} />
+      {/* The two facts about YOU, kept together on the right of the spacer - everything left of it
+          is a fact about the item. */}
+      <OwnedChip owned={owned} />
       {wished && (
         <Chip
           size="small"
