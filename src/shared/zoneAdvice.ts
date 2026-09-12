@@ -76,6 +76,10 @@ export interface RankOptions {
   min?: number
   /** zone → distinct wished items droppable there; absent means "no wish list", every zone 0 */
   wished?: ReadonlyMap<string, number>
+  /** keep only these fits; absent or empty means every fit the goal admits */
+  fits?: ReadonlySet<ZoneFit>
+  /** a zone-name search, folded case-insensitively; absent or blank means everything */
+  search?: string
 }
 
 /** Best first for experience: even, then a reach, then green. `deadly` is never experience advice. */
@@ -89,6 +93,14 @@ function admits(goal: ZoneGoal, fit: ZoneFit, wished: number): boolean {
   if (goal === 'wish') return wished > 0
   if (goal === 'motes') return fit === 'even' || fit === 'hard'
   return fit !== 'deadly'
+}
+
+/** The caller's narrowing - evidence floor, search, fit filter - on top of what the goal admits. */
+function keeps(zone: string, band: ZoneLevelBand, fit: ZoneFit, opts: RankOptions): boolean {
+  if (band.n < (opts.min ?? 0)) return false
+  const needle = (opts.search ?? '').trim().toLowerCase()
+  if (needle !== '' && !zone.toLowerCase().includes(needle)) return false
+  return opts.fits === undefined || opts.fits.size === 0 || opts.fits.has(fit)
 }
 
 /** The goal's order. Every comparator ends on the zone name so the same input always lists the same way. */
@@ -125,16 +137,55 @@ export function rankZones(
   opts: RankOptions = {}
 ): ZoneAdvice[] {
   const goal = opts.goal ?? 'exp'
-  const min = opts.min ?? 0
   const out: ZoneAdvice[] = []
   for (const [zone, band] of bands) {
-    if (band.n < min) continue
     const fit = zoneFit(band, level)
     const wished = opts.wished?.get(zone) ?? 0
-    if (!admits(goal, fit, wished)) continue
+    if (!admits(goal, fit, wished) || !keeps(zone, band, fit, opts)) continue
     out.push({ zone, band, fit, motesPer100: MOTES_PER_100[fit], n: band.n, wished })
   }
   return out.sort(compare(goal))
+}
+
+// ---- a column sort on top of the goal's order (owner, 2026-09-12: "need filters/search/sort") -
+
+export type AdviceSortKey = 'fit' | 'zone' | 'low' | 'high' | 'motes' | 'wished' | 'n'
+export interface AdviceSort {
+  key: AdviceSortKey
+  dir: 'asc' | 'desc'
+}
+
+/** What a column reads for one row - numbers for the numeric columns, the fit's rank for the chip. */
+const SORT_VALUE: Readonly<Record<AdviceSortKey, (row: ZoneAdvice) => number | string>> = {
+  fit: (r) => EXP_RANK[r.fit],
+  zone: (r) => r.zone.toLowerCase(),
+  low: (r) => r.band.typical[0],
+  high: (r) => r.band.typical[1],
+  motes: (r) => r.motesPer100,
+  wished: (r) => r.wished,
+  n: (r) => r.n
+}
+
+/**
+ * The rows in column order, the Gear table's arrangement (`sortGearRows`): the view owns a sort
+ * state and asks for the rows in it, and the ordering runs HERE rather than in the renderer.
+ * Ties fall back to the goal's own order, which the input already carries - a stable sort keeps it.
+ */
+export function sortAdvice(rows: readonly ZoneAdvice[], sort: AdviceSort): ZoneAdvice[] {
+  const value = SORT_VALUE[sort.key]
+  const sign = sort.dir === 'asc' ? 1 : -1
+  return [...rows].sort((a, b) => {
+    const x = value(a)
+    const y = value(b)
+    if (x === y) return 0
+    return (x < y ? -1 : 1) * sign
+  })
+}
+
+/** Click a column: a new column starts descending for numbers and ascending for names; the same column flips. */
+export function nextAdviceSort(sort: AdviceSort | null, key: AdviceSortKey): AdviceSort {
+  if (sort !== null && sort.key === key) return { key, dir: sort.dir === 'asc' ? 'desc' : 'asc' }
+  return { key, dir: key === 'zone' || key === 'fit' ? 'asc' : 'desc' }
 }
 
 /**
