@@ -54,21 +54,9 @@ import type { ClassAbbr, ComboDelta, ComboSnap } from '../shared/classCombo'
 import type { CharacterSheet } from '../shared/characterSheet'
 // The `/outputfile` registry's one IPC shape (JOS-44) — command, why-clause, and the dump's own
 // mtime, per kind. Every surface fed by an export command reads this and nothing else.
-<<<<<<< HEAD
 // The `/outputfile` registry's slice (status line + the Factions tab's log evidence) — split for
 // file mass, planner.ts's arrangement.
 import { outputsApi } from './outputs'
-import type {
-  MapGetResult,
-  MapPackListResult,
-  MapPackPrefs,
-  MapSearchHit,
-  MapSearchOpts,
-  ZoneShort
-} from '../shared/maps'
-=======
-import type { OutputFileStatus } from '../shared/outputs/kinds'
->>>>>>> map-improvements
 // Presence-driven prefs live beside their normalizers, not in shared/types.ts — see the note at
 // the bottom of that file.
 import type { CursorRingPrefs, OverlayAutoHidePrefs } from '../shared/presencePrefs'
