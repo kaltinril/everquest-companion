@@ -59,6 +59,8 @@ import MapToolbar from './MapToolbar'
 import { zoneLabel } from './zoneOptions'
 import { loadPackPrefs, savePackPrefs, useMapData, useMapPacks } from './useMapData'
 import { useLocMarker } from './useLocMarker'
+import MapTravelCard from './MapTravelCard'
+import { useZoneTravel } from './useZoneTravel'
 import {
   loadZoneSelection,
   onCharacterZone,
@@ -401,6 +403,9 @@ export default function MapsView({
   // filtered rows are derived ONCE and read by both the list and the surface's pins.
   const zoneName = zoneLongName(zone, raw)
   const pane = useZonePane({ vp, data, zoneName, prefs, zones })
+  // The zone's own level band and the ports that reach it — joined on the LONG name, the same key
+  // the pins use, because the bestiary spells zones that way.
+  const travel = useZoneTravel(zoneName, data)
 
   return (
     <Stack spacing={1.5} sx={{ height: '100%' }}>
@@ -436,6 +441,10 @@ export default function MapsView({
         onZoom={vp.zoomBy}
         onFit={vp.fit}
       />
+      {/* HOW YOU GET HERE, AND WHAT FOR (owner ask 2026-09-11). Under the toolbar rather than in
+          the sidebar: it is about the zone itself, not about finding something in it, and the
+          sidebar is the finder. Draws nothing at all when neither witness has anything to say. */}
+      <MapTravelCard travel={travel} />
       <MapBody
         data={data}
         // Nothing is claimed before the pack listing and the first fetch have answered — a

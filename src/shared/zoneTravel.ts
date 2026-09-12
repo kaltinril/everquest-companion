@@ -30,7 +30,7 @@
 // and the item corpus - and it lives in `main/zonePorts.ts`. This module answers only "what does
 // this map say you can walk, sail or step to", and the two are joined at the surface.
 
-import { zoneEntryFor } from './zones'
+import { ZONES, zoneEntryFor, type ZoneEntry } from './zones'
 import type { MapPoint, ZoneShort } from './maps'
 
 /** How the map says you make this crossing. */
@@ -45,6 +45,32 @@ export interface ZoneExit {
   name: string
   /** the point's RAW label, so a surface can show the map's own words (law 2) */
   label: string
+}
+
+/**
+ * WHO TAKES YOU THERE — a port's witness, as opposed to an exit's.
+ *
+ * The TYPES live here beside `ZoneExit` and the DERIVATION lives in `main/zonePorts.ts`, because
+ * the two corpora it reads (`spells.json`, and the 8.6 MB `items.json`) are main's. Preload
+ * carries the shape across the wire and must never import the module that builds it.
+ */
+export type PortVia = 'druid' | 'wizard' | 'item'
+
+/** One way to arrive in one zone by magic — the port half of `ZoneExit`'s walk/boat/portal half. */
+export interface ZonePort {
+  /** the destination's map stem — the same join key `ZoneExit.zone` carries */
+  zone: ZoneShort
+  /** the destination's display name, as `zones.ts` spells it */
+  zoneName: string
+  via: PortVia
+  /** the spell's own name, whether cast or clicked */
+  spell: string
+  /** the caster level the class line states; absent on an item port, which needs none */
+  level?: number
+  /** the item you click, on an item port only */
+  item?: string
+  /** true when the spell takes the whole group rather than only the caster */
+  group: boolean
 }
 
 /**
@@ -77,6 +103,33 @@ function destinationsOf(raw: string): string[] {
     .filter((s) => s !== '')
 }
 
+/**
+ * A ZONE OUT OF ANY CORPUS TOKEN — the one door both travel witnesses knock on.
+ *
+ * They speak different dialects and neither is wrong. Map labels write DISPLAY names
+ * (`to_West_Commonlands`), which `zoneEntryFor` already folds. The spell corpus writes MAP STEMS
+ * (`Teleport to 478,1427,-48 in commons`), which it does not - measured, 46 of the 50 stated
+ * teleport destinations fell on the floor until this existed.
+ *
+ * A TRAILING CLAUSE IS TRIMMED, once. The corpus carries `thurgadinb facing North`: a stem plus a
+ * direction, which is a fact about where you arrive rather than about which zone. Only the first
+ * token is retried, and only after the whole string has failed, so nothing that resolves whole is
+ * ever re-read.
+ *
+ * NULL IS A REAL ANSWER and the common one for the tokens neither corpus means as a zone.
+ */
+export function resolveZone(raw: string): ZoneEntry | null {
+  const token = raw.trim()
+  if (token === '') return null
+  const named = zoneEntryFor(token)
+  if (named !== null) return named
+  const lower = token.toLowerCase()
+  const stem = ZONES.find((z) => z.short === lower)
+  if (stem !== undefined) return stem
+  const head = lower.split(/\s+/)[0]
+  return head === lower ? null : (ZONES.find((z) => z.short === head) ?? null)
+}
+
 /** One point, as zero or more exits — zero when its label is not a crossing, or names no zone. */
 function exitsOfPoint(point: MapPoint): ZoneExit[] {
   const raw = point.label.trim()
@@ -90,7 +143,7 @@ function exitsOfPoint(point: MapPoint): ZoneExit[] {
     // A label naming something the catalog does not know is DROPPED rather than guessed at: the
     // packs carry guild halls, merchants and non-classic destinations under the same shapes, and
     // inventing a zone from a label is exactly the fuzzy join law 12 refuses.
-    const entry = zoneEntryFor(candidate)
+    const entry = resolveZone(candidate)
     if (entry === null) continue
     out.push({ kind, zone: entry.short, name: entry.name, label: raw })
   }
