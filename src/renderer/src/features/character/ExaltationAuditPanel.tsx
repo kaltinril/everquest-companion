@@ -13,6 +13,7 @@
 
 import { type JSX } from 'react'
 import { Paper, Stack, Typography } from '@mui/material'
+import { ownershipKey } from '@shared/planner/ownership'
 import { KnownItemTooltip } from '../../lib/KnownItemTooltip'
 import type { DuplicateFinding, ExaltationAudit } from './exaltationAudit'
 import type { Recommendations } from './socketRecommend'
@@ -81,10 +82,39 @@ function redundantLines(recs: Recommendations): JSX.Element[] {
   ))
 }
 
+/**
+ * EVERY GEM THIS PANEL IS, SOMEWHERE ELSE IN ITSELF, TELLING YOU TO SOCKET.
+ *
+ * The panel runs two independent engines - `socketRecommend` writes the board lists, `exaltationAudit`
+ * writes the passive findings - and neither has ever read the other. A tester caught what that costs
+ * (Malkil via kaltinril, 2026-09-11): `socket Adamantite Band (Summoning Haste I)` four lines above
+ * `Adamantite Band ... outclassed by Brell's Girdle (Summoning Haste III)`. Both sentences were
+ * defensible on their own and together they are nonsense.
+ *
+ * THE FILL PASS'S OWN HALF OF THAT BUG IS FIXED AT THE SOURCE (`socketRecommend.fillPass` now
+ * refuses a family the board already grants). This is the remaining half, and it is a PANEL
+ * question rather than an engine one: even when a fill is right - the better copy cannot reach any
+ * seat, so the lesser one really is the best you can socket - a Scrap heading over it contradicts
+ * the instruction above it. So the word SCRAP is withheld from anything the panel is spending.
+ *
+ * Keyed through `ownershipKey`, because the two engines name gems from different sides: the audit
+ * from the dump's own spelling, the recommender from the corpus row.
+ */
+function inUse(recs: Recommendations, plan: BoardPlan | null): Set<string> {
+  const out = new Set<string>()
+  for (const f of recs.fills) out.add(ownershipKey(f.gemName))
+  for (const w of recs.swaps) out.add(ownershipKey(w.toName))
+  for (const r of recs.redundant) {
+    if (r.replaceWith !== undefined) out.add(ownershipKey(r.replaceWith.name))
+  }
+  for (const m of plan?.moves ?? []) out.add(ownershipKey(m.gemName))
+  return out
+}
+
 /** Loose lower tiers only - the socketed ones are the SWAP list's and the red cards' job. */
-function scrapLines(audit: ExaltationAudit): JSX.Element[] {
+function scrapLines(audit: ExaltationAudit, spending: ReadonlySet<string>): JSX.Element[] {
   return audit.superseded
-    .filter((f) => !f.socketed)
+    .filter((f) => !f.socketed && !spending.has(ownershipKey(f.name)))
     .map((f, i) => (
       <Typography key={`x${String(i)}`} variant="body2" color="text.secondary" data-testid="exaltation-scrap">
         <Name>{f.name}</Name>
@@ -153,7 +183,7 @@ export default function ExaltationAuditPanel({
   const swaps = swapLines(recs)
   const fills = fillLines(recs)
   const redundant = redundantLines(recs)
-  const scrap = scrapLines(audit)
+  const scrap = scrapLines(audit, inUse(recs, plan))
   const copies = audit.duplicates.map(copyLine)
   if (board.length + swaps.length + fills.length + redundant.length + scrap.length + copies.length === 0) return null
   return (

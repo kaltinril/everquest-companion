@@ -267,3 +267,56 @@ test('keeper-first: a socket called dead is never also offered an upgrade (the S
   assert.equal(recs.redundant.length, 1)
   assert.equal(recs.redundant[0].cellId, 'finger1')
 })
+
+// ---- the fill pass obeys the in-force ledger (Malkil via kaltinril, 2026-09-11) --------------
+//
+// The report, verbatim: *"It's telling me to put Summoning Haste I in my finger focus slot, then
+// telling me that the same Exaltation is outclassed by Brell's Girdle, which I already have
+// equipped"*. Both halves of the panel were defensible alone. Together they told him to spend a
+// socket on nothing, because same-name effects do not stack.
+//
+// The fill pass was the only one of the three that asked its candidates nothing (`() => true`)
+// while the swap and redundancy passes had always been gated. These two tests are that gate.
+
+test('a fill never offers a family the board already grants - the Summoning Haste report', () => {
+  const rows = [
+    row('belt gem', 'Belt Gem', [{ name: 'Summoning Haste III', kind: 'worn' }]),
+    row('ring gem', 'Ring Gem', [{ name: 'Summoning Haste I', kind: 'worn' }]),
+    row('other gem', 'Other Gem', [{ name: 'Improved Damage II', kind: 'worn' }])
+  ]
+  const recs = recommendSockets(
+    [
+      { name: 'Belt Gem', key: 'belt gem', where: 'socketed in Waist', socketed: true },
+      { name: 'Ring Gem', key: 'ring gem', where: 'General 2', socketed: false },
+      { name: 'Other Gem', key: 'other gem', where: 'General 3', socketed: false }
+    ],
+    rows,
+    [],
+    [host('waist', 'Worn', 'Belt Gem'), host('finger1', 'Worn', null)]
+  )
+  // The empty finger takes the OTHER family. The loose Summoning Haste I is left where it is: the
+  // III in the waist outranks it and the socket would have granted nothing.
+  assert.equal(recs.fills.length, 1)
+  assert.equal(recs.fills[0].cellId, 'finger1')
+  assert.equal(recs.fills[0].gemName, 'Other Gem')
+})
+
+test('…and two empty sockets are never filled from one family, which is the same bug twice', () => {
+  const rows = [
+    row('big gem', 'Big Gem', [{ name: 'Summoning Haste III', kind: 'worn' }]),
+    row('small gem', 'Small Gem', [{ name: 'Summoning Haste I', kind: 'worn' }])
+  ]
+  const recs = recommendSockets(
+    [
+      { name: 'Big Gem', key: 'big gem', where: 'General 1', socketed: false },
+      { name: 'Small Gem', key: 'small gem', where: 'General 2', socketed: false }
+    ],
+    rows,
+    [],
+    [host('ear1', 'Worn', null), host('ear2', 'Worn', null)]
+  )
+  // Two loose copies of one family, two open sockets: the better one is placed and the second
+  // socket is left empty rather than filled with a copy that would add nothing to it.
+  assert.equal(recs.fills.length, 1)
+  assert.equal(recs.fills[0].gemName, 'Big Gem')
+})
