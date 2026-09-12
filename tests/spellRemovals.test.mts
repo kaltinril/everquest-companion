@@ -47,6 +47,7 @@ import assert from 'node:assert/strict'
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { applySpellRemovals, SPELL_REMOVALS } from '../src/main/data/spellRemovals.ts'
+import { spellPagePreferenceReport } from '../src/main/data/spellPagePreference.ts'
 import { SPELL_CORRECTIONS } from '../src/main/data/spellCorrections.ts'
 import {
   buildSpellCatalog,
@@ -348,7 +349,10 @@ test('loadSpellDb builds its tables from the list the removals left behind', () 
   assert.deepEqual(removals.satisfied, [])
 
   assert.equal(db.byKey.get('invigor'), undefined, 'the join key a cast line would fold to is gone')
-  assert.equal(db.spells.length, RAW.length - removals.removed, 'and the row count says so')
+  // …less the classic pages the PAGE PREFERENCE drops beside their Legends twins (2026-09-12;
+  // tests/spellPagePreference.test.mts pins which). Two layers, two reports, one count.
+  const preferred = spellPagePreferenceReport()?.dropped ?? 0
+  assert.equal(db.spells.length, RAW.length - removals.removed - preferred, 'and the row count says so')
   for (const table of [db.castOnYou, db.wearsOff, db.castOnOtherSuffix]) {
     for (const cands of table.values()) {
       assert.ok(!cands.some((c) => c.name === 'Invigor'), 'no derived table may still hold the row')

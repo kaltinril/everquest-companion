@@ -93,8 +93,8 @@
 // there", rule 3 a stated mechanical drift (a dropped word — never a different SPELL), rule 4 the
 // same three attribution routes. A name correction patches EVERY row the DB names that way, unlike
 // a message correction, which patches the first: the DB carries era/rank duplicates of one spell
-// whose MESSAGES may legitimately differ (`Shock of Frost` has two rows saying two different
-// things) but whose NAME cannot, and a half-renamed pair would put a phantom line in the catalog.
+// whose MESSAGES may legitimately differ (`Poison` has two rows saying two different things) but
+// whose NAME cannot, and a half-renamed pair would put a phantom line in the catalog.
 //
 // THE WRONG POLARITY is the sixth drift class, and it is why `field` may be `spellType` (JOS-413).
 // All five above are about WORDS; this one is about the wiki's TYPE COLUMN. `Pacify` is
@@ -472,14 +472,9 @@ const HAND_DERIVED_CORRECTIONS: readonly SpellCorrection[] = [
     evidence:
       'Terminal period lost by the scrape. Four siblings (Ice Comet, Silver Breath, …) carry the full stop, which matches 376 owner-log lines.'
   },
-  {
-    spells: ['Shock of Frost'],
-    field: 'msgCastOnYou',
-    from: 'Your feel your skin freeze.',
-    to: 'You feel your skin freeze.',
-    attribution: 'db',
-    evidence: 'A `Your`/`You` typo on the wiki page; the same four siblings carry the correct sentence.'
-  },
+  // RETIRED 2026-09-12 with the row it patched: `Shock of Frost`'s classic page ("Your feel your
+  // skin freeze.") is dropped by the page preference (spellPagePreference.ts) and the surviving
+  // Legends page prints "Your skin goes numb.", which the log agrees with.
   // --- inflection and spelling drift between the wiki text and the shipped string ----------------
   {
     spells: ['Lifedraw', 'SpectreLifetap'],
