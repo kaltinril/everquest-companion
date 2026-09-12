@@ -9,6 +9,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { applyLegendsPagePreference, spellPagePreferenceReport } from '../src/main/data/spellPagePreference.ts'
 import { loadSpellDb } from '../src/main/data/spellDb.ts'
+import { buildLevelUnlocks, resetLevelUnlocksCache } from '../src/main/data/levelUnlocks.ts'
 import type { SpellDbFile, SpellEntry } from '../src/shared/types.ts'
 import spellsJson from '../src/main/data/spells.json' with { type: 'json' }
 
@@ -37,6 +38,21 @@ test('the effective DB holds one row per contested name, and it is the autogrant
   }
   loadSpellDb()
   assert.deepEqual(spellPagePreferenceReport()?.names.slice().sort(), CONTESTED)
+})
+
+test('THE SPELLBOOK draws one row per contested name: the unlock builder runs the same pass', () => {
+  // The owner's report was a spellbook screenshot, and the spellbook is drawn off buildLevelUnlocks,
+  // which loads the scrape through its own copy of the pipeline rather than loadSpellDb. Same
+  // passes, same order, same six survivors - or the two surfaces disagree about what exists.
+  resetLevelUnlocksCache()
+  try {
+    const rows = buildLevelUnlocks(null).spells
+    for (const n of CONTESTED) {
+      assert.equal(rows.filter((s) => s.name === n).length, 1, `${n}: one unlock row`)
+    }
+  } finally {
+    resetLevelUnlocksCache()
+  }
 })
 
 test("the survivor's numbers are the client's, where the client has the row", () => {

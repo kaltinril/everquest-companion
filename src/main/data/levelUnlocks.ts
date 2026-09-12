@@ -43,6 +43,7 @@ import { applySpellEra } from './spellEra'
 // or the box goes quietly deaf on one of them — the same argument `searchTextFor`'s own header
 // makes about the query side.
 import { searchTextFor } from './spellDb'
+import { applyLegendsPagePreference } from './spellPagePreference'
 import { parseSpellClasses } from '../../shared/spellLevels'
 // The canon fold every spell join in this app uses - here so `dedupeByName` groups two pages of
 // one name the same way the client table keys them.
@@ -379,7 +380,13 @@ function writeLineage(spell: UnlockSpell, at: readonly { cls: ClassAbbr; level: 
 function unlockSpells(client: SpellResistTable | null): UnlockSpell[] {
   const file = spellsJson as SpellDbFile
   const out: NamedRow[] = []
-  for (const s of applySpellCorrections(applySpellEra(applySpellRemovals(file.spells).spells).spells).spells) {
+  // THE SAME PASSES AS loadSpellDb, IN THE SAME ORDER: removals, era, corrections, and then the
+  // page preference (spellPagePreference.ts, 2026-09-12) - the spellbook is drawn off this list,
+  // and it was the surface that showed the wiki's two Shock of Frost pages side by side.
+  const effective = applyLegendsPagePreference(
+    applySpellCorrections(applySpellEra(applySpellRemovals(file.spells).spells).spells).spells
+  ).spells
+  for (const s of effective) {
     const at = parseSpellClasses(s.classes)
     if (at.length === 0) continue
     const spell: UnlockSpell = { name: s.name, at }
