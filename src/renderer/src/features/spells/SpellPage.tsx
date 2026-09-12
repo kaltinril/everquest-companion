@@ -28,6 +28,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { Box, Button, Chip, Divider, Stack, Typography } from '@mui/material'
 import type { ClassAbbr } from '@shared/classCombo'
 import type { SpellDetail, SpellLineStep } from '@shared/spellDetail'
+import { wikiPageUrl } from '@shared/wiki'
 import {
   spellClassIsYours,
   spellFactsAreForLine,
@@ -249,6 +250,25 @@ function PageSections({ detail }: { detail: SpellDetail }): JSX.Element {
  * it and says so (`spellFactsAreForLine`), and the page repeats that caveat because a page is read
  * for longer than a hover.
  */
+/**
+ * THE DOOR TO THE WIKI PAGE (owner ask 2026-09-12: "I don't see a link to the wiki page from the
+ * spell"). The mob page's `WikiSourceLine` idiom: a caption, an `<a target="_blank">` that main
+ * turns into the default browser (shared/wiki.ts says how), never an app window. The title is the
+ * spell's NAME: the scrape reads `spellname` off the page's own template and falls back to the
+ * page title, and the two agree on every page the app has needed to open by hand.
+ */
+function WikiLine({ name }: { name: string }): JSX.Element | null {
+  const url = wikiPageUrl(name)
+  if (!url) return null
+  return (
+    <Typography variant="caption" color="text.disabled" display="block" data-testid="spell-page-wiki">
+      <a href={url} target="_blank" rel="noreferrer" style={{ color: 'inherit' }}>
+        eqlwiki.com
+      </a>
+    </Typography>
+  )
+}
+
 export function SpellPage({
   name,
   nav,
@@ -283,6 +303,7 @@ export function SpellPage({
             <Typography variant="h6" data-testid="spell-page-title">
               {name}
             </Typography>
+            <WikiLine name={name} />
             {detail !== null && spellFactsAreForLine(detail) && (
               <Typography variant="caption" color="text.secondary" data-testid="spell-page-line-note">
                 these are the {detail.name} line&apos;s numbers - the database states none per rank
