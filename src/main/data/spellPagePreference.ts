@@ -47,8 +47,9 @@ export function spellPagePreferenceReport(): PagePreferenceReport | null {
 
 /**
  * Keep, for every name that has one, only the rows whose class line carries the Legends
- * `(Autogranted)` note. Runs after removals and before every derived table, so the catalog, the
- * level unlocks and the spellbook all see one row where the wiki had two.
+ * `(Autogranted)` note. Runs after the corrections (spellDb.ts says why) and before the placeholder
+ * pass and every derived table, so the catalog, the level unlocks and the spellbook all see one row
+ * where the wiki had two.
  */
 export function applyLegendsPagePreference(spells: readonly SpellEntry[]): {
   spells: SpellEntry[]

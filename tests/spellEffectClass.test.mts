@@ -44,6 +44,7 @@ import {
 // The two things this file compares the derivation AGAINST: the name stems it is meant to replace,
 // and the overlay it is meant to be independent of.
 import { CC_STEMS, CHARM_STEMS } from '../src/main/data/spellStems'
+import { spellCanonKey } from '../src/shared/spellKey'
 import { applySpellCorrections } from '../src/main/data/spellCorrections.ts'
 import { CALM_LANDING_MESSAGES } from '../src/main/data/spellDb.ts'
 
@@ -54,7 +55,7 @@ const RAW: SpellEntry[] = (spellsJson as SpellDbFile).spells
 function names(klass: Parameters<typeof effectRoster>[1], opts?: Parameters<typeof effectRoster>[2]): string[] {
   const keys = effectRoster(RAW, klass, opts)
   const out = new Set<string>()
-  for (const s of RAW) if (keys.has(s.name.toLowerCase())) out.add(s.name)
+  for (const s of RAW) if (keys.has(spellCanonKey(s.name))) out.add(s.name)
   return [...out].sort()
 }
 
@@ -170,7 +171,7 @@ test('JOS-251 R3: the hold roster is mez ∪ root, and a movement debuff is in N
   for (const n of ["Largo's Melodic Binding", "Largo's Assonant Binding"]) {
     const row = RAW.find((s) => s.name === n)
     assert.ok(row, `spells.json must still carry "${n}"`)
-    assert.ok(!holds.has(n.toLowerCase()), `"${n}" holds nothing — that is the JOS-225 report`)
+    assert.ok(!holds.has(spellCanonKey(n)), `"${n}" holds nothing — that is the JOS-225 report`)
     assert.ok(spellHasEffect(row, 'slow'), `"${n}" is an attack-speed debuff — the JOS-233 ruling`)
   }
   // …AND THE RULING WAS HALF RIGHT, which the effect lines are the first thing in the tree able to
@@ -205,7 +206,7 @@ test('JOS-251 R3b: three spells CC_STEMS claims today are not holds by their eff
     const row = RAW.find((s) => s.name === name)
     assert.ok(row, `spells.json must still carry "${name}"`)
     assert.ok(CC_STEMS.test(name), `the stems really do claim "${name}" — ${why}`)
-    assert.ok(!holds.has(name.toLowerCase()), `"${name}" is not a hold — ${why}`)
+    assert.ok(!holds.has(spellCanonKey(name)), `"${name}" is not a hold — ${why}`)
     assert.ok(!spellHasEffect(row, 'mez') && !spellHasEffect(row, 'root'), `${name}: ${why}`)
   }
 })
@@ -292,7 +293,9 @@ test('JOS-251 R4d: the per-class membership counts, pinned', () => {
   assert.deepEqual(
     Object.fromEntries(EFFECT_RULES.map((r) => [r.klass, all(r.klass)])),
     {
-      charm: 23, summonPet: 102, mez: 16, root: 24, snare: 31, slow: 34, haste: 45, fear: 15,
+      // slow 34 -> 33 (2026-09-12): spellKey.ts drops apostrophes, and the wiki spells Turgur's Insects
+      // two ways (an apostrophe and a `); one slow, one key now, as the client and the log had it.
+      charm: 23, summonPet: 102, mez: 16, root: 24, snare: 31, slow: 33, haste: 45, fear: 15,
       stun: 92, blind: 12, pacify: 12, memblur: 17, invisibility: 20, feignDeath: 2,
       // JOS-318, the class the alert catalog reads. 67 rows / 66 canonical names.
       healOverTime: 66
@@ -336,7 +339,7 @@ test('JOS-318 R9b: the roster answers for every HoT the OWNER`S LOG has printed 
     ['Stoicism', 3], ['Blooming Heal', 3], ['Impassivity', 1]
   ]
   const roster = effectRoster(RAW, 'healOverTime', { castableOnly: false, targetOnly: false })
-  const missing = LOGGED.filter(([n]) => !roster.has(n.toLowerCase())).map(([n]) => n)
+  const missing = LOGGED.filter(([n]) => !roster.has(spellCanonKey(n))).map(([n]) => n)
   assert.deepEqual(missing, [], 'a spell the log ticks for that the effect read cannot see')
   // THE ONE THE LOG PRINTS AND NO ROSTER CAN EVER HOLD, stated rather than quietly dropped: five
   // `Harm Touch IX` ticks. `Harm Touch` is not in spells.json at all, so it is out of every derived
@@ -485,7 +488,7 @@ test('JOS-251 R7: THE SEPARATION — the roster comes off the RAW scrape, and th
   // Half one: the derivation needs no overlay. `RAW` is the committed JSON exactly as the scrape
   // wrote it — no corrections, no derived durations, no learned message overlay — and it produces
   // the whole roster.
-  assert.deepEqual([...charmRoster(RAW)].sort(), RESEARCH_CHARMS.map((n) => n.toLowerCase()).sort())
+  assert.deepEqual([...charmRoster(RAW)].sort(), RESEARCH_CHARMS.map(spellCanonKey).sort())
 
   // Half two: the overlay is not load-bearing for the derivation either. The corrections rename and
   // re-message rows (JOS-161 renames both Bravura rows), and the roster is IDENTICAL apart from the
@@ -494,7 +497,7 @@ test('JOS-251 R7: THE SEPARATION — the roster comes off the RAW scrape, and th
   const corrected = applySpellCorrections(RAW).spells
   const rawKeys = charmRoster(RAW)
   const corrKeys = charmRoster(corrected)
-  assert.deepEqual([...corrKeys].filter((k) => !rawKeys.has(k)), ["solon's bewitching bravura"])
-  assert.deepEqual([...rawKeys].filter((k) => !corrKeys.has(k)), ["solon's bravura"])
+  assert.deepEqual([...corrKeys].filter((k) => !rawKeys.has(k)), ['solons bewitching bravura'])
+  assert.deepEqual([...rawKeys].filter((k) => !corrKeys.has(k)), ['solons bravura'])
   assert.equal(rawKeys.size, corrKeys.size, 'a rename, and nothing else')
 })

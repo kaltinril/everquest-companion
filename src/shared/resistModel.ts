@@ -54,6 +54,7 @@
 // also shipped a separate run detector that printed a second verdict beside this estimate, and the
 // owner removed it the same day (JOS-400). A card says one thing about a creature, and this is it.
 
+import { spellCanonKey } from './spellKey'
 import {
   LOW_SAMPLE_BELOW,
   RESIST_CASTER_KINDS,
@@ -375,7 +376,10 @@ function prepare(rows: readonly ResistRow[], spells: SpellResistTable, opts: Est
   const modes = opts.modes ?? fullDamageRefs(rows)
   const newest = opts.newestWeek ?? newestWeekOf(rows)
   for (const row of rows) {
-    const info = spells[row.spellKey]
+    // THROUGH THE CANON KEY, not by the stored string: a ledger row written before spellKey.ts
+    // dropped apostrophes (2026-09-12) still says `denon`s desperate dirge`, and the client table is
+    // keyed without the backtick now. The fold is idempotent, so a new row costs one map lookup.
+    const info = spells[spellCanonKey(row.spellKey)]
     if (!rowIsEvidence(row, info, opts.axis)) continue
     const mode = modes.get(damageRefKey(row.spellKey, row.casterLevel))
     noteEvidence(prep, row, info, mode)
