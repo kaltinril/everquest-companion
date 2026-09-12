@@ -38,6 +38,7 @@ import type { ClassAbbr } from './classCombo'
  * equality against the real parser helper.
  */
 const RANK_TAIL_RE = / (I|II|III|IV|V|VI|VII|VIII|IX|X)$/i
+const APOSTROPHE_RE = /[`'\u2019]/g
 
 /** Roman numeral → ordinal, for the ten ranks the log and the DB actually use. */
 const RANK_VALUE: Record<string, number> = {
@@ -88,9 +89,10 @@ export interface SpellLine {
   ranks: SpellRank[]
 }
 
-/** The line key for a spell display name — mirrors parseCommon.spellCanonKey exactly. */
+/** The line key for a spell display name — mirrors spellKey.ts `spellCanonKey` exactly, apostrophe
+ *  fold included (`O\`Keil's` and `O'Keils` are one line; tests/spellLines.test.mts L1 pins the pair). */
 export function spellLineKey(name: string): string {
-  return name.trim().replace(RANK_TAIL_RE, '').trim().toLowerCase()
+  return name.trim().replace(RANK_TAIL_RE, '').trim().replace(APOSTROPHE_RE, '').toLowerCase()
 }
 
 /** Split a display name into its base + rank ordinal. Unsuffixed names are rank 1. */

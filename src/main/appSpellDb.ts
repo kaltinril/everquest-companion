@@ -48,6 +48,7 @@ import {
   spellRemovalsReport,
   type SpellDb
 } from './data/spellDb'
+import { spellPagePreferenceReport } from './data/spellPagePreference'
 import { MessageOverlayMiner } from './data/messageOverlay'
 import { baselineOverlay, loadUserSources } from './data/overlayPersistence'
 import { BASELINE_SOURCE } from './data/messageOverlay'
@@ -115,6 +116,15 @@ export const DATA_READY_MS = performance.now()
  * rows the sidecar has no answer for; `unreachable` counts spells that can never be resolved to
  * their own landing sentence.
  */
+/** The boot line for the page preference (spellPagePreference.ts); silent when it dropped nothing. */
+function logPagePreference(): void {
+  const g = spellPagePreferenceReport()
+  if (!g || g.dropped === 0) return
+  logInfo(
+    `[everquest-companion] Spell pages: ${g.dropped} classic page${g.dropped === 1 ? '' : 's'} dropped beside a Legends page (${g.names.join(', ')}).`
+  )
+}
+
 export function logSpellDbSummary(): void {
   const db = appSpellDb()
   logInfo(
@@ -133,6 +143,7 @@ export function logSpellDbSummary(): void {
       `[everquest-companion] Spell removals: ${r.removed} row${r.removed === 1 ? '' : 's'} dropped (absent from EQ Legends), ${r.satisfied.length} already absent upstream.${tombstones}`
     )
   }
+  logPagePreference()
   const p = spellPlaceholdersReport()
   if (p) {
     const which = p.rows.map((row) => `${row.spell}/${row.field}`).join(', ')

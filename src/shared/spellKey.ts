@@ -62,6 +62,19 @@ export function idKey(name: string): string {
 const RANK_TAIL_RE = / (?:I|II|III|IV|V|VI|VII|VIII|IX|X)$/
 
 /**
+ * AND THE APOSTROPHE IS NOT PART OF THE NAME (owner report 2026-09-12: spells with no icon). The
+ * client writes `O`Keil's Radiation` with a backtick and a possessive, the wiki page is titled
+ * `O'Keils Radiation`, and the log prints whichever the client has. Three spellings of one spell
+ * met at three different keys, and the icon, the client's HP figures and the cast-to-page pairing
+ * all missed. Measured over the committed corpus against the owner's spells_us.txt: 26 spells the
+ * client has were unreachable by punctuation alone (Al'Kabor's spirals, Jyll's, Markar's, Tigir's,
+ * Zumaik's, ...), and dropping the three marks joins no two spells a player can cast - the one
+ * client pair it folds (`Frozen Limbs` / `Frozen Limb's`, ids 33690 and 33677) is two NPC copies
+ * no class learns, and the file-order rule in spellsUsParse.ts already picks one.
+ */
+const APOSTROPHE_RE = /[`'\u2019]/g
+
+/**
  * MEMOIZED, and the measurement is why (JOS-59). This is a PURE function of its argument — a
  * trim, a regex, a trim and a lowercase — and it was called from the parser on every cast-shaped
  * line AND from the buffs module's per-event hygiene sweep, once per live buff instance. On the
@@ -84,7 +97,7 @@ const CANON_CACHE_MAX = 20_000
 export function spellCanonKey(spell: string): string {
   const hit = CANON_CACHE.get(spell)
   if (hit !== undefined) return hit
-  const key = spell.trim().replace(RANK_TAIL_RE, '').trim().toLowerCase()
+  const key = spell.trim().replace(RANK_TAIL_RE, '').trim().replace(APOSTROPHE_RE, '').toLowerCase()
   if (CANON_CACHE.size < CANON_CACHE_MAX) CANON_CACHE.set(spell, key)
   return key
 }

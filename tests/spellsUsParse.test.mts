@@ -31,6 +31,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { parseSpellsUs } from '../src/main/resist/spellsUsParse'
+import { spellCanonKey } from '../src/shared/spellKey'
 
 /**
  * Build one caret row. Only the fields this parser reads are filled; the rest are the padding the
@@ -165,7 +166,7 @@ test('JOS-444: the re-use timer is FIELD 10, and field 9 is the cooldown that lo
   // Odium is the row that picks the column: field 10 reads 6000 and the wiki's own `recast_time`
   // for Odium is 6 seconds. Field 9 reads 1500 on the same row, which is what makes it a decoy.
   assert.equal(TABLE.odium.recastMs, 6000)
-  assert.equal(TABLE["garrison's mighty mana shock"].recastMs, 1500)
+  assert.equal(TABLE['garrisons mighty mana shock'].recastMs, 1500)
   // A row whose field 10 is 0 states that it has NO re-use timer, and the absence is how the
   // reader hears that — a stored 0 would be half the table saying nothing.
   assert.equal(TABLE['complete heal'].recastMs, undefined)
@@ -198,7 +199,7 @@ test('a one-point resist rider is not a resist debuff', () => {
   // A charm that shaves a point off magic resistance is a charm. Opening an eleven-minute debuff
   // window for it would file every later observation under a condition that never mattered.
   const rider = parseSpellsUs(row({ id: 750, name: "Solon's Bewitching Bravura", resistType: 1, slots: '1|22|1|0|100|51$2|50|-1|0|119|0' }))
-  assert.equal(rider["solon's bewitching bravura"].debuffSlots, undefined)
+  assert.equal(rider['solons bewitching bravura'].debuffSlots, undefined)
 })
 
 test('a HARD LEVEL CAP comes only from the primary slot', () => {
@@ -304,4 +305,15 @@ test('JOS-451: a HITPOINT SLOT is effect 0, 100 or 334 — and `hpSlot` is still
 test('a malformed row is skipped rather than half-read', () => {
   const table = parseSpellsUs(['not^a^row', '', TASHANI].join('\n'))
   assert.deepEqual(Object.keys(table), ['tashani'])
+})
+
+test("the key drops apostrophes, so O`Keil's Radiation is found under the wiki's O'Keils (2026-09-12)", () => {
+  // The owner's client writes the backtick and the possessive; eqlwiki titles the page without
+  // either; the icon lookup and clientHpFor both go through spellCanonKey, so one fold serves all.
+  const okeil = row({ id: 378, name: "O`Keil's Radiation", castMs: 3000, resistType: 2, targetType: 51, classes: { [WIZ]: 2 }, slots: '1|59|-2|0|100|0' })
+  const table = parseSpellsUs(okeil + '\n')
+  assert.equal(Object.keys(table).join(','), 'okeils radiation')
+  assert.equal(spellCanonKey("O'Keils Radiation"), 'okeils radiation')
+  assert.equal(spellCanonKey('O’Keils Radiation'), 'okeils radiation', 'and the typographic quote')
+  assert.equal(table[spellCanonKey("O'Keils Radiation")]?.id, 378)
 })

@@ -60,6 +60,7 @@ import {
 // evidence bar of its own — absence cannot be log-measured, so the bar is a dated owner
 // verification per entry — and it is not the corrections bar. Read it before adding a removal.
 import { applySpellRemovals, type RemovalsReport } from './spellRemovals'
+import { applyLegendsPagePreference } from './spellPagePreference'
 // …and the wiki's ERA VERDICT for each spell's page (JOS-393), joined from the sidecar the item and
 // mob surfaces already read. A JOIN, not an edit: the verdict comes from a second scrape of a
 // different endpoint, and `spells.json` is rewritten wholesale by its own. Read that file's header
@@ -951,7 +952,9 @@ export function loadSpellDb(): SpellDb {
   // position is free. What is NOT free is that it happens HERE rather than at each consumer — one
   // catalog, one verdict, so the level panel, the search and the spell card cannot disagree about
   // whether the wiki badges a spell. Its own report is `spellEra.ts`'s (`spellEraReport`).
-  const dated = applyDerivedDurations(applySpellEra(present.spells).spells).spells
+  // …after the PAGE PREFERENCE (spellPagePreference.ts, 2026-09-12): of two wiki pages under one
+  // name, the one EQ Legends runs. It reports through its own module, the way the era join does.
+  const dated = applyDerivedDurations(applySpellEra(applyLegendsPagePreference(present.spells).spells).spells).spells
   const { spells, report } = applySpellCorrections(dated)
   cachedCorrections = report
   // …and LAST, the scrape's stubs, blanked so every table below reads them as the nothing they are.
