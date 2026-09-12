@@ -167,6 +167,40 @@ function loosePool(owned: readonly OwnedExaltation[]): LoosePool {
   }
 }
 
+/**
+ * CAN THIS DONOR LEGALLY SIT IN THIS SEAT — R2's two halves and the unanswerable-seat guard, in
+ * ONE place, for BOTH engines that ask.
+ *
+ * IT WAS WRITTEN TWICE (owner catch 2026-09-11: *"if they have the same logic they shouldn't
+ * duplicate code in 2 places"*). This module had `socketable` + `classesOverlap` and
+ * `socketOptimize.ts` had its own `fits`, the same rule spelled out again. That is not a
+ * hypothetical drift risk: when the slot half was corrected on 2026-09-10 — `donor ∩ hostItem`
+ * first, the cell as a SECOND constraint — BOTH copies had to be found and fixed, and
+ * socketOptimize's own header already claimed "the rules are the recommender's" while carrying a
+ * private copy of them.
+ *
+ *   SLOT — `shared/planner/rules.ts slotFits` carries the rule and the measurement behind it.
+ *   CLASS — socketing re-restricts the HOST to the donor's classes, so the two must share one.
+ *     Either list unstated, or a host the corpus does not know, passes (law 1).
+ *   UNANSWERABLE — an `Any Slot` cell whose host the corpus cannot name has no slot on either
+ *     side. There is nothing to check against, so it takes nothing rather than everything.
+ *
+ * The LOADOUT class gate (`usable`) is deliberately NOT here: the two engines apply it at
+ * different moments — per candidate here, once per claim in the optimizer — and folding it in
+ * would make one of them ask it twice.
+ */
+export function seatFits(
+  donor: GearRow,
+  seat: Pick<SocketHostCell, 'slot'>,
+  hostRow: GearRow | undefined
+): boolean {
+  const hostSlots = hostRow?.slots ?? []
+  if (seat.slot === null && hostSlots.length === 0) return false
+  if (!slotFits(donor.slots, hostSlots, seat.slot)) return false
+  if (hostRow === undefined || donor.classes.length === 0 || hostRow.classes.length === 0) return true
+  return donor.classes.some((c) => hostRow.classes.includes(c))
+}
+
 /** The best loose candidate for one socket, under a predicate on its effect. */
 /** The recommender's fixed context, bundled once so the lookups keep four parameters. */
 interface RecContext {
@@ -181,50 +215,16 @@ function bestLoose(
   accept: (eff: KindEffect) => boolean
 ): { key: string; row: GearRow; eff: KindEffect } | null {
   const hostRow = ctx.rowByKey.get(host.itemKey)
-  const hostSlots = hostRow?.slots ?? []
-  // R2's slot half needs SOMETHING to check against. An any-cell whose host the corpus does not
-  // know is genuinely unanswerable - there is no slot on either side - and stays silent.
-  if (host.slot === null && hostSlots.length === 0) return null
-  const seat: SeatFacts = { cell: host.slot, hostRow, hostSlots }
   let best: { key: string; row: GearRow; eff: KindEffect } | null = null
   for (const key of ctx.pool.keys()) {
     const row = ctx.rowByKey.get(key)
-    if (row === undefined || !socketable(row, ctx.classes, seat)) continue
+    // The loadout gate is this engine's own; the seat gate is the one both engines share.
+    if (row === undefined || !usable(row, ctx.classes) || !seatFits(row, host, hostRow)) continue
     const eff = bestEffectFor(row, host.type)
     if (eff === null || !accept(eff)) continue
     if (best === null || eff.tier > best.eff.tier) best = { key, row, eff }
   }
   return best
-}
-
-/**
- * Can this loose gem legally go in this seat at all - R2's two halves, before any question of
- * whether it is a good idea.
- *
- * Its own function because `bestLoose` crossed the tree's complexity ceiling when the slot half
- * grew its third fact (the host item's own slots), and the seam is the honest one: everything here
- * is about LEGALITY and everything left behind is about RANKING.
- */
-interface SeatFacts {
-  /** the cell's equip slot, or null for an `Any Slot` / `Held` cell */
-  cell: EquipSlot | null
-  /** the HOST item's corpus row, for R2's class half; undefined when the corpus lacks it */
-  hostRow: GearRow | undefined
-  /** the HOST item's own equip slots - the half R2's slot test was missing until 2026-09-10 */
-  hostSlots: readonly EquipSlot[]
-}
-
-function socketable(row: GearRow, classes: readonly ClassAbbr[], seat: SeatFacts): boolean {
-  if (!usable(row, classes)) return false
-  if (!slotFits(row.slots, seat.hostSlots, seat.cell)) return false
-  return classesOverlap(row, seat.hostRow)
-}
-
-/** R2's class half: the gem re-restricts the host to the donor's classes, so they must share
- *  one. Either list unstated (or the host unknown to the corpus) passes — law 1. */
-function classesOverlap(donor: GearRow, host: GearRow | undefined): boolean {
-  if (host === undefined || donor.classes.length === 0 || host.classes.length === 0) return true
-  return donor.classes.some((c) => host.classes.includes(c))
 }
 
 function flag(map: Map<string, Set<string>>, cellId: string, key: string): void {
