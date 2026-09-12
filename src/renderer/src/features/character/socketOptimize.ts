@@ -28,7 +28,7 @@ import type { OwnedExaltation } from '../../../../shared/characterSheet'
 import { bestEffectFor, usable, type KindEffect } from './exaltationAudit'
 // R2 lives THERE, not here (owner catch 2026-09-11). This file's header has always said "the rules
 // are the recommender's"; until now it said so while carrying its own copy of them.
-import { seatFits, type SocketHostCell } from './socketRecommend'
+import { seatFits, seatIsLive, type SocketHostCell } from './socketRecommend'
 
 /** One family's claim: its best owned tier, the donor gems that carry it, and how many copies. */
 interface FamilyClaim {
@@ -135,7 +135,7 @@ function currentSeatExists(
   rowByKey: ReadonlyMap<string, GearRow>
 ): boolean {
   return sockets.some((s) => {
-    if (s.currentKey === null) return false
+    if (s.currentKey === null || !seatIsLive(s)) return false
     const occ = bestEffectFor(rowByKey.get(s.currentKey), s.type)
     if (occ?.family !== c.eff.family) return false
     const hostRow = rowByKey.get(s.itemKey)
@@ -157,6 +157,9 @@ function edges(
     const empty: number[] = []
     const occupied: number[] = []
     sockets.forEach((s, i) => {
+      // A proc seat nothing swings is not a seat (`seatIsLive`), so it never becomes an edge and
+      // the matching cannot spend a family on it.
+      if (!seatIsLive(s)) return
       const hostRow = rowByKey.get(s.itemKey)
       if (!c.donors.some((d) => d.type === s.type && seatFits(d.row, s, hostRow))) return
       const occupant = s.currentKey === null ? null : bestEffectFor(rowByKey.get(s.currentKey), s.type)
