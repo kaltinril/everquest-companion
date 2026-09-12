@@ -12,6 +12,10 @@
 
 import { zoneLevelBand, type ZoneLevelBand } from '@shared/zoneLevels'
 import { MOB_CATALOG } from '../mobs/mobSearch'
+// The same two readers the map's own wish-list pins use, so a zone's count and the pins on its map
+// can never disagree about which drops are wished.
+import { sourceItemKey } from '../../lib/itemSources'
+import { wishedDrops } from './mobPins'
 
 let CACHE: Map<string, ZoneLevelBand> | null = null
 
@@ -39,5 +43,38 @@ export function zoneBands(): ReadonlyMap<string, ZoneLevelBand> {
     if (band !== null) out.set(zone, band)
   }
   CACHE = out
+  return out
+}
+
+/**
+ * Zone name → how many DISTINCT wished items the bestiary says can drop there (owner ask,
+ * 2026-09-12: *"most wishlist items in a single zone"*).
+ *
+ * DISTINCT ITEMS, not drop rows: three mobs in one zone that each drop the same wished sword are
+ * one reason to go, not three. Keyed through `sourceItemKey`, the way `wishedDrops` is, because
+ * the catalog spells `Ghoulbane` and `Ghoulbane +1` on different mobs and they are one item.
+ *
+ * A mob standing in several zones counts in each - it really is in all of them.
+ *
+ * ONE WALK, not one per zone: `mobsInZone` would answer this too, but 193 zones times the catalog
+ * on every wish-list edit is the wrong shape for a list that redraws as you type.
+ */
+export function wishedByZone(wished: ReadonlySet<string>): ReadonlyMap<string, number> {
+  const out = new Map<string, number>()
+  if (wished.size === 0) return out
+  const byZone = new Map<string, Set<string>>()
+  for (const mob of MOB_CATALOG) {
+    const drops = wishedDrops(mob, wished)
+    if (drops.length === 0) continue
+    for (const zone of mob.zones ?? []) {
+      let items = byZone.get(zone)
+      if (items === undefined) {
+        items = new Set()
+        byZone.set(zone, items)
+      }
+      for (const name of drops) items.add(sourceItemKey(name))
+    }
+  }
+  for (const [zone, items] of byZone) out.set(zone, items.size)
   return out
 }

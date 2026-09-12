@@ -1,10 +1,12 @@
-// WHERE TO LEVEL AND WHERE TO FARM MOTES (owner ask, kaltinril 2026-09-11: "somewhere it shows
-// recommendation for where to level, where to get motes (should be equal or higher level but not
-// crazy higher)").
+// WHERE TO LEVEL, WHERE TO FARM MOTES, WHERE YOUR WISH LIST DROPS (owner asks, kaltinril
+// 2026-09-11 and -12: "recommendation for where to level, where to get motes (should be equal or
+// higher level but not crazy higher)" and then "different level ranges for different stuff - D4
+// mote farming, or best EXP or best gear, or most wishlist items in a single zone").
 //
-// The design claim under test is that those are ONE question, and it rests on this project's own
-// measurement rather than on intuition: white/yellow/red cons drop 7-10 motes per 100 kills
-// against 4.2 blue and 3.1 green. `shared/zoneAdvice.ts` carries the figures and their provenance.
+// The design claim under test is that the first two are ONE ranking read two ways, and it rests on
+// this project's own measurement: white/yellow/red cons drop 7-10 motes per 100 kills against 4.2
+// blue and 3.1 green, and the grade floor rises with difficulty. `shared/zoneAdvice.ts` carries
+// the figures, their provenance, and why "best gear" is not here yet.
 
 import test from 'node:test'
 import assert from 'node:assert/strict'
@@ -20,18 +22,16 @@ function band(low: number, high: number): ZoneLevelBand {
   return made
 }
 
-test('a zone you cannot survive is not advice, however good its motes would be', () => {
-  const bands = new Map([['Plane of Fear', band(48, 58)], ['Befallen', band(6, 26)]])
-  const ranked = rankZones(bands, 20)
-  assert.deepEqual(ranked.map((r) => r.zone), ['Befallen'], '"not crazy higher" is a bound, not a preference')
+const FEAR = band(48, 58)
+const BEFALLEN = band(6, 26)
+
+test('experience: a zone you cannot survive is not advice, however good its motes would be', () => {
+  const bands = new Map([['Plane of Fear', FEAR], ['Befallen', BEFALLEN]])
+  assert.deepEqual(rankZones(bands, 20).map((r) => r.zone), ['Befallen'], '"not crazy higher" is a bound')
 })
 
-test('even and slightly-above lead, and green is last rather than absent', () => {
-  const bands = new Map([
-    ['easy', band(5, 10)],
-    ['even', band(18, 24)],
-    ['reach', band(23, 28)]
-  ])
+test('experience: even and a reach lead, and green is last rather than absent', () => {
+  const bands = new Map([['easy', band(5, 10)], ['even', band(18, 24)], ['reach', band(23, 28)]])
   const ranked = rankZones(bands, 22)
   assert.deepEqual(ranked.map((r) => r.zone), ['reach', 'even', 'easy'])
   // The harder of two equally-fitting bands leads: the measured GRADE floor rises with difficulty
@@ -44,10 +44,37 @@ test('even and slightly-above lead, and green is last rather than absent', () =>
   assert.ok(MOTES_PER_100.even > MOTES_PER_100.green * 2, 'the measured rate roughly doubles')
 })
 
+test('motes: the reach leads and green is gone - 3.1 per hundred is not a mote plan', () => {
+  // `reach` starts TWO above: one above still counts as even (`zoneFit`), and this test wants a
+  // genuinely hard band leading, not an even one that happens to start higher.
+  const bands = new Map([['easy', band(5, 10)], ['even', band(18, 24)], ['reach', band(24, 29)]])
+  const ranked = rankZones(bands, 22, { goal: 'motes' })
+  assert.deepEqual(ranked.map((r) => r.zone), ['reach', 'even'], 'green dropped, reach first')
+  assert.equal(ranked[0].fit, 'hard', 'where the grade floor is higher')
+  // ...and still nothing deadly: the mote goal is not a licence to die.
+  assert.deepEqual(rankZones(new Map([['Plane of Fear', FEAR]]), 20, { goal: 'motes' }), [])
+})
+
+test('wish list: ranked by distinct wished drops, and the one goal that keeps a deadly zone', () => {
+  const bands = new Map([['Plane of Fear', FEAR], ['Befallen', BEFALLEN], ['Nowhere', band(19, 23)]])
+  const wished = new Map([['Plane of Fear', 3], ['Befallen', 1]])
+  const ranked = rankZones(bands, 20, { goal: 'wish', wished })
+  // Most wished items first, even though Fear is deadly at 20: the item is where it is.
+  assert.deepEqual(ranked.map((r) => r.zone), ['Plane of Fear', 'Befallen'])
+  assert.equal(ranked[0].fit, 'deadly', 'and the chip still says what the trip costs')
+  assert.equal(ranked[0].wished, 3)
+  // A zone with nothing you want is not on this list, however well it fits.
+  assert.ok(!ranked.some((r) => r.zone === 'Nowhere'))
+  // No wish list at all is no list at all - never every zone at zero.
+  assert.deepEqual(rankZones(bands, 20, { goal: 'wish' }), [])
+})
+
 test('a thinly documented zone can be held back, and every row says how thin it is', () => {
-  const bands = new Map([['thin', zoneLevelBand([20, 21])!], ['thick', band(19, 23)]])
+  const thin = zoneLevelBand([20, 21])
+  assert.ok(thin)
+  const bands = new Map([['thin', thin], ['thick', band(19, 23)]])
   assert.deepEqual(rankZones(bands, 20).map((r) => r.zone).sort(), ['thick', 'thin'])
-  assert.deepEqual(rankZones(bands, 20, 10).map((r) => r.zone), ['thick'], 'min n drops the thin one')
+  assert.deepEqual(rankZones(bands, 20, { min: 10 }).map((r) => r.zone), ['thick'], 'min n drops the thin one')
   for (const row of rankZones(bands, 20)) assert.equal(row.n, row.band.n, 'the weight rides on the row')
 })
 
@@ -59,7 +86,7 @@ test('your own level caps the grade you can bank', () => {
   assert.equal(moteGradeCap(60), 10, 'and never past the ceiling')
 })
 
-test('the committed bestiary yields real advice for a real level', () => {
+test('the committed bestiary yields real advice for a real level, for both con goals', () => {
   const levels = new Map<string, number[]>()
   for (const mob of mobsJson.mobs) {
     const level = Number.parseInt(String(mob.level), 10)
@@ -75,10 +102,11 @@ test('the committed bestiary yields real advice for a real level', () => {
     const made = zoneLevelBand(ls)
     if (made !== null) bands.set(zone, made)
   }
-  const ranked = rankZones(bands, 20, 8)
-  assert.ok(ranked.length >= 5, `expected real advice, got ${String(ranked.length)} zones`)
-  // Nothing deadly survives the cut, at any level the catalog covers.
-  for (const row of ranked) assert.notEqual(row.fit, 'deadly')
-  // A level 20's best zones are not level 50 zones.
-  assert.ok(ranked[0].band.typical[0] <= 24, `led with ${ranked[0].zone} ${String(ranked[0].band.typical)}`)
+  for (const goal of ['exp', 'motes'] as const) {
+    const ranked = rankZones(bands, 20, { goal, min: 8 })
+    assert.ok(ranked.length >= 5, `${goal}: expected real advice, got ${String(ranked.length)} zones`)
+    for (const row of ranked) assert.notEqual(row.fit, 'deadly', `${goal}: nothing deadly survives the cut`)
+    // A level 20's best zones are not level 50 zones.
+    assert.ok(ranked[0].band.typical[0] <= 25, `${goal}: led with ${ranked[0].zone} ${String(ranked[0].band.typical)}`)
+  }
 })
