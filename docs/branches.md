@@ -14,7 +14,7 @@ re-reads them. Last taken 2026-09-11.
 | Branch | PR | Worktree | behind/ahead | What it does |
 |---|---|---|---|---|
 | `gear-tab-improvements` | [#31](https://github.com/jmoyers/everquest-companion/pull/31) | `C:/git/eqc-gear-sticky` | 11 / 56 | Gear tab: drop sources, worth-scores, numeric search, a wish column, resizable columns. The tab the other two gear branches build on. |
-| `map-improvements` | [#35](https://github.com/jmoyers/everquest-companion/pull/35) | *(none)* | 11 / 23 | Maps: clickable zone links, mob pins, hover cards, wish-list highlights. |
+| `map-improvements` | [#35](https://github.com/jmoyers/everquest-companion/pull/35) | `C:/git/eqc-maps` | 11 / 26 | Maps: clickable zone links, mob pins, hover cards, wish-list highlights. Plus the travel work (2026-09-11): the zone graph read off the client's own map labels, the druid/wizard/item port table derived from the spell and item corpora, per-zone level bands from the bestiary, and the level-scoped "where to level and farm motes" panel. |
 | `gear-progression-plan` | [#36](https://github.com/jmoyers/everquest-companion/pull/36) | `C:/git/eqc-plan-fix` | 11 / 60 | Recommended tab: a level route with exp zones and role-weighted gear targets. Carries the planner scoring recalibration (survivability dial, chunk-stat law, quest lane, ownership/equip advisory). |
 | `fix-ds-ever-struck` | [#61](https://github.com/jmoyers/everquest-companion/pull/61) | `C:/git/eqc-fix-allypet` | 11 / 3 | A damage-shield tick is not a strike: `ds` lines no longer write `ever_struck`. The ally-pet crediting bug, fixed in the Rust engine. |
 
