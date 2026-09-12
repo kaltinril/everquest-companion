@@ -60,6 +60,7 @@ import { zoneLabel } from './zoneOptions'
 import { loadPackPrefs, savePackPrefs, useMapData, useMapPacks } from './useMapData'
 import { useLocMarker } from './useLocMarker'
 import MapTravelCard from './MapTravelCard'
+import MapZoneAdvice from './MapZoneAdvice'
 import { useZoneTravel } from './useZoneTravel'
 import {
   loadZoneSelection,
@@ -445,6 +446,9 @@ export default function MapsView({
           the sidebar: it is about the zone itself, not about finding something in it, and the
           sidebar is the finder. Draws nothing at all when neither witness has anything to say. */}
       <MapTravelCard travel={travel} />
+      {/* WHERE SHOULD I BE (owner ask 2026-09-11) — level-scoped, and clicking a row opens that
+          zone's map, which is what makes it a map-tab feature rather than a report. */}
+      <MapZoneAdvice onPick={pick} />
       <MapBody
         data={data}
         // Nothing is claimed before the pack listing and the first fetch have answered — a
