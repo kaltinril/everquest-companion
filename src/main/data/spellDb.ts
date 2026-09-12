@@ -952,13 +952,16 @@ export function loadSpellDb(): SpellDb {
   // position is free. What is NOT free is that it happens HERE rather than at each consumer — one
   // catalog, one verdict, so the level panel, the search and the spell card cannot disagree about
   // whether the wiki badges a spell. Its own report is `spellEra.ts`'s (`spellEraReport`).
-  // …after the PAGE PREFERENCE (spellPagePreference.ts, 2026-09-12): of two wiki pages under one
-  // name, the one EQ Legends runs. It reports through its own module, the way the era join does.
-  const dated = applyDerivedDurations(applySpellEra(applyLegendsPagePreference(present.spells).spells).spells).spells
+  const dated = applyDerivedDurations(applySpellEra(present.spells).spells).spells
   const { spells, report } = applySpellCorrections(dated)
   cachedCorrections = report
   // …and LAST, the scrape's stubs, blanked so every table below reads them as the nothing they are.
-  const honest = applyPlaceholderMessages(spells)
+  // …the PAGE PREFERENCE (spellPagePreference.ts, 2026-09-12): of two wiki pages under one name, the
+  // one EQ Legends runs. AFTER the corrections on purpose: a message correction patches the first
+  // row of a name, and on these six that row is the classic page, so running the choice first
+  // would report the correction stale and move the engine's sidecar for a sentence nobody reads.
+  // It reports through its own module, the way the era join does.
+  const honest = applyPlaceholderMessages(applyLegendsPagePreference(spells).spells)
   cachedPlaceholders = honest.report
   cached = buildSpellDb(honest.spells)
   return cached
