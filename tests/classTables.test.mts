@@ -274,7 +274,13 @@ test('the SHIPPED index is keyed by canon key, so rank variants collapse', () =>
   // union that made one key out of two spellings gains and loses nobody. The RAW tallies above are
   // untouched for the usual reason — they measure the pristine scrape, which still carries both
   // pages.
-  assert.equal(spellClassIndex().size, 1412)
+  //
+  // 1412 -> 1410 (2026-09-12): the canon key now drops apostrophes (spellKey.ts), and the effective
+  // index had two spells the wiki spells two ways - `O\`Keil's Flickering Flame` / `O\`Keils Flickering
+  // Flame` and `Turgur's Insects` / `Turgur\`s Insects` - which are one key each now, as the client
+  // and the log already had them. The page preference of the same day drops six ROWS but no KEY:
+  // each of the six names keeps its Legends page.
+  assert.equal(spellClassIndex().size, 1410)
   assert.equal(CANON.get('ENC')?.excl, 176)
   assert.equal(RAW.get('ENC')?.excl, 184)
   assert.deepEqual(classesForSpell('Clarity II'), classesForSpell('Clarity'))

@@ -284,7 +284,8 @@ test('C10 the mana column is resolved main-side, once, and only over a stated ze
   // all and these rows are what the real parse produces for those two ids.
   const zeroMana: SpellResistTable = {
     'chords of dissonance': { axis: 'magic', resistAdj: -100, castMs: 3000, targetType: 4 },
-    'denon`s desperate dirge': { axis: 'magic', resistAdj: 0, castMs: 3000, mana: 800, targetType: 8 }
+    // The key is the canon key, which drops the backtick (spellKey.ts, 2026-09-12).
+    'denons desperate dirge': { axis: 'magic', resistAdj: 0, castMs: 3000, mana: 800, targetType: 8 }
   }
   // CENSUS (2026-08-23): NO catalog spell placed at a level is in the wiki-silent/client-positive
   // shape — the eight rows that are, are all NPC-only or unlearnable. So the mana rule moves nothing
