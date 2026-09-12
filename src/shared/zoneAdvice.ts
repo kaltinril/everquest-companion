@@ -1,40 +1,46 @@
-// zoneAdvice.ts — WHERE SHOULD I BE, AND WHERE DO MOTES COME FROM.
+// zoneAdvice.ts — WHERE SHOULD I BE, for one of three reasons.
 //
 // Owner ask (kaltinril 2026-09-11): *"somewhere it shows recommendation for where to level, where
-// to get motes (should be equal or higher level but not crazy higher)"*.
+// to get motes (should be equal or higher level but not crazy higher)"* - and, the next night,
+// having seen every row of the first version print the same number: *"why not expand this new tab
+// inside maps to give different level ranges for different stuff - like if you're going for D4
+// mote farming, or best EXP or best gear, or most wishlist items in a single zone"*.
 //
-// ── THE TWO ASKS ARE ONE QUESTION, AND THAT IS MEASURED RATHER THAN ASSUMED ───────────────────
+// ── ONE RANKER, THREE GOALS, AND WHY IT IS NOT FOUR ──────────────────────────────────────────
 //
-// It would be easy to build two rankings here. The measurements say one will do, because what
-// drives mote drops is the same thing that drives experience: the CON of what you are killing.
-// From this project's own logged fights (owner's shadowknight, con bands taken from the bestiary's
-// levels against his level at each kill):
+//   EXPERIENCE. Con drives experience and this project's own logged fights put the rates on it
+//   (owner's shadowknight, 2026-09-07, con bands from the bestiary against his level per kill):
+//   white / yellow / red 7 to 10 motes per 100 kills, blue 4.2, green 3.1. Even and a-reach lead,
+//   green is listed last rather than dropped - it is slower, not useless.
 //
-//     white / yellow / red   7 to 10 motes per 100 kills
-//     blue                   4.2
-//     green                  3.1
+//   MOTE GRADE. The same measurements say the grade FLOOR rises with zone difficulty and that
+//   Superior-and-better come from harder content, not from luckier kills in easy content. So this
+//   goal leads with the zones that start ABOVE you and drops green entirely: 3.1 per hundred is
+//   not a mote plan. "D4" is what the owner called it, and D4 is a real thing - the top instance
+//   difficulty tier - but WHICH ZONES OFFER WHICH TIERS IS STATED NOWHERE IN ANY CORPUS THIS APP
+//   HOLDS, so this goal is named for what it can measure (harder zone, higher floor) and not for
+//   the tier it cannot see.
 //
-// So a zone worth levelling in is a zone worth farming motes in, and "equal or higher but not
-// crazy higher" is not a preference - it is where the rate roughly doubles. Two further measured
-// facts shape the advice rather than the ranking:
+//   WISH LIST. The bestiary states what each mob drops and where it stands; the wish list states
+//   what you want. Zones are ranked by how many DISTINCT wished items can drop in them. This is the
+//   one goal that keeps a `deadly` zone: the item is where it is, and hiding the zone would hide
+//   the item. The fit chip still says deadly, so the reader knows what the trip costs.
 //
-//   GRADE FLOOR RISES WITH ZONE DIFFICULTY. Superior and better motes come from harder content,
-//   not from luckier kills in easy content - so a harder zone is worth naming even when the raw
-//   per-kill rate is level with an easier one.
+//   NOT BUILT: "best gear". That needs a value for a piece of gear, and the worth-score that
+//   answers it lives on the `gear-tab-improvements` branch, not this one. A ranking on
+//   "how many items drop here" would be a count of junk. It is deferred, not forgotten.
 //
-//   YOUR LEVEL CAPS THE GRADE, about one tier per five levels (50 caps at tier 10). A level 20
-//   farming a level 45 zone cannot bank what he finds there, which is the other half of why
-//   "crazy higher" is the wrong answer even for someone who could survive it.
+// ── WHAT EVERY GOAL STILL REFUSES ────────────────────────────────────────────────────────────
 //
-// ── WHAT THIS IS NOT ─────────────────────────────────────────────────────────────────────────
-//
-// NOT A ROUTE and not an experience-per-hour model. It ranks zones the bestiary can describe, by
-// how well their band fits a level; it says nothing about how fast you kill, what you can survive
-// with a given group, or what a zone drops. `ZoneAdvice.n` rides on every row for the same reason
-// it rides on the band: a zone the catalog knows through four mobs is a weaker claim than one it
-// knows through forty, and hiding that would overstate the whole list.
+// NO ROUTE, NO PER-HOUR. These rank zones by fit and by what the catalog says drops there; they say
+// nothing about how fast you kill, what you survive with a given group, or how far the zone is.
+// `n` rides on every row for the same reason it rides on the band: a zone the catalog knows through
+// four mobs is a weaker claim than one it knows through forty, and hiding that overstates the list.
 
 import { zoneFit, type ZoneFit, type ZoneLevelBand } from './zoneLevels'
+
+/** Why you are asking. */
+export type ZoneGoal = 'exp' | 'motes' | 'wish'
 
 /**
  * MOTES PER HUNDRED KILLS, by how the zone cons — measured, this project's own log (2026-09-07,
@@ -51,7 +57,7 @@ export const MOTES_PER_100: Readonly<Record<ZoneFit, number>> = {
   deadly: 8.5
 }
 
-/** One zone, judged against one level. */
+/** One zone, judged against one level for one goal. */
 export interface ZoneAdvice {
   zone: string
   band: ZoneLevelBand
@@ -60,41 +66,75 @@ export interface ZoneAdvice {
   motesPer100: number
   /** how many catalog mobs the band rests on — the weight of the whole row */
   n: number
+  /** how many DISTINCT wished items the bestiary says can drop here (0 when none, or no list) */
+  wished: number
 }
 
-/** Best first: even, then hard, then green. `deadly` is never advice. */
-const RANK: Readonly<Record<ZoneFit, number>> = { even: 0, hard: 1, green: 2, deadly: 3 }
+export interface RankOptions {
+  goal?: ZoneGoal
+  /** zones the catalog knows through fewer mobs than this are held back */
+  min?: number
+  /** zone → distinct wished items droppable there; absent means "no wish list", every zone 0 */
+  wished?: ReadonlyMap<string, number>
+}
+
+/** Best first for experience: even, then a reach, then green. `deadly` is never experience advice. */
+const EXP_RANK: Readonly<Record<ZoneFit, number>> = { even: 0, hard: 1, green: 2, deadly: 3 }
+
+/** Best first for motes: the reach leads, because that is where the grade floor is higher. */
+const MOTE_RANK: Readonly<Record<ZoneFit, number>> = { hard: 0, even: 1, green: 2, deadly: 3 }
+
+/** Does this row belong on the list for this goal at all? */
+function admits(goal: ZoneGoal, fit: ZoneFit, wished: number): boolean {
+  if (goal === 'wish') return wished > 0
+  if (goal === 'motes') return fit === 'even' || fit === 'hard'
+  return fit !== 'deadly'
+}
+
+/** The goal's order. Every comparator ends on the zone name so the same input always lists the same way. */
+function compare(goal: ZoneGoal): (a: ZoneAdvice, b: ZoneAdvice) => number {
+  if (goal === 'wish') {
+    return (a, b) =>
+      b.wished - a.wished ||
+      EXP_RANK[a.fit] - EXP_RANK[b.fit] ||
+      b.band.typical[0] - a.band.typical[0] ||
+      a.zone.localeCompare(b.zone)
+  }
+  const rank = goal === 'motes' ? MOTE_RANK : EXP_RANK
+  // Within a fit the HARDER band leads: the measured grade floor rises with difficulty and the
+  // per-kill rate does not separate them. Ties break on `n`, so the better-documented zone is
+  // named first — a statement about our confidence, not about the game.
+  return (a, b) =>
+    rank[a.fit] - rank[b.fit] ||
+    b.band.typical[0] - a.band.typical[0] ||
+    b.n - a.n ||
+    a.zone.localeCompare(b.zone)
+}
 
 /**
- * The zones worth your time at `level`, best first.
+ * The zones worth your time at `level`, for `goal`, best first.
  *
- * `deadly` ZONES ARE DROPPED ENTIRELY rather than ranked last. The owner's own words bound this
- * feature — *"not crazy higher"* — and a list that ends in six zones you cannot survive is a list
- * whose tail teaches the reader to stop reading.
- *
- * WITHIN A FIT, THE HARDER BAND LEADS, because the measured grade floor rises with zone difficulty
- * and the per-kill rate does not separate them. Ties break on `n`, so the better-documented zone
- * is named first — that is a statement about our confidence, not about the game.
+ * `deadly` ZONES ARE DROPPED for experience and motes rather than ranked last. The owner's own
+ * words bound this feature - *"not crazy higher"* - and a list that ends in six zones you cannot
+ * survive teaches the reader to stop reading. The wish-list goal is the one exception and the
+ * header says why.
  */
 export function rankZones(
   bands: ReadonlyMap<string, ZoneLevelBand>,
   level: number,
-  min = 0
+  opts: RankOptions = {}
 ): ZoneAdvice[] {
+  const goal = opts.goal ?? 'exp'
+  const min = opts.min ?? 0
   const out: ZoneAdvice[] = []
   for (const [zone, band] of bands) {
     if (band.n < min) continue
     const fit = zoneFit(band, level)
-    if (fit === 'deadly') continue
-    out.push({ zone, band, fit, motesPer100: MOTES_PER_100[fit], n: band.n })
+    const wished = opts.wished?.get(zone) ?? 0
+    if (!admits(goal, fit, wished)) continue
+    out.push({ zone, band, fit, motesPer100: MOTES_PER_100[fit], n: band.n, wished })
   }
-  return out.sort(
-    (a, b) =>
-      RANK[a.fit] - RANK[b.fit] ||
-      b.band.typical[0] - a.band.typical[0] ||
-      b.n - a.n ||
-      a.zone.localeCompare(b.zone)
-  )
+  return out.sort(compare(goal))
 }
 
 /**
