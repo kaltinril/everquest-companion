@@ -31,10 +31,38 @@
 // this map say you can walk, sail or step to", and the two are joined at the surface.
 
 import { ZONES, zoneEntryFor, type ZoneEntry } from './zones'
+import { CURRENT_ERA } from './planner/era'
 import type { MapPoint, ZoneShort } from './maps'
 
 /** How the map says you make this crossing. */
 export type ExitKind = 'walk' | 'translocator' | 'portal'
+
+/**
+ * IS THIS ZONE IN THE GAME YET — the era gate every route runs through by default.
+ *
+ * Owner (2026-09-12), reading a route "via Plane of Knowledge": *"plane of knowledge doesn't exist
+ * in this era of EverQuest Legends yet ... so we need a limit to era that's on by default"*. The
+ * map pack ships every zone the client has ever had, PoK's portals included, and a graph that
+ * walks them finds shortcuts through content nobody can stand in.
+ *
+ * `zones.ts` states each zone's era, or DELIBERATELY none - and the header there says which zones
+ * carry none: the ones that postdate the three eras (PoK, the Bazaar, the Nexus) and the one EQL
+ * expedition. Downstream, an unstated era reads as UNKNOWN, never as out-of-era, and that is the
+ * right law for a filter that must not cry wolf. THIS IS A RECOMMENDER, and a recommender must not
+ * offer what it cannot verify (`planner/rules.ts` states the same split for socket advice): an
+ * unstated era is not a zone anybody is being sent through. So both halves are gated - a stated
+ * era at or before `CURRENT_ERA` passes, anything else does not.
+ */
+const ERA_RANK: Readonly<Record<string, number | undefined>> = { classic: 0, kunark: 1, velious: 2 }
+// The planner's Era is wider than the zone catalog's, so the current era may name an expansion no
+// zone is annotated with; then NOTHING passes, which is the honest answer to a question the
+// catalog cannot place.
+const CURRENT_RANK: number | undefined = ERA_RANK[CURRENT_ERA]
+
+export function zoneInEra(entry: ZoneEntry): boolean {
+  const rank = entry.era === undefined ? undefined : ERA_RANK[entry.era]
+  return rank !== undefined && CURRENT_RANK !== undefined && rank <= CURRENT_RANK
+}
 
 /** One way out of the zone whose map this is. */
 export interface ZoneExit {
@@ -190,10 +218,20 @@ export function zoneExits(points: readonly MapPoint[]): ZoneExit[] {
  * It lives here rather than in the view because ruling 4 is exactly about this: the renderer is
  * handed collections already filtered, never a corpus to sift.
  */
-export function travelSeams(exits: readonly ZoneExit[]): ZoneExit[] {
+export function travelSeams(exits: readonly ZoneExit[], eraOnly = true): ZoneExit[] {
   const out: ZoneExit[] = []
-  for (const exit of exits) if (exit.kind !== 'walk') out.push(exit)
+  for (const exit of exits) {
+    if (exit.kind === 'walk') continue
+    if (eraOnly && !inEra(exit.zone)) continue
+    out.push(exit)
+  }
   return out
+}
+
+/** The era gate by stem, for the search - a stem the catalog cannot name is out too. */
+function inEra(zone: ZoneShort): boolean {
+  const entry = resolveZone(zone)
+  return entry !== null && zoneInEra(entry)
 }
 
 // ---- the whole graph, and the nearest port through it ----------------------------------------
@@ -222,6 +260,12 @@ export interface PortRoute {
 
 /** How far "closest" is allowed to look before the answer is a route rather than advice. */
 export const MAX_HOPS = 4
+
+export interface SearchOptions {
+  maxHops?: number
+  /** walk and land only in zones the current era has - on by default, see `zoneInEra` */
+  eraOnly?: boolean
+}
 
 interface Edge {
   to: ZoneShort
@@ -273,13 +317,22 @@ interface Walk {
   parents: Map<ZoneShort, Edge | null>
 }
 
+/** May the walk step into `zone`: not yet seen, and - by default - a zone the era has. */
+function enters(zone: ZoneShort, seen: ReadonlyMap<ZoneShort, Edge | null>, eraOnly: boolean): boolean {
+  if (seen.has(zone)) return false
+  // A zone the era does not have is neither a landing nor a way through.
+  return !eraOnly || inEra(zone)
+}
+
 /**
  * Breadth-first from `start`, so the first time a zone is reached is the shortest way to it.
  *
  * `for-of` over a list that is appended to as it runs is deliberate and correct: the array
  * iterator reads the length live, which is exactly what a queue wants.
  */
-function walkFrom(adj: ReadonlyMap<ZoneShort, Edge[]>, start: ZoneShort, maxHops: number): Walk {
+function walkFrom(adj: ReadonlyMap<ZoneShort, Edge[]>, start: ZoneShort, opts: SearchOptions): Walk {
+  const maxHops = opts.maxHops ?? MAX_HOPS
+  const eraOnly = opts.eraOnly ?? true
   const parents = new Map<ZoneShort, Edge | null>([[start, null]])
   const hops = new Map<ZoneShort, number>([[start, 0]])
   const order: ZoneShort[] = [start]
@@ -287,7 +340,7 @@ function walkFrom(adj: ReadonlyMap<ZoneShort, Edge[]>, start: ZoneShort, maxHops
     const depth = hops.get(zone) ?? 0
     if (depth === maxHops) continue
     for (const edge of adj.get(zone) ?? []) {
-      if (parents.has(edge.to)) continue
+      if (!enters(edge.to, parents, eraOnly)) continue
       // The parent edge points BACK toward start: it is the seam you cross after landing.
       parents.set(edge.to, { to: zone, name: resolveZone(zone)?.name ?? zone, kind: edge.kind })
       hops.set(edge.to, depth + 1)
@@ -311,12 +364,15 @@ export function nearestPorts(
   graph: ZoneGraph,
   ports: readonly ZonePort[],
   start: ZoneShort,
-  maxHops = MAX_HOPS
+  opts: SearchOptions = {}
 ): PortRoute[] {
-  const { order, parents } = walkFrom(undirected(graph), start, maxHops)
+  const { order, parents } = walkFrom(undirected(graph), start, opts)
   const out: PortRoute[] = []
   const seen = new Set<string>()
   for (const zone of order) {
+    // The start is in `order` unconditionally - it is where you stand - but a port LANDING there
+    // is still an offer, and an offer into a zone the era lacks is refused like any other.
+    if ((opts.eraOnly ?? true) && !inEra(zone)) continue
     const here: PortRoute[] = []
     for (const port of ports) {
       const key = `${port.via}|${port.spell}|${port.item ?? ''}`

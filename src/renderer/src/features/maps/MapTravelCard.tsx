@@ -261,6 +261,57 @@ function TravelBody({ travel, onPick }: { travel: ZoneTravel; onPick?: (zone: st
   )
 }
 
+/** The "Closest port" head: the fold, the name, the era gate, and the nearest landing when folded. */
+function TravelHead({
+  travel,
+  open,
+  onOpen
+}: {
+  travel: ZoneTravel
+  open: boolean
+  onOpen: (next: boolean) => void
+}): JSX.Element {
+  const { landings, eraOnly, setEraOnly } = travel
+  return (
+    <Stack direction="row" spacing={0.5} alignItems="center">
+      <IconButton
+        size="small"
+        data-testid="map-travel-toggle"
+        aria-label={open ? 'Collapse closest port' : 'Expand closest port'}
+        onClick={() => {
+          onOpen(!open)
+        }}
+        sx={{ p: 0.25 }}
+      >
+        {open ? <ExpandMoreIcon fontSize="small" /> : <ChevronRightIcon fontSize="small" />}
+      </IconButton>
+      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+        Closest port
+      </Typography>
+      {/* ON BY DEFAULT (owner, 2026-09-12): the pack ships every zone the client ever had, and a
+          route through Plane of Knowledge is a route through nothing. Lifting it shows the pack's
+          own graph, for whoever wants to see what is coming. */}
+      <Chip
+        size="small"
+        label="Current era"
+        title={eraOnly ? 'Only zones EQ Legends has now are used as landings or walked through. Click to lift.' : 'Every zone the map pack knows is in play, including ones not in the game yet. Click to limit.'}
+        data-testid="map-travel-era"
+        color={eraOnly ? 'primary' : 'default'}
+        variant={eraOnly ? 'filled' : 'outlined'}
+        onClick={() => {
+          setEraOnly(!eraOnly)
+        }}
+        sx={TINY}
+      />
+      {!open && landings.length > 0 && (
+        <Typography variant="caption" color="text.disabled" noWrap sx={{ minWidth: 0 }}>
+          {`${landings[0].zoneName}${landings.length > 1 ? ` and ${String(landings.length - 1)} more` : ''}`}
+        </Typography>
+      )}
+    </Stack>
+  )
+}
+
 export default function MapTravelCard({
   travel,
   onPick
@@ -276,28 +327,14 @@ export default function MapTravelCard({
     <Paper variant="outlined" data-testid="map-travel-card" sx={{ p: 1, mb: 1 }}>
       <Stack spacing={0.5}>
         <LevelLine band={band} />
-        <Stack direction="row" spacing={0.5} alignItems="center">
-          <IconButton
-            size="small"
-            data-testid="map-travel-toggle"
-            aria-label={open ? 'Collapse closest port' : 'Expand closest port'}
-            onClick={() => {
-              setOpen(!open)
-              saveTravelOpen(!open)
-            }}
-            sx={{ p: 0.25 }}
-          >
-            {open ? <ExpandMoreIcon fontSize="small" /> : <ChevronRightIcon fontSize="small" />}
-          </IconButton>
-          <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-            Closest port
-          </Typography>
-          {!open && landings.length > 0 && (
-            <Typography variant="caption" color="text.disabled" noWrap sx={{ minWidth: 0 }}>
-              {`${landings[0].zoneName}${landings.length > 1 ? ` and ${String(landings.length - 1)} more` : ''}`}
-            </Typography>
-          )}
-        </Stack>
+        <TravelHead
+          travel={travel}
+          open={open}
+          onOpen={(next) => {
+            setOpen(next)
+            saveTravelOpen(next)
+          }}
+        />
         {open && <TravelBody travel={travel} onPick={onPick} />}
       </Stack>
     </Paper>

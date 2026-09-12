@@ -1,15 +1,23 @@
 // maps/MapZoneAdviceBar — the controls over the "Where to level" table: level, goal, search, fit.
 //
 // Owner (2026-09-12): *"need filters/search/sort"*. The sort is the table header's; everything
-// else is here, in the Gear bar's idiom - a search box, one-lit chips for a single choice, and
-// toggle chips for a filter - so a reader who knows the Gear tab knows this one.
+// else is here, in the Gear bar's idiom, so a reader who knows the Gear tab knows this one.
+//
+// TWO CONTROLS THAT LOOK DIFFERENT BECAUSE THEY BEHAVE DIFFERENTLY. The first cut drew the goal
+// and the fit filter as two rows of identical chips, and the owner could not tell that one row was
+// exclusive and the other pick-and-choose: *"it was not obvious that on level, a reach, easy,
+// deadly were all clickable but the first three are mutually exclusive. Maybe it needs to be a
+// drop down selection list like the classes is"*. So the goal is a SELECT - the one-of-N control,
+// the Exaltations bar's "Group by" - and the fit filter is the classes picker itself
+// (`ChipMultiSelect`), whose empty state says ALL out loud.
 //
 // THE LEVEL IS TYPED, NOT DETECTED, AND THAT IS THE POINT. The app can often infer a level, and this
 // control deliberately does not use it. Half the reason anybody opens this list is to plan for
 // someone ELSE - the level you will be next week, the friend you are about to group with, the alt.
 
 import type { JSX } from 'react'
-import { Chip, Stack, TextField, Typography } from '@mui/material'
+import { MenuItem, Stack, TextField, Typography } from '@mui/material'
+import ChipMultiSelect from '../../components/ChipMultiSelect'
 import { moteGradeCap, type ZoneGoal } from '@shared/zoneAdvice'
 import type { ZoneFit } from '@shared/zoneLevels'
 import { FIT, FIT_ORDER, GOALS, GOAL_ORDER } from './zoneAdviceUi'
@@ -26,34 +34,12 @@ export interface AdviceQuery {
 
 export const DEFAULT_QUERY: AdviceQuery = { level: '20', goal: 'exp', search: '', fits: new Set() }
 
-/** The bar's ON/OFF chip - lit when on, the Exaltations bar's `ToggleChip` exactly. */
-function ToggleChip({
-  label,
-  hint,
-  on,
-  color,
-  testId,
-  onToggle
-}: {
-  label: string
-  hint: string
-  on: boolean
-  color?: 'success' | 'warning' | 'error' | 'default'
-  testId: string
-  onToggle: () => void
-}): JSX.Element {
-  return (
-    <Chip
-      size="small"
-      label={label}
-      title={hint}
-      data-testid={testId}
-      color={on ? (color === undefined || color === 'default' ? 'primary' : color) : 'default'}
-      variant={on ? 'filled' : 'outlined'}
-      onClick={onToggle}
-      sx={{ flexShrink: 0 }}
-    />
-  )
+/** The fit picker speaks in the words a row wears; these fold a picked word back to its fit. */
+const FIT_WORDS: readonly string[] = FIT_ORDER.map((f) => FIT[f].label)
+function fitsFromWords(words: readonly string[]): Set<ZoneFit> {
+  const out = new Set<ZoneFit>()
+  for (const fit of FIT_ORDER) if (words.includes(FIT[fit].label)) out.add(fit)
+  return out
 }
 
 export default function MapZoneAdviceBar({
@@ -67,12 +53,8 @@ export default function MapZoneAdviceBar({
   count: number
 }): JSX.Element {
   const level = Number.parseInt(query.level, 10)
-  const toggleFit = (fit: ZoneFit): void => {
-    const next = new Set(query.fits)
-    if (next.has(fit)) next.delete(fit)
-    else next.add(fit)
-    onChange({ ...query, fits: next })
-  }
+  const pickedWords: string[] = []
+  for (const fit of FIT_ORDER) if (query.fits.has(fit)) pickedWords.push(FIT[fit].label)
   return (
     <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap" sx={{ mb: 1 }}>
       <TextField
@@ -95,35 +77,34 @@ export default function MapZoneAdviceBar({
         }}
         sx={{ minWidth: 160 }}
       />
-      <Stack direction="row" spacing={0.5}>
+      <TextField
+        select
+        size="small"
+        label="Goal"
+        value={query.goal}
+        title={GOALS[query.goal].hint}
+        onChange={(e) => {
+          onChange({ ...query, goal: e.target.value as ZoneGoal })
+        }}
+        slotProps={{ htmlInput: { 'data-testid': 'zone-advice-goal' } }}
+        sx={{ minWidth: 150 }}
+      >
         {GOAL_ORDER.map((g) => (
-          <ToggleChip
-            key={g}
-            label={GOALS[g].label}
-            hint={GOALS[g].hint}
-            on={g === query.goal}
-            testId={`zone-advice-goal-${g}`}
-            onToggle={() => {
-              onChange({ ...query, goal: g })
-            }}
-          />
+          <MenuItem key={g} value={g} title={GOALS[g].hint} data-testid={`zone-advice-goal-${g}`}>
+            {GOALS[g].label}
+          </MenuItem>
         ))}
-      </Stack>
-      <Stack direction="row" spacing={0.5}>
-        {FIT_ORDER.map((fit) => (
-          <ToggleChip
-            key={fit}
-            label={FIT[fit].label}
-            hint={`Show only zones that con ${FIT[fit].label} at this level`}
-            on={query.fits.has(fit)}
-            color={FIT[fit].color}
-            testId={`zone-advice-fit-${fit}`}
-            onToggle={() => {
-              toggleFit(fit)
-            }}
-          />
-        ))}
-      </Stack>
+      </TextField>
+      <ChipMultiSelect
+        options={FIT_WORDS}
+        value={pickedWords}
+        onChange={(words) => {
+          onChange({ ...query, fits: fitsFromWords(words) })
+        }}
+        label="Fit"
+        placeholder="all"
+        minWidth={170}
+      />
       {Number.isFinite(level) && level > 0 && query.goal !== 'wish' && (
         <Typography variant="caption" color="text.disabled">
           {`motes cap at grade ${String(moteGradeCap(level))}`}

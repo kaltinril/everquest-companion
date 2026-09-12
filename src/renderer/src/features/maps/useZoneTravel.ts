@@ -28,6 +28,7 @@
 // labelled the shared seam still reaches it. Map packs vary; 93 of the default 213 label theirs.
 
 import { useEffect, useMemo, useState } from 'react'
+import { loadTravelEra, saveTravelEra } from './useMapData'
 import type { MapData } from '@shared/maps'
 import {
   landings,
@@ -67,6 +68,9 @@ export interface ZoneTravel {
   landings: Landing[]
   /** false until the port table has crossed from main; the card draws nothing rather than "none" */
   ready: boolean
+  /** the era gate, on by default (`zoneTravel.zoneInEra`), and the card's switch for it */
+  eraOnly: boolean
+  setEraOnly: (on: boolean) => void
 }
 
 /**
@@ -105,6 +109,11 @@ function allGraph(): Promise<ZoneGraph> {
 export function useZoneTravel(stem: string | null, zoneName: string | null, data: MapData | null): ZoneTravel {
   const [ports, setPorts] = useState<ZonePort[] | null>(null)
   const [graph, setGraph] = useState<ZoneGraph | null>(null)
+  const [eraOnly, setEraOnlyState] = useState(loadTravelEra)
+  const setEraOnly = (on: boolean): void => {
+    setEraOnlyState(on)
+    saveTravelEra(on)
+  }
   useEffect(() => {
     let alive = true
     void allPorts().then((rows) => {
@@ -132,10 +141,10 @@ export function useZoneTravel(stem: string | null, zoneName: string | null, data
     if (ports === null || stem === null) return []
     // The map on screen is the seed graph until the full one lands; either way, one search.
     const seed: ZoneGraph = graph ?? new Map([[stem, exits]])
-    return landings(nearestPorts(seed, ports, stem))
-  }, [stem, exits, ports, graph])
+    return landings(nearestPorts(seed, ports, stem, { eraOnly }))
+  }, [stem, exits, ports, graph, eraOnly])
 
-  const rides = useMemo(() => travelSeams(exits), [exits])
+  const rides = useMemo(() => travelSeams(exits, eraOnly), [exits, eraOnly])
 
-  return { band, exits, rides, landings: landed, ready: ports !== null }
+  return { band, exits, rides, landings: landed, ready: ports !== null, eraOnly, setEraOnly }
 }

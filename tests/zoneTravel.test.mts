@@ -15,7 +15,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
-import { landings, nearestPorts, zoneExits, type ZoneGraph, type ZonePort } from '../src/shared/zoneTravel'
+import { landings, nearestPorts, travelSeams, zoneExits, type ZoneGraph, type ZonePort } from '../src/shared/zoneTravel'
 import { parseMapText } from '../src/main/maps/parseMap'
 import { splitMapFileName } from '../src/main/maps/packs'
 import type { MapPoint } from '../src/shared/maps'
@@ -158,8 +158,10 @@ test('the search is bounded, and says nothing past the bound', () => {
     ['c', [{ kind: 'walk', zone: 'd', name: 'd', label: 'to_d' }]]
   ])
   const at_d = [port('d', 'Far Gate', 1)]
-  assert.equal(nearestPorts(far, at_d, 'a', 3).length, 1, 'three hops away, reachable at three')
-  assert.equal(nearestPorts(far, at_d, 'a', 2).length, 0, 'and not at two - no guessing past the bound')
+  // Invented stems are not in the catalog and so not in any era: this test is about the BOUND, so
+  // it lifts the gate the way a reader would to see the pack's own graph.
+  assert.equal(nearestPorts(far, at_d, 'a', { maxHops: 3, eraOnly: false }).length, 1, 'three hops away, reachable at three')
+  assert.equal(nearestPorts(far, at_d, 'a', { maxHops: 2, eraOnly: false }).length, 0, 'and not at two - no guessing past the bound')
 })
 
 test('a port is offered once, through its nearest landing, and a dock crossing keeps its kind', () => {
@@ -167,7 +169,8 @@ test('a port is offered once, through its nearest landing, and a dock crossing k
     ['isle', [{ kind: 'translocator', zone: 'freporte', name: 'East Freeport', label: 'to_Freeport_(boat_or_translocator)' }]],
     ['freporte', [{ kind: 'walk', zone: 'freportw', name: 'West Freeport', label: 'to_West_Freeport' }]]
   ])
-  const routes = nearestPorts(two, [port('isle', 'Isle Gate', 5)], 'freportw')
+  // `isle` is invented (not in the catalog, so not in any era); the test is about the KIND.
+  const routes = nearestPorts(two, [port('isle', 'Isle Gate', 5)], 'freportw', { eraOnly: false })
   assert.equal(routes.length, 1)
   assert.deepEqual(routes[0].path.map((s) => s.kind), ['translocator', 'walk'], 'the dock NPC that replaced the boat')
 })
@@ -198,4 +201,34 @@ test('every port into one zone folds onto one line, nearest zone first, cheapest
   assert.equal(commons.items.length, 1, 'the item click lands here too')
   assert.deepEqual(commons.path.map((s) => s.zone), ['befallen'], 'the walk, stated once for the zone')
   assert.deepEqual(lines[0].path, [], 'and none for where you stand')
+})
+
+// ---- the era gate (owner, 2026-09-12) ---------------------------------------------------------
+//
+// "plane of knowledge doesn't exist in this era of EverQuest Legends yet ... so we need a limit
+// to era that's on by default". The pack ships PoK's map and its portals; the graph found a route
+// through it. zones.ts gives PoK no era at all, on purpose, and a recommender does not send
+// anyone through a zone it cannot place in the game.
+
+test('a route never passes through, or lands in, a zone the era does not have - unless asked', () => {
+  // befallen -> PoK -> gfaydark, the only way stated; a port lands in gfaydark.
+  const viaPok: ZoneGraph = new Map([
+    ['befallen', [{ kind: 'portal', zone: 'poknowledge', name: 'Plane of Knowledge', label: 'Knowledge_Portal' }]],
+    ['poknowledge', [{ kind: 'portal', zone: 'gfaydark', name: 'The Greater Faydark', label: 'Kelethin_Portal' }]]
+  ])
+  const fay = [port('gfaydark', 'Fay Gate', 20)]
+  assert.deepEqual(nearestPorts(viaPok, fay, 'befallen'), [], 'on by default: no way through PoK')
+  const lifted = nearestPorts(viaPok, fay, 'befallen', { eraOnly: false })
+  assert.equal(lifted.length, 1, 'lifted, the pack\'s own route shows')
+  assert.deepEqual(lifted[0].path.map((s) => s.zone), ['poknowledge', 'befallen'])
+  // ...and a port that LANDS in a zone the era lacks is not offered either.
+  assert.deepEqual(nearestPorts(new Map(), [port('poknowledge', 'Knowledge Gate', 1)], 'poknowledge'), [])
+})
+
+test('the dock crossings on the card are gated the same way', () => {
+  // The catalog names it "Plane of Knowledge"; the pack's bare `Knowledge_Portal` never resolves to
+  // a zone at all (and is not how PoK reached a route - its OWN map's exits did that).
+  const exits = zoneExits([point('Plane_of_Knowledge_Portal'), point("to_Erud's_Crossing_(boat_or_translocator)")])
+  assert.deepEqual(travelSeams(exits).map((e) => e.zone), ['erudsxing'], 'the PoK portal is not a ride you can take')
+  assert.equal(travelSeams(exits, false).length, 2, 'lifted, it is listed')
 })
