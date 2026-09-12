@@ -15,7 +15,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
-import { zoneExits } from '../src/shared/zoneTravel'
+import { nearestPorts, zoneExits, type ZoneGraph, type ZonePort } from '../src/shared/zoneTravel'
 import { parseMapText } from '../src/main/maps/parseMap'
 import { splitMapFileName } from '../src/main/maps/packs'
 import type { MapPoint } from '../src/shared/maps'
@@ -98,4 +98,76 @@ test('the default pack states a usable graph, and Befallen leads to West Commons
   for (const z of ['Butcherblock Mountains', 'Clan Crushbone', 'The Lesser Faydark', 'North Felwithe']) {
     assert.ok(faydark.has(z), `Greater Faydark should state ${z}`)
   }
+})
+
+// ---- the nearest port, through the whole graph (owner, 2026-09-12) ----------------------------
+//
+// *"even if you can't, it should show the closest zone that has a port right?"* - and, standing in
+// West Freeport: *"freeport doesn't seem to give that you can come from west commons or nektulos
+// forest, OR, from the islands via the dock NPC port"*. Those are two-hop answers and a dock
+// crossing, and the one-hop first version could not give any of them.
+
+
+function port(zone: string, spell: string, level?: number): ZonePort {
+  return {
+    zone,
+    zoneName: zone,
+    via: level === undefined ? 'item' : 'druid',
+    spell,
+    ...(level === undefined ? { item: `${spell} charm` } : { level }),
+    group: false
+  }
+}
+
+/** befallen -> commons -> ecommons -> freportw, labelled from the west only. */
+const CHAIN: ZoneGraph = new Map([
+  ['befallen', [{ kind: 'walk', zone: 'commons', name: 'West Commonlands', label: 'to_West_Commonlands' }]],
+  ['commons', [{ kind: 'walk', zone: 'ecommons', name: 'East Commonlands', label: 'to_East_Commonlands' }]],
+  ['ecommons', [{ kind: 'walk', zone: 'freportw', name: 'West Freeport', label: 'to_West_Freeport' }]]
+])
+const COMMONS_PORTS = [port('commons', 'Circle of Commons', 29), port('commons', 'Ring of Commons', 19)]
+
+test('a port landing where you stand has no walk, and the cheapest cast leads', () => {
+  const routes = nearestPorts(CHAIN, COMMONS_PORTS, 'commons')
+  assert.deepEqual(routes.map((r) => r.port.spell), ['Ring of Commons', 'Circle of Commons'])
+  assert.deepEqual(routes[0].path, [], '"lands here" - the owner`s West Commons case')
+})
+
+test('closest means a search, not one hop: Freeport reaches the Commons port two seams away', () => {
+  // The chain is labelled west-to-east only; the reverse edges the search adds are what let
+  // Freeport find a port that no map east of Commons ever names.
+  const routes = nearestPorts(CHAIN, COMMONS_PORTS, 'freportw')
+  assert.equal(routes.length, 2)
+  assert.deepEqual(
+    routes[0].path.map((s) => s.zone),
+    ['ecommons', 'freportw'],
+    'the walk after landing, in order, ending where you are'
+  )
+  assert.deepEqual(routes[0].path.map((s) => s.kind), ['walk', 'walk'])
+})
+
+test('the walk names each zone it enters through the catalog, not the label', () => {
+  const [route] = nearestPorts(CHAIN, [port('commons', 'Ring of Commons', 19)], 'befallen')
+  assert.deepEqual(route.path, [{ zone: 'befallen', name: 'Befallen', kind: 'walk' }])
+})
+
+test('the search is bounded, and says nothing past the bound', () => {
+  const far: ZoneGraph = new Map([
+    ['a', [{ kind: 'walk', zone: 'b', name: 'b', label: 'to_b' }]],
+    ['b', [{ kind: 'walk', zone: 'c', name: 'c', label: 'to_c' }]],
+    ['c', [{ kind: 'walk', zone: 'd', name: 'd', label: 'to_d' }]]
+  ])
+  const at_d = [port('d', 'Far Gate', 1)]
+  assert.equal(nearestPorts(far, at_d, 'a', 3).length, 1, 'three hops away, reachable at three')
+  assert.equal(nearestPorts(far, at_d, 'a', 2).length, 0, 'and not at two - no guessing past the bound')
+})
+
+test('a port is offered once, through its nearest landing, and a dock crossing keeps its kind', () => {
+  const two: ZoneGraph = new Map([
+    ['isle', [{ kind: 'translocator', zone: 'freporte', name: 'East Freeport', label: 'to_Freeport_(boat_or_translocator)' }]],
+    ['freporte', [{ kind: 'walk', zone: 'freportw', name: 'West Freeport', label: 'to_West_Freeport' }]]
+  ])
+  const routes = nearestPorts(two, [port('isle', 'Isle Gate', 5)], 'freportw')
+  assert.equal(routes.length, 1)
+  assert.deepEqual(routes[0].path.map((s) => s.kind), ['translocator', 'walk'], 'the dock NPC that replaced the boat')
 })

@@ -7,11 +7,12 @@
 // 2026-09-11) and the map files still print the old word; `zoneTravel.ts` translates it once, and
 // the copy here says dock and translocator because that is what the player walks up to.
 //
-// ── IT LEADS WITH THE PORT THAT LANDS HERE ───────────────────────────────────────────────────
+// ── IT LEADS WITH THE PORT THAT LANDS HERE, THEN THE NEAREST ─────────────────────────────────
 //
-// A port INTO the zone beats a port one hop away, always, and the hop is spelled out rather than
-// implied - "Ring of Commons, then west into Befallen" is a thing a player can do; "Ring of
-// Commons" beside a Befallen map is a puzzle. The exit's own words come from the client's label.
+// A port INTO the zone beats one a hop away, always, and the walk is spelled out rather than
+// implied - "lands in West Commonlands, then on foot to Befallen" is a thing a player can do;
+// "Ring of Commons" beside a Befallen map is a puzzle. Beyond one hop the walk names the zones
+// passed through, because that IS the route and the reader is about to take it.
 //
 // ── THE BAND IS THE HEADLINE AND THE EXTREMES ARE THE HOVER ──────────────────────────────────
 //
@@ -26,7 +27,8 @@ import type { JSX } from 'react'
 import { Box, Chip, Paper, Stack, Typography } from '@mui/material'
 import type { ZonePort } from '@shared/zoneTravel'
 import type { ZoneLevelBand } from '@shared/zoneLevels'
-import type { TravelOption, ZoneTravel } from './useZoneTravel'
+import { MAX_HOPS, type PortRoute } from '@shared/zoneTravel'
+import type { ZoneTravel } from './useZoneTravel'
 // The two hover-and-drill seams the rest of the app already uses for these nouns. Wrapping the
 // names here is the whole of "link them": `SpellTooltip` carries its own click-through to the
 // spell page (lib/spellLink.tsx publishes the opener app-wide), and `KnownItemTooltip` is the
@@ -63,11 +65,24 @@ function LevelLine({ band }: { band: ZoneLevelBand | null }): JSX.Element | null
   )
 }
 
-/** One way in: the spell, who casts it, and the seam you walk after landing. */
-function OptionRow({ option }: { option: TravelOption }): JSX.Element {
-  const { port, then } = option
+/** The walk after landing, in the reader's words: "then on foot via West Commonlands to Befallen". */
+function walkText(route: PortRoute): string {
+  const { path } = route
+  if (path.length === 0) return 'lands here'
+  const kinds = new Set(path.map((p) => p.kind))
+  const how = kinds.size === 1 && kinds.has('walk') ? 'on foot' : 'on foot and by translocator'
+  const via = path.slice(0, -1).map((p) => p.name)
+  const end = path[path.length - 1].name
+  return via.length === 0
+    ? `lands in ${route.port.zoneName}, then ${how} to ${end}`
+    : `lands in ${route.port.zoneName}, then ${how} via ${via.join(', ')} to ${end}`
+}
+
+/** One way in: the spell, who casts it, and the walk after landing. */
+function OptionRow({ route }: { route: PortRoute }): JSX.Element {
+  const { port } = route
   return (
-    <Stack direction="row" spacing={0.75} alignItems="center" data-testid="map-travel-option">
+    <Stack direction="row" spacing={0.75} alignItems="center" data-testid="map-travel-option" data-hops={route.path.length}>
       <Chip size="small" variant="outlined" label={VIA_LABEL[port.via]} sx={TINY} />
       <SpellTooltip name={port.spell}>
         <Typography variant="caption" component="span" sx={{ color: 'text.primary' }}>
@@ -75,11 +90,8 @@ function OptionRow({ option }: { option: TravelOption }): JSX.Element {
           {port.level !== undefined && ` (${String(port.level)})`}
         </Typography>
       </SpellTooltip>
-      <Typography variant="caption" color="text.secondary" noWrap sx={{ minWidth: 0 }}>
-        {then === null
-          ? 'lands here'
-          : /* The client's own label, so the reader can find the seam on the map. */
-            `to ${then.name}, then ${then.kind === 'walk' ? 'on foot' : 'by translocator'}`}
+      <Typography variant="caption" color="text.secondary" noWrap sx={{ minWidth: 0 }} title={walkText(route)}>
+        {walkText(route)}
       </Typography>
       {port.item !== undefined && (
         <KnownItemTooltip name={port.item} clickThrough>
@@ -100,10 +112,10 @@ function OptionRow({ option }: { option: TravelOption }): JSX.Element {
 const SHOWN = 3
 
 export default function MapTravelCard({ travel }: { travel: ZoneTravel }): JSX.Element | null {
-  const { band, exits, rides, options, ready } = travel
+  const { band, exits, rides, routes, ready } = travel
   // Until the port table has crossed from main, drawing "no ports" would be a claim about the
   // corpus rather than about the wait (law 1). A card with only a level line is still worth having.
-  const shown = ready ? options.slice(0, SHOWN) : []
+  const shown = ready ? routes.slice(0, SHOWN) : []
   if (band === null && exits.length === 0 && shown.length === 0) return null
   return (
     <Paper variant="outlined" data-testid="map-travel-card" sx={{ p: 1, mb: 1 }}>
@@ -121,17 +133,17 @@ export default function MapTravelCard({ travel }: { travel: ZoneTravel }): JSX.E
             </Typography>
           </Stack>
         ))}
-        {shown.map((option, i) => (
-          <OptionRow key={`${option.port.spell}-${option.then?.zone ?? 'here'}-${String(i)}`} option={option} />
+        {shown.map((route, i) => (
+          <OptionRow key={`${route.port.spell}-${route.port.item ?? ''}-${String(i)}`} route={route} />
         ))}
-        {ready && options.length === 0 && exits.length > 0 && (
+        {ready && routes.length === 0 && (
           <Typography variant="caption" color="text.disabled">
-            No port lands here or in the zones this map names.
+            {`No port lands within ${String(MAX_HOPS)} zones of here, by the seams the maps label.`}
           </Typography>
         )}
-        {options.length > SHOWN && (
+        {routes.length > SHOWN && (
           <Typography variant="caption" color="text.disabled">
-            {`and ${String(options.length - SHOWN)} more`}
+            {`and ${String(routes.length - SHOWN)} more`}
           </Typography>
         )}
       </Stack>

@@ -195,3 +195,137 @@ export function travelSeams(exits: readonly ZoneExit[]): ZoneExit[] {
   for (const exit of exits) if (exit.kind !== 'walk') out.push(exit)
   return out
 }
+
+// ---- the whole graph, and the nearest port through it ----------------------------------------
+//
+// Owner (2026-09-12), on a zone with no port and no ported neighbour: *"even if you can't, it
+// should show the closest zone that has a port right?"*. Right. One hop was the first version's
+// bound because it read only the map on screen; the answer to "closest" is a search over every
+// map's labels, which main builds once (`main/zoneGraph.ts`) and this walks.
+
+/** Every zone's stated exits, keyed by stem — what `main/zoneGraph.ts` ships once per window. */
+export type ZoneGraph = ReadonlyMap<ZoneShort, readonly ZoneExit[]>
+
+/** One zone entered on the way from a port's landing to where you are, with the seam crossed. */
+export interface RouteStep {
+  zone: ZoneShort
+  name: string
+  kind: ExitKind
+}
+
+/** A port and the walk after it. `path` empty means the port lands where you are. */
+export interface PortRoute {
+  port: ZonePort
+  /** the zones entered after landing, in order, ending where you are */
+  path: RouteStep[]
+}
+
+/** How far "closest" is allowed to look before the answer is a route rather than advice. */
+export const MAX_HOPS = 4
+
+interface Edge {
+  to: ZoneShort
+  name: string
+  kind: ExitKind
+}
+
+/**
+ * THE GRAPH READ AS UNDIRECTED, which is the physical truth and the labelling's cure.
+ *
+ * A zone line is two-way - you walk Befallen to Commons and back through the same seam - but only
+ * 93 of the default pack's 213 maps label theirs, so the stated graph is one-way wherever the
+ * neighbour's author did not. Adding the reverse of every stated edge recovers the seam from
+ * whichever side labelled it. The reverse edge names its destination through the catalog, because
+ * a `ZoneExit` only ever names where it GOES.
+ */
+function undirected(graph: ZoneGraph): Map<ZoneShort, Edge[]> {
+  const adj = new Map<ZoneShort, Edge[]>()
+  const push = (from: ZoneShort, edge: Edge): void => {
+    const held = adj.get(from)
+    if (held) held.push(edge)
+    else adj.set(from, [edge])
+  }
+  for (const [from, exits] of graph) {
+    const fromName = resolveZone(from)?.name ?? from
+    for (const e of exits) {
+      push(from, { to: e.zone, name: e.name, kind: e.kind })
+      push(e.zone, { to: from, name: fromName, kind: e.kind })
+    }
+  }
+  return adj
+}
+
+/** The steps from `zone` back to the search's start, read off the BFS parents. */
+function pathBack(parents: ReadonlyMap<ZoneShort, Edge | null>, zone: ZoneShort): RouteStep[] {
+  const out: RouteStep[] = []
+  let at = zone
+  for (;;) {
+    const via = parents.get(at)
+    if (via === null || via === undefined) return out
+    out.push({ zone: via.to, name: via.name, kind: via.kind })
+    at = via.to
+  }
+}
+
+/** The zones reached from `start` in breadth-first order, each remembering the seam back. */
+interface Walk {
+  order: ZoneShort[]
+  parents: Map<ZoneShort, Edge | null>
+}
+
+/**
+ * Breadth-first from `start`, so the first time a zone is reached is the shortest way to it.
+ *
+ * `for-of` over a list that is appended to as it runs is deliberate and correct: the array
+ * iterator reads the length live, which is exactly what a queue wants.
+ */
+function walkFrom(adj: ReadonlyMap<ZoneShort, Edge[]>, start: ZoneShort, maxHops: number): Walk {
+  const parents = new Map<ZoneShort, Edge | null>([[start, null]])
+  const hops = new Map<ZoneShort, number>([[start, 0]])
+  const order: ZoneShort[] = [start]
+  for (const zone of order) {
+    const depth = hops.get(zone) ?? 0
+    if (depth === maxHops) continue
+    for (const edge of adj.get(zone) ?? []) {
+      if (parents.has(edge.to)) continue
+      // The parent edge points BACK toward start: it is the seam you cross after landing.
+      parents.set(edge.to, { to: zone, name: resolveZone(zone)?.name ?? zone, kind: edge.kind })
+      hops.set(edge.to, depth + 1)
+      order.push(edge.to)
+    }
+  }
+  return { order, parents }
+}
+
+/**
+ * EVERY PORT WITHIN `maxHops` OF `start`, NEAREST FIRST - the whole of "closest".
+ *
+ * A port landing in a zone is offered with exactly the walk `walkFrom` found to it. Ties at one
+ * distance go to the cheapest cast, items last. A port is offered once, through its nearest
+ * landing.
+ *
+ * `start` is always distance zero, so a port landing where you are has an empty path - the card
+ * says "lands here" and nothing about walking.
+ */
+export function nearestPorts(
+  graph: ZoneGraph,
+  ports: readonly ZonePort[],
+  start: ZoneShort,
+  maxHops = MAX_HOPS
+): PortRoute[] {
+  const { order, parents } = walkFrom(undirected(graph), start, maxHops)
+  const out: PortRoute[] = []
+  const seen = new Set<string>()
+  for (const zone of order) {
+    const here: PortRoute[] = []
+    for (const port of ports) {
+      const key = `${port.via}|${port.spell}|${port.item ?? ''}`
+      if (port.zone !== zone || seen.has(key)) continue
+      seen.add(key)
+      here.push({ port, path: pathBack(parents, zone) })
+    }
+    here.sort((a, b) => (a.port.level ?? 99) - (b.port.level ?? 99))
+    out.push(...here)
+  }
+  return out
+}

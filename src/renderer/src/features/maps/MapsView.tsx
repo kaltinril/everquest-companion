@@ -406,7 +406,7 @@ export default function MapsView({
   const pane = useZonePane({ vp, data, zoneName, prefs, zones })
   // The zone's own level band and the ports that reach it — joined on the LONG name, the same key
   // the pins use, because the bestiary spells zones that way.
-  const travel = useZoneTravel(zoneName, data)
+  const travel = useZoneTravel(zone, zoneName, data)
 
   return (
     <Stack spacing={1.5} sx={{ height: '100%' }}>
