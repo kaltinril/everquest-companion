@@ -22,6 +22,7 @@ import { mapLibrary } from '../maps'
 import { isSafePackId } from '../security'
 import type { MapGetResult, MapPackPrefs, MapSearchOpts } from '../../shared/maps'
 import { zonePorts } from '../zonePorts'
+import { logError } from '../errorLog'
 import { zoneGraph } from '../zoneGraph'
 
 /** Narrow the renderer's `prefs` to validated pack ids. `false` = something unsafe was sent. */
@@ -37,7 +38,27 @@ function safePrefs(raw: unknown): MapPackPrefs | false {
   }
 }
 
+/**
+ * THE GRAPH IS BUILT AT IDLE, NOT ON THE FIRST MAPS TAB (owner report 2026-09-12). Its build is
+ * 0.13 s of disk read now (zoneGraph.ts), but it sat in front of the map the tab asked for, and a
+ * tab that draws its map and its port advice together needs the graph already there. A short
+ * delay after registration keeps it out of the startup path; the memo means the tab's own request
+ * then costs nothing, and a library rebuilt for a new EQ root rebuilds it on the next ask.
+ */
+const GRAPH_WARM_MS = 4_000
+
+function warmZoneGraph(): void {
+  setTimeout(() => {
+    try {
+      zoneGraph()
+    } catch (err) {
+      logError('main:zoneGraph', err)
+    }
+  }, GRAPH_WARM_MS)
+}
+
 export function registerMapsIpc(): void {
+  warmZoneGraph()
   ipcMain.handle(IPC.mapsListPacks, () => {
     const packs = mapLibrary().packs()
     // No packs is the fresh-machine state (no EQ install, or an install without `maps\`), and

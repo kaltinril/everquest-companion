@@ -9,11 +9,13 @@
 //
 // ── IT IS THE MAP LIBRARY'S OWN PARSE, WALKED ONCE ───────────────────────────────────────────
 //
-// No second reader of the maps directory. `mapLibrary()` already indexes the packs, resolves each
-// zone's layers and caches the parse; this asks it for every zone in turn and keeps the labels'
-// verdict (`zoneExits`). The first call therefore parses every map in the default pack - measured
-// 213 files on the owner's install - which is a one-time second or so per window and is why the
-// result is memoized rather than rebuilt per request.
+// No second reader of the maps directory. `mapLibrary()` already indexes the packs and resolves
+// each zone's layers; this asks it for every zone's LABELS in turn (`labels`, the label-only
+// reader) and keeps their verdict (`zoneExits`). It used to ask for the full parse, and that was
+// the whole of the owner's 2026-09-12 report that the Maps tab took seconds to draw: 581 layers,
+// 215 MB of geometry parsed on the main thread to read about 1,500 label lines, 3.9 s measured,
+// with the map the tab asked for queued behind it. Labels alone are 0.13 s, which is the disk
+// read; the result is memoized, and ipc/maps.ts builds it at idle so the tab never pays it.
 //
 // MEMOIZED AGAINST THE LIBRARY INSTANCE, not forever: `mapLibrary()` hands back a fresh object when
 // the EQ directory changes (its own header says so), and a graph read off the old directory would
@@ -35,9 +37,9 @@ export function zoneGraph(): ZoneGraph {
   if (CACHE !== null && CACHE.library === library) return CACHE.graph
   const out = new Map<ZoneShort, ZoneExit[]>()
   for (const stem of library.zones()) {
-    const got = library.get(stem, {})
-    if (!got.ok) continue
-    const exits = zoneExits(got.data.points)
+    const points = library.labels(stem, {})
+    if (points === null) continue
+    const exits = zoneExits(points)
     if (exits.length > 0) out.set(stem, exits)
   }
   CACHE = { library, graph: out }

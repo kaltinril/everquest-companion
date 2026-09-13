@@ -424,3 +424,17 @@ test('an in-zone search ranks over the SAME zone resolution get() returns for th
     assert.deepEqual(lib.search('my own', { prefs }), [])
   })
 })
+
+test('labels() reads the same points get() parses, zone for zone, without the geometry', () => {
+  // The zone graph's reader (zoneGraph.ts). It must agree with the full parse on every label or
+  // the closest-port search sees a different world than the map on screen. Same layers, same
+  // parsePoint, same trim; only the L records are skipped.
+  withLibrary((lib) => {
+    for (const zone of lib.zones()) {
+      const full = lib.get(zone)
+      assert.ok(full.ok, zone)
+      assert.deepEqual(lib.labels(zone), full.data.points, zone)
+    }
+    assert.equal(lib.labels('nosuchzone'), null)
+  })
+})
