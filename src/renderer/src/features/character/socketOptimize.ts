@@ -15,7 +15,10 @@
 //
 // THE RULES ARE THE RECOMMENDER'S (socketRecommend.ts states them): R2 both halves — donor's
 // slots must include the destination cell's slot, donor's classes must overlap the host item's —
-// the loadout class gate, socket-type match, one physical copy seated once. Socketed copies
+// the loadout class gate, socket-type match, one physical copy seated once. And a PROC IS PER
+// WEAPON (owner correction 2026-09-12): the matching seats each family once, then `secondHand`
+// gives a Proc family's spare copy the other hand — only a seat the matching left free, so a
+// second Lifebite never costs a distinct family its seat. Socketed copies
 // COUNT AS OWNED: the plan is a target layout for everything you have, and the MOVES list is the
 // diff from where things sit today. Whether prying a socketed gem out is free, lossy, or
 // impossible is a game rule this corpus does not state — the panel says so once.
@@ -27,7 +30,7 @@ import type { OwnedExaltation } from '../../../../shared/characterSheet'
 import { bestEffectFor, usable, type KindEffect, type Loadout } from './exaltationAudit'
 // R2 lives THERE, not here (owner catch 2026-09-11). This file's header has always said "the rules
 // are the recommender's"; until now it said so while carrying its own copy of them.
-import { seatFits, seatIsLive, type SocketHostCell } from './socketRecommend'
+import { inForcePerSeat, seatFits, seatIsLive, type SocketHostCell } from './socketRecommend'
 
 /** One family's claim: its best owned tier, the donor gems that carry it, and how many copies. */
 interface FamilyClaim {
@@ -185,15 +188,52 @@ function tryPlace(u: number, adj: readonly number[][], seatOf: number[], seen: b
   return false
 }
 
-/** The maximum matching: seat index per claim, or -1 when the claim went unseated. */
-function match(claims: readonly FamilyClaim[], adj: readonly number[][], seatCount: number): number[] {
+/** The maximum matching: claim index per seat, or -1 where the seat stays free. */
+function match(claimCount: number, adj: readonly number[][], seatCount: number): number[] {
   const seatOf = new Array<number>(seatCount).fill(-1)
-  for (let u = 0; u < claims.length; u++) {
+  for (let u = 0; u < claimCount; u++) {
     tryPlace(u, adj, seatOf, new Array<boolean>(seatCount).fill(false))
   }
-  const placed = new Array<number>(claims.length).fill(-1)
-  for (let v = 0; v < seatCount; v++) if (seatOf[v] !== -1) placed[seatOf[v]] = v
+  return seatOf
+}
+
+/** The matching read the other way: seat index per claim, or -1 when the claim went unseated. */
+function placedOf(seatOf: readonly number[], claimCount: number): number[] {
+  const placed = new Array<number>(claimCount).fill(-1)
+  seatOf.forEach((u, v) => {
+    if (u !== -1) placed[u] = v
+  })
   return placed
+}
+
+/**
+ * THE SECOND HAND (owner correction, kaltinril 2026-09-12: *"You can have 2 procs, one on the
+ * primary and one on the secondary and that is fine they will both work"*).
+ *
+ * The matching seats every family ONCE, which is the whole objective for Focus, Click and Worn:
+ * a second copy anywhere on the body grants nothing. A proc is the weapon's, not the body's, so
+ * a Proc family that owns a spare copy may hold BOTH hands. It gets them here, AFTER the
+ * matching and only from the seats the matching left free — the objective is still distinct
+ * families, and a second Lifebite must never evict an Earthquake from the other hand. A Proc
+ * seat with no free edge simply stays as the matching left it. `socketRecommend.forceKey` is
+ * the same rule for the other engine.
+ */
+function secondHand(claims: readonly FamilyClaim[], adj: readonly number[][], seatOf: number[]): void {
+  claims.forEach((c, u) => {
+    if (!isProcClaim(c) || !seatOf.includes(u)) return
+    let spare = c.copies - 1
+    for (const v of adj[u]) {
+      if (spare === 0) break
+      if (seatOf[v] !== -1) continue
+      seatOf[v] = u
+      spare -= 1
+    }
+  })
+}
+
+/** A claim whose donors serve the one kind `socketRecommend` holds in force per seat. */
+function isProcClaim(c: FamilyClaim): boolean {
+  return c.donors.some((d) => inForcePerSeat(d.type))
 }
 
 /** The seat's placement names the donor that actually FITS it (user catch 2026-09-10: a claim
@@ -253,14 +293,17 @@ function clearsOf(
   sockets: readonly SocketHostCell[],
   rowByKey: ReadonlyMap<string, GearRow>
 ): PlanClear[] {
-  const seatOfFamily = new Map(placements.map((p) => [p.family, p]))
+  // A family holds ONE seat, except a Proc family the second hand seated twice.
+  const seatsOfFamily = new Map<string, Placement[]>()
+  for (const p of placements) seatsOfFamily.set(p.family, [...(seatsOfFamily.get(p.family) ?? []), p])
   const out: PlanClear[] = []
   for (const s of sockets) {
     if (s.currentKey === null || s.currentName === null) continue
     const occ = bestEffectFor(rowByKey.get(s.currentKey), s.type)
     if (occ === null) continue
-    const seat = seatOfFamily.get(occ.family)
-    if (seat === undefined || (seat.cellId === s.cellId && seat.type === s.type)) continue
+    const seats = seatsOfFamily.get(occ.family)
+    if (seats === undefined || seats.some((p) => p.cellId === s.cellId && p.type === s.type)) continue
+    const seat = seats[0]
     out.push({
       cellLabel: s.cellLabel,
       item: s.item,
@@ -332,11 +375,17 @@ export function planBoard(
     .sort((a, b) => b.c.eff.tier - a.c.eff.tier || Number(keeps[b.i]) - Number(keeps[a.i]))
     .map((x) => x.c)
   const adj = edges(order, sockets, rowByKey)
-  const placed = match(order, adj, sockets.length)
+  const seatOf = match(order.length, adj, sockets.length)
+  // The contests are the MATCHING's: a spare proc copy going unseated is not one.
+  const placed = placedOf(seatOf, order.length)
+  secondHand(order, adj, seatOf)
   const placements: Placement[] = []
   for (let u = 0; u < order.length; u++) {
     if (placed[u] !== -1) placements.push(placementOf(order[u], sockets[placed[u]], rowByKey))
   }
+  seatOf.forEach((u, v) => {
+    if (u !== -1 && placed[u] !== v) placements.push(placementOf(order[u], sockets[v], rowByKey))
+  })
   return {
     placements,
     moves: movesOf(placements, sockets, rowByKey),

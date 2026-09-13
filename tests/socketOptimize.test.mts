@@ -230,3 +230,52 @@ test('the user`s exact belt board: tier-I incumbency elsewhere must not lend Sum
   assert.ok(plan.contested.some((c) => c.effect === 'Summoning Haste III'))
   assert.equal(plan.moves.filter((m) => m.cellLabel === 'waist').length, 0)
 })
+
+// ---- a proc is per weapon (owner correction, kaltinril 2026-09-12) ---------------------------
+//
+// "You can have 2 procs, one on the primary and one on the secondary and that is fine they will
+// both work." The matching seats a family once; `secondHand` gives a Proc family's spare copy the
+// other hand, but only a seat the matching left free.
+
+const proc = (name: string, eff: string): GearRow['effects'] => [{ name: eff, kind: 'proc' }]
+const hands = (primary: string | null, secondary: string | null): SocketHostCell[] => [
+  seat({ cellId: 'primary', type: 'Proc', slot: 'PRIMARY', currentName: primary, item: 'Sword' }),
+  seat({ cellId: 'secondary', type: 'Proc', slot: 'SECONDARY', currentName: secondary, item: 'Sword' })
+]
+
+test('a proc family with two copies holds both hands: two placements, no moves, no clears', () => {
+  const rows = [
+    row({ key: 'fangs', name: 'Fangs', effects: proc('Fangs', 'Lifebite Combat'), slots: ['PRIMARY', 'SECONDARY'] }),
+    row({ key: 'sword', name: 'Sword', effects: [], slots: ['PRIMARY', 'SECONDARY'] })
+  ]
+  const plan = planBoard(
+    [gem('Fangs', 'socketed in Primary', true), gem('Fangs', 'socketed in Secondary', true)],
+    rows,
+    NOBODY,
+    hands('Fangs', 'Fangs')
+  )
+  assert.equal(plan.placements.length, 2)
+  assert.deepEqual(plan.placements.map((p) => p.cellLabel).sort(), ['primary', 'secondary'])
+  assert.equal(plan.moves.length, 0)
+  assert.equal(plan.clears.length, 0, 'the second Lifebite is not a duplicate to pull')
+  assert.equal(plan.contested.length, 0)
+})
+
+test('…but a second copy never costs a distinct family its hand', () => {
+  const rows = [
+    row({ key: 'fangs', name: 'Fangs', effects: proc('Fangs', 'Lifebite Combat'), slots: ['PRIMARY', 'SECONDARY'] }),
+    row({ key: 'quake', name: 'Quake', effects: proc('Quake', 'Earthquake'), slots: ['PRIMARY', 'SECONDARY'] }),
+    row({ key: 'sword', name: 'Sword', effects: [], slots: ['PRIMARY', 'SECONDARY'] })
+  ]
+  const plan = planBoard(
+    [gem('Fangs', 'socketed in Primary', true), gem('Fangs', 'socketed in Secondary', true), gem('Quake', 'Bank 1')],
+    rows,
+    NOBODY,
+    hands('Fangs', 'Fangs')
+  )
+  assert.deepEqual(plan.placements.map((p) => p.effect).sort(), ['Earthquake', 'Lifebite Combat'])
+  assert.equal(plan.contested.length, 0)
+  // One copy of Fangs is spare once Quake takes a hand: a single copy holds one seat.
+  const single = planBoard([gem('Fangs', 'socketed in Primary', true)], rows, NOBODY, hands('Fangs', null))
+  assert.equal(single.placements.length, 1)
+})

@@ -371,3 +371,45 @@ test('a Proc seat is only offered where a weapon is actually swung', () => {
   )
   assert.equal(still.fills.length, 1, 'an Any Slot is a real seat for everything but a proc')
 })
+
+// ---- a proc is per weapon (owner correction, kaltinril 2026-09-12) ---------------------------
+//
+// The board called his Secondary's Lifebite a dead socket - "a second Lifebite adds nothing on
+// top of the one in Primary". His ruling: "You can have 2 procs, one on the primary and one on
+// the secondary and that is fine they will both work." A Focus/Click/Worn effect is the
+// character's, a proc is the weapon's. `socketRecommend.forceKey` carries it.
+
+test('one proc in each hand is two procs: neither is a dead socket, and the second hand is a fill', () => {
+  const weapon = (key: string, name: string, effects: GearRow['effects']): GearRow => ({
+    ...row(key, name, effects),
+    slots: ['PRIMARY', 'SECONDARY']
+  })
+  const rows = [
+    weapon('fangs', 'Fangs', [{ name: 'Lifebite Combat', kind: 'proc' }]),
+    weapon('sword', 'Sword', [])
+  ]
+  const primary: SocketHostCell = { ...host('primary', 'Proc', 'Fangs', 'Sword'), slot: 'PRIMARY' }
+  const secondary: SocketHostCell = { ...host('secondary', 'Proc', 'Fangs', 'Sword'), slot: 'SECONDARY' }
+
+  // Both hands socketed with the same proc: nothing is red.
+  const both = recommendSockets(
+    [owned('Fangs', 'socketed in Primary', true), owned('Fangs', 'socketed in Secondary', true)],
+    rows,
+    NOBODY,
+    [primary, secondary]
+  )
+  assert.equal(both.redundant.length, 0, 'a proc on each weapon fires on each weapon')
+  assert.equal(both.flaggedByCell.size, 0)
+
+  // Primary socketed, Secondary empty, a loose copy in the bank: the fill is offered - the
+  // family being in force in the OTHER hand blocks nothing here.
+  const fill = recommendSockets(
+    [owned('Fangs', 'socketed in Primary', true), owned('Fangs', 'Bank 3')],
+    rows,
+    NOBODY,
+    [primary, { ...secondary, currentKey: null, currentName: null }]
+  )
+  assert.equal(fill.fills.length, 1)
+  assert.equal(fill.fills[0].cellId, 'secondary')
+  assert.equal(fill.fills[0].gemName, 'Fangs')
+})

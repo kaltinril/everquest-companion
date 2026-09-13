@@ -12,6 +12,8 @@
 //   NO CROSS-FAMILY EXCHANGE RATE: swaps are same-family only; the one objective cross-family
 //   call is replacing a DEAD socket, where anything beats nothing.
 //   POOL DISCIPLINE: one physical loose copy is never recommended twice.
+//   A PROC IS PER WEAPON (owner correction 2026-09-12): "in force" is judged per BODY for Focus,
+//   Click and Worn and per SEAT for Proc — one Lifebite in each hand is two procs. `forceKey`.
 //
 // Pure and node-tested (tests/exaltationAudit.test.mts drives both modules).
 
@@ -91,7 +93,8 @@ export interface FillRec {
 }
 
 /** A socketed gem whose effect family is ALREADY IN FORCE at a higher (or equal, earlier) tier
- *  elsewhere on the body — same-name effects do not stack, so this socket grants NOTHING. */
+ *  elsewhere on the body — same-name effects do not stack, so this socket grants NOTHING. A Proc
+ *  gem is never one of these across hands: each weapon fires its own (`forceKey`). */
 export interface RedundantRec {
   cellId: string
   cellLabel: string
@@ -202,6 +205,29 @@ export function seatIsLive(seat: Pick<SocketHostCell, 'type' | 'slot'>): boolean
 }
 
 /**
+ * THE KEY ON WHICH "SAME-NAME EFFECTS DO NOT STACK" IS JUDGED (owner correction, kaltinril
+ * 2026-09-12: *"You can have 2 procs, one on the primary and one on the secondary and that is
+ * fine they will both work"*).
+ *
+ * The board had called his Secondary's Lifebite a dead socket because Primary already carried
+ * one. That is the body-wide rule applied to the one socket kind it does not govern: a Focus,
+ * Click or Worn effect is a property of the CHARACTER, so a second copy anywhere on the body
+ * grants nothing; a proc is a property of the WEAPON that swings it, and each hand swings its
+ * own. Two Lifebites are two procs.
+ *
+ * So a Proc family is in force PER SEAT and every other kind PER BODY. Both engines ask this one
+ * function: the keeper/dead/fill ledger here, the second-hand pass in `socketOptimize`.
+ */
+export function forceKey(family: string, seat: Pick<SocketHostCell, 'type' | 'cellId'>): string {
+  return inForcePerSeat(seat.type) ? `${family}@${seat.cellId}` : family
+}
+
+/** The one socket kind whose effect belongs to the seat rather than the body. */
+export function inForcePerSeat(type: string): boolean {
+  return type === 'Proc'
+}
+
+/**
  * CAN THIS DONOR LEGALLY SIT IN THIS SEAT — R2's two halves and the unanswerable-seat guard, in
  * ONE place, for BOTH engines that ask.
  *
@@ -299,8 +325,9 @@ function filledHosts(ctx: RecContext, hosts: readonly SocketHostCell[]): Effecti
 function keepersByFamily(effective: readonly EffectiveHost[]): Map<string, EffectiveHost> {
   const kept = new Map<string, EffectiveHost>()
   for (const e of effective) {
-    const held = kept.get(e.eff.family)
-    if (held === undefined || e.eff.tier > held.eff.tier) kept.set(e.eff.family, e)
+    const key = forceKey(e.eff.family, e.host)
+    const held = kept.get(key)
+    if (held === undefined || e.eff.tier > held.eff.tier) kept.set(key, e)
   }
   return kept
 }
@@ -338,8 +365,9 @@ function redundancyPass(
   out: { redundant: RedundantRec[]; flagged: Map<string, Set<string>>; inForce: Set<string> }
 ): void {
   for (const e of effective) {
-    if (keepers.get(e.eff.family) === e) continue
-    out.redundant.push(redundantRec(ctx, e, keepers.get(e.eff.family), out.inForce))
+    const keeper = keepers.get(forceKey(e.eff.family, e.host))
+    if (keeper === e) continue
+    out.redundant.push(redundantRec(ctx, e, keeper, out.inForce))
     if (e.host.currentKey !== null) flag(out.flagged, e.host.cellId, e.host.currentKey)
   }
 }
@@ -350,9 +378,9 @@ function redundantRec(
   keptHost: EffectiveHost | undefined,
   inForce: Set<string>
 ): RedundantRec {
-  const repl = bestLoose(ctx, e.host, (x) => !inForce.has(x.family))
+  const repl = bestLoose(ctx, e.host, (x) => !inForce.has(forceKey(x.family, e.host)))
   const where = repl === null ? undefined : ctx.pool.take(repl.key)
-  if (repl !== null && where !== undefined) inForce.add(repl.eff.family)
+  if (repl !== null && where !== undefined) inForce.add(forceKey(repl.eff.family, e.host))
   return {
     cellId: e.host.cellId,
     cellLabel: e.host.cellLabel,
@@ -390,11 +418,11 @@ function fillPass(
 ): void {
   for (const host of hosts) {
     if (host.currentKey !== null) continue
-    const best = bestLoose(ctx, host, (x) => !out.inForce.has(x.family))
+    const best = bestLoose(ctx, host, (x) => !out.inForce.has(forceKey(x.family, host)))
     if (best === null) continue
     const where = ctx.pool.take(best.key)
     if (where === undefined) continue
-    out.inForce.add(best.eff.family)
+    out.inForce.add(forceKey(best.eff.family, host))
     out.fills.push({
       cellId: host.cellId,
       cellLabel: host.cellLabel,
@@ -429,8 +457,8 @@ export function recommendSockets(
   const flagged = new Map<string, Set<string>>()
   const effective = filledHosts(ctx, hosts)
   const keepers = keepersByFamily(effective)
-  // ONE in-force ledger for the whole run: the families the board already grants, plus every family
-  // this run places. Shared so the three passes cannot contradict each other about what is live -
+  // ONE in-force ledger for the whole run, keyed by `forceKey`: the families the board already
+  // grants, plus every family this run places. Shared so the three passes cannot contradict each other about what is live -
   // a swap keeps its family in force, a dead socket's replacement claims a new one, and a fill may
   // claim only what neither of them has.
   const inForce = new Set(keepers.keys())

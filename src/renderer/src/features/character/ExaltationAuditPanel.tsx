@@ -200,8 +200,9 @@ export default function ExaltationAuditPanel({
         <Section title="Scrap candidates" lines={scrap} />
         <Section title="Copies" lines={copies} />
         <Typography variant="caption" color="text.disabled">
-          Assumes same-name effects do not stack (only the highest applies). Upgrades compare
-          within one effect family only; nothing is changed for you.
+          Assumes same-name effects do not stack (only the highest applies), except a proc, which
+          counts per weapon: one in each hand both fire. Upgrades compare within one effect family
+          only; nothing is changed for you.
         </Typography>
         {/* R2's fourth condition is off until the one file that states a deity has been read
             (owner report 2026-09-11). Saying so is the difference between advice that is narrowed
