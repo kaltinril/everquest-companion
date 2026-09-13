@@ -7,7 +7,8 @@
 
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { portsTo, zonePorts } from '../src/main/zonePorts'
+import { portsInClient, portsTo, zonePorts } from '../src/main/zonePorts'
+import type { SpellResistTable } from '../src/shared/resistTypes'
 
 test('the corpora state a usable port table', () => {
   const all = zonePorts()
@@ -67,4 +68,26 @@ test('the druid rings land where they say: Ring of Feerrott is a port to The Fee
   assert.ok(all.some((p) => p.spell.startsWith('Translocate:')), 'a translocate is a port someone gives you')
   assert.ok(all.some((p) => p.spell.startsWith('Evacuate:')), 'an evac is a port')
   assert.ok(!all.some((p) => /safe location/i.test(p.spell)), 'an in-zone succor names no zone')
+})
+
+test('with the client table loaded, only the spells it carries are offered (2026-09-12)', () => {
+  // The wizard ladder to Cazic-Thule: the wiki keeps the classic page beside the renamed Legends
+  // page, and the owner's client has only the Legends names. Keys are canon keys, as the table's are.
+  const all = zonePorts()
+  const cazic = all.filter((p) => p.via !== 'item' && /cazic/i.test(p.spell))
+  assert.ok(cazic.some((p) => p.spell === 'Cazic Gate') && cazic.some((p) => p.spell === 'Cazic Temple Gate'), 'both pages in the corpus')
+  const client: SpellResistTable = {
+    'cazic temple gate': { axis: null, resistAdj: 0, castMs: 7000, targetType: 6 },
+    'cazic temple portal': { axis: null, resistAdj: 0, castMs: 7000, targetType: 41 },
+    'translocate: cazic temple': { axis: null, resistAdj: 0, castMs: 7000, targetType: 5 }
+  }
+  const kept = portsInClient(cazic, client).map((p) => p.spell).sort()
+  assert.deepEqual(kept, ['Cazic Temple Gate', 'Cazic Temple Portal', 'Translocate: Cazic Temple'])
+  // No table, no verdict: nothing is dropped on a machine with no install.
+  assert.equal(portsInClient(cazic, null).length, cazic.length)
+  // An item port passes on the item: Thulian Wand's click is the wiki's "Cazic Portal", a name
+  // this client does not carry, and the wand is real.
+  const wand = all.find((p) => p.via === 'item' && p.item === 'Thulian Wand')
+  assert.ok(wand, 'the wand is in the corpus')
+  assert.ok(portsInClient([wand], client).length === 1, 'and it survives a table without its spell name')
 })

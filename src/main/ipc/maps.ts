@@ -21,7 +21,8 @@ import { IPC } from '../../shared/ipc'
 import { mapLibrary } from '../maps'
 import { isSafePackId } from '../security'
 import type { MapGetResult, MapPackPrefs, MapSearchOpts } from '../../shared/maps'
-import { zonePorts } from '../zonePorts'
+import { portsInClient, zonePorts } from '../zonePorts'
+import { spellTable } from '../resist/spellTable'
 import { logError } from '../errorLog'
 import { zoneGraph } from '../zoneGraph'
 
@@ -84,7 +85,10 @@ export function registerMapsIpc(): void {
 
   // NO ARGUMENT, so nothing to validate: the table is derived from two committed corpora and is
   // the same for every caller. Memoized in `zonePorts()`, so a second call costs a return.
-  ipcMain.handle(IPC.mapsPorts, () => zonePorts())
+  // Awaited, not sampled: on a cold start the client table may still be parsing, and a port list
+  // read before it settles would offer the wiki's ghosts once and never again (zonePorts.ts
+  // `portsInClient`). The promise settles once per run; every later await is immediate.
+  ipcMain.handle(IPC.mapsPorts, async () => portsInClient(zonePorts(), await spellTable()))
 
   // Likewise no argument. The first call parses every map in the default pack once (`zoneGraph`
   // memoizes); a Map cannot cross IPC, so it goes as entries and the renderer rebuilds it.
