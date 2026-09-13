@@ -627,6 +627,17 @@ function pushNeighbours(
 //
 // It is a POLICY and not a measurement, and the surface that draws it says so rather than
 // presenting eight spells as a computed optimum.
+//
+// ── ONE GEM PER LINE (owner report, kaltinril 2026-09-12) ─────────────────────────────────────
+//
+// *"you also seem to be recommending multiple levels of spells in the same damage line for some
+// reason"*. The reason was that a ranking by figure puts Chaos Flux first and the rung under it
+// second, and eight gems spent down that ranking bought three rungs of one ladder. A ladder means
+// the rung above supersedes the one below, so the lower rung is skipped whenever the table also
+// shows the rung that replaces it for a class in the trio - the Spellbook's own "newest rank only"
+// reading (`spellbook.supersededNames`), applied to what is spent rather than what is drawn. Only
+// a row the table SHOWS may hide another: the tables are already at the level asked and in era,
+// so a successor you cannot cast yet takes nothing from you.
 
 /** One spell in the combat set, with the table it was the best of. */
 export interface CombatPick {
@@ -691,12 +702,13 @@ export function combatSet(
   const picks: CombatPick[] = []
   const taken = new Set<string>()
   const tabsUsed = which.filter((t) => tables[t].shown.length > 0)
+  const superseded = supersededByShown(tabsUsed.flatMap((t) => tables[t].shown))
   const deepest = Math.max(0, ...tabsUsed.map((t) => tables[t].shown.length))
   for (let place = 0; place < deepest && picks.length < gems; place++) {
     for (const tab of tabsUsed) {
       if (picks.length >= gems) break
       const row = tables[tab].shown[place]
-      if (row === undefined || taken.has(row.name)) continue
+      if (row === undefined || taken.has(row.name) || outgrown(row, superseded)) continue
       taken.add(row.name)
       picks.push({
         name: row.name,
@@ -714,6 +726,25 @@ export function combatSet(
   return { picks, tabsUsed, gems }
 }
 
+/**
+ * `name|cls` for every rung a SHOWN row replaces, for a class that owns that row. See ONE GEM PER
+ * LINE above. A row's `classes` are the trio's classes that gain it at the level asked, so the
+ * class test is the same one the Spellbook's chip applies - and it is kept PER CLASS, because a
+ * shaman's ladder replacing a name says nothing about the enchanter's rung of that name.
+ */
+function supersededByShown(shown: readonly CombatSource[]): Set<string> {
+  const out = new Set<string>()
+  for (const row of shown) {
+    for (const r of row.replaces ?? []) if (row.classes.includes(r.cls)) out.add(`${r.name}|${r.cls}`)
+  }
+  return out
+}
+
+/** Outgrown for EVERY class that owns the row: no class in the trio still has it as a top rung. */
+function outgrown(row: CombatSource, superseded: ReadonlySet<string>): boolean {
+  return row.classes.every((cls) => superseded.has(`${row.name}|${cls}`))
+}
+
 /** The fields `combatSet` reads off a ranked row. Structural, so `bestSpells.ts` need not be imported. */
 export interface CombatSource {
   name: string
@@ -724,6 +755,8 @@ export interface CombatSource {
   gainedAt: number
   classes: ClassAbbr[]
   iconId?: number
+  /** `BestSpellRow.replaces` - the ladder's answer, for the one-gem-per-line rule. */
+  replaces?: { name: string; cls: ClassAbbr }[]
 }
 
 // =================================================================================================

@@ -230,7 +230,7 @@ function Pane({
         title="Combat set"
         set={sets.combat}
         level={level}
-        blurb="Ranked by the Leveling tab, then spent one table at a time: the best nuke, the best damage over time and the best area spell before any second pick. Three tables because they answer three different fights, and eight of one of them can only fight one."
+        blurb="Ranked by the Leveling tab, then spent one table at a time: the best nuke, the best damage over time and the best area spell before any second pick. Three tables because they answer three different fights, and eight of one of them can only fight one. One gem per line: a rung you have outgrown is never picked over the one that replaced it."
         empty="None of your classes has a damage spell this app can put a figure on yet."
         testId="combat-set"
       />
@@ -241,7 +241,7 @@ function Pane({
       title="Heal set"
       set={sets.heals}
       level={level}
-      blurb="The same spend, over the healing tables: the best direct heal and the best heal over time before any second pick. A heal occupies no slot on you, so nothing here contests anything - unlike the buffs, which do."
+      blurb="The same spend, over the healing tables: the best direct heal and the best heal over time before any second pick, one gem per line. A heal occupies no slot on you, so nothing here contests anything - unlike the buffs, which do."
       empty="None of your classes has a healing spell this app can put a figure on yet."
       testId="heal-set"
     />

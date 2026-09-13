@@ -13,8 +13,10 @@ import { stackView, type StackSpellView } from '../src/shared/spellStack'
 import {
   DEFAULT_STAT_WEIGHTS,
   buildLoadout,
+  combatSet,
   loadoutCandidates,
   scoreGrants,
+  type CombatSource,
   type LoadoutCandidate
 } from '../src/shared/spellLoadout'
 
@@ -264,4 +266,53 @@ test('a per-tick line is a grant: HP regen from the hitpoint lines, mana regen f
   const set = buildLoadout(loadoutCandidates([breeze, clarity], ['ENC'], DEFAULT_STAT_WEIGHTS, { level: 60 }), L)
   assert.deepEqual(set.keep.map((c) => c.name), ['Clarity'])
   assert.equal(set.rejected[0]?.name, 'Breeze')
+})
+
+// =================================================================================================
+// THE COMBAT SET (goal 5), and ONE GEM PER LINE (owner report 2026-09-12: "you also seem to be
+// recommending multiple levels of spells in the same damage line")
+// =================================================================================================
+
+/** A ranked row as `bestSpellsAt` hands it over, with the ladder's answer riding along. */
+function ranked(name: string, dps: number, replaces: string[] = [], classes: string[] = ['ENC']): CombatSource {
+  return {
+    name,
+    rank: 1,
+    metrics: { damage: dps * 10, dps } as CombatSource['metrics'],
+    mana: 50,
+    gainedAt: 20,
+    classes: classes as CombatSource['classes'],
+    ...(replaces.length === 0 ? {} : { replaces: replaces.map((n) => ({ name: n, cls: 'ENC' as const })) })
+  }
+}
+
+const NO_TABLE = { shown: [] as CombatSource[] }
+
+test('the combat set spends breadth first, and never two rungs of one line', () => {
+  // The enchanter's Chaos line ranked by figure: three rungs in a row at the top of the DD table.
+  const tables = {
+    dd: { shown: [ranked('Chaos Flux', 30, ['Sanity Warp']), ranked('Sanity Warp', 20, ['Chaotic Feedback']), ranked('Chaotic Feedback', 10), ranked('Shock of Blades', 8)] },
+    dot: { shown: [ranked('Suffocate', 12, ['Choke']), ranked('Choke', 6)] },
+    aoe: NO_TABLE,
+    heal: NO_TABLE,
+    hot: NO_TABLE
+  }
+  const set = combatSet(tables, 8, ['dd', 'dot', 'aoe'])
+  // One per line: the two lower Chaos rungs and Choke are spent nowhere; the unrelated nuke is.
+  assert.deepEqual(set.picks.map((p) => p.name), ['Chaos Flux', 'Suffocate', 'Shock of Blades'])
+  assert.deepEqual(set.tabsUsed, ['dd', 'dot'])
+})
+
+test('a successor the table does not show supersedes nothing, and a class outside the row`s owners does not either', () => {
+  // The rung that replaces Sanity Warp is not in the table (not reached, or out of era): it stays.
+  const tables = {
+    dd: { shown: [ranked('Sanity Warp', 20, ['Chaotic Feedback']), ranked('Chaotic Feedback', 10)] },
+    // A shaman row whose ladder replaces Choke for the SHAMAN: an enchanter's Choke is untouched.
+    dot: { shown: [ranked('Choke', 6), { ...ranked('Venom', 9, [], ['SHM']), replaces: [{ name: 'Choke', cls: 'SHM' as const }] }] },
+    aoe: NO_TABLE,
+    heal: NO_TABLE,
+    hot: NO_TABLE
+  }
+  const set = combatSet(tables, 8, ['dd', 'dot'])
+  assert.deepEqual(set.picks.map((p) => p.name).sort(), ['Choke', 'Sanity Warp', 'Venom'])
 })
