@@ -50,7 +50,7 @@ import type { ClassAbbr } from './classCombo'
 import type { BestSpellTab } from './bestSpells'
 import type { SpellMetrics } from './spellMetrics'
 import { compareStatKeys, grantsShareASlot, type SpellStatGrant, type SpellStatKey } from './spellStats'
-import { parseHpLine } from './spellMetrics'
+import { parseHpLine, parseManaLine, type HpLine } from './spellMetrics'
 import {
   conflictComponents,
   spellsConflict,
@@ -106,6 +106,11 @@ export const DEFAULT_STAT_WEIGHTS: StatWeights = {
   // of healing in it and more in a long one. It is a weight, not a measurement, like every other
   // number in this table.
   HP_REGEN: 20,
+  // MANA REGEN BY THE SAME ARGUMENT, scaled by this table's own HP:MP ratio (1 : 0.75). Breeze's
+  // 2 a tick scores 30 and Clarity's 7 scores 105 - the same league as the STR and AC buffs they
+  // share a set with, which is what the owner's report asked for: Breeze was not in the set, and
+  // not in the left-out list either, because a stat with no weight is a stat worth nothing.
+  MANA_REGEN: 15,
   ABSORB_DAMAGE: 0.5,
   // The percent-valued stats. They are scored on their PERCENT, which is a different unit from a
   // point of STR - the weights below are what makes them comparable, and they are the roundest
@@ -293,7 +298,7 @@ function isKeepUp(s: UnlockSpell, minMs: number): boolean {
 }
 
 /**
- * THE REGEN A HEAL-OVER-TIME BUFF GRANTS, PER TICK, at the caster's level.
+ * THE REGEN A BUFF GRANTS, PER TICK, at the caster's level - hit points and mana alike.
  *
  * ============================================================================
  * IT READS THE EFFECT LINE, because dividing a total is not the same arithmetic
@@ -316,20 +321,36 @@ function isKeepUp(s: UnlockSpell, minMs: number): boolean {
  *
  * `perTick` and `direction` are the filters. An instant heal has a hitpoint line too and is not
  * regen; a `Decrease` line is damage.
+ *
+ * MANA TAKES THE SAME ROAD (owner report 2026-09-12: *"why does this spell branch/code not
+ * recommend breeze?"*). Breeze's only line is `Increase Mana by 2 per tick`; `spellStats.ts`
+ * refuses every per-tick line on purpose, this function read only the hitpoint ones, so the spell
+ * scored zero and `loadoutCandidates` dropped it before either list - not kept, not left out,
+ * simply absent. `UnlockSpell.manaLines` now carries those lines and `parseManaLine` reads them.
  */
-function regenGrant(s: UnlockSpell, level: number): SpellStatGrant | null {
+function regenGrants(s: UnlockSpell, level: number): SpellStatGrant[] {
+  const out: SpellStatGrant[] = []
+  const hp = perTickOf(s.hpLines, parseHpLine, level)
+  if (hp > 0) out.push({ key: 'HP_REGEN', amount: hp, percent: false, line: `Increase Hit points by ${String(hp)} per tick` })
+  const mana = perTickOf(s.manaLines, parseManaLine, level)
+  if (mana > 0) out.push({ key: 'MANA_REGEN', amount: mana, percent: false, line: `Increase Mana by ${String(mana)} per tick` })
+  return out
+}
+
+/** The upward per-tick total the lines state at this level, through one pool's reader. */
+function perTickOf(
+  lines: readonly string[] | undefined,
+  parse: (line: string, level: number) => HpLine | null,
+  level: number
+): number {
   let perTick = 0
-  for (const line of s.hpLines ?? []) {
-    const hp = parseHpLine(line, level)
-    if (hp?.perTick === true && hp.direction === 'up') perTick += hp.amount
+  for (const line of lines ?? []) {
+    const read = parse(line, level)
+    if (read?.perTick === true && read.direction === 'up') perTick += read.amount
   }
-  if (perTick <= 0) return null
-  return {
-    key: 'HP_REGEN',
-    amount: perTick,
-    percent: false,
-    line: `Increase Hit points by ${String(perTick)} per tick`
-  }
+  // A ramp read between two breakpoints lands between two integers, and the game pays whole
+  // points a tick: Boon of the Clear Mind at 50 read 7.09 and would have drawn it on the chip.
+  return Math.round(perTick)
 }
 
 function admitsBuff(s: UnlockSpell, query: CandidateQuery, minMs: number): boolean {
@@ -380,9 +401,8 @@ export function loadoutCandidates(
     // trio through the Warrior alone, and the surviving pairs are what the row then reports.
     const at = s.at.filter((p) => classes.includes(p.cls) && (level === undefined || p.level <= level))
     if (at.length === 0) continue
-    // The catalog's own grants, plus the per-tick regen it states in another vocabulary.
-    const regen = regenGrant(s, level ?? ASSUMED_CASTER_LEVEL)
-    const grants = regen === null ? (s.grants ?? []) : [...(s.grants ?? []), regen]
+    // The catalog's own grants, plus the per-tick regens it states in another vocabulary.
+    const grants = [...(s.grants ?? []), ...regenGrants(s, level ?? ASSUMED_CASTER_LEVEL)]
     const score = scoreGrants(grants, weights)
     // A buff worth nothing under the weights in force is not a recommendation. It is still a real
     // spell and the Spellbook still lists it; this tab is about a SET worth keeping up.
@@ -607,6 +627,17 @@ function pushNeighbours(
 //
 // It is a POLICY and not a measurement, and the surface that draws it says so rather than
 // presenting eight spells as a computed optimum.
+//
+// ── ONE GEM PER LINE (owner report, kaltinril 2026-09-12) ─────────────────────────────────────
+//
+// *"you also seem to be recommending multiple levels of spells in the same damage line for some
+// reason"*. The reason was that a ranking by figure puts Chaos Flux first and the rung under it
+// second, and eight gems spent down that ranking bought three rungs of one ladder. A ladder means
+// the rung above supersedes the one below, so the lower rung is skipped whenever the table also
+// shows the rung that replaces it for a class in the trio - the Spellbook's own "newest rank only"
+// reading (`spellbook.supersededNames`), applied to what is spent rather than what is drawn. Only
+// a row the table SHOWS may hide another: the tables are already at the level asked and in era,
+// so a successor you cannot cast yet takes nothing from you.
 
 /** One spell in the combat set, with the table it was the best of. */
 export interface CombatPick {
@@ -671,12 +702,13 @@ export function combatSet(
   const picks: CombatPick[] = []
   const taken = new Set<string>()
   const tabsUsed = which.filter((t) => tables[t].shown.length > 0)
+  const superseded = supersededByShown(tabsUsed.flatMap((t) => tables[t].shown))
   const deepest = Math.max(0, ...tabsUsed.map((t) => tables[t].shown.length))
   for (let place = 0; place < deepest && picks.length < gems; place++) {
     for (const tab of tabsUsed) {
       if (picks.length >= gems) break
       const row = tables[tab].shown[place]
-      if (row === undefined || taken.has(row.name)) continue
+      if (row === undefined || taken.has(row.name) || outgrown(row, superseded)) continue
       taken.add(row.name)
       picks.push({
         name: row.name,
@@ -694,6 +726,25 @@ export function combatSet(
   return { picks, tabsUsed, gems }
 }
 
+/**
+ * `name|cls` for every rung a SHOWN row replaces, for a class that owns that row. See ONE GEM PER
+ * LINE above. A row's `classes` are the trio's classes that gain it at the level asked, so the
+ * class test is the same one the Spellbook's chip applies - and it is kept PER CLASS, because a
+ * shaman's ladder replacing a name says nothing about the enchanter's rung of that name.
+ */
+function supersededByShown(shown: readonly CombatSource[]): Set<string> {
+  const out = new Set<string>()
+  for (const row of shown) {
+    for (const r of row.replaces ?? []) if (row.classes.includes(r.cls)) out.add(`${r.name}|${r.cls}`)
+  }
+  return out
+}
+
+/** Outgrown for EVERY class that owns the row: no class in the trio still has it as a top rung. */
+function outgrown(row: CombatSource, superseded: ReadonlySet<string>): boolean {
+  return row.classes.every((cls) => superseded.has(`${row.name}|${cls}`))
+}
+
 /** The fields `combatSet` reads off a ranked row. Structural, so `bestSpells.ts` need not be imported. */
 export interface CombatSource {
   name: string
@@ -704,6 +755,8 @@ export interface CombatSource {
   gainedAt: number
   classes: ClassAbbr[]
   iconId?: number
+  /** `BestSpellRow.replaces` - the ladder's answer, for the one-gem-per-line rule. */
+  replaces?: { name: string; cls: ClassAbbr }[]
 }
 
 // =================================================================================================

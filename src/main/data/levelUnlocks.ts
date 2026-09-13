@@ -53,6 +53,7 @@ import type { LevelUnlockData, UnlockSkill, UnlockSpell } from '../../shared/lev
 import {
   anyClientCurve,
   parseHpLine,
+  parseManaLine,
   resolveSpellMana,
   spellMetricsAt,
   type SpellMetrics,
@@ -309,6 +310,20 @@ function writeSpellFacts(
 }
 
 /**
+ * The pool lines a re-reader evaluates at another level: every hitpoint line (`hpLines`), and the
+ * PER-TICK mana lines (`manaLines`, 2026-09-12 - Breeze's whole worth is one, and nothing read it).
+ * Whether a line is one is level-independent, so `LEVEL_ANY` reads the same set at every level.
+ * Returns the hitpoint lines, which `writeInputs` still needs for the client-curve rule.
+ */
+function writePoolLines(spell: UnlockSpell, effects: readonly string[]): string[] {
+  const hpLines = effects.filter((line) => parseHpLine(line, LEVEL_ANY) !== null)
+  if (hpLines.length > 0) spell.hpLines = hpLines
+  const manaLines = effects.filter((line) => parseManaLine(line, LEVEL_ANY)?.perTick === true)
+  if (manaLines.length > 0) spell.manaLines = manaLines
+  return hpLines
+}
+
+/**
  * The re-evaluation inputs (JOS-445) and the two resolved fields, split out of `writeFigures` so
  * that function stays under the complexity ceiling as the sources it reconciles multiply.
  *
@@ -322,8 +337,7 @@ function writeInputs(
   s: SpellDbFile['spells'][number],
   clientHp: ClientHpFacts | undefined
 ): void {
-  const hpLines = (s.effects ?? []).filter((line) => parseHpLine(line, LEVEL_ANY) !== null)
-  if (hpLines.length > 0) spell.hpLines = hpLines
+  const hpLines = writePoolLines(spell, s.effects ?? [])
   if (clientHp && (hpLines.length === 0 || anyClientCurve(hpLines, clientHp))) {
     spell.clientHp = clientHp
   }

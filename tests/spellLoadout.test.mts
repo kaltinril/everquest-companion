@@ -13,8 +13,10 @@ import { stackView, type StackSpellView } from '../src/shared/spellStack'
 import {
   DEFAULT_STAT_WEIGHTS,
   buildLoadout,
+  combatSet,
   loadoutCandidates,
   scoreGrants,
+  type CombatSource,
   type LoadoutCandidate
 } from '../src/shared/spellLoadout'
 
@@ -220,4 +222,97 @@ test('the default weights are provisional but complete enough to rank a real buf
   const ac = scoreGrants(spellStatGrants(['Increase AC by 20'], 50), DEFAULT_STAT_WEIGHTS)
   const cha = scoreGrants(spellStatGrants(['Increase CHA by 20'], 50), DEFAULT_STAT_WEIGHTS)
   assert.ok(ac > cha)
+})
+
+// =================================================================================================
+// THE REGENS (owner reports 2026-09-10 "you're also missing HP Regen" and 2026-09-12 "why does
+// this spell branch/code not recommend breeze?")
+// =================================================================================================
+
+test('a per-tick line is a grant: HP regen from the hitpoint lines, mana regen from the mana lines', () => {
+  // Breeze, as the unlock row carries it: no stat grants at all, one mana line. It used to score
+  // zero and vanish before either list - not kept, not left out.
+  const breeze = {
+    name: 'Breeze',
+    at: [{ cls: 'ENC', level: 14 }],
+    upgradeCategory: 'buff',
+    durationMs: 1_626_000,
+    manaLines: ['Increase Mana by 2 per tick']
+  } as UnlockSpell
+  // Regeneration-shaped: a `hot` that lasts, carrying its hitpoint line.
+  const regen = {
+    name: 'Regen',
+    at: [{ cls: 'ENC', level: 22 }],
+    upgradeCategory: 'hot',
+    durationMs: 960_000,
+    hpLines: ['Increase Hitpoints by 1 per tick']
+  } as UnlockSpell
+  const out = loadoutCandidates([breeze, regen], ['ENC'], DEFAULT_STAT_WEIGHTS, { level: 50 })
+  const b = out.find((c) => c.name === 'Breeze')
+  assert.ok(b, 'Breeze is a candidate')
+  assert.deepEqual(b.grants.map((g) => [g.key, g.amount]), [['MANA_REGEN', 2]])
+  assert.equal(b.score, 2 * (DEFAULT_STAT_WEIGHTS.MANA_REGEN ?? 0))
+  const r = out.find((c) => c.name === 'Regen')
+  assert.deepEqual(r?.grants.map((g) => [g.key, g.amount]), [['HP_REGEN', 1]])
+  // A ramp is read at the caller's level: Clarity's 4 (L29) to 7 (L60) is 7 at the cap, not 4.
+  const clarity = { ...breeze, name: 'Clarity', manaLines: ['Increase Mana by 4 per tick (L29) to 7 per tick (L60)'] } as UnlockSpell
+  const atCap = loadoutCandidates([clarity], ['ENC'], DEFAULT_STAT_WEIGHTS, { level: 60 })
+  assert.equal(atCap[0]?.grants[0]?.amount, 7)
+  // Between breakpoints the ramp is rounded to the whole point a tick the game pays.
+  const midway = loadoutCandidates([clarity], ['ENC'], DEFAULT_STAT_WEIGHTS, { level: 50 })
+  assert.equal(midway[0]?.grants[0]?.amount, 6)
+  // …and without the client file the two are FLAGGED as sharing a slot, which is the truth: both
+  // state mana regen, and the set keeps the better one.
+  const set = buildLoadout(loadoutCandidates([breeze, clarity], ['ENC'], DEFAULT_STAT_WEIGHTS, { level: 60 }), L)
+  assert.deepEqual(set.keep.map((c) => c.name), ['Clarity'])
+  assert.equal(set.rejected[0]?.name, 'Breeze')
+})
+
+// =================================================================================================
+// THE COMBAT SET (goal 5), and ONE GEM PER LINE (owner report 2026-09-12: "you also seem to be
+// recommending multiple levels of spells in the same damage line")
+// =================================================================================================
+
+/** A ranked row as `bestSpellsAt` hands it over, with the ladder's answer riding along. */
+function ranked(name: string, dps: number, replaces: string[] = [], classes: string[] = ['ENC']): CombatSource {
+  return {
+    name,
+    rank: 1,
+    metrics: { damage: dps * 10, dps } as CombatSource['metrics'],
+    mana: 50,
+    gainedAt: 20,
+    classes: classes as CombatSource['classes'],
+    ...(replaces.length === 0 ? {} : { replaces: replaces.map((n) => ({ name: n, cls: 'ENC' as const })) })
+  }
+}
+
+const NO_TABLE = { shown: [] as CombatSource[] }
+
+test('the combat set spends breadth first, and never two rungs of one line', () => {
+  // The enchanter's Chaos line ranked by figure: three rungs in a row at the top of the DD table.
+  const tables = {
+    dd: { shown: [ranked('Chaos Flux', 30, ['Sanity Warp']), ranked('Sanity Warp', 20, ['Chaotic Feedback']), ranked('Chaotic Feedback', 10), ranked('Shock of Blades', 8)] },
+    dot: { shown: [ranked('Suffocate', 12, ['Choke']), ranked('Choke', 6)] },
+    aoe: NO_TABLE,
+    heal: NO_TABLE,
+    hot: NO_TABLE
+  }
+  const set = combatSet(tables, 8, ['dd', 'dot', 'aoe'])
+  // One per line: the two lower Chaos rungs and Choke are spent nowhere; the unrelated nuke is.
+  assert.deepEqual(set.picks.map((p) => p.name), ['Chaos Flux', 'Suffocate', 'Shock of Blades'])
+  assert.deepEqual(set.tabsUsed, ['dd', 'dot'])
+})
+
+test('a successor the table does not show supersedes nothing, and a class outside the row`s owners does not either', () => {
+  // The rung that replaces Sanity Warp is not in the table (not reached, or out of era): it stays.
+  const tables = {
+    dd: { shown: [ranked('Sanity Warp', 20, ['Chaotic Feedback']), ranked('Chaotic Feedback', 10)] },
+    // A shaman row whose ladder replaces Choke for the SHAMAN: an enchanter's Choke is untouched.
+    dot: { shown: [ranked('Choke', 6), { ...ranked('Venom', 9, [], ['SHM']), replaces: [{ name: 'Choke', cls: 'SHM' as const }] }] },
+    aoe: NO_TABLE,
+    heal: NO_TABLE,
+    hot: NO_TABLE
+  }
+  const set = combatSet(tables, 8, ['dd', 'dot'])
+  assert.deepEqual(set.picks.map((p) => p.name).sort(), ['Choke', 'Sanity Warp', 'Venom'])
 })

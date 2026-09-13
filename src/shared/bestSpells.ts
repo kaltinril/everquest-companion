@@ -258,6 +258,12 @@ export interface BestSpellRow {
   /** The rank the LOG has actually seen this line at, when it has seen one above base. 0 otherwise. */
   observedRank: number
   /**
+   * WHAT THIS SPELL REPLACES, per class - `UnlockSpell.replaces`, carried through so the combat set
+   * can spend one gem per line (owner, 2026-09-12: *"you also seem to be recommending multiple
+   * levels of spells in the same damage line"*). Absent when no ladder places the spell.
+   */
+  replaces?: { name: string; cls: ClassAbbr }[]
+  /**
    * THE TARGET COUNT THIS ROW'S FIGURES ASSUME (JOS-449). 1 on every tab but AOE, where it is the
    * spell's own cap or `DEFAULT_AE_MAX_TARGETS`.
    *
@@ -627,6 +633,7 @@ function buildRow(
     outOfEra: spell.outOfEra === true,
     rank,
     observedRank,
+    ...(spell.replaces === undefined ? {} : { replaces: spell.replaces }),
     targets,
     hits: spellHitsFor(spell, targets),
     ...(focus.length > 0 ? { focus } : {})

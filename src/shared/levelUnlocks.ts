@@ -120,6 +120,14 @@ export interface UnlockSpell {
    */
   hpLines?: string[]
   /**
+   * THE MANA-PER-TICK LINES, under `hpLines`'s rule and for one reader: the buff set's regen grant
+   * (`spellLoadout.ts`). Breeze's whole worth is `Increase Mana by 2 per tick`, a line the stat
+   * reader refuses by design, so without this the spell scored zero and was never a candidate
+   * (owner report 2026-09-12). Only the per-tick lines travel - a flat `Increase Mana by 50` is
+   * `spellStats.ts`'s `MP` grant already. Absent for the many spells that state none.
+   */
+  manaLines?: string[]
+  /**
    * The CLIENT'S hitpoint slots (JOS-396's fallback source), carried for the same reason and under
    * the same rule: only for the spells whose wiki lines yield nothing, which is the only case
    * `spellMetricsAt` consults it in. Fifteen spells in the owner's install; absent for everyone
