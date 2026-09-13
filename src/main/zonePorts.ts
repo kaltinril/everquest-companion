@@ -8,7 +8,7 @@
 //
 //   DRUID AND WIZARD SPELLS. `spells.json` states the destination in the effect line itself -
 //   `Teleport to 478,1427,-48 in commons` - and the class and level in `classes`
-//   (`* Druid - Level 29`). 51 teleport effects in the corpus; the ones that matter are the
+//   (`* Druid - Level 29`). 152 port effects in the corpus (see DESTINATION); the ones that matter are the
 //   player-castable ones.
 //
 //   ITEM PORTS, which the owner named specifically ("the cazic thule potion port"). An item's
@@ -41,8 +41,15 @@ import { resolveZone, type PortVia, type ZonePort } from '../shared/zoneTravel'
 import type { SpellEntry } from '../shared/buffTypes'
 import type { ZoneShort } from '../shared/maps'
 
-/** `Teleport to 478,1427,-48 in commons` and `Teleport to in Cazic Thule` — coords optional. */
-const DESTINATION = /^Teleport to (?:[-0-9., ]+ )?in (.+)$/i
+/**
+ * `Teleport to 478,1427,-48 in commons` and `Teleport to in Cazic Thule` — coords optional — and
+ * the three other ways the wiki states a zone port (owner report 2026-09-12: The Feerrott showed no
+ * druid port, while the game offers Ring of Feerrott). Census of the corpus: 50 `Teleport to`,
+ * 42 `Teleport group to` (every druid ring and circle), 34 `Translocate to`, 15 `Evacuate to`,
+ * 11 `Evacuate group to`. All five land you in a named zone; only the first was being read. The
+ * in-zone evacs (`Teleports your group to a safe location`) name no zone and stay out.
+ */
+const DESTINATION = /^(?:Teleport|Translocate|Evacuate)(?: group)? to (?:[-0-9., ]+ )?in (.+)$/i
 
 /** `* Druid - Level 29` — the only two classes that carry travel, and the level it opens at. */
 const CASTER = /\b(Druid|Wizard)\b[^0-9]*?Level\s*(\d+)/i
