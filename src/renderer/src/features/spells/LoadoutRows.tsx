@@ -1,4 +1,4 @@
-// spells/LoadoutRows — the four rows the Loadout tab draws, and nothing about which set is on screen.
+// spells/LoadoutRows — the rows the Loadout tab draws, and nothing about which set is on screen.
 //
 // Split out of `SpellLoadoutView` when that file crossed this tree's 400-line ceiling. The seam is
 // the same one `BuffStatsPanel` came out of: the view decides WHICH set to show and these decide
@@ -14,6 +14,7 @@ import { Alert, Box, Chip, Stack, Typography } from '@mui/material'
 import { spellStatText } from '@shared/spellStats'
 import { TAB_LABEL } from '@shared/bestSpells'
 import type { CombatPick, CombatSet, LoadoutCandidate, LoadoutRejection } from '@shared/spellLoadout'
+import type { UtilityPick, UtilitySet } from '@shared/spellUtilitySet'
 import { SpellTooltip } from '../../lib/SpellCard'
 import SpellIcon from './SpellIcon'
 import { romanRank } from './spellbookFormat'
@@ -170,6 +171,79 @@ export function CombatRow({ p }: { p: CombatPick }): JSX.Element {
   )
 }
 
+/**
+ * One top rung on the Utility pane: the spell, the level it came at, who casts it when the trio
+ * has more than one caster, and THE LINE'S OWN NAME - the one caption that tells a reader what
+ * job the row does ("Slow line (Deeds line)") without this file inventing a word for it.
+ */
+export function UtilityRow({ p, casters }: { p: UtilityPick; casters: number }): JSX.Element {
+  return (
+    <Stack
+      direction="row"
+      spacing={1}
+      alignItems="center"
+      useFlexGap
+      flexWrap="wrap"
+      data-testid="utility-pick"
+      data-spell={p.name}
+      data-category={p.category}
+      sx={{ py: 0.35 }}
+    >
+      <SpellIcon iconId={p.iconId} />
+      <SpellTooltip name={p.name} placement="right">
+        <Typography variant="body1" sx={{ fontWeight: 600, minWidth: 190 }}>
+          {p.name}
+        </Typography>
+      </SpellTooltip>
+      <Chip size="small" variant="outlined" label={`L${String(p.gainedAt)}`} sx={TINY_CHIP} />
+      {casters > 1 && <Chip size="small" variant="outlined" label={p.classes.join(' / ')} sx={TINY_CHIP} />}
+      {p.line !== undefined && (
+        <Typography variant="caption" color="text.secondary" data-testid="utility-line">
+          {p.line}
+        </Typography>
+      )}
+    </Stack>
+  )
+}
+
+/** THE UTILITY PANE: the top rung of every line the other three panes did not place, by job. */
+export function UtilitySection({ set, level }: { set: UtilitySet; level: number }): JSX.Element {
+  return (
+    <Box data-testid="utility-set">
+      <Stack direction="row" spacing={1} alignItems="baseline">
+        <Typography variant="h6">Utility</Typography>
+        <Typography variant="caption" color="text.secondary">
+          {String(set.count)} spells, read at level {String(level)}
+        </Typography>
+      </Stack>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+        The best you have of each job: the highest rung of every spell line you can cast, from the
+        shipped ladders, leaving out what the other three panes already placed. Slows, charms,
+        mezzes, dispels, pets, and the buffs the buff set could not place: no stat it weighs, or too
+        short to keep up. Nothing here is ranked against anything else - there is no exchange rate
+        between a mez and a slow.
+      </Typography>
+      {set.count === 0 ? (
+        <Alert severity="info" data-testid="utility-set-empty">
+          None of your classes has a spell line this app places that the other panes did not cover.
+        </Alert>
+      ) : (
+        set.groups.map((g) => (
+          <Box key={g.category} sx={{ mb: 1 }}>
+            <Typography variant="overline" color="text.secondary" data-testid="utility-group">
+              {g.label} ({String(g.picks.length)})
+            </Typography>
+            <Stack>
+              {g.picks.map((p) => (
+                <UtilityRow key={p.name} p={p} casters={set.casters} />
+              ))}
+            </Stack>
+          </Box>
+        ))
+      )}
+    </Box>
+  )
+}
 
 /**
  * A CAST SET - combat or heals. One component for both because they differ only in their words:

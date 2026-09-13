@@ -348,7 +348,9 @@ function perTickOf(
     const read = parse(line, level)
     if (read?.perTick === true && read.direction === 'up') perTick += read.amount
   }
-  return perTick
+  // A ramp read between two breakpoints lands between two integers, and the game pays whole
+  // points a tick: Boon of the Clear Mind at 50 read 7.09 and would have drawn it on the chip.
+  return Math.round(perTick)
 }
 
 function admitsBuff(s: UnlockSpell, query: CandidateQuery, minMs: number): boolean {

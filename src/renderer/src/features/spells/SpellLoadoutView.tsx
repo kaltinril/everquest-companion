@@ -53,12 +53,13 @@ import {
   type LoadoutSet
 } from '@shared/spellLoadout'
 import { bestSpellsAt, defaultSorts } from '@shared/bestSpells'
+import { utilitySet, type UtilitySet } from '@shared/spellUtilitySet'
 import { observedRankRow } from '@shared/spellRanks'
 import type { CharacterSnap } from '@shared/characterTypes'
 import { useCurrentComboClasses, useLevelUnlocks } from '../leveling/useLevelUnlocks'
 import { useModule } from '../../lib/useModule'
 import SpellTierSlider from './SpellTierSlider'
-import { CastSection, KeepRow, RejectRow, TINY_CHIP } from './LoadoutRows'
+import { CastSection, KeepRow, RejectRow, TINY_CHIP, UtilitySection } from './LoadoutRows'
 import BuffStatsPanel from './BuffStatsPanel'
 import { useObservedSpellRanks } from '../../lib/useObservedSpellRanks'
 import { useLoadoutViews } from './useLoadoutViews'
@@ -192,13 +193,15 @@ function BuffSection({
 }
 
 /** Which set is on screen. Local to this view - see the tab bar for why it is not an app View. */
-type LoadoutPane = 'buffs' | 'combat' | 'heals'
+type LoadoutPane = 'buffs' | 'combat' | 'heals' | 'utility'
 
-/** The three sets, as one value - they travel together into `Pane` and never apart. */
+/** The four sets, as one value - they travel together into `Pane` and never apart. */
 interface LoadoutSets {
   buffs: LoadoutSet
   combat: CombatSet
   heals: CombatSet
+  /** THE FOURTH (owner, 2026-09-12): the top rung of every line the other three did not place. */
+  utility: UtilitySet
 }
 
 /**
@@ -220,6 +223,7 @@ function Pane({
   rankOf: (name: string) => number
 }): JSX.Element {
   if (pane === 'buffs') return <BuffSection set={sets.buffs} classes={classes} rankOf={rankOf} />
+  if (pane === 'utility') return <UtilitySection set={sets.utility} level={level} />
   if (pane === 'combat') {
     return (
       <CastSection
@@ -293,7 +297,12 @@ export default function SpellLoadoutView(): JSX.Element {
   const combat = useMemo(() => combatSet(ranked.tabs, GEMS, COMBAT_TABLES.combat), [ranked])
   const heals = useMemo(() => combatSet(ranked.tabs, GEMS, COMBAT_TABLES.heals), [ranked])
   const totals = useMemo(() => buffTotals(set.keep), [set.keep])
-  const sets = useMemo<LoadoutSets>(() => ({ buffs: set, combat, heals }), [set, combat, heals])
+  // THE FOURTH PANE reads what the first three placed, so a spell appears on exactly one.
+  const utility = useMemo(() => {
+    const placed = new Set([...set.keep, ...set.rejected, ...combat.picks, ...heals.picks].map((x) => x.name))
+    return utilitySet(data.spells, combo.resolved, level, { placed })
+  }, [data.spells, combo.resolved, level, set, combat, heals])
+  const sets = useMemo<LoadoutSets>(() => ({ buffs: set, combat, heals, utility }), [set, combat, heals, utility])
 
   if (combo.resolved.length === 0) {
     return (
@@ -330,6 +339,7 @@ export default function SpellLoadoutView(): JSX.Element {
         <Tab value="buffs" label={`Buffs (${String(set.gems)})`} data-testid="loadout-pane-buffs" />
         <Tab value="combat" label={`Combat (${String(combat.picks.length)})`} data-testid="loadout-pane-combat" />
         <Tab value="heals" label={`Heals (${String(heals.picks.length)})`} data-testid="loadout-pane-heals" />
+        <Tab value="utility" label={`Utility (${String(utility.count)})`} data-testid="loadout-pane-utility" />
       </Tabs>
 
       {/* THE SLIDER, and a caption that says what it does NOT do - see `BuffStatsPanel`. */}
@@ -340,7 +350,9 @@ export default function SpellLoadoutView(): JSX.Element {
         note={
           pane === 'buffs'
             ? 'a buff set gains mana, duration and cast time - never bigger stats'
-            : 'damage and healing move; mana, duration and cast time move with them'
+            : pane === 'utility'
+              ? 'utility spells gain mana, duration and cast time; a charm or mez caps one level higher a rank'
+              : 'damage and healing move; mana, duration and cast time move with them'
         }
       />
 

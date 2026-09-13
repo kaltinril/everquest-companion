@@ -256,6 +256,9 @@ test('a per-tick line is a grant: HP regen from the hitpoint lines, mana regen f
   const clarity = { ...breeze, name: 'Clarity', manaLines: ['Increase Mana by 4 per tick (L29) to 7 per tick (L60)'] } as UnlockSpell
   const atCap = loadoutCandidates([clarity], ['ENC'], DEFAULT_STAT_WEIGHTS, { level: 60 })
   assert.equal(atCap[0]?.grants[0]?.amount, 7)
+  // Between breakpoints the ramp is rounded to the whole point a tick the game pays.
+  const midway = loadoutCandidates([clarity], ['ENC'], DEFAULT_STAT_WEIGHTS, { level: 50 })
+  assert.equal(midway[0]?.grants[0]?.amount, 6)
   // …and without the client file the two are FLAGGED as sharing a slot, which is the truth: both
   // state mana regen, and the set keeps the better one.
   const set = buildLoadout(loadoutCandidates([breeze, clarity], ['ENC'], DEFAULT_STAT_WEIGHTS, { level: 60 }), L)
