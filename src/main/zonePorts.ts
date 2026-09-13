@@ -39,6 +39,8 @@ import { resolveZone, type PortVia, type ZonePort } from '../shared/zoneTravel'
 // The scrape's own row type, rather than a local restatement of it: this module reads four of its
 // fields and a private interface would be a second place to keep them right.
 import type { SpellEntry } from '../shared/buffTypes'
+import type { SpellResistTable } from '../shared/resistTypes'
+import { spellCanonKey } from '../shared/spellKey'
 import type { ZoneShort } from '../shared/maps'
 
 /**
@@ -163,6 +165,27 @@ export function zonePorts(): ZonePort[] {
   for (const port of itemPorts(castable)) out.push(port)
   CACHE = out
   return out
+}
+
+/**
+ * ONLY WHAT THIS CLIENT CAN CAST (owner ruling 2026-09-12: "we don't want things that do not
+ * relate to EQL"). The wiki keeps a classic-EverQuest page beside the Legends page for a spell
+ * Legends renamed - `Cazic Gate` 24 beside `Cazic Temple Gate` 23, `Translocate: Cazic` beside
+ * `Translocate: Cazic Temple`, both 44 - and the table read off the wiki listed both, so the
+ * wizard chip to Cazic-Thule read six levels for three spells. The client's own spell file is the
+ * authority on what exists: with the table loaded, a port whose spell it does not carry is not
+ * offered. With no table (no install on this machine) nothing is dropped, because nothing can be
+ * checked. The key is `spellCanonKey`, the same fold the icon lookup uses.
+ *
+ * AN ITEM PORT PASSES ON THE ITEM, NOT ON THE SPELL'S NAME. The wiki's item pages name a click by
+ * the classic spell (Crazy Cleric Greaves: "Ring of Misty") while the client calls the spell
+ * "Ring of Misty Thicket"; every one of the 16 item ports failed the name check on the owner's
+ * install, and the items are real. What an item port claims is that clicking the item lands you
+ * somewhere, which is true of the item whatever the wiki called its spell.
+ */
+export function portsInClient(ports: readonly ZonePort[], table: SpellResistTable | null): ZonePort[] {
+  if (table === null) return [...ports]
+  return ports.filter((p) => p.via === 'item' || table[spellCanonKey(p.spell)] !== undefined)
 }
 
 /** The ports that land in one zone, cheapest caster level first, items last. */
