@@ -30,6 +30,7 @@ import {
   clientDurationTicks,
   clientHpMagnitudeAt,
   parseHpLine,
+  parseManaLine,
   spellMetricsAt,
   spellMetricsParts,
   ticksOf,
@@ -561,4 +562,35 @@ test('JOS-528: Vengeance of the Wild reads as a DoT once the effects correction 
   const m = spellMetricsAt(corrected, 49)
   assert.equal(m?.dot, true, 'the corrected slot line carries the rate marker')
   assert.equal(m?.damage, 632.5, 'per-tick midpoint x 5 ticks, not a one-shot 126.5')
+})
+
+// ---- the mana pool (owner report 2026-09-12: the buff set never offered Breeze) ----------------
+//
+// Breeze's only line is `Increase Mana by 2 per tick`. `spellStats.ts` refuses per-tick lines on
+// purpose and `parseHpLine` reads hitpoints only, so nothing read it. `parseManaLine` is the same
+// reader with the mana head - a ramp evaluates at a level by the same arithmetic.
+
+test('parseManaLine reads the mana pool by the hitpoint arithmetic, and only the mana pool', () => {
+  // Breeze, flat.
+  assert.deepEqual(parseManaLine('Increase Mana by 2 per tick', 14), {
+    amount: 2,
+    direction: 'up',
+    perTick: true,
+    flat: true
+  })
+  // The other spelling (`Current Mana`).
+  assert.equal(parseManaLine('Increase Current Mana by 3 per tick', 50)?.amount, 3)
+  // Clarity, a ramp with the marker repeated inside each clause.
+  const clarity = 'Increase Mana by 4 per tick (L29) to 7 per tick (L60)'
+  assert.equal(parseManaLine(clarity, 29)?.amount, 4)
+  assert.equal(parseManaLine(clarity, 60)?.amount, 7)
+  assert.equal(parseManaLine(clarity, 60)?.perTick, true)
+  // A drain reads DOWN, and a drain on the TARGET is not this pool at all.
+  assert.equal(parseManaLine('Decrease Mana by 35 per tick', 50)?.direction, 'down')
+  assert.equal(parseManaLine('Decrease Target Mana by 6 per tick', 50), null)
+  // A bigger pool is `spellStats.ts`'s `MP` grant, and a hitpoint line is the other reader's.
+  assert.equal(parseManaLine('Increase Max Mana by 50', 50), null)
+  assert.equal(parseManaLine('Increase Hitpoints by 2 per tick', 50), null)
+  // The mana head does not leak into the hitpoint reader either.
+  assert.equal(parseHpLine('Increase Mana by 2 per tick', 50), null)
 })

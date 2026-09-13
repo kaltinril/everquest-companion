@@ -221,3 +221,44 @@ test('the default weights are provisional but complete enough to rank a real buf
   const cha = scoreGrants(spellStatGrants(['Increase CHA by 20'], 50), DEFAULT_STAT_WEIGHTS)
   assert.ok(ac > cha)
 })
+
+// =================================================================================================
+// THE REGENS (owner reports 2026-09-10 "you're also missing HP Regen" and 2026-09-12 "why does
+// this spell branch/code not recommend breeze?")
+// =================================================================================================
+
+test('a per-tick line is a grant: HP regen from the hitpoint lines, mana regen from the mana lines', () => {
+  // Breeze, as the unlock row carries it: no stat grants at all, one mana line. It used to score
+  // zero and vanish before either list - not kept, not left out.
+  const breeze = {
+    name: 'Breeze',
+    at: [{ cls: 'ENC', level: 14 }],
+    upgradeCategory: 'buff',
+    durationMs: 1_626_000,
+    manaLines: ['Increase Mana by 2 per tick']
+  } as UnlockSpell
+  // Regeneration-shaped: a `hot` that lasts, carrying its hitpoint line.
+  const regen = {
+    name: 'Regen',
+    at: [{ cls: 'ENC', level: 22 }],
+    upgradeCategory: 'hot',
+    durationMs: 960_000,
+    hpLines: ['Increase Hitpoints by 1 per tick']
+  } as UnlockSpell
+  const out = loadoutCandidates([breeze, regen], ['ENC'], DEFAULT_STAT_WEIGHTS, { level: 50 })
+  const b = out.find((c) => c.name === 'Breeze')
+  assert.ok(b, 'Breeze is a candidate')
+  assert.deepEqual(b.grants.map((g) => [g.key, g.amount]), [['MANA_REGEN', 2]])
+  assert.equal(b.score, 2 * (DEFAULT_STAT_WEIGHTS.MANA_REGEN ?? 0))
+  const r = out.find((c) => c.name === 'Regen')
+  assert.deepEqual(r?.grants.map((g) => [g.key, g.amount]), [['HP_REGEN', 1]])
+  // A ramp is read at the caller's level: Clarity's 4 (L29) to 7 (L60) is 7 at the cap, not 4.
+  const clarity = { ...breeze, name: 'Clarity', manaLines: ['Increase Mana by 4 per tick (L29) to 7 per tick (L60)'] } as UnlockSpell
+  const atCap = loadoutCandidates([clarity], ['ENC'], DEFAULT_STAT_WEIGHTS, { level: 60 })
+  assert.equal(atCap[0]?.grants[0]?.amount, 7)
+  // …and without the client file the two are FLAGGED as sharing a slot, which is the truth: both
+  // state mana regen, and the set keeps the better one.
+  const set = buildLoadout(loadoutCandidates([breeze, clarity], ['ENC'], DEFAULT_STAT_WEIGHTS, { level: 60 }), L)
+  assert.deepEqual(set.keep.map((c) => c.name), ['Clarity'])
+  assert.equal(set.rejected[0]?.name, 'Breeze')
+})

@@ -390,6 +390,10 @@ export const SPELL_STAT_LABEL: Partial<Record<SpellStatKey, string>> = {
   HP_ON_CAST: 'HP on cast',
   ABSORB_DAMAGE: 'Rune',
   ABSORB_MAGIC_DAMAGE: 'Magic rune',
+  // The two regens the buff set adds from the per-tick lines (`spellLoadout.regenGrants`). They
+  // drew as `HP_REGEN +1` on the Loadout tab until 2026-09-12 - the table had no word for them.
+  HP_REGEN: 'HP regen',
+  MANA_REGEN: 'Mana regen',
   STAMINA_LOSS: 'Stamina loss',
   SPELL_DURATION: 'Spell duration',
   SPELL_RANGE: 'Spell range',

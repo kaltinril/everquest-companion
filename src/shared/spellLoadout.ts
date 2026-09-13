@@ -50,7 +50,7 @@ import type { ClassAbbr } from './classCombo'
 import type { BestSpellTab } from './bestSpells'
 import type { SpellMetrics } from './spellMetrics'
 import { compareStatKeys, grantsShareASlot, type SpellStatGrant, type SpellStatKey } from './spellStats'
-import { parseHpLine } from './spellMetrics'
+import { parseHpLine, parseManaLine, type HpLine } from './spellMetrics'
 import {
   conflictComponents,
   spellsConflict,
@@ -106,6 +106,11 @@ export const DEFAULT_STAT_WEIGHTS: StatWeights = {
   // of healing in it and more in a long one. It is a weight, not a measurement, like every other
   // number in this table.
   HP_REGEN: 20,
+  // MANA REGEN BY THE SAME ARGUMENT, scaled by this table's own HP:MP ratio (1 : 0.75). Breeze's
+  // 2 a tick scores 30 and Clarity's 7 scores 105 - the same league as the STR and AC buffs they
+  // share a set with, which is what the owner's report asked for: Breeze was not in the set, and
+  // not in the left-out list either, because a stat with no weight is a stat worth nothing.
+  MANA_REGEN: 15,
   ABSORB_DAMAGE: 0.5,
   // The percent-valued stats. They are scored on their PERCENT, which is a different unit from a
   // point of STR - the weights below are what makes them comparable, and they are the roundest
@@ -293,7 +298,7 @@ function isKeepUp(s: UnlockSpell, minMs: number): boolean {
 }
 
 /**
- * THE REGEN A HEAL-OVER-TIME BUFF GRANTS, PER TICK, at the caster's level.
+ * THE REGEN A BUFF GRANTS, PER TICK, at the caster's level - hit points and mana alike.
  *
  * ============================================================================
  * IT READS THE EFFECT LINE, because dividing a total is not the same arithmetic
@@ -316,20 +321,34 @@ function isKeepUp(s: UnlockSpell, minMs: number): boolean {
  *
  * `perTick` and `direction` are the filters. An instant heal has a hitpoint line too and is not
  * regen; a `Decrease` line is damage.
+ *
+ * MANA TAKES THE SAME ROAD (owner report 2026-09-12: *"why does this spell branch/code not
+ * recommend breeze?"*). Breeze's only line is `Increase Mana by 2 per tick`; `spellStats.ts`
+ * refuses every per-tick line on purpose, this function read only the hitpoint ones, so the spell
+ * scored zero and `loadoutCandidates` dropped it before either list - not kept, not left out,
+ * simply absent. `UnlockSpell.manaLines` now carries those lines and `parseManaLine` reads them.
  */
-function regenGrant(s: UnlockSpell, level: number): SpellStatGrant | null {
+function regenGrants(s: UnlockSpell, level: number): SpellStatGrant[] {
+  const out: SpellStatGrant[] = []
+  const hp = perTickOf(s.hpLines, parseHpLine, level)
+  if (hp > 0) out.push({ key: 'HP_REGEN', amount: hp, percent: false, line: `Increase Hit points by ${String(hp)} per tick` })
+  const mana = perTickOf(s.manaLines, parseManaLine, level)
+  if (mana > 0) out.push({ key: 'MANA_REGEN', amount: mana, percent: false, line: `Increase Mana by ${String(mana)} per tick` })
+  return out
+}
+
+/** The upward per-tick total the lines state at this level, through one pool's reader. */
+function perTickOf(
+  lines: readonly string[] | undefined,
+  parse: (line: string, level: number) => HpLine | null,
+  level: number
+): number {
   let perTick = 0
-  for (const line of s.hpLines ?? []) {
-    const hp = parseHpLine(line, level)
-    if (hp?.perTick === true && hp.direction === 'up') perTick += hp.amount
+  for (const line of lines ?? []) {
+    const read = parse(line, level)
+    if (read?.perTick === true && read.direction === 'up') perTick += read.amount
   }
-  if (perTick <= 0) return null
-  return {
-    key: 'HP_REGEN',
-    amount: perTick,
-    percent: false,
-    line: `Increase Hit points by ${String(perTick)} per tick`
-  }
+  return perTick
 }
 
 function admitsBuff(s: UnlockSpell, query: CandidateQuery, minMs: number): boolean {
@@ -380,9 +399,8 @@ export function loadoutCandidates(
     // trio through the Warrior alone, and the surviving pairs are what the row then reports.
     const at = s.at.filter((p) => classes.includes(p.cls) && (level === undefined || p.level <= level))
     if (at.length === 0) continue
-    // The catalog's own grants, plus the per-tick regen it states in another vocabulary.
-    const regen = regenGrant(s, level ?? ASSUMED_CASTER_LEVEL)
-    const grants = regen === null ? (s.grants ?? []) : [...(s.grants ?? []), regen]
+    // The catalog's own grants, plus the per-tick regens it states in another vocabulary.
+    const grants = [...(s.grants ?? []), ...regenGrants(s, level ?? ASSUMED_CASTER_LEVEL)]
     const score = scoreGrants(grants, weights)
     // A buff worth nothing under the weights in force is not a recommendation. It is still a real
     // spell and the Spellbook still lists it; this tab is about a SET worth keeping up.
