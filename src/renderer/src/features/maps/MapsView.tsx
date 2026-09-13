@@ -450,7 +450,7 @@ export default function MapsView({
         {/* HOW YOU GET HERE, AND WHAT FOR (owner ask 2026-09-11). Under the toolbar rather than in
             the sidebar: it is about the zone itself, not about finding something in it, and the
             sidebar is the finder. Draws nothing at all when neither witness has anything to say. */}
-        <MapTravelCard travel={travel} onPick={pick} />
+        <MapTravelCard travel={travel} onPick={pick} onOpenItem={onOpenLoot} />
         <MapBody
           data={data}
           // Nothing is claimed before the pack listing and the first fetch have answered — a

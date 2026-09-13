@@ -181,8 +181,16 @@ function CasterChip({ label, ports }: { label: string; ports: readonly ZonePort[
   )
 }
 
-/** `[item]` — the clicks that land here, each name a card, folded to one chip. */
-function ItemChip({ ports }: { ports: readonly ZonePort[] }): JSX.Element | null {
+/** Open one item's page - the app's loot deep link. Absent, the names are hover-only text. */
+type OpenItem = (name: string) => void
+
+/**
+ * `[item]` — the clicks that land here, each name a card AND A CLICK THROUGH (owner, 2026-09-12:
+ * *"looks like i can't click the items to see more info on this item that allows me to port"*).
+ * The card was hover-only; the name now opens the item on the Loot tab the way the drops card's
+ * rows do, drawn as the same dotted link `ZoneLink` uses beside it.
+ */
+function ItemChip({ ports, onOpenItem }: { ports: readonly ZonePort[]; onOpenItem?: OpenItem }): JSX.Element | null {
   if (ports.length === 0) return null
   return (
     <Chip
@@ -196,9 +204,7 @@ function ItemChip({ ports }: { ports: readonly ZonePort[] }): JSX.Element | null
           {ports.length === 1 ? 'item' : `items ${String(ports.length)}`}
           {ports.map((p) => (
             <KnownItemTooltip key={p.item ?? p.spell} name={p.item ?? p.spell} clickThrough>
-              <Box component="span" sx={{ ml: 0.5, textDecoration: 'underline dotted', textUnderlineOffset: 2 }}>
-                {p.item ?? p.spell}
-              </Box>
+              <ItemName name={p.item ?? p.spell} onOpenItem={onOpenItem} />
             </KnownItemTooltip>
           ))}
         </>
@@ -207,13 +213,54 @@ function ItemChip({ ports }: { ports: readonly ZonePort[] }): JSX.Element | null
   )
 }
 
+/** The item's name inside the chip: a link when the view can open items, plain text otherwise. */
+function ItemName({ name, onOpenItem }: { name: string; onOpenItem?: OpenItem }): JSX.Element {
+  if (onOpenItem === undefined) {
+    return (
+      <Box component="span" sx={{ ml: 0.5, textDecoration: 'underline dotted', textUnderlineOffset: 2 }}>
+        {name}
+      </Box>
+    )
+  }
+  return (
+    <Link
+      component="button"
+      variant="caption"
+      underline="none"
+      data-testid="map-travel-item"
+      title={`Open ${name}`}
+      onClick={() => {
+        onOpenItem(name)
+      }}
+      sx={{
+        ml: 0.5,
+        verticalAlign: 'baseline',
+        color: 'primary.main',
+        textDecoration: 'underline dotted',
+        textUnderlineOffset: 2,
+        '&:hover': { textDecoration: 'underline solid' }
+      }}
+    >
+      {name}
+    </Link>
+  )
+}
+
 /** One zone you can land in: who casts you there, and the walk after. */
-function LandingRow({ landing, onPick }: { landing: Landing; onPick?: (zone: string) => void }): JSX.Element {
+function LandingRow({
+  landing,
+  onPick,
+  onOpenItem
+}: {
+  landing: Landing
+  onPick?: (zone: string) => void
+  onOpenItem?: OpenItem
+}): JSX.Element {
   return (
     <Stack direction="row" spacing={0.75} alignItems="center" data-testid="map-travel-landing" data-hops={landing.path.length}>
       <CasterChip label="WIZ" ports={landing.wizard} />
       <CasterChip label="DRU" ports={landing.druid} />
-      <ItemChip ports={landing.items} />
+      <ItemChip ports={landing.items} onOpenItem={onOpenItem} />
       <Typography variant="caption" component="span" color="text.secondary" noWrap sx={{ minWidth: 0 }} title={walkText(landing)}>
         <Walk landing={landing} onPick={onPick} />
       </Typography>
@@ -225,7 +272,15 @@ function LandingRow({ landing, onPick }: { landing: Landing; onPick?: (zone: str
 const SHOWN = 3
 
 /** Everything under the "Closest port" head: the crossings, the landings, and the honest empties. */
-function TravelBody({ travel, onPick }: { travel: ZoneTravel; onPick?: (zone: string) => void }): JSX.Element {
+function TravelBody({
+  travel,
+  onPick,
+  onOpenItem
+}: {
+  travel: ZoneTravel
+  onPick?: (zone: string) => void
+  onOpenItem?: OpenItem
+}): JSX.Element {
   const { rides, landings, ready } = travel
   // Until the port table has crossed from main, drawing "no ports" would be a claim about the
   // corpus rather than about the wait (law 1).
@@ -245,7 +300,7 @@ function TravelBody({ travel, onPick }: { travel: ZoneTravel; onPick?: (zone: st
         </Stack>
       ))}
       {shown.map((landing) => (
-        <LandingRow key={landing.zone} landing={landing} onPick={onPick} />
+        <LandingRow key={landing.zone} landing={landing} onPick={onPick} onOpenItem={onOpenItem} />
       ))}
       {ready && landings.length === 0 && (
         <Typography variant="caption" color="text.disabled">
@@ -314,11 +369,14 @@ function TravelHead({
 
 export default function MapTravelCard({
   travel,
-  onPick
+  onPick,
+  onOpenItem
 }: {
   travel: ZoneTravel
   /** open a zone's map by stem - the view's own `pick`; absent, the zone names are plain text */
   onPick?: (zone: string) => void
+  /** open an item's page - the app's `openLoot` deep link; absent, the item names are hover-only */
+  onOpenItem?: OpenItem
 }): JSX.Element | null {
   const { band, exits, landings } = travel
   const [open, setOpen] = useState(loadTravelOpen)
@@ -335,7 +393,7 @@ export default function MapTravelCard({
             saveTravelOpen(next)
           }}
         />
-        {open && <TravelBody travel={travel} onPick={onPick} />}
+        {open && <TravelBody travel={travel} onPick={onPick} onOpenItem={onOpenItem} />}
       </Stack>
     </Paper>
   )
