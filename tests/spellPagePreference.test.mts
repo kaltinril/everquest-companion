@@ -2,7 +2,7 @@
 // the spellbook "showing 2 of the same spell").
 //
 // `src/main/data/spellPagePreference.ts` carries the rule and its evidence; this suite pins the
-// six names the committed corpus contests, that the survivor is the page with the `(Autogranted)`
+// three names the committed corpus contests, that the survivor is the page with the `(Autogranted)`
 // note, and that the survivor's numbers are the ones the owner's client states (spells_us.txt,
 // 2026-09-12) — read here as literals so the suite needs no install.
 import test from 'node:test'
@@ -16,13 +16,16 @@ import spellsJson from '../src/main/data/spells.json' with { type: 'json' }
 const RAW = (spellsJson as SpellDbFile).spells
 const NOTE = /\(Autogranted\)/
 
-const CONTESTED = ['Anthem De Arms', 'Burst of Flame', 'Greater Healing', 'Healing', "O'Keils Radiation", 'Shock of Frost']
+/** Same name, one page noted, SAME three sentences: one spell on two pages. */
+const CONTESTED = ['Anthem De Arms', 'Burst of Flame', "O'Keils Radiation"]
+/** Same name, one page noted, DIFFERENT sentences: two spells sharing a title - both stay. */
+const TWO_SPELLS = ['Greater Healing', 'Healing', 'Shock of Frost']
 
-test('the committed corpus contests exactly these six names, each a classic page beside a Legends page', () => {
+test('the committed corpus contests exactly these three names, each a classic page beside a Legends page', () => {
   const { report } = applyLegendsPagePreference(RAW)
   assert.deepEqual([...report.names].sort(), CONTESTED)
-  assert.equal(report.dropped, 6, 'one classic row per name')
-  for (const n of CONTESTED) {
+  assert.equal(report.dropped, 3, 'one classic row per name')
+  for (const n of [...CONTESTED, ...TWO_SPELLS]) {
     const rows = RAW.filter((s) => s.name === n)
     assert.equal(rows.length, 2, `${n}: two pages in the scrape`)
     assert.equal(rows.filter((s) => NOTE.test(s.classes ?? '')).length, 1, `${n}: one of them autogranted`)
@@ -38,6 +41,18 @@ test('the effective DB holds one row per contested name, and it is the autogrant
   }
   loadSpellDb()
   assert.deepEqual(spellPagePreferenceReport()?.names.slice().sort(), CONTESTED)
+})
+
+test('HEALING WATER STAYS: a same-name pair with different sentences is two spells, and both survive', () => {
+  // test.11's regression (levelUnlocks.ts couldBeSameSpell), which the first cut of this pass
+  // repeated one day later. The druid's Healing Water is the wiki's second `Greater Healing`.
+  const effective = loadSpellDb().spells
+  for (const n of TWO_SPELLS) {
+    assert.equal(effective.filter((s) => s.name === n).length, 2, `${n}: both pages stay`)
+  }
+  const water = effective.find((s) => s.name === 'Greater Healing' && s.msgCastOnYou === 'Healing water flows over you.')
+  assert.ok(water, 'Healing water flows over you - the row a friend lost once already')
+  assert.equal(water.mana, 150)
 })
 
 test('THE SPELLBOOK draws one row per contested name: the unlock builder runs the same pass', () => {
@@ -59,23 +74,33 @@ test("the survivor's numbers are the client's, where the client has the row", ()
   // spells_us.txt (owner's install, 2026-09-12): Burst of Flame id 93 mana 4 cast 1500; Greater
   // Healing id 15 mana 115 cast 3000; Healing id 12 mana 65 cast 2500. The dropped pages said
   // 7 mana, 150 mana / 750 cast, and "* None" at 0 mana respectively.
-  const by = new Map(loadSpellDb().spells.map((s) => [s.name, s]))
+  const noted = (n: string): SpellEntry | undefined =>
+    loadSpellDb().spells.find((s) => s.name === n && NOTE.test(s.classes ?? ''))
   const fig = (s: SpellEntry | undefined): [number | undefined, number | undefined] => [s?.mana, s?.castTimeMs]
-  assert.deepEqual(fig(by.get('Burst of Flame')), [4, 1500])
-  assert.deepEqual(fig(by.get('Greater Healing')), [115, 3000])
-  assert.deepEqual(fig(by.get('Healing')), [65, 2500])
+  assert.deepEqual(fig(noted('Burst of Flame')), [4, 1500])
+  assert.deepEqual(fig(noted('Greater Healing')), [115, 3000])
+  assert.deepEqual(fig(noted('Healing')), [65, 2500])
 })
 
-test('a name whose rows all carry the note, or none of them, is untouched', () => {
+test('a name whose rows all carry the note, or none of them, or whose sentences differ, is untouched', () => {
   const rows: SpellEntry[] = [
     { name: 'Twin', classes: '* Wizard - Level 1 (Autogranted)' } as SpellEntry,
     { name: 'Twin', classes: '* Wizard - Level 9 (Autogranted)' } as SpellEntry,
     { name: 'Era', classes: '* Wizard - Level 1' } as SpellEntry,
     { name: 'Era', classes: '* Wizard - Level 4' } as SpellEntry,
     { name: 'Lone', classes: '* Wizard - Level 2' } as SpellEntry,
-    { name: 'Bare' } as SpellEntry
+    { name: 'Bare' } as SpellEntry,
+    { name: 'Shared', classes: '* Druid - Level 1 (Autogranted)', msgCastOnYou: 'You feel better.' } as SpellEntry,
+    { name: 'Shared', classes: '* Druid - Level 34', msgCastOnYou: 'Healing water flows over you.' } as SpellEntry
   ]
   const { spells, report } = applyLegendsPagePreference(rows)
-  assert.equal(spells.length, 6)
+  assert.equal(spells.length, 8)
   assert.deepEqual(report, { dropped: 0, names: [] })
+  // …and the same pair with the SAME sentence folds to the noted page.
+  const same = applyLegendsPagePreference([
+    { name: 'One', classes: '* Druid - Level 1 (Autogranted)', msgCastOnYou: 'You glow.' } as SpellEntry,
+    { name: 'One', classes: '* Druid - Level 4', msgCastOnYou: 'You glow.' } as SpellEntry
+  ])
+  assert.equal(same.spells.length, 1)
+  assert.deepEqual(same.report, { dropped: 1, names: ['One'] })
 })

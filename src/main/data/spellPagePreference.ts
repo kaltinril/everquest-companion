@@ -23,6 +23,17 @@
 //
 // A name whose rows ALL carry the note, or none of them, is untouched: rank and era siblings that
 // legitimately differ in their messages (`rowsFor` in spellCorrections.ts) stay as they are.
+//
+// AND THE MESSAGES DECIDE WHETHER TWO ROWS ARE ONE SPELL AT ALL - the guard levelUnlocks.ts learned
+// on 2026-09-10 (`couldBeSameSpell`: a friend's druid lost Healing Water, which the wiki files as a
+// second `Greater Healing`, Druid 34, whose message reads "Healing water flows over you"). The
+// first cut of this pass dropped that row again, one day after test.11 shipped its fix, because
+// "same name, one page noted" looked like the same rule. It is not: of the six contested names,
+// three pairs print identical sentences (Anthem De Arms, Burst of Flame, O'Keils Radiation) and are
+// one spell on two pages; three do not (Greater Healing, Healing, Shock of Frost) and are two
+// spells sharing a title. A classic row is dropped ONLY when a noted row of its name prints the
+// same three messages. The other three pairs stay as two rows, and Shock of Frost's answer is a
+// rename (its Legends page is Blast of Cold, by the owner's log), not a preference.
 import type { SpellEntry } from '../../shared/buffTypes'
 
 export interface PagePreferenceReport {
@@ -36,6 +47,11 @@ const AUTOGRANT_NOTE = '(Autogranted)'
 
 function isLegendsPage(s: SpellEntry): boolean {
   return (s.classes ?? '').includes(AUTOGRANT_NOTE)
+}
+
+/** The three sentences a page prints, as one comparable string. */
+function sentences(s: SpellEntry): string {
+  return JSON.stringify([s.msgCastOnYou ?? null, s.msgCastOnOther ?? null, s.msgWearsOff ?? null])
 }
 
 let lastReport: PagePreferenceReport | null = null
@@ -55,13 +71,19 @@ export function applyLegendsPagePreference(spells: readonly SpellEntry[]): {
   spells: SpellEntry[]
   report: PagePreferenceReport
 } {
-  const legends = new Set<string>()
-  const classic = new Set<string>()
-  for (const s of spells) (isLegendsPage(s) ? legends : classic).add(s.name)
-  const contested = new Set([...classic].filter((n) => legends.has(n)))
-  const out = spells.filter((s) => !contested.has(s.name) || isLegendsPage(s))
+  // name -> the sentence sets its noted pages print
+  const legends = new Map<string, Set<string>>()
+  for (const s of spells) {
+    if (!isLegendsPage(s)) continue
+    const set = legends.get(s.name) ?? new Set<string>()
+    set.add(sentences(s))
+    legends.set(s.name, set)
+  }
+  const dropped = (s: SpellEntry): boolean =>
+    !isLegendsPage(s) && (legends.get(s.name)?.has(sentences(s)) ?? false)
+  const out = spells.filter((s) => !dropped(s))
   const names: string[] = []
-  for (const s of spells) if (contested.has(s.name) && !names.includes(s.name)) names.push(s.name)
+  for (const s of spells) if (dropped(s) && !names.includes(s.name)) names.push(s.name)
   lastReport = { dropped: spells.length - out.length, names }
   return { spells: out, report: lastReport }
 }
