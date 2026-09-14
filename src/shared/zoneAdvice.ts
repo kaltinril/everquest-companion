@@ -36,7 +36,29 @@
 // nothing about how fast you kill, what you survive with a given group, or how far the zone is.
 // `n` rides on every row for the same reason it rides on the band: a zone the catalog knows through
 // four mobs is a weaker claim than one it knows through forty, and hiding that overstates the list.
+//
+// ── THREE ZONES THAT ARE NEVER ADVICE, WHATEVER THE BAND SAYS (owner, 2026-09-14) ────────────
+//
+// The first cut ranked by the band alone, and the owner's screenshot at level 44 led with Siren's
+// Grotto, Velketor's and Chardok, listed Neriak Commons and the Felwithes as hunting grounds, and
+// offered the Plane of Fear to a character the game would not let in. Each is a fact the zone
+// table holds (`shared/zones.ts`) and the band cannot express:
+//
+//   NOT IN THIS ERA. *"some of these recommendations are not in the current era"*. The catalog
+//   documents Kunark and Velious wholesale; `zoneInEra` is the one rule that says what EQ Legends
+//   has, and the same "Current era" switch the Closest-port card wears lifts it here. A zone the
+//   table places but gives NO era (New Sebilis Expedition, EQL-new) is kept - it is in the game,
+//   and calling it out of era would be a lie - and so is a spelling the table cannot place at
+//   all: unknown reads as unknown, never as out of era (`zones.ts`, the `ZoneEra` rule).
+//
+//   A CITY. *"make sure it exits cities, we don't want to kill npcs like that"*. A home city has
+//   a band because the catalog documents its guards; farming them is not a plan, on any goal.
+//
+//   LOCKED BELOW YOUR LEVEL. *"plane of fear is locked to level 45"*. A door that will not open is
+//   not deadly, it is absent - so this holds for the wish list too, the one goal that keeps deadly.
 
+import { zoneEntryFromCatalog } from './zones'
+import { zoneInEra } from './zoneTravel'
 import { zoneFit, type ZoneFit, type ZoneLevelBand } from './zoneLevels'
 
 /** Why you are asking. */
@@ -80,6 +102,8 @@ export interface RankOptions {
   fits?: ReadonlySet<ZoneFit>
   /** a zone-name search, folded case-insensitively; absent or blank means everything */
   search?: string
+  /** keep only zones EQ Legends has now - ON unless the caller lifts it, the Closest-port rule */
+  eraOnly?: boolean
 }
 
 /** Best first for experience: even, then a reach, then green. `deadly` is never experience advice. */
@@ -93,6 +117,19 @@ function admits(goal: ZoneGoal, fit: ZoneFit, wished: number): boolean {
   if (goal === 'wish') return wished > 0
   if (goal === 'motes') return fit === 'even' || fit === 'hard'
   return fit !== 'deadly'
+}
+
+/**
+ * Can this zone be walked into and hunted at all - the three refusals in the header. Reads the
+ * zone table through the catalog's own spelling, because the bands are keyed by it; a spelling
+ * the table does not hold is unknown, and unknown is kept.
+ */
+function huntable(zone: string, level: number, eraOnly: boolean): boolean {
+  const entry = zoneEntryFromCatalog(zone)
+  if (entry === null) return true
+  if (entry.city === true) return false
+  if (entry.minLevel !== undefined && level < entry.minLevel) return false
+  return !eraOnly || entry.era === undefined || zoneInEra(entry)
 }
 
 /** The caller's narrowing - evidence floor, search, fit filter - on top of what the goal admits. */
@@ -137,8 +174,10 @@ export function rankZones(
   opts: RankOptions = {}
 ): ZoneAdvice[] {
   const goal = opts.goal ?? 'exp'
+  const eraOnly = opts.eraOnly ?? true
   const out: ZoneAdvice[] = []
   for (const [zone, band] of bands) {
+    if (!huntable(zone, level, eraOnly)) continue
     const fit = zoneFit(band, level)
     const wished = opts.wished?.get(zone) ?? 0
     if (!admits(goal, fit, wished) || !keeps(zone, band, fit, opts)) continue

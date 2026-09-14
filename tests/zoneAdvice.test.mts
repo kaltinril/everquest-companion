@@ -56,11 +56,12 @@ test('motes: the reach leads and green is gone - 3.1 per hundred is not a mote p
 })
 
 test('wish list: ranked by distinct wished drops, and the one goal that keeps a deadly zone', () => {
-  const bands = new Map([['Plane of Fear', FEAR], ['Befallen', BEFALLEN], ['Nowhere', band(19, 23)]])
-  const wished = new Map([['Plane of Fear', 3], ['Befallen', 1]])
+  // Nagafen's Lair rather than Fear: Fear is LOCKED below 45 (below), and a locked door is not deadly.
+  const bands = new Map([["Nagafen's Lair", FEAR], ['Befallen', BEFALLEN], ['Nowhere', band(19, 23)]])
+  const wished = new Map([["Nagafen's Lair", 3], ['Befallen', 1]])
   const ranked = rankZones(bands, 20, { goal: 'wish', wished })
-  // Most wished items first, even though Fear is deadly at 20: the item is where it is.
-  assert.deepEqual(ranked.map((r) => r.zone), ['Plane of Fear', 'Befallen'])
+  // Most wished items first, even though Sol B is deadly at 20: the item is where it is.
+  assert.deepEqual(ranked.map((r) => r.zone), ["Nagafen's Lair", 'Befallen'])
   assert.equal(ranked[0].fit, 'deadly', 'and the chip still says what the trip costs')
   assert.equal(ranked[0].wished, 3)
   // A zone with nothing you want is not on this list, however well it fits.
@@ -86,7 +87,8 @@ test('your own level caps the grade you can bank', () => {
   assert.equal(moteGradeCap(60), 10, 'and never past the ceiling')
 })
 
-test('the committed bestiary yields real advice for a real level, for both con goals', () => {
+/** The committed bestiary's bands, keyed by the catalog's own zone spellings - what the app ranks. */
+function realBands(): Map<string, ZoneLevelBand> {
   const levels = new Map<string, number[]>()
   for (const mob of mobsJson.mobs) {
     const level = Number.parseInt(String(mob.level), 10)
@@ -102,6 +104,11 @@ test('the committed bestiary yields real advice for a real level, for both con g
     const made = zoneLevelBand(ls)
     if (made !== null) bands.set(zone, made)
   }
+  return bands
+}
+
+test('the committed bestiary yields real advice for a real level, for both con goals', () => {
+  const bands = realBands()
   for (const goal of ['exp', 'motes'] as const) {
     const ranked = rankZones(bands, 20, { goal, min: 8 })
     assert.ok(ranked.length >= 5, `${goal}: expected real advice, got ${String(ranked.length)} zones`)
@@ -109,6 +116,53 @@ test('the committed bestiary yields real advice for a real level, for both con g
     // A level 20's best zones are not level 50 zones.
     assert.ok(ranked[0].band.typical[0] <= 25, `${goal}: led with ${ranked[0].zone} ${String(ranked[0].band.typical)}`)
   }
+})
+
+// ---- never advice, whatever the band says (owner, 2026-09-14) ---------------------------------
+//
+// The level-44 screenshot: Siren's Grotto, Velketor's and Chardok led ("not in the current era"),
+// Neriak Commons and the Felwithes were listed as hunting grounds ("we don't want to kill npcs like
+// that"), and the Plane of Fear was offered to a character the door would not open for ("locked
+// to level 45"). All three answers live in `shared/zones.ts`; the ranker reads them, band or no band.
+
+test('era: a zone EQ Legends does not have yet is not advice - unless the era switch is lifted', () => {
+  // Real catalog spellings, invented bands: the rule under test is the table's, not the bestiary's.
+  const bands = new Map([['Old Sebilis', band(46, 56)], ['The Hole', band(40, 55)], ['New Sebilis Expedition', band(43, 50)]])
+  const kept = rankZones(bands, 44, { goal: 'motes' }).map((r) => r.zone)
+  assert.ok(!kept.includes('Old Sebilis'), 'Kunark is not open')
+  assert.ok(kept.includes('The Hole'), 'classic is')
+  assert.ok(kept.includes('New Sebilis Expedition'), 'EQL-new content claims no era, and it is in the game')
+  assert.ok(rankZones(bands, 44, { goal: 'motes', eraOnly: false }).some((r) => r.zone === 'Old Sebilis'), 'lifted: the pack`s whole world')
+  // A spelling the table cannot place is unknown, and unknown is kept - never read as out of era.
+  assert.equal(rankZones(new Map([['nowhere-known', band(42, 48)]]), 44).length, 1)
+})
+
+test('a home city is never advice, on any goal, however well its guards con', () => {
+  const bands = new Map([['Neriak Commons', band(40, 61)], ['Southern Felwithe', band(40, 60)], ['The Hole', band(40, 55)]])
+  for (const goal of ['exp', 'motes'] as const) {
+    assert.deepEqual(rankZones(bands, 44, { goal }).map((r) => r.zone), ['The Hole'], goal)
+  }
+  const wished = new Map([['Neriak Commons', 5], ['The Hole', 1]])
+  assert.deepEqual(rankZones(bands, 44, { goal: 'wish', wished }).map((r) => r.zone), ['The Hole'], 'not even for the wish list')
+})
+
+test('a zone locked below your level is absent, not deadly - the wish list included', () => {
+  const bands = new Map([['Plane of Fear', FEAR]])
+  const wished = new Map([['Plane of Fear', 3]])
+  assert.deepEqual(rankZones(bands, 44, { goal: 'wish', wished }), [], 'the door does not open at 44')
+  assert.equal(rankZones(bands, 45, { goal: 'motes' }).length, 1, 'and it does at 45')
+  assert.equal(rankZones(bands, 45, { goal: 'motes' })[0].fit, 'hard')
+})
+
+test('the committed bestiary at 44, for motes: The Hole is on the list, no city and nothing out of era is', () => {
+  const ranked = rankZones(realBands(), 44, { goal: 'motes', min: 8 })
+  const zones = ranked.map((r) => r.zone)
+  assert.ok(zones.includes('The Hole'), zones.join(', '))
+  for (const gone of ["Siren's Grotto", "Velketor's Labyrinth", 'Chardok', 'Old Sebilis', 'Icewell Keep', 'Neriak Commons', 'Southern Felwithe', 'Northern Felwithe', 'South Kaladim']) {
+    assert.ok(!zones.includes(gone), `${gone} listed`)
+  }
+  assert.ok(!zones.includes('Plane of Fear'), 'locked at 44')
+  assert.ok(rankZones(realBands(), 45, { goal: 'motes', min: 8 }).some((r) => r.zone === 'Plane of Fear'), 'open at 45')
 })
 
 // ---- search, fit filter, column sort (owner, 2026-09-12: "need filters/search/sort") -----------
