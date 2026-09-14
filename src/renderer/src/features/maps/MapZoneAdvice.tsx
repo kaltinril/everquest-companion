@@ -28,7 +28,11 @@
 import { useMemo, useRef, useState, type JSX } from 'react'
 import { Paper, Typography } from '@mui/material'
 import { nextAdviceSort, rankZones, sortAdvice, type AdviceSort, type ZoneGoal } from '@shared/zoneAdvice'
+import type { ProgressionSnap } from '@shared/types'
+import { useModule } from '../../lib/useModule'
 import { useWindowedRows } from '../../lib/useWindowedRows'
+import { EMPTY_PROGRESSION } from '../leveling/progressionDelta'
+import { useStatedLevel } from '../leveling/useStatedLevel'
 import { useWishlist } from '../wishlist/useWishlist'
 import MapZoneAdviceBar, { DEFAULT_QUERY, type AdviceQuery } from './MapZoneAdviceBar'
 import MapZoneAdviceTable, { ROW_HEIGHT } from './MapZoneAdviceTable'
@@ -60,9 +64,20 @@ function emptyText(goal: ZoneGoal, level: number, haveWishes: boolean, narrowed:
 export default function MapZoneAdvice({ onPick }: { onPick?: (zone: string) => void }): JSX.Element {
   // The era switch is the Closest-port card's, read from and written to the same stored key, so
   // the two surfaces of the Maps tab cannot disagree about what EQ Legends has.
-  const [query, setQueryState] = useState<AdviceQuery>(() => ({ ...DEFAULT_QUERY, eraOnly: loadTravelEra() }))
+  const [stored, setQueryState] = useState<AdviceQuery>(() => ({ ...DEFAULT_QUERY, eraOnly: loadTravelEra() }))
+  // THE LEVEL STARTS AS YOURS (owner, 2026-09-14: *"why does it not default the LEVEL to my
+  // current character's level"*) - the stated level the Leveling tab and the identity chip read,
+  // so it follows a ding - and becomes the typed one the moment a different number is typed. The
+  // field stays a field: planning for an alt or a friend is still one edit away, and the first cut
+  // that started at 20 for that reason made everyone pay for it. `typed` is what tells the two
+  // apart, because a goal or filter change also passes through `onChange` and must not freeze the
+  // level at whatever it showed.
+  const [typed, setTyped] = useState(false)
+  const stated = useStatedLevel(useModule<ProgressionSnap>('progression') ?? EMPTY_PROGRESSION).level
+  const query: AdviceQuery = typed || stated === null ? stored : { ...stored, level: String(stated) }
   const setQuery = (next: AdviceQuery): void => {
     if (next.eraOnly !== query.eraOnly) saveTravelEra(next.eraOnly)
+    if (next.level !== query.level) setTyped(true)
     setQueryState(next)
   }
   // null = the goal's own order, which is the honest default and lights no column.
