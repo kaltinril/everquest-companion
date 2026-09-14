@@ -37,7 +37,7 @@ import { ItemDbSources } from './ItemDbSources'
 import { DroppedByColumn, type LootTally } from './ItemDroppedBy'
 import { ItemZoneTable } from './ItemZoneTable'
 import { isWearable, itemWindowBlock, simulatedUpgrade, upgradeSeed } from './itemUpgradeSim'
-import { KnowledgeSection } from './KnowledgeSection'
+import { KnowledgeSection, type KnowledgeLinks } from './KnowledgeSection'
 import { useItemZoneRates, type ItemZoneRates } from './useItemZoneRates'
 
 /**
@@ -269,7 +269,8 @@ function ObservedColumn({
   zoneRates,
   owned,
   onOpenMob,
-  onOpenMapZone
+  onOpenMapZone,
+  links
 }: {
   events: LootEvent[]
   agg: LootBreakdown
@@ -279,6 +280,8 @@ function ObservedColumn({
   owned?: number
   onOpenMob?: (t: MobTarget) => void
   onOpenMapZone?: (zone: ZoneShort) => void
+  /** the "What it's for" card's routes out: a Sky quest's page, a reward's page */
+  links: KnowledgeLinks
 }): JSX.Element {
   return (
     <Box sx={{ flex: 1, minWidth: 0, width: '100%' }}>
@@ -298,7 +301,7 @@ function ObservedColumn({
       </Stack>
 
       {/* "What it's for" (Task #53) — quest knowledge. Local posky + cached wiki. */}
-      <KnowledgeSection data={knowledge.data} loading={knowledge.loading} />
+      <KnowledgeSection data={knowledge.data} loading={knowledge.loading} {...links} />
 
       {/* WHO drops it beside WHERE — and the where half is a RATE now (JOS-78), because a zone's
           count alone cannot tell eleven-in-an-evening from eleven-over-a-fortnight. */}
@@ -366,8 +369,10 @@ export function ItemDetailContent({
   slice,
   owned,
   onOpenMob,
-  onOpenMapZone
-}: Omit<ItemDetailProps, 'isQuestItem'> & {
+  onOpenMapZone,
+  onOpenQuest,
+  onOpenItem
+}: Omit<ItemDetailProps, 'isQuestItem'> & KnowledgeLinks & {
   active: boolean
   /** the source and dropped-by mobs' door to their pages (App's `openMob`); absent, plain text */
   onOpenMob?: (t: MobTarget) => void
@@ -403,6 +408,7 @@ export function ItemDetailContent({
         owned={owned}
         onOpenMob={onOpenMob}
         onOpenMapZone={onOpenMapZone}
+        links={{ onOpenQuest, onOpenItem }}
       />
     </Stack>
   )

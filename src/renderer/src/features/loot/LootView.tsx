@@ -112,15 +112,19 @@ export interface LootViewProps {
    *  returns to whatever tab deep-linked here (the Planner, the Overview, a Sky quest); absent or
    *  empty ⇒ it means the ledger, exactly as it always did. */
   nav?: NavBack
-  /** The drill-down's routes out (ItemDetailContent): a source mob's page, a zone's map. */
+  /** The drill-down's routes out (ItemDetailContent): a source mob's page, a zone's map, and a
+   *  Sky quest's page on the Plane of Sky tab (App's `openQuest`). */
   onOpenMob?: (t: MobTarget) => void
   onOpenMapZone?: (zone: ZoneShort) => void
+  onOpenQuest?: (key: string) => void
 }
 
-/** Which item the pane has taken over for, and the two ways in and out of it. */
+/** Which item the pane has taken over for, and the ways in and out of it. */
 interface LootDetail {
   selected: string | null
   open: (item: string) => void
+  /** ITEM → ITEM, in place: a reward named on one page opens its own page. See `useLootDetail`. */
+  hop: (item: string) => void
   close: () => void
 }
 
@@ -168,6 +172,10 @@ function useLootDetail(
       props.nav?.clear()
       setSelected(item)
     },
+    // A hop parks nothing and saves nothing, by the spell drilldown's rule (appRouting.ts): you
+    // did not travel, so the trail behind you — the parked origin and the ledger's scroll — is
+    // still the trail behind you, and ONE Back leaves the whole excursion.
+    hop: (item) => setSelected(item),
     close: () => setSelected(null)
   }
 }
@@ -187,6 +195,7 @@ interface TakeoverProps {
   invByKey: Map<string, InventoryRow>
   onOpenMob?: (t: MobTarget) => void
   onOpenMapZone?: (zone: ZoneShort) => void
+  onOpenQuest?: (key: string) => void
 }
 
 function LootDetailTakeover(p: TakeoverProps): JSX.Element {
@@ -230,6 +239,8 @@ function LootDetailTakeover(p: TakeoverProps): JSX.Element {
       origin={nav?.origin?.label ?? null}
       onOpenMob={p.onOpenMob}
       onOpenMapZone={p.onOpenMapZone}
+      onOpenQuest={p.onOpenQuest}
+      onOpenItem={detail.hop}
     />
   )
 }
@@ -377,7 +388,7 @@ export default function LootView(props: LootViewProps = {}): JSX.Element {
   const selected = detail.selected
   if (selected !== null) {
     const p = { item: selected, events: sliced, slice, detail, nav: props.nav, invByKey }
-    return <LootDetailTakeover {...p} onOpenMob={props.onOpenMob} onOpenMapZone={props.onOpenMapZone} />
+    return <LootDetailTakeover {...p} onOpenMob={props.onOpenMob} onOpenMapZone={props.onOpenMapZone} onOpenQuest={props.onOpenQuest} />
   }
 
   const served = { client: engineClient, source, setSource, knowledgeByKey, onSelect: detail.open }
