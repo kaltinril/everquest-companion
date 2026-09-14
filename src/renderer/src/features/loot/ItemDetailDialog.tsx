@@ -24,6 +24,9 @@ import { formatDate } from '../../lib/formatDate'
 import { sourceItemKey } from '../../lib/itemSources'
 import { EQ_ITEM_COLORS } from '../../lib/ItemWindow'
 import { ObservedItemWindow } from '../../lib/ObservedItemWindow'
+// THE ONE UPGRADE CONTROL: the Gear toolbar's slider, mounted under the item card (fork decision,
+// kaltinril 2026-09-13) — same two sliders, same label, same calculator behind the numbers.
+import UpgradeSlider from '../gear/UpgradeSlider'
 import type { MobTarget } from '../mobs/mobTarget'
 // THE ONE WISH CONTROL (JOS-343/346) and the ONE gear-wish builder (wishSearch.ts) — the drill-down
 // writes the same bytes the Gear table's row control writes, through the same shared document.
@@ -33,6 +36,7 @@ import { wishFromGear } from '../wishlist/wishSearch'
 import { ItemDbSources } from './ItemDbSources'
 import { DroppedByColumn, type LootTally } from './ItemDroppedBy'
 import { ItemZoneTable } from './ItemZoneTable'
+import { isWearable, itemWindowBlock, simulatedUpgrade, upgradeSeed } from './itemUpgradeSim'
 import { KnowledgeSection } from './KnowledgeSection'
 import { useItemZoneRates, type ItemZoneRates } from './useItemZoneRates'
 
@@ -202,7 +206,14 @@ function ItemWishRow({ item }: { item: string }): JSX.Element | null {
 
 /* The item as the GAME shows it: wiki base data, drawn in the item-window language.
    `stats` (posky's scraped block) is the offline fallback when the wiki lookup hasn't
-   structured one yet. */
+   structured one yet.
+
+   AND AT ANY PLUS-STATE, for a WEARABLE item (fork decision, kaltinril 2026-09-13): the Gear
+   toolbar's simulate-upgrade slider sits under the card, and the window draws the item at the
+   state it reads. The slider opens where the name says the item IS (`upgradeSeed`), and while it
+   stands there the window is handed nothing — it reads exactly as it always has, name tier or
+   merge history — so a simulation is only ever on screen once the reader has asked for one
+   (`simulatedUpgrade`). State is per item, not remembered: the column is keyed by `item`. */
 function ItemWindowColumn({
   item,
   stats,
@@ -212,15 +223,26 @@ function ItemWindowColumn({
   stats?: string
   knowledge: ItemKnowledgeState
 }): JSX.Element {
+  const block = useMemo(
+    () => itemWindowBlock(knowledge.data?.stats, stats ?? knowledge.data?.statsBlock),
+    [knowledge.data, stats]
+  )
+  const seed = upgradeSeed(item)
+  const [upgrade, setUpgrade] = useState(seed)
   return (
     <Box sx={{ width: { xs: '100%', md: 340 }, flexShrink: 0 }}>
       <ObservedItemWindow
         name={item}
-        stats={knowledge.data?.stats}
-        rawStats={stats ?? knowledge.data?.statsBlock}
+        stats={block}
         iconId={knowledge.data?.iconId}
         flavor={knowledge.data?.summary}
+        upgrade={simulatedUpgrade(upgrade, seed)}
       />
+      {isWearable(block) && (
+        <Box sx={{ mt: 1 }} data-testid="item-detail-upgrade">
+          <UpgradeSlider state={upgrade} onChange={setUpgrade} testId="item" wrap />
+        </Box>
+      )}
       <ItemWishRow item={item} />
       {knowledge.loading && !knowledge.data && (
         <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 1, color: 'text.secondary' }}>
@@ -371,7 +393,7 @@ export function ItemDetailContent({
   const zoneRates = useItemZoneRates(looted, slice)
   return (
     <Stack direction={{ xs: 'column', md: 'row' }} spacing={2.5} alignItems="flex-start">
-      <ItemWindowColumn item={item} stats={stats} knowledge={knowledge} />
+      <ItemWindowColumn key={item} item={item} stats={stats} knowledge={knowledge} />
       <ObservedColumn
         events={looted}
         agg={agg}

@@ -9,7 +9,9 @@
 // exists. Unknown is not empty — an item whose exaltation sockets we've never read shows
 // NO socket rows at all, and the tier meter appears only for a name that actually
 // carries its item level (` +N`). Within-tier item exp is unobservable (no log line
-// reports it), so the meter shows tier position, never a fabricated exp fill.
+// reports it), so the meter shows tier position, never a fabricated exp fill. The one
+// exception is `upgrade`, a state the READER chose (the Loot drill-down's slider): every
+// number is then the wiki calculator's (itemUpgrade.ts) and the meter says `simulated`.
 
 import { type JSX, useMemo } from 'react'
 import { Box, Chip, Stack, Typography } from '@mui/material'
@@ -25,6 +27,7 @@ import {
   ITEM_MAX_TIER,
   type ItemStatBlock
 } from '@shared/itemStats'
+import { percentLabel, scaleStatBlock, type ItemUpgradeState } from '@shared/itemUpgrade'
 import { Tooltip } from './Tooltip'
 
 /** Item-window palette. All foregrounds ≥ 7:1 on `bg` (AA at any size, AAA for body). */
@@ -108,18 +111,22 @@ function Line({ children, color, compact }: { children: React.ReactNode; color?:
  * tier position out of the max tier — the game's own "x / y" within-tier exp is not
  * observable anywhere in the log, so it is never drawn.
  *
- * `observed` flips the header to say WHOSE tier this is: the name in front of you didn't
- * state a level, so the number comes from your own merge history (state, not process — a
- * chip-style tag, no methodology caption).
+ * `note` says WHOSE tier this is when it is not the name's: `yours` — the name in front of
+ * you didn't state a level, so the number comes from your own merge history — or
+ * `simulated`, the slider's state (state, not process — a chip-style tag, no methodology
+ * caption). `bonus` overrides the whole-tier headline when the state is finer than a tier
+ * (`+27.5% stats` at tier 2 + 3/4).
  */
 function TierBlock({
   tier,
   compact,
-  observed
+  note,
+  bonus
 }: {
   tier: number
   compact?: boolean
-  observed?: boolean
+  note?: string
+  bonus?: string
 }): JSX.Element {
   const next = expToNextTier(tier)
   const sockets = unlockedExaltationSlots(tier)
@@ -131,11 +138,11 @@ function TierBlock({
           <Typography component="span" sx={{ color: EQ_ITEM_COLORS.label, fontSize: 'inherit', fontFamily: MONO }}>
             {' '}
             / {ITEM_MAX_TIER}
-            {observed ? ' · yours' : ''}
+            {note ? ` · ${note}` : ''}
           </Typography>
         </Typography>
         <Typography sx={{ color: EQ_ITEM_COLORS.label, fontSize: compact ? 10 : 11, fontFamily: MONO }}>
-          +{tierBonusPct(tier)}% stats
+          {bonus ?? `+${tierBonusPct(tier)}% stats`}
         </Typography>
       </Stack>
       <Box sx={{ height: 5, bgcolor: 'rgba(255,255,255,0.10)', borderRadius: 1, mt: 0.4 }}>
@@ -180,6 +187,22 @@ function TierBlock({
 /** Stat keys that describe an effect's timing rather than the item's own numbers. */
 const TIMING_KEYS = new Set(['CAST TIME', 'COOLDOWN', 'RECAST', 'CHARGES'])
 
+/**
+ * What the tier meter draws, or nothing (no `tier`) when no one has stated a level.
+ * A simulated state wins outright: the reader chose it. Otherwise the displayed NAME wins when
+ * it states a level — that is this exact instance's tier, what the game itself would print. The
+ * observed tier is the fallback for a base name ("what have I got this item to?"), tagged `yours`.
+ */
+function tierReading(
+  upgrade?: ItemUpgradeState,
+  nameTier?: number,
+  observedTier?: number
+): { tier?: number; note?: string; bonus?: string } {
+  if (upgrade) return { tier: upgrade.full, note: 'simulated', bonus: `${percentLabel(upgrade)} stats` }
+  if (nameTier !== undefined) return { tier: nameTier }
+  return observedTier === undefined ? {} : { tier: observedTier, note: 'yours' }
+}
+
 export interface ItemWindowProps {
   /** display name exactly as observed (keeps its ` +N` item level) */
   name: string
@@ -200,6 +223,13 @@ export interface ItemWindowProps {
    * stays blank: unknown is not tier 0 (law 1).
    */
   observedTier?: number
+  /**
+   * Draw the item AT this plus-state (the Loot drill-down's simulate-upgrade slider, the Gear
+   * toolbar's own control). Every stat goes through `scaleStatBlock` — nothing here re-derives
+   * a number — and the meter reads this state as `simulated`, over whatever the name or the
+   * merge history said: the reader chose it. Absent, the window reads as it always has.
+   */
+  upgrade?: ItemUpgradeState
 }
 
 /** The window shell: the game's frame, or nothing at all on a compact hover surface. */
@@ -427,15 +457,14 @@ export function ItemWindow({
   iconId,
   flavor,
   compact,
-  observedTier
+  observedTier,
+  upgrade
 }: ItemWindowProps): JSX.Element {
-  const block = useMemo(() => stats ?? (rawStats ? parseStatsBlock(rawStats) : undefined), [stats, rawStats])
-  // The displayed NAME wins when it states a level: that is this exact instance's tier, and
-  // it is what the game itself would print. Our observed tier is the fallback for a base
-  // name — it answers "what have I got this item to?" where the wiki has nothing to say.
-  const nameTier = itemTierFromName(name)
-  const tier = nameTier ?? observedTier
-  const tierIsObserved = nameTier === undefined && observedTier !== undefined
+  const block = useMemo(() => {
+    const base = stats ?? (rawStats ? parseStatsBlock(rawStats) : undefined)
+    return base && upgrade ? scaleStatBlock(base, upgrade) : base
+  }, [stats, rawStats, upgrade])
+  const meter = tierReading(upgrade, itemTierFromName(name), observedTier)
 
   // Cast/cooldown belong to the click effect, not the attribute grid (Boots of the Long
   // Road prints them right under its `Click Effect:` line).
@@ -451,7 +480,7 @@ export function ItemWindow({
       <IdentityLines block={block} compact={compact} />
 
       {/* Item level — only when the name carries it, or we watched this character merge it */}
-      {tier !== undefined && <TierBlock tier={tier} compact={compact} observed={tierIsObserved} />}
+      {meter.tier !== undefined && <TierBlock tier={meter.tier} compact={compact} note={meter.note} bonus={meter.bonus} />}
 
       <StatGrid block={block} compact={compact} />
       <StatPairs rows={attrs} compact={compact} />
