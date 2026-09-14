@@ -32,6 +32,7 @@ import { useWindowedRows } from '../../lib/useWindowedRows'
 import { useWishlist } from '../wishlist/useWishlist'
 import MapZoneAdviceBar, { DEFAULT_QUERY, type AdviceQuery } from './MapZoneAdviceBar'
 import MapZoneAdviceTable, { ROW_HEIGHT } from './MapZoneAdviceTable'
+import { loadTravelEra, saveTravelEra } from './useMapData'
 import { wishedByZone, zoneBands } from './zoneBands'
 import { GOALS } from './zoneAdviceUi'
 
@@ -57,7 +58,13 @@ function emptyText(goal: ZoneGoal, level: number, haveWishes: boolean, narrowed:
 }
 
 export default function MapZoneAdvice({ onPick }: { onPick?: (zone: string) => void }): JSX.Element {
-  const [query, setQuery] = useState<AdviceQuery>(DEFAULT_QUERY)
+  // The era switch is the Closest-port card's, read from and written to the same stored key, so
+  // the two surfaces of the Maps tab cannot disagree about what EQ Legends has.
+  const [query, setQueryState] = useState<AdviceQuery>(() => ({ ...DEFAULT_QUERY, eraOnly: loadTravelEra() }))
+  const setQuery = (next: AdviceQuery): void => {
+    if (next.eraOnly !== query.eraOnly) saveTravelEra(next.eraOnly)
+    setQueryState(next)
+  }
   // null = the goal's own order, which is the honest default and lights no column.
   const [sort, setSort] = useState<AdviceSort | null>(null)
   const level = Number.parseInt(query.level, 10)
@@ -77,10 +84,11 @@ export default function MapZoneAdvice({ onPick }: { onPick?: (zone: string) => v
       min: MIN_EVIDENCE,
       wished,
       fits: query.fits,
-      search: query.search
+      search: query.search,
+      eraOnly: query.eraOnly
     })
     return sort === null ? ranked : sortAdvice(ranked, sort)
-  }, [level, query.goal, query.fits, query.search, wished, sort])
+  }, [level, query.goal, query.fits, query.search, query.eraOnly, wished, sort])
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const win = useWindowedRows({ count: rows.length, rowHeight: ROW_HEIGHT, scrollRef })

@@ -16,7 +16,7 @@
 // someone ELSE - the level you will be next week, the friend you are about to group with, the alt.
 
 import type { JSX } from 'react'
-import { MenuItem, Stack, TextField, Typography } from '@mui/material'
+import { Chip, MenuItem, Stack, TextField, Typography } from '@mui/material'
 import ChipMultiSelect from '../../components/ChipMultiSelect'
 import { moteGradeCap, type ZoneGoal } from '@shared/zoneAdvice'
 import type { ZoneFit } from '@shared/zoneLevels'
@@ -30,9 +30,13 @@ export interface AdviceQuery {
   search: string
   /** the fits kept; empty means every fit the goal admits */
   fits: ReadonlySet<ZoneFit>
+  /** only zones EQ Legends has now - the Closest-port card's switch, shared (owner, 2026-09-14) */
+  eraOnly: boolean
 }
 
-export const DEFAULT_QUERY: AdviceQuery = { level: '20', goal: 'exp', search: '', fits: new Set() }
+export const DEFAULT_QUERY: AdviceQuery = { level: '20', goal: 'exp', search: '', fits: new Set(), eraOnly: true }
+
+const TINY = { height: 18, fontSize: 10, '& .MuiChip-label': { px: 0.6 } } as const
 
 /** The fit picker speaks in the words a row wears; these fold a picked word back to its fit. */
 const FIT_WORDS: readonly string[] = FIT_ORDER.map((f) => FIT[f].label)
@@ -104,6 +108,19 @@ export default function MapZoneAdviceBar({
         label="Fit"
         placeholder="all"
         minWidth={170}
+      />
+      {/* The Closest-port card's switch, same words and same stored key: lifting it here lifts it there. */}
+      <Chip
+        size="small"
+        label="Current era"
+        title={query.eraOnly ? 'Only zones EQ Legends has now are listed. Click to lift.' : 'Every zone the bestiary documents is listed, including ones not in the game yet. Click to limit.'}
+        data-testid="zone-advice-era"
+        color={query.eraOnly ? 'primary' : 'default'}
+        variant={query.eraOnly ? 'filled' : 'outlined'}
+        onClick={() => {
+          onChange({ ...query, eraOnly: !query.eraOnly })
+        }}
+        sx={TINY}
       />
       {Number.isFinite(level) && level > 0 && query.goal !== 'wish' && (
         <Typography variant="caption" color="text.disabled">
