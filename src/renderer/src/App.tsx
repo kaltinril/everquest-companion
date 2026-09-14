@@ -114,7 +114,7 @@ function PlainView({
           focusItem={routing.lootItem}
           focusNonce={routing.lootNonce}
           onFocusConsumed={routing.clearLootFocus}
-          nav={routing.nav} onOpenMob={routing.openMob} onOpenMapZone={routing.openMapZone}
+          nav={routing.nav} onOpenMob={routing.openMob} onOpenMapZone={routing.openMapZone} onOpenQuest={routing.openQuest}
         />
       )}
       {/* Maps remounts per character rebuild like the rest: the zone it auto-opens comes from
