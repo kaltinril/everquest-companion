@@ -11,9 +11,13 @@
 // the Exaltations bar's "Group by" - and the fit filter is the classes picker itself
 // (`ChipMultiSelect`), whose empty state says ALL out loud.
 //
-// THE LEVEL IS TYPED, NOT DETECTED, AND THAT IS THE POINT. The app can often infer a level, and this
-// control deliberately does not use it. Half the reason anybody opens this list is to plan for
-// someone ELSE - the level you will be next week, the friend you are about to group with, the alt.
+// THE LEVEL IS A FIELD, SEEDED WITH YOURS. The first cut typed it and started at 20, on the
+// argument that half the reason anybody opens this list is to plan for someone ELSE - the level
+// you will be next week, the friend, the alt. The owner's first question was why it was not his
+// level (2026-09-14). So the view seeds it with the stated level and the field stays editable:
+// planning for someone else is one edit away instead of everyone retyping their own number.
+// `DEFAULT_QUERY.level` is therefore EMPTY - "nothing stated yet", which the empty-table text
+// already explains - and the view, not this bar, is where the seed comes from.
 
 import type { JSX } from 'react'
 import { Chip, MenuItem, Stack, TextField, Typography } from '@mui/material'
@@ -34,7 +38,7 @@ export interface AdviceQuery {
   eraOnly: boolean
 }
 
-export const DEFAULT_QUERY: AdviceQuery = { level: '20', goal: 'exp', search: '', fits: new Set(), eraOnly: true }
+export const DEFAULT_QUERY: AdviceQuery = { level: '', goal: 'exp', search: '', fits: new Set(), eraOnly: true }
 
 const TINY = { height: 18, fontSize: 10, '& .MuiChip-label': { px: 0.6 } } as const
 
