@@ -21,6 +21,10 @@ spell-upgrades
 faction-tab
 sidebar-groups
 # third-party, vetted (ADOPTIONS.md)
+community/pr-16-setup-node
+community/pr-59-actions-cache
+community/pr-65-deploy-pages
+community/pr-70-npm-minor-patch
 # ours, never closes, always last
 test-neutering
 ```
@@ -66,6 +70,10 @@ commits. The vetting record is the PR's row in [ADOPTIONS.md](ADOPTIONS.md).
 
 | Branch | Upstream PR | What it does |
 |---|---|---|
+| `community/pr-16-setup-node` | [#16](https://github.com/jmoyers/everquest-companion/pull/16) | CI: `actions/setup-node` 4.4.0 to 7.0.0 in `build.yml` and `infra.yml`. The creator's hand-written `# v4 (v4.4.0)` comments are left stale by dependabot; the SHAs were checked against the tags. |
+| `community/pr-59-actions-cache` | [#59](https://github.com/jmoyers/everquest-companion/pull/59) | CI: `actions/cache` 4.3.0 to 6.1.0 in `build.yml`. Same stale comment. |
+| `community/pr-65-deploy-pages` | [#65](https://github.com/jmoyers/everquest-companion/pull/65) | CI: `actions/deploy-pages` 4.0.5 to 5.0.1 in `pages.yml`. Same stale comment. |
+| `community/pr-70-npm-minor-patch` | [#70](https://github.com/jmoyers/everquest-companion/pull/70) | Twelve of dependabot's fourteen minor and patch bumps: electron 43.2 to 43.7, electron-builder, esbuild, tsx, playwright-core, pg, the AWS SDK clients. Two commits on top pin `typescript-eslint` back to 8.65 and `onnxruntime-node` back to 1.20.1; the ADOPTIONS.md row says why. |
 
 ### Not in the recipe
 
