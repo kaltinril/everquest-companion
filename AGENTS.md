@@ -8,6 +8,9 @@ that proves load-bearing is reversible in one paste — and
 protocol: done carefully by the integrator, never delegated to a worker,
 never mechanical truncation, archive before cutting.
 
+**This clone is a fork.** `docs/community/RULES.md` governs branches, pull requests and
+trust here and wins over this file where they touch; `CLAUDE.md` at the root points there.
+
 ## What this is
 
 Electron (electron-vite) + TS + React + MUI desktop app that tails the
