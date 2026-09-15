@@ -7,7 +7,9 @@
 # merging every branch in the recipe in order, then prints a tree diff against main_community.
 # An empty diff means the recipe reproduces the current build. --replace deletes and recreates
 # the target (refuses if a worktree has it checked out). Conflicts stop the script; resolve in
-# the temporary worktree it names, commit, and re-run: rerere replays what it has seen before.
+# the worktree it names, commit, and re-run the same command: a target that is checked out in a
+# worktree is resumed there, and recipe branches already merged are skipped. rerere replays
+# every resolution it has seen before.
 #
 # See docs/community/RULES.md rule 3 and rule 9.
 set -euo pipefail
@@ -35,25 +37,32 @@ for b in "${recipe[@]}"; do
   git rev-parse --verify -q "refs/heads/$b" >/dev/null || { echo "recipe names a branch that does not exist locally: $b" >&2; exit 1; }
 done
 
+wt=
 if git rev-parse --verify -q "refs/heads/$target" >/dev/null; then
+  checked_out=$(git worktree list --porcelain | awk -v b="branch refs/heads/$target" '$0=="worktree "s{next} /^worktree /{w=substr($0,10)} $0==b{print w}')
   if [ $replace -eq 1 ]; then
-    if git worktree list --porcelain | grep -qx "branch refs/heads/$target"; then
-      echo "$target is checked out in a worktree; detach it first" >&2; exit 1
-    fi
+    [ -z "$checked_out" ] || { echo "$target is checked out in $checked_out; remove that worktree first" >&2; exit 1; }
     git branch -D "$target"
+  elif [ -n "$checked_out" ]; then
+    wt=$checked_out
+    echo "resuming $target in $wt"
   else
-    echo "$target exists; pass --replace to rebuild it" >&2; exit 1
+    echo "$target exists; pass --replace to rebuild it, or check it out in a worktree to resume" >&2; exit 1
   fi
 fi
 
-wt=$(mktemp -d "${TMPDIR:-/tmp}/eqc-rebuild.XXXXXX")
-rmdir "$wt"
-git worktree add -q -b "$target" "$wt" "$base"
-echo "building $target from $base in $wt"
+if [ -z "$wt" ]; then
+  wt=$(mktemp -d "${TMPDIR:-/tmp}/eqc-rebuild.XXXXXX")
+  rmdir "$wt"
+  git worktree add -q -b "$target" "$wt" "$base"
+  echo "building $target from $base in $wt"
+fi
 
 cd "$wt"
+[ -z "$(git diff --name-only --diff-filter=U)" ] || { echo "unresolved conflicts in $wt; resolve and commit first" >&2; exit 1; }
 git config rerere.enabled true
 for b in "${recipe[@]}"; do
+  if git merge-base --is-ancestor "$b" HEAD; then echo "== $b already merged"; continue; fi
   echo "== merge $b"
   if ! git merge --no-ff --no-edit -m "recipe: merge $b" "$b" >/dev/null 2>&1; then
     # rerere may have resolved everything it has seen before; only unresolved paths block.
@@ -61,7 +70,7 @@ for b in "${recipe[@]}"; do
       git commit -q --no-edit
       echo "   conflicts replayed by rerere"
     else
-      echo "CONFLICT merging $b. Resolve in $wt, commit, then re-run with --target $target." >&2
+      echo "CONFLICT merging $b. Resolve in $wt, commit, then re-run this command to resume." >&2
       echo "Unresolved:" >&2; git diff --name-only --diff-filter=U >&2
       exit 1
     fi
