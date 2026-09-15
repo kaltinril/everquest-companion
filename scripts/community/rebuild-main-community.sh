@@ -39,7 +39,7 @@ done
 
 wt=
 if git rev-parse --verify -q "refs/heads/$target" >/dev/null; then
-  checked_out=$(git worktree list --porcelain | awk -v b="branch refs/heads/$target" '$0=="worktree "s{next} /^worktree /{w=substr($0,10)} $0==b{print w}')
+  checked_out=$(git worktree list --porcelain | awk -v b="branch refs/heads/$target" '/^worktree /{w=substr($0,10)} $0==b{print w}')
   if [ $replace -eq 1 ]; then
     [ -z "$checked_out" ] || { echo "$target is checked out in $checked_out; remove that worktree first" >&2; exit 1; }
     git branch -D "$target"
