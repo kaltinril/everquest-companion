@@ -129,4 +129,4 @@ export const OWNER_TOOLS: boolean = DEV_TOOLS && ownerToolsGranted(ownerToolsBri
 // draws the UNRELEASED Factions tab — the whole point of test.8. The strip argument above stands
 // for real releases; a TEST install is the review audience, and `src/main/unreleased.ts` takes
 // the same forcing through `TEST_BUILD` so both halves of the gate agree.
-export const UNRELEASED: boolean = true
+export const UNRELEASED = true as boolean
