@@ -9,7 +9,7 @@
 # the target (refuses if a worktree has it checked out). Conflicts stop the script; resolve in
 # the worktree it names, commit, and re-run the same command: a target that is checked out in a
 # worktree is resumed there, and recipe branches already merged are skipped. rerere replays
-# every resolution it has seen before.
+# every resolution it has seen before, and *.tsbuildinfo conflicts always take the incoming side.
 #
 # See docs/community/RULES.md rule 3 and rule 9.
 set -euo pipefail
@@ -65,10 +65,15 @@ for b in "${recipe[@]}"; do
   if git merge-base --is-ancestor "$b" HEAD; then echo "== $b already merged"; continue; fi
   echo "== merge $b"
   if ! git merge --no-ff --no-edit -m "recipe: merge $b" "$b" >/dev/null 2>&1; then
-    # rerere may have resolved everything it has seen before; only unresolved paths block.
+    # Generated tsbuildinfo files are tracked upstream and conflict on nearly every merge; the
+    # incoming side is taken, typecheck regenerates them anyway. rerere replays everything else it
+    # has seen before. Only what is still unresolved after both blocks.
+    for f in $(git diff --name-only --diff-filter=U | grep -E '\.tsbuildinfo$' || true); do
+      git checkout --theirs -- "$f" && git add "$f"
+    done
     if [ -z "$(git diff --name-only --diff-filter=U)" ]; then
       git commit -q --no-edit
-      echo "   conflicts replayed by rerere"
+      echo "   conflicts resolved (rerere and/or tsbuildinfo)"
     else
       echo "CONFLICT merging $b. Resolve in $wt, commit, then re-run this command to resume." >&2
       echo "Unresolved:" >&2; git diff --name-only --diff-filter=U >&2
