@@ -93,9 +93,12 @@ creator's own repo and does not know the fork exists.
 13. **`src/shared/releaseNotes.ts` is his.** Our branches never edit it. On a `main` merge
     conflict there, take `main`'s version wholesale.
 
-14. **`AGENTS.md` is his.** The fork adds one pointer paragraph to it and nothing else, because
-    `tests/agentsDoc.test.mts` enforces a word ceiling he manages and every edit of ours is a
-    merge conflict waiting for his next distillation pass. Fork rules live here, not there.
+14. **`AGENTS.md` is his.** The fork adds one five-word pointer line to it and nothing else.
+    `tests/agentsDoc.test.mts` enforces a 20,000-word ceiling he manages and his `main` sits
+    within ten words of it (2026-09-15: 19,990 by the test's own count), so anything longer
+    turns the suite red on every build, and every edit of ours is a merge conflict waiting for
+    his next distillation pass. Fork rules live here, not there. `CLAUDE.md` at the root is the
+    hook that carries the full pointer.
 
 15. **The wiki is not ours to hammer.** No new network fetches ship in a PR without the owner's
     and the creator's sign-off. Data refreshes are an owner decision, run by hand, at the
