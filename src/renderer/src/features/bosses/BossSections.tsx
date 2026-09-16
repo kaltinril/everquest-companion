@@ -333,7 +333,9 @@ function TargetCard({
       }}
     >
       {chip.on && <TargetKilledBadge tier={tier} />}
-      {onToggleHidden && <HideTargetButton name={s.target.name} hidden={hidden} onToggle={onToggleHidden} />}
+      {onToggleHidden && (
+        <HideTargetButton name={s.target.name} hidden={hidden} artHeight={imgH} onToggle={onToggleHidden} />
+      )}
       <TargetCardMedia s={s} chip={chip} height={imgH} />
       <TargetCardCaption s={s} compact={compact} ladder={ladder} baseMark={baseMark} />
     </Paper>
