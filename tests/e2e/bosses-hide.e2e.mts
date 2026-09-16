@@ -38,7 +38,7 @@ import {
   settleGone
 } from './appHarness.mjs'
 import { mainWindow, makeUserData, removeUserData } from './appWindow.mjs'
-import { launchOnFixture, stageFixture } from './logFixture.mjs'
+import { launchOnFixture, stageFixture, type FixtureLog } from './logFixture.mjs'
 
 const NAV_OVERVIEW = '[data-testid="nav-overview"]'
 const NAV_BOSSES = '[data-testid="nav-bosses"]'
@@ -100,6 +100,32 @@ async function stepPeekAndRestore(page: Page, base: { cards: number; total: numb
   check('…and the tally is whole again', (await tallyTotal(page)) === base.total)
 }
 
+/**
+ * Launch 2, against the SAME userData: the hidden set must come back, the peek must not. Its own
+ * body, not a block inside `main`: with the try/finally around each launch counted, the second
+ * launch's assertions sat one level past the repo's `max-depth` ceiling.
+ */
+async function launchTwo(log: FixtureLog, userData: string, base: { cards: number; total: number }): Promise<void> {
+  console.log('launch 2: the SAME userData dir, a new process — the SET survives, the PEEK does not…')
+  const second = await launchOnFixture(log, { userData })
+  let restarted: Page | null = null
+  try {
+    restarted = await mainWindow(second.app)
+    await restarted.waitForSelector(NAV_OVERVIEW, { timeout: 60_000 })
+    if (check('the Bosses tab opens again', await openBosses(restarted))) {
+      const cards = await settle(() => countOf(restarted as Page, CARD), (n) => n === base.cards - 1, {
+        timeoutMs: 8_000
+      })
+      check('THE HIDE SURVIVED THE RESTART', cards === base.cards - 1, `${String(cards)} cards`)
+      check('…and the peek came back OFF: a hide is standing, a peek is a moment',
+        (await peekState(restarted)) === false)
+    }
+    if (failures.length) await dumpArtifacts(restarted, 'bosses-hide-restart-FAIL')
+  } finally {
+    await second.close()
+  }
+}
+
 async function main(): Promise<void> {
   await buildIfStale()
   const userData = makeUserData()
@@ -130,26 +156,7 @@ async function main(): Promise<void> {
       await first.close()
     }
 
-    if (base) {
-      console.log('launch 2: the SAME userData dir, a new process — the SET survives, the PEEK does not…')
-      const second = await launchOnFixture(log, { userData })
-      let restarted: Page | null = null
-      try {
-        restarted = await mainWindow(second.app)
-        await restarted.waitForSelector(NAV_OVERVIEW, { timeout: 60_000 })
-        if (check('the Bosses tab opens again', await openBosses(restarted))) {
-          const cards = await settle(() => countOf(restarted as Page, CARD), (n) => n === base.cards - 1, {
-            timeoutMs: 8_000
-          })
-          check('THE HIDE SURVIVED THE RESTART', cards === base.cards - 1, `${String(cards)} cards`)
-          check('…and the peek came back OFF: a hide is standing, a peek is a moment',
-            (await peekState(restarted)) === false)
-        }
-        if (failures.length) await dumpArtifacts(restarted, 'bosses-hide-restart-FAIL')
-      } finally {
-        await second.close()
-      }
-    }
+    if (base) await launchTwo(log, userData, base)
   } finally {
     await log.dispose()
     await removeUserData(userData)
