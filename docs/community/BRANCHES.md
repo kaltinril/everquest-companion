@@ -15,6 +15,7 @@ gear-tab-improvements
 gear-progression-plan
 map-improvements
 fix-ds-ever-struck
+fix-roster-overrides-ever-struck
 character-slot-sockets
 exaltation-clarity
 spell-upgrades
@@ -51,6 +52,7 @@ The fork is `origin` (`kaltinril/everquest-companion`). Nothing is ever pushed t
 | `gear-progression-plan` | [#36](https://github.com/jmoyers/everquest-companion/pull/36) | `C:/git/eqc-plan-fix` | Recommended tab: a level route with exp zones and role-weighted gear targets. Carries the planner scoring recalibration (survivability dial, chunk-stat law, quest lane, ownership and equip advisory). |
 | `map-improvements` | [#35](https://github.com/jmoyers/everquest-companion/pull/35) | `C:/git/eqc-maps` | Maps: clickable zone links, mob pins, hover cards, wish-list highlights. Plus the travel work: the zone graph read off the client's map labels, the port table from the spell and item corpora, per-zone level bands, and the "where to level" panel. |
 | `fix-ds-ever-struck` | [#61](https://github.com/jmoyers/everquest-companion/pull/61) | `C:/git/eqc-fix-allypet` | A damage-shield tick is not a strike: `ds` lines no longer write `ever_struck`. The ally-pet crediting bug, fixed in the Rust engine. |
+| `fix-roster-overrides-ever-struck` | not yet filed (second path of [#60](https://github.com/jmoyers/everquest-companion/issues/60)) | `C:/git/eqc-fix-allypet-roster` | A group member you struck is still a group member: `ally_caster_allowed` lets a name on the live roster through the `ever_struck` refusal. Three ripostes on a mob-charmed group-mate had silenced his pets for good. Proof in `tests/member_strike.rs`; the factoring register shrinks by two. |
 
 ### Ours, finished, no PR opened yet
 
