@@ -26,6 +26,10 @@ community/pr-16-setup-node
 community/pr-59-actions-cache
 community/pr-65-deploy-pages
 community/pr-70-npm-minor-patch
+community/pr-23-bundled-images-win32
+community/pr-63-bonus-exp
+community/pr-68-week-clears
+community/pr-47-hide-raid-targets
 # ours, never closes, always last
 test-neutering
 ```
@@ -76,6 +80,10 @@ commits. The vetting record is the PR's row in [ADOPTIONS.md](ADOPTIONS.md).
 | `community/pr-59-actions-cache` | [#59](https://github.com/jmoyers/everquest-companion/pull/59) | CI: `actions/cache` 4.3.0 to 6.1.0 in `build.yml`. Same stale comment. |
 | `community/pr-65-deploy-pages` | [#65](https://github.com/jmoyers/everquest-companion/pull/65) | CI: `actions/deploy-pages` 4.0.5 to 5.0.1 in `pages.yml`. Same stale comment. |
 | `community/pr-70-npm-minor-patch` | [#70](https://github.com/jmoyers/everquest-companion/pull/70) | Twelve of dependabot's fourteen minor and patch bumps: electron 43.2 to 43.7, electron-builder, esbuild, tsx, playwright-core, pg, the AWS SDK clients. Two commits on top pin `typescript-eslint` back to 8.65 and `onnxruntime-node` back to 1.20.1; the ADOPTIONS.md row says why. |
+| `community/pr-23-bundled-images-win32` | [#23](https://github.com/jmoyers/everquest-companion/pull/23) | Tests only: one `bundledImages` assertion uses `win32.isAbsolute` so the win32-shaped fixture reads the same on every host. |
+| `community/pr-63-bonus-exp` | [#63](https://github.com/jmoyers/everquest-companion/pull/63) | Engine parser: `You gain experience (with a bonus)!` is an experience line. 1,528 such lines in the owner's log went unclaimed over the Sep 3 to 7 bonus weekend. |
+| `community/pr-68-week-clears` | [#68](https://github.com/jmoyers/everquest-companion/pull/68) | Bosses, week view: a manual "base tier cleared" mark gated on a credited kill this week, plus the same parser widening as #63 (resolved to #63's spelling on merge). One commit on top drops the PR's plan document, which carried text addressed to AI agents (rule 6). After `pr-63`, before `pr-47`. |
+| `community/pr-47-hide-raid-targets` | [#47](https://github.com/jmoyers/everquest-companion/pull/47) | Bosses: hide a target from the Raid Targets roster and the tally, peek at hidden ones from the toolbar. One commit on top makes the PR's own e2e spec pass `max-depth`. Conflicts with `pr-68` in two files; merged after it, rerere holds the union. |
 
 ### Not in the recipe
 
