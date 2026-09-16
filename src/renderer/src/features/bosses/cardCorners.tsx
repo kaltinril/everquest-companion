@@ -6,11 +6,10 @@
 // is at the measured file ceiling and this control is a self-contained intent: one button, one
 // writer of the hidden set (useHiddenTargets via the section props), no reading of the roster.
 //
-// It sits at the BOTTOM-RIGHT OF THE ART: the kill badge owns top-left and the tier chip owns
-// top-right, and a control drawn over the chip left "D4" unreadable on every defeated card
-// (the fork's first build of this PR). The card passes the art's height so the button can
-// find that corner. It STOPS the click: the card routes to the mob page, and hiding a card
-// must not also open it. The icon is the state you would
+// It sits at the BOTTOM-RIGHT OF THE CARD, beside the date line: the kill badge owns top-left
+// and the tier chip owns top-right, and a control drawn over the chip left "D4" unreadable on
+// every defeated card (the fork's first build of this PR; the owner placed it here). It STOPS
+// the click: the card routes to the mob page, and hiding a card must not also open it. The icon is the state you would
 // MOVE TO (an eye on a hidden card, a struck eye on a visible one), matching the toolbar peek's
 // vocabulary. Low opacity until hover on a visible card so the control does not compete with
 // the art it sits over; near-full on a hidden card, where the control IS the point.
@@ -25,13 +24,10 @@ import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 export function HideTargetButton({
   name,
   hidden,
-  artHeight,
   onToggle
 }: {
   name: string
   hidden: boolean
-  /** The card art's height: the button sits inside its bottom-right corner. */
-  artHeight: number
   onToggle: () => void
 }): JSX.Element {
   return (
@@ -45,7 +41,7 @@ export function HideTargetButton({
       }}
       sx={{
         position: 'absolute',
-        top: artHeight - 30,
+        bottom: 2,
         right: 2,
         zIndex: 1,
         color: 'text.secondary',
