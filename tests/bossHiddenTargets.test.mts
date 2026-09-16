@@ -13,9 +13,10 @@
 // it stops the drop so the cards can render (dimmed, with the restore control) and changes
 // nothing about the set.
 //
-// Same fixtures as tests/bossDefeatedFilter.test.mts — real kill histories, because a
-// hand-built status would assume away the interplay these tests pin (a hidden target that
-// matches the search box must still be gone).
+// The roster is the two-boss history tests/bossHistories.mts used to replay (Lord of Ire on d4
+// and in the open world either side of the Aug 04 reset, the princess twice in Sky) — built by
+// hand here, because JOS-499 retired that helper with the TypeScript kills module it replayed
+// through. The same rows, the same counts, the same tiers; only the parser is gone.
 //
 // Run: `npm test`.
 
@@ -24,10 +25,64 @@ process.env.TZ = 'America/Los_Angeles'
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { everDefeated, filterRoster } from '../src/renderer/src/features/bosses/rosterFilter'
-import { history } from './bossHistories.mts'
+import { allStatuses, type TargetStatus } from '../src/renderer/src/features/bosses/bossStatus'
+import { TIER_OPEN_WORLD } from '../src/shared/kills'
+import type { KillMap, KillTierRun, RaidTarget } from '../src/shared/types'
 
 /** An untouched toolbar, stated once. */
 const none = { query: '', defeatedOnly: false, defeated: everDefeated } as const
+
+const IRE: RaidTarget = { name: 'Lord of Ire', category: 'Plane of Hate', match: ['Lord of Ire'] }
+const PRINCESS: RaidTarget = {
+  name: 'Thunder Spirit Princess',
+  category: 'Plane of Sky',
+  match: ['Thunder Spirit Princess']
+}
+
+/** One kill at one tier, credited or merely witnessed. */
+function run(ts: number, credited: boolean): KillTierRun {
+  return { count: 1, firstTs: ts, lastTs: ts, credited: credited ? 1 : 0, lastCreditedTs: credited ? ts : 0 }
+}
+
+/**
+ * The history the retired helper replayed, straddling Tue Aug 04 2026 08:00 Pacific:
+ *   Sat Aug 01 16:09:29  Lord of Ire, d4                — credited
+ *   Mon Aug 03 23:02:44  Lord of Ire, open world        — credited
+ *   Tue Aug 04 22:55:08  a thunder spirit princess, OW  — credited
+ *   Wed Aug 05 00:33:45  a thunder spirit princess, OW  — witnessed (killed by Pesmerga)
+ */
+function history(): TargetStatus[] {
+  const ireD4 = run(Date.UTC(2026, 7, 1, 23, 9, 29), true)
+  const ireOw = run(Date.UTC(2026, 7, 4, 6, 2, 44), true)
+  const princess: KillTierRun = {
+    count: 2,
+    firstTs: Date.UTC(2026, 7, 5, 5, 55, 8),
+    lastTs: Date.UTC(2026, 7, 5, 7, 33, 45),
+    credited: 1,
+    lastCreditedTs: Date.UTC(2026, 7, 5, 5, 55, 8)
+  }
+  const kills: KillMap = {
+    'lord of ire': {
+      count: 2,
+      bestTier: 4,
+      firstTs: ireD4.firstTs,
+      lastTs: ireOw.lastTs,
+      credited: 2,
+      display: 'Lord of Ire',
+      tiers: { 4: ireD4, [TIER_OPEN_WORLD]: ireOw }
+    },
+    'a thunder spirit princess': {
+      count: 2,
+      bestTier: TIER_OPEN_WORLD,
+      firstTs: princess.firstTs,
+      lastTs: princess.lastTs,
+      credited: 1,
+      display: 'a thunder spirit princess',
+      tiers: { [TIER_OPEN_WORLD]: princess }
+    }
+  }
+  return allStatuses([IRE, PRINCESS], kills)
+}
 
 test('a hidden target leaves the roster', () => {
   const list = history()
