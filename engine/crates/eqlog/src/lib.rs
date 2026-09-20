@@ -225,6 +225,43 @@ mod tests {
         );
     }
 
+    /// The dashed form already parsed a chest payout, as an item CALLED `Ivory from Reward Chest`
+    /// with no source. The chest is named rather than ` corpse` made optional, because here
+    /// nothing follows the source to end it: an item may carry a `from` of its own.
+    #[test]
+    fn the_dashed_loot_line_takes_the_chest_out_of_the_item_name() {
+        let p = bare();
+        let out = parse_one(
+            &p,
+            "[Wed Aug 19 16:21:47 2026] --You have looted a Ivory from Reward Chest.--",
+        );
+        assert!(
+            out.ends_with(r#""item":"Ivory","source":"Reward Chest"}"#),
+            "{out}"
+        );
+        let out = parse_one(
+            &p,
+            "[Wed Aug 19 16:21:47 2026] --You have looted 2 Drop of Mercury from Reward Chest.--",
+        );
+        assert!(
+            out.ends_with(r#""item":"Drop of Mercury","source":"Reward Chest","count":2}"#),
+            "{out}"
+        );
+        let out = parse_one(
+            &p,
+            "[Wed Aug 19 16:21:47 2026] --You have looted a Bone Chips from a rat's corpse.--",
+        );
+        assert!(
+            out.ends_with(r#""item":"Bone Chips","source":"a rat"}"#),
+            "{out}"
+        );
+        let out = parse_one(
+            &p,
+            "[Wed Aug 19 16:21:47 2026] --You have looted a Letter from Bob.--",
+        );
+        assert!(out.ends_with(r#""item":"Letter from Bob"}"#), "{out}");
+    }
+
     #[test]
     fn the_group_kind_writes_change_before_the_envelope() {
         let p = bare();

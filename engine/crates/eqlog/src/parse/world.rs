@@ -57,11 +57,11 @@ impl WorldRes {
             .join("|");
         WorldRes {
             loot: Regex::new(
-                r"^--You have looted (?:([0-9]+) |an? )?(.+?)(?: from (.+?) corpse)?\.--$",
+                r"^--You have looted (?:([0-9]+) |an? )?(.+?)(?: from (?:(.+?) corpse|(Reward Chest)))?\.--$",
             )
             .unwrap(),
             loot_plain: Regex::new(
-                r"^You have looted (?:([0-9]+) |an? )?(.+?)(?: from (.+?) corpse)?\.$",
+                r"^You have looted (?:([0-9]+) |an? )?(.+?)(?: from (?:(.+?) corpse|(Reward Chest)))?\.$",
             )
             .unwrap(),
             loot_currency: Regex::new(
@@ -277,7 +277,7 @@ pub fn classify_loot(r: &WorldRes, c: &Ctx, out: &mut Ev) -> bool {
             c,
             out,
             &m[2],
-            clean_mob(m.get(3).map(|g| g.as_str())),
+            clean_mob(m.get(3).or(m.get(4)).map(|g| g.as_str())),
             None,
             m.get(1).map(|g| g.as_str()),
         );
