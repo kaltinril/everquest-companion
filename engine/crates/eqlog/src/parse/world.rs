@@ -65,19 +65,19 @@ impl WorldRes {
             )
             .unwrap(),
             loot_currency: Regex::new(
-                r"^You looted (?:([0-9]+) |an? )?(.+?) from (.+?) corpse and stored it in your currency\.?$",
+                r"^You looted (?:([0-9]+) |an? )?(.+?) from (.+?)(?: corpse)? and stored it in your currency\.?$",
             )
             .unwrap(),
             loot_sold: Regex::new(
-                r"^You looted (?:([0-9]+) |an? )?(.+?) from (.+?) corpse and sold it for (?:free|[0-9,]+ (?:platinum|gold|silver|copper).*?)\.?$",
+                r"^You looted (?:([0-9]+) |an? )?(.+?) from (.+?)(?: corpse)? and sold it for (?:free|[0-9,]+ (?:platinum|gold|silver|copper).*?)\.?$",
             )
             .unwrap(),
             loot_stored: Regex::new(
-                r"^You looted (?:([0-9]+) |an? )?(.+?) from (.+?) corpse and stored it in your (Dragon Hoard|tradeskill depot)\.?$",
+                r"^You looted (?:([0-9]+) |an? )?(.+?) from (.+?)(?: corpse)? and stored it in your (Dragon Hoard|tradeskill depot)\.?$",
             )
             .unwrap(),
             loot_combine: Regex::new(
-                r"^You looted (?:([0-9]+) |an? )?(.+?) from (.+?) corpse to create (?:an? )?(.+?)\.?$",
+                r"^You looted (?:([0-9]+) |an? )?(.+?) from (.+?)(?: corpse)? to create (?:an? )?(.+?)\.?$",
             )
             .unwrap(),
             destroy: Regex::new(r"^You successfully destroyed ([0-9]+) (.+?)\.$").unwrap(),

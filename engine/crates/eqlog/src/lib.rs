@@ -180,6 +180,51 @@ mod tests {
         assert!(out.starts_with(r#"{"kind":"unknown""#), "{out}");
     }
 
+    /// The Dungeon Crawl pays out of a chest, not a corpse: the same four sentences with
+    /// `Reward Chest` where the corpse was, and the chest is the source.
+    #[test]
+    fn a_reward_chest_is_a_loot_source_like_a_corpse() {
+        let p = bare();
+        let out = parse_one(
+            &p,
+            "[Wed Aug 19 16:21:47 2026] You looted 4 Mote of Infinitesimal Potential from Reward Chest and stored it in your currency",
+        );
+        assert!(
+            out.ends_with(r#""item":"Mote of Infinitesimal Potential","source":"Reward Chest","disposition":"currency","count":4}"#),
+            "{out}"
+        );
+        let out = parse_one(
+            &p,
+            "[Wed Aug 19 16:21:47 2026] You looted a Shin Greaves +2 from Reward Chest and sold it for free.",
+        );
+        assert!(
+            out.contains(r#""source":"Reward Chest","disposition":"sold""#),
+            "{out}"
+        );
+        let out = parse_one(
+            &p,
+            "[Wed Aug 19 16:21:47 2026] You looted a Crystallized Sulfur from Reward Chest and stored it in your tradeskill depot",
+        );
+        assert!(
+            out.contains(r#""source":"Reward Chest","disposition":"depot""#),
+            "{out}"
+        );
+        let out = parse_one(
+            &p,
+            "[Wed Aug 19 16:21:47 2026] You looted a Thick Banded Belt +3 from Reward Chest to create a Thick Banded Belt +4",
+        );
+        assert!(out.ends_with(r#""source":"Reward Chest","disposition":"combined","created":"Thick Banded Belt +4"}"#), "{out}");
+        // …and a corpse still loses its possessive, as it always did.
+        let out = parse_one(
+            &p,
+            "[Wed Aug 19 16:21:47 2026] You looted a Wind Rune Lena from a spiroc vanquisher's corpse and stored it in your currency",
+        );
+        assert!(
+            out.contains(r#""source":"a spiroc vanquisher","disposition":"currency""#),
+            "{out}"
+        );
+    }
+
     #[test]
     fn the_group_kind_writes_change_before_the_envelope() {
         let p = bare();
