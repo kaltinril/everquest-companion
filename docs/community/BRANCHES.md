@@ -16,6 +16,8 @@ gear-progression-plan
 map-improvements
 fix-ds-ever-struck
 fix-roster-overrides-ever-struck
+fix-self-dot-ticks
+fix-reward-chest-loot
 character-slot-sockets
 exaltation-clarity
 spell-upgrades
@@ -30,6 +32,7 @@ community/pr-23-bundled-images-win32
 community/pr-63-bonus-exp
 community/pr-68-week-clears
 community/pr-47-hide-raid-targets
+community/pr-67-self-meter-name
 # ours, never closes, always last
 test-neutering
 ```
@@ -63,6 +66,8 @@ The fork is `origin` (`kaltinril/everquest-companion`). Nothing is ever pushed t
 | Branch | Worktree | What it does |
 |---|---|---|
 | `scrape-delta-tool` | `C:/git/eqc-scrape` | `scripts/scrape-delta.mts`: the wiki-DB top-up that reads MediaWiki `recentchanges` since `items.json`'s `scrapedAt` and re-fetches only changed pages, at the creator's 1 req/s etiquette. Running it is an owner decision, never automatic. |
+| `fix-self-dot-ticks` | `C:/git/eqc-fix-self-dot` | Engine parser: `You have taken N damage from <spell> by <mob>.` is a DoT tick on the player. The DoT half gated and matched on `has taken` only, so 10,703 lines carrying 533,440 damage (about 6% of everything the owner's character took, 2026-08-12 to 2026-09-15) were `unknown`. Two lines of `combat.rs` and a test; the file does not grow. With the other engine fixes, independent of them. |
+| `fix-reward-chest-loot` | `C:/git/eqc-fix-reward-chest` | Engine parser: a Dungeon Crawl pays out of a `Reward Chest`, and the four auto-loot regexes all required the word `corpse`. ` corpse` becomes optional; a chest line carries `source: "Reward Chest"`, a corpse line captures what it always did. First seen 2026-09-09, 67 lines (motes, runes, depot stores, `+N` combines). Touches the loot regexes only, so it does not meet `pr-63`'s experience regex in the same file. |
 | `character-slot-sockets` | *(none)* | The socket board's foundation, the base `exaltation-clarity` sits on. Nothing new lands here. Merges before `exaltation-clarity`. |
 | `exaltation-clarity` | `C:/git/eqc-exaltation-clarity` | The Exaltations and Character socket work: merged socket row, cleanup advisor, whole-board optimizer, owned tri-state, the proc rule, deity as R2's fourth condition. |
 | `spell-upgrades` | `C:/git/eqc-spells` | The whole Spells area: spellbook with icons and sortable columns, the Loadout tab, the mote tier slider, the buff stats panel, the EQEmu stacking port and its ground-truth corpus. |
@@ -84,6 +89,7 @@ commits. The vetting record is the PR's row in [ADOPTIONS.md](ADOPTIONS.md).
 | `community/pr-63-bonus-exp` | [#63](https://github.com/jmoyers/everquest-companion/pull/63) | Engine parser: `You gain experience (with a bonus)!` is an experience line. 1,528 such lines in the owner's log went unclaimed over the Sep 3 to 7 bonus weekend. |
 | `community/pr-68-week-clears` | [#68](https://github.com/jmoyers/everquest-companion/pull/68) | Bosses, week view: a manual "base tier cleared" mark gated on a credited kill this week, plus the same parser widening as #63 (resolved to #63's spelling on merge). One commit on top drops the PR's plan document, which carried text addressed to AI agents (rule 6). After `pr-63`, before `pr-47`. |
 | `community/pr-47-hide-raid-targets` | [#47](https://github.com/jmoyers/everquest-companion/pull/47) | Bosses: hide a target from the Raid Targets roster and the tally, peek at hidden ones from the toolbar. Four commits on top: the PR's own e2e spec passes `max-depth`, its unit test no longer imports a helper JOS-499 retired, and the hide button sits in the card's bottom-right corner instead of over the tier chip. Conflicts with `pr-68` in two files; merged after it, rerere holds the union. |
+| `community/pr-67-self-meter-name` | [#67](https://github.com/jmoyers/everquest-companion/pull/67) | Combat: a preference, off by default, that shows the self row of the damage meters as `<Character> (You)` on the Combat tab, the Overview Damage card, the floating overlay and "Copy this view". The PR's twelve commits, nothing on top. Independent of the Bosses PRs; last of the third-party list because nothing builds on it. |
 
 ### Not in the recipe
 
