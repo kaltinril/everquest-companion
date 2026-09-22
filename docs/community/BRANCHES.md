@@ -18,6 +18,7 @@ fix-ds-ever-struck
 fix-roster-overrides-ever-struck
 fix-self-dot-ticks
 fix-reward-chest-loot
+fix-it-2026-09-21
 character-slot-sockets
 exaltation-clarity
 spell-upgrades
@@ -68,6 +69,7 @@ The fork is `origin` (`kaltinril/everquest-companion`). Nothing is ever pushed t
 | `scrape-delta-tool` | `C:/git/eqc-scrape` | `scripts/scrape-delta.mts`: the wiki-DB top-up that reads MediaWiki `recentchanges` since `items.json`'s `scrapedAt` and re-fetches only changed pages, at the creator's 1 req/s etiquette. Running it is an owner decision, never automatic. |
 | `fix-self-dot-ticks` | `C:/git/eqc-fix-self-dot` | Engine parser: `You have taken N damage from <spell> by <mob>.` is a DoT tick on the player. The DoT half gated and matched on `has taken` only, so 10,703 lines carrying 533,440 damage (about 6% of everything the owner's character took, 2026-08-12 to 2026-09-15) were `unknown`. Two lines of `combat.rs` and a test; the file does not grow. With the other engine fixes, independent of them. |
 | `fix-reward-chest-loot` | `C:/git/eqc-fix-reward-chest` | Engine parser: a Dungeon Crawl pays out of a `Reward Chest`, and the four auto-loot regexes all required the word `corpse`. ` corpse` becomes optional; a chest line carries `source: "Reward Chest"`, a corpse line captures what it always did. A second commit covers the dashed form, `--You have looted a Ivory from Reward Chest.--`, which was never `unknown` but parsed as an item called `Ivory from Reward Chest` with no source; there the chest is named in a group of its own, because making ` corpse` optional would turn `Letter from Bob` into a Letter looted from Bob. First seen 2026-09-09; all 67 chest lines in the owner's log (30 auto-loot, 37 dashed) now read `source: "Reward Chest"`. Touches the loot regexes only and merged clean beside `pr-63`'s experience regex in the same file. |
+| `fix-it-2026-09-21` | `C:/git/eqc-fix-it` | Small fixes to the creator's own code that belong to no feature branch of ours, one commit each. First: the Maps pack select showed the stored pack before the pack list had arrived (and after a pack was removed), so MUI warned about an out-of-range value on every render; it now says Auto whenever `packOrder` would fall back to auto, which is the truth of what draws. Renderer only. |
 | `character-slot-sockets` | *(none)* | The socket board's foundation, the base `exaltation-clarity` sits on. Nothing new lands here. Merges before `exaltation-clarity`. |
 | `exaltation-clarity` | `C:/git/eqc-exaltation-clarity` | The Exaltations and Character socket work: merged socket row, cleanup advisor, whole-board optimizer, owned tri-state, the proc rule, deity as R2's fourth condition. |
 | `spell-upgrades` | `C:/git/eqc-spells` | The whole Spells area: spellbook with icons and sortable columns, the Loadout tab, the mote tier slider, the buff stats panel, the EQEmu stacking port and its ground-truth corpus. |
