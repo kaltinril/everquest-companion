@@ -272,7 +272,14 @@ export interface MapToolbarProps {
  */
 const AUTO = '#auto'
 
-/** One `<TextField select>` over the installed packs. `AUTO` is the resolution order. */
+/**
+ * One `<TextField select>` over the installed packs. `AUTO` is the resolution order.
+ *
+ * The stored pack is SHOWN only while it is installed. The toolbar renders before the pack list
+ * has arrived (and after a pack is removed), and `packOrder` falls back to the auto order
+ * for an id it cannot find - so the select says Auto then too, instead of MUI warning about an
+ * out-of-range value on every render until the list lands.
+ */
 function PackSelect({
   label,
   value,
@@ -289,7 +296,7 @@ function PackSelect({
       select
       size="small"
       label={label}
-      value={value ?? AUTO}
+      value={value != null && packs.some((p) => p.id === value) ? value : AUTO}
       onChange={(e) => {
         onChange(e.target.value === AUTO ? undefined : e.target.value)
       }}
