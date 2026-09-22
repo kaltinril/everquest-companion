@@ -23,7 +23,8 @@
 //   const hostRef = useRef<HTMLDivElement>(null)
 //   const vp = useMapViewport({ bounds: data.bounds, id: data.zone, hostRef })
 //   <Box ref={hostRef} onPointerDown={vp.onPointerDown} onPointerMove={vp.onPointerMove}
-//        onPointerUp={vp.onPointerUp}
+//        onPointerUp={vp.onPointerUp} onPointerCancel={vp.onPointerCancel}
+//        onLostPointerCapture={vp.onPointerCancel}
 //        sx={{ position:'relative', flexGrow:1, minHeight:0, overflow:'hidden',
 //              touchAction:'none', cursor: vp.dragging ? 'grabbing' : 'grab' }}>
 //     <MapCanvas lines={data.lines} vp={vp} layers={layers} zBand={zBand} />
@@ -100,6 +101,8 @@ export interface MapViewport {
   onPointerDown: (ev: React.PointerEvent<HTMLElement>) => void
   onPointerMove: (ev: React.PointerEvent<HTMLElement>) => void
   onPointerUp: (ev: React.PointerEvent<HTMLElement>) => void
+  /** Wire to BOTH `onPointerCancel` and `onLostPointerCapture`: a cancelled or stolen pointer is a release. */
+  onPointerCancel: (ev: React.PointerEvent<HTMLElement>) => void
 }
 
 /**
@@ -218,10 +221,26 @@ export function useMapViewport({ bounds, id, hostRef }: MapViewportArgs): MapVie
     },
     [view]
   )
+  // A DRAG ENDS WHEN ITS PRESS DOES, AND THE SURFACE DOES NOT SEE EVERY RELEASE. Capture waits
+  // for the slop, so a press let go before it has travelled 3px, with the cursor already off the
+  // surface, releases where no handler of ours is listening; and a pointer the browser cancels
+  // mid-drag (focus lost to the game, a popover taking the pointer) never sends pointerup at all.
+  // Left armed, the next move over the map resumed the pan with no button held and the map
+  // followed the mouse until the next press. So a move with `buttons === 0` is the release the
+  // surface missed, and pointercancel / lostpointercapture end the drag as pointerup does.
+  const endDrag = useCallback((ev: React.PointerEvent<HTMLElement>) => {
+    dragRef.current = null
+    if (ev.currentTarget.hasPointerCapture(ev.pointerId)) ev.currentTarget.releasePointerCapture(ev.pointerId)
+    setDragging(false)
+  }, [])
   const onPointerMove = useCallback(
     (ev: React.PointerEvent<HTMLElement>) => {
       const d = dragRef.current
       if (!d) return
+      if (ev.buttons === 0) {
+        endDrag(ev)
+        return
+      }
       const dx = ev.clientX - d.px
       const dy = ev.clientY - d.py
       if (!d.captured) {
@@ -233,13 +252,8 @@ export function useMapViewport({ bounds, id, hostRef }: MapViewportArgs): MapVie
       // Against the drag's START view, never the previous move's result.
       setZoomed(panBy(d.from, bounds, size, { px: dx, py: dy }))
     },
-    [bounds, size]
+    [bounds, size, endDrag]
   )
-  const onPointerUp = useCallback((ev: React.PointerEvent<HTMLElement>) => {
-    dragRef.current = null
-    if (ev.currentTarget.hasPointerCapture(ev.pointerId)) ev.currentTarget.releasePointerCapture(ev.pointerId)
-    setDragging(false)
-  }, [])
 
   const zoomBy = useCallback(
     (factor: number) => zoomAt({ px: size.w / 2, py: size.h / 2 }, factor),
@@ -266,6 +280,7 @@ export function useMapViewport({ bounds, id, hostRef }: MapViewportArgs): MapVie
     dragging,
     onPointerDown,
     onPointerMove,
-    onPointerUp
+    onPointerUp: endDrag,
+    onPointerCancel: endDrag
   }
 }

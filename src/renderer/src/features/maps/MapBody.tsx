@@ -218,6 +218,8 @@ function MapSurface({
       onPointerDown={vp.onPointerDown}
       onPointerMove={vp.onPointerMove}
       onPointerUp={vp.onPointerUp}
+      onPointerCancel={vp.onPointerCancel}
+      onLostPointerCapture={vp.onPointerCancel}
       sx={{
         position: 'relative',
         flexGrow: 1,
