@@ -203,9 +203,7 @@ function ItemChip({ ports, onOpenItem }: { ports: readonly ZonePort[]; onOpenIte
         <>
           {ports.length === 1 ? 'item' : `items ${String(ports.length)}`}
           {ports.map((p) => (
-            <KnownItemTooltip key={p.item ?? p.spell} name={p.item ?? p.spell} clickThrough>
-              <ItemName name={p.item ?? p.spell} onOpenItem={onOpenItem} />
-            </KnownItemTooltip>
+            <ItemName key={p.item ?? p.spell} name={p.item ?? p.spell} onOpenItem={onOpenItem} />
           ))}
         </>
       }
@@ -213,36 +211,46 @@ function ItemChip({ ports, onOpenItem }: { ports: readonly ZonePort[]; onOpenIte
   )
 }
 
-/** The item's name inside the chip: a link when the view can open items, plain text otherwise. */
+/**
+ * The item's name inside the chip, under its card: a link when the view can open items, plain
+ * text otherwise. The tooltip wraps the Box/Link HERE rather than wrapping this component: MUI's
+ * Tooltip clones its child with a ref and the hover handlers, and a plain function component in
+ * that seat dropped both, so the card never opened over a map item and React warned on every
+ * render (errors.log, 2026-09-13 on). The link carries no `title` for the same reason: the card
+ * is the hover text, and MUI refuses a child that brings its own.
+ */
 function ItemName({ name, onOpenItem }: { name: string; onOpenItem?: OpenItem }): JSX.Element {
   if (onOpenItem === undefined) {
     return (
-      <Box component="span" sx={{ ml: 0.5, textDecoration: 'underline dotted', textUnderlineOffset: 2 }}>
-        {name}
-      </Box>
+      <KnownItemTooltip name={name} clickThrough>
+        <Box component="span" sx={{ ml: 0.5, textDecoration: 'underline dotted', textUnderlineOffset: 2 }}>
+          {name}
+        </Box>
+      </KnownItemTooltip>
     )
   }
   return (
-    <Link
-      component="button"
-      variant="caption"
-      underline="none"
-      data-testid="map-travel-item"
-      title={`Open ${name}`}
-      onClick={() => {
-        onOpenItem(name)
-      }}
-      sx={{
-        ml: 0.5,
-        verticalAlign: 'baseline',
-        color: 'primary.main',
-        textDecoration: 'underline dotted',
-        textUnderlineOffset: 2,
-        '&:hover': { textDecoration: 'underline solid' }
-      }}
-    >
-      {name}
-    </Link>
+    <KnownItemTooltip name={name} clickThrough>
+      <Link
+        component="button"
+        variant="caption"
+        underline="none"
+        data-testid="map-travel-item"
+        onClick={() => {
+          onOpenItem(name)
+        }}
+        sx={{
+          ml: 0.5,
+          verticalAlign: 'baseline',
+          color: 'primary.main',
+          textDecoration: 'underline dotted',
+          textUnderlineOffset: 2,
+          '&:hover': { textDecoration: 'underline solid' }
+        }}
+      >
+        {name}
+      </Link>
+    </KnownItemTooltip>
   )
 }
 
