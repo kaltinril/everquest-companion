@@ -152,17 +152,27 @@ function FilterSwitch({
   )
 }
 
-/** The race-gate pair: the hunt switch (disabled with its reason until an achievements dump
- *  exists) and — only while it is on — the still-needed refinement that drops settled gates.
+/** The race-gate controls: the hunt switch (disabled with its reason until an achievements dump
+ *  exists) and — only while it is on — its two refinements: the still-needed switch that drops
+ *  settled gates, and the race picker that keeps only the picked races' gates.
  *  Split out of `FilterBar` at the 100-line function ceiling. */
 function RaceGateSwitches({
   toggles,
   unlockers,
-  unlocksKnown
+  unlocksKnown,
+  raceOptions
 }: {
-  toggles: { unlocksOnly: boolean; onUnlocksOnly: (on: boolean) => void; unlocksPending: boolean; onUnlocksPending: (on: boolean) => void }
+  toggles: {
+    unlocksOnly: boolean
+    onUnlocksOnly: (on: boolean) => void
+    unlocksPending: boolean
+    onUnlocksPending: (on: boolean) => void
+    races: string[]
+    onRaces: (v: string[]) => void
+  }
   unlockers: number
   unlocksKnown: boolean
+  raceOptions: readonly string[]
 }): JSX.Element {
   return (
     <>
@@ -187,6 +197,20 @@ function RaceGateSwitches({
           testId="factions-unlocks-pending"
         />
       )}
+      {/* WHICH race: the dump's own race list as a closed pick, empty meaning every race. A
+          player working toward one unlock wants that race's factions and nothing else on the
+          table; a friend helping wants the same list for the friend's race. */}
+      {toggles.unlocksOnly && (
+        <ChipMultiSelect
+          options={raceOptions}
+          value={toggles.races}
+          onChange={toggles.onRaces}
+          label="Race"
+          placeholder="Any race"
+          minWidth={200}
+          testId="factions-race-filter"
+        />
+      )}
     </>
   )
 }
@@ -198,6 +222,7 @@ export function FilterBar({
   toggles,
   counts,
   unlocksKnown,
+  raceOptions,
   expandedCount,
   onCollapseAll
 }: {
@@ -212,10 +237,14 @@ export function FilterBar({
     onUnlocksOnly: (on: boolean) => void
     unlocksPending: boolean
     onUnlocksPending: (on: boolean) => void
+    races: string[]
+    onRaces: (v: string[]) => void
     rewardsOnly: boolean
     onRewardsOnly: (on: boolean) => void
   }
   counts: { untouched: number; maxed: number; unlockers: number; shown: number; total: number }
+  /** the achievements dump's races, verbatim — the race picker's closed list (empty without one) */
+  raceOptions: readonly string[]
   /** false until an achievements dump has been loaded — the race filter's whole data source */
   unlocksKnown: boolean
   /** how many rows are expanded — the collapse-all affordance shows only while any are */
@@ -257,7 +286,12 @@ export function FilterBar({
       {/* Only the factions still GATING a race unlock — each row's chip says which race. The
           count is 0 without an achievements dump, and the switch is honest about that: it shows
           an empty table rather than pretending to know. */}
-      <RaceGateSwitches toggles={toggles} unlockers={counts.unlockers} unlocksKnown={unlocksKnown} />
+      <RaceGateSwitches
+        toggles={toggles}
+        unlockers={counts.unlockers}
+        unlocksKnown={unlocksKnown}
+        raceOptions={raceOptions}
+      />
       <Box sx={{ flexGrow: 1 }} />
       {expandedCount > 0 && (
         <Button

@@ -5,7 +5,7 @@
 import type { GearRow } from '@shared/planner/gear'
 import type { EquipSlot } from '@shared/planner/types'
 import type { FactionWork } from './factionQuests'
-import type { FactionRowVm } from './useFactionRows'
+import type { FactionRowVm, RaceGate } from './useFactionRows'
 import { filterWork, rewardKey, wishedRewards, type WorkFilters } from './factionFilters'
 
 /**
@@ -108,6 +108,9 @@ export interface RowFilters {
   unlocksOnly: boolean
   /** …narrowed to gates THIS character has not settled yet (only read while `unlocksOnly`) */
   unlocksPending: boolean
+  /** …narrowed to the gates of THESE races, the dump's own names (`RaceUnlockClaim.race`);
+   *  empty = any race (only read while `unlocksOnly`) */
+  races: readonly string[]
   /** the search reads REWARDS only — the find-the-chain's-final-quest scope */
   rewardsOnly: boolean
 }
@@ -130,6 +133,15 @@ function compareBy(a: FactionRowVm, b: FactionRowVm, key: SortKey): number {
   return a.standing - b.standing || a.name.localeCompare(b.name)
 }
 
+/** The gates the hunt is FOR: every race's by default, one race's when a race is picked, and
+ *  only the unsettled ones under the still-needed refinement. Both narrowings read the same
+ *  list, so "Kerran, still needed" is exactly the Kerran gates this character has yet to earn. */
+export function huntedGates(r: FactionRowVm, f: RowFilters): RaceGate[] {
+  return r.unlocks.filter(
+    (u) => !(f.unlocksPending && u.done) && (f.races.length === 0 || f.races.includes(u.race))
+  )
+}
+
 export function visibleRows(rows: readonly FactionRowVm[], f: RowFilters, sort: RowSort): FactionRowVm[] {
   const q = f.query.trim().toLowerCase()
   const sign = sort.dir === 'asc' ? 1 : -1
@@ -140,7 +152,7 @@ export function visibleRows(rows: readonly FactionRowVm[], f: RowFilters, sort: 
       // finds Kerra Isle without anyone knowing which faction owns the quest. A live search also
       // OVERRIDES the hide-toggles: the one faction holding the match may be untouched or maxed,
       // and a search whose only answer is hidden reads as no answer at all.
-      const gates = f.unlocksPending ? r.unlocks.filter((u) => !u.done) : r.unlocks
+      const gates = huntedGates(r, f)
       if (q !== '') {
         const hay = f.rewardsOnly ? r.rewardText : r.searchText
         return hay.includes(q) && !(f.unlocksOnly && gates.length === 0)
