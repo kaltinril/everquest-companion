@@ -31,17 +31,46 @@ import type { ZoneShort } from '../shared/maps'
 
 let CACHE: { library: unknown; graph: ZoneGraph } | null = null
 
-/** Every zone with at least one stated exit, keyed by map stem. */
+/**
+ * Every zone with at least one stated exit, keyed by map stem.
+ *
+ * EVERY PACK IS READ, NOT THE PREFERRED ONE. The Maps tab picks one label pack per zone
+ * (brewall first, for its 26,607 points to the default set's 285), and this used to ask for the
+ * same pick - so a seam only the OTHER pack labelled was invisible. Measured (owner report,
+ * 2026-09-23: *"the plane of hate ... incorrectly showing no ports near"*): the Oasis entrance to
+ * Hate (`to_The_Plane_of_Hate_(click)`) and East Freeport's portal to Sky are stated by the
+ * default pack's `oasis_1.txt` / `freporte_1.txt` alone, and brewall's Oasis labels only the two
+ * deserts. A seam is a fact about the zone whichever pack wrote it down, so the graph is the
+ * union across packs, deduped the way `zoneExits` dedupes within one map.
+ */
 export function zoneGraph(): ZoneGraph {
   const library = mapLibrary()
   if (CACHE !== null && CACHE.library === library) return CACHE.graph
+  const packIds = library.packs().map((p) => p.id)
   const out = new Map<ZoneShort, ZoneExit[]>()
   for (const stem of library.zones()) {
-    const points = library.labels(stem, {})
-    if (points === null) continue
-    const exits = zoneExits(points)
+    const exits = statedExits(library, stem, packIds)
     if (exits.length > 0) out.set(stem, exits)
   }
   CACHE = { library, graph: out }
   return out
+}
+
+/** One zone's exits across every pack, each (kind, destination) once. */
+function statedExits(library: ReturnType<typeof mapLibrary>, stem: ZoneShort, packIds: readonly string[]): ZoneExit[] {
+  const exits: ZoneExit[] = []
+  const seen = new Set<string>()
+  for (const labels of packIds) {
+    // A pack that lacks the zone hands back another pack's file (resolveLayer's fallback); the
+    // dedupe makes that a harmless repeat rather than a doubled seam.
+    const points = library.labels(stem, { labels })
+    if (points === null) continue
+    for (const exit of zoneExits(points)) {
+      const key = `${exit.kind}|${exit.zone}`
+      if (seen.has(key)) continue
+      seen.add(key)
+      exits.push(exit)
+    }
+  }
+  return exits
 }

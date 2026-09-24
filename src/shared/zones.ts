@@ -266,7 +266,8 @@ export const ZONES: readonly ZoneEntry[] = [
   { short: 'oot', name: 'The Ocean of Tears', era: 'classic' },
   { short: 'fearplane', name: 'The Plane of Fear', minLevel: 45, era: 'classic' },
   { short: 'hateplane', name: 'The Plane of Hate', era: 'classic' }, // brewall only (hateplaneb is the revamp)
-  { short: 'airplane', name: 'The Plane of Sky', era: 'classic' },
+  // `Plane of Air` is the spell corpus's name for it (Alter Plane: Sky teleports "in Plane of Air").
+  { short: 'airplane', name: 'The Plane of Sky', aliases: ['Plane of Air'], era: 'classic' },
   { short: 'rathemtn', name: 'The Rathe Mountains', aliases: ['Mountains of Rathe'], era: 'classic' },
   {
     short: 'gukbottom',

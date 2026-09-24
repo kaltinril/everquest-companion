@@ -163,14 +163,30 @@ export function resolveZone(raw: string): ZoneEntry | null {
   return head === lower ? null : (ZONES.find((z) => z.short === head) ?? null)
 }
 
+/**
+ * The three label shapes that state a crossing, and which kind each is:
+ *   `to_West_Commonlands` (a walk, or a translocator when the DOCK parenthetical is on it),
+ *   `Ak`Anon_Portal` (a portal), and
+ *   `portal_to_The_Plane_of_Sky_(click)` (a portal - East Freeport's spire, in the default pack's
+ *   own words, 2026-09-23).
+ * Null when the label is none of these.
+ */
+function crossingOf(raw: string): { body: string; kind: ExitKind } | null {
+  const portalTo = /^portal[_\s]+to[_\s]+(.+)$/i.exec(raw)
+  if (portalTo !== null) return { body: portalTo[1], kind: 'portal' }
+  const to = /^to[_\s]+(.+)$/i.exec(raw)
+  if (to !== null) return { body: to[1], kind: DOCK.test(raw) ? 'translocator' : 'walk' }
+  const portal = /^(.+?)[_\s]+portal$/i.exec(raw)
+  if (portal !== null) return { body: portal[1], kind: 'portal' }
+  return null
+}
+
 /** One point, as zero or more exits — zero when its label is not a crossing, or names no zone. */
 function exitsOfPoint(point: MapPoint): ZoneExit[] {
   const raw = point.label.trim()
-  const to = /^to[_\s]+(.+)$/i.exec(raw)
-  const portal = /^(.+?)[_\s]+portal$/i.exec(raw)
-  const body = to?.[1] ?? portal?.[1]
-  if (body === undefined) return []
-  const kind: ExitKind = portal !== null && to === null ? 'portal' : DOCK.test(raw) ? 'translocator' : 'walk'
+  const crossing = crossingOf(raw)
+  if (crossing === null) return []
+  const { body, kind } = crossing
   const out: ZoneExit[] = []
   for (const candidate of destinationsOf(body)) {
     // A label naming something the catalog does not know is DROPPED rather than guessed at: the

@@ -91,3 +91,17 @@ test('with the client table loaded, only the spells it carries are offered (2026
   assert.ok(wand, 'the wand is in the corpus')
   assert.ok(portsInClient([wand], client).length === 1, 'and it survives a table without its spell name')
 })
+
+test('the wizard plane ports land in the planes: Alter Plane: Hate and Sky (2026-09-23)', () => {
+  // The corpus states `in Plane of Hate.` (trailing period) and `in Plane of Air` (the spell's
+  // name for Sky); both fell on the floor and the Plane of Hate card said no port lands within
+  // four zones while a level-46 wizard has one that lands on the spot.
+  const byName = new Map(zonePorts().map((p) => [p.spell, p]))
+  const hate = byName.get('Alter Plane: Hate')
+  const sky = byName.get('Alter Plane: Sky')
+  assert.equal(hate?.zone, 'hateplane')
+  assert.equal(sky?.zone, 'airplane')
+  assert.equal(hate?.via, 'wizard')
+  assert.equal(hate?.level, 46)
+  assert.equal(hate?.group, true, 'Alter Plane takes the group')
+})

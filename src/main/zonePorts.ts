@@ -50,8 +50,12 @@ import type { ZoneShort } from '../shared/maps'
  * 42 `Teleport group to` (every druid ring and circle), 34 `Translocate to`, 15 `Evacuate to`,
  * 11 `Evacuate group to`. All five land you in a named zone; only the first was being read. The
  * in-zone evacs (`Teleports your group to a safe location`) name no zone and stay out.
+ *
+ * THE TRAILING PERIOD IS OPTIONAL because the corpus is inconsistent about it: `Alter Plane:
+ * Hate` states `in Plane of Hate.` and its twin `Alter Plane: Sky` states `in Plane of Air`
+ * (owner report 2026-09-23: the Plane of Hate showed no port, while a level-46 wizard has one).
  */
-const DESTINATION = /^(?:Teleport|Translocate|Evacuate)(?: group)? to (?:[-0-9., ]+ )?in (.+)$/i
+const DESTINATION = /^(?:Teleport|Translocate|Evacuate)(?: group)? to (?:[-0-9., ]+ )?in (.+?)\.?$/i
 
 /** `* Druid - Level 29` — the only two classes that carry travel, and the level it opens at. */
 const CASTER = /\b(Druid|Wizard)\b[^0-9]*?Level\s*(\d+)/i
