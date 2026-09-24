@@ -59,6 +59,7 @@ function useRowFilterState(): {
   const [hideMaxed, setHideMaxed] = useState(true)
   const [unlocksOnly, setUnlocksOnly] = useState(false)
   const [unlocksPending, setUnlocksPending] = useState(false)
+  const [races, setRaces] = useState<string[]>([])
   const [rewardsOnly, setRewardsOnly] = useState(false)
   // A race chip's click REVEALS its faction row: the search finds it, and both hide-toggles come
   // off — a race's missing faction is usually untouched, which is exactly what the default view
@@ -69,7 +70,7 @@ function useRowFilterState(): {
     setHideMaxed(false)
   }, [])
   return {
-    rowFilters: { query, hideUntouched, hideMaxed, unlocksOnly, unlocksPending, rewardsOnly },
+    rowFilters: { query, hideUntouched, hideMaxed, unlocksOnly, unlocksPending, races, rewardsOnly },
     onQuery: setQuery,
     toggles: {
       hideUntouched,
@@ -80,6 +81,8 @@ function useRowFilterState(): {
       onUnlocksOnly: setUnlocksOnly,
       unlocksPending,
       onUnlocksPending: setUnlocksPending,
+      races,
+      onRaces: setRaces,
       rewardsOnly,
       onRewardsOnly: setRewardsOnly
     },
@@ -168,6 +171,9 @@ export function useFactionsController(props: FactionsViewProps): FactionsControl
       return (w?.raise.length ?? 0) > 0 || (w?.nearby.length ?? 0) > 0
     })
   }, [all, rowFilters, sort, workFilters, derivedById])
+  // The race picker's closed list IS the dump's race list, in the dump's own order — the same
+  // names the row chips wear, so a pick and a chip agree by plain equality.
+  const raceOptions = useMemo(() => (raceUnlocks ?? []).map((c) => c.race), [raceUnlocks])
   const counts = useMemo(
     () => ({
       untouched: (all ?? []).filter((r) => r.standing === 0).length,
@@ -190,6 +196,7 @@ export function useFactionsController(props: FactionsViewProps): FactionsControl
       toggles,
       counts,
       unlocksKnown: raceUnlocks !== undefined,
+      raceOptions,
       expandedCount: expanded.size,
       onCollapseAll
     },
