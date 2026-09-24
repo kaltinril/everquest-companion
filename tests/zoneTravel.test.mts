@@ -232,3 +232,13 @@ test('the dock crossings on the card are gated the same way', () => {
   assert.deepEqual(travelSeams(exits).map((e) => e.zone), ['erudsxing'], 'the PoK portal is not a ride you can take')
   assert.equal(travelSeams(exits, false).length, 2, 'lifted, it is listed')
 })
+
+test('a portal_to_ label is a portal - East Freeport`s spire to the Plane of Sky (2026-09-23)', () => {
+  // freporte_1.txt (default pack), verbatim: the third portal spelling the packs use.
+  const exits = zoneExits([point('portal_to_The_Plane_of_Sky_(click)')])
+  assert.equal(exits.length, 1)
+  assert.equal(exits[0].kind, 'portal')
+  assert.equal(exits[0].zone, 'airplane')
+  // oasis_1.txt (default pack): the click into Hate is a plain to_ with a parenthetical.
+  assert.equal(zoneExits([point('to_The_Plane_of_Hate_(click)')])[0]?.zone, 'hateplane')
+})
