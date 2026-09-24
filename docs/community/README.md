@@ -81,7 +81,11 @@ script ends by printing a tree diff against the previous `main_community`, which
 
 **Cut a test build.** Bump the version and write the tester notes as a commit on `test-neutering`,
 merge it into `main_community`, then `npm run dist`. The notes stay on a branch that survives a
-rebuild. Read the previous build's notes first; they list what the testers caught.
+rebuild. Read the previous build's notes first; they list what the testers caught. The installer
+is `release/<version>/everquest-companion-test-Setup-<version>.exe` in this clone, next to the
+earlier builds (RULES.md, rule 17). If the dev app is running out of this clone, build in a
+throwaway worktree under the temp directory, move the `release/<version>` folder here, and remove
+the worktree (rule 16); never beside the repo.
 
 **When the creator is back.** Each feature branch is already a PR or ready to be one. As he merges
 them, `main` gains them, the merged branch's recipe line is removed, and `main_community` is
