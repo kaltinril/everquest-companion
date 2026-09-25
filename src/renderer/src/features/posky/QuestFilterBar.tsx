@@ -43,9 +43,10 @@
 // was the same: the poppers go, here and in every file that draws this tab. Hover text that
 // survives is a native `title` — an OS tooltip is not in the DOM and has no hit area at all.
 
-import { type JSX, memo, useCallback, useState } from 'react'
+import { type JSX, memo, useCallback, useEffect, useState } from 'react'
 import {
   Box,
+  Button,
   Checkbox,
   FormControlLabel,
   MenuItem,
@@ -74,7 +75,63 @@ export interface QuestFilterBarProps {
    * being drawn by the view because the line now BELONGS to the dropdown below (JOS-268).
    */
   inventoryLoadedAt: number | null
+  /**
+   * Take back every turn-in of every quest (`useProgress.resetTurnIns`, upstream issue #72). It
+   * sits on the RIGHT with "Count items from" because it moves the numbers under the bar, not
+   * the rows above it; the two-click arm is the whole confirmation, since the store keeps no
+   * history to restore from and a dialog for one button is a dialog too many.
+   */
+  onResetTurnIns: () => Promise<void>
 }
+
+/** How long the armed reset waits for its second click before standing down. */
+const RESET_ARM_MS = 5000
+
+/**
+ * The reset, armed by one click and fired by the next (upstream issue #72: "there is no current
+ * working way to reset progress in the plane of sky tab"). Armed, it says what the second click
+ * does; left alone, it stands down, because a control that stays armed across a scroll is a
+ * control that fires by accident.
+ */
+const ResetTurnIns = memo(function ResetTurnIns({
+  onReset
+}: {
+  onReset: () => Promise<void>
+}): JSX.Element {
+  const [armed, setArmed] = useState(false)
+  useEffect(() => {
+    if (!armed) return
+    const t = setTimeout(() => setArmed(false), RESET_ARM_MS)
+    return () => clearTimeout(t)
+  }, [armed])
+  const click = useCallback(() => {
+    if (!armed) {
+      setArmed(true)
+      return
+    }
+    setArmed(false)
+    // Fire and forget, the `reloadInventory` precedent: main answers by pushing `progress`, and
+    // the rows under the bar are what report the result.
+    void onReset().catch(() => undefined)
+  }, [armed, onReset])
+  return (
+    <Button
+      size="small"
+      variant={armed ? 'contained' : 'outlined'}
+      color={armed ? 'warning' : 'inherit'}
+      data-testid="posky-reset-turnins"
+      data-armed={armed ? 'true' : undefined}
+      onClick={click}
+      title={
+        armed
+          ? 'Click again to take back every turn-in on this tab. Turn-ins the log shows after this still count.'
+          : 'Take back every turn-in on this tab, including the ones read from your log'
+      }
+    >
+      {armed ? 'Confirm reset' : 'Reset turn-ins'}
+    </Button>
+  )
+})
 
 /**
  * WHY THE CONTROLS BELOW TAKE THEIR OWN STATE RATHER THAN `list` (JOS-206).
@@ -472,7 +529,8 @@ export default function QuestFilterBar({
   classes,
   countSource,
   onCountSource,
-  inventoryLoadedAt
+  inventoryLoadedAt,
+  onResetTurnIns
 }: QuestFilterBarProps): JSX.Element {
   return (
     <Stack direction="row" spacing={2} flexWrap="wrap" alignItems="center" useFlexGap>
@@ -499,6 +557,7 @@ export default function QuestFilterBar({
         setFavoritesOnly={list.setFavoritesOnly}
       />
       <Box sx={{ flexGrow: 1 }} />
+      <ResetTurnIns onReset={onResetTurnIns} />
       <InventorySource
         countSource={countSource}
         onCountSource={onCountSource}
