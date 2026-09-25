@@ -102,6 +102,28 @@ export function storedTurnIns(progress: Pick<ProgressState, 'questTurnIns'> | nu
   return sanitizeTurnInLedger(progress?.questTurnIns)
 }
 
+/** The instants the user took back, cleaned (upstream issue #72). Empty for a store without the key. */
+export function rejectedTurnIns(
+  progress: Pick<ProgressState, 'rejectedTurnIns'> | null
+): TurnInInstants {
+  return sanitizeTurnInLedger(progress?.rejectedTurnIns)
+}
+
+/**
+ * A ledger with the rejected instants taken out, key by key. Applied to the log's detected list
+ * and to the merged one alike, so a rejected detection is absent everywhere a turn-in is read:
+ * the count, the dump window, the consumption it would have charged.
+ */
+export function withoutRejected(instants: TurnInInstants, rejected: TurnInInstants): TurnInInstants {
+  const out: TurnInInstants = {}
+  for (const [key, list] of Object.entries(instants)) {
+    const drop = new Set(rejected[key] ?? [])
+    const kept = drop.size === 0 ? list : list.filter((ts) => !drop.has(ts))
+    if (kept.length > 0) out[key] = kept
+  }
+  return out
+}
+
 /** What one quest key's turn-ins are, once the log and the store agree. */
 export interface QuestTurnIns {
   /** key → every instant either source knows, merged */
@@ -112,20 +134,27 @@ export interface QuestTurnIns {
 
 /**
  * THE one place a turn-in count is decided. Merges the log's detected instants with the persisted
- * ones and floors the count at 1 for a legacy `completedQuests` entry.
+ * ones, takes out the ones the user rejected, and floors the count at 1 for a legacy
+ * `completedQuests` entry.
  *
  * `detected` is keyed the same way everything else here is: the canonical `Class::Name` quest key.
+ *
+ * THE REJECTION IS APPLIED TO THE STORED SIDE TOO, not only to `detected` (which the renderer
+ * already filters): an older build re-persists a rejected detection into `questTurnIns`, and
+ * this is where that copy is refused as well.
  */
 export function resolveTurnIns(
-  progress: Pick<ProgressState, 'questTurnIns' | 'completedQuests'> | null,
+  progress: Pick<ProgressState, 'questTurnIns' | 'completedQuests' | 'rejectedTurnIns'> | null,
   detected: TurnInInstants
 ): QuestTurnIns {
   const stored = storedTurnIns(progress)
+  const rejected = rejectedTurnIns(progress)
   const legacy = new Set(progress?.completedQuests ?? [])
-  const instants: TurnInInstants = {}
+  const merged: TurnInInstants = {}
   for (const key of new Set([...Object.keys(stored), ...Object.keys(detected)])) {
-    instants[key] = mergeTurnInInstants(stored[key] ?? [], detected[key] ?? [])
+    merged[key] = mergeTurnInInstants(stored[key] ?? [], detected[key] ?? [])
   }
+  const instants = withoutRejected(merged, rejected)
 
   const all: Record<string, number> = {}
   for (const key of new Set([...Object.keys(instants), ...legacy])) {
@@ -161,22 +190,64 @@ export function turnInsToPersist(
  * JOS-131 reads only that key, so a quest with turn-ins has to be in it and a quest whose last
  * turn-in was just taken back has to be out of it. Pure, so main's store is three lines and the
  * rule is testable without electron-store.
+ *
+ * `rejected`, when given, REPLACES this quest's list of taken-back detections (upstream issue
+ * #72): the caller states the whole list, the way it states the whole instants list, so one IPC
+ * carries both halves of an undo and there is no second call to race. Omitted, the stored
+ * rejections are left as they are.
  */
 export function applyTurnIns(
-  progress: Pick<ProgressState, 'questTurnIns' | 'completedQuests'>,
+  progress: Pick<ProgressState, 'questTurnIns' | 'completedQuests' | 'rejectedTurnIns'>,
   key: string,
-  instants: number[]
-): Pick<ProgressState, 'questTurnIns' | 'completedQuests'> {
+  instants: number[],
+  rejected?: number[]
+): Pick<ProgressState, 'questTurnIns' | 'completedQuests' | 'rejectedTurnIns'> {
   const clean = sanitizeTurnInInstants(instants)
-  const ledger: TurnInInstants = {}
-  for (const [k, v] of Object.entries(sanitizeTurnInLedger(progress.questTurnIns))) {
-    if (k !== key) ledger[k] = v
-  }
-  if (clean.length > 0) ledger[key] = clean
+  const ledger = replaceKey(sanitizeTurnInLedger(progress.questTurnIns), key, clean)
   const completed = new Set(progress.completedQuests)
   if (clean.length > 0) completed.add(key)
   else completed.delete(key)
-  return { questTurnIns: ledger, completedQuests: [...completed] }
+  const out = { questTurnIns: ledger, completedQuests: [...completed] }
+  if (rejected === undefined) return out
+  const refused = replaceKey(rejectedTurnIns(progress), key, sanitizeTurnInInstants(rejected))
+  return { ...out, rejectedTurnIns: refused }
+}
+
+/** What one IPC call states about a quest: its instants, and optionally its rejected list restated. */
+export interface TurnInStatement {
+  instants: number[]
+  rejected?: number[]
+}
+
+/**
+ * THE UNDO, as a statement (upstream issue #72). Drops the newest instant; when the log detected
+ * that instant, it joins the rejected list so the next snapshot cannot put it back. With no
+ * instants at all the statement is "never turned in", which clears a pre-JOS-131 completion.
+ */
+export function takeBackTurnIn(
+  instants: readonly number[],
+  detected: readonly number[],
+  rejected: readonly number[]
+): TurnInStatement {
+  const cut = instants[instants.length - 1]
+  if (cut === undefined) return { instants: [] }
+  const kept = instants.filter((ts) => ts !== cut)
+  return detected.includes(cut) ? { instants: kept, rejected: [...rejected, cut] } : { instants: kept }
+}
+
+/** THE RESET, per quest: nothing turned in, every detection the log shows today rejected. */
+export function rejectAllTurnIns(detected: readonly number[], rejected: readonly number[]): TurnInStatement {
+  return { instants: [], rejected: [...rejected, ...detected] }
+}
+
+/** One key's list restated in a cleaned ledger; an empty list drops the key, as the sanitizer does. */
+function replaceKey(ledger: TurnInInstants, key: string, list: number[]): TurnInInstants {
+  const out: TurnInInstants = {}
+  for (const [k, v] of Object.entries(ledger)) {
+    if (k !== key) out[k] = v
+  }
+  if (list.length > 0) out[key] = list
+  return out
 }
 
 /** How the badge says it: "Turned in" once, "Turned in x3" after that. Never for a count of 0. */

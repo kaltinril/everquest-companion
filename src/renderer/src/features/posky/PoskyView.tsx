@@ -310,6 +310,8 @@ interface PoskyBodyProps {
   countSource: CountSource
   onCountSource: (s: CountSource) => void
   inventoryLoadedAt: number | null
+  /** the Sky tab's reset (`useProgress.resetTurnIns`, upstream issue #72), for the filter bar */
+  resetTurnIns: () => Promise<void>
   /**
    * When this app last read the `/outputfile achievements` dump (`achievementsSource.readAt`), or
    * `null` for never (JOS-429) — the second instant of that kind's freshness line, exactly as
@@ -401,6 +403,7 @@ function PoskyBody(x: PoskyBodyProps): JSX.Element {
         countSource={countSource}
         onCountSource={onCountSource}
         inventoryLoadedAt={inventoryLoadedAt}
+        onResetTurnIns={x.resetTurnIns}
       />
       <CountsLine
         questCount={x.quests.length}
@@ -469,6 +472,7 @@ export default function PoskyView({
     setCountSource,
     recordTurnIn,
     undoTurnIn,
+    resetTurnIns,
     setItemOverride,
     itemOverrides,
     inventoryInfo,
@@ -522,6 +526,7 @@ export default function PoskyView({
         countSource={countSource}
         onCountSource={setCountSource}
         inventoryLoadedAt={inventoryInfo?.readAt ?? null}
+        resetTurnIns={resetTurnIns}
         achievementsLoadedAt={achievementsInfo?.readAt ?? null}
         onOpenLoot={onOpenLoot}
         itemOverrides={itemOverrides}
