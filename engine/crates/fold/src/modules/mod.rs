@@ -27,6 +27,7 @@ pub mod buff_rounds;
 pub mod buff_timer_rows;
 pub mod buff_timers;
 pub mod buffs;
+pub mod buffs_defines;
 pub mod buffs_entities;
 pub mod buffs_instance_rules;
 pub mod buffs_instances;

@@ -69,7 +69,7 @@ pub fn shared_core(facts: SpellFacts) -> SharedCore {
 
 pub struct BuffsModule {
     seq: i64,
-    core: SharedCore,
+    pub(crate) core: SharedCore,
     /// The pet/charm/target identity slots (the who/what).
     pets: PetEntities,
     /// The live (spell, entity) instances + every mutation over them.
@@ -195,14 +195,15 @@ impl BuffsModule {
     fn on_buff_apply(&mut self, ev: &Event, core: &mut BuffsCore) {
         let cands = candidates_of(ev);
         let ts = ev.ts();
+        let target = ev.str(Key::Target).unwrap_or_default();
         let landing = {
             let inst = &self.inst;
             let has_active = |k: &str| inst.has_active_spell(k);
-            admit_landing(&cands, ts, &core.anchors, &self.facts, &has_active)
+            admit_landing(&cands, target, ts, &core.anchors, &self.facts, &has_active)
         };
         let Some(landing) = landing else { return };
         let spec = LandingSpec {
-            target: ev.str(Key::Target).unwrap_or_default().to_string(),
+            target: target.to_string(),
             ts,
             illusion: landing.illusion,
             duration_ms: landing.duration_ms,
@@ -481,6 +482,19 @@ impl BuffsModule {
     }
 }
 
+/// A melee hit YOU landed is the proc gate's swing (buff_anchors `proc_evidence`): the target and
+/// the instant, nothing else. Every other line that reaches this arm is not this module's business.
+/// Never published — it is evidence a LATER landing is read through.
+fn note_melee_hit(anchors: &mut CastAnchors, ev: &Event) -> bool {
+    if ev.kind_of() == Kind::Damage
+        && ev.str(Key::Dtype) == Some("melee")
+        && id_key(ev.str(Key::Attacker).unwrap_or_default()) == "you"
+    {
+        anchors.note_melee(ev.str(Key::Target).unwrap_or_default(), ev.ts());
+    }
+    false
+}
+
 /// The `buffApply` candidate shape.
 fn candidates_of(ev: &Event) -> Vec<Candidate> {
     ev.candidates(Key::Candidates)
@@ -695,7 +709,7 @@ impl EqModule for BuffsModule {
                 self.inst.on_zone(&core.stats, &mut self.pets);
                 true
             }
-            _ => false,
+            _ => note_melee_hit(&mut core.anchors, ev),
         };
         drop(core);
         if published {
@@ -760,28 +774,5 @@ impl EqModule for BuffsModule {
     /// The persisted-overlay write seam. See `EqModule::as_buffs_mut`.
     fn as_buffs_mut(&mut self) -> Option<&mut BuffsModule> {
         Some(self)
-    }
-}
-
-impl crate::Defines for BuffsModule {
-    fn family(&self) -> &'static str {
-        "buffTrust"
-    }
-
-    /// The externals allowlist, replaced whole.
-    ///
-    /// It lands on the shared core and therefore on both modules at once, so the buff bar and the
-    /// crowd-control bar cannot end up with two ideas of whose spell just landed. `buffs` answers
-    /// for the family because it owns the core's construction; `buffTimers` clones the same handle
-    /// and needs no define of its own.
-    fn define(&mut self, payload: &Value) {
-        let Some(list) = payload.get("externals").and_then(Value::as_array) else {
-            return;
-        };
-        let names: Vec<String> = list
-            .iter()
-            .filter_map(|v| v.as_str().map(str::to_owned))
-            .collect();
-        self.core.borrow_mut().anchors.set_trust(names);
     }
 }
