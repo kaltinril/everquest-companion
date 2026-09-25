@@ -7,7 +7,8 @@ moving without losing the ability to hand everything back when he returns.
 
 Read [RULES.md](RULES.md) before touching any branch. [BRANCHES.md](BRANCHES.md) is the ordered
 list of branches that make up `main_community`. [ADOPTIONS.md](ADOPTIONS.md) records every
-third-party pull request that was vetted, adopted or deferred.
+third-party pull request that was vetted, adopted or deferred. [ISSUES.md](ISSUES.md) records
+every upstream issue that was looked at and what became of it.
 
 ## Why
 

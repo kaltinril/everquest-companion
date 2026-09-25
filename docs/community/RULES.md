@@ -86,7 +86,9 @@ creator's own repo and does not know the fork exists.
 12. **Every adoption is recorded.** A third-party PR that was looked at gets a row in
     `ADOPTIONS.md` whether it was adopted or deferred: number, title, author, the upstream head
     commit at the time, the date, our `community/` branch or the deferral reason, and what the
-    vetting found. A deferred PR is re-evaluated from its row, not from scratch.
+    vetting found. A deferred PR is re-evaluated from its row, not from scratch. An upstream
+    issue that was looked at gets a row in `ISSUES.md` the same way: fixed on which branch,
+    covered by what, answered how, or characterized and waiting on the owner's ruling.
 
 ## Things the creator owns
 
