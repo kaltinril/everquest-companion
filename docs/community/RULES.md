@@ -107,13 +107,15 @@ creator's own repo and does not know the fork exists.
 ## The workspace
 
 16. **Nothing new is created beside the repo.** `C:/git` is the owner's folder of repositories,
-    not a scratch area. The long-lived `eqc-*` worktrees in BRANCHES.md are the whole set; no
-    build checkout, version-bump checkout or other throwaway directory is added next to them
-    (owner, 2026-09-23). A worktree that exists only to serve one job goes under the session's
-    temp directory and is removed with `git worktree remove` the moment the job is done. A
-    packaged build is never such a job: `npm run dist` runs in this clone only, because a
-    worktree whose `node_modules` is a junction ships an installer missing dependencies (test.13,
-    2026-09-23: "Cannot find module 'conf'" on the tester's machine).
+    not a scratch area. Every worktree of this clone lives inside it, under `.claude/worktrees/`,
+    in a folder named after its branch (owner, 2026-09-24: "all work needs to be in this repo").
+    That folder is gitignored; the creator's lint config already skips it. The worktrees in
+    BRANCHES.md are the whole set; no build checkout, version-bump checkout or other throwaway
+    directory is added beside the repo (owner, 2026-09-23). A worktree that exists only to serve
+    one job goes under the session's temp directory and is removed with `git worktree remove`
+    the moment the job is done. A packaged build is never such a job: `npm run dist` runs in this
+    clone only, because a worktree whose `node_modules` is a junction ships an installer missing
+    dependencies (test.13, 2026-09-23: "Cannot find module 'conf'" on the tester's machine).
 
 17. **A test build always lands in `release/<version>/` of this clone**, beside the earlier
     builds, whatever directory produced it. That folder is where the owner looks; an installer
