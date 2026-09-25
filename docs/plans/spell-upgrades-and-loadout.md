@@ -651,7 +651,7 @@ owner-and-creator decision, not a thing this feature helps itself to.
 ## 5. Waves
 
 Each wave is mergeable and leaves the app working. Branch `spell-upgrades`, worktree
-`C:/git/eqc-spell-upgrades`, based on **`origin/main`** — verified current: `origin/main` and
+`.claude/worktrees/spell-upgrades`, based on **`origin/main`** — verified current: `origin/main` and
 `upstream/main` are both at `af7a938a` today, so no stale-base dance is needed. Fixes land on this
 branch and merge into `local_all_changes_testing`, never the reverse. **This branch never touches
 `shared/releaseNotes.ts`.**
