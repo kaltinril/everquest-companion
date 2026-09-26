@@ -177,7 +177,10 @@ test('the dead-lands gate actually removed something, and the count is measured 
     if (s.spellType !== 'Detrimental' || !s.msgCastOnOther) continue
     if (castOnOtherSuffix(s.msgCastOnOther) === null) dead += 1
   }
-  assert.equal(dead, 40, 'the measured population the `lands` gate now excludes')
+  // AND 17 once a bare lowercase predicate (`screams in pain.`, `is washed over by a wave of
+  // shadows.`) counts as its own suffix: 23 Detrimental rows the wiki wrote with no subject at all
+  // join the table in one move, measured on the owner's log before the rule was widened.
+  assert.equal(dead, 17, 'the measured population the `lands` gate now excludes')
 })
 
 test('`landsOnOther` always travels with the pattern it needs', () => {
