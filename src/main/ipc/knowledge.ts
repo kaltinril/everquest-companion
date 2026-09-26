@@ -69,6 +69,7 @@ import type { AlertsSnap } from '../../shared/alertTypes'
 import { resolvedClasses, type ClassAbbr, type ComboSnap } from '../../shared/classCombo'
 import {
   OBSERVED_SPELL_RANKS_MODULE_ID,
+  normalizeObservedRanks,
   observedRankRow,
   type ObservedSpellRanksSnap
 } from '../../shared/spellRanks'
@@ -199,7 +200,7 @@ export function registerKnowledgeIpc(): void {
     ])
     return buildSpellDetail(appSpellDb(), wanted, Object.keys(snap?.spellLastCast ?? {}), {
       client,
-      rank: observedRankRow(rankSnap, wanted)?.rank,
+      rank: observedRankRow(rankSnap && normalizeObservedRanks(rankSnap), wanted)?.rank,
       // JOS-452 — the same worn-focus answer the planner's inventory payload carries, from the same
       // memoized resolution, so the card and the leveling table can never credit a different item.
       focus: currentWornFocus(),

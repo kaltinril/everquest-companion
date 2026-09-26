@@ -244,3 +244,12 @@ test('P13 a record that was never found still states the loadout it was asked un
   assert.equal(d.linePath, null)
   assert.equal(spellLineNote(d), null)
 })
+
+// THE APOSTROPHE FOLD REACHES THE ROW (2026-09-25). `spellLineKey` drops apostrophes; `db.byKey`
+// keeps them (its key is a persisted id). The client spells `O`Keil's Radiation`, the wiki
+// `O'Keils Radiation`, and the card used to say not found for exactly the pair the fold joins.
+test('P6 a client spelling with an apostrophe finds the wiki row under the one fold', () => {
+  const db = loadSpellDb()
+  assert.equal(buildSpellDetail(db, 'O`Keil\'s Radiation', [], {}).found, true)
+  assert.equal(buildSpellDetail(db, "Jonthan's Whistling Warsong III", [], {}).found, true)
+})

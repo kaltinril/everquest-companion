@@ -148,6 +148,20 @@ export function normalizeSpellRank(rank: number | null | undefined): number {
 }
 
 /**
+ * A rank as ARITHMETIC: an integer 0..10, clamped, and 1 stays 1.
+ *
+ * DELIBERATELY NOT `normalizeSpellRank`. That fold belongs to EVIDENCE - the log cannot tell
+ * `Clarity I` from `Clarity`, so an OBSERVED 1 reads as base. A slider rung has no such doubt: tier
+ * 1 is one mote spent, and folding it made the Spellbook's rung I print the base figures and the
+ * Upgrades tab's arithmetic quote a free rung (`spellUpgradePlan.ts tierNumber` records the first
+ * catch). Every simulated tier goes through this; every observed rank goes through the fold.
+ */
+export function clampSpellRank(rank: number): number {
+  if (!Number.isFinite(rank)) return 0
+  return Math.max(0, Math.min(SPELL_MAX_RANK, Math.trunc(rank)))
+}
+
+/**
  * ONE DAMAGE MAGNITUDE AT A RANK: `amount + floor(amount * pct * N / 100)`.
  *
  * Spelled as `amount + floor(...)` rather than `floor(amount * (1 + 0.06N))` to mirror
@@ -172,16 +186,29 @@ export function scaleSpellDamage(
   rank: number | null | undefined,
   perTick = false
 ): number {
-  const n = normalizeSpellRank(rank)
-  if (n === 0 || amount <= 0) return amount
-  const pct = perTick ? SPELL_DOT_DAMAGE_RANK_PERCENT : SPELL_DAMAGE_RANK_PERCENT
-  return amount + Math.floor((amount * pct * n) / 100)
+  return damageAtRank(amount, normalizeSpellRank(rank), perTick)
 }
 
 /** ONE HEALING MAGNITUDE AT A RANK: the damage rule at half the rate (see the header's evidence). */
 export function scaleSpellHeal(amount: number, rank: number | null | undefined): number {
-  const n = normalizeSpellRank(rank)
-  if (n === 0 || amount <= 0) return amount
+  return healAtRank(amount, normalizeSpellRank(rank))
+}
+
+/**
+ * THE SAME ARITHMETIC AT A RANK ALREADY RESOLVED - no evidence fold, so a caller that has decided
+ * for itself whether its number is an observed rank or a simulated tier (`spellMetrics.ts
+ * spellMetricsAt` resolves it once for both of its folds) is not second-guessed here, where a
+ * slider's tier 1 would silently become base. `n` is `normalizeSpellRank`'s or `clampSpellRank`'s
+ * answer; the two exported scalers above are these with the fold applied.
+ */
+export function damageAtRank(amount: number, n: number, perTick = false): number {
+  if (n <= 0 || amount <= 0) return amount
+  const pct = perTick ? SPELL_DOT_DAMAGE_RANK_PERCENT : SPELL_DAMAGE_RANK_PERCENT
+  return amount + Math.floor((amount * pct * n) / 100)
+}
+
+export function healAtRank(amount: number, n: number): number {
+  if (n <= 0 || amount <= 0) return amount
   return amount + Math.floor((amount * SPELL_HEAL_RANK_PERCENT * n) / 100)
 }
 
@@ -190,12 +217,19 @@ export function scaleSpellHeal(amount: number, rank: number | null | undefined):
  *
  * The panel's slider lifts every row to a rank, but a row already ABOVE it must not be pulled down —
  * the owner's ask was to read his real Garrison's VIII against every other spell as if levelled, not
- * to hide the rank he actually owns. `Math.max` over two normalized ranks is that rule, and it lives
- * here rather than in the panel so the model and the card cannot disagree about it.
+ * to hide the rank he actually owns. `Math.max` over the two resolved ranks is that rule, and it
+ * lives here rather than in the panel so the model and the card cannot disagree about it.
+ *
+ * EACH SIDE IS RESOLVED BY ITS OWN RULE. The observed rank is evidence and is FOLDED
+ * (`normalizeSpellRank`: an observed I reads as base, because the log cannot tell `Clarity I` from
+ * `Clarity`). The simulated rank is a slider rung and is CLAMPED (`clampSpellRank`): rung I is one
+ * mote, and folding it had the Leveling tab's "all at I+" position printing the base figures.
+ * The answer is therefore ALREADY RESOLVED, and a reader that takes it must not fold it again -
+ * `bestSpells.ts buildRow` hands it to `spellMetricsForLevel` as a `tier` for that reason.
  */
 export function effectiveSpellRank(
   observed: number | null | undefined,
   simulated: number | null | undefined
 ): number {
-  return Math.max(normalizeSpellRank(observed), normalizeSpellRank(simulated))
+  return Math.max(normalizeSpellRank(observed), clampSpellRank(simulated ?? 0))
 }

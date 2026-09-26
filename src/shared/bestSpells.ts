@@ -76,7 +76,7 @@ import type { ClassAbbr } from './classCombo'
 import { comboClassSet, type ComboClasses, type LevelUnlockData, type UnlockSpell } from './levelUnlocks'
 import { spellMetricsAt, type SpellMetrics } from './spellMetrics'
 import { observedRankRow, type ObservedSpellRanksSnap } from './spellRanks'
-import { effectiveSpellRank, normalizeSpellRank } from './spellScale'
+import { clampSpellRank, effectiveSpellRank, normalizeSpellRank } from './spellScale'
 import { bestWornFocus, wornFocusLabel, type FocusKind, type WornFocus } from './wornFocus'
 
 // ── AND EVERY FIGURE WEARS YOUR GEAR SINCE JOS-452 (owner ask 2026-08-23) ──────────────────────
@@ -433,6 +433,8 @@ export function spellHitsFor(spell: UnlockSpell, targets: number): number {
  */
 export interface MetricsReading {
   rank?: number
+  /** a SLIDER tier in place of an observed rank - clamped, never folded; `SpellMetricsInput.tier` */
+  tier?: number
   targets?: number
   /** the worn DAMAGE focus percent for this spell; absent or 0 is no focus */
   focusDamagePct?: number
@@ -458,6 +460,7 @@ export function spellMetricsForLevel(
     // The mote rank rides the same input for the same reason: `spellMetricsAt` resolves it once and
     // both of its folds scale by that one number (JOS-447).
     rank,
+    ...(reading.tier === undefined ? {} : { tier: reading.tier }),
     // AND HOW MANY TIMES THE CAST LANDS (JOS-449): `targets` 1 gives a rain its three waves and
     // every other spell the single hit it has always had.
     hits: spellHitsFor(spell, targets),
@@ -569,7 +572,9 @@ function ownedRows(
   fold: RowFold
 ): BestSpellRow[] {
   const view = fold.view
-  const simulate = normalizeSpellRank(view.simulate)
+  // The slider's rung, CLAMPED and not folded: rung I is tier 1. `effectiveSpellRank` applies the
+  // evidence fold to the observed side alone.
+  const simulate = clampSpellRank(view.simulate ?? 0)
   const byName = new Map<string, BestSpellRow>()
   for (const spell of data.spells) {
     // THE AREA READING IS A DIFFERENT CORPUS, not a filter applied later: a spell that hits one
@@ -616,8 +621,10 @@ function buildRow(
   const rank = effectiveSpellRank(observedRank, ctx.simulate)
   const targets = ctx.fold.area ? targetsFor(spell) : 1
   const focus = rowFocus(spell, view.focus ?? [], owned.gainedAt)
+  // `rank` is already resolved (observed folded, simulated clamped), so it rides as a TIER: handed
+  // as `rank` the reader would fold a simulated I back to base on the way through.
   const metrics = spellMetricsForLevel(spell, ctx.level, {
-    rank,
+    tier: rank,
     targets,
     focusDamagePct: pctOfSide(focus, 'damage'),
     focusHealPct: pctOfSide(focus, 'heal')

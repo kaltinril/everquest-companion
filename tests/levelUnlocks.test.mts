@@ -31,7 +31,8 @@ import {
   type UnlockSpell
 } from '../src/shared/levelUnlocks'
 import { spellMetricsParts } from '../src/shared/spellMetrics'
-import { buildLevelUnlocks } from '../src/main/data/levelUnlocks'
+import type { SpellResistTable } from '../src/shared/resistTypes'
+import { buildLevelUnlocks, dedupeByName, type NamedRow } from '../src/main/data/levelUnlocks'
 
 // ---- fixtures ---------------------------------------------------------------------------
 
@@ -160,6 +161,25 @@ test('a spell the wiki carries TWICE is one row — a bookkeeping duplicate neve
   }
   const clr = comboClassesOf(interval(0, null, [slot(['CLR']), slot(['CLR'])]))
   assert.deepEqual(unlockCounts(unlocksAtLevel(dupes, clr, 29)), { spells: 1, skills: 0 })
+})
+
+test('the client tiebreak folds SAME-NAMED pages only - two ranks of one line are two spells', () => {
+  // Burnout's shape (2026-09-25): the client file keys its one `burnout` row by the rank-stripped
+  // name, and the fold grouped the catalog the same way - so rank II, which agrees with that row,
+  // was the only rank of four to survive on a machine with the game installed. The client may pick
+  // between two SCRAPES of one page; it may not pick between two ranks of one line.
+  const rank = (name: string, mana: number, level: number): NamedRow => ({
+    spell: { name, at: [{ cls: 'MAG', level }], mana, castTimeMs: 6500, recastMs: 1500 },
+    you: 'Your pet is surrounded by an aura of flame.'
+  })
+  const client: SpellResistTable = {
+    burnout: { id: 106, axis: null, resistAdj: 0, mana: 75, castMs: 6500, recastMs: 1500 }
+  }
+  const kept = dedupeByName([rank('Burnout', 35, 11), rank('Burnout II', 75, 29)], client)
+  assert.deepEqual(kept.map((s) => s.name), ['Burnout', 'Burnout II'])
+  // …while two pages of ONE name still fold to the one the client agrees with.
+  const pages = [rank('Burnout II', 75, 29), rank('Burnout II', 70, 29)]
+  assert.deepEqual(dedupeByName(pages, client).map((s) => s.mana), [75])
 })
 
 test('a class OUTSIDE the loadout contributes nothing, however loudly the DB states it', () => {

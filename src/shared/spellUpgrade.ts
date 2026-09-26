@@ -180,6 +180,7 @@ import {
   SPELL_DOT_DAMAGE_RANK_PERCENT,
   SPELL_HEAL_RANK_PERCENT,
   SPELL_MAX_RANK,
+  clampSpellRank,
   normalizeSpellRank
 } from './spellScale'
 
@@ -647,9 +648,7 @@ function benefitRowsAt(
   if (base.resistAdjust !== undefined && categoryIsOffensive(base.category)) {
     row.resistAdjust = base.resistAdjust - UNIVERSAL_RATES.resistPerTier * tier
   }
-  // A MEASURED EXCEPTION READS AS NO RATE AT ALL, so the ladder prints the base figure at every
-  // rung rather than a climb the game was measured not to give.
-  const rate = magnitudeIsMeasuredStatic(base) ? { damage: null, heal: null } : rates
+  const rate = magnitudeRates(base)
   const damage = stated(base.damage)
   if (damage !== undefined) row.damage = magnitudeAt(damage, rate.damage, tier)
   const heal = stated(base.heal)
@@ -658,15 +657,36 @@ function benefitRowsAt(
 }
 
 /**
+ * THE RATES THIS SPELL'S MAGNITUDES ACTUALLY MOVE AT: the category's, or none at all for a
+ * measured exception, so the ladder prints the base figure at every rung rather than a climb the
+ * game was measured not to give.
+ *
+ * Exported for the Spellbook, which reads a spell's magnitudes PER LINE (`shared/spellbook.ts`)
+ * and has to ask the same question before it scales anything - a null here is "do not scale", and
+ * inventing a rate at the far end is how Arch Lich's self-DoT would start growing on a buff.
+ */
+export function magnitudeRates(base: SpellTierBase): { damage: number | null; heal: number | null } {
+  const rates = UPGRADE_RATES[base.category]
+  return magnitudeIsMeasuredStatic(base) ? { damage: null, heal: null } : rates
+}
+
+/**
  * One magnitude at a tier, or the base back untouched where the category states no rate.
  *
  * `amount + floor(amount * pct * tier / 100)` mirrors `spellScale.scaleSpellDamage` to the character,
  * which is what keeps the Spells area and the Leveling tab's rank slider printing the same number
  * for the same spell.
+ *
+ * THE RATE BECOMES A WHOLE PERCENT BEFORE IT TOUCHES THE AMOUNT, because that is the one place the
+ * mirror can quietly break. `spellScale` multiplies by an integer percent; this table holds the
+ * rate as a fraction, and `30 * 0.03 * 100` is `89.999...`, so the floor came out one low on about
+ * one figure in 250: a nuke of 15 read 23 at rank X where the Leveling tab read 24, and a DoT of 30
+ * read 38 at both IX and X, so the top rung's gain read as nothing and the spell silently left the
+ * ranked upgrade plan.
  */
 function magnitudeAt(amount: number, rate: number | null, tier: number): number {
   if (rate === null) return amount
-  return amount + Math.floor((amount * rate * 100 * tier) / 100)
+  return amount + Math.floor((amount * Math.round(rate * 100) * tier) / 100)
 }
 
 export function spellTierLadder(base: SpellTierBase): SpellTierReading[] {
@@ -841,13 +861,17 @@ export function upgradePayoffSentence(p: UpgradePayoff): string {
  *
  * Returns null at the cap and wherever the next tier changes nothing the caller can value - a
  * division that would read as an infinite return on 512 motes.
+ *
+ * `from` IS A TIER AND IS CLAMPED, not folded: a line at tier 1 has tier 2 to buy next, and the
+ * evidence fold (`normalizeSpellRank`, 1 -> 0) had this recommending tier 1 to a line already
+ * holding it. A caller with an OBSERVED rank folds it before asking, as `heldRank` does.
  */
 export function nextTierReturn(
   ladder: readonly SpellTierReading[],
   from: number,
   valueAt: (reading: SpellTierReading) => number
 ): { tier: number; motes: number; gain: number; perMote: number } | null {
-  const here = normalizeSpellRank(from)
+  const here = clampSpellRank(from)
   const next = here + 1
   if (next > SPELL_MAX_RANK) return null
   const a = ladder[here]

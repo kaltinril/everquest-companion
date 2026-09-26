@@ -34,6 +34,7 @@ import {
   priorResist,
 } from './resistFormula'
 import { type DamageRef, damageKind, splitDamage } from './resistDamage'
+import { spellCanonKey } from './spellKey'
 import type { ResistAxis, ResistRow, SpellResistInfo, SpellResistTable } from './resistTypes'
 import { type GridFit, gridFit } from './resistFit'
 
@@ -192,7 +193,10 @@ export function debuffAmount(
   if (debuffs === '') return 0
   let total = 0
   for (const key of debuffs.split('|')) {
-    const slots = spells[key]?.debuffSlots
+    // The row's keys are the engine's (apostrophes kept); the table's are `spellCanonKey`'s
+    // (dropped) — the same re-fold `resistModel.ts estimate` applies to `row.spellKey`, without
+    // which `Ro's Fiery Sundering` counted for nothing (2026-09-25).
+    const slots = spells[spellCanonKey(key)]?.debuffSlots
     if (!slots) continue
     for (const slot of slots) {
       if (slot.axis !== axis && slot.axis !== 'all') continue

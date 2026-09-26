@@ -90,9 +90,11 @@ export function buildLines(
     if (list) list.push(name)
     else names.set(key, [name])
   }
-  // DB names first so their casing wins the dedupe in buildSpellLine.
+  // DB names first so their casing wins the dedupe in buildSpellLine. The catalog key keeps its
+  // apostrophes (it is a persisted id); the log names are pushed under `spellLineKey`, which drops
+  // them, so both sides are folded here or an apostrophe spell would be two lines (2026-09-25).
   for (const e of catalog?.entries ?? []) {
-    for (const name of e.rankNames ?? [e.name]) push(e.key, name)
+    for (const name of e.rankNames ?? [e.name]) push(spellLineKey(e.key), name)
   }
   for (const name of Object.keys(spellLastCast)) push(spellLineKey(name), name)
   const out = new Map<string, SpellLine>()

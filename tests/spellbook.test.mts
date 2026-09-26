@@ -17,6 +17,9 @@ import {
   spellbookRows
 } from '../src/shared/spellbook'
 import { SPELL_MAX_RANK } from '../src/shared/spellScale'
+import { spellMetricsAt } from '../src/shared/spellMetrics'
+import { spellMetricsForLevel } from '../src/shared/bestSpells'
+import { UPGRADE_RATES } from '../src/shared/spellUpgrade'
 import { buildLevelUnlocks } from '../src/main/data/levelUnlocks'
 
 /** A catalog row with only what a case is about. */
@@ -34,6 +37,7 @@ test('every figure on a row is read at the row`s own stated tier', () => {
     upgradeCategory: 'nuke',
     mana: 200,
     castTimeMs: 3000,
+    hpLines: ['Decrease Hitpoints by 333'],
     metrics: { damage: 333 } as UnlockSpell['metrics']
   })
   const base = spellbookRow(nuke, 0)
@@ -44,19 +48,59 @@ test('every figure on a row is read at the row`s own stated tier', () => {
   assert.equal(five.tier, 5)
   assert.equal(five.mana, 180) // 200 x (1 - 0.02 x 5)
   assert.equal(five.damage, 432) // 333 + floor(333 x 6 x 5 / 100)
+  // …and 432 is the Leveling tab's number for the same spell at the same rank, from its own reader.
+  assert.equal(five.damage, spellMetricsAt({ effects: nuke.hpLines, rank: 5 }, 20)?.damage)
   // The row states the tier it was read at, so no caller can hold a figure without its tier.
   assert.equal(spellbookRow(nuke, 99).tier, SPELL_MAX_RANK)
 })
 
-test('a DoT`s ticks scale at the measured three percent, not six', () => {
-  const dot = spell({
-    name: 'Test DoT',
+test('a DoT scales PER TICK - the Leveling tab`s number, never the total scaled on its own', () => {
+  // The row used to hand the ladder its TOTAL (tick x ticks) and scale that. The game scales the
+  // tick, and floor-then-multiply is not multiply-then-floor: Affliction is 6 a tick over 14 ticks,
+  // and floor(6 x 1.15) is still 6, so at V it reads 84 - where the scaled total read 96. 386 of
+  // the corpus's 1,170 (row, tier) pairs disagreed with the Leveling tab that way (2026-09-25).
+  const affliction = spell({
+    name: 'Test Affliction',
     upgradeCategory: 'dot',
-    metrics: { damage: 387 } as UnlockSpell['metrics']
+    durationMs: 84000,
+    hpLines: ['Decrease Hitpoints by 6 per tick'],
+    metrics: { damage: 84 } as UnlockSpell['metrics']
   })
-  // Odium's own ladder, through the browsing surface: the same numbers the log measured.
-  assert.equal(spellbookRow(dot, 5).damage, 445)
-  assert.equal(spellbookRow(dot, 7).damage, 468)
+  assert.equal(spellbookRow(affliction, 0).damage, 84)
+  assert.equal(spellbookRow(affliction, 5).damage, 84)
+  // Odium's own ladder: a 387 tick reads 445 at V and 468 at VII (the log's numbers), times ticks.
+  const odium = spell({
+    name: 'Test Odium',
+    upgradeCategory: 'dot',
+    durationMs: 24000,
+    hpLines: ['Decrease Hitpoints by 387 per tick'],
+    metrics: { damage: 387 * 4 } as UnlockSpell['metrics']
+  })
+  assert.equal(spellbookRow(odium, 5).damage, 445 * 4)
+  assert.equal(spellbookRow(odium, 7).damage, 468 * 4)
+  // The law, stated once for both: the row IS the Leveling tab's reading at that rank, and so is
+  // every rung of the ladder the Upgrades tab ranks from.
+  for (const s of [affliction, odium]) {
+    const ladder = spellbookLadder(s)
+    for (const t of [0, 2, 5, 7, 10]) {
+      const leveling = spellMetricsAt({ effects: s.hpLines, durationMs: s.durationMs, rank: t }, 20)
+      assert.equal(spellbookRow(s, t).damage, leveling?.damage, `${s.name} at ${String(t)}`)
+      assert.equal(ladder[t].damage, leveling?.damage, `${s.name} ladder at ${String(t)}`)
+    }
+  }
+})
+
+test('a category with no magnitude rate keeps its base figure at every tier, lines or not', () => {
+  // Arch Lich: a beneficial self-DoT filed as a buff. The per-line reader WOULD scale its tick at
+  // three percent; the category says a buff's numbers do not move, and no rate is invented for it.
+  const lich = spell({
+    name: 'Test Lich',
+    upgradeCategory: 'buff',
+    durationMs: 60000,
+    hpLines: ['Decrease hitpoints by 20 per tick'],
+    metrics: { damage: 200 } as UnlockSpell['metrics']
+  })
+  for (const t of [0, 5, 10]) assert.equal(spellbookRow(lich, t).damage, 200)
 })
 
 test('the Bear Form row says a buff`s numbers do not move', () => {
@@ -73,6 +117,27 @@ test('the Bear Form row says a buff`s numbers do not move', () => {
   // …and the two figures it DOES buy really move.
   assert.equal(row.mana, 60)
   assert.equal(row.castSeconds, 2.4)
+})
+
+test('rung I of the slider is tier 1, not base - the evidence fold is for observed ranks only', () => {
+  // `normalizeSpellRank` reads an observed 1 as 0 because the log cannot tell `Clarity I` from
+  // `Clarity`. The slider's rung I ran through the same fold and printed the base figures (dot 387
+  // / mana 100) under a label saying I, where the ladder's own tier 1 reads 398 / 98.
+  const dot = spell({
+    name: 'Test DoT',
+    upgradeCategory: 'dot',
+    mana: 100,
+    durationMs: 6000,
+    hpLines: ['Decrease Hitpoints by 387 per tick'],
+    metrics: { damage: 387 } as UnlockSpell['metrics']
+  })
+  const base = spellbookRow(dot, 0)
+  const one = spellbookRow(dot, 1)
+  assert.equal(one.tier, 1)
+  assert.notDeepEqual([one.mana, one.damage], [base.mana, base.damage])
+  assert.deepEqual([one.mana, one.damage], [98, 398])
+  const ladder = spellbookLadder(dot)
+  assert.deepEqual([one.mana, one.damage], [ladder[1].mana, ladder[1].damage])
 })
 
 test('a spell stating no mana never grows one at any tier', () => {
@@ -238,6 +303,30 @@ test('Form of the Bear is filed `hot`, and that CONTRADICTS the owner - recorded
   const regen = REAL.find((s) => s.name === 'Regeneration')
   assert.ok(regen !== undefined)
   assert.equal(spellbookRow(regen, 8).category, 'hot', 'the two are filed identically, as they must be')
+})
+
+/** One real row against the Leveling tab's reader at one rank: the sides compared, or 0. */
+function sidesAgreeing(s: UnlockSpell, t: number): number {
+  const row = spellbookRow(s, t)
+  if (!row.payoff.magnitude) return 0
+  const rate = UPGRADE_RATES[row.category]
+  const leveling = spellMetricsForLevel(s, Math.min(...s.at.map((p) => p.level)), { rank: t })
+  let compared = 0
+  for (const side of ['damage', 'heal'] as const) {
+    if (rate[side] === null || (s.metrics?.[side] ?? 0) <= 0) continue
+    assert.equal(row[side], leveling?.[side], `${s.name} ${side} at ${String(t)}`)
+    compared++
+  }
+  return compared
+}
+
+test('the real corpus prints the Leveling tab`s number at every tier wherever its category scales', () => {
+  // The cross-check the validator ran (2026-09-25): every row with a figure, at three ranks, against
+  // the Leveling tab's reader with the same inputs. Rows whose category has no rate for that side
+  // are the deliberate exceptions (Arch Lich, Cannibalize) and the measured statics (Chloroplast).
+  let compared = 0
+  for (const s of REAL) for (const t of [2, 5, 10]) compared += sidesAgreeing(s, t)
+  assert.ok(compared > 1000, `${String(compared)} (row, tier) pairs compared`)
 })
 
 test('the whole corpus reads at tier 10 without producing a NaN', () => {

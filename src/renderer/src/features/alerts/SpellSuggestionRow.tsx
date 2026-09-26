@@ -26,7 +26,7 @@ import { Box, Chip, Typography } from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import type { SpellCatalogEntry } from '@shared/types'
 import type { ClassAbbr } from '@shared/classCombo'
-import { preferredRank, type SpellLine } from '@shared/spellLines'
+import { preferredRank, spellLineKey, type SpellLine } from '@shared/spellLines'
 import {
   RANK_TEMPLATES,
   SUGGEST_TEMPLATES,
@@ -259,7 +259,12 @@ function SpellRow({
   const isDebuff = entry.spellType === 'Detrimental'
   // The rank the one-click chips target: the MOST RECENTLY CAST rank of this line (the owner's
   // rule), falling back to the highest rank known when the line has never been observed.
-  const rank = useMemo(() => preferredRank(ctx.lines.get(entry.key)?.ranks ?? []), [ctx.lines, entry.key])
+  // `ctx.lines` is keyed under `spellLineKey` (lineIntel.ts), the catalog key under spellDb's own
+  // fold; they differ by an apostrophe, so the read folds too.
+  const rank = useMemo(
+    () => preferredRank(ctx.lines.get(spellLineKey(entry.key))?.ranks ?? []),
+    [ctx.lines, entry.key]
+  )
   // Building the AlertDefs is the row's heaviest work, and it depends only on the entry and the
   // rank — so a re-render that changes neither (a parent re-render, a hover) does none of it.
   const suggestions = useMemo(

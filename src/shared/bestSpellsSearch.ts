@@ -200,13 +200,15 @@ function readingOf(spell: UnlockSpell, ask: BestSpellSearchAsk, gainedAt: number
   const area = ask.tab === 'aoe'
   if (area && !isAeTargetType(spell.targetType)) return null
   const observedRank = normalizeSpellRank(observedRankRow(ask.observed, spell.name)?.rank)
-  const rank = effectiveSpellRank(observedRank, normalizeSpellRank(ask.simulate))
+  // The slider side is clamped inside `effectiveSpellRank` (rung I is tier 1); only the observed
+  // side is folded. The answer is resolved, so it rides as a TIER - see `bestSpells.ts buildRow`.
+  const rank = effectiveSpellRank(observedRank, ask.simulate)
   const targets = area ? targetsFor(spell) : 1
   // JOS-452 — the reader's own gear, resolved by the SAME function the ranked fold uses so a result
   // and a ranked row of one spell can never disagree about which item answered for it.
   const focus = rowFocus(spell, ask.focus ?? [], gainedAt)
   const metrics = spellMetricsForLevel(spell, ask.level, {
-    rank,
+    tier: rank,
     targets,
     focusDamagePct: pctOfSide(focus, 'damage'),
     focusHealPct: pctOfSide(focus, 'heal')

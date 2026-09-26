@@ -19,7 +19,11 @@ export const OBSERVED_SPELL_RANKS_MODULE_ID = 'observedSpellRanks'
 
 /** One spell LINE and the highest rank of it this character has been observed to hold. */
 export interface ObservedSpellRankRow {
-  /** `spellLineKey(name)` — lowercased, roman-numeral tail stripped. */
+  /**
+   * The engine's key for the line: lowercased, roman-numeral tail stripped, apostrophes KEPT
+   * (Rust `spell_canon_key`). It is `spellLineKey(name)` only for a name without one, which is
+   * why every reader indexes through `normalizeObservedRanks` rather than the snapshot itself.
+   */
   key: string
   /** RAW base display name, tail stripped, as the evidence spelled it ("Shiftless Deeds"). */
   name: string
@@ -46,6 +50,22 @@ export interface ObservedSpellRankRow {
 export type ObservedSpellRanksSnap = Record<string, ObservedSpellRankRow>
 export interface ObservedSpellRanksDelta {
   changed: ObservedSpellRanksSnap
+}
+
+/**
+ * The snapshot re-keyed under `spellLineKey`, which DROPS apostrophes where the engine's key keeps
+ * them (2026-09-25): `Denon's Disruptive Discord IV` landed in the engine under
+ * `denon's disruptive discord` and every TypeScript reader asked for `denons disruptive discord`,
+ * so an apostrophe line never showed its held rank, read every figure at rank 1, and fell out of
+ * the upgrade plan. Idempotent — folding an already-folded key changes nothing — so a reader can
+ * apply it without knowing which side wrote the map. `row.key` itself is left as the engine
+ * spelled it. Two rows folding to one key would be two engine lines for one spell, which the
+ * engine's own key rule already forbids, so the later one simply wins.
+ */
+export function normalizeObservedRanks(snap: ObservedSpellRanksSnap): ObservedSpellRanksSnap {
+  const out: ObservedSpellRanksSnap = {}
+  for (const [key, row] of Object.entries(snap)) out[spellLineKey(key)] = row
+  return out
 }
 
 /** Merge a delta's changed rows over a held map. The ONE fold both windows would ever write. */

@@ -267,7 +267,9 @@ test('the effective rank is the HIGHER of observed and simulated, never the slid
   assert.equal(effectiveSpellRank(undefined, 5), 5)
   assert.equal(effectiveSpellRank(7, undefined), 7)
   assert.equal(effectiveSpellRank(null, null), 0)
-  assert.equal(effectiveSpellRank(1, 0), 0, 'rank 1 is base at both ends of the max')
+  assert.equal(effectiveSpellRank(1, 0), 0, 'an OBSERVED rank 1 is base - the evidence fold')
+  assert.equal(effectiveSpellRank(0, 1), 1, 'a SIMULATED rank 1 is tier 1 - a slider rung is not evidence')
+  assert.equal(effectiveSpellRank(1, 1), 1)
 })
 
 test('the rate is stated once and the two constants are the ones the header argues for', () => {

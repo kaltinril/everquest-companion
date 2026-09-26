@@ -57,7 +57,14 @@ import type { SpellDb } from './spellDb'
 export function dbRowFor(db: SpellDb, name: string): SpellEntry | undefined {
   const wanted = name.trim().toLowerCase()
   const exact = db.spells.find((s) => s.name.trim().toLowerCase() === wanted)
-  return exact ?? db.byKey.get(spellLineKey(name))
+  if (exact) return exact
+  // `db.byKey` is keyed by spellDb.ts's own fold, which KEEPS apostrophes because the catalog key
+  // is a persisted id (alert suggestion ids are built from it); `spellLineKey` drops them, so an
+  // apostrophe spell — the client's `O`Keil's Radiation` against the wiki's `O'Keils Radiation`,
+  // the very pair the fold exists to join — missed here (2026-09-25). The line walk is the same
+  // first-row-per-line answer byKey gives, under the one fold both names reach.
+  const line = spellLineKey(name)
+  return db.byKey.get(line) ?? db.spells.find((s) => spellLineKey(s.name) === line)
 }
 
 /** One class that files this spell, and where in that class's ladder it sits. */

@@ -35,7 +35,7 @@ import {
   type UpgradeCategory,
   type UpgradeFacts
 } from '../src/shared/spellUpgrade'
-import { SPELL_MAX_RANK } from '../src/shared/spellScale'
+import { SPELL_MAX_RANK, scaleSpellDamage, scaleSpellHeal } from '../src/shared/spellScale'
 
 /** A fact set with everything off, so each case states only what it is about. */
 function facts(over: Partial<UpgradeFacts>): UpgradeFacts {
@@ -295,6 +295,30 @@ test('a magnitude only moves where the category says it does', () => {
   assert.equal(tash[10].damage, undefined)
 })
 
+test('the ladder prints the SAME magnitude the Leveling tab`s rank slider prints', () => {
+  // The two are meant to be one arithmetic and were not, by a float: `15 * 0.06 * 100` is
+  // `89.999...`, so the ladder's floor read one low on about one figure in 250. A nuke of 15 read
+  // 23 at rank X where `scaleSpellDamage` read 24…
+  assert.equal(spellTierLadder({ category: 'nuke', damage: 15 })[10].damage, 24)
+  assert.equal(spellTierLadder({ category: 'nuke', damage: 15 })[10].damage, scaleSpellDamage(15, 10))
+  // …and a DoT of 30 read 37, 38, 38 at VIII, IX, X - a top rung worth nothing, which dropped the
+  // spell out of the ranked plan. The per-tick rule says 39.
+  const dot = spellTierLadder({ category: 'dot', damage: 30 })
+  assert.deepEqual([dot[8].damage, dot[9].damage, dot[10].damage], [37, 38, 39])
+  assert.equal(dot[10].damage, scaleSpellDamage(30, 10, true))
+  // Every amount a spell can state, at every rung, under all three rates: no figure differs.
+  for (let amount = 1; amount <= 2000; amount++) {
+    const nuke = spellTierLadder({ category: 'nuke', damage: amount })
+    const tick = spellTierLadder({ category: 'dot', damage: amount })
+    const heal = spellTierLadder({ category: 'heal', heal: amount })
+    for (let tier = 2; tier <= SPELL_MAX_RANK; tier++) {
+      assert.equal(nuke[tier].damage, scaleSpellDamage(amount, tier))
+      assert.equal(tick[tier].damage, scaleSpellDamage(amount, tier, true))
+      assert.equal(heal[tier].heal, scaleSpellHeal(amount, tier))
+    }
+  }
+})
+
 // =================================================================================================
 // THE PAYOFF — the owner's question 2
 // =================================================================================================
@@ -371,6 +395,16 @@ test('return per mote falls off a cliff as the cost doubles', () => {
   assert.equal(last.motes, 512)
   // Each rung adds the same 60 damage; the 10th costs 512 times what the 1st did.
   assert.ok(first.perMote > last.perMote * 100)
+})
+
+test('a line at tier 1 is offered tier 2, never tier 1 again', () => {
+  // `from` is a tier and is clamped; the evidence fold read 1 as 0 and had this quoting the rung
+  // the line already holds, at the one-mote price.
+  const ladder = spellTierLadder({ category: 'nuke', damage: 1000 })
+  const next = nextTierReturn(ladder, 1, (r) => r.damage ?? 0)
+  assert.ok(next !== null)
+  assert.equal(next.tier, 2)
+  assert.equal(next.motes, 2)
 })
 
 test('there is no return past the cap, and none where nothing moves', () => {

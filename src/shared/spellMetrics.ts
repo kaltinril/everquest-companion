@@ -89,7 +89,7 @@
 // absent means no focus - `applyFocusPct(x, 0)` returns `x` by identity, so every figure printed
 // before JOS-452 is unchanged. The families, the level-range decay and the qualification test live
 // in `shared/wornFocus.ts`, which can be deleted without taking the magnitude reader with it.
-import { normalizeSpellRank, scaleSpellDamage, scaleSpellHeal } from './spellScale'
+import { clampSpellRank, damageAtRank, healAtRank, normalizeSpellRank } from './spellScale'
 import { applyFocusPct } from './wornFocus'
 // The line reader was this file's until the mana pool joined it; the readers still arrive from
 // here for every importer that ever asked, and the fold below reads hitpoints through it.
@@ -430,6 +430,14 @@ export interface SpellMetricsInput {
    */
   rank?: number
   /**
+   * THE SAME THING AS A SLIDER TIER rather than an observed rank: an integer 0..10 that is CLAMPED
+   * and never folded, so 1 is one mote spent and not "the log could not tell". The Spellbook's tier
+   * slider reads through this (`shared/spellbook.ts`), so its rung I prints the tier-I figures the
+   * ladder beside it prints, while every OBSERVED rank keeps arriving as `rank` and keeps its fold.
+   * Wins over `rank` when both are stated, because a caller that has a tier has already decided.
+   */
+  tier?: number
+  /**
    * HOW MANY TIMES THE DAMAGE MAGNITUDE LANDS FROM ONE CAST (JOS-449). Absent and 1 are the same
    * answer, and 1 is what every spell in the catalog reads until a caller says otherwise — so every
    * figure this file printed before JOS-449 is unchanged by construction.
@@ -533,11 +541,15 @@ function foldLine(side: Side, line: HpLine, durationTicks: number, fold: Fold): 
   // mote rank is part of the spell you own, a focus rolls on top of the spell as it is cast, and the
   // waves are that cast landing more than once. Each side takes its OWN focus - a damage focus can
   // never lift a healing line, and the two are resolved separately against the same spell.
+  //
+  // `fold.rank` IS ALREADY RESOLVED - observed ranks folded, slider tiers clamped, once, in
+  // `spellMetricsAt` - so the scalers here are the fold-free ones: `scaleSpellDamage` would fold a
+  // tier of 1 back to base on the way through.
   const amount =
     line.direction === 'down'
-      ? applyFocusPct(scaleSpellDamage(line.amount, fold.rank, line.perTick), fold.focusDamagePct) *
+      ? applyFocusPct(damageAtRank(line.amount, fold.rank, line.perTick), fold.focusDamagePct) *
         fold.hits
-      : applyFocusPct(scaleSpellHeal(line.amount, fold.rank), fold.focusHealPct)
+      : applyFocusPct(healAtRank(line.amount, fold.rank), fold.focusHealPct)
   if (!line.perTick) {
     side.total += amount
     return
@@ -610,6 +622,15 @@ function withMana(spell: SpellMetricsInput, client?: ClientHpFacts): SpellMetric
  * rather than threaded past `assemble` so that every path below — the wiki fold, the client fold,
  * the unlock row, the spell card — divides by one denominator resolved one way.
  */
+/**
+ * THE ONE NUMBER BOTH FOLDS SCALE BY: a slider TIER is clamped and an observed RANK is folded -
+ * see `SpellMetricsInput.tier` for why they differ. Its own function so `spellMetricsAt` stays
+ * under the complexity ceiling.
+ */
+function foldRankOf(spell: SpellMetricsInput): number {
+  return spell.tier === undefined ? normalizeSpellRank(spell.rank) : clampSpellRank(spell.tier)
+}
+
 export function spellMetricsAt(
   input: SpellMetricsInput,
   level: number,
@@ -618,7 +639,7 @@ export function spellMetricsAt(
   const spell = withMana(withRecast(input, client), client)
   // Resolved ONCE, here, for `withRecast`'s reason: one number reaches both folds.
   const fold: Fold = {
-    rank: normalizeSpellRank(spell.rank),
+    rank: foldRankOf(spell),
     hits: hitsOf(spell.hits),
     focusDamagePct: pctOf(spell.focusDamagePct),
     focusHealPct: pctOf(spell.focusHealPct)
