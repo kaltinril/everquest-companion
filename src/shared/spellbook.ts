@@ -46,7 +46,7 @@ import type { UnlockSpell } from './levelUnlocks'
 // The Leveling tab's own reader, so a magnitude at a tier here is the number that tab prints for
 // the same spell at the same rank - see `tierMagnitudes`.
 import { spellMetricsForLevel } from './bestSpells'
-import { SPELL_MAX_RANK, normalizeSpellRank } from './spellScale'
+import { SPELL_MAX_RANK, clampSpellRank } from './spellScale'
 import { compareStatKeys, type SpellStatGrant } from './spellStats'
 import {
   UPGRADE_RATES,
@@ -313,7 +313,13 @@ function lineFields(s: UnlockSpell): Pick<SpellbookRow, 'iconId' | 'line' | 'rep
 }
 
 export function spellbookRow(s: UnlockSpell, tier: number): SpellbookRow {
-  const t = normalizeSpellRank(tier)
+  // THE TIER IS CLAMPED, NOT FOLDED. `normalizeSpellRank` reads an OBSERVED 1 as base, because the
+  // log cannot tell `Clarity I` from `Clarity` - an evidence rule, and the right one for a rank the
+  // log reported. The slider's rung I is not evidence of anything: it is one mote spent, and
+  // folding it printed the base figures under a rung labelled I (dot 387 / mana 100 where the
+  // ladder's own tier 1 reads 398 / 98) and sent the Upgrades tab a row that recommended buying
+  // tier 1 again. Observed ranks still arrive here folded, by `spellUpgradePlan.ts heldRank`.
+  const t = clampSpellRank(tier)
   const base = tierBase(s)
   const reading = spellTierLadder(base)[t]
   const row: SpellbookRow = {

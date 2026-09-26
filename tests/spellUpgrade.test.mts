@@ -397,6 +397,16 @@ test('return per mote falls off a cliff as the cost doubles', () => {
   assert.ok(first.perMote > last.perMote * 100)
 })
 
+test('a line at tier 1 is offered tier 2, never tier 1 again', () => {
+  // `from` is a tier and is clamped; the evidence fold read 1 as 0 and had this quoting the rung
+  // the line already holds, at the one-mote price.
+  const ladder = spellTierLadder({ category: 'nuke', damage: 1000 })
+  const next = nextTierReturn(ladder, 1, (r) => r.damage ?? 0)
+  assert.ok(next !== null)
+  assert.equal(next.tier, 2)
+  assert.equal(next.motes, 2)
+})
+
 test('there is no return past the cap, and none where nothing moves', () => {
   const ladder = spellTierLadder({ category: 'buff', durationTicks: 100, mana: 50 })
   assert.equal(nextTierReturn(ladder, SPELL_MAX_RANK, (r) => r.durationTicks ?? 0), null)

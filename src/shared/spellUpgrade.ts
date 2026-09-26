@@ -180,6 +180,7 @@ import {
   SPELL_DOT_DAMAGE_RANK_PERCENT,
   SPELL_HEAL_RANK_PERCENT,
   SPELL_MAX_RANK,
+  clampSpellRank,
   normalizeSpellRank
 } from './spellScale'
 
@@ -860,13 +861,17 @@ export function upgradePayoffSentence(p: UpgradePayoff): string {
  *
  * Returns null at the cap and wherever the next tier changes nothing the caller can value - a
  * division that would read as an infinite return on 512 motes.
+ *
+ * `from` IS A TIER AND IS CLAMPED, not folded: a line at tier 1 has tier 2 to buy next, and the
+ * evidence fold (`normalizeSpellRank`, 1 -> 0) had this recommending tier 1 to a line already
+ * holding it. A caller with an OBSERVED rank folds it before asking, as `heldRank` does.
  */
 export function nextTierReturn(
   ladder: readonly SpellTierReading[],
   from: number,
   valueAt: (reading: SpellTierReading) => number
 ): { tier: number; motes: number; gain: number; perMote: number } | null {
-  const here = normalizeSpellRank(from)
+  const here = clampSpellRank(from)
   const next = here + 1
   if (next > SPELL_MAX_RANK) return null
   const a = ladder[here]

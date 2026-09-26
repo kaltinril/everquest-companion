@@ -119,6 +119,27 @@ test('the Bear Form row says a buff`s numbers do not move', () => {
   assert.equal(row.castSeconds, 2.4)
 })
 
+test('rung I of the slider is tier 1, not base - the evidence fold is for observed ranks only', () => {
+  // `normalizeSpellRank` reads an observed 1 as 0 because the log cannot tell `Clarity I` from
+  // `Clarity`. The slider's rung I ran through the same fold and printed the base figures (dot 387
+  // / mana 100) under a label saying I, where the ladder's own tier 1 reads 398 / 98.
+  const dot = spell({
+    name: 'Test DoT',
+    upgradeCategory: 'dot',
+    mana: 100,
+    durationMs: 6000,
+    hpLines: ['Decrease Hitpoints by 387 per tick'],
+    metrics: { damage: 387 } as UnlockSpell['metrics']
+  })
+  const base = spellbookRow(dot, 0)
+  const one = spellbookRow(dot, 1)
+  assert.equal(one.tier, 1)
+  assert.notDeepEqual([one.mana, one.damage], [base.mana, base.damage])
+  assert.deepEqual([one.mana, one.damage], [98, 398])
+  const ladder = spellbookLadder(dot)
+  assert.deepEqual([one.mana, one.damage], [ladder[1].mana, ladder[1].damage])
+})
+
 test('a spell stating no mana never grows one at any tier', () => {
   const song = spell({ name: 'Test Song', upgradeCategory: 'buff', durationMs: 60000 })
   for (const t of [0, 5, 10]) assert.equal(spellbookRow(song, t).mana, undefined)
