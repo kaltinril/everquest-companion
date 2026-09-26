@@ -663,10 +663,17 @@ function benefitRowsAt(
  * `amount + floor(amount * pct * tier / 100)` mirrors `spellScale.scaleSpellDamage` to the character,
  * which is what keeps the Spells area and the Leveling tab's rank slider printing the same number
  * for the same spell.
+ *
+ * THE RATE BECOMES A WHOLE PERCENT BEFORE IT TOUCHES THE AMOUNT, because that is the one place the
+ * mirror can quietly break. `spellScale` multiplies by an integer percent; this table holds the
+ * rate as a fraction, and `30 * 0.03 * 100` is `89.999...`, so the floor came out one low on about
+ * one figure in 250: a nuke of 15 read 23 at rank X where the Leveling tab read 24, and a DoT of 30
+ * read 38 at both IX and X, so the top rung's gain read as nothing and the spell silently left the
+ * ranked upgrade plan.
  */
 function magnitudeAt(amount: number, rate: number | null, tier: number): number {
   if (rate === null) return amount
-  return amount + Math.floor((amount * rate * 100 * tier) / 100)
+  return amount + Math.floor((amount * Math.round(rate * 100) * tier) / 100)
 }
 
 export function spellTierLadder(base: SpellTierBase): SpellTierReading[] {
