@@ -21,7 +21,7 @@ import itemsJson from '../src/main/data/items.json'
 import type { ItemDbFile } from '../src/main/itemsDb'
 import { buildGearIndex } from '../src/main/planner/gearIndex'
 // The SHIPPED era join, reached the way the Gear tab reaches it.
-import { eraChip, eraHides } from '../src/renderer/src/features/planner/plannerData'
+import { donorEra, eraChip, eraHides } from '../src/renderer/src/features/planner/plannerData'
 
 const file = itemsJson as unknown as ItemDbFile
 const index = buildGearIndex(file)
@@ -123,10 +123,16 @@ test('layer 3 is counted in the build census, and only its ONE definitive edge o
 
   // AND THE IN-ERA DIRECTION IS REAL AND SMALL: 40 rows are shown BECAUSE a page the wiki files as
   // classic content vouches for them. Each one carries no chip at all, which is what in-era means.
-  const shown = rows.filter((r) => r.eraDerived?.verdict === 'in-era')
+  // Counted where the derivation SPEAKS: a quest edge is computed off the page's own zones, and the
+  // catalog can still place the row out (Targ Shield: Bandit Sisters hands it out in Felwithe, its
+  // catalog droppers all stand in Kunark) — the overruled derivation is the safety valve, not a chip.
+  const shown = rows.filter((r) => r.eraDerived?.verdict === 'in-era' && donorEra(r).by === 'derived')
   assert.ok(shown.length >= 30, `only ${String(shown.length)} rows are derived in-era`)
   for (const row of shown) {
-    assert.equal(row.eraDerived?.basis, 'page', `${row.name} was derived in-era by a ${String(row.eraDerived?.basis)} edge`)
+    assert.ok(
+      row.eraDerived?.basis === 'page' || row.eraDerived?.basis === 'quest',
+      `${row.name} was derived in-era by a ${String(row.eraDerived?.basis)} edge`
+    )
     assert.equal(eraChip(row), null, `${row.name} is in-era and still wears a chip`)
     assert.equal(eraHides(row, true), false, `${row.name} is in-era and the filter still hides it`)
   }

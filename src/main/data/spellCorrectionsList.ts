@@ -158,6 +158,11 @@ import { SUBJECT_PLACEHOLDER_CORRECTIONS } from './spellCorrectionsSubjects'
 // code-mass ceiling is shared with none of it; that file's header carries the report, the four rungs
 // of the ladder and the reason the fourth rung is deliberately left uncorrected.
 import { HEALING_LADDER_CORRECTIONS } from './spellCorrectionsHealing'
+// THE RESIST FAMILY (2026-09-25), appended below. Two of this header's drift classes at once — the
+// preposition, for the self landing of four resists, and the scrape stub, for two wear-offs the wiki
+// filled with the spell's own name — measured on a second owner log and held to this file's bar.
+// It lives next door because this file was one entry short of its code-mass ceiling.
+import { RESIST_FAMILY_CORRECTIONS } from './spellCorrectionsResists'
 // THE POLARITY RULING (JOS-413), appended below. The SIXTH drift class and the only one that is not
 // about a sentence: the owner ruled that the lull and memory-wipe families are DEBUFFS, whatever the
 // wiki's type column says. It lives next door for the same reason the two above do — its argument is
@@ -729,5 +734,6 @@ export const SPELL_CORRECTIONS: readonly SpellCorrection[] = [
   ...COLUMN_CORRECTIONS,
   ...SUBJECT_PLACEHOLDER_CORRECTIONS,
   ...HEALING_LADDER_CORRECTIONS,
+  ...RESIST_FAMILY_CORRECTIONS,
   ...POLARITY_CORRECTIONS
 ]

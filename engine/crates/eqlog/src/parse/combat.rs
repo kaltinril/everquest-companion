@@ -96,12 +96,12 @@ impl CombatRes {
                     r"|(YOU) (parry|dodge|riposte|block)",
                     r"|.+?'s magical skin (absorbs) the blow",
                     r"|(YOUR) magical skin absorbs the blow)",
-                    r"!(?: \([A-Za-z]+\))?$"
+                    r"!(?: \([A-Za-z ]+\))?$"
                 ),
             )
             .unwrap(),
             miss_verb: Regex::new(r" tr(?:y|ies) to ([0-9A-Za-z_]+)").unwrap(),
-            miss_mod: Regex::new(r" \(([A-Za-z]+)\)$").unwrap(),
+            miss_mod: Regex::new(r" \(([A-Za-z ]+)\)$").unwrap(),
             resist_yours: Regex::new(r"^(.+?) resisted your (.+?)!$").unwrap(),
             resist_caster: Regex::new(r"^(.+?) resisted (.+?)'s (.+?)!$").unwrap(),
             resist_incoming: Regex::new(r"^You resist(?:ed)? (.+?)'s (.+?)!$").unwrap(),

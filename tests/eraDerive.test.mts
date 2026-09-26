@@ -57,6 +57,7 @@ const QUESTS: QuestData = {
   quests: [
     { name: 'Scaled Mystic Breastplate', page: 'Scaled Mystic Armor Quests', startZone: 'East Cabilis' },
     { name: 'A Classic Errand', page: 'A Classic Errand', startZone: 'Plane of Hate' },
+    { name: 'An Epic Errand', page: 'An Epic Errand', startZone: 'Erudin', requiredItems: ['Small Breastplate Mold'] },
     { name: 'A Quest With No Zone', page: 'A Quest With No Zone' }
   ]
 }
@@ -168,9 +169,33 @@ test('a quest we cannot resolve, or that states no start zone, states NOTHING (l
 
   const zoneless = item('Another Reward', { questUses: [{ quest: 'A Quest With No Zone', source: 'wiki' }] })
   assert.equal(deriveEra(zoneless, corpusOf(zoneless), catalogs()), null)
+})
 
+test('a related quest that starts in an OPENED zone vouches the item in, unless a turn-in is badged out', () => {
+  // The Soldier's Brooch shape: no drop zone, no banner, one quest, and that quest starts in Rathe
+  // Mountains. Before 2026-09-25 this was `null` and the row hid as era?.
   const classic = item('A Third Reward', { questUses: [{ quest: 'A Classic Errand', source: 'wiki' }] })
-  assert.equal(deriveEra(classic, corpusOf(classic), catalogs()), null)
+  assert.deepEqual(deriveEra(classic, corpusOf(classic), catalogs()), {
+    basis: 'quest',
+    verdict: 'in-era',
+    target: 'A Classic Errand',
+    detail: 'Plane of Hate'
+  })
+
+  // OUT BEFORE IN: a second quest that starts in Kunark still wins.
+  const both = item('A Fourth Reward', {
+    questUses: [
+      { quest: 'A Classic Errand', source: 'wiki' },
+      { quest: 'Scaled Mystic Breastplate', page: 'Scaled Mystic Armor Quests', source: 'wiki' }
+    ]
+  })
+  assert.equal(deriveEra(both, corpusOf(both), catalogs())?.verdict, 'out-of-era')
+
+  // THE EPIC REFUSAL: the giver stands in Erudin, but a turn-in the quest names is badged out, so
+  // the start zone vouches for nothing (law 1 in the direction that would SHOW content).
+  const mold = item('Small Breastplate Mold', { eraTag: 'Epics' })
+  const chain = item('A Chain Piece', { questUses: [{ quest: 'An Epic Errand', source: 'wiki' }] })
+  assert.equal(deriveEra(chain, corpusOf(chain, mold), catalogs()), null)
 })
 
 test('every related quest counts, not only the ones the catalog calls a reward', () => {

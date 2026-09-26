@@ -401,4 +401,97 @@ mod tests {
         assert!(out.starts_with(r#"{"kind":"buffApply","#), "{out}");
         assert!(out.contains(r#""candidates":[{"name":"#), "{out}");
     }
+
+    /// The resist family after `spellCorrectionsResists.ts` (2026-09-25): the wear-off the wiki
+    /// filled with the spell's own name used to fall through to `Fade`'s generic ` fades.` suffix
+    /// and land as a buffApply; the self landing used to match nothing at all.
+    #[test]
+    fn the_resist_family_prints_the_sentences_the_corrections_say() {
+        let p = parser_for("Primitive", chrono_tz::America::Los_Angeles);
+        let out = parse_one(&p, "[Fri Aug 21 20:41:47 2026] Your fire resistance fades.");
+        assert!(out.starts_with(r#"{"kind":"buffWearOff","#), "{out}");
+        assert!(out.contains(r#""spell":"Resist Fire""#), "{out}");
+        assert!(out.ends_with(r#""target":"self"}"#), "{out}");
+        let out = parse_one(
+            &p,
+            "[Fri Aug 21 20:41:47 2026] Your magic resistance fades.",
+        );
+        assert!(out.starts_with(r#"{"kind":"buffWearOff","#), "{out}");
+        assert!(out.contains(r#""Resist Magic""#), "{out}");
+        assert!(out.contains(r#""Resistance to Magic""#), "{out}");
+        let out = parse_one(&p, "[Fri Aug 21 20:41:47 2026] You feel resistant to fire.");
+        assert!(out.starts_with(r#"{"kind":"buffApply","#), "{out}");
+        assert!(
+            out.contains(r#""target":"self","spell":"Resist Fire""#),
+            "{out}"
+        );
+        for x in ["cold", "poison", "disease"] {
+            let out = parse_one(
+                &p,
+                &format!("[Fri Aug 21 20:41:47 2026] You feel resistant to {x}."),
+            );
+            assert!(out.starts_with(r#"{"kind":"buffApply","#), "{out}");
+            assert!(out.contains(r#""target":"self","spell":"Resist "#), "{out}");
+        }
+    }
+
+    /// A song cut short prints its own sentence, not `Your <X> spell is interrupted.`.
+    #[test]
+    fn a_missed_note_is_the_songs_cast_interrupt() {
+        let p = bare();
+        let raw = "[Fri Aug 21 20:41:47 2026] You miss a note, bringing your Denon's Disruptive Discord to a close!";
+        assert_eq!(
+            parse_one(&p, raw),
+            format!(
+                r#"{{"kind":"castInterrupted","seq":0,"ts":1787370107000,"raw":{},"spell":"Denon's Disruptive Discord"}}"#,
+                serde_json::to_string(raw).unwrap()
+            )
+        );
+    }
+
+    /// A quest payment names its payer and no item: the vendor form without the `for the` clause.
+    #[test]
+    fn a_quest_payment_is_coin_from_an_npc() {
+        let p = bare();
+        let out = parse_one(
+            &p,
+            "[Fri Aug 21 20:41:47 2026] You receive 6 gold from Zok Zribb.",
+        );
+        assert!(out.starts_with(r#"{"kind":"coin","#), "{out}");
+        assert!(out.contains(r#""source":"npc""#), "{out}");
+        assert!(out.contains(r#""coins":{"gold":6}"#), "{out}");
+        assert!(out.ends_with(r#""npc":"Zok Zribb"}"#), "{out}");
+        // …and the vendor form still carries its item, so the looser NPC anchor did not take it.
+        let out = parse_one(
+            &p,
+            "[Fri Aug 21 20:41:47 2026] You receive 2 gold from Zok Zribb for the Bone Chips(s).",
+        );
+        assert!(out.contains(r#""source":"vendor""#), "{out}");
+        assert!(
+            out.ends_with(r#""npc":"Zok Zribb","item":"Bone Chips"}"#),
+            "{out}"
+        );
+    }
+
+    /// A miss can carry a two-word modifier, exactly as a hit can; the parenthetical used to admit
+    /// one word and left every `(Wild Rampage)` miss `unknown`. The modifier splits into two tokens
+    /// because that is how the same parenthetical splits on a HIT (`parse_modifiers` keeps only Slay
+    /// Undead, Finishing Blow and Crippling Blow whole), and a miss follows the hit's convention.
+    #[test]
+    fn a_missed_swing_keeps_a_two_word_modifier() {
+        let p = bare();
+        let out = parse_one(
+            &p,
+            "[Fri Aug 21 20:41:47 2026] Lobarer tries to slash a glyphed guard, but misses! (Wild Rampage)",
+        );
+        assert!(out.starts_with(r#"{"kind":"miss","#), "{out}");
+        assert!(
+            out.contains(r#""attacker":"Lobarer","target":"a glyphed guard","mtype":"miss""#),
+            "{out}"
+        );
+        assert!(
+            out.ends_with(r#""verb":"slash","modifiers":["Wild","Rampage"]}"#),
+            "{out}"
+        );
+    }
 }
