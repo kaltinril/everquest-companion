@@ -14,9 +14,10 @@
 //
 // AND ONE SWITCH (upstream issue #69): count a debuff your held weapon or item procs as yours. The
 // game prints no line when an item procs, so the engine reads two other facts instead — your own
-// melee hit on that mob in the last two seconds, and the spell being a combat effect of an item
-// your latest inventory dump holds. Off by default; the caption says why, because the residual (a
-// group-mate swinging the same weapon at the same mob) is the user's to accept, not the app's.
+// swing at that mob in the last two seconds, and the spell being a combat effect of an item your
+// latest inventory dump holds. Off by default; the caption says why, because the residual (anyone's
+// landing of that spell on a mob you are hitting reads as yours) is the user's to accept, not the
+// app's.
 //
 // ONE BORDER: PreferencesView already wraps each item in an outlined Paper, so this renders bare
 // Stacks.
@@ -131,9 +132,10 @@ export function BuffTrustSetting(): JSX.Element {
         label="Count debuffs your weapon or item procs as yours"
       />
       <Typography variant="caption" color="text.secondary" data-testid="pref-buff-trust-procs-note">
-        A proc prints no cast line, so a landing counts only on a mob you hit in the last two seconds, and only for a
-        combat effect of an item in your latest /outputfile inventory. A group member swinging the same weapon at the
-        same mob would be counted too, which is why this is off by default.
+        A proc prints no cast line, so a landing counts only on a mob you swung at in the last two seconds, and only
+        for a combat effect of an item in your latest /outputfile inventory. Any landing of that spell on a mob you are
+        hitting is counted as yours, including a group member`s cast, click or proc of the same spell, which is why this
+        is off by default.
       </Typography>
     </Stack>
   )

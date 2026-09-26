@@ -115,7 +115,7 @@ let cached: { items: unknown; index: ClickyIndex } | undefined
  *  count nor the nesting depth of `index()` depends on how many effect kinds there are. */
 function fileEffects(entry: { page: string; stats?: { effects: ItemEffect[] } }, into: ClickyIndex): void {
   for (const e of entry.stats?.effects ?? []) {
-    const name = e.name.trim()
+    const name = effectSpellName(e.name)
     if (!name) continue
     const spell = spellCanonKey(name)
     if (e.kind === 'combat' || e.kind === 'proc') {
@@ -123,6 +123,19 @@ function fileEffects(entry: { page: string; stats?: { effects: ItemEffect[] } },
       push(into.procsByItem, itemKey(entry.page), name)
     } else if (e.kind === 'click' && INSTANT.test(e.detail ?? '')) push(into.byItem, itemKey(entry.page), spell)
   }
+}
+
+/**
+ * The spell an effect line names, with the wiki's level tail cut off: two combat effects in the
+ * committed DB read `Frost Strike  Level 51` and `Frost Strike  at lvl 5` (measured 2026-09-25,
+ * the only two of 453 whose spelling failed to resolve), and a name that resolves to nothing arms
+ * nothing, silently. A double space or a level suffix begins the tail; no spell name has either.
+ */
+function effectSpellName(raw: string): string {
+  return raw
+    .replace(/\s{2,}.*$/, '')
+    .replace(/\s+(?:at\s+)?l(?:vl|evel)\s*\d+$/i, '')
+    .trim()
 }
 
 function push(m: Map<string, string[]>, key: string, value: string): void {

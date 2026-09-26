@@ -30,7 +30,8 @@
 use crate::event::{Event, Key, Kind};
 use crate::jsmap::JsMap;
 use crate::modules::buff_anchors::CastAnchors;
-use crate::modules::buff_landing::{admit_landing, Candidate};
+use crate::modules::buff_landing::{admit_landing, candidates_of, wear_off_candidates, Candidate};
+use crate::modules::buff_procs::ProcStash;
 use crate::modules::buffs_entities::PetEntities;
 use crate::modules::buffs_instances::{BuffInstances, LandingSpec};
 use crate::modules::buffs_mining::OverlayMining;
@@ -78,6 +79,8 @@ pub struct BuffsModule {
     permanent_illusion_owned_ts: Option<i64>,
     /// Emote learning: recognize real landing-emote texts.
     emote_text_count: JsMap<i64>,
+    /// Landings the gate refused for want of a swing, held for the swing line that follows.
+    stash: ProcStash,
     /// Last-seen clock + the log-hole question.
     frame: SessionFrame,
     /// The observed-message overlay: which lines the miner is fed, and what it builds.
@@ -117,6 +120,7 @@ impl BuffsModule {
             inst: BuffInstances::new(),
             permanent_illusion_owned_ts: None,
             emote_text_count: JsMap::new(),
+            stash: ProcStash::default(),
             frame: SessionFrame::new(),
             mining: OverlayMining::new(
                 facts.clone(),
@@ -194,14 +198,21 @@ impl BuffsModule {
     /// anchor a stranger's buff would bind as ours. A refusal means the landing produces nothing.
     fn on_buff_apply(&mut self, ev: &Event, core: &mut BuffsCore) {
         let cands = candidates_of(ev);
-        let ts = ev.ts();
         let target = ev.str(Key::Target).unwrap_or_default();
+        self.apply_landing(target, ev.ts(), &cands, core);
+    }
+
+    /// The landing itself, apart from the event it came on: a swing line replays a held one.
+    fn apply_landing(&mut self, target: &str, ts: i64, cands: &[Candidate], core: &mut BuffsCore) {
         let landing = {
             let inst = &self.inst;
             let has_active = |k: &str| inst.has_active_spell(k);
-            admit_landing(&cands, target, ts, &core.anchors, &self.facts, &has_active)
+            admit_landing(cands, target, ts, &core.anchors, &self.facts, &has_active)
         };
-        let Some(landing) = landing else { return };
+        let Some(landing) = landing else {
+            // Refused for want of a swing, maybe: the proc prints BEFORE its swing's own line.
+            return self.stash.hold(target, ts, cands, &core.anchors);
+        };
         let spec = LandingSpec {
             target: target.to_string(),
             ts,
@@ -215,6 +226,18 @@ impl BuffsModule {
         };
         self.inst
             .apply_message_buff(&landing.spell, &spec, &mut core.stats, &mut self.pets);
+    }
+
+    /// Every line no arm above claims: a swing of YOURS is the proc gate's evidence
+    /// (`buff_procs.rs`), and the landings it was holding for that swing are applied now. Published
+    /// only when one was replayed; a swing on its own moves nothing a client can read.
+    fn on_swing(&mut self, ev: &Event, core: &mut BuffsCore) -> bool {
+        let held = self.stash.note_swing(&mut core.anchors, ev);
+        let replayed = !held.is_empty();
+        for p in held {
+            self.apply_landing(&p.target, p.ts, &p.cands, core);
+        }
+        replayed
     }
 
     /// A HoT tick is not a landing. `You healed <X> over time for N by <Spell>.` is printed once per
@@ -482,38 +505,6 @@ impl BuffsModule {
     }
 }
 
-/// A melee hit YOU landed is the proc gate's swing (buff_anchors `proc_evidence`): the target and
-/// the instant, nothing else. Every other line that reaches this arm is not this module's business.
-/// Never published — it is evidence a LATER landing is read through.
-fn note_melee_hit(anchors: &mut CastAnchors, ev: &Event) -> bool {
-    if ev.kind_of() == Kind::Damage
-        && ev.str(Key::Dtype) == Some("melee")
-        && id_key(ev.str(Key::Attacker).unwrap_or_default()) == "you"
-    {
-        anchors.note_melee(ev.str(Key::Target).unwrap_or_default(), ev.ts());
-    }
-    false
-}
-
-/// The `buffApply` candidate shape.
-fn candidates_of(ev: &Event) -> Vec<Candidate> {
-    ev.candidates(Key::Candidates)
-        .into_iter()
-        .map(|(name, duration_ms, illusion)| Candidate {
-            name,
-            duration_ms,
-            illusion,
-        })
-        .collect()
-}
-
-/// The `buffWearOff` candidate shape — plain names.
-fn wear_off_candidates(ev: &Event) -> Vec<String> {
-    ev.arr_str(Key::Candidates)
-        .into_iter()
-        .map(str::to_string)
-        .collect()
-}
 
 impl EqModule for BuffsModule {
     fn id(&self) -> &'static str {
@@ -709,7 +700,7 @@ impl EqModule for BuffsModule {
                 self.inst.on_zone(&core.stats, &mut self.pets);
                 true
             }
-            _ => note_melee_hit(&mut core.anchors, ev),
+            _ => self.on_swing(ev, &mut core),
         };
         drop(core);
         if published {

@@ -21,6 +21,7 @@
 //! under `spell_key`, so they are the same spell by construction and differ only in how the log
 //! wrote it down — and the DB name is the string every other surface states.
 
+use crate::event::{Event, Key};
 use crate::modules::buff_anchors::CastAnchors;
 use crate::modules::buffs_shapes::{spell_key, SELF_CASTER};
 use crate::spell_facts::{Nature, SpellFacts};
@@ -31,6 +32,27 @@ pub struct Candidate {
     pub name: String,
     pub duration_ms: Option<i64>,
     pub illusion: bool,
+}
+
+/// The `buffApply` candidate shape. Here rather than in buffs.rs because the shape is this
+/// file's type, and because buffs.rs sits at the factoring bar.
+pub fn candidates_of(ev: &Event) -> Vec<Candidate> {
+    ev.candidates(Key::Candidates)
+        .into_iter()
+        .map(|(name, duration_ms, illusion)| Candidate {
+            name,
+            duration_ms,
+            illusion,
+        })
+        .collect()
+}
+
+/// The `buffWearOff` candidate shape — plain names.
+pub fn wear_off_candidates(ev: &Event) -> Vec<String> {
+    ev.arr_str(Key::Candidates)
+        .into_iter()
+        .map(str::to_string)
+        .collect()
 }
 
 /// What the gate admitted.

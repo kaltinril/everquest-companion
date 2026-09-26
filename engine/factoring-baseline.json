@@ -375,7 +375,7 @@
       "file": "crates/fold/src/modules/buffs.rs",
       "metric": "file-lines",
       "name": "",
-      "value": 531
+      "value": 521
     },
     {
       "file": "crates/fold/src/modules/buffs.rs",

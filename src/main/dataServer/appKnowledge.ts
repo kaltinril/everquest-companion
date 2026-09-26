@@ -52,7 +52,7 @@ export function readDefine<O extends DefineOp>(op: O): DefineParams<O> {
     // (`loadInventoryNow`, `reloadInventory`) and nothing about a bag is ever persisted as trust.
     case 'buffTrust.define':
       return {
-        trust: { ...getBuffTrustPrefs(), procSpells: [...heldProcSpells(getProgress(activeCharId()).inventory)] }
+        trust: { ...getBuffTrustPrefs(), procSpells: [...heldProcSpells(getProgress(activeCharId()).inventory ?? {})] }
       } as unknown as DefineParams<O>
     case 'respawn.define':
       return { prefs: getRespawnPrefs() } as unknown as DefineParams<O>
