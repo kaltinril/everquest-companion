@@ -138,8 +138,10 @@ function useVisibleRows(input: RowsInput): { rows: BrowserRow[]; hidden: HiddenB
     const rows = filterDonors(donors, { ...filters, text }, planClasses, view)
     // ONE pass, ONE rule — `itemFits` (plannerPreset.ts), which is R3's flat no on haste plus R2's
     // two halves asked about the HOST rather than the set: an effect can only move into an item it
-    // shares a slot AND a class with. Nothing about it is restated here.
-    return focus === null ? rows : rows.filter((d) => itemFits(d, focus))
+    // shares a slot AND a class with — and, under the trio-only toggle, into an item the set can
+    // still wear once the socket has narrowed it. Nothing about it is restated here.
+    const wearer = filters.trioOnly ? planClasses : []
+    return focus === null ? rows : rows.filter((d) => itemFits(d, focus, wearer))
   }, [donors, filters, text, planClasses, view, focus])
   const groups = useMemo(() => groupDonors(filtered, axis, donorEraOf), [filtered, axis])
   const rows = useMemo(() => browserRows(groups, open), [groups, open])

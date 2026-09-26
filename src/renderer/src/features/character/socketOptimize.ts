@@ -114,6 +114,8 @@ function copyCounts(owned: readonly OwnedExaltation[]): Map<string, number> {
  */
 interface PlanContext {
   rowByKey: ReadonlyMap<string, GearRow>
+  /** who wears the board - `seatFits` refuses a seat whose combined item they could not wear */
+  loadout: Loadout
   /** copies of each donor key not yet named by a placement */
   left: Map<string, number>
 }
@@ -150,14 +152,14 @@ function familyClaims(
 function currentSeatExists(
   c: FamilyClaim,
   sockets: readonly SocketHostCell[],
-  rowByKey: ReadonlyMap<string, GearRow>
+  ctx: PlanContext
 ): boolean {
   return sockets.some((s) => {
     if (s.currentKey === null || !seatIsLive(s)) return false
-    const occ = bestEffectFor(rowByKey.get(s.currentKey), s.type)
+    const occ = bestEffectFor(ctx.rowByKey.get(s.currentKey), s.type)
     if (occ?.family !== c.eff.family) return false
-    const hostRow = rowByKey.get(s.itemKey)
-    return c.donors.some((d) => d.type === s.type && seatFits(d.row, s, hostRow))
+    const hostRow = ctx.rowByKey.get(s.itemKey)
+    return c.donors.some((d) => d.type === s.type && seatFits(d.row, s, hostRow, ctx.loadout))
   })
 }
 
@@ -168,7 +170,7 @@ function currentSeatExists(
 function edges(
   claims: readonly FamilyClaim[],
   sockets: readonly SocketHostCell[],
-  rowByKey: ReadonlyMap<string, GearRow>
+  ctx: PlanContext
 ): number[][] {
   return claims.map((c) => {
     const current: number[] = []
@@ -178,9 +180,9 @@ function edges(
       // A proc seat nothing swings is not a seat (`seatIsLive`), so it never becomes an edge and
       // the matching cannot spend a family on it.
       if (!seatIsLive(s)) return
-      const hostRow = rowByKey.get(s.itemKey)
-      if (!c.donors.some((d) => d.type === s.type && seatFits(d.row, s, hostRow))) return
-      const occupant = s.currentKey === null ? null : bestEffectFor(rowByKey.get(s.currentKey), s.type)
+      const hostRow = ctx.rowByKey.get(s.itemKey)
+      if (!c.donors.some((d) => d.type === s.type && seatFits(d.row, s, hostRow, ctx.loadout))) return
+      const occupant = s.currentKey === null ? null : bestEffectFor(ctx.rowByKey.get(s.currentKey), s.type)
       if (occupant !== null && occupant.family === c.family) current.push(i)
       else if (s.currentKey === null) empty.push(i)
       else occupied.push(i)
@@ -284,7 +286,7 @@ function placementOf(
 ): Placement | null {
   const hostRow = ctx.rowByKey.get(socket.itemKey)
   const fits = claim.donors.filter(
-    (d) => d.type === socket.type && (ctx.left.get(d.key) ?? 0) > 0 && seatFits(d.row, socket, hostRow)
+    (d) => d.type === socket.type && (ctx.left.get(d.key) ?? 0) > 0 && seatFits(d.row, socket, hostRow, ctx.loadout)
   )
   const donor = fits.find((d) => d.key === socket.currentKey) ?? fits[0]
   if (donor === undefined) return null
@@ -404,7 +406,7 @@ export function planBoard(
   sockets: readonly SocketHostCell[]
 ): BoardPlan {
   const rowByKey = new Map(rows.map((r) => [r.key, r]))
-  const ctx: PlanContext = { rowByKey, left: copyCounts(owned) }
+  const ctx: PlanContext = { rowByKey, loadout, left: copyCounts(owned) }
   // THE INCUMBENT TIEBREAK, third and final form (user reports 2026-09-10, the belt three
   // times). A claim is incumbent only when ITS OWN best-tier donors can KEEP a seat the family
   // already holds — "the family is socketed somewhere" was too coarse: Summoning Haste counted
@@ -412,12 +414,12 @@ export function planBoard(
   // and outmuscled the belt's true incumbent on a tie. Incumbents-that-can-stay are seated
   // first at equal tier, so a claim can only take a contested seat by OUTRANKING its holder.
   const claims = familyClaims(ctx.left, rowByKey, loadout, TYPES)
-  const keeps = claims.map((c) => currentSeatExists(c, sockets, rowByKey))
+  const keeps = claims.map((c) => currentSeatExists(c, sockets, ctx))
   const order = claims
     .map((c, i) => ({ c, i }))
     .sort((a, b) => b.c.eff.tier - a.c.eff.tier || Number(keeps[b.i]) - Number(keeps[a.i]))
     .map((x) => x.c)
-  const adj = edges(order, sockets, rowByKey)
+  const adj = edges(order, sockets, ctx)
   const seatOf = match(order.length, adj, sockets.length)
   // The contests are the MATCHING's: a spare proc copy going unseated is not one.
   const placed = placedOf(seatOf, order.length)

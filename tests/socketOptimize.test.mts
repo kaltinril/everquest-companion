@@ -134,6 +134,22 @@ test('R2 holds inside the plan, and a seat already holding its target is not a m
   assert.equal(plan.contested[0].noSeat, true)
 })
 
+test('R2`s third party holds inside the plan: a seat whose combined item the loadout cannot wear is no seat', () => {
+  // Donor [ROG,MNK], host [WAR,ROG], character [WAR,MNK]: both pairs overlap, the socketed host
+  // is ROG-only, and nobody in the loadout can wear it. Not contested - there is no legal seat.
+  const rows = [
+    row({ key: 'rogmnk gem', name: 'RogMnk Gem', effects: worn('RogMnk Gem', 'Effect A III'), slots: ['WRIST'], classes: ['ROG', 'MNK'] }),
+    row({ key: 'war rog host', name: 'War Rog Host', effects: [], slots: ['WRIST'], classes: ['WAR', 'ROG'] })
+  ]
+  const board = [seat({ cellId: 'wrist1', type: 'Worn', slot: 'WRIST', item: 'War Rog Host' })]
+  const plan = planBoard([gem('RogMnk Gem')], rows, { classes: ['WAR', 'MNK'], deity: null }, board)
+  assert.equal(plan.placements.length, 0)
+  assert.equal(plan.contested.length, 1)
+  assert.equal(plan.contested[0].noSeat, true)
+  // The same board on a character who CAN wear a ROG-only bracer seats it.
+  assert.equal(planBoard([gem('RogMnk Gem')], rows, { classes: ['WAR', 'ROG'], deity: null }, board).placements.length, 1)
+})
+
 test('a move names what it replaces, and the higher tier takes the family seat', () => {
   const rows = [
     row({ key: 'tier1', name: 'Tier1', effects: worn('Tier1', 'Effect A I'), slots: ['WAIST'] }),

@@ -22,7 +22,7 @@ import { useEffect, useState } from 'react'
 import type { ClassAbbr } from '@shared/classCombo'
 // RELATIVE value imports (the mobSearch house law): `itemFits` is reached under the node runner by
 // tests/plannerItemFilter.test.mts, where the vite-only `@shared` alias does not resolve.
-import { socketCompatibility } from '../../../../shared/planner/rules'
+import { narrowedClasses, socketCompatibility } from '../../../../shared/planner/rules'
 import {
   EQUIP_SLOTS,
   type EquipSlot,
@@ -65,11 +65,19 @@ export interface ItemFocus {
  * An item with NO STATED SLOTS narrows nothing rather than matching nothing: the filter bar's
  * picker only ever offers items that state one, so this arm is unreachable from the UI and exists
  * so a gap in our own data can never blank the browser.
+ *
+ * THE THIRD PARTY (validator catch 2026-09-25): donor ∩ item and donor ∩ character were each
+ * asked, and nothing asked whether the character can wear the item the socket MAKES - R2 narrows
+ * the host to `narrowedClasses(item, donor)`, and a [ROG,MNK] gem in a [WAR,ROG] bracer leaves a
+ * ROG-only bracer a [WAR,MNK] character cannot wear. `planClasses` is that character, passed
+ * exactly when the browser's own class gate is on (the trio-only toggle) and empty otherwise, so
+ * the filter's opinion of unknowns is unchanged: an unstated list on either side narrows nothing.
  */
-export function itemFits(donor: PlannerDonor, item: ItemFocus): boolean {
+export function itemFits(donor: PlannerDonor, item: ItemFocus, planClasses: readonly ClassAbbr[] = []): boolean {
   const slots = item.slots.length === 0 ? EQUIP_SLOTS : item.slots
   if (!socketCompatibility(donor, slots, []).ok) return false
-  return !classesMismatch(donor.classes, item.classes)
+  if (classesMismatch(donor.classes, item.classes)) return false
+  return !classesMismatch(narrowedClasses(item.classes, donor.classes), planClasses)
 }
 
 // ---- the item index, as the two pickers ask it ----------------------------------------
