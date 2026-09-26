@@ -15,6 +15,7 @@ pub struct AcquireRes {
     coin_corpse: Regex,
     coin_item: Regex,
     coin_vendor: Regex,
+    coin_npc: Regex,
     coin_bare: Regex,
     purchase: Regex,
     item_inventory: Regex,
@@ -41,6 +42,7 @@ impl AcquireRes {
             coin_corpse: Regex::new(r"^You receive (.+?) from the corpse\.$").unwrap(),
             coin_item: Regex::new(r"^You received (.+?) from that item\.$").unwrap(),
             coin_vendor: Regex::new(r"^You receive (.+?) from (.+?) for the (.+)\(s\)\.$").unwrap(),
+            coin_npc: Regex::new(r"^You receive (.+?) from (.+?)\.$").unwrap(),
             coin_bare: Regex::new(&format!(r"^You received? (.+?){s}*\.$")).unwrap(),
             purchase: Regex::new(r"^You purchased ([0-9]+) (.+?) from (.+?) for (.*)\.$").unwrap(),
             item_inventory: Regex::new(r"^(.+?) has been placed in your inventory!$").unwrap(),
@@ -92,7 +94,11 @@ fn parse_coins(r: &AcquireRes, clause: &str) -> Option<Vec<(&'static str, i64)>>
     }
 }
 
-/// The four coin sentences, tried in the order their anchors get looser.
+/// The five coin sentences, tried in the order their anchors get looser. The NPC form is the
+/// vendor form without the item clause — a quest payment (`You receive 6 gold from Zok Zribb.`,
+/// 1,635 single-denomination lines in the owner's 2026-09-25 log) — and it must sit after the
+/// vendor form, which it would otherwise swallow, and before the bare form, which rejects the
+/// trailing `from <NPC>` and left every one of those lines `unknown`.
 fn classify_coin(r: &AcquireRes, c: &Ctx, out: &mut Ev) -> bool {
     if let Some(m) = r.coin_corpse.captures(c.text) {
         if let Some(coins) = parse_coins(r, &m[1]) {
@@ -120,6 +126,16 @@ fn classify_coin(r: &AcquireRes, c: &Ctx, out: &mut Ev) -> bool {
             out.coins(Key::Coins, &coins);
             out.s(Key::Npc, js_trim(&m[2]));
             out.s(Key::Item, js_trim(&m[3]));
+            return true;
+        }
+    }
+    if let Some(m) = r.coin_npc.captures(c.text) {
+        if let Some(coins) = parse_coins(r, &m[1]) {
+            out.begin(Kind::Coin);
+            out.envelope(c.seq, c.ts, c.raw);
+            out.s(Key::Source, "npc");
+            out.coins(Key::Coins, &coins);
+            out.s(Key::Npc, js_trim(&m[2]));
             return true;
         }
     }

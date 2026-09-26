@@ -77,7 +77,8 @@
  *   to Magic; `You feel resistant to fire/cold/poison/disease.` were `unknown` and are now self
  *   `buffApply`. A red confined to those six sentences is the correction, not drift. Same day,
  *   same branch: `You miss a note, bringing your <X> to a close!` was `unknown` and is now the
- *   song's `castInterrupted`.
+ *   song's `castInterrupted`; `You receive <coins> from <NPC>.` (a quest payment, no item clause)
+ *   was `unknown` and is now `coin` with source `npc`.
  *
  * ── `--ledger`: WHAT A PARTIAL PORT IS ALLOWED TO CLAIM ────────────────────────────────────────
  *

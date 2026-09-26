@@ -303,4 +303,28 @@ mod tests {
             )
         );
     }
+
+    /// A quest payment names its payer and no item: the vendor form without the `for the` clause.
+    #[test]
+    fn a_quest_payment_is_coin_from_an_npc() {
+        let p = bare();
+        let out = parse_one(
+            &p,
+            "[Fri Aug 21 20:41:47 2026] You receive 6 gold from Zok Zribb.",
+        );
+        assert!(out.starts_with(r#"{"kind":"coin","#), "{out}");
+        assert!(out.contains(r#""source":"npc""#), "{out}");
+        assert!(out.contains(r#""coins":{"gold":6}"#), "{out}");
+        assert!(out.ends_with(r#""npc":"Zok Zribb"}"#), "{out}");
+        // …and the vendor form still carries its item, so the looser NPC anchor did not take it.
+        let out = parse_one(
+            &p,
+            "[Fri Aug 21 20:41:47 2026] You receive 2 gold from Zok Zribb for the Bone Chips(s).",
+        );
+        assert!(out.contains(r#""source":"vendor""#), "{out}");
+        assert!(
+            out.ends_with(r#""npc":"Zok Zribb","item":"Bone Chips"}"#),
+            "{out}"
+        );
+    }
 }
