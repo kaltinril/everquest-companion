@@ -75,7 +75,9 @@
  *   `buffApply` of `Fade` on a target called "Your fire resistance" and is now a `buffWearOff` of
  *   Resist Fire; `Your magic resistance fades.` gains Resist Magic as a candidate beside Resistance
  *   to Magic; `You feel resistant to fire/cold/poison/disease.` were `unknown` and are now self
- *   `buffApply`. A red confined to those six sentences is the correction, not drift.
+ *   `buffApply`. A red confined to those six sentences is the correction, not drift. Same day,
+ *   same branch: `You miss a note, bringing your <X> to a close!` was `unknown` and is now the
+ *   song's `castInterrupted`.
  *
  * ── `--ledger`: WHAT A PARTIAL PORT IS ALLOWED TO CLAIM ────────────────────────────────────────
  *

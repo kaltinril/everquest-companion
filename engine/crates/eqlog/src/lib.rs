@@ -289,4 +289,18 @@ mod tests {
             assert!(out.contains(r#""target":"self","spell":"Resist "#), "{out}");
         }
     }
+
+    /// A song cut short prints its own sentence, not `Your <X> spell is interrupted.`.
+    #[test]
+    fn a_missed_note_is_the_songs_cast_interrupt() {
+        let p = bare();
+        let raw = "[Fri Aug 21 20:41:47 2026] You miss a note, bringing your Denon's Disruptive Discord to a close!";
+        assert_eq!(
+            parse_one(&p, raw),
+            format!(
+                r#"{{"kind":"castInterrupted","seq":0,"ts":1787370107000,"raw":{},"spell":"Denon's Disruptive Discord"}}"#,
+                serde_json::to_string(raw).unwrap()
+            )
+        );
+    }
 }

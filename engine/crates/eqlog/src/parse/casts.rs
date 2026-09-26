@@ -42,6 +42,7 @@ pub struct CastRes {
     other_cast_begin: Regex,
     cast_fizzle: Regex,
     cast_interrupt: Regex,
+    song_close: Regex,
     buff_fade_pet: Regex,
     buff_fade_self: Regex,
     aa_activate: Regex,
@@ -100,6 +101,7 @@ impl CastRes {
             other_cast_begin: Regex::new(r"^(.+?) begins (?:casting|singing) (.+?)\.$").unwrap(),
             cast_fizzle: Regex::new(r"^Your (.+?) spell fizzles!$").unwrap(),
             cast_interrupt: Regex::new(r"^Your (.+?) spell is interrupted\.$").unwrap(),
+            song_close: Regex::new(r"^You miss a note, bringing your (.+?) to a close!$").unwrap(),
             buff_fade_pet: Regex::new(r"^Your pet's (.+?) spell has worn off\.$").unwrap(),
             buff_fade_self: Regex::new(r"^Your (.+?) spell has worn off\.$").unwrap(),
             aa_activate: Regex::new(r"^You activate (.+?)\.$").unwrap(),
@@ -156,20 +158,22 @@ pub fn classify_cast_lifecycle(r: &CastRes, c: &Ctx, out: &mut Ev) -> bool {
             }
         }
     }
-    if text.contains("spell fizzles!") {
-        if let Some(m) = r.cast_fizzle.captures(text) {
-            out.begin(Kind::CastFizzle);
-            out.envelope(c.seq, c.ts, c.raw);
-            out.s(Key::Spell, crate::jsstr::js_trim(&m[1]));
-            return true;
-        }
-    }
-    if text.contains("spell is interrupted.") {
-        if let Some(m) = r.cast_interrupt.captures(text) {
-            out.begin(Kind::CastInterrupted);
-            out.envelope(c.seq, c.ts, c.raw);
-            out.s(Key::Spell, crate::jsstr::js_trim(&m[1]));
-            return true;
+    // The three ways a cast ends short of landing, each a substring gate over one regex. A song
+    // does not print `Your <X> spell is interrupted.`: a bard who moves or is hit mid-song gets
+    // `You miss a note, bringing your <X> to a close!` (190 lines over 6 songs in the owner's
+    // 2026-09-25 log, every one preceded by `You begin singing <X>.`), and it is the same event.
+    for (gate, re, kind) in [
+        ("spell fizzles!", &r.cast_fizzle, Kind::CastFizzle),
+        ("interrupted.", &r.cast_interrupt, Kind::CastInterrupted),
+        (" to a close!", &r.song_close, Kind::CastInterrupted),
+    ] {
+        if text.contains(gate) {
+            if let Some(m) = re.captures(text) {
+                out.begin(kind);
+                out.envelope(c.seq, c.ts, c.raw);
+                out.s(Key::Spell, crate::jsstr::js_trim(&m[1]));
+                return true;
+            }
         }
     }
     if text == CAST_RESUMED_LINE {
