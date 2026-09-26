@@ -33,6 +33,7 @@ import {
   type SpellResistTable,
 } from '../../shared/resistTypes'
 import { estimate, hasAnswer } from '../../shared/resistModel'
+import { spellCanonKey } from '../../shared/spellKey'
 import type { DamageRef } from '../../shared/resistDamage'
 import { resistBenchmark } from '../../shared/resistFormula'
 import { BASELINE_SOURCE_KEY } from '../../shared/resistTypes'
@@ -255,7 +256,8 @@ export function mobResistCell(
       newestWeek: deps.newestWeek(),
     })
   )
-  const keep = rows.filter((r) => spells[r.spellKey]?.axis === axis)
+  // Ledger keys keep apostrophes, the table's do not — `resistModel.ts estimate`'s re-fold.
+  const keep = rows.filter((r) => spells[spellCanonKey(r.spellKey)]?.axis === axis)
   return { mobKey: key, axis, estimate: est, rows: keep }
 }
 

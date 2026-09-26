@@ -31,8 +31,9 @@
 // THE KEY IS THE SPELL LINE, NOT THE INSTANCE AND NOT THE RANK (the 2026-08-14 amendment): a haste
 // is a haste across characters, and a rank upgrade must not silently reset a user's answer. The
 // fold is `timerNameKey` (shared/buffTimers.ts) — the same rank-stripped, case-folded key that
-// file already builds every timer row id from, and the same fold `spellLineKey` performs in
-// shared/spellLines.ts. This module never computes one: it takes a key, so there is exactly one
+// file already builds every timer row id from (NOT `spellLineKey`, which since 2026-09-12 also
+// drops apostrophes; the rows and these keys come from the engine's rule, which keeps them). This
+// module never computes one: it takes a key, so there is exactly one
 // place in the tree that decides what a line IS and every caller reaches it.
 //
 // IT IS A DISPLAY FILTER OVER TWO WINDOWS AND STRUCTURALLY NOTHING ELSE (JOS-215's law, restated
