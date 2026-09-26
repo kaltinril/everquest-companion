@@ -70,6 +70,13 @@
  *   off a culled record. Phase 1 is unaffected. A `buffs` red outside these two spells and
  *   JOS-527's five field classes is still drift.
  *
+ *   Resist corrections (2026-09-25, catch_all) — `spellCorrectionsResists.ts` gives Resist Fire and
+ *   Resist Magic the wear-off sentence the game prints. Phase 1: `Your fire resistance fades.` was a
+ *   `buffApply` of `Fade` on a target called "Your fire resistance" and is now a `buffWearOff` of
+ *   Resist Fire; `Your magic resistance fades.` gains Resist Magic as a candidate beside Resistance
+ *   to Magic; `You feel resistant to fire/cold/poison/disease.` were `unknown` and are now self
+ *   `buffApply`. A red confined to those six sentences is the correction, not drift.
+ *
  * ── `--ledger`: WHAT A PARTIAL PORT IS ALLOWED TO CLAIM ────────────────────────────────────────
  *
  * `firstDiff` answers "are these the same?" and it is the right instrument for a bar that is

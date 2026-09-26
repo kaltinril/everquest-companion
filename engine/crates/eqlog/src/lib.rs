@@ -256,4 +256,37 @@ mod tests {
         assert!(out.starts_with(r#"{"kind":"buffApply","#), "{out}");
         assert!(out.contains(r#""candidates":[{"name":"#), "{out}");
     }
+
+    /// The resist family after `spellCorrectionsResists.ts` (2026-09-25): the wear-off the wiki
+    /// filled with the spell's own name used to fall through to `Fade`'s generic ` fades.` suffix
+    /// and land as a buffApply; the self landing used to match nothing at all.
+    #[test]
+    fn the_resist_family_prints_the_sentences_the_corrections_say() {
+        let p = parser_for("Primitive", chrono_tz::America::Los_Angeles);
+        let out = parse_one(&p, "[Fri Aug 21 20:41:47 2026] Your fire resistance fades.");
+        assert!(out.starts_with(r#"{"kind":"buffWearOff","#), "{out}");
+        assert!(out.contains(r#""spell":"Resist Fire""#), "{out}");
+        assert!(out.ends_with(r#""target":"self"}"#), "{out}");
+        let out = parse_one(
+            &p,
+            "[Fri Aug 21 20:41:47 2026] Your magic resistance fades.",
+        );
+        assert!(out.starts_with(r#"{"kind":"buffWearOff","#), "{out}");
+        assert!(out.contains(r#""Resist Magic""#), "{out}");
+        assert!(out.contains(r#""Resistance to Magic""#), "{out}");
+        let out = parse_one(&p, "[Fri Aug 21 20:41:47 2026] You feel resistant to fire.");
+        assert!(out.starts_with(r#"{"kind":"buffApply","#), "{out}");
+        assert!(
+            out.contains(r#""target":"self","spell":"Resist Fire""#),
+            "{out}"
+        );
+        for x in ["cold", "poison", "disease"] {
+            let out = parse_one(
+                &p,
+                &format!("[Fri Aug 21 20:41:47 2026] You feel resistant to {x}."),
+            );
+            assert!(out.starts_with(r#"{"kind":"buffApply","#), "{out}");
+            assert!(out.contains(r#""target":"self","spell":"Resist "#), "{out}");
+        }
+    }
 }

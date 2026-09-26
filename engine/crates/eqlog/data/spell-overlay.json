@@ -939,6 +939,54 @@
     },
     {
       "spells": [
+        "Resist Fire"
+      ],
+      "field": "msgCastOnYou",
+      "from": "You feel resistant from fire.",
+      "to": "You feel resistant to fire."
+    },
+    {
+      "spells": [
+        "Resist Cold"
+      ],
+      "field": "msgCastOnYou",
+      "from": "You feel resistant from cold.",
+      "to": "You feel resistant to cold."
+    },
+    {
+      "spells": [
+        "Resist Poison"
+      ],
+      "field": "msgCastOnYou",
+      "from": "You feel resistant from poison.",
+      "to": "You feel resistant to poison."
+    },
+    {
+      "spells": [
+        "Resist Disease"
+      ],
+      "field": "msgCastOnYou",
+      "from": "You feel resistant from disease.",
+      "to": "You feel resistant to disease."
+    },
+    {
+      "spells": [
+        "Resist Fire"
+      ],
+      "field": "msgWearsOff",
+      "from": "Your resist fire fades.",
+      "to": "Your fire resistance fades."
+    },
+    {
+      "spells": [
+        "Resist Magic"
+      ],
+      "field": "msgWearsOff",
+      "from": "Your resist magic fades.",
+      "to": "Your magic resistance fades."
+    },
+    {
+      "spells": [
         "Lull",
         "Soothe",
         "Calm",
