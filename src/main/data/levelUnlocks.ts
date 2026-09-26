@@ -45,8 +45,10 @@ import { applySpellEra } from './spellEra'
 import { searchTextFor } from './spellDb'
 import { applyLegendsPagePreference } from './spellPagePreference'
 import { parseSpellClasses } from '../../shared/spellLevels'
-// The canon fold every spell join in this app uses - here so `dedupeByName` groups two pages of
-// one name the same way the client table keys them.
+// The canon fold every spell join in this app uses - here so `dedupeByName` can LOOK UP the client
+// row for a group, because that is how the client table is keyed. It is deliberately NOT how the
+// groups themselves are formed: the fold strips a rank numeral, and a group made under it holds a
+// whole line. See `dedupeByName` for what that cost.
 import { spellCanonKey } from '../../shared/spellKey'
 import { isClassAbbr, type ClassAbbr } from '../../shared/classCombo'
 import type { LevelUnlockData, UnlockSkill, UnlockSpell } from '../../shared/levelUnlocks'
@@ -520,7 +522,7 @@ function couldBeOneSpell(a: NamedRow, b: NamedRow): boolean {
  * them, and putting them on the wire for ~1,450 rows to serve one fold would be bytes saying
  * nothing. So they ride beside the row for the length of the fold and are dropped at the end.
  */
-interface NamedRow {
+export interface NamedRow {
   spell: UnlockSpell
   you?: string
   other?: string
@@ -550,18 +552,41 @@ function pickAmong(group: readonly NamedRow[], row: SpellResistInfo | undefined)
   return [distinct[scores.indexOf(best)]]
 }
 
-/** Fold same-named rows wherever the client file can say which is current. */
-function dedupeByName(rows: readonly NamedRow[], client: SpellResistTable | null): UnlockSpell[] {
+/**
+ * Fold same-named rows wherever the client file can say which is current.
+ *
+ * SAME-NAMED MEANS THE EXACT NAME, folded for case and whitespace and nothing else. The groups were
+ * keyed by `spellCanonKey` - the join every other spell lookup uses - and that key STRIPS THE RANK
+ * NUMERAL, so `Burnout`, `Burnout II`, `Burnout III` and `Burnout IV` were one group of four
+ * different spells. With the client table in hand, `pickAmong` then asked which of the four agreed
+ * with the client's single `burnout` row, found a clean winner (rank II, mana 75), and deleted the
+ * other three; Cannibalize lost two ranks the same way. Nine rows gone from the catalog on a
+ * machine with the game installed and none on a machine without, which is the worst shape a bug
+ * can have (measured 2026-09-25: 1447 rows without the client, 1438 with).
+ *
+ * The canon key is still the right thing to LOOK THE CLIENT ROW UP by, because it is how the
+ * client table is keyed - and it is exactly right there, since the four legitimate same-name pairs
+ * (Imbue Emerald, Solon's Bewitching Bravura, Summon Orb, Swift Like The Wind) carry no numeral and
+ * fold to the same row either way.
+ *
+ * Exported as a test seam, so the rank case above can be pinned on a fixture rather than on whether
+ * the machine running the tests has the game installed.
+ */
+export function dedupeByName(
+  rows: readonly NamedRow[],
+  client: SpellResistTable | null
+): UnlockSpell[] {
   const groups = new Map<string, NamedRow[]>()
   for (const r of rows) {
-    const key = spellCanonKey(r.spell.name)
+    const key = r.spell.name.trim().toLowerCase()
     const group = groups.get(key)
     if (group) group.push(r)
     else groups.set(key, [r])
   }
   const out: UnlockSpell[] = []
-  for (const [key, group] of groups) {
-    const kept = group.length === 1 ? group : pickAmong(group, client?.[key])
+  for (const group of groups.values()) {
+    const kept =
+      group.length === 1 ? group : pickAmong(group, client?.[spellCanonKey(group[0].spell.name)])
     for (const r of kept) out.push(r.spell)
   }
   return out
