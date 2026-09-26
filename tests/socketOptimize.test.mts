@@ -134,6 +134,22 @@ test('R2 holds inside the plan, and a seat already holding its target is not a m
   assert.equal(plan.contested[0].noSeat, true)
 })
 
+test('R2`s third party holds inside the plan: a seat whose combined item the loadout cannot wear is no seat', () => {
+  // Donor [ROG,MNK], host [WAR,ROG], character [WAR,MNK]: both pairs overlap, the socketed host
+  // is ROG-only, and nobody in the loadout can wear it. Not contested - there is no legal seat.
+  const rows = [
+    row({ key: 'rogmnk gem', name: 'RogMnk Gem', effects: worn('RogMnk Gem', 'Effect A III'), slots: ['WRIST'], classes: ['ROG', 'MNK'] }),
+    row({ key: 'war rog host', name: 'War Rog Host', effects: [], slots: ['WRIST'], classes: ['WAR', 'ROG'] })
+  ]
+  const board = [seat({ cellId: 'wrist1', type: 'Worn', slot: 'WRIST', item: 'War Rog Host' })]
+  const plan = planBoard([gem('RogMnk Gem')], rows, { classes: ['WAR', 'MNK'], deity: null }, board)
+  assert.equal(plan.placements.length, 0)
+  assert.equal(plan.contested.length, 1)
+  assert.equal(plan.contested[0].noSeat, true)
+  // The same board on a character who CAN wear a ROG-only bracer seats it.
+  assert.equal(planBoard([gem('RogMnk Gem')], rows, { classes: ['WAR', 'ROG'], deity: null }, board).placements.length, 1)
+})
+
 test('a move names what it replaces, and the higher tier takes the family seat', () => {
   const rows = [
     row({ key: 'tier1', name: 'Tier1', effects: worn('Tier1', 'Effect A I'), slots: ['WAIST'] }),
@@ -166,6 +182,24 @@ test('a placement names the donor that FITS the seat, never the claim`s first do
   )
   assert.equal(plan.placements.length, 1)
   assert.equal(plan.placements[0].gemName, 'Neck Gem')
+})
+
+test('a seat keeps its own copy: two gems of one effect are not a swap, whichever the dump lists first', () => {
+  // Gem A sits in the waist; Gem B, the same effect at the same tier, is loose. Naming B here is
+  // "socket Gem B replacing Gem A" - a move that grants nothing - and the old `find` named it
+  // exactly when the dump happened to list B ahead of A.
+  const rows = [
+    row({ key: 'gem a', name: 'Gem A', effects: worn('Gem A', 'Effect A III'), slots: ['WAIST'] }),
+    row({ key: 'gem b', name: 'Gem B', effects: worn('Gem B', 'Effect A III'), slots: ['WAIST'] })
+  ]
+  const board = [seat({ cellId: 'waist', type: 'Worn', slot: 'WAIST', currentName: 'Gem A' })]
+  const socketedA = gem('Gem A', 'socketed in Waist', true)
+  for (const owned of [[gem('Gem B', 'General 1'), socketedA], [socketedA, gem('Gem B', 'General 1')]]) {
+    const plan = planBoard(owned, rows, NOBODY, board)
+    assert.equal(plan.placements.length, 1)
+    assert.equal(plan.placements[0].gemName, 'Gem A')
+    assert.equal(plan.moves.length, 0, 'the seat already holds a copy of its target')
+  }
 })
 
 test('incumbency breaks ties: the belt keeps its socketed Burning Affliction III, Summoning Haste stays benched', () => {
@@ -259,6 +293,34 @@ test('a proc family with two copies holds both hands: two placements, no moves, 
   assert.equal(plan.moves.length, 0)
   assert.equal(plan.clears.length, 0, 'the second Lifebite is not a duplicate to pull')
   assert.equal(plan.contested.length, 0)
+})
+
+test('two donors of one proc family, one copy each: each hand names its own gem, never one gem twice', () => {
+  // Fangs and Claw both proc Lifebite. The claim had "two copies", so the second hand was taken -
+  // and both seats were labelled Fangs, because the label took the first donor that fit. One
+  // physical Fangs is one seat; the other hand is Claw's.
+  const rows = [
+    row({ key: 'fangs', name: 'Fangs', effects: proc('Fangs', 'Lifebite Combat'), slots: ['PRIMARY', 'SECONDARY'] }),
+    row({ key: 'claw', name: 'Claw', effects: proc('Claw', 'Lifebite Combat'), slots: ['PRIMARY', 'SECONDARY'] }),
+    row({ key: 'sword', name: 'Sword', effects: [], slots: ['PRIMARY', 'SECONDARY'] })
+  ]
+  const plan = planBoard([gem('Fangs'), gem('Claw')], rows, NOBODY, hands(null, null))
+  assert.deepEqual(
+    plan.placements.map((p) => `${p.cellLabel}:${p.gemName}`).sort(),
+    ['primary:Fangs', 'secondary:Claw']
+  )
+  // Fangs already in the primary, Claw loose: the one move is Claw into the empty hand.
+  const seated = planBoard(
+    [gem('Fangs', 'socketed in Primary', true), gem('Claw', 'Bank 1')],
+    rows,
+    NOBODY,
+    hands('Fangs', null)
+  )
+  assert.deepEqual(
+    seated.moves.map((m) => `${m.cellLabel}: socket ${m.gemName}`),
+    ['secondary: socket Claw']
+  )
+  assert.equal(seated.clears.length, 0)
 })
 
 test('…but a second copy never costs a distinct family its hand', () => {

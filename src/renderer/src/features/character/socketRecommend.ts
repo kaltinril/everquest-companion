@@ -8,7 +8,9 @@
 //   also called dead.
 //   R2, BOTH HALVES (user ruling 2026-09-10): a gem fits only a host whose cell SLOT its donor
 //   states, and only a host whose CLASSES overlap the donor's — socketing re-restricts the host
-//   to the donor's classes, so a MNK-only gem needs a monk-capable item.
+//   to the donor's classes, so a MNK-only gem needs a monk-capable item. AND THE COMBINED ITEM
+//   MUST STILL BE WEARABLE (validator catch 2026-09-25): the overlap the host narrows to has to
+//   include a class of the loadout, or the socket makes an item this character cannot wear.
 //   NO CROSS-FAMILY EXCHANGE RATE: swaps are same-family only; the one objective cross-family
 //   call is replacing a DEAD socket, where anything beats nothing.
 //   POOL DISCIPLINE: one physical loose copy is never recommended twice.
@@ -25,7 +27,7 @@ import type { EquipLocationToken } from '../../../../shared/outputs/inventory'
 import type { EquipSlot } from '../../../../shared/planner/types'
 // R2's slot half, corrected 2026-09-10: `donor ∩ hostItem` first, the cell second. Its header
 // carries the report and the measurement behind it.
-import { slotFits } from '../../../../shared/planner/rules'
+import { narrowedClasses, slotFits } from '../../../../shared/planner/rules'
 import { bestEffectFor, usable, type KindEffect, type Loadout } from './exaltationAudit'
 
 // ---- the recommender (the "best with what we have" ask) ----------------------------------------
@@ -244,21 +246,33 @@ export function inForcePerSeat(type: string): boolean {
  *     Either list unstated, or a host the corpus does not know, passes (law 1).
  *   UNANSWERABLE — an `Any Slot` cell whose host the corpus cannot name has no slot on either
  *     side. There is nothing to check against, so it takes nothing rather than everything.
+ *   WEARABLE — the class rule was only ever PAIRWISE (validator catch 2026-09-25): this checked
+ *     donor ∩ host, `usable` checks donor ∩ loadout, and nothing checked all three. A [ROG,MNK]
+ *     gem in a [WAR,ROG] bracer on a [WAR,MNK] character passed both pairs and produced a
+ *     ROG-only bracer nobody in the loadout can wear. `narrowedClasses` (rules.ts) is what R2
+ *     says the host becomes; given a loadout, that COMBINED list must still meet it.
  *
- * The LOADOUT class gate (`usable`) is deliberately NOT here: the two engines apply it at
+ * The LOADOUT class gate on the DONOR (`usable`) is still not here: the two engines apply it at
  * different moments — per candidate here, once per claim in the optimizer — and folding it in
- * would make one of them ask it twice.
+ * would make one of them ask it twice. The `loadout` this takes answers a different question:
+ * not "can the character use the gem" but "can the character wear the item the gem makes".
+ * Without one, or with an empty one, the seat is judged on the two pairs alone.
  */
 export function seatFits(
   donor: GearRow,
   seat: Pick<SocketHostCell, 'slot'>,
-  hostRow: GearRow | undefined
+  hostRow: GearRow | undefined,
+  loadout?: Loadout
 ): boolean {
   const hostSlots = hostRow?.slots ?? []
   if (seat.slot === null && hostSlots.length === 0) return false
   if (!slotFits(donor.slots, hostSlots, seat.slot)) return false
   if (hostRow === undefined || donor.classes.length === 0 || hostRow.classes.length === 0) return true
-  return donor.classes.some((c) => hostRow.classes.includes(c))
+  // R2's side effect: the host becomes `combined`-only, and THIS character must still wear it.
+  const combined = narrowedClasses(hostRow.classes, donor.classes)
+  if (combined.length === 0) return false
+  if (loadout === undefined || loadout.classes.length === 0) return true
+  return combined.some((c) => loadout.classes.includes(c))
 }
 
 /** The best loose candidate for one socket, under a predicate on its effect. */
@@ -280,7 +294,7 @@ function bestLoose(
   for (const key of ctx.pool.keys()) {
     const row = ctx.rowByKey.get(key)
     // The loadout gate is this engine's own; the seat gate is the one both engines share.
-    if (row === undefined || !usable(row, ctx.loadout) || !seatFits(row, host, hostRow)) continue
+    if (row === undefined || !usable(row, ctx.loadout) || !seatFits(row, host, hostRow, ctx.loadout)) continue
     const eff = bestEffectFor(row, host.type)
     if (eff === null || !accept(eff)) continue
     if (best === null || eff.tier > best.eff.tier) best = { key, row, eff }

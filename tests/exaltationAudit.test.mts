@@ -23,6 +23,7 @@ import {
 } from '../src/renderer/src/features/character/exaltationAudit'
 import {
   recommendSockets,
+  seatFits,
   type SocketHostCell
 } from '../src/renderer/src/features/character/socketRecommend'
 
@@ -251,6 +252,23 @@ test('R2: a gem fits only a host sharing its donor SLOT, and only a host sharing
   const fills = recommendSockets(looseBoth, rows, NOBODY, [warHost]).fills
   assert.equal(fills.length, 1)
   assert.equal(fills[0].gemName, 'Belt Gem')
+})
+
+test('R2 has a third party: the COMBINED item must still be wearable by the loadout', () => {
+  // Donor [ROG,MNK], host [WAR,ROG], character [WAR,MNK]. Every pair overlaps - the gem fits the
+  // host, the character can use the gem - and the socketed host is ROG-only, which nobody in the
+  // loadout can wear. Both engines used to accept it; `seatFits` now asks all three.
+  const donor = row('rogmnk gem', 'RogMnk Gem', [{ name: 'Effect A III', kind: 'worn' }], ['ROG', 'MNK'])
+  const hostRow = row('war rog host', 'War Rog Host', [], ['WAR', 'ROG'])
+  const loadout: Loadout = { classes: ['WAR', 'MNK'], deity: null }
+  const cell = { ...host('waist', 'Worn', null, 'War Rog Host'), itemKey: 'war rog host' }
+  assert.equal(seatFits(donor, cell, hostRow), true, 'the two pairs alone still pass')
+  assert.equal(seatFits(donor, cell, hostRow, loadout), false, 'the combined ROG-only host fails the loadout')
+  assert.equal(seatFits(donor, cell, hostRow, NOBODY), true, 'no loadout stated is no third check')
+  // A [WAR,ROG] character can wear the ROG-only result.
+  assert.equal(seatFits(donor, cell, hostRow, { classes: ['WAR', 'ROG'], deity: null }), true)
+  const fills = recommendSockets([owned('RogMnk Gem', 'Bank 1')], [donor, hostRow], loadout, [cell]).fills
+  assert.equal(fills.length, 0)
 })
 
 test('keeper-first: a socket called dead is never also offered an upgrade (the Summoning Haste case)', () => {

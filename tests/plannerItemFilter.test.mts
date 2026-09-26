@@ -93,3 +93,16 @@ test('R2 class half: a provable disagreement hides the row, an unknown never doe
   assert.equal(itemFits(SILENT, item({ classes: ['CLR'] })), true)
   assert.equal(itemFits(SWORD, item({ classes: [] })), true)
 })
+
+test('R2`s third party: the item the socket MAKES must still fit the set`s classes', () => {
+  // Donor [ROG,MNK], item [WAR,ROG], set [WAR,MNK]: each pair overlaps, and the socketed item is
+  // ROG-only - nobody in the set can wear it.
+  const rogMnk = donor({ name: 'RogMnk Gem', classes: ['ROG', 'MNK'] })
+  const warRog = item({ classes: ['WAR', 'ROG'] })
+  assert.equal(itemFits(rogMnk, warRog), true, 'without a set, the two pairs decide')
+  assert.equal(itemFits(rogMnk, warRog, ['WAR', 'MNK']), false)
+  assert.equal(itemFits(rogMnk, warRog, ['WAR', 'ROG']), true)
+  // An unknown on either side still narrows nothing (law 1): the check falls back to the pair.
+  assert.equal(itemFits(rogMnk, item({ classes: [] }), ['WAR', 'MNK']), true)
+  assert.equal(itemFits(SILENT, warRog, ['WAR', 'MNK']), true)
+})
