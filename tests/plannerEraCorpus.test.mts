@@ -394,7 +394,8 @@ test('THE IN-ERA DIRECTION refuses a page that merely failed to be out', () => {
   const inEra = [...derivations.values()].filter((d) => d.verdict === 'in-era')
   assert.ok(inEra.length >= 50, `only ${String(inEra.length)} in-era derivations`)
   for (const d of inEra) {
-    assert.equal(d.basis, 'page', `an in-era verdict came from a ${d.basis} edge, which cannot mean in-era`)
+    assert.ok(d.basis === 'page' || d.basis === 'quest', `an in-era verdict came from a ${d.basis} edge, which cannot mean in-era`)
+    if (d.basis === 'quest') continue // the quest catalog's start zone, not the sidecar (eraDerive.ts questEdges)
     const target = SIDECAR.pages[pageEraKey(d.target)]
     assert.ok(target, `${d.target} is not in the committed sidecar`)
     assert.equal(target.outOfEra, false, `${d.target} is badged out and still argued IN`)

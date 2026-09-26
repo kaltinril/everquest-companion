@@ -71,7 +71,10 @@
 //
 // AND IT NO LONGER ONLY HIDES. The `page` edge can say IN as well as OUT, because a set page filed
 // under `Classic Era` is a claim rather than an absence. Measured: 40 gear rows are visible today
-// BECAUSE a page vouches for them, against 2,474 hidden by an out edge.
+// BECAUSE a page vouches for them, against 2,474 hidden by an out edge. Since 2026-09-25 the `quest`
+// edge says IN too, under a guard of its own (`questEdges` below): 154 gear rows, the eight
+// Soldier's Brooches among them, were hidden as `era?` for being handed out by a quest that starts
+// in a classic zone and nowhere else stated.
 //
 // THE OTHER HALF OF THE SECOND RULING IS NOT IMPLEMENTED, ON PURPOSE, and this is the record of
 // why. The owner also leaned the opposite way: an item eqlwiki carries that does NOT exist in other
@@ -416,14 +419,33 @@ function recipeEdges(
   return edges
 }
 
-/** Every edge `|relatedquests` and the quest catalog state between them. */
-function questEdges(entry: ItemDbEntry, catalogs: EraDeriveCatalogs): EraDerivation[] {
+/**
+ * Every edge `|relatedquests` and the quest catalog state between them, BOTH WAYS since 2026-09-25.
+ *
+ * OUT is unchanged: a start zone the server has not opened is a wall. IN is where the start zone
+ * resolves to an opened expansion, and it is NOT the mirror image, because a giver you can walk to
+ * says nothing about the turn-ins: every epic 1.0 chain starts in a classic city and ends at a
+ * Kunark hand-in (the `Epics` row of `TAG_ERA`). So the in-era direction is refused for a quest
+ * whose `requiredItems` include a page the wiki badges out — the same `badgedOut` read edge 1 makes
+ * of a recipe's components, one hop, no zone inference. Measured over the committed corpus the day
+ * it landed: 154 era? gear rows flip in, and the guard drops exactly three, all epic pieces
+ * (Rebreather, Large Muddy Sandals, Slime Blood of Cazic-Thule). Non-definitive, so it still speaks
+ * only into `unknown`, and `deriveEra`'s out-before-in keeps any out edge winning over it.
+ */
+function questEdges(
+  entry: ItemDbEntry,
+  corpus: ReadonlyMap<string, ItemDbEntry>,
+  catalogs: EraDeriveCatalogs
+): EraDerivation[] {
   const edges: EraDerivation[] = []
   for (const use of entry.questUses ?? []) {
     const quest = catalogs.questByName.get((use.page ?? use.quest).trim().toLowerCase())
     if (quest?.startZone === undefined) continue
-    if (unopened(zoneEra(quest.startZone))) {
+    const era = zoneEra(quest.startZone)
+    if (unopened(era)) {
       edges.push({ basis: 'quest', verdict: 'out-of-era', target: quest.name, detail: quest.startZone })
+    } else if (era !== null && !(quest.requiredItems ?? []).some((name) => badgedOut(corpus.get(itemKey(name))))) {
+      edges.push({ basis: 'quest', verdict: 'in-era', target: quest.name, detail: quest.startZone })
     }
   }
   return edges
@@ -522,7 +544,7 @@ export function eraEdges(
   return [
     ...(dropper === null ? [] : [dropper]),
     ...recipeEdges(entry, corpus, catalogs),
-    ...questEdges(entry, catalogs),
+    ...questEdges(entry, corpus, catalogs),
     ...pageEdges(entry, catalogs)
   ]
 }
