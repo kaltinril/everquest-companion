@@ -4,7 +4,7 @@ import type { CountSource, ItemCountOverride } from '@shared/types'
 import { OverrideSummaryChip } from './ItemOverrides'
 import { useProgress, type QuestProgress } from './useProgress'
 import { IgnoredList } from './IgnoredList'
-import QuestFilterBar, { InventorySource } from './QuestFilterBar'
+import QuestFilterBar, { InventorySource, ResetTurnIns } from './QuestFilterBar'
 // The `/outputfile` freshness line (JOS-44). The Sky tab draws it twice now — the inventory dump's
 // under the count-source dropdown, the achievements dump's under the counts line (JOS-429).
 import OutputKindLine from '../../components/OutputKindLine'
@@ -403,16 +403,23 @@ function PoskyBody(x: PoskyBodyProps): JSX.Element {
         countSource={countSource}
         onCountSource={onCountSource}
         inventoryLoadedAt={inventoryLoadedAt}
-        onResetTurnIns={x.resetTurnIns}
       />
-      <CountsLine
-        questCount={x.quests.length}
-        // Counts describe the list you are looking at, so ignored quests are not in them.
-        totalQuests={list.visible.length}
-        filteredCount={list.filtered.length}
-        countSource={countSource}
-        overrides={x.itemOverrides}
-      />
+      {/* THE RESET SITS ON THE COUNTS ROW (upstream issue #72), at its right, because it takes
+          back the numbers this row reports — and because it cannot live on the bar: one more
+          control in the bar's right group wrapped the bar onto a fourth row under the dropdown's
+          wider labels, moving this very line the freshness caption promises never to move. */}
+      <Stack direction="row" spacing={2} alignItems="center" useFlexGap>
+        <CountsLine
+          questCount={x.quests.length}
+          // Counts describe the list you are looking at, so ignored quests are not in them.
+          totalQuests={list.visible.length}
+          filteredCount={list.filtered.length}
+          countSource={countSource}
+          overrides={x.itemOverrides}
+        />
+        <Box sx={{ flexGrow: 1 }} />
+        <ResetTurnIns onReset={x.resetTurnIns} />
+      </Stack>
       {/* THE SECOND `/outputfile` LINE (JOS-429), and deliberately the SAME line component the
           inventory dump gets — `OutputKindLine quiet`, which inherits the command string, the
           why-clause and the file's own mtime from the registry, and reads "not yet run" for a
