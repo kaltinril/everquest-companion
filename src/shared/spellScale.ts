@@ -148,6 +148,20 @@ export function normalizeSpellRank(rank: number | null | undefined): number {
 }
 
 /**
+ * A rank as ARITHMETIC: an integer 0..10, clamped, and 1 stays 1.
+ *
+ * DELIBERATELY NOT `normalizeSpellRank`. That fold belongs to EVIDENCE - the log cannot tell
+ * `Clarity I` from `Clarity`, so an OBSERVED 1 reads as base. A slider rung has no such doubt: tier
+ * 1 is one mote spent, and folding it made the Spellbook's rung I print the base figures and the
+ * Upgrades tab's arithmetic quote a free rung (`spellUpgradePlan.ts tierNumber` records the first
+ * catch). Every simulated tier goes through this; every observed rank goes through the fold.
+ */
+export function clampSpellRank(rank: number): number {
+  if (!Number.isFinite(rank)) return 0
+  return Math.max(0, Math.min(SPELL_MAX_RANK, Math.trunc(rank)))
+}
+
+/**
  * ONE DAMAGE MAGNITUDE AT A RANK: `amount + floor(amount * pct * N / 100)`.
  *
  * Spelled as `amount + floor(...)` rather than `floor(amount * (1 + 0.06N))` to mirror
@@ -172,16 +186,29 @@ export function scaleSpellDamage(
   rank: number | null | undefined,
   perTick = false
 ): number {
-  const n = normalizeSpellRank(rank)
-  if (n === 0 || amount <= 0) return amount
-  const pct = perTick ? SPELL_DOT_DAMAGE_RANK_PERCENT : SPELL_DAMAGE_RANK_PERCENT
-  return amount + Math.floor((amount * pct * n) / 100)
+  return damageAtRank(amount, normalizeSpellRank(rank), perTick)
 }
 
 /** ONE HEALING MAGNITUDE AT A RANK: the damage rule at half the rate (see the header's evidence). */
 export function scaleSpellHeal(amount: number, rank: number | null | undefined): number {
-  const n = normalizeSpellRank(rank)
-  if (n === 0 || amount <= 0) return amount
+  return healAtRank(amount, normalizeSpellRank(rank))
+}
+
+/**
+ * THE SAME ARITHMETIC AT A RANK ALREADY RESOLVED - no evidence fold, so a caller that has decided
+ * for itself whether its number is an observed rank or a simulated tier (`spellMetrics.ts
+ * spellMetricsAt` resolves it once for both of its folds) is not second-guessed here, where a
+ * slider's tier 1 would silently become base. `n` is `normalizeSpellRank`'s or `clampSpellRank`'s
+ * answer; the two exported scalers above are these with the fold applied.
+ */
+export function damageAtRank(amount: number, n: number, perTick = false): number {
+  if (n <= 0 || amount <= 0) return amount
+  const pct = perTick ? SPELL_DOT_DAMAGE_RANK_PERCENT : SPELL_DAMAGE_RANK_PERCENT
+  return amount + Math.floor((amount * pct * n) / 100)
+}
+
+export function healAtRank(amount: number, n: number): number {
+  if (n <= 0 || amount <= 0) return amount
   return amount + Math.floor((amount * SPELL_HEAL_RANK_PERCENT * n) / 100)
 }
 

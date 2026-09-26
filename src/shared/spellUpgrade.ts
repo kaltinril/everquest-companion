@@ -647,14 +647,26 @@ function benefitRowsAt(
   if (base.resistAdjust !== undefined && categoryIsOffensive(base.category)) {
     row.resistAdjust = base.resistAdjust - UNIVERSAL_RATES.resistPerTier * tier
   }
-  // A MEASURED EXCEPTION READS AS NO RATE AT ALL, so the ladder prints the base figure at every
-  // rung rather than a climb the game was measured not to give.
-  const rate = magnitudeIsMeasuredStatic(base) ? { damage: null, heal: null } : rates
+  const rate = magnitudeRates(base)
   const damage = stated(base.damage)
   if (damage !== undefined) row.damage = magnitudeAt(damage, rate.damage, tier)
   const heal = stated(base.heal)
   if (heal !== undefined) row.heal = magnitudeAt(heal, rate.heal, tier)
   return row
+}
+
+/**
+ * THE RATES THIS SPELL'S MAGNITUDES ACTUALLY MOVE AT: the category's, or none at all for a
+ * measured exception, so the ladder prints the base figure at every rung rather than a climb the
+ * game was measured not to give.
+ *
+ * Exported for the Spellbook, which reads a spell's magnitudes PER LINE (`shared/spellbook.ts`)
+ * and has to ask the same question before it scales anything - a null here is "do not scale", and
+ * inventing a rate at the far end is how Arch Lich's self-DoT would start growing on a buff.
+ */
+export function magnitudeRates(base: SpellTierBase): { damage: number | null; heal: number | null } {
+  const rates = UPGRADE_RATES[base.category]
+  return magnitudeIsMeasuredStatic(base) ? { damage: null, heal: null } : rates
 }
 
 /**

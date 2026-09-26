@@ -433,6 +433,8 @@ export function spellHitsFor(spell: UnlockSpell, targets: number): number {
  */
 export interface MetricsReading {
   rank?: number
+  /** a SLIDER tier in place of an observed rank - clamped, never folded; `SpellMetricsInput.tier` */
+  tier?: number
   targets?: number
   /** the worn DAMAGE focus percent for this spell; absent or 0 is no focus */
   focusDamagePct?: number
@@ -458,6 +460,7 @@ export function spellMetricsForLevel(
     // The mote rank rides the same input for the same reason: `spellMetricsAt` resolves it once and
     // both of its folds scale by that one number (JOS-447).
     rank,
+    ...(reading.tier === undefined ? {} : { tier: reading.tier }),
     // AND HOW MANY TIMES THE CAST LANDS (JOS-449): `targets` 1 gives a rain its three waves and
     // every other spell the single hit it has always had.
     hits: spellHitsFor(spell, targets),

@@ -43,10 +43,14 @@
 
 import type { ClassAbbr } from './classCombo'
 import type { UnlockSpell } from './levelUnlocks'
+// The Leveling tab's own reader, so a magnitude at a tier here is the number that tab prints for
+// the same spell at the same rank - see `tierMagnitudes`.
+import { spellMetricsForLevel } from './bestSpells'
 import { SPELL_MAX_RANK, normalizeSpellRank } from './spellScale'
 import { compareStatKeys, type SpellStatGrant } from './spellStats'
 import {
   UPGRADE_RATES,
+  magnitudeRates,
   spellTierLadder,
   upgradePayoff,
   type SpellTierBase,
@@ -126,7 +130,10 @@ export interface SpellbookRow {
    * a buff. The stats beside it never budge, which the Loadout tab says out loud.
    */
   durationTicks?: number
-  /** Damage and healing at the requested tier, from `metrics` where main computed one. */
+  /**
+   * Damage and healing at the requested tier, where main computed a base figure - read PER LINE
+   * at the tier, by the Leveling tab's own reader (`tierMagnitudes`), never by scaling the total.
+   */
   damage?: number
   heal?: number
   /** The wiki's era verdict, `true` or absent - never false (law 1, the sidecar's own rule). */
@@ -237,6 +244,48 @@ function gainLevel(s: UnlockSpell): number {
 }
 
 /**
+ * DAMAGE AND HEALING AT A TIER, READ PER LINE.
+ *
+ * The ladder scaled the row's TOTAL - `metrics.damage`, which for a DoT is the tick times the
+ * ticks - and the game scales the TICK: Odium's tick reads 387 at base and 445 at V, and its
+ * fourteen-tick total is fourteen times whichever of those the rank produced. Floor a tick and
+ * multiply, or multiply and floor a total, and the two differ by up to the tick count: Asystole
+ * read 555 here at V where the Leveling tab read 553, Affliction (6 a tick over 14) read 96
+ * against 84, and 386 of the 1,170 (row, tier) pairs the corpus states disagreed with that tab
+ * (measured 2026-09-25). A slider that prints one number on one tab and another on the next is
+ * not a slider anyone can trust.
+ *
+ * So the figure is the Leveling tab's own: `spellMetricsForLevel` over the row's hitpoint lines at
+ * the row's own gain level - the level `metrics` was read at - with the tier riding as a TIER
+ * (`MetricsReading.tier`), clamped rather than folded, because a slider's rung I is one mote and
+ * not an evidence problem. Every line scales by its own measured rate (six percent direct, three
+ * a tick, three healing), which is the arithmetic that reproduced Odium exactly.
+ *
+ * THE CATEGORY STILL DECIDES WHETHER ANYTHING SCALES AT ALL. `magnitudeRates` is null for a
+ * category whose magnitudes the model says do not move (a buff, a debuff) and for the measured
+ * exceptions, and there the base figure stands at every tier: Arch Lich is a beneficial self-DoT
+ * filed as a buff, and reading it per line at a tier would have it grow on a rate nobody stated.
+ * The reader scales both sides by their own rules whatever the category, so each side is gated on
+ * its own rate. A row the reader cannot re-read (no lines crossed the wire) keeps the ladder's
+ * figure, which is what it printed before and is never the case in the committed corpus - all 392
+ * rows with a figure reconstruct exactly at tier 0.
+ */
+function tierMagnitudes(
+  s: UnlockSpell,
+  base: SpellTierBase,
+  reading: SpellTierReading
+): Pick<SpellbookRow, 'damage' | 'heal'> {
+  const rate = magnitudeRates(base)
+  const scaled =
+    reading.tier > 0 && (rate.damage !== null || rate.heal !== null)
+      ? spellMetricsForLevel(s, gainLevel(s), { tier: reading.tier })
+      : undefined
+  const damage = rate.damage === null ? base.damage : (scaled?.damage ?? reading.damage)
+  const heal = rate.heal === null ? base.heal : (scaled?.heal ?? reading.heal)
+  return { ...positive('damage', damage), ...positive('heal', heal) }
+}
+
+/**
  * ONE ROW, at a tier.
  *
  * Exported because the spell page and the Upgrades tab both want a single row without running the
@@ -286,8 +335,7 @@ export function spellbookRow(s: UnlockSpell, tier: number): SpellbookRow {
   if (reading.mana !== undefined) row.mana = reading.mana
   if (reading.castSeconds !== undefined) row.castSeconds = reading.castSeconds
   if (reading.durationTicks !== undefined) row.durationTicks = reading.durationTicks
-  if (reading.damage !== undefined) row.damage = reading.damage
-  if (reading.heal !== undefined) row.heal = reading.heal
+  Object.assign(row, tierMagnitudes(s, base, reading))
   // `true` or absent, never false - the era sidecar's own shape (law 1).
   if (s.outOfEra === true) row.outOfEra = true
   return row
@@ -498,9 +546,18 @@ export function magnitudeRatePercent(c: UpgradeCategory): number | null {
   return rate === null || rate === undefined ? null : Math.round(rate * 100)
 }
 
-/** The ladder for one row, for the surfaces that draw a whole table rather than one tier. */
+/**
+ * The ladder for one row, for the surfaces that draw a whole table rather than one tier.
+ *
+ * Its magnitudes are `tierMagnitudes`' too, rung by rung, so the Upgrades tab's "from -> to" is
+ * the pair of numbers the Spellbook prints at those two tiers and not a total scaled on its own.
+ */
 export function spellbookLadder(s: UnlockSpell): SpellTierReading[] {
-  return spellTierLadder(tierBase(s))
+  const base = tierBase(s)
+  return spellTierLadder(base).map((reading) => {
+    const { damage: _damage, heal: _heal, ...rest } = reading
+    return { ...rest, ...tierMagnitudes(s, base, reading) }
+  })
 }
 
 export { SPELL_MAX_RANK }
