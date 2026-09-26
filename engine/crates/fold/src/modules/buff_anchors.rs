@@ -13,10 +13,14 @@
 //! A FOURTH FORM, OFF BY DEFAULT (upstream issue #69): a weapon or item proc. EQ prints nothing
 //! when an item procs — only the landing — so an Orb of Tishan's Tashania on a mob has no cast line
 //! and was dropped on purpose. The evidence that stands in for the cast line comes from outside the
-//! sentence: YOU landed a melee hit on that mob inside `PROC_MELEE_WINDOW_MS`, and the spell is a
-//! combat effect of an item the inventory dump says you hold. Both halves are required and the
-//! gate is a preference (`buffTrust.define`, `procDebuffs`), because a group-mate swinging the same
-//! weapon at the same mob prints the identical landing — the residual the user opts into.
+//! sentence: YOU swung at that mob inside `PROC_MELEE_WINDOW_MS`, and the spell is a combat effect
+//! of an item the inventory dump says you hold. Both halves are required and the gate is a
+//! preference (`buffTrust.define`, `procDebuffs`), because anyone's landing of the same sentence on
+//! a mob you are hitting — a group-mate's cast, click or proc — reads the same; that residual is
+//! what the user opts into. A SWING is a melee hit, a miss (procs fire on misses: measured over
+//! the owner's log, 3.2% of 5,769 Puma Maw landings had only miss lines in window) or the damage
+//! line of a held proc itself. The landing prints BEFORE its swing's own line (5,769 of 5,769 in
+//! that log), so `buff_procs.rs` holds a refused landing for the swing that follows it.
 
 use crate::jsmap::JsMap;
 use crate::modules::buffs_shapes::{
@@ -25,8 +29,8 @@ use crate::modules::buffs_shapes::{
 use eqlog::jsstr::js_trim;
 use eqlog::names::id_key;
 
-/// How long after YOUR OWN melee hit on a mob a cast-less landing on it may still be a proc of the
-/// weapon that hit it. EQ stamps to the second and a proc lands in the swing's own second, so two
+/// How long after YOUR OWN swing at a mob a cast-less landing on it may still be a proc of the
+/// weapon that swung. EQ stamps to the second and a proc lands in the swing's own second, so two
 /// seconds is one second of slack; a melee round is longer than that only when you are not
 /// swinging, which is when a landing is somebody else's.
 pub const PROC_MELEE_WINDOW_MS: i64 = 2_000;
@@ -124,16 +128,27 @@ impl CastAnchors {
         self.proc_spells = spells.into_iter().map(|s| spell_key(&s)).collect();
     }
 
-    /// A melee hit YOU landed on `target` — the swing a proc rides on.
+    /// A swing YOU made at `target` — the swing a proc rides on.
     pub fn note_melee(&mut self, target: &str, ts: i64) {
         self.melee.insert(id_key(target), ts);
     }
 
-    /// The proc gate for ONE spell: switched on, a combat effect of something you hold, and a melee
-    /// hit of yours on `target` inside the window. It says nothing about uniqueness — the landing
-    /// gate asks per candidate and refuses a sentence two held procs could both explain.
+    /// Switched on, and this spell is a combat effect of something you hold.
+    pub fn is_held_proc(&self, spell: &str) -> bool {
+        self.proc_debuffs && self.proc_spells.contains(&spell_key(spell))
+    }
+
+    /// Could the gate ever vouch for a landing with these candidates, given a swing? The test
+    /// `buff_procs.rs` asks before holding a refused landing for one.
+    pub fn proc_possible<'a>(&self, names: impl IntoIterator<Item = &'a str>) -> bool {
+        names.into_iter().any(|n| self.is_held_proc(n))
+    }
+
+    /// The proc gate for ONE spell: switched on, a combat effect of something you hold, and a swing
+    /// of yours at `target` inside the window. It says nothing about uniqueness — the landing gate
+    /// asks per candidate and refuses a sentence two held procs could both explain.
     pub fn proc_evidence(&self, spell: &str, target: &str, ts: i64) -> bool {
-        if !self.proc_debuffs || !self.proc_spells.contains(&spell_key(spell)) {
+        if !self.is_held_proc(spell) {
             return false;
         }
         self.melee

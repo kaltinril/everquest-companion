@@ -21,6 +21,7 @@ pub mod alerts_early;
 pub mod alerts_rules;
 pub mod buff_anchors;
 pub mod buff_landing;
+pub mod buff_procs;
 pub mod buff_rounds;
 /// The timer-row projection — `src/shared/buffTimers.ts`'s model half. A pure fold over two
 /// modules' published state, read by the view layer and the alerts evaluator. Holds no `EqModule`.

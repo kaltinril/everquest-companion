@@ -66,6 +66,20 @@ test('the held-proc catalog names the combat effects of what the dump holds, as 
   )
 })
 
+test("the wiki's level tail on an effect name is not part of the spell", () => {
+  const tailed: ItemDb = {
+    'club of the ice ocean': {
+      page: 'Club of the Ice Ocean',
+      stats: { effects: [{ kind: 'combat', name: 'Frost Strike  Level 51', detail: 'Combat' }] }
+    } as unknown as ItemDb[string],
+    'dirk of the dain': {
+      page: 'Dirk of the Dain',
+      stats: { effects: [{ kind: 'combat', name: 'Frost Strike  at lvl 5', detail: 'Combat' }] }
+    } as unknown as ItemDb[string]
+  }
+  assert.deepEqual([...heldProcSpells(tailed, { 'club of the ice ocean': 1, 'dirk of the dain': 1 })], ['Frost Strike'])
+})
+
 test('a spell that both procs and clicks is a proc here and never a click there', () => {
   const held = { 'pestilence scythe': 1 }
   assert.deepEqual([...heldProcSpells(CATALOG, held)], ['Vampiric Curse'])
