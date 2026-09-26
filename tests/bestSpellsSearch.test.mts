@@ -255,6 +255,11 @@ test('every row is read at max(observed, simulated) rank, out-of-class rows incl
     (lifted.metrics.damage ?? 0) > (base.metrics.damage ?? 0),
     `${String(lifted.metrics.damage)} vs ${String(base.metrics.damage)}`
   )
+  // Rung I of the slider is tier 1 here as on the ranked table: the slider side is clamped, and
+  // only an OBSERVED rank goes through the evidence fold (tests/bestSpellsRank.test.mts pins both).
+  const one = rowOf(find('bolt of bark', ask('dd', 44, ['WIZ'], { simulate: 1 })), 'Bolt of Bark')
+  assert.equal(one.rank, 1)
+  assert.ok((one.metrics.damage ?? 0) > (base.metrics.damage ?? 0), 'rung I moves the figure')
 })
 
 test('the results carry the tab`s own sort, and flipping it flips them', () => {

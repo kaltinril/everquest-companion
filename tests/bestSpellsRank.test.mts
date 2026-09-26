@@ -25,6 +25,7 @@ import {
 import { comboClassesOf, type LevelUnlockData } from '../src/shared/levelUnlocks'
 import { spellLineKey } from '../src/shared/spellLines'
 import type { ObservedSpellRanksSnap } from '../src/shared/spellRanks'
+import { spellTierLadder } from '../src/shared/spellUpgrade'
 import { buildLevelUnlocks } from '../src/main/data/levelUnlocks'
 
 // ---- fixtures ---------------------------------------------------------------------------------
@@ -180,6 +181,28 @@ test('the SLIDER lifts every row, and MAX keeps a better observed rank where the
   assert.equal(simulated.rank, 4)
   assert.equal(simulated.observedRank, 0, 'simulated is not observed, and the row says which')
   assert.equal(simulated.metrics.damage, 372, '300 + floor(300 * 24 / 100)')
+})
+
+test('slider rung I is tier 1, and an OBSERVED rank I is still base', () => {
+  // The slider's value went through the evidence fold (`normalizeSpellRank`, 1 -> 0), so "all at
+  // I+" printed the base figures. A slider rung is not evidence: it is one mote spent, and the
+  // Leveling tab now prints at rung I what the tier ladder prints at tier 1.
+  const wiz = comboOf(['WIZ'])
+  const base = rowOf(bestSpellsAt(DATA, wiz, 35, view({ simulate: 0 })).tabs.dd.shown, 'Flat Bolt')
+  const one = rowOf(bestSpellsAt(DATA, wiz, 35, view({ simulate: 1 })).tabs.dd.shown, 'Flat Bolt')
+  assert.equal(base.metrics.damage, 150)
+  assert.equal(one.rank, 1)
+  assert.equal(one.metrics.damage, 159, '150 + floor(150 * 6 / 100)')
+  assert.equal(one.metrics.damage, spellTierLadder({ category: 'nuke', damage: 150 })[1].damage)
+  assert.notEqual(one.metrics.damage, base.metrics.damage)
+  // The fold still holds where it belongs: the log cannot tell `Flat Bolt I` from `Flat Bolt`.
+  const observed = rowOf(
+    bestSpellsAt(DATA, wiz, 35, view({ observed: ranksOf({ 'Flat Bolt': 1 }) })).tabs.dd.shown,
+    'Flat Bolt'
+  )
+  assert.equal(observed.rank, 0)
+  assert.equal(observed.observedRank, 0)
+  assert.equal(observed.metrics.damage, 150, 'an observed I reads as base')
 })
 
 test('a rank lifts the row`s own derived figures, not only its total', () => {

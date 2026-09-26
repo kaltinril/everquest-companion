@@ -76,7 +76,7 @@ import type { ClassAbbr } from './classCombo'
 import { comboClassSet, type ComboClasses, type LevelUnlockData, type UnlockSpell } from './levelUnlocks'
 import { spellMetricsAt, type SpellMetrics } from './spellMetrics'
 import { observedRankRow, type ObservedSpellRanksSnap } from './spellRanks'
-import { effectiveSpellRank, normalizeSpellRank } from './spellScale'
+import { clampSpellRank, effectiveSpellRank, normalizeSpellRank } from './spellScale'
 import { bestWornFocus, wornFocusLabel, type FocusKind, type WornFocus } from './wornFocus'
 
 // ── AND EVERY FIGURE WEARS YOUR GEAR SINCE JOS-452 (owner ask 2026-08-23) ──────────────────────
@@ -572,7 +572,9 @@ function ownedRows(
   fold: RowFold
 ): BestSpellRow[] {
   const view = fold.view
-  const simulate = normalizeSpellRank(view.simulate)
+  // The slider's rung, CLAMPED and not folded: rung I is tier 1. `effectiveSpellRank` applies the
+  // evidence fold to the observed side alone.
+  const simulate = clampSpellRank(view.simulate ?? 0)
   const byName = new Map<string, BestSpellRow>()
   for (const spell of data.spells) {
     // THE AREA READING IS A DIFFERENT CORPUS, not a filter applied later: a spell that hits one
@@ -619,8 +621,10 @@ function buildRow(
   const rank = effectiveSpellRank(observedRank, ctx.simulate)
   const targets = ctx.fold.area ? targetsFor(spell) : 1
   const focus = rowFocus(spell, view.focus ?? [], owned.gainedAt)
+  // `rank` is already resolved (observed folded, simulated clamped), so it rides as a TIER: handed
+  // as `rank` the reader would fold a simulated I back to base on the way through.
   const metrics = spellMetricsForLevel(spell, ctx.level, {
-    rank,
+    tier: rank,
     targets,
     focusDamagePct: pctOfSide(focus, 'damage'),
     focusHealPct: pctOfSide(focus, 'heal')

@@ -217,12 +217,19 @@ export function healAtRank(amount: number, n: number): number {
  *
  * The panel's slider lifts every row to a rank, but a row already ABOVE it must not be pulled down —
  * the owner's ask was to read his real Garrison's VIII against every other spell as if levelled, not
- * to hide the rank he actually owns. `Math.max` over two normalized ranks is that rule, and it lives
- * here rather than in the panel so the model and the card cannot disagree about it.
+ * to hide the rank he actually owns. `Math.max` over the two resolved ranks is that rule, and it
+ * lives here rather than in the panel so the model and the card cannot disagree about it.
+ *
+ * EACH SIDE IS RESOLVED BY ITS OWN RULE. The observed rank is evidence and is FOLDED
+ * (`normalizeSpellRank`: an observed I reads as base, because the log cannot tell `Clarity I` from
+ * `Clarity`). The simulated rank is a slider rung and is CLAMPED (`clampSpellRank`): rung I is one
+ * mote, and folding it had the Leveling tab's "all at I+" position printing the base figures.
+ * The answer is therefore ALREADY RESOLVED, and a reader that takes it must not fold it again -
+ * `bestSpells.ts buildRow` hands it to `spellMetricsForLevel` as a `tier` for that reason.
  */
 export function effectiveSpellRank(
   observed: number | null | undefined,
   simulated: number | null | undefined
 ): number {
-  return Math.max(normalizeSpellRank(observed), normalizeSpellRank(simulated))
+  return Math.max(normalizeSpellRank(observed), clampSpellRank(simulated ?? 0))
 }
