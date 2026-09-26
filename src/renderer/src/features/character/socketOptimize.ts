@@ -239,14 +239,22 @@ function isProcClaim(c: FamilyClaim): boolean {
 /** The seat's placement names the donor that actually FITS it (user catch 2026-09-10: a claim
  *  carried by several donors printed its FIRST donor's name, which read as a SECONDARY-only
  *  shield gem being sent to the neck - the matching had legally seated a different, neck-slot
- *  donor of the same effect, and the label lied about which). */
+ *  donor of the same effect, and the label lied about which).
+ *
+ *  AND, AMONG THE DONORS THAT FIT, THE SEAT'S OWN OCCUPANT FIRST (validator catch 2026-09-25).
+ *  Two gems of one effect at one tier are two donors of one claim, and `find` took whichever the
+ *  dump listed first - so with Gem A socketed and Gem B loose, a dump that listed B first made
+ *  the plan say "socket Gem B replacing Gem A": a swap that buys nothing, and one that came and
+ *  went with the ORDER of the dump. The incumbent is a fit like any other; it is simply the fit
+ *  that costs no move. */
 function placementOf(
   claim: FamilyClaim,
   socket: SocketHostCell,
   rowByKey: ReadonlyMap<string, GearRow>
 ): Placement {
   const hostRow = rowByKey.get(socket.itemKey)
-  const donor = claim.donors.find((d) => d.type === socket.type && seatFits(d.row, socket, hostRow))
+  const fits = claim.donors.filter((d) => d.type === socket.type && seatFits(d.row, socket, hostRow))
+  const donor = fits.find((d) => d.key === socket.currentKey) ?? fits[0]
   return {
     cellId: socket.cellId,
     cellLabel: socket.cellLabel,

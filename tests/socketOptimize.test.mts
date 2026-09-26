@@ -168,6 +168,24 @@ test('a placement names the donor that FITS the seat, never the claim`s first do
   assert.equal(plan.placements[0].gemName, 'Neck Gem')
 })
 
+test('a seat keeps its own copy: two gems of one effect are not a swap, whichever the dump lists first', () => {
+  // Gem A sits in the waist; Gem B, the same effect at the same tier, is loose. Naming B here is
+  // "socket Gem B replacing Gem A" - a move that grants nothing - and the old `find` named it
+  // exactly when the dump happened to list B ahead of A.
+  const rows = [
+    row({ key: 'gem a', name: 'Gem A', effects: worn('Gem A', 'Effect A III'), slots: ['WAIST'] }),
+    row({ key: 'gem b', name: 'Gem B', effects: worn('Gem B', 'Effect A III'), slots: ['WAIST'] })
+  ]
+  const board = [seat({ cellId: 'waist', type: 'Worn', slot: 'WAIST', currentName: 'Gem A' })]
+  const socketedA = gem('Gem A', 'socketed in Waist', true)
+  for (const owned of [[gem('Gem B', 'General 1'), socketedA], [socketedA, gem('Gem B', 'General 1')]]) {
+    const plan = planBoard(owned, rows, NOBODY, board)
+    assert.equal(plan.placements.length, 1)
+    assert.equal(plan.placements[0].gemName, 'Gem A')
+    assert.equal(plan.moves.length, 0, 'the seat already holds a copy of its target')
+  }
+})
+
 test('incumbency breaks ties: the belt keeps its socketed Burning Affliction III, Summoning Haste stays benched', () => {
   // The user's own board: BA III is IN the belt, SH III is loose, both belt-only, one seat.
   // A value judgment between the two is impossible - but the incumbent staying put needs none.
