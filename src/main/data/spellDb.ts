@@ -159,9 +159,7 @@ export function castOnOtherSuffix(msg: string): string | null {
   if (poss) return ("'s" + poss[1]).trim()
   const lead = /^Someone\s+(.*)$/i.exec(m)
   if (lead) return lead[1].trim()
-  // No subject at all: a bare lowercase predicate ("looks powerful.") is already the suffix. A
-  // capitalised one is a sentence with some other placeholder subject (Player, Target, Soandso).
-  if (/^[a-z]/.test(m)) return m
+  if (/^[a-z]/.test(m)) return m // a bare predicate ("looks powerful.") IS the suffix; capitalised = placeholder subject
   return null
 }
 
