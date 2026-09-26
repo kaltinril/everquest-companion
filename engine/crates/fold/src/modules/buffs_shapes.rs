@@ -14,12 +14,18 @@ const TICK_MS: i64 = 6_000;
 ///
 /// Where the wiki is unsure the conservative end is taken, because the two errors are not
 /// symmetric: an undershot floor is beaten by ONE clean sample, while an overshot one needs three
-/// corroborated below-floor cycles to come down. Same reason an `Unstated` row takes 5.
+/// corroborated below-floor cycles to come down. Same reason an `Unstated` row takes 5 — and, since
+/// 2026-09-25, a proc buff too: "unstated" had read as 0, but the owner's log shows Spirit of the
+/// Puma's self duration growing every rank (60 s base: 69 s at I, 92 s at IV, 112 s at VI; n=267,
+/// 11, 366), so 0 was not the conservative end of an unknown rate, it was a claim the log refutes.
+/// 5 still undershoots every measured rank, which is the side the ruling wants.
 fn rank_scale_pct(cat: DurationCategory) -> i64 {
     match cat {
         DurationCategory::Buff | DurationCategory::Debuff => 10,
-        DurationCategory::DotHot | DurationCategory::CrowdControl | DurationCategory::Unstated => 5,
-        DurationCategory::ProcBuff => 0,
+        DurationCategory::DotHot
+        | DurationCategory::CrowdControl
+        | DurationCategory::Unstated
+        | DurationCategory::ProcBuff => 5,
     }
 }
 
@@ -73,18 +79,21 @@ pub const SESSION_GAP_MS: i64 = 30 * 60_000;
 /// When you die with a slow on a boss, or a pet despawns wearing a buff you cast, the wear-off line
 /// is printed to somebody who is not there to receive it, so it never arrives and the bar sits at
 /// 0 s. The timeout comes from the ESTIMATE'S QUALITY and nothing else: a learned duration gets 15 s
-/// because the only thing left to be late is the LINE, and a DB floor gets 60 s, long enough for a
-/// merely late line and short enough that a stale row is never a fixture of the window. A death
-/// bound takes the 60 s branch by being neither — it is a LOWER bound, so culling it on the learned
-/// schedule would retire a row we have positive evidence is still running. A rank-scaled floor is
-/// still a floor and reports `Db`, so it keeps the 60 s grace: the rank raised the number, not its
-/// quality.
+/// because the only thing left to be late is the LINE, and a DB floor gets 60 s or a tenth of
+/// itself, whichever is longer — long enough for a merely late line, and for the floor to be
+/// short: measured over the owner's log, every DB-floored buff runs ~5% past the wiki number
+/// (27.0 m -> 28.4 m, 36 m -> 37.9 m, n to 41), so a flat minute culled a 27-minute pet buff 21 s
+/// before it faded. A tenth is twice the measured overshoot and still keeps a stale row from being
+/// a fixture of the window. A death bound takes the same branch by being neither — it is a LOWER
+/// bound, so culling it on the learned schedule would retire a row we have positive evidence is
+/// still running. A rank-scaled floor is still a floor and reports `Db`, so it keeps the grace: the
+/// rank raised the number, not its quality.
 ///
 /// A cull is not evidence: it mints no sample and counts as no break, because nothing was observed.
-pub fn unwitnessed_timeout_ms(source: Option<EstimatorSource>) -> i64 {
+pub fn unwitnessed_timeout_ms(source: Option<EstimatorSource>, estimate_ms: i64) -> i64 {
     match source {
         Some(EstimatorSource::Observed) | Some(EstimatorSource::Cluster) => 15_000,
-        _ => 60_000,
+        _ => 60_000.max(estimate_ms / 10),
     }
 }
 
@@ -410,10 +419,42 @@ mod tests {
             scaled_floor_ms(30_000, DurationCategory::Unstated, 10),
             42_000
         );
+        // A proc buff grows at the unstated rate: the log refuted the 0 it used to take.
         assert_eq!(
             scaled_floor_ms(1_200_000, DurationCategory::ProcBuff, 10),
-            1_200_000
+            1_800_000
         );
+    }
+
+    /// A learned number waits only for a late line; a floor waits a minute, or a tenth of itself
+    /// when that is longer, because the floor itself runs short by a measured 5%.
+    #[test]
+    fn the_unwitnessed_grace_grows_with_a_long_floor_and_only_a_floor() {
+        assert_eq!(
+            unwitnessed_timeout_ms(Some(EstimatorSource::Observed), 1_620_000),
+            15_000
+        );
+        assert_eq!(
+            unwitnessed_timeout_ms(Some(EstimatorSource::Cluster), 1_620_000),
+            15_000
+        );
+        assert_eq!(
+            unwitnessed_timeout_ms(Some(EstimatorSource::Db), 210_000),
+            60_000
+        );
+        assert_eq!(
+            unwitnessed_timeout_ms(Some(EstimatorSource::Db), 600_000),
+            60_000
+        );
+        assert_eq!(
+            unwitnessed_timeout_ms(Some(EstimatorSource::Db), 1_620_000),
+            162_000
+        );
+        assert_eq!(
+            unwitnessed_timeout_ms(Some(EstimatorSource::DeathBound), 2_160_000),
+            216_000
+        );
+        assert_eq!(unwitnessed_timeout_ms(None, 0), 60_000);
     }
 
     /// The instance key is a NUL join, and both halves come back out of it.
