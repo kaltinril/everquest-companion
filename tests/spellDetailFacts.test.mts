@@ -22,6 +22,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { loadSpellDb } from '../src/main/data/spellDb'
 import { buildSpellDetail } from '../src/main/data/spellDetail'
+import { buildLevelUnlocks } from '../src/main/data/levelUnlocks'
 import { spellMetricsAt } from '../src/shared/spellMetrics'
 import {
   spellClassLine,
@@ -356,6 +357,27 @@ test('D21 the gear reading rides the RANK, so the card`s last line is its most c
   // The same 10.5% over the rank figure, which is what a player holding a VIII and wearing the mask
   // is really casting.
   assert.equal(both.metricsWithFocus?.damage, 444.2)
+})
+
+test('D22 the page files a spell under the SAME upgrade category as its Spellbook row', () => {
+  // The page classified from a regex over the effect text and the row from the computed metrics,
+  // and 67 spells disagreed (2026-09-25). Blast of Frost's line reads `Decrease Current Hit Points
+  // by 71`, which the regex did not know, so the row called it a nuke and the page a debuff - and
+  // the page's ladder then said its damage never grows. One reader now (`upgradeCategoryFor`).
+  const rows = new Map(buildLevelUnlocks(null).spells.map((s) => [s.name, s.upgradeCategory]))
+  assert.equal(buildSpellDetail(db, 'Blast of Frost').upgradeCategory, 'nuke')
+  assert.equal(rows.get('Blast of Frost'), 'nuke')
+  // Aegolism grants HP (`Increase HP when cast by 1100`) and heals nothing: a buff, not a HoT.
+  assert.equal(buildSpellDetail(db, 'Aegolism').upgradeCategory, 'buff')
+  assert.equal(rows.get('Aegolism'), 'buff')
+  // And as a property over the whole corpus, for every name the DB carries exactly once - two
+  // spells under one name (Aria of Asceticism) resolve to different pages, which is not this rule.
+  const pages = new Map<string, number>()
+  for (const s of db.spells) pages.set(s.name, (pages.get(s.name) ?? 0) + 1)
+  for (const [name, category] of rows) {
+    if (pages.get(name) !== 1) continue
+    assert.equal(buildSpellDetail(db, name).upgradeCategory, category, name)
+  }
 })
 
 test('D19 a spell with no hitpoint line states no figures at all — never a zero', () => {

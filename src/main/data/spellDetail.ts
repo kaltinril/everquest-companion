@@ -16,7 +16,7 @@
 
 import type { SpellDetail, SpellDetailFocus, SpellRankMember } from '../../shared/spellDetail'
 import { bestWornFocus, type WornFocus } from '../../shared/wornFocus'
-import { spellMetricsAt } from '../../shared/spellMetrics'
+import { spellMetricsAt, type SpellMetrics } from '../../shared/spellMetrics'
 import { parseSpellClassLevels, parseSpellRank, spellLineKey } from '../../shared/spellLines'
 import type { SpellResistTable } from '../../shared/resistTypes'
 import type { SpellEntry } from '../../shared/types'
@@ -26,11 +26,12 @@ import { aeHits, aeMaxTargets } from '../../shared/aoeSpells'
 import { spellEffectClasses } from './spellEffectClass'
 import { normalizeSpellRank } from '../../shared/spellScale'
 import { spellNature, type SpellDb } from './spellDb'
+import { upgradeCategoryFor } from './spellUpgradeCategory'
 // THE GRANT READER, THE UPGRADE CLASSIFIER and the ladder (docs/plans/spell-upgrades-and-loadout.md).
 // Separable overlays over the same scrape, like `spellEffectClass.ts`: delete them and the catalog
 // is unchanged. They run HERE because the renderer may not parse domain text (ruling 4).
 import { spellStatGrants } from '../../shared/spellStats'
-import { classifyUpgrade, spellTierLadder, upgradePayoff, type SpellTierBase } from '../../shared/spellUpgrade'
+import { spellTierLadder, upgradePayoff, type SpellTierBase } from '../../shared/spellUpgrade'
 import { itemsForSpell, type SpellItemIndex } from '../planner/spellItemIndex'
 // THE UPGRADE LADDER (JOS-508). A second join beside the rank lineage above, and a DIFFERENT
 // question — see `spellLinePath.ts`'s header for why the two must never be folded together.
@@ -169,17 +170,20 @@ export function buildSpellDetail(
   const entry: SpellEntry | undefined = dbRowFor(db, name)
   if (!entry) return notFound(name, combo)
   const classLevels = parseSpellClassLevels(entry.classes)
+  // Read once and handed to the category reader, so the ladder is filed under the figures the card
+  // prints rather than under a second reading of the same page (see `tierBaseFor`).
+  const worth = worthFields(entry, classLevels, sources)
   return {
     queried: name,
     name: entry.name,
     found: true,
     ...statedFields(entry),
-    ...worthFields(entry, classLevels, sources),
+    ...worth,
     nature: spellNature(entry.spellType),
     illusion: entry.illusion,
     classLevels,
     effectClasses: spellEffectClasses(entry),
-    ...upgradeFields(entry, classLevels, sources),
+    ...upgradeFields(entry, classLevels, sources, worth.metrics),
     lineage: buildLineage(name, db, observedRanks, entry),
     // THE LADDER (JOS-508), asked about the ROW'S OWN NAME rather than the queried one: the
     // research table files `Celestial Remedy`, and a hover on `Celestial Remedy III` has to reach
@@ -345,24 +349,18 @@ function statedPositive<K extends string>(
  * row: this one states the re-use timer, so the page's ladder can show every column the game's own
  * spell window does. `shared/spellbook.ts tierBase` records why the row's deliberately does not.
  *
- * THE SIX CLASSIFICATION FACTS ARE READ OFF THE PAGE'S OWN WORDS. Five come from fields; the sixth,
- * `permanent`, is the wiki's own adjective in `durationText`, which is the only place it is stated.
+ * THE CATEGORY IS THE ROW'S CATEGORY, from the same function and the same metrics
+ * (`spellUpgradeCategory.ts`). This page used to file the spell from a regex over its effect
+ * text while the Spellbook row asked the computed metrics, and the two disagreed on 67 spells: Blast
+ * of Frost (`Decrease Current Hit Points by 71`) was a nuke on the row and a debuff here, so its
+ * ladder said the damage never grows. `metrics` is the reading `worthFields` took, handed across so
+ * the verdict on the card and the verdict on the row beside it are one verdict.
  */
-function tierBaseFor(e: SpellEntry): SpellTierBase {
-  const effects = e.effects ?? []
-  const has = (re: RegExp): boolean => effects.some((x) => re.test(x))
+function tierBaseFor(e: SpellEntry, metrics: SpellMetrics | undefined): SpellTierBase {
   return {
     // See `shared/spellbook.ts tierBase`: carried for the measured-exception list alone.
     name: e.name,
-    category: classifyUpgrade({
-      beneficial: spellNature(e.spellType) === 'beneficial',
-      hasDuration: (e.durationMs ?? 0) > 0,
-      permanent: /permanent/i.test(e.durationText ?? ''),
-      damage: has(/^Decrease (Hit ?points|HP|Current HP)/i),
-      heal: has(/^Increase (Hit ?points|HP|Current HP)/i),
-      charm: has(/^(Charm|Mesmeriz)/i),
-      pet: has(/^Summon Pet/i)
-    }),
+    category: upgradeCategoryFor(e, metrics),
     ...statedPositive('mana', e.mana),
     ...statedPositive('castSeconds', e.castTimeMs === undefined ? undefined : e.castTimeMs / 1000),
     ...statedPositive('reuseSeconds', e.recastMs === undefined ? undefined : e.recastMs / 1000),
@@ -392,7 +390,8 @@ function tierBaseFor(e: SpellEntry): SpellTierBase {
 function upgradeFields(
   e: SpellEntry,
   classLevels: readonly { level: number }[],
-  sources: SpellDetailSources
+  sources: SpellDetailSources,
+  metrics: SpellMetrics | undefined
 ): Partial<SpellDetail> {
   const level = classLevels.length > 0 ? Math.min(...classLevels.map((c) => c.level)) : 1
   const out: Partial<SpellDetail> = {}
@@ -401,7 +400,7 @@ function upgradeFields(
     out.grants = grants
     out.grantsLevel = level
   }
-  const base = tierBaseFor(e)
+  const base = tierBaseFor(e, metrics)
   out.upgradeCategory = base.category
   out.tierLadder = spellTierLadder(base)
   out.payoff = upgradePayoff(base)

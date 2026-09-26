@@ -74,11 +74,10 @@ import { lineContaining, replacedBy } from './spellLineLookup'
 // delete either and the catalog is unchanged. They run HERE rather than at the far end because the
 // renderer may not parse domain text (ruling 4) - see `writeSpellFacts`.
 import { spellStatGrants } from '../../shared/spellStats'
-import { classifyUpgrade } from '../../shared/spellUpgrade'
-// The beneficial/detrimental verdict, imported rather than re-derived from `spellType`: `spellDb.ts`
-// owns that vocabulary (it enumerates every type the scrape states) and a second opinion here would
-// file a whole class of spells under the wrong upgrade rates.
-import { spellNature } from './spellDb'
+// The category reader, imported rather than assembled here from `classifyUpgrade`'s facts: the
+// spell page files the same spell through the same function, and a second opinion here filed Blast
+// of Frost as a nuke on its row and a debuff on its page (2026-09-25).
+import { upgradeCategoryFor } from './spellUpgradeCategory'
 import type { SpellResistInfo, SpellResistTable } from '../../shared/resistTypes'
 import type { SpellDbFile } from '../../shared/types'
 
@@ -284,7 +283,8 @@ function writeFigures(
  * lines' own verbs); the sixth, `permanent`, is the wiki's own word in `durationText`. A spell the
  * catalog places in no type at all is `beneficial: false`, which files it under `debuff` - the
  * cautious end, since a debuff's rates are the conservative ones and nothing about the fold claims
- * more confidence than that.
+ * more confidence than that. `spellUpgradeCategory.ts` is that reading, shared with the spell page
+ * so the two cannot file one spell two ways.
  */
 function writeSpellFacts(
   spell: UnlockSpell,
@@ -297,18 +297,9 @@ function writeSpellFacts(
     spell.grants = grants
     spell.grantsLevel = level
   }
-  const duration = s.durationText ?? ''
-  spell.upgradeCategory = classifyUpgrade({
-    beneficial: spellNature(s.spellType) === 'beneficial',
-    hasDuration: (s.durationMs ?? 0) > 0,
-    permanent: /permanent/i.test(duration),
-    // `metrics` has already reconciled the wiki's lines with the client's slots, so asking it is
-    // asking the one reader that saw both - and it costs no second parse of anything.
-    damage: (metrics?.damage ?? 0) > 0,
-    heal: (metrics?.heal ?? 0) > 0,
-    charm: (s.effects ?? []).some((e) => /^(Charm|Mesmeriz|Mesmerize)/i.test(e)),
-    pet: (s.effects ?? []).some((e) => /^Summon Pet/i.test(e))
-  })
+  // `metrics` has already reconciled the wiki's lines with the client's slots, so handing it over
+  // is asking the one reader that saw both - and it costs no second parse of anything.
+  spell.upgradeCategory = upgradeCategoryFor(s, metrics)
 }
 
 /**
