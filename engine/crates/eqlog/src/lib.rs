@@ -327,4 +327,26 @@ mod tests {
             "{out}"
         );
     }
+
+    /// A miss can carry a two-word modifier, exactly as a hit can; the parenthetical used to admit
+    /// one word and left every `(Wild Rampage)` miss `unknown`. The modifier splits into two tokens
+    /// because that is how the same parenthetical splits on a HIT (`parse_modifiers` keeps only Slay
+    /// Undead, Finishing Blow and Crippling Blow whole), and a miss follows the hit's convention.
+    #[test]
+    fn a_missed_swing_keeps_a_two_word_modifier() {
+        let p = bare();
+        let out = parse_one(
+            &p,
+            "[Fri Aug 21 20:41:47 2026] Lobarer tries to slash a glyphed guard, but misses! (Wild Rampage)",
+        );
+        assert!(out.starts_with(r#"{"kind":"miss","#), "{out}");
+        assert!(
+            out.contains(r#""attacker":"Lobarer","target":"a glyphed guard","mtype":"miss""#),
+            "{out}"
+        );
+        assert!(
+            out.ends_with(r#""verb":"slash","modifiers":["Wild","Rampage"]}"#),
+            "{out}"
+        );
+    }
 }
