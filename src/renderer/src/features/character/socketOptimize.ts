@@ -32,13 +32,13 @@ import { bestEffectFor, usable, type KindEffect, type Loadout } from './exaltati
 // are the recommender's"; until now it said so while carrying its own copy of them.
 import { inForcePerSeat, seatFits, seatIsLive, type SocketHostCell } from './socketRecommend'
 
-/** One family's claim: its best owned tier, the donor gems that carry it, and how many copies. */
+/** One family's claim: its best owned tier and the donor gems that carry it. How many copies
+ *  each donor has is the ledger's business (`PlanContext.left`), not the claim's. */
 interface FamilyClaim {
   family: string
   eff: KindEffect
   /** the donor keys whose best effect of this kind IS this family at the best tier */
   donors: { key: string; row: GearRow; type: string }[]
-  copies: number
   gemName: string
 }
 
@@ -101,6 +101,23 @@ function copyCounts(owned: readonly OwnedExaltation[]): Map<string, number> {
   return out
 }
 
+/**
+ * The optimizer's fixed facts plus THE COPY LEDGER every placement spends.
+ *
+ * "One physical copy seated once" was a counter on the CLAIM (`copies`, summed over every donor
+ * of the family and over every effect kind), and the second hand spent it while `placementOf`
+ * named whichever donor fit first (validator catch 2026-09-25): Fangs x1 and Claw x1, both
+ * Lifebite, two empty Proc seats - the claim had two copies, so the second hand took the other
+ * hand, and BOTH seats were named "Fangs". The ledger is per donor KEY: `left` starts at
+ * `copyCounts(owned)` and every placement takes one from the donor it names, so a copy that has
+ * been named is not there to name again, whichever claim or hand asks.
+ */
+interface PlanContext {
+  rowByKey: ReadonlyMap<string, GearRow>
+  /** copies of each donor key not yet named by a placement */
+  left: Map<string, number>
+}
+
 /** Every family's best owned claim. ONE claim per family (user catch 2026-09-10: keyed by
  *  family-and-type, a family could be seated twice through two socket types); its donors carry
  *  the type each serves, and the tier is the best across all of them. */
@@ -111,7 +128,7 @@ function familyClaims(
   types: readonly string[]
 ): FamilyClaim[] {
   const best = new Map<string, FamilyClaim>()
-  for (const [key, copies] of counts) {
+  for (const key of counts.keys()) {
     const row = rowByKey.get(key)
     if (row === undefined || !usable(row, loadout)) continue
     for (const type of types) {
@@ -119,10 +136,9 @@ function familyClaims(
       if (eff === null) continue
       const held = best.get(eff.family)
       if (held === undefined || eff.tier > held.eff.tier) {
-        best.set(eff.family, { family: eff.family, eff, donors: [{ key, row, type }], copies, gemName: row.name })
+        best.set(eff.family, { family: eff.family, eff, donors: [{ key, row, type }], gemName: row.name })
       } else if (eff.tier === held.eff.tier) {
         held.donors.push({ key, row, type })
-        held.copies += copies
       }
     }
   }
@@ -217,18 +233,29 @@ function placedOf(seatOf: readonly number[], claimCount: number): number[] {
  * families, and a second Lifebite must never evict an Earthquake from the other hand. A Proc
  * seat with no free edge simply stays as the matching left it. `socketRecommend.forceKey` is
  * the same rule for the other engine.
+ *
+ * Whether a spare copy EXISTS is the ledger's answer, not a counter's: `place` names a donor
+ * of the claim that fits the seat and still has a copy left, or nothing - so the hand is taken
+ * only when there is a copy to put in it, and the placement says which.
  */
-function secondHand(claims: readonly FamilyClaim[], adj: readonly number[][], seatOf: number[]): void {
+function secondHand(
+  claims: readonly FamilyClaim[],
+  adj: readonly number[][],
+  seatOf: number[],
+  place: (u: number, v: number) => Placement | null
+): Placement[] {
+  const out: Placement[] = []
   claims.forEach((c, u) => {
     if (!isProcClaim(c) || !seatOf.includes(u)) return
-    let spare = c.copies - 1
     for (const v of adj[u]) {
-      if (spare === 0) break
       if (seatOf[v] !== -1) continue
+      const p = place(u, v)
+      if (p === null) continue
       seatOf[v] = u
-      spare -= 1
+      out.push(p)
     }
   })
+  return out
 }
 
 /** A claim whose donors serve the one kind `socketRecommend` holds in force per seat. */
@@ -246,15 +273,22 @@ function isProcClaim(c: FamilyClaim): boolean {
  *  dump listed first - so with Gem A socketed and Gem B loose, a dump that listed B first made
  *  the plan say "socket Gem B replacing Gem A": a swap that buys nothing, and one that came and
  *  went with the ORDER of the dump. The incumbent is a fit like any other; it is simply the fit
- *  that costs no move. */
+ *  that costs no move.
+ *
+ *  A donor with no copy LEFT in the ledger does not fit, and a seat no donor fits gets NO
+ *  placement (null) rather than the claim's name over a copy that is already spoken for. */
 function placementOf(
   claim: FamilyClaim,
   socket: SocketHostCell,
-  rowByKey: ReadonlyMap<string, GearRow>
-): Placement {
-  const hostRow = rowByKey.get(socket.itemKey)
-  const fits = claim.donors.filter((d) => d.type === socket.type && seatFits(d.row, socket, hostRow))
+  ctx: PlanContext
+): Placement | null {
+  const hostRow = ctx.rowByKey.get(socket.itemKey)
+  const fits = claim.donors.filter(
+    (d) => d.type === socket.type && (ctx.left.get(d.key) ?? 0) > 0 && seatFits(d.row, socket, hostRow)
+  )
   const donor = fits.find((d) => d.key === socket.currentKey) ?? fits[0]
+  if (donor === undefined) return null
+  ctx.left.set(donor.key, (ctx.left.get(donor.key) ?? 0) - 1)
   return {
     cellId: socket.cellId,
     cellLabel: socket.cellLabel,
@@ -263,7 +297,7 @@ function placementOf(
     family: claim.family,
     effect: claim.eff.effect,
     tier: claim.eff.tier,
-    gemName: donor === undefined ? claim.gemName : donor.row.name
+    gemName: donor.row.name
   }
 }
 
@@ -370,13 +404,14 @@ export function planBoard(
   sockets: readonly SocketHostCell[]
 ): BoardPlan {
   const rowByKey = new Map(rows.map((r) => [r.key, r]))
+  const ctx: PlanContext = { rowByKey, left: copyCounts(owned) }
   // THE INCUMBENT TIEBREAK, third and final form (user reports 2026-09-10, the belt three
   // times). A claim is incumbent only when ITS OWN best-tier donors can KEEP a seat the family
   // already holds — "the family is socketed somewhere" was too coarse: Summoning Haste counted
   // as incumbent through the tier-I gem in a ring that its belt-only tier-III donor cannot use,
   // and outmuscled the belt's true incumbent on a tie. Incumbents-that-can-stay are seated
   // first at equal tier, so a claim can only take a contested seat by OUTRANKING its holder.
-  const claims = familyClaims(copyCounts(owned), rowByKey, loadout, TYPES)
+  const claims = familyClaims(ctx.left, rowByKey, loadout, TYPES)
   const keeps = claims.map((c) => currentSeatExists(c, sockets, rowByKey))
   const order = claims
     .map((c, i) => ({ c, i }))
@@ -386,14 +421,17 @@ export function planBoard(
   const seatOf = match(order.length, adj, sockets.length)
   // The contests are the MATCHING's: a spare proc copy going unseated is not one.
   const placed = placedOf(seatOf, order.length)
-  secondHand(order, adj, seatOf)
+  // The matching's seats are named first, so they spend the ledger before any second hand does.
+  // (A gem that donates to TWO families - a proc of one and a click of another - is one copy the
+  // matching may seat twice; the ledger then names it once and the later seat gets nothing,
+  // which is quieter than the contested list but no longer a copy in two places.)
   const placements: Placement[] = []
   for (let u = 0; u < order.length; u++) {
-    if (placed[u] !== -1) placements.push(placementOf(order[u], sockets[placed[u]], rowByKey))
+    if (placed[u] === -1) continue
+    const p = placementOf(order[u], sockets[placed[u]], ctx)
+    if (p !== null) placements.push(p)
   }
-  seatOf.forEach((u, v) => {
-    if (u !== -1 && placed[u] !== v) placements.push(placementOf(order[u], sockets[v], rowByKey))
-  })
+  placements.push(...secondHand(order, adj, seatOf, (u, v) => placementOf(order[u], sockets[v], ctx)))
   return {
     placements,
     moves: movesOf(placements, sockets, rowByKey),

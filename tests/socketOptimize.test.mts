@@ -279,6 +279,34 @@ test('a proc family with two copies holds both hands: two placements, no moves, 
   assert.equal(plan.contested.length, 0)
 })
 
+test('two donors of one proc family, one copy each: each hand names its own gem, never one gem twice', () => {
+  // Fangs and Claw both proc Lifebite. The claim had "two copies", so the second hand was taken -
+  // and both seats were labelled Fangs, because the label took the first donor that fit. One
+  // physical Fangs is one seat; the other hand is Claw's.
+  const rows = [
+    row({ key: 'fangs', name: 'Fangs', effects: proc('Fangs', 'Lifebite Combat'), slots: ['PRIMARY', 'SECONDARY'] }),
+    row({ key: 'claw', name: 'Claw', effects: proc('Claw', 'Lifebite Combat'), slots: ['PRIMARY', 'SECONDARY'] }),
+    row({ key: 'sword', name: 'Sword', effects: [], slots: ['PRIMARY', 'SECONDARY'] })
+  ]
+  const plan = planBoard([gem('Fangs'), gem('Claw')], rows, NOBODY, hands(null, null))
+  assert.deepEqual(
+    plan.placements.map((p) => `${p.cellLabel}:${p.gemName}`).sort(),
+    ['primary:Fangs', 'secondary:Claw']
+  )
+  // Fangs already in the primary, Claw loose: the one move is Claw into the empty hand.
+  const seated = planBoard(
+    [gem('Fangs', 'socketed in Primary', true), gem('Claw', 'Bank 1')],
+    rows,
+    NOBODY,
+    hands('Fangs', null)
+  )
+  assert.deepEqual(
+    seated.moves.map((m) => `${m.cellLabel}: socket ${m.gemName}`),
+    ['secondary: socket Claw']
+  )
+  assert.equal(seated.clears.length, 0)
+})
+
 test('…but a second copy never costs a distinct family its hand', () => {
   const rows = [
     row({ key: 'fangs', name: 'Fangs', effects: proc('Fangs', 'Lifebite Combat'), slots: ['PRIMARY', 'SECONDARY'] }),
