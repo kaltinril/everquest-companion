@@ -75,13 +75,6 @@ export interface QuestFilterBarProps {
    * being drawn by the view because the line now BELONGS to the dropdown below (JOS-268).
    */
   inventoryLoadedAt: number | null
-  /**
-   * Take back every turn-in of every quest (`useProgress.resetTurnIns`, upstream issue #72). It
-   * sits on the RIGHT with "Count items from" because it moves the numbers under the bar, not
-   * the rows above it; the two-click arm is the whole confirmation, since the store keeps no
-   * history to restore from and a dialog for one button is a dialog too many.
-   */
-  onResetTurnIns: () => Promise<void>
 }
 
 /** How long the armed reset waits for its second click before standing down. */
@@ -92,8 +85,13 @@ const RESET_ARM_MS = 5000
  * working way to reset progress in the plane of sky tab"). Armed, it says what the second click
  * does; left alone, it stands down, because a control that stays armed across a scroll is a
  * control that fires by accident.
+ *
+ * DRAWN BY THE VIEW ON THE COUNTS ROW, NOT HERE ON THE BAR: it takes back the numbers that row
+ * reports, and one more control on the bar's right group made the bar wrap onto a fourth row
+ * under the dropdown's wider labels, which moved the counts line the freshness caption above it
+ * promises never to move (sky-inventory-autoload measures that promise).
  */
-const ResetTurnIns = memo(function ResetTurnIns({
+export const ResetTurnIns = memo(function ResetTurnIns({
   onReset
 }: {
   onReset: () => Promise<void>
@@ -529,8 +527,7 @@ export default function QuestFilterBar({
   classes,
   countSource,
   onCountSource,
-  inventoryLoadedAt,
-  onResetTurnIns
+  inventoryLoadedAt
 }: QuestFilterBarProps): JSX.Element {
   return (
     <Stack direction="row" spacing={2} flexWrap="wrap" alignItems="center" useFlexGap>
@@ -557,7 +554,6 @@ export default function QuestFilterBar({
         setFavoritesOnly={list.setFavoritesOnly}
       />
       <Box sx={{ flexGrow: 1 }} />
-      <ResetTurnIns onReset={onResetTurnIns} />
       <InventorySource
         countSource={countSource}
         onCountSource={onCountSource}
