@@ -160,8 +160,9 @@ export function castOnOtherSuffix(msg: string): string | null {
   if (poss) return ("'s" + poss[1]).trim()
   const lead = /^Someone\s+(.*)$/i.exec(m)
   if (lead) return lead[1].trim()
-  if (/^[a-z]/.test(m)) return m // a bare predicate ("looks powerful.") IS the suffix; capitalised = placeholder subject
-  return null
+  // No subject at all: a bare lowercase predicate ("looks powerful.") is already the suffix; a
+  // capitalised one is a sentence with some other placeholder subject (Player, Target, Soandso).
+  return /^[a-z]/.test(m) ? m : null
 }
 
 /** Add a spell to a message→candidates multimap, de-duping identical names. */
