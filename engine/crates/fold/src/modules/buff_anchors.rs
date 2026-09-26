@@ -35,6 +35,21 @@ use eqlog::names::id_key;
 /// swinging, which is when a landing is somebody else's.
 pub const PROC_MELEE_WINDOW_MS: i64 = 2_000;
 
+/// The key the anchors join on: [`spell_key`] with every apostrophe folded to one glyph. The cast
+/// line and the DB spell the same name with different marks — `You begin singing Jaxan's Jig o`
+/// Vigor.` lands as `Jaxan's Jig o' Vigor` (measured on the owner's log: 0 of 248 sings anchored)
+/// — and the join is the ONLY place the two spellings meet. Every instance, stat and overlay key
+/// stays on `spell_key`, so nothing a client reads moves.
+fn anchor_key(spell: &str) -> String {
+    spell_key(spell)
+        .chars()
+        .map(|c| match c {
+            '`' | '\u{2018}' | '\u{2019}' | '\u{00B4}' => '\'',
+            c => c,
+        })
+        .collect()
+}
+
 /// One remembered cast line. `display` is the ranked name exactly as the log spelled it; the map is
 /// keyed by the rank-STRIPPED line, so a rank upgrade replaces its predecessor. `rank_changed`
 /// records that two ranks of one line were cast in the same window — the landing cannot say which,
@@ -171,7 +186,7 @@ impl CastAnchors {
     }
 
     fn note(&mut self, spell: &str, ts: i64, caster: String) {
-        let key = spell_key(spell);
+        let key = anchor_key(spell);
         let display = js_trim(spell).to_string();
         let rank_changed = is_rank_change(self.by_line.get(&key), &display, ts, &caster);
         let is_self = caster == SELF_CASTER;
@@ -198,7 +213,7 @@ impl CastAnchors {
 
     /// A fizzle/interrupt: the cast did not land, so nothing it might have resolved is ours.
     pub fn clear_cast(&mut self, spell: &str) {
-        self.by_line.remove(&spell_key(spell));
+        self.by_line.remove(&anchor_key(spell));
     }
 
     fn in_quick_buff_burst(&self, ts: i64) -> bool {
@@ -214,7 +229,7 @@ impl CastAnchors {
     /// `unnamed`, which the caller must not treat as narrowing. An unanchored landing produces
     /// nothing.
     pub fn attribute(&self, spell: &str, ts: i64) -> Option<Attribution> {
-        if let Some(a) = self.by_line.get(&spell_key(spell)) {
+        if let Some(a) = self.by_line.get(&anchor_key(spell)) {
             // Re-checked against the CURRENT allowlist, so a name the user just removed stops
             // anchoring immediately rather than at the next cast.
             if ts >= a.ts && ts - a.ts <= OWN_CAST_WINDOW_MS && self.trusted(&a.caster) {
@@ -246,7 +261,7 @@ impl CastAnchors {
 
     /// The newest ts YOU ever cast this line — the ambiguous-apply recency tiebreak.
     pub fn last_cast_ts(&self, spell: &str) -> Option<i64> {
-        self.ever_cast.get(&spell_key(spell)).copied()
+        self.ever_cast.get(&anchor_key(spell)).copied()
     }
 }
 
@@ -264,6 +279,29 @@ mod tests {
         a.clear_cast("Clarity");
         assert!(a.named_anchor_for("Clarity", 2000).is_none());
         assert_eq!(a.last_cast_ts("Clarity"), Some(1000));
+    }
+
+    /// The cast line's backtick and the DB's straight apostrophe are one spell at the join, and
+    /// only there.
+    #[test]
+    fn an_apostrophe_spelled_either_way_anchors_the_db_name() {
+        let mut a = CastAnchors::new();
+        a.note_self_cast("Jaxan's Jig o` Vigor V", 1000);
+        let at = a
+            .named_anchor_for("Jaxan's Jig o' Vigor", 2000)
+            .expect("anchored");
+        assert_eq!(at.display.as_deref(), Some("Jaxan's Jig o` Vigor V"));
+        assert_eq!(
+            a.last_cast_ts("Jaxan\u{2019}s Jig o\u{2019} Vigor"),
+            Some(1000)
+        );
+        a.clear_cast("Jaxan's Jig o' Vigor");
+        assert!(a.named_anchor_for("Jaxan's Jig o` Vigor", 2000).is_none());
+        assert_ne!(
+            spell_key("o` vigor"),
+            spell_key("o' vigor"),
+            "spell_key itself is untouched"
+        );
     }
 
     /// The window is one-sided: a landing before its cast is not that cast's, and one past the

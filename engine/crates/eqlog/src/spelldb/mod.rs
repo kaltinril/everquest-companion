@@ -157,7 +157,11 @@ fn first_suffix_match<'a>(
     None
 }
 
-/// Strip the wiki's "Someone" subject, keeping a possessive tail.
+/// Strip the wiki's "Someone" subject, keeping a possessive tail. A message the wiki wrote with no
+/// subject at all — a bare predicate, beginning lowercase (`looks powerful.`, `screams in pain.`;
+/// 61 of the 111 subject-less rows in the committed catalog) — is already the suffix. One that
+/// begins with a capital is a sentence with some other placeholder subject (`Player`, `Target`,
+/// `Soandso`) and stays out of the table.
 pub fn cast_on_other_suffix(msg: &str) -> Option<String> {
     use regex::Regex;
     use std::sync::OnceLock;
@@ -178,6 +182,9 @@ pub fn cast_on_other_suffix(msg: &str) -> Option<String> {
     }
     if let Some(c) = lead.captures(m) {
         return Some(crate::jsstr::js_trim(&c[1]).to_string());
+    }
+    if m.starts_with(|c: char| c.is_ascii_lowercase()) {
+        return Some(m.to_string());
     }
     None
 }

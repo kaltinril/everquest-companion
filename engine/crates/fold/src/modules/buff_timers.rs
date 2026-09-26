@@ -678,7 +678,7 @@ impl BuffTimersModule {
                     continue;
                 };
                 let life = match held.duration_ms {
-                    Some(ms) => ms + unwitnessed_timeout_ms(held.source),
+                    Some(ms) => ms + unwitnessed_timeout_ms(held.source, ms),
                     None => CC_UNKNOWN_CAP_MS,
                 };
                 (life, held.group.drop_expired(now_ms - life))

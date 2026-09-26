@@ -180,7 +180,7 @@ pub fn unwitnessed_cull_cap(a: &ActiveBuff) -> f64 {
         return f64::INFINITY;
     }
     match a.overlay_duration_ms {
-        Some(dur) if dur > 0 => (dur + unwitnessed_timeout_ms(a.overlay_source)) as f64,
+        Some(dur) if dur > 0 => (dur + unwitnessed_timeout_ms(a.overlay_source, dur)) as f64,
         // No number at all: the row is counting UP and has nothing to be overdue against.
         _ => f64::INFINITY,
     }
