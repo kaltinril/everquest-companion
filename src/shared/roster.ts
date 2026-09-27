@@ -87,6 +87,19 @@ export interface RosterMember {
    * dimmed and STILL PASSES the allowlist until a fresh signal either confirms or replaces them.
    */
   stale: boolean
+  /**
+   * The class codes this member's latest `/who` row stated, in row order (`['DRU','RNG','MAG']`).
+   *
+   * The ROSTER MODULE'S snapshot only; the narrower member the combat snapshot carries has none.
+   * Absent until a row has named them, and absent is unknown, never "no classes": the log states
+   * another player's loadout nowhere else. A loadout can be swapped without a line saying so,
+   * which is what `classesTs` is for.
+   */
+  classes?: string[]
+  /** The level that row bracketed: the minimum over the loadout's class levels. With `classes`. */
+  level?: number
+  /** When that row was printed. With `classes`. */
+  classesTs?: number
 }
 
 /** The roster module's snapshot — small enough (a group is at most five other players) that

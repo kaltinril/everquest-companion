@@ -197,6 +197,9 @@ pub struct RosterModule {
     /// list is the APP's and the fold does not get to edit it.
     epoch_ts: i64,
     left_ts: i64,
+    /// What other players' `/who` rows stated — see [`super::roster_who`]. Knowledge about NAMES,
+    /// so like `never_member` it outlives a reset: a rebirth of yours changes nobody else's classes.
+    who: super::roster_who::WhoSeen,
 }
 
 /// One persisted user edit.
@@ -397,6 +400,27 @@ impl RosterModule {
         }
         out.into_values()
     }
+
+    /// Another player's `/who` row. It admits nobody; it is a published change only when it named
+    /// somebody the roster already publishes.
+    fn fold_who(&mut self, ev: &Event) {
+        let Some(key) = self.who.observe(ev) else {
+            return;
+        };
+        if self.effective().iter().any(|m| m.key == key) {
+            self.announce.changed(self.seq);
+        }
+    }
+
+    /// One member as published: the roster's own row, plus what their latest `/who` row stated.
+    /// The three fields are ABSENT for a member no row has named — silence, not an empty loadout.
+    fn published(&self, m: &RosterMember) -> Value {
+        let mut out = json!(m);
+        if let (Some(said), Some(row)) = (self.who.stated(&m.key), out.as_object_mut()) {
+            row.extend(json!(said).as_object().cloned().unwrap_or_default());
+        }
+        out
+    }
 }
 
 impl EqModule for RosterModule {
@@ -465,7 +489,7 @@ impl EqModule for RosterModule {
             "petClaim" => self.refuse_pet(ev.str("name").unwrap_or_default()),
             "heal" => self.fold_heal(ev),
             "group" => self.fold_group(ev),
-            _ => {}
+            _ => self.fold_who(ev),
         }
     }
 
@@ -477,7 +501,7 @@ impl EqModule for RosterModule {
 
     fn snapshot(&self) -> Value {
         // With no edits pushed this is the log's map in join order, verbatim.
-        let members = self.effective();
+        let members: Vec<Value> = self.effective().iter().map(|m| self.published(m)).collect();
         json!({
             "seq": self.seq,
             "state": {
