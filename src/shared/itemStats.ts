@@ -110,11 +110,39 @@ const STRUCT_KEYS = [
   'BACKSTAB', 'Backstab', 'WT', 'Weight', 'Size', 'Range', 'AC'
 ]
 
+/**
+ * ELEMENTAL DAMAGE IS ITS OWN LINE, NOT THE WEAPON'S DAMAGE. `DMG: 11 Fire DMG: 3` is two facts,
+ * and with no key for the second the bare `DMG` matched twice and the 3 overwrote the 11: Mithril
+ * Champion Arrows read DMG 3, so the +7 the owner held (Base Dmg 18, Fire Dmg 3) was predicted at
+ * 5 (owner report, 2026-09-26). Fire, Cold and Poison are the three the corpus states, on seven
+ * pages; Magic and Disease are the game's other two elements, named so they cannot do the same.
+ */
+const ELEMENTAL_DMG_KEYS = ['Fire DMG', 'Cold DMG', 'Poison DMG', 'Magic DMG', 'Disease DMG']
+const ELEMENTAL_DMG_LINE = /\b(?:Fire|Cold|Poison|Magic|Disease) DMG\s*:/i
+
+/**
+ * A STORED parse, repaired against the block it was parsed from.
+ *
+ * `items.json` stores each page's parse as the scraper made it, so the rows scraped before the
+ * keys above existed still carry the overwritten damage. The file is rewritten wholesale by a
+ * scrape and nothing concluded here may live in it, so the repair is made at LOAD: a block that
+ * states an elemental line is parsed again and its damage and stat rows taken from that reading.
+ * Every other row is returned as it was stored, untouched and unparsed.
+ */
+export function repairElementalDamage(stored: ItemStatBlock, statsBlock: string | undefined): ItemStatBlock {
+  if (statsBlock === undefined || !ELEMENTAL_DMG_LINE.test(statsBlock)) return stored
+  const fresh = parseStatsBlock(statsBlock)
+  const elemental = fresh.stats.filter((s) => ELEMENTAL_DMG_LINE.test(`${s.key}:`))
+  const kept = stored.stats.filter((s) => !ELEMENTAL_DMG_LINE.test(`${s.key}:`))
+  return { ...stored, ...(fresh.dmg === undefined ? {} : { dmg: fresh.dmg }), stats: [...kept, ...elemental] }
+}
+
 /** Plain `KEY: value` stats that land in the attribute grid. */
 const STAT_KEYS = [
   'STR', 'STA', 'AGI', 'DEX', 'WIS', 'INT', 'CHA', 'HP', 'MANA', 'END', 'ENDURANCE',
   'Haste', 'Attack', 'Regen', 'Mana Regen', 'Charges', 'Rec Level', 'Recommended Level',
-  'Required Level', 'Req Level', 'Cast Time', 'Cooldown', 'Recast', 'Range Damage'
+  'Required Level', 'Req Level', 'Cast Time', 'Cooldown', 'Recast', 'Range Damage',
+  ...ELEMENTAL_DMG_KEYS
 ]
 
 const ALL_KEYS = [...SAVE_KEYS, ...EFFECT_KEYS, ...STRUCT_KEYS, ...STAT_KEYS]

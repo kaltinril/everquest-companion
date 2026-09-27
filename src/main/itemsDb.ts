@@ -24,7 +24,7 @@
 //     rare; otherwise the title IS the name.
 // Both are restored in ONE place, `knowledgeFromDb`, so no caller ever sees the compact form.
 
-import { itemBaseName } from '../shared/itemStats'
+import { itemBaseName, repairElementalDamage } from '../shared/itemStats'
 // The rename overlay (JOS-415) — items.json is a scrape rewritten wholesale, so a name the wiki
 // has since changed is corrected at LOAD, never in the file. Read its header before adding a row.
 import { renamedItems } from '../shared/itemRenames'
@@ -76,6 +76,8 @@ export interface ItemDbFile {
 export function knowledgeFromDb(entry: ItemDbEntry): Omit<ItemKnowledge, 'cached'> {
   return {
     ...entry,
+    // A parse stored before the parser knew an elemental damage line is repaired here, at load.
+    ...(entry.stats === undefined ? {} : { stats: repairElementalDamage(entry.stats, entry.statsBlock) }),
     name: entry.name ?? entry.page,
     lore: entry.lore ?? false,
     quest: entry.quest ?? false,
