@@ -332,13 +332,14 @@ const TWO_HAND_DPS: RoleWeights = { ...ONE_HAND_DPS, stats: { ...MELEE_STATS } }
  * and its class pages ranged crit chance - so it is the one attribute a ranged focus weighs far
  * above the melee's (2 to their 0.4).
  *
- * STR AND ATTACK ARE NEARLY NOTHING HERE, since 2026-09-26 (they were 0.8 and the melee's 2). Two
+ * STR AND ATTACK SCORE NOTHING HERE, since 2026-09-26 (they were 0.8 and the melee's 2). Two
  * player reports the owner brought in say the same thing from two directions: that attack *"only
  * makes a big difference with melee"* and that what moves a bow is archery buffs, ranged foci and
  * raw DEX; and that bow hits did not move between high and low STR at one DEX. NEITHER IS MEASURED
- * HERE - no log this fork holds has a bow in it - so the numbers are a judgement, like every other
- * in this table. They are not zero because a ranged character still swings when something closes
- * on them, and a tie between two DEX items may as well break toward the one that helps then.
+ * HERE - no log this fork holds has a bow in it. They are ZERO rather than small on the owner's
+ * ruling the same day: *"ranged characters in EQL get an AA that lets them do ranged at melee...
+ * so str and atk, if they do not apply to ranged damage, are useless for them"*. A ranged build
+ * never has to swing, so there is no melee moment for either stat to pay for.
  *
  * Everything else is the melee profile: a ranger takes hits, drinks, and has a bar. Haste inherits
  * the melee weight. The weapon RATIO is the melee's 40 and reads DMG/DELAY off a bow exactly as
@@ -348,7 +349,7 @@ const TWO_HAND_DPS: RoleWeights = { ...ONE_HAND_DPS, stats: { ...MELEE_STATS } }
  * grants it, and none of the 254 focus and worn effect lines names archery or accuracy).
  */
 const RANGED: RoleWeights = {
-  stats: { ...MELEE_STATS, STR: 0.2, DEX: 2, ATTACK: 0.5 },
+  stats: { ...MELEE_STATS, STR: 0, DEX: 2, ATTACK: 0 },
   manaStat: 0.1,
   ehp: 0.1,
   ratio: 40,
