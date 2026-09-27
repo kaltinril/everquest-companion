@@ -11,15 +11,22 @@ import { spellStatGrants } from '../src/shared/spellStats'
 import { DEFAULT_STAT_WEIGHTS, buildLoadout, loadoutCandidates } from '../src/shared/spellLoadout'
 import {
   MAX_PARTY_MEMBERS,
+  PARTY_COLOR_COUNT,
   castByLabel,
+  keepByCaster,
   landsOnOthers,
   normalizeParty,
   partyCandidates,
+  partyColors,
+  partySuggestions,
   readParty,
+  readSelfColor,
+  withColor,
   withMember,
   withoutMember,
   type PartyMember
 } from '../src/shared/spellParty'
+import { PARTY_PAINT } from '../src/renderer/src/features/spells/partyPaint'
 
 const L = { worn: 50, cast: 50 }
 const SCORING = { weights: DEFAULT_STAT_WEIGHTS }
@@ -160,4 +167,85 @@ test('who casts it, in words', () => {
   assert.equal(castByLabel(['You']), 'You')
   assert.equal(castByLabel(['You', 'Garrett']), 'You or Garrett')
   assert.equal(castByLabel(['You', 'Garrett', 'Malkil']), 'You, Garrett or Malkil')
+})
+
+// =================================================================================================
+// BY CASTER, IN COLOUR
+// =================================================================================================
+
+test('the kept set groups by caster, you first, and a shared spell is listed under you', () => {
+  const corpus = [
+    buff('Mine', { effects: ['Increase STR by 20'], classes: ['SHM'] }),
+    buff('Shared', { effects: ['Increase AC by 30'], classes: ['SHM', 'ENC'], targetType: 'Single' }),
+    buff('Theirs', { effects: ['Increase HP by 50'], classes: ['ENC'], targetType: 'Single' })
+  ]
+  const party = [GARRETT, { name: 'Idle', classes: ['WAR' as const] }]
+  const pool = partyCandidates(corpus, ['SHM'], party, SCORING)
+  const set = buildLoadout(pool.candidates, L)
+  const groups = keepByCaster(set.keep, pool.casters, party)
+  assert.deepEqual(
+    groups.map((g) => [g.caster, g.rows.map((r) => r.name)]),
+    [
+      ['You', ['Shared', 'Mine']],
+      ['Garrett', ['Theirs']]
+    ]
+  )
+})
+
+test('everyone wears a colour of their own until the user says otherwise', () => {
+  const party: PartyMember[] = [
+    { name: 'A', classes: ['ENC'] },
+    { name: 'B', classes: ['CLR'], color: 1 },
+    { name: 'C', classes: ['DRU'] }
+  ]
+  // You wear slot 0 and B picked 1, so A and C take the first two slots nobody is wearing.
+  assert.deepEqual([...partyColors(party, 0)], [['You', 0], ['A', 2], ['B', 1], ['C', 3]])
+  // A picked colour is kept even when it matches somebody else's: that is the user's call.
+  assert.equal(partyColors(withColor(party, 'c', 1), 0).get('C'), 1)
+  // Your own colour moves too, and the unpicked members move out of its way.
+  assert.deepEqual([...partyColors(party, 2)], [['You', 2], ['A', 0], ['B', 1], ['C', 3]])
+})
+
+test('a colour is a slot the palette has, stored or not at all', () => {
+  assert.equal(PARTY_PAINT.length, PARTY_COLOR_COUNT)
+  assert.deepEqual(normalizeParty([{ name: 'A', classes: ['ENC'], color: 3 }]), [
+    { name: 'A', classes: ['ENC'], color: 3 }
+  ])
+  for (const bad of [-1, 1.5, PARTY_COLOR_COUNT, '2', null]) {
+    assert.deepEqual(normalizeParty([{ name: 'A', classes: ['ENC'], color: bad }]), [{ name: 'A', classes: ['ENC'] }])
+  }
+  assert.deepEqual(withColor([GARRETT], 'Garrett', 99), [GARRETT])
+  assert.equal(readSelfColor(null), 0)
+  assert.equal(readSelfColor('5'), 5)
+  assert.equal(readSelfColor('nope'), 0)
+  assert.equal(readSelfColor('42'), 0)
+})
+
+// =================================================================================================
+// THE OFFERS
+// =================================================================================================
+
+test('a roster member is offered only when a /who row stated their classes', () => {
+  const roster = [
+    { name: 'Malkil', classes: ['DRU', 'RNG', 'MAG'] },
+    { name: 'Quiet' },
+    { name: 'Odd', classes: ['XYZ'] }
+  ]
+  assert.deepEqual(partySuggestions(roster, []), [{ name: 'Malkil', classes: ['DRU', 'RNG', 'MAG'] }])
+  // …and an offer says how old its evidence is, when the roster says.
+  assert.deepEqual(partySuggestions([{ ...roster[0], classesTs: 1234 }], []), [
+    { name: 'Malkil', classes: ['DRU', 'RNG', 'MAG'], statedTs: 1234 }
+  ])
+  // Adding an offer stores a member, not the offer: the instant is evidence, not a preference.
+  assert.deepEqual(withMember([], { name: 'Malkil', classes: ['DRU'], statedTs: 1234 } as PartyMember), [
+    { name: 'Malkil', classes: ['DRU'] }
+  ])
+})
+
+test('somebody already in the group is offered again only when their classes changed', () => {
+  const roster = [{ name: 'Malkil', classes: ['DRU', 'RNG', 'MAG'] }]
+  assert.deepEqual(partySuggestions(roster, [{ name: 'malkil', classes: ['DRU', 'RNG', 'MAG'] }]), [])
+  assert.deepEqual(partySuggestions(roster, [{ name: 'Malkil', classes: ['DRU', 'RNG', 'ENC'] }]), [
+    { name: 'Malkil', classes: ['DRU', 'RNG', 'MAG'] }
+  ])
 })

@@ -37,6 +37,8 @@ export interface PartyMember {
   name: string
   /** One to three classes, in the order they were picked. */
   classes: ClassAbbr[]
+  /** The colour the user picked for them, as a palette slot. Absent: the first slot not in use. */
+  color?: number
 }
 
 /** A group is six, and one of them is you. */
@@ -46,6 +48,18 @@ const MAX_NAME_LENGTH = 32
 
 /** The caster name your own spells carry. */
 export const SELF_CASTER = 'You'
+
+/**
+ * HOW MANY COLOURS THERE ARE TO TELL CASTERS APART (owner, 2026-09-26: *"different colors for each
+ * group member"*, and *"SET the color for the player if you don't like the color chosen"*).
+ *
+ * A SLOT, not a colour: which paint a slot wears is the renderer's, and what is stored and
+ * validated here is a small integer. Eight, so a full group of six never has to share one.
+ */
+export const PARTY_COLOR_COUNT = 8
+
+const isColor = (v: unknown): v is number =>
+  typeof v === 'number' && Number.isInteger(v) && v >= 0 && v < PARTY_COLOR_COUNT
 
 /** The pool, and who in the group can cast each spell in it. */
 export interface PartyCandidates {
@@ -73,11 +87,12 @@ function memberClasses(raw: unknown): ClassAbbr[] {
 /** One stored row, or null when it names no class. A nameless member is named by their classes. */
 function memberOf(raw: unknown): PartyMember | null {
   if (typeof raw !== 'object' || raw === null) return null
-  const row = raw as { name?: unknown; classes?: unknown }
+  const row = raw as { name?: unknown; classes?: unknown; color?: unknown }
   const classes = memberClasses(row.classes)
   if (classes.length === 0) return null
   const typed = typeof row.name === 'string' ? row.name.trim().slice(0, MAX_NAME_LENGTH) : ''
-  return { name: typed === '' ? classes.join('/') : typed, classes }
+  const name = typed === '' ? classes.join('/') : typed
+  return isColor(row.color) ? { name, classes, color: row.color } : { name, classes }
 }
 
 /**
@@ -110,8 +125,43 @@ export function withMember(party: readonly PartyMember[], member: PartyMember): 
   if (next === null) return [...party]
   const key = nameKey(next.name)
   const at = party.findIndex((m) => nameKey(m.name) === key)
-  if (at >= 0) return party.map((m, i) => (i === at ? next : m))
+  // A replaced member keeps the colour they wore unless the new row picked one.
+  if (at >= 0) return party.map((m, i) => (i === at ? { ...(m.color === undefined ? {} : { color: m.color }), ...next } : m))
   return party.length >= MAX_PARTY_MEMBERS ? [...party] : [...party, next]
+}
+
+/** The group with this member wearing this colour. An unknown name or slot changes nothing. */
+export function withColor(party: readonly PartyMember[], name: string, color: number): PartyMember[] {
+  const key = nameKey(name)
+  return party.map((m) => (nameKey(m.name) === key && isColor(color) ? { ...m, color } : m))
+}
+
+/** Your own colour out of its stored text. Anything unreadable is the first slot. */
+export function readSelfColor(text: string | null): number {
+  const n = text === null || text === '' ? 0 : Number(text)
+  return isColor(n) ? n : 0
+}
+
+/**
+ * THE COLOUR EACH CASTER WEARS, you included.
+ *
+ * A picked colour is kept as picked, even when two people picked the same one: that is the user's
+ * call. Everyone who picked none takes the first slot nobody is wearing, in group order, so adding
+ * a member never repaints the ones already there.
+ */
+export function partyColors(party: readonly PartyMember[], selfColor: number): Map<string, number> {
+  const out = new Map<string, number>([[SELF_CASTER, isColor(selfColor) ? selfColor : 0]])
+  const used = new Set<number>(out.values())
+  for (const m of party) if (m.color !== undefined) used.add(m.color)
+  for (const m of party) {
+    let color = m.color
+    for (let slot = 0; color === undefined && slot < PARTY_COLOR_COUNT; slot++) {
+      if (!used.has(slot)) color = slot
+    }
+    used.add(color ?? 0)
+    out.set(m.name, color ?? 0)
+  }
+  return out
 }
 
 /** The group without the member of this name. */
@@ -188,4 +238,82 @@ export function partyCandidates(
 export function castByLabel(names: readonly string[]): string {
   if (names.length <= 1) return names[0] ?? ''
   return `${names.slice(0, -1).join(', ')} or ${names[names.length - 1]}`
+}
+
+// =================================================================================================
+// THE KEPT SET, BY WHO CASTS IT
+// =================================================================================================
+
+/** One caster's share of the kept set. */
+export interface CasterGroup {
+  caster: string
+  rows: LoadoutCandidate[]
+}
+
+/**
+ * THE KEPT SET GROUPED BY CASTER (owner, 2026-09-26: *"grouping by that player in the Keep up
+ * section"*), you first and then the group in the order it was entered.
+ *
+ * A SPELL IS LISTED ONCE, under the first of its casters in that order: a buff you can cast
+ * yourself is yours to keep up, and the row's own chip still names who else could. Rows keep the
+ * set's order inside a group, and a caster with nothing kept has no group.
+ */
+export function keepByCaster(
+  keep: readonly LoadoutCandidate[],
+  casters: ReadonlyMap<string, readonly string[]>,
+  party: readonly PartyMember[]
+): CasterGroup[] {
+  const order = [SELF_CASTER, ...party.map((m) => m.name)]
+  const groups = new Map<string, LoadoutCandidate[]>(order.map((name) => [name, []]))
+  for (const row of keep) {
+    const first = casters.get(row.name)?.[0] ?? SELF_CASTER
+    groups.get(first)?.push(row)
+  }
+  return order
+    .map((caster) => ({ caster, rows: groups.get(caster) ?? [] }))
+    .filter((g) => g.rows.length > 0)
+}
+
+// =================================================================================================
+// WHO THE LOG SAYS YOU ARE GROUPED WITH
+// =================================================================================================
+
+/** A roster member as far as this file reads one: a name, and the classes a `/who` row stated. */
+export interface RosterClasses {
+  name: string
+  classes?: readonly string[]
+  /** When that row was printed (ms epoch). */
+  classesTs?: number
+}
+
+/** One offer: the member as they would be added, and when the log stated it. */
+export interface PartySuggestion extends PartyMember {
+  /**
+   * When the `/who` row was printed. A loadout can be swapped with no line saying so, so an offer
+   * has to be able to say how old its evidence is.
+   */
+  statedTs?: number
+}
+
+/**
+ * THE GROUP-MATES THE APP CAN OFFER TO ADD (owner, 2026-09-26: *"if i'm grouped with someone and it
+ * knows what class they are via a /who... automatically give me an add group suggestion"*).
+ *
+ * A roster member whose classes a `/who` row stated, and who is not already in the group with
+ * exactly those classes. A member the log never stated classes for is not offered: the offer is a
+ * statement the game made, never a guess. OFFERED, NOT ADDED - the group stays the user's list.
+ */
+export function partySuggestions(
+  roster: readonly RosterClasses[],
+  party: readonly PartyMember[]
+): PartySuggestion[] {
+  const out: PartySuggestion[] = []
+  for (const r of roster) {
+    const offer = memberOf({ name: r.name, classes: r.classes })
+    if (offer === null) continue
+    const held = party.find((m) => nameKey(m.name) === nameKey(offer.name))
+    if (held?.classes.join('/') === offer.classes.join('/')) continue
+    out.push(typeof r.classesTs === 'number' ? { ...offer, statedTs: r.classesTs } : offer)
+  }
+  return out
 }
