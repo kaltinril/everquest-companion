@@ -36,7 +36,16 @@ export const TINY_CHIP = { height: 18, fontSize: 10, '& .MuiChip-label': { px: 0
  * A rank of 1 draws nothing: every spell starts there, and a chip on every row would say nothing
  * (`observedRankLabel`'s own display rule).
  */
-export function KeepRow({ c, rank }: { c: LoadoutCandidate; rank: number }): JSX.Element {
+export function KeepRow({
+  c,
+  rank,
+  castBy
+}: {
+  c: LoadoutCandidate
+  rank: number
+  /** Who in the group casts it. Absent with no group: every row is yours. */
+  castBy?: string
+}): JSX.Element {
   return (
     <Stack
       direction="row"
@@ -63,6 +72,17 @@ export function KeepRow({ c, rank }: { c: LoadoutCandidate; rank: number }): JSX
           data-rank={rank}
           label={romanRank(rank)}
           title="The rank this reads at: the highest your log has seen, lifted to the slider."
+          sx={TINY_CHIP}
+        />
+      )}
+      {castBy !== undefined && (
+        <Chip
+          size="small"
+          color="info"
+          variant="outlined"
+          data-testid="loadout-cast-by"
+          label={castBy}
+          title="Who in your group can cast it."
           sx={TINY_CHIP}
         />
       )}
