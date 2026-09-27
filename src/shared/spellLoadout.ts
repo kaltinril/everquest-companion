@@ -517,13 +517,14 @@ export function buildLoadout(
   const rejected: LoadoutRejection[] = []
   for (const c of candidates) {
     if (kept.has(c.name)) continue
-    const winner = keep.find((k) => conflicts(k, c, levels))
+    const winners = keep.filter((k) => conflicts(k, c, levels))
+    const winner = closestWinner(winners, c)
     if (winner === undefined) continue
     rejected.push({
       name: c.name,
       score: c.score,
       beatenBy: winner.name,
-      loses: c.grants.filter((g) => !winner.grants.some((w) => w.key === g.key)),
+      loses: c.grants.filter((g) => !winners.some((w) => w.grants.some((x) => x.key === g.key))),
       // THIS pair's tier, not the set's: `conflicts()` used the engine here exactly when both of
       // these two carried a client view, so that is what the row is entitled to claim.
       certainty: winner.view !== undefined && c.view !== undefined ? 'exact' : 'flagged'
@@ -539,6 +540,24 @@ export function buildLoadout(
     provenOptimal,
     gems: keep.length
   }
+}
+
+/**
+ * WHICH OF THE KEPT SPELLS A LOSER IS SAID TO HAVE LOST TO, when it contests several.
+ *
+ * The one that grants the most of the same stats, first in set order on a tie. The first kept
+ * spell that contests it was the wrong answer (owner's screen, 2026-09-26): Augmentation read
+ * "loses its slot to Skin Like Diamond, you lose Haste +22%" with Alacrity's haste in the same set,
+ * because Skin Like Diamond merely scored higher. What is LOST is judged against every spell that
+ * beat it, for the same reason: a stat one of them grants is not a stat the set gave up.
+ */
+function closestWinner(
+  winners: readonly LoadoutCandidate[],
+  loser: LoadoutCandidate
+): LoadoutCandidate | undefined {
+  const shared = (w: LoadoutCandidate): number => grantsShareASlot(w.grants, loser.grants).length
+  // A stable sort, so a tie keeps the set's own order.
+  return [...winners].sort((x, y) => shared(y) - shared(x))[0]
 }
 
 /**

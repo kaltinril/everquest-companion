@@ -316,3 +316,22 @@ test('a successor the table does not show supersedes nothing, and a class outsid
   const set = combatSet(tables, 8, ['dd', 'dot'])
   assert.deepEqual(set.picks.map((p) => p.name).sort(), ['Choke', 'Sanity Warp', 'Venom'])
 })
+
+test('a loser that contests several kept spells is said to lose to the one it shares the most with', () => {
+  // THE OWNER'S SCREEN, 2026-09-26: Augmentation read "loses its slot to Skin Like Diamond, you
+  // lose Haste +22%" with Alacrity's haste in the same set. Both contest it under the flagged rule
+  // here (one shares AC, one shares haste and AGI); the higher score must not decide the sentence.
+  const set = buildLoadout(
+    [
+      cand('Skin', 300, ['Increase AC by 40', 'Increase HP by 178']),
+      cand('Alacrity', 120, ['Increase Attack Speed by 34%', 'Increase AGI by 5']),
+      cand('Augmentation', 90, ['Increase Attack Speed by 22%', 'Increase AGI by 19', 'Increase AC by 10'])
+    ],
+    L
+  )
+  assert.deepEqual(set.keep.map((c) => c.name), ['Skin', 'Alacrity'])
+  assert.equal(set.rejected.length, 1)
+  assert.equal(set.rejected[0].beatenBy, 'Alacrity')
+  // …and a stat ANY of the spells that beat it grants is not a stat the set gave up.
+  assert.deepEqual(set.rejected[0].loses, [])
+})

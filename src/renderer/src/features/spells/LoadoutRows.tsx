@@ -40,12 +40,17 @@ export const TINY_CHIP = { height: 18, fontSize: 10, '& .MuiChip-label': { px: 0
 export function KeepRow({
   c,
   rank,
-  caster
+  also
 }: {
   c: LoadoutCandidate
   rank: number
-  /** Who in the group casts it, and the colour they wear. Absent with no group: every row is yours. */
-  caster?: { label: string; paint: string }
+  /**
+   * WHO ELSE in the group could cast it, each in their colour. The block a row sits in already
+   * names its caster (owner, 2026-09-26: *"we don't need those chips on every single spell since
+   * the section already says the player name"*), so a chip is drawn only for what the heading
+   * cannot say.
+   */
+  also?: readonly CasterMark[]
 }): JSX.Element {
   return (
     <Stack
@@ -76,16 +81,17 @@ export function KeepRow({
           sx={TINY_CHIP}
         />
       )}
-      {caster !== undefined && (
+      {(also ?? []).map((m) => (
         <Chip
+          key={m.name}
           size="small"
           variant="outlined"
-          data-testid="loadout-cast-by"
-          label={caster.label}
-          title="Who in your group can cast it."
-          sx={{ ...TINY_CHIP, ...casterChipSx(caster.paint) }}
+          data-testid="loadout-also-cast-by"
+          label={`or ${m.name}`}
+          title="They can cast it too."
+          sx={{ ...TINY_CHIP, ...casterChipSx(m.paint) }}
         />
-      )}
+      ))}
       {c.grants.map((g, i) => (
         <Chip
           key={`${g.key}-${String(i)}`}
@@ -99,8 +105,14 @@ export function KeepRow({
   )
 }
 
-/** One buff that lost its slot, and what that cost. */
-export function RejectRow({ r }: { r: LoadoutRejection }): JSX.Element {
+/** A caster's name and the colour they wear. */
+export interface CasterMark {
+  name: string
+  paint: string
+}
+
+/** One buff that lost its slot, and what that cost. With a group, whose buff it was. */
+export function RejectRow({ r, casters }: { r: LoadoutRejection; casters?: readonly CasterMark[] }): JSX.Element {
   return (
     <Stack
       direction="row"
@@ -117,6 +129,11 @@ export function RejectRow({ r }: { r: LoadoutRejection }): JSX.Element {
           {r.name}
         </Typography>
       </SpellTooltip>
+      {(casters ?? []).map((m) => (
+        <Typography key={m.name} variant="caption" data-testid="loadout-rejected-caster" sx={{ color: m.paint }}>
+          {m.name}
+        </Typography>
+      ))}
       <Typography variant="caption" color="text.secondary" data-testid="loadout-beaten-by">
         {r.certainty === 'exact' ? 'loses its slot to' : 'probably contests'} {r.beatenBy}
       </Typography>

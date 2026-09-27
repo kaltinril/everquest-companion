@@ -16,7 +16,6 @@ import type { ClassAbbr } from '@shared/classCombo'
 import type { UnlockSpell } from '@shared/levelUnlocks'
 import { DEFAULT_STAT_WEIGHTS, type LoadoutCandidate } from '@shared/spellLoadout'
 import {
-  castByLabel,
   keepByCaster,
   partyCandidates,
   partyColors,
@@ -47,8 +46,8 @@ export interface LoadoutGroup {
 /** The pool, who casts what in it, and the group it was drawn from. */
 export interface LoadoutPool extends LoadoutGroup {
   candidates: LoadoutCandidate[]
-  /** Who casts a spell, in words. Undefined with no group: every row is yours. */
-  castBy: (name: string) => string | undefined
+  /** Everyone in the group who can cast a spell, you first. Empty with no group. */
+  castersOf: (name: string) => readonly string[]
   /** The kept set by caster, you first. One group when nobody else is in it. */
   groupKeep: (keep: readonly LoadoutCandidate[]) => CasterGroup[]
 }
@@ -87,16 +86,10 @@ export function useLoadoutPool(
     () => partyCandidates(spells, classes, party, { weights: DEFAULT_STAT_WEIGHTS, query: { level } }),
     [spells, classes, party, level]
   )
-  const castBy = useCallback(
-    (name: string) => {
-      const names = pool.casters.get(name)
-      return names === undefined ? undefined : castByLabel(names)
-    },
-    [pool]
-  )
+  const castersOf = useCallback((name: string) => pool.casters.get(name) ?? [], [pool])
   const groupKeep = useCallback(
     (keep: readonly LoadoutCandidate[]) => keepByCaster(keep, pool.casters, party),
     [pool, party]
   )
-  return { ...group, suggestions, candidates: pool.candidates, castBy, groupKeep }
+  return { ...group, suggestions, candidates: pool.candidates, castersOf, groupKeep }
 }

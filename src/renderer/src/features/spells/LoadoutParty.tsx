@@ -110,7 +110,7 @@ function Suggestions({ group }: { group: LoadoutGroup }): JSX.Element | null {
   const { party, setParty, suggestions } = group
   if (suggestions.length === 0 || party.length >= MAX_PARTY_MEMBERS) return null
   return (
-    <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap" sx={{ mb: 1 }}>
+    <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap" sx={{ mt: 1 }}>
       <Typography variant="caption" color="text.secondary">
         In your group, from /who:
       </Typography>
@@ -135,8 +135,8 @@ function Suggestions({ group }: { group: LoadoutGroup }): JSX.Element | null {
   )
 }
 
-/** The row that adds a member by hand. */
-function AddRow({ group }: { group: LoadoutGroup }): JSX.Element {
+/** The row that adds a member by hand. It closes itself once it has added one. */
+function AddRow({ group, onDone }: { group: LoadoutGroup; onDone: () => void }): JSX.Element {
   const { party, setParty } = group
   const [name, setName] = useState('')
   const [classes, setClasses] = useState<ClassAbbr[]>([])
@@ -145,9 +145,10 @@ function AddRow({ group }: { group: LoadoutGroup }): JSX.Element {
     setParty(withMember(party, { name, classes }))
     setName('')
     setClasses([])
+    onDone()
   }
   return (
-    <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
+    <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap" sx={{ mt: 1 }}>
       <TextField
         size="small"
         label="Name"
@@ -181,12 +182,18 @@ function AddRow({ group }: { group: LoadoutGroup }): JSX.Element {
   )
 }
 
-/** The group strip: the chips, the offers, and the one row that adds another by hand. */
+/**
+ * The group strip: the chips, the offers, and the row that adds another by hand.
+ *
+ * THE ADD ROW IS CLOSED UNTIL ASKED FOR. It is two fields and a button that are used once per
+ * group-mate, and open they sat between the heading and the set on every visit.
+ */
 export default function LoadoutParty({ group }: { group: LoadoutGroup }): JSX.Element {
   const { party } = group
+  const [adding, setAdding] = useState(false)
   return (
     <Box data-testid="loadout-party">
-      <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap" sx={{ mb: 1 }}>
+      <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
         <Typography variant="overline" color="text.secondary">
           Group
         </Typography>
@@ -197,15 +204,19 @@ export default function LoadoutParty({ group }: { group: LoadoutGroup }): JSX.El
         ) : (
           <MemberChips group={group} />
         )}
+        <Chip
+          size="small"
+          variant={adding ? 'filled' : 'outlined'}
+          icon={<AddIcon />}
+          data-testid="loadout-party-open"
+          label="Add"
+          title="Add a group-mate and their classes by hand. They add only the buffs they can cast on someone else, read at your level: the log does not state theirs."
+          disabled={party.length >= MAX_PARTY_MEMBERS}
+          onClick={() => setAdding((v) => !v)}
+        />
       </Stack>
       <Suggestions group={group} />
-      <AddRow group={group} />
-      {party.length > 0 && (
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-          A group-mate adds only the buffs they can cast on someone else, read at your level: the
-          log does not state theirs.
-        </Typography>
-      )}
+      {adding && <AddRow group={group} onDone={() => setAdding(false)} />}
     </Box>
   )
 }

@@ -12,15 +12,16 @@ import { DEFAULT_STAT_WEIGHTS, buildLoadout, loadoutCandidates } from '../src/sh
 import {
   MAX_PARTY_MEMBERS,
   PARTY_COLOR_COUNT,
-  castByLabel,
   keepByCaster,
   landsOnOthers,
   normalizeParty,
   partyCandidates,
   partyColors,
   partySuggestions,
+  readOwnClasses,
   readParty,
   readSelfColor,
+  sameClassSet,
   withColor,
   withMember,
   withoutMember,
@@ -162,12 +163,6 @@ test('adding a name that is already there replaces it, and a full group takes no
   assert.deepEqual(withoutMember(full, 'm0').map((m) => m.name), ['M1', 'M2', 'M3', 'M4'])
 })
 
-test('who casts it, in words', () => {
-  assert.equal(castByLabel([]), '')
-  assert.equal(castByLabel(['You']), 'You')
-  assert.equal(castByLabel(['You', 'Garrett']), 'You or Garrett')
-  assert.equal(castByLabel(['You', 'Garrett', 'Malkil']), 'You, Garrett or Malkil')
-})
 
 // =================================================================================================
 // BY CASTER, IN COLOUR
@@ -219,6 +214,17 @@ test('a colour is a slot the palette has, stored or not at all', () => {
   assert.equal(readSelfColor('5'), 5)
   assert.equal(readSelfColor('nope'), 0)
   assert.equal(readSelfColor('42'), 0)
+})
+
+test('your own pinned classes are a loadout or nothing', () => {
+  assert.deepEqual(readOwnClasses('["MNK","WAR","SHM"]'), ['MNK', 'WAR', 'SHM'])
+  // At most a loadout's three, each once, and only real classes.
+  assert.deepEqual(readOwnClasses('["MNK","MNK","XYZ","WAR","SHM","ENC"]'), ['MNK', 'WAR', 'SHM'])
+  // Absent, unreadable and empty all hand the tab back to detection.
+  for (const text of [null, '', '[]', '{nope', '"MNK"']) assert.equal(readOwnClasses(text), null)
+  assert.equal(sameClassSet(['MNK', 'WAR'], ['WAR', 'MNK']), true)
+  assert.equal(sameClassSet(['MNK', 'WAR'], ['MNK', 'ENC']), false)
+  assert.equal(sameClassSet(['MNK'], ['MNK', 'WAR']), false)
 })
 
 // =================================================================================================

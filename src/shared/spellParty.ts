@@ -84,6 +84,27 @@ function memberClasses(raw: unknown): ClassAbbr[] {
   return out
 }
 
+/**
+ * YOUR OWN PINNED CLASSES out of their stored text, or null while the tab follows detection.
+ *
+ * Null for absent, unreadable and EMPTY alike: a loadout of no classes is not a loadout, so
+ * clearing the picker hands the tab back to what the log says.
+ */
+export function readOwnClasses(text: string | null): ClassAbbr[] | null {
+  if (text === null || text === '') return null
+  try {
+    const classes = memberClasses(JSON.parse(text) as unknown)
+    return classes.length === 0 ? null : classes
+  } catch {
+    return null
+  }
+}
+
+/** Are these the same classes, in any order? */
+export function sameClassSet(a: readonly ClassAbbr[], b: readonly ClassAbbr[]): boolean {
+  return a.length === b.length && a.every((c) => b.includes(c))
+}
+
 /** One stored row, or null when it names no class. A nameless member is named by their classes. */
 function memberOf(raw: unknown): PartyMember | null {
   if (typeof raw !== 'object' || raw === null) return null
@@ -232,12 +253,6 @@ export function partyCandidates(
   // Score-descending, which `buildLoadout`'s greedy path relies on.
   const candidates = [...byName.values()].sort((a, b) => b.score - a.score || a.name.localeCompare(b.name))
   return { candidates, casters }
-}
-
-/** Who casts a spell, in words: `You`, `Garrett`, `You or Garrett`, `You, Garrett or Malkil`. */
-export function castByLabel(names: readonly string[]): string {
-  if (names.length <= 1) return names[0] ?? ''
-  return `${names.slice(0, -1).join(', ')} or ${names[names.length - 1]}`
 }
 
 // =================================================================================================
