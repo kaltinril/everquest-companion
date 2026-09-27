@@ -148,6 +148,7 @@ import {
 import { PICKABLE_COLUMNS, columnLabel, columnsFor, sortWithin, type GearColumn } from './gearColumns'
 import {
   useEraHidden,
+  type GearOwnershipState,
   type GearViewRow,
   useGearClasses,
   useGearCompare,
@@ -289,6 +290,15 @@ function ownedHint(map: GearOwnershipMap | null, uncounted: string | null): stri
   const base =
     'Where your newest /outputfile inventory dump names a copy, and at what +N. Each +N is its own copy, never a total. Looted means the log saw it and the dump names none.'
   return uncounted === null ? base : `${base} ${uncounted}`
+}
+
+/** `ownedHint`, memoized on the join. (A hook of its own since 2026-09-26, purely for GearView's
+ *  100-code-line ceiling — the zone options' prop tipped it over.) */
+function useOwnedHint(ownership: GearOwnershipState): string {
+  return useMemo(
+    () => ownedHint(ownership.map, uncountedNote(ownership.payload.uncounted)),
+    [ownership.map, ownership.payload.uncounted]
+  )
 }
 
 /**
@@ -487,8 +497,8 @@ function useOwnFilters(
 ): { own: GearFilters; setOwn: (f: GearFilters) => void } {
   const own = useMemo<GearFilters>(() => ({ ...DEFAULT_GEAR_FILTERS, ...form }), [form])
   const setOwn = useCallback(
-    ({ slots, weaponTypes, effect, eraOnly, ownedOnly, ignoreHaste }: GearFilters) => {
-      setForm({ slots, weaponTypes, effect, eraOnly, ownedOnly, ignoreHaste })
+    ({ slots, weaponTypes, zones, effect, eraOnly, ownedOnly, ignoreHaste }: GearFilters) => {
+      setForm({ slots, weaponTypes, zones, effect, eraOnly, ownedOnly, ignoreHaste })
     },
     [setForm]
   )
@@ -519,7 +529,7 @@ function RowsAbove({
 }
 
 export default function GearView({ onOpenLoot, onOpenMob, onOpenMapZone }: GearViewProps = {}): JSX.Element {
-  const { rows, ready, refused, scrapedAt } = useGearIndex()
+  const { rows, zones, ready, refused, scrapedAt } = useGearIndex()
   const classes = useGearClasses()
   const upgrade = useUpgradeState()
   const ownership = useGearOwnership()
@@ -574,10 +584,7 @@ export default function GearView({ onOpenLoot, onOpenMob, onOpenMapZone }: GearV
   const deps = useMemo(() => ({ ...era, ...owned, ownedHaste }), [era, owned, ownedHaste])
   const table = useTableRows(rows, state, filters, { sort, deps, chosen: prefs.columns, showDrops: prefs.dropCols })
   const win = useWindowedRows({ count: table.rows.length, rowHeight: ROW_HEIGHT, scrollRef })
-  const hint = useMemo(
-    () => ownedHint(ownership.map, uncountedNote(ownership.payload.uncounted)),
-    [ownership.map, ownership.payload.uncounted]
-  )
+  const hint = useOwnedHint(ownership)
   // STABLE while the sort is, so `GearHead`'s memo holds across scroll ticks — an inline arrow
   // would hand the header a fresh identity every frame. The base is the sort IN FORCE, not the
   // requested one: after a picker removed the sorted column, clicking the header that took over
@@ -592,6 +599,7 @@ export default function GearView({ onOpenLoot, onOpenMob, onOpenMapZone }: GearV
         text={text}
         setText={setText}
         classes={classes}
+        zoneOptions={zones}
         upgrade={upgrade}
         visible={visible}
         hasteRelevant={readsDerivedScores(table.columns, deferredText)}

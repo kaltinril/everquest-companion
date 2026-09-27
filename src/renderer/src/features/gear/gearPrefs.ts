@@ -156,7 +156,8 @@ export function sanitizeDropCols(raw: unknown): boolean {
 // `shield` was a control for two hours on 2026-08-15 and is NOT legacy vocabulary: it shipped in a
 // test build only, and kaltinril (the fork) ruled it into the Weapon type dropdown (`GearWeaponPick`) before a
 // release carried the toggle. `haste` (same day) draws on the identity row, after the Owned chip.
-export const GEAR_CONTROLS = ['slot', 'weapon', 'effect', 'classes', 'era', 'owned', 'haste', 'upgrade'] as const
+// `zone` (2026-09-26) leads the SECOND row: the first was full (GearFilterBar.NumbersRow measured it).
+export const GEAR_CONTROLS = ['slot', 'weapon', 'effect', 'classes', 'era', 'owned', 'haste', 'zone', 'upgrade'] as const
 
 export type GearControl = (typeof GEAR_CONTROLS)[number]
 
@@ -168,6 +169,7 @@ export const GEAR_CONTROL_LABEL: Record<GearControl, string> = {
   classes: 'Classes',
   era: 'Current era',
   owned: 'Owned or looted',
+  zone: 'Zones',
   upgrade: 'Upgrade state',
   haste: 'Ignore haste'
 }
@@ -207,7 +209,7 @@ export const LEGACY_GEAR_CONTROLS: readonly string[] = [
   'upgrade',
   'ratio',
   'thresholds'
-  // `weapon` is not here and neither is `haste` (added 2026-08-15), for the same reason: a control
+  // `weapon` is not here and neither is `haste` (added 2026-08-15) nor `zone` (2026-09-26), for the same reason: a control
   // that did not exist when a legacy bare-array choice was written is a control that choice never
   // ruled on, so `resolveChoice` must turn it ON — which it does exactly BECAUSE it is absent here.
 ]
@@ -303,6 +305,7 @@ export function inertFilters(filters: GearFilters, visible: ReadonlySet<GearCont
     ...filters,
     slots: visible.has('slot') ? filters.slots : d.slots,
     weaponTypes: visible.has('weapon') ? filters.weaponTypes : d.weaponTypes,
+    zones: visible.has('zone') ? filters.zones : d.zones,
     effect: visible.has('effect') ? filters.effect : d.effect,
     classes: visible.has('classes') ? filters.classes : [],
     // NOT `d.eraOnly` — that is `true`. Inert is the value that hides nothing.

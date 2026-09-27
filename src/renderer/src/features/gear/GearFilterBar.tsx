@@ -8,7 +8,8 @@
 //
 // THE SPLIT IS BY QUESTION, not by fit. The first row asks WHICH ITEMS — name, slots, weapon type,
 // classes, effect kind, era, owned. The second asks WHAT THEY READ, and since JOS-302 that is one
-// control: the plus-state being simulated.
+// control: the plus-state being simulated. (Since 2026-09-26 the Zones picker leads that row too,
+// and that one IS by fit — `NumbersRow` states the measurement.)
 //
 // THE SECOND ROW USED TO CARRY TWO MORE (owner ruling 2026-08-13: *drop the min-ratio and
 // stat-at-least filters completely - sorting services that need without spending toolbar real
@@ -50,6 +51,7 @@ import type { JSX } from 'react'
 import { Chip, MenuItem, Stack, TextField } from '@mui/material'
 import { CLASS_ABBRS } from '@shared/classCombo'
 import type { ItemUpgradeState } from '@shared/itemUpgrade'
+import type { ZoneShort } from '@shared/maps'
 import { EQUIP_SLOTS } from '@shared/planner/types'
 import { WEAPON_PICK_LABEL } from '@shared/planner/weaponType'
 import { classDisplayName } from '@shared/spellLevels'
@@ -58,6 +60,7 @@ import { CURRENT_ERA_LABEL } from '../planner/plannerData'
 import { SOCKET_LABEL } from '../planner/plannerGroups'
 import UpgradeSlider from './UpgradeSlider'
 import { GEAR_WEAPON_PICKS, type EffectFilter, type GearFilters } from './gearFilter'
+import { gearZoneLabel, zoneOptionsWith } from './gearZones'
 import type { GearControl } from './gearPrefs'
 import type { GearClasses } from './gearData'
 
@@ -106,6 +109,8 @@ export interface GearFilterBarProps {
   text: string
   setText: (v: string) => void
   classes: GearClasses
+  /** the zones at least one row drops in (`gearData.useGearIndex`) — empty until the index arrives */
+  zoneOptions: readonly ZoneShort[]
   upgrade: { state: ItemUpgradeState; set: (s: ItemUpgradeState) => void }
   /** which controls to draw (JOS-297) — `gearPrefs.controlsVisible`, the whole set by default */
   visible: ReadonlySet<GearControl>
@@ -180,7 +185,7 @@ function SelectRow({ filters, setFilters, visible }: Pick<GearFilterBarProps, 'f
 }
 
 /** WHICH ITEMS: name, slot, classes, effect kind, era. Search is always drawn — see the header. */
-function IdentityRow({ filters, setFilters, text, setText, classes, visible, hasteRelevant }: Omit<GearFilterBarProps, 'upgrade'>): JSX.Element {
+function IdentityRow({ filters, setFilters, text, setText, classes, visible, hasteRelevant }: Omit<GearFilterBarProps, 'upgrade' | 'zoneOptions'>): JSX.Element {
   return (
     <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'nowrap' }}>
       <TextField
@@ -272,23 +277,44 @@ function IdentityRow({ filters, setFilters, text, setText, classes, visible, has
 
 /** WHAT THEY READ: the simulated plus-state. The haste knob visited this row for an hour on
  *  2026-08-15 and moved to the identity row the same day — the user read this row as the upgrade
- *  estimation it is, and a chip about the SCORES sat wrong beside it. */
-function NumbersRow({ upgrade }: Pick<GearFilterBarProps, 'upgrade'>): JSX.Element {
+ *  estimation it is, and a chip about the SCORES sat wrong beside it.
+ *
+ *  AND WHERE THEY DROP (fork decision, kaltinril 2026-09-26), which is a WHICH ITEMS question on
+ *  the wrong row ON PURPOSE: the first row is full. MEASURED in gear.e2e.mts at the default 1280px
+ *  window — a fifth picker up there put the row 60px past the content area and the era chip out
+ *  from under the pointer. The split by question yields to the `flexWrap` law it was made to serve;
+ *  this row had the room. The picker leads the row so it does not move when the fraction slider
+ *  comes and goes. The fourth multi-select, and the same control again: the picks UNION, an empty
+ *  pick is no filter, and the options are ZONES, never the wiki's spellings of them — three
+ *  spellings of Unrest are one pick (gearZones.ts holds the measurement). */
+function NumbersRow({ filters, setFilters, zoneOptions, upgrade, visible }: Omit<GearFilterBarProps, 'text' | 'setText' | 'classes' | 'hasteRelevant'>): JSX.Element {
   return (
     <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'nowrap', minWidth: 0 }}>
-      <UpgradeSlider state={upgrade.state} onChange={upgrade.set} />
+      {visible.has('zone') && (
+        <ChipMultiSelect
+          options={zoneOptionsWith(zoneOptions, filters.zones)}
+          value={filters.zones}
+          onChange={(zones) => setFilters({ ...filters, zones })}
+          label="Zones"
+          placeholder="every zone"
+          optionLabel={gearZoneLabel}
+          minWidth={190}
+          testId="gear-zone"
+        />
+      )}
+      {visible.has('upgrade') && <UpgradeSlider state={upgrade.state} onChange={upgrade.set} />}
     </Stack>
   )
 }
 
 /**
- * Does the WHAT THEY READ row have anything left to draw? An empty row is height with no content.
- * A one-entry list again, and still a LIST — the row is a place (JOS-302's survivor).
+ * Does the second row have anything left to draw? An empty row is height with no content.
+ * Still a LIST — the row is a place (JOS-302's survivor).
  */
-const NUMBERS_CONTROLS: readonly GearControl[] = ['upgrade']
+const NUMBERS_CONTROLS: readonly GearControl[] = ['zone', 'upgrade']
 
 export default function GearFilterBar(props: GearFilterBarProps): JSX.Element {
-  const { filters, setFilters, text, setText, classes, upgrade, visible, hasteRelevant } = props
+  const { filters, setFilters, text, setText, classes, zoneOptions, upgrade, visible, hasteRelevant } = props
   return (
     <Stack spacing={1} sx={{ mb: 1, flexShrink: 0 }}>
       <IdentityRow
@@ -300,7 +326,9 @@ export default function GearFilterBar(props: GearFilterBarProps): JSX.Element {
         visible={visible}
         hasteRelevant={hasteRelevant}
       />
-      {NUMBERS_CONTROLS.some((c) => visible.has(c)) && <NumbersRow upgrade={upgrade} />}
+      {NUMBERS_CONTROLS.some((c) => visible.has(c)) && (
+        <NumbersRow filters={filters} setFilters={setFilters} zoneOptions={zoneOptions} upgrade={upgrade} visible={visible} />
+      )}
     </Stack>
   )
 }

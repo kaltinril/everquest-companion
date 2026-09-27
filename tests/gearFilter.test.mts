@@ -181,7 +181,7 @@ test('the STRUCTURED filters are set memberships; the numbers ride the search bo
   // set membership or a flag (`ignoreHaste` is the 2026-08-15 addition — a knob on the DERIVED
   // scores, not a row filter), and the one place a number can filter is `text`.
   const keys = Object.keys(DEFAULT_GEAR_FILTERS).sort()
-  assert.deepEqual(keys, ['classes', 'effect', 'eraOnly', 'ignoreHaste', 'ownedOnly', 'slots', 'text', 'weaponTypes'])
+  assert.deepEqual(keys, ['classes', 'effect', 'eraOnly', 'ignoreHaste', 'ownedOnly', 'slots', 'text', 'weaponTypes', 'zones'])
   // …and "absent is not zero" holds in the SORT and in a THRESHOLD alike (its own tests below).
   assert.equal(sortValue(THELVORN, 'HASTE'), undefined, 'no HASTE line is not 0% haste')
   assert.equal(sortValue(CLUB, 'HASTE'), 10)

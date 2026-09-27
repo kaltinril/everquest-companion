@@ -77,6 +77,7 @@ import {
   type GearSortKey,
   type GearWeaponPick
 } from './gearFilter'
+import { GEAR_ZONE_STEMS } from './gearZones'
 
 // ---- the tier table ---------------------------------------------------------------------------
 
@@ -226,12 +227,16 @@ function sanitizeSlot(raw: unknown, fallback: EquipSlot | null): EquipSlot | nul
  * fields over it on every render, so writing them here would persist a value that is overwritten
  * before anything reads it.
  */
-export type GearFormMemory = Pick<GearFilters, 'slots' | 'weaponTypes' | 'effect' | 'eraOnly' | 'ownedOnly' | 'ignoreHaste'>
+export type GearFormMemory = Pick<
+  GearFilters,
+  'slots' | 'weaponTypes' | 'zones' | 'effect' | 'eraOnly' | 'ownedOnly' | 'ignoreHaste'
+>
 
 /** What the bar opens on when nothing is stored — the shipped defaults, projected. */
 export const DEFAULT_GEAR_FORM: GearFormMemory = {
   slots: DEFAULT_GEAR_FILTERS.slots,
   weaponTypes: DEFAULT_GEAR_FILTERS.weaponTypes,
+  zones: DEFAULT_GEAR_FILTERS.zones,
   effect: DEFAULT_GEAR_FILTERS.effect,
   eraOnly: DEFAULT_GEAR_FILTERS.eraOnly,
   ownedOnly: DEFAULT_GEAR_FILTERS.ownedOnly,
@@ -251,6 +256,10 @@ export function sanitizeGearForm(raw: unknown): GearFormMemory {
   return {
     slots: sanitizeList<EquipSlot>(o.slots, EQUIP_SLOTS),
     weaponTypes: sanitizeList<GearWeaponPick>(o.weaponTypes, GEAR_WEAPON_PICKS),
+    // The zone picks (2026-09-26) are checked against the zone TABLE, not against the corpus this
+    // file may not load: a stem the table dropped is gone, and one whose zone merely has no gear
+    // left stays a chip the user can take off (`gearZones.zoneOptionsWith`).
+    zones: sanitizeList(o.zones, GEAR_ZONE_STEMS),
     effect: sanitizeOne<EffectFilter>(o.effect, EFFECT_FILTERS, DEFAULT_GEAR_FORM.effect),
     // Era ships ON, so an unreadable value must come back ON — `sanitizeFlag`'s fallback, never a
     // bare `=== true`, which would silently turn the default filter off for a corrupted store.

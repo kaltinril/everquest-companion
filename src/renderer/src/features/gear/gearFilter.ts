@@ -56,6 +56,8 @@ import {
 import { WEAPON_PICKS, weaponPicksMatch, type WeaponPick } from '../../../../shared/planner/weaponType'
 import { isShieldLike } from '../../../../shared/planner/shield'
 import type { EquipSlot, SocketType } from '../../../../shared/planner/types'
+import type { ZoneShort } from '../../../../shared/maps'
+import { gearZoneOf } from './gearZones'
 
 // ---- the filter model ---------------------------------------------------------------------
 
@@ -116,6 +118,13 @@ export interface GearFilters {
    * shield pick, ORed inside the one control exactly as the categories already union.
    */
   weaponTypes: GearWeaponPick[]
+  /**
+   * The zones asked for, as map stems (fork decision, kaltinril 2026-09-26). `[]` = every zone, rows
+   * that state no source included; several = the UNION, the slot picker's rule. A row drops in
+   * several zones of its own, so the test is an intersection — and it is made on the ZONE a
+   * spelling resolves to, never on the spelling (gearZones.ts holds the measurement).
+   */
+  zones: ZoneShort[]
   effect: EffectFilter
   /** hide rows the era join places outside the current expansion */
   eraOnly: boolean
@@ -147,6 +156,7 @@ export const DEFAULT_GEAR_FILTERS: GearFilters = {
   // reason the table is empty, and why the picker's own chips sit in the toolbar saying so.
   classes: [],
   weaponTypes: [],
+  zones: [],
   effect: 'any',
   // ON by default — the same argument the exaltation browser's era toggle carries: more than half
   // the corpus drops in expansions this server has not opened, and a plan built on them is a wish
@@ -372,6 +382,21 @@ export function slotMatches(row: GearRow, slots: readonly EquipSlot[]): boolean 
   return slots.some((s) => row.slots.includes(s))
 }
 
+/**
+ * Does this row drop in ANY of the zones asked for? Empty asks for no zone filter.
+ *
+ * A ROW THAT STATES NO SOURCE FAILS EVERY PICK, the threshold's rule for an absent number: an item
+ * nobody has placed is not an item that drops in Unrest, and a zone question about it has no yes
+ * in it (law 1). So does a row whose only zones are spellings the table refuses.
+ */
+export function zoneMatches(row: Pick<GearRow, 'dropZones'>, zones: readonly ZoneShort[]): boolean {
+  if (zones.length === 0) return true
+  return (row.dropZones ?? []).some((spelling) => {
+    const stem = gearZoneOf(spelling)
+    return stem !== null && zones.includes(stem)
+  })
+}
+
 /** Does this row state an effect of the kind asked for? */
 export function effectMatches(row: GearRow, effect: EffectFilter): boolean {
   if (effect === 'any') return true
@@ -381,8 +406,8 @@ export function effectMatches(row: GearRow, effect: EffectFilter): boolean {
 
 /**
  * WHO THIS ROW IS — the local half of the filter: the search words, the thresholds those words
- * carried (2026-08-15 — see the header), the slots, the kind of weapon, the class combo and the
- * effect kind.
+ * carried (2026-08-15 — see the header), the slots, the kind of weapon, the zones it drops in
+ * (2026-09-26), the class combo and the effect kind.
  *
  * Everything ANDs, and everything is inert while empty — see `GearFilters`. Two are UNIONS inside
  * (slots, weapon types), which is the JOS-302 shape: several answers to one question, ANDed against
@@ -399,6 +424,7 @@ function matchesIdentity(row: GearRow, filters: GearFilters, deps: GearFilterDep
   if (!query.thresholds.every((t) => meetsThreshold(row, t, opts))) return false
   if (!slotMatches(row, filters.slots)) return false
   if (!matchesHeldKind(row, filters.weaponTypes)) return false
+  if (!zoneMatches(row, filters.zones)) return false
   if (!effectMatches(row, filters.effect)) return false
   return !classMismatch(row.classes, filters.classes)
 }
