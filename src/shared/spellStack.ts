@@ -86,6 +86,20 @@ const SE_IMPROVEDTAUNT = 444
 const STACKERS = [446, 447, 448, 449]
 
 /**
+ * EFFECTS THAT CAST A SECOND SPELL ON THE TARGET: `limit` is that spell's id, `base` the chance.
+ *
+ * MEASURED, and it is the owner's report (2026-09-26, with the screenshot): the buff set kept Form
+ * of the Great Wolf AND Spirit of Bih`Li, *"movement speed stacking that doesn't work"*. In his
+ * file the wolf form's own row is an illusion and a 475 naming a second spell, and the run speed and
+ * the ATK its page states sit on THAT spell - movement in slot 2, which is Bih`Li's slot. A check
+ * that reads only the row that was cast sees an illusion and nothing to contest.
+ *
+ * 475 is the measured one. 340 and 374 are the same statement in the same two fields on the other
+ * castable buffs in that file, every one of them an illusion handing over a levitate or a breath.
+ */
+const TRIGGER_EFFECTS: ReadonlySet<number> = new Set([340, 374, 475])
+
+/**
  * HOW MANY EFFECT SLOTS THE ENGINE COMPARES. Gaps are blanks so positions stay exact.
  *
  * EQEmu's own constant is twelve and this port carried that number over. THE OWNER'S CLIENT FILE
@@ -137,6 +151,8 @@ export interface StackSpellView {
   unstackableDot: boolean
   /** Exactly `EFFECT_COUNT` entries, gaps filled with blanks. Build it with `stackView`. */
   effects: readonly StackSlot[]
+  /** The spells casting this one also lands on the target. See `TRIGGER_EFFECTS`. */
+  triggered?: readonly StackSpellView[]
 }
 
 /** What one spell does to another. From the CAST spell's point of view. */
@@ -152,6 +168,22 @@ export interface StackSource {
   durationValue?: number
   song?: boolean
   slots?: readonly { slot: number; effect: number; base: number; limit: number; calc: number; max: number }[]
+  /** The rows `triggeredSpellIds` names, resolved by whoever holds the table. One level deep. */
+  triggers?: readonly StackSource[]
+}
+
+/**
+ * The spells a row is CERTAIN to cast with itself, by id.
+ *
+ * ONLY A CHANCE OF 100. A row that rolls between three spells (the file has them, at 60/30/10)
+ * lands one of them, and which one is not something a planner can know.
+ */
+export function triggeredSpellIds(slots: StackSource['slots']): number[] {
+  const out: number[] = []
+  for (const e of slots ?? []) {
+    if (TRIGGER_EFFECTS.has(e.effect) && e.base >= 100 && e.limit > 0) out.push(e.limit)
+  }
+  return out
 }
 
 /**
@@ -188,8 +220,14 @@ export function stackView(row: StackSource): StackSpellView {
     buffDuration: row.durationValue ?? 0,
     isBardSong: row.song ?? false,
     unstackableDot: false,
-    effects
+    effects,
+    ...triggeredViews(row.triggers)
   }
+}
+
+/** A spreadable fragment, because `stackView` sits at the complexity ceiling. */
+function triggeredViews(triggers: StackSource['triggers']): Pick<StackSpellView, 'triggered'> {
+  return triggers === undefined ? {} : { triggered: triggers.map(stackView) }
 }
 
 // =================================================================================================
@@ -654,8 +692,22 @@ export interface StackComponent {
  * The graph is UNDIRECTED on purpose. `checkStackConflict` is asymmetric - it answers "what happens
  * when I cast B onto A" - but the planner's question is "can these two both be up", and that is
  * symmetric: if either direction is anything but `'stacks'`, they cannot both stand.
+ *
+ * AND IT IS ASKED OF EVERYTHING EACH CAST LANDS, not only of the two rows that were cast: a spell
+ * that hands its effects to a second one contests through that one (`TRIGGER_EFFECTS`).
  */
 export function spellsConflict(a: StackSpellView, b: StackSpellView, levels: StackLevels): boolean {
+  for (const x of [a, ...(a.triggered ?? [])]) {
+    for (const y of [b, ...(b.triggered ?? [])]) {
+      // Two spells that both hand over the SAME second spell share it rather than contest it.
+      if (x !== a && y !== b && sameIdentity(x, y)) continue
+      if (eitherRefuses(x, y, levels)) return true
+    }
+  }
+  return false
+}
+
+function eitherRefuses(a: StackSpellView, b: StackSpellView, levels: StackLevels): boolean {
   if (checkStackConflict(a, b, levels) !== 'stacks') return true
   return checkStackConflict(b, a, { worn: levels.cast, cast: levels.worn }) !== 'stacks'
 }

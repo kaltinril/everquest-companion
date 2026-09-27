@@ -27,41 +27,9 @@ import { spellItemIndex } from '../planner/indexCurrent'
 // `spellTable()` is the load promise itself; it settles once per run and every later await is
 // already-resolved, so the wait is paid exactly where the race was.
 import { spellTable } from '../resist/spellTable'
-import { spellCanonKey } from '../../shared/spellKey'
-import type { StackSource } from '../../shared/spellStack'
-import type { SpellResistTable } from '../../shared/resistTypes'
-
-/**
- * The stacking rows for a validated list of names, keyed by the name AS ASKED.
- *
- * Its own function so the handler above stays a door - validate, resolve the table, delegate - which
- * is also what keeps it under the tree's complexity ceiling. Keyed as asked so a caller can look its
- * own strings back up without re-folding a key.
- */
-function stackViewsFor(table: SpellResistTable, names: readonly unknown[]): Record<string, StackSource> {
-  const out: Record<string, StackSource> = {}
-  for (const raw of names) {
-    if (typeof raw !== 'string' || raw.length === 0 || raw.length > 128) continue
-    const row = table[spellCanonKey(raw)]
-    // Only rows the parser kept slots for - which is rows with a DURATION, the only ones a stacking
-    // question is ever about (`SpellResistInfo.slots` states the filter and why).
-    if (!row?.slots) continue
-    out[raw] = {
-      // THE ID IS NOT OPTIONAL DECORATION. Without it every view the renderer builds claims to be
-      // spell zero and the stacking engine reads all of them as one spell - the 2026-09-10 Loadout
-      // collapse. `shared/spellStack.ts sameIdentity` carries the report.
-      id: row.id,
-      name: raw,
-      goodEffect: row.goodEffect ?? false,
-      targetType: row.targetType,
-      durationFormula: row.durationFormula ?? 0,
-      durationValue: row.durationValue ?? 0,
-      song: row.song ?? false,
-      slots: row.slots
-    }
-  }
-  return out
-}
+// The stacking rows, and what each one casts with itself - a join, so it lives where a test can
+// drive it (resist/stackSources.ts).
+import { stackViewsFor } from '../resist/stackSources'
 
 /** The most spell names one `spells:stackViews` call may ask about. See the handler. */
 const MAX_STACK_VIEW_NAMES = 400

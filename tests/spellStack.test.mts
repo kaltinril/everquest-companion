@@ -18,6 +18,7 @@ import {
   conflictComponents,
   spellsConflict,
   stackView,
+  triggeredSpellIds,
   type StackSource,
   type StackSpellView
 } from '../src/shared/spellStack'
@@ -383,4 +384,44 @@ test('a CHAIN is a component and is NOT a clique - the case the optimizer must n
 
 test('an empty candidate set has no components', () => {
   assert.deepEqual(conflictComponents([], L), [])
+})
+
+// =================================================================================================
+// A SPELL THAT HANDS ITS EFFECTS TO A SECOND ONE
+// =================================================================================================
+
+const ILLUSION = 58
+const TRIGGER = 475
+
+test('THE OWNER`S SET: a wolf form contests Bih`Li through the spell it casts with itself', () => {
+  // The owner, 2026-09-26, reading a set that kept both: "movement speed stacking that doesn't
+  // work". The form's own row is an illusion and a trigger; the run speed is on the second spell.
+  const benefit = { id: 9001, name: 'benefit', goodEffect: true, slots: [slot(1, MOVEMENT, 35, { calc: 101, max: 60 })] }
+  const form = { id: 9002, name: 'form', goodEffect: true, slots: [slot(0, ILLUSION, 796), slot(1, TRIGGER, 100, { limit: 9001 })] }
+  const bihli = spell({ slots: [slot(1, MOVEMENT, 30, { calc: 101, max: 55 }), slot(5, STR, 15)], targetType: 0x29 })
+  // The row alone contests nothing, which is what the set was built on…
+  assert.equal(spellsConflict(stackView(form), bihli, L), false)
+  // …and with what it lands, it does, from either side.
+  const whole = stackView({ ...form, triggers: [benefit] })
+  assert.equal(whole.triggered?.length, 1)
+  assert.equal(spellsConflict(whole, bihli, L), true)
+  assert.equal(spellsConflict(bihli, whole, L), true)
+  assert.equal(conflictComponents([whole, bihli], L).length, 1)
+  // A buff in another slot still stands beside it.
+  assert.equal(spellsConflict(whole, spell({ slots: [slot(3, AC, 20)] }), L), false)
+})
+
+test('only a CERTAIN trigger is followed, and the id is read from the limit', () => {
+  assert.deepEqual(triggeredSpellIds([slot(0, ILLUSION, 796, { limit: 2 }), slot(1, TRIGGER, 100, { limit: 9001 })]), [9001])
+  assert.deepEqual(triggeredSpellIds([slot(0, 374, 100, { limit: 7 }), slot(1, 340, 100, { limit: 8 })]), [7, 8])
+  // A roll between three spells lands one of them, and which is not knowable.
+  assert.deepEqual(triggeredSpellIds([slot(0, 340, 60, { limit: 1 }), slot(1, 340, 30, { limit: 2 })]), [])
+  assert.deepEqual(triggeredSpellIds(undefined), [])
+})
+
+test('two spells that hand over the SAME second spell share it rather than contest it', () => {
+  const shared = { id: 9010, name: 'levitate', goodEffect: true, slots: [slot(4, 57, 1)] }
+  const a = stackView({ id: 9011, name: 'a', goodEffect: true, slots: [slot(0, STR, 10), slot(1, TRIGGER, 100, { limit: 9010 })], triggers: [shared] })
+  const b = stackView({ id: 9012, name: 'b', goodEffect: true, slots: [slot(2, AC, 10), slot(3, TRIGGER, 100, { limit: 9010 })], triggers: [shared] })
+  assert.equal(spellsConflict(a, b, L), false)
 })
