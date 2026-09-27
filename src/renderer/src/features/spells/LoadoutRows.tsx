@@ -18,6 +18,7 @@ import type { UtilityPick, UtilitySet } from '@shared/spellUtilitySet'
 import { SpellTooltip } from '../../lib/SpellCard'
 import SpellIcon from './SpellIcon'
 import { romanRank } from './spellbookFormat'
+import { casterChipSx } from './partyPaint'
 
 /** A chip that fits on a dense line. One style, so a row of them never wobbles. */
 export const TINY_CHIP = { height: 18, fontSize: 10, '& .MuiChip-label': { px: 0.6 } } as const
@@ -39,12 +40,12 @@ export const TINY_CHIP = { height: 18, fontSize: 10, '& .MuiChip-label': { px: 0
 export function KeepRow({
   c,
   rank,
-  castBy
+  caster
 }: {
   c: LoadoutCandidate
   rank: number
-  /** Who in the group casts it. Absent with no group: every row is yours. */
-  castBy?: string
+  /** Who in the group casts it, and the colour they wear. Absent with no group: every row is yours. */
+  caster?: { label: string; paint: string }
 }): JSX.Element {
   return (
     <Stack
@@ -75,15 +76,14 @@ export function KeepRow({
           sx={TINY_CHIP}
         />
       )}
-      {castBy !== undefined && (
+      {caster !== undefined && (
         <Chip
           size="small"
-          color="info"
           variant="outlined"
           data-testid="loadout-cast-by"
-          label={castBy}
+          label={caster.label}
           title="Who in your group can cast it."
-          sx={TINY_CHIP}
+          sx={{ ...TINY_CHIP, ...casterChipSx(caster.paint) }}
         />
       )}
       {c.grants.map((g, i) => (

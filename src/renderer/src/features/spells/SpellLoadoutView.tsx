@@ -57,7 +57,8 @@ import type { CharacterSnap } from '@shared/characterTypes'
 import { useCurrentComboClasses, useLevelUnlocks } from '../leveling/useLevelUnlocks'
 import { useModule } from '../../lib/useModule'
 import SpellTierSlider from './SpellTierSlider'
-import { CastSection, KeepRow, RejectRow, TINY_CHIP, UtilitySection } from './LoadoutRows'
+import { CastSection, RejectRow, TINY_CHIP, UtilitySection } from './LoadoutRows'
+import LoadoutKeep from './LoadoutKeep'
 import BuffStatsPanel from './BuffStatsPanel'
 import { useObservedSpellRanks } from '../../lib/useObservedSpellRanks'
 import { useLoadoutViews } from './useLoadoutViews'
@@ -136,7 +137,7 @@ function BuffSection({
   return (
     <>
       <SetHeader set={set} classes={drawnFrom} />
-      <LoadoutParty party={pool.party} onParty={pool.setParty} />
+      <LoadoutParty group={pool} />
       {set.keep.length === 0 ? (
         <Alert severity="info" data-testid="loadout-empty">
           No buff your classes can cast states a stat this app knows how to value yet.
@@ -170,11 +171,7 @@ function BuffSection({
               />
             )}
           </Stack>
-          <Stack>
-            {set.keep.map((c) => (
-              <KeepRow key={c.name} c={c} rank={rankOf(c.name)} castBy={pool.castBy(c.name)} />
-            ))}
-          </Stack>
+          <LoadoutKeep keep={set.keep} rankOf={rankOf} pool={pool} />
         </Box>
       )}
 
