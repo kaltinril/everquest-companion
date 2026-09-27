@@ -127,7 +127,8 @@ export default function PlanBracketCard({ bracket, onAdd, compare, onOpenLoot, o
     >
       <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'nowrap', minWidth: 0 }}>
         <Typography variant="subtitle2" sx={{ flexShrink: 0 }}>
-          {bracket.from}-{bracket.to}
+          {/* One level is one number: at the cap the bracket is the character's own level. */}
+          {bracket.from === bracket.to ? bracket.from : `${String(bracket.from)}-${String(bracket.to)}`}
         </Typography>
         <Box sx={{ display: 'flex', gap: 0.5, minWidth: 0, flexGrow: 1, overflow: 'hidden' }}>
           {bracket.expZones.map((pick) => (
