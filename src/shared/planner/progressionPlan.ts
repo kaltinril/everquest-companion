@@ -32,7 +32,7 @@
 //   3. THE ROLE WEIGHTS ARE A HEURISTIC AND SAY SO. They live in `roleWeights.ts` (beside the weapon
 //      policy of rule 10), which this file re-exports (`GearRole`, `roleValue`) so no caller has to
 //      know they moved.
-//   4. THE HORIZON IS DATA-DRIVEN, not a level cap this file claims to know. See
+//   4. THE HORIZON IS THE LEVEL CAP, or the data running out, whichever comes first. See
 //      `buildProgressionPlan`.
 //   5. THE TARGET GATE IS A CEILING, NOT A WINDOW. CORRECTED 2026-08-15, from the owner playing the
 //      first cut: the plan was hiding good items because their drop mob conned GREY. "Blue and white
@@ -123,6 +123,7 @@ import type { ConBand } from '../conBands'
 import type { GearRow } from './gear'
 import type { EquipSlot } from './types'
 import { layeredVerdict } from './era'
+import { LAST_BRACKET_ROOM, QUIET_BRACKETS, bracketsFrom, type Bracket } from './planHorizon'
 import {
   CLASS_FACTS,
   ROLE_WEAPON_POLICY,
@@ -169,6 +170,8 @@ export interface PlanInputs {
   survivability?: number
   /** plan §8 calls 6 a first guess, so it is an input and not a constant. Default 6. */
   bracketSize?: number
+  /** the highest level a character can be - see `LEVEL_CAP`, which is the default */
+  levelCap?: number
 }
 
 /** One item worth going and getting, at one bracket, off one stated witness. */
@@ -347,8 +350,6 @@ export function ownedHasteOutside(sources: readonly OwnedHaste[] | undefined, sl
 
 // ---- the constants, each with the reason it is that number ------------------------------------
 
-/** Plan §8: "a first guess", and the fold takes it as an input so tuning it is a constant. */
-const DEFAULT_BRACKET_SIZE = 6
 /**
  * FOUR EXP ZONES PER BRACKET. A route is a recommendation, not a gazetteer: the real corpus profiles
  * ~190 zones and a bracket that listed every zone whose median reads even would be a list nobody
@@ -365,16 +366,6 @@ const TARGET_CAP = 8
 const RUN_TARGET_CAP = 3
 /** SIX RUNS PER BRACKET, same disclosure. A bracket is an evening's advice, not an atlas. */
 const RUN_CAP = 6
-/**
- * THE HARD BACKSTOP: seven default brackets — the one the character is in and six past it, since
- * the loop runs `from <= start + 36` inclusive. The horizon is meant to be
- * DATA-driven (see `buildProgressionPlan`), and this exists only so a corpus that keeps answering
- * cannot loop forever. It is NOT a level cap claim — this file states no level cap, because the
- * server's is not in any data this repo holds.
- */
-const HORIZON_LEVELS = 36
-/** How many consecutive silent brackets end the route. Two, so one gap does not truncate a plan. */
-const QUIET_BRACKETS = 2
 
 /**
  * THE TARGET GATE IS A CEILING, NOT A WINDOW — corrected 2026-08-15 from live testing, and the
@@ -391,11 +382,6 @@ const GROUP_GATE: readonly ConBand[] = ['trivial', 'safe', 'even', 'risky']
 // THE FOLD
 // =================================================================================================
 
-/** A bracket's bounds, before it has any content. */
-interface Bracket {
-  from: number
-  to: number
-}
 
 /** One stated drop witness off an item page, with the tier suffix already split off. */
 interface Witness {
@@ -687,7 +673,7 @@ function runsFrom(admitted: readonly GearTarget[], ctx: PlanCtx, midpoint: numbe
       a.zone.localeCompare(b.zone) ||
       (a.plus ?? 0) - (b.plus ?? 0)
   )
-  return runs.slice(0, RUN_CAP)
+  return runs
 }
 
 /**
@@ -701,8 +687,9 @@ function runsFrom(admitted: readonly GearTarget[], ctx: PlanCtx, midpoint: numbe
 function bracketOf(ctx: PlanCtx, bracket: Bracket, used: Set<string>): PlanBracket {
   const midpoint = Math.floor((bracket.from + bracket.to) / 2)
   const admitted = admittedFor(ctx, bracket, used)
-  const targets = admitted.slice(0, TARGET_CAP)
-  const runs = runsFrom(admitted, ctx, midpoint)
+  const room = bracket.last === true ? LAST_BRACKET_ROOM : 1
+  const targets = admitted.slice(0, TARGET_CAP * room)
+  const runs = runsFrom(admitted, ctx, midpoint).slice(0, RUN_CAP * room)
   for (const target of targets) used.add(target.key)
   for (const run of runs) for (const target of run.targets) used.add(target.key)
   return {
@@ -878,11 +865,11 @@ function isQuiet(bracket: PlanBracket): boolean {
  * THE ROUTE: brackets of `bracketSize` levels, opening at the character's CURRENT level (44 → 44-49,
  * 50-55, …), each carrying where to grind and what to go and get while you are there.
  *
- * THE HORIZON IS DATA-DRIVEN, because this repo has no level cap to read. The route stops after
+ * THE HORIZON IS THE LEVEL CAP, OR THE DATA RUNNING OUT, whichever comes first. The route never
+ * opens a bracket past `LEVEL_CAP` and its last bracket ends ON the cap; below that it stops after
  * `QUIET_BRACKETS` consecutive brackets that carry neither an exp zone nor a target — that is the
- * corpus saying it has run out of things to state, which is a fact, where "stop at 50" would be a
- * number invented about a server whose cap is nowhere in this data. `HORIZON_LEVELS` is a hard
- * backstop so a strange corpus cannot loop, not a claim. Trailing silent brackets are trimmed before
+ * corpus saying it has run out of things to state. `HORIZON_LEVELS` is a hard backstop so a
+ * strange corpus cannot loop, not a claim. Trailing silent brackets are trimmed before
  * the route is returned — a silent bracket in the MIDDLE is information ("nothing here, keep going"),
  * a silent one at the end is just the loop's own footprint.
  *
@@ -916,8 +903,6 @@ export function routeFromPool(
   pool: readonly PlanCandidate[],
   wished: ReadonlySet<string>
 ): PlanBracket[] {
-  const size = Math.max(1, Math.floor(inputs.bracketSize ?? DEFAULT_BRACKET_SIZE))
-  const start = Math.max(1, Math.floor(inputs.level))
   const ctx: PlanCtx = {
     corpora,
     gate: inputs.reach === 'group' ? GROUP_GATE : SOLO_GATE,
@@ -928,8 +913,8 @@ export function routeFromPool(
   const used = new Set<string>()
   const route: PlanBracket[] = []
   let quiet = 0
-  for (let from = start; from <= start + HORIZON_LEVELS; from += size) {
-    route.push(bracketOf(ctx, { from, to: from + size - 1 }, used))
+  for (const bounds of bracketsFrom(inputs)) {
+    route.push(bracketOf(ctx, bounds, used))
     quiet = isQuiet(route[route.length - 1]) ? quiet + 1 : 0
     if (quiet >= QUIET_BRACKETS) break
   }
