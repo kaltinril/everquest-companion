@@ -52,5 +52,6 @@ pub mod progression;
 pub mod resist;
 pub mod respawn;
 pub mod roster;
+pub mod roster_who;
 pub mod spell_sets;
 pub mod turnins;
