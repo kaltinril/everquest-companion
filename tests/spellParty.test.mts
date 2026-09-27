@@ -1,0 +1,163 @@
+// THE BUFF SET WITH THE GROUP IN IT (src/shared/spellParty.ts).
+//
+// THE CLAIM UNDER TEST: a group changes the pool and nothing else. What a group-mate adds is what
+// they can put ON YOU, the selection over the wider pool is `buildLoadout`'s own, and with no group
+// the answer is the solo one.
+
+import assert from 'node:assert/strict'
+import { test } from 'node:test'
+import type { UnlockSpell } from '../src/shared/levelUnlocks'
+import { spellStatGrants } from '../src/shared/spellStats'
+import { DEFAULT_STAT_WEIGHTS, buildLoadout, loadoutCandidates } from '../src/shared/spellLoadout'
+import {
+  MAX_PARTY_MEMBERS,
+  castByLabel,
+  landsOnOthers,
+  normalizeParty,
+  partyCandidates,
+  readParty,
+  withMember,
+  withoutMember,
+  type PartyMember
+} from '../src/shared/spellParty'
+
+const L = { worn: 50, cast: 50 }
+const SCORING = { weights: DEFAULT_STAT_WEIGHTS }
+
+interface BuffSpec {
+  effects: string[]
+  classes: string[]
+  targetType?: string
+}
+
+function buff(name: string, spec: BuffSpec): UnlockSpell {
+  return {
+    name,
+    at: spec.classes.map((cls) => ({ cls, level: 20 })),
+    upgradeCategory: 'buff',
+    grants: spellStatGrants(spec.effects, 50),
+    grantsLevel: 50,
+    ...(spec.targetType === undefined ? {} : { targetType: spec.targetType })
+  } as UnlockSpell
+}
+
+const GARRETT: PartyMember = { name: 'Garrett', classes: ['ENC'] }
+
+// =================================================================================================
+// THE POOL
+// =================================================================================================
+
+test('with no group the pool is the solo candidate list', () => {
+  const corpus = [
+    buff('Mine', { effects: ['Increase STR by 20'], classes: ['SHM'] }),
+    buff('Theirs', { effects: ['Increase AC by 30'], classes: ['ENC'], targetType: 'Single' })
+  ]
+  const pool = partyCandidates(corpus, ['SHM'], [], SCORING)
+  assert.deepEqual(pool.candidates, loadoutCandidates(corpus, ['SHM'], DEFAULT_STAT_WEIGHTS))
+  assert.equal(pool.casters.size, 0)
+})
+
+test('a group-mate adds the buffs they can put on you, and the row says who casts it', () => {
+  const corpus = [
+    buff('Mine', { effects: ['Increase STR by 20'], classes: ['SHM'] }),
+    buff('Theirs', { effects: ['Increase AC by 30'], classes: ['ENC'], targetType: 'Single' }),
+    buff('Nobodys', { effects: ['Increase HP by 99'], classes: ['CLR'], targetType: 'Single' })
+  ]
+  const pool = partyCandidates(corpus, ['SHM'], [GARRETT], SCORING)
+  assert.deepEqual(pool.candidates.map((c) => c.name), ['Theirs', 'Mine'])
+  assert.deepEqual(pool.casters.get('Mine'), ['You'])
+  assert.deepEqual(pool.casters.get('Theirs'), ['Garrett'])
+})
+
+test('a group-mate`s SELF buff is theirs, and your own self buff is still yours', () => {
+  const corpus = [
+    buff('MySelfBuff', { effects: ['Increase AC by 10'], classes: ['SHM'], targetType: 'Self' }),
+    buff('TheirSelfBuff', { effects: ['Increase AC by 40'], classes: ['ENC'], targetType: 'Self' }),
+    buff('TheirPetBuff', { effects: ['Increase STR by 40'], classes: ['ENC'], targetType: 'Pet' })
+  ]
+  const pool = partyCandidates(corpus, ['SHM'], [GARRETT], SCORING)
+  assert.deepEqual(pool.candidates.map((c) => c.name), ['MySelfBuff'])
+})
+
+test('a spell two of you can cast is one candidate with both casters, you first', () => {
+  const corpus = [buff('Shared', { effects: ['Increase STR by 20'], classes: ['SHM', 'ENC'], targetType: 'Single' })]
+  const pool = partyCandidates(corpus, ['SHM'], [GARRETT, { name: 'Malkil', classes: ['ENC'] }], SCORING)
+  assert.equal(pool.candidates.length, 1)
+  assert.deepEqual(pool.casters.get('Shared'), ['You', 'Garrett', 'Malkil'])
+})
+
+test('your level is the group`s: a spell a group-mate has not reached is not offered', () => {
+  const corpus = [buff('Theirs', { effects: ['Increase AC by 30'], classes: ['ENC'], targetType: 'Single' })]
+  const at = (level: number): string[] =>
+    partyCandidates(corpus, ['SHM'], [GARRETT], { ...SCORING, query: { level } }).candidates.map((c) => c.name)
+  assert.deepEqual(at(19), [])
+  assert.deepEqual(at(20), ['Theirs'])
+})
+
+test('THE POINT OF IT: a group-mate`s better buff takes the slot from yours', () => {
+  const corpus = [
+    buff('My Haste', { effects: ['Increase Attack Speed by 30%'], classes: ['SHM'], targetType: 'Single' }),
+    buff('Their Haste', { effects: ['Increase Attack Speed by 47%'], classes: ['ENC'], targetType: 'Single' }),
+    buff('My Strength', { effects: ['Increase STR by 20'], classes: ['SHM'], targetType: 'Single' })
+  ]
+  const solo = buildLoadout(partyCandidates(corpus, ['SHM'], [], SCORING).candidates, L)
+  assert.deepEqual(solo.keep.map((c) => c.name), ['My Haste', 'My Strength'])
+
+  const grouped = buildLoadout(partyCandidates(corpus, ['SHM'], [GARRETT], SCORING).candidates, L)
+  assert.deepEqual(grouped.keep.map((c) => c.name), ['Their Haste', 'My Strength'])
+  assert.deepEqual(grouped.rejected.map((r) => [r.name, r.beatenBy]), [['My Haste', 'Their Haste']])
+})
+
+test('the target types that reach another player', () => {
+  for (const t of ['Single', 'Single Friendly (or Self)', 'Group v1', 'Group v2', 'Group', 'Party', 'Target Group Member or Self']) {
+    assert.equal(landsOnOthers({ targetType: t }), true, t)
+  }
+  for (const t of ['Self', 'Pet', 'Corpse', 'Undead', 'Targeted AE']) {
+    assert.equal(landsOnOthers({ targetType: t }), false, t)
+  }
+  // Silence is not a verdict.
+  assert.equal(landsOnOthers({}), true)
+})
+
+// =================================================================================================
+// THE STORED LIST
+// =================================================================================================
+
+test('a stored group is validated, not trusted', () => {
+  const stored = [
+    { name: '  Garrett ', classes: ['ENC', 'ENC', 'SHM', 'DRU', 'WAR'] },
+    { name: 'NoClasses', classes: [] },
+    { name: 'BadClass', classes: ['XYZ'] },
+    { classes: ['CLR', 'PAL'] },
+    'not a member',
+    null
+  ]
+  assert.deepEqual(normalizeParty(stored), [
+    { name: 'Garrett', classes: ['ENC', 'SHM', 'DRU'] },
+    { name: 'CLR/PAL', classes: ['CLR', 'PAL'] }
+  ])
+  assert.deepEqual(normalizeParty('nope'), [])
+})
+
+test('unreadable stored text is an empty group', () => {
+  assert.deepEqual(readParty(null), [])
+  assert.deepEqual(readParty('{not json'), [])
+  assert.deepEqual(readParty(JSON.stringify([GARRETT])), [GARRETT])
+})
+
+test('adding a name that is already there replaces it, and a full group takes nobody new', () => {
+  const swapped = withMember([GARRETT], { name: 'garrett', classes: ['CLR'] })
+  assert.deepEqual(swapped, [{ name: 'garrett', classes: ['CLR'] }])
+
+  let full: PartyMember[] = []
+  for (let i = 0; i < MAX_PARTY_MEMBERS + 2; i++) full = withMember(full, { name: `M${String(i)}`, classes: ['WAR'] })
+  assert.equal(full.length, MAX_PARTY_MEMBERS)
+  assert.deepEqual(withoutMember(full, 'm0').map((m) => m.name), ['M1', 'M2', 'M3', 'M4'])
+})
+
+test('who casts it, in words', () => {
+  assert.equal(castByLabel([]), '')
+  assert.equal(castByLabel(['You']), 'You')
+  assert.equal(castByLabel(['You', 'Garrett']), 'You or Garrett')
+  assert.equal(castByLabel(['You', 'Garrett', 'Malkil']), 'You, Garrett or Malkil')
+})

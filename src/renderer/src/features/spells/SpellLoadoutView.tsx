@@ -43,12 +43,10 @@
 import { type JSX, useCallback, useMemo, useState } from 'react'
 import { Alert, Box, Chip, Divider, Stack, Tab, Tabs, Typography } from '@mui/material'
 import {
-  DEFAULT_STAT_WEIGHTS,
   buildLoadout,
   COMBAT_TABLES,
   buffTotals,
   combatSet,
-  loadoutCandidates,
   type CombatSet,
   type LoadoutSet
 } from '@shared/spellLoadout'
@@ -63,6 +61,8 @@ import { CastSection, KeepRow, RejectRow, TINY_CHIP, UtilitySection } from './Lo
 import BuffStatsPanel from './BuffStatsPanel'
 import { useObservedSpellRanks } from '../../lib/useObservedSpellRanks'
 import { useLoadoutViews } from './useLoadoutViews'
+import { useLoadoutPool, type LoadoutPool } from './useLoadoutPool'
+import LoadoutParty from './LoadoutParty'
 
 /** A player has eight gems. Neither set trims to fit; they report what they want. */
 const GEMS = 8
@@ -122,16 +122,21 @@ function SetHeader({ set, classes }: { set: LoadoutSet; classes: string }): JSX.
 function BuffSection({
   set,
   classes,
-  rankOf
+  rankOf,
+  pool
 }: {
   set: LoadoutSet
   classes: string
   /** `max(observed, simulated)` for one spell - see `KeepRow`. */
   rankOf: (name: string) => number
+  /** The group the set was picked from, and who casts each row - see `useLoadoutPool`. */
+  pool: LoadoutPool
 }): JSX.Element {
+  const drawnFrom = pool.party.length === 0 ? classes : `${classes} + ${String(pool.party.length)} in group`
   return (
     <>
-      <SetHeader set={set} classes={classes} />
+      <SetHeader set={set} classes={drawnFrom} />
+      <LoadoutParty party={pool.party} onParty={pool.setParty} />
       {set.keep.length === 0 ? (
         <Alert severity="info" data-testid="loadout-empty">
           No buff your classes can cast states a stat this app knows how to value yet.
@@ -167,7 +172,7 @@ function BuffSection({
           </Stack>
           <Stack>
             {set.keep.map((c) => (
-              <KeepRow key={c.name} c={c} rank={rankOf(c.name)} />
+              <KeepRow key={c.name} c={c} rank={rankOf(c.name)} castBy={pool.castBy(c.name)} />
             ))}
           </Stack>
         </Box>
@@ -214,15 +219,17 @@ function Pane({
   sets,
   level,
   classes,
-  rankOf
+  rankOf,
+  pool
 }: {
   pane: LoadoutPane
   sets: LoadoutSets
   level: number
   classes: string
   rankOf: (name: string) => number
+  pool: LoadoutPool
 }): JSX.Element {
-  if (pane === 'buffs') return <BuffSection set={sets.buffs} classes={classes} rankOf={rankOf} />
+  if (pane === 'buffs') return <BuffSection set={sets.buffs} classes={classes} rankOf={rankOf} pool={pool} />
   if (pane === 'utility') return <UtilitySection set={sets.utility} level={level} />
   if (pane === 'combat') {
     return (
@@ -260,12 +267,9 @@ export default function SpellLoadoutView(): JSX.Element {
   // number. Absent until the log has seen a level-up or your own `/who` row, which is the ordinary
   // state of a fresh log - see `ASSUMED_LEVEL`.
   const level = who?.level?.level ?? ASSUMED_LEVEL
-  // LEVEL AND ERA ARE PART OF THE QUESTION (owner, 2026-09-10). Without them the tab recommended
-  // spells he could not cast - see `CandidateQuery.level` for the count.
-  const candidates = useMemo(
-    () => loadoutCandidates(data.spells, combo.resolved, DEFAULT_STAT_WEIGHTS, { level }),
-    [data.spells, combo.resolved, level]
-  )
+  // YOUR BUFFS, PLUS WHAT A GROUP-MATE CAN PUT ON YOU (Garrett, 2026-09-26) - `useLoadoutPool`.
+  const pool = useLoadoutPool(data.spells, combo.resolved, level)
+  const { candidates } = pool
   // THE RANK YOU ACTUALLY HAVE, off the log (JOS-446), lifted to whatever the slider asks for -
   // `max(observed, simulated)`, which is the Leveling tab's own rule so the two cannot disagree.
   const ranks = useObservedSpellRanks()
@@ -358,7 +362,7 @@ export default function SpellLoadoutView(): JSX.Element {
 
       <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ pb: 4, mt: 1 }}>
         <Stack spacing={2} sx={{ flexGrow: 1, minWidth: 0 }}>
-          <Pane pane={pane} sets={sets} level={level} classes={combo.resolved.join(' / ')} rankOf={rankOf} />
+          <Pane pane={pane} sets={sets} level={level} classes={combo.resolved.join(' / ')} rankOf={rankOf} pool={pool} />
         </Stack>
         {/* THE SUMMARY RIDES BESIDE ALL THREE PANES. "What am I getting from my buffs" is the
             standing question whichever set you are reading, and it is the panel the slider is
