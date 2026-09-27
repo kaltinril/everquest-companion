@@ -37,14 +37,23 @@ const TINY_CHIP = { height: 18, fontSize: 10, '& .MuiChip-label': { px: 0.6 } } 
  * while the control beside it moved would read as broken, so the stillness is LABELLED rather than
  * left to be discovered.
  */
-export default function BuffStatsPanel({ totals, tier }: { totals: BuffTotals; tier: number }): JSX.Element {
+export default function BuffStatsPanel({
+  totals,
+  tier,
+  grouped
+}: {
+  totals: BuffTotals
+  tier: number
+  /** True when the set was picked from a group's buffs, so the heading does not call them yours. */
+  grouped?: boolean
+}): JSX.Element {
   // ONE READING ORDER, points and percents interleaved - `buffTotals` states it (the fold keeps the
   // two KINDS apart for the arithmetic, which is a different claim from how they are drawn).
   const rows = totals.rows
   return (
     <Paper variant="outlined" sx={{ p: 1.25, position: 'sticky', top: 8 }} data-testid="buff-stats">
       <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 0.75 }}>
-        <Typography variant="subtitle2">From your buffs</Typography>
+        <Typography variant="subtitle2">{grouped === true ? "From the group's buffs" : 'From your buffs'}</Typography>
         <Chip
           size="small"
           variant="outlined"

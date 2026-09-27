@@ -54,11 +54,12 @@ import { bestSpellsAt, defaultSorts } from '@shared/bestSpells'
 import { utilitySet, type UtilitySet } from '@shared/spellUtilitySet'
 import { observedRankRow } from '@shared/spellRanks'
 import type { CharacterSnap } from '@shared/characterTypes'
-import { useCurrentComboClasses, useLevelUnlocks } from '../leveling/useLevelUnlocks'
+import { useLevelUnlocks } from '../leveling/useLevelUnlocks'
 import { useModule } from '../../lib/useModule'
 import SpellTierSlider from './SpellTierSlider'
 import { CastSection, RejectRow, TINY_CHIP, UtilitySection } from './LoadoutRows'
-import LoadoutKeep from './LoadoutKeep'
+import LoadoutKeep, { othersWhoCast } from './LoadoutKeep'
+import LoadoutClasses, { useLoadoutClasses } from './LoadoutClasses'
 import BuffStatsPanel from './BuffStatsPanel'
 import { useObservedSpellRanks } from '../../lib/useObservedSpellRanks'
 import { useLoadoutViews } from './useLoadoutViews'
@@ -148,7 +149,8 @@ function BuffSection({
             <Typography variant="overline" color="text.secondary">
               Keep up ({String(set.gems)})
             </Typography>
-            {set.gems > GEMS && (
+            {/* With a group the gem count is each caster's own, and the blocks below say it. */}
+            {pool.party.length === 0 && set.gems > GEMS && (
               <Chip
                 size="small"
                 color="warning"
@@ -171,7 +173,7 @@ function BuffSection({
               />
             )}
           </Stack>
-          <LoadoutKeep keep={set.keep} rankOf={rankOf} pool={pool} />
+          <LoadoutKeep keep={set.keep} rankOf={rankOf} pool={pool} gems={GEMS} />
         </Box>
       )}
 
@@ -184,7 +186,7 @@ function BuffSection({
             </Typography>
             <Stack>
               {set.rejected.map((r) => (
-                <RejectRow key={r.name} r={r} />
+                <RejectRow key={r.name} r={r} casters={othersWhoCast(pool, r.name)} />
               ))}
             </Stack>
           </Box>
@@ -258,7 +260,9 @@ export default function SpellLoadoutView(): JSX.Element {
   // (`SpellTierSlider`), and it means the same thing here: every spell read at AT LEAST this rank.
   const [tier, setTier] = useState(0)
   const data = useLevelUnlocks()
-  const combo = useCurrentComboClasses()
+  // THE CLASSES ARE THE PLAYER'S TO PICK, following the log until they do - `LoadoutClasses`.
+  const picked = useLoadoutClasses()
+  const { combo } = picked
   const who = useModule<CharacterSnap>('character')
   // `LevelStatement` is the level plus WHICH line stated it and when; the magnitudes want the
   // number. Absent until the log has seen a level-up or your own `/who` row, which is the ordinary
@@ -309,9 +313,10 @@ export default function SpellLoadoutView(): JSX.Element {
     return (
       <Stack spacing={2} sx={{ maxWidth: 900 }} data-testid="spell-loadout-view">
         <Typography variant="h6">Loadout</Typography>
+        <LoadoutClasses state={picked} />
         <Alert severity="info" data-testid="loadout-no-combo">
-          This tab needs to know which classes you are playing. It fills in once the log has named
-          your loadout.
+          This tab needs to know which classes you are playing. Pick them above, or it fills in once
+          the log has named your loadout.
         </Alert>
       </Stack>
     )
@@ -343,6 +348,7 @@ export default function SpellLoadoutView(): JSX.Element {
         <Tab value="utility" label={`Utility (${String(utility.count)})`} data-testid="loadout-pane-utility" />
       </Tabs>
 
+      <LoadoutClasses state={picked} />
       {/* THE SLIDER, and a caption that says what it does NOT do - see `BuffStatsPanel`. */}
       <SpellTierSlider
         tier={tier}
@@ -365,7 +371,7 @@ export default function SpellLoadoutView(): JSX.Element {
             standing question whichever set you are reading, and it is the panel the slider is
             there to be dragged next to. */}
         <Box sx={{ width: 220, flexShrink: 0 }}>
-          <BuffStatsPanel totals={totals} tier={tier} />
+          <BuffStatsPanel totals={totals} tier={tier} grouped={pool.party.length > 0} />
         </Box>
       </Stack>
     </Stack>
