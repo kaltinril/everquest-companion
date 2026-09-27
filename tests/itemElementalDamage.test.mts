@@ -12,7 +12,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { knowledgeFromDb, type ItemDbFile } from '../src/main/itemsDb'
 import { parseStatsBlock, repairElementalDamage } from '../src/shared/itemStats'
-import { scaleStatBlock } from '../src/shared/itemUpgrade'
+import { scaleRange, scaleStatBlock } from '../src/shared/itemUpgrade'
 import itemsJson from '../src/main/data/items.json'
 
 const db = itemsJson as unknown as ItemDbFile
@@ -34,9 +34,27 @@ test('the weapon damage and the elemental damage are two facts', () => {
 
 test('THE OWNER`S ARROWS: the +7 is the one he holds', () => {
   const at7 = scaleStatBlock(parseStatsBlock(ARROWS), { full: 7, fraction: 0 })
-  // In game: Base Dmg 18, Fire Dmg 3. An upgrade moves the weapon damage and not the element.
+  // In game: Base Dmg 18, Fire Dmg 3, Range 220. An upgrade moves the weapon damage and the range,
+  // and not the element.
   assert.equal(at7.dmg, 18)
   assert.deepEqual(at7.stats, [{ key: 'FIRE DMG', value: '3' }])
+  assert.equal(at7.range, '220')
+})
+
+test('RANGE gains ten a tier, whatever the base', () => {
+  const at = (base: number, full: number): number => scaleRange(base, { full, fraction: 0 })
+  // The three readings: the owner's game window, and the wiki's slider on two arrows.
+  assert.equal(at(150, 7), 220)
+  assert.equal(at(150, 10), 250)
+  assert.equal(at(170, 10), 270, 'a percentage would have read 283')
+  assert.equal(at(150, 0), 150)
+  // The fraction is ignored, as the flat stats ignore it: no reading has stated otherwise.
+  assert.equal(scaleRange(150, { full: 7, fraction: 100 }), 220)
+  // An absent range stays absent, and a triple is text this file does not claim to understand.
+  const bare = scaleStatBlock(parseStatsBlock('DMG: 5 Atk Delay: 20'), { full: 5, fraction: 0 })
+  assert.equal(bare.range, undefined)
+  const triple = parseStatsBlock('Slot: AMMO\n\nDMG: 2\n\nWT: 0.1 Range: 50 / 75 / 100 Size: SMALL')
+  assert.equal(scaleStatBlock(triple, { full: 5, fraction: 0 }).range, triple.range)
 })
 
 test('a stored parse is repaired against its own block, and only when the block states an element', () => {

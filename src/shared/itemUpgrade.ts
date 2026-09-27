@@ -137,10 +137,11 @@ export function excelRoundUp(value: number, digits = 0): number {
 
 /**
  * How a stat key scales. `unchanged` is the DEFAULT and covers everything the reference
- * leaves alone: heroic stats, Attack, Dmg Bon, Backstab, Range, Size, Rec Level, charges,
- * effect magnitudes — anything not named in the three tables below.
+ * leaves alone: heroic stats, Attack, Dmg Bon, Backstab, Size, Rec Level, charges,
+ * effect magnitudes — anything not named in the three tables below. RANGE left that list on
+ * 2026-09-26: see `scaleRange`.
  */
-export type UpgradeStatClass = 'primary' | 'flat' | 'damage' | 'delay' | 'weight' | 'unchanged'
+export type UpgradeStatClass = 'primary' | 'flat' | 'damage' | 'delay' | 'weight' | 'range' | 'unchanged'
 
 /**
  * Key aliases, mirroring the slider's own table. Sorted LONGEST-FIRST so a compound key can
@@ -183,6 +184,7 @@ export function upgradeStatClass(key: string): UpgradeStatClass {
   if (k === 'DMG') return 'damage'
   if (k === 'DELAY') return 'delay'
   if (k === 'WEIGHT') return 'weight'
+  if (k === 'RANGE') return 'range'
   if (FLAT_KEYS.has(k)) return 'flat'
   if (PRIMARY_KEYS.has(k) || k.startsWith('SV_')) return 'primary'
   return 'unchanged'
@@ -210,6 +212,28 @@ export function scalePrimary(base: number, state: ItemUpgradeState): number {
 export function scaleDamage(base: number, state: ItemUpgradeState): number {
   if (base <= 0) return base
   return base + Math.floor((base * effectiveLevel(state)) / 10)
+}
+
+/** What one tier adds to a range. */
+const RANGE_PER_TIER = 10
+
+/**
+ * RANGE: `base + 10 * full`. READ OFF THE SLIDER AND THE GAME, NOT OFF THE SLIDER'S SOURCE - the
+ * port this file began as copied Range unchanged, and the owner's arrows showed it was wrong
+ * (2026-09-26). Three readings, two items:
+ *
+ *   Mithril Champion Arrows, base 150:  220 at +7 in the game window, 250 at +10 on the slider
+ *   Blessed Champion Arrows, base 170:  270 at +10 on the slider
+ *
+ * Two bases ten tiers up both gained exactly 100, which is what rules out a percentage (170 would
+ * have read 283). TWO THINGS ARE NOT MEASURED and are stated rather than hidden: every reading is
+ * an ARROW, so a bow following the same rule is this file reading the slider's rule as one rule
+ * per key, the way every other rule here is; and every reading is a whole tier, so the fraction
+ * is ignored, as the flat stats ignore it, until a reading says otherwise.
+ */
+export function scaleRange(base: number, state: ItemUpgradeState): number {
+  if (base <= 0) return base
+  return base + RANGE_PER_TIER * normalizeUpgradeState(state).full
 }
 
 /** FLAT (the three regens, Haste): `base + full`, fraction ignored. */
@@ -291,6 +315,17 @@ function scaleWeightText(weight: string | undefined, state: ItemUpgradeState): s
   return scaled === base ? weight : scaled.toFixed(1)
 }
 
+/**
+ * Range is stored as TEXT, and only a range that is ONE whole number scales. The thirty arrow
+ * pages that state a triple ("50 / 75 / 100") survive verbatim: which third is the base is not
+ * something this file knows.
+ */
+function scaleRangeText(range: string | undefined, state: ItemUpgradeState): string | undefined {
+  if (range === undefined || !WHOLE_NUMBER.test(range.trim())) return range
+  return String(scaleRange(Number(range.trim()), state))
+}
+const WHOLE_NUMBER = /^[0-9]+$/
+
 // ---- the API --------------------------------------------------------------------
 
 /**
@@ -303,7 +338,7 @@ function scaleWeightText(weight: string | undefined, state: ItemUpgradeState): s
  * representation, which is the same direction as `excelRound`; no separate helper is needed.
  *
  * Everything the reference leaves alone is COPIED, not recomputed: flags, slot, class/race,
- * skill, Dmg Bon, Backstab, Range, Size, effects, exaltation sockets and `extras`.
+ * skill, Dmg Bon, Backstab, Size, effects, exaltation sockets and `extras`.
  */
 export function scaleStatBlock(block: ItemStatBlock, state: ItemUpgradeState): ItemStatBlock {
   const s = normalizeUpgradeState(state)
@@ -317,6 +352,7 @@ export function scaleStatBlock(block: ItemStatBlock, state: ItemUpgradeState): I
     ...(block.ac === undefined ? {} : { ac: scalePrimary(block.ac, s) }),
     ...(block.dmg === undefined ? {} : { dmg: scaleDamage(block.dmg, s) }),
     weight: scaleWeightText(block.weight, s),
+    ...(block.range === undefined ? {} : { range: scaleRangeText(block.range, s) }),
     flags: [...block.flags],
     effects: [...block.effects],
     exaltationSlots: [...block.exaltationSlots],

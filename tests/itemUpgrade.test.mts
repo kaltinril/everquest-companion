@@ -289,7 +289,9 @@ test('stat keys normalize longest-first, and heroics are not attributes', () => 
   assert.equal(upgradeStatClass('DMG'), 'damage')
   assert.equal(upgradeStatClass('Atk Delay'), 'delay')
   assert.equal(upgradeStatClass('WT'), 'weight')
-  for (const k of ['Attack', 'Dmg Bon', 'Backstab', 'Range', 'Size', 'Rec Level', 'HEROIC STR', 'Charges']) {
+  // Range left the unchanged list on 2026-09-26, on three readings (tests/itemElementalDamage.test.mts).
+  assert.equal(upgradeStatClass('Range'), 'range')
+  for (const k of ['Attack', 'Dmg Bon', 'Backstab', 'Size', 'Rec Level', 'HEROIC STR', 'Charges']) {
     assert.equal(upgradeStatClass(k), 'unchanged', k)
   }
 })
