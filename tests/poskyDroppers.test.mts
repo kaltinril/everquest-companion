@@ -204,20 +204,22 @@ test('an item with no known dropper resolves EMPTY', () => {
   // exists, so none is invented. (Most runes behave this way; Ozah is the exception below.)
   assert.deepEqual(skyDroppersFor('Wind Rune Meda'), [])
   assert.deepEqual(skyDroppersFor('Wind Rune Azia'), [])
-  // No page in the catalog lists this one.
-  assert.deepEqual(skyDroppersFor('Large Sky Lapis'), [])
+  // (Large Sky Lapis stood here until the 2026-09-27 top-up: the Eye of Veeshan page lists it now.)
+  assert.deepEqual(names(skyDroppersFor('Large Sky Lapis')), ['Eye of Veeshan'])
   // A name nothing in EverQuest has ever heard of.
   assert.deepEqual(skyDroppersFor('Sword of Nonexistence'), [])
   assert.deepEqual(skyDroppersFor(''), [])
 })
 
-test('the 2026-08-22 rescrape gave the Azarack pair (and Ozah) a real dropper', () => {
-  // The Protector of Sky page (edited 2026-08-21) now lists Azarack Blood, Azarack Skin and
-  // Wind Rune Ozah in its loot — a triggered Island 2 raid spawn, verified on the live page.
-  // These three used to be the measured no-dropper remainder; they are kill targets now.
+test('the 2026-08-22 rescrape gave the Azarack pair a real dropper', () => {
+  // The Protector of Sky page (edited 2026-08-21) now lists Azarack Blood and Azarack Skin in its
+  // loot — a triggered Island 2 raid spawn, verified on the live page. They used to be the
+  // measured no-dropper remainder; they are kill targets now.
   assert.deepEqual(names(skyDroppersFor('Azarack Blood')), ['Protector of Sky'])
   assert.deepEqual(names(skyDroppersFor('Azarack Skin')), ['Protector of Sky'])
-  assert.deepEqual(names(skyDroppersFor('Wind Rune Ozah')), ['Protector of Sky'])
+  // Wind Rune Ozah was the third until the 2026-09-27 top-up: the page stopped listing it (and
+  // lists Key of Misfortune), so Ozah is a random drop again like every other rune.
+  assert.deepEqual(skyDroppersFor('Wind Rune Ozah'), [])
 })
 
 // =============================================================================
@@ -293,7 +295,8 @@ test('the tracker resolves a kill target for the great majority of its items', (
   assert.ok(resolved.length >= 109, `resolved: ${resolved.length} of ${items.length}`)
   // Every unresolved item is a wind rune or one of the gaps the catalog simply never lists.
   // (Azarack Blood/Skin left this set 2026-08-22 — Protector of Sky now lists them.)
-  const expectedGaps = new Set(['Bixie Stinger', 'Large Sky Lapis'])
+  // (Large Sky Lapis left it 2026-09-27 — Eye of Veeshan now lists it.)
+  const expectedGaps = new Set(['Bixie Stinger'])
   for (const n of unresolved) {
     assert.ok(
       n.toLowerCase().startsWith('wind rune') || expectedGaps.has(n),

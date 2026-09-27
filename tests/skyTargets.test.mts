@@ -240,10 +240,11 @@ test('a missing Wind Rune lands in the collective entry and never on a mob (AE5,
 })
 
 test('a missing item with no known dropper lands in the no-known-source list (AE6, real data)', () => {
-  // Large Sky Lapis: posky states a source in words, the catalog resolves nobody. (This was
-  // Azarack Blood until 2026-08-22, when the Protector of Sky page began listing it.)
-  const row = QUESTS.flatMap((q) => q.items).find((it) => it.name === 'Large Sky Lapis')
-  assert.ok(row, 'Large Sky Lapis is in the committed data')
+  // Bixie Stinger: posky states a source in words, the catalog resolves nobody. (This was
+  // Azarack Blood until 2026-08-22, when the Protector of Sky page began listing it, and Large
+  // Sky Lapis until 2026-09-27, when the Eye of Veeshan page did the same.)
+  const row = QUESTS.flatMap((q) => q.items).find((it) => it.name === 'Bixie Stinger')
+  assert.ok(row, 'Bixie Stinger is in the committed data')
   const droppers = skyDroppersFor(row.name, row.who)
   assert.equal(droppers.length, 0, 'still unresolved in the committed catalog')
   const q = quest({ name: 'Test of Azarack', items: [item({ name: row.name, where: row.where, who: row.who, droppers })] })

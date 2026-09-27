@@ -88,10 +88,14 @@ test('E4: a drop whose page states no era is NOT hidden', () => {
   // layer 1 speaks first and every mob the catalog says drops it lives in Plane of Fear, which
   // `shared/zones.ts` calls classic. Both verdicts render the row PLAINLY, which is the claim the
   // brief was making, so the fold is unchanged - what moves is only which chip (none, vs `era?`).
+  // 2026-09-27 top-up: the wiki has bannered Blood Fire `{{Classic Era}}` since, and with it every
+  // drop Cazic Thule has left carries a banner. The claim is about a row WITHOUT one, so the row is
+  // the committed Blood Fire with the banner taken back off.
   const annotated = annotateDropEras(cazicThule())
-  const bloodFire = (annotated.dropsWiki ?? []).find((d) => d.item === 'Blood Fire')
-  assert.ok(bloodFire)
-  assert.equal(bloodFire.eraTag, undefined, 'its item page carries no era banner')
+  const bannered = (annotated.dropsWiki ?? []).find((d) => d.item === 'Blood Fire')
+  assert.ok(bannered)
+  assert.equal(bannered.eraTag, 'Classic', 'the wiki bannered it; the bare row below is ours')
+  const bloodFire: MobDrop = { ...bannered, eraTag: undefined }
   assert.notEqual(donorEra(dropEraSubject(bloodFire)).verdict, 'out-of-era')
   const { shown } = splitDropsByEra([bloodFire])
   assert.equal(shown.length, 1, 'no verdict is never a reason to hide what the wiki listed')

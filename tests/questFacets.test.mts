@@ -122,9 +122,10 @@ test('LAW 1 — a quest with no resolvable dropper names NO boss, and keeps the 
   // this count is the tripwire that says which world the suite is measuring.
   const bossless = ALL.filter((q) => questBosses(q).length === 0)
   assert.equal(bossless.length, 0, `boss-less quests: ${bossless.length}`)
-  // The synthetic no-dropper quest: an island stated in words, an item no catalog page lists.
+  // The synthetic no-dropper quest: an island stated in words, an item no Sky page lists.
+  // (Large Sky Lapis until the 2026-09-27 top-up, when the Eye of Veeshan page began listing it.)
   const synthetic = {
-    items: [{ where: 'Island 2', droppers: skyDroppersFor('Large Sky Lapis') }]
+    items: [{ where: 'Island 2', droppers: skyDroppersFor('Bixie Stinger') }]
   }
   assert.deepEqual(questBosses(synthetic), [])
   assert.deepEqual(questIslands(synthetic), ['Island 2'])
