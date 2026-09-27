@@ -94,7 +94,10 @@ export function parseMobLoot(block: string): MobDrop[] {
   const re = /\{\{:\s*([^}|]+?)\s*\}\}/g
   const marks: { item: string; end: number }[] = []
   let m: RegExpExecArray | null
-  while ((m = re.exec(block)) !== null) marks.push({ item: m[1].trim(), end: re.lastIndex })
+  // A title's underscores ARE its spaces to MediaWiki: `{{:Brass_Knuckles}}` transcludes the page
+  // `Brass Knuckles`. Nine catalog drops were spelled that way and joined to no item (2026-09-27).
+  const title = (raw: string): string => raw.replace(/[_\s]+/g, ' ').trim()
+  while ((m = re.exec(block)) !== null) marks.push({ item: title(m[1]), end: re.lastIndex })
   for (let i = 0; i < marks.length; i++) {
     const item = marks[i].item
     if (!item) continue
