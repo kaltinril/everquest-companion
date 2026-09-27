@@ -328,18 +328,27 @@ const ONE_HAND_DPS: RoleWeights = {
 const TWO_HAND_DPS: RoleWeights = { ...ONE_HAND_DPS, stats: { ...MELEE_STATS } }
 
 /**
- * THE RANGED PROFILE. DEX is the accuracy and damage stat for archery and throwing in this era,
- * so it is the one attribute a ranged focus weighs ABOVE the melee's (2 to their 1), and STR falls
- * to 0.8 because a bow does not read it the way a sword does. ATTACK still counts (the ranged
- * rolls read it too), haste applies to ranged delay (2, below the melee's 4 — a ranged fight is
- * rarely a sustained swing — it inherits the melee weight), and the damage bonus rides the
- * ratio. Everything else is the
- * melee profile: a ranger takes hits, drinks, and has a bar. The weapon RATIO is the same 20 and
- * reads DMG/DELAY off a bow exactly as off an axe — the corpus states both for every bow and
- * throwing weapon, so nothing here is a ranged-only invention.
+ * THE RANGED PROFILE. DEX is the bow's stat - the wiki's Statistics page gives it bow average hit,
+ * and its class pages ranged crit chance - so it is the one attribute a ranged focus weighs far
+ * above the melee's (2 to their 0.4).
+ *
+ * STR AND ATTACK ARE NEARLY NOTHING HERE, since 2026-09-26 (they were 0.8 and the melee's 2). Two
+ * player reports the owner brought in say the same thing from two directions: that attack *"only
+ * makes a big difference with melee"* and that what moves a bow is archery buffs, ranged foci and
+ * raw DEX; and that bow hits did not move between high and low STR at one DEX. NEITHER IS MEASURED
+ * HERE - no log this fork holds has a bow in it - so the numbers are a judgement, like every other
+ * in this table. They are not zero because a ranged character still swings when something closes
+ * on them, and a tie between two DEX items may as well break toward the one that helps then.
+ *
+ * Everything else is the melee profile: a ranger takes hits, drinks, and has a bar. Haste inherits
+ * the melee weight. The weapon RATIO is the melee's 40 and reads DMG/DELAY off a bow exactly as
+ * off an axe - the corpus states both for every bow and throwing weapon, so nothing here is a
+ * ranged-only invention. ARCHERY BUFFS AND RANGED FOCI ARE NOT SCORED, because no equippable row
+ * in the committed corpus carries one (2026-09-26 census: Hawk Eye is a spell with no item that
+ * grants it, and none of the 254 focus and worn effect lines names archery or accuracy).
  */
 const RANGED: RoleWeights = {
-  stats: { ...MELEE_STATS, STR: 0.8, DEX: 2 },
+  stats: { ...MELEE_STATS, STR: 0.2, DEX: 2, ATTACK: 0.5 },
   manaStat: 0.1,
   ehp: 0.1,
   ratio: 40,
