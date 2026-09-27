@@ -390,11 +390,11 @@ test('a stored toolbar choice degrades the same way a column choice does', () =>
   // exactly `['slot','classes']`, and it now resolves to `['slot','weapon','classes']`. See the next
   // test and `gearPrefs.LEGACY_GEAR_CONTROLS` — a legacy list cannot have hidden a control that did
   // not exist when it was written, so `weapon` joins every one of these — AND SO DOES `haste`
-  // (added 2026-08-15), by exactly the same rule. The DEGRADATION claim these lines were written
-  // for is untouched: unknown keys still drop out, repeats still collapse.
-  assert.deepEqual(sanitizeControls(['slot', 'classOnly', 'classes']), ['slot', 'weapon', 'classes', 'haste'])
-  assert.deepEqual(sanitizeControls(['upgrade', 'ratio', 'thresholds', 'era']), ['weapon', 'era', 'haste', 'upgrade'])
-  assert.deepEqual(sanitizeControls(['era', 'nope', 'era', 7, 'slot']), ['slot', 'weapon', 'era', 'haste'])
+  // (added 2026-08-15) AND `zone` (2026-09-26), by exactly the same rule. The DEGRADATION claim
+  // these lines were written for is untouched: unknown keys still drop out, repeats still collapse.
+  assert.deepEqual(sanitizeControls(['slot', 'classOnly', 'classes']), ['slot', 'weapon', 'classes', 'haste', 'zone'])
+  assert.deepEqual(sanitizeControls(['upgrade', 'ratio', 'thresholds', 'era']), ['weapon', 'era', 'haste', 'zone', 'upgrade'])
+  assert.deepEqual(sanitizeControls(['era', 'nope', 'era', 7, 'slot']), ['slot', 'weapon', 'era', 'haste', 'zone'])
   // ORDER IS THE BAR'S, not the store's — and that is not a loss. A control list is turned into a
   // Set by `controlsVisible` and `GearFilterBar` draws in its own fixed order, so unlike the COLUMN
   // list (which the user can see the order of) this one has no order anybody can observe.

@@ -119,7 +119,7 @@ import {
   type GearColumnFixture
 } from './gearColumnSteps.mjs'
 // JOS-302's class, slot-union and weapon-type steps, likewise.
-import { clearPicks, pickIn, stepGearClassFilter, stepGearSlotPicks, stepGearWeaponTypes } from './gearFilterSteps.mjs'
+import { clearPicks, pickIn, stepGearClassFilter, stepGearSlotPicks, stepGearWeaponTypes, stepGearZonePicks } from './gearFilterSteps.mjs'
 // JOS-336's EFFECTIVE HP step: pick the derived column, sort it, and move the slider under it.
 import { stepGearEffectiveHp } from './gearEffectiveHpSteps.mjs'
 // JOS-335's wish gesture — a module for the same reason, and it spans two tabs (its header argues
@@ -627,6 +627,8 @@ async function steps(app: ElectronApplication, page: Page, log: FixtureLog): Pro
     // narrowing: its whole subject is what one picker does to the whole corpus, and it hands the
     // tab back with both of its pickers empty.
     await stepGearWeaponTypes(page)
+    // The zone picker (2026-09-26) runs on the same unnarrowed corpus and hands it back the same way.
+    await stepGearZonePicks(page)
     // The token and the chip run on the corpus the weapon step left unnarrowed, columns derived
     // (AC is a core column); both hand the tab back exactly as they found it.
     await stepGearThreshold(page)

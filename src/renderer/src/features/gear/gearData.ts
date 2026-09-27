@@ -45,6 +45,8 @@ import { gearOwnershipMap, ownershipFor, type GearOwnershipMap } from './gearOwn
 // JOS-329: the two pieces of state below survive a tab switch now — see each one's own comment.
 import { sanitizeGearClassPins, sanitizeUpgrade, type GearClassPins } from './areaMemory'
 import { useRemembered } from './useAreaMemory'
+import type { ZoneShort } from '@shared/maps'
+import { gearZoneOptions } from './gearZones'
 
 /**
  * The index row as the TABLE reads it: the drop trio's four arrays REQUIRED rather than optional
@@ -106,6 +108,8 @@ function toRow(row: GearRow): GearViewRow {
 
 export interface GearIndexState {
   rows: GearViewRow[]
+  /** the zones the Zones picker offers (`gearZoneOptions`) — built with the rows, once per window */
+  zones: ZoneShort[]
   /** false until the first fetch settles */
   ready: boolean
   /** the corpus's own `scrapedAt` — WHEN the data is from */
@@ -115,7 +119,7 @@ export interface GearIndexState {
   refused: boolean
 }
 
-const EMPTY: GearIndexState = { rows: [], ready: false, scrapedAt: null, stats: null, refused: false }
+const EMPTY: GearIndexState = { rows: [], zones: [], ready: false, scrapedAt: null, stats: null, refused: false }
 
 let CACHE: GearIndexState | null = null
 let INFLIGHT: Promise<GearIndexState> | null = null
@@ -126,6 +130,7 @@ async function fetchIndex(): Promise<GearIndexState> {
     payload.version === GEAR_INDEX_VERSION
       ? {
           rows: payload.rows.map(toRow),
+          zones: gearZoneOptions(payload.rows),
           ready: true,
           scrapedAt: payload.scrapedAt,
           stats: payload.stats,

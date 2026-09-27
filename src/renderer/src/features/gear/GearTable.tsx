@@ -387,7 +387,7 @@ const GearLine = memo(function GearLine({
       <TableCell title={row.classes.join(' ')}>{classText(row.classes)}</TableCell>
       {showDrops && (
         <>
-          <TableCell title={row.dropZones.join(' · ')}>
+          <TableCell data-testid="gear-cell-zone" title={row.dropZones.join(' · ')}>
             <OverflowCell values={row.dropZones} open={dropZoneOpen(row, on.openMapZone)} />
           </TableCell>
           {/* dropLevels[i] IS dropMobs[i]'s level (shared/itemSources.dropDetails, at build), so the title can pair them. */}
