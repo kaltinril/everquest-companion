@@ -292,15 +292,19 @@ test('the unindexed stat keys are exactly the eight the corpus states', () => {
   // as the weapon's own damage (tests/itemElementalDamage.test.mts). They ARE a gear fact, and the
   // table has no column for them: six pages state one, the item card draws the line, and the
   // weapon's DMG column is right again, which is what the report was about.
-  assert.deepEqual(Object.keys(index.stats.unindexedStatKeys).sort(), [
+  //
+  // `REQ_LEVEL` IS ALLOWED, NOT REQUIRED, since 2026-09-27: the wiki spelled its eight pages out,
+  // so the corpus the creator ships still states it and a refreshed one does not. It is set aside
+  // before the equality, which still stops the suite on any spelling nobody has read.
+  const keys = Object.keys(index.stats.unindexedStatKeys).filter((k) => k !== 'REQ_LEVEL')
+  assert.deepEqual(keys.sort(), [
     'CAST_TIME',
     'CHARGES',
     'COLD_DMG',
     'COOLDOWN',
     'FIRE_DMG',
     'POISON_DMG',
-    'REQUIRED_LEVEL',
-    'REQ_LEVEL'
+    'REQUIRED_LEVEL'
   ])
 })
 
