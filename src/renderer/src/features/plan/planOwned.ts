@@ -33,6 +33,7 @@ import type { EquipSlot } from '../../../../shared/planner/types'
 import {
   ownedHasteOutside,
   roleValue,
+  wearable,
   type OwnedHaste,
   type PlanScope
 } from '../../../../shared/planner/progressionPlan'
@@ -169,6 +170,11 @@ export interface OwnedUpgrade {
  * shipped without one: "it's recommending my 2h for 1h dps" — a banked two-hander is not advice a
  * 1H focus may give about the main hand, exactly as the route may not suggest one). A slot with NO
  * bar is a gap and the held item fills it. Sorted best first.
+ *
+ * AND THROUGH THE SAME CLASS GATE (fork report, kaltinril 2026-09-27: a WAR/MNK/SHM trio was told
+ * to equip Windstriker, RNG only, and a PAL and an SHD shield). What sits in the bank is not what
+ * the trio can wear, and the route's own `wearable` is the question, asked the route's way: a row
+ * that states no classes, or a trio nobody stated, gates nothing.
  */
 export function ownedUpgrades(
   keys: OwnedKeys,
@@ -182,7 +188,7 @@ export function ownedUpgrades(
   for (const key of keys.held) {
     if (keys.worn.has(key) || keys.wornAny.has(key)) continue
     const row = byKey.get(key)
-    if (row === undefined) continue
+    if (row === undefined || !wearable(row, scope.classes)) continue
     let bestSlot: EquipSlot | undefined
     let bestScore = -Infinity
     for (const slot of row.slots) {

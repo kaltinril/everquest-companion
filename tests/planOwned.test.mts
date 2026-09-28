@@ -333,6 +333,38 @@ test('the advisory obeys the weapon-slot policy: a banked 2H is not main-hand ad
   assert.deepEqual(ups2.map((u) => u.name), ['Monsoon, Sword of the Swiftwind'])
 })
 
+test('the advisory obeys the class gate: a banked bow only a ranger can draw is not advice to a monk', () => {
+  // Fork report, 2026-09-27, a WAR/MNK/SHM trio: "it's recommending is RNG (Ranger) only". Five
+  // items were named and four were another class's. The real rows' slots and classes, stats cut
+  // to what the focus reads.
+  const WINDSTRIKER = row({
+    key: 'windstriker', name: 'Windstriker', slots: ['RANGE'], classes: ['RNG'],
+    skill: 'Archery', stats: { DMG: 45, DELAY: 60 }
+  })
+  const PAL_SHIELD = row({
+    key: 'shield of the stalwart seas', name: 'Shield of the Stalwart Seas', slots: ['SECONDARY'],
+    classes: ['PAL'], stats: { AC: 35 }
+  })
+  const SASH = row({
+    key: 'golden sash of tranquility', name: 'Golden Sash of Tranquility', slots: ['WAIST'],
+    classes: ['MNK'], stats: { AC: 5 }
+  })
+  const UNSTATED = row({ key: 'plain belt', name: 'Plain Belt', slots: ['WAIST'], stats: { AC: 3 } })
+  const rows = [WINDSTRIKER, PAL_SHIELD, SASH, UNSTATED]
+  const byKey = new Map(rows.map((r) => [r.key, r]))
+  const keys = ownedKeysOf(new Map(rows.map((r) => [r.key, own({ facts: [at('bank')] })])))
+  const trio = { role: 'dps1h' as const, classes: ['WAR' as const, 'MNK' as const, 'SHM' as const] }
+  const ups = ownedUpgrades(keys, byKey, ownedSide(keys, byKey, trio), trio)
+  // The monk's sash, and nothing a ranger or a paladin wears. The belt that states no classes is
+  // kept, the route's own reading ("UNKNOWN, never nobody"); nothing is worn at the waist, so
+  // both fill the gap.
+  assert.deepEqual(ups.map((u) => u.name), ['Golden Sash of Tranquility', 'Plain Belt'])
+  // And a trio nobody stated gates nothing, as on the route.
+  const anyone = { role: 'dps1h' as const, classes: [] }
+  const all = ownedUpgrades(keys, byKey, ownedSide(keys, byKey, anyone), anyone).map((u) => u.name)
+  assert.ok(all.includes('Windstriker') && all.includes('Shield of the Stalwart Seas'), all.join(', '))
+})
+
 test('a 3-STA necklace does not beat the worn regen talisman: regen keeps a glass floor', () => {
   // The seventh field case (fork, 2026-09-05: "regen should mean something more than nothing") —
   // when regen slid from zero like the mitigation rows, every trinket with a scrap of garnish

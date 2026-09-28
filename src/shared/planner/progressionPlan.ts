@@ -460,7 +460,7 @@ function baseName(name: string): string {
  * (`gear.ts`: "UNKNOWN, never 'nobody'"), so it is KEPT. And an empty INPUT trio means the surface
  * has no class detection to gate with, which gates nothing rather than everything.
  */
-function wearable(row: GearRow, classes: readonly ClassAbbr[]): boolean {
+export function wearable(row: GearRow, classes: readonly ClassAbbr[]): boolean {
   if (row.classes.length === 0 || classes.length === 0) return true
   return row.classes.some((c) => classes.includes(c))
 }
