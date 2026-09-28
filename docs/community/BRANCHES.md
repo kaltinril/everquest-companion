@@ -127,10 +127,10 @@ Failures that are not regressions, so the gate can tell a new red from an old on
 
 - 2 `enginePackaging` signing assertions (the TEST neutering turns signing off on purpose).
 - 1 `rustFactoring` register count (pending a hand edit to `engine/factoring-baseline.json`).
-- 5 delta-data reds from the local re-scrape, as of the 2026-09-27 top-up: the slot table
-  (`Legs`, `PRIMARY,`), the class table (`SHA`), the unindexed stat keys (`REQ_LEVEL` left the
-  corpus), `eraFromTag` (the catalog lists no Greenmist armour) and the layer-3 census floor.
-  Each failing test names its tokens. The icon red and the two canonical-token reds cleared
-  with that top-up.
+
+The delta-data reds that stood here from 2026-09-04 cleared with the 2026-09-27 top-up. A
+top-up is not finished until the creator's data-pinned tests are re-measured against it: wiki
+typos are corrected on the wiki and read back by a second delta run, the fact pins and floors
+move on `local-data-refresh`, and a census that compared case moves on `catch_all`.
 
 Every feature branch is green on its own.
