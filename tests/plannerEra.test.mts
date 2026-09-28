@@ -240,11 +240,13 @@ test('eraFromTag is the hand-authored table, token for token (law 12)', () => {
   assert.equal(eraBadge('FearHateRevamp'), 'out')
 
   // The evidence that used to justify `classic` is re-derived here anyway, because it is still
-  // TRUE and still not enough: the Greenmist droppers really do live in a zone this server ships,
+  // TRUE and still not enough: the revamp droppers really do live in a zone this server ships,
   // and the armour is still out-of-era, because the zone cannot speak for a revamped drop table.
-  const greenmist = catalog.mobs.filter((m) => (m.drops ?? []).some((d) => /^Greenmist /i.test(d)))
-  assert.ok(greenmist.length > 0, 'the catalog no longer lists Greenmist armour at all')
-  for (const mob of greenmist) {
+  // (Greenmist armour was the example until the 2026-09-04 top-up, when the mob pages stopped
+  // listing it; Pauldrons of Ferocity carries the same banner and Cazic Thule still lists it.)
+  const revamp = catalog.mobs.filter((m) => (m.drops ?? []).includes('Pauldrons of Ferocity'))
+  assert.ok(revamp.length > 0, 'the catalog no longer lists Pauldrons of Ferocity at all')
+  for (const mob of revamp) {
     assert.equal(eraVerdict(mob.zones ?? []), 'in-era', `${mob.name} ${JSON.stringify(mob.zones)}`)
     assert.equal(layeredVerdict(mob.zones ?? [], 'FearHateRevamp'), 'out-of-era', mob.name)
   }
