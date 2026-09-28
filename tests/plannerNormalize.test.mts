@@ -148,8 +148,12 @@ test('the slot table covers the whole committed corpus', () => {
   assert.ok(stated >= 6000, `only ${stated} pages state a slot — expected >= 6000`)
   assert.deepEqual(stray.slice(0, 20), [], 'slot tokens the hand-authored table does not know')
   // Every token the corpus states must be in the table above, so the inventory can't drift.
-  const known = new Set(SLOT_TOKENS.map(([t]) => t))
-  assert.deepEqual([...seen].filter((t) => !known.has(t)), [], 'corpus token missing from SLOT_TOKENS')
+  // Compared the way the table reads a token, case and trailing punctuation folded (owner,
+  // 2026-09-27: LEGS = legs = Legs): a new SPELLING of a known slot is not a new slot, and the
+  // wiki writes one with every wave (`Legs` and `PRIMARY,` in the 2026-09-27 top-up).
+  const fold = (t: string): string => t.replace(/[,.;:]+$/, '').toUpperCase()
+  const known = new Set(SLOT_TOKENS.map(([t]) => fold(t)))
+  assert.deepEqual([...seen].filter((t) => !known.has(fold(t))), [], 'corpus token missing from SLOT_TOKENS')
 })
 
 // ---- classes ----------------------------------------------------------------------
@@ -211,8 +215,10 @@ test('the class table covers the whole committed corpus', () => {
   // The measured token inventory: 16 codes + ALL/All + NONE/None + except + two annotations —
   // plus `War`, the one Title Case class code the 2026-08-22 rescrape added (the case fold
   // already normalizes it; it is listed so the inventory stays a census and not a guess).
-  const known = new Set<string>([...CLASS_ABBRS, 'ALL', 'All', 'NONE', 'None', 'except', '(35)', '(48)', 'War'])
-  assert.deepEqual([...seen].filter((t) => !known.has(t)), [], 'corpus class token outside the measured set')
+  // Case is folded here as the table folds it, so `War` and `All` are the codes they spell.
+  const known = new Set<string>([...CLASS_ABBRS, 'ALL', 'NONE', 'EXCEPT', '(35)', '(48)'])
+  const stray = [...seen].filter((t) => !known.has(t.toUpperCase()))
+  assert.deepEqual(stray, [], 'corpus class token outside the measured set')
 })
 
 // ---- socket types (D2) -------------------------------------------------------------
