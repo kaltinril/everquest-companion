@@ -188,10 +188,11 @@ test('THE WHOLE POINT: the corrected quest infers from a held reward, the stale 
 
 test('the corrected reward is what an inventory export actually spells (the report)', () => {
   // The join this row exists to close: the export's raw name, lowercased the way
-  // `heldCountsFromDump` stores it, must equal the corrected reward's counting key. Item id 27723,
-  // "Amulet of the Fae", Bank7-Slot1 of the export attached to 01M0FH3XC4ST5Q3XXPJ0H3X75J.
-  const bard = SKY_QUEST_REWARDS.find((r) => r.questName === 'Bard Test of Wind')
-  assert.ok(bard, 'the reported row has left the table')
-  assert.equal(itemKey('Amulet of the Fae'), itemKey(bard.to))
-  assert.notEqual(itemKey('Amulet of the Fae'), itemKey(bard.from))
+  // `heldCountsFromDump` stores it, must equal the corrected reward's counting key. Item id
+  // 177762, "Griffin-Hide Armguards", Bank12-Slot12 of an export that never enters git. (The Bard
+  // row stood here, item id 27723 "Amulet of the Fae", until the wiki caught up to it 2026-09-27.)
+  const beastlord = SKY_QUEST_REWARDS.find((r) => r.questName === 'Beastlord Test of Harpy')
+  assert.ok(beastlord, 'the reported row has left the table')
+  assert.equal(itemKey('Griffin-Hide Armguards'), itemKey(beastlord.to))
+  assert.notEqual(itemKey('Griffin-Hide Armguards'), itemKey(beastlord.from))
 })
