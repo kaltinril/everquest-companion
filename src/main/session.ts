@@ -56,6 +56,9 @@ import { markFunnelStep } from './telemetry'
 import { stopWatchingForQuietSwitch, watchForQuietSwitch } from './switchNudge'
 // A leaf (see its header) — the two dump loads below are timed seams.
 import { timeSeam } from './perfAttribution'
+// The achievements dump's Slayer counters: their own read and their own store write.
+import { loadSlayer } from './outputs/slayer'
+import { setSlayer } from './storeSlayer'
 // WHO OWNS THE WORLD RIGHT NOW (JOS-457). Every switch takes a turn and re-asks `owns()` after
 // every point it could have been suspended; a turn that has lost touches nothing shared and
 // returns. The whole argument — why a generation and not a queue or a mutex — is in that file.
@@ -560,6 +563,8 @@ function loadAchievementsNow(ref: CharacterRef, why: 'startup' | 'watch'): void 
   // A TIMED SEAM, on `loadInventoryNow`'s terms exactly — same shape of work, same second file,
   // same place in `tailCharacter`, and the guard is likewise outside the bracket.
   timeSeam('achievementsLoad', () => {
+    const slayer = loadSlayer(who.name, who.server)
+    if (slayer) setSlayer(activeCharId(), slayer)
     const res = loadAchievements(who.name, who.server)
     if (!res) return
     setAchievements(activeCharId(), res.unlocks, res.source)

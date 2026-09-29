@@ -6,6 +6,7 @@ import BarChartIcon from '@mui/icons-material/BarChart'
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
+import MilitaryTechIcon from '@mui/icons-material/MilitaryTech'
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 import TimerIcon from '@mui/icons-material/Timer'
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh'
@@ -18,7 +19,7 @@ import FeedbackIcon from '@mui/icons-material/Feedback'
 // an icon whose only use sits inside a `false &&` branch is tree-shaken out with the branch.
 import RuleFolderIcon from '@mui/icons-material/RuleFolder'
 import UpdateChip from './UpdateChip'
-import { OWNER_TOOLS } from '../devFlags'
+import { OWNER_TOOLS, UNRELEASED } from '../devFlags'
 import type { PrefsRouting } from '../appRouting'
 import { GEAR_AREA_VIEWS, VIEW_LABELS, loadGearTab, type View } from '../appViews'
 
@@ -98,6 +99,9 @@ const ROWS: NavRow[] = [
   },
   { view: 'maps', icon: <MapIcon /> },
   { view: 'bosses', icon: <EmojiEventsIcon /> },
+  // SLAYER (UNRELEASED) sits under Raid Targets: both are lists of things to go and kill. The row
+  // is built inside the conditional, so a build without the flag folds it away, icon and all.
+  ...(UNRELEASED ? [{ view: 'slayer' as View, icon: <MilitaryTechIcon /> }] : []),
   { view: 'posky', icon: <ShieldMoonIcon /> },
   { view: 'alerts', icon: <NotificationsActiveIcon /> },
   { view: 'leveling', icon: <TrendingUpIcon /> },

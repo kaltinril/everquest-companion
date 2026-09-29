@@ -22,6 +22,7 @@ import type { InventorySource } from './outputs/baseline'
 import type { ExaltPlan } from './planner/types'
 import type { GearSet } from './planner/gearSet'
 import type { WishList } from './planner/wishlist'
+import type { SlayerRecord } from './outputs/slayer'
 
 /** Held-item counts keyed by lowercased item name. */
 export type HeldCounts = Record<string, number>
@@ -208,6 +209,13 @@ export interface ProgressState {
    * both halves).
    */
   wishlist?: WishList
+  /**
+   * WHAT IS LEFT OF THE SLAYER ACHIEVEMENTS, as the last `/outputfile achievements` dump stated
+   * it: the open kill counters and the General achievements' open requirements
+   * (shared/outputs/slayer.ts). Written beside `achievementUnlocks` from the same file, so
+   * `achievementsSource` dates it. Additive and optional, the `exaltPlans` precedent.
+   */
+  slayer?: SlayerRecord
   /**
    * GROUP-ROSTER user edits (docs/plans/group-model.md §3). Character-scoped, like everything
    * else here. The roster itself is re-derived from the log on every replay; an edit is the one
