@@ -44,6 +44,7 @@
     }
   ],
   "rendererOnly": [
+    "src/renderer/src/data/eqlegends/mobRaces.json",
     "src/renderer/src/data/eqlegends/posky.json",
     "src/renderer/src/data/eqlegends/quests.json"
   ]

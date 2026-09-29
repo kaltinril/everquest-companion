@@ -10,6 +10,10 @@ export type View =
   | 'mobs'
   | 'maps'
   | 'bosses'
+  // SLAYER (2026-09-28): where to go for the Slayer achievements the newest `/outputfile
+  // achievements` dump says are still open. UNRELEASED like every new tab: in `KNOWN_VIEWS` only
+  // behind the flag's splice, its nav row gated the same way, and absent from `TELEMETRY_VIEWS`.
+  | 'slayer'
   | 'posky'
   | 'alerts'
   | 'leveling'
@@ -116,6 +120,7 @@ export const VIEW_LABELS: Record<View, string> = {
   mobs: 'Mobs',
   maps: 'Maps',
   bosses: 'Raid Targets',
+  slayer: 'Slayer',
   posky: 'Plane of Sky',
   alerts: 'Alerts',
   leveling: 'Leveling',
@@ -166,6 +171,9 @@ const KNOWN_VIEWS: View[] = [
   'mobs',
   'maps',
   'bosses',
+  // The review-gate splice: a dev server draws the Slayer tab, a packaged build bounces a
+  // persisted 'slayer' to the default view instead of routing to a tab it will not draw.
+  ...(UNRELEASED ? (['slayer'] as const) : []),
   'posky',
   'alerts',
   'leveling',

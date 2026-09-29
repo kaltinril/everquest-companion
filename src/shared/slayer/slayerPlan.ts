@@ -1,0 +1,242 @@
+// slayerPlan.ts — WHERE TO GO for a set of Slayer counters. Pure: no Node, no Electron, no React.
+//
+// THE QUESTION (owner ask, 2026-09-28): one achievement wants gargoyles or scarecrows, another
+// wants bats, and a place that has both is the better trip. So the unit of the answer is a ZONE,
+// and a zone is better the more of the picked counters it serves at once.
+//
+// WHAT A ZONE IS RANKED ON, in this order:
+//   1. how many of the picked counters have at least one mob there;
+//   2. `advances`: counter ticks per clear of the zone's matching spawn points. A spawn point
+//      whose mob counts toward three picked counters is three ticks (one gnoll kill moves
+//      `Gnolls` in Conquest, Special and Skill together);
+//   3. the name, so the order is total.
+//
+// WHAT A SPAWN POINT IS. The wiki's stated `/loc` rows on the mob's page (`MobEntry.loc`). A mob
+// whose page states none counts as one, and so does a mob whose page names several zones, because
+// the page does not say which location is in which zone. It is a count of places to stand, not a
+// kill rate: the catalog states a respawn time for one page in twenty.
+//
+// WHAT IS LEFT OUT, and both are switches on `PlanOptions`:
+//   - a mob whose lowest stated level is above `maxLevel`;
+//   - a zone every era reading places in a later expansion than the server has opened.
+// A zone the era table makes no claim about stays in (`unknown` is not `out-of-era`).
+
+import type { ZoneShort } from '../maps'
+import type { MobEntry } from '../mobTypes'
+import { achievementKey, type SlayerCounter } from '../outputs/slayer'
+import { eraVerdict } from '../planner/era'
+import { ZONES, zoneKey, zoneShortNameFromCatalog } from '../zones'
+import {
+  labelMatcher,
+  matchMob,
+  mobFacts,
+  strictMatcher,
+  type LabelMatcher,
+  type MatchBasis,
+  type MobFacts
+} from './slayerMatch'
+
+/** A counter with its requirement line compiled. */
+export interface SlayerTarget {
+  id: string
+  counter: SlayerCounter
+  matcher: LabelMatcher
+}
+
+/** A counter's identity: `I'm a People Person!` has one counter per race under one name. */
+export function counterId(c: SlayerCounter): string {
+  return `${c.achievement} / ${c.label}`
+}
+
+/** The one achievement that counts the race itself (slayerMatch.ts `strictMatcher`). */
+const STRICT_ACHIEVEMENT = "i'm a people person!"
+
+export function slayerTarget(counter: SlayerCounter): SlayerTarget {
+  const strict = achievementKey(counter.achievement) === STRICT_ACHIEVEMENT
+  const matcher = strict ? strictMatcher(counter.label) : labelMatcher(counter.label)
+  return { id: counterId(counter), counter, matcher }
+}
+
+/** A catalog mob with everything the join reads, computed once. */
+export interface SlayerMob {
+  entry: MobEntry
+  facts: MobFacts
+  /** the lowest and highest level the page states; null when it states none */
+  low: number | null
+  high: number | null
+}
+
+/** The number the text opens with, and the one a dash or `to` joins to it. */
+const LEVEL_RE = /^\D{0,12}?(\d+)(?:\s*(?:-|to)\s*(\d+))?/
+
+/**
+ * `36-40`, `2 - 4`, `18`, `50+`. ONLY THE OPENING OF THE TEXT IS READ: the field is prose on some
+ * pages (`6 (strangely cons dark blue to me at lvl 42, at night)`), and a number further in is
+ * somebody's character, not the mob.
+ */
+export function levelSpan(text: string | undefined): { low: number | null; high: number | null } {
+  const found = LEVEL_RE.exec(text ?? '')
+  if (found === null) return { low: null, high: null }
+  const a = Number(found[1])
+  const b = found[2] === undefined ? a : Number(found[2])
+  return { low: Math.min(a, b), high: Math.max(a, b) }
+}
+
+/** A span as the tab prints it: `14-17`, `20`, or nothing when the page stated no level. */
+function levelText(low: number | null, high: number | null): string {
+  if (low === null || high === null) return ''
+  return low === high ? String(low) : `${String(low)}-${String(high)}`
+}
+
+export function slayerMobs(
+  catalog: readonly MobEntry[],
+  raceOf: (page: string) => string | undefined
+): SlayerMob[] {
+  return catalog.map((entry) => ({
+    entry,
+    facts: mobFacts(entry.name, raceOf(entry.page)),
+    ...levelSpan(entry.level)
+  }))
+}
+
+export interface PlanOptions {
+  /** leave out mobs whose lowest stated level is above this; null keeps every level */
+  maxLevel: number | null
+  /** keep zones from expansions the server has not opened */
+  outOfEra: boolean
+}
+
+/** One mob in a zone that counts toward at least one picked counter. */
+export interface PlanMob {
+  /** the catalog row, which is what a link to the mob's page pins its identity with */
+  entry: MobEntry
+  name: string
+  /** the stated level as numbers (`14-17`), '' when the page stated none */
+  level: string
+  spawns: number
+  /** `name` when any counter it is listed for was read off its name */
+  basis: MatchBasis
+  targets: string[]
+}
+
+export interface PlanZone {
+  key: string
+  name: string
+  /** the map stem, when the zone table knows the zone */
+  short: ZoneShort | null
+  mobs: PlanMob[]
+  /** the picked counters with a mob here, in the order they were picked */
+  targets: string[]
+  spawns: number
+  advances: number
+  low: number | null
+  high: number | null
+}
+
+let NAME_BY_SHORT: Map<ZoneShort, string> | null = null
+
+function zoneNameByShort(): Map<ZoneShort, string> {
+  NAME_BY_SHORT ??= new Map(ZONES.map((z) => [z.short, z.name]))
+  return NAME_BY_SHORT
+}
+
+/** The catalog writes placeholders where a zone belongs; they are not places to go. */
+const NOT_A_ZONE = new Set(['', 'various', 'varies', 'unknown', 'none', '?'])
+
+function spawnPoints(entry: MobEntry): number {
+  if ((entry.zones?.length ?? 0) !== 1) return 1
+  return Math.max(1, entry.loc?.length ?? 0)
+}
+
+/** The mob as one zone row's line, or null when it counts toward nothing picked. */
+function planMob(mob: SlayerMob, targets: readonly SlayerTarget[]): PlanMob | null {
+  const hits: string[] = []
+  let basis: MatchBasis = 'race'
+  for (const t of targets) {
+    const how = matchMob(t.matcher, mob.facts)
+    if (how === null) continue
+    hits.push(t.id)
+    if (how === 'name') basis = 'name'
+  }
+  if (hits.length === 0) return null
+  const { entry } = mob
+  return {
+    entry,
+    name: entry.name,
+    level: levelText(mob.low, mob.high),
+    spawns: spawnPoints(entry),
+    basis,
+    targets: hits
+  }
+}
+
+function emptyZone(key: string, catalogName: string): PlanZone {
+  const short = zoneShortNameFromCatalog(catalogName)
+  const name = (short === null ? undefined : zoneNameByShort().get(short)) ?? catalogName
+  return { key, name, short, mobs: [], targets: [], spawns: 0, advances: 0, low: null, high: null }
+}
+
+function addMob(zone: PlanZone, row: PlanMob, mob: SlayerMob): void {
+  zone.mobs.push(row)
+  zone.spawns += row.spawns
+  zone.advances += row.spawns * row.targets.length
+  if (mob.low !== null) zone.low = zone.low === null ? mob.low : Math.min(zone.low, mob.low)
+  if (mob.high !== null) zone.high = zone.high === null ? mob.high : Math.max(zone.high, mob.high)
+}
+
+/** The zones a mob is filed under that are places and that the options keep. */
+function keptZones(entry: MobEntry, opts: PlanOptions): string[] {
+  return (entry.zones ?? []).filter((z) => {
+    if (NOT_A_ZONE.has(zoneKey(z))) return false
+    return opts.outOfEra || eraVerdict([z]) !== 'out-of-era'
+  })
+}
+
+function byRank(a: PlanZone, b: PlanZone): number {
+  return (
+    b.targets.length - a.targets.length || b.advances - a.advances || a.name.localeCompare(b.name)
+  )
+}
+
+/** Every zone with a mob that counts toward a picked counter, best first. */
+export function planZones(
+  mobs: readonly SlayerMob[],
+  targets: readonly SlayerTarget[],
+  opts: PlanOptions
+): PlanZone[] {
+  const zones = new Map<string, PlanZone>()
+  for (const mob of mobs) {
+    if (opts.maxLevel !== null && mob.low !== null && mob.low > opts.maxLevel) continue
+    const row = planMob(mob, targets)
+    if (row === null) continue
+    for (const catalogName of keptZones(mob.entry, opts)) {
+      const key = zoneShortNameFromCatalog(catalogName) ?? zoneKey(catalogName)
+      const zone = zones.get(key) ?? emptyZone(key, catalogName)
+      zones.set(key, zone)
+      addMob(zone, row, mob)
+    }
+  }
+  const order = new Map(targets.map((t, i) => [t.id, i]))
+  for (const zone of zones.values()) {
+    const seen = new Set(zone.mobs.flatMap((m) => m.targets))
+    zone.targets = [...seen].sort((a, b) => (order.get(a) ?? 0) - (order.get(b) ?? 0))
+    zone.mobs.sort((a, b) => b.spawns * b.targets.length - a.spawns * a.targets.length)
+  }
+  return [...zones.values()].sort(byRank)
+}
+
+/** How many zones and spawn points each counter has, over a plan made for ALL of them. */
+export function targetReach(zones: readonly PlanZone[]): Map<string, { zones: number; spawns: number }> {
+  const reach = new Map<string, { zones: number; spawns: number }>()
+  for (const zone of zones) {
+    const here = new Map<string, number>()
+    for (const mob of zone.mobs) {
+      for (const id of mob.targets) here.set(id, (here.get(id) ?? 0) + mob.spawns)
+    }
+    for (const [id, spawns] of here) {
+      const r = reach.get(id) ?? { zones: 0, spawns: 0 }
+      reach.set(id, { zones: r.zones + 1, spawns: r.spawns + spawns })
+    }
+  }
+  return reach
+}

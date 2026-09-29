@@ -43,6 +43,7 @@ import { mapFromLoc, type EqLoc, type LayerMask } from './mapGeometry'
 import { bandRange, type FloorBand } from './floorSlice'
 import type { MapViewport } from './useMapViewport'
 import { Tooltip } from '../../lib/Tooltip'
+import UnreleasedSlayerMap from '../../unreleasedSlayerMap'
 
 /** How long the jump-to marker stays on screen. Long enough to find, short enough to forget. */
 const MARKER_MS = 2600
@@ -259,6 +260,8 @@ function MapSurface({
       {/* THE ONE SEAM, AGAIN: the typed reading reaches the screen through `mapFromLoc` and then
           the same `project` every other mark uses. Nothing here knows which way north is. */}
       {locMarker != null && <MapLocMarker at={mapFromLoc(locMarker)} loc={locMarker} vp={vp} />}
+      {/* The picked Slayer counters, shaded where their mobs spawn (UNRELEASED; gated in the file). */}
+      <UnreleasedSlayerMap zone={data.zone} vp={vp} />
     </Box>
   )
 }

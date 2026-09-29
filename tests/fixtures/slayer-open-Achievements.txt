@@ -1,0 +1,320 @@
+Slayer: General
+I	Megadeath
+I		Complete the achievement "A Force of Nature"
+I		Complete the achievement "Highly Decorated"
+I		Complete the achievement "Progressive"
+I	A Force of Nature
+I		Complete the achievement "Doesn't Play Well With Others"
+I		Complete the achievement "Don't Bug Me"
+I		Complete the achievement "I Hate Snakes!"
+I		Complete the achievement "Pesticide"
+I		Complete the achievement "We are the dead!"
+I		Complete the achievement "Strange Weather"
+I		Complete the achievement "The Zookeeper"
+I		Complete the achievement "Swordfishmermaid"
+I		Complete the achievement "Orc stomp!"
+I		Complete the achievement "Ugly creature near my feet..."
+I		Complete the achievement "BBBBBAAAARRRKKKK!!!!!"
+I		Complete the achievement "Puttin' On The Dog"
+I		Complete the achievement "It's Alive!"
+I		Complete the achievement "Plants Concrete and Stone"
+I		Complete the achievement "Here Be Dragons!"
+I		Complete the achievement "Might They Be Giants?"
+I		Complete the achievement "Legendary Creatures"
+I		Complete the achievement "Planes, Trains and Element-iles"
+I		Complete the achievement "A Sight for Sore Eyes"
+I		Complete the achievement "Domo Arigato"
+I		(Optional) Complete the achievement "Foreign Affair"
+I		(Optional) Complete the achievement "Invaders in a Strange Land"
+I		Complete the achievement "Table Flipper"
+I	Highly Decorated
+I		Complete the achievement "I'm a People Person!"
+I		Complete the achievement "What Keeps Mankind Alive?"
+I		Complete the achievement "Short People"
+I		Complete the achievement "Simple Folk of the Ykesha"
+I		Complete the achievement "Bounced!"
+I		Complete the achievement "Mostly Kunzar"
+I		Complete the achievement "Catnipped in the bud."
+I		Complete the achievement "Rats!"
+I		Complete the achievement "Eight legs are better than one!"
+I		Complete the achievement "The Hounds"
+I		Complete the achievement "The Cat's Pajamas"
+I		Complete the achievement "Bird Flew"
+I		Complete the achievement "Monkey Business"
+I		(Optional) Complete the achievement "I'm Boared!"
+I		Complete the achievement "Orc Kill!"
+I		Complete the achievement "Me thinks that you'll be good to eat!"
+I		Complete the achievement "Gnolling is Half the Battle"
+I		Complete the achievement "Kobolded Killer"
+I		Complete the achievement "Gooooooooooooooolem!"
+I		(Optional) Complete the achievement "Drawing Life From a Stone"
+I		(Optional) Complete the achievement "Living Stone I presume?"
+I		(Optional) Complete the achievement "Herbicide"
+I		Complete the achievement "Dragonbane"
+I		Complete the achievement "You call that a dragon?"
+I		Complete the achievement "A Giant Problem"
+I		Complete the achievement "Shorter People"
+I		Complete the achievement "Slayer of Mystical Horses"
+I		(Optional) Complete the achievement "It's Plane to See"
+I		Complete the achievement "Breakdown Dead Ahead"
+I		(Optional) Complete the achievement "Natives of Velious"
+I		(Optional) Complete the achievement "Natives of Luclin"
+I		(Optional) Complete the achievement "Natives of Taelosia"
+I		(Optional) Complete the achievement "Natives of Kuua"
+I		(Optional) Complete the achievement "Natives of Alaris"
+I		(Optional) Complete the achievement "Such Anguish"
+I	Progressive
+I		Complete the achievement "Barbarous"
+I		(Optional) Complete the achievement "Drackity Drak"
+I		Complete the achievement "Wood you could you?"
+I		Complete the achievement "Highly Uncivilized"
+I		(Optional) Complete the achievement "It was called Tunaria"
+I		Complete the achievement "Axe me no questions."
+I		(Optional) Complete the achievement "Dainy it's cold outside."
+I		Complete the achievement "Fuzzyfeet"
+I		(Optional) Complete the achievement "Icky!"
+I		(Optional) Complete the achievement "Why the Kylong faces?"
+I		(Optional) Complete the achievement "Good Luck, Bad Guk"
+I		Complete the achievement "It's a frog eat frog world"
+I		(Optional) Complete the achievement "Rrrribit!"
+I		(Optional) Complete the achievement "Moonkitty"
+I		Complete the achievement "Bat Country!"
+I		Complete the achievement "Armadilloed and Dangerous"
+I		Complete the achievement "It Stinks!"
+I		(Optional) Complete the achievement "Bunnyslayer"
+I		Complete the achievement "You dirty ratman!"
+I		(Optional) Complete the achievement "Of Micelike Men"
+I		(Optional) Complete the achievement "Badger, Badger, Badger..."
+I		Complete the achievement "Beetlemania"
+I		Complete the achievement "Leechy Keen"
+I		(Optional) Complete the achievement "Corathus!"
+I		(Optional) Complete the achievement "Army Ants"
+I		Complete the achievement "Shoo fly!"
+I		(Optional) Complete the achievement "A Web of Lies"
+I		(Optional) Complete the achievement "Fury of Soriz"
+I		Complete the achievement "Snake in the Grass"
+I		(Optional) Complete the achievement "50 Shades Repaid"
+I		(Optional) Complete the achievement "Suit up!"
+I		Complete the achievement "Better Get a Barrel"
+I		Complete the achievement "Bear with me"
+I		Complete the achievement "The Elephant in the Room"
+I		(Optional) Complete the achievement "Overthere in the Wastes"
+I		Complete the achievement "These boots were made for..."
+I		(Optional) Complete the achievement "Guess you didn't like turtles."
+I		(Optional) Complete the achievement "What has science done!?"
+I		(Optional) Complete the achievement "Have you seen my bucket?"
+I		(Optional) Complete the achievement "Seacow!"
+I		(Optional) Complete the achievement "A molkor?"
+I		(Optional) Complete the achievement "Sealephant"
+I		(Optional) Complete the achievement "A Horse of Course"
+I		(Optional) Complete the achievement "Why so crabby?"
+I		(Optional) Complete the achievement "Sarnak Slayer"
+I		(Optional) Complete the achievement "Don't be Shellfish!"
+I		(Optional) Complete the achievement "Innoruuk's Gift"
+I		(Optional) Complete the achievement "A Fallen Empire"
+I		(Optional) Complete the achievement "You can call me Alaran"
+I		Complete the achievement "Re-Extinction"
+I		Complete the achievement "Aquatic Allure"
+I		Complete the achievement "You're not scaring anyone."
+I		Complete the achievement "Lumberer"
+I		Complete the achievement "Stop dragon this out."
+I		(Optional) Complete the achievement "Quit dragon your heels!"
+I		Complete the achievement "You keep dragon me into this."
+I		Complete the achievement "Fairicide"
+I		Complete the achievement "For the Hive!"
+I		Complete the achievement "Jumjummery"
+I		Complete the achievement "Self Centaured"
+I		(Optional) Complete the achievement "You're Faunny"
+I		Complete the achievement "Amazing!"
+I		(Optional) Complete the achievement "Half Man, Half Scorpion, Half Lion."
+I		Complete the achievement "Puzzling"
+I		Complete the achievement "My Golden Boots"
+I		Complete the achievement "Spin Me Right Round"
+I		(Optional) Complete the achievement "They Call Me The Riftseeker"
+I		(Optional) Complete the achievement "Insatiable"
+I		(Optional) Complete the achievement "You look lovely"
+I		(Optional) Complete the achievement "Goo-dness Gracious!"
+I		(Optional) Complete the achievement "Discord Sounds Out of Tune"
+I		(Optional) Complete the achievement "Shadows of Lxanvom"
+I		(Optional) Complete the achievement "Achievement: Spider-Bear"
+I		(Optional) Complete the achievement "Reader's Die Jest"
+I		(Optional) Complete the achievement "Witch Mount?"
+I		(Optional) Complete the achievement "Dino-sore!"
+I		(Optional) Complete the achievement "In Your Eyes"
+I		Complete the achievement "Denizens of Fear"
+I		Complete the achievement "Eye see what you did there!"
+I		Complete the achievement "Cubic"
+I		Complete the achievement "Gnome Tested, Steamwork Approved!"
+I		(Optional) Complete the achievement "Terror from the Stars"
+Slayer: Conquest
+I	Doesn't Play Well With Others
+I		The playable races.	6502/10000
+I	Don't Bug Me
+I		Beetles, Cliknars, Corathus Beasts, Drachnids, Insects, Leeches, Mosquitoes, Spiders, Ursarachnids.	314/5000
+I	I Hate Snakes!
+I		Alligators, Basilisks, Crocodiles, Lizard Men, Sarnaks, Shissar, Snakes, Sokokar, and Turtles.	552/5000
+I	Pesticide
+I		Armadillos, Bats, Bubonians, Burynai, Molerats, Rabbits, Ratmen, Rats, Skunks and Werebats.	352/5000
+I	We Are the Dead!
+I		Animated Armors, Ghosts, Ghouls, Mummies, Shades, Skeletons, Spectres, Vampires, and Zombies.	6016/10000
+I	Strange Weather
+I		Chokidais, Drolvargs, Hynids, Lions, Pumas, Rotdogs, Tigers, Werewolves, Wolves, Worgs, and Wrulons.	229/5000
+I	The Zookeeper
+I		Apes, Bears, Birds, Boars, Mammoths, Mystical Horses, Othmirs, Rhinos, Sea Mammals, and Swinetors.	217/5000
+I	Swordfishmermaid
+I		Crabs, Fishes, Hraquis, Kedge, Krakens, Mermaids, Nymphs, Piranhas, Seahorses, Sharks, and Sirens.	117/5000
+I	Orc Stomp!
+I		Orcs and Wereorcs.	731/5000
+I	Ugly Creature Near My Feet...
+I		Goblins and Nightmare Goblins.	404/5000
+I	BBBBBAAAARRRKKKK!!!!!
+I		Gnolls	962/5000
+I	Puttin' On The Dog
+I		Kobolds	201/5000
+I	It's Alive!
+I		Brellian Constructs, Gargoyles, Gingerbread Men, Golems, Marionettes, Muddites, and Scarecrows.	1147/5000
+I	Plants Concrete and Stone
+I		Crystal Creatures, Grekens, Living Plants, Shriekers, Sporalis, Stonegrabbers, and Treants.	143/5000
+I	Here Be Dragons!
+I		Dinosaurs, Dracoliches, Dragons, Drakes, Drixies, Raptors, Witherans, Wurms, and Wyverns.	109/5000
+I	Might They Be Giants?
+I		Giants	405/5000
+I	Legendary Creatures
+I		Bixies, Brownies, Centaurs, Fairies, Griffins, Manticores, Minotaurs, Pixies, Satyr, and Sphinxes.	216/5000
+I	Planes, Trains and Element-iles
+I		Dervishes, Efreetis, Elementals, Imps, Nilborien, Riftseekers, Scrykin, Stormriders, and Wraiths.	1329/10000
+I	A Sight for Sore Eyes
+I		Amygdalans, Cubes, Eyes, Goos, Gorgons, Harpies, Luggalds, Shiliskins, Tentacle Terrors, and Xulous.	291/5000
+I	Domo Arigato
+I		Clockwork: Beetles, Boars, Dragons, Rats, Snakes, Spiders, Gnomeworks, Copters, and Tin Soldiers.	4/5000
+I	Table Flipper
+I		Barrels, Bones, Boxes, Chests, Clocks, Coffins, Mimics, Tables, Totems, Traps, Vases, and Webs.	43/5000
+Slayer: Special
+I	I'm a People Person!
+I		Barbarians	4/10
+I		Wood Elves	0/10
+I		High Elves	0/10
+I		Dwarves	0/10
+I		Halflings	4/10
+I		Iksars	0/10
+I	What Keeps Mankind Alive?
+I		Barbarians, Drakkin, Erudites, and Humans.	556/1000
+I	Short People
+I		Coldain, Dwarves, Gnomes, and Halflings.	199/1000
+I	Simple Folk of the Ykesha
+I		Trolls	259/1000
+I	Bounced!
+I		Ogres	145/1000
+I	Mostly Kunzar
+I		Iksars and Kylong Iksars of Veksar.	73/1000
+I	Catnipped In the Bud
+I		Kerrans and Vah Shir.	111/1000
+I	Rats!
+I		Armadillos, Bubonians, Burynai, Molerats, Rabbits, Ratmen, Rats, and Skunks.	253/1000
+I	Eight Legs Are Better Than One!
+I		Drachnids, Scorpions, Spiders, and Ursarachnids.	157/1000
+I	The Hounds
+I		Chokidais, Drolvargs, Hynids, Rotdogs, Werewolves, Wolves, and Worgs.	100/1000
+I	The Cat's Pajamas
+I		Cats, Lions, Pumas, Sabertooths, Scarlet Cheetahs, Tigers, Topiary Lions, and Wrulons.	129/1000
+I	Bird Flew
+I		Aviaks, Blood Ravens, Cockatrices, Hawks, and Parrots.	110/500
+I	Monkey Business
+I		Gorillas, Holgresh, and Yetis.	13/500
+I	Orc Kill!
+I		Orcs and Wereorcs.	731/1000
+I	Me Thinks That You'll Be Good to Eat!
+I		Goblins and Nightmare Goblins.	404/1000
+I	Gnolling is Half the Battle
+I		Gnolls	962/1000
+I	Kobolded Killer
+I		Kobolds	201/1000
+I	Gooooooooooooooolem!
+I		Gingerbread Men, Golems, Muddites, and Statues.	356/1000
+I	Dragonbane
+I		True Dragons	19/250
+I	You Call That a Dragon?
+I		Dinosaurs, Dracoliches, Lesser Dragons, Drakes, Drixies, Raptors, Witherans, Wurms, and Wyverns.	90/1000
+I	A Giant Problem
+I		Giants	405/1000
+I	Shorter People
+I		Bixies, Brownies, Dryads, Fairies, and Pixies.	46/1000
+I	Slayer of Mystical Horses
+I		Kirins, Nightmares, Pegasus, and Unicorns.	83/250
+I	Breakdown Dead Ahead
+I		Clockwork: Beetles, Boars, Dragons, Rats, Snakes, Spiders, Gnomeworks, Copters, and Tin Soldiers.	4/1000
+Slayer: Skill
+I	Barbarous
+I		Barbarians	4/100
+I	Wood You Could You?
+I		Wood Elves	0/100
+I	Highly Uncivilized
+I		High Elves	0/100
+I	Axe Me No Questions
+I		Dwarves	26/100
+I	Fuzzyfeet
+I		Halflings	4/100
+I	Icky!
+I		Iksars	73/100
+I	It's a Frog Eat Frog World
+I		Frogloks and Tadpoles.	56/100
+I	Bat Country!
+I		Bats and Werebats.	99/100
+I	Armadilloed and Dangerous
+I		Armadillos	2/50
+I	It Stinks!
+I		Skunks	2/5
+I	You Dirty Ratman!
+I		Ratmen	44/100
+I	Beetlemania
+I		Beetles, Insects, Lightcrawlers, Shik'Nars, and Underbulks.	80/100
+I	Leechy Keen
+I		Leeches, Ticks, and Vacuum Worms.	17/100
+I	Shoo fly!
+I		Butterflies, Flies, Malarians, Mosquitoes, Tsetsians, and Wasps.	60/100
+I	Snake in the Grass
+I		Snakes	57/100
+I	Better Get a Barrel
+I		Gorillas, Holgresh, and Yetis.	13/100
+I	Bear With Me
+I		Bears, Kodiaks, Owlbears, and Pandas.	11/100
+I	The Elephant in the Room
+I		Elephants and Mammoths.	0/100
+I	These Boots Were Made For...
+I		Alligators, Basilisks, and Crocodiles.	82/100
+I	Re-Extinction
+I		Kedge	2/50
+I	Aquatic Allure
+I		Nagas, Mermaids, Nymphs, and Sirens.	9/50
+I	You're Not Scaring Anyone
+I		Scarecrows and Totems.	13/50
+I	Lumberer
+I		Treants	0/100
+I	Stop Dragon This Out
+I		Dracoliches, Water Dragons, and Witherans.	27/100
+I	You Keep Dragon Me Into This
+I		Drakes, Drixies, and Fay Drakes.	63/100
+I	Fairicide
+I		Dryads, Fairies, and Pixies.	14/100
+I	For the Hive!
+I		Bixies	26/100
+I	Jumjummery
+I		Brownies	6/100
+I	Self Centaured
+I		Centaurs	0/100
+I	Amazing!
+I		Minotaurs and Tizmak.	21/100
+I	Puzzling
+I		Sphinxes	4/10
+I	My Golden Boots
+I		Djinns and Efreetis.	70/100
+I	Spin Me Right Round
+I		Dervishes	37/100
+I	Denizens of Fear
+I		Amygdalans	11/50
+I	Eye See What You Did There!
+I		Evil Eyes	68/100
+I	Cubic
+I		Gelatinous Cubes	12/50
+I	Gnome Tested, Steamwork Approved!
+I		Clockwork: Beetles, Boars, Dragons, Rats, Snakes, Spiders, Gnomeworks, Copters, and Tin Soldiers.	4/100
