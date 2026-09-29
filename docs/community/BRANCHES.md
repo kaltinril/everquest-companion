@@ -27,6 +27,7 @@ character-slot-sockets
 exaltation-clarity
 spell-upgrades
 faction-tab
+log-archive
 sidebar-groups
 # third-party, vetted (ADOPTIONS.md)
 community/pr-16-setup-node
@@ -57,7 +58,7 @@ creator's lint config already skips it.
 | Branch | Worktree | What it does |
 |---|---|---|
 | `main_community_rules` | `.claude/worktrees/main_community_rules` | `docs/community/`, the rebuild script, the root `CLAUDE.md` hook, the `docs/branches.md` pointer. First in the recipe so the rules are on every build. |
-| `local-data-refresh` | *(none)* | The locally re-scraped corpus: `items.json`, `mobs.json`, `dataWeight.generated.json` (2026-08-19, 2026-09-04 and 2026-09-27 scrapes). Second, so every feature branch's tests run against the data the build ships. 2026-09-27: 1,213 changed pages in 25 requests, 57 new items and 8 new mobs; the wiki retired the `{{Sky Era}}` banner in that window and moved the per-class Plane of Sky test pages to sections of the Plane of Sky page. The branch also carries what a top-up drags with it: the icons the new pages ask for, and the creator's tests that pinned the wiki as it was, re-measured. |
+| `local-data-refresh` | *(none)* | The locally re-scraped corpus: `items.json`, `mobs.json`, `dataWeight.generated.json` (2026-08-19, 2026-09-04 and 2026-09-27 scrapes). Second, so every feature branch's tests run against the data the build ships. 2026-09-27: 1,213 changed pages in 25 requests, 57 new items and 8 new mobs; the wiki retired the `{{Sky Era}}` banner in that window and moved the per-class Plane of Sky test pages to sections of the Plane of Sky page. The branch also carries what a top-up drags with it: the icons the new pages ask for, and the creator's tests that pinned the wiki as it was, re-measured. Since 2026-09-27 it holds `posky.json` too (the delta covers items and mobs only; the Plane of Sky quests are `npm run scrape:posky`, 209 requests, slowed to one a second for the run) and the one row of `skyQuestRewards.ts` that rescrape retired and the one it called for. |
 | `test-neutering` | *(none)* | The TEST build identity (own appId, own userData, telemetry and feedback dark, updater guarded, no signing), the UNRELEASED gate forced open, and the `0.1.0-test.N` version bumps with tester notes. Always last. |
 
 ### Ours, in front of the creator (open PRs)
@@ -87,6 +88,12 @@ creator's lint config already skips it.
 | `spell-upgrades` | `.claude/worktrees/spell-upgrades` | The whole Spells area: spellbook with icons and sortable columns, the Loadout tab, the mote tier slider, the buff stats panel, the EQEmu stacking port and its ground-truth corpus. 2026-09-25 fixes: the apostrophe fold now reaches every join (spell card, observed ranks, resist debuff amounts, alert suggestion lines); tier magnitudes in whole percents; the same-name fold no longer deletes ranked rows (Burnout, Cannibalize); the spell page and the Spellbook row file a spell under one category; the Spellbook scales per effect line like the Leveling tab; rung I of both tier sliders is tier 1; `spellItemIndex.ts` is text again (its NUL separators are escapes). 2026-09-26: the Loadout tab's buff set takes the group into account (a tester's ask): group-mates' classes are entered on the Buffs pane, the pool gains the buffs they can cast on someone else (`shared/spellParty.ts`), and each kept row says who casts it. The kept set is grouped by caster, each caster wears a colour the user can change, and a roster member whose `/who` row stated classes is offered as a one-click add (the classes come from `roster-who-classes`). |
 | `faction-tab` | `.claude/worktrees/faction-tab` | `/outputfile faction` graduated to a third supported kind, the UNRELEASED Factions tab, and the race-unlock claims read out of the achievements dump. |
 | `sidebar-groups` | `.claude/worktrees/sidebar-groups` | The nav drawer's tabs under three headings (Research, Stats/Data, Config) with Overview on top. Merges after every tab-adding branch, because it places each tab in a group at merge time. |
+
+### Ours, planned, nothing built yet
+
+| Branch | Worktree | What it does |
+|---|---|---|
+| `log-archive` | `.claude/worktrees/log-archive` | The plan for upstream issue #37 (ISSUES.md), in `docs/plans/log-archive/`: keep a compressed archive of the log and the totals the engine computed from it, and show both together, so a player can start a fresh log and keep their history. Seven phase documents, each step ending in a state that can ship. Documents only so far; phase 0 holds the rulings that come before any code. Placed before `sidebar-groups` because its panel will sit in Settings and adds no tab. |
 
 ### Third-party, adopted
 

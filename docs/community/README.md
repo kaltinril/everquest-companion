@@ -1,8 +1,8 @@
 # The fork's branch model
 
 This fork (`kaltinril/everquest-companion`, git remote `origin`) tracks the creator's repo
-(`jmoyers/everquest-companion`, git remote `upstream`). The creator is on hiatus and is not
-merging pull requests. This directory holds the rules and the recipe that let the fork keep
+(`jmoyers/everquest-companion`, git remote `upstream`). The creator is on hiatus, so pull
+requests wait for his return. This directory holds the rules and the recipe that let the fork keep
 moving without losing the ability to hand everything back when he returns.
 
 Read [RULES.md](RULES.md) before touching any branch. [BRANCHES.md](BRANCHES.md) is the ordered
