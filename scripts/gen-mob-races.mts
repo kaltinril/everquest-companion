@@ -7,11 +7,15 @@
 // writes `src/renderer/src/data/eqlegends/mobRaces.json`.
 //
 // IT PARSES; IT DOES NOT SCRAPE. No request leaves this script. Its input is wikitext the
-// scrapers already fetched and left under `scripts/sources/cache/`:
-//   - `cache/items/`  the item scraper's batches. `embeddedin Template:Itempage` reports indirect
-//                     transclusions, so every mob page that shows an item box was fetched along
-//                     with the items (5,408 mob pages, measured 2026-09-28).
-//   - `cache/mobs/`   the mob scraper's own batches, when `npm run scrape:mobs` has run here.
+// scrapers already fetched and left under `scripts/sources/cache/`, in the two shapes they write:
+//   - `cache/items/`  the item scraper's batches, one JSON array of pages per file.
+//                     `embeddedin Template:Itempage` reports indirect transclusions, so every mob
+//                     page that shows an item box was fetched along with the items (5,408 mob
+//                     pages, measured 2026-09-28).
+//   - `cache/mobs/`   the mob scraper's own cache, when `npm run scrape:mobs` has run here: one
+//                     `page-<pageid>.wikitext` per page and `mob-pages.json` naming them.
+// The committed index was generated on 2026-09-29 from a mob cache holding every catalogued page
+// (the owner ran the fetch for the 2,547 pages no earlier scrape had kept).
 // The cache is gitignored, so a worktree has none of its own: pass the directories to read as
 // arguments (`npx tsx scripts/gen-mob-races.mts <dir> [<dir> ...]`, later ones win) and the
 // defaults are skipped. A page found nowhere is simply absent from the index; the Slayer tab
@@ -52,16 +56,34 @@ function readBatch(path: string): CachedPage[] {
   }
 }
 
+/** The mob scraper's list of the pages it fetched. */
+const MOB_INDEX = 'mob-pages.json'
+
+/** The pages a mob-scraper cache names, each read from its own file. */
+function indexedPages(abs: string): CachedPage[] {
+  if (!existsSync(join(abs, MOB_INDEX))) return []
+  const members = readBatch(join(abs, MOB_INDEX)) as { pageid?: number; title?: string }[]
+  const pages: CachedPage[] = []
+  for (const member of members) {
+    const file = join(abs, `page-${String(member.pageid)}.wikitext`)
+    if (member.title === undefined || !existsSync(file)) continue
+    const content = readFileSync(file, 'utf8')
+    pages.push({ title: member.title, revisions: [{ slots: { main: { content } } }] })
+  }
+  return pages
+}
+
 /** Every mob page's wikitext found in one cache directory, by title. */
 function cachedMobPages(dir: string): Map<string, string> {
   const pages = new Map<string, string>()
   const abs = resolve(ROOT, dir)
   if (!existsSync(abs)) return pages
-  for (const name of readdirSync(abs).filter((n) => n.endsWith('.json'))) {
-    for (const page of readBatch(join(abs, name))) {
-      const text = page.revisions?.[0]?.slots?.main?.content
-      if (page.title && text && isMobPage(text)) pages.set(page.title, text)
-    }
+  const batches = readdirSync(abs)
+    .filter((n) => n.endsWith('.json') && n !== MOB_INDEX)
+    .flatMap((name) => readBatch(join(abs, name)))
+  for (const page of [...batches, ...indexedPages(abs)]) {
+    const text = page.revisions?.[0]?.slots?.main?.content
+    if (page.title && text && isMobPage(text)) pages.set(page.title, text)
   }
   return pages
 }

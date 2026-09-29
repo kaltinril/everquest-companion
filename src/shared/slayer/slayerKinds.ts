@@ -151,10 +151,13 @@ const CLAIMS: Record<string, SlayerTerm> = {
     races: ['human', 'qeynos citizen', 'freeport guards', 'highpass citizen', 'human beggar', 'hman']
   },
   barbarians: { races: ['barbarian', 'halas citizen'], names: ['barbarian'] },
-  erudites: { races: ['erudite', 'erudin citizen', 'erudite ghost'], names: ['erudite'] },
+  erudites: {
+    races: ['erudite', 'erudin citizen', 'paineel citizen', 'erudite ghost'],
+    names: ['erudite']
+  },
   'wood elves': { races: ['wood elf', 'fayguard'], names: ['wood elf'] },
   'high elves': {
-    races: ['high elf', 'felguard', 'female high elf', 'high elf male'],
+    races: ['high elf', 'felguard', 'female high elf', 'high elf male', 'male high elf'],
     names: ['high elf']
   },
   'dark elves': {
@@ -170,7 +173,10 @@ const CLAIMS: Record<string, SlayerTerm> = {
   iksars: { races: ['iksar', 'iksar citizen'], names: ['iksar'] },
   kerrans: { races: ['kerra', 'kerran'], names: ['kerran', 'kerra'] },
   kerran: { of: ['kerrans'] },
-  frogloks: { races: ['froglok', 'old froglok', 'kunark froglok'], names: ['froglok'] },
+  frogloks: {
+    races: ['froglok', 'old froglok', 'kunark froglok', 'froglock'],
+    names: ['froglok']
+  },
   tadpoles: { races: ['old froglok tadpole'], names: ['tadpole', 'froglok tad'] },
   frogs: { names: ['frog'] },
   coldain: { races: ['coldain'], names: ['coldain'] },
@@ -192,10 +198,21 @@ const CLAIMS: Record<string, SlayerTerm> = {
   ghouls: { races: ['ghoul', 'old froglok ghoul', 'froglok ghoul'], names: ['ghoul'] },
   mummies: { races: ['mummy'], names: ['mummy'] },
   ghosts: {
-    races: ['erudite ghost', 'ghost dwarf', 'spectral iksar', 'spectral sarnak'],
+    races: [
+      'erudite ghost',
+      'ghost dwarf',
+      'spectral iksar',
+      'spectral sarnak',
+      'ghost',
+      'iksar ghost',
+      'sarnak ghost'
+    ],
     names: ['ghost']
   },
-  spectres: { races: ['spectre', 'cold spectre'], names: ['spectre', 'specter'] },
+  spectres: {
+    races: ['spectre', 'cold spectre', 'spectre (undead)'],
+    names: ['spectre', 'specter']
+  },
   vampires: { races: ['vampire', 'elf vampire'], names: ['vampire'] },
   shades: { names: ['shade'] },
   wisps: { races: ["will o' wisp"], names: ['wisp', 'willowisp'] },
@@ -215,7 +232,7 @@ const CLAIMS: Record<string, SlayerTerm> = {
   skunks: { races: ['skunk'], names: ['skunk'] },
   burynai: { races: ['burynai', 'burnyai'], names: ['burynai'] },
   ratmen: { races: ['ratman'], names: ['ratman'] },
-  beetles: { races: ['beetle'], names: ['beetle', 'scarab'] },
+  beetles: { races: ['beetle', 'fire beetle'], names: ['beetle', 'scarab'] },
   cliknars: { names: ['cliknar'] },
   drachnids: { races: ['dracnid', 'drachnid'], names: ['drachnid'] },
   leeches: { races: ['leech'], names: ['leech'] },
@@ -330,7 +347,11 @@ const CLAIMS: Record<string, SlayerTerm> = {
   statues: { names: ['statue'] },
   mimics: { races: ['mimic'], names: ['mimic'] },
   chests: { names: ['chest'] },
-  clockwork: { races: ['clockwork gnome', 'clockwork rat'], names: ['clockwork'], always: true },
+  clockwork: {
+    races: ['clockwork gnome', 'clockwork rat', 'clockwork', 'clockwork spider'],
+    names: ['clockwork'],
+    always: true
+  },
 
   // ---- growing things
   'living plants': { races: ['man eating plant', 'succulent', 'mantrap'] },
@@ -358,7 +379,7 @@ const CLAIMS: Record<string, SlayerTerm> = {
   efreetis: { races: ['efreeti'], names: ['efreeti'] },
   djinns: { races: ['djinn'], names: ['djinn', 'djinni'] },
   elementals: {
-    races: ['elemental', 'water elemental', 'earth elemental', 'fire elemental'],
+    races: ['elemental', 'water elemental', 'earth elemental', 'fire elemental', 'air elemental'],
     names: ['elemental']
   },
   imps: { races: ['imp', 'fire imp'], names: ['imp'] },
