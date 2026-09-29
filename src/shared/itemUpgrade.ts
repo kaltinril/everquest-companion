@@ -198,11 +198,18 @@ export function upgradeStatClass(key: string): UpgradeStatClass {
  *   0 < base <= 10       → base + full  (FRACTION IGNORED — this is the "+1 per tier" the
  *                                        old research note mistook for a floor rule)
  *   base > 10            → floor(base + round(base * effective / 10))
- *   base < 0             → min(0, base + full)   penalties SHRINK toward zero, never past it
+ *   -10 <= base < 0      → min(0, base + full)   penalties SHRINK toward zero, never past it
+ *   base < -10           → min(0, base + round(|base| * effective / 10))
+ *
+ * THE LAST ROW joined on 2026-09-28. The slider's source states it (`scalePrimarySpreadsheetStat`,
+ * "larger penalties improve by 10% per effective tier"), and the owner's reading agrees:
+ * Stonemelder's Band, DEX -35 AGI -35, reads 0 on both at +10. Until then every penalty took the
+ * row above it, which read that item -25.
  */
 export function scalePrimary(base: number, state: ItemUpgradeState): number {
   const s = normalizeUpgradeState(state)
   if (base === 0) return 0
+  if (base < -10) return Math.min(0, base + excelRound((-base * effectiveLevel(s)) / 10, 0))
   if (base < 0) return Math.min(0, base + s.full)
   if (base <= 10) return base + s.full
   return Math.floor(base + excelRound((base * effectiveLevel(s)) / 10, 0))

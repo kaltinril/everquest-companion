@@ -218,7 +218,7 @@ test('a negative stat SHRINKS toward zero by the tier and stops there', () => {
   assert.equal(scalePrimary(-5, at(2, 3)), -3) // fraction ignored on this branch
   assert.equal(scalePrimary(-5, at(5)), 0)
   assert.equal(scalePrimary(-5, at(9)), 0) // never crosses into a bonus
-  assert.equal(scalePrimary(-100, at(10)), -90) // and a big penalty is still a penalty
+  assert.equal(scalePrimary(-10, at(3)), -7) // the last base the per-tier row takes
 
   const s = scaleStatBlock(AXE, CHECKPOINT)
   assert.equal(s.ac, -3)
@@ -227,6 +227,23 @@ test('a negative stat SHRINKS toward zero by the tier and stops there', () => {
   assert.equal(scaleStatBlock(AXE, at(5)).ac, 0)
   assert.equal(statOf(scaleStatBlock(AXE, at(6)), 'WIS'), '0')
   assert.equal(statOf(scaleStatBlock(GHOUL_HEART, at(3)), 'CHA'), '-7')
+})
+
+// Stonemelder's Band (EAR, AC 18, DEX -35, AGI -35) is the owner's reading, 2026-09-28: both
+// penalties read 0 at +10. The steps between are the slider's own rule, not readings.
+test('a penalty past ten shrinks by a tenth of itself a tier, and reads the fraction', () => {
+  assert.equal(scalePrimary(-35, at(0)), -35)
+  assert.equal(scalePrimary(-11, at(1)), -10)
+  assert.equal(scalePrimary(-35, at(2, 3)), -25) // round(9.625) = 10
+  assert.equal(scalePrimary(-35, at(5)), -17) // round(17.5) = 18, half away from zero
+  assert.equal(scalePrimary(-35, at(10)), 0)
+  assert.equal(scalePrimary(-100, at(3)), -70)
+  assert.equal(scalePrimary(-100, at(10)), 0)
+
+  const band = scaleStatBlock(parseStatsBlock('AC: 18\n\nDEX: -35 AGI: -35'), at(10))
+  assert.equal(band.ac, 36)
+  assert.equal(statOf(band, 'DEX'), '0')
+  assert.equal(statOf(band, 'AGI'), '0')
 })
 
 test('base 0 stays 0, and base 1..10 is a flat +tier that ignores the fraction', () => {

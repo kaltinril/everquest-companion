@@ -95,7 +95,8 @@
 //       BEFORE it is added and the SUM is floored (WIS 15 at tier 2+3/4 is 19, not 20). At
 //       base 1..10 it is simply base + tier with the FRACTION IGNORED — that branch is what
 //       the old "+1 minimum" note was actually describing, and it is a branch, never a floor
-//       laid over a percentage. A NEGATIVE stat shrinks toward zero by the tier and stops at 0;
+//       laid over a percentage. A NEGATIVE stat shrinks toward zero by the tier and stops at 0,
+//       and one past -10 shrinks by a tenth of itself a tier;
 //     - weapon DAMAGE is base + floor(base * effective / 10) — +10% per level, NOT +5%
 //       (Thelvorn at tier 2+3/4 reads DMG 25; +5%/tier would say 22, and the screenshot
 //       says 25). Weapon DELAY never scales, which is where the ratio gain comes from;
