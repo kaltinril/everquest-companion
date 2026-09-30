@@ -374,6 +374,13 @@ test('closest first puts the nearest to done on top, inside its own group', () =
     skill.group.achievements.filter((a) => !a.done)
   )
   assert.notDeepEqual(game.achievements, skill.achievements)
+  // What is finished is shown after what is still work.
+  const [both] = visibleSections(FULL, INDEX, { ...open, complete: true, sort: 'closest' })
+  assert.equal(both.achievements[0].name, 'Oh the Humanity!')
+  assert.deepEqual(
+    both.achievements.map((a) => a.done),
+    [...Array<boolean>(53).fill(false), ...Array<boolean>(17).fill(true)]
+  )
 })
 
 test('the plan is offered in a family that holds a counter, and nowhere else', () => {
