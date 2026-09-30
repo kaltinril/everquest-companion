@@ -214,14 +214,6 @@ function ViewContent({
   const { openSection } = prefs
   const onOpenVoicePrefs = useCallback(() => openSection('voice'), [openSection])
   const onOpenOverlayPrefs = useCallback(() => openSection('overlays'), [openSection])
-  const { selectView } = routing
-  const openUnlock = useCallback(
-    (ref?: UnlockRef) => {
-      setUnlockFocus(ref ?? null)
-      selectView('unlocks')
-    },
-    [selectView]
-  )
   if (view === 'preferences') {
     return (
       <PreferencesView key={prefs.section ?? 'prefs'} onSendFeedback={onSendFeedback} section={prefs.section} />
@@ -241,63 +233,61 @@ function ViewContent({
   // no provider at all — keeps the plain text it has always had.
   return (
     <SpellLinkProvider open={routing.openSpell}>
-      <UnlockLinkProvider open={UNRELEASED ? openUnlock : null}>
-        <PlainView
-          view={view}
-          viewKey={viewKey}
-          routing={routing}
-          onOpenVoicePrefs={onOpenVoicePrefs}
-          onOpenOverlayPrefs={onOpenOverlayPrefs}
+      <PlainView
+        view={view}
+        viewKey={viewKey}
+        routing={routing}
+        onOpenVoicePrefs={onOpenVoicePrefs}
+        onOpenOverlayPrefs={onOpenOverlayPrefs}
+      />
+      {/* The Mobs tab stays MOUNTED across a deep link (no `key` churn on target
+          change) — remounting per character rebuild only, like every other view. */}
+      {view === 'mobs' && (
+        <MobsView
+          key={viewKey}
+          target={routing.mobTarget}
+          targetNonce={routing.mobNonce}
+          onTargetConsumed={routing.clearMob}
+          nav={routing.nav}
         />
-        {/* The Mobs tab stays MOUNTED across a deep link (no `key` churn on target
-            change) — remounting per character rebuild only, like every other view. */}
-        {view === 'mobs' && (
-          <MobsView
-            key={viewKey}
-            target={routing.mobTarget}
-            targetNonce={routing.mobNonce}
-            onTargetConsumed={routing.clearMob}
-            nav={routing.nav}
-          />
-        )}
-        {view === 'bosses' && <BossView key={viewKey} onOpenMob={routing.openMob} />}
-        {/* Sky quest items name the mob that drops them, so the tracker links out to the Mobs
-            tab exactly the way the boss roster does — and, since 2026-08-04, out to the LOOT
-            drill-down for the item itself (owner: clicking a Sky item you are hovering should
-            take you to its item page). It keeps its remount `key`: both deep links run the other
-            way (out of posky). Its own INBOUND link — a celebration toast anchored at the quest
-            that just completed — rides the nonce props instead, so the remount key stays what it
-            always was: one per character rebuild. */}
-        {view === 'posky' && (
-          <PoskyView
-            key={viewKey}
-            onOpenMob={routing.openMob}
-            onOpenLoot={routing.openLoot}
-            focusQuest={routing.questKey}
-            focusNonce={routing.questNonce}
-            onFocusConsumed={routing.clearQuestFocus}
-          />
-        )}
-        {view === 'overview' && (
-          <OverviewView
-            key={viewKey}
-            onOpenCombat={routing.openCombat}
-            onOpenMob={routing.openMob}
-            onOpenLoot={routing.openLoot}
-            onOpenLeveling={onOpenLeveling}
-          />
-        )}
-        {/* Like Mobs, the Combat tab stays MOUNTED across a deep link — the focus arrives
-            through the nonce, not through a remount. */}
-        {view === 'combat' && (
-          <CombatView
-            key={viewKey}
-            focus={routing.combatFocus}
-            focusNonce={routing.combatNonce}
-            onFocusConsumed={routing.clearCombatFocus}
-          />
-        )}
-      </UnlockLinkProvider>
+      )}
+      {view === 'bosses' && <BossView key={viewKey} onOpenMob={routing.openMob} />}
+      {/* Sky quest items name the mob that drops them, so the tracker links out to the Mobs
+          tab exactly the way the boss roster does — and, since 2026-08-04, out to the LOOT
+          drill-down for the item itself (owner: clicking a Sky item you are hovering should
+          take you to its item page). It keeps its remount `key`: both deep links run the other
+          way (out of posky). Its own INBOUND link — a celebration toast anchored at the quest
+          that just completed — rides the nonce props instead, so the remount key stays what it
+          always was: one per character rebuild. */}
+      {view === 'posky' && (
+        <PoskyView
+          key={viewKey}
+          onOpenMob={routing.openMob}
+          onOpenLoot={routing.openLoot}
+          focusQuest={routing.questKey}
+          focusNonce={routing.questNonce}
+          onFocusConsumed={routing.clearQuestFocus}
+        />
+      )}
+      {view === 'overview' && (
+        <OverviewView
+          key={viewKey}
+          onOpenCombat={routing.openCombat}
+          onOpenMob={routing.openMob}
+          onOpenLoot={routing.openLoot}
+          onOpenLeveling={onOpenLeveling}
+        />
+      )}
+      {/* Like Mobs, the Combat tab stays MOUNTED across a deep link — the focus arrives
+          through the nonce, not through a remount. */}
+      {view === 'combat' && (
+        <CombatView
+          key={viewKey}
+          focus={routing.combatFocus}
+          focusNonce={routing.combatNonce}
+          onFocusConsumed={routing.clearCombatFocus}
+        />
+      )}
     </SpellLinkProvider>
   )
 }
@@ -522,6 +512,15 @@ export default function App(): JSX.Element {
   // `ViewContentMemo` three fresh functions on every shell re-render and it would never bail out
   // once — the boundary would cost a comparison and buy nothing.
   const onOpenPreferences = useCallback(() => selectView('preferences'), [selectView])
+  // Every "on the way to" chip opens the Unlocks tab on its unlock (lib/unlockLink.tsx), while
+  // the tab exists: the provider below publishes nothing in a build without it.
+  const openUnlock = useCallback(
+    (ref?: UnlockRef) => {
+      setUnlockFocus(ref ?? null)
+      selectView('unlocks')
+    },
+    [selectView]
+  )
   const onOpenLeveling = useCallback(() => openLeveling(), [openLeveling])
   const hasCharacters = characters.length > 0
 
@@ -549,16 +548,18 @@ export default function App(): JSX.Element {
         <NavDrawer view={view} onSelect={selectView} prefs={prefsRouting} onSendFeedback={() => feedback.openFeedback()} />
 
         <MainColumn view={view} onSelect={selectView} onReport={feedback.openFeedback}>
-          <ViewContentMemo
-            view={view}
-            hasCharacters={hasCharacters}
-            viewKey={viewKey}
-            routing={routing}
-            prefs={prefsRouting}
-            onOpenPreferences={onOpenPreferences}
-            onOpenLeveling={onOpenLeveling}
-            onSendFeedback={feedback.openFeedback}
-          />
+          <UnlockLinkProvider open={UNRELEASED ? openUnlock : null}>
+            <ViewContentMemo
+              view={view}
+              hasCharacters={hasCharacters}
+              viewKey={viewKey}
+              routing={routing}
+              prefs={prefsRouting}
+              onOpenPreferences={onOpenPreferences}
+              onOpenLeveling={onOpenLeveling}
+              onSendFeedback={feedback.openFeedback}
+            />
+          </UnlockLinkProvider>
         </MainColumn>
       </Box>
 
