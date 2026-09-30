@@ -1,16 +1,16 @@
-// slayer/useSlayerController.ts — all of the Slayer tab's state and derivation, as one hook. The
-// view is a render shell; the two lists take the bundles this returns.
+// slayer/useSlayerController.ts — the Slayer plan's state and derivation, as one hook. The
+// Achievements tab (features/achievements/) draws the counters in its own list and takes two
+// bundles from here: the picks, and the zone ranking made for them.
 //
 // TWO PLANS ARE MADE, and they answer different questions:
-//   - over EVERY open counter, to say how many zones each counter has (the left list's reach);
-//   - over the PICKED counters, which is the ranking on the right. With nothing picked the
-//     second plan is the first one, so the tab opens on "where is the most to do".
+//   - over EVERY open counter, to say how many zones each counter has (a counter's reach);
+//   - over the PICKED counters, which is the ranking. With nothing picked the second plan is
+//     the first one, so the ranking opens on "where is the most to do".
 // Both read the same options, so a level cap that empties a counter's reach empties it in both.
 
 import { useCallback, useMemo, useState } from 'react'
 import type { CharacterSnap } from '@shared/characterTypes'
 import type { ZoneShort } from '@shared/maps'
-import type { SlayerGoal } from '@shared/outputs/slayer'
 import { planZones, targetReach, type PlanOptions, type PlanZone } from '@shared/slayer/slayerPlan'
 import type { View } from '../../appViews'
 import { useModule } from '../../lib/useModule'
@@ -23,14 +23,12 @@ import {
   MAX_LEVEL_KEY,
   OUT_OF_ERA_KEY,
   PICKS_KEY,
-  REQUIRED_ONLY_KEY,
   counterRows,
   loadFlag,
   loadMaxLevel,
   loadPicks,
   nearlyDone,
   savePref,
-  visibleCounters,
   type CounterRow
 } from './slayerRows'
 
@@ -41,15 +39,13 @@ export interface SlayerViewProps {
   onSelectView?: (v: View) => void
 }
 
-export interface CounterListBundle {
-  rows: CounterRow[]
-  total: number
+export interface PickBundle {
+  /** every open counter the dump states, by id */
+  rows: ReadonlyMap<string, CounterRow>
   picks: ReadonlySet<string>
-  query: string
-  requiredOnly: boolean
-  onQuery: (q: string) => void
-  onRequiredOnly: (on: boolean) => void
-  onToggle: (id: string) => void
+  /** how many of the picks are counters the newest dump still lists */
+  picked: number
+  onSet: (ids: readonly string[], on: boolean) => void
   onPickNearlyDone: () => void
   onClear: () => void
 }
@@ -68,11 +64,7 @@ export interface ZoneListBundle {
 }
 
 export interface SlayerController {
-  ready: boolean
-  hasDump: boolean
-  readAt: number | null
-  goals: SlayerGoal[]
-  list: CounterListBundle
+  picks: PickBundle
   plan: ZoneListBundle
 }
 
@@ -108,26 +100,31 @@ function usePlanOptions(): {
   return { opts, onMaxLevel, onOutOfEra }
 }
 
-function toggled(picks: ReadonlySet<string>, id: string): ReadonlySet<string> {
+function withSet(picks: ReadonlySet<string>, ids: readonly string[], on: boolean): Set<string> {
   const next = new Set(picks)
-  if (!next.delete(id)) next.add(id)
+  for (const id of ids) {
+    if (on) next.add(id)
+    else next.delete(id)
+  }
   return next
 }
 
-export function useSlayerController(props: SlayerViewProps): SlayerController {
-  const { onOpenMob, onSelectView } = props
-  const { record, readAt, ready } = useSlayerData()
-  const [picks, setPicks] = usePicks()
-  const { opts, onMaxLevel, onOutOfEra } = usePlanOptions()
-  const [query, setQuery] = useState('')
-  const [requiredOnly, setRequiredOnly] = useState(() => loadFlag(REQUIRED_ONLY_KEY))
-
-  const all = useMemo(() => {
+/** Every open counter with its reach, and the plan over all of them. */
+function useAllCounters(opts: PlanOptions): { rows: CounterRow[]; zones: PlanZone[] } {
+  const { record } = useSlayerData()
+  return useMemo(() => {
     if (record === null) return { rows: [], zones: [] }
     const targets = counterRows(record, new Map()).map((r) => r.target)
     const zones = planZones(slayerCatalog(), targets, opts)
     return { rows: counterRows(record, targetReach(zones)), zones }
   }, [record, opts])
+}
+
+export function useSlayerController(props: SlayerViewProps): SlayerController {
+  const { onOpenMob, onSelectView } = props
+  const [picks, setPicks] = usePicks()
+  const { opts, onMaxLevel, onOutOfEra } = usePlanOptions()
+  const all = useAllCounters(opts)
 
   const picked = useMemo(() => all.rows.filter((r) => picks.has(r.id)), [all.rows, picks])
   const zones = useMemo(() => {
@@ -138,10 +135,7 @@ export function useSlayerController(props: SlayerViewProps): SlayerController {
     () => new Map(all.rows.map((r) => [r.id, r.counter.achievement])),
     [all.rows]
   )
-  const rows = useMemo(
-    () => visibleCounters(all.rows, { query, requiredOnly }),
-    [all.rows, query, requiredOnly]
-  )
+  const rows = useMemo(() => new Map(all.rows.map((r) => [r.id, r])), [all.rows])
   const onOpenZone = useCallback(
     (zone: ZoneShort) => {
       saveZoneSelection(onPick(zone))
@@ -151,23 +145,12 @@ export function useSlayerController(props: SlayerViewProps): SlayerController {
   )
 
   return {
-    ready,
-    hasDump: record !== null,
-    readAt,
-    goals: record?.goals ?? [],
-    list: {
+    picks: {
       rows,
-      total: all.rows.length,
       picks,
-      query,
-      requiredOnly,
-      onQuery: setQuery,
-      onRequiredOnly: (on) => {
-        setRequiredOnly(on)
-        savePref(REQUIRED_ONLY_KEY, on ? '1' : '0')
-      },
-      onToggle: (id) => {
-        setPicks(toggled(picks, id))
+      picked: picked.length,
+      onSet: (ids, on) => {
+        setPicks(withSet(picks, ids, on))
       },
       onPickNearlyDone: () => {
         setPicks(new Set(nearlyDone(all.rows)))

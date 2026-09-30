@@ -4,7 +4,7 @@
 // it. The layer is INERT like the pin layer: `pointerEvents: 'none'` on everything but its one
 // switch, so dragging the map works straight through a shaded area.
 //
-// IT DRAWS THE PICKS, NOT EVERYTHING. With nothing picked on the Slayer tab there is no layer and
+// IT DRAWS THE PICKS, NOT EVERYTHING. With nothing picked on the Achievements tab there is no layer and
 // no switch: a map should not change for someone who never opened that tab.
 //
 // ONE COLOUR OF ITS OWN (the theme's info tone). The map file's labels keep the pack author's

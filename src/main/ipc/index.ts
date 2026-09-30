@@ -13,6 +13,7 @@
 //
 // Every channel name lives in `src/shared/ipc.ts`; nothing here invents one.
 
+import { registerAchievementsIpc } from './achievements'
 import { registerAlertsIpc } from './alerts'
 import { registerBuffAllowIpc } from './buffAllow'
 import { registerBuffTrustIpc } from './buffTrust'
@@ -89,6 +90,8 @@ export function registerIpc(): void {
   registerSpeechIpc()
   registerKnowledgeIpc()
   registerPlannerIpc()
+  // Gated on the review-gate door inside the register (ipc/achievements.ts).
+  registerAchievementsIpc()
   registerMapsIpc()
   registerPresenceIpc()
   registerWindowIpc()

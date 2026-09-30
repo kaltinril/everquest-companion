@@ -12,7 +12,7 @@
 //
 // WHAT IS NOT DRAWN, for the reason the pin layer gives (mobPins.ts): a mob whose page names
 // several zones states locations nobody can assign to the map on screen, and a mob whose page
-// states none has nowhere to be drawn. Both still count in the Slayer tab's zone list.
+// states none has nowhere to be drawn. Both still count in the Achievements tab's zone list.
 
 import type { ZoneShort } from '@shared/maps'
 import { matchMob } from '../../../../shared/slayer/slayerMatch'
