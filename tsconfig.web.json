@@ -58,6 +58,8 @@
     "src/preload/respawn.ts",
     // …and `planner.ts` (the exaltation planner + the Gear tab's reads, JOS-285), likewise.
     "src/preload/planner.ts",
+    // …and `achievements.ts` (the Achievements tab's one read), likewise.
+    "src/preload/achievements.ts",
     // …and `knowledge.ts` (the spell/item/mob lookups, JOS-293), likewise.
     "src/preload/knowledge.ts",
     // …and `overlaySnap.ts` (the overlay-snapping switch, JOS-217), likewise.

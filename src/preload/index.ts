@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { IPC } from '../shared/ipc'
 import { windowsApi } from './windows'
 import { plannerApi } from './planner'
+import { achievementsApi } from './achievements'
 import { rosterApi } from './roster'
 import { soundsBridge } from './sounds'
 // "What IS this" — the spell/item/mob lookups, split out at the 400-line ceiling (preload/knowledge.ts).
@@ -446,6 +447,9 @@ const api = {
   // 400-code-line ceiling, and phase 4 (JOS-285) needed one more method than it had room for.
   // (The item/mob lookups live in knowledge.ts beside the spell lookups — JOS-293's split.)
   ...plannerApi,
+  // The two reads of the achievements dump (preload/achievements.ts), split out under the same
+  // rule: the Achievements tab's, and the feedback attachment's preview.
+  ...achievementsApi,
 
   // ---- character sheet (JOS-45) ----
   /** The armory grid, the gear sum and the carry-all ledger for the active character, from their
@@ -653,9 +657,8 @@ const api = {
    *  main's answer through the outputs registry, never a path the renderer supplies. */
   buildFeedbackInventory: (): Promise<FeedbackInventoryPreview> =>
     ipcRenderer.invoke(IPC.feedbackBuildInventory),
-  /** The same for the CURRENT `/outputfile achievements` dump (JOS-441), no argument either. */
-  buildFeedbackAchievements: (): Promise<FeedbackAchievementsPreview> =>
-    ipcRenderer.invoke(IPC.feedbackBuildAchievements),
+  // (The same for the achievements dump, JOS-441, is `buildFeedbackAchievements` in
+  // preload/achievements.ts, beside the other read of that file.)
   /** Submit. NEVER rejects: a network failure resolves `{ok:false, queued:true}` and the report
    *  is retried later; a 4xx resolves `{ok:false, queued:false}` and is not retried. */
   submitFeedback: (draft: FeedbackDraft, opts: SubmitOpts): Promise<SubmitResult> =>

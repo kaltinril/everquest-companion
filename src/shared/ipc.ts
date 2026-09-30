@@ -33,6 +33,12 @@ export const IPC = {
   // main -> renderer: the active character's *-Inventory.txt was auto-reloaded.
   onInventoryReload: 'inventory:autoReloaded',
 
+  // ---- the Achievements tab (UNRELEASED-gated at the handler, like the tab) ----
+  // renderer -> main: the active character's `/outputfile achievements` dump as the tree the
+  // game draws (shared/outputs/achievementBook.ts). Returns AchievementBook | null; null means
+  // there is no dump. Read on demand and never stored; the tab re-asks when the dump is re-read.
+  achievementsBook: 'achievements:book',
+
   // ---- `/outputfile` exports (JOS-44: one treatment for every export command) ----
   // renderer -> main: every `/outputfile` kind the app knows, joined to the active character's
   // file on disk. Returns OutputFileStatus[] (shared/outputs/kinds.ts): the command to type, one

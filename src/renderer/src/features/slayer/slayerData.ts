@@ -1,4 +1,4 @@
-// slayer/slayerData.ts — the Slayer tab's two inputs: the catalog joined to the wiki's races, and
+// slayer/slayerData.ts — the Slayer plan's two inputs: the catalog joined to the wiki's races, and
 // the character's open counters.
 //
 // THE CATALOG INDEX IS BUILT ONCE, ON FIRST USE (the mobSearch posture): reading a race and a name

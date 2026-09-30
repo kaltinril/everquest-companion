@@ -1,12 +1,12 @@
-// slayer/slayerRows.ts — the Slayer tab's view models and its stored choices. Pure: no React.
+// slayer/slayerRows.ts — the Slayer plan's view models and its stored choices. Pure: no React.
 //
 // A COUNTER ROW is one open counter with what the plan says about it: how many kills are left,
 // whether a General achievement still requires it, and how many zones and spawn points the
-// catalog knows for it. The list's default order is LEAST LEFT FIRST, because the counter a
-// player can finish tonight is the one worth seeing first.
+// catalog knows for it. The Achievements tab draws the counters in its own list
+// (features/achievements/); these rows are what it reads the reach and the picks from.
 //
 // THE STORED CHOICES (`eq.slayer.*` in localStorage) exist because a view unmounts on every tab
-// switch: the picks, the level cap and the two toggles are things the user set on purpose. Every
+// switch: the picks, the level cap and the toggle are things the user set on purpose. Every
 // read degrades rather than throws; a pick naming a counter the newest dump no longer lists
 // (it was completed) is simply not drawn.
 
@@ -30,11 +30,6 @@ export interface CounterRow {
   spawns: number
 }
 
-export interface CounterFilters {
-  query: string
-  requiredOnly: boolean
-}
-
 export type Reach = ReadonlyMap<string, { zones: number; spawns: number }>
 
 export function counterRows(record: SlayerRecord, reach: Reach): CounterRow[] {
@@ -55,22 +50,6 @@ export function counterRows(record: SlayerRecord, reach: Reach): CounterRow[] {
   })
 }
 
-function matchesQuery(row: CounterRow, query: string): boolean {
-  if (query === '') return true
-  const hay = `${row.counter.achievement} ${row.counter.label} ${row.counter.group}`.toLowerCase()
-  return query
-    .toLowerCase()
-    .split(/\s+/)
-    .every((word) => hay.includes(word))
-}
-
-/** The rows the list draws: filtered, least left first, then by name. */
-export function visibleCounters(rows: readonly CounterRow[], f: CounterFilters): CounterRow[] {
-  return rows
-    .filter((r) => (!f.requiredOnly || r.required) && matchesQuery(r, f.query.trim()))
-    .sort((a, b) => a.left - b.left || a.counter.achievement.localeCompare(b.counter.achievement))
-}
-
 /** How few kills away a counter must be for the "Nearly done" pick to take it. */
 export const NEARLY_DONE = 50
 
@@ -84,7 +63,6 @@ export function nearlyDone(rows: readonly CounterRow[]): string[] {
 export const PICKS_KEY = 'eq.slayer.picks'
 export const MAX_LEVEL_KEY = 'eq.slayer.maxLevel'
 export const OUT_OF_ERA_KEY = 'eq.slayer.outOfEra'
-export const REQUIRED_ONLY_KEY = 'eq.slayer.requiredOnly'
 
 /** The slice of `Storage` this module uses, so a test can hand it a plain object. */
 export interface PrefStore {
@@ -92,7 +70,7 @@ export interface PrefStore {
   setItem: (key: string, value: string) => void
 }
 
-function read(store: PrefStore, key: string): string | null {
+export function readPref(store: PrefStore, key: string): string | null {
   try {
     return store.getItem(key)
   } catch {
@@ -110,7 +88,7 @@ export function savePref(key: string, value: string, store: PrefStore = localSto
 
 export function loadPicks(store: PrefStore = localStorage): string[] {
   try {
-    const parsed: unknown = JSON.parse(read(store, PICKS_KEY) ?? '[]')
+    const parsed: unknown = JSON.parse(readPref(store, PICKS_KEY) ?? '[]')
     return Array.isArray(parsed) ? parsed.filter((p): p is string => typeof p === 'string') : []
   } catch {
     return []
@@ -122,7 +100,7 @@ export function loadPicks(store: PrefStore = localStorage): string[] {
  * (the tab then follows the character's own level).
  */
 export function loadMaxLevel(store: PrefStore = localStorage): number | null | undefined {
-  const raw = read(store, MAX_LEVEL_KEY)
+  const raw = readPref(store, MAX_LEVEL_KEY)
   if (raw === null) return undefined
   if (raw === '') return null
   const n = Number(raw)
@@ -130,5 +108,5 @@ export function loadMaxLevel(store: PrefStore = localStorage): number | null | u
 }
 
 export function loadFlag(key: string, store: PrefStore = localStorage): boolean {
-  return read(store, key) === '1'
+  return readPref(store, key) === '1'
 }
