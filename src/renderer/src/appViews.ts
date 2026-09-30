@@ -16,6 +16,10 @@ export type View =
   // label (`bosses` is Raid Targets). UNRELEASED like every new tab: in `KNOWN_VIEWS` only
   // behind the flag's splice, its nav row gated the same way, and absent from `TELEMETRY_VIEWS`.
   | 'slayer'
+  // UNLOCKS (2026-09-29): the three unlock families of the same dump (races, classes, deities)
+  // as what each still needs, joined to the factions dump and the Sky quests. UNRELEASED on the
+  // same three terms as the tab above.
+  | 'unlocks'
   | 'posky'
   | 'alerts'
   | 'leveling'
@@ -90,6 +94,7 @@ export const VIEW_LABELS: Record<View, string> = {
   maps: 'Maps',
   bosses: 'Raid Targets',
   slayer: 'Achievements',
+  unlocks: 'Unlocks',
   posky: 'Plane of Sky',
   alerts: 'Alerts',
   leveling: 'Leveling',
@@ -126,7 +131,7 @@ const KNOWN_VIEWS: View[] = [
   'bosses',
   // The review-gate splice: a dev server draws the Achievements tab, a packaged build bounces a
   // persisted 'slayer' to the default view instead of routing to a tab it will not draw.
-  ...(UNRELEASED ? (['slayer'] as const) : []),
+  ...(UNRELEASED ? (['slayer', 'unlocks'] as const) : []),
   'posky',
   'alerts',
   'leveling',

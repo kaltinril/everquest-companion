@@ -255,10 +255,26 @@ test('the overlay-kind list is the SAME set the app uses (the duplication cannot
  * separately from "the spread is there and holds nothing", because the two look identical to a
  * regex and only one of them would also be what a BROKEN regex looks like — see the caller.
  */
+/**
+ * A quoted view id, as `appViews.ts` spells one.
+ *
+ * CAMEL CASE IS PART OF THE VOCABULARY (2026-09-10). Every reader below used `[a-z]+`, which was
+ * true of every view id in the app until the Spells area added `spellUpgrades` and `spellLoadout` -
+ * and the failure mode was the dangerous one: a camelCase id matched NOWHERE, so it was missing
+ * from the declared union AND from the gated list at once, and the two omissions cancelled. The
+ * test went green while silently knowing nothing about two of the app's views.
+ *
+ * ONE CONSTANT read by all three parsers, so a fourth reader cannot reintroduce the narrow class.
+ */
+const VIEW_ID = /'([a-zA-Z]+)'/g
+
 function unreleasedViews(src: string): string[] | null {
-  const spread = /UNRELEASED \? \(\[([^\]]*)\]/.exec(src)?.[1]
-  if (spread === undefined) return null
-  return [...spread.matchAll(/'([a-z]+)'/g)].map((m) => m[1])
+  // EVERY SPLICE, NOT THE FIRST (2026-09-10). `exec` found one, which was right while exactly one
+  // surface was ever gated at a time and silently wrong the moment two were: the Factions tab's
+  // splice came first in the file and the Spells area's three views were simply never exempted.
+  const spreads = [...src.matchAll(/UNRELEASED \? \(\[([^\]]*)\]/g)].map((m) => m[1])
+  if (spreads.length === 0) return null
+  return spreads.flatMap((spread) => [...spread.matchAll(VIEW_ID)].map((m) => m[1]))
 }
 
 /**
@@ -280,7 +296,7 @@ test('the view list is the SAME set the app can render', () => {
   const src = readFileSync(join(ROOT, 'src', 'renderer', 'src', 'appViews.ts'), 'utf8')
   const union = /export type View =([\s\S]*?)export const VIEW_KEY/.exec(src)?.[1] ?? ''
   // Deduped: the union's own doc comment quotes 'triage' while explaining why it stays in.
-  const declared = [...new Set([...union.matchAll(/'([a-z]+)'/g)].map((m) => m[1] as string))]
+  const declared = [...new Set([...union.matchAll(VIEW_ID)].map((m) => m[1]))]
   assert.ok(declared.length > 5, 'failed to read the View union out of appViews.ts')
 
   // ...MINUS the UNRELEASED views, which report NOTHING on purpose (JOS-45). A new enum value is

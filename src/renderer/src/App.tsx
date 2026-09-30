@@ -65,8 +65,9 @@ import CharacterView from './features/character/CharacterView'
 import UnreleasedFactionsView from './unreleasedFactions'
 import { SpellDrill } from './features/spells/SpellPage'
 import { SpellLinkProvider } from './lib/spellLink'
-// The SLAYER TAB, behind the review gate; its view check lives in the gate file.
+// The ACHIEVEMENTS and UNLOCKS tabs, behind the review gate; each view check lives in its gate file.
 import UnreleasedSlayerView from './unreleasedSlayer'
+import UnreleasedUnlocksView from './unreleasedUnlocks'
 import { OWNER_TOOLS } from './devFlags'
 import { useFeedbackDialog, type FeedbackPrefill } from './features/feedback/useFeedback'
 // Usage analytics (docs/plans/usage-analytics.md). The notice is mounted unconditionally and
@@ -166,6 +167,7 @@ function PlainView({
           and the remount is how this app says that. */}
       {view === 'character' && <CharacterView key={viewKey} />}
       <UnreleasedSlayerView view={view} viewKey={viewKey} routing={routing} />
+      <UnreleasedUnlocksView view={view} viewKey={viewKey} routing={routing} />
       {/* THE SPELL DRILLDOWN (JOS-508). Its view check and its payload check live in the feature
           file, not here: this switch is one branch per view and a branch needing both would have
           cost `PlainView` two points of the measured complexity ceiling. */}

@@ -7,6 +7,7 @@ import ReceiptLongIcon from '@mui/icons-material/ReceiptLong'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech'
+import LockOpenIcon from '@mui/icons-material/LockOpen'
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 import TimerIcon from '@mui/icons-material/Timer'
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh'
@@ -105,6 +106,8 @@ const ROWS: NavRow[] = [
   // SLAYER (UNRELEASED) sits under Raid Targets: both are lists of things to go and kill. The row
   // is built inside the conditional, so a build without the flag folds it away, icon and all.
   ...(UNRELEASED ? [{ view: 'slayer' as View, icon: <MilitaryTechIcon /> }] : []),
+  // UNLOCKS (UNRELEASED) sits under it: the same dump, read for what is still closed.
+  ...(UNRELEASED ? [{ view: 'unlocks' as View, icon: <LockOpenIcon /> }] : []),
   { view: 'posky', icon: <ShieldMoonIcon /> },
   { view: 'alerts', icon: <NotificationsActiveIcon /> },
   { view: 'leveling', icon: <TrendingUpIcon /> },
