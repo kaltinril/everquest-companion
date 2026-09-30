@@ -41,7 +41,7 @@
 // page failed to mention.
 
 import { type JSX, useEffect, useState } from 'react'
-import { Chip, Divider, Paper, Stack, Typography } from '@mui/material'
+import { Box, Chip, Divider, Paper, Stack, Typography } from '@mui/material'
 import type { KillMap, MobEntry, MobKnowledge, MobQuestUse } from '@shared/types'
 import { killsFor } from '@shared/kills'
 import { CONSIDER_FACTION_COLOR, CONSIDER_FACTION_LABEL, considerDifficultyShort } from '@shared/logEvents'
@@ -59,6 +59,8 @@ import { knowledgeFromEntry } from './mobSearch'
 // overlay mounts the very same component - see features/resists/ResistProfile.tsx.
 import { ResistProfile } from '../resists/ResistProfile'
 import type { MobConsiderContext, MobTarget } from './mobTarget'
+import UnlockChips from '../unlocks/UnlockChips'
+import { mobUnlockPaths } from '../unlocks/unlockJoins'
 
 /** What the calling surface knew about your kills on this mob, when it knew anything. */
 type MobKillFacts = MobTarget['kill']
@@ -277,13 +279,21 @@ function WikiLevelZone({ zone, levelText }: { zone?: string; levelText?: string 
 }
 
 /** ---- 3. QUESTS ---- */
-function QuestsSection({ quests }: { quests: MobQuestUse[] }): JSX.Element {
+function QuestsSection({ name, quests }: { name: string; quests: MobQuestUse[] }): JSX.Element {
+  // What the mob is on the way to: a Sky quest it gives, or a quest naming it that is an unlock's
+  // task or a part of one (features/unlocks/unlockJoins.ts).
+  const unlocks = mobUnlockPaths(name, quests)
   return (
     <>
       <Divider sx={{ my: 1.5 }} />
       <Typography variant="subtitle2" gutterBottom>
         Quests that name it
       </Typography>
+      {unlocks.length > 0 && (
+        <Box sx={{ mb: 0.75 }} data-testid="mob-unlocks">
+          <UnlockChips paths={unlocks} />
+        </Box>
+      )}
       {quests.length > 0 ? (
         <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
           {quests.map((q) => (
@@ -388,7 +398,7 @@ export function MobPage({ target, kills }: { target: MobTarget; kills: KillMap }
         onOpenItem={openItem}
       />
       <AlsoLootedSection extraSeen={extra} kills={kill?.count} onOpenItem={openItem} />
-      <QuestsSection quests={quests} />
+      <QuestsSection name={target.mob} quests={quests} />
       <KillsSection kill={kill} />
       {/* ---- 5. RESISTS ---- what it shrugs off and what it does not, mined from the logs. */}
       <ResistProfile mob={mob} />

@@ -5,6 +5,9 @@ import type { ItemKnowledge, ItemQuestUse, ItemRecipeUse } from '@shared/types'
 import { craftedByLabel, recipeUseLabel } from '@shared/itemKnowledge'
 import { wikiPageUrl } from '@shared/wiki'
 import { questUseWhere } from '../../lib/itemKnowledgeView'
+// What the item is on the way to (a race, a class, a deity), drawn under the quest uses.
+import UnlockChips from '../unlocks/UnlockChips'
+import { itemUnlockPaths } from '../unlocks/unlockJoins'
 
 // The quiet "still asking" state — shown only while the FIRST lookup for this item is in
 // flight (a re-open with cached data never flashes it).
@@ -185,7 +188,10 @@ export function KnowledgeSection({
   // era), the card it lived inside simply never mounted. So the attribution line stands alone when
   // there is nothing else: one quiet caption, no header and no icon, which is not the "noise on
   // vendor trash" the gate exists to prevent.
-  if (!hasKnowledge(data, recipes, crafted)) {
+  // An unlock's reward or turn-in is knowledge too: the one line the card exists to add when the
+  // item is a Sky reward nothing else on the page can explain.
+  const unlocks = itemUnlockPaths(data.name, data.questUses)
+  if (!hasKnowledge(data, recipes, crafted) && unlocks.length === 0) {
     return <SourceNote wikiUrl={wikiPageUrl(data.page)} questUses={data.questUses} />
   }
 
@@ -193,6 +199,11 @@ export function KnowledgeSection({
     <Box sx={{ mb: 2 }}>
       <KnowledgeHeader offline={data.offline} />
       <QuestUsesBlock data={data} recipes={recipes} crafted={crafted} />
+      {unlocks.length > 0 && (
+        <Box sx={{ mt: 0.75 }} data-testid="loot-unlocks">
+          <UnlockChips paths={unlocks} />
+        </Box>
+      )}
       <RecipesBlock recipes={recipes} questUseCount={data.questUses.length} />
       <RecipesNote note={data.recipesNote} recipeCount={recipes.length} />
       <CraftedNote crafted={crafted} />

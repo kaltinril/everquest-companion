@@ -30,6 +30,7 @@ export default function UnreleasedUnlocksView({
       <LazyUnlocksView
         key={viewKey}
         onOpenQuest={routing.openQuest}
+        onOpenMob={routing.openMob}
         onSelectView={routing.selectView}
       />
     </Suspense>

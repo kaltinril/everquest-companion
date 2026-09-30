@@ -65,10 +65,13 @@ import CharacterView from './features/character/CharacterView'
 import UnreleasedFactionsView from './unreleasedFactions'
 import { SpellDrill } from './features/spells/SpellPage'
 import { SpellLinkProvider } from './lib/spellLink'
+// Every "on the way to" chip is a link the same way (lib/unlockLink.tsx), while the tab exists.
+import { UnlockLinkProvider, setUnlockFocus } from './lib/unlockLink'
+import type { UnlockRef } from '@shared/unlocks/unlockGraph'
 // The ACHIEVEMENTS and UNLOCKS tabs, behind the review gate; each view check lives in its gate file.
 import UnreleasedSlayerView from './unreleasedSlayer'
 import UnreleasedUnlocksView from './unreleasedUnlocks'
-import { OWNER_TOOLS } from './devFlags'
+import { OWNER_TOOLS, UNRELEASED } from './devFlags'
 import { useFeedbackDialog, type FeedbackPrefill } from './features/feedback/useFeedback'
 // Usage analytics (docs/plans/usage-analytics.md). The notice is mounted unconditionally and
 // renders nothing once it has been answered; `useViewDwell` reports how long each tab was on
@@ -211,6 +214,14 @@ function ViewContent({
   const { openSection } = prefs
   const onOpenVoicePrefs = useCallback(() => openSection('voice'), [openSection])
   const onOpenOverlayPrefs = useCallback(() => openSection('overlays'), [openSection])
+  const { selectView } = routing
+  const openUnlock = useCallback(
+    (ref?: UnlockRef) => {
+      setUnlockFocus(ref ?? null)
+      selectView('unlocks')
+    },
+    [selectView]
+  )
   if (view === 'preferences') {
     return (
       <PreferencesView key={prefs.section ?? 'prefs'} onSendFeedback={onSendFeedback} section={prefs.section} />
@@ -230,61 +241,63 @@ function ViewContent({
   // no provider at all — keeps the plain text it has always had.
   return (
     <SpellLinkProvider open={routing.openSpell}>
-      <PlainView
-        view={view}
-        viewKey={viewKey}
-        routing={routing}
-        onOpenVoicePrefs={onOpenVoicePrefs}
-        onOpenOverlayPrefs={onOpenOverlayPrefs}
-      />
-      {/* The Mobs tab stays MOUNTED across a deep link (no `key` churn on target
-          change) — remounting per character rebuild only, like every other view. */}
-      {view === 'mobs' && (
-        <MobsView
-          key={viewKey}
-          target={routing.mobTarget}
-          targetNonce={routing.mobNonce}
-          onTargetConsumed={routing.clearMob}
-          nav={routing.nav}
+      <UnlockLinkProvider open={UNRELEASED ? openUnlock : null}>
+        <PlainView
+          view={view}
+          viewKey={viewKey}
+          routing={routing}
+          onOpenVoicePrefs={onOpenVoicePrefs}
+          onOpenOverlayPrefs={onOpenOverlayPrefs}
         />
-      )}
-      {view === 'bosses' && <BossView key={viewKey} onOpenMob={routing.openMob} />}
-      {/* Sky quest items name the mob that drops them, so the tracker links out to the Mobs
-          tab exactly the way the boss roster does — and, since 2026-08-04, out to the LOOT
-          drill-down for the item itself (owner: clicking a Sky item you are hovering should
-          take you to its item page). It keeps its remount `key`: both deep links run the other
-          way (out of posky). Its own INBOUND link — a celebration toast anchored at the quest
-          that just completed — rides the nonce props instead, so the remount key stays what it
-          always was: one per character rebuild. */}
-      {view === 'posky' && (
-        <PoskyView
-          key={viewKey}
-          onOpenMob={routing.openMob}
-          onOpenLoot={routing.openLoot}
-          focusQuest={routing.questKey}
-          focusNonce={routing.questNonce}
-          onFocusConsumed={routing.clearQuestFocus}
-        />
-      )}
-      {view === 'overview' && (
-        <OverviewView
-          key={viewKey}
-          onOpenCombat={routing.openCombat}
-          onOpenMob={routing.openMob}
-          onOpenLoot={routing.openLoot}
-          onOpenLeveling={onOpenLeveling}
-        />
-      )}
-      {/* Like Mobs, the Combat tab stays MOUNTED across a deep link — the focus arrives
-          through the nonce, not through a remount. */}
-      {view === 'combat' && (
-        <CombatView
-          key={viewKey}
-          focus={routing.combatFocus}
-          focusNonce={routing.combatNonce}
-          onFocusConsumed={routing.clearCombatFocus}
-        />
-      )}
+        {/* The Mobs tab stays MOUNTED across a deep link (no `key` churn on target
+            change) — remounting per character rebuild only, like every other view. */}
+        {view === 'mobs' && (
+          <MobsView
+            key={viewKey}
+            target={routing.mobTarget}
+            targetNonce={routing.mobNonce}
+            onTargetConsumed={routing.clearMob}
+            nav={routing.nav}
+          />
+        )}
+        {view === 'bosses' && <BossView key={viewKey} onOpenMob={routing.openMob} />}
+        {/* Sky quest items name the mob that drops them, so the tracker links out to the Mobs
+            tab exactly the way the boss roster does — and, since 2026-08-04, out to the LOOT
+            drill-down for the item itself (owner: clicking a Sky item you are hovering should
+            take you to its item page). It keeps its remount `key`: both deep links run the other
+            way (out of posky). Its own INBOUND link — a celebration toast anchored at the quest
+            that just completed — rides the nonce props instead, so the remount key stays what it
+            always was: one per character rebuild. */}
+        {view === 'posky' && (
+          <PoskyView
+            key={viewKey}
+            onOpenMob={routing.openMob}
+            onOpenLoot={routing.openLoot}
+            focusQuest={routing.questKey}
+            focusNonce={routing.questNonce}
+            onFocusConsumed={routing.clearQuestFocus}
+          />
+        )}
+        {view === 'overview' && (
+          <OverviewView
+            key={viewKey}
+            onOpenCombat={routing.openCombat}
+            onOpenMob={routing.openMob}
+            onOpenLoot={routing.openLoot}
+            onOpenLeveling={onOpenLeveling}
+          />
+        )}
+        {/* Like Mobs, the Combat tab stays MOUNTED across a deep link — the focus arrives
+            through the nonce, not through a remount. */}
+        {view === 'combat' && (
+          <CombatView
+            key={viewKey}
+            focus={routing.combatFocus}
+            focusNonce={routing.combatNonce}
+            onFocusConsumed={routing.clearCombatFocus}
+          />
+        )}
+      </UnlockLinkProvider>
     </SpellLinkProvider>
   )
 }
