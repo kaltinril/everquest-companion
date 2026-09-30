@@ -1,0 +1,212 @@
+// factions/useFactionRows.ts — everything the Factions tab reads, joined into its row model.
+//
+// THREE SOURCES, ONE ROW. The dump's standings arrive through `ProgressState` (session.ts loads
+// and follows the file; `onProgress` is the delivery). The LOG's receipts since that dump arrive
+// through `factions:evidence` (main/factionsEvidence.ts) and are applied here per row — the
+// numeric `adjusted by N` lines sum onto the dump's number, and a cap line PINS the value at the
+// faction's own ceiling or the scale floor whatever the old file said (shared/factionLog.ts
+// carries the algebra and its exactness rules). The quest work joins by name (factionQuests.ts).
+//
+// So the STANDING THE TAB SHOWS IS LIVE: dump + log, not dump alone — with `drift` and `exact`
+// carried on the row so the view can say what was corrected and how confidently. Split out of
+// FactionsView.tsx at the 400-code-line file ceiling (split, never ratchet).
+
+import { useEffect, useMemo, useState } from 'react'
+import type { FactionStanding } from '@shared/outputs/factions'
+import type { RaceUnlockClaim } from '@shared/outputs/achievements'
+import type { HeldCounts, ProgressState } from '@shared/types'
+import { applyEvidence, type FactionEvidence, type FactionEvidenceReport } from '@shared/factionLog'
+import { CONSIDER_FACTION_COLOR, CONSIDER_FACTION_LABEL } from '@shared/considerFaction'
+import { FACTION_TIER_FLOORS, factionTier } from './factionTiers'
+import { factionWorkIndex, type FactionWork } from './factionQuests'
+
+/** The dump's floor — the far end every bar is measured from (measured ±2000, factions.ts). */
+const SCALE_FLOOR = -2000
+
+export interface FactionRowVm {
+  id: number
+  name: string
+  /** the LIVE standing: the dump's number corrected by the log's receipts since the dump */
+  standing: number
+  /** what the file itself said — the hover's "dump said N" half */
+  dumpStanding: number
+  /** standing − dumpStanding: what the log moved since the file was written */
+  drift: number
+  /** false when the log window could not reach back to the dump AND nothing pinned this row */
+  exact: boolean
+  /** the faction's own ceiling (`dump standing + toMax` — the file's fact, never hardcoded) */
+  cap: number
+  /** distance from the LIVE standing to the cap — what the maxed filter reads */
+  toMax: number
+  label: string
+  color: string
+  /** the rung's position on the ladder, friendliest first (0 = ally) — the Regard sort's axis */
+  tierRank: number
+  /** the bar, 0–100 from the scale floor to this faction's cap */
+  pct: number
+  /** everything a search may match, lowercased: the name plus every quest name, giver, zone,
+   *  turn-in and reward on this faction's work — "Talisman of Kejaar" finds Kerra Isle */
+  searchText: string
+  /** the rewards-only haystack: just what this faction's quests GRANT (plus the name) */
+  rewardText: string
+  /** the quests on record that move this faction (factionQuests.ts), null when none name it */
+  work: FactionWork | null
+  raiseCount: number
+  /**
+   * EVERY race this faction gates — from the achievements dump's race-unlock requirements
+   * ("Get maximum faction with <this>"). A gate is a fact about the FACTION, so it stays on the
+   * row after you have earned it (`done`) — a friend's Kerran still runs through Kerra Isle
+   * whatever your own achievements say. Empty without an achievements dump ("we don't know").
+   */
+  unlocks: RaceGate[]
+}
+
+/** One race a faction gates, and whether YOUR side of it is already settled (the race is open,
+ *  or this faction's requirement is marked complete). */
+export interface RaceGate {
+  race: string
+  done: boolean
+}
+
+/** Lowercased faction name → every race gated on it, done or still pending. */
+function unlockNeeds(races: readonly RaceUnlockClaim[] | undefined): Map<string, RaceGate[]> {
+  const m = new Map<string, RaceGate[]>()
+  for (const race of races ?? []) {
+    for (const f of race.factions) {
+      const key = f.name.toLowerCase()
+      const gate: RaceGate = { race: race.race, done: race.complete || f.complete }
+      const list = m.get(key)
+      if (list === undefined) m.set(key, [gate])
+      else list.push(gate)
+    }
+  }
+  return m
+}
+
+/** Everything a row is joined against, bundled once per fold (max-params, and it IS one thing). */
+interface RowJoins {
+  work: Map<string, FactionWork>
+  evidence: Map<string, FactionEvidence>
+  windowComplete: boolean
+  unlocksByName: Map<string, RaceGate[]>
+}
+
+/** The ladder as ranks, friendliest first — computed once from the one tier table. */
+const TIER_RANK = new Map(FACTION_TIER_FLOORS.map((t, i) => [t.faction, i]))
+
+/** The two search haystacks: everything the work panel would draw, and the rewards alone. */
+function haystacksOf(name: string, w: FactionWork | null): { searchText: string; rewardText: string } {
+  const parts = [name]
+  const rewardParts = [name]
+  for (const q of [...(w?.raise ?? []), ...(w?.nearby ?? []), ...(w?.lower ?? [])]) {
+    parts.push(q.name, q.giver ?? '', q.startZone ?? '')
+    for (const n of q.items) parts.push(n)
+    for (const n of q.rewards) {
+      parts.push(n)
+      rewardParts.push(n)
+    }
+  }
+  return { searchText: parts.join('\n').toLowerCase(), rewardText: rewardParts.join('\n').toLowerCase() }
+}
+
+function toRowVm(r: FactionStanding, joins: RowJoins): FactionRowVm {
+  const ev = joins.evidence.get(r.name.toLowerCase())
+  const cap = r.standing + r.toMax
+  const live =
+    ev === undefined
+      ? { value: r.standing, drift: 0, exact: true }
+      : applyEvidence(r.standing, cap, ev, joins.windowComplete)
+  const tier = factionTier(live.value)
+  const w = joins.work.get(r.name.toLowerCase()) ?? null
+  return {
+    id: r.id,
+    name: r.name,
+    standing: live.value,
+    dumpStanding: r.standing,
+    drift: live.drift,
+    exact: live.exact,
+    cap,
+    toMax: cap - live.value,
+    label: CONSIDER_FACTION_LABEL[tier],
+    color: CONSIDER_FACTION_COLOR[tier],
+    tierRank: TIER_RANK.get(tier) ?? FACTION_TIER_FLOORS.length,
+    pct: Math.max(0, Math.min(100, ((live.value - SCALE_FLOOR) / (cap - SCALE_FLOOR)) * 100)),
+    ...haystacksOf(r.name, w),
+    work: w,
+    raiseCount: w?.raise.length ?? 0,
+    unlocks: joins.unlocksByName.get(r.name.toLowerCase()) ?? []
+  }
+}
+
+export interface FactionsData {
+  /** null until the first read lands AND while no dump has ever been loaded for this character */
+  rows: FactionRowVm[] | null
+  /** when this app last read the dump — `OutputKindLine`'s second slot */
+  readAt: number | null
+  /** the dump's held counts, for the work panel's "you have N" beside each turn-in item */
+  held: HeldCounts
+  /** the achievements dump's race unlocks, for the race panel; undefined until one is loaded */
+  raceUnlocks?: RaceUnlockClaim[]
+}
+
+/** The log-evidence report, re-asked whenever progress moves (a dump reload resets the window). */
+function useFactionEvidence(progress: ProgressState | null): FactionEvidenceReport | null {
+  const [report, setReport] = useState<FactionEvidenceReport | null>(null)
+  const loadedAt = progress?.factionsSource?.loadedAt
+  useEffect(() => {
+    let alive = true
+    window.eq
+      .factionsEvidence()
+      .then((r) => {
+        if (alive) setReport(r)
+      })
+      .catch(() => {
+        // A build whose handler is absent (packaged: the gate) or a read that failed — the dump
+        // alone is the honest fallback, which is what a null report renders.
+        if (alive) setReport(null)
+      })
+    return () => {
+      alive = false
+    }
+  }, [loadedAt])
+  return report
+}
+
+/** Everything the tab draws, live on the same push every progress consumer rides. */
+export function useFactionData(): FactionsData {
+  const [progress, setProgress] = useState<ProgressState | null>(null)
+  useEffect(() => {
+    let alive = true
+    void window.eq.getProgress().then((p) => {
+      if (alive) setProgress(p)
+    })
+    const off = window.eq.onProgress((p) => {
+      setProgress(p)
+    })
+    return () => {
+      alive = false
+      off()
+    }
+  }, [])
+  const evidence = useFactionEvidence(progress)
+  const standings = progress?.factionStandings
+  const races = progress?.raceUnlocks
+  const rows = useMemo(() => {
+    if (standings === undefined) return null
+    const byName = new Map<string, FactionEvidence>()
+    for (const ev of evidence?.rows ?? []) byName.set(ev.name.toLowerCase(), ev)
+    const joins: RowJoins = {
+      work: factionWorkIndex(),
+      evidence: byName,
+      windowComplete: evidence?.complete ?? false,
+      unlocksByName: unlockNeeds(races)
+    }
+    return standings.map((r) => toRowVm(r, joins))
+  }, [standings, evidence, races])
+  return {
+    rows,
+    readAt: progress?.factionsSource?.readAt ?? null,
+    held: progress?.inventory ?? {},
+    ...(progress?.raceUnlocks === undefined ? {} : { raceUnlocks: progress.raceUnlocks })
+  }
+}

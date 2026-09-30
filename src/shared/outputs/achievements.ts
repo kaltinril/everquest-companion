@@ -221,6 +221,73 @@ export interface AchievementsSource {
   readAt: number
 }
 
+// ---------------------------------------------------------------------------
+// THE RACE-UNLOCK HALF (the Factions tab, 2026-09-05) — the same file, a second category.
+// ---------------------------------------------------------------------------
+// `Untapped Potential: Races` holds sixteen `Race Unlock - <Race>` achievements (the race name
+// sometimes carries a city: `Human (Freeport)` and `Human (Qeynos)` are separate unlocks), and
+// their requirement components are, apart from the two pseudo-rows the class unlocks also carry
+// ("created as a <Race>" / "Race Unlock Token"), exactly `Get maximum faction with <Faction>.` —
+// 40 such rows across the measured fixture. RACE OPENING **IS** FACTION WORK, stated by the
+// server itself, which is why this projection feeds the Factions tab: each named faction joins
+// the `/outputfile faction` dump's Name column and the tab can say how far from "maximum" you
+// stand.
+//
+// UNLIKE THE CLASS HALF, NOTHING HERE FEEDS QUEST CREDITING — the projection is display-only
+// (which races are open, which factions each still needs), so the JOS-441 cascade discipline
+// costs nothing: the achievement ROW's status is taken at face value (a race opened by creation
+// or token is exactly as open as one grinded), and a component's `C` means what it says — that
+// faction has been at maximum. The evidence-kind ladder stays a class-unlock concern.
+
+/** The category holding the race-unlock achievements. */
+export const RACE_UNLOCK_CATEGORY = 'Untapped Potential: Races'
+
+/** What every race-unlock achievement's name starts with; the rest is the race (± a city). */
+export const RACE_UNLOCK_PREFIX = 'Race Unlock - '
+
+/** What every required-faction component starts with; the rest is the faction, plus a period. */
+const RACE_FACTION_PREFIX = 'Get maximum faction with '
+
+/** One faction a race unlock requires at maximum, with what the server says about it. */
+export interface RaceUnlockFaction {
+  /** the faction's name, the game's spelling — joins the factions dump's Name column */
+  name: string
+  complete: boolean
+}
+
+/** One race's unlock, as the achievements dump states it. */
+export interface RaceUnlockClaim {
+  /** `Barbarian`, `Human (Freeport)`, … — verbatim after the prefix */
+  race: string
+  /** the achievement row's own status — open however it was opened (earned, created, token) */
+  complete: boolean
+  /** the factions the server requires at maximum, each with its own status */
+  factions: RaceUnlockFaction[]
+}
+
+/** The race-unlock projection — display-only (see the header block above). */
+export function raceUnlockClaims(dump: AchievementsDump): RaceUnlockClaim[] {
+  const byRace = new Map<string, RaceUnlockClaim>()
+  for (const row of dump.rows) {
+    if (row.category !== RACE_UNLOCK_CATEGORY) continue
+    if (!row.achievement.startsWith(RACE_UNLOCK_PREFIX)) continue
+    const race = row.achievement.slice(RACE_UNLOCK_PREFIX.length).trim()
+    if (race === '') continue
+    let claim = byRace.get(race)
+    if (claim === undefined) {
+      claim = { race, complete: false, factions: [] }
+      byRace.set(race, claim)
+    }
+    if (row.component === undefined) {
+      claim.complete = row.status === 'complete'
+    } else if (row.component.startsWith(RACE_FACTION_PREFIX)) {
+      const name = row.component.slice(RACE_FACTION_PREFIX.length).trim().replace(/\.$/, '')
+      if (name !== '') claim.factions.push({ name, complete: row.status === 'complete' })
+    }
+  }
+  return [...byRace.values()]
+}
+
 /**
  * Parse a dump's text into rows.
  *

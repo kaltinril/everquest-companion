@@ -95,7 +95,10 @@ export function lineTs(line: string): number {
  * Returns null when the file is missing or empty. `truncated` says whether we started
  * mid-file, in which case the first line is a fragment and the caller drops it.
  */
-async function readTail(
+// Exported since the factions evidence reader (main/factionsEvidence.ts) — the same read-only,
+// capped tail read over the same log, and the module header's REUSE rule cuts both ways: a
+// second readTail would be a second place to get the fragment/truncation handling wrong.
+export async function readTail(
   path: string,
   cap: number
 ): Promise<{ text: string; truncated: boolean } | null> {

@@ -15,6 +15,7 @@
 
 import type { InventoryDump } from '../../shared/outputs/inventory'
 import { parseAchievementsDump, type AchievementsDump } from '../../shared/outputs/achievements'
+import { parseFactionsDump, type FactionStanding } from '../../shared/outputs/factions'
 import { outputKind, type OutputKindId } from '../../shared/outputs/kinds'
 import { parseInventoryDump } from './inventoryParse'
 
@@ -46,8 +47,18 @@ export interface AchievementsOutput {
   dump: AchievementsDump
 }
 
+/**
+ * The factions kind's payload (the third graduated kind, 2026-09-05). The parse is shared for the
+ * achievements argument verbatim: the standings are what the renderer draws, so the format lives
+ * where both halves of the app can state it (shared/outputs/factions.ts carries the measurement).
+ */
+export interface FactionsOutput {
+  kind: 'faction'
+  standings: FactionStanding[]
+}
+
 /** The parsed payload of each supported kind: a union with one member per graduated kind. */
-export type OutputData = InventoryOutput | AchievementsOutput
+export type OutputData = InventoryOutput | AchievementsOutput | FactionsOutput
 
 /** A parse either produced a typed payload, or explicitly refused and said why. */
 export type OutputParseResult =
@@ -65,6 +76,9 @@ export function parseOutput(id: OutputKindId, text: string): OutputParseResult {
   }
   if (def.id === 'achievements') {
     return { ok: true, kind: id, data: { kind: 'achievements', dump: parseAchievementsDump(text) } }
+  }
+  if (def.id === 'faction') {
+    return { ok: true, kind: id, data: { kind: 'faction', standings: parseFactionsDump(text) } }
   }
   return {
     ok: false,
