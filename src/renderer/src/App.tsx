@@ -66,8 +66,7 @@ import UnreleasedFactionsView from './unreleasedFactions'
 import { SpellDrill } from './features/spells/SpellPage'
 import { SpellLinkProvider } from './lib/spellLink'
 // Every "on the way to" chip is a link the same way (lib/unlockLink.tsx), while the tab exists.
-import { UnlockLinkProvider, setUnlockFocus } from './lib/unlockLink'
-import type { UnlockRef } from '@shared/unlocks/unlockGraph'
+import { UnlockLinkProvider, useOpenUnlock } from './lib/unlockLink'
 // The ACHIEVEMENTS and UNLOCKS tabs, behind the review gate; each view check lives in its gate file.
 import UnreleasedSlayerView from './unreleasedSlayer'
 import UnreleasedUnlocksView from './unreleasedUnlocks'
@@ -514,13 +513,7 @@ export default function App(): JSX.Element {
   const onOpenPreferences = useCallback(() => selectView('preferences'), [selectView])
   // Every "on the way to" chip opens the Unlocks tab on its unlock (lib/unlockLink.tsx), while
   // the tab exists: the provider below publishes nothing in a build without it.
-  const openUnlock = useCallback(
-    (ref?: UnlockRef) => {
-      setUnlockFocus(ref ?? null)
-      selectView('unlocks')
-    },
-    [selectView]
-  )
+  const openUnlock = useOpenUnlock(selectView)
   const onOpenLeveling = useCallback(() => openLeveling(), [openLeveling])
   const hasCharacters = characters.length > 0
 

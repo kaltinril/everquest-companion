@@ -12,8 +12,9 @@
 // ceilings, and a view that reads one pending ref when it mounts needs nothing more than a
 // module-level slot. The tab takes the ref (once) and scrolls to that row.
 
-import { createContext, useContext, type JSX, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, type JSX, type ReactNode } from 'react'
 import type { UnlockRef } from '@shared/unlocks/unlockGraph'
+import type { View } from '../appViews'
 
 export type OpenUnlock = (ref?: UnlockRef) => void
 
@@ -50,4 +51,15 @@ export function takeUnlockFocus(): UnlockRef | null {
 /** The row's DOM id, so a link can scroll to it. */
 export function unlockRowId(ref: UnlockRef): string {
   return `unlock-${ref.kind}-${ref.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`
+}
+
+/** The opener App publishes: park the ref, then switch to the tab by the MANUAL navigator. */
+export function useOpenUnlock(selectView: (v: View) => void): OpenUnlock {
+  return useCallback(
+    (ref?: UnlockRef) => {
+      setUnlockFocus(ref ?? null)
+      selectView('unlocks')
+    },
+    [selectView]
+  )
 }
