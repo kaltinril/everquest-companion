@@ -74,10 +74,22 @@ export function PickBox({
   )
 }
 
-/** The line's words: a link when they are a mob's whole name. */
-function LineText({ component, ctx }: { component: BookComponent; ctx: RowContext }): JSX.Element {
-  const text = componentText(component)
-  const mobs = namedMobs(component, ctx.mobs)
+/**
+ * The line's words: a link when they are a mob's whole name, and the achievement's own name when
+ * the line names one (`Complete the achievement "Pesticide"` is drawn as `Pesticide`, under the
+ * caret that opens it).
+ */
+function LineText({
+  component,
+  named,
+  ctx
+}: {
+  component: BookComponent
+  named: Located | null
+  ctx: RowContext
+}): JSX.Element {
+  const text = named === null ? componentText(component) : named.achievement.name
+  const mobs = named === null ? namedMobs(component, ctx.mobs) : []
   const { onOpenMob } = ctx
   if (mobs.length === 0 || onOpenMob === undefined) {
     return (
@@ -175,25 +187,36 @@ export function ComponentLine(props: LineProps): JSX.Element {
   const id = counterIdOf(group, parent, component)
   return (
     <Box data-testid="achievement-line" data-done={component.done ? 'true' : 'false'}>
-      <Stack direction="row" spacing={0.75} alignItems="center" flexWrap="wrap" useFlexGap>
+      <Stack direction="row" spacing={0.75} alignItems="center">
         {!bare && ctx.pickable && id !== null && (
           <PickBox ids={[id]} label={componentText(component)} ctx={ctx} />
         )}
         {!bare && <StatusIcon done={component.done} />}
-        <LineText component={component} ctx={ctx} />
-        {isOptional(component) && (
-          <Chip size="small" variant="outlined" label="optional" sx={CHIP_SX} />
-        )}
-        {!bare && <LineCounter id={id} component={component} ctx={ctx} />}
-        {named !== null && (
-          <NestToggle
-            named={named}
-            open={open}
-            onToggle={() => {
-              setOpen(!open)
-            }}
-          />
-        )}
+        <Stack
+          direction="row"
+          spacing={0.75}
+          alignItems="center"
+          flexWrap="wrap"
+          useFlexGap
+          sx={{ flex: 1, minWidth: 0 }}
+        >
+          <LineText component={component} named={found} ctx={ctx} />
+          {isOptional(component) && (
+            <Chip size="small" variant="outlined" label="optional" sx={CHIP_SX} />
+          )}
+        </Stack>
+        <Stack direction="row" spacing={0.75} alignItems="center" sx={{ flexShrink: 0 }}>
+          {!bare && <LineCounter id={id} component={component} ctx={ctx} />}
+          {named !== null && (
+            <NestToggle
+              named={named}
+              open={open}
+              onToggle={() => {
+                setOpen(!open)
+              }}
+            />
+          )}
+        </Stack>
       </Stack>
       {named !== null && (
         <Collapse in={open} unmountOnExit>

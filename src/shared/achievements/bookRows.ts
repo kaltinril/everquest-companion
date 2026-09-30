@@ -265,8 +265,11 @@ export function visibleSections(
     const achievements = group.achievements.filter((a) => keeps(group, a, f, words))
     if (achievements.length === 0) continue
     if (f.sort === 'closest') {
+      // What is finished is as close as it gets and is no longer work, so it goes last.
       const pct = new Map(achievements.map((a) => [a, achievementPct(a, index)]))
-      achievements.sort((a, b) => (pct.get(b) ?? 0) - (pct.get(a) ?? 0))
+      achievements.sort(
+        (a, b) => Number(a.done) - Number(b.done) || (pct.get(b) ?? 0) - (pct.get(a) ?? 0)
+      )
     }
     sections.push({ group, achievements })
   }
