@@ -65,31 +65,33 @@ export interface SkyQuestReward {
 }
 
 export const SKY_QUEST_REWARDS: readonly SkyQuestReward[] = [
+  // The Bard row this file was written for (`Fae Amulet` -> `Amulet of the Fae`, verified
+  // 2026-08-20) RETIRED 2026-09-27: the wiki's Plane of Sky page links Amulet of the Fae now, the
+  // posky rescrape says so, and the audit's own instruction is to delete a row the scrape has
+  // caught up to. The header above is that row's argument and still the reason the overlay exists.
   {
-    className: 'Bard',
-    questName: 'Bard Test of Wind',
-    from: 'Fae Amulet',
-    to: 'Amulet of the Fae',
+    className: 'Beastlord',
+    questName: 'Beastlord Test of Harpy',
+    from: 'Griffon-Hide Armguards',
+    to: 'Griffin-Hide Armguards',
     stats: [
-      'MAGIC ITEM LORE ITEM NO DROP',
-      'Slot: NECK',
-      'Charges: 4',
-      'AC: 8',
-      'STR: +5 DEX: +4 STA: +4 HP: +50',
-      'SV DISEASE: +10 SV POISON: +10',
-      'Effect: Healing (Must Equip, Casting Time: Instant) at Level 45',
-      'WT: 0.1 Size: TINY',
-      'Class: BRD',
-      'Race: ALL'
+      'Lore Equipped, No Trade',
+      'Slot: ARMS',
+      'Class: BST',
+      'Race: ALL',
+      'AC: 6',
+      'STA: +4 WIS: +3',
+      'SV MAGIC: +5 SV FIRE: +5 SV COLD: +5 SV DISEASE: +5 SV POISON: +5',
+      'End: +15',
+      'WT: 2.5 Size: SMALL'
     ].join('\n'),
-    verified: '2026-08-20',
+    verified: '2026-09-27',
     evidence:
-      'Reported 01M0FH3XC4ST5Q3XXPJ0H3X75J (1.6.0), "The link Fae Amulet/name should be Amulet of ' +
-      'the Fae"; the same report\'s inventory export holds Amulet of the Fae (id 27723, Bank7) and ' +
-      'no Fae Amulet. items.json carries both pages: Fae Amulet AC 5 with questUses Bard Test of ' +
-      'Wind, Amulet of the Fae AC 8 STR +5 with the identical NECK/BRD/4-charge-Healing profile, ' +
-      'the same icon 1043, and no source of its own stated anywhere. Each page asks in its own ' +
-      'summary whether the other is the upgraded version; the bag settles it.'
+      'The game spells it Griffin: an inventory export holds Griffin-Hide Armguards (id 177762, ' +
+      'Bank12) and the achievements file reads "Obtain Griffin-Hide Armguards". The wiki holds TWO ' +
+      'pages for the one item, identical in every stat and both naming Beastlord Test of Harpy; ' +
+      'until the 2026-09-27 rescrape the Plane of Sky reward cell linked the Griffin page, and it ' +
+      'links the Griffon one now.'
   }
 ]
 
