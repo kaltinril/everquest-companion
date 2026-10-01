@@ -7,6 +7,7 @@ import {
   Box,
   Button,
   FormControlLabel,
+  Link,
   MenuItem,
   Stack,
   Switch,
@@ -23,6 +24,7 @@ import { EQUIP_SLOTS } from '@shared/planner/types'
 import ChipMultiSelect from '../../components/ChipMultiSelect'
 import type { RowSort, SortKey } from './factionDerive'
 import type { SlotFilter } from './factionFilters'
+import { useUnlockLink } from '../../lib/unlockLink'
 
 /** The table's header: three sortable columns (Faction, Regard, Standing) and the bar's. */
 export function FactionTableHead({
@@ -152,10 +154,37 @@ function FilterSwitch({
   )
 }
 
-/** The race-gate controls: the hunt switch (disabled with its reason until an achievements dump
- *  exists) and — only while it is on — its two refinements: the still-needed switch that drops
- *  settled gates, and the race picker that keeps only the picked races' gates.
- *  Split out of `FilterBar` at the 100-line function ceiling. */
+/** Where classes and deities open instead, said once under the race hunt so nobody looks for a
+ *  class toggle here: no faction line exists for either (shared/unlocks/unlockRules.generated.ts).
+ *  The word is a link to the Unlocks tab while the app publishes one. */
+function OtherUnlocksNote(): JSX.Element {
+  const open = useUnlockLink()
+  return (
+    <Typography variant="caption" color="text.secondary" data-testid="factions-other-unlocks">
+      No faction opens a class or a deity; see{' '}
+      {open === null ? (
+        'Unlocks'
+      ) : (
+        <Link
+          component="button"
+          variant="caption"
+          underline="hover"
+          onClick={() => {
+            open()
+          }}
+        >
+          Unlocks
+        </Link>
+      )}
+      .
+    </Typography>
+  )
+}
+
+/** The race-gate controls: the hunt switch (the gates are the rulebook's, so it works before any
+ *  achievements dump) and — only while it is on — its two refinements: the still-needed switch
+ *  that drops settled gates (which needs the dump, and says so), and the race picker that keeps
+ *  only the picked races' gates. Split out of `FilterBar` at the 100-line function ceiling. */
 function RaceGateSwitches({
   toggles,
   unlockers,
@@ -180,23 +209,25 @@ function RaceGateSwitches({
         label={`Unlocks a race (${String(unlockers)})`}
         checked={toggles.unlocksOnly}
         onChange={toggles.onUnlocksOnly}
-        disabledHint={
-          unlocksKnown
-            ? undefined
-            : 'The race requirements come from the achievements export - type /outputfile achievements in game and this lights up.'
-        }
         testId="factions-unlocks-only"
       />
       {/* The refinement, offered only while the gate hunt is on: drop the gates this character
-          has already settled (the ✓ ones stay visible by default for the friend case). */}
+          has already settled (the ✓ ones stay visible by default for the friend case). Which
+          gates are settled is the achievements dump's knowledge and nothing else's. */}
       {toggles.unlocksOnly && (
         <FilterSwitch
           label="Still needed"
           checked={toggles.unlocksPending}
           onChange={toggles.onUnlocksPending}
+          disabledHint={
+            unlocksKnown
+              ? undefined
+              : 'Which gates you have settled comes from the achievements export - type /outputfile achievements in game and this lights up.'
+          }
           testId="factions-unlocks-pending"
         />
       )}
+      {toggles.unlocksOnly && <OtherUnlocksNote />}
       {/* WHICH race: the dump's own race list as a closed pick, empty meaning every race. A
           player working toward one unlock wants that race's factions and nothing else on the
           table; a friend helping wants the same list for the friend's race. */}

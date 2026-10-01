@@ -212,3 +212,37 @@ export function howText(how: UnlockHow | null): string {
       return ''
   }
 }
+
+/**
+ * The rulebook as a book with nothing known: every unlock closed, no line done, no way in named.
+ * What the tab draws for a character who has never exported achievements, so the requirements
+ * are on screen before the status is.
+ */
+export function unlocksFromRules(rules: readonly UnlockRuleLike[]): UnlockBook {
+  const of = (kind: UnlockKind): Unlock[] =>
+    rules
+      .filter((r) => r.kind === kind)
+      .map((r) => ({
+        kind,
+        name: r.name,
+        open: false,
+        how: null,
+        needs: r.needs.map((n) => ({ kind: n.kind, subject: n.subject, text: n.text, done: false })),
+        done: 0
+      }))
+  return {
+    races: of('race'),
+    classes: of('class'),
+    deities: of('deity'),
+    deity: null,
+    primaryClass: null,
+    createdAs: null
+  }
+}
+
+/** The shape of a rulebook row this file needs, so it does not import the generated file. */
+export interface UnlockRuleLike {
+  kind: UnlockKind
+  name: string
+  needs: readonly { kind: NeedKind; subject: string; text: string }[]
+}

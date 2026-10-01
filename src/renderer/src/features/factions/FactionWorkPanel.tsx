@@ -26,6 +26,8 @@ import { MOB_CARD_SLOT_PROPS, MobCard } from '../../lib/hoverCards'
 import { mainMobLookup } from '../timers/mobLookup'
 // The reward-name fold (`*` off, corpus key) — the same one the filters and the wishlist use.
 import { rewardKey as rewardKeyOf } from './factionFilters'
+import { unlocksNeedingQuest } from '@shared/unlocks/unlockGraph'
+import UnlockChips from '../unlocks/UnlockChips'
 import type { FactionQuestRef, FactionWork } from './factionQuests'
 
 /** The links a quest line can offer — threaded once rather than as four props per level. */
@@ -276,6 +278,8 @@ function QuestLine({
         </Typography>
       </Typography>
       <Box sx={{ pl: 3 }}>
+        {/* A quest that is an unlock's task, or a part of one, says so (unlockGraph.ts). */}
+        <UnlockChips paths={unlocksNeedingQuest(quest.name)} testId="factions-quest-unlock" />
         <ItemLinks
           label="turn in:"
           names={quest.items}

@@ -17,6 +17,7 @@ import type { RaceUnlockClaim } from '@shared/outputs/achievements'
 import type { HeldCounts, ProgressState } from '@shared/types'
 import { applyEvidence, type FactionEvidence, type FactionEvidenceReport } from '@shared/factionLog'
 import { CONSIDER_FACTION_COLOR, CONSIDER_FACTION_LABEL } from '@shared/considerFaction'
+import { rulesOf } from '@shared/unlocks/unlockGraph'
 import { FACTION_TIER_FLOORS, factionTier } from './factionTiers'
 import { factionWorkIndex, type FactionWork } from './factionQuests'
 
@@ -68,19 +69,43 @@ export interface RaceGate {
   done: boolean
 }
 
-/** Lowercased faction name → every race gated on it, done or still pending. */
+function addGate(m: Map<string, RaceGate[]>, faction: string, gate: RaceGate): void {
+  const key = faction.toLowerCase()
+  const list = m.get(key)
+  if (list === undefined) m.set(key, [gate])
+  else list.push(gate)
+}
+
+/**
+ * Lowercased faction name → every race gated on it, done or still pending.
+ *
+ * THE GATES ARE THE RULEBOOK'S (shared/unlocks/unlockGraph.ts), so a faction says which race it
+ * opens for a player who has never exported achievements; the dump adds only what it alone
+ * knows, whether THIS character has settled the gate. A race the dump names and the rulebook
+ * does not is still read off the dump.
+ */
 function unlockNeeds(races: readonly RaceUnlockClaim[] | undefined): Map<string, RaceGate[]> {
   const m = new Map<string, RaceGate[]>()
-  for (const race of races ?? []) {
-    for (const f of race.factions) {
-      const key = f.name.toLowerCase()
-      const gate: RaceGate = { race: race.race, done: race.complete || f.complete }
-      const list = m.get(key)
-      if (list === undefined) m.set(key, [gate])
-      else list.push(gate)
+  const claims = new Map((races ?? []).map((c) => [c.race, c]))
+  for (const rule of rulesOf('race')) {
+    const claim = claims.get(rule.name)
+    claims.delete(rule.name)
+    for (const need of rule.needs) {
+      if (need.kind === 'faction') addGate(m, need.subject, { race: rule.name, done: settled(claim, need.subject) })
+    }
+  }
+  for (const claim of claims.values()) {
+    for (const f of claim.factions) {
+      addGate(m, f.name, { race: claim.race, done: claim.complete || f.complete })
     }
   }
   return m
+}
+
+/** Whether the dump says this gate is settled: the race is open, or that faction line is `C`. */
+function settled(claim: RaceUnlockClaim | undefined, faction: string): boolean {
+  if (claim === undefined) return false
+  return claim.complete || claim.factions.some((f) => f.name === faction && f.complete)
 }
 
 /** Everything a row is joined against, bundled once per fold (max-params, and it IS one thing). */

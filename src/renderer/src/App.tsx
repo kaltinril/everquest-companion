@@ -70,10 +70,12 @@ import { SpellDrill } from './features/spells/SpellPage'
 // trio and the view test, the `devTriage` shape, so this file gains a line rather than nine.
 import UnreleasedSpellsView from './unreleasedSpells'
 import { SpellLinkProvider } from './lib/spellLink'
+// Every "on the way to" chip is a link the same way (lib/unlockLink.tsx), while the tab exists.
+import { UnlockLinkProvider, useOpenUnlock } from './lib/unlockLink'
 // The ACHIEVEMENTS and UNLOCKS tabs, behind the review gate; each view check lives in its gate file.
 import UnreleasedSlayerView from './unreleasedSlayer'
 import UnreleasedUnlocksView from './unreleasedUnlocks'
-import { OWNER_TOOLS } from './devFlags'
+import { OWNER_TOOLS, UNRELEASED } from './devFlags'
 import { useFeedbackDialog, type FeedbackPrefill } from './features/feedback/useFeedback'
 // Usage analytics (docs/plans/usage-analytics.md). The notice is mounted unconditionally and
 // renders nothing once it has been answered; `useViewDwell` reports how long each tab was on
@@ -537,6 +539,9 @@ export default function App(): JSX.Element {
   // `ViewContentMemo` three fresh functions on every shell re-render and it would never bail out
   // once — the boundary would cost a comparison and buy nothing.
   const onOpenPreferences = useCallback(() => selectView('preferences'), [selectView])
+  // Every "on the way to" chip opens the Unlocks tab on its unlock (lib/unlockLink.tsx), while
+  // the tab exists: the provider below publishes nothing in a build without it.
+  const openUnlock = useOpenUnlock(selectView)
   const onOpenLeveling = useCallback(() => openLeveling(), [openLeveling])
   const hasCharacters = characters.length > 0
 
@@ -564,16 +569,18 @@ export default function App(): JSX.Element {
         <NavDrawer view={view} onSelect={selectView} prefs={prefsRouting} onSendFeedback={() => feedback.openFeedback()} />
 
         <MainColumn view={view} onSelect={selectView} onReport={feedback.openFeedback}>
-          <ViewContentMemo
-            view={view}
-            hasCharacters={hasCharacters}
-            viewKey={viewKey}
-            routing={routing}
-            prefs={prefsRouting}
-            onOpenPreferences={onOpenPreferences}
-            onOpenLeveling={onOpenLeveling}
-            onSendFeedback={feedback.openFeedback}
-          />
+          <UnlockLinkProvider open={UNRELEASED ? openUnlock : null}>
+            <ViewContentMemo
+              view={view}
+              hasCharacters={hasCharacters}
+              viewKey={viewKey}
+              routing={routing}
+              prefs={prefsRouting}
+              onOpenPreferences={onOpenPreferences}
+              onOpenLeveling={onOpenLeveling}
+              onSendFeedback={feedback.openFeedback}
+            />
+          </UnlockLinkProvider>
         </MainColumn>
       </Box>
 

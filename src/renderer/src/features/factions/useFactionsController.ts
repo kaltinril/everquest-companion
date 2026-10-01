@@ -32,6 +32,7 @@ import {
 } from './factionDerive'
 import { filtersActive, type SlotFilter, type WorkFilters } from './factionFilters'
 import { useFactionData, type FactionRowVm } from './useFactionRows'
+import { rulesOf } from '@shared/unlocks/unlockGraph'
 
 /** The set with one member toggled — a fresh Set, because React compares by identity. */
 function toggledSet(s: ReadonlySet<number>, id: number): ReadonlySet<number> {
@@ -171,9 +172,14 @@ export function useFactionsController(props: FactionsViewProps): FactionsControl
       return (w?.raise.length ?? 0) > 0 || (w?.nearby.length ?? 0) > 0
     })
   }, [all, rowFilters, sort, workFilters, derivedById])
-  // The race picker's closed list IS the dump's race list, in the dump's own order — the same
-  // names the row chips wear, so a pick and a chip agree by plain equality.
-  const raceOptions = useMemo(() => (raceUnlocks ?? []).map((c) => c.race), [raceUnlocks])
+  // The race picker's closed list is the rulebook's race list, in the game's order — the same
+  // names the row chips wear, so a pick and a chip agree by plain equality. The dump used to be
+  // the only source; it still adds a race the rulebook lacks.
+  const raceOptions = useMemo(() => {
+    const names = rulesOf('race').map((r) => r.name)
+    for (const c of raceUnlocks ?? []) if (!names.includes(c.race)) names.push(c.race)
+    return names
+  }, [raceUnlocks])
   const counts = useMemo(
     () => ({
       untouched: (all ?? []).filter((r) => r.standing === 0).length,
