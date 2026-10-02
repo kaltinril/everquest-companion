@@ -24,6 +24,7 @@ import {
   OUT_OF_ERA_KEY,
   PICKS_KEY,
   counterRows,
+  levelCap,
   loadFlag,
   loadMaxLevel,
   loadPicks,
@@ -87,7 +88,7 @@ function usePlanOptions(): {
   const own = useModule<CharacterSnap>('character')?.level?.level
   const [stored, setStored] = useState(() => loadMaxLevel())
   const [outOfEra, setOutOfEra] = useState(() => loadFlag(OUT_OF_ERA_KEY))
-  const maxLevel = stored === undefined ? (own ?? null) : stored
+  const maxLevel = levelCap(stored, own)
   const opts = useMemo(() => ({ maxLevel, outOfEra }), [maxLevel, outOfEra])
   const onMaxLevel = useCallback((level: number | null) => {
     setStored(level)

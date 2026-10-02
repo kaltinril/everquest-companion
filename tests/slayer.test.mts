@@ -21,6 +21,7 @@ import {
   achievementKey,
   requiredByGoal,
   requiredLeft,
+  showsOpenRows,
   slayerRecord
 } from '../src/shared/outputs/slayer'
 import { SLAYER_TERMS, labelTerms, raceKey, resolveTerm } from '../src/shared/slayer/slayerKinds'
@@ -73,6 +74,18 @@ test('the open counters are read per group, and only the open ones', () => {
     OLD.counters.some((c) => c.achievement === 'Amphibicide'),
     false
   )
+})
+
+test('a dump with no open row at all (Show Open unticked) is no witness about Slayer', () => {
+  const text = read('Primitive_freeport-Achievements.txt')
+  assert.equal(showsOpenRows(parseAchievementsDump(text)), true)
+  const doneOnly = text
+    .split(/\r?\n/)
+    .filter((line) => !line.startsWith('I\t'))
+    .join('\n')
+  const dump = parseAchievementsDump(doneOnly)
+  assert.ok(dump.rows.length > 0)
+  assert.equal(showsOpenRows(dump), false)
 })
 
 test('a counter carries the numbers as numbers and the line verbatim', () => {
@@ -239,6 +252,14 @@ test('a ghost is its race, except where the game counts the race itself', () => 
   assert.equal(matchMob(slayerTarget(people).matcher, ghost), null)
 })
 
+test('a strict term that only names another counts what that one counts (`Kerran`)', () => {
+  assert.equal(SLAYER_TERMS.get('kerran')?.races, undefined)
+  const kerran = OLD.counters.find((c) => c.label === 'Kerran' && c.group === 'Special')
+  assert.ok(kerran)
+  const strict = slayerTarget(kerran).matcher
+  assert.equal(matchMob(strict, mobFacts('a kerran warrior', 'Kerra')), 'race')
+})
+
 // ---------------------------------------------------------------------------
 // THE PLAN
 // ---------------------------------------------------------------------------
@@ -333,6 +354,22 @@ test('a placeholder is not a zone, and a several-zone mob is one spawn in each',
   )
 })
 
+test('a guess, a various and a closing period are read as the catalog writes them', () => {
+  const odd = slayerMobs(
+    [
+      mob('a gnoll scout', ['Various Starter Zones', 'Warsliks?', 'Lake of Ill Omen.'], '10', 2),
+      mob('a gnoll guard', ['various (Qeynos Hills)', 'also in Chardok?'], '10', 2)
+    ],
+    () => 'Gnoll'
+  )
+  const every = { maxLevel: null, outOfEra: true }
+  const gnolls = planZones(odd, [slayerTarget(counter('The More You Gnoll!', 'Gnolls'))], every)
+  assert.deepEqual(
+    gnolls.map((z) => [z.key, z.name]),
+    [['lakeofillomen', 'Lake of Ill Omen']]
+  )
+})
+
 test('the level cap reads the LOWEST stated level, and an unopened zone is a switch', () => {
   const capped = planZones(MOBS, [ALIVE], { maxLevel: 20, outOfEra: false })
   assert.deepEqual(
@@ -390,7 +427,7 @@ const FIELD_MOBS = slayerMobs(FIELD, (page) =>
 )
 
 test('spawn points that stand together are one area, and it names what it serves', () => {
-  const areas = slayerAreas('qey2hh1', FIELD_MOBS, [BATS, CROWS])
+  const areas = slayerAreas('qey2hh1', FIELD_MOBS, [BATS, CROWS], null)
   assert.equal(areas.length, 2)
   const [camp, lone] = areas
   assert.equal(camp.spawns, 3)
@@ -410,12 +447,26 @@ test('spawn points that stand together are one area, and it names what it serves
 })
 
 test('an area is drawn only for this map, only for picks, only for one-zone pages', () => {
-  assert.deepEqual(slayerAreas('qey2hh1', FIELD_MOBS, []), [])
-  assert.deepEqual(slayerAreas('befallen', FIELD_MOBS, [BATS, CROWS]), [])
-  const bats = slayerAreas('qey2hh1', FIELD_MOBS, [BATS])
+  assert.deepEqual(slayerAreas('qey2hh1', FIELD_MOBS, [], null), [])
+  assert.deepEqual(slayerAreas('befallen', FIELD_MOBS, [BATS, CROWS], null), [])
+  const bats = slayerAreas('qey2hh1', FIELD_MOBS, [BATS], null)
   assert.deepEqual(
     bats.map((a) => a.mobs),
     [['a giant bat']],
     'the two-zone cave bat states a location nobody can place'
   )
+})
+
+test('the map leaves out what the level cap leaves out of the zone list', () => {
+  const high = { ...at('a scarecrow', 'Western Plains of Karana', [[100, 100]]), level: '30' }
+  const low = { ...at('a giant bat', 'Western Plains of Karana', [[150, 150]]), level: '4-6' }
+  const field = slayerMobs([high, low], (page) =>
+    page.includes('bat') ? 'Giant Bat' : 'Scarecrow'
+  )
+  const cap = { maxLevel: 20, outOfEra: false }
+  const listed = planZones(field, [BATS, CROWS], cap).flatMap((z) => z.mobs.map((m) => m.name))
+  const shaded = slayerAreas('qey2hh1', field, [BATS, CROWS], cap.maxLevel).flatMap((a) => a.mobs)
+  assert.deepEqual(listed, ['a giant bat'])
+  assert.deepEqual(shaded, listed)
+  assert.equal(slayerAreas('qey2hh1', field, [BATS, CROWS], null)[0].mobs.length, 2)
 })

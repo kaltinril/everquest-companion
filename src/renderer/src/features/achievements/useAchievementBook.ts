@@ -26,13 +26,19 @@ export function useAchievementBook(): BookData {
   useEffect(() => {
     let alive = true
     let asked: number | null | undefined
+    // A failed read is not "never run": what was shown stays, and `asked` is cleared so the next
+    // progress push asks again even when it carries the same instant.
     const ask = (readAt: number | null): void => {
-      void window.eq
-        .achievementsBook()
-        .catch(() => null)
-        .then((book) => {
+      window.eq.achievementsBook().then(
+        (book) => {
           if (alive && asked === readAt) setData({ book, readAt, ready: true })
-        })
+        },
+        () => {
+          if (!alive || asked !== readAt) return
+          asked = undefined
+          setData((prev) => ({ ...prev, ready: true }))
+        }
+      )
     }
     const onProgress = (p: ProgressState): void => {
       const readAt = p.achievementsSource?.readAt ?? null

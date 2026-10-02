@@ -37,6 +37,7 @@ import {
   componentSubject,
   componentText,
   isOptional,
+  isOwnAchievementsDump,
   splitCategory,
   type BookComponent
 } from '../src/shared/outputs/achievementBook'
@@ -389,4 +390,14 @@ test('the plan is offered in a family that holds a counter, and nowhere else', (
   assert.equal(familyHasCounter(FULL, 'EverQuest'), false)
   assert.equal(familyHasCounter(FULL, 'Tradeskill'), false)
   assert.equal(familyHasCounter(FULL, null), false)
+})
+
+test("another character's dump is not this character's, whatever discovery fell back to", () => {
+  const own = 'C:\\EQ\\Primitive_freeport-Achievements.txt'
+  assert.equal(isOwnAchievementsDump(own, 'Primitive', 'freeport'), true)
+  assert.equal(isOwnAchievementsDump(own, 'primitive', 'Freeport'), true)
+  assert.equal(isOwnAchievementsDump('/eq/Primitive-Achievements.txt', 'Primitive'), true)
+  assert.equal(isOwnAchievementsDump(own, 'Garrett', 'freeport'), false)
+  // A character whose name is not known owns whatever was found: the one-character machine.
+  assert.equal(isOwnAchievementsDump(own, undefined), true)
 })

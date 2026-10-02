@@ -13,10 +13,13 @@
 // WHAT IS NOT DRAWN, for the reason the pin layer gives (mobPins.ts): a mob whose page names
 // several zones states locations nobody can assign to the map on screen, and a mob whose page
 // states none has nowhere to be drawn. Both still count in the Achievements tab's zone list.
+// A mob above the plan's level cap is left out here as the zone list leaves it out
+// (`withinLevel`), so the list and the map never disagree about where to go.
 
 import type { ZoneShort } from '@shared/maps'
 import { matchMob } from '../../../../shared/slayer/slayerMatch'
 import type { SlayerMob, SlayerTarget } from '@shared/slayer/slayerPlan'
+import { withinLevel } from '../../../../shared/slayer/slayerPlan'
 import { zoneShortNameFromCatalog } from '../../../../shared/zones'
 import { mobPins } from '../maps/mobPins'
 
@@ -59,10 +62,12 @@ function hits(mob: SlayerMob, targets: readonly SlayerTarget[]): string[] {
 function pointsOn(
   zone: ZoneShort,
   mobs: readonly SlayerMob[],
-  targets: readonly SlayerTarget[]
+  targets: readonly SlayerTarget[],
+  maxLevel: number | null
 ): Point[] {
   const points: Point[] = []
   for (const mob of mobs) {
+    if (!withinLevel(mob, maxLevel)) continue
     const zones = mob.entry.zones ?? []
     if (zones.length !== 1 || zoneShortNameFromCatalog(zones[0]) !== zone) continue
     const counts = hits(mob, targets)
@@ -109,14 +114,16 @@ function areaOf(members: readonly Point[], order: ReadonlyMap<string, number>): 
   }
 }
 
-/** The areas of one map, the one with the most spawn points first. */
+/** The areas of one map, the one with the most spawn points first. `maxLevel` is the plan's cap
+ *  (`PlanOptions.maxLevel`); null draws every level. */
 export function slayerAreas(
   zone: ZoneShort,
   mobs: readonly SlayerMob[],
-  targets: readonly SlayerTarget[]
+  targets: readonly SlayerTarget[],
+  maxLevel: number | null
 ): SlayerArea[] {
   if (targets.length === 0) return []
-  const points = pointsOn(zone, mobs, targets)
+  const points = pointsOn(zone, mobs, targets, maxLevel)
   const byGroup = new Map<number, Point[]>()
   groups(points).forEach((group, i) => {
     byGroup.set(group, [...(byGroup.get(group) ?? []), points[i]])

@@ -89,6 +89,15 @@ export function requiredLeft(goal: SlayerGoal): number {
   return goal.needs.filter((n) => !n.optional).length
 }
 
+/**
+ * Whether the dump printed any open row at all. A dump written with the window's `Show Open`
+ * unticked has none, and its empty record would say nothing is left: such a dump is no witness
+ * about Slayer, and the record it would make is not stored over the last good one.
+ */
+export function showsOpenRows(dump: AchievementsDump): boolean {
+  return dump.rows.some((row) => row.status === 'incomplete')
+}
+
 const COUNTER_RE = /^(\d+)\/(\d+)$/
 const NEED_RE = /^(\(Optional\) )?Complete the achievement "(.+)"$/
 
