@@ -378,6 +378,18 @@ interface MatchOutcome {
   placed: readonly number[]
   adj: readonly number[][]
   sockets: readonly SocketHostCell[]
+  /** the plan's ledger after naming - a free option whose copies are all spent says so */
+  left: ReadonlyMap<string, number>
+}
+
+/** Who holds seat `v` in the plan, as the contest line reads it. A seat the plan left free is
+ *  open to claim `u` only if a copy of its donors is still loose. */
+function heldByOf(m: MatchOutcome, u: number, v: number, byCell: ReadonlyMap<string, Placement>): string {
+  const s = m.sockets[v]
+  const held = byCell.get(`${s.cellId}|${s.type}`)
+  if (held !== undefined) return held.effect
+  const loose = m.claims[u].donors.some((d) => d.type === s.type && (m.left.get(d.key) ?? 0) > 0)
+  return loose ? 'empty' : 'nothing (its only copy is seated elsewhere)'
 }
 
 function contestedOf(m: MatchOutcome, placements: readonly Placement[]): ContestedFamily[] {
@@ -385,14 +397,11 @@ function contestedOf(m: MatchOutcome, placements: readonly Placement[]): Contest
   const out: ContestedFamily[] = []
   for (let u = 0; u < m.claims.length; u++) {
     if (m.placed[u] !== -1) continue
-    const options = m.adj[u].map((v) => {
-      const s = m.sockets[v]
-      return {
-        cellLabel: s.cellLabel,
-        type: s.type,
-        heldBy: byCell.get(`${s.cellId}|${s.type}`)?.effect ?? 'empty'
-      }
-    })
+    const options = m.adj[u].map((v) => ({
+      cellLabel: m.sockets[v].cellLabel,
+      type: m.sockets[v].type,
+      heldBy: heldByOf(m, u, v, byCell)
+    }))
     out.push({
       effect: m.claims[u].eff.effect,
       gemName: m.claims[u].gemName,
@@ -401,6 +410,87 @@ function contestedOf(m: MatchOutcome, placements: readonly Placement[]): Contest
     })
   }
   return out
+}
+
+/** One run of the matching, named against its own fresh ledger. */
+interface Seating {
+  seatOf: number[]
+  placed: number[]
+  placements: Placement[]
+  ctx: PlanContext
+}
+
+/** A claim-to-seat edge of the matching: `[claim index, seat index]`. */
+type Edge = readonly [number, number]
+
+/** What every run shares, bundled once so the runs keep four parameters. */
+interface SeatingInput {
+  order: readonly FamilyClaim[]
+  sockets: readonly SocketHostCell[]
+  base: PlanContext
+  owned: readonly OwnedExaltation[]
+}
+
+/** Runs past this many refusals stop branching and simply drop the refused edge. */
+const SEARCH_BUDGET = 32
+
+/**
+ * Match, then name every matched seat against a fresh ledger. `refused` is null when every
+ * matched claim got a placement; otherwise it lists the first matched edge the ledger refused,
+ * then the earlier edges that spent the copy it needed.
+ */
+function seatOnce(input: SeatingInput, adj: readonly number[][]): { seating: Seating; refused: Edge[] | null } {
+  const ctx: PlanContext = { ...input.base, left: copyCounts(input.owned) }
+  const seatOf = match(input.order.length, adj, input.sockets.length)
+  const placed = placedOf(seatOf, input.order.length)
+  const seating: Seating = { seatOf, placed, placements: [], ctx }
+  const named: { edge: Edge; gem: string }[] = []
+  for (let u = 0; u < input.order.length; u++) {
+    const v = placed[u]
+    if (v === -1) continue
+    const p = placementOf(input.order[u], input.sockets[v], ctx)
+    if (p === null) {
+      const gems = new Set(
+        input.order[u].donors.filter((d) => d.type === input.sockets[v].type).map((d) => d.row.name.toLowerCase())
+      )
+      return { seating, refused: [[u, v], ...named.filter((n) => gems.has(n.gem)).map((n) => n.edge)] }
+    }
+    named.push({ edge: [u, v], gem: p.gemName.toLowerCase() })
+    seating.placements.push(p)
+  }
+  return { seating, refused: null }
+}
+
+/**
+ * ONE COPY, TWO FAMILIES (validator catch 2026-10-01). A gem with a Focus of one family and a
+ * Click of another is two claims, and the matching may seat both - one copy in two places. The
+ * ledger names it once and the second seat used to be dropped in silence, AFTER the matching had
+ * denied that seat to every other family: one ring with Focus and Click, g x1 granting Alpha
+ * (focus) and Beta (click), h granting Gamma (focus) - the plan was "Focus: g" alone and h was
+ * reported benched, where g in the Click and h in the Focus seats two families.
+ *
+ * So a refused edge is removed and the matching runs again, until every matched claim places.
+ * WHICH edge goes is a choice: the refused one, or an earlier edge that spent the copy. Each is
+ * tried (the refused one first, so a tie keeps the higher tier's seat) and the run that seats
+ * more families wins. Past `SEARCH_BUDGET` refusals the search stops branching and drops the
+ * refused edge alone; every run removes an edge, so it always ends.
+ */
+function bestSeating(input: SeatingInput, adj: readonly number[][], budget: { runs: number }): Seating {
+  const { seating, refused } = seatOnce(input, adj)
+  if (refused === null) return seating
+  budget.runs--
+  const tries = budget.runs > 0 ? refused : refused.slice(0, 1)
+  let best = seating
+  let bestCount = -1
+  for (const [u, v] of tries) {
+    const next = adj.map((a, i) => (i === u ? a.filter((x) => x !== v) : a))
+    const run = bestSeating(input, next, budget)
+    if (run.placements.length > bestCount) {
+      best = run
+      bestCount = run.placements.length
+    }
+  }
+  return best
 }
 
 /** The four transferable socket types, as the sheet spells them. */
@@ -431,24 +521,14 @@ export function planBoard(
     .sort((a, b) => b.c.eff.tier - a.c.eff.tier || Number(keeps[b.i]) - Number(keeps[a.i]))
     .map((x) => x.c)
   const adj = edges(order, sockets, ctx)
-  const seatOf = match(order.length, adj, sockets.length)
   // The contests are the MATCHING's: a spare proc copy going unseated is not one.
-  const placed = placedOf(seatOf, order.length)
-  // The matching's seats are named first, so they spend the ledger before any second hand does.
-  // (A gem that donates to TWO families - a proc of one and a click of another - is one copy the
-  // matching may seat twice; the ledger then names it once and the later seat gets nothing,
-  // which is quieter than the contested list but no longer a copy in two places.)
-  const placements: Placement[] = []
-  for (let u = 0; u < order.length; u++) {
-    if (placed[u] === -1) continue
-    const p = placementOf(order[u], sockets[placed[u]], ctx)
-    if (p !== null) placements.push(p)
-  }
-  placements.push(...secondHand(order, adj, seatOf, (u, v) => placementOf(order[u], sockets[v], ctx)))
+  const run = bestSeating({ order, sockets, base: ctx, owned }, adj, { runs: SEARCH_BUDGET })
+  const placements = [...run.placements]
+  placements.push(...secondHand(order, adj, run.seatOf, (u, v) => placementOf(order[u], sockets[v], run.ctx)))
   return {
     placements,
     moves: movesOf(placements, sockets, rowByKey),
     clears: clearsOf(placements, sockets, rowByKey),
-    contested: contestedOf({ claims: order, placed, adj, sockets }, placements)
+    contested: contestedOf({ claims: order, placed: run.placed, adj, sockets, left: run.ctx.left }, placements)
   }
 }

@@ -368,3 +368,32 @@ test('a free seat is taken before an incumbent is asked to move', () => {
   ])
   assert.equal(plan.clears.length, 0)
 })
+
+test('one copy granting two families is seated once, and the seat it cannot fill goes to another family', () => {
+  // g x1 carries Alpha (focus) and Beta (click); h carries Gamma (focus); one ring with a Focus
+  // and a Click socket. The matching seats Alpha and Beta, both through the one g - the ledger
+  // can name only one, and the plan used to stop at "Focus: g" with h benched. g in the Click
+  // and h in the Focus seats two families.
+  const rows = [
+    row({
+      key: 'g',
+      name: 'g',
+      effects: [{ name: 'Alpha', kind: 'focus' }, { name: 'Beta', kind: 'click' }],
+      slots: ['FINGER']
+    }),
+    row({ key: 'h', name: 'h', effects: [{ name: 'Gamma', kind: 'focus' }], slots: ['FINGER'] })
+  ]
+  const plan = planBoard([gem('g'), gem('h')], rows, NOBODY, [
+    seat({ cellId: 'ring', type: 'Focus', slot: 'FINGER' }),
+    seat({ cellId: 'ring', type: 'Click', slot: 'FINGER' })
+  ])
+  assert.deepEqual(plan.placements.map((p) => `${p.type}:${p.gemName}:${p.effect}`).sort(), [
+    'Click:g:Beta',
+    'Focus:h:Gamma'
+  ])
+  // Alpha is the honest contest: its one seat holds Gamma, and its copy is in the Click.
+  assert.deepEqual(
+    plan.contested.map((c) => ({ effect: c.effect, options: c.options })),
+    [{ effect: 'Alpha', options: [{ cellLabel: 'ring', type: 'Focus', heldBy: 'Gamma' }] }]
+  )
+})
