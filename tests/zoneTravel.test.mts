@@ -242,3 +242,20 @@ test('a portal_to_ label is a portal - East Freeport`s spire to the Plane of Sky
   // oasis_1.txt (default pack): the click into Hate is a plain to_ with a parenthetical.
   assert.equal(zoneExits([point('to_The_Plane_of_Hate_(click)')])[0]?.zone, 'hateplane')
 })
+
+test('a (click) entrance is one-way: the route never walks back out through it (2026-10-01)', () => {
+  // oasis_1.txt states the click into Hate; Hate's map states no way back. A port into Hate is
+  // no way to reach Oasis, and Hate still finds Oasis's ports through the stated direction.
+  const graph: ZoneGraph = new Map([
+    ['oasis', [{ kind: 'walk', zone: 'hateplane', name: 'The Plane of Hate', label: 'to_The_Plane_of_Hate_(click)' }]]
+  ])
+  const ports = [port('hateplane', 'Hate Gate', 30), port('oasis', 'Oasis Gate', 20)]
+  const fromOasis = nearestPorts(graph, ports, 'oasis', { eraOnly: false })
+  assert.deepEqual(fromOasis.map((r) => r.port.zone), ['oasis'], 'no route lands in Hate and walks out to Oasis')
+  const fromHate = nearestPorts(graph, ports, 'hateplane', { eraOnly: false })
+  assert.deepEqual(
+    fromHate.map((r) => `${r.port.zone}:${r.path.map((s) => s.zone).join('>')}`),
+    ['hateplane:', 'oasis:hateplane'],
+    'Hate still shows the Oasis port, through the click'
+  )
+})
