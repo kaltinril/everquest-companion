@@ -29,7 +29,7 @@
 // ratio does not.
 
 import type { GearRow } from '../../../../shared/planner/gear'
-import type { EquipSlot } from '../../../../shared/planner/types'
+import { PAIRED_SLOTS, type EquipSlot } from '../../../../shared/planner/types'
 import {
   ownedHasteOutside,
   roleValue,
@@ -51,6 +51,9 @@ export interface OwnedKeys {
    *  shield parked in Any Slot barred the offhand it was not in). A key worn in a real cell TOO
    *  stays in `worn`. */
   wornAny: ReadonlySet<string>
+  /** how many copies of each `worn` key the dump files in real cells: two identical rings are two
+   *  FINGER copies, which a paired slot's bar needs (`ownedSide`). A key it does not name is one. */
+  wornCopies?: ReadonlyMap<string, number>
 }
 
 /**
@@ -69,16 +72,19 @@ export function ownedKeysOf(map: GearOwnershipMap | null): OwnedKeys {
   const held = new Set<string>()
   const worn = new Set<string>()
   const wornAny = new Set<string>()
+  const wornCopies = new Map<string, number>()
   if (map !== null) {
     for (const [key, o] of map) {
-      const cell = o.facts.some((fact) => fact.place === 'equipped' && fact.wildcard === undefined)
+      const inCells = o.facts.filter((fact) => fact.place === 'equipped' && fact.wildcard === undefined)
       const wild = o.facts.some((fact) => fact.place === 'equipped' && fact.wildcard === true)
-      if (cell) worn.add(key)
-      else if (wild) wornAny.add(key)
+      if (inCells.length > 0) {
+        worn.add(key)
+        wornCopies.set(key, inCells.reduce((sum, fact) => sum + fact.count, 0))
+      } else if (wild) wornAny.add(key)
       if (o.owned || o.exaltations > 0) held.add(key)
     }
   }
-  return { held, worn, wornAny }
+  return { held, worn, wornAny, wornCopies }
 }
 
 /** The owned side of the gap test, as the fold's two corpora fields. */
@@ -97,8 +103,9 @@ export interface OwnedSide {
  *
  * ONE OWNED ITEM RAISES EVERY SLOT IT FITS, and the bar is the MAX rather than a sum or an average:
  * the question the fold asks is "would this beat what I would actually wear there", and what you
- * would wear there is your best. An earring that fits two ear cells raises both. The same reading
- * places a haste source in every slot it fits (`OwnedHaste.slots`).
+ * would wear there is your best. A PAIRED slot is two cells, so its bar is the weaker of the two
+ * worn copies (`barsOf`). The same reading places a haste source in every slot it fits
+ * (`OwnedHaste.slots`).
  *
  * BASE STATS, LIKE THE TARGETS THEY ARE COMPARED AGAINST (fold rule 6, the owner's *"base stats can
  * be used, that's fine, because we can upgrade"*). `useGearIndex` hands out the UNSCALED corpus, so
@@ -121,18 +128,18 @@ export interface OwnedSide {
  * and the bars are scored afterwards because a bar's haste term needs every source known first.
  */
 export function ownedSide(
-  keys: Pick<OwnedKeys, 'worn' | 'wornAny'>,
+  keys: Pick<OwnedKeys, 'worn' | 'wornAny' | 'wornCopies'>,
   byKey: ReadonlyMap<string, GearRow>,
   scope: Pick<PlanScope, 'role' | 'classes' | 'survivability'>
 ): OwnedSide {
-  const rows: GearRow[] = []
+  const rows: WornRow[] = []
   const haste: OwnedHaste[] = []
   for (const key of [...keys.worn, ...keys.wornAny]) {
     const row = byKey.get(key)
     if (row === undefined) continue
     // A wildcard resident is worn for HASTE (it is on the character) and absent for BARS (it
     // occupies no wiki slot) — the fork report above.
-    if (keys.worn.has(key)) rows.push(row)
+    if (keys.worn.has(key)) rows.push({ row, copies: keys.wornCopies?.get(key) ?? 1 })
     // A haste WEAPON's percentage is still haste you own — swapped out of the hand, it keeps
     // granting from an Any Slot (fork ruling, 2026-09-05: "i could still toss the monsoon in one
     // of the two ANY slots to gain the haste") — so every worn source counts here, weapons
@@ -140,16 +147,43 @@ export function ownedSide(
     // row, so a blade never wins or loses the HAND comparison on a stat the loadout keeps anyway.
     if (row.stats.HASTE !== undefined && row.stats.HASTE > 0) haste.push({ haste: row.stats.HASTE, slots: row.slots })
   }
-  const bars = new Map<EquipSlot, number>()
+  return { bars: barsOf(rows, haste, scope), haste }
+}
+
+/** A worn row and how many copies of it the dump files in real cells. */
+interface WornRow {
+  row: GearRow
+  copies: number
+}
+
+/**
+ * THE BARS, scored once every haste source is known. A single slot's bar is its best worn score. A
+ * PAIRED slot (EAR, WRIST, FINGER) is two cells, and an upgrade over EITHER is one you would wear,
+ * so its bar is the WEAKER of the top two worn copies — and absent, a gap, when fewer than two are
+ * worn: an empty second cell takes anything. Read as the best copy, rings of AC 30 and AC 2 worn
+ * and an AC 15 ring in the bank drew no advice, because the bar was the AC 30 one.
+ */
+function barsOf(
+  rows: readonly WornRow[],
+  haste: readonly OwnedHaste[],
+  scope: Pick<PlanScope, 'role' | 'classes' | 'survivability'>
+): Map<EquipSlot, number> {
+  const tops = new Map<EquipSlot, number[]>()
   const ctx = { classes: scope.classes, survivability: scope.survivability }
-  for (const row of rows) {
+  for (const { row, copies } of rows) {
     for (const slot of row.slots) {
       const score = roleValue(row.stats, scope.role, { ...ctx, ownedHaste: ownedHasteOutside(haste, slot) })
-      const held = bars.get(slot)
-      if (held === undefined || score > held) bars.set(slot, score)
+      const kept = [...(tops.get(slot) ?? []), ...Array<number>(Math.min(copies, 2)).fill(score)]
+      tops.set(slot, kept.sort((a, b) => b - a).slice(0, 2))
     }
   }
-  return { bars, haste }
+  const bars = new Map<EquipSlot, number>()
+  for (const [slot, [best, second]] of tops) {
+    const paired = (PAIRED_SLOTS as readonly EquipSlot[]).includes(slot)
+    if (!paired) bars.set(slot, best)
+    else if (second !== undefined) bars.set(slot, second)
+  }
+  return bars
 }
 
 /** One thing you already own that beats what you wear — the "equip it, you idiot" advisory. */

@@ -300,8 +300,9 @@ export interface PlanCorpora {
    */
   wished?: ReadonlySet<string>
   /**
-   * THE BAR EACH SLOT HAS TO BEAT: the role-scored best OWNED item per equip slot, computed by the
-   * caller (the renderer folds it out of ownership + `roleValue`; the tests build it by hand).
+   * THE BAR EACH SLOT HAS TO BEAT: the role-scored best OWNED item per equip slot (for a paired
+   * slot, the weaker of the two worn copies, absent until two are worn), computed by the caller
+   * (the renderer folds it out of ownership + `roleValue`; the tests build it by hand).
    *
    * A SLOT THAT IS ABSENT FROM THIS MAP IS A GAP, and any wearable item is an upgrade for a gap.
    * That is law 1 read carefully rather than bent: absent is not "an owned item worth 0" — it is the

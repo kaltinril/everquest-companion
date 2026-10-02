@@ -68,7 +68,7 @@ test('HELD is what the route will not farm; WORN is what the dump says is EQUIPP
   assert.deepEqual([...side.bars.keys()], ['PRIMARY'])
 
   // No dump and no loot is two empty sets, never a throw.
-  assert.deepEqual(ownedKeysOf(null), { held: new Set(), worn: new Set(), wornAny: new Set() })
+  assert.deepEqual(ownedKeysOf(null), { held: new Set(), worn: new Set(), wornAny: new Set(), wornCopies: new Map() })
 })
 
 test('a haste item in a BAG or the BANK sets neither a bar nor the haste ceiling; the same item EQUIPPED sets both', () => {
@@ -381,4 +381,29 @@ test('a 3-STA necklace does not beat the worn regen talisman: regen keeps a glas
     const challenger = roleValue(BEARTOOTH, 'dps', { classes: scope.classes, survivability })
     assert.ok(challenger < bar, `at dial ${String(survivability)} the trinket (${challenger.toFixed(1)}) must not clear the regen bar (${bar.toFixed(1)})`)
   }
+})
+
+test('a paired slot is two cells: its bar is the weaker worn copy, and a gap until two are worn', () => {
+  // Rings of AC 30 and AC 2 worn, an AC 15 ring in the bank. Read as the best copy, the bar was the
+  // AC 30 ring and the banked one was never offered over the AC 2 one it beats.
+  const ring = (name: string, AC: number): GearRow => row({ key: name.toLowerCase(), name, slots: ['FINGER'], stats: { AC } })
+  const [STRONG, WEAK, BANKED] = [ring('Strong Band', 30), ring('Weak Band', 2), ring('Banked Band', 15)]
+  const byKey = new Map([STRONG, WEAK, BANKED].map((r) => [r.key, r]))
+  const scope = { role: 'tank' as const, classes: ['WAR' as const] }
+  const advise = (worn: [string, number][]): { bar?: number; ups: string[] } => {
+    const map: GearOwnershipMap = new Map(worn.map(([key, count]) => [key, own({ facts: [{ place: 'equipped', count }] })]))
+    map.set(BANKED.key, own({ facts: [at('bank')] }))
+    const keys = ownedKeysOf(map)
+    const side = ownedSide(keys, byKey, scope)
+    return { bar: side.bars.get('FINGER'), ups: ownedUpgrades(keys, byKey, side, scope).map((u) => u.name) }
+  }
+  const both = advise([[STRONG.key, 1], [WEAK.key, 1]])
+  assert.equal(both.bar, roleValue(WEAK.stats, 'tank'), 'the bar is the weaker of the two worn rings')
+  assert.deepEqual(both.ups, ['Banked Band'], 'so the AC 15 ring is advice: it replaces the AC 2 one')
+  const one = advise([[STRONG.key, 1]])
+  assert.equal(one.bar, undefined, 'one ring worn: the other finger is empty, a gap')
+  assert.deepEqual(one.ups, ['Banked Band'], 'and the banked ring fills it')
+  const pair = advise([[STRONG.key, 2]])
+  assert.equal(pair.bar, roleValue(STRONG.stats, 'tank'), 'two copies of one ring are two worn copies')
+  assert.deepEqual(pair.ups, [], 'and an AC 15 ring beats neither')
 })
