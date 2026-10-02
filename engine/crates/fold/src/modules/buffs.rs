@@ -233,11 +233,10 @@ impl BuffsModule {
     /// only when one was replayed; a swing on its own moves nothing a client can read.
     fn on_swing(&mut self, ev: &Event, core: &mut BuffsCore) -> bool {
         let held = self.stash.note_swing(&mut core.anchors, ev);
-        let replayed = !held.is_empty();
-        for p in held {
+        for p in &held {
             self.apply_landing(&p.target, p.ts, &p.cands, core);
         }
-        replayed
+        !held.is_empty()
     }
 
     /// A HoT tick is not a landing. `You healed <X> over time for N by <Spell>.` is printed once per
@@ -505,7 +504,6 @@ impl BuffsModule {
     }
 }
 
-
 impl EqModule for BuffsModule {
     fn id(&self) -> &'static str {
         "buffs"
@@ -524,6 +522,7 @@ impl EqModule for BuffsModule {
         self.frame.reset();
         self.permanent_illusion_owned_ts = None;
         self.pets.reset();
+        self.stash.clear();
         // Not reset: the message-overlay mining. It is game knowledge, and
         // `begin_overlay_source` — not `reset` — is what discards a source's bucket.
     }

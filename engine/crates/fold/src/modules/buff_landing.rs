@@ -6,7 +6,7 @@
 //!      with one in window resolves to THAT CANDIDATE'S DB NAME. The rank is kept beside it as
 //!      `cast_name`; what it may not be is the spell's identity.
 //!   2. Several of your own casts sharing one sentence resolve to the most recent.
-//!   2b. A weapon or item PROC (upstream issue #69, opt-in): no cast line exists, so the anchor is
+//!      2b. A weapon or item PROC (upstream issue #69, opt-in): no cast line exists, so the anchor is
 //!      your own melee hit on the target inside the proc window, and the spell is the ONE candidate
 //!      some item you hold procs. Two held procs sharing a sentence is a coin flip and is refused,
 //!      exactly as case 3's family refuses a duration its members do not agree on.

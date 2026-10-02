@@ -42,11 +42,14 @@ pub struct ProcStash {
 
 impl ProcStash {
     /// Hold a refused landing — only when the gate is on and some candidate is a held proc, so an
-    /// ordinary stranger's buff costs nothing and is never replayed.
+    /// ordinary stranger's buff costs nothing and is never replayed. Landings past `HOLD_MS` go
+    /// first: a fight of procs and no swing lines (a pet's, a group-mate's) would otherwise grow
+    /// the stash for as long as you never swing.
     pub fn hold(&mut self, target: &str, ts: i64, cands: &[Candidate], anchors: &CastAnchors) {
         if !anchors.proc_possible(cands.iter().map(|c| c.name.as_str())) {
             return;
         }
+        self.pending.retain(|p| ts - p.ts <= HOLD_MS);
         self.pending.push(PendingLanding {
             target: target.to_string(),
             ts,
@@ -69,6 +72,11 @@ impl ProcStash {
             .partition(|p| ts >= p.ts && ts - p.ts <= SAME_SECOND_MS && id_key(&p.target) == key);
         self.pending = keep;
         hit
+    }
+
+    /// Forget every held landing: log state, cleared with the module's.
+    pub fn clear(&mut self) {
+        self.pending.clear();
     }
 
     #[cfg(test)]
@@ -170,6 +178,22 @@ mod tests {
             &ev(r#"{"kind":"miss","seq":1,"ts":8000,"raw":"m","attacker":"You","target":"a froglok","mtype":"miss"}"#),
         );
         assert!(late.is_empty());
+        assert_eq!(s.held(), 0);
+    }
+
+    /// Holding prunes what is past `HOLD_MS`, so landings with no swing of yours between them do
+    /// not pile up; `clear` forgets the rest.
+    #[test]
+    fn holding_forgets_stale_landings_and_clear_forgets_them_all() {
+        let a = armed();
+        let mut s = ProcStash::default();
+        for ts in [1000, 2000, 3000] {
+            s.hold("a Kunark goblin", ts, &cands(), &a);
+        }
+        assert_eq!(s.held(), 3);
+        s.hold("a Kunark goblin", 3000 + HOLD_MS, &cands(), &a);
+        assert_eq!(s.held(), 2, "1000 and 2000 are past the hold at 5000");
+        s.clear();
         assert_eq!(s.held(), 0);
     }
 
