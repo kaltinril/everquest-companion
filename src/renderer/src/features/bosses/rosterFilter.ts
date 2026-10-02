@@ -15,10 +15,11 @@
 //   OVERALL   → `everDefeated`      — ever, at any difficulty, however long ago. Unchanged.
 //   THIS WEEK → `defeatedThisWeek`  — a credited kill inside the current lockout window.
 //
-// ONE CLOCK, AND IT IS `lockout.ts`'s. The week reading is `tierLocks(...).length > 0` over the
-// SAME `LockoutWindow` the view already computes for the ladder and the chips (useLockoutWeek →
-// lockoutWindow), so the filter can never disagree with the rungs it is filtering by: a card is
-// kept exactly when at least one of its five rungs is green. There is no second boundary here,
+// ONE CLOCK, AND IT IS `lockout.ts`'s. The week reading is `lockOf(s).length > 0` over the SAME
+// `lockOf` the view already computes for the ladder and the chips (useLockoutWeek: `tierLocks` in
+// the current `lockoutWindow`, plus a live hand-marked base rung), so the filter can never disagree
+// with the rungs it is filtering by: a card is kept exactly when at least one of its five rungs is
+// green. There is no second boundary here,
 // no `Date.now()`, and no day arithmetic of its own — the reset day/hour and their sourcing are
 // lockout.ts's business alone (and the analytics day/week boundary rule is the owner's, so a
 // surface must never quietly grow its own).
@@ -30,7 +31,7 @@
 // That is why this is a predicate over a status rather than a filter over the roster array.
 
 import type { TargetStatus } from './bossStatus'
-import { tierLocks, type LockoutWindow } from './lockout'
+import type { TierLock } from './lockout'
 
 /** What "defeated" means in one view — see the file header. */
 export type DefeatedTest = (s: TargetStatus) => boolean
@@ -43,16 +44,17 @@ export type DefeatedTest = (s: TargetStatus) => boolean
 export const everDefeated: DefeatedTest = (s) => s.killed
 
 /**
- * THIS WEEK: a credited kill of this target, at a real instance difficulty, inside `w`.
+ * THIS WEEK: a credited kill of this target, at a real instance difficulty, inside the week — or
+ * a live hand-marked base rung.
  *
- * It is `tierLocks` and nothing else, so every qualification that predicate carries comes along
- * for free and stays stated in ONE place: credited rather than merely witnessed, a difficulty
+ * It is the view's `lockOf` and nothing else, so every qualification `tierLocks` carries comes
+ * along for free and stays stated in ONE place: credited rather than merely witnessed, a difficulty
  * rather than an open-world or unknown-zone kill, and the half-open Pacific week `[start, next)`.
  * An empty lock set is "open this week", which is a different sentence from "never killed" — and
  * on this view it is the sentence the switch is there to hide.
  */
-export function defeatedThisWeek(w: LockoutWindow): DefeatedTest {
-  return (s) => tierLocks(s.tiers, w).length > 0
+export function defeatedThisWeek(lockOf: (s: TargetStatus) => TierLock[]): DefeatedTest {
+  return (s) => lockOf(s).length > 0
 }
 
 /** The toolbar's two filters, as the view holds them. */

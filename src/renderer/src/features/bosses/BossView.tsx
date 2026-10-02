@@ -241,7 +241,7 @@ export default function BossView({ onOpenMob }: { onOpenMob: (t: MobTarget) => v
    * The all-time flag is right for the OVERALL roster and wrong for the week view, which is about
    * this reset week and nothing else — so the predicate is the mode's, not the roster's.
    */
-  const defeated = useMemo(() => (mode === 'week' ? defeatedThisWeek(week) : everDefeated), [mode, week])
+  const defeated = useMemo(() => (mode === 'week' ? defeatedThisWeek(lockOf) : everDefeated), [mode, lockOf])
 
   const filtered = useMemo(
     () => filterRoster(statuses, { query, defeatedOnly, defeated }),
