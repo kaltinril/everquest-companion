@@ -134,7 +134,12 @@ creator's own repo and does not know the fork exists.
     `(Get-Item <worktree>\node_modules).Delete()`, or `cmd /c rmdir <worktree>\node_modules`),
     then `git worktree remove <worktree>`, then `git worktree prune`. Never `rm -rf` or
     `Remove-Item -Recurse` a worktree that still has its junction; that empties this clone's own
-    `node_modules`. The same pass deletes what the job left elsewhere: a scratch
-    `CARGO_TARGET_DIR` (one session's held 12.8 GB), temp worktrees under the session's temp
-    directory, `engine/target/debug/incremental`, and an unpacked `release/<version>/win-unpacked`
-    once that build has been handed to the testers.
+    `node_modules`. The same pass deletes DUPLICATES the job left elsewhere: a scratch
+    `CARGO_TARGET_DIR` (a second copy of `engine/target`; one session's held 12.8 GB), temp
+    worktrees and scratch copies of the repo under the session's temp directory, and an unpacked
+    `release/<version>/win-unpacked` once that build has been handed to the testers (the
+    installer beside it holds the same files). What every build or test run reuses stays, however
+    large, as long as there is one copy of it: this clone's `node_modules`, `engine/target`
+    (`debug` and `release`), the cargo registry under the user profile, and the downloaded
+    Electron and electron-builder caches. Deleting those only makes the next build fetch or
+    compile them again (owner, 2026-10-02).
