@@ -21,7 +21,7 @@ import assert from 'node:assert/strict'
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
-import { installPack, sanitizeRegistryPacks } from '../src/main/packRegistry'
+import { installPack, sanitizeRegistryPacks, uninstallPack } from '../src/main/packRegistry'
 import type { PackInstallProgress, RegistryPack } from '../src/shared/types'
 
 /** A structurally-valid registry row; override any field to craft an adversarial one. */
@@ -90,6 +90,17 @@ test('installPack REFUSES a traversal/invalid name before touching the filesyste
     } finally {
       rmSync(base, { recursive: true, force: true })
     }
+  }
+})
+
+// uninstallPack takes the same allowlist. `''` and `'.'` are the names that matter most: both
+// resolve to the soundpacks root itself, which safeJoin admits, so without the check rmSync
+// removed every installed pack. Under plain Node `electron`'s `app` is undefined, so a name
+// that got as far as userPacksRoot() would throw here instead of returning false: a clean
+// `false` proves the refusal came before any path was built.
+test('uninstallPack REFUSES the root and every traversal name before building a path', () => {
+  for (const name of ['', '.', ...EVIL_NAMES]) {
+    assert.equal(uninstallPack(name), false, `name ${JSON.stringify(name)} must be refused`)
   }
 })
 

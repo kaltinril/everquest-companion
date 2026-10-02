@@ -41,6 +41,25 @@ export function encodeShareString(env: ShareEnvelope): string {
   return SHARE_PREFIX + toBase64Url(deflateRawSync(Buffer.from(json, 'utf8'), { level: 9 }))
 }
 
+type Inflated = { json: string; error: null } | { json: null; error: ShareDecodeError }
+
+/**
+ * Inflate a base64url payload, capped at one byte past the JSON limit. zlib stops at the cap
+ * and throws ERR_BUFFER_TOO_LARGE, so a small paste that inflates to many megabytes is refused
+ * as too long without ever being expanded in full. One byte past the limit still inflates, and
+ * the length check reports it the same way.
+ */
+function inflatePayload(payload: string): Inflated {
+  try {
+    const out = inflateRawSync(fromBase64Url(payload), { maxOutputLength: SHARE_LIMITS.maxJsonChars + 1 })
+    if (out.length > SHARE_LIMITS.maxJsonChars) return { json: null, error: 'too-long' }
+    return { json: out.toString('utf8'), error: null }
+  } catch (err) {
+    const tooLarge = (err as NodeJS.ErrnoException).code === 'ERR_BUFFER_TOO_LARGE'
+    return { json: null, error: tooLarge ? 'too-long' : 'corrupt' }
+  }
+}
+
 /**
  * Decode a pasted string. Tolerant of the ways chat clients mangle a paste — surrounding
  * whitespace, wrapped lines, a stray code-fence — but never of a bad checksum: a payload
@@ -62,18 +81,12 @@ export function decodeShareString(input: string): ShareValidation {
   const payload = cleaned.slice(at + SHARE_PREFIX.length).replace(/[^A-Za-z0-9_-]+$/, '')
   if (!payload) return { ok: false, error: 'corrupt' }
 
-  let json: string
-  try {
-    const inflated = inflateRawSync(fromBase64Url(payload))
-    if (inflated.length > SHARE_LIMITS.maxJsonChars) return { ok: false, error: 'too-long' }
-    json = inflated.toString('utf8')
-  } catch {
-    return { ok: false, error: 'corrupt' }
-  }
+  const inflated = inflatePayload(payload)
+  if (inflated.error !== null) return { ok: false, error: inflated.error }
 
   let parsed: unknown
   try {
-    parsed = JSON.parse(json)
+    parsed = JSON.parse(inflated.json)
   } catch {
     return { ok: false, error: 'corrupt' }
   }
