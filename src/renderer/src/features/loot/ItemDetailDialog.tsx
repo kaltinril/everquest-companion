@@ -36,7 +36,7 @@ import { wishFromGear } from '../wishlist/wishSearch'
 import { ItemDbSources } from './ItemDbSources'
 import { DroppedByColumn, type LootTally } from './ItemDroppedBy'
 import { ItemZoneTable } from './ItemZoneTable'
-import { isWearable, itemWindowBlock, simulatedUpgrade, upgradeSeed } from './itemUpgradeSim'
+import { isWearable, itemWindowBlock, upgradeSeed, windowUpgrade } from './itemUpgradeSim'
 import { KnowledgeSection, type KnowledgeLinks } from './KnowledgeSection'
 import { useItemZoneRates, type ItemZoneRates } from './useItemZoneRates'
 
@@ -210,10 +210,10 @@ function ItemWishRow({ item }: { item: string }): JSX.Element | null {
 
    AND AT ANY PLUS-STATE, for a WEARABLE item (fork decision, kaltinril 2026-09-13): the Gear
    toolbar's simulate-upgrade slider sits under the card, and the window draws the item at the
-   state it reads. The slider opens where the name says the item IS (`upgradeSeed`), and while it
-   stands there the window is handed nothing — it reads exactly as it always has, name tier or
-   merge history — so a simulation is only ever on screen once the reader has asked for one
-   (`simulatedUpgrade`). State is per item, not remembered: the column is keyed by `item`. */
+   state it reads. The slider opens where the name says the item IS (`upgradeSeed`), and the base
+   block is drawn at that tier, its meter reading the name as always; a simulation is only ever
+   tagged once the reader has asked for one (`windowUpgrade`). State is per item, not remembered:
+   the column is keyed by `item`. */
 function ItemWindowColumn({
   item,
   stats,
@@ -229,6 +229,7 @@ function ItemWindowColumn({
   )
   const seed = upgradeSeed(item)
   const [upgrade, setUpgrade] = useState(seed)
+  const drawn = windowUpgrade(upgrade, seed)
   return (
     <Box sx={{ width: { xs: '100%', md: 340 }, flexShrink: 0 }}>
       <ObservedItemWindow
@@ -236,7 +237,8 @@ function ItemWindowColumn({
         stats={block}
         iconId={knowledge.data?.iconId}
         flavor={knowledge.data?.summary}
-        upgrade={simulatedUpgrade(upgrade, seed)}
+        upgrade={drawn.upgrade}
+        simulated={drawn.simulated}
       />
       {isWearable(block) && (
         <Box sx={{ mt: 1 }} data-testid="item-detail-upgrade">

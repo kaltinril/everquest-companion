@@ -10,9 +10,10 @@
 //   * WHERE THE SLIDER OPENS — the tier the displayed name states, else base. `upgradeStateForTier`
 //     is the one reading of a ` +N` the app has (a name says the tier and stops), so a ` +3` loot
 //     line opens at tier 3 with the wiki's base numbers scaled to it.
-//   * WHEN THE WINDOW IS TOLD — only once the reader has moved off the seed. At the seed the
-//     window is handed nothing and reads exactly as it always has (the name's tier, or your own
-//     merge history with its `yours` tag); a simulation nobody asked for is never on screen.
+//   * WHEN THE WINDOW IS TOLD — the stats are the wiki's base block, so the window is handed the
+//     seed itself when the name puts it past base, and its meter reads the name's tier as always.
+//     Only once the reader has moved off the seed is it a `simulated` state; at a base seed the
+//     window is handed nothing (the name, or your own merge history with its `yours` tag).
 //
 // Nothing here scales a number: that is `scaleStatBlock` (shared/itemUpgrade.ts), called by the
 // window itself.
@@ -42,7 +43,14 @@ export function sameUpgradeState(a: ItemUpgradeState, b: ItemUpgradeState): bool
   return x.full === y.full && x.fraction === y.fraction
 }
 
-/** What the window is handed: nothing at the seed, the state once the reader has moved it. */
-export function simulatedUpgrade(state: ItemUpgradeState, seed: ItemUpgradeState): ItemUpgradeState | undefined {
-  return sameUpgradeState(state, seed) ? undefined : normalizeUpgradeState(state)
+/** What the window is handed: the state to draw the stats at, and whether the reader chose it. The
+    block is the wiki's BASE one, so a seed past base is handed too (a ` +3` card drawn at base numbers
+    reads lower than +2), but only a state off the seed is `simulated`. At a base seed: nothing. */
+export function windowUpgrade(
+  state: ItemUpgradeState,
+  seed: ItemUpgradeState
+): { upgrade?: ItemUpgradeState; simulated: boolean } {
+  const simulated = !sameUpgradeState(state, seed)
+  const atBase = sameUpgradeState(state, upgradeStateForTier(0))
+  return { upgrade: simulated || !atBase ? normalizeUpgradeState(state) : undefined, simulated }
 }
