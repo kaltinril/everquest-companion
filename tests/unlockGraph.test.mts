@@ -14,6 +14,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { achievementBook } from '../src/shared/outputs/achievementBook'
 import { parseAchievementsDump } from '../src/shared/outputs/achievements'
+import { factionNameKey, parseFactionsDump } from '../src/shared/outputs/factions'
 import {
   TASK_PARTS,
   UNLOCK_TOKENS,
@@ -55,6 +56,17 @@ test('a faction is on the way to the races that want it at maximum', () => {
   )
   assert.equal(kaladim[0].need.text, 'Get maximum faction with Merchants of Kaladim.')
   assert.deepEqual(unlocksNeedingFaction('Kerra Isle'), [])
+})
+
+test('every faction the rulebook names finds its row in the real factions dump', () => {
+  const dump = parseFactionsDump(readFileSync(join(FIXTURES, 'Drywrought_oggok-WAR-Factions.txt'), 'utf8'))
+  const keys = new Set(dump.map((r) => factionNameKey(r.name)))
+  const subjects = UNLOCK_RULES.flatMap((r) => r.needs.filter((n) => n.kind === 'faction').map((n) => n.subject))
+  assert.equal(subjects.length, 40)
+  assert.deepEqual(subjects.filter((s) => !keys.has(factionNameKey(s))), [])
+  // The dump's own spelling of a faction the achievements dump spells differently finds the race.
+  assert.deepEqual(unlocksNeedingFaction('DaBashers').map((p) => p.unlock.name), ['Troll'])
+  assert.deepEqual(unlocksNeedingFaction('The Freeport Militia').map((p) => p.unlock.name), ['Human (Freeport)'])
 })
 
 test('a Sky reward is on the way to its class, by the dump\'s spelling', () => {

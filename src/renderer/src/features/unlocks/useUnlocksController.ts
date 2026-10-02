@@ -16,6 +16,7 @@
 // once when the tab mounts and the row it names is scrolled to and marked.
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { factionNameKey } from '@shared/outputs/factions'
 import type { QuestData } from '@shared/types'
 import type { UnlockRef } from '@shared/unlocks/unlockGraph'
 import { TASK_PARTS, nameKey } from '@shared/unlocks/unlockGraph'
@@ -71,7 +72,7 @@ export interface UnlocksController {
   hasDump: boolean
   readAt: number | null
   book: UnlockBook
-  /** by the faction's name, lowercased; empty without a factions dump */
+  /** by factionNameKey (either dump's spelling finds it); empty without a factions dump */
   factions: ReadonlyMap<string, FactionFact>
   /** by `rewardKey(className, item)` */
   rewards: ReadonlyMap<string, RewardFact>
@@ -140,7 +141,7 @@ function taskIndex(): Map<string, TaskPart[]> {
 function factionFacts(rows: readonly FactionRowVm[] | null): Map<string, FactionFact> {
   const facts = new Map<string, FactionFact>()
   for (const r of rows ?? []) {
-    facts.set(r.name.toLowerCase(), {
+    facts.set(factionNameKey(r.name), {
       standing: r.standing,
       cap: r.cap,
       label: r.label,

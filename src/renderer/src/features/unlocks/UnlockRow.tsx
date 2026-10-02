@@ -16,6 +16,7 @@ import { type JSX } from 'react'
 import { Box, Chip, Stack, Tooltip, Typography } from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked'
+import { factionNameKey } from '@shared/outputs/factions'
 import { nameKey } from '@shared/unlocks/unlockGraph'
 import { countedNeeds, howText, type Unlock, type UnlockNeed } from '@shared/unlocks/unlocks'
 import { unlockRowId } from '../../lib/unlockLink'
@@ -27,7 +28,7 @@ const CHIP_SX = { height: 20, fontSize: 11, '& .MuiChip-label': { px: 0.75 } }
 const NAMED = 5
 
 function FactionNeed({ need, c }: { need: UnlockNeed; c: UnlocksController }): JSX.Element {
-  const fact = c.factions.get(need.subject.toLowerCase())
+  const fact = c.factions.get(factionNameKey(need.subject))
   const label =
     fact === undefined
       ? need.subject
