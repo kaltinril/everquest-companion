@@ -29,19 +29,61 @@ const MOBS_PATH = resolve(HERE, '../src/renderer/src/data/eqlegends/mobs.json')
 const API = 'https://eqlwiki.com/api.php'
 const UA = 'eqcompanion-delta (fork of jmoyers/everquest-companion; one serialized req/s)'
 const DELAY_MS = 1000
+const MAX_RETRIES = 5
 const BATCH = 50
 const DRY = process.argv.includes('--dry-run')
 
 const sleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms))
 
+/** Wait before a retry: the server's Retry-After when it gave a usable one, else our backoff. */
+function retryDelayMs(res: Response, backoff: number): number {
+  const retryAfter = Number(res.headers.get('retry-after'))
+  return Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : backoff
+}
+
+/** The response, or null for a network failure worth retrying (the last one is thrown). */
+async function fetchOnce(url: string, lastTry: boolean): Promise<Response | null> {
+  try {
+    return await fetch(url, { headers: { 'User-Agent': UA } })
+  } catch (err) {
+    if (lastTry) throw err
+    return null
+  }
+}
+
+/**
+ * The body, or null to retry: 429/5xx, and a maxlag deferral (HTTP 200 with an error body).
+ * A permanent 4xx throws at once. Any other error body throws too: a delta built on a
+ * half-answered query is silently wrong.
+ */
+async function readBody<T>(res: Response, lastTry: boolean, what: string): Promise<T | null> {
+  if (!res.ok) {
+    if ((res.status === 429 || res.status >= 500) && !lastTry) return null
+    throw new Error(`${res.status} ${res.statusText} for ${what}`)
+  }
+  const j = (await res.json()) as T & { error?: { code?: string } }
+  if (j.error?.code === 'maxlag' && !lastTry) return null
+  if (j.error) throw new Error(`wiki error ${j.error.code ?? '?'} for ${what}`)
+  return j
+}
+
+/**
+ * One serialized GET, scrape-items.ts's contract: maxlag=5, the 1s gap after EVERY request
+ * (failed ones included), exponential backoff honouring Retry-After on every retry.
+ */
 async function api<T>(params: Record<string, string>): Promise<T> {
-  const url = `${API}?${new URLSearchParams({ ...params, format: 'json', formatversion: '2' })}`
-  for (let attempt = 1; ; attempt++) {
-    const res = await fetch(url, { headers: { 'User-Agent': UA } })
+  const query = { format: 'json', formatversion: '2', maxlag: '5', ...params }
+  const url = `${API}?${new URLSearchParams(query).toString()}`
+  const what = `${params.action} ${params.list ?? params.prop ?? ''}`
+  let wait = DELAY_MS
+  for (let attempt = 0; ; attempt++) {
+    const lastTry = attempt >= MAX_RETRIES
+    const res = await fetchOnce(url, lastTry)
     await sleep(DELAY_MS)
-    if (res.ok) return (await res.json()) as T
-    if (attempt >= 5) throw new Error(`${res.status} for ${url}`)
-    await sleep(DELAY_MS * 2 ** attempt)
+    const j = res ? await readBody<T>(res, lastTry, what) : null
+    if (j) return j
+    await sleep(res ? retryDelayMs(res, wait) : wait)
+    wait *= 2
   }
 }
 
