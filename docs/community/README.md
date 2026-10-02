@@ -80,6 +80,22 @@ merges each branch in order into a fresh branch off `main`. Conflict resolutions
 `git rerere` (enabled in this clone), so a resolution made once replays on the next rebuild. The
 script ends by printing a tree diff against the previous `main_community`, which should be empty.
 
+**Merge while the dev app is up.** `npm run dev` runs `electron-vite dev --watch` in this clone,
+so every file a merge writes restarts Electron, and a merge burst relaunches the app on a
+half-merged tree. Close the app before merging into `main_community`, and make sure the watcher
+itself is gone: stopping the shell or task that started `npm run dev` can leave the
+`node ... electron-vite.js dev --watch` process running, and it relaunches the app on its own
+(2026-10-01). Find it with `Get-CimInstance Win32_Process -Filter "Name='node.exe'"` and a
+CommandLine match on `electron-vite`, stop that one process, and its Electron exits with it.
+Relaunch after the merges with `node_modules/.vite` cleared.
+
+**Background work while the owner uses the app.** The app's engine must announce itself within
+10 seconds of launch. Several parallel typecheck, test or cargo runs pinned the CPU at 100% and
+the engine missed that deadline three times (2026-10-01, the "data engine started but never
+answered" banner, nothing actually broken). While the owner has the app open, run build and test
+work at Idle priority (`(Get-Process -Id <pid>).PriorityClass = 'Idle'` on cargo, rustc and the
+test runners) or one job at a time.
+
 **Cut a test build.** Bump the version and write the tester notes as a commit on `test-neutering`,
 merge it into `main_community`, then `npm run dist`. The notes stay on a branch that survives a
 rebuild. Read the previous build's notes first; they list what the testers caught. The installer
