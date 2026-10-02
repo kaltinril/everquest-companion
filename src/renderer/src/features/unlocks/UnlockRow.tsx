@@ -9,8 +9,9 @@
 // giver's page. A PLACEHOLDER LINE is the file saying the game has published nothing yet, and
 // is drawn as that.
 //
-// WITHOUT A DUMP the row is the rulebook's: the requirements stand, the status is not claimed
-// (no tick, no circle, no figure), because "not done" is not something the app knows.
+// WITHOUT A DUMP, OR WHEN THE DUMP LEFT THIS ONE OUT, the row is the rulebook's: the requirements
+// stand, the status is not claimed (no tick, no circle, no figure), because "not done" is not
+// something the app knows.
 
 import { type JSX } from 'react'
 import { Box, Chip, Stack, Tooltip, Typography } from '@mui/material'
@@ -175,6 +176,7 @@ function Standing({ unlock, known }: { unlock: Unlock; known: boolean }): JSX.El
   return (
     <Typography variant="caption" color="text.secondary">
       {String(unlock.done)} of {String(counted)}
+      {unlock.unstated > 0 ? `, ${String(unlock.unstated)} not in the dump` : ''}
     </Typography>
   )
 }
@@ -201,7 +203,8 @@ export default function UnlockRow({
   focused: boolean
   c: UnlocksController
 }): JSX.Element {
-  const known = c.hasDump
+  // The dump's own row: a rule the dump left out is drawn as the rulebook's, status unclaimed.
+  const known = c.hasDump && unlock.known
   return (
     <Box
       id={unlockRowId(unlock)}

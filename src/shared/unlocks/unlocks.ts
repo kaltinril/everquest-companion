@@ -69,6 +69,10 @@ export interface Unlock {
   needs: UnlockNeed[]
   /** the requirement lines the server marks done, over all of them */
   done: number
+  /** false when the dump said nothing about this unlock (the rulebook's row, status unclaimed) */
+  known: boolean
+  /** the rulebook's lines the dump did not print (the window's Show filters hide `C` rows) */
+  unstated: number
 }
 
 export interface UnlockBook {
@@ -130,7 +134,7 @@ function unlockOf(kind: UnlockKind, name: string, a: BookAchievement): Unlock {
     // A `C` on a way-in line names how the unlock opened; `earned` stands only when none says so.
     if (way !== null && c.done && a.done) how = way
   }
-  return { kind, name, open: a.done, how, needs, done: needs.filter((n) => n.done).length }
+  return { kind, name, open: a.done, how, needs, done: needs.filter((n) => n.done).length, known: true, unstated: 0 }
 }
 
 /** The achievements of one family, by the name after the prefix. */
@@ -189,10 +193,12 @@ export function countedNeeds(unlock: Unlock): number {
   return unlock.needs.filter((n) => n.kind !== 'placeholder').length
 }
 
-/** `6 of 16 open`, for a heading. */
+/** `6 of 16 open`, for a heading, saying how many the dump left out rather than counting them shut. */
 export function openText(unlocks: readonly Unlock[]): string {
   const open = unlocks.filter((u) => u.open).length
-  return `${String(open)} of ${String(unlocks.length)} open`
+  const unknown = unlocks.filter((u) => !u.known).length
+  const tail = unknown === 0 ? '' : `, ${String(unknown)} not in the dump`
+  return `${String(open)} of ${String(unlocks.length)} open${tail}`
 }
 
 /** The word the tab uses for how an unlock opened. */
@@ -228,7 +234,9 @@ export function unlocksFromRules(rules: readonly UnlockRuleLike[]): UnlockBook {
         open: false,
         how: null,
         needs: r.needs.map((n) => ({ kind: n.kind, subject: n.subject, text: n.text, done: false })),
-        done: 0
+        done: 0,
+        known: false,
+        unstated: 0
       }))
   return {
     races: of('race'),
@@ -237,6 +245,45 @@ export function unlocksFromRules(rules: readonly UnlockRuleLike[]): UnlockBook {
     deity: null,
     primaryClass: null,
     createdAs: null
+  }
+}
+
+const fold = (raw: string): string => raw.toLowerCase().replace(/\s+/g, ' ').trim()
+
+/** A dumped unlock over its rule: the dump's lines where it printed them, the rule's where not. */
+function overlayUnlock(rule: Unlock, dumped: Unlock): Unlock {
+  const lines = new Map(dumped.needs.map((n) => [fold(n.text), n]))
+  const needs = rule.needs.map((n) => lines.get(fold(n.text)) ?? n)
+  const ruled = new Set(rule.needs.map((n) => fold(n.text)))
+  needs.push(...dumped.needs.filter((n) => !ruled.has(fold(n.text))))
+  const unstated = rule.needs.filter((n) => n.kind !== 'placeholder' && !lines.has(fold(n.text))).length
+  return { ...dumped, needs, unstated }
+}
+
+/** One family: every rule, overlaid by the dump's row of that name; a row the rules lack, after. */
+function overlayFamily(rules: readonly Unlock[], dumped: readonly Unlock[]): Unlock[] {
+  const byName = new Map(dumped.map((u) => [fold(u.name), u]))
+  const out = rules.map((r) => {
+    const d = byName.get(fold(r.name))
+    byName.delete(fold(r.name))
+    return d === undefined ? r : overlayUnlock(r, d)
+  })
+  return [...out, ...byName.values()]
+}
+
+/**
+ * THE DUMP OVER THE RULEBOOK, never instead of it. The game's achievements window has Show
+ * checkboxes and `/outputfile achievements` writes what the window shows: a real dump arrived with
+ * no `C` row at all, so every open unlock was simply absent from it. Reading such a file as the
+ * whole book lost those unlocks ("0 of 14"); overlaid, a rule the dump omits stays on screen as
+ * the rulebook's row with its status unclaimed (`known` false), and a line it omits stays too.
+ */
+export function overlayUnlockBook(rules: UnlockBook, dump: UnlockBook): UnlockBook {
+  return {
+    ...dump,
+    races: overlayFamily(rules.races, dump.races),
+    classes: overlayFamily(rules.classes, dump.classes),
+    deities: overlayFamily(rules.deities, dump.deities)
   }
 }
 

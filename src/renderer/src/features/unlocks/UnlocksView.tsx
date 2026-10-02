@@ -82,7 +82,7 @@ function Section({
       {shown.map((u) => (
         <UnlockRow key={u.name} unlock={u} yours={u.name === yours} focused={u.name === focused} c={c} />
       ))}
-      {shown.length === 0 && (
+      {shown.length === 0 && unlocks.length > 0 && unlocks.every((u) => u.open) && (
         <Typography variant="caption" color="text.secondary">
           Every one is open.
         </Typography>

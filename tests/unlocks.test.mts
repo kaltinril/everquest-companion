@@ -21,16 +21,16 @@ import {
   countedNeeds,
   howText,
   openText,
+  overlayUnlockBook,
   unlockBook,
+  unlocksFromRules,
   type Unlock
 } from '../src/shared/unlocks/unlocks'
+import { UNLOCK_RULES } from '../src/shared/unlocks/unlockRules.generated'
 
 const FIXTURES = join(import.meta.dirname, 'fixtures')
-const BOOK = unlockBook(
-  achievementBook(
-    parseAchievementsDump(readFileSync(join(FIXTURES, 'Primitive_freeport-Achievements.txt'), 'utf8'))
-  )
-)
+const TEXT = readFileSync(join(FIXTURES, 'Primitive_freeport-Achievements.txt'), 'utf8')
+const BOOK = unlockBook(achievementBook(parseAchievementsDump(TEXT)))
 const by = (list: readonly Unlock[], name: string): Unlock => {
   const found = list.find((u) => u.name === name)
   assert.ok(found, `${name} is in the fixture`)
@@ -150,4 +150,27 @@ test('the two spellings of the token line are both a way in, and a closed one na
   assert.equal(troll.how, null)
   assert.deepEqual(troll.needs.map((n) => n.kind), ['faction'])
   assert.equal(troll.done, 1)
+})
+
+test('a dump the window filtered is overlaid on the rulebook: what it leaves out stays, unclaimed', () => {
+  // The game's Show checkboxes decide what the file prints; a real dump came with no `C` row.
+  const incomplete = TEXT.split('\n').filter((line) => !line.startsWith('C\t')).join('\n')
+  const book = overlayUnlockBook(unlocksFromRules(UNLOCK_RULES), unlockBook(achievementBook(parseAchievementsDump(incomplete))))
+  assert.equal(book.races.length, 16)
+  assert.equal(book.classes.length, 16)
+  assert.equal(book.deities.length, 17)
+  // Froglok and Human (Freeport) were the open races; the filtered file never names them.
+  const froglok = by(book.races, 'Froglok')
+  assert.equal(froglok.known, false)
+  assert.equal(froglok.needs.length, by(BOOK.races, 'Froglok').needs.length, 'the rulebook keeps its lines')
+  assert.equal(openText(book.races), '0 of 16 open, 2 not in the dump')
+  // A closed race the file does print is the dump's row, and a `C` line it dropped is counted out.
+  const troll = by(book.races, 'Troll')
+  assert.equal(troll.known, true)
+  assert.equal(troll.needs.length, by(BOOK.races, 'Troll').needs.length)
+  assert.equal(troll.unstated, by(BOOK.races, 'Troll').done)
+  // The unfiltered file overlaid is the file: every row known, nothing unstated.
+  const whole = overlayUnlockBook(unlocksFromRules(UNLOCK_RULES), BOOK)
+  assert.deepEqual(whole.races, BOOK.races)
+  assert.equal([...whole.classes, ...whole.deities].every((u) => u.known && u.unstated === 0), true)
 })

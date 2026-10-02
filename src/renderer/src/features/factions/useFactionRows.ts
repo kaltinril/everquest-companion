@@ -63,10 +63,11 @@ export interface FactionRowVm {
 }
 
 /** One race a faction gates, and whether YOUR side of it is already settled (the race is open,
- *  or this faction's requirement is marked complete). */
+ *  or this faction's requirement is marked complete). `null` when an achievements dump exists and
+ *  says nothing about it — the window's Show filters drop `C` rows, so silence is not "pending". */
 export interface RaceGate {
   race: string
-  done: boolean
+  done: boolean | null
 }
 
 function addGate(m: Map<string, RaceGate[]>, faction: string, gate: RaceGate): void {
@@ -87,11 +88,12 @@ function addGate(m: Map<string, RaceGate[]>, faction: string, gate: RaceGate): v
 function unlockNeeds(races: readonly RaceUnlockClaim[] | undefined): Map<string, RaceGate[]> {
   const m = new Map<string, RaceGate[]>()
   const claims = new Map((races ?? []).map((c) => [c.race, c]))
+  const dumped = races !== undefined
   for (const rule of rulesOf('race')) {
     const claim = claims.get(rule.name)
     claims.delete(rule.name)
     for (const need of rule.needs) {
-      if (need.kind === 'faction') addGate(m, need.subject, { race: rule.name, done: settled(claim, need.subject) })
+      if (need.kind === 'faction') addGate(m, need.subject, { race: rule.name, done: settled(claim, need.subject, dumped) })
     }
   }
   for (const claim of claims.values()) {
@@ -102,10 +104,13 @@ function unlockNeeds(races: readonly RaceUnlockClaim[] | undefined): Map<string,
   return m
 }
 
-/** Whether the dump says this gate is settled: the race is open, or that faction line is `C`. */
-function settled(claim: RaceUnlockClaim | undefined, faction: string): boolean {
-  if (claim === undefined) return false
-  return claim.complete || claim.factions.some((f) => f.name === faction && f.complete)
+/** Whether the dump says this gate is settled: the race is open, or that faction line is `C`.
+ *  With a dump that left the race or the line out, unknown (null); with no dump, not settled. */
+function settled(claim: RaceUnlockClaim | undefined, faction: string, dumped: boolean): boolean | null {
+  if (claim === undefined) return dumped ? null : false
+  if (claim.complete) return true
+  const key = factionNameKey(faction)
+  return claim.factions.find((f) => factionNameKey(f.name) === key)?.complete ?? null
 }
 
 /** Everything a row is joined against, bundled once per fold (max-params, and it IS one thing). */

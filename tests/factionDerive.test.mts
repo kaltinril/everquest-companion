@@ -112,6 +112,10 @@ test('huntedGates is the one list both refinements read', () => {
   assert.deepEqual(huntedGates(r, { ...OFF, unlocksOnly: true, unlocksPending: true }).map((g) => g.race), ['Kerran'])
   assert.deepEqual(huntedGates(r, { ...OFF, unlocksOnly: true, races: ['Froglok'] }).map((g) => g.race), ['Froglok'])
   assert.deepEqual(huntedGates(r, { ...OFF, unlocksOnly: true, unlocksPending: true, races: ['Froglok'] }), [])
+  // A gate the achievements dump left out (null) is not known to be needed, so still-needed drops it.
+  const unknown = row(99, 'Grobb Merchants', 0, [{ race: 'Troll', done: null }])
+  assert.deepEqual(huntedGates(unknown, { ...OFF, unlocksOnly: true }).map((g) => g.race), ['Troll'])
+  assert.deepEqual(huntedGates(unknown, { ...OFF, unlocksOnly: true, unlocksPending: true }), [])
 })
 
 test('the default sort is standing, biggest first', () => {

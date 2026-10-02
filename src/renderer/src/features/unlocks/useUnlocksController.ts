@@ -3,8 +3,10 @@
 // FOUR SOURCES, ONE ROW EACH:
 //   - the rulebook (shared/unlocks/unlockRules.generated.ts): every race, class and deity unlock
 //     and its requirement lines, on screen before any dump exists;
-//   - the achievements dump, as the unlock model (shared/unlocks/unlocks.ts), which REPLACES the
-//     rulebook's rows once there is one: which are open, how each opened, which lines are done;
+//   - the achievements dump, as the unlock model (shared/unlocks/unlocks.ts), OVERLAID on the
+//     rulebook's rows once there is one: which are open, how each opened, which lines are done.
+//     Overlaid, not swapped in: the game's window filters what the file prints, so a row the
+//     dump leaves out stays the rulebook's, its status unclaimed;
 //   - the factions dump with the log's receipts folded in (features/factions/useFactionRows.ts),
 //     so a `Get maximum faction with X` line carries X's LIVE standing over its cap and the
 //     quests on record that raise it;
@@ -22,7 +24,7 @@ import type { UnlockRef } from '@shared/unlocks/unlockGraph'
 import { TASK_PARTS, nameKey } from '@shared/unlocks/unlockGraph'
 import { UNLOCK_RULES } from '@shared/unlocks/unlockRules.generated'
 import type { UnlockBook } from '@shared/unlocks/unlocks'
-import { unlockBook, unlocksFromRules } from '@shared/unlocks/unlocks'
+import { overlayUnlockBook, unlockBook, unlocksFromRules } from '@shared/unlocks/unlocks'
 import type { View } from '../../appViews'
 import { getPoskyData } from '../../data'
 import questsJson from '../../data/eqlegends/quests.json'
@@ -165,7 +167,7 @@ export function useUnlocksController(props: UnlocksViewProps): UnlocksController
   }, [])
 
   const book = useMemo(
-    () => (achievements === null ? RULES_BOOK : unlockBook(achievements)),
+    () => (achievements === null ? RULES_BOOK : overlayUnlockBook(RULES_BOOK, unlockBook(achievements))),
     [achievements]
   )
   const factions = useMemo(() => factionFacts(rows), [rows])
