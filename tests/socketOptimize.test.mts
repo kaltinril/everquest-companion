@@ -341,3 +341,83 @@ test('…but a second copy never costs a distinct family its hand', () => {
   const single = planBoard([gem('Fangs', 'socketed in Primary', true)], rows, NOBODY, hands('Fangs', null))
   assert.equal(single.placements.length, 1)
 })
+
+test('a free seat is taken before an incumbent is asked to move', () => {
+  // A sits in the neck and fits neck and waist; X fits back and neck; C fits back and waist.
+  // X takes the empty back, so C's free seat is the waist: two moves, and A stays put. Walking
+  // C's list in one pass recursed through the held back first and sent A to the waist.
+  const rows = [
+    row({ key: 'a', name: 'A', effects: worn('A', 'Effect A'), slots: ['NECK', 'WAIST'] }),
+    row({ key: 'x', name: 'X', effects: worn('X', 'Effect X'), slots: ['BACK', 'NECK'] }),
+    row({ key: 'c', name: 'C', effects: worn('C', 'Effect C'), slots: ['BACK', 'WAIST'] })
+  ]
+  const plan = planBoard(
+    [gem('A', 'socketed in Neck', true), gem('X'), gem('C')],
+    rows,
+    NOBODY,
+    [
+      seat({ cellId: 'neck', type: 'Worn', slot: 'NECK', currentName: 'A' }),
+      seat({ cellId: 'back', type: 'Worn', slot: 'BACK' }),
+      seat({ cellId: 'waist', type: 'Worn', slot: 'WAIST' })
+    ]
+  )
+  assert.equal(plan.placements.length, 3)
+  assert.deepEqual(plan.moves.map((m) => `${m.cellLabel}: socket ${m.gemName}`).sort(), [
+    'back: socket X',
+    'waist: socket C'
+  ])
+  assert.equal(plan.clears.length, 0)
+})
+
+test('one copy granting two families is seated once, and the seat it cannot fill goes to another family', () => {
+  // g x1 carries Alpha (focus) and Beta (click); h carries Gamma (focus); one ring with a Focus
+  // and a Click socket. The matching seats Alpha and Beta, both through the one g - the ledger
+  // can name only one, and the plan used to stop at "Focus: g" with h benched. g in the Click
+  // and h in the Focus seats two families.
+  const rows = [
+    row({
+      key: 'g',
+      name: 'g',
+      effects: [{ name: 'Alpha', kind: 'focus' }, { name: 'Beta', kind: 'click' }],
+      slots: ['FINGER']
+    }),
+    row({ key: 'h', name: 'h', effects: [{ name: 'Gamma', kind: 'focus' }], slots: ['FINGER'] })
+  ]
+  const plan = planBoard([gem('g'), gem('h')], rows, NOBODY, [
+    seat({ cellId: 'ring', type: 'Focus', slot: 'FINGER' }),
+    seat({ cellId: 'ring', type: 'Click', slot: 'FINGER' })
+  ])
+  assert.deepEqual(plan.placements.map((p) => `${p.type}:${p.gemName}:${p.effect}`).sort(), [
+    'Click:g:Beta',
+    'Focus:h:Gamma'
+  ])
+  // Alpha is the honest contest: its one seat holds Gamma, and its copy is in the Click.
+  assert.deepEqual(
+    plan.contested.map((c) => ({ effect: c.effect, options: c.options })),
+    [{ effect: 'Alpha', options: [{ cellLabel: 'ring', type: 'Focus', heldBy: 'Gamma' }] }]
+  )
+})
+
+test('the plan judges an item by ALL its sockets: a WAR-only and a MNK-only gem never share one', () => {
+  const rows = [
+    row({ key: 'war gem', name: 'War Gem', effects: [{ name: 'Effect A', kind: 'focus' }], slots: ['WRIST'], classes: ['WAR'] }),
+    row({ key: 'mnk gem', name: 'Mnk Gem', effects: worn('Mnk Gem', 'Effect B'), slots: ['WRIST'], classes: ['MNK'] }),
+    row({ key: 'bracer a', name: 'Bracer A', effects: [], slots: ['WRIST'], classes: ['WAR', 'MNK', 'ROG'] }),
+    row({ key: 'bracer b', name: 'Bracer B', effects: [], slots: ['WRIST'], classes: ['WAR', 'MNK', 'ROG'] })
+  ]
+  const loadout: Loadout = { classes: ['WAR', 'MNK'], deity: null }
+  const gems = [gem('War Gem'), gem('Mnk Gem')]
+  const a = [
+    seat({ cellId: 'wrist1', type: 'Focus', slot: 'WRIST', item: 'Bracer A' }),
+    seat({ cellId: 'wrist1', type: 'Worn', slot: 'WRIST', item: 'Bracer A' })
+  ]
+  // One bracer: both gems fit it alone, together they make it unwearable - one is contested.
+  const one = planBoard(gems, rows, loadout, a)
+  assert.deepEqual(one.placements.map((p) => p.gemName), ['War Gem'])
+  assert.deepEqual(one.contested.map((c) => c.gemName), ['Mnk Gem'])
+  assert.match(one.contested[0].options[0].heldBy, /other sockets/)
+  // A second bracer with a Worn socket: the matching sends the MNK gem there instead.
+  const two = planBoard(gems, rows, loadout, [...a, seat({ cellId: 'wrist2', type: 'Worn', slot: 'WRIST', item: 'Bracer B' })])
+  assert.deepEqual(two.placements.map((p) => `${p.cellId}:${p.gemName}`).sort(), ['wrist1:War Gem', 'wrist2:Mnk Gem'])
+  assert.equal(two.contested.length, 0)
+})

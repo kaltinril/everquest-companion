@@ -230,10 +230,14 @@ export interface OwnedExaltation {
   socketed: boolean
 }
 
+/** The `where` of a keyring-shaped row: the game's Storage > Exaltations window, which the dump
+ *  files as `Augmentation` rows of the `KeyRing` table. */
+export const EXALTATION_STORAGE = 'Exaltations storage'
+
 /**
- * Every exaltation copy the dump names, wherever it names one: worn sockets, bags, the bank, and
- * any other section that spells the ` (Exaltation)` suffix (the real dump has an `Augmentation`
- * table). Sections outside the Location table keep their section name as the `where`, because
+ * Every exaltation copy the dump names, wherever it names one: worn sockets, bags, the bank, the
+ * Storage > Exaltations stash (`Augmentation` rows of the `KeyRing` table), and any other section
+ * that spells the ` (Exaltation)` suffix. Sections outside the Location table keep their section name as the `where`, because
  * this fold reports the file rather than interpreting it. Computed main-side (the dump is in
  * hand there) and shipped on `CharacterSheet` for the cleanup advisor to join against the gear
  * index — the advisor itself lives renderer-side (`features/character/exaltationAudit.ts`).
@@ -255,6 +259,11 @@ export function ownedExaltations(dump: InventoryDump): OwnedExaltation[] {
       where: socketed ? `socketed in ${base}` : base,
       socketed
     })
+  }
+  for (const entry of dump.keyRing) {
+    if (!entry.parsedName.exaltation) continue
+    const name = entry.parsedName.base
+    out.push({ name, key: ownershipKey(name), where: EXALTATION_STORAGE, socketed: false })
   }
   return out
 }

@@ -30,7 +30,7 @@ import type { OwnedExaltation } from '../../../../shared/characterSheet'
 import { bestEffectFor, usable, type KindEffect, type Loadout } from './exaltationAudit'
 // R2 lives THERE, not here (owner catch 2026-09-11). This file's header has always said "the rules
 // are the recommender's"; until now it said so while carrying its own copy of them.
-import { inForcePerSeat, seatFits, seatIsLive, type SocketHostCell } from './socketRecommend'
+import { inForcePerSeat, narrowedHost, seatFits, seatIsLive, type SocketHostCell } from './socketRecommend'
 
 /** One family's claim: its best owned tier and the donor gems that carry it. How many copies
  *  each donor has is the ledger's business (`PlanContext.left`), not the claim's. */
@@ -118,6 +118,9 @@ interface PlanContext {
   loadout: Loadout
   /** copies of each donor key not yet named by a placement */
   left: Map<string, number>
+  /** cellId → the donors named into that item's sockets so far: they narrow its classes for the
+   *  next socket of the same item (`narrowedHost`) */
+  seated: Map<string, GearRow[]>
 }
 
 /** Every family's best owned claim. ONE claim per family (user catch 2026-09-10: keyed by
@@ -193,12 +196,23 @@ function edges(
   })
 }
 
-/** Kuhn's augmenting path: can claim `u` be seated, evicting and reseating others as needed? */
+/** Kuhn's augmenting path: can claim `u` be seated, evicting and reseating others as needed?
+ *  A FREE seat anywhere in `u`'s list is taken before any holder is asked to move: walking the
+ *  list in one pass recursed through a held seat listed ahead of a free one, and moved an
+ *  incumbent for nothing (validator catch 2026-10-01 - A in the neck, fitting neck and waist; X
+ *  fitting back and neck; C fitting back and waist: C took back, X took the neck, and A was sent
+ *  to the waist, three moves where C into the waist is one). */
 function tryPlace(u: number, adj: readonly number[][], seatOf: number[], seen: boolean[]): boolean {
+  const free = adj[u].find((v) => !seen[v] && seatOf[v] === -1)
+  if (free !== undefined) {
+    seen[free] = true
+    seatOf[free] = u
+    return true
+  }
   for (const v of adj[u]) {
     if (seen[v]) continue
     seen[v] = true
-    if (seatOf[v] === -1 || tryPlace(seatOf[v], adj, seatOf, seen)) {
+    if (tryPlace(seatOf[v], adj, seatOf, seen)) {
       seatOf[v] = u
       return true
     }
@@ -278,19 +292,23 @@ function isProcClaim(c: FamilyClaim): boolean {
  *  that costs no move.
  *
  *  A donor with no copy LEFT in the ledger does not fit, and a seat no donor fits gets NO
- *  placement (null) rather than the claim's name over a copy that is already spoken for. */
+ *  placement (null) rather than the claim's name over a copy that is already spoken for. The
+ *  host is judged as the donors already named into its other sockets leave it: two gems that
+ *  each pass alone may together make an item nobody in the loadout can wear. */
 function placementOf(
   claim: FamilyClaim,
   socket: SocketHostCell,
   ctx: PlanContext
 ): Placement | null {
-  const hostRow = ctx.rowByKey.get(socket.itemKey)
+  const hostRow = narrowedHost(ctx.rowByKey.get(socket.itemKey), ctx.seated.get(socket.cellId) ?? [])
+  if (hostRow === null) return null
   const fits = claim.donors.filter(
     (d) => d.type === socket.type && (ctx.left.get(d.key) ?? 0) > 0 && seatFits(d.row, socket, hostRow, ctx.loadout)
   )
   const donor = fits.find((d) => d.key === socket.currentKey) ?? fits[0]
   if (donor === undefined) return null
   ctx.left.set(donor.key, (ctx.left.get(donor.key) ?? 0) - 1)
+  ctx.seated.set(socket.cellId, [...(ctx.seated.get(socket.cellId) ?? []), donor.row])
   return {
     cellId: socket.cellId,
     cellLabel: socket.cellLabel,
@@ -367,6 +385,21 @@ interface MatchOutcome {
   placed: readonly number[]
   adj: readonly number[][]
   sockets: readonly SocketHostCell[]
+  /** the plan's ledger after naming - a free option whose copies are all spent says so */
+  left: ReadonlyMap<string, number>
+}
+
+/** Who holds seat `v` in the plan, as the contest line reads it. A legal seat a maximum
+ *  matching left free was refused at naming: either every copy of the claim's donors is seated
+ *  elsewhere, or the gems planned into the item's other sockets narrow it past the loadout. */
+function heldByOf(m: MatchOutcome, u: number, v: number, byCell: ReadonlyMap<string, Placement>): string {
+  const s = m.sockets[v]
+  const held = byCell.get(`${s.cellId}|${s.type}`)
+  if (held !== undefined) return held.effect
+  const loose = m.claims[u].donors.some((d) => d.type === s.type && (m.left.get(d.key) ?? 0) > 0)
+  return loose
+    ? 'nothing (beside the gems planned for its other sockets, the item would fit no class you play)'
+    : 'nothing (its only copy is seated elsewhere)'
 }
 
 function contestedOf(m: MatchOutcome, placements: readonly Placement[]): ContestedFamily[] {
@@ -374,14 +407,11 @@ function contestedOf(m: MatchOutcome, placements: readonly Placement[]): Contest
   const out: ContestedFamily[] = []
   for (let u = 0; u < m.claims.length; u++) {
     if (m.placed[u] !== -1) continue
-    const options = m.adj[u].map((v) => {
-      const s = m.sockets[v]
-      return {
-        cellLabel: s.cellLabel,
-        type: s.type,
-        heldBy: byCell.get(`${s.cellId}|${s.type}`)?.effect ?? 'empty'
-      }
-    })
+    const options = m.adj[u].map((v) => ({
+      cellLabel: m.sockets[v].cellLabel,
+      type: m.sockets[v].type,
+      heldBy: heldByOf(m, u, v, byCell)
+    }))
     out.push({
       effect: m.claims[u].eff.effect,
       gemName: m.claims[u].gemName,
@@ -390,6 +420,93 @@ function contestedOf(m: MatchOutcome, placements: readonly Placement[]): Contest
     })
   }
   return out
+}
+
+/** One run of the matching, named against its own fresh ledger. */
+interface Seating {
+  seatOf: number[]
+  placed: number[]
+  placements: Placement[]
+  ctx: PlanContext
+}
+
+/** A claim-to-seat edge of the matching: `[claim index, seat index]`. */
+type Edge = readonly [number, number]
+
+/** What every run shares, bundled once so the runs keep four parameters. */
+interface SeatingInput {
+  order: readonly FamilyClaim[]
+  sockets: readonly SocketHostCell[]
+  base: PlanContext
+  owned: readonly OwnedExaltation[]
+}
+
+/** Runs past this many refusals stop branching and simply drop the refused edge. */
+const SEARCH_BUDGET = 32
+
+/**
+ * Match, then name every matched seat against a fresh ledger. `refused` is null when every
+ * matched claim got a placement; otherwise it lists the first matched edge the ledger refused,
+ * then the earlier edges that spent the copy it needed or narrowed the same item.
+ */
+function seatOnce(input: SeatingInput, adj: readonly number[][]): { seating: Seating; refused: Edge[] | null } {
+  const ctx: PlanContext = { ...input.base, left: copyCounts(input.owned), seated: new Map() }
+  const seatOf = match(input.order.length, adj, input.sockets.length)
+  const placed = placedOf(seatOf, input.order.length)
+  const seating: Seating = { seatOf, placed, placements: [], ctx }
+  const named: { edge: Edge; gem: string; cellId: string }[] = []
+  for (let u = 0; u < input.order.length; u++) {
+    const v = placed[u]
+    if (v === -1) continue
+    const socket = input.sockets[v]
+    const p = placementOf(input.order[u], socket, ctx)
+    if (p === null) {
+      const gems = new Set(
+        input.order[u].donors.filter((d) => d.type === socket.type).map((d) => d.row.name.toLowerCase())
+      )
+      const rivals = named.filter((n) => gems.has(n.gem) || n.cellId === socket.cellId)
+      return { seating, refused: [[u, v], ...rivals.map((n) => n.edge)] }
+    }
+    named.push({ edge: [u, v], gem: p.gemName.toLowerCase(), cellId: p.cellId })
+    seating.placements.push(p)
+  }
+  return { seating, refused: null }
+}
+
+/**
+ * ONE COPY, TWO FAMILIES (validator catch 2026-10-01). A gem with a Focus of one family and a
+ * Click of another is two claims, and the matching may seat both - one copy in two places. The
+ * ledger names it once and the second seat used to be dropped in silence, AFTER the matching had
+ * denied that seat to every other family: one ring with Focus and Click, g x1 granting Alpha
+ * (focus) and Beta (click), h granting Gamma (focus) - the plan was "Focus: g" alone and h was
+ * reported benched, where g in the Click and h in the Focus seats two families.
+ *
+ * The same refusal covers the item's classes: two gems that each fit a host alone can together
+ * narrow it past every class of the loadout, and the second one named is refused.
+ *
+ * So a refused edge is removed and the matching runs again, until every matched claim places.
+ * WHICH edge goes is a choice: the refused one, or an earlier edge that spent the copy (or
+ * narrowed the same item). Each is
+ * tried (the refused one first, so a tie keeps the higher tier's seat) and the run that seats
+ * more families wins. Past `SEARCH_BUDGET` refusals the search stops branching and drops the
+ * refused edge alone; every run removes an edge, so it always ends.
+ */
+function bestSeating(input: SeatingInput, adj: readonly number[][], budget: { runs: number }): Seating {
+  const { seating, refused } = seatOnce(input, adj)
+  if (refused === null) return seating
+  budget.runs--
+  const tries = budget.runs > 0 ? refused : refused.slice(0, 1)
+  let best = seating
+  let bestCount = -1
+  for (const [u, v] of tries) {
+    const next = adj.map((a, i) => (i === u ? a.filter((x) => x !== v) : a))
+    const run = bestSeating(input, next, budget)
+    if (run.placements.length > bestCount) {
+      best = run
+      bestCount = run.placements.length
+    }
+  }
+  return best
 }
 
 /** The four transferable socket types, as the sheet spells them. */
@@ -406,7 +523,7 @@ export function planBoard(
   sockets: readonly SocketHostCell[]
 ): BoardPlan {
   const rowByKey = new Map(rows.map((r) => [r.key, r]))
-  const ctx: PlanContext = { rowByKey, loadout, left: copyCounts(owned) }
+  const ctx: PlanContext = { rowByKey, loadout, left: copyCounts(owned), seated: new Map() }
   // THE INCUMBENT TIEBREAK, third and final form (user reports 2026-09-10, the belt three
   // times). A claim is incumbent only when ITS OWN best-tier donors can KEEP a seat the family
   // already holds — "the family is socketed somewhere" was too coarse: Summoning Haste counted
@@ -420,24 +537,14 @@ export function planBoard(
     .sort((a, b) => b.c.eff.tier - a.c.eff.tier || Number(keeps[b.i]) - Number(keeps[a.i]))
     .map((x) => x.c)
   const adj = edges(order, sockets, ctx)
-  const seatOf = match(order.length, adj, sockets.length)
   // The contests are the MATCHING's: a spare proc copy going unseated is not one.
-  const placed = placedOf(seatOf, order.length)
-  // The matching's seats are named first, so they spend the ledger before any second hand does.
-  // (A gem that donates to TWO families - a proc of one and a click of another - is one copy the
-  // matching may seat twice; the ledger then names it once and the later seat gets nothing,
-  // which is quieter than the contested list but no longer a copy in two places.)
-  const placements: Placement[] = []
-  for (let u = 0; u < order.length; u++) {
-    if (placed[u] === -1) continue
-    const p = placementOf(order[u], sockets[placed[u]], ctx)
-    if (p !== null) placements.push(p)
-  }
-  placements.push(...secondHand(order, adj, seatOf, (u, v) => placementOf(order[u], sockets[v], ctx)))
+  const run = bestSeating({ order, sockets, base: ctx, owned }, adj, { runs: SEARCH_BUDGET })
+  const placements = [...run.placements]
+  placements.push(...secondHand(order, adj, run.seatOf, (u, v) => placementOf(order[u], sockets[v], run.ctx)))
   return {
     placements,
     moves: movesOf(placements, sockets, rowByKey),
     clears: clearsOf(placements, sockets, rowByKey),
-    contested: contestedOf({ claims: order, placed, adj, sockets }, placements)
+    contested: contestedOf({ claims: order, placed: run.placed, adj, sockets, left: run.ctx.left }, placements)
   }
 }
