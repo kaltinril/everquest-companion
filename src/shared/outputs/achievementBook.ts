@@ -29,6 +29,7 @@
 // decided the difference between the two owner dumps. Nothing in the file states it.
 
 import type { AchievementsDump } from './achievements'
+import { outputFileNames, outputKind } from './kinds'
 
 /** One requirement line of an achievement. */
 export interface BookComponent {
@@ -109,6 +110,24 @@ function groupFor(groups: Map<string, BookGroup>, category: string): BookGroup {
     groups.set(category, group)
   }
   return group
+}
+
+/**
+ * Whether the dump found is the named character's own file. `preferredOutputFile` (kinds.ts)
+ * falls back to ANYBODY's newest dump, the right answer for its own readers; but this dump is
+ * stated per character, and another's would be drawn and stored as this one's. A character
+ * whose name is not known owns whatever was found, which is the one-character machine.
+ */
+export function isOwnAchievementsDump(
+  path: string,
+  characterName?: string,
+  server?: string
+): boolean {
+  if (!characterName) return true
+  const file = (path.split(/[\\/]/).pop() ?? '').toLowerCase()
+  return outputFileNames(outputKind('achievements'), characterName, server).some(
+    (name) => name.toLowerCase() === file
+  )
 }
 
 export function achievementBook(dump: AchievementsDump): AchievementBook {
