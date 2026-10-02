@@ -289,6 +289,9 @@ interface Edge {
   kind: ExitKind
 }
 
+/** The parenthetical the packs put on an entrance with no way back out (see `undirected`). */
+const ONE_WAY = /\(click/i
+
 /**
  * THE GRAPH READ AS UNDIRECTED, which is the physical truth and the labelling's cure.
  *
@@ -297,6 +300,14 @@ interface Edge {
  * neighbour's author did not. Adding the reverse of every stated edge recovers the seam from
  * whichever side labelled it. The reverse edge names its destination through the catalog, because
  * a `ZoneExit` only ever names where it GOES.
+ *
+ * THE WALK RUNS BACKWARD FROM WHERE YOU STAND, so an edge kept at `from` means "you can arrive at
+ * `from` from `to`" - the forward push is the REVERSE crossing and the reverse push is the stated
+ * one. Every two-way seam wants both. A ONE-WAY entrance wants only the stated one: a label that
+ * says `(click` (`to_The_Plane_of_Hate_(click)`, `portal_to_The_Plane_of_Sky_(click)`) is a door
+ * into a plane that states no way back, and reading it backwards routed Oasis's players into the
+ * Plane of Hate and out through Oasis (validator catch 2026-10-01). Hate still finds Oasis's ports
+ * through the stated direction, which is the 2026-09-23 fix.
  */
 function undirected(graph: ZoneGraph): Map<ZoneShort, Edge[]> {
   const adj = new Map<ZoneShort, Edge[]>()
@@ -308,7 +319,7 @@ function undirected(graph: ZoneGraph): Map<ZoneShort, Edge[]> {
   for (const [from, exits] of graph) {
     const fromName = resolveZone(from)?.name ?? from
     for (const e of exits) {
-      push(from, { to: e.zone, name: e.name, kind: e.kind })
+      if (!ONE_WAY.test(e.label)) push(from, { to: e.zone, name: e.name, kind: e.kind })
       push(e.zone, { to: from, name: fromName, kind: e.kind })
     }
   }
