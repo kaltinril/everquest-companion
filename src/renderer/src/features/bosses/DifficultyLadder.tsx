@@ -136,7 +136,13 @@ export default function DifficultyLadder({
       data-testid="boss-difficulty-ladder"
       direction="row"
       spacing={0.25}
-      sx={{ mt: 0.25, mb: 0.25 }}
+      sx={{
+        mt: 0.25,
+        mb: 0.25,
+        // Clear of the hide control (cardCorners.tsx): a 28px button inset 2px from the card's
+        // bottom-right, over the caption's 6-8px padding. 24px keeps D4 readable at both densities.
+        pr: 3
+      }}
     >
       {rungs.map((rung) => (
         <Rung
