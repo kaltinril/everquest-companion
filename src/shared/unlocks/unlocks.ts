@@ -193,9 +193,9 @@ export function isYours(name: string, stated: string | null): boolean {
   return name === stated || name.startsWith(`${stated} (`)
 }
 
-/** The ones still closed. */
-export function closedOf(unlocks: readonly Unlock[]): Unlock[] {
-  return unlocks.filter((u) => !u.open)
+/** The ones still closed, and the one named `keep` whatever its status (the row a chip asked for). */
+export function closedOf(unlocks: readonly Unlock[], keep: string | null = null): Unlock[] {
+  return unlocks.filter((u) => !u.open || u.name === keep)
 }
 
 /** How many of an unlock's lines are work: a placeholder line is the game saying there is none. */

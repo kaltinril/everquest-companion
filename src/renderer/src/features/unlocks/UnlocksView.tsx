@@ -68,8 +68,9 @@ function Section({
   yours: string | null
   c: UnlocksController
 }): JSX.Element {
-  const shown = c.hideOpen && c.hasDump ? closedOf(unlocks) : unlocks
   const focused = c.focus?.kind === kind ? c.focus.name : null
+  // Hiding what is open never hides the row a chip elsewhere opened the tab on.
+  const shown = c.hideOpen && c.hasDump ? closedOf(unlocks, focused) : unlocks
   return (
     <Box data-testid="unlocks-section" sx={{ pb: 2 }}>
       <Typography variant="subtitle2">

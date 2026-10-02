@@ -129,6 +129,9 @@ test('a deity has a task or a placeholder, and a placeholder is not counted as w
 test('the headings and the words', () => {
   assert.equal(openText(BOOK.races), '2 of 16 open')
   assert.equal(closedOf(BOOK.deities).length, 16)
+  // The row a chip asked for stays under Hide-open, open or not.
+  assert.equal(closedOf(BOOK.deities, 'Mithaniel Marr').length, 17)
+  assert.equal(closedOf(BOOK.deities, 'Cazic Thule').length, 16)
   assert.equal(howText('created'), 'created as')
   assert.equal(howText('other-unlock'), 'with another race')
   assert.equal(howText(null), '')
