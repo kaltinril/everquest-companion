@@ -19,8 +19,12 @@ import {
   lockoutWindow,
   manualClearIsLiveThisWeek,
   tierLadder,
+  tierLocks,
+  withManualBaseLock,
   type TierLock
 } from '../src/renderer/src/features/bosses/lockout'
+import { defeatedThisWeek } from '../src/renderer/src/features/bosses/rosterFilter'
+import type { TargetStatus } from '../src/renderer/src/features/bosses/bossStatus'
 import type { KillTierRun } from '../src/shared/types'
 
 // A Wednesday, comfortably inside one Pacific lockout week (reset is Tue 08:00 America/Los_Angeles).
@@ -139,4 +143,37 @@ test('a real tier-0 lock wins over a manual mark (no double, no manual flag)', (
   const lock: TierLock = { tier: 0, ts: 12345 }
   const rungs = tierLadder([lock], WED)
   assert.deepEqual(rungs[0], { tier: 0, cleared: true, ts: 12345 })
+})
+
+// ── a hand-marked base rung is a lock everywhere the week is read ───────────────────────────
+//
+// The rung went green, but the tally, "Defeated only" and the card chip read `tierLocks` alone, so
+// a hand-cleared boss stayed "open" in all three. useLockoutWeek's `lockOf` now folds the live mark
+// in through `withManualBaseLock`, and every one of them reads `lockOf`.
+
+test('withManualBaseLock adds a tier-0 lock for a live mark, flagged manual', () => {
+  const d3: TierLock = { tier: 3, ts: 999 }
+  assert.deepEqual(withManualBaseLock([d3], WED), [{ tier: 0, ts: WED, manual: true }, d3])
+})
+
+test('withManualBaseLock: no mark, or a real tier-0 lock, leaves the locks as they were', () => {
+  const locks: TierLock[] = [{ tier: 2, ts: 5 }]
+  assert.equal(withManualBaseLock(locks, undefined), locks)
+  const real: TierLock[] = [{ tier: 0, ts: 12345 }]
+  assert.equal(withManualBaseLock(real, WED), real)
+})
+
+test('the ladder over folded locks still says the base rung was marked by hand', () => {
+  const rungs = tierLadder(withManualBaseLock([], WED), WED)
+  assert.deepEqual(rungs[0], { tier: 0, cleared: true, ts: WED, manual: true })
+  assert.equal(rungs.filter((r) => r.cleared).length, 1)
+})
+
+test('"Defeated this week" keeps a boss whose only clear is the hand mark', () => {
+  // An open-world kill this week (no lock of its own) plus a live base mark.
+  const s = { tiers: { [-1]: run({ lastCreditedTs: WED }) } } as unknown as TargetStatus
+  const killsOnly = (t: TargetStatus): TierLock[] => tierLocks(t.tiers, week)
+  const withMark = (t: TargetStatus): TierLock[] => withManualBaseLock(killsOnly(t), WED)
+  assert.equal(defeatedThisWeek(killsOnly)(s), false)
+  assert.equal(defeatedThisWeek(withMark)(s), true)
 })

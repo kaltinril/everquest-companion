@@ -146,8 +146,10 @@ export function lockoutWindow(now: number): LockoutWindow {
 export interface TierLock {
   /** instance difficulty tier (0 = base … 4 = Refined) */
   tier: number
-  /** when the credited kill landed (ms) */
+  /** when the credited kill landed (ms), or when the base rung was marked by hand */
   ts: number
+  /** a hand-marked base clear (section 2a) folded in by `withManualBaseLock`, not a kill */
+  manual?: true
 }
 
 /**
@@ -199,6 +201,17 @@ export function hasCreditedAmbiguousKill(
     if (run && run.lastCreditedTs >= w.start && run.lastCreditedTs < w.next) return true
   }
   return false
+}
+
+/**
+ * The week's locks with a live manual base-rung mark folded in as a tier-0 lock — unless a real
+ * tier-0 kill already locks it, which wins. Folded where the view computes its locks
+ * (useLockoutWeek's `lockOf`), so the tally, the "Defeated only" filter, the card chip and the
+ * ladder all read one answer: a rung drawn green is a lock everywhere else too.
+ */
+export function withManualBaseLock(locks: TierLock[], manualBaseTs?: number): TierLock[] {
+  if (manualBaseTs === undefined || locks.some((l) => l.tier === 0)) return locks
+  return [{ tier: 0, ts: manualBaseTs, manual: true }, ...locks]
 }
 
 /**
@@ -284,10 +297,11 @@ export interface LadderRung {
  * rather than inventing a sixth rung.
  */
 export function tierLadder(locks: TierLock[], manualBaseTs?: number): LadderRung[] {
-  const byTier = new Map(locks.map((l) => [l.tier, l.ts]))
+  const byTier = new Map(locks.map((l) => [l.tier, l]))
   return DIFFICULTY_TIERS.map((tier) => {
-    const lockTs = byTier.get(tier)
-    if (lockTs !== undefined) return { tier, cleared: true, ts: lockTs }
+    const lock = byTier.get(tier)
+    // A folded manual lock (withManualBaseLock) keeps its flag: the rung stays undoable.
+    if (lock) return { tier, cleared: true, ts: lock.ts, ...(lock.manual ? { manual: true } : {}) }
     if (tier === 0 && manualBaseTs !== undefined) {
       return { tier, cleared: true, ts: manualBaseTs, manual: true }
     }
