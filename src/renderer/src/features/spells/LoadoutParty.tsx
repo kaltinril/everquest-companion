@@ -91,7 +91,9 @@ function MemberChips({ group }: { group: LoadoutGroup }): JSX.Element {
     <>
       {chip(SELF_CASTER, SELF_CASTER)}
       {party.map((m) =>
-        chip(m.name, `${m.name} · ${m.classes.join(' / ')}`, () => setParty(withoutMember(party, m.name)))
+        chip(m.name, `${m.name} · ${m.classes.join(' / ')}`, () =>
+          setParty(withoutMember(party, m.name, colorOf(SELF_CASTER)))
+        )
       )}
       <Popover
         open={picking !== null}
@@ -107,7 +109,7 @@ function MemberChips({ group }: { group: LoadoutGroup }): JSX.Element {
 
 /** The offers: roster members a `/who` row stated classes for. One click adds one. */
 function Suggestions({ group }: { group: LoadoutGroup }): JSX.Element | null {
-  const { party, setParty, suggestions } = group
+  const { party, setParty, suggestions, colorOf } = group
   if (suggestions.length === 0 || party.length >= MAX_PARTY_MEMBERS) return null
   return (
     <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap" sx={{ mt: 1 }}>
@@ -128,7 +130,7 @@ function Suggestions({ group }: { group: LoadoutGroup }): JSX.Element | null {
               ? 'Add them to the group with the classes their /who row stated.'
               : `Add them to the group with the classes their /who row stated on ${new Date(s.statedTs).toLocaleDateString()}.`
           }
-          onClick={() => setParty(withMember(party, s))}
+          onClick={() => setParty(withMember(party, s, colorOf(SELF_CASTER)))}
         />
       ))}
     </Stack>
@@ -137,14 +139,14 @@ function Suggestions({ group }: { group: LoadoutGroup }): JSX.Element | null {
 
 /** The row that adds a member by hand. It closes itself once it has added one. */
 function AddRow({ group, onDone }: { group: LoadoutGroup; onDone: () => void }): JSX.Element {
-  const { party, setParty } = group
+  const { party, setParty, colorOf } = group
   const [name, setName] = useState('')
   const [classes, setClasses] = useState<ClassAbbr[]>([])
   const full = party.length >= MAX_PARTY_MEMBERS
   // "You" is your own caster; the shared reader refuses a member of that name.
   const isSelf = name.trim().toLowerCase() === SELF_CASTER.toLowerCase()
   const add = (): void => {
-    setParty(withMember(party, { name, classes }))
+    setParty(withMember(party, { name, classes }, colorOf(SELF_CASTER)))
     setName('')
     setClasses([])
     onDone()
