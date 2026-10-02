@@ -15,7 +15,7 @@
 import { type JSX, useEffect } from 'react'
 import { Box, Chip, FormControlLabel, Stack, Switch, Typography } from '@mui/material'
 import { UNLOCK_TOKENS } from '@shared/unlocks/unlockGraph'
-import { closedOf, openText, type Unlock, type UnlockBook, type UnlockKind } from '@shared/unlocks/unlocks'
+import { closedOf, isYours, openText, type Unlock, type UnlockBook, type UnlockKind } from '@shared/unlocks/unlocks'
 import OutputKindLine from '../../components/OutputKindLine'
 import { unlockRowId } from '../../lib/unlockLink'
 import UnlockRow from './UnlockRow'
@@ -80,7 +80,7 @@ function Section({
         Or a {UNLOCK_TOKENS[kind]}, sold in the marketplace.
       </Typography>
       {shown.map((u) => (
-        <UnlockRow key={u.name} unlock={u} yours={u.name === yours} focused={u.name === focused} c={c} />
+        <UnlockRow key={u.name} unlock={u} yours={isYours(u.name, yours)} focused={u.name === focused} c={c} />
       ))}
       {shown.length === 0 && unlocks.length > 0 && unlocks.every((u) => u.open) && (
         <Typography variant="caption" color="text.secondary">

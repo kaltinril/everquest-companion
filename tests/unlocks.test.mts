@@ -20,6 +20,7 @@ import {
   closedOf,
   countedNeeds,
   howText,
+  isYours,
   openText,
   overlayUnlockBook,
   unlockBook,
@@ -54,6 +55,13 @@ test('the three families are read whole, and every line is a requirement or a wa
 
 test('what the file says about the character: created as, confirmed class, confirmed deity', () => {
   assert.equal(BOOK.createdAs, 'Froglok')
+  // The created-as line names the bare race; the Human unlocks carry a city.
+  assert.equal(isYours('Froglok', BOOK.createdAs), true)
+  assert.equal(isYours('Human (Freeport)', 'Human'), true)
+  assert.equal(isYours('Human (Qeynos)', 'Human'), true)
+  assert.equal(isYours('Half Elf', 'Human'), false)
+  assert.equal(isYours('Humanoid', 'Human'), false)
+  assert.equal(isYours('Froglok', null), false)
   assert.equal(BOOK.primaryClass, 'Paladin')
   assert.equal(BOOK.deity, 'Mithaniel Marr')
 })

@@ -183,6 +183,16 @@ export function unlockBook(book: AchievementBook): UnlockBook {
   }
 }
 
+/**
+ * Whether an unlock is the one the file states as yours. The created-as line names the bare race
+ * (`created as a Human`, on both Human rows of the fixture) where the unlocks carry a city
+ * (`Human (Freeport)`, `Human (Qeynos)`), so the bare name marks each city's row of it.
+ */
+export function isYours(name: string, stated: string | null): boolean {
+  if (stated === null) return false
+  return name === stated || name.startsWith(`${stated} (`)
+}
+
 /** The ones still closed. */
 export function closedOf(unlocks: readonly Unlock[]): Unlock[] {
   return unlocks.filter((u) => !u.open)
