@@ -72,21 +72,39 @@ export const MAX_TURN_INS_PER_QUEST = 200
  * throwing the character's whole progress away.
  */
 export function sanitizeTurnInInstants(value: unknown): number[] {
+  return cleanInstants(value).slice(0, MAX_TURN_INS_PER_QUEST)
+}
+
+/**
+ * Clean one quest's REJECTED instants: the same cleaning, but the cap keeps the NEWEST. A
+ * rejection is only ever needed while the log still shows the trade it refuses, and the log a
+ * snapshot re-reads is the recent end, so dropping the newest would let the latest take-back be
+ * written straight back.
+ */
+export function sanitizeRejectedInstants(value: unknown): number[] {
+  return cleanInstants(value).slice(-MAX_TURN_INS_PER_QUEST)
+}
+
+/** Whole non-negative milliseconds, ascending, deduped, uncapped. */
+function cleanInstants(value: unknown): number[] {
   if (!Array.isArray(value)) return []
   const seen = new Set<number>()
   for (const v of value) {
     if (typeof v !== 'number' || !Number.isFinite(v) || v < 0) continue
     seen.add(Math.floor(v))
   }
-  return [...seen].sort((a, b) => a - b).slice(0, MAX_TURN_INS_PER_QUEST)
+  return [...seen].sort((a, b) => a - b)
 }
 
-/** Clean a whole ledger, dropping keys left with nothing. */
-export function sanitizeTurnInLedger(value: unknown): TurnInInstants {
+/** Clean a whole ledger, dropping keys left with nothing. `clean` is the per-quest rule. */
+export function sanitizeTurnInLedger(
+  value: unknown,
+  clean: (v: unknown) => number[] = sanitizeTurnInInstants
+): TurnInInstants {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) return {}
   const out: TurnInInstants = {}
   for (const [key, v] of Object.entries(value as Record<string, unknown>)) {
-    const instants = sanitizeTurnInInstants(v)
+    const instants = clean(v)
     if (instants.length > 0) out[key] = instants
   }
   return out
@@ -106,7 +124,7 @@ export function storedTurnIns(progress: Pick<ProgressState, 'questTurnIns'> | nu
 export function rejectedTurnIns(
   progress: Pick<ProgressState, 'rejectedTurnIns'> | null
 ): TurnInInstants {
-  return sanitizeTurnInLedger(progress?.rejectedTurnIns)
+  return sanitizeTurnInLedger(progress?.rejectedTurnIns, sanitizeRejectedInstants)
 }
 
 /**
@@ -209,7 +227,7 @@ export function applyTurnIns(
   else completed.delete(key)
   const out = { questTurnIns: ledger, completedQuests: [...completed] }
   if (rejected === undefined) return out
-  const refused = replaceKey(rejectedTurnIns(progress), key, sanitizeTurnInInstants(rejected))
+  const refused = replaceKey(rejectedTurnIns(progress), key, sanitizeRejectedInstants(rejected))
   return { ...out, rejectedTurnIns: refused }
 }
 

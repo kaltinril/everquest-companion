@@ -40,10 +40,16 @@ export interface TurnInActions {
  * The statements, over the ledger `useTurnInLedger` derived. `detected` is the log's list with the
  * rejections already out, `rejected` the current rejected list, so each statement restates a
  * quest from what the user sees.
+ *
+ * `detected` IS NULL UNTIL THE TURN-INS MODULE HAS LOADED, and undo and reset do nothing until it
+ * has (the Sky tab disables both on `turnInsReady`). Right after launch the store already holds
+ * the persisted detections but the log's list is still empty, so a take-back could not tell a
+ * detection from a hand-recorded turn-in: it dropped the instant without rejecting it, and the
+ * module's first snapshot wrote it straight back.
  */
 export function useTurnInActions(
   turnIns: QuestTurnIns,
-  detected: TurnInInstants,
+  detected: TurnInInstants | null,
   rejected: TurnInInstants,
   setProgress: (p: ProgressState) => void
 ): TurnInActions {
@@ -74,6 +80,7 @@ export function useTurnInActions(
    */
   const undoTurnIn = useCallback(
     async (key: string): Promise<void> => {
+      if (detected === null) return
       const s = takeBackTurnIn(turnIns.instants[key] ?? [], detected[key] ?? [], rejected[key] ?? [])
       setProgress(await window.eq.setQuestTurnIns(key, s.instants, s.rejected))
     },
@@ -86,6 +93,7 @@ export function useTurnInActions(
    * lists, sequentially — the store is a file and the last answer is the state to keep.
    */
   const resetTurnIns = useCallback(async (): Promise<void> => {
+    if (detected === null) return
     let last: ProgressState | null = null
     for (const key of new Set([...Object.keys(turnIns.all), ...Object.keys(detected)])) {
       const s = rejectAllTurnIns(detected[key] ?? [], rejected[key] ?? [])
