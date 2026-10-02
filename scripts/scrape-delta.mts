@@ -8,7 +8,9 @@
 // pages' wikitext is then fetched (50 per request, the same serialized one-request-per-second
 // etiquette scrape-items.ts states as law), parsed through the SAME parsers the full scrapers
 // use, and folded over the committed records. Full-scrape @ T plus every change since T is the
-// wiki's state now, so scrapedAt moves to now honestly.
+// wiki's state now, so scrapedAt moves to now honestly. That holds only while the feed still
+// reaches back to scrapedAt (it ages out), so the run refuses when it does not. Moves and
+// deletes are listed for a human, never applied.
 //
 // This file deliberately does not touch the full scrapers: importing scrape-items.ts would run
 // its main, so its three tiny page->record helpers are mirrored here (marked below) — the real
@@ -16,7 +18,7 @@
 //
 // After a run that changed anything: `npm run gen:data-weight` (the ledger pins exact bytes).
 
-import { readFileSync, writeFileSync } from 'fs'
+import { readFileSync, renameSync, writeFileSync } from 'fs'
 import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
 import { parseItemWikitext, templateField } from '../src/main/itemLookupParse'
@@ -87,9 +89,50 @@ async function api<T>(params: Record<string, string>): Promise<T> {
   }
 }
 
-/** Every ns0 page edited or created since `sinceIso`, newest first, deduped. */
-async function changedTitles(sinceIso: string): Promise<string[]> {
+/**
+ * The wiki keeps recentchanges for a limited age ($wgRCMaxAge, 90 days by default). If its
+ * OLDEST row of any kind is newer than `sinceIso`, changes in the gap are gone from the feed and
+ * a delta would silently miss them: refuse, and say a full scrape is due.
+ */
+async function assertFeedReaches(sinceIso: string): Promise<void> {
+  const j = await api<{ query?: { recentchanges?: { timestamp: string }[] } }>({
+    action: 'query',
+    list: 'recentchanges',
+    rcdir: 'newer',
+    rclimit: '1',
+    rcprop: 'timestamp'
+  })
+  const oldest = j.query?.recentchanges?.[0]?.timestamp
+  if (!oldest || Date.parse(oldest) > Date.parse(sinceIso)) {
+    throw new Error(
+      `recentchanges reaches back only to ${oldest ?? '(empty)'}, not to ${sinceIso}: ` +
+        'the delta cannot see the gap. Run the full scrapers (npm run scrape:items, scrape:mobs).'
+    )
+  }
+}
+
+/** A move or delete in ns0: listed for a human, never applied (the delta only adds/updates). */
+export interface PageLogEvent {
+  logtype: string
+  logaction: string
+  title: string
+  target?: string
+}
+
+export interface RcRow {
+  type: string
+  title: string
+  logtype?: string
+  logaction?: string
+  logparams?: { target_title?: string }
+}
+
+/** Every ns0 page edited or created since `sinceIso`, newest first, deduped; plus moves/deletes. */
+async function changedTitles(
+  sinceIso: string
+): Promise<{ titles: string[]; logs: PageLogEvent[] }> {
   const seen = new Set<string>()
+  const logs: PageLogEvent[] = []
   let rccontinue: string | undefined
   for (;;) {
     const params: Record<string, string> = {
@@ -97,20 +140,30 @@ async function changedTitles(sinceIso: string): Promise<string[]> {
       list: 'recentchanges',
       rcend: sinceIso, // rc walks backward in time; end = oldest bound
       rclimit: '500',
-      rcprop: 'title',
-      rctype: 'edit|new',
+      rcprop: 'title|loginfo',
+      rctype: 'edit|new|log',
       rcnamespace: '0'
     }
     if (rccontinue) params.rccontinue = rccontinue
     const j = await api<{
-      query?: { recentchanges?: { title: string }[] }
+      query?: { recentchanges?: RcRow[] }
       continue?: { rccontinue?: string }
     }>(params)
-    for (const rc of j.query?.recentchanges ?? []) seen.add(rc.title)
+    for (const rc of j.query?.recentchanges ?? []) foldRcRow(rc, seen, logs)
     rccontinue = j.continue?.rccontinue
     if (!rccontinue) break
   }
-  return [...seen]
+  return { titles: [...seen], logs }
+}
+
+export function foldRcRow(rc: RcRow, seen: Set<string>, logs: PageLogEvent[]): void {
+  if (rc.type !== 'log') {
+    seen.add(rc.title)
+    return
+  }
+  if (rc.logtype !== 'move' && rc.logtype !== 'delete') return
+  const target = rc.logparams?.target_title
+  logs.push({ logtype: rc.logtype, logaction: rc.logaction ?? '', title: rc.title, target })
 }
 
 interface RevPage {
@@ -119,16 +172,23 @@ interface RevPage {
   revisions?: { slots?: { main?: { content?: string } } }[]
 }
 
+/**
+ * A `continue` here means the wiki cut the batch short (a response-size limit) and some pages came
+ * back without content. Skipping them would drop their edits from the delta without a word.
+ */
 async function fetchWikitext(titles: string[]): Promise<Map<string, string>> {
   const out = new Map<string, string>()
   for (let i = 0; i < titles.length; i += BATCH) {
-    const j = await api<{ query?: { pages?: RevPage[] } }>({
+    const j = await api<{ query?: { pages?: RevPage[] }; continue?: unknown }>({
       action: 'query',
       prop: 'revisions',
       rvprop: 'content',
       rvslots: 'main',
       titles: titles.slice(i, i + BATCH).join('|')
     })
+    if (j.continue) {
+      throw new Error(`revisions batch at ${i} came back continued; content would be missing`)
+    }
     for (const p of j.query?.pages ?? []) {
       const wt = p.revisions?.[0]?.slots?.main?.content
       if (!p.missing && wt != null) out.set(p.title, wt)
@@ -201,7 +261,7 @@ export function foldItems(itemsFile: ItemDbFile, wikitext: Map<string, string>):
   return entries.size
 }
 
-/** Does `entry` take a key `prev` holds? Its own page's newer revision does; else only if richer. */
+/** Does `entry` take a key `prev` holds? Its own page's newer revision does, else only richer. */
 function claims(entry: ItemDbEntry, prev: ItemDbEntry | undefined): boolean {
   if (!prev || prev.page === entry.page) return true
   return JSON.stringify(entry).length > JSON.stringify(prev).length
@@ -236,9 +296,11 @@ async function run(): Promise<void> {
     Math.min(Date.parse(itemsFile.scrapedAt), Date.parse(mobsFile.scrapedAt)) - 3600_000
   ).toISOString()
 
+  await assertFeedReaches(oldest)
   console.log(`Changed ns0 pages since ${oldest}…`)
-  const changed = await changedTitles(oldest)
+  const { titles: changed, logs } = await changedTitles(oldest)
   console.log(`  ${changed.length} pages changed`)
+  printPageLogs(logs)
   if (DRY) {
     const knownItems = changed.filter((t) => itemsFile.items[itemKey(t) ?? '']).length
     const mobPages = new Set(mobsFile.mobs.map((m) => m.page))
@@ -272,13 +334,32 @@ async function run(): Promise<void> {
     mobs: [...byPage.values()].sort((a, b) => a.page.localeCompare(b.page))
   }
 
-  writeFileSync(ITEMS_PATH, JSON.stringify(itemsOut), 'utf8')
-  writeFileSync(MOBS_PATH, JSON.stringify(mobsOut), 'utf8')
+  writeAtomic(ITEMS_PATH, JSON.stringify(itemsOut))
+  writeAtomic(MOBS_PATH, JSON.stringify(mobsOut))
   console.log(
     `\nFolded ${itemsTouched} item pages and ${mobsTouched} mob pages over the committed DBs.`
   )
   console.log(`items.json count: ${itemsFile.count} → ${distinctPages}; both scrapedAt → now.`)
   console.log(`Next: npm run gen:data-weight  (the ledger pins exact bytes)`)
+  console.log(
+    'Not refreshed by the delta: pageEra.json (npm run scrape:page-era), posky.json ' +
+      '(npm run scrape:posky) and, where the build carries it, mobRaces.json (gen-mob-races.mts).'
+  )
+}
+
+/** Write beside, then rename: an interrupted run never leaves a truncated committed DB. */
+function writeAtomic(path: string, data: string): void {
+  writeFileSync(`${path}.tmp`, data, 'utf8')
+  renameSync(`${path}.tmp`, path)
+}
+
+/** Moves and deletes are a human's call: the delta lists them and changes nothing for them. */
+function printPageLogs(logs: PageLogEvent[]): void {
+  if (logs.length === 0) return
+  console.log(`  ${logs.length} ns0 move/delete log entries (not applied; check by hand):`)
+  for (const l of logs) {
+    console.log(`    ${l.logtype}/${l.logaction}: ${l.title}${l.target ? ` → ${l.target}` : ''}`)
+  }
 }
 
 if ((process.argv[1] ?? '').endsWith('scrape-delta.mts')) main()

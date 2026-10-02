@@ -2,7 +2,7 @@
 // page's newer revision or to a richer record, and an edited page's stale `|itemname` key goes.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { foldItems } from '../scripts/scrape-delta.mts'
+import { foldItems, foldRcRow, type PageLogEvent, type RcRow } from '../scripts/scrape-delta.mts'
 import { itemKey, type ItemDbEntry, type ItemDbFile } from '../src/main/itemsDb'
 
 const CANON: ItemDbEntry = {
@@ -42,7 +42,8 @@ test("a page's newer revision replaces its own keys even when it is poorer", () 
 test('a richer record still wins a key held by another page', () => {
   const thin: ItemDbEntry = { page: 'Cyclops skull', iconId: 1 }
   const f = file([thin])
-  foldItems(f, new Map([['Cyclops Skull', page('|statsblock=MAGIC ITEM  WT: 1.0\n|lucy_img_ID=2')]]))
+  const richPage = page('|statsblock=MAGIC ITEM  WT: 1.0\n|lucy_img_ID=2')
+  foldItems(f, new Map([['Cyclops Skull', richPage]]))
   assert.equal(f.items[itemKey('Cyclops skull') ?? '']?.page, 'Cyclops Skull')
 })
 
@@ -54,4 +55,28 @@ test("an edited page's old |itemname key is dropped, another page's key is not",
   assert.equal(f.items[itemKey('Old Name') ?? ''], undefined)
   assert.equal(f.items[itemKey('New Name') ?? '']?.page, renamed.page)
   assert.equal(f.items[itemKey('Bystander') ?? ''], other)
+})
+
+test('recentchanges rows: edits are fetched, moves and deletes are only listed', () => {
+  const seen = new Set<string>()
+  const logs: PageLogEvent[] = []
+  const rows: RcRow[] = [
+    { type: 'edit', title: 'Cyclops Skull' },
+    { type: 'new', title: 'Brand New Item' },
+    {
+      type: 'log',
+      title: 'Old Title',
+      logtype: 'move',
+      logaction: 'move',
+      logparams: { target_title: 'New Title' }
+    },
+    { type: 'log', title: 'Gone Page', logtype: 'delete', logaction: 'delete' },
+    { type: 'log', title: 'Someone', logtype: 'newusers', logaction: 'create' }
+  ]
+  for (const rc of rows) foldRcRow(rc, seen, logs)
+  assert.deepEqual([...seen], ['Cyclops Skull', 'Brand New Item'])
+  assert.deepEqual(logs, [
+    { logtype: 'move', logaction: 'move', title: 'Old Title', target: 'New Title' },
+    { logtype: 'delete', logaction: 'delete', title: 'Gone Page', target: undefined }
+  ])
 })
