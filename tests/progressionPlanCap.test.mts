@@ -9,7 +9,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import type { ConBand } from '../src/shared/conBands'
 import type { GearRow } from '../src/shared/planner/gear'
-import { LEVEL_CAP } from '../src/shared/planner/planHorizon'
+import { LEVEL_CAP, bracketsFrom } from '../src/shared/planner/planHorizon'
 import {
   buildProgressionPlan,
   type PlanBracket,
@@ -80,6 +80,16 @@ test('no bracket opens past the cap, and the last one ends on it', () => {
   const route = buildProgressionPlan(inputs(), corpora([...GHOUL_DROPS, SKY_DROP]))
   // THE OWNER'S SCREEN: level 37, six at a time. It ran 37-42 ... 73-78.
   assert.deepEqual(bounds(route), ['37-42', '43-48', '49-50'])
+})
+
+test('a low character\'s horizon reaches the cap: levels 1, 2 and 8 end in the bracket holding 50', () => {
+  // The old 36-level backstop ended a level-1 route at 37-42, short of the cap and never `last`.
+  for (const level of [1, 2, 8]) {
+    const all = bracketsFrom({ level })
+    const end = all[all.length - 1]
+    assert.equal(end.from <= 50 && end.to === 50, true, `level ${String(level)} ends ${String(end.from)}-${String(end.to)}`)
+    assert.equal(end.last, true, `level ${String(level)}: the last bracket gets LAST_BRACKET_ROOM`)
+  }
 })
 
 test('a character AT the cap has one bracket, their own level', () => {

@@ -569,10 +569,10 @@ test('the route stops when the corpus runs out of things to state, and trims tra
   assert.deepEqual(zones(route1[1]), [], 'the middle bracket is silent and is KEPT')
   assert.deepEqual(zones(route1[2]), ['Najena'], 'because the route picks up again after it')
 
-  // AND THE HARD BACKSTOP holds even when every bracket keeps answering: a corpus whose one zone
-  // cons in reach forever cannot make the loop run past level + 36.
+  // AND THE CAP holds even when every bracket keeps answering: a corpus whose one zone cons in
+  // reach forever runs a level-1 route to the level cap and no further.
   const forever = corpora({ gear: [], profiles: PROFILES, con: () => 'even' })
   const route = buildProgressionPlan(inputs({ level: 1, bracketSize: 6 }), forever)
-  assert.equal(route[route.length - 1].to <= 1 + 36 + 6, true)
-  assert.equal(route.length <= 7, true)
+  assert.equal(route[route.length - 1].to, 50)
+  assert.equal(route.length, 9)
 })

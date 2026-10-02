@@ -868,8 +868,8 @@ function isQuiet(bracket: PlanBracket): boolean {
  * THE HORIZON IS THE LEVEL CAP, OR THE DATA RUNNING OUT, whichever comes first. The route never
  * opens a bracket past `LEVEL_CAP` and its last bracket ends ON the cap; below that it stops after
  * `QUIET_BRACKETS` consecutive brackets that carry neither an exp zone nor a target — that is the
- * corpus saying it has run out of things to state. `HORIZON_LEVELS` is a hard backstop so a
- * strange corpus cannot loop, not a claim. Trailing silent brackets are trimmed before
+ * corpus saying it has run out of things to state. The cap is also what keeps a corpus that never
+ * goes quiet from looping. Trailing silent brackets are trimmed before
  * the route is returned — a silent bracket in the MIDDLE is information ("nothing here, keep going"),
  * a silent one at the end is just the loop's own footprint.
  *
