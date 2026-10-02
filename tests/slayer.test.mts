@@ -354,6 +354,22 @@ test('a placeholder is not a zone, and a several-zone mob is one spawn in each',
   )
 })
 
+test('a guess, a various and a closing period are read as the catalog writes them', () => {
+  const odd = slayerMobs(
+    [
+      mob('a gnoll scout', ['Various Starter Zones', 'Warsliks?', 'Lake of Ill Omen.'], '10', 2),
+      mob('a gnoll guard', ['various (Qeynos Hills)', 'also in Chardok?'], '10', 2)
+    ],
+    () => 'Gnoll'
+  )
+  const every = { maxLevel: null, outOfEra: true }
+  const gnolls = planZones(odd, [slayerTarget(counter('The More You Gnoll!', 'Gnolls'))], every)
+  assert.deepEqual(
+    gnolls.map((z) => [z.key, z.name]),
+    [['lakeofillomen', 'Lake of Ill Omen']]
+  )
+})
+
 test('the level cap reads the LOWEST stated level, and an unopened zone is a switch', () => {
   const capped = planZones(MOBS, [ALIVE], { maxLevel: 20, outOfEra: false })
   assert.deepEqual(

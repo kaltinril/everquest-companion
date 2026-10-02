@@ -140,8 +140,13 @@ function zoneNameByShort(): Map<ZoneShort, string> {
   return NAME_BY_SHORT
 }
 
-/** The catalog writes placeholders where a zone belongs; they are not places to go. */
+/** The catalog writes placeholders where a zone belongs; they are not places to go. Besides
+ *  these, any `various ...` (`Various Starter Zones`) and any guess ending in `?` (`Warsliks?`). */
 const NOT_A_ZONE = new Set(['', 'various', 'varies', 'unknown', 'none', '?'])
+
+function isPlaceholder(key: string): boolean {
+  return NOT_A_ZONE.has(key) || key.startsWith('various') || key.endsWith('?')
+}
 
 function spawnPoints(entry: MobEntry): number {
   if ((entry.zones?.length ?? 0) !== 1) return 1
@@ -190,12 +195,15 @@ function addMob(zone: PlanZone, row: PlanMob, mob: SlayerMob): void {
   if (mob.high !== null) zone.high = zone.high === null ? mob.high : Math.max(zone.high, mob.high)
 }
 
-/** The zones a mob is filed under that are places and that the options keep. */
+/** The zones a mob is filed under that are places and that the options keep, each without the
+ *  closing period a page sometimes leaves on it (`Lake of Ill Omen.`). */
 function keptZones(entry: MobEntry, opts: PlanOptions): string[] {
-  return (entry.zones ?? []).filter((z) => {
-    if (NOT_A_ZONE.has(zoneKey(z))) return false
-    return opts.outOfEra || eraVerdict([z]) !== 'out-of-era'
-  })
+  return (entry.zones ?? [])
+    .map((z) => z.replace(/\.\s*$/, ''))
+    .filter((z) => {
+      if (isPlaceholder(zoneKey(z))) return false
+      return opts.outOfEra || eraVerdict([z]) !== 'out-of-era'
+    })
 }
 
 function byRank(a: PlanZone, b: PlanZone): number {
