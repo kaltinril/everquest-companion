@@ -38,7 +38,10 @@ fn active_under(trust: Option<Value>) -> Value {
 fn active_after(trust: Option<Value>, lines: &[String]) -> Value {
     let mut fold = Fold::new(registered(ClusterDeps::default()), 1000);
     if let Some(payload) = trust {
-        assert!(fold.registry.define("buffTrust", &payload), "buffs answers to buffTrust");
+        assert!(
+            fold.registry.define("buffTrust", &payload),
+            "buffs answers to buffTrust"
+        );
     }
     for line in lines {
         fold.on_primary(&Event::from_json(line).expect("a JSON object"), false);
@@ -59,7 +62,9 @@ fn a_held_procs_landing_on_a_mob_you_are_hitting_opens_a_row_under_the_opt_in() 
     assert_eq!(active_under(None), json!([]));
     // The switch without the item is nothing, and the item without the switch is nothing.
     assert_eq!(
-        active_under(Some(json!({ "externals": [], "procDebuffs": true, "procSpells": [] }))),
+        active_under(Some(
+            json!({ "externals": [], "procDebuffs": true, "procSpells": [] })
+        )),
         json!([])
     );
     assert_eq!(
@@ -79,24 +84,45 @@ fn a_held_procs_landing_on_a_mob_you_are_hitting_opens_a_row_under_the_opt_in() 
 }
 
 /// The landing prints BEFORE its swing's line, and the swing may be a miss: both measured over the
-/// owner's log. A landing-first pair in one second draws the row; a swing three seconds later does
-/// not.
+/// owner's log. A landing-first pair in one second, or across one second boundary, draws the row;
+/// a swing three seconds later does not.
 #[test]
 fn a_landing_that_prints_before_its_swing_is_held_for_it_and_a_miss_is_a_swing() {
-    let armed = || Some(json!({ "externals": [], "procDebuffs": true, "procSpells": ["Tashania"] }));
+    let armed =
+        || Some(json!({ "externals": [], "procDebuffs": true, "procSpells": ["Tashania"] }));
     let [swing, landing] = lines();
     let miss = format!(
         r#"{{"kind":"miss","seq":0,"ts":3000,"raw":"m","attacker":"You","target":"{MOB}","mtype":"miss"}}"#
     );
     // Landing first, then the swing's own line in the same second.
-    let active = active_after(armed(), &[landing.clone(), swing.replace(r#""ts":2000"#, r#""ts":3000"#)]);
+    let active = active_after(
+        armed(),
+        &[
+            landing.clone(),
+            swing.replace(r#""ts":2000"#, r#""ts":3000"#),
+        ],
+    );
     assert_eq!(active.as_array().map(Vec::len), Some(1), "{active}");
     assert_eq!(active[0]["spell"], "Tashania", "{active}");
+    // Landing first, then its swing stamped one second later: the second boundary fell between
+    // them (`[..:47] a Kunark goblin glances nervously.` then `[..:48] You hit a Kunark goblin`).
+    let active = active_after(
+        armed(),
+        &[
+            landing.clone(),
+            swing.replace(r#""ts":2000"#, r#""ts":4000"#),
+        ],
+    );
+    assert_eq!(active.as_array().map(Vec::len), Some(1), "{active}");
+    assert_eq!(active[0]["startedTs"], 3000, "{active}");
     // A miss is a swing.
     let active = active_after(armed(), &[landing.clone(), miss]);
     assert_eq!(active.as_array().map(Vec::len), Some(1), "{active}");
     // A swing three seconds after the landing is another round: nothing.
-    let active = active_after(armed(), &[landing, swing.replace(r#""ts":2000"#, r#""ts":6000"#)]);
+    let active = active_after(
+        armed(),
+        &[landing, swing.replace(r#""ts":2000"#, r#""ts":6000"#)],
+    );
     assert_eq!(active, json!([]));
 }
 

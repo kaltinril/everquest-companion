@@ -23,6 +23,7 @@
 //! that log), so `buff_procs.rs` holds a refused landing for the swing that follows it.
 
 use crate::jsmap::JsMap;
+use crate::modules::buff_procs::SAME_SECOND_MS;
 use crate::modules::buffs_shapes::{
     caster_key, caster_trusted, spell_key, OWN_CAST_WINDOW_MS, QUICK_BUFF_WINDOW_MS, SELF_CASTER,
 };
@@ -147,13 +148,18 @@ impl CastAnchors {
     /// The proc gate for ONE spell: switched on, a combat effect of something you hold, and a swing
     /// of yours at `target` inside the window. It says nothing about uniqueness — the landing gate
     /// asks per candidate and refuses a sentence two held procs could both explain.
+    ///
+    /// The swing may also come up to `SAME_SECOND_MS` AFTER the landing: that is the held landing
+    /// `buff_procs.rs` replays at its own ts once the swing that follows it arrives, one second
+    /// boundary later at most. A landing folded live never sees a later swing here — the swing has
+    /// not been read yet — so the slack only reaches the replay (and a log clock stepping back).
     pub fn proc_evidence(&self, spell: &str, target: &str, ts: i64) -> bool {
         if !self.is_held_proc(spell) {
             return false;
         }
         self.melee
             .get(&id_key(target))
-            .is_some_and(|&hit| ts >= hit && ts - hit <= PROC_MELEE_WINDOW_MS)
+            .is_some_and(|&hit| hit - ts <= SAME_SECOND_MS && ts - hit <= PROC_MELEE_WINDOW_MS)
     }
 
     /// Trusted against this world's allowlist: you, plus whoever the user named.
@@ -325,8 +331,10 @@ mod tests {
             a.proc_evidence("Tashania", "A Kunark Goblin", 3000),
             "the target key is case-folded"
         );
+        // A landing before its swing, inside one second boundary: the replay of a held landing.
+        assert!(a.proc_evidence("Tashania", "a Kunark goblin", 1000 - SAME_SECOND_MS));
         // A spell the held items do not proc, a mob you did not swing at, a stale swing, and a
-        // landing before the swing: none of them.
+        // landing further before the swing than that: none of them.
         assert!(!a.proc_evidence("Tashani", "a Kunark goblin", 1500));
         assert!(!a.proc_evidence("Tashania", "a froglok", 1500));
         assert!(!a.proc_evidence(
@@ -334,7 +342,7 @@ mod tests {
             "a Kunark goblin",
             1000 + PROC_MELEE_WINDOW_MS + 1
         ));
-        assert!(!a.proc_evidence("Tashania", "a Kunark goblin", 999));
+        assert!(!a.proc_evidence("Tashania", "a Kunark goblin", 1000 - SAME_SECOND_MS - 1));
     }
 
     /// `reset` clears the swings, which are log state, and keeps the gate, which is a preference.
