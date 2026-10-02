@@ -41,8 +41,9 @@ function safePrefs(raw: unknown): MapPackPrefs | false {
 
 /**
  * THE GRAPH IS BUILT AT IDLE, NOT ON THE FIRST MAPS TAB (owner report 2026-09-12). Its build is
- * 0.13 s of disk read now (zoneGraph.ts), but it sat in front of the map the tab asked for, and a
- * tab that draws its map and its port advice together needs the graph already there. A short
+ * about 1.5 s of disk read, yielding between zones (zoneGraph.ts), but it sat in front of the map
+ * the tab asked for, and a tab that draws its map and its port advice together needs the graph
+ * already there. A short
  * delay after registration keeps it out of the startup path; the memo means the tab's own request
  * then costs nothing, and a library rebuilt for a new EQ root rebuilds it on the next ask.
  */
@@ -50,11 +51,9 @@ const GRAPH_WARM_MS = 4_000
 
 function warmZoneGraph(): void {
   setTimeout(() => {
-    try {
-      zoneGraph()
-    } catch (err) {
+    zoneGraph().catch((err: unknown) => {
       logError('main:zoneGraph', err)
-    }
+    })
   }, GRAPH_WARM_MS)
 }
 
@@ -92,7 +91,7 @@ export function registerMapsIpc(): void {
 
   // Likewise no argument. The first call parses every map in the default pack once (`zoneGraph`
   // memoizes); a Map cannot cross IPC, so it goes as entries and the renderer rebuilds it.
-  ipcMain.handle(IPC.mapsGraph, () => [...zoneGraph()])
+  ipcMain.handle(IPC.mapsGraph, async () => [...(await zoneGraph())])
 
   // `prefs` goes through the SAME `safePrefs` gate as `maps:get` — an in-zone search parses the
   // zone under the caller's preference, so both pack ids reach the same `join()` they do there.

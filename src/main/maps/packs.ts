@@ -277,13 +277,20 @@ export interface MapLibrary {
    * The zone's LABEL points alone, off the same layers `get` would pick, without parsing its
    * geometry or entering the cache. `null` when no pack has the zone. The zone graph's reader
    * (zoneGraph.ts): it walks every zone once and needs only the seam labels.
+   *
+   * `memo`, when given, keeps each FILE's label points by path, so a walk that asks for one zone
+   * under several pack preferences reads and scans a file shared between them once. The caller
+   * owns it and drops it when the walk is done; the library keeps nothing.
    */
-  labels: (zone: ZoneShort, prefs?: MapPackPrefs) => MapPoint[] | null
+  labels: (zone: ZoneShort, prefs?: MapPackPrefs, memo?: LabelMemo) => MapPoint[] | null
   /** Label search: in one zone, or across the whole corpus when `opts.zone` is absent. */
   search: (query: string, opts?: MapSearchOpts) => MapSearchHit[]
   /** Drop every cache and re-scan the roots (a pack was installed/removed). */
   refresh: () => void
 }
+
+/** One walk's label points per file path (`MapLibrary.labels`); null for an unreadable file. */
+export type LabelMemo = Map<string, MapPoint[] | null>
 
 /** A corpus-search row: the point, the zone it is in, and its pre-tokenized haystack. */
 interface CorpusRow {
@@ -333,16 +340,31 @@ function zoneLabels(
   packs: readonly PackIndex[],
   zone: ZoneShort,
   prefs: MapPackPrefs,
-  readText: (path: string) => string | null
+  labelsOf: (pick: LayerPick) => MapPoint[] | null
 ): MapPoint[] | null {
   const picks = resolveZoneLayers(packs, zone, prefs)
   if (picks.length === 0) return null
   const out: MapPoint[] = []
   for (const pick of picks) {
-    const text = readText(pick.path)
-    if (text != null) out.push(...parseMapLabels(text, pick.layer))
+    const points = labelsOf(pick)
+    if (points != null) out.push(...points)
   }
   return out
+}
+
+/** One file's label points, read through `memo` when the caller keeps one. */
+function memoLabels(
+  read: (pick: LayerPick) => MapPoint[] | null,
+  memo: LabelMemo | undefined
+): (pick: LayerPick) => MapPoint[] | null {
+  if (memo === undefined) return read
+  return (pick) => {
+    const held = memo.get(pick.path)
+    if (held !== undefined) return held
+    const points = read(pick)
+    memo.set(pick.path, points)
+    return points
+  }
 }
 
 export function createMapLibrary(opts: MapLibraryOptions): MapLibrary {
@@ -359,6 +381,11 @@ export function createMapLibrary(opts: MapLibraryOptions): MapLibrary {
   function parseLayer(pick: LayerPick): MapParseResult | null {
     const text = readText(pick.path)
     return text == null ? null : parseMapText(text, pick.layer)
+  }
+
+  function readLabels(pick: LayerPick): MapPoint[] | null {
+    const text = readText(pick.path)
+    return text == null ? null : parseMapLabels(text, pick.layer)
   }
 
   function load(zone: ZoneShort, prefs: MapPackPrefs): MapData | null {
@@ -449,8 +476,8 @@ export function createMapLibrary(opts: MapLibraryOptions): MapLibrary {
       return [...stems].sort()
     },
     get,
-    labels: (zone, prefs = {}) =>
-      cache.get(prefsKey(zone, prefs))?.points ?? zoneLabels(packs(), zone, prefs, readText),
+    labels: (zone, prefs = {}, memo) =>
+      cache.get(prefsKey(zone, prefs))?.points ?? zoneLabels(packs(), zone, prefs, memoLabels(readLabels, memo)),
     search: (query, searchOpts) => {
       const tokens = tokenize(query)
       if (tokens.length === 0) return []
