@@ -88,13 +88,22 @@ function allPorts(): Promise<ZonePort[]> {
  * The whole graph, fetched once and kept - the port table's arrangement. Until it arrives the
  * search runs over the one map on screen, which is exactly what the first version did and is the
  * honest interim: one hop, from labels already in hand, rather than nothing.
+ *
+ * ONLY A REAL GRAPH IS KEPT. A failed or EMPTY answer (no maps found yet, or main still settling
+ * on the EQ directory) is null, so the one-hop interim stays in force, and it is not memoized, so
+ * the next mount asks again. An empty Map kept forever used to win `graph ?? interim` and leave
+ * every later card with no exits at all.
  */
-let pendingGraph: Promise<ZoneGraph> | null = null
-function allGraph(): Promise<ZoneGraph> {
+let pendingGraph: Promise<ZoneGraph | null> | null = null
+function allGraph(): Promise<ZoneGraph | null> {
   pendingGraph ??= window.eq
     .getZoneGraph()
-    .then((rows) => new Map(rows))
-    .catch(() => new Map())
+    .then((rows): ZoneGraph | null => (rows.length === 0 ? null : new Map(rows)))
+    .catch(() => null)
+    .then((graph) => {
+      if (graph === null) pendingGraph = null
+      return graph
+    })
   return pendingGraph
 }
 
