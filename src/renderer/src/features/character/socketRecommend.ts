@@ -275,21 +275,64 @@ export function seatFits(
   return combined.some((c) => loadout.classes.includes(c))
 }
 
-/** The best loose candidate for one socket, under a predicate on its effect. */
+/**
+ * THE HOST AS ITS OTHER SOCKETS LEAVE IT (validator catch 2026-10-01). `seatFits` narrows the
+ * BASE host by one donor, but a gem already in - or planned for - another socket of the same item
+ * has narrowed it first: a WAR-only gem in an ALL bracer's Focus and a MNK-only gem in its Worn
+ * each pass alone for a WAR+MNK loadout, and together leave a bracer nobody can wear. So every
+ * engine hands `seatFits` the host narrowed by its siblings' donors. NULL when the siblings
+ * already share no class (an empty list would read as "unknown" and pass everything); an
+ * unknown host stays unknown (law 1).
+ */
+export function narrowedHost(
+  hostRow: GearRow | undefined,
+  siblings: readonly GearRow[]
+): GearRow | undefined | null {
+  if (hostRow === undefined) return undefined
+  let classes = hostRow.classes
+  for (const sib of siblings) {
+    const next = narrowedClasses(classes, sib.classes)
+    if (next.length === 0 && classes.length > 0) return null
+    classes = next
+  }
+  return classes === hostRow.classes ? hostRow : { ...hostRow, classes }
+}
+
 /** The recommender's fixed context, bundled once so the lookups keep four parameters. */
 interface RecContext {
   pool: LoosePool
   rowByKey: ReadonlyMap<string, GearRow>
   loadout: Loadout
+  /** the whole board, so a socket can see its item's other sockets */
+  hosts: readonly SocketHostCell[]
+  /** `cellId|type` → the donor key this run has advised into that socket */
+  planned: Map<string, string>
 }
 
+const seatId = (h: Pick<SocketHostCell, 'cellId' | 'type'>): string => `${h.cellId}|${h.type}`
+
+/** The donors the item's OTHER sockets will hold: this run's advice where it gave any, else
+ *  whatever sits there today. */
+function siblingDonors(ctx: RecContext, host: Pick<SocketHostCell, 'cellId' | 'type'>): GearRow[] {
+  const out: GearRow[] = []
+  for (const h of ctx.hosts) {
+    if (h.cellId !== host.cellId || h.type === host.type) continue
+    const key = ctx.planned.get(seatId(h)) ?? h.currentKey
+    const row = key === null ? undefined : ctx.rowByKey.get(key)
+    if (row !== undefined) out.push(row)
+  }
+  return out
+}
+
+/** The best loose candidate for one socket, under a predicate on its effect. */
 function bestLoose(
   ctx: RecContext,
-  host: Pick<SocketHostCell, 'type' | 'slot' | 'itemKey'>,
+  host: Pick<SocketHostCell, 'cellId' | 'type' | 'slot' | 'itemKey'>,
   accept: (eff: KindEffect) => boolean
 ): { key: string; row: GearRow; eff: KindEffect } | null {
   if (!seatIsLive(host)) return null
-  const hostRow = ctx.rowByKey.get(host.itemKey)
+  const hostRow = narrowedHost(ctx.rowByKey.get(host.itemKey), siblingDonors(ctx, host))
+  if (hostRow === null) return null
   let best: { key: string; row: GearRow; eff: KindEffect } | null = null
   for (const key of ctx.pool.keys()) {
     const row = ctx.rowByKey.get(key)
@@ -356,6 +399,7 @@ function swapPass(
     const better = bestLoose(ctx, e.host, (x) => x.family === e.eff.family && x.tier > e.eff.tier)
     const where = better === null ? undefined : ctx.pool.take(better.key)
     if (better === null || where === undefined) continue
+    ctx.planned.set(seatId(e.host), better.key)
     out.swaps.push({
       cellId: e.host.cellId,
       cellLabel: e.host.cellLabel,
@@ -394,7 +438,10 @@ function redundantRec(
 ): RedundantRec {
   const repl = bestLoose(ctx, e.host, (x) => !inForce.has(forceKey(x.family, e.host)))
   const where = repl === null ? undefined : ctx.pool.take(repl.key)
-  if (repl !== null && where !== undefined) inForce.add(forceKey(repl.eff.family, e.host))
+  if (repl !== null && where !== undefined) {
+    inForce.add(forceKey(repl.eff.family, e.host))
+    ctx.planned.set(seatId(e.host), repl.key)
+  }
   return {
     cellId: e.host.cellId,
     cellLabel: e.host.cellLabel,
@@ -437,6 +484,7 @@ function fillPass(
     const where = ctx.pool.take(best.key)
     if (where === undefined) continue
     out.inForce.add(forceKey(best.eff.family, host))
+    ctx.planned.set(seatId(host), best.key)
     out.fills.push({
       cellId: host.cellId,
       cellLabel: host.cellLabel,
@@ -463,7 +511,9 @@ export function recommendSockets(
   const ctx: RecContext = {
     pool: loosePool(owned),
     rowByKey: new Map(rows.map((r) => [r.key, r])),
-    loadout
+    loadout,
+    hosts,
+    planned: new Map()
   }
   const swaps: SwapRec[] = []
   const fills: FillRec[] = []

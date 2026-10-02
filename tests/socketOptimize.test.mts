@@ -397,3 +397,27 @@ test('one copy granting two families is seated once, and the seat it cannot fill
     [{ effect: 'Alpha', options: [{ cellLabel: 'ring', type: 'Focus', heldBy: 'Gamma' }] }]
   )
 })
+
+test('the plan judges an item by ALL its sockets: a WAR-only and a MNK-only gem never share one', () => {
+  const rows = [
+    row({ key: 'war gem', name: 'War Gem', effects: [{ name: 'Effect A', kind: 'focus' }], slots: ['WRIST'], classes: ['WAR'] }),
+    row({ key: 'mnk gem', name: 'Mnk Gem', effects: worn('Mnk Gem', 'Effect B'), slots: ['WRIST'], classes: ['MNK'] }),
+    row({ key: 'bracer a', name: 'Bracer A', effects: [], slots: ['WRIST'], classes: ['WAR', 'MNK', 'ROG'] }),
+    row({ key: 'bracer b', name: 'Bracer B', effects: [], slots: ['WRIST'], classes: ['WAR', 'MNK', 'ROG'] })
+  ]
+  const loadout: Loadout = { classes: ['WAR', 'MNK'], deity: null }
+  const gems = [gem('War Gem'), gem('Mnk Gem')]
+  const a = [
+    seat({ cellId: 'wrist1', type: 'Focus', slot: 'WRIST', item: 'Bracer A' }),
+    seat({ cellId: 'wrist1', type: 'Worn', slot: 'WRIST', item: 'Bracer A' })
+  ]
+  // One bracer: both gems fit it alone, together they make it unwearable - one is contested.
+  const one = planBoard(gems, rows, loadout, a)
+  assert.deepEqual(one.placements.map((p) => p.gemName), ['War Gem'])
+  assert.deepEqual(one.contested.map((c) => c.gemName), ['Mnk Gem'])
+  assert.match(one.contested[0].options[0].heldBy, /other sockets/)
+  // A second bracer with a Worn socket: the matching sends the MNK gem there instead.
+  const two = planBoard(gems, rows, loadout, [...a, seat({ cellId: 'wrist2', type: 'Worn', slot: 'WRIST', item: 'Bracer B' })])
+  assert.deepEqual(two.placements.map((p) => `${p.cellId}:${p.gemName}`).sort(), ['wrist1:War Gem', 'wrist2:Mnk Gem'])
+  assert.equal(two.contested.length, 0)
+})

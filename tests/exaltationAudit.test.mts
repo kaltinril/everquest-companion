@@ -431,3 +431,29 @@ test('one proc in each hand is two procs: neither is a dead socket, and the seco
   assert.equal(fill.fills[0].cellId, 'secondary')
   assert.equal(fill.fills[0].gemName, 'Fangs')
 })
+
+test('R2 counts the item\'s OTHER sockets: two gems that each fit alone may not share an item', () => {
+  // An ALL-class bracer with a WAR-only gem in its Focus: a MNK-only gem fits the Worn socket
+  // pairwise, and the bracer it makes is WAR-and-MNK-only - nobody. The WAR+MNK loadout can use
+  // both gems, so only the sibling socket can say no.
+  const war = row('war gem', 'War Gem', [{ name: 'Effect A III', kind: 'focus' }], ['WAR'])
+  const mnk = row('mnk gem', 'Mnk Gem', [{ name: 'Effect B III', kind: 'worn' }], ['MNK'])
+  const bracer = row('all bracer', 'All Bracer', [], ['WAR', 'MNK', 'ROG'])
+  const loadout: Loadout = { classes: ['WAR', 'MNK'], deity: null }
+  const seat = (type: string, current: string | null): SocketHostCell => host('wrist', type, current, 'All Bracer')
+  const socketed = recommendSockets(
+    [owned('War Gem', 'socketed in Wrist', true), owned('Mnk Gem', 'Bank 1')],
+    [war, mnk, bracer],
+    loadout,
+    [seat('Focus', 'War Gem'), seat('Worn', null)]
+  )
+  assert.equal(socketed.fills.length, 0)
+  // Both loose and both sockets empty: one of them, never both.
+  const loose = recommendSockets(
+    [owned('War Gem', 'Bank 1'), owned('Mnk Gem', 'Bank 1')],
+    [war, mnk, bracer],
+    loadout,
+    [seat('Focus', null), seat('Worn', null)]
+  )
+  assert.deepEqual(loose.fills.map((f) => f.gemName), ['War Gem'])
+})
