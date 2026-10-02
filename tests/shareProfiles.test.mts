@@ -12,6 +12,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import { deflateRawSync } from 'node:zlib'
 import {
   alertBehaviorKey,
   applyAlertMerge,
@@ -118,6 +119,17 @@ test('rejects a truncated share string as corrupt, never half-applies it', () =>
   const res = decodeShareString(text.slice(0, text.length - 12))
   assert.equal(res.ok, false)
   if (!res.ok) assert.ok(res.error === 'corrupt' || res.error === 'checksum')
+})
+
+// A compression bomb: a few kilobytes of paste that inflate to megabytes. The decoder used to
+// inflate all of it before the size check; it now stops one byte past the JSON limit.
+test('rejects a payload that inflates past the JSON limit as too long', () => {
+  const bomb = deflateRawSync(Buffer.alloc(SHARE_LIMITS.maxJsonChars * 8, 0x20), { level: 9 })
+  const text = SHARE_PREFIX + bomb.toString('base64url')
+  assert.ok(text.length < SHARE_LIMITS.maxStringChars, 'the paste itself is under the string limit')
+  const res = decodeShareString(text)
+  assert.equal(res.ok, false)
+  if (!res.ok) assert.equal(res.error, 'too-long')
 })
 
 test('rejects a newer schema version with a "newer version" story', () => {
