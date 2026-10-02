@@ -127,9 +127,7 @@ test('rejects a payload that inflates past the JSON limit as too long', () => {
   const bomb = deflateRawSync(Buffer.alloc(SHARE_LIMITS.maxJsonChars * 8, 0x20), { level: 9 })
   const text = SHARE_PREFIX + bomb.toString('base64url')
   assert.ok(text.length < SHARE_LIMITS.maxStringChars, 'the paste itself is under the string limit')
-  const res = decodeShareString(text)
-  assert.equal(res.ok, false)
-  if (!res.ok) assert.equal(res.error, 'too-long')
+  assert.deepEqual(decodeShareString(text), { ok: false, error: 'too-long' })
 })
 
 test('rejects a newer schema version with a "newer version" story', () => {
