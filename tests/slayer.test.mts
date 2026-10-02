@@ -21,6 +21,7 @@ import {
   achievementKey,
   requiredByGoal,
   requiredLeft,
+  showsOpenRows,
   slayerRecord
 } from '../src/shared/outputs/slayer'
 import { SLAYER_TERMS, labelTerms, raceKey, resolveTerm } from '../src/shared/slayer/slayerKinds'
@@ -73,6 +74,18 @@ test('the open counters are read per group, and only the open ones', () => {
     OLD.counters.some((c) => c.achievement === 'Amphibicide'),
     false
   )
+})
+
+test('a dump with no open row at all (Show Open unticked) is no witness about Slayer', () => {
+  const text = read('Primitive_freeport-Achievements.txt')
+  assert.equal(showsOpenRows(parseAchievementsDump(text)), true)
+  const doneOnly = text
+    .split(/\r?\n/)
+    .filter((line) => !line.startsWith('I\t'))
+    .join('\n')
+  const dump = parseAchievementsDump(doneOnly)
+  assert.ok(dump.rows.length > 0)
+  assert.equal(showsOpenRows(dump), false)
 })
 
 test('a counter carries the numbers as numbers and the line verbatim', () => {
