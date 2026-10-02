@@ -597,6 +597,9 @@ export async function installPack(
  * uninstallable. Returns false if the pack dir doesn't exist under userData.
  */
 export function uninstallPack(name: string): boolean {
+  // The same allowlist installPack applies, before any path is built. safeJoin admits the root
+  // itself, so `''` or `'.'` would otherwise resolve to the soundpacks root and remove every pack.
+  if (!isSafePackId(name)) return false
   // Same reservation as installPack: the user's own sounds are managed from "My sounds…",
   // one at a time and with a warning, never wiped wholesale by the registry browser.
   if (name === USER_SOUNDS_PACK_ID) return false
