@@ -31,13 +31,6 @@ export const LEVEL_CAP = 50
  * spends the rest of the game, so that is where the longest list belongs.
  */
 export const LAST_BRACKET_ROOM = 4
-/**
- * THE HARD BACKSTOP: seven default brackets — the one the character is in and six past it, since
- * the loop runs `from <= start + 36` inclusive. The horizon is meant to be
- * DATA-driven (see `progressionPlan.ts buildProgressionPlan`), and this exists only so a corpus that keeps answering
- * cannot loop forever. It is NOT the level cap - that is `LEVEL_CAP`, above.
- */
-const HORIZON_LEVELS = 36
 /** How many consecutive silent brackets end the route. Two, so one gap does not truncate a plan. */
 export const QUIET_BRACKETS = 2
 
@@ -51,7 +44,9 @@ export interface HorizonInputs {
 /**
  * EVERY BRACKET THE ROUTE MAY OPEN, in order: `bracketSize` levels each from the character's
  * CURRENT level, none opening past the cap and the last ending on it. The caller stops early when
- * the corpus goes quiet (`QUIET_BRACKETS`); this is only the furthest it may go.
+ * the corpus goes quiet (`QUIET_BRACKETS`); this is only the furthest it may go. The cap is also
+ * what keeps a corpus that never goes quiet from looping: the old 36-level backstop that did that
+ * job before the cap existed stopped a level 1-8 character short of 50, in a bracket not `last`.
  */
 export function bracketsFrom(inputs: HorizonInputs): Bracket[] {
   const size = Math.max(1, Math.floor(inputs.bracketSize ?? DEFAULT_BRACKET_SIZE))
@@ -59,7 +54,7 @@ export function bracketsFrom(inputs: HorizonInputs): Bracket[] {
   // A character already past the stated cap is their own cap: one bracket, at their level.
   const cap = Math.max(start, Math.floor(inputs.levelCap ?? LEVEL_CAP))
   const out: Bracket[] = []
-  for (let from = start; from <= Math.min(cap, start + HORIZON_LEVELS); from += size) {
+  for (let from = start; from <= cap; from += size) {
     const to = Math.min(from + size - 1, cap)
     out.push({ from, to, last: to === cap })
   }
