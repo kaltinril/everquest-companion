@@ -270,11 +270,12 @@ Var pid
 #    that is fine (nothing here depends on $INSTDIR) and it is the only hook available.
 #  * The dir name is spelled out, NOT taken from ${APP_PACKAGE_NAME}. `RMDir /r` on an
 #    accidentally-empty define would be `RMDir /r "$APPDATA\"` - the entire roaming
-#    profile. It must stay in sync with package.json `name` (= Electron's
-#    app.getName(), there being no productName in package.json) and with the prod row of
-#    src/main/channel.ts. NEVER widen this: `%APPDATA%\eq-tools` is the pre-rename
-#    BACKUP that the one-time seed reads from, and `%APPDATA%\everquest-companion-dev`
-#    is the running dev app's data. Neither is ours to delete.
+#    profile. TEST BUILD (this branch only, never a PR): it must stay in sync with
+#    PROD_DIR_NAME in src/main/channel.ts, which moves this build's userData to
+#    `%APPDATA%\everquest-companion-test`. NEVER widen this: `%APPDATA%\everquest-companion`
+#    is the OFFICIAL install's data (and the seed this build copies from),
+#    `%APPDATA%\eq-tools` is the pre-rename BACKUP, and `%APPDATA%\everquest-companion-dev`
+#    is the running dev app's data. None of them is ours to delete.
 !macro customUnInstall
   # Build-time proof that the hook actually fires. `!ifmacrodef customUnInstall` lives in
   # uninstaller.nsh, which is only !included in the -DBUILD_UNINSTALLER pass, so this line
@@ -301,12 +302,12 @@ Var pid
   # Interactive uninstall. Yes (default button, and the /SD fallback) keeps everything.
   # Deliberately ONE line: this file has a history of "compiles clean, installer dies",
   # and a line continuation inside a macro body is not worth re-litigating.
-  MessageBox MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON1|MB_TOPMOST|MB_SETFOREGROUND "Keep your settings and history?$\r$\n$\r$\nThey'll be restored if you reinstall EQ Legends Companion.$\r$\n(Choosing No deletes them permanently.)" /SD IDYES IDYES eqKeepUserData
+  MessageBox MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON1|MB_TOPMOST|MB_SETFOREGROUND "Keep your settings and history?$\r$\n$\r$\nThey'll be restored if you reinstall EQ Legends Companion TEST.$\r$\n(Choosing No deletes them permanently.)" /SD IDYES IDYES eqKeepUserData
 
   ${If} $installMode == "all"
     SetShellVarContext current
   ${EndIf}
-  RMDir /r "$APPDATA\everquest-companion"
+  RMDir /r "$APPDATA\everquest-companion-test"
   ${If} $installMode == "all"
     SetShellVarContext all
   ${EndIf}
