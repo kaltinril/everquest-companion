@@ -128,19 +128,41 @@ function main(): void {
   void run()
 }
 
-/** Items: the newest revision simply replaces what the key held — a delta has no older rival. */
-function foldItems(itemsFile: ItemDbFile, wikitext: Map<string, string>): number {
-  let touched = 0
+/** The keys a record registers: its page title and, when it differs, its `|itemname`. */
+function entryKeys(entry: ItemDbEntry): string[] {
+  const keys = [itemKey(entry.page), entry.name ? itemKey(entry.name) : null]
+  return keys.filter((k): k is string => !!k)
+}
+
+/**
+ * Items: scrape-items.ts's `addKeys` law, applied to a delta. A key changes hands only to its own
+ * page's newer revision or to a RICHER record, so an edited variant page (A Sealed Letter (Thex
+ * Dagger Quest), `|itemname` "A Sealed Letter") never repoints the canonical page's key. Keys a
+ * changed page held under an older `|itemname` are dropped before the fold.
+ */
+export function foldItems(itemsFile: ItemDbFile, wikitext: Map<string, string>): number {
+  const entries = new Map<string, ItemDbEntry>()
   for (const [title, wt] of wikitext) {
-    if (!isItemPage(wt)) continue
-    const entry = toEntry(title, wt)
-    if (!entry) continue
-    for (const k of [itemKey(entry.page), entry.name ? itemKey(entry.name) : null]) {
-      if (k) itemsFile.items[k] = entry
-    }
-    touched++
+    const entry = isItemPage(wt) ? toEntry(title, wt) : null
+    if (entry) entries.set(entry.page, entry)
   }
-  return touched
+  const items = Object.fromEntries(
+    Object.entries(itemsFile.items).filter(([k, prev]) => {
+      const next = entries.get(prev.page)
+      return !next || entryKeys(next).includes(k)
+    })
+  )
+  for (const entry of entries.values()) {
+    for (const k of entryKeys(entry)) if (claims(entry, items[k])) items[k] = entry
+  }
+  itemsFile.items = items
+  return entries.size
+}
+
+/** Does `entry` take a key `prev` holds? Its own page's newer revision does; else only if richer. */
+function claims(entry: ItemDbEntry, prev: ItemDbEntry | undefined): boolean {
+  if (!prev || prev.page === entry.page) return true
+  return JSON.stringify(entry).length > JSON.stringify(prev).length
 }
 
 /** Mobs: the same fold, keyed by page over the committed sorted list. */
@@ -217,4 +239,4 @@ async function run(): Promise<void> {
   console.log(`Next: npm run gen:data-weight  (the ledger pins exact bytes)`)
 }
 
-main()
+if ((process.argv[1] ?? '').endsWith('scrape-delta.mts')) main()
