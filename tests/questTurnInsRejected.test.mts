@@ -19,10 +19,12 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
+  MAX_TURN_INS_PER_QUEST,
   applyTurnIns,
   rejectAllTurnIns,
   rejectedTurnIns,
   resolveTurnIns,
+  sanitizeTurnInInstants,
   takeBackTurnIn,
   turnInsToPersist,
   withoutRejected
@@ -88,6 +90,22 @@ test('the rejected list is sanitized like the ledger: junk dropped, a hand-edite
   assert.deepEqual(rejectedTurnIns(p), { [CLAW_KEY]: [1000] })
   assert.deepEqual(rejectedTurnIns(progress({})), {})
   assert.deepEqual(rejectedTurnIns(null), {})
+})
+
+test('a full rejected list keeps its NEWEST instants, so the latest take-back is the one that sticks', () => {
+  const old = Array.from({ length: MAX_TURN_INS_PER_QUEST }, (_, i) => 1000 + i)
+  const newest = 999_999
+  // The undo restates the whole list with the new rejection on the end; the oldest one gives way.
+  const next = applyTurnIns(progress({}), CLAW_KEY, [], [...old, newest])
+  const kept = next.rejectedTurnIns?.[CLAW_KEY] ?? []
+  assert.equal(kept.length, MAX_TURN_INS_PER_QUEST)
+  assert.equal(kept[kept.length - 1], newest)
+  assert.equal(kept[0], 1001)
+  // …and the same on the way back out of a store that holds more.
+  const read = rejectedTurnIns(progress({ rejectedTurnIns: { [CLAW_KEY]: [...old, newest] } }))[CLAW_KEY]
+  assert.deepEqual([read.length, read[0], read[read.length - 1]], [MAX_TURN_INS_PER_QUEST, 1001, newest])
+  // The turn-in list itself is unchanged: its cap still keeps the oldest.
+  assert.equal(sanitizeTurnInInstants([...old, newest]).includes(newest), false)
 })
 
 test('THE UNDO STATEMENT: a hand-recorded instant is dropped, a log-detected one is dropped AND rejected', () => {
