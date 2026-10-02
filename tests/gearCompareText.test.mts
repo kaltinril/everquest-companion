@@ -16,6 +16,7 @@ import type { GearRow } from '../src/shared/planner/gear'
 import {
   NO_BASE_CHANGE,
   arrowText,
+  baseStats,
   compareDirection,
   compareStats,
   swapSections
@@ -69,6 +70,20 @@ test('the card compares BASE TO BASE, and a merged worn copy is stated in the fr
   const [same] = swapSections(worn.stats, host, worn)
   assert.deepEqual(same.changes, [])
   assert.equal(typeof NO_BASE_CHANGE, 'string')
+})
+
+test('the hovered side is BASE too: a row the slider scaled is read back from the corpus by key', () => {
+  const base: GearRow = {
+    key: 'shiverback-hide boots', name: 'Shiverback-Hide Boots', searchKey: 'shiverback-hide boots',
+    slots: ['FEET'], classes: [], races: ['ALL'], flags: [], quest: false, playerCrafted: false,
+    stats: { AC: 6, STA: 9 }, effects: []
+  }
+  const scaled: GearRow = { ...base, stats: { AC: 12, STA: 18 } }
+  const byKey = new Map([[base.key, base]])
+  assert.deepEqual(baseStats(scaled, byKey), { AC: 6, STA: 9 }, 'the slider never enters the subtraction')
+  const [same] = swapSections(baseStats(scaled, byKey), { key: base.key, name: base.name }, base)
+  assert.deepEqual(same.changes, [], 'the same item worn reads as no change, at any slider position')
+  assert.deepEqual(baseStats(scaled, new Map()), scaled.stats, 'no corpus row: the row is all there is')
 })
 
 test('the pipeline end to end: compareStats rows feed the grouped form losslessly', () => {

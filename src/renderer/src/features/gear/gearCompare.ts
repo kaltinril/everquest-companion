@@ -252,6 +252,12 @@ export function swapSections(item: GearStats, host: PlannerInventoryHost | null,
   return [{ label, changes: compareStats(item, worn.stats) }]
 }
 
+/** The hovered item's BASE numbers: the table hands the card its row scaled to the slider, so the
+ *  base-to-base math reads the unscaled corpus row back by key (the row itself when there is none). */
+export function baseStats(row: GearRow, byKey: ReadonlyMap<string, GearRow>): GearStats {
+  return byKey.get(row.key)?.stats ?? row.stats
+}
+
 /** `Thelvorn, Blade of Light +5` — the worn copy as the dump names it, tier and all. */
 export function hostText(host: PlannerInventoryHost): string {
   return host.tier === undefined ? host.name : `${host.name} +${String(host.tier)}`

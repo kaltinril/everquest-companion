@@ -111,6 +111,7 @@ import { Tooltip } from '../../lib/Tooltip'
 import {
   NO_BASE_CHANGE,
   arrowText,
+  baseStats,
   compareDirection,
   compareStats,
   dumpFreshnessText,
@@ -265,8 +266,9 @@ function EquippedRow({ cell, row, data }: { cell: EquippedCell; row: GearRow; da
   const host = cell.host
   const worn = host === null ? undefined : data.byKey.get(host.key)
   // BASE AGAINST BASE, the same math the route admits by (`swapSections` argues the reversal); the
-  // section's label states the frame whenever the worn copy is merged past base.
-  const sections = swapSections(row.stats, host, worn)
+  // section's label states the frame whenever the worn copy is merged past base. The hovered row is
+  // scaled to the slider, so its BASE numbers come back out of the corpus (`baseStats`).
+  const sections = swapSections(baseStats(row, data.byKey), host, worn)
   return (
     <div
       style={{ marginTop: 3 }}
