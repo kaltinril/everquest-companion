@@ -11,7 +11,8 @@
 // carries its item level (` +N`). Within-tier item exp is unobservable (no log line
 // reports it), so the meter shows tier position, never a fabricated exp fill. The one
 // exception is `upgrade`, a state the READER chose (the Loot drill-down's slider): every
-// number is then the wiki calculator's (itemUpgrade.ts) and the meter says `simulated`.
+// number is then the wiki calculator's (itemUpgrade.ts) and the meter says `simulated`, unless
+// the state is only the name's own ` +N` drawn on the wiki's base block (`simulated={false}`).
 
 import { type JSX, useMemo } from 'react'
 import { Box, Chip, Stack, Typography } from '@mui/material'
@@ -27,7 +28,8 @@ import {
   ITEM_MAX_TIER,
   type ItemStatBlock
 } from '@shared/itemStats'
-import { percentLabel, scaleStatBlock, type ItemUpgradeState } from '@shared/itemUpgrade'
+import { scaleStatBlock, type ItemUpgradeState } from '@shared/itemUpgrade'
+import { tierReading } from './itemTierReading'
 import { Tooltip } from './Tooltip'
 
 /** Item-window palette. All foregrounds ≥ 7:1 on `bg` (AA at any size, AAA for body). */
@@ -187,22 +189,6 @@ function TierBlock({
 /** Stat keys that describe an effect's timing rather than the item's own numbers. */
 const TIMING_KEYS = new Set(['CAST TIME', 'COOLDOWN', 'RECAST', 'CHARGES'])
 
-/**
- * What the tier meter draws, or nothing (no `tier`) when no one has stated a level.
- * A simulated state wins outright: the reader chose it. Otherwise the displayed NAME wins when
- * it states a level — that is this exact instance's tier, what the game itself would print. The
- * observed tier is the fallback for a base name ("what have I got this item to?"), tagged `yours`.
- */
-function tierReading(
-  upgrade?: ItemUpgradeState,
-  nameTier?: number,
-  observedTier?: number
-): { tier?: number; note?: string; bonus?: string } {
-  if (upgrade) return { tier: upgrade.full, note: 'simulated', bonus: `${percentLabel(upgrade)} stats` }
-  if (nameTier !== undefined) return { tier: nameTier }
-  return observedTier === undefined ? {} : { tier: observedTier, note: 'yours' }
-}
-
 export interface ItemWindowProps {
   /** display name exactly as observed (keeps its ` +N` item level) */
   name: string
@@ -230,6 +216,8 @@ export interface ItemWindowProps {
    * merge history said: the reader chose it. Absent, the window reads as it always has.
    */
   upgrade?: ItemUpgradeState
+  /** False when `upgrade` is only the name's own ` +N`: the stats scale, the meter reads the name. */
+  simulated?: boolean
 }
 
 /** The window shell: the game's frame, or nothing at all on a compact hover surface. */
@@ -458,13 +446,14 @@ export function ItemWindow({
   flavor,
   compact,
   observedTier,
-  upgrade
+  upgrade,
+  simulated = true
 }: ItemWindowProps): JSX.Element {
   const block = useMemo(() => {
     const base = stats ?? (rawStats ? parseStatsBlock(rawStats) : undefined)
     return base && upgrade ? scaleStatBlock(base, upgrade) : base
   }, [stats, rawStats, upgrade])
-  const meter = tierReading(upgrade, itemTierFromName(name), observedTier)
+  const meter = tierReading(simulated ? upgrade : undefined, itemTierFromName(name), observedTier)
 
   // Cast/cooldown belong to the click effect, not the attribute grid (Boots of the Long
   // Road prints them right under its `Click Effect:` line).
