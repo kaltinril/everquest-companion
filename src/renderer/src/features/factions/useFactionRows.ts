@@ -12,7 +12,7 @@
 // FactionsView.tsx at the 400-code-line file ceiling (split, never ratchet).
 
 import { useEffect, useMemo, useState } from 'react'
-import type { FactionStanding } from '@shared/outputs/factions'
+import { factionNameKey, type FactionStanding } from '@shared/outputs/factions'
 import type { RaceUnlockClaim } from '@shared/outputs/achievements'
 import type { HeldCounts, ProgressState } from '@shared/types'
 import { applyEvidence, type FactionEvidence, type FactionEvidenceReport } from '@shared/factionLog'
@@ -68,12 +68,12 @@ export interface RaceGate {
   done: boolean
 }
 
-/** Lowercased faction name → every race gated on it, done or still pending. */
+/** Faction join key (factionNameKey) → every race gated on it, done or still pending. */
 function unlockNeeds(races: readonly RaceUnlockClaim[] | undefined): Map<string, RaceGate[]> {
   const m = new Map<string, RaceGate[]>()
   for (const race of races ?? []) {
     for (const f of race.factions) {
-      const key = f.name.toLowerCase()
+      const key = factionNameKey(f.name)
       const gate: RaceGate = { race: race.race, done: race.complete || f.complete }
       const list = m.get(key)
       if (list === undefined) m.set(key, [gate])
@@ -134,7 +134,7 @@ function toRowVm(r: FactionStanding, joins: RowJoins): FactionRowVm {
     ...haystacksOf(r.name, w),
     work: w,
     raiseCount: w?.raise.length ?? 0,
-    unlocks: joins.unlocksByName.get(r.name.toLowerCase()) ?? []
+    unlocks: joins.unlocksByName.get(factionNameKey(r.name)) ?? []
   }
 }
 
