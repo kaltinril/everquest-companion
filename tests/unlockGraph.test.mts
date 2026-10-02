@@ -29,6 +29,7 @@ import {
 } from '../src/shared/unlocks/unlockGraph'
 import { UNLOCK_RULES } from '../src/shared/unlocks/unlockRules.generated'
 import { unlockBook, unlocksFromRules } from '../src/shared/unlocks/unlocks'
+import { achievementSpellings } from '../src/renderer/src/features/unlocks/itemSpellings'
 
 const FIXTURES = join(import.meta.dirname, 'fixtures')
 
@@ -79,6 +80,18 @@ test('a Sky reward is on the way to its class, by the dump\'s spelling', () => {
     ['Beastlord']
   )
   assert.deepEqual(unlocksNeedingItem('Windhowl'), [])
+})
+
+test('an item page finds its class through the Sky alias: either half of the Beastlord pair', () => {
+  // What unlockJoins.ts itemUnlockPaths asks the graph: the page's name and its achievement spellings.
+  const viaPage = (page: string): string[][] =>
+    [page, ...achievementSpellings(page)].flatMap((n) => unlocksNeedingItem(n)).map((p) => [p.unlock.name, p.need.subject])
+  for (const page of ['Windhowl', 'Spirit Render', 'spirit  render']) {
+    assert.deepEqual(viaPage(page), [['Beastlord', 'Windhowl and Spirit Render']], page)
+  }
+  assert.deepEqual(achievementSpellings('Mask of Song'), [])
+  assert.deepEqual(viaPage('Mask of Song'), [['Bard', 'Mask of Song']])
+  assert.deepEqual(achievementSpellings('Spirit'), [])
 })
 
 test('a task is on the way to its unlock, and so is each quest the task is made of', () => {

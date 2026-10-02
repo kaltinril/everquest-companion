@@ -16,6 +16,7 @@ import {
 } from '@shared/unlocks/unlockGraph'
 import { getPoskyData } from '../../data'
 import { achievementItemsFor } from '../posky/achievementInference'
+import { achievementSpellings } from './itemSpellings'
 
 /** The unlocks an item is on the way to. */
 export function itemUnlockPaths(
@@ -23,7 +24,7 @@ export function itemUnlockPaths(
   questUses: readonly { quest: string }[]
 ): UnlockPath[] {
   return distinctPaths([
-    ...unlocksNeedingItem(name),
+    ...[name, ...achievementSpellings(name)].flatMap((n) => unlocksNeedingItem(n)),
     ...questUses.flatMap((u) => unlocksNeedingQuest(u.quest))
   ])
 }
