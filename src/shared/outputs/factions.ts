@@ -82,6 +82,30 @@ export interface FactionsSource {
   readAt: number
 }
 
+/**
+ * THE ACHIEVEMENTS DUMP SPELLS FOUR FACTIONS DIFFERENTLY FROM THIS FILE. The race-unlock rows
+ * (`Get maximum faction with <X>.`, achievements.ts) were matched against the Drywrought fixture's
+ * Name column: 36 of 40 agree up to case, and these four do not. Keyed lowercased, achievement
+ * spelling → this file's spelling. The same achievements dump names all four again, as their own
+ * faction achievements, in THIS file's spelling — so the pairing is the server's, not a guess.
+ */
+const ACHIEVEMENT_FACTION_ALIASES: ReadonlyMap<string, string> = new Map([
+  ['coalition of tradesfolk', 'Coalition of Tradefolk'],
+  ['freeport militia', 'The Freeport Militia'],
+  ['corrupt qeynos guard', 'Corrupt Qeynos Guards'],
+  ['da bashers', 'DaBashers']
+])
+
+/**
+ * THE ONE JOIN KEY for a faction name, from either side — this file's Name column or a name the
+ * achievements dump writes. Case folded, the alias table above applied. Every join between those
+ * two sources keys both sides through here, so a fifth misspelling is a one-line fix.
+ */
+export function factionNameKey(name: string): string {
+  const folded = name.trim().toLowerCase()
+  return (ACHIEVEMENT_FACTION_ALIASES.get(folded) ?? folded).toLowerCase()
+}
+
 /** The header row, verbatim — recognized and skipped rather than special-cased by position, so a
  *  dump that has lost or duplicated it still reads by the same rule as every other line. */
 const HEADER = 'ID\tName\tStandingValue\tPointsToMax'

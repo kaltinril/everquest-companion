@@ -12,7 +12,7 @@
 // FactionsView.tsx at the 400-code-line file ceiling (split, never ratchet).
 
 import { useEffect, useMemo, useState } from 'react'
-import type { FactionStanding } from '@shared/outputs/factions'
+import { factionNameKey, type FactionStanding } from '@shared/outputs/factions'
 import type { RaceUnlockClaim } from '@shared/outputs/achievements'
 import type { HeldCounts, ProgressState } from '@shared/types'
 import { applyEvidence, type FactionEvidence, type FactionEvidenceReport } from '@shared/factionLog'
@@ -70,14 +70,14 @@ export interface RaceGate {
 }
 
 function addGate(m: Map<string, RaceGate[]>, faction: string, gate: RaceGate): void {
-  const key = faction.toLowerCase()
+  const key = factionNameKey(faction)
   const list = m.get(key)
   if (list === undefined) m.set(key, [gate])
   else list.push(gate)
 }
 
 /**
- * Lowercased faction name → every race gated on it, done or still pending.
+ * Faction join key (factionNameKey) → every race gated on it, done or still pending.
  *
  * THE GATES ARE THE RULEBOOK'S (shared/unlocks/unlockGraph.ts), so a faction says which race it
  * opens for a player who has never exported achievements; the dump adds only what it alone
@@ -159,7 +159,7 @@ function toRowVm(r: FactionStanding, joins: RowJoins): FactionRowVm {
     ...haystacksOf(r.name, w),
     work: w,
     raiseCount: w?.raise.length ?? 0,
-    unlocks: joins.unlocksByName.get(r.name.toLowerCase()) ?? []
+    unlocks: joins.unlocksByName.get(factionNameKey(r.name)) ?? []
   }
 }
 
