@@ -44,6 +44,7 @@ import { spellLineKey } from './spellLines'
 import type { ObservedSpellRanksSnap } from './spellRanks'
 import { SPELL_MAX_RANK, normalizeSpellRank } from './spellScale'
 import { spellbookLadder, spellbookRow, type SpellbookRow } from './spellbook'
+import { foldSpellsByName } from './spellFold'
 import { motesToReach, type SpellTierReading, type UpgradeCategory } from './spellUpgrade'
 
 /** One line you hold, and what its next tier is worth. */
@@ -130,7 +131,8 @@ export function buildUpgradePlan(
   const deadEnds: DeadEnd[] = []
   let unrankedCount = 0
   let heldCount = 0
-  for (const spell of spells) {
+  // One line, one row: the catalog lists a few spells twice, and each copy counted as held.
+  for (const spell of foldSpellsByName(spells)) {
     const rank = heldRank(observed, spell.name)
     // Presence in the observed map is what makes a line "held" - not a positive rank, since the log
     // watching you cast the base of a line is still evidence you own it.

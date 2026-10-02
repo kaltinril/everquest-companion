@@ -51,6 +51,7 @@ import type { BestSpellTab } from './bestSpells'
 import type { SpellMetrics } from './spellMetrics'
 import { compareStatKeys, grantsShareASlot, type SpellStatGrant, type SpellStatKey } from './spellStats'
 import { parseHpLine, parseManaLine, type HpLine } from './spellMetrics'
+import { foldSpellsByName } from './spellFold'
 import {
   conflictComponents,
   spellsConflict,
@@ -394,7 +395,8 @@ export function loadoutCandidates(
   const { views, level } = query
   const minMs = query.minDurationMs ?? DEFAULT_MIN_BUFF_MS
   const out: LoadoutCandidate[] = []
-  for (const s of spells) {
+  // One spell, one candidate: the catalog lists a few twice, and "Left out" drew them twice.
+  for (const s of foldSpellsByName(spells)) {
     if (!admitsBuff(s, query, minMs)) continue
     // THE LEVEL IS PART OF "CAN I CAST IT", and it is applied to the (class, level) pairs rather
     // than to the row: a spell a Shaman gets at 60 and a Warrior at 45 is castable by a level-50

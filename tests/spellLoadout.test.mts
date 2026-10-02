@@ -56,6 +56,18 @@ test('only BUFFS are candidates, and only ones the trio can cast', () => {
   assert.deepEqual(out.map((c) => c.name), ['Mine'])
 })
 
+test('a spell the catalog lists twice is one candidate, castable wherever either row says', () => {
+  // Skin Like Diamond's two rows: Druid 36 and Ranger 54, then Ranger 54 and Druid 39.
+  const first = { ...buff('Skin Like Diamond', ['Increase AC by 30']), at: [{ cls: 'DRU', level: 36 }, { cls: 'RNG', level: 54 }] }
+  const again = { ...buff('Skin Like Diamond', ['Increase AC by 30']), at: [{ cls: 'RNG', level: 54 }, { cls: 'DRU', level: 39 }] }
+  const out = loadoutCandidates([first, again] as UnlockSpell[], ['DRU', 'RNG'], DEFAULT_STAT_WEIGHTS)
+  assert.deepEqual(out.map((c) => c.name), ['Skin Like Diamond'])
+  assert.deepEqual(out[0].at, [{ cls: 'DRU', level: 36 }, { cls: 'RNG', level: 54 }])
+  // Where the level filter empties the first copy, the second still stands for the spell.
+  const at37 = loadoutCandidates([again, first] as UnlockSpell[], ['RNG', 'DRU'], DEFAULT_STAT_WEIGHTS, { level: 37 })
+  assert.deepEqual(at37.map((c) => [c.name, c.at]), [['Skin Like Diamond', [{ cls: 'DRU', level: 36 }]]])
+})
+
 test('a buff worth nothing under the weights in force is not a recommendation', () => {
   // Still a real spell, still in the Spellbook. This tab is about a SET worth keeping up.
   const corpus = [buff('Cosmetic', ['Increase Player Size by 20'])]

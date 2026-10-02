@@ -71,6 +71,14 @@ test('a line watched only at base still counts as held', () => {
   assert.equal(plan.next[0].motes, 1)
 })
 
+test('a spell the catalog lists twice is one row and one held line', () => {
+  // Dustdevil and Shock of Frost each have two catalog rows of the same name.
+  const plan = buildUpgradePlan([NUKE, { ...NUKE }, BEAR, { ...BEAR }], held({ Nuke: 2, Bear: 1 }))
+  assert.equal(plan.heldCount, 2)
+  assert.deepEqual(plan.next.map((c) => c.name), ['Nuke'])
+  assert.deepEqual(plan.deadEnds.map((d) => d.name), ['Bear'])
+})
+
 // =================================================================================================
 // THE RANKING
 // =================================================================================================
