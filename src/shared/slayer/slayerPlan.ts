@@ -148,6 +148,12 @@ function spawnPoints(entry: MobEntry): number {
   return Math.max(1, entry.loc?.length ?? 0)
 }
 
+/** The level cap, read off the LOWEST stated level. The zone list and the map shading both ask
+ *  this, so a mob the list leaves out is not shaded either. */
+export function withinLevel(mob: SlayerMob, maxLevel: number | null): boolean {
+  return maxLevel === null || mob.low === null || mob.low <= maxLevel
+}
+
 /** The mob as one zone row's line, or null when it counts toward nothing picked. */
 function planMob(mob: SlayerMob, targets: readonly SlayerTarget[]): PlanMob | null {
   const hits: string[] = []
@@ -206,7 +212,7 @@ export function planZones(
 ): PlanZone[] {
   const zones = new Map<string, PlanZone>()
   for (const mob of mobs) {
-    if (opts.maxLevel !== null && mob.low !== null && mob.low > opts.maxLevel) continue
+    if (!withinLevel(mob, opts.maxLevel)) continue
     const row = planMob(mob, targets)
     if (row === null) continue
     for (const catalogName of keptZones(mob.entry, opts)) {

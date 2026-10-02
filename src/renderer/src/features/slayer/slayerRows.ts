@@ -107,6 +107,14 @@ export function loadMaxLevel(store: PrefStore = localStorage): number | null | u
   return Number.isInteger(n) && n > 0 && n < 200 ? n : undefined
 }
 
+/** The cap the plan applies: the stored one, or the character's own level until one is set. */
+export function levelCap(
+  stored: number | null | undefined,
+  own: number | undefined
+): number | null {
+  return stored === undefined ? (own ?? null) : stored
+}
+
 export function loadFlag(key: string, store: PrefStore = localStorage): boolean {
   return readPref(store, key) === '1'
 }
