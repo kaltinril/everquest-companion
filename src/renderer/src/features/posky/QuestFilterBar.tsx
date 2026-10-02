@@ -92,9 +92,15 @@ const RESET_ARM_MS = 5000
  * promises never to move (sky-inventory-autoload measures that promise).
  */
 export const ResetTurnIns = memo(function ResetTurnIns({
-  onReset
+  onReset,
+  ready
 }: {
   onReset: () => Promise<void>
+  /**
+   * The log's turn-ins have loaded. Until they have, a reset could not reject the detections it
+   * takes back, and the module's first snapshot would write them all straight back.
+   */
+  ready: boolean
 }): JSX.Element {
   const [armed, setArmed] = useState(false)
   useEffect(() => {
@@ -119,11 +125,14 @@ export const ResetTurnIns = memo(function ResetTurnIns({
       color={armed ? 'warning' : 'inherit'}
       data-testid="posky-reset-turnins"
       data-armed={armed ? 'true' : undefined}
+      disabled={!ready}
       onClick={click}
       title={
-        armed
-          ? 'Click again to take back every turn-in on this tab. Turn-ins the log shows after this still count.'
-          : 'Take back every turn-in on this tab, including the ones read from your log'
+        !ready
+          ? 'Reading the turn-ins in your log. The reset is available once they have loaded'
+          : armed
+            ? 'Click again to take back every turn-in on this tab. Turn-ins the log shows after this still count.'
+            : 'Take back every turn-in on this tab, including the ones read from your log'
       }
     >
       {armed ? 'Confirm reset' : 'Reset turn-ins'}

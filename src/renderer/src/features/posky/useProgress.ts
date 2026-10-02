@@ -288,6 +288,11 @@ export interface UseProgress {
    */
   resetTurnIns: () => Promise<void>
   /**
+   * Has the log's turn-in list loaded? Until it has, undo and reset cannot tell a log-detected
+   * turn-in from a hand-recorded one, so the tab holds both disabled (see `turnInActions.ts`).
+   */
+  turnInsReady: boolean
+  /**
    * STATE ONE ITEM'S HELD COUNT BY HAND, or take the statement back with `count: null` (JOS-186).
    * Takes the item's DISPLAY name — the counting key is this module's business, not a control's —
    * and the statement is dated in main at the instant it lands.
@@ -464,6 +469,8 @@ interface TurnInLedger extends TurnInActions {
   detected: TurnInInstants
   /** quest key → how many of its turn-ins the LOG accounts for */
   logCounts: Record<string, number>
+  /** the turn-ins module has loaded, so `detected` is the log's list rather than a placeholder */
+  turnInsReady: boolean
 }
 
 /**
@@ -550,7 +557,9 @@ function useTurnInLedger(
 
   // The statements — record, undo, reset — live in turnInActions.ts (upstream issue #72 added the
   // reset and this file crossed its ceiling). They restate a quest from the ledger derived above.
-  return { turnIns, detected, logCounts, ...useTurnInActions(turnIns, detected, rejected, setProgress) }
+  const turnInsReady = turnInsRaw != null
+  const actions = useTurnInActions(turnIns, turnInsReady ? detected : null, rejected, setProgress)
+  return { turnIns, detected, logCounts, turnInsReady, ...actions }
 }
 
 export function useProgress(opts?: UseProgressOptions): UseProgress {
@@ -578,11 +587,8 @@ export function useProgress(opts?: UseProgressOptions): UseProgress {
     }
   }, [])
 
-  const { turnIns, detected, logCounts, recordTurnIn, undoTurnIn, resetTurnIns } = useTurnInLedger(
-    progress,
-    setProgress,
-    opts?.onQuestComplete
-  )
+  const ledger = useTurnInLedger(progress, setProgress, opts?.onQuestComplete)
+  const { turnIns, detected, logCounts, recordTurnIn, undoTurnIn, resetTurnIns, turnInsReady } = ledger
 
   const setCountSource = useCallback((s: CountSource) => {
     localStorage.setItem(COUNT_SOURCE_KEY, s)
@@ -654,6 +660,7 @@ export function useProgress(opts?: UseProgressOptions): UseProgress {
     recordTurnIn,
     undoTurnIn,
     resetTurnIns,
+    turnInsReady,
     setItemOverride,
     itemOverrides,
     inventoryInfo: progress?.inventorySource,

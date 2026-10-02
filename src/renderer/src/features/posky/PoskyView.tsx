@@ -418,7 +418,7 @@ function PoskyBody(x: PoskyBodyProps): JSX.Element {
           overrides={x.itemOverrides}
         />
         <Box sx={{ flexGrow: 1 }} />
-        <ResetTurnIns onReset={x.resetTurnIns} />
+        <ResetTurnIns onReset={x.resetTurnIns} ready={rows.turnInsReady} />
       </Stack>
       {/* THE SECOND `/outputfile` LINE (JOS-429), and deliberately the SAME line component the
           inventory dump gets — `OutputKindLine quiet`, which inherits the command string, the
@@ -480,6 +480,7 @@ export default function PoskyView({
     recordTurnIn,
     undoTurnIn,
     resetTurnIns,
+    turnInsReady,
     setItemOverride,
     itemOverrides,
     inventoryInfo,
@@ -516,6 +517,7 @@ export default function PoskyView({
     anchor,
     recordTurnIn,
     undoTurnIn,
+    turnInsReady,
     setItemCount: setItemOverride,
     onOpenMob,
     onOpenLoot
