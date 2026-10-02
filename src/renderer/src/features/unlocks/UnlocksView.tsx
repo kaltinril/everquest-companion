@@ -15,7 +15,7 @@
 import { type JSX, useEffect } from 'react'
 import { Box, Chip, FormControlLabel, Stack, Switch, Typography } from '@mui/material'
 import { UNLOCK_TOKENS } from '@shared/unlocks/unlockGraph'
-import { closedOf, openText, type Unlock, type UnlockBook, type UnlockKind } from '@shared/unlocks/unlocks'
+import { closedOf, isYours, openText, type Unlock, type UnlockBook, type UnlockKind } from '@shared/unlocks/unlocks'
 import OutputKindLine from '../../components/OutputKindLine'
 import { unlockRowId } from '../../lib/unlockLink'
 import UnlockRow from './UnlockRow'
@@ -68,8 +68,9 @@ function Section({
   yours: string | null
   c: UnlocksController
 }): JSX.Element {
-  const shown = c.hideOpen && c.hasDump ? closedOf(unlocks) : unlocks
   const focused = c.focus?.kind === kind ? c.focus.name : null
+  // Hiding what is open never hides the row a chip elsewhere opened the tab on.
+  const shown = c.hideOpen && c.hasDump ? closedOf(unlocks, focused) : unlocks
   return (
     <Box data-testid="unlocks-section" sx={{ pb: 2 }}>
       <Typography variant="subtitle2">
@@ -80,9 +81,9 @@ function Section({
         Or a {UNLOCK_TOKENS[kind]}, sold in the marketplace.
       </Typography>
       {shown.map((u) => (
-        <UnlockRow key={u.name} unlock={u} yours={u.name === yours} focused={u.name === focused} c={c} />
+        <UnlockRow key={u.name} unlock={u} yours={isYours(u.name, yours)} focused={u.name === focused} c={c} />
       ))}
-      {shown.length === 0 && (
+      {shown.length === 0 && unlocks.length > 0 && unlocks.every((u) => u.open) && (
         <Typography variant="caption" color="text.secondary">
           Every one is open.
         </Typography>

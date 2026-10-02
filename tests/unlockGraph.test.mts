@@ -14,6 +14,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { achievementBook } from '../src/shared/outputs/achievementBook'
 import { parseAchievementsDump } from '../src/shared/outputs/achievements'
+import { factionNameKey, parseFactionsDump } from '../src/shared/outputs/factions'
 import {
   TASK_PARTS,
   UNLOCK_TOKENS,
@@ -28,6 +29,7 @@ import {
 } from '../src/shared/unlocks/unlockGraph'
 import { UNLOCK_RULES } from '../src/shared/unlocks/unlockRules.generated'
 import { unlockBook, unlocksFromRules } from '../src/shared/unlocks/unlocks'
+import { achievementSpellings } from '../src/renderer/src/features/unlocks/itemSpellings'
 
 const FIXTURES = join(import.meta.dirname, 'fixtures')
 
@@ -57,6 +59,17 @@ test('a faction is on the way to the races that want it at maximum', () => {
   assert.deepEqual(unlocksNeedingFaction('Kerra Isle'), [])
 })
 
+test('every faction the rulebook names finds its row in the real factions dump', () => {
+  const dump = parseFactionsDump(readFileSync(join(FIXTURES, 'Drywrought_oggok-WAR-Factions.txt'), 'utf8'))
+  const keys = new Set(dump.map((r) => factionNameKey(r.name)))
+  const subjects = UNLOCK_RULES.flatMap((r) => r.needs.filter((n) => n.kind === 'faction').map((n) => n.subject))
+  assert.equal(subjects.length, 40)
+  assert.deepEqual(subjects.filter((s) => !keys.has(factionNameKey(s))), [])
+  // The dump's own spelling of a faction the achievements dump spells differently finds the race.
+  assert.deepEqual(unlocksNeedingFaction('DaBashers').map((p) => p.unlock.name), ['Troll'])
+  assert.deepEqual(unlocksNeedingFaction('The Freeport Militia').map((p) => p.unlock.name), ['Human (Freeport)'])
+})
+
 test('a Sky reward is on the way to its class, by the dump\'s spelling', () => {
   assert.deepEqual(
     unlocksNeedingItem('Mask of Song').map((p) => p.unlock.name),
@@ -67,6 +80,18 @@ test('a Sky reward is on the way to its class, by the dump\'s spelling', () => {
     ['Beastlord']
   )
   assert.deepEqual(unlocksNeedingItem('Windhowl'), [])
+})
+
+test('an item page finds its class through the Sky alias: either half of the Beastlord pair', () => {
+  // What unlockJoins.ts itemUnlockPaths asks the graph: the page's name and its achievement spellings.
+  const viaPage = (page: string): string[][] =>
+    [page, ...achievementSpellings(page)].flatMap((n) => unlocksNeedingItem(n)).map((p) => [p.unlock.name, p.need.subject])
+  for (const page of ['Windhowl', 'Spirit Render', 'spirit  render']) {
+    assert.deepEqual(viaPage(page), [['Beastlord', 'Windhowl and Spirit Render']], page)
+  }
+  assert.deepEqual(achievementSpellings('Mask of Song'), [])
+  assert.deepEqual(viaPage('Mask of Song'), [['Bard', 'Mask of Song']])
+  assert.deepEqual(achievementSpellings('Spirit'), [])
 })
 
 test('a task is on the way to its unlock, and so is each quest the task is made of', () => {

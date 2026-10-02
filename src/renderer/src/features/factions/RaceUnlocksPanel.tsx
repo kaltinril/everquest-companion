@@ -15,6 +15,7 @@ import { Box, Chip, Collapse, Stack, Typography } from '@mui/material'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import type { RaceUnlockClaim } from '@shared/outputs/achievements'
+import { factionNameKey } from '@shared/outputs/factions'
 import type { FactionRowVm } from './useFactionRows'
 
 /** One required faction as a chip: live standing over cap, green once the server calls it done.
@@ -38,7 +39,7 @@ function FactionChip({
       label={label}
       variant="outlined"
       color={complete ? 'success' : undefined}
-      onClick={onFind === undefined ? undefined : () => onFind(name)}
+      onClick={onFind === undefined ? undefined : () => onFind(row?.name ?? name)}
       sx={{ height: 20, fontSize: 11, '& .MuiChip-label': { px: 0.75 } }}
     />
   )
@@ -69,7 +70,7 @@ function RaceRow({
           key={f.name}
           name={f.name}
           complete={f.complete || claim.complete}
-          row={byName.get(f.name.toLowerCase())}
+          row={byName.get(factionNameKey(f.name))}
           onFind={onFind}
         />
       ))}
@@ -96,7 +97,7 @@ export default function RaceUnlocksPanel({
   const [open, setOpen] = useState(false)
   if (races === undefined || races.length === 0) return null
   const byName = new Map<string, FactionRowVm>()
-  for (const r of rows) byName.set(r.name.toLowerCase(), r)
+  for (const r of rows) byName.set(factionNameKey(r.name), r)
   const done: RaceUnlockClaim[] = []
   const todo: RaceUnlockClaim[] = []
   for (const c of races) (c.complete ? done : todo).push(c)

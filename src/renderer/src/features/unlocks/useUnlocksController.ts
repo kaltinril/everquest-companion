@@ -3,8 +3,10 @@
 // FOUR SOURCES, ONE ROW EACH:
 //   - the rulebook (shared/unlocks/unlockRules.generated.ts): every race, class and deity unlock
 //     and its requirement lines, on screen before any dump exists;
-//   - the achievements dump, as the unlock model (shared/unlocks/unlocks.ts), which REPLACES the
-//     rulebook's rows once there is one: which are open, how each opened, which lines are done;
+//   - the achievements dump, as the unlock model (shared/unlocks/unlocks.ts), OVERLAID on the
+//     rulebook's rows once there is one: which are open, how each opened, which lines are done.
+//     Overlaid, not swapped in: the game's window filters what the file prints, so a row the
+//     dump leaves out stays the rulebook's, its status unclaimed;
 //   - the factions dump with the log's receipts folded in (features/factions/useFactionRows.ts),
 //     so a `Get maximum faction with X` line carries X's LIVE standing over its cap and the
 //     quests on record that raise it;
@@ -16,12 +18,13 @@
 // once when the tab mounts and the row it names is scrolled to and marked.
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { factionNameKey } from '@shared/outputs/factions'
 import type { QuestData } from '@shared/types'
 import type { UnlockRef } from '@shared/unlocks/unlockGraph'
 import { TASK_PARTS, nameKey } from '@shared/unlocks/unlockGraph'
 import { UNLOCK_RULES } from '@shared/unlocks/unlockRules.generated'
 import type { UnlockBook } from '@shared/unlocks/unlocks'
-import { unlockBook, unlocksFromRules } from '@shared/unlocks/unlocks'
+import { overlayUnlockBook, unlockBook, unlocksFromRules } from '@shared/unlocks/unlocks'
 import type { View } from '../../appViews'
 import { getPoskyData } from '../../data'
 import questsJson from '../../data/eqlegends/quests.json'
@@ -71,7 +74,7 @@ export interface UnlocksController {
   hasDump: boolean
   readAt: number | null
   book: UnlockBook
-  /** by the faction's name, lowercased; empty without a factions dump */
+  /** by factionNameKey (either dump's spelling finds it); empty without a factions dump */
   factions: ReadonlyMap<string, FactionFact>
   /** by `rewardKey(className, item)` */
   rewards: ReadonlyMap<string, RewardFact>
@@ -140,7 +143,7 @@ function taskIndex(): Map<string, TaskPart[]> {
 function factionFacts(rows: readonly FactionRowVm[] | null): Map<string, FactionFact> {
   const facts = new Map<string, FactionFact>()
   for (const r of rows ?? []) {
-    facts.set(r.name.toLowerCase(), {
+    facts.set(factionNameKey(r.name), {
       standing: r.standing,
       cap: r.cap,
       label: r.label,
@@ -164,7 +167,7 @@ export function useUnlocksController(props: UnlocksViewProps): UnlocksController
   }, [])
 
   const book = useMemo(
-    () => (achievements === null ? RULES_BOOK : unlockBook(achievements)),
+    () => (achievements === null ? RULES_BOOK : overlayUnlockBook(RULES_BOOK, unlockBook(achievements))),
     [achievements]
   )
   const factions = useMemo(() => factionFacts(rows), [rows])

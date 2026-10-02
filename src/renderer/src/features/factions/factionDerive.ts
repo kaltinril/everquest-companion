@@ -134,11 +134,11 @@ function compareBy(a: FactionRowVm, b: FactionRowVm, key: SortKey): number {
 }
 
 /** The gates the hunt is FOR: every race's by default, one race's when a race is picked, and
- *  only the unsettled ones under the still-needed refinement. Both narrowings read the same
+ *  only the ones known unsettled under the still-needed refinement. Both narrowings read the same
  *  list, so "Kerran, still needed" is exactly the Kerran gates this character has yet to earn. */
 export function huntedGates(r: FactionRowVm, f: RowFilters): RaceGate[] {
   return r.unlocks.filter(
-    (u) => !(f.unlocksPending && u.done) && (f.races.length === 0 || f.races.includes(u.race))
+    (u) => !(f.unlocksPending && u.done !== false) && (f.races.length === 0 || f.races.includes(u.race))
   )
 }
 

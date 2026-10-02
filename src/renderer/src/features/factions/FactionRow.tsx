@@ -50,6 +50,12 @@ function QuestCounts({ work }: { work: RowDerived['work'] }): JSX.Element | null
   )
 }
 
+/** One gate in the chip: checked when settled, queried when the dump said nothing about it. */
+function gateText(u: RaceGate): string {
+  if (u.done === null) return `${u.race} ?`
+  return u.done ? `${u.race} ✓` : u.race
+}
+
 /** The name cell's trailing signals: quest tallies, the race gate, gear value, the wishlist chip. */
 function NameSignals({ derived, unlocks }: { derived: RowDerived; unlocks: readonly RaceGate[] }): JSX.Element {
   return (
@@ -61,10 +67,10 @@ function NameSignals({ derived, unlocks }: { derived: RowDerived; unlocks: reado
       {unlocks.length > 0 && (
         <Chip
           size="small"
-          color={unlocks.some((u) => !u.done) ? 'info' : undefined}
+          color={unlocks.some((u) => u.done === false) ? 'info' : undefined}
           variant="outlined"
-          label={`unlocks ${unlocks.map((u) => (u.done ? `${u.race} ✓` : u.race)).join(', ')}`}
-          title="needed at maximum for these Race Unlock achievements (✓ = already settled on this character)"
+          label={`unlocks ${unlocks.map(gateText).join(', ')}`}
+          title="needed at maximum for these Race Unlock achievements (✓ = already settled on this character, ? = the achievements dump left it out)"
           data-testid="factions-unlocks"
           sx={{ ml: 1, height: 20, fontSize: 11, maxWidth: 320 }}
         />

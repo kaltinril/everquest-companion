@@ -18,6 +18,7 @@
 // the line they satisfy, and that is the whole of what the app knows about them: no page, no
 // price.
 
+import { factionNameKey } from '../outputs/factions'
 import type { UnlockKind } from './unlocks'
 import { UNLOCK_RULES, type RuleNeed, type UnlockRule } from './unlockRules.generated'
 
@@ -59,8 +60,10 @@ export function nameKey(raw: string): string {
 
 let BY_SUBJECT: Map<string, UnlockPath[]> | null = null
 
+// A faction subject keys through factionNameKey, so the factions dump's spelling of a faction
+// finds the rule the achievements dump spells differently (`DaBashers`, `Da Bashers`).
 function subjectKey(kind: RuleNeed['kind'], subject: string): string {
-  return `${kind}\u0000${nameKey(subject)}`
+  return `${kind}\u0000${kind === 'faction' ? factionNameKey(subject) : nameKey(subject)}`
 }
 
 function index(): Map<string, UnlockPath[]> {

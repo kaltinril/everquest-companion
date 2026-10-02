@@ -24,7 +24,8 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { parseFactionsDump } from '../src/shared/outputs/factions'
+import { factionNameKey, parseFactionsDump } from '../src/shared/outputs/factions'
+import { parseAchievementsDump, raceUnlockClaims } from '../src/shared/outputs/achievements'
 import { outputKind, parseOutput, preferredOutputFile } from '../src/main/outputs/kinds'
 import { FACTION_TIER_FLOORS, factionTier } from '../src/renderer/src/features/factions/factionTiers'
 
@@ -167,4 +168,23 @@ test('every tier floor maps to its own rung, the value below it to the next, and
   // Out-of-range values (a format change) land on an honest extreme rather than throwing.
   assert.equal(factionTier(99_999), 'ally')
   assert.equal(factionTier(-99_999), 'scowls')
+})
+
+// ---------------------------------------------------------------------------
+// THE NAME JOIN — the achievements dump's race-unlock rows against this file's Name column.
+// ---------------------------------------------------------------------------
+
+test('every faction a race unlock names joins a row of the real dump through factionNameKey', () => {
+  const achievements = readFileSync(join(FIXTURES, 'Primitive_freeport-Achievements.txt'), 'utf8')
+  const keys = new Set(parseFactionsDump(REAL).map((r) => factionNameKey(r.name)))
+  const named = raceUnlockClaims(parseAchievementsDump(achievements)).flatMap((c) => c.factions.map((f) => f.name))
+  assert.equal(named.length, 40, 'the 40 requirement rows the header measured')
+  const missed = named.filter((n) => !keys.has(factionNameKey(n)))
+  assert.deepEqual(missed, [], 'every requirement finds its faction row')
+  // The four the achievements dump spells differently, each landing on the right row.
+  assert.equal(factionNameKey('Coalition of Tradesfolk'), factionNameKey('Coalition of Tradefolk'))
+  assert.equal(factionNameKey('Freeport Militia'), factionNameKey('The Freeport Militia'))
+  assert.equal(factionNameKey('Corrupt Qeynos Guard'), factionNameKey('Corrupt Qeynos Guards'))
+  assert.equal(factionNameKey('Da Bashers'), factionNameKey('DaBashers'))
+  assert.notEqual(factionNameKey('Coalition of Tradesfolk'), factionNameKey('Coalition of Tradefolk Underground'))
 })
