@@ -341,3 +341,30 @@ test('…but a second copy never costs a distinct family its hand', () => {
   const single = planBoard([gem('Fangs', 'socketed in Primary', true)], rows, NOBODY, hands('Fangs', null))
   assert.equal(single.placements.length, 1)
 })
+
+test('a free seat is taken before an incumbent is asked to move', () => {
+  // A sits in the neck and fits neck and waist; X fits back and neck; C fits back and waist.
+  // X takes the empty back, so C's free seat is the waist: two moves, and A stays put. Walking
+  // C's list in one pass recursed through the held back first and sent A to the waist.
+  const rows = [
+    row({ key: 'a', name: 'A', effects: worn('A', 'Effect A'), slots: ['NECK', 'WAIST'] }),
+    row({ key: 'x', name: 'X', effects: worn('X', 'Effect X'), slots: ['BACK', 'NECK'] }),
+    row({ key: 'c', name: 'C', effects: worn('C', 'Effect C'), slots: ['BACK', 'WAIST'] })
+  ]
+  const plan = planBoard(
+    [gem('A', 'socketed in Neck', true), gem('X'), gem('C')],
+    rows,
+    NOBODY,
+    [
+      seat({ cellId: 'neck', type: 'Worn', slot: 'NECK', currentName: 'A' }),
+      seat({ cellId: 'back', type: 'Worn', slot: 'BACK' }),
+      seat({ cellId: 'waist', type: 'Worn', slot: 'WAIST' })
+    ]
+  )
+  assert.equal(plan.placements.length, 3)
+  assert.deepEqual(plan.moves.map((m) => `${m.cellLabel}: socket ${m.gemName}`).sort(), [
+    'back: socket X',
+    'waist: socket C'
+  ])
+  assert.equal(plan.clears.length, 0)
+})

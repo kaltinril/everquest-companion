@@ -193,12 +193,23 @@ function edges(
   })
 }
 
-/** Kuhn's augmenting path: can claim `u` be seated, evicting and reseating others as needed? */
+/** Kuhn's augmenting path: can claim `u` be seated, evicting and reseating others as needed?
+ *  A FREE seat anywhere in `u`'s list is taken before any holder is asked to move: walking the
+ *  list in one pass recursed through a held seat listed ahead of a free one, and moved an
+ *  incumbent for nothing (validator catch 2026-10-01 - A in the neck, fitting neck and waist; X
+ *  fitting back and neck; C fitting back and waist: C took back, X took the neck, and A was sent
+ *  to the waist, three moves where C into the waist is one). */
 function tryPlace(u: number, adj: readonly number[][], seatOf: number[], seen: boolean[]): boolean {
+  const free = adj[u].find((v) => !seen[v] && seatOf[v] === -1)
+  if (free !== undefined) {
+    seen[free] = true
+    seatOf[free] = u
+    return true
+  }
   for (const v of adj[u]) {
     if (seen[v]) continue
     seen[v] = true
-    if (seatOf[v] === -1 || tryPlace(seatOf[v], adj, seatOf, seen)) {
+    if (tryPlace(seatOf[v], adj, seatOf, seen)) {
       seatOf[v] = u
       return true
     }
