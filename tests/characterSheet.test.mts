@@ -152,6 +152,26 @@ test('ownedExaltations walks the WHOLE dump: worn sockets, bag sockets, everythi
   assert.ok(bagged.every((o) => !o.socketed))
 })
 
+test('ownedExaltations counts the Storage > Exaltations stash, which the dump files under KeyRing', () => {
+  // The real dump lists that window as `Augmentation` rows of the keyring-shaped table; the
+  // other keyring categories (Activated, Equipment) are not exaltations and stay out.
+  const stash = parseInventoryDump(
+    [
+      'Location\tName\tID\tCount\tSlots',
+      'Neck\tGnoll Hide Lariat\t5317\t1\t0',
+      '',
+      'KeyRing\tName\tID\t',
+      'Augmentation\tCat Skull Cap (Exaltation)\t12372',
+      'Augmentation\tFangol (Exaltation)\t11675',
+      'Equipment\tBoots of the Long Road\t177708'
+    ].join('\n')
+  )
+  assert.deepEqual(ownedExaltations(stash), [
+    { name: 'Cat Skull Cap', key: 'cat skull cap', where: 'Exaltations storage', socketed: false },
+    { name: 'Fangol', key: 'fangol', where: 'Exaltations storage', socketed: false }
+  ])
+})
+
 // ---- the sum -------------------------------------------------------------------------
 
 test('statInteger takes an integer and REFUSES a percentage', () => {
