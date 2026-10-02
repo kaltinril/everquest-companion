@@ -163,6 +163,15 @@ test('adding a name that is already there replaces it, and a full group takes no
   assert.deepEqual(withoutMember(full, 'm0').map((m) => m.name), ['M1', 'M2', 'M3', 'M4'])
 })
 
+test('nobody in the group can be named You: that name is your own caster', () => {
+  for (const name of ['You', 'you', '  YOU ']) {
+    assert.deepEqual(withMember([GARRETT], { name, classes: ['CLR'] }), [GARRETT], name)
+  }
+  assert.deepEqual(normalizeParty([{ name: 'you', classes: ['CLR'] }, GARRETT]), [GARRETT])
+  assert.deepEqual(partySuggestions([{ name: 'You', classes: ['CLR'] }], []), [])
+  // A name that merely starts with it is somebody else.
+  assert.deepEqual(withMember([], { name: 'Youngblood', classes: ['CLR'] }), [{ name: 'Youngblood', classes: ['CLR'] }])
+})
 
 // =================================================================================================
 // BY CASTER, IN COLOUR

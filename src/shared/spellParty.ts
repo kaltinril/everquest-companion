@@ -105,13 +105,19 @@ export function sameClassSet(a: readonly ClassAbbr[], b: readonly ClassAbbr[]): 
   return a.length === b.length && a.every((c) => b.includes(c))
 }
 
-/** One stored row, or null when it names no class. A nameless member is named by their classes. */
+/**
+ * One stored row, or null when it names no class. A nameless member is named by their classes.
+ *
+ * A member named "You" is refused like any other row that is not a member: that name is your own
+ * caster key, and two casters under it shared one colour and drew two "You" groups.
+ */
 function memberOf(raw: unknown): PartyMember | null {
   if (typeof raw !== 'object' || raw === null) return null
   const row = raw as { name?: unknown; classes?: unknown; color?: unknown }
   const classes = memberClasses(row.classes)
   if (classes.length === 0) return null
   const typed = typeof row.name === 'string' ? row.name.trim().slice(0, MAX_NAME_LENGTH) : ''
+  if (nameKey(typed) === nameKey(SELF_CASTER)) return null
   const name = typed === '' ? classes.join('/') : typed
   return isColor(row.color) ? { name, classes, color: row.color } : { name, classes }
 }

@@ -141,6 +141,8 @@ function AddRow({ group, onDone }: { group: LoadoutGroup; onDone: () => void }):
   const [name, setName] = useState('')
   const [classes, setClasses] = useState<ClassAbbr[]>([])
   const full = party.length >= MAX_PARTY_MEMBERS
+  // "You" is your own caster; the shared reader refuses a member of that name.
+  const isSelf = name.trim().toLowerCase() === SELF_CASTER.toLowerCase()
   const add = (): void => {
     setParty(withMember(party, { name, classes }))
     setName('')
@@ -171,10 +173,10 @@ function AddRow({ group, onDone }: { group: LoadoutGroup; onDone: () => void }):
       <Button
         size="small"
         variant="outlined"
-        disabled={classes.length === 0 || full}
+        disabled={classes.length === 0 || full || isSelf}
         onClick={add}
         data-testid="loadout-party-add"
-        title={full ? 'A group is six, and one of them is you.' : undefined}
+        title={full ? 'A group is six, and one of them is you.' : isSelf ? 'You are already in the group.' : undefined}
       >
         Add
       </Button>
