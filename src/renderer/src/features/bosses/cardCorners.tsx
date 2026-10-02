@@ -12,7 +12,9 @@
 // the click: the card routes to the mob page, and hiding a card must not also open it. The icon is the state you would
 // MOVE TO (an eye on a hidden card, a struck eye on a visible one), matching the toolbar peek's
 // vocabulary. Low opacity until hover on a visible card so the control does not compete with
-// the art it sits over; near-full on a hidden card, where the control IS the point.
+// the art it sits over; near-full on a hidden card, where the control IS the point. On the week
+// card the difficulty ladder is the last row, so DifficultyLadder reserves right padding for this
+// corner; without it the button sat over the D4 rung.
 
 import type { JSX } from 'react'
 import { Box, IconButton } from '@mui/material'
