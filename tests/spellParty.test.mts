@@ -251,6 +251,8 @@ test('a roster member is offered only when a /who row stated their classes', () 
 test('somebody already in the group is offered again only when their classes changed', () => {
   const roster = [{ name: 'Malkil', classes: ['DRU', 'RNG', 'MAG'] }]
   assert.deepEqual(partySuggestions(roster, [{ name: 'malkil', classes: ['DRU', 'RNG', 'MAG'] }]), [])
+  // The same classes in another order are the same member: a /who row prints them its own way.
+  assert.deepEqual(partySuggestions(roster, [{ name: 'Malkil', classes: ['MAG', 'DRU', 'RNG'] }]), [])
   assert.deepEqual(partySuggestions(roster, [{ name: 'Malkil', classes: ['DRU', 'RNG', 'ENC'] }]), [
     { name: 'Malkil', classes: ['DRU', 'RNG', 'MAG'] }
   ])

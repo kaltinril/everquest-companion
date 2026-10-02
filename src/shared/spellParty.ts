@@ -327,7 +327,8 @@ export function partySuggestions(
     const offer = memberOf({ name: r.name, classes: r.classes })
     if (offer === null) continue
     const held = party.find((m) => nameKey(m.name) === nameKey(offer.name))
-    if (held?.classes.join('/') === offer.classes.join('/')) continue
+    // In any order: a `/who` row prints classes its own way, not in the order they were picked.
+    if (held !== undefined && sameClassSet(held.classes, offer.classes)) continue
     out.push(typeof r.classesTs === 'number' ? { ...offer, statedTs: r.classesTs } : offer)
   }
   return out
