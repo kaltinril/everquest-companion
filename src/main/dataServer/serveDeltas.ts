@@ -76,7 +76,7 @@
 
 import { IPC } from '../../shared/ipc'
 import { MODULE_WORLD_CHANGED, type ModuleChanged } from '../../shared/types'
-import { sendToModuleOverlays } from '../worldRebuilt'
+import { sendToCharacterAwareOverlays, sendToModuleOverlays } from '../worldRebuilt'
 import { sendToMain } from '../windows'
 import { noteTailLine } from '../switchNudge'
 import { noteEventKind } from '../telemetry/breadcrumbs'
@@ -182,5 +182,11 @@ function notifyCombatActivity(): void {
  */
 export function pushWorldChanged(): void {
   if (!SERVE_ASKED) return
-  push({ moduleId: MODULE_WORLD_CHANGED, seq: -1 })
+  // THE ONE FRAME THE DAMAGE METER ALSO HEARS. The 'fight' / 'overall' overlays read
+  // `character.name` for the self row, and at launch they can hydrate before the engine attaches
+  // (an empty snapshot, the previous name kept). Going live is their cue to ask again, so this
+  // frame takes the character-aware list; the per-cursor firehose above stays module-only.
+  const frame: ModuleChanged = { moduleId: MODULE_WORLD_CHANGED, seq: -1 }
+  sendToMain(IPC.onModuleChanged, frame)
+  sendToCharacterAwareOverlays(IPC.onModuleChanged, frame)
 }

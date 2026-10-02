@@ -232,8 +232,31 @@ test('the ~10x/s cursor firehose still targets the module-reading set only, not 
   // serveDeltas.ts drives IPC.onModuleChanged (the cursor bump, up to ~10x/s). It must keep using
   // the module-only fan-out — the meter overlay reads character.name, which never bumps a cursor.
   const mod = code('../src/main/dataServer/serveDeltas.ts')
-  assert.match(mod, /sendToModuleOverlays\(IPC\.onModuleChanged, frame\)/)
-  assert.doesNotMatch(mod, /sendToCharacterAwareOverlays|CHARACTER_AWARE_OVERLAYS/)
+  const push = /\nfunction push\([\s\S]*?\n\}/.exec(mod)
+  assert.ok(push, 'push not found')
+  assert.match(push[0], /sendToModuleOverlays\(IPC\.onModuleChanged, frame\)/)
+  assert.doesNotMatch(push[0], /sendToCharacterAwareOverlays|CHARACTER_AWARE_OVERLAYS/)
+  const cursor = /export function pushModuleChanged\([\s\S]*?\n\}/.exec(mod)
+  assert.ok(cursor, 'pushModuleChanged not found')
+  assert.match(cursor[0], /push\(\{ moduleId, seq \}\)/)
+  assert.doesNotMatch(cursor[0], /sendToCharacterAwareOverlays/)
+})
+
+// ── …and so does the engine's go-live frame ──────────────────────────────────────────────────
+//
+// At launch a meter overlay can hydrate `character` before the engine attaches: the snapshot is
+// empty and the label keeps whatever name it last drew. No onCharacter follows when the engine
+// goes live for the same character, so the MODULE_WORLD_CHANGED frame is the meter's only cue to
+// ask again. That ONE frame takes the character-aware list; the firehose above does not.
+
+test('the world-changed frame reaches the damage-meter overlay as well as the module readers', () => {
+  const mod = code('../src/main/dataServer/serveDeltas.ts')
+  const body = /export function pushWorldChanged\([\s\S]*?\n\}/.exec(mod)
+  assert.ok(body, 'pushWorldChanged not found')
+  assert.match(body[0], /moduleId: MODULE_WORLD_CHANGED/)
+  assert.match(body[0], /sendToMain\(IPC\.onModuleChanged, frame\)/)
+  assert.match(body[0], /sendToCharacterAwareOverlays\(IPC\.onModuleChanged, frame\)/)
+  assert.doesNotMatch(body[0], /\bpush\(/, 'the world-changed frame fell back to the module-only list')
 })
 
 

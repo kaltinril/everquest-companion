@@ -76,7 +76,8 @@ export function sendToModuleOverlays(channel: string, ...args: unknown[]): void 
 
 /**
  * Push to every overlay that is character-aware — the module-reading set PLUS the damage meter
- * ('fight' / 'overall'). Used only for the rebuild / character-switch signal below, never for the
+ * ('fight' / 'overall'). Used only for the rebuild / character-switch signal below and for the
+ * engine's world-changed frame (`dataServer/serveDeltas.ts` `pushWorldChanged`), never for the
  * per-cursor firehose: see `CHARACTER_AWARE_OVERLAYS`.
  */
 export function sendToCharacterAwareOverlays(channel: string, ...args: unknown[]): void {
