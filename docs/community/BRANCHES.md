@@ -53,7 +53,9 @@ The fork is `origin` (`kaltinril/everquest-companion`). Nothing is ever pushed t
 
 Worktree paths are relative to this clone. Every branch worktree lives under `.claude/worktrees/`,
 named after its branch (owner, 2026-09-24; RULES.md, rule 16). The folder is gitignored and the
-creator's lint config already skips it.
+creator's lint config already skips it. The Worktree column says where a branch is checked out
+WHEN it is being worked on: a worktree is removed once its work is merged into `main_community`,
+junction first (RULES.md, rule 18).
 
 ### Ours, never closing, never a PR
 

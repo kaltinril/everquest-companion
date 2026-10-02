@@ -113,8 +113,9 @@ creator's own repo and does not know the fork exists.
 16. **Nothing new is created beside the repo.** `C:/git` is the owner's folder of repositories,
     not a scratch area. Every worktree of this clone lives inside it, under `.claude/worktrees/`,
     in a folder named after its branch (owner, 2026-09-24: "all work needs to be in this repo").
-    That folder is gitignored; the creator's lint config already skips it. The worktrees in
-    BRANCHES.md are the whole set; no build checkout, version-bump checkout or other throwaway
+    That folder is gitignored; the creator's lint config already skips it. The worktree paths in
+    BRANCHES.md are the only places a branch is checked out, and only while it is being worked
+    on (rule 18); no build checkout, version-bump checkout or other throwaway
     directory is added beside the repo (owner, 2026-09-23). A worktree that exists only to serve
     one job goes under the session's temp directory and is removed with `git worktree remove`
     the moment the job is done. A packaged build is never such a job: `npm run dist` runs in this
@@ -124,3 +125,16 @@ creator's own repo and does not know the fork exists.
 17. **A test build always lands in `release/<version>/` of this clone**, beside the earlier
     builds, whatever directory produced it. That folder is where the owner looks; an installer
     anywhere else does not exist as far as the testers are concerned.
+
+18. **A worktree is removed once its work is merged into `main_community`.** Worktrees are made
+    to do a job, not kept around: the branch stays, the checkout goes, and the next job makes a
+    fresh one with `git worktree add .claude/worktrees/<branch> <branch>` (owner, 2026-10-01,
+    after the disk filled up). Removal order matters, because each worktree's `node_modules` is a
+    junction to this clone's: unlink the junction first without following it (PowerShell
+    `(Get-Item <worktree>\node_modules).Delete()`, or `cmd /c rmdir <worktree>\node_modules`),
+    then `git worktree remove <worktree>`, then `git worktree prune`. Never `rm -rf` or
+    `Remove-Item -Recurse` a worktree that still has its junction; that empties this clone's own
+    `node_modules`. The same pass deletes what the job left elsewhere: a scratch
+    `CARGO_TARGET_DIR` (one session's held 12.8 GB), temp worktrees under the session's temp
+    directory, `engine/target/debug/incremental`, and an unpacked `release/<version>/win-unpacked`
+    once that build has been handed to the testers.
