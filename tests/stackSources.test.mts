@@ -56,6 +56,13 @@ test('a trigger the table cannot answer for is left off, never invented', () => 
   assert.equal('triggers' in out['Points At An Instant'], false)
 })
 
+test('a catalog title with the wiki`s (Spell) suffix finds the client`s row, keyed as asked', () => {
+  const out = stackViewsFor(table, ['Plain Buff (Spell)', 'Nobody Wrote This (Spell)'])
+  assert.deepEqual(Object.keys(out), ['Plain Buff (Spell)'])
+  assert.equal(out['Plain Buff (Spell)'].id, 60)
+  assert.equal(out['Plain Buff (Spell)'].name, 'Plain Buff (Spell)')
+})
+
 test('the door still refuses what it refused', () => {
   assert.deepEqual(stackViewsFor(table, [42, '', 'x'.repeat(200), 'Nobody Wrote This', 'An Instant']), {})
 })

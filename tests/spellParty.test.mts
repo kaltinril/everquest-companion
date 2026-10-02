@@ -154,15 +154,26 @@ test('unreadable stored text is an empty group', () => {
 })
 
 test('adding a name that is already there replaces it, and a full group takes nobody new', () => {
-  const swapped = withMember([GARRETT], { name: 'garrett', classes: ['CLR'] })
-  assert.deepEqual(swapped, [{ name: 'garrett', classes: ['CLR'] }])
+  const swapped = withMember([GARRETT], { name: 'garrett', classes: ['CLR'] }, 0)
+  assert.deepEqual(swapped, [{ name: 'garrett', classes: ['CLR'], color: 1 }])
 
   let full: PartyMember[] = []
-  for (let i = 0; i < MAX_PARTY_MEMBERS + 2; i++) full = withMember(full, { name: `M${String(i)}`, classes: ['WAR'] })
+  for (let i = 0; i < MAX_PARTY_MEMBERS + 2; i++) full = withMember(full, { name: `M${String(i)}`, classes: ['WAR'] }, 0)
   assert.equal(full.length, MAX_PARTY_MEMBERS)
-  assert.deepEqual(withoutMember(full, 'm0').map((m) => m.name), ['M1', 'M2', 'M3', 'M4'])
+  assert.deepEqual(withoutMember(full, 'm0', 0).map((m) => m.name), ['M1', 'M2', 'M3', 'M4'])
 })
 
+test('nobody in the group can be named You: that name is your own caster', () => {
+  for (const name of ['You', 'you', '  YOU ']) {
+    assert.deepEqual(withMember([GARRETT], { name, classes: ['CLR'] }, 0), [GARRETT], name)
+  }
+  assert.deepEqual(normalizeParty([{ name: 'you', classes: ['CLR'] }, GARRETT]), [GARRETT])
+  assert.deepEqual(partySuggestions([{ name: 'You', classes: ['CLR'] }], []), [])
+  // A name that merely starts with it is somebody else.
+  assert.deepEqual(withMember([], { name: 'Youngblood', classes: ['CLR'] }, 0), [
+    { name: 'Youngblood', classes: ['CLR'], color: 1 }
+  ])
+})
 
 // =================================================================================================
 // BY CASTER, IN COLOUR
@@ -199,6 +210,31 @@ test('everyone wears a colour of their own until the user says otherwise', () =>
   assert.equal(partyColors(withColor(party, 'c', 1), 0).get('C'), 1)
   // Your own colour moves too, and the unpicked members move out of its way.
   assert.deepEqual([...partyColors(party, 2)], [['You', 2], ['A', 0], ['B', 1], ['C', 3]])
+})
+
+test('a member added without a colour keeps the one they were given when somebody leaves', () => {
+  let party: PartyMember[] = []
+  for (const name of ['A', 'B', 'C']) party = withMember(party, { name, classes: ['WAR'] }, 0)
+  assert.deepEqual([...partyColors(party, 0)], [['You', 0], ['A', 1], ['B', 2], ['C', 3]])
+  // Before, C took B's free slot once B left, and every chip after the gap moved.
+  assert.deepEqual([...partyColors(withoutMember(party, 'B', 0), 0)], [['You', 0], ['A', 1], ['C', 3]])
+  // A group stored before colours were kept is pinned as it reads on the way out, too.
+  const legacy: PartyMember[] = [{ name: 'A', classes: ['WAR'] }, { name: 'B', classes: ['WAR'] }, { name: 'C', classes: ['WAR'] }]
+  assert.equal(partyColors(withoutMember(legacy, 'A', 0), 0).get('C'), 3)
+  // Your own colour is free ground: the first member after you takes the next slot up.
+  assert.deepEqual(withMember([], { name: 'A', classes: ['WAR'] }, 2), [{ name: 'A', classes: ['WAR'], color: 0 }])
+})
+
+test('a second nameless member of the same classes is somebody else, not a replacement', () => {
+  let party: PartyMember[] = []
+  for (let i = 0; i < 3; i++) party = withMember(party, { name: '', classes: ['CLR'] }, 0)
+  assert.deepEqual(party.map((m) => m.name), ['CLR', 'CLR #2', 'CLR #3'])
+  // A typed name is still the user's way of replacing somebody.
+  assert.deepEqual(withMember(party, { name: 'clr', classes: ['DRU'] }, 0).map((m) => [m.name, m.classes]), [
+    ['clr', ['DRU']],
+    ['CLR #2', ['CLR']],
+    ['CLR #3', ['CLR']]
+  ])
 })
 
 test('a colour is a slot the palette has, stored or not at all', () => {
@@ -243,14 +279,16 @@ test('a roster member is offered only when a /who row stated their classes', () 
     { name: 'Malkil', classes: ['DRU', 'RNG', 'MAG'], statedTs: 1234 }
   ])
   // Adding an offer stores a member, not the offer: the instant is evidence, not a preference.
-  assert.deepEqual(withMember([], { name: 'Malkil', classes: ['DRU'], statedTs: 1234 } as PartyMember), [
-    { name: 'Malkil', classes: ['DRU'] }
+  assert.deepEqual(withMember([], { name: 'Malkil', classes: ['DRU'], statedTs: 1234 } as PartyMember, 0), [
+    { name: 'Malkil', classes: ['DRU'], color: 1 }
   ])
 })
 
 test('somebody already in the group is offered again only when their classes changed', () => {
   const roster = [{ name: 'Malkil', classes: ['DRU', 'RNG', 'MAG'] }]
   assert.deepEqual(partySuggestions(roster, [{ name: 'malkil', classes: ['DRU', 'RNG', 'MAG'] }]), [])
+  // The same classes in another order are the same member: a /who row prints them its own way.
+  assert.deepEqual(partySuggestions(roster, [{ name: 'Malkil', classes: ['MAG', 'DRU', 'RNG'] }]), [])
   assert.deepEqual(partySuggestions(roster, [{ name: 'Malkil', classes: ['DRU', 'RNG', 'ENC'] }]), [
     { name: 'Malkil', classes: ['DRU', 'RNG', 'MAG'] }
   ])

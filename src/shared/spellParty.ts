@@ -105,13 +105,19 @@ export function sameClassSet(a: readonly ClassAbbr[], b: readonly ClassAbbr[]): 
   return a.length === b.length && a.every((c) => b.includes(c))
 }
 
-/** One stored row, or null when it names no class. A nameless member is named by their classes. */
+/**
+ * One stored row, or null when it names no class. A nameless member is named by their classes.
+ *
+ * A member named "You" is refused like any other row that is not a member: that name is your own
+ * caster key, and two casters under it shared one colour and drew two "You" groups.
+ */
 function memberOf(raw: unknown): PartyMember | null {
   if (typeof raw !== 'object' || raw === null) return null
   const row = raw as { name?: unknown; classes?: unknown; color?: unknown }
   const classes = memberClasses(row.classes)
   if (classes.length === 0) return null
   const typed = typeof row.name === 'string' ? row.name.trim().slice(0, MAX_NAME_LENGTH) : ''
+  if (nameKey(typed) === nameKey(SELF_CASTER)) return null
   const name = typed === '' ? classes.join('/') : typed
   return isColor(row.color) ? { name, classes, color: row.color } : { name, classes }
 }
@@ -125,7 +131,7 @@ export function normalizeParty(raw: unknown): PartyMember[] {
   let out: PartyMember[] = []
   for (const entry of raw) {
     const member = memberOf(entry)
-    if (member !== null) out = withMember(out, member)
+    if (member !== null) out = placeMember(out, member)
   }
   return out
 }
@@ -140,15 +146,43 @@ export function readParty(text: string | null): PartyMember[] {
   }
 }
 
-/** The group with this member added, replacing a member of the same name. Refused when full. */
-export function withMember(party: readonly PartyMember[], member: PartyMember): PartyMember[] {
-  const next = memberOf(member)
-  if (next === null) return [...party]
+/** A validated member placed in the group, replacing one of the same name. Refused when full. */
+function placeMember(party: readonly PartyMember[], next: PartyMember): PartyMember[] {
   const key = nameKey(next.name)
   const at = party.findIndex((m) => nameKey(m.name) === key)
   // A replaced member keeps the colour they wore unless the new row picked one.
   if (at >= 0) return party.map((m, i) => (i === at ? { ...(m.color === undefined ? {} : { color: m.color }), ...next } : m))
   return party.length >= MAX_PARTY_MEMBERS ? [...party] : [...party, next]
+}
+
+/** A name nobody in the group has: the base itself, else `CLR #2`, `CLR #3`... */
+function freeName(party: readonly PartyMember[], base: string): string {
+  const taken = new Set(party.map((m) => nameKey(m.name)))
+  let name = base
+  for (let n = 2; taken.has(nameKey(name)); n++) name = `${base} #${String(n)}`
+  return name
+}
+
+/** Everyone wearing, as a stored pick, the colour they wear now. */
+function pinColors(party: readonly PartyMember[], selfColor: number): PartyMember[] {
+  const colors = partyColors(party, selfColor)
+  return party.map((m) => (m.color === undefined ? { ...m, color: colors.get(m.name) ?? 0 } : m))
+}
+
+/**
+ * The group with this member added, replacing a member of the same name. Refused when full.
+ *
+ * A NAMELESS MEMBER IS A NEW ONE: two unnamed Clerics are two people, so the second is `CLR #2`
+ * rather than a replacement of the first.
+ *
+ * EVERY COLOUR IS STORED ON THE WAY OUT (`pinColors`). An automatic colour is the first slot free in
+ * group order, so left unstored it moved whenever somebody ahead of it left the group.
+ */
+export function withMember(party: readonly PartyMember[], member: PartyMember, selfColor: number): PartyMember[] {
+  const next = memberOf(member)
+  if (next === null) return [...party]
+  const named = typeof member.name === 'string' && member.name.trim() !== ''
+  return pinColors(placeMember(party, named ? next : { ...next, name: freeName(party, next.name) }), selfColor)
 }
 
 /** The group with this member wearing this colour. An unknown name or slot changes nothing. */
@@ -168,7 +202,8 @@ export function readSelfColor(text: string | null): number {
  *
  * A picked colour is kept as picked, even when two people picked the same one: that is the user's
  * call. Everyone who picked none takes the first slot nobody is wearing, in group order, so adding
- * a member never repaints the ones already there.
+ * a member never repaints the ones already there - and `withMember` / `withoutMember` store that
+ * slot, so removing one does not either.
  */
 export function partyColors(party: readonly PartyMember[], selfColor: number): Map<string, number> {
   const out = new Map<string, number>([[SELF_CASTER, isColor(selfColor) ? selfColor : 0]])
@@ -185,10 +220,10 @@ export function partyColors(party: readonly PartyMember[], selfColor: number): M
   return out
 }
 
-/** The group without the member of this name. */
-export function withoutMember(party: readonly PartyMember[], name: string): PartyMember[] {
+/** The group without the member of this name. Those who stay keep the colours they wore. */
+export function withoutMember(party: readonly PartyMember[], name: string, selfColor: number): PartyMember[] {
   const key = nameKey(name)
-  return party.filter((m) => nameKey(m.name) !== key)
+  return pinColors(party, selfColor).filter((m) => nameKey(m.name) !== key)
 }
 
 // =================================================================================================
@@ -327,7 +362,8 @@ export function partySuggestions(
     const offer = memberOf({ name: r.name, classes: r.classes })
     if (offer === null) continue
     const held = party.find((m) => nameKey(m.name) === nameKey(offer.name))
-    if (held?.classes.join('/') === offer.classes.join('/')) continue
+    // In any order: a `/who` row prints classes its own way, not in the order they were picked.
+    if (held !== undefined && sameClassSet(held.classes, offer.classes)) continue
     out.push(typeof r.classesTs === 'number' ? { ...offer, statedTs: r.classesTs } : offer)
   }
   return out

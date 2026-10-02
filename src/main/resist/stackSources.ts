@@ -19,7 +19,7 @@ export function stackViewsFor(table: SpellResistTable, names: readonly unknown[]
   const out: Record<string, StackSource> = {}
   for (const raw of names) {
     if (typeof raw !== 'string' || raw.length === 0 || raw.length > 128) continue
-    const row = table[spellCanonKey(raw)]
+    const row = clientRow(table, raw)
     // Only rows the parser kept slots for - which is rows with a DURATION, the only ones a stacking
     // question is ever about (`SpellResistInfo.slots` states the filter and why).
     if (!row?.slots) continue
@@ -27,6 +27,20 @@ export function stackViewsFor(table: SpellResistTable, names: readonly unknown[]
     out[raw] = { ...stackSource(row, raw), ...(triggers.length > 0 ? { triggers } : {}) }
   }
   return out
+}
+
+/**
+ * THE WIKI'S PAGE SUFFIX IS NOT PART OF THE SPELL'S NAME. Where a spell and an item share a title the
+ * catalog's row is `Shield of Thorns (Spell)` and the client's is `Shield of Thorns`, so the exact
+ * name is tried first and the suffix-free one second. Here and not in `spellCanonKey`: that is a
+ * join key a dozen other readers share.
+ */
+const WIKI_SPELL_SUFFIX = / \(Spell\)$/i
+
+function clientRow(table: SpellResistTable, raw: string): SpellResistInfo | undefined {
+  const exact = table[spellCanonKey(raw)]
+  if (exact !== undefined || !WIKI_SPELL_SUFFIX.test(raw)) return exact
+  return table[spellCanonKey(raw.replace(WIKI_SPELL_SUFFIX, ''))]
 }
 
 function stackSource(row: SpellResistInfo, name: string): StackSource {
