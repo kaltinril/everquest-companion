@@ -112,9 +112,12 @@ export function labelMatcher(label: string): LabelMatcher {
  * no ghosts, no citizens, no names. `I'm a People Person!` is the one achievement that needs it.
  * MEASURED on the owner's dump of 2026-09-28: its `Dwarves` stood at 0/10 beside the Skill
  * counter's `Dwarves 26/100`, whose kills were ghost dwarves.
+ * A term that only names others (`Kerran`, `of: ['kerrans']`) counts what those others count.
  */
 export function strictMatcher(label: string): LabelMatcher {
-  const own = labelTerms(label).flatMap((term) => SLAYER_TERMS.get(term)?.races?.slice(0, 1) ?? [])
+  const own = labelTerms(label)
+    .flatMap((term) => resolveTerm(term))
+    .flatMap((term) => SLAYER_TERMS.get(term)?.races?.slice(0, 1) ?? [])
   return { races: new Set(own), terms: new Set() }
 }
 

@@ -239,6 +239,14 @@ test('a ghost is its race, except where the game counts the race itself', () => 
   assert.equal(matchMob(slayerTarget(people).matcher, ghost), null)
 })
 
+test('a strict term that only names another counts what that one counts (`Kerran`)', () => {
+  assert.equal(SLAYER_TERMS.get('kerran')?.races, undefined)
+  const kerran = OLD.counters.find((c) => c.label === 'Kerran' && c.group === 'Special')
+  assert.ok(kerran)
+  const strict = slayerTarget(kerran).matcher
+  assert.equal(matchMob(strict, mobFacts('a kerran warrior', 'Kerra')), 'race')
+})
+
 // ---------------------------------------------------------------------------
 // THE PLAN
 // ---------------------------------------------------------------------------
