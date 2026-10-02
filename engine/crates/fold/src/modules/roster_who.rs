@@ -43,7 +43,7 @@ pub struct WhoSeen {
     row: Regex,
     corpse_suffix: Regex,
     stated: HashMap<String, WhoStated>,
-    /// Keys in first-seen order, for eviction.
+    /// Keys in last-seen order, oldest first, for eviction.
     order: VecDeque<String>,
 }
 
@@ -80,12 +80,14 @@ impl WhoSeen {
             level: m[1].parse().unwrap_or(0),
             classes_ts: ev.ts(),
         };
-        if self.stated.insert(key.clone(), said).is_none() {
-            self.order.push_back(key.clone());
-            if self.order.len() > CAPACITY {
-                if let Some(oldest) = self.order.pop_front() {
-                    self.stated.remove(&oldest);
-                }
+        // A restated name moves to the back, so eviction takes the name least recently seen.
+        if self.stated.insert(key.clone(), said).is_some() {
+            self.order.retain(|k| *k != key);
+        }
+        self.order.push_back(key.clone());
+        if self.order.len() > CAPACITY {
+            if let Some(oldest) = self.order.pop_front() {
+                self.stated.remove(&oldest);
             }
         }
         Some(key)
@@ -177,24 +179,32 @@ mod tests {
         assert_eq!(who.stated("malkil").unwrap().classes, ["DRU", "RNG", "ENC"]);
     }
 
+    /// `P<i>` spelled in letters, since a row's name is letters: 0 is `Pa`, 12 is `Pbc`.
+    fn letters(i: usize) -> String {
+        format!("P{i}")
+            .chars()
+            .map(|c| {
+                if c.is_ascii_digit() {
+                    (b'a' + (c as u8 - b'0')) as char
+                } else {
+                    c
+                }
+            })
+            .collect()
+    }
+
+    fn row_for(who: &mut WhoSeen, ts: i64, name: &str) {
+        who.observe(&unknown(
+            ts,
+            &format!("[Mon Sep 21 23:31:00 2026] [50 WAR] {name} (Human)  ZONE: Halas (halas)"),
+        ));
+    }
+
     #[test]
     fn the_memory_is_bounded_and_forgets_the_oldest_name_first() {
         let mut who = WhoSeen::default();
         for i in 0..=CAPACITY {
-            let name: String = format!("P{i}")
-                .chars()
-                .map(|c| {
-                    if c.is_ascii_digit() {
-                        (b'a' + (c as u8 - b'0')) as char
-                    } else {
-                        c
-                    }
-                })
-                .collect();
-            who.observe(&unknown(
-                i as i64,
-                &format!("[Mon Sep 21 23:31:00 2026] [50 WAR] {name} (Human)  ZONE: Halas (halas)"),
-            ));
+            row_for(&mut who, i as i64, &letters(i));
         }
         assert_eq!(who.stated.len(), CAPACITY);
         assert!(
@@ -202,5 +212,24 @@ mod tests {
             "the first name seen is the one forgotten"
         );
         assert!(who.stated("pb").is_some());
+    }
+
+    /// The memory keeps the newest names: a name restated since is not the oldest, however early
+    /// it was first seen.
+    #[test]
+    fn a_restated_name_is_newest_again_and_outlives_one_seen_once_since() {
+        let mut who = WhoSeen::default();
+        for i in 0..CAPACITY {
+            row_for(&mut who, i as i64, &letters(i));
+        }
+        row_for(&mut who, 1000, "Pa");
+        row_for(&mut who, 1001, &letters(CAPACITY));
+        assert_eq!(who.stated.len(), CAPACITY);
+        assert_eq!(who.order.len(), CAPACITY);
+        assert_eq!(who.stated("pa").map(|s| s.classes_ts), Some(1000));
+        assert!(
+            who.stated("pb").is_none(),
+            "the oldest name not restated is the one forgotten"
+        );
     }
 }
