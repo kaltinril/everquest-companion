@@ -669,9 +669,11 @@ export function fightScopeOptions(segments: SegmentSummary[]): ScopeOptions {
   const open = segments.find((s) => s.kind === 'current') ?? null
   // eslint-disable-next-line eqc/no-domain-munging -- JOS-459 cutover ledger item 3: no served view source answers this yet, so the renderer still derives SegmentSummary. Becomes a view descriptor when the source lands.
   const finalized = segments.filter((s) => s.kind === 'fight')
-  const headSeg = open ?? finalized.find((s) => s.archive === undefined) ?? null
-  // eslint-disable-next-line eqc/no-domain-munging -- JOS-459 cutover ledger item 3, as above: the head row is taken out of the same list. Archived fights (log archive, step 4.7) are app-side and have no served view source to come from.
-  const rest = finalized.filter((s) => s !== headSeg).map(fightOption)
+  // Archived fights (log archive, step 4.7) come after every live one, so the live log's last fight
+  // is the first row or there is none: an archived fight is never the head.
+  const last = finalized.length > 0 && finalized[0].archive === undefined ? finalized[0] : null
+  const headSeg = open ?? last
+  const rest = (open === null && last !== null ? finalized.slice(1) : finalized).map(fightOption)
   if (!headSeg) return { head: null, rest }
   const head: ScopeOption = {
     value: LIVE_SELECTION,
