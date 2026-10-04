@@ -117,9 +117,10 @@ order.
 These are stated here so nobody discovers them later.
 
 - **Context at the start of a fresh log.** Until the next zone line, level line or group line
-  prints, the engine does not know the current zone, level or group. Kills before the first zone
-  line carry no tier. Most of this recovers within minutes of play. Carrying it over would need a
-  new input to the engine, which is the creator's decision.
+  prints, the engine does not know the current zone, level or group. The app files kills and
+  respawn deaths before the first zone line in the zone the archive ended in (step 3.8), when the
+  archive's own kills say which tier that zone had. Level and group recover within minutes of
+  play. Carrying them in the engine would need a new input to it, which is the creator's decision.
 - **Detail inside archived fights.** Fight summaries are kept. The per-fight breakdown is about
   14.5 KB per fight (92 MB for the measured log) and is not kept. An archived fight opens as a
   summary.
@@ -148,6 +149,7 @@ Update this table in the same commit as the step it records.
 | 1.0 to 1.7 | done 2026-10-03: inert, gate green | this commit |
 | 2.1 to 2.5 | done 2026-10-03 (see the phase notes) | c318c9b4 |
 | 3.1 to 3.6 | done 2026-10-03; 3.7 is the owner's trial | c318c9b4 |
+| 3.8 | done 2026-10-04: the archive's last zone carried to kills and respawn before the fresh log's first zone line | this commit |
 | 4.1 | done 2026-10-03: consider ring, and one mob's drops seen rebuilt from archived loot | 4f090517 |
 | 4.2 | done 2026-10-03: item tiers | 449b7b12 |
 | 4.3 | done 2026-10-03: class unlocks and raw turn-ins | e8887e04 |

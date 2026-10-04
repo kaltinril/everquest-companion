@@ -254,9 +254,19 @@ function projectModule(moduleId: string, r: ModuleSnapshotResult): ModuleSnap | 
  * draws its loading/unavailable state rather than being handed invented emptiness. The REASON is
  * still counted and narrated by `readShim.ts`, so the silence is legible in the dev log.
  */
-export function serveModuleSnapshot(moduleId: string): Promise<ModuleSnap | null> {
+export async function serveModuleSnapshot(moduleId: string): Promise<ModuleSnap | null> {
+  // Asked first, so the history merge inside the projection already knows the live log's first
+  // zone line (docs/plans/log-archive, step 3.8). Only with history shown, and only until it is known.
+  if (liveHistory.wantsLiveZone(moduleId)) liveHistory.noteLiveProgression(await serveLiveState('progression'))
   return readShim().serve('module.snapshot', { module: moduleId }, (r) =>
     projectModule(moduleId, r)
+  , () => null)
+}
+
+/** One module's live state as the engine served it, no history merged; null when unserved. */
+function serveLiveState(moduleId: string): Promise<unknown> {
+  return readShim().serve<'module.snapshot', unknown>('module.snapshot', { module: moduleId }, (r) =>
+    r.module === moduleId ? r.state : null
   , () => null)
 }
 
