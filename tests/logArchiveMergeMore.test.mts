@@ -23,14 +23,17 @@ import { readFileSync } from 'node:fs'
 import { CONSIDER_CAP, mergeConsider } from '../src/shared/logArchive/mergeConsider'
 import { mergeItemTiers } from '../src/shared/logArchive/mergeItemTiers'
 import { dropsFromLoot, mergeDropsSeen, withArchivedDrops } from '../src/shared/logArchive/mergeDropsSeen'
+import { mergeClassUnlocks, mergeTurnIns } from '../src/shared/logArchive/mergeUnlocksTurnIns'
 import { hasMergeRule, mergeModule } from '../src/shared/logArchive/mergeRules'
 import { MobLootIndex } from '../src/main/mobLookupParse'
-import type { ConsiderRow, ConsiderSnap, ItemTierRow, ItemTiersSnap, LootSnap, MobSeenDrop } from '../src/shared/types'
+import type { ClassUnlockSnap, ConsiderRow, ConsiderSnap, ItemTierRow, ItemTiersSnap, LootSnap, MobSeenDrop, TurnInSnap } from '../src/shared/types'
 
 interface Recorded {
   loot: LootSnap
   consider?: ConsiderSnap
   itemTiers: ItemTiersSnap
+  classUnlocks?: ClassUnlockSnap
+  turnins?: TurnInSnap
 }
 
 const fixture = (name: string): Recorded =>
@@ -217,8 +220,40 @@ test('item tiers: inputs are not changed, and a bad shape is not merged', () => 
   assert.equal(mergeItemTiers({ k: { key: 'k' } }, {}), null)
 })
 
+// ── 4.3 class unlocks and raw turn-ins ──────────────────────────────────────────────────────────
+
+test('split log: class unlocks of A merged with B equal the whole log, the repeated sighting in B left out', () => {
+  assert.deepEqual(mergeModule('classUnlocks', [LA.a.classUnlocks], LA.b.classUnlocks).state, LA.whole.classUnlocks)
+})
+
+test('split log: turn-ins of A merged with B equal the turn-ins of the whole log', () => {
+  assert.deepEqual(mergeModule('turnins', [LA.a.turnins], LA.b.turnins).state, LA.whole.turnins)
+})
+
+test('split log: la2 unlocks one class in both halves and trades in both', () => {
+  const a = (LA.a.classUnlocks ?? []).map((r) => r.className)
+  assert.ok((LA.b.classUnlocks ?? []).some((r) => a.includes(r.className)))
+  assert.ok((LA.a.turnins ?? []).length > 0 && (LA.b.turnins ?? []).length > 0)
+})
+
+test('class unlocks: the earliest sighting wins, case-folded, and a bad shape is not merged', () => {
+  const older = [{ ts: 1, className: 'Paladin' }]
+  const newer = [{ ts: 5, className: 'paladin' }, { ts: 6, className: 'Rogue' }]
+  assert.deepEqual(mergeClassUnlocks(older, newer), [{ ts: 1, className: 'Paladin' }, { ts: 6, className: 'Rogue' }])
+  assert.equal(older.length + newer.length, 3, 'inputs are not changed')
+  assert.equal(mergeClassUnlocks([{ ts: 1 }], []), null)
+  assert.equal(mergeClassUnlocks({}, []), null)
+})
+
+test('turn-ins: rows join older first', () => {
+  const a = { ts: 1, npc: 'A', items: ['x'] }
+  const b = { ts: 2, npc: 'B', items: ['y'] }
+  assert.deepEqual(mergeTurnIns([a], [b]), [a, b])
+  assert.equal(mergeTurnIns({}, []), null)
+})
+
 // ── the lookup ──────────────────────────────────────────────────────────────────────────────────
 
 test('lookup: the phase 4 modules have rules', () => {
-  assert.ok(hasMergeRule('consider') && hasMergeRule('itemTiers'))
+  for (const id of ['consider', 'itemTiers', 'classUnlocks', 'turnins']) assert.ok(hasMergeRule(id), id)
 })

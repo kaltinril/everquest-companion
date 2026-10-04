@@ -9,6 +9,7 @@ import { mergeItemTiers } from './mergeItemTiers'
 import { mergeKills } from './mergeKills'
 import { mergeLeveling } from './mergeLeveling'
 import { mergeLoot } from './mergeLoot'
+import { mergeClassUnlocks, mergeTurnIns } from './mergeUnlocksTurnIns'
 
 /** Older then newer, or null when the two cannot be merged (that segment is left out). */
 export type MergeRule = (older: unknown, newer: unknown) => unknown
@@ -18,7 +19,9 @@ export const MERGE_RULES: Readonly<Record<string, MergeRule>> = {
   loot: mergeLoot,
   leveling: mergeLeveling,
   consider: mergeConsider,
-  itemTiers: mergeItemTiers
+  itemTiers: mergeItemTiers,
+  classUnlocks: mergeClassUnlocks,
+  turnins: mergeTurnIns
 }
 
 export function hasMergeRule(moduleId: string): boolean {
