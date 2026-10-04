@@ -799,19 +799,20 @@ export type PlanScope = Pick<PlanInputs, 'classes' | 'role' | 'eraOnly' | 'survi
 /**
  * THE ROW'S SCORE IN EACH SLOT IT FITS, and the best of them (rule 12).
  *
- * Only the haste term can differ between two slots — it is credited against the haste you would
- * still own with THAT slot swapped out (`ownedHasteOutside`) — so a row that states no `HASTE` is
- * scored once and the number is shared. `best` is what a target is RANKED by: the slot where the
- * item is worth most is the slot you would wear it in.
+ * Two terms can differ between two slots: haste, credited against the haste you would still own
+ * with THAT slot swapped out (`ownedHasteOutside`), and the weapon ratio, read only in a weapon
+ * slot (`roleValue`'s `slot`). A row stating neither is scored once and the number is shared.
+ * `best` is what a target is RANKED by: the slot where the item is worth most is the slot you
+ * would wear it in.
  */
 function scoresOf(row: GearRow, scope: PlanScope, corpora: PlanCorpora): { best: number; bySlot: number[] } {
   const ctx = { classes: scope.classes, survivability: scope.survivability }
-  if (row.stats.HASTE === undefined || row.slots.length === 0) {
+  if ((row.stats.HASTE === undefined && row.stats.DMG === undefined) || row.slots.length === 0) {
     const one = roleValue(row.stats, scope.role, ctx)
     return { best: one, bySlot: row.slots.map(() => one) }
   }
   const bySlot = row.slots.map((slot) =>
-    roleValue(row.stats, scope.role, { ...ctx, ownedHaste: ownedHasteOutside(corpora.ownedHaste, slot) })
+    roleValue(row.stats, scope.role, { ...ctx, slot, ownedHaste: ownedHasteOutside(corpora.ownedHaste, slot) })
   )
   return { best: Math.max(...bySlot), bySlot }
 }

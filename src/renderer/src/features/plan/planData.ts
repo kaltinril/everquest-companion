@@ -283,7 +283,14 @@ export function usePlanRoute(
 ): PlanBracket[] {
   const { classes, role, reach, eraOnly, survivability } = picks
   const entries = list.entries
-  const wished = useMemo(() => new Set(entries.map((e) => e.itemKey)), [entries])
+  // A wish to WEAR is the statement rule 9 honours. A donor wish wants the item for an effect to
+  // melt into an exaltation (owner report, 2026-10-03: Drakescale Belt, wished for Extended
+  // Enhancement II, was routed over a far better worn belt), so it says nothing about the slot.
+  const wished = useMemo(() => {
+    const keys = new Set<string>()
+    for (const e of entries) if (e.kind === 'gear') keys.add(e.itemKey)
+    return keys
+  }, [entries])
   const pool = useMemo(
     () => candidatePool({ classes, role, eraOnly, survivability }, corpora),
     [classes, role, eraOnly, survivability, corpora]
@@ -358,10 +365,15 @@ export function usePlanWishes(): {
     },
     [add]
   )
+  // A target wished only as a donor reads unwished here, and the list keeps one wish per item: the
+  // add replaces the donor line with a wear one, which the Wish list tab can switch back.
   const toggle = useCallback(
     (target: GearTarget) => {
       if (target.wished) remove(target.key)
-      else add(wishFromGear(target, Date.now()))
+      else {
+        remove(target.key)
+        add(wishFromGear(target, Date.now()))
+      }
     },
     [add, remove]
   )

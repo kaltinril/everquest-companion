@@ -172,7 +172,7 @@ function barsOf(
   const ctx = { classes: scope.classes, survivability: scope.survivability }
   for (const { row, copies } of rows) {
     for (const slot of row.slots) {
-      const score = roleValue(row.stats, scope.role, { ...ctx, ownedHaste: ownedHasteOutside(haste, slot) })
+      const score = roleValue(row.stats, scope.role, { ...ctx, slot, ownedHaste: ownedHasteOutside(haste, slot) })
       const kept = [...(tops.get(slot) ?? []), ...Array<number>(Math.min(copies, 2)).fill(score)]
       tops.set(slot, kept.sort((a, b) => b - a).slice(0, 2))
     }
@@ -227,7 +227,7 @@ export function ownedUpgrades(
     let bestScore = -Infinity
     for (const slot of row.slots) {
       if (!policyAdmits(policy, slot, row)) continue
-      const score = roleValue(row.stats, scope.role, { ...ctx, ownedHaste: ownedHasteOutside(side.haste, slot) })
+      const score = roleValue(row.stats, scope.role, { ...ctx, slot, ownedHaste: ownedHasteOutside(side.haste, slot) })
       const bar = side.bars.get(slot)
       if (bar !== undefined && score <= bar) continue
       if (score > bestScore) {
