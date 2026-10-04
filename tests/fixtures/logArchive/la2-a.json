@@ -75,5 +75,51 @@
    "name": "Whitened Treant Fists",
    "tier": 1
   }
+ },
+ "progression": {
+  "aaGainAmount": [],
+  "aaGainTs": [],
+  "dropped": 0,
+  "expFlag": [],
+  "expPct": [],
+  "expTs": [],
+  "killCredit": [
+   0
+  ],
+  "killTs": [
+   1785549720000
+  ],
+  "killZone": [
+   0
+  ],
+  "lastTs": 1785549780000,
+  "levelTs": [],
+  "levelValue": [],
+  "lootTs": [
+   1785549725000,
+   1785549726000
+  ],
+  "offlineCamped": [],
+  "offlineEnd": [],
+  "offlineStart": [],
+  "recentKills": [
+   {
+    "credit": 0,
+    "name": "a large rat",
+    "ts": 1785549720000,
+    "zone": "West Freeport"
+   }
+  ],
+  "windowStart": 0,
+  "witnessTs": [],
+  "zoneEnd": [
+   0
+  ],
+  "zoneName": [
+   "West Freeport"
+  ],
+  "zoneStart": [
+   1785549600000
+  ]
  }
 }

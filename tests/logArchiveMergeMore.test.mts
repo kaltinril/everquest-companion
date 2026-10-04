@@ -7,11 +7,12 @@
 // fixture sets, each recorded once with the engine's own snapshot tool:
 //
 //   * `wl40-{a,b,whole}.json`: `tests/fixtures/wl40-farm-run.log` cut after line 470.
-//   * `la2-{a,b,whole}.json`: `tests/fixtures/logArchive/la2-history-run.log` cut after line 12. A
+//   * `la2-{a,b,whole}.json`: `tests/fixtures/logArchive/la2-history-run.log` cut after line 13. A
 //     small synthetic log, written for this test because no fixture log holds a class unlock and
-//     none cons the same mob on both sides of a cut. Its B half opens with a line no module reads:
-//     the engine does not ring a con on the very first line of a file, which is the engine's own
-//     behaviour and not a merge matter, so the cut keeps it out of the way.
+//     none cons the same mob on both sides of a cut. Both halves open with a line no module reads:
+//     the engine's fold does not take the very first line of a file into the consider ring or the
+//     zone timeline, which is the engine's own behaviour and not a merge matter, so the cut keeps it
+//     out of the way.
 //
 // To re-record: cut the log the same way into files named `eqlog_Primitive_freeport.<part>.txt`,
 // run `engine/target/release/parity.exe <file> --snapshots --tz UTC` on each, and keep the modules
@@ -23,12 +24,13 @@ import { readFileSync } from 'node:fs'
 import { CONSIDER_CAP, mergeConsider } from '../src/shared/logArchive/mergeConsider'
 import { mergeItemTiers } from '../src/shared/logArchive/mergeItemTiers'
 import { dropsFromLoot, mergeDropsSeen, withArchivedDrops } from '../src/shared/logArchive/mergeDropsSeen'
+import { mergeProgression } from '../src/shared/logArchive/mergeProgression'
 import { mergeRespawn } from '../src/shared/logArchive/mergeRespawn'
 import { mergeClassUnlocks, mergeTurnIns } from '../src/shared/logArchive/mergeUnlocksTurnIns'
 import { hasMergeRule, mergeModule } from '../src/shared/logArchive/mergeRules'
 import { MobLootIndex } from '../src/main/mobLookupParse'
 import { RESPAWN_MAX_GAPS, RESPAWN_MAX_RECENT, type RespawnCandidate, type RespawnRow, type RespawnSnap } from '../src/shared/respawn'
-import type { ClassUnlockSnap, ConsiderRow, ConsiderSnap, ItemTierRow, ItemTiersSnap, LootSnap, MobSeenDrop, TurnInSnap } from '../src/shared/types'
+import type { ClassUnlockSnap, ConsiderRow, ConsiderSnap, ItemTierRow, ItemTiersSnap, LootSnap, MobSeenDrop, ProgressionSnap, TurnInSnap } from '../src/shared/types'
 
 interface Recorded {
   loot: LootSnap
@@ -37,6 +39,7 @@ interface Recorded {
   classUnlocks?: ClassUnlockSnap
   turnins?: TurnInSnap
   respawn?: RespawnSnap
+  progression: ProgressionSnap
 }
 
 const fixture = (name: string): Recorded =>
@@ -335,8 +338,92 @@ test('respawn: inputs are not changed, and a different shape version is not merg
   assert.equal(mergeRespawn({ v: 4 }, newer), null)
 })
 
+// ── 4.5 progression ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * THE ONE SAMPLE ALLOWED TO DIFFER. Line 470, the last line of A, is `You gain experience!
+ * (2.650%)`. The parser holds an experience line until the next line arrives, so a log that ends
+ * on one never publishes it: A alone has no such sample, and the whole log has it at index 170.
+ * The same line is why the kills test above lets one credit go. A live log archived just after an
+ * experience line loses it the same way.
+ */
+function wholeProgressionAsSplitSeesIt(): ProgressionSnap {
+  const p = structuredClone(WL.whole.progression)
+  const at = p.expTs.indexOf(Date.UTC(2026, 7, 2, 16, 11, 12))
+  assert.equal(at, 170)
+  for (const col of [p.expTs, p.expPct, p.expFlag]) col.splice(at, 1)
+  return p
+}
+
+test('split log (wl40): progression of A merged with B equals the whole log, but for the held experience line', () => {
+  assert.deepEqual(mergeModule('progression', [WL.a.progression], WL.b.progression).state, wholeProgressionAsSplitSeesIt())
+})
+
+test("split log (la2): progression of A merged with B equals the whole log, a kill before B's first zone line included", () => {
+  assert.deepEqual(mergeModule('progression', [LA.a.progression], LA.b.progression).state, LA.whole.progression)
+})
+
+test('split log: the progression fixtures are split, and la2 carries a zone across the cut', () => {
+  assert.ok(WL.a.progression.killTs.length > 0 && WL.b.progression.killTs.length > 0)
+  assert.ok(WL.a.progression.expTs.length > 0 && WL.b.progression.expTs.length > 0)
+  assert.equal(LA.a.progression.zoneEnd.at(-1), 0, "A's last zone band is open")
+  assert.equal(LA.b.progression.killZone[0], -1, "B's first kill has no zone of its own")
+})
+
+function progression(over: Partial<ProgressionSnap>): ProgressionSnap {
+  const empty: ProgressionSnap = {
+    expTs: [], expPct: [], expFlag: [], killTs: [], killZone: [], killCredit: [], witnessTs: [], recentKills: [],
+    lootTs: [], zoneStart: [], zoneEnd: [], zoneName: [], offlineStart: [], offlineEnd: [], offlineCamped: [],
+    levelTs: [], levelValue: [], aaGainTs: [], aaGainAmount: [], lastTs: 0, windowStart: 0, dropped: 0
+  }
+  return { ...empty, ...over }
+}
+
+test("progression: live zone indexes move past the archive's, and the archive's open band closes at the live first zone", () => {
+  const older = progression({ zoneStart: [10, 20], zoneEnd: [20, 0], zoneName: ['A', 'B'], killTs: [15], killZone: [0], killCredit: [0] })
+  const newer = progression({ zoneStart: [50], zoneEnd: [0], zoneName: ['C'], killTs: [40, 60], killZone: [-1, 0], killCredit: [0, 1], lastTs: 60 })
+  const m = mergeProgression(older, newer)
+  assert.ok(m)
+  assert.deepEqual(m.zoneEnd, [20, 50, 0])
+  assert.deepEqual(m.killZone, [0, 1, 2], 'the kill before the live first zone line is in the zone the archive ended in')
+  assert.equal(m.lastTs, 60)
+})
+
+test('progression: a live side that dropped history carries no zone across, since -1 may mean an aged-out zone', () => {
+  const older = progression({ zoneStart: [10], zoneEnd: [0], zoneName: ['A'] })
+  const newer = progression({ killTs: [40], killZone: [-1], killCredit: [0], recentKills: [{ ts: 40, name: 'x', credit: 0, zone: '' }], windowStart: 30, dropped: 5 })
+  const m = mergeProgression(older, newer)
+  assert.deepEqual(m?.killZone, [-1])
+  assert.equal(m?.recentKills[0].zone, '')
+  assert.equal(m?.dropped, 5)
+  assert.equal(m?.windowStart, 30)
+})
+
+test("progression: the engine's caps apply to the joined columns, and the trim moves dropped and windowStart", () => {
+  const n = 20_000 + 1_024
+  const older = progression({ witnessTs: Array.from({ length: 1_024 }, (_, i) => i) })
+  const newer = progression({ witnessTs: Array.from({ length: n - 1_024 }, (_, i) => 1_024 + i) })
+  const m = mergeProgression(older, newer)
+  assert.equal(m?.witnessTs.length, 20_000)
+  assert.equal(m?.witnessTs[0], 1_024)
+  assert.equal(m?.dropped, 1_024)
+  assert.equal(m?.windowStart, 1_024)
+  const kills = Array.from({ length: 30 }, (_, i) => ({ ts: i, name: 'k', credit: 0, zone: 'z' }))
+  assert.equal(mergeProgression(progression({ recentKills: kills }), progression({ recentKills: kills }))?.recentKills.length, 50)
+})
+
+test('progression: inputs are not changed, and a bad shape is not merged', () => {
+  const older = progression({ zoneStart: [1], zoneEnd: [0], zoneName: ['A'], recentKills: [{ ts: 1, name: 'x', credit: 0, zone: '' }] })
+  const newer = progression({ zoneStart: [5], zoneEnd: [0], zoneName: ['B'], killTs: [3], killZone: [-1], killCredit: [0], recentKills: [{ ts: 3, name: 'y', credit: 0, zone: '' }] })
+  const before = JSON.stringify([older, newer])
+  mergeProgression(older, newer)
+  assert.equal(JSON.stringify([older, newer]), before)
+  assert.equal(mergeProgression({ ...older, expPct: [1] }, newer), null, 'columns of one group must line up')
+  assert.equal(mergeProgression([], newer), null)
+})
+
 // ── the lookup ──────────────────────────────────────────────────────────────────────────────────
 
 test('lookup: the phase 4 modules have rules', () => {
-  for (const id of ['consider', 'itemTiers', 'classUnlocks', 'turnins', 'respawn']) assert.ok(hasMergeRule(id), id)
+  for (const id of ['consider', 'itemTiers', 'classUnlocks', 'turnins', 'respawn', 'progression']) assert.ok(hasMergeRule(id), id)
 })

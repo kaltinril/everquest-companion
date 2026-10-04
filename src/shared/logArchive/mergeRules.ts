@@ -9,6 +9,7 @@ import { mergeItemTiers } from './mergeItemTiers'
 import { mergeKills } from './mergeKills'
 import { mergeLeveling } from './mergeLeveling'
 import { mergeLoot } from './mergeLoot'
+import { mergeProgression } from './mergeProgression'
 import { mergeRespawn } from './mergeRespawn'
 import { mergeClassUnlocks, mergeTurnIns } from './mergeUnlocksTurnIns'
 
@@ -23,7 +24,8 @@ export const MERGE_RULES: Readonly<Record<string, MergeRule>> = {
   itemTiers: mergeItemTiers,
   classUnlocks: mergeClassUnlocks,
   turnins: mergeTurnIns,
-  respawn: mergeRespawn
+  respawn: mergeRespawn,
+  progression: mergeProgression
 }
 
 export function hasMergeRule(moduleId: string): boolean {
