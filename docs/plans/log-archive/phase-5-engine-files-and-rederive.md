@@ -65,6 +65,44 @@ says needs the owner's agreement.
 
 Agreement (owner, 2026-10-04): build it. What is best for the player decides it.
 
+As built (2026-10-04), in `main/logArchive/engineBuckets.ts`:
+
+- **The bucket is read at the archive and written in at the next launch.** At that launch the
+  file no longer holds only the archived log: the engine keeps tailing after the move, adds the
+  fresh log's first lines to the same bucket and writes it back every minute. A copy taken then
+  would count those lines twice. So the rotation reads the character's bucket from both files
+  after the capture and before the move, and keeps it beside the segment as `<id>.buckets.json`.
+  Nothing is written into the engine's files during the session, because the engine rewrites its
+  whole store every minute. The next launch, after the interrupted-archive check and before the
+  session resolves the log, adds each sealed segment's buckets under `archive:<segment id>`.
+- **The read waits for the engine's own write.** A file written by an earlier attach can hold an
+  older log's lines under the same character. Before the capture, the rotation waits for the
+  engine to write either file, for at most 65 seconds. The engine writes on every 60th beat, and
+  the first write of an attach always lands. If neither file changes in that time, a write beat
+  has passed with nothing new, so the files already hold this attach's buckets. An archive can
+  therefore take up to a minute longer than before.
+- **Once per segment.** A key that is already in the file is not copied again.
+- **A second archive of one character in one run keeps nothing.** The attach that is still
+  running holds both logs' lines. A relaunch between the two archives avoids this.
+- **Put back (3.6):** a segment that is no longer sealed has its key taken out of both files at
+  the next launch, which the restore itself starts, and its stash is deleted. A segment whose
+  interrupted archive is still to be finished is left for the launch that seals it.
+- **Versions:** only resist ledger version 3 and message register version 2 are read or written.
+  A file of any other version, or one that does not parse, is left exactly as it is. Every write
+  is temp + fsync + rename.
+- **With the switch off** the launch step does nothing. Keys already added stay in the files,
+  and the resist card and the message register keep pooling them.
+- **What is missed:** what the engine learned after its last write and before the move, which is
+  under a minute. No line is counted twice.
+- **Call sites:** the rotation (`rotateNow`) and the launch check (`recoverLogArchiveAtLaunch`),
+  both in `main/logArchive/actions.ts`. The plan named one call site; the read at the archive is
+  the second, for the reason in the first bullet.
+- **Tests** (`tests/logArchiveBuckets.test.mts`, fixture files): the copy survives the engine
+  rewriting the file and holds only the archived share; a second launch does not copy again; an
+  unknown version is left alone at the archive and at launch; the switch off does nothing; an
+  unsealed segment waits; a restored segment is taken out; nothing is kept when the log was not
+  moved or for a second archive in one run; the wait ends at a write, or after its limit.
+
 ## Refreshing totals after a parser fix
 
 Today a parser fix corrects history by itself, because the next launch folds the whole log

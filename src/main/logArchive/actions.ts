@@ -18,6 +18,7 @@ import { driveOf, rotateBlockers } from '../../shared/logArchive/preflight'
 import type { Segment } from '../../shared/logArchive/segment'
 import { archiveName, backupLog, sweepTemp } from './backup'
 import { captureSegment, type CaptureDeps } from './capture'
+import { archiveBuckets, placeArchivedBuckets } from './engineBuckets'
 import { liveHistory, logArchiveDir } from './liveHistory'
 import { readLogPrefix } from './logPrefix'
 import { readJournal, recoverRotation, restoreLog, rotateLog, type RotateDeps } from './rotate'
@@ -212,10 +213,15 @@ export function rotateNow(): Promise<LogArchiveReply> {
     if (blockers.length > 0) return reply(false, blockers.join(' '))
     const a = attached()
     if (a === null) return reply(false, 'No character log is attached.')
+    // Step 5.2: resist and message history is read between the capture and the move (engineBuckets.ts).
+    const buckets = archiveBuckets(app.getPath('userData'), a.character)
+    await buckets.settle()
     const cap = await captureSegment(captureDeps)
     if (!cap.ok) return reply(false, `Not archived: ${cap.reason}. Nothing has changed.`)
     const dir = logArchiveDir()
+    buckets.take()
     const r = await rotateLog(a.logPath, dir, cap.segment, rotateDeps)
+    buckets.keep(dir, cap.segment.id, r.ok || r.logTouched)
     if (!r.ok) return reply(false, r.logTouched ? `Interrupted: ${r.reason}` : `Not archived: ${r.reason}`)
     liveHistory.noteSealedThisAttach(r.segment.id)
     const gap = r.segment.gapLines ?? 0
@@ -246,7 +252,7 @@ export function restoreNow(id: string): Promise<LogArchiveReply> {
   })
 }
 
-/** Step 3.4, at launch before the engine attaches. Never throws. */
+/** Steps 3.4 and 5.2, at launch before the engine attaches. Never throws. */
 export async function recoverLogArchiveAtLaunch(note: (line: string) => void): Promise<void> {
   try {
     const dir = logArchiveDir()
@@ -254,6 +260,14 @@ export async function recoverLogArchiveAtLaunch(note: (line: string) => void): P
     sweepTemp(dir)
     const done = await recoverRotation(dir, rotateDeps)
     if (done !== null) note(`log archive: ${done}`)
+    // Step 5.2, after any interrupted archive is sealed and before the engine is told where its files are.
+    placeArchivedBuckets({
+      on: logArchiveOn,
+      userData: app.getPath('userData'),
+      dir,
+      stateOf: (id) => (readJournal(dir)?.segmentId === id ? null : (rotateDeps.readSegment(dir, id)?.state ?? null)),
+      note
+    })
   } catch (err) {
     note(`log archive: launch check failed: ${(err as Error).message}`)
   }
