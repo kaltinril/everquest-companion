@@ -137,6 +137,14 @@ Until a module's step lands, that module shows what the live log holds, as it do
 - **Touches**: the combat drill-down in the renderer.
 - **After this step**: no dead end when a player clicks an archived fight.
 - **Should follow**: step 4.7. Without it there is nothing to open.
+- **As built** (2026-10-04): the meter body shows `ArchivedFightPane.tsx` for an archived
+  selection: the fight's name, zone, start, rate, total and length, and the line "This fight is
+  from an archived log, so only its summary is kept here. The full breakdown is in the archive
+  <file name>." The summary comes from the snapshot's `archivedSelected` (step 4.7), so a fight
+  picked from a search far outside the listed page opens the same way. Archived rows in the
+  picker, its closed trigger and search results say "archived" before their timing. The timeline
+  view is not offered for such a fight, as for any fight without an event ring. Rebuilding the
+  breakdown from the archive on demand (the idea recorded under ruling 0.4) is not built.
 
 ## When this phase is done
 

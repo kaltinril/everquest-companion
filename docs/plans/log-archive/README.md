@@ -155,8 +155,8 @@ Update this table in the same commit as the step it records.
 | 4.5 | done 2026-10-03: progression series, one named difference | dc987532 |
 | 4.6 | left out 2026-10-03: the snapshot holds summaries, not samples (see phase 4) | f57a4792 |
 | 4.7 | done 2026-10-04: fight summaries kept at capture and listed after the live fights | 4581690b |
-| 4.8 | done 2026-10-04: search reaches archived fights, pinned to the engine's own fixtures | this commit |
-| 4.9 | not started | |
+| 4.8 | done 2026-10-04: search reaches archived fights, pinned to the engine's own fixtures | 4c05f5a3 |
+| 4.9 | done 2026-10-04: an archived fight opens to its summary and names its archive | this commit |
 | 5.1 | answered 2026-10-03: yes, with conditions | |
 | 5.3 | done with the panel (version shown, older builds marked) | |
 | 5.2, 5.4, 5.5 | not started | |

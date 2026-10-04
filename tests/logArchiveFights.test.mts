@@ -23,6 +23,7 @@ import {
   withArchivedFights
 } from '../src/shared/logArchive/mergeFights'
 import { fightScopeOptions } from '../src/renderer/src/features/combat/dashboardData'
+import { hitRow, rowTiming } from '../src/renderer/src/features/combat/fightPickerRows'
 import { parseSegment, SEGMENT_VERSION, type Segment, type SegmentLog } from '../src/shared/logArchive/segment'
 
 const sha = (s: string): string => createHash('sha256').update(s).digest('hex')
@@ -242,4 +243,12 @@ test('picker: the pinned head row is the live log’s, never an archived fight',
   const b = fightScopeOptions(fresh.segments)
   assert.equal(b.head, null, 'a fresh log has no last fight, whatever the archive holds')
   assert.deepEqual(b.rest.map((o) => o.value), ['arch:seg-a:e2', 'arch:seg-a:e1'])
+})
+
+test('picker: an archived row says so before its timing, in the list, the trigger and a search hit', () => {
+  const [opt] = fightScopeOptions(withArchivedFights(snapshot([ZONE_ROW]), ROWS, { archived: true }).segments).rest
+  assert.match(rowTiming(opt, 'fight', Date.now()), /^archived · /)
+  assert.match(hitRow({ summary: ROWS[0], score: 1 }).timing, /^archived · /)
+  const live = fight('e3', 'a bat', 5000)
+  assert.doesNotMatch(hitRow({ summary: live, score: 1 }).timing, /archived/)
 })
