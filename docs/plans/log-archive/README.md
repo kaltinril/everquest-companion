@@ -145,7 +145,7 @@ Update this table in the same commit as the step it records.
 | 0.1 to 0.3 | ruled 2026-10-03 (0.2 provisional) | |
 | 0.4 | not yet ruled; needed only by phase 4's fight steps | |
 | 0.5 | measured 2026-10-03: the log can be moved while the game runs | |
-| 1.0 to 1.7 | not started | |
+| 1.0 to 1.7 | done 2026-10-03: inert, gate green | this commit |
 | 2.1 to 2.5 | not started | |
 | 3.1 to 3.7 | not started | |
 | 4.1 to 4.9 | not started | |

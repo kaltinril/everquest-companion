@@ -26,7 +26,7 @@ archive exists), `sealed` (may be shown as history). Only `sealed` segments are 
 
 ## When a sealed segment is shown
 
-All four must hold. This rule is the whole defence against counting anything twice.
+All five must hold. This rule is the whole defence against counting anything twice.
 
 1. The segment belongs to the character that is attached.
 2. The live log does not begin with the segment: the head fingerprints differ.
@@ -34,6 +34,10 @@ All four must hold. This rule is the whole defence against counting anything twi
    fingerprints differ, the two may overlap: the segment is held back and the player is told.
 4. The segment was not sealed during the current engine attach, because the engine's memory
    still holds those lines until it next folds the log.
+5. No other shown segment already holds the same lines. Two captures of one log, taken at
+   different times, share a head fingerprint; only the longer is shown. Two segments that overlap
+   in time without sharing a head (a log edited by hand) show the earlier, and the later is held
+   back with the reason. Added while building step 1.2.
 
 ## Steps
 
@@ -62,7 +66,7 @@ All four must hold. This rule is the whole defence against counting anything twi
 
 ### 1.2 The eligibility rule
 
-- **Does**: the four-part rule above as one pure function. Inputs: the segments, the attached
+- **Does**: the five-part rule above as one pure function. Inputs: the segments, the attached
   character, the live log's head fingerprint and first line time, and the set sealed during this
   attach. Output: the segments to show, and for each one held back, the reason.
 - **Touches**: one new file in `src/shared/`.

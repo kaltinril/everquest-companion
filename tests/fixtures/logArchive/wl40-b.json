@@ -1,0 +1,1548 @@
+{
+ "kills": {
+  "mobs": {
+   "a basalt gargoyle": {
+    "bestTier": -1,
+    "count": 3,
+    "credited": 3,
+    "display": "a basalt gargoyle",
+    "firstTs": 1785689653000,
+    "lastTs": 1785689705000,
+    "tiers": {
+     "-1": {
+      "count": 3,
+      "credited": 3,
+      "firstTs": 1785689653000,
+      "lastCreditedTs": 1785689705000,
+      "lastTs": 1785689705000
+     }
+    }
+   },
+   "a deadly black widow": {
+    "bestTier": -1,
+    "count": 8,
+    "credited": 8,
+    "display": "a deadly black widow",
+    "firstTs": 1785689471000,
+    "lastTs": 1785689602000,
+    "tiers": {
+     "-1": {
+      "count": 8,
+      "credited": 8,
+      "firstTs": 1785689471000,
+      "lastCreditedTs": 1785689602000,
+      "lastTs": 1785689602000
+     }
+    }
+   },
+   "a froglok gaz knight": {
+    "bestTier": -1,
+    "count": 1,
+    "credited": 0,
+    "display": "A froglok gaz knight",
+    "firstTs": 1785688890000,
+    "lastTs": 1785688890000,
+    "tiers": {
+     "-1": {
+      "count": 1,
+      "credited": 0,
+      "firstTs": 1785688890000,
+      "lastCreditedTs": 0,
+      "lastTs": 1785688890000
+     }
+    }
+   },
+   "a froglok vis knight": {
+    "bestTier": -1,
+    "count": 1,
+    "credited": 0,
+    "display": "A froglok vis knight",
+    "firstTs": 1785689003000,
+    "lastTs": 1785689003000,
+    "tiers": {
+     "-1": {
+      "count": 1,
+      "credited": 0,
+      "firstTs": 1785689003000,
+      "lastCreditedTs": 0,
+      "lastTs": 1785689003000
+     }
+    }
+   },
+   "a ghoul assassin": {
+    "bestTier": -1,
+    "count": 1,
+    "credited": 1,
+    "display": "a ghoul assassin",
+    "firstTs": 1785690050000,
+    "lastTs": 1785690050000,
+    "tiers": {
+     "-1": {
+      "count": 1,
+      "credited": 1,
+      "firstTs": 1785690050000,
+      "lastCreditedTs": 1785690050000,
+      "lastTs": 1785690050000
+     }
+    }
+   },
+   "a ghoul executioner": {
+    "bestTier": -1,
+    "count": 2,
+    "credited": 2,
+    "display": "a ghoul executioner",
+    "firstTs": 1785690471000,
+    "lastTs": 1785691325000,
+    "tiers": {
+     "-1": {
+      "count": 2,
+      "credited": 2,
+      "firstTs": 1785690471000,
+      "lastCreditedTs": 1785691325000,
+      "lastTs": 1785691325000
+     }
+    }
+   },
+   "a ghoul ritualist": {
+    "bestTier": -1,
+    "count": 1,
+    "credited": 1,
+    "display": "a ghoul ritualist",
+    "firstTs": 1785689905000,
+    "lastTs": 1785689905000,
+    "tiers": {
+     "-1": {
+      "count": 1,
+      "credited": 1,
+      "firstTs": 1785689905000,
+      "lastCreditedTs": 1785689905000,
+      "lastTs": 1785689905000
+     }
+    }
+   },
+   "a ghoul savant": {
+    "bestTier": -1,
+    "count": 2,
+    "credited": 2,
+    "display": "a ghoul savant",
+    "firstTs": 1785690259000,
+    "lastTs": 1785691189000,
+    "tiers": {
+     "-1": {
+      "count": 2,
+      "credited": 2,
+      "firstTs": 1785690259000,
+      "lastCreditedTs": 1785691189000,
+      "lastTs": 1785691189000
+     }
+    }
+   },
+   "a ghoul supplier": {
+    "bestTier": -1,
+    "count": 1,
+    "credited": 1,
+    "display": "a ghoul supplier",
+    "firstTs": 1785690030000,
+    "lastTs": 1785690030000,
+    "tiers": {
+     "-1": {
+      "count": 1,
+      "credited": 1,
+      "firstTs": 1785690030000,
+      "lastCreditedTs": 1785690030000,
+      "lastTs": 1785690030000
+     }
+    }
+   },
+   "a kor ghoul wizard": {
+    "bestTier": -1,
+    "count": 2,
+    "credited": 2,
+    "display": "a kor ghoul wizard",
+    "firstTs": 1785690612000,
+    "lastTs": 1785691724000,
+    "tiers": {
+     "-1": {
+      "count": 2,
+      "credited": 2,
+      "firstTs": 1785690612000,
+      "lastCreditedTs": 1785691724000,
+      "lastTs": 1785691724000
+     }
+    }
+   },
+   "a shadowknight": {
+    "bestTier": -2,
+    "count": 2,
+    "credited": 2,
+    "display": "a shadowknight",
+    "firstTs": 1785687335000,
+    "lastTs": 1785688108000,
+    "tiers": {
+     "-2": {
+      "count": 2,
+      "credited": 2,
+      "firstTs": 1785687335000,
+      "lastCreditedTs": 1785688108000,
+      "lastTs": 1785688108000
+     }
+    }
+   },
+   "a shadowknight pet": {
+    "bestTier": -2,
+    "count": 1,
+    "credited": 0,
+    "display": "a shadowknight pet",
+    "firstTs": 1785688099000,
+    "lastTs": 1785688099000,
+    "tiers": {
+     "-2": {
+      "count": 1,
+      "credited": 0,
+      "firstTs": 1785688099000,
+      "lastCreditedTs": 0,
+      "lastTs": 1785688099000
+     }
+    }
+   },
+   "a shin ghoul knight": {
+    "bestTier": -1,
+    "count": 11,
+    "credited": 10,
+    "display": "A shin ghoul knight",
+    "firstTs": 1785688985000,
+    "lastTs": 1785689313000,
+    "tiers": {
+     "-1": {
+      "count": 11,
+      "credited": 10,
+      "firstTs": 1785688985000,
+      "lastCreditedTs": 1785689313000,
+      "lastTs": 1785689313000
+     }
+    }
+   },
+   "a tal ghoul wizard": {
+    "bestTier": -1,
+    "count": 2,
+    "credited": 2,
+    "display": "a tal ghoul wizard",
+    "firstTs": 1785689893000,
+    "lastTs": 1785689920000,
+    "tiers": {
+     "-1": {
+      "count": 2,
+      "credited": 2,
+      "firstTs": 1785689893000,
+      "lastCreditedTs": 1785689920000,
+      "lastTs": 1785689920000
+     }
+    }
+   },
+   "a teir`dal priest": {
+    "bestTier": -2,
+    "count": 1,
+    "credited": 1,
+    "display": "a Teir`Dal priest",
+    "firstTs": 1785688337000,
+    "lastTs": 1785688337000,
+    "tiers": {
+     "-2": {
+      "count": 1,
+      "credited": 1,
+      "firstTs": 1785688337000,
+      "lastCreditedTs": 1785688337000,
+      "lastTs": 1785688337000
+     }
+    }
+   },
+   "a teir`dal priestess": {
+    "bestTier": -2,
+    "count": 2,
+    "credited": 2,
+    "display": "a Teir`Dal priestess",
+    "firstTs": 1785688160000,
+    "lastTs": 1785688296000,
+    "tiers": {
+     "-2": {
+      "count": 2,
+      "credited": 2,
+      "firstTs": 1785688160000,
+      "lastCreditedTs": 1785688296000,
+      "lastTs": 1785688296000
+     }
+    }
+   },
+   "a teir`dal ranger": {
+    "bestTier": -2,
+    "count": 13,
+    "credited": 13,
+    "display": "a Teir`Dal ranger",
+    "firstTs": 1785687144000,
+    "lastTs": 1785688315000,
+    "tiers": {
+     "-2": {
+      "count": 13,
+      "credited": 13,
+      "firstTs": 1785687144000,
+      "lastCreditedTs": 1785688315000,
+      "lastTs": 1785688315000
+     }
+    }
+   },
+   "a teir`dal rogue": {
+    "bestTier": -2,
+    "count": 6,
+    "credited": 6,
+    "display": "a Teir`Dal rogue",
+    "firstTs": 1785687098000,
+    "lastTs": 1785688178000,
+    "tiers": {
+     "-2": {
+      "count": 6,
+      "credited": 6,
+      "firstTs": 1785687098000,
+      "lastCreditedTs": 1785688178000,
+      "lastTs": 1785688178000
+     }
+    }
+   },
+   "a teir`dal shadowknight": {
+    "bestTier": -2,
+    "count": 14,
+    "credited": 13,
+    "display": "a Teir`Dal shadowknight",
+    "firstTs": 1785687072000,
+    "lastTs": 1785688328000,
+    "tiers": {
+     "-2": {
+      "count": 14,
+      "credited": 13,
+      "firstTs": 1785687072000,
+      "lastCreditedTs": 1785688328000,
+      "lastTs": 1785688328000
+     }
+    }
+   },
+   "a vampire bat": {
+    "bestTier": -1,
+    "count": 5,
+    "credited": 5,
+    "display": "a vampire bat",
+    "firstTs": 1785689322000,
+    "lastTs": 1785689552000,
+    "tiers": {
+     "-1": {
+      "count": 5,
+      "credited": 5,
+      "firstTs": 1785689322000,
+      "lastCreditedTs": 1785689552000,
+      "lastTs": 1785689552000
+     }
+    }
+   },
+   "a vis ghoul knight": {
+    "bestTier": -1,
+    "count": 8,
+    "credited": 8,
+    "display": "a vis ghoul knight",
+    "firstTs": 1785689177000,
+    "lastTs": 1785691930000,
+    "tiers": {
+     "-1": {
+      "count": 8,
+      "credited": 8,
+      "firstTs": 1785689177000,
+      "lastCreditedTs": 1785691930000,
+      "lastTs": 1785691930000
+     }
+    }
+   },
+   "a wan ghoul knight": {
+    "bestTier": -1,
+    "count": 35,
+    "credited": 35,
+    "display": "a wan ghoul knight",
+    "firstTs": 1785689989000,
+    "lastTs": 1785691951000,
+    "tiers": {
+     "-1": {
+      "count": 35,
+      "credited": 35,
+      "firstTs": 1785689989000,
+      "lastCreditedTs": 1785691951000,
+      "lastTs": 1785691951000
+     }
+    }
+   },
+   "a yun ghoul wizard": {
+    "bestTier": -1,
+    "count": 4,
+    "credited": 4,
+    "display": "a yun ghoul wizard",
+    "firstTs": 1785691038000,
+    "lastTs": 1785691898000,
+    "tiers": {
+     "-1": {
+      "count": 4,
+      "credited": 4,
+      "firstTs": 1785691038000,
+      "lastCreditedTs": 1785691898000,
+      "lastTs": 1785691898000
+     }
+    }
+   },
+   "a zol ghoul knight": {
+    "bestTier": -1,
+    "count": 19,
+    "credited": 19,
+    "display": "a zol ghoul knight",
+    "firstTs": 1785690370000,
+    "lastTs": 1785691883000,
+    "tiers": {
+     "-1": {
+      "count": 19,
+      "credited": 19,
+      "firstTs": 1785690370000,
+      "lastCreditedTs": 1785691883000,
+      "lastTs": 1785691883000
+     }
+    }
+   },
+   "an urd ghoul wizard": {
+    "bestTier": -1,
+    "count": 4,
+    "credited": 4,
+    "display": "an urd ghoul wizard",
+    "firstTs": 1785690181000,
+    "lastTs": 1785691962000,
+    "tiers": {
+     "-1": {
+      "count": 4,
+      "credited": 4,
+      "firstTs": 1785690181000,
+      "lastCreditedTs": 1785691962000,
+      "lastTs": 1785691962000
+     }
+    }
+   },
+   "baron telyx v`zher": {
+    "bestTier": -2,
+    "count": 2,
+    "credited": 2,
+    "display": "Baron Telyx V`Zher",
+    "firstTs": 1785687176000,
+    "lastTs": 1785688208000,
+    "tiers": {
+     "-2": {
+      "count": 2,
+      "credited": 2,
+      "firstTs": 1785687176000,
+      "lastCreditedTs": 1785688208000,
+      "lastTs": 1785688208000
+     }
+    }
+   },
+   "kahaptra z`taj": {
+    "bestTier": -2,
+    "count": 1,
+    "credited": 1,
+    "display": "Kahaptra Z`Taj",
+    "firstTs": 1785687736000,
+    "lastTs": 1785687736000,
+    "tiers": {
+     "-2": {
+      "count": 1,
+      "credited": 1,
+      "firstTs": 1785687736000,
+      "lastCreditedTs": 1785687736000,
+      "lastTs": 1785687736000
+     }
+    }
+   },
+   "knight v`tal": {
+    "bestTier": -2,
+    "count": 2,
+    "credited": 2,
+    "display": "Knight V`Tal",
+    "firstTs": 1785687357000,
+    "lastTs": 1785688118000,
+    "tiers": {
+     "-2": {
+      "count": 2,
+      "credited": 2,
+      "firstTs": 1785687357000,
+      "lastCreditedTs": 1785688118000,
+      "lastTs": 1785688118000
+     }
+    }
+   },
+   "korven nisere": {
+    "bestTier": -2,
+    "count": 2,
+    "credited": 2,
+    "display": "Korven Nisere",
+    "firstTs": 1785687204000,
+    "lastTs": 1785688281000,
+    "tiers": {
+     "-2": {
+      "count": 2,
+      "credited": 2,
+      "firstTs": 1785687204000,
+      "lastCreditedTs": 1785688281000,
+      "lastTs": 1785688281000
+     }
+    }
+   },
+   "soldier of v`zher": {
+    "bestTier": -2,
+    "count": 2,
+    "credited": 2,
+    "display": "Soldier of V`Zher",
+    "firstTs": 1785687189000,
+    "lastTs": 1785688193000,
+    "tiers": {
+     "-2": {
+      "count": 2,
+      "credited": 2,
+      "firstTs": 1785687189000,
+      "lastCreditedTs": 1785688193000,
+      "lastTs": 1785688193000
+     }
+    }
+   }
+  },
+  "v": 5
+ },
+ "loot": [
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Rapier",
+   "source": "a Teir`Dal shadowknight",
+   "ts": 1785687072000
+  },
+  {
+   "item": "Mote of Infinitesimal Potential",
+   "source": "a Teir`Dal rogue",
+   "ts": 1785687098000
+  },
+  {
+   "item": "Mote of Infinitesimal Potential",
+   "source": "a Teir`Dal shadowknight",
+   "ts": 1785687109000
+  },
+  {
+   "disposition": "sold",
+   "item": "Ringmail Gloves",
+   "source": "a Teir`Dal rogue",
+   "ts": 1785687138000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Rapier",
+   "source": "a Teir`Dal ranger",
+   "ts": 1785687145000
+  },
+  {
+   "disposition": "sold",
+   "item": "Pristine Studded Leather Tunic",
+   "source": "Baron Telyx V`Zher",
+   "ts": 1785687177000
+  },
+  {
+   "disposition": "sold",
+   "item": "Pristine Studded Leather Leggings +1",
+   "source": "Soldier of V`Zher",
+   "ts": 1785687189000
+  },
+  {
+   "created": "Shimmering Ruby Stiletto +2",
+   "disposition": "combined",
+   "item": "Shimmering Ruby Stiletto +1",
+   "source": "Korven Nisere",
+   "ts": 1785687204000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Long Sword",
+   "source": "a Teir`Dal shadowknight",
+   "ts": 1785687215000
+  },
+  {
+   "disposition": "sold",
+   "item": "Splintered Wooden Key",
+   "source": "a shadowknight",
+   "ts": 1785687335000
+  },
+  {
+   "disposition": "sold",
+   "item": "Charred Bone Key",
+   "source": "a shadowknight",
+   "ts": 1785687335000
+  },
+  {
+   "disposition": "sold",
+   "item": "Smoked Glass Key",
+   "source": "a shadowknight",
+   "ts": 1785687335000
+  },
+  {
+   "disposition": "sold",
+   "item": "Barbed Legplates",
+   "source": "a shadowknight",
+   "ts": 1785687335000
+  },
+  {
+   "disposition": "sold",
+   "item": "Dark Elf Parts",
+   "source": "a shadowknight",
+   "ts": 1785687335000
+  },
+  {
+   "disposition": "sold",
+   "item": "Enchanted Fine Steel Long Sword",
+   "source": "Knight V`Tal",
+   "ts": 1785687357000
+  },
+  {
+   "item": "Mote of Infinitesimal Potential",
+   "source": "a Teir`Dal ranger",
+   "ts": 1785687374000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Scimitar",
+   "source": "a Teir`Dal rogue",
+   "ts": 1785687389000
+  },
+  {
+   "item": "Mote of Infinitesimal Potential",
+   "source": "a Teir`Dal ranger",
+   "ts": 1785687401000
+  },
+  {
+   "item": "Mote of Lesser Potential",
+   "source": "a Teir`Dal ranger",
+   "ts": 1785687437000
+  },
+  {
+   "created": "Golem Metal Wand +3",
+   "disposition": "combined",
+   "item": "Golem Metal Wand +1",
+   "source": "Kahaptra Z`Taj",
+   "ts": 1785687736000
+  },
+  {
+   "item": "Mote of Infinitesimal Potential",
+   "source": "Kahaptra Z`Taj",
+   "ts": 1785687736000
+  },
+  {
+   "disposition": "sold",
+   "item": "Splintered Wooden Key",
+   "source": "a shadowknight",
+   "ts": 1785688108000
+  },
+  {
+   "disposition": "sold",
+   "item": "Charred Bone Key",
+   "source": "a shadowknight",
+   "ts": 1785688108000
+  },
+  {
+   "disposition": "sold",
+   "item": "Smoked Glass Key",
+   "source": "a shadowknight",
+   "ts": 1785688108000
+  },
+  {
+   "disposition": "sold",
+   "item": "Barbed Legplates",
+   "source": "a shadowknight",
+   "ts": 1785688108000
+  },
+  {
+   "disposition": "sold",
+   "item": "Dark Elf Parts",
+   "source": "a shadowknight",
+   "ts": 1785688108000
+  },
+  {
+   "disposition": "sold",
+   "item": "Enchanted Fine Steel Long Sword",
+   "source": "Knight V`Tal",
+   "ts": 1785688118000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Short Sword",
+   "source": "a Teir`Dal ranger",
+   "ts": 1785688149000
+  },
+  {
+   "disposition": "sold",
+   "item": "Ringmail Coat",
+   "source": "a Teir`Dal ranger",
+   "ts": 1785688170000
+  },
+  {
+   "disposition": "sold",
+   "item": "Ringmail Neckguard",
+   "source": "a Teir`Dal rogue",
+   "ts": 1785688183000
+  },
+  {
+   "disposition": "sold",
+   "item": "Pristine Studded Leather Leggings",
+   "source": "Soldier of V`Zher",
+   "ts": 1785688193000
+  },
+  {
+   "disposition": "sold",
+   "item": "Pristine Studded Leather Tunic",
+   "source": "Baron Telyx V`Zher",
+   "ts": 1785688209000
+  },
+  {
+   "disposition": "sold",
+   "item": "Enchanted Fine Steel Rapier +1",
+   "source": "Korven Nisere",
+   "ts": 1785688281000
+  },
+  {
+   "disposition": "sold",
+   "item": "Ringmail Gloves",
+   "source": "a Teir`Dal priestess",
+   "ts": 1785688296000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Two Handed Sword",
+   "source": "a Teir`Dal ranger",
+   "ts": 1785688315000
+  },
+  {
+   "item": "Mote of Minor Potential",
+   "source": "a vis ghoul knight",
+   "ts": 1785689177000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Undead Froglok Tongue",
+   "source": "a shin ghoul knight",
+   "ts": 1785689182000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Shin Greaves",
+   "source": "a shin ghoul knight",
+   "ts": 1785689182000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Pearl Earring",
+   "source": "a shin ghoul knight",
+   "ts": 1785689186000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Undead Froglok Tongue",
+   "source": "a shin ghoul knight",
+   "ts": 1785689232000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Long Sword",
+   "source": "a shin ghoul knight",
+   "ts": 1785689245000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Undead Froglok Tongue",
+   "source": "a shin ghoul knight",
+   "ts": 1785689266000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Undead Froglok Tongue",
+   "source": "a shin ghoul knight",
+   "ts": 1785689286000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "item": "Mote of Infinitesimal Potential",
+   "source": "a shin ghoul knight",
+   "ts": 1785689303000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Spider Venom Sac",
+   "source": "a deadly black widow",
+   "ts": 1785689480000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Spider Silk",
+   "source": "a deadly black widow",
+   "ts": 1785689480000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Ivory",
+   "source": "a deadly black widow",
+   "ts": 1785689480000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Spider Silk",
+   "source": "a deadly black widow",
+   "ts": 1785689490000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Spider Venom Sac",
+   "source": "a deadly black widow",
+   "ts": 1785689490000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Jade Earring",
+   "source": "a deadly black widow",
+   "ts": 1785689490000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Spider Legs",
+   "source": "a deadly black widow",
+   "ts": 1785689490000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 2,
+   "disposition": "sold",
+   "item": "Spider Silk",
+   "source": "a deadly black widow",
+   "ts": 1785689504000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Spider Venom Sac",
+   "source": "a deadly black widow",
+   "ts": 1785689514000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Spider Silk",
+   "source": "a deadly black widow",
+   "ts": 1785689514000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Jade",
+   "source": "a deadly black widow",
+   "ts": 1785689529000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Spider Legs",
+   "source": "a deadly black widow",
+   "ts": 1785689529000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 2,
+   "disposition": "sold",
+   "item": "Spider Silk",
+   "source": "a deadly black widow",
+   "ts": 1785689574000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 3,
+   "disposition": "sold",
+   "item": "Spider Silk",
+   "source": "a deadly black widow",
+   "ts": 1785689602000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Spider Venom Sac",
+   "source": "a deadly black widow",
+   "ts": 1785689602000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Gargoyle Eye",
+   "source": "a basalt gargoyle",
+   "ts": 1785689653000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Basalt Carapace",
+   "source": "a basalt gargoyle",
+   "ts": 1785689674000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 2,
+   "disposition": "sold",
+   "item": "Phosphorous Powder",
+   "source": "a ghoul ritualist",
+   "ts": 1785689905000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "item": "Mote of Infinitesimal Potential",
+   "source": "a ghoul ritualist",
+   "ts": 1785689905000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Embroidered Black Cape",
+   "source": "a ghoul ritualist",
+   "ts": 1785689974000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "item": "Mote of Infinitesimal Potential",
+   "source": "a wan ghoul knight",
+   "ts": 1785689989000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Rapier",
+   "source": "a vis ghoul knight",
+   "ts": 1785690001000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Undead Froglok Tongue",
+   "source": "a ghoul supplier",
+   "ts": 1785690030000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "item": "Light Burlap Sack",
+   "source": "a ghoul supplier",
+   "ts": 1785690040000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "created": "Guise of the Deceiver +1",
+   "disposition": "combined",
+   "item": "Guise of the Deceiver",
+   "source": "a ghoul assassin",
+   "ts": 1785690055000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Undead Froglok Tongue",
+   "source": "a wan ghoul knight",
+   "ts": 1785690058000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Morning Star",
+   "source": "a wan ghoul knight",
+   "ts": 1785690132000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Undead Froglok Tongue",
+   "source": "an urd ghoul wizard",
+   "ts": 1785690181000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 2,
+   "disposition": "sold",
+   "item": "Phosphorous Powder",
+   "source": "a ghoul savant",
+   "ts": 1785690259000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "item": "Mote of Infinitesimal Potential",
+   "source": "a ghoul savant",
+   "ts": 1785690259000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Enameled Black Mace",
+   "source": "a ghoul savant",
+   "ts": 1785690266000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Morning Star",
+   "source": "a zol ghoul knight",
+   "ts": 1785690370000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Undead Froglok Tongue",
+   "source": "a zol ghoul knight",
+   "ts": 1785690370000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Undead Froglok Tongue",
+   "source": "a wan ghoul knight",
+   "ts": 1785690433000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Executioner's Axe",
+   "source": "a ghoul executioner",
+   "ts": 1785690475000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Topaz",
+   "source": "a wan ghoul knight",
+   "ts": 1785690492000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Undead Froglok Tongue",
+   "source": "a wan ghoul knight",
+   "ts": 1785690492000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Long Sword",
+   "source": "a wan ghoul knight",
+   "ts": 1785690516000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Rapier",
+   "source": "a wan ghoul knight",
+   "ts": 1785690528000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Mithril Earring",
+   "source": "a wan ghoul knight",
+   "ts": 1785690584000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Pearl",
+   "source": "a kor ghoul wizard",
+   "ts": 1785690613000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 2,
+   "disposition": "sold",
+   "item": "Phosphorous Powder",
+   "source": "a kor ghoul wizard",
+   "ts": 1785690613000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Undead Froglok Tongue",
+   "source": "a wan ghoul knight",
+   "ts": 1785690647000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Flame Agate",
+   "source": "a wan ghoul knight",
+   "ts": 1785690751000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 2,
+   "disposition": "sold",
+   "item": "Phosphorous Powder",
+   "source": "a zol ghoul knight",
+   "ts": 1785690779000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Undead Froglok Tongue",
+   "source": "a zol ghoul knight",
+   "ts": 1785690851000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 2,
+   "disposition": "sold",
+   "item": "Phosphorous Powder",
+   "source": "a zol ghoul knight",
+   "ts": 1785690866000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Jade Earring +1",
+   "source": "a zol ghoul knight",
+   "ts": 1785690884000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 2,
+   "disposition": "sold",
+   "item": "Phosphorous Powder",
+   "source": "a zol ghoul knight",
+   "ts": 1785690884000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Mithril Earring",
+   "source": "a zol ghoul knight",
+   "ts": 1785690912000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 2,
+   "disposition": "sold",
+   "item": "Phosphorous Powder",
+   "source": "a zol ghoul knight",
+   "ts": 1785690923000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Pearl",
+   "source": "a wan ghoul knight",
+   "ts": 1785690985000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Warhammer",
+   "source": "a wan ghoul knight",
+   "ts": 1785691015000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Ivory",
+   "source": "a wan ghoul knight",
+   "ts": 1785691015000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Spear",
+   "source": "a yun ghoul wizard",
+   "ts": 1785691038000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Undead Froglok Tongue",
+   "source": "a yun ghoul wizard",
+   "ts": 1785691038000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 2,
+   "disposition": "sold",
+   "item": "Phosphorous Powder",
+   "source": "a yun ghoul wizard",
+   "ts": 1785691038000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Scimitar",
+   "source": "a wan ghoul knight",
+   "ts": 1785691121000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Undead Froglok Tongue",
+   "source": "a ghoul savant",
+   "ts": 1785691189000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Enameled Black Chestplate",
+   "source": "a ghoul savant",
+   "ts": 1785691197000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 2,
+   "disposition": "sold",
+   "item": "Phosphorous Powder",
+   "source": "a zol ghoul knight",
+   "ts": 1785691240000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Morning Star",
+   "source": "a wan ghoul knight",
+   "ts": 1785691267000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Executioner's Axe",
+   "source": "a ghoul executioner",
+   "ts": 1785691325000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 2,
+   "disposition": "sold",
+   "item": "Phosphorous Powder",
+   "source": "a ghoul executioner",
+   "ts": 1785691325000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Undead Froglok Tongue",
+   "source": "a zol ghoul knight",
+   "ts": 1785691380000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Jade",
+   "source": "a yun ghoul wizard",
+   "ts": 1785691391000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Ivory",
+   "source": "a yun ghoul wizard",
+   "ts": 1785691391000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Undead Froglok Tongue",
+   "source": "a yun ghoul wizard",
+   "ts": 1785691391000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 2,
+   "disposition": "sold",
+   "item": "Phosphorous Powder",
+   "source": "a yun ghoul wizard",
+   "ts": 1785691391000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Jade",
+   "source": "a wan ghoul knight",
+   "ts": 1785691413000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Flawless Aquamarine",
+   "source": "a vis ghoul knight",
+   "ts": 1785691434000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 2,
+   "disposition": "sold",
+   "item": "Phosphorous Powder",
+   "source": "a yun ghoul wizard",
+   "ts": 1785691453000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 2,
+   "disposition": "sold",
+   "item": "Phosphorous Powder",
+   "source": "a zol ghoul knight",
+   "ts": 1785691481000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Dagger",
+   "source": "a wan ghoul knight",
+   "ts": 1785691515000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Undead Froglok Tongue",
+   "source": "a wan ghoul knight",
+   "ts": 1785691515000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Undead Froglok Tongue",
+   "source": "a wan ghoul knight",
+   "ts": 1785691636000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 2,
+   "disposition": "sold",
+   "item": "Phosphorous Powder",
+   "source": "a zol ghoul knight",
+   "ts": 1785691650000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Scimitar",
+   "source": "a zol ghoul knight",
+   "ts": 1785691678000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Long Sword",
+   "source": "a zol ghoul knight",
+   "ts": 1785691698000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 2,
+   "disposition": "sold",
+   "item": "Phosphorous Powder",
+   "source": "a zol ghoul knight",
+   "ts": 1785691698000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Mithril Earring +1",
+   "source": "a kor ghoul wizard",
+   "ts": 1785691724000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 2,
+   "disposition": "sold",
+   "item": "Phosphorous Powder",
+   "source": "a kor ghoul wizard",
+   "ts": 1785691724000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 2,
+   "disposition": "sold",
+   "item": "Phosphorous Powder",
+   "source": "a zol ghoul knight",
+   "ts": 1785691765000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Two Handed Sword",
+   "source": "a wan ghoul knight",
+   "ts": 1785691807000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Undead Froglok Tongue",
+   "source": "a wan ghoul knight",
+   "ts": 1785691807000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "item": "Mote of Infinitesimal Potential",
+   "source": "an urd ghoul wizard",
+   "ts": 1785691822000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 2,
+   "disposition": "sold",
+   "item": "Phosphorous Powder",
+   "source": "a zol ghoul knight",
+   "ts": 1785691846000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Great Staff",
+   "source": "a zol ghoul knight",
+   "ts": 1785691861000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 2,
+   "disposition": "sold",
+   "item": "Phosphorous Powder",
+   "source": "a zol ghoul knight",
+   "ts": 1785691861000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 2,
+   "disposition": "sold",
+   "item": "Phosphorous Powder",
+   "source": "a zol ghoul knight",
+   "ts": 1785691883000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "disposition": "sold",
+   "item": "Flame Agate",
+   "source": "a yun ghoul wizard",
+   "ts": 1785691898000,
+   "zone": "The Ruins of Old Guk"
+  },
+  {
+   "count": 2,
+   "disposition": "sold",
+   "item": "Phosphorous Powder",
+   "source": "a yun ghoul wizard",
+   "ts": 1785691898000,
+   "zone": "The Ruins of Old Guk"
+  }
+ ],
+ "leveling": {
+  "aaGains": [
+   {
+    "amount": 2,
+    "nowHave": 11,
+    "ts": 1785687330000
+   },
+   {
+    "amount": 2,
+    "nowHave": 3,
+    "ts": 1785688328000
+   },
+   {
+    "amount": 2,
+    "nowHave": 5,
+    "ts": 1785689552000
+   },
+   {
+    "amount": 2,
+    "nowHave": 2,
+    "ts": 1785690181000
+   },
+   {
+    "amount": 1,
+    "nowHave": 3,
+    "ts": 1785690751000
+   },
+   {
+    "amount": 2,
+    "nowHave": 5,
+    "ts": 1785691325000
+   },
+   {
+    "amount": 2,
+    "nowHave": 7,
+    "ts": 1785691846000
+   }
+  ],
+  "aaPotions": [],
+  "aaSpends": [
+   {
+    "ability": "Innate Regeneration 4",
+    "cost": 2,
+    "rank": 4,
+    "ts": 1785687341000
+   },
+   {
+    "ability": "Innate Regeneration 5",
+    "cost": 3,
+    "rank": 5,
+    "ts": 1785687343000
+   },
+   {
+    "ability": "Innate Regeneration 6",
+    "cost": 5,
+    "rank": 6,
+    "ts": 1785687345000
+   },
+   {
+    "ability": "Innate Regeneration 7",
+    "cost": 5,
+    "rank": 7,
+    "ts": 1785689568000
+   },
+   {
+    "ability": "Double Riposte 2",
+    "cost": 6,
+    "rank": 2,
+    "ts": 1785691886000
+   }
+  ],
+  "levels": [
+   {
+    "level": 23,
+    "ts": 1785687215000
+   },
+   {
+    "level": 24,
+    "ts": 1785689266000
+   },
+   {
+    "level": 25,
+    "ts": 1785690030000
+   },
+   {
+    "level": 26,
+    "ts": 1785690647000
+   },
+   {
+    "level": 27,
+    "ts": 1785691353000
+   },
+   {
+    "level": 28,
+    "ts": 1785692006000
+   }
+  ]
+ }
+}

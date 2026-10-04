@@ -1,0 +1,1150 @@
+{
+ "kills": {
+  "mobs": {
+   "a ghoul": {
+    "bestTier": -2,
+    "count": 6,
+    "credited": 5,
+    "display": "a ghoul",
+    "firstTs": 1785685526000,
+    "lastTs": 1785685680000,
+    "tiers": {
+     "-2": {
+      "count": 6,
+      "credited": 5,
+      "firstTs": 1785685526000,
+      "lastCreditedTs": 1785685680000,
+      "lastTs": 1785685680000
+     }
+    }
+   },
+   "a greater dread bone": {
+    "bestTier": -2,
+    "count": 2,
+    "credited": 2,
+    "display": "a greater dread bone",
+    "firstTs": 1785684171000,
+    "lastTs": 1785684496000,
+    "tiers": {
+     "-2": {
+      "count": 2,
+      "credited": 2,
+      "firstTs": 1785684171000,
+      "lastCreditedTs": 1785684496000,
+      "lastTs": 1785684496000
+     }
+    }
+   },
+   "a hardened skeleton": {
+    "bestTier": -2,
+    "count": 1,
+    "credited": 1,
+    "display": "a hardened skeleton",
+    "firstTs": 1785685672000,
+    "lastTs": 1785685672000,
+    "tiers": {
+     "-2": {
+      "count": 1,
+      "credited": 1,
+      "firstTs": 1785685672000,
+      "lastCreditedTs": 1785685672000,
+      "lastTs": 1785685672000
+     }
+    }
+   },
+   "a necro acolyte": {
+    "bestTier": -2,
+    "count": 1,
+    "credited": 1,
+    "display": "a necro acolyte",
+    "firstTs": 1785685579000,
+    "lastTs": 1785685579000,
+    "tiers": {
+     "-2": {
+      "count": 1,
+      "credited": 1,
+      "firstTs": 1785685579000,
+      "lastCreditedTs": 1785685579000,
+      "lastTs": 1785685579000
+     }
+    }
+   },
+   "a necro theurgist": {
+    "bestTier": -2,
+    "count": 2,
+    "credited": 2,
+    "display": "a necro theurgist",
+    "firstTs": 1785684492000,
+    "lastTs": 1785685531000,
+    "tiers": {
+     "-2": {
+      "count": 2,
+      "credited": 2,
+      "firstTs": 1785684492000,
+      "lastCreditedTs": 1785685531000,
+      "lastTs": 1785685531000
+     }
+    }
+   },
+   "a scorched zombie": {
+    "bestTier": -2,
+    "count": 1,
+    "credited": 1,
+    "display": "a scorched zombie",
+    "firstTs": 1785685533000,
+    "lastTs": 1785685533000,
+    "tiers": {
+     "-2": {
+      "count": 1,
+      "credited": 1,
+      "firstTs": 1785685533000,
+      "lastCreditedTs": 1785685533000,
+      "lastTs": 1785685533000
+     }
+    }
+   },
+   "a shadowknight": {
+    "bestTier": -2,
+    "count": 5,
+    "credited": 5,
+    "display": "a shadowknight",
+    "firstTs": 1785683738000,
+    "lastTs": 1785686801000,
+    "tiers": {
+     "-2": {
+      "count": 5,
+      "credited": 5,
+      "firstTs": 1785683738000,
+      "lastCreditedTs": 1785686801000,
+      "lastTs": 1785686801000
+     }
+    }
+   },
+   "a shadowknight pet": {
+    "bestTier": -2,
+    "count": 1,
+    "credited": 0,
+    "display": "a shadowknight pet",
+    "firstTs": 1785684580000,
+    "lastTs": 1785684580000,
+    "tiers": {
+     "-2": {
+      "count": 1,
+      "credited": 0,
+      "firstTs": 1785684580000,
+      "lastCreditedTs": 0,
+      "lastTs": 1785684580000
+     }
+    }
+   },
+   "a teir`dal priest": {
+    "bestTier": -2,
+    "count": 6,
+    "credited": 6,
+    "display": "a Teir`Dal priest",
+    "firstTs": 1785683932000,
+    "lastTs": 1785686606000,
+    "tiers": {
+     "-2": {
+      "count": 6,
+      "credited": 6,
+      "firstTs": 1785683932000,
+      "lastCreditedTs": 1785686606000,
+      "lastTs": 1785686606000
+     }
+    }
+   },
+   "a teir`dal priestess": {
+    "bestTier": -2,
+    "count": 6,
+    "credited": 6,
+    "display": "a Teir`Dal priestess",
+    "firstTs": 1785683706000,
+    "lastTs": 1785686477000,
+    "tiers": {
+     "-2": {
+      "count": 6,
+      "credited": 6,
+      "firstTs": 1785683706000,
+      "lastCreditedTs": 1785686477000,
+      "lastTs": 1785686477000
+     }
+    }
+   },
+   "a teir`dal ranger": {
+    "bestTier": -2,
+    "count": 38,
+    "credited": 38,
+    "display": "a Teir`Dal ranger",
+    "firstTs": 1785683520000,
+    "lastTs": 1785686953000,
+    "tiers": {
+     "-2": {
+      "count": 38,
+      "credited": 38,
+      "firstTs": 1785683520000,
+      "lastCreditedTs": 1785686953000,
+      "lastTs": 1785686953000
+     }
+    }
+   },
+   "a teir`dal rogue": {
+    "bestTier": -2,
+    "count": 36,
+    "credited": 36,
+    "display": "a Teir`Dal rogue",
+    "firstTs": 1785683582000,
+    "lastTs": 1785686894000,
+    "tiers": {
+     "-2": {
+      "count": 36,
+      "credited": 36,
+      "firstTs": 1785683582000,
+      "lastCreditedTs": 1785686894000,
+      "lastTs": 1785686894000
+     }
+    }
+   },
+   "a teir`dal shadowknight": {
+    "bestTier": -2,
+    "count": 29,
+    "credited": 29,
+    "display": "a Teir`Dal shadowknight",
+    "firstTs": 1785683598000,
+    "lastTs": 1785686934000,
+    "tiers": {
+     "-2": {
+      "count": 29,
+      "credited": 29,
+      "firstTs": 1785683598000,
+      "lastCreditedTs": 1785686934000,
+      "lastTs": 1785686934000
+     }
+    }
+   },
+   "an elf skeleton": {
+    "bestTier": -2,
+    "count": 1,
+    "credited": 1,
+    "display": "an elf skeleton",
+    "firstTs": 1785685613000,
+    "lastTs": 1785685613000,
+    "tiers": {
+     "-2": {
+      "count": 1,
+      "credited": 1,
+      "firstTs": 1785685613000,
+      "lastCreditedTs": 1785685613000,
+      "lastTs": 1785685613000
+     }
+    }
+   },
+   "baron telyx v`zher": {
+    "bestTier": -2,
+    "count": 5,
+    "credited": 5,
+    "display": "Baron Telyx V`Zher",
+    "firstTs": 1785683554000,
+    "lastTs": 1785686511000,
+    "tiers": {
+     "-2": {
+      "count": 5,
+      "credited": 5,
+      "firstTs": 1785683554000,
+      "lastCreditedTs": 1785686511000,
+      "lastTs": 1785686511000
+     }
+    }
+   },
+   "boondin babbinsbort": {
+    "bestTier": -2,
+    "count": 1,
+    "credited": 1,
+    "display": "Boondin Babbinsbort",
+    "firstTs": 1785683641000,
+    "lastTs": 1785683641000,
+    "tiers": {
+     "-2": {
+      "count": 1,
+      "credited": 1,
+      "firstTs": 1785683641000,
+      "lastCreditedTs": 1785683641000,
+      "lastTs": 1785683641000
+     }
+    }
+   },
+   "footman of v`zher": {
+    "bestTier": -2,
+    "count": 1,
+    "credited": 1,
+    "display": "Footman of V`Zher",
+    "firstTs": 1785685678000,
+    "lastTs": 1785685678000,
+    "tiers": {
+     "-2": {
+      "count": 1,
+      "credited": 1,
+      "firstTs": 1785685678000,
+      "lastCreditedTs": 1785685678000,
+      "lastTs": 1785685678000
+     }
+    }
+   },
+   "gynok moltor": {
+    "bestTier": -2,
+    "count": 4,
+    "credited": 4,
+    "display": "Gynok Moltor",
+    "firstTs": 1785683911000,
+    "lastTs": 1785686943000,
+    "tiers": {
+     "-2": {
+      "count": 4,
+      "credited": 4,
+      "firstTs": 1785683911000,
+      "lastCreditedTs": 1785686943000,
+      "lastTs": 1785686943000
+     }
+    }
+   },
+   "ice boned skeleton": {
+    "bestTier": -2,
+    "count": 6,
+    "credited": 6,
+    "display": "ice boned skeleton",
+    "firstTs": 1785684168000,
+    "lastTs": 1785685655000,
+    "tiers": {
+     "-2": {
+      "count": 6,
+      "credited": 6,
+      "firstTs": 1785684168000,
+      "lastCreditedTs": 1785685655000,
+      "lastTs": 1785685655000
+     }
+    }
+   },
+   "kahaptra z`taj": {
+    "bestTier": -2,
+    "count": 6,
+    "credited": 6,
+    "display": "Kahaptra Z`Taj",
+    "firstTs": 1785683865000,
+    "lastTs": 1785686900000,
+    "tiers": {
+     "-2": {
+      "count": 6,
+      "credited": 6,
+      "firstTs": 1785683865000,
+      "lastCreditedTs": 1785686900000,
+      "lastTs": 1785686900000
+     }
+    }
+   },
+   "knight v`tal": {
+    "bestTier": -2,
+    "count": 5,
+    "credited": 5,
+    "display": "Knight V`Tal",
+    "firstTs": 1785683762000,
+    "lastTs": 1785686817000,
+    "tiers": {
+     "-2": {
+      "count": 5,
+      "credited": 5,
+      "firstTs": 1785683762000,
+      "lastCreditedTs": 1785686817000,
+      "lastTs": 1785686817000
+     }
+    }
+   },
+   "korven nisere": {
+    "bestTier": -2,
+    "count": 4,
+    "credited": 4,
+    "display": "Korven Nisere",
+    "firstTs": 1785683607000,
+    "lastTs": 1785686538000,
+    "tiers": {
+     "-2": {
+      "count": 4,
+      "credited": 4,
+      "firstTs": 1785683607000,
+      "lastCreditedTs": 1785686538000,
+      "lastTs": 1785686538000
+     }
+    }
+   },
+   "soldier of v`zher": {
+    "bestTier": -2,
+    "count": 5,
+    "credited": 5,
+    "display": "Soldier of V`Zher",
+    "firstTs": 1785683570000,
+    "lastTs": 1785686497000,
+    "tiers": {
+     "-2": {
+      "count": 5,
+      "credited": 5,
+      "firstTs": 1785683570000,
+      "lastCreditedTs": 1785686497000,
+      "lastTs": 1785686497000
+     }
+    }
+   }
+  },
+  "v": 5
+ },
+ "loot": [
+  {
+   "disposition": "sold",
+   "item": "Pristine Studded Leather Tunic",
+   "source": "Baron Telyx V`Zher",
+   "ts": 1785683554000
+  },
+  {
+   "disposition": "sold",
+   "item": "Pristine Studded Leather Leggings",
+   "source": "Soldier of V`Zher",
+   "ts": 1785683570000
+  },
+  {
+   "disposition": "sold",
+   "item": "Small Ringmail Belt +1",
+   "source": "a Teir`Dal shadowknight",
+   "ts": 1785683603000
+  },
+  {
+   "item": "Shimmering Ruby Stiletto",
+   "source": "Korven Nisere",
+   "ts": 1785683607000
+  },
+  {
+   "disposition": "sold",
+   "item": "Icon of the Ardent",
+   "source": "Boondin Babbinsbort",
+   "ts": 1785683646000
+  },
+  {
+   "disposition": "sold",
+   "item": "Dagger",
+   "source": "Boondin Babbinsbort",
+   "ts": 1785683651000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Great Staff",
+   "source": "a Teir`Dal ranger",
+   "ts": 1785683676000
+  },
+  {
+   "disposition": "sold",
+   "item": "Rusty Long Sword",
+   "source": "a shadowknight",
+   "ts": 1785683738000
+  },
+  {
+   "disposition": "sold",
+   "item": "Splintered Wooden Key",
+   "source": "a shadowknight",
+   "ts": 1785683738000
+  },
+  {
+   "disposition": "sold",
+   "item": "Charred Bone Key",
+   "source": "a shadowknight",
+   "ts": 1785683738000
+  },
+  {
+   "disposition": "sold",
+   "item": "Smoked Glass Key",
+   "source": "a shadowknight",
+   "ts": 1785683738000
+  },
+  {
+   "item": "Mote of Infinitesimal Potential",
+   "source": "a shadowknight",
+   "ts": 1785683738000
+  },
+  {
+   "disposition": "sold",
+   "item": "Raw-Hide Gloves",
+   "source": "a shadowknight",
+   "ts": 1785683745000
+  },
+  {
+   "disposition": "sold",
+   "item": "Enchanted Fine Steel Long Sword +1",
+   "source": "Knight V`Tal",
+   "ts": 1785683777000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Dagger",
+   "source": "a Teir`Dal shadowknight",
+   "ts": 1785683789000
+  },
+  {
+   "created": "Golem Metal Wand +2",
+   "disposition": "combined",
+   "item": "Golem Metal Wand",
+   "source": "Kahaptra Z`Taj",
+   "ts": 1785683865000
+  },
+  {
+   "disposition": "sold",
+   "item": "Cloth Choker +1",
+   "source": "Gynok Moltor",
+   "ts": 1785683911000
+  },
+  {
+   "disposition": "sold",
+   "item": "Rusty Short Sword +1",
+   "source": "Gynok Moltor",
+   "ts": 1785683911000
+  },
+  {
+   "disposition": "sold",
+   "item": "Platinum Ring +1",
+   "source": "Gynok Moltor",
+   "ts": 1785683911000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Morning Star",
+   "source": "a Teir`Dal priest",
+   "ts": 1785683946000
+  },
+  {
+   "disposition": "sold",
+   "item": "Ringmail Bracelet",
+   "source": "a Teir`Dal priest",
+   "ts": 1785683946000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Rapier +1",
+   "source": "a Teir`Dal priest",
+   "ts": 1785684027000
+  },
+  {
+   "disposition": "sold",
+   "item": "Ivory",
+   "source": "a Teir`Dal priest",
+   "ts": 1785684027000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Short Sword",
+   "source": "a Teir`Dal shadowknight",
+   "ts": 1785684208000
+  },
+  {
+   "created": "Golem Metal Wand +2",
+   "disposition": "combined",
+   "item": "Golem Metal Wand",
+   "source": "Kahaptra Z`Taj",
+   "ts": 1785684343000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Rapier",
+   "source": "a Teir`Dal priest",
+   "ts": 1785684364000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Two Handed Sword",
+   "source": "a Teir`Dal shadowknight",
+   "ts": 1785684398000
+  },
+  {
+   "disposition": "sold",
+   "item": "Ringmail Coat",
+   "source": "a Teir`Dal shadowknight",
+   "ts": 1785684398000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Rapier",
+   "source": "a Teir`Dal ranger",
+   "ts": 1785684416000
+  },
+  {
+   "disposition": "sold",
+   "item": "Small Ringmail Belt",
+   "source": "a Teir`Dal ranger",
+   "ts": 1785684416000
+  },
+  {
+   "disposition": "sold",
+   "item": "Ringmail Gloves",
+   "source": "a Teir`Dal rogue",
+   "ts": 1785684426000
+  },
+  {
+   "disposition": "sold",
+   "item": "Iron Visor",
+   "source": "a Teir`Dal rogue",
+   "ts": 1785684439000
+  },
+  {
+   "disposition": "sold",
+   "item": "Rusty Long Sword",
+   "source": "Gynok Moltor",
+   "ts": 1785684504000
+  },
+  {
+   "disposition": "sold",
+   "item": "Platinum Ring +1",
+   "source": "Gynok Moltor",
+   "ts": 1785684504000
+  },
+  {
+   "disposition": "sold",
+   "item": "Topaz",
+   "source": "a Teir`Dal shadowknight",
+   "ts": 1785684538000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Long Sword",
+   "source": "a Teir`Dal shadowknight",
+   "ts": 1785684575000
+  },
+  {
+   "disposition": "sold",
+   "item": "Bronze Short Sword",
+   "source": "a shadowknight",
+   "ts": 1785684582000
+  },
+  {
+   "disposition": "sold",
+   "item": "Splintered Wooden Key",
+   "source": "a shadowknight",
+   "ts": 1785684582000
+  },
+  {
+   "disposition": "sold",
+   "item": "Charred Bone Key",
+   "source": "a shadowknight",
+   "ts": 1785684582000
+  },
+  {
+   "disposition": "sold",
+   "item": "Smoked Glass Key",
+   "source": "a shadowknight",
+   "ts": 1785684582000
+  },
+  {
+   "disposition": "sold",
+   "item": "Barbed Legplates",
+   "source": "a shadowknight",
+   "ts": 1785684591000
+  },
+  {
+   "disposition": "sold",
+   "item": "Enchanted Fine Steel Long Sword",
+   "source": "Knight V`Tal",
+   "ts": 1785684593000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Great Staff",
+   "source": "a Teir`Dal ranger",
+   "ts": 1785684616000
+  },
+  {
+   "disposition": "sold",
+   "item": "Small Ringmail Belt",
+   "source": "a Teir`Dal rogue",
+   "ts": 1785684627000
+  },
+  {
+   "disposition": "sold",
+   "item": "Pristine Studded Leather Leggings",
+   "source": "Soldier of V`Zher",
+   "ts": 1785684669000
+  },
+  {
+   "disposition": "sold",
+   "item": "Pristine Studded Leather Tunic",
+   "source": "Baron Telyx V`Zher",
+   "ts": 1785684720000
+  },
+  {
+   "item": "Shimmering Ruby Stiletto +1",
+   "source": "Korven Nisere",
+   "ts": 1785684830000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Great Staff +2",
+   "source": "a Teir`Dal priestess",
+   "ts": 1785684839000
+  },
+  {
+   "created": "Golem Metal Wand +2",
+   "disposition": "combined",
+   "item": "Golem Metal Wand +1",
+   "source": "Kahaptra Z`Taj",
+   "ts": 1785684930000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Dagger +1",
+   "source": "a Teir`Dal shadowknight",
+   "ts": 1785684951000
+  },
+  {
+   "disposition": "sold",
+   "item": "Topaz",
+   "source": "a Teir`Dal ranger",
+   "ts": 1785685019000
+  },
+  {
+   "item": "Mote of Infinitesimal Potential",
+   "source": "a Teir`Dal shadowknight",
+   "ts": 1785685044000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Scimitar",
+   "source": "a Teir`Dal rogue",
+   "ts": 1785685139000
+  },
+  {
+   "disposition": "sold",
+   "item": "Ringmail Cape +1",
+   "source": "a Teir`Dal rogue",
+   "ts": 1785685179000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Short Sword",
+   "source": "a Teir`Dal ranger",
+   "ts": 1785685202000
+  },
+  {
+   "disposition": "sold",
+   "item": "Splintered Wooden Key",
+   "source": "a shadowknight",
+   "ts": 1785685260000
+  },
+  {
+   "disposition": "sold",
+   "item": "Charred Bone Key",
+   "source": "a shadowknight",
+   "ts": 1785685260000
+  },
+  {
+   "disposition": "sold",
+   "item": "Smoked Glass Key",
+   "source": "a shadowknight",
+   "ts": 1785685260000
+  },
+  {
+   "disposition": "sold",
+   "item": "Raw-Hide Skullcap",
+   "source": "a shadowknight",
+   "ts": 1785685266000
+  },
+  {
+   "disposition": "sold",
+   "item": "Enchanted Fine Steel Long Sword +1",
+   "source": "Knight V`Tal",
+   "ts": 1785685270000
+  },
+  {
+   "disposition": "sold",
+   "item": "Pristine Studded Leather Leggings",
+   "source": "Soldier of V`Zher",
+   "ts": 1785685299000
+  },
+  {
+   "disposition": "sold",
+   "item": "Pristine Studded Leather Tunic +1",
+   "source": "Baron Telyx V`Zher",
+   "ts": 1785685319000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Two Handed Sword +1",
+   "source": "a Teir`Dal ranger",
+   "ts": 1785685352000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Dagger",
+   "source": "a Teir`Dal rogue",
+   "ts": 1785685359000
+  },
+  {
+   "created": "Golem Metal Wand +3",
+   "disposition": "combined",
+   "item": "Golem Metal Wand",
+   "source": "Kahaptra Z`Taj",
+   "ts": 1785685385000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Short Sword",
+   "source": "a Teir`Dal ranger",
+   "ts": 1785685422000
+  },
+  {
+   "disposition": "sold",
+   "item": "Golden Earring +1",
+   "source": "a necro theurgist",
+   "ts": 1785685531000
+  },
+  {
+   "disposition": "sold",
+   "item": "Antiqued Silver Band",
+   "source": "a necro theurgist",
+   "ts": 1785685531000
+  },
+  {
+   "disposition": "sold",
+   "item": "Thaumaturgist's Robe",
+   "source": "a necro theurgist",
+   "ts": 1785685531000
+  },
+  {
+   "disposition": "sold",
+   "item": "Chipped Bone Rod",
+   "source": "a necro theurgist",
+   "ts": 1785685545000
+  },
+  {
+   "disposition": "sold",
+   "item": "Rusty Long Sword +1",
+   "source": "an elf skeleton",
+   "ts": 1785685613000
+  },
+  {
+   "disposition": "sold",
+   "item": "Mallet Head",
+   "source": "an elf skeleton",
+   "ts": 1785685613000
+  },
+  {
+   "disposition": "sold",
+   "item": "Ringmail Sleeves",
+   "source": "a Teir`Dal shadowknight",
+   "ts": 1785685626000
+  },
+  {
+   "disposition": "sold",
+   "item": "Pristine Studded Leather Gloves",
+   "source": "Footman of V`Zher",
+   "ts": 1785685678000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Two Handed Sword",
+   "source": "a Teir`Dal rogue",
+   "ts": 1785685743000
+  },
+  {
+   "item": "Mote of Infinitesimal Potential",
+   "source": "a Teir`Dal ranger",
+   "ts": 1785685801000
+  },
+  {
+   "disposition": "sold",
+   "item": "Raw-Hide Shoulderpads",
+   "source": "a shadowknight",
+   "ts": 1785685811000
+  },
+  {
+   "disposition": "sold",
+   "item": "Splintered Wooden Key",
+   "source": "a shadowknight",
+   "ts": 1785685811000
+  },
+  {
+   "disposition": "sold",
+   "item": "Charred Bone Key",
+   "source": "a shadowknight",
+   "ts": 1785685811000
+  },
+  {
+   "disposition": "sold",
+   "item": "Smoked Glass Key",
+   "source": "a shadowknight",
+   "ts": 1785685811000
+  },
+  {
+   "disposition": "sold",
+   "item": "Barbed Legplates",
+   "source": "a shadowknight",
+   "ts": 1785685811000
+  },
+  {
+   "disposition": "sold",
+   "item": "Dark Elf Parts",
+   "source": "a shadowknight",
+   "ts": 1785685811000
+  },
+  {
+   "disposition": "sold",
+   "item": "Enchanted Fine Steel Long Sword",
+   "source": "Knight V`Tal",
+   "ts": 1785685828000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Rapier",
+   "source": "a Teir`Dal shadowknight",
+   "ts": 1785685874000
+  },
+  {
+   "disposition": "sold",
+   "item": "Pristine Studded Leather Leggings",
+   "source": "Soldier of V`Zher",
+   "ts": 1785685933000
+  },
+  {
+   "item": "Mote of Infinitesimal Potential",
+   "source": "Soldier of V`Zher",
+   "ts": 1785685933000
+  },
+  {
+   "item": "The Baron's Blade +1",
+   "source": "Baron Telyx V`Zher",
+   "ts": 1785685947000
+  },
+  {
+   "item": "Mote of Infinitesimal Potential",
+   "source": "a Teir`Dal shadowknight",
+   "ts": 1785685955000
+  },
+  {
+   "item": "Enchanted Fine Steel Rapier",
+   "source": "Korven Nisere",
+   "ts": 1785685966000
+  },
+  {
+   "disposition": "sold",
+   "item": "Ringmail Sleeves",
+   "source": "a Teir`Dal ranger",
+   "ts": 1785686142000
+  },
+  {
+   "disposition": "sold",
+   "item": "Ringmail Cape",
+   "source": "a Teir`Dal ranger",
+   "ts": 1785686155000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Scimitar",
+   "source": "a Teir`Dal shadowknight",
+   "ts": 1785686163000
+  },
+  {
+   "created": "Golem Metal Wand +3",
+   "disposition": "combined",
+   "item": "Golem Metal Wand",
+   "source": "Kahaptra Z`Taj",
+   "ts": 1785686202000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Dagger +1",
+   "source": "a Teir`Dal ranger",
+   "ts": 1785686247000
+  },
+  {
+   "disposition": "sold",
+   "item": "Platinum Ring +1",
+   "source": "Gynok Moltor",
+   "ts": 1785686253000
+  },
+  {
+   "disposition": "sold",
+   "item": "Round Shield",
+   "source": "Gynok Moltor",
+   "ts": 1785686257000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Dagger",
+   "source": "a Teir`Dal ranger",
+   "ts": 1785686411000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Short Sword",
+   "source": "a Teir`Dal priestess",
+   "ts": 1785686477000
+  },
+  {
+   "disposition": "sold",
+   "item": "Ringmail Bracelet",
+   "source": "a Teir`Dal priestess",
+   "ts": 1785686477000
+  },
+  {
+   "disposition": "sold",
+   "item": "Pristine Studded Leather Sleeves",
+   "source": "Soldier of V`Zher",
+   "ts": 1785686497000
+  },
+  {
+   "disposition": "sold",
+   "item": "The Baron's Blade",
+   "source": "Baron Telyx V`Zher",
+   "ts": 1785686511000
+  },
+  {
+   "disposition": "sold",
+   "item": "Enchanted Fine Steel Rapier",
+   "source": "Korven Nisere",
+   "ts": 1785686538000
+  },
+  {
+   "item": "Mote of Infinitesimal Potential",
+   "source": "a Teir`Dal ranger",
+   "ts": 1785686566000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Long Sword +1",
+   "source": "a Teir`Dal rogue",
+   "ts": 1785686642000
+  },
+  {
+   "disposition": "sold",
+   "item": "Splintered Wooden Key",
+   "source": "a shadowknight",
+   "ts": 1785686801000
+  },
+  {
+   "disposition": "sold",
+   "item": "Charred Bone Key",
+   "source": "a shadowknight",
+   "ts": 1785686801000
+  },
+  {
+   "disposition": "sold",
+   "item": "Smoked Glass Key",
+   "source": "a shadowknight",
+   "ts": 1785686801000
+  },
+  {
+   "disposition": "sold",
+   "item": "Dark Elf Parts",
+   "source": "a shadowknight",
+   "ts": 1785686801000
+  },
+  {
+   "disposition": "sold",
+   "item": "Enchanted Fine Steel Long Sword",
+   "source": "Knight V`Tal",
+   "ts": 1785686817000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Long Sword",
+   "source": "a Teir`Dal rogue",
+   "ts": 1785686894000
+  },
+  {
+   "disposition": "sold",
+   "item": "Enchanted Fine Steel Great Staff",
+   "source": "Kahaptra Z`Taj",
+   "ts": 1785686900000
+  },
+  {
+   "disposition": "sold",
+   "item": "Platinum Ring",
+   "source": "Gynok Moltor",
+   "ts": 1785686943000
+  },
+  {
+   "disposition": "sold",
+   "item": "Fine Steel Scimitar",
+   "source": "a Teir`Dal ranger",
+   "ts": 1785686953000
+  },
+  {
+   "item": "Mote of Infinitesimal Potential",
+   "source": "a Teir`Dal ranger",
+   "ts": 1785686953000
+  }
+ ],
+ "leveling": {
+  "aaGains": [
+   {
+    "amount": 2,
+    "nowHave": 2,
+    "ts": 1785683737000
+   },
+   {
+    "amount": 2,
+    "nowHave": 4,
+    "ts": 1785684426000
+   },
+   {
+    "amount": 2,
+    "nowHave": 3,
+    "ts": 1785684966000
+   },
+   {
+    "amount": 2,
+    "nowHave": 5,
+    "ts": 1785685555000
+   },
+   {
+    "amount": 2,
+    "nowHave": 7,
+    "ts": 1785686127000
+   },
+   {
+    "amount": 2,
+    "nowHave": 9,
+    "ts": 1785686773000
+   }
+  ],
+  "aaPotions": [],
+  "aaSpends": [
+   {
+    "ability": "Innate Regeneration",
+    "cost": 1,
+    "ts": 1785684463000
+   },
+   {
+    "ability": "Innate Regeneration 2",
+    "cost": 1,
+    "rank": 2,
+    "ts": 1785684467000
+   },
+   {
+    "ability": "Innate Regeneration 3",
+    "cost": 1,
+    "rank": 3,
+    "ts": 1785684469000
+   }
+  ],
+  "levels": [
+   {
+    "level": 19,
+    "ts": 1785684173000
+   },
+   {
+    "level": 20,
+    "ts": 1785684839000
+   },
+   {
+    "level": 21,
+    "ts": 1785685458000
+   },
+   {
+    "level": 22,
+    "ts": 1785686246000
+   }
+  ]
+ }
+}
