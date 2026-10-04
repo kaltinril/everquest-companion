@@ -653,12 +653,20 @@ impl Fold {
 
     /// One primary event: deliver it, then drain whatever anybody queued through the same delivery.
     ///
-    /// The three producers drain in subscription order — the modules first, so a `buffExpired`
-    /// precedes both detectors' output for the same primary event, then the epoch detector, then
-    /// the offline-gap detector. That is the order the goldens were recorded under.
+    /// The producers drain in subscription order — the modules first, so a `buffExpired` precedes
+    /// the offline-gap detector's output for the same primary event.
+    ///
+    /// THE LAUNCH EPOCH IS THE EXCEPTION: it is delivered BEFORE the line that trips it. That line
+    /// is the first one of the new character, so it belongs after the wipe, not under it. Delivered
+    /// after, the wipe erased the line's own kill, loot or level; in a log that began before launch
+    /// day that line was a login line, but a log that begins after it (a fresh log, an archived and
+    /// restarted one) lost its first real line on every cold read (docs/plans/log-archive, 3.7).
     pub fn on_primary(&mut self, ev: &Event, live: bool) {
         self.events += 1;
         self.last_ts = self.last_ts.max(ev.ts());
+        if let Some(d) = self.epoch.observe(ev) {
+            self.observe(&d, live);
+        }
         self.observe(ev, live);
         // Shift-until-empty, so anything a derived event queues in turn is delivered too — and it
         // can: `buffs` folds an `epoch` by clearing its live state, and a cleared instance may
@@ -688,9 +696,7 @@ impl Fold {
         if let Some(c) = &mut self.combat {
             c.on_event(ev, live, self.registry.roster());
         }
-        if let Some(d) = self.epoch.observe(ev) {
-            self.derived.push(d);
-        }
+        // The epoch detector is not here: it runs ahead of the line in `on_primary`.
         if let Some(d) = self.sessions.observe(ev) {
             self.derived.push(d);
         }
@@ -750,6 +756,10 @@ impl Fold {
             out.reparse_ns += u64::try_from(t.elapsed().as_nanos()).unwrap_or(u64::MAX);
             self.events += 1;
             self.last_ts = self.last_ts.max(ev.ts());
+            // The launch epoch ahead of its line, as `on_primary` delivers it.
+            if let Some(d) = self.epoch.observe(&ev) {
+                self.observe_attributed(&d, false, &mut out);
+            }
             self.observe_attributed(&ev, false, &mut out);
             let mut i = 0;
             while i < self.derived.len() {
@@ -774,9 +784,6 @@ impl Fold {
             out.combat_ns += u64::try_from(t.elapsed().as_nanos()).unwrap_or(u64::MAX);
         }
         let t = std::time::Instant::now();
-        if let Some(d) = self.epoch.observe(ev) {
-            self.derived.push(d);
-        }
         if let Some(d) = self.sessions.observe(ev) {
             self.derived.push(d);
         }
@@ -1218,8 +1225,8 @@ mod tests {
         assert_eq!(rows["shiftless deeds"]["name"], "Shiftless Deeds");
     }
 
-    /// The epoch event is derived, drains after the primary event, and drops every
-    /// character-scoped module's state — while `outputFiles` deliberately keeps its receipts.
+    /// The epoch event is derived, is delivered BEFORE the primary event that trips it, and drops
+    /// every character-scoped module's state — while `outputFiles` deliberately keeps its receipts.
     #[test]
     fn the_launch_boundary_drops_the_dead_characters_state() {
         let mut fold = Fold::new(registered(ClusterDeps::default()), 1000);
@@ -1232,9 +1239,9 @@ mod tests {
             fold.on_primary(&Event::from_json(line).expect("object"), false);
         }
         let snaps = fold.registry.snapshots();
-        // The boundary event fires on the ts:1500 loot line and is drained after it, so that row
-        // is cleared too.
-        assert_eq!(state_of(&snaps, "loot"), json!([]));
+        // The boundary event fires on the ts:1500 loot line and is delivered before it, so that
+        // row is the new character's first and survives; the beta row (index 0 before) does not.
+        assert_eq!(state_of(&snaps, "loot")[0]["item"], "Live Sword");
         assert_eq!(state_of(&snaps, "leveling")["levels"], json!([]));
         // …and the dump receipt outlives the epoch on purpose: the file outlives it too.
         assert_eq!(state_of(&snaps, "outputFiles")["inventory.txt"], 600);
@@ -1960,7 +1967,7 @@ mod tests {
             fold.on_primary(&Event::from_json(line).expect("object"), false);
         }
         let snaps = fold.registry.snapshots();
-        assert_eq!(state_of(&snaps, "loot"), json!([]));
+        assert_eq!(state_of(&snaps, "loot").as_array().map(Vec::len), Some(1));
         assert_eq!(state_of(&snaps, "resist"), json!({ "rows": 1, "mobs": 1 }));
     }
 

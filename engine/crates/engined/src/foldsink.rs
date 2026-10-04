@@ -766,19 +766,19 @@ mod tests {
         // The point of the seam: a snapshot taken between two events is the state after the first
         // and no part of the second.
         //
-        // Two deaths, and the first one is supposed to vanish. The launch anchor resolves through
-        // the parser's own clock, so the first event past it fires the `epoch` boundary — character
-        // rebirth — and `kills` clears on it. That is what a real attach does, and pinning it here
-        // makes a later change to the anchor announce itself as a behaviour change.
+        // Two deaths of one mob. The launch anchor resolves through the parser's own clock, so the
+        // first event past it fires the `epoch` boundary — character rebirth — and `kills` clears
+        // on it. The boundary is delivered BEFORE that event (`Fold::on_primary`), so the first
+        // death survives it: it is the new character's first line, not the old one's last.
         let clock = super::test_clock();
         let log = Path::new("C:/nowhere/eqlog_Primitive_freeport.txt");
         let mut sink = FoldSink::new(&inputs(log, &clock));
         assert_eq!(counted(&sink), 0);
 
         kill(&mut sink, 0);
-        assert_eq!(counted(&sink), 0, "the epoch boundary cleared the map");
+        assert_eq!(counted(&sink), 1, "the epoch boundary cleared the map, then the death landed");
         kill(&mut sink, 1);
-        assert_eq!(counted(&sink), 1, "and the next one is the new world's");
+        assert_eq!(counted(&sink), 1, "and the next one is the same mob in the new world");
 
         let after = sink.snapshot("kills").expect("kills is registered");
         assert_eq!(after.seq, 1, "the module's own seq is the event it folded");
