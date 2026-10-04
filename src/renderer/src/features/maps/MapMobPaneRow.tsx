@@ -15,6 +15,7 @@ import type { MapPaneRow } from './mobPins'
 // gear table, the wish list and the plan draw, so a wished drop here reads and routes like theirs.
 import { DonorName } from '../planner/PlannerChips'
 import { Tooltip } from '../../lib/Tooltip'
+import { KnownItemTooltip } from '../../lib/KnownItemTooltip'
 
 /**
  * The one-line "and what else does this row know" text. Null when it knows nothing extra.
@@ -39,6 +40,7 @@ function rowNote(row: MapPaneRow): string | null {
  * `stopPropagation` (only when routed) so the click opens the item, not the row's pin — and
  * `pointerEvents:'auto'` because an unlocatable mob's row button is DISABLED, which turns pointer
  * events off for the whole subtree: the mob has no spot on this map, but its drop still has a page.
+ * Each name hovers with the click-through item card (owner ask, 2026-10-03: no bare item names).
  */
 function WishDrops({ names, onOpenLoot }: { names: readonly string[]; onOpenLoot?: ((name: string) => void) | undefined }): JSX.Element {
   return (
@@ -51,7 +53,11 @@ function WishDrops({ names, onOpenLoot }: { names: readonly string[]; onOpenLoot
       {names.map((n, i) => (
         <Box component="span" key={n}>
           {i > 0 && ', '}
-          <DonorName name={n} onOpen={onOpenLoot} />
+          <KnownItemTooltip name={n} clickThrough>
+            <span>
+              <DonorName name={n} onOpen={onOpenLoot} />
+            </span>
+          </KnownItemTooltip>
         </Box>
       ))}
       {' (wish list)'}
