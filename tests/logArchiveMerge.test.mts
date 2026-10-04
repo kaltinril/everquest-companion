@@ -11,7 +11,8 @@
 // To re-record after a fold change: cut the log the same way into files named
 // `eqlog_Primitive_freeport.<part>.txt` (the tool reads the character from the name), run
 // `engine/target/release/parity.exe <file> --snapshots --tz UTC` on each, and keep `kills`, `loot`
-// and `leveling` from the `modules` array.
+// and `leveling` from the `modules` array, plus the phase 4 modules logArchiveMergeMore.test.mts
+// reads from the same fixtures.
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'

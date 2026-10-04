@@ -4,9 +4,14 @@
 // always has; a segment still stores its snapshot, so the day its line lands it applies to logs
 // archived earlier too (phase 4).
 
+import { mergeConsider } from './mergeConsider'
+import { mergeItemTiers } from './mergeItemTiers'
 import { mergeKills } from './mergeKills'
 import { mergeLeveling } from './mergeLeveling'
 import { mergeLoot } from './mergeLoot'
+import { mergeProgression } from './mergeProgression'
+import { mergeRespawn } from './mergeRespawn'
+import { mergeClassUnlocks, mergeTurnIns } from './mergeUnlocksTurnIns'
 
 /** Older then newer, or null when the two cannot be merged (that segment is left out). */
 export type MergeRule = (older: unknown, newer: unknown) => unknown
@@ -14,7 +19,13 @@ export type MergeRule = (older: unknown, newer: unknown) => unknown
 export const MERGE_RULES: Readonly<Record<string, MergeRule>> = {
   kills: mergeKills,
   loot: mergeLoot,
-  leveling: mergeLeveling
+  leveling: mergeLeveling,
+  consider: mergeConsider,
+  itemTiers: mergeItemTiers,
+  classUnlocks: mergeClassUnlocks,
+  turnins: mergeTurnIns,
+  respawn: mergeRespawn,
+  progression: mergeProgression
 }
 
 export function hasMergeRule(moduleId: string): boolean {
@@ -55,10 +66,14 @@ export function mergeModule(moduleId: string, archived: readonly unknown[], live
 /**
  * An empty value of the live state's shape (same version stamps, empty lists and maps). Joining an
  * archived state to it is how each one is checked against the live shape before it is used.
+ *
+ * A state that is itself a map of rows (`itemTiers`: every value a record) empties to `{}`, not to
+ * a map of empty records that no rule would accept as rows. Added with step 4.2.
  */
 function emptyLike(state: unknown): unknown {
   if (Array.isArray(state)) return []
   if (state === null || typeof state !== 'object') return state
+  if (Object.values(state).every((v) => v !== null && typeof v === 'object' && !Array.isArray(v))) return {}
   const out: Record<string, unknown> = {}
   for (const [k, v] of Object.entries(state)) {
     out[k] = Array.isArray(v) ? [] : v !== null && typeof v === 'object' ? {} : v
