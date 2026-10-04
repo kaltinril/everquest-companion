@@ -17,10 +17,14 @@
 //
 // `archived` hands out the eligible archived states of one module, unmerged, for a read that is not
 // a module snapshot (one mob's drops, step 4.1). The same switch and the same eligibility apply.
+// `archivedFights` is the same for the fight summaries a segment keeps beside its modules (step
+// 4.7), already re-named and sorted, and built once per context: the picker polls it.
 
 import { createHash } from 'node:crypto'
 import { closeSync, openSync, readSync } from 'node:fs'
 import { eligibleSegments, type Held } from '../../shared/logArchive/eligible'
+import type { SegmentSummary } from '../../shared/combat'
+import { archivedFightRows } from '../../shared/logArchive/mergeFights'
 import { hasMergeRule, mergeModule } from '../../shared/logArchive/mergeRules'
 import { HEAD_BYTES, logStampKey, type Segment } from '../../shared/logArchive/segment'
 import { listSegments, type SkippedFile } from './segmentStore'
@@ -42,6 +46,8 @@ interface Context {
   shown: Segment[]
   held: Held[]
   skipped: SkippedFile[]
+  /** `archivedFights`, built on first ask. */
+  fights?: SegmentSummary[]
 }
 
 export interface HistoryStatus {
@@ -66,6 +72,8 @@ export interface HistoryMerge {
   mergeHistory: (moduleId: string, seq: number, state: unknown) => unknown
   /** The eligible archived states of `moduleId`, oldest first; empty with the switch off. */
   archived: (moduleId: string) => unknown[]
+  /** Every eligible segment's fight summaries, newest first; empty with the switch off. */
+  archivedFights: () => SegmentSummary[]
   status: () => HistoryStatus | null
   noteSealedThisAttach: (id: string) => void
   forgetHistoryContext: () => void
@@ -120,6 +128,14 @@ export function createHistoryMerge(deps: HistoryDeps): HistoryMerge {
     return c === null ? [] : statesOf(c, moduleId)
   }
 
+  function archivedFights(): SegmentSummary[] {
+    if (!deps.on()) return []
+    const c = context()
+    if (c === null) return []
+    c.fights ??= archivedFightRows(c.shown)
+    return c.fights
+  }
+
   function mergeHistory(moduleId: string, seq: number, state: unknown): unknown {
     if (!hasMergeRule(moduleId) || !deps.on()) return state
     const c = context()
@@ -134,6 +150,7 @@ export function createHistoryMerge(deps: HistoryDeps): HistoryMerge {
   return {
     mergeHistory,
     archived,
+    archivedFights,
     status: () => (ctx === null ? null : { shown: ctx.shown.map((s) => s.id), held: ctx.held, skipped: ctx.skipped }),
     noteSealedThisAttach: (id) => {
       sealedThisAttach.add(id)

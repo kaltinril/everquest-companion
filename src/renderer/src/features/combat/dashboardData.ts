@@ -652,10 +652,13 @@ export interface ScopeOption {
   durationSec: number
   /** genuinely live right now — an OPEN fight, or the current zone session. */
   live: boolean
+  /** the archive a fight from an archived log is in (log archive, step 4.7); absent otherwise. */
+  archive?: string
 }
 
 export interface ScopeOptions {
-  /** The pinned first row. Null only when the scope has no data at all yet (fresh session). */
+  /** The pinned first row. Null when the live log has no fight yet (fresh session), even when
+   *  archived fights are listed: the head is the live log's, never an archive's. */
   head: ScopeOption | null
   /** Every other row, newest-first. Never contains `head`. */
   rest: ScopeOption[]
@@ -666,8 +669,10 @@ export function fightScopeOptions(segments: SegmentSummary[]): ScopeOptions {
   const open = segments.find((s) => s.kind === 'current') ?? null
   // eslint-disable-next-line eqc/no-domain-munging -- JOS-459 cutover ledger item 3: no served view source answers this yet, so the renderer still derives SegmentSummary. Becomes a view descriptor when the source lands.
   const finalized = segments.filter((s) => s.kind === 'fight')
-  const headSeg = open ?? finalized[0] ?? null
-  if (!headSeg) return { head: null, rest: [] }
+  const headSeg = open ?? finalized.find((s) => s.archive === undefined) ?? null
+  // eslint-disable-next-line eqc/no-domain-munging -- JOS-459 cutover ledger item 3, as above: the head row is taken out of the same list. Archived fights (log archive, step 4.7) are app-side and have no served view source to come from.
+  const rest = finalized.filter((s) => s !== headSeg).map(fightOption)
+  if (!headSeg) return { head: null, rest }
   const head: ScopeOption = {
     value: LIVE_SELECTION,
     // State, not process: while a fight is open this row IS the current fight; between pulls it
@@ -679,16 +684,21 @@ export function fightScopeOptions(segments: SegmentSummary[]): ScopeOptions {
     durationSec: headSeg.durationSec,
     live: !!open
   }
-  const rest = (open ? finalized : finalized.slice(1)).map((s) => ({
+  return { head, rest }
+}
+
+/** A finalized fight as a selector row; an archived one says which archive it is in. */
+function fightOption(s: SegmentSummary): ScopeOption {
+  return {
     value: s.id,
     label: s.name,
     name: s.name,
     dps: s.dps,
     startTs: s.startTs,
     durationSec: s.durationSec,
-    live: false
-  }))
-  return { head, rest }
+    live: false,
+    ...(s.archive === undefined ? {} : { archive: s.archive })
+  }
 }
 
 /**

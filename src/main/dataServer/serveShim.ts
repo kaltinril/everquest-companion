@@ -57,6 +57,7 @@ import { engineLogMtimeMs, engineRequest, engineServeReadiness } from './engineC
 import { createReadShim, type ReadShim } from './readShim'
 import { liveHistory } from '../logArchive/liveHistory'
 import { withArchivedDrops } from '../../shared/logArchive/mergeDropsSeen'
+import { engineSideOpts, withArchivedFights } from '../../shared/logArchive/mergeFights'
 import { resolveMobIdentity } from '../mobAliases'
 import type { CombatSnapshot, FightSearchResult, SnapshotOpts } from '../../shared/combat'
 import type { MobLevelFact } from '../resist/world'
@@ -177,7 +178,10 @@ export const OPTS_ARE_STATED: Record<keyof SnapshotOpts, true> = {
   selectedId: true,
   showUnparsed: true,
   maxSegments: true,
-  timeline: true
+  timeline: true,
+  // APP-SIDE ON PURPOSE: archived fights are this process's to add (`serveCombatSnapshot`), and the
+  // engine has never seen them.
+  archived: true
 }
 
 // ── the three channels ─────────────────────────────────────────────────────────────────────────
@@ -260,18 +264,24 @@ export function serveModuleSnapshot(moduleId: string): Promise<ModuleSnap | null
   , () => null)
 }
 
-/** `combat:snapshot`, served — see the header for the clock test and for the cast. */
+/**
+ * `combat:snapshot`, served — see the header for the clock test and for the cast.
+ *
+ * ARCHIVED HISTORY (docs/plans/log-archive, step 4.7): for a caller that asks (`opts.archived`),
+ * fights from eligible archived logs follow the live ones. The same object back unless Keep log
+ * history is on and an eligible segment kept fights.
+ */
 export function serveCombatSnapshot(
   opts: SnapshotOpts,
   own: () => CombatSnapshot
 ): Promise<CombatSnapshot> {
   return readShim().serve(
     'combat.snapshot',
-    { opts: engineOpts(opts) },
+    { opts: engineOpts(engineSideOpts(opts)) },
     (r) =>
       Math.abs(r.now - Date.now()) > NOW_SKEW_MS ? null : (r.snapshot as unknown as CombatSnapshot),
     own
-  )
+  ).then((snap) => (opts.archived === true ? withArchivedFights(snap, liveHistory.archivedFights(), opts) : snap))
 }
 
 /** `combat:searchFights`, served. The clamp stays in `world.ts`: the schema mirrors this app's own

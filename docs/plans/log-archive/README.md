@@ -154,7 +154,8 @@ Update this table in the same commit as the step it records.
 | 4.4 | done 2026-10-03: respawn gaps of watched mobs, and the recent-kill candidates | 30d0e1b7 |
 | 4.5 | done 2026-10-03: progression series, one named difference | dc987532 |
 | 4.6 | left out 2026-10-03: the snapshot holds summaries, not samples (see phase 4) | f57a4792 |
-| 4.7 to 4.9 | waiting for ruling 0.4 | |
+| 4.7 | done 2026-10-04: fight summaries kept at capture and listed after the live fights | this commit |
+| 4.8, 4.9 | not started | |
 | 5.1 | answered 2026-10-03: yes, with conditions | |
 | 5.3 | done with the panel (version shown, older builds marked) | |
 | 5.2, 5.4, 5.5 | not started | |

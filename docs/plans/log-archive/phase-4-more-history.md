@@ -94,6 +94,21 @@ Until a module's step lands, that module shows what the live log holds, as it do
 - **Depends on**: ruling 0.4.
 - **Touches**: `src/main/dataServer/serveShim.ts` (a few lines), one merge file.
 - **After this step**: the fight picker lists fights from archived logs.
+- **As built** (2026-10-04): capture now also asks `combat.snapshot` for every fight (a page size
+  no log reaches) inside the same before/after pair as the modules, and stores the summaries as the
+  segment's optional `fights` field. The open fight is kept as finished; the whole-zone row is not
+  a fight and is left out. `SEGMENT_VERSION` stays 1: a segment written before this step reads as
+  one with no fights kept. The read path (`mergeFights.ts`, `history.ts archivedFights`) renames
+  each archived fight `arch:<segment>:<id>`, because the engine counts `e<n>` from the start of
+  each log and every log has an `e1`. Archived fights follow the live ones, newest first, before
+  the whole-zone row, and only fill the page the live log leaves under `maxSegments`, so "Load
+  more fights" pages into the archives and a poll stays small. Two changes the plan did not name:
+  the archived rows are added only for a caller that asks (`SnapshotOpts.archived`, app-side and
+  never sent to the engine), which is the Combat tab, so the overlays keep the live log's fights
+  and cannot open an archived one to an empty meter; and an archived selection resolves to
+  `selected: null` with the summary in `archivedSelected`, rather than to the engine's default
+  fight, which is what the engine does with an id it does not know. The picker's pinned head row
+  is the live log's current or last fight only, never an archived one.
 
 ### 4.8 Fight search
 

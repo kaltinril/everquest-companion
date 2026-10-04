@@ -15,6 +15,7 @@ import { getActiveCharacter } from '../session'
 import { getLogArchivePrefs, logArchiveOn, setLogArchivePrefs } from '../storeLogArchive'
 import { HELD_TEXT, type DumpAdvice, type LogArchiveReply, type LogArchiveStatus, type SegmentRow } from '../../shared/logArchive/panel'
 import { driveOf, rotateBlockers } from '../../shared/logArchive/preflight'
+import { capturedFights } from '../../shared/logArchive/mergeFights'
 import type { Segment } from '../../shared/logArchive/segment'
 import { archiveName, backupLog, sweepTemp } from './backup'
 import { captureSegment, type CaptureDeps } from './capture'
@@ -24,6 +25,10 @@ import { readJournal, recoverRotation, restoreLog, rotateLog, type RotateDeps } 
 import { listSegments, writeSegment } from './segmentStore'
 
 let busy: string | null = null
+
+/** A page size no log reaches, so the capture asks for every fight (step 4.7). The engine keeps
+ *  every finalized fight's summary; 6,299 fights measured at 1.6 MB (ruling 0.4). */
+const ALL_FIGHTS = 1_000_000
 
 function attached(): { character: string; logPath: string } | null {
   const c = getActiveCharacter()
@@ -38,6 +43,14 @@ const captureDeps: CaptureDeps = {
     try {
       const r = await engineRequest('module.snapshot', { module })
       return r.module === module ? { seq: r.seq, state: r.state } : null
+    } catch {
+      return null
+    }
+  },
+  fights: async () => {
+    try {
+      const r = await engineRequest('combat.snapshot', { opts: { maxSegments: ALL_FIGHTS } })
+      return capturedFights((r.snapshot as { segments?: unknown }).segments)
     } catch {
       return null
     }
