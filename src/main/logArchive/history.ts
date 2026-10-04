@@ -14,6 +14,9 @@
 //
 // CACHED PER MODULE AND ENGINE SEQ, so a busy surface re-reading the same snapshot does not
 // re-merge it.
+//
+// `archived` hands out the eligible archived states of one module, unmerged, for a read that is not
+// a module snapshot (one mob's drops, step 4.1). The same switch and the same eligibility apply.
 
 import { createHash } from 'node:crypto'
 import { closeSync, openSync, readSync } from 'node:fs'
@@ -61,6 +64,8 @@ function firstStamp(head: Buffer): string | null {
 
 export interface HistoryMerge {
   mergeHistory: (moduleId: string, seq: number, state: unknown) => unknown
+  /** The eligible archived states of `moduleId`, oldest first; empty with the switch off. */
+  archived: (moduleId: string) => unknown[]
   status: () => HistoryStatus | null
   noteSealedThisAttach: (id: string) => void
   forgetHistoryContext: () => void
@@ -105,20 +110,30 @@ export function createHistoryMerge(deps: HistoryDeps): HistoryMerge {
     return ctx
   }
 
+  function statesOf(c: Context, moduleId: string): unknown[] {
+    return c.shown.flatMap((s) => (Object.hasOwn(s.modules, moduleId) ? [s.modules[moduleId].state] : []))
+  }
+
+  function archived(moduleId: string): unknown[] {
+    if (!deps.on()) return []
+    const c = context()
+    return c === null ? [] : statesOf(c, moduleId)
+  }
+
   function mergeHistory(moduleId: string, seq: number, state: unknown): unknown {
     if (!hasMergeRule(moduleId) || !deps.on()) return state
     const c = context()
     if (c === null || c.shown.length === 0) return state
     const hit = cache.get(moduleId)
     if (hit?.seq === seq) return hit.state
-    const archived = c.shown.flatMap((s) => (Object.hasOwn(s.modules, moduleId) ? [s.modules[moduleId].state] : []))
-    const merged = mergeModule(moduleId, archived, state).state
+    const merged = mergeModule(moduleId, statesOf(c, moduleId), state).state
     cache.set(moduleId, { seq, state: merged })
     return merged
   }
 
   return {
     mergeHistory,
+    archived,
     status: () => (ctx === null ? null : { shown: ctx.shown.map((s) => s.id), held: ctx.held, skipped: ctx.skipped }),
     noteSealedThisAttach: (id) => {
       sealedThisAttach.add(id)

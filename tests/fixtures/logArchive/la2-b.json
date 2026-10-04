@@ -1,0 +1,69 @@
+{
+ "consider": [
+  {
+   "cons": 1,
+   "difficulty": "You could probably win this fight.",
+   "faction": "indifferent",
+   "id": "a large rat",
+   "level": 1,
+   "mob": "a large rat",
+   "rare": false,
+   "ts": 1785550200000
+  },
+  {
+   "cons": 1,
+   "difficulty": "You could probably win this fight.",
+   "faction": "indifferent",
+   "id": "sheldon",
+   "level": 10,
+   "mob": "Sheldon",
+   "rare": false,
+   "ts": 1785550350000,
+   "zone": "East Freeport"
+  }
+ ],
+ "loot": [
+  {
+   "item": "Rat Whisker",
+   "source": "a large rat",
+   "ts": 1785550325000
+  },
+  {
+   "count": 1,
+   "disposition": "destroyed",
+   "item": "Rat Whisker",
+   "ts": 1785550380000,
+   "zone": "East Freeport"
+  }
+ ],
+ "classUnlocks": [
+  {
+   "className": "Paladin",
+   "ts": 1785550210000
+  },
+  {
+   "className": "Rogue",
+   "ts": 1785550220000
+  }
+ ],
+ "turnins": [
+  {
+   "items": [
+    "Wind Rune Geza"
+   ],
+   "npc": "Dason Goldblade",
+   "ts": 1785550265000
+  }
+ ],
+ "itemTiers": {
+  "whitened treant fists": {
+   "firstAt": 1785550290000,
+   "key": "whitened treant fists",
+   "lastAt": 1785550300000,
+   "lastTier": 2,
+   "merges": 2,
+   "name": "Whitened Treant Fists",
+   "tier": 3
+  }
+ }
+}

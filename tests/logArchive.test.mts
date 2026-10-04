@@ -248,6 +248,15 @@ test('read path: one sealed segment is merged under the live rows', () => {
   assert.deepEqual(t.h.status()?.shown, ['seg-a'])
 })
 
+test('read path: archived states are handed out only with the switch on (step 4.1)', () => {
+  const off = harness({ on: () => false, segments: [sealedLoot] })
+  assert.deepEqual(off.h.archived('loot'), [])
+  assert.equal(off.dirReads(), 0)
+  const on = harness({ segments: [sealedLoot] })
+  assert.deepEqual(on.h.archived('loot'), [[{ ts: 1, item: 'old' }]])
+  assert.deepEqual(on.h.archived('kills'), [])
+})
+
 test('read path: the same seq is merged once', () => {
   const t = harness({ segments: [sealedLoot] })
   const first = t.h.mergeHistory('loot', 4, [{ ts: 2, item: 'new' }])
