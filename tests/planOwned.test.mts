@@ -407,3 +407,44 @@ test('a paired slot is two cells: its bar is the weaker worn copy, and a gap unt
   assert.equal(pair.bar, roleValue(STRONG.stats, 'tank'), 'two copies of one ring are two worn copies')
   assert.deepEqual(pair.ups, [], 'and an AC 15 ring beats neither')
 })
+
+test('fang of the wolf does not clear an earring bar: a weapon block does nothing worn in the ear', () => {
+  // Owner report, 2026-10-03: the route offered Fang of the Wolf (EAR, PRIMARY, SECONDARY) over two
+  // stat earrings on the 7.7 points its DMG 5 / DELAY 26 ratio earns in a hand.
+  const FANG = row({
+    key: 'fang of the wolf',
+    name: 'Fang of the Wolf',
+    slots: ['EAR', 'PRIMARY', 'SECONDARY'],
+    skill: 'Piercing',
+    classes: ['WAR', 'ROG', 'SHM'],
+    stats: { DMG: 5, DELAY: 26 }
+  })
+  const DIAMONDINE = row({ key: 'diamondine earring', name: 'Diamondine Earring', slots: ['EAR'], stats: { AC: 2, STR: 3, HP: 12 } })
+  const BASHING = row({
+    key: 'earring of bashing',
+    name: 'Earring of Bashing',
+    slots: ['EAR'],
+    stats: { AC: 5, STR: 8, WIS: 8, SV_FIRE: 5, SV_COLD: 5, SV_MAGIC: 5, SV_DISEASE: 5, SV_POISON: 5 }
+  })
+  const scope = { role: 'dps1h' as const, classes: ['WAR' as const, 'MNK' as const, 'SHM' as const] }
+  const ctx = { classes: scope.classes }
+  assert.ok(
+    roleValue(FANG.stats, scope.role, { ...ctx, slot: 'EAR' }) < roleValue(DIAMONDINE.stats, scope.role, ctx),
+    'in the ear the fang states nothing a 1H focus reads'
+  )
+  assert.ok(roleValue(FANG.stats, scope.role, { ...ctx, slot: 'PRIMARY' }) > 7, 'in a hand its ratio still counts')
+
+  const byKey = new Map([FANG, DIAMONDINE, BASHING].map((r) => [r.key, r]))
+  const map: GearOwnershipMap = new Map([
+    [DIAMONDINE.key, own({ facts: [at('equipped')] })],
+    [BASHING.key, own({ facts: [at('equipped')] })],
+    [FANG.key, own({ facts: [at('bank')] })]
+  ])
+  const keys = ownedKeysOf(map)
+  const side = ownedSide(keys, byKey, scope)
+  assert.deepEqual(
+    ownedUpgrades(keys, byKey, side, scope).map((u) => u.slot),
+    ['PRIMARY'],
+    'the banked fang is hand advice (both hands empty here), never ear advice'
+  )
+})

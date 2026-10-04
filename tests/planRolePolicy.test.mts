@@ -29,6 +29,7 @@ import itemsJson from '../src/main/data/items.json'
 import type { ItemDbFile } from '../src/main/itemsDb'
 import { buildGearIndex } from '../src/main/planner/gearIndex'
 import type { GearRow } from '../src/shared/planner/gear'
+import type { EquipSlot } from '../src/shared/planner/types'
 import {
   ROLE_WEAPON_POLICY,
   SURVIVABILITY_DEFAULT,
@@ -405,4 +406,25 @@ test('DD and DOT are NEARLY THE SAME RANKING, on purpose, and differ on exactly 
   for (const stats of [{ AC: 20 }, { STR: 10, DEX: 10 }, { HP: 40, STA: 10 }, { SV_FIRE: 15 }]) {
     assert.equal(roleValue(stats, 'dd'), roleValue(stats, 'dot'))
   }
+})
+
+test('a weapon that also lists EAR is scored as a stat item in the ear, not on its ratio', () => {
+  // Owner report, 2026-10-03: Fang of the Wolf was routed into EAR over two stat earrings.
+  const FANG = row({
+    key: 'fang of the wolf',
+    name: 'Fang of the Wolf',
+    slots: ['EAR', 'PRIMARY', 'SECONDARY'],
+    skill: 'Piercing',
+    stats: { DMG: 5, DELAY: 26 }
+  })
+  const earBar = roleValue({ AC: 2, STR: 3, HP: 12 }, 'dps1h', { slot: 'EAR' })
+  const handBar = roleValue({ DMG: 16, DELAY: 22 }, 'dps1h', { slot: 'PRIMARY' })
+  const bars = new Map<EquipSlot, number>([
+    ['EAR', earBar],
+    ['PRIMARY', handBar],
+    ['SECONDARY', handBar]
+  ])
+  assert.deepEqual(admitted('dps1h', { gear: [FANG], ownedBestBySlot: bars }), [], 'no slot it fits is an upgrade')
+  // A hand bar it does clear on its ratio still admits it: the weapon block counts where it swings.
+  assert.deepEqual(admitted('dps1h', { gear: [FANG], ownedBestBySlot: new Map([...bars, ['PRIMARY', 1]]) }), ['fang of the wolf'])
 })

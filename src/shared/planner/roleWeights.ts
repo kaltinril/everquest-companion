@@ -542,6 +542,22 @@ export interface RoleContext {
    *  absent is `SURVIVABILITY_DEFAULT` (damage-leaning, by ruling), 0.5 IS the table above, and
    *  every other focus ignores it entirely. */
   survivability?: number
+  /** the slot the item would be WORN in; absent is "any slot" and reads the weapon block wherever
+   *  it is stated (the Gear tab's slot-free score) */
+  slot?: EquipSlot
+}
+
+/**
+ * THE SLOTS A WEAPON SWINGS FROM (owner report, 2026-10-03: Fang of the Wolf, DMG 5 DELAY 26, was
+ * routed into EAR over two stat earrings on its 7.7-point ratio). The corpus states DMG and DELAY on
+ * rows that also list EAR, NECK and the like, and worn there the weapon block does nothing: the
+ * row is scored as the stat item it is in that slot.
+ */
+const WEAPON_SLOTS: ReadonlySet<EquipSlot> = new Set<EquipSlot>(['PRIMARY', 'SECONDARY', 'RANGE'])
+
+/** The ratio the focus reads in `ctx.slot` — none outside the hands and the range slot. */
+function slotRatio(stats: GearStats, slot: EquipSlot | undefined): number | undefined {
+  return slot === undefined || WEAPON_SLOTS.has(slot) ? gearEffectiveRatio(stats) : undefined
 }
 
 /**
@@ -577,7 +593,7 @@ export interface RoleContext {
 export function roleValue(stats: GearStats, role: GearRole, ctx: RoleContext = {}): number {
   const weights = focusWeights(role, ctx.survivability)
   const gate = liveGate(ctx.classes ?? [])
-  const ratio = gearEffectiveRatio(stats)
+  const ratio = slotRatio(stats, ctx.slot)
   // HASTE PRICES AT NOTHING ON A WEAPON ROW (fork ruling, kaltinril 2026-09-05: *"i'd obviously
   // put a haste belt or cape on when i get the fangol"*). Worn haste does not stack, the same
   // percentage lives on belts, capes and gloves, so it is a property of the LOADOUT and not of the
