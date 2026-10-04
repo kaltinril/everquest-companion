@@ -56,7 +56,9 @@ import {
   applySeed,
   clearDone,
   removeWish,
+  setWishReason,
   type WishEntry,
+  type WishReason,
   type WishList
 } from '@shared/planner/wishlist'
 
@@ -67,6 +69,8 @@ export interface WishlistApi {
   /** add one wish; already-wished items are a no-op (the model dedupes by `itemKey`) */
   add: (entry: WishEntry) => void
   remove: (itemKey: string) => void
+  /** change what a wish is wanted for — to wear, or one effect for an exaltation — in place */
+  setReason: (itemKey: string, reason: WishReason) => void
   /** dismiss a batch of fulfilled wishes from the done strip, persistently */
   dismiss: (itemKeys: readonly string[]) => void
   /**
@@ -179,7 +183,7 @@ function apply(edit: (prev: WishList) => WishList): void {
   void window.eq.setWishlist(next)
 }
 
-// THE FOUR DOORS, AT MODULE SCOPE, so their identity is fixed for the life of the window. Both
+// THE DOORS, AT MODULE SCOPE, so their identity is fixed for the life of the window. Both
 // browse surfaces hand a per-row handler down through a `memo`'d row and JOS-343 made those
 // handlers depend on `add`/`remove`; a `useCallback` per mount would have been stable too, but a
 // constant cannot be got wrong.
@@ -189,6 +193,10 @@ function add(entry: WishEntry): void {
 
 function remove(itemKey: string): void {
   apply((prev) => removeWish(prev, itemKey))
+}
+
+function setReason(itemKey: string, reason: WishReason): void {
+  apply((prev) => setWishReason(prev, itemKey, reason))
 }
 
 function dismiss(itemKeys: readonly string[]): void {
@@ -211,7 +219,7 @@ export function useWishlist(): WishlistApi {
     load()
   }, [])
   return useMemo(
-    () => ({ list: snap.list, ready: snap.ready, add, remove, dismiss, seed }),
+    () => ({ list: snap.list, ready: snap.ready, add, remove, setReason, dismiss, seed }),
     [snap]
   )
 }

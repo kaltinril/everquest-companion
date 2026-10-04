@@ -39,6 +39,7 @@ import { dropMobTarget, dropZoneTarget } from '../gear/dropLinks'
 import type { MobTarget } from '../mobs/mobTarget'
 import type { ZoneShort } from '@shared/maps'
 import type { ClassAbbr } from '@shared/classCombo'
+import { WantedFor } from './WishReason'
 
 const KIND_HINT: Record<FarmGroup['kind'], string> = {
   zone: 'Wishes whose best-known camp is in this zone.',
@@ -87,15 +88,6 @@ function AlsoZones({
           </Box>
         )
       })}
-    </Typography>
-  )
-}
-
-/** What a row is WANTED FOR — the effect on a donor wish, the honest word `gear` otherwise. */
-function WantedFor({ row }: { row: FarmNeed }): JSX.Element {
-  return (
-    <Typography variant="caption" noWrap sx={{ display: 'block', color: 'text.secondary' }}>
-      {row.effect ?? 'gear'}
     </Typography>
   )
 }
