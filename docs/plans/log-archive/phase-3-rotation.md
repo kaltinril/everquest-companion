@@ -135,7 +135,24 @@ reopens is checked in step 3.3; step 6 above records them either way.
 - **After this step**: the result is recorded here, with anything that differed.
 - **Undo**: step 3.6.
 
-Result: _not yet run_
+Result (2026-10-03, automated by `tests/e2e/log-archive-trial.mts` on a copy of the owner's
+324 MB log, in a temp install with its own settings folder; the live log was never touched):
+
+- Archive: 324,347,223 bytes became a 28,260,590-byte archive; the live log was left at 0 bytes.
+- **The next launch was ready in 2 seconds instead of 60.**
+- Kills, loot, levels and AA, consider, item tiers, class unlocks, turn-ins, respawn and the
+  leveling series were identical before the archive, in the same session after it, and at the
+  next launch from the archive plus the fresh log. The only difference is the respawn card's
+  current zone, which the fresh log does not know until the game prints a zone line.
+- New lines in the fresh log added to the history. Putting the log back produced exactly the
+  original bytes followed by the new lines, and nothing was counted twice.
+- **One loss, found by the trial and caused by the engine:** the first line of a fresh log is
+  counted while the app runs, but not at the next launch. The engine's launch-date epoch
+  (`engine/crates/fold/src/epoch.rs`) fires at the first line dated after 2026-07-28 and is
+  delivered after that line, so every character-scoped module clears what that line just added.
+  In a log that began before launch day the line is a login line and nothing is lost; in a fresh
+  log it is whatever the game printed first. Fixing it is an engine change and waits on the
+  owner.
 
 ## As built (2026-10-03)
 
