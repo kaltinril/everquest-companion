@@ -90,8 +90,10 @@ As built (2026-10-04), in `main/logArchive/engineBuckets.ts`:
 - **Versions:** only resist ledger version 3 and message register version 2 are read or written.
   A file of any other version, or one that does not parse, is left exactly as it is. Every write
   is temp + fsync + rename.
-- **With the switch off** the launch step does nothing. Keys already added stay in the files,
-  and the resist card and the message register keep pooling them.
+- **With the switch off** the launch step takes every `archive:` key out of both files (same
+  version checks, same durable write), so the tabs show what the live log alone gives, as the
+  README's switch rule says. It does not open the archive folder, and the stashes stay: turning
+  the switch back on adds them again at the next launch through the ordinary copy.
 - **What is missed:** what the engine learned after its last write and before the move, which is
   under a minute. No line is counted twice.
 - **Call sites:** the rotation (`rotateNow`) and the launch check (`recoverLogArchiveAtLaunch`),
@@ -99,7 +101,8 @@ As built (2026-10-04), in `main/logArchive/engineBuckets.ts`:
   the second, for the reason in the first bullet.
 - **Tests** (`tests/logArchiveBuckets.test.mts`, fixture files): the copy survives the engine
   rewriting the file and holds only the archived share; a second launch does not copy again; an
-  unknown version is left alone at the archive and at launch; the switch off does nothing; an
+  unknown version is left alone at the archive, at launch and with the switch off; the switch off
+  takes the keys out and keeps the stashes, and turning it on again adds them back; an
   unsealed segment waits; a restored segment is taken out; nothing is kept when the log was not
   moved or for a second archive in one run; the wait ends at a write, or after its limit.
 

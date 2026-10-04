@@ -217,16 +217,24 @@ function place(userData: string, stash: BucketStash): number {
   return n
 }
 
+/** Take every key `drop` names out of both files. How many files changed. */
+function removeKeys(userData: string, drop: (key: string) => boolean): number {
+  let n = 0
+  for (const f of ENGINE_FILES) {
+    const changed = editFile(userData, f, (file) => {
+      const before = file.sources.length
+      file.sources = file.sources.filter((s) => !drop(s.key))
+      return file.sources.length !== before
+    })
+    if (changed) n++
+  }
+  return n
+}
+
 /** A restored segment: take its key out of both files and forget the stash. */
 function withdraw(userData: string, dir: string, stash: BucketStash): void {
   const key = archiveKey(stash.segmentId)
-  for (const f of ENGINE_FILES) {
-    editFile(userData, f, (file) => {
-      const before = file.sources.length
-      file.sources = file.sources.filter((s) => s.key !== key)
-      return file.sources.length !== before
-    })
-  }
+  removeKeys(userData, (k) => k === key)
   rmSync(stashPath(dir, stash.segmentId), { force: true })
 }
 
@@ -242,9 +250,21 @@ export interface PlaceDeps {
   note: (line: string) => void
 }
 
-/** At launch, before the engine is told where its files are. Nothing while the switch is off. */
+/**
+ * At launch, before the engine is told where its files are.
+ *
+ * WITH THE SWITCH OFF every carried key is taken out of both files, so the tabs show what the live
+ * log alone gives (the README's switch rule). The archive folder is not opened and the stashes stay,
+ * so turning the switch back on adds them again at the next launch through the ordinary copy.
+ */
 export function placeArchivedBuckets(deps: PlaceDeps): void {
-  if (!deps.on() || !existsSync(deps.dir)) return
+  if (!deps.on()) {
+    if (removeKeys(deps.userData, (k) => k.startsWith(archiveKey(''))) > 0) {
+      deps.note('log archive: Keep log history is off, so carried resist and message history was taken out')
+    }
+    return
+  }
+  if (!existsSync(deps.dir)) return
   for (const stash of readStashes(deps.dir)) {
     const state = deps.stateOf(stash.segmentId)
     if (state === 'sealed') {

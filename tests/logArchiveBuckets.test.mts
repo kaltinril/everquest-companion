@@ -139,14 +139,43 @@ test('buckets: a file that becomes an unknown version before the launch is not w
   assert.equal(readFileSync(join(f.userData, LEDGER), 'utf8'), future)
 })
 
-test('buckets: with the switch off the launch does nothing', async () => {
+test('buckets: the switch off withdraws every carried key, keeps the stashes, and on again re-adds them', async () => {
   resetArchiveBucketsForTests()
   const f = fixture()
   await archive(f)
   const before = [readFileSync(join(f.userData, LEDGER), 'utf8'), readFileSync(join(f.userData, OVERLAY), 'utf8')]
-  placeArchivedBuckets(placeDeps(f, 'sealed', { on: () => false, stateOf: () => assert.fail('read while off') }))
-  assert.deepEqual([readFileSync(join(f.userData, LEDGER), 'utf8'), readFileSync(join(f.userData, OVERLAY), 'utf8')], before)
-  assert.ok(existsSync(join(f.dir, `${SEG}.buckets.json`)))
+  placeArchivedBuckets(placeDeps(f, 'sealed'))
+  const placed = [readFileSync(join(f.userData, LEDGER), 'utf8'), readFileSync(join(f.userData, OVERLAY), 'utf8')]
+  const stashPath = join(f.dir, `${SEG}.buckets.json`)
+  const stash = readFileSync(stashPath, 'utf8')
+  // Off: the archive folder is not read, the keys go, everything else stays as it was.
+  const off = placeDeps(f, 'sealed', { on: () => false, stateOf: () => assert.fail('read while off') })
+  placeArchivedBuckets(off)
+  assert.equal(bucket(f, LEDGER, archiveKey(SEG)), undefined)
+  assert.equal(bucket(f, OVERLAY, archiveKey(SEG)), undefined)
+  assert.deepEqual(read(f, LEDGER), JSON.parse(before[0]))
+  assert.deepEqual(read(f, OVERLAY), JSON.parse(before[1]))
+  assert.equal(readFileSync(stashPath, 'utf8'), stash)
+  // A second launch while off writes nothing.
+  const offOnce = [readFileSync(join(f.userData, LEDGER), 'utf8'), readFileSync(join(f.userData, OVERLAY), 'utf8')]
+  const notes: string[] = []
+  placeArchivedBuckets({ ...off, note: (l) => notes.push(l) })
+  assert.deepEqual([readFileSync(join(f.userData, LEDGER), 'utf8'), readFileSync(join(f.userData, OVERLAY), 'utf8')], offOnce)
+  assert.deepEqual(notes, [])
+  // On again: the next launch adds them back from the untouched stash.
+  placeArchivedBuckets(placeDeps(f, 'sealed'))
+  assert.deepEqual(read(f, LEDGER), JSON.parse(placed[0]))
+  assert.deepEqual(read(f, OVERLAY), JSON.parse(placed[1]))
+  assert.equal(readFileSync(stashPath, 'utf8'), stash)
+})
+
+test('buckets: the switch off leaves a file of an unknown version alone', async () => {
+  resetArchiveBucketsForTests()
+  const f = fixture()
+  const future = JSON.stringify({ version: 99, sources: [{ key: archiveKey(SEG), rows: [row('a gnoll', 1)] }] })
+  writeFileSync(join(f.userData, LEDGER), future)
+  placeArchivedBuckets(placeDeps(f, 'sealed', { on: () => false }))
+  assert.equal(readFileSync(join(f.userData, LEDGER), 'utf8'), future)
 })
 
 test('buckets: a segment that is not sealed yet, or still being finished, is waited for', async () => {
