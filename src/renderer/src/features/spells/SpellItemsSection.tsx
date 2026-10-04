@@ -27,6 +27,7 @@ import { Box, Chip, Stack, Typography } from '@mui/material'
 import type { SpellItemGroup, SpellItemSource } from '@shared/spellDetail'
 import type { SocketType } from '@shared/planner/types'
 import { Tooltip } from '../../lib/Tooltip'
+import { KnownItemTooltip } from '../../lib/KnownItemTooltip'
 
 /**
  * WHAT EACH SOCKET IS CALLED, and what it means in one clause.
@@ -44,7 +45,8 @@ const SOCKET_WORDS: Record<SocketType, { label: string; hint: string }> = {
   proc: { label: 'Proc', hint: 'it fires on its own in combat' }
 }
 
-/** One item. The name is plain text: the Loot drill takes an item KEY and this is a future link. */
+/** One item. The name hovers with its item card; the Loot drill takes an item KEY and a click on
+ *  it is a future link. */
 function ItemRow({ row }: { row: SpellItemSource }): JSX.Element {
   return (
     <Stack
@@ -56,7 +58,9 @@ function ItemRow({ row }: { row: SpellItemSource }): JSX.Element {
       data-socket={row.socket}
       sx={{ py: 0.25 }}
     >
-      <Typography variant="body2">{row.name}</Typography>
+      <KnownItemTooltip name={row.name} clickThrough>
+        <Typography variant="body2">{row.name}</Typography>
+      </KnownItemTooltip>
       {/* THE EFFECT AS THE ITEM WRITES IT, which is not always the spell's own name: a focus row
           carries a rank (`Improved Healing III`) the spell page's title does not, and hiding that
           would make three different items look like three copies of one. */}
