@@ -1043,6 +1043,11 @@ export const IPC = {
   logArchiveRotate: 'logArchive:rotate',
   // Arg: segment id. Put an archived log back in front of the live one, then restart the app.
   logArchiveRestore: 'logArchive:restore',
+  // Args: segment id, boolean (copy the client's tables beside the staged log). Developer-only,
+  // refused in a packaged build: refold the archive in a second engine and compare (step 5.4).
+  logArchiveRefoldTrial: 'logArchive:refoldTrial',
+  // Arg: segment id. Refold a segment an older build produced, and swap the new totals in (5.5).
+  logArchiveRefresh: 'logArchive:refresh',
 
   // ---- misc pushes ----
   onLine: 'log:line',

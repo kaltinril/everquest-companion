@@ -70,7 +70,8 @@ function SegmentLine(props: { s: SegmentRow; newest: boolean; run: (p: Promise<L
       )}
       {s.olderEngine && (
         <Typography variant="caption" color="text.secondary" display="block">
-          Recorded by version {s.app}. Later fixes to how the log is read do not reach this history.
+          Recorded by version {s.app}. Later fixes to how the log is read reach this history only
+          when it is refreshed.
         </Typography>
       )}
       <Stack direction="row" spacing={1} sx={{ mt: 0.5 }}>
@@ -78,6 +79,14 @@ function SegmentLine(props: { s: SegmentRow; newest: boolean; run: (p: Promise<L
           <Button size="small" variant="outlined" data-testid="log-archive-keep" onClick={() => props.run(window.eq.logArchiveKeep(s.id))}>
             Keep this history
           </Button>
+        )}
+        {s.olderEngine && s.archivePath !== null && (
+          <ConfirmButton
+            testId="log-archive-refresh"
+            label="Refresh this history"
+            confirm="This reads the archived log again with this version, in the background, and replaces the kept totals with the new ones. It can take a minute or two for a big log."
+            onGo={() => props.run(window.eq.logArchiveRefresh(s.id))}
+          />
         )}
         {s.state === 'sealed' && props.newest && s.archivePath !== null && (
           <ConfirmButton

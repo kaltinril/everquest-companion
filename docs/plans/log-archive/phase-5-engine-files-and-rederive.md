@@ -136,7 +136,44 @@ every line, so the totals can be recomputed.
   totals as the segment, given the same engine build?
 - **Undo**: delete the file.
 
-Finding: _not yet run_
+Finding (2026-10-04, measured): **yes. Given the same engine build, a second fold of the archive
+produces the totals the segment stored, in every module.**
+
+- **How it was run.** `tests/e2e/log-archive-refold-trial.mts` stages a log in a temp install with
+  its own settings folder, folds it in the app, turns the switch on, backs the log up, and calls
+  the developer's trial (`window.eq.logArchiveRefoldTrial`, refused in a packaged build). Both folds
+  used the same `engined.exe` (app 43.7.0).
+- **The split-log fixture** (`wl40-farm-run.log`, 76,494 bytes, 941 events): all 20 captured
+  modules the same. Folded in 0.75 s.
+- **A copy of the owner's log** (324,347,223 bytes, 3,888,249 events; the copy was deleted
+  afterwards): all 20 modules the same, kills, loot, levels and AA, respawn, progression, buffs,
+  resist and the event feed included. Decompressing and checking the hash took 5.1 to 5.4 s. The
+  second fold took 134 s without the client's tables and 109 s with them, at below-normal
+  priority, while the trial's own engine and the owner's dev app were running. The app's own first
+  fold of the same log in that run was ready in 83 s.
+- **One value always differs, and is not a total:** the `character` module names the file it read,
+  which for a refold is the staged copy. The comparison leaves out that one path
+  (`refoldCompare.ts IDENTITY_PATHS`), and a refresh keeps the stored path.
+- **The supervisor** is not used. `main/logArchive/secondEngine.ts` starts the same binary by the
+  same contract (token on stdin, port on stdout, closing stdin stops it), with no restart and no
+  health watchdog, and stops it when the snapshots are read. The process itself is started by
+  `engineHost.ts spawnEngineProcess`, which stays the one module allowed to launch the engine
+  (`tests/noChildProcess.test.mts`). The app's engine kept serving.
+- **The client's tables** made no difference to any module. The engine reads `spells_us.txt`
+  lazily, to answer card and search questions (`engined/src/spells.rs`). They are copied beside
+  the staged log anyway when the live install is known, so a later engine that does use them in
+  the fold gets them.
+- **The app's knowledge must go first.** Alert definitions, buff trust, respawn watches and the
+  character's combo and roster edits change a fold, so the refold sends them before its attach,
+  as the app's own client does, and a define the engine refuses is skipped, as the app does (this
+  build refuses `buffTrust.define` from both). A refold therefore uses today's settings, not the
+  ones in force at capture: a player who has since changed a respawn watch gets a refold under the
+  new watch.
+- **No state folder.** The refold reads and writes no resist ledger or message register. The trial
+  profile had none, so this was not a difference here. `resist` has no merge rule, so a refreshed
+  segment's resist state is never shown either way.
+
+So step 5.5 can be built.
 
 ### 5.5 Refresh a segment
 
@@ -149,6 +186,26 @@ Finding: _not yet run_
 - **Check**: on a fixture, a segment captured with a snapshot that lacks one event kind gains
   it after the refresh.
 - **Undo**: the old segment file is restored from its kept copy.
+
+As built (2026-10-04):
+
+- `main/logArchive/refresh.ts` holds the order: refold (step 5.4's code, with the client's tables),
+  write `<id>.segment.json.next`, read it back and compare it with what was written, copy the old
+  file to `<id>.segment.json.old`, then rename the new file over the old. A crash leaves the old
+  file or the new one in place. The launch check removes `.old` and any unswapped `.next`.
+- Only the module snapshots and `producedBy` change. The log identity, the archive, the state and
+  the path the `character` module names are kept. A refold that lacks a module the segment held is
+  refused, so a refresh never loses one. The merge reads the folder again afterwards, so the tabs
+  show the new totals at once.
+- The panel shows "Refresh this history" only on a segment marked as older that has an archive,
+  and asks first; main refuses a segment this version already produced. The reply names the
+  modules whose totals changed.
+- Check, on the split-log fixture with the real engine (`tests/e2e/log-archive-refold-trial.mts`):
+  the segment was rewritten as an older build with its 250 loot rows removed; the panel marked it
+  older; the refresh answered "Updated: loot", the 250 rows were back, the segment recorded 43.7.0,
+  the old file was kept beside it, and the mark was gone. Unit tests in
+  `tests/logArchiveRefold.test.mts` cover the refusals and a failed or short refold leaving the
+  file untouched.
 
 ## When this phase is done
 

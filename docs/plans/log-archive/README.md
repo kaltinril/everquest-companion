@@ -165,6 +165,7 @@ Update this table in the same commit as the step it records.
 | 5.1 | answered 2026-10-03: yes, with conditions | |
 | 5.2 | done 2026-10-04: resist and message buckets kept per archive, read at the archive, added at the next launch | c5d40f07 |
 | 5.3 | done with the panel (version shown, older builds marked) | |
-| 5.4, 5.5 | not started | |
+| 5.4 | measured 2026-10-04: a second fold matches the segment in all 20 modules (see phase 5) | a20bf12d, c10e63d0 |
+| 5.5 | done 2026-10-04: "Refresh this history" on older segments | 386fa030 |
 | 6.1 | first pass in the panel's own words | |
 | 6.2 to 6.4 | wait for the owner's trial | |
