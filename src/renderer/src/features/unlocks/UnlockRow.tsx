@@ -21,6 +21,7 @@ import { factionNameKey } from '@shared/outputs/factions'
 import { nameKey } from '@shared/unlocks/unlockGraph'
 import { countedNeeds, howText, type Unlock, type UnlockNeed } from '@shared/unlocks/unlocks'
 import { unlockRowId } from '../../lib/unlockLink'
+import { KnownItemTooltip } from '../../lib/KnownItemTooltip'
 import { rewardKey, type UnlocksController } from './useUnlocksController'
 
 const CHIP_SX = { height: 20, fontSize: 11, '& .MuiChip-label': { px: 0.75 } }
@@ -70,8 +71,18 @@ function RewardNeed({
     fact === undefined
       ? 'No Sky quest on record hands this out'
       : `${fact.questName}${fact.giver === undefined ? '' : ` - ${fact.giver}`}`
+  // The subject IS an item, so it hovers with the item card, and the quest that hands it out rides
+  // under the item window as the card's own extra line (owner ask, 2026-10-03).
   return (
-    <Tooltip title={title}>
+    <KnownItemTooltip
+      name={need.subject}
+      clickThrough
+      extra={
+        <Typography component="div" sx={{ fontSize: 11, mt: 0.5 }}>
+          {title}
+        </Typography>
+      }
+    >
       <Chip
         size="small"
         variant="outlined"
@@ -87,7 +98,7 @@ function RewardNeed({
         }
         sx={CHIP_SX}
       />
-    </Tooltip>
+    </KnownItemTooltip>
   )
 }
 
