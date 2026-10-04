@@ -43,6 +43,11 @@ export interface MergedModule {
  * rule cannot join to the live state's shape is skipped, so an old-format archive never blocks the
  * archives after it. With no rule, or nothing usable, the live state comes back untouched, the
  * same object.
+ *
+ * The first usable state starts the fold as itself, not as its join with the empty template: the
+ * template is a shape test, not a side. Joined through it, a rule that reads the newer side's present
+ * read an empty one: respawn dropped every archived clock (the template watches nothing), and
+ * progression counted the live side's `dropped` twice. Found and fixed with step 3.8.
  */
 export function mergeModule(moduleId: string, archived: readonly unknown[], live: unknown): MergedModule {
   const rule = hasMergeRule(moduleId) ? MERGE_RULES[moduleId] : undefined
@@ -51,9 +56,8 @@ export function mergeModule(moduleId: string, archived: readonly unknown[], live
   let acc: unknown = undefined
   let used = 0
   for (const state of archived) {
-    const alone = rule(state, template)
-    if (alone === null) continue
-    const next = acc === undefined ? alone : rule(acc, state)
+    if (rule(state, template) === null) continue
+    const next = acc === undefined ? state : rule(acc, state)
     if (next === null) continue
     acc = next
     used++

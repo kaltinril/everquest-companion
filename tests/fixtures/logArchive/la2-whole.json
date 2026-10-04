@@ -159,5 +159,45 @@
    1785549600000,
    1785550330000
   ]
+ },
+ "kills": {
+  "mobs": {
+   "a large rat": {
+    "bestTier": -1,
+    "count": 2,
+    "credited": 0,
+    "display": "a large rat",
+    "firstTs": 1785549720000,
+    "lastTs": 1785550320000,
+    "tiers": {
+     "-1": {
+      "count": 2,
+      "credited": 0,
+      "firstTs": 1785549720000,
+      "lastCreditedTs": 0,
+      "lastTs": 1785550320000
+     }
+    }
+   }
+  },
+  "v": 5
+ },
+ "respawn": {
+  "prefs": {
+   "watches": []
+  },
+  "recent": [
+   {
+    "display": "a large rat",
+    "key": "a large rat",
+    "kills": 2,
+    "lastTs": 1785550320000,
+    "watched": false,
+    "zone": "West Freeport"
+   }
+  ],
+  "rows": [],
+  "v": 4,
+  "zone": "East Freeport"
  }
 }

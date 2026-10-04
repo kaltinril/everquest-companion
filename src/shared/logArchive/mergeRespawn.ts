@@ -16,6 +16,12 @@
 // from the live state only. An archived clock row is shown only for a mob the live watch list still
 // watches, numbered with today's custom value. A gap that spans the cut (the last death in the
 // archive to the first in the live log) is not recovered: neither side measured it.
+//
+// THE ZONE ACROSS THE CUT (step 3.8). Before its first zone line the fold stands in zone '', so a
+// fresh log's header is blank and its deaths are filed under ''. Read as one log, it stood in the
+// zone the archive ended in, so the merge files those rows and candidates there (joining one the
+// live side already holds for that zone), and a blank live header shows the archive's zone. Only ''
+// moves: the fold never files a death under '' once it has read a zone line.
 
 import {
   RESPAWN_MAX_GAPS,
@@ -101,8 +107,29 @@ function mergeRecent(older: RespawnSnap, newer: RespawnSnap): RespawnCandidate[]
   return [...byId.values()].sort((a, b) => b.lastTs - a.lastTs).slice(0, RESPAWN_MAX_RECENT)
 }
 
+/** `newer` with what it filed under zone '' moved to `zone`, the zone the older side ended in. */
+function carryZone(newer: RespawnSnap, zone: string): RespawnSnap {
+  if (zone === '') return newer
+  const rows = new Map<string, RespawnRow>()
+  for (const r of newer.rows) {
+    const before = r.zone === ''
+    const row = before ? { ...r, zone, id: `${respawnZoneKey(zone)}::${r.key}` } : r
+    const prev = rows.get(row.id)
+    rows.set(row.id, prev === undefined ? row : before ? joinRow(row, prev) : joinRow(prev, row))
+  }
+  const recent = new Map<string, RespawnCandidate>()
+  for (const c of newer.recent) {
+    const cand = c.zone === '' ? { ...c, zone } : c
+    const prev = recent.get(candidateId(cand))
+    const joined = prev === undefined ? cand : { ...prev, kills: prev.kills + cand.kills, lastTs: Math.max(prev.lastTs, cand.lastTs) }
+    recent.set(candidateId(cand), joined)
+  }
+  return { ...newer, zone: newer.zone === '' ? zone : newer.zone, rows: [...rows.values()], recent: [...recent.values()] }
+}
+
 /** `older` then `newer`, or null when either is not a respawn snapshot of the same shape version. */
 export function mergeRespawn(older: unknown, newer: unknown): RespawnSnap | null {
   if (!isRespawnSnap(older) || !isRespawnSnap(newer) || older.v !== newer.v) return null
-  return { ...newer, rows: mergeRows(older, newer), recent: mergeRecent(older, newer) }
+  const live = carryZone(newer, older.zone)
+  return { ...live, rows: mergeRows(older, live), recent: mergeRecent(older, live) }
 }

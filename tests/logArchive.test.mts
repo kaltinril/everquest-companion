@@ -304,3 +304,24 @@ test('readHeadBytes: reads at most n bytes, and null for a missing file', () => 
   assert.equal(readHeadBytes(p, 100)?.toString(), 'abcdef')
   assert.equal(readHeadBytes(join(dir, 'missing.txt'), 4), null)
 })
+
+test('read path: kills before the live first zone line take the archive zone once the live progression has been noted (step 3.8)', () => {
+  const run = (ts: number) => ({ count: 1, firstTs: ts, lastTs: ts, credited: 0, lastCreditedTs: 0 })
+  const kills = (tier: number, ts: number) => ({ v: 5, mobs: { rat: { count: 1, bestTier: tier, firstTs: ts, lastTs: ts, credited: 0, display: 'rat', tiers: { [tier]: run(ts) } } } })
+  const progression = (zoneStart: number[]) => ({
+    expTs: [], expPct: [], expFlag: [], killTs: [], killZone: [], killCredit: [], witnessTs: [], recentKills: [], lootTs: [],
+    zoneStart, zoneEnd: zoneStart.map(() => 0), zoneName: zoneStart.map(() => 'Inst'), offlineStart: [], offlineEnd: [], offlineCamped: [],
+    levelTs: [], levelValue: [], aaGainTs: [], aaGainAmount: [], lastTs: 0, windowStart: 0, dropped: 0
+  })
+  const sealed = segment({ modules: { kills: { seq: 1, state: kills(3, 20) }, progression: { seq: 1, state: progression([10]) } } })
+  const t = harness({ segments: [sealed] })
+  const tiersOf = (state: unknown) => Object.keys((state as { mobs: { rat: { tiers: object } } }).mobs.rat.tiers).sort()
+  assert.ok(t.h.wantsLiveZone('kills') && !t.h.wantsLiveZone('loot'))
+  assert.deepEqual(tiersOf(t.h.mergeHistory('kills', 4, kills(-2, 50))), ['-2', '3'], 'not yet noted: nothing moves')
+  t.h.noteLiveProgression(progression([]))
+  assert.deepEqual(tiersOf(t.h.mergeHistory('kills', 4, kills(-2, 50))), ['3'], 'the same seq is merged again once the zone is known')
+  assert.ok(t.h.wantsLiveZone('kills'), 'no zone line yet, so it is asked again')
+  t.h.noteLiveProgression(progression([60]))
+  assert.ok(!t.h.wantsLiveZone('kills'), 'a known first zone line cannot move')
+  assert.deepEqual(tiersOf(t.h.mergeHistory('kills', 5, kills(-2, 70))), ['-2', '3'], 'a kill after the line stays unknown')
+})

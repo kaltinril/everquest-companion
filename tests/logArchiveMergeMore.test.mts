@@ -427,3 +427,16 @@ test('progression: inputs are not changed, and a bad shape is not merged', () =>
 test('lookup: the phase 4 modules have rules', () => {
   for (const id of ['consider', 'itemTiers', 'classUnlocks', 'turnins', 'respawn', 'progression']) assert.ok(hasMergeRule(id), id)
 })
+
+test("lookup: an archived clock survives the fold, since the first archive is joined as itself and not through the empty template", () => {
+  const older = respawnSnap([clock({ kills: 3, samples: 2, gapsMs: [400_000, 500_000] })], [])
+  const live = { ...respawnSnap([], [{ key: 'a ghoul', display: 'a ghoul' }]), zone: '' }
+  const rows = (mergeModule('respawn', [older], live).state as RespawnSnap).rows
+  assert.deepEqual(rows.map((r) => [r.id, r.kills, r.gapsMs]), [['guk::a ghoul', 3, [400_000, 500_000]]])
+})
+
+test("lookup: the live side's dropped count is added once", () => {
+  const older = progression({ dropped: 2, windowStart: 5 })
+  const live = progression({ dropped: 7, windowStart: 9 })
+  assert.equal((mergeModule('progression', [older], live).state as ProgressionSnap).dropped, 9)
+})
