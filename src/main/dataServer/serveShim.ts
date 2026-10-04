@@ -58,6 +58,7 @@ import { createReadShim, type ReadShim } from './readShim'
 import { liveHistory } from '../logArchive/liveHistory'
 import { withArchivedDrops } from '../../shared/logArchive/mergeDropsSeen'
 import { engineSideOpts, withArchivedFights } from '../../shared/logArchive/mergeFights'
+import { withArchivedHits } from '../../shared/logArchive/searchFights'
 import { resolveMobIdentity } from '../mobAliases'
 import type { CombatSnapshot, FightSearchResult, SnapshotOpts } from '../../shared/combat'
 import type { MobLevelFact } from '../resist/world'
@@ -286,7 +287,11 @@ export function serveCombatSnapshot(
 
 /** `combat:searchFights`, served. The clamp stays in `world.ts`: the schema mirrors this app's own
  *  clamping rule, so sending a pre-clamped number means both worlds search the same corpus slice
- *  rather than each applying its own bound to a different input. */
+ *  rather than each applying its own bound to a different input.
+ *
+ *  ARCHIVED HISTORY (docs/plans/log-archive, step 4.8): archived fights are ranked app-side by the
+ *  same rule (`shared/logArchive/searchFights.ts`) and joined under the same limit. The same object
+ *  back unless Keep log history is on and an eligible segment kept fights. */
 export function serveSearchFights(
   text: string,
   limit: number | undefined,
@@ -297,7 +302,7 @@ export function serveSearchFights(
     limit === undefined ? { query: text } : { query: text, limit },
     (r) => ({ hits: r.hits, corpus: r.corpus }) as unknown as FightSearchResult,
     own
-  )
+  ).then((found) => withArchivedHits(found, liveHistory.archivedFights(), text, limit))
 }
 
 // ── the fourth channel: how old is this creature (JOS-497 item 1) ──────────────────────────────

@@ -117,6 +117,18 @@ Until a module's step lands, that module shows what the live log holds, as it do
 - **Note**: the matching rule lives in the engine. This step writes it a second time, so the
   test pins both to the same fixture and fails if they drift.
 - **After this step**: searching finds archived fights.
+- **As built** (2026-10-04): `shared/logArchive/searchFights.ts` restates the parts of
+  `engine/crates/engined/src/search.rs` that sit around the scorer: the haystack (name, plus the
+  zone when it has one), the order (score, then newer first, then id), the empty-query answer and
+  the default limit of 50. The scorer itself is `shared/fuzzy.ts`, which `search.rs` already
+  mirrors. The engine's top hits and the archive's top hits are joined, ranked once and cut to the
+  limit, which is exactly the top of the union; the corpus count adds the archived fights. No
+  engine file changed. `tests/logArchiveFightSearch.test.mts` reads `search.rs`'s own test
+  fixtures and stated answers out of the Rust source (nine today, with a floor so a parser that
+  reads fewer fails) and runs each through the TypeScript copy, and compares the score constants,
+  the typo floor, the edit-budget bands and `DEFAULT_FIGHT_HITS` in `ops.rs`. `cargo test` holds
+  the Rust side to the same fixtures, so a change on either side that the other does not share
+  fails one of the two.
 
 ### 4.9 Opening an archived fight
 
