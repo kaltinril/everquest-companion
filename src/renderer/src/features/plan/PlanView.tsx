@@ -70,8 +70,12 @@ import {
   useGearCompare,
   useGearIndex,
   useGearOwnership,
-  type GearClasses
+  type GearClasses,
+  type GearCompareData
 } from '../gear/gearData'
+import { GearRowCompare } from '../gear/GearCompareCard'
+import { KnownItemTooltip } from '../../lib/KnownItemTooltip'
+import type { OwnedUpgrade } from './planOwned'
 import { useRemembered } from '../gear/useAreaMemory'
 import { EMPTY_PROGRESSION } from '../leveling/progressionDelta'
 import { useStatedLevel, type StatedLevel } from '../leveling/useStatedLevel'
@@ -306,6 +310,25 @@ function emptyText(level: number | null, ready: boolean): string {
   return `Nothing above level ${String(level)} beats what you own, inside this reach and era.`
 }
 
+/** One name in the equip advisory, hovering like a route target: the compare pair when the gear
+ *  index has the row, the item card when it does not (owner ask, 2026-10-03: no bare item names). */
+function OwnedUpgradeName({ up, compare }: { up: OwnedUpgrade; compare: GearCompareData }): JSX.Element {
+  const row = compare.byKey.get(up.key)
+  const label = <span>{up.name}</span>
+  if (row === undefined) {
+    return (
+      <KnownItemTooltip name={up.name} clickThrough>
+        {label}
+      </KnownItemTooltip>
+    )
+  }
+  return (
+    <GearRowCompare row={row} data={compare}>
+      {label}
+    </GearRowCompare>
+  )
+}
+
 export interface PlanViewProps {
   /**
    * Deep-link an item name into the Loot tab's drill-down (App's `openLoot`) — the same contract
@@ -396,7 +419,12 @@ export default function PlanView({ onOpenLoot, onOpenMapZone, onOpenMob }: PlanV
           sx={{ mb: 1, px: 0.5, flexShrink: 0 }}
         >
           You already own upgrades - equip:{' '}
-          {ownedUps.slice(0, 5).map((u) => `${u.name} (${u.slot.charAt(0) + u.slot.slice(1).toLowerCase()})`).join(' · ')}
+          {ownedUps.slice(0, 5).map((u, i) => (
+            <span key={u.key}>
+              {i > 0 && ' · '}
+              <OwnedUpgradeName up={u} compare={compare} /> ({u.slot.charAt(0) + u.slot.slice(1).toLowerCase()})
+            </span>
+          ))}
           {ownedUps.length > 5 ? ` · +${String(ownedUps.length - 5)} more` : ''}
         </Typography>
       )}

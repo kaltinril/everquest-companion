@@ -78,6 +78,7 @@ import { isCommonMob } from '@shared/mobNames'
 import type { MobTarget } from '../mobs/mobTarget'
 import { DonorName } from '../planner/PlannerChips'
 import { CellLink } from '../../lib/CellLink'
+import { KnownItemTooltip } from '../../lib/KnownItemTooltip'
 // THE ONE WISH CONTROL (JOS-343/346): the same component the Gear and Exaltations rows draw, with the
 // same two sentences, so a reader who learned it on one tab meets no second spelling here.
 import WishToggle from '../wishlist/WishToggle'
@@ -244,7 +245,10 @@ function TargetRow({
               <span>{name}</span>
             </GearRowCompare>
           ) : (
-            name
+            // No gear row to compare against: the item card alone, never a bare name.
+            <KnownItemTooltip name={target.name} clickThrough>
+              <span>{name}</span>
+            </KnownItemTooltip>
           )}
         </Box>
         <SlotChip slot={target.slot} />
