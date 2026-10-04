@@ -151,35 +151,57 @@ function SocketRow({
     <Box data-testid="character-sockets" sx={CHIP_ROW}>
       {chips.map((c) => {
         const d = dress(c)
+        const chip = (
+          <Chip
+            label={d.label}
+            size="small"
+            color={d.bad ? 'error' : 'default'}
+            variant={c.state === 'filled' ? 'filled' : 'outlined'}
+            data-state={c.state}
+            data-testid={`character-socket-${c.type.toLowerCase()}`}
+            sx={{
+              ...SMALL_CHIP,
+              opacity: c.state === 'filled' ? 1 : 0.5,
+              ...(c.state === 'filled' && !d.bad ? { borderColor: EQ_ITEM_COLORS.border } : {})
+            }}
+          />
+        )
+        // A FILLED socket holds a gem, and a gem is an item: the item card, with the socket's own
+        // sentence under the item window (owner ask, 2026-10-03). An empty socket keeps its text.
+        if (c.state !== 'filled') {
+          return (
+            <Tooltip key={c.type} title={d.hover}>
+              {chip}
+            </Tooltip>
+          )
+        }
         return (
-          <Tooltip key={c.type} title={d.hover}>
-            <Chip
-              label={d.label}
-              size="small"
-              color={d.bad ? 'error' : 'default'}
-              variant={c.state === 'filled' ? 'filled' : 'outlined'}
-              data-state={c.state}
-              data-testid={`character-socket-${c.type.toLowerCase()}`}
-              sx={{
-                ...SMALL_CHIP,
-                opacity: c.state === 'filled' ? 1 : 0.5,
-                ...(c.state === 'filled' && !d.bad ? { borderColor: EQ_ITEM_COLORS.border } : {})
-              }}
-            />
-          </Tooltip>
+          <KnownItemTooltip
+            key={c.type}
+            name={c.label.slice(c.type.length + 2)}
+            clickThrough
+            extra={<Typography component="div" sx={{ fontSize: 11, mt: 0.5 }}>{d.hover}</Typography>}
+          >
+            {chip}
+          </KnownItemTooltip>
         )
       })}
       {leftover.map((name, i) => (
-        <Chip
+        <KnownItemTooltip
           // The same exaltation can legitimately be socketed twice into one item, so the name is
           // not a key — the position is.
           key={`${name}#${String(i)}`}
-          label={name}
-          size="small"
-          variant="outlined"
-          data-testid="character-exaltation"
-          sx={{ ...SMALL_CHIP, borderColor: EQ_ITEM_COLORS.border }}
-        />
+          name={name}
+          clickThrough
+        >
+          <Chip
+            label={name}
+            size="small"
+            variant="outlined"
+            data-testid="character-exaltation"
+            sx={{ ...SMALL_CHIP, borderColor: EQ_ITEM_COLORS.border }}
+          />
+        </KnownItemTooltip>
       ))}
     </Box>
   )

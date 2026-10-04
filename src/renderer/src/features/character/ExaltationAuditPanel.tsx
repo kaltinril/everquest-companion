@@ -132,9 +132,17 @@ function planLines(plan: BoardPlan): JSX.Element[] {
       {`${m.cellLabel}: socket `}
       <Name>{m.gemName}</Name>
       {` (${m.effect})`}
-      {m.replacesName === null
-        ? ''
-        : ` - replaces ${m.replacesEffect ?? m.replacesName}`}
+      {/* An unknown effect leaves the gem's own NAME, and a name is an item: it hovers like one. */}
+      {m.replacesName === null ? (
+        ''
+      ) : m.replacesEffect != null ? (
+        ` - replaces ${m.replacesEffect}`
+      ) : (
+        <>
+          {' - replaces '}
+          <Name>{m.replacesName}</Name>
+        </>
+      )}
     </Typography>
   ))
   for (const [i, c] of plan.clears.entries()) {
