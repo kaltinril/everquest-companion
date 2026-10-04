@@ -63,6 +63,8 @@ says needs the owner's agreement.
   left alone.
 - **Undo**: revert the commit. Copied buckets stay in the file and are harmless.
 
+Agreement (owner, 2026-10-04): build it. What is best for the player decides it.
+
 ## Refreshing totals after a parser fix
 
 Today a parser fix corrects history by itself, because the next launch folds the whole log

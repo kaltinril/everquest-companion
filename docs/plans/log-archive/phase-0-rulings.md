@@ -68,7 +68,8 @@ Ruling: yes, on three conditions (owner, 2026-10-03):
   archived fight can then rebuild its full breakdown from that one archive, on demand, instead of
   storing it. This is what makes "summaries only" cost nothing that cannot be had back.
 
-Ruling: _not yet made_
+Ruling (owner, 2026-10-04): **summaries only.** Each segment keeps its fights' summaries; the full
+detail stays in the archive.
 
 ## 0.5 Does the client let go of the log between lines?
 
