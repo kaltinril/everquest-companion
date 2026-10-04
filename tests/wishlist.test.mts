@@ -29,6 +29,7 @@ import {
   hasWish,
   removeWish,
   seedWishes,
+  setWishReason,
   type PlannedWish,
   type WishEntry,
   type WishList
@@ -174,4 +175,24 @@ test('the seed DEDUPES by item — one donor socketed into three cells is one th
   )
   // The FIRST occurrence keeps its effect context, so the walk order is the choice.
   assert.equal(seeds[0].effect, 'Bat Fang')
+})
+
+test('a wish can change what it is FOR, in place, keeping its instant, its source and its order', () => {
+  // Owner ask, 2026-10-03: a belt wished for its focus read as a wish to wear it.
+  const list: WishList = { entries: [gearWish('a'), donorWish('drakescale belt', 'Extended Enhancement II'), gearWish('c')], clearedDone: [] }
+  const toGear = setWishReason(list, 'drakescale belt', { kind: 'gear' })
+  assert.deepEqual(toGear.entries[1], gearWish('drakescale belt'), 'a gear reason drops the effect context outright')
+  assert.deepEqual(toGear.entries.map((e) => e.itemKey), ['a', 'drakescale belt', 'c'])
+  const back = setWishReason(toGear, 'drakescale belt', { kind: 'donor', effect: 'Extended Enhancement II', socket: 'proc' })
+  assert.deepEqual(back.entries[1], donorWish('drakescale belt', 'Extended Enhancement II'))
+  const other = setWishReason(back, 'drakescale belt', { kind: 'donor', effect: 'Flame Shield', socket: 'focus' })
+  assert.equal(other.entries[1]?.effect, 'Flame Shield')
+  assert.equal(other.entries[1]?.socket, 'focus')
+})
+
+test('a reason change that changes nothing, or names no wish, returns the same object', () => {
+  const list: WishList = { entries: [gearWish('a'), donorWish('b', 'Haste')], clearedDone: [] }
+  assert.equal(setWishReason(list, 'a', { kind: 'gear' }), list)
+  assert.equal(setWishReason(list, 'b', { kind: 'donor', effect: 'Haste', socket: 'proc' }), list)
+  assert.equal(setWishReason(list, 'missing', { kind: 'gear' }), list)
 })

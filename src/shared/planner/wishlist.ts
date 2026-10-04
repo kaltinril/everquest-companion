@@ -140,6 +140,30 @@ export function removeWish(list: WishList, itemKey: string): WishList {
   }
 }
 
+/** What a wish is FOR: to wear (`gear`), or one effect to melt into an exaltation (`donor`). */
+export type WishReason = { kind: 'gear' } | { kind: 'donor'; effect: string; socket: SocketType }
+
+/**
+ * Change what a wish is wanted for, in place (owner ask, 2026-10-03: a belt added from the
+ * Exaltations tab for its focus read as a wish to wear it, and nothing could say otherwise).
+ * `addedAt`, `source` and the list order are kept: the person still wants the same item. A gear
+ * reason drops the effect context outright (law 1, as `WishEntry.effect` says). Unknown key, or
+ * the reason the wish already has ⇒ the same object back.
+ */
+export function setWishReason(list: WishList, itemKey: string, reason: WishReason): WishList {
+  const at = list.entries.findIndex((e) => e.itemKey === itemKey)
+  const prev = list.entries[at]
+  if (prev === undefined) return list
+  if (prev.kind === reason.kind && (reason.kind === 'gear' || (prev.effect === reason.effect && prev.socket === reason.socket))) {
+    return list
+  }
+  const { effect: _effect, socket: _socket, ...base } = prev
+  const next: WishEntry = reason.kind === 'gear' ? { ...base, kind: 'gear' } : { ...base, ...reason }
+  const entries = [...list.entries]
+  entries[at] = next
+  return { ...list, entries }
+}
+
 /** Dismiss a batch of fulfilled wishes from the done strip. Idempotent, and order is preserved. */
 export function clearDone(list: WishList, itemKeys: readonly string[]): WishList {
   const next = [...list.clearedDone]

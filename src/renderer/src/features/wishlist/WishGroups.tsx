@@ -32,6 +32,7 @@ import { classesMismatch } from '../planner/plannerClasses'
 import { CURRENT_ERA_LABEL } from '../planner/plannerData'
 import { campText, costText, type FarmGroup, type FarmNeed, type FarmRow, type FarmZone } from '../planner/plannerFarm'
 import type { ClassAbbr } from '@shared/classCombo'
+import { WantedFor } from './WishReason'
 
 const KIND_HINT: Record<FarmGroup['kind'], string> = {
   zone: 'Wishes whose best-known camp is in this zone.',
@@ -67,15 +68,6 @@ function AlsoZones({ zones }: { zones: readonly FarmZone[] }): JSX.Element {
           )}
         </Box>
       ))}
-    </Typography>
-  )
-}
-
-/** What a row is WANTED FOR — the effect on a donor wish, the honest word `gear` otherwise. */
-function WantedFor({ row }: { row: FarmNeed }): JSX.Element {
-  return (
-    <Typography variant="caption" noWrap sx={{ display: 'block', color: 'text.secondary' }}>
-      {row.effect ?? 'gear'}
     </Typography>
   )
 }
