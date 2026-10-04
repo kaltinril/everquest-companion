@@ -6,7 +6,7 @@ log is opened for reading only. Nothing in the game's folder changes in this pha
 [Back to the plan](README.md) · Needs: phase 1 · Touches the game folder: no (reads only)
 
 Everything a player can see in this phase sits behind the app's existing gate for unreleased
-features, until phase 6.
+features, until phase 6. Every step also refuses while [the switch](README.md#the-switch) is off.
 
 ## Steps
 
@@ -15,7 +15,7 @@ features, until phase 6.
 - **Does**: asks the engine for every module snapshot and for the fight summaries, and writes
   them into a new segment in state `captured`, together with the log's byte length, SHA-256,
   head fingerprint and first and last line times.
-- **Refuses, with the reason, when**: the engine is not live on this log, the fold is still
+- **Refuses, with the reason, when**: the switch is off, the engine is not live on this log, the fold is still
   running, or the log grew while the capture ran. The engine's sequence number is read before
   and after; if it moved, the capture is thrown away.
 - **Touches**: one new file in `src/main/`; an IPC channel for the trigger.
@@ -48,8 +48,8 @@ features, until phase 6.
 - **Why sealing is safe before rotation exists**: a sealed segment whose log is still in place
   fails rule 2 (the live log begins with it), so it is held back. History appears only once the
   live log no longer contains the segment.
-- **This step also serves a player who clears the log by hand.** With the game closed they
-  capture, back up and seal, then delete or empty the log themselves. At the next launch the
+- **This step also serves a player who clears the log by hand.** They capture, back up and seal,
+  then move or empty the log themselves. At the next launch the
   live log no longer begins with the segment, and the history is shown.
 - **Touches**: the merge lookup from step 1.7; the capture file.
 - **After this step**: history survives a log that was cleared by hand after sealing.
@@ -60,12 +60,15 @@ features, until phase 6.
 
 ### 2.4 The panel
 
-- **Does**: adds a "Log archive" section to Settings. It shows the live log's size and age, the
-  segments for this character with their state and size, and any segment being held back with
-  the reason in plain words. Buttons: "Back up this log", and "Keep this history" (seal).
+- **Does**: adds a "Log archive" section to Settings. While the switch is off it shows only the
+  switch and a plain statement of what turning it on allows. Once on, it shows the live log's
+  size and age, the segments for this character with their state and size, and any segment being
+  held back with the reason in plain words. Buttons: "Back up this log", and "Keep this history"
+  (seal). Turning the switch off asks first, and says the history stays on disk.
 - **Touches**: a new renderer feature folder; one settings entry.
 - **After this step**: a player can do everything in this phase without developer tools.
-- **Check**: an e2e pass over the panel on a fixture log; both buttons; each refusal message.
+- **Check**: an e2e pass over the panel on a fixture log: the switch off by default on a fresh
+  profile, with no buttons shown; both buttons once on; each refusal message.
 - **Undo**: revert the commit. Segments stay on disk and keep working.
 
 ### 2.5 Before-you-clear advice

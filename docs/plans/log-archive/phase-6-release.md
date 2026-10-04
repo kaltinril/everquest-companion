@@ -26,8 +26,8 @@ Takes the feature out from behind the unreleased gate and offers it upstream. Ca
 
 ### 6.3 Open the gate
 
-- **Does**: removes the unreleased gate from the panel. Rotation keeps its own opt-in, off by
-  default.
+- **Does**: removes the unreleased gate from the panel. The switch stays off by default, for
+  every player, and only the player turns it on.
 - **Needs**: the owner's trial (step 3.7) and at least one tester report from step 6.2.
 - **Touches**: the panel's gate check.
 - **After this step**: the feature is visible in every build of the fork.

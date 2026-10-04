@@ -37,6 +37,18 @@ All four must hold. This rule is the whole defence against counting anything twi
 
 ## Steps
 
+### 1.0 The switch
+
+- **Does**: adds the **Keep log history** setting, off by default, as an optional key in the
+  app's settings, and one function every later step asks before it does anything. See
+  [the switch](README.md#the-switch).
+- **Touches**: the settings shape (an optional key, so no migration), one new file in
+  `src/main/` that answers "is it on".
+- **After this step**: no behaviour change. The setting has no control yet; the control arrives
+  with the panel in step 2.4, and until then nothing can turn it on.
+- **Check**: a missing key reads as off; an older build reading the store ignores the key.
+- **Undo**: revert the commit. A stored key is left on disk and ignored.
+
 ### 1.1 Segment format and store
 
 - **Does**: defines the segment shape, its version number, and pure functions to write, read,
@@ -105,7 +117,8 @@ All four must hold. This rule is the whole defence against counting anything twi
 ### 1.7 Wire the merge into reads
 
 - **Does**: `serveModuleSnapshot` in `src/main/dataServer/serveShim.ts` passes what the engine
-  served through the merge. With no eligible segment, the served object is returned unchanged.
+  served through the merge. With the switch off, the archive folder is not opened and the served
+  object is returned unchanged. With no eligible segment, the same.
   The file already adjusts one module's state before serving it (`graftLastPlayed` on the
   character module), so this follows an existing pattern in the same function.
 - **Covers**: every reader of module snapshots, because the renderer's `module:getSnapshot`
@@ -115,7 +128,8 @@ All four must hold. This rule is the whole defence against counting anything twi
   module and engine sequence number so a busy surface does not re-merge on every read.
 - **After this step**: no behaviour change for any player, because nothing creates segments. A
   developer can place a hand-made sealed segment in the folder and see merged history.
-- **Check**: a test that an empty store returns the identical object; a test with one sealed
+- **Check**: a test that the switch off returns the identical object even with a sealed segment
+  on disk; a test that an empty store returns the identical object; a test with one sealed
   segment; the full gate; the dev app opened on a real log with Bosses, Loot and Leveling
   compared against the same tabs before the change.
 - **Undo**: revert the commit. Segment files on disk are ignored by older builds.

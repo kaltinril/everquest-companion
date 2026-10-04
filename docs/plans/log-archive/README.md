@@ -34,12 +34,32 @@ them is redesigned, not excused.
 
 | Rule | Where it comes from |
 |---|---|
-| The game's log is never rewritten. It is moved whole, or left alone. | `AGENTS.md` ("Never write to the game log"), `src/main/feedback/slice.ts` header |
+| The game's log is never rewritten: no line is removed or changed. It is moved whole, put back whole (step 3.6), or left alone. | `AGENTS.md` ("Never write to the game log"), `src/main/feedback/slice.ts` header |
 | No engine file changes. The engine stays the only thing that folds a log. | The factoring ratchet in `engine/factoring-baseline.json`; the creator owns the engine |
 | A count is never stored twice. History from an archived stretch is shown only when the live log does not contain that stretch. | The creator's note on seeding a fold with what it is about to re-derive (`AGENTS.md`, fold checkpoint section) |
 | The raw archive is always kept. Stored totals are a convenience; the archive is the record. | Parser fixes keep landing, and only raw lines can benefit from them |
-| Nothing touches the game's folder without the player opting in, and never while the game runs. | Owner and creator ruling, [phase 0](phase-0-rulings.md) |
+| The whole feature is off until the player turns it on, by hand, in Settings. Nothing turns it on for them, and nothing runs on its own once it is on. | Owner ruling, 2026-10-03 ([the switch](#the-switch)) |
 | Every branch rule of the fork applies. | `docs/community/RULES.md`, on the fork's integration branch |
+
+## The switch
+
+The feature has one switch, **Keep log history**, and it is off for every player, new or existing.
+Only the player can turn it on, in the Log archive section of Settings. Step 1.0 builds it before
+anything else, and every later step checks it.
+
+While the switch is off:
+
+- the app does not capture, back up or move anything;
+- the app does not open the archive folder, and every tab shows exactly what the engine served;
+- the Log archive section shows the switch, a plain statement of what turning it on allows, and
+  nothing else.
+
+While it is on, nothing still happens by itself. Every backup and every archive is one click by
+the player, and moving the log asks for confirmation each time, naming the file. There is no
+schedule, no size threshold and no trigger on the game closing (see [Not planned](#not-planned)).
+
+Turning the switch off again stops the history from being shown. Segments and archives stay on
+disk, and turning it back on shows them again. The panel says so before the player turns it off.
 
 ## The stop-anywhere contract
 
@@ -68,7 +88,7 @@ Three design choices make that contract hold:
 | Phase | What it delivers | Touches the game folder | Estimate |
 |---|---|---|---|
 | [0. Rulings](phase-0-rulings.md) | Decisions and one measurement. No code. | No | Owner's time |
-| [1. History store](phase-1-history-store.md) | Segment format, merge rules for kills, loot and levels, wired in and inert | No | 3 to 4 h |
+| [1. History store](phase-1-history-store.md) | The switch, the segment format, merge rules for kills, loot and levels, wired in and inert | No | 3 to 4 h |
 | [2. Capture and backup](phase-2-capture-and-backup.md) | The app can record a segment and make a verified compressed copy of the log | No (reads only) | 3 to 4 h |
 | [3. Rotation](phase-3-rotation.md) | Opt-in "archive and start fresh", with recovery and restore | **Yes** | 4 to 5 h |
 | [4. More history](phase-4-more-history.md) | Remaining modules, leveling charts, fight history | No | 5 to 8 h |
@@ -109,10 +129,9 @@ These are stated here so nobody discovers them later.
 
 ## Not planned
 
-- **Rotating while the game is running.** Other EverQuest tools do this by renaming the file
-  mid-session. Whether the EverQuest Legends client allows it has one report behind it and no
-  measurement. It stays out of scope until the test in [phase 0](phase-0-rulings.md) is run and
-  the owner asks for it.
+- **Archiving on its own.** Issue #37 suggests archiving when the game quits, and when the log
+  passes a size such as 50 MB. Both are left out because the owner wants every archive to be the
+  player's own click. Either could be added later as a further opt-in under the switch.
 - **Removing lines from a log.** See the first rule above.
 - **A resume checkpoint for the fold.** The creator built one and later removed it; this plan
   does not bring it back.
@@ -123,8 +142,10 @@ Update this table in the same commit as the step it records.
 
 | Step | Status | Commit |
 |---|---|---|
-| 0.1 to 0.5 | not started | |
-| 1.1 to 1.7 | not started | |
+| 0.1 to 0.3 | ruled 2026-10-03 (0.2 provisional) | |
+| 0.4 | not yet ruled; needed only by phase 4's fight steps | |
+| 0.5 | measured 2026-10-03: the log can be moved while the game runs | |
+| 1.0 to 1.7 | not started | |
 | 2.1 to 2.5 | not started | |
 | 3.1 to 3.7 | not started | |
 | 4.1 to 4.9 | not started | |

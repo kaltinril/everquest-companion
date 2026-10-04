@@ -11,20 +11,33 @@ and tested before the button exists, and the restore is built before the owner's
 ## What rotation does, in order
 
 1. Run the preflight checks.
-2. Capture, back up and verify, as in phase 2. The live log has not been touched yet.
-3. Run the preflight checks again, and confirm the log's length and SHA-256 are still the ones
-   captured.
-4. Write a journal entry naming the log, the segment and the step about to be taken.
-5. Rename the live log into the archive folder. On the same drive this is a single operation
-   that either happens or does not.
-6. Create an empty file at the live log's path, and close it at once.
-7. Seal the segment and add it to the set sealed during this attach.
-8. Confirm the moved file's SHA-256 matches the verified archive, then delete the moved file.
-   The compressed archive remains.
-9. Clear the journal entry.
+2. Wait until the engine has read to the end of the log, then capture, as in phase 2.
+3. Write a journal entry naming the log, the segment and the step about to be taken.
+4. Rename the live log into the archive folder at once. On the same drive this is a single
+   operation that either happens or does not.
+5. If no file is at the live log's path, create an empty one without truncating anything: if
+   the game created it first, it is left alone.
+6. Compare the moved file's length with the captured length. Any extra bytes are lines the game
+   wrote between the capture and the rename. They stay in the moved file, so they are in the
+   archive, and the segment records how many lines they are, because its totals do not include
+   them. Phase 5's re-derive counts them. The window is the time between two back-to-back calls.
+7. Back up and verify the moved file, as in phase 2. The moved file is no longer written to, so
+   its SHA-256 is final.
+8. Seal the segment and add it to the set sealed during this attach.
+9. Confirm the archive's SHA-256 matches the moved file, then delete the moved file. The
+   compressed archive remains.
+10. Clear the journal entry.
 
-If anything fails before step 5, the log was never touched. After step 5, the moved file stays
-in the archive folder until step 8 proves the compressed copy is good.
+If anything fails before step 4, the log was never touched. After step 4, the moved file stays
+in the archive folder until step 9 proves the compressed copy is good.
+
+**Why the game may keep running** ([step 0.5](phase-0-rulings.md#05-does-the-client-let-go-of-the-log-between-lines)):
+the client opens the log by name for each line, so after the rename it writes to a fresh file at
+the old name and never to the moved one. The engine's tailer already handles this: a path that
+vanished and came back forces a reopen, and a file smaller than the read cursor restarts at byte 0
+(`engine/crates/eqlog/src/tail.rs`, module header, rules 1 and 5). The fresh file starts empty, so
+the restart re-reads nothing. Whether the engine reads the last bytes of the old file before it
+reopens is checked in step 3.3; step 6 above records them either way.
 
 ## Steps
 
@@ -32,26 +45,28 @@ in the archive folder until step 8 proves the compressed copy is good.
 
 - **Does**: one pure function that answers "may this log be rotated now" with a list of reasons
   when the answer is no.
-- **Checks**: the player has opted in; the game is not running; the log has not grown for ten
-  minutes; the engine is live on this log and has finished folding; the archive folder is on the
-  same drive, or the player has accepted a slower copy; free space covers the log's size.
-- **On the game check**: the app's presence watcher starts only when a feature needs it, begins
-  by assuming the game is running, and keeps its last answer when a check fails. The preflight
-  therefore asks for a fresh reading of its own, and treats a failed reading as "running".
+- **Checks**: the switch is on; the engine is live on this log and has finished folding; the
+  archive folder is on the same drive, or the player has accepted a slower copy; free space
+  covers the log's size.
+- **No game check**: step 0.5 removed the need for one. The app's presence watcher is not
+  consulted, which also avoids its habit of assuming the game is running until a check says
+  otherwise.
 - **Touches**: one new file in `src/shared/` for the rule, one in `src/main/` for the readings.
 - **After this step**: no behaviour change. The panel can show why rotation is unavailable.
 - **Check**: a unit test per reason, including the failed reading.
 - **Undo**: delete the files.
 
-### 3.2 The opt-in
+### 3.2 The preflight in the panel
 
-- **Does**: adds the setting, off by default, with a plain statement of what it allows: moving
-  the log file with the game closed. The panel shows the preflight result. There is still no
-  rotate button.
-- **Touches**: the store shape (an optional key, so no migration is needed), the panel.
-- **After this step**: a player can opt in and see whether rotation would be allowed.
-- **Check**: the setting persists; an older build reading the store ignores it.
-- **Undo**: revert the commit. The stored key is left on disk and ignored.
+- **Does**: the panel shows the preflight result in plain words. The switch itself was built in
+  step 1.0 and given its control in step 2.4, and turning it on is what allows moving the log;
+  the panel's statement beside the switch says so from this step on. There is still no rotate
+  button.
+- **Touches**: the panel.
+- **After this step**: a player who has turned the switch on can see whether archiving would be
+  allowed now, and why not.
+- **Check**: each preflight reason shown in the panel.
+- **Undo**: revert the commit.
 
 ### 3.3 The rotation itself, on test folders only
 
@@ -59,6 +74,8 @@ in the archive folder until step 8 proves the compressed copy is good.
   calls it with a real log.
 - **Reports in plain words when**: the rename is refused because another program holds the
   file. Nothing has changed at that point, and the player is told so.
+- **Also settles**: whether the engine reads the old file's last bytes before it reopens the
+  fresh one, using a temp-folder log appended to between the capture and the rename.
 - **Touches**: one new file in `src/main/`.
 - **After this step**: no behaviour change.
 - **Check**: tests on temp folders for the clean run and for a failure injected after each of
@@ -82,8 +99,8 @@ in the archive folder until step 8 proves the compressed copy is good.
 ### 3.5 The button
 
 - **Does**: adds "Archive this log and start fresh" to the panel. It is enabled only when the
-  preflight passes. It states the log's size, where the archive will go, and that the game must
-  stay closed until it finishes.
+  preflight passes. Each click asks for confirmation, naming the file, its size and where the
+  archive will go. Nothing else ever starts an archive.
 - **What the player sees afterwards**: the same history as before. During this session it comes
   from the engine's memory. From the next launch it comes from the sealed segment merged with
   the fresh log.
@@ -96,12 +113,14 @@ in the archive folder until step 8 proves the compressed copy is good.
 
 ### 3.6 Restore
 
-- **Does**: "Put this log back" for the newest segment. Allowed when the game is closed and the
-  live log is empty. It decompresses the archive to the live log's path, confirms the SHA-256,
-  and sets the segment back to `backed-up`.
-- **When the fresh log already has lines**: the panel explains that the two files can be joined
-  by hand, oldest first, and gives both paths. The app does not join them, because that would
-  be writing the game's log.
+- **Does**: "Put this log back" for the newest segment. It decompresses the archive beside the
+  live log, confirms the SHA-256, then joins the two the way step 0.5 did by hand: move the fresh
+  log aside, add its bytes to the end of the restored one, move the restored one to the live
+  name, and repeat if the game recreated the name in between. Then it sets the segment back to
+  `backed-up`.
+- **On the rule that the log is never rewritten**: no line is removed or changed. The result is
+  the game's own bytes, oldest first, exactly as if the log had never been moved. The owner had
+  this done to their own log on 2026-10-03.
 - **Touches**: the rotation file; the panel.
 - **After this step**: a rotation can be taken back.
 - **Check**: rotate then restore on a fixture; the restored file's SHA-256 equals the original.
@@ -109,8 +128,8 @@ in the archive folder until step 8 proves the compressed copy is good.
 
 ### 3.7 The owner's trial
 
-- **Does**: no code. The owner rotates a copy of their real log in a test folder, then a real
-  log on a throwaway character, and compares the tabs.
+- **Does**: no code. The owner rotates a copy of their real log in a test folder, then their
+  real log, and compares the tabs.
 - **Compares**: boss kill counts and first and last seen; this week's lockout rungs; loot row
   count and three item totals; level and AA history; Plane of Sky held counts.
 - **After this step**: the result is recorded here, with anything that differed.
@@ -122,7 +141,7 @@ Result: _not yet run_
 
 | Question | Answer |
 |---|---|
-| What changed for players? | Behind the unreleased gate and an opt-in: one button that archives the log and keeps the history. |
-| Did the app change the game's folder? | Yes: it moved the log and left an empty one, with the game closed. |
+| What changed for players? | Behind the unreleased gate and the switch: one button that archives the log and keeps the history. |
+| Did the app change the game's folder? | Yes: it moved the log, when the player clicked and confirmed. |
 | Can work stop here for good? | Yes. This is the core feature. |
 | What is not covered yet? | Fight history, leveling charts, learned buff durations, resist history. See phases 4 and 5. |

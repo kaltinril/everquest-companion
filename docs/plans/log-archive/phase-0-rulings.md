@@ -17,7 +17,8 @@ Step 0.5 is optional.
 - **After this step**: the ISSUES.md row names this branch and this plan.
 - **Undo**: restore the row.
 
-Ruling: _not yet made_
+Ruling: yes (owner, 2026-10-03, asking for phase 1 to start). The fork builds the plan as a
+whole, and every part of it sits behind the switch described in the [plan](README.md#the-switch).
 
 ## 0.2 Where do archives and segments live?
 
@@ -34,40 +35,63 @@ Ruling: _not yet made_
   log discovery reads, because discovery would list it as a character.
 - **Undo**: a later change of folder moves files; segment files record the archive path.
 
-Ruling: _not yet made_
+Ruling: provisional, the app's own data folder (2026-10-03). The owner asked for phase 1 to start
+without choosing; phase 1 writes nothing, so the recommendation is used and the folder can still
+change before phase 2 writes the first file.
 
 ## 0.3 May the app move the live log?
 
 - **Decides**: whether phase 3 is built.
-- **What is being asked**: with the game closed and the player opted in, the app renames the live
-  log into the archive folder and leaves an empty file in its place.
-- **What is not being asked**: editing the log, removing lines from it, or touching it while the
-  game runs.
+- **What is being asked**: with the player opted in, the app renames the live log into the archive
+  folder, and the game starts a fresh one.
+- **What is not being asked**: editing the log, or removing lines from it.
 - **Who decides**: the owner for the fork. The creator's view is asked for on the issue before
   anything is offered upstream (step 6.4).
-- **If the answer is no**: phases 1, 2, 4 and 5 still stand. The player clears the log by hand
-  with the game closed, and step 3.4's launch check recognises that the log was replaced.
+- **If the answer is no**: phases 1, 2, 4 and 5 still stand. The player clears the log by hand,
+  and step 3.4's launch check recognises that the log was replaced.
 
-Ruling: _not yet made_
+Ruling: yes, on three conditions (owner, 2026-10-03):
+
+1. The feature is off until the player turns it on by hand ([the switch](README.md#the-switch)).
+2. Every move is the player's own click, confirmed each time. Nothing moves the log on its own.
+3. The game does not have to be closed. Step 0.5 showed the move is safe while it runs, and the
+   owner asked why it should be closed.
 
 ## 0.4 How much of each fight is kept?
 
 - **Decides**: what phase 4 stores for archived fights.
 - **Measured**: summaries for 6,299 fights are 1.6 MB. Full breakdowns are 92 MB.
 - **Recommendation**: summaries only. The archive still holds every line, so a full breakdown can
-  be rebuilt from it by step 5.5 if it is ever wanted.
+  be rebuilt from it if it is ever wanted.
+- **Idea from #37 (joeymavity)**: archives are named by the time of their first and last line,
+  so the one archive that holds a given fight is found from the fight's time alone. Opening an
+  archived fight can then rebuild its full breakdown from that one archive, on demand, instead of
+  storing it. This is what makes "summaries only" cost nothing that cannot be had back.
 
 Ruling: _not yet made_
 
 ## 0.5 Does the client let go of the log between lines?
 
 - **Measures**: whether the EverQuest Legends client holds the log open.
-- **Needed for**: nothing in this plan. It is recorded because the question keeps coming up, and
-  because a client that holds the file would make a rename fail cleanly, which step 3.3 must
-  report in plain words.
+- **Needed for**: whether phase 3 must wait for the game to close.
 - **How**: on a throwaway character, with the game running and `/log on`, rename the live log in
   Explorer. Then say something in game. Note whether the rename succeeded and whether a new file
   appeared.
 - **Owner's time**: about ten minutes.
 
-Result: _not yet measured_
+Result (2026-10-03, on the owner's real log, 321 MB, game running, companion closed):
+
+- The rename succeeded at once while the game was writing. No lock, no error.
+- The moved file never grew again. Its last line is from before the rename.
+- The game created a fresh `eqlog_<Character>_<server>.txt` by itself with its next line, nine
+  seconds later.
+- So the client opens the log by name for each write and does not hold it. This matches the
+  report on #37 (joeymavity) from the EQBuddy tool.
+- The log was then put back with the game still running: the fresh file was moved aside, its
+  bytes added to the end of the old one, and the old one moved back to the live name, in a loop
+  that repeats if the game recreates the name in between. It took one round. The result was
+  exactly the old size plus the fresh file's size, the join read cleanly from the last old line
+  to the first new one, and the game went on adding to it.
+
+One limit: the test shows the game did not write to the moved file. It cannot prove that no line
+was lost in the nine seconds between, though nothing suggests one was.
