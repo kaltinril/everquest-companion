@@ -121,8 +121,10 @@ function withoutLiveContext(s: Snaps): Snaps {
     delete respawn.zone
     for (const r of respawn.recent ?? []) if (r.key.endsWith(' rat')) delete r.zone
   }
-  const mobs = (out.kills as { mobs?: Record<string, unknown> } | null)?.mobs ?? {}
-  for (const key of Object.keys(mobs)) if (key.endsWith(' rat')) delete mobs[key]
+  const kills = out.kills as { mobs?: Record<string, unknown> } | null
+  if (kills?.mobs !== undefined) {
+    kills.mobs = Object.fromEntries(Object.entries(kills.mobs).filter(([key]) => !key.endsWith(' rat')))
+  }
   return out
 }
 
