@@ -55,6 +55,9 @@
 import { logInfo } from '../errorLog'
 import { engineLogMtimeMs, engineRequest, engineServeReadiness } from './engineClientHost'
 import { createReadShim, type ReadShim } from './readShim'
+import { liveHistory } from '../logArchive/liveHistory'
+import { withArchivedDrops } from '../../shared/logArchive/mergeDropsSeen'
+import { resolveMobIdentity } from '../mobAliases'
 import type { CombatSnapshot, FightSearchResult, SnapshotOpts } from '../../shared/combat'
 import type { MobLevelFact } from '../resist/world'
 import type { MobSeenDrop } from '../../shared/mobTypes'
@@ -236,7 +239,10 @@ function graftLastPlayed(state: unknown): unknown {
  */
 function projectModule(moduleId: string, r: ModuleSnapshotResult): ModuleSnap | null {
   if (r.module !== moduleId) return null
-  const state = moduleId === CHARACTER_MODULE ? graftLastPlayed(r.state) : r.state
+  const grafted = moduleId === CHARACTER_MODULE ? graftLastPlayed(r.state) : r.state
+  // ARCHIVED HISTORY (docs/plans/log-archive, step 1.7): the same object back unless Keep log
+  // history is on and a sealed segment is eligible for this character (logArchive/history.ts).
+  const state = liveHistory.mergeHistory(moduleId, r.seq, grafted)
   return { seq: r.seq, state, served: true }
 }
 
@@ -390,7 +396,17 @@ export function serveMobDropsSeen(name: string): Promise<{ seen?: MobSeenDrop[] 
       return { box: { seen: seen as MobSeenDrop[] } }
     },
     () => null
-  ).then((boxed) => (boxed === null ? null : boxed.box))
+  ).then((boxed) => (boxed === null ? null : withHistory(name, boxed.box)))
+}
+
+/**
+ * ARCHIVED HISTORY (docs/plans/log-archive, step 4.1): drops looted in archived logs, rebuilt from
+ * their `loot` rows under every spelling the mob answers to. The same box back unless Keep log
+ * history is on and an eligible segment saw this mob drop something.
+ */
+function withHistory(name: string, box: { seen?: MobSeenDrop[] }): { seen?: MobSeenDrop[] } {
+  const loot = liveHistory.archived('loot')
+  return loot.length === 0 ? box : withArchivedDrops(box, loot, resolveMobIdentity(name).keys)
 }
 
 // NO TEARDOWN FLUSH, AND THAT IS A DECISION. The tally prints its FIRST fallback immediately
