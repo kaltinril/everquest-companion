@@ -5,6 +5,7 @@ import type { ItemKnowledge, ItemQuestUse, ItemRecipeUse } from '@shared/types'
 import { craftedByLabel, recipeUseLabel } from '@shared/itemKnowledge'
 import { wikiPageUrl } from '@shared/wiki'
 import { CellLink } from '../../lib/CellLink'
+import { KnownItemTooltip } from '../../lib/KnownItemTooltip'
 import { questUseOutcomes, questUseWhere } from '../../lib/itemKnowledgeView'
 
 /**
@@ -79,7 +80,8 @@ function questUseLabel(u: ItemQuestUse): string {
  * "hide completed" tick or a class pick can never leave the reader staring at an empty list the
  * chip promised something in. The reward beside it is the answer to "and what do I get" without
  * the jump: `questUseOutcomes` is the tooltip's rule for which uses have one, and each name is a
- * `CellLink` into that item's own page when the pane can hop, plain text otherwise.
+ * `CellLink` into that item's own page when the pane can hop, plain text otherwise. Either way it
+ * hovers with the reward's item card (owner ask, 2026-10-03: no bare item names).
  *
  * The unit is an inline row so the outer wrap keeps working: a rune used by a dozen quests still
  * flows across lines rather than stacking twelve rows.
@@ -107,7 +109,9 @@ function QuestUseChip({ use, links }: { use: ItemQuestUse; links: KnowledgeLinks
           {outcomes.map((name, i) => (
             <Box component="span" key={name} sx={{ color: 'text.primary' }}>
               {i > 0 && ', '}
-              {links.onOpenItem ? <CellLink text={name} onOpen={() => links.onOpenItem?.(name)} /> : name}
+              <KnownItemTooltip name={name} clickThrough>
+                <span>{links.onOpenItem ? <CellLink text={name} onOpen={() => links.onOpenItem?.(name)} /> : name}</span>
+              </KnownItemTooltip>
             </Box>
           ))}
         </Typography>
