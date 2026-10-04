@@ -152,7 +152,8 @@ Update this table in the same commit as the step it records.
 | 4.2 | done 2026-10-03: item tiers | 449b7b12 |
 | 4.3 | done 2026-10-03: class unlocks and raw turn-ins | e8887e04 |
 | 4.4 | done 2026-10-03: respawn gaps of watched mobs, and the recent-kill candidates | 30d0e1b7 |
-| 4.5 | done 2026-10-03: progression series, one named difference | this commit |
-| 4.6 to 4.9 | not started | |
+| 4.5 | done 2026-10-03: progression series, one named difference | dc987532 |
+| 4.6 | left out 2026-10-03: the snapshot holds summaries, not samples (see phase 4) | this commit |
+| 4.7 to 4.9 | not started | |
 | 5.1 to 5.5 | not started | |
 | 6.1 to 6.4 | not started | |
