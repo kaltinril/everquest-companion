@@ -6,10 +6,10 @@
 // swap. The second engine itself is exercised by `tests/e2e/log-archive-refold-trial.mts` against
 // the real binary; here a refold that cannot start is enough to prove the temp folder goes.
 
-import { test } from 'node:test'
+import { after, test } from 'node:test'
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { gzipSync } from 'node:zlib'
@@ -45,9 +45,15 @@ function segmentWith(archivePath: string | null, over: Partial<Segment> = {}): S
   }
 }
 
+const roots: string[] = []
+after(() => {
+  for (const r of roots) rmSync(r, { recursive: true, force: true })
+})
+
 /** An archive holding the segment's lines followed by a line written during the move. */
 function archiveFixture(): { root: string; archive: string } {
   const root = mkdtempSync(join(tmpdir(), 'logrefold-'))
+  roots.push(root)
   const archive = join(root, 'eqlog_Primitive_freeport_2026-08-02_to_2026-08-02.log.gz')
   writeFileSync(archive, gzipSync(Buffer.from(TOTALS + GAP)))
   return { root, archive }
