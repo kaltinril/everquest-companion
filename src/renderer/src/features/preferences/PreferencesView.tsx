@@ -139,6 +139,8 @@ import PrefSectionBlock, { FILL_COLUMN_SX, FILL_ROOT_SX, FILL_ROW_SX, paneFills,
 // THE HYDRATION GATE (JOS-340) — one batched read of everything this pane paints from main, and
 // nothing renders until it lands. Read that file's header before touching any card's state.
 import { PrefsGate, usePrefsSeed } from './prefsHydration'
+import { LogArchiveSetting } from './LogArchiveSetting'
+import { UNRELEASED } from '../../devFlags'
 import { normalizeQuery } from '../../lib/search'
 
 // ------------------------------------------------------------------- the view
@@ -314,7 +316,18 @@ function buildSections({ version, status, onSendFeedback, onWhatsNew }: SectionI
           label: 'EverQuest install folder',
           keywords: 'path directory logs eqlog character detect override install location',
           content: <EqFolderSetting />
-        }
+        },
+        // KEEP LOG HISTORY (docs/plans/log-archive), behind the unreleased gate until phase 6.
+        ...(UNRELEASED
+          ? [
+              {
+                id: 'log-archive',
+                label: 'Keep log history',
+                keywords: 'log archive rotate clear compress backup history size shrink large slow loading',
+                content: <LogArchiveSetting />
+              }
+            ]
+          : [])
       ]
     },
     // SECOND IN THE RAIL, ahead of everything about the game (JOS-123). A person who opens

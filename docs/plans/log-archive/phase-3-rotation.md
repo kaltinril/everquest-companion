@@ -137,6 +137,23 @@ reopens is checked in step 3.3; step 6 above records them either way.
 
 Result: _not yet run_
 
+## As built (2026-10-03)
+
+- `main/logArchive/rotate.ts` holds steps 3.3, 3.4 and 3.6 over paths; `shared/logArchive/preflight.ts`
+  is 3.1. The archive folder must be on the log's drive, so the move is a rename.
+- **The moved file is checked** to begin with exactly the captured bytes before anything is
+  compressed. A file that does not is kept where it is and the player is told.
+- **The launch check (3.4)** runs before the session resolves the log (`main/index.ts`), and
+  returns at once when the archive folder does not exist.
+- **Restore (3.6) restarts the app.** The engine is following a short log that just became a
+  long one, and a reopened path keeps its read offset (`tail.rs`, rule 5), so only a fresh launch
+  folds the restored log correctly. The card says so before the player confirms. The join uses a
+  hard link to the live name, which fails if the game recreated it, so it can never overwrite.
+- **Tests**: a clean run; lines written between capture and move (archived and counted); the
+  game recreating the log first (never truncated); a log that cannot be moved; a crash after each
+  step followed by the launch recovery, checking the lines are whole at every point; restore byte
+  for byte; a corrupt archive refused.
+
 ## When this phase is done
 
 | Question | Answer |

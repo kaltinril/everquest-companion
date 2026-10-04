@@ -28,7 +28,26 @@ This happens today to any player who shortens their log by hand. It is not cause
 - **If no**: step 5.2 is not built. The loss is added to the README's list, and the question is
   put to the creator, since the fix would be in the engine.
 
-Finding: _not yet investigated_
+Finding (2026-10-03, read from the code): **yes, with conditions; no engine change needed.**
+
+- Keys are `name_server` in lower case (`engine/crates/engined/src/foldsink.rs` 208-214). The
+  key `baseline` is dropped on read and write; `log` is the engine's fallback name. Avoid both.
+- Resist evidence is pooled across every bucket: `src/main/resist/ledger.ts rowsFor` (219-229)
+  reads all of them, and so do the whole-ledger figures in `src/main/ipc/resist.ts`. Learned
+  messages are pooled too: the engine sums every bucket (`message_overlay.rs aggregate`, 348-373)
+  and the app's `appSpellDb.ts` merges every user bucket (76-80).
+- At attach the engine restores every bucket and empties only the attached character's
+  (`fold/src/lib.rs` 451-462). Other keys are written back unchanged; there is no cap and no
+  pruning by key. Empty buckets are dropped.
+- The engine reads both files once at attach and rewrites them every 60th live beat with its
+  whole store, so a key added while a fold is live is lost within about a minute. The copy must
+  be made after the old fold stops and before `session.attach` (`engineClientHost.ts` 584-600).
+  The app reads each file once per run, so the copy reaches the resist card from the next launch.
+- The copy must be made exactly at the rotation, or the live log and the copy both count the
+  same lines.
+
+So step 5.2 is possible. It writes into a file format the creator owns, which the plan already
+says needs the owner's agreement.
 
 ### 5.2 Keep the bucket
 

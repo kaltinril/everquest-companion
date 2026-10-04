@@ -82,6 +82,23 @@ features, until phase 6. Every step also refuses while [the switch](README.md#th
   hidden otherwise.
 - **Undo**: revert the commit.
 
+## As built (2026-10-03)
+
+- **Capture reads the engine's position, not the file's size.** `session.health` reports the end
+  of the last complete line the engine has folded. Capture asks for it, takes every module's
+  snapshot, and asks again; if it moved, a line landed mid-capture and the capture is taken
+  again (four tries). The segment then describes exactly bytes [0, offset) of the log, which the
+  game never changes, so capture works with the game running and needs no "log grew" refusal.
+- **Fight summaries are not captured yet.** What to keep of a fight is ruling 0.4.
+- **Segments and archives share one folder**, `<app data>/log-archive`.
+- **The panel** is `features/preferences/LogArchiveSetting.tsx`, in Preferences under Game,
+  behind the unreleased gate. The main side is `main/logArchive/actions.ts` and
+  `main/ipc/logArchive.ts`; every action checks the switch first and runs one at a time.
+- **The dump advice (2.5)** compares the inventory and factions dump files beside the game with
+  the log's last write, and shows when either is missing or more than a day older.
+- **Tests**: `tests/logArchiveRotate.test.mts` (capture refusals and retries, backup round trip,
+  mismatch, crash sweep). No e2e pass over the panel yet.
+
 ## When this phase is done
 
 | Question | Answer |

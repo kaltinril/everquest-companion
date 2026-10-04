@@ -55,6 +55,11 @@ export interface Segment {
   producedBy: { app: string; engine: string }
   /** The compressed archive, once one exists. */
   archivePath: string | null
+  /** What the archive holds once uncompressed. It can be longer than `log` when the game wrote
+   *  lines between the capture and a rotation (phase 3); `gapLines` counts them. */
+  archiveSource?: { bytes: number; sha256: string }
+  /** The archive's size on disk. */
+  archiveGzBytes?: number
   /** Lines in the archive that the totals do not include (a live archive's capture window). */
   gapLines?: number
   /** Every module the engine published, keyed by module id. */

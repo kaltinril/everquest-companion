@@ -146,8 +146,11 @@ Update this table in the same commit as the step it records.
 | 0.4 | not yet ruled; needed only by phase 4's fight steps | |
 | 0.5 | measured 2026-10-03: the log can be moved while the game runs | |
 | 1.0 to 1.7 | done 2026-10-03: inert, gate green | this commit |
-| 2.1 to 2.5 | not started | |
-| 3.1 to 3.7 | not started | |
+| 2.1 to 2.5 | done 2026-10-03 (see the phase notes) | phases 2 and 3 commit |
+| 3.1 to 3.6 | done 2026-10-03; 3.7 is the owner's trial | phases 2 and 3 commit |
 | 4.1 to 4.9 | not started | |
-| 5.1 to 5.5 | not started | |
-| 6.1 to 6.4 | not started | |
+| 5.1 | answered 2026-10-03: yes, with conditions | |
+| 5.3 | done with the panel (version shown, older builds marked) | |
+| 5.2, 5.4, 5.5 | not started | |
+| 6.1 | first pass in the panel's own words | |
+| 6.2 to 6.4 | wait for the owner's trial | |
