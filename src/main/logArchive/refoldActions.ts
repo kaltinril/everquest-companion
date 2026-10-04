@@ -12,7 +12,7 @@ import { app } from 'electron'
 import { dirname, join } from 'node:path'
 import { readDefine } from '../dataServer/appKnowledge'
 import { DEFINE_OPS } from '../dataServer/definePush'
-import { engineBinaryInUse } from '../dataServer/engineHost'
+import { engineBinaryInUse, spawnEngineProcess } from '../dataServer/engineHost'
 import { hostClockHint, resolvedTimeZone } from '../dataServer/hostClock'
 import { getActiveCharacter } from '../session'
 import { logArchiveOn } from '../storeLogArchive'
@@ -39,6 +39,7 @@ export function refoldDeps(withTables: boolean): RefoldDeps | string {
   if (bin === null) return 'the engine has not started'
   return {
     bin,
+    spawn: spawnEngineProcess,
     tablesRoot: withTables ? installRoot() : null,
     defines: DEFINE_OPS.map((op) => ({ op, params: readDefine(op) })),
     clock: hostClockHint(new Date(), resolvedTimeZone),

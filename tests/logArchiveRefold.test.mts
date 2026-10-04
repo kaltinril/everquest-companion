@@ -8,7 +8,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { gzipSync } from 'node:zlib'
@@ -109,11 +109,14 @@ test('a refold that cannot start says why and leaves no temp folder', async () =
   const work = join(root, 'work')
   const r = await refoldSegment(segmentWith(archive), {
     bin: join(root, 'no-such-engine.exe'),
+    spawn: () => {
+      throw new Error('spawn failed')
+    },
     tablesRoot: null,
     defines: [],
     clock: { utcOffsetMin: 0 },
     workRoot: work
   })
   assert.equal(r.ok, false)
-  assert.deepEqual(readdirSync(work), [])
+  assert.equal(existsSync(work), false)
 })

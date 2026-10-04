@@ -13,7 +13,7 @@
 // binary, the tables and the defines.
 
 import { createHash } from 'node:crypto'
-import { copyFileSync, createReadStream, createWriteStream, existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs'
+import { copyFileSync, createReadStream, createWriteStream, existsSync, mkdirSync, mkdtempSync, rmdirSync, rmSync } from 'node:fs'
 import { basename, join } from 'node:path'
 import { createGunzip } from 'node:zlib'
 import { CAPTURED_MODULES } from '../../shared/logArchive/modules'
@@ -28,6 +28,7 @@ const FOLD_TIMEOUT_MS = 10 * 60_000
 
 export interface RefoldDeps {
   bin: string
+  spawn: SecondFoldRequest['spawn']
   /** The EverQuest folder to copy the client's tables from, or null to fold without them. */
   tablesRoot: string | null
   defines: SecondFoldRequest['defines']
@@ -86,6 +87,15 @@ export async function stageSegmentLog(segment: Segment, root: string, tablesRoot
   return { logPath, tables: copyTables(tablesRoot, root) }
 }
 
+/** The shared parent goes too, unless another refold is using it. */
+function removeIfEmpty(dir: string): void {
+  try {
+    rmdirSync(dir)
+  } catch {
+    // Not empty, or already gone.
+  }
+}
+
 /** Fold a segment's archived lines in a second engine and read every module back. */
 export async function refoldSegment(segment: Segment, deps: RefoldDeps): Promise<RefoldResult> {
   mkdirSync(deps.workRoot, { recursive: true })
@@ -97,6 +107,7 @@ export async function refoldSegment(segment: Segment, deps: RefoldDeps): Promise
     const stageMs = Date.now() - began
     const fold = await foldWithSecondEngine({
       bin: deps.bin,
+      spawn: deps.spawn,
       logPath: staged.logPath,
       bytes: segment.log.bytes,
       modules: CAPTURED_MODULES,
@@ -109,5 +120,6 @@ export async function refoldSegment(segment: Segment, deps: RefoldDeps): Promise
     return { ok: false, reason: (err as Error).message }
   } finally {
     rmSync(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 })
+    removeIfEmpty(deps.workRoot)
   }
 }

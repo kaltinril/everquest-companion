@@ -69,7 +69,7 @@
 //     probes, and `build:engine` fails the build rather than shipping without it). So default-on in
 //     a shipped app means the engine actually runs, which is the entire content of this ticket.
 
-import { spawn } from 'node:child_process'
+import { spawn, type ChildProcess } from 'node:child_process'
 import { copyFileSync, existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 import { app, powerMonitor } from 'electron'
@@ -382,6 +382,12 @@ export function engineBinaryInUse(): string | null {
  */
 function spawnEngine(binPath: string): SupervisedChild {
   binaryInUse = binPath
+  return spawnEngineProcess(binPath)
+}
+
+/** The spawn itself, by the contract above. Also starts the second engine a refold of an archive
+ *  runs (docs/plans/log-archive, step 5.4), so this file stays the one place that launches it. */
+export function spawnEngineProcess(binPath: string): ChildProcess {
   return spawn(binPath, [], {
     stdio: ['pipe', 'pipe', 'pipe'],
     windowsHide: true,

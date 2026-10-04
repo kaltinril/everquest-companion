@@ -13,11 +13,10 @@
 // definitions, buff trust, respawn watches and the character's combo and roster edits change what a
 // fold produces, so they are handed over before the attach.
 //
-// Electron-free: the caller names the binary and the defines.
+// Electron-free: the caller names the binary and the defines, and hands in the spawn, which is
+// `engineHost.ts spawnEngineProcess` (the one module that launches the engine).
 
-import { spawn, type ChildProcess } from 'node:child_process'
 import { constants, setPriority } from 'node:os'
-import { dirname } from 'node:path'
 import { createEngineClient, type EngineClient } from '../../shared/dataServer/client'
 import { createNdjsonTransport } from '../../shared/dataServer/ndjson'
 import type { ClientMessage, EngineMessage, HealthResult } from '../../shared/dataServer/protocol.generated'
@@ -25,13 +24,29 @@ import type { ParamsFor } from '../../shared/dataServer/ops'
 import type { SegmentModule } from '../../shared/logArchive/segment'
 import { parseAnnounce } from '../dataServer/engineProtocol'
 import { connectToEngine } from '../dataServer/socketChannel'
-import { readLines } from '../dataServer/supervisorChild'
+import { readLines, type SupervisedStream } from '../dataServer/supervisorChild'
 import { mintToken } from '../dataServer/token'
 import type { DefineOp } from '../dataServer/definePush'
+
+/** What this file needs of a child process; Node's `ChildProcess` is one. */
+export interface EngineProcess {
+  readonly pid?: number
+  readonly exitCode: number | null
+  readonly signalCode: string | null
+  readonly stdin: { write(chunk: string): unknown; end(): unknown } | null
+  readonly stdout: SupervisedStream | null
+  readonly stderr: SupervisedStream | null
+  on(event: 'exit', listener: (code: number | null) => void): unknown
+  on(event: 'error', listener: (err: Error) => void): unknown
+  once(event: 'exit', listener: () => void): unknown
+  removeAllListeners(event: 'exit'): unknown
+  kill(): unknown
+}
 
 export interface SecondFoldRequest {
   /** The engine binary: the one the app is running, so both folds come from the same build. */
   bin: string
+  spawn: (bin: string) => EngineProcess
   /** The log to fold. */
   logPath: string
   /** Its length; the fold is done when the engine has read to here and gone live. */
@@ -55,8 +70,8 @@ const ANNOUNCE_MS = 10_000
 const POLL_MS = 250
 
 /** Start the binary and wait for its port. */
-function launch(bin: string, token: string): Promise<{ child: ChildProcess; port: number }> {
-  const child = spawn(bin, [], { stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true, cwd: dirname(bin) })
+function launch(req: SecondFoldRequest, token: string): Promise<{ child: EngineProcess; port: number }> {
+  const child = req.spawn(req.bin)
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
       reject(new Error('the second engine did not announce a port'))
@@ -82,7 +97,7 @@ function launch(bin: string, token: string): Promise<{ child: ChildProcess; port
 }
 
 /** Below normal, as the app's own engine runs: a refold must not compete with the game. */
-function lowerPriority(child: ChildProcess): void {
+function lowerPriority(child: EngineProcess): void {
   try {
     if (child.pid !== undefined) setPriority(child.pid, constants.priority.PRIORITY_BELOW_NORMAL)
   } catch {
@@ -134,7 +149,7 @@ async function foldOn(client: EngineClient, req: SecondFoldRequest): Promise<Sec
 
 /** Close stdin (the shutdown signal); kill it if it has not gone within two seconds. Resolves once
  *  it has exited, so the caller can remove the folder the engine had open. */
-function stop(child: ChildProcess): Promise<void> {
+function stop(child: EngineProcess): Promise<void> {
   if (child.exitCode !== null || child.signalCode !== null) return Promise.resolve()
   return new Promise((resolve) => {
     const kill = setTimeout(() => child.kill(), 2_000)
@@ -149,7 +164,7 @@ function stop(child: ChildProcess): Promise<void> {
 /** Fold `req.logPath` in a fresh engine process and read every module back. Always stops it. */
 export async function foldWithSecondEngine(req: SecondFoldRequest): Promise<SecondFold> {
   const token = mintToken()
-  const { child, port } = await launch(req.bin, token)
+  const { child, port } = await launch(req, token)
   child.removeAllListeners('exit')
   lowerPriority(child)
   const client = createEngineClient({ token })
