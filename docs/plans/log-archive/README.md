@@ -125,6 +125,9 @@ These are stated here so nobody discovers them later.
   14.5 KB per fight (92 MB for the measured log) and is not kept. An archived fight opens as a
   summary.
 - **Alerts and the event feed** are live only, today and after.
+- **Up to a minute of resist and message history** before each archive: what the engine had
+  not yet written when the log was moved. A second archive of one character without a relaunch
+  in between keeps none of that log's resist and message history (step 5.2).
 - **The engine-fed loot ledger** (the optional data-source toggle on the Loot tab) reads the
   engine directly and shows the live log only. The default ledger shows merged history.
 
@@ -160,7 +163,8 @@ Update this table in the same commit as the step it records.
 | 4.8 | done 2026-10-04: search reaches archived fights, pinned to the engine's own fixtures | 4c05f5a3 |
 | 4.9 | done 2026-10-04: an archived fight opens to its summary and names its archive | 4989463e |
 | 5.1 | answered 2026-10-03: yes, with conditions | |
+| 5.2 | done 2026-10-04: resist and message buckets kept per archive, read at the archive, added at the next launch | this commit |
 | 5.3 | done with the panel (version shown, older builds marked) | |
-| 5.2, 5.4, 5.5 | not started | |
+| 5.4, 5.5 | not started | |
 | 6.1 | first pass in the panel's own words | |
 | 6.2 to 6.4 | wait for the owner's trial | |
