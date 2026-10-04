@@ -157,6 +157,7 @@ Update this table in the same commit as the step it records.
 | 4.7 to 4.9 | waiting for ruling 0.4 | |
 | 5.1 | answered 2026-10-03: yes, with conditions | |
 | 5.3 | done with the panel (version shown, older builds marked) | |
-| 5.2, 5.4, 5.5 | not started | |
+| 5.4 | measured 2026-10-04: a second fold matches the segment in all 20 modules (see phase 5) | this commit |
+| 5.2, 5.5 | not started | |
 | 6.1 | first pass in the panel's own words | |
 | 6.2 to 6.4 | wait for the owner's trial | |

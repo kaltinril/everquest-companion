@@ -359,6 +359,16 @@ function describeErr(err: unknown): string {
   return err instanceof Error ? err.message : String(err)
 }
 
+/** The binary the last launch spawned. */
+let binaryInUse: string | null = null
+
+/** The engine binary this app is running, or null before the first spawn. A refold of an archive
+ *  (docs/plans/log-archive, step 5.4) starts a second process from the same file, so both folds
+ *  come from one build. */
+export function engineBinaryInUse(): string | null {
+  return binaryInUse
+}
+
 /**
  * Spawn the engine.
  *
@@ -371,6 +381,7 @@ function describeErr(err: unknown): string {
  * directory, so that is where it should be standing.
  */
 function spawnEngine(binPath: string): SupervisedChild {
+  binaryInUse = binPath
   return spawn(binPath, [], {
     stdio: ['pipe', 'pipe', 'pipe'],
     windowsHide: true,
