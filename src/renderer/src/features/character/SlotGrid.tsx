@@ -215,8 +215,15 @@ function SlotWishChips({ wishes }: { wishes: readonly SlotWish[] }): JSX.Element
   if (wishes.length === 0) return null
   return (
     <Box data-testid="character-slot-wishes" sx={CHIP_ROW}>
+      {/* Each wish is an item, so it hovers with the item card; the wish's own sentence rides
+          under the item window (owner ask, 2026-10-03: no bare item names). */}
       {wishes.map((w, i) => (
-        <Tooltip key={`${w.name}#${String(i)}`} title={wishHover(w)}>
+        <KnownItemTooltip
+          key={`${w.name}#${String(i)}`}
+          name={w.name}
+          clickThrough
+          extra={<Typography component="div" sx={{ fontSize: 11, mt: 0.5 }}>{wishHover(w)}</Typography>}
+        >
           <Chip
             label={`♥ ${w.effect ?? w.name}`}
             size="small"
@@ -225,7 +232,7 @@ function SlotWishChips({ wishes }: { wishes: readonly SlotWish[] }): JSX.Element
             data-testid={`character-slot-wish-${w.kind}`}
             sx={SMALL_CHIP}
           />
-        </Tooltip>
+        </KnownItemTooltip>
       ))}
     </Box>
   )
