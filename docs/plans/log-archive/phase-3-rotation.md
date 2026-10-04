@@ -151,8 +151,15 @@ Result (2026-10-03, automated by `tests/e2e/log-archive-trial.mts` on a copy of 
   (`engine/crates/fold/src/epoch.rs`) fires at the first line dated after 2026-07-28 and is
   delivered after that line, so every character-scoped module clears what that line just added.
   In a log that began before launch day the line is a login line and nothing is lost; in a fresh
-  log it is whatever the game printed first. Fixing it is an engine change and waits on the
-  owner.
+  log it is whatever the game printed first. **Fixed 2026-10-04 on `catch_all` (06c37f78), at
+  the owner's request:** the epoch is now delivered before its line. Re-run with the fixed engine:
+  the first line counts live and at the next launch.
+- With the fix in, the only differences left are context the fresh log does not have yet: a kill
+  made before the fresh log's first zone line is counted but filed under "unknown zone" (tier
+  key -2) instead of the zone the player was in, and the respawn card's zone is blank until the
+  next zone line. A boss killed in an instance in that window would not credit its tier rung
+  until the player zones. Carrying the archive's last zone over to those kills is possible
+  app-side (step 4.5 already does it for the leveling series) and is not built.
 
 ## As built (2026-10-03)
 

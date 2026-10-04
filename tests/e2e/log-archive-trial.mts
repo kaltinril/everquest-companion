@@ -110,12 +110,19 @@ function canon(v: unknown): string {
 
 /**
  * Fields a fresh log cannot know until the game prints them again, so they may differ after an
- * archive (the plan's "what is lost"): the zone the respawn card is showing.
+ * archive (the plan's "what is lost"): the zone the respawn card is showing, and the zone of a kill
+ * made in the fresh log before its first zone line (filed under "unknown zone", counted all the
+ * same, on the respawn card's recent row and in the kill's tier key).
  */
 function withoutLiveContext(s: Snaps): Snaps {
   const out = structuredClone(s)
-  const respawn = out.respawn as { zone?: unknown } | null
-  if (respawn !== null && typeof respawn === 'object') delete respawn.zone
+  const respawn = out.respawn as { zone?: unknown; recent?: { key: string; zone?: string }[] } | null
+  if (respawn !== null && typeof respawn === 'object') {
+    delete respawn.zone
+    for (const r of respawn.recent ?? []) if (r.key.endsWith(' rat')) delete r.zone
+  }
+  const mobs = (out.kills as { mobs?: Record<string, unknown> } | null)?.mobs ?? {}
+  for (const key of Object.keys(mobs)) if (key.endsWith(' rat')) delete mobs[key]
   return out
 }
 
@@ -182,9 +189,8 @@ async function main(): Promise<void> {
   dump('2-after-relaunch', after)
   note(`after relaunch: ${shape(after)}`)
   check('the first line of the fresh log is counted at the next launch', killsOf(after, 'a first rat') === 1, `${killsOf(after, 'a first rat')}`)
-  const withoutRat = structuredClone(after)
-  delete (withoutRat.kills as { mobs: Record<string, unknown> }).mobs['a first rat']
-  compare('next launch, archive + fresh log', before, withoutRat)
+  // Against the running session just after the first line was counted: both hold the same lines.
+  compare('next launch, archive + fresh log', firstLive, after)
 
   // 3. New lines add to the history.
   appendFileSync(logPath, line('You have slain a trial rat!') + line('You have gained a level! Welcome to level 61!'))
