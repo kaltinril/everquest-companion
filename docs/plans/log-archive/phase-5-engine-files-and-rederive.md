@@ -115,7 +115,9 @@ produces the totals the segment stored, in every module.**
   (`refoldCompare.ts IDENTITY_PATHS`), and a refresh keeps the stored path.
 - **The supervisor** is not used. `main/logArchive/secondEngine.ts` starts the same binary by the
   same contract (token on stdin, port on stdout, closing stdin stops it), with no restart and no
-  health watchdog, and stops it when the snapshots are read. The app's engine kept serving.
+  health watchdog, and stops it when the snapshots are read. The process itself is started by
+  `engineHost.ts spawnEngineProcess`, which stays the one module allowed to launch the engine
+  (`tests/noChildProcess.test.mts`). The app's engine kept serving.
 - **The client's tables** made no difference to any module. The engine reads `spells_us.txt`
   lazily, to answer card and search questions (`engined/src/spells.rs`). They are copied beside
   the staged log anyway when the live install is known, so a later engine that does use them in
@@ -143,6 +145,26 @@ So step 5.5 can be built.
 - **Check**: on a fixture, a segment captured with a snapshot that lacks one event kind gains
   it after the refresh.
 - **Undo**: the old segment file is restored from its kept copy.
+
+As built (2026-10-04):
+
+- `main/logArchive/refresh.ts` holds the order: refold (step 5.4's code, with the client's tables),
+  write `<id>.segment.json.next`, read it back and compare it with what was written, copy the old
+  file to `<id>.segment.json.old`, then rename the new file over the old. A crash leaves the old
+  file or the new one in place. The launch check removes `.old` and any unswapped `.next`.
+- Only the module snapshots and `producedBy` change. The log identity, the archive, the state and
+  the path the `character` module names are kept. A refold that lacks a module the segment held is
+  refused, so a refresh never loses one. The merge reads the folder again afterwards, so the tabs
+  show the new totals at once.
+- The panel shows "Refresh this history" only on a segment marked as older that has an archive,
+  and asks first; main refuses a segment this version already produced. The reply names the
+  modules whose totals changed.
+- Check, on the split-log fixture with the real engine (`tests/e2e/log-archive-refold-trial.mts`):
+  the segment was rewritten as an older build with its 250 loot rows removed; the panel marked it
+  older; the refresh answered "Updated: loot", the 250 rows were back, the segment recorded 43.7.0,
+  the old file was kept beside it, and the mark was gone. Unit tests in
+  `tests/logArchiveRefold.test.mts` cover the refusals and a failed or short refold leaving the
+  file untouched.
 
 ## When this phase is done
 

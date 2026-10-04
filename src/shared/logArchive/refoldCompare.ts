@@ -66,6 +66,28 @@ export function stateDifference(module: string, stored: unknown, refolded: unkno
   return d.count === 0 ? null : d
 }
 
+/** `refolded` with the stored value put back at every `IDENTITY_PATHS` entry. Neither input is
+ *  changed. */
+export function keepIdentity(
+  stored: Record<string, SegmentModule>,
+  refolded: Record<string, SegmentModule>
+): Record<string, SegmentModule> {
+  const out = structuredClone(refolded)
+  for (const entry of IDENTITY_PATHS) {
+    const [module, path] = entry.split(':')
+    const keys = path.split('.')
+    let from: unknown = stored[module]?.state
+    let to: unknown = out[module]?.state
+    for (const k of keys.slice(0, -1)) {
+      from = isObject(from) ? from[k] : undefined
+      to = isObject(to) ? to[k] : undefined
+    }
+    const last = keys[keys.length - 1]
+    if (isObject(from) && isObject(to) && last in from) to[last] = from[last]
+  }
+  return out
+}
+
 /** Every module either side holds, in the stored side's order, then the refold's extras. */
 export function compareModules(
   stored: Record<string, SegmentModule>,

@@ -1,4 +1,4 @@
-// main/logArchive/actions.ts — WHAT THE LOG ARCHIVE CARD CAN ASK FOR (steps 2.1 to 2.5, 3.2, 3.5, 3.6).
+// main/logArchive/actions.ts — WHAT THE LOG ARCHIVE CARD CAN ASK FOR (steps 2.1 to 2.5, 3.2, 3.5, 3.6, 5.5).
 //
 // Every action checks the switch first and refuses while it is off; nothing here runs unless the
 // player clicked for it. One action at a time. Each returns the outcome in plain words and the
@@ -20,6 +20,8 @@ import { archiveName, backupLog, sweepTemp } from './backup'
 import { captureSegment, type CaptureDeps } from './capture'
 import { liveHistory, logArchiveDir } from './liveHistory'
 import { readLogPrefix } from './logPrefix'
+import { refoldWithApp } from './refoldActions'
+import { refreshSegment, sweepRefreshLeftovers } from './refresh'
 import { readJournal, recoverRotation, restoreLog, rotateLog, type RotateDeps } from './rotate'
 import { listSegments, writeSegment } from './segmentStore'
 
@@ -246,12 +248,27 @@ export function restoreNow(id: string): Promise<LogArchiveReply> {
   })
 }
 
+/** Step 5.5: refold an older segment's archive with this build and swap the new totals in. */
+export function refreshHistory(id: string): Promise<LogArchiveReply> {
+  return exclusive('refreshing a history', async () => {
+    const r = await refreshSegment(logArchiveDir(), id, {
+      refold: (s) => refoldWithApp(s, true),
+      producedBy: captureDeps.producedBy
+    })
+    if (!r.ok) return reply(false, `Not refreshed: ${r.reason}.`)
+    liveHistory.forgetHistoryContext()
+    const what = r.changed.length === 0 ? 'Nothing in it changed.' : `Updated: ${r.changed.join(', ')}.`
+    return reply(true, `Refreshed with this version. ${what}`)
+  })
+}
+
 /** Step 3.4, at launch before the engine attaches. Never throws. */
 export async function recoverLogArchiveAtLaunch(note: (line: string) => void): Promise<void> {
   try {
     const dir = logArchiveDir()
     if (!existsSync(dir)) return
     sweepTemp(dir)
+    sweepRefreshLeftovers(dir)
     const done = await recoverRotation(dir, rotateDeps)
     if (done !== null) note(`log archive: ${done}`)
   } catch (err) {

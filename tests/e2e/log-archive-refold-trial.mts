@@ -11,10 +11,13 @@
  * One app run: fold the log, turn Keep log history on, back it up (a segment with an archive), then
  * ask the developer's refold trial to fold the archive in a second engine and compare every module.
  * With tables named, it folds twice: without the client's tables beside the staged log, and with.
+ *
+ * Then step 5.5's check: the segment is made to look as an older build would have left it, with no
+ * loot rows, and "Refresh this history" must bring the rows back and record this version.
  */
 
 import type { Page } from 'playwright-core'
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, statSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { basename, join } from 'node:path'
 import { buildIfStale } from './build.mjs'
@@ -22,6 +25,7 @@ import { check, note, reportRun } from './appHarness.mjs'
 import { launchApp, mainWindow, makeUserData, removeUserData } from './appWindow.mjs'
 import { settleEngineServing } from './engineSteps.mjs'
 import type { RefoldTrialReport } from '../../src/shared/logArchive/refoldCompare'
+import type { Segment } from '../../src/shared/logArchive/segment'
 
 const SOURCE = process.env.LOG_ARCHIVE_TRIAL_LOG
 const TABLES = process.env.LOG_ARCHIVE_TRIAL_TABLES
@@ -56,6 +60,30 @@ function report(label: string, r: RefoldTrialReport): void {
   check(`${label}: every module matches`, r.verdicts.length > 0 && differ.length === 0, differ.join(', '))
 }
 
+interface Status {
+  segments: { id: string; olderEngine: boolean }[]
+}
+
+/** Step 5.5: strip one event kind as an older build might have, mark it older, and refresh. */
+async function refreshCheck(page: Page, userData: string, id: string): Promise<void> {
+  const file = join(userData, 'log-archive', `${id}.segment.json`)
+  const seg = JSON.parse(readFileSync(file, 'utf8')) as Segment
+  const rows = (seg.modules.loot?.state as unknown[] | undefined)?.length ?? 0
+  check('the fixture has loot rows to lose', rows > 0, String(rows))
+  writeFileSync(file, JSON.stringify({ ...seg, producedBy: { app: '0.0.1', engine: '0.0.1' }, modules: { ...seg.modules, loot: { seq: 0, state: [] } } }))
+  const st = await call<Status>(page, 'logArchiveStatus')
+  check('the panel marks it older', st.segments.find((s) => s.id === id)?.olderEngine === true)
+  const r = await call<{ ok: boolean; message: string; status: Status }>(page, 'logArchiveRefresh', id)
+  note(`refresh: ${r.message}`)
+  check('refresh succeeds', r.ok, r.message)
+  const back = JSON.parse(readFileSync(file, 'utf8')) as Segment
+  const after = (back.modules.loot?.state as unknown[] | undefined)?.length ?? 0
+  check('the loot rows are back after the refresh', after === rows, `${String(after)} of ${String(rows)}`)
+  check('the refresh records this version', back.producedBy.engine === seg.producedBy.engine, back.producedBy.engine)
+  check('the old file is kept beside it', existsSync(`${file}.old`))
+  check('it is no longer marked older', r.status.segments.find((s) => s.id === id)?.olderEngine === false)
+}
+
 async function main(): Promise<void> {
   buildIfStale()
   const { installDir, logPath } = stage()
@@ -75,6 +103,7 @@ async function main(): Promise<void> {
     const id = backed.status.segments[0]?.id ?? ''
     report('without tables', await call<RefoldTrialReport>(page, 'logArchiveRefoldTrial', id, false))
     if (TABLES !== undefined) report('with tables', await call<RefoldTrialReport>(page, 'logArchiveRefoldTrial', id, true))
+    await refreshCheck(page, userData, id)
   } finally {
     await run.close()
     await removeUserData(userData)

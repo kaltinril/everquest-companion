@@ -1,19 +1,22 @@
 // ============================================================================
-// logArchiveRefold.test.mts — folding a segment's archive again (log archive, step 5.4).
+// logArchiveRefold.test.mts — folding a segment's archive again (log archive, steps 5.4 and 5.5).
 // ============================================================================
 //
-// The comparison, and the staging of an archive as an install. The second engine itself is exercised by `tests/e2e/log-archive-refold-trial.mts` against
+// The comparison, the staging of an archive as an install, and the refresh's write, read back and
+// swap. The second engine itself is exercised by `tests/e2e/log-archive-refold-trial.mts` against
 // the real binary; here a refold that cannot start is enough to prove the temp folder goes.
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { gzipSync } from 'node:zlib'
-import { liveLogName, refoldSegment, stageSegmentLog } from '../src/main/logArchive/refold'
-import { compareModules, stateDifference } from '../src/shared/logArchive/refoldCompare'
+import { liveLogName, refoldSegment, stageSegmentLog, type RefoldResult } from '../src/main/logArchive/refold'
+import { refreshSegment, sweepRefreshLeftovers } from '../src/main/logArchive/refresh'
+import { listSegments, segmentPath, writeSegment } from '../src/main/logArchive/segmentStore'
+import { compareModules, keepIdentity, stateDifference } from '../src/shared/logArchive/refoldCompare'
 import { SEGMENT_VERSION, type Segment } from '../src/shared/logArchive/segment'
 
 const sha = (b: Buffer | string): string => createHash('sha256').update(b).digest('hex')
@@ -119,4 +122,83 @@ test('a refold that cannot start says why and leaves no temp folder', async () =
   })
   assert.equal(r.ok, false)
   assert.equal(existsSync(work), false)
+})
+
+// ---- step 5.5: refresh ----
+
+const STORED_LOG = 'C:/EQ/Logs/eqlog_Primitive_freeport.txt'
+
+/** A sealed segment from an older build whose loot module lacks the one row its log holds. */
+function olderSegment(): { dir: string; segment: Segment } {
+  const { root, archive } = archiveFixture()
+  const dir = join(root, 'archive')
+  const segment = segmentWith(archive, {
+    producedBy: { app: '0.9.0', engine: '0.9.0' },
+    modules: {
+      kills: { seq: 1, state: { mobs: { 'a gnoll': { count: 1 } } } },
+      loot: { seq: 1, state: [] },
+      character: { seq: 1, state: { character: { name: 'Primitive', logPath: STORED_LOG } } }
+    }
+  })
+  writeSegment(dir, segment)
+  return { dir, segment }
+}
+
+function refoldGiving(modules: Record<string, { seq: number; state: unknown }>): () => Promise<RefoldResult> {
+  return async () => ({ ok: true, fold: { modules, foldMs: 1, events: 2 }, stageMs: 1, tables: 0 })
+}
+
+const NOW = { app: '1.0.0', engine: '1.0.0' }
+
+const REFOLDED = {
+  kills: { seq: 2, state: { mobs: { 'a gnoll': { count: 1 } } } },
+  loot: { seq: 2, state: [{ ts: 1, item: 'Rusty Dagger' }] },
+  character: { seq: 2, state: { character: { name: 'Primitive', logPath: 'C:/Temp/refold-1/Logs/eqlog_Primitive_freeport.txt' } } }
+}
+
+test('refresh: an older segment gains the event kind its build did not read', async () => {
+  const { dir, segment } = olderSegment()
+  const r = await refreshSegment(dir, segment.id, { refold: refoldGiving(REFOLDED), producedBy: () => NOW })
+  assert.equal(r.ok, true)
+  assert.deepEqual(r.ok && r.changed, ['loot'])
+  const back = listSegments(dir).segments[0]
+  assert.deepEqual(back.modules.loot.state, [{ ts: 1, item: 'Rusty Dagger' }])
+  assert.deepEqual(back.producedBy, NOW)
+  assert.equal((back.modules.character.state as { character: { logPath: string } }).character.logPath, STORED_LOG)
+  assert.deepEqual({ ...back, modules: {}, producedBy: segment.producedBy }, { ...segment, modules: {} })
+  // The old file is kept beside it until the next launch, and only the swapped one is listed.
+  const old = JSON.parse(readFileSync(`${segmentPath(dir, segment.id)}.old`, 'utf8')) as Segment
+  assert.deepEqual(old, segment)
+  assert.equal(listSegments(dir).segments.length, 1)
+  assert.equal(sweepRefreshLeftovers(dir), 1)
+  assert.equal(existsSync(`${segmentPath(dir, segment.id)}.old`), false)
+})
+
+test('refresh: refused for a segment this version produced, or with no archive', async () => {
+  const { dir, segment } = olderSegment()
+  const deps = { refold: refoldGiving(REFOLDED), producedBy: () => segment.producedBy }
+  assert.deepEqual(await refreshSegment(dir, segment.id, deps), { ok: false, reason: 'this version already produced it' })
+  writeSegment(dir, { ...segment, id: 'no-archive', archivePath: null })
+  assert.deepEqual(await refreshSegment(dir, 'no-archive', { ...deps, producedBy: () => NOW }), { ok: false, reason: 'it has no archive to read again' })
+  assert.deepEqual(await refreshSegment(dir, 'missing', { ...deps, producedBy: () => NOW }), { ok: false, reason: 'that history was not found' })
+})
+
+test('refresh: a refold that fails or loses a module leaves the segment as it was', async () => {
+  const { dir, segment } = olderSegment()
+  const before = readFileSync(segmentPath(dir, segment.id), 'utf8')
+  const failing = async (): Promise<RefoldResult> => ({ ok: false, reason: 'the engine has not started' })
+  assert.deepEqual(await refreshSegment(dir, segment.id, { refold: failing, producedBy: () => NOW }), { ok: false, reason: 'the engine has not started' })
+  const lacking = refoldGiving({ kills: REFOLDED.kills, character: REFOLDED.character })
+  assert.deepEqual(await refreshSegment(dir, segment.id, { refold: lacking, producedBy: () => NOW }), { ok: false, reason: 'the refold did not give back loot' })
+  assert.equal(readFileSync(segmentPath(dir, segment.id), 'utf8'), before)
+  assert.deepEqual(readdirSync(dir).sort(), [`${segment.id}.segment.json`])
+})
+
+test('keepIdentity puts the stored path back and changes neither input', () => {
+  const stored = { character: { seq: 1, state: { character: { logPath: 'a' } } } }
+  const refolded = { character: { seq: 2, state: { character: { logPath: 'b', level: 3 } } } }
+  const out = keepIdentity(stored, refolded)
+  assert.deepEqual(out.character.state, { character: { logPath: 'a', level: 3 } })
+  assert.equal(refolded.character.state.character.logPath, 'b')
+  assert.deepEqual(keepIdentity({}, { kills: { seq: 1, state: {} } }), { kills: { seq: 1, state: {} } })
 })

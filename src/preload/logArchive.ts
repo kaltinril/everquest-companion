@@ -13,6 +13,7 @@ export const logArchiveBridge = {
   logArchiveKeep: (id: string): Promise<LogArchiveReply> => ipcRenderer.invoke(IPC.logArchiveKeep, id),
   logArchiveRotate: (): Promise<LogArchiveReply> => ipcRenderer.invoke(IPC.logArchiveRotate),
   logArchiveRestore: (id: string): Promise<LogArchiveReply> => ipcRenderer.invoke(IPC.logArchiveRestore, id),
+  logArchiveRefresh: (id: string): Promise<LogArchiveReply> => ipcRenderer.invoke(IPC.logArchiveRefresh, id),
   /** Developer-only (step 5.4): refused in a packaged build, and no player surface calls it. */
   logArchiveRefoldTrial: (id: string, withTables: boolean): Promise<RefoldTrialReport> =>
     ipcRenderer.invoke(IPC.logArchiveRefoldTrial, id, withTables)
