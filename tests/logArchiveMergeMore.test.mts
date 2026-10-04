@@ -23,9 +23,11 @@ import { readFileSync } from 'node:fs'
 import { CONSIDER_CAP, mergeConsider } from '../src/shared/logArchive/mergeConsider'
 import { mergeItemTiers } from '../src/shared/logArchive/mergeItemTiers'
 import { dropsFromLoot, mergeDropsSeen, withArchivedDrops } from '../src/shared/logArchive/mergeDropsSeen'
+import { mergeRespawn } from '../src/shared/logArchive/mergeRespawn'
 import { mergeClassUnlocks, mergeTurnIns } from '../src/shared/logArchive/mergeUnlocksTurnIns'
 import { hasMergeRule, mergeModule } from '../src/shared/logArchive/mergeRules'
 import { MobLootIndex } from '../src/main/mobLookupParse'
+import { RESPAWN_MAX_GAPS, RESPAWN_MAX_RECENT, type RespawnCandidate, type RespawnRow, type RespawnSnap } from '../src/shared/respawn'
 import type { ClassUnlockSnap, ConsiderRow, ConsiderSnap, ItemTierRow, ItemTiersSnap, LootSnap, MobSeenDrop, TurnInSnap } from '../src/shared/types'
 
 interface Recorded {
@@ -34,6 +36,7 @@ interface Recorded {
   itemTiers: ItemTiersSnap
   classUnlocks?: ClassUnlockSnap
   turnins?: TurnInSnap
+  respawn?: RespawnSnap
 }
 
 const fixture = (name: string): Recorded =>
@@ -252,8 +255,88 @@ test('turn-ins: rows join older first', () => {
   assert.equal(mergeTurnIns({}, []), null)
 })
 
+// ── 4.4 respawn ─────────────────────────────────────────────────────────────────────────────────
+
+test('split log: respawn of A merged with B equals the respawn state of the whole log', () => {
+  assert.deepEqual(mergeModule('respawn', [WL.a.respawn], WL.b.respawn).state, WL.whole.respawn)
+})
+
+test('split log: the respawn fixture really is split, and the candidate cap really binds', () => {
+  const a = WL.a.respawn?.recent ?? []
+  const b = WL.b.respawn?.recent ?? []
+  assert.ok(a.some((c) => b.some((d) => d.key === c.key && d.zone === c.zone)), 'a mob is killed in both halves')
+  assert.ok(new Set([...a, ...b].map((c) => `${c.zone}::${c.key}`)).size > RESPAWN_MAX_RECENT)
+})
+
+const clock = (over: Partial<RespawnRow>): RespawnRow => ({
+  id: 'guk::a ghoul',
+  key: 'a ghoul',
+  display: 'a ghoul',
+  zone: 'Guk',
+  baseTs: 100,
+  basis: 'death',
+  source: 'none',
+  samples: 0,
+  kills: 1,
+  ...over
+})
+
+const respawnSnap = (rows: RespawnRow[], watches: RespawnSnap['prefs']['watches'], recent: RespawnCandidate[] = []): RespawnSnap => ({
+  v: 4,
+  zone: 'Guk',
+  rows,
+  recent,
+  prefs: { watches }
+})
+
+test('respawn: learned gaps join newest first under the cap, samples and kills add, the bound takes the smaller', () => {
+  const older = respawnSnap([clock({ kills: 5, samples: 4, observedMs: 300_000, gapsMs: [400_000, 300_000, 500_000, 600_000] })], [])
+  const newer = respawnSnap([clock({ kills: 4, samples: 3, observedMs: 350_000, gapsMs: [360_000, 350_000, 370_000], baseTs: 900 })], [{ key: 'a ghoul', display: 'a ghoul' }])
+  const row = mergeRespawn(older, newer)?.rows[0]
+  assert.ok(row)
+  assert.deepEqual(row.gapsMs, [360_000, 350_000, 370_000, 400_000, 300_000, 500_000])
+  assert.equal(row.gapsMs.length, RESPAWN_MAX_GAPS)
+  assert.equal(row.samples, 7)
+  assert.equal(row.kills, 9)
+  assert.equal(row.observedMs, 300_000)
+  assert.equal(row.estimateMs, 300_000)
+  assert.equal(row.source, 'observed')
+  assert.equal(row.baseTs, 900, 'the clock is the live one')
+})
+
+test("respawn: an archived clock shows only for a mob the live list watches, with today's custom number", () => {
+  const older = respawnSnap([clock({ samples: 1, observedMs: 200_000, customMs: 60_000, source: 'custom', estimateMs: 60_000 })], [{ key: 'a ghoul', display: 'a ghoul', customSec: 60 }])
+  const unwatched = mergeRespawn(older, respawnSnap([], []))
+  assert.deepEqual(unwatched?.rows, [])
+  const watched = mergeRespawn(older, respawnSnap([], [{ key: 'a ghoul', display: 'a ghoul' }]))
+  assert.equal(watched?.rows.length, 1)
+  assert.equal(watched?.rows[0].customMs, undefined)
+  assert.equal(watched?.rows[0].source, 'observed')
+  assert.equal(watched?.rows[0].estimateMs, 200_000)
+})
+
+test('respawn: candidates join, the live watch list says which are watched, and the present is the live state', () => {
+  const cand = (key: string, lastTs: number, kills: number): RespawnCandidate => ({ key, display: key, zone: 'Guk', lastTs, kills, watched: false })
+  const older = respawnSnap([], [], [cand('a ghoul', 50, 2), cand('a rat', 40, 1)])
+  const newer: RespawnSnap = { ...respawnSnap([], [{ key: 'a rat', display: 'a rat' }], [cand('a ghoul', 90, 3)]), zone: 'Now' }
+  const m = mergeRespawn(older, newer)
+  assert.deepEqual(m?.recent, [{ ...cand('a ghoul', 90, 5) }, { ...cand('a rat', 40, 1), watched: true }])
+  assert.equal(m?.zone, 'Now')
+  assert.equal(m?.prefs, newer.prefs)
+})
+
+test('respawn: inputs are not changed, and a different shape version is not merged', () => {
+  const older = respawnSnap([clock({ gapsMs: [1] })], [], [{ key: 'k', display: 'k', zone: 'z', lastTs: 1, kills: 1, watched: false }])
+  const newer = respawnSnap([clock({ gapsMs: [2] })], [], [{ key: 'k', display: 'k', zone: 'z', lastTs: 2, kills: 1, watched: false }])
+  const before = JSON.stringify([older, newer])
+  mergeRespawn(older, newer)
+  assert.equal(JSON.stringify([older, newer]), before)
+  assert.equal(mergeRespawn({ ...older, v: 3 }, newer), null)
+  assert.equal(mergeRespawn({ v: 4 }, newer), null)
+})
+
 // ── the lookup ──────────────────────────────────────────────────────────────────────────────────
 
 test('lookup: the phase 4 modules have rules', () => {
-  for (const id of ['consider', 'itemTiers', 'classUnlocks', 'turnins']) assert.ok(hasMergeRule(id), id)
+  for (const id of ['consider', 'itemTiers', 'classUnlocks', 'turnins', 'respawn']) assert.ok(hasMergeRule(id), id)
 })

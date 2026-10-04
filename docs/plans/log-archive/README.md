@@ -150,7 +150,8 @@ Update this table in the same commit as the step it records.
 | 3.1 to 3.7 | not started | |
 | 4.1 | done 2026-10-03: consider ring, and one mob's drops seen rebuilt from archived loot | 4f090517 |
 | 4.2 | done 2026-10-03: item tiers | 449b7b12 |
-| 4.3 | done 2026-10-03: class unlocks and raw turn-ins | this commit |
-| 4.4 to 4.9 | not started | |
+| 4.3 | done 2026-10-03: class unlocks and raw turn-ins | e8887e04 |
+| 4.4 | done 2026-10-03: respawn gaps of watched mobs, and the recent-kill candidates | this commit |
+| 4.5 to 4.9 | not started | |
 | 5.1 to 5.5 | not started | |
 | 6.1 to 6.4 | not started | |

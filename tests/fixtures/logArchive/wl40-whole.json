@@ -2501,5 +2501,362 @@
    "name": "Shimmering Ruby Stiletto",
    "tier": 2
   }
+ },
+ "respawn": {
+  "prefs": {
+   "watches": []
+  },
+  "recent": [
+   {
+    "display": "an urd ghoul wizard",
+    "key": "an urd ghoul wizard",
+    "kills": 4,
+    "lastTs": 1785691962000,
+    "watched": false,
+    "zone": "The Ruins of Old Guk"
+   },
+   {
+    "display": "a wan ghoul knight",
+    "key": "a wan ghoul knight",
+    "kills": 35,
+    "lastTs": 1785691951000,
+    "watched": false,
+    "zone": "The Ruins of Old Guk"
+   },
+   {
+    "display": "a vis ghoul knight",
+    "key": "a vis ghoul knight",
+    "kills": 8,
+    "lastTs": 1785691930000,
+    "watched": false,
+    "zone": "The Ruins of Old Guk"
+   },
+   {
+    "display": "a yun ghoul wizard",
+    "key": "a yun ghoul wizard",
+    "kills": 4,
+    "lastTs": 1785691898000,
+    "watched": false,
+    "zone": "The Ruins of Old Guk"
+   },
+   {
+    "display": "a zol ghoul knight",
+    "key": "a zol ghoul knight",
+    "kills": 19,
+    "lastTs": 1785691883000,
+    "watched": false,
+    "zone": "The Ruins of Old Guk"
+   },
+   {
+    "display": "a kor ghoul wizard",
+    "key": "a kor ghoul wizard",
+    "kills": 2,
+    "lastTs": 1785691724000,
+    "watched": false,
+    "zone": "The Ruins of Old Guk"
+   },
+   {
+    "display": "a ghoul executioner",
+    "key": "a ghoul executioner",
+    "kills": 2,
+    "lastTs": 1785691325000,
+    "watched": false,
+    "zone": "The Ruins of Old Guk"
+   },
+   {
+    "display": "a ghoul savant",
+    "key": "a ghoul savant",
+    "kills": 2,
+    "lastTs": 1785691189000,
+    "watched": false,
+    "zone": "The Ruins of Old Guk"
+   },
+   {
+    "display": "a ghoul assassin",
+    "key": "a ghoul assassin",
+    "kills": 1,
+    "lastTs": 1785690050000,
+    "watched": false,
+    "zone": "The Ruins of Old Guk"
+   },
+   {
+    "display": "a ghoul supplier",
+    "key": "a ghoul supplier",
+    "kills": 1,
+    "lastTs": 1785690030000,
+    "watched": false,
+    "zone": "The Ruins of Old Guk"
+   },
+   {
+    "display": "a tal ghoul wizard",
+    "key": "a tal ghoul wizard",
+    "kills": 2,
+    "lastTs": 1785689920000,
+    "watched": false,
+    "zone": "The Ruins of Old Guk"
+   },
+   {
+    "display": "a ghoul ritualist",
+    "key": "a ghoul ritualist",
+    "kills": 1,
+    "lastTs": 1785689905000,
+    "watched": false,
+    "wikiMs": 1680000,
+    "wikiText": "28 min 00 sec",
+    "zone": "The Ruins of Old Guk"
+   },
+   {
+    "display": "a basalt gargoyle",
+    "key": "a basalt gargoyle",
+    "kills": 3,
+    "lastTs": 1785689705000,
+    "watched": false,
+    "zone": "The Ruins of Old Guk"
+   },
+   {
+    "display": "a deadly black widow",
+    "key": "a deadly black widow",
+    "kills": 8,
+    "lastTs": 1785689602000,
+    "watched": false,
+    "zone": "The Ruins of Old Guk"
+   },
+   {
+    "display": "a vampire bat",
+    "key": "a vampire bat",
+    "kills": 5,
+    "lastTs": 1785689552000,
+    "watched": false,
+    "wikiText": "12am",
+    "zone": "The Ruins of Old Guk"
+   },
+   {
+    "display": "a shin ghoul knight",
+    "key": "a shin ghoul knight",
+    "kills": 11,
+    "lastTs": 1785689313000,
+    "watched": false,
+    "zone": "The Ruins of Old Guk"
+   },
+   {
+    "display": "A froglok vis knight",
+    "key": "a froglok vis knight",
+    "kills": 1,
+    "lastTs": 1785689003000,
+    "watched": false,
+    "zone": "The Ruins of Old Guk"
+   },
+   {
+    "display": "A froglok gaz knight",
+    "key": "a froglok gaz knight",
+    "kills": 1,
+    "lastTs": 1785688890000,
+    "watched": false,
+    "zone": "The City of Guk"
+   },
+   {
+    "display": "a Teir`Dal priest",
+    "key": "a teir`dal priest",
+    "kills": 7,
+    "lastTs": 1785688337000,
+    "watched": false,
+    "zone": ""
+   },
+   {
+    "display": "a Teir`Dal shadowknight",
+    "key": "a teir`dal shadowknight",
+    "kills": 43,
+    "lastTs": 1785688328000,
+    "watched": false,
+    "wikiMs": 267000,
+    "wikiText": "4:27",
+    "zone": ""
+   },
+   {
+    "display": "a Teir`Dal ranger",
+    "key": "a teir`dal ranger",
+    "kills": 51,
+    "lastTs": 1785688315000,
+    "watched": false,
+    "wikiMs": 267000,
+    "wikiText": "4:27",
+    "zone": ""
+   },
+   {
+    "display": "a Teir`Dal priestess",
+    "key": "a teir`dal priestess",
+    "kills": 8,
+    "lastTs": 1785688296000,
+    "watched": false,
+    "wikiMs": 267000,
+    "wikiText": "4:27",
+    "zone": ""
+   },
+   {
+    "display": "Korven Nisere",
+    "key": "korven nisere",
+    "kills": 6,
+    "lastTs": 1785688281000,
+    "watched": false,
+    "wikiMs": 270000,
+    "wikiText": "4:30",
+    "zone": ""
+   },
+   {
+    "display": "Baron Telyx V`Zher",
+    "key": "baron telyx v`zher",
+    "kills": 7,
+    "lastTs": 1785688208000,
+    "watched": false,
+    "wikiMs": 267000,
+    "wikiText": "4:27",
+    "zone": ""
+   },
+   {
+    "display": "Soldier of V`Zher",
+    "key": "soldier of v`zher",
+    "kills": 7,
+    "lastTs": 1785688193000,
+    "watched": false,
+    "wikiMs": 330000,
+    "wikiText": "5:30",
+    "zone": ""
+   },
+   {
+    "display": "a Teir`Dal rogue",
+    "key": "a teir`dal rogue",
+    "kills": 42,
+    "lastTs": 1785688178000,
+    "watched": false,
+    "wikiMs": 267000,
+    "wikiText": "4:27",
+    "zone": ""
+   },
+   {
+    "display": "Knight V`Tal",
+    "key": "knight v`tal",
+    "kills": 7,
+    "lastTs": 1785688118000,
+    "watched": false,
+    "wikiMs": 267000,
+    "wikiText": "4:27",
+    "zone": ""
+   },
+   {
+    "display": "a shadowknight",
+    "key": "a shadowknight",
+    "kills": 7,
+    "lastTs": 1785688108000,
+    "watched": false,
+    "zone": ""
+   },
+   {
+    "display": "a shadowknight pet",
+    "key": "a shadowknight pet",
+    "kills": 2,
+    "lastTs": 1785688099000,
+    "watched": false,
+    "zone": ""
+   },
+   {
+    "display": "Kahaptra Z`Taj",
+    "key": "kahaptra z`taj",
+    "kills": 7,
+    "lastTs": 1785687736000,
+    "watched": false,
+    "wikiMs": 267000,
+    "wikiText": "4:27",
+    "zone": ""
+   },
+   {
+    "display": "Gynok Moltor",
+    "key": "gynok moltor",
+    "kills": 4,
+    "lastTs": 1785686943000,
+    "watched": false,
+    "wikiMs": 960000,
+    "wikiText": "16.0 min (PH)",
+    "zone": ""
+   },
+   {
+    "display": "a ghoul",
+    "key": "a ghoul",
+    "kills": 6,
+    "lastTs": 1785685680000,
+    "watched": false,
+    "zone": ""
+   },
+   {
+    "display": "Footman of V`Zher",
+    "key": "footman of v`zher",
+    "kills": 1,
+    "lastTs": 1785685678000,
+    "watched": false,
+    "wikiMs": 267000,
+    "wikiText": "4:27",
+    "zone": ""
+   },
+   {
+    "display": "a hardened skeleton",
+    "key": "a hardened skeleton",
+    "kills": 1,
+    "lastTs": 1785685672000,
+    "watched": false,
+    "zone": ""
+   },
+   {
+    "display": "ice boned skeleton",
+    "key": "ice boned skeleton",
+    "kills": 6,
+    "lastTs": 1785685655000,
+    "watched": false,
+    "zone": ""
+   },
+   {
+    "display": "an elf skeleton",
+    "key": "an elf skeleton",
+    "kills": 1,
+    "lastTs": 1785685613000,
+    "watched": false,
+    "wikiMs": 400000,
+    "wikiText": "6m40s",
+    "zone": ""
+   },
+   {
+    "display": "a necro acolyte",
+    "key": "a necro acolyte",
+    "kills": 1,
+    "lastTs": 1785685579000,
+    "watched": false,
+    "zone": ""
+   },
+   {
+    "display": "a scorched zombie",
+    "key": "a scorched zombie",
+    "kills": 1,
+    "lastTs": 1785685533000,
+    "watched": false,
+    "zone": ""
+   },
+   {
+    "display": "a necro theurgist",
+    "key": "a necro theurgist",
+    "kills": 2,
+    "lastTs": 1785685531000,
+    "watched": false,
+    "zone": ""
+   },
+   {
+    "display": "a greater dread bone",
+    "key": "a greater dread bone",
+    "kills": 2,
+    "lastTs": 1785684496000,
+    "watched": false,
+    "zone": ""
+   }
+  ],
+  "rows": [],
+  "v": 4,
+  "zone": "The Ruins of Old Guk"
  }
 }
