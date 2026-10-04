@@ -21,14 +21,16 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { CONSIDER_CAP, mergeConsider } from '../src/shared/logArchive/mergeConsider'
+import { mergeItemTiers } from '../src/shared/logArchive/mergeItemTiers'
 import { dropsFromLoot, mergeDropsSeen, withArchivedDrops } from '../src/shared/logArchive/mergeDropsSeen'
 import { hasMergeRule, mergeModule } from '../src/shared/logArchive/mergeRules'
 import { MobLootIndex } from '../src/main/mobLookupParse'
-import type { ConsiderRow, ConsiderSnap, LootSnap, MobSeenDrop } from '../src/shared/types'
+import type { ConsiderRow, ConsiderSnap, ItemTierRow, ItemTiersSnap, LootSnap, MobSeenDrop } from '../src/shared/types'
 
 interface Recorded {
   loot: LootSnap
   consider?: ConsiderSnap
+  itemTiers: ItemTiersSnap
 }
 
 const fixture = (name: string): Recorded =>
@@ -174,8 +176,49 @@ test('drops seen: nothing archived for the mob returns the served box as the sam
   })
 })
 
+// ── 4.2 item tiers ──────────────────────────────────────────────────────────────────────────────
+
+for (const [name, set] of [['wl40', WL], ['la2', LA]] as const) {
+  test(`split log (${name}): item tiers of A merged with B equal the item tiers of the whole log`, () => {
+    assert.deepEqual(mergeModule('itemTiers', [set.a.itemTiers], set.b.itemTiers).state, set.whole.itemTiers)
+  })
+}
+
+test('split log: an item is upgraded in both halves of both fixtures, and la2 names a lower tier last', () => {
+  for (const set of [WL, LA]) {
+    assert.ok(Object.keys(set.a.itemTiers).some((k) => Object.prototype.hasOwnProperty.call(set.b.itemTiers, k)))
+  }
+  const fists = LA.whole.itemTiers['whitened treant fists']
+  assert.ok(fists.tier !== undefined && fists.lastTier !== undefined && fists.lastTier < fists.tier)
+})
+
+const tierRow = (over: Partial<ItemTierRow>): ItemTierRow => ({ key: 'k', name: 'K', merges: 1, firstAt: 1, lastAt: 1, ...over })
+
+test('item tiers: the higher tier wins, the newer last tier stands, merges add, first and last instants span both', () => {
+  const m = mergeItemTiers({ k: tierRow({ tier: 4, lastTier: 4, merges: 3, firstAt: 1, lastAt: 5 }) }, { k: tierRow({ name: 'k', tier: 2, lastTier: 2, firstAt: 9, lastAt: 12 }) })
+  assert.deepEqual(m, { k: { key: 'k', name: 'k', tier: 4, lastTier: 2, merges: 4, firstAt: 1, lastAt: 12 } })
+})
+
+test("item tiers: a side that named no tier keeps the other side's, and absent stays absent", () => {
+  const m = mergeItemTiers({ k: tierRow({ tier: 3, lastTier: 3 }) }, { k: tierRow({ firstAt: 7, lastAt: 7 }) })
+  assert.equal(m?.k.tier, 3)
+  assert.equal(m?.k.lastTier, 3)
+  const none = mergeItemTiers({ k: tierRow({}) }, { k: tierRow({ lastAt: 4 }) })
+  assert.ok(none && !('tier' in none.k) && !('lastTier' in none.k))
+})
+
+test('item tiers: inputs are not changed, and a bad shape is not merged', () => {
+  const older = { k: tierRow({ tier: 1 }) }
+  const newer = { k: tierRow({ tier: 2 }) }
+  const before = JSON.stringify([older, newer])
+  mergeItemTiers(older, newer)
+  assert.equal(JSON.stringify([older, newer]), before)
+  assert.equal(mergeItemTiers([], {}), null)
+  assert.equal(mergeItemTiers({ k: { key: 'k' } }, {}), null)
+})
+
 // ── the lookup ──────────────────────────────────────────────────────────────────────────────────
 
 test('lookup: the phase 4 modules have rules', () => {
-  assert.ok(hasMergeRule('consider'))
+  assert.ok(hasMergeRule('consider') && hasMergeRule('itemTiers'))
 })

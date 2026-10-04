@@ -1146,5 +1146,16 @@
     "ts": 1785686246000
    }
   ]
+ },
+ "itemTiers": {
+  "golem metal wand": {
+   "firstAt": 1785683865000,
+   "key": "golem metal wand",
+   "lastAt": 1785686202000,
+   "lastTier": 3,
+   "merges": 5,
+   "name": "Golem Metal Wand",
+   "tier": 3
+  }
  }
 }

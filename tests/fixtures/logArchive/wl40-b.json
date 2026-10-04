@@ -1544,5 +1544,34 @@
     "ts": 1785692006000
    }
   ]
+ },
+ "itemTiers": {
+  "golem metal wand": {
+   "firstAt": 1785687736000,
+   "key": "golem metal wand",
+   "lastAt": 1785687736000,
+   "lastTier": 3,
+   "merges": 1,
+   "name": "Golem Metal Wand",
+   "tier": 3
+  },
+  "guise of the deceiver": {
+   "firstAt": 1785690055000,
+   "key": "guise of the deceiver",
+   "lastAt": 1785690055000,
+   "lastTier": 1,
+   "merges": 1,
+   "name": "Guise of the Deceiver",
+   "tier": 1
+  },
+  "shimmering ruby stiletto": {
+   "firstAt": 1785687204000,
+   "key": "shimmering ruby stiletto",
+   "lastAt": 1785687204000,
+   "lastTier": 2,
+   "merges": 1,
+   "name": "Shimmering Ruby Stiletto",
+   "tier": 2
+  }
  }
 }
