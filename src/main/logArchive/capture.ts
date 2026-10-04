@@ -7,9 +7,14 @@
 // the game never changes because it only appends.
 //
 // REFUSES, WITH THE REASON, when the switch is off, no character is attached, or the engine is not
-// live on this log. Fight summaries are not captured yet: what to keep of a fight is ruling 0.4.
+// live on this log.
+//
+// FIGHTS (step 4.7, ruling 0.4): every fight's summary is taken inside the same before/after pair
+// as the modules, so it describes the same bytes. The breakdown is not kept; the archive holds it.
+// An engine that cannot give the list leaves the segment without `fights`, as before step 4.7.
 
 import { CAPTURED_MODULES } from '../../shared/logArchive/modules'
+import type { SegmentSummary } from '../../shared/combat'
 import { SEGMENT_VERSION, type Segment, type SegmentLog, type SegmentModule } from '../../shared/logArchive/segment'
 
 export interface EngineHealth {
@@ -24,6 +29,8 @@ export interface CaptureDeps {
   health: () => Promise<EngineHealth>
   /** One module's served snapshot, or null when the engine has no such module. */
   snapshot: (module: string) => Promise<SegmentModule | null>
+  /** Every fight's summary, uncapped (`capturedFights`), or null when the engine has none to give. */
+  fights: () => Promise<SegmentSummary[] | null>
   readPrefix: (path: string, bytes: number) => Promise<SegmentLog>
   producedBy: () => { app: string; engine: string }
 }
@@ -69,6 +76,7 @@ export async function captureSegment(deps: CaptureDeps): Promise<CaptureResult> 
     const problem = healthProblem(before, a.logPath)
     if (problem !== null) return { ok: false, reason: problem }
     const modules = await snapshotAll(deps)
+    const fights = await deps.fights()
     const after = await deps.health()
     if (after.mark?.offset !== before.mark?.offset || after.events !== before.events) continue
     const offset = before.mark?.offset ?? 0
@@ -83,7 +91,8 @@ export async function captureSegment(deps: CaptureDeps): Promise<CaptureResult> 
         log,
         producedBy: deps.producedBy(),
         archivePath: null,
-        modules
+        modules,
+        ...(fights === null ? {} : { fights })
       }
     }
   }

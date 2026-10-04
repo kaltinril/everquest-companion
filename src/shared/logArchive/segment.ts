@@ -9,9 +9,14 @@
 // A FILE THAT DOES NOT PARSE IS SKIPPED AND REPORTED, never repaired in place. A newer version is
 // skipped the same way: an older build must not guess at a shape it has not seen.
 //
-// ZERO-IMPORT: the main-side store and the node tests both read it.
+// ZERO-IMPORT: the main-side store and the node tests both read it. (The one import is a type and
+// is erased.)
 
-/** Bump when a field changes meaning. A segment from a newer version is skipped, not guessed at. */
+import type { SegmentSummary } from '../combat'
+
+/** Bump when a field changes meaning. A segment from a newer version is skipped, not guessed at.
+ *  `fights` (step 4.7) did not bump it: the field is optional and adds nothing to what the others
+ *  mean, so a segment written before it reads as one with no fights kept. */
 export const SEGMENT_VERSION = 1
 
 /** How many bytes of a log's head identify it: enough to differ between any two real logs. */
@@ -64,6 +69,9 @@ export interface Segment {
   gapLines?: number
   /** Every module the engine published, keyed by module id. */
   modules: Record<string, SegmentModule>
+  /** Every fight's summary (ruling 0.4: summaries only; the breakdown stays in the archive).
+   *  Absent on a segment captured before step 4.7, or when the engine had no fight list to give. */
+  fights?: SegmentSummary[]
 }
 
 export type ParsedSegment = { ok: true; segment: Segment } | { ok: false; reason: string }
@@ -99,6 +107,13 @@ function modulesProblem(modules: unknown): string | null {
   return null
 }
 
+function fightsProblem(fights: unknown): string | null {
+  if (fights === undefined) return null
+  if (!Array.isArray(fights)) return 'fights is not a list'
+  const bad = fights.some((f) => !isObject(f) || typeof f.id !== 'string' || typeof f.name !== 'string' || typeof f.startTs !== 'number')
+  return bad ? 'a fight summary is malformed' : null
+}
+
 function versionProblem(v: unknown): string | null {
   if (typeof v !== 'number') return 'no version'
   if (v > SEGMENT_VERSION) return `version ${v} is newer than this build reads`
@@ -115,7 +130,12 @@ function segmentProblem(raw: unknown): string | null {
   if (!STATES.includes(raw.state as SegmentState)) return 'unknown state'
   if (raw.archivePath !== null && typeof raw.archivePath !== 'string') return 'bad archive path'
   if (!isObject(raw.producedBy)) return 'no producer'
-  return logProblem(raw.log) ?? modulesProblem(raw.modules)
+  return contentProblem(raw)
+}
+
+/** The log identity, the modules and the fights: what a segment holds rather than names. */
+function contentProblem(raw: Record<string, unknown>): string | null {
+  return logProblem(raw.log) ?? modulesProblem(raw.modules) ?? fightsProblem(raw.fights)
 }
 
 /** Read a segment from parsed JSON. Never throws. */

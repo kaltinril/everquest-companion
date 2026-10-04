@@ -94,6 +94,21 @@ Until a module's step lands, that module shows what the live log holds, as it do
 - **Depends on**: ruling 0.4.
 - **Touches**: `src/main/dataServer/serveShim.ts` (a few lines), one merge file.
 - **After this step**: the fight picker lists fights from archived logs.
+- **As built** (2026-10-04): capture now also asks `combat.snapshot` for every fight (a page size
+  no log reaches) inside the same before/after pair as the modules, and stores the summaries as the
+  segment's optional `fights` field. The open fight is kept as finished; the whole-zone row is not
+  a fight and is left out. `SEGMENT_VERSION` stays 1: a segment written before this step reads as
+  one with no fights kept. The read path (`mergeFights.ts`, `history.ts archivedFights`) renames
+  each archived fight `arch:<segment>:<id>`, because the engine counts `e<n>` from the start of
+  each log and every log has an `e1`. Archived fights follow the live ones, newest first, before
+  the whole-zone row, and only fill the page the live log leaves under `maxSegments`, so "Load
+  more fights" pages into the archives and a poll stays small. Two changes the plan did not name:
+  the archived rows are added only for a caller that asks (`SnapshotOpts.archived`, app-side and
+  never sent to the engine), which is the Combat tab, so the overlays keep the live log's fights
+  and cannot open an archived one to an empty meter; and an archived selection resolves to
+  `selected: null` with the summary in `archivedSelected`, rather than to the engine's default
+  fight, which is what the engine does with an id it does not know. The picker's pinned head row
+  is the live log's current or last fight only, never an archived one.
 
 ### 4.8 Fight search
 
@@ -102,6 +117,18 @@ Until a module's step lands, that module shows what the live log holds, as it do
 - **Note**: the matching rule lives in the engine. This step writes it a second time, so the
   test pins both to the same fixture and fails if they drift.
 - **After this step**: searching finds archived fights.
+- **As built** (2026-10-04): `shared/logArchive/searchFights.ts` restates the parts of
+  `engine/crates/engined/src/search.rs` that sit around the scorer: the haystack (name, plus the
+  zone when it has one), the order (score, then newer first, then id), the empty-query answer and
+  the default limit of 50. The scorer itself is `shared/fuzzy.ts`, which `search.rs` already
+  mirrors. The engine's top hits and the archive's top hits are joined, ranked once and cut to the
+  limit, which is exactly the top of the union; the corpus count adds the archived fights. No
+  engine file changed. `tests/logArchiveFightSearch.test.mts` reads `search.rs`'s own test
+  fixtures and stated answers out of the Rust source (nine today, with a floor so a parser that
+  reads fewer fails) and runs each through the TypeScript copy, and compares the score constants,
+  the typo floor, the edit-budget bands and `DEFAULT_FIGHT_HITS` in `ops.rs`. `cargo test` holds
+  the Rust side to the same fixtures, so a change on either side that the other does not share
+  fails one of the two.
 
 ### 4.9 Opening an archived fight
 
@@ -110,6 +137,14 @@ Until a module's step lands, that module shows what the live log holds, as it do
 - **Touches**: the combat drill-down in the renderer.
 - **After this step**: no dead end when a player clicks an archived fight.
 - **Should follow**: step 4.7. Without it there is nothing to open.
+- **As built** (2026-10-04): the meter body shows `ArchivedFightPane.tsx` for an archived
+  selection: the fight's name, zone, start, rate, total and length, and the line "This fight is
+  from an archived log, so only its summary is kept here. The full breakdown is in the archive
+  <file name>." The summary comes from the snapshot's `archivedSelected` (step 4.7), so a fight
+  picked from a search far outside the listed page opens the same way. Archived rows in the
+  picker, its closed trigger and search results say "archived" before their timing. The timeline
+  view is not offered for such a fight, as for any fight without an event ring. Rebuilding the
+  breakdown from the archive on demand (the idea recorded under ruling 0.4) is not built.
 
 ## When this phase is done
 
