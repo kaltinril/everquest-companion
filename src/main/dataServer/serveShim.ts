@@ -57,6 +57,8 @@ import { engineLogMtimeMs, engineRequest, engineServeReadiness } from './engineC
 import { createReadShim, type ReadShim } from './readShim'
 import { liveHistory } from '../logArchive/liveHistory'
 import { withArchivedDrops } from '../../shared/logArchive/mergeDropsSeen'
+import { engineSideOpts, withArchivedFights } from '../../shared/logArchive/mergeFights'
+import { withArchivedHits } from '../../shared/logArchive/searchFights'
 import { resolveMobIdentity } from '../mobAliases'
 import type { CombatSnapshot, FightSearchResult, SnapshotOpts } from '../../shared/combat'
 import type { MobLevelFact } from '../resist/world'
@@ -177,7 +179,10 @@ export const OPTS_ARE_STATED: Record<keyof SnapshotOpts, true> = {
   selectedId: true,
   showUnparsed: true,
   maxSegments: true,
-  timeline: true
+  timeline: true,
+  // APP-SIDE ON PURPOSE: archived fights are this process's to add (`serveCombatSnapshot`), and the
+  // engine has never seen them.
+  archived: true
 }
 
 // ── the three channels ─────────────────────────────────────────────────────────────────────────
@@ -254,29 +259,49 @@ function projectModule(moduleId: string, r: ModuleSnapshotResult): ModuleSnap | 
  * draws its loading/unavailable state rather than being handed invented emptiness. The REASON is
  * still counted and narrated by `readShim.ts`, so the silence is legible in the dev log.
  */
-export function serveModuleSnapshot(moduleId: string): Promise<ModuleSnap | null> {
+export async function serveModuleSnapshot(moduleId: string): Promise<ModuleSnap | null> {
+  // Asked first, so the history merge inside the projection already knows the live log's first
+  // zone line (docs/plans/log-archive, step 3.8). Only with history shown, and only until it is known.
+  if (liveHistory.wantsLiveZone(moduleId)) liveHistory.noteLiveProgression(await serveLiveState('progression'))
   return readShim().serve('module.snapshot', { module: moduleId }, (r) =>
     projectModule(moduleId, r)
   , () => null)
 }
 
-/** `combat:snapshot`, served — see the header for the clock test and for the cast. */
+/** One module's live state as the engine served it, no history merged; null when unserved. */
+function serveLiveState(moduleId: string): Promise<unknown> {
+  return readShim().serve<'module.snapshot', unknown>('module.snapshot', { module: moduleId }, (r) =>
+    r.module === moduleId ? r.state : null
+  , () => null)
+}
+
+/**
+ * `combat:snapshot`, served — see the header for the clock test and for the cast.
+ *
+ * ARCHIVED HISTORY (docs/plans/log-archive, step 4.7): for a caller that asks (`opts.archived`),
+ * fights from eligible archived logs follow the live ones. The same object back unless Keep log
+ * history is on and an eligible segment kept fights.
+ */
 export function serveCombatSnapshot(
   opts: SnapshotOpts,
   own: () => CombatSnapshot
 ): Promise<CombatSnapshot> {
   return readShim().serve(
     'combat.snapshot',
-    { opts: engineOpts(opts) },
+    { opts: engineOpts(engineSideOpts(opts)) },
     (r) =>
       Math.abs(r.now - Date.now()) > NOW_SKEW_MS ? null : (r.snapshot as unknown as CombatSnapshot),
     own
-  )
+  ).then((snap) => (opts.archived === true ? withArchivedFights(snap, liveHistory.archivedFights(), opts) : snap))
 }
 
 /** `combat:searchFights`, served. The clamp stays in `world.ts`: the schema mirrors this app's own
  *  clamping rule, so sending a pre-clamped number means both worlds search the same corpus slice
- *  rather than each applying its own bound to a different input. */
+ *  rather than each applying its own bound to a different input.
+ *
+ *  ARCHIVED HISTORY (docs/plans/log-archive, step 4.8): archived fights are ranked app-side by the
+ *  same rule (`shared/logArchive/searchFights.ts`) and joined under the same limit. The same object
+ *  back unless Keep log history is on and an eligible segment kept fights. */
 export function serveSearchFights(
   text: string,
   limit: number | undefined,
@@ -287,7 +312,7 @@ export function serveSearchFights(
     limit === undefined ? { query: text } : { query: text, limit },
     (r) => ({ hits: r.hits, corpus: r.corpus }) as unknown as FightSearchResult,
     own
-  )
+  ).then((found) => withArchivedHits(found, liveHistory.archivedFights(), text, limit))
 }
 
 // ── the fourth channel: how old is this creature (JOS-497 item 1) ──────────────────────────────

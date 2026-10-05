@@ -158,8 +158,41 @@ Result (2026-10-03, automated by `tests/e2e/log-archive-trial.mts` on a copy of 
   made before the fresh log's first zone line is counted but filed under "unknown zone" (tier
   key -2) instead of the zone the player was in, and the respawn card's zone is blank until the
   next zone line. A boss killed in an instance in that window would not credit its tier rung
-  until the player zones. Carrying the archive's last zone over to those kills is possible
-  app-side (step 4.5 already does it for the leveling series) and is not built.
+  until the player zones. **Built 2026-10-04 as step 3.8**, below.
+
+### 3.8 The zone across the cut
+
+- **Does**: files what a fresh log records before its first zone line in the zone the archive
+  ended in, as reading the two as one log would. App-side only; no engine file changes.
+- **Kills** (`shared/logArchive/carryZone.ts`, applied by `main/logArchive/history.ts`): a
+  `-2` run moves only when its last kill is before the stretch's first zone line, read from that
+  stretch's `progression` zone column (or the stretch has none yet). `-2` also means an instance
+  whose difficulty the app does not decode, after a zone line; a run that straddles the line mixes
+  the two causes and cannot be split, so it stays. The tier is not decoded again from the zone's
+  name, because the kills fold also remembers instance notices that no snapshot publishes: it is
+  read off the archive's own kills, as the one key every run carries whose last kill came at or
+  after the archive's last zone line. When no kill says, or two disagree, nothing moves. Every cut
+  is handled, oldest first, so an archive that began as a fresh log takes the zone of the one
+  before it. As in step 4.5, only a progression that dropped nothing can place its first zone line.
+- **The live log's first zone line** comes from the live `progression` snapshot, which
+  `serveModuleSnapshot` asks for before a kills read, only while history is shown and only until
+  the line is known (it cannot move afterwards).
+- **Respawn** (`mergeRespawn.ts`): the fold files a death before its first zone line under zone
+  `''`, and nothing else is ever filed there. Those rows and candidates join the archive's zone,
+  merging with one the live side already holds for it, and a blank live header shows the archive's
+  zone.
+- **Found on the way**: `mergeModule` started its fold from the first archive joined with an empty
+  template, so the respawn rule read an empty watch list and dropped every archived clock, and
+  progression added the live side's `dropped` twice. The first archive now starts the fold as
+  itself (6f1a7910).
+- **What it still cannot do**: a boss killed before the first zone line in a zone whose archive
+  holds no kill after its last zone line stays under "unknown zone" until a later kill there; the
+  engine's own memory of an instance notice is not carried, so a bare zone name never becomes d0
+  without that kill evidence.
+- **Tests**: `tests/logArchiveCarryZone.test.mts`, with the la2 fixtures' `kills` and `respawn`
+  recorded for this step: the merged split log equals the whole log for both modules. A read-path
+  test in `tests/logArchive.test.mts` covers when the live progression is asked for.
+- **Undo**: revert the commit.
 
 ## As built (2026-10-03)
 

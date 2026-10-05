@@ -11,7 +11,7 @@
 
 import { addTierRun, killTotals, type KillInfo, type KillMap, type KillsSnap } from '../kills'
 
-function isKillsSnap(x: unknown): x is KillsSnap {
+export function isKillsSnap(x: unknown): x is KillsSnap {
   if (x === null || typeof x !== 'object') return false
   const s = x as { v?: unknown; mobs?: unknown }
   return typeof s.v === 'number' && s.mobs !== null && typeof s.mobs === 'object'

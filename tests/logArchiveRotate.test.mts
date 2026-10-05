@@ -52,6 +52,7 @@ function captureDeps(logPath: string, over: Partial<CaptureDeps> = {}): CaptureD
     attached: () => ({ character: 'primitive_freeport', logPath }),
     health: async () => ({ status: 'live', mark: { log: logPath, offset: size() }, events: 4 }),
     snapshot: async (m) => (m === 'loot' ? { seq: 4, state: [{ ts: 1, item: 'Rusty Dagger' }] } : m === 'nope' ? null : { seq: 1, state: {} }),
+    fights: async () => [],
     readPrefix: readLogPrefix,
     producedBy: () => ({ app: '1.0.0', engine: '1.0.0' }),
     ...over

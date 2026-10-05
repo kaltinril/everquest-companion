@@ -45,7 +45,7 @@ const GROUPS: readonly Group[] = [
 
 type Columns = Record<Column, (number | string)[]>
 
-function isProgressionSnap(x: unknown): x is ProgressionSnap {
+export function isProgressionSnap(x: unknown): x is ProgressionSnap {
   if (x === null || typeof x !== 'object') return false
   const s = x as Record<string, unknown>
   if (!Array.isArray(s.recentKills)) return false

@@ -17,10 +17,21 @@
 //
 // `archived` hands out the eligible archived states of one module, unmerged, for a read that is not
 // a module snapshot (one mob's drops, step 4.1). The same switch and the same eligibility apply.
+//
+// KILLS ALSO NEED THE LIVE LOG'S FIRST ZONE LINE (step 3.8, `carryZone.ts`), which only the live
+// `progression` states. The caller asks `wantsLiveZone` and hands that snapshot to
+// `noteLiveProgression` before the kills merge. Once the line is known it is kept for the context:
+// it cannot move, so the snapshot is not asked for again.
+//
+// `archivedFights` is the same for the fight summaries a segment keeps beside its modules (step
+// 4.7), already re-named and sorted, and built once per context: the picker polls it.
 
 import { createHash } from 'node:crypto'
 import { closeSync, openSync, readSync } from 'node:fs'
 import { eligibleSegments, type Held } from '../../shared/logArchive/eligible'
+import { carryZoneIntoKills, firstZoneLine } from '../../shared/logArchive/carryZone'
+import type { SegmentSummary } from '../../shared/combat'
+import { archivedFightRows } from '../../shared/logArchive/mergeFights'
 import { hasMergeRule, mergeModule } from '../../shared/logArchive/mergeRules'
 import { HEAD_BYTES, logStampKey, type Segment } from '../../shared/logArchive/segment'
 import { listSegments, type SkippedFile } from './segmentStore'
@@ -42,6 +53,10 @@ interface Context {
   shown: Segment[]
   held: Held[]
   skipped: SkippedFile[]
+  /** The live log's first zone line: `firstZoneLine` of the last live progression noted. */
+  firstZone?: number | null
+  /** `archivedFights`, built on first ask. */
+  fights?: SegmentSummary[]
 }
 
 export interface HistoryStatus {
@@ -66,6 +81,11 @@ export interface HistoryMerge {
   mergeHistory: (moduleId: string, seq: number, state: unknown) => unknown
   /** The eligible archived states of `moduleId`, oldest first; empty with the switch off. */
   archived: (moduleId: string) => unknown[]
+  /** True when a merge of `moduleId` would read the live progression and has not got its answer. */
+  wantsLiveZone: (moduleId: string) => boolean
+  noteLiveProgression: (state: unknown) => void
+  /** Every eligible segment's fight summaries, newest first; empty with the switch off. */
+  archivedFights: () => SegmentSummary[]
   status: () => HistoryStatus | null
   noteSealedThisAttach: (id: string) => void
   forgetHistoryContext: () => void
@@ -120,13 +140,47 @@ export function createHistoryMerge(deps: HistoryDeps): HistoryMerge {
     return c === null ? [] : statesOf(c, moduleId)
   }
 
-  function mergeHistory(moduleId: string, seq: number, state: unknown): unknown {
-    if (!hasMergeRule(moduleId) || !deps.on()) return state
+  function archivedFights(): SegmentSummary[] {
+    if (!deps.on()) return []
     const c = context()
-    if (c === null || c.shown.length === 0) return state
+    if (c === null) return []
+    c.fights ??= archivedFightRows(c.shown)
+    return c.fights
+  }
+
+  function shownContext(): Context | null {
+    if (!deps.on()) return null
+    const c = context()
+    return c === null || c.shown.length === 0 ? null : c
+  }
+
+  function wantsLiveZone(moduleId: string): boolean {
+    return moduleId === 'kills' && typeof shownContext()?.firstZone !== 'number'
+  }
+
+  function noteLiveProgression(state: unknown): void {
+    const c = shownContext()
+    if (c === null) return
+    const first = firstZoneLine(state)
+    if (first === c.firstZone) return
+    c.firstZone = first
+    cache.delete('kills')
+  }
+
+  function mergeKills(c: Context, state: unknown): unknown {
+    const stateOf = (s: Segment, id: string): unknown => (Object.hasOwn(s.modules, id) ? s.modules[id].state : undefined)
+    const stretches = c.shown.map((s) => ({ kills: stateOf(s, 'kills'), progression: stateOf(s, 'progression') }))
+    const carried = carryZoneIntoKills(stretches, { kills: state, firstZone: c.firstZone })
+    return mergeModule('kills', carried.archived.filter((k) => k !== undefined), carried.live).state
+  }
+
+  function mergeHistory(moduleId: string, seq: number, state: unknown): unknown {
+    if (!hasMergeRule(moduleId)) return state
+    const c = shownContext()
+    if (c === null) return state
     const hit = cache.get(moduleId)
     if (hit?.seq === seq) return hit.state
-    const merged = mergeModule(moduleId, statesOf(c, moduleId), state).state
+    const merged = moduleId === 'kills' ? mergeKills(c, state) : mergeModule(moduleId, statesOf(c, moduleId), state).state
     cache.set(moduleId, { seq, state: merged })
     return merged
   }
@@ -134,6 +188,9 @@ export function createHistoryMerge(deps: HistoryDeps): HistoryMerge {
   return {
     mergeHistory,
     archived,
+    wantsLiveZone,
+    noteLiveProgression,
+    archivedFights,
     status: () => (ctx === null ? null : { shown: ctx.shown.map((s) => s.id), held: ctx.held, skipped: ctx.skipped }),
     noteSealedThisAttach: (id) => {
       sealedThisAttach.add(id)

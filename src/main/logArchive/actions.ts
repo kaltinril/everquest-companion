@@ -1,4 +1,4 @@
-// main/logArchive/actions.ts — WHAT THE LOG ARCHIVE CARD CAN ASK FOR (steps 2.1 to 2.5, 3.2, 3.5, 3.6).
+// main/logArchive/actions.ts — WHAT THE LOG ARCHIVE CARD CAN ASK FOR (steps 2.1 to 2.5, 3.2, 3.5, 3.6, 5.5).
 //
 // Every action checks the switch first and refuses while it is off; nothing here runs unless the
 // player clicked for it. One action at a time. Each returns the outcome in plain words and the
@@ -15,15 +15,23 @@ import { getActiveCharacter } from '../session'
 import { getLogArchivePrefs, logArchiveOn, setLogArchivePrefs } from '../storeLogArchive'
 import { HELD_TEXT, type DumpAdvice, type LogArchiveReply, type LogArchiveStatus, type SegmentRow } from '../../shared/logArchive/panel'
 import { driveOf, rotateBlockers } from '../../shared/logArchive/preflight'
+import { capturedFights } from '../../shared/logArchive/mergeFights'
 import type { Segment } from '../../shared/logArchive/segment'
 import { archiveName, backupLog, sweepTemp } from './backup'
 import { captureSegment, type CaptureDeps } from './capture'
+import { archiveBuckets, placeArchivedBuckets } from './engineBuckets'
 import { liveHistory, logArchiveDir } from './liveHistory'
 import { readLogPrefix } from './logPrefix'
+import { refoldWithApp } from './refoldActions'
+import { refreshSegment, sweepRefreshLeftovers } from './refresh'
 import { readJournal, recoverRotation, restoreLog, rotateLog, type RotateDeps } from './rotate'
 import { listSegments, writeSegment } from './segmentStore'
 
 let busy: string | null = null
+
+/** A page size no log reaches, so the capture asks for every fight (step 4.7). The engine keeps
+ *  every finalized fight's summary; 6,299 fights measured at 1.6 MB (ruling 0.4). */
+const ALL_FIGHTS = 1_000_000
 
 function attached(): { character: string; logPath: string } | null {
   const c = getActiveCharacter()
@@ -38,6 +46,14 @@ const captureDeps: CaptureDeps = {
     try {
       const r = await engineRequest('module.snapshot', { module })
       return r.module === module ? { seq: r.seq, state: r.state } : null
+    } catch {
+      return null
+    }
+  },
+  fights: async () => {
+    try {
+      const r = await engineRequest('combat.snapshot', { opts: { maxSegments: ALL_FIGHTS } })
+      return capturedFights((r.snapshot as { segments?: unknown }).segments)
     } catch {
       return null
     }
@@ -212,10 +228,15 @@ export function rotateNow(): Promise<LogArchiveReply> {
     if (blockers.length > 0) return reply(false, blockers.join(' '))
     const a = attached()
     if (a === null) return reply(false, 'No character log is attached.')
+    // Step 5.2: resist and message history is read between the capture and the move (engineBuckets.ts).
+    const buckets = archiveBuckets(app.getPath('userData'), a.character)
+    await buckets.settle()
     const cap = await captureSegment(captureDeps)
     if (!cap.ok) return reply(false, `Not archived: ${cap.reason}. Nothing has changed.`)
     const dir = logArchiveDir()
+    buckets.take()
     const r = await rotateLog(a.logPath, dir, cap.segment, rotateDeps)
+    buckets.keep(dir, cap.segment.id, r.ok || r.logTouched)
     if (!r.ok) return reply(false, r.logTouched ? `Interrupted: ${r.reason}` : `Not archived: ${r.reason}`)
     liveHistory.noteSealedThisAttach(r.segment.id)
     const gap = r.segment.gapLines ?? 0
@@ -246,14 +267,37 @@ export function restoreNow(id: string): Promise<LogArchiveReply> {
   })
 }
 
-/** Step 3.4, at launch before the engine attaches. Never throws. */
+/** Step 5.5: refold an older segment's archive with this build and swap the new totals in. */
+export function refreshHistory(id: string): Promise<LogArchiveReply> {
+  return exclusive('refreshing a history', async () => {
+    const r = await refreshSegment(logArchiveDir(), id, {
+      refold: (s) => refoldWithApp(s, true),
+      producedBy: captureDeps.producedBy
+    })
+    if (!r.ok) return reply(false, `Not refreshed: ${r.reason}.`)
+    liveHistory.forgetHistoryContext()
+    const what = r.changed.length === 0 ? 'Nothing in it changed.' : `Updated: ${r.changed.join(', ')}.`
+    return reply(true, `Refreshed with this version. ${what}`)
+  })
+}
+
+/** Steps 3.4 and 5.2, at launch before the engine attaches. Never throws. */
 export async function recoverLogArchiveAtLaunch(note: (line: string) => void): Promise<void> {
   try {
     const dir = logArchiveDir()
     if (!existsSync(dir)) return
     sweepTemp(dir)
+    sweepRefreshLeftovers(dir)
     const done = await recoverRotation(dir, rotateDeps)
     if (done !== null) note(`log archive: ${done}`)
+    // Step 5.2, after any interrupted archive is sealed and before the engine is told where its files are.
+    placeArchivedBuckets({
+      on: logArchiveOn,
+      userData: app.getPath('userData'),
+      dir,
+      stateOf: (id) => (readJournal(dir)?.segmentId === id ? null : (rotateDeps.readSegment(dir, id)?.state ?? null)),
+      note
+    })
   } catch (err) {
     note(`log archive: launch check failed: ${(err as Error).message}`)
   }
