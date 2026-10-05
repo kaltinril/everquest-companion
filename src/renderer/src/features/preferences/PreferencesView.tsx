@@ -140,7 +140,6 @@ import PrefSectionBlock, { FILL_COLUMN_SX, FILL_ROOT_SX, FILL_ROW_SX, paneFills,
 // nothing renders until it lands. Read that file's header before touching any card's state.
 import { PrefsGate, usePrefsSeed } from './prefsHydration'
 import { LogArchiveSetting } from './LogArchiveSetting'
-import { UNRELEASED } from '../../devFlags'
 import { normalizeQuery } from '../../lib/search'
 
 // ------------------------------------------------------------------- the view
@@ -317,17 +316,13 @@ function buildSections({ version, status, onSendFeedback, onWhatsNew }: SectionI
           keywords: 'path directory logs eqlog character detect override install location',
           content: <EqFolderSetting />
         },
-        // KEEP LOG HISTORY (docs/plans/log-archive), behind the unreleased gate until phase 6.
-        ...(UNRELEASED
-          ? [
-              {
-                id: 'log-archive',
-                label: 'Keep log history',
-                keywords: 'log archive rotate clear compress backup history size shrink large slow loading',
-                content: <LogArchiveSetting />
-              }
-            ]
-          : [])
+        // KEEP LOG HISTORY (docs/plans/log-archive). Off until the player turns it on (step 6.3).
+        {
+          id: 'log-archive',
+          label: 'Keep log history',
+          keywords: 'log archive rotate clear compress backup history size shrink large slow loading',
+          content: <LogArchiveSetting />
+        }
       ]
     },
     // SECOND IN THE RAIL, ahead of everything about the game (JOS-123). A person who opens
