@@ -5,7 +5,7 @@
 // While it is on, nothing happens by itself: every backup and every archive is a click, and the two
 // that move a file ask first, naming it.
 //
-// Shown behind the unreleased gate until the owner's trial (phase 6).
+// Shown in every build since step 6.3 (owner, 2026-10-04); the switch stays off by default.
 
 import { type JSX, useCallback, useEffect, useState } from 'react'
 import { Alert, Box, Button, FormControlLabel, Stack, Switch, Typography } from '@mui/material'
