@@ -168,4 +168,6 @@ Update this table in the same commit as the step it records.
 | 5.4 | measured 2026-10-04: a second fold matches the segment in all 20 modules (see phase 5) | a20bf12d, c10e63d0 |
 | 5.5 | done 2026-10-04: "Refresh this history" on older segments | 386fa030 |
 | 6.1 | first pass in the panel's own words | |
-| 6.2 to 6.4 | wait for the owner's trial | |
+| 6.2 | not a separate step (owner, 2026-10-04): the switch is off by default, so the feature rides the next ordinary test build | |
+| 6.3 | waiting for the owner's word on showing the switch in every build | |
+| 6.4 | not planned (owner, 2026-10-04): no upstream offer | |
