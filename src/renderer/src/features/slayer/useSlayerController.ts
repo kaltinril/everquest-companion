@@ -11,7 +11,14 @@
 import { useCallback, useMemo, useState } from 'react'
 import type { CharacterSnap } from '@shared/characterTypes'
 import type { ZoneShort } from '@shared/maps'
-import { planZones, targetReach, type PlanOptions, type PlanZone } from '@shared/slayer/slayerPlan'
+import {
+  planZones,
+  sortZones,
+  targetReach,
+  type PlanOptions,
+  type PlanZone,
+  type ZoneOrder
+} from '@shared/slayer/slayerPlan'
 import type { View } from '../../appViews'
 import { useModule } from '../../lib/useModule'
 // The Maps tab's own pin is the zone deep link: write the selection it persists, then switch
@@ -24,11 +31,13 @@ import {
   NO_FACTION_HITS_KEY,
   OUT_OF_ERA_KEY,
   PICKS_KEY,
+  ZONE_ORDER_KEY,
   counterRows,
   levelCap,
   loadFlag,
   loadMaxLevel,
   loadPicks,
+  loadZoneOrder,
   nearlyDone,
   savePref,
   type CounterRow
@@ -60,9 +69,11 @@ export interface ZoneListBundle {
   maxLevel: number | null
   outOfEra: boolean
   noFactionHits: boolean
+  order: ZoneOrder
   onMaxLevel: (level: number | null) => void
   onOutOfEra: (on: boolean) => void
   onNoFactionHits: (on: boolean) => void
+  onOrder: (order: ZoneOrder) => void
   onOpenZone: (zone: ZoneShort) => void
   onOpenMob?: (t: MobTarget) => void
 }
@@ -142,10 +153,16 @@ export function useSlayerController(props: SlayerViewProps): SlayerController {
   const all = useAllCounters(opts)
 
   const picked = useMemo(() => all.rows.filter((r) => picks.has(r.id)), [all.rows, picks])
+  const [order, setOrder] = useState(() => loadZoneOrder())
   const zones = useMemo(() => {
-    if (picked.length === 0) return all.zones
-    return planZones(slayerCatalog(), picked.map((r) => r.target), opts)
-  }, [all.zones, picked, opts])
+    const plan =
+      picked.length === 0 ? all.zones : planZones(slayerCatalog(), picked.map((r) => r.target), opts)
+    return sortZones(plan, order)
+  }, [all.zones, picked, opts, order])
+  const onOrder = useCallback((next: ZoneOrder) => {
+    setOrder(next)
+    savePref(ZONE_ORDER_KEY, next)
+  }, [])
   const names = useMemo(
     () => new Map(all.rows.map((r) => [r.id, r.counter.achievement])),
     [all.rows]
@@ -181,9 +198,11 @@ export function useSlayerController(props: SlayerViewProps): SlayerController {
       maxLevel: opts.maxLevel,
       outOfEra: opts.outOfEra,
       noFactionHits: opts.noFactionHits,
+      order,
       onMaxLevel,
       onOutOfEra,
       onNoFactionHits,
+      onOrder,
       onOpenZone,
       ...(onOpenMob === undefined ? {} : { onOpenMob })
     },

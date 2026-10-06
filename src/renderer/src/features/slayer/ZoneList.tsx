@@ -15,13 +15,15 @@ import {
   Stack,
   Switch,
   TextField,
+  ToggleButton,
+  ToggleButtonGroup,
   Tooltip,
   Typography
 } from '@mui/material'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import MapIcon from '@mui/icons-material/Map'
-import type { PlanMob, PlanZone } from '@shared/slayer/slayerPlan'
+import type { PlanMob, PlanZone, ZoneOrder } from '@shared/slayer/slayerPlan'
 import type { ZoneListBundle } from './useSlayerController'
 
 const CHIP_SX = { height: 18, fontSize: 10, '& .MuiChip-label': { px: 0.75 } }
@@ -31,7 +33,9 @@ const NAMED = 4
 
 function levelText(zone: PlanZone): string {
   if (zone.low === null || zone.high === null) return ''
-  return zone.low === zone.high ? `level ${String(zone.low)}` : `levels ${String(zone.low)}-${String(zone.high)}`
+  if (zone.low === zone.high) return `level ${String(zone.low)}`
+  const avg = zone.level === null ? '' : `, avg ${String(zone.level)}`
+  return `levels ${String(zone.low)}-${String(zone.high)}${avg}`
 }
 
 function CounterChips({
@@ -162,7 +166,7 @@ function ZoneRow({ zone, bundle }: { zone: PlanZone; bundle: ZoneListBundle }): 
 
 function PlanControls(props: ZoneListBundle): JSX.Element {
   return (
-    <Stack direction="row" spacing={1.5} alignItems="center" sx={{ pb: 0.5 }}>
+    <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" useFlexGap sx={{ pb: 0.5 }}>
       <TextField
         size="small"
         type="number"
@@ -202,6 +206,35 @@ function PlanControls(props: ZoneListBundle): JSX.Element {
           label={<Typography variant="caption">No faction hits</Typography>}
         />
       </Tooltip>
+      <Stack direction="row" spacing={1} alignItems="center">
+        <Typography variant="caption" color="text.secondary">
+          Sort
+        </Typography>
+        <ToggleButtonGroup
+          size="small"
+          exclusive
+          value={props.order}
+          onChange={(_e, next: ZoneOrder | null) => {
+            if (next !== null) props.onOrder(next)
+          }}
+        >
+          <Tooltip title="Most of your picked achievements first">
+            <ToggleButton value="matches" data-testid="slayer-sort-matches" sx={{ py: 0.25 }}>
+              Matches
+            </ToggleButton>
+          </Tooltip>
+          <Tooltip title="Most spawn points first">
+            <ToggleButton value="spawns" data-testid="slayer-sort-spawns" sx={{ py: 0.25 }}>
+              Spawns
+            </ToggleButton>
+          </Tooltip>
+          <Tooltip title="Lowest average level of the mobs that count first">
+            <ToggleButton value="level" data-testid="slayer-sort-level" sx={{ py: 0.25 }}>
+              Level
+            </ToggleButton>
+          </Tooltip>
+        </ToggleButtonGroup>
+      </Stack>
     </Stack>
   )
 }
