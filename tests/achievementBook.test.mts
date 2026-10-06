@@ -16,6 +16,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import {
   EVERYTHING,
+  achievementLeft,
   achievementPct,
   bookIndex,
   bookTally,
@@ -384,7 +385,7 @@ test('a search reads names and requirement lines, in every group, and keeps the 
   assert.ok(crushbone >= 2, 'Hunter of Crushbone and Crushbone Traveler, by name')
 })
 
-test('closest first puts the nearest to done on top, inside its own group', () => {
+test('closest first puts the least left on top, inside its own group, not the highest percentage', () => {
   const open: BookFilters = {
     ...SHOW_ALL,
     scope: { family: 'Slayer', category: 'Slayer: Skill' },
@@ -393,7 +394,15 @@ test('closest first puts the nearest to done on top, inside its own group', () =
   const [skill] = visibleSections(FULL, INDEX, { ...open, sort: 'closest' })
   assert.deepEqual(
     skill.achievements.slice(0, 3).map((a) => a.name),
-    ['Oh the Humanity!', 'Round of Applause', 'Denizens of Fear']
+    ['Round of Applause', 'Puzzling', 'It Stinks!']
+  )
+  // It Stinks! has 5 of 5 left at 0%; Oh the Humanity! has 6 left at 94%. The kills decide.
+  assert.deepEqual(
+    skill.achievements.slice(2, 4).map((a) => [a.name, achievementLeft(a, INDEX)]),
+    [
+      ['It Stinks!', 5],
+      ['Oh the Humanity!', 6]
+    ]
   )
   // The file's own order is left as it was, and is what the other order shows.
   const [game] = visibleSections(FULL, INDEX, open)
@@ -404,7 +413,7 @@ test('closest first puts the nearest to done on top, inside its own group', () =
   assert.notDeepEqual(game.achievements, skill.achievements)
   // What is finished is shown after what is still work.
   const [both] = visibleSections(FULL, INDEX, { ...open, complete: true, sort: 'closest' })
-  assert.equal(both.achievements[0].name, 'Oh the Humanity!')
+  assert.equal(both.achievements[0].name, 'Round of Applause')
   assert.deepEqual(
     both.achievements.map((a) => a.done),
     [...Array<boolean>(53).fill(false), ...Array<boolean>(17).fill(true)]

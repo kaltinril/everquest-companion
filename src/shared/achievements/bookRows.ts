@@ -100,6 +100,30 @@ export function achievementPct(a: BookAchievement, index: BookIndex): number {
   return 100 * fraction(a, index, 0)
 }
 
+function lineLeft(c: BookComponent, parent: BookAchievement, index: BookIndex, depth: number): number {
+  if (c.done) return 0
+  if (c.have !== undefined && c.need !== undefined && c.need > 0) return Math.max(0, c.need - c.have)
+  const named = namedAchievement(c, parent, index)
+  return named === null ? 1 : left(named.achievement, index, depth + 1)
+}
+
+function left(a: BookAchievement, index: BookIndex, depth: number): number {
+  if (a.done) return 0
+  const lines = requiredLines(a)
+  if (lines.length === 0 || depth > MAX_DEPTH) return 1
+  return lines.reduce((n, c) => n + lineLeft(c, a, index, depth), 0)
+}
+
+/**
+ * HOW MUCH IS LEFT, in the work's own units: a counter's kills still to make, one for a line not
+ * yet done, and for a line naming another achievement, what that one has left. Closest first
+ * sorts on this rather than on the percentage (owner, 2026-10-05): 300 kills from 700 of 1,000 is
+ * further away than 33 from 67 of 100, though the percentage says the opposite.
+ */
+export function achievementLeft(a: BookAchievement, index: BookIndex): number {
+  return left(a, index, 0)
+}
+
 /** `4 of 10` for a single counter, `3 of 9` lines otherwise, and nothing for one plain line. */
 export function progressText(a: BookAchievement): string {
   if (a.done) return 'Complete'
@@ -290,10 +314,15 @@ export function visibleSections(
     const achievements = group.achievements.filter((a) => keeps(group, a, f, words))
     if (achievements.length === 0) continue
     if (f.sort === 'closest') {
-      // What is finished is as close as it gets and is no longer work, so it goes last.
+      // What is finished is as close as it gets and is no longer work, so it goes last. Among the
+      // rest, the least left first, and the further along of two that have as much left.
+      const rest = new Map(achievements.map((a) => [a, achievementLeft(a, index)]))
       const pct = new Map(achievements.map((a) => [a, achievementPct(a, index)]))
       achievements.sort(
-        (a, b) => Number(a.done) - Number(b.done) || (pct.get(b) ?? 0) - (pct.get(a) ?? 0)
+        (a, b) =>
+          Number(a.done) - Number(b.done) ||
+          (rest.get(a) ?? 0) - (rest.get(b) ?? 0) ||
+          (pct.get(b) ?? 0) - (pct.get(a) ?? 0)
       )
     }
     sections.push({ group, achievements })
