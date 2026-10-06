@@ -1064,7 +1064,7 @@ export const IPC = {
   // launch (spawn contract rule 5), so this is a fresh token, port and epoch world. Returns void.
   engineRetry: 'engine:retry',
 
-  // ---- Keep log history (docs/plans/log-archive; main/ipc/logArchive.ts) ----
+  // ---- Summarize and archive log (docs/plans/log-archive; main/ipc/logArchive.ts) ----
   // renderer -> main. Every action returns LogArchiveReply (shared/logArchive/panel.ts): the
   // outcome and the panel's whole state after it. Each action refuses while the switch is off.
   logArchiveStatus: 'logArchive:status',

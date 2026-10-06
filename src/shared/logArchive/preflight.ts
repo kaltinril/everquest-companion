@@ -4,7 +4,7 @@
 // opens the log by name for each line, so the game may keep running (ruling 0.5).
 
 export interface PreflightInput {
-  /** Keep log history is on. */
+  /** Summarize and archive log is on. */
   on: boolean
   /** A character is attached and its log exists. */
   hasLog: boolean
@@ -23,7 +23,7 @@ export interface PreflightInput {
 
 export function rotateBlockers(p: PreflightInput): string[] {
   const out: string[] = []
-  if (!p.on) out.push('Keep log history is off.')
+  if (!p.on) out.push('Summarize and archive log is off.')
   if (!p.hasLog) out.push('No character log is attached.')
   if (p.hasLog && !p.engineLive) out.push('The app is still reading your log. Try again when it has caught up.')
   if (!p.sameDrive) out.push('The archive folder is on a different drive from your log, so the log cannot be moved in one step.')

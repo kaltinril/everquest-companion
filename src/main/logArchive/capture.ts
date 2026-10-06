@@ -68,7 +68,7 @@ export function segmentId(character: string, log: SegmentLog): string {
 
 /** Take one consistent capture, in state `captured`. Nothing is written here. */
 export async function captureSegment(deps: CaptureDeps): Promise<CaptureResult> {
-  if (!deps.on()) return { ok: false, reason: 'Keep log history is off' }
+  if (!deps.on()) return { ok: false, reason: 'Summarize and archive log is off' }
   const a = deps.attached()
   if (a === null) return { ok: false, reason: 'no character is attached' }
   for (let i = 0; i < TRIES; i++) {

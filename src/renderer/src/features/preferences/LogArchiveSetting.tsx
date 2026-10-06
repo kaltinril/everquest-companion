@@ -1,4 +1,4 @@
-// LogArchiveSetting — Preferences → Game → "Keep log history" (docs/plans/log-archive).
+// LogArchiveSetting — Preferences → Game → "Summarize and archive log" (docs/plans/log-archive).
 //
 // OFF FOR EVERY PLAYER, and only the player turns it on, here. While it is off the card shows the
 // switch and what turning it on allows, and nothing else, and the app does nothing with the log.
@@ -187,7 +187,7 @@ export function LogArchiveSetting(): JSX.Element {
             }}
           />
         }
-        label={<Typography variant="body2">Keep log history</Typography>}
+        label={<Typography variant="body2">Summarize and archive log</Typography>}
       />
       <Typography variant="caption" color="text.secondary">
         {st.enabled

@@ -18,7 +18,7 @@ export function setLogArchivePrefs(patch: Partial<LogArchivePrefs>): LogArchiveP
   return next
 }
 
-/** Is Keep log history on? Off unless the player turned it on. */
+/** Is Summarize and archive log on? Off unless the player turned it on. */
 export function logArchiveOn(): boolean {
   return getLogArchivePrefs().enabled
 }

@@ -316,10 +316,10 @@ function buildSections({ version, status, onSendFeedback, onWhatsNew }: SectionI
           keywords: 'path directory logs eqlog character detect override install location',
           content: <EqFolderSetting />
         },
-        // KEEP LOG HISTORY (docs/plans/log-archive). Off until the player turns it on (step 6.3).
+        // SUMMARIZE AND ARCHIVE LOG (docs/plans/log-archive). Off until the player turns it on (step 6.3).
         {
           id: 'log-archive',
-          label: 'Keep log history',
+          label: 'Summarize and archive log',
           keywords: 'log archive rotate clear compress backup history size shrink large slow loading',
           content: <LogArchiveSetting />
         }

@@ -107,7 +107,7 @@ export function useCombat(): UseCombat {
         maxSegments,
         timeline: wantTimeline,
         // Fights from archived logs follow the live ones (log archive, step 4.7). Inert unless
-        // Keep log history is on and an archive is eligible.
+        // Summarize and archive log is on and an archive is eligible.
         archived: true
       })
       if (alive) setSnap(s)

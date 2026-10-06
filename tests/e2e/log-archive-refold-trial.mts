@@ -8,7 +8,7 @@
  *   LOG_ARCHIVE_TRIAL_TABLES=<EverQuest folder, for spells_us*.txt and dbstr_us.txt; optional> \
  *   EQ_ENGINE_BIN=<engined.exe; optional> node --import tsx tests/e2e/log-archive-refold-trial.mts
  *
- * One app run: fold the log, turn Keep log history on, back it up (a segment with an archive), then
+ * One app run: fold the log, turn Summarize and archive log on, back it up (a segment with an archive), then
  * ask the developer's refold trial to fold the archive in a second engine and compare every module.
  * With tables named, it folds twice: without the client's tables beside the staged log, and with.
  *

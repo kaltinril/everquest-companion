@@ -12,7 +12,7 @@
 
 /** The persisted log-archive prefs. A blob so the feature can grow without a second shape. */
 export interface LogArchivePrefs {
-  /** Keep log history: archive on the player's click, and show archived history on the tabs. */
+  /** Summarize and archive log: archive on the player's click, and show archived history on the tabs. */
   enabled: boolean
 }
 
