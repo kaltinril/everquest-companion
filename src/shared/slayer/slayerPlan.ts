@@ -137,6 +137,8 @@ export interface PlanZone {
   advances: number
   low: number | null
   high: number | null
+  /** the counting mobs' lowest levels, averaged over their spawn points; null when none states one */
+  level: number | null
 }
 
 let NAME_BY_SHORT: Map<ZoneShort, string> | null = null
@@ -200,7 +202,7 @@ function planMob(mob: SlayerMob, targets: readonly SlayerTarget[]): PlanMob | nu
 function emptyZone(key: string, catalogName: string): PlanZone {
   const short = zoneShortNameFromCatalog(catalogName)
   const name = (short === null ? undefined : zoneNameByShort().get(short)) ?? catalogName
-  return { key, name, short, mobs: [], targets: [], spawns: 0, advances: 0, low: null, high: null }
+  return { key, name, short, mobs: [], targets: [], spawns: 0, advances: 0, low: null, high: null, level: null }
 }
 
 function addMob(zone: PlanZone, row: PlanMob, mob: SlayerMob): void {
@@ -235,6 +237,7 @@ export function planZones(
   opts: PlanOptions
 ): PlanZone[] {
   const zones = new Map<string, PlanZone>()
+  const levels = new Map<PlanZone, { sum: number; spawns: number }>()
   for (const mob of mobs) {
     if (!keptMob(mob, opts)) continue
     const row = planMob(mob, targets)
@@ -244,15 +247,32 @@ export function planZones(
       const zone = zones.get(key) ?? emptyZone(key, catalogName)
       zones.set(key, zone)
       addMob(zone, row, mob)
+      if (mob.low === null) continue
+      const l = levels.get(zone) ?? { sum: 0, spawns: 0 }
+      levels.set(zone, { sum: l.sum + mob.low * row.spawns, spawns: l.spawns + row.spawns })
     }
   }
   const order = new Map(targets.map((t, i) => [t.id, i]))
   for (const zone of zones.values()) {
+    const l = levels.get(zone)
+    zone.level = l === undefined ? null : Math.round(l.sum / l.spawns)
     const seen = new Set(zone.mobs.flatMap((m) => m.targets))
     zone.targets = [...seen].sort((a, b) => (order.get(a) ?? 0) - (order.get(b) ?? 0))
     zone.mobs.sort((a, b) => b.spawns * b.targets.length - a.spawns * a.targets.length)
   }
   return [...zones.values()].sort(byRank)
+}
+
+/** How the zone list is ordered: by how many picked counters a zone serves (the plan's own
+ *  ranking), by spawn points, or by level, lowest first. Each falls back to the plan's ranking. */
+export type ZoneOrder = 'matches' | 'spawns' | 'level'
+
+const NO_LEVEL = Number.MAX_SAFE_INTEGER
+
+export function sortZones(zones: readonly PlanZone[], order: ZoneOrder): PlanZone[] {
+  if (order === 'matches') return [...zones]
+  if (order === 'spawns') return [...zones].sort((a, b) => b.spawns - a.spawns || byRank(a, b))
+  return [...zones].sort((a, b) => (a.level ?? NO_LEVEL) - (b.level ?? NO_LEVEL) || byRank(a, b))
 }
 
 /** The counters with a mob in this zone, by id. */

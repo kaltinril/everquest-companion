@@ -16,7 +16,7 @@ import {
   type SlayerCounter,
   type SlayerRecord
 } from '@shared/outputs/slayer'
-import { counterId, slayerTarget, type SlayerTarget } from '@shared/slayer/slayerPlan'
+import { counterId, slayerTarget, type SlayerTarget, type ZoneOrder } from '@shared/slayer/slayerPlan'
 
 export interface CounterRow {
   id: string
@@ -64,6 +64,7 @@ export const PICKS_KEY = 'eq.slayer.picks'
 export const MAX_LEVEL_KEY = 'eq.slayer.maxLevel'
 export const OUT_OF_ERA_KEY = 'eq.slayer.outOfEra'
 export const NO_FACTION_HITS_KEY = 'eq.slayer.noFactionHits'
+export const ZONE_ORDER_KEY = 'eq.slayer.zoneOrder'
 
 /** The slice of `Storage` this module uses, so a test can hand it a plain object. */
 export interface PrefStore {
@@ -106,6 +107,11 @@ export function loadMaxLevel(store: PrefStore = localStorage): number | null | u
   if (raw === '') return null
   const n = Number(raw)
   return Number.isInteger(n) && n > 0 && n < 200 ? n : undefined
+}
+
+export function loadZoneOrder(store: PrefStore = localStorage): ZoneOrder {
+  const raw = readPref(store, ZONE_ORDER_KEY)
+  return raw === 'spawns' || raw === 'level' ? raw : 'matches'
 }
 
 /** The cap the plan applies: the stored one, or the character's own level until one is set. */
