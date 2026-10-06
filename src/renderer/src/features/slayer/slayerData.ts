@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react'
 import type { SlayerRecord } from '@shared/outputs/slayer'
 import { slayerMobs, type SlayerMob } from '@shared/slayer/slayerPlan'
 import type { ProgressState } from '@shared/types'
+import factionsJson from '../../data/eqlegends/mobFactions.json'
 import racesJson from '../../data/eqlegends/mobRaces.json'
 import { MOB_CATALOG } from '../mobs/mobSearch'
 
@@ -25,7 +26,12 @@ export function slayerCatalog(): SlayerMob[] {
   for (const [race, pages] of Object.entries(races)) {
     for (const page of pages) raceOf.set(page, race)
   }
-  MOBS = slayerMobs(MOB_CATALOG, (page) => raceOf.get(page))
+  const hit = new Set<string>(factionsJson.hit)
+  MOBS = slayerMobs(
+    MOB_CATALOG,
+    (page) => raceOf.get(page),
+    (page) => hit.has(page)
+  )
   return MOBS
 }
 

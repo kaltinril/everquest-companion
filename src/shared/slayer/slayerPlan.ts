@@ -64,6 +64,8 @@ export interface SlayerMob {
   /** the lowest and highest level the page states; null when it states none */
   low: number | null
   high: number | null
+  /** the wiki says a kill lowers a faction (`mobFactions.json`); false when it says none or nothing */
+  factionHit: boolean
 }
 
 /** The number the text opens with, and the one a dash or `to` joins to it. */
@@ -90,12 +92,14 @@ function levelText(low: number | null, high: number | null): string {
 
 export function slayerMobs(
   catalog: readonly MobEntry[],
-  raceOf: (page: string) => string | undefined
+  raceOf: (page: string) => string | undefined,
+  hitsFaction: (page: string) => boolean = () => false
 ): SlayerMob[] {
   return catalog.map((entry) => ({
     entry,
     facts: mobFacts(entry.name, raceOf(entry.page)),
-    ...levelSpan(entry.level)
+    ...levelSpan(entry.level),
+    factionHit: hitsFaction(entry.page)
   }))
 }
 
@@ -104,6 +108,8 @@ export interface PlanOptions {
   maxLevel: number | null
   /** keep zones from expansions the server has not opened */
   outOfEra: boolean
+  /** leave out mobs the wiki says lower a faction; a mob it is silent on stays */
+  noFactionHits: boolean
 }
 
 /** One mob in a zone that counts toward at least one picked counter. */
@@ -157,6 +163,16 @@ function spawnPoints(entry: MobEntry): number {
  *  this, so a mob the list leaves out is not shaded either. */
 export function withinLevel(mob: SlayerMob, maxLevel: number | null): boolean {
   return maxLevel === null || mob.low === null || mob.low <= maxLevel
+}
+
+/** The options that leave a MOB out, which the zone list and the map shading both apply. */
+export type MobCap = Pick<PlanOptions, 'maxLevel' | 'noFactionHits'>
+
+export const NO_CAP: MobCap = { maxLevel: null, noFactionHits: false }
+
+/** The mob is under the level cap, and costs no faction while the faction switch is on. */
+export function keptMob(mob: SlayerMob, cap: MobCap): boolean {
+  return withinLevel(mob, cap.maxLevel) && !(cap.noFactionHits && mob.factionHit)
 }
 
 /** The mob as one zone row's line, or null when it counts toward nothing picked. */
@@ -220,7 +236,7 @@ export function planZones(
 ): PlanZone[] {
   const zones = new Map<string, PlanZone>()
   for (const mob of mobs) {
-    if (!withinLevel(mob, opts.maxLevel)) continue
+    if (!keptMob(mob, opts)) continue
     const row = planMob(mob, targets)
     if (row === null) continue
     for (const catalogName of keptZones(mob.entry, opts)) {
@@ -237,6 +253,11 @@ export function planZones(
     zone.mobs.sort((a, b) => b.spawns * b.targets.length - a.spawns * a.targets.length)
   }
   return [...zones.values()].sort(byRank)
+}
+
+/** The counters with a mob in this zone, by id. */
+export function countersIn(zones: readonly PlanZone[], zone: ZoneShort): Set<string> {
+  return new Set(zones.filter((z) => z.short === zone).flatMap((z) => z.targets))
 }
 
 /** How many zones and spawn points each counter has, over a plan made for ALL of them. */

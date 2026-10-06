@@ -14,6 +14,7 @@ import {
   TextField,
   ToggleButton,
   ToggleButtonGroup,
+  Tooltip,
   Typography
 } from '@mui/material'
 import AchievementRow from './AchievementRow'
@@ -74,6 +75,22 @@ function Controls(props: ListBundle): JSX.Element {
           onChange={props.onComplete}
           testId="achievements-show-complete"
         />
+        <Tooltip
+          title={
+            props.zoneName === null
+              ? 'The log has not named a zone yet. Zone once and this fills in.'
+              : `Only what can be worked on in ${props.zoneName}: kill counters with a mob here, named mobs here, and this zone's Hunter, Conqueror and Traveler.`
+          }
+        >
+          <span>
+            <Show
+              label={props.zoneName === null ? "Zone I'm in" : `Zone I'm in (${props.zoneName})`}
+              checked={props.zoneOnly}
+              onChange={props.onZoneOnly}
+              testId="achievements-zone-here"
+            />
+          </span>
+        </Tooltip>
       </Stack>
       <ToggleButtonGroup
         size="small"

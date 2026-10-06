@@ -63,6 +63,7 @@ export function nearlyDone(rows: readonly CounterRow[]): string[] {
 export const PICKS_KEY = 'eq.slayer.picks'
 export const MAX_LEVEL_KEY = 'eq.slayer.maxLevel'
 export const OUT_OF_ERA_KEY = 'eq.slayer.outOfEra'
+export const NO_FACTION_HITS_KEY = 'eq.slayer.noFactionHits'
 
 /** The slice of `Storage` this module uses, so a test can hand it a plain object. */
 export interface PrefStore {

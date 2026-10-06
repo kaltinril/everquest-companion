@@ -23,13 +23,18 @@ import {
   type RailFamily,
   type Scope,
   type SortOrder,
-  type Tally
+  type Tally,
+  type ZoneHere
 } from '@shared/achievements/bookRows'
+import type { CharacterSnap } from '@shared/characterTypes'
 import type { ZoneShort } from '@shared/maps'
+import { countersIn, type PlanZone } from '@shared/slayer/slayerPlan'
+import { zoneShortName } from '@shared/zones'
+import { useModule } from '../../lib/useModule'
 import type { AchievementBook } from '@shared/outputs/achievementBook'
 import { MOB_CATALOG } from '../mobs/mobSearch'
 import type { MobTarget } from '../mobs/mobTarget'
-import { savePref } from '../slayer/slayerRows'
+import { loadFlag, savePref } from '../slayer/slayerRows'
 import {
   useSlayerController,
   type PickBundle,
@@ -41,6 +46,7 @@ import {
   SHOW_COMPLETE_KEY,
   SHOW_OPEN_KEY,
   SORT_KEY,
+  ZONE_HERE_KEY,
   loadScope,
   loadShown,
   loadSort,
@@ -75,11 +81,16 @@ export interface ListBundle {
   open: boolean
   complete: boolean
   sort: SortOrder
+  /** the "Zone I'm in" switch */
+  zoneOnly: boolean
+  /** the zone the log last put the character in, by name; null before it names one */
+  zoneName: string | null
   hasComplete: boolean
   onQuery: (q: string) => void
   onOpen: (on: boolean) => void
   onComplete: (on: boolean) => void
   onSort: (sort: SortOrder) => void
+  onZoneOnly: (on: boolean) => void
   ctx: RowContext
 }
 
@@ -103,22 +114,36 @@ function catalogMobs(): MobIndex {
 
 const NO_INDEX: BookIndex = new Map()
 
+/** No map is named '', so nothing is worked on here. */
+const NOWHERE: ZoneHere = { zone: '', counters: new Set(), mobs: new Map() }
+
 /** The stored choices, each written back on change. */
 function useChoices(): Pick<
   ListBundle,
-  'query' | 'open' | 'complete' | 'sort' | 'onQuery' | 'onOpen' | 'onComplete' | 'onSort'
+  | 'query'
+  | 'open'
+  | 'complete'
+  | 'sort'
+  | 'zoneOnly'
+  | 'onQuery'
+  | 'onOpen'
+  | 'onComplete'
+  | 'onSort'
+  | 'onZoneOnly'
 > & { scope: Scope; onScope: (scope: Scope) => void } {
   const [scope, setScope] = useState(() => loadScope())
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(() => loadShown(SHOW_OPEN_KEY))
   const [complete, setComplete] = useState(() => loadShown(SHOW_COMPLETE_KEY))
   const [sort, setSort] = useState(() => loadSort())
+  const [zoneOnly, setZoneOnly] = useState(() => loadFlag(ZONE_HERE_KEY))
   return {
     scope,
     query,
     open,
     complete,
     sort,
+    zoneOnly,
     onQuery: setQuery,
     onScope: useCallback((next: Scope) => {
       setScope(next)
@@ -135,8 +160,17 @@ function useChoices(): Pick<
     onSort: useCallback((next: SortOrder) => {
       setSort(next)
       savePref(SORT_KEY, next)
+    }, []),
+    onZoneOnly: useCallback((on: boolean) => {
+      setZoneOnly(on)
+      savePref(ZONE_HERE_KEY, on ? '1' : '0')
     }, [])
   }
+}
+
+/** The zone filter for this zone: the counters the plan over every counter places here. */
+function zoneHere(zone: ZoneShort, everyZone: readonly PlanZone[]): ZoneHere {
+  return { zone, counters: countersIn(everyZone, zone), mobs: catalogMobs() }
 }
 
 function shownIn(book: AchievementBook | null, scope: Scope): Scope {
@@ -147,15 +181,24 @@ export function useAchievementsController(props: SlayerViewProps): AchievementsC
   const { book, readAt, ready } = useAchievementBook()
   const slayer = useSlayerController(props)
   const choices = useChoices()
-  const { query, open, complete, sort } = choices
+  const { query, open, complete, sort, zoneOnly } = choices
+  const zoneName = useModule<CharacterSnap>('character')?.zone ?? null
 
   const index = useMemo(() => (book === null ? NO_INDEX : bookIndex(book)), [book])
   const families = useMemo(() => (book === null ? [] : railFamilies(book)), [book])
   const total = useMemo(() => bookTally(index), [index])
   const scope = useMemo(() => shownIn(book, choices.scope), [book, choices.scope])
+  // ON WITH NO KNOWN ZONE, THE FILTER KEEPS NOTHING: the switch says "here", and an empty list with
+  // the switch's own note says why, where a full list would read as every row being here.
+  const here = useMemo((): ZoneHere | null => {
+    if (!zoneOnly) return null
+    const zone = zoneShortName(zoneName)
+    return zone === null ? NOWHERE : zoneHere(zone, slayer.everyZone)
+  }, [zoneOnly, zoneName, slayer.everyZone])
   const sections = useMemo(
-    () => (book === null ? [] : visibleSections(book, index, { scope, query, open, complete, sort })),
-    [book, index, scope, query, open, complete, sort]
+    () =>
+      book === null ? [] : visibleSections(book, index, { scope, query, open, complete, sort, here }),
+    [book, index, scope, query, open, complete, sort, here]
   )
   const pickable = useMemo(
     () => book !== null && familyHasCounter(book, scope.family),
@@ -172,6 +215,7 @@ export function useAchievementsController(props: SlayerViewProps): AchievementsC
       ...choices,
       sections,
       shown: shownCount(sections),
+      zoneName,
       hasComplete,
       ctx: {
         index,

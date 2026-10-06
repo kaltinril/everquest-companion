@@ -187,6 +187,21 @@ function PlanControls(props: ZoneListBundle): JSX.Element {
         }
         label={<Typography variant="caption">Zones not open yet</Typography>}
       />
+      <Tooltip title="Leave out every mob the wiki says lowers a faction when killed. Mobs the wiki says nothing about stay.">
+        <FormControlLabel
+          control={
+            <Switch
+              size="small"
+              data-testid="slayer-no-faction-hits"
+              checked={props.noFactionHits}
+              onChange={(e) => {
+                props.onNoFactionHits(e.target.checked)
+              }}
+            />
+          }
+          label={<Typography variant="caption">No faction hits</Typography>}
+        />
+      </Tooltip>
     </Stack>
   )
 }

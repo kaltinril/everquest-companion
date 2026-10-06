@@ -11,6 +11,7 @@ export const SCOPE_KEY = 'eq.achievements.scope'
 export const SHOW_OPEN_KEY = 'eq.achievements.showOpen'
 export const SHOW_COMPLETE_KEY = 'eq.achievements.showComplete'
 export const SORT_KEY = 'eq.achievements.sort'
+export const ZONE_HERE_KEY = 'eq.achievements.zoneHere'
 
 /** A switch that is ON until somebody turns it off. */
 export function loadShown(key: string, store: PrefStore = localStorage): boolean {
