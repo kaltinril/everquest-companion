@@ -21,6 +21,7 @@ import type { MobTarget } from '../mobs/mobTarget'
 import { slayerCatalog, useSlayerData } from './slayerData'
 import {
   MAX_LEVEL_KEY,
+  NO_FACTION_HITS_KEY,
   OUT_OF_ERA_KEY,
   PICKS_KEY,
   counterRows,
@@ -58,8 +59,10 @@ export interface ZoneListBundle {
   picked: number
   maxLevel: number | null
   outOfEra: boolean
+  noFactionHits: boolean
   onMaxLevel: (level: number | null) => void
   onOutOfEra: (on: boolean) => void
+  onNoFactionHits: (on: boolean) => void
   onOpenZone: (zone: ZoneShort) => void
   onOpenMob?: (t: MobTarget) => void
 }
@@ -67,6 +70,8 @@ export interface ZoneListBundle {
 export interface SlayerController {
   picks: PickBundle
   plan: ZoneListBundle
+  /** the plan over every open counter, whatever is picked: where each counter can be worked */
+  everyZone: PlanZone[]
 }
 
 /** The picks, stored on every change. */
@@ -84,12 +89,17 @@ function usePlanOptions(): {
   opts: PlanOptions
   onMaxLevel: (level: number | null) => void
   onOutOfEra: (on: boolean) => void
+  onNoFactionHits: (on: boolean) => void
 } {
   const own = useModule<CharacterSnap>('character')?.level?.level
   const [stored, setStored] = useState(() => loadMaxLevel())
   const [outOfEra, setOutOfEra] = useState(() => loadFlag(OUT_OF_ERA_KEY))
+  const [noFactionHits, setNoFactionHits] = useState(() => loadFlag(NO_FACTION_HITS_KEY))
   const maxLevel = levelCap(stored, own)
-  const opts = useMemo(() => ({ maxLevel, outOfEra }), [maxLevel, outOfEra])
+  const opts = useMemo(
+    () => ({ maxLevel, outOfEra, noFactionHits }),
+    [maxLevel, outOfEra, noFactionHits]
+  )
   const onMaxLevel = useCallback((level: number | null) => {
     setStored(level)
     savePref(MAX_LEVEL_KEY, level === null ? '' : String(level))
@@ -98,7 +108,11 @@ function usePlanOptions(): {
     setOutOfEra(on)
     savePref(OUT_OF_ERA_KEY, on ? '1' : '0')
   }, [])
-  return { opts, onMaxLevel, onOutOfEra }
+  const onNoFactionHits = useCallback((on: boolean) => {
+    setNoFactionHits(on)
+    savePref(NO_FACTION_HITS_KEY, on ? '1' : '0')
+  }, [])
+  return { opts, onMaxLevel, onOutOfEra, onNoFactionHits }
 }
 
 function withSet(picks: ReadonlySet<string>, ids: readonly string[], on: boolean): Set<string> {
@@ -124,7 +138,7 @@ function useAllCounters(opts: PlanOptions): { rows: CounterRow[]; zones: PlanZon
 export function useSlayerController(props: SlayerViewProps): SlayerController {
   const { onOpenMob, onSelectView } = props
   const [picks, setPicks] = usePicks()
-  const { opts, onMaxLevel, onOutOfEra } = usePlanOptions()
+  const { opts, onMaxLevel, onOutOfEra, onNoFactionHits } = usePlanOptions()
   const all = useAllCounters(opts)
 
   const picked = useMemo(() => all.rows.filter((r) => picks.has(r.id)), [all.rows, picks])
@@ -166,10 +180,13 @@ export function useSlayerController(props: SlayerViewProps): SlayerController {
       picked: picked.length,
       maxLevel: opts.maxLevel,
       outOfEra: opts.outOfEra,
+      noFactionHits: opts.noFactionHits,
       onMaxLevel,
       onOutOfEra,
+      onNoFactionHits,
       onOpenZone,
       ...(onOpenMob === undefined ? {} : { onOpenMob })
-    }
+    },
+    everyZone: all.zones
   }
 }

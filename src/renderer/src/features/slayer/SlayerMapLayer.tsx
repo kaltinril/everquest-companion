@@ -20,7 +20,15 @@ import { useModule } from '../../lib/useModule'
 import type { MapViewport } from '../maps/useMapViewport'
 import { slayerAreas, type SlayerArea } from './slayerAreas'
 import { slayerCatalog, useSlayerData } from './slayerData'
-import { counterRows, levelCap, loadFlag, loadMaxLevel, loadPicks, savePref } from './slayerRows'
+import {
+  NO_FACTION_HITS_KEY,
+  counterRows,
+  levelCap,
+  loadFlag,
+  loadMaxLevel,
+  loadPicks,
+  savePref
+} from './slayerRows'
 
 /** The switch's stored state. Stored as HIDDEN so the layer shows until somebody turns it off. */
 export const MAP_AREAS_HIDDEN_KEY = 'eq.slayer.mapAreasHidden'
@@ -89,10 +97,12 @@ export default function SlayerMapLayer({
   vp: MapViewport
 }): JSX.Element | null {
   const { record } = useSlayerData()
-  // The Achievements tab's level cap, read as its plan reads it, so the shading and the zone list
-  // leave out the same mobs.
+  // The Achievements tab's level cap and faction switch, read as its plan reads them, so the
+  // shading and the zone list leave out the same mobs.
   const own = useModule<CharacterSnap>('character')?.level?.level
   const maxLevel = levelCap(loadMaxLevel(), own)
+  const noFactionHits = loadFlag(NO_FACTION_HITS_KEY)
+  const cap = useMemo(() => ({ maxLevel, noFactionHits }), [maxLevel, noFactionHits])
   const [hidden, setHidden] = useState(() => loadFlag(MAP_AREAS_HIDDEN_KEY))
   const picked = useMemo(() => {
     if (record === null) return []
@@ -100,8 +110,8 @@ export default function SlayerMapLayer({
     return counterRows(record, new Map()).filter((row) => picks.has(row.id))
   }, [record])
   const areas = useMemo(
-    () => slayerAreas(zone, slayerCatalog(), picked.map((row) => row.target), maxLevel),
-    [zone, picked, maxLevel]
+    () => slayerAreas(zone, slayerCatalog(), picked.map((row) => row.target), cap),
+    [zone, picked, cap]
   )
   const names = useMemo(() => new Map(picked.map((r) => [r.id, r.counter.achievement])), [picked])
   if (areas.length === 0) return null

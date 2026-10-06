@@ -29,8 +29,10 @@ import {
   railFamilies,
   shownCount,
   visibleSections,
+  worksHere,
   type BookFilters,
-  type Located
+  type Located,
+  type ZoneHere
 } from '../src/shared/achievements/bookRows'
 import {
   achievementBook,
@@ -69,7 +71,8 @@ const SHOW_ALL: BookFilters = {
   query: '',
   open: true,
   complete: true,
-  sort: 'game'
+  sort: 'game',
+  here: null
 }
 
 // ---------------------------------------------------------------------------
@@ -322,6 +325,26 @@ test("an achievement's name points at a map when it names a zone the table knows
   assert.equal(namedZone('Bat Country!'), null)
 })
 
+test("an achievement works here by its own name, an open counter placed here, or a mob filed here", () => {
+  const slayer = { category: 'Slayer: Skill', family: 'Slayer', name: 'Skill', achievements: [] }
+  const general = { category: 'EverQuest: Hunter', family: 'EverQuest', name: 'Hunter', achievements: [] }
+  const bats = { name: 'Bat Country!', done: false, components: [line('Bats and Werebats.', { have: 4, need: 100 })] }
+  const batId = counterIds(slayer, bats)[0]
+  const here: ZoneHere = {
+    zone: 'crushbone',
+    counters: new Set([batId]),
+    mobs: mobIndex([{ name: 'Emperor Crush', page: 'Emperor Crush', zones: ['Crushbone'] }])
+  }
+  assert.ok(worksHere(general, { name: 'Hunter of Crushbone', done: false, components: [] }, here))
+  assert.ok(!worksHere(general, { name: 'Hunter of Befallen', done: false, components: [] }, here))
+  assert.ok(worksHere(slayer, bats, here))
+  assert.ok(!worksHere(slayer, bats, { ...here, counters: new Set() }), 'no mob of it here')
+  const crush = { name: 'Royalty', done: false, components: [line('Emperor Crush')] }
+  assert.ok(worksHere(general, crush, here))
+  assert.ok(!worksHere(general, { ...crush, components: [line('Emperor Crush', { done: true })] }, here), 'done lines are not work')
+  assert.ok(!worksHere(general, crush, { ...here, zone: 'befallen' }))
+})
+
 // ---------------------------------------------------------------------------
 // THE LIST
 // ---------------------------------------------------------------------------
@@ -355,6 +378,10 @@ test('a search reads names and requirement lines, in every group, and keeps the 
     ]
   )
   assert.equal(shownCount(visibleSections(FULL, INDEX, { ...SHOW_ALL, query: 'bats skill' })), 1)
+  const nowhere: ZoneHere = { zone: '', counters: new Set(), mobs: new Map() }
+  assert.equal(shownCount(visibleSections(FULL, INDEX, { ...SHOW_ALL, here: nowhere })), 0, 'no zone keeps nothing')
+  const crushbone = shownCount(visibleSections(FULL, INDEX, { ...SHOW_ALL, here: { ...nowhere, zone: 'crushbone' } }))
+  assert.ok(crushbone >= 2, 'Hunter of Crushbone and Crushbone Traveler, by name')
 })
 
 test('closest first puts the nearest to done on top, inside its own group', () => {

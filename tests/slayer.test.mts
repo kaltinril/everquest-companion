@@ -35,6 +35,7 @@ import {
   unknownTerms
 } from '../src/shared/slayer/slayerMatch'
 import {
+  NO_CAP,
   counterId,
   levelSpan,
   planZones,
@@ -427,7 +428,7 @@ const FIELD_MOBS = slayerMobs(FIELD, (page) =>
 )
 
 test('spawn points that stand together are one area, and it names what it serves', () => {
-  const areas = slayerAreas('qey2hh1', FIELD_MOBS, [BATS, CROWS], null)
+  const areas = slayerAreas('qey2hh1', FIELD_MOBS, [BATS, CROWS], NO_CAP)
   assert.equal(areas.length, 2)
   const [camp, lone] = areas
   assert.equal(camp.spawns, 3)
@@ -447,9 +448,9 @@ test('spawn points that stand together are one area, and it names what it serves
 })
 
 test('an area is drawn only for this map, only for picks, only for one-zone pages', () => {
-  assert.deepEqual(slayerAreas('qey2hh1', FIELD_MOBS, [], null), [])
-  assert.deepEqual(slayerAreas('befallen', FIELD_MOBS, [BATS, CROWS], null), [])
-  const bats = slayerAreas('qey2hh1', FIELD_MOBS, [BATS], null)
+  assert.deepEqual(slayerAreas('qey2hh1', FIELD_MOBS, [], NO_CAP), [])
+  assert.deepEqual(slayerAreas('befallen', FIELD_MOBS, [BATS, CROWS], NO_CAP), [])
+  const bats = slayerAreas('qey2hh1', FIELD_MOBS, [BATS], NO_CAP)
   assert.deepEqual(
     bats.map((a) => a.mobs),
     [['a giant bat']],
@@ -463,10 +464,10 @@ test('the map leaves out what the level cap leaves out of the zone list', () => 
   const field = slayerMobs([high, low], (page) =>
     page.includes('bat') ? 'Giant Bat' : 'Scarecrow'
   )
-  const cap = { maxLevel: 20, outOfEra: false }
+  const cap = { maxLevel: 20, outOfEra: false, noFactionHits: false }
   const listed = planZones(field, [BATS, CROWS], cap).flatMap((z) => z.mobs.map((m) => m.name))
-  const shaded = slayerAreas('qey2hh1', field, [BATS, CROWS], cap.maxLevel).flatMap((a) => a.mobs)
+  const shaded = slayerAreas('qey2hh1', field, [BATS, CROWS], cap).flatMap((a) => a.mobs)
   assert.deepEqual(listed, ['a giant bat'])
   assert.deepEqual(shaded, listed)
-  assert.equal(slayerAreas('qey2hh1', field, [BATS, CROWS], null)[0].mobs.length, 2)
+  assert.equal(slayerAreas('qey2hh1', field, [BATS, CROWS], NO_CAP)[0].mobs.length, 2)
 })

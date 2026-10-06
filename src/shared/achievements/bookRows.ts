@@ -164,6 +164,28 @@ export function namedZone(name: string): ZoneShort | null {
   return null
 }
 
+/** The zone the character is in, as the list's "Zone I'm in" filter reads it. */
+export interface ZoneHere {
+  zone: ZoneShort
+  /** the open counters with a mob in this zone, by `counterId`, as the Slayer plan places them */
+  counters: ReadonlySet<string>
+  mobs: MobIndex
+}
+
+/** An achievement that can be worked on in this zone: its own name is the zone, an open counter
+ *  has a mob here, or an open line names a mob the catalog files here. */
+export function worksHere(group: BookGroup, a: BookAchievement, here: ZoneHere): boolean {
+  if (namedZone(a.name) === here.zone) return true
+  return a.components.some((c) => {
+    if (c.done) return false
+    const id = counterIdOf(group, a, c)
+    if (id !== null && here.counters.has(id)) return true
+    return namedMobs(c, here.mobs).some((m) =>
+      (m.zones ?? []).some((z) => zoneShortNameFromCatalog(z) === here.zone)
+    )
+  })
+}
+
 // ---- the rail ------------------------------------------------------------------------------------
 
 /** What the list is showing: everything, one family, or one group of it. */
@@ -234,6 +256,8 @@ export interface BookFilters {
   open: boolean
   complete: boolean
   sort: SortOrder
+  /** keep only what can be worked on in this zone; null keeps every zone */
+  here: ZoneHere | null
 }
 
 /** One group's achievements that the filters keep. */
@@ -248,6 +272,7 @@ function haystack(group: BookGroup, a: BookAchievement): string {
 
 function keeps(group: BookGroup, a: BookAchievement, f: BookFilters, words: readonly string[]): boolean {
   if (a.done ? !f.complete : !f.open) return false
+  if (f.here !== null && !worksHere(group, a, f.here)) return false
   if (words.length === 0) return true
   const hay = haystack(group, a)
   return words.every((w) => hay.includes(w))
