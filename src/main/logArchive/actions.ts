@@ -165,7 +165,7 @@ function reply(ok: boolean, message: string): LogArchiveReply {
 
 /** Run one action at a time, behind the switch. */
 async function exclusive(label: string, fn: () => LogArchiveReply | Promise<LogArchiveReply>): Promise<LogArchiveReply> {
-  if (!logArchiveOn()) return reply(false, 'Keep log history is off.')
+  if (!logArchiveOn()) return reply(false, 'Summarize and archive log is off.')
   if (busy !== null) return reply(false, `Busy: ${busy}.`)
   busy = label
   try {
@@ -181,7 +181,7 @@ async function exclusive(label: string, fn: () => LogArchiveReply | Promise<LogA
 export function setLogArchiveEnabled(enabled: boolean): LogArchiveReply {
   setLogArchivePrefs({ enabled })
   liveHistory.forgetHistoryContext()
-  return reply(true, enabled ? 'Keep log history is on.' : 'Keep log history is off. Your archives stay where they are.')
+  return reply(true, enabled ? 'Summarize and archive log is on.' : 'Summarize and archive log is off. Your archives stay where they are.')
 }
 
 /** Steps 2.1 and 2.2: capture, then a verified compressed copy. The live log is only read. */

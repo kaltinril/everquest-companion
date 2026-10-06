@@ -260,7 +260,7 @@ export interface PlaceDeps {
 export function placeArchivedBuckets(deps: PlaceDeps): void {
   if (!deps.on()) {
     if (removeKeys(deps.userData, (k) => k.startsWith(archiveKey(''))) > 0) {
-      deps.note('log archive: Keep log history is off, so carried resist and message history was taken out')
+      deps.note('log archive: Summarize and archive log is off, so carried resist and message history was taken out')
     }
     return
   }

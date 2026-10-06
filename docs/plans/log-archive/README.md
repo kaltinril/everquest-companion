@@ -43,7 +43,7 @@ them is redesigned, not excused.
 
 ## The switch
 
-The feature has one switch, **Keep log history**, and it is off for every player, new or existing.
+The feature has one switch, **Summarize and archive log**, and it is off for every player, new or existing.
 Only the player can turn it on, in the Log archive section of Settings. Step 1.0 builds it before
 anything else, and every later step checks it.
 

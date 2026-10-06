@@ -245,7 +245,7 @@ export interface StoreShape {
    */
   buffTrust?: BuffTrustPrefs
   /**
-   * KEEP LOG HISTORY (docs/plans/log-archive, step 1.0; shared/logArchive/prefs.ts). OFF until
+   * SUMMARIZE AND ARCHIVE LOG (docs/plans/log-archive, step 1.0; shared/logArchive/prefs.ts). OFF until
    * the player turns it on. Absent means off, the shipped behaviour, so it is an additive optional
    * key with no schema bump and no migration, on the `buffTrust` precedent above.
    */

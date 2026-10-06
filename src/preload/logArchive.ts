@@ -3,7 +3,7 @@ import { IPC } from '../shared/ipc'
 import type { LogArchiveReply, LogArchiveStatus } from '../shared/logArchive/panel'
 import type { RefoldTrialReport } from '../shared/logArchive/refoldCompare'
 
-/** Keep log history (docs/plans/log-archive). Every action refuses while the switch is off. */
+/** Summarize and archive log (docs/plans/log-archive). Every action refuses while the switch is off. */
 export const logArchiveBridge = {
   logArchiveStatus: (): Promise<LogArchiveStatus> => ipcRenderer.invoke(IPC.logArchiveStatus),
   /** Only the player flips this, from the card. */

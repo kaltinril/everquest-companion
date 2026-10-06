@@ -10,7 +10,7 @@
  *   EQ_ENGINE_BIN=<engined.exe; optional> node --import tsx tests/e2e/log-archive-trial.mts
  *
  * What it does, in one app run after another on the same settings folder:
- *   1. fold the log, record every merged module, turn Keep log history on, archive the log;
+ *   1. fold the log, record every merged module, turn Summarize and archive log on, archive the log;
  *      the same session must still show the same history (the engine's memory);
  *   2. relaunch: the fresh log plus the archive must show the same history again;
  *   3. append new lines: they must add to the history, not replace it;

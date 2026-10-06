@@ -62,7 +62,7 @@ let trialRunning = false
 /** Step 5.4: does a second fold of this segment's archive give the totals it stored? */
 export async function refoldTrial(id: string, withTables: boolean): Promise<RefoldTrialReport> {
   if (app.isPackaged) return empty('The refold trial is a developer tool.')
-  if (!logArchiveOn()) return empty('Keep log history is off.')
+  if (!logArchiveOn()) return empty('Summarize and archive log is off.')
   if (trialRunning) return empty('A refold trial is already running.')
   const segment = listSegments(logArchiveDir()).segments.find((s) => s.id === id)
   if (segment === undefined) return empty('That segment was not found.')

@@ -302,7 +302,7 @@ if (!gotSingleInstanceLock) {
     // call: the composition root's own step is handing the session its work, and everything the
     // scan then does belongs to the phase that names it. A failed attach still marks the phase
     // (with no count) rather than leaving the profile forever incomplete.
-    // KEEP LOG HISTORY'S LAUNCH CHECK (docs/plans/log-archive, step 3.4) goes first: an archive
+    // SUMMARIZE AND ARCHIVE LOG'S LAUNCH CHECK (docs/plans/log-archive, step 3.4) goes first: an archive
     // interrupted mid-move is finished before the log is resolved, so the session never attaches to
     // a log that is half way into the archive folder. Returns at once when the feature was never used.
     void recoverLogArchiveAtLaunch((line) => {

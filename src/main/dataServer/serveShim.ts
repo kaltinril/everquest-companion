@@ -301,7 +301,7 @@ export function serveCombatSnapshot(
  *
  *  ARCHIVED HISTORY (docs/plans/log-archive, step 4.8): archived fights are ranked app-side by the
  *  same rule (`shared/logArchive/searchFights.ts`) and joined under the same limit. The same object
- *  back unless Keep log history is on and an eligible segment kept fights. */
+ *  back unless Summarize and archive log is on and an eligible segment kept fights. */
 export function serveSearchFights(
   text: string,
   limit: number | undefined,

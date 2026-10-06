@@ -43,7 +43,7 @@ All five must hold. This rule is the whole defence against counting anything twi
 
 ### 1.0 The switch
 
-- **Does**: adds the **Keep log history** setting, off by default, as an optional key in the
+- **Does**: adds the **Summarize and archive log** setting, off by default, as an optional key in the
   app's settings, and one function every later step asks before it does anything. See
   [the switch](README.md#the-switch).
 - **Touches**: the settings shape (an optional key, so no migration), one new file in
