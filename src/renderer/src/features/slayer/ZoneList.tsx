@@ -23,6 +23,7 @@ import {
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import MapIcon from '@mui/icons-material/Map'
+import { killsFor, type KillMap } from '@shared/kills'
 import type { PlanMob, PlanZone, ZoneOrder } from '@shared/slayer/slayerPlan'
 import type { ZoneListBundle } from './useSlayerController'
 
@@ -60,6 +61,36 @@ function CounterChips({
   )
 }
 
+/**
+ * How often the log saw this mob die, so a mob already worked for a counter reads differently from
+ * one never tried. The kills module's own count, archives included (shared/logArchive/mergeKills.ts).
+ */
+function Killed({ name, kills }: { name: string; kills: KillMap }): JSX.Element {
+  const k = killsFor(kills, name)
+  if (k === undefined || k.count === 0) {
+    return (
+      <Typography variant="caption" color="text.disabled" data-testid="slayer-mob-kills">
+        never killed
+      </Typography>
+    )
+  }
+  const last = new Date(k.lastTs).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+  return (
+    <Tooltip title={`Last killed ${last}`}>
+      <Typography variant="caption" sx={{ color: 'success.main' }} data-testid="slayer-mob-kills">
+        killed {String(k.count)}×
+      </Typography>
+    </Tooltip>
+  )
+}
+
+/** How many of a zone's listed mobs the log has seen die at least once. */
+function killedIn(zone: PlanZone, kills: KillMap): number {
+  let n = 0
+  for (const mob of zone.mobs) if ((killsFor(kills, mob.name)?.count ?? 0) > 0) n++
+  return n
+}
+
 function MobLine({ mob, bundle }: { mob: PlanMob; bundle: ZoneListBundle }): JSX.Element {
   const { onOpenMob, names } = bundle
   return (
@@ -94,6 +125,7 @@ function MobLine({ mob, bundle }: { mob: PlanMob; bundle: ZoneListBundle }): JSX
       <Typography variant="caption" color="text.secondary">
         {String(mob.spawns)} {mob.spawns === 1 ? 'spawn' : 'spawns'}
       </Typography>
+      <Killed name={mob.name} kills={bundle.kills} />
       {mob.basis === 'name' && <Chip size="small" label="est." sx={CHIP_SX} />}
       <CounterChips ids={mob.targets} names={names} />
     </Stack>
@@ -132,6 +164,9 @@ function ZoneRow({ zone, bundle }: { zone: PlanZone; bundle: ZoneListBundle }): 
             </Typography>
             <Typography variant="caption" color="text.secondary">
               {levelText(zone)}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" data-testid="slayer-zone-killed">
+              {String(killedIn(zone, bundle.kills))} of {String(zone.mobs.length)} killed before
             </Typography>
           </Stack>
           <Stack direction="row" spacing={0.5} alignItems="center" flexWrap="wrap" useFlexGap>

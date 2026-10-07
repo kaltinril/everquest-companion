@@ -10,6 +10,8 @@
 
 import { useCallback, useMemo, useState } from 'react'
 import type { CharacterSnap } from '@shared/characterTypes'
+import { killIndex, type KillMap } from '@shared/kills'
+import type { KillsSnap } from '@shared/types'
 import type { ZoneShort } from '@shared/maps'
 import {
   planZones,
@@ -76,6 +78,8 @@ export interface ZoneListBundle {
   onOrder: (order: ZoneOrder) => void
   onOpenZone: (zone: ZoneShort) => void
   onOpenMob?: (t: MobTarget) => void
+  /** every kill the log (and its archives) holds, by canonical mob name: how often each mob fell */
+  kills: KillMap
 }
 
 export interface SlayerController {
@@ -163,6 +167,8 @@ export function useSlayerController(props: SlayerViewProps): SlayerController {
     setOrder(next)
     savePref(ZONE_ORDER_KEY, next)
   }, [])
+  const killSnap = useModule<KillsSnap>('kills')
+  const kills = useMemo(() => killIndex(killSnap?.mobs ?? {}), [killSnap])
   const names = useMemo(
     () => new Map(all.rows.map((r) => [r.id, r.counter.achievement])),
     [all.rows]
@@ -204,6 +210,7 @@ export function useSlayerController(props: SlayerViewProps): SlayerController {
       onNoFactionHits,
       onOrder,
       onOpenZone,
+      kills,
       ...(onOpenMob === undefined ? {} : { onOpenMob })
     },
     everyZone: all.zones
