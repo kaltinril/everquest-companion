@@ -18,7 +18,12 @@ interface Row {
   sum: number
   /** Every priced offer's platinum per unit (since 2026-10-06). */
   prices?: number[]
+  /** Who said what, the day's first QUOTES_KEPT counted offers (since 2026-10-07). */
+  quotes?: unknown[]
 }
+
+/** The fold's own cap on a row's quotes (bazaar.rs `QUOTES_KEPT`). */
+const QUOTES_KEPT = 20
 
 interface Snap {
   rows: Row[]
@@ -41,6 +46,12 @@ function highest(a: number | null, b: number | null): number | null {
   return a === null ? b : b === null ? a : Math.max(a, b)
 }
 
+/** Both sides' quotes, the older first, when either has any (rows from before 2026-10-07 have none). */
+function quotesOf(had: Row, r: Row): Pick<Row, 'quotes'> {
+  if (had.quotes === undefined && r.quotes === undefined) return {}
+  return { quotes: [...(had.quotes ?? []), ...(r.quotes ?? [])].slice(0, QUOTES_KEPT) }
+}
+
 /** `older` then `newer`, a row on both sides added together; null when either is not a bazaar state. */
 export function mergeBazaar(older: unknown, newer: unknown): Snap | null {
   if (!isSnap(older) || !isSnap(newer)) return null
@@ -59,7 +70,8 @@ export function mergeBazaar(older: unknown, newer: unknown): Snap | null {
             min: lowest(had.min, r.min),
             max: highest(had.max, r.max),
             sum: had.sum + r.sum,
-            prices: [...pricesOf(had), ...pricesOf(r)]
+            prices: [...pricesOf(had), ...pricesOf(r)],
+            ...quotesOf(had, r)
           }
     )
   }
