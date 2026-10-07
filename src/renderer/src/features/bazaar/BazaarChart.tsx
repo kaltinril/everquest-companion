@@ -41,11 +41,14 @@ interface Geo {
   t1: number
 }
 
-function geometry(points: readonly BazaarPoint[], w: number): Geo {
-  const t0 = timeOf(points[0].day) - (points.length === 1 ? DAY : 0)
-  const t1 = timeOf(points[points.length - 1].day) + (points.length === 1 ? DAY : 0)
+function geometry(item: BazaarItem, endDay: string, w: number): Geo {
+  const { points } = item
+  const last = Math.max(timeOf(points[points.length - 1].day), timeOf(endDay))
+  const single = timeOf(points[0].day) === last
+  const t0 = timeOf(points[0].day) - (single ? DAY : 0)
+  const t1 = last + (single ? DAY : 0)
   const highs = points.map((p) => Math.max(p.sell.high ?? 0, p.buy.high ?? 0))
-  const top = niceMax(Math.max(...highs) * 1.05)
+  const top = niceMax(Math.max(...highs, item.askingPredicted ?? 0, item.offeredPredicted ?? 0) * 1.05)
   const pw = w - M.left - M.right
   const ph = H - M.top - M.bottom
   return {
@@ -74,6 +77,20 @@ function Series({ points, side, color, g, hover }: { points: readonly BazaarPoin
       {drawn.map((v) => (
         <circle key={v.day} cx={g.x(v.day)} cy={g.y(v.s.median ?? 0)} r={v.day === hover ? 6 : 4} fill={color} stroke={SURFACE} strokeWidth={2} />
       ))}
+    </g>
+  )
+}
+
+/** A dashed run from a direction's newest median to its predicted price on the log's newest day. */
+function Projection({ item, side, endDay, color, g }: { item: BazaarItem; side: 'sell' | 'buy'; endDay: string; color: string; g: Geo }): JSX.Element | null {
+  const pred = side === 'sell' ? item.askingPredicted : item.offeredPredicted
+  let from: BazaarPoint | undefined
+  for (const p of item.points) if (p[side].median !== null) from = p
+  if (pred === null || from === undefined) return null
+  return (
+    <g>
+      <line x1={g.x(from.day)} y1={g.y(from[side].median ?? 0)} x2={g.x(endDay)} y2={g.y(pred)} stroke={color} strokeWidth={2} strokeDasharray="4 4" opacity={0.8} />
+      <circle cx={g.x(endDay)} cy={g.y(pred)} r={5} fill={SURFACE} stroke={color} strokeWidth={2} />
     </g>
   )
 }
@@ -124,7 +141,7 @@ function Legend(): JSX.Element {
       {key(ASK_COLOR, 'Asking (selling)')}
       {key(OFFER_COLOR, 'Offered (buying)')}
       <Typography variant="caption" color="text.disabled">
-        Line: daily median. Band: that day&apos;s low to high.
+        Line: daily median. Band: that day&apos;s low to high. Dashed to the ring: predicted.
       </Typography>
     </Stack>
   )
@@ -164,11 +181,11 @@ function HoverCard({ hov, p, w }: { hov: Hover; p: BazaarPoint; w: number }): JS
   )
 }
 
-export function BazaarChart({ item }: { item: BazaarItem }): JSX.Element {
+export function BazaarChart({ item, endDay }: { item: BazaarItem; endDay: string }): JSX.Element {
   const box = useRef<HTMLDivElement>(null)
   const w = useWidth(box)
   const [hov, setHov] = useState<Hover | null>(null)
-  const g = geometry(item.points, w)
+  const g = geometry(item, endDay, w)
   const nearest = (px: number): BazaarPoint => {
     const t = g.t0 + ((px - M.left) / Math.max(1, w - M.left - M.right)) * (g.t1 - g.t0)
     let best = item.points[0]
@@ -185,6 +202,8 @@ export function BazaarChart({ item }: { item: BazaarItem }): JSX.Element {
           {hov !== null && <line x1={g.x(hov.day)} x2={g.x(hov.day)} y1={M.top} y2={H - M.bottom} stroke={AXIS_TEXT} strokeWidth={1} />}
           <Series points={item.points} side="buy" color={OFFER_COLOR} g={g} hover={hov?.day ?? null} />
           <Series points={item.points} side="sell" color={ASK_COLOR} g={g} hover={hov?.day ?? null} />
+          <Projection item={item} side="buy" endDay={endDay} color={OFFER_COLOR} g={g} />
+          <Projection item={item} side="sell" endDay={endDay} color={ASK_COLOR} g={g} />
           <rect
             x={M.left}
             y={M.top}

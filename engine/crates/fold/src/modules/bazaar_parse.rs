@@ -16,6 +16,9 @@
 //!   glued to the name (`Cloak6k`). `3k each: A | B` prices both; so does `A, B 150g each`.
 //! * a bare number (no `k`, `pp` or coin) is a price only right after the item, its tier or its
 //!   count, or before `each`: "only have 1" and "- buying 100 10lb meatpies" are counts.
+//! * "paying 4k" or "offering 4k" after several items prices each of them, as `each` does; as the
+//!   message's first word it is a buy, and a price before "for" prices what follows
+//!   ("paying 15k for fleeting quiver").
 //! * `+4` and `4+` are the upgrade tier; `x2`, `2x` and a bare count before the name are the
 //!   quantity, as is a count before "for" (`Bone Chips 1000 for 10k`).
 //! * a trade (WTT) is a barter: its numbers count the other thing, so it never carries a price.
@@ -242,9 +245,15 @@ impl<'a> Parser<'a> {
     }
 
     fn try_dir(&mut self, i: usize) -> Option<usize> {
-        let d = Dir::of(&self.t[i].n)?;
-        let acronym = self.t[i].n.starts_with("wt");
         let opens = i == 0 || self.t[..i].iter().all(|x| x.n.is_empty());
+        // "paying 15k for X" is a buy, but only as the opening word: after "WTB X." it is the price.
+        let paying = opens && matches!(self.t[i].n.as_str(), "paying" | "offering");
+        let d = if paying {
+            Dir::Buy
+        } else {
+            Dir::of(&self.t[i].n)?
+        };
+        let acronym = self.t[i].n.starts_with("wt");
         let after_sep = i > 0 && [",", ".", "|", "/"].contains(&self.t[i - 1].raw.as_str());
         if !(opens || acronym || after_sep) {
             return None;
@@ -323,29 +332,54 @@ impl<'a> Parser<'a> {
             return None;
         }
         self.fresh = true;
-        if bare && self.item_at(i + 1).is_some() {
-            self.pending_qty = self.t[i].raw.parse().ok();
+        if bare && self.try_count(i) {
             return Some(i + 1);
-        }
-        if bare && self.t.get(i + 1).is_some_and(|x| x.n == "for") {
-            if let Some(last) = self.last {
-                self.out[last].qty = self.t[i].raw.parse().ok();
-                return Some(i + 1);
-            }
         }
         let next = i + used;
         if dir != Dir::Trade {
-            self.apply_price(pp, next, dir);
+            self.apply_price(pp, i, dir);
         }
         Some(next)
     }
 
-    fn apply_price(&mut self, pp: f64, next: usize, dir: Dir) {
+    /// A bare number that counts rather than prices: before an item ("WTS 400 Fruit 30k"), or
+    /// before "for" and a price ("Bone Chips 1000 for 10k"); "250 for diamonds" is a price.
+    fn try_count(&mut self, i: usize) -> bool {
+        if self.item_at(i + 1).is_some() {
+            self.pending_qty = self.t[i].raw.parse().ok();
+            return true;
+        }
+        let for_price =
+            self.t.get(i + 1).is_some_and(|x| x.n == "for") && self.item_at(i + 2).is_none();
+        match (for_price, self.last) {
+            (true, Some(last)) => {
+                self.out[last].qty = self.t[i].raw.parse().ok();
+                true
+            }
+            _ => false,
+        }
+    }
+
+    /// The price starting at `at`: for the item before it, or with `each` after it or `paying`
+    /// before it, for every unpriced item before it ("A +5/B +5 paying 4k").
+    fn apply_price(&mut self, pp: f64, at: usize, dir: Dir) {
+        let (_, used) = price_at(&self.t, at).unwrap_or((pp, 1));
         let each = self
             .t
-            .get(next)
-            .is_some_and(|x| matches!(x.n.as_str(), "each" | "ea" | "per"));
+            .get(at + used)
+            .is_some_and(|x| matches!(x.n.as_str(), "each" | "ea" | "per"))
+            || (at > 0 && matches!(self.t[at - 1].n.as_str(), "paying" | "offering"));
+        // A price before "for" and an item prices that item, wherever it stands: "paying 15k for
+        // A", "400 plat for black sapphires and 250 for diamonds". "3k for both" stays with the
+        // item before it.
+        let for_item = self.t.get(at + used).is_some_and(|x| x.n == "for")
+            && self.item_at(at + used + 1).is_some();
+        if for_item {
+            self.lead_price = Some(pp);
+            return;
+        }
         let Some(last) = self.last else {
+            // A price before any item: "3k each: A | B".
             if each {
                 self.lead_price = Some(pp);
             }
