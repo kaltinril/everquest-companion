@@ -16,6 +16,8 @@ interface Row {
   min: number | null
   max: number | null
   sum: number
+  /** Every priced offer's platinum per unit (since 2026-10-06). */
+  prices?: number[]
 }
 
 interface Snap {
@@ -27,6 +29,9 @@ function isSnap(x: unknown): x is Snap {
 }
 
 const keyOf = (r: Row): string => `${r.day}|${r.dir}|${r.item}|${r.tier}`
+
+/** A row's prices; a row from before the list stands for its average, `n` times. */
+const pricesOf = (r: Row): number[] => r.prices ?? (r.n > 0 ? Array<number>(r.n).fill(r.sum / r.n) : [])
 
 function lowest(a: number | null, b: number | null): number | null {
   return a === null ? b : b === null ? a : Math.min(a, b)
@@ -53,7 +58,8 @@ export function mergeBazaar(older: unknown, newer: unknown): Snap | null {
             unpriced: had.unpriced + r.unpriced,
             min: lowest(had.min, r.min),
             max: highest(had.max, r.max),
-            sum: had.sum + r.sum
+            sum: had.sum + r.sum,
+            prices: [...pricesOf(had), ...pricesOf(r)]
           }
     )
   }
