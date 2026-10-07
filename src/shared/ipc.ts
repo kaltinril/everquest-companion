@@ -907,6 +907,9 @@ export const IPC = {
   // ways, normalized at the handler; returns what was stored.
   bazaarWatchGet: 'bazaarWatch:get',
   bazaarWatchSet: 'bazaarWatch:set',
+  // renderer -> main: save the Bazaar's offers as a CSV through a save dialog. Returns the path,
+  // or null when the player cancelled.
+  bazaarSaveCsv: 'bazaar:saveCsv',
   // renderer -> main: "that sighting WAS the spawn — start this row's clock from it" (owner
   // ruling, prototype round 3). The app never does this on its own: a sighting proves the mob is
   // up and says nothing about when it spawned, so re-basing a clock is a judgement and needs a

@@ -260,7 +260,25 @@ fn the_module_keeps_one_row_per_day_item_tier_and_direction() {
     {
         m.on_event(&line(seq as i64 + 1, raw), false);
     }
-    let rows = m.snapshot()["state"]["rows"].clone();
+    let mut rows = m.snapshot()["state"]["rows"].clone();
+    // Who said what, once per counted offer, with the time of day.
+    let quotes: Vec<serde_json::Value> = rows
+        .as_array_mut()
+        .expect("rows")
+        .iter_mut()
+        .map(|r| {
+            r.as_object_mut()
+                .and_then(|o| o.remove("quotes"))
+                .expect("quotes")
+        })
+        .collect();
+    assert_eq!(
+        quotes[0],
+        json!([
+            { "at": "17:54:48", "who": "Leric", "price": 20000.0, "msg": "WTS Fleeting Quiver 20k" },
+            { "at": "18:10:00", "who": "Aaron", "price": 18000.0, "msg": "WTS Fleeting Quiver 18k" }
+        ])
+    );
     assert_eq!(
         rows,
         json!([

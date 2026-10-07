@@ -97,6 +97,12 @@ export function findWatch(list: BazaarWatchlist, item: string, tier: number): Ba
   return on.find((w) => w.tier === tier) ?? on.find((w) => w.tier === null) ?? null
 }
 
+/** Any watch on this item, its tier's or not: the row's chip, when a row stands for every tier. */
+export function watchOnItem(list: BazaarWatchlist, item: string): BazaarWatch | null {
+  const lower = item.toLowerCase()
+  return list.entries.find((w) => w.item.toLowerCase() === lower) ?? null
+}
+
 /** The list with `w` in place of the watch on the same item and tier, or added. */
 export function setWatch(list: BazaarWatchlist, w: BazaarWatch): BazaarWatchlist {
   const k = watchKey(w.item, w.tier)

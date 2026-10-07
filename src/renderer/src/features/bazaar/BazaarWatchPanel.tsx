@@ -3,7 +3,7 @@
 
 import { type JSX, useEffect, useState } from 'react'
 import { Checkbox, FormControlLabel, Stack, Switch, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
-import { findWatch, type BazaarWatch, type WatchStatus } from '@shared/bazaarWatch'
+import { findWatch, watchOnItem, type BazaarWatch, type WatchStatus } from '@shared/bazaarWatch'
 import { formatPlat, type BazaarItem } from '@shared/bazaar'
 import { useBazaarWatch } from './useBazaarWatch'
 
@@ -68,13 +68,16 @@ function Thresholds({ w, put }: { w: BazaarWatch; put: (w: BazaarWatch) => void 
 
 export default function BazaarWatchPanel({ item }: { item: BazaarItem }): JSX.Element {
   const { list, put, remove } = useBazaarWatch()
-  const w = findWatch(list, item.item, item.tier)
+  // A combined row stands for every tier, so its watch is any on the item, and a new one is every tier.
+  const combined = item.combined !== undefined
+  const w = combined ? watchOnItem(list, item.item) : findWatch(list, item.item, item.tier)
+  const tier = combined ? null : item.tier
   const pick = (status: WatchStatus | 'none'): void => {
     if (status === 'none') {
       if (w !== null) remove(w.item, w.tier)
       return
     }
-    put(w === null ? { item: item.item, tier: item.tier, status, alert: status !== 'watch', price: null, medianShare: null } : { ...w, status, alert: status !== 'watch' && w.alert, medianShare: status === 'buy' ? w.medianShare : null })
+    put(w === null ? { item: item.item, tier, status, alert: status !== 'watch', price: null, medianShare: null } : { ...w, status, alert: status !== 'watch' && w.alert, medianShare: status === 'buy' ? w.medianShare : null })
   }
   return (
     <Stack spacing={1} data-testid="bazaar-watch">
@@ -88,7 +91,7 @@ export default function BazaarWatchPanel({ item }: { item: BazaarItem }): JSX.El
           <ToggleButton value="sell">Want to sell</ToggleButton>
           <ToggleButton value="watch">Watching</ToggleButton>
         </ToggleButtonGroup>
-        {w !== null && (
+        {w !== null && !combined && (
           <FormControlLabel
             control={
               <Checkbox

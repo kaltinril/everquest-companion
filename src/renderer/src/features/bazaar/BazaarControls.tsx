@@ -1,8 +1,9 @@
 // BazaarControls — the Bazaar tab's toolbar: search, direction, which items to show (all, the wish
-// list, the watchlist or one of its statuses), and Popular with its price floor.
+// list, the watchlist or one of its statuses), Popular with its price floor, whether items the
+// wiki marks No Drop or No Trade show at all, and the offers list with its CSV export.
 
 import { type JSX } from 'react'
-import { MenuItem, Stack, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { Button, FormControlLabel, MenuItem, Stack, Switch, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material'
 import type { BazaarDir } from '@shared/bazaar'
 import { WATCH_STATUS_LABEL, type WatchStatus } from '@shared/bazaarWatch'
 
@@ -30,14 +31,22 @@ export interface BazaarControlState {
   show: BazaarShow
   popular: boolean
   minPrice: number
+  /** Leave out items the wiki marks No Drop or No Trade: chat sometimes offers what cannot trade. */
+  hideNoTrade: boolean
+  /** Show every offer as said, in a list, instead of only the per-item summary. */
+  offers: boolean
+  /** One row per item, every tier read as +0 (shared/bazaarTiers.ts). */
+  combineTiers: boolean
 }
 
 export default function BazaarControls({
   state,
-  set
+  set,
+  onExport
 }: {
   state: BazaarControlState
   set: (patch: Partial<BazaarControlState>) => void
+  onExport: () => void
 }): JSX.Element {
   return (
     <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" useFlexGap>
@@ -94,6 +103,22 @@ export default function BazaarControls({
           </MenuItem>
         ))}
       </TextField>
+      <FormControlLabel
+        control={<Switch size="small" checked={state.combineTiers} onChange={(_e, on) => set({ combineTiers: on })} data-testid="bazaar-combine-tiers" />}
+        label="All tiers as one"
+        title="One row per item: every tier's price read as its +0, by how much a tier adds for that item"
+      />
+      <FormControlLabel
+        control={<Switch size="small" checked={state.hideNoTrade} onChange={(_e, on) => set({ hideNoTrade: on })} data-testid="bazaar-hide-notrade" />}
+        label="Hide No Drop"
+        title="Leave out items the wiki marks No Drop or No Trade"
+      />
+      <ToggleButton size="small" value="offers" selected={state.offers} onChange={() => set({ offers: !state.offers })} data-testid="bazaar-offers-toggle">
+        Offers list
+      </ToggleButton>
+      <Button size="small" variant="outlined" onClick={onExport} data-testid="bazaar-export">
+        Export CSV
+      </Button>
     </Stack>
   )
 }

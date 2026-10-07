@@ -38,7 +38,26 @@ pub struct BazaarRow {
     sum: f64,
     /// Every priced offer's platinum per unit, in log order, for medians and outliers.
     prices: Vec<f64>,
+    /// Who said it and what they said, the first QUOTES_KEPT counted offers of the day.
+    quotes: Vec<Quote>,
 }
+
+/// One counted offer as it was said: the "who's offering" list.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Quote {
+    /// The log's time of day, `17:54:48`.
+    at: String,
+    who: String,
+    /// Platinum per unit, when the offer stated a price.
+    price: Option<f64>,
+    /// The whole chat message, cut at QUOTE_CHARS.
+    msg: String,
+}
+
+/// Quotes kept per row: a day of one item is rarely more, and the snapshot stays small.
+const QUOTES_KEPT: usize = 20;
+const QUOTE_CHARS: usize = 200;
 
 /// One offer heard live, newest last: what a watch alert is raised from.
 #[derive(Debug, Clone, Serialize)]
@@ -119,6 +138,14 @@ impl BazaarModule {
                 ..BazaarRow::default()
             });
             add(row, unit);
+            if row.quotes.len() < QUOTES_KEPT {
+                row.quotes.push(Quote {
+                    at: time_of(raw).unwrap_or_default(),
+                    who: speaker.to_string(),
+                    price: unit,
+                    msg: msg.chars().take(QUOTE_CHARS).collect(),
+                });
+            }
             changed = true;
         }
         changed
@@ -166,10 +193,19 @@ fn chat_of(text: &str) -> Option<(&str, &str)> {
     Some((c.get(1)?.as_str(), c.get(2)?.as_str()))
 }
 
+/// `[Wed Sep 23 17:54:48 2026] …` → `17:54:48`.
+fn time_of(raw: &str) -> Option<String> {
+    Some(
+        raw.strip_prefix('[')?
+            .split_whitespace()
+            .nth(3)?
+            .to_string(),
+    )
+}
+
 /// `[Wed Sep 23 17:54:48 2026] …` → `2026-09-23 17:54:48`.
 fn stamp_of(raw: &str) -> Option<String> {
-    let time = raw.strip_prefix('[')?.split_whitespace().nth(3)?;
-    Some(format!("{} {time}", day_of(raw)?))
+    Some(format!("{} {}", day_of(raw)?, time_of(raw)?))
 }
 
 /// `[Wed Sep 23 17:54:48 2026] …` → `2026-09-23`.
