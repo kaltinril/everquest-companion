@@ -8,7 +8,6 @@
 import { type JSX, useMemo, useState } from 'react'
 import {
   Box,
-  MenuItem,
   Paper,
   Stack,
   Table,
@@ -16,6 +15,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  TableSortLabel,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
@@ -30,18 +30,49 @@ import {
   type BazaarDir,
   type BazaarItem,
   type BazaarSnap,
-  type BazaarSort
+  type BazaarSort,
+  type BazaarSortKey
 } from '@shared/bazaar'
 import { useModule } from '../../lib/useModule'
 import { ASK_COLOR, BazaarChart, BazaarSparkline, OFFER_COLOR } from './BazaarChart'
 
 const SPARK_DAYS = 30
-const SORTS: { value: BazaarSort; label: string }[] = [
-  { value: 'recent', label: 'Most recent' },
-  { value: 'offers', label: 'Most offers' },
-  { value: 'price', label: 'Highest price' },
-  { value: 'move', label: 'Biggest move' }
+/** The list's columns, each sortable; numbers sort biggest first on the first click. */
+const COLUMNS: { key: BazaarSortKey; label: string; right: boolean }[] = [
+  { key: 'item', label: 'Item', right: false },
+  { key: 'trend', label: `Last ${SPARK_DAYS} days`, right: false },
+  { key: 'asking', label: 'Asking', right: true },
+  { key: 'askingAvg', label: 'Avg 7 days', right: true },
+  { key: 'askingPredicted', label: 'Predicted', right: true },
+  { key: 'move', label: 'Change', right: true },
+  { key: 'offered', label: 'Offered', right: true },
+  { key: 'offers', label: 'Offers', right: true },
+  { key: 'lastDay', label: 'Last seen', right: true }
 ]
+
+function SortHead({ sort, onSort }: { sort: BazaarSort; onSort: (s: BazaarSort) => void }): JSX.Element {
+  return (
+    <TableHead>
+      <TableRow>
+        {COLUMNS.map((c) => {
+          const on = sort.key === c.key
+          return (
+            <TableCell key={c.key} align={c.right ? 'right' : 'left'} sortDirection={on ? (sort.desc ? 'desc' : 'asc') : false}>
+              <TableSortLabel
+                active={on}
+                direction={on && !sort.desc ? 'asc' : 'desc'}
+                onClick={() => onSort({ key: c.key, desc: on ? !sort.desc : c.key !== 'item' })}
+                data-testid={`bazaar-sort-${c.key}`}
+              >
+                {c.label}
+              </TableSortLabel>
+            </TableCell>
+          )
+        })}
+      </TableRow>
+    </TableHead>
+  )
+}
 
 const nameOf = (i: BazaarItem): string => `${i.item}${i.tier > 0 ? ` +${i.tier}` : ''}`
 
@@ -184,8 +215,6 @@ function Controls(props: {
   setText: (v: string) => void
   dir: BazaarDir | 'all'
   setDir: (v: BazaarDir | 'all') => void
-  sort: BazaarSort
-  setSort: (v: BazaarSort) => void
 }): JSX.Element {
   return (
     <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" useFlexGap>
@@ -202,13 +231,6 @@ function Controls(props: {
         <ToggleButton value="buy">Buying</ToggleButton>
         <ToggleButton value="trade">Trading</ToggleButton>
       </ToggleButtonGroup>
-      <TextField select size="small" label="Sort" value={props.sort} onChange={(ev) => props.setSort(ev.target.value as BazaarSort)} sx={{ minWidth: 160 }}>
-        {SORTS.map((s) => (
-          <MenuItem key={s.value} value={s.value}>
-            {s.label}
-          </MenuItem>
-        ))}
-      </TextField>
     </Stack>
   )
 }
@@ -217,7 +239,7 @@ export default function BazaarView(): JSX.Element {
   const snap = useModule<BazaarSnap>(BAZAAR_MODULE_ID)
   const [text, setText] = useState('')
   const [dir, setDir] = useState<BazaarDir | 'all'>('all')
-  const [sort, setSort] = useState<BazaarSort>('recent')
+  const [sort, setSort] = useState<BazaarSort>({ key: 'lastDay', desc: true })
   const [pick, setPick] = useState<string | null>(null)
   const sum = useMemo(() => summarizeBazaar(snap, { text, dir, sort }), [snap, text, dir, sort])
   const picked = sum.items.find((i) => i.key === pick) ?? sum.items.at(0) ?? null
@@ -229,7 +251,7 @@ export default function BazaarView(): JSX.Element {
         {sum.days > 0 ? `: ${sum.offers} offers over ${sum.days} days` : ''}. Prices are daily medians; a
         seller repeating an offer in a day counts once.
       </Typography>
-      <Controls text={text} setText={setText} dir={dir} setDir={setDir} sort={sort} setSort={setSort} />
+      <Controls text={text} setText={setText} dir={dir} setDir={setDir} />
       {snap === null ? (
         <Typography variant="body2">Reading your log…</Typography>
       ) : picked === null || sum.lastDay === null ? (
@@ -239,19 +261,7 @@ export default function BazaarView(): JSX.Element {
           <Detail item={picked} endDay={sum.lastDay} />
           <Box sx={{ overflowX: 'auto' }}>
             <Table size="small" stickyHeader>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Item</TableCell>
-                  <TableCell>Last {SPARK_DAYS} days</TableCell>
-                  <TableCell align="right">Asking</TableCell>
-                  <TableCell align="right">Avg 7 days</TableCell>
-                  <TableCell align="right">Predicted</TableCell>
-                  <TableCell align="right">Change</TableCell>
-                  <TableCell align="right">Offered</TableCell>
-                  <TableCell align="right">Offers</TableCell>
-                  <TableCell align="right">Last seen</TableCell>
-                </TableRow>
-              </TableHead>
+              <SortHead sort={sort} onSort={setSort} />
               <TableBody>
                 {sum.items.map((i) => (
                   <ItemRow key={i.key} item={i} endDay={sum.lastDay ?? i.lastDay} picked={i.key === picked.key} onPick={() => setPick(i.key)} />

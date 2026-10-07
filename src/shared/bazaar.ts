@@ -76,11 +76,19 @@ export interface BazaarItem {
   buyOffers: number
   trades: number
   outliers: number
+  /** Days with any offer in the TREND_DAYS ending on the log's newest day: what the trend column sorts by. */
+  activeDays: number
   /** Every day with any offer, oldest first. */
   points: BazaarPoint[]
 }
 
-export type BazaarSort = 'recent' | 'offers' | 'price' | 'move'
+/** A column of the tab's list; every one sorts. */
+export type BazaarSortKey = 'item' | 'trend' | 'asking' | 'askingAvg' | 'askingPredicted' | 'move' | 'offered' | 'offers' | 'lastDay'
+
+export interface BazaarSort {
+  key: BazaarSortKey
+  desc: boolean
+}
 
 export interface BazaarQuery {
   /** Part of an item name, any case. */
@@ -101,6 +109,7 @@ export interface BazaarSummary {
 
 const OUTLIER = 4
 const RECENT = 3
+export const TREND_DAYS = 30
 
 export function median(xs: readonly number[]): number | null {
   if (xs.length === 0) return null
@@ -188,21 +197,38 @@ function itemOf(key: string, rows: readonly BazaarRow[], endDay: string): Bazaar
     buyOffers: counted('buy'),
     trades: points.reduce((s, p) => s + p.trades, 0),
     outliers: pricesIn('sell').length + pricesIn('buy').length - kept,
+    activeDays: endDay === '' ? 0 : days.filter((d) => (Date.parse(endDay) - Date.parse(d)) / 86_400_000 < TREND_DAYS).length,
     points
   }
 }
 
+/** Each column's value; null sorts last whichever way the column is turned. */
+const COLUMN: Record<BazaarSortKey, (x: BazaarItem) => number | string | null> = {
+  item: (x) => `${x.item.toLowerCase()} ${String(x.tier).padStart(2, '0')}`,
+  trend: (x) => x.activeDays,
+  asking: (x) => x.asking,
+  askingAvg: (x) => x.askingAvg,
+  askingPredicted: (x) => x.askingPredicted,
+  move: (x) => x.askingMove,
+  offered: (x) => x.offered,
+  offers: (x) => x.sellOffers + x.buyOffers + x.trades,
+  lastDay: (x) => x.lastDay
+}
+
+function byValue(a: number | string, b: number | string): number {
+  return typeof a === 'number' && typeof b === 'number' ? a - b : String(a).localeCompare(String(b))
+}
+
 function compare(sort: BazaarSort): (a: BazaarItem, b: BazaarItem) => number {
-  const offers = (x: BazaarItem): number => x.sellOffers + x.buyOffers + x.trades
-  const price = (x: BazaarItem): number => x.asking ?? x.offered ?? -1
-  const move = (x: BazaarItem): number => Math.abs(x.askingMove ?? -1)
-  const primary: Record<BazaarSort, (a: BazaarItem, b: BazaarItem) => number> = {
-    recent: (a, b) => b.lastDay.localeCompare(a.lastDay) || offers(b) - offers(a),
-    offers: (a, b) => offers(b) - offers(a),
-    price: (a, b) => price(b) - price(a),
-    move: (a, b) => move(b) - move(a)
+  const value = COLUMN[sort.key]
+  return (a, b) => {
+    const va = value(a)
+    const vb = value(b)
+    const nulls = (va === null ? 1 : 0) - (vb === null ? 1 : 0)
+    if (nulls !== 0) return nulls
+    const c = va === null || vb === null ? 0 : byValue(va, vb)
+    return (sort.desc ? -c : c) || b.lastDay.localeCompare(a.lastDay) || a.item.localeCompare(b.item) || a.tier - b.tier
   }
-  return (a, b) => primary[sort](a, b) || a.item.localeCompare(b.item) || a.tier - b.tier
 }
 
 function matches(rows: readonly BazaarRow[], q: BazaarQuery, text: string): boolean {
