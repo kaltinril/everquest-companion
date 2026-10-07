@@ -97,5 +97,8 @@ export const plannerApi = {
   /** The Bazaar watchlist (shared/bazaarWatch.ts), app-wide; the set returns what was stored. */
   getBazaarWatch: (): Promise<BazaarWatchlist> => ipcRenderer.invoke(IPC.bazaarWatchGet),
 
-  setBazaarWatch: (list: BazaarWatchlist): Promise<BazaarWatchlist> => ipcRenderer.invoke(IPC.bazaarWatchSet, list)
+  setBazaarWatch: (list: BazaarWatchlist): Promise<BazaarWatchlist> => ipcRenderer.invoke(IPC.bazaarWatchSet, list),
+
+  /** Save the Bazaar's offers as a CSV through a save dialog; the path, or null if cancelled. */
+  saveBazaarCsv: (text: string, name: string): Promise<string | null> => ipcRenderer.invoke(IPC.bazaarSaveCsv, text, name)
 }

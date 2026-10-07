@@ -1,4 +1,6 @@
-// useItemIcons — each Bazaar item's icon id, for the icon beside its name (the Gear tab's look).
+// useItemFacts — what the Bazaar needs to know about each item: its icon (the Gear tab's look) and
+// whether the wiki marks it No Drop or No Trade, which a "Hide No Drop" switch filters on, since
+// trade chat sometimes offers what cannot be traded.
 //
 // Asked once per name through `lookupItem`, which answers from the item database first; every
 // name the Bazaar shows IS a database name (the parser only reads those), so no page is fetched.
@@ -6,7 +8,14 @@
 
 import { useEffect, useSyncExternalStore } from 'react'
 
-const icons = new Map<string, number | null>()
+export interface ItemFacts {
+  iconId?: number
+  /** The wiki's No Drop, No Trade or NODROP flag. */
+  noTrade: boolean
+}
+
+const NO_TRADE = new Set(['no drop', 'no trade', 'nodrop'])
+const facts = new Map<string, ItemFacts | null>()
 let version = 0
 const listeners = new Set<() => void>()
 
@@ -17,24 +26,31 @@ function subscribe(l: () => void): () => void {
   }
 }
 
-function settle(name: string, iconId: number | null): void {
-  icons.set(name, iconId)
-  version++
-  for (const l of listeners) l()
+let flush: ReturnType<typeof setTimeout> | null = null
+
+/** Answers land a few hundred at once on the first open; readers hear of them in one batch. */
+function settle(name: string, f: ItemFacts): void {
+  facts.set(name, f)
+  flush ??= setTimeout(() => {
+    flush = null
+    version++
+    for (const l of listeners) l()
+  }, 100)
 }
 
-/** The icon id for each of `names` once known; undefined while asked or when there is none. */
-export function useItemIcons(names: readonly string[]): (name: string) => number | undefined {
-  useSyncExternalStore(subscribe, () => version)
+/** Each of `names`' facts once known; undefined while asked. */
+export function useItemFacts(names: readonly string[]): (name: string) => ItemFacts | undefined {
+  const v = useSyncExternalStore(subscribe, () => version)
   useEffect(() => {
     for (const name of names) {
-      if (icons.has(name)) continue
-      icons.set(name, null)
+      if (facts.has(name)) continue
+      facts.set(name, null)
       window.eq.lookupItem(name).then(
-        (k) => settle(name, k.iconId ?? null),
+        (k) => settle(name, { iconId: k.iconId, noTrade: (k.stats?.flags ?? []).some((f) => NO_TRADE.has(f.toLowerCase())) }),
         () => undefined
       )
     }
   }, [names])
-  return (name) => icons.get(name) ?? undefined
+  // `v` ties the reader to the store's version, so a settled lookup re-renders its readers.
+  return v >= 0 ? (name) => facts.get(name) ?? undefined : () => undefined
 }

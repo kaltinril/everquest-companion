@@ -12,6 +12,7 @@
 // there are at least three to judge by.
 
 import { averageNow, predictNow } from './bazaarForecast'
+import { asBaseTier, tierRate, type BaseTierRow } from './bazaarTiers'
 
 export const BAZAAR_MODULE_ID = 'bazaar'
 
@@ -33,6 +34,26 @@ export interface BazaarRow {
   sum: number
   /** Every priced offer, platinum per unit. Absent in rows from before 2026-10-06. */
   prices?: number[]
+  /** Who said it and what they said, the day's first 20 counted offers. Absent before 2026-10-07. */
+  quotes?: Quote[]
+}
+
+/** One counted offer as it was said. */
+export interface Quote {
+  /** The log's time of day, `17:54:48`. */
+  at: string
+  who: string
+  /** Platinum per unit; null when the offer stated none. */
+  price: number | null
+  msg: string
+}
+
+/** A quote with its day, direction, item and tier: the who's-offering list and the CSV. */
+export interface DayQuote extends Quote {
+  day: string
+  dir: BazaarDir
+  item: string
+  tier: number
 }
 
 /** One offer heard live (bazaar.rs `LiveOffer`): what the watch alerts read. */
@@ -63,6 +84,8 @@ export interface BazaarSide {
   /** Priced offers counted. */
   n: number
   unpriced: number
+  /** That day's offers as said, for the chart's hover. */
+  quotes: Quote[]
 }
 
 export interface BazaarPoint {
@@ -100,6 +123,26 @@ export interface BazaarItem {
   volume: number | null
   /** Every day with any offer, oldest first. */
   points: BazaarPoint[]
+  /** The offers as said, newest first. */
+  quotes: DayQuote[]
+  /** With "All tiers as one": every tier read as +0 (shared/bazaarTiers.ts), and each tier's own line. */
+  combined?: CombinedTiers
+}
+
+/** One tier of a combined item: what it was asked and offered at, and what the estimate says. */
+export interface TierLine {
+  tier: number
+  asking: number | null
+  offered: number | null
+  offers: number
+  /** The combined +0 asking price grown by the item's tier rate. */
+  estimate: number | null
+}
+
+export interface CombinedTiers {
+  /** How much one tier adds, as a factor (1.22 = 22% a tier). */
+  rate: number
+  tiers: TierLine[]
 }
 
 /** A column of the tab's list; every one sorts. */
@@ -130,6 +173,8 @@ export interface BazaarQuery {
   keep?: (item: string, tier: number) => boolean
   /** Keep only items whose price now (asking, else offered) is at least this, in platinum. */
   minPrice?: number
+  /** One entry per item, every tier read as +0 (shared/bazaarTiers.ts). */
+  combineTiers?: boolean
 }
 
 export interface BazaarSummary {
@@ -158,7 +203,7 @@ function pricesOf(r: BazaarRow): number[] {
   return r.n > 0 ? Array<number>(r.n).fill(r.sum / r.n) : []
 }
 
-const EMPTY: BazaarSide = { median: null, mean: null, low: null, high: null, n: 0, unpriced: 0 }
+const EMPTY: BazaarSide = { median: null, mean: null, low: null, high: null, n: 0, unpriced: 0, quotes: [] }
 
 function sideOf(rows: readonly BazaarRow[], keep: (p: number) => boolean): BazaarSide {
   const ps = rows.flatMap(pricesOf).filter(keep)
@@ -168,7 +213,8 @@ function sideOf(rows: readonly BazaarRow[], keep: (p: number) => boolean): Bazaa
     low: ps.length > 0 ? Math.min(...ps) : null,
     high: ps.length > 0 ? Math.max(...ps) : null,
     n: ps.length,
-    unpriced: rows.reduce((s, r) => s + r.unpriced, 0)
+    unpriced: rows.reduce((s, r) => s + r.unpriced, 0),
+    quotes: rows.flatMap((r) => r.quotes ?? [])
   }
 }
 
@@ -236,8 +282,35 @@ function itemOf(key: string, rows: readonly BazaarRow[], endDay: string): Bazaar
     outliers: pricesIn('sell').length + pricesIn('buy').length - kept,
     activeDays: recent.length,
     volume: ref === null ? null : ref * recentOffers,
+    quotes: quotesOf(rows),
     points
   }
+}
+
+export const newestFirst = (a: DayQuote, b: DayQuote): number => `${b.day} ${b.at}`.localeCompare(`${a.day} ${a.at}`)
+
+/** Every quote of these rows, newest first. */
+function quotesOf(rows: readonly BazaarRow[]): DayQuote[] {
+  return rows
+    .flatMap((r) => (r.quotes ?? []).map((q) => ({ ...q, day: r.day, dir: r.dir, item: r.item, tier: (r as Partial<BaseTierRow>).fromTier ?? r.tier })))
+    .sort(newestFirst)
+}
+
+/** Every tier of one item as one entry priced as its +0, with each tier's own line beside the estimate. */
+function combinedOf(key: string, rows: readonly BazaarRow[], endDay: string): BazaarItem {
+  const rate = tierRate(rows)
+  const x = itemOf(key, asBaseTier(rows, rate), endDay)
+  const tiers = [...new Set(rows.map((r) => r.tier))].sort((a, b) => a - b).map((tier): TierLine => {
+    const t = itemOf(`${key}|${tier}`, rows.filter((r) => r.tier === tier), endDay)
+    return {
+      tier,
+      asking: t.asking,
+      offered: t.offered,
+      offers: t.sellOffers + t.buyOffers + t.trades,
+      estimate: x.asking === null ? null : x.asking * rate ** tier
+    }
+  })
+  return { ...x, combined: { rate, tiers } }
 }
 
 /** Each column's value; null sorts last whichever way the column is turned. */
@@ -272,7 +345,8 @@ function compare(sort: BazaarSort): (a: BazaarItem, b: BazaarItem) => number {
 
 function matches(rows: readonly BazaarRow[], q: BazaarQuery, text: string): boolean {
   if (text !== '' && !rows[0].item.toLowerCase().includes(text)) return false
-  if (q.keep !== undefined && !q.keep(rows[0].item, rows[0].tier)) return false
+  const keep = q.keep
+  if (keep !== undefined && !rows.some((r) => keep(r.item, r.tier))) return false
   return q.dir === 'all' || rows.some((r) => r.dir === q.dir)
 }
 
@@ -287,7 +361,7 @@ export function summarizeBazaar(snap: BazaarSnap | null, q: BazaarQuery): Bazaar
   const rows = snap?.rows ?? []
   const groups = new Map<string, BazaarRow[]>()
   for (const r of rows) {
-    const key = `${r.item}|${r.tier}`
+    const key = q.combineTiers === true ? r.item : `${r.item}|${r.tier}`
     const g = groups.get(key)
     if (g === undefined) groups.set(key, [r])
     else g.push(r)
@@ -297,7 +371,7 @@ export function summarizeBazaar(snap: BazaarSnap | null, q: BazaarQuery): Bazaar
   const endDay = days.length > 0 ? days[days.length - 1] : ''
   const items = [...groups]
     .filter(([, g]) => matches(g, q, text))
-    .map(([key, g]) => itemOf(key, g, endDay))
+    .map(([key, g]) => (q.combineTiers === true ? combinedOf(key, g, endDay) : itemOf(key, g, endDay)))
     .filter((x) => pricedEnough(x, q.minPrice))
     .sort(compare(q.sort))
   return {

@@ -1,14 +1,17 @@
 // THE BAZAAR TAB — what players asked and offered for items in trade chat (owner ask, 2026-10-06).
 //
 // On top, the picked item: its asking and offered prices now, how far asking has moved, its range,
-// and a chart of both by day. Below, every item and tier with a 30-day trend, newest first or in
-// the picked order; clicking one picks it. Every number is a median with outliers left out
+// a chart of both by day (hover a day for who said what), and who is offering. Below, every item
+// and tier with a 30-day trend, newest first or in the picked order; clicking one picks it. "All
+// tiers as one" makes it one row per item, every tier read as +0 (shared/bazaarTiers.ts). The
+// Offers list shows every offer as said, and Export CSV saves them for Excel. Every number is a median with outliers left out
 // (shared/bazaar.ts). What the parser reads is stated in engine/crates/fold/src/modules/bazaar_parse.rs.
 
 import { type JSX, useMemo, useState } from 'react'
 import { Box, Chip, Paper, Stack, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Typography } from '@mui/material'
 import { itemTierKey } from '@shared/itemStats'
-import { findWatch, type BazaarWatch, type BazaarWatchlist } from '@shared/bazaarWatch'
+import { findWatch, watchOnItem, type BazaarWatch, type BazaarWatchlist } from '@shared/bazaarWatch'
+import { offersCsv, offersOf } from '@shared/bazaarCsv'
 import {
   BAZAAR_MODULE_ID,
   formatMove,
@@ -25,10 +28,12 @@ import { itemIconUrl } from '../../lib/ItemWindow'
 import { useWishlist } from '../wishlist/useWishlist'
 import { ASK_COLOR, BazaarChart, BazaarSparkline, OFFER_COLOR } from './BazaarChart'
 import BazaarControls, { type BazaarControlState, type BazaarShow } from './BazaarControls'
+import BazaarQuotes from './BazaarQuotes'
+import BazaarTierTable from './BazaarTierTable'
 import BazaarWatchPanel from './BazaarWatchPanel'
 import { useHeardAlerts } from './BazaarWatcher'
 import { useBazaarWatch } from './useBazaarWatch'
-import { useItemIcons } from './useItemIcons'
+import { useItemFacts, type ItemFacts } from './useItemFacts'
 
 const SPARK_DAYS = 30
 /** The list's columns, each sortable; numbers sort biggest first on the first click. */
@@ -69,7 +74,7 @@ function SortHead({ sort, onSort }: { sort: BazaarSort; onSort: (s: BazaarSort) 
   )
 }
 
-const nameOf = (i: BazaarItem): string => `${i.item}${i.tier > 0 ? ` +${i.tier}` : ''}`
+const nameOf = (i: BazaarItem): string => (i.combined !== undefined ? i.item : `${i.item}${i.tier > 0 ? ` +${i.tier}` : ''}`)
 
 /** A move up or down, in the status words rather than color alone. */
 function Move({ f }: { f: number | null }): JSX.Element | null {
@@ -155,7 +160,7 @@ function Detail({ item, endDay }: { item: BazaarItem; endDay: string }): JSX.Ele
         <Stack direction="row" alignItems="baseline" spacing={1.5} flexWrap="wrap">
           <Typography variant="h6">{nameOf(item)}</Typography>
           <Typography variant="body2" color="text.secondary">
-            last seen {item.lastDay}
+            {item.combined !== undefined ? 'all tiers, priced as +0 · ' : ''}last seen {item.lastDay}
           </Typography>
         </Stack>
         <Stack direction="row" spacing={4} flexWrap="wrap" useFlexGap>
@@ -167,8 +172,10 @@ function Detail({ item, endDay }: { item: BazaarItem; endDay: string }): JSX.Ele
             </Typography>
           </Tile>
         </Stack>
+        {item.combined !== undefined && <BazaarTierTable c={item.combined} />}
         <BazaarWatchPanel item={item} />
         <BazaarChart item={item} endDay={endDay} />
+        <BazaarQuotes quotes={item.quotes} title="Who's offering (newest first)" />
         <Typography variant="caption" color="text.disabled">
           Predicted: a trend through the last ten priced days, newer and busier days counting more,
           read on the log&apos;s newest day ({endDay}) and kept within half to double the recent median.
@@ -207,6 +214,8 @@ const WATCH_CHIP: Record<BazaarWatch['status'], { label: string; color: 'success
 
 interface RowMarks {
   iconId: number | undefined
+  /** Tiers folded into this row, with All tiers as one. */
+  tiers: number
   wished: boolean
   watch: BazaarWatch | null
 }
@@ -220,6 +229,7 @@ function ItemRow({ item, endDay, picked, onPick, marks }: { item: BazaarItem; en
         <Stack direction="row" spacing={0.75} alignItems="center" sx={{ flexWrap: 'nowrap' }}>
           <ItemIcon iconId={marks.iconId} />
           <span>{nameOf(item)}</span>
+          {marks.tiers > 1 && <Chip size="small" variant="outlined" label={`${marks.tiers} tiers as +0`} sx={{ height: 18, fontSize: 10 }} />}
           {marks.wished && <Chip size="small" variant="outlined" color="secondary" label="♥ wish" sx={{ height: 18, fontSize: 10 }} data-testid="bazaar-wish-chip" />}
           {chip !== null && <Chip size="small" color={chip.color} label={chip.label} sx={{ height: 18, fontSize: 10 }} data-testid="bazaar-watch-chip" />}
         </Stack>
@@ -274,7 +284,17 @@ function keeperOf(show: BazaarShow, wished: ReadonlySet<string>, watch: BazaarWa
   }
 }
 
-const START: BazaarControlState = { text: '', dir: 'all', show: 'all', popular: false, minPrice: 0 }
+const START: BazaarControlState = { text: '', dir: 'all', show: 'all', popular: false, minPrice: 0, hideNoTrade: true, offers: false, combineTiers: false }
+
+/** The Show picker's keep, and the No Drop switch's, as one. */
+function keepOf(show: ReturnType<typeof keeperOf>, hideNoTrade: boolean, factsOf: (name: string) => ItemFacts | undefined): ((item: string, tier: number) => boolean) | undefined {
+  if (!hideNoTrade) return show
+  return (item, tier) => factsOf(item)?.noTrade !== true && (show === undefined || show(item, tier))
+}
+
+async function exportCsv(items: readonly BazaarItem[], lastDay: string | null): Promise<void> {
+  await window.eq.saveBazaarCsv(offersCsv(offersOf(items)), `bazaar-offers-${lastDay ?? 'all'}.csv`)
+}
 
 export default function BazaarView(): JSX.Element {
   const snap = useModule<BazaarSnap>(BAZAAR_MODULE_ID)
@@ -284,13 +304,13 @@ export default function BazaarView(): JSX.Element {
   const [sort, setSort] = useState<BazaarSort>({ key: 'lastDay', desc: true })
   const [pick, setPick] = useState<string | null>(null)
   const wished = useMemo(() => new Set(wishes.ready ? wishes.list.entries.map((e) => e.itemKey) : []), [wishes])
-  const keep = useMemo(() => keeperOf(ctl.show, wished, watch), [ctl.show, wished, watch])
+  const names = useMemo(() => [...new Set((snap?.rows ?? []).map((r) => r.item))], [snap])
+  const factsOf = useItemFacts(names)
+  const keep = useMemo(() => keepOf(keeperOf(ctl.show, wished, watch), ctl.hideNoTrade, factsOf), [ctl.show, ctl.hideNoTrade, wished, watch, factsOf])
   const sum = useMemo(
-    () => summarizeBazaar(snap, { text: ctl.text, dir: ctl.dir, sort, keep, minPrice: ctl.minPrice }),
-    [snap, ctl.text, ctl.dir, ctl.minPrice, sort, keep]
+    () => summarizeBazaar(snap, { text: ctl.text, dir: ctl.dir, sort, keep, minPrice: ctl.minPrice, combineTiers: ctl.combineTiers }),
+    [snap, ctl.text, ctl.dir, ctl.minPrice, ctl.combineTiers, sort, keep]
   )
-  const names = useMemo(() => [...new Set(sum.items.map((i) => i.item))], [sum.items])
-  const iconOf = useItemIcons(names)
   const picked = sum.items.find((i) => i.key === pick) ?? sum.items.at(0) ?? null
   const set = (patch: Partial<BazaarControlState>): void => {
     const next = { ...ctl, ...patch }
@@ -314,8 +334,9 @@ export default function BazaarView(): JSX.Element {
         {sum.days > 0 ? `: ${sum.offers} offers over ${sum.days} days` : ''}. Prices are daily medians; a
         seller repeating an offer in a day counts once.
       </Typography>
-      <BazaarControls state={ctl} set={set} />
+      <BazaarControls state={ctl} set={set} onExport={() => void exportCsv(sum.items, sum.lastDay)} />
       <HeardAlerts />
+      {ctl.offers && <BazaarQuotes quotes={offersOf(sum.items)} title="Every offer of the items below, newest first" withItem maxHeight={420} />}
       {snap === null ? (
         <Typography variant="body2">Reading your log…</Typography>
       ) : picked === null || sum.lastDay === null ? (
@@ -334,7 +355,12 @@ export default function BazaarView(): JSX.Element {
                     endDay={sum.lastDay ?? i.lastDay}
                     picked={i.key === picked.key}
                     onPick={() => setPick(i.key)}
-                    marks={{ iconId: iconOf(i.item), wished: wished.has(itemTierKey(i.item)), watch: findWatch(watch, i.item, i.tier) }}
+                    marks={{
+                      iconId: factsOf(i.item)?.iconId,
+                      tiers: i.combined?.tiers.length ?? 1,
+                      wished: wished.has(itemTierKey(i.item)),
+                      watch: i.combined !== undefined ? watchOnItem(watch, i.item) : findWatch(watch, i.item, i.tier)
+                    }}
                   />
                 ))}
               </TableBody>

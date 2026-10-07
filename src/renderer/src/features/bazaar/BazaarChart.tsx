@@ -167,8 +167,22 @@ interface Hover {
   y: number
 }
 
+const QUOTES_ON_HOVER = 6
+
+/** Who said it, and what: `17:54 Leric` · `20k  WTS Fleeting Quiver 20k pst`, a few per side. */
+function quoteRows(s: BazaarSide, color: string): TooltipRow[] {
+  const shown = s.quotes.slice(0, QUOTES_ON_HOVER).map((q) => ({
+    label: `${q.at.slice(0, 5)} ${q.who}`,
+    value: `${q.price === null ? '' : `${formatPlat(q.price)}  `}${q.msg.length > 70 ? `${q.msg.slice(0, 69)}…` : q.msg}`,
+    color
+  }))
+  const more = s.quotes.length - shown.length
+  return more > 0 ? [...shown, { value: `+${more} more (listed below the chart)` }] : shown
+}
+
 function HoverCard({ hov, p, w }: { hov: Hover; p: BazaarPoint; w: number }): JSX.Element {
-  const rows = [sideRow('Asking', p.sell, ASK_COLOR), sideRow('Offered', p.buy, OFFER_COLOR)].flatMap((r) => (r === null ? [] : [r]))
+  const sides = [sideRow('Asking', p.sell, ASK_COLOR), ...quoteRows(p.sell, ASK_COLOR), sideRow('Offered', p.buy, OFFER_COLOR), ...quoteRows(p.buy, OFFER_COLOR)]
+  const rows = sides.flatMap((r) => (r === null ? [] : [r]))
   return (
     <ChartTooltip
       x={hov.x}
