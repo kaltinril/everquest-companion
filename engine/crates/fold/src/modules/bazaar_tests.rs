@@ -9,6 +9,7 @@ use serde_json::json;
 use std::sync::Arc;
 
 const NAMES: &[&str] = &[
+    "Cloak of Flames",
     "Loam Encrusted Robe",
     "Bone-Clasped Girdle",
     "McVaxius` Horn of War",
@@ -327,5 +328,22 @@ fn bazaar_corpus() {
     }
     println!(
         "trade {trade} withItem {with_item} withPrice {with_price} offers {offers} priced {priced}"
+    );
+}
+
+#[test]
+fn paying_after_several_items_prices_each_of_them() {
+    // The owner's screenshot, 2026-10-06.
+    assert_eq!(read("Buying Fruit PST"), ["buy Fruit"]);
+    assert_eq!(
+        read("wtb Cloak of Flames +5/Slime Blood of Cazic-Thule +5 paying 4k "),
+        [
+            "buy Cloak of Flames +5 4000pp",
+            "buy Slime Blood of Cazic-Thule +5 4000pp"
+        ]
+    );
+    assert_eq!(
+        read("WTB Fleeting Quiver PST paying 10k"),
+        ["buy Fleeting Quiver 10000pp"]
     );
 }

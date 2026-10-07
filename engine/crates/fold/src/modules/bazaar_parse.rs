@@ -16,6 +16,7 @@
 //!   glued to the name (`Cloak6k`). `3k each: A | B` prices both; so does `A, B 150g each`.
 //! * a bare number (no `k`, `pp` or coin) is a price only right after the item, its tier or its
 //!   count, or before `each`: "only have 1" and "- buying 100 10lb meatpies" are counts.
+//! * "paying 4k" or "offering 4k" after several items prices each of them, as `each` does.
 //! * `+4` and `4+` are the upgrade tier; `x2`, `2x` and a bare count before the name are the
 //!   quantity, as is a count before "for" (`Bone Chips 1000 for 10k`).
 //! * a trade (WTT) is a barter: its numbers count the other thing, so it never carries a price.
@@ -335,16 +336,20 @@ impl<'a> Parser<'a> {
         }
         let next = i + used;
         if dir != Dir::Trade {
-            self.apply_price(pp, next, dir);
+            self.apply_price(pp, i, dir);
         }
         Some(next)
     }
 
-    fn apply_price(&mut self, pp: f64, next: usize, dir: Dir) {
+    /// The price starting at `at`: for the item before it, or with `each` after it or `paying`
+    /// before it, for every unpriced item before it ("A +5/B +5 paying 4k").
+    fn apply_price(&mut self, pp: f64, at: usize, dir: Dir) {
+        let (_, used) = price_at(&self.t, at).unwrap_or((pp, 1));
         let each = self
             .t
-            .get(next)
-            .is_some_and(|x| matches!(x.n.as_str(), "each" | "ea" | "per"));
+            .get(at + used)
+            .is_some_and(|x| matches!(x.n.as_str(), "each" | "ea" | "per"))
+            || (at > 0 && matches!(self.t[at - 1].n.as_str(), "paying" | "offering"));
         let Some(last) = self.last else {
             if each {
                 self.lead_price = Some(pp);
