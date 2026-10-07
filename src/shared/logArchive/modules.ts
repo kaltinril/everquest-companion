@@ -25,5 +25,6 @@ export const CAPTURED_MODULES: readonly string[] = [
   'buffTimers',
   'consider',
   'resist',
+  'bazaar',
   'eventFeed'
 ]

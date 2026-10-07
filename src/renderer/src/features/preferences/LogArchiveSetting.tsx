@@ -124,8 +124,7 @@ function OnPanel(props: { st: LogArchiveStatus; run: (p: Promise<LogArchiveReply
           Archiving is not available right now: {st.rotateBlockers.join(' ')}
         </Typography>
       )}
-      {/* eslint-disable-next-line eqc/no-domain-munging -- the status lists every segment (the trial scripts read backups from it); the card shows only archived logs. */}
-      {st.segments.filter((s) => s.state === 'sealed').map((s) => (
+      {st.archived.map((s) => (
         <SegmentLine key={s.id} s={s} newest={s.id === st.newestSealedId} run={run} />
       ))}
       {st.held.map((h) => (

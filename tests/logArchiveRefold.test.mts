@@ -189,6 +189,12 @@ test('refresh: refused for a segment this version produced, or with no archive',
   assert.deepEqual(await refreshSegment(dir, 'missing', { ...deps, producedBy: () => NOW }), { ok: false, reason: 'that history was not found' })
 })
 
+test('refresh: this version may refresh its own segment when the segment lacks a module the engine has', async () => {
+  const { dir, segment } = olderSegment()
+  const r = await refreshSegment(dir, segment.id, { refold: refoldGiving(REFOLDED), producedBy: () => segment.producedBy, lacking: () => true })
+  assert.equal(r.ok, true)
+})
+
 test('refresh: a refold that fails or loses a module leaves the segment as it was', async () => {
   const { dir, segment } = olderSegment()
   const before = readFileSync(segmentPath(dir, segment.id), 'utf8')
