@@ -7,7 +7,7 @@
 // The engine ships with the app, so the app version names the parser that produced a segment.
 
 import { app } from 'electron'
-import { existsSync, statfsSync, statSync } from 'node:fs'
+import { existsSync, readdirSync, statfsSync, statSync } from 'node:fs'
 import { basename, dirname, join } from 'node:path'
 import { engineRequest, engineServeReadiness } from '../dataServer/engineClientHost'
 import { characterId } from '../log/config'
@@ -129,11 +129,21 @@ export async function refreshLackingHistories(note: (line: string) => void): Pro
 
 /** Step 2.5: when were the inventory and faction dumps last written, beside the log's last write. */
 function dumpAdvice(logPath: string, logModified: number): DumpAdvice {
-  const stem = basename(logPath).replace(/^eqlog_/i, '').replace(/\.txt$/i, '')
+  const stem = basename(logPath).replace(/^eqlog_/i, '').replace(/\.txt$/i, '').toLowerCase()
   const root = dirname(dirname(logPath))
+  let files: string[] = []
+  try {
+    files = readdirSync(root)
+  } catch {
+    // No folder to read: both dumps read as never written.
+  }
+  // The newest of this character's dumps of a kind. The factions dump carries a class token
+  // (`Drywrought_oggok-WAR-Factions.txt`), so anything between the stem and the suffix is allowed,
+  // as shared/outputs/kinds.ts preferredOutputFile allows it.
   const mtime = (kind: string): number | null => {
-    const p = join(root, `${stem}-${kind}.txt`)
-    return existsSync(p) ? statSync(p).mtimeMs : null
+    const own = files.filter((f) => f.toLowerCase().startsWith(`${stem}-`) && f.toLowerCase().endsWith(`-${kind.toLowerCase()}.txt`))
+    const times = own.map((f) => statSync(join(root, f)).mtimeMs)
+    return times.length > 0 ? Math.max(...times) : null
   }
   const inventoryMs = mtime('Inventory')
   const factionsMs = mtime('Factions') ?? mtime('Faction')
