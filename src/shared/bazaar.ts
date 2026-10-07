@@ -11,6 +11,8 @@
 // the median of all that item's prices in that direction is left out (counted in `outliers`), once
 // there are at least three to judge by.
 
+import { averageNow, predictNow } from './bazaarForecast'
+
 export const BAZAAR_MODULE_ID = 'bazaar'
 
 export type BazaarDir = 'sell' | 'buy' | 'trade'
@@ -40,6 +42,7 @@ export interface BazaarSnap {
 /** One direction on one day, outliers left out. */
 export interface BazaarSide {
   median: number | null
+  mean: number | null
   low: number | null
   high: number | null
   /** Priced offers counted. */
@@ -64,6 +67,11 @@ export interface BazaarItem {
   offered: number | null
   /** Asking now against the RECENT priced days before them, as a fraction (0.1 = up 10%). */
   askingMove: number | null
+  /** Mean of the last week's prices, and the trend's value on the log's newest day (bazaarForecast.ts). */
+  askingAvg: number | null
+  offeredAvg: number | null
+  askingPredicted: number | null
+  offeredPredicted: number | null
   sellOffers: number
   buyOffers: number
   trades: number
@@ -107,12 +115,13 @@ function pricesOf(r: BazaarRow): number[] {
   return r.n > 0 ? Array<number>(r.n).fill(r.sum / r.n) : []
 }
 
-const EMPTY: BazaarSide = { median: null, low: null, high: null, n: 0, unpriced: 0 }
+const EMPTY: BazaarSide = { median: null, mean: null, low: null, high: null, n: 0, unpriced: 0 }
 
 function sideOf(rows: readonly BazaarRow[], keep: (p: number) => boolean): BazaarSide {
   const ps = rows.flatMap(pricesOf).filter(keep)
   return {
     median: median(ps),
+    mean: ps.length > 0 ? ps.reduce((a, b) => a + b, 0) / ps.length : null,
     low: ps.length > 0 ? Math.min(...ps) : null,
     high: ps.length > 0 ? Math.max(...ps) : null,
     n: ps.length,
@@ -146,13 +155,21 @@ function pointOf(day: string, rows: readonly BazaarRow[], keep: Record<'sell' | 
   }
 }
 
-function itemOf(key: string, rows: readonly BazaarRow[]): BazaarItem {
+/** One direction's average and predicted price on `endDay`. */
+function forecast(points: readonly BazaarPoint[], dir: 'sell' | 'buy', endDay: string, recent: number | null): [number | null, number | null] {
+  const days = points.map((p) => ({ day: p.day, median: p[dir].median, mean: p[dir].mean, n: p[dir].n }))
+  return [averageNow(days, endDay), predictNow(days, endDay, recent)]
+}
+
+function itemOf(key: string, rows: readonly BazaarRow[], endDay: string): BazaarItem {
   const pricesIn = (d: BazaarDir): number[] => rows.filter((r) => r.dir === d).flatMap(pricesOf)
   const keep = { sell: keeper(pricesIn('sell')), buy: keeper(pricesIn('buy')) }
   const days = [...new Set(rows.map((r) => r.day))].sort()
   const points = days.map((day) => pointOf(day, rows, keep))
   const [asking, askedBefore] = recentAndBefore(points, 'sell')
   const [offered] = recentAndBefore(points, 'buy')
+  const [askingAvg, askingPredicted] = forecast(points, 'sell', endDay, asking)
+  const [offeredAvg, offeredPredicted] = forecast(points, 'buy', endDay, offered)
   const counted = (dir: 'sell' | 'buy'): number => points.reduce((s, p) => s + p[dir].n + p[dir].unpriced, 0)
   const kept = points.reduce((s, p) => s + p.sell.n + p.buy.n, 0)
   return {
@@ -163,6 +180,10 @@ function itemOf(key: string, rows: readonly BazaarRow[]): BazaarItem {
     asking,
     offered,
     askingMove: asking !== null && askedBefore !== null && askedBefore > 0 ? asking / askedBefore - 1 : null,
+    askingAvg,
+    offeredAvg,
+    askingPredicted,
+    offeredPredicted,
     sellOffers: counted('sell'),
     buyOffers: counted('buy'),
     trades: points.reduce((s, p) => s + p.trades, 0),
@@ -200,11 +221,12 @@ export function summarizeBazaar(snap: BazaarSnap | null, q: BazaarQuery): Bazaar
     else g.push(r)
   }
   const text = q.text.trim().toLowerCase()
+  const days = [...new Set(rows.map((r) => r.day))].sort()
+  const endDay = days.length > 0 ? days[days.length - 1] : ''
   const items = [...groups]
     .filter(([, g]) => matches(g, q, text))
-    .map(([key, g]) => itemOf(key, g))
+    .map(([key, g]) => itemOf(key, g, endDay))
     .sort(compare(q.sort))
-  const days = [...new Set(rows.map((r) => r.day))].sort()
   return {
     items,
     days: days.length,

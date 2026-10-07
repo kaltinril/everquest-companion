@@ -75,7 +75,50 @@ function Tile({ label, value, color, children }: { label: string; value: string;
   )
 }
 
-function Detail({ item }: { item: BazaarItem }): JSX.Element {
+const PRICE_HEADS = ['Now (median)', '7-day average', 'Predicted today']
+
+interface PriceLine {
+  label: string
+  color: string
+  now: number | null
+  avg: number | null
+  pred: number | null
+  move?: number | null
+}
+
+/** Asking and offered, each now, averaged over the week and predicted, in one small grid. */
+function PriceGrid({ item }: { item: BazaarItem }): JSX.Element {
+  const line = (l: PriceLine): JSX.Element => (
+    <>
+      <Stack direction="row" spacing={0.75} alignItems="center">
+        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: l.color }} />
+        <Typography variant="body2" color="text.secondary">
+          {l.label}
+        </Typography>
+      </Stack>
+      <Stack direction="row" spacing={1} alignItems="baseline">
+        <Typography variant="h6">{formatPlat(l.now)}</Typography>
+        {l.move !== undefined && <Move f={l.move} />}
+      </Stack>
+      <Typography variant="h6">{formatPlat(l.avg)}</Typography>
+      <Typography variant="h6">{formatPlat(l.pred)}</Typography>
+    </>
+  )
+  return (
+    <Box sx={{ display: 'grid', gridTemplateColumns: 'auto repeat(3, minmax(110px, auto))', columnGap: 4, rowGap: 0.5, alignItems: 'center' }} data-testid="bazaar-prices">
+      <Box />
+      {PRICE_HEADS.map((h) => (
+        <Typography key={h} variant="caption" color="text.secondary">
+          {h}
+        </Typography>
+      ))}
+      {line({ label: 'Asking (selling)', color: ASK_COLOR, now: item.asking, avg: item.askingAvg, pred: item.askingPredicted, move: item.askingMove })}
+      {line({ label: 'Offered (buying)', color: OFFER_COLOR, now: item.offered, avg: item.offeredAvg, pred: item.offeredPredicted })}
+    </Box>
+  )
+}
+
+function Detail({ item, endDay }: { item: BazaarItem; endDay: string }): JSX.Element {
   const lows = item.points.map((p) => p.sell.low ?? Infinity)
   const highs = item.points.map((p) => p.sell.high ?? -Infinity)
   const low = Math.min(...lows)
@@ -90,10 +133,7 @@ function Detail({ item }: { item: BazaarItem }): JSX.Element {
           </Typography>
         </Stack>
         <Stack direction="row" spacing={4} flexWrap="wrap" useFlexGap>
-          <Tile label="Asking now" value={formatPlat(item.asking)} color={ASK_COLOR}>
-            <Move f={item.askingMove} />
-          </Tile>
-          <Tile label="Offered now" value={formatPlat(item.offered)} color={OFFER_COLOR} />
+          <PriceGrid item={item} />
           <Tile label="Asking range" value={Number.isFinite(low) ? `${formatPlat(low)} to ${formatPlat(high)}` : '-'} />
           <Tile label="Offers seen" value={String(item.sellOffers + item.buyOffers + item.trades)}>
             <Typography component="span" variant="caption" color="text.secondary">
@@ -101,7 +141,11 @@ function Detail({ item }: { item: BazaarItem }): JSX.Element {
             </Typography>
           </Tile>
         </Stack>
-        <BazaarChart item={item} />
+        <BazaarChart item={item} endDay={endDay} />
+        <Typography variant="caption" color="text.disabled">
+          Predicted: a trend through the last ten priced days, newer and busier days counting more,
+          read on the log&apos;s newest day ({endDay}) and kept within half to double the recent median.
+        </Typography>
         {item.outliers > 0 && (
           <Typography variant="caption" color="text.disabled">
             {item.outliers} price(s) more than four times away from this item&apos;s usual price are left out.
@@ -121,6 +165,8 @@ function ItemRow({ item, endDay, picked, onPick }: { item: BazaarItem; endDay: s
         <BazaarSparkline sell={spark.sell} buy={spark.buy} />
       </TableCell>
       <TableCell align="right">{formatPlat(item.asking)}</TableCell>
+      <TableCell align="right">{formatPlat(item.askingAvg)}</TableCell>
+      <TableCell align="right">{formatPlat(item.askingPredicted)}</TableCell>
       <TableCell align="right">
         <Move f={item.askingMove} />
       </TableCell>
@@ -190,7 +236,7 @@ export default function BazaarView(): JSX.Element {
         <Typography variant="body2">No trade offers {text === '' && dir === 'all' ? 'in your log yet' : 'match'}.</Typography>
       ) : (
         <>
-          <Detail item={picked} />
+          <Detail item={picked} endDay={sum.lastDay} />
           <Box sx={{ overflowX: 'auto' }}>
             <Table size="small" stickyHeader>
               <TableHead>
@@ -198,6 +244,8 @@ export default function BazaarView(): JSX.Element {
                   <TableCell>Item</TableCell>
                   <TableCell>Last {SPARK_DAYS} days</TableCell>
                   <TableCell align="right">Asking</TableCell>
+                  <TableCell align="right">Avg 7 days</TableCell>
+                  <TableCell align="right">Predicted</TableCell>
                   <TableCell align="right">Change</TableCell>
                   <TableCell align="right">Offered</TableCell>
                   <TableCell align="right">Offers</TableCell>
