@@ -24,6 +24,10 @@ export type View =
   | 'alerts'
   | 'leveling'
   | 'loot'
+  // BAZAAR (2026-10-06): what trade chat asked and offered per item, per day. UNRELEASED like
+  // every new tab: in `KNOWN_VIEWS` only behind the flag's splice, its nav row gated the same
+  // way, and absent from `TELEMETRY_VIEWS`.
+  | 'bazaar'
   | 'planner'
   // The GEAR PLANNER's search surface (JOS-284) — the candidate index over every equippable item.
   // It was a top-level nav row of its own until JOS-324; it is now the FIRST TAB of the gear area
@@ -132,6 +136,7 @@ export const VIEW_LABELS: Record<View, string> = {
   alerts: 'Alerts',
   leveling: 'Leveling',
   loot: 'Loot',
+  bazaar: 'Bazaar',
   // THE TAB IS CALLED EXALTATIONS (owner, 2026-08-06, JOS-42). "Planner" described what the
   // surface does for us; "Exaltations" names the game system the player came here about. The
   // `planner` view id, its route, its `eq.planner.*` keys and every `planner-*` testid are
@@ -185,6 +190,9 @@ const KNOWN_VIEWS: View[] = [
   'alerts',
   'leveling',
   'loot',
+  // The review-gate splice: a dev server draws the Bazaar tab, a packaged build bounces a
+  // persisted 'bazaar' to the default view instead of routing to a tab it will not draw.
+  ...(UNRELEASED ? (['bazaar'] as const) : []),
   'planner',
   'gear',
   'plan',

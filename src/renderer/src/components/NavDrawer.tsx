@@ -17,6 +17,7 @@ import SettingsIcon from '@mui/icons-material/Settings'
 import ShieldMoonIcon from '@mui/icons-material/ShieldMoon'
 import BarChartIcon from '@mui/icons-material/BarChart'
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong'
+import StorefrontIcon from '@mui/icons-material/Storefront'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech'
@@ -141,6 +142,8 @@ const GROUPS: NavGroup[] = [
     rows: [
       { view: 'combat', icon: <BarChartIcon /> },
       { view: 'loot', icon: <ReceiptLongIcon /> },
+      // BAZAAR (UNRELEASED) sits under Loot: what you got, then what it is worth to other players.
+      ...(UNRELEASED ? [{ view: 'bazaar' as View, icon: <StorefrontIcon /> }] : []),
       { view: 'buffs', icon: <AutoFixHighIcon /> },
       { view: 'leveling', icon: <TrendingUpIcon /> }
     ]
