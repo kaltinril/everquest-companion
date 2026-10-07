@@ -443,26 +443,26 @@ test("lookup: the live side's dropped count is added once", () => {
 })
 
 test('bazaar: rows join by day, item, tier and direction, and the shared day adds up', () => {
-  const row = (day: string, n: number, min: number | null, max: number | null, sum: number): Record<string, unknown> => ({
+  const row = (day: string, prices: number[], unpriced = 1): Record<string, unknown> => ({
     day,
     dir: 'sell',
     item: 'Fleeting Quiver',
     tier: 0,
-    n,
-    unpriced: 1,
-    min,
-    max,
-    sum
+    n: prices.length,
+    unpriced,
+    min: prices.length > 0 ? Math.min(...prices) : null,
+    max: prices.length > 0 ? Math.max(...prices) : null,
+    sum: prices.reduce((a, b) => a + b, 0),
+    prices
   })
-  const older = { rows: [row('2026-10-05', 1, 20000, 20000, 20000), row('2026-10-06', 1, 18000, 18000, 18000)] }
-  const newer = { rows: [row('2026-10-06', 2, 19000, 21000, 40000), row('2026-10-07', 0, null, null, 0)] }
+  const older = { rows: [row('2026-10-05', [20000]), row('2026-10-06', [18000])] }
+  const newer = { rows: [row('2026-10-06', [19000, 21000]), row('2026-10-07', [])] }
   assert.deepEqual(mergeBazaar(older, newer), {
-    rows: [
-      row('2026-10-05', 1, 20000, 20000, 20000),
-      { ...row('2026-10-06', 3, 18000, 21000, 58000), unpriced: 2 },
-      row('2026-10-07', 0, null, null, 0)
-    ]
+    rows: [row('2026-10-05', [20000]), row('2026-10-06', [18000, 19000, 21000], 2), row('2026-10-07', [])]
   })
+  const listless = { ...row('2026-10-06', [3, 5]), prices: undefined }
+  const joined = mergeBazaar({ rows: [row('2026-10-06', [1, 2])] }, { rows: [listless] }) as { rows: { prices: number[] }[] }
+  assert.deepEqual(joined.rows[0].prices, [1, 2, 4, 4], 'a row without its list stands for its average')
   assert.equal(mergeBazaar({ rows: 'x' }, newer), null)
   assert.equal(mergeBazaar(older, []), null)
 })
