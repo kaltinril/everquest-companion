@@ -38,7 +38,7 @@ pub struct BazaarRow {
     sum: f64,
     /// Every priced offer's platinum per unit, in log order, for medians and outliers.
     prices: Vec<f64>,
-    /// Who said it and what they said: every counted offer of the day (a repeat is not counted).
+    /// Who said it and what they said: one quote per person, their newest, the latest QUOTES_KEPT people.
     quotes: Vec<Quote>,
 }
 
@@ -55,9 +55,9 @@ pub struct Quote {
     msg: String,
 }
 
-/// A ceiling against a flood, not a sample: a seller repeating an offer counts once a day already,
-/// so a row only grows by distinct offers, and fifty sellers in a day are fifty quotes.
-const QUOTES_KEPT: usize = 500;
+/// The latest QUOTES_KEPT people quoted per row (owner, 2026-10-07): one quote a person, their
+/// newest, so a seller posting all day never crowds out the others.
+const QUOTES_KEPT: usize = 20;
 const QUOTE_CHARS: usize = 200;
 
 /// One offer heard live, newest last: what a watch alert is raised from.
@@ -139,14 +139,15 @@ impl BazaarModule {
                 ..BazaarRow::default()
             });
             add(row, unit);
-            if row.quotes.len() < QUOTES_KEPT {
-                row.quotes.push(Quote {
+            quote(
+                &mut row.quotes,
+                Quote {
                     at: time_of(raw).unwrap_or_default(),
                     who: speaker.to_string(),
                     price: unit,
                     msg: msg.chars().take(QUOTE_CHARS).collect(),
-                });
-            }
+                },
+            );
             changed = true;
         }
         changed
@@ -167,6 +168,15 @@ impl BazaarModule {
             tier: o.tier,
             price: o.unit_pp(),
         });
+    }
+}
+
+/// A person's newest quote replaces their earlier one; past QUOTES_KEPT people, the oldest goes.
+fn quote(quotes: &mut Vec<Quote>, q: Quote) {
+    quotes.retain(|x| !x.who.eq_ignore_ascii_case(&q.who));
+    quotes.push(q);
+    if quotes.len() > QUOTES_KEPT {
+        quotes.remove(0);
     }
 }
 

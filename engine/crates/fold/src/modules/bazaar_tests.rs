@@ -333,7 +333,7 @@ fn offers_heard_live_are_kept_for_the_watch_alerts() {
 }
 
 #[test]
-fn every_distinct_seller_of_a_day_is_quoted() {
+fn the_latest_twenty_people_are_quoted_once_each() {
     let mut m = BazaarModule::new();
     let k: Arc<dyn Knowledge> = Arc::new(Names);
     m.install_knowledge(&k);
@@ -343,14 +343,22 @@ fn every_distinct_seller_of_a_day_is_quoted() {
             (b'a' + i as u8 / 26) as char,
             (b'a' + i as u8 % 26) as char
         );
-        m.on_event(&line(i64::from(i) * 2 + 1, &raw), false);
-        // The same seller again, the same price: counted once, quoted once.
-        m.on_event(&line(i64::from(i) * 2 + 2, &raw), false);
+        m.on_event(&line(i64::from(i) + 1, &raw), false);
     }
-    let quotes = m.snapshot()["state"]["rows"][0]["quotes"]
+    // The first seller again, at a new price: their newest quote replaces the old one.
+    let again = "[Wed Sep 23 19:00:00 2026] Selleraa tells General:1, 'WTS Fleeting Quiver 18k'";
+    m.on_event(&line(40, again), false);
+    let quotes = m.snapshot()["state"]["rows"][0]["quotes"].clone();
+    let who: Vec<&str> = quotes
         .as_array()
-        .map(Vec::len);
-    assert_eq!(quotes, Some(30));
+        .expect("quotes")
+        .iter()
+        .filter_map(|q| q["who"].as_str())
+        .collect();
+    assert_eq!(who.len(), 20);
+    assert_eq!(who.first(), Some(&"Selleral"));
+    assert_eq!(who.last(), Some(&"Selleraa"));
+    assert_eq!(quotes[19]["price"], 18000.0);
 }
 
 #[test]
