@@ -9,7 +9,7 @@
 //! item at one price counts once. The day is the log's own date, read off the line, so it is the
 //! player's calendar day and never shifts with a time zone.
 
-use super::bazaar_parse::{parse_trade, Dir, ItemIndex};
+use super::bazaar_parse::{parse_trade, Dir, ItemIndex, Offer};
 use crate::event::Event;
 use crate::knowledge::Knowledge;
 use crate::message_overlay::message_text_of;
@@ -17,7 +17,7 @@ use crate::EqModule;
 use regex::Regex;
 use serde::Serialize;
 use serde_json::{json, Value};
-use std::collections::{BTreeMap, HashSet};
+use std::collections::{BTreeMap, HashSet, VecDeque};
 use std::sync::{Arc, OnceLock};
 
 /// One day's offers for one item, tier and direction.
@@ -40,6 +40,24 @@ pub struct BazaarRow {
     prices: Vec<f64>,
 }
 
+/// One offer heard live, newest last: what a watch alert is raised from.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LiveOffer {
+    seq: i64,
+    /// The log's own stamp, `2026-09-23 17:54:48`.
+    at: String,
+    speaker: String,
+    dir: &'static str,
+    item: String,
+    tier: u32,
+    /// Platinum per unit, when the offer stated a price.
+    price: Option<f64>,
+}
+
+/// Live offers kept for the watch alerts; older ones have been alerted on already.
+const LIVE_KEEP: usize = 100;
+
 type Key = (String, Dir, String, u32);
 
 #[derive(Default)]
@@ -49,6 +67,7 @@ pub struct BazaarModule {
     /// Today's (speaker, direction, item, tier, price in hundredths of a platinum) already counted.
     seen: HashSet<(String, Dir, String, u32, i64)>,
     seen_day: String,
+    live: VecDeque<LiveOffer>,
     seq: i64,
     announce: crate::announce::Announce,
 }
@@ -62,9 +81,10 @@ impl BazaarModule {
         self.rows.clear();
         self.seen.clear();
         self.seen_day.clear();
+        self.live.clear();
     }
 
-    fn fold_line(&mut self, raw: &str) -> bool {
+    fn fold_line(&mut self, raw: &str, live: bool) -> bool {
         let Some(ix) = self.index.as_ref() else {
             return false;
         };
@@ -87,6 +107,9 @@ impl BazaarModule {
             if !self.seen.insert(first) {
                 continue;
             }
+            if live {
+                self.hear(raw, speaker, &o);
+            }
             let key = (day.clone(), o.dir, o.item, o.tier);
             let row = self.rows.entry(key).or_insert_with_key(|k| BazaarRow {
                 day: k.0.clone(),
@@ -99,6 +122,23 @@ impl BazaarModule {
             changed = true;
         }
         changed
+    }
+}
+
+impl BazaarModule {
+    fn hear(&mut self, raw: &str, speaker: &str, o: &Offer) {
+        if self.live.len() == LIVE_KEEP {
+            self.live.pop_front();
+        }
+        self.live.push_back(LiveOffer {
+            seq: self.seq,
+            at: stamp_of(raw).unwrap_or_default(),
+            speaker: speaker.to_string(),
+            dir: o.dir.as_str(),
+            item: o.item.clone(),
+            tier: o.tier,
+            price: o.unit_pp(),
+        });
     }
 }
 
@@ -124,6 +164,12 @@ fn chat_of(text: &str) -> Option<(&str, &str)> {
     });
     let c = rx.captures(text)?;
     Some((c.get(1)?.as_str(), c.get(2)?.as_str()))
+}
+
+/// `[Wed Sep 23 17:54:48 2026] …` → `2026-09-23 17:54:48`.
+fn stamp_of(raw: &str) -> Option<String> {
+    let time = raw.strip_prefix('[')?.split_whitespace().nth(3)?;
+    Some(format!("{} {time}", day_of(raw)?))
 }
 
 /// `[Wed Sep 23 17:54:48 2026] …` → `2026-09-23`.
@@ -152,14 +198,14 @@ impl EqModule for BazaarModule {
         self.announce.reset();
     }
 
-    fn on_event(&mut self, ev: &Event, _live: bool) {
+    fn on_event(&mut self, ev: &Event, live: bool) {
         self.seq = ev.seq();
         if ev.kind() == "epoch" {
             self.clear();
             self.announce.changed(self.seq);
             return;
         }
-        if ev.kind() == "unknown" && self.fold_line(ev.raw()) {
+        if ev.kind() == "unknown" && self.fold_line(ev.raw(), live) {
             self.announce.changed(self.seq);
         }
     }
@@ -171,7 +217,7 @@ impl EqModule for BazaarModule {
 
     fn snapshot(&self) -> Value {
         let rows: Vec<&BazaarRow> = self.rows.values().collect();
-        json!({ "seq": self.seq, "state": { "rows": rows } })
+        json!({ "seq": self.seq, "state": { "rows": rows, "live": self.live } })
     }
 
     fn install_knowledge(&mut self, k: &Arc<dyn Knowledge>) {
