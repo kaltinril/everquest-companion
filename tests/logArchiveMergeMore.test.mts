@@ -26,6 +26,7 @@ import { mergeItemTiers } from '../src/shared/logArchive/mergeItemTiers'
 import { dropsFromLoot, mergeDropsSeen, withArchivedDrops } from '../src/shared/logArchive/mergeDropsSeen'
 import { mergeProgression } from '../src/shared/logArchive/mergeProgression'
 import { mergeRespawn } from '../src/shared/logArchive/mergeRespawn'
+import { mergeBazaar } from '../src/shared/logArchive/mergeBazaar'
 import { mergeClassUnlocks, mergeTurnIns } from '../src/shared/logArchive/mergeUnlocksTurnIns'
 import { hasMergeRule, mergeModule } from '../src/shared/logArchive/mergeRules'
 import { MobLootIndex } from '../src/main/mobLookupParse'
@@ -439,4 +440,29 @@ test("lookup: the live side's dropped count is added once", () => {
   const older = progression({ dropped: 2, windowStart: 5 })
   const live = progression({ dropped: 7, windowStart: 9 })
   assert.equal((mergeModule('progression', [older], live).state as ProgressionSnap).dropped, 9)
+})
+
+test('bazaar: rows join by day, item, tier and direction, and the shared day adds up', () => {
+  const row = (day: string, n: number, min: number | null, max: number | null, sum: number): Record<string, unknown> => ({
+    day,
+    dir: 'sell',
+    item: 'Fleeting Quiver',
+    tier: 0,
+    n,
+    unpriced: 1,
+    min,
+    max,
+    sum
+  })
+  const older = { rows: [row('2026-10-05', 1, 20000, 20000, 20000), row('2026-10-06', 1, 18000, 18000, 18000)] }
+  const newer = { rows: [row('2026-10-06', 2, 19000, 21000, 40000), row('2026-10-07', 0, null, null, 0)] }
+  assert.deepEqual(mergeBazaar(older, newer), {
+    rows: [
+      row('2026-10-05', 1, 20000, 20000, 20000),
+      { ...row('2026-10-06', 3, 18000, 21000, 58000), unpriced: 2 },
+      row('2026-10-07', 0, null, null, 0)
+    ]
+  })
+  assert.equal(mergeBazaar({ rows: 'x' }, newer), null)
+  assert.equal(mergeBazaar(older, []), null)
 })

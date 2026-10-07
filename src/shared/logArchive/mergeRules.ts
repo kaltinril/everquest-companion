@@ -4,6 +4,7 @@
 // always has; a segment still stores its snapshot, so the day its line lands it applies to logs
 // archived earlier too (phase 4).
 
+import { mergeBazaar } from './mergeBazaar'
 import { mergeConsider } from './mergeConsider'
 import { mergeItemTiers } from './mergeItemTiers'
 import { mergeKills } from './mergeKills'
@@ -25,7 +26,8 @@ export const MERGE_RULES: Readonly<Record<string, MergeRule>> = {
   classUnlocks: mergeClassUnlocks,
   turnins: mergeTurnIns,
   respawn: mergeRespawn,
-  progression: mergeProgression
+  progression: mergeProgression,
+  bazaar: mergeBazaar
 }
 
 export function hasMergeRule(moduleId: string): boolean {

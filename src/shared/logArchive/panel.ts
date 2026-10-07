@@ -36,6 +36,9 @@ export interface LogArchiveStatus {
   dir: string
   live: { path: string; bytes: number; modifiedMs: number } | null
   segments: SegmentRow[]
+  /** The kept ones among `segments`: the archived logs the card lists. `segments` keeps every
+   *  state, because the trial scripts read a fresh backup's id from it. */
+  archived: SegmentRow[]
   /** The newest kept segment: the only one that can be put back. */
   newestSealedId: string | null
   /** Sealed segments not being shown, with the reason in plain words. */

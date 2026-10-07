@@ -130,6 +130,7 @@ export function logArchiveStatus(): LogArchiveStatus {
     dir,
     live: liveLog(a),
     segments: [],
+    archived: [],
     newestSealedId: null,
     held: [],
     skipped: [],
@@ -144,6 +145,7 @@ function fillOn(base: LogArchiveStatus, dir: string, a: { character: string; log
   const listing = listSegments(dir, a?.character)
   const ctx = liveHistory.status()
   base.segments = listing.segments.map(row).sort((x, y) => x.firstStamp.localeCompare(y.firstStamp))
+  base.archived = base.segments.filter((s) => s.state === 'sealed')
   base.newestSealedId = newestSealed(base.segments)
   base.held = (ctx?.held ?? []).map((h) => ({ id: h.id, text: HELD_TEXT[h.reason] }))
   base.skipped = listing.skipped
