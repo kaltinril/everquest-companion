@@ -1,13 +1,15 @@
 // THE BAZAAR TAB — what players asked and offered for items in trade chat (owner ask, 2026-10-06).
 //
-// One line per item, upgrade tier and direction (selling, buying, trading), most recently seen
-// first, with the newest day's average and the low, average and high over every day the log holds.
-// Opening a line shows it day by day. The numbers are the engine's `bazaar` module; what the parser
-// reads and what it leaves out is stated in engine/crates/fold/src/modules/bazaar_parse.rs.
+// On top, the picked item: its asking and offered prices now, how far asking has moved, its range,
+// and a chart of both by day. Below, every item and tier with a 30-day trend, newest first or in
+// the picked order; clicking one picks it. Every number is a median with outliers left out
+// (shared/bazaar.ts). What the parser reads is stated in engine/crates/fold/src/modules/bazaar_parse.rs.
 
 import { type JSX, useMemo, useState } from 'react'
 import {
   Box,
+  MenuItem,
+  Paper,
   Stack,
   Table,
   TableBody,
@@ -21,47 +23,147 @@ import {
 } from '@mui/material'
 import {
   BAZAAR_MODULE_ID,
+  formatMove,
   formatPlat,
+  sparkline,
   summarizeBazaar,
   type BazaarDir,
-  type BazaarEntry,
-  type BazaarSnap
+  type BazaarItem,
+  type BazaarSnap,
+  type BazaarSort
 } from '@shared/bazaar'
 import { useModule } from '../../lib/useModule'
+import { ASK_COLOR, BazaarChart, BazaarSparkline, OFFER_COLOR } from './BazaarChart'
 
-const DIR_LABEL: Record<BazaarDir, string> = { sell: 'Selling', buy: 'Buying', trade: 'Trading' }
+const SPARK_DAYS = 30
+const SORTS: { value: BazaarSort; label: string }[] = [
+  { value: 'recent', label: 'Most recent' },
+  { value: 'offers', label: 'Most offers' },
+  { value: 'price', label: 'Highest price' },
+  { value: 'move', label: 'Biggest move' }
+]
 
-function EntryRow({ e, open, onToggle }: { e: BazaarEntry; open: boolean; onToggle: () => void }): JSX.Element {
+const nameOf = (i: BazaarItem): string => `${i.item}${i.tier > 0 ? ` +${i.tier}` : ''}`
+
+/** A move up or down, in the status words rather than color alone. */
+function Move({ f }: { f: number | null }): JSX.Element | null {
+  if (f === null || Math.round(f * 100) === 0) return null
+  const up = f > 0
   return (
-    <>
-      <TableRow hover onClick={onToggle} sx={{ cursor: 'pointer' }} data-testid={`bazaar-row-${e.key}`}>
-        <TableCell>
-          {e.item}
-          {e.tier > 0 ? ` +${e.tier}` : ''}
-        </TableCell>
-        <TableCell>{DIR_LABEL[e.dir]}</TableCell>
-        <TableCell>{e.lastDay}</TableCell>
-        <TableCell align="right">{formatPlat(e.lastAvg)}</TableCell>
-        <TableCell align="right">{formatPlat(e.low)}</TableCell>
-        <TableCell align="right">{formatPlat(e.avg)}</TableCell>
-        <TableCell align="right">{formatPlat(e.high)}</TableCell>
-        <TableCell align="right">{e.offers}</TableCell>
-        <TableCell align="right">{e.unpriced}</TableCell>
-      </TableRow>
-      {open &&
-        e.days.map((d) => (
-          <TableRow key={d.day} sx={{ '& td': { color: 'text.secondary', borderBottom: 'none' } }}>
-            <TableCell sx={{ pl: 4 }} colSpan={2} />
-            <TableCell>{d.day}</TableCell>
-            <TableCell />
-            <TableCell align="right">{formatPlat(d.low)}</TableCell>
-            <TableCell align="right">{formatPlat(d.avg)}</TableCell>
-            <TableCell align="right">{formatPlat(d.high)}</TableCell>
-            <TableCell align="right">{d.n}</TableCell>
-            <TableCell align="right">{d.unpriced}</TableCell>
-          </TableRow>
+    <Typography component="span" variant="body2" sx={{ color: up ? 'success.main' : 'warning.main' }}>
+      {up ? '▲' : '▼'} {formatMove(f)}
+    </Typography>
+  )
+}
+
+function Tile({ label, value, color, children }: { label: string; value: string; color?: string; children?: JSX.Element | null }): JSX.Element {
+  return (
+    <Box sx={{ minWidth: 120 }}>
+      <Stack direction="row" spacing={0.75} alignItems="center">
+        {color !== undefined && <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: color }} />}
+        <Typography variant="caption" color="text.secondary">
+          {label}
+        </Typography>
+      </Stack>
+      <Stack direction="row" spacing={1} alignItems="baseline">
+        <Typography variant="h5" sx={{ fontWeight: 700 }}>
+          {value}
+        </Typography>
+        {children}
+      </Stack>
+    </Box>
+  )
+}
+
+function Detail({ item }: { item: BazaarItem }): JSX.Element {
+  const lows = item.points.map((p) => p.sell.low ?? Infinity)
+  const highs = item.points.map((p) => p.sell.high ?? -Infinity)
+  const low = Math.min(...lows)
+  const high = Math.max(...highs)
+  return (
+    <Paper variant="outlined" sx={{ p: 2 }} data-testid="bazaar-detail">
+      <Stack spacing={2}>
+        <Stack direction="row" alignItems="baseline" spacing={1.5} flexWrap="wrap">
+          <Typography variant="h6">{nameOf(item)}</Typography>
+          <Typography variant="body2" color="text.secondary">
+            last seen {item.lastDay}
+          </Typography>
+        </Stack>
+        <Stack direction="row" spacing={4} flexWrap="wrap" useFlexGap>
+          <Tile label="Asking now" value={formatPlat(item.asking)} color={ASK_COLOR}>
+            <Move f={item.askingMove} />
+          </Tile>
+          <Tile label="Offered now" value={formatPlat(item.offered)} color={OFFER_COLOR} />
+          <Tile label="Asking range" value={Number.isFinite(low) ? `${formatPlat(low)} to ${formatPlat(high)}` : '-'} />
+          <Tile label="Offers seen" value={String(item.sellOffers + item.buyOffers + item.trades)}>
+            <Typography component="span" variant="caption" color="text.secondary">
+              {item.sellOffers} selling · {item.buyOffers} buying{item.trades > 0 ? ` · ${item.trades} trade` : ''}
+            </Typography>
+          </Tile>
+        </Stack>
+        <BazaarChart item={item} />
+        {item.outliers > 0 && (
+          <Typography variant="caption" color="text.disabled">
+            {item.outliers} price(s) more than four times away from this item&apos;s usual price are left out.
+          </Typography>
+        )}
+      </Stack>
+    </Paper>
+  )
+}
+
+function ItemRow({ item, endDay, picked, onPick }: { item: BazaarItem; endDay: string; picked: boolean; onPick: () => void }): JSX.Element {
+  const spark = sparkline(item.points, endDay, SPARK_DAYS)
+  return (
+    <TableRow hover selected={picked} onClick={onPick} sx={{ cursor: 'pointer' }} data-testid={`bazaar-row-${item.key}`}>
+      <TableCell sx={{ fontWeight: picked ? 700 : 400 }}>{nameOf(item)}</TableCell>
+      <TableCell>
+        <BazaarSparkline sell={spark.sell} buy={spark.buy} />
+      </TableCell>
+      <TableCell align="right">{formatPlat(item.asking)}</TableCell>
+      <TableCell align="right">
+        <Move f={item.askingMove} />
+      </TableCell>
+      <TableCell align="right">{formatPlat(item.offered)}</TableCell>
+      <TableCell align="right">{item.sellOffers + item.buyOffers + item.trades}</TableCell>
+      <TableCell align="right" sx={{ color: 'text.secondary' }}>
+        {item.lastDay}
+      </TableCell>
+    </TableRow>
+  )
+}
+
+function Controls(props: {
+  text: string
+  setText: (v: string) => void
+  dir: BazaarDir | 'all'
+  setDir: (v: BazaarDir | 'all') => void
+  sort: BazaarSort
+  setSort: (v: BazaarSort) => void
+}): JSX.Element {
+  return (
+    <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" useFlexGap>
+      <TextField
+        size="small"
+        placeholder="Search items"
+        value={props.text}
+        onChange={(ev) => props.setText(ev.target.value)}
+        slotProps={{ htmlInput: { 'data-testid': 'bazaar-search' } }}
+      />
+      <ToggleButtonGroup size="small" exclusive value={props.dir} onChange={(_e, v: BazaarDir | 'all' | null) => v !== null && props.setDir(v)}>
+        <ToggleButton value="all">All</ToggleButton>
+        <ToggleButton value="sell">Selling</ToggleButton>
+        <ToggleButton value="buy">Buying</ToggleButton>
+        <ToggleButton value="trade">Trading</ToggleButton>
+      </ToggleButtonGroup>
+      <TextField select size="small" label="Sort" value={props.sort} onChange={(ev) => props.setSort(ev.target.value as BazaarSort)} sx={{ minWidth: 160 }}>
+        {SORTS.map((s) => (
+          <MenuItem key={s.value} value={s.value}>
+            {s.label}
+          </MenuItem>
         ))}
-    </>
+      </TextField>
+    </Stack>
   )
 }
 
@@ -69,57 +171,47 @@ export default function BazaarView(): JSX.Element {
   const snap = useModule<BazaarSnap>(BAZAAR_MODULE_ID)
   const [text, setText] = useState('')
   const [dir, setDir] = useState<BazaarDir | 'all'>('all')
-  const [open, setOpen] = useState<string | null>(null)
-  const entries = useMemo(() => summarizeBazaar(snap, { text, dir }), [snap, text, dir])
+  const [sort, setSort] = useState<BazaarSort>('recent')
+  const [pick, setPick] = useState<string | null>(null)
+  const sum = useMemo(() => summarizeBazaar(snap, { text, dir, sort }), [snap, text, dir, sort])
+  const picked = sum.items.find((i) => i.key === pick) ?? sum.items.at(0) ?? null
 
   return (
     <Stack spacing={2} sx={{ p: 2 }} data-testid="bazaar-view">
       <Typography variant="body2" color="text.secondary">
-        Prices players asked (selling) and offered (buying) in trade chat, read from your log. A seller
-        repeating the same offer in a day counts once. Click a line to see it day by day.
+        What players asked (WTS) and offered (WTB) in trade chat, read from your log
+        {sum.days > 0 ? `: ${sum.offers} offers over ${sum.days} days` : ''}. Prices are daily medians; a
+        seller repeating an offer in a day counts once.
       </Typography>
-      <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
-        <TextField
-          size="small"
-          placeholder="Search items"
-          value={text}
-          onChange={(ev) => setText(ev.target.value)}
-          slotProps={{ htmlInput: { 'data-testid': 'bazaar-search' } }}
-        />
-        <ToggleButtonGroup size="small" exclusive value={dir} onChange={(_e, v: BazaarDir | 'all' | null) => v !== null && setDir(v)}>
-          <ToggleButton value="all">All</ToggleButton>
-          <ToggleButton value="sell">Selling</ToggleButton>
-          <ToggleButton value="buy">Buying</ToggleButton>
-          <ToggleButton value="trade">Trading</ToggleButton>
-        </ToggleButtonGroup>
-      </Stack>
+      <Controls text={text} setText={setText} dir={dir} setDir={setDir} sort={sort} setSort={setSort} />
       {snap === null ? (
         <Typography variant="body2">Reading your log…</Typography>
-      ) : entries.length === 0 ? (
+      ) : picked === null || sum.lastDay === null ? (
         <Typography variant="body2">No trade offers {text === '' && dir === 'all' ? 'in your log yet' : 'match'}.</Typography>
       ) : (
-        <Box sx={{ overflowX: 'auto' }}>
-          <Table size="small" stickyHeader>
-            <TableHead>
-              <TableRow>
-                <TableCell>Item</TableCell>
-                <TableCell>Direction</TableCell>
-                <TableCell>Last seen</TableCell>
-                <TableCell align="right">Latest</TableCell>
-                <TableCell align="right">Low</TableCell>
-                <TableCell align="right">Average</TableCell>
-                <TableCell align="right">High</TableCell>
-                <TableCell align="right">Priced</TableCell>
-                <TableCell align="right">No price</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {entries.map((e) => (
-                <EntryRow key={e.key} e={e} open={open === e.key} onToggle={() => setOpen(open === e.key ? null : e.key)} />
-              ))}
-            </TableBody>
-          </Table>
-        </Box>
+        <>
+          <Detail item={picked} />
+          <Box sx={{ overflowX: 'auto' }}>
+            <Table size="small" stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Item</TableCell>
+                  <TableCell>Last {SPARK_DAYS} days</TableCell>
+                  <TableCell align="right">Asking</TableCell>
+                  <TableCell align="right">Change</TableCell>
+                  <TableCell align="right">Offered</TableCell>
+                  <TableCell align="right">Offers</TableCell>
+                  <TableCell align="right">Last seen</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {sum.items.map((i) => (
+                  <ItemRow key={i.key} item={i} endDay={sum.lastDay ?? i.lastDay} picked={i.key === picked.key} onPick={() => setPick(i.key)} />
+                ))}
+              </TableBody>
+            </Table>
+          </Box>
+        </>
       )}
     </Stack>
   )

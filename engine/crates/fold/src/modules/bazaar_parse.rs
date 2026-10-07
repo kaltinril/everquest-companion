@@ -14,6 +14,8 @@
 //!   "Arrow"). Case and apostrophes never matter.
 //! * prices: `5k`, `2.5k`, `500pp`, `10 000pp`, `4 pp`, `150g`, `20 copper`, `5kpp`, and a price
 //!   glued to the name (`Cloak6k`). `3k each: A | B` prices both; so does `A, B 150g each`.
+//! * a bare number (no `k`, `pp` or coin) is a price only right after the item, its tier or its
+//!   count, or before `each`: "only have 1" and "- buying 100 10lb meatpies" are counts.
 //! * `+4` and `4+` are the upgrade tier; `x2`, `2x` and a bare count before the name are the
 //!   quantity, as is a count before "for" (`Bone Chips 1000 for 10k`).
 //! * a trade (WTT) is a barter: its numbers count the other thing, so it never carries a price.
@@ -312,8 +314,15 @@ impl<'a> Parser<'a> {
 
     fn try_price(&mut self, i: usize, dir: Dir) -> Option<usize> {
         let (pp, used) = price_at(&self.t, i)?;
-        self.fresh = true;
         let bare = used == 1 && self.t[i].raw.bytes().all(|b| b.is_ascii_digit());
+        let each_next = self
+            .t
+            .get(i + 1)
+            .is_some_and(|x| matches!(x.n.as_str(), "each" | "ea" | "per"));
+        if bare && !self.fresh && !each_next && self.item_at(i + 1).is_none() {
+            return None;
+        }
+        self.fresh = true;
         if bare && self.item_at(i + 1).is_some() {
             self.pending_qty = self.t[i].raw.parse().ok();
             return Some(i + 1);
