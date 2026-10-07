@@ -50,6 +50,7 @@ import { noteHeapAfterData } from './dataWeight'
 import { initProcessPriority } from './processPriority'
 import { startEngineSupervisor, stopEngineSupervisor } from './dataServer/engineHost'
 import { recoverLogArchiveAtLaunch } from './logArchive/actions'
+import { startAutoArchive } from './logArchive/autoArchive'
 import { getProcessPriorityPrefs } from './storeProcessPriority'
 import { initPresenceEffects, stopPresenceEffects } from './presenceEffects'
 import { provisionDefaultPacks } from './provisionPacks'
@@ -310,6 +311,7 @@ if (!gotSingleInstanceLock) {
     })
       .then(() => startTailing())
       .then(() => {
+        startAutoArchive()
         // THE PHASE SURVIVES, ITS NUMBERS DO NOT (JOS-499). `replayDone` used to carry what THIS
         // process's fold cost — events replayed, the slicer's duty cycle, bytes read, the
         // cold-read delta, the first megabyte. There is no fold here to measure, and reporting

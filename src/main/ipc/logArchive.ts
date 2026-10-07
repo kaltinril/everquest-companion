@@ -6,11 +6,16 @@
 import { ipcMain } from 'electron'
 import { IPC } from '../../shared/ipc'
 import { backupNow, keepHistory, logArchiveStatus, refreshHistory, restoreNow, rotateNow, setLogArchiveEnabled } from '../logArchive/actions'
+import { autoArchiveCheck } from '../logArchive/autoArchive'
 import { refoldTrial } from '../logArchive/refoldActions'
 
 export function registerLogArchiveIpc(): void {
   ipcMain.handle(IPC.logArchiveStatus, () => logArchiveStatus())
-  ipcMain.handle(IPC.logArchiveSetEnabled, (_e, enabled: unknown) => setLogArchiveEnabled(enabled === true))
+  // Turning the switch on is the consent: a log already over the limit is archived straight away.
+  ipcMain.handle(IPC.logArchiveSetEnabled, async (_e, enabled: unknown) => {
+    const r = setLogArchiveEnabled(enabled === true)
+    return enabled === true ? ((await autoArchiveCheck()) ?? r) : r
+  })
   ipcMain.handle(IPC.logArchiveBackup, () => backupNow())
   ipcMain.handle(IPC.logArchiveKeep, (_e, id: unknown) => keepHistory(typeof id === 'string' ? id : ''))
   ipcMain.handle(IPC.logArchiveRotate, () => rotateNow())

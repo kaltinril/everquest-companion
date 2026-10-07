@@ -28,6 +28,8 @@ import { readJournal, recoverRotation, restoreLog, rotateLog, type RotateDeps } 
 import { listSegments, writeSegment } from './segmentStore'
 
 let busy: string | null = null
+/** One archive per app run: see `archivedThisRun` in preflight.ts. */
+let archivedThisRun = false
 
 /** A page size no log reaches, so the capture asks for every fight (step 4.7). The engine keeps
  *  every finalized fight's summary; 6,299 fights measured at 1.6 MB (ruling 0.4). */
@@ -154,7 +156,8 @@ function fillOn(base: LogArchiveStatus, dir: string, a: { character: string; log
     freeBytes: freeBytes(dir),
     logBytes: base.live?.bytes ?? 0,
     interrupted: readJournal(dir) !== null,
-    busy: busy !== null
+    busy: busy !== null,
+    archivedThisRun
   })
   return base
 }
@@ -242,6 +245,7 @@ export function rotateNow(): Promise<LogArchiveReply> {
     buckets.keep(dir, cap.segment.id, r.ok || r.logTouched)
     if (!r.ok) return reply(false, r.logTouched ? `Interrupted: ${r.reason}` : `Not archived: ${r.reason}`)
     liveHistory.noteSealedThisAttach(r.segment.id)
+    archivedThisRun = true
     const gap = r.segment.gapLines ?? 0
     const extra = gap > 0 ? ` ${gap} line(s) written during the move are in the archive but not in the totals.` : ''
     return reply(true, `Archived to ${r.segment.archivePath ?? dir}. Your history is kept.${extra}`)

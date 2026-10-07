@@ -2,15 +2,18 @@
 //
 // OFF FOR EVERY PLAYER, and only the player turns it on, here. While it is off the card shows the
 // switch and what turning it on allows, and nothing else, and the app does nothing with the log.
-// While it is on, nothing happens by itself: archiving is one button, and it asks first, naming the
-// file. The archive makes its own verified backup, so the card offers no separate backup or keep
-// step (owner, 2026-10-06); the IPC for them stays for the trial scripts.
+// While it is on, the log is archived automatically whenever it passes AUTO_ARCHIVE_BYTES
+// (main/logArchive/autoArchive.ts): turning the switch on is the consent, and the player should
+// never have to come back here (owner, 2026-10-06). The one button archives now, for a player who
+// does not want to wait. The archive makes its own verified backup, so the card offers no separate
+// backup or keep step; the IPC for them stays for the trial scripts.
 //
 // Shown in every build since step 6.3 (owner, 2026-10-04); the switch stays off by default.
 
 import { type JSX, useCallback, useEffect, useState } from 'react'
 import { Alert, Box, Button, FormControlLabel, Stack, Switch, Typography } from '@mui/material'
 import type { LogArchiveReply, LogArchiveStatus, SegmentRow } from '@shared/logArchive/panel'
+import { AUTO_ARCHIVE_BYTES } from '@shared/logArchive/preflight'
 
 function fmtBytes(n: number): string {
   if (n >= 1024 ** 3) return `${(n / 1024 ** 3).toFixed(1)} GB`
@@ -110,7 +113,7 @@ function OnPanel(props: { st: LogArchiveStatus; run: (p: Promise<LogArchiveReply
       <Box>
         <ConfirmButton
           testId="log-archive-rotate"
-          label="Archive this log and start fresh"
+          label="Archive now"
           disabled={st.rotateBlockers.length > 0}
           confirm={`This moves ${st.live?.path ?? 'your log'} (${fmtBytes(st.live?.bytes ?? 0)}) into ${st.dir}, compresses it, and starts a fresh log. Your kills, loot and levels keep showing. The game can stay open.`}
           onGo={() => run(window.eq.logArchiveRotate())}
@@ -179,8 +182,8 @@ export function LogArchiveSetting(): JSX.Element {
       />
       <Typography variant="caption" color="text.secondary">
         {st.enabled
-          ? 'On. Nothing happens by itself: the log is archived only when you click the button below.'
-          : 'Off. When on, one button archives your EverQuest log as a compressed copy and starts a fresh, small log while your kills, loot and levels keep showing. The app never does it unless you click.'}
+          ? `On. Whenever your log passes ${fmtBytes(AUTO_ARCHIVE_BYTES)}, it is moved into a compressed archive and a fresh, small log starts. Your kills, loot and levels keep showing. Nothing else to do.`
+          : `Off. When on, the app keeps your EverQuest log small: whenever it passes ${fmtBytes(AUTO_ARCHIVE_BYTES)}, it is moved into a compressed archive and a fresh log starts, while your kills, loot and levels keep showing.`}
       </Typography>
       {offAsking && (
         <Stack direction="row" spacing={1} alignItems="center">
