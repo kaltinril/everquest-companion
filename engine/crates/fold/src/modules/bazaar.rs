@@ -38,7 +38,7 @@ pub struct BazaarRow {
     sum: f64,
     /// Every priced offer's platinum per unit, in log order, for medians and outliers.
     prices: Vec<f64>,
-    /// Who said it and what they said, the first QUOTES_KEPT counted offers of the day.
+    /// Who said it and what they said: every counted offer of the day (a repeat is not counted).
     quotes: Vec<Quote>,
 }
 
@@ -55,8 +55,9 @@ pub struct Quote {
     msg: String,
 }
 
-/// Quotes kept per row: a day of one item is rarely more, and the snapshot stays small.
-const QUOTES_KEPT: usize = 20;
+/// A ceiling against a flood, not a sample: a seller repeating an offer counts once a day already,
+/// so a row only grows by distinct offers, and fifty sellers in a day are fifty quotes.
+const QUOTES_KEPT: usize = 500;
 const QUOTE_CHARS: usize = 200;
 
 /// One offer heard live, newest last: what a watch alert is raised from.
@@ -264,3 +265,7 @@ impl EqModule for BazaarModule {
 #[cfg(test)]
 #[path = "bazaar_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "bazaar_corpus_tests.rs"]
+mod corpus_tests;

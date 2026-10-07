@@ -34,7 +34,7 @@ export interface BazaarRow {
   sum: number
   /** Every priced offer, platinum per unit. Absent in rows from before 2026-10-06. */
   prices?: number[]
-  /** Who said it and what they said, the day's first 20 counted offers. Absent before 2026-10-07. */
+  /** Who said it and what they said, every counted offer of the day. Absent before 2026-10-07. */
   quotes?: Quote[]
 }
 
