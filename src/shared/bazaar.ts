@@ -35,8 +35,23 @@ export interface BazaarRow {
   prices?: number[]
 }
 
+/** One offer heard live (bazaar.rs `LiveOffer`): what the watch alerts read. */
+export interface LiveOffer {
+  seq: number
+  /** The log's stamp, `2026-09-23 17:54:48`. */
+  at: string
+  speaker: string
+  dir: BazaarDir
+  item: string
+  tier: number
+  /** Platinum per unit; null when the offer stated none. */
+  price: number | null
+}
+
 export interface BazaarSnap {
   rows: BazaarRow[]
+  /** The last offers heard after the replay caught up, newest last. Absent from older engines. */
+  live?: LiveOffer[]
 }
 
 /** One direction on one day, outliers left out. */
@@ -78,12 +93,27 @@ export interface BazaarItem {
   outliers: number
   /** Days with any offer in the TREND_DAYS ending on the log's newest day: what the trend column sorts by. */
   activeDays: number
+  /**
+   * Platinum changing hands in the TREND_DAYS, roughly: the price now (asking, else offered) times
+   * the offers seen. What "Popular" ranks by: a 5-gold item asked for a hundred times stays small.
+   */
+  volume: number | null
   /** Every day with any offer, oldest first. */
   points: BazaarPoint[]
 }
 
 /** A column of the tab's list; every one sorts. */
-export type BazaarSortKey = 'item' | 'trend' | 'asking' | 'askingAvg' | 'askingPredicted' | 'move' | 'offered' | 'offers' | 'lastDay'
+export type BazaarSortKey =
+  | 'item'
+  | 'trend'
+  | 'asking'
+  | 'askingAvg'
+  | 'askingPredicted'
+  | 'move'
+  | 'offered'
+  | 'offers'
+  | 'volume'
+  | 'lastDay'
 
 export interface BazaarSort {
   key: BazaarSortKey
@@ -96,6 +126,10 @@ export interface BazaarQuery {
   /** Keep items with offers in this direction. */
   dir: BazaarDir | 'all'
   sort: BazaarSort
+  /** Keep only these items and tiers (the wish list, the watchlist). */
+  keep?: (item: string, tier: number) => boolean
+  /** Keep only items whose price now (asking, else offered) is at least this, in platinum. */
+  minPrice?: number
 }
 
 export interface BazaarSummary {
@@ -181,6 +215,9 @@ function itemOf(key: string, rows: readonly BazaarRow[], endDay: string): Bazaar
   const [offeredAvg, offeredPredicted] = forecast(points, 'buy', endDay, offered)
   const counted = (dir: 'sell' | 'buy'): number => points.reduce((s, p) => s + p[dir].n + p[dir].unpriced, 0)
   const kept = points.reduce((s, p) => s + p.sell.n + p.buy.n, 0)
+  const recent = endDay === '' ? [] : points.filter((p) => (Date.parse(endDay) - Date.parse(p.day)) / 86_400_000 < TREND_DAYS)
+  const recentOffers = recent.reduce((s, p) => s + p.sell.n + p.sell.unpriced + p.buy.n + p.buy.unpriced, 0)
+  const ref = asking ?? offered
   return {
     key,
     item: rows[0].item,
@@ -197,7 +234,8 @@ function itemOf(key: string, rows: readonly BazaarRow[], endDay: string): Bazaar
     buyOffers: counted('buy'),
     trades: points.reduce((s, p) => s + p.trades, 0),
     outliers: pricesIn('sell').length + pricesIn('buy').length - kept,
-    activeDays: endDay === '' ? 0 : days.filter((d) => (Date.parse(endDay) - Date.parse(d)) / 86_400_000 < TREND_DAYS).length,
+    activeDays: recent.length,
+    volume: ref === null ? null : ref * recentOffers,
     points
   }
 }
@@ -212,6 +250,7 @@ const COLUMN: Record<BazaarSortKey, (x: BazaarItem) => number | string | null> =
   move: (x) => x.askingMove,
   offered: (x) => x.offered,
   offers: (x) => x.sellOffers + x.buyOffers + x.trades,
+  volume: (x) => x.volume,
   lastDay: (x) => x.lastDay
 }
 
@@ -233,7 +272,14 @@ function compare(sort: BazaarSort): (a: BazaarItem, b: BazaarItem) => number {
 
 function matches(rows: readonly BazaarRow[], q: BazaarQuery, text: string): boolean {
   if (text !== '' && !rows[0].item.toLowerCase().includes(text)) return false
+  if (q.keep !== undefined && !q.keep(rows[0].item, rows[0].tier)) return false
   return q.dir === 'all' || rows.some((r) => r.dir === q.dir)
+}
+
+function pricedEnough(x: BazaarItem, min: number | undefined): boolean {
+  if (min === undefined || min <= 0) return true
+  const ref = x.asking ?? x.offered
+  return ref !== null && ref >= min
 }
 
 /** The tab: one entry per item and tier that matches, in the asked order, with the log's totals. */
@@ -252,6 +298,7 @@ export function summarizeBazaar(snap: BazaarSnap | null, q: BazaarQuery): Bazaar
   const items = [...groups]
     .filter(([, g]) => matches(g, q, text))
     .map(([key, g]) => itemOf(key, g, endDay))
+    .filter((x) => pricedEnough(x, q.minPrice))
     .sort(compare(q.sort))
   return {
     items,

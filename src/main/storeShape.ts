@@ -20,6 +20,7 @@ import type { BuffTrustPrefs } from '../shared/buffTrust'
 import type { BuffAllowPrefs } from '../shared/buffAllow'
 import type { LogArchivePrefs } from '../shared/logArchive/prefs'
 import type { RespawnPrefs } from '../shared/respawn'
+import type { BazaarWatchlist } from '../shared/bazaarWatch'
 import type { SoundPackPrefs } from '../shared/soundPacks'
 import type { WindowBounds } from './store'
 
@@ -269,6 +270,11 @@ export interface StoreShape {
    * every field, so an older build reading a store written here is unaffected and vice versa.
    */
   respawn?: RespawnPrefs
+  /**
+   * The Bazaar watchlist (shared/bazaarWatch.ts): items to buy, sell or watch, and their alert
+   * prices. Another additive key: absent reads as no watches, no schema bump, no migration.
+   */
+  bazaarWatch?: BazaarWatchlist
   /**
    * The newest release whose notes this install has been SHOWN (JOS-73; shared/releaseNotes.ts).
    *

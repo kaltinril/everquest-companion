@@ -271,6 +271,49 @@ fn the_module_keeps_one_row_per_day_item_tier_and_direction() {
     );
 }
 
+#[test]
+fn offers_heard_live_are_kept_for_the_watch_alerts() {
+    let mut m = BazaarModule::new();
+    let k: Arc<dyn Knowledge> = Arc::new(Names);
+    m.install_knowledge(&k);
+    // Replayed history is never alerted on, and a repeat of one offer counts once.
+    m.on_event(
+        &line(
+            1,
+            "[Wed Sep 23 17:54:48 2026] Leric tells General:1, 'WTS Fleeting Quiver 20k'",
+        ),
+        false,
+    );
+    m.on_event(
+        &line(
+            2,
+            "[Wed Sep 23 18:00:00 2026] Aaron tells General:1, 'WTS Fleeting Quiver 18k'",
+        ),
+        true,
+    );
+    m.on_event(
+        &line(
+            3,
+            "[Wed Sep 23 18:05:00 2026] Aaron tells General:1, 'WTS Fleeting Quiver 18k'",
+        ),
+        true,
+    );
+    m.on_event(
+        &line(
+            4,
+            "[Wed Sep 23 18:06:00 2026] Bbqz tells General:1, 'WTB Fleeting Quiver'",
+        ),
+        true,
+    );
+    assert_eq!(
+        m.snapshot()["state"]["live"],
+        json!([
+            { "seq": 2, "at": "2026-09-23 18:00:00", "speaker": "Aaron", "dir": "sell", "item": "Fleeting Quiver", "tier": 0, "price": 18000.0 },
+            { "seq": 4, "at": "2026-09-23 18:06:00", "speaker": "Bbqz", "dir": "buy", "item": "Fleeting Quiver", "tier": 0, "price": null }
+        ])
+    );
+}
+
 /// The whole parser over a chat corpus with the real item database, for measuring against the
 /// prototype: `BAZAAR_CORPUS=<chat lines> [BAZAAR_ITEMS=<items.json>] [BAZAAR_DUMP=1] cargo test -p fold bazaar_corpus -- --ignored --nocapture`.
 #[test]
@@ -318,10 +361,7 @@ fn bazaar_corpus() {
         if std::env::var("BAZAAR_DUMP").is_ok() {
             println!(
                 "DUMP	{msg}	{}",
-                o.iter()
-                    .map(|x| x.item.as_str())
-                    .collect::<Vec<_>>()
-                    .join("|")
+                o.iter().map(short).collect::<Vec<_>>().join(" | ")
             );
         }
         with_price += usize::from(o.iter().any(|x| x.price_pp.is_some()));

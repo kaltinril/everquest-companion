@@ -23,6 +23,7 @@ import type { GearIndexPayload } from '../shared/planner/gear'
 import type { GearSet } from '../shared/planner/gearSet'
 import type { OwnershipPayload } from '../shared/planner/ownership'
 import type { WishList } from '../shared/planner/wishlist'
+import type { BazaarWatchlist } from '../shared/bazaarWatch'
 
 export const plannerApi = {
   // ---- exaltation planner (docs/plans/exaltation-planner.md §4.1, §6) ----
@@ -91,5 +92,10 @@ export const plannerApi = {
   /** Replace the whole wish list for the active character. Main re-validates every entry — the
    *  item key, the two kinds, the closed socket allowlist — and silently drops what does not fit.
    *  Whole-document, because the list and the two facts about it must move together. */
-  setWishlist: (list: WishList): Promise<void> => ipcRenderer.invoke(IPC.wishlistSet, list)
+  setWishlist: (list: WishList): Promise<void> => ipcRenderer.invoke(IPC.wishlistSet, list),
+
+  /** The Bazaar watchlist (shared/bazaarWatch.ts), app-wide; the set returns what was stored. */
+  getBazaarWatch: (): Promise<BazaarWatchlist> => ipcRenderer.invoke(IPC.bazaarWatchGet),
+
+  setBazaarWatch: (list: BazaarWatchlist): Promise<BazaarWatchlist> => ipcRenderer.invoke(IPC.bazaarWatchSet, list)
 }

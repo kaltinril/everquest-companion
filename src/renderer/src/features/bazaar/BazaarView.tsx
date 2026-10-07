@@ -6,35 +6,29 @@
 // (shared/bazaar.ts). What the parser reads is stated in engine/crates/fold/src/modules/bazaar_parse.rs.
 
 import { type JSX, useMemo, useState } from 'react'
-import {
-  Box,
-  Paper,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TableSortLabel,
-  TextField,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography
-} from '@mui/material'
+import { Box, Chip, Paper, Stack, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Typography } from '@mui/material'
+import { itemTierKey } from '@shared/itemStats'
+import { findWatch, type BazaarWatch, type BazaarWatchlist } from '@shared/bazaarWatch'
 import {
   BAZAAR_MODULE_ID,
   formatMove,
   formatPlat,
   sparkline,
   summarizeBazaar,
-  type BazaarDir,
   type BazaarItem,
   type BazaarSnap,
   type BazaarSort,
   type BazaarSortKey
 } from '@shared/bazaar'
 import { useModule } from '../../lib/useModule'
+import { itemIconUrl } from '../../lib/ItemWindow'
+import { useWishlist } from '../wishlist/useWishlist'
 import { ASK_COLOR, BazaarChart, BazaarSparkline, OFFER_COLOR } from './BazaarChart'
+import BazaarControls, { type BazaarControlState, type BazaarShow } from './BazaarControls'
+import BazaarWatchPanel from './BazaarWatchPanel'
+import { useHeardAlerts } from './BazaarWatcher'
+import { useBazaarWatch } from './useBazaarWatch'
+import { useItemIcons } from './useItemIcons'
 
 const SPARK_DAYS = 30
 /** The list's columns, each sortable; numbers sort biggest first on the first click. */
@@ -47,6 +41,7 @@ const COLUMNS: { key: BazaarSortKey; label: string; right: boolean }[] = [
   { key: 'move', label: 'Change', right: true },
   { key: 'offered', label: 'Offered', right: true },
   { key: 'offers', label: 'Offers', right: true },
+  { key: 'volume', label: 'Traded 30d', right: true },
   { key: 'lastDay', label: 'Last seen', right: true }
 ]
 
@@ -172,6 +167,7 @@ function Detail({ item, endDay }: { item: BazaarItem; endDay: string }): JSX.Ele
             </Typography>
           </Tile>
         </Stack>
+        <BazaarWatchPanel item={item} />
         <BazaarChart item={item} endDay={endDay} />
         <Typography variant="caption" color="text.disabled">
           Predicted: a trend through the last ten priced days, newer and busier days counting more,
@@ -187,11 +183,47 @@ function Detail({ item, endDay }: { item: BazaarItem; endDay: string }): JSX.Ele
   )
 }
 
-function ItemRow({ item, endDay, picked, onPick }: { item: BazaarItem; endDay: string; picked: boolean; onPick: () => void }): JSX.Element {
+/** The item's icon, the Gear tab's way: hidden when the image fails or the page names none. */
+function ItemIcon({ iconId }: { iconId: number | undefined }): JSX.Element {
+  if (iconId === undefined) return <Box sx={{ width: 22, flexShrink: 0 }} />
+  return (
+    <Box
+      component="img"
+      src={itemIconUrl(iconId)}
+      alt=""
+      onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+        e.currentTarget.style.display = 'none'
+      }}
+      sx={{ width: 22, height: 22, imageRendering: 'pixelated', flexShrink: 0 }}
+    />
+  )
+}
+
+const WATCH_CHIP: Record<BazaarWatch['status'], { label: string; color: 'success' | 'info' | 'default' }> = {
+  buy: { label: 'Buy', color: 'success' },
+  sell: { label: 'Sell', color: 'info' },
+  watch: { label: 'Watch', color: 'default' }
+}
+
+interface RowMarks {
+  iconId: number | undefined
+  wished: boolean
+  watch: BazaarWatch | null
+}
+
+function ItemRow({ item, endDay, picked, onPick, marks }: { item: BazaarItem; endDay: string; picked: boolean; onPick: () => void; marks: RowMarks }): JSX.Element {
   const spark = sparkline(item.points, endDay, SPARK_DAYS)
+  const chip = marks.watch === null ? null : WATCH_CHIP[marks.watch.status]
   return (
     <TableRow hover selected={picked} onClick={onPick} sx={{ cursor: 'pointer' }} data-testid={`bazaar-row-${item.key}`}>
-      <TableCell sx={{ fontWeight: picked ? 700 : 400 }}>{nameOf(item)}</TableCell>
+      <TableCell sx={{ fontWeight: picked ? 700 : 400 }}>
+        <Stack direction="row" spacing={0.75} alignItems="center" sx={{ flexWrap: 'nowrap' }}>
+          <ItemIcon iconId={marks.iconId} />
+          <span>{nameOf(item)}</span>
+          {marks.wished && <Chip size="small" variant="outlined" color="secondary" label="♥ wish" sx={{ height: 18, fontSize: 10 }} data-testid="bazaar-wish-chip" />}
+          {chip !== null && <Chip size="small" color={chip.color} label={chip.label} sx={{ height: 18, fontSize: 10 }} data-testid="bazaar-watch-chip" />}
+        </Stack>
+      </TableCell>
       <TableCell>
         <BazaarSparkline sell={spark.sell} buy={spark.buy} />
       </TableCell>
@@ -203,6 +235,7 @@ function ItemRow({ item, endDay, picked, onPick }: { item: BazaarItem; endDay: s
       </TableCell>
       <TableCell align="right">{formatPlat(item.offered)}</TableCell>
       <TableCell align="right">{item.sellOffers + item.buyOffers + item.trades}</TableCell>
+      <TableCell align="right">{formatPlat(item.volume)}</TableCell>
       <TableCell align="right" sx={{ color: 'text.secondary' }}>
         {item.lastDay}
       </TableCell>
@@ -210,39 +243,69 @@ function ItemRow({ item, endDay, picked, onPick }: { item: BazaarItem; endDay: s
   )
 }
 
-function Controls(props: {
-  text: string
-  setText: (v: string) => void
-  dir: BazaarDir | 'all'
-  setDir: (v: BazaarDir | 'all') => void
-}): JSX.Element {
+/** The watch alerts raised this session, so one missed with the banner closed is still here. */
+function HeardAlerts(): JSX.Element | null {
+  const heard = useHeardAlerts()
+  if (heard.length === 0) return null
   return (
-    <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" useFlexGap>
-      <TextField
-        size="small"
-        placeholder="Search items"
-        value={props.text}
-        onChange={(ev) => props.setText(ev.target.value)}
-        slotProps={{ htmlInput: { 'data-testid': 'bazaar-search' } }}
-      />
-      <ToggleButtonGroup size="small" exclusive value={props.dir} onChange={(_e, v: BazaarDir | 'all' | null) => v !== null && props.setDir(v)}>
-        <ToggleButton value="all">All</ToggleButton>
-        <ToggleButton value="sell">Selling</ToggleButton>
-        <ToggleButton value="buy">Buying</ToggleButton>
-        <ToggleButton value="trade">Trading</ToggleButton>
-      </ToggleButtonGroup>
-    </Stack>
+    <Paper variant="outlined" sx={{ p: 1.5 }} data-testid="bazaar-heard">
+      <Typography variant="caption" color="text.secondary">
+        Watch alerts this session
+      </Typography>
+      {heard.map((a) => (
+        <Typography key={a.seq} variant="body2">
+          <Box component="span" sx={{ color: 'text.secondary', mr: 1 }}>
+            {a.at.slice(11)}
+          </Box>
+          {a.text}
+        </Typography>
+      ))}
+    </Paper>
   )
 }
 
+/** Which items the Show picker keeps; undefined keeps all. */
+function keeperOf(show: BazaarShow, wished: ReadonlySet<string>, watch: BazaarWatchlist): ((item: string, tier: number) => boolean) | undefined {
+  if (show === 'all') return undefined
+  if (show === 'wish') return (item) => wished.has(itemTierKey(item))
+  return (item, tier) => {
+    const w = findWatch(watch, item, tier)
+    return w !== null && (show === 'watched' || w.status === show)
+  }
+}
+
+const START: BazaarControlState = { text: '', dir: 'all', show: 'all', popular: false, minPrice: 0 }
+
 export default function BazaarView(): JSX.Element {
   const snap = useModule<BazaarSnap>(BAZAAR_MODULE_ID)
-  const [text, setText] = useState('')
-  const [dir, setDir] = useState<BazaarDir | 'all'>('all')
+  const wishes = useWishlist()
+  const { list: watch } = useBazaarWatch()
+  const [ctl, setCtl] = useState<BazaarControlState>(START)
   const [sort, setSort] = useState<BazaarSort>({ key: 'lastDay', desc: true })
   const [pick, setPick] = useState<string | null>(null)
-  const sum = useMemo(() => summarizeBazaar(snap, { text, dir, sort }), [snap, text, dir, sort])
+  const wished = useMemo(() => new Set(wishes.ready ? wishes.list.entries.map((e) => e.itemKey) : []), [wishes])
+  const keep = useMemo(() => keeperOf(ctl.show, wished, watch), [ctl.show, wished, watch])
+  const sum = useMemo(
+    () => summarizeBazaar(snap, { text: ctl.text, dir: ctl.dir, sort, keep, minPrice: ctl.minPrice }),
+    [snap, ctl.text, ctl.dir, ctl.minPrice, sort, keep]
+  )
+  const names = useMemo(() => [...new Set(sum.items.map((i) => i.item))], [sum.items])
+  const iconOf = useItemIcons(names)
   const picked = sum.items.find((i) => i.key === pick) ?? sum.items.at(0) ?? null
+  const set = (patch: Partial<BazaarControlState>): void => {
+    const next = { ...ctl, ...patch }
+    // Popular ranks by platinum traded, and leaves out what sells for under a platinum.
+    if (patch.popular === true) {
+      setSort({ key: 'volume', desc: true })
+      if (next.minPrice === 0) next.minPrice = 1
+    }
+    setCtl(next)
+  }
+  const onSort = (next: BazaarSort): void => {
+    setSort(next)
+    if (ctl.popular && next.key !== 'volume') setCtl({ ...ctl, popular: false })
+  }
+  const filtered = ctl.text !== '' || ctl.dir !== 'all' || ctl.show !== 'all' || ctl.minPrice > 0
 
   return (
     <Stack spacing={2} sx={{ p: 2 }} data-testid="bazaar-view">
@@ -251,20 +314,28 @@ export default function BazaarView(): JSX.Element {
         {sum.days > 0 ? `: ${sum.offers} offers over ${sum.days} days` : ''}. Prices are daily medians; a
         seller repeating an offer in a day counts once.
       </Typography>
-      <Controls text={text} setText={setText} dir={dir} setDir={setDir} />
+      <BazaarControls state={ctl} set={set} />
+      <HeardAlerts />
       {snap === null ? (
         <Typography variant="body2">Reading your log…</Typography>
       ) : picked === null || sum.lastDay === null ? (
-        <Typography variant="body2">No trade offers {text === '' && dir === 'all' ? 'in your log yet' : 'match'}.</Typography>
+        <Typography variant="body2">No trade offers {filtered ? 'match' : 'in your log yet'}.</Typography>
       ) : (
         <>
           <Detail item={picked} endDay={sum.lastDay} />
           <Box sx={{ overflowX: 'auto' }}>
             <Table size="small" stickyHeader>
-              <SortHead sort={sort} onSort={setSort} />
+              <SortHead sort={sort} onSort={onSort} />
               <TableBody>
                 {sum.items.map((i) => (
-                  <ItemRow key={i.key} item={i} endDay={sum.lastDay ?? i.lastDay} picked={i.key === picked.key} onPick={() => setPick(i.key)} />
+                  <ItemRow
+                    key={i.key}
+                    item={i}
+                    endDay={sum.lastDay ?? i.lastDay}
+                    picked={i.key === picked.key}
+                    onPick={() => setPick(i.key)}
+                    marks={{ iconId: iconOf(i.item), wished: wished.has(itemTierKey(i.item)), watch: findWatch(watch, i.item, i.tier) }}
+                  />
                 ))}
               </TableBody>
             </Table>

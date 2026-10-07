@@ -12,6 +12,7 @@ import { UNRELEASED } from './devFlags'
 import type { View } from './appViews'
 
 const LazyBazaarView = UNRELEASED ? lazy(() => import('./features/bazaar/BazaarView')) : null
+const LazyBazaarWatcher = UNRELEASED ? lazy(() => import('./features/bazaar/BazaarWatcher')) : null
 
 /** The Bazaar tab: nothing at all in a build without the flag, or on any other view. */
 export default function UnreleasedBazaarView({ view, viewKey }: { view: View; viewKey: string }): JSX.Element | null {
@@ -19,6 +20,16 @@ export default function UnreleasedBazaarView({ view, viewKey }: { view: View; vi
   return (
     <Suspense fallback={<CircularProgress size={20} />}>
       <LazyBazaarView key={viewKey} />
+    </Suspense>
+  )
+}
+
+/** The watchlist's alerts, mounted for the life of the window; nothing at all without the flag. */
+export function UnreleasedBazaarWatcher(): JSX.Element | null {
+  if (!LazyBazaarWatcher) return null
+  return (
+    <Suspense fallback={null}>
+      <LazyBazaarWatcher />
     </Suspense>
   )
 }
