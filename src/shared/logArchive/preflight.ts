@@ -3,6 +3,10 @@
 // One pure answer with every reason it is no, in the player's words. No game check: the client
 // opens the log by name for each line, so the game may keep running (ruling 0.5).
 
+/** With the switch on, a log this size is archived automatically (autoArchive.ts). It folds in
+ *  about 20 s at launch (measured ~5.4 MB/s). */
+export const AUTO_ARCHIVE_BYTES = 100 * 1024 ** 2
+
 export interface PreflightInput {
   /** Summarize and archive log is on. */
   on: boolean
@@ -19,6 +23,9 @@ export interface PreflightInput {
   interrupted: boolean
   /** Another log-archive action is running. */
   busy: boolean
+  /** The log was already archived since the app started. The engine still holds the archived
+   *  lines until the next launch, so a second capture would count them twice. */
+  archivedThisRun?: boolean
 }
 
 export function rotateBlockers(p: PreflightInput): string[] {
@@ -30,6 +37,7 @@ export function rotateBlockers(p: PreflightInput): string[] {
   if (p.freeBytes !== null && p.freeBytes < p.logBytes) out.push('There is not enough free space for the archive.')
   if (p.interrupted) out.push('An earlier archive was interrupted. Restart the app to finish it first.')
   if (p.busy) out.push('Another log archive action is running.')
+  if (p.archivedThisRun === true) out.push('Your log was already archived since the app started. It can be archived again after a restart.')
   return out
 }
 

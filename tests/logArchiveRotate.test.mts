@@ -341,6 +341,7 @@ test('preflight: every reason is stated, and none when all is well', () => {
   assert.deepEqual(rotateBlockers(ok), [])
   assert.equal(rotateBlockers({ ...ok, on: false, engineLive: false, sameDrive: false, freeBytes: 1, interrupted: true, busy: true }).length, 6)
   assert.equal(rotateBlockers({ ...ok, freeBytes: null }).length, 0, 'unknown free space does not block')
+  assert.equal(rotateBlockers({ ...ok, archivedThisRun: true }).length, 1, 'one archive per app run')
 })
 
 test('preflight: drive of a path', () => {
