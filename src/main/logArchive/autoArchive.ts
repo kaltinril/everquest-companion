@@ -17,7 +17,7 @@ import { getActiveCharacter } from '../session'
 import { logArchiveOn } from '../storeLogArchive'
 import type { LogArchiveReply } from '../../shared/logArchive/panel'
 import { AUTO_ARCHIVE_BYTES } from '../../shared/logArchive/preflight'
-import { rotateNow } from './actions'
+import { learnEngineModules, refreshLackingHistories, rotateNow } from './actions'
 
 const WAIT_FOR_ENGINE_MS = 30_000
 const CHECK_EVERY_MS = 24 * 3600_000
@@ -52,7 +52,10 @@ export function startAutoArchive(): void {
   const waiting = setInterval(() => {
     if (!engineServeReadiness().ok) return
     clearInterval(waiting)
-    void autoArchiveCheck()
+    // Archives made before a module existed are filled in first, then the log is checked.
+    void learnEngineModules()
+      .then(() => refreshLackingHistories((line) => logInfo(`[everquest-companion] ${line}`)))
+      .then(() => autoArchiveCheck())
     setInterval(() => void autoArchiveCheck(), CHECK_EVERY_MS).unref()
   }, WAIT_FOR_ENGINE_MS)
   waiting.unref()

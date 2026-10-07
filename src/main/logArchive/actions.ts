@@ -17,6 +17,7 @@ import { HELD_TEXT, type DumpAdvice, type LogArchiveReply, type LogArchiveStatus
 import { driveOf, rotateBlockers } from '../../shared/logArchive/preflight'
 import { capturedFights } from '../../shared/logArchive/mergeFights'
 import type { Segment } from '../../shared/logArchive/segment'
+import { CAPTURED_MODULES } from '../../shared/logArchive/modules'
 import { archiveName, backupLog, sweepTemp } from './backup'
 import { captureSegment, type CaptureDeps } from './capture'
 import { archiveBuckets, placeArchivedBuckets } from './engineBuckets'
@@ -30,6 +31,8 @@ import { listSegments, writeSegment } from './segmentStore'
 let busy: string | null = null
 /** One archive per app run: see `archivedThisRun` in preflight.ts. */
 let archivedThisRun = false
+/** The captured modules the running engine serves, learned once it has caught up; null before. */
+let engineModules: ReadonlySet<string> | null = null
 
 /** A page size no log reaches, so the capture asks for every fight (step 4.7). The engine keeps
  *  every finalized fight's summary; 6,299 fights measured at 1.6 MB (ruling 0.4). */
@@ -91,7 +94,36 @@ function row(s: Segment): SegmentRow {
     archivePath: s.archivePath,
     gapLines: s.gapLines ?? 0,
     app: s.producedBy.app,
-    olderEngine: s.producedBy.engine !== app.getVersion()
+    olderEngine: s.producedBy.engine !== app.getVersion() || lacksModules(s)
+  }
+}
+
+/** The segment was captured before this engine had one of its modules (a new tab's data). */
+function lacksModules(s: Segment): boolean {
+  return engineModules !== null && [...engineModules].some((m) => !Object.prototype.hasOwnProperty.call(s.modules, m))
+}
+
+/** Ask the engine which captured modules it serves. Once per run, after it has caught up. */
+export async function learnEngineModules(): Promise<void> {
+  const served = await Promise.all(CAPTURED_MODULES.map(async (m) => ((await captureDeps.snapshot(m)) !== null ? m : null)))
+  engineModules = new Set(served.filter((m): m is string => m !== null))
+}
+
+/**
+ * Refresh every kept history that lacks a module this engine serves, oldest first, so a new tab's
+ * data reaches logs archived before it existed without the player coming back to the card
+ * (owner, 2026-10-06). A history recorded by an older version only lacks parser fixes and keeps its
+ * button: re-reading every archive after every update is not done unasked.
+ */
+export async function refreshLackingHistories(note: (line: string) => void): Promise<void> {
+  const a = attached()
+  if (!logArchiveOn() || a === null || engineModules === null) return
+  const lacking = listSegments(logArchiveDir(), a.character).segments.filter(
+    (s) => s.state === 'sealed' && s.archivePath !== null && lacksModules(s)
+  )
+  for (const s of lacking.sort((x, y) => x.log.lastStamp.localeCompare(y.log.lastStamp))) {
+    const r = await refreshHistory(s.id)
+    note(`log archive (automatic refresh of ${s.id}): ${r.message}`)
   }
 }
 
@@ -281,7 +313,8 @@ export function refreshHistory(id: string): Promise<LogArchiveReply> {
   return exclusive('refreshing a history', async () => {
     const r = await refreshSegment(logArchiveDir(), id, {
       refold: (s) => refoldWithApp(s, true),
-      producedBy: captureDeps.producedBy
+      producedBy: captureDeps.producedBy,
+      lacking: lacksModules
     })
     if (!r.ok) return reply(false, `Not refreshed: ${r.reason}.`)
     liveHistory.forgetHistoryContext()
