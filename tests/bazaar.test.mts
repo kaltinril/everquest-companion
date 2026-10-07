@@ -2,7 +2,16 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { formatMove, formatPlat, median, sparkline, summarizeBazaar, type BazaarRow } from '../src/shared/bazaar'
+import {
+  formatMove,
+  formatPlat,
+  median,
+  sparkline,
+  summarizeBazaar,
+  type BazaarItem,
+  type BazaarRow,
+  type BazaarSortKey
+} from '../src/shared/bazaar'
 
 type Where = [day: string, dir: BazaarRow['dir'], item: string]
 const row = ([day, dir, item]: Where, prices: number[], more: Partial<BazaarRow> = {}): BazaarRow => ({
@@ -32,7 +41,7 @@ const rows: BazaarRow[] = [
   row(['2026-09-20', 'sell', 'Bone-Clasped Girdle'], [5000], { tier: 4 })
 ]
 
-const all = { text: '', dir: 'all' as const, sort: 'recent' as const }
+const all = { text: '', dir: 'all' as const, sort: { key: 'lastDay' as const, desc: true } }
 
 test('one entry per item and tier, asking and offered side by side, outliers left out', () => {
   const s = summarizeBazaar({ rows }, all)
@@ -49,12 +58,20 @@ test('one entry per item and tier, asking and offered side by side, outliers lef
   assert.equal(q.offered, 18000)
   assert.deepEqual([q.sellOffers, q.buyOffers, q.trades], [8, 3, 1])
   assert.deepEqual([s.days, s.lastDay], [6, '2026-09-25'])
+  assert.equal(q.activeDays, 6)
 })
 
 test('search, direction and sort', () => {
   assert.deepEqual(summarizeBazaar({ rows }, { ...all, text: 'girdle' }).items.map((i) => i.tier), [3, 4])
   assert.deepEqual(summarizeBazaar({ rows }, { ...all, dir: 'buy' }).items.map((i) => i.item), ['Fleeting Quiver'])
-  assert.deepEqual(summarizeBazaar({ rows }, { ...all, sort: 'price' }).items.map((i) => i.asking), [24000, 5000, 3000])
+  const by = (key: BazaarSortKey, desc: boolean): BazaarItem[] => summarizeBazaar({ rows }, { ...all, sort: { key, desc } }).items
+  assert.deepEqual(by('asking', true).map((i) => i.asking), [24000, 5000, 3000])
+  assert.deepEqual(by('asking', false).map((i) => i.asking), [3000, 5000, 24000])
+  assert.deepEqual(by('item', false).map((i) => [i.item, i.tier]), [['Bone-Clasped Girdle', 3], ['Bone-Clasped Girdle', 4], ['Fleeting Quiver', 0]])
+  assert.deepEqual(by('offers', true).map((i) => i.item), ['Fleeting Quiver', 'Bone-Clasped Girdle', 'Bone-Clasped Girdle'])
+  // An item with no value in the column sorts last, whichever way the column is turned.
+  for (const desc of [true, false]) assert.equal(by('offered', desc).at(0)?.item, 'Fleeting Quiver')
+  assert.equal(by('offered', false).at(-1)?.offered, null)
   assert.deepEqual(summarizeBazaar(null, all).items, [])
 })
 
