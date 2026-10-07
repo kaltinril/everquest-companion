@@ -1,0 +1,317 @@
+//! The bazaar parser and module, on lines taken from the owner's log (2026-10-06).
+
+use super::super::bazaar_parse::{parse_trade, Dir, ItemIndex, Offer};
+use super::BazaarModule;
+use crate::event::Event;
+use crate::knowledge::{Answer, Knowledge, Miss, OwnLoot};
+use crate::EqModule;
+use serde_json::json;
+use std::sync::Arc;
+
+const NAMES: &[&str] = &[
+    "Loam Encrusted Robe",
+    "Bone-Clasped Girdle",
+    "McVaxius` Horn of War",
+    "Lyssa`s Darkwood Piccolo",
+    "High Quality Lion Skin",
+    "High Quality Cat Pelt",
+    "White Dragonscale Cloak",
+    "Fruit",
+    "Jacinth",
+    "Black Sapphire",
+    "Mithril Champion Arrows",
+    "Arrow",
+    "Quiver",
+    "Fleeting Quiver",
+    "Stonemelder's Band",
+    "Potion of the Swamp",
+    "Potion of the Frost",
+    "Phosphorous Powder",
+    "Bone Chips",
+    "Black Wolf Skin",
+    "Slime Blood of Cazic-Thule",
+    "Gauntlets of Fiery Might",
+];
+
+fn ix() -> ItemIndex {
+    ItemIndex::new(NAMES.iter().map(|s| s.to_string()))
+}
+
+fn short(o: &Offer) -> String {
+    let mut s = format!("{} {}", o.dir.as_str(), o.item);
+    if o.tier > 0 {
+        s += &format!(" +{}", o.tier);
+    }
+    if let Some(q) = o.qty {
+        s += &format!(" x{q}");
+    }
+    if let Some(p) = o.unit_pp() {
+        s += &format!(" {p}pp");
+    }
+    s
+}
+
+fn read(msg: &str) -> Vec<String> {
+    parse_trade(msg, &ix()).iter().map(short).collect()
+}
+
+#[test]
+fn several_items_each_with_tier_and_price() {
+    assert_eq!(
+        read("WTS Loam Encrusted Robe +4 3k, Bone-Clasped Girdle +2 5k"),
+        [
+            "sell Loam Encrusted Robe +4 3000pp",
+            "sell Bone-Clasped Girdle +2 5000pp"
+        ]
+    );
+    assert_eq!(
+        read("WTS White Dragonscale Cloak6k"),
+        ["sell White Dragonscale Cloak 6000pp"]
+    );
+    assert_eq!(
+        read("WTS Gauntlets of Fiery Might +4 2.5k"),
+        ["sell Gauntlets of Fiery Might +4 2500pp"]
+    );
+}
+
+#[test]
+fn a_leading_each_price_covers_every_item_after_it() {
+    assert_eq!(
+        read("WTS 3k each:  McVaxius` Horn of War +5  |  Lyssa`s Darkwood Piccolo +1"),
+        [
+            "sell McVaxius` Horn of War +5 3000pp",
+            "sell Lyssa`s Darkwood Piccolo +1 3000pp"
+        ]
+    );
+    // Without "each" a leading number prices nothing.
+    assert_eq!(
+        read("WTS froglok unlock mats, 10k, 800x Phosphorous Powder"),
+        ["sell Phosphorous Powder"]
+    );
+}
+
+#[test]
+fn a_trailing_each_price_covers_the_unpriced_items_before_it() {
+    assert_eq!(
+        read("wts Potion of the Swamp, Potion of the Frost 150g each"),
+        [
+            "sell Potion of the Swamp 15pp",
+            "sell Potion of the Frost 15pp"
+        ]
+    );
+}
+
+#[test]
+fn counts_divide_a_total_but_not_an_each_price() {
+    assert_eq!(read("WTS 400 Fruit 30k plat"), ["sell Fruit x400 75pp"]);
+    assert_eq!(
+        read("WTS Bone Chips 1000 for 10k pst"),
+        ["sell Bone Chips x1000 10pp"]
+    );
+    assert_eq!(
+        read("WTS High Quality Lion Skin x2 6k each High Quality Cat Pelt 2k each"),
+        [
+            "sell High Quality Lion Skin x2 6000pp",
+            "sell High Quality Cat Pelt 2000pp"
+        ]
+    );
+    assert_eq!(
+        read("WTS Jacinthx16, Black Sapphire x10 pst"),
+        ["sell Jacinth x16", "sell Black Sapphire x10"]
+    );
+}
+
+#[test]
+fn price_shapes() {
+    assert_eq!(
+        read("wtb Fleeting Quiver 10 000pp"),
+        ["buy Fleeting Quiver 10000pp"]
+    );
+    assert_eq!(
+        read("Selling Mithril Champion Arrows 100 pp each"),
+        ["sell Mithril Champion Arrows 100pp"]
+    );
+    assert_eq!(
+        read("WTS Fleeting Quiver 20kPCT;PCT;"),
+        ["sell Fleeting Quiver 20000pp"]
+    );
+    assert_eq!(
+        read("WTS Fleeting Quiver 5kpp"),
+        ["sell Fleeting Quiver 5000pp"]
+    );
+    assert_eq!(
+        read("WTS Fleeting Quiver 1.5m"),
+        ["sell Fleeting Quiver 1500000pp"]
+    );
+    assert_eq!(
+        read("WTS Bone Chips 20 copper each"),
+        ["sell Bone Chips 0.02pp"]
+    );
+}
+
+#[test]
+fn names_ignore_case_apostrophes_and_shorthand() {
+    assert_eq!(
+        read("WTB Stonemelders Band 4+"),
+        ["buy Stonemelder's Band +4"]
+    );
+    assert_eq!(
+        read("wtb mithril champ arrows +5"),
+        ["buy Mithril Champion Arrows +5"]
+    );
+    assert_eq!(read("WTB FLEETING QUIVER"), ["buy Fleeting Quiver"]);
+}
+
+#[test]
+fn a_name_never_starts_inside_unmatched_words() {
+    // "Mithril Champ" is matched; "Mithril Something arrows" is not "Arrow".
+    assert_eq!(read("wtb Mithril Something arrows"), Vec::<String>::new());
+}
+
+#[test]
+fn direction_switches_and_barter() {
+    assert_eq!(
+        read("WTS Phosphorous Powder & Bone Chips 10pp, WTB Black Wolf Skin 20pp"),
+        [
+            "sell Phosphorous Powder",
+            "sell Bone Chips 10pp",
+            "buy Black Wolf Skin 20pp"
+        ]
+    );
+    assert_eq!(
+        read("WTT Slime Blood of Cazic-Thule for 15 LQ pelts"),
+        ["trade Slime Blood of Cazic-Thule"]
+    );
+}
+
+#[test]
+fn only_a_message_that_opens_with_a_direction_is_an_offer() {
+    assert!(read("anyone selling Fleeting Quiver?").is_empty());
+    assert!(read("aint nobody buying slime bloods").is_empty());
+    assert_eq!(read("!! WTS Fruit 5pp"), ["sell Fruit 5pp"]);
+    assert_eq!(parse_trade("selling Fruit 5pp", &ix())[0].dir, Dir::Sell);
+}
+
+struct Names;
+
+impl Knowledge for Names {
+    fn item(&self, _name: &str) -> Answer {
+        Answer {
+            record: json!({}),
+            found: false,
+        }
+    }
+    fn identity_keys(&self, mob: &str) -> Vec<String> {
+        vec![mob.to_string()]
+    }
+    fn mob(&self, _name: &str, _loot: &dyn OwnLoot) -> Answer {
+        self.item("")
+    }
+    fn known_mob(&self, _name: &str) -> bool {
+        false
+    }
+    fn take_misses(&self) -> Vec<Miss> {
+        Vec::new()
+    }
+    fn item_names(&self) -> Vec<String> {
+        NAMES.iter().map(|s| s.to_string()).collect()
+    }
+}
+
+fn line(seq: i64, raw: &str) -> Event<'static> {
+    Event::from_json(&json!({ "kind": "unknown", "seq": seq, "ts": 0, "raw": raw }).to_string())
+        .expect("an event")
+}
+
+#[test]
+fn the_module_keeps_one_row_per_day_item_tier_and_direction() {
+    let mut m = BazaarModule::new();
+    let k: Arc<dyn Knowledge> = Arc::new(Names);
+    m.install_knowledge(&k);
+    for (seq, raw) in [
+        "[Wed Sep 23 17:54:48 2026] Leric tells General:1, 'WTS Fleeting Quiver 20k'",
+        // The same seller repeating the same offer counts once.
+        "[Wed Sep 23 18:04:48 2026] Leric tells General:1, 'WTS Fleeting Quiver 20k'",
+        "[Wed Sep 23 18:10:00 2026] Aaron tells General:1, 'WTS Fleeting Quiver 18k'",
+        "[Wed Sep 23 18:11:00 2026] Bbqz tells General:1, 'WTB Fleeting Quiver'",
+        "[Thu Sep 24 09:00:00 2026] Leric tells General:1, 'WTS Fleeting Quiver 20k'",
+        "[Thu Sep 24 09:01:00 2026] You tell General:1, 'WTS Fleeting Quiver 19k'",
+        // Not chat, and not an offer.
+        "[Thu Sep 24 09:02:00 2026] Leric says, 'WTS Fleeting Quiver 1k'",
+        "[Thu Sep 24 09:03:00 2026] Leric tells General:1, 'anyone selling Fleeting Quiver?'",
+    ]
+    .iter()
+    .enumerate()
+    {
+        m.on_event(&line(seq as i64 + 1, raw), false);
+    }
+    let rows = m.snapshot()["state"]["rows"].clone();
+    assert_eq!(
+        rows,
+        json!([
+            { "day": "2026-09-23", "dir": "sell", "item": "Fleeting Quiver", "tier": 0, "n": 2, "unpriced": 0, "min": 18000.0, "max": 20000.0, "sum": 38000.0 },
+            { "day": "2026-09-23", "dir": "buy", "item": "Fleeting Quiver", "tier": 0, "n": 0, "unpriced": 1, "min": null, "max": null, "sum": 0.0 },
+            { "day": "2026-09-24", "dir": "sell", "item": "Fleeting Quiver", "tier": 0, "n": 2, "unpriced": 0, "min": 19000.0, "max": 20000.0, "sum": 39000.0 }
+        ])
+    );
+}
+
+/// The whole parser over a chat corpus with the real item database, for measuring against the
+/// prototype: `BAZAAR_CORPUS=<chat lines> [BAZAAR_ITEMS=<items.json>] [BAZAAR_DUMP=1] cargo test -p fold bazaar_corpus -- --ignored --nocapture`.
+#[test]
+#[ignore]
+fn bazaar_corpus() {
+    let corpus = std::env::var("BAZAAR_CORPUS").expect("BAZAAR_CORPUS");
+    let db: serde_json::Value = serde_json::from_str(
+        &std::fs::read_to_string(std::env::var("BAZAAR_ITEMS").unwrap_or_else(|_| {
+            concat!(
+                env!("CARGO_MANIFEST_DIR"),
+                "/../../../src/main/data/items.json"
+            )
+            .to_string()
+        }))
+        .unwrap(),
+    )
+    .unwrap();
+    let names = db["items"]
+        .as_object()
+        .unwrap()
+        .values()
+        .filter_map(|e| e["page"].as_str().map(str::to_string));
+    let ix = ItemIndex::new(names);
+    let (mut trade, mut with_item, mut with_price, mut offers, mut priced) = (0, 0, 0, 0, 0);
+    for l in std::fs::read_to_string(corpus).unwrap().lines() {
+        let Some((_, msg)) = super::chat_of(crate::message_overlay::message_text_of(l)) else {
+            continue;
+        };
+        let lead = msg
+            .trim_start_matches(|c: char| !c.is_alphanumeric())
+            .to_lowercase();
+        let opens = ["wts", "wtb", "wtt", "selling", "buying", "trading"]
+            .iter()
+            .any(|w| {
+                lead.starts_with(w) && !lead[w.len()..].starts_with(|c: char| c.is_alphanumeric())
+            });
+        if !opens {
+            continue;
+        }
+        trade += 1;
+        let o = parse_trade(msg, &ix);
+        offers += o.len();
+        priced += o.iter().filter(|x| x.price_pp.is_some()).count();
+        with_item += usize::from(!o.is_empty());
+        if std::env::var("BAZAAR_DUMP").is_ok() {
+            println!(
+                "DUMP	{msg}	{}",
+                o.iter()
+                    .map(|x| x.item.as_str())
+                    .collect::<Vec<_>>()
+                    .join("|")
+            );
+        }
+        with_price += usize::from(o.iter().any(|x| x.price_pp.is_some()));
+    }
+    println!(
+        "trade {trade} withItem {with_item} withPrice {with_price} offers {offers} priced {priced}"
+    );
+}

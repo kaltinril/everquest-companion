@@ -19,6 +19,8 @@ pub mod alerts_early;
 /// The alerts module's matcher half: the evaluator is a different kind of thing from the two maps
 /// the fold keeps, and one file would put it past the repo's factoring ceiling.
 pub mod alerts_rules;
+pub mod bazaar;
+pub mod bazaar_parse;
 pub mod buff_anchors;
 pub mod buff_landing;
 pub mod buff_rounds;
