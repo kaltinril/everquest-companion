@@ -2,8 +2,10 @@
 //! it is tested without a fold.
 //!
 //! Measured on the owner's log (2026-10-06): 1,644 messages that open with WTS, WTB, WTT,
-//! selling, buying or trading; an item is found in 86% of them, and most of the rest name it by an
-//! abbreviation (COF, SBoZ) or a spelling no item page uses. What it reads:
+//! selling, buying or trading; an item is found in 86% of them. Re-measured on the archived log
+//! (2026-08-12 to 2026-10-07, 1,687 such messages): 88% with the acronyms, spellings and glued
+//! links of [`super::bazaar_words`]; most of the rest are not offers ("selling tomatoes would be a
+//! lucrative business") or name an item no page spells that way. What it reads:
 //!
 //! * the direction word opens the message, or follows a separator ("WTS a 5k / WTB b 3k"); the
 //!   acronyms switch direction anywhere. "anyone selling X?" opens with no direction, so it is not
@@ -19,10 +21,16 @@
 //! * "paying 4k" or "offering 4k" after several items prices each of them, as `each` does; as the
 //!   message's first word it is a buy, and a price before "for" prices what follows
 //!   ("paying 15k for fleeting quiver").
+//! * an item right after "for" is what the offer is for ("Book of Scale for Fiery Avenger"), unless
+//!   a price stands before the "for" or the offer is a barter.
+//! * a bare number before a word that is no item and no price word counts ("6 left"), and one
+//!   before a comma and a price with a unit is not the price ("Bone Chips 580, 10p each").
+//! * a tier after a priced tier starts that item's next offer ("+7 20k, +6 11k").
 //! * `+4` and `4+` are the upgrade tier; `x2`, `2x` and a bare count before the name are the
 //!   quantity, as is a count before "for" (`Bone Chips 1000 for 10k`).
 //! * a trade (WTT) is a barter: its numbers count the other thing, so it never carries a price.
 
+use super::bazaar_words::{loose, price_at, re, tokens, unglued, Tok, AFTER_BARE_PRICE};
 use regex::Regex;
 use std::collections::HashMap;
 use std::sync::OnceLock;
@@ -86,12 +94,19 @@ impl ItemIndex {
     pub fn new(names: impl IntoIterator<Item = String>) -> Self {
         let mut ix = ItemIndex::default();
         for name in names {
-            let key = loose(&name);
-            if key.len() < 3 {
-                continue;
+            // Also as the chat's tokens spell it once a glued link is split (`Mc Vaxius`).
+            for key in [loose(&name), loose(&unglued(&name))] {
+                if key.len() < 3 {
+                    continue;
+                }
+                ix.max_words = ix.max_words.max(key.split(' ').count());
+                // Two pages one hyphen apart are one item; the game writes the hyphen
+                // ("Slime Blood of Cazic-Thule"), and so do rows an archive already holds.
+                let kept = ix.names.entry(key).or_insert_with(|| name.clone());
+                if !kept.contains('-') && name.contains('-') {
+                    kept.clone_from(&name);
+                }
             }
-            ix.max_words = ix.max_words.max(key.split(' ').count());
-            ix.names.entry(key).or_insert(name);
         }
         ix
     }
@@ -103,6 +118,7 @@ impl ItemIndex {
     /// The name a phrase spells, allowing a plural `s` and a leading article.
     fn get(&self, phrase: &str) -> Option<&String> {
         let unplural = phrase.strip_suffix('s').unwrap_or(phrase);
+        let plural = format!("{phrase}s");
         let bare = ["a ", "an ", "the "]
             .iter()
             .find_map(|a| phrase.strip_prefix(a))
@@ -110,106 +126,9 @@ impl ItemIndex {
         self.names
             .get(phrase)
             .or_else(|| self.names.get(unplural))
+            .or_else(|| self.names.get(&plural).filter(|_| phrase.contains(' ')))
             .or_else(|| self.names.get(bare))
     }
-}
-
-/// Lowercase, apostrophes gone, anything but letters, digits, `:` and `-` a space, spaces single.
-pub fn loose(s: &str) -> String {
-    let mut out = String::with_capacity(s.len());
-    for c in s.chars().flat_map(char::to_lowercase) {
-        match c {
-            '`' | '\'' | '\u{2019}' => {}
-            'a'..='z' | '0'..='9' | ':' | '-' => out.push(c),
-            _ => out.push(' '),
-        }
-    }
-    out.split_whitespace().collect::<Vec<_>>().join(" ")
-}
-
-fn re(cell: &'static OnceLock<Regex>, pattern: &str) -> &'static Regex {
-    cell.get_or_init(|| Regex::new(pattern).expect("a valid pattern"))
-}
-
-struct Tok {
-    raw: String,
-    n: String,
-}
-
-/// Split glued prices and counts off words, expand the shorthands, and pad separators.
-fn tokens(msg: &str) -> Vec<Tok> {
-    static GLUED_PRICE: OnceLock<Regex> = OnceLock::new();
-    static PRICE_WORD: OnceLock<Regex> = OnceLock::new();
-    static GLUED_QTY: OnceLock<Regex> = OnceLock::new();
-    static SHORT: OnceLock<Regex> = OnceLock::new();
-    static SEP: OnceLock<Regex> = OnceLock::new();
-    let s = re(&GLUED_PRICE, r"(?i)([a-z])(\d+(?:\.\d+)?k)\b").replace_all(msg, "$1 $2");
-    let s = re(&PRICE_WORD, r"(?i)(\d(?:k|pp))([a-z]{2,})").replace_all(&s, "$1 $2");
-    let s = re(&GLUED_QTY, r"(?i)([a-z]{3,})(x\d+)\b").replace_all(&s, "$1 $2");
-    let s = re(&SHORT, r"(?i)\b(champ|hq|mq|lq)\b").replace_all(&s, |c: &regex::Captures| {
-        match c[1].to_lowercase().as_str() {
-            "champ" => "champion",
-            "hq" => "high quality",
-            "mq" => "medium quality",
-            _ => "low quality",
-        }
-        .to_string()
-    });
-    let s = re(&SEP, r"([|/,;:!?()]|\s-\s)").replace_all(&s, " $1 ");
-    s.split_whitespace()
-        .map(|raw| Tok {
-            raw: raw.to_string(),
-            n: loose(raw),
-        })
-        .collect()
-}
-
-fn unit_of(word: &str) -> f64 {
-    match word {
-        "g" | "gp" | "gold" => 0.1,
-        "s" | "sp" | "silver" => 0.01,
-        "c" | "cp" | "copper" => 0.001,
-        _ => 1.0,
-    }
-}
-
-/// A price starting at `t[i]`, in platinum, and how many tokens it spans.
-fn price_at(t: &[Tok], i: usize) -> Option<(f64, usize)> {
-    static PRICE: OnceLock<Regex> = OnceLock::new();
-    let rx = re(
-        &PRICE,
-        r"(?i)^(\d{1,3}(?:[ ,]\d{3})+|\d+(?:\.\d+)?)\s*(k|m|mil)?\s*(pp|p|plat|platinum|g|gp|gold|s|sp|silver|c|cp|copper)?$",
-    );
-    (1..=3)
-        .rev()
-        .filter(|span| i + span <= t.len())
-        .find_map(|span| {
-            let joined: Vec<&str> = t[i..i + span].iter().map(|x| x.raw.as_str()).collect();
-            let s = joined.join(" ");
-            let s = s.trim_end_matches(['.', '!']);
-            let m = rx.captures(s)?;
-            // Two bare numbers side by side are a count and a price, unless they are `10 000`.
-            let lettered = s.chars().any(|c| c.is_ascii_alphabetic());
-            let thousands = s.split(' ').skip(1).all(|g| g.len() == 3);
-            if span > 1 && !lettered && !thousands {
-                return None;
-            }
-            let num: f64 = m[1].replace([' ', ','], "").parse().ok()?;
-            let mult = m.get(2).map_or(1.0, |k| {
-                if k.as_str().eq_ignore_ascii_case("k") {
-                    1e3
-                } else {
-                    1e6
-                }
-            });
-            let unit = m
-                .get(3)
-                .map_or(1.0, |u| unit_of(&u.as_str().to_lowercase()));
-            if m.get(2).is_none() && m.get(3).is_none() && num < 1.0 {
-                return None;
-            }
-            Some((num * mult * unit, span))
-        })
 }
 
 const SEPARATORS: &[&str] = &["|", "/", ",", ";", ":", "!", "-", "(", ")"];
@@ -228,6 +147,8 @@ struct Parser<'a> {
     last: Option<usize>,
     /// May an item name start here.
     fresh: bool,
+    /// The price on `last` was stated after it, so a tier that follows starts the next tier's offer.
+    priced_here: bool,
 }
 
 impl<'a> Parser<'a> {
@@ -282,6 +203,10 @@ impl<'a> Parser<'a> {
             return None;
         }
         let (item, used) = self.item_at(i)?;
+        if self.is_purpose(i, dir) {
+            return Some(i + used);
+        }
+        self.priced_here = false;
         self.out.push(Offer {
             dir,
             item,
@@ -294,14 +219,57 @@ impl<'a> Parser<'a> {
         Some(i + used)
     }
 
+    /// "Book of Scale for Fiery Avenger 5k", "jewelry kit for White Dragonscale Cloak": an item after
+    /// "for" names what the offer is for, not a second offer. Not in a barter, nor after a price
+    /// ("paying 15k for X") or "trade for X".
+    fn is_purpose(&self, i: usize, dir: Dir) -> bool {
+        if dir == Dir::Trade || i < 2 || self.t[i - 1].n != "for" {
+            return false;
+        }
+        // A price ends right before "for": `15k`, `400 plat`, `10 000 pp`.
+        let priced = (1..=3).any(|span| {
+            i > span && price_at(&self.t, i - 1 - span).is_some_and(|(_, used)| used == span)
+        });
+        let before = self.t[i - 2].n.as_str();
+        !priced && !matches!(before, "trade" | "wtt" | "trading" | "swap")
+    }
+
+    fn next_tier_offer(&self, i: usize) -> bool {
+        let after_sep = i > 0 && SEPARATORS.contains(&self.t[i - 1].raw.as_str());
+        let after_price = (1..=3).any(|span| {
+            i >= span && price_at(&self.t, i - span).is_some_and(|(_, used)| used == span)
+        });
+        (after_sep || after_price) && price_at(&self.t, i + 1).is_some()
+    }
+
     /// `+4` or `4+` sets the tier; `x2` or `2x` the count; `each` marks the price per unit.
     fn try_modifier(&mut self, i: usize) -> Option<usize> {
         static TIER: OnceLock<Regex> = OnceLock::new();
         static QTY: OnceLock<Regex> = OnceLock::new();
         let raw = self.t[i].raw.as_str();
         if let Some(c) = re(&TIER, r"^(?:\+(\d{1,2})|(\d{1,2})\+)$").captures(raw) {
-            let last = self.last?;
-            self.out[last].tier = c.get(1).or(c.get(2))?.as_str().parse().ok()?;
+            let mut last = self.last?;
+            let tier = c.get(1).or(c.get(2))?.as_str().parse().ok()?;
+            // "+7 20k, +6 11k": a priced tier is done, so a tier after a separator or a price, with a
+            // price of its own next, is the same item's next offer. Any other tier after the price
+            // ("can make up to +5!", "2k if buying 3+") says nothing about this offer.
+            if self.priced_here {
+                if !self.next_tier_offer(i) {
+                    return Some(i + 1);
+                }
+                let next = Offer {
+                    tier,
+                    qty: None,
+                    price_pp: None,
+                    each: false,
+                    ..self.out[last].clone()
+                };
+                self.out.push(next);
+                last = self.out.len() - 1;
+                self.last = Some(last);
+                self.priced_here = false;
+            }
+            self.out[last].tier = tier;
             self.fresh = true;
             return Some(i + 1);
         }
@@ -324,22 +292,57 @@ impl<'a> Parser<'a> {
     fn try_price(&mut self, i: usize, dir: Dir) -> Option<usize> {
         let (pp, used) = price_at(&self.t, i)?;
         let bare = used == 1 && self.t[i].raw.bytes().all(|b| b.is_ascii_digit());
+        if bare {
+            if let Some(verdict) = self.bare_number(i) {
+                return verdict;
+            }
+        }
+        self.fresh = true;
+        if dir != Dir::Trade {
+            self.apply_price(pp, i, dir);
+        }
+        Some(i + used)
+    }
+
+    /// A number with no `k`, `pp` or coin: `Some` when it is no price here (the inner value is
+    /// where to go on, `None` when it is an unread word), `None` when it is one.
+    fn bare_number(&mut self, i: usize) -> Option<Option<usize>> {
         let each_next = self
             .t
             .get(i + 1)
             .is_some_and(|x| matches!(x.n.as_str(), "each" | "ea" | "per"));
-        if bare && !self.fresh && !each_next && self.item_at(i + 1).is_none() {
-            return None;
+        if !self.fresh && !each_next && self.item_at(i + 1).is_none() || self.words_follow(i) {
+            return Some(None);
+        }
+        // "Bone Chips 580, 10p each", "ssoy 4, 1k": the price with a unit is the price.
+        if self.unit_price_follows(i) {
+            return Some(Some(i + 1));
         }
         self.fresh = true;
-        if bare && self.try_count(i) {
-            return Some(i + 1);
-        }
-        let next = i + used;
-        if dir != Dir::Trade {
-            self.apply_price(pp, i, dir);
-        }
-        Some(next)
+        self.try_count(i).then_some(Some(i + 1))
+    }
+
+    /// "6 left", "2 black saphires": a bare number before a word that is no item and no price word
+    /// counts something, so it prices nothing.
+    fn words_follow(&self, i: usize) -> bool {
+        let Some(next) = self.t.get(i + 1) else {
+            return false;
+        };
+        let word = next
+            .n
+            .chars()
+            .next()
+            .is_some_and(|c| c.is_ascii_alphabetic());
+        word && !AFTER_BARE_PRICE.contains(&next.n.as_str()) && self.item_at(i + 1).is_none()
+    }
+
+    fn unit_price_follows(&self, i: usize) -> bool {
+        self.t.get(i + 1).is_some_and(|x| x.raw == ",")
+            && price_at(&self.t, i + 2).is_some_and(|(_, used)| {
+                self.t[i + 2..i + 2 + used]
+                    .iter()
+                    .any(|x| x.raw.bytes().any(|b| b.is_ascii_alphabetic()))
+            })
     }
 
     /// A bare number that counts rather than prices: before an item ("WTS 400 Fruit 30k"), or
@@ -391,6 +394,7 @@ impl<'a> Parser<'a> {
         for (k, o) in self.out.iter_mut().enumerate() {
             let backfill = each && o.price_pp.is_none() && o.dir == dir;
             if k == last || backfill {
+                self.priced_here |= k == last;
                 o.price_pp = Some(pp);
                 o.each |= each;
             }
@@ -418,8 +422,21 @@ impl<'a> Parser<'a> {
 
 /// Every offer in one chat message. Empty when it does not open with a direction.
 pub fn parse_trade(msg: &str, ix: &ItemIndex) -> Vec<Offer> {
+    let whole = parse_tokens(tokens(msg, false), ix);
+    // Two item links pasted back to back ("Stonemelder's BandFleeting Quiver") read apart, kept
+    // only when that finds more; "StoneMelders Band" is one item either way.
+    if !unglued(msg).eq(msg) {
+        let apart = parse_tokens(tokens(msg, true), ix);
+        if apart.len() > whole.len() {
+            return apart;
+        }
+    }
+    whole
+}
+
+fn parse_tokens(t: Vec<Tok>, ix: &ItemIndex) -> Vec<Offer> {
     let mut p = Parser {
-        t: tokens(msg),
+        t,
         ix,
         out: Vec::new(),
         dir: None,
@@ -427,6 +444,7 @@ pub fn parse_trade(msg: &str, ix: &ItemIndex) -> Vec<Offer> {
         pending_qty: None,
         last: None,
         fresh: true,
+        priced_here: false,
     };
     let mut i = 0;
     while i < p.t.len() {
@@ -437,3 +455,7 @@ pub fn parse_trade(msg: &str, ix: &ItemIndex) -> Vec<Offer> {
     }
     p.out
 }
+
+#[cfg(test)]
+#[path = "bazaar_rules_tests.rs"]
+mod rules_tests;

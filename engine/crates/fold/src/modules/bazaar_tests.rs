@@ -318,10 +318,7 @@ fn bazaar_corpus() {
         if std::env::var("BAZAAR_DUMP").is_ok() {
             println!(
                 "DUMP	{msg}	{}",
-                o.iter()
-                    .map(|x| x.item.as_str())
-                    .collect::<Vec<_>>()
-                    .join("|")
+                o.iter().map(short).collect::<Vec<_>>().join(" | ")
             );
         }
         with_price += usize::from(o.iter().any(|x| x.price_pp.is_some()));
