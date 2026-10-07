@@ -18,12 +18,12 @@ interface Row {
   sum: number
   /** Every priced offer's platinum per unit (since 2026-10-06). */
   prices?: number[]
-  /** Who said what, the day's first QUOTES_KEPT counted offers (since 2026-10-07). */
+  /** Who said what, every counted offer of the day (since 2026-10-07). */
   quotes?: unknown[]
 }
 
 /** The fold's own cap on a row's quotes (bazaar.rs `QUOTES_KEPT`). */
-const QUOTES_KEPT = 20
+const QUOTES_KEPT = 500
 
 interface Snap {
   rows: Row[]
