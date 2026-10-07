@@ -868,6 +868,11 @@ export const IPC = {
   // the module's own revision counter is what keeps the push from being deduped, because a watch
   // edit advances no log seq (JOS-87). Returns what was stored.
   respawnSet: 'respawn:set',
+
+  // THE BAZAAR WATCHLIST (shared/bazaarWatch.ts): items to buy, sell or watch. Whole list both
+  // ways, normalized at the handler; returns what was stored.
+  bazaarWatchGet: 'bazaarWatch:get',
+  bazaarWatchSet: 'bazaarWatch:set',
   // renderer -> main: "that sighting WAS the spawn — start this row's clock from it" (owner
   // ruling, prototype round 3). The app never does this on its own: a sighting proves the mob is
   // up and says nothing about when it spawned, so re-basing a clock is a judgement and needs a

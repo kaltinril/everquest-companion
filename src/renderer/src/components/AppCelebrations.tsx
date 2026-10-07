@@ -34,6 +34,7 @@ import CelebrationToasts from './CelebrationToasts'
 import { useModule } from '../lib/useModule'
 import { tierStyle } from '../lib/tierChip'
 import AlertPlayer, { fireAppSignal } from '../features/alerts/player'
+import { UnreleasedBazaarWatcher } from '../unreleasedBazaar'
 import { getBossData } from '../data'
 import { useBossKills } from '../features/bosses/useBossKills'
 import type { TargetStatus } from '../features/bosses/bossStatus'
@@ -168,6 +169,7 @@ export default function AppCelebrations(): JSX.Element {
     <>
       {/* Always-mounted: plays fired alert sounds regardless of the active tab. */}
       <AlertPlayer />
+      <UnreleasedBazaarWatcher />
       <CelebrationToasts
         defeatToast={defeatToast}
         questToast={questToast}

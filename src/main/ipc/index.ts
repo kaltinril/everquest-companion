@@ -16,6 +16,7 @@
 import { registerAlertsIpc } from './alerts'
 import { registerBuffAllowIpc } from './buffAllow'
 import { registerBuffTrustIpc } from './buffTrust'
+import { registerBazaarWatchIpc } from './bazaarWatch'
 import { registerResistIpc } from './resist'
 import { registerRespawnIpc } from './respawn'
 import { registerCharacterIpc } from './character'
@@ -104,6 +105,7 @@ export function registerIpc(): void {
   registerBuffTrustIpc()
   registerBuffAllowIpc()
   registerRespawnIpc()
+  registerBazaarWatchIpc()
   registerResistIpc()
   registerUiScaleIpc()
   registerReleaseNotesIpc()
