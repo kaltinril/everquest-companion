@@ -150,6 +150,20 @@ fn price_shapes() {
 }
 
 #[test]
+fn a_bare_number_after_other_words_is_a_count_not_a_price() {
+    assert_eq!(read("WTS Bone Chips only have 1"), ["sell Bone Chips"]);
+    assert_eq!(
+        read("wts Fruit +4 - buying 100 10lb meatpies"),
+        ["sell Fruit +4"]
+    );
+    assert_eq!(
+        read("Selling Bone Chips 200 each"),
+        ["sell Bone Chips 200pp"]
+    );
+    assert_eq!(read("WTS Bone Chips 500"), ["sell Bone Chips 500pp"]);
+}
+
+#[test]
 fn names_ignore_case_apostrophes_and_shorthand() {
     assert_eq!(
         read("WTB Stonemelders Band 4+"),
@@ -249,9 +263,9 @@ fn the_module_keeps_one_row_per_day_item_tier_and_direction() {
     assert_eq!(
         rows,
         json!([
-            { "day": "2026-09-23", "dir": "sell", "item": "Fleeting Quiver", "tier": 0, "n": 2, "unpriced": 0, "min": 18000.0, "max": 20000.0, "sum": 38000.0 },
-            { "day": "2026-09-23", "dir": "buy", "item": "Fleeting Quiver", "tier": 0, "n": 0, "unpriced": 1, "min": null, "max": null, "sum": 0.0 },
-            { "day": "2026-09-24", "dir": "sell", "item": "Fleeting Quiver", "tier": 0, "n": 2, "unpriced": 0, "min": 19000.0, "max": 20000.0, "sum": 39000.0 }
+            { "day": "2026-09-23", "dir": "sell", "item": "Fleeting Quiver", "tier": 0, "n": 2, "unpriced": 0, "min": 18000.0, "max": 20000.0, "sum": 38000.0, "prices": [20000.0, 18000.0] },
+            { "day": "2026-09-23", "dir": "buy", "item": "Fleeting Quiver", "tier": 0, "n": 0, "unpriced": 1, "min": null, "max": null, "sum": 0.0, "prices": [] },
+            { "day": "2026-09-24", "dir": "sell", "item": "Fleeting Quiver", "tier": 0, "n": 2, "unpriced": 0, "min": 19000.0, "max": 20000.0, "sum": 39000.0, "prices": [20000.0, 19000.0] }
         ])
     );
 }

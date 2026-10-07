@@ -36,6 +36,8 @@ pub struct BazaarRow {
     max: Option<f64>,
     /// Of the priced offers, for the average.
     sum: f64,
+    /// Every priced offer's platinum per unit, in log order, for medians and outliers.
+    prices: Vec<f64>,
 }
 
 type Key = (String, Dir, String, u32);
@@ -107,6 +109,7 @@ fn add(row: &mut BazaarRow, unit: Option<f64>) {
     };
     row.n += 1;
     row.sum += p;
+    row.prices.push(p);
     row.min = Some(row.min.map_or(p, |m| m.min(p)));
     row.max = Some(row.max.map_or(p, |m| m.max(p)));
 }
