@@ -2,8 +2,9 @@
 //
 // OFF FOR EVERY PLAYER, and only the player turns it on, here. While it is off the card shows the
 // switch and what turning it on allows, and nothing else, and the app does nothing with the log.
-// While it is on, nothing happens by itself: every backup and every archive is a click, and the two
-// that move a file ask first, naming it.
+// While it is on, nothing happens by itself: archiving is one button, and it asks first, naming the
+// file. The archive makes its own verified backup, so the card offers no separate backup or keep
+// step (owner, 2026-10-06); the IPC for them stays for the trial scripts.
 //
 // Shown in every build since step 6.3 (owner, 2026-10-04); the switch stays off by default.
 
@@ -19,12 +20,6 @@ function fmtBytes(n: number): string {
 
 function fmtDay(ms: number | null): string {
   return ms === null ? 'never' : new Date(ms).toLocaleDateString()
-}
-
-const STATE_TEXT: Record<SegmentRow['state'], string> = {
-  captured: 'recorded, not backed up yet',
-  'backed-up': 'backed up',
-  sealed: 'kept'
 }
 
 /** Two-step button: the first click shows what will happen, the second does it. */
@@ -56,7 +51,7 @@ function SegmentLine(props: { s: SegmentRow; newest: boolean; run: (p: Promise<L
     <Box data-testid={`log-archive-segment-${s.id}`}>
       <Typography variant="body2">
         {s.firstStamp.slice(0, 10)} to {s.lastStamp.slice(0, 10)}: {fmtBytes(s.logBytes)}
-        {s.gzBytes !== null ? `, ${fmtBytes(s.gzBytes)} compressed` : ''} ({STATE_TEXT[s.state]})
+        {s.gzBytes !== null ? `, ${fmtBytes(s.gzBytes)} compressed` : ''}
       </Typography>
       {s.archivePath !== null && (
         <Typography variant="caption" color="text.secondary" sx={{ wordBreak: 'break-all' }}>
@@ -75,11 +70,6 @@ function SegmentLine(props: { s: SegmentRow; newest: boolean; run: (p: Promise<L
         </Typography>
       )}
       <Stack direction="row" spacing={1} sx={{ mt: 0.5 }}>
-        {s.state === 'backed-up' && (
-          <Button size="small" variant="outlined" data-testid="log-archive-keep" onClick={() => props.run(window.eq.logArchiveKeep(s.id))}>
-            Keep this history
-          </Button>
-        )}
         {s.olderEngine && s.archivePath !== null && (
           <ConfirmButton
             testId="log-archive-refresh"
@@ -88,7 +78,7 @@ function SegmentLine(props: { s: SegmentRow; newest: boolean; run: (p: Promise<L
             onGo={() => props.run(window.eq.logArchiveRefresh(s.id))}
           />
         )}
-        {s.state === 'sealed' && props.newest && s.archivePath !== null && (
+        {props.newest && s.archivePath !== null && (
           <ConfirmButton
             testId="log-archive-restore"
             label="Put this log back"
@@ -117,10 +107,7 @@ function OnPanel(props: { st: LogArchiveStatus; run: (p: Promise<LogArchiveReply
           last factions file: {fmtDay(st.dumps.factionsMs)}.
         </Alert>
       )}
-      <Stack direction="row" spacing={1} flexWrap="wrap">
-        <Button size="small" variant="outlined" data-testid="log-archive-backup" disabled={st.busy !== null || st.live === null} onClick={() => run(window.eq.logArchiveBackup())}>
-          Back up this log
-        </Button>
+      <Box>
         <ConfirmButton
           testId="log-archive-rotate"
           label="Archive this log and start fresh"
@@ -128,13 +115,14 @@ function OnPanel(props: { st: LogArchiveStatus; run: (p: Promise<LogArchiveReply
           confirm={`This moves ${st.live?.path ?? 'your log'} (${fmtBytes(st.live?.bytes ?? 0)}) into ${st.dir}, compresses it, and starts a fresh log. Your kills, loot and levels keep showing. The game can stay open.`}
           onGo={() => run(window.eq.logArchiveRotate())}
         />
-      </Stack>
+      </Box>
       {st.rotateBlockers.length > 0 && (
         <Typography variant="caption" color="text.secondary" data-testid="log-archive-blockers">
           Archiving is not available right now: {st.rotateBlockers.join(' ')}
         </Typography>
       )}
-      {st.segments.map((s) => (
+      {/* eslint-disable-next-line eqc/no-domain-munging -- the status lists every segment (the trial scripts read backups from it); the card shows only archived logs. */}
+      {st.segments.filter((s) => s.state === 'sealed').map((s) => (
         <SegmentLine key={s.id} s={s} newest={s.id === st.newestSealedId} run={run} />
       ))}
       {st.held.map((h) => (
@@ -191,8 +179,8 @@ export function LogArchiveSetting(): JSX.Element {
       />
       <Typography variant="caption" color="text.secondary">
         {st.enabled
-          ? 'On. Nothing happens by itself: the buttons below are the only way a backup or an archive starts.'
-          : 'Off. When on, you can back up your EverQuest log as a compressed copy, and archive it to start a fresh, small log while your kills, loot and levels keep showing. The app never does either unless you click.'}
+          ? 'On. Nothing happens by itself: the log is archived only when you click the button below.'
+          : 'Off. When on, one button archives your EverQuest log as a compressed copy and starts a fresh, small log while your kills, loot and levels keep showing. The app never does it unless you click.'}
       </Typography>
       {offAsking && (
         <Stack direction="row" spacing={1} alignItems="center">
