@@ -6,9 +6,12 @@
 // preflight rule still holds: it waits while the engine is still reading the log, and it archives
 // at most once per app run.
 //
-// The check is a stat of the live log; the folder is read only once the log is over the limit.
+// When: once at launch, as soon as the engine has caught up on the log, then once a day. A month
+// of play wrote ~300 MB (owner, 2026-10-06), so anything more often buys nothing. The check is a
+// stat of the live log; the folder is read only once the log is over the limit.
 
 import { statSync } from 'node:fs'
+import { engineServeReadiness } from '../dataServer/engineClientHost'
 import { logInfo } from '../errorLog'
 import { getActiveCharacter } from '../session'
 import { logArchiveOn } from '../storeLogArchive'
@@ -16,7 +19,8 @@ import type { LogArchiveReply } from '../../shared/logArchive/panel'
 import { AUTO_ARCHIVE_BYTES } from '../../shared/logArchive/preflight'
 import { rotateNow } from './actions'
 
-const CHECK_EVERY_MS = 5 * 60_000
+const WAIT_FOR_ENGINE_MS = 30_000
+const CHECK_EVERY_MS = 24 * 3600_000
 
 let running = false
 
@@ -45,5 +49,11 @@ export async function autoArchiveCheck(): Promise<LogArchiveReply | null> {
 
 /** Called once at launch, after the session has started tailing. */
 export function startAutoArchive(): void {
-  setInterval(() => void autoArchiveCheck(), CHECK_EVERY_MS).unref()
+  const waiting = setInterval(() => {
+    if (!engineServeReadiness().ok) return
+    clearInterval(waiting)
+    void autoArchiveCheck()
+    setInterval(() => void autoArchiveCheck(), CHECK_EVERY_MS).unref()
+  }, WAIT_FOR_ENGINE_MS)
+  waiting.unref()
 }
