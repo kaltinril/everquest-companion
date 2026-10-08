@@ -8,7 +8,8 @@ moving without losing the ability to hand everything back when he returns.
 Read [RULES.md](RULES.md) before touching any branch. [BRANCHES.md](BRANCHES.md) is the ordered
 list of branches that make up `main_community`. [ADOPTIONS.md](ADOPTIONS.md) records every
 third-party pull request that was vetted, adopted or deferred. [ISSUES.md](ISSUES.md) records
-every upstream issue that was looked at and what became of it.
+every upstream issue that was looked at and what became of it. [RELEASING.md](RELEASING.md), on
+the `community_release` branch, is how a test build reaches the fork's Releases page.
 
 ## Why
 
@@ -35,6 +36,7 @@ and rebuilt from the recipe at any time, and the rebuild script exists to prove 
 | feature branches | `main` | until the creator merges them | Our work, one branch per feature, each an open or future upstream PR. Listed in BRANCHES.md. |
 | `community/pr-N-slug` | the upstream PR's own base | until upstream merges the PR | Our copy of an adopted third-party PR. The recipe depends on these, never on `upstream/pr/N` refs, which vanish when a PR closes and move when a contributor force-pushes. |
 | `local-data-refresh` | `main` | never closes, never a PR | The locally re-scraped item and mob corpus. The official refresh is the creator's to run, so this stays off the PRs. |
+| `community_release` | `main` | never closes, never a PR | How a TEST build is published to the fork's Releases page: [RELEASING.md](RELEASING.md) and the script it describes. |
 | `test-neutering` | `main` | never closes, never a PR | The TEST build: its own appId and userData, telemetry and feedback dark, updater guarded, the UNRELEASED gate forced open, and the `0.1.0-test.N` version with each build's tester notes. Always the last merge, so it wins. |
 | `main_community` | rebuilt from the recipe | disposable | What the dev app runs and test builds are cut from. Nothing lands here directly. |
 
