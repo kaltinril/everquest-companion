@@ -24,6 +24,9 @@ import { archiveBuckets, placeArchivedBuckets } from './engineBuckets'
 import { liveHistory, logArchiveDir } from './liveHistory'
 import { readLogPrefix } from './logPrefix'
 import { refoldWithApp } from './refoldActions'
+import { historyKeys, readRespawnHistory } from './respawnHistory'
+import { readDefine } from '../dataServer/appKnowledge'
+import type { RespawnRow } from '../../shared/respawn'
 import { refreshSegment, sweepRefreshLeftovers } from './refresh'
 import { readJournal, recoverRotation, restoreLog, rotateLog, type RotateDeps } from './rotate'
 import { listSegments, writeSegment } from './segmentStore'
@@ -41,6 +44,24 @@ const ALL_FIGHTS = 1_000_000
 function attached(): { character: string; logPath: string } | null {
   const c = getActiveCharacter()
   return c === null ? null : { character: characterId(c), logPath: c.logPath }
+}
+
+/** Step 4.14: every remembered mob's learned rows, read off the live engine by watching them in
+ *  batches; the player's own watch list is pushed back from the store afterwards. */
+async function liveRespawnHistory(modules: Parameters<NonNullable<CaptureDeps['respawnHistory']>>[0]): Promise<RespawnRow[] | null> {
+  return readRespawnHistory(historyKeys(modules.kills?.state, modules.respawn?.state), {
+    watch: async (keys) => {
+      await engineRequest('respawn.define', { prefs: { watches: keys.map((key) => ({ key, display: key })) } })
+    },
+    rows: async () => {
+      const r = await engineRequest('module.snapshot', { module: 'respawn' })
+      const rows = (r.state as { rows?: unknown } | null)?.rows
+      return Array.isArray(rows) ? (rows as RespawnRow[]) : null
+    },
+    restore: async () => {
+      await engineRequest('respawn.define', readDefine('respawn.define'))
+    }
+  })
 }
 
 const captureDeps: CaptureDeps = {
@@ -63,6 +84,7 @@ const captureDeps: CaptureDeps = {
       return null
     }
   },
+  respawnHistory: liveRespawnHistory,
   readPrefix: readLogPrefix,
   producedBy: () => ({ app: app.getVersion(), engine: app.getVersion() })
 }
@@ -98,9 +120,12 @@ function row(s: Segment): SegmentRow {
   }
 }
 
-/** The segment was captured before this engine had one of its modules (a new tab's data). */
+/** The segment was captured before this engine had one of its modules (a new tab's data), or
+ *  before step 4.14 kept the respawn history of unwatched mobs. */
 function lacksModules(s: Segment): boolean {
-  return engineModules !== null && [...engineModules].some((m) => !Object.prototype.hasOwnProperty.call(s.modules, m))
+  if (engineModules === null) return false
+  if (engineModules.has('respawn') && s.respawnHistory === undefined) return true
+  return [...engineModules].some((m) => !Object.prototype.hasOwnProperty.call(s.modules, m))
 }
 
 /** Ask the engine which captured modules it serves. Once per run, after it has caught up. */

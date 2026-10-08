@@ -17,6 +17,13 @@
 // watches, numbered with today's custom value. A gap that spans the cut (the last death in the
 // archive to the first in the live log) is not recovered: neither side measured it.
 //
+// UNWATCHED MOBS (step 4.14). A segment captured since step 4.14 also keeps `respawnHistory`, the
+// learned rows of every mob the fold remembered, read by watching them in batches
+// (`main/logArchive/respawnHistory.ts`). `withHistoryRows` puts the rows of the mobs the live list
+// watches today into an archived state, and gives it today's watch list, before the fold: so a mob
+// first watched after its log was archived still gets the gaps learned there, and a fold over
+// several archives filters by today's list rather than by each archive's own.
+//
 // THE ZONE ACROSS THE CUT (step 3.8). Before its first zone line the fold stands in zone '', so a
 // fresh log's header is blank and its deaths are filed under ''. Read as one log, it stood in the
 // zone the archive ended in, so the merge files those rows and candidates there (joining one the
@@ -132,4 +139,16 @@ export function mergeRespawn(older: unknown, newer: unknown): RespawnSnap | null
   if (!isRespawnSnap(older) || !isRespawnSnap(newer) || older.v !== newer.v) return null
   const live = carryZone(newer, older.zone)
   return { ...live, rows: mergeRows(older, live), recent: mergeRecent(older, live) }
+}
+
+/**
+ * An archived state with its history rows for every mob `live` watches, and `live`'s watch list.
+ * A row the archived state already has is left as captured. Anything else comes back as is.
+ */
+export function withHistoryRows(archived: unknown, history: readonly RespawnRow[], live: unknown): unknown {
+  if (!isRespawnSnap(archived) || !isRespawnSnap(live)) return archived
+  const watches = watchesOf(live)
+  const have = new Set(archived.rows.map((r) => r.id))
+  const extra = history.filter((r) => watches.has(r.key) && !have.has(r.id))
+  return { ...archived, prefs: live.prefs, rows: [...archived.rows, ...extra] }
 }

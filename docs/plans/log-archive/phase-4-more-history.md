@@ -196,6 +196,24 @@ Until a module's step lands, that module shows what the live log holds, as it do
   key. The resist card reads every bucket. A merge rule would count the archive twice, so `resist`
   has no line in the lookup, and a test holds it there.
 
+### 4.14 Respawn gaps of mobs nobody watched
+
+- **Does**: keeps the learned respawn gaps of every mob the fold remembered, not only the watched
+  ones, so a mob watched for the first time after a rotation starts from what the archive learned.
+- **Touches**: `main/logArchive/respawnHistory.ts` (new), the capture, the refresh's second engine,
+  `mergeRespawn.ts withHistoryRows`, and an optional `respawnHistory` field on the segment.
+- **As built** (2026-10-08): the fold keeps up to 800 mobs with their gaps but publishes a clock
+  row only for a watched mob (4.4). The watch list is a define, and the fold re-cuts its rows from
+  the history it holds when the list changes, with no refold. So the capture, inside its
+  before/after pair and after the modules, watches the mobs of the `kills` snapshot and the recent
+  candidates in batches of 40, keeps every row that learned something, and pushes the player's own
+  list back from the store. A refresh reads the same from its throwaway engine. At read time each
+  archived respawn state takes the history rows of the mobs the live list watches today, and
+  today's list, before the fold. No engine file changed. Probed on `wl40-farm-run.log` against the
+  real binary: 41 mobs asked for, none watched, 9 with learned gaps back. A segment without the
+  field counts as lacking, so the automatic refresh at launch fills it in for older archives.
+  The Timers tab may redraw once while the batches run, for well under a second.
+
 ## When this phase is done
 
 | Question | Answer |

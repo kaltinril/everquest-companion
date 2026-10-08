@@ -215,3 +215,15 @@ test('keepIdentity puts the stored path back and changes neither input', () => {
   assert.equal(refolded.character.state.character.logPath, 'b')
   assert.deepEqual(keepIdentity({}, { kills: { seq: 1, state: {} } }), { kills: { seq: 1, state: {} } })
 })
+
+test('refresh: the respawn history is taken again with the totals, and kept when the refold could not read it (step 4.14)', async () => {
+  const { dir, segment } = olderSegment()
+  const history = [{ id: 'guk::a gnoll', key: 'a gnoll', samples: 2 }]
+  const giving = (h: unknown) => async (): Promise<RefoldResult> =>
+    ({ ok: true, fold: { modules: REFOLDED, foldMs: 1, events: 2, respawnHistory: h }, stageMs: 1, tables: 0 }) as RefoldResult
+  const r = await refreshSegment(dir, segment.id, { refold: giving(history), producedBy: () => NOW })
+  assert.deepEqual(r.ok && r.changed, ['loot', 'respawn history'])
+  assert.deepEqual(listSegments(dir).segments[0].respawnHistory, history)
+  await refreshSegment(dir, segment.id, { refold: giving(null), producedBy: () => NOW })
+  assert.deepEqual(listSegments(dir).segments[0].respawnHistory, history)
+})
