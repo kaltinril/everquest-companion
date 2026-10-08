@@ -93,6 +93,21 @@ EOF
 
 (cd "$dir" && sha256sum "$exe" >SHA256SUMS.txt)
 
+# The PREVIOUS release's blockmap rides along too. An install on that version asks the feed for
+# its own installer's blockmap to download only what changed; the feed is the newest release, so
+# without this copy every update is the whole installer. Best effort: the first release, or a
+# previous release without one, simply means full downloads.
+extra=()
+prevdir=$(mktemp -d)
+trap 'rm -f "$notes"; rm -rf "$prevdir"' EXIT
+prev_tag=$(gh release view --repo "$repo_slug" --json tagName -q .tagName 2>/dev/null || true)
+if [ -n "$prev_tag" ] && [ "$prev_tag" != "$tag" ]; then
+  if gh release download "$prev_tag" --repo "$repo_slug" --pattern '*.exe.blockmap' --dir "$prevdir" >/dev/null 2>&1; then
+    for f in "$prevdir"/*.exe.blockmap; do [ -f "$f" ] && extra+=("$f"); done
+  fi
+fi
+[ ${#extra[@]} -gt 0 ] && echo "previous blockmap: $(basename "${extra[0]}") from $prev_tag" || echo "previous blockmap: none (first release, or $prev_tag has none): updates download the whole installer"
+
 echo
 echo "tag:     $tag"
 echo "target:  $target"
@@ -110,4 +125,4 @@ fi
 
 gh release create "$tag" --repo "$repo_slug" --target "$target" --latest \
   --title "EQ Legends Companion TEST $version" --notes-file "$notes" \
-  "$dir/$exe" "$dir/SHA256SUMS.txt" "$dir/test.yml" "$blockmap"
+  "$dir/$exe" "$dir/SHA256SUMS.txt" "$dir/test.yml" "$blockmap" "${extra[@]}"
