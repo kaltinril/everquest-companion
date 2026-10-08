@@ -5,6 +5,7 @@
 // archived earlier too (phase 4).
 
 import { mergeBazaar } from './mergeBazaar'
+import { mergeBuffStats } from './mergeBuffStats'
 import { mergeConsider } from './mergeConsider'
 import { mergeItemTiers } from './mergeItemTiers'
 import { mergeKills } from './mergeKills'
@@ -29,7 +30,8 @@ export const MERGE_RULES: Readonly<Record<string, MergeRule>> = {
   respawn: mergeRespawn,
   progression: mergeProgression,
   bazaar: mergeBazaar,
-  observedSpellRanks: mergeSpellRanks
+  observedSpellRanks: mergeSpellRanks,
+  buffs: mergeBuffStats
 }
 
 export function hasMergeRule(moduleId: string): boolean {
