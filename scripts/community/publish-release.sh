@@ -59,7 +59,10 @@ else
 fi
 
 # The tester notes are the body of the version-bump commit on test-neutering.
-notes_commit=$(git log --format=%H --grep="^Test build $version:" -1 test-neutering)
+# A fresh CI checkout has origin/test-neutering but no local branch of that name.
+notes_ref=test-neutering
+git rev-parse -q --verify "$notes_ref" >/dev/null || notes_ref=origin/test-neutering
+notes_commit=$(git log --format=%H --grep="^Test build $version:" -1 "$notes_ref")
 [ -n "$notes_commit" ] || fail "no 'Test build $version:' commit on test-neutering"
 
 if [ -z "$target" ]; then
@@ -106,7 +109,11 @@ if [ -n "$prev_tag" ] && [ "$prev_tag" != "$tag" ]; then
     for f in "$prevdir"/*.exe.blockmap; do [ -f "$f" ] && extra+=("$f"); done
   fi
 fi
-[ ${#extra[@]} -gt 0 ] && echo "previous blockmap: $(basename "${extra[0]}") from $prev_tag" || echo "previous blockmap: none (first release, or $prev_tag has none): updates download the whole installer"
+if [ ${#extra[@]} -gt 0 ]; then
+  echo "previous blockmap: $(basename "${extra[0]}") from $prev_tag"
+else
+  echo "previous blockmap: none (${prev_tag:-no earlier release}); an update from it downloads the whole installer"
+fi
 
 echo
 echo "tag:     $tag"
