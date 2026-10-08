@@ -6,7 +6,8 @@
 import { join } from 'node:path'
 import { logInfo } from '../errorLog'
 import { characterId, eqLogsDir } from '../log/config'
-import { getActiveCharacter } from '../session'
+import { activeCharId, getActiveCharacter } from '../session'
+import { getComboCorrections } from '../store'
 import { logArchiveOn } from '../storeLogArchive'
 import { createHistoryMerge, readHeadBytes } from './history'
 
@@ -30,6 +31,7 @@ export const liveHistory = createHistoryMerge({
     return c === null ? null : { character: characterId(c), logPath: c.logPath }
   },
   readHead: (path, n) => readHeadBytes(path, n),
+  comboCorrections: () => getComboCorrections(activeCharId()),
   note: (line) => {
     logInfo(`[everquest-companion] ${line}`)
   }

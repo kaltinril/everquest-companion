@@ -6,6 +6,7 @@
 
 import { mergeBazaar } from './mergeBazaar'
 import { mergeBuffStats } from './mergeBuffStats'
+import { mergeCombo } from './mergeCombo'
 import { mergeConsider } from './mergeConsider'
 import { mergeItemTiers } from './mergeItemTiers'
 import { mergeKills } from './mergeKills'
@@ -33,7 +34,8 @@ export const MERGE_RULES: Readonly<Record<string, MergeRule>> = {
   bazaar: mergeBazaar,
   observedSpellRanks: mergeSpellRanks,
   buffs: mergeBuffStats,
-  spellSets: mergeSpellSets
+  spellSets: mergeSpellSets,
+  combo: mergeCombo
 }
 
 export function hasMergeRule(moduleId: string): boolean {

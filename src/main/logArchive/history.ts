@@ -23,6 +23,10 @@
 // `noteLiveProgression` before the kills merge. Once the line is known it is kept for the context:
 // it cannot move, so the snapshot is not asked for again.
 //
+// COMBO ALSO NEEDS TODAY'S CORRECTIONS (step 4.12, `mergeCombo.ts withCorrections`): the engine
+// applies a correction only to its own log, so the archived intervals take it here. A correction
+// moves the engine's combo revision, so the cache below is never stale on one.
+//
 // `archivedFights` is the same for the fight summaries a segment keeps beside its modules (step
 // 4.7), already re-named and sorted, and built once per context: the picker polls it.
 
@@ -33,6 +37,8 @@ import { carryZoneIntoKills, firstZoneLine } from '../../shared/logArchive/carry
 import type { SegmentSummary } from '../../shared/combat'
 import { archivedFightRows } from '../../shared/logArchive/mergeFights'
 import { hasMergeRule, mergeModule } from '../../shared/logArchive/mergeRules'
+import { firstStart, withCorrections } from '../../shared/logArchive/mergeCombo'
+import type { ComboCorrection } from '../../shared/classCombo'
 import { HEAD_BYTES, logStampKey, type Segment } from '../../shared/logArchive/segment'
 import { listSegments, type SkippedFile } from './segmentStore'
 
@@ -46,6 +52,8 @@ export interface HistoryDeps {
   /** Up to `n` bytes from the start of `path`, or null when it cannot be read. */
   readHead: (path: string, n: number) => Buffer | null
   note: (line: string) => void
+  /** The attached character's class-loadout corrections; none when absent. */
+  comboCorrections?: () => readonly ComboCorrection[]
 }
 
 interface Context {
@@ -89,6 +97,13 @@ export interface HistoryMerge {
   status: () => HistoryStatus | null
   noteSealedThisAttach: (id: string) => void
   forgetHistoryContext: () => void
+}
+
+/** A module's archived states as the merge takes them: combo's with today's corrections on. */
+function archivedFor(states: unknown[], moduleId: string, live: unknown, deps: HistoryDeps): unknown[] {
+  if (moduleId !== 'combo') return states
+  const corrections = deps.comboCorrections?.() ?? []
+  return states.map((s) => withCorrections(s, corrections, firstStart(live)))
 }
 
 export function createHistoryMerge(deps: HistoryDeps): HistoryMerge {
@@ -180,7 +195,7 @@ export function createHistoryMerge(deps: HistoryDeps): HistoryMerge {
     if (c === null) return state
     const hit = cache.get(moduleId)
     if (hit?.seq === seq) return hit.state
-    const merged = moduleId === 'kills' ? mergeKills(c, state) : mergeModule(moduleId, statesOf(c, moduleId), state).state
+    const merged = moduleId === 'kills' ? mergeKills(c, state) : mergeModule(moduleId, archivedFor(statesOf(c, moduleId), moduleId, state, deps), state).state
     cache.set(moduleId, { seq, state: merged })
     return merged
   }
