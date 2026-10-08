@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+# Publish a TEST build to the fork's GitHub Releases page.
+#
+#   scripts/community/publish-release.sh [--version <v>] [--target <commit>] [--publish]
+#
+# Run from the clone that cut the build (main_community checked out). Without --publish it only
+# checks and prints what it would do. The procedure, and why each check is here, is
+# docs/community/RELEASING.md.
+#
+# The tag is community-<version>, never v<version>: a v* tag starts the creator's release job in
+# .github/workflows/build.yml, which builds the official app and publishes toward his repo.
+set -euo pipefail
+
+repo_slug=kaltinril/everquest-companion
+repo=$(git rev-parse --show-toplevel)
+cd "$repo"
+
+version=$(node -p "require('./package.json').version")
+target=
+publish=0
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --version) version=$2; shift ;;
+    --target) target=$2; shift ;;
+    --publish) publish=1 ;;
+    *) echo "unknown argument: $1" >&2; exit 2 ;;
+  esac
+  shift
+done
+
+fail() { echo "STOP: $*" >&2; exit 1; }
+
+case "$version" in
+  *-test.*) ;;
+  *) fail "version $version is not a 0.1.0-test.N build; only TEST builds are published from the fork" ;;
+esac
+
+tag="community-$version"
+dir="release/$version"
+exe="everquest-companion-test-Setup-$version.exe"
+[ -f "$dir/$exe" ] || fail "no installer at $dir/$exe; cut the build first (RELEASING.md step 1)"
+
+# The installer must carry its whole dependency tree (test.13 shipped without `conf`).
+if [ -f "$dir/win-unpacked/resources/app.asar" ]; then
+  asar_list=$(node_modules/.bin/asar list "$dir/win-unpacked/resources/app.asar" | tr -d '\r')
+  modules=$(grep -c 'node_modules' <<<"$asar_list" || true)
+  grep -q '[\\/]node_modules[\\/]conf$' <<<"$asar_list" || fail "the asar has no node_modules/conf; this build is broken"
+  [ "$modules" -ge 29000 ] || fail "the asar lists only $modules node_modules entries (a good build has about 29,000)"
+  echo "asar: $modules node_modules entries, conf present"
+else
+  echo "note: $dir/win-unpacked is gone, so the asar was not re-checked; it was checked at the build"
+fi
+
+# The tester notes are the body of the version-bump commit on test-neutering.
+notes_commit=$(git log --format=%H --grep="^Test build $version:" -1 test-neutering)
+[ -n "$notes_commit" ] || fail "no 'Test build $version:' commit on test-neutering"
+
+if [ -z "$target" ]; then
+  target=$(git rev-parse origin/main_community)
+fi
+target=$(git rev-parse "$target^{commit}")
+git merge-base --is-ancestor "$notes_commit" "$target" || fail "$target does not contain the test.N commit $notes_commit"
+git branch -r --contains "$target" | grep -q 'origin/main_community$' || fail "$target is not on origin/main_community; push first (RELEASING.md step 3)"
+
+if gh release view "$tag" --repo "$repo_slug" >/dev/null 2>&1; then
+  fail "release $tag already exists on $repo_slug"
+fi
+
+notes=$(mktemp)
+trap 'rm -f "$notes"' EXIT
+{
+  cat <<EOF
+**EQ Legends Companion TEST $version**, a community build of [EQ Legends Companion](https://github.com/jmoyers/everquest-companion) with the fork's changes on top.
+
+**To install:** download \`$exe\` below and run it. The installer is not code-signed, so Windows shows "Windows protected your PC" the first time: click **More info**, then **Run anyway**. It installs beside the official app, not over it, and keeps its own settings.
+
+**Updates are manual.** This build does not update itself. To get a newer one, download it from this page and run it; your settings carry over.
+
+\`SHA256SUMS.txt\` holds the installer's checksum, to compare with \`Get-FileHash $exe\`.
+
+---
+
+EOF
+  git log -1 --format=%b "$notes_commit"
+} >"$notes"
+
+(cd "$dir" && sha256sum "$exe" >SHA256SUMS.txt)
+
+echo
+echo "tag:     $tag"
+echo "target:  $target"
+echo "assets:  $dir/$exe ($(du -h "$dir/$exe" | cut -f1)), $dir/SHA256SUMS.txt"
+echo "notes:   from $(git log -1 --format='%h %s' "$notes_commit")"
+echo
+
+if [ $publish -eq 0 ]; then
+  echo "----- release notes -----"
+  cat "$notes"
+  echo "-------------------------"
+  echo "dry run: nothing published. Re-run with --publish once the owner has said yes."
+  exit 0
+fi
+
+gh release create "$tag" --repo "$repo_slug" --target "$target" --latest \
+  --title "EQ Legends Companion TEST $version" --notes-file "$notes" \
+  "$dir/$exe" "$dir/SHA256SUMS.txt"
