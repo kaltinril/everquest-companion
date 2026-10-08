@@ -12,6 +12,7 @@ import { mergeLeveling } from './mergeLeveling'
 import { mergeLoot } from './mergeLoot'
 import { mergeProgression } from './mergeProgression'
 import { mergeRespawn } from './mergeRespawn'
+import { mergeSpellRanks } from './mergeSpellRanks'
 import { mergeClassUnlocks, mergeTurnIns } from './mergeUnlocksTurnIns'
 
 /** Older then newer, or null when the two cannot be merged (that segment is left out). */
@@ -27,7 +28,8 @@ export const MERGE_RULES: Readonly<Record<string, MergeRule>> = {
   turnins: mergeTurnIns,
   respawn: mergeRespawn,
   progression: mergeProgression,
-  bazaar: mergeBazaar
+  bazaar: mergeBazaar,
+  observedSpellRanks: mergeSpellRanks
 }
 
 export function hasMergeRule(moduleId: string): boolean {
