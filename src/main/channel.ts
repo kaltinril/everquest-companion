@@ -107,8 +107,14 @@ function seedFromLegacy(target: string, legacy: string): string[] {
       const src = join(legacy, entry)
       if (!existsSync(src)) continue
       const destName = entry === LEGACY_STORE_FILE ? `${STORE_NAME}.json` : entry
-      cpSync(src, join(target, destName), { recursive: true })
-      copied.push(destName)
+      // One entry at a time (TEST BUILD): Local Storage is a live database while the official app
+      // runs, and a locked file in it must cost that entry only, never the rest or the stamp.
+      try {
+        cpSync(src, join(target, destName), { recursive: true })
+        copied.push(destName)
+      } catch (err) {
+        logConsoleError(`[everquest-companion] userData seed: ${entry} was not copied:`, err)
+      }
     }
     writeFileSync(
       join(target, SEED_STAMP),
