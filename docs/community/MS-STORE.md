@@ -26,6 +26,26 @@ Sources:
 [flexible virtualization](https://learn.microsoft.com/en-us/windows/msix/desktop/flexible-virtualization),
 [Store policies, section 10.1](https://learn.microsoft.com/windows/uwp/publish/store-policies).
 
+## The rule: one version, one build, every channel (owner, 2026-10-08)
+
+A player must see the same version and get the same app whether it came from the GitHub page or the
+Store. So:
+
+- **One commit.** Both packages of a release are built from the same `main_community` commit, in
+  the same session. The only differences allowed are packaging and where updates come from.
+- **One version number.** Today's `0.1.0-test.N` cannot be written as a Store version (four plain
+  numbers, the last reserved as 0), so the scheme moves to plain `0.1.N`: the GitHub build is
+  `0.1.N` and the Store build is `0.1.N.0`, the same number in the Store's form. The app shows
+  `0.1.N` either way. Semver puts `0.1.21` above `0.1.0-test.20`, so installs already out there
+  update to it, and the update file stays `test.yml` because its name is pinned
+  (`electron-builder.yml`, checked with a build numbered 0.2.0).
+- **Released together.** The GitHub release is published when the Store submission is certified,
+  or the GitHub one goes first and the Store one follows within the certification delay; RELEASING.md
+  says which (Phase 0 ruling). A Store submission that fails certification is fixed as the next
+  version on both channels, never as a Store-only build.
+- **Checked by the script.** The publish script refuses to publish when the version is not plain
+  `0.1.N`, and records the commit both packages came from.
+
 ## What changes for this app (read before Phase 1)
 
 These are the facts that make an MSIX of this app different from the NSIS installer. Each is either
@@ -39,8 +59,8 @@ settled by a ruling in Phase 0 or tested in Phase 2.
    AppX/MSIX package, which is the switch). The GitHub build keeps updating itself.
 3. **Version numbers.** MSIX versions are four numbers, the fourth reserved by the Store (0), and
    each submission must be higher than the last. electron-builder turns `0.1.0-test.20` into
-   `0.1.0.x` for every test build (it drops the `-test` part), so the Store build needs its own
-   mapping, for example `0.1.<N>.0` for test.N.
+   `0.1.0.x` for every test build (it drops the `-test` part), which is why the version rule above
+   moves both channels to plain `0.1.N`.
 4. **Settings live somewhere else.** A packaged app's writes under `%APPDATA%` are virtualized into
    the package's private folder and deleted on uninstall, unlike the NSIS build, which keeps them.
    Two ways out, an owner ruling: accept separate settings (a player moving from the GitHub build
@@ -69,7 +89,11 @@ Every phase ends in a state that can stop: nothing reaches players before Phase 
 - Individual account under the owner's name, or a company account (costs money).
 - The listing title (a suggestion: "Companion for EQ Legends (unofficial)"), and whether to ask
   Daybreak for permission first.
-- Settings: separate per build, or shared through an unvirtualized folder (item 4 above).
+- Settings: separate per build, or shared through an unvirtualized folder (item 4 above). Shared is
+  what "the same app however it was installed" asks for.
+- When the version scheme moves to plain `0.1.N`: at the next build (it can be done before the
+  Store exists, and nothing has been published yet), or with the first Store release.
+- Release order between the two channels.
 
 ### Phase 1: account and name (owner, about an hour, no code)
 
@@ -79,6 +103,14 @@ Every phase ends in a state that can stop: nothing reaches players before Phase 
 - Copy the identity values from Product management, Product identity: Package/Identity/Name,
   Package/Identity/Publisher, and PublisherDisplayName. They go into Phase 2's config, exactly.
 
+### Phase 1b: the version scheme (code, small; can land before any Store work)
+
+- **Touches:** `test-neutering` (version `0.1.N`; the test-build procedure's bump), and
+  `community_release_rules` (`publish-release.sh` accepts `0.1.N`, finds the `Test build 0.1.N:`
+  notes, and refuses a prerelease-shaped version; the tag stays `community-<version>`).
+- **Check:** a build numbered `0.1.21` is offered to an installed `0.1.0-test.20` by the local
+  feed test used for test.20 (RELEASING.md), and its `test.yml` and installer name carry `0.1.21`.
+
 ### Phase 2: a Store build that runs locally (code, about half a day)
 
 - **Touches:** a Store build config beside the TEST one on `test-neutering` (an `appx` target with
@@ -86,6 +118,8 @@ Every phase ends in a state that can stop: nothing reaches players before Phase 
   `build/icon.png` into `build/appx/` (Square44x44Logo, Square150x150Logo, StoreLogo,
   Wide310x150Logo; electron-builder does not make them from the .ico), and the updater turned off
   when `process.windowsStore` is true.
+- **Same version:** the Store build reads the version from the same `package.json` and writes it as
+  `0.1.N.0`; a check in the build fails if the two ever differ.
 - **Check, on a Windows machine with Developer Mode and a local test certificate:** it installs,
   launches, finds the logs, starts its engine, reads a dump, archives a log into
   `Logs\companion-archive` and puts it back, and survives an uninstall and reinstall. Record where
@@ -114,8 +148,9 @@ Every phase ends in a state that can stop: nothing reaches players before Phase 
 
 - Upload the MSIX, submit, wait for certification. Answer any rejection (naming is the most likely)
   and resubmit.
-- Once live, add a Store step to RELEASING.md: after the GitHub release, build the Store package of
-  the same commit and submit it. The GitHub page stays the fastest channel.
+- Once live, add a Store step to RELEASING.md: both packages built from the same commit in one
+  session, the same version, released in the order Phase 0 ruled. The GitHub page stays the fastest
+  channel; it is never ahead by more than the certification delay.
 
 ## What it costs and what it does not fix
 
