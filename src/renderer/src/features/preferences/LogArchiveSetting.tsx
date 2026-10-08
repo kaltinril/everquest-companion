@@ -48,47 +48,70 @@ function ConfirmButton(props: { label: string; confirm: string; disabled?: boole
   )
 }
 
+/** A grey fill rather than a border, as the install-folder card does: the card is the one border. */
+const FILL = { p: 1.25, borderRadius: 1, bgcolor: 'action.hover' } as const
+
+/** A small label over its value, the install-folder card's path row. */
+function Stat(props: { label: string; value: string; mono?: boolean; testId?: string }): JSX.Element {
+  return (
+    <Box sx={{ minWidth: 0 }}>
+      <Typography variant="caption" color="text.secondary" display="block">
+        {props.label}
+      </Typography>
+      <Typography
+        variant="body2"
+        data-testid={props.testId}
+        sx={props.mono === true ? { fontFamily: 'monospace', wordBreak: 'break-all' } : undefined}
+      >
+        {props.value}
+      </Typography>
+    </Box>
+  )
+}
+
 function SegmentLine(props: { s: SegmentRow; newest: boolean; run: (p: Promise<LogArchiveReply>) => void }): JSX.Element {
   const { s } = props
   return (
-    <Box data-testid={`log-archive-segment-${s.id}`}>
-      <Typography variant="body2">
-        {s.firstStamp.slice(0, 10)} to {s.lastStamp.slice(0, 10)}: {fmtBytes(s.logBytes)}
-        {s.gzBytes !== null ? `, ${fmtBytes(s.gzBytes)} compressed` : ''}
-      </Typography>
-      {s.archivePath !== null && (
-        <Typography variant="caption" color="text.secondary" sx={{ wordBreak: 'break-all' }}>
-          {s.archivePath}
+    <Box
+      data-testid={`log-archive-segment-${s.id}`}
+      sx={{ ...FILL, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1, flexWrap: 'wrap' }}
+    >
+      <Box sx={{ minWidth: 0 }}>
+        <Typography variant="body2" fontWeight={600} title={s.archivePath ?? undefined}>
+          {s.firstStamp.slice(0, 10)} to {s.lastStamp.slice(0, 10)}
         </Typography>
-      )}
-      {s.gapLines > 0 && (
         <Typography variant="caption" color="text.secondary" display="block">
-          {s.gapLines} line(s) written during the move are in the archive but not in the kept totals.
+          {fmtBytes(s.logBytes)}
+          {s.gzBytes !== null ? `, ${fmtBytes(s.gzBytes)} compressed` : ''}
+          {s.olderEngine && (
+            <span title="Later fixes to how the log is read reach this history when it is refreshed.">
+              {' '}· recorded by {s.app}
+            </span>
+          )}
         </Typography>
-      )}
-      {s.olderEngine && (
-        <Typography variant="caption" color="text.secondary" display="block">
-          Recorded by version {s.app}. Later fixes to how the log is read reach this history only
-          when it is refreshed.
-        </Typography>
-      )}
-      <Stack direction="row" spacing={1} sx={{ mt: 0.5 }}>
+        {s.gapLines > 0 && (
+          <Typography variant="caption" color="text.secondary" display="block">
+            {s.gapLines} line(s) written during the move are archived but not counted.
+          </Typography>
+        )}
+      </Box>
+      <Stack direction="row" spacing={1}>
         {/* Offered whenever the archive is kept, not only for an older version: a reading can change
             without the version moving (a dev build, or a module that learned something new, as
             the Bazaar did quoting who said what), and reading it again only replaces the totals. */}
         {s.archivePath !== null && (
           <ConfirmButton
             testId="log-archive-refresh"
-            label="Refresh this history"
-            confirm="This reads the archived log again with this version, in the background, and replaces the kept totals with the new ones. It can take a minute or two for a big log."
+            label="Refresh"
+            confirm="Read this archive again with this version, in the background, and replace its totals. A big log takes a minute or two."
             onGo={() => props.run(window.eq.logArchiveRefresh(s.id))}
           />
         )}
         {props.newest && s.archivePath !== null && (
           <ConfirmButton
             testId="log-archive-restore"
-            label="Put this log back"
-            confirm="This joins the archived log back onto the front of your current log, oldest first, so nothing is lost. The app then restarts to read it."
+            label="Put back"
+            confirm="Join this archive back onto the front of your current log, oldest first, so nothing is lost. The app then restarts to read it."
             onGo={() => props.run(window.eq.logArchiveRestore(s.id))}
           />
         )}
@@ -101,16 +124,16 @@ function OnPanel(props: { st: LogArchiveStatus; run: (p: Promise<LogArchiveReply
   const { st, run } = props
   return (
     <Stack spacing={1.5}>
-      {st.live !== null && (
-        <Typography variant="body2" data-testid="log-archive-live">
-          Your current log: {fmtBytes(st.live.bytes)}, last written {fmtDay(st.live.modifiedMs)}.
-        </Typography>
-      )}
+      <Box sx={{ ...FILL, display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+        {st.live !== null && (
+          <Stat label="Current log" value={`${fmtBytes(st.live.bytes)} · ${fmtDay(st.live.modifiedMs)}`} testId="log-archive-live" />
+        )}
+        <Stat label="Archives kept in" value={st.dir} mono />
+      </Box>
       {st.dumps?.stale === true && (
         <Alert severity="info" data-testid="log-archive-dumps">
-          Before archiving, run <b>/outputfile inventory</b> and <b>/outputfile factions</b> in game. Some
-          counts lean on those files once the log is gone. Last inventory file: {fmtDay(st.dumps.inventoryMs)};
-          last factions file: {fmtDay(st.dumps.factionsMs)}.
+          Run <b>/outputfile inventory</b> and <b>/outputfile factions</b> before archiving. Last run{' '}
+          {fmtDay(st.dumps.inventoryMs)} and {fmtDay(st.dumps.factionsMs)}.
         </Alert>
       )}
       <Box>
@@ -118,13 +141,18 @@ function OnPanel(props: { st: LogArchiveStatus; run: (p: Promise<LogArchiveReply
           testId="log-archive-rotate"
           label="Archive now"
           disabled={st.rotateBlockers.length > 0}
-          confirm={`This moves ${st.live?.path ?? 'your log'} (${fmtBytes(st.live?.bytes ?? 0)}) into ${st.dir}, compresses it, and starts a fresh log. Your kills, loot and levels keep showing. The game can stay open.`}
+          confirm={`Move your log (${fmtBytes(st.live?.bytes ?? 0)}) into the archive folder and start a fresh one? Your history stays, and the game can stay open.`}
           onGo={() => run(window.eq.logArchiveRotate())}
         />
       </Box>
       {st.rotateBlockers.length > 0 && (
         <Typography variant="caption" color="text.secondary" data-testid="log-archive-blockers">
           Archiving is not available right now: {st.rotateBlockers.join(' ')}
+        </Typography>
+      )}
+      {st.archived.length > 0 && (
+        <Typography variant="overline" color="text.secondary" sx={{ lineHeight: 1 }}>
+          History
         </Typography>
       )}
       {st.archived.map((s) => (
@@ -141,8 +169,7 @@ function OnPanel(props: { st: LogArchiveStatus; run: (p: Promise<LogArchiveReply
         </Typography>
       ))}
       <Typography variant="caption" color="text.secondary">
-        Archives are kept in {st.dir}. Kills, loot, levels and AA carry over. Fight details, alerts,
-        and the zone and group you were in when the log was archived start fresh.
+        Kills, loot, levels and AA carry over. Fight details, alerts, zone and group start fresh.
       </Typography>
     </Stack>
   )
@@ -184,8 +211,8 @@ export function LogArchiveSetting(): JSX.Element {
       />
       <Typography variant="caption" color="text.secondary">
         {st.enabled
-          ? `On. Whenever your log passes ${fmtBytes(AUTO_ARCHIVE_BYTES)}, it is moved into a compressed archive and a fresh, small log starts. Your kills, loot and levels keep showing. Nothing else to do.`
-          : `Off. When on, the app keeps your EverQuest log small: whenever it passes ${fmtBytes(AUTO_ARCHIVE_BYTES)}, it is moved into a compressed archive and a fresh log starts, while your kills, loot and levels keep showing.`}
+          ? `On. Past ${fmtBytes(AUTO_ARCHIVE_BYTES)}, your log is archived and a fresh one starts.`
+          : `Off. Keeps your log small: past ${fmtBytes(AUTO_ARCHIVE_BYTES)}, it is archived and a fresh one starts, and your kills, loot and levels keep showing.`}
       </Typography>
       {offAsking && (
         <Stack direction="row" spacing={1} alignItems="center">
