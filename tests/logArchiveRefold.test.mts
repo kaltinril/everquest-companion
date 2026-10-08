@@ -227,3 +227,16 @@ test('refresh: the respawn history is taken again with the totals, and kept when
   await refreshSegment(dir, segment.id, { refold: giving(null), producedBy: () => NOW })
   assert.deepEqual(listSegments(dir).segments[0].respawnHistory, history)
 })
+
+test('refresh: the fight summaries are taken again too, and kept when the refold could not read them (step 4.15)', async () => {
+  const { dir, segment } = olderSegment()
+  writeSegment(dir, { ...segment, fights: [{ id: 'e1', name: 'a gnoll', startTs: 1, kind: 'fight' } as never] })
+  const fights = [{ id: 'e1', name: 'a gnoll', startTs: 1, kind: 'fight', total: 40 }]
+  const giving = (f: unknown) => async (): Promise<RefoldResult> =>
+    ({ ok: true, fold: { modules: REFOLDED, foldMs: 1, events: 2, fights: f }, stageMs: 1, tables: 0 }) as RefoldResult
+  const r = await refreshSegment(dir, segment.id, { refold: giving(fights), producedBy: () => NOW })
+  assert.deepEqual(r.ok && r.changed, ['loot', 'fights'])
+  assert.deepEqual(listSegments(dir).segments[0].fights, fights)
+  await refreshSegment(dir, segment.id, { refold: giving(null), producedBy: () => NOW })
+  assert.deepEqual(listSegments(dir).segments[0].fights, fights)
+})

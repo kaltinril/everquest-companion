@@ -214,6 +214,16 @@ Until a module's step lands, that module shows what the live log holds, as it do
   field counts as lacking, so the automatic refresh at launch fills it in for older archives.
   The Timers tab may redraw once while the batches run, for well under a second.
 
+### 4.15 Fight summaries on Refresh
+
+- **Does**: a refresh takes every fight's summary again with the totals, so a parser fix reaches
+  an archive's fight list, and a segment kept before step 4.7 gains one.
+- **As built** (2026-10-08): the refresh's throwaway engine is asked for every fight after the
+  modules (`secondEngine.ts`), exactly as the capture asks the live one, and the refresh writes them
+  into the segment beside the totals. A refold that could not read them keeps the stored list. A
+  segment with no fight list now counts as lacking, so the automatic refresh at launch fills it in.
+  Probed on `e2e-combat.log` against the real binary: both fights back, totals and timings intact.
+
 ## When this phase is done
 
 | Question | Answer |

@@ -9,8 +9,9 @@
 // rename the new one into place. A crash at any point leaves the old segment file in place or the
 // new one, never neither. The `.old` copy is the undo until the next launch, which removes it.
 //
-// THE RESPAWN HISTORY IS TAKEN AGAIN with the totals (step 4.14), so a segment captured before that
-// step gains it on its first refresh. A refold that could not read it keeps the old field.
+// THE FIGHTS AND THE RESPAWN HISTORY ARE TAKEN AGAIN with the totals (steps 4.15 and 4.14), so a
+// parser fix reaches the fight list too, and a segment captured before either step gains it on its
+// first refresh. A refold that could not read one keeps the old field.
 //
 // ONLY THE TOTALS CHANGE. The log's identity, the archive and the state are kept, and so is the
 // path the character module names (the refold read a staged copy). A refold that lacks a module
@@ -22,6 +23,8 @@ import { compareModules, keepIdentity } from '../../shared/logArchive/refoldComp
 import { parseSegment, type Segment } from '../../shared/logArchive/segment'
 import { writeFileDurable } from '../telemetry/durableWrite'
 import type { RefoldResult } from './refold'
+
+type RefoldOk = Extract<RefoldResult, { ok: true }>
 import { listSegments, segmentPath } from './segmentStore'
 
 const NEXT = '.next'
@@ -65,6 +68,27 @@ function writeChecked(dir: string, next: Segment): boolean {
   return back === text && parsed.ok && parsed.segment.id === next.id
 }
 
+/** The segment with the refold's totals, fights and respawn history; a part the refold could not
+ *  read stays as it was. */
+function refreshed(old: Segment, fold: RefoldOk['fold'], producedBy: Segment['producedBy']): Segment {
+  const { fights, respawnHistory } = fold
+  return {
+    ...old,
+    producedBy,
+    modules: keepIdentity(old.modules, fold.modules),
+    ...(fights === undefined || fights === null ? {} : { fights }),
+    ...(respawnHistory === undefined || respawnHistory === null ? {} : { respawnHistory })
+  }
+}
+
+/** What a refresh changed, in the words the card prints. */
+function changedParts(old: Segment, next: Segment): string[] {
+  const changed = compareModules(old.modules, next.modules).filter((v) => !v.same).map((v) => v.module)
+  if (JSON.stringify(old.fights) !== JSON.stringify(next.fights)) changed.push('fights')
+  if (JSON.stringify(old.respawnHistory) !== JSON.stringify(next.respawnHistory)) changed.push('respawn history')
+  return changed
+}
+
 /** Refold one segment's archive with this build and swap the new totals in. */
 export async function refreshSegment(dir: string, id: string, deps: RefreshDeps): Promise<RefreshResult> {
   const old = listSegments(dir).segments.find((s) => s.id === id)
@@ -74,13 +98,7 @@ export async function refreshSegment(dir: string, id: string, deps: RefreshDeps)
   if (!r.ok) return { ok: false, reason: r.reason }
   const missing = Object.keys(old.modules).filter((m) => r.fold.modules[m] === undefined)
   if (missing.length > 0) return { ok: false, reason: `the refold did not give back ${missing.join(', ')}` }
-  const history = r.fold.respawnHistory
-  const next: Segment = {
-    ...old,
-    producedBy: deps.producedBy(),
-    modules: keepIdentity(old.modules, r.fold.modules),
-    ...(history === undefined || history === null ? {} : { respawnHistory: history })
-  }
+  const next = refreshed(old, r.fold, deps.producedBy())
   if (!writeChecked(dir, next)) {
     rmSync(`${segmentPath(dir, id)}${NEXT}`, { force: true })
     return { ok: false, reason: 'the new totals did not read back the same' }
@@ -88,9 +106,7 @@ export async function refreshSegment(dir: string, id: string, deps: RefreshDeps)
   const live = segmentPath(dir, id)
   copyFileSync(live, `${live}${OLD}`)
   renameSync(`${live}${NEXT}`, live)
-  const changed = compareModules(old.modules, next.modules).filter((v) => !v.same).map((v) => v.module)
-  if (JSON.stringify(old.respawnHistory) !== JSON.stringify(next.respawnHistory)) changed.push('respawn history')
-  return { ok: true, segment: next, changed }
+  return { ok: true, segment: next, changed: changedParts(old, next) }
 }
 
 /** At launch: drop the copies a refresh kept, and any new file a crash left unswapped. */
