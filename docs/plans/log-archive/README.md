@@ -165,6 +165,7 @@ Update this table in the same commit as the step it records.
 | 4.10 | done 2026-10-08: spell ranks, exact | this commit |
 | 4.11 | done 2026-10-08: spell sets; gems are the live log's, two named differences | this commit |
 | 4.12 | done 2026-10-08: class-loadout history, joined at the cut, corrections applied to archived spans | this commit |
+| 4.13 | 2026-10-08: no rule for resist, step 5.2 already keeps it | this commit |
 | 5.1 | answered 2026-10-03: yes, with conditions | |
 | 5.2 | done 2026-10-04: resist and message buckets kept per archive, read at the archive, added at the next launch | c5d40f07 |
 | 5.3 | done with the panel (version shown, older builds marked) | |

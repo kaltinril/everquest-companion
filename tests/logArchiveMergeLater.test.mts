@@ -216,3 +216,9 @@ test('combo corrections: firstStart reads the live log\'s first interval', () =>
   assert.equal(firstStart(G.b.combo), G.b.combo.intervals[0].startTs)
   assert.equal(firstStart(snap([])), null)
 })
+
+// ── 4.13 resist: no rule ────────────────────────────────────────────────────────────────────────
+
+test("resist has no rule: the archived log's bucket is kept in the engine's own ledger (step 5.2), and the snapshot counts every bucket, so a rule would count the archive twice", () => {
+  assert.equal(hasMergeRule('resist'), false)
+})
