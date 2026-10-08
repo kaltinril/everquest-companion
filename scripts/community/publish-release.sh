@@ -39,6 +39,13 @@ tag="community-$version"
 dir="release/$version"
 exe="everquest-companion-test-Setup-$version.exe"
 [ -f "$dir/$exe" ] || fail "no installer at $dir/$exe; cut the build first (RELEASING.md step 1)"
+# The update feed (test.20 on): installs read latest.yml from the newest release, and the blockmap
+# lets them download only what changed. latest.yml must name this version and this installer.
+[ -f "$dir/latest.yml" ] || fail "no $dir/latest.yml; the build did not write its update file"
+grep -q "^version: $version" "$dir/latest.yml" || fail "$dir/latest.yml does not name version $version"
+grep -q "$exe" "$dir/latest.yml" || fail "$dir/latest.yml does not name $exe"
+blockmap="$dir/$exe.blockmap"
+[ -f "$blockmap" ] || fail "no $blockmap"
 
 # The installer must carry its whole dependency tree (test.13 shipped without `conf`).
 if [ -f "$dir/win-unpacked/resources/app.asar" ]; then
@@ -74,7 +81,7 @@ trap 'rm -f "$notes"' EXIT
 
 **To install:** download \`$exe\` below and run it. The installer is not code-signed, so Windows shows "Windows protected your PC" the first time: click **More info**, then **Run anyway**. It installs beside the official app, not over it, and keeps its own settings.
 
-**Updates are manual.** This build does not update itself. To get a newer one, download it from this page and run it; your settings carry over.
+**Updates come from this page.** Once installed, the app checks this page every few hours, downloads a newer build quietly, and applies it when you close the app. It never installs the official app over itself, and the official app never replaces it.
 
 \`SHA256SUMS.txt\` holds the installer's checksum, to compare with \`Get-FileHash $exe\`.
 
@@ -89,7 +96,7 @@ EOF
 echo
 echo "tag:     $tag"
 echo "target:  $target"
-echo "assets:  $dir/$exe ($(du -h "$dir/$exe" | cut -f1)), $dir/SHA256SUMS.txt"
+echo "assets:  $dir/$exe ($(du -h "$dir/$exe" | cut -f1)), $dir/SHA256SUMS.txt, $dir/latest.yml, $blockmap"
 echo "notes:   from $(git log -1 --format='%h %s' "$notes_commit")"
 echo
 
@@ -103,4 +110,4 @@ fi
 
 gh release create "$tag" --repo "$repo_slug" --target "$target" --latest \
   --title "EQ Legends Companion TEST $version" --notes-file "$notes" \
-  "$dir/$exe" "$dir/SHA256SUMS.txt"
+  "$dir/$exe" "$dir/SHA256SUMS.txt" "$dir/latest.yml" "$blockmap"

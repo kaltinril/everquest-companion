@@ -15,9 +15,13 @@ hand to strangers:
 
 - **It installs beside the official app, not over it.** Its own appId, product name, install
   folder and settings (`test-neutering`).
-- **It never updates itself.** There is no update feed in the TEST `electron-builder.yml` and the
-  updater is guarded off, so it cannot be replaced by the official app either. A player gets a new
-  version by downloading it from the Releases page; settings carry over.
+- **It updates itself from this fork's Releases page, and only from it** (since test.20). The TEST
+  `electron-builder.yml` on `test-neutering` points the creator's own updater at a generic feed,
+  `https://github.com/kaltinril/everquest-companion/releases/latest/download/`, so an install reads
+  `latest.yml` from the newest release here, downloads the newer installer quietly and applies it
+  when the app closes. Nothing points at the creator's repo, so the official app never replaces a
+  TEST install and a TEST release never reaches an official one. The updates are unsigned, which
+  is the same trust a manual download from this page has: the fork's GitHub account and HTTPS.
 - **Telemetry and feedback are dark**, so nothing it does reaches the creator's servers.
 - **It is not code-signed.** Windows SmartScreen says "Windows protected your PC" on first run;
   the player clicks **More info**, then **Run anyway**. The release notes say so.
@@ -45,7 +49,7 @@ creating the release runs nothing.
    release points at a commit on `origin/main_community`, so the source of every download is
    public and matches it.
 4. **Dry run:** `scripts/community/publish-release.sh`. It reads the version from `package.json`,
-   checks the installer exists and its asar is whole (about 29,000 `node_modules` entries and
+   checks the installer, its `latest.yml` and `.blockmap` exist and its asar is whole (about 29,000 `node_modules` entries and
    `node_modules/conf`), finds the `Test build <version>:` commit, checks the target commit is on
    `origin/main_community` and contains it, checks the tag is free, writes
    `release/<version>/SHA256SUMS.txt`, and prints the release notes it would post.
@@ -66,9 +70,11 @@ someone may already have downloaded. Deleting a release is the owner's call.
   six `AZURE_*` variables are set, and `win.signtoolOptions.publisherName` must then be the
   certificate's name exactly. Free signing services (SignPath Foundation) require an OSI licence,
   which FSL is not. A new certificate still meets SmartScreen warnings until it builds reputation.
-- **Auto-update: off.** Turning it on for the fork does not need signing: a `publish` block
-  pointing at `kaltinril/everquest-companion`, a release that carries `latest.yml`, and the
-  `TEST_BUILD` guard in `src/main/channel.ts` lifted for that channel. Unsigned updates are only
-  as trustworthy as the fork's GitHub account, which is the same trust a manual download has.
+- **Auto-update: on since test.20**, without signing. What it took: the generic `publish` block
+  above, `publisherName` dropped from the TEST build (with it every unsigned update is rejected),
+  the `TEST_BUILD` early-out in `src/main/updater.ts` removed, and the publish script uploading
+  `latest.yml` and the installer's `.blockmap` with every release. A release must therefore be
+  marked Latest (the script does), and an install older than test.20 never updates: those players
+  download once by hand.
 - **The fork's front page** shows the creator's README, because the default branch is `main`
   and `main` is never committed to. Share the Releases link directly.
