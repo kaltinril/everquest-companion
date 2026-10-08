@@ -39,11 +39,11 @@ tag="community-$version"
 dir="release/$version"
 exe="everquest-companion-test-Setup-$version.exe"
 [ -f "$dir/$exe" ] || fail "no installer at $dir/$exe; cut the build first (RELEASING.md step 1)"
-# The update feed (test.20 on): installs read latest.yml from the newest release, and the blockmap
-# lets them download only what changed. latest.yml must name this version and this installer.
-[ -f "$dir/latest.yml" ] || fail "no $dir/latest.yml; the build did not write its update file"
-grep -q "^version: $version" "$dir/latest.yml" || fail "$dir/latest.yml does not name version $version"
-grep -q "$exe" "$dir/latest.yml" || fail "$dir/latest.yml does not name $exe"
+# The update feed (test.20 on): installs read test.yml (the channel file electron-builder names after 0.1.0-test.N) from the newest release, and the blockmap
+# lets them download only what changed. test.yml must name this version and this installer.
+[ -f "$dir/test.yml" ] || fail "no $dir/test.yml; the build did not write its update file"
+grep -q "^version: $version" "$dir/test.yml" || fail "$dir/test.yml does not name version $version"
+grep -q "$exe" "$dir/test.yml" || fail "$dir/test.yml does not name $exe"
 blockmap="$dir/$exe.blockmap"
 [ -f "$blockmap" ] || fail "no $blockmap"
 
@@ -96,7 +96,7 @@ EOF
 echo
 echo "tag:     $tag"
 echo "target:  $target"
-echo "assets:  $dir/$exe ($(du -h "$dir/$exe" | cut -f1)), $dir/SHA256SUMS.txt, $dir/latest.yml, $blockmap"
+echo "assets:  $dir/$exe ($(du -h "$dir/$exe" | cut -f1)), $dir/SHA256SUMS.txt, $dir/test.yml, $blockmap"
 echo "notes:   from $(git log -1 --format='%h %s' "$notes_commit")"
 echo
 
@@ -110,4 +110,4 @@ fi
 
 gh release create "$tag" --repo "$repo_slug" --target "$target" --latest \
   --title "EQ Legends Companion TEST $version" --notes-file "$notes" \
-  "$dir/$exe" "$dir/SHA256SUMS.txt" "$dir/latest.yml" "$blockmap"
+  "$dir/$exe" "$dir/SHA256SUMS.txt" "$dir/test.yml" "$blockmap"
