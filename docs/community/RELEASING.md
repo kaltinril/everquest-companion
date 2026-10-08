@@ -66,7 +66,8 @@ someone may already have downloaded. Deleting a release is the owner's call.
 ## Not done, and why
 
 - **Code signing: shelved (owner, 2026-10-07)**, because every publicly trusted certificate costs
-  money and this is a free project. The build already supports Azure Artifact Signing
+  money and this is a free project. A free route was suggested since: publish an MSIX on the
+  Microsoft Store, which Microsoft signs; the plan is [MS-STORE.md](MS-STORE.md). The build already supports Azure Artifact Signing
   (US$9.99/month, individuals in the US and Canada): `scripts/azure-sign.cjs` signs whenever the
   six `AZURE_*` variables are set, and `win.signtoolOptions.publisherName` must then be the
   certificate's name exactly. Free signing services (SignPath Foundation) require an OSI licence,
