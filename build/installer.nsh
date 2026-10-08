@@ -126,6 +126,12 @@
     ${If} ${FileExists} "$INSTDIR\EQ Legends Companion.exe"
     ${OrIfNot} ${FileExists} "$INSTDIR\Uninstall EQ Legends Companion TEST.exe"
       Delete "$INSTDIR\EQ Legends Companion TEST.exe"
+      # Still there means it is running from the old folder: the stock running-app check below
+      # looks in the NEW folder and would not see it. Stop before touching the registry.
+      ${If} ${FileExists} "$INSTDIR\EQ Legends Companion TEST.exe"
+        MessageBox MB_OK|MB_ICONEXCLAMATION|MB_TOPMOST|MB_SETFOREGROUND "Close EQ Legends Companion TEST (including its tray icon), then run this installer again." /SD IDOK
+        Quit
+      ${EndIf}
       Delete "$INSTDIR\Uninstall EQ Legends Companion TEST.exe"
       DeleteRegValue HKCU "${UNINSTALL_REGISTRY_KEY}" "UninstallString"
       DeleteRegValue HKCU "${UNINSTALL_REGISTRY_KEY}" "QuietUninstallString"
