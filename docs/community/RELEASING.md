@@ -18,7 +18,8 @@ hand to strangers:
 - **It updates itself from this fork's Releases page, and only from it** (since test.20). The TEST
   `electron-builder.yml` on `test-neutering` points the creator's own updater at a generic feed,
   `https://github.com/kaltinril/everquest-companion/releases/latest/download/`, so an install reads
-  `latest.yml` from the newest release here, downloads the newer installer quietly and applies it
+  `test.yml` (electron-builder names the update file after the version's prerelease word) from the
+  newest release here, downloads the newer installer quietly and applies it
   when the app closes. Nothing points at the creator's repo, so the official app never replaces a
   TEST install and a TEST release never reaches an official one. The updates are unsigned, which
   is the same trust a manual download from this page has: the fork's GitHub account and HTTPS.
@@ -49,7 +50,7 @@ creating the release runs nothing.
    release points at a commit on `origin/main_community`, so the source of every download is
    public and matches it.
 4. **Dry run:** `scripts/community/publish-release.sh`. It reads the version from `package.json`,
-   checks the installer, its `latest.yml` and `.blockmap` exist and its asar is whole (about 29,000 `node_modules` entries and
+   checks the installer, its `test.yml` and `.blockmap` exist and its asar is whole (about 29,000 `node_modules` entries and
    `node_modules/conf`), finds the `Test build <version>:` commit, checks the target commit is on
    `origin/main_community` and contains it, checks the tag is free, writes
    `release/<version>/SHA256SUMS.txt`, and prints the release notes it would post.
@@ -73,7 +74,9 @@ someone may already have downloaded. Deleting a release is the owner's call.
 - **Auto-update: on since test.20**, without signing. What it took: the generic `publish` block
   above, `publisherName` dropped from the TEST build (with it every unsigned update is rejected),
   the `TEST_BUILD` early-out in `src/main/updater.ts` removed, and the publish script uploading
-  `latest.yml` and the installer's `.blockmap` with every release. A release must therefore be
+  `test.yml` and the installer's `.blockmap` with every release, and the test package renamed
+  `everquest-companion-test` so it has its own install folder and updater cache (a one-click
+  install is named after the package; before test.20 both apps shared one folder). A release must therefore be
   marked Latest (the script does), and an install older than test.20 never updates: those players
   download once by hand.
 - **The fork's front page** shows the creator's README, because the default branch is `main`
