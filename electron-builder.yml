@@ -1,7 +1,10 @@
 # TEST BUILD IDENTITY (local_all_changes_testing only — never merges to a PR branch). A
 # different appId + productName means the NSIS installer registers as a SEPARATE app: it
 # installs beside the official EQ Legends Companion instead of replacing it, gets its own
-# uninstall entry, its own %LOCALAPPDATA%\Programs folder and its own taskbar identity.
+# uninstall entry and its own taskbar identity. Its OWN %LOCALAPPDATA%\Programs FOLDER comes from
+# package.json's `name` (everquest-companion-test since test.20): a one-click per-user install is
+# named after the package, not the product, so before that both apps shared one folder (and one
+# updater cache, which is also named after the package).
 appId: com.kaltinril.everquest-companion.test
 productName: EQ Legends Companion TEST
 copyright: Copyright © 2026 Josh Moyers
@@ -164,8 +167,9 @@ npmRebuild: false
 # A `github` publish block would point app-update.yml at a repo's tags, and the official one
 # would stage the creator's release and silently REPLACE this install on quit. So the feed is a
 # GENERIC one at the fork's "latest release" download URL: `scripts/community/publish-release.sh`
-# uploads latest.yml beside the installer, and GitHub redirects /releases/latest/download/<file>
-# to the newest release's asset. The version check is a plain semver comparison, so
+# uploads the update file beside the installer, and GitHub redirects /releases/latest/download/<file>
+# to the newest release's asset. The file is `test.yml`, not latest.yml: electron-builder names the
+# channel after the version's prerelease word (0.1.0-test.N), and the app asks for the same name. The version check is a plain semver comparison, so
 # 0.1.0-test.20 -> 0.1.0-test.21 is an update and the official 1.x line is never offered here.
 publish:
   - provider: generic
