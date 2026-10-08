@@ -99,6 +99,41 @@
 # these gates fire. The stock win7Required/x64WinRequired paths leave it too. Nothing is
 # extracted and no registry key is written, so an empty directory is the entire residue;
 # an RMDir here would be new behaviour on a path that is meant to stay boring.
+# ---------------------------------------------------------------------------------------
+# eqLeaveSharedFolder - TEST BUILD ONLY (this branch never reaches a PR). Move an existing
+# TEST install out of the folder the official app also uses.
+#
+# THE PROBLEM: a one-click per-user install is named after package.json's `name`, and before
+# test.20 both apps were `everquest-companion`, so both installed into
+# %LOCALAPPDATA%\Programs\everquest-companion. Every install or update first runs the previous
+# version's uninstaller, which does `RMDir /r $INSTDIR`: a TEST update wiped the official app,
+# and an official update wiped ours. test.20 renames the package (fresh installs land in
+# everquest-companion-test), but initMultiUser reads the OLD InstallLocation from the registry,
+# so an existing TEST install would keep updating into the shared folder.
+#
+# THE MOVE: when the recorded folder is the shared one, install into everquest-companion-test.
+# The old copy is then removed one of two ways:
+#   * the official app is there too (its exe exists), or our old uninstaller is gone: delete only
+#     our two exes and forget our uninstall command, so uninstallOldVersion runs nothing and the
+#     official app's files are left alone;
+#   * otherwise the folder holds only our old copy, and the stock old-version uninstall removes it
+#     as it always has (its uninstaller is run with --updated, so settings are kept).
+# Settings live in %APPDATA%\everquest-companion-test either way and are never touched here.
+# Inserted from customInit, i.e. after initMultiUser has set $INSTDIR, where LogicLib and the
+# UNINSTALL_REGISTRY_KEY define exist.
+!macro eqLeaveSharedFolder
+  ${If} $INSTDIR == "$LOCALAPPDATA\Programs\everquest-companion"
+    ${If} ${FileExists} "$INSTDIR\EQ Legends Companion.exe"
+    ${OrIfNot} ${FileExists} "$INSTDIR\Uninstall EQ Legends Companion TEST.exe"
+      Delete "$INSTDIR\EQ Legends Companion TEST.exe"
+      Delete "$INSTDIR\Uninstall EQ Legends Companion TEST.exe"
+      DeleteRegValue HKCU "${UNINSTALL_REGISTRY_KEY}" "UninstallString"
+      DeleteRegValue HKCU "${UNINSTALL_REGISTRY_KEY}" "QuietUninstallString"
+    ${EndIf}
+    StrCpy $INSTDIR "$LOCALAPPDATA\Programs\everquest-companion-test"
+  ${EndIf}
+!macroend
+
 !macro customInit
   # Build-time proof the hook fired, same trick as customCheckAppRunning / customUnInstall
   # below. !verbose 4 is required for !echo to print and is NOT a warning, so -WX stays happy.
@@ -112,6 +147,9 @@
     MessageBox MB_OK|MB_ICONEXCLAMATION|MB_TOPMOST|MB_SETFOREGROUND "${PRODUCT_NAME} needs Windows 10 or later, so it can't be installed on this version of Windows." /SD IDOK
     Quit
   ${EndIf}
+
+  # TEST BUILD: leave the folder shared with the official app (eqLeaveSharedFolder above).
+  !insertmacro eqLeaveSharedFolder
 !macroend
 
 # ---------------------------------------------------------------------------------------

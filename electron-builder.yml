@@ -171,9 +171,14 @@ npmRebuild: false
 # to the newest release's asset. The file is `test.yml`, not latest.yml: electron-builder names the
 # channel after the version's prerelease word (0.1.0-test.N), and the app asks for the same name. The version check is a plain semver comparison, so
 # 0.1.0-test.20 -> 0.1.0-test.21 is an update and the official 1.x line is never offered here.
+# THE CHANNEL IS PINNED. Left alone, electron-builder names it after the version's prerelease
+# word, so a build numbered without "-test" would write latest.yml while every install already in
+# players' hands keeps asking for test.yml and silently stops updating. Pinned, the file is always
+# test.yml whatever the version looks like (test.20 shipped with this same name).
 publish:
   - provider: generic
     url: https://github.com/kaltinril/everquest-companion/releases/latest/download/
+    channel: test
 
 win:
   target:
