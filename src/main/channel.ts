@@ -79,7 +79,12 @@ const SEED_ENTRIES = [
   'message-overlay.json', // learned cast-message overlay (expensive to relearn)
   'item-knowledge-cache.json', // wiki item cache (incl. negative caching)
   'registry-cache.json', // sound-pack registry index
-  'soundpacks' // installed packs, incl. the provisioned alan-rickman default
+  'soundpacks', // installed packs, incl. the provisioned alan-rickman default
+  // TEST BUILD: two more, so a player moving over from the official app keeps everything they
+  // set up. The resist ledger holds other characters' learned resists, which no log re-derives;
+  // Local Storage holds the renderer's own choices (hidden raid targets, picks and filters).
+  'resist-ledger.json',
+  'Local Storage'
 ]
 
 /** Marker written into a seeded dir: what came from where, and when. */
