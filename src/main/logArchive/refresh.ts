@@ -30,19 +30,20 @@ export interface RefreshDeps {
   refold: (segment: Segment) => Promise<RefoldResult>
   /** The build doing the refold, recorded as the segment's new producer. */
   producedBy: () => { app: string; engine: string }
-  /** True when the segment lacks a module this engine has, so even this version's refold adds to it. */
-  lacking?: (segment: Segment) => boolean
 }
 
 export type RefreshResult =
   | { ok: true; segment: Segment; changed: string[] }
   | { ok: false; reason: string }
 
-/** Why a segment cannot be refreshed, or null when it can. */
-function refreshProblem(s: Segment | undefined, engine: string, lacking: boolean): string | null {
+/**
+ * Why a segment cannot be refreshed, or null when it can. The version that produced it is no reason:
+ * a reading can change without the version moving (a dev build; the Bazaar learning who said what),
+ * and reading the archive again only replaces the totals.
+ */
+function refreshProblem(s: Segment | undefined): string | null {
   if (s === undefined) return 'that history was not found'
   if (s.archivePath === null) return 'it has no archive to read again'
-  if (s.producedBy.engine === engine && !lacking) return 'this version already produced it'
   return null
 }
 
@@ -64,7 +65,7 @@ function writeChecked(dir: string, next: Segment): boolean {
 /** Refold one segment's archive with this build and swap the new totals in. */
 export async function refreshSegment(dir: string, id: string, deps: RefreshDeps): Promise<RefreshResult> {
   const old = listSegments(dir).segments.find((s) => s.id === id)
-  const problem = refreshProblem(old, deps.producedBy().engine, old !== undefined && deps.lacking?.(old) === true)
+  const problem = refreshProblem(old)
   if (old === undefined || problem !== null) return { ok: false, reason: problem ?? 'not found' }
   const r = await deps.refold(old)
   if (!r.ok) return { ok: false, reason: r.reason }
