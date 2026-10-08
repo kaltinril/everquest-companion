@@ -19,8 +19,8 @@ creator's own repo and does not know the fork exists.
    The only commits it has that are not merges are conflict resolutions, and those are recorded
    by `git rerere` so a rebuild replays them.
 
-4. **Never-closing branches never take a PR.** `main_community_rules`, `test-neutering` and
-   `local-data-refresh` exist only for the fork. Nothing on them is offered upstream.
+4. **Never-closing branches never take a PR.** `main_community_rules`, `test-neutering`,
+   `local-data-refresh` and `community_release` exist only for the fork. Nothing on them is offered upstream.
 
 ## Trust
 

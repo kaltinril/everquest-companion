@@ -9,6 +9,7 @@ before the branch that groups them, `test-neutering` last so the TEST identity w
 # ours, never closes
 main_community_rules
 local-data-refresh
+community_release
 # ours, feature branches (open or future upstream PRs)
 scrape-delta-tool
 gear-tab-improvements
@@ -66,6 +67,7 @@ junction first (RULES.md, rule 18).
 |---|---|---|
 | `main_community_rules` | `.claude/worktrees/main_community_rules` | `docs/community/`, the rebuild script, the root `CLAUDE.md` hook, the `docs/branches.md` pointer, the dev launcher `start_companion.ps1` and its `start-companion` skill. First in the recipe so the rules are on every build. |
 | `local-data-refresh` | *(none)* | The locally re-scraped corpus: `items.json`, `mobs.json`, `dataWeight.generated.json` (2026-08-19, 2026-09-04 and 2026-09-27 scrapes). Second, so every feature branch's tests run against the data the build ships. 2026-09-27: 1,213 changed pages in 25 requests, 57 new items and 8 new mobs; the wiki retired the `{{Sky Era}}` banner in that window and moved the per-class Plane of Sky test pages to sections of the Plane of Sky page. The branch also carries what a top-up drags with it: the icons the new pages ask for, and the creator's tests that pinned the wiki as it was, re-measured. Since 2026-09-27 it holds `posky.json` too (the delta covers items and mobs only; the Plane of Sky quests are `npm run scrape:posky`, 209 requests, slowed to one a second for the run) and the one row of `skyQuestRewards.ts` that rescrape retired and the one it called for. |
+| `community_release` | `.claude/worktrees/community_release` | Publishing a TEST build to the fork's own Releases page (owner ask, 2026-10-07: someone asked for an exe to install). `docs/community/RELEASING.md` is the procedure; `scripts/community/publish-release.sh` checks the build and posts it under a `community-<version>` tag, never `v*`, which would start the creator's release job. Unsigned on purpose: signing is shelved because it costs money. Docs and a script only, so its place in the order is free; it sits with the other never-closing branches. |
 | `test-neutering` | *(none)* | The TEST build identity (own appId, own userData, telemetry and feedback dark, updater guarded, no signing), the UNRELEASED gate forced open, and the `0.1.0-test.N` version bumps with tester notes. Always last. |
 
 ### Ours, in front of the creator (open PRs)
