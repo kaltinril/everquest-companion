@@ -19,8 +19,8 @@ npm test >"$out" 2>&1
 status=$?
 
 # node:test prints each failure as "✖ <name> (<n>ms)", then repeats them under "✖ failing tests:".
-failing=$(grep -E '^✖ ' "$out" | grep -v '^✖ failing tests:' | sed -E 's/ \([0-9.]+ms\)$//; s/^✖ //' | sort -u)
-known=$(grep -vE '^\s*(#|$)' "$list" | sort -u)
+failing=$(tr -d '\r' <"$out" | grep -E '^✖ ' | grep -v '^✖ failing tests:' | sed -E 's/ \([0-9.]+ms\)$//; s/^✖ //' | sort -u)
+known=$(tr -d '\r' <"$list" | grep -vE '^\s*(#|$)' | sort -u)
 
 grep -E 'ℹ (tests|pass|fail)' "$out"
 

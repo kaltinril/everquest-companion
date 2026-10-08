@@ -37,6 +37,10 @@ jobs:
     permissions:
       contents: write
     steps:
+      # The Windows runner's git turns LF into CRLF on checkout, and bash cannot run a CRLF script.
+      - name: Keep LF line endings
+        run: git config --global core.autocrlf false
+
       - name: Checkout (full history, for the notes and branch checks)
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (v4.4.0)
         with:
