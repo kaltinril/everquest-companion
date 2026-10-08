@@ -70,12 +70,14 @@ creator's own repo and does not know the fork exists.
    `test-neutering` is always last. An agent that creates a branch and does not add it to the
    recipe has not finished.
 
-10. **A branch is never closed until the creator closes it from his side, and that close is
-    warranted.** Warranted means he merged it, or his own change made it obsolete (he rebuilt the
-    feature, changed the technology under it, or removed the surface it lived on). A branch that
-    is merely stale, superseded by a newer branch of ours, or still waiting on a response upstream stays open. When a
-    branch does close, its recipe line is removed in the same change and `main_community` is
-    rebuilt. Its worktree may be removed; the branch on `origin` stays until he has merged.
+10. **A branch is closed only when the owner directs it.** Every branch of ours is kept, locally
+    and on `origin`, so it can be offered upstream as a pull request when the creator returns
+    (owner, 2026-10-07). Nothing closes a branch by itself: not being stale, not being superseded
+    by a newer branch of ours, not waiting on a response upstream, and not the creator merging or
+    closing it on his side, which is something to tell the owner about rather than act on.
+    Removing a worktree after a merge (rule 18) never closes its branch. When the owner does
+    direct a branch closed, its recipe line is removed in the same change and `main_community` is
+    rebuilt.
 
 ## Gate
 
