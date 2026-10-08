@@ -9,7 +9,8 @@
 //   4. an empty live log is created if the game has not already made one (never truncating);
 //   5. the moved file is checked to begin with exactly the captured bytes, and any lines the game
 //      wrote between the capture and the rename are counted (`gapLines`);
-//   6. the moved file is compressed and verified, the segment sealed, the moved file deleted, and
+//   6. the moved file is compressed and verified, the segment sealed, its faction lines kept as a
+//      ledger beside it (step 4.16, while the moved file still exists), the moved file deleted, and
 //      the journal cleared.
 //
 // Before step 3 nothing in the game's folder has changed. After it, the moved file stays in the
@@ -27,6 +28,7 @@ import { createHash } from 'node:crypto'
 import type { Segment, SegmentLog } from '../../shared/logArchive/segment'
 import type { BackupRequest, BackupResult } from './backup'
 import { archiveName } from './backup'
+import { logNameOf, type LedgerSource } from './factionLedgerFile'
 
 export const JOURNAL = 'rotation-journal.json'
 
@@ -45,6 +47,9 @@ export interface RotateDeps {
   readPrefix: (path: string, bytes: number) => Promise<SegmentLog>
   writeSegment: (dir: string, s: Segment) => void
   readSegment: (dir: string, id: string) => Segment | null
+  /** Step 4.16: keep the moved log's faction lines beside the segment. A failure is the caller's to
+   *  note; it never stops the archive. */
+  factionLedger?: (dir: string, segmentId: string, source: LedgerSource) => Promise<void>
   /** Test seam: throw here to simulate a crash after the named step. */
   crashAfter?: (step: string) => void
 }
@@ -122,6 +127,9 @@ async function finishFromMoved(dir: string, j: Journal, deps: RotateDeps): Promi
     seg = { ...seg, state: 'sealed' }
     deps.writeSegment(dir, seg)
     deps.crashAfter?.('sealed')
+  }
+  if (deps.factionLedger !== undefined && existsSync(j.movedPath)) {
+    await deps.factionLedger(dir, seg.id, { path: j.movedPath, gz: false, logName: logNameOf(j.logPath) }).catch(() => undefined)
   }
   rmSync(j.movedPath, { force: true })
   clearJournal(dir)

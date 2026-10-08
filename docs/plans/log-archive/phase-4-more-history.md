@@ -224,6 +224,25 @@ Until a module's step lands, that module shows what the live log holds, as it do
   segment with no fight list now counts as lacking, so the automatic refresh at launch fills it in.
   Probed on `e2e-combat.log` against the real binary: both fights back, totals and timings intact.
 
+### 4.16 Faction lines for the Factions tab
+
+- **Does**: keeps an archived log's faction lines in a small ledger beside its segment, so the
+  Factions tab can still correct a stale `/outputfile faction` dump with lines that were archived.
+- **Touches**: `shared/factionLedger.ts` (new, byte-identical on `faction-tab`, which reads it),
+  `main/logArchive/factionLedgerFile.ts` (new), `rotate.ts finishFromMoved`, and Refresh.
+- **As built** (2026-10-08): written as `<segment id>.factions.json` while the moved log still exists
+  (so the lines written during the move are in it too), and again on Refresh from the compressed
+  archive. A run of identical cap lines for one faction is kept as one entry at its last time. A
+  segment without a ledger counts as lacking, so the automatic refresh at launch writes one for logs
+  archived before this step. The reader on `faction-tab` takes the ledgers newest first and each
+  only for lines older than what it already covers, so a backup and a later archive of the same log
+  count once. Not built until then: no `/outputfile` gives these lines back, and the live log alone
+  starts after the archive.
+- **One exception to the switch**: the Factions tab reads the ledgers whether the switch is on or
+  not. A ledger exists only if the switch was on when the log was archived, and what it corrects is
+  today's standing, not a history shown on a tab; without it the tab would show a standing the
+  player knows is wrong.
+
 ## When this phase is done
 
 | Question | Answer |
