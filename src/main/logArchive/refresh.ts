@@ -9,6 +9,9 @@
 // rename the new one into place. A crash at any point leaves the old segment file in place or the
 // new one, never neither. The `.old` copy is the undo until the next launch, which removes it.
 //
+// THE RESPAWN HISTORY IS TAKEN AGAIN with the totals (step 4.14), so a segment captured before that
+// step gains it on its first refresh. A refold that could not read it keeps the old field.
+//
 // ONLY THE TOTALS CHANGE. The log's identity, the archive and the state are kept, and so is the
 // path the character module names (the refold read a staged copy). A refold that lacks a module
 // the segment held is refused, so a refresh can never lose a module.
@@ -71,7 +74,13 @@ export async function refreshSegment(dir: string, id: string, deps: RefreshDeps)
   if (!r.ok) return { ok: false, reason: r.reason }
   const missing = Object.keys(old.modules).filter((m) => r.fold.modules[m] === undefined)
   if (missing.length > 0) return { ok: false, reason: `the refold did not give back ${missing.join(', ')}` }
-  const next: Segment = { ...old, producedBy: deps.producedBy(), modules: keepIdentity(old.modules, r.fold.modules) }
+  const history = r.fold.respawnHistory
+  const next: Segment = {
+    ...old,
+    producedBy: deps.producedBy(),
+    modules: keepIdentity(old.modules, r.fold.modules),
+    ...(history === undefined || history === null ? {} : { respawnHistory: history })
+  }
   if (!writeChecked(dir, next)) {
     rmSync(`${segmentPath(dir, id)}${NEXT}`, { force: true })
     return { ok: false, reason: 'the new totals did not read back the same' }
@@ -80,6 +89,7 @@ export async function refreshSegment(dir: string, id: string, deps: RefreshDeps)
   copyFileSync(live, `${live}${OLD}`)
   renameSync(`${live}${NEXT}`, live)
   const changed = compareModules(old.modules, next.modules).filter((v) => !v.same).map((v) => v.module)
+  if (JSON.stringify(old.respawnHistory) !== JSON.stringify(next.respawnHistory)) changed.push('respawn history')
   return { ok: true, segment: next, changed }
 }
 

@@ -113,7 +113,8 @@ export async function refoldSegment(segment: Segment, deps: RefoldDeps): Promise
       modules: CAPTURED_MODULES,
       defines: deps.defines,
       clock: deps.clock,
-      timeoutMs: FOLD_TIMEOUT_MS
+      timeoutMs: FOLD_TIMEOUT_MS,
+      respawnHistory: true
     })
     return { ok: true, fold, stageMs, tables: staged.tables }
   } catch (err) {

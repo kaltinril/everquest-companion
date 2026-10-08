@@ -13,6 +13,10 @@
 // definitions, buff trust, respawn watches and the character's combo and roster edits change what a
 // fold produces, so they are handed over before the attach.
 //
+// RESPAWN HISTORY (step 4.14): asked for, the fold's learned respawn rows of every remembered mob
+// are read after the modules, as the capture reads them (`respawnHistory.ts`). This engine is
+// thrown away, so there is no watch list to put back.
+//
 // Electron-free: the caller names the binary and the defines, and hands in the spawn, which is
 // `engineHost.ts spawnEngineProcess` (the one module that launches the engine).
 
@@ -27,6 +31,8 @@ import { connectToEngine } from '../dataServer/socketChannel'
 import { readLines, type SupervisedStream } from '../dataServer/supervisorChild'
 import { mintToken } from '../dataServer/token'
 import type { DefineOp } from '../dataServer/definePush'
+import type { RespawnRow } from '../../shared/respawn'
+import { historyKeys, readRespawnHistory } from './respawnHistory'
 
 /** What this file needs of a child process; Node's `ChildProcess` is one. */
 export interface EngineProcess {
@@ -57,6 +63,8 @@ export interface SecondFoldRequest {
   clock: ParamsFor<'session.attach'>['clock']
   /** How long the whole fold may take before it is given up. */
   timeoutMs: number
+  /** Also read every remembered mob's learned respawn rows (step 4.14). */
+  respawnHistory?: boolean
 }
 
 export interface SecondFold {
@@ -64,6 +72,8 @@ export interface SecondFold {
   /** From the attach to the engine going live on the whole log. */
   foldMs: number
   events: number
+  /** Present when asked for: the learned rows, or null when they could not be read. */
+  respawnHistory?: RespawnRow[] | null
 }
 
 const ANNOUNCE_MS = 10_000
@@ -144,7 +154,25 @@ async function foldOn(client: EngineClient, req: SecondFoldRequest): Promise<Sec
   await client.request('session.attach', { logPath: req.logPath, clock: req.clock })
   const h = await waitLive(client, req, began)
   const foldMs = Date.now() - began
-  return { modules: await snapshotAll(client, req.modules), foldMs, events: h.events ?? 0 }
+  const modules = await snapshotAll(client, req.modules)
+  const out: SecondFold = { modules, foldMs, events: h.events ?? 0 }
+  if (req.respawnHistory === true) out.respawnHistory = await foldRespawnHistory(client, modules)
+  return out
+}
+
+/** Step 4.14 on this engine: the same batched read as the capture's, with nothing to restore. */
+function foldRespawnHistory(client: EngineClient, modules: Record<string, SegmentModule>): Promise<RespawnRow[] | null> {
+  return readRespawnHistory(historyKeys(modules.kills?.state, modules.respawn?.state), {
+    watch: async (keys) => {
+      await client.request('respawn.define', { prefs: { watches: keys.map((key) => ({ key, display: key })) } })
+    },
+    rows: async () => {
+      const r = await client.request('module.snapshot', { module: 'respawn' })
+      const rows = (r.state as { rows?: unknown } | null)?.rows
+      return Array.isArray(rows) ? (rows as RespawnRow[]) : null
+    },
+    restore: () => Promise.resolve()
+  })
 }
 
 /** Close stdin (the shutdown signal); kill it if it has not gone within two seconds. Resolves once

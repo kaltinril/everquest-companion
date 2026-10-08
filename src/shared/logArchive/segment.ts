@@ -9,14 +9,15 @@
 // A FILE THAT DOES NOT PARSE IS SKIPPED AND REPORTED, never repaired in place. A newer version is
 // skipped the same way: an older build must not guess at a shape it has not seen.
 //
-// ZERO-IMPORT: the main-side store and the node tests both read it. (The one import is a type and
-// is erased.)
+// ZERO-IMPORT: the main-side store and the node tests both read it. (The two imports are types and
+// are erased.)
 
 import type { SegmentSummary } from '../combat'
+import type { RespawnRow } from '../respawn'
 
 /** Bump when a field changes meaning. A segment from a newer version is skipped, not guessed at.
- *  `fights` (step 4.7) did not bump it: the field is optional and adds nothing to what the others
- *  mean, so a segment written before it reads as one with no fights kept. */
+ *  `fights` (step 4.7) and `respawnHistory` (step 4.14) did not bump it: each field is optional and
+ *  adds nothing to what the others mean, so a segment written before it reads as one without it. */
 export const SEGMENT_VERSION = 1
 
 /** How many bytes of a log's head identify it: enough to differ between any two real logs. */
@@ -72,6 +73,9 @@ export interface Segment {
   /** Every fight's summary (ruling 0.4: summaries only; the breakdown stays in the archive).
    *  Absent on a segment captured before step 4.7, or when the engine had no fight list to give. */
   fights?: SegmentSummary[]
+  /** The learned respawn rows of every mob the fold remembered, watched or not (step 4.14). Absent
+   *  on a segment captured before that step, or when the engine could not be read. */
+  respawnHistory?: RespawnRow[]
 }
 
 export type ParsedSegment = { ok: true; segment: Segment } | { ok: false; reason: string }
@@ -114,6 +118,13 @@ function fightsProblem(fights: unknown): string | null {
   return bad ? 'a fight summary is malformed' : null
 }
 
+function respawnHistoryProblem(rows: unknown): string | null {
+  if (rows === undefined) return null
+  if (!Array.isArray(rows)) return 'respawn history is not a list'
+  const bad = rows.some((r) => !isObject(r) || typeof r.id !== 'string' || typeof r.key !== 'string')
+  return bad ? 'a respawn history row is malformed' : null
+}
+
 function versionProblem(v: unknown): string | null {
   if (typeof v !== 'number') return 'no version'
   if (v > SEGMENT_VERSION) return `version ${v} is newer than this build reads`
@@ -133,9 +144,9 @@ function segmentProblem(raw: unknown): string | null {
   return contentProblem(raw)
 }
 
-/** The log identity, the modules and the fights: what a segment holds rather than names. */
+/** The log identity, the modules, the fights and the respawn history: what a segment holds rather than names. */
 function contentProblem(raw: Record<string, unknown>): string | null {
-  return logProblem(raw.log) ?? modulesProblem(raw.modules) ?? fightsProblem(raw.fights)
+  return logProblem(raw.log) ?? modulesProblem(raw.modules) ?? fightsProblem(raw.fights) ?? respawnHistoryProblem(raw.respawnHistory)
 }
 
 /** Read a segment from parsed JSON. Never throws. */

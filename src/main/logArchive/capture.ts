@@ -12,9 +12,13 @@
 // FIGHTS (step 4.7, ruling 0.4): every fight's summary is taken inside the same before/after pair
 // as the modules, so it describes the same bytes. The breakdown is not kept; the archive holds it.
 // An engine that cannot give the list leaves the segment without `fights`, as before step 4.7.
+//
+// RESPAWN HISTORY (step 4.14, `respawnHistory.ts`) is read in the same pair, after the modules, so
+// the `respawn` snapshot above shows the player's own watch list and not a batch of the reader's.
 
 import { CAPTURED_MODULES } from '../../shared/logArchive/modules'
 import type { SegmentSummary } from '../../shared/combat'
+import type { RespawnRow } from '../../shared/respawn'
 import { SEGMENT_VERSION, type Segment, type SegmentLog, type SegmentModule } from '../../shared/logArchive/segment'
 
 export interface EngineHealth {
@@ -31,6 +35,8 @@ export interface CaptureDeps {
   snapshot: (module: string) => Promise<SegmentModule | null>
   /** Every fight's summary, uncapped (`capturedFights`), or null when the engine has none to give. */
   fights: () => Promise<SegmentSummary[] | null>
+  /** Every remembered mob's learned respawn rows, given the modules just taken; null when unread. */
+  respawnHistory?: (modules: Record<string, SegmentModule>) => Promise<RespawnRow[] | null>
   readPrefix: (path: string, bytes: number) => Promise<SegmentLog>
   producedBy: () => { app: string; engine: string }
 }
@@ -66,6 +72,35 @@ export function segmentId(character: string, log: SegmentLog): string {
   return `${character.replace(/[^a-z0-9_]/gi, '')}-${when}-${log.bytes}`
 }
 
+interface Taken {
+  modules: Record<string, SegmentModule>
+  fights: SegmentSummary[] | null
+  respawnHistory: RespawnRow[] | null
+}
+
+/** Everything a segment keeps from the engine, in the order the header gives. */
+async function takeAll(deps: CaptureDeps): Promise<Taken> {
+  const modules = await snapshotAll(deps)
+  const fights = await deps.fights()
+  const respawnHistory = (await deps.respawnHistory?.(modules)) ?? null
+  return { modules, fights, respawnHistory }
+}
+
+function toSegment(deps: CaptureDeps, character: string, log: SegmentLog, t: Taken): Segment {
+  return {
+    v: SEGMENT_VERSION,
+    id: segmentId(character, log),
+    character,
+    state: 'captured',
+    log,
+    producedBy: deps.producedBy(),
+    archivePath: null,
+    modules: t.modules,
+    ...(t.fights === null ? {} : { fights: t.fights }),
+    ...(t.respawnHistory === null ? {} : { respawnHistory: t.respawnHistory })
+  }
+}
+
 /** Take one consistent capture, in state `captured`. Nothing is written here. */
 export async function captureSegment(deps: CaptureDeps): Promise<CaptureResult> {
   if (!deps.on()) return { ok: false, reason: 'Summarize and archive log is off' }
@@ -75,26 +110,11 @@ export async function captureSegment(deps: CaptureDeps): Promise<CaptureResult> 
     const before = await deps.health()
     const problem = healthProblem(before, a.logPath)
     if (problem !== null) return { ok: false, reason: problem }
-    const modules = await snapshotAll(deps)
-    const fights = await deps.fights()
+    const taken = await takeAll(deps)
     const after = await deps.health()
     if (after.mark?.offset !== before.mark?.offset || after.events !== before.events) continue
-    const offset = before.mark?.offset ?? 0
-    const log = await deps.readPrefix(a.logPath, offset)
-    return {
-      ok: true,
-      segment: {
-        v: SEGMENT_VERSION,
-        id: segmentId(a.character, log),
-        character: a.character,
-        state: 'captured',
-        log,
-        producedBy: deps.producedBy(),
-        archivePath: null,
-        modules,
-        ...(fights === null ? {} : { fights })
-      }
-    }
+    const log = await deps.readPrefix(a.logPath, before.mark?.offset ?? 0)
+    return { ok: true, segment: toSegment(deps, a.character, log, taken) }
   }
   return { ok: false, reason: 'the log kept growing while it was being read; try again in a quiet moment' }
 }
