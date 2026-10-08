@@ -175,12 +175,10 @@ interface RespawnState {
 
 const watchKeys = (s: Snaps): string[] => ((s.respawn as RespawnState | null)?.prefs?.watches ?? []).map((w) => w.key)
 
-/** Two killed mobs, the second one with gaps the segment learned without anyone watching it. */
-function pickMobs(segment: { respawnHistory?: { key: string; gapsMs?: number[] }[] }, kills: Snaps): { first: string; second: string | null } {
-  const mobs = Object.keys((kills.kills as { mobs: object }).mobs)
+/** A mob with gaps the segment learned while nobody watched it: not the one watched at the archive. */
+function unwatchedLearned(segment: { respawnHistory?: { key: string; gapsMs?: number[] }[] }, watched: string): string | null {
   const learned = (segment.respawnHistory ?? []).filter((r) => (r.gapsMs?.length ?? 0) > 0).map((r) => r.key)
-  const first = learned[0] ?? mobs[0]
-  return { first, second: learned.find((k) => k !== first) ?? null }
+  return learned.find((k) => k !== watched) ?? null
 }
 
 async function main(): Promise<void> {
@@ -234,7 +232,7 @@ async function main(): Promise<void> {
   compare('next launch, archive + fresh log', firstLive, after)
 
   // 2b. Watch a mob nobody watched when the log was archived: its gaps come from the archive.
-  const { second } = pickMobs(segment, before)
+  const second = unwatchedLearned(segment, firstMob)
   if (second === null) {
     note('no second mob with learned gaps in this log; the unwatched-gaps check is skipped')
   } else {
