@@ -16,6 +16,12 @@
  *   3. append new lines: they must add to the history, not replace it;
  *   4. put the log back, relaunch: the log must be the original bytes plus the new lines, and the
  *      history must not be counted twice.
+ *
+ * Since 2026-10-08 (steps 4.6, 4.10 to 4.16) it also holds spell ranks, learned buff durations,
+ * spell sets and the class-loadout history to the same three comparisons; watches one mob before
+ * the archive (the watch list must come back after the respawn history is read) and a second one
+ * after it (its gaps must come from the archive); and checks the segment keeps fights and respawn
+ * history with a faction ledger beside it, in `<Logs>/companion-archive/`.
  */
 
 import type { ElectronApplication, Page } from 'playwright-core'
@@ -30,7 +36,7 @@ import { settleEngineServing } from './engineSteps.mjs'
 
 const SOURCE = process.env.LOG_ARCHIVE_TRIAL_LOG
 const TABLES = process.env.LOG_ARCHIVE_TRIAL_TABLES
-const MODULES = ['kills', 'loot', 'leveling', 'consider', 'itemTiers', 'classUnlocks', 'turnins', 'respawn', 'progression']
+const MODULES = ['kills', 'loot', 'leveling', 'consider', 'itemTiers', 'classUnlocks', 'turnins', 'respawn', 'progression', 'observedSpellRanks', 'buffs', 'spellSets', 'combo']
 
 type Snaps = Record<string, unknown>
 
@@ -125,6 +131,10 @@ function withoutLiveContext(s: Snaps): Snaps {
   if (kills?.mobs !== undefined) {
     kills.mobs = Object.fromEntries(Object.entries(kills.mobs).filter(([key]) => !key.endsWith(' rat')))
   }
+  // The present, by design not carried (steps 4.6 and 4.11): the buffs on you now and the gems the
+  // fresh log has watched go in. The learned durations and the named sets are history and compared.
+  if (out.buffs !== null && typeof out.buffs === 'object') out.buffs = { stats: (out.buffs as { stats?: unknown }).stats }
+  if (out.spellSets !== null && typeof out.spellSets === 'object') out.spellSets = { sets: (out.spellSets as { sets?: unknown }).sets }
   return out
 }
 
@@ -155,6 +165,24 @@ function call<T>(page: Page, fn: string, arg?: string | boolean): Promise<T> {
   }, [fn, arg] as const) as Promise<T>
 }
 
+/** The archive folder beside the logs (ruling 0.2, since 2026-10-07). */
+const archiveDir = (installDir: string): string => join(installDir, 'Logs', 'companion-archive')
+
+interface RespawnState {
+  rows: { key: string; gapsMs?: number[] }[]
+  prefs?: { watches?: { key: string }[] }
+}
+
+const watchKeys = (s: Snaps): string[] => ((s.respawn as RespawnState | null)?.prefs?.watches ?? []).map((w) => w.key)
+
+/** Two killed mobs, the second one with gaps the segment learned without anyone watching it. */
+function pickMobs(segment: { respawnHistory?: { key: string; gapsMs?: number[] }[] }, kills: Snaps): { first: string; second: string | null } {
+  const mobs = Object.keys((kills.kills as { mobs: object }).mobs)
+  const learned = (segment.respawnHistory ?? []).filter((r) => (r.gapsMs?.length ?? 0) > 0).map((r) => r.key)
+  const first = learned[0] ?? mobs[0]
+  return { first, second: learned.find((k) => k !== first) ?? null }
+}
+
 async function main(): Promise<void> {
   buildIfStale()
   const { installDir, logPath } = stage()
@@ -162,18 +190,29 @@ async function main(): Promise<void> {
   const originalSha = sha(logPath)
   note(`staged ${statSync(logPath).size.toLocaleString()} bytes at ${logPath}`)
 
-  // 1. Fold, record, archive.
+  // 1. Fold, watch one mob, record, archive.
   let run = await open(installDir, userData)
+  const firstMob = Object.keys(((await snaps(run.page)).kills as { mobs: object }).mobs)[0]
+  await call(run.page, 'setRespawn', { watches: [{ key: firstMob, display: firstMob }] } as never)
+  await new Promise((r) => setTimeout(r, 2000))
   const before = await snaps(run.page)
+  check('the watch is set before the archive', watchKeys(before).includes(firstMob), watchKeys(before).join(', '))
   note(`before: ${shape(before)}`)
   check('the switch starts off', (await call<{ enabled: boolean }>(run.page, 'logArchiveStatus')).enabled === false)
   await call(run.page, 'setLogArchiveEnabled', true)
   const rotated = await call<Reply>(run.page, 'logArchiveRotate')
   check('archive succeeds', rotated.ok, rotated.message)
   check('the live log is fresh', statSync(logPath).size < 1024, `${statSync(logPath).size} bytes`)
-  const archives = readdirSync(join(userData, 'log-archive')).filter((f) => f.endsWith('.log.gz'))
+  const dir = archiveDir(installDir)
+  const archives = readdirSync(dir).filter((f) => f.endsWith('.log.gz'))
   check('one compressed archive exists', archives.length === 1, archives.join(', '))
-  if (archives.length === 1) note(`archive ${statSync(join(userData, 'log-archive', archives[0])).size.toLocaleString()} bytes`)
+  if (archives.length === 1) note(`archive ${statSync(join(dir, archives[0])).size.toLocaleString()} bytes`)
+  const segFile = readdirSync(dir).find((f) => f.endsWith('.segment.json'))
+  const segment = JSON.parse(readFileSync(join(dir, segFile ?? 'none'), 'utf8')) as { id: string; fights?: unknown[]; respawnHistory?: { key: string; gapsMs?: number[] }[] }
+  check('the segment keeps every fight summary', Array.isArray(segment.fights), `${segment.fights?.length ?? 'none'}`)
+  check('the segment keeps the respawn history (step 4.14)', Array.isArray(segment.respawnHistory), `${segment.respawnHistory?.length ?? 'none'} mobs`)
+  check('a faction ledger sits beside it (step 4.16)', existsSync(join(dir, `${segment.id}.factions.json`)))
+  check('the watch list is the player\'s again after the history read', canon(watchKeys(await snaps(run.page))) === canon([firstMob]), watchKeys(await snaps(run.page)).join(', '))
   await new Promise((r) => setTimeout(r, 3000))
   compare('same session after archiving', before, await snaps(run.page))
   // The game's next line is the FIRST line of the fresh log. Is it counted while the app runs?
@@ -193,6 +232,19 @@ async function main(): Promise<void> {
   check('the first line of the fresh log is counted at the next launch', killsOf(after, 'a first rat') === 1, `${killsOf(after, 'a first rat')}`)
   // Against the running session just after the first line was counted: both hold the same lines.
   compare('next launch, archive + fresh log', firstLive, after)
+
+  // 2b. Watch a mob nobody watched when the log was archived: its gaps come from the archive.
+  const { second } = pickMobs(segment, before)
+  if (second === null) {
+    note('no second mob with learned gaps in this log; the unwatched-gaps check is skipped')
+  } else {
+    await call(run.page, 'setRespawn', { watches: [{ key: firstMob, display: firstMob }, { key: second, display: second }] } as never)
+    await new Promise((r) => setTimeout(r, 3000))
+    const rows = ((await snaps(run.page)).respawn as RespawnState).rows.filter((r) => r.key === second)
+    check(`a mob first watched after the archive shows the archive's gaps (${second})`, rows.some((r) => (r.gapsMs?.length ?? 0) > 0), JSON.stringify(rows.map((r) => r.gapsMs)))
+    await call(run.page, 'setRespawn', { watches: [{ key: firstMob, display: firstMob }] } as never)
+    await new Promise((r) => setTimeout(r, 2000))
+  }
 
   // 3. New lines add to the history.
   appendFileSync(logPath, line('You have slain a trial rat!') + line('You have gained a level! Welcome to level 61!'))
