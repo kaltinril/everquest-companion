@@ -10,7 +10,7 @@ export default function BazaarTierTable({ c }: { c: CombinedTiers }): JSX.Elemen
   return (
     <Box data-testid="bazaar-tiers">
       <Typography variant="caption" color="text.secondary">
-        Every tier read as +0: each tier adds about {Math.round((c.rate - 1) * 100)}% for this item
+        Every tier read as +{c.at}: each tier adds about {Math.round((c.rate - 1) * 100)}% for this item
       </Typography>
       <Table size="small" sx={{ maxWidth: 560 }}>
         <TableHead>

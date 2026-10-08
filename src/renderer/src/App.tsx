@@ -189,7 +189,7 @@ function PlainView({
       {view === 'character' && <CharacterView key={viewKey} />}
       <UnreleasedSlayerView view={view} viewKey={viewKey} routing={routing} />
       <UnreleasedUnlocksView view={view} viewKey={viewKey} routing={routing} />
-      <UnreleasedBazaarView view={view} viewKey={viewKey} />
+      <UnreleasedBazaarView view={view} viewKey={viewKey} onOpenLoot={routing.openLoot} />
       {/* THE SPELL DRILLDOWN (JOS-508). Its view check and its payload check live in the feature
           file, not here: this switch is one branch per view and a branch needing both would have
           cost `PlainView` two points of the measured complexity ceiling. */}

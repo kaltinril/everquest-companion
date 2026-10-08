@@ -48,18 +48,19 @@ export function tierRate(rows: readonly BazaarRow[]): number {
   return Math.min(MAX_RATE, Math.max(1, rate))
 }
 
-/** A row read as tier +0: every price divided by `rate` once per tier. `fromTier` keeps where it came from. */
+/** A row read at another tier: every price moved by `rate` once per tier between. `fromTier` keeps where it came from. */
 export interface BaseTierRow extends BazaarRow {
   fromTier: number
 }
 
-export function asBaseTier(rows: readonly BazaarRow[], rate: number): BaseTierRow[] {
+/** Rows read as tier `at` (+0 unless named): the "Price at" slider's tier. */
+export function asBaseTier(rows: readonly BazaarRow[], rate: number, at = 0): BaseTierRow[] {
   return rows.map((r) => {
-    const f = rate ** -r.tier
+    const f = rate ** (at - r.tier)
     const scale = (x: number | null): number | null => (x === null ? null : x * f)
     return {
       ...r,
-      tier: 0,
+      tier: at,
       fromTier: r.tier,
       min: scale(r.min),
       max: scale(r.max),

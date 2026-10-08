@@ -1,9 +1,10 @@
 // BazaarControls — the Bazaar tab's toolbar: search, direction, which items to show (all, the wish
-// list, the watchlist or one of its statuses), Popular with its price floor, whether items the
-// wiki marks No Drop or No Trade show at all, and the offers list with its CSV export.
+// list, the watchlist or one of its statuses), Popular with its price floor, how far back prices
+// count, All tiers as one with its Price at slider, whether items the wiki marks No Drop or No
+// Trade show at all, and the offers list with its CSV export.
 
 import { type JSX } from 'react'
-import { Button, FormControlLabel, MenuItem, Stack, Switch, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { Box, Button, FormControlLabel, MenuItem, Slider, Stack, Switch, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import type { BazaarDir } from '@shared/bazaar'
 import { WATCH_STATUS_LABEL, type WatchStatus } from '@shared/bazaarWatch'
 
@@ -25,6 +26,18 @@ export const MIN_PRICES: { pp: number; label: string }[] = [
   { pp: 5000, label: '5k and up' }
 ]
 
+/** How far back prices count, in days counted back from the log's newest day; 0 is every day. */
+export const SINCE_DAYS: { days: number; label: string }[] = [
+  { days: 0, label: 'All days' },
+  { days: 10, label: 'Last 10 days' },
+  { days: 15, label: 'Last 15 days' },
+  { days: 30, label: 'Last 30 days' },
+  { days: 60, label: 'Last 60 days' }
+]
+
+/** Most upgraded offers in the owner's log are +4 (the instances people run), so the slider starts there. */
+export const DEFAULT_PRICE_TIER = 4
+
 export interface BazaarControlState {
   text: string
   dir: BazaarDir | 'all'
@@ -35,21 +48,23 @@ export interface BazaarControlState {
   hideNoTrade: boolean
   /** Show every offer as said, in a list, instead of only the per-item summary. */
   offers: boolean
-  /** One row per item, every tier read as +0 (shared/bazaarTiers.ts). */
+  /** One row per item, every tier read as one tier (shared/bazaarTiers.ts). */
   combineTiers: boolean
+  /** With combineTiers, the tier every price is read at. */
+  priceTier: number
+  /** Only the last this-many days; 0 is every day. */
+  sinceDays: number
 }
 
-export default function BazaarControls({
-  state,
-  set,
-  onExport
-}: {
+interface Props {
   state: BazaarControlState
   set: (patch: Partial<BazaarControlState>) => void
-  onExport: () => void
-}): JSX.Element {
+}
+
+/** Which items: search, direction, the Show picker, Popular and its price floor. */
+function FilterControls({ state, set }: Props): JSX.Element {
   return (
-    <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" useFlexGap>
+    <>
       <TextField
         size="small"
         placeholder="Search items"
@@ -103,11 +118,60 @@ export default function BazaarControls({
           </MenuItem>
         ))}
       </TextField>
+    </>
+  )
+}
+
+/** How far back, and how tiers are read: the days window, All tiers as one, and its Price at slider. */
+function WindowControls({ state, set }: Props): JSX.Element {
+  return (
+    <>
+      <TextField
+        select
+        size="small"
+        label="Days"
+        value={state.sinceDays}
+        onChange={(ev) => set({ sinceDays: Number(ev.target.value) })}
+        sx={{ minWidth: 140 }}
+        slotProps={{ htmlInput: { 'data-testid': 'bazaar-since-days' } }}
+      >
+        {SINCE_DAYS.map((d) => (
+          <MenuItem key={d.days} value={d.days}>
+            {d.label}
+          </MenuItem>
+        ))}
+      </TextField>
       <FormControlLabel
         control={<Switch size="small" checked={state.combineTiers} onChange={(_e, on) => set({ combineTiers: on })} data-testid="bazaar-combine-tiers" />}
         label="All tiers as one"
-        title="One row per item: every tier's price read as its +0, by how much a tier adds for that item"
+        title="One row per item: every tier's price read at one tier, by how much a tier adds for that item"
       />
+      {state.combineTiers && (
+        <Box sx={{ width: 190, px: 1 }} data-testid="bazaar-price-tier">
+          <Typography variant="caption" color="text.secondary">
+            Price at +{state.priceTier}
+          </Typography>
+          <Slider
+            size="small"
+            min={0}
+            max={10}
+            step={1}
+            marks
+            value={state.priceTier}
+            onChange={(_e, v) => set({ priceTier: Array.isArray(v) ? v[0] : v })}
+            valueLabelDisplay="auto"
+            valueLabelFormat={(v) => `+${v}`}
+          />
+        </Box>
+      )}
+    </>
+  )
+}
+
+/** What the list leaves out and how it is shown: Hide No Drop, the offers list, and its CSV export. */
+function ListControls({ state, set, onExport }: Props & { onExport: () => void }): JSX.Element {
+  return (
+    <>
       <FormControlLabel
         control={<Switch size="small" checked={state.hideNoTrade} onChange={(_e, on) => set({ hideNoTrade: on })} data-testid="bazaar-hide-notrade" />}
         label="Hide No Drop"
@@ -119,6 +183,16 @@ export default function BazaarControls({
       <Button size="small" variant="outlined" onClick={onExport} data-testid="bazaar-export">
         Export CSV
       </Button>
+    </>
+  )
+}
+
+export default function BazaarControls({ state, set, onExport }: Props & { onExport: () => void }): JSX.Element {
+  return (
+    <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" useFlexGap>
+      <FilterControls state={state} set={set} />
+      <WindowControls state={state} set={set} />
+      <ListControls state={state} set={set} onExport={onExport} />
     </Stack>
   )
 }
