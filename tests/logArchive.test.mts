@@ -211,7 +211,8 @@ function harness(over: Partial<HistoryDeps> & { segments?: Segment[] } = {}) {
     },
     attached: over.attached ?? (() => ({ character: 'primitive_freeport', logPath: 'live.txt' })),
     readHead: over.readHead ?? ((_p, n) => Buffer.from(LOG).subarray(0, n)),
-    note: (l) => notes.push(l)
+    note: (l) => notes.push(l),
+    comboCorrections: over.comboCorrections
   })
   return { h, notes, dirReads: () => dirReads }
 }
@@ -324,4 +325,21 @@ test('read path: kills before the live first zone line take the archive zone onc
   t.h.noteLiveProgression(progression([60]))
   assert.ok(!t.h.wantsLiveZone('kills'), 'a known first zone line cannot move')
   assert.deepEqual(tiersOf(t.h.mergeHistory('kills', 5, kills(-2, 70))), ['-2', '3'], 'a kill after the line stays unknown')
+})
+
+test("read path: archived combo intervals take today's corrections; the live state is the engine's (step 4.12)", () => {
+  const slots = [
+    { candidates: ['WAR'], confidence: 1, provenance: 'inferred', because: [] },
+    { candidates: ['CLR'], confidence: 1, provenance: 'inferred', because: [] }
+  ]
+  const span = { startLo: 100, startHi: 100, endLo: 150, endHi: null, startReason: 'logStart', expectedSlots: 2, slots, levelLo: 10, levelHi: 12, evidenceCount: 1, userLocked: false }
+  const archived = { intervals: [{ id: 'ci1', startTs: 100, endTs: null, ...span }], current: null, ready: true }
+  const live = { intervals: [{ ...span, id: 'ci1', startTs: 300, endTs: null, startLo: 300, startHi: 300, slots: [slots[0], { ...slots[0], candidates: ['ENC'] }] }], current: null, ready: true }
+  const corrections = [{ startTs: 90, endTs: 200, classes: ['ROG' as const, 'BER' as const], setAt: 1 }]
+  const t = harness({ segments: [segment({ modules: { combo: { seq: 3, state: archived } } })], comboCorrections: () => corrections })
+  const merged = t.h.mergeHistory('combo', 7, live) as { intervals: { userLocked: boolean; slots: { candidates: string[] }[] }[] }
+  assert.deepEqual(merged.intervals.map((i) => [i.userLocked, i.slots.map((s) => s.candidates[0]).join('/')]), [
+    [true, 'ROG/BER'],
+    [false, 'WAR/ENC']
+  ])
 })

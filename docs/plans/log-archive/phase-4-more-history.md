@@ -173,6 +173,21 @@ Until a module's step lands, that module shows what the live log holds, as it do
   only the gems the live log watched go in, and the memorized list starts empty, which the module
   reads as unknown. Not recoverable: a set deleted in the live log is still shown from the archive.
 
+### 4.12 Class-loadout history
+
+- **Does**: merges the `combo` module's loadout intervals (Profiles).
+- **After this step**: the loadout history continues across a rotation, and a correction placed
+  over archived time takes effect there.
+- **As built** (2026-10-08): at the cut, the archive's open interval and the live log's first are
+  joined when both state the same loadout outright and no level went down, else the archived one
+  is closed where the live one begins. Ids are renumbered over the whole list. The engine applies
+  corrections only to its own log, so the read path applies the stored corrections to archived
+  intervals, by the engine's own rule (`combo/intervals.rs correction_for_slice`, restated in
+  `mergeCombo.ts`); a span the game named with `/who` keeps its classes and is marked overruled.
+  Today's open-ended override does not reach back past the live log's first interval. Exact on the
+  split fixture. One thing cannot be undone: an archived interval locked by a correction that was
+  later cleared keeps that loadout, because the archive kept the result, not the evidence.
+
 ## When this phase is done
 
 | Question | Answer |
