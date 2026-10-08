@@ -130,12 +130,6 @@ function OnPanel(props: { st: LogArchiveStatus; run: (p: Promise<LogArchiveReply
         )}
         <Stat label="Archives kept in" value={st.dir} mono />
       </Box>
-      {st.dumps?.stale === true && (
-        <Alert severity="info" data-testid="log-archive-dumps">
-          Run <b>/outputfile inventory</b> and <b>/outputfile factions</b> before archiving. Last run{' '}
-          {fmtDay(st.dumps.inventoryMs)} and {fmtDay(st.dumps.factionsMs)}.
-        </Alert>
-      )}
       <Box>
         <ConfirmButton
           testId="log-archive-rotate"
