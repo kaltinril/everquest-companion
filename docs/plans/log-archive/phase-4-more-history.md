@@ -162,6 +162,17 @@ Until a module's step lands, that module shows what the live log holds, as it do
   earlier and the last the later. Exact on a new split fixture (`la3-gems-run.log`, cut after line
   10), which also holds the spell set and class-loadout snapshots.
 
+### 4.11 Spell sets
+
+- **Does**: merges the `spellSets` module's named sets, each name's latest definition.
+- **After this step**: the spell set names on the Leveling tab keep sets saved in archived logs.
+- **As built** (2026-10-08): a name both sides defined takes the later definition. The memorized
+  gems are the live log's alone, because the module records presence only and a gem forgotten in
+  the live log before the live log saw it go in leaves nothing to remove it from. Two named
+  differences on the split fixture follow from that rule: a set saved again in the live log holds
+  only the gems the live log watched go in, and the memorized list starts empty, which the module
+  reads as unknown. Not recoverable: a set deleted in the live log is still shown from the archive.
+
 ## When this phase is done
 
 | Question | Answer |

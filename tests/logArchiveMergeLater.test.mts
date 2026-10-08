@@ -15,6 +15,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { hasMergeRule, mergeModule } from '../src/shared/logArchive/mergeRules'
 import { mergeSpellRanks } from '../src/shared/logArchive/mergeSpellRanks'
+import { mergeSpellSets } from '../src/shared/logArchive/mergeSpellSets'
 import { mergeBuffStats } from '../src/shared/logArchive/mergeBuffStats'
 import type { ObservedSpellRanksSnap } from '../src/shared/spellRanks'
 import type { SpellSetsSnap } from '../src/shared/spellSets'
@@ -82,4 +83,36 @@ test('buffs: each spell keeps the summary of the newest stretch that saw it; the
   assert.deepEqual(merged.stats, { a: stat('A', 9, 1000), b: stat('B', 1, 3000) })
   assert.equal(merged.active, newer.active)
   assert.equal(mergeBuffStats(older, { active: [] }), null)
+})
+
+// ── 4.11 spell sets ─────────────────────────────────────────────────────────────────────────────
+
+/** The two named differences: B re-saves `primary` without the gems only A watched go in, and the
+ *  memorized list is the live log's own. */
+function wholeSetsAsSplitSeesThem(): SpellSetsSnap {
+  const whole = structuredClone(G.whole.spellSets)
+  whole.sets.primary = { ...whole.sets.primary, spells: [] }
+  whole.memorized = []
+  return whole
+}
+
+test('spell sets: the rule is in the lookup', () => {
+  assert.ok(hasMergeRule('spellSets'))
+})
+
+test('split log: spell sets of A merged with B equal the whole log, but for the two named differences', () => {
+  assert.deepEqual(mergeModule('spellSets', [G.a.spellSets], G.b.spellSets).state, wholeSetsAsSplitSeesThem())
+})
+
+test('split log: the spell sets fixture really is split', () => {
+  assert.ok(Object.hasOwn(G.a.spellSets.sets, 'second') && !Object.hasOwn(G.b.spellSets.sets, 'second'), 'a set only A saved')
+  assert.ok(Object.hasOwn(G.b.spellSets.sets, 'primary') && Object.hasOwn(G.a.spellSets.sets, 'primary'), 'a set both saved')
+})
+
+test('spell sets: the later definition of a name wins whichever side it is on, and gems are the live log only', () => {
+  const def = (at: number, spells: string[]): SpellSetsSnap['sets'][string] => ({ spells, observedAt: at, source: 'saved' })
+  const older: SpellSetsSnap = { v: 1, memorized: ['Old Gem'], sets: { x: def(10, ['A']), y: def(50, ['B']) } }
+  const newer: SpellSetsSnap = { v: 1, memorized: ['New Gem'], sets: { x: def(20, ['C']), y: def(40, ['D']) } }
+  assert.deepEqual(mergeSpellSets(older, newer), { v: 1, memorized: ['New Gem'], sets: { x: def(20, ['C']), y: def(50, ['B']) } })
+  assert.equal(mergeSpellSets(older, { ...newer, v: 2 }), null)
 })

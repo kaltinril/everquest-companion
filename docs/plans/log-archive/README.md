@@ -163,6 +163,7 @@ Update this table in the same commit as the step it records.
 | 4.8 | done 2026-10-04: search reaches archived fights, pinned to the engine's own fixtures | 4c05f5a3 |
 | 4.9 | done 2026-10-04: an archived fight opens to its summary and names its archive | 4989463e |
 | 4.10 | done 2026-10-08: spell ranks, exact | this commit |
+| 4.11 | done 2026-10-08: spell sets; gems are the live log's, two named differences | this commit |
 | 5.1 | answered 2026-10-03: yes, with conditions | |
 | 5.2 | done 2026-10-04: resist and message buckets kept per archive, read at the archive, added at the next launch | c5d40f07 |
 | 5.3 | done with the panel (version shown, older builds marked) | |
