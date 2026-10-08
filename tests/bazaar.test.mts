@@ -92,7 +92,7 @@ test('numbers read the way trade chat writes them', () => {
   assert.equal(median([]), null)
   assert.equal(formatPlat(20000), '20k')
   assert.equal(formatPlat(2500), '2.5k')
-  assert.equal(formatPlat(75), '75pp')
+  assert.equal(formatPlat(75), '75p')
   assert.equal(formatPlat(0.5), '5g')
   assert.equal(formatPlat(null), '-')
   assert.equal(formatMove(0.123), '+12%')

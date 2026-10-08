@@ -9,7 +9,7 @@ export function offersOf(items: readonly BazaarItem[]): DayQuote[] {
 }
 
 const BOM = String.fromCharCode(0xfeff)
-const HEADER = ['Date', 'Time', 'Who', 'Direction', 'Item', 'Tier', 'Price (pp)', 'Message']
+const HEADER = ['Date', 'Time', 'Who', 'Direction', 'Item', 'Tier', 'Price (plat)', 'Message']
 const DIR = { sell: 'WTS', buy: 'WTB', trade: 'WTT' } as const
 
 /** One field, quoted when it holds a comma, a quote or a line break; a leading = + - @ is defused. */

@@ -424,12 +424,12 @@ export function sparkline(points: readonly BazaarPoint[], endDay: string, n: num
   return out
 }
 
-/** `20000` → `20k`, `2500` → `2.5k`, `75` → `75pp`, `0.5` → `5g`. */
+/** `20000` → `20k`, `2500` → `2.5k`, `75` → `75p`, `0.5` → `5g`: platinum as trade chat writes it. */
 export function formatPlat(pp: number | null): string {
   if (pp === null) return '-'
   if (pp >= 1_000_000) return `${Number((pp / 1_000_000).toFixed(pp >= 10_000_000 ? 0 : 1))}M`
   if (pp >= 1000) return `${Number((pp / 1000).toFixed(pp >= 10000 ? 0 : 1))}k`
-  if (pp >= 1) return `${Math.round(pp)}pp`
+  if (pp >= 1) return `${Math.round(pp)}p`
   return `${Number((pp * 10).toFixed(1))}g`
 }
 

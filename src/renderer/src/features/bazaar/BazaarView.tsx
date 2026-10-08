@@ -28,7 +28,8 @@ import { useWishlist } from '../wishlist/useWishlist'
 import { ASK_COLOR, BazaarChart, BazaarSparkline, OFFER_COLOR } from './BazaarChart'
 import BazaarControls, { DEFAULT_PRICE_TIER, type BazaarControlState, type BazaarShow } from './BazaarControls'
 import BazaarQuotes from './BazaarQuotes'
-import { ItemIcon, ItemName, priceOf } from './BazaarItemCells'
+import { ItemIcon, ItemName, nameOf, priceOf } from './BazaarItemCells'
+import { HiddenDetail, HideDetailButton, useDetailHidden } from './BazaarDetailToggle'
 import BazaarTierTable from './BazaarTierTable'
 import BazaarWatchPanel from './BazaarWatchPanel'
 import { useHeardAlerts } from './BazaarWatcher'
@@ -148,7 +149,7 @@ function PriceGrid({ item }: { item: BazaarItem }): JSX.Element {
   )
 }
 
-function Detail({ item, endDay, onOpenLoot }: { item: BazaarItem; endDay: string; onOpenLoot: (item: string) => void }): JSX.Element {
+function Detail({ item, endDay, onOpenLoot, onHide }: { item: BazaarItem; endDay: string; onOpenLoot: (item: string) => void; onHide: () => void }): JSX.Element {
   const lows = item.points.map((p) => p.sell.low ?? Infinity)
   const highs = item.points.map((p) => p.sell.high ?? -Infinity)
   const low = Math.min(...lows)
@@ -166,6 +167,7 @@ function Detail({ item, endDay, onOpenLoot }: { item: BazaarItem; endDay: string
               : `all tiers, priced as +${item.combined.at}${item.combined.atSeen ? '' : ` (an estimate: nobody listed +${item.combined.at})`} · `}
             last seen {item.lastDay}
           </Typography>
+          <HideDetailButton onHide={onHide} />
         </Stack>
         <Stack direction="row" spacing={4} flexWrap="wrap" useFlexGap>
           <PriceGrid item={item} />
@@ -278,6 +280,12 @@ function HeardAlerts(): JSX.Element | null {
   )
 }
 
+/** The picked item's panel, or the slim bar it folds to. */
+function PickedPanel(p: { item: BazaarItem; endDay: string; hidden: boolean; setHidden: (h: boolean) => void; onOpenLoot: (item: string) => void }): JSX.Element {
+  if (p.hidden) return <HiddenDetail name={nameOf(p.item)} onShow={() => p.setHidden(false)} />
+  return <Detail item={p.item} endDay={p.endDay} onOpenLoot={p.onOpenLoot} onHide={() => p.setHidden(true)} />
+}
+
 /** Which items the Show picker keeps; undefined keeps all. */
 function keeperOf(show: BazaarShow, wished: ReadonlySet<string>, watch: BazaarWatchlist): ((item: string, tier: number) => boolean) | undefined {
   if (show === 'all') return undefined
@@ -318,6 +326,7 @@ export default function BazaarView({ onOpenLoot }: { onOpenLoot: (item: string) 
   const [ctl, setCtl] = useState<BazaarControlState>(START)
   const [sort, setSort] = useState<BazaarSort>({ key: 'lastDay', desc: true })
   const [pick, setPick] = useState<string | null>(null)
+  const [detailHidden, setDetailHidden] = useDetailHidden()
   const wished = useMemo(() => new Set(wishes.ready ? wishes.list.entries.map((e) => e.itemKey) : []), [wishes])
   const names = useMemo(() => [...new Set((snap?.rows ?? []).map((r) => r.item))], [snap])
   const factsOf = useItemFacts(names)
@@ -368,7 +377,7 @@ export default function BazaarView({ onOpenLoot }: { onOpenLoot: (item: string) 
         <Typography variant="body2">No trade offers {filtered ? 'match' : 'in your log yet'}.</Typography>
       ) : (
         <>
-          <Detail item={picked} endDay={sum.lastDay} onOpenLoot={onOpenLoot} />
+          <PickedPanel item={picked} endDay={sum.lastDay} hidden={detailHidden} setHidden={setDetailHidden} onOpenLoot={onOpenLoot} />
           <Box sx={{ overflowX: 'auto' }}>
             <Table size="small" stickyHeader>
               <SortHead sort={sort} onSort={onSort} />
@@ -379,7 +388,10 @@ export default function BazaarView({ onOpenLoot }: { onOpenLoot: (item: string) 
                     item={i}
                     endDay={sum.lastDay ?? i.lastDay}
                     picked={i.key === picked.key}
-                    onPick={() => setPick(i.key)}
+                    onPick={() => {
+                      setPick(i.key)
+                      setDetailHidden(false)
+                    }}
                     onOpenLoot={onOpenLoot}
                     marks={{
                       iconId: factsOf(i.item)?.iconId,
