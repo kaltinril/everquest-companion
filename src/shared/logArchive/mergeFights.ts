@@ -14,6 +14,10 @@
 
 import type { CombatSnapshot, SegmentSummary, SnapshotOpts } from '../combat'
 
+/** A page size no log reaches, so a capture or a refold asks for every fight (step 4.7). The engine
+ *  keeps every finalized fight's summary; 6,299 fights measured at 1.6 MB (ruling 0.4). */
+export const ALL_FIGHTS = 1_000_000
+
 /** The engine's default page of finalized fights, `ops.rs DEFAULT_MAX_SEGMENTS`. */
 const DEFAULT_MAX_SEGMENTS = 100
 

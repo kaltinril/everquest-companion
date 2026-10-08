@@ -15,7 +15,7 @@ import { getActiveCharacter } from '../session'
 import { getLogArchivePrefs, logArchiveOn, setLogArchivePrefs } from '../storeLogArchive'
 import { HELD_TEXT, type DumpAdvice, type LogArchiveReply, type LogArchiveStatus, type SegmentRow } from '../../shared/logArchive/panel'
 import { driveOf, rotateBlockers } from '../../shared/logArchive/preflight'
-import { capturedFights } from '../../shared/logArchive/mergeFights'
+import { ALL_FIGHTS, capturedFights } from '../../shared/logArchive/mergeFights'
 import type { Segment } from '../../shared/logArchive/segment'
 import { CAPTURED_MODULES } from '../../shared/logArchive/modules'
 import { archiveName, backupLog, sweepTemp } from './backup'
@@ -36,10 +36,6 @@ let busy: string | null = null
 let archivedThisRun = false
 /** The captured modules the running engine serves, learned once it has caught up; null before. */
 let engineModules: ReadonlySet<string> | null = null
-
-/** A page size no log reaches, so the capture asks for every fight (step 4.7). The engine keeps
- *  every finalized fight's summary; 6,299 fights measured at 1.6 MB (ruling 0.4). */
-const ALL_FIGHTS = 1_000_000
 
 function attached(): { character: string; logPath: string } | null {
   const c = getActiveCharacter()
@@ -120,10 +116,11 @@ function row(s: Segment): SegmentRow {
   }
 }
 
-/** The segment was captured before this engine had one of its modules (a new tab's data), or
- *  before step 4.14 kept the respawn history of unwatched mobs. */
+/** The segment was captured before this engine had one of its modules (a new tab's data), before
+ *  step 4.7 kept fight summaries, or before step 4.14 kept the respawn history of unwatched mobs. */
 function lacksModules(s: Segment): boolean {
   if (engineModules === null) return false
+  if (s.fights === undefined) return true
   if (engineModules.has('respawn') && s.respawnHistory === undefined) return true
   return [...engineModules].some((m) => !Object.prototype.hasOwnProperty.call(s.modules, m))
 }

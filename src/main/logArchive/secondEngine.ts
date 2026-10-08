@@ -13,6 +13,9 @@
 // definitions, buff trust, respawn watches and the character's combo and roster edits change what a
 // fold produces, so they are handed over before the attach.
 //
+// FIGHTS (step 4.15): asked for, every fight's summary is read after the modules, as the capture
+// reads it, so a refresh brings an archive's fight list up to this build too.
+//
 // RESPAWN HISTORY (step 4.14): asked for, the fold's learned respawn rows of every remembered mob
 // are read after the modules, as the capture reads them (`respawnHistory.ts`). This engine is
 // thrown away, so there is no watch list to put back.
@@ -33,6 +36,8 @@ import { mintToken } from '../dataServer/token'
 import type { DefineOp } from '../dataServer/definePush'
 import type { RespawnRow } from '../../shared/respawn'
 import { historyKeys, readRespawnHistory } from './respawnHistory'
+import type { SegmentSummary } from '../../shared/combat'
+import { ALL_FIGHTS, capturedFights } from '../../shared/logArchive/mergeFights'
 
 /** What this file needs of a child process; Node's `ChildProcess` is one. */
 export interface EngineProcess {
@@ -65,6 +70,8 @@ export interface SecondFoldRequest {
   timeoutMs: number
   /** Also read every remembered mob's learned respawn rows (step 4.14). */
   respawnHistory?: boolean
+  /** Also read every fight's summary (step 4.15). */
+  fights?: boolean
 }
 
 export interface SecondFold {
@@ -74,6 +81,8 @@ export interface SecondFold {
   events: number
   /** Present when asked for: the learned rows, or null when they could not be read. */
   respawnHistory?: RespawnRow[] | null
+  /** Present when asked for: every fight's summary, or null when the list could not be read. */
+  fights?: SegmentSummary[] | null
 }
 
 const ANNOUNCE_MS = 10_000
@@ -156,8 +165,19 @@ async function foldOn(client: EngineClient, req: SecondFoldRequest): Promise<Sec
   const foldMs = Date.now() - began
   const modules = await snapshotAll(client, req.modules)
   const out: SecondFold = { modules, foldMs, events: h.events ?? 0 }
+  if (req.fights === true) out.fights = await foldFights(client)
   if (req.respawnHistory === true) out.respawnHistory = await foldRespawnHistory(client, modules)
   return out
+}
+
+/** Step 4.15: every fight's summary, as the capture takes it. */
+async function foldFights(client: EngineClient): Promise<SegmentSummary[] | null> {
+  try {
+    const r = await client.request('combat.snapshot', { opts: { maxSegments: ALL_FIGHTS } })
+    return capturedFights((r.snapshot as { segments?: unknown }).segments)
+  } catch {
+    return null
+  }
 }
 
 /** Step 4.14 on this engine: the same batched read as the capture's, with nothing to restore. */
