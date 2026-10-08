@@ -12,7 +12,18 @@
 // presenting a partial sum as a total; cap-pinned factions stay exact regardless (the shared
 // module's header carries that argument). 32 MB covers weeks of ordinary play — the measured log
 // holds its whole 21k faction lines in well under that.
+//
+// AN ARCHIVED LOG LEFT ITS LINES IN A LEDGER (log archive step 4.16, `shared/factionLedger.ts`,
+// kept byte-identical with the `log-archive` branch that writes them). Once a log is archived the
+// live log starts after it, so the lines between the dump and the archive are in the ledgers beside
+// it: `<Logs>/companion-archive/<segment>.factions.json`. They are read here, read-only, under the
+// ledger's own window rule: only lines older than the live read holds, newest ledger first, so
+// nothing is counted twice. With ledgers present the window is complete only when the live read and
+// the ledgers together reach back to the dump. With none, nothing changes. The ledgers are read
+// whether or not the archive switch is on: they correct today's standing, not a history.
 
+import { readdirSync, readFileSync } from 'node:fs'
+import { basename, dirname, join } from 'node:path'
 import { lineTs, readTail } from './feedback/slice'
 import {
   foldFactionEvidence,
@@ -20,6 +31,14 @@ import {
   type FactionEvidenceReport,
   type FactionLogEvent
 } from '../shared/factionLog'
+import {
+  FACTION_LEDGER_DIR,
+  isLedgerFileName,
+  ledgerWindow,
+  parseLedger,
+  type FactionLedger,
+  type LedgerEvent
+} from '../shared/factionLedger'
 
 const TAIL_CAP_BYTES = 32 * 1024 * 1024
 
@@ -51,9 +70,51 @@ function collectEvents(
   return { events, windowStartTs }
 }
 
+/** Every ledger an archive left for this log. Read-only; an unreadable or foreign file is skipped. */
+export function readLedgers(logPath: string): FactionLedger[] {
+  const dir = join(dirname(logPath), FACTION_LEDGER_DIR)
+  let files: string[]
+  try {
+    files = readdirSync(dir)
+  } catch {
+    return []
+  }
+  const want = basename(logPath).toLowerCase()
+  return files.filter(isLedgerFileName).flatMap((f) => {
+    try {
+      const l = parseLedger(JSON.parse(readFileSync(join(dir, f), 'utf8')))
+      return l !== null && l.log.toLowerCase() === want ? [l] : []
+    } catch {
+      return []
+    }
+  })
+}
+
+const asLogEvent = (e: LedgerEvent): FactionLogEvent =>
+  e.kind === 'adjust' ? { name: e.name, kind: 'adjust', amount: e.amount } : { name: e.name, kind: 'cap', cap: e.cap }
+
 /**
- * Fold the log's faction lines newer than `sinceMs`. Null when the log cannot be read at all —
- * the tab then simply shows the dump as-is, which is what it showed before this existed.
+ * The live read's events joined to the ledgers'. `liveComplete` is the read's own answer (the
+ * header's rule); with ledgers, completeness is how far back the two reach together.
+ */
+export function withLedgers(
+  ledgers: readonly FactionLedger[],
+  live: { events: FactionLogEvent[]; windowStartTs: number; liveComplete: boolean },
+  sinceMs: number
+): FactionEvidenceReport {
+  if (ledgers.length === 0) return { complete: live.liveComplete, sinceMs, rows: foldFactionEvidence(live.events) }
+  const w = ledgerWindow(ledgers, live.windowStartTs === 0 ? Infinity : live.windowStartTs, sinceMs)
+  return {
+    complete: w.reachedTs <= sinceMs,
+    sinceMs,
+    rows: foldFactionEvidence([...w.events.map(asLogEvent), ...live.events])
+  }
+}
+
+/**
+ * Fold the log's faction lines newer than `sinceMs`, and an archive's ledgers before them. Null
+ * when the log cannot be read at all — the tab then simply shows the dump as-is, which is what it
+ * showed before this existed.
  */
 export async function readFactionEvidence(
   logPath: string,
@@ -73,6 +134,6 @@ export async function readFactionEvidence(
   const { events, windowStartTs } = collectEvents(raw, from, sinceMs)
   // Complete when the window reaches back to the dump: an untruncated read always does; a
   // truncated one does only if its first readable line is no newer than the dump.
-  const complete = !tail.truncated || (windowStartTs !== 0 && windowStartTs <= sinceMs)
-  return { complete, sinceMs, rows: foldFactionEvidence(events) }
+  const liveComplete = !tail.truncated || (windowStartTs !== 0 && windowStartTs <= sinceMs)
+  return withLedgers(readLedgers(logPath), { events, windowStartTs, liveComplete }, sinceMs)
 }
