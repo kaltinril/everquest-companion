@@ -39,6 +39,14 @@ Ruling: provisional, the app's own data folder (2026-10-03). The owner asked for
 without choosing; phase 1 writes nothing, so the recommendation is used and the folder can still
 change before phase 2 writes the first file.
 
+Ruling: `Logs\companion-archive\` inside the game's folder (owner, 2026-10-07). The data folder
+put the history in one install's folder while the log it came from is read by every install on
+the machine: an archive made by the dev app left the TEST app looking at a fresh log with its
+history out of reach. Beside the log, every install finds the same history, and it stays with the
+log through a reinstall of the app. Deleting the game's Logs folder now deletes the history too.
+The owner's own archives were moved by hand. test.18 and test.19 could archive into the data
+folder, but the owner ruled that no tester uses the feature yet, so no migration ships.
+
 ## 0.3 May the app move the live log?
 
 - **Decides**: whether phase 3 is built.

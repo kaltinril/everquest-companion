@@ -146,7 +146,7 @@ Update this table in the same commit as the step it records.
 
 | Step | Status | Commit |
 |---|---|---|
-| 0.1 to 0.3 | ruled 2026-10-03 (0.2 provisional) | |
+| 0.1 to 0.3 | ruled 2026-10-03 (0.2 ruled again 2026-10-07: beside the logs) | |
 | 0.4 | ruled 2026-10-04: summaries only, the detail stays in the archive | |
 | 0.5 | measured 2026-10-03: the log can be moved while the game runs | |
 | 1.0 to 1.7 | done 2026-10-03: inert, gate green | this commit |
