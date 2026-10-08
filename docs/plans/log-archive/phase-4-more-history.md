@@ -86,6 +86,12 @@ Until a module's step lands, that module shows what the live log holds, as it do
   samples are "the five most recent" across the cut cannot be told. A merge would be a guess, so
   buff bars keep learning from the live log only. It could be built if the engine published the
   recent samples per spell, which is an engine change and so the creator's decision.
+- **As built** (2026-10-08): what the reasoning above rules out is
+  joining two summaries of one spell, and nothing joins them. Each spell keeps the summary of the
+  newest stretch of log that saw it: the live log's row when it has one, else the newest archive's.
+  That reaches the Buffs tab's learned-duration table. The countdown bars are timed inside the
+  engine from its own samples, so after a rotation a bar starts from the database duration until
+  the spell is cast again; carrying the bars over is still an engine change.
 
 ### 4.7 Fight history
 

@@ -15,9 +15,11 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { hasMergeRule, mergeModule } from '../src/shared/logArchive/mergeRules'
 import { mergeSpellRanks } from '../src/shared/logArchive/mergeSpellRanks'
+import { mergeBuffStats } from '../src/shared/logArchive/mergeBuffStats'
 import type { ObservedSpellRanksSnap } from '../src/shared/spellRanks'
 import type { SpellSetsSnap } from '../src/shared/spellSets'
 import type { ComboSnap } from '../src/shared/classCombo'
+import type { BuffStat, BuffsSnap } from '../src/shared/buffTypes'
 
 interface Recorded {
   observedSpellRanks: ObservedSpellRanksSnap
@@ -54,4 +56,30 @@ test('spell ranks: a rank learned only in the archive is kept, and absent stays 
   const newer: ObservedSpellRanksSnap = { mez: { key: 'mez', name: 'Mez', rank: 1, merges: 2, firstAt: 5, lastAt: 9 } }
   assert.deepEqual(mergeSpellRanks(older, newer), { mez: { key: 'mez', name: 'Mez', rank: 3, castRank: 3, merges: 2, firstAt: 1, lastAt: 9 } })
   assert.equal(mergeSpellRanks(older, { mez: { key: 'mez' } }), null)
+})
+
+// ── 4.6 learned buff durations ──────────────────────────────────────────────────────────────────
+
+const stat = (spell: string, n: number, medianMs: number): BuffStat => ({
+  spell,
+  cls: 'buff',
+  n,
+  medianMs,
+  p25: medianMs,
+  p75: medianMs,
+  minMs: medianMs,
+  maxMs: medianMs
+})
+
+test('buffs: the rule is in the lookup', () => {
+  assert.ok(hasMergeRule('buffs'))
+})
+
+test('buffs: each spell keeps the summary of the newest stretch that saw it; the present is the live log', () => {
+  const older: BuffsSnap = { active: [], stats: { a: stat('A', 9, 1000), b: stat('B', 4, 2000) } }
+  const newer = { active: [{ spell: 'live' }], stats: { b: stat('B', 1, 3000) } } as unknown as BuffsSnap
+  const merged = mergeModule('buffs', [older], newer).state as BuffsSnap
+  assert.deepEqual(merged.stats, { a: stat('A', 9, 1000), b: stat('B', 1, 3000) })
+  assert.equal(merged.active, newer.active)
+  assert.equal(mergeBuffStats(older, { active: [] }), null)
 })
