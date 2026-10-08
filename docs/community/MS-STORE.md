@@ -1,5 +1,7 @@
 # Microsoft Store: free signing by publishing there
 
+**PARKED (owner, 2026-10-08):** kept as research; not started. The GitHub installer comes first.
+
 A plan, in phases, for offering the community build through the Microsoft Store as well as the
 fork's GitHub Releases page. Nothing here is built yet. It lives on `community_release_rules` beside
 [RELEASING.md](RELEASING.md), because it is about how the build reaches players.
