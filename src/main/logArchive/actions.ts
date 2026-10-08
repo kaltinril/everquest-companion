@@ -25,6 +25,10 @@ import { liveHistory, logArchiveDir } from './liveHistory'
 import { readLogPrefix } from './logPrefix'
 import { refoldWithApp } from './refoldActions'
 import { historyKeys, readRespawnHistory } from './respawnHistory'
+import { writeFactionLedger, type LedgerSource } from './factionLedgerFile'
+import { liveLogName } from './refold'
+import { ledgerFileName } from '../../shared/factionLedger'
+import { logInfo } from '../errorLog'
 import { readDefine } from '../dataServer/appKnowledge'
 import type { RespawnRow } from '../../shared/respawn'
 import { refreshSegment, sweepRefreshLeftovers } from './refresh'
@@ -85,9 +89,20 @@ const captureDeps: CaptureDeps = {
   producedBy: () => ({ app: app.getVersion(), engine: app.getVersion() })
 }
 
+/** Step 4.16: write a ledger; a failure is noted and costs only that stretch's faction lines. */
+async function keepFactionLedger(dir: string, segmentId: string, source: LedgerSource): Promise<void> {
+  try {
+    const n = await writeFactionLedger(dir, segmentId, source)
+    logInfo(`[everquest-companion] log archive: kept ${n} faction line(s) of ${segmentId}`)
+  } catch (err) {
+    logInfo(`[everquest-companion] log archive: the faction lines of ${segmentId} were not kept: ${(err as Error).message}`)
+  }
+}
+
 const rotateDeps: RotateDeps = {
   backup: backupLog,
   readPrefix: readLogPrefix,
+  factionLedger: keepFactionLedger,
   writeSegment,
   readSegment: (dir, id) => listSegments(dir).segments.find((s) => s.id === id) ?? null
 }
@@ -117,10 +132,11 @@ function row(s: Segment): SegmentRow {
 }
 
 /** The segment was captured before this engine had one of its modules (a new tab's data), before
- *  step 4.7 kept fight summaries, or before step 4.14 kept the respawn history of unwatched mobs. */
+ *  step 4.7 kept fight summaries, before step 4.14 kept the respawn history of unwatched mobs, or
+ *  has no faction ledger beside it (step 4.16). */
 function lacksModules(s: Segment): boolean {
   if (engineModules === null) return false
-  if (s.fights === undefined) return true
+  if (s.fights === undefined || !existsSync(join(logArchiveDir(), ledgerFileName(s.id)))) return true
   if (engineModules.has('respawn') && s.respawnHistory === undefined) return true
   return [...engineModules].some((m) => !Object.prototype.hasOwnProperty.call(s.modules, m))
 }
@@ -348,6 +364,10 @@ export function refreshHistory(id: string): Promise<LogArchiveReply> {
       producedBy: captureDeps.producedBy
     })
     if (!r.ok) return reply(false, `Not refreshed: ${r.reason}.`)
+    // Step 4.16: the faction ledger is written again from the archive, which holds the same bytes.
+    if (r.segment.archivePath !== null) {
+      await keepFactionLedger(logArchiveDir(), r.segment.id, { path: r.segment.archivePath, gz: true, logName: liveLogName(r.segment) })
+    }
     liveHistory.forgetHistoryContext()
     const what = r.changed.length === 0 ? 'Nothing in it changed.' : `Updated: ${r.changed.join(', ')}.`
     return reply(true, `Refreshed with this version. ${what}`)

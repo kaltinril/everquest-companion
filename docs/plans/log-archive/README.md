@@ -50,7 +50,9 @@ anything else, and every later step checks it.
 While the switch is off:
 
 - the app does not capture, back up or move anything;
-- the app does not open the archive folder, and every tab shows exactly what the engine served;
+- the app does not open the archive folder, and every tab shows exactly what the engine served,
+  with one exception: the Factions tab still reads the faction ledgers an earlier archive left,
+  because they correct today's standing rather than show history (step 4.16);
 - the Log archive section shows the switch, a plain statement of what turning it on allows, and
   nothing else.
 
@@ -168,6 +170,7 @@ Update this table in the same commit as the step it records.
 | 4.13 | 2026-10-08: no rule for resist, step 5.2 already keeps it | this commit |
 | 4.14 | done 2026-10-08: learned respawn gaps of every remembered mob, read by batched watches at capture and refresh | this commit |
 | 4.15 | done 2026-10-08: Refresh takes the fight summaries again; a segment without them is refreshed at launch | this commit |
+| 4.16 | done 2026-10-08: faction ledger beside each archive, written at the archive and on Refresh, read by the Factions tab (faction-tab) | this commit |
 | 5.1 | answered 2026-10-03: yes, with conditions | |
 | 5.2 | done 2026-10-04: resist and message buckets kept per archive, read at the archive, added at the next launch | c5d40f07 |
 | 5.3 | done with the panel (version shown, older builds marked) | |
