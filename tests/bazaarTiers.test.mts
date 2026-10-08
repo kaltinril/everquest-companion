@@ -118,3 +118,11 @@ test('millions read as M, and no offers in 30 days is no volume', () => {
   const old = summarizeBazaar({ rows: [row(['2026-08-01', 'sell', 'Cloak'], [9000]), row(['2026-09-25', 'sell', 'Rain Caller'], [5000])] }, { text: '', dir: 'all', sort: { key: 'item', desc: false } })
   assert.equal(old.items.find((i) => i.item === 'Cloak')?.volume, null)
 })
+
+test('an item never offered above +0 keeps its own price whatever the Price at tier', () => {
+  // "Buying Basilisk Egg 10x for 6k": a quest item, 600 each, never upgraded.
+  const rows = [row(['2026-10-07', 'buy', 'Basilisk Egg'], [600])]
+  const egg = summarizeBazaar({ rows }, { text: '', dir: 'all', sort: { key: 'item', desc: false }, combineTiers: true, priceTier: 4 }).items[0]
+  assert.equal(egg.offered, 600)
+  assert.deepEqual([egg.combined?.at, egg.combined?.atSeen], [0, true])
+})
