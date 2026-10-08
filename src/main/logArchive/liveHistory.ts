@@ -1,19 +1,23 @@
 // main/logArchive/liveHistory.ts — the production instance of history.ts, wired to the real
-// switch, the app's data folder (ruling 0.2) and the attached character.
+// switch, the archive folder beside the game's logs (ruling 0.2) and the attached character.
 //
 // Kept apart from history.ts so that file stays free of Electron and node-tested end to end.
 
-import { app } from 'electron'
 import { join } from 'node:path'
 import { logInfo } from '../errorLog'
-import { characterId } from '../log/config'
+import { characterId, eqLogsDir } from '../log/config'
 import { getActiveCharacter } from '../session'
 import { logArchiveOn } from '../storeLogArchive'
 import { createHistoryMerge, readHeadBytes } from './history'
 
-/** Where segments and archives live: the app's own data folder, never the game's. */
+/**
+ * Where segments and archives live: a subfolder of the game's Logs folder (ruling 0.2, owner
+ * 2026-10-07). Every install on the machine reads the same log, so the history the log was moved
+ * into has to be where all of them look, not in one install's data folder. Log discovery does not
+ * read subfolders, so nothing here is mistaken for a character.
+ */
 export function logArchiveDir(): string {
-  return join(app.getPath('userData'), 'log-archive')
+  return join(eqLogsDir(), 'companion-archive')
 }
 
 export const liveHistory = createHistoryMerge({
