@@ -343,3 +343,24 @@ test("read path: archived combo intervals take today's corrections; the live sta
     [false, 'WAR/ENC']
   ])
 })
+
+test('read path: with two archives, a correction in the newer one does not reach back into the older one (step 4.12)', () => {
+  const slots = [
+    { candidates: ['WAR'], confidence: 1, provenance: 'inferred', because: [] },
+    { candidates: ['CLR'], confidence: 1, provenance: 'inferred', because: [] }
+  ]
+  const span = { startLo: 0, startHi: 0, endLo: null, endHi: null, startReason: 'logStart', expectedSlots: 2, slots, levelLo: 10, levelHi: 12, evidenceCount: 1, userLocked: false }
+  const combo = (start: number) => ({ intervals: [{ ...span, id: 'ci1', startTs: start, endTs: null, startLo: start, startHi: start }], current: null, ready: true })
+  const older = segment({ id: 'seg-a', head: 'head-a', first: '2026-08-01 10:00:00', last: '2026-08-02 10:00:00', modules: { combo: { seq: 1, state: combo(100) } } })
+  const newer = segment({ id: 'seg-b', head: 'head-b', first: '2026-08-03 10:00:00', last: '2026-08-04 10:00:00', modules: { combo: { seq: 1, state: combo(1000) } } })
+  // Placed over the newer archive only, and open-ended toward it: the older span is 100..1000.
+  const corrections = [{ startTs: 1000, endTs: 5000, classes: ['ROG' as const, 'BER' as const], setAt: 1 }]
+  const t = harness({ segments: [older, newer], comboCorrections: () => corrections })
+  const merged = t.h.mergeHistory('combo', 7, combo(9000)) as { intervals: { startTs: number; userLocked: boolean }[] }
+  assert.deepEqual(merged.intervals.map((i) => [i.startTs, i.userLocked]), [
+    [100, false],
+    [1000, true],
+    [9000, false]
+  ])
+})
+

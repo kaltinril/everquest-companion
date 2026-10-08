@@ -75,6 +75,7 @@ function refreshed(old: Segment, fold: RefoldOk['fold'], producedBy: Segment['pr
   return {
     ...old,
     producedBy,
+    extrasTriedBy: producedBy.app,
     modules: keepIdentity(old.modules, fold.modules),
     ...(fights === undefined || fights === null ? {} : { fights }),
     ...(respawnHistory === undefined || respawnHistory === null ? {} : { respawnHistory })

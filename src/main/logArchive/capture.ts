@@ -13,8 +13,12 @@
 // as the modules, so it describes the same bytes. The breakdown is not kept; the archive holds it.
 // An engine that cannot give the list leaves the segment without `fights`, as before step 4.7.
 //
-// RESPAWN HISTORY (step 4.14, `respawnHistory.ts`) is read in the same pair, after the modules, so
-// the `respawn` snapshot above shows the player's own watch list and not a batch of the reader's.
+// RESPAWN HISTORY (step 4.14, `respawnHistory.ts`) is read AFTER the pair has held, never inside
+// it: it is a couple of dozen engine round trips, and inside the pair any line the game writes
+// meanwhile would throw the whole capture away, so an archive during busy play would keep failing.
+// Read after, it is kept only if the log still has not moved; otherwise the segment goes without
+// it, and the refresh at the next launch takes it from the archive instead. Taken after the
+// modules, the `respawn` snapshot shows the player's own watch list, not a batch of the reader's.
 
 import { CAPTURED_MODULES } from '../../shared/logArchive/modules'
 import type { SegmentSummary } from '../../shared/combat'
@@ -78,12 +82,19 @@ interface Taken {
   respawnHistory: RespawnRow[] | null
 }
 
-/** Everything a segment keeps from the engine, in the order the header gives. */
+/** The modules and the fights, inside the before/after pair. */
 async function takeAll(deps: CaptureDeps): Promise<Taken> {
   const modules = await snapshotAll(deps)
   const fights = await deps.fights()
-  const respawnHistory = (await deps.respawnHistory?.(modules)) ?? null
-  return { modules, fights, respawnHistory }
+  return { modules, fights, respawnHistory: null }
+}
+
+/** The respawn history, after the pair; null unless the log is still where the pair saw it. */
+async function historyIfStill(deps: CaptureDeps, before: EngineHealth, modules: Record<string, SegmentModule>): Promise<RespawnRow[] | null> {
+  if (deps.respawnHistory === undefined) return null
+  const rows = await deps.respawnHistory(modules)
+  const now = await deps.health()
+  return now.mark?.offset === before.mark?.offset && now.events === before.events ? rows : null
 }
 
 function toSegment(deps: CaptureDeps, character: string, log: SegmentLog, t: Taken): Segment {
@@ -114,7 +125,8 @@ export async function captureSegment(deps: CaptureDeps): Promise<CaptureResult> 
     const after = await deps.health()
     if (after.mark?.offset !== before.mark?.offset || after.events !== before.events) continue
     const log = await deps.readPrefix(a.logPath, before.mark?.offset ?? 0)
-    return { ok: true, segment: toSegment(deps, a.character, log, taken) }
+    const respawnHistory = await historyIfStill(deps, before, taken.modules)
+    return { ok: true, segment: toSegment(deps, a.character, log, { ...taken, respawnHistory }) }
   }
   return { ok: false, reason: 'the log kept growing while it was being read; try again in a quiet moment' }
 }

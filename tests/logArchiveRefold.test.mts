@@ -171,7 +171,8 @@ test('refresh: an older segment gains the event kind its build did not read', as
   assert.deepEqual(back.modules.loot.state, [{ ts: 1, item: 'Rusty Dagger' }])
   assert.deepEqual(back.producedBy, NOW)
   assert.equal((back.modules.character.state as { character: { logPath: string } }).character.logPath, STORED_LOG)
-  assert.deepEqual({ ...back, modules: {}, producedBy: segment.producedBy }, { ...segment, modules: {} })
+  assert.equal(back.extrasTriedBy, NOW.app)
+  assert.deepEqual({ ...back, modules: {}, producedBy: segment.producedBy, extrasTriedBy: undefined }, { ...segment, modules: {}, extrasTriedBy: undefined })
   // The old file is kept beside it until the next launch, and only the swapped one is listed.
   const old = JSON.parse(readFileSync(`${segmentPath(dir, segment.id)}.old`, 'utf8')) as Segment
   assert.deepEqual(old, segment)
