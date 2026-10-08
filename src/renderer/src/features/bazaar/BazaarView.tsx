@@ -234,7 +234,7 @@ function ItemRow({
           <ItemIcon iconId={marks.iconId} />
           <ItemName item={item} onOpenLoot={onOpenLoot} />
           {item.combined !== undefined && (
-            <Chip size="small" variant="outlined" label={`${marks.tiers} tier${marks.tiers === 1 ? '' : 's'} at +${item.combined.at}`} sx={{ height: 18, fontSize: 10 }} />
+            <Chip size="small" variant="outlined" label={item.combined.tiers.every((t) => t.tier === 0) ? 'not seen upgraded' : `${marks.tiers} tiers at +${item.combined.at}`} sx={{ height: 18, fontSize: 10 }} />
           )}
           {marks.wished && <Chip size="small" variant="outlined" color="secondary" label="♥ wish" sx={{ height: 18, fontSize: 10 }} data-testid="bazaar-wish-chip" />}
           {chip !== null && <Chip size="small" color={chip.color} label={chip.label} sx={{ height: 18, fontSize: 10 }} data-testid="bazaar-watch-chip" />}

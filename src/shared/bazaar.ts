@@ -308,7 +308,10 @@ function quotesOf(rows: readonly BazaarRow[]): DayQuote[] {
  * Every tier of one item as one entry, its prices read at tier `at`, with each tier's own line beside
  * the estimate. Traded 30d stays in platinum as offered: each tier's own volume, added up.
  */
-function combinedOf(key: string, rows: readonly BazaarRow[], endDay: string, at: number): BazaarItem {
+function combinedOf(key: string, rows: readonly BazaarRow[], endDay: string, asked: number): BazaarItem {
+  // An item nobody offered above +0 (a quest item, a gem, a tradeskill part) is not upgraded:
+  // read at its own price, never grown to the slider's tier by a rate it has no tiers to show.
+  const at = rows.some((r) => r.tier > 0) ? asked : 0
   const rate = tierRate(rows)
   const x = itemOf(key, asBaseTier(rows, rate, at), endDay)
   const perTier = [...new Set(rows.map((r) => r.tier))].sort((a, b) => a - b).map((tier) => itemOf(`${key}|${tier}`, rows.filter((r) => r.tier === tier), endDay))
