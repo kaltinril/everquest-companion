@@ -7,7 +7,7 @@ import { findWatch, watchOnItem, type BazaarWatch, type WatchStatus } from '@sha
 import { formatPlat, type BazaarItem } from '@shared/bazaar'
 import { useBazaarWatch } from './useBazaarWatch'
 
-/** `5k`, `2.5k`, `500`, `500pp` → platinum; blank or unreadable → null. */
+/** `5k`, `2.5k`, `500`, `500p`, `500pp` → platinum; blank or unreadable → null. */
 export function parsePlat(s: string): number | null {
   const m = /^\s*(\d+(?:\.\d+)?)\s*(k|pp|p)?\s*$/i.exec(s)
   if (m === null) return null

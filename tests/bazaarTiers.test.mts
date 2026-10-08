@@ -79,7 +79,7 @@ test('quotes keep their own tier and price when tiers are combined, and export a
   const csv = offersCsv(quotes)
   assert.equal(csv.charCodeAt(0), 0xfeff)
   assert.deepEqual(csv.slice(1).split('\r\n'), [
-    'Date,Time,Who,Direction,Item,Tier,Price (pp),Message',
+    'Date,Time,Who,Direction,Item,Tier,Price (plat),Message',
     '2026-09-25,09:30:00,Aaron,WTB,Cloak,2,3000,"WTB Cloak +2, ""3k"" =pst"',
     '2026-09-24,10:00:00,Leric,WTS,Cloak,0,1000,WTS Cloak 1k',
     ''

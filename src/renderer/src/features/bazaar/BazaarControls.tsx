@@ -17,13 +17,14 @@ const SHOW_LABEL: Record<BazaarShow, string> = {
   ...WATCH_STATUS_LABEL
 }
 
-/** Price floors for Popular, in platinum: anything under a platinum is not worth the trip. */
+/** Price floors, in platinum, labelled the way trade chat says them: anything under 1P is not worth the trip. */
 export const MIN_PRICES: { pp: number; label: string }[] = [
-  { pp: 0, label: 'Any price' },
-  { pp: 1, label: '1pp and up' },
-  { pp: 100, label: '100pp and up' },
-  { pp: 1000, label: '1k and up' },
-  { pp: 5000, label: '5k and up' }
+  { pp: 0, label: 'All' },
+  { pp: 1, label: '1P and up' },
+  { pp: 100, label: '100P and up' },
+  { pp: 1000, label: '1K and up' },
+  { pp: 10_000, label: '10K and up' },
+  { pp: 100_000, label: '100K and up' }
 ]
 
 /** How far back prices count, in days counted back from the log's newest day; 0 is every day. */
