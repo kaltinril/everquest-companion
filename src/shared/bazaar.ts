@@ -135,7 +135,7 @@ export interface TierLine {
   asking: number | null
   offered: number | null
   offers: number
-  /** The combined +0 asking price grown by the item's tier rate. */
+  /** The combined asking price moved to this tier by the item's tier rate. */
   estimate: number | null
 }
 
@@ -143,6 +143,10 @@ export interface CombinedTiers {
   /** How much one tier adds, as a factor (1.22 = 22% a tier). */
   rate: number
   tiers: TierLine[]
+  /** The tier every price of this entry is read at: the "Price at" slider. */
+  at: number
+  /** Someone priced the item at that tier; false means every price here is an estimate from the rate. */
+  atSeen: boolean
 }
 
 /** A column of the tab's list; every one sorts. */
@@ -173,8 +177,12 @@ export interface BazaarQuery {
   keep?: (item: string, tier: number) => boolean
   /** Keep only items whose price now (asking, else offered) is at least this, in platinum. */
   minPrice?: number
-  /** One entry per item, every tier read as +0 (shared/bazaarTiers.ts). */
+  /** One entry per item, every tier read as one tier (shared/bazaarTiers.ts). */
   combineTiers?: boolean
+  /** With combineTiers, the tier the prices are read at; +0 unless named. */
+  priceTier?: number
+  /** Only offers from the last this-many days, counted back from the log's newest day. */
+  sinceDays?: number
 }
 
 export interface BazaarSummary {
@@ -281,7 +289,7 @@ function itemOf(key: string, rows: readonly BazaarRow[], endDay: string): Bazaar
     trades: points.reduce((s, p) => s + p.trades, 0),
     outliers: pricesIn('sell').length + pricesIn('buy').length - kept,
     activeDays: recent.length,
-    volume: ref === null ? null : ref * recentOffers,
+    volume: ref === null || recentOffers === 0 ? null : ref * recentOffers,
     quotes: quotesOf(rows),
     points
   }
@@ -296,21 +304,37 @@ function quotesOf(rows: readonly BazaarRow[]): DayQuote[] {
     .sort(newestFirst)
 }
 
-/** Every tier of one item as one entry priced as its +0, with each tier's own line beside the estimate. */
-function combinedOf(key: string, rows: readonly BazaarRow[], endDay: string): BazaarItem {
+/**
+ * Every tier of one item as one entry, its prices read at tier `at`, with each tier's own line beside
+ * the estimate. Traded 30d stays in platinum as offered: each tier's own volume, added up.
+ */
+function combinedOf(key: string, rows: readonly BazaarRow[], endDay: string, at: number): BazaarItem {
   const rate = tierRate(rows)
-  const x = itemOf(key, asBaseTier(rows, rate), endDay)
-  const tiers = [...new Set(rows.map((r) => r.tier))].sort((a, b) => a - b).map((tier): TierLine => {
-    const t = itemOf(`${key}|${tier}`, rows.filter((r) => r.tier === tier), endDay)
-    return {
-      tier,
+  const x = itemOf(key, asBaseTier(rows, rate, at), endDay)
+  const perTier = [...new Set(rows.map((r) => r.tier))].sort((a, b) => a - b).map((tier) => itemOf(`${key}|${tier}`, rows.filter((r) => r.tier === tier), endDay))
+  const tiers = perTier.map(
+    (t): TierLine => ({
+      tier: t.tier,
       asking: t.asking,
       offered: t.offered,
       offers: t.sellOffers + t.buyOffers + t.trades,
-      estimate: x.asking === null ? null : x.asking * rate ** tier
-    }
-  })
-  return { ...x, combined: { rate, tiers } }
+      estimate: x.asking === null ? null : x.asking * rate ** (t.tier - at)
+    })
+  )
+  const volumes = perTier.flatMap((t) => (t.volume === null ? [] : [t.volume]))
+  const atSeen = tiers.some((t) => t.tier === at && (t.asking !== null || t.offered !== null))
+  return {
+    ...x,
+    volume: volumes.length > 0 ? volumes.reduce((a, b) => a + b, 0) : null,
+    combined: { rate, tiers, at, atSeen }
+  }
+}
+
+/** Rows within the last `days` days of `endDay`; every row when `days` is absent. */
+function within(rows: readonly BazaarRow[], endDay: string, days: number | undefined): readonly BazaarRow[] {
+  if (days === undefined || days <= 0 || endDay === '') return rows
+  const end = Date.parse(endDay)
+  return rows.filter((r) => (end - Date.parse(r.day)) / 86_400_000 < days)
 }
 
 /** Each column's value; null sorts last whichever way the column is turned. */
@@ -359,19 +383,19 @@ function pricedEnough(x: BazaarItem, min: number | undefined): boolean {
 /** The tab: one entry per item and tier that matches, in the asked order, with the log's totals. */
 export function summarizeBazaar(snap: BazaarSnap | null, q: BazaarQuery): BazaarSummary {
   const rows = snap?.rows ?? []
+  const days = [...new Set(rows.map((r) => r.day))].sort()
+  const endDay = days.length > 0 ? days[days.length - 1] : ''
   const groups = new Map<string, BazaarRow[]>()
-  for (const r of rows) {
+  for (const r of within(rows, endDay, q.sinceDays)) {
     const key = q.combineTiers === true ? r.item : `${r.item}|${r.tier}`
     const g = groups.get(key)
     if (g === undefined) groups.set(key, [r])
     else g.push(r)
   }
   const text = q.text.trim().toLowerCase()
-  const days = [...new Set(rows.map((r) => r.day))].sort()
-  const endDay = days.length > 0 ? days[days.length - 1] : ''
   const items = [...groups]
     .filter(([, g]) => matches(g, q, text))
-    .map(([key, g]) => (q.combineTiers === true ? combinedOf(key, g, endDay) : itemOf(key, g, endDay)))
+    .map(([key, g]) => (q.combineTiers === true ? combinedOf(key, g, endDay, q.priceTier ?? 0) : itemOf(key, g, endDay)))
     .filter((x) => pricedEnough(x, q.minPrice))
     .sort(compare(q.sort))
   return {
@@ -403,6 +427,7 @@ export function sparkline(points: readonly BazaarPoint[], endDay: string, n: num
 /** `20000` → `20k`, `2500` → `2.5k`, `75` → `75pp`, `0.5` → `5g`. */
 export function formatPlat(pp: number | null): string {
   if (pp === null) return '-'
+  if (pp >= 1_000_000) return `${Number((pp / 1_000_000).toFixed(pp >= 10_000_000 ? 0 : 1))}M`
   if (pp >= 1000) return `${Number((pp / 1000).toFixed(pp >= 10000 ? 0 : 1))}k`
   if (pp >= 1) return `${Math.round(pp)}pp`
   return `${Number((pp * 10).toFixed(1))}g`

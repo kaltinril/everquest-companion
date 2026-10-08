@@ -58,7 +58,7 @@ function Thresholds({ w, put }: { w: BazaarWatch; put: (w: BazaarWatch) => void 
             const pct = Number(ev.target.value)
             put({ ...w, medianShare: ev.target.value === '' || !(pct > 0) ? null : Math.min(pct, 100) / 100 })
           }}
-          sx={{ width: 200 }}
+          sx={{ width: 250 }}
           slotProps={{ htmlInput: { 'data-testid': 'bazaar-watch-share', min: 1, max: 100 } }}
         />
       )}

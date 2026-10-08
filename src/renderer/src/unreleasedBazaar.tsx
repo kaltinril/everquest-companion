@@ -15,11 +15,20 @@ const LazyBazaarView = UNRELEASED ? lazy(() => import('./features/bazaar/BazaarV
 const LazyBazaarWatcher = UNRELEASED ? lazy(() => import('./features/bazaar/BazaarWatcher')) : null
 
 /** The Bazaar tab: nothing at all in a build without the flag, or on any other view. */
-export default function UnreleasedBazaarView({ view, viewKey }: { view: View; viewKey: string }): JSX.Element | null {
+export default function UnreleasedBazaarView({
+  view,
+  viewKey,
+  onOpenLoot
+}: {
+  view: View
+  viewKey: string
+  /** An item name's click: its page on the Loot tab, as on the Gear tab. */
+  onOpenLoot: (item: string) => void
+}): JSX.Element | null {
   if (!LazyBazaarView || view !== 'bazaar') return null
   return (
     <Suspense fallback={<CircularProgress size={20} />}>
-      <LazyBazaarView key={viewKey} />
+      <LazyBazaarView key={viewKey} onOpenLoot={onOpenLoot} />
     </Suspense>
   )
 }

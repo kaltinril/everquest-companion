@@ -3,7 +3,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { summarizeBazaar, type BazaarRow, type Quote } from '../src/shared/bazaar'
+import { formatPlat, summarizeBazaar, type BazaarItem, type BazaarRow, type Quote } from '../src/shared/bazaar'
 import { DEFAULT_TIER_RATE, asBaseTier, tierRate } from '../src/shared/bazaarTiers'
 import { offersCsv, offersOf } from '../src/shared/bazaarCsv'
 
@@ -84,4 +84,37 @@ test('quotes keep their own tier and price when tiers are combined, and export a
     '2026-09-24,10:00:00,Leric,WTS,Cloak,0,1000,WTS Cloak 1k',
     ''
   ])
+})
+
+test('the Price at tier reads every price at that tier, and says when nobody priced it', () => {
+  const rows = [row(['2026-09-25', 'sell', 'Cloak'], [1000, 1000]), row(['2026-09-25', 'sell', 'Cloak', 2], [4000])]
+  const at = (priceTier: number): BazaarItem =>
+    summarizeBazaar({ rows }, { text: '', dir: 'all', sort: { key: 'item', desc: false }, combineTiers: true, priceTier }).items[0]
+  // Each tier doubles: at +2 the three offers read 4k, 4k and 4k; at +4 nobody listed it.
+  assert.equal(at(2).asking, 4000)
+  assert.equal(at(2).combined?.atSeen, true)
+  assert.equal(at(4).asking, 16000)
+  assert.equal(at(4).combined?.atSeen, false)
+  assert.deepEqual(at(4).combined?.tiers.map((t) => t.estimate), [1000, 4000])
+  // Traded 30d is platinum as offered, whatever tier the prices are read at: 2 x 1k + 1 x 4k.
+  assert.equal(at(0).volume, 6000)
+  assert.equal(at(4).volume, 6000)
+})
+
+test('the days window counts back from the log newest day', () => {
+  const rows = [row(['2026-08-01', 'sell', 'Cloak'], [9000]), row(['2026-09-20', 'sell', 'Cloak'], [1000]), row(['2026-09-25', 'sell', 'Rain Caller'], [5000])]
+  const sum = summarizeBazaar({ rows }, { text: '', dir: 'all', sort: { key: 'item', desc: false }, sinceDays: 10 })
+  assert.deepEqual(sum.items.map((i) => [i.key, i.asking]), [
+    ['Cloak|0', 1000],
+    ['Rain Caller|0', 5000]
+  ])
+  const none = summarizeBazaar({ rows }, { text: '', dir: 'all', sort: { key: 'item', desc: false }, sinceDays: 3 })
+  assert.deepEqual(none.items.map((i) => i.key), ['Rain Caller|0'])
+})
+
+test('millions read as M, and no offers in 30 days is no volume', () => {
+  assert.equal(formatPlat(1_320_000), '1.3M')
+  assert.equal(formatPlat(25_000_000), '25M')
+  const old = summarizeBazaar({ rows: [row(['2026-08-01', 'sell', 'Cloak'], [9000]), row(['2026-09-25', 'sell', 'Rain Caller'], [5000])] }, { text: '', dir: 'all', sort: { key: 'item', desc: false } })
+  assert.equal(old.items.find((i) => i.item === 'Cloak')?.volume, null)
 })
