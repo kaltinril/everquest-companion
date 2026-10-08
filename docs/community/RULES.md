@@ -20,7 +20,8 @@ creator's own repo and does not know the fork exists.
    by `git rerere` so a rebuild replays them.
 
 4. **Never-closing branches never take a PR.** `main_community_rules`, `test-neutering`,
-   `local-data-refresh` and `community_release` exist only for the fork. Nothing on them is offered upstream.
+   `local-data-refresh` and `community_release_rules` exist only for the fork. Nothing on them is
+   offered upstream.
 
 ## Trust
 
