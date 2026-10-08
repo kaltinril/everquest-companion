@@ -160,11 +160,16 @@ asarUnpack:
 # `electron-builder install-app-deps`), or it would ship built against the wrong ABI.
 npmRebuild: false
 
-# NO `publish` BLOCK IN THE TEST BUILD — deliberately. With one, electron-builder writes
-# app-update.yml pointing at jmoyers/everquest-companion and the packaged app would find the
-# official release, stage it, and `autoInstallOnAppQuit` would silently REPLACE this test
-# install with the official app on quit. Without it no update feed exists at all; updater.ts
-# is also guarded off by TEST_BUILD (channel.ts) so the chip honestly reads "disabled".
+# THE TEST BUILD UPDATES FROM THE FORK'S RELEASES, NEVER FROM THE CREATOR'S (since test.20).
+# A `github` publish block would point app-update.yml at a repo's tags, and the official one
+# would stage the creator's release and silently REPLACE this install on quit. So the feed is a
+# GENERIC one at the fork's "latest release" download URL: `scripts/community/publish-release.sh`
+# uploads latest.yml beside the installer, and GitHub redirects /releases/latest/download/<file>
+# to the newest release's asset. The version check is a plain semver comparison, so
+# 0.1.0-test.20 -> 0.1.0-test.21 is an update and the official 1.x line is never offered here.
+publish:
+  - provider: generic
+    url: https://github.com/kaltinril/everquest-companion/releases/latest/download/
 
 win:
   target:
@@ -195,13 +200,11 @@ win:
     # arguments instead. It self-skips when the AZURE_* env is absent, so local
     # dist builds stay unsigned; CI injects the env and signs.
     sign: scripts/azure-sign.cjs
-    # UPDATE SIGNATURE VERIFICATION (do not remove): electron-updater's
-    # NsisUpdater.verifySignature SKIPS all checking when publisherName is null —
-    # a signed build alone protects nothing on the update path. This name must
-    # exactly match the certificate subject CN (Azure profile eq-companion-public).
-    # With it set, every downloaded update must carry a valid Authenticode
-    # signature from this publisher or it is rejected before install.
-    publisherName: Joshua Moyers
+    # NO publisherName IN THE TEST BUILD. The official build sets it so electron-updater rejects
+    # any update not signed by the creator's certificate. TEST builds are not signed (code
+    # signing is shelved, docs/community/RELEASING.md), so with it every update would be
+    # rejected. Without it an update is exactly as trustworthy as a manual download from the
+    # fork's Releases page: both rest on the fork's GitHub account and the HTTPS download.
 
 # One-click installer (Discord model): double-click installs per-user under
 # %LOCALAPPDATA%\Programs (no UAC prompt), then launches. Friendly for friends
