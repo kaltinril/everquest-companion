@@ -180,10 +180,11 @@ test('refresh: an older segment gains the event kind its build did not read', as
   assert.equal(existsSync(`${segmentPath(dir, segment.id)}.old`), false)
 })
 
-test('refresh: refused for a segment this version produced, or with no archive', async () => {
+test('refresh: allowed for a segment this version produced, refused with no archive', async () => {
   const { dir, segment } = olderSegment()
   const deps = { refold: refoldGiving(REFOLDED), producedBy: () => segment.producedBy }
-  assert.deepEqual(await refreshSegment(dir, segment.id, deps), { ok: false, reason: 'this version already produced it' })
+  // A reading can change without the version moving, so the same version may read it again.
+  assert.equal((await refreshSegment(dir, segment.id, deps)).ok, true)
   writeSegment(dir, { ...segment, id: 'no-archive', archivePath: null })
   assert.deepEqual(await refreshSegment(dir, 'no-archive', { ...deps, producedBy: () => NOW }), { ok: false, reason: 'it has no archive to read again' })
   assert.deepEqual(await refreshSegment(dir, 'missing', { ...deps, producedBy: () => NOW }), { ok: false, reason: 'that history was not found' })
@@ -191,7 +192,7 @@ test('refresh: refused for a segment this version produced, or with no archive',
 
 test('refresh: this version may refresh its own segment when the segment lacks a module the engine has', async () => {
   const { dir, segment } = olderSegment()
-  const r = await refreshSegment(dir, segment.id, { refold: refoldGiving(REFOLDED), producedBy: () => segment.producedBy, lacking: () => true })
+  const r = await refreshSegment(dir, segment.id, { refold: refoldGiving(REFOLDED), producedBy: () => segment.producedBy })
   assert.equal(r.ok, true)
 })
 

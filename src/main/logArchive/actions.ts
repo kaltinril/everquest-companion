@@ -323,8 +323,7 @@ export function refreshHistory(id: string): Promise<LogArchiveReply> {
   return exclusive('refreshing a history', async () => {
     const r = await refreshSegment(logArchiveDir(), id, {
       refold: (s) => refoldWithApp(s, true),
-      producedBy: captureDeps.producedBy,
-      lacking: lacksModules
+      producedBy: captureDeps.producedBy
     })
     if (!r.ok) return reply(false, `Not refreshed: ${r.reason}.`)
     liveHistory.forgetHistoryContext()

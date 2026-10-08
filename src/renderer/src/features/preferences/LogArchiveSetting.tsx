@@ -73,7 +73,10 @@ function SegmentLine(props: { s: SegmentRow; newest: boolean; run: (p: Promise<L
         </Typography>
       )}
       <Stack direction="row" spacing={1} sx={{ mt: 0.5 }}>
-        {s.olderEngine && s.archivePath !== null && (
+        {/* Offered whenever the archive is kept, not only for an older version: a reading can change
+            without the version moving (a dev build, or a module that learned something new, as
+            the Bazaar did quoting who said what), and reading it again only replaces the totals. */}
+        {s.archivePath !== null && (
           <ConfirmButton
             testId="log-archive-refresh"
             label="Refresh this history"
