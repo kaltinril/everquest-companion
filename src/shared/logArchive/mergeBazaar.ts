@@ -18,8 +18,8 @@ interface Row {
   sum: number
   /** Every priced offer's platinum per unit (since 2026-10-06). */
   prices?: number[]
-  /** Who said what, the day's first QUOTES_KEPT counted offers (since 2026-10-07). */
-  quotes?: unknown[]
+  /** Who said what: one per person, their newest, the day's latest QUOTES_KEPT people (since 2026-10-07). */
+  quotes?: { who?: string }[]
 }
 
 /** The fold's own cap on a row's quotes (bazaar.rs `QUOTES_KEPT`). */
@@ -46,10 +46,16 @@ function highest(a: number | null, b: number | null): number | null {
   return a === null ? b : b === null ? a : Math.max(a, b)
 }
 
-/** Both sides' quotes, the older first, when either has any (rows from before 2026-10-07 have none). */
+/**
+ * Both sides' quotes when either has any (rows from before 2026-10-07 have none), as the fold keeps
+ * them: one per person, the newer side's winning, the latest QUOTES_KEPT people.
+ */
 function quotesOf(had: Row, r: Row): Pick<Row, 'quotes'> {
   if (had.quotes === undefined && r.quotes === undefined) return {}
-  return { quotes: [...(had.quotes ?? []), ...(r.quotes ?? [])].slice(0, QUOTES_KEPT) }
+  const newer = r.quotes ?? []
+  const said = new Set(newer.map((q) => (q.who ?? '').toLowerCase()))
+  const older = (had.quotes ?? []).filter((q) => !said.has((q.who ?? '').toLowerCase()))
+  return { quotes: [...older, ...newer].slice(-QUOTES_KEPT) }
 }
 
 /** `older` then `newer`, a row on both sides added together; null when either is not a bazaar state. */
