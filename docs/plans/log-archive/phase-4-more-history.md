@@ -188,10 +188,18 @@ Until a module's step lands, that module shows what the live log holds, as it do
   split fixture. One thing cannot be undone: an archived interval locked by a correction that was
   later cleared keeps that loadout, because the archive kept the result, not the evidence.
 
+### 4.13 Resist history
+
+- **Does**: nothing, by design.
+- **As built** (2026-10-08): the `resist` snapshot is two counts over every bucket of the engine's
+  resist ledger, and step 5.2 already keeps each archived log's bucket in that ledger under its own
+  key. The resist card reads every bucket. A merge rule would count the archive twice, so `resist`
+  has no line in the lookup, and a test holds it there.
+
 ## When this phase is done
 
 | Question | Answer |
 |---|---|
 | What changed for players? | Every history surface continues across a rotation. |
 | Can work stop after any single step? | Yes. Each step adds one module's history and nothing else. |
-| What is still not covered? | Resist history and learned messages, which the engine stores in its own files. See phase 5. |
+| What is still not covered? | Nothing by a merge rule: resist history and learned messages are kept by step 5.2 (see 4.13). The buff countdown bars restart from the database (see 4.6). |

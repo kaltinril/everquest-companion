@@ -3,6 +3,10 @@
 // One line per module with a merge rule. A module without a line shows the live log only, as it
 // always has; a segment still stores its snapshot, so the day its line lands it applies to logs
 // archived earlier too (phase 4).
+//
+// `resist` HAS NO LINE ON PURPOSE. Its snapshot is two counts over every bucket of the engine's
+// resist ledger, and an archived log's bucket is already kept in that ledger under its own key
+// (step 5.2, `main/logArchive/engineBuckets.ts`). Adding the archived counts would count it twice.
 
 import { mergeBazaar } from './mergeBazaar'
 import { mergeBuffStats } from './mergeBuffStats'
