@@ -3,7 +3,9 @@
 How a TEST build goes from `release/<version>/` on the owner's machine to a download link anyone
 can use, on the fork's own Releases page:
 <https://github.com/kaltinril/everquest-companion/releases>. This lives on the never-closing
-`community_release` branch, with the script it describes (`scripts/community/publish-release.sh`).
+`community_release_rules` branch, with the script it describes (`scripts/community/publish-release.sh`).
+That branch holds only these two files and merges into `main_community` like `main_community_rules`;
+the build and the release always come from `main_community`.
 
 ## What a community release is
 
