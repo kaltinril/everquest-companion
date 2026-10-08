@@ -146,6 +146,16 @@ Until a module's step lands, that module shows what the live log holds, as it do
   view is not offered for such a fight, as for any fight without an event ring. Rebuilding the
   breakdown from the archive on demand (the idea recorded under ruling 0.4) is not built.
 
+### 4.10 Spell ranks
+
+- **Does**: merges the `observedSpellRanks` module, the highest rank of each spell line this
+  character was seen to merge or cast.
+- **After this step**: rank chips and the spell upgrade plan keep a rank learned in an archived log.
+  The game prints a rank only when a spell is merged or cast, so no `/outputfile` gives it back.
+- **As built** (2026-10-08): every rank takes the higher side, merges add, the first instant is the
+  earlier and the last the later. Exact on a new split fixture (`la3-gems-run.log`, cut after line
+  10), which also holds the spell set and class-loadout snapshots.
+
 ## When this phase is done
 
 | Question | Answer |
