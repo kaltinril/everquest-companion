@@ -112,7 +112,10 @@ function archivedFor(shown: readonly Segment[], moduleId: string, live: unknown,
   const states = kept.map((s) => s.modules[moduleId].state)
   if (moduleId !== 'combo') return states
   const corrections = deps.comboCorrections?.() ?? []
-  return states.map((s) => withCorrections(s, corrections, firstStart(live)))
+  // Each archive's open interval ends where the NEXT stretch begins (the next archive, or the live
+  // log for the newest), so a correction placed in a later stretch cannot reach back into it.
+  const nextStarts = [...states.slice(1).map(firstStart), firstStart(live)]
+  return states.map((s, i) => withCorrections(s, corrections, nextStarts[i]))
 }
 
 export function createHistoryMerge(deps: HistoryDeps): HistoryMerge {

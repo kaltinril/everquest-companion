@@ -76,6 +76,9 @@ export interface Segment {
   /** The learned respawn rows of every mob the fold remembered, watched or not (step 4.14). Absent
    *  on a segment captured before that step, or when the engine could not be read. */
   respawnHistory?: RespawnRow[]
+  /** The app version whose refresh last tried to fill the extras (fights, respawn history, the
+   *  faction ledger). A refresh at launch is not tried again by the same version. */
+  extrasTriedBy?: string
 }
 
 export type ParsedSegment = { ok: true; segment: Segment } | { ok: false; reason: string }

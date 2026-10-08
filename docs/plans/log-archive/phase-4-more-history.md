@@ -187,6 +187,8 @@ Until a module's step lands, that module shows what the live log holds, as it do
   Today's open-ended override does not reach back past the live log's first interval. Exact on the
   split fixture. One thing cannot be undone: an archived interval locked by a correction that was
   later cleared keeps that loadout, because the archive kept the result, not the evidence.
+  With several archives, each archive's open interval ends where the next archive begins (the
+  live log for the newest), so a correction placed in a later stretch cannot lock an earlier one.
 
 ### 4.13 Resist history
 
@@ -213,6 +215,13 @@ Until a module's step lands, that module shows what the live log holds, as it do
   real binary: 41 mobs asked for, none watched, 9 with learned gaps back. A segment without the
   field counts as lacking, so the automatic refresh at launch fills it in for older archives.
   The Timers tab may redraw once while the batches run, for well under a second.
+- **Revised after review** (2026-10-08): the read now runs AFTER the capture's before/after pair
+  has held, not inside it, because inside it any line written during the read threw the whole
+  capture away and an archive during busy play kept failing. The history is kept only if the log
+  still has not moved; otherwise the segment goes without it and the next launch's refresh takes
+  it from the archive. Putting the player's list back is retried, and if it still fails the app
+  re-pushes it by its usual path. A refresh stamps `extrasTriedBy`, so an extra a refold could not
+  read costs one refold per version, not one per launch.
 
 ### 4.15 Fight summaries on Refresh
 
@@ -242,6 +251,10 @@ Until a module's step lands, that module shows what the live log holds, as it do
   not. A ledger exists only if the switch was on when the log was archived, and what it corrects is
   today's standing, not a history shown on a tab; without it the tab would show a standing the
   player knows is wrong.
+- **Known limit**: the window cannot see an archive whose ledger is missing. If one in the middle
+  has none (its write failed and no refresh has run since), the tab can call its correction
+  complete while that stretch's lines are left out. The refresh at launch writes a missing ledger,
+  so this lasts until the next launch at most.
 
 ## When this phase is done
 

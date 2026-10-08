@@ -30,6 +30,7 @@ import { liveLogName } from './refold'
 import { ledgerFileName } from '../../shared/factionLedger'
 import { logInfo } from '../errorLog'
 import { readDefine } from '../dataServer/appKnowledge'
+import { pushAppKnowledge } from '../dataServer/definePush'
 import type { RespawnRow } from '../../shared/respawn'
 import { refreshSegment, sweepRefreshLeftovers } from './refresh'
 import { readJournal, recoverRotation, restoreLog, rotateLog, type RotateDeps } from './rotate'
@@ -60,6 +61,10 @@ async function liveRespawnHistory(modules: Parameters<NonNullable<CaptureDeps['r
     },
     restore: async () => {
       await engineRequest('respawn.define', readDefine('respawn.define'))
+    },
+    restoreFailed: (err) => {
+      logInfo(`[everquest-companion] log archive: the respawn watch list could not be put back directly (${String(err)}); re-pushing it`)
+      pushAppKnowledge('respawn.define')
     }
   })
 }
@@ -131,14 +136,24 @@ function row(s: Segment): SegmentRow {
   }
 }
 
-/** The segment was captured before this engine had one of its modules (a new tab's data), before
- *  step 4.7 kept fight summaries, before step 4.14 kept the respawn history of unwatched mobs, or
- *  has no faction ledger beside it (step 4.16). */
+/** The segment was captured before this engine had one of its modules (a new tab's data), or lacks
+ *  one of the extras (fights, step 4.7; respawn history, 4.14; the faction ledger, 4.16). */
 function lacksModules(s: Segment): boolean {
   if (engineModules === null) return false
-  if (s.fights === undefined || !existsSync(join(logArchiveDir(), ledgerFileName(s.id)))) return true
-  if (engineModules.has('respawn') && s.respawnHistory === undefined) return true
+  if (lacksExtras(s)) return true
   return [...engineModules].some((m) => !Object.prototype.hasOwnProperty.call(s.modules, m))
+}
+
+/**
+ * An extra is missing AND no refresh by this version has tried yet. A refresh whose read of an
+ * extra failed keeps it missing and stamps `extrasTriedBy`, so a failing read costs one refold per
+ * version, not one per launch; an archive made by this version that dropped its respawn history
+ * (capture.ts) is still refreshed once.
+ */
+function lacksExtras(s: Segment): boolean {
+  if (s.extrasTriedBy === app.getVersion()) return false
+  const ledger = existsSync(join(logArchiveDir(), ledgerFileName(s.id)))
+  return s.fights === undefined || s.respawnHistory === undefined || !ledger
 }
 
 /** Ask the engine which captured modules it serves. Once per run, after it has caught up. */

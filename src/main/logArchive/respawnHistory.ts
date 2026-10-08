@@ -25,8 +25,27 @@ export interface RespawnHistoryDeps {
   watch: (keys: readonly string[]) => Promise<void>
   /** The respawn module's clock rows as they stand, or null when they cannot be read. */
   rows: () => Promise<RespawnRow[] | null>
-  /** Put the player's own watch list back. Called once, whatever happened. */
+  /** Put the player's own watch list back. Called whatever happened, retried if it fails. */
   restore: () => Promise<void>
+  /** Told when the list could not be put back after every retry, so the caller can re-push it
+   *  by its own path and say so. */
+  restoreFailed?: (err: unknown) => void
+}
+
+const RESTORE_TRIES = 3
+
+/** `restore`, tried a few times; a list left as a batch would stand until something pushed again. */
+async function restoreList(deps: RespawnHistoryDeps): Promise<void> {
+  let last: unknown
+  for (let i = 0; i < RESTORE_TRIES; i++) {
+    try {
+      await deps.restore()
+      return
+    } catch (err) {
+      last = err
+    }
+  }
+  deps.restoreFailed?.(last)
 }
 
 /** Keys per define: under the engine's 200-watch cap, and few enough that most batches stay under
@@ -78,6 +97,6 @@ export async function readRespawnHistory(keys: readonly string[], deps: RespawnH
   } catch {
     return null
   } finally {
-    await deps.restore().catch(() => undefined)
+    await restoreList(deps)
   }
 }

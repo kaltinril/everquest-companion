@@ -124,14 +124,48 @@ function captureDeps(over: Partial<CaptureDeps> = {}): CaptureDeps & { order: st
   }
 }
 
-test('capture: the respawn history is read inside the before/after pair, after the modules, and kept', async () => {
+test('capture: the respawn history is read after the before/after pair has held, and kept while the log has not moved', async () => {
   const deps = captureDeps()
   const r = await captureSegment(deps)
   assert.ok(r.ok)
   if (!r.ok) return
   assert.deepEqual(r.segment.respawnHistory?.map((x) => x.id), ['guk::a ghoul'])
-  assert.deepEqual(deps.order, ['health', 'respawnHistory', 'health'])
+  assert.deepEqual(deps.order, ['health', 'health', 'respawnHistory', 'health'])
   assert.ok(parseSegment(JSON.parse(JSON.stringify(r.segment))).ok)
+})
+
+test('capture: a line landing during the history read drops the history, never the capture', async () => {
+  let n = 0
+  const deps = captureDeps({
+    health: async () => {
+      n++
+      return { status: 'live', mark: { log: 'live.txt', offset: n >= 3 ? 20 : 10 }, events: 4 }
+    }
+  })
+  const r = await captureSegment(deps)
+  assert.ok(r.ok)
+  assert.ok(r.ok && !('respawnHistory' in r.segment))
+})
+
+test('read: a restore that fails is retried, and the caller is told when every try failed', async () => {
+  let tries = 0
+  const told: unknown[] = []
+  const { deps } = fakeEngine([row('a')], {
+    restore: async () => {
+      tries++
+      if (tries < 2) throw new Error('busy')
+    },
+    restoreFailed: (e) => told.push(e)
+  })
+  assert.equal((await readRespawnHistory(['a'], deps))?.length, 1)
+  assert.equal(tries, 2)
+  assert.deepEqual(told, [])
+  const never = fakeEngine([row('a')], {
+    restore: () => Promise.reject(new Error('gone')),
+    restoreFailed: (e) => told.push(e)
+  })
+  await readRespawnHistory(['a'], never.deps)
+  assert.equal(told.length, 1)
 })
 
 test('capture: no reader, or one that could not read, leaves the field out', async () => {
