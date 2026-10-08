@@ -78,6 +78,19 @@ someone may already have downloaded. Deleting a release is the owner's call.
   `everquest-companion-test` so it has its own install folder and updater cache (a one-click
   install is named after the package; before test.20 both apps shared one folder). A release must therefore be
   marked Latest (the script does), and an install older than test.20 never updates: those players
-  download once by hand.
+  download once by hand. Each release also carries the previous release's `.blockmap`, so an
+  install one version behind downloads only what changed; one further behind gets the whole
+  installer.
+- **Moving over from older installs (since test.20)**, all checked on the owner's machine:
+  - *An older TEST build* (test.19 and before) lived in `%LOCALAPPDATA%\Programs\everquest-companion`,
+    the official app's folder. test.20's installer (`build/installer.nsh`, `eqLeaveSharedFolder`
+    on `test-neutering`) moves it to `everquest-companion-test`; settings are untouched.
+  - *Both apps installed*: the official app's files in the shared folder are left alone; only the
+    TEST exes are removed. The TEST settings are kept and win, since they already exist. An
+    official app an earlier TEST install had overwritten needs one reinstall from the creator's
+    page.
+  - *Only the official app*: on first launch the TEST build copies the official app's settings,
+    learned messages, resist history, item cache, sound packs and UI choices (`channel.ts`
+    `SEED_ENTRIES`); the official app is never changed.
 - **The fork's front page** shows the creator's README, because the default branch is `main`
   and `main` is never committed to. Share the Releases link directly.
