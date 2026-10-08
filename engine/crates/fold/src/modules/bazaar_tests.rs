@@ -332,61 +332,33 @@ fn offers_heard_live_are_kept_for_the_watch_alerts() {
     );
 }
 
-/// The whole parser over a chat corpus with the real item database, for measuring against the
-/// prototype: `BAZAAR_CORPUS=<chat lines> [BAZAAR_ITEMS=<items.json>] [BAZAAR_DUMP=1] cargo test -p fold bazaar_corpus -- --ignored --nocapture`.
 #[test]
-#[ignore]
-fn bazaar_corpus() {
-    let corpus = std::env::var("BAZAAR_CORPUS").expect("BAZAAR_CORPUS");
-    let db: serde_json::Value = serde_json::from_str(
-        &std::fs::read_to_string(std::env::var("BAZAAR_ITEMS").unwrap_or_else(|_| {
-            concat!(
-                env!("CARGO_MANIFEST_DIR"),
-                "/../../../src/main/data/items.json"
-            )
-            .to_string()
-        }))
-        .unwrap(),
-    )
-    .unwrap();
-    let names = db["items"]
-        .as_object()
-        .unwrap()
-        .values()
-        .filter_map(|e| e["page"].as_str().map(str::to_string));
-    let ix = ItemIndex::new(names);
-    let (mut trade, mut with_item, mut with_price, mut offers, mut priced) = (0, 0, 0, 0, 0);
-    for l in std::fs::read_to_string(corpus).unwrap().lines() {
-        let Some((_, msg)) = super::chat_of(crate::message_overlay::message_text_of(l)) else {
-            continue;
-        };
-        let lead = msg
-            .trim_start_matches(|c: char| !c.is_alphanumeric())
-            .to_lowercase();
-        let opens = ["wts", "wtb", "wtt", "selling", "buying", "trading"]
-            .iter()
-            .any(|w| {
-                lead.starts_with(w) && !lead[w.len()..].starts_with(|c: char| c.is_alphanumeric())
-            });
-        if !opens {
-            continue;
-        }
-        trade += 1;
-        let o = parse_trade(msg, &ix);
-        offers += o.len();
-        priced += o.iter().filter(|x| x.price_pp.is_some()).count();
-        with_item += usize::from(!o.is_empty());
-        if std::env::var("BAZAAR_DUMP").is_ok() {
-            println!(
-                "DUMP	{msg}	{}",
-                o.iter().map(short).collect::<Vec<_>>().join(" | ")
-            );
-        }
-        with_price += usize::from(o.iter().any(|x| x.price_pp.is_some()));
+fn the_latest_twenty_people_are_quoted_once_each() {
+    let mut m = BazaarModule::new();
+    let k: Arc<dyn Knowledge> = Arc::new(Names);
+    m.install_knowledge(&k);
+    for i in 0..30 {
+        let raw = format!(
+            "[Wed Sep 23 18:{i:02}:00 2026] Seller{}{} tells General:1, 'WTS Fleeting Quiver 20k'",
+            (b'a' + i as u8 / 26) as char,
+            (b'a' + i as u8 % 26) as char
+        );
+        m.on_event(&line(i64::from(i) + 1, &raw), false);
     }
-    println!(
-        "trade {trade} withItem {with_item} withPrice {with_price} offers {offers} priced {priced}"
-    );
+    // The first seller again, at a new price: their newest quote replaces the old one.
+    let again = "[Wed Sep 23 19:00:00 2026] Selleraa tells General:1, 'WTS Fleeting Quiver 18k'";
+    m.on_event(&line(40, again), false);
+    let quotes = m.snapshot()["state"]["rows"][0]["quotes"].clone();
+    let who: Vec<&str> = quotes
+        .as_array()
+        .expect("quotes")
+        .iter()
+        .filter_map(|q| q["who"].as_str())
+        .collect();
+    assert_eq!(who.len(), 20);
+    assert_eq!(who.first(), Some(&"Selleral"));
+    assert_eq!(who.last(), Some(&"Selleraa"));
+    assert_eq!(quotes[19]["price"], 18000.0);
 }
 
 #[test]
