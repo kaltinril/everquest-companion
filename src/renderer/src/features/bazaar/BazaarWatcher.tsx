@@ -3,16 +3,16 @@
 //
 // It reads the engine's live offers (bazaar.rs `LiveOffer`): only offers heard after the replay
 // caught up are ever there, and the first snapshot's are a baseline, never alerted on (the
-// useLevelUpToast rule: what was already there when you looked is history). A matched offer goes
-// to the alert banner, is said aloud unless the app is muted, and is kept in a short list the tab
-// shows, so one missed with the banner closed is still there to read.
+// useLevelUpToast rule: what was already there when you looked is history). A matched offer fires
+// the 'bazaarWatch' app signal, so the Alerts tab's "Bazaar watchlist match" alert says it with
+// its own sound, voice, banner and cooldown, and is kept in a short list the tab shows, so one
+// missed with the banner closed is still there to read.
 
 import { useEffect, useRef, useSyncExternalStore } from 'react'
 import { BAZAAR_MODULE_ID, type BazaarSnap, type LiveOffer } from '@shared/bazaar'
-import { freshWatchAlerts } from '@shared/bazaarWatch'
+import { freshWatchAlerts, watchAlertCaptures } from '@shared/bazaarWatch'
 import { useModule } from '../../lib/useModule'
-import { currentVoicePrefs, speak } from '../../lib/speech'
-import { currentPrefs } from '../alerts/player'
+import { fireAppSignal } from '../alerts/player'
 import { useBazaarWatch } from './useBazaarWatch'
 
 export interface HeardAlert {
@@ -43,17 +43,7 @@ export function useHeardAlerts(): HeardAlert[] {
 }
 
 function raise(o: LiveOffer, text: string): void {
-  window.eq.showAlertBanner({
-    id: `bazaar:${o.seq}`,
-    alertId: 'bazaar-watch',
-    ts: Date.now(),
-    text,
-    color: o.dir === 'sell' ? 'green' : 'blue'
-  })
-  const prefs = currentPrefs()
-  if (!prefs.muted) {
-    void speak(`${o.item} ${o.dir === 'sell' ? 'for sale' : 'wanted'}`, currentVoicePrefs(), { gain: prefs.globalVolume })
-  }
+  fireAppSignal('bazaarWatch', text, watchAlertCaptures(o))
   record({ seq: o.seq, at: o.at, text })
 }
 

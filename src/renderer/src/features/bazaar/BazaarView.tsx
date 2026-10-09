@@ -196,10 +196,10 @@ function Detail({ item, endDay, onOpenLoot, onHide }: { item: BazaarItem; endDay
   )
 }
 
-const WATCH_CHIP: Record<BazaarWatch['status'], { label: string; color: 'success' | 'info' | 'default' }> = {
-  buy: { label: 'Buy', color: 'success' },
-  sell: { label: 'Sell', color: 'info' },
-  watch: { label: 'Watch', color: 'default' }
+/** The row's watch chip: what alerts on it, or only that it is watched. */
+function watchChipLabel(w: BazaarWatch): string {
+  const on = [w.wts ? 'WTS' : '', w.wtb ? 'WTB' : ''].filter((s) => s !== '')
+  return on.length === 0 ? 'Watch' : `Watch: ${on.join(' + ')}`
 }
 
 interface RowMarks {
@@ -226,7 +226,7 @@ function ItemRow({
   onOpenLoot: (item: string) => void
 }): JSX.Element {
   const spark = sparkline(item.points, endDay, SPARK_DAYS)
-  const chip = marks.watch === null ? null : WATCH_CHIP[marks.watch.status]
+  const chip = marks.watch === null ? null : watchChipLabel(marks.watch)
   return (
     <TableRow hover selected={picked} onClick={onPick} sx={{ cursor: 'pointer' }} data-testid={`bazaar-row-${item.key}`}>
       <TableCell sx={{ fontWeight: picked ? 700 : 400 }}>
@@ -237,7 +237,7 @@ function ItemRow({
             <Chip size="small" variant="outlined" label={item.combined.tiers.every((t) => t.tier === 0) ? 'not seen upgraded' : `${marks.tiers} tiers at +${item.combined.at}`} sx={{ height: 18, fontSize: 10 }} />
           )}
           {marks.wished && <Chip size="small" variant="outlined" color="secondary" label="♥ wish" sx={{ height: 18, fontSize: 10 }} data-testid="bazaar-wish-chip" />}
-          {chip !== null && <Chip size="small" color={chip.color} label={chip.label} sx={{ height: 18, fontSize: 10 }} data-testid="bazaar-watch-chip" />}
+          {chip !== null && <Chip size="small" color="info" label={chip} sx={{ height: 18, fontSize: 10 }} data-testid="bazaar-watch-chip" />}
         </Stack>
       </TableCell>
       <TableCell>
@@ -290,10 +290,7 @@ function PickedPanel(p: { item: BazaarItem; endDay: string; hidden: boolean; set
 function keeperOf(show: BazaarShow, wished: ReadonlySet<string>, watch: BazaarWatchlist): ((item: string, tier: number) => boolean) | undefined {
   if (show === 'all') return undefined
   if (show === 'wish') return (item) => wished.has(itemTierKey(item))
-  return (item, tier) => {
-    const w = findWatch(watch, item, tier)
-    return w !== null && (show === 'watched' || w.status === show)
-  }
+  return (item, tier) => findWatch(watch, item, tier) !== null
 }
 
 const START: BazaarControlState = {

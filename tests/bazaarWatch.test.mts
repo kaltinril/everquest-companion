@@ -10,10 +10,11 @@ import {
   normalizeBazaarWatchlist,
   removeWatch,
   setWatch,
-  watchAlertReason,
-  weekMedianAsking,
+  watchAlertCaptures,
+  watchAlerts,
   type BazaarWatch
 } from '../src/shared/bazaarWatch'
+import { APP_SIGNAL_CAPTURES, applyCaptures, captureNamesIn } from '../src/shared/alertCaptures'
 
 const row = ([day, dir, item, tier = 0]: [string, BazaarRow['dir'], string, number?], prices: number[]): BazaarRow => ({
   day,
@@ -38,81 +39,83 @@ const offer = ([seq, dir, item, tier = 0]: [number, LiveOffer['dir'], string, nu
   price
 })
 
-const watch = (w: Partial<BazaarWatch> & Pick<BazaarWatch, 'item' | 'status'>): BazaarWatch => ({
-  tier: null,
-  alert: true,
-  price: null,
-  medianShare: null,
-  ...w
-})
+const watch = (w: Partial<BazaarWatch> & Pick<BazaarWatch, 'item'>): BazaarWatch => ({ tier: null, wts: false, wtb: false, ...w })
 
 test('a stored watchlist is read defensively and never throws', () => {
   assert.deepEqual(normalizeBazaarWatchlist(undefined), { entries: [] })
   assert.deepEqual(normalizeBazaarWatchlist({ entries: 'no' }), { entries: [] })
   const list = normalizeBazaarWatchlist({
     entries: [
-      { item: 'Fleeting Quiver', tier: null, status: 'buy', alert: true, price: 20000, medianShare: 1.5 },
-      { item: 'fleeting quiver', tier: null, status: 'sell' },
-      { item: '', status: 'buy' },
-      { item: 'Cloak of Flames', tier: 4, status: 'watch', alert: true, price: -3 },
-      { item: 'Rain Caller', status: 'nonsense' }
+      { item: 'Fleeting Quiver', tier: null, wts: true, wtb: true },
+      { item: 'fleeting quiver', tier: null, wts: false },
+      { item: '', wts: true },
+      { item: 'Cloak of Flames', tier: 4, wtb: 'yes' },
+      { item: 'Rain Caller', tier: 99 }
     ]
   })
   assert.deepEqual(list.entries, [
-    // A share over 100% is 100%; the repeat of the same item and tier is dropped.
-    { item: 'Fleeting Quiver', tier: null, status: 'buy', alert: true, price: 20000, medianShare: 1 },
-    // Watching never alerts, and a negative price is no price.
-    { item: 'Cloak of Flames', tier: 4, status: 'watch', alert: false, price: null, medianShare: null }
+    // Both at once; the repeat of the same item and tier is dropped.
+    { item: 'Fleeting Quiver', tier: null, wts: true, wtb: true },
+    // Only `true` is on, and an impossible tier is every tier.
+    { item: 'Cloak of Flames', tier: 4, wts: false, wtb: false },
+    { item: 'Rain Caller', tier: null, wts: false, wtb: false }
+  ])
+})
+
+test('the first shape (one status, one alert switch) reads into the two switches', () => {
+  const list = normalizeBazaarWatchlist({
+    entries: [
+      { item: 'A', tier: null, status: 'buy', alert: true, price: 20000, medianShare: 0.8 },
+      { item: 'B', tier: null, status: 'sell', alert: true, price: null },
+      { item: 'C', tier: null, status: 'buy', alert: false },
+      { item: 'D', tier: 2, status: 'watch', alert: false }
+    ]
+  })
+  assert.deepEqual(list.entries, [
+    { item: 'A', tier: null, wts: true, wtb: false },
+    { item: 'B', tier: null, wts: false, wtb: true },
+    { item: 'C', tier: null, wts: false, wtb: false },
+    { item: 'D', tier: 2, wts: false, wtb: false }
   ])
 })
 
 test('a tier watch wins over an every-tier watch, and edits replace in place', () => {
-  let list = setWatch({ entries: [] }, watch({ item: 'Cloak of Flames', status: 'watch' }))
-  list = setWatch(list, watch({ item: 'Cloak of Flames', tier: 4, status: 'buy' }))
-  assert.equal(findWatch(list, 'cloak of flames', 4)?.status, 'buy')
-  assert.equal(findWatch(list, 'Cloak of Flames', 2)?.status, 'watch')
-  list = setWatch(list, watch({ item: 'Cloak of Flames', tier: 4, status: 'sell' }))
+  let list = setWatch({ entries: [] }, watch({ item: 'Cloak of Flames' }))
+  list = setWatch(list, watch({ item: 'Cloak of Flames', tier: 4, wts: true }))
+  assert.equal(findWatch(list, 'cloak of flames', 4)?.wts, true)
+  assert.equal(findWatch(list, 'Cloak of Flames', 2)?.wts, false)
+  list = setWatch(list, watch({ item: 'Cloak of Flames', tier: 4, wtb: true }))
   assert.equal(list.entries.length, 2)
   list = removeWatch(list, 'Cloak of Flames', null)
   assert.equal(findWatch(list, 'Cloak of Flames', 2), null)
 })
 
-test('want to buy: a sale at or under the price, or under a share of the 7-day median', () => {
-  const w = watch({ item: 'Fleeting Quiver', status: 'buy', price: 20000 })
-  assert.match(watchAlertReason(w, offer([1, 'sell', 'Fleeting Quiver'], 19000), null) ?? '', /under your 20k/)
-  assert.equal(watchAlertReason(w, offer([1, 'sell', 'Fleeting Quiver'], 21000), null), null)
-  // A buyer is no seller, and an unpriced sale cannot be judged against a price.
-  assert.equal(watchAlertReason(w, offer([1, 'buy', 'Fleeting Quiver'], 1000), null), null)
-  assert.equal(watchAlertReason(w, offer([1, 'sell', 'Fleeting Quiver'], null), null), null)
-  const share = watch({ item: 'Fleeting Quiver', status: 'buy', medianShare: 0.8 })
-  assert.match(watchAlertReason(share, offer([1, 'sell', 'Fleeting Quiver'], 16000), 22000) ?? '', /73% of the 7-day median 22k/)
-  assert.equal(watchAlertReason(share, offer([1, 'sell', 'Fleeting Quiver'], 19000), 22000), null)
-  // With neither set, any sale alerts; with the alert off, none does.
-  assert.ok(watchAlertReason(watch({ item: 'Fleeting Quiver', status: 'buy' }), offer([1, 'sell', 'Fleeting Quiver'], null), null))
-  assert.equal(watchAlertReason({ ...w, alert: false }, offer([1, 'sell', 'Fleeting Quiver'], 1), null), null)
+test('WTS and WTB alert independently; a watch with neither only watches', () => {
+  const sale = offer([1, 'sell', 'Fleeting Quiver'], 19000)
+  const want = offer([2, 'buy', 'Fleeting Quiver'], null)
+  const both = watch({ item: 'Fleeting Quiver', wts: true, wtb: true })
+  assert.equal(watchAlerts(both, sale), true)
+  assert.equal(watchAlerts(both, want), true)
+  assert.equal(watchAlerts(watch({ item: 'Fleeting Quiver', wts: true }), want), false)
+  assert.equal(watchAlerts(watch({ item: 'Fleeting Quiver', wtb: true }), sale), false)
+  assert.equal(watchAlerts(watch({ item: 'Fleeting Quiver' }), sale), false)
+  // Another tier is another item, unless the watch is every tier.
+  assert.equal(watchAlerts(watch({ item: 'Bone-Clasped Girdle', tier: 4, wtb: true }), offer([1, 'buy', 'Bone-Clasped Girdle', 3], 9000)), false)
+  assert.equal(watchAlerts(watch({ item: 'Bone-Clasped Girdle', wtb: true }), offer([1, 'buy', 'Bone-Clasped Girdle', 3], 9000)), true)
 })
 
-test('want to sell: a buyer at or over the price, or one who names none', () => {
-  const w = watch({ item: 'Bone-Clasped Girdle', tier: 4, status: 'sell', price: 8000 })
-  assert.match(watchAlertReason(w, offer([1, 'buy', 'Bone-Clasped Girdle', 4], 9000), null) ?? '', /over your 8k/)
-  assert.equal(watchAlertReason(w, offer([1, 'buy', 'Bone-Clasped Girdle', 4], 5000), null), null)
-  assert.equal(watchAlertReason(w, offer([1, 'buy', 'Bone-Clasped Girdle', 4], null), null), 'no price stated')
-  // Another tier is another item.
-  assert.equal(watchAlertReason(w, offer([1, 'buy', 'Bone-Clasped Girdle', 3], 9000), null), null)
-})
-
-test('the 7-day median asking counts only the week ending that day', () => {
-  const rows = [
-    row(['2026-09-10', 'sell', 'Fleeting Quiver'], [50000]),
-    row(['2026-09-20', 'sell', 'Fleeting Quiver'], [20000, 24000]),
-    row(['2026-09-25', 'sell', 'Fleeting Quiver'], [22000]),
-    row(['2026-09-25', 'buy', 'Fleeting Quiver'], [1000])
-  ]
-  assert.equal(weekMedianAsking(rows, 'Fleeting Quiver', 0, '2026-09-25'), 22000)
+test('the bazaarWatch signal declares the tokens it fills, and they fill a phrase', () => {
+  assert.deepEqual(captureNamesIn({ type: 'app', signal: 'bazaarWatch' }), [...APP_SIGNAL_CAPTURES.bazaarWatch])
+  assert.deepEqual(captureNamesIn({ type: 'app', signal: 'bossDefeat' }), [])
+  const caps = watchAlertCaptures(offer([1, 'sell', 'Fleeting Quiver', 4], 18000))
+  assert.deepEqual(Object.keys(caps), [...APP_SIGNAL_CAPTURES.bazaarWatch])
+  assert.equal(applyCaptures('{item} {what}', caps), 'Fleeting Quiver +4 for sale')
+  assert.equal(applyCaptures('{offer}', caps), 'Leric WTS Fleeting Quiver +4 18k')
+  assert.equal(applyCaptures('{seller} wants {item} at {price}', watchAlertCaptures(offer([1, 'buy', 'Rain Caller'], null))), 'Leric wants Rain Caller at no price')
 })
 
 test('the first snapshot is a baseline; later live offers alert once', () => {
-  const list = { entries: [watch({ item: 'Fleeting Quiver', status: 'buy', price: 20000 })] }
+  const list = { entries: [watch({ item: 'Fleeting Quiver', wts: true })] }
   const snap: BazaarSnap = { rows: [], live: [offer([5, 'sell', 'Fleeting Quiver'], 15000)] }
   assert.deepEqual(freshWatchAlerts(snap, list, null), { newest: 5, alerts: [] })
   const later: BazaarSnap = { rows: [], live: [...(snap.live ?? []), offer([6, 'sell', 'Fleeting Quiver'], 18000), offer([7, 'sell', 'Rain Caller'], 1)] }
@@ -120,7 +123,7 @@ test('the first snapshot is a baseline; later live offers alert once', () => {
   assert.equal(fresh.newest, 7)
   assert.deepEqual(
     fresh.alerts.map((a) => a.text),
-    ['Leric WTS Fleeting Quiver 18k (at or under your 20k)']
+    ['Leric WTS Fleeting Quiver 18k']
   )
   assert.deepEqual(freshWatchAlerts(later, list, 7).alerts, [])
 })

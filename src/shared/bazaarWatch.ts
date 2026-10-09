@@ -1,38 +1,26 @@
-// shared/bazaarWatch.ts — the Bazaar watchlist: items the player wants to buy, wants to sell, or
-// only watches, and the alerts a live trade-chat offer raises against them (asked by Malkil,
-// 2026-10-07).
+// shared/bazaarWatch.ts — the Bazaar watchlist: items the player watches, for any reason, and
+// which trade-chat offers on them alert (asked by Malkil, 2026-10-07; made simple 2026-10-08).
 //
-// A watch is an item, a tier or every tier, and a status:
-//   * WANT TO BUY: a WTS (or "selling") offer alerts when it is at or under the watch's price, or
-//     at or under a share of the item's 7-day median asking. With neither set, any WTS alerts.
-//   * WANT TO SELL: a WTB (or "buying") offer alerts when it is at or over the watch's price, or
-//     states no price (someone wants it; the price is a conversation). With no price set, any WTB.
-//   * WATCHING: a filter only, never an alert.
+// A watch is an item, a tier or every tier, and two independent switches:
+//   * `wts`: alert when someone is selling it (a WTS offer);
+//   * `wtb`: alert when someone is buying it (a WTB offer).
+// Either, both or neither: with neither the item is only watched (the My watchlist filter).
+// What an alert sounds and looks like is not here: it fires the 'bazaarWatch' app signal, and the
+// Alerts tab's "Bazaar watchlist match" alert says it, like any other alert.
 // One app-wide list, not per character: what an item sells for does not change with who asks.
 // Stored through the settings store (main/storeBazaarWatch.ts) and normalized on both sides.
 
-import { formatPlat, median, type BazaarRow, type BazaarSnap, type LiveOffer } from './bazaar'
-
-export type WatchStatus = 'buy' | 'sell' | 'watch'
-
-export const WATCH_STATUS_LABEL: Record<WatchStatus, string> = {
-  buy: 'Want to buy',
-  sell: 'Want to sell',
-  watch: 'Watching'
-}
+import { formatPlat, type BazaarSnap, type LiveOffer } from './bazaar'
 
 export interface BazaarWatch {
   /** The item page's spelling, as the bazaar rows carry it. */
   item: string
   /** One upgrade tier, or null for every tier. */
   tier: number | null
-  status: WatchStatus
-  /** Raise an alert when a live offer matches (never for `watch`). */
-  alert: boolean
-  /** Buy: a WTS at or under this; sell: a WTB at or over this. Platinum; null for any price. */
-  price: number | null
-  /** Buy only: a WTS at or under this share of the 7-day median asking (0.8 = 80%). */
-  medianShare: number | null
+  /** Alert on a WTS (someone selling). */
+  wts: boolean
+  /** Alert on a WTB (someone buying). */
+  wtb: boolean
 }
 
 export interface BazaarWatchlist {
@@ -42,12 +30,6 @@ export interface BazaarWatchlist {
 export const EMPTY_WATCHLIST: BazaarWatchlist = { entries: [] }
 export const MAX_WATCHES = 300
 
-const STATUSES: readonly WatchStatus[] = ['buy', 'sell', 'watch']
-
-function positive(x: unknown): number | null {
-  return typeof x === 'number' && Number.isFinite(x) && x > 0 ? x : null
-}
-
 function tierOf(x: unknown): number | null {
   return typeof x === 'number' && Number.isInteger(x) && x >= 0 && x <= 20 ? x : null
 }
@@ -56,17 +38,15 @@ function watchOf(raw: unknown): BazaarWatch | null {
   if (raw === null || typeof raw !== 'object') return null
   const r = raw as Record<string, unknown>
   const item = typeof r.item === 'string' ? r.item.trim().slice(0, 120) : ''
-  const status = STATUSES.find((s) => s === r.status)
-  if (item === '' || status === undefined) return null
-  const tier = tierOf(r.tier)
-  const share = positive(r.medianShare)
+  if (item === '') return null
+  // The first shape (2026-10-07) had one status and one alert switch: want to buy alerted on a
+  // WTS, want to sell on a WTB, watching on neither.
+  const alert = r.alert === true
   return {
     item,
-    tier,
-    status,
-    alert: status !== 'watch' && r.alert === true,
-    price: positive(r.price),
-    medianShare: status === 'buy' && share !== null ? Math.min(share, 1) : null
+    tier: tierOf(r.tier),
+    wts: r.wts === true || (r.status === 'buy' && alert),
+    wtb: r.wtb === true || (r.status === 'sell' && alert)
   }
 }
 
@@ -115,47 +95,33 @@ export function removeWatch(list: BazaarWatchlist, item: string, tier: number | 
   return { entries: list.entries.filter((x) => watchKey(x.item, x.tier) !== k) }
 }
 
-const DAY_MS = 86_400_000
-
-/** Median asking for one item and tier over the 7 days ending `endDay`; null with none. */
-export function weekMedianAsking(rows: readonly BazaarRow[], item: string, tier: number, endDay: string): number | null {
-  const end = Date.parse(endDay)
-  const prices = rows
-    .filter((r) => r.dir === 'sell' && r.item === item && r.tier === tier && end - Date.parse(r.day) < 7 * DAY_MS)
-    .flatMap((r) => r.prices ?? (r.n > 0 ? Array<number>(r.n).fill(r.sum / r.n) : []))
-  return median(prices)
+/** Does this live offer alert under this watch? */
+export function watchAlerts(w: BazaarWatch, o: LiveOffer): boolean {
+  if (o.item.toLowerCase() !== w.item.toLowerCase()) return false
+  if (w.tier !== null && w.tier !== o.tier) return false
+  return o.dir === 'sell' ? w.wts : o.dir === 'buy' ? w.wtb : false
 }
 
-/** Why this live offer alerts under this watch, or null when it does not. */
-export function watchAlertReason(w: BazaarWatch, o: LiveOffer, weekMedian: number | null): string | null {
-  if (!w.alert || o.item.toLowerCase() !== w.item.toLowerCase()) return null
-  if (w.tier !== null && w.tier !== o.tier) return null
-  if (w.status === 'buy' && o.dir === 'sell') return buyReason(w, o.price, weekMedian)
-  if (w.status === 'sell' && o.dir === 'buy') return sellReason(w, o.price)
-  return null
-}
-
-function buyReason(w: BazaarWatch, price: number | null, weekMedian: number | null): string | null {
-  if (w.price === null && w.medianShare === null) return 'on your want-to-buy list'
-  if (price === null) return null
-  if (w.price !== null && price <= w.price) return `at or under your ${formatPlat(w.price)}`
-  const cap = w.medianShare !== null && weekMedian !== null ? w.medianShare * weekMedian : null
-  if (cap !== null && price <= cap) return `${Math.round((price / (weekMedian ?? price)) * 100)}% of the 7-day median ${formatPlat(weekMedian)}`
-  return null
-}
-
-function sellReason(w: BazaarWatch, price: number | null): string | null {
-  if (w.price === null) return 'on your want-to-sell list'
-  if (price === null) return 'no price stated'
-  return price >= w.price ? `at or over your ${formatPlat(w.price)}` : null
-}
-
-/** The banner line for an alert: `Leric WTS Fleeting Quiver +4 18k (at or under your 20k)`. */
-export function watchAlertText(o: LiveOffer, reason: string): string {
+/** The offer as one line: `Leric WTS Fleeting Quiver +4 18k`. */
+export function watchAlertText(o: LiveOffer): string {
   const what = `${o.item}${o.tier > 0 ? ` +${o.tier}` : ''}`
   const verb = o.dir === 'sell' ? 'WTS' : 'WTB'
   const price = o.price === null ? '' : ` ${formatPlat(o.price)}`
-  return `${o.speaker} ${verb} ${what}${price} (${reason})`.slice(0, 120)
+  return `${o.speaker} ${verb} ${what}${price}`.slice(0, 120)
+}
+
+/**
+ * The tokens the 'bazaarWatch' app signal fills (shared/alertCaptures.ts APP_SIGNAL_CAPTURES), so
+ * the alert's banner or spoken phrase can say `{item} {what}` or `{offer}`.
+ */
+export function watchAlertCaptures(o: LiveOffer): Record<string, string> {
+  return {
+    item: `${o.item}${o.tier > 0 ? ` +${o.tier}` : ''}`,
+    seller: o.speaker,
+    price: o.price === null ? 'no price' : formatPlat(o.price),
+    what: o.dir === 'sell' ? 'for sale' : 'wanted',
+    offer: watchAlertText(o)
+  }
 }
 
 export interface WatchAlert {
@@ -175,8 +141,7 @@ export function freshWatchAlerts(snap: BazaarSnap, list: BazaarWatchlist, after:
   for (const o of live) {
     if (o.seq <= after) continue
     const w = findWatch(list, o.item, o.tier)
-    const reason = w === null ? null : watchAlertReason(w, o, weekMedianAsking(snap.rows, o.item, o.tier, o.at.slice(0, 10)))
-    if (reason !== null) alerts.push({ offer: o, text: watchAlertText(o, reason) })
+    if (w !== null && watchAlerts(w, o)) alerts.push({ offer: o, text: watchAlertText(o) })
   }
   return { newest, alerts }
 }
