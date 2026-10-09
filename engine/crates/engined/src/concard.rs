@@ -84,6 +84,12 @@ pub fn chips() -> Vec<ConCardChip> {
     AXES.into_iter().map(blank_chip).collect()
 }
 
+/// A fact the line carried, or absent: an empty string is the parser saying it named nothing, and
+/// the app payload's shape for that is a missing field rather than an empty one.
+fn present(s: &str) -> Option<String> {
+    (!s.is_empty()).then(|| s.to_owned())
+}
+
 /// Is the thing the player just conned a person?
 ///
 /// The `known_mob` half is handed in so the rule can be driven from a test without a corpus, and so
@@ -117,6 +123,10 @@ pub fn card(ev: &ConEvent, knowledge: &dyn Knowledge) -> Option<ConCardMessage> 
         zone: ev.zone.clone(),
         // Absent rather than false, which is the app payload's own shape.
         rare: ev.rare.then_some(true),
+        // The standing and the verdict, as the line printed them (upstream issue #75). The colour
+        // the verdict means is the app's to draw, from the words.
+        faction: present(&ev.faction),
+        difficulty: present(&ev.difficulty),
         chips: chips(),
         spell_data: false,
     })
@@ -141,6 +151,8 @@ mod tests {
             level: Some(52),
             rare: false,
             zone: Some("Nagafen's Lair".to_owned()),
+            faction: "scowls".to_owned(),
+            difficulty: "looks like quite a gamble.".to_owned(),
         }
     }
 
@@ -153,6 +165,20 @@ mod tests {
         assert_eq!(card.zone.as_deref(), Some("Nagafen's Lair"));
         assert_eq!(card.rare, None, "absent rather than false");
         assert_eq!(card.at, 1_787_181_707_000);
+    }
+
+    #[test]
+    fn the_card_carries_the_standing_and_the_verdict_the_line_printed() {
+        let full = card(&con("a fire giant warlord"), &*corpus()).expect("a card");
+        assert_eq!(full.faction.as_deref(), Some("scowls"));
+        assert_eq!(full.difficulty.as_deref(), Some("looks like quite a gamble."));
+        // …and an event that carried neither sends neither, rather than two empty strings.
+        let mut ev = con("a fire giant warlord");
+        ev.faction.clear();
+        ev.difficulty.clear();
+        let bare = card(&ev, &*corpus()).expect("a card");
+        assert_eq!(bare.faction, None);
+        assert_eq!(bare.difficulty, None);
     }
 
     #[test]

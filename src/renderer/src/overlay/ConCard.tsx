@@ -46,6 +46,8 @@
 import { type CSSProperties, type JSX, type MouseEvent, useEffect, useState } from 'react'
 import type { ConCardPayload } from '@shared/conCard'
 import { RESIST_AXIS_WORDS } from '@shared/resistTypes'
+import { CON_COLOR_HEX, CON_COLOR_LABEL } from '@shared/conColor'
+import { CONSIDER_FACTION_COLOR, CONSIDER_FACTION_LABEL, considerDifficultyShort } from '@shared/considerFaction'
 import { lowSamples } from '@shared/resistModel'
 import { RESIST_AXIS_COLORS } from '../features/resists/resistColors'
 import {
@@ -145,6 +147,50 @@ function Identity({ payload, linked }: { payload: ConCardPayload; linked: boolea
         <div data-testid="con-card-facts" style={{ color: MUTED, fontSize: 11, marginTop: 1 }}>
           {facts.join(' · ')}
         </div>
+      )}
+    </div>
+  )
+}
+
+/**
+ * THE STANDING LINE (upstream issue #75): the con colour and the faction rung the game just printed,
+ * for the player whose chat window is on another tab. Both are what the LINE said: the rung is the
+ * parser's 1:1 key, and the colour is `shared/conColor.ts`'s measured reading of the clause. A clause
+ * that table has not measured prints in words with no swatch, never a guessed colour.
+ *
+ * The colour and the rung each carry a WORD beside their hue, the chips' own rule: nobody has to
+ * tell yellow from white by eye over a running game.
+ */
+function Standing({ payload }: { payload: ConCardPayload }): JSX.Element | null {
+  const { conColor, difficulty, faction } = payload
+  const verdict = difficulty === undefined ? undefined : (considerDifficultyShort(difficulty) ?? difficulty)
+  if (conColor === undefined && verdict === undefined && faction === undefined) return null
+  const hue = conColor === undefined ? MUTED : CON_COLOR_HEX[conColor]
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '2px 10px', fontSize: 12 }}>
+      {verdict !== undefined && (
+        <span
+          data-testid="con-card-con"
+          data-con={conColor ?? ''}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}
+        >
+          {conColor !== undefined && (
+            <>
+              <span aria-hidden style={{ width: 10, height: 10, borderRadius: 2, background: hue, flex: '0 0 auto' }} />
+              <span style={{ color: hue, fontWeight: 700 }}>{`${CON_COLOR_LABEL[conColor]} con`}</span>
+            </>
+          )}
+          <span style={{ color: MUTED }}>{conColor === undefined ? verdict : `· ${verdict}`}</span>
+        </span>
+      )}
+      {faction !== undefined && (
+        <span
+          data-testid="con-card-standing"
+          data-faction={faction}
+          style={{ color: CONSIDER_FACTION_COLOR[faction], fontWeight: 700 }}
+        >
+          {CONSIDER_FACTION_LABEL[faction]}
+        </span>
       )}
     </div>
   )
@@ -380,12 +426,12 @@ export function ConCard({
         </button>
       </div>
       <Chips payload={payload} />
-      {/* THE FACTION SLOT (JOS-94). Deliberately EMPTY and deliberately here: the ticket that owns
-          faction-on-con lands its standing read in this exact position, under the resists, and a
-          slot reserved in the layout is the difference between that being an insertion and a
-          redesign. Nothing is drawn, because nothing is known — the con line states a faction RUNG,
-          which is a fact about standing this card does not yet claim to report. */}
-      <div data-testid="con-card-faction" />
+      {/* THE FACTION SLOT (JOS-94), filled by upstream issue #75 in the position it reserved: the
+          con colour and the faction rung the line printed. It reports the RUNG as the game worded
+          it, not a standing number, which the con line does not state. */}
+      <div data-testid="con-card-faction">
+        <Standing payload={payload} />
+      </div>
     </div>
   )
 }
