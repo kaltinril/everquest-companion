@@ -8,7 +8,7 @@
 // schema edit that lands without regenerating turns tests/protocolSchema.test.mts red on the
 // TypeScript side and the protocol-codegen staleness test red on the Rust side.
 //
-// schema-digest: sha256:d02184bb8cfcfc641683a27d6cc3c5d0202f34ea5ffebe5e12abeeb51c85f2c8
+// schema-digest: sha256:4eb6afa7108288eb765f49365080f0ba89d6a0688d91c233bc1d2afb4bd97385
 
 /**
  * Anything that can travel the wire, in either direction. The transport adapters are generic over exactly this: a transport moves ProtocolMessages and knows nothing else about the protocol.
@@ -1451,6 +1451,14 @@ export interface ConCardMessage {
    * The ` - a rare creature - ` infix was on the line. Absent rather than false when it was not, which is the shape the app's payload has.
    */
   rare?: boolean
+  /**
+   * The faction rung the line printed (`scowls`, `threatening`, `amiably`, `ally`, ...), the parser's 1:1 key for the phrase, never inferred. Absent when the event carried none. The card shows it so a player chatting in another window still sees their standing (upstream issue #75).
+   */
+  faction?: string
+  /**
+   * The difficulty clause, VERBATIM (`looks like quite a gamble.`). The game's con colour is a function of it, and the app turns it into one (`shared/conColor.ts`); the engine carries the words, not a colour. Absent when the event carried none.
+   */
+  difficulty?: string
   /**
    * ALWAYS FIVE, ALWAYS IN `RESIST_AXES` ORDER (magic, fire, cold, poison, disease). All five are present whatever the ledger has seen, because `we have not seen fire cast on this` and `fire is fine` are different statements and a missing chip says neither.
    */

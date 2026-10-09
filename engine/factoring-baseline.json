@@ -405,7 +405,7 @@
       "file": "crates/fold/src/modules/consider.rs",
       "metric": "file-lines",
       "name": "",
-      "value": 455
+      "value": 443
     },
     {
       "file": "crates/fold/src/modules/resist/catalog.rs",

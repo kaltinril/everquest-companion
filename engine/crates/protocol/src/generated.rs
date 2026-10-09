@@ -8,7 +8,7 @@
 //! and a schema edit that lands without regenerating turns the protocol-codegen staleness
 //! test red on this side and tests/protocolSchema.test.mts red on the other.
 //!
-//! schema-digest: sha256:d02184bb8cfcfc641683a27d6cc3c5d0202f34ea5ffebe5e12abeeb51c85f2c8
+//! schema-digest: sha256:4eb6afa7108288eb765f49365080f0ba89d6a0688d91c233bc1d2afb4bd97385
 #![allow(missing_docs, clippy::all, clippy::pedantic)]
 
 /// Error types.
@@ -1933,6 +1933,14 @@ pub struct ConCardChip {
 ///        "$ref": "#/$defs/ConCardChip"
 ///      }
 ///    },
+///    "difficulty": {
+///      "description": "The difficulty clause, VERBATIM (`looks like quite a gamble.`). The game's con colour is a function of it, and the app turns it into one (`shared/conColor.ts`); the engine carries the words, not a colour. Absent when the event carried none.",
+///      "type": "string"
+///    },
+///    "faction": {
+///      "description": "The faction rung the line printed (`scowls`, `threatening`, `amiably`, `ally`, ...), the parser's 1:1 key for the phrase, never inferred. Absent when the event carried none. The card shows it so a player chatting in another window still sees their standing (upstream issue #75).",
+///      "type": "string"
+///    },
 ///    "id": {
 ///      "description": "QUEUE IDENTITY: the canonical mob key (`shared/mobKey.ts mobKey`). A re-con REFRESHES the card on screen rather than stacking a second one, which is what the overlay's card queue keys off.",
 ///      "type": "string"
@@ -1975,6 +1983,12 @@ pub struct ConCardMessage {
     pub at: i64,
     ///ALWAYS FIVE, ALWAYS IN `RESIST_AXES` ORDER (magic, fire, cold, poison, disease). All five are present whatever the ledger has seen, because `we have not seen fire cast on this` and `fire is fine` are different statements and a missing chip says neither.
     pub chips: ::std::vec::Vec<ConCardChip>,
+    ///The difficulty clause, VERBATIM (`looks like quite a gamble.`). The game's con colour is a function of it, and the app turns it into one (`shared/conColor.ts`); the engine carries the words, not a colour. Absent when the event carried none.
+    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+    pub difficulty: ::std::option::Option<::std::string::String>,
+    ///The faction rung the line printed (`scowls`, `threatening`, `amiably`, `ally`, ...), the parser's 1:1 key for the phrase, never inferred. Absent when the event carried none. The card shows it so a player chatting in another window still sees their standing (upstream issue #75).
+    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+    pub faction: ::std::option::Option<::std::string::String>,
     ///QUEUE IDENTITY: the canonical mob key (`shared/mobKey.ts mobKey`). A re-con REFRESHES the card on screen rather than stacking a second one, which is what the overlay's card queue keys off.
     pub id: ::std::string::String,
     pub kind: ConCardMessageKind,

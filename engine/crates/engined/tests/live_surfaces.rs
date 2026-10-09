@@ -299,6 +299,8 @@ fn a_live_con_becomes_a_card_and_a_historical_one_becomes_nothing() {
         "the zone the module was holding when the line arrived"
     );
     assert_eq!(card.rare, None, "absent rather than false");
+    assert_eq!(card.faction.as_deref(), Some("threatening"), "the rung the line printed");
+    assert_eq!(card.difficulty.as_deref(), Some("looks like quite a gamble."));
 
     // Five empty chips, and the card says why: with no spell table engine-side this is
     // `mobResistProfile`'s own no-table branch rather than a stub.

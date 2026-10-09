@@ -32,6 +32,8 @@
 // it. Everything here is a type, a constant or a total function, so `npm test` exercises every rule.
 
 import { isPlayerShapedName } from './playerShape'
+import { CONSIDER_FACTION_RUNGS, type ConsiderFaction } from './considerFaction'
+import { conColorOf, type ConColor } from './conColor'
 import {
   RESIST_AXES,
   type MobResistAxis,
@@ -248,6 +250,13 @@ export interface ConCardPayload {
   zone?: string
   /** The ` - a rare creature - ` infix was on the line. */
   rare?: boolean
+  /** The faction rung the line printed (upstream issue #75). Absent when it named none. */
+  faction?: ConsiderFaction
+  /** The difficulty clause, VERBATIM. Absent when the line carried none. */
+  difficulty?: string
+  /** The con colour that clause means (`shared/conColor.ts`). Absent for a clause not yet measured,
+   *  and then the card prints the clause with no swatch rather than a guessed colour. */
+  conColor?: ConColor
   /** Always five, always in `RESIST_AXES` order. */
   chips: ConCardChip[]
   /** False when the client's `spells_us.txt` could not be read; the card says so instead of
@@ -307,4 +316,27 @@ const MAX_NAME_CHARS = 96
 
 export function cappedName(name: string): string {
   return name.replace(/\s+/g, ' ').trim().slice(0, MAX_NAME_CHARS)
+}
+
+/** The standing and the verdict, as the card carries them. */
+export type ConCardStanding = Pick<ConCardPayload, 'faction' | 'difficulty' | 'conColor'>
+
+/**
+ * THE STANDING HALF OF THE CARD (upstream issue #75), from what the con line printed. Both card paths
+ * call this, the app's own and the engine's frame, so the two cannot disagree about it.
+ *
+ * The rung is checked against the ladder rather than cast: it crosses a socket under serve, and a
+ * string the ladder does not name is dropped, never drawn.
+ */
+export function conCardStanding(faction: string | undefined, difficulty: string | undefined): ConCardStanding {
+  const out: ConCardStanding = {}
+  const rung = CONSIDER_FACTION_RUNGS.find((r) => r.faction === faction)
+  if (rung) out.faction = rung.faction
+  const clause = difficulty?.trim()
+  if (clause) {
+    out.difficulty = clause
+    const color = conColorOf(clause)
+    if (color) out.conColor = color
+  }
+  return out
 }

@@ -117,26 +117,8 @@ struct ConsiderRow {
     knowledge: Option<Value>,
 }
 
-/// One live `/con`, as the con-card hook saw it.
-///
-/// A HAND-BACK rather than a callback, for the same ownership reason `take_fires` and `take_derived`
-/// are: a module cannot hold a mutable reference to something the registry is iterating. It carries
-/// the four facts the card is built from and nothing derived — deriving is the serve layer's job.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ConEvent {
-    /// The `ts` of the con line — the LOG's own clock.
-    pub ts: i64,
-    /// The mob's display name, exactly as the line printed it. Uncapped and unfolded here: capping
-    /// is a rendering guarantee and folding is an identity, and both belong to whoever builds the
-    /// card rather than to the module that saw the line.
-    pub mob: String,
-    /// The level the con line stated, when it stated one.
-    pub level: Option<i64>,
-    /// The ` - a rare creature - ` infix was on the line.
-    pub rare: bool,
-    /// The zone the player was in — the module's own, which is why this is not simply the event.
-    pub zone: Option<String>,
-}
+mod con_event;
+pub use con_event::ConEvent;
 
 #[derive(Default)]
 pub struct ConsiderModule {
@@ -389,13 +371,7 @@ impl EqModule for ConsiderModule {
                 // Beside the fold rather than inside it, because the two answer different questions:
                 // `fold_consider` maintains a state, and this is a thing that happened.
                 if live {
-                    self.cons.push(ConEvent {
-                        ts: ev.ts(),
-                        mob: ev.str("mob").unwrap_or_default().to_owned(),
-                        level: ev.int("level"),
-                        rare: ev.bool("rare"),
-                        zone: self.zone.clone(),
-                    });
+                    self.cons.push(ConEvent::from_event(ev, self.zone.clone()));
                 }
             }
             _ => {}

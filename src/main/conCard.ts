@@ -46,6 +46,7 @@ import {
   cappedName,
   conCardChips,
   conCardIsPlayer,
+  conCardStanding,
   conCardSuppressed,
   type ConCardPayload
 } from '../shared/conCard'
@@ -112,7 +113,14 @@ function chipsFor(
 function firstPass(ev: ConsiderEvent, zone: string | undefined, key: string): ConCardPayload {
   const display = cappedName(ev.mob)
   const { chips, spellData } = chipsFor(display)
-  const payload: ConCardPayload = { id: key, ts: ev.ts, name: display, chips, spellData }
+  const payload: ConCardPayload = {
+    id: key,
+    ts: ev.ts,
+    name: display,
+    chips,
+    spellData,
+    ...conCardStanding(ev.faction, ev.difficulty)
+  }
   if (ev.level !== undefined) payload.level = ev.level
   if (zone !== undefined) payload.zone = zone
   if (ev.rare) payload.rare = true
@@ -171,6 +179,9 @@ export interface ServedConCard {
   readonly level?: number
   readonly zone?: string
   readonly rare?: true
+  /** The faction rung and the difficulty clause, as the line printed them (upstream issue #75). */
+  readonly faction?: string
+  readonly difficulty?: string
 }
 
 /**
@@ -222,7 +233,14 @@ export async function noteEngineConCard(card: ServedConCard, now = Date.now()): 
   // finished folding — microseconds — against a card whose whole promise is the two seconds before
   // you decide to fight. `conCardServe.ts` narrates the outcome when this settles.
   const { chips, spellData } = chipsFor(card.name, await servedMobLevel(card.name))
-  const payload: ConCardPayload = { id: card.id, ts: card.at, name: card.name, chips, spellData }
+  const payload: ConCardPayload = {
+    id: card.id,
+    ts: card.at,
+    name: card.name,
+    chips,
+    spellData,
+    ...conCardStanding(card.faction, card.difficulty)
+  }
   if (card.level !== undefined) payload.level = card.level
   if (card.zone !== undefined) payload.zone = card.zone
   if (card.rare === true) payload.rare = true
