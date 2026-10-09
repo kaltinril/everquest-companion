@@ -45,6 +45,13 @@ Since 2026-10-08 a release is built and published by GitHub Actions
 creator's releases are by `build.yml` on a `v*` tag. Nothing is built on the owner's machine. The
 step-by-step checklist is the `community-release` skill (`.claude/skills/community-release/SKILL.md`).
 
+**Pushing branches never releases anything** (owner, 2026-10-08: branches go up between
+releases without starting a version). Only the `community-*` tag starts `community-release.yml`;
+`build.yml` builds on a push to `main` (a CI check that publishes nothing) and releases only on a
+`v*` tag, which the fork never pushes. Feature branches, `main_community` and the rules branches
+start no workflow at all, so they are pushed whenever the work is done and tested, and a release is
+only ever the deliberate tag in step 4.
+
 1. **Prepare** as for any tester build: read the previous `Test build` commit's notes, check every
    recipe branch is level with `main_community`, bump `package.json` and write the notes as a
    commit on `test-neutering` (they become the release notes, so they are written for players),
