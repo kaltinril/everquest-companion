@@ -51,6 +51,7 @@ import {
   type FeedbackPrefill,
   type FeedbackState
 } from './useFeedback'
+import { FORK_FEEDBACK_OFF } from './forkFeedback'
 
 /**
  * The §5.3 disclosure, verbatim. State, never process: it says what IS in the slice and what is
@@ -403,8 +404,8 @@ export default function FeedbackDialog({ open, onClose, prefill }: FeedbackDialo
           <Stack spacing={1.5}>
             {dark && (
               <Alert severity="info" variant="standard" data-testid="feedback-unavailable">
-                Sending isn’t available in this build - it has no feedback endpoint. You can still
-                save a copy of your log slice below and send it another way.
+                {FORK_FEEDBACK_OFF} You can still save a copy of your log slice below and attach it
+                to the issue.
               </Alert>
             )}
             <TypeToggle value={state.fields.type} onChange={state.setType} />

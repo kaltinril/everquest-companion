@@ -18,6 +18,7 @@ import FeedbackIcon from '@mui/icons-material/Feedback'
 // an icon whose only use sits inside a `false &&` branch is tree-shaken out with the branch.
 import RuleFolderIcon from '@mui/icons-material/RuleFolder'
 import UpdateChip from './UpdateChip'
+import { FORK_FEEDBACK_OFF } from '../features/feedback/forkFeedback'
 import { OWNER_TOOLS } from '../devFlags'
 import type { PrefsRouting } from '../appRouting'
 import { GEAR_AREA_VIEWS, VIEW_LABELS, loadGearTab, type View } from '../appViews'
@@ -223,11 +224,13 @@ export default function NavDrawer({
         <List disablePadding>
           {/* Send feedback (Task #65): a dialog, so it is a plain action row — no `selected`
               state to own, because nothing in the nav stays "on" while it is open. */}
-          <ListItemButton data-testid="nav-feedback" onClick={onSendFeedback}>
+          {/* TEST-BUILD NEUTERING (this branch only): disabled, and named for why, since a
+              disabled row draws no tooltip (features/feedback/forkFeedback.ts). */}
+          <ListItemButton data-testid="nav-feedback" onClick={onSendFeedback} disabled aria-label={FORK_FEEDBACK_OFF}>
             <ListItemIcon>
               <FeedbackIcon />
             </ListItemIcon>
-            <ListItemText primary="Send feedback" />
+            <ListItemText primary="Send feedback" secondary="Off in the community build" />
           </ListItemButton>
           <NavRowButton row={PREFERENCES} view={view} onSelect={onSelect} />
         </List>
