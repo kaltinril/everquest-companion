@@ -198,7 +198,8 @@ function Detail({ item, endDay, onOpenLoot, onHide }: { item: BazaarItem; endDay
 
 /** The row's watch chip: what alerts on it, or only that it is watched. */
 function watchChipLabel(w: BazaarWatch): string {
-  const on = [w.wts ? 'WTS' : '', w.wtb ? 'WTB' : ''].filter((s) => s !== '')
+  const wts = w.wtsMax !== null ? `WTS ≤ ${formatPlat(w.wtsMax)}` : w.wtsShare !== null ? `WTS ≤ ${Math.round(w.wtsShare * 100)}% median` : 'WTS'
+  const on = [w.wts ? wts : '', w.wtb ? (w.wtbMin !== null ? `WTB ≥ ${formatPlat(w.wtbMin)}` : 'WTB') : ''].filter((s) => s !== '')
   return on.length === 0 ? 'Watch' : `Watch: ${on.join(' + ')}`
 }
 

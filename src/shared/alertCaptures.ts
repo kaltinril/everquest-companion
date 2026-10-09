@@ -309,7 +309,7 @@ export function captureNamesIn(trigger: AlertTrigger): string[] {
 export const APP_SIGNAL_CAPTURES: Record<AppSignal, readonly string[]> = {
   bossDefeat: [],
   questComplete: [],
-  bazaarWatch: ['item', 'seller', 'price', 'what', 'offer']
+  bazaarWatch: ['item', 'seller', 'price', 'what', 'offer', 'why']
 }
 
 /** Every regex SOURCE one primitive condition carries: its raw pattern, or its `/regex/` matchers. */
