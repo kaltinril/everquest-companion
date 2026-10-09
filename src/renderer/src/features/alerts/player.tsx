@@ -200,8 +200,9 @@ export function previewAlertNow(def: AlertDef): void {
  * double-invocation in the same tick can't double-play. `context` (e.g. the boss
  * name) is reported to main via appFired so the module's recent-fires history —
  * the single source of truth — records the signal with meaningful matched text.
+ * `captures` fill the alert's `{token}`s (shared/alertCaptures.ts APP_SIGNAL_CAPTURES).
  */
-export function fireAppSignal(signal: AppSignal, context = ''): void {
+export function fireAppSignal(signal: AppSignal, context = '', captures?: Record<string, string>): void {
   const now = Date.now()
   for (const def of defs) {
     if (!def.enabled) continue
@@ -210,7 +211,7 @@ export function fireAppSignal(signal: AppSignal, context = ''): void {
     const last = appCooldown.get(def.id)
     if (last !== undefined && now - last < cd) continue
     appCooldown.set(def.id, now)
-    playAlertNow(def)
+    playAlertNow(def, captures ? { captures } : undefined)
     // Route the fire through main so history stays the single source of truth.
     window.eq.appFired(def.id, context)
   }

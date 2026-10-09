@@ -1,20 +1,18 @@
 // BazaarControls — the Bazaar tab's toolbar: search, direction, which items to show (all, the wish
-// list, the watchlist or one of its statuses), Popular with its price floor, how far back prices
+// list or the watchlist), Popular with its price floor, how far back prices
 // count, All tiers as one with its Price at slider, whether items the wiki marks No Drop or No
 // Trade show at all, and the offers list with its CSV export.
 
 import { type JSX } from 'react'
 import { Box, Button, FormControlLabel, MenuItem, Slider, Stack, Switch, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import type { BazaarDir } from '@shared/bazaar'
-import { WATCH_STATUS_LABEL, type WatchStatus } from '@shared/bazaarWatch'
 
-export type BazaarShow = 'all' | 'wish' | 'watched' | WatchStatus
+export type BazaarShow = 'all' | 'wish' | 'watched'
 
 const SHOW_LABEL: Record<BazaarShow, string> = {
   all: 'All items',
   wish: 'On my wish list',
-  watched: 'My watchlist',
-  ...WATCH_STATUS_LABEL
+  watched: 'My watchlist'
 }
 
 /** Price floors, in platinum, labelled the way trade chat says them: anything under 1P is not worth the trip. */

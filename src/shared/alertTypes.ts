@@ -81,7 +81,7 @@ export type LogEventKind =
   | 'unknown'
 
 /** Renderer-side app signals an alert can fire on (evaluated in the player, not main). */
-export type AppSignal = 'bossDefeat' | 'questComplete'
+export type AppSignal = 'bossDefeat' | 'questComplete' | 'bazaarWatch'
 
 /**
  * A PRIMITIVE alert trigger — the three original shapes:

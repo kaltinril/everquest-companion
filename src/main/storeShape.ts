@@ -102,6 +102,8 @@ export interface StoreShape {
    * per-mob cooldown. Absent ⇒ never migrated; see migrateStoredAlertTriggers().
    */
   alertTriggerMigration?: number
+  /** True once the Bazaar watchlist's alert was seeded (src/main/alertBazaarSeed.ts). */
+  alertBazaarSeed?: boolean
   /**
    * WHICH SOUND PACK IS YOURS, AND WHICH SHIPPED ONES YOU THREW AWAY (JOS-273;
    * shared/soundPacks.ts). Two keys, both absent for almost everybody: the default-pack

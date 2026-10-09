@@ -152,7 +152,7 @@
 // PURE, like every other module in `src/shared/**`: no `node:`, no Electron, no DOM. It compiles
 // under both tsconfigs and loads under `tsx` for node:test.
 
-import type { AlertTrigger, AlertTriggerPrimitive } from './alertTypes'
+import type { AlertTrigger, AlertTriggerPrimitive, AppSignal } from './alertTypes'
 import { sanitizeOneLine } from './sanitizeText'
 
 /**
@@ -293,11 +293,23 @@ export function captureNamesIn(trigger: AlertTrigger): string[] {
   const out = new Set<string>()
   const conditions = 'conditions' in trigger ? trigger.conditions : [trigger]
   for (const c of conditions) {
+    if (c.type === 'app') for (const name of APP_SIGNAL_CAPTURES[c.signal]) out.add(name)
     for (const source of conditionRegexSources(c)) {
       for (const m of source.matchAll(GROUP_DECL_RE)) out.add(m[1])
     }
   }
   return [...out]
+}
+
+/**
+ * The tokens an app signal fills, declared by the signal rather than by a pattern: the renderer
+ * builds the values itself (shared/bazaarWatch.ts `watchAlertCaptures`) and they still pass
+ * through `applyCaptures`' sanitizer on the way out.
+ */
+export const APP_SIGNAL_CAPTURES: Record<AppSignal, readonly string[]> = {
+  bossDefeat: [],
+  questComplete: [],
+  bazaarWatch: ['item', 'seller', 'price', 'what', 'offer']
 }
 
 /** Every regex SOURCE one primitive condition carries: its raw pattern, or its `/regex/` matchers. */
