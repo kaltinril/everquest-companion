@@ -158,3 +158,10 @@ creator's own repo and does not know the fork exists.
     owner first. The list lives here, not in an agent's private notes, so every session sees it
     (owner, 2026-10-08, after a simplification of the Bazaar watchlist dropped the price
     thresholds a tester had asked for).
+
+20. **A report that touches the original code is filed upstream too.** Players report to this
+    fork (its issues page, linked from the app). When a report's cause is in code the creator
+    wrote, and not only in a branch of ours, it is also filed as an issue on
+    `jmoyers/everquest-companion`, written courteously and with the evidence, and the fork's
+    record (ISSUES.md) links both. The fix may still land here first on its own branch (owner,
+    2026-10-09).
