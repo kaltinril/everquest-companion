@@ -42,8 +42,8 @@ export function useHeardAlerts(): HeardAlert[] {
   return useSyncExternalStore(subscribe, () => heard)
 }
 
-function raise(o: LiveOffer, text: string): void {
-  fireAppSignal('bazaarWatch', text, watchAlertCaptures(o))
+function raise(o: LiveOffer, reason: string, text: string): void {
+  fireAppSignal('bazaarWatch', text, watchAlertCaptures(o, reason))
   record({ seq: o.seq, at: o.at, text })
 }
 
@@ -60,7 +60,7 @@ export default function BazaarWatcher(): null {
     }
     const { newest, alerts } = freshWatchAlerts(snap, list, seen.current)
     seen.current = newest
-    for (const a of alerts) raise(a.offer, a.text)
+    for (const a of alerts) raise(a.offer, a.reason, a.text)
   }, [snap, list])
 
   return null

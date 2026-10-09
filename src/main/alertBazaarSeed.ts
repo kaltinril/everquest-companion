@@ -22,10 +22,11 @@ const BAZAAR_WATCH_ALERT: AlertDef = {
   enabled: true,
   trigger: { type: 'app', signal: 'bazaarWatch' },
   sound: { packId: DEFAULT_ALERT_PACK_ID, soundId: DEFAULT_ALERT_SOUNDS.buffWearsOff },
-  // "Fleeting Quiver +4 for sale" aloud; "Leric WTS Fleeting Quiver +4 18k" on the banner.
+  // "Fleeting Quiver +4 for sale" aloud; "Leric WTS Fleeting Quiver +4 18k - at or under your
+  // 20k" on the banner.
   audio: 'speech',
   speech: { mode: 'custom', phrase: '{item} {what}' },
-  bannerText: '{offer}',
+  bannerText: '{offer} - {why}',
   note: 'Seeded default - fires when a trade-chat offer matches your Bazaar watchlist (the WTS and WTB boxes on each watch).'
 }
 
