@@ -59,6 +59,24 @@ export const IMAGE_CREDITS: readonly Credit[] = [
 export function ThanksSetting(): JSX.Element {
   return (
     <Stack spacing={1.25} data-testid="prefs-thanks">
+      {/* TEST build (this branch only, never a PR): this build continues the original app, so its
+          author is thanked first, with his repo findable on purpose and labelled as the original. */}
+      <Stack spacing={0.25} data-testid="prefs-thanks-original">
+        <Typography variant="body2">
+          This app is a community continuation of EQ Companion, built by jmoyers. Nearly everything
+          you use here started as his work, and it would not exist without it. Thank you.
+        </Typography>
+        <Link
+          href="https://github.com/jmoyers/everquest-companion"
+          target="_blank"
+          rel="noreferrer"
+          variant="caption"
+          color="text.secondary"
+          data-testid="prefs-thanks-link-original"
+        >
+          The original app on GitHub (no longer updated; this build updates from kaltinril&apos;s fork)
+        </Link>
+      </Stack>
       <Typography variant="body2">
         The pictures in this app are not ours. Item icons and boss portraits come from two
         volunteer-run EverQuest wikis, and they are copied into the app when it is built - so they

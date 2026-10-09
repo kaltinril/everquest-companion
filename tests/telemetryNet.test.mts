@@ -103,8 +103,9 @@ test('COLLECTION is gated on the user’s switch ALONE — that is what makes th
   // T1: "Collection may buffer pre-notice; the network starts only after the notice renders."
   // A buffer that stayed empty until the notice was answered would leave the notice's own
   // "here is what would be sent" panel showing nothing, which is the wrong kind of honest.
-  assert.equal(telemetryCollectEnabled(prefs({ noticeShown: false })), true)
-  assert.equal(telemetryCollectEnabled(prefs()), true)
+  // TEST build: with no endpoint compiled in, nothing collects whatever the switch says.
+  assert.equal(telemetryCollectEnabled(prefs({ noticeShown: false })), TELEMETRY_API_URL !== '')
+  assert.equal(telemetryCollectEnabled(prefs()), TELEMETRY_API_URL !== '')
   assert.equal(telemetryCollectEnabled(prefs({ enabled: false })), false)
   assert.equal(telemetryCollectEnabled(prefs({ enabled: false, noticeShown: false })), false)
 })

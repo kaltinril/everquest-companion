@@ -176,7 +176,10 @@ export function TelemetrySetting(): JSX.Element {
     void window.eq.rotateAnalyticsId().then(refresh)
   }, [refresh])
 
-  const enabled = payload.prefs.enabled
+  // TEST build (this branch only, never a PR): with no endpoint, analytics are off and the switch
+  // says so rather than showing an "on" that nothing behind it honours.
+  const live = payload.endpointConfigured
+  const enabled = live && payload.prefs.enabled
   return (
     <Stack spacing={2} data-testid="pref-telemetry">
       <Stack spacing={0.5}>
@@ -186,6 +189,7 @@ export function TelemetrySetting(): JSX.Element {
               size="small"
               data-testid="pref-telemetry-enabled"
               checked={enabled}
+              disabled={!live}
               onChange={(e) => {
                 setEnabled(e.target.checked)
               }}
@@ -194,7 +198,9 @@ export function TelemetrySetting(): JSX.Element {
           label={<Typography variant="body2">Send anonymous usage counts</Typography>}
         />
         <Typography variant="caption" color="text.secondary">
-          {enabled
+          {!live
+            ? 'Off in this community build: usage counts would go to the original developer’s server, so this build has no analytics address and collects and sends nothing.'
+            : enabled
             ? 'Counts only, from a fixed list of events - never your character names, zones, chat, searches or log lines. There is no field in what’s sent that could hold them.'
             : 'Off. Nothing is collected. Everything that had been buffered (and the random id itself) was thrown away the moment you switched it off; turning it back on starts from empty with a new one.'}
         </Typography>
