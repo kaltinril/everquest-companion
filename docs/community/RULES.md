@@ -146,3 +146,15 @@ creator's own repo and does not know the fork exists.
     (`debug` and `release`), the cargo registry under the user profile, and the downloaded
     Electron and electron-builder caches. Deleting those only makes the next build fetch or
     compile them again (owner, 2026-10-02).
+
+## Requirements
+
+19. **Every feature branch keeps a list of what was asked for**, in
+    `docs/community/requirements/<branch>.md`: one row per request, with the date, who asked
+    (the owner, a tester by name, an upstream issue), the ask in plain words, and its status.
+    A request is added the moment it arrives, before any code. Before changing a feature, read
+    its list and check the change against every row; nothing on the list is removed, narrowed or
+    "simplified away" without the owner's word, and a change that drops a row says so to the
+    owner first. The list lives here, not in an agent's private notes, so every session sees it
+    (owner, 2026-10-08, after a simplification of the Bazaar watchlist dropped the price
+    thresholds a tester had asked for).
