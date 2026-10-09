@@ -12,10 +12,13 @@ import { Button, Stack, Typography } from '@mui/material'
 import BugReportIcon from '@mui/icons-material/BugReport'
 import LightbulbIcon from '@mui/icons-material/Lightbulb'
 import type { FeedbackPrefill } from '../feedback/useFeedback'
+import { FORK_FEEDBACK_OFF } from '../feedback/forkFeedback'
 
 /** Opens the app-level feedback dialog, optionally preselecting a type. */
 export type OpenFeedback = (prefill?: FeedbackPrefill) => void
 
+// TEST-BUILD NEUTERING (this branch only, never a PR): both buttons are disabled and the caption
+// says where reports go instead (features/feedback/forkFeedback.ts).
 export function FeedbackSetting({ onSend }: { onSend: OpenFeedback }): JSX.Element {
   return (
     <Stack spacing={1}>
@@ -25,6 +28,7 @@ export function FeedbackSetting({ onSend }: { onSend: OpenFeedback }): JSX.Eleme
           variant="outlined"
           startIcon={<LightbulbIcon />}
           data-testid="prefs-feedback-feature"
+          disabled
           onClick={() => onSend({ type: 'feature' })}
         >
           Request a feature
@@ -34,14 +38,14 @@ export function FeedbackSetting({ onSend }: { onSend: OpenFeedback }): JSX.Eleme
           variant="outlined"
           startIcon={<BugReportIcon />}
           data-testid="prefs-feedback-bug"
+          disabled
           onClick={() => onSend({ type: 'bug' })}
         >
           Report a problem
         </Button>
       </Stack>
-      <Typography variant="caption" color="text.secondary">
-        A bug report can attach a scrubbed slice of your EverQuest log - chat, tells, group and
-        /who lines are removed, and you read every line that remains before it leaves the machine.
+      <Typography variant="caption" color="text.secondary" data-testid="prefs-feedback-fork-note">
+        {FORK_FEEDBACK_OFF}
       </Typography>
     </Stack>
   )
