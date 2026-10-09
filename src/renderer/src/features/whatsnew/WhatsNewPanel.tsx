@@ -56,16 +56,23 @@ import { WhatsNewDevRow } from './WhatsNewDevRow'
  * running". The releases page answers it, and it is where the downloads and the tags live for
  * anybody who wants them. It opens in the SYSTEM BROWSER: `target="_blank"` is turned into
  * `shell.openExternal` by main's `setWindowOpenHandler`, which passes only an allowlisted https
- * URL — and the `github.com` entry on `EXTERNAL_LINK_ALLOWLIST` (src/main/security.ts) is scoped
- * to THIS repo's subtree (JOS-263), so it opens this link and nothing else on the host. Keep this
- * constant pointing inside `github.com/jmoyers/everquest-companion/`; anywhere else silently
- * fails to open.
+ * URL — and the `github.com` entries on `EXTERNAL_LINK_ALLOWLIST` (src/main/security.ts) are
+ * scoped to a repo's subtree (JOS-263), so they open these links and nothing else on the host.
+ * Keep each constant inside an allowlisted subtree (`jmoyers/everquest-companion/`, or in a TEST
+ * build `kaltinril/everquest-companion/`); anywhere else silently fails to open.
  *
  * It sits BELOW the scroll box rather than inside it: leaving the app is the last thing on offer
  * here, never the first, and a link that scrolled away with the history would be a door that
  * moves.
  */
-const GITHUB_RELEASES_URL = 'https://github.com/jmoyers/everquest-companion/releases'
+const GITHUB_RELEASES_URL = 'https://github.com/kaltinril/everquest-companion/releases'
+
+/**
+ * TEST build (this branch only, never a PR): the original app's releases, still findable but only
+ * on purpose. This build continues the original, which is no longer updated, so the main link is
+ * this build's own releases and the original's is labelled as what it is.
+ */
+const ORIGINAL_RELEASES_URL = 'https://github.com/jmoyers/everquest-companion/releases'
 
 /** What each `kind` is called in front of a person. Entries with no kind get no sub-header at
  *  all — that is the shape of the backfilled releases, which drew no such distinction. */
@@ -255,6 +262,18 @@ export function WhatsNewPanel(): JSX.Element {
         sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, alignSelf: 'flex-start' }}
       >
         All releases on GitHub
+        <OpenInNewIcon sx={{ fontSize: 13 }} />
+      </Link>
+      <Link
+        href={ORIGINAL_RELEASES_URL}
+        target="_blank"
+        rel="noreferrer"
+        variant="caption"
+        color="text.secondary"
+        data-testid="whats-new-original"
+        sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, alignSelf: 'flex-start' }}
+      >
+        The original app&apos;s releases (by jmoyers, no longer updated)
         <OpenInNewIcon sx={{ fontSize: 13 }} />
       </Link>
       {/* DEV-only, and it lives on THIS card rather than beside the dev restart button for the

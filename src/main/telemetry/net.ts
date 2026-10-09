@@ -87,7 +87,9 @@ export function telemetryFlushEnabled(
  * only reader of the ring is the flush loop, and the flush loop is gated above.
  */
 export function telemetryCollectEnabled(prefs: TelemetryPrefs): boolean {
-  return prefs.enabled
+  // TEST build (this branch only, never a PR): no endpoint means analytics are off outright, not
+  // only unsent. Counts from this build must never reach the original developer's server.
+  return prefs.enabled && telemetryEndpointConfigured()
 }
 
 /**

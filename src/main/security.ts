@@ -77,10 +77,15 @@ export const EXTERNAL_LINK_ALLOWLIST: readonly ExternalLinkRule[] = [
   { host: 'eqlwiki.com' },
   { host: 'www.eqlwiki.com' },
   { host: 'wiki.project1999.com' },
-  { host: 'github.com', pathPrefix: '/jmoyers/everquest-companion' }
+  { host: 'github.com', pathPrefix: '/jmoyers/everquest-companion' },
+  // TEST build (this branch only, never a PR): the community fork's own repo, where its releases
+  // live, scoped exactly like the original's.
+  { host: 'github.com', pathPrefix: '/kaltinril/everquest-companion' }
 ]
 
-const ALLOWED_LINK_RULES = new Map(EXTERNAL_LINK_ALLOWLIST.map((r) => [r.host, r] as const))
+/** Every rule for a host: one host may carry several scoped subtrees (github.com does). */
+const ALLOWED_LINK_RULES = new Map<string, ExternalLinkRule[]>()
+for (const r of EXTERNAL_LINK_ALLOWLIST) ALLOWED_LINK_RULES.set(r.host, [...(ALLOWED_LINK_RULES.get(r.host) ?? []), r])
 
 /**
  * Is `pathname` the allowed subtree itself, or something inside it?
@@ -138,9 +143,8 @@ export function allowedExternalUrl(raw: unknown): string | null {
   if (u.protocol !== 'https:') return null
   if (u.username !== '' || u.password !== '') return null
   if (u.port !== '') return null
-  const rule = ALLOWED_LINK_RULES.get(u.hostname)
-  if (!rule) return null
-  if (rule.pathPrefix !== undefined && !isUnderPathPrefix(u.pathname, rule.pathPrefix)) return null
+  const rules = ALLOWED_LINK_RULES.get(u.hostname) ?? []
+  if (!rules.some((rule) => rule.pathPrefix === undefined || isUnderPathPrefix(u.pathname, rule.pathPrefix))) return null
   return u.toString()
 }
 

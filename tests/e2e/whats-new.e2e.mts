@@ -348,8 +348,8 @@ async function checkGitHubLink(page: Page): Promise<void> {
     }
   })
   check(
-    "…pointing at this app's releases page",
-    link.href === 'https://github.com/jmoyers/everquest-companion/releases',
+    "…pointing at this app's releases page (the community fork's, in a TEST build)",
+    link.href === 'https://github.com/kaltinril/everquest-companion/releases',
     `href="${link.href}"`
   )
   check(
