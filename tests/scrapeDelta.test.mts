@@ -2,7 +2,8 @@
 // page's newer revision or to a richer record, and an edited page's stale `|itemname` key goes.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { foldItems, foldRcRow, type PageLogEvent, type RcRow } from '../scripts/scrape-delta.mts'
+import { foldRcRow, type PageLogEvent, type RcRow } from '../scripts/scrape-delta.mts'
+import { foldItems } from '../scripts/sources/deltaItems'
 import { itemKey, type ItemDbEntry, type ItemDbFile } from '../src/main/itemsDb'
 
 const CANON: ItemDbEntry = {
@@ -23,9 +24,17 @@ function file(entries: ItemDbEntry[]): ItemDbFile {
 
 const page = (fields: string): string => `{{Itempage\n${fields}\n}}`
 
+/** Fold over `f` in place, the way the run writes the result. */
+function fold(f: ItemDbFile, pages: Map<string, string>): ReturnType<typeof foldItems> {
+  const r = foldItems(f, pages)
+  f.items = r.items
+  return r
+}
+
 test('an edited variant page does not repoint the canonical key its |itemname names', () => {
   const f = file([CANON])
-  const n = foldItems(f, new Map([[VARIANT, page('|itemname=A Sealed Letter\n|lucy_img_ID=708')]]))
+  const variant = page('|itemname=A Sealed Letter\n|lucy_img_ID=708')
+  const { folded: n } = fold(f, new Map([[VARIANT, variant]]))
   assert.equal(n, 1)
   assert.equal(f.items[itemKey(CANON.page) ?? ''], CANON)
   assert.equal(f.items[itemKey(VARIANT) ?? '']?.page, VARIANT)
@@ -33,7 +42,7 @@ test('an edited variant page does not repoint the canonical key its |itemname na
 
 test("a page's newer revision replaces its own keys even when it is poorer", () => {
   const f = file([CANON])
-  foldItems(f, new Map([[CANON.page, page('|lucy_img_ID=709')]]))
+  fold(f, new Map([[CANON.page, page('|lucy_img_ID=709')]]))
   const now = f.items[itemKey(CANON.page) ?? '']
   assert.equal(now?.page, CANON.page)
   assert.equal(now?.statsBlock, undefined)
@@ -43,7 +52,7 @@ test('a richer record still wins a key held by another page', () => {
   const thin: ItemDbEntry = { page: 'Cyclops skull', iconId: 1 }
   const f = file([thin])
   const richPage = page('|statsblock=MAGIC ITEM  WT: 1.0\n|lucy_img_ID=2')
-  foldItems(f, new Map([['Cyclops Skull', richPage]]))
+  fold(f, new Map([['Cyclops Skull', richPage]]))
   assert.equal(f.items[itemKey('Cyclops skull') ?? '']?.page, 'Cyclops Skull')
 })
 
@@ -51,10 +60,34 @@ test("an edited page's old |itemname key is dropped, another page's key is not",
   const renamed: ItemDbEntry = { page: 'Rusty Thing (quest)', name: 'Old Name', iconId: 3 }
   const other: ItemDbEntry = { page: 'Bystander', iconId: 4 }
   const f = file([renamed, other])
-  foldItems(f, new Map([[renamed.page, page('|itemname=New Name\n|lucy_img_ID=3')]]))
+  fold(f, new Map([[renamed.page, page('|itemname=New Name\n|lucy_img_ID=3')]]))
   assert.equal(f.items[itemKey('Old Name') ?? ''], undefined)
   assert.equal(f.items[itemKey('New Name') ?? '']?.page, renamed.page)
   assert.equal(f.items[itemKey('Bystander') ?? ''], other)
+})
+
+test('a key a changed page stops naming goes to the unchanged page that still claims it', () => {
+  // The wiki's Armadillo Tail page carried |itemname=Armadillo Tooth, a typo, and held that key.
+  const tail: ItemDbEntry = { page: 'Armadillo Tail', name: 'Armadillo Tooth', iconId: 5 }
+  const tooth: ItemDbEntry = { page: 'Armadillo Tooth', name: 'Tooth of an Armadillo', iconId: 6 }
+  const f = file([tooth, tail])
+  assert.equal(f.items['armadillo tooth'], tail)
+  const { orphans } = fold(f, new Map([[tail.page, page('|lucy_img_ID=5')]]))
+  assert.equal(f.items['armadillo tooth'], tooth)
+  assert.deepEqual(orphans, [])
+})
+
+test('a key with no known claimant left is dropped and its name is offered for a read', () => {
+  const tail: ItemDbEntry = { page: 'Armadillo Tail', name: 'Armadillo Tooth', iconId: 5 }
+  const f = file([tail])
+  const edited = page('|lucy_img_ID=5')
+  const first = foldItems(f, new Map([[tail.page, edited]]))
+  assert.equal(first.items['armadillo tooth'], undefined)
+  assert.deepEqual(first.orphans, ['Armadillo Tooth'])
+  const tooth = page('|lucy_img_ID=6')
+  const second = foldItems(f, new Map([[tail.page, edited], ['Armadillo Tooth', tooth]]))
+  assert.equal(second.items['armadillo tooth']?.page, 'Armadillo Tooth')
+  assert.equal(f.items['armadillo tooth'], tail, 'the committed file is not mutated')
 })
 
 test('recentchanges rows: edits are fetched, moves and deletes are only listed', () => {

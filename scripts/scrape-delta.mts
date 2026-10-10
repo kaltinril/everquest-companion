@@ -13,7 +13,7 @@
 // deletes are listed for a human, never applied.
 //
 // This file deliberately does not touch the full scrapers: importing scrape-items.ts would run
-// its main, so its three tiny page->record helpers are mirrored here (marked below) — the real
+// its main, so its three tiny page->record helpers are mirrored in sources/deltaItems.ts — the real
 // parsing lives in src/main/itemLookupParse.ts and scripts/sources/mobPage.ts and is imported.
 //
 // After a run that changed anything: `npm run gen:data-weight` (the ledger pins exact bytes).
@@ -21,8 +21,8 @@
 import { readFileSync, renameSync, writeFileSync } from 'fs'
 import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
-import { parseItemWikitext, templateField } from '../src/main/itemLookupParse'
-import { itemKey, type ItemDbEntry, type ItemDbFile } from '../src/main/itemsDb'
+import { itemKey, type ItemDbFile } from '../src/main/itemsDb'
+import { foldItems } from './sources/deltaItems'
 import { isMobPage, parseMobPage } from './sources/mobPage'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
@@ -198,73 +198,8 @@ async function fetchWikitext(titles: string[]): Promise<Map<string, string>> {
   return out
 }
 
-// ---- mirrored from scripts/scrape-items.ts (whose import would run its main) -------------------
-
-function isItemPage(wikitext: string): boolean {
-  return /\{\{\s*Itempage\b/i.test(wikitext)
-}
-
-function displayName(wikitext: string, title: string): string | undefined {
-  const raw = templateField(wikitext, 'itemname')?.replace(/\s+/g, ' ').trim()
-  if (!raw || raw.length > 80) return undefined
-  if (/[{}[\]|<>]/.test(raw)) return undefined
-  return raw === title ? undefined : raw
-}
-
-function isEmptyValue(v: unknown): boolean {
-  return v === undefined || v === false || (Array.isArray(v) && v.length === 0)
-}
-
-function toEntry(title: string, wikitext: string): ItemDbEntry | null {
-  const parsed = parseItemWikitext(title, wikitext)
-  const name = displayName(wikitext, title)
-  const full = { page: title, ...parsed, ...(name ? { name } : {}) }
-  const kept = Object.entries(full).filter(([, v]) => !isEmptyValue(v))
-  const entry = Object.fromEntries(kept) as unknown as ItemDbEntry
-  return Object.keys(entry).length > 1 ? entry : null
-}
-
-// ------------------------------------------------------------------------------------------------
-
 function main(): void {
   void run()
-}
-
-/** The keys a record registers: its page title and, when it differs, its `|itemname`. */
-function entryKeys(entry: ItemDbEntry): string[] {
-  const keys = [itemKey(entry.page), entry.name ? itemKey(entry.name) : null]
-  return keys.filter((k): k is string => !!k)
-}
-
-/**
- * Items: scrape-items.ts's `addKeys` law, applied to a delta. A key changes hands only to its own
- * page's newer revision or to a RICHER record, so an edited variant page (A Sealed Letter (Thex
- * Dagger Quest), `|itemname` "A Sealed Letter") never repoints the canonical page's key. Keys a
- * changed page held under an older `|itemname` are dropped before the fold.
- */
-export function foldItems(itemsFile: ItemDbFile, wikitext: Map<string, string>): number {
-  const entries = new Map<string, ItemDbEntry>()
-  for (const [title, wt] of wikitext) {
-    const entry = isItemPage(wt) ? toEntry(title, wt) : null
-    if (entry) entries.set(entry.page, entry)
-  }
-  const items = Object.fromEntries(
-    Object.entries(itemsFile.items).filter(([k, prev]) => {
-      const next = entries.get(prev.page)
-      return !next || entryKeys(next).includes(k)
-    })
-  )
-  for (const entry of entries.values()) {
-    for (const k of entryKeys(entry)) if (claims(entry, items[k])) items[k] = entry
-  }
-  itemsFile.items = items
-  return entries.size
-}
-
-/** Does `entry` take a key `prev` holds? Its own page's newer revision does, else only richer. */
-function claims(entry: ItemDbEntry, prev: ItemDbEntry | undefined): boolean {
-  if (!prev || prev.page === entry.page) return true
-  return JSON.stringify(entry).length > JSON.stringify(prev).length
 }
 
 /** Mobs: the same fold, keyed by page over the committed sorted list. */
@@ -311,9 +246,16 @@ async function run(): Promise<void> {
   }
 
   const wikitext = await fetchWikitext(changed)
-
-  const itemsTouched = foldItems(itemsFile, wikitext)
-  const distinctPages = new Set(Object.values(itemsFile.items).map((e) => e.page)).size
+  let itemFold = foldItems(itemsFile, wikitext)
+  // A key whose last known claimant let go may still have a page of that name: read it and refold.
+  const orphans = itemFold.orphans.filter((t) => !wikitext.has(t))
+  if (orphans.length > 0) {
+    console.log(`  ${orphans.length} item keys lost their holder; reading those titles`)
+    for (const [t, wt] of await fetchWikitext(orphans)) wikitext.set(t, wt)
+    itemFold = foldItems(itemsFile, wikitext)
+  }
+  const itemsTouched = itemFold.folded
+  const distinctPages = new Set(Object.values(itemFold.items).map((e) => e.page)).size
   const itemsOut: ItemDbFile = {
     scrapedAt: new Date().toISOString(),
     source: itemsFile.source.includes('delta')
@@ -321,7 +263,7 @@ async function run(): Promise<void> {
       : `${itemsFile.source} + recentchanges delta (scripts/scrape-delta.mts)`,
     count: distinctPages,
     items: Object.fromEntries(
-      Object.entries(itemsFile.items).sort((a, b) => a[0].localeCompare(b[0]))
+      Object.entries(itemFold.items).sort((a, b) => a[0].localeCompare(b[0]))
     )
   }
 
