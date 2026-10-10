@@ -22,6 +22,68 @@
 !macroend
 
 # ---------------------------------------------------------------------------------------
+# eqAskBeforeDowngrade - an older installer asks before replacing a newer install.
+#
+# The stock one-click installer replaces whatever is installed, newer or not, so an old setup
+# exe found by a Start-menu search silently rolls the app back. This compares the installed
+# DisplayVersion (written by registryAddInstallInfo) with this installer's ${VERSION} and asks,
+# defaulting to No. Silent runs (/S, the updater) answer Yes: whoever scripted them chose the
+# version. Inserted from customInit, after initMultiUser, so SHELL_CONTEXT and LogicLib exist.
+!include WordFunc.nsh
+
+# VersionCompare reads only dotted numbers: 1.2.3 -> 1.2.3.1.0 and 1.2.3-test.22 -> 1.2.3.0.22,
+# so a prerelease sorts below its release and then by its last number.
+!macro eqDottedVersion IN OUT
+  StrCpy $eqVerPos 0
+  ${Do}
+    StrCpy $eqVerChar "${IN}" 1 $eqVerPos
+    ${IfThen} $eqVerChar == "" ${|} ${ExitDo} ${|}
+    ${IfThen} $eqVerChar == "-" ${|} ${ExitDo} ${|}
+    IntOp $eqVerPos $eqVerPos + 1
+  ${Loop}
+  StrCpy ${OUT} "${IN}" $eqVerPos
+  ${If} $eqVerChar == ""
+    StrCpy ${OUT} "${OUT}.1.0"
+  ${Else}
+    StrCpy $eqVerPos 0
+    ${Do}
+      IntOp $eqVerPos $eqVerPos - 1
+      StrCpy $eqVerChar "${IN}" 1 $eqVerPos
+      ${IfThen} $eqVerChar == "." ${|} ${ExitDo} ${|}
+      ${IfThen} $eqVerChar == "-" ${|} ${ExitDo} ${|}
+    ${Loop}
+    IntOp $eqVerPos $eqVerPos + 1
+    StrCpy $eqVerChar 0
+    ${If} $eqVerPos < 0
+      StrCpy $eqVerChar "${IN}" "" $eqVerPos
+    ${EndIf}
+    IntOp $eqVerChar $eqVerChar + 0
+    StrCpy ${OUT} "${OUT}.0.$eqVerChar"
+  ${EndIf}
+!macroend
+
+!macro eqAskBeforeDowngrade
+  Var /GLOBAL eqVerInstalled
+  Var /GLOBAL eqVerPos
+  Var /GLOBAL eqVerChar
+  Var /GLOBAL eqVerOld
+  Var /GLOBAL eqVerNew
+  ClearErrors
+  ReadRegStr $eqVerInstalled SHELL_CONTEXT "${UNINSTALL_REGISTRY_KEY}" "DisplayVersion"
+  ClearErrors
+  ${If} $eqVerInstalled != ""
+    !insertmacro eqDottedVersion $eqVerInstalled $eqVerOld
+    !insertmacro eqDottedVersion "${VERSION}" $eqVerNew
+    ${VersionCompare} $eqVerOld $eqVerNew $eqVerChar
+    ${If} $eqVerChar == 1
+      ${If} ${Cmd} `MessageBox MB_YESNO|MB_ICONEXCLAMATION|MB_DEFBUTTON2|MB_TOPMOST|MB_SETFOREGROUND "A newer ${PRODUCT_NAME} is already installed (version $eqVerInstalled).$\r$\n$\r$\nThis installer is the older version ${VERSION}. Replace the newer version with it?" /SD IDYES IDNO`
+        Quit
+      ${EndIf}
+    ${EndIf}
+  ${EndIf}
+!macroend
+
+# ---------------------------------------------------------------------------------------
 # customInit - refuse cleanly on Windows 8.1 and older instead of installing an app that
 # cannot start.
 #
@@ -147,6 +209,8 @@
   !verbose 4
   !echo "everquest-companion: customInit inserted (Windows 10+ gate is live)"
   !verbose pop
+
+  !insertmacro eqAskBeforeDowngrade
 
   ${IfNot} ${AtLeastWin10}
     # Deliberately ONE line and one sentence: it names the requirement and stops.
