@@ -107,8 +107,9 @@ creator's own repo and does not know the fork exists.
     his next distillation pass. Fork rules live here, not there. `CLAUDE.md` at the root is the
     hook that carries the full pointer.
 
-15. **The wiki is not ours to hammer.** No new network fetches ship in a PR without the owner's
-    and the creator's sign-off. Data refreshes are an owner decision, run by hand, at the
+15. **The wiki is not ours to hammer.** No new network fetches ship without the owner's
+    sign-off (the creator's is no longer needed while the fork runs the project, owner
+    2026-09-28). Data refreshes are an owner decision, run by hand, at the
     creator's 1 request per second etiquette, and land on `local-data-refresh`.
 
 ## The workspace
