@@ -51,6 +51,7 @@ import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
 import { parseItemWikitext, templateField } from '../src/main/itemLookupParse'
 import { itemKey, type ItemDbEntry, type ItemDbFile } from '../src/main/itemsDb'
+import { isMain } from './sources/isMain'
 
 const API = 'https://eqlwiki.com/api.php'
 const UA = 'everquest-companion/0.1 (personal quest tracker)'
@@ -244,7 +245,7 @@ export function toEntry(title: string, wikitext: string): ItemDbEntry | null {
 
 // ---- main ------------------------------------------------------------------------------
 
-interface RunStats {
+export interface RunStats {
   pages: number
   entries: number
   notItem: number
@@ -265,23 +266,39 @@ interface RunStats {
  * (law 2). One of the pair is normally the filled-in page and the other a near-stub, so the
  * RICHER record wins (more serialized bytes = more fields the page actually stated); ties go
  * to the first title in sort order, which keeps the output deterministic either way.
+ *
+ * Titles are registered FIRST and an alias never takes a key a page title holds: a page whose
+ * `|itemname` was copy-pasted from another item ('Armadillo Tail' naming 'Armadillo Tooth')
+ * would otherwise evict the real page whenever its record serialized longer.
  */
-function addKeys(items: Map<string, ItemDbEntry>, entry: ItemDbEntry, stats: RunStats): void {
-  const keys = [itemKey(entry.page)]
-  if (entry.name) {
-    keys.push(itemKey(entry.name))
-    stats.aliases++
-  }
-  for (const k of keys) {
-    if (!k) continue
-    const prev = items.get(k)
-    if (prev) stats.collisions++
-    if (!prev || JSON.stringify(entry).length > JSON.stringify(prev).length) items.set(k, entry)
-  }
+function claimKey(items: Map<string, ItemDbEntry>, k: string, entry: ItemDbEntry, stats: RunStats): void {
+  const prev = items.get(k)
+  if (prev) stats.collisions++
+  if (!prev || JSON.stringify(entry).length > JSON.stringify(prev).length) items.set(k, entry)
 }
 
-/** Fold one fetched page into the index, counting exactly why it produced no record. */
-function foldPage(p: RevPage, items: Map<string, ItemDbEntry>, stats: RunStats): void {
+/** A disambiguated title's base name: `Dimensional Hole (Item)` → `Dimensional Hole`. */
+function baseTitle(page: string): string | undefined {
+  return /^(.+?)\s*\(Item\)$/i.exec(page)?.[1]
+}
+
+export function buildIndex(entries: ItemDbEntry[], stats: RunStats): Map<string, ItemDbEntry> {
+  const items = new Map<string, ItemDbEntry>()
+  for (const e of entries) {
+    const k = itemKey(e.page)
+    if (k) claimKey(items, k, e, stats)
+  }
+  const titled = new Set(items.keys())
+  for (const e of entries) {
+    if (e.name) stats.aliases++
+    const aliases = new Set([e.name, baseTitle(e.page)].map((a) => (a ? itemKey(a) : '')))
+    for (const k of aliases) if (k && !titled.has(k)) claimKey(items, k, e, stats)
+  }
+  return items
+}
+
+/** Fold one fetched page into the entry list, counting exactly why it produced no record. */
+function foldPage(p: RevPage, entries: ItemDbEntry[], stats: RunStats): void {
   const wt = p.revisions?.[0]?.slots?.main?.content
   if (p.missing === true || wt == null) {
     stats.missing++
@@ -297,7 +314,7 @@ function foldPage(p: RevPage, items: Map<string, ItemDbEntry>, stats: RunStats):
     return
   }
   stats.entries++
-  addKeys(items, entry, stats)
+  entries.push(entry)
 }
 
 async function collectPages(): Promise<Member[]> {
@@ -333,16 +350,17 @@ async function main(): Promise<void> {
   const batches = Math.ceil(pages.length / BATCH)
   console.log(`\nFetching ${pages.length} pages in ${batches} batches of ${BATCH}…`)
 
-  const items = new Map<string, ItemDbEntry>()
+  const entries: ItemDbEntry[] = []
   const stats: RunStats = {
     pages: pages.length, entries: 0, notItem: 0, missing: 0, empty: 0, aliases: 0, collisions: 0
   }
   for (let i = 0; i < pages.length; i += BATCH) {
-    for (const p of await fetchBatch(pages.slice(i, i + BATCH))) foldPage(p, items, stats)
+    for (const p of await fetchBatch(pages.slice(i, i + BATCH))) foldPage(p, entries, stats)
     const n = i / BATCH + 1
     if (n % 25 === 0) console.log(`  batch ${n}/${batches}  (items so far: ${stats.entries})`)
   }
 
+  const items = buildIndex(entries, stats)
   // Sorted keys ⇒ a deterministic file ⇒ a re-scrape diffs cleanly against the wiki.
   const sorted = Object.fromEntries([...items.entries()].sort((a, b) => a[0].localeCompare(b[0])))
   const out: ItemDbFile = {
@@ -361,4 +379,4 @@ async function main(): Promise<void> {
   printSummary(stats, items.size, Buffer.byteLength(json), startedAt)
 }
 
-void main()
+if (isMain(import.meta.url)) void main()
