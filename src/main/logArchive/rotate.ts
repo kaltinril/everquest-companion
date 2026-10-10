@@ -139,6 +139,9 @@ async function finishFromMoved(dir: string, j: Journal, deps: RotateDeps): Promi
 /** Archive the live log behind a captured segment. The caller has run the preflight. */
 export async function rotateLog(logPath: string, dir: string, captured: Segment, deps: RotateDeps): Promise<RotateResult> {
   const j: Journal = { v: 1, logPath, movedPath: join(dir, `${captured.id}.moving`), segmentId: captured.id, step: 'moving' }
+  // A log captured again at the same length has the same id as the history kept from it (Back up,
+  // then Keep, then Archive with nothing played): a move that fails must leave that record as it was.
+  const prior = deps.readSegment(dir, captured.id)
   try {
     deps.writeSegment(dir, captured)
     writeJournal(dir, j)
@@ -146,6 +149,7 @@ export async function rotateLog(logPath: string, dir: string, captured: Segment,
     renameSync(logPath, j.movedPath)
   } catch (err) {
     clearJournal(dir)
+    if (prior !== null) deps.writeSegment(dir, prior)
     const busy = (err as NodeJS.ErrnoException).code === 'EBUSY' || (err as NodeJS.ErrnoException).code === 'EPERM'
     const reason = busy
       ? 'another program is holding the log open, so it was not moved. Nothing has changed.'

@@ -92,13 +92,15 @@ const POLL_MS = 250
 function launch(req: SecondFoldRequest, token: string): Promise<{ child: EngineProcess; port: number }> {
   const child = req.spawn(req.bin)
   return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => {
-      reject(new Error('the second engine did not announce a port'))
-    }, ANNOUNCE_MS)
-    child.on('error', (err) => {
+    // A launch that fails never reaches foldWithSecondEngine's `finally`, so it stops the child here.
+    const fail = (err: Error): void => {
       clearTimeout(timer)
+      child.stdin?.end()
+      child.kill()
       reject(err)
-    })
+    }
+    const timer = setTimeout(() => fail(new Error('the second engine did not announce a port')), ANNOUNCE_MS)
+    child.on('error', fail)
     child.on('exit', (code) => {
       clearTimeout(timer)
       reject(new Error(`the second engine exited early (code ${String(code)})`))
