@@ -2,18 +2,18 @@ import { type JSX, useMemo, useState } from 'react'
 import type { OverlayKind } from '@shared/types'
 import type { CombatSnapshot, SegmentView } from '@shared/combat'
 import { formatTime } from '../lib/formatDate'
+import { fmtDur } from '../features/combat/copyTable'
 import { scopeOptions } from '../features/combat/dashboardData'
 import { useGlobalFight } from '../features/combat/useGlobalFight'
-import { type OverlaySelectRow } from './OverlaySelect'
+import { relativeAge, type OverlaySelectRow } from './OverlaySelect'
 import { OverlayHeader } from './OverlayHeader'
 import { HealBars } from './healBars'
 import { useMeterScope } from '../features/combat/useCombatPrefs'
 import { EMPTY_ROSTER, chipLabel } from '@shared/roster'
 import { ICON_ACCENT_GREEN } from './IconButton'
 import { MeterPane } from './scopeFloor'
-import { TextScaleStepper } from './TextScaleStepper'
-import { FOOTER_ROW } from './overlayScale'
-import { useOverlayChrome, type OverlayChrome } from './useOverlayChrome'
+import { BgFooter } from './BgFooter'
+import { useOverlayChrome } from './useOverlayChrome'
 import { useOverlayCombat } from './useOverlayCombat'
 
 /**
@@ -53,23 +53,6 @@ import { useOverlayCombat } from './useOverlayCombat'
 const HEAL_GOLD = '#7fd1a0'
 
 const LIVE = '__live__'
-
-function fmtDur(sec: number): string {
-  const s = Math.max(0, Math.round(sec))
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
-}
-
-/** Coarse, live-updating relative age for selector rows (Task #54 disambiguation timing). */
-function relativeAge(ts: number, now: number): string {
-  if (!ts) return ''
-  const secs = Math.max(0, (now - ts) / 1000)
-  if (secs < 45) return 'now'
-  const mins = secs / 60
-  if (mins < 60) return `${Math.round(mins)}m`
-  const hrs = mins / 60
-  if (hrs < 36) return `${Math.round(hrs)}h`
-  return `${Math.round(hrs / 24)}d`
-}
 
 /** Everything the chrome renders, resolved from one snapshot in one place. */
 interface HealView {
@@ -227,47 +210,7 @@ export default function HealMeter(): JSX.Element {
         <HealBars seg={seg} scope={meterScope} roster={roster} drill={drill} setDrill={locked ? null : setDrill} live={live} />
       </MeterPane>
 
-      {!locked && <HealFooter bgAlpha={bgAlpha} textScale={textScale} patch={patch} noDrag={noDrag} />}
-    </div>
-  )
-}
-
-/** Footer controls — interactive mode only: bg-alpha slider + text size. Chrome, so unscaled and
- *  ONE ROW at any width: the buttons never shrink and the slider absorbs whatever the row is
- *  short (see the damage meter's twin for the whole reasoning). */
-function HealFooter({
-  bgAlpha,
-  textScale,
-  patch,
-  noDrag
-}: {
-  bgAlpha: number
-  textScale: number
-  patch: OverlayChrome['patch']
-  noDrag: React.CSSProperties
-}): JSX.Element {
-  return (
-    <div
-      style={{
-        ...FOOTER_ROW,
-        ...noDrag,
-        gap: 8,
-        fontSize: 10,
-        color: 'rgba(255,255,255,0.6)'
-      }}
-    >
-      {/* The word IS the label (JOS-358) — the footer names its own controls, it does not hover. */}
-      <span style={{ flexShrink: 0 }}>bg</span>
-      <input
-        type="range"
-        min={0.1}
-        max={1}
-        step={0.02}
-        value={bgAlpha}
-        onChange={(e) => patch({ bgAlpha: Number(e.target.value) })}
-        style={{ flexGrow: 1, flexShrink: 1, flexBasis: 0, minWidth: 24, accentColor: HEAL_GOLD, height: 4 }}
-      />
-      <TextScaleStepper textScale={textScale} patch={patch} noDrag={noDrag} />
+      {!locked && <BgFooter accent={HEAL_GOLD} bgAlpha={bgAlpha} textScale={textScale} patch={patch} noDrag={noDrag} />}
     </div>
   )
 }

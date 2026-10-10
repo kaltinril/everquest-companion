@@ -28,7 +28,9 @@
 
 import type { AlertDef, AlertTrigger, AlertTriggerPrimitive, PoisonSlowRecency } from './alertTypes'
 import { POISON_SLOW_ALERT_ID } from './alertGroups'
-import type { ClassAbbr } from './classCombo'
+import { isClassAbbr, type ClassAbbr } from './classCombo'
+// The wiki class-name table (both spellings of Shadow Knight) lives once, in spellLevels.ts.
+import { classAbbrForDisplayName } from './spellLevels'
 
 /**
  * The rank tail, MIRRORING `spellCanonKey` in src/main/log/parseCommon.ts (I–X, case
@@ -186,44 +188,20 @@ export interface ClassLevel {
   level: number
 }
 
-/** Wiki class name → /who code. Mirrors spellClasses.ts ABBR_BY_NAME (both wiki spellings). */
-const ABBR_BY_NAME: Record<string, ClassAbbr> = {
-  bard: 'BRD',
-  beastlord: 'BST',
-  berserker: 'BER',
-  cleric: 'CLR',
-  druid: 'DRU',
-  enchanter: 'ENC',
-  magician: 'MAG',
-  monk: 'MNK',
-  necromancer: 'NEC',
-  paladin: 'PAL',
-  ranger: 'RNG',
-  rogue: 'ROG',
-  'shadow knight': 'SHD',
-  shadowknight: 'SHD',
-  shaman: 'SHM',
-  warrior: 'WAR',
-  wizard: 'WIZ'
-}
-
-/** Abbr set, for the direct `class:shm` spelling (the map above is by wiki NAME). */
-const ABBR_SET: ReadonlySet<string> = new Set<string>(Object.values(ABBR_BY_NAME))
-
 /**
  * A user-typed class token → the /who code, or null when it names no class we know.
  *
  * Accepts either spelling the user is likely to reach for: the three-letter code (`shm`) or
  * the wiki's full class name (`shaman`, and both spellings of Shadow Knight). ONE
- * implementation, exported here beside the table it reads, so the search box and the level
+ * implementation, exported here over spellLevels' class table, so the search box and the level
  * chips can never disagree about what "SHD" means.
  */
 export function classAbbrFor(text: string): ClassAbbr | null {
   const t = text.trim().toLowerCase()
   if (!t) return null
   const upper = t.toUpperCase()
-  if (ABBR_SET.has(upper)) return upper as ClassAbbr
-  return ABBR_BY_NAME[t] ?? null
+  if (isClassAbbr(upper)) return upper
+  return classAbbrForDisplayName(t) ?? null
 }
 
 /**
@@ -235,7 +213,7 @@ export function parseSpellClassLevels(classes: string | undefined): ClassLevel[]
   if (classes === undefined) return []
   const best = new Map<ClassAbbr, number>()
   for (const m of classes.matchAll(/\*\s*([A-Za-z][A-Za-z ]*?)\s*-\s*Level\s*(\d+)/g)) {
-    const cls = ABBR_BY_NAME[m[1].trim().toLowerCase()]
+    const cls = classAbbrForDisplayName(m[1])
     if (cls === undefined) continue
     const level = Number(m[2])
     const prev = best.get(cls)

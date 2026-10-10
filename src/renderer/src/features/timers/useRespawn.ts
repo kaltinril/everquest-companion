@@ -8,7 +8,7 @@
 // prop, is also what keeps every row on the page agreeing about what time it is (world-model law
 // 9's "one time base per chart", one floor down).
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback } from 'react'
 import { useModule } from '../../lib/useModule'
 import {
   EMPTY_RESPAWN_SNAP,
@@ -21,19 +21,8 @@ export function useRespawnSnap(): RespawnSnap {
   return snap ?? EMPTY_RESPAWN_SNAP
 }
 
-/** One shared 1 Hz clock. Every countdown on the surface reads this and nothing else. */
-export function useSecondsClock(): number {
-  const [now, setNow] = useState(() => Date.now())
-  useEffect(() => {
-    const id = setInterval(() => {
-      setNow(Date.now())
-    }, 1000)
-    return () => {
-      clearInterval(id)
-    }
-  }, [])
-  return now
-}
+/** One shared 1 Hz clock; it lives in lib/ so the overlays can share it too. */
+export { useSecondsClock } from '../../lib/useSecondsClock'
 
 /**
  * Write the watch list. The handler re-normalizes, applies it to the running module and forces a

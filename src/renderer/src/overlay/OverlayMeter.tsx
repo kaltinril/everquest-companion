@@ -3,17 +3,17 @@ import type { OverlayKind } from '@shared/types'
 import type { CombatSnapshot, PetSummonNudge, SegmentView } from '@shared/combat'
 import { formatRate } from '../lib/formatRate'
 import { formatTime } from '../lib/formatDate'
+import { fmtDur } from '../features/combat/copyTable'
 import { LIVE_SELECTION, scopeOptions, type ScopeOption } from '../features/combat/dashboardData'
 import { useGlobalFight } from '../features/combat/useGlobalFight'
-import { type OverlaySelectRow } from './OverlaySelect'
+import { relativeAge, type OverlaySelectRow } from './OverlaySelect'
 import { OverlayHeader, type OverlayHeaderAction } from './OverlayHeader'
 import { useSessionMarks } from '../features/timeslice/useSessionMarks'
 import { MeterBars } from './meterBars'
 import { MeterPane } from './scopeFloor'
 import { PetNudgeCard } from './petNudgeCard'
-import { TextScaleStepper } from './TextScaleStepper'
-import { FOOTER_ROW } from './overlayScale'
-import { useOverlayChrome, type OverlayChrome } from './useOverlayChrome'
+import { BgFooter } from './BgFooter'
+import { useOverlayChrome } from './useOverlayChrome'
 import { useOverlayCombat } from './useOverlayCombat'
 import { useMeterScope } from '../features/combat/useCombatPrefs'
 import { EMPTY_ROSTER, chipLabel } from '@shared/roster'
@@ -23,23 +23,6 @@ const GOLD = '#d9b25f'
 
 /** The "head row" sentinel — one definition, shared with the main view (dashboardData). */
 const LIVE = LIVE_SELECTION
-
-function fmtDur(sec: number): string {
-  const s = Math.max(0, Math.round(sec))
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
-}
-
-/** Coarse, live-updating relative age for selector rows (Task #54 disambiguation timing). */
-function relativeAge(ts: number, now: number): string {
-  if (!ts) return ''
-  const secs = Math.max(0, (now - ts) / 1000)
-  if (secs < 45) return 'now'
-  const mins = secs / 60
-  if (mins < 60) return `${Math.round(mins)}m`
-  const hrs = mins / 60
-  if (hrs < 36) return `${Math.round(hrs)}h`
-  return `${Math.round(hrs / 24)}d`
-}
 
 /**
  * The dense disambiguation line under a selector row: start clock · coarse age · duration
@@ -305,53 +288,7 @@ export default function OverlayMeter(): JSX.Element {
         />
       </MeterPane>
 
-      {!locked && <MeterFooter bgAlpha={bgAlpha} textScale={textScale} patch={patch} noDrag={noDrag} />}
-    </div>
-  )
-}
-
-/**
- * Footer controls — interactive mode only: bg-alpha slider + text size.
- *
- * CHROME, so it is UNSCALED and must fit whatever window it is in — ONE ROW, always (owner: the
- * A+ was rendering cut off mid-glyph on a narrow meter). The BUTTONS are fixed-size and never
- * shrink; the SLIDER is the give: `flexBasis: 0` + a floor small enough to still be draggable
- * means it absorbs every pixel the row is short, instead of an `<input type=range>`'s intrinsic
- * width pushing the controls that fix a too-small window off the edge of one.
- */
-function MeterFooter({
-  bgAlpha,
-  textScale,
-  patch,
-  noDrag
-}: {
-  bgAlpha: number
-  textScale: number
-  patch: OverlayChrome['patch']
-  noDrag: React.CSSProperties
-}): JSX.Element {
-  return (
-    <div
-      style={{
-        ...FOOTER_ROW,
-        ...noDrag,
-        gap: 8,
-        fontSize: 10,
-        color: 'rgba(255,255,255,0.6)'
-      }}
-    >
-      {/* The word IS the label (JOS-358) — the footer names its own controls, it does not hover. */}
-      <span style={{ flexShrink: 0 }}>bg</span>
-      <input
-        type="range"
-        min={0.1}
-        max={1}
-        step={0.02}
-        value={bgAlpha}
-        onChange={(e) => patch({ bgAlpha: Number(e.target.value) })}
-        style={{ flexGrow: 1, flexShrink: 1, flexBasis: 0, minWidth: 24, accentColor: GOLD, height: 4 }}
-      />
-      <TextScaleStepper textScale={textScale} patch={patch} noDrag={noDrag} />
+      {!locked && <BgFooter accent={GOLD} bgAlpha={bgAlpha} textScale={textScale} patch={patch} noDrag={noDrag} />}
     </div>
   )
 }

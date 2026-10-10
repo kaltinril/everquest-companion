@@ -389,7 +389,9 @@ test('THE CHROME IS NEVER SCALED, and cannot be pushed out of a narrow window', 
     SURFACES['the event log'],
     SURFACES['the buff timers']
   ]) {
-    const text = code(path)
+    // The two meters and the event log share BgFooter.tsx, so its slider is theirs.
+    const own = code(path)
+    const text = /<BgFooter /.test(own) ? own + code('../src/renderer/src/overlay/BgFooter.tsx') : own
     assert.match(
       text,
       /flexGrow: 1, flexShrink: 1, flexBasis: 0, minWidth: 24/,
@@ -446,6 +448,10 @@ test('every overlay kind can reach the control', () => {
   // The meters and the event log put it in their footer; the toast has neither header nor footer,
   // so it lives in the drag frame that IS its interactive chrome.
   for (const [name, path] of Object.entries(SURFACES)) {
-    assert.match(src(path), /<TextScaleStepper/, `${name} offers no text size control`)
+    assert.match(src(path), /<TextScaleStepper|<DragFrame |<BgFooter /, `${name} offers no text size control`)
   }
+  // The three strips share that frame, so their stepper is written once, in DragFrame.tsx.
+  assert.match(src('../src/renderer/src/overlay/DragFrame.tsx'), /<TextScaleStepper/)
+  // …and the two meters and the event log share BgFooter.tsx.
+  assert.match(src('../src/renderer/src/overlay/BgFooter.tsx'), /<TextScaleStepper/)
 })

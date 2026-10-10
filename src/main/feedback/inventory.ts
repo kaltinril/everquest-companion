@@ -130,9 +130,21 @@ export function previewOfDump(lines: readonly string[]): {
  * then the read, then the row cap, then gzip, then the byte cap. Nothing is trimmed at any step
  * — see MAX_INVENTORY_LINES's header for why a partial inventory is worse than none.
  */
-export async function buildInventoryAttachment(
+export function buildInventoryAttachment(
   path: string,
   fileName: string
+): Promise<InventoryResult> {
+  return buildDumpAttachment(path, fileName, MAX_INVENTORY_LINES)
+}
+
+/**
+ * The packaging every dump kind shares, in the order above; only the ROW CAP is a kind's own
+ * (achievements.ts passes MAX_ACHIEVEMENTS_LINES). The byte caps are shared.
+ */
+export async function buildDumpAttachment(
+  path: string,
+  fileName: string,
+  maxLines: number
 ): Promise<InventoryResult> {
   let updatedAt: number
   let rawBytes: number
@@ -162,7 +174,7 @@ export async function buildInventoryAttachment(
 
   const lines = dumpLines(text)
   if (lines.length === 0) return refuse('empty')
-  if (lines.length > MAX_INVENTORY_LINES) return refuse('too-large')
+  if (lines.length > maxLines) return refuse('too-large')
 
   const gz = gzipSync(Buffer.from(text, 'utf8'), { level: 9 })
   if (gz.length > MAX_UPLOAD_BYTES) return refuse('too-large')

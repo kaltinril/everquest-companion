@@ -2,9 +2,10 @@
 // attachment (JOS-441).
 //
 // ============================ THE ONE RULE ============================
-// THE DUMP IS OPENED READ-ONLY AND IS NEVER WRITTEN TO. `readFile(path)` and `stat(path)`, and
-// that is the entire filesystem surface of this module. The file belongs to the game and to the
-// player; the app is a guest in it, exactly as it is in the log and in the inventory dump.
+// THE DUMP IS OPENED READ-ONLY AND IS NEVER WRITTEN TO. `readFile(path)` and `stat(path)`, inside
+// inventory.ts's `buildDumpAttachment`, and that is the entire filesystem surface of this module.
+// The file belongs to the game and to the player; the app is a guest in it, exactly as it is in
+// the log and in the inventory dump.
 // ======================================================================
 //
 // ---------------------------------------------------------------------------------------------
@@ -70,16 +71,12 @@
 // whole pipeline against temp files, and the resolution of WHICH dump belongs to the active
 // character stays in `submit.ts`, where the registry and the store live.
 
-import { createHash } from 'node:crypto'
-import { readFile, stat } from 'node:fs/promises'
-import { gzipSync } from 'node:zlib'
 import {
   MAX_ACHIEVEMENTS_LINES,
-  MAX_UPLOAD_BYTES,
   type AchievementsDumpMeta,
   type InventoryUnavailable
 } from '../../shared/feedback'
-import { dumpLines, previewOfDump, MAX_DUMP_READ_BYTES } from './inventory'
+import { buildDumpAttachment } from './inventory'
 
 /** A packaged dump: the metadata for the JSON body, the gz for S3, the text, and the preview. */
 export interface AchievementsAttachment extends AchievementsDumpMeta {
@@ -99,62 +96,22 @@ export type AchievementsResult =
   | AchievementsAttachment
   | { readonly ok: false; readonly reason: InventoryUnavailable }
 
-const refuse = (reason: InventoryUnavailable): AchievementsResult => ({ ok: false, reason })
-
 /**
  * Package the dump at `path` for upload. Never throws — every failure is a named reason, because
  * the dialog has to SAY which nothing it is looking at.
  *
- * THE ORDER AND THE HELPERS ARE THE INVENTORY'S, IMPORTED RATHER THAN RETYPED. `dumpLines` and
+ * THE ORDER AND THE HELPERS ARE THE INVENTORY'S, IMPORTED RATHER THAN RETYPED: the whole
+ * packaging is `buildDumpAttachment`, given this kind's row cap. `dumpLines` and
  * `previewOfDump` are decisions about "a tabular export we are about to show somebody", not about
  * items: interior blank lines are kept (this file has none, and a filter that would have dropped
  * them is still the wrong filter), and the preview is head-only because a tree read from the top
  * gives its useful rows first. The ROW CAP is this kind's own, and the byte cap is shared.
  */
-export async function buildAchievementsAttachment(
+export function buildAchievementsAttachment(
   path: string,
   fileName: string
 ): Promise<AchievementsResult> {
-  let updatedAt: number
-  let rawBytes: number
-  try {
-    const st = await stat(path)
-    // A regular file or nothing — a directory stats fine and reports size 0 on Windows, so the
-    // isFile check has to come before the size one (inventory.ts argues it at length).
-    if (!st.isFile()) return refuse('unreadable')
-    updatedAt = Math.floor(st.mtimeMs)
-    rawBytes = st.size
-  } catch {
-    return refuse('no-dump')
-  }
-  if (rawBytes <= 0) return refuse('empty')
-  if (rawBytes > MAX_DUMP_READ_BYTES) return refuse('too-large')
-
-  let text: string
-  try {
-    text = await readFile(path, 'utf8')
-  } catch {
-    return refuse('unreadable')
-  }
-
-  const lines = dumpLines(text)
-  if (lines.length === 0) return refuse('empty')
-  if (lines.length > MAX_ACHIEVEMENTS_LINES) return refuse('too-large')
-
-  const gz = gzipSync(Buffer.from(text, 'utf8'), { level: 9 })
-  if (gz.length > MAX_UPLOAD_BYTES) return refuse('too-large')
-
-  return {
-    ok: true,
-    bytes: gz.length,
-    lines: lines.length,
-    updatedAt,
-    sha256: createHash('sha256').update(gz).digest('hex'),
-    gz,
-    text,
-    fileName,
-    ...previewOfDump(lines)
-  }
+  return buildDumpAttachment(path, fileName, MAX_ACHIEVEMENTS_LINES)
 }
 
 /** The metadata half of a packaged dump — what travels in the JSON body. */

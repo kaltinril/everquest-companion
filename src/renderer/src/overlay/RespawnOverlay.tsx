@@ -79,7 +79,7 @@
 //
 // MUI-FREE, plain divs and inline styles, like every file in this bundle.
 
-import { type JSX, useEffect, useState } from 'react'
+import type { JSX } from 'react'
 import {
   EMPTY_RESPAWN_SNAP,
   RESPAWN_CONFIRM_TITLE,
@@ -101,6 +101,7 @@ import { OverlayHeader } from './OverlayHeader'
 import { FOOTER_ROW, OverlayContent } from './overlayScale'
 import { TextScaleStepper } from './TextScaleStepper'
 import { useOverlayModule } from './useOverlayModule'
+import { useSecondsClock } from '../lib/useSecondsClock'
 import { type OverlayChrome, useOverlayChrome } from './useOverlayChrome'
 
 /** This window's accent — a warm amber, deliberately none of the four already in use (damage gold,
@@ -132,9 +133,6 @@ const STALE = 'rgba(255,255,255,0.38)'
  */
 const OVERRIDDEN = '#c3aef5'
 
-/** One second. A countdown is the one number in this app that has to move while the log is idle. */
-const TICK_MS = 1000
-
 /**
  * WHAT THE TWO COLOURS CLAIM, on the header count's hover. The distinction is load-bearing - a
  * clock at zero is this app's estimate elapsing and is never a sighting, while UP is the game
@@ -143,19 +141,6 @@ const TICK_MS = 1000
  */
 const RESPAWN_LEGEND_TITLE =
   'Clocks running. Zero = our estimate elapsed, not a sighting. UP = the log named the mob.'
-
-function useSecondsClock(): number {
-  const [now, setNow] = useState(() => Date.now())
-  useEffect(() => {
-    const id = setInterval(() => {
-      setNow(Date.now())
-    }, TICK_MS)
-    return () => {
-      clearInterval(id)
-    }
-  }, [])
-  return now
-}
 
 /**
  * The seen line, and the button that is the whole of the second ruling. Its own component because
