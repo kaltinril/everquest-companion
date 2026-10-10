@@ -77,15 +77,21 @@ export function useNotablePickups(history: LootEvent[], dismissed: Set<string>):
 
   useEffect(() => {
     let alive = true
-    const toFetch = recent.current.filter((r) => !requested.current.has(r.key))
+    const asked = requested.current
+    const toFetch = recent.current.filter((r) => !asked.has(r.key))
     if (toFetch.length === 0) return
-    for (const r of toFetch) requested.current.add(r.key)
+    for (const r of toFetch) asked.add(r.key)
+    // A run cut short (a newer drop changed the keys, or StrictMode's dev remount) hands back the
+    // keys it never answered: left marked as requested, they were never asked again, and every
+    // Overview drop row sat without its icon in `npm run dev`.
+    const unanswered = new Set(toFetch.map((r) => r.key))
     void (async () => {
       for (const r of toFetch) {
         if (!alive) return
         try {
           const k = await window.eq.lookupItem(r.item)
           if (!alive) return
+          unanswered.delete(r.key)
           setByKey((prev) => {
             const next = new Map(prev)
             next.set(r.key, k)
@@ -98,6 +104,7 @@ export function useNotablePickups(history: LootEvent[], dismissed: Set<string>):
     })()
     return () => {
       alive = false
+      for (const key of unanswered) asked.delete(key)
     }
     // Re-run when the set of recent keys changes (join of the capped recent keys).
     // eslint-disable-next-line react-hooks/exhaustive-deps
