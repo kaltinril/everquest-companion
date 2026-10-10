@@ -32,13 +32,23 @@ import { bestEffectFor, usable, type KindEffect, type Loadout } from './exaltati
 // are the recommender's"; until now it said so while carrying its own copy of them.
 import { inForcePerSeat, narrowedHost, seatFits, seatIsLive, type SocketHostCell } from './socketRecommend'
 
+/** A donor gem and the socket type it serves. */
+interface Donor {
+  key: string
+  row: GearRow
+  type: string
+}
+
 /** One family's claim: its best owned tier and the donor gems that carry it. How many copies
  *  each donor has is the ledger's business (`PlanContext.left`), not the claim's. */
 interface FamilyClaim {
   family: string
   eff: KindEffect
   /** the donor keys whose best effect of this kind IS this family at the best tier */
-  donors: { key: string; row: GearRow; type: string }[]
+  donors: Donor[]
+  /** the family's donors BELOW the best tier, each with its own effect: only the second hand
+   *  reads them, since a proc fires per weapon whatever tier the other hand holds */
+  lower: (Donor & { eff: KindEffect })[]
   gemName: string
 }
 
@@ -140,10 +150,15 @@ function familyClaims(
       const eff = bestEffectFor(row, type)
       if (eff === null) continue
       const held = best.get(eff.family)
+      const donor = { key, row, type }
       if (held === undefined || eff.tier > held.eff.tier) {
-        best.set(eff.family, { family: eff.family, eff, donors: [{ key, row, type }], gemName: row.name })
+        // The superseded tier is not dropped: it is the second hand's fallback.
+        const lower = held === undefined ? [] : [...held.lower, ...held.donors.map((d) => ({ ...d, eff: held.eff }))]
+        best.set(eff.family, { family: eff.family, eff, donors: [donor], lower, gemName: row.name })
       } else if (eff.tier === held.eff.tier) {
-        held.donors.push({ key, row, type })
+        held.donors.push(donor)
+      } else {
+        held.lower.push({ ...donor, eff })
       }
     }
   }
@@ -253,25 +268,39 @@ function placedOf(seatOf: readonly number[], claimCount: number): number[] {
  * Whether a spare copy EXISTS is the ledger's answer, not a counter's: `place` names a donor
  * of the claim that fits the seat and still has a copy left, or nothing - so the hand is taken
  * only when there is a copy to put in it, and the placement says which.
+ *
+ * AND THE SPARE MAY BE A LOWER TIER (reviewer catch 2026-10-09): Lifebite III in the primary and
+ * Lifebite II in the secondary both fire, but the claim held only the best tier, so the plan
+ * pulled the secondary's Lifebite II and left that hand empty while the recommender filled it.
+ * The best tier is offered first, then the family's lower tiers, best first - so the free seats
+ * are every live Proc seat, not only the ones the best tier's donors fit.
  */
 function secondHand(
   claims: readonly FamilyClaim[],
-  adj: readonly number[][],
+  sockets: readonly SocketHostCell[],
   seatOf: number[],
-  place: (u: number, v: number) => Placement | null
+  place: (c: FamilyClaim, v: number) => Placement | null
 ): Placement[] {
   const out: Placement[] = []
   claims.forEach((c, u) => {
     if (!isProcClaim(c) || !seatOf.includes(u)) return
-    for (const v of adj[u]) {
-      if (seatOf[v] !== -1) continue
-      const p = place(u, v)
-      if (p === null) continue
+    const tiers = [c, ...lowerTiers(c)]
+    sockets.forEach((s, v) => {
+      if (seatOf[v] !== -1 || !inForcePerSeat(s.type) || !seatIsLive(s)) return
+      const p = tiers.reduce<Placement | null>((got, k) => got ?? place(k, v), null)
+      if (p === null) return
       seatOf[v] = u
       out.push(p)
-    }
+    })
   })
   return out
+}
+
+/** A claim's lower tiers, best first, each as a one-donor claim `placementOf` can name. */
+function lowerTiers(c: FamilyClaim): FamilyClaim[] {
+  return [...c.lower]
+    .sort((a, b) => b.eff.tier - a.eff.tier)
+    .map(({ eff, ...d }) => ({ ...c, eff, donors: [d], lower: [], gemName: d.row.name }))
 }
 
 /** A claim whose donors serve the one kind `socketRecommend` holds in force per seat. */
@@ -349,7 +378,8 @@ function movesOf(
 
 /** Seats holding a gem whose family the plan put SOMEWHERE ELSE: pull these, or the family is
  *  in force twice and the seat is dead. A seat whose family the plan left in place, or whose
- *  family went unseated entirely, is not a clear. */
+ *  family went unseated entirely, is not a clear - and neither is a Proc seat no placement
+ *  takes: that proc fires on its own weapon, so pulling it buys nothing. */
 function clearsOf(
   placements: readonly Placement[],
   sockets: readonly SocketHostCell[],
@@ -365,6 +395,7 @@ function clearsOf(
     if (occ === null) continue
     const seats = seatsOfFamily.get(occ.family)
     if (seats === undefined || seats.some((p) => p.cellId === s.cellId && p.type === s.type)) continue
+    if (inForcePerSeat(s.type) && !placements.some((p) => p.cellId === s.cellId && p.type === s.type)) continue
     const seat = seats[0]
     out.push({
       cellLabel: s.cellLabel,
@@ -540,7 +571,7 @@ export function planBoard(
   // The contests are the MATCHING's: a spare proc copy going unseated is not one.
   const run = bestSeating({ order, sockets, base: ctx, owned }, adj, { runs: SEARCH_BUDGET })
   const placements = [...run.placements]
-  placements.push(...secondHand(order, adj, run.seatOf, (u, v) => placementOf(order[u], sockets[v], run.ctx)))
+  placements.push(...secondHand(order, sockets, run.seatOf, (c, v) => placementOf(c, sockets[v], run.ctx)))
   return {
     placements,
     moves: movesOf(placements, sockets, rowByKey),
