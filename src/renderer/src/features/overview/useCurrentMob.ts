@@ -87,18 +87,17 @@ function useMobKnowledgeMemo(pending: PendingLookup): Map<string, MobKnowledge> 
   useEffect(() => {
     if (!pending.key || requested.current.has(pending.key)) return
     requested.current.add(pending.key)
-    let alive = true
+    // The answer lands even after the target moved on. A key is asked once, so an answer dropped
+    // because the player re-targeted first left that mob without knowledge on every later target;
+    // `byKey` is keyed by the mob, so a late answer is never shown for the wrong one.
     void window.eq
       .lookupMob(pending.name)
       .then((k) => {
-        if (alive) setByKey((prev) => new Map(prev).set(pending.key, k))
+        setByKey((prev) => new Map(prev).set(pending.key, k))
       })
       .catch(() => {
         /* main never rejects; a missing record renders the honest empty states */
       })
-    return () => {
-      alive = false
-    }
   }, [pending])
   return byKey
 }
