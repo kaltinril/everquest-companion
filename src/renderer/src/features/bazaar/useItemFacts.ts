@@ -6,7 +6,7 @@
 // name the Bazaar shows IS a database name (the parser only reads those), so no page is fetched.
 // The image itself comes through `itemIconUrl`, the app's permanent icon cache.
 
-import { useEffect, useSyncExternalStore } from 'react'
+import { useCallback, useEffect, useSyncExternalStore } from 'react'
 
 export interface ItemFacts {
   iconId?: number
@@ -51,6 +51,7 @@ export function useItemFacts(names: readonly string[]): (name: string) => ItemFa
       )
     }
   }, [names])
-  // `v` ties the reader to the store's version, so a settled lookup re-renders its readers.
-  return v >= 0 ? (name) => facts.get(name) ?? undefined : () => undefined
+  // `v` ties the reader to the store's version: a settled batch hands out a new reader, so its
+  // readers re-render, and every other render keeps the same one, so the tab's memos still hit.
+  return useCallback((name: string) => (v >= 0 ? (facts.get(name) ?? undefined) : undefined), [v])
 }
