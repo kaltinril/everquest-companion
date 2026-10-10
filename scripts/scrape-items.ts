@@ -83,6 +83,17 @@ function describeRequest(params: Record<string, string>): string {
   return `${params.action} ${params.eititle ?? params.pageids?.slice(0, 40) ?? ''}`
 }
 
+/**
+ * A maxlag deferral (HTTP 200, error body, Retry-After) is retried while attempts remain; any
+ * other error body, or maxlag on the last attempt, throws rather than reading as an empty answer.
+ */
+function maxlagRetry(j: unknown, params: Record<string, string>, attempt: number): boolean {
+  const error = (j as { error?: { code?: string; info?: string } }).error
+  if (!error) return false
+  if (error.code === 'maxlag' && attempt < MAX_RETRIES) return true
+  throw new Error(`API error ${error.code}: ${error.info ?? ''} for ${describeRequest(params)}`)
+}
+
 /** One serialized GET with exponential backoff on 429/5xx (honours Retry-After). */
 async function api<T>(params: Record<string, string>): Promise<T> {
   // maxlag=5: MediaWiki's own bot-courtesy contract — the server refuses the request outright
@@ -102,15 +113,11 @@ async function api<T>(params: Record<string, string>): Promise<T> {
     if (res.ok) {
       await sleep(DELAY_MS)
       const j = (await res.json()) as T
-      const error = (j as { error?: { code?: string; info?: string } }).error
-      // A maxlag deferral arrives as HTTP 200 with an error body and a Retry-After header.
-      if (error?.code === 'maxlag' && attempt < MAX_RETRIES) {
+      if (maxlagRetry(j, params, attempt)) {
         await sleep(retryDelayMs(res, wait))
         wait *= 2
         continue
       }
-      // Any other error body is permanent: fail once, never cache it as an empty answer.
-      if (error) throw new Error(`API error ${error.code}: ${error.info ?? ''} for ${describeRequest(params)}`)
       return j
     }
     if ((res.status === 429 || res.status >= 500) && attempt < MAX_RETRIES) {
