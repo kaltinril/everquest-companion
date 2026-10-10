@@ -310,3 +310,24 @@ test('a removed custom sound falls back to the shipped default line instead of g
   const bare = rootsIn(tempTree())
   assert.equal(getSoundDataIn(bare, 'portal-turret', 'anything'), null)
 })
+
+test('a sound is served only from inside its own pack, and only by a key the manifest owns', () => {
+  const tree = tempTree()
+  const roots = rootsIn(tree)
+  fakePack(roots.user, 'chimes', 'ding')
+  // A sibling whose name merely STARTS with the pack's: a bare prefix test called it inside.
+  fakePack(roots.user, 'chimesX', 'loot')
+  const manifest = join(roots.user, 'chimes', 'manifest.json')
+  const sounds = {
+    ding: { file: 'sounds/ding.wav', label: 'ding' },
+    sneak: { file: '../chimesX/sounds/loot.wav', label: 'sneak' }
+  }
+  writeFileSync(manifest, JSON.stringify({ id: 'chimes', name: 'chimes', sounds }))
+
+  assert.equal(getSoundDataIn(roots, 'chimes', 'ding')?.mime, 'audio/wav', 'its own sound plays')
+  // Nothing is installed to fall back to, so a refused ref answers null.
+  assert.equal(getSoundDataIn(roots, 'chimes', 'sneak', 'none'), null, 'the sibling is refused')
+  // Inherited names are not sounds; they answer null rather than throwing.
+  assert.equal(getSoundDataIn(roots, 'chimes', '__proto__', 'none'), null)
+  assert.equal(getSoundDataIn(roots, 'chimes', 'constructor', 'none'), null)
+})
