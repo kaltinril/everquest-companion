@@ -66,7 +66,7 @@ only ever the deliberate tag in step 4.
    unit suite (only the known reds in `scripts/community/known-reds.txt` may fail, by name); builds
    the engine and the unsigned installer on a clean Windows runner; then runs
    `scripts/community/publish-release.sh --publish`, which checks the installer, its `test.yml` and
-   `.blockmap`, the asar (about 29,000 `node_modules` entries and `node_modules/conf`), that the
+   `.blockmap`, the asar (every runtime dependency `package.json` declares, and `node_modules/conf`), that the
    tagged commit is on `origin/main_community` and contains the `Test build <version>:` commit, and
    that the tag has no release yet, then creates the release, marked Latest, with the installer,
    `test.yml`, the blockmap, the previous release's blockmap and `SHA256SUMS.txt`.
