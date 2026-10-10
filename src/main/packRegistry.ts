@@ -163,8 +163,12 @@ function httpGetBuffer(
           reject(new Error(`too many redirects (${url})`))
           return
         }
-        const next = new URL(res.headers.location, url).toString()
-        httpGetBuffer(next, onProgress, redirects + 1).then(resolvePromise, reject)
+        const location = res.headers.location
+        // A Location that does not parse throws, and a throw inside this callback reaches nobody:
+        // the promise would never settle. Inside the chain it is a failed download like any other.
+        Promise.resolve()
+          .then(() => httpGetBuffer(new URL(location, url).toString(), onProgress, redirects + 1))
+          .then(resolvePromise, reject)
         return
       }
       if (status < 200 || status >= 300) {
@@ -195,6 +199,11 @@ function httpGetBuffer(
       res.on('error', reject)
     })
     req.on('error', reject)
+    // A connection that goes silent would otherwise hang the install forever, and the retry loop
+    // (shared/packInstall.ts) never got the failure it is there to retry. ETIMEDOUT is the code it
+    // already reads as "unreachable", so 30 s without a byte is retried like a dropped connection.
+    const stalled = Object.assign(new Error(`request timed out (${url})`), { code: 'ETIMEDOUT' })
+    req.setTimeout(30_000, () => req.destroy(stalled))
   })
 }
 
