@@ -184,12 +184,53 @@ export function normalizeItemName(name: string): string {
 export function templateField(wikitext: string, field: string): string | null {
   // Match `|field = <value>` up to the next top-level `|field2 =` or the template close.
   // Values can contain newlines and bullet lists.
-  const re = new RegExp(
-    `\\|\\s*${field}\\s*=([\\s\\S]*?)(?=\\n\\s*\\|\\s*[a-zA-Z_]+\\s*=|\\n\\s*\\}\\})`,
-    'i'
-  )
-  const m = re.exec(wikitext)
-  return m ? m[1].trim() : null
+  // A field stated twice (`|notes = |notes = …`) reads as its first non-empty value.
+  let value: string | null = null
+  for (const m of wikitext.matchAll(new RegExp(`\\|\\s*${field}\\s*=`, 'gi'))) {
+    const start = m.index + m[0].length
+    const end = fieldValueEnd(wikitext, start)
+    if (end === null) continue
+    value = wikitext.slice(start, end).trim()
+    if (value) break
+  }
+  return value
+}
+
+/** `|name =` opening the next field (names may hold spaces: mob pages' `respawn time`). */
+const NEXT_FIELD_RE = /^\|+\s*[a-zA-Z_][\w ]*=/
+
+/** Does a field end at `i`? At a line start always (the old rule), mid-line only at top level. */
+function endsAt(s: string, i: number, top: boolean): boolean {
+  if (!top) return false
+  return s.startsWith('}}', i) || (s[i] === '|' && NEXT_FIELD_RE.test(s.slice(i, i + 64)))
+}
+
+/**
+ * Where a field's value ends: the next `|name =` or the template's `}}`. At a line start that
+ * holds regardless of nesting; mid-line it counts only outside nested `{{ }}` / `[[ ]]`, so a
+ * close on the value's last line (`Race: ALL<br>}}`) and a second field on the same line
+ * (`level = 22 | respawn time = 6:40`) both end it.
+ */
+function fieldValueEnd(s: string, from: number): number | null {
+  const depth = { tpl: 0, link: 0 }
+  let lineStart = false
+  for (let i = from; i < s.length; i++) {
+    if (endsAt(s, i, lineStart || (depth.tpl === 0 && depth.link === 0))) return i
+    if (s[i] === '\n') lineStart = true
+    else if (!/\s/.test(s[i])) lineStart = false
+    i += bracketStep(s.slice(i, i + 2), depth)
+  }
+  return null
+}
+
+/** Track `{{ }}` / `[[ ]]` nesting; returns 1 when `two` was a bracket pair to skip past. */
+function bracketStep(two: string, depth: { tpl: number; link: number }): number {
+  if (two === '{{') depth.tpl++
+  else if (two === '}}') depth.tpl = Math.max(0, depth.tpl - 1)
+  else if (two === '[[') depth.link++
+  else if (two === ']]') depth.link = Math.max(0, depth.link - 1)
+  else return 0
+  return 1
 }
 
 /** Parse the `* [[Page|Label]]` / `* [[Page]]` bullet links out of a relatedquests block. */
