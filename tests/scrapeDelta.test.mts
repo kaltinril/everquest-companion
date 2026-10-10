@@ -1,5 +1,5 @@
-// scrape-delta's item fold keeps scrape-items.ts's key law: a key changes hands only to its own
-// page's newer revision or to a richer record, and an edited page's stale `|itemname` key goes.
+// scrape-delta's item fold keeps scrape-items.ts's key law: a page's title key is its own, an
+// `|itemname` alias takes a key no page is titled with, every key a change touches is re-awarded.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { foldRcRow, type PageLogEvent, type RcRow } from '../scripts/scrape-delta.mts'
@@ -88,6 +88,33 @@ test('a key with no known claimant left is dropped and its name is offered for a
   const second = foldItems(f, new Map([[tail.page, edited], ['Armadillo Tooth', tooth]]))
   assert.equal(second.items['armadillo tooth']?.page, 'Armadillo Tooth')
   assert.equal(f.items['armadillo tooth'], tail, 'the committed file is not mutated')
+})
+
+test('a page titled with a key takes it back from an edited alias holder, however rich', () => {
+  const quest: ItemDbEntry = { page: 'Rusty Dagger (quest)', name: 'Rusty Dagger', iconId: 7 }
+  const real: ItemDbEntry = { page: 'Rusty Dagger', name: 'RD', iconId: 8 }
+  const f = file([real, quest])
+  const rich = page('|itemname=Rusty Dagger\n|lucy_img_ID=7\n|statsblock=MAGIC ITEM  WT: 1.0')
+  fold(f, new Map([[quest.page, rich]]))
+  assert.equal(f.items['rusty dagger'], real)
+  assert.equal(f.items['rusty dagger (quest)']?.page, quest.page)
+})
+
+test('an edited case-variant page that is now poorer loses its key to the richer variant', () => {
+  const rich: ItemDbEntry = { page: 'Cyclops skull', name: 'Skull of a Cyclops', iconId: 1 }
+  const edited: ItemDbEntry = { page: 'Cyclops Skull', iconId: 2, statsBlock: 'MAGIC ITEM WT: 1' }
+  const f = file([rich, edited])
+  assert.equal(f.items['cyclops skull'], edited)
+  fold(f, new Map([['Cyclops Skull', page('|lucy_img_ID=2')]]))
+  assert.equal(f.items['cyclops skull'], rich)
+})
+
+test('equal claimants of a key go to the first title in sort order', () => {
+  const a: ItemDbEntry = { page: 'Bone Chips', name: 'X1', iconId: 1 }
+  const f = file([a])
+  fold(f, new Map([['Bone chips', page('|itemname=X2\n|lucy_img_ID=1')]]))
+  const first = ['Bone Chips', 'Bone chips'].sort((x, y) => x.localeCompare(y))[0]
+  assert.equal(f.items['bone chips']?.page, first)
 })
 
 test('recentchanges rows: edits are fetched, moves and deletes are only listed', () => {

@@ -48,29 +48,29 @@ export interface ItemFold {
 }
 
 /**
- * Items: scrape-items.ts's `addKeys` law, applied to a delta. A key changes hands only to its own
- * page's newer revision or to a RICHER record, so an edited variant page (A Sealed Letter (Thex
- * Dagger Quest), `|itemname` "A Sealed Letter") never repoints the canonical page's key. A key a
- * changed page no longer names is re-offered to the committed records that still claim it.
- * Does not mutate `itemsFile`.
+ * Items: scrape-items.ts's key law, applied to a delta. A page's TITLE key is its own; an
+ * `|itemname` alias takes a key only when no page has that title; the richer record wins only
+ * between claimants of the same kind, ties to the first title in sort order. Every key a changed
+ * page held or now names is re-awarded among ALL known claimants (the committed records plus the
+ * changed pages), so an edited variant page (A Sealed Letter (Thex Dagger Quest), `|itemname`
+ * "A Sealed Letter") never repoints the canonical page's key. Does not mutate `itemsFile`.
  */
 export function foldItems(itemsFile: ItemDbFile, wikitext: Map<string, string>): ItemFold {
   const changed = changedEntries(wikitext)
-  const items: Record<string, ItemDbEntry> = {}
-  const dropped = new Map<string, ItemDbEntry>()
+  const items = new Map(Object.entries(itemsFile.items))
+  // key -> its committed holder, for every key the change can move
+  const affected = new Map<string, ItemDbEntry | undefined>()
   const pool = new Map<string, ItemDbEntry>()
-  for (const [k, prev] of Object.entries(itemsFile.items)) {
-    const next = changed.get(prev.page)
-    if (!next) pool.set(prev.page, prev)
-    if (next && !entryKeys(next).includes(k)) dropped.set(k, prev)
-    else items[k] = prev
+  for (const [k, prev] of items) {
+    if (changed.has(prev.page)) affected.set(k, prev)
+    else pool.set(prev.page, prev)
   }
   for (const entry of changed.values()) {
     pool.set(entry.page, entry)
-    for (const k of entryKeys(entry)) if (claims(entry, items[k])) items[k] = entry
+    for (const k of entryKeys(entry)) if (!affected.has(k)) affected.set(k, items.get(k))
   }
-  const orphans = reoffer(items, dropped, claimantsByKey(pool.values()))
-  return { items, folded: changed.size, orphans }
+  const orphans = award(items, affected, claimantsByKey(pool.values()))
+  return { items: Object.fromEntries(items), folded: changed.size, orphans }
 }
 
 function changedEntries(wikitext: Map<string, string>): Map<string, ItemDbEntry> {
@@ -82,26 +82,20 @@ function changedEntries(wikitext: Map<string, string>): Map<string, ItemDbEntry>
   return changed
 }
 
-/** Each dropped key to its best remaining claimant; the `|itemname`s that found none. */
-function reoffer(
-  items: Record<string, ItemDbEntry>,
-  dropped: Map<string, ItemDbEntry>,
+/** Each affected key to its winning claimant; the `|itemname`s whose key found none. */
+function award(
+  items: Map<string, ItemDbEntry>,
+  affected: Map<string, ItemDbEntry | undefined>,
   claimants: Map<string, ItemDbEntry[]>
 ): string[] {
   const orphans: string[] = []
-  for (const [k, prev] of dropped) {
-    if (items[k]) continue
-    const holder = pickHolder(claimants.get(k) ?? [])
-    if (holder) items[k] = holder
-    else if (prev.name && itemKey(prev.name) === k) orphans.push(prev.name)
+  for (const [k, prev] of affected) {
+    const holder = pickHolder(k, claimants.get(k) ?? [])
+    if (holder) items.set(k, holder)
+    else items.delete(k)
+    if (!holder && prev?.name && itemKey(prev.name) === k) orphans.push(prev.name)
   }
   return orphans
-}
-
-/** Does `entry` take a key `prev` holds? Its own page's newer revision does, else only richer. */
-function claims(entry: ItemDbEntry, prev: ItemDbEntry | undefined): boolean {
-  if (!prev || prev.page === entry.page) return true
-  return JSON.stringify(entry).length > JSON.stringify(prev).length
 }
 
 function claimantsByKey(records: Iterable<ItemDbEntry>): Map<string, ItemDbEntry[]> {
@@ -114,7 +108,9 @@ function claimantsByKey(records: Iterable<ItemDbEntry>): Map<string, ItemDbEntry
 
 const size = (e: ItemDbEntry): number => JSON.stringify(e).length
 
-/** scrape-items' winner: the richer record, ties to the first title in sort order. */
-function pickHolder(claimants: ItemDbEntry[]): ItemDbEntry | undefined {
-  return [...claimants].sort((a, b) => size(b) - size(a) || a.page.localeCompare(b.page))[0]
+/** Title claimants first; then the richer record, ties to the first title in sort order. */
+function pickHolder(k: string, claimants: ItemDbEntry[]): ItemDbEntry | undefined {
+  const titled = claimants.filter((c) => itemKey(c.page) === k)
+  const field = titled.length > 0 ? titled : claimants
+  return [...field].sort((a, b) => size(b) - size(a) || a.page.localeCompare(b.page))[0]
 }
