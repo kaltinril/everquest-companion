@@ -59,6 +59,14 @@ test('the fold compresses: a cap resets the sum, later adjustments ride on the p
   ])
 })
 
+test('the fold keys a faction as the dump join does: two spellings of one faction are one row', () => {
+  const rows = foldFactionEvidence([
+    { name: 'Freeport Militia', kind: 'adjust', amount: 5 },
+    { name: 'The Freeport Militia', kind: 'adjust', amount: 3 }
+  ])
+  assert.deepEqual(rows, [{ name: 'Freeport Militia', cap: null, sum: 8, hits: 2 }])
+})
+
 test('applyEvidence corrects a stale dump: sums ride the number, caps override it', () => {
   // Unpinned + complete window: the sum is the whole story.
   assert.deepEqual(applyEvidence(690, 2000, { name: 'x', cap: null, sum: 35, hits: 7 }, true), {

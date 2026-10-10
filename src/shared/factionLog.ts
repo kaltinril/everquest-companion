@@ -30,6 +30,8 @@
 // instant regardless of everything unread before it. That is the property the user asked for by
 // name: the cap messages are what update a stale old file.
 
+import { factionNameKey } from './outputs/factions'
+
 /** One faction line, parsed. `amount` for an adjustment; `cap` for a pin. */
 export type FactionLogEvent =
   | { name: string; kind: 'adjust'; amount: number }
@@ -70,12 +72,13 @@ export interface FactionEvidenceReport {
 
 /**
  * Fold parsed events (chronological order — the log's own order) into per-faction evidence.
- * A cap RESTARTS a faction's arithmetic: the pin is absolute, so the running sum resets.
+ * A cap RESTARTS a faction's arithmetic: the pin is absolute, so the running sum resets. Keyed by
+ * `factionNameKey`, the dump join's own key, so two spellings of one faction fold into one row.
  */
 export function foldFactionEvidence(events: Iterable<FactionLogEvent>): FactionEvidence[] {
   const byName = new Map<string, FactionEvidence>()
   for (const ev of events) {
-    const key = ev.name.toLowerCase()
+    const key = factionNameKey(ev.name)
     let row = byName.get(key)
     if (row === undefined) {
       row = { name: ev.name, cap: null, sum: 0, hits: 0 }
