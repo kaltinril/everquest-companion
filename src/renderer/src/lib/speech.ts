@@ -52,6 +52,7 @@ import {
   resolveAlertAudio,
   speechTextFor
 } from '../../../shared/speechText'
+import { noteAudioPlayed, reportAudioFailure } from '../features/alerts/audioHealth'
 
 // ------------------------------------------------------------------ the pure decisions
 
@@ -493,6 +494,9 @@ export async function speak(text: string, voicePrefs: VoicePrefs, opts: SpeakOpt
   speakSystem(said, voicePrefs, opts)
 }
 
+/** The throttle key a Kokoro playback failure is reported under (`audioHealth.ts`). */
+const KOKORO_AUDIO_KEY = 'speech:kokoro'
+
 /** The Kokoro tier: main synthesizes + caches and hands back a playable url. False ⇒ fall back. */
 async function sayThroughEngine(
   text: string,
@@ -521,7 +525,13 @@ async function sayThroughEngine(
   // rate would make one key mean two sounds); the user's rate applies at PLAYBACK.
   audio.playbackRate = clamp(voicePrefs.rate, 0.5, 2, 1)
   audio.volume = clamp(voicePrefs.volume * (opts.gain ?? 1), 0, 1, 1)
-  void audio.play().catch(() => undefined)
+  // A rejected play is still `true`: the engine answered, so falling back would speak twice. It is
+  // reported through the alert sounds' own door (JOS-442) rather than swallowed, because an empty
+  // catch here is the same evening of silence with nothing in the log.
+  void audio.play().then(
+    () => noteAudioPlayed(KOKORO_AUDIO_KEY),
+    (err: unknown) => reportAudioFailure('play', KOKORO_AUDIO_KEY, err)
+  )
   return true
 }
 
