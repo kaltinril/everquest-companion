@@ -107,9 +107,16 @@ let INFLIGHT: Promise<DonorRow[]> | null = null
 
 /** One fetch per window — the corpus is compiled-in bytes, so a second call cannot differ. */
 async function fetchDonors(): Promise<DonorRow[]> {
-  const rows = await window.eq.plannerDonors()
-  CACHE = rows.map(toRow)
-  return CACHE
+  try {
+    const rows = await window.eq.plannerDonors()
+    CACHE = rows.map(toRow)
+    return CACHE
+  } catch (err) {
+    // A failed read is not the answer for the window: kept in flight, every later mount awaited
+    // the same rejection and the planner stayed empty all session. The next mount asks again.
+    INFLIGHT = null
+    throw err
+  }
 }
 
 export interface DonorsState {

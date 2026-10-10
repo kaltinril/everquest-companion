@@ -687,6 +687,23 @@ async function healUnreadableEntry(
 }
 
 /**
+ * NETWORK LEG: no response at all (offline, DNS, TLS, the 10 s timeout), or a body cut off
+ * mid-read. A counter and, the first time this session for this host, one warn line. See the
+ * section above `warnedFetchHosts`. Always null, so a caller can return it.
+ */
+function fetchUnreachable(url: string, err: unknown, warn: (m: string) => void): null {
+  noteImageFetchFailure()
+  const host = imageFetchHost(url)
+  if (takeImageFetchWarning(host)) {
+    warn(
+      `[everquest-companion] image cache: cannot reach ${host} (${describeFetchFailure(err)}); ` +
+        `those images will be hidden. Further failures this session are counted, not logged.`
+    )
+  }
+  return null
+}
+
+/**
  * Install the `eqimg://` handler on the default session. Call ONCE, after `app.whenReady()`
  * and before any window loads a page that references an icon (creating the window in the
  * same tick is fine — the handler is registered synchronously here).
@@ -742,17 +759,7 @@ export function installImageCacheProtocol(protocol: ProtocolLike, opts: ImageCac
         signal: AbortSignal.timeout(FETCH_TIMEOUT_MS)
       })
     } catch (err) {
-      // NETWORK LEG: no response at all (offline, DNS, TLS, the 10 s timeout). A counter and, the
-      // first time this session for this host, one warn line. See the section above `warnedFetchHosts`.
-      noteImageFetchFailure()
-      const host = imageFetchHost(url)
-      if (takeImageFetchWarning(host)) {
-        warn(
-          `[everquest-companion] image cache: cannot reach ${host} (${describeFetchFailure(err)}); ` +
-            `those images will be hidden. Further failures this session are counted, not logged.`
-        )
-      }
-      return null
+      return fetchUnreachable(url, err, warn)
     }
     if (!res.ok) {
       // THE HOST ANSWERED, AND SAID NO. Still an error, deliberately (JOS-133): a status means we
@@ -763,7 +770,14 @@ export function installImageCacheProtocol(protocol: ProtocolLike, opts: ImageCac
       onError(`[everquest-companion:error] image cache: ${res.status} for ${url}`, res.statusText)
       return null
     }
-    const bytes = new Uint8Array(await res.arrayBuffer())
+    let bytes: Uint8Array
+    try {
+      bytes = new Uint8Array(await res.arrayBuffer())
+    } catch (err) {
+      // The same leg, cut off mid-body (the timeout, a reset). Uncaught, it rejected the request
+      // that every waiter on this image shares, past the counter.
+      return fetchUnreachable(url, err, warn)
+    }
     // A wiki error page / empty body must never become a permanent cache entry.
     const mime = sniffImageMime(bytes)
     if (mime == null) {

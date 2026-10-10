@@ -30,7 +30,7 @@ import {
 import type { FactionStanding, FactionsSource } from '../../shared/outputs/factions'
 import type { OutputKindId } from '../../shared/outputs/kinds'
 import { logWarn } from '../errorLog'
-import { parseOutput, type OutputParseResult } from './kinds'
+import { outputFileNames, outputKind, parseOutput, type OutputParseResult } from './kinds'
 import { outputStatus, type OutputCharacter } from './registry'
 
 export { findOutputFile } from './discovery'
@@ -164,6 +164,12 @@ export function loadAchievements(
 ): LoadedAchievements | null {
   const loaded = loadOutput('achievements', characterName, server)
   if (!loaded) return null
+  // Discovery falls back to ANYBODY's newest dump (`preferredOutputFile`), which suits a reader
+  // that only looks; these claims are stored under this character, so another's file is refused.
+  // A character whose name is not known owns whatever was found: the one-character machine.
+  const file = (loaded.path.split(/[\\/]/).pop() ?? '').toLowerCase()
+  const own = outputFileNames(outputKind('achievements'), characterName, server)
+  if (characterName && !own.some((name) => name.toLowerCase() === file)) return null
   const { result } = loaded
   if (!result.ok || result.data.kind !== 'achievements') return null
   return {

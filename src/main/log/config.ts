@@ -259,8 +259,29 @@ export function eqLogsDir(): string {
 export function parseLogName(logPath: string): CharacterRef | null {
   const m = /^eqlog_(.+?)_(.+?)\.txt$/i.exec(basename(logPath))
   if (!m) return null
-  const lastPlayed = existsSync(logPath) ? statSync(logPath).mtimeMs : undefined
-  return { name: m[1], server: m[2], logPath, lastPlayed }
+  return { name: m[1], server: m[2], logPath, lastPlayed: mtimeOf(logPath) }
+}
+
+/** A file's mtime, or undefined when it is gone (or cannot be stat'd) by the time we look. */
+function mtimeOf(path: string): number | undefined {
+  try {
+    return statSync(path).mtimeMs
+  } catch {
+    return undefined
+  }
+}
+
+/**
+ * The `eqlog_*.txt` names in a Logs dir. A dir that cannot be read (a file where the folder
+ * should be, no permission) has none, which is how `readLogsDir` already reads it; throwing here
+ * instead rejected every caller, the idle rescan and the quiet-switch poll among them.
+ */
+function characterLogFiles(logsDir: string): string[] {
+  try {
+    return readdirSync(logsDir).filter((f) => /^eqlog_.+\.txt$/i.test(f))
+  } catch {
+    return []
+  }
 }
 
 /** Stable id for a character (used to key per-character progress). */
@@ -271,9 +292,7 @@ export function characterId(c: CharacterRef): string {
 /** All detected character logs, most-recently-played first. */
 export function listCharacters(): CharacterRef[] {
   const logsDir = eqLogsDir()
-  if (!existsSync(logsDir)) return []
-  return readdirSync(logsDir)
-    .filter((f) => /^eqlog_.+\.txt$/i.test(f))
+  return characterLogFiles(logsDir)
     .map((f) => parseLogName(join(logsDir, f)))
     .filter((c): c is CharacterRef => c !== null)
     .sort((a, b) => (b.lastPlayed ?? 0) - (a.lastPlayed ?? 0))
@@ -292,12 +311,11 @@ export function resolveActiveCharacter(): CharacterRef | null {
     return parseLogName(override) ?? { name: 'Unknown', server: 'unknown', logPath: override }
   }
   const logsDir = eqLogsDir()
-  if (!existsSync(logsDir)) return null
-
-  const candidates = readdirSync(logsDir)
-    .filter((f) => /^eqlog_.+\.txt$/i.test(f))
+  const candidates = characterLogFiles(logsDir)
     .map((f) => join(logsDir, f))
-    .map((p) => ({ p, mtime: statSync(p).mtimeMs }))
+    .map((p) => ({ p, mtime: mtimeOf(p) }))
+    // A log deleted between the listing and the stat is not a candidate.
+    .filter((c): c is { p: string; mtime: number } => c.mtime !== undefined)
     .sort((a, b) => b.mtime - a.mtime)
 
   if (candidates.length === 0) return null

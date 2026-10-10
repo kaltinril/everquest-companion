@@ -22,6 +22,7 @@ import { app } from 'electron'
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { logError } from './errorLog'
+import { isInsideDir } from './security'
 import { DEFAULT_ALERT_PACK_ID, DEFAULT_ALERT_SOUNDS } from './data/defaultPacks'
 import { USER_SOUNDS_PACK_ID, USER_SOUNDS_PACK_NAME } from '../shared/userSounds'
 import { resolveSoundRef } from '../shared/soundPacks'
@@ -343,11 +344,15 @@ function readPackSound(roots: SoundRoots, packId: string, soundId: string): Soun
   const loc = packDir(roots, packId)
   if (!loc) return null
   const manifest = readManifest(loc.dir)
-  const sound = manifest?.sounds?.[soundId]
+  // The soundId comes off the renderer, so only the manifest's OWN keys answer: `__proto__` or
+  // `constructor` would otherwise find the prototype, and its missing `file` throws in join().
+  if (!manifest?.sounds || !Object.hasOwn(manifest.sounds, soundId)) return null
+  const sound = manifest.sounds[soundId]
   if (!sound) return null
   const file = join(loc.dir, sound.file)
-  // Guard against manifest paths escaping the pack dir.
-  if (!file.startsWith(loc.dir)) return null
+  // Guard against manifest paths escaping the pack dir. Segment-aware: a bare prefix test let
+  // `../<pack>X/a.wav` through to a sibling folder whose name merely starts with this one's.
+  if (!isInsideDir(file, loc.dir)) return null
   if (!existsSync(file)) return null
   const ext = sound.file.slice(sound.file.lastIndexOf('.')).toLowerCase()
   const mime = AUDIO_MIME[ext]

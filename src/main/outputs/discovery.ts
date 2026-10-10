@@ -36,7 +36,16 @@ function candidates(id: OutputKindId): Candidate[] {
   if (!existsSync(eqRoot)) return []
   return readdirSync(eqRoot)
     .filter((f) => isOutputFileName(def, f))
-    .map((f) => ({ file: f, full: join(eqRoot, f), mtime: statSync(join(eqRoot, f)).mtimeMs }))
+    .flatMap((f) => {
+      const full = join(eqRoot, f)
+      // EQ replaces a dump by deleting and recreating it, so a file listed a moment ago can be
+      // gone by the stat. It is simply not a candidate; throwing took every caller down with it.
+      try {
+        return [{ file: f, full, mtime: statSync(full).mtimeMs }]
+      } catch {
+        return []
+      }
+    })
     .sort((a, b) => b.mtime - a.mtime)
 }
 
