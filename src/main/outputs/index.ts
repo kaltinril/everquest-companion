@@ -25,6 +25,7 @@ import {
   type ClassUnlockClaim
 } from '../../shared/outputs/achievements'
 import type { OutputKindId } from '../../shared/outputs/kinds'
+import { logWarn } from '../errorLog'
 import { parseOutput, type OutputParseResult } from './kinds'
 import { outputStatus, type OutputCharacter } from './registry'
 
@@ -78,11 +79,21 @@ export function loadOutput(
   const character: OutputCharacter = { name: characterName, server }
   const status = outputStatus(id, character)
   if (status.path === null || status.updatedAt === null) return null
+  let text: string
+  try {
+    text = readFileSync(status.path, 'utf8')
+  } catch (err) {
+    // The dump can vanish between the status check and this read, or be held open by EQ while it
+    // writes (EBUSY). Either way it reads as "no dump", the answer the stat above already gives a
+    // deleted file. Throwing instead escaped `tailCharacter` at startup, before the engine attach.
+    logWarn(`[everquest-companion] Could not read ${id} dump: ${status.path}`, err)
+    return null
+  }
   return {
     kind: id,
     path: status.path,
     loadedAt: status.updatedAt,
-    result: parseOutput(id, readFileSync(status.path, 'utf8'))
+    result: parseOutput(id, text)
   }
 }
 
