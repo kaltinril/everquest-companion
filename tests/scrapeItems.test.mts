@@ -2,7 +2,7 @@
 // Fixtures are small {{Itempage}} strings shaped like the real pages they are named after.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { buildIndex, toEntry, type RunStats } from '../scripts/scrape-items'
+import { buildIndex, reachableCount, toEntry, type RunStats } from '../scripts/scrape-items'
 import type { ItemDbEntry } from '../src/main/itemsDb'
 
 const page = (fields: string): string => `<onlyinclude>{{Itempage\n${fields}\n}}</onlyinclude>`
@@ -43,4 +43,11 @@ test('a disambiguated "(Item)" title is also reachable by its base name', () => 
   const items = buildIndex([e], stats())
   assert.equal(items.get('dimensional hole')?.page, 'Dimensional Hole (Item)')
   assert.equal(items.get('dimensional hole (item)')?.page, 'Dimensional Hole (Item)')
+})
+
+test('the committed count is the distinct pages a key reaches, not every parsed page', () => {
+  const stub = entry('Cyclops skull', page('|statsblock = WT: 1'))
+  const full = entry('Cyclops Skull', page('|statsblock = MAGIC ITEM<br>\nWT: 1.0\n|notes = Used in a quest.'))
+  const alias = entry('Gnome Meat (raw)', page('|itemname = Gnome Meat\n|statsblock = WT: 0.1'))
+  assert.equal(reachableCount(buildIndex([full, stub, alias], stats())), 2)
 })

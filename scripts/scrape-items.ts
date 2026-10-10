@@ -297,6 +297,11 @@ export function buildIndex(entries: ItemDbEntry[], stats: RunStats): Map<string,
   return items
 }
 
+/** Distinct pages a key still reaches: a case-variant loser is parsed but not shipped. */
+export function reachableCount(items: Map<string, ItemDbEntry>): number {
+  return new Set(items.values()).size
+}
+
 /** Fold one fetched page into the entry list, counting exactly why it produced no record. */
 function foldPage(p: RevPage, entries: ItemDbEntry[], stats: RunStats): void {
   const wt = p.revisions?.[0]?.slots?.main?.content
@@ -366,7 +371,7 @@ async function main(): Promise<void> {
   const out: ItemDbFile = {
     scrapedAt: new Date().toISOString(),
     source: SOURCE,
-    count: stats.entries,
+    count: reachableCount(items),
     items: sorted
   }
   // No pretty-printing: this file is INLINED into every user's main bundle, and indentation
