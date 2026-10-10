@@ -366,6 +366,10 @@ test('…but a second copy never costs a distinct family its hand', () => {
   )
   assert.deepEqual(plan.placements.map((p) => p.effect).sort(), ['Earthquake', 'Lifebite Combat'])
   assert.equal(plan.contested.length, 0)
+  // The owner's board (2026-10-09): the swap is ONE line, "socket Quake - replaces Lifebite", never
+  // a second "pull Fangs - it now lives in primary" for the same seat, as if the proc were wasted.
+  assert.deepEqual(plan.moves.map((m) => `${m.gemName} replaces ${m.replacesEffect ?? ''}`), ['Quake replaces Lifebite Combat'])
+  assert.equal(plan.clears.length, 0, 'the replaced seat is the move, not a clear')
   // One copy of Fangs is spare once Quake takes a hand: a single copy holds one seat.
   const single = planBoard([gem('Fangs', 'socketed in Primary', true)], rows, NOBODY, hands('Fangs', null))
   assert.equal(single.placements.length, 1)

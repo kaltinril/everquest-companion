@@ -378,8 +378,10 @@ function movesOf(
 
 /** Seats holding a gem whose family the plan put SOMEWHERE ELSE: pull these, or the family is
  *  in force twice and the seat is dead. A seat whose family the plan left in place, or whose
- *  family went unseated entirely, is not a clear - and neither is a Proc seat no placement
- *  takes: that proc fires on its own weapon, so pulling it buys nothing. */
+ *  family went unseated entirely, is not a clear - and neither is a seat a placement takes (its
+ *  move already says what it replaces) or any Proc seat: a proc fires on its own weapon, so
+ *  "it now lives in" the other hand is never a reason to pull it (owner, 2026-10-09: a
+ *  Lifebite swapped for Laceration read as a Lifebite gone to waste). */
 function clearsOf(
   placements: readonly Placement[],
   sockets: readonly SocketHostCell[],
@@ -395,7 +397,7 @@ function clearsOf(
     if (occ === null) continue
     const seats = seatsOfFamily.get(occ.family)
     if (seats === undefined || seats.some((p) => p.cellId === s.cellId && p.type === s.type)) continue
-    if (inForcePerSeat(s.type) && !placements.some((p) => p.cellId === s.cellId && p.type === s.type)) continue
+    if (inForcePerSeat(s.type) || placements.some((p) => p.cellId === s.cellId && p.type === s.type)) continue
     const seat = seats[0]
     out.push({
       cellLabel: s.cellLabel,

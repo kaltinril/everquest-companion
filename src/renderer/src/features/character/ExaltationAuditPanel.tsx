@@ -148,7 +148,8 @@ function planLines(plan: BoardPlan): JSX.Element[] {
   for (const [i, c] of plan.clears.entries()) {
     out.push(
       <Typography key={`cl${String(i)}`} variant="body2" color="text.secondary" data-testid="exaltation-plan-clear">
-        {`${c.cellLabel}: pull `}
+        {/* The item names which of a pair (two Ears, two Fingers) the line means. */}
+        {`${c.cellLabel} (${c.item}): pull `}
         <Name>{c.gemName}</Name>
         {` (${c.effect}) - it now lives in ${c.movedTo}`}
       </Typography>
