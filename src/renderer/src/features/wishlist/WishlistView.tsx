@@ -221,7 +221,7 @@ export default function WishlistView({ onOpenLoot }: WishlistViewProps = {}): JS
         <WishAdd
           gear={gearState.rows}
           donors={donorsState.donors}
-          ready={gearState.ready && donorsState.ready}
+          ready={wishlist.ready && gearState.ready && donorsState.ready}
           wished={wished}
           onPick={(hit) => wishlist.add(wishFromHit(hit, Date.now()))}
         />

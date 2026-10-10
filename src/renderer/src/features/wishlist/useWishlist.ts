@@ -172,6 +172,9 @@ function getSnapshot(): Snapshot {
  * it always did: StrictMode double-invokes those, and an IPC write is not a thing to do twice.
  */
 function apply(edit: (prev: WishList) => WishList): void {
+  // Before the read lands the document is the empty placeholder, and a fold over it would be
+  // written over the whole stored list. Every surface gates its controls on `ready`; so does this.
+  if (!snapshot.ready) return
   const next = edit(snapshot.list)
   if (next === snapshot.list) return
   superseded = true
