@@ -3,9 +3,10 @@ import type { OverlayKind } from '@shared/types'
 import type { CombatSnapshot, PetSummonNudge, SegmentView } from '@shared/combat'
 import { formatRate } from '../lib/formatRate'
 import { formatTime } from '../lib/formatDate'
+import { fmtDur } from '../features/combat/copyTable'
 import { LIVE_SELECTION, scopeOptions, type ScopeOption } from '../features/combat/dashboardData'
 import { useGlobalFight } from '../features/combat/useGlobalFight'
-import { type OverlaySelectRow } from './OverlaySelect'
+import { relativeAge, type OverlaySelectRow } from './OverlaySelect'
 import { OverlayHeader, type OverlayHeaderAction } from './OverlayHeader'
 import { useSessionMarks } from '../features/timeslice/useSessionMarks'
 import { MeterBars } from './meterBars'
@@ -22,23 +23,6 @@ const GOLD = '#d9b25f'
 
 /** The "head row" sentinel — one definition, shared with the main view (dashboardData). */
 const LIVE = LIVE_SELECTION
-
-function fmtDur(sec: number): string {
-  const s = Math.max(0, Math.round(sec))
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
-}
-
-/** Coarse, live-updating relative age for selector rows (Task #54 disambiguation timing). */
-function relativeAge(ts: number, now: number): string {
-  if (!ts) return ''
-  const secs = Math.max(0, (now - ts) / 1000)
-  if (secs < 45) return 'now'
-  const mins = secs / 60
-  if (mins < 60) return `${Math.round(mins)}m`
-  const hrs = mins / 60
-  if (hrs < 36) return `${Math.round(hrs)}h`
-  return `${Math.round(hrs / 24)}d`
-}
 
 /**
  * The dense disambiguation line under a selector row: start clock · coarse age · duration

@@ -44,6 +44,19 @@ export interface OverlaySelectRow {
   live: boolean
 }
 
+/** Coarse, live-updating relative age for selector rows (Task #54 disambiguation timing). The
+ *  damage and heal meters both print it; terser than the main view's own ('now', not 'just now'). */
+export function relativeAge(ts: number, now: number): string {
+  if (!ts) return ''
+  const secs = Math.max(0, (now - ts) / 1000)
+  if (secs < 45) return 'now'
+  const mins = secs / 60
+  if (mins < 60) return `${Math.round(mins)}m`
+  const hrs = mins / 60
+  if (hrs < 36) return `${Math.round(hrs)}h`
+  return `${Math.round(hrs / 24)}d`
+}
+
 /** Shared chrome tokens so the trigger, the popup and the meter agree. */
 const PANEL_BG = 'rgba(18,22,28,0.97)'
 export const HAIRLINE = 'rgba(255,255,255,0.12)'

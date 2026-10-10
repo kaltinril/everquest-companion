@@ -2,9 +2,10 @@ import { type JSX, useMemo, useState } from 'react'
 import type { OverlayKind } from '@shared/types'
 import type { CombatSnapshot, SegmentView } from '@shared/combat'
 import { formatTime } from '../lib/formatDate'
+import { fmtDur } from '../features/combat/copyTable'
 import { scopeOptions } from '../features/combat/dashboardData'
 import { useGlobalFight } from '../features/combat/useGlobalFight'
-import { type OverlaySelectRow } from './OverlaySelect'
+import { relativeAge, type OverlaySelectRow } from './OverlaySelect'
 import { OverlayHeader } from './OverlayHeader'
 import { HealBars } from './healBars'
 import { useMeterScope } from '../features/combat/useCombatPrefs'
@@ -52,23 +53,6 @@ import { useOverlayCombat } from './useOverlayCombat'
 const HEAL_GOLD = '#7fd1a0'
 
 const LIVE = '__live__'
-
-function fmtDur(sec: number): string {
-  const s = Math.max(0, Math.round(sec))
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
-}
-
-/** Coarse, live-updating relative age for selector rows (Task #54 disambiguation timing). */
-function relativeAge(ts: number, now: number): string {
-  if (!ts) return ''
-  const secs = Math.max(0, (now - ts) / 1000)
-  if (secs < 45) return 'now'
-  const mins = secs / 60
-  if (mins < 60) return `${Math.round(mins)}m`
-  const hrs = mins / 60
-  if (hrs < 36) return `${Math.round(hrs)}h`
-  return `${Math.round(hrs / 24)}d`
-}
 
 /** Everything the chrome renders, resolved from one snapshot in one place. */
 interface HealView {
