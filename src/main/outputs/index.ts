@@ -28,7 +28,7 @@ import {
   type RaceUnlockClaim
 } from '../../shared/outputs/achievements'
 import type { FactionStanding, FactionsSource } from '../../shared/outputs/factions'
-import { isOwnOutputFile, outputKind } from '../../shared/outputs/kinds'
+import { isOwnOutputFile } from '../../shared/outputs/kinds'
 import type { OutputKindId } from '../../shared/outputs/kinds'
 import { logWarn } from '../errorLog'
 import { outputFileNames, outputKind, parseOutput, type OutputParseResult } from './kinds'
@@ -211,7 +211,7 @@ export function loadFactions(
   const loaded = loadOutput('faction', characterName, server)
   if (!loaded) return null
   // Standings are per character: another character's dump is never this one's.
-  if (!isOwnOutputFile(loaded.path, outputKind('faction'), characterName, server)) return null
+  if (!isOwnOutputFile(loaded.path, 'faction', characterName, server)) return null
   const { result } = loaded
   if (!result.ok || result.data.kind !== 'faction') return null
   return {
