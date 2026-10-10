@@ -15,7 +15,16 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
-import { landings, nearestPorts, travelSeams, zoneExits, type ZoneGraph, type ZonePort } from '../src/shared/zoneTravel'
+import {
+  landings,
+  nearestPorts,
+  travelSeams,
+  zoneExits,
+  zoneInEraAt,
+  type ZoneGraph,
+  type ZonePort
+} from '../src/shared/zoneTravel'
+import { ERA_ORDER } from '../src/shared/planner/era'
 import { parseMapText } from '../src/main/maps/parseMap'
 import { splitMapFileName } from '../src/main/maps/packs'
 import type { MapPoint } from '../src/shared/maps'
@@ -258,4 +267,15 @@ test('a (click) entrance is one-way: the route never walks back out through it (
     ['hateplane:', 'oasis:hateplane'],
     'Hate still shows the Oasis port, through the click'
   )
+})
+
+test('the era gate ranks eras by the planner`s ERA_ORDER, Luclin included', () => {
+  // A private copy of the ordering stopped at Velious, so a current era of Luclin ranked nothing
+  // and every zone, classic ones included, read as out of era.
+  const commons = { short: 'ecommons', name: 'East Commonlands', era: 'classic' } as const
+  for (const era of ERA_ORDER) assert.equal(zoneInEraAt(commons, era), true, `classic is in ${era}`)
+  const kael = { short: 'kael', name: 'Kael Drakkel', era: 'velious' } as const
+  assert.equal(zoneInEraAt(kael, 'luclin'), true)
+  assert.equal(zoneInEraAt(kael, 'kunark'), false)
+  assert.equal(zoneInEraAt({ short: 'poknowledge', name: 'The Plane of Knowledge' }, 'luclin'), false)
 })

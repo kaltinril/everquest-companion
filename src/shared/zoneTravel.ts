@@ -31,7 +31,7 @@
 // this map say you can walk, sail or step to", and the two are joined at the surface.
 
 import { ZONES, zoneEntryFor, type ZoneEntry } from './zones'
-import { CURRENT_ERA } from './planner/era'
+import { CURRENT_ERA, eraRank, type Era } from './planner/era'
 import type { MapPoint, ZoneShort } from './maps'
 
 /** How the map says you make this crossing. */
@@ -53,15 +53,17 @@ export type ExitKind = 'walk' | 'translocator' | 'portal'
  * unstated era is not a zone anybody is being sent through. So both halves are gated - a stated
  * era at or before `CURRENT_ERA` passes, anything else does not.
  */
-const ERA_RANK: Readonly<Record<string, number | undefined>> = { classic: 0, kunark: 1, velious: 2 }
-// The planner's Era is wider than the zone catalog's, so the current era may name an expansion no
-// zone is annotated with; then NOTHING passes, which is the honest answer to a question the
-// catalog cannot place.
-const CURRENT_RANK: number | undefined = ERA_RANK[CURRENT_ERA]
-
 export function zoneInEra(entry: ZoneEntry): boolean {
-  const rank = entry.era === undefined ? undefined : ERA_RANK[entry.era]
-  return rank !== undefined && CURRENT_RANK !== undefined && rank <= CURRENT_RANK
+  return zoneInEraAt(entry, CURRENT_ERA)
+}
+
+/**
+ * The gate at a given era. The ranks are the planner's `eraRank`, so the release order is stated
+ * once: a private copy that stopped at Velious would rank a Luclin current era as nothing and shut
+ * every zone out.
+ */
+export function zoneInEraAt(entry: ZoneEntry, era: Era): boolean {
+  return entry.era !== undefined && eraRank(entry.era) <= eraRank(era)
 }
 
 /** One way out of the zone whose map this is. */
