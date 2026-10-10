@@ -102,12 +102,15 @@ async function api<T>(params: Record<string, string>): Promise<T> {
     if (res.ok) {
       await sleep(DELAY_MS)
       const j = (await res.json()) as T
+      const error = (j as { error?: { code?: string; info?: string } }).error
       // A maxlag deferral arrives as HTTP 200 with an error body and a Retry-After header.
-      if ((j as { error?: { code?: string } }).error?.code === 'maxlag' && attempt < MAX_RETRIES) {
+      if (error?.code === 'maxlag' && attempt < MAX_RETRIES) {
         await sleep(retryDelayMs(res, wait))
         wait *= 2
         continue
       }
+      // Any other error body is permanent: fail once, never cache it as an empty answer.
+      if (error) throw new Error(`API error ${error.code}: ${error.info ?? ''} for ${describeRequest(params)}`)
       return j
     }
     if ((res.status === 429 || res.status >= 500) && attempt < MAX_RETRIES) {
@@ -126,7 +129,7 @@ interface Member {
 }
 
 /** Every ns0 page that (directly or indirectly) transcludes a template. */
-async function embeddedIn(template: string): Promise<Member[]> {
+export async function embeddedIn(template: string): Promise<Member[]> {
   const out: Member[] = []
   let cont: string | undefined
   for (let page = 0; page < 200; page++) {
@@ -141,9 +144,9 @@ async function embeddedIn(template: string): Promise<Member[]> {
     const j = await api<{ query?: { embeddedin?: Member[] }; continue?: { eicontinue?: string } }>(params)
     out.push(...(j.query?.embeddedin ?? []))
     cont = j.continue?.eicontinue
-    if (!cont) break
+    if (!cont) return out
   }
-  return out
+  throw new Error(`embeddedin ${template}: still continuing after 200 pages, refusing a truncated list`)
 }
 
 // ---- disk cache --------------------------------------------------------------------
@@ -186,8 +189,9 @@ interface RevPage {
 async function fetchBatch(slice: Member[]): Promise<RevPage[]> {
   const file = `batch-${slice[0].pageid}-${slice.length}.json`
   const cached = readCache(file) as RevPage[] | null
-  if (cached) return cached
-  const j = await api<{ query?: { pages?: RevPage[] } }>({
+  // A batch left by an older page list can share the name; reuse it only if it holds exactly this slice.
+  if (Array.isArray(cached) && batchProblem(slice, cached, false) === null) return cached
+  const j = await api<{ query?: { pages?: RevPage[] }; continue?: unknown }>({
     action: 'query',
     prop: 'revisions',
     rvprop: 'content',
@@ -195,9 +199,19 @@ async function fetchBatch(slice: Member[]): Promise<RevPage[]> {
     pageids: slice.map((p) => p.pageid).join('|')
   })
   const pages = j.query?.pages ?? []
+  const problem = batchProblem(slice, pages, j.continue !== undefined)
+  if (problem) throw new Error(`batch ${file}: ${problem}; not cached`)
   // Write only AFTER a complete response: a half-written batch must never look cached.
   writeCache(file, pages)
   return pages
+}
+
+/** Why a batch response is not the whole slice (null when it is): wrong page set, or continued. */
+export function batchProblem(slice: Member[], pages: RevPage[], continued: boolean): string | null {
+  if (continued) return 'response carries continue (partial content)'
+  const want = slice.map((p) => p.pageid).sort((a, b) => a - b).join()
+  const have = pages.map((p) => p.pageid ?? -1).sort((a, b) => a - b).join()
+  return want === have ? null : `pages ${pages.length} do not match the ${slice.length} requested`
 }
 
 // ---- page → record -------------------------------------------------------------------
