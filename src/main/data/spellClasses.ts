@@ -39,6 +39,8 @@ import { applySpellCorrections } from './spellCorrections'
 import { applySpellRemovals } from './spellRemovals'
 import type { SpellDbFile } from '../../shared/types'
 import type { ClassAbbr } from '../../shared/classCombo'
+// Wiki class name → /who code, both wiki spellings of Shadow Knight: the one table, in shared/.
+import { classAbbrForDisplayName } from '../../shared/spellLevels'
 
 /**
  * WAVE 3 RECONCILIATION. This module used to DECLARE its own `ClassAbbr` because
@@ -48,31 +50,6 @@ import type { ClassAbbr } from '../../shared/classCombo'
  * tests/classTables.test.mts) keep importing the name from where they always did.
  */
 export type { ClassAbbr }
-
-/**
- * Wiki class name → /who code. The wiki spells the Shadow Knight BOTH ways across its own
- * spell pages ("Shadow Knight" 75×, "Shadowknight" 15× in the committed DB); both
- * canonicalize to SHD.
- */
-const ABBR_BY_NAME = new Map<string, ClassAbbr>([
-  ['bard', 'BRD'],
-  ['beastlord', 'BST'],
-  ['berserker', 'BER'],
-  ['cleric', 'CLR'],
-  ['druid', 'DRU'],
-  ['enchanter', 'ENC'],
-  ['magician', 'MAG'],
-  ['monk', 'MNK'],
-  ['necromancer', 'NEC'],
-  ['paladin', 'PAL'],
-  ['ranger', 'RNG'],
-  ['rogue', 'ROG'],
-  ['shadow knight', 'SHD'],
-  ['shadowknight', 'SHD'],
-  ['shaman', 'SHM'],
-  ['warrior', 'WAR'],
-  ['wizard', 'WIZ']
-])
 
 /**
  * One `classes` field → the classes it names, deduped and sorted.
@@ -85,7 +62,7 @@ export function parseSpellClassString(classes: string | undefined): ClassAbbr[] 
   if (classes === undefined) return []
   const found = new Set<ClassAbbr>()
   for (const m of classes.matchAll(/\*\s*([A-Za-z][A-Za-z ]*?)\s*-\s*Level\s*\d+/g)) {
-    const abbr = ABBR_BY_NAME.get(m[1].trim().toLowerCase())
+    const abbr = classAbbrForDisplayName(m[1])
     if (abbr !== undefined) found.add(abbr)
   }
   return [...found].sort()

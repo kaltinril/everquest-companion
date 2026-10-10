@@ -91,6 +91,7 @@ export function knownClassDisplayNames(): string[] {
  * other place a class arrives as a display name: the spell-lines research files, whose thirteen
  * agents each wrote `"class": "Cleric"` at the top (scripts/gen-spell-lines.ts, JOS-391). A second
  * copy of this map in a generator is a second opinion about how the wiki spells Shadowknight.
+ * spellLines.ts and main's spellClasses.ts read their `classes` fields through it too.
  */
 export function classAbbrForDisplayName(name: string): ClassAbbr | undefined {
   return ABBR_BY_DISPLAY_NAME.get(name.trim().toLowerCase())
