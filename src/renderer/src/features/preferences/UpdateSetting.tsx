@@ -7,7 +7,17 @@
 // it, and PreferencesView only names the three exports in its section table.
 
 import { type JSX, useCallback, useEffect, useState } from 'react'
-import { Box, Button, Chip, LinearProgress, Link, Stack, Typography } from '@mui/material'
+import {
+  Box,
+  Button,
+  Chip,
+  FormControlLabel,
+  LinearProgress,
+  Link,
+  Stack,
+  Switch,
+  Typography
+} from '@mui/material'
 import RefreshIcon from '@mui/icons-material/Refresh'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import type { UpdateStatus } from '@shared/types'
@@ -201,6 +211,41 @@ function UpdateActions({
   )
 }
 
+/**
+ * "Update automatically". Off keeps the app on the version it is: no background check, no
+ * download, nothing applied on quit. The manual check still works, so moving up stays a choice.
+ * Follows the answer from main rather than a push, because dev never pushes.
+ */
+function AutoUpdateSwitch({ status, version }: { status: UpdateStatus; version: string }): JSX.Element {
+  const [off, setOff] = useState(status.autoUpdateOff === true)
+  useEffect(() => setOff(status.autoUpdateOff === true), [status.autoUpdateOff])
+  const toggle = async (enabled: boolean): Promise<void> => {
+    setOff(!enabled)
+    const next = await window.eq.setAutoUpdate(enabled)
+    setOff(next.autoUpdateOff === true)
+  }
+  return (
+    <Stack spacing={0.5}>
+      <FormControlLabel
+        control={
+          <Switch
+            size="small"
+            data-testid="pref-auto-update"
+            checked={!off}
+            onChange={(e) => void toggle(e.target.checked)}
+          />
+        }
+        label={<Typography variant="body2">Update automatically</Typography>}
+      />
+      <Typography variant="caption" color="text.secondary">
+        {off
+          ? `Staying on ${version ? `v${version}` : 'this version'}. It updates only when you press Check for updates.`
+          : 'New versions download in the background and install when you close the app.'}
+      </Typography>
+    </Stack>
+  )
+}
+
 export function UpdateSetting({
   status,
   version
@@ -242,6 +287,7 @@ export function UpdateSetting({
         cooldown={cooldown}
         onCheck={() => void checkNow()}
       />
+      <AutoUpdateSwitch status={status} version={version} />
     </Stack>
   )
 }

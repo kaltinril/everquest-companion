@@ -453,6 +453,8 @@ export const IPC = {
   checkForUpdates: 'update:checkNow',
   // renderer -> main: apply the downloaded update now (quit + install + relaunch).
   installUpdate: 'update:install',
+  // renderer -> main: the "Update automatically" switch. Resolves to the resulting status.
+  setAutoUpdate: 'update:setAuto',
   // renderer -> main: the running app's version (app.getVersion()), shown in Preferences.
   getAppVersion: 'app:getVersion',
 

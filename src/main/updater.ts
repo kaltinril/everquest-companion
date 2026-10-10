@@ -162,6 +162,7 @@ import {
   type UpdateStep
 } from './updateLog'
 import { getUpdateChannel, getUpdateLastCheckedAt, setUpdateLastCheckedAt } from './store'
+import { getAutoUpdateOff, setAutoUpdateOff } from './storeAutoUpdate'
 import { classifyFailure, recordEvent } from './telemetry'
 
 const { autoUpdater } = electronUpdater
@@ -200,6 +201,10 @@ const LIBRARY_LOGGER = {
 }
 
 let timer: ReturnType<typeof setTimeout> | null = null
+/** "Update automatically" is off: no background checks, downloads or apply-on-quit. */
+let autoUpdateOff = false
+/** Re-applies the switch to the live machinery; set only in a packaged build. */
+let applyAutoUpdate: (() => void) | null = null
 
 /** The last status pushed — the single source of truth behind `update:getStatus`. */
 let lastStatus: UpdateStatus = { state: 'idle' }
@@ -555,6 +560,26 @@ function registerUpdaterEvents(
 }
 
 /**
+ * The "Update automatically" switch. Registered in dev too, so Preferences can flip and keep it
+ * there; the machinery it steers exists only in a packaged build (`applyAutoUpdate`).
+ */
+function registerAutoUpdateSwitch(): void {
+  autoUpdateOff = getAutoUpdateOff()
+  lastStatus = { ...lastStatus, autoUpdateOff }
+  ipcMain.handle(IPC.setAutoUpdate, (_e, enabled: unknown): UpdateStatus => {
+    autoUpdateOff = enabled === false
+    try {
+      setAutoUpdateOff(autoUpdateOff)
+    } catch {
+      // A store write must never break the update flow; the switch holds for this session.
+    }
+    lastStatus = { ...lastStatus, autoUpdateOff }
+    applyAutoUpdate?.()
+    return lastStatus
+  })
+}
+
+/**
  * Initialize the auto-updater. `getMainWindow` is called lazily on each status
  * push so we always target the current window (it can be recreated). The update
  * machinery is skipped (and logged) when the app isn't packaged; the IPC surface
@@ -576,6 +601,7 @@ export function initUpdater(
   // and forever for a user who quits before the first check.
   lastCheckedAt = getUpdateLastCheckedAt()
   lastStatus = lastCheckedAt ? { state: 'idle', checkedAt: lastCheckedAt } : { state: 'idle' }
+  registerAutoUpdateSwitch()
 
   // Registered in dev too: Preferences shows the version + a (benign) status there.
   ipcMain.handle(IPC.getAppVersion, () => app.getVersion())
@@ -588,7 +614,7 @@ export function initUpdater(
     // forever (dev never checks), which reads as a broken updater rather than an absent one.
     // No checkedAt — a stamp inherited from the store would claim a check this process
     // never made.
-    lastStatus = { state: 'idle', disabled: true }
+    lastStatus = { state: 'idle', disabled: true, autoUpdateOff }
     ipcMain.handle(IPC.installUpdate, noInstallInDev)
     ipcMain.handle(IPC.checkForUpdates, () => lastStatus)
     logInfo('[everquest-companion] Auto-update disabled (dev / not packaged).')
@@ -599,7 +625,9 @@ export function initUpdater(
 
   /** Record + broadcast a status. `checkedAt` rides along on every push once known. */
   const push = (status: UpdateStatus): void => {
-    lastStatus = lastCheckedAt ? { ...status, checkedAt: lastCheckedAt } : status
+    lastStatus = lastCheckedAt
+      ? { ...status, checkedAt: lastCheckedAt, autoUpdateOff }
+      : { ...status, autoUpdateOff }
     const win = getMainWindow()
     if (win && !win.isDestroyed()) win.webContents.send(IPC.onUpdateStatus, lastStatus)
   }
@@ -645,7 +673,9 @@ export function initUpdater(
   // is armed. That is why we never persist a 'ready' state across restarts: the
   // startup check must be allowed to run and re-arm it. Also why a non-zero exit
   // code skips the install — a crash never installs anything.
-  autoUpdater.autoInstallOnAppQuit = true
+  // Off when the user switched automatic updates off; electron-updater reads it again at quit,
+  // so a build staged before the switch is not applied either.
+  autoUpdater.autoInstallOnAppQuit = !autoUpdateOff
   // We ship an NSIS target, never the web installer. Left at its default (false)
   // electron-updater logs a deprecation nag on EVERY download
   // (NsisUpdater.js:44-46).
@@ -716,6 +746,9 @@ export function initUpdater(
   /** Self-rescheduling poll loop — a setInterval can't carry jitter or backoff. */
   const schedule = (phase: 'startup' | 'periodic' | 'resume'): void => {
     if (timer) clearTimeout(timer)
+    timer = null
+    // Automatic updates off: no background check. The manual "Check for updates" still runs.
+    if (autoUpdateOff) return
     timer = setTimeout(() => {
       void runCheck(false).finally(() => schedule('periodic'))
     }, nextCheckDelayMs({ phase, consecutiveFailures }))
@@ -731,6 +764,13 @@ export function initUpdater(
   })
 
   schedule('startup')
+
+  // The switch flipped: re-arm or stop apply-on-quit, and the poll (switching on checks soon).
+  applyAutoUpdate = () => {
+    autoUpdater.autoInstallOnAppQuit = !autoUpdateOff
+    schedule('resume')
+    push(lastStatus)
+  }
 
   // THE OTHER HALF OF "RETRY ON RESUME" (JOS-307), and it is the half that covers the common case.
   //
