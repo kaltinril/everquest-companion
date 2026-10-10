@@ -50,11 +50,8 @@ import {
   type CardAction,
   type CardState
 } from './cardQueue'
-import { TextScaleStepper } from './TextScaleStepper'
-import { BgAlphaSlider } from './BgAlphaSlider'
-import { useOverlayChrome, type OverlayChrome } from './useOverlayChrome'
-
-const GOLD = '#d9b25f'
+import { DragFrame } from './DragFrame'
+import { useOverlayChrome } from './useOverlayChrome'
 
 type BannerAction = CardAction<AlertBannerPayload>
 type BannerState = CardState<AlertBannerPayload>[]
@@ -63,71 +60,6 @@ type BannerState = CardState<AlertBannerPayload>[]
  *  same defaults main would have filled in. */
 function bannerConfig(config: OverlayConfig | null): AlertBannerOverlayConfig {
   return config?.alertBanner ?? DEFAULT_ALERT_BANNER_CONFIG
-}
-
-/**
- * The positioning frame, shown only while the overlay is unlocked — the toast's DragFrame, with
- * this window's own words. It is also where the TEXT SIZE and the TRANSPARENCY live, for the same
- * reason: this kind renders nothing at all most of the time, so the frame is the only chrome it
- * ever shows, and Preferences → Overlays → "Move it" is the whole route to all three knobs. (The
- * `bg` slider arrived in JOS-407; until then this kind's 0.72 was not settable at all.)
- */
-function DragFrame({
-  onDone,
-  textScale,
-  bgAlpha,
-  patch,
-  noDrag
-}: {
-  onDone: () => void
-  textScale: number
-  bgAlpha: number
-  patch: OverlayChrome['patch']
-  noDrag: React.CSSProperties
-}): JSX.Element {
-  return (
-    <div
-      data-testid="banner-drag-frame"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 8,
-        marginBottom: 8,
-        padding: '6px 10px',
-        borderRadius: 8,
-        border: `1px dashed ${GOLD}`,
-        background: 'rgba(15,17,21,0.65)',
-        color: GOLD,
-        fontSize: 11
-      }}
-    >
-      {/* The PROSE is the give on a narrow strip; the three controls beside it are the whole point
-          of the frame and stay whole at every width. */}
-      <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        Drag me where alerts should appear
-      </span>
-      <BgAlphaSlider bgAlpha={bgAlpha} patch={patch} noDrag={noDrag} />
-      <TextScaleStepper textScale={textScale} patch={patch} noDrag={noDrag} />
-      <button
-        type="button"
-        onClick={onDone}
-        style={{
-          ...noDrag,
-          flexShrink: 0,
-          border: `1px solid ${GOLD}`,
-          borderRadius: 4,
-          background: 'transparent',
-          color: GOLD,
-          fontSize: 11,
-          padding: '2px 8px',
-          cursor: 'pointer'
-        }}
-      >
-        Done
-      </button>
-    </div>
-  )
 }
 
 /**
@@ -208,13 +140,7 @@ export default function AlertBannerOverlay(): JSX.Element {
       {/* The drag frame is CHROME: unscaled, so "Done" and A− / A+ stay inside the strip at 2.0
           — the one route to both knobs must not be the thing the scale pushes off screen. */}
       {chrome.ready && !chrome.locked && (
-        <DragFrame
-          onDone={chrome.toggleLock}
-          textScale={chrome.textScale}
-          bgAlpha={chrome.bgAlpha}
-          patch={chrome.patch}
-          noDrag={chrome.noDrag}
-        />
+        <DragFrame testId="banner-drag-frame" prompt="Drag me where alerts should appear" chrome={chrome} />
       )}
       {/* The lines ARE the content — newest at the bottom (arrival order is render order), oldest
           evicted past the cap. No scroll pane: this kind renders nothing most of the time, and a

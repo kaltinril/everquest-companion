@@ -31,83 +31,13 @@ import { ToastCard } from './ToastCard'
 import { ScaledContent } from './overlayScale'
 import { useUnpinOnPointerExit } from './cardQueue'
 import { toastReduce, type ToastAction, type ToastCardState } from './toastQueue'
-import { TextScaleStepper } from './TextScaleStepper'
-import { BgAlphaSlider } from './BgAlphaSlider'
-import { useOverlayChrome, type OverlayChrome } from './useOverlayChrome'
+import { DragFrame } from './DragFrame'
+import { useOverlayChrome } from './useOverlayChrome'
 
 /** How often the queue's clocks advance. 100 ms is imperceptible against a 6 s hold and costs
  *  nothing: the reducer returns the SAME array when no card moved, so React re-renders only
  *  when something actually changed. */
 const TICK_MS = 100
-
-const GOLD = '#d9b25f'
-
-/**
- * The positioning frame, shown only while the overlay is unlocked.
- *
- * It is also where the TEXT SIZE and the TRANSPARENCY live for this kind, for the same reason the
- * drag handle does: the toast has no header and no footer to hang a control off — it renders
- * nothing at all most of the time — so this frame is the only chrome it ever shows. Preferences →
- * Overlays → "Move it" is therefore the whole route to all three knobs: move it, size it, fade it,
- * Done. (The `bg` slider arrived in JOS-407; until then this kind's 0.72 was not settable at all.)
- */
-function DragFrame({
-  onDone,
-  textScale,
-  bgAlpha,
-  patch,
-  noDrag
-}: {
-  onDone: () => void
-  textScale: number
-  bgAlpha: number
-  patch: OverlayChrome['patch']
-  noDrag: React.CSSProperties
-}): JSX.Element {
-  return (
-    <div
-      data-testid="toast-drag-frame"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 8,
-        marginBottom: 8,
-        padding: '6px 10px',
-        borderRadius: 8,
-        border: `1px dashed ${GOLD}`,
-        background: 'rgba(15,17,21,0.65)',
-        color: GOLD,
-        fontSize: 11
-      }}
-    >
-      {/* The PROSE is the give on a narrow strip; the three controls beside it are the whole point
-          of the frame and stay whole at every width. */}
-      <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        Drag me where celebrations should appear
-      </span>
-      <BgAlphaSlider bgAlpha={bgAlpha} patch={patch} noDrag={noDrag} />
-      <TextScaleStepper textScale={textScale} patch={patch} noDrag={noDrag} />
-      <button
-        type="button"
-        onClick={onDone}
-        style={{
-          ...noDrag,
-          flexShrink: 0,
-          border: `1px solid ${GOLD}`,
-          borderRadius: 4,
-          background: 'transparent',
-          color: GOLD,
-          fontSize: 11,
-          padding: '2px 8px',
-          cursor: 'pointer'
-        }}
-      >
-        Done
-      </button>
-    </div>
-  )
-}
 
 /**
  * Keep main's click-through state in step with the queue.
@@ -188,13 +118,7 @@ export default function ToastOverlay(): JSX.Element {
       {/* The drag frame is CHROME: unscaled, so "Done" and A− / A+ stay inside the strip at 2.0
           — the one route to both knobs must not be the thing the scale pushes off screen. */}
       {chrome.ready && !chrome.locked && (
-        <DragFrame
-          onDone={chrome.toggleLock}
-          textScale={chrome.textScale}
-          bgAlpha={chrome.bgAlpha}
-          patch={chrome.patch}
-          noDrag={chrome.noDrag}
-        />
+        <DragFrame testId="toast-drag-frame" prompt="Drag me where celebrations should appear" chrome={chrome} />
       )}
       {/* The cards ARE the content — no scroll pane, because this kind renders nothing most of
           the time and a strip that could scroll would be a window, which is what it is not. */}

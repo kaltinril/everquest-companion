@@ -446,6 +446,8 @@ test('every overlay kind can reach the control', () => {
   // The meters and the event log put it in their footer; the toast has neither header nor footer,
   // so it lives in the drag frame that IS its interactive chrome.
   for (const [name, path] of Object.entries(SURFACES)) {
-    assert.match(src(path), /<TextScaleStepper/, `${name} offers no text size control`)
+    assert.match(src(path), /<TextScaleStepper|<DragFrame /, `${name} offers no text size control`)
   }
+  // The three strips share that frame, so their stepper is written once, in DragFrame.tsx.
+  assert.match(src('../src/renderer/src/overlay/DragFrame.tsx'), /<TextScaleStepper/)
 })

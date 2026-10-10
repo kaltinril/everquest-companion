@@ -341,8 +341,10 @@ test('THE THREE STRIPS HAVE A SLIDER NOW, and it writes through the config patch
     '../src/renderer/src/overlay/AlertBannerOverlay.tsx',
     '../src/renderer/src/overlay/ConCardOverlay.tsx'
   ]) {
-    assert.match(src(path), /<BgAlphaSlider bgAlpha=\{bgAlpha\}/, `${path} carries one in its drag frame`)
+    assert.match(src(path), /<DragFrame /, `${path} carries one in its drag frame`)
   }
+  // …which the three share, so the slider is written once.
+  assert.match(src('../src/renderer/src/overlay/DragFrame.tsx'), /<BgAlphaSlider bgAlpha=\{chrome\.bgAlpha\}/)
 })
 
 // ---- crossing a machine boundary (profiles / share) ---------------------------------------

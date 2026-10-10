@@ -49,12 +49,9 @@ import { ConCard } from './ConCard'
 import { ScaledContent } from './overlayScale'
 import { cardReduce, useCardTick, useQueueMouseCapture, useUnpinOnPointerExit } from './cardQueue'
 import type { CardAction, CardState } from './cardQueue'
-import { TextScaleStepper } from './TextScaleStepper'
-import { BgAlphaSlider } from './BgAlphaSlider'
-import { useOverlayChrome, type OverlayChrome } from './useOverlayChrome'
+import { DragFrame } from './DragFrame'
+import { useOverlayChrome } from './useOverlayChrome'
 import { fitChanged, overlayFitRequest } from './overlayFit'
-
-const GOLD = '#d9b25f'
 
 /** One card at a time, by design — see the header. */
 const CAP = 1
@@ -69,68 +66,6 @@ type ConState = CardState<ConCardPayload>[]
  *  default main would have filled in. */
 function conCardConfig(config: OverlayConfig | null): ConCardOverlayConfig {
   return config?.conCard ?? DEFAULT_CON_CARD_CONFIG
-}
-
-/**
- * The positioning frame, shown only while the overlay is unlocked — the banner's DragFrame with
- * this window's own words, and for the same reason: this kind renders nothing between cons, so the
- * frame is the only chrome it ever shows and the text size — and, since JOS-407, the transparency —
- * has nowhere else to live.
- */
-function DragFrame({
-  onDone,
-  textScale,
-  bgAlpha,
-  patch,
-  noDrag
-}: {
-  onDone: () => void
-  textScale: number
-  bgAlpha: number
-  patch: OverlayChrome['patch']
-  noDrag: React.CSSProperties
-}): JSX.Element {
-  return (
-    <div
-      data-testid="con-card-drag-frame"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 8,
-        marginBottom: 8,
-        padding: '6px 10px',
-        borderRadius: 8,
-        border: `1px dashed ${GOLD}`,
-        background: 'rgba(15,17,21,0.65)',
-        color: GOLD,
-        fontSize: 11
-      }}
-    >
-      <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        Drag me where mob cards should appear
-      </span>
-      <BgAlphaSlider bgAlpha={bgAlpha} patch={patch} noDrag={noDrag} />
-      <TextScaleStepper textScale={textScale} patch={patch} noDrag={noDrag} />
-      <button
-        type="button"
-        onClick={onDone}
-        style={{
-          ...noDrag,
-          flexShrink: 0,
-          border: `1px solid ${GOLD}`,
-          borderRadius: 4,
-          background: 'transparent',
-          color: GOLD,
-          fontSize: 11,
-          padding: '2px 8px',
-          cursor: 'pointer'
-        }}
-      >
-        Done
-      </button>
-    </div>
-  )
 }
 
 /**
@@ -249,13 +184,7 @@ export default function ConCardOverlay(): JSX.Element {
             It is INSIDE the measured box on purpose — the JOS-378 rule is that the frame stays in
             the window at every text scale, and a window fitted to the card alone would cut it off. */}
         {chrome.ready && !chrome.locked && (
-          <DragFrame
-            onDone={chrome.toggleLock}
-            textScale={chrome.textScale}
-            bgAlpha={chrome.bgAlpha}
-            patch={chrome.patch}
-            noDrag={chrome.noDrag}
-          />
+          <DragFrame testId="con-card-drag-frame" prompt="Drag me where mob cards should appear" chrome={chrome} />
         )}
         <ScaledContent textScale={chrome.textScale}>
           {cards.map((c) => (
