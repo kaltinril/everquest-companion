@@ -52,14 +52,18 @@ export function liveLogName(segment: Segment): string {
 async function gunzipPrefix(archive: string, dest: string, bytes: number): Promise<{ sha256: string; bytes: number }> {
   const h = createHash('sha256')
   const out = createWriteStream(dest)
+  // A write that fails (a full temp drive) never drains; the wait has to end on the error instead.
+  const failed = new Promise<never>((_, reject) => out.once('error', reject))
+  failed.catch(() => undefined)
   let n = 0
   for await (const chunk of createReadStream(archive).pipe(createGunzip())) {
     const take = (chunk as Buffer).subarray(0, Math.max(0, bytes - n))
     if (take.length === 0) break
     h.update(take)
     n += take.length
-    if (!out.write(take)) await new Promise<void>((r) => out.once('drain', () => r()))
+    if (!out.write(take)) await Promise.race([new Promise<void>((r) => out.once('drain', () => r())), failed])
   }
+  if (out.errored !== null) throw out.errored
   await new Promise<void>((resolve, reject) => out.end((err?: Error | null) => (err ? reject(err) : resolve())))
   return { sha256: h.digest('hex'), bytes: n }
 }

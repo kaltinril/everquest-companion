@@ -242,6 +242,18 @@ test('rotate: a log that cannot be moved changes nothing and says so', async () 
   assert.equal(readFileSync(f.logPath, 'utf8'), LOG_TEXT)
 })
 
+test('rotate: a failed move leaves the history already kept from the same bytes as it was', async () => {
+  const f = fixture()
+  const s = await captured(f.logPath)
+  const kept: Segment = { ...s, state: 'sealed', archivePath: join(f.dir, 'kept.log.gz') }
+  writeSegment(f.dir, kept)
+  const r = await rotateLog(join(f.logs, 'missing.txt'), f.dir, await captured(f.logPath), rotateDeps())
+  assert.equal(r.ok, false)
+  const after = listSegments(f.dir).segments.find((x) => x.id === s.id)
+  assert.equal(after?.state, 'sealed')
+  assert.equal(after?.archivePath, kept.archivePath)
+})
+
 for (const step of ['journal', 'moved', 'backed-up', 'sealed']) {
   test(`rotate: a crash after "${step}" is finished by the launch recovery, and no byte is lost`, async () => {
     const f = fixture()

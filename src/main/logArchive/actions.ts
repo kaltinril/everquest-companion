@@ -195,7 +195,8 @@ function dumpAdvice(logPath: string, logModified: number): DumpAdvice {
   // as shared/outputs/kinds.ts preferredOutputFile allows it.
   const mtime = (kind: string): number | null => {
     const own = files.filter((f) => f.toLowerCase().startsWith(`${stem}-`) && f.toLowerCase().endsWith(`-${kind.toLowerCase()}.txt`))
-    const times = own.map((f) => statSync(join(root, f)).mtimeMs)
+    // A dump can be replaced between the listing and the stat; a vanished one reads as absent.
+    const times = own.map((f) => statSync(join(root, f), { throwIfNoEntry: false })?.mtimeMs ?? 0)
     return times.length > 0 ? Math.max(...times) : null
   }
   const inventoryMs = mtime('Inventory')
@@ -205,8 +206,8 @@ function dumpAdvice(logPath: string, logModified: number): DumpAdvice {
 }
 
 function liveLog(a: { logPath: string } | null): LogArchiveStatus['live'] {
-  if (a === null || !existsSync(a.logPath)) return null
-  const st = statSync(a.logPath)
+  const st = a === null ? undefined : statSync(a.logPath, { throwIfNoEntry: false })
+  if (a === null || st === undefined) return null
   return { path: a.logPath, bytes: st.size, modifiedMs: st.mtimeMs }
 }
 
@@ -273,8 +274,9 @@ async function exclusive(label: string, fn: () => LogArchiveReply | Promise<LogA
     r = await fn()
   } catch (err) {
     r = reply(false, (err as Error).message)
+  } finally {
+    busy = null
   }
-  busy = null
   // The status in `r` was read while this action still held `busy`; read it again so the card
   // does not keep showing the action as running.
   return { ...r, status: logArchiveStatus() }
@@ -295,6 +297,10 @@ export function backupNow(): Promise<LogArchiveReply> {
     const cap = await captureSegment(captureDeps)
     if (!cap.ok) return reply(false, `Not backed up: ${cap.reason}.`)
     const s = cap.segment
+    // The same bytes captured again carry the same id; writing over a backup or a kept history
+    // would take it off the tabs until it was kept a second time.
+    const had = rotateDeps.readSegment(dir, s.id)
+    if (had !== null && had.state !== 'captured') return reply(true, `Already backed up: ${had.archivePath ?? dir}.`)
     writeSegment(dir, s)
     const logPath = attached()?.logPath ?? ''
     const name = archiveName(basename(logPath), s.log.firstStamp, s.log.lastStamp)

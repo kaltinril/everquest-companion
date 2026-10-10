@@ -56,6 +56,7 @@ export function startAutoArchive(): void {
     void learnEngineModules()
       .then(() => refreshLackingHistories((line) => logInfo(`[everquest-companion] ${line}`)))
       .then(() => autoArchiveCheck())
+      .catch((err: unknown) => logInfo(`[everquest-companion] log archive: launch check failed: ${(err as Error).message}`))
     setInterval(() => void autoArchiveCheck(), CHECK_EVERY_MS).unref()
   }, WAIT_FOR_ENGINE_MS)
   waiting.unref()
