@@ -57,6 +57,7 @@ import {
 // them, which is why the hook is handed the overlay bridge (no setter on it, by construction).
 import type { BuffAllowPrefs } from '@shared/buffAllow'
 import { useBuffAllow } from '../features/buffs/useBuffAllow'
+import { useSecondsClock } from '../lib/useSecondsClock'
 import { OverlayHeader } from './OverlayHeader'
 import { FOOTER_ROW, OverlayContent } from './overlayScale'
 import { TextScaleStepper } from './TextScaleStepper'
@@ -205,22 +206,6 @@ function useWholeSnapshot<S>(moduleId: string, empty: S): { state: S; hydrations
   }, [moduleId])
 
   return { state, hydrations }
-}
-
-/** A local 1 Hz clock. A timer must recede while the log is idle, which is exactly when no delta
- *  is coming; every row already carries its own `startedTs`, so this costs one render a second
- *  and zero IPC. */
-function useSecondsClock(): number {
-  const [now, setNow] = useState(() => Date.now())
-  useEffect(() => {
-    const id = setInterval(() => {
-      setNow(Date.now())
-    }, 1000)
-    return () => {
-      clearInterval(id)
-    }
-  }, [])
-  return now
 }
 
 /**
