@@ -12,6 +12,17 @@ every upstream issue that was looked at and what became of it. [requirements/](r
 holds each feature branch's list of what was asked for (rule 19). [RELEASING.md](RELEASING.md), on
 the `community_release_rules` branch, is how a test build reaches the fork's Releases page.
 
+## At a glance
+
+![How the community fork is run: upstream/main fast-forwards into main; every branch starts from main; the recipe in BRANCHES.md merges them in order into main_community behind the gate; a community tag on main_community builds a release](fork-workflow.svg)
+
+Read it top to bottom, then left to right. The creator's `main` comes down unchanged. Every branch
+of ours starts from it, in four kinds that line up with the five steps of the recipe. Merged in
+that order, behind the gate, they make `main_community`, which the dev app runs and every test
+build comes from. The strip along the bottom is the path one fix takes. The picture is
+[fork-workflow.svg](fork-workflow.svg), plain SVG, so a change to the process is a change to that
+file in the same commit.
+
 ## Why
 
 Three things have to stay true at once:
@@ -43,16 +54,10 @@ and rebuilt from the recipe at any time, and the rebuild script exists to prove 
 
 ## How a change flows
 
-```
-upstream/main ──fast-forward──▶ main ──branch──▶ feature branch ──merge──▶ main_community
-                                                        │
-                                                        └──push origin──▶ PR to upstream (when he is back)
+The picture above, in words:
 
-upstream PR #N ──vet──▶ community/pr-N-slug ──merge──▶ main_community
-                              │
-                              └── row in ADOPTIONS.md, line in BRANCHES.md
-```
-
+- `main` only ever fast-forwards to `upstream/main`. A feature branch is pushed to `origin`, and
+  becomes a pull request to the creator's repo when he is back.
 - A fix goes on the branch that owns the code, in that branch's worktree, then merges into
   `main_community` from the main tree. A fix committed on `main_community` is lost on the next
   rebuild and never reaches a PR.
