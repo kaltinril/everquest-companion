@@ -5,7 +5,8 @@
 // faction receipt lines their wiki pages quote (`QuestEntry.factions`, scraped offline from the
 // cached corpus — scripts/sources/questPage.ts parseFactionHits). The JOIN KEY is the faction's
 // name: the wiki links `[[Kerra Isle]]` and the `/outputfile faction` dump's Name column says
-// `Kerra Isle`, so a lowercased name equality is the whole join. Factions the dump tracks but no
+// `Kerra Isle`, so a name equality is the whole join — keyed through `factionNameKey`, the one join
+// key, since the quest pages also drop the dump's spelling (`Freeport Militia`, `Da Bashers`). Factions the dump tracks but no
 // quest page names simply have no work on record; factions quest pages name but the dump does not
 // track (Kunark/Velious-era names in a classic dump) are indexed anyway and shown or not by the
 // caller.
@@ -18,6 +19,7 @@
 // zone here is the string to hand it.
 
 import type { QuestData, QuestEntry } from '@shared/types'
+import { factionNameKey } from '../../../../shared/outputs/factions'
 import questsJson from '../../data/eqlegends/quests.json'
 
 /** ONE QUEST as the factions tab draws it — this file's own shape, projected from the catalog. */
@@ -140,7 +142,7 @@ export function buildFactionWorkIndex(quests: readonly QuestEntry[]): Map<string
   for (const q of quests) {
     fileSilent(q, silentByZone)
     for (const hit of q.factions ?? []) {
-      const key = hit.name.toLowerCase()
+      const key = factionNameKey(hit.name)
       let work = index.get(key)
       if (work === undefined) {
         work = { raise: [], lower: [], nearby: [] }

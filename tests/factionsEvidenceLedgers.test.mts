@@ -8,7 +8,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { readFactionEvidence, readLedgers } from '../src/main/factionsEvidence'
@@ -96,4 +96,19 @@ test('the ledger reads a line exactly as the tab does (the reading is restated t
     if (a === null) assert.equal(b, null, l)
     else assert.deepEqual(a, b === null ? null : b.kind === 'adjust' ? { name: b.name, kind: b.kind, amount: b.amount } : { name: b.name, kind: b.kind, cap: b.cap }, l)
   }
+})
+
+test('a live log just archived (empty, or not yet recreated) still reads the ledgers', async () => {
+  const logPath = install([], [ledgerOf(ARCHIVED, 'seg-1')])
+  const empty = await readFactionEvidence(logPath, at('10:05:30'))
+  assert.equal(empty?.complete, true)
+  assert.deepEqual(empty?.rows.find((x) => x.name === 'Heretics'), { name: 'Heretics', cap: null, sum: -5, hits: 1 })
+  rmSync(logPath)
+  const missing = await readFactionEvidence(logPath, at('10:05:30'))
+  assert.deepEqual(missing, empty)
+})
+
+test('with neither a live log nor a ledger there is nothing to report', async () => {
+  const logPath = install([], [])
+  assert.equal(await readFactionEvidence(logPath, at('09:00:00')), null)
 })

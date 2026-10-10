@@ -140,14 +140,14 @@ function haystacksOf(name: string, w: FactionWork | null): { searchText: string;
 }
 
 function toRowVm(r: FactionStanding, joins: RowJoins): FactionRowVm {
-  const ev = joins.evidence.get(r.name.toLowerCase())
+  const ev = joins.evidence.get(factionNameKey(r.name))
   const cap = r.standing + r.toMax
   const live =
     ev === undefined
       ? { value: r.standing, drift: 0, exact: true }
       : applyEvidence(r.standing, cap, ev, joins.windowComplete)
   const tier = factionTier(live.value)
-  const w = joins.work.get(r.name.toLowerCase()) ?? null
+  const w = joins.work.get(factionNameKey(r.name)) ?? null
   return {
     id: r.id,
     name: r.name,
@@ -224,7 +224,7 @@ export function useFactionData(): FactionsData {
   const rows = useMemo(() => {
     if (standings === undefined) return null
     const byName = new Map<string, FactionEvidence>()
-    for (const ev of evidence?.rows ?? []) byName.set(ev.name.toLowerCase(), ev)
+    for (const ev of evidence?.rows ?? []) byName.set(factionNameKey(ev.name), ev)
     const joins: RowJoins = {
       work: factionWorkIndex(),
       evidence: byName,

@@ -113,8 +113,8 @@ export function withLedgers(
 
 /**
  * Fold the log's faction lines newer than `sinceMs`, and an archive's ledgers before them. Null
- * when the log cannot be read at all — the tab then simply shows the dump as-is, which is what it
- * showed before this existed.
+ * when neither the log nor a ledger can be read — the tab then simply shows the dump as-is, which
+ * is what it showed before this existed.
  */
 export async function readFactionEvidence(
   logPath: string,
@@ -124,9 +124,15 @@ export async function readFactionEvidence(
   try {
     tail = await readTail(logPath, TAIL_CAP_BYTES)
   } catch {
-    return null
+    tail = null
   }
-  if (tail === null) return null
+  if (tail === null) {
+    // A log just archived is empty or not yet recreated, yet every line since the dump is in the
+    // ledgers beside it — read them over an empty live window rather than fall back to the dump.
+    const ledgers = readLedgers(logPath)
+    if (ledgers.length === 0) return null
+    return withLedgers(ledgers, { events: [], windowStartTs: 0, liveComplete: true }, sinceMs)
+  }
 
   const raw = tail.text.split(/\r?\n/)
   // A truncated read starts mid-line; the fragment cannot be trusted to parse.
