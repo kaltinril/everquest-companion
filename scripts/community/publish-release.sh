@@ -52,8 +52,14 @@ if [ -f "$dir/win-unpacked/resources/app.asar" ]; then
   asar_list=$(node_modules/.bin/asar list "$dir/win-unpacked/resources/app.asar" | tr -d '\r')
   modules=$(grep -c 'node_modules' <<<"$asar_list" || true)
   grep -q '[\\/]node_modules[\\/]conf$' <<<"$asar_list" || fail "the asar has no node_modules/conf; this build is broken"
-  [ "$modules" -ge 29000 ] || fail "the asar lists only $modules node_modules entries (a good build has about 29,000)"
-  echo "asar: $modules node_modules entries, conf present"
+  # Every runtime dependency the build's own package.json declares must be in it. A count was the
+  # check until test.22, when the renderer-only packages left the installer (installer-size) and a
+  # good build went from about 29,000 entries to under a thousand; naming the packages is exact.
+  slashed=$(tr '\\' '/' <<<"$asar_list")
+  for dep in $(node -p "Object.keys(require('./package.json').dependencies || {}).join(' ')"); do
+    grep -qF "node_modules/$dep/package.json" <<<"$slashed" || fail "the asar has no node_modules/$dep; this build is broken"
+  done
+  echo "asar: $modules node_modules entries, every runtime dependency present"
 else
   echo "note: $dir/win-unpacked is gone, so the asar was not re-checked; it was checked at the build"
 fi
