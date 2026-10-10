@@ -27,6 +27,7 @@ import { join } from 'node:path'
 import { factionNameKey, parseFactionsDump } from '../src/shared/outputs/factions'
 import { parseAchievementsDump, raceUnlockClaims } from '../src/shared/outputs/achievements'
 import { outputKind, parseOutput, preferredOutputFile } from '../src/main/outputs/kinds'
+import { isOwnOutputFile } from '../src/shared/outputs/kinds'
 import { FACTION_TIER_FLOORS, factionTier } from '../src/renderer/src/features/factions/factionTiers'
 
 const FIXTURES = join(import.meta.dirname, 'fixtures')
@@ -147,6 +148,29 @@ test('preferredOutputFile resolves the class-token filename to ITS character, no
   )
   // …and an unknown character still lands on the newest file, the one-character machine's answer.
   assert.equal(preferredOutputFile(files, def), 'Other_oggok-Factions.txt')
+})
+
+test("isOwnOutputFile refuses another character's dump, the one the newest-file fallback hands back", () => {
+  const def = outputKind('faction')
+  // A character with no dump of their own: the fallback answers with Other's file, and the load
+  // must not persist Other's standings under this character.
+  const only = ['Other_oggok-WAR-Factions.txt']
+  const picked = preferredOutputFile(only, def, 'Drywrought', 'oggok')
+  assert.equal(picked, 'Other_oggok-WAR-Factions.txt')
+  assert.equal(isOwnOutputFile(`C:\\EQ\\${picked}`, def, 'Drywrought', 'oggok'), false)
+  // Their own dump is accepted under every name the resolver would pick it by, case folded…
+  for (const own of [
+    'Drywrought_oggok-WAR-Factions.txt',
+    'drywrought_OGGOK-shd-factions.txt',
+    'Drywrought_oggok-Factions.txt',
+    'Drywrought-Factions.txt'
+  ]) {
+    assert.equal(isOwnOutputFile(`C:\\EQ\\${own}`, def, 'Drywrought', 'oggok'), true, own)
+  }
+  // …a name that merely starts the same is someone else…
+  assert.equal(isOwnOutputFile('Drywroughter_oggok-WAR-Factions.txt', def, 'Drywrought', 'oggok'), false)
+  // …and an unknown character accepts any file, the one-character machine's answer.
+  assert.equal(isOwnOutputFile('Other_oggok-WAR-Factions.txt', def), true)
 })
 
 // ---------------------------------------------------------------------------

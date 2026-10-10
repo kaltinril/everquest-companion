@@ -314,3 +314,23 @@ export function preferredOutputFile(
   }
   return filesNewestFirst[0]
 }
+
+/**
+ * Is this dump provably the character's OWN? `preferredOutputFile`'s two ownership rules (an
+ * exact preferred name, or the `<Character>_<server>-` prefix with the kind's suffix), without its
+ * newest-file fallback. A per-character load asks this before persisting, so a character with no
+ * dump of their own never takes on another character's. An unknown character accepts any file —
+ * the one-character machine's answer, unchanged.
+ */
+export function isOwnOutputFile(
+  path: string,
+  def: OutputKindDef,
+  characterName?: string,
+  server?: string
+): boolean {
+  if (!characterName) return true
+  const file = (path.split(/[\\/]/).pop() ?? '').toLowerCase()
+  if (outputFileNames(def, characterName, server).some((n) => n.toLowerCase() === file)) return true
+  if (!server) return false
+  return file.startsWith(`${characterName}_${server}-`.toLowerCase()) && isOutputFileName(def, file)
+}
