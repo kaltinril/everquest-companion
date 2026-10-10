@@ -162,8 +162,11 @@ export function useUnlocksController(props: UnlocksViewProps): UnlocksController
   const { rows } = useFactionData()
   const [hideOpen, setHideOpen] = useState(() => loadFlag(HIDE_OPEN_KEY))
   const [focus, setFocus] = useState<UnlockRef | null>(null)
+  // The parked ref is taken once, and StrictMode runs this effect twice in dev: the second run
+  // finds the slot empty and must not clear the focus the first run took.
   useEffect(() => {
-    setFocus(takeUnlockFocus())
+    const ref = takeUnlockFocus()
+    if (ref !== null) setFocus(ref)
   }, [])
 
   const book = useMemo(
