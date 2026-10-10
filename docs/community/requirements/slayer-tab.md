@@ -9,3 +9,4 @@ before 2026-10-10 were gathered that day from agent notes and the branch history
 | 2026-09-28 | owner | Where to go to finish Slayer achievements, several picked together, shaded on the map. | built |
 | 2026-09-29 | owner | Redesign it for any and all achievements, grouped like the game window. | built (Achievements tab) |
 | 2026-10-05 | owner | No faction hits switch, Zone I'm in filter, zone sort, Closest first = least left. | built |
+| 2026-10-10 | owner | Scraper bug review: a mob whose wiki faction line is negative under an `oppfac` span, or names the faction without a link, counts as a faction hit. | in progress |

@@ -7,3 +7,4 @@ branch's earlier fixes are listed on its BRANCHES.md row; this list starts on 20
 | Date | Asked by | The ask | Status |
 | --- | --- | --- | --- |
 | 2026-10-10 | owner | Running an older installer over a newer install asks first ("are you sure you want to replace the newer version?") instead of silently rolling the app back. | built (customInit, build/installer.nsh) |
+| 2026-10-10 | owner | Scraper bug review: a weapon's `Bane DMG` line no longer overwrites its DMG (Greenmist read 6 for 18). | in progress |
