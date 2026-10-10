@@ -48,9 +48,16 @@ export function useSlayerData(): SlayerData {
   const [progress, setProgress] = useState<ProgressState | null>(null)
   useEffect(() => {
     let alive = true
-    void window.eq.getProgress().then((p) => {
-      if (alive) setProgress(p)
-    })
+    // The first reply can be read before a dump push and land after it, so it only fills an
+    // empty state.
+    void window.eq.getProgress().then(
+      (p) => {
+        if (alive) setProgress((prev) => prev ?? p)
+      },
+      () => {
+        /* a failed read leaves what is shown alone */
+      }
+    )
     const off = window.eq.onProgress((p) => {
       setProgress(p)
     })

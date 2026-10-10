@@ -46,8 +46,21 @@ export function useAchievementBook(): BookData {
       asked = readAt
       ask(readAt)
     }
-    void window.eq.getProgress().then(onProgress)
-    const off = window.eq.onProgress(onProgress)
+    // The first reply can be read before a push and land after it; once a push has come, that
+    // reply is stale and is dropped.
+    let pushed = false
+    void window.eq.getProgress().then(
+      (p) => {
+        if (!pushed) onProgress(p)
+      },
+      () => {
+        /* a failed read leaves what is shown alone */
+      }
+    )
+    const off = window.eq.onProgress((p) => {
+      pushed = true
+      onProgress(p)
+    })
     return () => {
       alive = false
       off()
