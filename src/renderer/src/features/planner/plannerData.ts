@@ -558,7 +558,9 @@ export function hiddenByView(
   planClasses: readonly ClassAbbr[],
   view: DonorView
 ): HiddenByView {
-  const open: DonorView = { eraOnly: false, nonEquip: true }
+  // Only the two toggles open: the owned chips and the charged filter stay as the user set them,
+  // or a row they hide would be counted as one releasing a toggle could bring back.
+  const open: DonorView = { ...view, eraOnly: false, nonEquip: true }
   const candidates = filterDonors(rows, filters, planClasses, open)
   return {
     era: view.eraOnly ? candidates.filter((d) => eraHides(d, true)).length : 0,
