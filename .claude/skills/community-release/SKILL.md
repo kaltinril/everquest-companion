@@ -19,9 +19,10 @@ reaches players within hours: only publish what the owner has asked for.
    `git rev-list --count main_community..<branch>` is 0 for each; merge any that is not.
 3. **Bump and write the notes on `test-neutering`**, in its worktree (`.claude/worktrees/test-neutering`):
    `package.json` version `0.1.0-test.N` -> `N+1`, and one commit titled
-   `Test build 0.1.0-test.N: <one line>` whose body is the player-facing notes (a high-level list
-   of what the build adds, what is new in this version, how to install over what you have, known
-   issues; short). The script takes the NEWEST `Test build <version>:` commit, so a correction is
+   `Test build 0.1.0-test.N: <one line>` whose body is the player-facing notes: ONLY what changed
+   since the previous version, then the known issues; short. Never repeat the cumulative "what
+   this build adds" list: test.20, the first release, carries it, and the script links to it from
+   every later release (it stops if the heading reappears). The script takes the NEWEST `Test build <version>:` commit, so a correction is
    a new empty commit (`--allow-empty`), never an amend of a pushed one.
 4. **Merge `test-neutering` into `main_community`** from the main tree (`git merge --no-ff --no-edit`).
 5. **Gate locally:** `npm run typecheck`, `npm run lint`, `bash scripts/community/known-reds.sh`
