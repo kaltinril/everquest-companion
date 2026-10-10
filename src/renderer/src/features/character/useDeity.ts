@@ -36,8 +36,19 @@ export function useDeity(): string | null {
     const read = (p: { deity?: string } | null): void => {
       setDeity(p?.deity === undefined ? null : deityKey(p.deity))
     }
-    void window.eq.getProgress().then(read)
-    const off = window.eq.onProgress(read)
+    // A push is newer than the initial read, so a reply that lands after one is stale; a failed
+    // read leaves the deity unknown, which every consumer already handles.
+    let pushed = false
+    void window.eq
+      .getProgress()
+      .then((p) => {
+        if (!pushed) read(p)
+      })
+      .catch(() => undefined)
+    const off = window.eq.onProgress((p) => {
+      pushed = true
+      read(p)
+    })
     return off
   }, [])
   return deity
