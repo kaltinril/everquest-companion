@@ -6,10 +6,10 @@
 // cached corpus — scripts/sources/questPage.ts parseFactionHits). The JOIN KEY is the faction's
 // name: the wiki links `[[Kerra Isle]]` and the `/outputfile faction` dump's Name column says
 // `Kerra Isle`, so a name equality is the whole join — keyed through `factionNameKey`, the one join
-// key, since the quest pages also drop the dump's spelling (`Freeport Militia`, `Da Bashers`). Factions the dump tracks but no
-// quest page names simply have no work on record; factions quest pages name but the dump does not
-// track (Kunark/Velious-era names in a classic dump) are indexed anyway and shown or not by the
-// caller.
+// key, since the quest pages also drop the dump's spelling (`Freeport Militia`, `Da Bashers`).
+// Factions the dump tracks but no quest page names simply have no work on record; factions quest
+// pages name but the dump does not track (Kunark/Velious-era names in a classic dump) are indexed
+// anyway and shown or not by the caller.
 //
 // THE PROJECTION HAPPENS HERE, ONCE (owner ruling 4's shape): quests project into this file's own
 // row model as they are indexed, so the view filters and sorts ITS OWN rows, never the catalog's.
