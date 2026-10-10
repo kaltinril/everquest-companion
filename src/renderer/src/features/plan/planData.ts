@@ -15,13 +15,16 @@
 // would re-fold the whole catalog every time a tab switch remounted the view. Module scope with a
 // lazy singleton is the shape that answers all three.
 //
-// THE MOB KEY IS THE FOLD `mergeItemSources` ALREADY USES — trim, case-fold, and nothing else. It
-// is joining two halves of one wiki that disagree about capitalisation constantly (the item page's
-// `|dropsfrom` spelling against the catalog's own page title), which is exactly the join that
-// function documents. It is NOT `zoneLevelKey`, whose name is about zones, and it is NOT
-// `sourceItemKey`, whose `+N` strip belongs to ITEMS: a mob named `Ixiblat Fer +5` is a creature
-// this catalog has no row for at all (plan §0.2), and quietly folding it onto the base mob would
-// hand back a level about a different creature — the very thing `witnessOf` refuses.
+// THE MOB KEY IS THE SHARED `mobKey` (src/shared/mobKey.ts) — trim, case-fold, the apostrophe fold
+// and the ` (N)` strip. It is joining two halves of one wiki that disagree about capitalisation
+// constantly (the item page's `|dropsfrom` spelling against the catalog's own page title), and about
+// the apostrophe too: the item corpus names "Advisor Sh'Orok" where the catalog titles him
+// "Advisor Sh`Orok", and a trim-and-case-fold alone left thirteen drop edges with no level, so the
+// route dropped their items from every bracket. It is NOT `zoneLevelKey`, whose name is about
+// zones, and it is NOT `sourceItemKey`, whose `+N` strip belongs to ITEMS: a mob named
+// `Ixiblat Fer +5` is a creature this catalog has no row for at all (plan §0.2), and quietly
+// folding it onto the base mob would hand back a level about a different creature — the very
+// thing `witnessOf` refuses.
 //
 // A NAME THE CATALOG STATES TWICE KEEPS THE HIGHER LEVEL. The catalog is one row per PAGE and the
 // same creature name recurs across zones and tiers, so a name can resolve to several stated levels.
@@ -40,6 +43,7 @@
 import { useCallback, useMemo } from 'react'
 import type { ClassAbbr } from '@shared/classCombo'
 import { conBand } from '@shared/conBands'
+import { mobKey } from '@shared/mobKey'
 import type { MobEntry } from '@shared/mobTypes'
 import type { GearRow } from '@shared/planner/gear'
 import type { WishList } from '@shared/planner/wishlist'
@@ -73,11 +77,6 @@ let MOB_PAGES: ReadonlyMap<string, MobEntry> | null = null
 export function zoneProfiles(): ReadonlyMap<string, ZoneLevels> {
   PROFILES ??= zoneLevelProfile(MOB_CATALOG)
   return PROFILES
-}
-
-/** The join key for a mob NAME, the `mergeItemSources` fold — see the header for what it is not. */
-function mobKey(name: string): string {
-  return name.trim().toLowerCase()
 }
 
 // ---- the quest lane (fork, 2026-09-05) --------------------------------------------------------
@@ -170,9 +169,10 @@ export function mobLevelOf(name: string): number | null {
  * THE CATALOG ROW FOR A WIKI PAGE TITLE, or `undefined` — the identity pin a mob click carries
  * (`MobTarget.entry`). Keyed on `MobEntry.page`, not `name`, because that is what an item page's
  * `|dropsfrom` links (`GearTarget.mobPage`) and a page is one row where a name can be nine. The
- * same trim-and-case-fold as the level join, for the same two-halves-of-one-wiki reason. Eleven
- * pages share a title in the committed catalog; the first wins, which is the lookup `useMobKnowledge`
- * would make anyway.
+ * same `mobKey` as the level join, for the same two-halves-of-one-wiki reason. Thirteen
+ * pages share a key in the committed catalog (two of them, "Innoruuk's Chosen" and "Opal H'Rugla",
+ * only once the apostrophes fold); the first wins, which is the lookup `useMobKnowledge` would make
+ * anyway.
  */
 export function mobEntryOf(page: string): MobEntry | undefined {
   if (MOB_PAGES === null) {
