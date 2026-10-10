@@ -11,6 +11,30 @@ third-party pull request that was vetted, adopted or deferred. [ISSUES.md](ISSUE
 every upstream issue that was looked at and what became of it. [requirements/](requirements/)
 holds each feature branch's list of what was asked for (rule 19). [RELEASING.md](RELEASING.md), on
 the `community_release_rules` branch, is how a test build reaches the fork's Releases page.
+[agent/](agent/INDEX.md) is the working manual for AI agents.
+
+## How to work in this fork
+
+The same steps for people and agents:
+
+1. **Set up:** Node 24 (Node 22 gives hundreds of false test failures), Rust via rustup, then
+   `npm ci`.
+2. **Pick the branch.** A change goes on the feature branch that owns the code. A small fix to the
+   original code that no feature owns goes on `catch_all`. A new feature gets a new branch off
+   `main`. Never commit to `main` or `main_community`.
+3. **Work in a worktree:** `git worktree add .claude/worktrees/<branch> <branch>`. Nothing is
+   created beside the repo folder.
+4. **Write down the ask first.** A feature's requests go in `requirements/<branch>.md` before any
+   code. Check every row before changing a feature.
+5. **Keep it small.** Change only what the feature needs and match the code around it.
+6. **Gate it:** `npm run typecheck`, `npm run lint`, `npm test`. Only the known reds listed in
+   BRANCHES.md may fail.
+7. **Merge it:** close the dev app, then merge the branch into `main_community` from the main
+   folder and run the gate again. A new branch also gets its recipe line in BRANCHES.md.
+8. **Push after testing:** once the owner has tried it in the app, push every touched branch to
+   `origin`. Never to `upstream`.
+9. **Record what you learned.** Rules, procedures and measured facts go in this directory, so
+   anyone who clones the repo has them.
 
 ## At a glance
 
@@ -111,7 +135,7 @@ is `release/<version>/everquest-companion-test-Setup-<version>.exe` in this clon
 earlier builds (RULES.md, rule 17). `npm run dist` runs in this clone, never in a worktree (rule
 16): a junctioned `node_modules` ships an asar missing dependencies. Before handing a build out,
 `npx @electron/asar list release/<version>/win-unpacked/resources/app.asar` must list
-`node_modulesnf`; a build without it fails at launch.
+`\node_modules\conf`; a build without it fails at launch.
 
 **When the creator is back.** Each feature branch is already a PR or ready to be one. As he merges
 them, `main` gains them, the merged branch's recipe line is removed, and `main_community` is

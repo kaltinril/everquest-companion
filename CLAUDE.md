@@ -19,3 +19,5 @@ The short version:
 - Pushes go to `origin` only, never `upstream`.
 
 [docs/community/README.md](docs/community/README.md) explains why and how.
+[docs/community/agent/INDEX.md](docs/community/agent/INDEX.md) is the agent's working manual for
+this fork: read it next. What a later session needs goes there, not into private agent memory.
