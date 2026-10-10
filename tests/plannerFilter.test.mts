@@ -137,3 +137,12 @@ test('with no inventory dump the filter does nothing at all, in either direction
     assert.equal(names({ ...OPEN, owned: mode }).length, ROWS.length, `${mode}: no dump, no filter`)
   }
 })
+
+test('the empty state counts only what the era and slot toggles hide, not what the owned chip does', () => {
+  // You own the out-of-era wand and the MISSING chip is lit: turning the era filter off would
+  // still show nothing, so the empty state must not offer it as the answer.
+  const view: DonorView = { ...DEFAULT_VIEW, ownedKeys: new Set(['later wand']), owned: 'missing' }
+  const filters = { ...FILTERS, text: 'later wand' }
+  assert.equal(filterDonors(ROWS, filters, [], view).length, 0)
+  assert.deepEqual(hiddenByView(ROWS, filters, [], view), { era: 0, nonEquip: 0 })
+})
