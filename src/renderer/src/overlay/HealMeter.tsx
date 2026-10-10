@@ -11,9 +11,8 @@ import { useMeterScope } from '../features/combat/useCombatPrefs'
 import { EMPTY_ROSTER, chipLabel } from '@shared/roster'
 import { ICON_ACCENT_GREEN } from './IconButton'
 import { MeterPane } from './scopeFloor'
-import { TextScaleStepper } from './TextScaleStepper'
-import { FOOTER_ROW } from './overlayScale'
-import { useOverlayChrome, type OverlayChrome } from './useOverlayChrome'
+import { BgFooter } from './BgFooter'
+import { useOverlayChrome } from './useOverlayChrome'
 import { useOverlayCombat } from './useOverlayCombat'
 
 /**
@@ -227,47 +226,7 @@ export default function HealMeter(): JSX.Element {
         <HealBars seg={seg} scope={meterScope} roster={roster} drill={drill} setDrill={locked ? null : setDrill} live={live} />
       </MeterPane>
 
-      {!locked && <HealFooter bgAlpha={bgAlpha} textScale={textScale} patch={patch} noDrag={noDrag} />}
-    </div>
-  )
-}
-
-/** Footer controls — interactive mode only: bg-alpha slider + text size. Chrome, so unscaled and
- *  ONE ROW at any width: the buttons never shrink and the slider absorbs whatever the row is
- *  short (see the damage meter's twin for the whole reasoning). */
-function HealFooter({
-  bgAlpha,
-  textScale,
-  patch,
-  noDrag
-}: {
-  bgAlpha: number
-  textScale: number
-  patch: OverlayChrome['patch']
-  noDrag: React.CSSProperties
-}): JSX.Element {
-  return (
-    <div
-      style={{
-        ...FOOTER_ROW,
-        ...noDrag,
-        gap: 8,
-        fontSize: 10,
-        color: 'rgba(255,255,255,0.6)'
-      }}
-    >
-      {/* The word IS the label (JOS-358) — the footer names its own controls, it does not hover. */}
-      <span style={{ flexShrink: 0 }}>bg</span>
-      <input
-        type="range"
-        min={0.1}
-        max={1}
-        step={0.02}
-        value={bgAlpha}
-        onChange={(e) => patch({ bgAlpha: Number(e.target.value) })}
-        style={{ flexGrow: 1, flexShrink: 1, flexBasis: 0, minWidth: 24, accentColor: HEAL_GOLD, height: 4 }}
-      />
-      <TextScaleStepper textScale={textScale} patch={patch} noDrag={noDrag} />
+      {!locked && <BgFooter accent={HEAL_GOLD} bgAlpha={bgAlpha} textScale={textScale} patch={patch} noDrag={noDrag} />}
     </div>
   )
 }

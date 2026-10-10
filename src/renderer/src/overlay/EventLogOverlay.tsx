@@ -46,9 +46,9 @@ import { ItemHoverCard, lookupItemCached } from './feedHoverCards'
 import { MobCard } from '../lib/hoverCards'
 import { overlayMobLookup } from './mobLookup'
 import { HoverCardLayer } from './hoverCardLayer'
-import { FOOTER_ROW, OverlayContent } from './overlayScale'
-import { TextScaleStepper } from './TextScaleStepper'
-import { useOverlayChrome, type OverlayChrome } from './useOverlayChrome'
+import { OverlayContent } from './overlayScale'
+import { BgFooter } from './BgFooter'
+import { useOverlayChrome } from './useOverlayChrome'
 import { OverlayHeader } from './OverlayHeader'
 
 const GOLD = '#d9b25f'
@@ -359,46 +359,6 @@ function useEventFeed(): FeedSnap {
   return rows
 }
 
-/** Footer — interactive mode only: the bg-alpha slider + text size, matching the meters. Chrome,
- *  so unscaled and ONE ROW at any width: the buttons never shrink and the slider absorbs whatever
- *  the row is short (see OverlayMeter's footer for the whole reasoning). */
-function FeedFooter({
-  bgAlpha,
-  textScale,
-  patch,
-  noDrag
-}: {
-  bgAlpha: number
-  textScale: number
-  patch: OverlayChrome['patch']
-  noDrag: React.CSSProperties
-}): JSX.Element {
-  return (
-    <div
-      style={{
-        ...FOOTER_ROW,
-        ...noDrag,
-        gap: 8,
-        fontSize: 10,
-        color: 'rgba(255,255,255,0.6)'
-      }}
-    >
-      {/* The word IS the label (JOS-358) — the footer names its own controls, it does not hover. */}
-      <span style={{ flexShrink: 0 }}>bg</span>
-      <input
-        type="range"
-        min={0.1}
-        max={1}
-        step={0.02}
-        value={bgAlpha}
-        onChange={(e) => patch({ bgAlpha: Number(e.target.value) })}
-        style={{ flexGrow: 1, flexShrink: 1, flexBasis: 0, minWidth: 24, accentColor: GOLD, height: 4 }}
-      />
-      <TextScaleStepper textScale={textScale} patch={patch} noDrag={noDrag} />
-    </div>
-  )
-}
-
 export default function EventLogOverlay(): JSX.Element {
   const rows = useEventFeed()
   const { locked, bgAlpha, textScale, hovering, patch, toggleLock, onEnter, onLeave, dragRegion, noDrag } =
@@ -450,7 +410,7 @@ export default function EventLogOverlay(): JSX.Element {
         )}
       </OverlayContent>
 
-      {!locked && <FeedFooter bgAlpha={bgAlpha} textScale={textScale} patch={patch} noDrag={noDrag} />}
+      {!locked && <BgFooter accent={GOLD} bgAlpha={bgAlpha} textScale={textScale} patch={patch} noDrag={noDrag} />}
     </div>
   )
 }
