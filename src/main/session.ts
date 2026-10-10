@@ -125,7 +125,8 @@ async function resolveMostRecentCharacter(): Promise<CharacterRef | null> {
  */
 async function resolveInitialCharacter(): Promise<CharacterRef | null> {
   const savedPath = getActiveLogPath()
-  if (savedPath) {
+  // A saved log that has since been deleted falls through to the served arm, as the header says.
+  if (savedPath && existsSync(savedPath)) {
     const ref = parseLogName(savedPath)
     if (ref) return ref
   }
