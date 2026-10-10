@@ -96,9 +96,9 @@ export function zoneKey(zone: string | undefined | null): string {
  * numeric shape shares is that its FIRST digit run is the low end of the level, so that is what
  * we read — a range sorts by where it starts, which is what a player scanning "what can I fight
  * here" wants. Anything with no digits at all is genuinely unknown and sorts LAST rather than
- * pretending to be level 0.
+ * pretending to be level 0. The Maps tab's zone bands read levels through it too.
  */
-function sortLevel(entry: MobEntry): number | null {
+export function sortLevel(entry: MobEntry): number | null {
   const m = /\d+/.exec(entry.level ?? '')
   return m ? Number(m[0]) : null
 }

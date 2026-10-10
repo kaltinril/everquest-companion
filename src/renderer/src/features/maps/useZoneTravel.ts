@@ -28,7 +28,7 @@
 // labelled the shared seam still reaches it. Map packs vary; 93 of the default 213 label theirs.
 
 import { useEffect, useMemo, useState } from 'react'
-import { loadTravelEra, saveTravelEra } from './useMapData'
+import { saveTravelEra, useTravelEra } from './useMapData'
 import type { MapData } from '@shared/maps'
 import {
   landings,
@@ -41,7 +41,7 @@ import {
   type ZonePort
 } from '@shared/zoneTravel'
 import { zoneLevelBand, type ZoneLevelBand } from '@shared/zoneLevels'
-import { mobsInZone } from '../mobs/mobZone'
+import { mobsInZone, sortLevel } from '../mobs/mobZone'
 // The one committed bestiary the whole app reads — the same export the mob search and the pins on
 // this map use, so no second copy of "which mobs are here" can drift from it.
 import { MOB_CATALOG } from '../mobs/mobSearch'
@@ -118,11 +118,7 @@ function allGraph(): Promise<ZoneGraph | null> {
 export function useZoneTravel(stem: string | null, zoneName: string | null, data: MapData | null): ZoneTravel {
   const [ports, setPorts] = useState<ZonePort[] | null>(null)
   const [graph, setGraph] = useState<ZoneGraph | null>(null)
-  const [eraOnly, setEraOnlyState] = useState(loadTravelEra)
-  const setEraOnly = (on: boolean): void => {
-    setEraOnlyState(on)
-    saveTravelEra(on)
-  }
+  const eraOnly = useTravelEra()
   useEffect(() => {
     let alive = true
     void allPorts().then((rows) => {
@@ -143,7 +139,7 @@ export function useZoneTravel(stem: string | null, zoneName: string | null, data
     // The mob pins on this very map make the same join; reusing it is what stops the caption and
     // the pins ever describing two different sets of inhabitants.
     const rows = mobsInZone(zoneName, MOB_CATALOG)
-    return zoneLevelBand(rows.map((m) => Number.parseInt(String(m.level), 10)))
+    return zoneLevelBand(rows.map((m) => sortLevel(m) ?? Number.NaN))
   }, [zoneName])
 
   const landed = useMemo(() => {
@@ -155,5 +151,5 @@ export function useZoneTravel(stem: string | null, zoneName: string | null, data
 
   const rides = useMemo(() => travelSeams(exits, eraOnly), [exits, eraOnly])
 
-  return { band, exits, rides, landings: landed, ready: ports !== null, eraOnly, setEraOnly }
+  return { band, exits, rides, landings: landed, ready: ports !== null, eraOnly, setEraOnly: saveTravelEra }
 }

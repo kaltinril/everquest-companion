@@ -36,7 +36,7 @@ import { useStatedLevel } from '../leveling/useStatedLevel'
 import { useWishlist } from '../wishlist/useWishlist'
 import MapZoneAdviceBar, { DEFAULT_QUERY, type AdviceQuery } from './MapZoneAdviceBar'
 import MapZoneAdviceTable, { ROW_HEIGHT } from './MapZoneAdviceTable'
-import { loadTravelEra, saveTravelEra } from './useMapData'
+import { saveTravelEra, useTravelEra } from './useMapData'
 import { wishedByZone, zoneBands } from './zoneBands'
 import { GOALS } from './zoneAdviceUi'
 
@@ -62,9 +62,10 @@ function emptyText(goal: ZoneGoal, level: number, haveWishes: boolean, narrowed:
 }
 
 export default function MapZoneAdvice({ onPick }: { onPick?: (zone: string) => void }): JSX.Element {
-  // The era switch is the Closest-port card's, read from and written to the same stored key, so
-  // the two surfaces of the Maps tab cannot disagree about what EQ Legends has.
-  const [stored, setQueryState] = useState<AdviceQuery>(() => ({ ...DEFAULT_QUERY, eraOnly: loadTravelEra() }))
+  // The era switch is the Closest-port card's, read live from the one value both surfaces share
+  // (`useTravelEra`) rather than copied here, so the two cannot disagree about what EQ Legends has.
+  const [stored, setQueryState] = useState<AdviceQuery>(DEFAULT_QUERY)
+  const eraOnly = useTravelEra()
   // THE LEVEL STARTS AS YOURS (owner, 2026-09-14: *"why does it not default the LEVEL to my
   // current character's level"*) - the stated level the Leveling tab and the identity chip read,
   // so it follows a ding - and becomes the typed one the moment a different number is typed. The
@@ -74,7 +75,7 @@ export default function MapZoneAdvice({ onPick }: { onPick?: (zone: string) => v
   // level at whatever it showed.
   const [typed, setTyped] = useState(false)
   const stated = useStatedLevel(useModule<ProgressionSnap>('progression') ?? EMPTY_PROGRESSION).level
-  const query: AdviceQuery = typed || stated === null ? stored : { ...stored, level: String(stated) }
+  const query: AdviceQuery = { ...(typed || stated === null ? stored : { ...stored, level: String(stated) }), eraOnly }
   const setQuery = (next: AdviceQuery): void => {
     if (next.eraOnly !== query.eraOnly) saveTravelEra(next.eraOnly)
     if (next.level !== query.level) setTyped(true)
