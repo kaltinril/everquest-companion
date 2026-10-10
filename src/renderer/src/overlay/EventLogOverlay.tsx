@@ -107,7 +107,6 @@ function useTradeskillFilter(feed: FeedEvent[]): FeedEvent[] {
     .join('|')
 
   useEffect(() => {
-    let alive = true
     const todo: string[] = []
     for (const e of feed) {
       if (e.kind !== 'loot') continue
@@ -118,14 +117,14 @@ function useTradeskillFilter(feed: FeedEvent[]): FeedEvent[] {
     }
     for (const title of todo) {
       // Same door the hover card uses (lookupItemCached), so the verdict ALSO warms the card.
+      // Every answer lands, even after the titles moved on: a title is asked once, so a verdict
+      // dropped because a second drop arrived first (two items off one corpse) left that row
+      // hidden until reload. Verdicts are keyed by title, so a late one is never wrong.
       void lookupItemCached(title).then((k) => {
         // A lookup that failed (null) counts as "not tradeskill" — an outage must never blank
         // the feed.
-        if (alive) setVerdict((v) => ({ ...v, [title.toLowerCase()]: k ? isTradeskillOnly(k) : false }))
+        setVerdict((v) => ({ ...v, [title.toLowerCase()]: k ? isTradeskillOnly(k) : false }))
       })
-    }
-    return () => {
-      alive = false
     }
     // Re-run when the set of loot titles on screen changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
