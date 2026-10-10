@@ -54,3 +54,10 @@ export function windowUpgrade(
   const atBase = sameUpgradeState(state, upgradeStateForTier(0))
   return { upgrade: simulated || !atBase ? normalizeUpgradeState(state) : undefined, simulated }
 }
+
+/** What a HOVER card is handed: the name's own seed, unmoved. A hover has no slider, so a ` +4` name
+    draws the base block at +4 (untagged) and a plain name draws it as it always has. */
+export function nameUpgrade(name: string): ItemUpgradeState | undefined {
+  const seed = upgradeSeed(name)
+  return windowUpgrade(seed, seed).upgrade
+}

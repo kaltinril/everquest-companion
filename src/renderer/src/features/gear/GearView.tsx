@@ -142,8 +142,10 @@ import {
   GEAR_CONTROL_LABEL,
   controlsVisible,
   inertFilters,
+  keepHiddenFilters,
   toggleColumn,
-  toggleControl
+  toggleControl,
+  type GearControl
 } from './gearPrefs'
 import { PICKABLE_COLUMNS, columnLabel, columnsFor, sortWithin, type GearColumn } from './gearColumns'
 import {
@@ -493,14 +495,18 @@ export interface GearViewProps {
  */
 function useOwnFilters(
   form: GearFormMemory,
-  setForm: (next: GearFormMemory) => void
+  setForm: (next: GearFormMemory) => void,
+  visible: ReadonlySet<GearControl>
 ): { own: GearFilters; setOwn: (f: GearFilters) => void } {
   const own = useMemo<GearFilters>(() => ({ ...DEFAULT_GEAR_FILTERS, ...form }), [form])
+  // The bar is handed the INERT copy, so a hidden control's field comes back forced; it is put back
+  // to the stored value before anything is written (`keepHiddenFilters`).
   const setOwn = useCallback(
-    ({ slots, weaponTypes, zones, effect, eraOnly, ownedOnly, ignoreHaste }: GearFilters) => {
+    (bar: GearFilters) => {
+      const { slots, weaponTypes, zones, effect, eraOnly, ownedOnly, ignoreHaste } = keepHiddenFilters(bar, own, visible)
       setForm({ slots, weaponTypes, zones, effect, eraOnly, ownedOnly, ignoreHaste })
     },
-    [setForm]
+    [setForm, own, visible]
   )
   return { own, setOwn }
 }
@@ -548,13 +554,13 @@ export default function GearView({ onOpenLoot, onOpenMob, onOpenMapZone }: GearV
 
   // The bar's own five stored fields — rebuilt and projected by `useOwnFilters` (its header
   // carries the argument, verbatim from when the pair lived inline here).
-  const { own, setOwn } = useOwnFilters(form, setForm)
+  const visible = useMemo(() => controlsVisible(prefs.controls), [prefs.controls])
+  const { own, setOwn } = useOwnFilters(form, setForm, visible)
 
   // Both deferrals, and nothing else deferred: the two controls whose every movement re-derives
   // six thousand rows (see the header).
   const deferredText = useDeferredValue(text)
   const deferredState = useDeferredValue(stateKey(upgrade.state))
-  const visible = useMemo(() => controlsVisible(prefs.controls), [prefs.controls])
   // NO SLIDER, NO SIMULATION: the corpus reads at base when the control that moves it is hidden.
   const state = useMemo(
     () => (visible.has('upgrade') ? parseStateKey(deferredState) : ITEM_UPGRADE_BASE),

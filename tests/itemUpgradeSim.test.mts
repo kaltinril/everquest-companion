@@ -13,6 +13,7 @@ import { scaleStatBlock } from '../src/shared/itemUpgrade'
 import {
   isWearable,
   itemWindowBlock,
+  nameUpgrade,
   sameUpgradeState,
   upgradeSeed,
   windowUpgrade
@@ -81,4 +82,13 @@ test('what the card will show at +10 is phase 0 arithmetic, not a restatement', 
   assert.equal(at10.atkDelay, 24, 'delay never scales - that is why the ratio improves')
   assert.equal(at10.stats.find((s) => s.key === 'WIS')?.value, '+28', 'floor(14 + round(14 * 10 / 10))')
   assert.equal(at10.stats.find((s) => s.key === 'HP')?.value, '+100')
+})
+
+test('a hover card draws the name at its own tier: a +4 hover shows +4 numbers, a plain name base', () => {
+  // The hover cards (lib/KnownItemTooltip, overlay/feedHoverCards) have no slider; they hand the
+  // window this, so "Warhammer of the Wind +4" never hovers with the wiki's base numbers.
+  assert.equal(nameUpgrade('Warhammer of the Wind'), undefined, 'base: the window reads as it always has')
+  assert.deepEqual(nameUpgrade('Warhammer of the Wind +4'), { full: 4, fraction: 0 })
+  const block = parseStatsBlock(WARHAMMER)
+  assert.ok(scaleStatBlock(block, nameUpgrade('Warhammer of the Wind +4')!).dmg! > block.dmg!, 'above base')
 })

@@ -204,10 +204,17 @@ export type SwapDirection = 'gain' | 'loss'
  *  not worth" (roleWeights' own census). Direction flips for them; nothing else is editorialized. */
 const LOWER_IS_BETTER: ReadonlySet<GearStatKey> = new Set(['DELAY', 'WEIGHT'])
 
+/** Of those two, the one whose mere PRESENCE is a cost. A DELAY stated on one side only is the
+ *  weapon itself arriving or leaving (a shield hovered over a worn off-hand weapon), so it reads
+ *  the way that weapon's DMG beside it does; only weight flips when one side is silent. */
+const PRESENCE_IS_COST: ReadonlySet<GearStatKey> = new Set(['WEIGHT'])
+
 export function compareDirection(entry: StatCompare): SwapDirection {
-  const rising =
-    entry.item === undefined ? false : entry.equipped === undefined ? true : entry.item > entry.equipped
-  return rising === !LOWER_IS_BETTER.has(entry.key) ? 'gain' : 'loss'
+  if (entry.item === undefined || entry.equipped === undefined) {
+    const arriving = entry.item !== undefined
+    return arriving === !PRESENCE_IS_COST.has(entry.key) ? 'gain' : 'loss'
+  }
+  return entry.item > entry.equipped === !LOWER_IS_BETTER.has(entry.key) ? 'gain' : 'loss'
 }
 
 /**

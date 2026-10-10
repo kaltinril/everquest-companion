@@ -49,6 +49,7 @@ import {
   GEAR_CONTROL_LABEL,
   controlsVisible,
   inertFilters,
+  keepHiddenFilters,
   sanitizeColumns,
   sanitizeControls,
   sanitizeDropCols,
@@ -521,4 +522,21 @@ test('HIDING A CONTROL CANNOT MOVE A COLUMN any more - the two choices stopped b
     void inertFilters(busy, shown)
     assert.deepEqual(columnsFor(null, sort).map((c) => c.key), whole)
   }
+})
+
+test('a HIDDEN control keeps its stored value when the bar writes - era off-screen, a slot picked, era back ON', () => {
+  // The bar is handed `inertFilters`' copy and writes a whole object back, so the forced values of
+  // hidden controls arrive with it; `keepHiddenFilters` is what stops them being stored.
+  const own = filters({ slots: [], weaponTypes: ['TWO_HAND'], effect: 'proc', eraOnly: true, ownedOnly: true, ignoreHaste: true })
+  const shown = controlsVisible(['slot'])
+  const bar = { ...inertFilters(own, shown), slots: ['PRIMARY'] as typeof own.slots }
+  const stored = keepHiddenFilters(bar, own, shown)
+  assert.deepEqual(stored.slots, ['PRIMARY'], 'the visible edit is kept')
+  assert.equal(stored.eraOnly, true, 'era comes back ON when its chip does')
+  assert.equal(stored.ownedOnly, true)
+  assert.equal(stored.ignoreHaste, true)
+  assert.equal(stored.effect, 'proc')
+  assert.deepEqual(stored.weaponTypes, ['TWO_HAND'])
+  // The whole bar visible: what the bar wrote is what is stored.
+  assert.deepEqual(keepHiddenFilters(bar, own, controlsVisible(null)), bar)
 })
