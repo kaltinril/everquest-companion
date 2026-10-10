@@ -367,3 +367,42 @@ test('THE WIRING: the read failure evicts, counts, and never reaches the error s
   assert.match(src, /const warn = opts\.warn \?\? \(\(m: string\) => logWarn\(m\)\)/)
   assert.equal(src.match(/logError\(/g), null, 'imageCache never writes errors.log directly')
 })
+
+test('a body cut off mid-read is the network leg: counted, warned once, and a 404', async () => {
+  // The response arrived and then died (the 10 s timeout, a reset). That is the same failure as
+  // no response at all, so it must not reject the request every waiter on this image shares.
+  freshSession()
+  const root = mkdtempSync(join(tmpdir(), 'eqc-imgheal-'))
+  const warns: string[] = []
+  const errors: string[] = []
+  let handler: ((request: GlobalRequest) => GlobalResponse | Promise<GlobalResponse>) | null = null
+  const cutOff = new Response(new Uint8Array(PNG), { status: 200 })
+  cutOff.arrayBuffer = () => Promise.reject(new Error('terminated'))
+  installImageCacheProtocol(
+    {
+      registerSchemesAsPrivileged: () => undefined,
+      handle: (_s, h) => {
+        handler = h
+      }
+    },
+    {
+      userData: root,
+      bundledDir: null,
+      fetchImpl: () => Promise.resolve(cutOff),
+      log: () => undefined,
+      onError: (msg) => errors.push(msg),
+      warn: (msg) => warns.push(msg)
+    }
+  )
+  const ask = handler as unknown as (request: GlobalRequest) => Promise<GlobalResponse>
+  try {
+    const res = await ask(new Request('eqimg://item/77'))
+    assert.equal(res.status, 404)
+    assert.equal(takeHealth().imageFetchFailures, 1, 'counted with the other network failures')
+    assert.equal(warns.length, 1, 'one warn line for the host')
+    assert.equal(errors.length, 0, 'and nothing filed as an error')
+  } finally {
+    rmSync(root, { recursive: true, force: true })
+    freshSession()
+  }
+})

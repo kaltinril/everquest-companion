@@ -236,10 +236,13 @@ test('JOS-133 wired two more, and BOTH are counts on paths that used to log an e
   //    of the ticket is that this branch and the HTTP-status branch stopped being one decision.
   const img = read('src/main/imageCache.ts')
   const netCatch = img.slice(img.indexOf('} catch (err) {', img.indexOf('res = await doFetch')), img.indexOf('if (!res.ok)'))
-  assert.match(netCatch, /noteImageFetchFailure\(\)/, 'the network leg counts')
-  assert.doesNotMatch(netCatch, /onError\(/, 'and it no longer files an error')
+  assert.match(netCatch, /return fetchUnreachable\(url, err, warn\)/, 'the network leg goes one way')
+  // That way is shared with a body cut off mid-read, so the count and the silence are pinned on it.
+  const netLeg = img.slice(img.indexOf('function fetchUnreachable'), img.indexOf('export function installImageCacheProtocol'))
+  assert.match(netLeg, /noteImageFetchFailure\(\)/, 'the network leg counts')
+  assert.doesNotMatch(netLeg, /onError\(/, 'and it no longer files an error')
   // …while the branch beside it, where a host ANSWERED, still does.
-  const statusBranch = img.slice(img.indexOf('if (!res.ok)'), img.indexOf('const bytes = new Uint8Array'))
+  const statusBranch = img.slice(img.indexOf('if (!res.ok)'), img.indexOf('bytes = new Uint8Array'))
   assert.match(statusBranch, /onError\(/, 'an HTTP status is still ours to fix, and still an error')
 
   // 7. suppressed lines — bumped in `logError` from a leaf rule's verdict, and from NOWHERE ELSE
