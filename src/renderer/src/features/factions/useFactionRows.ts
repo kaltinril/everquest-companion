@@ -195,10 +195,19 @@ export function useFactionData(): FactionsData {
   const [progress, setProgress] = useState<ProgressState | null>(null)
   useEffect(() => {
     let alive = true
-    void window.eq.getProgress().then((p) => {
-      if (alive) setProgress(p)
-    })
+    // A push is always the newer snapshot: the initial reply may have been read before it and
+    // still land after it, so once a push has arrived the reply is dropped.
+    let pushed = false
+    window.eq
+      .getProgress()
+      .then((p) => {
+        if (alive && !pushed) setProgress(p)
+      })
+      .catch(() => {
+        // A failed first read leaves the tab empty until the next push, which is what it shows.
+      })
     const off = window.eq.onProgress((p) => {
+      pushed = true
       setProgress(p)
     })
     return () => {
