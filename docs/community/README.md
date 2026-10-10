@@ -44,7 +44,7 @@ and rebuilt from the recipe at any time, and the rebuild script exists to prove 
 | Branch | Base | Lifetime | Purpose |
 |---|---|---|---|
 | `main` | `origin/main` = `upstream/main` | forever | The creator's main. Never committed to. Pushed to `origin` only, never to `upstream`. |
-| `main_community_rules` | `main` | never closes, never a PR | This directory, the rebuild script, and the root `CLAUDE.md` hook. The recipe lives here. |
+| `main_community_rules` | `main` | never closes, never a PR | This directory, the rebuild script, the fork's front page `.github/README.md`, and the root `CLAUDE.md` hook. The recipe lives here. |
 | feature branches | `main` | until the creator merges them | Our work, one branch per feature, each an open or future upstream PR. Listed in BRANCHES.md. |
 | `community/pr-N-slug` | the upstream PR's own base | until upstream merges the PR | Our copy of an adopted third-party PR. The recipe depends on these, never on `upstream/pr/N` refs, which vanish when a PR closes and move when a contributor force-pushes. |
 | `local-data-refresh` | `main` | never closes, never a PR | The locally re-scraped item and mob corpus. The official refresh is the creator's to run, so this stays off the PRs. |
