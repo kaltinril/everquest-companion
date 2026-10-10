@@ -50,7 +50,7 @@ and rebuilt from the recipe at any time, and the rebuild script exists to prove 
 | `local-data-refresh` | `main` | never closes, never a PR | The locally re-scraped item and mob corpus. The official refresh is the creator's to run, so this stays off the PRs. |
 | `community_release_rules` | `main` | never closes, never a PR | How a TEST build is published to the fork's Releases page: [RELEASING.md](RELEASING.md) and the script it describes. |
 | `test-neutering` | `main` | never closes, never a PR | The TEST build: its own appId and userData, telemetry and feedback dark, updater guarded, the UNRELEASED gate forced open, and the `0.1.0-test.N` version with each build's tester notes. Always the last merge, so it wins. |
-| `main_community` | rebuilt from the recipe | disposable | What the dev app runs and test builds are cut from. Nothing lands here directly. |
+| `main_community` | rebuilt from the recipe | disposable | What the dev app runs and test builds are cut from. Nothing lands here directly. The fork's default branch on GitHub since 2026-10-09 (owner), so visitors land on it and its `.github/README.md` is the front page. |
 
 ## How a change flows
 
