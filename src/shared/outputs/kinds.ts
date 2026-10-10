@@ -324,11 +324,12 @@ export function preferredOutputFile(
  */
 export function isOwnOutputFile(
   path: string,
-  def: OutputKindDef,
+  kind: OutputKindId,
   characterName?: string,
   server?: string
 ): boolean {
   if (!characterName) return true
+  const def = outputKind(kind)
   const file = (path.split(/[\\/]/).pop() ?? '').toLowerCase()
   if (outputFileNames(def, characterName, server).some((n) => n.toLowerCase() === file)) return true
   if (!server) return false

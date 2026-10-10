@@ -157,7 +157,7 @@ test("isOwnOutputFile refuses another character's dump, the one the newest-file 
   const only = ['Other_oggok-WAR-Factions.txt']
   const picked = preferredOutputFile(only, def, 'Drywrought', 'oggok')
   assert.equal(picked, 'Other_oggok-WAR-Factions.txt')
-  assert.equal(isOwnOutputFile(`C:\\EQ\\${picked}`, def, 'Drywrought', 'oggok'), false)
+  assert.equal(isOwnOutputFile(`C:\\EQ\\${picked}`, 'faction', 'Drywrought', 'oggok'), false)
   // Their own dump is accepted under every name the resolver would pick it by, case folded…
   for (const own of [
     'Drywrought_oggok-WAR-Factions.txt',
@@ -165,12 +165,12 @@ test("isOwnOutputFile refuses another character's dump, the one the newest-file 
     'Drywrought_oggok-Factions.txt',
     'Drywrought-Factions.txt'
   ]) {
-    assert.equal(isOwnOutputFile(`C:\\EQ\\${own}`, def, 'Drywrought', 'oggok'), true, own)
+    assert.equal(isOwnOutputFile(`C:\\EQ\\${own}`, 'faction', 'Drywrought', 'oggok'), true, own)
   }
   // …a name that merely starts the same is someone else…
-  assert.equal(isOwnOutputFile('Drywroughter_oggok-WAR-Factions.txt', def, 'Drywrought', 'oggok'), false)
+  assert.equal(isOwnOutputFile('Drywroughter_oggok-WAR-Factions.txt', 'faction', 'Drywrought', 'oggok'), false)
   // …and an unknown character accepts any file, the one-character machine's answer.
-  assert.equal(isOwnOutputFile('Other_oggok-WAR-Factions.txt', def), true)
+  assert.equal(isOwnOutputFile('Other_oggok-WAR-Factions.txt', 'faction'), true)
 })
 
 // ---------------------------------------------------------------------------
