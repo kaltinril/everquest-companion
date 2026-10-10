@@ -103,6 +103,12 @@ test('an exalted reward still testifies: the +N variant folds onto the counting 
   assert.ok(keys.has('Wizard::Wizard Test of Focus'))
 })
 
+test('a starred dump row testifies too: the trailing * drops before the +N fold', () => {
+  // The dump writes some rows as `Name*` or `Name +N*`; the planner already reads them as the item.
+  const keys = rewardInferredQuests(QUESTS, { "al`kabor's cap of binding +2*": 1 })
+  assert.ok(keys.has('Wizard::Wizard Test of Focus'))
+})
+
 test('a quest with no reward in the data never infers (missing data, not a finished quest)', () => {
   const keys = rewardInferredQuests(QUESTS, { 'necklace of resolution': 1, undefined: 1 })
   assert.ok(!keys.has('Monk::Monk Test of Stone'))
