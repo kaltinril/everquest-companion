@@ -70,7 +70,9 @@ function isUntradeable(rewardStats: string | undefined): boolean {
  * inventory holds (the header's gate - a reward that can move proves nothing).
  *
  * `inventory` is `ProgressState.inventory` as stored — raw names lowercased, `+N` variants NOT
- * yet folded — so the fold happens here, on both sides of the match. A count of zero or less is
+ * yet folded — so the fold happens here, on both sides of the match. A dump row's trailing `*`
+ * is dropped first, as the inventory reconcile does: the file never says what the star means,
+ * and the planner already reads a starred row as the item. A count of zero or less is
  * an absent item: the parser never writes one, so it can only mean a hand-edited store, and an
  * item you hold none of vouches for nothing.
  */
@@ -82,7 +84,7 @@ export function rewardInferredQuests(
   if (!inventory) return vouched
   const held = new Set<string>()
   for (const [name, count] of Object.entries(inventory)) {
-    if (count > 0) held.add(itemCountKey(name))
+    if (count > 0) held.add(itemCountKey(name.endsWith('*') ? name.slice(0, -1) : name))
   }
   for (const q of quests) {
     // A quest with no reward in the data never infers: that is missing data about a quest, not

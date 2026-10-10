@@ -387,8 +387,10 @@ export default function MapsView({
     [data]
   )
   const [floor, setFloor] = useState<number | null>(null)
-  // A new zone starts on All levels — a floor index means nothing across two different maps.
-  useEffect(() => setFloor(null), [data?.zone])
+  // A new zone starts on All levels — a floor index means nothing across two different maps. The
+  // same holds for a different map pack of the same zone, whose geometry can cluster into fewer
+  // bands: keyed on the zone alone, a kept index read "Level 5 of 3".
+  useEffect(() => setFloor(null), [data?.zone, bands.length])
 
   useMapOpenTracking(data)
 

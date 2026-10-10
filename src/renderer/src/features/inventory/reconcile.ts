@@ -138,6 +138,11 @@ export interface ReconcileResult {
  * `nameByKey` is filled in place — display names are claimed first-writer-wins, and
  * the call order in `reconcile` (loot names, then export names, then quest item
  * names) is what decides which spelling the user sees.
+ *
+ * The dump also writes some rows with a trailing `*` (`Bandages*`, `Sword +3*`). The file
+ * never states what the star means, and the planner (`parseItemName`) already reads a starred
+ * row as the item itself, so the star is dropped here too, before the ` +N` strip it would
+ * otherwise hide. A ` (Exaltation)` row keeps its own key: a socketed copy is not a turn-in copy.
  */
 function foldInventoryByKey(
   inv: Record<string, number>,
@@ -145,9 +150,10 @@ function foldInventoryByKey(
 ): Record<string, number> {
   const invByKey: Record<string, number> = {}
   for (const [rawK, n] of Object.entries(inv)) {
-    const k = itemCountKey(rawK)
+    const name = rawK.endsWith('*') ? rawK.slice(0, -1) : rawK
+    const k = itemCountKey(name)
     invByKey[k] = (invByKey[k] ?? 0) + n
-    nameByKey[k] ??= rawK
+    nameByKey[k] ??= name
   }
   return invByKey
 }
