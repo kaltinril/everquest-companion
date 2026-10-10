@@ -122,6 +122,8 @@ export interface StoreShape {
    * "never" for the first minute of every single launch.
    */
   updateLastCheckedAt?: number
+  /** "Update automatically" switched OFF: no background checks, downloads or apply-on-quit. */
+  autoUpdateOff?: boolean
   /**
    * RETIRED flat overlay config (Task #52). Task #54 made the overlay per-kind; schema
    * migration 1→2 folds this into `overlays.fight` and deletes it. Declared, never read —

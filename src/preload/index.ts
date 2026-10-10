@@ -100,6 +100,7 @@ import { graphicsBridge } from './graphics'
 // and normalizer live together in shared/buffTrust.ts.
 import { buffTrustBridge } from './buffTrust'
 import { respawnBridge } from './respawn'
+import { updatesBridge } from './updates'
 // The main window's text size (JOS-123), split out for the same file-mass reason. Its shapes are
 // a single number; the ladder and the normalizer live in shared/uiScale.ts.
 import { uiScaleBridge } from './uiScale'
@@ -599,19 +600,8 @@ const api = {
     return () => ipcRenderer.removeListener(IPC.onAppBack, listener)
   },
 
-  // ---- auto-update (Task #27; reworked in Task #55) ----
-  /** Subscribe to update lifecycle pushes (checking/available/downloading/ready/error). */
-  onUpdateStatus: (cb: (s: UpdateStatus) => void): (() => void) => {
-    const listener = (_e: unknown, s: UpdateStatus): void => cb(s)
-    ipcRenderer.on(IPC.onUpdateStatus, listener)
-    return () => ipcRenderer.removeListener(IPC.onUpdateStatus, listener)
-  },
-  /** Pull the last update status (pushes only reach renderers mounted at the time). */
-  getUpdateStatus: (): Promise<UpdateStatus> => ipcRenderer.invoke(IPC.getUpdateStatus),
-  /** Run an update check now; resolves to the resulting status (idle no-op in dev). */
-  checkForUpdates: (): Promise<UpdateStatus> => ipcRenderer.invoke(IPC.checkForUpdates),
-  /** Apply the downloaded update now (quit + install + relaunch). */
-  installUpdate: (): Promise<void> => ipcRenderer.invoke(IPC.installUpdate),
+  // ---- auto-update (Task #27; reworked in Task #55): preload/updates.ts (moved for the 400-line ceiling) ----
+  ...updatesBridge,
   /** The running app's version (app.getVersion()). */
   getAppVersion: (): Promise<string> => ipcRenderer.invoke(IPC.getAppVersion),
 

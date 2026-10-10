@@ -985,6 +985,8 @@ export interface UpdateStatus {
    *  so instead of showing an eternally-stale "not checked yet" that reads as a broken
    *  updater — dev is the only place that state can persist. */
   disabled?: boolean
+  /** The user switched "Update automatically" off: only the manual check runs. */
+  autoUpdateOff?: boolean
 }
 
 // ----- Split-out sections -----
