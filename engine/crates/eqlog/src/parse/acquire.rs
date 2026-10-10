@@ -94,6 +94,14 @@ fn parse_coins(r: &AcquireRes, clause: &str) -> Option<Vec<(&'static str, i64)>>
     }
 }
 
+/// An auto-sold loot's price clause: `free` is the empty price, as a free purchase is.
+pub(super) fn sale_price(r: &AcquireRes, clause: &str) -> Option<Vec<(&'static str, i64)>> {
+    if clause == "free" {
+        return Some(Vec::new());
+    }
+    parse_coins(r, clause)
+}
+
 /// The five coin sentences, tried in the order their anchors get looser. The NPC form is the
 /// vendor form without the item clause — a quest payment (`You receive 6 gold from Zok Zribb.`,
 /// 1,635 single-denomination lines in the owner's 2026-09-25 log) — and it must sit after the
