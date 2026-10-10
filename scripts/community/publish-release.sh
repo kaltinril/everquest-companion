@@ -70,6 +70,12 @@ notes_ref=test-neutering
 git rev-parse -q --verify "$notes_ref" >/dev/null || notes_ref=origin/test-neutering
 notes_commit=$(git log --format=%H --grep="^Test build $version:" -1 "$notes_ref")
 [ -n "$notes_commit" ] || fail "no 'Test build $version:' commit on test-neutering"
+# Each release lists only what changed since the one before. The cumulative list lives once, on
+# test.20 (the first release), and every later release links to it below.
+first_tag=community-0.1.0-test.20
+if [ "$tag" != "$first_tag" ] && git log -1 --format=%b "$notes_commit" | grep -q '^WHAT THIS BUILD ADDS'; then
+  fail "the $version notes repeat the cumulative WHAT THIS BUILD ADDS list; keep only what changed since the previous version (it is on $first_tag)"
+fi
 
 if [ -z "$target" ]; then
   target=$(git rev-parse origin/main_community)
@@ -94,9 +100,9 @@ trap 'rm -f "$notes"' EXIT
 
 \`SHA256SUMS.txt\` holds the installer's checksum, to compare with \`Get-FileHash $exe\`.
 
----
-
 EOF
+  [ "$tag" = "$first_tag" ] || echo "Below is what changed since the previous build. Everything this build adds to the official app is listed on [TEST 0.1.0-test.20](https://github.com/$repo_slug/releases/tag/$first_tag), the first release."
+  printf '\n---\n\n'
   git log -1 --format=%b "$notes_commit"
 } >"$notes"
 

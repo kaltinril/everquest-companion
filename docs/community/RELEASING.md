@@ -54,8 +54,10 @@ only ever the deliberate tag in step 4.
 
 1. **Prepare** as for any tester build: read the previous `Test build` commit's notes, check every
    recipe branch is level with `main_community`, bump `package.json` and write the notes as a
-   commit on `test-neutering` (they become the release notes, so they are written for players),
-   merge it, and run the gate (`bash scripts/community/known-reds.sh` is the unit suite with only
+   commit on `test-neutering` (they become the release notes, so they are written for players,
+   and hold only what changed since the previous version plus the known issues: the full list of
+   what the community build adds lives once, on the test.20 release, and every later release links
+   to it), merge it, and run the gate (`bash scripts/community/known-reds.sh` is the unit suite with only
    the known reds allowed).
 2. **The owner says to release.** A release is public the moment it exists, reaches every install
    from test.20 on within hours, and may be mirrored or indexed, so this is always the owner's word.
