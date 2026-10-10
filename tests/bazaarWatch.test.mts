@@ -16,6 +16,7 @@ import {
   type BazaarWatch
 } from '../src/shared/bazaarWatch'
 import { APP_SIGNAL_CAPTURES, applyCaptures, captureNamesIn } from '../src/shared/alertCaptures'
+import { replyGate } from '../src/renderer/src/features/bazaar/latestReply'
 
 const row = ([day, dir, item, tier = 0]: [string, BazaarRow['dir'], string, number?], prices: number[]): BazaarRow => ({
   day,
@@ -193,4 +194,15 @@ test('a watch price reads what the field shows it as, millions included, so a th
   assert.equal(parsePlat('500pp'), 500)
   assert.equal(parsePlat(''), null)
   for (const pp of [500, 2500, 15_000, 1_500_000, 12_000_000]) assert.equal(parsePlat(formatPlat(pp)), pp)
+})
+
+test('a store reply lands only while its write is the newest, and the first load only before any write', () => {
+  // "Every tier" removes and puts back-to-back; the median share field puts on every keystroke.
+  const g = replyGate()
+  const first = g.next()
+  const second = g.next()
+  assert.equal(g.isLatest(first), false, 'the earlier reply, landing late, must not put the older list back')
+  assert.equal(g.isLatest(second), true)
+  assert.equal(g.isLatest(0), false, 'an edit made while the load was out is not overwritten by it')
+  assert.equal(replyGate().isLatest(0), true, 'with nothing written, the load lands')
 })
