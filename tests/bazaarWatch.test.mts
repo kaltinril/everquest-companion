@@ -3,7 +3,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { summarizeBazaar, type BazaarRow, type BazaarSnap, type LiveOffer } from '../src/shared/bazaar'
+import { formatPlat, parsePlat, summarizeBazaar, type BazaarRow, type BazaarSnap, type LiveOffer } from '../src/shared/bazaar'
 import {
   findWatch,
   freshWatchAlerts,
@@ -184,4 +184,13 @@ test('Popular ranks by platinum traded and the floor drops what sells under it',
   )
   const kept = summarizeBazaar({ rows }, { text: '', dir: 'all', sort: { key: 'item', desc: false }, keep: (item, tier) => tier === 4 && item === 'Cloak of Flames' })
   assert.deepEqual(kept.items.map((i) => i.key), ['Cloak of Flames|4'])
+})
+
+test('a watch price reads what the field shows it as, millions included, so a threshold survives the field', () => {
+  assert.equal(parsePlat('1.5M'), 1_500_000)
+  assert.equal(parsePlat('2m'), 2_000_000)
+  assert.equal(parsePlat('2.5k'), 2500)
+  assert.equal(parsePlat('500pp'), 500)
+  assert.equal(parsePlat(''), null)
+  for (const pp of [500, 2500, 15_000, 1_500_000, 12_000_000]) assert.equal(parsePlat(formatPlat(pp)), pp)
 })

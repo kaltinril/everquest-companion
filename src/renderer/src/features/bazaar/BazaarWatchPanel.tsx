@@ -6,20 +6,14 @@
 import { type JSX, useEffect, useState } from 'react'
 import { Checkbox, FormControlLabel, Stack, Switch, TextField, Typography } from '@mui/material'
 import { findWatch, watchOnItem } from '@shared/bazaarWatch'
-import { formatPlat, type BazaarItem } from '@shared/bazaar'
+import { formatPlat, parsePlat, type BazaarItem } from '@shared/bazaar'
 import { useBazaarWatch } from './useBazaarWatch'
 
-/** `5k`, `2.5k`, `500`, `500p`, `500pp` → platinum; blank or unreadable → null. */
-export function parsePlat(s: string): number | null {
-  const m = /^\s*(\d+(?:\.\d+)?)\s*(k|pp|p)?\s*$/i.exec(s)
-  if (m === null) return null
-  const n = Number(m[1]) * (m[2]?.toLowerCase() === 'k' ? 1000 : 1)
-  return n > 0 ? n : null
-}
-
 function PriceField({ label, value, onCommit, testId }: { label: string; value: number | null; onCommit: (v: number | null) => void; testId: string }): JSX.Element {
-  const [text, setText] = useState(value === null ? '' : formatPlat(value))
-  useEffect(() => setText(value === null ? '' : formatPlat(value)), [value])
+  const shown = value === null ? '' : formatPlat(value)
+  const [text, setText] = useState(shown)
+  useEffect(() => setText(shown), [shown])
+  // The field shows the price rounded (12,345 reads 12k); leaving it untouched must not store the rounding.
   return (
     <TextField
       size="small"
@@ -27,7 +21,9 @@ function PriceField({ label, value, onCommit, testId }: { label: string; value: 
       placeholder="any"
       value={text}
       onChange={(ev) => setText(ev.target.value)}
-      onBlur={() => onCommit(parsePlat(text))}
+      onBlur={() => {
+        if (text !== shown) onCommit(parsePlat(text))
+      }}
       sx={{ width: 150 }}
       slotProps={{ htmlInput: { 'data-testid': testId } }}
     />

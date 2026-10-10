@@ -436,6 +436,16 @@ export function formatPlat(pp: number | null): string {
   return `${Number((pp * 10).toFixed(1))}g`
 }
 
+const PLAT_SCALE: Record<string, number> = { k: 1000, m: 1_000_000 }
+
+/** `5k`, `2.5k`, `1.5M`, `500`, `500p`, `500pp` → platinum; blank or unreadable → null. */
+export function parsePlat(s: string): number | null {
+  const m = /^\s*(\d+(?:\.\d+)?)\s*(k|m|pp|p)?\s*$/i.exec(s)
+  if (m === null) return null
+  const n = Number(m[1]) * (PLAT_SCALE[m[2]?.toLowerCase() ?? ''] ?? 1)
+  return n > 0 ? n : null
+}
+
 /** `0.12` → `+12%`, `-0.05` → `-5%`. */
 export function formatMove(f: number | null): string {
   if (f === null) return ''
