@@ -755,9 +755,25 @@ export function notesLinkTargets(wikitext: string): string[] {
   return out
 }
 
+/** `{{Item Lore|X}}`/`{{Lore|X}}` → X, `{{:Page}}` → Page, `{{Loc|Zone|x, y}}` → x, y; any
+ *  other template (`{{Item Lore Missing}}`, `{{SmIcon|…}}`) says nothing in prose and is dropped. */
+function unwrapTemplate(body: string): string {
+  const parts = body.split('|')
+  const name = parts[0].trim().toLowerCase()
+  if (name === 'lore' || /^item\s+lore$/.test(name)) return parts.slice(1).join('|').trim()
+  if (name === 'loc') return (parts[2] ?? '').trim()
+  return name.startsWith(':') ? parts[0].trim().slice(1) : ''
+}
+
 /** Collapse a `notes` field to a single trimmed prose line (strips wiki markup, caps length). */
 export function cleanSummary(notes: string): string | undefined {
-  const text = notes
+  let unwrapped = notes
+  for (let prev = ''; prev !== unwrapped; ) {
+    prev = unwrapped
+    unwrapped = unwrapped.replace(/\{\{([^{}]*)\}\}/g, (_m, body: string) => unwrapTemplate(body))
+  }
+  const text = unwrapped
+    .replace(/\{+|\}+/g, '') // stray braces of an unbalanced template
     .replace(/\[\[[^\]|]*\|([^\]]*)\]\]/g, '$1') // [[Page|Label]] -> Label
     .replace(/\[\[([^\]]*)\]\]/g, '$1') // [[Page]] -> Page
     .replace(/<[^>]+>/g, ' ') // strip HTML tags

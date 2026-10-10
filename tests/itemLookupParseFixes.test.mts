@@ -2,7 +2,7 @@
 // copies of the real page shapes they are named after.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { parseItemWikitext, templateField } from '../src/main/itemLookupParse'
+import { cleanSummary, parseItemWikitext, templateField } from '../src/main/itemLookupParse'
 
 const LARGE_SKY_LAPIS = `<onlyinclude>{{Itempage
 |itemname = Large Sky Lapis
@@ -69,4 +69,14 @@ test('a doubled pipe ends the field before it, and a duplicated field reads its 
 test('a line-start |name = or }} still ends a field even inside an unbalanced nested template', () => {
   const wt = '{{Itempage\n|dropsfrom = [[Najena]]\n\n{{VeliousGray|[[Western Wastes]]\n\n* [[Makil Rargon]]\n}}\n|itemname = Robe\n}}'
   assert.equal(templateField(wt, 'dropsfrom'), '[[Najena]]\n\n{{VeliousGray|[[Western Wastes]]\n\n* [[Makil Rargon]]')
+})
+
+test('summaries unwrap lore/transclusion/loc templates and drop the rest instead of showing markup', () => {
+  assert.equal(cleanSummary('{{Item Lore|Blood Spirit Wine}} This is Stackable.'), 'Blood Spirit Wine This is Stackable.')
+  assert.equal(cleanSummary('{{Lore|Headband of the Chosen}}'), 'Headband of the Chosen')
+  assert.equal(cleanSummary('{{Item Lore Missing}}'), undefined)
+  assert.equal(cleanSummary('namely {{:Shattering Hammer}}s.'), 'namely Shattering Hammers.')
+  assert.equal(cleanSummary('Ground spawn at {{Loc|Dalnir|-20, 50|(-20, 50)}}.'), 'Ground spawn at -20, 50.')
+  assert.equal(cleanSummary("{{{Item Lore | 'Runed Bokken'}}"), "'Runed Bokken'")
+  assert.equal(cleanSummary('Icon {{SmIcon|1211}} here'), 'Icon here')
 })
