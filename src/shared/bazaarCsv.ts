@@ -12,10 +12,10 @@ const BOM = String.fromCharCode(0xfeff)
 const HEADER = ['Date', 'Time', 'Who', 'Direction', 'Item', 'Tier', 'Price (plat)', 'Message']
 const DIR = { sell: 'WTS', buy: 'WTB', trade: 'WTT' } as const
 
-/** One field, quoted when it holds a comma, a quote or a line break; a leading = + - @ is defused. */
+/** One field, quoted when it holds a comma, a quote or a line break; a leading = + - @, tab or CR is defused. */
 function field(v: string | number | null): string {
   const s = v === null ? '' : String(v)
-  const safe = /^[=+\-@]/.test(s) ? `'${s}` : s
+  const safe = /^[=+\-@\t\r]/.test(s) ? `'${s}` : s
   return /[",\r\n]/.test(safe) ? `"${safe.replace(/"/g, '""')}"` : safe
 }
 
