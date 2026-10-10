@@ -28,7 +28,7 @@
 // labelled the shared seam still reaches it. Map packs vary; 93 of the default 213 label theirs.
 
 import { useEffect, useMemo, useState } from 'react'
-import { loadTravelEra, saveTravelEra } from './useMapData'
+import { saveTravelEra, useTravelEra } from './useMapData'
 import type { MapData } from '@shared/maps'
 import {
   landings,
@@ -118,11 +118,7 @@ function allGraph(): Promise<ZoneGraph | null> {
 export function useZoneTravel(stem: string | null, zoneName: string | null, data: MapData | null): ZoneTravel {
   const [ports, setPorts] = useState<ZonePort[] | null>(null)
   const [graph, setGraph] = useState<ZoneGraph | null>(null)
-  const [eraOnly, setEraOnlyState] = useState(loadTravelEra)
-  const setEraOnly = (on: boolean): void => {
-    setEraOnlyState(on)
-    saveTravelEra(on)
-  }
+  const eraOnly = useTravelEra()
   useEffect(() => {
     let alive = true
     void allPorts().then((rows) => {
@@ -155,5 +151,5 @@ export function useZoneTravel(stem: string | null, zoneName: string | null, data
 
   const rides = useMemo(() => travelSeams(exits, eraOnly), [exits, eraOnly])
 
-  return { band, exits, rides, landings: landed, ready: ports !== null, eraOnly, setEraOnly }
+  return { band, exits, rides, landings: landed, ready: ports !== null, eraOnly, setEraOnly: saveTravelEra }
 }
