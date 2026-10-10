@@ -38,6 +38,14 @@ test('DELAY and WEIGHT run the other way: more of either is worse', () => {
   assert.equal(compareDirection({ key: 'WEIGHT', equipped: 2.5 }), 'gain')
 })
 
+test('a ONE-SIDED DELAY is the weapon arriving or leaving, never a gain for losing it', () => {
+  // A shield hovered while a weapon is worn in Secondary: the weapon's delay goes with its damage,
+  // so `DELAY 24→-` is a loss beside `DMG 9→-`, and a weapon arriving brings its delay as a gain.
+  assert.equal(compareDirection({ key: 'DELAY', equipped: 24 }), 'loss')
+  assert.equal(compareDirection({ key: 'DMG', equipped: 9 }), 'loss')
+  assert.equal(compareDirection({ key: 'DELAY', item: 24 }), 'gain')
+})
+
 test('the arrow entry is `KEY worn→this`, dash for a silent side, table spelling throughout', () => {
   assert.equal(arrowText({ key: 'AC', item: 5, equipped: 10, delta: -5 }), 'AC 10→5')
   assert.equal(arrowText({ key: 'DEX', item: 8 }), 'DEX -→8')
