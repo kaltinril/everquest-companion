@@ -29,7 +29,7 @@
 // No search UI lives here (that is the sidebar, `MapMobPane.tsx`); `labelPosition` is exported so
 // the jump-to-a-hit path positions its marker with exactly the arithmetic the labels used.
 
-import { useMemo, useState, type JSX } from 'react'
+import { useEffect, useMemo, useState, type JSX } from 'react'
 import type { MapPoint } from '@shared/maps'
 import { expandRect, visiblePoints, type LayerMask, type ScreenPos } from './mapGeometry'
 import { LABEL_FONT_PX, layoutLabels, type LabelSlot } from './labelLayout'
@@ -197,6 +197,9 @@ function useLabelSlots(props: MapPointsLayerProps): LabelSlot[] {
 export function MapPointsLayer(props: MapPointsLayerProps): JSX.Element {
   const slots = useLabelSlots(props)
   const [hover, setHover] = useState<number | null>(null)
+  // `hover` is an index into `points`, so it means nothing once the zone's points are replaced: a
+  // kept index would draw the new map's point N raised, under a pointer that never touched it.
+  useEffect(() => setHover(null), [props.points])
   return (
     <div
       data-testid="map-points-layer"
