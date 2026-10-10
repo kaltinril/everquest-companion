@@ -19,6 +19,7 @@ import { applyEvidence, type FactionEvidence, type FactionEvidenceReport } from 
 import { CONSIDER_FACTION_COLOR, CONSIDER_FACTION_LABEL } from '@shared/considerFaction'
 import { FACTION_TIER_FLOORS, factionTier } from './factionTiers'
 import { factionWorkIndex, type FactionWork } from './factionQuests'
+import { trailingRefresh } from './evidenceRefresh'
 
 /** The dump's floor — the far end every bar is measured from (measured ±2000, factions.ts). */
 const SCALE_FLOOR = -2000
@@ -149,10 +150,27 @@ export interface FactionsData {
   raceUnlocks?: RaceUnlockClaim[]
 }
 
-/** The log-evidence report, re-asked whenever progress moves (a dump reload resets the window). */
+/**
+ * The log-evidence report, re-asked when the dump reloads (that resets the window) and, while the
+ * tab is open, after the log moves or the window regains focus — a quest hand-in's "standing
+ * adjusted" line reaches the row without a tab revisit. The live asks are coalesced
+ * (evidenceRefresh.ts) because each one reads the log tail.
+ */
 function useFactionEvidence(progress: ProgressState | null): FactionEvidenceReport | null {
   const [report, setReport] = useState<FactionEvidenceReport | null>(null)
+  const [asks, setAsks] = useState(0)
   const loadedAt = progress?.factionsSource?.loadedAt
+  useEffect(() => {
+    const refresh = trailingRefresh(() => setAsks((n) => n + 1))
+    // The engine's "a module moved" ping is the existing signal that the log has new lines.
+    const off = window.eq.onCombatActivity(refresh.nudge)
+    window.addEventListener('focus', refresh.nudge)
+    return () => {
+      refresh.cancel()
+      off()
+      window.removeEventListener('focus', refresh.nudge)
+    }
+  }, [])
   useEffect(() => {
     let alive = true
     window.eq
@@ -168,7 +186,7 @@ function useFactionEvidence(progress: ProgressState | null): FactionEvidenceRepo
     return () => {
       alive = false
     }
-  }, [loadedAt])
+  }, [loadedAt, asks])
   return report
 }
 
