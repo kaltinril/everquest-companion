@@ -315,3 +315,28 @@ export function inertFilters(filters: GearFilters, visible: ReadonlySet<GearCont
     ignoreHaste: visible.has('haste') ? filters.ignoreHaste : false
   }
 }
+
+/**
+ * THE WAY BACK FROM `inertFilters`: what the bar wrote, with every HIDDEN control's field put back
+ * to the user's own stored value. The bar is handed the inert copy and writes back a whole object,
+ * so without this, editing any visible control would store the forced value of every hidden one
+ * (hide the era chip, pick a slot, show the era chip again: it is off). The header's promise is
+ * that the user's value "comes back untouched when the control does"; this is what keeps it.
+ */
+export function keepHiddenFilters(
+  next: GearFilters,
+  own: GearFilters,
+  visible: ReadonlySet<GearControl>
+): GearFilters {
+  return {
+    ...next,
+    slots: visible.has('slot') ? next.slots : own.slots,
+    weaponTypes: visible.has('weapon') ? next.weaponTypes : own.weaponTypes,
+    zones: visible.has('zone') ? next.zones : own.zones,
+    effect: visible.has('effect') ? next.effect : own.effect,
+    classes: visible.has('classes') ? next.classes : own.classes,
+    eraOnly: visible.has('era') ? next.eraOnly : own.eraOnly,
+    ownedOnly: visible.has('owned') ? next.ownedOnly : own.ownedOnly,
+    ignoreHaste: visible.has('haste') ? next.ignoreHaste : own.ignoreHaste
+  }
+}
