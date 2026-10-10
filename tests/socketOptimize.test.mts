@@ -323,6 +323,35 @@ test('two donors of one proc family, one copy each: each hand names its own gem,
   assert.equal(seated.clears.length, 0)
 })
 
+test('a lower tier of the same proc family keeps the other hand: both weapons fire their own', () => {
+  // Lifebite III in the primary and Lifebite II in the secondary are two procs, one per weapon.
+  // The claim held only the best tier, so the plan said to pull Claw ("it now lives in primary")
+  // and, with the secondary empty, left it empty while the recommender said to socket Claw there.
+  const rows = [
+    row({ key: 'fangs', name: 'Fangs', effects: proc('Fangs', 'Lifebite III'), slots: ['PRIMARY', 'SECONDARY'] }),
+    row({ key: 'claw', name: 'Claw', effects: proc('Claw', 'Lifebite II'), slots: ['PRIMARY', 'SECONDARY'] }),
+    row({ key: 'sword', name: 'Sword', effects: [], slots: ['PRIMARY', 'SECONDARY'] })
+  ]
+  const kept = planBoard(
+    [gem('Fangs', 'socketed in Primary', true), gem('Claw', 'socketed in Secondary', true)],
+    rows,
+    NOBODY,
+    hands('Fangs', 'Claw')
+  )
+  assert.deepEqual(
+    kept.placements.map((p) => `${p.cellLabel}:${p.gemName}:${p.effect}`).sort(),
+    ['primary:Fangs:Lifebite III', 'secondary:Claw:Lifebite II']
+  )
+  assert.equal(kept.moves.length, 0)
+  assert.equal(kept.clears.length, 0, 'the secondary proc fires on its own weapon')
+  const offered = planBoard([gem('Fangs', 'socketed in Primary', true), gem('Claw')], rows, NOBODY, hands('Fangs', null))
+  assert.deepEqual(
+    offered.moves.map((m) => `${m.cellLabel}: socket ${m.gemName}`),
+    ['secondary: socket Claw']
+  )
+  assert.equal(offered.clears.length, 0)
+})
+
 test('…but a second copy never costs a distinct family its hand', () => {
   const rows = [
     row({ key: 'fangs', name: 'Fangs', effects: proc('Fangs', 'Lifebite Combat'), slots: ['PRIMARY', 'SECONDARY'] }),
