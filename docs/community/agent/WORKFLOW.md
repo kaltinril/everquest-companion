@@ -134,6 +134,10 @@ disagree, RULES.md wins; fix this file.
   `AGENTS.md` / `releaseNotes.ts` stay hands-off unless the owner says otherwise.
 - **Wiki and network:** no new runtime fetches. Data comes from committed files and bundled
   assets. Any new scrape is an owner decision, in bulk, at 1 request per second.
+  Development, testing and validation send the wiki zero requests (owner, 2026-10-10): work from
+  fixtures and the committed caches, and a scraper's `--dry-run` that reads the wiki counts as
+  a request. Scraper changes keep real runs light: revid checks so only changed pages are
+  fetched, 50 pages per request, no retries on permanent errors.
 - **Diffs:** surgical. Smallest mergeable change; never reformat, rename or restructure beyond
   the feature. New code gets lean comments: a one-line note for a real constraint, not an essay,
   even where legacy files carry long headers.
