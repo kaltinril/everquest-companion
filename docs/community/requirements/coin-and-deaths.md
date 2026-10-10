@@ -1,0 +1,9 @@
+# coin-and-deaths: what was asked for
+
+Every request this feature has taken, newest at the bottom. Read it before changing the branch;
+nothing listed here is removed or narrowed without the owner's word (RULES.md, rule 19).
+
+| Date | Asked by | The ask | Status |
+| --- | --- | --- | --- |
+| 2026-10-10 | owner | Coin income and deaths from the log, shown inside an existing tab (too small for a tab of their own). | open (home: the Leveling tab's range stats, per range and per zone) |
+| 2026-10-10 | owner | Coin counts what the log says was received: corpse coin and the coin auto-sold loot was sold for. | open |
