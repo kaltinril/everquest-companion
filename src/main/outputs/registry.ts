@@ -138,10 +138,17 @@ export function watchOutputKind(
   // and outlives every re-arm, so there is no window in which nobody is watching the root for the
   // dump to come back.
   let fileWatcher: FSWatcher | null = null
+  // The delayed announce below outlives the arm that set it, so it is kept to be cancelled: by the
+  // next re-arm (which decides afresh) and by close (a closed watch tells nobody anything).
+  let announceTimer: ReturnType<typeof setTimeout> | null = null
+  let closed = false
 
   const armFile = (announce = false): void => {
+    if (announceTimer !== null) clearTimeout(announceTimer)
+    announceTimer = null
     void fileWatcher?.close()
     fileWatcher = null
+    if (closed) return
     const path = findOutputFile(id, character.name, character.server)
     if (path === null) return
     fileWatcher = watchOutputFile(path, {
@@ -168,8 +175,9 @@ export function watchOutputKind(
     // reload if the directory watcher DOES also report it is the cost the header above already
     // accepts ("one re-read of a file we would have re-read anyway").
     if (announce) {
-      setTimeout(() => {
-        if (active()) opts.onChange()
+      announceTimer = setTimeout(() => {
+        announceTimer = null
+        if (!closed && active()) opts.onChange()
       }, 600)
     }
   }
@@ -188,6 +196,9 @@ export function watchOutputKind(
   armFile()
   return {
     close: () => {
+      closed = true
+      if (announceTimer !== null) clearTimeout(announceTimer)
+      announceTimer = null
       void fileWatcher?.close()
       fileWatcher = null
       void dirWatcher.close()
