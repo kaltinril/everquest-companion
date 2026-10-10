@@ -216,6 +216,14 @@ test('real catalog: the renamed zones resolve through the shared alias table', (
   }
 })
 
+test('real catalog: a zone the catalog spells by one of its table aliases resolves', () => {
+  // The zone table already knows these spellings as aliases; the join used to read only the
+  // catalog spellings, so Clan Crushbone found no mobs at all (29 "Crushbone" rows today).
+  assert.ok(mobsInZone('Clan Crushbone', REAL).length >= 25)
+  const unrest = mobsInZone('The Estate of Unrest', REAL)
+  assert.ok(unrest.some((m) => m.zones?.includes('Unrest')), 'the "Unrest" rows are missing')
+})
+
 test('real catalog: an alias never bleeds into a neighbouring zone of the same name', () => {
   // "Paineel" (116 rows) and "The Hole" (45) are two genuinely different places whose names sit
   // one word apart, and no catalog row lists both. A fuzzy/closest-match zone rule would merge

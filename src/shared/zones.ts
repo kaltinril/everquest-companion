@@ -519,6 +519,17 @@ export function catalogZonesFor(raw: string | undefined | null): string[] {
 }
 
 /**
+ * Every spelling the table holds for a zone: `name`, `aliases` and `mobCatalogNames`, for a join
+ * against the mob catalog. `catalogZonesFor` alone misses the catalog rows that spell the zone by
+ * one of its aliases (`Crushbone` for Clan Crushbone, `Unrest` for The Estate of Unrest). The
+ * index above lets no spelling fold onto two zones, so this never reaches another zone's mobs.
+ */
+export function zoneSpellingsFor(raw: string | undefined | null): string[] {
+  const entry = zoneEntryFor(raw)
+  return entry ? [entry.name, ...(entry.aliases ?? []), ...(entry.mobCatalogNames ?? [])] : []
+}
+
+/**
  * The OTHER DIRECTION of the same knowledge: a MOB-CATALOG zone spelling -> its map stem.
  *
  * `zoneEntryFor` indexes `name` + `aliases`, which is the right corpus for a name the LOG printed.
