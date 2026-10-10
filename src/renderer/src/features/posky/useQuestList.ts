@@ -14,7 +14,7 @@
 // the Quests/Ignored switch was never enough for them, because leaving the Sky tab for another
 // VIEW unmounts this hook outright.
 
-import { useDeferredValue, useEffect, useMemo, useState } from 'react'
+import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
 import type { QuestProgress } from './useProgress'
 import { useFavorites } from '../favorites/useFavorites'
 import { useQuestFavorites, useQuestIgnored, type QuestFlagSet } from '../favorites/useQuestFlags'
@@ -75,17 +75,22 @@ function loadNames(key: string): string[] {
 }
 
 /**
- * State that IS a stored preference: the load is the initialiser, the write is the effect, and
- * the caller cannot get one without the other. The class filter, the island facet and the boss
+ * State that IS a stored preference: the load is the initialiser, the write is the setter, and
+ * the caller cannot get one without the other. (A mount effect used to write it, which stored the
+ * default on first mount as if it were a choice.) The class filter, the island facet and the boss
  * facet are the same promise three times (JOS-90's rule, JOS-124's two new keys), so they are
  * the same nine lines once.
  */
 function useStoredNames(key: string): [string[], (v: string[]) => void] {
   const [value, setValue] = useState<string[]>(() => loadNames(key))
-  useEffect(() => {
-    localStorage.setItem(key, JSON.stringify(value))
-  }, [key, value])
-  return [value, setValue]
+  const set = useCallback(
+    (v: string[]) => {
+      localStorage.setItem(key, JSON.stringify(v))
+      setValue(v)
+    },
+    [key]
+  )
+  return [value, set]
 }
 
 /** The sort order, stored. An order retired from SORT_OPTIONS falls back to the default rather
@@ -95,10 +100,11 @@ function useStoredSort(): [SortKey, (v: SortKey) => void] {
     const v = localStorage.getItem(SORT_KEY)
     return isSortKey(v) ? v : DEFAULT_SORT
   })
-  useEffect(() => {
-    localStorage.setItem(SORT_KEY, sort)
-  }, [sort])
-  return [sort, setSort]
+  const set = useCallback((v: SortKey) => {
+    localStorage.setItem(SORT_KEY, v)
+    setSort(v)
+  }, [])
+  return [sort, set]
 }
 
 /**
@@ -140,10 +146,15 @@ function useStoredFlag(key: string, whenAbsent = false): [boolean, (v: boolean) 
     const raw = localStorage.getItem(key)
     return raw === null ? whenAbsent : raw === '1'
   })
-  useEffect(() => {
-    localStorage.setItem(key, value ? '1' : '0')
-  }, [key, value])
-  return [value, setValue]
+  // Written when the user sets it, never on mount: that is what keeps an absent key absent.
+  const set = useCallback(
+    (v: boolean) => {
+      localStorage.setItem(key, v ? '1' : '0')
+      setValue(v)
+    },
+    [key]
+  )
+  return [value, set]
 }
 
 /**
