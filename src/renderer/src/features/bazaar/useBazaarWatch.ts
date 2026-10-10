@@ -5,14 +5,15 @@
 // other. Loaded once from the settings store; every edit is written through at once, and the
 // stored (normalized) list is what the snapshot becomes, from the newest write's reply only
 // (latestReply.ts): an older reply landing late would flick a switch back or feed a keystroke a
-// stale list.
+// stale list. An edit made before the first load answers waits for it, so it lands on the stored
+// list rather than replacing it.
 
 import { useMemo, useSyncExternalStore } from 'react'
 import { EMPTY_WATCHLIST, removeWatch, setWatch, type BazaarWatch, type BazaarWatchlist } from '@shared/bazaarWatch'
-import { replyGate } from './latestReply'
+import { afterLoad, replyGate } from './latestReply'
 
 let list: BazaarWatchlist = EMPTY_WATCHLIST
-let loading: Promise<void> | null = null
+let loaded: ((edit: () => void) => void) | null = null
 const listeners = new Set<() => void>()
 const replies = replyGate()
 
@@ -28,9 +29,15 @@ function landing(ticket: number): (stored: BazaarWatchlist) => void {
   }
 }
 
+/** Loads the list once; what it returns runs an edit after that load has settled. */
+function load(): (edit: () => void) => void {
+  loaded ??= afterLoad(window.eq.getBazaarWatch().then(landing(0), () => undefined))
+  return loaded
+}
+
 function subscribe(listener: () => void): () => void {
   listeners.add(listener)
-  loading ??= window.eq.getBazaarWatch().then(landing(0), () => undefined)
+  load()
   return () => {
     listeners.delete(listener)
   }
@@ -53,8 +60,8 @@ export function useBazaarWatch(): BazaarWatchApi {
   return useMemo(
     () => ({
       list: current,
-      put: (w: BazaarWatch) => write(setWatch(list, w)),
-      remove: (item: string, tier: number | null) => write(removeWatch(list, item, tier))
+      put: (w: BazaarWatch) => load()(() => write(setWatch(list, w))),
+      remove: (item: string, tier: number | null) => load()(() => write(removeWatch(list, item, tier)))
     }),
     [current]
   )

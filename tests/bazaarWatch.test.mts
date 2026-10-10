@@ -16,7 +16,7 @@ import {
   type BazaarWatch
 } from '../src/shared/bazaarWatch'
 import { APP_SIGNAL_CAPTURES, applyCaptures, captureNamesIn } from '../src/shared/alertCaptures'
-import { replyGate } from '../src/renderer/src/features/bazaar/latestReply'
+import { afterLoad, replyGate } from '../src/renderer/src/features/bazaar/latestReply'
 
 const row = ([day, dir, item, tier = 0]: [string, BazaarRow['dir'], string, number?], prices: number[]): BazaarRow => ({
   day,
@@ -205,4 +205,21 @@ test('a store reply lands only while its write is the newest, and the first load
   assert.equal(g.isLatest(second), true)
   assert.equal(g.isLatest(0), false, 'an edit made while the load was out is not overwritten by it')
   assert.equal(replyGate().isLatest(0), true, 'with nothing written, the load lands')
+})
+
+test('an edit made before the first load answers waits for it, so it lands on the stored list', async () => {
+  let answer!: (stored: string[]) => void
+  let list: string[] = []
+  const load = new Promise<string[]>((r) => (answer = r)).then((stored) => {
+    list = stored
+  })
+  const run = afterLoad(load)
+  run(() => (list = [...list, 'Cloak of Flames']))
+  assert.deepEqual(list, [], 'nothing is written on the empty list while the load is out')
+  answer(['Fungus Covered Scale Tunic'])
+  await load
+  await Promise.resolve()
+  assert.deepEqual(list, ['Fungus Covered Scale Tunic', 'Cloak of Flames'])
+  run(() => (list = [...list, 'Robe of the Oracle']))
+  assert.equal(list.length, 3, 'once loaded, an edit applies at once')
 })
