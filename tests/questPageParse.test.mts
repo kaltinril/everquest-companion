@@ -40,3 +40,18 @@ You receive the {{:ShadowBound Gloves}}.
   assert.deepEqual(q.rewards, ['Harvester', 'ShadowBound Gloves'])
   assert.deepEqual(q.requiredItems, ['Rusty Scythe'])
 })
+
+test('a {{Gear Set|...}} list gives its item pieces as rewards, even under a nested heading', () => {
+  const wt = `== Rewards ==
+==== Sirtha Scarscale ====
+{{Gear Set
+|ShadowBound Gloves
+|Not An Item
+}}
+== Walkthrough ==
+Bring a [[Rusty Scythe]] and the [[ShadowBound Gloves]] pattern.
+`
+  const q = parseQuestPage('Gear', wt, isItem)
+  assert.deepEqual(q.rewards, ['ShadowBound Gloves'])
+  assert.deepEqual(q.requiredItems, ['Rusty Scythe'])
+})

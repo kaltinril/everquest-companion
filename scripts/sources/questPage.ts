@@ -96,6 +96,15 @@ export function transclusionTargets(text: string): string[] {
   return out
 }
 
+/** Positional params of every `{{Gear Set|A|B|...}}` (a quest's armor-set reward list). */
+export function gearSetItems(text: string): string[] {
+  const out: string[] = []
+  for (const m of text.matchAll(/\{\{\s*gear set\s*\|([^{}]*)\}\}/gi)) {
+    for (const p of m[1].split('|')) if (p.trim() && !p.includes('=')) out.push(p.trim())
+  }
+  return out
+}
+
 /** Case-insensitive de-dupe that keeps first-seen order and spelling. */
 export function dedupe(names: Iterable<string>): string[] {
   const seen = new Set<string>()
@@ -242,9 +251,11 @@ export function parseQuestPage(
 
   // Rewards: a `{{:Name}}` box is always an item; a plain link only counts when the
   // title is a known item page (Reward sections also link factions, zones and coin).
+  // Gear Set is only ever a reward list, read page-wide since it can sit under a sub-heading.
   const rewards = dedupe([
     ...transclusionTargets(rewardText),
-    ...linkTargets(rewardText).filter(isItem)
+    ...linkTargets(rewardText).filter(isItem),
+    ...gearSetItems(wikitext).filter(isItem)
   ])
   const rewardKeys = new Set(rewards.map((r) => r.toLowerCase()))
 
