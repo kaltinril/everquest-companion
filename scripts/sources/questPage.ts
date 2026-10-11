@@ -239,6 +239,10 @@ export function splitSections(wikitext: string): { lead: string; sections: WikiS
 const REWARD_HEADING = /^(?!.*\bwalkthrough\b).*\brewards?\b/i
 const EXP_MARKER = /\{\{\s*(yougainexperience|exp|experience)\s*\}\}|you gain experience/i
 
+function isSectionHub(top: QuestTopTable | null, wikitext: string): boolean {
+  return top === null && /\{\{\s*#lsth\s*:/i.test(wikitext)
+}
+
 /**
  * Parse one quest page. `isItem(title)` decides whether a prose link names an item page
  * (built from the wiki's item-title set); without it every link would be kept, dragging
@@ -291,7 +295,7 @@ export function parseQuestPage(
     expReward: EXP_MARKER.test(wikitext),
     disambiguation: /\{\{\s*disambig/i.test(wikitext),
     hasTopTable: top !== null,
-    sectionHub: top === null && /\{\{\s*#lsth\s*:/i.test(wikitext)
+    sectionHub: isSectionHub(top, wikitext)
   }
 }
 
