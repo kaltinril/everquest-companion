@@ -114,6 +114,8 @@ test('every deity the committed corpus states is one the game names', () => {
   // unusable. This assertion is the tripwire, and `GearBuildStats.unknownDeityTokens` is its twin.
   assert.deepEqual([...unknown], [], 'a deity token the game does not name - check the fold')
   // The census, so a rescrape that changes the shape of the answer is visible rather than silent.
-  assert.equal(restricted, 457, 'pages stating a deity line')
+  // 455 since the 2026-10-10 re-derive: the Teir`Dal Adamantite Cloak and Girdle keys reach their
+  // own pages again (no Deity line), not the Innoruuk-only (Imbued) pages whose alias had taken them.
+  assert.equal(restricted, 455, 'pages stating a deity line')
   assert.equal(donors, 20, 'of those, the effect-bearing ones - every possible exaltation donor')
 })
