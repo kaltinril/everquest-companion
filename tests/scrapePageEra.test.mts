@@ -11,6 +11,7 @@ import {
   batchName,
   batchOf,
   categoryVerdicts,
+  readTitleList,
   retryOnError,
   wikitextByRequested
 } from '../scripts/sources/pageEraBatch'
@@ -88,4 +89,16 @@ test('a query response without pages throws instead of becoming an empty cached 
   assert.throws(() => batchOf({}), /no pages/)
   const q = { pages: [{ title: 'A', missing: true }], redirects: [{ from: 'B', to: 'A' }] }
   assert.deepEqual(batchOf({ query: q }), { ...q, normalized: undefined })
+})
+
+test('a cached spell-page list warns when it is old or of unknown age, since only a re-enumeration finds new pages', () => {
+  const committed = JSON.parse(readFileSync(resolve(CACHE, 'spell-pages.json'), 'utf8'))
+  const legacy = readTitleList(committed)
+  assert.ok((legacy?.titles.length ?? 0) > 2000)
+  assert.match(legacy?.warning ?? '', /unknown age.*--refresh/)
+  const now = Date.parse('2026-10-10T00:00:00Z')
+  const fresh = readTitleList({ fetchedAt: '2026-10-01T00:00:00Z', titles: ['Yaulp'] }, now)
+  assert.deepEqual(fresh, { titles: ['Yaulp'] })
+  assert.match(readTitleList({ fetchedAt: '2026-08-01T00:00:00Z', titles: ['Yaulp'] }, now)?.warning ?? '', /70 days old/)
+  assert.equal(readTitleList(null), null)
 })

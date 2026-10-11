@@ -84,6 +84,7 @@ import {
   batchOf,
   categoryVerdicts,
   legacyBatchName,
+  readTitleList,
   retryOnError,
   wikitextByRequested,
   type CatPage,
@@ -449,10 +450,13 @@ function dropperTitles(file: ItemDbFile, catalog: { mobs: { name: string; drops?
 // under a different name. The endpoint answers a redirect as happily as a page, so asking the UNION
 // costs nothing but a few titles and leaves the LOADER able to join on the only handle it has.
 
-/** Every page the spell scrape enumerates, by title. Cached — a re-run asks the wiki nothing. */
+/** Every page the spell scrape enumerates, by title. Cached (a re-run asks nothing); warns when old. */
 async function spellPageTitles(): Promise<string[]> {
-  const cached = readCache('spell-pages.json') as string[] | null
-  if (cached !== null) return cached
+  const cached = readTitleList(readCache('spell-pages.json'))
+  if (cached !== null) {
+    if (cached.warning !== undefined) console.warn(`  ${cached.warning}`)
+    return cached.titles
+  }
   const out: string[] = []
   let eicontinue: string | undefined
   for (let page = 0; page < 200; page++) {
@@ -471,7 +475,7 @@ async function spellPageTitles(): Promise<string[]> {
     eicontinue = j.continue?.eicontinue
     if (eicontinue === undefined) break
   }
-  writeCache('spell-pages.json', out)
+  writeCache('spell-pages.json', { fetchedAt: new Date().toISOString(), titles: out })
   return out
 }
 

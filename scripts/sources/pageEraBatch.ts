@@ -125,3 +125,20 @@ export function batchOf<P>(j: { query?: Partial<RevBatch<P>> }): RevBatch<P> {
   if (q?.pages === undefined) throw new Error(`query returned no pages: ${JSON.stringify(j).slice(0, 300)}`)
   return { pages: q.pages, normalized: q.normalized, redirects: q.redirects }
 }
+
+const LIST_STALE_DAYS = 30
+
+/**
+ * The cached spell-page list, plus a warning when it is over LIST_STALE_DAYS old or predates the
+ * recorded fetch date (a bare array): a page list cannot be revid-checked, only re-enumerated.
+ */
+export function readTitleList(cached: unknown, now = Date.now()): { titles: string[]; warning?: string } | null {
+  if (Array.isArray(cached)) {
+    return { titles: cached as string[], warning: 'the cached spell-page list is of unknown age; new spell pages need --refresh' }
+  }
+  const c = cached as { fetchedAt?: string; titles?: string[] } | null
+  if (!Array.isArray(c?.titles)) return null
+  const days = Math.floor((now - Date.parse(c.fetchedAt ?? '')) / 86_400_000)
+  if (days <= LIST_STALE_DAYS) return { titles: c.titles }
+  return { titles: c.titles, warning: `the cached spell-page list is ${String(days)} days old; new spell pages need --refresh` }
+}
