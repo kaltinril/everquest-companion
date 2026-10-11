@@ -74,10 +74,17 @@ import { fileURLToPath } from 'url'
 import { notesLinkTargets, parsePageEraTag } from '../src/main/itemLookupParse'
 import { itemKey, type ItemDbEntry, type ItemDbFile } from '../src/main/itemsDb'
 import { pageEraKey, type PageEraEntry, type PageEraFile } from '../src/main/pageEraDb'
-import { eraBadge, layeredVerdict, namesEra } from '../src/shared/planner/era'
+import { eraBadge, layeredVerdict } from '../src/shared/planner/era'
 import type { SpellDbFile } from '../src/shared/types'
 import { isMain } from './sources/isMain'
-import { wikitextByRequested, type RevPage } from './sources/pageEraBatch'
+import {
+  asRevBatch,
+  categoryVerdicts,
+  wikitextByRequested,
+  type CatPage,
+  type RevBatch,
+  type RevPage
+} from './sources/pageEraBatch'
 
 const API = 'https://eqlwiki.com/api.php'
 const UA = 'everquest-companion/0.1 (personal quest tracker)'
@@ -230,20 +237,22 @@ async function fetchWikitext(titles: readonly string[], prefix: string): Promise
   for (let i = 0; i < titles.length; i += TITLE_BATCH) {
     const slice = titles.slice(i, i + TITLE_BATCH)
     const file = batchName(prefix, slice)
-    let pages = readCache(file) as RevPage[] | null
-    if (pages === null) {
-      const j = await api<{ query?: { pages?: RevPage[] } }>({
+    let batch = asRevBatch(readCache(file))
+    if (batch === null) {
+      // redirects=1: a redirect's era is its target's, resolved in this same request.
+      const j = await api<{ query?: Partial<RevBatch> }>({
         action: 'query',
         prop: 'revisions',
         rvprop: 'content',
         rvslots: 'main',
+        redirects: '1',
         titles: slice.join('|')
       })
-      pages = j.query?.pages ?? []
-      writeCache(file, pages)
+      batch = { pages: j.query?.pages ?? [], normalized: j.query?.normalized, redirects: j.query?.redirects }
+      writeCache(file, batch)
     }
     // Keyed by the REQUESTED spelling, so entryFor's lookup finds a title the API normalized.
-    for (const [t, wt] of wikitextByRequested(slice, { pages })) out.set(t, wt)
+    for (const [t, wt] of wikitextByRequested(slice, batch)) out.set(t, wt)
   }
   return out
 }
@@ -360,32 +369,22 @@ function keepRow(out: Map<string, boolean>, row: MetaRow): void {
  */
 async function fetchCategories(titles: readonly string[]): Promise<Map<string, boolean>> {
   const out = new Map<string, boolean>()
-  interface CatPage {
-    title: string
-    missing?: boolean
-    categories?: { title: string }[]
-  }
   for (let i = 0; i < titles.length; i += TITLE_BATCH) {
     const slice = titles.slice(i, i + TITLE_BATCH)
     const file = batchName('cats', slice)
-    let pages = readCache(file) as CatPage[] | null
-    if (pages === null) {
-      const j = await api<{ query?: { pages?: CatPage[] } }>({
+    let batch = asRevBatch<CatPage>(readCache(file))
+    if (batch === null) {
+      const j = await api<{ query?: Partial<RevBatch<CatPage>> }>({
         action: 'query',
         prop: 'categories',
         cllimit: 'max',
+        redirects: '1',
         titles: slice.join('|')
       })
-      pages = j.query?.pages ?? []
-      writeCache(file, pages)
+      batch = { pages: j.query?.pages ?? [], normalized: j.query?.normalized, redirects: j.query?.redirects }
+      writeCache(file, batch)
     }
-    for (const p of pages) {
-      const tokens = (p.categories ?? []).flatMap((c) => {
-        const m = /^Category:\s*(.+?)[ _]+Era$/i.exec(c.title)
-        return m === null ? [] : [m[1].replace(/[_\s]+/g, ' ').trim()]
-      })
-      out.set(pageEraKey(p.title), tokens.some((t) => namesEra(t) && eraBadge(t) === 'out'))
-    }
+    for (const [k, v] of categoryVerdicts(slice, batch)) out.set(k, v)
   }
   return out
 }

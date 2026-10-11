@@ -5,7 +5,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { wikitextByRequested } from '../scripts/sources/pageEraBatch'
+import { asRevBatch, categoryVerdicts, wikitextByRequested } from '../scripts/sources/pageEraBatch'
 import type { PageEraFile } from '../src/main/pageEraDb'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
@@ -24,4 +24,30 @@ test('the committed first target batch answers the three lowercase titles it was
   const pages = JSON.parse(readFileSync(resolve(CACHE, 'target-a-goblin-seer-50.json'), 'utf8'))
   const got = wikitextByRequested(titles.slice(0, 50), { pages })
   for (const t of ['a goblin seer', 'a minnow', 'a nesting rat']) assert.ok(got.has(t), t)
+})
+
+test('a redirect is read through to its target page, not off the #REDIRECT line', () => {
+  const batch = {
+    pages: [rev('Mistmoore Castle', '{{Classic Era}}')],
+    normalized: [{ from: 'mistmoore', to: 'Mistmoore' }],
+    redirects: [{ from: 'Mistmoore', to: 'Mistmoore Castle' }]
+  }
+  assert.equal(wikitextByRequested(['mistmoore'], batch).get('mistmoore'), '{{Classic Era}}')
+})
+
+test('a cached batch from before redirects were followed is refetched when it holds a redirect page', () => {
+  const read = (f: string): unknown => JSON.parse(readFileSync(resolve(CACHE, f), 'utf8'))
+  assert.equal(asRevBatch(read('target-a-goblin-seer-50.json')), null)
+  assert.equal(asRevBatch([{ title: 'X', categories: [] }]), null)
+  assert.equal(asRevBatch(read('target-Yaulp-1.json'))?.pages.length, 1)
+  const fresh = { pages: [rev('A', 'a')], redirects: [{ from: 'B', to: 'A' }] }
+  assert.deepEqual(asRevBatch(fresh), fresh)
+})
+
+test('the categories fallback files a redirect under the title asked for', () => {
+  const batch = {
+    pages: [{ title: 'Skill Fishing', categories: [{ title: 'Category:Kunark Era' }] }],
+    redirects: [{ from: 'Fishing', to: 'Skill Fishing' }]
+  }
+  assert.deepEqual([...categoryVerdicts(['Fishing'], batch)], [['fishing', true]])
 })
