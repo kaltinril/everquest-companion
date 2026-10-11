@@ -59,12 +59,15 @@ test('every key is canonical, and derived from the record it points at', () => {
     assert.ok(entry.page.length > 0, `entry under ${key} has no page title`)
     const fromTitle = itemKey(entry.page) === key
     const fromName = entry.name != null && itemKey(entry.name) === key
+    // A disambiguated title is also keyed by its base name (scrape-items' baseTitle).
+    const base = /^(.+?)\s*\(Item\)$/i.exec(entry.page)?.[1]
+    const fromBase = base !== undefined && itemKey(base) === key
     // THE ONE STATED EXCEPTION (JOS-415): the rename overlay keeps a renamed item's OLD key
     // addressable, pointing at the record under its CURRENT name — a log line or a share bundle
     // predating the rename must still resolve. Only a key the table names may miss the derivation.
     const fromRename = isRenamedItem(key) && itemKey(renameItemName(key)) === itemKey(entry.page)
     assert.ok(
-      fromTitle || fromName || fromRename,
+      fromTitle || fromName || fromBase || fromRename,
       `key ${key} matches neither page ${entry.page} nor name ${entry.name}`
     )
   }
