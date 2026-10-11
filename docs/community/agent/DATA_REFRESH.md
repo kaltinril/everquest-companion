@@ -89,6 +89,12 @@ holds no page titles, which the spell name now comes from (`Healing Water`, not 
 name corrections `Malisement`, `Invisibility vs. Undead` and `Solon's Bravura` in
 `spellCorrectionsList.ts` go stale and are updated in the same change.
 
+Done 2026-10-10 for every file but spells and respawns. To re-derive `items.json`/`mobs.json`
+offline without undoing later top-ups, replace a record only where the pre-fix parser reproduces
+it exactly from the cached page; keep it otherwise (its page changed after the cache). A
+respawns re-derive is held: it would key `the ghoul lord (hoptor thaggelum)`, which no death line
+matches (`tests/respawnWiki.test.mts` guards it).
+
 ## Wiki facts that matter to parsers (as of 2026-09-27)
 
 - `{{Sky Era}}` was retired: ~107 pages became `{{Classic Era}}`, ~45 have no banner. Pre-upgrade
