@@ -799,6 +799,20 @@ function buildStats(statsBlock: string, focusRaw: string | null): ItemStatBlock 
   return stats
 }
 
+/** A flag naming lore: `Lore`, `Lore Item`, `Lore Equipped` and its typos (`LORE EQUPPED`). */
+const LORE_FLAG_RE = /^lore(\s+(item|equ\w*))?$/i
+
+/** LORE / QUEST from the block text, plus the short forms the parsed flag line carries
+ *  (`No Trade, Quest`, `Lore`). */
+function loreQuestFlags(statsBlock: string | undefined, stats: ItemStatBlock | undefined): { lore: boolean; questFlag: boolean } {
+  const parsed = stats?.flags ?? []
+  const text = (statsBlock ?? '').toUpperCase()
+  return {
+    lore: /\bLORE (ITEM|EQUIPPED)\b/.test(text) || parsed.some((f) => LORE_FLAG_RE.test(f.trim())),
+    questFlag: /\bQUEST ITEM\b/.test(text) || parsed.some((f) => /^quest$/i.test(f.trim()))
+  }
+}
+
 /** `|lucy_img_ID` → File:Item <id>.png. A bare integer or nothing at all. */
 function parseIconId(iconRaw: string | null): number | undefined {
   return iconRaw && /^\d+$/.test(iconRaw.trim()) ? Number(iconRaw.trim()) : undefined
@@ -866,15 +880,12 @@ export function parseItemWikitext(
   const craftedRaw = templateField(wikitext, 'playercrafted')
   const dropsFrom = dropSourcesField(templateField(wikitext, 'dropsfrom'))
 
-  const flags = (statsBlock ?? '').toUpperCase()
-  const lore = /\bLORE ITEM\b/.test(flags) || /\bLORE EQUIPPED\b/.test(flags)
-  const questFlag = /\bQUEST ITEM\b/.test(flags)
+  const stats: ItemStatBlock | undefined = statsBlock ? buildStats(statsBlock, focusRaw) : undefined
+  const { lore, questFlag } = loreQuestFlags(statsBlock, stats)
 
   const questUses = relatedRaw ? parseQuestLinks(relatedRaw) : []
   const quest = questFlag || questUses.length > 0
   const summary = notesRaw ? cleanSummary(notesRaw) : undefined
-
-  const stats: ItemStatBlock | undefined = statsBlock ? buildStats(statsBlock, focusRaw) : undefined
 
   const iconId = parseIconId(iconRaw)
 

@@ -80,3 +80,12 @@ test('summaries unwrap lore/transclusion/loc templates and drop the rest instead
   assert.equal(cleanSummary("{{{Item Lore | 'Runed Bokken'}}"), "'Runed Bokken'")
   assert.equal(cleanSummary('Icon {{SmIcon|1211}} here'), 'Icon here')
 })
+
+test('the short Quest and Lore flag forms (and a Lore Equpped typo) set quest and lore', () => {
+  const page = (flags: string): string => `{{Itempage\n|statsblock = ${flags}<br>\nWT: 0.1  Size: SMALL<br>\n}}`
+  assert.equal(parseItemWikitext('X', page('No Trade, Quest')).quest, true)
+  assert.equal(parseItemWikitext('X', page('MAGIC ITEM  LORE EQUPPED')).lore, true)
+  assert.equal(parseItemWikitext('X', page('MAGIC ITEM  Lore')).lore, true)
+  assert.equal(parseItemWikitext('X', page('MAGIC ITEM  PENDING LORE')).lore, false)
+  assert.equal(parseItemWikitext('X', page('MAGIC ITEM  NO DROP')).quest, false)
+})
