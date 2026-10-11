@@ -81,8 +81,10 @@ import {
   answersSlice,
   asRevBatch,
   batchName,
+  batchOf,
   categoryVerdicts,
   legacyBatchName,
+  retryOnError,
   wikitextByRequested,
   type CatPage,
   type RevBatch,
@@ -127,11 +129,6 @@ function retryDelayMs(res: Response, backoff: number): number {
 
 let requestsSent = 0
 
-/** A maxlag deferral arrives as HTTP 200 with an error body (and a Retry-After header). */
-function isMaxlagDeferral(j: unknown): boolean {
-  return (j as { error?: { code?: string } }).error?.code === 'maxlag'
-}
-
 /**
  * One serialized request with exponential backoff on 429/5xx (honours Retry-After).
  *
@@ -171,7 +168,8 @@ async function api<T>(params: Record<string, string>, method: 'GET' | 'POST' = '
     if (res.ok) {
       await sleep(DELAY_MS)
       const j = (await res.json()) as T
-      if (isMaxlagDeferral(j) && attempt < MAX_RETRIES) {
+      // A maxlag deferral is retried; any other error body, or maxlag past the last try, throws.
+      if (retryOnError(j, attempt, MAX_RETRIES)) {
         await sleep(retryDelayMs(res, wait))
         wait *= 2
         continue
@@ -253,7 +251,7 @@ async function fetchWikitext(titles: readonly string[], prefix: string): Promise
         redirects: '1',
         titles: slice.join('|')
       })
-      batch = { pages: j.query?.pages ?? [], normalized: j.query?.normalized, redirects: j.query?.redirects }
+      batch = batchOf(j)
       writeCache(file, batch)
     }
     // Keyed by the REQUESTED spelling, so entryFor's lookup finds a title the API normalized.
@@ -344,13 +342,12 @@ async function fetchMetadata(titles: readonly string[]): Promise<Map<string, boo
   for (let i = 0; i < titles.length; i += META_BATCH) {
     const slice = titles.slice(i, i + META_BATCH)
     const file = batchName('meta', slice)
-    let j = readBatch('meta', slice) as MetaResponse | null
-    if (j === null) {
-      j = await api<MetaResponse>({ action: 'eqlmetadata', titles: slice.join('|') }, 'POST')
-      writeCache(file, j)
-    }
+    const cached = readBatch('meta', slice) as MetaResponse | null
+    const j = cached ?? (await api<MetaResponse>({ action: 'eqlmetadata', titles: slice.join('|') }, 'POST'))
     const rows = j.eqlmetadata?.pages
     if (rows === undefined) throw new Error(`eqlmetadata returned no pages: ${JSON.stringify(j).slice(0, 300)}`)
+    // Cached only once it has rows: a failed answer must never look cached.
+    if (cached === null) writeCache(file, j)
     eraRevision ??= j.eqlmetadata?.eraRevision
     for (const row of rows) keepRow(out, row)
   }
@@ -386,7 +383,7 @@ async function fetchCategories(titles: readonly string[]): Promise<Map<string, b
         redirects: '1',
         titles: slice.join('|')
       })
-      batch = { pages: j.query?.pages ?? [], normalized: j.query?.normalized, redirects: j.query?.redirects }
+      batch = batchOf(j)
       writeCache(file, batch)
     }
     for (const [k, v] of categoryVerdicts(slice, batch)) out.set(k, v)
