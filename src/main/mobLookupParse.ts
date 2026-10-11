@@ -222,7 +222,8 @@ export interface MobPageFacts {
 export function parseMobWikitext(wikitext: string): MobPageFacts {
   const out: MobPageFacts = {}
   const name = templateField(wikitext, 'name')
-  if (name) out.pageName = unlink(name)
+  // `a_minnow`: the page typed the spawn's DB name; the game prints spaces.
+  if (name) out.pageName = unlink(name).replace(/_/g, ' ')
   const level = templateField(wikitext, 'level')
   if (level) {
     const t = unlink(level)

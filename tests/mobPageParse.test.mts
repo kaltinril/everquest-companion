@@ -48,3 +48,7 @@ test('zones separated by <br>, newlines or side-by-side links stay separate (A T
   ])
   assert.equal(parseMobWikitext(page('[[Burning Woods]]<br>[[Emerald Jungle]]')).zone, 'Burning Woods, Emerald Jungle')
 })
+
+test('a |name typed with underscores reads as the spaced name the game prints', () => {
+  assert.equal(parseMobWikitext('{{Namedmobpage\n| name = a_minnow\n| level = 1\n}}').pageName, 'a minnow')
+})
