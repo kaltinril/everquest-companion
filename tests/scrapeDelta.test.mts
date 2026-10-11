@@ -4,11 +4,11 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { foldItems } from '../scripts/sources/deltaItems'
 import {
+  emptyFeed,
   foldMobs,
   foldRcRow,
   nextScrapedAt,
   readRevPages,
-  type PageLogEvent,
   type PageTexts,
   type RcRow
 } from '../scripts/sources/deltaPages'
@@ -126,32 +126,61 @@ test('equal claimants of a key go to the first title in sort order', () => {
 })
 
 test('recentchanges rows: edits are re-read, and so is every title a log row names', () => {
-  const seen = new Set<string>()
-  const logs: PageLogEvent[] = []
+  const feed = emptyFeed()
   const rows: RcRow[] = [
-    { type: 'edit', title: 'Cyclops Skull' },
-    { type: 'new', title: 'Brand New Item' },
+    { type: 'edit', title: 'Cyclops Skull', pageid: 11 },
+    { type: 'new', title: 'Brand New Item', pageid: 12 },
     {
       type: 'log',
       title: 'Old Title',
+      pageid: 13,
       logtype: 'move',
       logaction: 'move',
       logparams: { target_title: 'New Title' }
     },
-    { type: 'log', title: 'Gone Page', logtype: 'delete', logaction: 'delete' },
-    { type: 'log', title: 'Back Page', logtype: 'delete', logaction: 'restore' },
-    { type: 'log', title: 'Locked Page', logtype: 'protect', logaction: 'protect' }
+    { type: 'log', title: 'Gone Page', pageid: 0, logtype: 'delete', logaction: 'delete' },
+    { type: 'log', title: 'Back Page', pageid: 14, logtype: 'delete', logaction: 'restore' },
+    { type: 'log', title: 'Locked Page', pageid: 15, logtype: 'protect', logaction: 'protect' }
   ]
-  for (const rc of rows) foldRcRow(rc, seen, logs)
+  for (const rc of rows) foldRcRow(rc, feed)
+  assert.deepEqual([...feed.pageids], [11, 12])
   assert.deepEqual(
-    [...seen],
-    ['Cyclops Skull', 'Brand New Item', 'Old Title', 'New Title', 'Gone Page', 'Back Page', 'Locked Page']
+    [...feed.titles],
+    ['Old Title', 'New Title', 'Gone Page', 'Back Page', 'Locked Page']
   )
-  assert.deepEqual(logs, [
+  assert.deepEqual(feed.logs, [
     { logtype: 'move', logaction: 'move', title: 'Old Title', target: 'New Title' },
     { logtype: 'delete', logaction: 'delete', title: 'Gone Page', target: undefined },
     { logtype: 'delete', logaction: 'restore', title: 'Back Page', target: undefined }
   ])
+})
+
+test('an edited page moved since is read by pageid under its current title; its old title goes', () => {
+  // mobs.json kept 'Megan OReilly' after the wiki page (40178) moved to 'Megan O`Reilly'.
+  const feed = emptyFeed()
+  foldRcRow({ type: 'edit', title: 'Megan OReilly', pageid: 40178 }, feed)
+  const move = { target_title: 'Megan O`Reilly' }
+  foldRcRow({ type: 'log', title: 'Megan OReilly', logtype: 'move', logparams: move }, feed)
+  const pages: PageTexts = new Map()
+  const unapplied: string[] = []
+  const mob = '{{Namedmobpage\n|name=Megan O`Reilly\n|zone=[[Qeynos]]\n}}'
+  const current = { pageid: 40178, ns: 0, title: 'Megan O`Reilly' }
+  readRevPages([{ ...current, revisions: [{ slots: { main: { content: mob } } }] }], pages, unapplied)
+  const byTitle = [...feed.titles].filter((t) => !pages.has(t))
+  assert.deepEqual(byTitle, ['Megan OReilly'])
+  const redirect = '#REDIRECT [[Megan O`Reilly]]'
+  readRevPages([{ title: 'Megan OReilly', ns: 0, revisions: [{ slots: { main: { content: redirect } } }] }], pages, unapplied)
+  const r = foldMobs([{ page: 'Megan OReilly' }], pages)
+  assert.deepEqual([...r.byPage.keys()], ['Megan O`Reilly'])
+  assert.deepEqual(r.removed, ['Megan OReilly'])
+})
+
+test('a pageid that is gone or a page moved out of ns0 is left to its log row', () => {
+  const pages: PageTexts = new Map()
+  const unapplied: string[] = []
+  readRevPages([{ missing: true }, { title: 'User:Someone/Sandbox', ns: 2, revisions: [] }], pages, unapplied)
+  assert.equal(pages.size, 0)
+  assert.deepEqual(unapplied, [])
 })
 
 test('a revisions response: content, a page that is gone, a page that could not be read', () => {

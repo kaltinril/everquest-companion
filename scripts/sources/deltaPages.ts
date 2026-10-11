@@ -14,26 +14,52 @@ export interface PageLogEvent {
 export interface RcRow {
   type: string
   title: string
+  /** 0 for a row whose page no longer exists (a deletion) */
+  pageid?: number
   logtype?: string
   logaction?: string
   logparams?: { target_title?: string }
 }
 
+/** What the feed says to re-read: edited pages by id, titles named by log rows by title. */
+export interface FeedChanges {
+  pageids: Set<number>
+  titles: Set<string>
+  logs: PageLogEvent[]
+  /** every row's title as the feed gave it (the dry run's census) */
+  named: Set<string>
+}
+
+export const emptyFeed = (): FeedChanges => ({
+  pageids: new Set(),
+  titles: new Set(),
+  logs: [],
+  named: new Set()
+})
+
 /**
- * Edits and creations name a page to re-read. So does every log row (move source and target,
- * delete, restore, merge, import): the page's current state, read back, is the log applied.
+ * An edit or creation is re-read by pageid, so a page moved since comes back under its current
+ * title. Every log row (move source and target, delete, restore, merge, import) names titles to
+ * re-read: the page's current state, read back, is the log applied.
  */
-export function foldRcRow(rc: RcRow, seen: Set<string>, logs: PageLogEvent[]): void {
-  seen.add(rc.title)
-  if (rc.type !== 'log') return
+export function foldRcRow(rc: RcRow, feed: FeedChanges): void {
+  feed.named.add(rc.title)
+  if (rc.type !== 'log') {
+    if (rc.pageid) feed.pageids.add(rc.pageid)
+    else feed.titles.add(rc.title)
+    return
+  }
+  feed.titles.add(rc.title)
   const target = rc.logparams?.target_title
-  if (target) seen.add(target)
+  if (target) feed.titles.add(target)
   if (rc.logtype !== 'move' && rc.logtype !== 'delete') return
-  logs.push({ logtype: rc.logtype, logaction: rc.logaction ?? '', title: rc.title, target })
+  feed.logs.push({ logtype: rc.logtype, logaction: rc.logaction ?? '', title: rc.title, target })
 }
 
 export interface RevPage {
-  title: string
+  /** absent on a pageid that no longer exists */
+  title?: string
+  ns?: number
   missing?: boolean
   invalid?: boolean
   revisions?: { slots?: { main?: { content?: string } } }[]
@@ -44,11 +70,13 @@ export type PageTexts = Map<string, string | null>
 
 /**
  * One revisions response into `out`. A page that exists but came back without content (a hidden
- * revision) cannot be applied: it goes to `unapplied`, and the run does not stamp past it.
+ * revision) cannot be applied: it goes to `unapplied`, and the run does not stamp past it. A
+ * deleted pageid (no title) or a page moved out of ns0 is skipped: its log row's titles say it.
  */
 export function readRevPages(pages: RevPage[], out: PageTexts, unapplied: string[]): void {
   for (const p of pages) {
     const wt = p.revisions?.[0]?.slots?.main?.content
+    if (p.title === undefined || (p.ns ?? 0) !== 0) continue
     if (p.missing && !p.invalid) out.set(p.title, null)
     else if (wt != null) out.set(p.title, wt)
     else unapplied.push(p.title)

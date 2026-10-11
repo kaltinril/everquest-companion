@@ -25,10 +25,12 @@ import { fileURLToPath } from 'url'
 import { itemKey, type ItemDbFile } from '../src/main/itemsDb'
 import { foldItems } from './sources/deltaItems'
 import {
+  emptyFeed,
   foldMobs,
   foldRcRow,
   nextScrapedAt,
   readRevPages,
+  type FeedChanges,
   type PageLogEvent,
   type PageTexts,
   type RcRow,
@@ -121,12 +123,9 @@ async function assertFeedReaches(sinceIso: string): Promise<void> {
   }
 }
 
-/** Every ns0 title edited, created or named by a log row since `sinceIso`, deduped; plus logs. */
-async function changedTitles(
-  sinceIso: string
-): Promise<{ titles: string[]; logs: PageLogEvent[] }> {
-  const seen = new Set<string>()
-  const logs: PageLogEvent[] = []
+/** Every ns0 page edited or created since `sinceIso` (by id), every title a log row names. */
+async function changedPages(sinceIso: string): Promise<FeedChanges> {
+  const feed = emptyFeed()
   let rccontinue: string | undefined
   for (;;) {
     const params: Record<string, string> = {
@@ -134,7 +133,7 @@ async function changedTitles(
       list: 'recentchanges',
       rcend: sinceIso, // rc walks backward in time; end = oldest bound
       rclimit: '500',
-      rcprop: 'title|loginfo',
+      rcprop: 'title|ids|loginfo',
       rctype: 'edit|new|log',
       rcnamespace: '0'
     }
@@ -143,31 +142,37 @@ async function changedTitles(
       query?: { recentchanges?: RcRow[] }
       continue?: { rccontinue?: string }
     }>(params)
-    for (const rc of j.query?.recentchanges ?? []) foldRcRow(rc, seen, logs)
+    for (const rc of j.query?.recentchanges ?? []) foldRcRow(rc, feed)
     rccontinue = j.continue?.rccontinue
     if (!rccontinue) break
   }
-  return { titles: [...seen], logs }
+  return feed
 }
 
 /**
- * A `continue` here means the wiki cut the batch short (a response-size limit) and some pages came
- * back without content. Skipping them would drop their edits from the delta without a word.
+ * Wikitext of `ids` (pageids or titles), 50 per request. A `continue` here means the wiki cut the
+ * batch short (a response-size limit) and some pages came back without content. Skipping them
+ * would drop their edits from the delta without a word.
  */
-async function fetchWikitext(titles: string[], out: PageTexts, unapplied: string[]): Promise<void> {
-  for (let i = 0; i < titles.length; i += BATCH) {
+async function fetchWikitext(
+  by: 'pageids' | 'titles',
+  ids: string[],
+  out: PageTexts,
+  unapplied: string[]
+): Promise<void> {
+  for (let i = 0; i < ids.length; i += BATCH) {
     const j = await api<{ query?: { pages?: RevPage[] }; continue?: unknown }>({
       action: 'query',
       prop: 'revisions',
       rvprop: 'content',
       rvslots: 'main',
-      titles: titles.slice(i, i + BATCH).join('|')
+      [by]: ids.slice(i, i + BATCH).join('|')
     })
     if (j.continue) {
       throw new Error(`revisions batch at ${i} came back continued; content would be missing`)
     }
     readRevPages(j.query?.pages ?? [], out, unapplied)
-    console.log(`  content ${Math.min(i + BATCH, titles.length)}/${titles.length}`)
+    console.log(`  content by ${by} ${Math.min(i + BATCH, ids.length)}/${ids.length}`)
   }
 }
 
@@ -191,30 +196,33 @@ async function run(): Promise<void> {
 
   await assertFeedReaches(oldest)
   console.log(`Changed ns0 pages since ${oldest}…`)
-  const { titles: changed, logs } = await changedTitles(oldest)
-  console.log(`  ${changed.length} pages changed`)
-  printPageLogs(logs)
+  const feed = await changedPages(oldest)
+  console.log(`  ${feed.pageids.size} pages changed, ${feed.titles.size} titles named by log rows`)
+  printPageLogs(feed.logs)
   if (DRY) {
-    const knownItems = changed.filter((t) => itemsFile.items[itemKey(t) ?? '']).length
+    const named = [...feed.named]
+    const knownItems = named.filter((t) => itemsFile.items[itemKey(t) ?? '']).length
     const mobPages = new Set(mobsFile.mobs.map((m) => m.page))
-    const knownMobs = changed.filter((t) => mobPages.has(t)).length
+    const knownMobs = named.filter((t) => mobPages.has(t)).length
     console.log(`  of which already-known items: ${knownItems}, already-known mobs: ${knownMobs}`)
     console.log(`  (content not fetched — dry run; new pages resolve only by content)`)
     return
   }
-  await applyDelta(itemsFile, mobsFile, changed)
+  await applyDelta(itemsFile, mobsFile, feed)
 }
 
-async function applyDelta(itemsFile: ItemDbFile, mobsFile: MobsFile, changed: string[]): Promise<void> {
+async function applyDelta(itemsFile: ItemDbFile, mobsFile: MobsFile, feed: FeedChanges): Promise<void> {
   const pages: PageTexts = new Map()
   const unapplied: string[] = []
-  await fetchWikitext(changed, pages, unapplied)
+  await fetchWikitext('pageids', [...feed.pageids].map(String), pages, unapplied)
+  const logTitles = [...feed.titles].filter((t) => !pages.has(t))
+  await fetchWikitext('titles', logTitles, pages, unapplied)
   let itemFold = foldItems(itemsFile, pages)
   // A key whose last known claimant let go may still have a page of that name: read it and refold.
   const orphans = itemFold.orphans.filter((t) => !pages.has(t))
   if (orphans.length > 0) {
     console.log(`  ${orphans.length} item keys lost their holder; reading those titles`)
-    await fetchWikitext(orphans, pages, unapplied)
+    await fetchWikitext('titles', orphans, pages, unapplied)
     itemFold = foldItems(itemsFile, pages)
   }
   const now = new Date().toISOString()
