@@ -19,10 +19,11 @@
 //
 // After a run that changed anything: `npm run gen:data-weight` (the ledger pins exact bytes).
 
-import { readFileSync, renameSync, writeFileSync } from 'fs'
+import { existsSync, readFileSync, renameSync, writeFileSync } from 'fs'
 import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
 import { itemKey, type ItemDbFile } from '../src/main/itemsDb'
+import { writeItemCache, writeMobCache, type FreshPage } from './sources/deltaCache'
 import { foldItems, type ItemFold } from './sources/deltaItems'
 import {
   emptyFeed,
@@ -42,6 +43,8 @@ import {
 const HERE = dirname(fileURLToPath(import.meta.url))
 const ITEMS_PATH = resolve(HERE, '../src/main/data/items.json')
 const MOBS_PATH = resolve(HERE, '../src/renderer/src/data/eqlegends/mobs.json')
+const ITEM_CACHE = resolve(HERE, 'sources/cache/items')
+const MOB_CACHE = resolve(HERE, 'sources/cache/mobs')
 const API = 'https://eqlwiki.com/api.php'
 const UA = 'eqcompanion-delta (fork of jmoyers/everquest-companion; one serialized req/s)'
 const DELAY_MS = 1000
@@ -156,12 +159,7 @@ async function changedPages(sinceIso: string): Promise<FeedChanges> {
  * batch short (a response-size limit) and some pages came back without content. Skipping them
  * would drop their edits from the delta without a word.
  */
-async function fetchWikitext(
-  by: 'pageids' | 'titles',
-  ids: string[],
-  out: PageTexts,
-  unapplied: string[]
-): Promise<void> {
+async function fetchWikitext(by: 'pageids' | 'titles', ids: string[], reads: Reads): Promise<void> {
   for (let i = 0; i < ids.length; i += BATCH) {
     const j = await api<{ query?: { pages?: RevPage[] }; continue?: unknown }>({
       action: 'query',
@@ -173,13 +171,20 @@ async function fetchWikitext(
     if (j.continue) {
       throw new Error(`revisions batch at ${i} came back continued; content would be missing`)
     }
-    readRevPages(j.query?.pages ?? [], out, unapplied)
+    readRevPages(j.query?.pages ?? [], reads.pages, reads.unapplied, reads.pageids)
     console.log(`  content by ${by} ${Math.min(i + BATCH, ids.length)}/${ids.length}`)
   }
 }
 
 function main(): void {
   void run()
+}
+
+/** Everything the run read: wikitext by title, what could not be read, and each title's pageid. */
+interface Reads {
+  pages: PageTexts
+  unapplied: string[]
+  pageids: Map<string, number>
 }
 
 interface MobsFile {
@@ -217,25 +222,26 @@ async function run(): Promise<void> {
 async function readAndFoldItems(
   itemsFile: ItemDbFile,
   feed: FeedChanges
-): Promise<{ pages: PageTexts; unapplied: string[]; itemFold: ItemFold }> {
-  const pages: PageTexts = new Map()
-  const unapplied: string[] = []
-  await fetchWikitext('pageids', [...feed.pageids].map(String), pages, unapplied)
+): Promise<{ reads: Reads; itemFold: ItemFold }> {
+  const reads: Reads = { pages: new Map(), unapplied: [], pageids: new Map() }
+  const { pages } = reads
+  await fetchWikitext('pageids', [...feed.pageids].map(String), reads)
   const logTitles = [...feed.titles].filter((t) => !pages.has(t))
-  await fetchWikitext('titles', logTitles, pages, unapplied)
+  await fetchWikitext('titles', logTitles, reads)
   let itemFold = foldItems(itemsFile, pages)
   // A key whose last known claimant let go may still have a page of that name: read it and refold.
   const orphans = itemFold.orphans.filter((t) => !pages.has(t))
   if (orphans.length > 0) {
     console.log(`  ${orphans.length} item keys lost their holder; reading those titles`)
-    await fetchWikitext('titles', orphans, pages, unapplied)
+    await fetchWikitext('titles', orphans, reads)
     itemFold = foldItems(itemsFile, pages)
   }
-  return { pages, unapplied, itemFold }
+  return { reads, itemFold }
 }
 
 async function applyDelta(itemsFile: ItemDbFile, mobsFile: MobsFile, feed: FeedChanges): Promise<void> {
-  const { pages, unapplied, itemFold } = await readAndFoldItems(itemsFile, feed)
+  const { reads, itemFold } = await readAndFoldItems(itemsFile, feed)
+  const { pages, unapplied } = reads
   const now = new Date().toISOString()
   // count = distinct pages some key reaches, scrape-items.ts's definition on wiki-scraper-fixes.
   const distinctPages = new Set(Object.values(itemFold.items).map((e) => e.page)).size
@@ -265,6 +271,29 @@ async function applyDelta(itemsFile: ItemDbFile, mobsFile: MobsFile, feed: FeedC
   console.log(`Next: npm run gen:data-weight  (the ledger pins exact bytes)`)
   const folded = new Set([...itemFold.folded, ...mobFold.folded])
   for (const line of unfoldedReport(unfolded(pages, folded))) console.log(line)
+  writeBackCaches(reads, folded)
+}
+
+/** The fresh wikitext into the gitignored scraper caches this checkout has (sources/deltaCache). */
+function writeBackCaches(reads: Reads, keep: ReadonlySet<string>): void {
+  const fresh: FreshPage[] = []
+  for (const [title, pageid] of reads.pageids) {
+    const content = reads.pages.get(title)
+    if (content != null) fresh.push({ pageid, title, content })
+  }
+  const gone = new Set([...reads.pages].filter(([, wt]) => wt === null).map(([t]) => t))
+  const absent: string[] = []
+  if (existsSync(ITEM_CACHE)) {
+    console.log(`Item cache: ${writeItemCache(ITEM_CACHE, { fresh, gone, keep })} batch files updated`)
+  } else absent.push('scripts/sources/cache/items')
+  if (existsSync(MOB_CACHE)) console.log(`Mob cache: ${writeMobCache(MOB_CACHE, fresh)} pages updated`)
+  else absent.push('scripts/sources/cache/mobs')
+  if (absent.length === 0) return
+  console.log(
+    `No ${absent.join(' or ')} in this checkout, so it was not refreshed: scrape-page-era.ts, ` +
+      'gen-mob-races.mts and gen-mob-factions.mts read that cache wherever they run, and there it ' +
+      'still holds the text of the last full scrape.'
+  )
 }
 
 function deltaSource(source: string): string {

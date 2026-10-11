@@ -2,6 +2,16 @@
 // `|itemname` alias takes a key no page is titled with, every key a change touches is re-awarded.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import {
+  DELTA_BATCH,
+  patchItemBatches,
+  writeItemCache,
+  writeMobCache,
+  type CachedPage
+} from '../scripts/sources/deltaCache'
 import { foldItems } from '../scripts/sources/deltaItems'
 import {
   emptyFeed,
@@ -252,4 +262,57 @@ test('pages read but folded nowhere are counted by kind; the report names every 
   for (const f of [...skipped, 'mobRaces', 'mobFactions']) assert.ok(report.includes(`/${f}.json`), f)
   assert.ok(report.includes('`npm run scrape:spells` asks the wiki for current revids'))
   assert.ok(!unfoldedReport(new Map()).join('\n').includes('Spell pages changed'))
+})
+
+const cached = (pageid: number, title: string, content: string): CachedPage => ({
+  pageid,
+  ns: 0,
+  title,
+  revisions: [{ slots: { main: { content } } }]
+})
+
+test('item-cache batches: a fresh page replaces its copy by pageid, new item pages go to a delta batch', () => {
+  const batches = new Map<string, CachedPage[]>([
+    ['batch-1-2.json', [cached(1, 'Megan OReilly', 'old'), cached(2, 'Gone Page', 'old')]],
+    ['batch-3-1.json', [cached(3, 'Untouched', 'old')]]
+  ])
+  const dirty = patchItemBatches(batches, {
+    fresh: [
+      { pageid: 1, title: 'Megan O`Reilly', content: 'new' },
+      { pageid: 9, title: 'New Item', content: '{{Itempage}}' },
+      { pageid: 10, title: 'Some Spell', content: '{{Spellpage}}' }
+    ],
+    gone: new Set(['Gone Page']),
+    keep: new Set(['New Item'])
+  })
+  assert.deepEqual(dirty.sort(), ['batch-1-2.json', DELTA_BATCH])
+  assert.deepEqual(batches.get('batch-1-2.json'), [cached(1, 'Megan O`Reilly', 'new')])
+  assert.deepEqual(batches.get(DELTA_BATCH), [cached(9, 'New Item', '{{Itempage}}')])
+  assert.deepEqual(batches.get('batch-3-1.json'), [cached(3, 'Untouched', 'old')])
+})
+
+test('the caches on disk: batches rewritten, a mob page file and its index title moved', () => {
+  const root = mkdtempSync(join(tmpdir(), 'scrape-delta-'))
+  try {
+    const items = join(root, 'items')
+    const mobs = join(root, 'mobs')
+    mkdirSync(items)
+    mkdirSync(mobs)
+    writeFileSync(join(items, 'batch-1-1.json'), JSON.stringify([cached(1, 'Old', 'old')]))
+    writeFileSync(join(items, 'item-pages.json'), '[]')
+    writeFileSync(join(mobs, 'page-1.wikitext'), 'old')
+    writeFileSync(join(mobs, 'mob-pages.json'), JSON.stringify([{ pageid: 1, ns: 0, title: 'Old' }]))
+    const fresh = [{ pageid: 1, title: 'New', content: 'new' }, { pageid: 2, title: 'X', content: 'x' }]
+    assert.equal(writeItemCache(items, { fresh, gone: new Set(), keep: new Set() }), 1)
+    const batch = JSON.parse(readFileSync(join(items, 'batch-1-1.json'), 'utf8')) as CachedPage[]
+    assert.deepEqual(batch, [cached(1, 'New', 'new')])
+    assert.equal(readFileSync(join(items, 'item-pages.json'), 'utf8'), '[]')
+    assert.equal(writeMobCache(mobs, fresh), 1)
+    assert.equal(readFileSync(join(mobs, 'page-1.wikitext'), 'utf8'), 'new')
+    assert.equal(existsSync(join(mobs, 'page-2.wikitext')), false)
+    const index = JSON.parse(readFileSync(join(mobs, 'mob-pages.json'), 'utf8')) as CachedPage[]
+    assert.deepEqual(index, [{ pageid: 1, ns: 0, title: 'New' }])
+  } finally {
+    rmSync(root, { recursive: true, force: true })
+  }
 })

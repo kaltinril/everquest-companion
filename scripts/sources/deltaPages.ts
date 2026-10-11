@@ -59,11 +59,14 @@ export function foldRcRow(rc: RcRow, feed: FeedChanges): void {
 export interface RevPage {
   /** absent on a pageid that no longer exists */
   title?: string
+  pageid?: number
   ns?: number
   missing?: boolean
   invalid?: boolean
   revisions?: { slots?: { main?: { content?: string } } }[]
 }
+
+const contentOf = (p: RevPage): string | undefined => p.revisions?.[0]?.slots?.main?.content
 
 /** Read pages: wikitext, or null for a page that no longer exists. */
 export type PageTexts = Map<string, string | null>
@@ -73,13 +76,19 @@ export type PageTexts = Map<string, string | null>
  * revision) cannot be applied: it goes to `unapplied`, and the run does not stamp past it. A
  * deleted pageid (no title) or a page moved out of ns0 is skipped: its log row's titles say it.
  */
-export function readRevPages(pages: RevPage[], out: PageTexts, unapplied: string[]): void {
+export function readRevPages(
+  pages: RevPage[],
+  out: PageTexts,
+  unapplied: string[],
+  pageids?: Map<string, number>
+): void {
   for (const p of pages) {
-    const wt = p.revisions?.[0]?.slots?.main?.content
     if (p.title === undefined || (p.ns ?? 0) !== 0) continue
+    if (p.pageid) pageids?.set(p.title, p.pageid)
+    const wt = contentOf(p)
     if (p.missing && !p.invalid) out.set(p.title, null)
-    else if (wt != null) out.set(p.title, wt)
-    else unapplied.push(p.title)
+    else if (wt == null) unapplied.push(p.title)
+    else out.set(p.title, wt)
   }
 }
 
