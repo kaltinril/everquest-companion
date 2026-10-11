@@ -2,7 +2,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { nonQuestReason, queryBlock } from '../scripts/scrape-quests'
+import { buildCatalog, nonQuestReason, queryBlock } from '../scripts/scrape-quests'
 import { parseQuestPage } from '../scripts/sources/questPage'
 
 const isItem = (t: string): boolean => ['rusty scythe', 'harvester'].includes(t.toLowerCase())
@@ -24,4 +24,17 @@ test('a list response with an API error or no query block throws instead of read
   assert.throws(() => queryBlock({ error: { code: 'maxlag', info: 'Waiting for db' } }, 'Category:Quests'), /maxlag/)
   assert.throws(() => queryBlock({}, 'Category:Quests'), /no query/)
   assert.deepEqual(queryBlock({ query: { categorymembers: [] } }, 'Category:Empty'), { categorymembers: [] })
+})
+
+test('a page without wikitext is a failure, not a quietly missing quest', () => {
+  const pages = [
+    { pageid: 1, ns: 0, title: 'Harvester Quest' },
+    { pageid: 2, ns: 0, title: 'Lost Page' },
+    { pageid: 3, ns: 0, title: 'Empty Page' }
+  ]
+  const text: Record<number, string> = { 1: '== Reward ==\n{{:Harvester}}\n', 3: 'nothing here' }
+  const run = buildCatalog(pages, (p) => text[p.pageid] ?? null, isItem)
+  assert.deepEqual(run.quests.map((q) => q.page), ['Harvester Quest'])
+  assert.deepEqual(run.failed, ['Lost Page'])
+  assert.deepEqual(run.skipped.map((s) => s.page), ['Empty Page'])
 })

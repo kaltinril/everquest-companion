@@ -338,6 +338,35 @@ function printSummary(quests: QuestEntry[], skipped: { page: string; reason: str
   }
 }
 
+interface CatalogRun {
+  quests: QuestEntry[]
+  skipped: { page: string; reason: string }[]
+  /** pages that had no wikitext: the catalog would silently lose them */
+  failed: string[]
+}
+
+/** Parse every page; a page with no wikitext is a failure, never a silent omission. */
+export function buildCatalog(
+  pages: Member[],
+  wikitext: (p: Member) => string | null,
+  isItem: (title: string) => boolean
+): CatalogRun {
+  const run: CatalogRun = { quests: [], skipped: [], failed: [] }
+  for (const p of pages) {
+    const wt = wikitext(p)
+    if (wt == null) {
+      run.failed.push(p.title)
+      continue
+    }
+    const parsed = parseQuestPage(p.title, wt, isItem)
+    const reason = nonQuestReason(parsed)
+    if (reason) run.skipped.push({ page: p.title, reason })
+    else run.quests.push(toQuestEntry(parsed))
+  }
+  run.quests.sort((a, b) => a.page.localeCompare(b.page))
+  return run
+}
+
 async function main(): Promise<void> {
   const itemTitles = await collectItemTitles()
   const isItem = (title: string): boolean => itemTitles.has(titleKey(title))
@@ -345,28 +374,27 @@ async function main(): Promise<void> {
   const pages = await collectQuestPages()
   console.log(`\nFetching + parsing ${pages.length} quest pages…`)
 
-  const quests: QuestEntry[] = []
-  const skipped: { page: string; reason: string }[] = []
+  const texts = new Map<number, string>()
   let done = 0
   for (const p of pages) {
-    let wt: string | null = null
     try {
-      wt = await fetchWikitext(p.pageid)
+      const wt = await fetchWikitext(p.pageid)
+      if (wt != null) texts.set(p.pageid, wt)
     } catch (err) {
-      skipped.push({ page: p.title, reason: `fetch failed: ${(err as Error).message}` })
-    }
-    if (wt == null) {
-      if (!skipped.some((s) => s.page === p.title)) skipped.push({ page: p.title, reason: 'no wikitext' })
-    } else {
-      const parsed = parseQuestPage(p.title, wt, isItem)
-      const reason = nonQuestReason(parsed)
-      if (reason) skipped.push({ page: p.title, reason })
-      else quests.push(toQuestEntry(parsed))
+      console.warn(`  fetch failed: ${p.title}: ${(err as Error).message}`)
     }
     if (++done % 100 === 0) console.log(`  ${done}/${pages.length}`)
   }
 
-  quests.sort((a, b) => a.page.localeCompare(b.page))
+  const { quests, skipped, failed } = buildCatalog(pages, (p) => texts.get(p.pageid) ?? null, isItem)
+  if (failed.length) {
+    // Writing now would drop these quests from the committed file.
+    console.error(`\n${failed.length} pages have no wikitext; ${OUT_PATH} left unchanged:`)
+    for (const t of failed) console.error(`  - ${t}`)
+    console.error('Re-run to retry; --refresh re-lists the pages if they were deleted or renamed.')
+    process.exitCode = 1
+    return
+  }
   const out: QuestData = {
     scrapedAt: new Date().toISOString(),
     source: 'eqlwiki.com — Category:Quests + quest subcategories',
@@ -377,5 +405,6 @@ async function main(): Promise<void> {
 
   printSummary(quests, skipped)
 }
+
 
 if (isMain(import.meta.url)) void main()
