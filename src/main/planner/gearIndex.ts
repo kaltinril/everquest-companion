@@ -268,7 +268,6 @@ function gearEffect(effect: ItemEffect, spells: SpellFactsIndex, acc: Acc): Gear
   const rank = socket === 'focus' ? parseFocusEffect(effect.name) : null
   const facts = spells.get(effect.name.trim().toLowerCase()) ?? {}
   if (Object.keys(facts).length > 0) acc.stats.spellJoined++
-  if (socket === null) acc.stats.socketless++
   // Absent fields are OMITTED rather than set to `undefined`, here and on the row: the payload
   // crosses IPC, where a structured clone keeps an explicit `undefined` and a JSON round trip
   // does not. One shape on both sides of the wire, and absent stays the only spelling of unknown.
@@ -333,6 +332,7 @@ function optionalFields(
 function countRow(acc: Acc, row: GearRow): void {
   if (row.stats.DMG !== undefined || row.stats.DELAY !== undefined) acc.stats.weaponRows++
   if (row.effects.length > 0) acc.stats.effectRows++
+  acc.stats.socketless += row.effects.filter((e) => e.socket === undefined).length
   if (row.voidSynth === true) acc.stats.voidSynthRows++
   if (row.eraDerived !== undefined) acc.stats.eraDerivedRows++
   if (row.dropMobs !== undefined) acc.stats.dropRows++
