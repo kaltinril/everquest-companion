@@ -5,4 +5,4 @@ nothing listed here is removed or narrowed without the owner's word (RULES.md, r
 
 | Date | Asked by | The ask | Status |
 | --- | --- | --- | --- |
-| 2026-10-10 | owner | Buff conflicts from the log (your spell did not take hold, blocked by what; your spell on someone was overwritten) in the spells/buffs section. | open (home: the Buffs tab) |
+| 2026-10-10 | owner | Buff conflicts from the log (your spell did not take hold, blocked by what; your spell on someone was overwritten) in the spells/buffs section. | built (Buffs tab, current session) |
