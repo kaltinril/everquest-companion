@@ -20,6 +20,7 @@ pub mod alerts_early;
 /// the fold keeps, and one file would put it past the repo's factoring ceiling.
 pub mod alerts_rules;
 pub mod buff_anchors;
+pub mod buff_conflicts;
 pub mod buff_landing;
 pub mod buff_rounds;
 /// The timer-row projection — `src/shared/buffTimers.ts`'s model half. A pure fold over two
