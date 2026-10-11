@@ -202,9 +202,10 @@ export function splitSections(wikitext: string): { lead: string; sections: WikiS
   const lead: string[] = []
   let cur: WikiSection | null = null
   for (const line of lines) {
-    const h = /^\s*={2,6}\s*(.+?)\s*={2,6}\s*$/.exec(line)
+    // A template may follow the closing == on the same line (`== Checklist =={{CheckboxList}}`).
+    const h = /^\s*={2,6}\s*(.+?)\s*={2,6}\s*((?:\{\{[^{}]*\}\}\s*)*)$/.exec(line)
     if (h) {
-      cur = { heading: h[1].trim(), text: '' }
+      cur = { heading: h[1].trim(), text: h[2] ? h[2] + '\n' : '' }
       sections.push(cur)
       continue
     }
