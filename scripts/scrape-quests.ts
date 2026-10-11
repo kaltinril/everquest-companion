@@ -97,6 +97,13 @@ interface Member {
   title: string
 }
 
+/** A list response's `query` block. An error body or a missing block throws: it is never cached as an empty list. */
+export function queryBlock<Q>(j: { query?: Q; error?: { code?: string; info?: string } }, what: string): Q {
+  if (j.error) throw new Error(`API error ${j.error.code ?? '?'} for ${what}: ${j.error.info ?? ''}`)
+  if (!j.query) throw new Error(`no query block in the response for ${what}`)
+  return j.query
+}
+
 /** All members of a category, following cmcontinue. */
 async function categoryMembers(title: string): Promise<Member[]> {
   const out: Member[] = []
@@ -109,8 +116,12 @@ async function categoryMembers(title: string): Promise<Member[]> {
       cmlimit: '500'
     }
     if (cont) params.cmcontinue = cont
-    const j = await api<{ query?: { categorymembers?: Member[] }; continue?: { cmcontinue?: string } }>(params)
-    out.push(...(j.query?.categorymembers ?? []))
+    const j = await api<{
+      query?: { categorymembers?: Member[] }
+      error?: { code?: string; info?: string }
+      continue?: { cmcontinue?: string }
+    }>(params)
+    out.push(...(queryBlock(j, title).categorymembers ?? []))
     cont = j.continue?.cmcontinue
     if (!cont) break
   }
@@ -126,9 +137,10 @@ async function allCategories(): Promise<string[]> {
     if (cont) params.accontinue = cont
     const j = await api<{
       query?: { allcategories?: { category: string }[] }
+      error?: { code?: string; info?: string }
       continue?: { accontinue?: string }
     }>(params)
-    out.push(...(j.query?.allcategories ?? []).map((c) => c.category))
+    out.push(...(queryBlock(j, 'allcategories').allcategories ?? []).map((c) => c.category))
     cont = j.continue?.accontinue
     if (!cont) break
   }
