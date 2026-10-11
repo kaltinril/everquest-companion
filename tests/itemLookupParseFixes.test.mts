@@ -75,6 +75,11 @@ test('summaries unwrap lore/transclusion/loc templates and drop the rest instead
   assert.equal(cleanSummary('{{Item Lore|Blood Spirit Wine}} This is Stackable.'), 'Blood Spirit Wine This is Stackable.')
   assert.equal(cleanSummary('{{Lore|Headband of the Chosen}}'), 'Headband of the Chosen')
   assert.equal(cleanSummary('{{Item Lore Missing}}'), undefined)
+  // A lore line's own period does not end the summary before the prose after it (Gnome Sandwich).
+  assert.equal(
+    cleanSummary('{{Item Lore|Made by gnomes, not of gnomes.}} GM item occasionally handed out. More.'),
+    'Made by gnomes, not of gnomes. GM item occasionally handed out.'
+  )
   assert.equal(cleanSummary('namely {{:Shattering Hammer}}s.'), 'namely Shattering Hammers.')
   assert.equal(cleanSummary('Ground spawn at {{Loc|Dalnir|-20, 50|(-20, 50)}}.'), 'Ground spawn at -20, 50.')
   assert.equal(cleanSummary("{{{Item Lore | 'Runed Bokken'}}"), "'Runed Bokken'")

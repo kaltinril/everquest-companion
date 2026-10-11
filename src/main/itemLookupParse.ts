@@ -759,10 +759,12 @@ export function notesLinkTargets(wikitext: string): string[] {
 
 /** `{{Item Lore|X}}`/`{{Lore|X}}` → X, `{{:Page}}` → Page, `{{Loc|Zone|x, y}}` → x, y; any
  *  other template (`{{Item Lore Missing}}`, `{{SmIcon|…}}`) says nothing in prose and is dropped. */
+const LORE_END = '\u0001'
+
 function unwrapTemplate(body: string): string {
   const parts = body.split('|')
   const name = parts[0].trim().toLowerCase()
-  if (name === 'lore' || /^item\s+lore$/.test(name)) return parts.slice(1).join('|').trim()
+  if (name === 'lore' || /^item\s+lore$/.test(name)) return parts.slice(1).join('|').trim() + LORE_END
   if (name === 'loc') return (parts[2] ?? '').trim()
   return name.startsWith(':') ? parts[0].trim().slice(1) : ''
 }
@@ -784,8 +786,9 @@ export function cleanSummary(notes: string): string | undefined {
     .trim()
   if (!text) return undefined
   // First sentence / first 200 chars, whichever is shorter — a one-liner, not an essay.
-  const firstSentence = text.split(/(?<=\.)\s/)[0]
-  const s = (firstSentence.length <= 200 ? firstSentence : text.slice(0, 200)).trim()
+  // LORE_END keeps a lore line's closing period from ending the summary before the prose after it.
+  const firstSentence = text.split(/(?<=\.)\s/)[0].replaceAll(LORE_END, '')
+  const s = (firstSentence.length <= 200 ? firstSentence : text.replaceAll(LORE_END, '').slice(0, 200)).trim()
   return s || undefined
 }
 
