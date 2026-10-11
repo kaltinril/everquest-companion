@@ -64,3 +64,8 @@ test('underscored page names fold to spaces the way MediaWiki reads them', () =>
   const q = parseQuestPage('Underscores', '== Reward ==\n{{:Harvester}}\n== Walkthrough ==\n[[Rusty_Scythe]]\n', isItem)
   assert.deepEqual(q.requiredItems, ['Rusty Scythe'])
 })
+
+test('{{Experience}} marks an experience reward like {{exp}} does', () => {
+  assert.equal(parseQuestPage('Brain Bite (Evil)', '== Reward ==\n{{Experience}}\n', isItem).expReward, true)
+  assert.equal(parseQuestPage('No exp', '== Reward ==\n{{Expand}}\n', isItem).expReward, false)
+})

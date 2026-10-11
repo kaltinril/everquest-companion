@@ -234,7 +234,7 @@ export function splitSections(wikitext: string): { lead: string; sections: WikiS
 // 'Reward', 'Possible Rewards', 'Additional Rewards'; a mixed 'Rewards and Walkthrough'
 // section names its turn-ins in prose, so it reads as body.
 const REWARD_HEADING = /^(?!.*\bwalkthrough\b).*\brewards?\b/i
-const EXP_MARKER = /\{\{\s*(yougainexperience|exp)\s*\}\}|you gain experience/i
+const EXP_MARKER = /\{\{\s*(yougainexperience|exp|experience)\s*\}\}|you gain experience/i
 
 /**
  * Parse one quest page. `isItem(title)` decides whether a prose link names an item page
