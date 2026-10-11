@@ -2,7 +2,7 @@
 // copies of the real page shapes they are named after.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { cleanSummary, parseItemWikitext, templateField } from '../src/main/itemLookupParse'
+import { cleanSummary, parseItemWikitext, parseQuestLinks, templateField } from '../src/main/itemLookupParse'
 
 const LARGE_SKY_LAPIS = `<onlyinclude>{{Itempage
 |itemname = Large Sky Lapis
@@ -88,4 +88,11 @@ test('the short Quest and Lore flag forms (and a Lore Equpped typo) set quest an
   assert.equal(parseItemWikitext('X', page('MAGIC ITEM  Lore')).lore, true)
   assert.equal(parseItemWikitext('X', page('MAGIC ITEM  PENDING LORE')).lore, false)
   assert.equal(parseItemWikitext('X', page('MAGIC ITEM  NO DROP')).quest, false)
+})
+
+test('Category:/File:/Special: links are not read as quests or recipes', () => {
+  const uses = parseQuestLinks("* [[Icestar's Eve Snowdrift Feast]]\n[[Category:Inventory Items]]\n[[File:x.png|thumb]]")
+  assert.deepEqual(uses.map((u) => u.quest), ["Icestar's Eve Snowdrift Feast"])
+  const wt = '{{Itempage\n|recipes =\n* [[Blacksmithing]]\n** Various recipes (see [[Special:WhatLinksHere/{{PAGENAME}}]])\n}}'
+  assert.equal(parseItemWikitext('High Quality Folded Sheet Metal', wt).recipes, undefined)
 })

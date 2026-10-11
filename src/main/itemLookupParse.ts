@@ -243,7 +243,7 @@ export function parseQuestLinks(block: string): ItemQuestUse[] {
     const pipe = inner.indexOf('|')
     const page = (pipe >= 0 ? inner.slice(0, pipe) : inner).trim()
     const label = (pipe >= 0 ? inner.slice(pipe + 1) : inner).trim()
-    if (!label) continue
+    if (!label || EXCLUDED_NS.test(page)) continue
     if (!uses.some((u) => u.quest === label)) uses.push({ quest: label, page, source: 'wiki' })
   }
   return uses
@@ -253,7 +253,8 @@ export function parseQuestLinks(block: string): ItemQuestUse[] {
 
 /** First `[[Page]]` / `[[Page|Label]]` in a line, split into page + display label. */
 function firstLink(s: string): { page: string; label: string } | null {
-  const m = /\[\[([^\]]+?)\]\]/.exec(s)
+  // A Category:/File:/Special: link is page furniture, never a recipe or tradeskill.
+  const m = [...s.matchAll(/\[\[([^\]]+?)\]\]/g)].find((x) => !EXCLUDED_NS.test(x[1].trim()))
   if (!m) return null
   const inner = m[1].trim()
   const pipe = inner.indexOf('|')
