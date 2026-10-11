@@ -256,10 +256,12 @@ function isSectionHub(top: QuestTopTable | null, wikitext: string): boolean {
  * quest pages carry at least one). Wiki authors paste the game's own lines in two dialects —
  * direction-only (`…with [[X]] got better`) and numeric (`…with [[X]] has been adjusted by 10`,
  * the number sometimes parenthesised and sometimes signed: `by (+7)`, `by -300`). One pattern
- * matches both so a page mixing dialects reads consistently.
+ * matches both so a page mixing dialects reads consistently. Also pasted (2026-10-10): `faction
+ * with`, `faction standings with`, `has gotten`/`gets`, a `(+7)` or span before the verb, and the
+ * capped `could not possibly get any better`.
  */
 const FACTION_HIT_RE =
-  /faction standing (?:with|for) \[\[\s*([^\]|]+?)\s*(?:\|[^\]]*)?\]\]\s*(?:got\s+(better|worse)|(?:has been|was)\s+adjusted\s+by\s*\(?\s*([+-]?\d+)\s*\)?)/gi
+  /faction(?: standings?)? (?:with|for) \[\[\s*([^\]|]+?)\s*(?:\|[^\]]*)?\]\]\s*(?:\([^)\n]*\)\s*|<span[^>]*>[^<]*<\/span>\s*)?(?:(?:has\s+)?(?:got(?:ten)?|gets)\s+'*(better|worse)|(?:has been|was)\s+adjusted\s+by\s*\(?\s*([+-]?\d+)\s*\)?|could not possibly get any (better|worse))/gi
 
 /**
  * THE COIN TURN-IN (measured 2026-09-05: 48 cached quest pages carry one). The classic guard
@@ -307,10 +309,10 @@ export function parseFactionHits(wikitext: string): QuestFactionHit[] {
   let m: RegExpExecArray | null
   FACTION_HIT_RE.lastIndex = 0
   while ((m = FACTION_HIT_RE.exec(wikitext)) !== null) {
-    const name = m[1].replace(/\s+/g, ' ').trim()
+    const name = m[1].replace(/[\s_]+/g, ' ').trim()
     if (!name || NAMESPACED.test(name)) continue
     const amount = m[3] === undefined ? undefined : Number(m[3])
-    const up = amount === undefined ? m[2].toLowerCase() === 'better' : amount >= 0
+    const up = amount === undefined ? (m[2] ?? m[4]).toLowerCase() === 'better' : amount >= 0
     const key = name.toLowerCase()
     const prev = byName.get(key)
     if (prev === undefined) byName.set(key, { name, up, ...(amount === undefined ? {} : { amount }) })

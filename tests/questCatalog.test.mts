@@ -351,6 +351,30 @@ test('parseFactionHits takes the link TARGET when the line labels it, and skips 
   assert.deepEqual(parseFactionHits(wt), [{ name: 'Guards of Qeynos', up: true }])
 })
 
+test('parseFactionHits reads the receipt variants the wiki also pastes, and folds underscores', () => {
+  const wt = [
+    'Your faction with [[Claws_of_Veeshan]] got better.',
+    'Your faction with [[Kromzek]] got worse.',
+    'Your faction with [[Zlandicar_(Faction)]] has been adjusted by 5.',
+    'Your faction standings with [[Hall_of_the_Ebon_Mask]] got worse.',
+    'Your faction standing with [[Carson_McCabe]] has gotten better.',
+    'Your faction standing with [[Coldain]] (+7) got better.',
+    "Your faction standing with [[Tunare's Scouts]] <span class='oppfac'>(10+)</span> got better.",
+    'Your faction standing with [[Pirates of Gunthak]] could not possibly get any worse.',
+    'Your faction standing with Crushbone Orcs could not possibly get any worse.' // unlinked
+  ].join('\n')
+  assert.deepEqual(parseFactionHits(wt), [
+    { name: 'Claws of Veeshan', up: true },
+    { name: 'Kromzek', up: false },
+    { name: 'Zlandicar (Faction)', up: true, amount: 5 },
+    { name: 'Hall of the Ebon Mask', up: false },
+    { name: 'Carson McCabe', up: true },
+    { name: 'Coldain', up: true },
+    { name: "Tunare's Scouts", up: true },
+    { name: 'Pirates of Gunthak', up: false }
+  ])
+})
+
 test('the committed catalog carries the faction hits, and known rows read back exactly', () => {
   const withFactions = data.quests.filter((q) => q.factions?.length)
   assert.ok(withFactions.length > 400, `expected hundreds of quests with faction hits, got ${withFactions.length}`)
