@@ -74,3 +74,17 @@ test('an {{:UNKNOWN}} or {{:None}} placeholder box is not a reward', () => {
   const q = parseQuestPage('Placeholder', '== Reward ==\n{{:UNKNOWN}}\n{{:none}}\n{{:Harvester}}\n', isItem)
   assert.deepEqual(q.rewards, ['Harvester'])
 })
+
+test('a Recommended Level is not read as the Minimum Level', () => {
+  const top = `{| class="questTopTable"
+! ''' Quest Giver: '''
+| [[Vrynn]]
+|-
+! ''' Recommended Level: '''
+| 15+
+|}
+`
+  const q = parseQuestPage('Totemic Armor Quests', top, isItem)
+  assert.equal(q.giver, 'Vrynn')
+  assert.equal(q.minLevel, undefined)
+})

@@ -194,7 +194,8 @@ export function parseTopTable(wikitext: string): QuestTopTable | null {
     }
     return ''
   }
-  const minText = cellText(pick('minimum level', 'min level', 'level'))
+  // Not a bare 'level' fallback: that reads 'Recommended Level' as a minimum.
+  const minText = cellText(pick('minimum level', 'min level'))
   const minNum = minText ? Number(/(\d+)/.exec(minText)?.[1]) : NaN
 
   return {
