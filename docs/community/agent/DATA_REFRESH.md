@@ -7,7 +7,9 @@ How to bring the committed wiki corpus up to date. Running any of this is an own
 
 After a game patch or zone rework, give wiki editors a few days, then run the delta. The Gear
 tab's "wiki data from <date>" caption shows the current `scrapedAt`. Before the run, tell the
-owner which files it touches: the delta covers ONLY `items.json` + `mobs.json`.
+owner which files it touches: the delta covers ONLY `items.json` + `mobs.json`. Since 2026-10-10 it
+lists every changed page it read and folded nowhere (spell, quest, class, Plane of Sky, redirect),
+and closes with every wiki-derived file it leaves stale and the command that refreshes each.
 
 ## Delta procedure (items.json + mobs.json)
 
@@ -16,7 +18,8 @@ MediaWiki `list=recentchanges` since `items.json`'s `scrapedAt` and fetches only
 at 1 request per second, through the creator's own parsers (output byte-compatible, keys are
 lowercased names). A 3-week window was ~1,200 pages in ~25 batched requests.
 
-1. `npx tsx scripts/scrape-delta.mts --dry-run` from the main clone (reads only) to see volume.
+1. `npx tsx scripts/scrape-delta.mts --dry-run` from the main clone to see volume. It reads the
+   wiki, so it is part of the owner's run, never a development check (WORKFLOW.md).
 2. Make a throwaway worktree of `local-data-refresh` under the session temp dir with a
    `node_modules` junction, copy the script in, run it for real there. The dev app can stay up.
 3. `npm run gen:data-weight` (`dataWeight.test` pins exact bytes of every data JSON).
@@ -25,6 +28,17 @@ lowercased names). A 3-week window was ~1,200 pages in ~25 batched requests.
 6. Gate the merged result in a second scratch worktree
    (`git worktree add --detach <scratch>/mc main_community`, merge, typecheck/lint/test) and
    compare `^✖` lines against a baseline run at `main_community`'s head.
+- Since 2026-10-10 the delta follows moves (reads by pageid, so the current title comes back),
+  removes a page that was deleted, became a redirect or is no longer an item or mob, re-reads
+  restores, and re-decides every key a change touches (a page's own title wins its key; an
+  `|itemname` alias only takes a key no title holds). A page that came back unreadable holds
+  `scrapedAt` back and is named.
+- It writes the text it fetched back into `scripts/sources/cache/{items,mobs}` only where those
+  caches exist. The throwaway worktree of step 2 has none, so it warns that `scrape:page-era`,
+  `gen-mob-races` and `gen-mob-factions` still read the last full scrape's text.
+- Moves stamped past before that fix are not seen again: `Megan OReilly` and
+  `Solusek kobold king` in `mobs.json` are the wiki's `Megan O`Reilly` and `A kobold king`.
+  Repair is a full `scrape:mobs`, or a delta from an earlier date (no `--since` option yet).
 7. Remove the junctions first (`(Get-Item <wt>\node_modules).Delete()`), then
    `git worktree remove --force`. Only the final merge into the main clone needs the dev app
    closed.
@@ -51,17 +65,29 @@ New wiki content turns the creator's census tests red. Each failing test names i
 ## Plane of Sky quests (posky.json): not covered by the delta
 
 `npm run scrape:posky` reads the rendered `Plane of Sky` page plus one request per item/reward page
-(~209). Its script sleeps 110 ms: change `await sleep(110)` to `sleep(1000)` in
-`scripts/sources/eqlegends.ts` in the scratch worktree and `git checkout --` it before committing.
+(~209). Since `wiki-scraper-fixes` it spaces those 1 s apart itself, retries only a 429 or 5xx,
+names pages that ended without stats, and refuses to write when any class yields no quests.
 A posky rescrape trips two audits by design: rows in `skyQuestRewards.ts` the wiki has caught up to
 must be deleted, and `achievementInference` needs every reward to match the game's achievements
 file.
 
 ## Other scrapers
 
-`npm run scrape:quests|bosses|spells|page-era|mobs` are full-corpus and heavier. Run only on the
-owner's word. `scrape:mobs` was run once (2026-09-29, 2,547 pages, ~2 min) by seeding `cache/mobs`
-from `cache/items` first.
+`npm run scrape:quests|bosses|spells|page-era|mobs|classes` run only on the owner's word.
+`scrape:spells`, `scrape:classes` and (since `wiki-scraper-fixes`) `scrape:quests` are
+revid-checked: one request per 50 titles, then content only for pages whose revision moved, so a
+rerun is cheap; the quest scraper's first run builds its index (~38 requests). `scrape:mobs` was
+run once (2026-09-29, 2,547 pages, ~2 min) by seeding `cache/mobs` from `cache/items` first; that
+seeding served 5,406 pages from the August item cache and stamped them as new, so a run that sets
+a new baseline passes `--refresh`.
+
+The parser fixes of `wiki-scraper-fixes`, `faction-tab` and `slayer-tab` reach the shipped data
+only when it is re-derived. Items, mobs, quests, `mobFactions.json`, `mobRaces.json` and
+`spellLines.json` re-derive from the caches with zero requests. Spells do not: the spell cache
+holds no page titles, which the spell name now comes from (`Healing Water`, not the page's stale
+`|spellname = Greater Healing`); its next real run records them. After a spell re-derive, the
+name corrections `Malisement`, `Invisibility vs. Undead` and `Solon's Bravura` in
+`spellCorrectionsList.ts` go stale and are updated in the same change.
 
 ## Wiki facts that matter to parsers (as of 2026-09-27)
 

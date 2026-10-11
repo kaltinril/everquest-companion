@@ -11,4 +11,4 @@ before 2026-10-10 were gathered that day from agent notes and the branch history
 | 2026-09-05 | owner | Race unlocks shown as faction work. | built |
 | 2026-09-05 | owner | Useful to other people too (friends' builds). | open |
 | 2026-09-23 | owner | A race picker on the race-unlock hunt. | built |
-| 2026-10-10 | owner | Scraper bug review: quest faction receipts the wiki words differently (`Your faction with [[X]] got better`, `standings`, a figure before `got`) and underscored faction names are read. | in progress |
+| 2026-10-10 | owner | Scraper bug review: quest faction receipts the wiki words differently (`Your faction with [[X]] got better`, `standings`, a figure before `got`) and underscored faction names are read. | built (shows in quests.json once re-derived) |
