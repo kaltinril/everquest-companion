@@ -237,6 +237,7 @@ async function readAndFoldItems(
 async function applyDelta(itemsFile: ItemDbFile, mobsFile: MobsFile, feed: FeedChanges): Promise<void> {
   const { pages, unapplied, itemFold } = await readAndFoldItems(itemsFile, feed)
   const now = new Date().toISOString()
+  // count = distinct pages some key reaches, scrape-items.ts's definition on wiki-scraper-fixes.
   const distinctPages = new Set(Object.values(itemFold.items).map((e) => e.page)).size
   const itemsOut: ItemDbFile = {
     scrapedAt: nextScrapedAt(itemsFile.scrapedAt, unapplied, now),
