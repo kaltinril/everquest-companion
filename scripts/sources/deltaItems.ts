@@ -4,6 +4,7 @@
 
 import { parseItemWikitext, templateField } from '../../src/main/itemLookupParse'
 import { itemKey, type ItemDbEntry, type ItemDbFile } from '../../src/main/itemsDb'
+import type { PageTexts } from './deltaPages'
 
 // ---- mirrored from scripts/scrape-items.ts ----------------------------------------------------
 
@@ -43,6 +44,8 @@ export interface ItemFold {
   items: Record<string, ItemDbEntry>
   /** item pages folded */
   folded: number
+  /** committed item pages that no longer read as an item */
+  removed: string[]
   /** `|itemname`s whose key lost its last known claimant: fetch these titles and fold again */
   orphans: string[]
 }
@@ -55,29 +58,32 @@ export interface ItemFold {
  * changed pages), so an edited variant page (A Sealed Letter (Thex Dagger Quest), `|itemname`
  * "A Sealed Letter") never repoints the canonical page's key. Does not mutate `itemsFile`.
  */
-export function foldItems(itemsFile: ItemDbFile, wikitext: Map<string, string>): ItemFold {
-  const changed = changedEntries(wikitext)
+export function foldItems(itemsFile: ItemDbFile, pages: PageTexts): ItemFold {
+  const changed = changedEntries(pages)
   const items = new Map(Object.entries(itemsFile.items))
   // key -> its committed holder, for every key the change can move
   const affected = new Map<string, ItemDbEntry | undefined>()
   const pool = new Map<string, ItemDbEntry>()
+  const removed = new Set<string>()
   for (const [k, prev] of items) {
-    if (changed.has(prev.page)) affected.set(k, prev)
-    else pool.set(prev.page, prev)
+    if (!changed.has(prev.page)) pool.set(prev.page, prev)
+    else affected.set(k, prev)
+    if (changed.get(prev.page) === null) removed.add(prev.page)
   }
-  for (const entry of changed.values()) {
+  const entries = [...changed.values()].filter((e): e is ItemDbEntry => e !== null)
+  for (const entry of entries) {
     pool.set(entry.page, entry)
     for (const k of entryKeys(entry)) if (!affected.has(k)) affected.set(k, items.get(k))
   }
   const orphans = award(items, affected, claimantsByKey(pool.values()))
-  return { items: Object.fromEntries(items), folded: changed.size, orphans }
+  return { items: Object.fromEntries(items), folded: entries.length, removed: [...removed], orphans }
 }
 
-function changedEntries(wikitext: Map<string, string>): Map<string, ItemDbEntry> {
-  const changed = new Map<string, ItemDbEntry>()
-  for (const [title, wt] of wikitext) {
-    const entry = isItemPage(wt) ? toEntry(title, wt) : null
-    if (entry) changed.set(entry.page, entry)
+/** Every read page: its record, or null when it is no item page now (gone, redirect, stub). */
+function changedEntries(pages: PageTexts): Map<string, ItemDbEntry | null> {
+  const changed = new Map<string, ItemDbEntry | null>()
+  for (const [title, wt] of pages) {
+    changed.set(title, wt != null && isItemPage(wt) ? toEntry(title, wt) : null)
   }
   return changed
 }

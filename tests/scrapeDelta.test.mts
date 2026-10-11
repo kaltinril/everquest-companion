@@ -2,8 +2,16 @@
 // `|itemname` alias takes a key no page is titled with, every key a change touches is re-awarded.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { foldRcRow, type PageLogEvent, type RcRow } from '../scripts/scrape-delta.mts'
 import { foldItems } from '../scripts/sources/deltaItems'
+import {
+  foldMobs,
+  foldRcRow,
+  nextScrapedAt,
+  readRevPages,
+  type PageLogEvent,
+  type PageTexts,
+  type RcRow
+} from '../scripts/sources/deltaPages'
 import { itemKey, type ItemDbEntry, type ItemDbFile } from '../src/main/itemsDb'
 
 const CANON: ItemDbEntry = {
@@ -25,7 +33,7 @@ function file(entries: ItemDbEntry[]): ItemDbFile {
 const page = (fields: string): string => `{{Itempage\n${fields}\n}}`
 
 /** Fold over `f` in place, the way the run writes the result. */
-function fold(f: ItemDbFile, pages: Map<string, string>): ReturnType<typeof foldItems> {
+function fold(f: ItemDbFile, pages: PageTexts): ReturnType<typeof foldItems> {
   const r = foldItems(f, pages)
   f.items = r.items
   return r
@@ -117,7 +125,7 @@ test('equal claimants of a key go to the first title in sort order', () => {
   assert.equal(f.items['bone chips']?.page, first)
 })
 
-test('recentchanges rows: edits are fetched, moves and deletes are only listed', () => {
+test('recentchanges rows: edits are re-read, and so is every title a log row names', () => {
   const seen = new Set<string>()
   const logs: PageLogEvent[] = []
   const rows: RcRow[] = [
@@ -131,12 +139,58 @@ test('recentchanges rows: edits are fetched, moves and deletes are only listed',
       logparams: { target_title: 'New Title' }
     },
     { type: 'log', title: 'Gone Page', logtype: 'delete', logaction: 'delete' },
-    { type: 'log', title: 'Someone', logtype: 'newusers', logaction: 'create' }
+    { type: 'log', title: 'Back Page', logtype: 'delete', logaction: 'restore' },
+    { type: 'log', title: 'Locked Page', logtype: 'protect', logaction: 'protect' }
   ]
   for (const rc of rows) foldRcRow(rc, seen, logs)
-  assert.deepEqual([...seen], ['Cyclops Skull', 'Brand New Item'])
+  assert.deepEqual(
+    [...seen],
+    ['Cyclops Skull', 'Brand New Item', 'Old Title', 'New Title', 'Gone Page', 'Back Page', 'Locked Page']
+  )
   assert.deepEqual(logs, [
     { logtype: 'move', logaction: 'move', title: 'Old Title', target: 'New Title' },
-    { logtype: 'delete', logaction: 'delete', title: 'Gone Page', target: undefined }
+    { logtype: 'delete', logaction: 'delete', title: 'Gone Page', target: undefined },
+    { logtype: 'delete', logaction: 'restore', title: 'Back Page', target: undefined }
   ])
+})
+
+test('a revisions response: content, a page that is gone, a page that could not be read', () => {
+  const out: PageTexts = new Map()
+  const unapplied: string[] = []
+  readRevPages(
+    [
+      { title: 'Here', revisions: [{ slots: { main: { content: 'text' } } }] },
+      { title: 'Gone', missing: true },
+      { title: 'Hidden', revisions: [{ slots: { main: {} } }] }
+    ],
+    out,
+    unapplied
+  )
+  assert.deepEqual([...out], [['Here', 'text'], ['Gone', null]])
+  assert.deepEqual(unapplied, ['Hidden'])
+  assert.equal(nextScrapedAt('then', unapplied, 'now'), 'then')
+  assert.equal(nextScrapedAt('then', [], 'now'), 'now')
+})
+
+test('an item page deleted or turned into a redirect leaves the DB, its keys re-awarded', () => {
+  const gone: ItemDbEntry = { page: 'Gone Item', name: 'Shared Name', iconId: 1 }
+  const redirected: ItemDbEntry = { page: 'Old Item', iconId: 2 }
+  const other: ItemDbEntry = { page: 'Other', name: 'Shared Name', iconId: 3 }
+  const f = file([other, gone, redirected])
+  const r = fold(f, new Map([['Gone Item', null], ['Old Item', '#REDIRECT [[New Item]]']]))
+  assert.equal(f.items['gone item'], undefined)
+  assert.equal(f.items['old item'], undefined)
+  assert.equal(f.items['shared name'], other)
+  assert.deepEqual(r.removed.sort(), ['Gone Item', 'Old Item'])
+})
+
+test('a mob page that is gone or no longer a mob leaves mobs.json', () => {
+  const mobs = [{ page: 'A kobold king' }, { page: 'Megan OReilly' }, { page: 'Stays' }]
+  const pages: PageTexts = new Map([
+    ['Megan OReilly', '#REDIRECT [[Megan O`Reilly]]'],
+    ['A kobold king', null]
+  ])
+  const r = foldMobs(mobs, pages)
+  assert.deepEqual([...r.byPage.keys()], ['Stays'])
+  assert.deepEqual(r.removed, ['Megan OReilly', 'A kobold king'])
 })

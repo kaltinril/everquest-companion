@@ -9,8 +9,9 @@
 // etiquette scrape-items.ts states as law), parsed through the SAME parsers the full scrapers
 // use, and folded over the committed records. Full-scrape @ T plus every change since T is the
 // wiki's state now, so scrapedAt moves to now honestly. That holds only while the feed still
-// reaches back to scrapedAt (it ages out), so the run refuses when it does not. Moves and
-// deletes are listed for a human, never applied.
+// reaches back to scrapedAt (it ages out), so the run refuses when it does not. A move, delete or
+// restore is applied by re-reading its titles: a page that no longer reads as an item or mob
+// leaves the DB. A page that could not be read keeps scrapedAt where it was.
 //
 // This file deliberately does not touch the full scrapers: importing scrape-items.ts would run
 // its main, so its three tiny page->record helpers are mirrored in sources/deltaItems.ts — the real
@@ -23,7 +24,16 @@ import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
 import { itemKey, type ItemDbFile } from '../src/main/itemsDb'
 import { foldItems } from './sources/deltaItems'
-import { isMobPage, parseMobPage } from './sources/mobPage'
+import {
+  foldMobs,
+  foldRcRow,
+  nextScrapedAt,
+  readRevPages,
+  type PageLogEvent,
+  type PageTexts,
+  type RcRow,
+  type RevPage
+} from './sources/deltaPages'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const ITEMS_PATH = resolve(HERE, '../src/main/data/items.json')
@@ -111,23 +121,7 @@ async function assertFeedReaches(sinceIso: string): Promise<void> {
   }
 }
 
-/** A move or delete in ns0: listed for a human, never applied (the delta only adds/updates). */
-export interface PageLogEvent {
-  logtype: string
-  logaction: string
-  title: string
-  target?: string
-}
-
-export interface RcRow {
-  type: string
-  title: string
-  logtype?: string
-  logaction?: string
-  logparams?: { target_title?: string }
-}
-
-/** Every ns0 page edited or created since `sinceIso`, newest first, deduped; plus moves/deletes. */
+/** Every ns0 title edited, created or named by a log row since `sinceIso`, deduped; plus logs. */
 async function changedTitles(
   sinceIso: string
 ): Promise<{ titles: string[]; logs: PageLogEvent[] }> {
@@ -156,28 +150,11 @@ async function changedTitles(
   return { titles: [...seen], logs }
 }
 
-export function foldRcRow(rc: RcRow, seen: Set<string>, logs: PageLogEvent[]): void {
-  if (rc.type !== 'log') {
-    seen.add(rc.title)
-    return
-  }
-  if (rc.logtype !== 'move' && rc.logtype !== 'delete') return
-  const target = rc.logparams?.target_title
-  logs.push({ logtype: rc.logtype, logaction: rc.logaction ?? '', title: rc.title, target })
-}
-
-interface RevPage {
-  title: string
-  missing?: boolean
-  revisions?: { slots?: { main?: { content?: string } } }[]
-}
-
 /**
  * A `continue` here means the wiki cut the batch short (a response-size limit) and some pages came
  * back without content. Skipping them would drop their edits from the delta without a word.
  */
-async function fetchWikitext(titles: string[]): Promise<Map<string, string>> {
-  const out = new Map<string, string>()
+async function fetchWikitext(titles: string[], out: PageTexts, unapplied: string[]): Promise<void> {
   for (let i = 0; i < titles.length; i += BATCH) {
     const j = await api<{ query?: { pages?: RevPage[] }; continue?: unknown }>({
       action: 'query',
@@ -189,43 +166,24 @@ async function fetchWikitext(titles: string[]): Promise<Map<string, string>> {
     if (j.continue) {
       throw new Error(`revisions batch at ${i} came back continued; content would be missing`)
     }
-    for (const p of j.query?.pages ?? []) {
-      const wt = p.revisions?.[0]?.slots?.main?.content
-      if (!p.missing && wt != null) out.set(p.title, wt)
-    }
+    readRevPages(j.query?.pages ?? [], out, unapplied)
     console.log(`  content ${Math.min(i + BATCH, titles.length)}/${titles.length}`)
   }
-  return out
 }
 
 function main(): void {
   void run()
 }
 
-/** Mobs: the same fold, keyed by page over the committed sorted list. */
-function foldMobs(
-  mobs: { page: string }[],
-  wikitext: Map<string, string>
-): { byPage: Map<string, { page: string }>; mobsTouched: number } {
-  const byPage = new Map(mobs.map((m) => [m.page, m]))
-  let mobsTouched = 0
-  for (const [title, wt] of wikitext) {
-    if (!isMobPage(wt)) continue
-    const entry = parseMobPage(title, wt)
-    if (!entry) continue
-    byPage.set(title, entry)
-    mobsTouched++
-  }
-  return { byPage, mobsTouched }
+interface MobsFile {
+  scrapedAt: string
+  source: string
+  mobs: { page: string }[]
 }
 
 async function run(): Promise<void> {
   const itemsFile = JSON.parse(readFileSync(ITEMS_PATH, 'utf8')) as ItemDbFile
-  const mobsFile = JSON.parse(readFileSync(MOBS_PATH, 'utf8')) as {
-    scrapedAt: string
-    source: string
-    mobs: { page: string }[]
-  }
+  const mobsFile = JSON.parse(readFileSync(MOBS_PATH, 'utf8')) as MobsFile
   // One overlap hour absorbs any clock skew between the scrape host and the wiki.
   const oldest = new Date(
     Math.min(Date.parse(itemsFile.scrapedAt), Date.parse(mobsFile.scrapedAt)) - 3600_000
@@ -244,49 +202,56 @@ async function run(): Promise<void> {
     console.log(`  (content not fetched — dry run; new pages resolve only by content)`)
     return
   }
+  await applyDelta(itemsFile, mobsFile, changed)
+}
 
-  const wikitext = await fetchWikitext(changed)
-  let itemFold = foldItems(itemsFile, wikitext)
+async function applyDelta(itemsFile: ItemDbFile, mobsFile: MobsFile, changed: string[]): Promise<void> {
+  const pages: PageTexts = new Map()
+  const unapplied: string[] = []
+  await fetchWikitext(changed, pages, unapplied)
+  let itemFold = foldItems(itemsFile, pages)
   // A key whose last known claimant let go may still have a page of that name: read it and refold.
-  const orphans = itemFold.orphans.filter((t) => !wikitext.has(t))
+  const orphans = itemFold.orphans.filter((t) => !pages.has(t))
   if (orphans.length > 0) {
     console.log(`  ${orphans.length} item keys lost their holder; reading those titles`)
-    for (const [t, wt] of await fetchWikitext(orphans)) wikitext.set(t, wt)
-    itemFold = foldItems(itemsFile, wikitext)
+    await fetchWikitext(orphans, pages, unapplied)
+    itemFold = foldItems(itemsFile, pages)
   }
-  const itemsTouched = itemFold.folded
+  const now = new Date().toISOString()
   const distinctPages = new Set(Object.values(itemFold.items).map((e) => e.page)).size
   const itemsOut: ItemDbFile = {
-    scrapedAt: new Date().toISOString(),
-    source: itemsFile.source.includes('delta')
-      ? itemsFile.source
-      : `${itemsFile.source} + recentchanges delta (scripts/scrape-delta.mts)`,
+    scrapedAt: nextScrapedAt(itemsFile.scrapedAt, unapplied, now),
+    source: deltaSource(itemsFile.source),
     count: distinctPages,
     items: Object.fromEntries(
       Object.entries(itemFold.items).sort((a, b) => a[0].localeCompare(b[0]))
     )
   }
-
-  const { byPage, mobsTouched } = foldMobs(mobsFile.mobs, wikitext)
+  const mobFold = foldMobs(mobsFile.mobs, pages)
   const mobsOut = {
-    scrapedAt: new Date().toISOString(),
-    source: mobsFile.source.includes('delta')
-      ? mobsFile.source
-      : `${mobsFile.source} + recentchanges delta (scripts/scrape-delta.mts)`,
-    mobs: [...byPage.values()].sort((a, b) => a.page.localeCompare(b.page))
+    scrapedAt: nextScrapedAt(mobsFile.scrapedAt, unapplied, now),
+    source: deltaSource(mobsFile.source),
+    mobs: [...mobFold.byPage.values()].sort((a, b) => a.page.localeCompare(b.page))
   }
 
   writeAtomic(ITEMS_PATH, JSON.stringify(itemsOut))
   writeAtomic(MOBS_PATH, JSON.stringify(mobsOut))
   console.log(
-    `\nFolded ${itemsTouched} item pages and ${mobsTouched} mob pages over the committed DBs.`
+    `\nFolded ${itemFold.folded} item pages and ${mobFold.folded} mob pages over the committed DBs.`
   )
-  console.log(`items.json count: ${itemsFile.count} → ${distinctPages}; both scrapedAt → now.`)
+  printRemoved('item', itemFold.removed)
+  printRemoved('mob', mobFold.removed)
+  console.log(`items.json count: ${itemsFile.count} → ${distinctPages}`)
+  printStamp(unapplied)
   console.log(`Next: npm run gen:data-weight  (the ledger pins exact bytes)`)
   console.log(
     'Not refreshed by the delta: pageEra.json (npm run scrape:page-era), posky.json ' +
       '(npm run scrape:posky) and, where the build carries it, mobRaces.json (gen-mob-races.mts).'
   )
+}
+
+function deltaSource(source: string): string {
+  return source.includes('delta') ? source : `${source} + recentchanges delta (scripts/scrape-delta.mts)`
 }
 
 /** Write beside, then rename: an interrupted run never leaves a truncated committed DB. */
@@ -295,13 +260,30 @@ function writeAtomic(path: string, data: string): void {
   renameSync(`${path}.tmp`, path)
 }
 
-/** Moves and deletes are a human's call: the delta lists them and changes nothing for them. */
+/** Moves and deletes, for the record: their titles were re-read like any edit. */
 function printPageLogs(logs: PageLogEvent[]): void {
   if (logs.length === 0) return
-  console.log(`  ${logs.length} ns0 move/delete log entries (not applied; check by hand):`)
+  console.log(`  ${logs.length} ns0 move/delete log entries (applied by re-reading their titles):`)
   for (const l of logs) {
     console.log(`    ${l.logtype}/${l.logaction}: ${l.title}${l.target ? ` → ${l.target}` : ''}`)
   }
+}
+
+function printRemoved(kind: string, pages: string[]): void {
+  if (pages.length === 0) return
+  console.log(`  ${pages.length} ${kind} pages removed (gone, a redirect, or no ${kind} page now):`)
+  console.log(`    ${pages.join(' | ')}`)
+}
+
+function printStamp(unapplied: string[]): void {
+  if (unapplied.length === 0) {
+    console.log('Both scrapedAt → now.')
+    return
+  }
+  console.log(
+    `scrapedAt NOT moved: ${unapplied.length} changed pages came back without readable content ` +
+      `(a hidden revision?), so the next run covers this window again: ${unapplied.join(' | ')}`
+  )
 }
 
 if ((process.argv[1] ?? '').endsWith('scrape-delta.mts')) main()
