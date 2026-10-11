@@ -471,3 +471,26 @@ test('bazaar: rows join by day, item, tier and direction, and the shared day add
   assert.equal(mergeBazaar({ rows: 'x' }, newer), null)
   assert.equal(mergeBazaar(older, []), null)
 })
+
+test('progression: coin and death columns join when either side has them, and stay absent when neither does', () => {
+  const older = progression({ ...({ coinTs: [1], coinCopper: [10] } as Partial<ProgressionSnap>) })
+  const newer = progression({ ...({ coinTs: [5], coinCopper: [20], deathTs: [6], deathKiller: ['a shiverback'] } as Partial<ProgressionSnap>) })
+  const m = mergeProgression(older, newer) as unknown as Record<string, unknown[]>
+  assert.deepEqual(m.coinTs, [1, 5])
+  assert.deepEqual(m.coinCopper, [10, 20])
+  assert.deepEqual(m.deathTs, [6])
+  assert.deepEqual(m.deathKiller, ['a shiverback'])
+  const plain = mergeProgression(progression({}), progression({})) as unknown as Record<string, unknown>
+  assert.equal('coinTs' in plain, false)
+})
+
+test('progression: the coin cap trims the joined column and moves dropped and windowStart', () => {
+  const ts = Array.from({ length: 20_000 + 1_024 }, (_, i) => i)
+  const older = progression({ ...({ coinTs: ts.slice(0, 1_024), coinCopper: ts.slice(0, 1_024) } as Partial<ProgressionSnap>) })
+  const newer = progression({ ...({ coinTs: ts.slice(1_024), coinCopper: ts.slice(1_024) } as Partial<ProgressionSnap>) })
+  const m = mergeProgression(older, newer)
+  const coin = (m as unknown as Record<string, number[]>).coinTs
+  assert.equal(coin.length, 20_000)
+  assert.equal(m?.dropped, 1_024)
+  assert.equal(m?.windowStart, 1_024)
+})
