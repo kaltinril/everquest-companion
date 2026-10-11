@@ -54,6 +54,8 @@ export interface ParsedQuestPage extends QuestTopTable {
   disambiguation: boolean
   /** true when the page has a questTopTable header block */
   hasTopTable: boolean
+  /** true when a page without a header pulls in other pages' sections ({{#lsth:...}}) */
+  sectionHub: boolean
 }
 
 const TOP_TABLE_RE = /\{\|[^\n]*questTopTable[^\n]*\n([\s\S]*?)\n\|\}/i
@@ -285,7 +287,8 @@ export function parseQuestPage(
     requiredItems,
     expReward: EXP_MARKER.test(wikitext),
     disambiguation: /\{\{\s*disambig/i.test(wikitext),
-    hasTopTable: top !== null
+    hasTopTable: top !== null,
+    sectionHub: top === null && /\{\{\s*#lsth\s*:/i.test(wikitext)
   }
 }
 

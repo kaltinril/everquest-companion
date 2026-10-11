@@ -33,6 +33,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
 import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
+import { isMain } from './sources/isMain'
 import { isEmptyParse, parseQuestPage, titleKey, type ParsedQuestPage } from './sources/questPage'
 import type { QuestData, QuestEntry } from '../src/shared/types'
 
@@ -273,7 +274,10 @@ async function collectItemTitles(): Promise<Set<string>> {
  * List") — no quest header at all, just hundreds of item links. Indexing those would tie
  * every listed item to a page that is not a quest.
  */
-function nonQuestReason(parsed: ParsedQuestPage): string | null {
+export function nonQuestReason(parsed: ParsedQuestPage): string | null {
+  // The class test pages are stubs over Plane of Sky, or stale copies listing rewards as turn-ins.
+  if (/ plane of sky tests$/i.test(parsed.page)) return 'Plane of Sky class tests (posky.json is the authority)'
+  if (parsed.sectionHub) return 'section-transclusion hub (lists other quests, no quest header)'
   const indexPage =
     !parsed.hasTopTable && !parsed.giver && !parsed.startZone && parsed.requiredItems.length > 40
   if (parsed.disambiguation && isEmptyParse(parsed)) return 'disambiguation hub'
@@ -362,4 +366,4 @@ async function main(): Promise<void> {
   printSummary(quests, skipped)
 }
 
-void main()
+if (isMain(import.meta.url)) void main()
