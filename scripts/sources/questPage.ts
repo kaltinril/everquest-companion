@@ -77,7 +77,7 @@ export function linkTargets(text: string): string[] {
   const re = /\[\[\s*([^\]|#<>{}]+?)\s*(?:\|[^\]]*)?\]\]/g
   let m: RegExpExecArray | null
   while ((m = re.exec(text)) !== null) {
-    const t = m[1].trim()
+    const t = m[1].replace(/_/g, ' ').trim()
     if (!t || NAMESPACED.test(t)) continue
     out.push(t)
   }
@@ -90,7 +90,7 @@ export function transclusionTargets(text: string): string[] {
   const re = /\{\{:\s*([^}|\n]+?)\s*(?:\|[^}]*)?\}\}/g
   let m: RegExpExecArray | null
   while ((m = re.exec(text)) !== null) {
-    const t = m[1].trim()
+    const t = m[1].replace(/_/g, ' ').trim()
     if (t && !NAMESPACED.test(t)) out.push(t)
   }
   return out
@@ -105,12 +105,17 @@ export function gearSetItems(text: string): string[] {
   return out
 }
 
+/** A page name's lookup key: case-folded, `_` read as a space (as MediaWiki does). */
+export function titleKey(name: string): string {
+  return name.toLowerCase().replace(/[\s_]+/g, ' ').trim()
+}
+
 /** Case-insensitive de-dupe that keeps first-seen order and spelling. */
 export function dedupe(names: Iterable<string>): string[] {
   const seen = new Set<string>()
   const out: string[] = []
   for (const n of names) {
-    const k = n.toLowerCase().replace(/\s+/g, ' ').trim()
+    const k = titleKey(n)
     if (!k || seen.has(k)) continue
     seen.add(k)
     out.push(n.replace(/\s+/g, ' ').trim())
@@ -257,7 +262,7 @@ export function parseQuestPage(
     ...linkTargets(rewardText).filter(isItem),
     ...gearSetItems(wikitext).filter(isItem)
   ])
-  const rewardKeys = new Set(rewards.map((r) => r.toLowerCase()))
+  const rewardKeys = new Set(rewards.map(titleKey))
 
   // Required/turn-in items: item references anywhere OUTSIDE the Reward section. Unlike the
   // Reward section (which only ever holds item boxes), the body transcludes mob/zone boxes
@@ -265,7 +270,7 @@ export function parseQuestPage(
   const requiredItems = dedupe([
     ...transclusionTargets(bodyText).filter(isItem),
     ...linkTargets(bodyText).filter(isItem)
-  ]).filter((n) => !rewardKeys.has(n.toLowerCase()))
+  ]).filter((n) => !rewardKeys.has(titleKey(n)))
 
   return {
     page,

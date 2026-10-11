@@ -3,7 +3,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { parseQuestPage, splitSections } from '../scripts/sources/questPage'
+import { dedupe, linkTargets, parseQuestPage, splitSections, titleKey, transclusionTargets } from '../scripts/sources/questPage'
 
 const ITEMS = new Set(['harvester', 'rusty scythe', 'shadowbound gloves'])
 const isItem = (t: string): boolean => ITEMS.has(t.toLowerCase())
@@ -53,5 +53,14 @@ Bring a [[Rusty Scythe]] and the [[ShadowBound Gloves]] pattern.
 `
   const q = parseQuestPage('Gear', wt, isItem)
   assert.deepEqual(q.rewards, ['ShadowBound Gloves'])
+  assert.deepEqual(q.requiredItems, ['Rusty Scythe'])
+})
+
+test('underscored page names fold to spaces the way MediaWiki reads them', () => {
+  assert.deepEqual(transclusionTargets('{{:Rusty_Scythe}} {{:Harvester}}'), ['Rusty Scythe', 'Harvester'])
+  assert.deepEqual(linkTargets('[[Rusty_Scythe|a scythe]]'), ['Rusty Scythe'])
+  assert.deepEqual(dedupe(['Rusty Scythe', 'rusty_scythe']), ['Rusty Scythe'])
+  assert.equal(titleKey(' Rusty__Scythe '), 'rusty scythe')
+  const q = parseQuestPage('Underscores', '== Reward ==\n{{:Harvester}}\n== Walkthrough ==\n[[Rusty_Scythe]]\n', isItem)
   assert.deepEqual(q.requiredItems, ['Rusty Scythe'])
 })

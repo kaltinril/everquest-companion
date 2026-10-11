@@ -33,7 +33,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
 import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
-import { isEmptyParse, parseQuestPage, type ParsedQuestPage } from './sources/questPage'
+import { isEmptyParse, parseQuestPage, titleKey, type ParsedQuestPage } from './sources/questPage'
 import type { QuestData, QuestEntry } from '../src/shared/types'
 
 const API = 'https://eqlwiki.com/api.php'
@@ -324,7 +324,7 @@ function printSummary(quests: QuestEntry[], skipped: { page: string; reason: str
 
 async function main(): Promise<void> {
   const itemTitles = await collectItemTitles()
-  const isItem = (title: string): boolean => itemTitles.has(title.toLowerCase().replace(/\s+/g, ' ').trim())
+  const isItem = (title: string): boolean => itemTitles.has(titleKey(title))
 
   const pages = await collectQuestPages()
   console.log(`\nFetching + parsing ${pages.length} quest pages…`)
