@@ -118,7 +118,10 @@ const STRUCT_KEYS = [
  * pages; Magic and Disease are the game's other two elements, named so they cannot do the same.
  */
 const ELEMENTAL_DMG_KEYS = ['Fire DMG', 'Cold DMG', 'Poison DMG', 'Magic DMG', 'Disease DMG']
-const ELEMENTAL_DMG_LINE = /\b(?:Fire|Cold|Poison|Magic|Disease) DMG\s*:/i
+// `Bane DMG: [[Shissar]] +6` overwrote DMG the same way (Greenmist 18 read 6; four pages). It is
+// no element, but it is kept and repaired the same way.
+const BANE_DMG_KEY = 'Bane DMG'
+const ELEMENTAL_DMG_LINE = /\b(?:Fire|Cold|Poison|Magic|Disease|Bane) DMG\s*:/i
 
 /**
  * A STORED parse, repaired against the block it was parsed from.
@@ -142,7 +145,7 @@ const STAT_KEYS = [
   'STR', 'STA', 'AGI', 'DEX', 'WIS', 'INT', 'CHA', 'HP', 'MANA', 'END', 'ENDURANCE',
   'Haste', 'Attack', 'Regen', 'Mana Regen', 'Charges', 'Rec Level', 'Recommended Level',
   'Required Level', 'Req Level', 'Cast Time', 'Cooldown', 'Recast', 'Range Damage',
-  ...ELEMENTAL_DMG_KEYS
+  ...ELEMENTAL_DMG_KEYS, BANE_DMG_KEY
 ]
 
 const ALL_KEYS = [...SAVE_KEYS, ...EFFECT_KEYS, ...STRUCT_KEYS, ...STAT_KEYS]

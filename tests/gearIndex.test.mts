@@ -275,7 +275,7 @@ test('scaling all rows at one state is fast enough to move a slider', () => {
 // THE CENSUSES — law 1 lives here rather than on the rows
 // =================================================================================
 
-test('the unindexed stat keys are exactly the eight the corpus states', () => {
+test('the unindexed stat keys are exactly the nine the corpus states', () => {
   // CHARGES / COOLDOWN / CAST TIME / REQUIRED LEVEL are per-item facts, not gear comparisons
   // (shared/planner/gear.ts says why they are out of the vector). A key here that is NOT one of
   // those is a stat the gear table would silently not have a column for.
@@ -290,13 +290,15 @@ test('the unindexed stat keys are exactly the eight the corpus states', () => {
   // THE THREE ELEMENTAL DAMAGES arrived 2026-09-26, when the parser stopped reading `Fire DMG: 3`
   // as the weapon's own damage (tests/itemElementalDamage.test.mts). They ARE a gear fact, and the
   // table has no column for them: six pages state one, the item card draws the line, and the
-  // weapon's DMG column is right again, which is what the report was about.
+  // weapon's DMG column is right again, which is what the report was about. `BANE_DMG`
+  // (2026-10-10) is the same case on four pages.
   //
   // `REQ_LEVEL` IS ALLOWED, NOT REQUIRED, since 2026-09-27: the wiki spelled its eight pages out,
   // so the corpus the creator ships still states it and a refreshed one does not. It is set aside
   // before the equality, which still stops the suite on any spelling nobody has read.
   const keys = Object.keys(index.stats.unindexedStatKeys).filter((k) => k !== 'REQ_LEVEL')
   assert.deepEqual(keys.sort(), [
+    'BANE_DMG',
     'CAST_TIME',
     'CHARGES',
     'COLD_DMG',
