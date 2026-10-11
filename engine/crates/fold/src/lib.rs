@@ -29,6 +29,7 @@ pub mod knowledge;
 pub mod message_overlay;
 pub mod modules;
 pub mod overlay_file;
+mod registry_drains;
 mod registry_views;
 pub mod session;
 pub mod spell_facts;
@@ -285,6 +286,7 @@ pub const WIRING_ORDER: &[&str] = &[
     "alerts",
     "buffs",
     "buffTimers",
+    "buffConflicts",
     "consider",
     "resist",
     "bazaar",
@@ -484,16 +486,6 @@ impl Registry {
             .iter()
             .filter_map(|m| m.published_seq().map(|seq| (m.id(), seq)))
             .collect()
-    }
-
-    /// Every live `/con` any module saw since the last drain, in registration order. Empty for
-    /// every historical fold — see [`EqModule::take_cons`].
-    pub fn take_cons(&mut self) -> Vec<modules::consider::ConEvent> {
-        let mut out = Vec::new();
-        for m in &mut self.mods {
-            out.append(&mut m.take_cons());
-        }
-        out
     }
 
     /// The registered module that owns the own-loot index (`consider`), or `None` when this build
@@ -891,6 +883,7 @@ pub fn registered(deps: ClusterDeps) -> Registry {
         core.clone(),
     )));
     r.register(Box::new(modules::buff_timers::BuffTimersModule::new(core)));
+    r.register(Box::new(modules::buff_conflicts::BuffConflictsModule::new()));
     r.register(Box::new(modules::consider::ConsiderModule::new()));
     r.register(Box::new(modules::resist::ResistModule::new()));
     r.register(Box::new(modules::bazaar::BazaarModule::new()));

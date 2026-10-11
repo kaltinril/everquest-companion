@@ -23,6 +23,7 @@ pub mod bazaar;
 pub mod bazaar_parse;
 pub mod bazaar_words;
 pub mod buff_anchors;
+pub mod buff_conflicts;
 pub mod buff_landing;
 pub mod buff_procs;
 pub mod buff_rounds;

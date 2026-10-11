@@ -26,6 +26,7 @@ import { Tooltip } from '../../lib/Tooltip'
 // The durations tables, their search and the allow-list box on every row (JOS-168) — split into
 // their own file because this one is at the 400-code-line factoring ceiling.
 import { BuffStats } from './BuffStats'
+import { BuffConflicts } from './BuffConflicts'
 import { useBuffAllow } from './useBuffAllow'
 
 // Stable empty reference so hooks don't churn before hydration.
@@ -334,6 +335,8 @@ export default function BuffsView(): JSX.Element {
           </Stack>
         )}
       </Box>
+
+      <BuffConflicts />
 
       <BuffStats stats={snap.stats} />
 
