@@ -2,7 +2,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { buildCatalog, nonQuestReason, queryBlock } from '../scripts/scrape-quests'
+import { buildCatalog, nonQuestReason, queryBlock, stalePages } from '../scripts/scrape-quests'
 import { parseQuestPage } from '../scripts/sources/questPage'
 
 const isItem = (t: string): boolean => ['rusty scythe', 'harvester'].includes(t.toLowerCase())
@@ -37,4 +37,16 @@ test('a page without wikitext is a failure, not a quietly missing quest', () => 
   assert.deepEqual(run.quests.map((q) => q.page), ['Harvester Quest'])
   assert.deepEqual(run.failed, ['Lost Page'])
   assert.deepEqual(run.skipped.map((s) => s.page), ['Empty Page'])
+})
+
+test('only pages whose revision moved, or that were never indexed, are re-fetched', () => {
+  const page = (pageid: number): { pageid: number; ns: number; title: string } => ({ pageid, ns: 0, title: `P${pageid}` })
+  const pages = [1, 2, 3, 4, 5, 6].map(page)
+  const indexed = { '1': 10, '2': 20, '5': 50, '6': 60 }
+  const live = new Map([[1, 10], [2, 21], [3, 30], [5, 50]])
+  const cached = new Set([1, 2, 3, 5, 6])
+  const stale = stalePages(pages, indexed, live, (id) => cached.has(id))
+  // 1 unchanged; 2 moved; 3 cached before the index (age unknown); 4 never cached;
+  // 5 unchanged; 6 got no revid from the wiki but has a cached copy, so it is kept.
+  assert.deepEqual(stale.map((p) => p.pageid), [2, 3, 4])
 })
