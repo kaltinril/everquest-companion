@@ -23,7 +23,9 @@ const TRIM_BATCH = 1024
 /** `progression.rs` RECENT_KILL_CAP. */
 const RECENT_KILL_CAP = 50
 
-type Column = Exclude<keyof ProgressionSnap, 'recentKills' | 'lastTs' | 'windowStart' | 'dropped'>
+/** The snapshot's required keys: an optional column is merged by `OPTIONAL_GROUPS` instead. */
+type Required_<T> = { [K in keyof T]-?: undefined extends T[K] ? never : K }[keyof T]
+type Column = Exclude<Required_<ProgressionSnap>, 'recentKills' | 'lastTs' | 'windowStart' | 'dropped'>
 
 interface Group {
   /** Index-aligned columns; the first holds the timestamps `windowStart` is read from. */
@@ -44,6 +46,35 @@ const GROUPS: readonly Group[] = [
 ]
 
 type Columns = Record<Column, (number | string)[]>
+
+/** Columns a newer fold adds (coin and deaths, `coin-and-deaths`), merged when either side has them,
+ * so this file builds with or without that branch and an archive made before it reads as none. */
+const OPTIONAL_GROUPS: readonly { cols: readonly string[]; cap: number }[] = [
+  { cols: ['coinTs', 'coinCopper'], cap: 20_000 },
+  { cols: ['deathTs', 'deathKiller'], cap: 4_000 }
+]
+
+const arrayOr = (v: unknown): unknown[] => (Array.isArray(v) ? (v as unknown[]) : [])
+
+/** The optional columns joined older first and trimmed to their caps, as `trim` does the rest. */
+function optional(older: ProgressionSnap, newer: ProgressionSnap): { cols: Record<string, unknown[]>; dropped: number; window: number } {
+  const o = older as unknown as Record<string, unknown>
+  const n = newer as unknown as Record<string, unknown>
+  const cols: Record<string, unknown[]> = {}
+  let dropped = 0
+  let window = 0
+  for (const g of OPTIONAL_GROUPS) {
+    if (!g.cols.some((c) => Array.isArray(o[c]) || Array.isArray(n[c]))) continue
+    for (const c of g.cols) cols[c] = [...arrayOr(o[c]), ...arrayOr(n[c])]
+    const len = cols[g.cols[0]].length
+    if (len < g.cap + TRIM_BATCH) continue
+    const cut = len - g.cap
+    for (const c of g.cols) cols[c].splice(0, cut)
+    dropped += cut
+    window = Math.max(window, Number(cols[g.cols[0]][0]))
+  }
+  return { cols, dropped, window }
+}
 
 export function isProgressionSnap(x: unknown): x is ProgressionSnap {
   if (x === null || typeof x !== 'object') return false
@@ -92,12 +123,14 @@ export function mergeProgression(older: unknown, newer: unknown): ProgressionSna
   const carriedName = carried >= 0 ? older.zoneName[carried] : ''
   const cols = joined(older, newer, carried)
   const cut = trim(cols)
+  const extra = optional(older, newer)
   const live = newer.recentKills.map((k) => (k.zone === '' ? { ...k, zone: carriedName } : { ...k }))
   return {
     ...(cols as unknown as Omit<ProgressionSnap, 'recentKills' | 'lastTs' | 'windowStart' | 'dropped'>),
+    ...extra.cols,
     recentKills: [...older.recentKills.map((k) => ({ ...k })), ...live].slice(-RECENT_KILL_CAP),
     lastTs: Math.max(older.lastTs, newer.lastTs),
-    windowStart: Math.max(older.windowStart, newer.windowStart, cut.window),
-    dropped: older.dropped + newer.dropped + cut.dropped
+    windowStart: Math.max(older.windowStart, newer.windowStart, cut.window, extra.window),
+    dropped: older.dropped + newer.dropped + cut.dropped + extra.dropped
   }
 }
