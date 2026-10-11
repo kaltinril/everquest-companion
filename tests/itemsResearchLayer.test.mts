@@ -103,11 +103,14 @@ function farmable(e: ItemDbEntry): boolean {
 
 /** The pages one prose list clearly marks AND that name no farm route — one table's whole source. */
 function derivedFromProse(prose: RegExp[]): Set<string> {
+  // Farmability is the ITEM's, not one page's: two pages can name one item (`Essence of Gukta`, a
+  // GM-event page, and its player-crafted `(Wormwood)` twin), and a route on either farms it.
+  const farmed = new Set(entries.filter(farmable).map(keyOf))
   const out = new Set<string>()
   for (const e of entries) {
     const summary = e.summary ?? ''
     if (!prose.some((re) => re.test(summary))) continue
-    if (farmable(e)) continue
+    if (farmable(e) || farmed.has(keyOf(e))) continue
     out.add(keyOf(e))
   }
   return out
