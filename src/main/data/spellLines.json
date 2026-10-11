@@ -2538,7 +2538,7 @@
       "level": 11
      }
     ],
-    "ladder": true
+    "ladder": false
    },
    {
     "id": "hail-ae-line",
@@ -2634,7 +2634,7 @@
       "level": 29
      }
     ],
-    "ladder": true
+    "ladder": false
    },
    {
     "id": "invis-line",
@@ -3808,7 +3808,7 @@
       "level": 49
      }
     ],
-    "ladder": true
+    "ladder": false
    },
    {
     "id": "enc-faction",
@@ -4240,7 +4240,7 @@
       "level": 45
      }
     ],
-    "ladder": true
+    "ladder": false
    },
    {
     "id": "enc-mass-enchant-metal",
@@ -4268,7 +4268,7 @@
       "level": 32
      }
     ],
-    "ladder": true
+    "ladder": false
    },
    {
     "id": "enc-mass-mana-vials",
@@ -4296,7 +4296,7 @@
       "level": 47
      }
     ],
-    "ladder": true
+    "ladder": false
    },
    {
     "id": "enc-memblur-ae",
@@ -5514,7 +5514,7 @@
       "level": 55
      }
     ],
-    "ladder": true
+    "ladder": false
    },
    {
     "id": "mag-summon-apparel",
@@ -5538,7 +5538,7 @@
       "level": 48
      }
     ],
-    "ladder": true
+    "ladder": false
    },
    {
     "id": "mag-summon-bags",
@@ -5582,7 +5582,7 @@
       "level": 51
      }
     ],
-    "ladder": true
+    "ladder": false
    },
    {
     "id": "mag-summon-jewelry-ear",
@@ -5702,7 +5702,7 @@
       "level": 56
      }
     ],
-    "ladder": true
+    "ladder": false
    },
    {
     "id": "mag-summon-modrod",
@@ -5730,7 +5730,7 @@
       "level": 45
      }
     ],
-    "ladder": true
+    "ladder": false
    },
    {
     "id": "mag-summon-phantom-armor-sets",
@@ -5802,7 +5802,7 @@
       "level": 31
      }
     ],
-    "ladder": true
+    "ladder": false
    },
    {
     "id": "mag-vision",
@@ -5912,7 +5912,7 @@
       "level": 53
      }
     ],
-    "ladder": true
+    "ladder": false
    },
    {
     "id": "nec-corpse-summon",
@@ -6828,7 +6828,7 @@
       "level": 55
      }
     ],
-    "ladder": true
+    "ladder": false
    },
    {
     "id": "nec-twitch",
@@ -9398,7 +9398,7 @@
       "level": 29
      }
     ],
-    "ladder": true
+    "ladder": false
    },
    {
     "id": "insidious",
@@ -9826,7 +9826,7 @@
       "level": 6
      }
     ],
-    "ladder": true
+    "ladder": false
    },
    {
     "id": "talisman-hp",
@@ -10912,7 +10912,7 @@
       "level": 25
      }
     ],
-    "ladder": true
+    "ladder": false
    },
    {
     "id": "wiz-shielding",
