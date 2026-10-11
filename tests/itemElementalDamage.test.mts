@@ -32,6 +32,20 @@ test('the weapon damage and the elemental damage are two facts', () => {
   assert.equal(parseStatsBlock('DMG: 5 Poison DMG: 1 Atk Delay: 20').dmg, 5)
 })
 
+test('a bane damage line is its own fact too, read and repaired like an element', () => {
+  const greenmist = 'Skill: 1H Slashing Atk Delay: 22\n\nDMG: 18 AC: 5\n\nBane DMG: [[Shissar]] +6\n\nSTR: +5'
+  const block = parseStatsBlock(greenmist)
+  assert.equal(block.dmg, 18)
+  assert.deepEqual(block.stats, [{ key: 'BANE DMG', value: 'Shissar +6' }, { key: 'STR', value: '+5' }])
+  assert.equal(parseStatsBlock('DMG: 6\n\nBane Dmg: Gnoll 5').dmg, 6)
+  const stale = { ...block, dmg: 6, stats: [{ key: 'STR', value: '+5' }] }
+  const repaired = repairElementalDamage(stale, greenmist)
+  assert.equal(repaired.dmg, 18)
+  assert.deepEqual(repaired.stats, [{ key: 'STR', value: '+5' }, { key: 'BANE DMG', value: 'Shissar +6' }])
+  // An upgrade moves the weapon's damage and leaves the bane line as stated, as with an element.
+  assert.deepEqual(scaleStatBlock(block, { full: 5, fraction: 0 }).stats[0], { key: 'BANE DMG', value: 'Shissar +6' })
+})
+
 test('THE OWNER`S ARROWS: the +7 is the one he holds', () => {
   const at7 = scaleStatBlock(parseStatsBlock(ARROWS), { full: 7, fraction: 0 })
   // In game: Base Dmg 18, Fire Dmg 3, Range 220. An upgrade moves the weapon damage and the range,
