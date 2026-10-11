@@ -5,18 +5,36 @@
 // or with a guess (`(-?)`). A page that knows of none says `* None`; one that has not been worked
 // out says `* Unknown` or leaves the field empty. A bullet marked `oppfac` is a faction the kill
 // RAISES, which the field occasionally carries (14 pages of 7,926, measured 2026-10-05).
+// The span class is not reliable (`oppfac` with `(-10)`), so a stated number decides by its sign.
+// About 60 pages name factions without a link (`* Guards of Qeynos <span ...>(-10)</span>`).
 
 import { templateField } from '../../src/main/itemLookupParse'
 
-/** The factions a kill lowers, as the page links them; none when it states none or does not know. */
+/** Bullets that are notes or headings, not a faction's name. */
+const NOT_A_FACTION = /^(?:none|unknown|need|information|kos\b|for\b|\?)/i
+
+/** Whether the bullet's faction is lowered: by its number's sign when it states one. */
+function lowers(line: string): boolean {
+  const n = /\(\s*([+-]?\d+)\s*\)/.exec(line)
+  if (n !== null) return n[1].startsWith('-') && Number(n[1]) !== 0
+  return !line.includes('oppfac') && !/\+\s*$/.test(line)
+}
+
+/** The faction a bullet names: its link's label, else the bullet's text before any `(` or `<`. */
+function bulletName(line: string): string {
+  const link = /\[\[(?:[^\]|]*\|)?([^\]]*)\]\]/.exec(line)
+  if (link !== null) return link[1].trim()
+  const text = /^\s*\*+\s*'*([^(<'*]*)/.exec(line)?.[1].replace(/\s*-\s*$/, '').trim() ?? ''
+  return NOT_A_FACTION.test(text) ? '' : text
+}
+
+/** The factions a kill lowers, as the page names them; none when it states none or does not know. */
 export function factionHits(wikitext: string): string[] {
   const raw = templateField(wikitext, 'factions') ?? ''
   const hits: string[] = []
   for (const line of raw.split('\n')) {
-    if (line.includes('oppfac')) continue
-    const link = /\[\[(?:[^\]|]*\|)?([^\]]*)\]\]/.exec(line)
-    const name = link?.[1].trim() ?? ''
-    if (name !== '' && !hits.includes(name)) hits.push(name)
+    const name = bulletName(line)
+    if (name !== '' && lowers(line) && !hits.includes(name)) hits.push(name)
   }
   return hits
 }

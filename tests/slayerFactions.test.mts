@@ -40,6 +40,22 @@ test("a mob page's faction hits are the factions it links, less any the kill rai
   assert.deepEqual(factionHits(page('* [[Ebon Mask|the Ebon Mask]] (-?)')), ['the Ebon Mask'])
 })
 
+test('a faction bullet is a hit by the sign of its number, and an unlinked bullet names its faction', () => {
+  const page = (field: string): string => `{{Namedmobpage\n| factions = \n\n${field}\n}}`
+  assert.deepEqual(factionHits(page("* [[Heretics]] <span class='oppfac'>(-10)</span>")), ['Heretics'])
+  assert.deepEqual(factionHits(page("* [[The Dead]]    <span class='oppfac'>(-30)</span>")), ['The Dead'])
+  assert.deepEqual(factionHits(page("* [[Heretics]] <span class='oppfac'>(-0)</span>")), [])
+  assert.deepEqual(factionHits(page("* [[Heretics]] <span class='oppfac'>(?)</span>")), [])
+  assert.deepEqual(
+    factionHits(page("* Guards of Qeynos <span class='profac'>(-10)</span>\n* Najena (-5)\n* GemChoppers")),
+    ['Guards of Qeynos', 'Najena', 'GemChoppers']
+  )
+  assert.deepEqual(factionHits(page('* KaranaResidents +\n* Aviak (+2)')), [])
+  for (const junk of ['* None?', '* Unknown', "* ''Need Info''", '* ?', '*', '* for Kaesora', '* KOS Animal']) {
+    assert.deepEqual(factionHits(page(junk)), [], junk)
+  }
+})
+
 test('the faction switch leaves out a mob the wiki says costs faction, from the list and the map', () => {
   const crow = at('a scarecrow', 'Western Plains of Karana', [[100, 100]])
   const bat = at('a giant bat', 'Western Plains of Karana', [[150, 150]])
