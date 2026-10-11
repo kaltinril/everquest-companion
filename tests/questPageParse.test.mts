@@ -25,3 +25,18 @@ test('a heading followed by a template on the same line still starts a section',
   assert.deepEqual(q.rewards, ['Harvester'])
   assert.deepEqual(q.requiredItems, ['Rusty Scythe'])
 })
+
+test('Additional and Possible Rewards headings are reward sections; a mixed Rewards and Walkthrough is not', () => {
+  const wt = `== Possible Rewards ==
+{{:Harvester}}
+== Walkthrough ==
+Kill things.
+==== Additional Rewards ====
+You receive the {{:ShadowBound Gloves}}.
+== Rewards and Walkthrough ==
+| 1 [[Rusty Scythe]] makes one piece.
+`
+  const q = parseQuestPage('Mixed', wt, isItem)
+  assert.deepEqual(q.rewards, ['Harvester', 'ShadowBound Gloves'])
+  assert.deepEqual(q.requiredItems, ['Rusty Scythe'])
+})

@@ -215,7 +215,9 @@ export function splitSections(wikitext: string): { lead: string; sections: WikiS
   return { lead: lead.join('\n'), sections }
 }
 
-const REWARD_HEADING = /^rewards?\b/i
+// 'Reward', 'Possible Rewards', 'Additional Rewards'; a mixed 'Rewards and Walkthrough'
+// section names its turn-ins in prose, so it reads as body.
+const REWARD_HEADING = /^(?!.*\bwalkthrough\b).*\brewards?\b/i
 const EXP_MARKER = /\{\{\s*(yougainexperience|exp)\s*\}\}|you gain experience/i
 
 /**
