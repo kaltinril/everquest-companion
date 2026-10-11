@@ -76,6 +76,8 @@ import { itemKey, type ItemDbEntry, type ItemDbFile } from '../src/main/itemsDb'
 import { pageEraKey, type PageEraEntry, type PageEraFile } from '../src/main/pageEraDb'
 import { eraBadge, layeredVerdict, namesEra } from '../src/shared/planner/era'
 import type { SpellDbFile } from '../src/shared/types'
+import { isMain } from './sources/isMain'
+import { wikitextByRequested, type RevPage } from './sources/pageEraBatch'
 
 const API = 'https://eqlwiki.com/api.php'
 const UA = 'everquest-companion/0.1 (personal quest tracker)'
@@ -201,12 +203,6 @@ function batchName(prefix: string, titles: readonly string[]): string {
 
 // ---- step 1: which corpus pages are still silent, and what do their notes link -----------------
 
-interface RevPage {
-  title: string
-  missing?: boolean
-  revisions?: { slots?: { main?: { content?: string } } }[]
-}
-
 /** The zones an item states on its OWN page — the same read `eraDerive.ts` makes. */
 function pageZones(entry: ItemDbEntry): string[] {
   return (entry.dropsFrom ?? []).flatMap((s) => (s.zone === undefined ? [] : [s.zone]))
@@ -246,10 +242,8 @@ async function fetchWikitext(titles: readonly string[], prefix: string): Promise
       pages = j.query?.pages ?? []
       writeCache(file, pages)
     }
-    for (const p of pages) {
-      const wt = p.revisions?.[0]?.slots?.main?.content
-      if (wt != null) out.set(p.title, wt)
-    }
+    // Keyed by the REQUESTED spelling, so entryFor's lookup finds a title the API normalized.
+    for (const [t, wt] of wikitextByRequested(slice, { pages })) out.set(t, wt)
   }
   return out
 }
@@ -637,4 +631,5 @@ async function main(): Promise<void> {
   console.log(`  eraRevision: ${String(eraRevision)}   live requests sent this run: ${String(requestsSent)}`)
 }
 
-void main()
+// Runs only as the entry script, so a test import can never start a scrape.
+if (isMain(import.meta.url)) void main()
