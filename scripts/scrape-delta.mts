@@ -23,7 +23,7 @@ import { readFileSync, renameSync, writeFileSync } from 'fs'
 import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
 import { itemKey, type ItemDbFile } from '../src/main/itemsDb'
-import { foldItems } from './sources/deltaItems'
+import { foldItems, type ItemFold } from './sources/deltaItems'
 import {
   emptyFeed,
   foldMobs,
@@ -34,7 +34,9 @@ import {
   type PageLogEvent,
   type PageTexts,
   type RcRow,
-  type RevPage
+  type RevPage,
+  unfolded,
+  unfoldedReport
 } from './sources/deltaPages'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
@@ -211,7 +213,11 @@ async function run(): Promise<void> {
   await applyDelta(itemsFile, mobsFile, feed)
 }
 
-async function applyDelta(itemsFile: ItemDbFile, mobsFile: MobsFile, feed: FeedChanges): Promise<void> {
+/** Read every page the feed names, plus the titles orphaned item keys point at, and fold items. */
+async function readAndFoldItems(
+  itemsFile: ItemDbFile,
+  feed: FeedChanges
+): Promise<{ pages: PageTexts; unapplied: string[]; itemFold: ItemFold }> {
   const pages: PageTexts = new Map()
   const unapplied: string[] = []
   await fetchWikitext('pageids', [...feed.pageids].map(String), pages, unapplied)
@@ -225,6 +231,11 @@ async function applyDelta(itemsFile: ItemDbFile, mobsFile: MobsFile, feed: FeedC
     await fetchWikitext('titles', orphans, pages, unapplied)
     itemFold = foldItems(itemsFile, pages)
   }
+  return { pages, unapplied, itemFold }
+}
+
+async function applyDelta(itemsFile: ItemDbFile, mobsFile: MobsFile, feed: FeedChanges): Promise<void> {
+  const { pages, unapplied, itemFold } = await readAndFoldItems(itemsFile, feed)
   const now = new Date().toISOString()
   const distinctPages = new Set(Object.values(itemFold.items).map((e) => e.page)).size
   const itemsOut: ItemDbFile = {
@@ -244,18 +255,15 @@ async function applyDelta(itemsFile: ItemDbFile, mobsFile: MobsFile, feed: FeedC
 
   writeAtomic(ITEMS_PATH, JSON.stringify(itemsOut))
   writeAtomic(MOBS_PATH, JSON.stringify(mobsOut))
-  console.log(
-    `\nFolded ${itemFold.folded} item pages and ${mobFold.folded} mob pages over the committed DBs.`
-  )
+  const items = itemFold.folded.length
+  console.log(`\nFolded ${items} item pages and ${mobFold.folded.length} mob pages over the DBs.`)
   printRemoved('item', itemFold.removed)
   printRemoved('mob', mobFold.removed)
   console.log(`items.json count: ${itemsFile.count} → ${distinctPages}`)
   printStamp(unapplied)
   console.log(`Next: npm run gen:data-weight  (the ledger pins exact bytes)`)
-  console.log(
-    'Not refreshed by the delta: pageEra.json (npm run scrape:page-era), posky.json ' +
-      '(npm run scrape:posky) and, where the build carries it, mobRaces.json (gen-mob-races.mts).'
-  )
+  const folded = new Set([...itemFold.folded, ...mobFold.folded])
+  for (const line of unfoldedReport(unfolded(pages, folded))) console.log(line)
 }
 
 function deltaSource(source: string): string {

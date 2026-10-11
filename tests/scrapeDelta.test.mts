@@ -10,7 +10,9 @@ import {
   nextScrapedAt,
   readRevPages,
   type PageTexts,
-  type RcRow
+  type RcRow,
+  unfolded,
+  unfoldedReport
 } from '../scripts/sources/deltaPages'
 import { itemKey, type ItemDbEntry, type ItemDbFile } from '../src/main/itemsDb'
 
@@ -42,8 +44,8 @@ function fold(f: ItemDbFile, pages: PageTexts): ReturnType<typeof foldItems> {
 test('an edited variant page does not repoint the canonical key its |itemname names', () => {
   const f = file([CANON])
   const variant = page('|itemname=A Sealed Letter\n|lucy_img_ID=708')
-  const { folded: n } = fold(f, new Map([[VARIANT, variant]]))
-  assert.equal(n, 1)
+  const { folded } = fold(f, new Map([[VARIANT, variant]]))
+  assert.deepEqual(folded, [VARIANT])
   assert.equal(f.items[itemKey(CANON.page) ?? ''], CANON)
   assert.equal(f.items[itemKey(VARIANT) ?? '']?.page, VARIANT)
 })
@@ -222,4 +224,32 @@ test('a mob page that is gone or no longer a mob leaves mobs.json', () => {
   const r = foldMobs(mobs, pages)
   assert.deepEqual([...r.byPage.keys()], ['Stays'])
   assert.deepEqual(r.removed, ['Megan OReilly', 'A kobold king'])
+})
+
+test('pages read but folded nowhere are counted by kind; the report names every skipped file', () => {
+  const pages: PageTexts = new Map([
+    ['Healing Water', '{{Classic Era}}\n{{Spellpagesmart\n|name=Healing Water\n}}'],
+    ['Old Name', '#REDIRECT [[New Name]]'],
+    ['Plane of Sky', 'quests by class'],
+    ['Bard', 'class prose'],
+    ['A Quest', 'steps\n[[Category:Cleric Quests]]'],
+    ['Some Zone', '{{Zonepage}}'],
+    ['Folded Item', '{{Itempage}}'],
+    ['Gone', null]
+  ])
+  const groups = unfolded(pages, new Set(['Folded Item']))
+  assert.deepEqual(Object.fromEntries(groups), {
+    spell: ['Healing Water'],
+    redirect: ['Old Name'],
+    'Plane of Sky': ['Plane of Sky'],
+    'class page': ['Bard'],
+    quest: ['A Quest'],
+    other: ['Some Zone']
+  })
+  const report = unfoldedReport(groups).join('\n')
+  assert.ok(report.startsWith('6 read pages folded into neither DB:'))
+  const skipped = ['spells', 'classes', 'quests', 'respawns', 'bosses', 'pageEra', 'posky']
+  for (const f of [...skipped, 'mobRaces', 'mobFactions']) assert.ok(report.includes(`/${f}.json`), f)
+  assert.ok(report.includes('`npm run scrape:spells` asks the wiki for current revids'))
+  assert.ok(!unfoldedReport(new Map()).join('\n').includes('Spell pages changed'))
 })

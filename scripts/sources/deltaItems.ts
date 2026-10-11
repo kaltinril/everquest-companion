@@ -42,8 +42,8 @@ function entryKeys(entry: ItemDbEntry): string[] {
 
 export interface ItemFold {
   items: Record<string, ItemDbEntry>
-  /** item pages folded */
-  folded: number
+  /** the item pages folded */
+  folded: string[]
   /** committed item pages that no longer read as an item */
   removed: string[]
   /** `|itemname`s whose key lost its last known claimant: fetch these titles and fold again */
@@ -76,7 +76,8 @@ export function foldItems(itemsFile: ItemDbFile, pages: PageTexts): ItemFold {
     for (const k of entryKeys(entry)) if (!affected.has(k)) affected.set(k, items.get(k))
   }
   const orphans = award(items, affected, claimantsByKey(pool.values()))
-  return { items: Object.fromEntries(items), folded: entries.length, removed: [...removed], orphans }
+  const folded = entries.map((e) => e.page)
+  return { items: Object.fromEntries(items), folded, removed: [...removed], orphans }
 }
 
 /** Every read page: its record, or null when it is no item page now (gone, redirect, stub). */

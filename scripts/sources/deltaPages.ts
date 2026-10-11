@@ -90,7 +90,7 @@ export function nextScrapedAt(prev: string, unapplied: string[], now: string): s
 
 export interface MobFold<T> {
   byPage: Map<string, T | { page: string }>
-  folded: number
+  folded: string[]
   /** committed mob pages that no longer read as a mob (gone, a redirect, template removed) */
   removed: string[]
 }
@@ -98,14 +98,76 @@ export interface MobFold<T> {
 /** Mobs: keyed by page over the committed list; a read page that is no mob now leaves it. */
 export function foldMobs<T extends { page: string }>(mobs: T[], pages: PageTexts): MobFold<T> {
   const byPage = new Map<string, T | { page: string }>(mobs.map((m) => [m.page, m]))
-  let folded = 0
+  const folded: string[] = []
   const removed: string[] = []
   for (const [title, wt] of pages) {
     const entry = wt != null && isMobPage(wt) ? parseMobPage(title, wt) : null
     if (entry) {
       byPage.set(title, entry)
-      folded++
+      folded.push(title)
     } else if (byPage.delete(title)) removed.push(title)
   }
   return { byPage, folded, removed }
+}
+
+/** The pages scrape-classes.ts reads. */
+const CLASS_PAGES = new Set([
+  'Bard', 'Beastlord', 'Berserker', 'Cleric', 'Druid', 'Enchanter', 'Magician', 'Monk',
+  'Necromancer', 'Paladin', 'Ranger', 'Rogue', 'Shadow Knight', 'Shaman', 'Warrior', 'Wizard',
+  'Character Classes', 'Alternate Advancement', 'Disciplines', 'Stances & Invocations'
+])
+
+export type UnfoldedKind = 'redirect' | 'Plane of Sky' | 'spell' | 'class page' | 'quest' | 'other'
+
+/** What a read page that folded into neither DB is, by the markers its own scraper keys on. */
+export function unfoldedKind(title: string, wikitext: string): UnfoldedKind {
+  if (/^\s*#REDIRECT/i.test(wikitext)) return 'redirect'
+  if (title.startsWith('Plane of Sky')) return 'Plane of Sky'
+  if (/\{\{\s*Spellpage(smart)?\b/i.test(wikitext)) return 'spell'
+  if (CLASS_PAGES.has(title)) return 'class page'
+  if (/\[\[\s*Category:[^\]]*Quests?\s*\]\]/i.test(wikitext)) return 'quest'
+  return 'other'
+}
+
+/** Every read page with content that is in `folded` for neither DB, grouped by kind. */
+export function unfolded(pages: PageTexts, folded: ReadonlySet<string>): Map<UnfoldedKind, string[]> {
+  const out = new Map<UnfoldedKind, string[]>()
+  for (const [title, wt] of pages) {
+    if (wt == null || folded.has(title)) continue
+    const kind = unfoldedKind(title, wt)
+    out.set(kind, [...(out.get(kind) ?? []), title])
+  }
+  return out
+}
+
+/** The committed wiki-derived files this delta does not touch, and what refreshes each. */
+const NOT_REFRESHED: [string, string][] = [
+  ['src/main/data/spells.json', 'npm run scrape:spells'],
+  ['src/main/data/classes.json', 'npm run scrape:classes'],
+  ['src/renderer/src/data/eqlegends/quests.json', 'npm run scrape:quests'],
+  ['src/main/data/respawns.json', 'npm run scrape:respawns'],
+  ['src/renderer/src/data/eqlegends/bosses.json', 'npm run scrape:bosses'],
+  ['src/main/data/pageEra.json', 'npm run scrape:page-era'],
+  ['src/renderer/src/data/eqlegends/posky.json', 'npm run scrape:posky'],
+  ['src/renderer/src/data/eqlegends/mobRaces.json', 'npx tsx scripts/gen-mob-races.mts'],
+  ['src/renderer/src/data/eqlegends/mobFactions.json', 'npx tsx scripts/gen-mob-factions.mts']
+]
+
+/** The closing report: what was read and folded nowhere, then what the delta never refreshes. */
+export function unfoldedReport(groups: Map<UnfoldedKind, string[]>): string[] {
+  const total = [...groups.values()].reduce((n, t) => n + t.length, 0)
+  const lines = total > 0 ? [`${total} read pages folded into neither DB:`] : []
+  const sorted = [...groups].sort((a, b) => b[1].length - a[1].length)
+  for (const [kind, titles] of sorted) {
+    lines.push(`  ${kind} (${titles.length}): ${titles.sort((a, b) => a.localeCompare(b)).join(' | ')}`)
+  }
+  lines.push('Not refreshed by the delta (committed, wiki-derived; where the build carries them):')
+  for (const [file, how] of NOT_REFRESHED) lines.push(`  ${file}  (${how})`)
+  if (groups.has('spell')) {
+    lines.push(
+      'Spell pages changed: `npm run scrape:spells` asks the wiki for current revids (50 per ' +
+        'request) and re-fetches content only for pages whose revid moved.'
+    )
+  }
+  return lines
 }
