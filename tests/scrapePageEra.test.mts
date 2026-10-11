@@ -5,7 +5,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { asRevBatch, categoryVerdicts, wikitextByRequested } from '../scripts/sources/pageEraBatch'
+import { answersSlice, asRevBatch, batchName, categoryVerdicts, wikitextByRequested } from '../scripts/sources/pageEraBatch'
 import type { PageEraFile } from '../src/main/pageEraDb'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
@@ -50,4 +50,20 @@ test('the categories fallback files a redirect under the title asked for', () =>
     redirects: [{ from: 'Fishing', to: 'Skill Fishing' }]
   }
   assert.deepEqual([...categoryVerdicts(['Fishing'], batch)], [['fishing', true]])
+})
+
+test('a batch file is named by every title in it, so a changed list never reuses a stale batch', () => {
+  assert.notEqual(batchName('meta', ['a goblin seer', 'Fishing']), batchName('meta', ['a goblin seer', 'Yaulp']))
+  assert.equal(batchName('meta', ['a goblin seer', 'Fishing']), batchName('meta', ['a goblin seer', 'Fishing']))
+})
+
+test('an older first-title-named batch is reused only when its rows are exactly the titles asked', () => {
+  const sidecar = JSON.parse(readFileSync(resolve(HERE, '../src/main/data/pageEra.json'), 'utf8')) as PageEraFile
+  const titles = Object.values(sidecar.pages).map((p) => p.title).sort((a, b) => a.localeCompare(b))
+  const read = (f: string): unknown => JSON.parse(readFileSync(resolve(CACHE, f), 'utf8'))
+  // The last run asked 153 spellings that fold to the sidecar's 151 keys; the 151-title file is an older list.
+  assert.equal(answersSlice(titles, read('meta-a-goblin-seer-153.json')), true)
+  assert.equal(answersSlice(titles, read('meta-a-goblin-seer-151.json')), false)
+  assert.equal(answersSlice(titles.slice(0, 50), read('target-a-goblin-seer-50.json')), true)
+  assert.equal(answersSlice(titles.slice(0, 50), read('target-Ornate-Chain-50.json')), false)
 })

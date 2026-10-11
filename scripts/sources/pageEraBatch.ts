@@ -1,4 +1,5 @@
 /** Batch helpers for scripts/scrape-page-era.ts, kept apart so they can be tested offline. */
+import { createHash } from 'crypto'
 import { pageEraKey } from '../../src/main/pageEraDb'
 import { eraBadge, namesEra } from '../../src/shared/planner/era'
 
@@ -20,7 +21,31 @@ export interface RevBatch<P = RevPage> {
   redirects?: TitleMap[]
 }
 
-const contentOf = (p: RevPage): string | undefined => p.revisions?.[0]?.slots?.main?.content
+const slugOf = (titles: readonly string[]): string => titles[0].replace(/[^A-Za-z0-9]+/g, '-').slice(0, 40)
+
+/** A file name only this exact title list can own: the first title for the eye, a hash of all. */
+export function batchName(prefix: string, titles: readonly string[]): string {
+  const hash = createHash('sha1').update(titles.join('\n')).digest('hex').slice(0, 12)
+  return `${prefix}-${slugOf(titles)}-${String(titles.length)}-${hash}.json`
+}
+
+/** The name batches had before the hash (first title + count): readable only via `answersSlice`. */
+export function legacyBatchName(prefix: string, titles: readonly string[]): string {
+  return `${prefix}-${slugOf(titles)}-${String(titles.length)}.json`
+}
+
+/** True when a legacy batch (a page array, or eqlmetadata rows) answers exactly the requested titles. */
+export function answersSlice(slice: readonly string[], cached: unknown): boolean {
+  const meta = (cached as { eqlmetadata?: { pages?: { requested?: string[] }[] } } | null)?.eqlmetadata?.pages
+  const got = Array.isArray(cached)
+    ? (cached as { title: string }[]).map((p) => p.title)
+    : meta?.flatMap((r) => r.requested ?? [])
+  if (got === undefined) return false
+  const keys = (ts: readonly string[]): string => [...new Set(ts.map(pageEraKey))].sort().join('\n')
+  return keys(got) === keys(slice)
+}
+
+const contentOf =(p: RevPage): string | undefined => p.revisions?.[0]?.slots?.main?.content
 
 /** The key of the page the API answered a requested title with, through normalization then redirect. */
 export function answeredKey(title: string, batch: Omit<RevBatch<unknown>, 'pages'>): string {

@@ -78,8 +78,11 @@ import { eraBadge, layeredVerdict } from '../src/shared/planner/era'
 import type { SpellDbFile } from '../src/shared/types'
 import { isMain } from './sources/isMain'
 import {
+  answersSlice,
   asRevBatch,
+  batchName,
   categoryVerdicts,
+  legacyBatchName,
   wikitextByRequested,
   type CatPage,
   type RevBatch,
@@ -202,10 +205,12 @@ function writeCache(name: string, data: unknown): void {
   writeFileSync(resolve(CACHE_DIR, name), JSON.stringify(data), 'utf8')
 }
 
-/** A file name a title list can own: the batch's first title, folded to something a disk likes. */
-function batchName(prefix: string, titles: readonly string[]): string {
-  const slug = titles[0].replace(/[^A-Za-z0-9]+/g, '-').slice(0, 40)
-  return `${prefix}-${slug}-${String(titles.length)}.json`
+/** This exact slice's cached batch: its hashed file, else an older-named file that proves it is this slice. */
+function readBatch(prefix: string, slice: readonly string[]): unknown {
+  const cached = readCache(batchName(prefix, slice))
+  if (cached !== null) return cached
+  const legacy = readCache(legacyBatchName(prefix, slice))
+  return answersSlice(slice, legacy) ? legacy : null
 }
 
 // ---- step 1: which corpus pages are still silent, and what do their notes link -----------------
@@ -237,7 +242,7 @@ async function fetchWikitext(titles: readonly string[], prefix: string): Promise
   for (let i = 0; i < titles.length; i += TITLE_BATCH) {
     const slice = titles.slice(i, i + TITLE_BATCH)
     const file = batchName(prefix, slice)
-    let batch = asRevBatch(readCache(file))
+    let batch = asRevBatch(readBatch(prefix, slice))
     if (batch === null) {
       // redirects=1: a redirect's era is its target's, resolved in this same request.
       const j = await api<{ query?: Partial<RevBatch> }>({
@@ -339,7 +344,7 @@ async function fetchMetadata(titles: readonly string[]): Promise<Map<string, boo
   for (let i = 0; i < titles.length; i += META_BATCH) {
     const slice = titles.slice(i, i + META_BATCH)
     const file = batchName('meta', slice)
-    let j = readCache(file) as MetaResponse | null
+    let j = readBatch('meta', slice) as MetaResponse | null
     if (j === null) {
       j = await api<MetaResponse>({ action: 'eqlmetadata', titles: slice.join('|') }, 'POST')
       writeCache(file, j)
@@ -372,7 +377,7 @@ async function fetchCategories(titles: readonly string[]): Promise<Map<string, b
   for (let i = 0; i < titles.length; i += TITLE_BATCH) {
     const slice = titles.slice(i, i + TITLE_BATCH)
     const file = batchName('cats', slice)
-    let batch = asRevBatch<CatPage>(readCache(file))
+    let batch = asRevBatch<CatPage>(readBatch('cats', slice))
     if (batch === null) {
       const j = await api<{ query?: Partial<RevBatch<CatPage>> }>({
         action: 'query',
