@@ -439,7 +439,8 @@ export function parseSpell(title: string, fields: Record<string, string>): Spell
   const name = spellName(title, clean(fields.spellname)).name
   const durationText = clean(fields.duration)
   const castRaw = clean(fields.casting_time)
-  const castSec = castRaw ? parseFloat(castRaw) : NaN
+  // `casting_time = Instant` (song/proc pages) is a stated zero, not an absent field.
+  const castSec = castRaw && /^instant$/i.test(castRaw) ? 0 : castRaw ? parseFloat(castRaw) : NaN
   // Schema 3: the re-use timer, read exactly the way casting_time is. The template writes
   // `recast_time = 1.50 sec`; a page that omits the field stays absent, never 0.
   const recastRaw = clean(fields.recast_time)

@@ -45,3 +45,10 @@ test('the page title names the spell unless it differs from |spellname only by a
   assert.deepEqual(spellName('Skin like Diamond', 'Skin Like Diamond'), { name: 'Skin Like Diamond', disagrees: false })
   assert.deepEqual(spellName('Bryrym', undefined), { name: 'Bryrym', disagrees: false })
 })
+
+test('casting_time = Instant reads as a zero cast time, not an absent one', () => {
+  const f = parseSpellpageFields('{{Spellpage\n| spellname = Brass Resonance 14\n| casting_time = Instant\n| mana = 0\n}}')
+  assert.equal(parseSpell('Brass Resonance 14', f).castTimeMs, 0)
+  const g = parseSpellpageFields('{{Spellpage\n| spellname = Healing\n| casting_time = 2.5\n| mana = 10\n}}')
+  assert.equal(parseSpell('Healing', g).castTimeMs, 2500)
+})
