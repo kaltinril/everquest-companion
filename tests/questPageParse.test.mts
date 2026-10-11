@@ -69,3 +69,8 @@ test('{{Experience}} marks an experience reward like {{exp}} does', () => {
   assert.equal(parseQuestPage('Brain Bite (Evil)', '== Reward ==\n{{Experience}}\n', isItem).expReward, true)
   assert.equal(parseQuestPage('No exp', '== Reward ==\n{{Expand}}\n', isItem).expReward, false)
 })
+
+test('an {{:UNKNOWN}} or {{:None}} placeholder box is not a reward', () => {
+  const q = parseQuestPage('Placeholder', '== Reward ==\n{{:UNKNOWN}}\n{{:none}}\n{{:Harvester}}\n', isItem)
+  assert.deepEqual(q.rewards, ['Harvester'])
+})

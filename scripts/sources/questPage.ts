@@ -60,6 +60,8 @@ export interface ParsedQuestPage extends QuestTopTable {
 
 const TOP_TABLE_RE = /\{\|[^\n]*questTopTable[^\n]*\n([\s\S]*?)\n\|\}/i
 const NAMESPACED = /^(file|image|category|template|help|user|special|talk|media|mediawiki)\s*:/i
+/** `{{:UNKNOWN}}`-style boxes an editor left where the item is not yet known. */
+const PLACEHOLDER = /^(unknown|none|n\/?a|tbd)$/i
 
 /** [[Page|Label]] → Label, [[Page]] → Page, then drop templates/html/quotes. */
 export function stripMarkup(v: string): string {
@@ -93,7 +95,7 @@ export function transclusionTargets(text: string): string[] {
   let m: RegExpExecArray | null
   while ((m = re.exec(text)) !== null) {
     const t = m[1].replace(/_/g, ' ').trim()
-    if (t && !NAMESPACED.test(t)) out.push(t)
+    if (t && !NAMESPACED.test(t) && !PLACEHOLDER.test(t)) out.push(t)
   }
   return out
 }
