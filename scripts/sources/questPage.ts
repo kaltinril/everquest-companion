@@ -62,10 +62,14 @@ export interface ParsedQuestPage extends QuestTopTable {
   disambiguation: boolean
   /** true when the page has a questTopTable header block */
   hasTopTable: boolean
+  /** true when a page without a header pulls in other pages' sections ({{#lsth:...}}) */
+  sectionHub: boolean
 }
 
 const TOP_TABLE_RE = /\{\|[^\n]*questTopTable[^\n]*\n([\s\S]*?)\n\|\}/i
 const NAMESPACED = /^(file|image|category|template|help|user|special|talk|media|mediawiki)\s*:/i
+/** `{{:UNKNOWN}}`-style boxes an editor left where the item is not yet known. */
+const PLACEHOLDER = /^(unknown|none|n\/?a|tbd)$/i
 
 /** [[Page|Label]] → Label, [[Page]] → Page, then drop templates/html/quotes. */
 export function stripMarkup(v: string): string {
@@ -85,7 +89,7 @@ export function linkTargets(text: string): string[] {
   const re = /\[\[\s*([^\]|#<>{}]+?)\s*(?:\|[^\]]*)?\]\]/g
   let m: RegExpExecArray | null
   while ((m = re.exec(text)) !== null) {
-    const t = m[1].trim()
+    const t = m[1].replace(/_/g, ' ').trim()
     if (!t || NAMESPACED.test(t)) continue
     out.push(t)
   }
@@ -98,10 +102,24 @@ export function transclusionTargets(text: string): string[] {
   const re = /\{\{:\s*([^}|\n]+?)\s*(?:\|[^}]*)?\}\}/g
   let m: RegExpExecArray | null
   while ((m = re.exec(text)) !== null) {
-    const t = m[1].trim()
-    if (t && !NAMESPACED.test(t)) out.push(t)
+    const t = m[1].replace(/_/g, ' ').trim()
+    if (t && !NAMESPACED.test(t) && !PLACEHOLDER.test(t)) out.push(t)
   }
   return out
+}
+
+/** Positional params of every `{{Gear Set|A|B|...}}` (a quest's armor-set reward list). */
+export function gearSetItems(text: string): string[] {
+  const out: string[] = []
+  for (const m of text.matchAll(/\{\{\s*gear set\s*\|([^{}]*)\}\}/gi)) {
+    for (const p of m[1].split('|')) if (p.trim() && !p.includes('=')) out.push(p.trim())
+  }
+  return out
+}
+
+/** A page name's lookup key: case-folded, `_` read as a space (as MediaWiki does). */
+export function titleKey(name: string): string {
+  return name.toLowerCase().replace(/[\s_]+/g, ' ').trim()
 }
 
 /** Case-insensitive de-dupe that keeps first-seen order and spelling. */
@@ -109,7 +127,7 @@ export function dedupe(names: Iterable<string>): string[] {
   const seen = new Set<string>()
   const out: string[] = []
   for (const n of names) {
-    const k = n.toLowerCase().replace(/\s+/g, ' ').trim()
+    const k = titleKey(n)
     if (!k || seen.has(k)) continue
     seen.add(k)
     out.push(n.replace(/\s+/g, ' ').trim())
@@ -184,7 +202,8 @@ export function parseTopTable(wikitext: string): QuestTopTable | null {
     }
     return ''
   }
-  const minText = cellText(pick('minimum level', 'min level', 'level'))
+  // Not a bare 'level' fallback: that reads 'Recommended Level' as a minimum.
+  const minText = cellText(pick('minimum level', 'min level'))
   const minNum = minText ? Number(/(\d+)/.exec(minText)?.[1]) : NaN
 
   return {
@@ -210,9 +229,10 @@ export function splitSections(wikitext: string): { lead: string; sections: WikiS
   const lead: string[] = []
   let cur: WikiSection | null = null
   for (const line of lines) {
-    const h = /^\s*={2,6}\s*(.+?)\s*={2,6}\s*$/.exec(line)
+    // A template may follow the closing == on the same line (`== Checklist =={{CheckboxList}}`).
+    const h = /^\s*={2,6}\s*(.+?)\s*={2,6}\s*((?:\{\{[^{}]*\}\}\s*)*)$/.exec(line)
     if (h) {
-      cur = { heading: h[1].trim(), text: '' }
+      cur = { heading: h[1].trim(), text: h[2] ? h[2] + '\n' : '' }
       sections.push(cur)
       continue
     }
@@ -222,8 +242,14 @@ export function splitSections(wikitext: string): { lead: string; sections: WikiS
   return { lead: lead.join('\n'), sections }
 }
 
-const REWARD_HEADING = /^rewards?\b/i
-const EXP_MARKER = /\{\{\s*(yougainexperience|exp)\s*\}\}|you gain experience/i
+// 'Reward', 'Possible Rewards', 'Additional Rewards'; a mixed 'Rewards and Walkthrough'
+// section names its turn-ins in prose, so it reads as body.
+const REWARD_HEADING = /^(?!.*\bwalkthrough\b).*\brewards?\b/i
+const EXP_MARKER = /\{\{\s*(yougainexperience|exp|experience)\s*\}\}|you gain experience/i
+
+function isSectionHub(top: QuestTopTable | null, wikitext: string): boolean {
+  return top === null && /\{\{\s*#lsth\s*:/i.test(wikitext)
+}
 
 /**
  * THE FACTION RECEIPT LINES (measured against the cached corpus, 2026-09-05: 755 of 933 cached
@@ -315,11 +341,13 @@ export function parseQuestPage(
 
   // Rewards: a `{{:Name}}` box is always an item; a plain link only counts when the
   // title is a known item page (Reward sections also link factions, zones and coin).
+  // Gear Set is only ever a reward list, read page-wide since it can sit under a sub-heading.
   const rewards = dedupe([
     ...transclusionTargets(rewardText),
-    ...linkTargets(rewardText).filter(isItem)
+    ...linkTargets(rewardText).filter(isItem),
+    ...gearSetItems(wikitext).filter(isItem)
   ])
-  const rewardKeys = new Set(rewards.map((r) => r.toLowerCase()))
+  const rewardKeys = new Set(rewards.map(titleKey))
 
   // Required/turn-in items: item references anywhere OUTSIDE the Reward section. Unlike the
   // Reward section (which only ever holds item boxes), the body transcludes mob/zone boxes
@@ -327,7 +355,7 @@ export function parseQuestPage(
   const requiredItems = dedupe([
     ...transclusionTargets(bodyText).filter(isItem),
     ...linkTargets(bodyText).filter(isItem)
-  ]).filter((n) => !rewardKeys.has(n.toLowerCase()))
+  ]).filter((n) => !rewardKeys.has(titleKey(n)))
 
   return {
     page,
@@ -344,7 +372,8 @@ export function parseQuestPage(
     factions: parseFactionHits(wikitext),
     ...coinField(wikitext),
     disambiguation: /\{\{\s*disambig/i.test(wikitext),
-    hasTopTable: top !== null
+    hasTopTable: top !== null,
+    sectionHub: isSectionHub(top, wikitext)
   }
 }
 
