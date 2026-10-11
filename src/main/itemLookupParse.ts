@@ -742,7 +742,7 @@ export function parsePageEraTag(wikitext: string): string | undefined {
  * page's, duplicates removed.
  */
 /** The namespaces eqlwiki's own `eraFilter` skips before it asks about a link target. */
-const EXCLUDED_NS = /^(File|Image|Category|Template|Special|Help|MediaWiki|User|Talk|Media|Portal)\s*:/i
+export const EXCLUDED_NS = /^(File|Image|Category|Template|Special|Help|MediaWiki|User|Talk|Media|Portal)\s*:/i
 
 export function notesLinkTargets(wikitext: string): string[] {
   const notes = templateField(wikitext, 'notes')
