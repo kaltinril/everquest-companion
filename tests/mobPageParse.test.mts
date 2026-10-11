@@ -2,7 +2,8 @@
 // cached wiki corpus. Fixtures are trimmed copies of the pages they are named after.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { parseMobLoot } from '../src/main/mobLookupParse'
+import { parseMobLoot, parseMobWikitext } from '../src/main/mobLookupParse'
+import { parseMobPage } from '../scripts/sources/mobPage'
 
 test('known_loot written as [[Item]] links is read as drops (A Blood Wolf, Gnawfang)', () => {
   const wolf = '* [[Chunk of Meat]]\n* [[Mist Wolf Pelt]]\n* [[Ruined Wolf Pelt]]\n* [[Wolf Meat]]'
@@ -31,4 +32,19 @@ test('a link inside a note is not a drop, and a quoted scroll name is not a rari
   const drops = parseMobLoot(block)
   assert.deepEqual(drops.map((d) => d.item), ['Cloak of Leaves', 'Illegible Scroll'])
   assert.equal(drops[1].rarity, undefined)
+})
+
+test('zones separated by <br>, newlines or side-by-side links stay separate (A Tottering Gorilla, A Treant)', () => {
+  const page = (zone: string): string => `{{Namedmobpage\n| name = x\n| zone = ${zone}\n| level = 10\n}}`
+  assert.deepEqual(parseMobPage('A Tottering Gorilla', page('[[Burning Woods]]<br>[[Emerald Jungle]]'))?.zones, ['Burning Woods', 'Emerald Jungle'])
+  assert.deepEqual(parseMobPage('A Treant', page('[[Eastern Plains of Karana]] [[Western Plains of Karana]]'))?.zones, [
+    'Eastern Plains of Karana',
+    'Western Plains of Karana'
+  ])
+  assert.deepEqual(parseMobPage('A Black Wolf', page('[[East Commonlands]]\n[[East Karana]]\n[[The Feerrott]]'))?.zones, [
+    'East Commonlands',
+    'East Karana',
+    'The Feerrott'
+  ])
+  assert.equal(parseMobWikitext(page('[[Burning Woods]]<br>[[Emerald Jungle]]')).zone, 'Burning Woods, Emerald Jungle')
 })

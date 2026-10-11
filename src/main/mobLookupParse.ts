@@ -199,6 +199,9 @@ export function parseMobLocations(field: string): MobLoc[] {
   return out
 }
 
+/** Zone separators in a raw `|zone`: `<br>`, a newline, or two links side by side. */
+const ZONE_SEP_RE = /<br\s*\/?>|\n|(?<=\]\])\s*(?=\[\[)/i
+
 /** What a mob page states. Every field is optional — absent means "the page didn't say". */
 export interface MobPageFacts {
   /** the page's own `|name` value, for the identity check on a non-exact search hit */
@@ -227,7 +230,8 @@ export function parseMobWikitext(wikitext: string): MobPageFacts {
   }
   const zone = templateField(wikitext, 'zone')
   if (zone) {
-    const t = unlink(zone)
+    // Split BEFORE unlinking: `unlink` drops `<br>`, gluing `[[Burning Woods]]<br>[[Emerald Jungle]]`.
+    const t = zone.split(ZONE_SEP_RE).map(unlink).filter(Boolean).join(', ')
     if (t) out.zone = t
   }
   const loot = templateField(wikitext, 'known_loot')
