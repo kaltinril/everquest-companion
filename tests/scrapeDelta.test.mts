@@ -21,6 +21,7 @@ import {
   readRevPages,
   type PageTexts,
   type RcRow,
+  type RevPage,
   unfolded,
   unfoldedReport
 } from '../scripts/sources/deltaPages'
@@ -167,7 +168,7 @@ test('recentchanges rows: edits are re-read, and so is every title a log row nam
   ])
 })
 
-test('an edited page moved since is read by pageid under its current title; its old title goes', () => {
+test('an edited page moved since is read by pageid, under its current title', () => {
   // mobs.json kept 'Megan OReilly' after the wiki page (40178) moved to 'Megan O`Reilly'.
   const feed = emptyFeed()
   foldRcRow({ type: 'edit', title: 'Megan OReilly', pageid: 40178 }, feed)
@@ -177,11 +178,12 @@ test('an edited page moved since is read by pageid under its current title; its 
   const unapplied: string[] = []
   const mob = '{{Namedmobpage\n|name=Megan O`Reilly\n|zone=[[Qeynos]]\n}}'
   const current = { pageid: 40178, ns: 0, title: 'Megan O`Reilly' }
-  readRevPages([{ ...current, revisions: [{ slots: { main: { content: mob } } }] }], pages, unapplied)
+  const rev = (content: string): RevPage['revisions'] => [{ slots: { main: { content } } }]
+  readRevPages([{ ...current, revisions: rev(mob) }], pages, unapplied)
   const byTitle = [...feed.titles].filter((t) => !pages.has(t))
   assert.deepEqual(byTitle, ['Megan OReilly'])
   const redirect = '#REDIRECT [[Megan O`Reilly]]'
-  readRevPages([{ title: 'Megan OReilly', ns: 0, revisions: [{ slots: { main: { content: redirect } } }] }], pages, unapplied)
+  readRevPages([{ title: 'Megan OReilly', ns: 0, revisions: rev(redirect) }], pages, unapplied)
   const r = foldMobs([{ page: 'Megan OReilly' }], pages)
   assert.deepEqual([...r.byPage.keys()], ['Megan O`Reilly'])
   assert.deepEqual(r.removed, ['Megan OReilly'])
@@ -190,7 +192,8 @@ test('an edited page moved since is read by pageid under its current title; its 
 test('a pageid that is gone or a page moved out of ns0 is left to its log row', () => {
   const pages: PageTexts = new Map()
   const unapplied: string[] = []
-  readRevPages([{ missing: true }, { title: 'User:Someone/Sandbox', ns: 2, revisions: [] }], pages, unapplied)
+  const userPage = { title: 'User:Someone/Sandbox', ns: 2, revisions: [] }
+  readRevPages([{ missing: true }, userPage], pages, unapplied)
   assert.equal(pages.size, 0)
   assert.deepEqual(unapplied, [])
 })
@@ -236,7 +239,7 @@ test('a mob page that is gone or no longer a mob leaves mobs.json', () => {
   assert.deepEqual(r.removed, ['Megan OReilly', 'A kobold king'])
 })
 
-test('pages read but folded nowhere are counted by kind; the report names every skipped file', () => {
+test('pages folded nowhere are counted by kind; the report names every skipped file', () => {
   const pages: PageTexts = new Map([
     ['Healing Water', '{{Classic Era}}\n{{Spellpagesmart\n|name=Healing Water\n}}'],
     ['Old Name', '#REDIRECT [[New Name]]'],
@@ -259,7 +262,9 @@ test('pages read but folded nowhere are counted by kind; the report names every 
   const report = unfoldedReport(groups).join('\n')
   assert.ok(report.startsWith('6 read pages folded into neither DB:'))
   const skipped = ['spells', 'classes', 'quests', 'respawns', 'bosses', 'pageEra', 'posky']
-  for (const f of [...skipped, 'mobRaces', 'mobFactions']) assert.ok(report.includes(`/${f}.json`), f)
+  for (const f of [...skipped, 'mobRaces', 'mobFactions']) {
+    assert.ok(report.includes(`/${f}.json`), f)
+  }
   assert.ok(report.includes('`npm run scrape:spells` asks the wiki for current revids'))
   assert.ok(!unfoldedReport(new Map()).join('\n').includes('Spell pages changed'))
 })
@@ -271,7 +276,7 @@ const cached = (pageid: number, title: string, content: string): CachedPage => (
   revisions: [{ slots: { main: { content } } }]
 })
 
-test('item-cache batches: a fresh page replaces its copy by pageid, new item pages go to a delta batch', () => {
+test('item cache: a page replaces its copy by pageid, a new item page goes to the delta batch', () => {
   const batches = new Map<string, CachedPage[]>([
     ['batch-1-2.json', [cached(1, 'Megan OReilly', 'old'), cached(2, 'Gone Page', 'old')]],
     ['batch-3-1.json', [cached(3, 'Untouched', 'old')]]
@@ -301,8 +306,12 @@ test('the caches on disk: batches rewritten, a mob page file and its index title
     writeFileSync(join(items, 'batch-1-1.json'), JSON.stringify([cached(1, 'Old', 'old')]))
     writeFileSync(join(items, 'item-pages.json'), '[]')
     writeFileSync(join(mobs, 'page-1.wikitext'), 'old')
-    writeFileSync(join(mobs, 'mob-pages.json'), JSON.stringify([{ pageid: 1, ns: 0, title: 'Old' }]))
-    const fresh = [{ pageid: 1, title: 'New', content: 'new' }, { pageid: 2, title: 'X', content: 'x' }]
+    const member = { pageid: 1, ns: 0, title: 'Old' }
+    writeFileSync(join(mobs, 'mob-pages.json'), JSON.stringify([member]))
+    const fresh = [
+      { pageid: 1, title: 'New', content: 'new' },
+      { pageid: 2, title: 'X', content: 'x' }
+    ]
     assert.equal(writeItemCache(items, { fresh, gone: new Set(), keep: new Set() }), 1)
     const batch = JSON.parse(readFileSync(join(items, 'batch-1-1.json'), 'utf8')) as CachedPage[]
     assert.deepEqual(batch, [cached(1, 'New', 'new')])

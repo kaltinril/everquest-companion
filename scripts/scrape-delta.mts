@@ -14,8 +14,8 @@
 // leaves the DB. A page that could not be read keeps scrapedAt where it was.
 //
 // This file deliberately does not touch the full scrapers: importing scrape-items.ts would run
-// its main, so its three tiny page->record helpers are mirrored in sources/deltaItems.ts — the real
-// parsing lives in src/main/itemLookupParse.ts and scripts/sources/mobPage.ts and is imported.
+// its main, so its three tiny page->record helpers are mirrored in sources/deltaItems.ts — the
+// real parsing lives in src/main/itemLookupParse.ts and scripts/sources/mobPage.ts and is imported.
 //
 // After a run that changed anything: `npm run gen:data-weight` (the ledger pins exact bytes).
 
@@ -239,7 +239,11 @@ async function readAndFoldItems(
   return { reads, itemFold }
 }
 
-async function applyDelta(itemsFile: ItemDbFile, mobsFile: MobsFile, feed: FeedChanges): Promise<void> {
+async function applyDelta(
+  itemsFile: ItemDbFile,
+  mobsFile: MobsFile,
+  feed: FeedChanges
+): Promise<void> {
   const { reads, itemFold } = await readAndFoldItems(itemsFile, feed)
   const { pages, unapplied } = reads
   const now = new Date().toISOString()
@@ -284,10 +288,12 @@ function writeBackCaches(reads: Reads, keep: ReadonlySet<string>): void {
   const gone = new Set([...reads.pages].filter(([, wt]) => wt === null).map(([t]) => t))
   const absent: string[] = []
   if (existsSync(ITEM_CACHE)) {
-    console.log(`Item cache: ${writeItemCache(ITEM_CACHE, { fresh, gone, keep })} batch files updated`)
+    const files = writeItemCache(ITEM_CACHE, { fresh, gone, keep })
+    console.log(`Item cache: ${files} batch files updated`)
   } else absent.push('scripts/sources/cache/items')
-  if (existsSync(MOB_CACHE)) console.log(`Mob cache: ${writeMobCache(MOB_CACHE, fresh)} pages updated`)
-  else absent.push('scripts/sources/cache/mobs')
+  if (existsSync(MOB_CACHE)) {
+    console.log(`Mob cache: ${writeMobCache(MOB_CACHE, fresh)} pages updated`)
+  } else absent.push('scripts/sources/cache/mobs')
   if (absent.length === 0) return
   console.log(
     `No ${absent.join(' or ')} in this checkout, so it was not refreshed: scrape-page-era.ts, ` +
@@ -297,7 +303,8 @@ function writeBackCaches(reads: Reads, keep: ReadonlySet<string>): void {
 }
 
 function deltaSource(source: string): string {
-  return source.includes('delta') ? source : `${source} + recentchanges delta (scripts/scrape-delta.mts)`
+  if (source.includes('delta')) return source
+  return `${source} + recentchanges delta (scripts/scrape-delta.mts)`
 }
 
 /** Write beside, then rename: an interrupted run never leaves a truncated committed DB. */

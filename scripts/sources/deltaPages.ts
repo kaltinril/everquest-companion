@@ -139,7 +139,10 @@ export function unfoldedKind(title: string, wikitext: string): UnfoldedKind {
 }
 
 /** Every read page with content that is in `folded` for neither DB, grouped by kind. */
-export function unfolded(pages: PageTexts, folded: ReadonlySet<string>): Map<UnfoldedKind, string[]> {
+export function unfolded(
+  pages: PageTexts,
+  folded: ReadonlySet<string>
+): Map<UnfoldedKind, string[]> {
   const out = new Map<UnfoldedKind, string[]>()
   for (const [title, wt] of pages) {
     if (wt == null || folded.has(title)) continue
@@ -168,7 +171,8 @@ export function unfoldedReport(groups: Map<UnfoldedKind, string[]>): string[] {
   const lines = total > 0 ? [`${total} read pages folded into neither DB:`] : []
   const sorted = [...groups].sort((a, b) => b[1].length - a[1].length)
   for (const [kind, titles] of sorted) {
-    lines.push(`  ${kind} (${titles.length}): ${titles.sort((a, b) => a.localeCompare(b)).join(' | ')}`)
+    const sortedTitles = [...titles].sort((a, b) => a.localeCompare(b))
+    lines.push(`  ${kind} (${titles.length}): ${sortedTitles.join(' | ')}`)
   }
   lines.push('Not refreshed by the delta (committed, wiki-derived; where the build carries them):')
   for (const [file, how] of NOT_REFRESHED) lines.push(`  ${file}  (${how})`)

@@ -44,7 +44,10 @@ const asCached = (p: FreshPage): CachedPage => ({
  * Each page stays in exactly one file, so no reader depends on file order. Returns the files
  * that changed.
  */
-export function patchItemBatches(batches: Map<string, CachedPage[]>, change: CacheChange): string[] {
+export function patchItemBatches(
+  batches: Map<string, CachedPage[]>,
+  change: CacheChange
+): string[] {
   const dirty = new Set<string>()
   const where = new Map<number, [string, number]>()
   for (const [file, pages] of batches) {
