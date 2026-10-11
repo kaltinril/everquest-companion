@@ -374,26 +374,35 @@ async function attachItemStats(all: PoskyQuest[]): Promise<void> {
   console.log(`Attached stats for ${statByPage.size}/${pages.size} items.`)
 }
 
-async function scrape(): Promise<PoskyData> {
+/**
+ * Every class's quests off the main page's parsed HTML. A class with none is a parser that stopped
+ * matching its block, so it throws before any item request and before posky.json is written.
+ */
+export function parseClasses(mainHtml: string, classes: readonly string[] = CLASSES): PoskyQuest[] {
+  const $main = cheerio.load(mainHtml)
   const all: PoskyQuest[] = []
-
-  // The main "Plane of Sky" page's compact per-class table is the authoritative
-  // source: quest name, giver, trigger, wind rune, required items, and reward.
-  // (The dedicated "<Class> Plane of Sky Tests" pages carry stale/older data and
-  // are intentionally NOT used.)
-  const mainHtml = await fetchParsedHtml('Plane of Sky')
-  const $main = mainHtml ? cheerio.load(mainHtml) : null
-  if (!$main) throw new Error('Could not fetch the Plane of Sky page.')
-
-  for (const cls of CLASSES) {
+  const empty: string[] = []
+  for (const cls of classes) {
     const quests = parseMainPageClass($main, cls, 'Plane of Sky')
     foldRuneItems(quests)
 
     const items = quests.reduce((s, q) => s + q.items.length, 0)
     if (quests.length) console.log(`  ✓ ${cls}: ${quests.length} quests, ${items} items`)
-    else console.warn(`  ! ${cls}: no quests found`)
+    else empty.push(cls)
     all.push(...quests)
   }
+  if (empty.length) throw new Error(`Refusing to write: no quests found for ${empty.join(', ')}`)
+  return all
+}
+
+async function scrape(): Promise<PoskyData> {
+  // The main "Plane of Sky" page's compact per-class table is the authoritative
+  // source: quest name, giver, trigger, wind rune, required items, and reward.
+  // (The dedicated "<Class> Plane of Sky Tests" pages carry stale/older data and
+  // are intentionally NOT used.)
+  const mainHtml = await fetchParsedHtml('Plane of Sky')
+  if (!mainHtml) throw new Error('Could not fetch the Plane of Sky page.')
+  const all = parseClasses(mainHtml)
 
   await attachItemStats(all)
 
