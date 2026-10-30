@@ -111,7 +111,7 @@ function RingSliders({
           max={MAX_RING_SIZE_PX}
           step={2}
           value={prefs.sizePx}
-          onChange={(_e, v) => onChange({ sizePx: v as number })}
+          onChange={(_e, v) => onChange({ sizePx: v })}
           sx={{ width: 160 }}
         />
       </Stack>
@@ -126,7 +126,7 @@ function RingSliders({
           max={MAX_RING_THICKNESS_PX}
           step={1}
           value={prefs.thicknessPx}
-          onChange={(_e, v) => onChange({ thicknessPx: v as number })}
+          onChange={(_e, v) => onChange({ thicknessPx: v })}
           sx={{ width: 160 }}
         />
       </Stack>

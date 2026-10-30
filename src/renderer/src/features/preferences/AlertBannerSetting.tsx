@@ -115,7 +115,7 @@ function BannerKnobs({
           disabled={disabled}
           data-testid="pref-banner-hold"
           value={cfg.holdMs}
-          onChange={(e) => onChange({ holdMs: Number(e.target.value) })}
+          onChange={(e) => onChange({ holdMs: e.target.value })}
         >
           {HOLD_CHOICES_SEC.map((sec) => (
             <MenuItem key={sec} value={sec * 1000}>
@@ -133,7 +133,7 @@ function BannerKnobs({
           disabled={disabled}
           data-testid="pref-banner-lines"
           value={cfg.maxLines}
-          onChange={(e) => onChange({ maxLines: Number(e.target.value) })}
+          onChange={(e) => onChange({ maxLines: e.target.value })}
         >
           {LINE_CHOICES.map((n) => (
             <MenuItem key={n} value={n}>

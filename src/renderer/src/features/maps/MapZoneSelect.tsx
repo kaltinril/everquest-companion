@@ -19,7 +19,7 @@
 // (`zoneFollow.ts`), the toolbar STATES which mode is in force right beside this control, and
 // `Current zone` is the labelled way back to following the log.
 
-import type { HTMLAttributes, JSX } from 'react'
+import type { HTMLAttributes, JSX, Key } from 'react'
 import { Autocomplete, Stack, TextField, Typography } from '@mui/material'
 import type { ZoneShort } from '@shared/maps'
 import { filterZones, zoneLabel, zoneOptions } from './zoneOptions'
@@ -28,7 +28,7 @@ import { filterZones, zoneLabel, zoneOptions } from './zoneOptions'
 const SELECT_W = 232
 
 /** What MUI hands `renderOption`, with its `any`-typed `key` pinned to what it actually is. */
-type OptionProps = HTMLAttributes<HTMLLIElement> & { key: string }
+type OptionProps = HTMLAttributes<HTMLLIElement> & { key: Key }
 
 export interface ZoneSelectProps {
   /** Every stem any installed pack provides, ascending. */
