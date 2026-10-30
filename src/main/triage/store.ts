@@ -97,7 +97,7 @@ const STACK_FILE = join(TRIAGE_DIR, 'stack.json')
  * and every bigint in this schema is an epoch-millisecond or a byte count that the
  * shared contract types as `number`.
  */
-types.setTypeParser(20, (value: string): number => Number(value))
+types.setTypeParser(types.builtins.INT8, (value: string): number => Number(value))
 
 export interface Stack {
   region: string
@@ -353,7 +353,7 @@ export async function applySchema(c: Clients, sql: string): Promise<MigrateStep[
     } catch (err) {
       const code = sqlState(err)
       if (code === null || !ALREADY_EXISTS.has(code)) {
-        throw new Error(`${String(err)}\n\nwhile applying:\n${statement}`)
+        throw new Error(`${String(err)}\n\nwhile applying:\n${statement}`, { cause: err })
       }
       steps.push({ sql: statement, status: 'exists' })
     }
