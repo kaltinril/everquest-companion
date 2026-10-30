@@ -106,7 +106,7 @@ export default function MapLocField({ marker, onPlace, onShow, onClear }: MapLoc
           variant="outlined"
           icon={<PlaceIcon />}
           data-testid="maps-loc-chip"
-          title="The location you entered. Click to centre on it; ✕ to remove it."
+          title="Your last /loc, typed or logged. Click to centre on it; ✕ to remove it."
           label={formatLoc(marker)}
           onClick={onShow}
           onDelete={onClear}

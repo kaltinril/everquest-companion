@@ -56,11 +56,13 @@ import {
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import PlaceIcon from '@mui/icons-material/Place'
+import { mobKey } from '@shared/mobKey'
 import { jumpTarget, type CrossZoneRow, type JumpTarget } from './crossZone'
 // A row's caption and its page door live next door (the file is at the line ceiling).
 import { WithPageDoor, WithRowActions, rowCaption, type RowActions } from './MapMobPaneRow'
 import { MapTrackedSection } from './MapTrackedSection'
 import type { ZoneTrack } from './useZoneTrack'
+import type { CrawlMode } from './useCrawlMode'
 import {
   MAX_PINS,
   isLocatable,
@@ -106,6 +108,8 @@ export interface MapMobPaneProps {
   pinsCapped: boolean
   /** The track list for this map, the /waypoint copy, and the centring a tracked row's click does. */
   track: ZoneTrack
+  /** Crawl mode's switch and the mobs killed this visit, whose rows are dimmed. */
+  crawl: CrawlMode
   onCopy: RowActions['onCopy']
   onCenter: (x: number, y: number) => void
   onClose: () => void
@@ -135,6 +139,7 @@ function Row({
   row,
   selected,
   wished,
+  crawled,
   actions,
   onSelect,
   onOpenMob,
@@ -143,6 +148,8 @@ function Row({
   row: MapPaneRow
   selected: boolean
   wished?: readonly string[]
+  /** Crawl mode: you killed this mob on this visit, so the row is dimmed. */
+  crawled: boolean
   actions: RowActions
   onSelect: (row: MapPaneRow) => void
   onOpenMob?: ((target: MobTarget) => void) | undefined
@@ -156,10 +163,11 @@ function Row({
       disabled={!locatable}
       selected={selected}
       data-testid={row.kind === 'mob' ? 'maps-pane-mob' : 'maps-pane-label'}
+      data-crawled={crawled ? 'true' : undefined}
       onClick={() => {
         onSelect(row)
       }}
-      sx={{ gap: 0.75, alignItems: 'flex-start' }}
+      sx={{ gap: 0.75, alignItems: 'flex-start', ...(crawled ? { opacity: 0.4 } : {}) }}
     >
       <PinMark locatable={locatable} wished={wished != null && wished.length > 0} />
       <ListItemText
@@ -194,6 +202,23 @@ function rowActions(acts: Pick<MapMobPaneProps, 'track' | 'onCopy'>, r: MapPaneR
   }
 }
 
+/** Crawl mode's switch (competitor-quick-wins, 2026-10-29): off by default, useCrawlMode.ts. */
+function CrawlChip({ crawl }: { crawl: CrawlMode }): JSX.Element {
+  return (
+    <Tooltip title="Dim the mobs you killed here until you leave the zone.">
+      <Chip
+        size="small"
+        variant={crawl.on ? 'filled' : 'outlined'}
+        color={crawl.on ? 'primary' : 'default'}
+        data-testid="maps-pane-crawl"
+        aria-pressed={crawl.on}
+        label="Crawl mode"
+        onClick={crawl.toggle}
+      />
+    </Tooltip>
+  )
+}
+
 /** The heading that names an AUTHORITY. Every list in this pane sits under exactly one. */
 function SectionHead({ title, note }: { title: string; note: string }): JSX.Element {
   return (
@@ -219,6 +244,7 @@ function Section({
   onOpenMob,
   onOpenLoot,
   acts,
+  crawled,
   empty
 }: {
   title: string
@@ -229,6 +255,8 @@ function Section({
   acts: Pick<MapMobPaneProps, 'track' | 'onCopy'>
   onSelect: (row: MapPaneRow) => void
   wishes?: ReadonlyMap<string, readonly string[]>
+  /** Crawl mode's killed-this-visit mobs (`mobKey`s); the mob section only. */
+  crawled?: ReadonlySet<string>
   onOpenMob?: ((target: MobTarget) => void) | undefined
   onOpenLoot?: ((name: string) => void) | undefined
   empty: string
@@ -244,6 +272,7 @@ function Section({
               row={r}
               selected={r.id === selectedId}
               wished={wishes?.get(r.id)}
+              crawled={crawled != null && crawled.size > 0 && crawled.has(mobKey(r.name))}
               actions={rowActions(acts, r)}
               onSelect={onSelect}
               onOpenMob={onOpenMob}
@@ -411,6 +440,7 @@ export default memo(function MapMobPane(props: MapMobPaneProps): JSX.Element {
             />
           </Tooltip>
           <Chip size="small" variant="outlined" label={`${String(counts.labels)} labels`} />
+          <CrawlChip crawl={props.crawl} />
           {pinsCapped && (
             <Tooltip title="Narrow the search to see the rest">
               <Chip
@@ -435,6 +465,7 @@ export default memo(function MapMobPane(props: MapMobPaneProps): JSX.Element {
           onSelect={onSelect}
           acts={props}
           wishes={wishes}
+          crawled={props.crawl.killed}
           onOpenMob={onOpenMob}
           onOpenLoot={onOpenLoot}
           empty={

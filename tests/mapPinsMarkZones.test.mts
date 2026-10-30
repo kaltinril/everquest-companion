@@ -53,3 +53,11 @@ test('a timer label is covered as drawn: name and clock, flipped by that whole w
   assert.equal(z.x + z.width, 168, 'flipped: the zone ends at the dot')
   assert.equal(z.width, Math.round(text.length * 5.6 + 6 + 16))
 })
+
+test('an Achievements area takes the mouse at its centre dot only, and only while its chip is on', () => {
+  const areas = [{ x: 50, y: 50, r: 40, text: 'Bat Country! - 3 spawns' }]
+  const on = markZones({ ...base, mobs: [], tracked: [], areas })
+  assert.deepEqual(on, [{ x: 92, y: 92, width: 16, height: 16 }], 'the dot, never the whole circle')
+  const off = markZones({ ...base, mobs: [], tracked: [], areas, layers: { ...base.layers, achievements: false } })
+  assert.equal(off.length, 0)
+})

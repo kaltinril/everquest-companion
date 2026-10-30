@@ -27,6 +27,20 @@ export interface CharacterSnap {
    * projection). See shared/currentLevel.ts for the precedence rules and the wording.
    */
   level?: LevelStatement
+  /**
+   * The current zone's last two `Your Location is` lines (EQ Legends writes `/loc` to the log),
+   * oldest first; absent until one is seen, emptied by any zone line (engine `character.rs`). The
+   * Maps tab's player marker and heading arrow.
+   */
+  locs?: LoggedLoc[]
+}
+
+/** One logged `/loc`, in its own order (north/south, west/east, elevation), at its LOG time. */
+export interface LoggedLoc {
+  ns: number
+  ew: number
+  z: number
+  ts: number
 }
 
 /** Every field is optional in a delta — the module pushes only what actually moved. */

@@ -179,6 +179,7 @@ function MapSurface({
   floor,
   marker,
   locMarker,
+  locHeading,
   pane,
   timers,
   zones,
@@ -195,6 +196,7 @@ function MapSurface({
   marker: Marker | null
   /** The `/loc` the user typed for THIS zone, still in the game's own axes (JOS-98). */
   locMarker: EqLoc | null
+  locHeading: number | null
   /** The sidebar's contribution, or null when it is closed and draws nothing. */
   pane: PaneOverlay | null
   /** The respawn-timer lane's rows for THIS map — drawn whether or not the sidebar is open,
@@ -271,6 +273,7 @@ function MapSurface({
           }}
           tracked={pane.tracked}
           onToggleTrack={pane.toggleTrack}
+          crawled={pane.crawled}
         />
       )}
       {tracked.length > 0 && <MapTrackedLayer points={tracked} vp={vp} />}
@@ -279,7 +282,7 @@ function MapSurface({
       {at != null && <MarkerRing at={at} size={22} testId="maps-marker" />}
       {/* THE ONE SEAM, AGAIN: the typed reading reaches the screen through `mapFromLoc` and then
           the same `project` every other mark uses. Nothing here knows which way north is. */}
-      {locMarker != null && <MapLocMarker at={mapFromLoc(locMarker)} loc={locMarker} vp={vp} />}
+      {locMarker != null && <MapLocMarker at={mapFromLoc(locMarker)} loc={locMarker} vp={vp} heading={locHeading} />}
       {/* The picked Slayer counters, shaded where their mobs spawn (UNRELEASED; gated in the file). */}
       <UnreleasedSlayerMap zone={data.zone} vp={vp} />
     </Box>
@@ -354,6 +357,8 @@ export interface MapBodyProps {
   marker: Marker | null
   /** This zone's typed-/loc marker, or null. Persistent, unlike `marker` above it. */
   locMarker: EqLoc | null
+  /** Which way you went to reach it (useLocMarker `heading`), or null for no arrow. */
+  locHeading: number | null
   /** A cross-zone hit was clicked — `useSearchJump`'s handler, which changes zone first. */
   onJump: (to: JumpTarget) => void
   /** Every stem an installed pack provides — gates which connection labels become links. */
@@ -368,7 +373,7 @@ export interface MapBodyProps {
 
 export default function MapBody(props: MapBodyProps): JSX.Element {
   const { data, empty, vp, hostRef, layers, bands, floor, pane, zoneName, marker, onJump } = props
-  const { locMarker, zones, onOpenMob, onOpenLoot, travel } = props
+  const { locMarker, locHeading, zones, onOpenMob, onOpenLoot, travel } = props
   // The respawn-timer join for the map ON SCREEN (`data.zone`, like every overlay) — and ONLY
   // that stem: `zoneName` is the zone being opened, and useMapData keeps the previous `data`
   // while the next loads, so pairing the two here drew the old map's rows against the new
@@ -393,6 +398,7 @@ export default function MapBody(props: MapBodyProps): JSX.Element {
           floor={floor}
           marker={marker}
           locMarker={locMarker}
+          locHeading={locHeading}
           pane={paneOverlay(pane)}
           timers={timers}
           zones={zones}
@@ -421,6 +427,7 @@ export default function MapBody(props: MapBodyProps): JSX.Element {
           onOpenLoot={onOpenLoot}
           pinsCapped={pane.pinsCapped}
           track={pane.track}
+          crawl={pane.crawl}
           onCopy={waypoint.copy}
           onCenter={pane.center}
           onClose={closePane}

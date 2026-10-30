@@ -6,9 +6,10 @@
 // A label near the right edge is drawn on the pin's LEFT, ending at the pin, so it never runs off
 // the window (owner, 2026-10-13).
 
-import { useMemo, useState, type CSSProperties, type JSX } from 'react'
+import { Fragment, useMemo, useState, type CSSProperties, type JSX } from 'react'
 import type { MapData, MapPoint } from '@shared/maps'
 import type { SlayerOverlayArea } from '@shared/slayerOverlay'
+import { mobKey } from '@shared/mobKey'
 import { UNRELEASED } from '../devFlags'
 import { AreaCircle } from '../features/maps/AreaCircle'
 import { MapCanvas } from '../features/maps/MapCanvas'
@@ -37,6 +38,8 @@ interface MarkProps {
   size: number
   shape: 'dot' | 'diamond'
   faint?: boolean
+  /** Crawl mode: a mob you killed on this visit, drawn fainter still. */
+  dim?: boolean
   /** A timer that has just come due: the mark grows, shrinks and glows. */
   pulse?: boolean
   onClick: () => void
@@ -69,7 +72,13 @@ function dotStyle(size: number, shape: MarkProps['shape'], color: string, flip: 
  * every name at once buried the zone (owner, 2026-10-13); timers and tracked marks always carry
  * theirs. The label flips to the left of the mark when it would cross the right edge.
  */
-function Mark({ at, w, text, color, size, shape, faint = false, pulse = false, onClick, testId }: MarkProps): JSX.Element {
+/** A mark's opacity at rest (hovered, every mark is solid). */
+function restOpacity(faint: boolean, dim: boolean): number {
+  if (dim) return 0.3
+  return faint ? 0.75 : 1
+}
+
+function Mark({ at, w, text, color, size, shape, faint = false, dim = false, pulse = false, onClick, testId }: MarkProps): JSX.Element {
   const [hot, setHot] = useState(false)
   const showText = !faint || hot
   const font = faint ? 9 : 10
@@ -95,7 +104,7 @@ function Mark({ at, w, text, color, size, shape, faint = false, pulse = false, o
         alignItems: 'center',
         gap: 3,
         cursor: 'pointer',
-        opacity: faint && !hot ? 0.75 : 1,
+        opacity: hot ? 1 : restOpacity(faint, dim),
         zIndex: hot ? 5 : undefined
       }}
     >
@@ -128,6 +137,8 @@ export interface MapPinsFieldProps {
   tracked: readonly TrackedPoint[]
   /** the Achievements areas on this zone (shared/slayerOverlay.ts) */
   areas: readonly SlayerOverlayArea[]
+  /** Crawl mode's killed-this-visit mobs (`mobKey`s); empty while it is off (MapPinsCrawl.tsx). */
+  crawled: ReadonlySet<string>
   nowMs: number
   onCopy: CopyPin
 }
@@ -143,26 +154,40 @@ function Lines({ data, ext, fit, w, h }: { data: MapData; ext: ZoneExtent; fit: 
   return <MapCanvas lines={data.lines} vp={vp} layers={DEFAULT_LAYERS} ink={`${TRACK_COLOR}cc`} />
 }
 
-/** The picked Slayer counters' areas, drawn as the Maps tab draws them. Inert: no click, no pin. */
-function AreaMarks({ ext, fit, areas }: MapPinsFieldProps): JSX.Element {
+/** The picked Slayer counters' areas. The circle is inert; its label sits on a faint centre dot
+ *  and shows on hover only, like a point's name (owner, 2026-10-29: "no reason to have extra
+ *  noise if someone doesn't care about it"). */
+function AreaMarks({ ext, fit, w, areas, onCopy }: MapPinsFieldProps): JSX.Element {
   return (
     <>
-      {areas.map((a) => (
-        <AreaCircle
-          key={`${String(a.x)},${String(a.y)}`}
-          testId="map-pins-area"
-          at={placeInExtent(ext, fit, a)}
-          r={a.r * fit.scale}
-          tone={AREA_COLOR}
-          text={a.text}
-        />
-      ))}
+      {areas.map((a) => {
+        const at = placeInExtent(ext, fit, a)
+        const key = `${String(a.x)},${String(a.y)}`
+        return (
+          <Fragment key={key}>
+            <AreaCircle testId="map-pins-area" at={at} r={a.r * fit.scale} tone={AREA_COLOR} />
+            <Mark
+              testId="map-pins-area-mark"
+              at={at}
+              w={w}
+              text={a.text}
+              color={AREA_COLOR}
+              size={5}
+              shape="dot"
+              faint
+              onClick={() => {
+                onCopy(a.text, { x: a.x, y: a.y })
+              }}
+            />
+          </Fragment>
+        )
+      })}
     </>
   )
 }
 
 function PoiMarks(props: MapPinsFieldProps): JSX.Element {
-  const { ext, fit, w, data, mobs, onCopy } = props
+  const { ext, fit, w, data, mobs, crawled, onCopy } = props
   const labels = useMemo(() => labelRows(data?.points ?? []).map((r) => r.point), [data])
   return (
     <>
@@ -186,6 +211,7 @@ function PoiMarks(props: MapPinsFieldProps): JSX.Element {
         <Mark
           key={m.key}
           testId="map-pins-poi"
+          dim={crawled.size > 0 && crawled.has(mobKey(m.name))}
           at={placeInExtent(ext, fit, m)}
           w={w}
           text={m.name}

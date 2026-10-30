@@ -33,6 +33,7 @@
 
 import { useMemo, useState, type JSX } from 'react'
 import { useTheme } from '@mui/material'
+import { mobKey } from '@shared/mobKey'
 // The bundled boss roster (profile-keyed) — handed to mobArt.ts, which stays pure and node-tested.
 import { getBossData } from '../../data'
 import { PinHoverCard, onActivateKey } from './mapPinChrome'
@@ -70,10 +71,18 @@ export interface MapMobPinsProps {
   /** Row ids on the track list, and right-click's toggle. */
   tracked: ReadonlySet<string>
   onToggleTrack: (row: MobPaneRow) => void
+  /** Crawl mode: mobs killed this visit (`mobKey`s), drawn faint. */
+  crawled: ReadonlySet<string>
+}
+
+/** A pin's opacity: raised when selected, faint when Crawl mode says you killed it here. */
+function pinOpacity(selected: boolean, crawled: boolean): number {
+  if (selected) return 1
+  return crawled ? 0.3 : 0.85
 }
 
 export function MapMobPins(props: MapMobPinsProps): JSX.Element {
-  const { pins, vp, selectedId, wishes, onMark, onCopy, tracked, onToggleTrack } = props
+  const { pins, vp, selectedId, wishes, onMark, onCopy, tracked, onToggleTrack, crawled } = props
   const { toScreen } = vp
   // The hovered pin's key. Its text is drawn INSTANTLY as DOM beside the pin — the same deferred
   // -text gesture the label layer's dots use, and for the same reason the surface bans poppers
@@ -99,6 +108,7 @@ export function MapMobPins(props: MapMobPinsProps): JSX.Element {
       {placed.map(({ row, pin, key, at }) => {
         const selected = row.id === selectedId
         const wished = wishes.get(row.id)
+        const killed = crawled.size > 0 && crawled.has(mobKey(row.name))
         const mark = (): void => {
           onMark(row, { x: pin.x, y: pin.y })
         }
@@ -107,6 +117,7 @@ export function MapMobPins(props: MapMobPinsProps): JSX.Element {
             key={key}
             data-testid="maps-mob-pin"
             data-wished={wished == null ? undefined : 'true'}
+            data-crawled={killed ? 'true' : undefined}
             title={`${pinText(row, pin, wished)}\nDouble-click: copy /waypoint. Right-click: ${tracked.has(row.id) ? 'untrack' : 'track'}.`}
             // Keyboard-reachable (mapPinChrome.tsx): a pin is a control, and a control a
             // keyboard cannot reach is a mouse-only feature on a surface the pane already
@@ -145,7 +156,7 @@ export function MapMobPins(props: MapMobPinsProps): JSX.Element {
               transform: 'rotate(-45deg)',
               background: wished == null ? pinColor : wishColor,
               boxShadow: '0 0 0 1px rgba(0,0,0,0.85)',
-              opacity: selected ? 1 : 0.85,
+              opacity: pinOpacity(selected, killed),
               pointerEvents: 'auto',
               cursor: 'pointer',
               zIndex: selected ? 3 : 1

@@ -6,7 +6,8 @@
 import type { JSX } from 'react'
 import { alpha } from '@mui/material/styles'
 
-/** `at` is the centre and `r` the radius, both in screen px; `text` is `areaText`'s (slayerOverlay.ts). */
+/** `at` is the centre and `r` the radius, both in screen px; `text` is `areaText`'s (slayerOverlay.ts).
+ *  No `text`, no rim label: the overlay shows it on hover instead (MapPinsField.tsx). */
 export function AreaCircle({
   at,
   r,
@@ -17,7 +18,7 @@ export function AreaCircle({
   at: { px: number; py: number }
   r: number
   tone: string
-  text: string
+  text?: string
   testId: string
 }): JSX.Element {
   return (
@@ -38,20 +39,22 @@ export function AreaCircle({
         pointerEvents: 'none'
       }}
     >
-      <span
-        style={{
-          marginTop: -9,
-          padding: '0 6px',
-          borderRadius: 8,
-          fontSize: 11,
-          lineHeight: '18px',
-          whiteSpace: 'nowrap',
-          color: '#000',
-          background: alpha(tone, 0.92)
-        }}
-      >
-        {text}
-      </span>
+      {text != null && (
+        <span
+          style={{
+            marginTop: -9,
+            padding: '0 6px',
+            borderRadius: 8,
+            fontSize: 11,
+            lineHeight: '18px',
+            whiteSpace: 'nowrap',
+            color: '#000',
+            background: alpha(tone, 0.92)
+          }}
+        >
+          {text}
+        </span>
+      )}
     </div>
   )
 }
