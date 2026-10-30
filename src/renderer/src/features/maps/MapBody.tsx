@@ -273,6 +273,7 @@ function MapSurface({
           }}
           tracked={pane.tracked}
           onToggleTrack={pane.toggleTrack}
+          crawled={pane.crawled}
         />
       )}
       {tracked.length > 0 && <MapTrackedLayer points={tracked} vp={vp} />}
@@ -426,6 +427,7 @@ export default function MapBody(props: MapBodyProps): JSX.Element {
           onOpenLoot={onOpenLoot}
           pinsCapped={pane.pinsCapped}
           track={pane.track}
+          crawl={pane.crawl}
           onCopy={waypoint.copy}
           onCenter={pane.center}
           onClose={closePane}

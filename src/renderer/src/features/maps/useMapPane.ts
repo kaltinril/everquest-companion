@@ -26,6 +26,7 @@ import { CROSS_ZONE_LIMIT, crossZoneRows, type CrossZoneRow } from './crossZone'
 import { loadPaneOpen, savePaneOpen, useTravelEra } from './useMapData'
 import type { MapViewport } from './useMapViewport'
 import { useZoneTrack, type ZoneTrack } from './useZoneTrack'
+import { useCrawlMode, type CrawlMode } from './useCrawlMode'
 import {
   filterPaneRows,
   labelRows,
@@ -243,6 +244,8 @@ export interface ZonePaneState extends MapPaneState {
   track: ZoneTrack
   /** Centre the map on a position, zooming in from a fitted view (a tracked row's click). */
   center: (x: number, y: number) => void
+  /** Crawl mode: its switch, and the mobs killed this visit that the rows and pins dim. */
+  crawl: CrawlMode
 }
 
 /**
@@ -303,7 +306,8 @@ export function useZonePane(args: {
     zones
   })
   const track = useZoneTrack(data)
-  return { ...pane, open, setOpen, hits, track, center: onCenter }
+  const crawl = useCrawlMode(data?.zone ?? null)
+  return { ...pane, open, setOpen, hits, track, center: onCenter, crawl }
 }
 
 /** What the surface needs from the pane: the pins, the selection, the wish-list join, and the
@@ -318,6 +322,8 @@ export interface PaneOverlay {
   /** Row ids on the track list, and the right-click that adds or removes one. */
   tracked: ReadonlySet<string>
   toggleTrack: (row: MapPaneRow) => void
+  /** Crawl mode's killed-this-visit mobs (`mobKey`s), drawn dimmed. */
+  crawled: ReadonlySet<string>
 }
 
 export function paneOverlay(pane: ZonePaneState): PaneOverlay | null {
@@ -329,6 +335,7 @@ export function paneOverlay(pane: ZonePaneState): PaneOverlay | null {
     wishes: pane.wishes,
     mark: pane.mark,
     tracked: pane.track.ids,
-    toggleTrack: pane.track.toggle
+    toggleTrack: pane.track.toggle,
+    crawled: pane.crawl.killed
   }
 }
