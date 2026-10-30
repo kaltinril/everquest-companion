@@ -302,7 +302,8 @@ async function createStaging(c: Clients, schemaSql: string, t: BackfillTable): P
     throw new Error(
       `the database role '${INGEST_ROLE}' does not exist on this cluster — run ` +
         '`triage-feedback migrate --refresh` first (it creates the role and its grants), ' +
-        'then re-run this command.'
+        'then re-run this command.',
+      { cause: err }
     )
   }
   return created
