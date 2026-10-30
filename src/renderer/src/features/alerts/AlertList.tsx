@@ -182,8 +182,8 @@ function AlertRowVolume({
         max={1}
         step={0.05}
         value={volume}
-        onChange={(_e, v) => onDrag(v as number)}
-        onChangeCommitted={(_e, v) => onCommit(v as number)}
+        onChange={(_e, v) => onDrag(v)}
+        onChangeCommitted={(_e, v) => onCommit(v)}
         sx={{ flex: 1, minWidth: 0 }}
       />
     </Stack>

@@ -132,6 +132,10 @@
 //   @typescript-eslint/restrict-template-expressions — allowNumber: true.
 //     `${dps}` in a log line is not a bug.
 //   @typescript-eslint/no-non-null-assertion — kept ON, but see the ratchet.
+//   @typescript-eslint/no-meaningless-void-operator — off (typescript-eslint 8.70
+//     widened it). `void _exhaustive` is this tree's "unused on purpose" idiom.
+//   no-useless-assignment — off (new in ESLint 10's recommended). It flags the
+//     `let page: Page | null = null` that a `finally` reads (54 sites).
 //
 // And two rules added BEYOND the presets, because the tree already assumed them:
 // `no-console` and `no-new` both had hand-written `eslint-disable` comments in
@@ -249,6 +253,8 @@ export default tseslint.config(
     rules: {
       // See "RULES DELIBERATELY OFF" above.
       '@typescript-eslint/no-unnecessary-condition': 'off',
+      '@typescript-eslint/no-meaningless-void-operator': 'off',
+      'no-useless-assignment': 'off',
       '@typescript-eslint/restrict-template-expressions': [
         'error',
         { allowNumber: true },
@@ -312,7 +318,13 @@ export default tseslint.config(
   // ---- react-hooks (renderer only) ---------------------------------------
   {
     files: ['src/renderer/**/*.{ts,tsx}'],
-    ...reactHooks.configs['recommended-latest'],
+    // The 5.x preset's two rules. 7.x's presets add the React Compiler rules (131 findings
+    // over ~80 files on adoption), which is a code change of its own, not a version bump.
+    plugins: { 'react-hooks': reactHooks },
+    rules: {
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+    },
   },
 
   // ---- 2b. THE NO-MUNGING LAW (owner ruling 4, JOS-501) -------------------

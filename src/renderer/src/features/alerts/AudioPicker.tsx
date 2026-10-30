@@ -222,7 +222,7 @@ function SayPicker({
       value={mode}
       renderValue={() => sayValueLabel(mode, phrase)}
       onChange={(e) => {
-        const next = e.target.value as SpeechMode
+        const next = e.target.value
         if (next !== 'custom') onMode(next)
       }}
       sx={{ gridArea: 'line', ...GRID_SX }}

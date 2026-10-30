@@ -7,7 +7,7 @@
 
 import type { JSX } from 'react'
 import { Box, MenuItem, Select, Stack, TextField, Typography } from '@mui/material'
-import type { AlertTriggerPrimitive, AppSignal, LogEventKind } from '@shared/types'
+import type { AppSignal, LogEventKind } from '@shared/types'
 import { ALL_LOG_EVENT_KINDS } from '@shared/logEventKinds'
 import {
   type ConditionDraft,
@@ -54,7 +54,7 @@ function EventConditionFields({ draft, onChange }: ConditionFieldProps): JSX.Ele
           size="small"
           fullWidth
           value={draft.kind}
-          onChange={(e) => onChange(retypeDraft(draft, { kind: e.target.value as LogEventKind }))}
+          onChange={(e) => onChange(retypeDraft(draft, { kind: e.target.value }))}
         >
           {EVENT_KINDS.map((k) => (
             <MenuItem key={k} value={k}>
@@ -143,7 +143,7 @@ function AppSignalField({ draft, onChange }: ConditionFieldProps): JSX.Element |
         size="small"
         fullWidth
         value={draft.signal}
-        onChange={(e) => onChange({ ...draft, signal: e.target.value as AppSignal })}
+        onChange={(e) => onChange({ ...draft, signal: e.target.value })}
       >
         {APP_SIGNALS.map((s) => (
           <MenuItem key={s} value={s}>
@@ -169,7 +169,7 @@ export default function ConditionEditor({ draft, onChange }: ConditionFieldProps
           value={draft.ttype}
           onChange={(e) =>
             onChange(
-              retypeDraft(draft, { ttype: e.target.value as AlertTriggerPrimitive['type'] })
+              retypeDraft(draft, { ttype: e.target.value })
             )
           }
         >

@@ -198,7 +198,7 @@ function WindowControls({ state, set }: Props): JSX.Element {
             step={1}
             marks
             value={state.priceTier}
-            onChange={(_e, v) => set({ priceTier: Array.isArray(v) ? v[0] : v })}
+            onChange={(_e, v) => set({ priceTier: v })}
             valueLabelDisplay="auto"
             valueLabelFormat={(v) => `+${v}`}
           />

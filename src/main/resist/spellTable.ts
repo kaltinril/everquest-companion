@@ -140,7 +140,7 @@ function parseOnWorker(path: string, cache: ResistTableCacheTarget): Promise<Spe
       }
       finish(reply.table ?? null)
     })
-    worker.on('error', (err) => {
+    worker.on('error', (err: unknown) => {
       logError('main:resistTable', { message: 'resist table worker error', err })
       finish(null)
     })

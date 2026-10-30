@@ -38,7 +38,6 @@ import { MAX_EARLY_WARN_SEC, breakTriggerKinds } from '@shared/earlyWarning'
 import { blankCondition, type CombineMode, type ConditionDraft } from './conditionDraft'
 import {
   type AlertForm,
-  type CooldownScope,
   defFromForm,
   formCanSave,
   triggerFromForm,
@@ -68,7 +67,7 @@ function CombineModeSection({
         fullWidth
         data-testid="alert-combine-mode"
         value={mode}
-        onChange={(e) => onChange(e.target.value as CombineMode)}
+        onChange={(e) => onChange(e.target.value)}
       >
         <MenuItem value="single">a single condition matches</MenuItem>
         <MenuItem value="any">ANY of these conditions matches (or)</MenuItem>
@@ -177,7 +176,7 @@ function VolumeCooldownSection({ f }: { f: AlertForm }): JSX.Element {
           max={1}
           step={0.05}
           value={f.volume}
-          onChange={(_e, v) => f.setVolume(v as number)}
+          onChange={(_e, v) => f.setVolume(v)}
           sx={{ width: 160 }}
         />
       </Stack>
@@ -200,7 +199,7 @@ function VolumeCooldownSection({ f }: { f: AlertForm }): JSX.Element {
         <Select
           size="small"
           value={f.cooldownScope}
-          onChange={(e) => f.setCooldownScope(e.target.value as CooldownScope)}
+          onChange={(e) => f.setCooldownScope(e.target.value)}
         >
           <MenuItem value="alert">per alert</MenuItem>
           <MenuItem value="target">per mob</MenuItem>

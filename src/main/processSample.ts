@@ -53,7 +53,7 @@
 // NOTHING HERE WRITES. Three read-only calls on a handle opened for querying, on a pid this app
 // spawned itself. It cannot change a priority, cannot signal, cannot terminate.
 
-import type { IKoffiLib } from 'koffi'
+import type { LibraryHandle } from 'koffi'
 
 /** One raw reading of one process, straight off the OS. */
 export interface ProcessReading {
@@ -225,11 +225,11 @@ function loadNative(): Native {
   // resolved degrades the same way one where the DLL will not map does.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const koffi = require('koffi') as {
-    load(name: string): IKoffiLib
+    load(name: string): LibraryHandle
   }
   const kernel32 = koffi.load('kernel32.dll')
   const psapi = koffi.load('psapi.dll')
-  const bind = (lib: IKoffiLib, prototype: string): Win32Fn => lib.func(prototype) as Win32Fn
+  const bind = (lib: LibraryHandle, prototype: string): Win32Fn => lib.func(prototype) as Win32Fn
 
   const OpenProcess = bind(
     kernel32,

@@ -313,7 +313,7 @@ function EngineRow({
         fullWidth
         data-testid="pref-voice-engine"
         value={prefs.engine}
-        onChange={(e) => onChange({ ...prefs, engine: e.target.value as SpeechEngine, voiceId: null })}
+        onChange={(e) => onChange({ ...prefs, engine: e.target.value, voiceId: null })}
       >
         {SPEECH_ENGINES.map((engine) => (
           <MenuItem key={engine} value={engine}>
@@ -432,7 +432,7 @@ function RateVolumeRow({ prefs, onChange }: { prefs: VoicePrefs; onChange: (p: V
           max={MAX_SPEECH_RATE}
           step={0.05}
           value={prefs.rate}
-          onChange={(_e, v) => onChange({ ...prefs, rate: v as number })}
+          onChange={(_e, v) => onChange({ ...prefs, rate: v })}
           sx={{ width: 160 }}
         />
       </Stack>
@@ -447,7 +447,7 @@ function RateVolumeRow({ prefs, onChange }: { prefs: VoicePrefs; onChange: (p: V
           max={1}
           step={0.05}
           value={prefs.volume}
-          onChange={(_e, v) => onChange({ ...prefs, volume: v as number })}
+          onChange={(_e, v) => onChange({ ...prefs, volume: v })}
           sx={{ width: 160 }}
         />
       </Stack>

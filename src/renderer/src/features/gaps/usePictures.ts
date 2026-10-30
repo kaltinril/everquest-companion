@@ -3,7 +3,7 @@
 // player made it, into the focused window, and into a text box only when the clipboard holds a picture
 // and no text; several pictures are read under one summary.
 
-import { type MutableRefObject, useCallback, useEffect, useRef, useState } from 'react'
+import { type RefObject, useCallback, useEffect, useRef, useState } from 'react'
 import { GAPS_MODULE_ID } from '@shared/gaps'
 import type { QuestJournalFacts } from '@shared/gapQuests'
 import { placesKey } from '@shared/pasteRoute'
@@ -57,7 +57,7 @@ async function readOne(raw: Uint8Array, job: Job, journals: Readonly<Record<stri
 }
 
 /** The queue: one picture at a time, in the order given; a batch ends in one summary note. */
-export function usePictureQueue(journals: MutableRefObject<Readonly<Record<string, QuestJournalFacts>>>, show: (o: Outcome) => void): (jobs: Job[]) => void {
+export function usePictureQueue(journals: RefObject<Readonly<Record<string, QuestJournalFacts>>>, show: (o: Outcome) => void): (jobs: Job[]) => void {
   const queue = useRef<Job[]>([])
   const running = useRef(false)
   const run = useCallback(async () => {
@@ -162,7 +162,7 @@ export function usePasteAndDrop(enqueue: (jobs: Job[]) => void): void {
  * Popups waiting in Unsorted are routed again when quest rows or chains change: the engine's chains can
  * land after the inbox was read at launch.
  */
-export function useReroute(journals: MutableRefObject<Readonly<Record<string, QuestJournalFacts>>>): void {
+export function useReroute(journals: RefObject<Readonly<Record<string, QuestJournalFacts>>>): void {
   const snap = useModule<Snap>(GAPS_MODULE_ID)
   const key = snap === null ? '' : placesKey(snap.rows, snap.questThreads)
   useEffect(() => {
