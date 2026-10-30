@@ -44,7 +44,11 @@ export default defineConfig({
       // asked for, and for a future closed dependency it would be.
       sourcemap: true,
       externalizeDeps: {
-        include: ['pg', '@aws-sdk/client-s3', '@aws-sdk/credential-providers', '@aws-sdk/dsql-signer']
+        include: ['pg', '@aws-sdk/client-s3', '@aws-sdk/credential-providers', '@aws-sdk/dsql-signer'],
+        // ESM-only since electron-store 9 and chokidar 5. This bundle is CommonJS, and a bare
+        // `require()` of an ES module hands back its namespace, not the class; bundled, the
+        // import is converted at build time instead.
+        exclude: ['electron-store', 'chokidar']
       },
       rollupOptions: {
         // FOUR main-process bundles. `index` is the app; the other three are worker_threads,
