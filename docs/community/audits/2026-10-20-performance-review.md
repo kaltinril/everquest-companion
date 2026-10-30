@@ -302,3 +302,48 @@ Items 1, 2 (short step), 3 and 5 of the ranking above. Headless production probe
   settle 507 to 129, Plan first visit 222 to 91. Left: MUI Tooltip (~700 per Character render) and
   Factions (4 renders per visit, same pattern).
 - Left for a later pass: 4 (one engine connection), 6, 7, 8, and 2's M step.
+
+## Done 2026-10-29 (perf-leftovers)
+
+Second pass item 2's M step, and item 4 measured. Engine numbers from the release benches in
+`engine/crates/engined/tests/read_path_bench.rs` (`met_cursor_moves`, `snapshot_build_costs`,
+`one_connection_in_order`) on a copy of the owner's 2026-10-17 log (68 MB; 8,239 death lines in
+97,770 active one-second windows). No app run.
+
+- 2, the always-watched modules: the engine's new `met` module (`met.rs`, `shared/metNames.ts`)
+  serves every mob killed, looted from or conned, every item looted, every zone entered, and the
+  kills map cut to the raid roster. The met-in-log feed reads it instead of `kills`, `loot`,
+  `consider` and `progression`; the always-mounted boss detector reads its roster cut
+  (`useBossKills(..., 'met')`); the always-mounted turn-in watch reads no loot
+  (`useQuestTurnInWatch`); the Sky quest overlay's counts (`SkyOverlayFeed`, loot-based) are read
+  only while that overlay is open. Archived history: `history.ts` rebuilds a segment's names from
+  the modules it captured (`logArchive/mergeMet.ts`).
+- What the main window re-reads on a tab that shows none of these modules, per window the log
+  folded a death in (each move is one re-fetch; sizes at the end of the log):
+
+  | Module | Moves per kill window | State | Engine build (kept answer aside) |
+  | --- | --- | --- | --- |
+  | `kills` | 1.00 | 189 KB | 1.5-2.8 ms |
+  | `loot` | 0.74 | 1,035 KB | 7.7-14.8 ms, plus 3.6 ms to serialize |
+  | `consider` | 0.10 | 10 KB | 0.1 ms |
+  | `progression` | 12.1 (every active second: `lastTs`) | 549 KB | 0.8-1.0 ms |
+  | before: the four together | | ~7.4 MB re-read per kill window (5.9 MB in the log's later half) | |
+  | after: `met` | 0.27 (0.17 in the later half: new names get rarer) | 58 KB | 0.4-0.6 ms |
+  | after, per kill window | | 15 KB (10 KB later half) | |
+
+  The progression share was the biggest: the feed kept it watched on every tab, and it moves every
+  second lines arrive. A boss's repeat kill still moves `met` (it carries the roster's records).
+- Still read per kill where a surface needs them: the Loot, Sky, Mobs, Overview, Raid Targets and
+  Gaps tabs, the xp overlay (`loot`, `progression`), and the Wiki Gaps overlay's feed while that
+  overlay is open (`loot`, `kills`, `consider` through `useGapsData`).
+- Evidence widened, not narrowed: `met` keeps every con and every zone line for the whole log, where
+  the `consider` ring held the last 50 mobs and the zone timeline 4,000 entries.
+- 4, one connection served in order, measured and skipped. A small ask (`character`) sent at the
+  same moment as a freshly built `loot` read: 48.5 ms p50 (max 65) on the same connection, 12.5 ms
+  (max 18.5) on a second; alone, 0.1 ms. The 12.5 ms is the ingest thread building `loot` (every
+  connection shares that one door, so dispatching asks concurrently in the engine buys nothing); the
+  rest is the big reply's serialize (3.6 ms), transfer and the client's parse of it, and main parses
+  every connection's frames on its one thread, so in the app a second connection saves the
+  serialize and transfer and some of the parse, roughly 5-15 ms per collided read. The reads that
+  collide are now rarer (above), the meters redraw once a second, and health probes already have
+  their own connection (`engineHealth.ts`). Not built; revisit if a meter is seen to stall.

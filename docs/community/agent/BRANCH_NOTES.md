@@ -657,7 +657,8 @@ where one exists.
 
 ## Sky quest overlay (was sky-quest-overlay)
 
-- Data path: AppCelebrations' always-mounted `useProgress` -> `useSkyOverlayFeed` -> localStorage
+- Data path: AppCelebrations' `SkyOverlayFeed` (mounted only while the overlay is open, since
+  2026-10-29: its counts read the whole loot ledger) -> `useProgress` -> `useSkyOverlayFeed` -> localStorage
   `eq.skyOverlay.rows` (written only on change) -> the overlay's `storage` listener. No IPC. The
   key is the main window's data, defined in `src/shared/`, so `tests/mapPinsReset.test.mts` (which
   scans keys defined in `overlay/`) does not see it and an overlay reset must not clear it.
@@ -673,3 +674,23 @@ where one exists.
   kind touches").
 - e2e: `tests/e2e/sky-quest-overlay.e2e.mts` (window opens, a searched quest starred by the Quests
   tab checkbox reaches the overlay, the second click unstars). Open: the Ready tab checkbox has no e2e.
+
+## Always-mounted readers and the `met` module (was perf-leftovers)
+
+- Law: nothing mounted on every tab watches `loot`, `kills`, `consider` or `progression`. Each
+  watched module is re-fetched on every cursor move in every window (`moduleStore.ts`); those four
+  move on nearly every kill or second of play. Serve a small fact from the engine instead.
+- `met` (`fold/src/modules/met.rs`, `shared/metNames.ts`): names met (raw spellings, sorted; the app
+  keys them) plus `bosses`, the kills map cut to the `bosses.json` roster by `bossStatus.ts
+  matchKey`. Kills reach it through a shared `MetSlot` the kills module fills (`KillsModule::sharing`),
+  so `met` must stay registered after `kills`. The engine reads the roster at compile time
+  (`resist::catalog::BOSSES_JSON`): a roster edit needs an engine rebuild.
+- `met.bosses` is live-log only; the archive merge (`logArchive/mergeMet.ts`) joins names and leaves
+  bosses to the live side. Fine for the celebration (it watches a credited count grow); the Raid
+  Targets tab still reads `kills` for its archived counts. No segment captures `met`: `history.ts`
+  rebuilds its names from each segment's `kills`/`loot`/`consider`/`progression`.
+- The always-mounted Sky pieces are split: `useQuestTurnInWatch` (celebrate, persist turn-ins; no
+  loot) always; `SkyOverlayFeed` (the loot-based counts) only while the Sky quest overlay is open.
+- Measuring: `read_path_bench.rs` `met_cursor_moves` replays a log copy and counts cursor moves per
+  kill window; `one_connection_in_order` times a small ask behind a fresh `loot` build. Results:
+  audits/2026-10-20-performance-review.md, "Done 2026-10-29".
