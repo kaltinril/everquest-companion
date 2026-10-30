@@ -142,3 +142,18 @@ test('the cross-check folds what is one fact spelled two ways: slot lists, ALL e
   assert.deepEqual(r.mobs.fieldDiffs, [])
   assert.deepEqual(r.items.fieldDiffs.map((d) => [d.title, d.field]), [['Odd Item', 'classes'], ['Odd Item', 'slot']])
 })
+
+test('toRead: never-listed pages as the wiki titles them, and loot-linked pages no item list holds (owner, 2026-10-29)', () => {
+  const pack: Pack = {
+    meta: { generatedAt: PACK_AT },
+    npcs: [npc('Brand new mob', 1)],
+    items: [{ wikiTitle: 'Drake Lava Powder', revisionId: 1 }, { wikiTitle: 'Darkwood Aegis', revisionId: 2 }],
+    // Cracked Darkwood Shield: a page the loot links name that no embeddedin list held, the pack's included.
+    lootSourceCounts: { 'Cracked Darkwood Shield': {}, 'Darkwood Aegis': {}, 'Listed Item': {}, 'Some Alias': {}, 'A cracked skeleton': {}, 'Not A Page': {} },
+    wikiEntities: { titles: ['Drake lava powder', 'Darkwood Aegis', 'Cracked Darkwood Shield', 'Listed Item', 'Some Alias', 'A cracked skeleton'] }
+  }
+  const items: OurFamily = { stamp: '2026-10-23T11:30:09Z', pages: new Map(), pageids: new Map([['Darkwood Aegis', 1], ['Listed Item', 2]]), revs: {} }
+  const r = comparePack(pack, items, mobs('2026-10-23T11:30:09Z'), new Set(['Some Alias']))
+  assert.deepEqual(r.toRead, { items: ['Drake lava powder'], linked: ['Cracked Darkwood Shield'], mobs: ['Brand new mob'] })
+  assert.deepEqual(comparePack({ ...pack, lootSourceCounts: undefined, wikiEntities: undefined }, items, mobs('x')).toRead.items, ['Drake Lava Powder'])
+})

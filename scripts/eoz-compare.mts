@@ -10,6 +10,9 @@
 //                                                 only when our files are newer than it (revIndex.ts)
 //   --offline     use the cached pack, fetch nothing      --root <repo>   data and caches from there
 //   --cache <dir> where the pack and reports live (default scripts/sources/cache/eoz)
+//
+// The report's `toRead` names the wiki pages our scrape never listed; `scrape-delta.mts
+// --titles-from-compare` reads them from the newest report (owner, 2026-10-29).
 
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { dirname, join, resolve } from 'path'
@@ -17,6 +20,7 @@ import { fileURLToPath } from 'url'
 import { gunzipSync } from 'zlib'
 import { comparePack, packRevisions, releaseDecision, wikiTitle, type CompareReport, type FamilyReport, type OurFamily, type OurFields, type Pack } from './sources/eozCompare'
 import { readRevIndex, seedRevs, writeRevIndex } from './sources/revIndex'
+import { readRedirectCache } from './sources/mobRedirects'
 import { refreshEozPack, type EozManifest } from '../src/main/eozPack'
 
 const UA = 'everquest-companion eoz-compare (+https://github.com/kaltinril/everquest-companion)'
@@ -60,7 +64,7 @@ function family(dir: string, list: string, ours: { stamp: string; pages: Map<str
   return { stamp, pages, pageids: new Map(listed.map((p) => [wikiTitle(p.title), p.pageid])), revs: readRevIndex(dir).revs }
 }
 
-function ours(root: string): { items: OurFamily; mobs: OurFamily } {
+function ours(root: string): { items: OurFamily; mobs: OurFamily; redirects: Set<string> } {
   const it = readJson(join(root, 'src/main/data/items.json')) as ItemFile
   const mb = readJson(join(root, 'src/renderer/src/data/eqlegends/mobs.json')) as MobFile
   const cache = join(root, 'scripts/sources/cache')
@@ -71,7 +75,8 @@ function ours(root: string): { items: OurFamily; mobs: OurFamily } {
   const mobPages = new Map<string, OurFields>(mb.mobs.map((m) => [wikiTitle(m.page), { level: m.level, zones: m.zones }]))
   return {
     items: family(join(cache, 'items'), 'item-pages.json', { stamp: it.scrapedAt, pages: itemPages }),
-    mobs: family(join(cache, 'mobs'), 'mob-pages.json', { stamp: mb.scrapedAt, pages: mobPages })
+    mobs: family(join(cache, 'mobs'), 'mob-pages.json', { stamp: mb.scrapedAt, pages: mobPages }),
+    redirects: new Set((readRedirectCache(join(cache, 'redirects/redirects.json'))?.redirects ?? []).map((r) => r.from))
   }
 }
 
@@ -91,9 +96,9 @@ function printRelease(r: CompareReport, now: string): void {
   const behind = r.items.stale.length + r.mobs.stale.length + r.items.unknown.length + r.mobs.unknown.length
   const d = releaseDecision(r.pack.generatedAt, now, behind)
   console.log(`\nRelease check (the pack is ${String(d.ageHours)} h old): the delta runs before every release, then this compare again.`)
-  // Not counted: some pack pages are left out on purpose by our scrape's filters. Shown for a look.
-  const unlisted = [...r.items.missingUnlisted, ...r.mobs.missingUnlisted]
-  if (unlisted.length > 0) console.log(`  Look by hand: ${String(unlisted.length)} pack pages our scrape never listed (${unlisted.slice(0, SHOW).join(' | ')}).`)
+  // Not counted: a page with no item or mob box stays unlisted until it is fixed on the wiki.
+  const unlisted = [...r.toRead.items, ...r.toRead.linked, ...r.toRead.mobs]
+  if (unlisted.length > 0) console.log(`  ${String(unlisted.length)} wiki pages our scrape never listed: \`scrape-delta.mts --titles-from-compare\` reads them (${unlisted.slice(0, SHOW).join(' | ')}).`)
   if (d.ready) {
     console.log('  Nothing behind the pack: ready, as far as items and mobs go (quests and spells are not in the pack).')
     return
@@ -122,8 +127,10 @@ async function main(): Promise<void> {
   const { pack, manifest, downloaded } = await freshPack(a)
   console.log(`Pack ${manifest.version ?? '?'} built ${pack.meta.generatedAt}; ${String(downloaded)} bytes from GitHub this run (0 wiki requests).`)
   const o = ours(a.root)
-  const report = comparePack(pack, o.items, o.mobs)
+  const report = comparePack(pack, o.items, o.mobs, o.redirects)
   printFamily(report.items)
+  const linked = report.toRead.linked
+  console.log(`  wiki pages the pack's loot links name, in neither item list: ${String(linked.length)}   ${linked.slice(0, SHOW).join(' | ')}`)
   printFamily(report.mobs)
   console.log(`\nNot in the pack, not checked: ${report.unchecked.join(', ')}.`)
   if (a.release) printRelease(report, new Date().toISOString())

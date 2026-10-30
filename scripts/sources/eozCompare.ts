@@ -29,6 +29,10 @@ export interface Pack {
   meta: { generatedAt: string; version?: string }
   npcs: PackNpc[]
   items: PackItem[]
+  /** item title -> its loot sources; names items the pack's own item list can lack */
+  lootSourceCounts?: Record<string, unknown>
+  /** `titles`: every article title on the wiki, as the wiki spells it */
+  wikiEntities?: { titles?: string[] }
 }
 
 /** Ours, per family: the data file's pages and stamp, the cache list (title -> pageid), the revisions. */
@@ -188,16 +192,44 @@ export interface CompareReport {
   mobs: FamilyReport
   /** not in the pack, so not checked */
   unchecked: string[]
+  /** pages our scrape never listed, as the wiki titles them: `scrape-delta.mts --titles-from-compare` reads these */
+  toRead: { items: string[]; linked: string[]; mobs: string[] }
 }
 
-export function comparePack(pack: Pack, items: OurFamily, mobs: OurFamily): CompareReport {
+export function comparePack(pack: Pack, items: OurFamily, mobs: OurFamily, redirects: ReadonlySet<string> = new Set()): CompareReport {
   const built = pack.meta.generatedAt
-  return {
-    pack: { version: pack.meta.version, generatedAt: built },
+  const r = {
     items: compareFamily('items', pack.items, items, { packBuilt: built, diffs: itemDiffs }),
-    mobs: compareFamily('mobs', pack.npcs, mobs, { packBuilt: built, diffs: npcDiffs }),
-    unchecked: ['quests', 'spells']
+    mobs: compareFamily('mobs', pack.npcs, mobs, { packBuilt: built, diffs: npcDiffs })
   }
+  const asPage = pageTitles(pack)
+  const toRead = {
+    items: r.items.missingUnlisted.map(asPage),
+    linked: linkedUnlisted(pack, { items, mobs, redirects }),
+    mobs: r.mobs.missingUnlisted.map(asPage)
+  }
+  return { pack: { version: pack.meta.version, generatedAt: built }, ...r, unchecked: ['quests', 'spells'], toRead }
+}
+
+/** A pack title as the wiki spells its page: the pack capitalises words (`Drake Lava Powder` is the page `Drake lava powder`). */
+function pageTitles(pack: Pack): (t: string) => string {
+  const titles = pack.wikiEntities?.titles ?? []
+  const exact = new Set(titles)
+  const byLower = new Map(titles.map((t) => [t.toLowerCase(), t]))
+  return (t) => (exact.has(t) ? t : (byLower.get(t.toLowerCase()) ?? t))
+}
+
+/**
+ * Wiki pages the pack's loot links name as items that neither item list holds (owner, 2026-10-29):
+ * Cracked Darkwood Shield opens {{Itempage}} yet is in no `embeddedin` list, ours or the pack's, so
+ * neither the compare nor a delta (which reads only edited pages) ever met it. Redirects and mob pages are left out.
+ */
+export function linkedUnlisted(pack: Pack, ours: { items: OurFamily; mobs: OurFamily; redirects: ReadonlySet<string> }): string[] {
+  const titles = new Set(pack.wikiEntities?.titles ?? [])
+  const packItems = new Set(pack.items.map((i) => wikiTitle(i.wikiTitle)))
+  const known = (t: string): boolean =>
+    packItems.has(t) || ours.items.pages.has(t) || ours.items.pageids.has(t) || ours.mobs.pages.has(t) || ours.redirects.has(t)
+  return Object.keys(pack.lootSourceCounts ?? {}).filter((t) => titles.has(t) && !known(wikiTitle(t))).sort()
 }
 
 /**
