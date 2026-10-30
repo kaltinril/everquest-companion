@@ -65,8 +65,8 @@ async function mainClipboard(app: ElectronApplication, write?: string): Promise<
   let last: unknown
   for (let i = 0; i < 4; i++) {
     try {
-      return await app.evaluate(({ clipboard }, w: string | undefined): string => {
-        if (w !== undefined) clipboard.writeText(w)
+      return await app.evaluate(async ({ clipboard }, w: string | undefined): Promise<string> => {
+        if (w !== undefined) await clipboard.writeText(w)
         return clipboard.readText()
       }, write)
     } catch (err) {
