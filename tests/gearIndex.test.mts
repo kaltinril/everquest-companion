@@ -62,6 +62,7 @@ import type { ItemStatBlock } from '../src/shared/itemStats'
 // two, so the test below asks the screen's own question instead of re-deriving a verdict.
 import { eraChip, eraHides } from '../src/renderer/src/features/planner/plannerData'
 import { eraBadge } from '../src/shared/planner/era'
+import { assertCorpusFloor } from './corpusFloor.mts'
 
 const file = itemsJson as unknown as ItemDbFile
 const index = buildGearIndex(file)
@@ -91,8 +92,8 @@ test('every equippable item becomes exactly one row (floors + the page identity)
   })
 
   // Floors, under the measured build so a growing corpus stays green.
-  assert.ok(rows.length >= 6700, `only ${rows.length} gear rows — expected >= 6700`)
-  assert.ok(index.stats.weaponRows >= 1650, `only ${index.stats.weaponRows} weapons`)
+  assertCorpusFloor(rows.length, 6967, 'gear rows')
+  assertCorpusFloor(index.stats.weaponRows, 1694, 'weapons')
   assert.ok(index.stats.effectRows >= 1150, `only ${index.stats.effectRows} effect-bearing rows`)
   assert.ok(index.stats.pages >= 11000, `only ${index.stats.pages} pages walked`)
 

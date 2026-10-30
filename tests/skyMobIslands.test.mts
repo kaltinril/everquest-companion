@@ -30,6 +30,7 @@ import {
 } from '../src/renderer/src/features/posky/poskyDroppers'
 import poskyRaw from '../src/renderer/src/data/eqlegends/posky.json' with { type: 'json' }
 import type { PoskyQuest } from '../src/shared/types'
+import { assertCorpusFloor } from './corpusFloor.mts'
 
 const QUESTS = (poskyRaw as { quests: PoskyQuest[] }).quests
 
@@ -147,8 +148,8 @@ test('the overlay changes the listed pages and no other mob in the committed dat
     assert.deepEqual(after, before, `${page}: not listed, yet its islands moved`)
   }
   assert.equal(changed, SKY_MOB_ISLANDS.length, 'every listed page must be reachable in the data')
-  // A floor, not a frozen count (a re-scrape may add mobs): today the join resolves 22 Sky pages.
-  assert.ok(derived.size >= 20, `pages resolved: ${derived.size}`)
+  // A floor, not a frozen count (a re-scrape may add mobs): the join resolved 20 Sky pages on 2026-10-29.
+  assertCorpusFloor(derived.size, 20, 'Sky pages resolved')
 })
 
 test('a mob the table does not name passes its derived islands through untouched', () => {

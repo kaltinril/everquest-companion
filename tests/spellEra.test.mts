@@ -43,6 +43,7 @@ import { pageEraKey, type PageEraFile } from '../src/main/pageEraDb.ts'
 import type { SpellDbFile, SpellEntry } from '../src/shared/types.ts'
 import pageEraJson from '../src/main/data/pageEra.json' with { type: 'json' }
 import spellsJson from '../src/main/data/spells.json' with { type: 'json' }
+import { assertCorpusFloor } from './corpusFloor.mts'
 
 const SIDECAR = pageEraJson as PageEraFile
 const RAW: SpellEntry[] = (spellsJson as SpellDbFile).spells
@@ -60,7 +61,7 @@ test('the spells table is the same fetch as the pages and mobs beside it', () =>
   // fetched at a different revision of `Template:PageEra` would be a second opinion.
   assert.equal(SIDECAR.eraRevision, 156232)
   const size = Object.keys(SIDECAR.spells).length
-  assert.ok(size >= 2000, `only ${size} spell pages carry a verdict`)
+  assertCorpusFloor(size, 2104, 'spell pages with a verdict')
   // Every value is a BOOLEAN. The mobs table's shape, for the mobs table's reason: only the OUT
   // direction is ever read, so a record with an `outOfEra` key would be a field nothing reads.
   assert.equal(

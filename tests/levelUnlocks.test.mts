@@ -33,6 +33,7 @@ import {
 import { spellMetricsParts } from '../src/shared/spellMetrics'
 import type { SpellResistTable } from '../src/shared/resistTypes'
 import { aaUnlocks, buildLevelUnlocks, dedupeByName, generalAaUnlocks, type NamedRow } from '../src/main/data/levelUnlocks'
+import { assertCorpusFloor } from './corpusFloor.mts'
 
 // ---- fixtures ---------------------------------------------------------------------------
 
@@ -230,7 +231,7 @@ const REAL = buildLevelUnlocks()
 
 test('the committed dataset carries both halves at real scale', () => {
   // Floors under what the tree measures today (1,455 spells with pairs / 16 classes).
-  assert.ok(REAL.spells.length >= 1400, `spells with stated levels: ${String(REAL.spells.length)}`)
+  assertCorpusFloor(REAL.spells.length, 1452, 'spells with stated levels')
   assert.equal(Object.keys(REAL.skills).length, CLASS_ABBRS.length)
   assert.ok((REAL.scrapedAt ?? '').length > 0)
 })
@@ -369,7 +370,7 @@ test('every UNCONFIRMED non-Rogue discipline row is LABELED disputed; every Rogu
     }
   }
   // BER 2 + MNK 10 = 12 today (RNG's one row is confirmed); a floor, a re-scrape may find more.
-  assert.ok(disputed >= 12, `disputed discipline rows: ${String(disputed)}`)
+  assertCorpusFloor(disputed, 12, 'disputed discipline rows')
 })
 
 test('Disrupting Shot reads level 20 for a Ranger, with NO disputed chip (JOS-351)', () => {

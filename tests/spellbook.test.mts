@@ -21,6 +21,7 @@ import { spellMetricsAt } from '../src/shared/spellMetrics'
 import { spellMetricsForLevel } from '../src/shared/bestSpells'
 import { UPGRADE_RATES } from '../src/shared/spellUpgrade'
 import { buildLevelUnlocks } from '../src/main/data/levelUnlocks'
+import { assertCorpusFloor } from './corpusFloor.mts'
 
 /** A catalog row with only what a case is about. */
 function spell(over: Partial<UnlockSpell> & { name: string }): UnlockSpell {
@@ -271,7 +272,7 @@ test('the ladder is the full eleven rungs and its base is the row', () => {
 const REAL = buildLevelUnlocks(null).spells
 
 test('the real catalog folds into rows, and every row is filed in a category', () => {
-  assert.ok(REAL.length > 1400, `unlock corpus is ${String(REAL.length)} rows`)
+  assertCorpusFloor(REAL.length, 1452, 'unlock corpus rows')
   for (const s of REAL) {
     assert.ok(s.upgradeCategory !== undefined, `${s.name} has no upgrade category`)
   }

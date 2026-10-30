@@ -24,6 +24,7 @@ import {
   scanSpellClasses,
   spellLevelFor
 } from '../src/shared/spellLevels'
+import { assertCorpusFloor } from './corpusFloor.mts'
 
 const spells: { name: string; classes?: string }[] = spellsJson.spells
 const ABBRS: string[] = [...CLASS_ABBRS]
@@ -109,7 +110,7 @@ test('the committed spell DB is the one we measured', () => {
 
 test('at least 1,400 spells yield a (class, level) pair', () => {
   // measured 1,455 of 1,926 — the rest are NPC-only, item-only or "No eligible class".
-  assert.ok(withPairs.length >= 1400, `only ${withPairs.length} spells placed at a level`)
+  assertCorpusFloor(withPairs.length, 1459, 'spells placed at a level')
 })
 
 test('at least 1,900 (class, level) pairs come out of the DB', () => {

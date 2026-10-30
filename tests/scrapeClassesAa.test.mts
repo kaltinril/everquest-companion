@@ -27,7 +27,7 @@ test('every AA row of the four tables is read, with its table', () => {
   assert.ok(groups('special') >= 1, 'special AAs')
   // A FLOOR for the class table: editors add class AAs (76 on 2026-10-10, 77 on 2026-10-18), and a
   // parser that stops reading rows still falls under it. Holds on the old cache and a re-scrape alike.
-  assert.ok(groups('class') >= 76, `class AAs: ${String(groups('class'))}`)
+  assertCorpusFloor(groups('class'), 77, 'class AAs')
   assert.deepEqual(aas.get('Heroic Leap'), { group: 'class', classes: ['WAR'], activated: true, levels: [12] })
   assert.deepEqual(aas.get('Origin'), { group: 'general', activated: true, levels: [1] })
   assert.deepEqual(aas.get('Mass Group Buff'), { group: 'archetype', activated: true, levels: [50] })

@@ -50,6 +50,7 @@ import { skyMobIslandFor } from '../src/renderer/src/features/posky/skyMobIsland
 import mobsRaw from '../src/renderer/src/data/eqlegends/mobs.json' with { type: 'json' }
 import poskyRaw from '../src/renderer/src/data/eqlegends/posky.json' with { type: 'json' }
 import type { MobEntry, PoskyQuest } from '../src/shared/types'
+import { assertCorpusFloor } from './corpusFloor.mts'
 
 const MOBS = (mobsRaw as { mobs: MobEntry[] }).mobs
 const QUESTS = (poskyRaw as { quests: PoskyQuest[] }).quests
@@ -291,8 +292,8 @@ test('the tracker resolves a kill target for the great majority of its items', (
   const items = [...new Set(QUESTS.flatMap((q) => q.items.map((i) => i.name)))]
   const resolved = items.filter((n) => skyDroppersFor(n).length > 0)
   const unresolved = items.filter((n) => skyDroppersFor(n).length === 0)
-  assert.ok(items.length >= 128, `distinct items: ${items.length}`)
-  assert.ok(resolved.length >= 109, `resolved: ${resolved.length} of ${items.length}`)
+  assertCorpusFloor(items.length, 128, 'distinct items')
+  assertCorpusFloor(resolved.length, 112, `resolved (of ${items.length})`)
   // Every unresolved item is a wind rune or one of the gaps the catalog simply never lists.
   // (Azarack Blood/Skin left this set 2026-08-22 — Protector of Sky now lists them.)
   // (Large Sky Lapis left it 2026-09-27 — Eye of Veeshan now lists it.)
@@ -349,7 +350,7 @@ test('the committed posky.json states an island for every non-rune item row it c
       shapes.set(k, (shapes.get(k) ?? 0) + 1)
     }
   assert.deepEqual([...shapes.keys()].sort(), ['Plane of Sky', 'blank', 'island'])
-  assert.ok((shapes.get('island') ?? 0) >= 103, `island rows: ${shapes.get('island')}`)
+  assertCorpusFloor(shapes.get('island'), 105, 'island rows')
   // Every "Plane of Sky" row is a wind rune, which is why it resolves to no island.
   for (const q of QUESTS)
     for (const it of q.items)
@@ -438,16 +439,13 @@ test('equal coverage falls back to the module\'s name order, and a repeat counts
 })
 
 test('the caption covers nearly every quest, and states an island for most', () => {
-  // Floors, not frozen counts (a re-scrape may fill gaps): today 93 of 95 quests name a kill
-  // target and 82 of those carry an island. The two silent ones are the quests whose every
-  // item is a wind rune or one of the items no catalog page lists.
+  // Floors, not frozen counts (a re-scrape may fill gaps): 93 of 95 quests named a kill target
+  // and 82 carried an island when written, 95 and 87 on 2026-10-29. A silent quest is one whose
+  // every item is a wind rune or one of the items no catalog page lists.
   const labels = QUESTS.map((q) => killTargetLabel(questKillTargets(questRows(q))))
   const captioned = labels.filter((l) => l !== '')
-  assert.ok(captioned.length >= 93, `captioned: ${captioned.length} of ${QUESTS.length}`)
-  assert.ok(
-    captioned.filter((l) => l.includes('Island')).length >= 82,
-    `with island: ${captioned.filter((l) => l.includes('Island')).length}`
-  )
+  assertCorpusFloor(captioned.length, 95, `captioned (of ${QUESTS.length})`)
+  assertCorpusFloor(captioned.filter((l) => l.includes('Island')).length, 87, 'captioned with an island')
   // Every island a caption states came from a stated `where` on one of that quest's items — OR
   // from the mob-island overlay, which is the ONE thing allowed to answer differently and states
   // per row what it replaces (skyMobIslands.ts, JOS-415). Anything else would be an invention.
@@ -553,6 +551,6 @@ test('EVERY committed item row says who drops it, and none of them says only an 
       if (island) assert.ok(facts.where.includes(island), `${it.name}: stated island lost`)
     }
   }
-  assert.ok(rows >= 222, `rows: ${rows}`)
-  assert.ok(named >= 123, `rows naming a catalog mob: ${named}`)
+  assertCorpusFloor(rows, 222, 'rows')
+  assertCorpusFloor(named, 126, 'rows naming a catalog mob')
 })

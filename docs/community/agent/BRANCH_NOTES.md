@@ -684,6 +684,8 @@ where one exists.
 - Not counts, and kept: token censuses (an unknown slot, class or stat token must go into the
   hand table), named-record pins (Odium is Unstated), oracle lists compared name for name with
   hand research (the charm roster), and counts of fixtures or of a parser over a fixed input.
-- Left as they are (2026-10-29): floors written at the day's exact count (`poskyDroppers`,
-  `planRolePolicy`, `classUnlocks`, `gearIndex` and others). They go red only when the wiki drops
-  pages; lower one to `assertCorpusFloor` when it does.
+- Floors written at or near the day's count (under 5% or 3 below it: `poskyDroppers`,
+  `planRolePolicy`, `classUnlocks`, `gearIndex` and 12 more files) are `assertCorpusFloor` on the
+  2026-10-29 count, measured by a probe run. Older floors with 5-10% headroom (gearIndex pages
+  11000 of 11674, respawnWiki 500 of 552) were left; a new floor uses the helper, never a hand number
+  at the day's count. Rust corpus floors (`loot_from.rs`: items > 10,000, mobs > 5,000) have room.

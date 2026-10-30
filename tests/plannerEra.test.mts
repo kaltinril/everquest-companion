@@ -50,6 +50,7 @@ import { mobOutOfEra } from '../src/shared/mobEra'
 import { ZONES, zoneKey } from '../src/shared/zones'
 import mobsJson from '../src/renderer/src/data/eqlegends/mobs.json'
 import type { MobData } from '../src/shared/types'
+import { assertCorpusFloor } from './corpusFloor.mts'
 
 const catalog = mobsJson as unknown as MobData
 
@@ -471,7 +472,7 @@ test('the tag layer moves with CURRENT_ERA too — it is the same rank compariso
 test('the era layer resolves the catalog, by name count AND by mob weight', () => {
   // 192 distinct names / 8,214 links measured 2026-08-04; both floors sit under the measurement
   // with room for a rescrape to add dirt without going red.
-  assert.ok(CATALOG_ZONES.size >= 180, `only ${String(CATALOG_ZONES.size)} distinct catalog zones`)
+  assertCorpusFloor(CATALOG_ZONES.size, 187, 'distinct catalog zones')
 
   let names = 0
   let links = 0

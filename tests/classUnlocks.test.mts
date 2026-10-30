@@ -15,6 +15,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import classes from '../src/main/data/classes.json'
+import { assertCorpusFloor } from './corpusFloor.mts'
 
 interface Unlock {
   name: string
@@ -74,16 +75,17 @@ test('each class lists a name once, in level order, so a panel can slice by leve
 
 // ---- coverage floors ------------------------------------------------------
 
-test('the class pages state at least 430 skill unlocks and 30 discipline unlocks', () => {
+test('the class pages state hundreds of skill unlocks and dozens of discipline unlocks', () => {
   const s = everyRow(skillUnlocks).length
   const d = everyRow(discUnlocks).length
-  assert.ok(s >= 430, `only ${s} skill-section unlocks`) // measured 450
-  assert.ok(d >= 30, `only ${d} discipline unlocks`) // measured 33
+  assertCorpusFloor(s, 450, 'skill-section unlocks')
+  assertCorpusFloor(d, 33, 'discipline unlocks')
 })
 
-test('no class page collapses to a stub — every class states at least 15 skill unlocks', () => {
+test('no class page collapses to a stub — every class states a real skill table', () => {
   for (const abbr of ALL) {
-    assert.ok(skillUnlocks[abbr].length >= 15, `${abbr} states only ${skillUnlocks[abbr].length}`)
+    // 16 for the smallest class page (2026-10-29).
+    assertCorpusFloor(skillUnlocks[abbr].length, 16, `${abbr} skill unlocks`)
   }
 })
 
@@ -172,6 +174,6 @@ test('the unlock names line up with the skills table the combo inference already
   // `skills` parser keys on the first linked cell, so those 15 rows never reached `skills`.
   // The unlock table reads them from the header instead and is strictly more complete —
   // this floor pins that it stays a small, one-class gap rather than a drift.
-  assert.ok(matched.length >= 420, `only ${matched.length} of ${rows.length} unlock names are in skills[]`)
+  assertCorpusFloor(matched.length, 433, `unlock names in skills[] (of ${rows.length})`)
   assert.ok(rows.length - matched.length <= 25, `${rows.length - matched.length} unlock names are unknown to skills[]`)
 })

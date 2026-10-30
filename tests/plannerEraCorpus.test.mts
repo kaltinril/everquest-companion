@@ -51,6 +51,7 @@ import pageEraJson from '../src/main/data/pageEra.json'
 import { itemKey, type ItemDbFile } from '../src/main/itemsDb'
 import { pageEraKey, type PageEraFile } from '../src/main/pageEraDb'
 import type { MobData } from '../src/shared/types'
+import { assertCorpusFloor } from './corpusFloor.mts'
 
 const catalog = mobsJson as unknown as MobData
 const corpus = itemsJson as unknown as ItemDbFile
@@ -238,7 +239,7 @@ test('the two out-of-head era claims are read, by name, off the committed corpus
   // pages that the parser header listed as an accepted loss until this wave.
   const FAMILY = /^(small |large )?fine (plate \w|splinted cloak$)|^(small|large) fine steel breastplate$/
   const finePlate = CORPUS.filter((r) => FAMILY.test(r.key))
-  assert.ok(finePlate.length >= 36, `only ${String(finePlate.length)} Fine Plate pages in the corpus`)
+  assertCorpusFloor(finePlate.length, 36, 'Fine Plate pages in the corpus')
   for (const row of finePlate) {
     assert.equal(row.tag, 'Classic', `${row.page} lost its body banner`)
     assert.equal(eraBadge(row.tag ?? ''), 'in', `${row.page} is not an in-era claim`)

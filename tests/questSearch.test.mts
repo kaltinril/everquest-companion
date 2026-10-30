@@ -115,7 +115,7 @@ test('JOS-207 — typing an island finds the quests that name it', () => {
 // =============================================================================
 
 test('searching a boss name finds AT LEAST what picking that boss does, for every boss offered', () => {
-  assert.ok(OPTIONS.bosses.length >= 20, String(OPTIONS.bosses.length))
+  assertCorpusFloor(OPTIONS.bosses.length, 20, 'bosses offered')
   for (const boss of OPTIONS.bosses) {
     const picked = keys(filterByFacets(ALL, { islands: [], bosses: [boss] }))
     const typed = new Set(keys(filterByQuery(ALL, boss)))
