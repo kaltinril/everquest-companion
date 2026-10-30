@@ -533,7 +533,9 @@ where one exists.
   (`fontReaderWorker.js`, a rollup input), alongside OCR. `fontMerge.ts`: a cell with fit <= 0.02
   replaces the OCR words under it; OCR keeps its lines, boxes and order (the icon is placed from
   them) and everything else (title bar, art, other scales). Item windows only (`readItemShot.ts`);
-  spell, popup, journal and nameplate reads are OCR alone. `I` and `l` are one bitmap: the catalog's
+  spell, popup, journal and nameplate reads are OCR alone (spell windows measured 2026-10-29: same
+  page fields 61 of 61 with or without the font; not wired, plan section "Font reader on spell windows").
+  `I` and `l` are one bitmap: the catalog's
   words pick (`fontWords.ts`). Windows only: elsewhere `arialAtlas()` is null and OCR reads alone.
 - Font reader traps: art slivers fit `i`/`j`/`f` exactly at 1.5x, so a cell over no OCR word needs 3+
   letters or digits and never makes a line of its own (`Place`, a button, became an unread line).

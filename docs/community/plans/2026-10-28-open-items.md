@@ -22,9 +22,11 @@ agreed work has a row in its `requirements/` file.
 ## Ruled 2026-10-29 (owner), work queued
 
 - Map pins overlay: Slayer area labels hover-only (`requirements/map-waypoints.md`).
-- Font reader on spell windows: measure on the spell fixtures (`requirements/screenshot-to-wiki.md`).
+- Font reader on spell windows: measured 2026-10-29 (17 characters wrong of 2,085 against OCR's 43,
+  page fields the same 61 of 61); recommended not wired. Waits on the owner (`requirements/screenshot-to-wiki.md`).
 - Tradeskill Ingredient rows' one-time "needs refresh" (`SAVED_ROWS` 3): accepted, nothing to do.
-- Spell-name corrections (audit 2026-10-11 §4): re-measure on a full log.
+- Spell-name corrections (audit 2026-10-11 §4): re-measured 2026-10-29 on 5.37 M lines; the log never
+  prints any of the three names, so no row: Largo's kept as is, Cantata and GelatRoot dropped.
 - Cracked Darkwood Shield, and any page the wiki's pack has that our scrape never listed: picked up
   before a release (`requirements/scrape-delta-tool.md`). A delta re-reads only edited pages, so an
   unedited page the baseline missed is never seen. Drake Lava Powder is not one of these: its wiki

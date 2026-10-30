@@ -384,3 +384,43 @@ screenshots are being gathered)
   slower; at 1.5x (Malkil) 0.75-1.3 s against OCR's ~0.75 s, so up to ~0.5-1 s slower.
 - Not done: spell windows, popups, the Quest Journal and nameplates stay OCR alone (other fonts or
   preprocessed pictures, never measured); the capture's yellow-label read stays OCR.
+
+## Font reader on spell windows, measured (2026-10-29; owner: "sure measure")
+
+- The six spell-window fixtures in `tests/fixtures/shots`: `burst-of-flame-spell`,
+  `burst-of-flame-invocation`, `burst-of-flame-i-tier1`, `burst-of-flame-i-tier1-invocation`,
+  `spell-familiar-mummy`, `spell-pet-illusion-mummy`. Transcribed by eye, body text only (no title
+  bar, no Upgrade / Place Mote buttons), 2,085 characters; scored as `tests/shotFontReader.test.mts`
+  scores items (each transcribed row's cheapest edit into any line read). The font reader's
+  transcription-independent check: where it fits, it reads every body row as transcribed.
+- No code change was needed: `readFont`, `mergeFont` and `readSpellWindow` ran as they are from a
+  session-scratch script. Nothing is wired; spell reads stay OCR alone (`shotIpc.ts readText`).
+- Scale: the four Burst of Flame windows fit at 1x; both Mummy windows fit no scale (0 cells,
+  ~0.25 s, then OCR alone), as their item windows (1.24-1.30) did.
+
+| Window | Font alone | Exact cells + OCR (the app's merge) | OCR alone | Page fields, OCR / merged |
+| --- | --- | --- | --- | --- |
+| burst-of-flame-spell | 0 | 0 | 5 | 11/11, 11/11 |
+| burst-of-flame-invocation | 0 | 3 | 9 | 11/11, 11/11 |
+| burst-of-flame-i-tier1 | 55 (the description row broke into junk cells) | 8 | 13 | 12/12, 12/12 |
+| burst-of-flame-i-tier1-invocation | 0 | 6 | 16 | 12/12, 12/12 |
+| spell-familiar-mummy | no scale | 0 | 0 | 8/8, 8/8 |
+| spell-pet-illusion-mummy | no scale | 0 | 0 | 7/7, 7/7 |
+| **total, characters wrong of 2,085** | n/a | **17** | **43** | **61/61 both** |
+
+- What OCR slips on a spell window: the colon after `Cast`, `Resist`, `Target`; `burns` -> `bums`;
+  `Burst of Flame I` -> `|`; `Reuse: 1 sec (1 sec)` -> `(11sec)` or `(1sec)`. The merge fixes all of
+  them except the `Tier N` / `0 / N` labels (another font: fit 0.43-0.46, OCR also wrong, 15 of the
+  merge's 17) and the tier1 description row.
+- Page fields (name, rank, description, duration, skill, mana, casting time, resist, target, range,
+  the three messages): identical with and without the font, 61 of 61 right. `readSpellWindow`
+  already absorbs OCR's slips: labels read with or without a colon, and the description follows the
+  install's own words (dbstr_us), which repairs `bums`. Without the install's description the font
+  fixes `bums` on 3 of the 4 Burst windows (OCR 0 of 4). The only other change: the modifier note
+  says `Reuse 1 sec` where OCR wrote `11sec` (a bracketed value, never written to the page).
+- Time (owner's PC, shared with other jobs, median of 3, two runs): OCR 0.5-1.4 s a window, the font
+  reader 0.23-0.49 s. Run on its own worker beside OCR (as item windows do) it would add no wait.
+- Recommendation: do not wire it for spell windows now. No page field changes on 6 of 6 windows,
+  and the larger UI scale (the Mummy windows) gets nothing from it. Wire it (`readText` through
+  `mergeFont`, as `readItemShot.ts windowLines`) the day a spell window's page field is misread by
+  OCR or a spell has no description in the install.
