@@ -185,8 +185,13 @@ async function iconUrl(id: unknown): Promise<string | null> {
 }
 
 /** The clipboard's picture (a Win+Shift+S snip), as PNG bytes; null when it holds none. */
-function clipboardPng(): Uint8Array | null {
-  const img = clipboard.readImage()
+async function clipboardPng(): Promise<Uint8Array | null> {
+  // Electron 44+ has no readImage(): a picture is an item offered as image/png, else image/jpeg.
+  const items = await clipboard.read()
+  const item = items.find((i) => i.types.includes('image/png')) ?? items.find((i) => i.types.includes('image/jpeg'))
+  if (item === undefined) return null
+  const blob = await item.getType(item.types.includes('image/png') ? 'image/png' : 'image/jpeg')
+  const img = nativeImage.createFromBuffer(Buffer.from(await blob.arrayBuffer()))
   return img.isEmpty() ? null : new Uint8Array(img.toPNG())
 }
 

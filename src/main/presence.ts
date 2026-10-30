@@ -490,7 +490,7 @@ function resetPresence(): void {
  */
 function retire(w: Worker, wedged = false): void {
   w.removeAllListeners()
-  w.on('error', (err) => logError('main:presence', { message: 'retired presence watcher', err }))
+  w.on('error', (err: unknown) => logError('main:presence', { message: 'retired presence watcher', err }))
   if (wedged) {
     lostWatchers++
     // It may still honour the stop when the call it is stuck in finally returns, and that is the

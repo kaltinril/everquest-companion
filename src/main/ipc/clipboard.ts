@@ -28,11 +28,11 @@ import { IPC } from '../../shared/ipc'
 const MAX_CLIPBOARD_CHARS = 1_000_000
 
 export function registerClipboardIpc(): void {
-  ipcMain.handle(IPC.clipboardWrite, (_e, text: unknown): boolean => {
+  ipcMain.handle(IPC.clipboardWrite, async (_e, text: unknown): Promise<boolean> => {
     if (typeof text !== 'string' || text.length === 0 || text.length > MAX_CLIPBOARD_CHARS) {
       return false
     }
-    clipboard.writeText(text)
+    await clipboard.writeText(text)
     return true
   })
 }
