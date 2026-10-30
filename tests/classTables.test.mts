@@ -20,6 +20,7 @@ import {
   parseSpellClassString,
   spellClassIndex
 } from '../src/main/data/spellClasses'
+import { assertCorpusFloor } from './corpusFloor.mts'
 
 /** The 16 /who codes. SHD, never SHK — the wiki writes the class two ways, we don't. */
 const ALL: string[] = [
@@ -197,56 +198,29 @@ test('BER, MNK and WAR have ZERO spells — three classes invisible to cast evid
   }
 })
 
-test('ROG has exactly nine spells, all ROG-exclusive', () => {
-  assert.equal(RAW.get('ROG')?.total, 9)
-  assert.equal(RAW.get('ROG')?.excl, 9)
-  assert.equal(CANON.get('ROG')?.total, 9)
+test("ROG's spells are all ROG-exclusive, and no rank variant folds them", () => {
+  // Nine measured (2026-10-29). A floor, not the count: the property is that a rogue poison is
+  // exclusive to rogues and keeps its own canon key.
+  assertCorpusFloor(RAW.get('ROG')?.total, 9, 'ROG spells')
+  assert.equal(RAW.get('ROG')?.excl, RAW.get('ROG')?.total)
+  assert.equal(CANON.get('ROG')?.total, RAW.get('ROG')?.total)
 })
 
-test('the per-class counts reproduce the design measurement, per spell entry', () => {
-  // docs/plans/class-combo-inference.md § 2/C1, measured over the 1926 raw entries.
-  //
-  // NEC 192 -> 193 AND SHD 90 -> 91 (JOS-439), and they are ONE spell. The game patched on
-  // 2026-08-18 and added `Lifebite`, an instant lifetap the wiki page for which was created that
-  // day — `* Necromancer - Level 8 (Autogranted) * Shadow Knight - Level 10 (Autogranted)`. The
-  // scrape brought it in whole; nothing was overlaid. Both classes gain a row and NEITHER gains an
-  // exclusive one, because a spell two classes cast is exclusive to neither — which is exactly the
-  // check that makes this pair of numbers worth pinning rather than one of them.
-  //
-  // Nothing else in that 78-row scrape diff reaches this table: the rest of the patch is the
-  // alchemy shelf (`Elixir of *`, `<Resist> Awareness`, `Healing Potion *`), whose `classes` field
-  // reads `This spell cannot be cast directly. It is triggered by drinking a …` and parses to no
-  // class at all. `Invisibility versus Undead` -> `Invisibility vs. Undead` is a RENAME of a page
-  // this table already counted, so its five classes each keep the row they had.
-  //
-  // AND JOS-440 DOES NOT MOVE THEM EITHER, stated because that ticket removes a row and a reader
-  // will expect a removal to show up in a per-class total. It cannot show up HERE: these tallies
-  // are taken over the PRISTINE scrape (`spellsJson` directly, no removals and no corrections),
-  // which still carries both invisibility pages exactly as the wiki wrote them. The effective
-  // index below is where that ticket lands.
-  //
-  // THE 2026-10-10 DELTA RUN MOVES SEVEN TOTALS AND NO EXCLUSIVE COUNT, by two pages:
-  //   * `Identify` (pageid 49731) lost its classes. The wiki edited the page to say "This spell
-  //     doesn't exist in EQL for classes to scribe." and emptied `classes`, so BRD, ENC, MAG, NEC
-  //     and WIZ each lose one shared row (91 -> 90, 239 -> 238, 202 -> 201, 193 -> 192,
-  //     235 -> 234). Shared by five, exclusive to none.
-  //   * `Mass Imbue Sapphire` is a new row, `* Cleric - Level 29 * Shaman - Level 29`, so CLR
-  //     206 -> 207 and SHM 209 -> 210, again exclusive to neither. (`Mass Imbue Emerald`, CLR/DRU,
-  //     is the second of the two former `Imbue Emerald` rows under its own title, so it moves
-  //     nothing.)
-  // The run's renames (names now come from page titles) re-label rows this table already counted.
-  // 2026-10-26 delta: `Tears of Arlyxir` is a new row, `* Wizard - Level 64`, so WIZ 234 -> 235
-  // and its exclusive count 193 -> 194. Its re-read: `Soul Orb` (Necromancer 61) and `Funeral Pyre
-  // of Kelador` (Necromancer 60), new rows, so NEC 192 -> 194 and its exclusive count 86 -> 88.
-  // 2026-10-28 delta: Greater Immobilize (PAL/CLR/SHM/NEC, +1 each) and Night Fire (NEC only, +1
-  // exclusive): CLR 208, NEC 196/89, PAL 92, SHM 211.
-  const expected: Record<string, [number, number]> = {
+test("the per-class counts hold the design measurement's shape, per spell entry", () => {
+  // docs/plans/class-combo-inference.md § 2/C1 measured these over the raw entries. They are FLOORS
+  // (90% of the 2026-10-29 count, tests/corpusFloor.mts): a wiki delta adds a spell or two and
+  // moves them, a scrape that lost a class's spell list does not pass. A spell two classes cast is
+  // exclusive to neither, so the exclusive count never exceeds the total.
+  const measured: Record<string, [number, number]> = {
     BRD: [89, 89], BST: [77, 27], CLR: [208, 82], DRU: [268, 152],
     ENC: [238, 184], MAG: [200, 160], NEC: [196, 89], PAL: [92, 17],
     RNG: [92, 20], SHD: [91, 23], SHM: [211, 102], WIZ: [235, 194]
   }
-  for (const [abbr, [total, excl]] of Object.entries(expected)) {
-    assert.deepEqual([RAW.get(abbr)?.total, RAW.get(abbr)?.excl], [total, excl], `${abbr} drifted`)
+  for (const [abbr, [total, excl]] of Object.entries(measured)) {
+    const row = RAW.get(abbr)
+    assertCorpusFloor(row?.total, total, `${abbr} spells`)
+    assertCorpusFloor(row?.excl, excl, `${abbr} exclusive spells`)
+    assert.ok((row?.excl ?? 0) <= (row?.total ?? 0), `${abbr}: more exclusive spells than spells`)
   }
 })
 
@@ -255,55 +229,16 @@ test('the SHIPPED index is keyed by canon key, so rank variants collapse', () =>
   // folds "Clarity I…X" into one key. ENC therefore holds 176 exclusive KEYS, not 184
   // exclusive ENTRIES — both numbers are correct, at different granularities.
   //
-  // 1412 -> 1411 (JOS-337): the shipped index is built through the REMOVALS layer now, and
-  // `Invigor` is the first spell EQ Legends does not have (src/main/data/spellRemovalsList.ts).
-  // The RAW tallies above are untouched and still measure 1,926 scrape entries, which is the
-  // point of the split — the wiki dataset stays pristine and only the EFFECTIVE index shrinks.
-  // No per-class exclusive count moves with it: Invigor was placed for six classes, so it was
-  // exclusive to none of them.
-  //
-  // 1411 -> 1413 (JOS-439), TWO keys from the 2026-08-18 game patch, and only ONE of them is a new
-  // spell:
-  //   `lifebite` — the new Necromancer 8 / Shadow Knight 10 lifetap.
-  //   `invisibility vs. undead` — NOT a new spell. The wiki carries this spell on two pages, and
-  //     until the patch they were `Invisibility versus Undead` and `Invisibility Versus Undead`,
-  //     which spellCanonKey folded to ONE key. The patch renamed the first to `Invisibility vs.
-  //     Undead`; the twin still says `Versus`, so the fold that used to join them no longer does
-  //     and the index holds both spellings. No spell was added and no class gained a row (the RAW
-  //     tallies above did not move) — a duplicate wiki page simply stopped looking like a
-  //     duplicate. Reported to the integrator: a name correction that re-joins the twins is an
-  //     owner call under the JOS-161 rename rules, not something a scrape run decides.
-  //
-  // 1413 -> 1412 (JOS-440), THE OWNER'S CALL, MADE — and the second key above is the one that goes.
-  // The twins are re-joined, but NOT in the direction the report above assumed: the wiki's retitle
-  // was an editorial edit and the GAME never adopted it. The install's own `spells_us.txt` carries
-  // the spell as id 235 `Invisibility Versus Undead`, and the owner's log prints that spelling 83
-  // times against 0 for `vs.` — so the surviving key is `invisibility versus undead`, the one a
-  // cast line produces, and `invisibility vs. undead` is the key that disappears. A rename alone
-  // could not do it: the two pages also disagree about mana (30 vs 40) and cast time (5.00 vs 4.00
-  // s), and every fold takes the FIRST row in scrape order, which is the classic page. So the
-  // classic page is dropped by a `supersededBy` removal (spellRemovalsList.ts, which carries the
-  // client-table reading) and the survivor is renamed by a JOS-161 name correction.
-  //
-  // NO PER-CLASS COUNT MOVES WITH IT, and that is the check worth having here: both pages placed
-  // the SAME five classes at the SAME five levels (NEC 1, SHD 4, CLR 11, ENC 14, PAL 17), so the
-  // union that made one key out of two spellings gains and loses nobody. The RAW tallies above are
-  // untouched for the usual reason — they measure the pristine scrape, which still carries both
-  // pages.
-  //
-  // 1412 -> 1410 (2026-09-12): the canon key now drops apostrophes (spellKey.ts), and the effective
-  // index had two spells the wiki spells two ways - `O\`Keil's Flickering Flame` / `O\`Keils Flickering
-  // Flame` and `Turgur's Insects` / `Turgur\`s Insects` - which are one key each now, as the client
-  // and the log already had them. The page preference of the same day drops six ROWS but no KEY:
-  // each of the six names keeps its Legends page.
-  // 1410 -> 1419 (2026-10-10): the delta run's catalog, named by page title (2,006 -> 2,013 rows).
-  // 1419 -> 1418 (2026-10-18): the full re-scrape; Magical Monologue (a BRD song page) is marked {{Delete}}.
-  // 1418 -> 1419 (2026-10-26 delta): Tears of Arlyxir, a new Wizard spell.
-  // 1419 -> 1421 (its re-read): Soul Orb and Funeral Pyre of Kelador, two new Necromancer spells.
-  // 1421 -> 1423 (2026-10-28 delta): Greater Immobilize (PAL/CLR/SHM/NEC) and Night Fire (NEC).
-  assert.equal(spellClassIndex().size, 1423)
-  assert.equal(CANON.get('ENC')?.excl, 178)
-  assert.equal(RAW.get('ENC')?.excl, 184)
+  // The key count moved with every rename, removal and new page (1,410 to 1,423 by 2026-10-28), so
+  // it is a floor; the collapse itself is the property: fewer keys than class-bearing raw entries,
+  // and fewer ENC exclusive keys than ENC exclusive entries.
+  const classed = (spellsJson as { spells: { classes?: string }[] }).spells.filter(
+    (s) => parseSpellClassString(s.classes).length > 0
+  ).length
+  assertCorpusFloor(spellClassIndex().size, 1423, 'shipped spell keys')
+  assert.ok(spellClassIndex().size < classed, `${String(spellClassIndex().size)} keys for ${String(classed)} entries`)
+  assertCorpusFloor(CANON.get('ENC')?.excl, 178, 'ENC exclusive keys')
+  assert.ok((CANON.get('ENC')?.excl ?? 0) < (RAW.get('ENC')?.excl ?? 0), 'ENC rank variants collapse')
   assert.deepEqual(classesForSpell('Clarity II'), classesForSpell('Clarity'))
   assert.deepEqual(classesForSpell('Swift Like the Wind IV'), ['ENC'])
 })

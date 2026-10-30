@@ -47,6 +47,7 @@ import { CC_STEMS, CHARM_STEMS } from '../src/main/data/spellStems'
 import { spellCanonKey } from '../src/shared/spellKey'
 import { applySpellCorrections } from '../src/main/data/spellCorrections.ts'
 import { CALM_LANDING_MESSAGES } from '../src/main/data/spellDb.ts'
+import { assertCorpusFloor } from './corpusFloor.mts'
 
 /** THE RAW SCRAPE. No corrections, no derived durations, no overlay of any kind. */
 const RAW: SpellEntry[] = (spellsJson as SpellDbFile).spells
@@ -230,8 +231,8 @@ test('JOS-251 R3c: and `Root` itself — which no stem has ever matched — is i
   // reached the "Mez / root broke" group at all.
   assert.ok(!CC_STEMS.test('Root'), 'the stems really do miss it')
   assert.ok(holdRoster(RAW).has('root'))
-  // 13 since the 2026-10-28 delta: Greater Immobilize (PAL/CLR/SHM/NEC).
-  assert.equal(names('root').length, 13, 'the castable, target-side root ladder')
+  // A floor (13 on 2026-10-28, when Greater Immobilize joined): the ladder grows with the wiki.
+  assertCorpusFloor(names('root').length, 13, 'the castable, target-side root ladder')
 })
 
 // ── R4: the grammar itself ──────────────────────────────────────────────────────────────────────
@@ -272,53 +273,21 @@ test('JOS-251 R4c: both wiki phrasings of a charm read the same, and a spell can
   assert.equal(sirens.instrumentEnhanced, 'Yes (just the resists debuff)', 'the bard row, captured verbatim')
 })
 
-test('JOS-251 R4d: the per-class membership counts, pinned', () => {
-  // A re-scrape that widens or narrows a class fails HERE, with the class named, instead of drifting
-  // into somebody's alert list. Counts are canonical (rank-stripped) names, ungated.
-  //
-  // THE 2026-08-18 GAME PATCH MOVED TWO OF THESE, AND NEITHER IS A NEW ABILITY (JOS-439):
-  //
-  //   haste 44 -> 45. The patch's `Elixir of Speed I..IX` (six rows) all read
-  //     `Increase Attack Speed by N%`, which is the haste rule's own anchor. Six ROWS, ONE
-  //     canonical name (`elixir of speed` — the rank suffix is stripped), so the count moves by
-  //     one. They are potion clickies (`classes` says the spell cannot be cast directly), which is
-  //     why they widen the roster without widening anybody's spell book. Note also what did NOT
-  //     move: `Jonthan's Provocation` was re-worded from `Increase Melee Haste by 3%` to
-  //     `Increase Attack Speed by 48% (L45) to 50% (L47)` and classifies as `haste` either way —
-  //     the anchor reads both phrasings, which is the whole argument for anchoring at the head of
-  //     the sentence instead of matching a stem.
-  //   invisibility 19 -> 20. NO spell was added. The wiki keeps this one spell on two pages, and
-  //     until the patch both were spelled `Invisibility versus/Versus Undead`, folding to one
-  //     canonical name; the patch renamed one of them to `Invisibility vs. Undead` and the fold
-  //     stopped joining them. The EFFECT line on both is still the string `Invisibility versus
-  //     Undead` (R4b asserts on it below, unchanged) — it is the NAME that split.
-  //
-  // AND JOS-440 PUT THE TWINS BACK TOGETHER WITHOUT MOVING THIS NUMBER, which is worth writing
-  // down because the ticket predicted 20 -> 19 and the prediction was wrong for a reason this file
-  // exists to state. JOS-440 drops the classic duplicate page (a `supersededBy` removal) and
-  // renames the survivor to the spelling the game prints, so the EFFECTIVE catalog holds one
-  // invisibility key where it held two. This roster is not the effective catalog: `RAW` is the
-  // committed scrape with NO overlay of any kind — that is R7's separation, asserted directly
-  // below — so it still sees both pages and still counts 20. A future re-scrape that drops the
-  // duplicate page UPSTREAM is what moves this number to 19, and it will be a diff of spells.json
-  // rather than of the overlay.
+test('JOS-251 R4d: every class has members, at a floor per class', () => {
+  // A re-scrape or a rule change that narrows a class fails HERE, with the class named, instead of
+  // drifting into somebody's alert list. Counts are canonical (rank-stripped) names, ungated. They
+  // are floors (90% of the 2026-10-28 count, tests/corpusFloor.mts): until then each wiki delta or
+  // page rename moved one of them by one (root 24 -> 25 for Greater Immobilize), which is the wiki
+  // growing, not the rule breaking. A new rule must be added here too, or the key check fails.
   const all = (k: Parameters<typeof effectRoster>[1]): number =>
     effectRoster(RAW, k, { castableOnly: false, targetOnly: false }).size
-  assert.deepEqual(
-    Object.fromEntries(EFFECT_RULES.map((r) => [r.klass, all(r.klass)])),
-    {
-      // slow 34 -> 33 (2026-09-12): spellKey.ts drops apostrophes, and the wiki spells Turgur's Insects
-      // two ways (an apostrophe and a `); one slow, one key now, as the client and the log had it.
-      // charm 23 -> 24 and invisibility 20 -> 19 (2026-10-10 delta run, names from PAGE TITLES): the
-      // second Bravura page is titled `Solon's Bewitching Bravura`, one song under a second raw key;
-      // and the invisibility twin 49735 is titled `Invisibility versus Undead`, which folds with
-      // 57190's `Versus` again - the 19 the JOS-440 paragraph above predicted for an upstream fix.
-      charm: 24, summonPet: 102, mez: 16, root: 25, snare: 31, slow: 33, haste: 45, fear: 15,
-      stun: 92, blind: 12, pacify: 12, memblur: 17, invisibility: 19, feignDeath: 2,
-      // JOS-318, the class the alert catalog reads. 67 rows / 66 canonical names.
-      healOverTime: 66
-    }
-  )
+  const measured: Record<string, number> = {
+    charm: 24, summonPet: 102, mez: 16, root: 25, snare: 31, slow: 33, haste: 45, fear: 15,
+    stun: 92, blind: 12, pacify: 12, memblur: 17, invisibility: 19, feignDeath: 2,
+    healOverTime: 66
+  }
+  assert.deepEqual(EFFECT_RULES.map((r) => r.klass).sort(), Object.keys(measured).sort())
+  for (const r of EFFECT_RULES) assertCorpusFloor(all(r.klass), measured[r.klass], r.klass)
 })
 
 // ── R9: the heal-over-time class (JOS-318) ──────────────────────────────────────────────────────
@@ -376,8 +345,8 @@ test('JOS-258 R8: the summon class reads what the spell DOES, not how the wiki F
   // the roster is keyed canonically, so a name-vs-key comparison would report a phantom gap.
   const byType = RAW.filter((s) => s.spellType === 'Pet').map((s) => s.name)
   const byEffect = RAW.filter((s) => spellHasEffect(s, 'summonPet')).map((s) => s.name)
-  assert.equal(byType.length, 83, 'the type column')
-  assert.equal(byEffect.length, 104, 'the effect lines')
+  assertCorpusFloor(byType.length, 83, 'the type column')
+  assertCorpusFloor(byEffect.length, 104, 'the effect lines')
   // Every typed row is found by the effect read; the reverse is 21 rows the type column misses —
   // the magician's whole Vocarate/Greater Vocaration top end, and the necromancer's three
   // differently-spelled pets.
@@ -427,7 +396,7 @@ test('JOS-258 R8c: the roster gate is INVERTED against the charm one, and on pur
   // `petSummonRoster` turns `targetOnly` OFF. Its consumer is `You begin casting <Spell>.`, a
   // sentence about the CASTER, and 103 of the 104 rows are `targetType: Self` — the charm reader's
   // gate would throw away essentially the whole family.
-  assert.equal(petSummonRoster(RAW).size, 99, 'castable, either target type')
+  assertCorpusFloor(petSummonRoster(RAW).size, 99, 'castable, either target type')
   assert.equal(effectRoster(RAW, 'summonPet').size, 1, 'the default gate keeps only Flaming Sword of Xuzl')
   // The castable gate stays ON: no player prints a cast line for an NPC-only spell.
   assert.deepEqual(
@@ -436,7 +405,7 @@ test('JOS-258 R8c: the roster gate is INVERTED against the charm one, and on pur
   )
 })
 
-test('JOS-251 R4e: the scrape captured an effect list for all but four spells', () => {
+test('JOS-251 R4e: the scrape captured an effect list for all but a handful of spells', () => {
   const file = spellsJson as SpellDbFile
   // 2 -> 3 on 2026-08-22: the scraper began capturing `recast_time` (SpellEntry.recastMs).
   assert.equal(file.schema, 3, 'the effect-list schema')
@@ -444,18 +413,17 @@ test('JOS-251 R4e: the scrape captured an effect list for all but four spells', 
   // 1 -> 4 (JOS-439), 4 -> 3 (2026-08-22): a wiki editor filled Heritage of Mistmoore's effect
   // box that same day ("Added spell effects to appropriate box", the edit our rescrape caught).
   // The two Improved Vampirism stubs are still slotless, and the pre-existing one is `Instill`.
-  // Naming them is the assertion: `effects: undefined` means THE WIKI SAID NOTHING, never "this
-  // spell does nothing" (the scrape writes the field absent rather than `[]` for exactly that
-  // reason), and a silent jump here would be the derived charm, mez and pet rosters quietly
-  // losing members.
+  // `effects: undefined` means THE WIKI SAID NOTHING, never "this spell does nothing" (the scrape
+  // writes the field absent rather than `[]` for exactly that reason), and a silent jump here would
+  // be the derived charm, mez and pet rosters quietly losing members.
   // 3 -> 5 (2026-10-24 delta): Familiar: Gelatinous Cube's new page has no slot table yet, and
-  // Illusion: Half Dark Elf is an unfilled blueprint the scraper reads as stating nothing.
-  assert.deepEqual(
-    RAW.filter((s) => !s.effects?.length).map((s) => s.name).sort(),
-    ['Familiar: Gelatinous Cube', 'Illusion: Half Dark Elf', 'Improved Vampirism II', 'Improved Vampirism III', 'Instill']
-  )
-  assert.equal(RAW.length - file.withEffects!, 5, 'exactly five pages state no slot table at all')
-  assert.equal(RAW.filter((s) => s.instrumentEnhanced).length, 79, 'the bard pages')
+  // Illusion: Half Dark Elf is an unfilled blueprint the scraper reads as stating nothing. Editors
+  // fill and add such pages between deltas, so it is a ceiling, not the list: a parser that stops
+  // reading slot tables strands hundreds.
+  const slotless = RAW.filter((s) => !s.effects?.length).map((s) => s.name).sort()
+  assert.equal(RAW.length - file.withEffects!, slotless.length, 'the header agrees with the rows')
+  assert.ok(slotless.length <= 15, `${String(slotless.length)} pages state no slot table: ${slotless.join(', ')}`)
+  assertCorpusFloor(RAW.filter((s) => s.instrumentEnhanced).length, 79, 'the bard pages')
 })
 
 // ── R5: the cross-oracle ────────────────────────────────────────────────────────────────────────

@@ -38,6 +38,7 @@ import {
 } from '../src/main/itemsResearch'
 import { buildPlannerIndex } from '../src/main/planner/effectIndex'
 import type { EquipSlot } from '../src/shared/planner/types'
+import { assertCorpusFloor } from './corpusFloor.mts'
 
 const file = itemsJson as unknown as ItemDbFile
 const entries = Object.values(file.items ?? {})
@@ -333,7 +334,7 @@ test('the instrument table is exactly what the committed corpus states, both way
 
   assert.deepEqual([...filed.keys()].sort(), [...derived.keys()].sort(), 'the filed table and the corpus disagree about WHICH items are instruments')
   for (const [key, fam] of derived) assert.equal(filed.get(key), fam, `${key}: filed family disagrees with the page`)
-  assert.ok(filed.size >= 46, `only ${filed.size} instrument entries`)
+  assertCorpusFloor(filed.size, 46, 'instrument entries')
 
   // Every value is one of the five families, and every family the game has is represented —
   // a mapping bug that folded everything into one bucket would still pass a size floor.
