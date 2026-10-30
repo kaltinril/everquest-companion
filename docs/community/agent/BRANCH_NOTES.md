@@ -55,11 +55,15 @@ where one exists.
   arrived). Cause: the travel card sat in the column above the row and grows as its band, ports
   and zone graph answer. It now floats over the map's top-left (`MapBody` `TravelFloat`), and sits
   inside the no-map panel's own scroll box. Nothing whose height arrives late goes above the row.
-- Heading arrow (2026-10-29): the Maps tab's only player position is the TYPED /loc crosshair
-  (`useLocMarker`); the arrow points from the marker a placement replaced to the new one
-  (`shared/mapHeading.ts`, map axes x right / y down, so the bearing holds at any zoom). The tail is
-  memory only, so a restored marker has no arrow. Logged `Your Location is` lines reach no renderer
-  module yet (only gaps_locs.rs reads them); a live source would be a `character` module field.
+- Player marker and heading arrow (2026-10-29): two sources. The engine's `character` module keeps
+  the zone's last two `Your Location is` lines as `locs` ({ns, ew, z, ts}, oldest first; any zone
+  line empties them; parsed by gaps_locs.rs `loc_of`), and the typed /loc is stamped `at` when
+  placed (`eq.maps.loc`; an unstamped old one counts as oldest). `useLocMarker` shows the newest
+  of all (`shared/mapHeading.ts newestTwo`) and points the arrow from the one before (map axes x
+  right / y down, so the bearing holds at any zoom). Logged lines count only on the map of the
+  log's own zone; Clear hides them up to that moment (memory only). Log ts vs `Date.now()` decides
+  typed-versus-logged, so a log clock far off the machine's would skew it. A module field is not a
+  protocol change (`ModuleState` is untyped).
 - Crawl mode (2026-10-29): `eq.maps.crawl`, off by default. Killed this visit = kills module
   `lastTs` >= the progression module's last `zoneStart`, when that interval's zone is the map on
   screen (`shared/crawlMode.ts`). `useCrawlMode` keys the set on the start NUMBER, so experience
@@ -115,6 +119,10 @@ where one exists.
 - Area labels are hover-only on the overlay (owner, 2026-10-29): `AreaCircle` with no `text`, plus a
   faint `Mark` at the centre (a `markZones` hover zone while pinned, `areas` in its input). The Maps
   tab's `SlayerMapLayer` still passes `text` and keeps the rim labels.
+- Crawl mode on the overlay (2026-10-29): reads the Maps tab's `eq.maps.crawl` (`CRAWL_KEY`) via
+  shared storage, no chip of its own; not an `eq.maps.overlay*` key, so the reset keeps it.
+  `MapPinsCrawl.tsx` mounts the kills/progression feed only while it is on (each overlay
+  `module:changed` refetches a whole snapshot). Only POI mob marks dim.
 
 ## Bazaar tab (was bazaar-tab)
 
