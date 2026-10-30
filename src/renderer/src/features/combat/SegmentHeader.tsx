@@ -99,6 +99,18 @@ function SlowChip({ seg, mode }: { seg: SegmentView; mode: MeterMode }): React.J
   )
 }
 
+/** A segment you died in says so beside its name; the recap is the Incoming card's third tab. */
+function DiedMark({ seg }: { seg: SegmentView }): React.JSX.Element | null {
+  if (!seg.deaths?.length) return null
+  return (
+    <Tooltip title="You died here. Incoming, Death recap shows what hit you.">
+      <Typography component="span" data-testid="segment-died" sx={{ ml: 1, color: KIND_COLOR.enemy, fontSize: 12 }}>
+        died{seg.deaths.length > 1 ? ` x${String(seg.deaths.length)}` : ''}
+      </Typography>
+    </Tooltip>
+  )
+}
+
 /**
  * The panel's title + stat run, and hard right of it the copy affordance — it belongs to THIS
  * panel (not to the tab's top bar), because what it copies is whatever level this panel is
@@ -133,6 +145,7 @@ export function SegmentHeader({
       <Typography variant="subtitle1" noWrap>
         {seg.name}
         {seg.active && <CircleIcon sx={{ fontSize: 10, color: 'success.main', ml: 1, verticalAlign: 'middle' }} />}
+        <DiedMark seg={seg} />
       </Typography>
       <Stack direction="row" spacing={0.5} alignItems="baseline" sx={{ minWidth: 0 }}>
         {/* The rate carries its own UNIT WORD, so a healing headline can never be read as dps:

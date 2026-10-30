@@ -17,6 +17,7 @@ use serde::Serialize;
 use crate::combat::aggregate::Agg;
 use crate::combat::ally::AllyCharms;
 use crate::combat::charm::CharmModel;
+use crate::combat::deathrecap::DeathRecaps;
 use crate::combat::encounter::{
     CoatSlot, Encounter, MarkerRaw, TimelineRaw, ZoneSession, ZoneSessionClose, FALLBACK_IDLE_MS,
     MARKER_CAP, RECENT_CAP, TIMELINE_CAP,
@@ -186,6 +187,8 @@ pub struct EngineState {
 
     /// See `RosterFacts`. Refreshed once per ingested event and once per snapshot.
     pub roster: RosterFacts,
+    /// The hits and heals on you before each of your deaths (`deathrecap.rs`).
+    pub recaps: DeathRecaps,
 }
 
 impl Default for EngineState {
@@ -235,6 +238,7 @@ impl EngineState {
             pet_nudge: PetNudgeState::new(),
             quick_buff_ts: 0,
             roster: RosterFacts::default(),
+            recaps: DeathRecaps::default(),
         }
     }
 

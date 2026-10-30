@@ -414,6 +414,35 @@ export interface SegmentView {
    * are for drawing, never for counting.
    */
   procs: ProcsView
+  /** Your deaths in this segment, oldest first (`deathrecap.rs`). Absent when there are none. */
+  deaths?: DeathRecap[]
+}
+
+/** One landed hit on you in a death's window. `source` is as the log printed it, or Environment. */
+export interface DeathRecapHit {
+  ts: number
+  source: string
+  ability: string
+  amount: number
+  crit: boolean
+}
+
+/** One heal on you in a death's window. */
+export interface DeathRecapHeal {
+  ts: number
+  source: string
+  spell?: string
+  amount: number
+}
+
+/** One of your deaths: the hits and heals on you in the `windowMs` before it, in log order. */
+export interface DeathRecap {
+  ts: number
+  /** Absent for the killerless `You died.`. */
+  killer?: string
+  windowMs: number
+  hits: DeathRecapHit[]
+  heals: DeathRecapHeal[]
 }
 
 // ---------------------------------------------------------------------------

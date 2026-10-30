@@ -19,6 +19,7 @@
 use crate::combat::aggregate::{DamageEvent, MissType, SourceRef};
 use crate::combat::ally::{AllyCastLine, AllyKind, AllyLeaderLine, AllyVerdict};
 use crate::combat::charm::CharmVerdict;
+use crate::combat::deathrecap;
 use crate::combat::encounter::{ZoneSessionClose, CC_HOLD_MS};
 use crate::combat::lifecycle::{ensure_encounter, eval_closure, finalize_current};
 use crate::combat::procdetect::{
@@ -524,6 +525,7 @@ fn ingest_combat(st: &mut EngineState, ev: &Event) -> bool {
                 crit: ev.bool(Key::Crit),
             };
             routing::route_heal(st, &line);
+            deathrecap::note_heal(st, &line);
             fold_heal_analytics(st, &line, ev.bool(Key::OverTime));
             let spell = match &line.spell {
                 Some(s) => format!(" ({s})"),
@@ -657,6 +659,7 @@ fn ingest_damage(st: &mut EngineState, ev: &Event) {
             eval_closure(st, ev.ts());
             let modifiers = ev.arr_str(Key::Modifiers);
             let dmg = to_damage_event(st, ev, routing::ENVIRONMENT, &modifiers);
+            deathrecap::note_hit(st, &dmg);
             routing::route_environment_damage(st, &dmg);
             return;
         }
@@ -667,6 +670,7 @@ fn ingest_damage(st: &mut EngineState, ev: &Event) {
     // Built here rather than inside `to_damage_event` so the record can borrow it.
     let modifiers = ev.arr_str(Key::Modifiers);
     let dmg = to_damage_event(st, ev, attacker, &modifiers);
+    deathrecap::note_hit(st, &dmg);
     // The origin verdict names the LANE, so it is reached before `route()` folds the hit — and
     // exactly once, because it CONSUMES the cast claim. Asking twice would take two claims off one
     // cast line and count the second landing as a proc.
@@ -1083,6 +1087,7 @@ fn ingest_modifier(st: &mut EngineState, ev: &Event) {
             // four coats ended is the last minute that should be believed clean.
             clear_coats(st, ev.ts(), CoatClearReason::Death);
             st.state_timeline.censor_all(ev.ts());
+            deathrecap::note_death(st, ev.ts(), ev.str(Key::Killer));
         }
         _ => {}
     }
