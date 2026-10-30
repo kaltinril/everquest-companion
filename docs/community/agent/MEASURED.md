@@ -56,6 +56,14 @@ SK, others).
 - **Client vs wiki names:** the client writes `O`Keil's`, the wiki `O'Keils`; keys fold backtick,
   apostrophe and typographic quotes. ~125 wiki spell names have no client row (Legends renames:
   Fay Gate -> Greater Faydark Gate).
+- **A spell name the log never prints cannot be counted from parity's output** (2026-10-29). Landing
+  and fade lines are shared by spell families (spells_us_str: `is bound by strands of solid music.`
+  32 spells, `You feel replenished.` 29, `stumbles.` 62), and the fold names them by the DB's name,
+  so a wiki typo in that name shows up as "the log's spelling". Count names from the raw log (`begin
+  singing`/`casting X`, `resisted your X`, `Your X spell has worn off`, scribe and vendor lines). The
+  owner's whole history (5.37 M lines) never names Largo's Assonant/Absonant Binding, Cantata/Cantana
+  of Replenishment or GelatRoot/Gelatinous Root; spells_us.txt is the game's spelling for those
+  (`audits/2026-10-11-data-gaps.md` section 4).
 
 ## Items and upgrades
 
