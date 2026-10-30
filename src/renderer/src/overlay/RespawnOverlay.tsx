@@ -103,6 +103,7 @@ import { TextScaleStepper } from './TextScaleStepper'
 import { useOverlayModule } from './useOverlayModule'
 import { useSecondsClock } from '../lib/useSecondsClock'
 import { type OverlayChrome, useOverlayChrome } from './useOverlayChrome'
+import { OVERLAY_FONT } from '../../../shared/overlayFont'
 
 /** This window's accent — a warm amber, deliberately none of the four already in use (damage gold,
  *  healing green, debuff red, XP blue). Two windows that look alike at a glance would be worse. */
@@ -427,7 +428,7 @@ export default function RespawnOverlay(): JSX.Element {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        fontFamily: 'Inter, "Segoe UI", Roboto, system-ui, sans-serif',
+        fontFamily: OVERLAY_FONT,
         color: '#f2f2f2',
         background: `rgba(14,17,21,${bgAlpha})`,
         border: locked ? '1px solid rgba(255,255,255,0.04)' : `1px solid ${ACCENT}66`,

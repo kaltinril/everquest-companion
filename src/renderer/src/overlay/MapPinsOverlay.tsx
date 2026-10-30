@@ -38,6 +38,7 @@ import { useGameMapShown, useHiddenMouse } from './useGameMapFollow'
 import { useMobPlaces, useOverlayMapData, useSlayerOverlay } from './useMapPinsData'
 import { useOverlayView, type OverlayViewControls } from './useOverlayView'
 import { zoneMobPins, zoneTimerPins, zoneWatched } from '../features/maps/overlayPoints'
+import { OVERLAY_FONT } from '../../../shared/overlayFont'
 
 const NO_CHARACTER: CharacterSnap = { character: null }
 const CORNER_PX = 16
@@ -358,7 +359,7 @@ export default function MapPinsOverlay(): JSX.Element {
         position: 'relative',
         width: '100%',
         height: '100%',
-        fontFamily: 'Inter, "Segoe UI", Roboto, system-ui, sans-serif',
+        fontFamily: OVERLAY_FONT,
         background: `rgba(14,17,21,${String(bg[0])})`,
         // The other overlays' frame (RespawnOverlay, XpOverlay): an accent line while unlocked, all
         // but invisible pinned (owner, 2026-10-13).

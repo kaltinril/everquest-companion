@@ -56,6 +56,7 @@ import { folderPicturesStore } from '../features/gaps/folderPicturesStore'
 import { heldPicture } from '@shared/mobPicture'
 import { hiddenKeep, screenshotLabel } from './feedGapTags'
 import { SHOT_CAPTURE_ACTION } from './shotCaptureAction'
+import { OVERLAY_FONT } from '../../../shared/overlayFont'
 
 const GOLD = '#d9b25f'
 
@@ -413,7 +414,7 @@ export default function EventLogOverlay(): JSX.Element {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        fontFamily: 'Inter, "Segoe UI", Roboto, system-ui, sans-serif',
+        fontFamily: OVERLAY_FONT,
         color: '#f2f2f2',
         background: `rgba(14,17,21,${bgAlpha})`,
         border: locked ? '1px solid rgba(255,255,255,0.04)' : `1px solid rgba(217,178,95,0.4)`,

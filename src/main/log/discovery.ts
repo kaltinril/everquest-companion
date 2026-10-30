@@ -613,6 +613,12 @@ function enumValueNames(
   }
 }
 
+/** A key's value names under HKLM or HKCU, or null without the binding or the key (installedFonts.ts). */
+export function registryValueNames(hive: 'HKLM' | 'HKCU', path: string): string[] | null {
+  const reg = registry()
+  return reg ? enumValueNames(reg, hive === 'HKLM' ? reg.HKLM : reg.HKCU, path) : null
+}
+
 /** Enumerate a key's subkey names, or null if the key cannot be opened/read. */
 function enumKeyNames(reg: typeof NativeReg, parent: NativeReg.HKEY, path: string): string[] | null {
   const key = openKey(reg, parent, path)

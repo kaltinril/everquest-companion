@@ -5,6 +5,7 @@
 
 import { useCallback, useState, type CSSProperties, type JSX } from 'react'
 import { TRACK_COLOR } from '../features/maps/mapTrack'
+import { OVERLAY_FONT } from '../../../shared/overlayFont'
 
 export interface PinLayers {
   lines: boolean
@@ -114,7 +115,7 @@ export function usePinLayers(): [PinLayers, (k: keyof PinLayers) => void] {
 
 function chipStyle(on: boolean): CSSProperties {
   return {
-    font: '600 10px Inter, "Segoe UI", system-ui, sans-serif',
+    font: `600 10px ${OVERLAY_FONT}`,
     padding: '1px 7px',
     borderRadius: 9,
     cursor: 'pointer',
@@ -180,7 +181,7 @@ export function LayerChips({
           Fit
         </button>
       )}
-      <span style={{ display: 'flex', alignItems: 'center', gap: 4, font: '600 10px Inter, "Segoe UI", system-ui, sans-serif', color: 'rgba(255,255,255,0.7)' }}>
+      <span style={{ display: 'flex', alignItems: 'center', gap: 4, font: `600 10px ${OVERLAY_FONT}`, color: 'rgba(255,255,255,0.7)' }}>
         bg
         <input
           type="range"

@@ -103,6 +103,8 @@ import { FeedbackSetting, type OpenFeedback } from './FeedbackSetting'
 import { VoiceSetting } from './VoiceSetting'
 import { OverlayAutoHideSetting } from './OverlayAutoHideSetting'
 import { OverlaySnapSetting } from './OverlaySnapSetting'
+import { overlayRecoverItem } from './OverlayRecoverSetting'
+import { overlayFontItem } from './OverlayFontSetting'
 // The release hold this card is behind (JOS-359). Imported for the FLAG, not for geometry.
 import { SNAP_RELEASE_HOLD } from '@shared/overlaySnap'
 import { ToastSetting } from './ToastSetting'
@@ -237,6 +239,8 @@ function overlaysSection(): PrefSection {
         content: <OverlayAutoHideSetting />
       },
       ...snapItems(),
+      overlayRecoverItem,
+      overlayFontItem,
       {
         id: 'toast',
         label: 'Celebration toasts',
