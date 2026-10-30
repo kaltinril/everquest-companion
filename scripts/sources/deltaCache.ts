@@ -7,6 +7,7 @@ import { existsSync, readdirSync, readFileSync, renameSync, writeFileSync } from
 import { join } from 'path'
 import type { Reads } from './deltaApi'
 import { cacheFamilies, readRevisions, recordCacheRevs } from './deltaSkip'
+import { writePageCache } from './deltaAllPages'
 
 /** One page as a `prop=revisions` batch holds it, the shape every cache reader takes. */
 export interface CachedPage {
@@ -123,9 +124,9 @@ export function writeMobCache(dir: string, change: CacheChange): number {
  * read (or proven current, `proven`) page's revision into that cache's index (sources/revIndex.ts).
  */
 export function writeBackCaches(
-  caches: { itemCache: string; mobCache: string },
+  caches: { itemCache: string; mobCache: string; pageCache?: string },
   reads: Reads,
-  keep: { items: ReadonlySet<string>; mobs: ReadonlySet<string> },
+  keep: { items: ReadonlySet<string>; mobs: ReadonlySet<string>; other?: ReadonlySet<string> },
   proven: Map<number, number>
 ): void {
   const fresh: FreshPage[] = []
@@ -142,7 +143,12 @@ export function writeBackCaches(
   if (existsSync(caches.mobCache)) {
     console.log(`Mob cache: ${String(writeMobCache(caches.mobCache, { fresh, gone, keep: keep.mobs }))} pages updated`)
   } else absent.push('scripts/sources/cache/mobs')
-  recordCacheRevs(cacheFamilies(caches.itemCache, caches.mobCache), new Map([...readRevisions(reads), ...proven]), gone, new Date().toISOString())
+  if (caches.pageCache && keep.other) {
+    // Every other page's text (deltaAllPages.ts); a page gone, now a redirect or now in a DB leaves it.
+    const drop = new Set([...reads.pages.keys()].filter((t) => !keep.other?.has(t)))
+    console.log(`Page cache: ${String(writePageCache(caches.pageCache, reads, keep.other, drop))} pages updated`)
+  }
+  recordCacheRevs(cacheFamilies(caches.itemCache, caches.mobCache, caches.pageCache), new Map([...readRevisions(reads), ...proven]), gone, new Date().toISOString())
   if (absent.length === 0) return
   console.log(
     `No ${absent.join(' or ')} in this checkout, so it was not refreshed: scrape-page-era.ts, ` +

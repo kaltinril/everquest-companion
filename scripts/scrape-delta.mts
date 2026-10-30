@@ -2,6 +2,8 @@
 // re-reading 18,000 pages that did not change.
 //
 //   npx tsx scripts/scrape-delta.mts [--dry-run] [--spell-titles] [--since-<file>=<ISO>]
+//                                    [--titles-from-compare[=<report.json>]] [--extra=<Title|Title>]
+//                                    [--all-pages]
 //
 // Files: items.json, mobs.json, spells.json, quests.json. `list=recentchanges` is read ONCE, from
 // the oldest stamp among them; each file takes only the changes newer than its own scrapedAt
@@ -16,6 +18,12 @@
 // from it): `--spell-titles` lists them (list=embeddedin, ~5 requests); the index keeps them for
 // later runs. `--since-<items|mobs|spells|quests>=<ISO>` moves a file's window back (never
 // forward), for a file whose stamp is newer than the wiki text it was built from.
+//
+// The feed names only edited pages. A page our scrape never listed and nobody edited since is read
+// by title with `--titles-from-compare` (the newest eoz-compare report's `toRead`, or the report
+// given) or `--extra`, and folded like an edit (sources/deltaExtra.ts). `--all-pages` lists every
+// ns0 article and reads each one no cache or DB holds; a read page no DB takes is kept in the page
+// cache and every page no DB keys is listed in src/main/data/wikiPages.json (sources/deltaAllPages.ts).
 //
 // A redirect page that lands on a mob is kept as that mob's otherNames (sources/mobRedirects.ts).
 // Then every other wiki-derived file the changes reach is brought up to date by its own tool
@@ -92,6 +100,8 @@ import { isMobPage } from './sources/mobPage'
 import type { NamedMob } from './sources/mobRedirects'
 import { redirectsOntoData } from './sources/deltaRedirects'
 import { skipHeldPages } from './sources/deltaSkip'
+import { addExtra, extraReport, extraTitles, type ExtraOptions } from './sources/deltaExtra'
+import { addAllPages, keyedOnDisk, otherPages, PAGE_CACHE, writePageIndex } from './sources/deltaAllPages'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 
@@ -107,6 +117,8 @@ export interface DeltaPaths {
   /** Every ns0 redirect, as scrape-mob-redirects listed it; the delta keeps it current. */
   redirectCache: string
   questCache: string
+  /** every other page's text (sources/deltaAllPages.ts) */
+  pageCache: string
 }
 
 /** The checkout's files, from `root` (the repo). */
@@ -121,22 +133,28 @@ export function deltaPaths(root: string): DeltaPaths {
     mobCache: resolve(root, 'scripts/sources/cache/mobs'),
     spellCache: resolve(root, 'scripts/sources/cache/spells'),
     redirectCache: resolve(root, 'scripts/sources/cache/redirects/redirects.json'),
-    questCache: resolve(root, 'scripts/sources/cache/quests')
+    questCache: resolve(root, 'scripts/sources/cache/quests'),
+    pageCache: resolve(root, PAGE_CACHE)
   }
 }
 
-export interface DeltaOptions {
+export interface DeltaOptions extends ExtraOptions {
   dry: boolean
   spellTitles: boolean
   since: Partial<Record<DeltaFile, string>>
+  allPages: boolean
 }
 
 export function parseArgs(argv: string[]): DeltaOptions {
-  const opts: DeltaOptions = { dry: false, spellTitles: false, since: {} }
+  const opts: DeltaOptions = { dry: false, spellTitles: false, since: {}, extra: [], fromCompare: null, allPages: false }
   for (const a of argv) {
     const since = /^--since-(items|mobs|spells|quests)=(.+)$/.exec(a)
+    const compare = /^--titles-from-compare(?:=(.+))?$/.exec(a)
     if (a === '--dry-run') opts.dry = true
     else if (a === '--spell-titles') opts.spellTitles = true
+    else if (a === '--all-pages') opts.allPages = true
+    else if (compare) opts.fromCompare = compare[1] ?? ''
+    else if (a.startsWith('--extra=')) opts.extra.push(...a.slice('--extra='.length).split('|'))
     else if (since && Number.isFinite(Date.parse(since[2]))) {
       opts.since[since[1] as DeltaFile] = new Date(since[2]).toISOString()
     } else throw new Error(`unknown argument ${a}`)
@@ -218,7 +236,11 @@ export async function run(paths: DeltaPaths, opts: DeltaOptions): Promise<void> 
       `${requests} feed requests, ${extra} of them only for windows older than ${newestStart(w)}`
   )
   printPageLogs(feed.logs)
-  const plan = planReads(feed, w, knownOf(db))
+  const known = knownOf(db)
+  const extras = extraTitles(opts, paths.root, (t) => known.itemPages.has(t) || known.mobPages.has(t))
+  addExtra(feed, extras, new Date().toISOString())
+  if (opts.allPages) await addAllPages(paths.root, known, feed, opts.dry)
+  const plan = planReads(feed, w, known)
   if (opts.dry) {
     printDryRun(plan, requests, w.spells && opts.spellTitles ? spellListCost(db) : 0)
     return
@@ -226,7 +248,7 @@ export async function run(paths: DeltaPaths, opts: DeltaOptions): Promise<void> 
   const universe = w.spells ? await spellUniverse(db, opts) : null
   const proven = skipHeldPages(plan, feed, paths)
   const reads = await readPlanned(paths, plan, universe)
-  await applyDelta({ paths, db, w, feed, reads, universe, proven })
+  await applyDelta({ paths, db, w, feed, reads, universe, proven, extras })
 }
 
 /** list=embeddedin answers 500 titles a request. */
@@ -267,6 +289,8 @@ interface DeltaCtx {
   universe: Record<string, string> | null
   /** pageid -> the newest revision, for pages skipped because we hold it */
   proven: Map<number, number>
+  /** never-listed titles read on request (sources/deltaExtra.ts) */
+  extras: string[]
 }
 
 /** Items over their window; a key whose last claimant let go may still have a page of that name. */
@@ -366,9 +390,12 @@ async function applyDelta(ctx: DeltaCtx): Promise<void> {
     refreshed.add(QUESTS_FILE)
   }
   printStamp([...reads.unapplied, ...(questFold?.unapplied ?? []), ...spellStuck])
-  writeBackCaches(paths, reads, { items: new Set([...itemFold.folded, ...mobFold.folded]), mobs: new Set(mobFold.folded) }, ctx.proven)
-  const spellPages = spellRun?.fold.folded ?? []
-  await followAndReport(ctx, { mobs, refreshed, items: itemFold, mob: mobFold, redirected, spells: spellPages, quests: questFold?.folded ?? [] })
+  const f: Folded = { mobs, refreshed, items: itemFold, mob: mobFold, redirected, spells: spellRun?.fold.folded ?? [], quests: questFold?.folded ?? [] }
+  // A read page no DB took and no redirect is kept as a page (sources/deltaAllPages.ts).
+  const other = otherPages(censusPages(ctx), foldedOf(f))
+  writeBackCaches(paths, reads, { items: new Set([...itemFold.folded, ...mobFold.folded]), mobs: new Set(mobFold.folded), other }, ctx.proven)
+  writePageIndex(paths.root, keyedOnDisk(paths.root))
+  await followAndReport(ctx, f)
 }
 
 interface Folded {
@@ -381,6 +408,8 @@ interface Folded {
   quests: string[]
 }
 
+const foldedOf = (f: Folded): Set<string> => new Set([...f.items.folded, ...f.mob.folded, ...f.redirected, ...f.quests, ...f.spells])
+
 /** The other files the changes reach (sources/deltaFollow.ts), then the closing report. */
 async function followAndReport(ctx: DeltaCtx, f: Folded): Promise<void> {
   const changed = {
@@ -392,8 +421,9 @@ async function followAndReport(ctx: DeltaCtx, f: Folded): Promise<void> {
   const stale = await followDelta(ctx.paths.root, changed, oldestStart(ctx.w), f.mobs)
   for (const file of FOLLOWED) if (!stale.includes(file)) f.refreshed.add(file)
   console.log(`\nRequests this run (the delta's own): ${pacing.requests}`)
-  const folded = new Set([...f.items.folded, ...f.mob.folded, ...f.redirected, ...f.quests, ...f.spells])
+  const folded = foldedOf(f)
   for (const line of unfoldedReport(unfolded(censusPages(ctx), folded), f.refreshed)) console.log(line)
+  for (const line of extraReport(ctx.extras, ctx.reads.pages, folded)) console.log(line)
 }
 
 /** spells.json and its cache; returns the listed pages that could not be read (they hold the stamp). */

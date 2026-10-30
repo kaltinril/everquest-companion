@@ -187,6 +187,33 @@ export async function fetchWikitext(
   }
 }
 
+/**
+ * Every ns0 article, whatever template it uses (owner, 2026-10-29), 500 a request. Redirects are left
+ * out: the redirect cache (scrape-mob-redirects.ts, kept current by the delta) holds them.
+ */
+export async function listAllPages(): Promise<{ pageid: number; title: string }[]> {
+  const out: { pageid: number; title: string }[] = []
+  let apcontinue: string | undefined
+  for (let page = 0; page < 400; page++) {
+    const j = await api<{
+      query?: { allpages?: { pageid: number; title: string }[] }
+      continue?: { apcontinue?: string }
+    }>({
+      action: 'query',
+      list: 'allpages',
+      apnamespace: '0',
+      apfilterredir: 'nonredirects',
+      aplimit: '500',
+      ...(apcontinue ? { apcontinue } : {})
+    })
+    if (!j.query) throw new Error('allpages came back without a query block')
+    for (const p of j.query.allpages ?? []) out.push({ pageid: p.pageid, title: p.title })
+    apcontinue = j.continue?.apcontinue
+    if (!apcontinue) return out
+  }
+  throw new Error('allpages: still continuing after 400 requests, refusing a truncated list')
+}
+
 /** scrape-spells.ts's page universe: every ns0 page embedding Template:Spellpage, 500 a request. */
 export async function listSpellPages(): Promise<{ pageid: number; title: string }[]> {
   const out: { pageid: number; title: string }[] = []
