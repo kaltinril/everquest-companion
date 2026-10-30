@@ -1,36 +1,47 @@
 # Open items after the 2026-10-27 sweep
 
-State at 2026-10-28 evening: the 2026-10-27 work and the 2026-10-28 wiki delta are pushed and
-tagged `community-0.1.0-test.36` (owner: "get a release out"). Nothing checked in the running app
-yet.
+State at 2026-10-29: test.38 is published (`community-0.1.0-test.38`); `main_community` matches
+`origin`. Fork #4 is closed. The owner's answers of 2026-10-29 are folded in below; each piece of
+agreed work has a row in its `requirements/` file.
 
 ## Waiting on the owner
 
-- Fork #4: test.36 ships the buff fix; close with a comment once the release is published.
-- Maps: the travel card now floats over the map's top-left corner. OK there?
-- Map pins overlay: Slayer area labels always on, or hover-only like point names?
-- Font reader: ~0.5-1 s slower per paste at 1.5x UI scale. Accept, or stop waiting once OCR ends?
-- Font reader on spell windows: measure on the spell fixtures first, then decide.
-- Tradeskill Ingredient rows bump `SAVED_ROWS` to 3: saved characters read "needs refresh" until
-  logged in once (as the forage rows did). Accept?
-- Spell-name corrections (audit 2026-10-11 §4): not made; `spells_us.txt` contradicts two of three.
-  Re-measure on a full log, or drop.
-- Cracked Darkwood Shield: the one item page missing from items.json. Fetch in the next top-up?
-- Fork #2: the owner's OCR-the-Currencies-tab idea is ledgered as an idea; ruling "leave it" stands.
-  The reporter's 2026-10-28 suggestion (ignore runes in the export, loot adds, turn-ins remove) is
-  mostly what "Both (higher of the two)", the default, already does; the gaps are in the ISSUES.md
-  row. Owner, 2026-10-28: the higher-of-two count is not accurate; the ask reads as pure log
-  tracking for runes (loot adds, any hand-over removes, the export ignored). Not built yet.
-- Drake Lava Powder: in the wiki's pack, never listed by our scrape (`eoz-compare --release`
-  "look by hand", 2026-10-28). Check its page's categories before the next delta.
-- Wiki edits for the owner: Enynti `| respawn_time = 8:50`, restore Sulgar, Clockwork Merchant `|name`.
-- Unconfirmed changes: meters update 1/s in a fight; `heal-*` overlays character-aware; a charm
-  bind still ends at the zone line.
-- The `UNRELEASED` gate: ruled 2026-10-28, always open ("no reason to hide them ever just always
-  show the tabs"). Both halves are pinned true. Left: remove the gate's ~128 call sites (48 files)
-  as cleanup; no player-visible change.
+- Maps: the travel card (closest port, era, routes) floats over the map's top-left corner since
+  2026-10-27, so the map row no longer moves when it loads. OK there?
+- Font reader at 1.5x UI scale: up to ~0.5-1 s slower per paste than OCR alone. Owner unsure;
+  default kept (wait for the font read: accuracy over half a second).
+- Upgrade maths: whether the regens qualify SV Void. Needs a screenshot of an upgraded item whose
+  only stats are regens. Weight at whole tiers was settled 2026-10-28; no Windstriker needed.
+- Wiki edits for the owner (found by our checks, not suggested by the app): Enynti
+  `| respawn_time = 8:50`, restore Sulgar, Clockwork Merchant `|name`. The app suggests missing
+  pages and drops, not wrong values on a page that exists; a "wiki says X, your log says Y"
+  respawn suggestion was offered, not asked for.
+- Unconfirmed in the app: `heal-*` overlays character-aware; a charm bind still ends at the zone
+  line. (Meter overlays read 4/s in a fight since test.37, `requirements/meter-cadence.md`.)
 
-## Candidate work (owner to pick)
+## Ruled 2026-10-29 (owner), work queued
+
+- Map pins overlay: Slayer area labels hover-only (`requirements/map-waypoints.md`).
+- Font reader on spell windows: measure on the spell fixtures (`requirements/screenshot-to-wiki.md`).
+- Tradeskill Ingredient rows' one-time "needs refresh" (`SAVED_ROWS` 3): accepted, nothing to do.
+- Spell-name corrections (audit 2026-10-11 §4): re-measure on a full log.
+- Cracked Darkwood Shield, and any page the wiki's pack has that our scrape never listed: picked up
+  before a release (`requirements/scrape-delta-tool.md`). A delta re-reads only edited pages, so an
+  unedited page the baseline missed is never seen. Drake Lava Powder is not one of these: its wiki
+  page is free text with no item box, so it has no record to fold until the wiki page is fixed (the
+  Gaps tab's "Fix page" opens it).
+- Fork #2: a log-only rune count as one more option; the default stays
+  (`requirements/sky-rune-count.md`).
+- `UNRELEASED` gate removed outright (`requirements/unreleased-gate.md`). Last, after the other
+  branches merge: it touches 48 files.
+- Census tests: floors or property checks, no exact corpus counts (`requirements/test-hygiene.md`).
+- Competitor-scan quick wins (`requirements/competitor-quick-wins.md`).
+- Performance leftovers (`requirements/performance-leftovers.md`).
+- Every major dependency bump, one branch each (`requirements/deps-refresh.md`).
+- Not yet: publishing to the wiki from the app; sending observations to the wiki.
+- A delta (with the pack compare) runs before every release (RULES.md rule 10); test.38 had one.
+
+## Candidate work (owner to pick; the ones ruled above are queued)
 
 - Count-pinned census tests (owner, 2026-10-28: "having random count tests is a bit dumb it forces us
   to update the test every time because counts change"): replace exact corpus counts with

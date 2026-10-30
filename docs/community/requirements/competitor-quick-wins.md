@@ -1,0 +1,8 @@
+# competitor-quick-wins: what was asked for
+
+Every request this feature has taken, newest at the bottom. Read it before changing the feature;
+nothing listed here is removed or narrowed without the owner's word (RULES.md, rule 19). Source: the competitor scans of 2026-10-27/28 (plans/2026-10-28-open-items.md).
+
+| Date | Asked by | The ask | Status |
+| --- | --- | --- | --- |
+| 2026-10-29 | owner | Build the cheap, no-network ideas from the competitor scans ("sure we'll see what this brings"): death recap; friends online from `/who`; a heading arrow on the 2D map marker (last two logged positions); crawl mode (dim mobs you killed on the map and loot list until you re-zone); a melee swing timer; overlay polish (drag a docked overlay to detach, a hotkey to recover overlays, any installed font). | open |
