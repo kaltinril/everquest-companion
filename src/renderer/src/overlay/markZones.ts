@@ -4,6 +4,7 @@
 // still reaches the game (owner, 2026-10-13). Pure, so a test can hold the shapes.
 
 import type { MapPoint } from '@shared/maps'
+import type { SlayerOverlayArea } from '@shared/slayerOverlay'
 import { placeInExtent, type ExtentFit, type TrackedPoint, type ZoneExtent } from '../features/maps/mapTrack'
 import { timerPinLabels, type TimerPin } from '../features/maps/respawnPins'
 import type { CatalogPin } from '../features/maps/overlayPoints'
@@ -46,6 +47,8 @@ export interface MarkZoneInput {
   mobs: readonly CatalogPin[]
   timers: readonly TimerPin[]
   tracked: readonly TrackedPoint[]
+  /** The Achievements areas: each centre dot shows its label on hover. */
+  areas?: readonly SlayerOverlayArea[]
   /** The timer labels' clock: their text, and so their width, moves with it. */
   nowMs: number
 }
@@ -73,6 +76,7 @@ export function markZones(i: MarkZoneInput): Zone[] {
     for (const p of i.labels) out.push(dot(place(p)))
     for (const m of i.mobs) out.push(dot(place(m)))
   }
+  if (i.layers.achievements) for (const a of i.areas ?? []) out.push(dot(place(a)))
   if (i.layers.timers) for (const t of i.timers) for (const p of t.pins) out.push(labelled(place(p), timerLabel(t, i.nowMs), i.w, TIMER_SIZE))
   if (i.layers.tracked) for (const t of i.tracked) for (const p of t.pins) out.push(labelled(place(p), t.name, i.w, TRACKED_SIZE))
   return out.filter((z) => onScreen(z, i.w, i.h)).map((z) => ({ x: Math.round(z.x), y: Math.round(z.y), width: Math.round(z.width), height: Math.round(z.height) }))

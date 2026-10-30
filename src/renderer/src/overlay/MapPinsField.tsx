@@ -6,7 +6,7 @@
 // A label near the right edge is drawn on the pin's LEFT, ending at the pin, so it never runs off
 // the window (owner, 2026-10-13).
 
-import { useMemo, useState, type CSSProperties, type JSX } from 'react'
+import { Fragment, useMemo, useState, type CSSProperties, type JSX } from 'react'
 import type { MapData, MapPoint } from '@shared/maps'
 import type { SlayerOverlayArea } from '@shared/slayerOverlay'
 import { UNRELEASED } from '../devFlags'
@@ -143,20 +143,34 @@ function Lines({ data, ext, fit, w, h }: { data: MapData; ext: ZoneExtent; fit: 
   return <MapCanvas lines={data.lines} vp={vp} layers={DEFAULT_LAYERS} ink={`${TRACK_COLOR}cc`} />
 }
 
-/** The picked Slayer counters' areas, drawn as the Maps tab draws them. Inert: no click, no pin. */
-function AreaMarks({ ext, fit, areas }: MapPinsFieldProps): JSX.Element {
+/** The picked Slayer counters' areas. The circle is inert; its label sits on a faint centre dot
+ *  and shows on hover only, like a point's name (owner, 2026-10-29: "no reason to have extra
+ *  noise if someone doesn't care about it"). */
+function AreaMarks({ ext, fit, w, areas, onCopy }: MapPinsFieldProps): JSX.Element {
   return (
     <>
-      {areas.map((a) => (
-        <AreaCircle
-          key={`${String(a.x)},${String(a.y)}`}
-          testId="map-pins-area"
-          at={placeInExtent(ext, fit, a)}
-          r={a.r * fit.scale}
-          tone={AREA_COLOR}
-          text={a.text}
-        />
-      ))}
+      {areas.map((a) => {
+        const at = placeInExtent(ext, fit, a)
+        const key = `${String(a.x)},${String(a.y)}`
+        return (
+          <Fragment key={key}>
+            <AreaCircle testId="map-pins-area" at={at} r={a.r * fit.scale} tone={AREA_COLOR} />
+            <Mark
+              testId="map-pins-area-mark"
+              at={at}
+              w={w}
+              text={a.text}
+              color={AREA_COLOR}
+              size={5}
+              shape="dot"
+              faint
+              onClick={() => {
+                onCopy(a.text, { x: a.x, y: a.y })
+              }}
+            />
+          </Fragment>
+        )
+      })}
     </>
   )
 }

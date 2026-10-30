@@ -329,8 +329,8 @@ export default function MapPinsOverlay(): JSX.Element {
   const note = emptyNote(zone, ext)
   const labels = useMemo(() => labelRows(data?.points ?? []).map((r) => r.point), [data])
   const zoneInput = useMemo(
-    () => (ext == null || fit == null ? null : { ext, fit, w, h, layers, labels, mobs, timers, tracked, nowMs }),
-    [ext, fit, w, h, layers, labels, mobs, timers, tracked, nowMs]
+    () => (ext == null || fit == null ? null : { ext, fit, w, h, layers, labels, mobs, timers, tracked, areas: UNRELEASED ? areas : [], nowMs }),
+    [ext, fit, w, h, layers, labels, mobs, timers, tracked, areas, nowMs]
   )
   const [follow, toggleFollow] = usePinsFollow()
   const { hidden, note: autoHideNote } = useFollowHidden(follow, locked)
