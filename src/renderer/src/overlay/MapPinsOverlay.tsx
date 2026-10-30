@@ -36,6 +36,7 @@ import { MapPinsField } from './MapPinsField'
 import { LayerChips, usePinLayers, usePinsBg, usePinsFollow, type PinLayers } from './mapPinsLayers'
 import { useGameMapShown, useHiddenMouse } from './useGameMapFollow'
 import { useMobPlaces, useOverlayMapData, useSlayerOverlay } from './useMapPinsData'
+import { useOverlayCrawl } from './MapPinsCrawl'
 import { useOverlayView, type OverlayViewControls } from './useOverlayView'
 import { zoneMobPins, zoneTimerPins, zoneWatched } from '../features/maps/overlayPoints'
 
@@ -321,6 +322,7 @@ export default function MapPinsOverlay(): JSX.Element {
   const { w, h } = useWindowSize()
   const zone = zoneShortName(who.zone)
   const { data, tracked, mobs, timers, ext, areas, slayerChip } = useZoneMarks(zone, layers)
+  const crawl = useOverlayCrawl(zone)
   const nowMs = useClock(layers.timers && timers.length > 0)
   const { copied, onCopy } = useCopy()
   const hostRef = useRef<HTMLDivElement>(null)
@@ -373,9 +375,10 @@ export default function MapPinsOverlay(): JSX.Element {
         // or not the bars are showing (pinned and not hovered, they are not, and nothing is cut).
         <div style={{ position: 'absolute', inset: 0, clipPath: clip }}>
           <Corners fit={fit} />
-          <MapPinsField ext={ext} fit={fit} w={w} h={h} data={data} layers={layers} mobs={mobs} timers={timers} tracked={tracked} areas={areas} nowMs={nowMs} onCopy={onCopy} />
+          <MapPinsField ext={ext} fit={fit} w={w} h={h} data={data} layers={layers} mobs={mobs} timers={timers} tracked={tracked} areas={areas} crawled={crawl.killed} nowMs={nowMs} onCopy={onCopy} />
         </div>
       )}
+      {crawl.feed}
       <PinsChrome heading={who.zone ?? 'Map pins'} count={tracked.length} chrome={chrome} shown={strip.shown} />
       {shownNote != null && <Note text={shownNote} />}
       {!locked && <PinsFooter layers={layers} achievements={slayerChip} onToggle={toggleLayer} zoom={zoom} bg={bg} follow={[follow, toggleFollow]} noDrag={chrome.noDrag} />}

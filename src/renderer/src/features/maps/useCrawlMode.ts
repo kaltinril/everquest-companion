@@ -3,12 +3,11 @@
 // screen are dimmed on the map and in the sidebar; the rule is shared/crawlMode.ts.
 
 import { useCallback, useMemo, useState } from 'react'
-import { killedSince, stayStart } from '@shared/crawlMode'
+import { CRAWL_KEY, killedSince, stayStart } from '@shared/crawlMode'
 import type { KillsSnap } from '@shared/kills'
 import type { ProgressionSnap } from '@shared/progressionTypes'
 import { useModule } from '../../lib/useModule'
 
-const KEY = 'eq.maps.crawl'
 const NONE: ReadonlySet<string> = new Set()
 
 export interface CrawlMode {
@@ -20,7 +19,7 @@ export interface CrawlMode {
 
 function load(): boolean {
   try {
-    return localStorage.getItem(KEY) === '1'
+    return localStorage.getItem(CRAWL_KEY) === '1'
   } catch {
     return false
   }
@@ -32,7 +31,7 @@ export function useCrawlMode(zone: string | null): CrawlMode {
   const toggle = useCallback(() => {
     setOn((prev) => {
       try {
-        localStorage.setItem(KEY, prev ? '0' : '1')
+        localStorage.setItem(CRAWL_KEY, prev ? '0' : '1')
       } catch {
         // A blocked store keeps the choice for this session only.
       }

@@ -9,6 +9,7 @@
 import { Fragment, useMemo, useState, type CSSProperties, type JSX } from 'react'
 import type { MapData, MapPoint } from '@shared/maps'
 import type { SlayerOverlayArea } from '@shared/slayerOverlay'
+import { mobKey } from '@shared/mobKey'
 import { UNRELEASED } from '../devFlags'
 import { AreaCircle } from '../features/maps/AreaCircle'
 import { MapCanvas } from '../features/maps/MapCanvas'
@@ -37,6 +38,8 @@ interface MarkProps {
   size: number
   shape: 'dot' | 'diamond'
   faint?: boolean
+  /** Crawl mode: a mob you killed on this visit, drawn fainter still. */
+  dim?: boolean
   /** A timer that has just come due: the mark grows, shrinks and glows. */
   pulse?: boolean
   onClick: () => void
@@ -69,7 +72,13 @@ function dotStyle(size: number, shape: MarkProps['shape'], color: string, flip: 
  * every name at once buried the zone (owner, 2026-10-13); timers and tracked marks always carry
  * theirs. The label flips to the left of the mark when it would cross the right edge.
  */
-function Mark({ at, w, text, color, size, shape, faint = false, pulse = false, onClick, testId }: MarkProps): JSX.Element {
+/** A mark's opacity at rest (hovered, every mark is solid). */
+function restOpacity(faint: boolean, dim: boolean): number {
+  if (dim) return 0.3
+  return faint ? 0.75 : 1
+}
+
+function Mark({ at, w, text, color, size, shape, faint = false, dim = false, pulse = false, onClick, testId }: MarkProps): JSX.Element {
   const [hot, setHot] = useState(false)
   const showText = !faint || hot
   const font = faint ? 9 : 10
@@ -95,7 +104,7 @@ function Mark({ at, w, text, color, size, shape, faint = false, pulse = false, o
         alignItems: 'center',
         gap: 3,
         cursor: 'pointer',
-        opacity: faint && !hot ? 0.75 : 1,
+        opacity: hot ? 1 : restOpacity(faint, dim),
         zIndex: hot ? 5 : undefined
       }}
     >
@@ -128,6 +137,8 @@ export interface MapPinsFieldProps {
   tracked: readonly TrackedPoint[]
   /** the Achievements areas on this zone (shared/slayerOverlay.ts) */
   areas: readonly SlayerOverlayArea[]
+  /** Crawl mode's killed-this-visit mobs (`mobKey`s); empty while it is off (MapPinsCrawl.tsx). */
+  crawled: ReadonlySet<string>
   nowMs: number
   onCopy: CopyPin
 }
@@ -176,7 +187,7 @@ function AreaMarks({ ext, fit, w, areas, onCopy }: MapPinsFieldProps): JSX.Eleme
 }
 
 function PoiMarks(props: MapPinsFieldProps): JSX.Element {
-  const { ext, fit, w, data, mobs, onCopy } = props
+  const { ext, fit, w, data, mobs, crawled, onCopy } = props
   const labels = useMemo(() => labelRows(data?.points ?? []).map((r) => r.point), [data])
   return (
     <>
@@ -200,6 +211,7 @@ function PoiMarks(props: MapPinsFieldProps): JSX.Element {
         <Mark
           key={m.key}
           testId="map-pins-poi"
+          dim={crawled.size > 0 && crawled.has(mobKey(m.name))}
           at={placeInExtent(ext, fit, m)}
           w={w}
           text={m.name}

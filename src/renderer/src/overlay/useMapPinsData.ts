@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import type { MapData } from '@shared/maps'
 import type { MobEntry } from '@shared/types'
 import { SLAYER_OVERLAY_KEY, parseSlayerOverlay, type SlayerOverlayPayload } from '@shared/slayerOverlay'
+import { CRAWL_KEY } from '@shared/crawlMode'
 import { PACK_PREFS_KEY, loadPackPrefs } from '../features/maps/useMapData'
 
 /** The slim placed-mob catalog from main, once; an empty list until it lands. */
@@ -90,4 +91,27 @@ export function useSlayerOverlay(): SlayerOverlayPayload | null {
     }
   }, [])
   return payload
+}
+
+function readCrawl(): boolean {
+  try {
+    return localStorage.getItem(CRAWL_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+/** The Maps tab's Crawl mode switch (shared storage), kept current through `storage` events. */
+export function useCrawlSetting(): boolean {
+  const [on, setOn] = useState(readCrawl)
+  useEffect(() => {
+    const onStorage = (e: StorageEvent): void => {
+      if (e.key === CRAWL_KEY || e.key === null) setOn(readCrawl())
+    }
+    window.addEventListener('storage', onStorage)
+    return () => {
+      window.removeEventListener('storage', onStorage)
+    }
+  }, [])
+  return on
 }

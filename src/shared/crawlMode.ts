@@ -16,6 +16,9 @@ export interface ZoneStays {
   zoneName: readonly string[]
 }
 
+/** The switch, `'1'` when on: the Maps tab's chip writes it, the Map pins overlay reads it too. */
+export const CRAWL_KEY = 'eq.maps.crawl'
+
 const NONE: ReadonlySet<string> = new Set()
 
 /** When your current visit to `zone` began, or null when the log's latest zone is another one. */
