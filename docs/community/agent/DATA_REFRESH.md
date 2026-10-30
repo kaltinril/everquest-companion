@@ -36,8 +36,38 @@ nowhere, and closes with any wiki-derived file it left stale and the command tha
 | `dropGroups.json` (Gaps) | a mob page or a cached group page changed | `scrape-drop-groups.ts --fresh <changed titles>`: only a page its cache lacks or the feed names |
 | `bosses.json` | always | `scrape-bosses.ts`: every portrait it has is kept; only a target with none is looked up, through the render cache; a changed boss page is also named |
 | `cache/files/files.json`, `mobs.json` `noImage` | always | `scrape-wiki-files.ts --fresh <changed File: titles>` (50 a request), else `--offline`; re-marks every mob whose page names no image or one the wiki lacks |
+| `cache/pages/`, `src/main/data/wikiPages.json` | always | every read page no DB takes is kept raw; the index is rebuilt from the caches, zero requests (next section) |
 
 A script missing from the checkout it runs in is named stale.
+
+## Every page, whatever its template (since 2026-10-29)
+
+Owner, 2026-10-29: "we should scrape EVERY page, regardless of the 'template' it uses". Code:
+`sources/deltaAllPages.ts`.
+
+- `--all-pages` lists every ns0 article (`list=allpages`, redirects left out: the redirect cache
+  holds them; 500 a request) and reads, by pageid with the feed's reads (50 a request), each page no
+  cache or DB holds: the item, mob and page caches, the spell index, the quest list, the class
+  pages, the drop-group pages, items.json and mobs.json. Once; after it the feed re-reads any page
+  when it is edited, as it always has. Re-run it only to recheck nothing slipped.
+- A page with a known template folds where it always has (items, mobs, spells, quests). Every other
+  read page that is no redirect is kept raw in the committed `scripts/sources/cache/pages/`
+  (`pages.json` pageid and title, `page-<id>.wikitext`, `index.json` revids, so an edit whose
+  revision we hold is skipped like an item or mob page). A page that becomes a redirect, is deleted
+  or starts folding into a DB leaves it.
+- `src/main/data/wikiPages.json` (committed) lists every held page no DB keys and no redirect:
+  title and the categories its own text writes (template-added categories are not in the text).
+  Rebuilt every run from the page cache, the item cache, the drop-group and class caches, and
+  written only when it changed; it needs the item cache (junction), else it is left and named.
+  No record is parsed from free text. Nothing in the app reads it yet.
+- Measured offline (2026-10-29; the 2026-10-28 pack's `wikiEntities.titles` and the main clone's
+  caches): the pack lists 26,607 ns0 titles, 4,148 of them our cached redirects, so ~22.5k
+  articles. We hold the text of 23,400 pages (item cache 19,158 incl. indirect embedders, mob
+  cache 2,500, spells 1,214, quests 295, drop groups 199, classes 6, rendered only 28; 1,527 of them
+  are not in the pack's list). Never read: ~745 (a few are pack zones, items, NPCs; most are guides,
+  factions, lists). Cost of the first `--all-pages`: ~45 listing requests (~22.5k / 500) plus ~15
+  content requests (~745 / 50) on top of the normal delta, about a minute at 1 a second. The index
+  from today's caches alone is 488 pages (~31 KB); after the run ~1.2k.
 
 ## The wiki's GitHub data pack, before a delta (since 2026-10-23)
 
@@ -61,8 +91,8 @@ repo is run.
   powder`), and `linked`, pages the pack's loot links name that neither item list holds (Cracked
   Darkwood Shield: in no `embeddedin` list, ours or the pack's; redirects and mob pages left out).
   The delta reads them with `--titles-from-compare` (next section). A page with no item or mob box
-  (Drake lava powder is free text) is named, not folded, and stays listed until it is fixed on the wiki;
-  it does not fail `--release`.
+  (Drake lava powder was free text) is named and kept as a page (`wikiPages.json`, next-but-one
+  section), not folded, and stays in `toRead` until it is fixed on the wiki; it does not fail `--release`.
 - The compare and the delta always run together, before every release and whenever the owner asks
   (owner, 2026-10-25: "wiki github pack from eoz and delta scrape should always run before a
   release"; "should run when i ask"): compare, delta, compare again (nothing behind). No pack age
@@ -103,12 +133,14 @@ full scrapers). A 3-week window was ~1,200 pages in ~25 batched requests.
    ledger. `--titles-from-compare` reads the newest compare report's `toRead` titles by title, with
    the feed's own title reads (50 a request, usually no extra request), and folds them like an edit;
    `=<report.json>` names a report, `--extra=<Title|Title>` names pages by hand. It closes with one
-   line per such title: folded, no item or mob template (fix it on the wiki), or no such page.
+   line per such title: folded, no item or mob template (kept as a page; fix it on the wiki if it
+   is one), or no such page. The first run after 2026-10-29 also passes `--all-pages` (previous
+   section); `--dry-run --all-pages` lists nothing and states the cost.
 4. `npx tsx scripts/data-diff.mts` and `npx tsx scripts/validate-data.mts`; cite the diff in the
    commits.
 5. Commit every changed file on that work branch: the data files and their committed caches
    (items, mobs, spells, quests, classes, pageEra, respawns, posky, mobFactions, mobRaces,
-   dropGroups, the spell overlay, images) and the run's line in
+   dropGroups, the spell overlay, images, `scripts/sources/cache/pages/`, `wikiPages.json`) and the run's line in
    `docs/community/wiki-usage/ledger.jsonl` (its requests and bytes, printed at the end too); cite
    the ledger counts and the data-diff in the data commit.
 6. Gate the work branch and compare `^✖` lines against `main_community`'s head; clear the census

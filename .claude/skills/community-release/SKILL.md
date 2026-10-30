@@ -21,7 +21,8 @@ reaches players within hours: only publish what the owner has asked for.
    updates)?" and wait.
 2. **The GitHub pack compare and a delta scrape first, always, both** (owner, 2026-10-25):
    `npx tsx scripts/eoz-compare.mts`, then the delta with `--titles-from-compare` (it also reads the
-   pages the compare found our scrape never listed; `docs/community/agent/DATA_REFRESH.md`; the
+   pages the compare found our scrape never listed; the first run after 2026-10-29 adds `--all-pages`;
+   `docs/community/agent/DATA_REFRESH.md`; the
    data committed on a work branch off `main_community`, gated and merged), then `npx tsx scripts/eoz-compare.mts
    --release` (exits 1 while anything is behind). No pack age stands in for the delta. A release ships the wiki as it stands today,
    owner's and testers' edits included.

@@ -342,6 +342,11 @@ where one exists.
   because nobody edited it since 2026-10-18. Since 2026-10-29 the compare names such pages in
   `toRead.linked` and `scrape-delta.mts --titles-from-compare` reads them (DATA_REFRESH.md); on the
   2026-10-28 pack that is Cracked Darkwood Shield and Exaltations (an index page, reported not folded).
+- Every wiki page (owner, 2026-10-29): `scrape-delta.mts --all-pages` reads each article no cache
+  holds once; pages no DB takes are kept in `scripts/sources/cache/pages/` and listed with their
+  categories in `src/main/data/wikiPages.json` (DATA_REFRESH.md, "Every page"). Not wired into the
+  app or the Gaps tab yet: a Gaps row naming such a page could say the page exists instead of
+  offering Create page. The index is rebuilt only where the item cache is junctioned.
 - The wiki's Help page (Editing Standards > AI Generated Content): "All graphics and readable page
   text should be crafted by real human contributors". Told the owner about Copy wiki page.
 - No generated merchant item list (owner, decided): vendor stock and player resells cannot be told
