@@ -22,7 +22,10 @@ import { type JSX, Suspense, lazy } from 'react'
 import { CircularProgress } from '@mui/material'
 import { DEV_TOOLS, OWNER_TOOLS } from './devFlags'
 
-const LazyTriageView = DEV_TOOLS ? lazy(() => import('./features/triage/TriageView')) : null
+// `import.meta.env.DEV &&` repeats DEV_TOOLS's own first term so the `false` sits in THIS module:
+// rolldown (Vite 8) still emits the chunk of an `import()` gated only on another module's constant.
+const LazyTriageView =
+  import.meta.env.DEV && DEV_TOOLS ? lazy(() => import('./features/triage/TriageView')) : null
 
 /** The owner's triage tab — nothing at all in a build without the flag, or a checkout without
  *  the opt-in. */

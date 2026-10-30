@@ -28,8 +28,9 @@ export default defineConfig({
     //
     // Inlined data JSONs (spells/mobs/items/classes) emit as JSON.parse("...") instead of
     // pretty-printed object literals — measured 4.66 MB smaller main bundle and a faster
-    // startup parse the day items.json (6.8 MB raw) landed.
-    json: { stringify: true },
+    // startup parse the day items.json (6.8 MB raw) landed. Vite 8 lets the default
+    // `namedExports: true` win over `stringify`, so it is turned off; nothing imports a JSON by name.
+    json: { stringify: true, namedExports: false },
     build: {
       // ---- SOURCEMAPS (JOS-100) --------------------------------------------------------
       // ON FOR ALL THREE BUNDLES, so an `errorReport`'s `out/…:line:col` frames can be turned
@@ -106,6 +107,8 @@ export default defineConfig({
   },
   renderer: {
     root: resolve(__dirname, 'src/renderer'),
+    // Large JSONs as JSON.parse("..."), as on Vite 7: see `json` on the main bundle.
+    json: { namedExports: false },
     // ---- THE DEV-TOOLS STRIP -------------------------------------------------------------
     // `__EQ_DEV_TOOLS__` is a COMPILE-TIME constant, not a runtime flag. The triage tab's whole
     // component tree is reached only through `if (__EQ_DEV_TOOLS__) import('./features/triage/…')`,
