@@ -561,6 +561,16 @@ function useTurnInLedger(
   return { turnIns, detected, logCounts, turnInsReady, ...actions }
 }
 
+/**
+ * The turn-in ledger alone: celebrate a live turn-in and write the log's turn-ins down. The app's
+ * always-mounted watch, which reads no loot (perf review 2026-10-20 #1: `useProgress` there kept the
+ * 1.4 MB loot ledger fetched on every loot line, on every tab, for counts nothing on screen drew).
+ */
+export function useQuestTurnInWatch(opts: UseProgressOptions): void {
+  const [progress, setProgress] = useHeldProgress()
+  useTurnInLedger(progress, setProgress, opts.onQuestComplete)
+}
+
 /** The character name this window last heard (lib/characterEpoch.ts), so a remount starts from it instead of re-rendering on the ask. */
 let heldCharacter: Held<string | null> | null = null
 

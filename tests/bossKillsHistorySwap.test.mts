@@ -105,3 +105,20 @@ test('a fetch already out when the frame came, or a roster change before the re-
   assert.deepEqual(fired, ['Lady Vox'], 'a real kill after the re-ask still celebrates')
   host.unmount()
 })
+
+test('the always-mounted detector reads the roster cut from met, and celebrates the same kills', async () => {
+  const metOf = (seq: number, bosses: Record<string, unknown>): Served =>
+    ({ seq, state: { mobs: [], items: [], zones: [], bosses } }) as unknown as Served
+  serving(metOf(1, { 'lord nagafen': info(1, 2_000) }))
+  const fired: string[] = []
+  const host = mountHook(() => useBossKills(targets, { onKill: (k) => fired.push(k.status.target.name) }, 'met'))
+  await settle()
+  host.render()
+  assert.deepEqual(fired, [], 'the first snapshot seeds silently')
+  serving(metOf(2, { 'lord nagafen': info(1, 2_000), 'lady vox': info(1, 5_000) }))
+  emit({ moduleId: 'met', seq: 2 })
+  await settle()
+  host.render()
+  assert.deepEqual(fired, ['Lady Vox'])
+  host.unmount()
+})

@@ -36,6 +36,7 @@
 
 import { useEffect, useRef } from 'react'
 import type { KillMap, KillsSnap, RaidTarget } from '@shared/types'
+import { MET_MODULE, type MetSnap } from '../../../../shared/metNames'
 import { kept, type Kept } from '../../lib/kept'
 import { useModule } from '../../lib/useModule'
 import { onHistorySwapped } from '../../lib/historySwapped'
@@ -51,19 +52,28 @@ export interface BossKillCallbacks {
   onKill?: (kill: BossKill) => void
 }
 
-const STATUSES: Kept<TargetStatus[]> = { last: null }
+/**
+ * Where the kill records come from. `kills`: the whole map, archived history merged (a tab that
+ * shows every count). `met`: the same records cut to the roster, live log only (`met.rs`), for the
+ * always-mounted detector, which only watches a credited count grow: it moves on a roster kill, not
+ * on every kill (perf review 2026-10-20 #1).
+ */
+export type BossKillSource = 'kills' | 'met'
+
+const STATUSES: Record<BossKillSource, Kept<TargetStatus[]>> = { kills: { last: null }, met: { last: null } }
 const NO_STATUSES: TargetStatus[] = []
 
 export function useBossKills(
   targets: RaidTarget[],
-  cbs?: BossKillCallbacks
+  cbs?: BossKillCallbacks,
+  from: BossKillSource = 'kills'
 ): { kills: KillMap; statuses: TargetStatus[] } {
   // Per-mob wholesale replace, with the shape guard: a delta stamped with a version the held
   // baseline was not written at re-hydrates instead of merging (shared/kills.ts).
-  const snap = useModule<KillsSnap>('kills')
-  const kills = snap?.mobs
+  const snap = useModule<KillsSnap | MetSnap>(from === 'met' ? MET_MODULE : 'kills')
+  const kills = snap === null ? undefined : 'bosses' in snap ? snap.bosses : snap.mobs
   // Empty until the module answers, as the effect's first render was.
-  const statuses = kills ? kept(STATUSES, [targets, kills], () => allStatuses(targets, kills)) : NO_STATUSES
+  const statuses = kills ? kept(STATUSES[from], [targets, kills], () => allStatuses(targets, kills)) : NO_STATUSES
   // Previous per-target status; seeded silently on first snapshot.
   const prevRef = useRef<Map<string, TargetStatus> | null>(null)
   const cbsRef = useRef(cbs)

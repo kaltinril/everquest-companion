@@ -18,6 +18,7 @@ import { mergeItemTiers } from './mergeItemTiers'
 import { mergeKills } from './mergeKills'
 import { mergeLeveling } from './mergeLeveling'
 import { mergeLoot } from './mergeLoot'
+import { mergeMet } from './mergeMet'
 import { mergeProgression } from './mergeProgression'
 import { mergeRespawn } from './mergeRespawn'
 import { mergeSpellRanks } from './mergeSpellRanks'
@@ -43,6 +44,8 @@ export const MERGE_RULES: Readonly<Record<string, MergeRule>> = {
   buffs: mergeBuffStats,
   spellSets: mergeSpellSets,
   combo: mergeCombo,
+  // Rebuilt per segment from the modules it captured (history.ts): a segment holds no `met`.
+  met: mergeMet,
   // No history of its own, only the present: zone and level carry across a rotation (carryOver.ts).
   character: carryOverRule('character')
 }
