@@ -239,6 +239,8 @@ export const IPC = {
   overlayRecover: 'overlay:recover',
   // renderer(main app) -> main: get or set the recover hotkey. Args: 'get' | 'set', accelerator or null.
   overlayRecoverHotkey: 'overlay:recoverHotkey',
+  // renderer(main app) -> main: the font families installed on this PC, sorted (installedFonts.ts).
+  fontsList: 'fonts:list',
   // main -> renderer(main app): a kind's open-state changed. Payload: {kind, open}. Keeps the
   // TitleBar overlay menu in sync (also fires when an overlay closes itself).
   onOverlayState: 'overlay:state',

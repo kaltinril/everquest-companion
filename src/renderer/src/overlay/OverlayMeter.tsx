@@ -17,6 +17,7 @@ import { useOverlayChrome } from './useOverlayChrome'
 import { useOverlayCombat } from './useOverlayCombat'
 import { useMeterScope } from '../features/combat/useCombatPrefs'
 import { EMPTY_ROSTER, chipLabel } from '@shared/roster'
+import { OVERLAY_FONT } from '../../../shared/overlayFont'
 
 // Palette (matches the app's combat colors; the overlay has no MUI theme).
 const GOLD = '#d9b25f'
@@ -226,7 +227,7 @@ export default function OverlayMeter(): JSX.Element {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        fontFamily: 'Inter, "Segoe UI", Roboto, system-ui, sans-serif',
+        fontFamily: OVERLAY_FONT,
         color: '#f2f2f2',
         background: `rgba(14,17,21,${bgAlpha})`,
         border: locked ? '1px solid rgba(255,255,255,0.04)' : `1px solid rgba(217,178,95,0.4)`,

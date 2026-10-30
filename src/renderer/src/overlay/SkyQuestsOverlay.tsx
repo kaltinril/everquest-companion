@@ -22,6 +22,7 @@ import { OverlayHeader } from './OverlayHeader'
 import { FOOTER_ROW, OverlayContent } from './overlayScale'
 import { TextScaleStepper } from './TextScaleStepper'
 import { type OverlayChrome, useOverlayChrome } from './useOverlayChrome'
+import { OVERLAY_FONT } from '../../../shared/overlayFont'
 
 /** A sky teal, none of the other windows' accents (gold, green, red, blue, amber). */
 const ACCENT = '#6fd6d0'
@@ -251,7 +252,7 @@ export default function SkyQuestsOverlay(): JSX.Element {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        fontFamily: 'Inter, "Segoe UI", Roboto, system-ui, sans-serif',
+        fontFamily: OVERLAY_FONT,
         color: '#f2f2f2',
         background: `rgba(14,17,21,${bgAlpha})`,
         border: locked ? '1px solid rgba(255,255,255,0.04)' : `1px solid ${ACCENT}66`,

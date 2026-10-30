@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { isHealOverlayKind } from '@shared/types'
 import { isTimerOverlayKind } from '@shared/buffTimers'
 import { installOverlayPointerExit } from './pointerExit'
+import { installOverlayFont } from './fontPick'
 
 // The overlay renders in its OWN transparent BrowserWindow (Task #52). It is a
 // standalone React root — deliberately NOT wrapped in the app's MUI ThemeProvider
@@ -78,6 +79,8 @@ function Surface(): React.JSX.Element {
 // is installed here, once, for whichever surface mounts below. See overlay/pointerExit.ts for
 // which three things count as "the pointer left" on an always-on-top window.
 installOverlayPointerExit()
+// The player's overlay font (Preferences > Overlays), for every kind alike.
+installOverlayFont()
 
 // overlay.html always carries #overlay-root; fail loudly rather than letting
 // createRoot throw a container error nobody can trace back.

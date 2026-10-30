@@ -47,6 +47,7 @@ import { registerGapsCharactersIpc } from '../gapsCharacters'
 import { registerShotIpc } from './shotIpc'
 import { registerShotCaptureIpc } from './shotCapture'
 import { registerOverlayRecoverIpc } from '../overlayRecover'
+import { registerInstalledFontsIpc } from '../installedFonts'
 import { registerGapQuestLiveIpc } from '../gapQuestLive'
 import { registerGapCopyLookupIpc } from '../gapCopyLookup'
 // The celebration toast's producer channel. It lives beside the window it feeds (src/main/toast.ts)
@@ -130,6 +131,7 @@ export function registerIpc(): void {
   registerShotIpc()
   registerShotCaptureIpc()
   registerOverlayRecoverIpc()
+  registerInstalledFontsIpc()
   registerGapQuestLiveIpc()
   registerGapCopyLookupIpc()
   registerReleaseNotesIpc()

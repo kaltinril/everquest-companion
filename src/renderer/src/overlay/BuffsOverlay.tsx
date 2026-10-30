@@ -63,6 +63,7 @@ import { FOOTER_ROW, OverlayContent } from './overlayScale'
 import { TextScaleStepper } from './TextScaleStepper'
 import { type OverlayChrome, useOverlayChrome } from './useOverlayChrome'
 import { BuffTimerGroup } from './buffTimerBars'
+import { OVERLAY_FONT } from '../../../shared/overlayFont'
 
 const GOLD = '#d9b25f'
 /** The debuff accent, and deliberately the same red `buffTimerBars.rowAccent` already gives a
@@ -540,7 +541,7 @@ export default function BuffsOverlay({ kind }: { kind: TimerOverlayKind }): JSX.
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        fontFamily: 'Inter, "Segoe UI", Roboto, system-ui, sans-serif',
+        fontFamily: OVERLAY_FONT,
         color: '#f2f2f2',
         background: `rgba(14,17,21,${bgAlpha})`,
         border: locked ? '1px solid rgba(255,255,255,0.04)' : `1px solid ${surface.accent}66`,

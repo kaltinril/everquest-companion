@@ -15,6 +15,7 @@ import { MeterPane } from './scopeFloor'
 import { BgFooter } from './BgFooter'
 import { useOverlayChrome } from './useOverlayChrome'
 import { useOverlayCombat } from './useOverlayCombat'
+import { OVERLAY_FONT } from '../../../shared/overlayFont'
 
 /**
  * The floating HEALING overlay (Task #59) — the 'heal-fight' / 'heal-overall' twin of the DPS
@@ -167,7 +168,7 @@ export default function HealMeter(): JSX.Element {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        fontFamily: 'Inter, "Segoe UI", Roboto, system-ui, sans-serif',
+        fontFamily: OVERLAY_FONT,
         color: '#f2f2f2',
         background: `rgba(14,17,21,${bgAlpha})`,
         border: locked ? '1px solid rgba(255,255,255,0.04)' : `1px solid rgba(127,209,160,0.4)`,

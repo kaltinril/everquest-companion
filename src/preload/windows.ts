@@ -71,6 +71,8 @@ export const windowsApi = {
   /** Read ('get') or set ('set', null turns it off) the recover hotkey; resolves to what is in force. */
   overlayRecoverHotkey: (action: 'get' | 'set', accel?: string | null): Promise<HotkeyAnswer> =>
     ipcRenderer.invoke(IPC.overlayRecoverHotkey, action, accel),
+  /** The font families installed on this PC, for the overlay font pick (main/installedFonts.ts). */
+  listFonts: (): Promise<string[]> => ipcRenderer.invoke(IPC.fontsList),
   /** Subscribe to overlay open-state changes (so the TitleBar menu stays in sync). Payload {kind, open}. */
   onOverlayState: (cb: (s: { kind: OverlayKind; open: boolean }) => void): (() => void) => {
     const listener = (_e: unknown, s: { kind: OverlayKind; open: boolean }): void => cb(s)

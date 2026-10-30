@@ -19,6 +19,7 @@ import { SHOT_CAPTURE_ACTION } from './shotCaptureAction'
 import { FOOTER_ROW, OverlayContent } from './overlayScale'
 import { TextScaleStepper } from './TextScaleStepper'
 import { type OverlayChrome, useOverlayChrome } from './useOverlayChrome'
+import { OVERLAY_FONT } from '../../../shared/overlayFont'
 
 /** A wiki violet, none of the other windows' accents (gold, green, red, blue, amber, teal). */
 const ACCENT = '#b49cf0'
@@ -108,7 +109,7 @@ export default function GapsOverlay(): JSX.Element {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        fontFamily: 'Inter, "Segoe UI", Roboto, system-ui, sans-serif',
+        fontFamily: OVERLAY_FONT,
         color: '#f2f2f2',
         background: `rgba(14,17,21,${bgAlpha})`,
         border: locked ? '1px solid rgba(255,255,255,0.04)' : `1px solid ${ACCENT}66`,
