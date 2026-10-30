@@ -24,6 +24,7 @@ import {
   type SpellStatKey
 } from '../src/shared/spellStats'
 import spellsJson from '../src/main/data/spells.json' with { type: 'json' }
+import { assertCorpusFloor } from './corpusFloor.mts'
 
 // =================================================================================================
 // THE TWO SHAPES
@@ -238,32 +239,13 @@ const BENEFICIAL = SPELLS.filter((s) => s.spellType === 'Beneficial')
 const BENEFICIAL_LINES = BENEFICIAL.flatMap((s) => s.effects ?? [])
 
 test('the corpus is the one the header measured', () => {
-  // Tripwire on the scrape itself. If these move, the numbers below are about a different corpus and
-  // the header has to be re-read rather than the assertions relaxed.
-  // Re-read 2026-10-10 after the whole-wiki delta run (2,006 -> 2,014 spells, 1,078 -> 1,084
-  // beneficial, 2,066 -> 2,076 lines): the header's own numbers did not move - 702 of 727
-  // shape-matches still read, and the unread-noun list below is unchanged. The ten new lines all
-  // fall outside the stat shape.
-  // Re-read 2026-10-18 after the full re-scrape (2,013 -> 2,012 spells, 1,083 -> 1,082 beneficial,
-  // 2,075 -> 2,074 lines: Magical Monologue, marked {{Delete}}, left): the coverage band below still
-  // reads the header's 702 of 727, so only the corpus size moved.
-  // Re-read 2026-10-22 after the evening delta (2,012 -> 2,014 spells, 1,082 -> 1,084 beneficial,
-  // 2,074 -> 2,076 lines: Summon Familiar: Werewolf and Pet Illusion: Werewolf, each one line naming
-  // itself, outside the stat shape): only the corpus size moved.
-  // Re-read 2026-10-24 after the morning delta (2,014 -> 2,018 spells, 1,084 -> 1,086 beneficial:
-  // 2,076 -> 2,078 lines: Summon Familiar: Mummy and Pet Illusion: Mummy, as the Werewolf pair; Familiar: Gelatinous Cube
-  // and the unfilled Illusion: Half Dark Elf blueprint state no type): only the corpus size moved.
-  // Re-read 2026-10-25 after the evening delta (2,018 -> 2,019 spells, 1,086 -> 1,087 beneficial,
-  // 2,078 -> 2,082 lines: Mana Preservation III, a mana-cost focus and its three Limit lines, outside
-  // the stat shape): only the corpus size moved.
-  // Re-read 2026-10-26 after the evening delta (2,019 -> 2,020 spells: Tears of Arlyxir, a
-  // Detrimental Wizard nuke): only the corpus size moved. Its re-read (2,020 -> 2,022: Soul Orb and
-  // Funeral Pyre of Kelador, Detrimental Necromancer spells): only the corpus size moved.
-  // Re-read 2026-10-28 after the delta (2,022 -> 2,024: Greater Immobilize and Night Fire, both
-  // Detrimental): only the corpus size moved.
-  assert.equal(SPELLS.length, 2024)
-  assert.equal(BENEFICIAL.length, 1087)
-  assert.equal(BENEFICIAL_LINES.length, 2082)
+  // Tripwire on the scrape itself, as floors (90% of the 2026-10-28 count, tests/corpusFloor.mts).
+  // Every wiki delta from 2026-10-10 to 2026-10-28 moved these by a spell or two and never moved
+  // the header's own numbers (the coverage band below still reads 702 of 727), so the size is not
+  // what the header rests on; a scrape that lost a real share of the spells or their lines is.
+  assertCorpusFloor(SPELLS.length, 2024, 'spells')
+  assertCorpusFloor(BENEFICIAL.length, 1087, 'beneficial spells')
+  assertCorpusFloor(BENEFICIAL_LINES.length, 2082, 'beneficial effect lines')
 })
 
 test('coverage over the real bytes matches the header, within a band', () => {

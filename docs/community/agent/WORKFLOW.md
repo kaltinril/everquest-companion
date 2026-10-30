@@ -303,8 +303,9 @@ disagree, RULES.md wins; fix this file.
   cleanup). Check the junction exists before a gate (a missing one fails as `tsc` not recognized),
   and keep long jobs under `.claude/worktrees/`. A junction to `engine/target` is unlinked before
   removal exactly like `node_modules` (RULES.md rule 18).
-- A test pinned to a data count goes red at the next data refresh. Prefer a floor, or a fixture
-  under `tests/fixtures/`, so the test survives a refresh.
+- A test pinned to a data count goes red at the next data refresh. Use a floor
+  (`tests/corpusFloor.mts`), a property, or a fixture under `tests/fixtures/` (BRANCH_NOTES.md,
+  Test hygiene).
 
 - **A scratch Playwright probe of the e2e app** (`tests/e2e/appWindow.mts` `mainWindow`,
   `logFixture.mts` `stageFixture` + `appendAt` + `launchOnFixture`) is the way to watch a tab

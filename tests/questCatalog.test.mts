@@ -31,6 +31,7 @@ import {
 import { MAX_ATTACHED_REWARDS, buildQuestItemIndex, questItemKey } from '../src/main/questItemIndex'
 import questsJson from '../src/renderer/src/data/eqlegends/quests.json'
 import type { QuestData } from '../src/shared/types'
+import { assertCorpusFloor } from './corpusFloor.mts'
 
 // --- verbatim wikitext fixtures --------------------------------------------------
 
@@ -428,7 +429,7 @@ test('parseCoinCost reads the measured donation spellings, first occurrence wins
 
 test('the committed catalog carries the coin costs, and a known donation quest reads back', () => {
   const coined = data.quests.filter((q) => q.coin !== undefined)
-  assert.ok(coined.length >= 40, `expected the measured ~43 coin quests, got ${coined.length}`)
+  assertCorpusFloor(coined.length, 42, 'coin quests')
   const scrolls = data.quests.find((q) => q.name === 'Blank Scrolls')
   assert.ok(scrolls)
   assert.equal(scrolls.coin, '2 gold')

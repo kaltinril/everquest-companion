@@ -675,3 +675,19 @@ where one exists.
   kind touches").
 - e2e: `tests/e2e/sky-quest-overlay.e2e.mts` (window opens, a searched quest starred by the Quests
   tab checkbox reaches the overlay, the second click unstars). Open: the Ready tab checkbox has no e2e.
+
+## Test hygiene: counts over the wiki data (test-hygiene)
+
+- A count over the committed wiki data (items, mobs, spells, quests, posky, classes, the caches) is
+  never an equality (owner, 2026-10-29). Use `assertCorpusFloor(actual, measured, what)` from
+  `tests/corpusFloor.mts` (at least 90% of the measured count), a property (set equality, every
+  record has X, A <= B), or a band when the number is an excluded population (dead-lands 1..50).
+  Rust: `got >= measured * 9 / 10` (`spell_facts.rs`).
+- Not counts, and kept: token censuses (an unknown slot, class or stat token must go into the
+  hand table), named-record pins (Odium is Unstated), oracle lists compared name for name with
+  hand research (the charm roster), and counts of fixtures or of a parser over a fixed input.
+- Floors written at or near the day's count (under 5% or 3 below it: `poskyDroppers`,
+  `planRolePolicy`, `classUnlocks`, `gearIndex` and 12 more files) are `assertCorpusFloor` on the
+  2026-10-29 count, measured by a probe run. Older floors with 5-10% headroom (gearIndex pages
+  11000 of 11674, respawnWiki 500 of 552) were left; a new floor uses the helper, never a hand number
+  at the day's count. Rust corpus floors (`loot_from.rs`: items > 10,000, mobs > 5,000) have room.

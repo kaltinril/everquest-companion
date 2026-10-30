@@ -27,6 +27,7 @@ import { questKey } from '../src/renderer/src/features/posky/keys'
 import { itemCountKey } from '../src/renderer/src/lib/itemName'
 import poskyRaw from '../src/renderer/src/data/eqlegends/posky.json' with { type: 'json' }
 import type { PoskyQuest, PoskyItem } from '../src/shared/types'
+import { assertCorpusFloor } from './corpusFloor.mts'
 
 const quests = (poskyRaw as { quests: PoskyQuest[] }).quests
 
@@ -167,8 +168,9 @@ test('real posky.json: overlap stats are sane and Wind Runes never appear', () =
   // now shared by Beastlord Test of Claw + Monk Test of Fists, Efreeti Great Staff by
   // Berserker + Necromancer, Efreeti Standard by Berserker + Cleric, Efreeti Statuette by
   // Druid + Wizard — lifting the counts from 19 quests / 10 items.)
-  assert.equal(map.size, 23, 'exactly 23 quests have ≥1 contested item')
-  assert.equal(contestedNames.size, 14, 'exactly 14 distinct contested items')
+  // Floors, not the counts (tests/corpusFloor.mts): a posky re-scrape moves them; the named items stay.
+  assertCorpusFloor(map.size, 23, 'quests with ≥1 contested item')
+  assertCorpusFloor(contestedNames.size, 14, 'distinct contested items')
   assert.ok(contestedNames.has('Sphinx Claw'), 'Sphinx Claw is a known contested item')
   assert.ok(contestedNames.has('Brass Knuckles'), 'Brass Knuckles (restored, Task #46) is contested')
 })

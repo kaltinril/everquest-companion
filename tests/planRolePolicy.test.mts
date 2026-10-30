@@ -44,6 +44,7 @@ import { buildProgressionPlan, type PlanCorpora, type PlanInputs } from '../src/
 import { weaponTypeOf, normalizeSkillToken } from '../src/shared/planner/weaponType'
 import { zoneLevelKey, type ZoneLevels } from '../src/shared/planner/zoneLevels'
 import type { ConBand } from '../src/shared/conBands'
+import { assertCorpusFloor } from './corpusFloor.mts'
 
 const ROWS = buildGearIndex(itemsJson as unknown as ItemDbFile).rows
 
@@ -56,8 +57,8 @@ test('CENSUS: handedness is read off the corpus, and every two-hander lists PRIM
   const oneHand = ROWS.filter((r) => gearHandedness(r.skill) === '1h')
 
   // Floors, not equalities: a rescrape may add weapon pages and must not turn this red for growing.
-  assert.equal(twoHand.length >= 442, true, `two-handers: ${twoHand.length} (was 442 on 2026-08-15)`)
-  assert.equal(oneHand.length >= 1071, true, `one-handers: ${oneHand.length} (was 1,071)`)
+  assertCorpusFloor(twoHand.length, 444, 'two-handers')
+  assertCorpusFloor(oneHand.length, 1097, 'one-handers')
 
   // THE CLAIM `dps2h`'s PRIMARY CONSTRAINT RESTS ON: a two-hander is a main-hand item, every time.
   assert.equal(twoHand.every((r) => r.slots.includes('PRIMARY')), true)
@@ -71,15 +72,15 @@ test('CENSUS: handedness is read off the corpus, and every two-hander lists PRIM
   )
 
   // Dual wield has something to say in both hands, which is what makes its policy worth having.
-  assert.equal(oneHand.filter((r) => r.slots.includes('PRIMARY')).length >= 1044, true)
-  assert.equal(oneHand.filter((r) => r.slots.includes('SECONDARY')).length >= 757, true)
+  assertCorpusFloor(oneHand.filter((r) => r.slots.includes('PRIMARY')).length, 1069, 'one-handers in PRIMARY')
+  assertCorpusFloor(oneHand.filter((r) => r.slots.includes('SECONDARY')).length, 772, 'one-handers in SECONDARY')
 })
 
 test('CENSUS: a row that states NO skill is not a weapon, and a weapon-only slot excludes it', () => {
   // 217 PRIMARY rows state no `Skill:` at all — brooms, torches, fishing poles, dolls. Law 1: the
   // wiki did not say, so we do not know, and "1H DPS" asked for a one-hander.
   const skillless = ROWS.filter((r) => r.slots.includes('PRIMARY') && r.skill === undefined)
-  assert.equal(skillless.length >= 217, true, `skill-less PRIMARY rows: ${skillless.length}`)
+  assertCorpusFloor(skillless.length, 227, 'skill-less PRIMARY rows')
   assert.equal(skillless.every((r) => gearHandedness(r.skill) === null), true)
   assert.equal(skillless.every((r) => !rowIsKind(r, 'weapon-1h') && !rowIsKind(r, 'weapon-2h')), true)
 
@@ -95,7 +96,7 @@ test('CENSUS: a row that states NO skill is not a weapon, and a weapon-only slot
 
 test('CENSUS: `isShieldLike` is the fork\'s ONE shield rule (planner/shield.ts), and the tank offhand reads it', () => {
   const shields = ROWS.filter((r) => isShieldLike(r))
-  assert.equal(shields.length >= 130, true, `shield rows: ${shields.length} (was 130)`)
+  assertCorpusFloor(shields.length, 130, 'shield rows')
 
   // THE RULE, restated so a future edit cannot loosen a clause unnoticed: every match sits in the
   // SECONDARY slot (a "Shield of…" cloak is not a shield), and speaks a shield word or the SHIELD skill.
@@ -129,12 +130,12 @@ test('CENSUS: the real corpus answers each policy differently, and none of them 
 
   // 2H closes the offhand ENTIRELY — not "narrows it", zero.
   assert.equal(admits('dps2h', 'SECONDARY'), 0)
-  assert.equal(admits('dps2h', 'PRIMARY') >= 442, true)
+  assertCorpusFloor(admits('dps2h', 'PRIMARY'), 444, 'dps2h PRIMARY')
   // Dual wield takes one-handers in both hands and nothing else.
-  assert.equal(admits('dualwield', 'SECONDARY') >= 757, true)
-  assert.equal(admits('dualwield', 'PRIMARY') >= 1044, true)
+  assertCorpusFloor(admits('dualwield', 'SECONDARY'), 772, 'dualwield SECONDARY')
+  assertCorpusFloor(admits('dualwield', 'PRIMARY'), 1069, 'dualwield PRIMARY')
   // Tank's offhand is the shield shelf - the word rule's 130 (planner/shield.ts), not the old shape's 147.
-  assert.equal(admits('tank', 'SECONDARY') >= 130, true)
+  assertCorpusFloor(admits('tank', 'SECONDARY'), 130, 'tank SECONDARY')
   assert.equal(admits('tank', 'SECONDARY') < admits('dualwield', 'SECONDARY'), true)
   // The unconstrained roles see every row their slots reach — today's behaviour, written down.
   for (const role of ['balanced', 'dps', 'dd', 'dot', 'healer'] as const) {

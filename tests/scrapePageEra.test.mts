@@ -16,6 +16,7 @@ import {
   readTitleList,
   wikitextByRequested
 } from '../scripts/sources/pageEraBatch'
+import { assertCorpusFloor } from './corpusFloor.mts'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const FIXTURES = resolve(HERE, 'fixtures/page-era')
@@ -83,7 +84,7 @@ test('a query response without pages throws instead of becoming an empty cached 
 
 test('a cached spell-page list warns when it is old or of unknown age, since only a re-enumeration finds new pages', () => {
   const committed = readFileSync(resolve(HERE, '../scripts/sources/cache/page-era/spell-pages.json'), 'utf8')
-  assert.ok((readTitleList(JSON.parse(committed))?.titles.length ?? 0) > 2000)
+  assertCorpusFloor(readTitleList(JSON.parse(committed))?.titles.length, 2047, 'cached spell pages')
   // The legacy shape, a bare title array, carries no date at all.
   assert.match(readTitleList(['Yaulp'])?.warning ?? '', /unknown age.*--refresh/)
   const now = Date.parse('2026-10-10T00:00:00Z')

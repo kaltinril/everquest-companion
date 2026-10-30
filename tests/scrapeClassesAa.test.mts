@@ -6,6 +6,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { parseAaAbilities, parseAaTable } from '../scripts/sources/classWiki'
+import { assertCorpusFloor } from './corpusFloor.mts'
 
 const WT = readFileSync(new URL('../scripts/sources/cache/classes/Alternate_Advancement.wikitext', import.meta.url), 'utf8')
 const ABBR = new Map(
@@ -20,10 +21,13 @@ const ABBR = new Map(
 test('every AA row of the four tables is read, with its table', () => {
   const aas = parseAaTable(WT, ABBR)
   const groups = (g: string): number => [...aas.values()].filter((r) => r.group === g).length
-  assert.deepEqual([groups('general'), groups('archetype'), groups('special')], [30, 34, 1])
+  // Floors (30, 34 and 1 on the 2026-10-18 cache, tests/corpusFloor.mts), like the class table below.
+  assertCorpusFloor(groups('general'), 30, 'general AAs')
+  assertCorpusFloor(groups('archetype'), 34, 'archetype AAs')
+  assert.ok(groups('special') >= 1, 'special AAs')
   // A FLOOR for the class table: editors add class AAs (76 on 2026-10-10, 77 on 2026-10-18), and a
   // parser that stops reading rows still falls under it. Holds on the old cache and a re-scrape alike.
-  assert.ok(groups('class') >= 76, `class AAs: ${String(groups('class'))}`)
+  assertCorpusFloor(groups('class'), 77, 'class AAs')
   assert.deepEqual(aas.get('Heroic Leap'), { group: 'class', classes: ['WAR'], activated: true, levels: [12] })
   assert.deepEqual(aas.get('Origin'), { group: 'general', activated: true, levels: [1] })
   assert.deepEqual(aas.get('Mass Group Buff'), { group: 'archetype', activated: true, levels: [50] })

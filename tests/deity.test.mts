@@ -15,6 +15,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { DEITIES, deitiesOf, deityFits, deityKey, isDeity } from '../src/shared/planner/deity'
 import { confirmedDeity, parseAchievementsDump } from '../src/shared/outputs/achievements'
+import { assertCorpusFloor } from './corpusFloor.mts'
 
 test('the two witnesses fold onto one spelling', () => {
   // The wiki's side.
@@ -113,9 +114,9 @@ test('every deity the committed corpus states is one the game names', () => {
   // An unrecognised token BLOCKS rather than passes, so a new spelling would quietly make an item
   // unusable. This assertion is the tripwire, and `GearBuildStats.unknownDeityTokens` is its twin.
   assert.deepEqual([...unknown], [], 'a deity token the game does not name - check the fold')
-  // The census, so a rescrape that changes the shape of the answer is visible rather than silent.
-  // 455 since the 2026-10-10 re-derive: the Teir`Dal Adamantite Cloak and Girdle keys reach their
-  // own pages again (no Deity line), not the Innoruuk-only (Imbued) pages whose alias had taken them.
-  assert.equal(restricted, 455, 'pages stating a deity line')
-  assert.equal(donors, 20, 'of those, the effect-bearing ones - every possible exaltation donor')
+  // The census as floors (455 and 20 measured 2026-10-10, tests/corpusFloor.mts): a delta that
+  // adds or re-aliases a page stays green, a parse that stops reading Deity lines does not.
+  assertCorpusFloor(restricted, 455, 'pages stating a deity line')
+  assertCorpusFloor(donors, 20, 'of those, the effect-bearing ones - every possible exaltation donor')
+  assert.ok(donors <= restricted)
 })

@@ -116,7 +116,8 @@ const ALL_OBTAIN = DUMP.rows
 
 test('the two sides are the same size, class for class', () => {
   assert.equal(ALL_OBTAIN.length, 95, 'Obtain rows in the real dump')
-  assert.equal(QUESTS.length, 95, 'Sky quests in the committed scrape')
+  // The scrape's side is held to the dump's, not to a number: the join is what must not break.
+  assert.equal(QUESTS.length, ALL_OBTAIN.length, 'Sky quests in the committed scrape')
   const fold = (s: string): string => s.toLowerCase().replace(/\s+/g, '')
   const perClass = (rows: { className: string }[]): Map<string, number> => {
     const m = new Map<string, number>()
@@ -139,7 +140,7 @@ test('every Sky quest is covered by exactly one achievement row', () => {
     [],
     'no Sky quest is left without an achievement row'
   )
-  assert.equal(vouched.quest.size, 95)
+  assert.equal(vouched.quest.size, QUESTS.length)
   assert.equal(vouched.classUnlock.size, 0, 'every row here is stamped as earned')
 })
 

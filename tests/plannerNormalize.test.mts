@@ -23,6 +23,7 @@ import { EQUIP_SLOTS } from '../src/shared/planner/types'
 import { CLASS_ABBRS } from '../src/shared/classCombo'
 import { buildItemDbIndex, type ItemDbFile } from '../src/main/itemsDb'
 import itemsJson from '../src/main/data/items.json'
+import { assertCorpusFloor } from './corpusFloor.mts'
 
 const db = itemsJson as unknown as ItemDbFile
 const index = buildItemDbIndex(db)
@@ -216,7 +217,7 @@ test('the class table covers the whole committed corpus', () => {
   }
   // Floors under the 2026-08-04 measurement (ALL 4752 bare rows, except 757, NONE 227).
   assert.ok(allRows >= 4000, `only ${allRows} plain ALL rows`)
-  assert.ok(exceptRows >= 700, `only ${exceptRows} 'except' rows`)
+  assertCorpusFloor(exceptRows, 711, 'except rows')
   assert.ok(noneRows >= 150, `only ${noneRows} NONE rows`)
   // The measured token inventory: 16 codes + ALL/All + NONE/None + except + two annotations —
   // plus `War`, the one Title Case class code the 2026-08-22 rescrape added (the case fold

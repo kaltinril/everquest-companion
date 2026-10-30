@@ -38,6 +38,7 @@ import {
 import { skyDroppersFor } from '../src/renderer/src/features/posky/poskyDroppers'
 import poskyRaw from '../src/renderer/src/data/eqlegends/posky.json' with { type: 'json' }
 import type { PoskyQuest } from '../src/shared/types'
+import { assertCorpusFloor } from './corpusFloor.mts'
 
 const QUESTS = (poskyRaw as { quests: PoskyQuest[] }).quests
 
@@ -89,8 +90,8 @@ function quest(name: string, ...items: [string, string, ...string[]][]): SearchQ
 test('JOS-207 — typing a boss name finds the quests he stands in front of', () => {
   const hits = filterByQuery(ALL, 'Gorgalosk')
   // MEASURED over the committed posky.json joined to mobs.json: sixteen class tests need
-  // something Gorgalosk drops. A re-scrape that changes the join changes this number.
-  assert.equal(hits.length, 16, keys(hits).join(', '))
+  // something Gorgalosk drops. A floor: a re-scrape that changes the join moves it.
+  assertCorpusFloor(hits.length, 16, `Gorgalosk: ${keys(hits).join(', ')}`)
   assert.ok(keys(hits).includes('Bard::Bard Test of Tone'), keys(hits).join(', '))
 
   // EVERY ONE OF THEM IS NEW REACH. Gorgalosk's name is in no quest name, no reward and no item
@@ -101,7 +102,7 @@ test('JOS-207 — typing a boss name finds the quests he stands in front of', ()
 
 test('JOS-207 — typing an island finds the quests that name it', () => {
   const hits = filterByQuery(ALL, 'Island 7')
-  assert.equal(hits.length, 17, keys(hits).join(', '))
+  assertCorpusFloor(hits.length, 17, `Island 7: ${keys(hits).join(', ')}`)
   // Same argument as the boss above: "Island 7" is stated by the item rows, never by a quest
   // name, a reward or an item name.
   assert.equal(ALL.filter((q) => matchedBefore(q, 'island 7')).length, 0)
@@ -114,7 +115,7 @@ test('JOS-207 — typing an island finds the quests that name it', () => {
 // =============================================================================
 
 test('searching a boss name finds AT LEAST what picking that boss does, for every boss offered', () => {
-  assert.ok(OPTIONS.bosses.length >= 20, String(OPTIONS.bosses.length))
+  assertCorpusFloor(OPTIONS.bosses.length, 20, 'bosses offered')
   for (const boss of OPTIONS.bosses) {
     const picked = keys(filterByFacets(ALL, { islands: [], bosses: [boss] }))
     const typed = new Set(keys(filterByQuery(ALL, boss)))
@@ -148,8 +149,9 @@ test('…and the same for every island offered', () => {
 test('a boss name that is ALSO an item word returns the union, not one of the two', () => {
   const byBoss = keys(ALL.filter((q) => questBosses(q).some((b) => b.toLowerCase().includes('spiroc'))))
   const byItem = keys(ALL.filter((q) => matchedBefore(q, 'spiroc')))
-  assert.equal(byBoss.length, 18, byBoss.join(', '))
-  assert.equal(byItem.length, 8, byItem.join(', '))
+  // Both sides are non-empty in the committed data (18 and 8 measured), which is the case under test.
+  assert.ok(byBoss.length > 0, 'quests in front of the Spiroc Lord')
+  assert.ok(byItem.length > 0, 'quests naming a Spiroc item')
   const typed = new Set(keys(filterByQuery(ALL, 'Spiroc')))
   for (const k of [...byBoss, ...byItem]) assert.ok(typed.has(k), k)
   assert.equal(typed.size, new Set([...byBoss, ...byItem]).size)

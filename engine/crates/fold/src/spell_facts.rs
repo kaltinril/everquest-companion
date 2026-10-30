@@ -440,8 +440,10 @@ mod tests {
         );
     }
 
-    /// The membership over the COMMITTED catalog, pinned so a re-scrape that re-files a spell moves
-    /// a number here rather than a bar in front of a player.
+    /// The membership over the COMMITTED catalog. Every category keeps at least 90% of its
+    /// 2026-10-28 count, so a wiki delta that adds a spell or two stays green and a rule or scrape
+    /// that re-files a real share of a category goes red (owner, 2026-10-29: no exact corpus
+    /// counts). Single re-filings are pinned by name below, where a player would see them.
     #[test]
     fn the_committed_catalog_falls_into_known_category_counts() {
         let facts = SpellFacts::project(&eqlog::spelldb::shared());
@@ -451,34 +453,40 @@ mod tests {
                 *counts.entry(format!("{:?}", row.category)).or_insert(0) += 1;
             }
         }
+        let measured = [
+            ("Buff", 494),
+            ("CrowdControl", 91),
+            ("Debuff", 124),
+            ("DotHot", 202),
+            ("ProcBuff", 1),
+            ("Unstated", 4),
+        ];
         assert_eq!(
-            counts
-                .iter()
-                .map(|(k, v)| (k.as_str(), *v))
-                .collect::<Vec<_>>(),
-            // MEASURED ON THE MERGED TREE (main_community, 2026-10-13): this branch's corrections and
-            // local-data-refresh's spells.json each pass the old counts alone and move them together;
-            // pinned here because this branch merges after the data (the dataWeight precedent).
-            vec![
-                // 494 -> 496 after the 2026-10-22 evening delta: Summon Familiar: Werewolf (6:00:00)
-                // and Pet Illusion: Werewolf (16:40:00), two timed beneficial spells.
-                // 496 -> 498 and Unstated 3 -> 4 after the 2026-10-24 delta: Summon Familiar: Mummy and
-                // Pet Illusion: Mummy (the Werewolf pair's twins), and Familiar: Gelatinous Cube, whose
-                // new page states a duration and no type.
-                // Buff 498 -> 494 and DotHot 196 -> 201 (2026-10-26): the per-tick rule reads the
-                // wiki's `HP` / `health` / `Increases` spellings, so the Elixir of Healing,
-                // Replenishment and Spiritualism lines and Extended Regeneration are heal over time,
-                // and the new Funeral Pyre of Kelador (`Decreases health by 290 per tick`) a DoT.
-                // CrowdControl 90 -> 91 and DotHot 201 -> 202 after the 2026-10-28 delta: the new
-                // Greater Immobilize and Night Fire.
-                ("Buff", 494),
-                ("CrowdControl", 91),
-                ("Debuff", 124),
-                ("DotHot", 202),
-                ("ProcBuff", 1),
-                ("Unstated", 4),
-            ]
+            counts.keys().map(String::as_str).collect::<Vec<_>>(),
+            measured.iter().map(|(k, _)| *k).collect::<Vec<_>>(),
+            "a category appeared or vanished"
         );
+        for (category, at) in measured {
+            let got = counts[category];
+            assert!(
+                got >= at * 9 / 10,
+                "{category}: {got}, under 90% of the {at} measured"
+            );
+        }
+        // Named re-filings: the wiki's `Root` line is crowd control, a per-tick health line a DoT,
+        // and a familiar's long timer a buff.
+        for (name, category) in [
+            ("Greater Immobilize", DurationCategory::CrowdControl),
+            ("Night Fire", DurationCategory::DotHot),
+            ("Funeral Pyre of Kelador", DurationCategory::DotHot),
+            ("Summon Familiar: Werewolf", DurationCategory::Buff),
+        ] {
+            assert_eq!(
+                facts.get(&db_canon_key(name)).map(|r| r.category),
+                Some(category),
+                "{name}"
+            );
+        }
         // The reported spell: its page lists a curse counter and no damage line, so the catalog
         // never says it ticks and it takes the conservative rate rather than a debuff's.
         assert_eq!(
