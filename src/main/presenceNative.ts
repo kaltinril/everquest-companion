@@ -35,9 +35,9 @@
 //   * `.npmrc` sets `ignore-scripts=true` and `electron-builder.yml` sets `npmRebuild: false`,
 //     and the note beside that flag states the rule this project actually operates by: a native
 //     dependency is acceptable when it ships PREBUILT N-API binaries inside its npm tarball, and
-//     needs the flags flipped when it ships node-gyp sources. koffi 2.x ships prebuilts for
-//     eighteen platforms in the tarball itself and needs no install script, no node-gyp, no
-//     Python and no MSVC (VERIFIED: extracted with scripts ignored, loaded, called). An in-tree
+//     needs the flags flipped when it ships node-gyp sources. koffi ships prebuilts (since 3.0 as
+//     per-platform optional packages on the registry) and needs no install script, no node-gyp,
+//     no Python and no MSVC (VERIFIED: extracted with scripts ignored, loaded, called). An in-tree
 //     addon would ship sources and need all four.
 //   * A CI-only compile means the addon does not exist in `npm run dev`, in `npm test`, or in a
 //     local `npm run dist`. Presence would be permanently degraded everywhere except a release
@@ -172,7 +172,7 @@ export interface ForegroundWindow {
 
 type Win32Fn = (...args: unknown[]) => unknown
 
-function bind(lib: koffi.IKoffiLib, prototype: string): Win32Fn {
+function bind(lib: koffi.LibraryHandle, prototype: string): Win32Fn {
   return lib.func(prototype)
 }
 
@@ -186,7 +186,7 @@ function asInt(v: unknown): number {
   return typeof v === 'number' && Number.isFinite(v) ? Math.trunc(v) : 0
 }
 
-/** A HANDLE. koffi hands back an opaque external for a non-null pointer and `null` for NULL. */
+/** A HANDLE. koffi hands back a BigInt address for a non-null pointer and `null` for NULL. */
 function isHandle(v: unknown): boolean {
   return v !== null && v !== undefined && v !== 0
 }
@@ -235,7 +235,7 @@ const MAX_PIDS = 4096
  * screen. Its own out-buffer, so a walk never shares scratch with the foreground read.
  */
 function makeStackingWalk(
-  user32: koffi.IKoffiLib,
+  user32: koffi.LibraryHandle,
   GetForegroundWindow: Win32Fn,
   GetWindowThreadProcessId: Win32Fn
 ): (ownPid: number) => boolean {

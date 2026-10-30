@@ -9,7 +9,7 @@
 // (processSample.ts: forbidden). Windows only; null elsewhere or when GDI will not answer, and the
 // reader then stays on OCR alone.
 
-import type { IKoffiLib } from 'koffi'
+import type { LibraryHandle } from 'koffi'
 
 export interface FontGlyph {
   ch: string
@@ -77,7 +77,7 @@ interface Gdi {
 
 function loadGdi(): Gdi {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const koffi = require('koffi') as { load(name: string): IKoffiLib }
+  const koffi = require('koffi') as { load(name: string): LibraryHandle }
   const gdi32 = koffi.load('gdi32.dll')
   const fns: Record<string, Fn> = {}
   for (const p of [
