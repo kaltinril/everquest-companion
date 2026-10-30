@@ -10,6 +10,7 @@
 
 import { type JSX, useEffect, useState } from 'react'
 import { swingReading, type SwingReading } from '@shared/swingTimer'
+import { OVERLAY_FONT } from '../../../shared/overlayFont'
 import { BgFooter } from './BgFooter'
 import { OverlayHeader } from './OverlayHeader'
 import { OverlayContent } from './overlayScale'
@@ -71,7 +72,7 @@ export default function SwingOverlay(): JSX.Element {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        fontFamily: 'Inter, "Segoe UI", Roboto, system-ui, sans-serif',
+        fontFamily: OVERLAY_FONT,
         color: '#f2f2f2',
         background: `rgba(14,17,21,${bgAlpha})`,
         border: locked ? '1px solid rgba(255,255,255,0.04)' : `1px solid ${ACCENT}66`,
