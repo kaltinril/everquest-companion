@@ -673,3 +673,39 @@ where one exists.
   kind touches").
 - e2e: `tests/e2e/sky-quest-overlay.e2e.mts` (window opens, a searched quest starred by the Quests
   tab checkbox reaches the overlay, the second click unstars). Open: the Ready tab checkbox has no e2e.
+
+## Death recap and swing timer (was combat-wins)
+
+- Death recap: `fold/src/combat/deathrecap.rs` keeps every landed hit on you and every heal on you
+  (`You` or your own name) for the last 15 s of log time, whoever the meter credited the hit to (a
+  fall, a tick from a mob the fight forgot), and freezes them on `playerDeath`. A recap is stamped
+  with the FRESH encounter at the death (`fresh_encounter_id`) and the zone stay `zone_seq + 1`;
+  a stay that `finalize_zone_session` drops (no damage) does not take a number, so its deaths would
+  read as the next stay's. 40 deaths kept.
+- It reaches the renderer as `deaths` on the SELECTED segment only, absent when the selection has
+  none (`mod.rs with_deaths`). Grouping is `src/shared/deathRecap.ts`, names case-insensitive (the
+  log prints `A tree snake bites YOU` and `a tree snake hit you ... by Weak Poison`). Incoming
+  melee files under the skill `Melee` (a bite and a maul both); `Bash`, `Kick` and spells keep
+  their names.
+- Shown as the Incoming card's third tab, Death recap, offered only on a segment with a death; the
+  segment header says `died` (Combat tab). A death with no fight open (DoT after the fight closed)
+  shows only on the zone stay's Overall.
+- Swing timer: `fold/src/combat/swing.rs` keeps the whole seconds you swung a weapon (landed or
+  `You try to ...`), 32 of them, served as top-level `swingRounds`. Weapon = the parser's
+  `melee_skill(verb)` is `Melee` or `Cleave`, not `reave`, and no riposte/flurry/rampage modifier;
+  kick, bash, backstab, strike, frenzy, shoot are out. The special-attack lane (`specials`) is not
+  consulted: a monk's `punch` could be either.
+- The cadence is measured, never a delay formula (`src/shared/swingTimer.ts`): the mean of the last
+  16 gaps under 8 s within a second of their median. Stamps are whole seconds, so no single gap is
+  the delay; the mean of a run is (span / count). Measured 2026-10-29: an SK two-hander's gaps run
+  2/3/4 s and read 2.875 s; a monk's (Drywrought) are mostly 1 s, where the bar is noise. Main and
+  off hand share a verb, so dual wield reads both hands' combined cadence.
+- The `swing` overlay kind is NOT in `METER_KINDS`: it opens 220x96 bottom-left (`swingBounds`).
+  A thirteenth meter slot shrank every meter's first-open size at 1080p and overlapped two slots on
+  a 1366x728 laptop (`tests/overlayLayout.test.mts`). It is in `METER_OVERLAYS` (4 Hz ping) and
+  `CHARACTER_AWARE_OVERLAYS`, and unreported to telemetry.
+- Fixtures: `tests/fixtures/death-recap.log` and `swing-timer.log` (a real SK's log, chat removed)
+  are folded by `fold/tests/death_recap.rs` and `swing_rounds.rs`, which pin the engine's output to
+  `death-recap.json` and `swing-rounds.json`; the TS tests read those JSON files, so both ends
+  check the same data. A deliberate engine change regenerates the JSON from the Rust test's
+  failure output.

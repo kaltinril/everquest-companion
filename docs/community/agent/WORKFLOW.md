@@ -24,6 +24,12 @@ disagree, RULES.md wins; fix this file.
 - **cargo** lives at `$USERPROFILE/.cargo/bin`. In a fresh worktree set
   `CARGO_TARGET_DIR=<another worktree>/engine/target` to reuse a warm build; delete a scratch
   target dir when done (RULES.md rule 18).
+  TRAP (2026-10-29): only while no other session builds the engine. Cargo names a workspace
+  member's artifacts by its path inside the workspace, so every worktree's `fold` is the SAME
+  `libfold-<hash>` in a shared target dir; a parallel helper's build replaced it and `cargo test`
+  ran the new test files against the other tree's code (a feature's own tests read as if the
+  feature were missing, then passed again on the next rebuild). With parallel helpers, give each
+  engine change its own `CARGO_TARGET_DIR` under its worktree.
 - **Engine rebuild after merging engine changes:** `npm run build:engine` in the main clone. The
   dev app resolves `engine/target/release`, and runs a COPY at
   `%APPDATA%/everquest-companion-dev/engine-run/engined.exe`, so an open app never blocks a rebuild.
