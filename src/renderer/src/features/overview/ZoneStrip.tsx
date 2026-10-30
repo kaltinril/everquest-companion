@@ -24,6 +24,7 @@ import { Box, Stack, Typography } from '@mui/material'
 import PlaceIcon from '@mui/icons-material/Place'
 import type { CharacterSnap } from '@shared/types'
 import { useModule } from '../../lib/useModule'
+import { FriendsOnline } from './FriendsOnline'
 
 export function ZoneStrip(): JSX.Element {
   const who = useModule<CharacterSnap>('character')
@@ -40,6 +41,7 @@ export function ZoneStrip(): JSX.Element {
             {who.character.name} · {who.character.server}
           </Typography>
         )}
+        <FriendsOnline />
       </Stack>
     </Box>
   )

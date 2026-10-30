@@ -133,7 +133,7 @@ function tellMain(channel: string): void {
 
 export function registerShotCaptureIpc(): void {
   // The Gaps tab that files a capture is behind the same gate.
-  if (UNRELEASED) setOwnFires([MACRO_DEF, CHANNELS_DEF], takeMacroFire)
+  if (UNRELEASED) setOwnFires('shot', [MACRO_DEF, CHANNELS_DEF], takeMacroFire)
   ipcMain.on(IPC.shotCaptureNow, () => start('overlay'))
   ipcMain.handle(IPC.shotCaptures, () => waiting.splice(0, waiting.length))
   ipcMain.handle(IPC.shotChannels, () => channels)

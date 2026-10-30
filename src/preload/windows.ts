@@ -21,6 +21,7 @@ import type { OverlayConfig, OverlayKind } from '../shared/types'
 import type { OverlayTextSizePrefs } from '../shared/overlayTextScale'
 import type { OverlayBgAlphaPrefs } from '../shared/overlayBgAlpha'
 import type { HotkeyAnswer } from '../shared/overlayHotkey'
+import type { WhoResult } from '../shared/whoFriends'
 
 export const windowsApi = {
   // ---- frameless window controls (Task #23) ----
@@ -73,6 +74,15 @@ export const windowsApi = {
     ipcRenderer.invoke(IPC.overlayRecoverHotkey, action, accel),
   /** The font families installed on this PC, for the overlay font pick (main/installedFonts.ts). */
   listFonts: (): Promise<string[]> => ipcRenderer.invoke(IPC.fontsList),
+  // ---- friends online from /who (main/whoWatch.ts; shared/whoFriends.ts) ----
+  /** The last /who listing read this launch, or null. */
+  whoLast: (): Promise<WhoResult | null> => ipcRenderer.invoke(IPC.whoLast),
+  /** Subscribe to /who listings as they come by. */
+  onWhoResult: (cb: (r: WhoResult) => void): (() => void) => {
+    const listener = (_e: unknown, r: WhoResult): void => cb(r)
+    ipcRenderer.on(IPC.onWhoResult, listener)
+    return () => ipcRenderer.removeListener(IPC.onWhoResult, listener)
+  },
   /** Subscribe to overlay open-state changes (so the TitleBar menu stays in sync). Payload {kind, open}. */
   onOverlayState: (cb: (s: { kind: OverlayKind; open: boolean }) => void): (() => void) => {
     const listener = (_e: unknown, s: { kind: OverlayKind; open: boolean }): void => cb(s)

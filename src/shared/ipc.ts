@@ -241,6 +241,10 @@ export const IPC = {
   overlayRecoverHotkey: 'overlay:recoverHotkey',
   // renderer(main app) -> main: the font families installed on this PC, sorted (installedFonts.ts).
   fontsList: 'fonts:list',
+  // renderer(main app) -> main: the last /who listing read this launch, or null (whoWatch.ts).
+  whoLast: 'who:last',
+  // main -> renderer(main app): a /who listing came by. Payload: WhoResult (shared/whoFriends.ts).
+  onWhoResult: 'who:result',
   // main -> renderer(main app): a kind's open-state changed. Payload: {kind, open}. Keeps the
   // TitleBar overlay menu in sync (also fires when an overlay closes itself).
   onOverlayState: 'overlay:state',
