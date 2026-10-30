@@ -54,6 +54,15 @@ repo is run.
   caches' `index.json`), pages the pack has that we never listed or listed and did not keep, pages
   only we have, and field disagreements at the same revision (level, zone, classes, slot, AC; zone
   spellings fold through the zone table). Quests and spells are reported unchecked.
+- Pages our scrape never listed (owner, 2026-10-29: "shouldn't this automatically be fetched when we
+  did the last delta scrape"): the feed names only edited pages, so a page missing from the
+  baseline's `embeddedin` list that nobody edits is never read. The report's `toRead` names them as
+  the wiki titles them: the never-listed pack pages (`Drake Lava Powder` is the page `Drake lava
+  powder`), and `linked`, pages the pack's loot links name that neither item list holds (Cracked
+  Darkwood Shield: in no `embeddedin` list, ours or the pack's; redirects and mob pages left out).
+  The delta reads them with `--titles-from-compare` (next section). A page with no item or mob box
+  (Drake lava powder is free text) is named, not folded, and stays listed until it is fixed on the wiki;
+  it does not fail `--release`.
 - The compare and the delta always run together, before every release and whenever the owner asks
   (owner, 2026-10-25: "wiki github pack from eoz and delta scrape should always run before a
   release"; "should run when i ask"): compare, delta, compare again (nothing behind). No pack age
@@ -87,9 +96,14 @@ full scrapers). A 3-week window was ~1,200 pages in ~25 batched requests.
    `git worktree add -b delta-<date> .claude/worktrees/delta-<date> main_community`, then junctions
    to the main clone's `node_modules`, `scripts/sources/cache/items`, `scripts/sources/cache/mobs` and
    `scripts/sources/cache/rendered` (gitignored, so the run keeps their text current where they
-   live; without `rendered`, posky and bosses render ~209 pages again). The dev app can stay up.
-3. `npx tsx scripts/scrape-delta.mts` there (`--spell-titles` the first time). It folds, writes the
-   caches back, runs the follow-ups above and re-measures the byte ledger.
+   live; without `rendered`, posky and bosses render ~209 pages again), and
+   `scripts/sources/cache/eoz` (the compare's reports). The dev app can stay up.
+3. `npx tsx scripts/scrape-delta.mts --titles-from-compare` there (`--spell-titles` the first
+   time). It folds, writes the caches back, runs the follow-ups above and re-measures the byte
+   ledger. `--titles-from-compare` reads the newest compare report's `toRead` titles by title, with
+   the feed's own title reads (50 a request, usually no extra request), and folds them like an edit;
+   `=<report.json>` names a report, `--extra=<Title|Title>` names pages by hand. It closes with one
+   line per such title: folded, no item or mob template (fix it on the wiki), or no such page.
 4. `npx tsx scripts/data-diff.mts` and `npx tsx scripts/validate-data.mts`; cite the diff in the
    commits.
 5. Commit every changed file on that work branch: the data files and their committed caches
@@ -100,7 +114,7 @@ full scrapers). A 3-week window was ~1,200 pages in ~25 batched requests.
 6. Gate the work branch and compare `^✖` lines against `main_community`'s head; clear the census
    reds there (next section). Then merge into `main_community` from the main clone and gate again
    (RULES.md rule 11).
-7. Remove the junctions first (`(Get-Item <wt>\node_modules).Delete()`, the same for the three cache
+7. Remove the junctions first (`(Get-Item <wt>\node_modules).Delete()`, the same for the four cache
    junctions), then `git worktree remove --force`, then `git branch -d delta-<date>`.
 - Known gap (2026-10-20 run): the quest scraper tells items by `cache/quests/item-titles.json`, a
   category listing cached once and never refreshed by the delta, so a quest linking a moved or new

@@ -329,9 +329,19 @@ where one exists.
   that redirect to an item page items.json has (A Shining Stone -> Shining Stone, A Piece of Rat
   Fur -> Piece of Rat Fur, Small Bronze Helm -> Bronze Helm), reachable through that record's
   `otherNames`. One is genuinely missing: Cracked Darkwood Shield (`{{Classic Era}}`, Highpass
-  Hold), absent from the item cache's `embeddedin` list and every cached batch; why the item scrape
-  and the deltas missed it is not known offline. No out-of-era or renamed ones (`ITEM_RENAMES` is
-  empty).
+  Hold), absent from the item cache's `embeddedin` list and every cached batch. No out-of-era or
+  renamed ones (`ITEM_RENAMES` is empty).
+- Why Cracked Darkwood Shield was missed (offline, 2026-10-29): its own text (that drop-groups copy)
+  opens `{{Itempage` directly inside `<onlyinclude>`: no redirect, no wrapper template, and
+  `Template:Itempage` has no redirects. `item-pages.json` was listed fresh at the 2026-10-18
+  baseline, not reused. The wiki's own GitHub pack (built from the wiki's database) leaves it out of
+  `items` and `wikiEntities.items` too, while `wikiEntities.titles` has it and `lootSourceCounts`
+  names it. Two separate listings missing a page that plainly uses the template points at the wiki's
+  own `templatelinks` row for it being absent (its links update never ran); a null edit or purge with
+  `forcelinkupdate` on the wiki would repair that (a wiki action, owner's call). The deltas missed it
+  because nobody edited it since 2026-10-18. Since 2026-10-29 the compare names such pages in
+  `toRead.linked` and `scrape-delta.mts --titles-from-compare` reads them (DATA_REFRESH.md); on the
+  2026-10-28 pack that is Cracked Darkwood Shield and Exaltations (an index page, reported not folded).
 - The wiki's Help page (Editing Standards > AI Generated Content): "All graphics and readable page
   text should be crafted by real human contributors". Told the owner about Copy wiki page.
 - No generated merchant item list (owner, decided): vendor stock and player resells cannot be told
