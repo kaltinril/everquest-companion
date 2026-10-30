@@ -39,8 +39,12 @@
 
 import type { EqLoc } from './mapGeometry'
 
+/** A typed marker and when it was placed (ms), so a newer logged `/loc` can outrank it
+ *  (useLocMarker.ts). A marker saved before the stamp existed has none and counts as oldest. */
+export type PlacedLoc = EqLoc & { at?: number }
+
 /** One remembered marker per zone stem, keyed by `ZoneShort`. One marker per zone is the scope. */
-export type LocMarkers = Record<string, EqLoc>
+export type LocMarkers = Record<string, PlacedLoc>
 
 /**
  * Every zone's marker, in ONE key beside `eq.maps.zone` / `eq.maps.packs` / `eq.maps.pane`.
@@ -118,11 +122,12 @@ export function formatLoc(loc: EqLoc): string {
   return `${short(loc.ns)}, ${short(loc.ew)}, ${short(loc.z)}`
 }
 
-function readLoc(value: unknown): EqLoc | null {
+function readLoc(value: unknown): PlacedLoc | null {
   if (typeof value !== 'object' || value === null) return null
-  const { ns, ew, z } = value as Record<string, unknown>
+  const { ns, ew, z, at } = value as Record<string, unknown>
   if (!Number.isFinite(ns) || !Number.isFinite(ew) || !Number.isFinite(z)) return null
-  return { ns: ns as number, ew: ew as number, z: z as number }
+  const loc = { ns: ns as number, ew: ew as number, z: z as number }
+  return Number.isFinite(at) ? { ...loc, at: at as number } : loc
 }
 
 /**
@@ -161,7 +166,7 @@ export function saveLocMarkers(marks: LocMarkers, store: LocStore = localStorage
  * Entering a new loc REPLACES the old one rather than adding to it — one marker per zone is the
  * scope, so there is never a list to manage, prune or explain.
  */
-export function setLocMarker(marks: LocMarkers, zone: string, loc: EqLoc): LocMarkers {
+export function setLocMarker(marks: LocMarkers, zone: string, loc: PlacedLoc): LocMarkers {
   return { ...marks, [zone]: loc }
 }
 
@@ -175,7 +180,7 @@ export function clearLocMarker(marks: LocMarkers, zone: string): LocMarkers {
 }
 
 /** This zone's marker, or null. `zone == null` (no map open) is the honest "nothing to draw". */
-export function locMarkerFor(marks: LocMarkers, zone: string | null): EqLoc | null {
+export function locMarkerFor(marks: LocMarkers, zone: string | null): PlacedLoc | null {
   if (zone == null) return null
   return marks[zone] ?? null
 }

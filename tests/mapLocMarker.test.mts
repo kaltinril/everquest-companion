@@ -320,3 +320,9 @@ test('the key is the one the app has shipped — a rename would silently drop ev
   saveLocMarkers({ oasis: { ns: 1, ew: 2, z: 3 } }, store)
   assert.equal(store.data['eq.maps.loc'], '{"oasis":{"ns":1,"ew":2,"z":3}}')
 })
+
+test('a typed marker keeps the time it was placed across the store, so a newer logged /loc can outrank it', () => {
+  const store = fakeStore()
+  saveLocMarkers(setLocMarker({}, 'oasis', { ns: 1, ew: 2, z: 3, at: 1_700 }), store)
+  assert.deepEqual(locMarkerFor(loadLocMarkers(store), 'oasis'), { ns: 1, ew: 2, z: 3, at: 1_700 })
+})

@@ -87,7 +87,7 @@ export function MapLocMarker({ at, loc, vp, heading = null }: MapLocMarkerProps)
       }}
     >
       <span
-        title={`The location you entered - /loc ${formatLoc(loc)}`}
+        title={`Your last /loc - ${formatLoc(loc)}`}
         style={{
           position: 'absolute',
           left: -half,

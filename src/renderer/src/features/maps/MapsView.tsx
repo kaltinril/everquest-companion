@@ -32,6 +32,8 @@
 // it says, and keeps it there per zone until you replace it or clear it. The caption states exactly
 // that pair, because a user hunting for a dot that does not exist is a worse outcome than one quiet
 // line saying so (§10) — and a user who does not know they can place one is the report we got.
+// (Since 2026-10-29 the marker also follows the log: EQ Legends DOES write `/loc` to it, unlike the
+// creator's logs measured above; useLocMarker.ts.)
 //
 // TWO DENSITY CONTROLS LIVE HERE AND BOTH ARE HONEST ABOUT WHAT THEY ARE. Labels declutter
 // themselves (`labelLayout.ts`) — a label that loses its space becomes a dot and hover raises the

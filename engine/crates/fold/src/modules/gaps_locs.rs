@@ -21,7 +21,7 @@ const LOC_PAIR_MS: i64 = 10_000;
 const SAME_POINT: f64 = 10.0;
 
 /// `Your Location is -790.65, 173.39, -12.01` → the three numbers.
-fn loc_of(text: &str) -> Option<[f64; 3]> {
+pub(crate) fn loc_of(text: &str) -> Option<[f64; 3]> {
     let rest = text
         .strip_prefix("Your Location is ")?
         .trim_end_matches('.');
