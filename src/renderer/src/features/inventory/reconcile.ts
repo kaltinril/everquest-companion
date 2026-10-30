@@ -2,6 +2,7 @@ import type { CountSource, ItemCountOverride, PoskyQuest } from '@shared/types'
 import type { TurnInInstants } from '@shared/questTurnIns'
 import { itemCountKey } from '../../lib/itemName'
 import { questKey } from '../posky/keys'
+import type { LogOnlyCounts } from '../posky/heldCounts'
 
 export interface InventoryRow {
   key: string
@@ -121,6 +122,11 @@ export interface ReconcileInput {
   destroyedSinceDump?: Record<string, number>
   /** JOS-401 — the same discount per key, after each key's own hand statement. */
   destroyedSinceOverride?: Record<string, number>
+  /**
+   * The `handins` count (fork issue #2, `computeLogOnlyCounts`): loot less every completed hand-over
+   * and destroy, in time order. Read only under `handins`; absent there, it answers as `log`.
+   */
+  logOnly?: LogOnlyCounts
 }
 
 export interface ReconcileResult {
@@ -199,6 +205,8 @@ interface Witnesses {
    * number inside its own baseline and does not read this field.
    */
   invSince: number
+  /** the `handins` net, set only under that source with the fold supplied */
+  logOnly: number | undefined
   /** the dump-anchored baseline, present only under `rebaseline` with an instant to anchor to */
   rebaseline?: { base: number; consumed: number }
   /** the hand-stated baseline, present only where the user has stated this item's count */
@@ -332,7 +340,8 @@ function dumpNet(w: Witnesses): number {
  */
 function witnessBase(w: Witnesses, countSource: CountSource): number {
   if (w.override) return w.override.base
-  if (countSource === 'log') return w.log
+  // `handins` starts where `log` does; its hand-overs are the row's `consumed`.
+  if (countSource === 'log' || countSource === 'handins') return w.log
   const dump = dumpBase(w)
   if (countSource === 'inventory') return dump
   if (countSource === 'rebaseline' && w.rebaseline) return w.rebaseline.base
@@ -578,6 +587,8 @@ function witnessNet(w: Witnesses, countSource: CountSource): number {
   if (w.override) return Math.max(0, w.override.base - w.override.consumed)
   const fromLog = Math.max(0, w.log - w.consumed)
   if (countSource === 'log') return fromLog
+  // Every hand-over, not just a known quest's turn-in; no dump read (fork issue #2).
+  if (countSource === 'handins') return w.logOnly ?? fromLog
   if (countSource === 'rebaseline' && w.rebaseline) {
     return Math.max(0, w.rebaseline.base - w.rebaseline.consumed)
   }
@@ -636,6 +647,8 @@ interface RowInputs {
   dumpWindow: Consumption | null
   /** consumption windowed to any instant, memoized (`windowedConsumption`) */
   windowed: (at: number) => Consumption
+  /** the `handins` fold, null under every other source */
+  logOnly: LogOnlyCounts | null
 }
 
 /**
@@ -663,6 +676,11 @@ function overrideWitness(
   }
 }
 
+/** One key's `handins` net: 0 for an item the fold never saw, undefined with no fold. */
+function logOnlyNet(k: string, fold: LogOnlyCounts | null): number | undefined {
+  return fold ? (fold.held[k] ?? 0) : undefined
+}
+
 /** Gather one key's witnesses, building only the windows that actually apply to it. */
 function witnessesFor(k: string, x: RowInputs): Witnesses {
   const w: Witnesses = {
@@ -671,7 +689,8 @@ function witnessesFor(k: string, x: RowInputs): Witnesses {
     consumed: x.all.consumed[k] ?? 0,
     invDestroyed: x.destroyedSinceDump[k] ?? 0,
     invConsumed: x.dumpWindow?.consumed[k] ?? 0,
-    invSince: x.lootSinceDump[k] ?? 0
+    invSince: x.lootSinceDump[k] ?? 0,
+    logOnly: logOnlyNet(k, x.logOnly)
   }
   if (x.rebaseline) {
     w.rebaseline = {
@@ -688,6 +707,8 @@ function witnessesFor(k: string, x: RowInputs): Witnesses {
 function blameFor(k: string, w: Witnesses, x: RowInputs): string[] {
   if (w.override) return x.windowed(w.override.statement.setAt).consumedBy[k] ?? []
   if (w.rebaseline && x.rebaseline) return x.rebaseline.consumption.consumedBy[k] ?? []
+  // `handins` took the row down by hand-overs, so the NPCs it went to name them.
+  if (x.logOnly) return x.logOnly.givenTo[k] ?? []
   // JOS-403 — a dump-answered row was discounted by the POST-DUMP turn-ins, so the post-dump pass is
   // what names them. The all-time list would name the same quests plus the ones whose turn-ins the
   // file already reflects, and its `x2` captions would count runs this row never paid for.
@@ -770,7 +791,8 @@ function dumpTurnInWindow(
   input: ReconcileInput,
   windowed: (at: number) => Consumption
 ): { at: number | null; window: Consumption | null } {
-  const at = input.countSource === 'log' ? null : (input.rebaselineAt ?? null)
+  const fileBlind = input.countSource === 'log' || input.countSource === 'handins'
+  const at = fileBlind ? null : (input.rebaselineAt ?? null)
   return { at, window: at === null ? null : windowed(at) }
 }
 
@@ -856,6 +878,7 @@ export function reconcile(input: ReconcileInput): ReconcileResult {
     destroyedSinceOverride: input.destroyedSinceOverride ?? {},
     lootSinceDump: dump.lootSinceDump,
     dumpWindow: dump.dumpWindow,
-    windowed
+    windowed,
+    logOnly: countSource === 'handins' ? (input.logOnly ?? null) : null
   })
 }

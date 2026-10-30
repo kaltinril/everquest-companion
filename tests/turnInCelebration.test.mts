@@ -142,3 +142,32 @@ test('an incomplete turn-in (missing Brass Knuckles) is NOT detected', () => {
     'missing an item ⇒ not detected now Brass Knuckles is required'
   )
 })
+
+// A cancelled or refused offer is no turn-in anywhere (owner, 2026-10-23, requirements/gaps-tab.md).
+// The engine leaves both out of a row's `given`; `items` still lists every offer, so crediting
+// reads `given` whenever the row carries it.
+test('a refused offer credits nothing: the NPC handed the item back', () => {
+  const offered = monkFists.items.map((i) => i.name)
+  const given = offered.slice(0, -1).map((item) => ({ item, count: 1 }))
+  const detected = countTurnIns([{ ts: 1, npc: 'Holwin', items: offered, given }], quests)
+  assert.equal(detected[questKey(monkFists)], undefined)
+})
+
+test('a cancelled offer credits nothing, even when the trade later completes', () => {
+  const offered = monkFists.items.map((i) => i.name)
+  const detected = countTurnIns([{ ts: 1, npc: 'Holwin', items: offered, given: [] }], quests)
+  assert.equal(detected[questKey(monkFists)], undefined)
+})
+
+test('a completed hand-in still credits, from `given` and from an older row without it', () => {
+  const offered = monkFists.items.map((i) => i.name)
+  const given = offered.map((item) => ({ item, count: 1 }))
+  const detected = countTurnIns(
+    [
+      { ts: 1, npc: 'Holwin', items: offered, given },
+      { ts: 2, npc: 'Holwin', items: offered }
+    ],
+    quests
+  )
+  assert.deepEqual(detected[questKey(monkFists)], [1, 2])
+})

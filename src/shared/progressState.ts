@@ -48,6 +48,9 @@ export type HeldCounts = Record<string, number>
  *                 is opt-in for exactly that reason: it is JOS-128's reverted reset offered as a
  *                 CHOICE rather than imposed as the default, so the banked items a closed bank
  *                 window kept out of the file are the user's own accepted cost, not a surprise.
+ * - 'handins'   : the log alone, as a running count: loot adds, every item handed over in a
+ *                 completed trade (any NPC, any quest or none) and every destroy removes. The
+ *                 export is ignored (fork issue #2, an opt-in beside the default).
  * The combination and the turn-in consumption that follows it live in ONE place,
  * renderer/features/inventory/reconcile.ts, which argues all four.
  *
@@ -57,7 +60,7 @@ export type HeldCounts = Record<string, number>
  * flip changes NOTHING for an install with no dump all live in
  * renderer/features/inventory/countSource.ts.
  */
-export type CountSource = 'log' | 'inventory' | 'both' | 'rebaseline'
+export type CountSource = 'log' | 'inventory' | 'both' | 'rebaseline' | 'handins'
 
 /** Persisted user progress (inventory + quest completion). */
 export interface ProgressState {

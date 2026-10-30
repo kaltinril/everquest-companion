@@ -475,7 +475,7 @@ export const InventorySource = memo(function InventorySource({
         sx={{ minWidth: 190 }}
       >
         {COUNT_SOURCE_OPTIONS.map((o) => (
-          <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>
+          <MenuItem key={o.value} value={o.value} title={o.hint}>{o.label}</MenuItem>
         ))}
       </TextField>
       {/* THE FRESHNESS LINE, HUNG UNDER THE DROPDOWN IT BELONGS TO (JOS-268).

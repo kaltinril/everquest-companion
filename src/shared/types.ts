@@ -377,6 +377,9 @@ export interface TurnInEvent {
   ts: number
   npc: string
   items: string[]
+  /** What the trade really took, with stack counts: no cancelled or refused offer. Absent on a
+   *  row folded before it existed (an older archive segment). */
+  given?: { item: string; count: number }[]
 }
 
 /** A level-up ("You have gained a level! Welcome to level N!"). */

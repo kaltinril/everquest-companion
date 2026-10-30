@@ -6,6 +6,7 @@ import type {
   LootSnap,
   PoskyQuest,
   ProgressState,
+  TurnInEvent,
   TurnInSnap
 } from '@shared/types'
 import { getPoskyData } from '../../data'
@@ -16,7 +17,8 @@ import {
   computeHeldCounts,
   computeHeldCountsAfter,
   computeHeldCountsAfterPerKey,
-  computeLastLootedAt
+  computeLastLootedAt,
+  computeLogOnlyCounts
 } from './heldCounts'
 import { useModule } from '../../lib/useModule'
 import { characterEpoch, heldNow, holdFor, type Held } from '../../lib/characterEpoch'
@@ -54,6 +56,7 @@ import {
 } from '../../../../shared/itemOverrides'
 
 const EMPTY_LOOT: LootEvent[] = []
+const EMPTY_TRADES: TurnInEvent[] = []
 
 const posky = getPoskyData()
 
@@ -364,9 +367,15 @@ function useHeldItems(x: {
   detectedTurnIns: TurnInInstants
   /** the hand statements in force, already sanitized (JOS-186) */
   overrides: ItemCountOverride[]
+  /** every completed trade the log shows, for the `handins` count (fork issue #2) */
+  trades: readonly TurnInEvent[]
 }): HeldItems {
-  const { lootHistory, progress, countSource, turnIns, detectedTurnIns, overrides } = x
+  const { lootHistory, progress, countSource, turnIns, detectedTurnIns, overrides, trades } = x
   const logCounts = useMemo(() => computeHeldCounts(lootHistory), [lootHistory])
+  const logOnly = useMemo(
+    () => (countSource === 'handins' ? computeLogOnlyCounts(lootHistory, trades) : undefined),
+    [countSource, lootHistory, trades]
+  )
   const lootNames = useMemo(() => deriveLootNames(lootHistory), [lootHistory])
   // Per-item drop recency, same counting key as the held counts — the whole plumbing the
   // "most recent drop" sort needs, folded from the loot history that is already here.
@@ -427,7 +436,8 @@ function useHeldItems(x: {
         rebaselineAt,
         lootSinceRebaseline,
         destroyedSinceDump,
-        destroyedSinceOverride
+        destroyedSinceOverride,
+        logOnly
       }),
     [
       logCounts,
@@ -441,7 +451,8 @@ function useHeldItems(x: {
       rebaselineAt,
       lootSinceRebaseline,
       destroyedSinceDump,
-      destroyedSinceOverride
+      destroyedSinceOverride,
+      logOnly
     ]
   )
   return { net, inventoryRows, lastLootedAt }
@@ -463,6 +474,8 @@ interface TurnInLedger extends TurnInActions {
   logCounts: Record<string, number>
   /** the turn-ins module has loaded, so `detected` is the log's list rather than a placeholder */
   turnInsReady: boolean
+  /** the module's rows as they came: every completed trade, quest or not */
+  trades: readonly TurnInEvent[]
 }
 
 /**
@@ -558,7 +571,7 @@ function useTurnInLedger(
   // reset and this file crossed its ceiling). They restate a quest from the ledger derived above.
   const turnInsReady = turnInsRaw != null
   const actions = useTurnInActions(turnIns, turnInsReady ? detected : null, rejected, setProgress)
-  return { turnIns, detected, logCounts, turnInsReady, ...actions }
+  return { turnIns, detected, logCounts, turnInsReady, trades: turnInsRaw ?? EMPTY_TRADES, ...actions }
 }
 
 /** The character name this window last heard (lib/characterEpoch.ts), so a remount starts from it instead of re-rendering on the ask. */
@@ -624,6 +637,7 @@ export function useProgress(opts?: UseProgressOptions): UseProgress {
     countSource,
     turnIns,
     detectedTurnIns: detected,
+    trades: ledger.trades,
     overrides: itemOverrides
   })
 
