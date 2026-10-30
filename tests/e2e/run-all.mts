@@ -213,8 +213,7 @@ function report(results: Result[], wallMs: number): number {
 /** TEST build (this branch only): specs whose subject this build turns off, so a red always means something. */
 const TEST_BUILD_SKIPS: Record<string, string> = {
   'feedback.e2e.mts': 'the feedback controls are disabled',
-  'telemetry.e2e.mts': 'no analytics are compiled in',
-  'spells-gate.e2e.mts': 'UNRELEASED is forced open'
+  'telemetry.e2e.mts': 'no analytics are compiled in'
 }
 for (const [spec, why] of Object.entries(TEST_BUILD_SKIPS)) console.log(`[e2e] skip ${spec} on the TEST build: ${why}`)
 

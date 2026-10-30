@@ -55,8 +55,7 @@ const ROWS = '[data-testid^="pref-overlay-row-"]'
 const sizeRow = (kind: string, part = ''): string => `[data-testid="pref-overlay-text-size-${kind}${part}"]`
 const alphaRow = (kind: string, part = ''): string => `[data-testid="pref-overlay-bg-alpha-${kind}${part}"]`
 
-/** Every kind that gets a row — the whole union, which is the list's own claim — less 'gaps': the
- *  Wiki Gaps window is listed only where the UNRELEASED Gaps tab is built (`listedKinds`). */
+/** Every kind that gets a row — the whole union, which is the list's own claim. */
 const ALL_KINDS = [
   'fight',
   'overall',
@@ -69,19 +68,12 @@ const ALL_KINDS = [
   'respawn',
   'mapPins',
   'skyQuests',
+  'gaps',
+  'swing',
   'toast',
   'alertBanner',
   'conCard'
 ]
-
-/**
- * The kinds THIS build lists: every kind, plus 'gaps' exactly where the Gaps tab is built. Read off
- * the gate the app uses (UNRELEASED): the nav row `nav-gaps` exists only then, and stays mounted in
- * a collapsed group. A plain e2e build lists 14; the community TEST build, which opens UNRELEASED, 15.
- */
-async function listedKinds(page: Page): Promise<string[]> {
-  return (await countOf(page, '[data-testid="nav-gaps"]')) > 0 ? [...ALL_KINDS, 'gaps'] : ALL_KINDS
-}
 
 /** `TEXT_SCALE_STEP` and `BG_ALPHA_PREF_STEP` from src/shared, spelled out rather than imported: an
  *  e2e file loads no `src` module (tests/e2e/overlayMinSizeSteps.mts states that rule). */
@@ -240,7 +232,7 @@ export async function stepSyncedShape(page: Page): Promise<void> {
  * be revealed with whatever number it was showing before the flip.
  */
 export async function stepIndependentShape(page: Page): Promise<void> {
-  const listed = await listedKinds(page)
+  const listed = ALL_KINDS
   await page.click(SWITCH, { timeout: 15_000 })
   const rows = await settle(() => countOf(page, ROWS), (n) => n === listed.length, { timeoutMs: 15_000 })
   check(
@@ -287,7 +279,7 @@ export async function stepClosedTag(page: Page): Promise<void> {
   const open = await page.evaluate(() =>
     (window as unknown as { eq: { getOverlayState: () => Promise<Record<string, boolean>> } }).eq.getOverlayState()
   )
-  const listed = await listedKinds(page)
+  const listed = ALL_KINDS
   const openKinds = listed.filter((k) => open[k])
   const closedKinds = listed.filter((k) => !open[k])
   // …and the claim is not vacuous only if both sides exist. This spec opened two meters, so they

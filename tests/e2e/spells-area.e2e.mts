@@ -1,38 +1,16 @@
 /**
- * THE SPELLS AREA IS GATED, AND THIS SPEC MEASURES THAT PROMISE ON THE EMITTED BUNDLE
- * (docs/plans/spell-upgrades-and-loadout.md §2, wave 7).
+ * THE SPELLS AREA IS DRAWN IN EVERY BUILD (owner, 2026-10-29: "everyone should always see all
+ * tabs"). This file was the area's absence spec while it sat behind the review gate; the gate is
+ * gone, so it states the opposite claims, on one launch of a production-shaped build:
  *
- * ── WHY AN ABSENCE SPEC, AND WHY IT IS NOT VACUOUS ────────────────────────────────────────────
- *
- * The area's three views sit behind `UNRELEASED` (devFlags.ts), which is `import.meta.env.DEV` and
- * therefore a literal `false` in every `electron-vite build`. So a production-shaped launch has no
- * nav row, no tab bar and no component tree - and the whole point of the gate is that this is a
- * STRIP rather than a hide: there is no bundled component to un-hide and no route into one.
- *
- * An absence assertion passes just as happily when a feature was never wired up at all, which is
- * the trap the character sheet's own gated spec named. So this file does not only assert that
- * `nav-spells` is missing. It asserts, on the SAME launch:
- *
- *   1. the Spells row and all three of its tabs are absent, AND
+ *   1. the Spells row is present, opens the area's tab bar with all three tabs, and the
+ *      Spellbook view mounts, AND
  *   2. the GEAR area - built on the same `AreaTabs` component, through the same `MainColumn`
- *      branch - is present and works. That is the control. If the shared machinery were broken
- *      rather than gated, this half goes red and the absence above stops meaning anything.
- *   3. `spells:stackViews`, the one IPC door wave 6 added, is REACHABLE and answers safely. The
- *      channel is deliberately NOT gated - it reads the player's own client file and refuses
- *      nonsense at the door - so a build must still answer `{}` rather than throw. A door that
- *      threw would be a live defect hiding behind a gated UI.
+ *      branch - is present and works, AND
+ *   3. `spells:stackViews`, the area's IPC door, answers safely: `{}` rather than a throw on a
+ *      machine with no EverQuest install, and it refuses nonsense at the door.
  *
- * ── WHAT THIS FILE BECOMES AT GRADUATION ──────────────────────────────────────────────────────
- *
- * The character sheet's spec is the precedent in both directions: it was an absence spec from
- * JOS-45 and was REWRITTEN into a presence spec when the owner released the tab (JOS-327). This one
- * follows it. When the Spells area graduates - `TELEMETRY_VIEWS` widened server-first, then the
- * `KNOWN_VIEWS` splice made unconditional - every claim below becomes false by design, and the file
- * states the opposite ones: not "the tab exists" (which a misspelled testid satisfies) but the
- * Spellbook mounts, its rows carry grants read off the committed catalog, and the tier slider moves
- * a number this spec can predict.
- *
- * Run: `npm run test:e2e -- spells-gate` (or node --import tsx this file).
+ * Run: `npm run test:e2e -- spells-area` (or node --import tsx this file).
  */
 import type { Page } from 'playwright-core'
 import {
@@ -49,7 +27,7 @@ import {
 import { mainWindow } from './appWindow.mjs'
 import { launchOnFixture } from './logFixture.mjs'
 
-/** The gated row and its three tabs. Every one of these must be absent from a build. */
+/** The Spells row, its tab bar and its three tabs. Every one of these must be present. */
 const NAV_SPELLS = '[data-testid="nav-spells"]'
 const SPELL_AREA_TABS = '[data-testid="spell-area-tabs"]'
 const TAB_SPELLBOOK = '[data-testid="tab-spells"]'
@@ -57,7 +35,7 @@ const TAB_UPGRADES = '[data-testid="tab-spellUpgrades"]'
 const TAB_LOADOUT = '[data-testid="tab-spellLoadout"]'
 const SPELLBOOK_VIEW = '[data-testid="spellbook-view"]'
 
-/** THE CONTROL: the gear area, which shares every piece of machinery the spells area uses. */
+/** The gear area, which shares every piece of machinery the spells area uses. */
 const NAV_GEAR = '[data-testid="nav-gear"]'
 const GEAR_AREA_TABS = '[data-testid="gear-area-tabs"]'
 const TAB_GEAR = '[data-testid="tab-gear"]'
@@ -76,25 +54,24 @@ async function answerNotice(page: Page): Promise<void> {
   )
 }
 
-/** STEP 1 — nothing of the Spells area reached the bundle. */
-async function stepAbsent(page: Page): Promise<void> {
+/** STEP 1 — the Spells row opens the area: its tab bar, its three tabs, and the Spellbook. */
+async function stepPresent(page: Page): Promise<void> {
+  check('the Spells nav row is present', (await countOf(page, NAV_SPELLS)) === 1)
+  await page.click(NAV_SPELLS)
+  const bars = await settle(() => countOf(page, SPELL_AREA_TABS), (n) => n === 1, { timeoutMs: 15_000 })
+  check('the Spells tab bar mounts', bars === 1, `saw ${String(bars)}`)
   for (const [what, sel] of [
-    ['the Spells nav row', NAV_SPELLS],
-    ['the Spells tab bar', SPELL_AREA_TABS],
     ['the Spellbook tab', TAB_SPELLBOOK],
     ['the Upgrades tab', TAB_UPGRADES],
-    ['the Loadout tab', TAB_LOADOUT],
-    ['the Spellbook view', SPELLBOOK_VIEW]
+    ['the Loadout tab', TAB_LOADOUT]
   ] as const) {
-    check(`${what} is absent from a production-shaped build`, (await countOf(page, sel)) === 0)
+    check(`…and it draws ${what}`, (await countOf(page, sel)) === 1)
   }
+  const views = await settle(() => countOf(page, SPELLBOOK_VIEW), (n) => n === 1, { timeoutMs: 15_000 })
+  check('the Spellbook view mounts', views === 1, `saw ${String(views)}`)
 }
 
-/**
- * STEP 2 — THE CONTROL. The gear area is built on the same `AreaTabs` component and reached through
- * the same `MainColumn` branch, so its working is what makes step 1 a statement about the GATE
- * rather than about broken machinery.
- */
+/** STEP 2 — the gear area, on the same `AreaTabs` component and the same `MainColumn` branch. */
 async function stepControl(page: Page): Promise<void> {
   check('the Gear nav row is present', (await countOf(page, NAV_GEAR)) === 1)
   await page.click(NAV_GEAR)
@@ -108,10 +85,9 @@ async function stepControl(page: Page): Promise<void> {
 /**
  * STEP 3 — the one door wave 6 added answers rather than throwing.
  *
- * It is deliberately NOT behind the gate: it reads the player's own `spells_us.txt` and validates at
- * the handler, so on a machine with no EverQuest install it answers `{}`. What must never happen is
- * a rejection - a caller reading an empty map as "no exact verdicts" is a supported state, and a
- * throw is a defect that a gated UI would have hidden until graduation day.
+ * It reads the player's own `spells_us.txt` and validates at the handler, so on a machine with no
+ * EverQuest install it answers `{}`. What must never happen is a rejection - a caller reading an
+ * empty map as "no exact verdicts" is a supported state, and a throw is a defect.
  */
 async function stepDoor(page: Page): Promise<void> {
   const result = await page.evaluate(async () => {
@@ -141,7 +117,7 @@ async function stepDoor(page: Page): Promise<void> {
 async function main(): Promise<void> {
   buildIfStale()
 
-  console.log('launch: production-shaped build — the Spells area must be structurally absent…')
+  console.log('launch: production-shaped build — the Spells area must be drawn…')
   const { app, close } = await launchOnFixture('e2e-planner.log')
 
   let page: Page | null = null
@@ -156,7 +132,7 @@ async function main(): Promise<void> {
     await page.waitForSelector('[data-testid="nav-overview"]', { timeout: 60_000 })
     await answerNotice(page)
 
-    await stepAbsent(page)
+    await stepPresent(page)
     await stepControl(page)
     await stepDoor(page)
 
@@ -165,7 +141,7 @@ async function main(): Promise<void> {
       consoleErrors.length === 0,
       consoleErrors.slice(0, 3).join(' | ')
     )
-    if (failures.length) await dumpArtifacts(page, 'spells-gate-FAIL')
+    if (failures.length) await dumpArtifacts(page, 'spells-area-FAIL')
   } finally {
     await close()
   }
@@ -175,6 +151,6 @@ async function main(): Promise<void> {
 
 main().catch((err: unknown) => {
   console.error('e2e: harness error —', err)
-  note('the spells-gate spec did not complete')
+  note('the spells-area spec did not complete')
   process.exitCode = 1
 })

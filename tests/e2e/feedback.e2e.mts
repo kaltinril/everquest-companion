@@ -145,8 +145,8 @@ async function stepTriageStripped(page: Page): Promise<void> {
  * THE OPT-IN'S POLARITY (JOS-72), and an honest account of what an e2e can prove about it.
  *
  * An absence assertion is the weakest kind — it passes just as happily when the feature was
- * never wired up. The character-sheet spec answers that by launching a second time with
- * `EQ_UNRELEASED=1` and watching the same IPC channel answer. THIS TIER CANNOT DO THAT, BY
+ * never wired up. The old review gate's specs answered that by launching a second time with an
+ * env override and watching the same IPC channel answer. THIS TIER CANNOT DO THAT, BY
  * DESIGN: `ownerToolsEnabled` refuses whenever `EQ_E2E=1`, because the harness must never reach
  * the owner's AWS account, and the renderer half is a compile-time strip no env var can undo.
  * Both refusals below are therefore the assertions, not limitations to work around.

@@ -12,8 +12,7 @@
  * the file states the opposite ones and states them the same way — not "the tab exists" (which a
  * misspelled testid satisfies) but the tab exists, mounts a sheet built from a KNOWN dump, draws
  * the exaltations socketed into it, and its ledger answers a search with a number this spec can
- * predict. The gate machinery itself survives tenantless (src/main/unreleased.ts); the day a
- * surface adopts it, the two-launch spec gets written again against that surface's own channel.
+ * predict. The gate machinery itself was removed on 2026-10-29.
  *
  * AND IT LAUNCHES ON A STAGED DUMP NOW, which is the other half of the rewrite. The old spec ran
  * `launchApp()` against whatever the machine happened to have, so every content assertion had to
