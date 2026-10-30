@@ -35,6 +35,7 @@ use crate::combat::procwindows::WindowFold;
 use crate::combat::routing::{self, Attribution, HealLine, MissLine, MitigationLine, ResistLine};
 use crate::combat::spellfacts::is_pet_summon_spell;
 use crate::combat::state::EngineState;
+use crate::combat::swing;
 use crate::event::{Event, Key, Kind};
 use eqlog::names::{id_key, id_key_ref};
 use std::borrow::Cow;
@@ -605,6 +606,7 @@ fn ingest_combat(st: &mut EngineState, ev: &Event) -> bool {
             // Your avoided swing is still an ATTEMPT, and the mechanical proc denominator is
             // attempts — a proc that cannot fire on a miss still had the chance to.
             if id_key_ref(&attacker) == "you" {
+                swing::note(st, ev);
                 fold_both(st, ev.ts(), |agg, active| {
                     agg.windows.fold(
                         &WindowFold {
@@ -651,6 +653,7 @@ fn ingest_combat(st: &mut EngineState, ev: &Event) -> bool {
 /// One canonical `damage` line: close any pending encounter at this ts BEFORE routing, so attributed
 /// damage after a closure starts a fresh encounter rather than reviving the old one.
 fn ingest_damage(st: &mut EngineState, ev: &Event) {
+    swing::note(st, ev);
     // Caster-less other-player DoTs (`attacker: null`) are not our fight, and the raw line is what
     // the ring keeps: there is nothing else to say about a line nobody owns.
     let Some(attacker) = ev.str(Key::Attacker) else {

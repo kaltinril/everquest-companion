@@ -70,7 +70,7 @@ fn excluded_verb(verb_lower: &str) -> Option<RoundExclusion> {
 
 /// Base modifiers that mark a swing as an EXTRA swing rather than part of an attack round. Keyed
 /// lowercase; the parser has already decomposed every compound form before anything here sees it.
-fn extra_swing_mod(m_lower: &str) -> Option<RoundExclusion> {
+pub(crate) fn extra_swing_mod(m_lower: &str) -> Option<RoundExclusion> {
     match m_lower {
         "riposte" => Some(RoundExclusion::Riposte),
         "flurry" => Some(RoundExclusion::Flurry),

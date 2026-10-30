@@ -184,6 +184,7 @@ export function overlayDefaultSize(kind: OverlayKind, workArea?: Bounds): Size {
   if (kind === 'toast') return { ...TOAST_SIZE }
   if (kind === 'alertBanner') return { ...BANNER_SIZE }
   if (kind === 'conCard') return { ...CON_CARD_SIZE }
+  if (kind === 'swing') return { ...SWING_SIZE }
   return workArea ? meterSize(workArea) : { ...DEFAULT_SIZE }
 }
 
@@ -273,6 +274,22 @@ function bannerBounds(workArea: Bounds): Bounds {
   }
 }
 
+/** The swing timer: one bar under its header, so it opens small and holds no meter slot. */
+const SWING_SIZE: Size = { width: 220, height: 96 }
+
+/** The swing timer's first-open placement: bottom-LEFT, clear of the meter stack, which docks
+ *  bottom-right and wraps leftward. */
+function swingBounds(workArea: Bounds): Bounds {
+  const size = { ...SWING_SIZE }
+  const x = workArea.x + MARGIN
+  const y = workArea.y + workArea.height - size.height - MARGIN
+  return {
+    ...size,
+    x: Math.max(workArea.x, Math.min(x, workArea.x + workArea.width - size.width)),
+    y: Math.max(workArea.y, Math.min(y, workArea.y + workArea.height - size.height))
+  }
+}
+
 /**
  * The toast's first-open placement: horizontally CENTRED on the work area, 12px from its top.
  * Clamped like every other kind so a display narrower than the strip still lands on-screen.
@@ -314,7 +331,8 @@ export function isStripKind(kind: OverlayKind): boolean {
  * None holds a slot in the meter grid, so none may consume an index either: adding one that did
  * would shift every meter's reserved slot out from under a user who has never opened it.
  */
-export const METER_KINDS: OverlayKind[] = OVERLAY_KINDS.filter((k) => !isStripKind(k))
+// The swing timer is left out too: a one-bar window opens at its own spot (`swingBounds`).
+export const METER_KINDS: OverlayKind[] = OVERLAY_KINDS.filter((k) => !isStripKind(k) && k !== 'swing')
 
 // ============================================================================================
 // JOS-406 — A STRIP'S WINDOW IS ITS CARD, SO THE WINDOW SCALES WITH THE TEXT.
@@ -471,6 +489,7 @@ export function defaultOverlayBounds(kind: OverlayKind, workArea: Bounds): Bound
   if (kind === 'toast') return toastBounds(workArea)
   if (kind === 'alertBanner') return bannerBounds(workArea)
   if (kind === 'conCard') return conCardBounds(workArea)
+  if (kind === 'swing') return swingBounds(workArea)
   const size = overlayDefaultSize(kind, workArea)
   // No strip holds a slot in the meter stack, so none consumes an index (METER_KINDS).
   const idx = Math.max(0, METER_KINDS.indexOf(kind))
@@ -516,5 +535,6 @@ export const OVERLAY_TITLE: Partial<Record<OverlayKind, string>> = {
   conCard: 'Mob Card Overlay',
   mapPins: 'Map Pins Overlay',
   skyQuests: 'Sky Quest Overlay',
-  gaps: 'Wiki Gaps Overlay'
+  gaps: 'Wiki Gaps Overlay',
+  swing: 'Swing Timer Overlay'
 }

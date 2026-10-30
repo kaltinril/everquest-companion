@@ -27,6 +27,7 @@ use crate::combat::petnudge::PetNudgeState;
 use crate::combat::procdetect::RecentCasts;
 use crate::combat::roster::{RosterSnap, RosterSource};
 use crate::combat::statetimeline::StateTimeline;
+use crate::combat::swing::SwingTrack;
 use crate::combat::world::{Resolved, WorldModel};
 use eqlog::names::{id_key, id_key_ref};
 use std::collections::HashSet;
@@ -189,6 +190,8 @@ pub struct EngineState {
     pub roster: RosterFacts,
     /// The hits and heals on you before each of your deaths (`deathrecap.rs`).
     pub recaps: DeathRecaps,
+    /// Your weapon swing seconds, for the swing timer (`swing.rs`).
+    pub swings: SwingTrack,
 }
 
 impl Default for EngineState {
@@ -239,6 +242,7 @@ impl EngineState {
             quick_buff_ts: 0,
             roster: RosterFacts::default(),
             recaps: DeathRecaps::default(),
+            swings: SwingTrack::default(),
         }
     }
 

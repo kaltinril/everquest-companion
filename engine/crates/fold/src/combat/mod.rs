@@ -39,6 +39,7 @@ pub mod routing;
 pub mod spellfacts;
 pub mod state;
 pub mod statetimeline;
+pub mod swing;
 pub mod timeline;
 pub mod views;
 pub mod world;
@@ -316,6 +317,11 @@ impl CombatEngine {
         }
         if let Some(target) = current_target(st) {
             out["currentTarget"] = json!(target);
+        }
+        // Your weapon swing seconds for the swing timer; absent until you have swung.
+        let swings = st.swings.rounds();
+        if !swings.is_empty() {
+            out["swingRounds"] = json!(swings);
         }
         // `timeline` is absent when the caller did not ask, and present-and-null when it asked and
         // the selection carries no timeline. `JSON.stringify` drops the first and keeps the second.

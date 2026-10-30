@@ -1138,6 +1138,9 @@ export interface CombatSnapshot {
    * for nothing; the meter learns the pet only through the same three routes it always did.
    */
   petNudge?: PetSummonNudge
+  /** The whole seconds you swung a weapon in, newest last (engine `swing.rs`), for the swing
+   *  timer (shared/swingTimer.ts). Absent until you have swung. */
+  swingRounds?: number[]
   /**
    * The selected fight's summary when the selection is an ARCHIVED fight (log archive, step 4.9).
    * `selected` is then null: the breakdown stays in the archive, which `archive` names.

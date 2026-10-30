@@ -36,6 +36,8 @@ import { installOverlayPointerExit } from './pointerExit'
 //   'gaps'                            → the Wiki Gaps list (owner, 2026-10-20): the first ten rows
 //                                       of the Gaps tab's list, written by the main window to the
 //                                       storage both windows share (shared/gapsOverlay.ts)
+//   'swing'                           → the swing timer (owner, 2026-10-29): your observed weapon
+//                                       swing cadence and a bar to the next swing
 //   everything else                   → the damage meter (fight / zone selection lives inside)
 //
 // ONE BUNDLE, BUT EACH WINDOW LOADS ONLY ITS OWN KIND (performance review 2026-10-20, finding 10).
@@ -54,6 +56,7 @@ const RespawnOverlay = lazy(() => import('./RespawnOverlay'))
 const MapPinsOverlay = lazy(() => import('./MapPinsOverlay'))
 const SkyQuestsOverlay = lazy(() => import('./SkyQuestsOverlay'))
 const GapsOverlay = lazy(() => import('./GapsOverlay'))
+const SwingOverlay = lazy(() => import('./SwingOverlay'))
 const BuffsOverlay = lazy(() => import('./BuffsOverlay'))
 const HealMeter = lazy(() => import('./HealMeter'))
 const OverlayMeter = lazy(() => import('./OverlayMeter'))
@@ -68,6 +71,7 @@ function Surface(): React.JSX.Element {
   if (kind === 'mapPins') return <MapPinsOverlay />
   if (kind === 'skyQuests') return <SkyQuestsOverlay />
   if (kind === 'gaps') return <GapsOverlay />
+  if (kind === 'swing') return <SwingOverlay />
   if (isTimerOverlayKind(kind)) return <BuffsOverlay kind={kind} />
   if (isHealOverlayKind(kind)) return <HealMeter />
   return <OverlayMeter />
