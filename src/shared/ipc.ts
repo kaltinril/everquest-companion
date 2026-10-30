@@ -235,6 +235,10 @@ export const IPC = {
   overlayReset: 'overlay:reset',
   // renderer(main app) -> main: raise every open overlay above other windows (overlayReset.ts).
   overlayRaise: 'overlay:raise',
+  // renderer(main app) -> main: re-fit every open overlay to the screens, then raise them (overlayRecover.ts).
+  overlayRecover: 'overlay:recover',
+  // renderer(main app) -> main: get or set the recover hotkey. Args: 'get' | 'set', accelerator or null.
+  overlayRecoverHotkey: 'overlay:recoverHotkey',
   // main -> renderer(main app): a kind's open-state changed. Payload: {kind, open}. Keeps the
   // TitleBar overlay menu in sync (also fires when an overlay closes itself).
   onOverlayState: 'overlay:state',

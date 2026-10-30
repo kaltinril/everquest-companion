@@ -20,6 +20,7 @@ import type { CloseToTrayPrefs } from '../shared/closeToTray'
 import type { OverlayConfig, OverlayKind } from '../shared/types'
 import type { OverlayTextSizePrefs } from '../shared/overlayTextScale'
 import type { OverlayBgAlphaPrefs } from '../shared/overlayBgAlpha'
+import type { HotkeyAnswer } from '../shared/overlayHotkey'
 
 export const windowsApi = {
   // ---- frameless window controls (Task #23) ----
@@ -65,6 +66,11 @@ export const windowsApi = {
   resetOverlays: (kinds?: OverlayKind[]): Promise<OverlayKind[]> => ipcRenderer.invoke(IPC.overlayReset, kinds),
   /** Raise every open overlay above other windows; resolves to the kinds raised. */
   raiseOverlays: (): Promise<OverlayKind[]> => ipcRenderer.invoke(IPC.overlayRaise),
+  /** Every open overlay back on a screen that exists, then raised (main/overlayRecover.ts). */
+  recoverOverlays: (): Promise<void> => ipcRenderer.invoke(IPC.overlayRecover),
+  /** Read ('get') or set ('set', null turns it off) the recover hotkey; resolves to what is in force. */
+  overlayRecoverHotkey: (action: 'get' | 'set', accel?: string | null): Promise<HotkeyAnswer> =>
+    ipcRenderer.invoke(IPC.overlayRecoverHotkey, action, accel),
   /** Subscribe to overlay open-state changes (so the TitleBar menu stays in sync). Payload {kind, open}. */
   onOverlayState: (cb: (s: { kind: OverlayKind; open: boolean }) => void): (() => void) => {
     const listener = (_e: unknown, s: { kind: OverlayKind; open: boolean }): void => cb(s)

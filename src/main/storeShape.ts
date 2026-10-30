@@ -159,6 +159,8 @@ export interface StoreShape {
    * `storeOverlaySnap.ts` because store.ts is at the 400-code-line ceiling.
    */
   overlaySnap?: OverlaySnapPrefs
+  /** The key that recovers lost overlays (shared/overlayHotkey.ts; main/overlayRecover.ts). Absent: off. */
+  overlayRecoverHotkey?: string
   /**
    * THE OVERLAYS' TEXT SIZE, as a preference rather than twelve copies of one number (JOS-405;
    * shared/overlayTextScale.ts). `{ shared, independent }`, defaulting to `{ 1, false }`.

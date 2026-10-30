@@ -235,13 +235,16 @@ test('THE GATE: PRESSES WITHIN THE DEBOUNCE ARE ONE; AN OLD MARKER LINE NEVER CA
   assert.equal(gate(t + 20_000, t + 20_000 + RECENT_MS + 1), false)
 })
 
-test('NO SYSTEM-WIDE KEY: the app registers no globalShortcut (owner, 2026-10-21: "avoid C")', () => {
+// The one exception is the overlay recover key (owner, 2026-10-29), off until the player sets one:
+// tests/overlayHotkey.test.mts pins that it lives in main/overlayRecover.ts alone.
+test('NO SYSTEM-WIDE KEY: the capture registers no globalShortcut (owner, 2026-10-21: "avoid C")', () => {
   const under = (dir: URL): URL[] =>
     readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
       e.isDirectory() ? under(new URL(`${e.name}/`, dir)) : /\.tsx?$/.test(e.name) ? [new URL(e.name, dir)] : []
     )
   for (const dir of ['main', 'preload', 'renderer', 'shared']) {
     for (const file of under(new URL(`../src/${dir}/`, import.meta.url))) {
+      if (file.pathname.endsWith('/src/main/overlayRecover.ts')) continue
       // Comments may say what was removed and why; code may not use it.
       const code = readFileSync(file, 'utf8').replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' ')
       assert.equal(/\bglobalShortcut\b/.test(code), false, file.pathname)
