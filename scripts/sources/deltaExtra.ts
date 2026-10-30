@@ -65,7 +65,7 @@ export function extraReport(titles: string[], pages: PageTexts, folded: Readonly
   const lines = ['Extra titles (never listed by our scrape):']
   for (const t of titles) {
     const wt = pages.get(t)
-    let what = 'no item or mob template, not folded: fix it on the wiki if it is one'
+    let what = 'no item or mob template: kept as a page, not folded (fix it on the wiki if it is one)'
     if (wt === undefined) what = 'not read (no readable content)'
     else if (wt === null) what = 'no such page'
     else if (folded.has(t)) what = 'folded'

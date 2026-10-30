@@ -75,7 +75,7 @@ test('--titles-from-compare reads the newest report\'s never-listed pages in one
   assert.ok(!Object.values(items.items).some((e) => /drake/i.test(e.page)), 'free text is not folded')
   assert.notEqual(items.scrapedAt, STAMP)
   assert.ok(out.includes('  Cracked Darkwood Shield: folded'))
-  assert.ok(out.includes('  Drake lava powder: no item or mob template, not folded: fix it on the wiki if it is one'))
+  assert.ok(out.includes('  Drake lava powder: no item or mob template: kept as a page, not folded (fix it on the wiki if it is one)'))
 })
 
 test('--extra names titles by hand; a dry run reads the feed only and counts them', async (t) => {

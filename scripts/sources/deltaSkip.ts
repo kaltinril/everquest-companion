@@ -79,11 +79,12 @@ function mobText(dir: string): (pageid: number) => string | undefined {
   }
 }
 
-/** The item and mob caches this checkout has. */
-export function cacheFamilies(itemCache: string, mobCache: string): Family[] {
+/** The item and mob caches this checkout has, and the page cache of every other page (deltaAllPages.ts). */
+export function cacheFamilies(itemCache: string, mobCache: string, pageCache?: string): Family[] {
   const out: Family[] = []
   if (existsSync(itemCache)) out.push({ dir: itemCache, list: 'item-pages.json', text: itemTexts(itemCache) })
   if (existsSync(mobCache)) out.push({ dir: mobCache, list: 'mob-pages.json', text: mobText(mobCache) })
+  if (pageCache && existsSync(pageCache)) out.push({ dir: pageCache, list: 'pages.json', text: mobText(pageCache) })
   return out
 }
 
@@ -128,8 +129,8 @@ export function readRevisions(ids: { pageids: Map<string, number>; revids: Map<s
 }
 
 /** The planned pageids less those whose newest revision we hold, printed; returns pageid -> that revision. */
-export function skipHeldPages(plan: { pageids: number[] }, feed: FeedChanges, caches: { itemCache: string; mobCache: string }): Map<number, number> {
-  const proven = unchangedPages(plan.pageids, feed, heldIn(cacheFamilies(caches.itemCache, caches.mobCache)))
+export function skipHeldPages(plan: { pageids: number[] }, feed: FeedChanges, caches: { itemCache: string; mobCache: string; pageCache?: string }): Map<number, number> {
+  const proven = unchangedPages(plan.pageids, feed, heldIn(cacheFamilies(caches.itemCache, caches.mobCache, caches.pageCache)))
   plan.pageids = plan.pageids.filter((id) => !proven.has(id))
   console.log(`  ${String(proven.size)} changed pages already hold their newest revision: not read`)
   return proven
