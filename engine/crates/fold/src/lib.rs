@@ -297,6 +297,9 @@ pub const WIRING_ORDER: &[&str] = &[
     "gaps",
     // The Gaps tab's kill-faction proof lines, apart so a Gaps fetch is small (`gaps_samples.rs`).
     "killFactionSamples",
+    // The names the log met and the roster's kill records, small, so no window watches `loot` and
+    // `kills` for them (`met.rs`). After `kills`, whose decision it drains.
+    "met",
     "eventFeed",
 ];
 
@@ -845,7 +848,8 @@ pub fn registered(deps: ClusterDeps) -> Registry {
     let log_name = character.as_ref().and_then(|c| c.get("name")?.as_str());
     r.register(Box::new(modules::turnins::TurnInsModule::new(log_name)));
     r.register(Box::new(modules::class_unlocks::ClassUnlocksModule::new()));
-    r.register(Box::new(modules::kills::KillsModule::new()));
+    let met = modules::met::SharedMet::default();
+    r.register(Box::new(modules::kills::KillsModule::sharing(met.clone())));
     // Beside `kills` because it folds the same death line, and after it, so anything reading both
     // within one delivery sees the kill counted before the clock that kill started.
     r.register(Box::new(modules::respawn::RespawnModule::new(
@@ -884,6 +888,7 @@ pub fn registered(deps: ClusterDeps) -> Registry {
     // The quest log writes the player as `Soandso` and keeps refusals said to others (gaps_quest_log.rs).
     r.register(Box::new(modules::gaps::GapsModule::for_log(con_marks.clone(), &character)));
     r.register(Box::new(modules::gaps_samples::KillFactionSamplesModule::new()));
+    r.register(Box::new(modules::met::MetModule::new(met)));
     r.register(Box::new(modules::event_feed::EventFeedModule::sharing(con_marks)));
     r
 }

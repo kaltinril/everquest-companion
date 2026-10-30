@@ -24,8 +24,8 @@ use harness::{attach, health, module_snapshot, perf_snapshot, session_mark, Clie
 use protocol::generated::{EngineMessage, HealthResultStatus, ReplyResult};
 
 /// The modules the performance review measured as big, plus two small ones for contrast, and the
-/// overlay served apart from `buffs`.
-const MODULES: [&str; 7] = [
+/// overlay served apart from `buffs`, and `met`, which the always-mounted readers ask instead.
+const MODULES: [&str; 8] = [
     "loot",
     "gaps",
     "kills",
@@ -33,6 +33,7 @@ const MODULES: [&str; 7] = [
     "consider",
     "buffs",
     "messageOverlay",
+    "met",
 ];
 
 /// Send one request and wait for the reply carrying its id; everything else on the stream is
@@ -340,5 +341,208 @@ fn snapshot_build_costs() {
             mid(clone),
             mid(ser)
         );
+    }
+}
+
+/// What the always-mounted readers cost per kill, from a replay (perf review 2026-10-20 #1): the
+/// log's own clock cut into one-second windows, as the serve loop announces about once a beat. For
+/// each window, which of these modules moved (each move is one re-fetch by a window watching it),
+/// counted per window that folded a death, and how big each state is at the end. Before `met`, the
+/// main window held `kills`, `loot`, `consider` and `progression` on every tab; after, `met` alone.
+#[test]
+#[ignore = "a measurement against a real log; see the header"]
+fn met_cursor_moves() {
+    const WATCHED: [&str; 5] = ["kills", "loot", "consider", "progression", "met"];
+    let log = std::env::var("EQ_BENCH_LOG").expect("EQ_BENCH_LOG names a COPY of a real log");
+    let bytes = std::fs::read(&log).expect("the log");
+    let name = std::path::Path::new(&log)
+        .file_name()
+        .expect("a file")
+        .to_string_lossy();
+    let character = eqlog::character_of(&name).unwrap_or_default();
+    let parser = eqlog::parser_for(&character, eqlog::host_timezone());
+    let db = parser.spell_db().expect("the parser carries the catalog");
+    let launch_ms = fold::epoch::launch_ms(parser.clock());
+    let deps = fold::ClusterDeps {
+        known_spell: db.keys().map(str::to_string).collect(),
+        spell_classes: fold::modules::combo::evidence::spell_class_index(db),
+        facts: fold::spell_facts::SpellFacts::project(db),
+        launch_ms,
+        construction_now_ms: now_ms(),
+        character: None,
+        self_name: None,
+        respawn_prefs: fold::modules::respawn::RespawnPrefs::default(),
+    };
+    let mut folder = fold::Fold::new(fold::registered(deps), launch_ms);
+    let cursors = |f: &fold::Fold| -> Vec<i64> {
+        let seqs = f.registry.published_seqs();
+        WATCHED
+            .iter()
+            .map(|id| seqs.iter().find(|(m, _)| m == id).map_or(-1, |(_, s)| *s))
+            .collect()
+    };
+    // One row per one-second window of the log's clock: did it fold a death, and which cursors moved.
+    let (mut window, mut killed, mut deaths) = (i64::MIN, false, 0_u64);
+    let mut last = vec![-1_i64; WATCHED.len()];
+    let mut rows: Vec<(bool, Vec<bool>)> = Vec::new();
+    let mut close = |f: &fold::Fold, killed: bool, last: &mut Vec<i64>| {
+        let now = cursors(f);
+        rows.push((
+            killed,
+            now.iter().zip(last.iter()).map(|(a, b)| a != b).collect(),
+        ));
+        *last = now;
+    };
+    eqlog::scan::scan_bytes(&parser, &bytes, |_json, payload| {
+        let ev = fold::event::Event::typed(payload);
+        let w = ev.ts().div_euclid(1000);
+        if w != window {
+            close(&folder, killed, &mut last);
+            (window, killed) = (w, false);
+        }
+        if ev.kind() == "death" {
+            killed = true;
+            deaths += 1;
+        }
+        folder.on_primary(&ev, false);
+    });
+    close(&folder, killed, &mut last);
+    // The later half of the log by kill windows: how a long-played character runs.
+    let kill_windows = rows.iter().filter(|r| r.0).count();
+    let half = rows
+        .iter()
+        .scan(0, |n, r| {
+            *n += usize::from(r.0);
+            Some(*n)
+        })
+        .position(|n| n * 2 >= kill_windows)
+        .unwrap_or(0);
+    let later_kills = rows[half..].iter().filter(|r| r.0).count();
+    eprintln!(
+        "{deaths} death lines, {kill_windows} kill windows of {} active one-second windows; later half from window {half}",
+        rows.len()
+    );
+    let moves = |from: usize, i: usize| rows[from..].iter().filter(|r| r.1[i]).count();
+    let (mut before, mut before_later) = (0_usize, 0_usize);
+    for (i, id) in WATCHED.iter().enumerate() {
+        let v = folder.registry.snapshot_of(id).expect("registered");
+        let size = serde_json::to_string(&v).expect("serializes").len();
+        let t = Instant::now();
+        let _ = folder.registry.snapshot_of(id);
+        let built = ms(t.elapsed());
+        let (all, later) = (moves(0, i), moves(half, i));
+        if *id != "met" {
+            before += all * size;
+            before_later += later * size;
+        }
+        #[allow(clippy::cast_precision_loss)]
+        let per = |n: usize, k: usize| n as f64 / k.max(1) as f64;
+        eprintln!(
+            "{id:<12} moved in {all:>6} windows ({:.2} per kill window; later half {:.2})  state {size:>9} bytes  build {built:.2} ms",
+            per(all, kill_windows),
+            per(later, later_kills)
+        );
+        if *id == "met" {
+            eprintln!(
+                "bytes re-read at end-of-log sizes, per kill window: kills+loot+consider+progression {:.0} KB (later half {:.0} KB), met {:.1} KB (later half {:.1} KB)",
+                per(before, kill_windows) / 1024.0,
+                per(before_later, later_kills) / 1024.0,
+                per(all * size, kill_windows) / 1024.0,
+                per(later * size, later_kills) / 1024.0
+            );
+        }
+    }
+}
+
+/// Wait for the reply carrying `id` on `client`, from `since`; everything else is traffic.
+fn reply_after(client: &mut Client, id: i64, since: Instant) -> Duration {
+    loop {
+        let mine = match client.recv() {
+            EngineMessage::Reply(reply) => *reply.id == id,
+            EngineMessage::ErrorReply(err) => *err.id == id,
+            _ => false,
+        };
+        if mine {
+            return since.elapsed();
+        }
+    }
+}
+
+/// "One connection, served in order" (perf review 2026-10-26, second pass #4): does a small ask
+/// wait longer behind a fresh big build on the SAME connection than on a second one? Each round
+/// appends a loot line (so `loot` is rebuilt, not kept), then asks `loot` and, at once, `character`
+/// on the same connection or on a second. Appends to the log: point it at a copy.
+#[test]
+#[ignore = "a measurement against a real log; see the header"]
+fn one_connection_in_order() {
+    let log = std::env::var("EQ_BENCH_LOG").expect("EQ_BENCH_LOG names a COPY of a real log");
+    let engine = Engine::start();
+    let mut client = engine.connected();
+    let mut side = engine.connected();
+    client.send(&attach(1, &log));
+    let mut id = 100;
+    let started = Instant::now();
+    while !matches!(health_of(&mut client, id).status, HealthResultStatus::Live) {
+        id += 1;
+        assert!(
+            started.elapsed() < Duration::from_secs(600),
+            "never went live"
+        );
+        std::thread::sleep(Duration::from_millis(50));
+    }
+    std::thread::sleep(Duration::from_secs(2));
+    let mut file = std::fs::OpenOptions::new()
+        .append(true)
+        .open(&log)
+        .expect("the copy is appendable");
+    let mut alone = Vec::new();
+    for _ in 0..20 {
+        id += 1;
+        alone.push(ms(round_trip(
+            &mut client,
+            &module_snapshot(id, "character"),
+            id,
+        )
+        .0));
+    }
+    eprintln!("character alone: {}", summary(alone));
+    for same in [true, false] {
+        let (mut big, mut small) = (Vec::new(), Vec::new());
+        for _ in 0..20 {
+            id += 1;
+            let before = health_of(&mut client, id).events;
+            file.write_all(
+                line("--You have looted a Bone Chips from a rat's corpse.--").as_bytes(),
+            )
+            .expect("append");
+            file.flush().expect("flush");
+            loop {
+                id += 1;
+                if health_of(&mut client, id).events != before {
+                    break;
+                }
+                std::thread::sleep(Duration::from_millis(1));
+            }
+            let (loot_id, char_id) = (id + 1, id + 2);
+            id += 2;
+            let t = Instant::now();
+            client.send(&module_snapshot(loot_id, "loot"));
+            if same {
+                client.send(&module_snapshot(char_id, "character"));
+                big.push(ms(reply_after(&mut client, loot_id, t)));
+                small.push(ms(reply_after(&mut client, char_id, t)));
+            } else {
+                side.send(&module_snapshot(char_id, "character"));
+                small.push(ms(reply_after(&mut side, char_id, t)));
+                big.push(ms(reply_after(&mut client, loot_id, t)));
+            }
+        }
+        let how = if same {
+            "same connection"
+        } else {
+            "second connection"
+        };
+        eprintln!("fresh loot build: {}", summary(big));
+        eprintln!("character asked with it, {how}: {}", summary(small));
     }
 }

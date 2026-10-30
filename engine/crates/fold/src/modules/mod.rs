@@ -67,6 +67,8 @@ pub mod item_tiers;
 pub mod kills;
 pub mod leveling;
 pub mod loot;
+/// `met`: the names the log met and the roster's kill records, served small for the era verdicts.
+pub mod met;
 pub mod observed_spell_ranks;
 pub mod output_files;
 pub mod progression;

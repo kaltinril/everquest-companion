@@ -39,6 +39,7 @@ import { carryZoneIntoKills, firstZoneLine } from '../../shared/logArchive/carry
 import type { SegmentSummary } from '../../shared/combat'
 import { archivedFightRows } from '../../shared/logArchive/mergeFights'
 import { hasMergeRule, mergeModule } from '../../shared/logArchive/mergeRules'
+import { MET_MODULE, metFromModules } from '../../shared/metNames'
 import { firstStart, withCorrections } from '../../shared/logArchive/mergeCombo'
 import { withCurrentWiki, withHistoryRows, type RespawnWikiNow } from '../../shared/logArchive/mergeRespawn'
 import type { ComboCorrection } from '../../shared/classCombo'
@@ -115,6 +116,8 @@ export interface HistoryMerge {
  * respawn's with the history rows of the mobs watched today (step 4.14) and what the wiki says today.
  */
 function archivedFor(shown: readonly Segment[], moduleId: string, live: unknown, deps: HistoryDeps): unknown[] {
+  // No segment captures `met`: its evidence is rebuilt from the modules each one did capture.
+  if (moduleId === MET_MODULE) return shown.map((s) => metFromModules(s.modules))
   const kept = shown.filter((s) => Object.hasOwn(s.modules, moduleId))
   if (moduleId === 'respawn') {
     const wikiNow = deps.respawnWiki

@@ -30,8 +30,9 @@ use super::mob_key;
 /// than inlining its own.
 pub static MOBS_JSON: &str =
     include_str!("../../../../../../src/renderer/src/data/eqlegends/mobs.json");
-/// The raid roster's bytes. Read only by [`alias_index`]; `knowledge` asks [`resolve_mob_identity`].
-static BOSSES_JSON: &str =
+/// The raid roster's bytes. Read by [`alias_index`] and `met`'s roster keys; `knowledge` asks
+/// [`resolve_mob_identity`].
+pub(crate) static BOSSES_JSON: &str =
     include_str!("../../../../../../src/renderer/src/data/eqlegends/bosses.json");
 
 /// One row of `mobs.json`, cut down to what the resist fold reads. The scrape carries `zones`,

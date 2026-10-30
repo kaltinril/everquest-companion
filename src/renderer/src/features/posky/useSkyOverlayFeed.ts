@@ -4,7 +4,7 @@ import { SKY_OVERLAY_KEY, orderSkyOverlayRows, type SkyOverlayRow } from '@share
 import { useQuestFavorites } from '../favorites/useQuestFlags'
 import { fetchItemMarks, useItemMarksReader } from '../../lib/itemMarks'
 import { hasEveryItem } from './questCompletion'
-import type { QuestProgress } from './useProgress'
+import { useProgress, type QuestProgress } from './useProgress'
 
 // The Sky quest overlay's feed (sky-quest-overlay): the starred quests, as the Sky tab counts them,
 // written to the storage the overlay window shares with this one (shared/skyQuestOverlay.ts). Item
@@ -43,4 +43,11 @@ export function useSkyOverlayFeed(quests: readonly QuestProgress[], loaded: bool
       // Storage refused the write: the overlay keeps the rows it last read.
     }
   }, [raw])
+}
+
+/** The feed's own reading of the Sky tab's counts; the app mounts it only while the overlay is open. */
+export function SkyOverlayFeed(): null {
+  const sky = useProgress()
+  useSkyOverlayFeed(sky.quests, sky.progress !== null)
+  return null
 }

@@ -38,8 +38,9 @@ import { UnreleasedBazaarWatcher } from '../unreleasedBazaar'
 import { getBossData } from '../data'
 import { useBossKills } from '../features/bosses/useBossKills'
 import type { TargetStatus } from '../features/bosses/bossStatus'
-import { useProgress } from '../features/posky/useProgress'
-import { useSkyOverlayFeed } from '../features/posky/useSkyOverlayFeed'
+import { useQuestTurnInWatch } from '../features/posky/useProgress'
+import { SkyOverlayFeed } from '../features/posky/useSkyOverlayFeed'
+import { useOverlayOpen } from '../lib/useOverlayOpen'
 // The canonical `Class::Name` quest key — the same one the tracker keys its rows on, so the
 // toast's anchor and the accordion it opens are the same string by construction.
 import { questKey } from '../features/posky/keys'
@@ -94,6 +95,7 @@ function useAppCelebrations(
   // effect runs, so the closure below always holds the zone of the render the kill arrived in.
   const zone = useModule<CharacterSnap>('character')?.zone
 
+  // The roster's records only (`met`), so a kill of anything else fetches nothing.
   useBossKills(bossData.targets, {
     // THE TIER OF THIS KILL, AND THE INSTANCE IT HAPPENED IN (JOS-165). This block used to print
     // `tierStyle(s.bestTier)` and the roster's static zone — the target's ALL-TIME summary, which
@@ -115,9 +117,9 @@ function useAppCelebrations(
         subtitle: [tierStyle(tier).long, zone ?? s.target.zone].filter(Boolean).join(' · ')
       })
     }
-  })
+  }, 'met')
 
-  const sky = useProgress({
+  useQuestTurnInWatch({
     onQuestComplete: (q, count) => {
       onQuestComplete(q.name)
       fireAppSignal('questComplete', q.name)
@@ -146,8 +148,12 @@ function useAppCelebrations(
       })
     }
   })
-  // The Sky quest overlay's rows come off this same reading, so it counts what the Sky tab counts.
-  useSkyOverlayFeed(sky.quests, sky.progress !== null)
+}
+
+/** The Sky quest overlay's rows, counted as the Sky tab counts them, only while that overlay is open:
+ *  the counts read the whole loot ledger. */
+function SkyOverlayFeedGate(): JSX.Element | null {
+  return useOverlayOpen('skyQuests') ? <SkyOverlayFeed /> : null
 }
 
 /**
@@ -186,6 +192,7 @@ export default function AppCelebrations(): JSX.Element {
       <UnreleasedGapsOverlayFeed />
       {/* The Map pins overlay's Achievements areas, only while that overlay is open. */}
       <UnreleasedSlayerOverlayFeed />
+      <SkyOverlayFeedGate />
       <UnreleasedGlobalPaste />
     </>
   )

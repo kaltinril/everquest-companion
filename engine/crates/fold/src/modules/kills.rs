@@ -26,6 +26,7 @@ use crate::event::Event;
 use crate::jsfn::{starts_with_you_word, zone_id_key, zone_tier, TIER_OPEN_WORLD, TIER_UNKNOWN};
 use crate::jsmap::JsMap;
 use crate::knowledge::Knowledge;
+use crate::modules::met::SharedMet;
 use crate::EqModule;
 use eqlog::names::{id_key, is_player_shaped_name};
 use serde::Serialize;
@@ -91,11 +92,28 @@ pub struct KillsModule {
     /// The mob catalog, for a one-word killer that is a mob all the same (`Terror`). Production
     /// only: replay and parity install none, so there a one-word victim dying to a mob is refused.
     knowledge: Option<Arc<dyn Knowledge>>,
+    /// Where each counted kill is handed to `met` (`met.rs`); none in a fold without that module.
+    met: Option<SharedMet>,
 }
 
 impl KillsModule {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// A kills module that hands each counted kill to `met`.
+    pub fn sharing(met: SharedMet) -> Self {
+        Self {
+            met: Some(met),
+            ..Self::default()
+        }
+    }
+
+    /// Hand `met` the kill just recorded under `key`; `first` is its spelling when the key is new.
+    fn hand_to_met(&self, key: &str, first: Option<&str>) {
+        if let (Some(met), Some(info)) = (&self.met, self.kills.get(key)) {
+            met.borrow_mut().note_kill(key, first, info);
+        }
     }
 
     /// The experience line this kill line claims, if any. Claiming CONSUMES it.
@@ -285,14 +303,10 @@ impl EqModule for KillsModule {
         // Key by the canonical lowercase name so the two casings EQ emits for one mob fold into a
         // single entry; keep the raw name for display.
         let name = ev.str("name").unwrap_or_default();
-        record_kill(
-            &mut self.kills,
-            &id_key(name),
-            name,
-            tier,
-            ev.ts(),
-            credited,
-        );
+        let key = id_key(name);
+        let first = !self.kills.contains_key(&key);
+        record_kill(&mut self.kills, &key, name, tier, ev.ts(), credited);
+        self.hand_to_met(&key, first.then_some(name));
         self.announce.changed(self.seq);
     }
 
