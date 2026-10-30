@@ -227,8 +227,31 @@ where one exists.
   --package-lock-only` on Node 24; the installer-size diff was only dev flags.
 - Measured, left out: en-US-only locales changes formatting for other locales; `compression:
   maximum` is byte-identical.
-- typescript-eslint >8.65 and onnxruntime-node 1.29 are pinned back (PR #70's adoption,
-  ADOPTIONS.md).
+- 2026-10-29 major bumps, one `deps-*` branch each: React 19 + MUI 7, Vite 8 + plugin-react 6 +
+  electron-vite 6, ESLint 10 + react-hooks 7 + typescript-eslint 8.72, TypeScript 6,
+  electron-store 11 + chokidar 5, Electron 45 + @types/node 24, koffi 3.
+- Held back, and why: MUI 9 drops the system props (`<Stack alignItems>`, `<Box display>`): 425
+  sites over ~200 files, a `v9.0.0/system-props` codemod sweep of its own. TypeScript 7:
+  typescript-eslint peers `typescript <6.1.0`. electron-store 12 (conf 16, a 2026-10-12 rewrite)
+  and chokidar 6 (2026-10-19): too new when looked at. onnxruntime-node stays 1.20.1: 1.31's
+  onnxruntime.dll carries Microsoft's 1DS telemetry client
+  (`mobile.events.data.microsoft.com/OneCollector`, a new network call: owner's word first);
+  1.29/1.30 move to `bin/napi-v6`, add dxcompiler/dxil (19.5 MB) and import
+  `MSVCP140_ATOMIC_WAIT.dll`, which `speech/pinned.ts` does not provision.
+- Lint kept as it was on ESLint 10: react-hooks 7's presets add the React Compiler rules (131
+  findings), so the renderer block names only rules-of-hooks and exhaustive-deps;
+  `no-useless-assignment` and `no-meaningless-void-operator` are off (54 and 11 idiom sites).
+- Vite 8 traps: `json.namedExports` (default true) now beats `json.stringify`, so both bundles set
+  it false; Rolldown still emits the chunk of an `import()` gated on ANOTHER module's constant, so
+  a build-time strip keeps its `false` in the same module (`devTriage.tsx`). Compare a build's
+  `out/renderer/assets` file list against the last one after any bundler bump.
+- An ESM-only `dependency` in main (electron-store 9+, chokidar 5+) must be bundled
+  (`externalizeDeps.exclude`): main is CommonJS, and `require()` of an ES module returns its
+  namespace, so `new Store()` throws.
+- koffi 3's binary is its own package, `@koromix/koffi-win32-x64` (asarUnpack names it); koffi's
+  `src/**/*.cjs` is its loader and must ship.
+- Electron 44+: `clipboard` is promise-based and `readImage` is gone (`shotIpc.ts` reads an
+  `image/png` item).
 
 ## Gaps tab (was gaps-tab, gaps-item-facts, gaps-all-characters, gaps-overlay)
 
