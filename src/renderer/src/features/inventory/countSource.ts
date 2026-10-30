@@ -71,7 +71,7 @@ export const COUNT_SOURCE_KEY = 'eq.countSource'
  */
 export const DEFAULT_COUNT_SOURCE: CountSource = 'both'
 
-const KNOWN: readonly string[] = ['log', 'inventory', 'both', 'rebaseline']
+const KNOWN: readonly string[] = ['log', 'inventory', 'both', 'rebaseline', 'handins']
 
 /**
  * A stored pick, or the default. `null` (never chosen) and an unreadable value both mean "this user
@@ -87,6 +87,8 @@ export interface CountSourceOption {
   label: string
   /** the same fact as a sentence fragment, for a line that reads "counting from …" */
   phrase: string
+  /** a one-sentence hover on the menu item (7-15 words), where the label alone is not enough */
+  hint?: string
 }
 
 /**
@@ -122,6 +124,14 @@ export const COUNT_SOURCE_OPTIONS: readonly CountSourceOption[] = [
     label: 'Rebaseline (export, then log forward)',
     phrase:
       'the inventory export as the starting point, plus everything looted since it was written - older log lines are discarded'
+  },
+  {
+    // Fork issue #2's suggestion, offered and never the default (owner, 2026-10-29). Unlike `log`,
+    // a hand-over to ANY NPC takes the item off, quest or not; reconcile.ts argues the fold.
+    value: 'handins',
+    label: 'Log only (loot minus hand-ins)',
+    phrase: 'the log alone - loot adds, hand-ins and destroys remove, the export is ignored',
+    hint: 'Counts loot from your log, minus anything handed to an NPC or destroyed.'
   }
 ]
 
@@ -139,7 +149,7 @@ export function countSourcePhrase(s: CountSource): string {
  * could be a year old or missing and not one number on screen would differ. Read as SELECTED, not
  * as offered — every option is always offered, which would make the gate a no-op.
  */
-export const countsFromInventory = (s: CountSource): boolean => s !== 'log'
+export const countsFromInventory = (s: CountSource): boolean => s !== 'log' && s !== 'handins'
 
 /**
  * THE INSTANT A REBASELINE ANCHORS TO, or null when nothing can anchor one (JOS-186).

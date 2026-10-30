@@ -79,7 +79,7 @@ test('an install that has never chosen a count source counts the export', () => 
 })
 
 test('an EXPLICIT choice is returned verbatim — the flip reaches only an absent key', () => {
-  for (const s of ['log', 'inventory', 'both', 'rebaseline'] as const) {
+  for (const s of ['log', 'inventory', 'both', 'rebaseline', 'handins'] as const) {
     assert.equal(resolveCountSource(s), s, `a stored ${s} survives the default change`)
   }
 })
@@ -90,8 +90,9 @@ test('every source is offered, labelled, and says which witness it ignores', () 
     // The first three are the order a player WIDENS (one witness, the other, both); `rebaseline`
     // (JOS-186) is last because it is the only one that throws evidence away rather than adding a
     // witness, and it is the only one that can make a count go down.
-    ['log', 'inventory', 'both', 'rebaseline'],
-    'the dropdown offers all four'
+    // `handins` (fork #2) is an opt-in added after them.
+    ['log', 'inventory', 'both', 'rebaseline', 'handins'],
+    'the dropdown offers all five'
   )
   // SCOPE D, as a property rather than as three frozen strings: the two labels this ticket fixed
   // described JOS-128's reset semantics ("Export, plus loot since" / "Export if any, else log"),
@@ -124,6 +125,7 @@ test('the caption gate is the source, not the file: only `log` ignores the dump'
   // — so the freshness line has to be on for it. A gate written as `=== 'inventory' || === 'both'`
   // would have silently excluded it.
   assert.equal(countsFromInventory('rebaseline'), true)
+  assert.equal(countsFromInventory('handins'), false, 'fork #2: the log alone, the export ignored')
 })
 
 // =============================================================================

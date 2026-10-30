@@ -212,7 +212,7 @@ export function LootToolbar({
         sx={{ minWidth: 190 }}
       >
         {COUNT_SOURCE_OPTIONS.map((o) => (
-          <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>
+          <MenuItem key={o.value} value={o.value} title={o.hint}>{o.label}</MenuItem>
         ))}
       </TextField>
       {/* No tooltip (JOS-127) — the ACCESSIBLE name still says what it does, and an aria-label

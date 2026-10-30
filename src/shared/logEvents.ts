@@ -105,6 +105,8 @@ export interface OfferEvent extends LogEventBase {
   kind: 'offer'
   item: string
   npc: string
+  /** the stack size the line names (`You offered 11 ...`) */
+  count?: number
 }
 
 /** `You complete the trade with <NPC>.` — closes a pending offer group. */

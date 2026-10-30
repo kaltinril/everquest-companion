@@ -37,7 +37,7 @@
 //     reads 2 rather than 0: the second loot is a fresh copy and nothing owes the first destroy
 //     anything. A max(0, sum) at the end would be the wrong arithmetic for exactly that history.
 
-import type { LootEvent } from '@shared/types'
+import type { LootEvent, TurnInEvent } from '@shared/types'
 // Relative, per the repo's node-tested-module rule (this file is imported by the golden-window
 // loot suites): a `@shared/*` VALUE import needs the renderer's bundler alias, a type-only one
 // does not.
@@ -71,17 +71,24 @@ function foldHeld(
   keep: (e: LootEvent, key: string) => boolean
 ): Record<string, number> {
   const c: Record<string, number> = {}
-  for (const e of lootHistory) {
-    if (e.disposition === 'sold' || e.disposition === 'combined') continue
-    // Fold +N variants onto the base counting key (Task #42): `Sphinx Claw` and
-    // `Sphinx Claw +1` are two of the same held item for quest purposes.
-    const k = itemCountKey(e.item)
-    if (!keep(e, k)) continue
-    const n = e.count ?? 1
-    // The one negative row on the lane (JOS-401). Floored HERE, per row — see the header.
-    c[k] = isDestroyed(e) ? Math.max(0, (c[k] ?? 0) - n) : (c[k] ?? 0) + n
-  }
+  for (const e of lootHistory) foldLootRow(c, e, keep)
   return c
+}
+
+/** One loot row into a running count: the disposition rule in the header, stated once. */
+function foldLootRow(
+  c: Record<string, number>,
+  e: LootEvent,
+  keep: (e: LootEvent, key: string) => boolean
+): void {
+  if (e.disposition === 'sold' || e.disposition === 'combined') return
+  // Fold +N variants onto the base counting key (Task #42): `Sphinx Claw` and
+  // `Sphinx Claw +1` are two of the same held item for quest purposes.
+  const k = itemCountKey(e.item)
+  if (!keep(e, k)) return
+  const n = e.count ?? 1
+  // The one negative row on the lane (JOS-401). Floored HERE, per row — see the header.
+  c[k] = isDestroyed(e) ? Math.max(0, (c[k] ?? 0) - n) : (c[k] ?? 0) + n
 }
 
 /**
@@ -208,4 +215,46 @@ export function computeLastLootedAt(lootHistory: readonly LootEvent[]): Record<s
     if (prev === undefined || e.ts > prev) t[k] = e.ts
   }
   return t
+}
+
+/** The log-only count (`handins`, fork issue #2): what the log saw come in, less what it saw go. */
+export interface LogOnlyCounts {
+  /** loot, less every hand-over and destroy, as one running count floored at 0 per row */
+  held: Record<string, number>
+  /** the NPCs each item was handed to, once each */
+  givenTo: Record<string, string[]>
+}
+
+/** A trade's hand-overs: `given` as the engine read them, else each item once (an older row). */
+function handedOver(t: TurnInEvent): { item: string; count: number }[] {
+  return t.given ?? t.items.map((item) => ({ item, count: 1 }))
+}
+
+/**
+ * Loot and completed trades folded together in time order, so a hand-over can only take what the
+ * log saw you holding, as a destroy can (the floor in the header). A trade to ANY NPC counts,
+ * quest or none; a cancelled or refused offer is already out of `given`. A loot row in the same
+ * instant as a trade folds first. The export plays no part.
+ */
+export function computeLogOnlyCounts(
+  lootHistory: readonly LootEvent[],
+  turnIns: readonly TurnInEvent[]
+): LogOnlyCounts {
+  const held: Record<string, number> = {}
+  const givenTo: Record<string, string[]> = {}
+  const take = (t: TurnInEvent): void => {
+    for (const g of handedOver(t)) {
+      const k = itemCountKey(g.item)
+      held[k] = Math.max(0, (held[k] ?? 0) - g.count)
+      const to = (givenTo[k] ??= [])
+      if (!to.includes(t.npc)) to.push(t.npc)
+    }
+  }
+  let j = 0
+  for (const e of lootHistory) {
+    while (j < turnIns.length && turnIns[j].ts < e.ts) take(turnIns[j++])
+    foldLootRow(held, e, () => true)
+  }
+  while (j < turnIns.length) take(turnIns[j++])
+  return { held, givenTo }
 }
