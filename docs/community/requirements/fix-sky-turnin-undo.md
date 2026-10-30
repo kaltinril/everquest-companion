@@ -13,3 +13,4 @@ not always who asked; those say "owner" or the upstream issue where the commit d
 | 2026-10-01 | owner | A full list of taken-back turn-ins keeps its newest entries. | built |
 | 2026-10-11 | owner | The Ready tab gets a class filter: "my class, or whatever class I chose". | built (stored, separate from the Quests tab's class filter) |
 | 2026-10-16 | owner (bug hunt, 2026-10-16) | Two quick '+' turn-in clicks counted once. | built (each click builds on the newest list, not the one captured at render) |
+| 2026-10-29 | owner (2026-10-23 ruling, requirements/gaps-tab.md: "if i cancel the trade or the npc says i don't want these it shouldn't [count]") | A Plane of Sky turn-in is never credited from an offer the player cancelled or the NPC refused; a completed hand-in still credits. | built (sky-log-only-count, not yet tested in the app): crediting reads the trade row's `given`; a row from an older archive with no `given` keeps the old reading |

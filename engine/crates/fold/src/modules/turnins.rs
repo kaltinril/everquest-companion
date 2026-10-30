@@ -6,7 +6,8 @@
 //!
 //! `given` is what the trade really took, for the log-only item count (fork #2): each offer with
 //! its stack count, less a cancel (every open offer) and an NPC's refusal (its last offer, as
-//! `gaps_quest_log.rs` reads them). `items` keeps its old reading, so quest crediting is unchanged.
+//! `gaps_quest_log.rs` reads them). `items` keeps every offer as before; Sky quest crediting reads
+//! `given` (`turnInCelebration.ts`), so a cancelled or refused offer is no turn-in there either.
 
 use crate::event::Event;
 use crate::message_overlay::message_text_of;

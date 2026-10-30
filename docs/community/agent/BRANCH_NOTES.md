@@ -679,10 +679,11 @@ where one exists.
 - Count source `handins` ("Log only (loot minus hand-ins)"): `heldCounts.computeLogOnlyCounts` folds
   loot and the `turnins` rows' `given` in time order, floored at 0 per row; `reconcile` reads it only
   under `handins`. Opt-in; the default stays `both` (owner, 2026-10-29).
-- `turnins` rows carry two lists: `items` is the old reading (quest crediting; still includes a
-  cancelled or refused offer), `given` is what the trade took (stack counts from the offer line's
-  `count`, cancel and refusal removed as `gaps_quest_log.rs` reads them). A row with no `given` (an
-  archive segment captured before it) counts each `items` entry once.
+- `turnins` rows carry two lists: `items` is every offer (the old reading), `given` is what the
+  trade took (stack counts from the offer line's `count`, cancel and refusal removed as
+  `gaps_quest_log.rs` reads them). Sky quest crediting (`countTurnIns`) and the `handins` count read
+  `given`; a row with no `given` (an archive segment captured before it) falls back to `items`, each
+  once. A turn-in already persisted in `questTurnIns` from a refused offer stays until undone.
 - Rotation: loot and trades come from the same log window (both merge across the app's archive), so
   `handins` never subtracts a turn-in whose loot it cannot see; it does lose items looted before a log
   the archive does not show. `log`/`both` subtract the persisted `questTurnIns`, which outlive the log.

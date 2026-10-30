@@ -35,7 +35,10 @@ export function countTurnIns(turnIns: readonly TurnInEvent[], quests: PoskyQuest
   const out: TurnInInstants = {}
   for (const t of turnIns) {
     const npc = t.npc.toLowerCase()
-    const offered = new Set(t.items.map((i) => itemCountKey(i)))
+    // What the trade really took: a cancelled or refused offer is no turn-in anywhere (owner,
+    // 2026-10-23). A row from before `given` existed keeps its offers as listed.
+    const taken = t.given?.map((g) => g.item) ?? t.items
+    const offered = new Set(taken.map((i) => itemCountKey(i)))
     for (const q of quests) {
       if (q.giver?.toLowerCase() !== npc) continue
       if (q.items.length > 0 && q.items.every((it) => offered.has(itemCountKey(it.name)))) {
