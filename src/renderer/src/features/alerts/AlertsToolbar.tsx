@@ -55,8 +55,8 @@ function VolumeControls({
           max={1}
           step={0.05}
           value={prefs.globalVolume}
-          onChange={(_e, v) => onPrefsDrag({ ...prefs, globalVolume: v as number })}
-          onChangeCommitted={(_e, v) => onPrefsCommit({ ...prefs, globalVolume: v as number })}
+          onChange={(_e, v) => onPrefsDrag({ ...prefs, globalVolume: v })}
+          onChangeCommitted={(_e, v) => onPrefsCommit({ ...prefs, globalVolume: v })}
           sx={{ width: 140 }}
         />
         <Typography variant="caption" color="text.secondary" sx={{ width: 34 }}>

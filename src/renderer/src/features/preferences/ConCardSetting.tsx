@@ -158,7 +158,7 @@ export function ConCardSetting(): JSX.Element {
           disabled={!state.open}
           data-testid="pref-con-card-hide"
           value={state.cfg.autoHideMs}
-          onChange={(e) => setHide(Number(e.target.value))}
+          onChange={(e) => setHide(e.target.value)}
         >
           {HIDE_CHOICES_SEC.map((sec) => (
             <MenuItem key={sec} value={sec * 1000}>

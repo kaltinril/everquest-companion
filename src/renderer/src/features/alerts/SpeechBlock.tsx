@@ -180,7 +180,7 @@ function AudioActionRow({ form, allAlwaysPlay }: { form: SpeechForm; allAlwaysPl
           fullWidth
           data-testid="alert-audio-action"
           value={form.audio}
-          onChange={(e) => form.setAudio(e.target.value as AlertAudioChoice)}
+          onChange={(e) => form.setAudio(e.target.value)}
         >
           {ALERT_AUDIO_CHOICES.map((a) => (
             <MenuItem key={a} value={a}>
@@ -310,7 +310,7 @@ function SaysRow({
           fullWidth
           data-testid="alert-speech-mode"
           value={form.mode}
-          onChange={(e) => form.setMode(e.target.value as SpeechMode)}
+          onChange={(e) => form.setMode(e.target.value)}
         >
           {SPEECH_MODES.map((m) => (
             <MenuItem key={m} value={m}>

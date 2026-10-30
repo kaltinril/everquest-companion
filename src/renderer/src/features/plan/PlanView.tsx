@@ -145,7 +145,7 @@ function SurvivabilitySlider(props: Pick<PicksProps, 'role' | 'survivability' | 
         value={props.survivability}
         data-testid="plan-survivability"
         onChange={(_, v) => {
-          props.setSurvivability(v as number)
+          props.setSurvivability(v)
         }}
         sx={{ py: 0.5 }}
       />
