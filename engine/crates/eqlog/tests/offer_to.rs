@@ -29,4 +29,14 @@ fn an_item_named_with_to_is_offered_whole_to_the_npc_after_the_last_to() {
     let v = parsed("You offered 1 Encoded Missive to Dorian G`Wyn.");
     assert_eq!(v["item"], "Encoded Missive");
     assert_eq!(v["npc"], "Dorian G`Wyn");
+    assert_eq!(v["count"], 1);
+}
+
+#[test]
+fn a_stack_offered_in_one_line_carries_its_count() {
+    let v = parsed("You offered 11 Mote of Infinitesimal Potential to Constructed Potential.");
+    assert_eq!(v["item"], "Mote of Infinitesimal Potential");
+    assert_eq!(v["npc"], "Constructed Potential");
+    assert_eq!(v["count"], 11);
+    assert_eq!(parsed("You offered 1,000 Platinum to Oogmug.")["count"], 1000);
 }

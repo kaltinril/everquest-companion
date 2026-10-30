@@ -92,7 +92,7 @@ impl WorldRes {
             mob_died: Regex::new(r"^(.+?) died\.$").unwrap(),
             // The item is the GREEDY part: an item name may hold " to " (`Plea to Freeport`), an NPC's
             // name does not (owner, 2026-10-22: `You offered 1 Plea to Freeport to Sir Mollin.`).
-            offer: Regex::new(r"^You offered [0-9,]+ (.+) to (.+?)\.$").unwrap(),
+            offer: Regex::new(r"^You offered ([0-9,]+) (.+) to (.+?)\.$").unwrap(),
             trade_done: Regex::new(r"^You complete the trade with (.+?)\.$").unwrap(),
             level: Regex::new(r"^You have gained a level! Welcome to level ([0-9]+)!$").unwrap(),
             exp: Regex::new(
@@ -394,8 +394,10 @@ pub fn classify_turn_in(r: &WorldRes, c: &Ctx, out: &mut Ev) -> bool {
         if let Some(m) = r.offer.captures(c.text) {
             out.begin(Kind::Offer);
             out.envelope(c.seq, c.ts, c.raw);
-            out.s(Key::Item, js_trim(&m[1]));
-            out.s(Key::Npc, js_trim(&m[2]));
+            out.s(Key::Item, js_trim(&m[2]));
+            out.s(Key::Npc, js_trim(&m[3]));
+            // A stack goes over as one line (`You offered 11 Mote of ... to ...`).
+            out.i(Key::Count, m[1].replace(',', "").parse().unwrap_or(1));
             return true;
         }
     }

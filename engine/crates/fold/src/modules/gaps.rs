@@ -584,7 +584,7 @@ impl EqModule for GapsModule {
 #[path = "gaps_craft.rs"]
 mod craft;
 #[path = "gaps_quests.rs"]
-mod quests;
+pub(crate) mod quests;
 use quests::QuestFacts;
 #[path = "gaps_quest_log.rs"]
 mod quest_log;

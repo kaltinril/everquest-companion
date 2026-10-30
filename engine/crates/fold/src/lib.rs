@@ -841,7 +841,9 @@ pub fn registered(deps: ClusterDeps) -> Registry {
         self_name.as_deref(),
     )));
     r.register(Box::new(modules::loot::LootModule::new()));
-    r.register(Box::new(modules::turnins::TurnInsModule::new()));
+    // The log's character, as the gaps module reads it: a refusal naming another player is theirs.
+    let log_name = character.as_ref().and_then(|c| c.get("name")?.as_str());
+    r.register(Box::new(modules::turnins::TurnInsModule::new(log_name)));
     r.register(Box::new(modules::class_unlocks::ClassUnlocksModule::new()));
     r.register(Box::new(modules::kills::KillsModule::new()));
     // Beside `kills` because it folds the same death line, and after it, so anything reading both
