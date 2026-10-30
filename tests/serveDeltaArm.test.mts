@@ -195,12 +195,13 @@ test('the cursor fan-out reaches the SAME windows the increments do', () => {
 test('the world-rebuilt signal reaches the damage-meter overlay, without widening the cursor firehose', () => {
   const mod = code('../src/main/worldRebuilt.ts')
 
-  // The character-aware list is the module-reading set PLUS the two meter kinds — built FROM
-  // MODULE_READING_OVERLAYS, never a hand-copied literal (JOS-172's lesson, one list).
+  // The character-aware list is the module-reading set PLUS the meter kinds and the swing timer
+  // (all read combat through useOverlayCombat) — built FROM MODULE_READING_OVERLAYS, never a
+  // hand-copied literal (JOS-172's lesson, one list).
   assert.match(
     mod,
-    /CHARACTER_AWARE_OVERLAYS:\s*OverlayKind\[\]\s*=\s*\[\s*\.\.\.MODULE_READING_OVERLAYS,\s*'fight',\s*'overall',\s*'heal-fight',\s*'heal-overall'\s*\]/,
-    'CHARACTER_AWARE_OVERLAYS must extend MODULE_READING_OVERLAYS with the four meter kinds'
+    /CHARACTER_AWARE_OVERLAYS:\s*OverlayKind\[\]\s*=\s*\[\s*\.\.\.MODULE_READING_OVERLAYS,\s*'fight',\s*'overall',\s*'heal-fight',\s*'heal-overall',\s*'swing'\s*\]/,
+    'CHARACTER_AWARE_OVERLAYS must extend MODULE_READING_OVERLAYS with the four meter kinds and the swing timer'
   )
 
   // sendWorldRebuilt sends onCharacter through the character-aware fan-out, NOT the module set.

@@ -1,0 +1,149 @@
+[
+  {
+    "heals": [
+      {
+        "amount": 5,
+        "source": "You",
+        "spell": "Lifetap",
+        "ts": 1792805752000
+      },
+      {
+        "amount": 5,
+        "source": "You",
+        "spell": "Lifetap",
+        "ts": 1792805756000
+      }
+    ],
+    "hits": [
+      {
+        "ability": "Melee",
+        "amount": 4,
+        "crit": false,
+        "source": "A tree snake",
+        "ts": 1792805752000
+      },
+      {
+        "ability": "Melee",
+        "amount": 5,
+        "crit": false,
+        "source": "A tree snake",
+        "ts": 1792805752000
+      },
+      {
+        "ability": "Melee",
+        "amount": 2,
+        "crit": false,
+        "source": "A black bear",
+        "ts": 1792805752000
+      },
+      {
+        "ability": "Weak Poison",
+        "amount": 6,
+        "crit": false,
+        "source": "a tree snake",
+        "ts": 1792805752000
+      },
+      {
+        "ability": "Bash",
+        "amount": 1,
+        "crit": false,
+        "source": "A tree snake",
+        "ts": 1792805752000
+      },
+      {
+        "ability": "Melee",
+        "amount": 12,
+        "crit": false,
+        "source": "A tree snake",
+        "ts": 1792805755000
+      },
+      {
+        "ability": "Melee",
+        "amount": 12,
+        "crit": false,
+        "source": "A tree snake",
+        "ts": 1792805758000
+      },
+      {
+        "ability": "Weak Poison",
+        "amount": 6,
+        "crit": false,
+        "source": "a tree snake",
+        "ts": 1792805758000
+      },
+      {
+        "ability": "Bash",
+        "amount": 1,
+        "crit": false,
+        "source": "A tree snake",
+        "ts": 1792805758000
+      },
+      {
+        "ability": "Melee",
+        "amount": 12,
+        "crit": false,
+        "source": "A tree snake",
+        "ts": 1792805761000
+      },
+      {
+        "ability": "Melee",
+        "amount": 2,
+        "crit": false,
+        "source": "A tree snake",
+        "ts": 1792805761000
+      },
+      {
+        "ability": "Melee",
+        "amount": 6,
+        "crit": false,
+        "source": "A black bear",
+        "ts": 1792805762000
+      },
+      {
+        "ability": "Melee",
+        "amount": 7,
+        "crit": false,
+        "source": "A tree snake",
+        "ts": 1792805764000
+      },
+      {
+        "ability": "Melee",
+        "amount": 4,
+        "crit": false,
+        "source": "A tree snake",
+        "ts": 1792805764000
+      },
+      {
+        "ability": "Weak Poison",
+        "amount": 6,
+        "crit": false,
+        "source": "a tree snake",
+        "ts": 1792805764000
+      },
+      {
+        "ability": "Melee",
+        "amount": 5,
+        "crit": false,
+        "source": "A black bear",
+        "ts": 1792805765000
+      },
+      {
+        "ability": "Bash",
+        "amount": 1,
+        "crit": false,
+        "source": "A tree snake",
+        "ts": 1792805766000
+      },
+      {
+        "ability": "Weak Poison",
+        "amount": 6,
+        "crit": false,
+        "source": "a tree snake",
+        "ts": 1792805766000
+      }
+    ],
+    "killer": "a tree snake",
+    "ts": 1792805766000,
+    "windowMs": 15000
+  }
+]

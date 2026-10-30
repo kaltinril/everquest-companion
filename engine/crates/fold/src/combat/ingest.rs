@@ -19,6 +19,7 @@
 use crate::combat::aggregate::{DamageEvent, MissType, SourceRef};
 use crate::combat::ally::{AllyCastLine, AllyKind, AllyLeaderLine, AllyVerdict};
 use crate::combat::charm::CharmVerdict;
+use crate::combat::deathrecap;
 use crate::combat::encounter::{ZoneSessionClose, CC_HOLD_MS};
 use crate::combat::lifecycle::{ensure_encounter, eval_closure, finalize_current};
 use crate::combat::procdetect::{
@@ -34,6 +35,7 @@ use crate::combat::procwindows::WindowFold;
 use crate::combat::routing::{self, Attribution, HealLine, MissLine, MitigationLine, ResistLine};
 use crate::combat::spellfacts::is_pet_summon_spell;
 use crate::combat::state::EngineState;
+use crate::combat::swing;
 use crate::event::{Event, Key, Kind};
 use eqlog::names::{id_key, id_key_ref};
 use std::borrow::Cow;
@@ -524,6 +526,7 @@ fn ingest_combat(st: &mut EngineState, ev: &Event) -> bool {
                 crit: ev.bool(Key::Crit),
             };
             routing::route_heal(st, &line);
+            deathrecap::note_heal(st, &line);
             fold_heal_analytics(st, &line, ev.bool(Key::OverTime));
             let spell = match &line.spell {
                 Some(s) => format!(" ({s})"),
@@ -603,6 +606,7 @@ fn ingest_combat(st: &mut EngineState, ev: &Event) -> bool {
             // Your avoided swing is still an ATTEMPT, and the mechanical proc denominator is
             // attempts — a proc that cannot fire on a miss still had the chance to.
             if id_key_ref(&attacker) == "you" {
+                swing::note(st, ev);
                 fold_both(st, ev.ts(), |agg, active| {
                     agg.windows.fold(
                         &WindowFold {
@@ -649,6 +653,7 @@ fn ingest_combat(st: &mut EngineState, ev: &Event) -> bool {
 /// One canonical `damage` line: close any pending encounter at this ts BEFORE routing, so attributed
 /// damage after a closure starts a fresh encounter rather than reviving the old one.
 fn ingest_damage(st: &mut EngineState, ev: &Event) {
+    swing::note(st, ev);
     // Caster-less other-player DoTs (`attacker: null`) are not our fight, and the raw line is what
     // the ring keeps: there is nothing else to say about a line nobody owns.
     let Some(attacker) = ev.str(Key::Attacker) else {
@@ -657,6 +662,7 @@ fn ingest_damage(st: &mut EngineState, ev: &Event) {
             eval_closure(st, ev.ts());
             let modifiers = ev.arr_str(Key::Modifiers);
             let dmg = to_damage_event(st, ev, routing::ENVIRONMENT, &modifiers);
+            deathrecap::note_hit(st, &dmg);
             routing::route_environment_damage(st, &dmg);
             return;
         }
@@ -667,6 +673,7 @@ fn ingest_damage(st: &mut EngineState, ev: &Event) {
     // Built here rather than inside `to_damage_event` so the record can borrow it.
     let modifiers = ev.arr_str(Key::Modifiers);
     let dmg = to_damage_event(st, ev, attacker, &modifiers);
+    deathrecap::note_hit(st, &dmg);
     // The origin verdict names the LANE, so it is reached before `route()` folds the hit — and
     // exactly once, because it CONSUMES the cast claim. Asking twice would take two claims off one
     // cast line and count the second landing as a proc.
@@ -1083,6 +1090,7 @@ fn ingest_modifier(st: &mut EngineState, ev: &Event) {
             // four coats ended is the last minute that should be believed clean.
             clear_coats(st, ev.ts(), CoatClearReason::Death);
             st.state_timeline.censor_all(ev.ts());
+            deathrecap::note_death(st, ev.ts(), ev.str(Key::Killer));
         }
         _ => {}
     }

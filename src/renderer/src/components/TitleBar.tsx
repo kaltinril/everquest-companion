@@ -141,6 +141,7 @@ const OVERLAY_MENU_ROWS: readonly (readonly [OverlayKind, string])[] = [
   // The Wiki Gaps overlay (owner, 2026-10-20), behind the Gaps tab's own UNRELEASED gate: a build
   // without the tab has nothing to feed the window, so it has no row to open it from either.
   ...(UNRELEASED ? ([['gaps', 'The top 10 of the Wiki Gaps tab you have showing']] as const) : []),
+  ['swing', 'Time to your next weapon swing, from your swings'],
   // JOS-383, and the first row here for a kind that ships ON. It is in this menu on the owner's
   // instruction (2026-08-16, the JOS-139 mirroring precedent): a window that appears by itself
   // needs its off switch within reach of the place you are already looking when you want it gone.

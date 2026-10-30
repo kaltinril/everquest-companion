@@ -410,3 +410,15 @@ test('the con card opens wide enough for THREE chip columns at the measured chip
   // …and not FOUR, which would be a card wider than the row it is supposed to draw.
   assert.equal(columns, 3, `${columns} columns — the card is wider than the chips it holds`)
 })
+
+test('the swing timer opens small, on-screen, and holds no meter slot', () => {
+  assert.ok(!METER_KINDS.includes('swing'), 'a one-bar window must not take a dock slot')
+  for (const [name, area] of Object.entries(WORK_AREAS)) {
+    const b = defaultOverlayBounds('swing', area)
+    assert.deepEqual({ width: b.width, height: b.height }, overlayDefaultSize('swing'), name)
+    assert.ok(b.height >= OVERLAY_MIN_SIZE.height && b.width >= OVERLAY_MIN_SIZE.width, name)
+    assert.ok(b.x >= area.x && b.x + b.width <= area.x + area.width, `${name}: off-screen x`)
+    assert.ok(b.y >= area.y && b.y + b.height <= area.y + area.height, `${name}: off-screen y`)
+    for (const k of METER_KINDS) assert.ok(!overlaps(b, defaultOverlayBounds(k, area)), `${name}: swing overlaps ${k}`)
+  }
+})

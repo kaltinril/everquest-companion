@@ -53,7 +53,8 @@ export const CHARACTER_AWARE_OVERLAYS: OverlayKind[] = [
   'fight',
   'overall',
   'heal-fight',
-  'heal-overall'
+  'heal-overall',
+  'swing'
 ]
 
 /**

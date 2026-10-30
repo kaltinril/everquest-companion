@@ -414,6 +414,35 @@ export interface SegmentView {
    * are for drawing, never for counting.
    */
   procs: ProcsView
+  /** Your deaths in this segment, oldest first (`deathrecap.rs`). Absent when there are none. */
+  deaths?: DeathRecap[]
+}
+
+/** One landed hit on you in a death's window. `source` is as the log printed it, or Environment. */
+export interface DeathRecapHit {
+  ts: number
+  source: string
+  ability: string
+  amount: number
+  crit: boolean
+}
+
+/** One heal on you in a death's window. */
+export interface DeathRecapHeal {
+  ts: number
+  source: string
+  spell?: string
+  amount: number
+}
+
+/** One of your deaths: the hits and heals on you in the `windowMs` before it, in log order. */
+export interface DeathRecap {
+  ts: number
+  /** Absent for the killerless `You died.`. */
+  killer?: string
+  windowMs: number
+  hits: DeathRecapHit[]
+  heals: DeathRecapHeal[]
 }
 
 // ---------------------------------------------------------------------------
@@ -1109,6 +1138,9 @@ export interface CombatSnapshot {
    * for nothing; the meter learns the pet only through the same three routes it always did.
    */
   petNudge?: PetSummonNudge
+  /** The whole seconds you swung a weapon in, newest last (engine `swing.rs`), for the swing
+   *  timer (shared/swingTimer.ts). Absent until you have swung. */
+  swingRounds?: number[]
   /**
    * The selected fight's summary when the selection is an ARCHIVED fight (log archive, step 4.9).
    * `selected` is then null: the breakdown stays in the archive, which `archive` names.

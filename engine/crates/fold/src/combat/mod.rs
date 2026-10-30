@@ -19,6 +19,7 @@ pub mod aggregate;
 pub mod ally;
 pub mod charm;
 pub mod collate;
+pub mod deathrecap;
 pub mod encounter;
 pub mod healing;
 pub mod ingest;
@@ -38,6 +39,7 @@ pub mod routing;
 pub mod spellfacts;
 pub mod state;
 pub mod statetimeline;
+pub mod swing;
 pub mod timeline;
 pub mod views;
 pub mod world;
@@ -273,7 +275,11 @@ impl CombatEngine {
 
         let selected_id = resolve_selected_id(st, opts);
         let selected = match views::build_selected(st, &selected_id, now) {
-            Some(v) => serde_json::to_value(v).unwrap_or(Value::Null),
+            Some(v) => with_deaths(
+                st,
+                &selected_id,
+                serde_json::to_value(v).unwrap_or(Value::Null),
+            ),
             // Null, not an empty shell: with no fights at all the selection resolves to nothing.
             None => Value::Null,
         };
@@ -311,6 +317,11 @@ impl CombatEngine {
         }
         if let Some(target) = current_target(st) {
             out["currentTarget"] = json!(target);
+        }
+        // Your weapon swing seconds for the swing timer; absent until you have swung.
+        let swings = st.swings.rounds();
+        if !swings.is_empty() {
+            out["swingRounds"] = json!(swings);
         }
         // `timeline` is absent when the caller did not ask, and present-and-null when it asked and
         // the selection carries no timeline. `JSON.stringify` drops the first and keeps the second.
@@ -390,6 +401,16 @@ fn resolve_selected_id(st: &EngineState, opts: &SnapshotOpts) -> String {
     } else {
         default_id
     }
+}
+
+/// Your deaths inside the selection, on the selected segment as `deaths`. Absent when there are none,
+/// so a segment with no death keeps its exact prior shape.
+fn with_deaths(st: &EngineState, selected_id: &str, mut seg: Value) -> Value {
+    let deaths = st.recaps.for_selection(selected_id, st.zone_seq + 1);
+    if !deaths.is_empty() && seg.is_object() {
+        seg["deaths"] = serde_json::to_value(deaths).unwrap_or(Value::Null);
+    }
+    seg
 }
 
 /// The mob in front of you (world-model law 6, live half). Absent when no encounter is open or the

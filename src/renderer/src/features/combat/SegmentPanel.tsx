@@ -14,6 +14,7 @@ import { useMemo, useState } from 'react'
 import { Box, Paper, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import { TargetSkillBars } from './CombatDashboard'
 import { DefensePanel } from './DefensePanel'
+import { DeathRecapPanel } from './DeathRecapPanel'
 import { segmented } from './segmented'
 import { meterDrill, skillsForTarget, type Drill, type MeterMode, type TargetDetail } from './dashboardData'
 import { HealBody } from './HealPanel'
@@ -52,7 +53,7 @@ function IncomingHeals({ seg }: { seg: SegmentView }): React.JSX.Element | null 
 // ── the card's own two tabs (JOS-361) ──────────────────────────────────────────────────
 
 /** Which question this card is answering about the INCOMING direction. */
-type MeterTab = 'damage' | 'mitigation'
+type MeterTab = 'damage' | 'mitigation' | 'death'
 
 /**
  * THE TAB STRIP, and the two conditions that decide whether the card has tabs at all:
@@ -69,7 +70,16 @@ type MeterTab = 'damage' | 'mitigation'
  * the app (the gear area, Plane of Sky) but they are PAGE-level chrome with a full-width rule
  * under them, which is not what a 22px-row card wants across its top.
  */
-function MeterTabs({ tab, setTab }: { tab: MeterTab; setTab: (t: MeterTab) => void }): React.JSX.Element {
+function MeterTabs({
+  tab,
+  setTab,
+  died
+}: {
+  tab: MeterTab
+  setTab: (t: MeterTab) => void
+  /** the segment holds one of your deaths: offer its recap as a third tab. */
+  died: boolean
+}): React.JSX.Element {
   return (
     <Box sx={{ mb: 0.75, flexShrink: 0 }}>
       <ToggleButtonGroup
@@ -82,9 +92,21 @@ function MeterTabs({ tab, setTab }: { tab: MeterTab; setTab: (t: MeterTab) => vo
       >
         <ToggleButton value="damage">Damage breakdown</ToggleButton>
         <ToggleButton value="mitigation">Mitigation</ToggleButton>
+        {died && (
+          <ToggleButton value="death" data-testid="meter-tab-death">
+            Death recap
+          </ToggleButton>
+        )}
       </ToggleButtonGroup>
     </Box>
   )
+}
+
+/** The tab the card shows: the first wherever there is no strip, and wherever a death tab left
+ *  open now sits on a segment with no death. */
+function resolveTab(tabbed: boolean, tab: MeterTab, died: boolean): MeterTab {
+  if (!tabbed || (tab === 'death' && !died)) return 'damage'
+  return tab
 }
 
 // ── drill resolution ───────────────────────────────────────────────────────────────────
@@ -204,7 +226,9 @@ function SegmentContent({
   }
   return (
     <Box data-testid="meter-body" sx={{ overflow: 'auto', flexGrow: 1, minHeight: 0 }}>
-      {tab === 'mitigation' ? (
+      {tab === 'death' ? (
+        <DeathRecapPanel deaths={seg.deaths} />
+      ) : tab === 'mitigation' ? (
         // YOUR DEFENCE (JOS-354), on its own tab since JOS-361. Nothing else draws here: the two
         // tabs are two answers, not one column with a heading on it.
         <DefensePanel d={seg.defense} />
@@ -334,7 +358,8 @@ export function SegmentBody({
   // The two conditions from `MeterTabs`, resolved ONCE: whether the card has tabs at all, and
   // therefore which tab the body is showing.
   const tabbed = mode === 'in' && d.crumb === null
-  const shownTab: MeterTab = tabbed ? tab : 'damage'
+  const died = (seg.deaths?.length ?? 0) > 0
+  const shownTab = resolveTab(tabbed, tab, died)
 
   // "Copy this view" means THIS view: the same choice the body below makes, so the clipboard can
   // never hold a level the user isn't looking at. Built on click, never on render. The per-ability
@@ -399,7 +424,7 @@ export function SegmentBody({
       )}
       {/* The card's own tabs, at the top of its CONTENT and outside the scroll box below — a tab
           strip that scrolls away with the rows it switches is not a tab strip. */}
-      {tabbed && <MeterTabs tab={tab} setTab={setTab} />}
+      {tabbed && <MeterTabs tab={shownTab} setTab={setTab} died={died} />}
       <SegmentContent
         seg={seg}
         mode={mode}

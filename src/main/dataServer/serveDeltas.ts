@@ -157,7 +157,7 @@ let combatActivityTimer: ReturnType<typeof setTimeout> | null = null
 
 /** The overlays that poll `combat.snapshot` (`useOverlayCombat`): without the ping they lag up to
  *  their 1 s fallback poll behind the main window's meters. */
-const METER_OVERLAYS = ['fight', 'overall', 'heal-fight', 'heal-overall'] as const
+const METER_OVERLAYS = ['fight', 'overall', 'heal-fight', 'heal-overall', 'swing'] as const
 
 function sendCombatActivity(): void {
   sendToMain(IPC.onCombatActivity)

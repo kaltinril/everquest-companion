@@ -17,6 +17,7 @@ use serde::Serialize;
 use crate::combat::aggregate::Agg;
 use crate::combat::ally::AllyCharms;
 use crate::combat::charm::CharmModel;
+use crate::combat::deathrecap::DeathRecaps;
 use crate::combat::encounter::{
     CoatSlot, Encounter, MarkerRaw, TimelineRaw, ZoneSession, ZoneSessionClose, FALLBACK_IDLE_MS,
     MARKER_CAP, RECENT_CAP, TIMELINE_CAP,
@@ -26,6 +27,7 @@ use crate::combat::petnudge::PetNudgeState;
 use crate::combat::procdetect::RecentCasts;
 use crate::combat::roster::{RosterSnap, RosterSource};
 use crate::combat::statetimeline::StateTimeline;
+use crate::combat::swing::SwingTrack;
 use crate::combat::world::{Resolved, WorldModel};
 use eqlog::names::{id_key, id_key_ref};
 use std::collections::HashSet;
@@ -186,6 +188,10 @@ pub struct EngineState {
 
     /// See `RosterFacts`. Refreshed once per ingested event and once per snapshot.
     pub roster: RosterFacts,
+    /// The hits and heals on you before each of your deaths (`deathrecap.rs`).
+    pub recaps: DeathRecaps,
+    /// Your weapon swing seconds, for the swing timer (`swing.rs`).
+    pub swings: SwingTrack,
 }
 
 impl Default for EngineState {
@@ -235,6 +241,8 @@ impl EngineState {
             pet_nudge: PetNudgeState::new(),
             quick_buff_ts: 0,
             roster: RosterFacts::default(),
+            recaps: DeathRecaps::default(),
+            swings: SwingTrack::default(),
         }
     }
 
