@@ -19,6 +19,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ZoneShort } from '@shared/maps'
+import { headingDeg } from '@shared/mapHeading'
 import { JUMP_ZOOM } from './MapBody'
 import { mapFromLoc, type EqLoc } from './mapGeometry'
 import {
@@ -35,6 +36,9 @@ import type { MapViewport } from './useMapViewport'
 export interface LocMarkerState {
   /** This zone's marker in the game's own axes, or null. */
   marker: EqLoc | null
+  /** Which way you went from this zone's previous marker to this one, degrees clockwise from the
+   *  map's top; null with no previous one this session, or the same spot twice. */
+  heading: number | null
   /** A well-formed reading was entered: remember it for this zone, and go look at it. */
   place: (loc: EqLoc) => void
   /** Centre on the marker already placed. The chip's click. */
@@ -49,7 +53,15 @@ export function useLocMarker(zone: ZoneShort | null, vp: MapViewport): LocMarker
     saveLocMarkers(marks)
   }, [marks])
 
+  // The marker each placement replaced, per zone: the heading arrow's tail. Memory only, so a
+  // restored marker carries no arrow.
+  const [tails, setTails] = useState<LocMarkers>({})
+  const marksNow = useRef(marks)
+  marksNow.current = marks
+
   const marker = locMarkerFor(marks, zone)
+  const before = locMarkerFor(tails, zone)
+  const heading = headingDeg(before == null ? null : mapFromLoc(before), marker == null ? null : mapFromLoc(marker))
   const { centerOn, zoomedIn, view } = vp
 
   // Fitted ⇒ a marker is a few pixels from everything else, so the jump also zooms in; already
@@ -72,6 +84,8 @@ export function useLocMarker(zone: ZoneShort | null, vp: MapViewport): LocMarker
       // No map open ⇒ nowhere to remember it. The field is gated on `hasMap`, so this is a guard,
       // not a path: a marker filed under no zone could never be found again.
       if (zone == null) return
+      const held = locMarkerFor(marksNow.current, zone)
+      if (held != null) setTails((p) => setLocMarker(p, zone, held))
       setMarks((prev) => setLocMarker(prev, zone, loc))
       goTo(loc)
     },
@@ -85,7 +99,8 @@ export function useLocMarker(zone: ZoneShort | null, vp: MapViewport): LocMarker
   const clear = useCallback(() => {
     if (zone == null) return
     setMarks((prev) => clearLocMarker(prev, zone))
+    setTails((p) => clearLocMarker(p, zone))
   }, [zone])
 
-  return { marker, place, show, clear }
+  return { marker, heading, place, show, clear }
 }

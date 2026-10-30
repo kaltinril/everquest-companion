@@ -486,6 +486,7 @@ function MapTab({
           zoneName={zoneName}
           marker={marker}
           locMarker={loc.marker}
+          locHeading={loc.heading}
           onJump={onJump}
           zones={zones}
           onOpenMob={onOpenMob}
