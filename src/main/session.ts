@@ -50,10 +50,6 @@ import {
 import { setAchievements } from './storeAchievements'
 // The factions dump's write pair (the third graduated kind) — the same split, the same reason.
 import { setFactions } from './storeFactions'
-// The factions follow is gated on the owner's review-gate mechanism (src/main/unreleased.ts): the
-// tab that reads the key is UNRELEASED-stripped from packaged builds, and a packaged build should
-// not run two watchers and write a store key for a surface it cannot draw.
-import { UNRELEASED } from './unreleased'
 // The clean-shutdown tail mark (JOS-57 scope addition) — a split-out store accessor, for the
 // reason its own header gives: store.ts is at the factoring ceiling.
 import { markFunnelStep } from './telemetry'
@@ -80,8 +76,7 @@ let inventoryWatch: OutputKindWatch | null = null
 // independently and each is armed for its own character — and because the day a third kind
 // graduates, a list would hide which one failed to close.
 let achievementsWatch: OutputKindWatch | null = null
-// The third kind's slot (factions), on the sentence above's own terms. Armed only under
-// `UNRELEASED` (see `tailCharacter`), so in a packaged build it stays null for the process's life.
+// The third kind's slot (factions), on the sentence above's own terms.
 let factionsWatch: OutputKindWatch | null = null
 // Wall-clock heartbeat (Task #30): drives module onTick so real-time deadlines (the
 // buffs 15s cast-landing timeout) fire even when the log is idle. Started once the
@@ -439,13 +434,9 @@ export async function tailCharacter(ref: CharacterRef): Promise<boolean> {
   loadAchievementsNow(ref, 'startup')
   startAchievementsWatch(ref)
 
-  // The third graduated kind (factions), same two steps — GATED on the review-gate door
-  // (src/main/unreleased.ts): the Factions tab is UNRELEASED-stripped from packaged builds, and a
-  // build that cannot draw the surface should not run its watchers or write its store keys.
-  if (UNRELEASED) {
-    loadFactionsNow(ref, 'startup')
-    startFactionsWatch(ref)
-  }
+  // The third graduated kind (factions), same two steps.
+  loadFactionsNow(ref, 'startup')
+  startFactionsWatch(ref)
 
   // THE ATTACH RIDES THIS CALL, and that is the whole of what "tailing a character" means now.
   //
@@ -626,9 +617,9 @@ function startAchievementsWatch(ref: CharacterRef): void {
  * every read, so no channel of its own (OutputKindLine's header carries that argument).
  *
  * NOT A TIMED SEAM, unlike its two elders, and deliberately: seam names are a closed schema that
- * rides telemetry (shared/perfSeams.ts → telemetryLive), so a seam for an UNRELEASED surface
- * would be the enum-widening this feature's gate exists to avoid. It gets its seam when the tab
- * graduates, in the same owner-sequenced change that widens `TELEMETRY_VIEWS`.
+ * rides telemetry (shared/perfSeams.ts → telemetryLive), so a seam for the Factions tab would be
+ * an enum widening. It gets its seam in the same owner-sequenced change that puts the tab in
+ * `TELEMETRY_VIEWS`.
  */
 function loadFactionsNow(ref: CharacterRef, why: 'startup' | 'watch'): void {
   const who = character

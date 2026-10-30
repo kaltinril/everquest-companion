@@ -462,7 +462,7 @@ const api = {
    *  newest `/outputfile inventory` dump; `null` when no dump exists.
    *
    *  IT USED TO BE THE ONE METHOD HERE THAT COULD REJECT, and JOS-327 ended that: the handler was
-   *  registered only when `UNRELEASED` (src/main/unreleased.ts) was true, so a packaged build had
+   *  registered only when the old `UNRELEASED` review gate was true, so a packaged build had
    *  nothing on the other side and the invoke failed with Electron's own "No handler registered
    *  for 'character:sheet'". The owner released the tab; the handler is unconditional. The
    *  renderer's read still tolerates a rejection (features/character/useCharacterSheet.ts) — a

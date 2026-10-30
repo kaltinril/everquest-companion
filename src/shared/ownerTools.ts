@@ -12,9 +12,9 @@
 //
 // SO THE DEV FLAG SPLITS IN TWO, by what the surface can touch:
 //
-//   TIER 1 — contributor conveniences. The dev restart button, the unreleased-surface gate,
-//     the boot diagnostics: credential-free, useful to anyone hacking on a fork, and they stay
-//     on plain DEV gating. Nothing here reaches anybody's account.
+//   TIER 1 — contributor conveniences. The dev restart button and the boot diagnostics:
+//     credential-free, useful to anyone hacking on a fork, and they stay on plain DEV gating.
+//     Nothing here reaches anybody's account.
 //   TIER 2 — OWNER tooling. The Triage tab and its `triage:*` IPC (the feedback backlog, the
 //     log slices, the usage-analytics panels — Aurora DSQL, S3 and CloudWatch in the owner's
 //     AWS sub-account). DEV **and** an explicit opt-in that a fresh checkout does not have.
@@ -46,7 +46,7 @@ export type EnvLike = Readonly<Record<string, string | undefined>>
  *
  * EXACTLY `'1'`, never truthiness. `EQ_OWNER_TOOLS=0` and `EQ_OWNER_TOOLS=false` both read as a
  * deliberate NO to anyone who types them, and a substring or `Boolean()` test would turn both
- * into YES. It matches the shape `EQ_E2E` / `EQ_UNRELEASED` / `EQ_DISABLE_GPU` already use.
+ * into YES. It matches the shape `EQ_E2E` / `EQ_DISABLE_GPU` already use.
  */
 export function ownerToolsOptIn(env: EnvLike): boolean {
   return env[OWNER_TOOLS_ENV] === '1'

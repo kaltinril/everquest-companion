@@ -21,8 +21,7 @@ export const outputsApi = {
   /**
    * The LOG's faction receipts since the factions dump was written, folded per faction
    * (shared/factionLog.ts) — what lets a stale dump's numbers be corrected on screen. Null when
-   * there is no dump or no log to fold from; in a packaged build the UNRELEASED-gated handler is
-   * absent and the invoke rejects, which the (equally absent) Factions tab never gets to see.
+   * there is no dump or no log to fold from.
    * `recentMinutes` sizes the report's recent tally (the factions the log moved lately).
    */
   factionsEvidence: (recentMinutes?: number): Promise<FactionEvidenceReport | null> =>

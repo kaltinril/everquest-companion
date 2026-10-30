@@ -19,7 +19,6 @@ import { DEFAULT_ALERT_PACK_ID, DEFAULT_ALERT_SOUNDS } from '../data/defaultPack
 import { setOwnFires } from '../dataServer/ownFires'
 import { captureSize, gameWindow, readCapture } from '../shot/captureRead'
 import { bgraToRgba, cropRgba, type Box, type Rgba } from '../shot/pixels'
-import { UNRELEASED } from '../unreleased'
 import { getMainWindow } from '../windows'
 import { READERS } from './shotIpc'
 
@@ -132,8 +131,7 @@ function tellMain(channel: string): void {
 }
 
 export function registerShotCaptureIpc(): void {
-  // The Gaps tab that files a capture is behind the same gate.
-  if (UNRELEASED) setOwnFires('shot', [MACRO_DEF, CHANNELS_DEF], takeMacroFire)
+  setOwnFires('shot', [MACRO_DEF, CHANNELS_DEF], takeMacroFire)
   ipcMain.on(IPC.shotCaptureNow, () => start('overlay'))
   ipcMain.handle(IPC.shotCaptures, () => waiting.splice(0, waiting.length))
   ipcMain.handle(IPC.shotChannels, () => channels)

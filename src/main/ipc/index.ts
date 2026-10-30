@@ -87,15 +87,8 @@ import { registerEngineLaunchIpc } from './engine'
 
 export function registerIpc(): void {
   registerCharacterIpc()
-  // UNGATED SINCE JOS-327. This line read `if (UNRELEASED) …` from JOS-45 until the owner released
-  // the Character tab as the gear area's last face; the channel is an ordinary one now. The flag
-  // itself survives, tenantless, for whatever surface lands on main before its review next
-  // (../unreleased.ts explains what it is for and how to adopt it).
   registerCharacterSheetIpc()
   registerOutputsIpc()
-  // GATED on the review-gate door INSIDE the register (ipc/factions.ts) — the UNRELEASED
-  // Factions tab's log-evidence channel, adopting exactly the arrangement the comment above
-  // describes the character sheet having outgrown.
   registerFactionsIpc()
   registerWorldIpc()
   registerComboIpc()

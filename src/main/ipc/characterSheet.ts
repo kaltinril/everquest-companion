@@ -1,10 +1,10 @@
 // IPC: the CHARACTER SHEET's door (JOS-45) — the armory grid, the gear sum, and the carry-all.
 //
 // IT WAS GATED, AND SINCE JOS-327 IT IS NOT. This handler used to be registered only when
-// `UNRELEASED` said so (src/main/unreleased.ts) — dev builds, or an explicit `EQ_UNRELEASED=1` —
-// because the surface had not passed the owner's review gate; in a packaged build the channel did
-// not exist and `window.eq.characterSheet()` rejected with Electron's own "No handler registered".
-// The owner released the tab (2026-08-13) as the gear area's last face, so the registration is
+// the old `UNRELEASED` review gate said so (dev builds only), because the surface had not passed
+// the owner's review; in a packaged build the channel did not exist and
+// `window.eq.characterSheet()` rejected with Electron's own "No handler registered". The owner
+// released the tab (2026-08-13) as the gear area's last face, so the registration is
 // unconditional now and the promise the gate protected is simply no longer being made. What did
 // NOT change is the file boundary below, or the shape of the answer.
 //

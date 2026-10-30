@@ -33,7 +33,7 @@ export const IPC = {
   // main -> renderer: the active character's *-Inventory.txt was auto-reloaded.
   onInventoryReload: 'inventory:autoReloaded',
 
-  // ---- the Achievements tab (UNRELEASED-gated at the handler, like the tab) ----
+  // ---- the Achievements tab ----
   // renderer -> main: the active character's `/outputfile achievements` dump as the tree the
   // game draws (shared/outputs/achievementBook.ts). Returns AchievementBook | null; null means
   // there is no dump. Read on demand and never stored; the tab re-asks when the dump is re-read.
@@ -50,7 +50,7 @@ export const IPC = {
   // written, folded per faction (shared/factionLog.ts). Returns FactionEvidenceReport | null —
   // null means no log/dump to fold from, which the Factions tab renders as the dump alone. A
   // bounded read-only tail read on demand (main/factionsEvidence.ts); the engine's tail is
-  // untouched. UNRELEASED-gated at the handler like the surface it feeds.
+  // untouched.
   factionsEvidence: 'factions:evidence',
 
   // ---- character selection ----
@@ -670,8 +670,8 @@ export const IPC = {
   // carries, with its location path and count. Returns CharacterSheet | null — null means no dump,
   // which the tab answers with its instructions card, never an error.
   //
-  // IT WAS GATED UNTIL JOS-327. The handler was registered only when `UNRELEASED`
-  // (src/main/unreleased.ts) was true, because the surface had not passed the owner's review gate,
+  // IT WAS GATED UNTIL JOS-327. The handler was registered only when the old `UNRELEASED` flag
+  // was true, because the surface had not passed the owner's review gate,
   // and the preload method below still documents the reject that came of it. The owner released the
   // tab, so this is an ordinary channel now: registered in every build, answering in every build.
   characterSheet: 'character:sheet',
