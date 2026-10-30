@@ -58,15 +58,14 @@ files:
   - '!node_modules/tesseract.js/dist/**'
   - '!node_modules/zlibjs/**'
   - '!node_modules/@tesseract.js-data/eng/4.0.0/**'
-  # koffi (JOS-182, the presence watcher's Win32 surface) is the same story again, and the most
-  # lopsided of the three: 18 prebuilt N-API binaries in one tarball, 28.7 MB unpacked, of which
-  # this Windows-x64-only app can load exactly one. Keep in sync with `win.target.arch` too.
-  - '!node_modules/koffi/build/koffi/!(win32_x64)/**'
-  # And koffi's SOURCES, which ship in the same tarball so `cnoke` can build a prebuild for a
-  # platform it has none for. We never build one — `.npmrc` ignores install scripts and the
-  # win32_x64 binary above is the one we load — so the C++, the vendored node-api headers and
-  # the docs are 4 MB of installer that can never be read.
-  - '!node_modules/koffi/{src,vendor,doc,lib}/**'
+  # koffi (JOS-182, the presence watcher's Win32 surface). Since 3.0 its binary is a separate
+  # per-platform optional package, and npm installs only this machine's (@koromix/koffi-win32-x64),
+  # so there are no foreign binaries left to exclude. What remains is koffi's SOURCES, which ship
+  # so `cnoke` can build a binary for a platform it has none for. We never build one (`.npmrc`
+  # ignores install scripts), so the C++ and assembly, the vendored node-api headers and the docs
+  # can never be read. NOT all of src/: its .cjs files are koffi's loader.
+  - '!node_modules/koffi/{vendor,doc,lib}/**'
+  - '!node_modules/koffi/src/**/*.{cc,hh,inc,S,asm,def,txt}'
   # DirectML.dll (18.5 MB) is NOT excludable, and that was MEASURED, not assumed. This app
   # never asks for the DirectML execution provider — Kokoro runs on CPU on purpose, because it
   # is a background alert reader on a machine that is also running EverQuest — so dropping the
@@ -133,11 +132,10 @@ asarUnpack:
   # (readdirSync) to choose a build before requiring it, and an explicit entry keeps the whole
   # directory on disk rather than relying on that one auto-rule. Nothing sits beside the binding.
   - node_modules/native-reg/prebuilds/**
-  # koffi's prebuilt binding (JOS-182), and the same belt to the same braces for the same reason:
-  # its loader does an `fs.existsSync` on the path before it `require`s it, and naming the
-  # directory means the probe and the load see one real file rather than relying on the asar
-  # shim to agree with itself about a path it is rewriting.
-  - node_modules/koffi/build/**
+  # koffi's prebuilt binding (JOS-182), and the same belt to the same braces: since koffi 3 it is
+  # its own package, required by name, and naming the directory keeps the binding a real file
+  # rather than relying on the asar shim to agree with itself about a path it is rewriting.
+  - node_modules/@koromix/koffi-win32-x64/**
 
 # npmRebuild defaults to TRUE, which makes electron-builder shell out to
 # @electron/rebuild -> node-gyp against the whole production tree at package
@@ -149,7 +147,7 @@ asarUnpack:
 # Win32 surface for the presence watcher), and this still stays false. It is the ABI
 # question that decides, not the presence of a .node file: onnxruntime-node ships
 # PREBUILT binaries under bin/napi-v3, native-reg under prebuilds/win32-x64 and koffi
-# under build/koffi/<platform>, i.e. all three target N-API, which is ABI-STABLE
+# in @koromix/koffi-<platform>, i.e. all three target N-API, which is ABI-STABLE
 # ACROSS NODE AND ELECTRON VERSIONS by definition. There is nothing to rebuild — the
 # shipped binary is the binary Electron loads. (Verified end to end: `npm run
 # dist:dir` + launching the packed app + a real synthesis, with ignore-scripts on and
