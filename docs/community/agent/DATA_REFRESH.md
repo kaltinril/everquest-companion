@@ -135,8 +135,10 @@ full scrapers). A 3-week window was ~1,200 pages in ~25 batched requests.
 New wiki content turns the creator's census tests red. Each failing test names its tokens.
 
 - `itemsResearch.json`'s instrument table is pinned both ways against the corpus: a page that stops
-  stating an instrument loses its entry, and the floor drops with it, in the data's work branch
-  (2026-10-21: Unfinished Lute Neck, 47 to 46).
+  stating an instrument loses its entry in the data's work branch (2026-10-21: Unfinished Lute
+  Neck, 47 to 46). Its size floor is 90% of 46 since 2026-10-29 and does not move with it.
+- Corpus counts (spells, classes, categories, posky joins) are floors since 2026-10-29
+  (`tests/corpusFloor.mts`): a delta that adds or drops a page or two no longer turns them red.
 
 - gearIndex family ("slots/classes/sockets/tiers tokens are canonical", "class/slot table covers
   the corpus", "unindexed stat keys are exactly the five", `eraFromTag` token-for-token, layer-3
