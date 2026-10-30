@@ -112,7 +112,7 @@ where one exists.
 - Achievements chip (2026-10-27): the main window works out the areas (`useSlayerMapAreas`, the one
   reading the Maps tab layer also uses) for the log's zone and writes them to `eq.slayer.overlayAreas`
   (`shared/slayerOverlay.ts`; main-window data, so a reset keeps it). Publisher mounted in
-  AppCelebrations only while `mapPins` is open, behind UNRELEASED (`unreleasedSlayerMap.tsx`). The
+  AppCelebrations only while `mapPins` is open (`unreleasedSlayerMap.tsx`). The
   overlay never imports `features/slayer/` (the catalog trap; measured clean 2026-10-27). Its on/off
   is `achievements` in `eq.maps.overlayLayers`. `savePref` fires `eq-slayer-prefs` so a pick on the
   tab reaches the feed at once (`storage` events skip their own window).
@@ -160,9 +160,11 @@ where one exists.
 
 ## Spells, upgrades and Loadout (was spell-upgrades)
 
-- All Spells views sit behind `UNRELEASED`. Graduation order: widen `TELEMETRY_VIEWS` and deploy
-  the ingest Lambda FIRST (a client reporting an unknown view 400s the whole batch), then the
-  `KNOWN_VIEWS` splice. Deploy is the owner's call. `tests/e2e/spells-gate.e2e.mts` guards it.
+- The Spells views are drawn in every build but not yet in `TELEMETRY_VIEWS` (listed in
+  `NOT_YET_REPORTED`, `tests/telemetryContract.test.mts`). Widening order: `TELEMETRY_VIEWS` and the
+  ingest Lambda deploy FIRST (a client reporting an unknown view 400s the whole batch), then drop
+  the view from that list. Deploy is the owner's call. `tests/e2e/spells-area.e2e.mts` checks the
+  area opens.
 - Two copies of the spell load pipeline: `buildLevelUnlocks` (levelUnlocks.ts) runs its own pass
   over spells.json, separate from `loadSpellDb`. A new load pass goes in both.
 - `spells_us.txt` is parsed into a versioned disk cache (`SPELL_RESIST_CACHE_VERSION`,
@@ -188,8 +190,8 @@ where one exists.
   requests). Wiki quest pages quote receipts inconsistently, so home-zone quests with no stated
   receipt are shown separately with a neutral marker.
 - Class filter is inclusive on ambiguity (wiki class tokens are prose).
-- Graduating the Factions tab: delete the UNRELEASED gate + `unreleasedFactions.tsx`, add `factions`
-  to `TELEMETRY_VIEWS` (Lambda first), give `loadFactionsNow` its perf seam.
+- Factions telemetry: add `factions` to `TELEMETRY_VIEWS` (Lambda first), drop it from
+  `NOT_YET_REPORTED`, give `loadFactionsNow` its perf seam.
 - Achievements: the view id stays `slayer`. `achievements:book` is read on demand and never stored. Mob race
   from the wiki `|race` field (`scripts/gen-mob-races.mts`), mob factions likewise
   (`gen-mob-factions.mts`). Open: `Obtain <Item>` lines link nowhere; picks are per machine, not
@@ -258,7 +260,7 @@ where one exists.
   back or cancelled is none (`gaps_quests.rs`). Map links: `lib/mapZoneLink.ts` (context from the
   gate), `shared/gapMapZones.ts`. Stored edits are read through `readEdit` (non-strings dropped, the
   store untouched). Held tiers: `GapHeld.tiers` only when no +0 copy; the chip is `primary` then.
-- The tab is UNRELEASED-gated (`unreleasedGaps.tsx`): dev builds only.
+- The tab is lazily loaded through `unreleasedGaps.tsx` (the name is historical; every build draws it).
 - Review and decisions: `audits/2026-10-19-gaps-review.md`. Laws from it (owner, 2026-10-19):
   instance tiers are one place and one item (`+N` folds to the base everywhere; zones are written
   as the wiki spells them, `shared/gapWikiZone.ts`); a rate is corpses over kills, no rate when

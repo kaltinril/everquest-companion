@@ -14,7 +14,7 @@ disagree, RULES.md wins; fix this file.
 - **`ELECTRON_RUN_AS_NODE` must be unset** for e2e and `npm run dev`. Shells spawned by a VS Code
   extension inherit `ELECTRON_RUN_AS_NODE=1`; Electron then runs as plain Node (`electron.app`
   undefined, "Process failed to launch!", or `Cannot read properties of undefined (reading
-  'isPackaged')` from `unreleased.ts`). Bash: `unset ELECTRON_RUN_AS_NODE`. PowerShell:
+  'isPackaged')`). Bash: `unset ELECTRON_RUN_AS_NODE`. PowerShell:
   `Remove-Item Env:ELECTRON_RUN_AS_NODE -ErrorAction SilentlyContinue`.
 - **Clear dev caches before `npm run dev`:** `rm -rf node_modules/.vite
   "$APPDATA/everquest-companion-dev/Cache" "$APPDATA/everquest-companion-dev/Code Cache"`. A stale
@@ -154,7 +154,8 @@ disagree, RULES.md wins; fix this file.
   feedback controls).
   Measured 2026-10-18 (full run on main_community, then serial, then the same specs on test.26):
   58/68 green; the 10 reds were identical on test.26. By design on the TEST build: `feedback`,
-  `telemetry` (no analytics compiled in), `spells-gate` (UNRELEASED forced open). Fixed that night
+  `telemetry` (no analytics compiled in), `spells-gate` (the old gate forced open; since 2026-10-29
+  the spec is `spells-area`, a presence spec, and is not skipped). Fixed that night
   (stale specs): `default-sound-pack`, `sky-recent-sort`, `plan`. Since 2026-10-18 the
   TEST-build three are skipped by the TEST build's e2e runner with the reason, and `overview`,
   `whats-new` (TEST build) and `voice-alerts` pass. `maps` was red until 2026-10-27: a real
@@ -166,9 +167,9 @@ disagree, RULES.md wins; fix this file.
   (no `wmic` on this machine: `engineTable()` falls back to `tasklist`, and engines from specs
   running alongside count as new). Each worktree builds its own `engined.exe`: the engine embeds the
   data files, so a shared binary cannot serve two trees.
-- **Headless look at an UNRELEASED tab:** temporarily set `UNRELEASED = true as boolean` in
-  `devFlags.ts`, `electron-vite build --outDir=<worktree>/out-e2e`, `git checkout` the flag file,
-  then a throwaway spec with `launchOnFixture(..., { env: { EQ_UNRELEASED: '1' } })`.
+- **Headless look at a tab:** every tab is in every build (the `UNRELEASED` gate was removed
+  2026-10-29), so `electron-vite build --outDir=<worktree>/out-e2e` and a throwaway spec with
+  `launchOnFixture(...)` reach any of them; no flag or env var is needed.
   `--mode development` does not flip `import.meta.env.DEV`. `page.screenshot` can hang on the
   hidden E2E window; `page.context().newCDPSession(page)` + `Page.captureScreenshot` worked once
   but hung on every try on 2026-10-26: read text instead, or bound the call with a timeout.
@@ -183,8 +184,10 @@ disagree, RULES.md wins; fix this file.
 ## Owner rulings that shape work
 
 - **No unreleased tabs** (owner, 2026-10-28: "no reason to hide them ever just always show the
-  tabs"). `UNRELEASED` is pinned true in both halves (`src/main/unreleased.ts`,
-  `src/renderer/src/devFlags.ts`); a new surface ships visible, not behind the gate.
+  tabs"; 2026-10-29: "everyone should always see all tabs"). The `UNRELEASED` gate is removed
+  outright (no flag, no `EQ_UNRELEASED`); a new surface ships visible. A view not yet in
+  `TELEMETRY_VIEWS` goes in `NOT_YET_REPORTED` (`tests/telemetryContract.test.mts`) until the
+  owner sequences the schema widening.
 
 - **The fork has taken over the project** (owner, 2026-09-28). A decision that used to wait on the
   creator (a new tab, a new data file, a departure from AGENTS.md design) is the owner's alone; do
@@ -317,9 +320,8 @@ disagree, RULES.md wins; fix this file.
   `logFixture.mts` `stageFixture` + `appendAt` + `launchOnFixture`) is the way to watch a tab
   without a window on the owner's screen. The window is hidden: `requestAnimationFrame` never
   fires (an `evaluate` awaiting it hangs forever), `page.screenshot` times out, and scroll events
-  land late (wait ~1.5 s, not 300 ms, before reading a re-windowed list). An UNRELEASED tab
-  (Gaps, Factions) needs `env: { EQ_UNRELEASED: '1' }` (the TEST build forces the renderer half
-  open). TRAP (2026-10-26, gone the same day): on a real log the app ran its own eqlwiki mob-lookup
+  land late (wait ~1.5 s, not 300 ms, before reading a re-windowed list). Every tab (Gaps,
+  Factions included) is in every build. TRAP (2026-10-26, gone the same day): on a real log the app ran its own eqlwiki mob-lookup
   searches (7 in one probe). Since the owner's ruling below, the app reads the wiki only on a Copy
   click; still launch a probe with `NODE_USE_ENV_PROXY=1` and `HTTPS_PROXY=http://127.0.0.1:9`, so
   a Copy clicked in a probe sends the wiki nothing either.
