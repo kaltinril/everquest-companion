@@ -283,7 +283,7 @@ function MapSurface({
       {/* THE ONE SEAM, AGAIN: the typed reading reaches the screen through `mapFromLoc` and then
           the same `project` every other mark uses. Nothing here knows which way north is. */}
       {locMarker != null && <MapLocMarker at={mapFromLoc(locMarker)} loc={locMarker} vp={vp} heading={locHeading} />}
-      {/* The picked Slayer counters, shaded where their mobs spawn (UNRELEASED; gated in the file). */}
+      {/* The picked Slayer counters, shaded where their mobs spawn. */}
       <UnreleasedSlayerMap zone={data.zone} vp={vp} />
     </Box>
   )

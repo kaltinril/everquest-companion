@@ -60,26 +60,25 @@ import DevTriageView from './devTriage'
 // keep the tree out of packaged bytes. The owner released the tab, so that file is gone and this is
 // an ordinary static import like the eleven views above it.
 import CharacterView from './features/character/CharacterView'
-// The FACTIONS TAB, behind the review gate (`UNRELEASED`) — a `devTriage`-style strip whose view
-// check lives in the gate file (the SpellDrill arrangement), so packaged builds carry none of it
-// and this switch pays no branch for it. See unreleasedFactions.tsx.
+// The FACTIONS TAB, lazily loaded; its view check lives in its own file (the SpellDrill
+// arrangement), so this switch pays no branch for it. See unreleasedFactions.tsx.
 import UnreleasedFactionsView from './unreleasedFactions'
-// The BAZAAR tab, behind the review gate; its view check lives in the gate file.
+// The BAZAAR tab; its view check lives in its own file.
 import UnreleasedBazaarView from './unreleasedBazaar'
-// The GAPS tab, behind the review gate; its view check lives in the gate file.
+// The GAPS tab; its view check lives in its own file.
 import UnreleasedGapsView from './unreleasedGaps'
 import { SpellDrill } from './features/spells/SpellPage'
-// THE SPELLS AREA (docs/plans/spell-upgrades-and-loadout.md), behind the review gate. One import
-// and one branch for three views - `unreleasedSpells.tsx` holds the `UNRELEASED ? lazy(…) : null`
-// trio and the view test, the `devTriage` shape, so this file gains a line rather than nine.
+// THE SPELLS AREA (docs/plans/spell-upgrades-and-loadout.md). One import and one branch for three
+// views - `unreleasedSpells.tsx` holds the `lazy(…)` trio and the view test, so this file gains a
+// line rather than nine.
 import UnreleasedSpellsView from './unreleasedSpells'
 import { SpellLinkProvider } from './lib/spellLink'
-// Every "on the way to" chip is a link the same way (lib/unlockLink.tsx), while the tab exists.
+// Every "on the way to" chip is a link the same way (lib/unlockLink.tsx).
 import { UnlockLinkProvider, useOpenUnlock } from './lib/unlockLink'
-// The ACHIEVEMENTS and UNLOCKS tabs, behind the review gate; each view check lives in its gate file.
+// The ACHIEVEMENTS and UNLOCKS tabs; each view check lives in its own file.
 import UnreleasedSlayerView from './unreleasedSlayer'
 import UnreleasedUnlocksView from './unreleasedUnlocks'
-import { OWNER_TOOLS, UNRELEASED } from './devFlags'
+import { OWNER_TOOLS } from './devFlags'
 import { useFeedbackDialog, type FeedbackPrefill } from './features/feedback/useFeedback'
 // Usage analytics (docs/plans/usage-analytics.md). The notice is mounted unconditionally and
 // renders nothing once it has been answered; `useViewDwell` reports how long each tab was on
@@ -198,8 +197,7 @@ function PlainView({
           file, not here: this switch is one branch per view and a branch needing both would have
           cost `PlainView` two points of the measured complexity ceiling. */}
       <SpellDrill view={view} viewKey={viewKey} routing={routing} />
-      {/* FACTIONS (UNRELEASED). Its view check and its gate live in unreleasedFactions.tsx for
-          the SpellDrill's reason — and because the gate's own deletion is how the tab graduates. */}
+      {/* FACTIONS. Its view check lives in unreleasedFactions.tsx for the SpellDrill's reason. */}
       <UnreleasedFactionsView view={view} viewKey={viewKey} routing={routing} />
       {/* THE SPELLS AREA. Its own view test lives in the feature file for `SpellDrill`'s reason -
           three branches here would cost `PlainView` three points of the measured complexity
@@ -591,7 +589,7 @@ export default function App(): JSX.Element {
         <NavDrawer view={view} onSelect={selectView} prefs={prefsRouting} onSendFeedback={() => feedback.openFeedback()} />
 
         <MainColumn view={view} onSelect={selectView} onReport={feedback.openFeedback}>
-          <UnlockLinkProvider open={UNRELEASED ? openUnlock : null}>
+          <UnlockLinkProvider open={openUnlock}>
             <ViewContentMemo
               view={view}
               hasCharacters={hasCharacters}

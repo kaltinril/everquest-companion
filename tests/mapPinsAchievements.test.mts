@@ -63,12 +63,12 @@ test('the chip is remembered with the other layer chips, which the Overlay menu 
   assert.ok(!(OVERLAY_LOCAL_KEY_PREFIXES.mapPins ?? []).some((p) => SLAYER_OVERLAY_KEY.startsWith(p)))
 })
 
-test('the chip and the feed are behind the UNRELEASED gate the Maps tab layer is behind', () => {
+test('the feed is lazily loaded and fed only while the Map pins overlay is open', () => {
   const gate = src('unreleasedSlayerMap.tsx')
-  assert.match(gate, /const LazyOverlayPublisher = UNRELEASED \? lazy\(\(\) => import\('\.\/features\/slayer\/SlayerOverlayPublisher'\)\) : null/)
+  assert.match(gate, /const LazyOverlayPublisher = lazy\(\(\) => import\('\.\/features\/slayer\/SlayerOverlayPublisher'\)\)/)
   assert.match(gate, /useOverlayOpen\('mapPins'\)/, 'fed only while the overlay is open')
-  assert.match(src('overlay/MapPinsOverlay.tsx'), /const slayerChip = UNRELEASED && \(slayer\?\.picks \?\? 0\) > 0/)
-  assert.match(src('overlay/MapPinsField.tsx'), /\{UNRELEASED && layers\.achievements && <AreaMarks/)
+  assert.match(src('overlay/MapPinsOverlay.tsx'), /const slayerChip = \(slayer\?\.picks \?\? 0\) > 0/)
+  assert.match(src('overlay/MapPinsField.tsx'), /\{layers\.achievements && <AreaMarks/)
   // The overlay never imports the catalog-reading slayer code (the conCard bundle trap).
   for (const f of ['overlay/MapPinsOverlay.tsx', 'overlay/MapPinsField.tsx', 'overlay/useMapPinsData.ts', 'overlay/mapPinsLayers.tsx']) {
     assert.doesNotMatch(src(f), /features\/slayer\//, f)

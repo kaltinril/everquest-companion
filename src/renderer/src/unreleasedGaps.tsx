@@ -1,35 +1,30 @@
-// unreleasedGaps — the UNRELEASED gate's reach into a component tree, for the Gaps tab.
-//
-// unreleasedSlayer.tsx's arrangement: `UNRELEASED` is anchored on `import.meta.env.DEV`
-// (devFlags.ts), a literal `false` in every `electron-vite build`, so the lazy const below
-// compiles to `null` there, the dynamic `import()` is dead code, and `features/gaps/**` leaves no
-// trace in `out/renderer`. The view check lives here, not in App.tsx, for the SpellDrill precedent
-// that file states.
+// unreleasedGaps — the Gaps tab, lazily loaded. The view check lives here, not in App.tsx, for the
+// SpellDrill precedent that file states. (The file name is from the retired review gate; every
+// build draws the tab.)
 
 import { type ComponentType, type JSX, Suspense, lazy, memo } from 'react'
 import { CircularProgress } from '@mui/material'
-import { UNRELEASED } from './devFlags'
 import { MapZoneContext, type MapZoneOpener } from './lib/mapZoneLink'
 import type { View } from './appViews'
 import { useOverlayOpen } from './lib/useOverlayOpen'
 import { useGapsTabMounted } from './lib/gapsTabMounted'
 
-const LazyGapsView = UNRELEASED ? lazy(() => import('./features/gaps/GapsView')) : null
-const LazyGapsOverlayPublisher = UNRELEASED ? lazy(() => import('./features/gaps/GapsOverlayPublisher')) : null
-const LazyGlobalPaste = UNRELEASED ? lazy(() => import('./features/gaps/GlobalPaste')) : null
+const LazyGapsView = lazy(() => import('./features/gaps/GapsView'))
+const LazyGapsOverlayPublisher = lazy(() => import('./features/gaps/GapsOverlayPublisher'))
+const LazyGlobalPaste = lazy(() => import('./features/gaps/GlobalPaste'))
 
 /** A picture pasted anywhere in the main window, read and sent where it belongs (features/gaps/GlobalPaste.tsx). */
-export const UnreleasedGlobalPaste = memo(function UnreleasedGlobalPaste(): JSX.Element | null {
-  return LazyGlobalPaste === null ? null : (
+export const UnreleasedGlobalPaste = memo(function UnreleasedGlobalPaste(): JSX.Element {
+  return (
     <Suspense fallback={null}>
       <LazyGlobalPaste />
     </Suspense>
   )
 })
 
-/** The Gaps tab: nothing at all in a build without the flag, or on any other view. */
+/** The Gaps tab: nothing at all on any other view. */
 export default function UnreleasedGapsView({ view, viewKey, onOpenMapZone }: { view: View; viewKey: string; onOpenMapZone?: MapZoneOpener }): JSX.Element | null {
-  if (!LazyGapsView || view !== 'gaps') return null
+  if (view !== 'gaps') return null
   // The Maps tab's opener (review C7), for the rows' and zone headings' map links.
   return (
     <MapZoneContext.Provider value={onOpenMapZone}>
@@ -55,8 +50,8 @@ function GapsOverlayFeedGate({ Publisher }: { Publisher: ComponentType }): JSX.E
 /**
  * The Wiki Gaps overlay's feed with the Gaps tab closed (owner, 2026-10-20). Mounted once, in
  * AppCelebrations, so it runs on every tab; memo'd, so that component's own re-renders (every kill,
- * loot and level push) stop here. Nothing at all in a build without the flag.
+ * loot and level push) stop here.
  */
-export const UnreleasedGapsOverlayFeed = memo(function UnreleasedGapsOverlayFeed(): JSX.Element | null {
-  return LazyGapsOverlayPublisher ? <GapsOverlayFeedGate Publisher={LazyGapsOverlayPublisher} /> : null
+export const UnreleasedGapsOverlayFeed = memo(function UnreleasedGapsOverlayFeed(): JSX.Element {
+  return <GapsOverlayFeedGate Publisher={LazyGapsOverlayPublisher} />
 })

@@ -1,4 +1,4 @@
-// achievements/AchievementsView.tsx — THE ACHIEVEMENTS TAB (UNRELEASED, 2026-09-29).
+// achievements/AchievementsView.tsx — THE ACHIEVEMENTS TAB (2026-09-29).
 //
 // WHAT THIS TAB IS FOR. The game's Achievements window says what there is to do and how much of
 // it is done, one group at a time. This tab reads the same thing out of the `/outputfile

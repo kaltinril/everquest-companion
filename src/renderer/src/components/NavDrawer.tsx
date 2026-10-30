@@ -34,16 +34,12 @@ import FeedbackIcon from '@mui/icons-material/Feedback'
 // Dev-only, and its import goes with it: MUI's icon packages declare `sideEffects: false`, so
 // an icon whose only use sits inside a `false &&` branch is tree-shaken out with the branch.
 import RuleFolderIcon from '@mui/icons-material/RuleFolder'
-// UNRELEASED-only today, tree-shaken from builds on the same argument as the icon above: its only
-// use sits inside the Factions row's `UNRELEASED &&` branch below.
 import HandshakeIcon from '@mui/icons-material/Handshake'
-// UNRELEASED-only today, tree-shaken from a build on the icon argument above: its only use sits
-// inside the Spells row's `UNRELEASED &&` branch below.
 import AutoStoriesIcon from '@mui/icons-material/AutoStories'
 import UpdateChip from './UpdateChip'
 import { useBoolPref } from '../features/combat/useCombatPrefs'
 import { FORK_FEEDBACK_OFF } from '../features/feedback/forkFeedback'
-import { OWNER_TOOLS, UNRELEASED } from '../devFlags'
+import { OWNER_TOOLS } from '../devFlags'
 import type { PrefsRouting } from '../appRouting'
 import {
   GEAR_AREA_VIEWS,
@@ -144,10 +140,10 @@ const GROUPS: NavGroup[] = [
     rows: [
       { view: 'combat', icon: <BarChartIcon /> },
       { view: 'loot', icon: <ReceiptLongIcon /> },
-      // BAZAAR (UNRELEASED) sits under Loot: what you got, then what it is worth to other players.
-      ...(UNRELEASED ? [{ view: 'bazaar' as View, icon: <StorefrontIcon /> }] : []),
-      // GAPS (UNRELEASED) sits under Loot: what the log named that the app's data does not know.
-      ...(UNRELEASED ? [{ view: 'gaps' as View, icon: <FindInPageIcon /> }] : []),
+      // BAZAAR sits under Loot: what you got, then what it is worth to other players.
+      { view: 'bazaar', icon: <StorefrontIcon /> },
+      // GAPS sits under Loot: what the log named that the app's data does not know.
+      { view: 'gaps', icon: <FindInPageIcon /> },
       { view: 'buffs', icon: <AutoFixHighIcon /> },
       { view: 'leveling', icon: <TrendingUpIcon /> }
     ]
@@ -170,39 +166,24 @@ const GROUPS: NavGroup[] = [
       },
       { view: 'maps', icon: <MapIcon /> },
       { view: 'bosses', icon: <EmojiEventsIcon /> },
-      // SLAYER (UNRELEASED) sits under Raid Targets: both are lists of things to go and kill. The
-      // row is built inside the conditional, so a build without the flag folds it away, icon and all.
-      ...(UNRELEASED ? [{ view: 'slayer' as View, icon: <MilitaryTechIcon /> }] : []),
-      // UNLOCKS (UNRELEASED) sits under it: the same dump, read for what is still closed.
-      ...(UNRELEASED ? [{ view: 'unlocks' as View, icon: <LockOpenIcon /> }] : []),
+      // SLAYER sits under Raid Targets: both are lists of things to go and kill.
+      { view: 'slayer', icon: <MilitaryTechIcon /> },
+      // UNLOCKS sits under it: the same dump, read for what is still closed.
+      { view: 'unlocks', icon: <LockOpenIcon /> },
       { view: 'posky', icon: <ShieldMoonIcon /> },
       // THE SPELLS AREA is research too: what exists, what a mote buys and what you ought to have
       // up. Its log-side counterpart, Buffs, is what is on you RIGHT NOW and sits under Stats/Data.
-      //
-      // GATED (devFlags.ts UNRELEASED — a compile-time literal in a build, so the row and its icon
-      // fold away with the branch), matching the `KNOWN_VIEWS` splice in appViews.ts. The two are
-      // edited together, always: a row that opens a view the build will bounce is a row that
-      // appears to do nothing. The row is named for the AREA rather than for its landing view —
-      // see `NavRow.label`.
-      ...(UNRELEASED
-        ? [
-            {
-              view: 'spells' as View,
-              icon: <AutoStoriesIcon />,
-              badge: BETA,
-              label: SPELL_AREA_LABEL,
-              area: SPELL_AREA_VIEWS,
-              opens: loadSpellTab
-            }
-          ]
-        : []),
-      // UNRELEASED (the review-gate mechanism the character sheet used from JOS-45 to JOS-327):
-      // the Factions tab draws the `/outputfile faction` dump's standings and has not passed the
-      // owner's review gate. `UNRELEASED` is `import.meta.env.DEV`, a literal `false` in every
-      // `electron-vite build`, so rollup deletes the row, its label and its icon from packaged
-      // bytes — the same strip the triage row gets from `DEV_TOOLS`, and the same fold the Spells
-      // row above rides.
-      ...(UNRELEASED ? [{ view: 'factions' as View, icon: <HandshakeIcon /> }] : [])
+      // The row is named for the AREA rather than for its landing view — see `NavRow.label`.
+      {
+        view: 'spells',
+        icon: <AutoStoriesIcon />,
+        badge: BETA,
+        label: SPELL_AREA_LABEL,
+        area: SPELL_AREA_VIEWS,
+        opens: loadSpellTab
+      },
+      // The Factions tab draws the `/outputfile faction` dump's standings.
+      { view: 'factions', icon: <HandshakeIcon /> }
     ]
   },
 {
@@ -346,14 +327,8 @@ export default function NavDrawer({
         {GROUPS.map((group) => (
           <NavGroupSection key={group.id} group={group} view={view} onSelect={onSelect} />
         ))}
-        {/* UNRELEASED (JOS-45) USED TO HAVE A ROW HERE, and JOS-324 moved it INTO the gear area:
-            the character sheet is now the area's last TAB, gated by the same `UNRELEASED` flag in
-            the same way (appViews.ts drops `character` from `KNOWN_VIEWS` in a build without it,
-            and `GEAR_AREA_VIEWS` is derived from that list, so the tab is absent from the bar and
-            the view is absent from the bundle). The gate itself is untouched and still measured —
-            `tests/e2e/character-sheet.e2e.mts` now asserts the TAB is absent in a production-shaped
-            build, which is a stronger reading than the old row check because the bar it looks at is
-            demonstrably mounted at the time. JOS-327 graduates it by deleting the flag. */}
+        {/* THE CHARACTER SHEET (JOS-45) USED TO HAVE A ROW HERE, and JOS-324 moved it INTO the gear
+            area: it is now the area's last TAB. */}
         {/* OWNER-ONLY: the feedback-triage tab. `OWNER_TOOLS` (JOS-72) is `DEV_TOOLS` AND the
             `EQ_OWNER_TOOLS=1` opt-in, so this row is absent from a fresh checkout's `npm run
             dev` as well as from every build — the tab reads the owner's AWS backlog, and a

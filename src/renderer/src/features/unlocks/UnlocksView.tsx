@@ -1,4 +1,4 @@
-// unlocks/UnlocksView.tsx — THE UNLOCKS TAB (UNRELEASED, 2026-09-29).
+// unlocks/UnlocksView.tsx — THE UNLOCKS TAB (2026-09-29).
 //
 // WHAT THIS TAB IS FOR. EQ Legends opens races, classes and deities one achievement each, and
 // the game's window lists the requirement lines without saying how far along any of them is.

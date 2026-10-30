@@ -7,7 +7,7 @@
 //
 // `ready` is a data-availability flag, not an error. A REJECT resolves to the same "no sheet"
 // state as a null answer, and that branch OUTLIVED THE REASON IT WAS WRITTEN. It existed because
-// the handler behind `character:sheet` was gated (src/main/unreleased.ts) and simply absent from a
+// the handler behind `character:sheet` was gated (the old review gate) and simply absent from a
 // packaged build; JOS-327 released the tab and the handler is registered everywhere now. The catch
 // stays anyway: an invoke can fail for reasons nobody planned, and a transport whose designed
 // answer for "no dump" is already `null` has no business turning any of them into a red box.

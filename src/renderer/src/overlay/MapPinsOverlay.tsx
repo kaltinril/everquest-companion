@@ -21,7 +21,6 @@ import type { CharacterSnap } from '@shared/types'
 import { EMPTY_RESPAWN_SNAP, type RespawnSnap } from '@shared/respawn'
 import { zoneShortName } from '@shared/zones'
 import { slayerOverlayAreasFor } from '@shared/slayerOverlay'
-import { UNRELEASED } from '../devFlags'
 import { OverlayHeader } from './OverlayHeader'
 import { useOverlayChrome } from './useOverlayChrome'
 import { FOOTER_ROW } from './overlayScale'
@@ -144,10 +143,10 @@ function useZoneMarks(zone: string | null, layers: PinLayers) {
   const mobs = useMemo(() => (layers.poi ? zoneMobPins(zone, catalog) : []), [zone, catalog, layers.poi])
   const timers = useMemo(() => zoneTimerPins(zone, respawn.rows, catalog), [zone, respawn.rows, catalog])
   const ext: ZoneExtent | undefined = data?.bounds ?? (zone == null ? undefined : state.extents[zone])
-  // The Achievements areas the main window wrote for this zone (UNRELEASED, as the Maps tab's).
+  // The Achievements areas the main window wrote for this zone (as the Maps tab's).
   const slayer = useSlayerOverlay()
   const areas = useMemo(() => slayerOverlayAreasFor(slayer, zone), [slayer, zone])
-  const slayerChip = UNRELEASED && (slayer?.picks ?? 0) > 0
+  const slayerChip = (slayer?.picks ?? 0) > 0
   return { data, tracked, mobs, timers, ext, areas, slayerChip }
 }
 
@@ -332,7 +331,7 @@ export default function MapPinsOverlay(): JSX.Element {
   const note = emptyNote(zone, ext)
   const labels = useMemo(() => labelRows(data?.points ?? []).map((r) => r.point), [data])
   const zoneInput = useMemo(
-    () => (ext == null || fit == null ? null : { ext, fit, w, h, layers, labels, mobs, timers, tracked, areas: UNRELEASED ? areas : [], nowMs }),
+    () => (ext == null || fit == null ? null : { ext, fit, w, h, layers, labels, mobs, timers, tracked, areas, nowMs }),
     [ext, fit, w, h, layers, labels, mobs, timers, tracked, areas, nowMs]
   )
   const [follow, toggleFollow] = usePinsFollow()

@@ -4,8 +4,7 @@
 // The tab says so here; the publisher's gate reads it. A count rather than a flag, so StrictMode's
 // mount, unmount, mount ends where it started.
 //
-// In lib/ rather than features/gaps/ because the gate reads it in every build, and nothing under
-// features/gaps/ may be imported outside the UNRELEASED strip.
+// In lib/ rather than features/gaps/ because the gate reads it outside the lazily loaded Gaps tree.
 
 import { useEffect, useSyncExternalStore } from 'react'
 

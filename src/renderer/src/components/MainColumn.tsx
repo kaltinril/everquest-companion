@@ -34,7 +34,6 @@ import { Box } from '@mui/material'
 import AreaTabs from './AreaTabs'
 import SpellsTypography from '../features/spells/SpellsTypography'
 import { EngineLaunchBanner } from './EngineLaunchBanner'
-import { UNRELEASED } from '../devFlags'
 import {
   GEAR_AREA_VIEWS,
   SPELL_AREA_VIEWS,
@@ -70,13 +69,7 @@ export default function MainColumn({
       {isGearAreaView(view) && (
         <AreaTabs views={GEAR_AREA_VIEWS} view={view} onSelect={onSelect} testId="gear-area-tabs" />
       )}
-      {/* `UNRELEASED &&` FIRST, and the order is the strip (devFlags.ts's own rule for OWNER_TOOLS,
-          applied here). It folds to a literal `false` in every `electron-vite build`, so rollup
-          deletes this branch and the `spell-area-tabs` string with it - proven by grep on the build,
-          not assumed. `isSpellAreaView` alone would be correct at RUNTIME, since the area's roster
-          is empty in a packaged build, but it is a function call and cannot fold, so the testid
-          would ship. */}
-      {UNRELEASED && isSpellAreaView(view) && (
+      {isSpellAreaView(view) && (
         <AreaTabs views={SPELL_AREA_VIEWS} view={view} onSelect={onSelect} testId="spell-area-tabs" />
       )}
       <Box data-testid="app-content" sx={{ flexGrow: 1, overflow: 'auto', p: 2 }}>
@@ -89,7 +82,7 @@ export default function MainColumn({
         {/* THE SPELLS AREA READS A SIZE UP (owner, 2026-09-10). Wrapped HERE rather than inside each
             of its views so the three tabs and anything added beside them are covered by one line,
             and so nothing outside the area is touched - see `SpellsTypography`. */}
-        {UNRELEASED && isSpellAreaView(view) ? (
+        {isSpellAreaView(view) ? (
           <SpellsTypography>
             {import.meta.env.DEV ? <RenderProfiler id={view}>{children}</RenderProfiler> : children}
           </SpellsTypography>

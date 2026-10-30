@@ -1,4 +1,4 @@
-// factions/FactionsView.tsx — THE FACTION STANDINGS TAB (UNRELEASED; the third graduated
+// factions/FactionsView.tsx — THE FACTION STANDINGS TAB (the third graduated
 // `/outputfile` kind, 2026-09-05).
 //
 // WHAT THIS TAB IS. The `/outputfile faction` dump, drawn LIVE: one row per faction the server

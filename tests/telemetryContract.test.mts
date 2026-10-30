@@ -251,14 +251,6 @@ test('the overlay-kind list is the SAME set the app uses (the duplication cannot
 })
 
 /**
- * The views `appViews.ts` gates behind `UNRELEASED` — read out of its `KNOWN_VIEWS` spread.
- *
- * `null` means THE SPREAD IS NOT THERE, which since JOS-327 is the ordinary state of the file: the
- * character sheet was the flag's only tenant and its release deleted the splice. That is reported
- * separately from "the spread is there and holds nothing", because the two look identical to a
- * regex and only one of them would also be what a BROKEN regex looks like — see the caller.
- */
-/**
  * A quoted view id, as `appViews.ts` spells one.
  *
  * CAMEL CASE IS PART OF THE VOCABULARY (2026-09-10). Every reader below used `[a-z]+`, which was
@@ -271,18 +263,17 @@ test('the overlay-kind list is the SAME set the app uses (the duplication cannot
  */
 const VIEW_ID = /'([a-zA-Z]+)'/g
 
-function unreleasedViews(src: string): string[] | null {
-  // EVERY SPLICE, NOT THE FIRST (2026-09-10). `exec` found one, which was right while exactly one
-  // surface was ever gated at a time and silently wrong the moment two were: the Factions tab's
-  // splice came first in the file and the Spells area's three views were simply never exempted.
-  const spreads = [...src.matchAll(/UNRELEASED \? \(\[([^\]]*)\]/g)].map((m) => m[1])
-  if (spreads.length === 0) return null
-  return spreads.flatMap((spread) => [...spread.matchAll(VIEW_ID)].map((m) => m[1]))
-}
+/**
+ * The tabs the old review gate held back, which the owner un-gated (2026-10-28, gate removed
+ * 2026-10-29) before their schema widening: every build draws them, and they report no dwell until
+ * the owner sequences the server deploy that widens `TELEMETRY_VIEWS`. Hand-kept, and the test
+ * below fails if one of them is ALSO in the schema, so the widening has to shorten this list.
+ */
+const NOT_YET_REPORTED = ['slayer', 'unlocks', 'bazaar', 'gaps', 'factions', 'spells', 'spellUpgrades', 'spellLoadout']
 
 /**
  * The view ids `KNOWN_VIEWS` lists — the ones this build can RESTORE, which is the same thing as
- * the ones that are tabs. Read out of the source for `unreleasedViews`' reason.
+ * the ones that are tabs. Read out of the source, because appViews.ts is renderer-only.
  *
  * `null` means the declaration stopped parsing, which the caller treats as a failure rather than
  * as an empty answer: a broken regex here would silently exempt every view in the app.
@@ -290,7 +281,7 @@ function unreleasedViews(src: string): string[] | null {
 function knownViews(src: string): string[] | null {
   const block = /const KNOWN_VIEWS: View\[\] = \[([\s\S]*?)\n\]/.exec(src)?.[1]
   if (block === undefined) return null
-  return [...new Set([...block.matchAll(/'([a-z]+)'/g)].map((m) => m[1]))]
+  return [...new Set([...block.matchAll(VIEW_ID)].map((m) => m[1]))]
 }
 
 test('the view list is the SAME set the app can render', () => {
@@ -302,36 +293,18 @@ test('the view list is the SAME set the app can render', () => {
   const declared = [...new Set([...union.matchAll(VIEW_ID)].map((m) => m[1]))]
   assert.ok(declared.length > 5, 'failed to read the View union out of appViews.ts')
 
-  // ...MINUS the UNRELEASED views, which report NOTHING on purpose (JOS-45). A new enum value is
-  // not additive-safe: the app auto-updates and the ingest Lambda is deployed by hand, so a
-  // client that reported a view the deployed validator has not learned would 400 the whole batch
-  // and drop every counter with it. A surface no user can reach is not worth that, so it stays
-  // out of the schema until it graduates. The tripwire is UNWEAKENED — this list is read from
-  // the source, not hand-maintained here, so an ordinary new view still fails until the schema
-  // (and therefore TELEMETRY.md) learns about it.
-  //
-  // THERE ARE NONE TODAY (JOS-327 released the flag's only tenant), and the absence is CHECKED
-  // rather than assumed: a missing spread and a spread this regex stopped understanding look the
-  // same to a `null`, and only one of those is a passing state. The tell is the IMPORT — a splice
-  // has to READ the flag, and the only way to read it is to import it from `./devFlags`, so a file
-  // that does not is a file with no gate whatever its comments say about the one it used to have.
-  // With no gated views the assertion below becomes `declared === TELEMETRY_VIEWS`, which is
-  // strictly stronger than what it was: every view the app can render must be in the schema.
-  const gated = unreleasedViews(src)
-  if (gated === null) {
-    assert.ok(
-      !/import\s*\{[^}]*\bUNRELEASED\b[^}]*\}\s*from\s*'\.\/devFlags'/.test(src),
-      'appViews.ts imports UNRELEASED but its gated-view spread did not parse'
-    )
-  } else {
-    assert.ok(gated.length > 0, 'the UNRELEASED spread is there and empty — delete it or fill it')
-  }
-  const unreleased = gated ?? []
+  // ...MINUS the views that report NOTHING until their schema widening (`NOT_YET_REPORTED`). A new
+  // enum value is not additive-safe: the app auto-updates and the ingest Lambda is deployed by
+  // hand, so a client that reported a view the deployed validator has not learned would 400 the
+  // whole batch and drop every counter with it. Each must still be a view the app declares, so a
+  // rename cannot leave a stale exemption behind; an ordinary new view still fails until the
+  // schema (and therefore TELEMETRY.md) learns about it.
+  for (const view of NOT_YET_REPORTED) assert.ok(declared.includes(view), `'${view}' is not a View any more`)
 
   // ...AND MINUS THE DRILLS (JOS-508). A second exempt category, and it is a DIFFERENT claim from
-  // the one above: an UNRELEASED view is one no user can reach, while a DRILL is one every user
-  // can reach and no user can arrive at cold. `KNOWN_VIEWS` is exactly that distinction already —
-  // it is the list `loadView()` will restore, so a member of the union that is absent from it has
+  // the one above: a NOT_YET_REPORTED view is a tab waiting on a deploy, while a DRILL is one every
+  // user can reach and no user can arrive at cold. `KNOWN_VIEWS` is exactly that distinction
+  // already — it is the list `loadView()` will restore, so a member of the union that is absent from it has
   // no nav row, no persisted arrival and no existence except as the far end of a link.
   //
   // WHY THEY ARE EXEMPT IS THE DEPLOY ARGUMENT ABOVE, UNCHANGED: the enum is validated by the
@@ -349,12 +322,12 @@ test('the view list is the SAME set the app can render', () => {
   // has already given up being a destination.
   const known = knownViews(src)
   assert.ok(known !== null && known.length > 5, 'failed to read KNOWN_VIEWS out of appViews.ts')
-  const drills = declared.filter((v) => !known.includes(v) && !unreleased.includes(v))
-  const reportable = declared.filter((v) => !unreleased.includes(v) && !drills.includes(v))
+  const drills = declared.filter((v) => !known.includes(v) && !NOT_YET_REPORTED.includes(v))
+  const reportable = declared.filter((v) => !NOT_YET_REPORTED.includes(v) && !drills.includes(v))
   assert.deepEqual(reportable.sort(), [...TELEMETRY_VIEWS].sort())
 
-  // The mirror of the UNRELEASED rule below: a drill must not ALSO be in the schema. If one is
-  // ever promoted, it becomes a tab (into KNOWN_VIEWS) in the same edit that puts it in the enum.
+  // The mirror of the NOT_YET_REPORTED rule below: a drill must not ALSO be in the schema. If one
+  // is ever promoted, it becomes a tab (into KNOWN_VIEWS) in the same edit that puts it in the enum.
   for (const view of drills) {
     assert.ok(
       !(TELEMETRY_VIEWS as readonly string[]).includes(view),
@@ -362,13 +335,13 @@ test('the view list is the SAME set the app can render', () => {
     )
   }
 
-  // And the other half of the same rule: an unreleased view must NOT already be in the schema.
-  // Graduation is both edits at once — out of this spread, into TELEMETRY_VIEWS — and doing only
+  // And the other half of the same rule: a NOT_YET_REPORTED view must NOT already be in the schema.
+  // The widening is both edits at once — out of that list, into TELEMETRY_VIEWS — and doing only
   // one of them fails here.
-  for (const view of unreleased) {
+  for (const view of NOT_YET_REPORTED) {
     assert.ok(
       !(TELEMETRY_VIEWS as readonly string[]).includes(view),
-      `'${view}' is gated behind UNRELEASED but is already in TELEMETRY_VIEWS`
+      `'${view}' is listed in NOT_YET_REPORTED but is already in TELEMETRY_VIEWS`
     )
   }
 })

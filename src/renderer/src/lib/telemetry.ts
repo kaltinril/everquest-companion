@@ -52,9 +52,8 @@ export type ViewDwellId = Extract<TelemetryEvent, { t: 'viewDwell' }>['view']
  * classes as a 400 and DROPS. So a client that reported `view: 'character'` before the deploy
  * landed would throw away every counter it was carrying, on every flush, until it did.
  *
- * That is a real cost for a view no user can reach: an UNRELEASED surface (devFlags.ts) is not
- * a product yet, and time spent on it belongs in no funnel. So it reports nothing until it
- * graduates — at which point it joins `TELEMETRY_VIEWS`, the Lambda is deployed, and this
+ * So a view the schema does not carry yet (the tabs the old review gate held back) reports
+ * nothing until it joins `TELEMETRY_VIEWS` and the Lambda is deployed, at which point this
  * function starts answering for it with no other change.
  *
  * A view id that is simply MISSPELLED lands here too and is silently not reported, which is the

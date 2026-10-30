@@ -2,7 +2,7 @@
 // persisted "which tab was I on" key all agree on. Lives outside App.tsx so the nav drawer
 // can import it without importing the app itself.
 
-import { OWNER_TOOLS, UNRELEASED } from './devFlags'
+import { OWNER_TOOLS } from './devFlags'
 
 export type View =
   | 'overview'
@@ -13,24 +13,21 @@ export type View =
   // ACHIEVEMENTS: everything the newest `/outputfile achievements` dump lists, grouped as the
   // game groups it, and for the kill counters where to go. The id is the one the tab was given
   // as the Slayer tab (2026-09-28), a day before it took in the other families; an id is not a
-  // label (`bosses` is Raid Targets). UNRELEASED like every new tab: in `KNOWN_VIEWS` only
-  // behind the flag's splice, its nav row gated the same way, and absent from `TELEMETRY_VIEWS`.
+  // label (`bosses` is Raid Targets). Not yet in `TELEMETRY_VIEWS` (a server deploy first).
   | 'slayer'
   // UNLOCKS (2026-09-29): the three unlock families of the same dump (races, classes, deities)
-  // as what each still needs, joined to the factions dump and the Sky quests. UNRELEASED on the
-  // same three terms as the tab above.
+  // as what each still needs, joined to the factions dump and the Sky quests. Not yet in
+  // `TELEMETRY_VIEWS`, as the tab above.
   | 'unlocks'
   | 'posky'
   | 'alerts'
   | 'leveling'
   | 'loot'
-  // BAZAAR (2026-10-06): what trade chat asked and offered per item, per day. UNRELEASED like
-  // every new tab: in `KNOWN_VIEWS` only behind the flag's splice, its nav row gated the same
-  // way, and absent from `TELEMETRY_VIEWS`.
+  // BAZAAR (2026-10-06): what trade chat asked and offered per item, per day. Not yet in
+  // `TELEMETRY_VIEWS`.
   | 'bazaar'
-  // GAPS (2026-10-11): names the log mentions that the wiki data has no record of. UNRELEASED
-  // like every new tab: in `KNOWN_VIEWS` only behind the flag's splice, its nav row gated the
-  // same way, and absent from `TELEMETRY_VIEWS`.
+  // GAPS (2026-10-11): names the log mentions that the wiki data has no record of. Not yet in
+  // `TELEMETRY_VIEWS`.
   | 'gaps'
   | 'planner'
   // The GEAR PLANNER's search surface (JOS-284) — the candidate index over every equippable item.
@@ -52,13 +49,10 @@ export type View =
   | 'buffs'
   | 'timers'
   // FACTION STANDINGS (the third graduated `/outputfile` kind, 2026-09-05) — the tab that draws
-  // `ProgressState.factionStandings`. UNRELEASED (the review-gate mechanism, devFlags.ts): it is
-  // in `KNOWN_VIEWS` only behind the flag's splice below, its nav row is gated the same way in
-  // NavDrawer.tsx, and it is deliberately ABSENT from `TELEMETRY_VIEWS` — that enum is validated
-  // by the ingest Lambda, so widening it is a server deploy before it is a client change
-  // (shared/telemetry.ts), and a gated view reports no dwell by construction (`dwellView` fails
-  // closed). Graduation is the character sheet's exact path: delete the gate, widen the enum,
-  // owner-sequenced.
+  // `ProgressState.factionStandings`. Not yet in `TELEMETRY_VIEWS` — that enum is validated by the
+  // ingest Lambda, so widening it is a server deploy before it is a client change
+  // (shared/telemetry.ts), and until then the view reports no dwell (`dwellView` fails closed).
+  // Widening it is owner-sequenced.
   | 'factions'
   | 'preferences'
   // OWNER-ONLY view (src/renderer/src/features/triage/**). It stays in the union
@@ -70,9 +64,8 @@ export type View =
   | 'triage'
   // The CHARACTER SHEET (src/renderer/src/features/character/**) — the gear area's LAST TAB: what
   // you are wearing right now, read out of the newest `/outputfile inventory` dump, plus the
-  // searchable ledger of everything else that dump lists. It was UNRELEASED from JOS-45 (a
-  // compile-time strip behind `UNRELEASED`, absent from every packaged build) until the owner
-  // released it in JOS-327; it is an ordinary member of both lists below now.
+  // searchable ledger of everything else that dump lists. It was behind the old review gate from
+  // JOS-45 until the owner released it in JOS-327; it is an ordinary member of both lists below now.
   | 'character'
   // THE SPELL DRILLDOWN (JOS-508) — the first member of this union that is NOT a tab.
   //
@@ -106,13 +99,10 @@ export type View =
   // clicking a spell name and left by Back; a tab that opened it would have to invent a spell to
   // open it on.
   //
-  // ALL THREE ARE UNRELEASED (devFlags.ts) — the review gate, and the exact path the character
-  // sheet took to release (JOS-45 -> JOS-327). They are spliced into `KNOWN_VIEWS` behind the flag,
-  // their nav row is gated the same way in NavDrawer.tsx, and they are ABSENT from
-  // `TELEMETRY_VIEWS` (shared/telemetry.ts): that enum is validated by the ingest Lambda, so
-  // widening it is a server deploy before it is a client change, and `lib/telemetry.ts dwellView`
-  // already fails closed for a view the schema does not carry. Graduation is one word moved here
-  // plus a server deploy, owner-sequenced, and the plan doc's wave 7 is where that is written down.
+  // ALL THREE ARE ABSENT FROM `TELEMETRY_VIEWS` (shared/telemetry.ts): that enum is validated by
+  // the ingest Lambda, so widening it is a server deploy before it is a client change, and
+  // `lib/telemetry.ts dwellView` fails closed for a view the schema does not carry. Widening it is
+  // owner-sequenced.
   | 'spells'
   | 'spellUpgrades'
   | 'spellLoadout'
@@ -189,41 +179,27 @@ const KNOWN_VIEWS: View[] = [
   'mobs',
   'maps',
   'bosses',
-  // The review-gate splice: a dev server draws the Achievements tab, a packaged build bounces a
-  // persisted 'slayer' to the default view instead of routing to a tab it will not draw.
-  ...(UNRELEASED ? (['slayer', 'unlocks'] as const) : []),
+  'slayer',
+  'unlocks',
   'posky',
   'alerts',
   'leveling',
   'loot',
-  // The review-gate splice: a dev server draws the Bazaar and Gaps tabs, a packaged build bounces a
-  // persisted 'bazaar' to the default view instead of routing to a tab it will not draw.
-  ...(UNRELEASED ? (['bazaar', 'gaps'] as const) : []),
+  'bazaar',
+  'gaps',
   'planner',
   'gear',
   'plan',
   'wishlist',
   'buffs',
   'timers',
-  // The review-gate splice (devFlags.ts UNRELEASED — a compile-time literal in a build, so the
-  // string folds away with the branch): a dev server draws the Factions tab, a packaged build
-  // bounces a persisted 'factions' to the default view instead of routing to a tab it will not
-  // draw. The character sheet lived in this exact splice from JOS-45 until its release in
-  // JOS-327; the telemetry contract test reads the splice and exempts its tenants from
-  // `TELEMETRY_VIEWS` (tests/telemetryContract.test.mts).
-  ...(UNRELEASED ? (['factions'] as const) : []),
+  'factions',
   'preferences',
-  // JOS-327: `character` used to be spliced in behind `UNRELEASED` right here, beside the
-  // owner-tools splice below. It is a plain member now — every build draws it.
   'character',
-  // THE SPELLS AREA, in the review-gate splice the character sheet occupied until JOS-327. It is
-  // compile-time in a BUILD (`UNRELEASED` folds to `false`, taking the three literals with it) and
-  // live on a dev server — so a packaged build bounces a persisted 'spells' to the default view
-  // instead of routing to a tab it will not draw, and `SPELL_AREA_VIEWS` below derives its roster
-  // from THIS list rather than re-spelling the gate, so the bar can never offer a tab that mounts
-  // nothing. The contract test reads the splice and exempts its tenants from `TELEMETRY_VIEWS`
-  // (tests/telemetryContract.test.mts).
-  ...(UNRELEASED ? (['spells', 'spellUpgrades', 'spellLoadout'] as const) : []),
+  // THE SPELLS AREA. `SPELL_AREA_VIEWS` below derives its roster from THIS list.
+  'spells',
+  'spellUpgrades',
+  'spellLoadout',
   // Compile-time in a BUILD (`false ? [...] : []` folds away, taking the literal with it) and a
   // runtime read of the opt-in on a dev server — so a contributor's checkout, which has no
   // `EQ_OWNER_TOOLS`, bounces a persisted 'triage' to the default view instead of routing to a
@@ -259,8 +235,7 @@ export function loadView(): View {
 // is MANUAL navigation and clears the parked trail, which is what a nav-row click always did.
 //
 // THE ORDER IS THE TAB BAR'S ORDER, and Character is LAST on purpose: it is the only member that
-// is not a shopping question. (It was also the one the review gate could still take away — JOS-327
-// released it, and the order is unchanged because the first reason was always the real one.)
+// is not a shopping question.
 
 /** Where the area remembers which tab you were last on. Renderer-only, like `VIEW_KEY`. */
 export const GEAR_TAB_KEY = 'eq.gear.tab'
@@ -343,12 +318,8 @@ export const DEFAULT_SPELL_TAB: View = 'spells'
 /**
  * The faces, in tab order - FILTERED BY WHAT THIS BUILD CAN RENDER.
  *
- * Derived from `KNOWN_VIEWS` rather than re-spelling the `UNRELEASED` gate, which is what keeps the
- * two lists from disagreeing: a tab appears exactly when the build can draw the view behind it.
- * While the gate is up this is the EMPTY ARRAY in a packaged build, and every function below
- * answers correctly for that - `isSpellAreaView` is false for everything, so no bar is drawn and no
- * row reads selected. Graduating the area is one word moved in `KNOWN_VIEWS` and no edit down here,
- * which is exactly how the Character tab graduated in JOS-327.
+ * Derived from `KNOWN_VIEWS`, which is what keeps the two lists from disagreeing: a tab appears
+ * exactly when the build can draw the view behind it.
  */
 export const SPELL_AREA_VIEWS: readonly View[] = (
   ['spells', 'spellUpgrades', 'spellLoadout'] as const
@@ -362,10 +333,8 @@ export function isSpellAreaView(view: View): boolean {
 /**
  * Which tab the Spells nav row opens: last-used, defaulting to Spellbook.
  *
- * Validated against `SPELL_AREA_VIEWS`, so a value written by a dev server (where the gate is down
- * and all three exist) cannot strand a packaged user on a tab their build does not draw. With the
- * gate up that array is empty and this answers `DEFAULT_SPELL_TAB` - a view `loadView` will bounce,
- * which is the correct end state for a row that is not drawn either.
+ * Validated against `SPELL_AREA_VIEWS`, so a stale or hand-edited value cannot strand the user on
+ * a tab the build does not draw.
  */
 export function loadSpellTab(): View {
   const v = localStorage.getItem(SPELL_TAB_KEY)

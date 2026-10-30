@@ -10,9 +10,9 @@
 // a dev build, STRIPPED from every packaged build, pending the owner's review — and it was stated
 // that it would graduate by DELETING its gate rather than by flipping a setting. That is exactly
 // what happened on 2026-08-13: `unreleasedCharacter.tsx` deleted, the `KNOWN_VIEWS` splice made
-// unconditional, the main-side handler registered like any other. The flag machinery survives with
-// no tenant (src/renderer/src/devFlags.ts, src/main/unreleased.ts) because the arrangement is worth
-// more than this one use of it. Nothing about the gate is left in this file but its history.
+// unconditional, the main-side handler registered like any other. The flag itself was removed on
+// 2026-10-29 (owner: "everyone should always see all tabs"). Nothing about the gate is left in this
+// file but its history.
 //
 // WHAT THIS TAB DOES NOT SHOW, AND WHY THERE IS NO PANEL APOLOGISING FOR IT: your real AC, HP,
 // mana, resists and AA. The JOS-45 spike read the shipped client's own string table — no

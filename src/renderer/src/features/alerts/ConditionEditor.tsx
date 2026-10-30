@@ -9,7 +9,6 @@ import type { JSX } from 'react'
 import { Box, MenuItem, Select, Stack, TextField, Typography } from '@mui/material'
 import type { AlertTriggerPrimitive, AppSignal, LogEventKind } from '@shared/types'
 import { ALL_LOG_EVENT_KINDS } from '@shared/logEventKinds'
-import { UNRELEASED } from '../../devFlags'
 import {
   type ConditionDraft,
   conditionFieldKeyErr,
@@ -23,8 +22,7 @@ import {
 // set of events a trigger can match (Task #47 — this absorbs the previously hand-maintained,
 // already-stale list which was missing buff/cast/cc kinds entirely).
 const EVENT_KINDS: readonly LogEventKind[] = ALL_LOG_EVENT_KINDS
-// The Bazaar tab fires its signal only where the tab exists (unreleasedBazaar.tsx).
-const APP_SIGNALS: AppSignal[] = UNRELEASED ? ['bossDefeat', 'questComplete', 'bazaarWatch'] : ['bossDefeat', 'questComplete']
+const APP_SIGNALS: AppSignal[] = ['bossDefeat', 'questComplete', 'bazaarWatch']
 
 const APP_SIGNAL_LABEL: Record<AppSignal, string> = {
   bossDefeat: 'Raid target defeated',

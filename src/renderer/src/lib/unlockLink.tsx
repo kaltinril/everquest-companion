@@ -4,9 +4,8 @@
 // screen is on the way to a race, a class or a deity, and to open the Unlocks tab on that unlock.
 // The opener lives in App (it is a view switch), and those three surfaces sit several components
 // deep in files that take no router; a context makes the link a property of the APP rather than
-// a prop drill through each of them. When the app publishes no opener (a build without the
-// UNRELEASED tab, the overlay window), `useUnlockLink()` answers null and the chip stays inert
-// text - a designed state, not an oversight.
+// a prop drill through each of them. When the app publishes no opener (the overlay window),
+// `useUnlockLink()` answers null and the chip stays inert text - a designed state, not an oversight.
 //
 // THE FOCUS RIDES BESIDE THE SWITCH, not through the router: `appRouting.ts` sits at its measured
 // ceilings, and a view that reads one pending ref when it mounts needs nothing more than a

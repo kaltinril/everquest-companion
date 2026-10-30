@@ -10,7 +10,6 @@ import { Fragment, useMemo, useState, type CSSProperties, type JSX } from 'react
 import type { MapData, MapPoint } from '@shared/maps'
 import type { SlayerOverlayArea } from '@shared/slayerOverlay'
 import { mobKey } from '@shared/mobKey'
-import { UNRELEASED } from '../devFlags'
 import { AreaCircle } from '../features/maps/AreaCircle'
 import { MapCanvas } from '../features/maps/MapCanvas'
 import { DEFAULT_LAYERS, viewRect } from '../features/maps/mapGeometry'
@@ -285,7 +284,7 @@ export function MapPinsField(props: MapPinsFieldProps): JSX.Element {
   return (
     <>
       {layers.lines && data != null && <Lines data={data} ext={ext} fit={fit} w={w} h={h} />}
-      {UNRELEASED && layers.achievements && <AreaMarks {...props} />}
+      {layers.achievements && <AreaMarks {...props} />}
       {layers.poi && <PoiMarks {...props} />}
       {layers.timers && (
         <>
