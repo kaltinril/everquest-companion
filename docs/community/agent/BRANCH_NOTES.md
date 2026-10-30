@@ -673,3 +673,20 @@ where one exists.
   kind touches").
 - e2e: `tests/e2e/sky-quest-overlay.e2e.mts` (window opens, a searched quest starred by the Quests
   tab checkbox reaches the overlay, the second click unstars). Open: the Ready tab checkbox has no e2e.
+
+## Overlay polish and friends online (competitor-quick-wins)
+
+- Recover hotkey: `main/overlayRecover.ts` is the ONE `globalShortcut` in the app (owner's 2026-10-21
+  "avoid C" stands for the capture; `tests/overlayHotkey.test.mts` pins the sole user, the capture
+  sweep in `shotCapture.test.mts` skips that file). Off until set; store key `overlayRecoverHotkey`.
+  It re-fits the STORED rectangle (`reconcileOverlayDisplays`): an overlay on a monitor Windows
+  still lists (switched off, not unplugged) is on a display and is not moved; the per-row reset is.
+- Overlay font: `eq.overlayFont` in shared localStorage (main-window data, so a reset keeps it).
+  Panels use `OVERLAY_FONT` (a CSS var with the old Inter stack as fallback); a new overlay panel
+  must too (`tests/overlayFont.test.mts` fails on a fixed `Inter, "Segoe UI"` stack under
+  `overlay/`). No pick = no var and no body font, so the con card keeps its measured default face.
+- Friends online: `/who` lines reach main only as LIVE fires of an app-owned raw alert
+  (`whoWatch.ts` via `ownFires.ts`, which now takes several owners by name); a replayed log
+  never fills it. Each taken fire logs one `data-server fire ... taken by the app` line, so a
+  `/who all` in a city writes hundreds of dev.log lines. Last listing and the list live in
+  `eq.who.last` / `eq.friends` (main window localStorage).
