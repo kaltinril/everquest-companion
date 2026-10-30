@@ -226,8 +226,9 @@ test('THE OVERTURN: storeFile.ts is not on a live path, and a settings write nev
   // (b) A routine `store.set(...)` is electron-store's write, and conf has gone through the
   //     `atomically` package since v10. That writer is `atomically.writeFileSync` inside
   //     node_modules — not something this repo moves off the thread by editing its own source.
-  const conf = readFileSync(require.resolve('conf/dist/source/index.js'), 'utf8')
-  assert.match(conf, /atomically\.writeFileSync\(/, 'conf still writes the settings file synchronously')
+  //     conf 15 exports only its root, and imports that writer as `atomicWriteFileSync`.
+  const conf = readFileSync(require.resolve('conf'), 'utf8')
+  assert.match(conf, /(atomically\.writeFileSync|atomicWriteFileSync)\(/, 'conf still writes the settings file synchronously')
   assert.equal(/\bwriteFileSync\s*\(/.test(read('src/main/storeFile.ts')), false, 'and storeFile is not that writer')
 
   // (c) …so the sync calls in storeFile.ts stay, and the file says why in its own header. This
