@@ -60,5 +60,10 @@ branches and need a purpose-level comparison before anything else.
 | [#46](https://github.com/jmoyers/everquest-companion/pull/46) | AI assistant: ask about this character over the game | DaveVoyles | new network surface; RULES.md rule 15 |
 | [#42](https://github.com/jmoyers/everquest-companion/pull/42) | feat(chat): capture and save player chat | Jibblits | log parser, storage |
 
+2026-10-29: the fork's own dependency branches (`requirements/deps-refresh.md`) take vite 8 (#18),
+@eslint/js 10 (#19) and eslint-plugin-react-hooks 7 (#21) and drop `@mui/x-data-grid` (#20), so
+those four need no re-evaluation; #90's two held bumps are typescript-eslint (now 8.72) and
+onnxruntime-node (still held, BRANCH_NOTES.md).
+
 Every dependabot PR open on 2026-09-15 is in Adopted or Deferred above. A `community/` branch
 exists only for adopted PRs; a deferred one is re-tried from its `upstream/pr/N` ref.
