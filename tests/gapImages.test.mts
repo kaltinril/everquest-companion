@@ -123,3 +123,19 @@ test('a looted item matches the page drop that differs only by a leading article
   ]
   assert.deepEqual(dropGaps(loot as never, cat, {}).map((r) => r.name), ['Bull Alligator Tooth (a bull alligator)'])
 })
+
+test("an image row keeps every zone it was met in, the newest first, so Zone I'm in finds it in each (owner, 2026-11-01: a lizardman warrior)", async () => {
+  const { gapInZone } = await import('../src/shared/gaps')
+  const cat = [{ page: 'A lizard man warrior', name: 'a lizard man warrior', otherNames: ['A lizardman warrior'], noImage: true as const }]
+  const looted = new Date(2026, 9, 19, 18, 13, 39).getTime()
+  const conned = new Date(2026, 10, 1, 20, 27, 54).getTime()
+  const loot = [{ item: 'Lizard Tail', source: 'a lizardman warrior', zone: 'The Feerrott', ts: looted }]
+  const cons = [{ mob: 'A lizardman warrior', zone: 'The Rathe Mountains', cons: 4, ts: conned }]
+  const [r] = imageGaps({ 'a lizardman warrior': kill('a lizardman warrior', 15) }, loot as never, cat, cons)
+  assert.deepEqual(r?.details.zones?.all, ['The Rathe Mountains', 'The Feerrott'])
+  assert.equal(r?.details.zones?.entries[0]?.name, 'The Rathe Mountains', 'the newest place heads the row')
+  assert.ok(r !== undefined && gapInZone(r, 'The Rathe Mountains') && gapInZone(r, 'The Feerrott'))
+  // An older con does not move a newer loot's zone off the head.
+  const [old] = imageGaps({}, loot as never, cat, [{ ...cons[0], ts: looted - 1000 }])
+  assert.equal(old?.details.zones?.entries[0]?.name, 'The Feerrott')
+})

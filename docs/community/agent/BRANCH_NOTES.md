@@ -351,6 +351,9 @@ where one exists.
   saw drop it; index the ledger once (a per-row scan over 500 rows is the lag shape).
 - Event log `unknown` flag (`event_feed.rs`): an unknown pickup is admitted, a player-shaped con is
   never flagged, and the overlay never looks up an unknown item (that lookup asks the wiki).
+  A con's mark reads the engine's Mobs row, which `gaps_roles.rs served_under` keeps behind a
+  Merchants row; the tab serves that NPC under Merchants, so `feedGapTags.ts` takes a Done on either
+  domain (2026-11-01, Jeim).
 - Merchants and Factions domains: the engine's `gaps_trade.rs` reads price quotes (`X told you,
   'That'll be ...'`, kind `unknown`), purchases and vendor sales, and pairs each death with the
   faction lines printed in the 2.5 s before it (`killFactions`); `shared/gapFactions.ts` checks the
@@ -365,6 +368,8 @@ where one exists.
   is `noImage` in mobs.json. `noImage` is written by `scrape-wiki-files.ts`
   against the cached file list; a re-parse of a mob page drops it, so the delta
   re-marks after every fold. 6,364 of 7,954 pages name a file nobody uploaded: only met mobs show.
+  A row carries every zone a loot or con placed it in, the newest first (heads the row and its
+  group); one zone only hid a mob conned here but last looted elsewhere under Zone I'm in (2026-11-01).
 - Drops reads both sides of the wiki's tie: the mob page (mobs.json) in the renderer and the item
   page's dropsfrom from main (`gaps:itemMobs`, `src/main/gapItemMobs.ts`; items.json is main-only).
   The server-wide rule waits for main's answer, so a half answer never hides a real gap. Measured

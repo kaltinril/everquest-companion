@@ -39,9 +39,17 @@ function conMissing(e: FeedEvent, players: ReadonlySet<string>): string | undefi
   return e.maybePlayer === true ? MAYBE_PLAYER_LABEL : 'missing · screenshot it'
 }
 
+/**
+ * A con's row is Done when the player marked it Done where the Gaps tab serves it. A merchant is served
+ * under Merchants only (owner, 2026-10-23), while the engine marks its con off the Mobs row it keeps
+ * behind (gaps_roles.rs `served_under`), so a Merchants Done counts too (owner, 2026-11-01: Jeim's
+ * picture taken and his row marked Done, and the Event log still asked for a screenshot).
+ */
+const conDone = (done: ReadonlySet<string>, title: string): boolean => isMarkedDone(done, 'mob', title) || isMarkedDone(done, 'merchant', title)
+
 /** An `unknown` row's mark: a con's from the Gaps tab's row, a loot's by whether it was sold. */
 function unknownLabel(e: FeedEvent, done: ReadonlySet<string>, players: ReadonlySet<string>): string | undefined {
-  if (isMarkedDone(done, e.kind === 'con' ? 'mob' : 'item', e.title)) return undefined
+  if (e.kind === 'con' ? conDone(done, e.title) : isMarkedDone(done, 'item', e.title)) return undefined
   if (e.kind === 'con') return conMissing(e, players)
   // Sold on loot is already gone: the next one is the screenshot (review 2026-10-19).
   return e.detail?.startsWith('auto-sold') === true ? 'missing · auto-sold, keep the next one' : 'missing · screenshot it'

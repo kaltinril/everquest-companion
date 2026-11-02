@@ -40,3 +40,13 @@ test('a con the Gaps tab serves "may be a player" says so; a proven NPC is plain
   const talon: FeedEvent = { id: 'f6', kind: 'loot', ts: 1, title: 'Raul', unknown: true }
   assert.equal(screenshotLabel(talon, none, new Set(['raul'])), 'missing · screenshot it', 'the players list is for mobs only')
 })
+
+test("a merchant's con is quiet once its Merchants row is Done (owner, 2026-11-01: Jeim, pictured and marked Done)", () => {
+  const jeim: FeedEvent = { id: 'f9', kind: 'con', ts: 1, title: 'Jeim', unknown: true }
+  assert.equal(screenshotLabel(jeim, new Set()), 'missing · screenshot it')
+  assert.equal(screenshotLabel(jeim, new Set(['merchant:jeim'])), undefined, 'Done on the Merchants row')
+  assert.equal(screenshotLabel(jeim, new Set(['mob:jeim'])), undefined, 'Done on the Mobs row, as before')
+  assert.equal(screenshotLabel(jeim, new Set(['image:jeim'])), 'missing · screenshot it', "another domain's mark does not count")
+  const loot: FeedEvent = { id: 'f10', kind: 'loot', ts: 1, title: 'Jeim', unknown: true }
+  assert.equal(screenshotLabel(loot, new Set(['merchant:jeim'])), 'missing · screenshot it', 'an item is not quieted by a merchant mark')
+})
