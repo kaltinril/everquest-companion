@@ -171,7 +171,7 @@ import type {
   ItemQuestUse,
   ItemRecipeUse
 } from '../shared/types'
-import { itemBaseName, parseStatsBlock, type ItemStatBlock } from '../shared/itemStats'
+import { itemBaseName, parseStatsBlock, wikiDefaultBackstab, type ItemStatBlock } from '../shared/itemStats'
 // The ONE question this parser asks the era tables: "is this a token you name?" — the guard on the
 // category reader below. What a token MEANS is still decided only in shared/planner/era.ts.
 import { namesEra } from '../shared/planner/era'
@@ -862,7 +862,8 @@ export function cleanSummary(notes: string): string | undefined {
 
 /** The game item WINDOW's structure for a stats block, with `|focus_effect` folded in. */
 function buildStats(statsBlock: string, focusRaw: string | null): ItemStatBlock {
-  const stats = parseStatsBlock(statsBlock)
+  // The wiki draws a rogue-usable piercer's BACKSTAB from its DMG when the page states none.
+  const stats = wikiDefaultBackstab(parseStatsBlock(statsBlock))
   // `|focus_effect` lives OUTSIDE the stats block (Djarn's Amethyst Ring, Golden
   // Efreeti Boots) but the game window shows it as just another effect line.
   const focus = focusRaw ? cleanSummary(focusRaw) : undefined

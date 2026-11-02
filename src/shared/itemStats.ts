@@ -170,6 +170,20 @@ export function repairWrappedStatKeys(stored: ItemStatBlock, statsBlock: string 
   return out
 }
 
+/**
+ * A wiki page's BACKSTAB the page text never states (owner, 2026-11-01). `Template:Itembox` draws
+ * `BACKSTAB: <DMG>` under the DMG line when the statsblock holds `Skill: Piercing`, `DMG:` and no
+ * `BACKSTAB:`, and its Class line holds `ROG` or `ALL` (substrings, so `ALL except CLR` counts). An
+ * explicit line wins. `1H Piercing` is not `Skill: Piercing`, so it gets no default there either.
+ * For a WIKI page's parse only: a game window prints its own Backstab line.
+ */
+export function wikiDefaultBackstab(block: ItemStatBlock): ItemStatBlock {
+  if (block.backstab !== undefined || block.dmg === undefined) return block
+  if (!/^Piercing\b/.test(block.skill ?? '')) return block
+  if (!(block.classes ?? []).some((c) => c.includes('ROG') || c.includes('ALL'))) return block
+  return { ...block, backstab: block.dmg }
+}
+
 /** Plain `KEY: value` stats that land in the attribute grid. */
 const STAT_KEYS = [
   'STR', 'STA', 'AGI', 'DEX', 'WIS', 'INT', 'CHA', 'HP', 'MANA', 'END', 'ENDURANCE', 'ENDUR',
