@@ -40,9 +40,30 @@ interface Met {
   kills: number
   loots: number
   cons: number
+  /** every zone a loot or a con placed it in, with how often; kills carry no zone */
+  zones: Map<string, number>
+  /** the zone it was last placed in, and when (epoch ms; -Infinity for a con with no time) */
   zone: string
+  zoneTs: number
   /** first and last met by a kill or a loot (a con carries no time here) */
   span?: Span
+}
+
+const unmet = (name: string): Met => ({ name, kills: 0, loots: 0, cons: 0, zones: new Map(), zone: '', zoneTs: -Infinity })
+
+/**
+ * A loot or a con places the mob: every zone is kept, so "Zone I'm in" finds the row wherever it was
+ * met (owner, 2026-11-01: a lizardman warrior conned in the Rathe Mountains was filed under The
+ * Feerrott, where one was looted two weeks before, and the filter hid it), and the newest names it.
+ */
+function placeAt(m: Met, zone: string | undefined, n: number, ts: number | undefined): void {
+  if (zone === undefined || zone === '') return
+  m.zones.set(zone, (m.zones.get(zone) ?? 0) + n)
+  const at = ts ?? -Infinity
+  if (m.zone === '' || at >= m.zoneTs) {
+    m.zone = zone
+    m.zoneTs = at
+  }
 }
 
 /** A /con as this reads it (the consider module's row): who, where, how often. */
@@ -57,28 +78,36 @@ export interface ConMet {
 /** The mobs met, by key: kills from the ledger, loot sources (never the Reward Chest) with the zone last looted in, cons with theirs. */
 function metMobs(kills: KillMap, loot: readonly LootEvent[], cons: readonly ConMet[]): Map<string, Met> {
   const out = new Map<string, Met>()
-  for (const k of Object.values(kills)) out.set(mobKey(k.display), { name: k.display, kills: k.count, loots: 0, cons: 0, zone: '', span: widen(widen(undefined, k.firstTs), k.lastTs) })
+  for (const k of Object.values(kills)) out.set(mobKey(k.display), { ...unmet(k.display), kills: k.count, span: widen(widen(undefined, k.firstTs), k.lastTs) })
   for (const e of loot) {
     const mob = mobSourceOf(e)
     if (mob === undefined) continue
-    const m = out.get(mobKey(mob)) ?? { name: mob, kills: 0, loots: 0, cons: 0, zone: '' }
+    const m = out.get(mobKey(mob)) ?? unmet(mob)
     m.loots++
-    m.zone = e.zone ?? m.zone
+    placeAt(m, e.zone, 1, e.ts)
     m.span = widen(m.span, e.ts)
     out.set(mobKey(mob), m)
   }
-  // A con places a mob the player only killed (kills carry no zone) or only looked at.
+  // A con places a mob the player only killed (kills carry no zone) or only looked at, and a newer
+  // con than the last loot moves it to where the player is now.
   for (const c of cons) {
-    const m = out.get(mobKey(c.mob)) ?? { name: c.mob, kills: 0, loots: 0, cons: 0, zone: '' }
+    const m = out.get(mobKey(c.mob)) ?? unmet(c.mob)
     m.cons += c.cons
     m.span = widen(m.span, c.ts)
-    if (m.zone === '') m.zone = c.zone ?? ''
+    placeAt(m, c.zone, c.cons, c.ts)
     out.set(mobKey(c.mob), m)
   }
   return out
 }
 
-/** One met spelling's row for a page, before it is named: its tallies, its times, its zone. */
+/** Every zone the mob was placed in, the newest first (it heads the row and its group), then by count. */
+function zoneTally(met: Met): NonNullable<GapRow['details']['zones']> {
+  const rest = [...met.zones].filter(([z]) => z !== met.zone).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+  const entries = [{ name: met.zone, n: met.zones.get(met.zone) ?? 1 }, ...rest.map(([name, n]) => ({ name, n }))]
+  return { entries, distinct: entries.length, all: entries.map((e) => e.name) }
+}
+
+/** One met spelling's row for a page, before it is named: its tallies, its times, its zones. */
 function metRow(met: Met, page: string, n: number): GapRow {
   return {
     domain: 'image',
@@ -90,7 +119,7 @@ function metRow(met: Met, page: string, n: number): GapRow {
     details: {
       samples: [],
       sources: { entries: [{ name: page, n }], distinct: 1 },
-      ...(met.zone === '' ? {} : { zones: { entries: [{ name: met.zone, n }], distinct: 1, all: [met.zone] } })
+      ...(met.zone === '' ? {} : { zones: zoneTally(met) })
     }
   }
 }
