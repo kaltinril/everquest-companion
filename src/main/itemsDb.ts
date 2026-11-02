@@ -24,7 +24,7 @@
 //     rare; otherwise the title IS the name.
 // Both are restored in ONE place, `knowledgeFromDb`, so no caller ever sees the compact form.
 
-import { itemBaseName, repairElementalDamage, repairWrappedStatKeys, type ItemStatBlock } from '../shared/itemStats'
+import { itemBaseName, repairElementalDamage, repairWrappedStatKeys, wikiDefaultBackstab, type ItemStatBlock } from '../shared/itemStats'
 // The rename overlay (JOS-415) — items.json is a scrape rewritten wholesale, so a name the wiki
 // has since changed is corrected at LOAD, never in the file. Read its header before adding a row.
 import { renamedItems } from '../shared/itemRenames'
@@ -76,7 +76,7 @@ export interface ItemDbFile {
  * `name` defaults to the page title (see the shape note in the header).
  */
 const repairStoredStats = (stats: ItemStatBlock, block: string | undefined): ItemStatBlock =>
-  repairWrappedStatKeys(repairElementalDamage(stats, block), block)
+  wikiDefaultBackstab(repairWrappedStatKeys(repairElementalDamage(stats, block), block))
 
 export function knowledgeFromDb(entry: ItemDbEntry): Omit<ItemKnowledge, 'cached'> {
   return {

@@ -2,20 +2,20 @@
   "rows": [
     {
       "file": "src/main/data/items.json",
-      "bytes": 8999829,
-      "parseMs": 75.3,
+      "bytes": 9002905,
+      "parseMs": 52.2,
       "heapMb": 21
     },
     {
       "file": "src/main/data/messageOverlay.baseline.json",
       "bytes": 410455,
-      "parseMs": 2.1,
+      "parseMs": 1.6,
       "heapMb": 0.7
     },
     {
       "file": "src/main/data/pageEra.json",
       "bytes": 235563,
-      "parseMs": 2.6,
+      "parseMs": 2.1,
       "heapMb": 0.7
     },
     {
@@ -39,7 +39,7 @@
     {
       "file": "src/renderer/src/data/eqlegends/mobs.json",
       "bytes": 5114438,
-      "parseMs": 15.5,
+      "parseMs": 17.6,
       "heapMb": 7.6
     }
   ],

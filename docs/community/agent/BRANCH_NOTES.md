@@ -486,6 +486,9 @@ where one exists.
 
 ## Screenshot to wiki (was screenshot-to-wiki)
 
+- Backstab (2026-11-01): the writer keeps the window's own Backstab line even where it equals DMG on
+  a rogue piercer (the wiki would draw it anyway; an explicit line is harmless and wins when it
+  differs). `wikiDefaultBackstab` runs on wiki parses only, never on `parseStatsBlock` or a window read.
 - Paste routing (2026-10-25): `rowPaste.ts` `pasteKind` reads the box's own OCR lines; a popup is
   known only by its closing `Click 'OK' to...` line, because a chat window behind a mob is also prose.
   The +0 work-back uses the Tier bar only when y is 2^N and x is below it. Weight rounds up to a

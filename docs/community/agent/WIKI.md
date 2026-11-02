@@ -115,6 +115,12 @@ A page is a mob page only if its OWN text opens the template (indirect transclus
 - **Foraged items**: `|foraged =` then a blank line and one `* [[Zone]]` per zone (`* ?` or
   `* Various` when unknown); after `</onlyinclude>` add `[[Category:Foraged]]` plus a
   `[[Category:<Zone>]]` per zone (`[[Category:Tradeskill Ingredient]]` when it is one).
+- **BACKSTAB default** (`Template:Itembox`, read 2026-11-01): the box draws `BACKSTAB: <DMG>` under
+  the DMG line when the statsblock holds `Skill: Piercing`, `DMG:` and no `BACKSTAB:`, and its Class
+  line holds `ROG` or `ALL` (substrings: `ALL except CLR` counts; `1H Piercing` does not). The page
+  text never states it. Measured on the cache: 231 pages take the default, 15 state their own;
+  `wikiDefaultBackstab` agrees with the template on every cached page. The same box also generates
+  `DMG Bonus: N @ lvl 50` (see DATA_REFRESH.md).
 - **statsblock flag line** (first line, measured 2026-10-20 on 11,594 cached pages): mostly classic
   caps, `MAGIC ITEM` 4,988, `LORE ITEM` 4,070, `NO DROP` 2,920; newer pages copy the Legends
   tooltip as-is (`Lore Equipped, No Trade, Quest`: No Trade 612, Lore Equipped 423, Quest 617).
