@@ -1,0 +1,10 @@
+'''Lucy''' is a spell and item database for EverQuest dating back to 2002. The current version of lucy is updated for the state of live EQ but the historical lucy database being nearly classic remains a valuable source of information in classic Everquest 
+development and refinement. The host for the 2002 version of the database (fnord.net) has long since ceased functioning but the live version of allakhazam's lucy is still running.
+
+* http://lucy.allakhazam.com
+
+A full list of items/spells and their icon codes can be found [https://eqlwiki.com/Lucy_Images here]
+
+See also: [[Allakhazam]]
+
+[[Category:Technical]]

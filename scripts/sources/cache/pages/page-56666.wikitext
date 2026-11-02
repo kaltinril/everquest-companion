@@ -1,0 +1,415 @@
+__NOTOC__
+
+<div style="
+	margin: 1.25rem 0;
+	padding: 1rem;
+	background: linear-gradient(180deg, rgba(13,18,26,0.88), rgba(8,12,18,0.94));
+	border: 1px solid rgba(216,183,92,0.34);
+	border-radius: 10px;
+	box-shadow: 0 10px 28px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.04);
+	box-sizing: border-box;
+">
+
+The EQ Legends team has updated the UI and game windows to modernize the experience and introduce key quality-of-life improvements. This guide explains how to navigate the interface, adjust its layout, and customize its appearance.
+
+</div>
+
+== Interface Overview ==
+
+<div style="
+	margin: 1.25rem 0;
+	padding: 1rem;
+	background: linear-gradient(180deg, rgba(13,18,26,0.88), rgba(8,12,18,0.94));
+	border: 1px solid rgba(216,183,92,0.34);
+	border-radius: 10px;
+	box-shadow: 0 10px 28px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.04);
+	box-sizing: border-box;
+">
+
+<div style="
+	margin-bottom: 1rem;
+	padding: 0.85rem 1rem;
+	background: rgba(255,255,255,0.035);
+	border: 1px solid rgba(216,183,92,0.22);
+	border-radius: 8px;
+	color: #aab3c2;
+	line-height: 1.5;
+">
+'''Let’s start with the big picture.''' Going by the numbers, these are the different parts you will see in the default user interface. Each entry below has room for a screenshot or uploaded image, plus notes for future expansion.
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 1rem;">
+
+<div style="display: grid; grid-template-columns: 300px minmax(0,1fr); gap: 1rem; padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="min-height: 190px; display: flex; align-items: center; justify-content: center; border: 1px dashed rgba(216,183,92,0.42); border-radius: 8px; background: rgba(0,0,0,0.20); text-align: center;">
+[[File:EQL_UI_Spell_Bar.png|300px]]
+</div>
+<div>
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.25rem; letter-spacing: 0.05em; margin-bottom: 0.35rem;">1. Spell Bar</div>
+<div style="color: #aab3c2; line-height: 1.55;">
+Your spell bar displays the current spells you have memorized. You can cast one spell at a time, and some spells have cooldowns that make you wait before casting again. To cast a spell, you can left-click the spell or press a hotbutton if it is assigned to your hotbar. You can have up to 8 memorized at one time to start, with a few more becoming available later.
+</div>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: 300px minmax(0,1fr); gap: 1rem; padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="min-height: 190px; display: flex; align-items: center; justify-content: center; border: 1px dashed rgba(216,183,92,0.42); border-radius: 8px; background: rgba(0,0,0,0.20); text-align: center;">
+[[File:EQL UI Hotbar.png|300px]]
+</div>
+<div>
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.25rem; letter-spacing: 0.05em; margin-bottom: 0.35rem;">2. Hotbar</div>
+<div style="color: #aab3c2; line-height: 1.55;">
+Hotbars are where you assign macros, abilities, items, socials, or spells. Each open slot on the hotbar can be assigned a hotbutton. Your number keys, 1 through =, are assigned to your primary hotbar by default. You can open more hotbars, assign more hot buttons, and customize your layout.
+</div>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: 300px minmax(0,1fr); gap: 1rem; padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="min-height: 190px; display: flex; align-items: center; justify-content: center; border: 1px dashed rgba(216,183,92,0.42); border-radius: 8px; background: rgba(0,0,0,0.20); text-align: center;">
+[[File:EQL UI Inventory.png|300px]]
+</div>
+<div>
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.25rem; letter-spacing: 0.05em; margin-bottom: 0.35rem;">3. Inventory</div>
+<div style="color: #aab3c2; line-height: 1.55;">
+Press <code>I</code> to open and close your inventory. Pressing <code>Escape</code> also closes it. The inventory has been condensed to include the parts of the UI needed to play the game: character gear, bags, stats, and currency. Right-clicking bags opens them, and pressing <code>B</code> toggles your bags.
+</div>
+<div style="margin-top: 0.65rem; color: #aab3c2;">
+There are new high contrast icons that improve the visibility of icons that were hard to see. Most items, gear, and equipment now have tooltips when you mouse over them.
+</div>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: 300px minmax(0,1fr); gap: 1rem; padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="min-height: 190px; display: flex; align-items: center; justify-content: center; border: 1px dashed rgba(216,183,92,0.42); border-radius: 8px; background: rgba(0,0,0,0.20); text-align: center;">
+[[File:EQL UI Chat Window.png|300px]]
+</div>
+<div>
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.25rem; letter-spacing: 0.05em; margin-bottom: 0.35rem;">4. Chat Window</div>
+<div style="color: #aab3c2; line-height: 1.55;">
+The chat window has two tabs open by default: one for social chat and one for combat chat. You can deeply customize chat. You can change font size by holding right-click and choosing '''Chat Size''', then selecting your preferred size. You can also right-click a chat window and create a new chat window.
+</div>
+<div style="margin-top: 0.65rem; color: #aab3c2;">
+A useful early setup step is to place your chat windows where you want them, then right-click each chat window, mouse over '''Window''', and choose '''Lock''' so you do not accidentally move, resize, or otherwise disturb them. Most UI windows can be locked.
+</div>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: 300px minmax(0,1fr); gap: 1rem; padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="min-height: 190px; display: flex; align-items: center; justify-content: center; border: 1px dashed rgba(216,183,92,0.42); border-radius: 8px; background: rgba(0,0,0,0.20); text-align: center;">
+[[File:EQL UI Player Window.png|300px]]
+</div>
+<div>
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.25rem; letter-spacing: 0.05em; margin-bottom: 0.35rem;">5. Player Window</div>
+<div style="color: #aab3c2; line-height: 1.55;">
+The player window shows your level, current class information, current state such as resting, health, mana, stamina, EXP, and AA EXP.
+</div>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: 300px minmax(0,1fr); gap: 1rem; padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="min-height: 190px; display: flex; align-items: center; justify-content: center; border: 1px dashed rgba(216,183,92,0.42); border-radius: 8px; background: rgba(0,0,0,0.20); text-align: center;">
+[[File:EQL UI Target Window.png|300px]]
+</div>
+<div>
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.25rem; letter-spacing: 0.05em; margin-bottom: 0.35rem;">6. Target Window</div>
+<div style="color: #aab3c2; line-height: 1.55;">
+The target window shows target information. Instead of EXP and AA, it shows the target’s target, often referred to as target of target or target's target.
+</div>
+<div style="margin-top: 0.65rem; color: #aab3c2;">
+The separate Target of Target window can be toggled with <code>Ctrl+U</code>. This information is built into the Target Window, so the separate window may not be needed, but it is available as a preference.
+</div>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: 300px minmax(0,1fr); gap: 1rem; padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="min-height: 190px; display: flex; align-items: center; justify-content: center; border: 1px dashed rgba(216,183,92,0.42); border-radius: 8px; background: rgba(0,0,0,0.20); text-align: center;">
+[[File:EQL UI Multi Menu.png|300px]]
+</div>
+<div>
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.25rem; letter-spacing: 0.05em; margin-bottom: 0.35rem;">7. Multi-Menu</div>
+<div style="color: #aab3c2; line-height: 1.55;">
+EQ Legends has combined the game menus, window toggles, and EQ button into a multi-menu.
+</div>
+<div style="margin-top: 0.65rem; color: #aab3c2;">
+'''Includes'''
+* Action window containing the Abilities, Disciplines, Spells, and Macros tabs
+* Inventory window
+* Alternate Advancement window
+* Achievements window
+* Options window
+* Help window
+* Instance window, allowing selection of 4 difficulties of the current zone if available
+* Marketplace
+* EQ Button, similar to but customized from the traditional EQ button
+</div>
+<div style="margin-top: 0.65rem; color: #aab3c2;">
+All of these windows have seen many changes for quality-of-life improvements from the original EQ interface.
+</div>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: 300px minmax(0,1fr); gap: 1rem; padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="min-height: 190px; display: flex; align-items: center; justify-content: center; border: 1px dashed rgba(216,183,92,0.42); border-radius: 8px; background: rgba(0,0,0,0.20); text-align: center;">
+[[File:EQL UI Group Window.png|300px]]
+</div>
+<div>
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.25rem; letter-spacing: 0.05em; margin-bottom: 0.35rem;">8. Group Window</div>
+<div style="color: #aab3c2; line-height: 1.55;">
+The group window is the same window used for raids. The group window title changes from '''Group''' to '''Raid''' automatically when you are in a raid, and it expands or shrinks as members join or leave. The game handles this automatically.
+</div>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: 300px minmax(0,1fr); gap: 1rem; padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="min-height: 190px; display: flex; align-items: center; justify-content: center; border: 1px dashed rgba(216,183,92,0.42); border-radius: 8px; background: rgba(0,0,0,0.20); text-align: center;">
+[[File:EQL UI Extended Target Window.png|300px]]
+</div>
+<div>
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.25rem; letter-spacing: 0.05em; margin-bottom: 0.35rem;">9. Extended Target Window</div>
+<div style="color: #aab3c2; line-height: 1.55;">
+The extended target window shows your active combat targets.
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+== UI Themes ==
+
+<div style="margin: 1rem 0; padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+
+<div style="min-height: 220px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; border: 1px dashed rgba(216,183,92,0.42); border-radius: 8px; background: rgba(0,0,0,0.20); text-align: center; overflow: hidden;">
+[[File:EQL UI Themes.png|1000px|frameless|link=]]
+</div>
+
+There are three UI themes currently available in game:
+
+* default
+* default light
+* default modern
+
+To load a UI theme, press <code>Alt + O</code>, left-click '''Load UI Skin''', select your choice of skin, then click '''Load Skin'''.
+
+</div>
+
+== Window and Feature Reference ==
+
+<div style="display: flex; flex-direction: column; gap: 1rem;">
+
+<div style="padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.05em;">Actions Window</div>
+<div style="color: #aab3c2; line-height: 1.55; margin-top: 0.5rem;">
+Pressing <code>L</code> toggles the Actions window.
+
+The Actions window has separate tabs that display all of your abilities, disciplines, spells, and macros. This includes spells that you have not scribed yet. On the abilities tab, there are filters to toggle general and basic abilities, leaving only your combat abilities displayed, including alternate advancement abilities.
+</div>
+</div>
+
+<div style="padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.05em;">Alternate Advancement</div>
+<div style="color: #aab3c2; line-height: 1.55; margin-top: 0.5rem;">
+The Alternate Advancement window can be toggled using the <code>V</code> key and is also located on the multi-menu.
+</div>
+</div>
+
+<div style="padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.05em;">Expedition</div>
+<div style="color: #aab3c2; line-height: 1.55; margin-top: 0.5rem;">
+The Expedition window can be toggled using <code>Alt+Z</code>.
+
+The term “Expedition” refers to unique instances of zones created specifically for your group or raid. Once the expedition has been created, players can be added and removed at will. There are other options available for expeditions; see [[Expedition]] for details.
+</div>
+</div>
+
+<div style="padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.05em;">Find Item</div>
+<div style="color: #aab3c2; line-height: 1.55; margin-top: 0.5rem;">
+The Find Item window can be toggled using the <code>G</code> key.
+</div>
+</div>
+
+<div style="padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.05em;">Friend</div>
+<div style="color: #aab3c2; line-height: 1.55; margin-top: 0.5rem;">
+The Friend window can be toggled using <code>Alt+F</code>.
+
+This window contains your current list of friends and a separate tab that lists players who are currently being ignored.
+</div>
+</div>
+
+<div style="padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.05em;">Guild</div>
+<div style="color: #aab3c2; line-height: 1.55; margin-top: 0.5rem;">
+The Guild window can be toggled using <code>Alt+G</code>.
+
+You can view the current roster of guild members in the guild management window. If you have permission, you can use the roster tab to promote or demote players.
+
+There is also an invite button that allows you to invite your current target to the guild, raid, DZ, or task. There is also an option to send an invitation to everyone in the guild to a raid, DZ, or task.
+
+The notes tab displays public notes and lets you make personal, private notes about any player.
+
+The information tab allows you to see the MOTD, the guild’s in-game chat channel if one is set, and the guild URL if one has been set.
+</div>
+</div>
+
+<div style="padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.05em;">Hot Buttons and Key Bindings</div>
+<div style="color: #aab3c2; line-height: 1.55; margin-top: 0.5rem;">
+Just to clarify terminology: in-game key bindings may refer to “hotkeys,” while this guide uses “hot buttons” because that is the term used by the game.
+
+Alt+O opens the Options window. With the Options window open, click '''Controls'''. On the Key Bindings tab, you can select all or specific categories to view which keybind options are set or unset.
+
+'''Note:''' when you assign a hot button to a keybind, it normally toggles a window or executes a command, but not all of them currently function.
+
+'''Useful default commands'''
+* <code>Q</code> = Attack. You can also set it to <code>~</code> or another preference.
+* <code>B</code> = Inventory bags toggle
+* <code>C</code> = Consider
+* <code>Ctrl + S</code> = Sit / Stand
+
+'''Target'''
+* <code>TAB</code> should be set to cycle through nearest NPCs.
+
+'''Chat'''
+* <code>H</code> = Hail
+* <code>R</code> = Reply
+
+'''Camera'''
+* <code>F9</code> = Toggle camera view
+
+There are many other hot buttons that some players may consider essential, but this is a quick overview of the most commonly used default hot buttons.
+</div>
+</div>
+
+<div style="padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.05em;">Key Rings</div>
+<div style="color: #aab3c2; line-height: 1.55; margin-top: 0.5rem;">
+The Key Rings window can be toggled using <code>Ctrl+K</code>.
+
+The tabs in this window show the various keys your character possesses. Some items can be placed in the bank or your key ring.
+</div>
+</div>
+
+<div style="padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.05em;">Loadout</div>
+<div style="color: #aab3c2; line-height: 1.55; margin-top: 0.5rem;">
+The Loadout tab of your inventory can be toggled using the <code>N</code> key.
+
+Using this tab in city zones or designated safe zones, you can change or add loadouts.
+</div>
+</div>
+
+<div style="padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.05em;">Mail</div>
+<div style="color: #aab3c2; line-height: 1.55; margin-top: 0.5rem;">
+The Mail window can be toggled using <code>Ctrl+E</code>.
+
+The game will send you mail at certain milestones while leveling. If you receive mail for other reasons, including from other players, it can be found here.
+</div>
+</div>
+
+<div style="padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.05em;">Map</div>
+<div style="color: #aab3c2; line-height: 1.55; margin-top: 0.5rem;">
+The Map window can be toggled with the <code>M</code> key or the <code>Backspace</code> key.
+</div>
+</div>
+
+<div style="padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.05em;">Options</div>
+<div style="color: #aab3c2; line-height: 1.55; margin-top: 0.5rem;">
+The Options window can be toggled with the <code>O</code> key or <code>Alt+O</code>.
+
+This is where you can set game options, game settings, and keybinds.
+</div>
+</div>
+
+<div style="padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.05em;">Paste from Clipboard</div>
+<div style="color: #aab3c2; line-height: 1.55; margin-top: 0.5rem;">
+Paste from clipboard is enabled by default and can be done by pressing <code>Ctrl+V</code>.
+</div>
+</div>
+
+<div style="padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.05em;">Pet</div>
+<div style="color: #aab3c2; line-height: 1.55; margin-top: 0.5rem;">
+The Pet window can be toggled using <code>Alt+F1</code>.
+</div>
+</div>
+
+<div style="padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.05em;">Short Duration Buffs</div>
+<div style="color: #aab3c2; line-height: 1.55; margin-top: 0.5rem;">
+The Short Duration Effects window can be toggled using <code>Alt+E</code>.
+</div>
+</div>
+
+<div style="padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.05em;">Spellbook</div>
+<div style="color: #aab3c2; line-height: 1.55; margin-top: 0.5rem;">
+The Spellbook window can be toggled using the <code>K</code> key or <code>Ctrl+B</code>. It displays your spellbook and all of your currently scribed spells.
+</div>
+</div>
+
+<div style="padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.05em;">Task Window</div>
+<div style="color: #aab3c2; line-height: 1.55; margin-top: 0.5rem;">
+The Task window, also called the Quest Journal, can be toggled using <code>Alt+Q</code>.
+</div>
+</div>
+
+<div style="padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.05em;">Title Window</div>
+<div style="color: #aab3c2; line-height: 1.55; margin-top: 0.5rem;">
+The Title window can be toggled using <code>Shift+T</code>. This allows you to see and set any available titles for your current character.
+</div>
+</div>
+
+<div style="padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.05em;">Toggle UI</div>
+<div style="color: #aab3c2; line-height: 1.55; margin-top: 0.5rem;">
+The UI can be toggled by pressing <code>F10</code>.
+</div>
+</div>
+
+<div style="padding: 1rem; border: 1px solid rgba(216,183,92,0.28); border-radius: 9px; background: rgba(255,255,255,0.035);">
+<div style="font-family: Georgia, 'Times New Roman', serif; color: #d8b75c; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.05em;">Toggle Netstat</div>
+<div style="color: #aab3c2; line-height: 1.55; margin-top: 0.5rem;">
+The Net Status display can be toggled with the <code>F11</code> key.
+</div>
+</div>
+
+</div>
+
+== Customizing Your UI ==
+
+<div style="
+	margin: 1.25rem 0;
+	padding: 1rem;
+	background: linear-gradient(180deg, rgba(13,18,26,0.88), rgba(8,12,18,0.94));
+	border: 1px solid rgba(216,183,92,0.34);
+	border-radius: 10px;
+	box-shadow: 0 10px 28px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.04);
+	box-sizing: border-box;
+">
+
+All of your UI windows and elements can be moved wherever you would like, though most cannot be moved off screen. You can resize some windows, open more hotbars, assign more hot buttons, choose between three themes, open more chat windows, decide which chat filters show in each window, and more.
+
+Up until level 20, you will occasionally receive pop-up windows when the game detects an action that matches one of its built-in new player help triggers. These were designed to give players gameplay tips when they do certain things. Each tip can be turned off so it does not display again in the future, which is recommended. You can also turn all tips off, but it is worth leaving them on if this is your first character.
+
+Everyone has their own playstyle and preferences. It can be helpful to see how others set up their UI to get ideas for your own layout. The '''modern''' theme is a popular choice because it is easy on the eyes.
+
+Right-clicking on each window gives options to toggle the window lock, set transparency level, and access other window-specific options.
+
+<div style="margin-top: 1rem; min-height: 260px; display: flex; align-items: center; justify-content: center; border: 1px dashed rgba(216,183,92,0.42); border-radius: 8px; background: rgba(0,0,0,0.20); text-align: center;">
+[[:File:EQL UI Example Layout.png|Upload Example Layout image]]
+</div>
+
+</div>
+
+<!-- Search synonyms: UI, Interface, User Interface, Game UI, HUD -->
+
+
+[[Category:Guides]]

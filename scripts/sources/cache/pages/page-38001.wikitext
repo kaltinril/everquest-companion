@@ -1,0 +1,52 @@
+{{Factionpage|
+
+| description = A faction which has come to light since the introduction of epics. Critical for the [[Shaman Epic Quest]] and the [[Wizard Epic Quest]].
+
+[[Bondl Felligan]] <span class='fmz'>(North Freeport - Quest NPC)</span> is on this faction, but does not lower your faction on killing him.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Freeport|East Freeport]]
+* [[Eastern Plains of Karana]]
+* [[Erudin]]
+* [[Firiona Vie]]
+* [[Northern Karana]]
+* [[Felwithe]]
+* [[Paineel]]
+* [[Skyfire Mountains]]
+* [[Trakanon's Teeth]]
+* [[Freeport|West Freeport]]
+
+| quests_raise = 
+
+* [[Enchanter Epic Quest]]
+* [[Shadow Knight Epic Quest]]
+* [[Shaman Epic Quest]]
+* [[Wizard Epic Quest]]
+
+| quests_lower = 
+
+* [[Wizard Epic Quest]]
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Camin]] <span class='fmz'>(Erudin - Quest NPC)</span>
+* [[Challice]] <span class='fmz'>(Northern Felwithe - Quest NPC)</span>
+* [[Duriek Bloodpool]] <span class='fmz'>(Paineel - Quest NPC)</span>
+* [[Kaiaren]] <span class='fmz'>(Trakanon's Teeth - Quest NPC)</span>
+* [[Nadia Starfeast]] <span class='fmz'>(Firiona Vie - Quest NPC)</span>
+* [[Tenal Redblade]] <span class='fmz'>(East Karana - Quest NPC)</span>
+* [[A lesser spirit]] <span class='fmz'>(Butcherblock Mountains - Quest NPC)</span>
+* [[A lesser spirit]] <span class='fmz'>(Ocean of Tears - Quest NPC)</span>
+* [[A lesser spirit]] <span class='fmz'>(Rathe Mountains - Quest NPC)</span>
+* [[A lesser spirit]] <span class='fmz'>(Field of Bone - Quest NPC)</span>
+* [[Joshua]] <span class='fmz'>(West Freeport - Quest NPC)</span>
+
+}}

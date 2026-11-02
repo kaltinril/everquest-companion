@@ -1,0 +1,12 @@
+{{expand}}
+A [[Monk]] special attack. Tiger Claw is learned at level 10. It is superseded by [[Eagle Strike]] at level 20.
+
+Tiger Claw has a reuse time (cooldown) of 6 seconds.
+
+== Classes ==
+
+* [[Monk]] - Level 10 '''(Max 225)'''
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

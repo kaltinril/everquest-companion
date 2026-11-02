@@ -1,0 +1,58 @@
+{{Factionpage|
+
+| description = The Merchants of Highhold and Highpass.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Highpass Keep]]
+* [[Highpass Hold]]
+* [[Rathe Mountains]]
+* [[Qeynos|North Qeynos]]
+
+| quests_raise = 
+
+* [[Gnoll Scalp Collecting]]
+* [[Left Goblin Ears]]
+* [[Orc Scalp Collecting]]
+* [[Rogue Errands]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a guard]] <span class='fmz'>(Highpass Hold)</span>
+* [[a Highpass citizen]] <span class='fmz'>(Highpass Hold - NPC, Non-Quest)</span>
+* [[a maid]] <span class='fmz'>(High Keep - NPC, Non-Quest)</span>
+* [[a noble]] (Highpass Keep) <span class='fmz'>(High Keep - NPC, Non-Quest)</span>
+* [[a smuggler]] <span class='fmz'>(Highpass Hold - NPC, Non-Quest)</span>
+* [[Bank Clerk Jaylin]] <span class='fmz'>(High Keep - Banker)</span>
+* [[Captain Orben]] <span class='fmz'>(Highpass Hold)</span>
+* [[Delila]] <span class='fmz'>(Mountains of Rathe - Quest NPC)</span>
+* [[Dyrna Nlith]] <span class='fmz'>(High Keep - NPC, Non-Quest)</span>
+* [[Flayer Hopkins]] <span class='fmz'>(High Keep - NPC, Non-Quest)</span>
+* [[Guard Bicker]] <span class='fmz'>(High Keep)</span>
+* [[Guard Blayle]] <span class='fmz'>(High Keep)</span>
+* [[Guard Duras]] <span class='fmz'>(High Keep)</span>
+* [[Guard Folton]] <span class='fmz'>(High Keep)</span>
+* [[Guard Lorton]] <span class='fmz'>(High Keep)</span>
+* [[Guard Rance]] <span class='fmz'>(High Keep)</span>
+* [[Guard Stald]] <span class='fmz'>(Highpass Hold)</span>
+* [[Jracol Brestiage]] <span class='fmz'>(North Qeynos - Quest NPC)</span>
+* [[Lady McCabe]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Lyn Tarburner]] <span class='fmz'>(Highpass Hold - Merchant)</span>
+* [[Meridith Tindle]]  <span class='fmz'>(Mountains of Rathe)</span>
+* [[Tyrana Slil]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Volunteer Renlor]] <span class='fmz'>(Highpass Hold - NPC, Non-Quest)</span>
+* [[Wres Corber]] <span class='fmz'>(Highpass Hold - NPC, Non-Quest)</span>
+
+}}
+
+= Suggested Route =
+*[[Rogue Errands]] Part 1: (+[[Carson McCabe]], +[[Coalition of Tradefolk Underground]], +[[Highpass Guards]], +[[Merchants of Highpass]], -[[Ring of Scale]])

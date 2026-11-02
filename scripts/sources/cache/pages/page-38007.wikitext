@@ -1,0 +1,34 @@
+{{disambig3|an [[Orc|overview of the orc race]]?}}
+{{Factionpage|
+
+| description = A generic Orc faction, which only the orc warriors from Oasis of Marr and the Southern Desert of Ro belong to.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Lake Rathetear]]
+* [[Rathe Mountains]]
+* [[Northern Desert of Ro]]
+* [[Southern Desert of Ro]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[an orc cleric]]  <span class='fmz'>(South Ro)</span>
+* [[an orc priest]]  <span class='fmz'>(South Ro)</span>
+* [[an orc raider]]  <span class='fmz'>(North Ro)</span>
+* [[an orc warrior]]  <span class='fmz'>(South Ro)</span>
+* [[An Orc Warrior]] <span class='fmz'>(Oasis of Marr)</span>
+* [[Grazhak the Berzerker]] <span class='fmz'>(Rathe Mountains)</span>
+
+}}

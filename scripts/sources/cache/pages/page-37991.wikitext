@@ -1,0 +1,34 @@
+{{Factionpage|
+
+| description = The forest giants of Kunark.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Burning Woods]]
+* [[Firiona Vie]]
+* [[Warsliks Woods]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a forest giant]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a forest giant ancient]]  <span class='fmz'>(Burning Woods)</span>
+* [[a forest giant arbor]]  <span class='fmz'>(Burning Woods)</span>
+* [[a forest giant evergreen]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a forest giant greenwood]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a forest giant sapling]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a forest giant verdant]]  <span class='fmz'>(Burning Woods)</span>
+* [[Gorgul Paclock]]  <span class='fmz'>(Burning Woods)</span>
+
+}}

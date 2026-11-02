@@ -1,0 +1,38 @@
+[[File:NakedGNM.jpg|right]]
+__NOTOC__
+ Distant cousins to Dwarves, Gnomes tend to burrow in the hillsides in underground communities. <br>A lack of surface light lends a tan hue to their skin tone, and they rarely emerge to mingle with other races.
+ - EverQuest manual
+==Description==
+While Gnomes are knee-high to some of the taller races, they make up for it with their cleverness and skills. They are by no means a strong and sturdy race, but their edge is their dexterity and intelligence. They were the second race, after Dwarves, created by Brell Serilis.
+
+Gnomes have an innate preoccupation and skill with gadgets. They are a curious race that creates strange, but very useful items that enhance their lives. Gnomes have created a number of fantastic machines, including an observatory which houses the most powerful telescope in Norrath and even their mechanical ruler King Ak'Anon. Even with all of their accomplishments, gnomes are rarely taken seriously because of their size and behavior.
+
+Universally loved themselves, Gnomes are friendly with all good Elves, Dwarves, Halflings, and Humans. Although they do not quite understand the Erudites, they will interact with them. Gnomes have a general aversion to Trolls, Ogres, Teir`Dal, and other evil races, but don't necessarily hate them.
+
+The clicking of gears and clacking of machinery fill the mechanized Gnome city of Ak'Anon that lies southeast of the Faydark, on the continent of Faydwer.
+
+==Basic Information==
+*<b>[[Faction Alignment|Faction Alignment:]]</b> Neutral
+*<b>Racial(s):</b> [[Skill Tinkering|Tinkering]], [[Infravision]]
+*<b>Starting City:</b> [[Ak'Anon]]
+*<b>Primary Class Choices:</b> [[Cleric]], [[Enchanter]], [[Magician]], [[Necromancer]], [[Paladin]], [[Shadowknight]], [[Rogue]], [[Warrior]], [[Wizard]]
+
+==Base Stats==
+{| class="eoTable2" style="text-align:left"
+|-
+! STR !! STA !! AGI !! DEX !! WIS !! INT !! CHA
+|-
+|| 60 || 70 || 85 || 85 || 67 || 98 || 60
+|}
+
+== Unlock Conditions ==
+
+* Get maximum faction with [[King Ak'Anon (Faction)|King Ak'Anon]]
+* Get maximum faction with [[Gem Choppers]]
+* Get maximum faction with [[Eldritch Collective]]
+
+
+
+{{Navbox Race}}
+
+[[Category:Character Races]]

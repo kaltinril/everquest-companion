@@ -1,0 +1,37 @@
+{{Factionpage|
+
+| description = The Songweavers can be found in the treetop city of [[Kelethin]] in Greater Faydark.  
+Under the leadership of Sylia Windlehands, many young bards receive their training.  Sharing their guildhall are the [[League of Antonican Bards]] Mail bards.  
+Here, the local mail is collected and then carried by mailpouch to Freeport and Beyond.  The Songweavers, unlike the League Bards remain neutral in the affairs of Faction.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Greater Faydark]]
+
+| quests_raise = 
+
+* [[Spiderling Silks]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Astar Leafsinger]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Beleth Streamfoot]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Tenra]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Serilia Whistlewind]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Sylia Windlehands]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+
+}}
+= Suggested Route =
+*None - [[Spiderling Silks]] requires amiable.  All players start at indifferent.  Maybe deity helps?
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]

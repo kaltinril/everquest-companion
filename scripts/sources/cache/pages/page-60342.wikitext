@@ -1,0 +1,149 @@
+This is a guide for how to create [[Blessed Champion Arrows]] - the highest damage arrows in the game for [[Warrior]]s, [[Paladin]]s, and [[Ranger]]s that worship Tunare. If you worship Karana, you will want to use [[Blessed Guardian Arrows]] instead.
+
+Additionally, you can save steps and money by leaving out the emeralds from the guide below. Follow the guide but ignore the emeralds and you will make [[Mithril Champion Arrows]] which are almost just as good, but cheaper to make.
+
+= Skills =
+
+You will need at least the following trade skills to complete all of the combines. You may want to get higher skill, or Mastery AAs - neither are required but will significantly reduce failures and save platinum. Maxing out the arrows, without using motes, will require successfully crafting 1024 arrows. So reducing your failure rate can be quite valuable.
+
+* [[Skill Blacksmithing|Smithing]] - 100
+* [[Skill Fletching|Fletching]] - 200
+
+= Materials =
+
+This is a table of all the materials needed and where to get them. I have only included the materials required to craft the arrows themselves. There are a few tools you will need to make first, but those are one time combines. The materials listed below you will be using a lot of. Each attempt to make an arrow will cost, at a minimum, ~18pp. However, you will occasionally fail the intermediate steps and need buy more supplies than the absolute minimum, so expect it to cost closer to 20-25pp per combine.
+
+== Store Bought Materials ==
+{| class="wikitable"
+|+
+!Materials
+!Amount per Arrow
+!Price per Arrow
+!Merchant
+|-
+|[[Arrow Shaft Mold]]
+|1/2
+|4cp
+|[[Merchant Lanin]]
+|-
+|[[Emerald]]
+|1/8
+|1pp 6gp 9sp 5cp
+|[[Merchant Laedar]]
+|-
+|[[Large Brick of Mithril]]
+|1/2
+|8pp 9gp 0sp 6cp
+|[[Merchant Niwiny]]
+|-
+|[[Small Groove Nocks]]
+|1
+|4sp 1cp
+|[[Merchant Lanin]]
+|-
+|[[Small Brick of Mithril]]
+|1
+|5pp 9gp 3sp 7cp
+|[[Merchant Niwiny]]
+|-
+|[[Water Flask]]
+|1
+|1sp 1cp
+|Lots of merchants
+|}
+
+== Imbued Emerald Shards ==
+You will need to take the [[Emerald]]s purchased from a merchant and have them imbued by a [[Druid]]. Then you will turn them into shards in the [[Feir`Dal Forge]] using the recipe below. These are used to make the [[Blessed Arrow Heads]]. You can choose to skip this step and make the arrow heads without the emeralds - the rest of the guide below stays the same, you just don't include the imbued emeralds.  The resulting arrows without the emeralds are the [[Mithril Champion Arrows]]. They have one less fire damage and don't require Tunare.
+
+* [[Skill Blacksmithing|Blacksmithing]] (Trivial: 96)
+** '''Yield: Imbued Emerald Shards''' x4
+** In [[Feir`Dal Forge]]:
+:: {{SmIcon|1035}} 1x [[File]]
+:: {{SmIcon|958}} 1x [[Imbued Emerald]]
+
+= Tools =
+
+These are the tools you will need access to for completing the combines. You only need to have <em>one</em> of each of these tools; they are always returned after each combine, even on a failure.
+
+== Feir`Dal Forge ==
+
+The [[Feir`Dal Forge]] is required for smithing the parts of the arrows. It can be found in Kelethin just behind [[Merchant Ainaiana]].
+
+== File ==
+
+You will need to make a [[File]] to use for several of the combines. You likely already have one from leveling up Smithing.
+* [[Blacksmithing]] (Trivial: 21)
+** '''Yield: File''' x1
+** In [[Forge]]:
+:: {{SmIcon|1031}} 1 x [[Metal Bits]]
+:: {{SmIcon|1151}} 1 x [[File Mold]]
+:: {{SmIcon|584}} 1 x [[Flask of Water]]
+
+== Mithril Working Knife ==
+
+You will need to make a [[Mithril Working Knife]] which is used for creating the fletching used in the arrows. The Hilt mold is sold by [[Merchant Nluolian]], who also sells the Fletching Kit molds you will need. Unfortunately, no one sells the [[Dagger Blade Mold]] in Kelethin - that I could find. I had to get them from [[Opal Leganyn]] in [[Northern Felwithe]].
+
+* [[Skill Blacksmithing|Blacksmithing]] (Trivial: 42)
+** '''Yield: Mithril Working Knife'''
+** In [[Feir`Dal Forge]]:
+:: {{SmIcon|1138}} 1x [[Small Brick of Mithril]]
+:: {{SmIcon|1151}} 1x [[Hilt Mold]]
+:: {{SmIcon|1151}} 1x [[Dagger Blade Mold]]
+:: {{SmIcon|584}} 1x [[Water Flask]]
+
+== Feir`Dal Fletching Kit ==
+
+This recipe is trivial at 163 Smithing, so you might fail a few times - but you only need to succeed once and it's not worth the time and platinum getting it to trivial. You can get all three molds required from [[Merchant Nluolian]] in Kelethin.
+
+* [[Skill Blacksmithing|Blacksmithing]] (Trivial: 163)
+** '''Yield: Feir`Dal Fletching Kit'''
+** In [[Feir`Dal Forge]]:
+:: {{SmIcon|584}} 1x [[Water Flask]]
+:: {{SmIcon|1138}} 1x [[Small Brick of Mithril]]
+:: {{SmIcon|1151}} 1x [[Hinge Mold]]
+:: {{SmIcon|1151}} 1x [[Container Base Mold]]
+:: {{SmIcon|1151}} 1x [[Container Lid Mold]]
+
+= Arrow Parts =
+These are the parts of the arrows you will need to make the final combine. Like all arrows there are four parts: Head, Shaft, Fletching, and Nock. Keep in mind, you will need to manually make each of these parts successfully at least once before you can auto-combine them.
+
+== Blessed Arrow Heads ==
+* [[Skill Blacksmithing|Blacksmithing]] (Trivial: 57)
+** '''Yield: Blessed Arrow Heads''' x2
+** In [[Feir`Dal Forge]]:
+:: {{SmIcon|1035}} 1x [[File]]
+:: {{SmIcon|1032}} 1x [[Imbued Emerald Shards]]
+:: {{SmIcon|1138}} 1x [[Small Brick of Mithril]]
+:: {{SmIcon|584}} 1x [[Flask of Water]]
+
+== Mithril Bundled Arrow Shafts ==
+
+* [[Skill Blacksmithing|Blacksmithing]] (Trivial: 57)
+** '''Yield: Mithril Bundled Arrow Shafts''' x2
+** In [[Feir`Dal Forge]]:
+:: {{SmIcon|1035}} 1x [[File]]
+:: {{SmIcon|1151}} 1x [[Arrow Shaft Mold]]
+:: {{SmIcon|1138}} 1x [[Large Brick of Mithril]]
+:: {{SmIcon|584}} 1x [[Flask of Water]]
+
+== Mithril Fletchings ==
+
+* [[Skill Fletching|Fletching]] (Trivial: 34)
+** '''Yield: Mithril Fletchings''' x2
+** In [[Feir`Dal Fletching Kit]]:
+:: {{SmIcon|1138}} 1 x [[Small Brick of Mithril]]
+:: {{SmIcon|576}} 1 x [[Mithril Working Knife]]
+
+== Small Groove Nocks ==
+These are simply bought from a fletching merchant. See the materials chart above.
+
+= Final Combine =
+You now have all the parts to create your arrows!  Good luck and happy hunting!
+
+* [[Fletching]] (Trivial: 335)
+** '''Yield: Blessed Champion Arrows''' x1
+** In [[Feir`Dal Fletching Kit]]:
+:: {{SmIcon|1100}} 1 x [[Blessed Arrow Heads]]
+:: {{SmIcon|1110}} 1 x [[Mithril Bundled Arrow Shafts]]
+:: {{SmIcon|1102}} 1 x [[Mithril Fletchings]]
+:: {{SmIcon|977}} 1 x [[Small Groove Nocks]]

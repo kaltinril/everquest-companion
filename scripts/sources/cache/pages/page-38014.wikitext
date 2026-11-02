@@ -1,0 +1,65 @@
+{{Factionpage|
+
+| description = In Neriak 3rd Gate can be found the Hall of the guild Ebon Mask. 
+The [[Rogue]] guildmaster [[Eolorn J`Axx]] has led his guild to have more than a few enemies.  
+Members of Ebon Mask can expect less than warm welcome from the following:
+
+*The [[Guards of Qeynos]]
+*The Barbarian Warriors of Halas called the [[Wolves of the North]]
+*The Halfling Warriors of Rivervale called the [[Guardians of the Vale]]
+*The Leader of Highpass [[Carson McCabe]].
+
+Many other factions than this also oppose the Ebon Mask.  Somehow though the Ebon Mask does not have a shortage of new recruits.
+
+| zones_raise = 
+
+* [[Butcherblock Mountains]]
+* [[Kaladim|North Kaladim]]
+
+| zones_lower = 
+
+* [[Freeport|East Freeport]]
+* [[Greater Faydark]]
+* [[Kithicor Forest]]
+* [[Kaladim|North Kaladim]]
+* [[Neriak|Neriak Third Gate]]
+
+| quests_raise = 
+
+* [[Death of Lyda Nasin]]
+* [[Honeybugger Assassin]]
+* [[Moss Snakes]]
+* [[The Rogue Take]]
+
+| quests_lower = 
+
+* [[Goblin Caster Necklace]]
+* [[Head of Granin O'Gill]]
+* [[Runnyeye Warbeads (Kaladim Rogue)]]
+* [[The Gnome Take]]
+* [[Tribunal Symbol Quests|Tribunal Initiate]]
+* [[Wooly Fungus Quest]]
+
+| mobs_raise = 
+
+* [[Founy Jestands]]? <span class='fmz'>(North Kaladim)</span>
+* [[Guard Gonin]] <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Guard Kyte]] <span class='fmz'>(Butcherblock Mountains)</span>
+
+| mobs_lower = 
+
+* [[Eolorn J`Axx]] <span class='fmz'>(Neriak Third Gate - Quest NPC)</span>
+* [[Frizin Q`Tentu]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Giz Dinree]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Glazin K`Jartan]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Hekzin G`Zule]] <span class='fmz'>(Neriak Third Gate - Quest NPC)</span>
+* [[Kanthu M`Rekkor]] <span class='fmz'>(Neriak Third Gate - Merchant)</span>
+* [[Molon Tplth]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Pazin Punox]] <span class='fmz'>(Neriak Third Gate - Rogue Guildmaster)</span>
+* [[Sazan K`Jartan]] <span class='fmz'>(Neriak Third Gate - Quest NPC)</span>
+* [[Tani N`Mar]] <span class='fmz'>(Neriak Third Gate - Rogue Guildmaster)</span>
+* [[Vivish Slon]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Yaz Tolax]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+
+}}
+[[Category:Achievement Faction]]

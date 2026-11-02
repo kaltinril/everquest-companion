@@ -1,0 +1,33 @@
+==Information==
+Beg an NPC for some money!
+
+* Begging skill is level-capped at (Level x 5): 5 - 255.
+* Has a 9 second cooldown.
+* When you perform a successful beg, NPCs will hand you a random amount of coin. Guards seemingly have an infinite amount of coin, while animals will typically never hand you anything.
+* A failed attempt at begging may result in the NPC or monster attacking you.
+* It is possible to beg platinum pieces no matter your skill level.
+* A great way to skill begging is to beg from a monster you are going to kill anyways then attack.
+* The rate of leveling seems equal to a skill like [[Foraging]].
+* You need to be very close to your mark to attempt. If you are not close enough, you don't beg, but the cooldown timer still activates.
+* Begging shares a cooldown timer with Rogue [[Skill Pick Pocket|Pick Pocket]].
+* You can gain skillups regardless of success or failure.
+
+A successful beg will result in the monster or NPC saying:
+
+:"Here [PC] take this and LEAVE ME ALONE!"
+:You have begged [amount of money].
+
+A critical begging failure will result in the monster or NPC saying one of the following dialogues and attacking you:
+
+:"You have the audacity to beg from me??!" "I Despise beggars, they are not fit to live."
+
+== Training ==
+Begging can be skilled up on any monster that can be stolen from, regardless of con. So, for example, you can beg from a level 1 goblin indefinitely (even after you take all its coin) for skillups.
+
+NPCs that cannot be stolen from, such as merchants, boats, and guild trainers will show failed attempts at begging but will not grant skill ups from begging.
+
+In EQ Legends, you can raise skill on a [[Voidling]] without a risk of being attacked. 
+
+{{Navbox Skills}}
+
+[[Category:Skills]]

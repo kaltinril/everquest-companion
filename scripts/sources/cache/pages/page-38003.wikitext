@@ -1,0 +1,33 @@
+{{Factionpage|
+
+| description = The normal citizens of Oggok.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Oggok]]
+* [[The Feerrott]]
+
+| quests_raise = 
+
+* [[The Emissary]]
+* [[Marda's Secret Mission]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Bup]] <span class='fmz'>(The Feerrott)</span>
+* [[Duga]] <span class='fmz'>(The Feerrott)</span>
+* [[Fugla]] <span class='fmz'>(The Feerrott - Merchant)</span>
+* [[Grak]]  <span class='fmz'>(The Feerrott)</span>
+* [[Mugu]] <span class='fmz'>(The Feerrott - Merchant)</span>
+* [[Murg]] <span class='fmz'>(The Feerrott - Merchant)</span>
+
+}}

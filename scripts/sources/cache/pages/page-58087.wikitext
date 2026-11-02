@@ -1,0 +1,12 @@
+Classes: ALL
+
+Reuse: 6h 0m
+
+This alternate advancement ability, when activated, will give everyone in your party the option of teleporting directly to your location.
+
+Requirements: level 1.
+
+Ability Activation ID: 5 - Refresh Time 6:00:00 - Ability Timer(s): 99
+
+{{Navbox Skills}}
+[[Category: Skills]]

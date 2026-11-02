@@ -1,0 +1,10 @@
+Classes: ALL
+
+Cooldown: 18m 0s
+
+This alternate advancement ability, when unlocked, transports you back to your starting city.
+
+You can check your origin location using the command /charinfo.
+
+{{Navbox Skills}}
+[[Category: Skills]]

@@ -1,0 +1,185 @@
+{{Classic Era}}[[File:Npc_furtog_ogrebane.png|right]]{{Factionpage|
+
+| description = In North Kaladim can be found the [[Warrior]] Guildhall of Storm Guard. Guildmaster [[Furtog Ogrebane]] leads the guild and can often be found overlooking the small arena in front of the guild. 
+
+The Storm Guard warriors support the Dwarven [[King Kazon Stormhammer]], the [[Merchants of Kaladim]] and the Paladin's guild called [[Miners Guild 249]]. 
+
+They deal war against the incursions of [[Krag]], [[Pickclaw Goblins]], [[Clan Runnyeye]], [[Riptide Goblins]], and [[Crushbone Orcs]]. They have a specific hatred for the [[Craknek Warriors]] of Oggok. With a name like Ogrebane, somehow this is not surprising.
+
+| zones_raise = 
+
+* [[Butcherblock Mountains]]
+* [[Clan Runnyeye]]
+* [[Crushbone]]
+* [[Dagnor's Cauldron]]
+* [[Greater Faydark]]
+* [[Kedge Keep]]
+* [[Lake Rathetear]]
+* [[Lesser Faydark]]
+* [[Ocean of Tears]]
+* [[Oggok]]
+* [[Southern Desert of Ro]]
+* [[Steamfont Mountains]]
+* [[Western Plains of Karana]]
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Crushbone]]
+* [[Dagnor's Cauldron]]
+* [[Firiona Vie]]
+* [[Innothule Swamp]]
+* [[Lake of Ill Omen]]
+* [[Rathe Mountains]]
+* [[Kaladim|North Kaladim]]
+* [[Qeynos Hills]]
+* [[Kaladim|South Kaladim]]
+* [[Steamfont Mountains]]
+
+| quests_raise = 
+
+* [[Beguile Plants Quest]]
+* [[Blyle Bundin's Head]]
+* [[Brain Bite (Good)]]
+* [[Cleaner Clockwork]]
+* [[Crushbone Belts]]
+* [[Crushbone Shoulderpads Quest]]
+* [[Drolvarg Teeth]]
+* [[Goblin Raiders]]
+* [[Illusion: Iksar Quest]]
+* [[Knight Card Quest]]
+* [[Ogre Heads]]
+* [[Rat Pelts]]
+* [[Runnyeye Warbeads (Kaladim Warrior)]]
+* [[Scarab Armor Quests]]
+* [[Trueshot Longbow Quest]]
+* [[Trumpy Irontoe]]
+
+| quests_lower = 
+
+* [[Lizard Meat No 2]]
+* [[Lizard Tails No 2]]
+* [[The Bridge]]
+
+| mobs_raise = 
+
+* [[a deepwater goblin]]  <span style="color:gray">(Lake Rathetear, Oasis of Marr)</span>
+* [[a dwarven bandit]]  <span style="color:gray">(Butcherblock Mountains)</span>
+* [[a goblin]]  <span style="color:gray">(Butcherblock Mountains)</span>
+* [[a goblin whelp]]  <span style="color:gray">(Butcherblock Mountains)</span>
+* [[a krag elder]]  <span style="color:gray">(Butcherblock Mountains)</span>
+* [[an aqua goblin]]  <span style="color:gray">(Butcherblock Mountains)</span>
+* [[an aqua goblin shaman]]  <span style="color:gray">(Butcherblock Mountains)</span>
+* [[an enraged goblin]]  <span style="color:gray">(Butcherblock Mountains)</span>
+* [[an orc scout]]  <span style="color:gray">(Dagnor's Cauldron)</span>
+* [[an orc witchdoctor]]  <span style="color:gray">(Greater Faydark)</span>
+* [[aqua goblin prisoner]]  <span style="color:gray">(Kedge Keep)</span>
+* [[Barma Dunfire]]  <span style="color:gray">(Butcherblock Mountains)</span>
+* [[Bonlarg]] <span style="color:gray">(Oggok - Shadowknight Guildmaster)</span>
+* [[Centurion Relgle]]  <span style="color:gray">(Greater Faydark)</span>
+* [[Chief Goonda]] <span style="color:gray">(West Karana - Shaman Guildmaster)</span>
+* [[Crilt - Ogre|Crilt]] <span style="color:gray">(Oggok - Merchant)</span>
+* [[Crytil Dunfire]]  <span style="color:gray">(Butcherblock Mountains)</span>
+* [[Emperor Crush]]  <span style="color:gray">(Crushbone)</span>
+* [[Glynda Smeltpot]]  <span style="color:gray">(Butcherblock Mountains)</span>
+* [[Glynn Smeltpot]]  <span style="color:gray">(Butcherblock Mountains)</span>
+* [[Goob Mudtoe]]  <span style="color:gray">(Ocean of Tears)</span>
+* [[Grevak]] <span style="color:gray">(Oggok - Shadowknight Guildmaster)</span>
+* [[Gundl]]  <span style="color:gray">(Butcherblock Mountains)</span>
+* [[Keldyn Dunfire]] <span style="color:gray">(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Lord Darish]]  <span style="color:gray">(Crushbone)</span>
+* [[Margyl Darklin]]  <span style="color:gray">(Butcherblock Mountains)</span>
+* [[Orc Pawn (Crushbone)|Orc Pawn]]  <span style="color:gray">(Crushbone)</span>
+* [[Orc Centurion (Crushbone)|Orc Centurion]]  <span style="color:gray">(Crushbone)</span>
+* [[Orc Oracle (Crushbone)|Orc Oracle]]  <span style="color:gray">(Crushbone)</span>
+* [[Orc Legionnaire (Crushbone)|Orc Legionnaire]]  <span style="color:gray">(Crushbone)</span>
+* [[orc chief]]  <span style="color:gray">(Lesser Faydark)</span>
+* [[orc emissary]]  <span style="color:gray">(Crushbone)</span>
+* [[orc hatchetman]]  <span style="color:gray">(Greater Faydark)</span>
+* [[orc slaver]]  <span style="color:gray">(Crushbone)</span>
+* [[orc taskmaster]]  <span style="color:gray">(Crushbone)</span>
+* [[orc trainer]]  <span style="color:gray">(Crushbone)</span>
+* [[orc warlord]]  <span style="color:gray">(Crushbone)</span>
+* [[Peg Leg]]  <span style="color:gray">(Butcherblock Mountains)</span>
+* [[Rondo Dunfire]]  <span style="color:gray">(Crushbone)</span>
+* [[royal guard]]  <span style="color:gray">(Crushbone)</span>
+* [[Sludge Dankmire]]  <span style="color:gray">(Clan RunnyEye)</span>
+* [[Soonog]] <span style="color:gray">(Oggok - Shadowknight Guildmaster)</span>
+* [[Stump Rundl]]  <span style="color:gray">(Butcherblock Mountains)</span>
+* [[The Prophet]]  <span style="color:gray">(Crushbone)</span>
+* [[Trusk]] <span style="color:gray">(Oggok - Merchant)</span>
+
+| mobs_lower = 
+
+* [[a dwarven smith]]  <span style="color:gray">(Crushbone)</span>
+* [[a pilgrim]]  <span style="color:gray">(Firiona Vie)</span>
+* [[Aanina Rockfinder]] <span style="color:gray">(North Kaladim - Merchant)</span>
+* [[an explorer]]  <span style="color:gray">(Lake of Ill Omen)</span>
+* [[Blyle Bundin]] <span style="color:gray">(Butcherblock Mountains - Quest NPC)</span>
+* [[Bndainy Everhot]] <span style="color:gray">(North Kaladim - Merchant)</span>
+* [[Bunk Odon]]  <span style="color:gray">(Innothule Swamp)</span>
+* [[Dimlore Stormhammer]] <span style="color:gray">(Steamfont Mountains - NPC, Non-Quest)</span>
+* [[Dindaek Everhot]] <span style="color:gray">(North Kaladim - Merchant)</span>
+* [[Firiona drixie]]  <span style="color:gray">(Firiona Vie)</span>
+* [[Fugan Mumfur]] <span style="color:gray">(Butcherblock Mountains - Merchant)</span>
+* [[Furtog Ogrebane]] <span style="color:gray">(South Kaladim - Warrior Guildmaster)</span>
+* [[Gand Truelink]] <span style="color:gray">(Butcherblock Mountains - Merchant)</span>
+* [[Guard Adolar]] <span style="color:gray">(South Kaladim)</span>
+* [[Guard Adolmer]] <span style="color:gray">(South Kaladim)</span>
+* [[Guard Anathur]] <span style="color:gray">(South Kaladim)</span>
+* [[Guard Badmer]] <span style="color:gray">(South Kaladim)</span>
+* [[Guard Bobbin]] <span style="color:gray">(South Kaladim)</span>
+* [[Guard Cardaff]] <span style="color:gray">(South Kaladim)</span>
+* [[Guard Clendin]] <span style="color:gray">(Butcherblock Mountains)</span>
+* [[Guard Dalammer]] <span style="color:gray">(North Kaladim)</span>
+* [[Guard Dalthur]] <span style="color:gray">(North Kaladim)</span>
+* [[Guard Didek]] <span style="color:gray">(South Kaladim)</span>
+* [[Guard Dinamin]] <span style="color:gray">(South Kaladim)</span>
+* [[Guard Dinler]] <span style="color:gray">(South Kaladim)</span>
+* [[Guard Doradek]] <span style="color:gray">(North Kaladim)</span>
+* [[Guard Frandan]] <span style="color:gray">(Firiona Vie)</span>
+* [[Guard Gabbles]] <span style="color:gray">(South Kaladim)</span>
+* [[Guard Hinolmer]] <span style="color:gray">(South Kaladim)</span>
+* [[Guard Humkor]] <span style="color:gray">(South Kaladim)</span>
+* [[Guard Humphet]] <span style="color:gray">(South Kaladim)</span>
+* [[Guard Kaldolar]] <span style="color:gray">(North Kaladim)</span>
+* [[Guard Kanuf]] <span style="color:gray">(North Kaladim)</span>
+* [[Guard Kathur]] <span style="color:gray">(South Kaladim)</span>
+* [[Guard Kindor]] <span style="color:gray">(South Kaladim)</span>
+* [[Guard Koranin]] <span style="color:gray">(South Kaladim)</span>
+* [[Guard Mandin]] <span style="color:gray">(Butcherblock Mountains)</span>
+* [[Guard Ninadek]] <span style="color:gray">(South Kaladim)</span>
+* [[Guard Ninaf]] <span style="color:gray">(South Kaladim)</span>
+* [[Guard Stump]] <span style="color:gray">(South Kaladim)</span>
+* [[Guard Tantan]] <span style="color:gray">(South Kaladim)</span>
+* [[Hiptal Frizzleboth]] <span style="color:gray">(Firiona Vie - Magician Guildmaster)</span>
+* [[Karam Dragonforge]] <span style="color:gray">(Mountains of Rathe - Merchant)</span>
+* [[King Kazon Stormhammer]]  <span style="color:gray">(South Kaladim)</span>
+* [[Kinlo Strongarm]] <span style="color:gray">(North Kaladim - Quest NPC)</span>
+* [[Lady Chromoire]]  <span style="color:gray">(Firiona Vie)</span>
+* [[Luminare Pasinia]] <span style="color:gray">(Firiona Vie - Quest NPC)</span>
+* [[Murlond Everhot]] <span style="color:gray">(North Kaladim - Merchant)</span>
+* [[Ragunk Everhot]] <span style="color:gray">(North Kaladim - Merchant)</span>
+* [[Scout Treekill]]  <span style="color:gray">(Firiona Vie)</span>
+* [[Serenk Greybloom]] <span style="color:gray">(North Kaladim - Merchant)</span>
+* [[Sergeant Daelione]] <span style="color:gray">(Firiona Vie)</span>
+* [[Sergeant Greenblade]] <span style="color:gray">(Firiona Vie)</span>
+* [[Shieldbearer Relios]] <span style="color:gray">(Firiona Vie)</span>
+* [[Sigan Ilbirkun]] <span style="color:gray">(Dagnor's Cauldron - NPC, Non-Quest)</span>
+* [[Tagnis Ginfarr]] <span style="color:gray">(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Thar Kelgand]] <span style="color:gray">(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Tissin Greybloom]] <span style="color:gray">(North Kaladim - Merchant)</span>
+* [[Tortuk Everhot]] <span style="color:gray">(North Kaladim - Merchant)</span>
+* [[Tracker Azeal]] <span style="color:gray">(Firiona Vie - NPC, Non-Quest)</span>
+* [[Trantor Everhot]]  <span style="color:gray">(North Kaladim)</span>
+* [[Vrionele]]  <span style="color:gray">(Firiona Vie)</span>
+* [[Wella Fargin]] <span style="color:gray">(Firiona Vie - Banker)</span>
+* [[Wellford Fargin]] <span style="color:gray">(Firiona Vie - Banker)</span>
+
+}}
+= Suggested Route =
+*[[Tumpy Tonics]] (+[[Storm Guard]], +[[Kazon Stormhammer]], +[[Miners Guild 249]], +[[Merchants of Kaladim]], -[[Craknek Warriors]])
+
+
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

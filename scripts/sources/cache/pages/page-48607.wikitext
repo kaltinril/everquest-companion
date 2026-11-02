@@ -1,0 +1,76 @@
+The skill that governs the use of [[:Category:1H_Blunt | one-handed blunt ("1HB") weapons]].
+
+== Classes ==
+
+{| class="wikitable"
+!Class
+!Cap Until 50
+!Cap Above 50
+!Feb 21, 2001
+!Oct 8, 2001
+|-
+|[[Monk]] (5+5xLEVEL)
+|240
+|252
+|-
+|[[Warrior]] (5+5xLEVEL)
+|200
+|250
+|-
+|[[Ranger]] (5+5xLEVEL)
+|200
+|240
+|250
+|-
+|[[Paladin]] (5+5xLEVEL)
+|200
+|225
+|-
+|[[Shadow Knight]] (5+5xLEVEL)
+|200
+|225
+|-
+|[[Bard]] (5+5xLEVEL)
+|200
+|225
+|
+|250
+|-
+|[[Shaman]] (4+4xLEVEL)
+|200
+|200
+|-
+|[[Cleric]] (4+4xLEVEL)
+|175
+|175
+|-
+|[[Druid]] (4+4xLEVEL)
+|175
+|175
+|-
+|[[Enchanter]] (3+3xLEVEL)
+|110
+|110
+|-
+|[[Magician]] (3+3xLEVEL)
+|110
+|110
+|-
+|[[Necromancer]] (3+3xLEVEL)
+|110
+|110
+|-
+|[[Wizard]] (3+3xLEVEL)
+|110
+|110
+|}
+
+
+== Ratios ==
+
+[[File:1H_Damage_Ratios.jpg|link=]]
+
+== Navigation ==
+
+{{Navbox Skills}}
+[[Category: Skills]]

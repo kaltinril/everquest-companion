@@ -1,0 +1,341 @@
+{{Velious Era}}
+[[File:Npc_a_frost_giant.png|right]]{{Factionpage|
+
+| description = The frost giants. Allied with the [[Kromzek]] and enemies of the [[Coldain]]. Most Kromrif are considered the lower class of the society of giants on Velious, and live either in their city of [[Kael Drakkel]] with the storm giants or venture out into the [[Eastern Wastes]] and [[Great Divide]] in search of [[Coldain]] enemies. They tend to sport rugged beards and wear leather and scale armor. Like the [[Coldain]], they have domesticated the native dire wolves of [[Velious]] to assist them in battle and track enemies and game.
+
+Most characters will start as kill-on-sight to this faction, except [[Rallos Zek]] [[Ogre]]s.
+
+| zones_raise =
+
+* [[Eastern Wastes]]
+* [[Great Divide]]
+* [[Iceclad Ocean]]
+* [[Icewell Keep]]
+* [[Kael Drakkel]]
+* [[Thurgadin]]
+
+| zones_lower =
+
+* [[Eastern Wastes]]
+* [[Great Divide]]
+* [[Iceclad Ocean]]
+* [[Kael Drakkel]]
+* [[Kerafyrm's Lair]]
+* [[The Wakening Land]]
+* [[Western Wastes]]
+
+| quests_raise =
+
+* [[Bvellos' Bounty]]
+* [[Coldain Books of Tactics]]
+* [[Coldain Skulls]]
+* [[Demise of Blizzent]]
+* [[Faerie Dragon Wings]]
+* [[Field Supplies Quest]]
+* [[Living Dragons]]
+* [[Living Granite Quest]]
+* [[Mechanical Net Delivery]]
+* [[Reinforcements for The Tunarean Regiment]]
+* [[Slaggak's Bounty]]
+* [[Strife to the Coldain]]
+* [[The Family Chest Straps]]
+* [[The Supply Run - Eastern Wastes]]
+* [[Tiny Savages]]
+* [[Vkjor's Major Task]]
+* [[Wage War Upon The Coldain]]
+
+* [[Bard Kael Armor Quests]]
+* [[Cleric Kael Armor Quests]]
+* [[Druid Kael Armor Quests]]
+* [[Enchanter Kael Armor Quests]]
+* [[Magician Kael Armor Quests]]
+* [[Monk Kael Armor Quests]]
+* [[Necromancer Kael Armor Quests]]
+* [[Paladin Kael Armor Quests]]
+* [[Ranger Kael Armor Quests]]
+* [[Rogue Kael Armor Quests]]
+* [[Shaman Kael Armor Quests]]
+* [[Shadowknight Kael Armor Quests]]
+* [[Warrior Kael Armor Quests]]
+* [[Wizard Kael Armor Quests]]
+
+| quests_lower =
+
+* [[Coldain Ring Quests]]
+* [[Coldain Prayer Shawl Quests]]
+* [[The Velium Focus]]
+
+* [[Bard Thurgadin Armor Quests]]
+* [[Cleric Thurgadin Armor Quests]]
+* [[Druid Thurgadin Armor Quests]]
+* [[Enchanter Thurgadin Armor Quests]]
+* [[Magician Thurgadin Armor Quests]]
+* [[Monk Thurgadin Armor Quests]]
+* [[Necromancer Thurgadin Armor Quests]]
+* [[Paladin Thurgadin Armor Quests]]
+* [[Ranger Thurgadin Armor Quests]]
+* [[Rogue Thurgadin Armor Quests]]
+* [[Shaman Thurgadin Armor Quests]]
+* [[Shadowknight Thurgadin Armor Quests]]
+* [[Warrior Thurgadin Armor Quests]]
+* [[Wizard Thurgadin Armor Quests]]
+
+| mobs_raise =
+
+* [[a coldain hunter]] <span class='fmz'>(Eastern Wastes - NPC, Non-Quest)</span>
+* [[a coldain lookout]] <span class='fmz'>(Eastern Wastes - Quest NPC)</span>
+* [[a Coldain miner]]  <span class='fmz'>(Great Divide)</span>
+* [[a coldain missionary]] <span class='fmz'>(Eastern Wastes - NPC, Non-Quest)</span>
+* [[a coldain skinner]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[a Coldain tracking wolf]]  <span class='fmz'>(Great Divide)</span>
+* [[a coldain warrior]] <span class='fmz'>(Eastern Wastes - NPC, Non-Quest)</span>
+* [[a coldain wolfmaster]] <span class='fmz'>(Great Divide - NPC, Non-Quest)</span>
+* [[a velium miner]]  <span class='fmz'>(Great Divide)</span>
+* [[Adia Coldbeard]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[an expedition guard]]  <span class='fmz'>(Great Divide)</span>
+* [[An Icewell Sentinel]] <span class='fmz'>(Icewell Keep)</span>
+* [[an injured warrior]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[Argash]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Betti Frostweaver]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Bixx Bartleby]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Brimgald Brightsteel]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Brina Snowfox]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Brynjar]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Captain Stonefist]]  <span class='fmz'>(Great Divide)</span>
+* [[Celtir Gronback]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Chamberlain Krystorf]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Clara]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Coldain Outcast]] <span class='fmz'>(Icewell Keep - Merchant)</span>
+* [[Corbin Blackwell]] <span class='fmz'>(Eastern Wastes - Quest NPC)</span>
+* [[Councilor Amberfeld]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Councilor Coldember]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Councilor Darakor]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Councilor Darkfrost]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Councilor Deynekn]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Councilor Dirkins]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Councilor Glacierbane]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Councilor Icelok]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Councilor Icepike]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Councilor Thubins]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Councilor Wintershade]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Darts O`Gavin]] <span class='fmz'>(Thurgadin - NPC, Non-Quest)</span>
+* [[Deaen Greyforge]] <span class='fmz'>(Eastern Wastes - Quest NPC)</span>
+* [[Doogle McBanick]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Durgan Bottlenip]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Fogerty Bottlenip]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Frundle Frenkler]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Gage]] <span class='fmz'>(Thurgadin - Banker)</span>
+* [[Garadain Glacierbane]] <span class='fmz'>(Eastern Wastes - Quest NPC)</span>
+* [[Garish Ironhelm]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Gilthan Brittleblade]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Grand Historian Thoridain]] <span class='fmz'>(Thurgadin - Quest NPC)</span>
+* [[Grand Huntsman Darral]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Guard Audun]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Baldvin]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Bergur]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Bjorn]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Clorn]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Dagur]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Dobbs]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Eirikur]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Elin]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Enre]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Eyvindur]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Fjola]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Gord]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Halldor]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Iris]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Jonas]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Karl]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Kilandur]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Korik]] <span class='fmz'>(Great Divide)</span>
+* [[Guard Krag]] <span class='fmz'>(Great Divide)</span>
+* [[Guard Kristrun]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Larus]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Leif]] <span class='fmz'>(Thurgadin - Quest NPC)</span>
+* [[Guard Mason]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Oskar]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Pert]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Rakel]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Royt]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Sigrun]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Suuna]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Teitur]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Thorbin]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Tinna]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Valdis]]  <span class='fmz'>(Thurgadin)</span>
+* [[Hakon Brightsteel]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Hulda]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Jeril Kettletop]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Karey]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Klarp Bartleby]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Korf Brokenhammer]]  <span class='fmz'>(Great Divide)</span>
+* [[Korrigain]] <span class='fmz'>(Eastern Wastes - Quest NPC)</span>
+* [[Leifur]] <span class='fmz'>(Thurgadin - Quest NPC)</span>
+* [[Lorekeeper Derrin]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Lorekeeper Einar]]  <span class='fmz'>(Thurgadin)</span>
+* [[Lorekeeper Taben]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Loremaster Borannin]] <span class='fmz'>(Thurgadin - Quest NPC)</span>
+* [[Loremaster Dorinan]] <span class='fmz'>(Thurgadin - Quest NPC)</span>
+* [[Loremaster Fronden]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Loremaster Solstrin]] <span class='fmz'>(Icewell Keep - Quest NPC)</span>
+* [[Meg Tucter]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Mordin Frostcleaver]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Nimren Stonecutter]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Pearce Icefang]]  <span class='fmz'>(Thurgadin)</span>
+* [[Perkins Doughbeard]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Petcas Coldbeard]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Relik]] <span class='fmz'>(Great Divide - Quest NPC)</span>
+* [[Rexx Frostweaver]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Seneschal Aldikar]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Sentinel Paxin]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Seril Kettletop]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Talem Tucter]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Tavir]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Tobart Dirkins]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Trademaster Kroven]]  <span class='fmz'>(Thurgadin)</span>
+* [[Vores the Hunter]]  <span class='fmz'>(Great Divide)</span>
+* [[Wevil Doughbeard]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Wolfmaster Finnur]]  <span class='fmz'>(Thurgadin)</span>
+* [[Zrelik the Scout]] <span class='fmz'>(Thurgadin - Quest NPC)</span>
+
+| mobs_lower =
+
+* [[a cleric of Vallon Zek]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[a domesticated direwolf]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[a drakkel dire wolf]]  <span class='fmz'>(Great Divide)</span>
+* [[a frost giant]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[a frost giant berserker]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[a frost giant captain]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[a frost giant commoner]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[a frost giant elite]]  <span class='fmz'>(Great Divide)</span>
+* [[a frost giant gladiator]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[a frost giant laborer]]  <span class='fmz'>(The Wakening Land)</span>
+* [[a Frost Giant Lord]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[a frost giant savage]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[a frost giant scout]]  <span class='fmz'>(Great Divide)</span>
+* [[a frost giant sentinel]]  <span class='fmz'>(The Wakening Land)</span>
+* [[a frost giant sentry]]  <span class='fmz'>(The Wakening Land)</span>
+* [[a frost giant trainer]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[a frost giant wolf tamer]] <span class='fmz'>(Kael Drakkel - Quest NPC)</span>
+* [[a guardian of Zek]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[a Kromrif recruiter]] <span class='fmz'>(Kael Drakkel - Quest NPC)</span>
+* [[a Kromzek Captain]] <span class='fmz'>(Western Wastes - Quest NPC)</span>
+* [[a lesser storm giant noble]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[a priest of Tallon Zek]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[a Protector of Zek]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[a storm giant berserker]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[a storm giant commoner]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[A Storm Giant Foreman]]  <span class='fmz'>(The Wakening Land)</span>
+* [[a storm giant gladiator]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[a storm giant surveyor]]  <span class='fmz'>(The Wakening Land)</span>
+* [[a temple guardian]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[a visiting noble]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[a wounded storm giant]]  <span class='fmz'>(The Wakening Land)</span>
+* [[Adjutant Cryyrn]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Adjutant Derkan]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Adjutant Droggren]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Adjutant Frinevrn]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Adjutant Hekrandor]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Adjutant Hoggren]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Adjutant Jharll]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Adjutant Skjell]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Adjutant Stormkeeper]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Adjutant Thyek]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[an angry commoner]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Armor of Zek]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Barbarian Mercenary]] <span class='fmz'>(The Wakening Land - Quest NPC)</span>
+* [[Bekerak Coldbones]] <span class='fmz'>(Great Divide - Quest NPC)</span>
+* [[Bjorak Stonefist]] <span class='fmz'>(Kael Drakkel - Merchant)</span>
+* [[Bjrakor the Cold]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Captain Bvellos]] <span class='fmz'>(Kael Drakkel - Quest NPC)</span>
+* [[Clrakk Blackfist]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Commander Bahreck]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[Derakor the Vindicator]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Fergul Frostsky]]  <span class='fmz'>(Great Divide)</span>
+* [[Fjloaren Icebane]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[Frostgiant Overseer]]  <span class='fmz'>(The Wakening Land)</span>
+* [[Gkrean Prophet of Tallon]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Gnome Mercenary]]  <span class='fmz'>(The Wakening Land)</span>
+* [[Gorul Longshanks]]  <span class='fmz'>(Great Divide)</span>
+* [[Guard Blaesek]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Guard Fjleed]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Guard Fjorlek]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Guard Fleshflayer]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Guard Greybeard]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Guard Hallenban]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Guard Khyosr]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Guard Kkrean]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Guard Ragern]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Guard Rolkin]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Guard Sjior]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Guard Stonebender]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Guard Ulfhedinn]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Guard Vydel]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Human Mercenary]]  <span class='fmz'>(The Wakening Land)</span>
+* [[Kallis Stormcaller]] <span class='fmz'>(Kael Drakkel - Quest NPC)</span>
+* [[Klaggan Iceshard]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Korakaz]] <span class='fmz'>(Kael Drakkel - Quest NPC)</span>
+* [[Korzak Stonehammer]] <span class='fmz'>(The Wakening Land - Quest NPC)</span>
+* [[kromriff guardsman]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[Legionnaire Byltor]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Legionnaire Icebender]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Legionnaire Renarn]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Legionnaire Sjeldor]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Legionnaire Yvedrn]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Lieutenant Krofer]]  <span class='fmz'>(The Wakening Land)</span>
+* [[Lieutenant Stormeye]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Noble Helssen]] <span class='fmz'>(Kael Drakkel - Quest NPC)</span>
+* [[Pollos Stormkeeper]] <span class='fmz'>(Kael Drakkel - Banker)</span>
+* [[Priest Grenk]] <span class='fmz'>(The Wakening Land - Quest NPC)</span>
+* [[protector of Zek]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Semkak Prophet of Vallon]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Senior Guard Akurr]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Senior Guard Dhryell]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Senior Guard Eihorn]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Senior Guard Grelden]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Senior Guard Icemead]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Senior Guard Randeil]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Senior Guard Tymul]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Senior Guard Whiteaxe]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Sentinel Sunderdrake]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Sergeant Blestrom]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Sergeant Brunfel]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Sergeant Fjrak]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Sergeant Miidenaer]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Sergeant Tellsren]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Sergeant Yggrellnik]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Teir`Dal Mercenary]]  <span class='fmz'>(The Wakening Land)</span>
+* [[The Avatar of War]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[The Statue of Rallos Zek]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Troll Mercenary]]  <span class='fmz'>(The Wakening Land)</span>
+* [[Trooper Derheim]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Trooper Dlemdimor]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Trooper Ebonblade]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Trooper Gyarll]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Trooper Jhonev]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Trooper Khyren]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Trooper Mjflean]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Trooper Nyorll]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Trooper Relhjorn]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Trooper Sardek]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Vealok the Angry]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Veteran Icecaller]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Veteran Skeldek]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Veteran Surlren]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Veteran Yllhaydm]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Vkjor]] <span class='fmz'>(Kael Drakkel - Quest NPC)</span>
+* [[Watcher Thrensheld]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Watcher Zedlek]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Watchman Bexlend]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Watchman Erendor]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Watchman Gardal]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Watchman Njella]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Watchman Reglekar]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Watchman Sunderthorn]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Watchman Thyek]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Watchman Vedravik]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Watchman Weyaen]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Weyrevar Bluehammer]] <span class='fmz'>(Kael Drakkel - Merchant)</span>
+
+}}

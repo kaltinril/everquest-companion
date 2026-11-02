@@ -1,0 +1,130 @@
+= Quest Guide by Jokon =
+
+The following documentation covers the best and worst quests for questing in Classic Everquest Legends. If you are looking for a ''specific'' guide for a quest please follow the links or use the search bar; this page is intended to aggregate the quests for quality.
+
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" | <span class="mw-collapsible-toggle" title="Good Quests" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Must Do</span>
+|-
+| style="padding:0.75rem;" |
+<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:visible;">
+<div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">
+{| class="wikitable"
+|+
+!Quest Name
+!Rec. Level
+!Why
+!Notes
+|-
+|[[Gnoll Fangs Quest|Gnoll Fangs]]
+|5
+|Lots of XP and Faction
+|South Qeynos OR Halas
+|-
+|[[Gharin's Note (evil)|Gharin's Note(evil)]]
+|1
+|Fix Bloodsaber faction
+|Especially do after killing Lord Grimrot
+|-
+|[[Tesch Val Scrolls]]
+|25
+|Easy to do
+|Any scroll works with Edvard Tommels
+|-
+|[[Qeynos Badge Quests|Qeynos Honor Badges]]
+|20+
+|Excellent necklace with see invis exalt
+|Very long
+|-
+|[[Merona's Brother]]
+|3
+|Early jewelry
+|Reward is random
+|-
+|[[Langseax Quest|Langseax]]
+|15+
+|Good warrior weapons
+|Reward is random
+|-
+|[[The Gnoll Slayer|Gnoll Slayer]]
+|20+
+|Excellent weapon for fighting gnolls
+|Great if planning on leveling in Splitpaw later
+|-
+|[[Miranda's Dice]]
+|20
+|Clickable Snare
+|Helps loadouts w/o snare
+|-
+|[[Heretic Heads]]
+|22+
+|Decent caster helm OR haste belt
+|45m respawn per heretic
+|-
+|[[Yuio's Illness]]
+|25+
+|Great mid-range weapon
+|Proc is also excellent
+|-
+|[[Leatherfoot Raiders|Leatherfoot Raider's Skullcap]]
+|20+
+|Portal clicky
+|
+|-
+|[[Gnasher's Head]]
+|10
+|Awesome quest script
+|Requires BOTH drops from Gnasher Furgutt
+|-}
+</div>
+</div>
+|}
+|}
+
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! colspan="4" style="text-align:left;" | <span class="mw-collapsible-toggle" title="Bad Quests" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Must Skip</span>
+|-
+! style="padding:0.75rem;" |Quest Name
+!Rec. Level
+!Why
+!Notes
+|-
+|[[Jagged Pine Crook Staff|Jaggedpine Crook]]
+|5
+|Way too rare, takes too long
+|Need two rare pieces from rare spawning mob
+|-
+|[[The Bayle List]]
+|20
+|Too much traveling, item is not good
+|
+|-
+|[[Kobold Molars (Evil)|Kobold Molars (evil)]]
+|5
+|Faction negatives not worth it
+|Hand in at Erudin instead for better net gains
+|-
+|[[Hollow Skull Quest|Hollow Skull]]
+|30
+|Trigger mob is rare
+|Bring ranger if you must
+|-
+|[[Solvedi Scimitar Quest|Solvedi Scimitar]]
+|25
+|Quest mobs are rare, drops not guaranteed
+|
+|-
+|[[Tibrinn's Quest]]
+|35
+|Quest mobs are rare, drops not guaranteed
+|
+|-
+|[[Lord Grimrot's Love]]
+|25
+|Broken
+|
+|-
+|[[The Visiting Priestess]]
+|30
+|Not great, rare drops from rare mobs
+|
+|}

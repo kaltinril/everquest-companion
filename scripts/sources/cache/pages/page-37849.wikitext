@@ -1,0 +1,57 @@
+{{Factionpage|
+
+| description = Residents of the [[Iksar]] city of Cabilis.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Cabilis|East Cabilis]]
+* [[Field of Bone]]
+* [[Firiona Vie]]
+* [[Lake of Ill Omen]]
+* [[Swamp of No Hope]]
+* [[Warsliks Woods]]
+
+| quests_raise = 
+
+* [[Blood Ink]]
+* [[Bone Chips Quests]]
+* [[Catfish Croak Sandwich Quest]]
+* [[Curscale Shield]]
+* [[Frogloc Tad Tongues]]
+* [[Geozite Tool Quest]]
+* [[Granite Pebbles]]
+* [[Illweed Parchment Quest]]
+* [[Legion Lager Quest]]
+* [[Marauder Armor]]
+* [[Sarnak Hatchling Brains]]
+* [[Scaled Curskins]]
+* [[Scorpion Pincers]]
+* [[The Restraining Order]]
+* [[Warrior Pike Quests|Warrior Pike #1 (Militia Pike)]]
+* [[Warrior Pike Quests|Warrior Pike #2 (Footman's Pike)]]
+* [[Warrior Pike Quests|Warrior Pike #4 (Trooper's Pike)]]
+* [[Watcher Torches]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Captain Gideen]] <span class='fmz'>(Warsliks Wood)</span>
+* [[Captain Nedar]] <span class='fmz'>(Swamp of No Hope)</span>
+* [[Frizazz]] <span class='fmz'>(East Cabilis - Quest NPC)</span>
+* [[Jozter]] <span class='fmz'>(East Cabilis - Quest NPC)</span>
+* [[Klok Migo]] <span class='fmz'>(Swamp of No Hope - Merchant)</span>
+* [[Trooper Taer]] <span class='fmz'>(Field of Bone)</span>
+* [[Vekis]] <span class='fmz'>(Firiona Vie - Quest NPC)</span>
+* [[Vessel Drozlin]] <span class='fmz'>(East Cabilis - Quest NPC)</span>
+* [[Warlord Hikyg]] <span class='fmz'>(Swamp of No Hope)</span>
+* [[Warlord Zyzz]] <span class='fmz'>(Field of Bone)</span>
+
+}}

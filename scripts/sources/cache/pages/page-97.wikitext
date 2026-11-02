@@ -1,0 +1,694 @@
+{{cleanup}}
+Finding one's way about Norrath is a task never want for assistance.
+
+== Getting Around Guide ==
+
+The purpose of this article is to provide you with the basics on how to get around the entire world of Everquest, designed for both newbie and expert alike. I'll talk about moving by foot, boat, and by spell and hopefully provide enough information that, after reading this, you'll be able to move freely around Norrath. It will help to be familiar with the [[Zones]], how they [[Zone Connection World|connect]], and the [[Commands#.2Floc|Location Command]].
+
+=== Land Travel ===
+
+Land Travel is the most common method of getting anywhere within the game. It is also about the least desirable, since it takes quite a bit of time to get from point A to point B within the game. There are several methods by which people speed up land travel however, which I will describe.
+
+==== Movement Speed Spells ====
+
+By far the most popular method is the spell [[Spirit of Wolf]], commonly called a SOW. This spell can be cast by shamans at level 9, by druids at level 14, and by rangers when they hit level 30, and can be cast on anyone. The higher level the caster is, the faster the spell allows you to move. This spell increases your run speed significantly (by a third to a half) and enables you to move quickly over land. Most monsters can't outrun you if you have SOW on you, although be aware that certain high-level ones can (like named Griffins and some giants), and that other creatures can snare or root you as well. Occasionally you will even find creatures that cast SOW on themselves (the ogres in WK are notorious for this) and can catch you that way. The spell lasts around 35 minutes. Alchemists have the ability to make potions that can be purchased that will cast SOW on the user as well. These come in single-use, 5- and 10-shot versions.
+
+There is an upgrade to SOW called [[Scale of Wolf]]. This can be cast by shamans at level 24 and druids at level 29, and can only be cast on people in your group. The movement rate given by this spell is much higher than SOW (around half to two-thirds increase) however the spell vanishes if you engage in melee or cast any spells. This limits its use, and many people rarely use this spell except when traveling through safe territory. This spell lasts around 45 minutes otherwise.
+
+Druids and rangers also get the ability to cast wolf form on themselves and those in their group. Druids get this spell at level 24 for themselves and at level 39 for their group, rangers at level 49 for themselves. This allows them to move slightly faster than SOW. The downside is that they go away (like all other illusions) upon zoning.
+
+There is a spell that is occasionally useful to move quickly in short bursts, which is the [[Spirit of Cheetah]]. Shamans and Druids both get this spell at level 24, and is self-only. This increases your run speed by double, but only lasts 48 seconds and overwrites any other speed spell you have. It is used for quick getaways exclusively.
+
+Bards also get two songs that help people to move more quickly. The first and most common one is [[Selo's Accelerando]], which bards get at level 5. The speed increase varies widely depending on what percussion instrument (if any) the bard is using and the level of the bard, but at higher levels is faster than SOW. The spell only effects people in the same group and within a certain distance from the bard singing the song. [[Selo's Song of Travel]] is a much more powerful version of [[Selo's Accelerando]], and is the level 51 bard song. This song gives faster movement, invisibility, see invisibility, and levitate to all those in the bard's group.
+
+==== Movement Speed Items ====
+
+There is an item that increases speed if you don't have the option of using one of the above called the [[Journeyman's Boots]], or more commonly JBoots. This item is obtained through a quest only and cannot be purchased. By right-clicking on the item, the person with the item gets a speed boost that is a little slower than a SOW, but is still useful. Also, Watchman Boots have charges of SOW in them, and one of the [[Shaman Epic Quest]] boots that you get along the way, [[Black Fur Boots]], have a SOW-like effect on them as well.
+
+Specific to EQ Legends, a quality-of-life pair of boots similar to JBoots was added called [[Boots of the Long Road]].  Every player will get them at the end of the tutorial, or they may be purchased from the Adventuring Supplies vendors in each city.  They provide a "fragile" movement speed buff similar to Scale of Wolf that will break if you engage in combat.
+
+All of the above abilities to move faster are only usable in "outdoors" areas. This includes all outside zones and the ones labelled "Outdoor" in the zone description.
+
+==== General Tips ====
+
+By using one of the above methods to move more quickly over land, travel on land is made much safer. The only other thing that you need to do is to be sure to avoid creatures that will attack you. This is intuitively obvious, but realize that even if a monster can't outrun you, they can still stun you and keep hitting you and, if they do enough damage while you're running away, you will start losing stats and become encumbered, thereby slowing you down enough that you can't outrun them at all. Keep your eyes on where you're going.
+
+Another thing to be careful of, especially when using a way to speed up movement, is rough terrain. Moving quickly on broken ground or over mountainous terrain will result in some serious falls for you and some really serious damage. Having a spell like levitate can help out in those areas. An even better spell is the spell Dead Man Floating, which necromancers get at level 44. This lasts much longer than levitate and also adds some other nice bonuses.
+
+Another thing that is important is knowing where you are going and what to expect. I recommend to look at the [[Zone Connection World|zone connection maps]] to figure out what zones you will be passing through to get to where you're headed, and then go to those zone guides and read about what dangers you might face, as well as to get a map and see how to get around that zone.
+
+=== Boat Travel ===
+
+Boat travel is only necessary in a few select circumstances, and is probably the slowest and most disliked of all forms of travel. The reason for this is simple: it takes forever. You must travel to the dock area, wait for the boat to arrive (which can take as long as 30 minutes), get onboard, and then sit there doing nothing until you arrive at your destination. I suggest bringing a good book. I'll describe the various boat routes so that people know how to get from point to point.
+
+Fortunately in EQ Legends, there are [[Translocators]] at the docks for each route who can instantly transport you to the other end of the route.  Still, if you want to ride the boat, see the details below. 
+
+==== Qeynos-Erudin Route ====
+
+The boat from Qeynos leaves from South Qeynos (#15 on my map). The boat travels to Erud's Crossing where it stops at the dock there (#5 on my map). It then travels to Erudin and stops just offshore from the dock there (labelled dock on my map). A small raft floats from the dock itself to the ship and back, ferrying passengers. The boat itself then returns through Erud's Crossing, although it does not stop at the dock this time, and then goes back to Qeynos. 
+
+* Round trip 17 minutes.
+
+In the table below, "Time" starts at zone in to Erud's Crossing. "Time" is cumulative. The third column is "Delta Time", which is the time from the last check point to the current one.
+
+{| class="eoTable2" style="width:50%;"
+! colspan="3"| Time to Checkpoint, Qeynos to Erudin
+|-
+! Checkpoint Location
+! Time [mm:ss]
+! Delta Time [mm:ss]
+|-
+| Qeynos zoneline to island || 2:20 || 2:20
+|-
+| Dwell time at island dock - boat starts moving || 3:20 || 1:00 dwell time
+|-
+| Island to Erudin zoneline || 5:55 || 2:35
+|-
+| Erudin zoneline to shuttle boat || 7:50 || 1:55
+|-
+| Shuttle boat to dock || 9:40 || 1:50
+|}
+
+Note that dwell time is the time that the boat "dwells" at a certain location. It appears to be 1 minute for all dwell times, whether that is at the island dock, or at zonelines. It is believed that this dwell time is the same for all old world boats. No dwell times have been measured for Kunark or Velious content.
+
+
+==== Freeport-Butcherblock Route ====
+
+* The boat from Freeport leaves from East Freeport heading east, you will stop at Zachariah Reigh Isle and again at the Island of the Sisters of Erollisi before continuing on to Butcherblock.
+* From Butcherblock the boat docks at the north western dock, heading west, you only stop at the Sisters. (Edit February 21st, 2026: Incorrect - the boat DOES stop at Zachariah Reigh Isle going this way also)
+
+* Round trip 32 minutes, 53 seconds.  
+* Butcher to Freeport, dock to dock, takes 15 minutes and 35 seconds.
+* The boat is the Seaking
+
+==== Odus-Faydwer Route ====
+
+(as of 2026-05-25)
+EQ Legends plans to add an additional boat route that was previously not available: Odus to Faydwer.  Little is known about this route as of yet.
+
+==== Kunark Boat Travel (Out of Era) ====
+
+There is a more detailed section regarding Kunark boat travel below.
+
+* Barrel Barge (Oasis) Round Trip: 12:59
+* Bloated Belly (OT) Round Trip: 33:45
+* Maiden's Voyage (FV) Round Trip: 20:28
+
+==== Velious Boat Travel (Out of Era) ====
+
+There is a more detailed section regarding Velious boat travel below.
+
+The trip to Velious starts in the Northern Desert of Ro at the docks there (#14 on the map). A small raft picks you up there and takes you to the Iceclad Ocean to a small island there (#7 on the map). You disembark in the water near there and run across the island to the dock (#6 on the map) where you board the Icebreaker. The Icebreaker then takes you to a dock on the mainland (#1 on the map). To return to the mainland, do this in reverse.
+
+Round trip: 07:30
+
+=== Teleportation ===
+
+==== Basic Teleportation ====
+
+Teleportation, often referred to as "porting", is the immediate transport to specific locations, usually via spells.  The simplest form of porting is the spell [[Gate]], which is gained by many classes, usually with their second set of spells. This allows them to travel back to their bind spot. Although this doesn't really speed up travel going to anyplace, it can greatly speed it up returning to where you started if you were smart enough to bind yourself there. This isn't really considered true porting, however.
+
+Additionally, EQ Legends has added two abilities for all characters to assist with basic travel called Origin and Gather Party.  Origin provides a self-only gate back to your home city.  Gather Party, as it sounds, will summon all party members to your current location.  Both have relatively long cooldowns.
+
+==== True Teleportation ====
+
+True teleportation is a special form of travel, which higher level druids and wizards are able to use. [[Druid]]s gain this line of spells at level 19, [[Wizard]]s at level 20. Some general principles apply for how this works. Druids and Wizards gain the ability to port themselves before they can port other people. They usually get the personal port spell two spell levels before they gain the group version of the same. The group versions are very costly in terms of mana (300 mana). For example, at 24th level a druid with 200 wisdom, casting one of these spells costs the druid almost a third of total mana. At level 40 it costs almost 20% of total. Realize this fact when asking people for ports, as they are not just a matter of quickly porting you somewhere.
+
+However, given the multi-classing nature of EQ Legends, many players may choose to level up either a druid or a wizard to allow access to at least the self-only version of the teleportation spells.  The addition of Ritual Casting ([[Travel Guide#Ritual Casting|see below]]) greatly improves the feasibility of this strategy.  If you take the time to level either a druid or a wizard to the mid-20s, you will then have access to most self-only ports from any loadout, greatly improving your ease of getting around the world.
+
+Even without leveling one of those classes and given that all of your classes will at least be level 10, you will have access to the [[Gate]] spell from any loadout, as it also works with Ritual Casting.  Similarly, [[Bind Affinity]] is available through Ritual Casting, and most players will likely have a caster leveled enough to cast Bind Affinity.  Thus even if you do not have a druid or wizard leveled, you should be able to use Origin to return to your home town and then Gate to return to your bind point, which you can set to any location.
+
+==== Translocation ====
+
+A third type of teleportation exists generally referred to as Translocations.  These spells allow the caster to target a single member of their group and send them to the desired location while the caster and any other group members remain behind.  They were initially added in the Velious expansion and only Wizards gained this type of spell.  A Druid version of this spell line came later: the Zephyr line.  EQ Legends has decided to go ahead and include these spells for both Wizards and Druids at launch, though naturally only for locations on the original three continents.  Of note, they are ''not'' included in the spells available to Ritual Casting.
+
+==== Other Forms of Teleportation ====
+
+The only unusual form of teleportation is that alchemists are able to make potions that will allow you to be teleported to either Halas area or Feerott. They are also able to create a potion that will take you to the ruins of [[Kaesora]] within the [[Field of Bone]]. These are useful for shamans for getting their spells, but also for others, especially to Halas which has no nearby port spell from anyone else.
+
+Some spells are considered "evac" type of spells, short for evacuation. These are generally used in dungeons as a way to get out of the place quickly when things go wrong. They are actually the same as regular group port spells in terms of mana cost, however they have a much quicker casting time and recast time, making them more appropriate for times of urgency. The downside with these spells is that there's a small chance that they will leave people behind. These spells are also used for travel to different places at times.
+
+==== Teleportation Spell Lists ====
+
+Now on to the specific spells. First the druid spells. Below is a table that includes the zones that the spells take you to and the number location on the map it's on, as well as info on the particular spell, including what the name is as well as whether it is solo or group and what level the druid obtains the spell. After the druid list is the wizard listing.
+
+{| class="eoTable2" style="width:100%;"
+! colspan="5" | Druid Port Spells
+|-
+! Zone Name
+! Solo Spell
+! Group Spell
+! Evac Spell
+!Zephyr Spell
+|-
+| [[Butcherblock Mountains]] (#20) || [[Ring of Butcherblock]] (16) || [[Circle of Butcherblock]] (25) || [[Succor: Butcherblock]] (32) || [[Zephyr: Butcherblock]] (33)
+|-
+| [[Northern Plains of Karana]] (#10) || [[Ring of North Karana]] (15) || [[Circle of North Karana]] (25) || [[Succor: North Karana]] (46) || [[Zephyr: North Karana]] (34)
+|-
+| [[Toxxulia Forest]] (#5) || [[Ring of Toxxulia]] (17) || [[Circle of Toxxulia]] (25) || || [[Zephyr: Toxxulia]] (32)
+|-	 
+| [[West Commonlands]] (#5) || [[Ring of West Commons]] (17) || [[Circle of West Commons]] (27) || || [[Zephyr: West Commons]] (35)
+|-
+| [[Surefall Glade]] (#8) (late Velious) || [[Ring of Surefall Glade]] (15) || [[Circle of Surefall Glade]] (26) || || [[Zephyr: Surefall Glade]] (35)
+|- 
+| [[The Feerrott]] (#7) || [[Ring of Feerrott]] (22) || [[Circle of Feerrott]] (32) || || [[Zephyr: Feerrott]] (39)
+|-
+| [[Lavastorm Mountains]] (#1) || [[Ring of Lavastorm]] (22) || [[Circle of Lavastorm]] (30) ||	[[Succor: Lavastorm]] (41) || [[Zephyr: Lavastorm]] (47)
+|-
+| [[Southern Desert of Ro]] (#13) || [[Ring of South Ro]] (20) || [[Circle of South Ro]] (32) || [[Succor: South Ro]] (38) || [[Zephyr: South Ro]] (40)
+|-
+| [[Steamfont Mountains]] (#6) || [[Ring of Steamfont]] (21) || [[Circle of Steamfont]] (31) || || [[Zephyr: Steamfont]] (39)
+|-	 
+| [[Misty Thicket]] (#13) || [[Ring of Misty]] (25) || [[Circle of Misty]] (36) || || [[Zephyr: Misty Thicket]] (45)
+|-
+| [[Stonebrunt Mountains]] || [[Ring of Stonebrunt]] (20) || [[Circle of Stonebrunt]] (28) || || [[Zephyr: Stonebrunt]] (35)
+|-
+| [[Eastern Plains of Karana]] (#1) || || || [[Succor: East Karana]] (26)
+|
+|-
+| [[Dreadlands]] (#2) || [[Ring of the Combines]] (24) || [[Circle of the Combines]] (34) ||
+|
+|- 
+| [[Emerald Jungle]] (loc -3100, 3500) || || || [[Wind of the South]] (39)
+|
+|-
+| [[Skyfire Mountains]] (#2) || || || [[Wind of the North]] (39)
+|
+|-
+| [[Iceclad Ocean]] (#5) || [[Ring of Iceclad]] (34) || [[Circle of Iceclad]] (34) ||
+|
+|-
+| [[Great Divide]] (#4) || [[Ring of Great Divide]] * (34) || [[Circle of Great Divide]] * (39) ||
+|
+|-
+| [[Cobalt Scar]] (#7) || [[Ring of Cobalt Scar]] * (39) || [[Circle of Cobalt Scar]] * (44) ||
+|
+|-
+| [[Wakening Lands]] (#8) || [[Ring of Wakening Lands]] * (39) || [[Circle of Wakening Lands]] * (44) ||
+|
+|}
+
+( * See below for Velious porting rules.)
+
+At level 18 druids get the spell [[Lesser Succor]], which is a group evac type spell that takes the entire group to a safe spot within the same zone.<br>
+Druids get the spell [[Egress]] at level 52, which allows them to port themselves only to a safe spot inside the same zone.<br>
+Two of the druid spells, Winds of the North and Winds of the South, start as dungeon-only evac spells (must be inside a Kunark dungeon to cast). This was later changed so that they worked anywhere (by 10-2001 on Live).<br>
+
+{| class="eoTable2" style="width:100%;"
+! colspan="5"| Wizard Port Spells
+|-
+! Zone Name
+! Solo Spell
+! Group Spell
+! Evac Spell
+! Translocate Spell
+|-
+| [[Greater Faydark]] (#4) || [[Fay Gate]] (20) || [[Fay Portal]] (27) || [[Evacuate: Fay]] (32) || [[Translocate: Fay]] (36)
+|-
+| [[Northern Plains of Karana]] (#11) || [[North Gate]] (18) || [[North Portal]] (25) || [[Evacuate: North]] (26) || [[Translocate: North]] (35)
+|-
+| [[Toxxulia Forest]] (#9) || [[Tox Gate]] (19) || [[Tox Portal]] (28) || || [[Translocate: Tox]] (37)
+|-
+| [[Cazic Thule]] (#1) || [[Cazic Gate]] (23) || [[Cazic Portal]] (33) || || [[Translocate: Cazic]] (44)
+|-
+| [[Nektulos Forest]] (#3) || [[Nek Gate]] (22) || [[Nek Portal]] (32) || [[Evacuate: Nek]] (42) || [[Translocate: Nek]] (41)
+|-
+| [[Northern Desert of Ro]] (#4) || [[Ro Gate]] (22) || [[Ro Portal]] (36) || || [[Translocate: Ro]] (43)
+|-
+| [[West Commonlands]] (#4) || [[Common Gate]] (21) || [[Common Portal]] (35) || || [[Translocate: Common]] (40)
+|-
+| [[Western Plains of Karana]] (#26) || [[West Gate]] (23) || [[West Portal]] (37) || [[Evacuate: West]] (47) || [[Translocate: West]] (42)
+|-
+| [[Southern Desert of Ro]] (#8) || || || [[Evacuate: Ro]] (38) ||
+|-
+| [[Dreadlands]] (#1) || [[Combine Gate]] (24) || [[Combine Portal]] (34) || || [[Translocate: Combine]] (39)
+|-
+| [[Emerald Jungle]] (loc -1250, 3500) || || || [[Markar's Relocation]] (39) ||
+|-
+| [[Skyfire Mountains]] (#3) || || || [[Tishan's Relocation]] (39) ||
+|-
+| [[Iceclad Ocean]] (#5) || [[Iceclad Gate]] (34) || [[Iceclad Portal]] (34) || || [[Translocate: Iceclad]] (49)
+|-
+| [[Great Divide]] (#4) || [[Great Divide Gate]] (34) || [[Great Divide Portal]] (39) * || || [[Translocate: Great Divide]] (49)
+|-
+| [[Cobalt Scar]] (#7) || [[Cobalt Scar Gate]] (39) || [[Cobalt Scar Portal]] (44) * || || [[Translocate: Cobalt Scar]] (49)
+|-
+| [[Wakening Lands]] (#8) || [[Wakening Lands Gate]] (39) || [[Wakening Lands Portal]] (44) * || || [[Translocate: Wakening Lands]] (49)
+|-
+| [[Plane of Hate]] || || [[Alter Plane: Hate]] (46) || ||
+|-
+| [[Plane of Sky]] || || [[Alter Plane: Sky]] (46) || ||
+|}
+
+At level 18 wizards get the spell [[Lesser Evacuate]], which is an evacuation spell for the group to a safe spot within the same zone.<br>
+Wizards also get a spell called [[Translocate]] that they get at level 50. Using this spell, they can send one group member back to that group member's bind spot.<br>
+At level 52 wizards get the spell [[Abscond]], which will teleport the wizard only to a safe spot within the same zone that the spell is cast in.<br>
+
+''' Rules for Velious Group Teleports '''
+
+The spells for porting around Velious are unique. First of all, they are the only spells where the druids and wizards both teleport to the same location. Secondly, there are keys required to teleport to these places. You require a key from the portal you wish to go to or one deeper into the continent in order to be able to teleport there. The sequence of portals is Great Divide, Wakening Land, Cobalt Scar. For example, if you had the key to the Wakening Land, you could teleport to either the Wakening Land or Great Divide, but not to Cobalt Scar (since it is further in). Every member in a group needs the key to that port spot, or they will simply be left behind. This means that you have to make it to that place at least once in person in order to pick up the key, in order to later on be able to go and teleport there:  
+ '''NOTE:''' The tooth below is NOT required for the Translocate line of wizard spells, <br>hence the fastest and easiest way to get a Cobalt Scar tooth <br>is to have a Wizard use Translocate: Cobalt Scar to send you there and simply pick up the tooth.
+
+* [[Tooth of the Great Divide]]
+* [[Tooth of the Wakening Lands]]
+* [[Tooth of the Cobalt Scar]]
+
+=== Ritual Casting ===
+
+Ritual Casting is a quality-of-life feature added to EQ Legends.  It is not exclusively used for travel purposes, but travel is one of it's major uses.  Ritual Casting allows characters to cast some spells from classes which are ''not'' active in their current loadout ''if'' they have the class leveled high enough for the spell in question.  All wizard and druid self-only ports and group ports are included among the spells that can be used by this feature.  That means if you have either a wizard or a druid (or both) leveled enough to have their port spells, you will be able to cast them from any loadout.
+
+For example, as a Level 12 Warrior/Monk/Rogue, you could use a Ritual to cast West Commons Gate, a level 21 Wizard Spell, if you have previously leveled a Wizard to level 21 or higher.
+
+When using Rituals, you must be in a resting state (out of combat). The cast time for all Rituals is 20 seconds, and you will lose all Mana and Endurance when it completes casting.
+
+Other notable spells that are available with Ritual Casting are [[Bind Affinity]] and [[Shrink]]
+
+=== Evacuate Locations ===
+
+Druids, Wizards, and Necromancers have the ability to port either themselves or their entire group (necromancers just themselves) to a set location in every zone. The relevant spells are [[Egress]] and [[Succor]] for Druids, [[Abscond]] and [[Evacuate]] for Wizards, and [[Levant]] for Necromancers. The following table describes where these spells take you in each zone.
+
+{| class="eoTable3 sortable"
+|-
+! Continent
+! Zone Name
+! Location
+! Description
+|-
+| Antonica || [[Befallen]] || {{Loc | Befallen | -75, 35}} || Zone line to West Commons
+|-
+| Antonica || [[Blackburrow]] || {{Loc | Blackburrow | -158, 38}} || Zone line to Qeynos Hills
+|-
+| Antonica || [[Cazic Thule]] || {{Loc | Cazic Thule | 80, -80}} || Zone line to the Feerrott
+|-
+| Antonica || [[East Commonlands]] || {{Loc | East Commonlands | 9, -1485}} || Zone line to West Freeport
+|-
+| Antonica || [[Eastern Plains of Karana]] || {{Loc | Eastern Plains of Karana | 0, 0}} || East of the bridge to North Karana
+|-
+| Antonica || [[Everfrost Peaks]] || {{Loc | Everfrost Peaks | 3139, 629}} || Outside Halas gates
+|-
+| Antonica || [[Freeport|Freeport - East Freeport]] || {{Loc | East Freeport | -1097, -648}} || Zone line to North Ro
+|-
+| Antonica || [[Freeport|Freeport - North Freeport]] || {{Loc | North Freeport | -296, 211}} || Eastern zone line to West Freeport
+|-
+| Antonica || [[Freeport|Freeport - West Freeport]] || {{Loc | West Freeport | 335, 181}} || Outside the gates
+|-
+| Antonica || [[Gorge of King Xorbb]] || {{Loc | Gorge of King Xorbb | -513, -22}} || Zone line to East Karana
+|-
+| Antonica || [[Grobb]] || {{Loc | Grobb | -100, 0}} || Zone line to Innothule Swamp
+|-
+| Antonica || [[Halas]] || {{Loc | Halas | 0, 0}} || Pier across the lake from the zone line to Everfrost
+|-
+| Antonica || [[High Keep]] || {{Loc | High Keep | -16, 88}} || Zone line to Highpass Hold
+|-
+| Antonica || [[Highpass Hold]] || {{Loc | Highpass Hold | -14, -104}} || Zone line to High Keep
+|-
+| Antonica || [[Innothule Swamp]] || {{Loc | Innothule Swamp | -2192, -588}} || Outside the gates of Grobb
+|-
+| Antonica || [[Kithicor Forest]] || {{Loc | Kithicor Forest | 1889, 3828}} || Zone line to Rivervale
+|-
+| Antonica || [[Lake Rathetear]] || {{Loc | Lake Rathetear | 4183, 1213}} || Zone line to South Karana
+|-
+| Antonica || [[Lavastorm Mountains]] || {{Loc | Lavastorm Mountains | -1843, 153}} || Zone line to Nektulos Forest
+|-
+| Antonica || [[Lower Guk]] || {{Loc | Lower Guk | 1197, -217}} || Zone line to Upper Guk (between Bedroom and Waterfall)
+|-
+| Antonica || [[Misty Thicket]] || {{Loc | Misty Thicket | 0, 0}} || Just outside the wall
+|-
+| Antonica || [[Nagafen's Lair]] || {{Loc | Nagafen's Lair | -424, -263}} || Zone line to Lavastorm
+|-
+| Antonica || [[Najena]] || {{Loc | Najena | -13, 856}} || Zone line to Lavastorm
+|-
+| Antonica || [[Nektulos Forest]] || {{Loc | Nektulos Forest | 2055, -701}} || Outside the gates of Neriak
+|-
+| Antonica || [[Neriak|Neriak - Commons]] || {{Loc | Neriak Commons | 3, -500}} || Zone line to Neriak Foreign Quarter
+|-
+| Antonica || [[Neriak|Neriak - Foreign Quarter]] || {{Loc | Neriak Foreign Quarter | -3, 157}} || Zone line to Nektulos Forest
+|-
+| Antonica || [[Neriak|Neriak - Third Gate]] || {{Loc | Neriak Third Gate | 892, -969}} || Between the Cleric guild and the rest of the zone
+|-
+| Antonica || [[Northern Desert of Ro]] || {{Loc | Northern Desert of Ro | 3537, 299}} || Zone line to East Freeport
+|-
+| Antonica || [[Northern Plains of Karana]] || {{Loc | Northern Plains of Karana | -284, -382}} || Gypsy camp
+|-
+| Antonica || [[Oasis of Marr]] || {{Loc | Oasis of Marr | 490, 903}} || By the lake
+|-
+| Antonica || [[Ocean of Tears]] || {{Loc | Ocean of Tears | 390, -9200}} || Sister Island pier
+|-
+| Antonica || [[Oggok]] || {{Loc | Oggok | -345, -99}} || Zone line to the Feerrott
+|-
+| Antonica || [[Permafrost]] || {{Loc | Permafrost | 0, 0}} || Near the zone line to Everfrost
+|-
+| Antonica || [[Qeynos Catacombs]] || {{Loc | Qeynos Catacombs | 214, -315}} || Near the zone line to South Qeynos
+|-
+| Antonica || [[Qeynos Hills]] || {{Loc | Qeynos Hills | 508, 83}} || Crossroads
+|-
+| Antonica || [[Qeynos|Qeynos - North Qeynos]] || {{Loc | North Qeynos | 678, 114}} || Outside the gates
+|-
+| Antonica || [[Qeynos|Qeynos - South Qeynos]] || {{Loc | South Qeynos | 14, 186}} || Northern pier
+|-
+| Antonica || [[Rathe Mountains]] || {{Loc | Rathe Mountains | 3825, 1831}} || Zone line to Lake Rathetear
+|-
+| Antonica || [[Rivervale]] || {{Loc | Rivervale | 2, 45}} || Zone line to Misty Thicket
+|-
+| Antonica || [[Runnyeye]] || {{Loc | Runnyeye | -109, -22}} || Zone line to Gorge of King Xorbb
+|-
+| Antonica || [[Solusek's Eye]] || {{Loc | Solusek's Eye | -476, -486}} || Zone line to Lavastorm
+|-
+| Antonica || [[Southern Desert of Ro]] || {{Loc | Southern Desert of Ro | 1265, 286}} || Zone line to Oasis of Marr
+|-
+| Antonica || [[Southern Plains of Karana]] || {{Loc | Southern Plains of Karana | 2348, 1294}} || Zone line to North Karana
+|-
+| Antonica || [[Splitpaw Lair]] || {{Loc | Splitpaw Lair | -79, -7}} || Zone line to South Karana
+|-
+| Antonica || [[Surefall Glade]] || {{Loc | Surefall Glade | -66, 137}} || Outside the tunnel to Qeynos Hills
+|-
+| Antonica || [[Temple of Solusek Ro]] || {{Loc | Temple of Solusek Ro | 269, 8}} || Zone line to Lavastorm Mountains
+|-
+| Antonica || [[The Arena]] || {{Loc | The Arena | -41, 461}} || The center of the arena
+|-
+| Antonica || [[The Feerrott]] || {{Loc | The Feerrott | 1091, 902}} || Outside the gates of Oggok
+|-
+| Antonica || [[Upper Guk]] || {{Loc | Upper Guk | -36, 7}} || Zone line to Innothule
+|-
+| Antonica || [[West Commonlands]] || {{Loc | West Commonlands | 209, -1335}} || Zone line to East Commons
+|-
+| Antonica || [[Western Plains of Karana]] || {{Loc | Western Plains of Karana | 12, -638}} || Zone line to Qeynos Hills
+|-
+| Faydwer || [[Ak'Anon]] || {{Loc | Ak'Anon | 47, -35}} || Zone line to Steamfont
+|-
+| Faydwer || [[Butcherblock Mountains]] || {{Loc | Butcherblock Mountains | 2550, -700}} || Outside the Kaladim gates
+|-
+| Faydwer || [[Crushbone]] || {{Loc | Crushbone | -644, 158}} || Zone line to Greater Faydark
+|-
+| Faydwer || [[Dagnor's Cauldron]] || {{Loc | Dagnor's Cauldron | 2815, 320}} || Zone line to Butcherblock
+|-
+| Faydwer || [[Felwithe | Felwithe - Northern Felwithe]] || {{Loc | Northern Felwithe | -25, 94}} || Zone line to Greater Faydark
+|-
+| Faydwer || [[Felwithe | Felwithe - Southern Felwithe]] || {{Loc | Southern Felwithe | 320, -790}} || Zone line to Northern Felwithe
+|-
+| Faydwer || [[Greater Faydark]] || {{Loc | Greater Faydark | -20, 10}} || By the Newbie Lift
+|-
+| Faydwer || [[Kaladim | Kaladim - North Kaladim]] || {{Loc | North Kaladim | 414, -267}} || Eastern zone line to South Kaladim
+|-
+| Faydwer || [[Kaladim | Kaladim - South Kaladim]] || {{Loc | South Kaladim | -18, -2}} || Zone line to Butcherblock Mountains
+|-
+| Faydwer || [[Kedge Keep]] || {{Loc | Kedge Keep | 14, 100}} || In a caged room some distance from the exit
+|-
+| Faydwer || [[Lesser Faydark]] || {{Loc | Lesser Faydark | -108, -1770}} || South of the zone line to Steamfont Mountains at #12 on map
+|-
+| Faydwer || [[Mistmoore Castle]] || {{Loc | Mistmoore Castle | -295, 123}} || Zone line to Lesser Faydark
+|-
+| Faydwer || [[Steamfont Mountains]] || {{Loc | Steamfont Mountains | 159, -273}} || Windmills
+|-
+| Faydwer || [[Unrest]] || {{Loc | Unrest | -38, 52}} || Zone line to Dagnor's Cauldron
+|-
+| Kunark || [[Burning Woods]] || {{Loc | Burning Woods | -4942, -821}} || Zone line to Dreadlands
+|-
+| Kunark || [[Cabilis|Cabilis East]] || {{Loc | Cabilis East | 1362, -417}} || Zone line to Field of Bone
+|-
+| Kunark || [[Cabilis|Cabilis West]] || {{Loc | Cabilis West | -783, 767}} || Zone line to Lake of Ill Omen
+|-
+| Kunark || [[Howling Stones|Howling Stones / Charasis]] || {{Loc | Howling Stones | 0, 0}} || Zone-in
+|-
+| Kunark || [[Chardok]] || {{Loc | Chardok | 119, 859}} || Zone line to Burning Woods (exit)
+|-
+| Kunark || [[City of Mist]] || {{Loc | City of Mist | 28, -734}} || Zone line to Emerald Jungle
+|-
+| Kunark || [[Dalnir]] || {{Loc | Dalnir | 8, 90}} || Zone-in
+|-
+| Kunark || [[Dreadlands]] || {{Loc | Dreadlands | 2806, 9565}} || Wizard spires
+|-
+| Kunark || [[Emerald Jungle]] || {{Loc | Emerald Jungle | -1223, 4648}} || Zone line to Field of Bone
+|-
+| Kunark || [[Field of Bone]] || {{Loc | Field of Bone | -1684, 1617}} || Takes you to the noob ramp
+|-
+| Kunark || [[Firiona Vie]] || {{Loc | Firiona Vie | -2392, 1440}} || Outside the city
+|-
+| Kunark || [[Frontier Mountains]] || {{Loc | Frontier Mountains | -633, -4262}}  || Zone line to Lake of Ill Omen 
+|-
+| Kunark || [[Kaesora]] || {{Loc | Kaesora | 370, 40}} || Zone line to Field of Bone
+|-
+| Kunark || [[Karnor's Castle]] || {{Loc | Karnor's Castle | 18, 302}} || Zone line to Dreadlands
+|-
+| Kunark || [[Kurn's Tower]] || {{Loc | Kurn's Tower | -265, 20}} || Zone line to Field of Bone
+|-
+| Kunark || [[Lake of Ill Omen]] || {{Loc | Lake of Ill Omen | 5747, -5383}} || Outside the gates of Cabilis
+|-
+| Kunark || [[Mines of Nurga]] || {{Loc | Mines of Nurga | -2000, -1762}} || Zone line to Frontier Mountains
+|-
+| Kunark || [[Sebilis]] || {{Loc | Sebilis | 250, 0}} || Zone-in
+|-
+| Kunark || [[Skyfire Mountains]] || {{Loc | Skyfire Mountains | -1140, -4290}} || Zone line to Overthere
+|-
+| Kunark || [[Swamp of No Hope]] || {{Loc | Swamp of No Hope | 2761, 2945}} || Outside the Cabilis gates
+|-
+| Kunark || [[Temple of Droga]] || {{Loc | Temple of Droga | 1375, 290}} || Zone line to Frontier Mountains
+|-
+| Kunark || [[The Overthere]] || {{Loc | The Overthere | -3500, 1450}} || Zone line to Frontier Mountains
+|-
+| Kunark || [[Timorous Deep]] || {{Loc | Timorous Deep | -5392, 2194}} || Chessboard island
+|-
+| Kunark || [[Trakanon's Teeth]] || {{Loc | Trakanon's Teeth | 3868, 1486}} || Zone line to Emerald Jungle
+|-
+| Kunark || [[Veeshan's Peak]] || {{Loc | Veeshan's Peak | -5, 1783}} || Zone-in
+|-
+| Kunark || [[Warsliks Woods]] || {{Loc | Warsliks Woods | -1429, -468}} || Outside the Cabilis gates
+|-
+| Odus || [[Erud's Crossing]] || {{Loc | Erud's Crossing | -1767, 795}} || Pier
+|-
+| Odus || [[Erudin]] || {{Loc | Erudin | 109, -309}} || Pier
+|-
+| Odus || [[Erudin|Erudin Palace]] || {{Loc | Erudin Palace | 712, 808}} || Teleporter to Erudin
+|-
+| Odus || [[Kerra Isle]] || {{Loc | Kerra Isle | 474, -860}} || Zone line to Toxxulia Forest
+|-
+| Odus || [[Paineel]] || {{Loc | Paineel | 800, 200}} || Zone line to Toxxulia Forest
+|-
+| Odus || [[Stonebrunt Mountains]] || {{Loc | Stonebrunt Mountains | -3427, -1643}} || On the hill just north of the dock
+|-
+| Odus || [[The Hole]] || {{Loc | The Hole | 640, -1050}} || Zone line to Paineel
+|-
+| Odus || [[The Warrens]] || {{Loc | The Warrens | 748, -930}} || Zone line to Paineel
+|-
+| Odus || [[Toxxulia Forest]] || {{Loc | Toxxulia Forest | 2295, 203}} || Outside the Erudin gates
+|-
+| Planes || [[Plane of Fear]] || {{Loc | Plane of Fear | -1139, 1282}} || Southwest corner of zone, near the zone-in
+|-
+| Planes || [[Plane of Hate]] || {{Loc | Plane of Hate | -375, -354}} || Zone-in
+|-
+| Planes || [[Plane of Sky]] || <strike>{{Loc | Plane of Sky | 1415, 614}}</strike> || Does not work in this zone
+|-
+| Planes || [[Plane of Growth]] || {{Loc | Plane of Growth | -2507, 2915}} || Zone-in
+|-
+| Planes || [[Plane of Mischief]] || -1400, -400 || Zone-in pad
+|-
+| Velious || [[Cobalt Scar]] || {{Loc | Cobalt Scar | -939, 895}} || Bottom of ramp leading up to Skyshrine zone
+|-
+| Velious || [[Crystal Caverns]] || {{Loc | Crystal Caverns | 487, 303}} || [[Eastern Wastes]] zone line
+|-
+| Velious || [[Dragon Necropolis]] || {{Loc | Dragon Necropolis | -100, 2000}} || At zone out to [[Western Wastes]]
+|-
+| Velious || [[Eastern Wastes]] || {{Loc | Eastern Wastes | -5049, -4296}} || Southwest of bridge to [[Iceclad Ocean]]
+|-
+| Velious || [[Great Divide]] || {{Loc | Great Divide | -7720, -965}} || South central part of zone
+|-
+| Velious || [[Iceclad Ocean]] || {{Loc | Iceclad Ocean | 5330, 340}} || Dock on pirate island
+|-
+| Velious || [[Icewell Keep]] || {{Loc | Icewell Keep | 250, 0}} || Outside castle gates near [[Thurgadin]] zone line
+|-
+| Velious || [[Kael Drakkal]] || {{Loc | Kael Drakkal | -250, -500}} || [[Eastern Wastes]] zone line
+|-
+| Velious || [[Siren's Grotto]] || {{Loc | Siren's Grotto | 200, -25}} || Near [[Western Wastes]] zone line
+|-
+| Velious || [[Skyshrine]] || {{Loc | Skyshrine | -100, -730}} || Near [[Wakening Lands]] zone line
+|-
+| Velious || [[Sleeper's Tomb]] || ? || ?
+|-
+| Velious || [[Thurgadin]] || {{Loc | Thurgadin | -1222, 0}} || Zone line to [[Great Divide]]
+|-
+| Velious || [[Tower of Frozen Shadow]] || {{Loc | Tower of Frozen Shadow | 120, 200}} || Zone-in
+|-
+| Velious || [[Wakening Lands]] || {{Loc | Wakening Lands | -673, -5000}} || [[Kael Drakkal]] zone line
+|-
+| Velious || [[Western Wastes]] || {{Loc | Western Wastes | -4100, -3500}} || Near [[Siren's Grotto]] cave entrance
+|-
+| Velious || [[Temple of Veeshan]] || {{Loc | Temple of Veeshan | -2086, -499}} || Zone in
+|-
+| Velious || [[Velketor's Labyrinth]] || {{Loc | Velketor's Labyrinth | 581, -65}} || Zone line to [[Great Divide]]
+|}
+
+== Plane of Sky and Plane of Hate ==
+
+These two zones are major points of interest for end-game content in the Classic Era.  Originally they were only accessible by Wizard teleportation using the spells [[Alter Plane: Sky]] and [[Alter Plane: Hate]].  EQ Legends added clickable items in the world to allow players access to these Planes without the need for Wizard teleportation.
+
+The Plane of Sky item is in the East Freeport harbor.  Look for a small brown island with a glowing blue orb on top.  Click to orb to go to Plane of Sky.  There are no mobs specifically guarding this island.
+
+The Plane of Hate item is in the Oasis of Marr at the top of a tower on the island in the middle of the lake.  Specters guard the tower which you'll either have to kill or run past.  The item itself is a sword stuck into a pedestal with blue flame around it.  Click on the sword to go to Plane of Hate.
+
+== Dark Races Travel Guide ==
+
+for Trolls, Ogres, Dark Elves, and other sociopaths...
+
+So, you've gone ahead and hit "Start" on the character creation screen that tells you "Moderate/High Difficulty," have you? Well, you're going to need my help then, because if you want to get any of the cool stuff in the game (and I'm sure you do) you're going to have to travel. Although Verant blessed the [[Troll]]s by putting the most goodie-filled dungeon on their doorstep (Guk), you all will still want to travel elsewhere in order to see more of the world. This guide will go through some of the more problematic areas that you might have to travel through and tell you how to not die...
+
+''' Religion '''
+
+Religion makes a large difference about whether or not a dark race is attacked. This is especially true for dark elves, who are generally accepted (if not liked) in a few major cities. Choosing Agnostic for your religion helps, as many won't attack you based on race but instead based on your religion. This is apparent with DE Enchanters, who can illusion their appearance but still be KOS from their religion. Something to consider.
+
+''' Freeport '''
+
+[[Freeport]] is probably the most frequently traveled city by the dark races. It is the port by which they all have to use to reach the island continent of Faydwer. It also lies between the Dark Elf city of [[Neriak]] and the swamplands to the south where the Trolls and Ogres reside. Due to its importance to the evil races in general, I will discuss it first.
+
+The Tunnels
+
+There is an extensive tunnel network running beneath the city of Freeport, which the dark races and less-than-legal classes use to get around. These tunnels start (from the outside) in both West Freeport and East Freeport. The path through West Freeport is the simplest. The entrance to the catacombs lies in the northeastern corner of the newbie area in the West Freeport zone. One of the two bends in the corner is where the actual tunnel is, and it is not distinguishable from the rest of the wall. The tunnels inside represent the remains of a water system that is empty at present. The key to getting to any area of interest is to stay to the left. If you take every left turn in the West Freeport zone, you will eventually zone into North Freeport.
+
+Once there, you will find yourself with your first danger, having to travel an open waterway underneath the paladin guild! The trick to this is that you have to travel through here at night time. During that time of day, all the guards that typically stand on the bridge that goes over the water are gone, and you won't be attacked. After passing into the tunnel on the other side, you again zone into West Freeport. In West Freeport again, you turn first right and then left, and this brings you out into a long, open-topped aqueduct running through a fairly empty section of the city. Specifically, it opens up behind Torlig's Herbs and Medicines, on the eastern edge of West Freeport just north of a zone to East Freeport. This is a dangerous area for evil races, although guards are not too common here. The zone to East Freeport is a short step away, but guarded by a guard (and you can't get anywhere on the other side except through guards anyway). The only place you can really go is to head into the court with the empty stage and the shady thief guys in the middle. They are involved in some quests. This is as far as the tunnels into West Freeport will bring you.
+
+East Freeport has some more important places of interest in the tunnel system. There are two entrances to it from the newbie zone, the easiest one to take is in the southwestern corner of the newbie zone, found in a similar fashion to the entrance in West Freeport. Passing into this tunnel entrance you will enter a small circular room with two exits leading off of it. The tunnel to the left leads to the other entrance to the catacombs and an interesting underwater structure, but nothing more. To the right leads to the other interesting parts of the city. Passing through this tunnel, you will come to a choice about going left or right. Left will lead the explorer to the [[Necromancer]], [[Shadow Knight]], and [[Cleric]] trainers for Freeport, and beyond them to a secret door that leads into the inn in the southeastern section of East Freeport. Taking the right path brings you to a door guarded by two Rogues. To the left of the door is a passage that leads to a room with a dark elf and another door into the Seafarer's Roost at the docks of East Freeport. If you pass through the door behind the two Rogue guards, there is a long tunnel that leads to an opening into the bay, whereby you can swim to the left to reach the actual Freeport docks. During night time hours there is a fishing Dark Elf on the shoreline who wont bother you too much, however during the day that spot is taken by a human who will attack if you get too close.
+
+The docks of Freeport are usually safe, as long as you stay outside of the Port Authority. There are a bunch of guards on the other side of the Port Authority, and I haven't tested whether or not they can see you. On the dock side of it, though, there are no NPC's (that I know of) that will attack you. I have on rare occasions seen a guard standing on the main dock, but only rarely. There are also reports of a fishing woman, her name is Olunea Miltin, that will occasionally attack evil travelers, She cons as glares threateningly to a troll SK worshiping Cazic-Thule...(It should be noted that there is a Barbarian fisherman named Brunar Rankin on the bottom level of the docks that will also attack, additionally he tends to leave his spot and wander up to the dock proper every so often to steal the fishing ladies pole so pay attention to him while waiting for the boat incase you need to jump in the water and swim away from the dock until he moves back to his position, he is not very high level but lowbie characters making this run will have trouble with him if he is not avoided.)
+
+''' Qeynos '''
+
+[[Qeynos]] is not traditionally regarded as a place for evil, and isn't as heavily trafficked, but has a similar infrastructure to Freeport, with an extensive underground network of tunnels tying the city together.
+
+The outside entrance to the Qeynos tunnels lies to the east of the Gates in North Qeynos. Along the wall there is a section of wall that is overgrown with vines. This is a false wall, and behind this wall lies a small room with a well, where the Klicknik Queen is known to spawn. Swimming down the well will bring one into the [[Qeynos Catacombs]]. There are other entrances/exits to the catacombs within the city, providing evil creatures some degree of mobility. The lake just outside the Crow's Nest and the Monk's Guild has a tunnel into the catacombs, as does the water under the bridge just before one enters the section of town with the bank. The last normal entrance is in the water by the docks where the boat comes in. All of these tunnels lead into the catacombs, and through the catacombs eventually connect with each other.
+
+The other, more unusual, entrance to the catacombs is through the arena. When entering the arena, one wall has an opening that leads into the area under the arena, where blood and bones mark those that died within those walls. Marked out in bones is a path that leads into one of the larger prison cages and to a secret door that leads into the catacombs. The catacombs at this point are dangerous to those who are not of the evil races or classes, as they are guarded by skeletons. In this area lie the Shadow Knight and Necromancer guilds for the city of Qeynos, as well as trainers for the other magic-using classes for evil races.
+
+''' Faydwer '''
+
+Half of the battle to reaching Faydwer is in getting onto the boat at Freeport. But what do you do when you reach the other side? You basically have to jump ship and swim for shore outside of the dock area. If you have to pick a side, go to the right, as there is more open area there and it's easier to get around. Going to the left forces you to walk past several guard houses in order to reach some of the better parts of [[Butcherblock Mountains]], and this can easily be avoided.
+
+As far as zones on Faydwer, they present their unique challenges and benefits for the dark races. Butcherblock is a large, open hunting ground, with the benefits of no roaming guards. Greater Faydark is the hub of all the other zones, and is good because you can be bound anywhere within the zone (not in a hostile city). The down side is that most of the areas near the cities as well as near [[Crushbone]] have roaming guards that will attack you. The entrance to Crushbone is generally safe, as is the area to [[Lesser Faydark]]. Lesser Faydark is generally safe, with a few exceptions (the ranger camp). [[Steamfont Mountains]] are similar to Butcherblock, scattered relatively easily avoidable non-moving guards. The downside to all these zones is that most if not all people are hostile to you, and buying and selling may well be impossible.
+
+The next trick is how do you get home? If you are traveling by boat, that can be fairly tricky. You basically have to swim around the entrance to the docks and get on the docks onto the boat without being seen and attacked. The NPC at the end of the dock ''might'' not attack you; I have walked an agnostic DE Enchanter past her without illusions, while my DE cleric of Innoruuk was KoS to everyone; but the one near the base of the dock will, although he can be avoided. <strike>The method that some players use is to swim in the water under the boat and then push yourself against the front of the mast; the mast leans backwards and so the angle is just shallow enough to climb if you are careful.</strike> The most reliable though? Find (or pay) a friend to teleport you.
+
+''' Cross-Country Trip '''
+
+The trip from Freeport to Qeynos is dangerous even for the good races, and the problems are exacerbated for the evil races. First of all, there is no easy way through the center of the continent. The passage through Beholder's Maze, Runnyeye, Misty Thicket and Rivervale is complicated by the fact that all evils are KOS in Rivervale. Likewise, passage through High Keep is complicated by the same problem, as well as the high level orcs and gnolls that are there. The safest route (and unfortunately the longest) is the southern route through the kingdoms of the ogres and trolls. Basically, from Qeynos, the route consists of travelling into Qeynos Hills, Western Karana, Northern Karana, Southern Karana, Lake Rathetear, Rathe Mountains, Feerott, Innothule Swamp, South Ro, Oasis of Marr, North Ro and from there East Freeport. The most difficult of these is Lake Rathetear where you need to avoid a fairly high-level camp of undead upon entering from South Karana and then get on a boat (or swim with more danger) to the eastern shore.
+
+''' Odus '''
+
+The continent of Odus is currently closed to the evil races. I'm not sure if this was intentional or not, and if it will continue to be so when the new zone (the necromancer city) get introduced on it, but it currently is. The basic difficulty is that there is no tunnel system or other system by which to avoid the guards when entering Erudin. The docks pass by several guards, then you zone into a chamber patrolled by several guards, and then into the main city where guards are ever-present, only to walk outside by the guards. As you can see there is no way to avoid them, and as far as I know you can't swim around to Kerra Isle, for instance. [[Erud's Crossing]] is still a possibility to hunt at, although it's so difficult to get to for the evil races (and the Kerrans might KOS them), that it's probably not worth it.
+
+''' Conclusion '''
+
+The above is a description of the major sections of the game and how the evil races can thrive and travel almost as much as the good races. Note that many of these problems can be circumvented by invisibility spells (in fact Odus is open to you if you can become invisible) and illusions. For the most part, though, these areas are open to the dark races as I've put forth above. I hope this means I'll see more ogres in Crushbone!
+
+== [[Firiona Vie|Kunark Boat Travel Guide (Out of Era)]] ==
+[[File:kunark_boats.jpg|200px|thumb|The Kunark Boat Trip]]
+
+(Tip: If you happen to fall off the boat while it's stationary and have no other way to get back on it, you can swim around the back of the boat and walk up the rudder to sit inside the V shape of the rudder. You'll then be fine to continue with boat and zone. Don't sit on the very back of the rudder as often you'll be forced off when the boat is in motion.)
+
+The boats for Kunark leave from [[Oasis of Marr]] and [[Butcherblock Mountains]]. From Oasis they leave at the dock along its eastern shore, the same dock that people generally hang out by when hunting in the Oasis. In Butcherblock Mountains, they leave from the same dock area that the boat to Freeport leaves from. The actual dock is different, it is the dock to the south of the Freeport dock.
+
+''' From Butcherblock '''
+
+The ships themselves are called ferries. The ferries each can hold a large number of people, either on the top or on the inside, which you have to swim to reach. The underside is recommended for travelers who would rather stay unnoticed by the types of people who frequently walk on the docks, and are easy to get on and off of while in the water itself.
+
+The boats pass quickly out of the local area that they are in, and enter another ocean area, the [[Timorous Deep]]. The ferries travel a short distance into this zone, at which time you need to disembark them and board the large sailing ship, the Maiden Voyage. This massive sailing ship then lowers its side sails and moves incredibly fast across the [[Timorous Deep]], circling around an island on its way to the land of Kunark. If you stay on the boat, you will pass into the zone called [[Firiona Vie]] in Kunark.
+
+The boat then (after a long period of time) takes you to a large beachhead area in an old [[Iksar]] waterfront area at approximately loc -2000, 1940. This area is guarded/owned by the good races, so it is reasonable that if you would be KOS on the mainland to them, the same is true here, and you should disembark shortly after coming into this area. Wolf form is also KOS here, so be careful. My suggestion would be to swim left (west) as you will cross a short waterway to the west of the docks and land on a small section of land that juts south along it. There appears to be nobody around, and you can safely move north into the rest of the zone. When returning, follow the same path and swim across the water to the leaving ferries as they head to the mainland.
+
+Once in this land, there are many dangers that immediately confront you. The frogloks have a strong presence in the local area, and tuk warriors and the like frequent the area. Also, the vicious drachnids move silently through the forest surrounding the docks. Remember that this area has gone wild...
+
+In Firiona Vie, the docks are in the extreme southwest portion of the zone. Note that if you are in Wolf Form, you will be KOS to the guards on the docks. Don't ask me to explain, I can't. From here you have several options. You can adventure into Firiona Vie itself, or you can proceed directly to the other nearby zone. the Lake of Ill Omen shares a spring that feeds both the lake and the small stream that leads down to near the docks. An adventurer can follow the stream to its source in the hills to the west, which will lead them to the [[Lake of Ill Omen]] area at approximately loc 1290, 3500. From there it is easy to find your way to the lands beyond.
+
+Realize what I stated above. Only on the docks are you safe. The races of Antonica have established a beachhead, nothing more, and once you step out of sight of the nearest guard, you fall prey to the dangers of this continent. Bind yourself on the dock, if you are able, and stock up on food and water, for it may be a long time before you see friendly faces from home again...
+
+''' From Oasis of Marr '''
+
+The "Barrel Barge" leaves from the dock in [[Oasis of Marr]]. This is a relatively safe spot to wait, but sometime it is visited by Sand Giants so you need to be on your toes. The Barge makes a very short trip, zoning quickly into the [[Timorous Deep]], and then quickly arriving at an island. It then almost immediately heads back to Oasis making no other stops nor passing anything else of interest.
+
+While the Barge is the start of the route to the Evil strong hold at [[The Overthere]], this part of the route is safe for Good travelers. There are no NPCs at either end of the trip.
+
+The island you arrive at is nicknamed Ogre Junction. It's a large island with a mountain on the North end, three mountains along the Southern side corner with a big sandy plane in the middle. The Barge a lands in a cove on the West side of the plane.
+
+At the South Western end of the Island is a small Ogre settlement. The settlement consists of a few typical Ogre hunts, docks, and 15 or so Ogres, mostly warrior types. These Ogres have the same faction as the Evil outpost in Kunark. They will let pass Evil travelers including Necromancers and Shadow Knights of any race.
+
+In the South East corner of the Island on a beach behind the mountain is a Spiroc city. The Spiroc is a parrot race and their city looks much like the Aviak city in South Karana. Some are at least in the high 30s and they can be aggressive.
+
+While there are a few Ogres in in the Northern mountain, and the Spiroc patrol around their city, the sandy center of the Island is uninhabited and probably a safe place to rest.
+
+At the Junction docks (pos 5835, pos 3635) a larger ship may be caught - this is at the larger dock just north of the actual village. The Bloated Belly is a huge raft made from the hull of a wrecked ship. It must be seen to be believed. Travelers not tolerated by the Ogres can probably not board the ship from the docks. However the ship is very low to the water, and it is possible to swim around and climb on. The ship has a number of barrels attached to its sides, the trick is to find one that is low in the water or at a 45 degree angle. It's easy to climb up those barrels and on to what passes for the deck. It is also possible to simple run on to it when levitating. Good travelers should be aware of the Ogres in the rocks when maneuvering for the boat.
+
+The ship heads across the [[Timorous Deep]] passing two points of Interest. The first is a grave yard of shipwrecks which forms an island. This island is rumored to be the home of bandits. The ship actually takes in it's sail and slows as it passes the wrecks so it's possible to board there.
+
+The second is Chess Board Island with Spirocs and Iksar outcasts. It's at about this point that the boat comes closest to the fire pot tower. If that's your destination, jump off and head more or less South. Even with the boat ride, it is still a very long swim.
+
+Finally the ship reaches The Overthere. As soon as the boat zones, Good travelers should jump off the left side and swim to shore. Stay away from the structures on your right. The boat pauses for a few minutes before moving to the dock. Good travelers can use this opportunity to swim out to the boat for the return trip.
+
+Once the boat starts moving again it arrives almost immediately at the dock. This is the Evil stronghold in Kunark. It's the ruins of the Iksar's Danak Shipyards. There are a number of buildings and a large open market surrounded by the remains of a great wall. The area is well guarded and should be a safe place to rest. Of note is a large open area called the Spell Vendor Pavilion, where 51+ spells for all classes may be purchased and spell quests start, a building full of clockwork merchants selling mostly trade supplies, and a bank with two clockwork bankers.
+
+Beyond the encampment is the vast plain of The Overthere. It's probably about the size of South Karana. It is teaming with life, and is a 20-40 hunting ground. [[Frontier Mountains]] and [[Skyfire Mountains]] and [[Warsliks Woods]] all lie beyond The Overthere and the entrance to a dungeon named Howling Stones maybe be found near the center of the zone.
+
+''' Gating Into Kunark '''
+
+Although I have never seen them with my own eyes, there are rumored to be some ancient [[Wizard]] and [[Druid]] portals that exist intact in the Dreadlands. This area is a small distance from Firiona Vie through a small section of tunnels that lead into the area surrounding the elven beachhead. These are the only known portals on the entire continent, as the Combine Empire did not rule this land as they did all the others.
+
+== [[Timorous Deep|Timorous Deep Teleportation Room (AKA Firepots) Guide]] ==
+
+[[File:fireports01.jpg|frame|Timorous Deep Firepot Spires]]
+[[File:firepot_room.jpg|frame|Timorous Deep Firepot Room]]
+
+The room is located at loc -12260, 4380, -277 within [[Timorous Deep]].
+
+Be careful when you enter here, as there is a dragon-like creature named '''[[Faydedar]]''' that is very often path in the area. He is on Ring of Scale faction and generally KOS to all, and /con's red to level 51 characters, so be very careful.
+
+Green(2019) - It was possible to bind at firepots for 4 days total.  It is not possible to bind in this zone on either server now.
+
+The listing of the pots and where they take you is:
+
+* North Left:(fire on floor) to [[Grobb]] (entrance)
+* North Center:(6 side gray) to [[Oggok]] (entrance)
+* North Right:(6 side tall) to [[Erudin]] (near dock)
+* East Left:(6 side gray) to [[Neriak]] Commons (entrance, Priest of Discord)
+* East Center:(4 side wood) to [[Greater Faydark]] (under Kelethin)
+* East Right:(6 side rust) to Northern [[Felwithe]] (entrance)
+* South Left:(Brown box) to [[Halas]] (near dock)
+* South Center:(Dark with blue) to East [[Freeport]] (on dock)
+* South Right:(tall gold vase) to [[Cabilis]] West (entrance near [[Lake of Ill Omen]])
+* West Left:(White marble) to South [[Kaladim]] (entrance)
+* West Center:(Lava Lamp) to [[Ak'Anon]] (entrance)
+* West Right:(torch stand) to [[Rivervale]] (entrance) 
+
+[[File:Fireport Room Map.jpg|link=]]
+
+
+== Item-Based Travel ==
+
+In addition to the above methods of travel there are also several ways that players can use items to travel around Norrath.  Such items include:
+
+* [[Worker Sledgemallet]] ([[The Overthere]]) - This popular item allows any player of level 50 or above to "proc" (have a chance to trigger every time they attack using the mallet) a teleport to the fort in [[The Overthere]].  Because the immediate zone-in location is safe, even characters with poor [[Venril Sathir (Faction)]] can utilize this item.  Furthermore, because of it's popularity many [[druid]]s and [[wizard]]s wait in [[The Overthere]] to offer ports to users of the mallet.
+
+* [[Vial of Velium Vapors]] ([[Thurgadin]]) - Technically part of the [[Coldain Prayer Shawl Quests]], this one-use item allows a character to teleport directly to [[Thurgadin]].  Making it requires crystal silk and Velium ore, which can be found in the [[Crystal Caverns]] and/or [[Velketor's Labyrinth]]
+
+* [[Leatherfoot Raider Skullcap]] - This one-use item allows a character to travel directly to the [[West Commons]].  Because it can be used instantaneously, it is often used as a last minute "escape hatch" to avoid death.  Making it requires completing a quest involving various animl skins, but because that quest is popular the cap can usually be found for sale in the [[East Commonlands]].  It can be re-charged (see [[Guide to Recharging Items]]) for about 200 plat, but since it is a Lore item recharging it requires the use of a second character (your's or someone else's) to re-charge it. This is NOT safe for the evil races; while other druid rings are staffed by Beta Neutral traders, this one has some aggressive druids guarding it.
+
+* [[Lizard Blood Potion]] - Drops of [[Cazic Cenobite]] in [[Cazic Thule]]. Single use expendable port potion to the Wizard port pyramid in the maze in Cazic Thule.
+
+* [[Plane of Mischief Armor Quest]] Leg Armor - The leg armor pieces from the PoM Armor Quest all have three charges of Ring of Misty. This is a self teleport to Misty Thicket Druid Circle.
+
+* Shaman Gate Potions (Assorted) - Shaman with a (very) high [[alchemy]] skill can create potions which teleport to the various [[Shaman]] newbie zones.  Because they cost nearly 300 plat to make however (and that's without accounting for the cost of failures or skilling up), and require more than 10 seconds to use, these potions are less popular:
+
+{| class="eoTable3 sortable"
+|-
+! Item
+! Zone Name
+! Location
+! Description
+|-
+| [[Potion of the Frost]] || [[Everfrost Peaks]] || {{Loc | Everfrost Peaks | 115, 919}} ||
+|- 
+| [[Potion of the Swamp]] || [[Innothule Swamp]] || {{Loc | Innothule Swamp | 1188, 544}} || 
+|-
+| [[Potion of the Bone Field]] || [[Field of Bone]] || {{Loc | Field of Bone | -1961, 340}} || 
+|}
+
+
+'''NOTE:''' There are many other item-based teleports, including both general ones (eg. the [[Lizard Blood Potion]]) and class-specific ones (eg. the [[Shamanistic Shenannigan Greaves]]).  Hopefully over time all of them can be added to this list (feel free to help; remember, it's a wiki!)
+
+
+[[Category:Guides]]

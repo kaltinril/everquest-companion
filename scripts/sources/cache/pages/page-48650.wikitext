@@ -1,0 +1,10 @@
+{{expand}}
+A [[Monk]] special attack. Round Kick is trainable at level 5, and is superseded by [[Flying Kick]] at level 30.
+
+== Classes ==
+
+* [[Monk]] - Level 5 '''(Max 225)'''
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

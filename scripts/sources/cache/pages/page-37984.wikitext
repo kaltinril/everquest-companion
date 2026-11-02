@@ -1,0 +1,54 @@
+{{Factionpage|
+
+| description = The outcast [[Iksar]]s, enemies of all the Cabilis factions.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Emerald Jungle]]
+* [[Field of Bone]]
+* [[Lake of Ill Omen]]
+* [[Mines of Nurga]]
+* [[Swamp of No Hope]]
+* [[Trakanon's Teeth]]
+* [[Warsliks Woods]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a rogue shaman]]  <span class='fmz'>(Field of Bone)</span>
+* [[an Iksar abductor]] <span class='fmz'>(Emerald Jungle)</span>
+* [[an Iksar anchoret]] <span class='fmz'>(Emerald Jungle)</span>
+* [[an iksar anchorite]] <span class='fmz'>(Emerald Jungle)</span>
+* [[an iksar bandit]]  <span class='fmz'>(Field of Bone)</span>
+* [[an iksar brigand]] <span class='fmz'>(Lake of Ill Omen)</span>
+* [[an iksar brigand]]  <span class='fmz'>(Field of Bone)</span>
+* [[an iksar brigand]] <span class='fmz'>(Warsliks Wood)</span>
+* [[an iksar brigand]] <span class='fmz'>(Swamp of No Hope)</span>
+* [[an Iksar footpad]]  <span class='fmz'>(Field of Bone)</span>
+* [[an iksar footpad]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[an iksar manslayer]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[an iksar marauder]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[an iksar marauder]]  <span class='fmz'>(Field of Bone)</span>
+* [[an Iksar pariah]] <span class='fmz'>(Field of Bone)</span>
+* [[an iksar picaroon]] <span class='fmz'>(Emerald Jungle)</span>
+* [[an iksar slave]]  <span class='fmz'>(Mines of Nurga)</span>
+* [[Deadeye_(NPC)|Deadeye]] <span class='fmz'>(Swamp of No Hope)</span>
+* [[Iksar exile]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[Iksar Mercenary]] <span class='fmz'>(Trakanon's Teeth)</span>
+* [[iksar pariah]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[Iksar treasure hunter]] <span class='fmz'>(Trakanon's Teeth)</span>
+* [[Kerosh Blackhand]]  <span class='fmz'>(Field of Bone)</span>
+* [[Zagran the Mad]] <span class='fmz'>(Swamp of No Hope)</span>
+
+}}

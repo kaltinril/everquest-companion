@@ -1,0 +1,61 @@
+{{Factionpage|
+
+| description = [[File:Npc_cinder_goblin.png|right]]Red-skinned [[Goblin]]s in [[Solusek's Eye]] and [[Lavastorm]] areas. Unlike the ice goblins of [[Vox]], [[Nagafen]] does not seem to care if players wipe out these possibly associated goblins of fire.
+
+The largest concentration of these fiery fart-knockers can be found in their fortress built into the first areas of [[Solusek's Eye]]. There you can find the [[goblin merchant]], [[Solusek Goblin King]], and [[Lord Gimblox]]. They cohabit the zone with the gnomes of [[Solusek Mining Co]] but do not give opposing faction hits, suggesting an uneasy truce.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Ak'Anon]]
+* [[Lavastorm Mountains]]
+* [[Solusek's Eye]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a fire goblin scout]]  <span class='fmz'>(Lavastorm Mountains)</span>
+* [[cinder goblin]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[cinder goblin shaman]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[cinder goblin wizard]] <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[Clockwork XXIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Drekon Vebnebber]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[fire goblin]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[fire goblin bartender]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[fire goblin shaman]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[a fire goblin wizard]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[flame goblin]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[flame goblin foreman]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[flame goblin shaman]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[flame goblin wizard]] <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[goblin drunkard]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[goblin high shaman]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[goblin merchant]] <span class='fmz'>(Solusek's Eye (Solusek A) - Merchant)</span>
+* [[goblin warrior]]  <span class='fmz'>(Lavastorm Mountains)</span>
+* [[inferno goblin]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[inferno goblin captain]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[inferno goblin shaman]] <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[inferno goblin torturer]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[inferno goblin wizard]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[large fire goblin]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[Solusek champion]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[Solusek goblin]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[Solusek goblin king]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[Solusek mage]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[Solusek priest]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[Tisella]]  <span class='fmz'>(Lavastorm Mountains)</span>
+* [[young goblin]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[young goblin shaman]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[young goblin wizard]] <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+
+}}

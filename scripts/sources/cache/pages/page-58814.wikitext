@@ -1,0 +1,63 @@
+{{Classic Era}}
+<div style="display: flex;">
+  <div style="flex: 1;">
+    <ul>
+    <li>Summoning Spell: [[Juli's Animation]]</li>
+    <li>Pet Type: Animation</li>
+    <li>Pet Classes: [[Paladin]] / [[Warrior]]</li>
+    <li>Pet Level: 5</li>
+    <li>Hit Points: 92 (+1/tick)</li>
+    <li>Mana: 100 (+10/tick)</li>
+    </ul>
+  </div>
+  <div style="flex: 1;">
+  [[File:animated_dagger_summon.png|left|x175px]]
+  </div>
+</div>
+<div style="display: flex;">
+  <div style="flex: 1;">
+    <ul>
+    <li>Defensive Stats</li>
+       <ul>
+       <li>Mitigation: 12</li>
+       <li>Evasion: 67</li>
+       </ul>
+    </ul>
+    <ul>
+    <li>Offensive Stats</li>
+       <ul>
+       <li>Offense: 25</li>
+       <li>Accuracy: 50</li>
+       <li>Max Damage: 14</li>
+       <li>Dual Wield Skill: None</li>
+       </ul>
+     </ul>
+  </div>
+  <div style="flex: 1;">
+    <ul><li>Strength: 75</li>
+    <li>Stamina: 75</li>
+    <li>Intelligence: 10</li>
+    <li>Wisdom: 10</li>
+    <li>Agility: 90</li>
+    <li>Dexterity: 75</li>
+    <li>Charisma: 75</li></ul>
+  </div>
+</div>
+
+== Abilities ==
+* [[Skill_Block|Block]]
+* [[Skill_Cleave|Cleave]]
+* [[Skill_Lay_on_Hands|Lay On Hands]]
+* [[Skill_Riposte|Riposte]]
+* [[Skill_Taunt|Taunt]]
+
+== Spell List ==
+* [[Minor Healing|<span class='itemeff'>Minor Healing</span>]]
+* [[Strike|<span class='itemeff'>Strike</span>]]
+== Focus Items ==
+* None
+== Notes ==
+* None
+
+[[Category: Summoned Pet]]
+[[Category: Enchanter Pet]]

@@ -1,0 +1,29 @@
+{{Factionpage|
+
+| description = The birds who are hated by the Paladins in Kaladim for their habit of messing up the statue of King Kazon Stormhammer.
+
+| zones_raise = 
+
+* [[Butcherblock Mountains]]
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Steamfont Mountains]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+
+| mobs_lower = 
+
+* [[a Krag chick]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[a krag elder]]  <span class='fmz'>(Butcherblock Mountains)</span>
+
+}}

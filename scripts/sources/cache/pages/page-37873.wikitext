@@ -1,0 +1,135 @@
+{{Classic Era}}
+[[File:Freeport_Coalition_Of_Tradesfolk.png|350px|right|A picture of the Freeport Coalition of Tradesfolk Headquarters in North Freeport.]]
+{{Factionpage|
+
+| description = The main merchant faction of [[Freeport]]. A picture of their Headquarters Located in North Freeport is below.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Freeport|East Freeport]]
+* [[Highpass Keep]]
+* [[Highpass Hold]]
+* [[Kithicor Forest]]
+* [[Northern Desert of Ro]]
+* [[Qeynos Aqueducts]]
+* [[Qeynos Hills]]
+* [[Qeynos|South Qeynos]]
+* [[Southern Desert of Ro]]
+* [[Freeport|West Freeport]]
+* [[Western Plains of Karana]]
+
+| quests_raise = 
+
+* [[Exotic Drinks]]
+* [[Fresh Baked Muffins]]
+* [[Inert Potion Quest]]
+* [[Marr Minnows for Palon]]
+* [[Nesiff's Statue]]
+* [[Note for Janam]]
+* [[Note for Rebby]]
+* [[Peacekeeper Staff Quest]]
+* [[Rogue Redemption]]
+* [[Rohand's Brandy]]
+* [[Sneed's Rat Infestation]]
+* [[Tayla Ironforge]]
+* [[The Bread Shipment]]
+* [[The Clothspinner Sisters (good)]]
+* [[The Crate (evil)]]
+* [[The Crate (good)]]
+* [[The Donations]]
+* [[The Frikniller Family]]
+* [[The Gnoll Slayer]]
+* [[The Lottery Ticket]]
+* [[The Package]]
+* [[Tonics for Groflah]]
+* [[Weapons Delivery]]
+
+| quests_lower = 
+
+* [[Death of Lyda Nasin]]
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Aimie Moonspin]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Alec Greenglade]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Alysa]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Amber (NPC)|Amber]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Ardiflah Steadirt]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Beur Tenlah]] <span class='fmz'>(East Freeport - Rogue Guildmaster)</span>
+* [[Boomba the Big]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Brunar Rankin]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Bryan Mcgee]] <span class='fmz'>(Highpass Hold - Quest NPC)</span>
+* [[Carson Mccabe]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Clomen Walker]] <span class='fmz'>(Kithicor Forest - Merchant)</span>
+* [[Cloud Alemaker]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Drona Whystlethin]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Eithne Walker]] <span class='fmz'>(Kithicor Forest - Merchant)</span>
+* [[Elisi Nasin]] <span class='fmz'>(East Freeport - Rogue Guildmaster)</span>
+* [[Roghur Muleson]] <span class='fmz'>(Mob Graveyard - Merchant)</span>
+* [[Ghul Rustem]] <span class='fmz'>(South Qeynos - Merchant)</span>
+* [[Gord Smith]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Gren Frikniller]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Groflah Steadirt]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Gurb Smithson]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Hadden]]  <span class='fmz'>(Qeynos Hills)</span>
+* [[Harkin Duskfoot]] <span class='fmz'>(East Freeport - Rogue Guildmaster)</span>
+* [[Henna Treghost]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Ikthar Fireheart]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Imxil Tbrow]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Innkeep Danin]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Innkeep Evelona]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Innkeep Palola]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Innkeep Rille]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Innkeep Rislarn]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Issilyn Ristan]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Jade]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Jallen Nooz]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Jenna Smith]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Judicla Riverfield]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Jynsa Smithson]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Klan Smith]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Krystin Charcoal]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Lyda Nasin]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Lylea]] <span class='fmz'>(Highpass Hold - NPC, Non-Quest)</span>
+* [[Lystyn Wyspin]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Meera Lylon]] <span class='fmz'>(South Qeynos - Merchant)</span>
+* [[Nestral TGaza]] <span class='fmz'>(East Freeport - Rogue Guildmaster)</span>
+* [[Ollysa Bladefinder]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Peran Silverfield]] <span class='fmz'>(West Freeport - Banker)</span>
+* [[Ponila Quickfingers]] <span class='fmz'>(Commonlands - Merchant)</span>
+* [[Ranvigoz Tonsmith]] <span class='fmz'>(Commonlands - Quest NPC)</span>
+* [[Rashinda Elore]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Shania Tassel]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Shintl Lowbrew]]  <span class='fmz'>(West Freeport)</span>
+* [[Slan ODonner]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Soris Silverfield]] <span class='fmz'>(West Freeport - Banker)</span>
+* [[Spoolie Gee]] <span class='fmz'>(North Ro - Merchant)</span>
+* [[Svinal Wyspin]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Swin Blackeye]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Tenni Kohern]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Timtok Tonsmith]] <span class='fmz'>(Commonlands - Quest NPC)</span>
+* [[Tira Sandfisher]] <span class='fmz'>(North Ro - Merchant)</span>
+* [[Tohsan Hallard]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Tradesman Lyna]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Tradesman Tulan]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Vin Moltor]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Wahnig Nooz]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Winoyn]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Yellus Gravien]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Zenita D`Rin]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+
+}}
+= Suggested Route =
+*[[The Frikniller Family]] (+[[Coalition of Tradefolk Underground]], +[[Coalition of Tradefolk]], +[[Carson McCabe]], +[[Corrupt Qeynos Guards]], +[[The Freeport Militia]])
+*[[Tonics for Groflah]] (+[[Coalition of Tradefolk]], +[[Knights of Truth]], +[[Merchants of Qeynos]], +[[Coalition of Tradefolk Underground]])
+*[[The Crate (evil)]] Part 1: (+[[Merchants of Qeynos]], +[[Antonius Bayle]], +[[Coalition of Tradefolk]], +[[Guards of Qeynos]], -[[Circle Of Unseen Hands]]) 
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

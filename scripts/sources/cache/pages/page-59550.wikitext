@@ -1,0 +1,14 @@
+This skill can be used by elemental [[Pet Guide|pets]]. Though its not seen much and its unclear when and how pets decide to use it; it may occur at low health when fighting large groups of mobs.
+
+The ability allows the pet to attack all enemies around them, not unlike an extra [[Skill_Cleave|Cleave]] attack.
+
+[[File:wild_rampage.png]]
+
+== Classes ==
+
+* [[Magician]] Elementals
+* Other class' pets??
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

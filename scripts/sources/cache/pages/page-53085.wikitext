@@ -1,0 +1,54 @@
+{{Delete}}
+
+==Intro==
+Everquest was designed at a time when 4:3 was the common aspect ratio for computers and contemporary monitors. As such, the game was designed around that.
+
+==The problem==
+In modern times, nearly all monitors are widescreen (16:9), with even wider aspect ratios common. 
+In the Project 1999 client, the horizontal viewport (the area of the world you can see) is locked.
+This means:
+If 2 points in the world are at the leftmost/rightmost edges of your screen, they will be that way no matter your aspect ratio. 
+However, '''the wider your aspect ratio, the less of the world you see vertically''', and the more narrow your aspect ratio, the more you see vertically
+
+==The solution==
+
+There are 2 solutions to this problem:
+
+1. Run the game in a 4:3 aspect ratio. In windowed mode, this will mean that part of your monitor is free for other things. In fullscreen mode this means black bars on the side that aren't usable (or your monitor tries to stretch the image, which is worse) 
+2. Run the game in a wide aspect ratio, but use the /viewport command in game to adjust the view. The advantage this has over the above is that you can place UI elements in the black bars to see more of the world. 
+
+Below are some examples highlighting what this looks like in practice. Notice the tree and the top of the far building in relation to the edge of the view. The character is stationary. The bottom is also cropped in widescreen, which is more noticable in melee combat. 
+
+ Note: it is recommended if you have trouble with the size of the interface, use full screen mode with a smaller resolution, see [[https://wiki.project1999.com/Green_UI#Impact_of_Screen_Resolution_.2F_UI_scaling here]] for more info. 
+
+Note: it is not important to use an exactly 4:3 ratio when using /viewport, but somewhere close will allow you to experience the game as intended. Play around with it. )
+
+1366x768 with a 16:9 viewport:
+
+[[File:Wide viewport 1366x768.jpg | 800px ]]
+
+1366x768 with a 4:3 viewport :
+
+[[File:Standard viewport 1366x768.jpg | 800px ]]
+
+
+1920x1080 with a 4:3 viewport:
+
+[[File:Wide viewport 1920x1080.jpg  | 800px ]]
+
+1920x1080 with a 16:9 viewport:
+
+[[File:Standard viewport 1920x1080.jpg | 800px ]]
+
+[[Category:Technical]]
+
+
+
+
+'''Popular 16:9 to 4:3 Viewport Settings:'''
+
+Using 768p: /viewport 171 0 1024 768
+
+Using a 1080p:   /viewport 240 0 1440 1080  
+
+Using a 1440p:   /viewport 320 0 1920 1440

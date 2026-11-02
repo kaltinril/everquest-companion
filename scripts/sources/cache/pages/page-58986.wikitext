@@ -1,0 +1,12 @@
+This ability frenzies your current target with your primary and optionally secondary weapon, then attacks an additional time with each weapon in a frenzy of attacks. Reduces the cooldown time of the Rampage AA.
+
+Frenzy will double and triple attack based on your skill
+
+Macro command: /doability Frenzy
+
+==Classes==
+* [[Berserker]] - Level 6 '''(Max 200)'''
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

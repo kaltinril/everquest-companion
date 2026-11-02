@@ -1,0 +1,24 @@
+This skill enables you to take reduced damage from falling from high places. At maximum levels, you can escape with barely a scratch. A short fall will skill up just as easily as a long one. Run in circles around a area with some Hills or Mountains.
+
+== Locations to Max ==
+
+* Wizard Spire in West Commons
+
+* Zone walls in South Karana and The Wakening Lands near the mountains.
+
+* Erudin teleportation point "A"
+
+* Any zone with mountains or lots of hills.
+
+
+''South Karana tip: the hill just South East of the bridge to North Karana (location 2230, 425) works extremely well. Face North, and run forward. After you land about 6-7 times, turn around, run back up the hill, and continue the process. The area is also fairly safe, and close to the zone line.''
+
+== Classes ==
+
+* [[Monk]] (Max: 255)
+* [[Rogue]] (Max: 94)
+* [[Bard]] (Max: 40)
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

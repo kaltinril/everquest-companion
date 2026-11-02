@@ -1,0 +1,81 @@
+{{Factionpage|
+
+| description = The faction of [[Iksar]] [[Shaman]]s and Crusader Quarg. Can only be raised with newbie quests.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Cabilis|East Cabilis]]
+* [[Field of Bone]]
+* [[Firiona Vie]]
+* [[Frontier Mountains]]
+* [[Lake of Ill Omen]]
+* [[Swamp of No Hope]]
+* [[The Overthere]]
+* [[Warsliks Woods]]
+* [[Cabilis|West Cabilis]]
+
+| quests_raise = 
+
+* [[Blood Ink]]
+* [[Bone Chips Quests]]
+* [[Crusader's Tests|Crusaders of Greenmist]]
+* [[Cures]]
+* [[Curscale Shield]]
+* [[Cursed Wafers Quest]]
+* [[Frogloc Tad Tongues]]
+* [[Geozite Tool Quest]]
+* [[Granite Pebbles]]
+* [[Illweed Parchment Quest]]
+* [[Legion Lager Quest]]
+* [[Marauder Armor]]
+* [[Sarnak Hatchling Brains]]
+* [[Scorpion Pincers]]
+* [[The Penance]]
+* [[The Restraining Order]]
+* [[Warrior Pike Quests|Warrior Pike #1 (Militia Pike)]]
+* [[Warrior Pike Quests|Warrior Pike #2 (Footman's Pike)]]
+* [[Warrior Pike Quests|Warrior Pike #4 (Trooper's Pike)]]
+* [[Watcher Torches]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Alchemist Granika]] <span class='fmz'>(The Overthere)</span>
+* [[an enslaved iksar]] <span class='fmz'>(Frontier Mountains - Quest NPC)</span>
+* [[Captain Gideen]] <span class='fmz'>(Warsliks Wood)</span>
+* [[Captain Nedar]] <span class='fmz'>(Swamp of No Hope)</span>
+* [[Crusader Axmo]] <span class='fmz'>(West Cabilis)</span>
+* [[Crusader Bodli]] <span class='fmz'>(Field of Bone)</span>
+* [[Crusader Cotat]] <span class='fmz'>(East Cabilis)</span>
+* [[Crusader Daehod]] <span class='fmz'>(East Cabilis)</span>
+* [[Crusader Deezin]] <span class='fmz'>(Lake of Ill Omen)</span>
+* [[Crusader Eaxl]] <span class='fmz'>(Warsliks Wood)</span>
+* [[Crusader Ezrogz]] <span class='fmz'>(West Cabilis)</span>
+* [[Crusader Golia]] <span class='fmz'>(East Cabilis)</span>
+* [[Crusader Hitol]] <span class='fmz'>(East Cabilis)</span>
+* [[Crusader Litia]] <span class='fmz'>(Swamp of No Hope)</span>
+* [[Crusader Mocdi]] <span class='fmz'>(West Cabilis)</span>
+* [[Crusader Myxl]] <span class='fmz'>(Warsliks Wood)</span>
+* [[Crusader Olos]] <span class='fmz'>(East Cabilis)</span>
+* [[Crusader Quarg]] <span class='fmz'>(Field of Bone)</span>
+* [[Crusader Reidak]] <span class='fmz'>(East Cabilis)</span>
+* [[Crusader Savot]] <span class='fmz'>(Swamp of No Hope)</span>
+* [[Crusader Swype]] <span class='fmz'>(Lake of Ill Omen)</span>
+* [[Crusader Wonku]] <span class='fmz'>(East Cabilis)</span>
+* [[Crusader Zixo]] <span class='fmz'>(East Cabilis - Quest NPC)</span>
+* [[Hierophant Oxyn]] <span class='fmz'>(East Cabilis)</span>
+* [[Trooper Taer]] <span class='fmz'>(Field of Bone)</span>
+* [[Vekis]] <span class='fmz'>(Firiona Vie - Quest NPC)</span>
+* [[Vessel Drozlin]] <span class='fmz'>(East Cabilis - Quest NPC)</span>
+* [[Warlord Hikyg]] <span class='fmz'>(Swamp of No Hope)</span>
+* [[Warlord Zyzz]] <span class='fmz'>(Field of Bone)</span>
+
+}}

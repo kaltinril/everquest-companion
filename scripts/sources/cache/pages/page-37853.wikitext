@@ -1,0 +1,76 @@
+{{Factionpage|
+
+| description = The [[Wizard]] Guild in Erudin is called the Crimson Hands and can be found on the upper floors of the Erudin Palace.  On the top floor of the Hall of Crimson Hands you can find the Wizard Guildmaster Ghanlin Skyphire.  The Crimson Hands Guild lend their magical support to the High Council and High Guard of Erudin, and oppose the [[Heretics]] of Paineel.
+
+| zones_raise = 
+
+* [[Lavastorm Mountains]]
+* [[Paineel]]
+* [[The Hole]]
+* [[Toxxulia Forest]]
+
+| zones_lower = 
+
+* [[Erudin|Erudin Palace]]
+* [[Qeynos|North Qeynos]]
+* [[Toxxulia Forest]]
+
+| quests_raise = 
+
+* [[Heretic Battle]]
+* [[Ice Goblin Beads]]
+* [[Ilanic's Scroll]]
+* [[Vasty Deep Water]]
+
+| quests_lower = 
+
+* [[Azzar's Dreadful Hat Quest]]
+* [[Bat Fur and Beetle Legs]]
+* [[Cazic Thule Initiate]]
+* [[Cold Iron]]
+* [[Kobold Molars (evil)]]
+* [[The Fisherman]]
+* [[The Lost Pet]]
+* [[The Waylaid Courier]]
+
+| mobs_raise = 
+
+* [[Aglthin Dasmore]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Azzar Habbib]] <span class='fmz'>(Paineel - Quest NPC)</span>
+* [[Derena Leflor]] <span class='fmz'>(Paineel - Quest NPC)</span>
+* [[Elial Brook]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Guard Korlack]]  <span class='fmz'>(Paineel)</span>
+* [[Guard Menbuknar]]  <span class='fmz'>(Paineel)</span>
+* [[Hykallen]]  <span class='fmz'>(Lavastorm Mountains)</span>
+* [[Jelquar the Soulslayer]]  <span class='fmz'>(Stonebrunt Mountains)</span>
+* [[Keeper of the Tombs]] <span class='fmz'>(Ruins of Old Paineel (The Hole) - Undead)</span>
+* [[Keeshla Levlora]] <span class='fmz'>(Paineel - Quest NPC)</span>
+* [[library assistant]] <span class='fmz'>(Paineel - Quest NPC)</span>
+* [[Medoris Flalzm]] <span class='fmz'>(Paineel - Quest NPC)</span>
+* [[Ninna Flalzm]] <span class='fmz'>(Paineel - Quest NPC)</span>
+* [[Noclin Saah]] <span class='fmz'>(Paineel - Quest NPC)</span>
+* [[Rallia Hapera]] <span class='fmz'>(Paineel - Merchant)</span>
+* [[Telan Buvare]] <span class='fmz'>(Paineel - Quest NPC)</span>
+* [[Velana Kelmuza]] <span class='fmz'>(Paineel - Quest NPC)</span>
+* [[Verolk Kishneal]] <span class='fmz'>(Paineel - Quest NPC)</span>
+* [[A kerran `amir]] <span class='fmz'>(Kerra Island)</span>
+* [[A kerran puma]] <span class='fmz'>(Kerra Island)</span>
+* [[A kerran pasdar]] <span class='fmz'>(Kerra Island)</span>
+* [[A kerran mujahed]] <span class='fmz'>(Kerra Island)</span>
+* [[Kerran tiger spahi]] <span class='fmz'>(Kerra Island)</span>
+
+| mobs_lower = 
+
+* [[Andane Starinen]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Barstall Methinon]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Ghanlin Skyphire]] <span class='fmz'>(Erudin Palace - Wizard Guildmaster)</span>
+* [[Gissa Brist]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Ilanics Skeleton]] <span class='fmz'>(Toxxulia Forest - Quest NPC)</span>
+* [[Josper Kenshed]] <span class='fmz'>(Erudin Palace - Wizard Guildmaster)</span>
+* [[Moodoro Finharn]] <span class='fmz'>(North Qeynos - Quest NPC)</span>
+* [[Raskena Djor]] <span class='fmz'>(Erudin Palace - Wizard Guildmaster)</span>
+* [[Tika Shockstep]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Whes Nareya]] <span class='fmz'>(Erudin Palace - Wizard Guildmaster)</span>
+
+}}
+[[Category:Achievement Faction]]

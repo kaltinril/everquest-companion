@@ -1,0 +1,84 @@
+{{Classic Era}}{{Disambig3|[[Miners Guild 249]]}}[[File:Npc_mater.png|right]]{{Factionpage|
+
+| description = In the mines and near the bank in South Kaladim can be found the rogues of Miners Guild 628.  These rogues get along fine with the Halfling Roges of Deeppoockets 
+in [[Rivervale]] but oppose the rogues of the [[Circle of Unseen Hands]] in [[Qeynos]] and the Dark Elf Rogues of the [[Ebon Mask]] in Neriak.  They also hate the [[Butcherblock Bandits]].  
+[[Mater]] is the guildmaster here and his stance against the more evil rogue guilds make his guild quite tolerated by the forces of good in the land.
+
+| zones_raise = 
+
+* [[Butcherblock Mountains]]
+* [[Crushbone]]
+* [[Rathe Mountains]]
+* [[Kaladim|North Kaladim]]
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Lesser Faydark]]
+* [[Kaladim|North Kaladim]]
+* [[Northern Karana]]
+* [[Solusek's Eye]]
+
+| quests_raise = 
+
+* [[Miner's Cap]]
+* [[Miners Pick]]
+* [[Parrying Pick Quest]]
+* [[Rat Patrol]]
+* [[Runnyeye Warbeads (Kaladim Rogue)]]
+* [[The Gnome Take]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[Aanina Rockfinder]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Barma Dunfire]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Bndainy Everhot]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Crytil Dunfire]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Dindaek Everhot]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Fugan Mumfur]] <span class='fmz'>(Butcherblock Mountains - Merchant)</span>
+* [[Gand Truelink]] <span class='fmz'>(Butcherblock Mountains - Merchant)</span>
+* [[Glynda Smeltpot]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Glynn Smeltpot]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Gundl]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Karam Dragonforge]] <span class='fmz'>(Mountains of Rathe - Merchant)</span>
+* [[Keldyn Dunfire]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Margyl Darklin]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Murlond Everhot]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Peg Leg]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Ragunk Everhot]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Rondo Dunfire]]  <span class='fmz'>(Crushbone)</span>
+* [[Serenk Greybloom]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Stump Rundl]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Tissin Greybloom]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Tortuk Everhot]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Qued]] <span class='fmz'>(Butcherblock Mountains)</span>
+
+| mobs_lower = 
+
+* [[CWG Model CB]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model CC]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model CX]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model MB]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model MC]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model XB]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model XC]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[Diggins]] <span class='fmz'>(North Kaladim - Quest NPC)</span>
+* [[Gabbie Mardoddle]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[Guard Gonin]] <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Guard Kyte]] <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Kafia Ratsbone]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Marfen Binkdirple]] <span class='fmz'>(Solusek's Eye (Solusek A) - Merchant)</span>
+* [[Mater]] <span class='fmz'>(North Kaladim - NPC, Non-Quest)</span>
+* [[Myre]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Saben Tucross]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+* [[Watchman Dexlin]] <span class='fmz'>(North Karana - Quest NPC)</span>
+
+}}
+= Suggested Route =
+*Kill named bandits ([[Barma Dunfire]], [[Peg Leg]], etc) in [[Butcherblock Mountains]] at spot 10 and 12.  (-[[Butcherblock Bandits]], +[[Miners Guild 628]], +[[Storm Guard]]).<br>You can save the tongues from the Dunfire's for [[Parrying Pick Quest]] (+[[Miners Guild 628]], -[[Circle Of Unseen Hands]], -[[Butcherblock Bandits]], +[[DeepPockets]], -[[Hall of the Ebon Mask]]), if you want to go to [[Crushbone]] for the [[Rondo's Tongue]] and willing to accept/fix the negative faction.
+*[[The Gnome Take]] (lowers clockworks which cannot be raised) (+[[Miners Guild 628]], +[[Deeppockets]], -[[Circle of Unseen Hands]], -[[Butcherblock Bandits]], -[[Ebon Mask]], -[[Clockworks of Ak`Anon]])
+
+[[Category:Achievement Faction]]

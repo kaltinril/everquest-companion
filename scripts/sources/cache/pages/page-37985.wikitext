@@ -1,0 +1,55 @@
+{{Factionpage|
+
+| description = The fish of Kedge Keep are all loyal to [[Phinigel Autropos]]. Killing these fish displeases him greatly.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Kedge Keep]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a cauldron hammerhead]]  <span class='fmz'>(Kedge Keep)</span>
+* [[a cauldron shark]]  <span class='fmz'>(Kedge Keep)</span>
+* [[a cerulean sailfin]]  <span class='fmz'>(Kedge Keep)</span>
+* [[a cobalt sailfin]]  <span class='fmz'>(Kedge Keep)</span>
+* [[a crimson sailfin]]  <span class='fmz'>(Kedge Keep)</span>
+* [[a fierce impaler]]  <span class='fmz'>(Kedge Keep)</span>
+* [[a gloomstalker mermaid]]  <span class='fmz'>(Kedge Keep)</span>
+* [[a gloomwater mermaid]]  <span class='fmz'>(Kedge Keep)</span>
+* [[a golden haired mermaid]]  <span class='fmz'>(Kedge Keep)</span>
+* [[a lancer swordfish]]  <span class='fmz'>(Kedge Keep)</span>
+* [[a piercer swordfish]]  <span class='fmz'>(Kedge Keep)</span>
+* [[a seahorse matriarch]]  <span class='fmz'>(Kedge Keep)</span>
+* [[a seahorse patriarch]]  <span class='fmz'>(Kedge Keep)</span>
+* [[a shimmering sailfin]]  <span class='fmz'>(Kedge Keep)</span>
+* [[a soothebrine seahorse]]  <span class='fmz'>(Kedge Keep)</span>
+* [[a spinereef seahorse]]  <span class='fmz'>(Kedge Keep)</span>
+* [[a squallsurge seahorse]]  <span class='fmz'>(Kedge Keep)</span>
+* [[a stiletto fang piranha]]  <span class='fmz'>(Kedge Keep)</span>
+* [[a stiletto tooth piranha]]  <span class='fmz'>(Kedge Keep)</span>
+* [[a stingtooth piranha]]  <span class='fmz'>(Kedge Keep)</span>
+* [[a swirlspine seahorse]]  <span class='fmz'>(Kedge Keep)</span>
+* [[an emerald sailfin]]  <span class='fmz'>(Kedge Keep)</span>
+* [[an impaler swordfish]]  <span class='fmz'>(Kedge Keep)</span>
+* [[Cauldronboil]]  <span class='fmz'>(Kedge Keep)</span>
+* [[Cauldronbubble]]  <span class='fmz'>(Kedge Keep)</span>
+* [[Coralyn Kelpmaiden]]  <span class='fmz'>(Kedge Keep)</span>
+* [[Estrella of Gloomwater]]  <span class='fmz'>(Kedge Keep)</span>
+* [[Phinigel Autropos]]  <span class='fmz'>(Kedge Keep)</span>
+* [[Shellara Ebbhunter]]  <span class='fmz'>(Kedge Keep)</span>
+* [[Swirlspine Guardian]]  <span class='fmz'>(Kedge Keep)</span>
+* [[Undertow]]  <span class='fmz'>(Kedge Keep)</span>
+
+}}

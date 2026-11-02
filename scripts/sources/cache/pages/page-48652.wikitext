@@ -1,0 +1,16 @@
+'''***Currently it isn't possible to raise Sense Traps in Everquest Legends without resorting to skill point expenditure at Rogue Guildmasters.***'''
+
+This skill will allow you sense any traps in a zone via changing your direction to face the trap.
+
+This skill can be increased by binding it to a movement key in your Everquest options.
+
+* Using this skill does not drop Hide or Sneak
+
+== Classes ==
+
+* [[Rogue]] (Level: 10)
+* [[Bard]] (Level: 20)
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

@@ -1,0 +1,138 @@
+{{Factionpage|
+
+| description = Climbing up to the [[Ak'Anon | Library Mechanimagica]] can be dangerous in the dark, but gnomish spellcasters do this when quite young where they seek the yellow robes offered by Juline Urncaller the Enchanter Guildmaster, Wuggan Aeusphere the Magician Guildmaster and Tobon Starpyre the Wizard Guildmaster.  The Eldritch collective is actively opposed to the Evil Gnomes of the [[Dark Reflection]] and the Dark Elf Necromancers and Shadowknights of [[The Dead]] in Neriak.  They are allied with the [[Gem Choppers]] and support the gnomish [[King Ak'Anon (Faction)|King Ak'Anon]].
+
+| zones_raise = 
+
+* [[Ak'Anon]]
+* [[The Estate of Unrest]]
+* [[Highpass Hold]]
+* [[Lesser Faydark]]
+* [[Neriak|Neriak Commons]]
+* [[Neriak|Neriak Foreign Quarter]]
+* [[Neriak|Neriak Third Gate]]
+* [[Ocean of Tears]]
+* [[Steamfont Mountains]]
+* [[Western Plains of Karana]]
+
+| zones_lower = 
+
+* [[Ak'Anon]]
+* [[Crushbone]]
+* [[Dagnor's Cauldron]]
+* [[Highpass Keep]]
+* [[Lesser Faydark]]
+* [[Steamfont Mountains]]
+
+| quests_raise = 
+
+* [[Air Tight Box Quest]]
+* [[Basilisk Tongues]]
+* [[Bugglegupp (Quest)|Bugglegupp]]
+* [[Minotaur Horns]]
+* [[Rogue Redemption]]
+* [[Series C Black Boxes]]
+* [[Slave Keys]]
+* [[Telescope Lenses]]
+* [[Tergon's Spellbook Quest]]
+
+| quests_lower = 
+
+* [[Bertoxxulous Symbol Quests|Bertoxxulous Initiate]]
+* [[Crude Stein Quest]]
+* [[Fire Beetle Eyes]]
+* [[Kerran Fire Beetle Eyes]]
+* [[Mammoth Tusks Quest]]
+* [[Necromancer Words - X`Ta Tempi]]
+* [[Sir Lindeal's Testimony]]
+* [[The Bridge]]
+* [[Thex Mallet Quest]]
+
+| mobs_raise = 
+
+* [[Capee]] <span class='fmz'>(Neriak Foreign Quarter - NPC, Non-Quest)</span>
+* [[Degarran Kixl]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Eonis Mournunder]] <span class='fmz'>(Ak'Anon - NPC, Non-Quest)</span>
+* [[Evah Xokez]] <span class='fmz'>(Ak'Anon - Cleric Guildmaster)</span>
+* [[Kaxon Frennor]] <span class='fmz'>(Ak'Anon - NPC, Non-Quest)</span>
+* [[Khrix Abomination]]  <span class='fmz'>(Estate of Unrest)</span>
+* [[Khrix Fritchoff]]  <span class='fmz'>(Estate of Unrest)</span>
+* [[Kizdean Gix]] <span class='fmz'>(Commonlands - Quest NPC)</span>
+* [[Kszan Punox]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Larik Z`Vole]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[Lisvan X`Lottl]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Loveal S`Nez]] <span class='fmz'>(Neriak Third Gate - Shadowknight Guildmaster)</span>
+* [[Naygog Mitope]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Noxhil V`Sek]] <span class='fmz'>(Neriak Third Gate - Quest NPC)</span>
+* [[Olavn N`Mar]] <span class='fmz'>(Neriak Commons - NPC, Non-Quest)</span>
+* [[Oobnopterbevny Biddilets]] <span class='fmz'>(West Karana - Quest NPC)</span>
+* [[Rilgor Plegnog]] <span class='fmz'>(Ak'Anon - Enchanter Guildmaster)</span>
+* [[Svunsa]] <span class='fmz'>(Neriak Foreign Quarter - NPC, Non-Quest)</span>
+* [[Uglan]] <span class='fmz'>(Neriak Foreign Quarter - Quest NPC)</span>
+* [[Vaenor Husga]] <span class='fmz'>(Ak'Anon - NPC, Non-Quest)</span>
+* [[Velena Corgtec]] <span class='fmz'>(Ak'Anon - NPC, Non-Quest)</span>
+* [[X`Ta Tempi]] <span class='fmz'>(Neriak Foreign Quarter - Quest NPC)</span>
+
+| mobs_lower = 
+
+* [[a mechanic]]  <span class='fmz'>(Ak'Anon)</span>
+* [[clockwork scrubber]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIIC]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIIE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIVE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIXA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVD]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVID]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIIA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIIC]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIIIE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXD]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXID]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIIIA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIVD]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIXB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVD]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVIC]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVIIC]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVIIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXXD]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Ghilanbiddle Nylwadil]] <span class='fmz'>(Dagnor's Cauldron - Quest NPC)</span>
+* [[Jogl Doobraugh]] <span class='fmz'>(Steamfont Mountains - Quest NPC)</span>
+* [[Juline Urncaller]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[King Ak`Anon]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Lodrand Dindlenod]] <span class='fmz'>(Steamfont Mountains - NPC, Non-Quest)</span>
+* [[Lozani]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Nonnie Texaker]] <span class='fmz'>(Ak'Anon - NPC, Non-Quest)</span>
+* [[Retlon Brenclog]] <span class='fmz'>(Crushbone - Quest NPC)</span>
+* [[Sanfyrd Featherhead]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Tergon Brenclog]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Thetherthag Wakintrob]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[Tobon Starpyre]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Trudo Frugrin]] <span class='fmz'>(Lesser Faydark - Quest NPC)</span>
+* [[Wuggan Azusphere]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+
+}}
+= Suggested Route = 
+*[[Series C Black Boxes]] - Part 1 (+[[King Ak'Anon (Faction)]], +[[Eldritch Collective]], +[[Gem Choppers]], -[[Dark Reflection]], -[[Meldrath]])
+
+
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

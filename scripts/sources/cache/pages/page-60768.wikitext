@@ -1,0 +1,947 @@
+{| class="wikitable"
+| colspan="2" |Slayer: Skill
+|-
+|
+|
+|-
+| colspan="2" |This guide  is how i would do it, it's not set in stone and can be done in other ways too. 
+Note: The steamfont area in the Northeast is the best place to start, since they are instant respawns and cover many different slayer achievements. 
+There is also the instant respawns in the Paineel newbie area for almost instant respawns as well. Rathe Mounatains next to Froglok city have many achievement at the same spot. 
+|-
+|
+|This guide in for Classic era.
+|-
+|
+|
+|-
+|
+|Nice to know: FD if pet can kill your target, then you wont  get faction hit.
+|-
+|
+|
+|-
+| 
+| 
+|-
+| 
+|Warring!!! Watch out for faction hit YOU don't want!
+|-
+| 
+|You wanna do race faction unlock first before getting bad  faction??
+|-
+| 
+| 
+|-
+| 
+|Oh the Humanity!
+|-
+| align="right" |100
+|Humans
+|-
+|Where:
+|Classic: Bandit camps - Oasis of Marr, North Karana, West Karana
+Kunark: 
+|-
+| 
+| 
+|-
+| 
+|Barbarous
+|-
+| align="right" |100
+|Barbarians
+|-
+|Where:
+|Classic: Halas (faction hit), West Commonland - bandit camp at 1000,  1000
+Kunark: 
+|-
+| 
+| 
+|-
+| 
+|Hardly Erudite of You
+|-
+| align="right" |100
+|Erudites
+|-
+|Where:
+|Classic: Erudin, Erudin Palace (Faction hit), Undead ghost Erudites in Hole
+Kunark: 
+|-
+| 
+| 
+|-
+| 
+|Wood You Could You?
+|-
+| align="right" |100
+|Wood Elves
+|-
+|Where:
+|Classic: Greater Faydark --> Bandit camp
+Kunark: 
+|-
+| 
+| 
+|-
+| 
+|Highly Uncivilized
+|-
+| align="right" |100
+|High Elves
+|-
+|Where:
+|Classic: Felwithe (faction hit)
+Kunark: 
+|-
+| 
+| 
+|-
+| 
+|Love Will Teir Them Apart
+|-
+| align="right" |100
+|Dark Elves
+|-
+|Where:
+|Classic: Castle Mistmoore
+Kunark: 
+|-
+| 
+| 
+|-
+| 
+|Now .49999%
+|-
+| align="right" |100
+|Half Elves
+|-
+|Where:
+|Classic: Bandit camp in West Karana, Lesser Faydark (faction hit), Bandit camp in Gfay
+Kunark: 
+|-
+| 
+| 
+|-
+| 
+|Axe Me No Questions
+|-
+| align="right" |100
+|Dwarves
+|-
+|Where:
+|Classic: Kaladim Faction hit, Bandit camps in Butcherblock
+Kunark: 
+|-
+| 
+| align="left" valign="top" |
+|-
+| 
+|Fuzzyfeet
+|-
+| align="right" |100
+|Halflings
+|-
+|Where:
+|Classic: Rivervale -400, 40 is a good spot, Nek Forest Leatherfoots (faction hits)
+Kunark: 
+|-
+| 
+| 
+|-
+| 
+|Clockwork Gnome
+|-
+| align="right" |100
+|Gnomes
+|-
+|Where:
+|Classic: Solusek's Eye, Befallen
+Kunark: 
+|-
+| 
+| 
+|-
+| 
+|Here's Yer Grozmok
+|-
+| align="right" |100
+|Trolls
+|-
+|Where:
+|Classic: West Commonlands, Rathe Mountains (Soldiers Brooch mobs)
+Kunark: 
+|-
+| 
+| 
+|-
+| 
+|Get Stupid
+|-
+| align="right" |100
+|Ogres
+|-
+|Where:
+|Classic: West Commonlands, Najena
+Kunark: 
+|-
+| 
+| 
+|-
+| 
+|Icky!
+|-
+| align="right" |100
+|Iksars
+|-
+|Where:
+|Classic: New Sebilisian Expedition Skeletons/Ghosts
+Kunark: 
+|-
+| 
+| 
+|-
+| 
+|It's a Frog Eat Frog World
+|-
+| align="right" |100
+|Frogloks and Tadpoles
+|-
+|Where:
+|Classic: Upper, Lower Guk
+Kunark: 
+|-
+| 
+| 
+|-
+| 
+|Not a Kerran the World!
+|-
+| align="right" |50
+|Kerrans
+|-
+|Where:
+|Classic: Kerra Ridge !!! Faction hit… Stonebrunt Mountains, cat camp up  north
+Kunark: 
+|-
+|
+|
+|-
+|
+|Bat Country!
+|-
+| align="right" |100
+|Bats and Werebats
+|-
+|Where:
+|Classic: Greater Faydark, Najena
+Kunark: 
+|-
+|
+|
+|-
+|
+|Rat Killer
+|-
+| align="right" |100
+|Rats and Molerats
+|-
+|Where:
+|Classic: Plane of Hate, Warrens
+Kunark: 
+|-
+|
+|
+|-
+|
+|Armadilloed and Dangerous
+|-
+| align="right" |50
+|Armadillos
+|-
+|Where:
+|Classic: North Ro
+Kunark: 
+|-
+|
+|
+|-
+|
+|It Stinks!
+|-
+| align="right" |5
+|Skunks
+|-
+|Where:
+|Classic: Toxxulia Forest
+Kunark: 
+|-
+|
+|
+|-
+|
+|You Dirty Ratman!
+|-
+| align="right" |100
+|Ratmen
+|-
+|Where:
+|Classic: The Hole: Camp Slizik the Mighty
+Kunark: 
+|-
+|
+|
+|-
+|
+|Beetlemania
+|-
+| align="right" |100
+|Beetles, Insects, Lightcrawlers, Shik'Nars, and Underbulks
+|-
+|Where:
+|Classic: North, south Karana, Misty Thicket, Paineel Newbie Area
+Kunark: 
+|-
+|
+|
+|-
+|
+|Leechy Keen
+|-
+| align="right" |100
+|Leeches, Ticks, and Vacuum Worms.
+|-
+|Where:
+|Classic: Rathe Mountains - near Froglok city (very small leeches)
+Kunark: 
+|-
+|
+|
+|-
+|
+|Shoo fly!
+|-
+| align="right" |100
+|Butterflies, Flies, Malarians, Mosquitoes, Tsetsians, and Wasps.
+|-
+|Where:
+|Classic: Rathe Mountains- Froglok newbie area
+Kunark: 
+|-
+|
+|
+|-
+|
+|Get the Broom!
+|-
+| align="right" |100
+|Scorpions and Spiders.
+|-
+|Where:
+|Classic: Misty Thicket, Kithicor Forest, Steamfont Mountains NE corner
+Kunark: 
+|-
+|
+|
+|-
+|
+|Snake in the Grass
+|-
+| align="right" |100
+|Snakes
+|-
+|Where:
+|Classic: Misty Thicket, Kithicor Forest, Paineel Newbie Area
+Kunark: 
+|-
+|
+|
+|-
+|
+|A Bone to Pick With You
+|-
+| align="right" |100
+|Skeletons
+|-
+|Where:
+|Classic: Paineel - newbie area, New Sebilisian Expedition
+Kunark: 
+|-
+|
+|
+|-
+|
+|Stake Dinner
+|-
+| align="right" |100
+|Vampires
+|-
+|Where:
+|Classic: Castle Mistmoore
+Kunark: 
+|-
+|
+|
+|-
+|
+|Hide Your Brains!
+|-
+| align="right" |100
+|Hags, Ghouls, and Zombies.
+|-
+|Where:
+|Classic: Estate of Unrest
+Kunark: 
+|-
+|
+|
+|-
+|
+|Mummy Dearest
+|-
+| align="right" |50
+|Mummies
+|-
+|Where:
+|Classic: South Desert of Ro, Oasis of Marr, Unrest
+Kunark: 
+|-
+|
+|
+|-
+|
+|Ghoul On the Hill
+|-
+| align="right" |50
+|Ghouls
+|-
+|Where:
+|Classic: Estate of Unrest
+Kunark: 
+|-
+|
+|
+|-
+|
+|Round of Applause
+|-
+| align="right" |25
+|Animated Hands
+|-
+|Where:
+|Classic: Najena or Befallen
+Kunark: 
+|-
+|
+|
+|-
+|
+|Ghosts of Frostfell Past
+|-
+| align="right" |100
+|Banshees, Ghosts, Spectres, Spirits, and Wisps.
+|-
+|Where:
+|Classic: Estate of Unrest, New Sebilisian Expedition
+Kunark: 
+|-
+|
+|
+|-
+|
+|New Tricks
+|-
+| align="right" |100
+|Chokidais, Drolvargs, Hynids, Rotdogs, Scaled Wolves, Sonic Wolves,  Werewolves, 
+|-
+|
+|Wolves, and Worgs.
+|-
+|Where:
+|Classic: Everfrost Peaks, Nektulos Forest, Misty Thicket, Kithcor Forest, East Karana
+Kunark: 
+|-
+|
+|
+|-
+|
+|Got Your Tongue?
+|-
+| align="right" |100
+|Cats, Lions, Pumas, Sabertooths, Scarlet Cheetahs, Tigers, Topiary Lions,  and Wrulons.
+|-
+|Where:
+|Classic: North, east, west Karana
+Kunark: 
+|-
+|
+|
+|-
+|
+|Featherbrained Plan
+|-
+| align="right" |100
+|Aviaks, Blood Ravens, Cockatrices, Hawks, and Parrots.
+|-
+|Where:
+|Classic: Southern Plains of Karana, PoSky Isle 5, Steamfont Mountains NE corner
+Kunark: 
+|-
+|
+|
+|-
+|
+|Better Get a Barrel
+|-
+| align="right" |100
+|Gorillas, Holgresh, and Yetis.
+|-
+|Where:
+|Classic: Feerrott - 2 at ent to CT + 2 more inside CT at the throne room, Plane of  Fear, Stonebrunt
+Kunark: 
+|-
+|
+|
+|-
+|
+|Bear With Me
+|-
+| align="right" |100
+|Bears, Kodiaks, Owlbears, and Pandas.
+|-
+|Where:
+|Classic: North, east, west Karana, West Commons towards the Kith zoneline
+Kunark: 
+|-
+|
+|
+|-
+|
+|The Elephant in the Room
+|-
+| align="right" |100
+|Elephants and Mammoths.
+|-
+|Where:
+|Classic: Southern Plains of Karana - all over the zone, Everfrost Peaks
+Kunark: 
+|-
+|
+|
+|-
+|
+|These Boots Were Made For...
+|-
+| align="right" |100
+|Alligators, Basilisks, and Crocodiles.
+|-
+|Where:
+|Classic: Rathe Mountains, Cazic Thule underwater gator area (best), Upper Guk, Oasis of Marr
+Kunark: 
+|-
+|
+|
+|-
+|
+|Plenty of Fish In the Sea
+|-
+| align="right" |100
+|Fishes, Piranhas, Seahorses, Sharks, Swordfishes, and Wetfang Minnows.
+|-
+|Where:
+|Classic: Kedge Keep (crossroads), Rivervale Pond
+Kunark: 
+|-
+|
+|
+|-
+|
+|Orc Weapons, Your Blood Will Spill!
+|-
+| align="right" |100
+|Orcs and Wereorcs.
+|-
+|Where:
+|Classic: Crushbone or West Commonlands
+Kunark: 
+|-
+|
+|
+|-
+|
+|New Frontiers
+|-
+| align="right" |100
+|Goblins and Nightmare Goblins.
+|-
+|Where:
+|Classic: Clan Runnyeye, Permafrost
+Kunark: 
+|-
+|
+|
+|-
+|
+|The More You Gnoll!
+|-
+| align="right" |100
+|Gnolls
+|-
+|Where:
+|Classic: Blackburrow
+Kunark: 
+|-
+|
+|
+|-
+|
+|World Warrens Three
+|-
+| align="right" |100
+|Kobolds
+|-
+|Where:
+|Classic: The Warrens
+Kunark: 
+|-
+|
+|
+|-
+|
+|Alliz Tae Ew
+|-
+| align="right" |100
+|Lizard Men
+|-
+|Where:
+|Classic: Temple of Cazic-Thule, Innothule Swamp
+Kunark: 
+|-
+|
+|
+|-
+|
+|Re-Extinction
+|-
+| align="right" |50
+|Kedge
+|-
+|Where:
+|Classic: Only Phinigel Autropos count, you can kill him 5 times a day!!
+Kunark: 
+|-
+|
+|
+|-
+|
+|Aquatic Allure
+|-
+| align="right" |50
+|Nagas, Mermaids, Nymphs, and Sirens.
+|-
+|Where:
+|Classic: Kedge Keep
+Kunark: 
+|-
+|
+|
+|-
+|
+|I Said Argyle!
+|-
+| align="right" |100
+|Gargoyles
+|-
+|Where:
+|Classic: Plane of Hate, Lower Guk
+Kunark: 
+|-
+|
+|
+|-
+|
+|You're Not Scaring Anyone
+|-
+| align="right" |50
+|Scarecrows and Totems.
+|-
+|Where:
+|Classic: West, eastkarana, PoFear
+Kunark: 
+|-
+|
+|
+|-
+|
+|Lumberer
+|-
+| align="right" |100
+|Treants
+|-
+|Where:
+|Classic: Southern Plains of Karana - two treants northeast in the corner
+Kunark: 
+|-
+|
+|
+|-
+|
+|Mushroom Hunting
+|-
+| align="right" |100
+|Sporalis
+|-
+|Where:
+|Classic: Runnyeye Citadel, Rathe Mountains Froglok Newbie Area
+Kunark: 
+|-
+|
+|
+|-
+|
+|Stop Dragon This Out
+|-
+| align="right" |100
+|Dracoliches, Water Dragons, and Witherans.
+|-
+|Where:
+|Classic: Plane of Fear (1), Plane of Hate 5-8
+Kunark: 
+|-
+|
+|
+|-
+|
+|You Keep Dragon Me Into This
+|-
+| align="right" |100
+|Drakes, Drixies, and Fay Drakes.
+|-
+|Where:
+|Classic: Lesser Faydark - all to the west of the map. Steamfont Mountains NE corner
+Kunark: 
+|-
+|
+|
+|-
+|
+|A Small Giant Problem
+|-
+| align="right" |100
+|Giants
+|-
+|Where:
+|Classic: Do this when doing Naggy and Vox runs, Rathe Mountains NE area, Ocean of Tears cyclops
+Kunark: 
+|-
+|
+|
+|-
+|
+|Fairicide
+|-
+| align="right" |100
+|Dryads, Fairies, and Pixies.
+|-
+|Where:
+|Classic: Lesser Faydark - all to the west of the map
+Kunark: 
+|-
+|
+|
+|-
+|
+|For the Hive!
+|-
+| align="right" |100
+|Bixies
+|-
+|Where:
+|Classic: Lesser Faydark - all to the west of the map, PoSky Isle 6 Boss, Misty Thicket
+Kunark: 
+|-
+|
+|
+|-
+|
+|Jumjummery
+|-
+| align="right" |100
+|Brownies
+|-
+|Where:
+|Classic: Lesser Faydark - all to the west of the map, Steamfont NE area (best)
+Kunark: 
+|-
+|
+|
+|-
+|
+|Self Centaured
+|-
+| align="right" |100
+|Centaurs
+|-
+|Where:
+|Classic: Southern Karana - camp north east
+Kunark: 
+|-
+|
+|
+|-
+|
+|Amazing!
+|-
+| align="right" |100
+|Minotaurs and Tizmak.
+|-
+|Where:
+|Classic: Steamfont - minotaur cave northeast.
+Kunark: 
+|-
+|
+|
+|-
+|
+|No Vacancy
+|-
+| align="right" |100
+|Griffons, Griffennes, and Griffins.
+|-
+|Where:
+|Classic: Plane of Sky, North & east Karana
+Kunark: 
+|-
+|
+|
+|-
+|
+|Puzzling
+|-
+| align="right" |10
+|Sphinxes
+|-
+|Where:
+|Classic: Plane of Sky
+Kunark: 
+|-
+|
+|
+|-
+|
+|My Golden Boots
+|-
+| align="right" |100
+|Djinns and Efreetis.
+|-
+|Where:
+|Classic: Plane of Sky, Nagafens Lair
+Kunark: 
+|-
+|
+|
+|-
+|
+|Imp-atient
+|-
+| align="right" |100
+|Imps and Mephits.
+|-
+|Where:
+|Classic: Plane of Sky, Nagafen's Lair
+Kunark: 
+|-
+|
+|
+|-
+|
+|Elementary
+|-
+| align="right" |100
+|Elementals
+|-
+|Where:
+|Classic: Plane of Sky, Plane of Fear, Najena, The Hole, Steamfont NE corner
+Kunark: 
+|-
+|
+|
+|-
+|
+|Spin Me Right Round
+|-
+| align="right" |100
+|Dervishes
+|-
+|Where:
+|Classic: Lavastorm, PoSky
+Kunark: 
+|-
+|
+|
+|-
+|
+|Terrorible Tentacles
+|-
+| align="right" |50
+|Tentacle Terrors
+|-
+|Where:
+|Classic: Estate of Unrest, Plane of Fear, Permafrost Vox Area
+Kunark: 
+|-
+|
+|
+|-
+|
+|Denizens of Fear
+|-
+| align="right" |50
+|Amygdalans
+|-
+|Where:
+|Classic: Plane of Fear
+Kunark: 
+|-
+|
+|
+|-
+|
+|Eye See What You Did There!
+|-
+| align="right" |100
+|Evil Eyes
+|-
+|Where:
+|Classic: Lower, upper Guk, Clan Runnyeye, Gorge of King Xorbb, Plane of Fear
+Kunark: 
+|-
+|
+|
+|-
+|
+|Cubic
+|-
+| align="right" |50
+|Gelatinous Cubes
+|-
+|Where:
+|Classic: Plane of Fear, Runnyeye (only 1)
+Kunark: 
+|-
+|
+|
+|-
+|
+|Gnome Tested, Steamwork Approved!
+|-
+| align="right" |100
+|Clockwork: Beetles, Boars, Dragons, Rats, Snakes, Spiders, Gnomeworks,  Copters, 
+|-
+|
+|and Tin Soldiers.
+|-
+|Where:
+|Classic: Steamfont - near minotaur cave northeast.
+Kunark: 
+|}

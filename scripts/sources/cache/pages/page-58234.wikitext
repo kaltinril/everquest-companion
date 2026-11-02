@@ -1,0 +1,126 @@
+Hail and well met! This guide is intended to help players looking to hunt in solo/group Fear break the zone. This may be a paradigm shift for you, dear reader; the Plane of Fear, without player administration, is not safe. To rectify this unfortunate situation, I'm compiling a list of techniques, methods, and understandings that you will need to successfully hunt in the Plane of Fear.
+
+Do note that you should be in the difficulty and mode of zone that you are prepared for; this guide is meaningless for a fresh level 46 solo play if you're in a D4 multiplayer instance. Be honest about the level difficulty you should be attempting and you'll find the guide here will always apply.
+
+= Table of Contents =
+
+# Camps
+#* Saddle
+#* Hourglass
+# Mobs
+#* amygdalan knight & amygdalan warrior
+#* a boogeyman
+#* a decrepit warder
+#* a fetid fiend
+#* a frightfinger
+#* a glare lord
+#* a gorgon
+#* a nightmare
+#* a phantasm
+#* a samhain
+#* a scareling
+#* a shiverback
+#* a spinechiller spider
+#* a tentacle tormentor
+#* a turmoil toad
+#* a worry wraith<br />
+
+== Zoning In ==
+
+The first thing to do regardless of your difficulty is get to a safe camp. This is the number one mistake most players make when they first visit Fear. You'll zone in, look around, and then just start killing mobs. This will not work out well for you for the following reasons:
+
+* All mobs in the Plane of Fear have very, very wide agro radii for their level.
+* Most mobs in the Plane of Fear are pathers, which means you will have a steady stream of traffic in most locations.
+* Most mobs in the Plane of Fear have mechanics that allow them to relocate you, be it a teleport, knockback, fear, or charm.
+
+As a result, fighting in the open is the least useful thing you can do. When zoning into Fear, apply the best form of invisibility you can use. There are undead, animals, and other creatures here which means any invisibility is good invisibility. Only rogues get all three, but doing what you can will reduce zone-in agro.
+
+Next, once you're zoned in, try to head to a camp. There's a couple of good options, but I'm going to talk about the two ''best''.
+
+=== Camp #1 Saddle at Succor ===
+[[File:Saddle Camp In Fear.png|alt=Saddle Camp Location|thumb|Saddle Camp Location]]
+The first camp you should be aware of is the Saddle at Succor. This camp is useful because it is one of the few locations in zone ''guaranteed to have no pathing enemies'' with one caveat. That caveat is that if you are a tall race (barbarian, troll, or ogre) then you must sit or shrink while using the camp.
+
+Here's why - the saddle is a dip in the terrain such that it blocks line of sight for mobs, provided you're medium or shorter. This means that even if mobs path by they won't agro you, even on D4's expanded agro radii '''PROVIDED''' you are not so tall your head pokes above the skyline too much. It will take approximately 8 pulls to secure enough space for your group to move to another camp.
+
+This is by far the best camp in Fear when it comes to safety. At the start of your Fear run, you'll have lots of pathers and the camp will all but pull itself - just stick your head out, see what's around! Normal rules of pulling still apply, of course. Conversely, if you need to rest you can hang out and not worry about it. Just keep in mind that if you have mobs in camp, their height and position counts as much as yours. Try to get mobs all the way into the saddle. Done right, you won't have to worry about scarelings, which actually I should talk about specifically...
+
+Once you have the area cleared out, you can proceed to the next best camp: Hourglass.
+
+=== Camp #2 Hourglass ===
+[[File:Hourglass Camp In Fear.png|alt=Hourglass Camp Location|thumb|Hourglass Camp Location]]
+Hourglass shares the line of sight blocking properties of saddle; if you tuck into the corner as indicated on the map, then teleports, fears, and knockbacks will be made far less consequential. You'll get hung up on the ramp when feared, the teleport can't send you through the ramp (only over the narrow part, which means you always teleport some narrow variety of north), and unlike other closed-ish structures this particular camp has only a single natural spawn (other buildings that block LoS have 3 or 4). Just pull into the corner, farm mobs, and chill when you want to chill.
+
+This camp is also noteworthy because it's the home of tentacle tormentors, who drop breastplates. Yay loot! From here, you can pull a good third of the zone safely, which will free up enough space that you can hunt safely.
+
+== Mobs ==
+
+Now, for the mobs. In this section we are going to stay focused on the mob's inherent abilities; on higher difficulties they'll multiclass but unless there's a particular combo to look out for we'll assume you know how to deal with it.
+
+=== amygdalan knight & amygdalan warrior ===
+
+These guys mana drain. Try not to create situations with long fights. If you pull multiples while using crowd control do not kill these first; they'll eat your mana and then you'll be OOM trying to deal with the other mobs. If you don't have crowd control, kill them VERY FAST.
+
+=== a boogeyman ===
+
+They proc ghoul root. This actually might be an advantage if you pull them with any other mob that has a displacement (fear, knockback, scareling step, etc) effect.
+
+=== a decrepit warder ===
+
+These mobs have a massive HP and mitigation bonus above other mobs in the area. Nothing else besides being annoying to kill.
+
+=== a fetid fiend ===
+
+This mob adds a weak disease DoT. Forgettable.
+
+=== a frightfinger ===
+
+These mobs are inherently wizards. If you don't kill or control them quickly they will hit you with Ice Comet, Conflagrate, or other nasty nukes.
+
+=== a glare lord ===
+
+These guys dispel and mana drain. Try not to create situations with long fights, and if you pull multiples while using crowd control do not kill these first; they'll eat your mana and then you'll be OOM trying to deal with the other mobs.  If you don't have crowd control, kill them VERY FAST.
+
+=== a gorgon ===
+
+Gorgons have an inherent stun proc that is very, very long lasting. By themselves it isn't a big deal but being unable to do anything for 12 seconds can be crippling in some situations. Heal-over-time if you can.
+
+=== a nightmare ===
+
+Nightmares will blind you. This can be quite terrifying in conjunction with other mobs; try to pull these guys solo or you'll spend a lot of time orienting. PROTIP: if you have the [[Tracking]] skill, you can open your minimap and use the sonar to face mobs correctly. You can do this somewhat without tracking, but only to get back to where you were.
+
+=== a phantasm ===
+
+It can stun. Boring.
+
+=== a samhain ===
+
+Proof that Cazic-Thule has presence on the Plains of Karana. Anyway, they proc ghoul root. This actually might be an advantage if you pull them with any other mob that has a displacement (fear, knockback, scareling step, etc) effect.
+
+=== a scareling ===
+
+Scarelings are interesting in that they will teleport you in different directions as a proc while fighting them. This can be bad, as they are not afraid of punting you into a group of enemy mobs. This can be mitigated, however. There are some restrictions on how far and where a scareling can teleport you; namely, they can't teleport you through geometry. This means you can fight a mob in saddle and get punts of relatively inconsequential nature; it is still possible to be sent down hill but you're not going to go very far. You're also not going to go anywhere you can't immediately turn around and get back to camp on.
+
+If you have evasive, slow, or roots use them; as a proc, the scareling can not teleport you if it can't hit you. The scareling step teleport is not resistable, so don't try to sponge it if you lack the other three tools.
+
+=== a shiverback ===
+
+They hit hard. Hit them harder.
+
+=== a spinechiller spider ===
+
+These spiders have a poison proc that doesn't mean much.
+
+=== a tentacle tormentor ===
+
+Tentacle tormentors have an inherent knockback proc which means you'll be thrown away from them when it triggers. It is essential you fight them either along a zone wall or in the curve of the staircase (at Hourglass; see above) where you're likely to find them.
+
+=== a turmoil toad ===
+
+Turmoil toads have an inherent fear ability that does not trigger in solo mode. In group play, be prepared to have someone running wild. Use a camp like Saddle or Hourglass to control where your group ends up.
+
+=== a worry wraith ===
+
+These will-o-wisp looking monsters are bog-standard enchanters. They will charm and mesmerize in group play. In solo play, they will roll over and die.
+
+[[Category:Guides]]

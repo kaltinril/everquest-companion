@@ -1,0 +1,189 @@
+{{Factionpage|
+
+| description = Rangers in Greater Faydark have a treetop guildhall in [[Kelethin]].  Here the Faydark's Champions train under guildmaster Maesyn Trueshot.  
+These champions oppose the Crushbone Orcs wherever they can find them.  They are loyal to the Elven [[King Tearis Thex]], and support both the Clerics and Soldiers of Tunare.
+
+| zones_raise = 
+
+* [[Butcherblock Mountains]]
+* [[Crushbone]]
+* [[Dagnor's Cauldron]]
+* [[Greater Faydark]]
+* [[Lesser Faydark]]
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Dagnor's Cauldron]]
+* [[Freeport|East Freeport]]
+* [[Eastern Plains of Karana]]
+* [[Erudin|Erudin Palace]]
+* [[Greater Faydark]]
+* [[Highpass Keep]]
+* [[Lesser Faydark]]
+* [[Rathe Mountains]]
+* [[Najena]]
+* [[Nektulos Forest]]
+* [[Felwithe]]
+* [[Ocean of Tears]]
+* {{VeliousGray|[[Plane of Growth]]}}
+* [[Felwithe]]
+* [[Steamfont Mountains]]
+* [[Timorous Deep]]
+* [[Freeport|West Freeport]]
+
+| quests_raise = 
+
+* [[Bat Wings]]
+* [[Black Wolf Skin Quest]]
+* [[Bladed Weapons]]
+* [[Bracers of Erollisi Quest]]
+* [[Call of Flame Quest]]
+* [[Hogcaller's Inn| Hogcaller's Inn (White Wine for Lady Shae)]]
+* [[Kilij's Plans]]
+* [[Muffin for Pandos]]
+* [[Orc Hatchets]]
+* [[Orc Runner (Kelethin)]]
+* [[Orc Vest]]
+* [[Pirate Earrings]]
+* [[Pixie Dust #1]]
+* [[Slave Keys]]
+* [[Tarnished scimitar]]
+* [[The Frightlings]]
+* [[The Mystic Cloak]]
+* [[Trueshot Longbow Quest]]
+* [[Tunare Symbol Quests|Tunare Warden]]
+
+| quests_lower = 
+
+* [[Innoruuk Symbol Quests|Innoruuk Regent]]
+
+| mobs_raise = 
+
+* [[an orc scout]]  <span class='fmz'>(Dagnor's Cauldron)</span>
+* [[an orc witchdoctor]]  <span class='fmz'>(Greater Faydark)</span>
+* [[Centurion Relgle]]  <span class='fmz'>(Greater Faydark)</span>
+* [[Emperor Crush]]  <span class='fmz'>(Crushbone)</span>
+* [[Lord Darish]]  <span class='fmz'>(Crushbone)</span>
+* [[Orc Pawn (Crushbone)|Orc Pawn]]  <span class='fmz'>(Crushbone)</span>
+* [[Orc Centurion (Crushbone)|Orc Centurion]]  <span class='fmz'>(Crushbone)</span>
+* [[Orc Oracle (Crushbone)|Orc Oracle]]  <span class='fmz'>(Crushbone)</span>
+* [[Orc Legionnaire (Crushbone)|Orc Legionnaire]]  <span class='fmz'>(Crushbone)</span>
+* [[orc chief]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[orc emissary]]  <span class='fmz'>(Crushbone)</span>
+* [[orc hatchetman]]  <span class='fmz'>(Greater Faydark)</span>
+* [[orc slaver]]  <span class='fmz'>(Crushbone)</span>
+* [[orc taskmaster]]  <span class='fmz'>(Crushbone)</span>
+* [[orc trainer]]  <span class='fmz'>(Crushbone)</span>
+* [[orc warlord]]  <span class='fmz'>(Crushbone)</span>
+* [[royal guard]]  <span class='fmz'>(Crushbone)</span>
+* [[The Prophet]]  <span class='fmz'>(Crushbone)</span>
+
+| mobs_lower = 
+
+<div class="grayout">
+* [[a contemplative thifling]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a feral amalgam]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a gale wolf]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a phase puma]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a protector of growth]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a rolling plains steed]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a sylvan protector]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a tranquil treant]]  <span class='fmz'>(Plane of Growth)</span>
+</div>
+* [[Aleena Lightleaf]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* <span class="grayout"> [[An Entoling Essense Channeller]]  <span class='fmz'>(Plane of Growth)</span>  </span>
+* <span class="grayout"> [[an entoling harvester]]  <span class='fmz'>(Plane of Growth)</span> </span>
+* [[Anelia Thrywiel]] <span class='fmz'>(Lesser Faydark - Merchant)</span>
+* [[Antinime]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Ascania Halvbin]] <span class='fmz'>(Ocean of Tears - NPC, Non-Quest)</span>
+* [[Banker Willaen]] <span class='fmz'>(Greater Faydark - Banker)</span>
+* [[Barkeep Aanlawen]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Lysslan]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Manlawen]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Myrisa]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Sissya]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Syntan]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Tuviena]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Tvanla]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Uulianu]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Bilrio Surecut]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Cerila Windrider]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Cleonae Kalen]] <span class='fmz'>(Ocean of Tears - Merchant)</span>
+* [[Deldryn Splendyr]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Dill Fireshine]] <span class='fmz'>(Greater Faydark - Ranger Guildmaster)</span>
+* [[Elia the Pure]] <span class='fmz'>(Northern Felwithe - Quest NPC)</span>
+* [[Elmion Hendrys]] <span class='fmz'>(Dagnor's Cauldron - NPC, Non-Quest)</span>
+* [[Euboea Delewyn]]  <span class='fmz'>(Ocean of Tears)</span>
+* <span class="grayout"> [[Galiel Spirithoof]]  <span class='fmz'>(Plane of Growth)</span> </span> 
+* [[Ganelorn Oast]] <span class='fmz'>(East Karana - Quest NPC)</span>
+* <span class="grayout"> [[Grahl Strongback]]  <span class='fmz'>(Plane of Growth)</span>  </span>
+* [[Guard Dykalin]] <span class='fmz'>(Mountains of Rathe)</span>
+* [[Guardian of Takish]] <span class='fmz'>(Plane of Growth - Quest NPC)</span>
+* [[Heartwood Master]] <span class='fmz'>(Greater Faydark - Druid Guildmaster)</span>
+* [[Hendricks]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Horth Evergreen]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Innkeep Anisyla]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Innkeep Larya]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Innkeep Linen]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Innkeep Wuleran]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Kinool Goldsinger]] <span class='fmz'>(Southern Felwithe - Enchanter Guildmaster)</span>
+* [[Larisa Gelrith]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Legyn Sarawyn]] <span class='fmz'>(Steamfont Mountains - NPC, Non-Quest)</span>
+* [[Linadian]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Linara Parlone]] <span class='fmz'>(Najena - Quest NPC)</span>
+* [[Maesyn Trueshot]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Merchant Aianya]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Aildien]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Ainaiana]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Aluuvila]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Aluwenae]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Gaeadin]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Gerienae]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Iludarae]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Kaeluase]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Kanoldar]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Kweili]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Kwein]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Laedar]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Lanin]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Legweien]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Linolyen]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Minamas]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Neaien]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Nildar]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Nluolian]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Sylnis]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Tananie]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Tegdian]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Tiladinya]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Tilluen]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Tinolwenya]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Tuluvdar]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Uaylain]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Ueaas]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Weaolanae]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Winerasea]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Niola Impholder]] <span class='fmz'>(Southern Felwithe - Magician Guildmaster)</span>
+* [[Paeonia Purnn]] <span class='fmz'>(Ocean of Tears - NPC, Non-Quest)</span>
+* [[pained unicorn]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[Ran Sunfire]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Rodrick Marslett]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Seloris Windweaver]] <span class='fmz'>(Timorous Deep - Merchant)</span>
+* [[Sister of Erollisi]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Styria Fearnon]] <span class='fmz'>(Ocean of Tears - Warrior Guildmaster)</span>
+* [[Tarker Blazetoss]] <span class='fmz'>(Southern Felwithe - Wizard Guildmaster)</span>
+* [[Tegea Prendyn]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Tolkar Parlone]] <span class='fmz'>(Northern Felwithe - Quest NPC)</span>
+* <span class="grayout"> [[Tunare (God)|Tunare]]  <span class='fmz'>(Plane of Growth)</span> </span>
+* [[Uleen Laughingwater]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Valaryn Elben]] <span class='fmz'>(Ocean of Tears - NPC, Non-Quest)</span>
+* [[Verth Mistwielder]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Zelli Starsfire]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+
+}}
+= Suggested Route =
+*[[Bat Wings]] (+[[Keepers of the Art]], +[[King Tearis Thex]], +[[Faydarks Champions]], -[[The Dead]])
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]

@@ -1,0 +1,26 @@
+{{Factionpage|
+
+| description = The only known mob on this faction is [[Lylanthian]].
+
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Qeynos|South Qeynos]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Lylanthian]] <span class='fmz'>(West Freeport)</span>
+
+}}

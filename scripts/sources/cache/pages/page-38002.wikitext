@@ -1,0 +1,47 @@
+{{Factionpage|
+
+| description = All the denziens of hate reside on this faction.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Plane of Hate]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a forsaken revenant]] <span class='fmz'>(Plane of Hate - Undead)</span>
+* [[a haunted chest]]  <span class='fmz'>(Plane of Hate)</span>
+* [[a kiraikuei]] <span class='fmz'>(Plane of Hate - Undead)</span>
+* [[a loathing lich]] <span class='fmz'>(Plane of Hate - Undead)</span>
+* [[a scorn banshee]] <span class='fmz'>(Plane of Hate - Undead)</span>
+* [[a spite golem]]  <span class='fmz'>(Plane of Hate)</span>
+* [[an abhorrent]]  <span class='fmz'>(Plane of Hate)</span>
+* [[Ashenbone Broodmaster]] <span class='fmz'>(Plane of Hate - Undead)</span>
+* [[an ashenbone drake]] <span class='fmz'>(Plane of Hate - Undead)</span>
+* [[an Elite Dragoon]] <span class='fmz'>(Mob Graveyard)</span>
+* [[an evil little imp]] <span class='fmz'>(Plane of Hate)</span>
+* [[an ire ghast]] <span class='fmz'>(Plane of Hate - Undead)</span>
+* [[Avatar of Abhorrence]]  <span class='fmz'>(Plane of Hate)</span>
+* [[Coercer T`vala]]  <span class='fmz'>(Plane of Hate)</span>
+* [[Grandmaster R`Tal]]  <span class='fmz'>(Plane of Hate)</span>
+* [[Innoruuk]]  <span class='fmz'>(Plane of Hate)</span>
+* [[Lord of Ire]]  <span class='fmz'>(Plane of Hate)</span>
+* [[Lord of Loathing]]  <span class='fmz'>(Plane of Hate)</span>
+* [[Maestro of Rancor]]  <span class='fmz'>(Plane of Hate)</span>
+* [[Magi P`Tasa]]  <span class='fmz'>(Plane of Hate)</span>
+* [[Master of Spite]]  <span class='fmz'>(Plane of Hate)</span>
+* [[Mistress of Scorn]]  <span class='fmz'>(Plane of Hate)</span>
+* [[Vicar M`Kari]]  <span class='fmz'>(Plane of Hate)</span>
+
+}}

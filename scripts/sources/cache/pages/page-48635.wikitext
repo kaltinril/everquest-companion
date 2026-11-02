@@ -1,0 +1,357 @@
+This skill enables you to find food and water. These items stay with you even after logging out. The higher the skill the more regularly you will succeed in your attempts. You can attempt the skill forage every minute.
+
+== Who Gets The Skill ==
+Skill is level-capped at (Level*5)+5)
+
+* Any [[Iksar]] at level 1, fixed at 50.
+* [[Bard]]s at level 12, max of 55.
+* [[Druid]]s at level 5, max of 200.
+* [[Ranger]]s at level 3, max of 200.
+* [[Shaman]]s at level 16, max of 50.
+* [[Wood Elf|Wood Elves]] at level 1, fixed at 50.
+
+== Zone-Specific Foraging ==
+
+Items on  the &quot;All Norrath&quot; table can be foraged in any zone by any person with the forage skill. However, druids and rangers with a forage skill of over 100 or anyone with a racial foraging ability can often find that various zones will produce a few extra surprises: many of which can be sold for money; some of which are used in quests; and some of which can be used for brewing, baking, or cultural smithing.
+
+== Chat Log Messages ==
+
+* SUCCESS (Food) = You have scrounged up some food.
+* SUCCESS (Drink) = You have scrounged up some water.
+* SUCCESS (Bait) = You have scrounged up some fishing grubs.
+* SUCCESS (Other) = You have scrounged up something that doesn't look edible.
+* FAILURE = You fail to locate any food nearby.
+
+== All Norrath ==
+
+{| class="eoTable3"
+!  Zone  || Item              || Edible || Stack || Lore || Magic || Nodrop ||  Comment
+|-
+| All    || [[Fruit]]         || Y      || Y     || N    || N     || N      || can be used in [[brewing]] and [[baking]]
+|- 
+| All    || [[Berries]]       || Y      || Y     || N    || N     || N      || can be used in [[brewing]] and [[baking]]
+|- 
+| All    || [[Vegetables]]    || Y      || Y     || N    || N     || N      || can be used in [[brewing]] and [[baking]]
+|- 
+| All    || [[Rabbit Meat]]   || Y      || Y     || N    || N     || N      || can be used in [[baking]] to make a stew
+|-  
+| All    || [[Roots]]         || Y      || Y     || N    || N     || N      || can be used in [[brewing]]
+|- 
+| All    || [[Pod of Water]]  || Y      || Y     || N    || N     || N      || can be used in [[brewing]] to make normal flasks of water 
+|- 
+| All    || [[Fishing Grubs]] || N      || Y     || N    || N     || N      || Used w/ [[Fishing]] Skill
+|}
+
+== Antonica ==
+
+{| class="eoTable3"
+! Zone                    || Item                     || Edible || Stack || Lore || Magic || Nodrop || Comment
+|- 
+| [[Plains of Karana|All Karanas]] || [[Plains Pebble]]   || N || N*  ||  N || N || N || Can be imbued by Karana Druid or cleric (*then  stackable); Iksar Monk Quest
+|-  
+| [[East Commonlands]]    || [[Griffon Eggs]]             || Y || Y || N || N || N || can be used in [[baking]] to make [[Clump of Dough]]
+|- 
+| [[Eastern Karana]]      || [[Tea Leaves]]               || Y || Y || N || N || N || used in [[brewing]] to make teas; also for [[Feskr's Supplies|Kerra Island Quest]]
+|- 
+| [[Everfrost]]           || [[Frost Crystal]]            || N || Y || N || N || N || &nbsp; 
+|- 
+| [[Everfrost]]           || [[Frost Turnip]]                || Y || Y || N || N || N || &nbsp; 
+|- 
+| [[Everfrost]]           || [[Chilled Tundra Root]]      || N || N  || Y  || Y || Y || Druid/Ranger Epic Quest item
+|- 
+| [[The Feerrott]]        || [[Alligator Eggs]]           || Y || Y || N  || N || N || can be used in [[baking]] to make [[Clump of Dough]]
+|- 
+| [[Gorge of King Xorbb]] || [[Gorge Moss]]                   || Y || Y || N || N || N || &nbsp;
+|- 
+| [[Innothule Swamp]]     || [[Speckled Molded Mushroom]] || N || N || Y || Y || Y || Druid/Ranger Epic Quest item
+|-  
+| [[Innothule Swamp]]     || [[Speckled Toadstool]]       || ? || Y || ? || ? || N || &nbsp; 
+|- 
+| [[Kithicor Forest]]     || [[Oak Bark]]                 || N || Y || N || ? || N || [[brewing|tanning agent]] for wood elf cultural tailoring
+|- 
+| [[Kithicor Forest]]     || [[Wild Radish]]                  || Y || Y || N || N || N || &nbsp;
+|- 
+| [[Lake Rathetear]]      || [[Rathe Berries]]            || Y || Y || N || N || N || used in [[brewing]] to make juice; [[Crest of the Wood Nymphs|Wakening Land Quest]]
+|- 
+| [[Lavastorm]]           || [[Ashweed]]                  || Y || Y || N || N || N || Rogue Poison Component
+|- 
+| [[Misty Thicket]]       || [[Sweetened Mudroot]]        || N || N || Y || Y || Y || Druid/Ranger Epic Quest item
+|- 
+| [[Misty Thicket]]       || [[Black Root]]               || Y || Y || N || N || N || &nbsp;
+|- 
+| [[Misty Thicket]]       || [[Misty Acorn]]              || N || Y || N || N || N || [[brewing|tanning agent]] for halfling cultural tailoring
+|- 
+| [[Nektulos Forest]]     || [[Glow Lichen]]              || Y || Y || N || N || N || &nbsp;
+|- 
+| [[Northern Karana]]     || [[Wild Cabbage]]             || Y || Y || N || N || N || &nbsp; 
+|- 
+| [[North Ro]]            || [[Cactus Pulp]]              || Y || Y || N || N || N || &nbsp;
+|- 
+| [[Oasis of Marr]]       || [[Bag of Sea Salt]]          || Y || Y || N || N || N || 
+|- 
+| [[Ocean of Tears]]      || [[Marr Cherries]]        || Y || Y || N || N || N || [[Crest of the Wood Nymphs|Wakening Land Quest]]
+|- 
+| [[Qeynos Hills]]        || [[Surefall Sap]]             || Y || Y || N || N || N || &nbsp;
+|- 
+| [[Rathe Mountains]]     || [[Basilisk Egg]]         || Y || Y || N || N || N || can be used in [[baking]] to make [[Clump of Dough]]
+|- 
+| [[Southern Karana]]     || [[Thunderhoof Mushroom]] || Y || Y || N || N || N || used for [[Feskr's Supplies|Kerra Island Quest]]
+|-  
+| [[South Ro]]            || [[Ro Dates]]              || Y || Y || N || N || N || &nbsp;
+|- 
+| [[West Commonlands]]    || [[Plains Roots]]             || Y || Y || N || N || N || &nbsp; 
+|- 
+| [[Western Karana]]      || [[Miller Carrot]]            || Y || Y || N || N || N || &nbsp; 
+|}
+
+== Faydwer ==
+
+{| class="eoTable3"
+! Zone                  || Item                     || Edible || Stack || Lore ||  class="intable"  | Magic || Nodrop || Comment
+|- 
+| All Faydarks          || [[Morning Dew]]          || N || Y || N || N || N || can be used for Elven Cultural Armor, also in [[Brewing]] for [[Elven Wine]]
+|- 
+| [[Butcherblock]]      || [[Aviak Eggs]]           || Y || Y || N || N || N || can be used in [[brewing]] to make [[Aviak Egg Oil]] or [[Egg Nog]], also in [[baking]] to make [[Clump of Dough]]
+|- 
+| [[Butcherblock]]      || [[Vineclinger Berries]]  || N || N || Y || ? || Y || Druid Only; [[Crest of the Wood Nymphs|Wakening Land Quest]]
+|- 
+| [[Dagnor's Cauldron]] || [[Cauldron Prawn]]          || Y || Y || N || N || N || &nbsp; 
+|- 
+| [[Greater Faydark]]   || [[Ripened Heartfruit]]   || N || N || Y || Y || Y || Druid/Ranger Epic Quest item; Wakening Land Quest
+|- 
+| [[Greater Faydark]]   || [[Cinnamon Sticks]]      || Y || Y || N || N || N || can be used in [[baking]] to make [[Pixie Powder Cinnesticks]]
+|- 
+| [[Lesser Faydark]]    || [[Sylvan Berries]]       || Y || Y || N || N || N || can be used in [[brewing]] to make juice
+|- 
+| [[Steamfont]]         || [[Steamfont Spring Water]]    || Y || Y || N || N || N || can be used in [[brewing]] 
+|- 
+| [[The Estate of Unrest]]         || [[Ashroot]]    || N || Y || N || N || N || can be used in [[Poison Making]]
+|}
+
+== Odus ==
+
+{| class="eoTable3"
+! Zone                     || Item                   || Edible || Stack || Lore || Magic || Nodrop || Comment
+|- 
+| [[Erud's Crossing]]      || [[Seahorse Roe]]          || Y ||  Y || N || N || N || &nbsp; 
+|- class=
+| [[Stonebrunt Mountains]] || [[Bamboo Shoot]]           || Y || Y || N || N || N || Stonebrunt wakizashi quest
+|- class=
+| [[Stonebrunt Mountains]] || [[Kejekan Palm Fruit]]     || Y || ? || N || ? || N || Stonebrunt wakizashi quest
+|- 
+| [[Toxxulia Forest]]      || [[Bag of Caynar Nuts]] || Y || Y || N || N || N || Wakening Land Quest
+|}
+
+== Kunark ==
+
+{| class="eoTable3"
+! Zone               || Item                     || Edible || Stack || Lore || Magic || Nodrop || Comment
+|- 
+| [[Burning Wood]]       || [[Giant Hornet Egg]]         || Y || Y || N || ? ||  N || &nbsp; 
+|- 
+| [[Burning Wood]]       || [[Mendglow Clay]]            || N || N || N || N || N || Iksar Shaman Quest
+|- 
+| [[Burning Wood]]       || [[Radiant Meteorite]]        || N || Y || N || ? || N || Iksar Monk/Warrior Quest
+|- 
+| [[Dreadlands]]         || [[Drachling Silk]]          || N || N || N || N || * || 2 types can be foraged, see page
+|- 
+| [[Dreadlands]]         || [[Frost Crystal]]            || N || Y || N || N || N || &nbsp; 
+|- 
+| [[Dreadlands]]         || [[Honey Berry]]              || Y || Y || N || N || N || &nbsp; 
+|- 
+| [[Emerald Jungle]]     || [[Emerald Orange]]          || Y || Y || N || N || N || Wakening Land Quest; can also be used in [[brewing]] to make juice
+|- 
+| [[Emerald Jungle]]     || [[Ancient Coin]]             || N || N || N || N || N || used in Nostrolo Tambourine quest
+|- 
+| [[Emerald Jungle]]     || [[Emerald Palm Root]]        || N || Y || N || ? || N || used to make purified water with the tracker's water extractor. No fail combine, makes 3
+|- 
+| [[Emerald Jungle]]     || [[Mantrap Bud]]              || N || Y || N || N || N || &nbsp;
+|- 
+| [[Field of Bone]]      || [[Deadbone Barley]]          || N || Y || N || N || N || can be used in [[brewing]] for an iksar quest
+|- 
+| [[Field of Bone]]      || [[Flarefire Seeds]]           || N || N || ? || ? || Y || Wakening Land Quest
+|- 
+| [[Field of Bone]]      || [[Iksar Phalange]]           || N || N || N || N || N || dagger
+|- 
+| [[Field of Bone]]      || [[Iksar Shank]]           || N || N || N || N || N || dagger
+|- 
+| [[Firiona Vie]]        || [[Drachling Silk]]          || N || N || N || N || Y || &nbsp;
+|- 
+| [[Firiona Vie]]        || Dung Crawler             || Y || Y || N || N || N  || &nbsp; 
+|- 
+| [[Firiona Vie]]        || [[Rose of Firiona]]             || N || N || N || N || N || used in druid/ranger epic quests
+|- 
+| [[Firiona Vie]]        || [[Lichenclover]]             || N  || Y  || N  || N  || N  || &nbsp; 
+|- 
+| [[Frontier Mountains]] || [[Drench Flower]]            || N || Y || N || N || N || &nbsp; 
+|- 
+| [[Frontier Mountains]] || [[Frontier Stink Beetles]]   || Y || Y || N || N || N || &nbsp; 
+|- 
+| [[Frontier Mountains]] || [[Gold Nugget]]              ||  N ||  N || N  || N ||  N || 2 types can be foraged, see page
+|- 
+| [[Frontier Mountains]] || [[Honey Berry]]              ||  Y ||  Y ||  N || N  ||  N || &nbsp; 
+|- 
+| [[Frontier Mountains]] || [[Lichenclover]]             || N ||  Y || ?  || ?  || N || &nbsp;
+|- 
+| [[Frontier Mountains]] || [[Moss Root]]                || N ||  Y || ? || ?  || N  || Use with purification tablet and tracker's water extractor for [[Purified Water]] 
+|- 
+| [[Lake of Ill Omen]]   || [[Barracuda Bones]]          || N || Y || N  || N  || N  || &nbsp; 
+|- 
+| [[Lake of Ill Omen]]   || [[Mud Crabs]]                || Y || Y || N || N || N  || Iksar Shaman Quest 
+|- 
+| [[Lake of Ill Omen]]   || [[Vein Worm]]                || Y ||  Y ||  N || N  ||  N || &nbsp; 
+|- 
+| [[Lake of Ill Omen]]   || [[Water Reed]]               || N || Y  || N || N  || N  || can be used in [[brewing]]
+|- 
+| [[Mines of Nurga]]     || [[Sponge Mushroom]]          || N || Y || N || N || N || part of an Iksar quest for Xinth
+|- 
+| [[The Overthere]]      || [[Cockatrice Egg]]           || Y || Y  || N  || N  || N  || can be used in [[baking]] to make [[Clump of Dough]]
+|- 
+| [[The Overthere]]      || [[Cracked Shell]]            || N ||  N || Y ||  Y || N  || &nbsp; 
+|- 
+| [[The Overthere]]      || [[Cursed Clover of Viesar]]  || N || Y  || ?  || N  || Y || &nbsp; 
+|- 
+| [[The Overthere]]      || [[Wet Clay]]                 || N  ||  N || N  || N || N || &nbsp;
+|- 
+| [[Skyfire]]            || [[Earth Dragon Crystal]]      || N ||  N ||  Y ||  Y ||  Y || &nbsp; 
+|- 
+| [[Skyfire]]            || [[Fire Dragon Crystal]]      || N ||  N ||  Y ||  Y ||  Y || &nbsp; 
+|- 
+| [[Skyfire]]            || [[Ice Dragon Crystal]]       || N ||  N ||  Y ||  Y ||  Y || &nbsp; 
+|- 
+| [[Skyfire]]            || [[Wind Dragon Crystal]]      || N ||  N ||  Y ||  Y ||  Y || &nbsp; 
+|- 
+| [[Swamp of No Hope]]   || [[Hopeless Willow Moss]]     || N  ||  Y || ?  || ?  ||  N || &nbsp; 
+|- 
+| [[Swamp of No Hope]]   || [[Maneater Bud]]             || N  || Y  || N  || N  || N  || &nbsp; 
+|- 
+| [[Swamp of No Hope]]   || [[Moss Root ]]               || N || Y  || N  || N  || N  || &nbsp; 
+|- 
+| [[Swamp of No Hope]]   || [[Muckskipper Fish]]              || Y  || Y  || N  || N  || N  || &nbsp; 
+|- 
+| [[Timorous Deep]]      || [[Gunthak Sea Shell]]        || N || N || N || N || Y || &nbsp;
+|- 
+| [[Timorous Deep]]      || [[Timorous coconut]]         || N ||  N || N || N || N || &nbsp; 
+|- 
+| [[Timorous Deep]]      || [[Rile's Sand Coin]]       || N  ||  N || ?  || ?  || N  || Iksar Monk Quest 
+|- 
+| [[Timorous Deep]]      || [[Sand Crabs]]               || Y  || Y || N  || N  || N  || &nbsp; 
+|- 
+| [[Trakanon's Teeth]]   || [[Cockatrice Egg]]           || Y || Y  || N  || N  || N  || can be used in [[baking]] to make [[Clump of Dough]]
+|- 
+| [[Trakanon's Teeth]]   || [[Emerald Orange]]          || Y  || Y  || N  || N || N  ||  Wakening Land Quest; can be [[brewing|brewed]] into juice
+|- 
+| [[Trakanon's Teeth]]   || [[Mantrap Bud]]              || N || Y || N || N || N || &nbsp;
+|- 
+| [[Trakanon's Teeth]]   || [[Trakanon Fern Root]]        || N || Y  || N  || N  || N  || &nbsp; 
+|- 
+| [[Warsliks Woods]]     || [[Bixie Berry Pie]]          || Y ||  Y || N  || N  || N  ||  Iksar Warrior Quest 
+|- 
+| [[Warsliks Woods]]     || [[Kromdul Carrot]]           || Y || Y || N || N || N || &nbsp; 
+|- 
+| [[Warsliks Woods]]     || [[Oak Bark]]                 || N ||  Y || N  || N  || N  || can be used in [[brewing]] for Wood Elf Cultural Tailoring 
+|- 
+| [[Warsliks Woods]]     || [[Petrified Redwood]]        || N ||  N || N  || N  || N ||  Iksar Monk/Warrior Quest 
+|- 
+| [[Warsliks Woods]]     || [[Sop Bark]]                 || N ||  N || N  || N  || N  || &nbsp; 
+|}
+
+== Velious ==
+
+{| class="eoTable3"
+! Zone                  || Item                       || Edible || Stack || Lore || Magic || Nodrop || Comment
+|- 
+| All Velious           || [[Glob of Slush Water]]    ||  Y ||  Y || N ||  N || N || &nbsp; 
+|- 
+| All Velious           || [[Tuft of Dire Wolf Fur]]  || N || Y || N || N || N || &nbsp;
+|- 
+| All Velious           || [[Small Chunk of Velium]]  || N ||  N ||  N ||  Y ||  N || +5 HP
+|- 
+| [[Cobalt Scar]]       || [[Arctic Mussels]]         || Y ||  Y ||  N || N ||  N || Brewing (Coldain Ring Quests) 
+|- 
+| [[Cobalt Scar]]       || [[Arctic Scallop]]         || Y  ||  Y ||  N || N ||  N || &nbsp;
+|- 
+| [[Cobalt Scar]]       || [[Small Clam]]             || Y || Y || N || N || N || &nbsp;
+|- 
+| [[Cobalt Scar]]       || [[Arctic King Crab]]       || Y || Y || N || N || N || &nbsp;
+|- 
+| [[Cobalt Scar]]       || [[Cobalt Rock Crab]]       || Y || Y || N || N || N || &nbsp;
+|- 
+| [[Cobalt Scar]]       || [[Brackish Water]]         || Y || Y || N || N || N || Brewing
+|- 
+| [[Cobalt Scar]]       || [[Cobalt Abalone]]         || Y || Y || N || N || N || &nbsp;
+|- 
+| [[Dragon Necropolis]] || [[Cracked Dragon Bone]]    || N || N || Y || N || N || 1HB: dam 5,delay 32, ALL/ALL
+|- 
+| [[Dragon Necropolis]] || [[Dragon Claw Sliver]]     || N || Y || N || N || N || ranged weapon: dam 5, delay 36, range 45
+|- 
+| [[Dragon Necropolis]] || [[Rotting Dragon Scale]]   || N || N || N || N || Y || &nbsp;
+|- 
+| [[Eastern Wastes]]    || [[Branch of Sylvan Oak]]   ||  N ||  N ||  N || N || N || &nbsp;
+|- 
+| [[Eastern Wastes]]    || [[Fresh Fish]]             || Y  ||  Y ||  N || N ||  N || &nbsp;
+|- 
+| [[Great Divide]]      || [[Fresh Fish]]             || Y  ||  Y ||  N || N ||  N || other fished items also foraged in this zone
+|- 
+| [[Great Divide]]      || [[Kedge Carp]]             || Y  ||  Y ||  N || N ||  N || &nbsp;
+|- 
+| [[Great Divide]]      || [[Arctic Mussels]]         || Y  ||  Y ||  N || N ||  N || Baking
+|- 
+| [[Great Divide]]      || [[Lichen Roots]]           || Y  || Y  ||  N || N ||  N || &nbsp;
+|- 
+| [[Iceclad Ocean]]     || [[Arctic Mussels]]         || Y  ||  Y ||  N || N ||  N || Brewing (Coldain Ring Quests) 
+|- 
+| [[Iceclad Ocean]]     || [[Arctic King Crab]]       || Y ||  Y ||  N || N ||  N || &nbsp; 
+|- 
+| [[Iceclad Ocean]]     || [[Arctic Scallop]]         || Y ||  Y ||  N || N ||  N || &nbsp; 
+|- 
+| [[Iceclad Ocean]]     || [[Iceclad Shrimp]]         || Y ||  Y ||  N || N ||  N || &nbsp; 
+|- 
+| [[Plane of Growth]]   || [[Branch of Planar Oak]]   ||  N ||  N ||  N || N || N || &nbsp; 
+|- 
+| [[Skyshrine]]         || [[Drake Egg]]              ||  Y ||  Y || N || N ||  N || [[Brewing|tanning agent]] for Velious leathers 
+|- 
+| [[Skyshrine]]         || [[Wurm Egg]]               ||  Y ||  Y ||  N || N ||  N || &nbsp; 
+|- 
+| [[Skyshrine]]         || [[Arctic Mussels]]         || Y  ||  Y ||  N || N ||  N || Brewing (Coldain Ring Quests)
+|- 
+| [[Skyshrine]]         || [[Arctic Scallop]]         || Y ||  Y ||  N || N ||  N || &nbsp;
+|- 
+| [[Temple of Veeshan]] || [[Dragon Claw Sliver]]     || N || N || N || N || N || &nbsp;
+|- 
+| [[Temple of Veeshan]] || [[Dragon Egg]]             || Y || Y || N || N || N || &nbsp;
+|- 
+| [[Temple of Veeshan]] || [[Drake Egg]]              ||  Y ||  Y || N || N ||  N || [[Brewing|tanning agent]] for Velious leathers 
+|- 
+| [[Temple of Veeshan]] || [[Lichen Roots]]           || Y  || Y  ||  N || N ||  N || &nbsp;
+|- 
+| [[Temple of Veeshan]] || [[Wurm Egg]]               || Y || Y || N || N || N || &nbsp;
+|- 
+| [[Thurgadin]]         || [[Arctic Mussels]]         || Y  ||  Y ||  N || N ||  N || Brewing (Coldain Ring Quests)
+|- 
+| [[Thurgadin]]         || [[Arctic Scallop]]         || Y ||  Y ||  N || N ||  N || &nbsp;
+|- 
+| [[Tower of Frozen Shadow]] || [[Splinter of Frozen Shadow]] ||  N ||  N  ||  N  ||  Y  ||  N  || +5 HP
+|- 
+| [[Tower of Frozen Shadow]] || [[Bone Chips]]        ||  N ||  Y  ||  N  ||  N  ||  N  || &nbsp;
+|- 
+| [[Wakening Lands]]    || [[Branch of Sylvan Oak]]   ||  N ||  N ||  N || N || N || &nbsp; 
+|- 
+| [[Wakening Lands]]    || [[Bark Bindings]]          || N ||  N || N  || ?  || Y || &nbsp; 
+|- 
+| [[Wakening Lands]]    || [[Fresh Tree Sap]]         || N || N || N  || Y  || Y || Quest: [[Captain Nalot's Triple Strength Rum]]
+|- 
+| [[Wakening Lands]]    || [[Ripened Mango]]          ||  N ||  Y ||  N || N ||  N || &nbsp;
+|- 
+| [[Wakening Lands]]    || [[Yew Leaf]]               ||  N ||  Y ||  N || N ||  N || Used in Haze/Black Pantherskin armor
+|- 
+| [[Western Wastes]]    || [[Dragon Egg]]             || Y || Y || N || N || N || &nbsp;
+|- 
+| [[Western Wastes]]    || [[Drake Egg]]              ||  Y ||  Y || N || N ||  N || [[Brewing|tanning agent]] for Velious leathers 
+|- 
+| [[Western Wastes]]    || [[Oak Bark]]               || N || N || N || ? || N || [[Brewing|tanning agent]] for mithril leathers
+|}
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

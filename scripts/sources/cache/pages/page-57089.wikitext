@@ -1,0 +1,7 @@
+[[File:forge.jpg|thumb|right|A forge in Kelethin]]
+A forge is a stationary object with which the player may interact in order to attempt to create a [[Blacksmithing]] recipe.  They are available in most major cities as well as many other locations around Norrath.
+
+(Consider a comprehensive list of locations as on p99 wiki.  Copy the code versus build from scratch)
+
+{{Navbox Tradeskill Containers}}
+[[Category:Tradeskill Containers]]

@@ -1,0 +1,48 @@
+{{Velious Era}}
+{{Factionpage|
+
+| description = A colony of ratmen in Dragon Necropolis. They are hostile to the [[Chetari]].
+
+| zones_raise =
+
+* [[Dragon Necropolis]]
+
+| zones_lower =
+
+* [[Dragon Necropolis]]
+
+| quests_raise =
+
+
+| quests_lower =
+
+
+| mobs_raise =
+
+* [[a Chelaki]]  <span class='fmz'>(Dragon Necropolis)</span>
+* [[a Chetari adolescent]]  <span class='fmz'>(Dragon Necropolis)</span>
+* [[a Chetari deathbinder]]  <span class='fmz'>(Dragon Necropolis)</span>
+* [[a Chetari Dominator]]  <span class='fmz'>(Dragon Necropolis)</span>
+* [[a Chetari dustshaper]]  <span class='fmz'>(Dragon Necropolis)</span>
+* [[a Chetari guard]]  <span class='fmz'>(Dragon Necropolis)</span>
+* [[a Chetari hunter]]  <span class='fmz'>(Dragon Necropolis)</span>
+* [[a Chetari master]]  <span class='fmz'>(Dragon Necropolis)</span>
+* [[a Chetari neophyte]]  <span class='fmz'>(Dragon Necropolis)</span>
+* [[a Chetari seeker]]  <span class='fmz'>(Dragon Necropolis)</span>
+* [[a Chetari servant]]  <span class='fmz'>(Dragon Necropolis)</span>
+* [[a Chetari Warrior]]  <span class='fmz'>(Dragon Necropolis)</span>
+* [[a Chetari worker]]  <span class='fmz'>(Dragon Necropolis)</span>
+* [[an escaped worker]]  <span class='fmz'>(Dragon Necropolis)</span>
+* [[Chetari Courier]]  <span class='fmz'>(Dragon Necropolis)</span>
+* [[Vaniki]]  <span class='fmz'>(Dragon Necropolis)</span>
+* [[Warmaster Utvara]]  <span class='fmz'>(Dragon Necropolis)</span>
+
+| mobs_lower =
+
+* [[a Paebala Rebel]]  <span class='fmz'>(Dragon Necropolis)</span>
+* [[a Paebala Spirit Talker]]  <span class='fmz'>(Dragon Necropolis)</span>
+* [[a Paebala warrior]]  <span class='fmz'>(Dragon Necropolis)</span>
+* [[Dralliw`tar]]  <span class='fmz'>(Dragon Necropolis)</span>
+* [[Neb]] <span class='fmz'>(Dragon Necropolis - Quest NPC)</span>
+
+}}

@@ -1,0 +1,53 @@
+{{Classic Era}}[[File:Npc_jayna_d`bious.png|right]]{{Factionpage|
+
+| description = In the Neriak Commons can be found the guildhall of The Spurned.
+
+Here Dark Elf casters practice the lesser magical arts (necromancy is, of course, considered the greatest art by dark elves).  Being spurned by Dark Elf society, they actively oppose [[The Dead]] whose Necromancers and Shadow Knights enjoy the favor of [[Queen Cristanos Thex]]. They seem to be allied with [[King Naythox Thex]] and the [[Priests of Innoruuk]].
+
+[[Camia V`Retta]] trains the [[Enchanter]]s, [[Jayna D`Bious]] the [[Magician]]s and [[Gath N`Mare]] the [[Wizard]]s.
+
+Note that several Wizards in Neriak Commons are on [[The Dead]] faction instead of this one.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Neriak|Neriak Commons]]
+* [[Neriak|Neriak Third Gate]]
+
+| quests_raise = 
+
+* [[Innoruuk Symbol Quests|Innoruuk Disciple]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Belux J`Ver]] <span class='fmz'>(Neriak Commons - NPC, Non-Quest)</span>
+* [[Camia V`Retta]] <span class='fmz'>(Neriak Commons - NPC, Non-Quest)</span>
+* [[Cizzar J`Axx]] <span class='fmz'>(Neriak Commons - Merchant)</span>
+* [[Drizm J`Axx]] <span class='fmz'>(Neriak Commons - NPC, Non-Quest)</span>
+* [[Gath N`Mare]] <span class='fmz'>(Neriak Commons - NPC, Non-Quest)</span>
+* [[Jayna D`Bious]] <span class='fmz'>(Neriak Commons - NPC, Non-Quest)</span>
+* [[Litz B`Doph]] <span class='fmz'>(Neriak Commons - Merchant)</span>
+* [[Mavin D`Dbth]] <span class='fmz'>(Neriak Commons - NPC, Non-Quest)</span>
+* [[Mys S`Tai]] <span class='fmz'>(Neriak Commons - Merchant)</span>
+* [[Opizel G`Efia]] <span class='fmz'>(Neriak Commons - NPC, Non-Quest)</span>
+* [[Ranza S`Ion]] <span class='fmz'>(Neriak Commons - Merchant)</span>
+* [[Shanez X`Teria]] <span class='fmz'>(Neriak Commons - NPC, Non-Quest)</span>
+* [[Tkaz H`Rugla]] <span class='fmz'>(Neriak Commons - Merchant)</span>
+* [[Utvex D`Jerna]] <span class='fmz'>(Neriak Commons - NPC, Non-Quest)</span>
+* [[Veca S`Karn]] <span class='fmz'>(Neriak Commons - Merchant)</span>
+
+}}
+= Suggested Route =
+*[[Innoruuk Symbol Quests]] - Disciple Symbol of Innoruuk Part (only get message and delivery message).  (+[[The Spurned]], -[[The Dead]]).
+
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]

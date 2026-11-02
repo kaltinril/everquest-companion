@@ -1,0 +1,49 @@
+{{Factionpage|
+
+| description = The faction of wurms and drakes in Skyfire and BW, as well as most trash of Veeshan's Peak. Aligned with the [[Ring of Scale]]. Unfortunately, there is no known way to repair this faction.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Burning Woods]]
+* [[Skyfire Mountains]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a chromadrac]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[a guardian wurm]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[a lava walker (Wyvern)]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[a mature chromadrac]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[a mature wurm]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[a mature wyvern]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[a shadow drake]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[a skyash drake]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[a skycinder drake]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[a wandering wurm]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[a wurm spirit]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[a wyvern]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[an ancient wyvern]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[an elder wyvern]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[an old wurm]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[Azdalin]]  <span class='fmz'>(Burning Woods)</span>
+* [[Black Scar]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[Eldrig the Old]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[Entalon]] <span class='fmz'>(Burning Woods)</span>
+* [[Faerie of Dismay]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[Guardian of Felia]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[Gylton]]  <span class='fmz'>(Burning Woods)</span>
+* [[Nezekezena]]  <span class='fmz'>(Burning Woods)</span>
+* [[Phurzikon]]  <span class='fmz'>(Burning Woods)</span>
+
+}}

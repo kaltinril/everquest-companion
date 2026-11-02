@@ -1,0 +1,117 @@
+==Dungeon Crawl Summary==
+A Dungeon Crawl is a form of instance available to players. It is in opposition to "Normal" instancing which supports respawning mobs for continuous farming. By contrast a Dungeon Crawl instance has a different ruleset based around non-respawning mobs.
+
+
+{| style="background:transparent; width:100%;"
+| style="width:50%; vertical-align:top;" |
+
+===Dungeon Crawl (in-game data)===
+Clear out the zone and you'll be rewarded for it.
+* Nothing you kill will respawn naturally.
+* To finish, slay every rare creature and enough of the zone's original population
+* You'll earn motes and experience, and anything you killed may add its loot and coin to the reward pool.
+* The easier the zone is for you, the smaller the payout
+* Finish it and you get you instance charge back.
+* Rare creatures show up more often, and you'll see them on your map
+
+| style="width:50%; vertical-align:top;" |
+===Dungeon Crawl (Discord clarification)===
+Some of the data in-game is contradicted by some dev comments in Discord, which are the following:
+
+(discord source link - https://discord.com/channels/1435786469968183456/1494372568680108193/1547094310636363786)
+<pre>
+SECRETS ON DUNGEON CRAWL (General Chat)
+
+Secrets [EQL],  — 8:43 PM
+FYI Dungeon Crawls work in all 3 planes 
+Secrets [EQL],  — 8:44 PM
+Rare named chances are not increased in Dungeon Crawls. They just appear on the map. We've mostly de-PH'd zones
+Secrets [EQL],  — 8:45 PM
+So the whole rare spawn chance thing doesn't really apply anymore 
+Secrets [EQL],  — 8:45 PM
+[*Plane of Fear will be interesting, are there any labeled rare creatures there?*]
+There are not. And that's a bonus and detriment
+Secrets [EQL],  — 8:46 PM
+Can continue to run them over and over
+Secrets [EQL],  — 8:46 PM
+It's based on the level of the zone versus your own.
+Secrets [EQL],  — 8:46 PM
+All of the Plane of Sky mobs are also considered rare creatures now, too
+Secrets [EQL],  — 8:47 PM
+If you want extra boss loot rolls (ie; mote chance higher on named) you need to be killing named. On the other hand, you stack up more kills to clear fear
+Secrets [EQL],  — 8:48 PM
+Dungeons and planes
+Secrets [EQL],  — 8:48 PM
+The total payout at the end is more if there's more higher level kills to make.
+Secrets [EQL],  — 8:49 PM
+Yes, similar to how doing higher difficulties give higher gear
+Secrets [EQL],  — 8:50 PM
+You get loot as you kill AND at the end from the chest
+Secrets [EQL],  — 8:50 PM
+Bosses
+They weren't flagged before
+*[Can dungeon crawls be done in groups?]*
+Secrets [EQL],  — 8:51 PM
+Yes. You need to be there for a majority of kills to qualify
+Secrets [EQL],  — 8:52 PM
+There are solo and multiplayer crawls
+[*Is the XP split at the end personalized or split among a group?*]
+Secrets [EQL],  — 8:52 PM
+Personalized
+</pre>
+
+|}
+
+
+===Random Bits of Details==
+When starting a Dungeon Crawl, you simply select it on the right side of the instance selector; you can choose "Normal" or "Dungeon Crawl". Instance starts like normal with a zone-in, and warm-up phase for mobs.
+
+[[File:dungeon_crawl_tracker_0.png|thumb|Dungeon Crawl Tracker]]
+Players are given a new window to track process.
+
+The tracker appears to track a bar with a number of general kills (percentage roughly), as well as the number of rare creatures in the zone.
+
+The tracker is called the "Task Overlay window". You can set a hotkey for it in:
+<code>Options > Controls > Key Bindings > All > Task Overlay window toggle</code>.
+
+Lower Guk was giving me about 1% completion per 1.3 enemies killed (13 slain enemies at 10%)
+
+It took 124 kills to get 100% general kills in Lower Guk, counting 25 Rare Kills
+
+[[File:dungeon_crawl_map_named.png|thumb|Dungeon Crawl Map showing Rare Creature]]
+Name enemies show up on the map just like with regular map "Mob Tracking", except they also show their name 
+
+Rare creatures only show up on the map if they are within the range of your map "Mob Tracking"
+
+Rare creature kills count as both "Rare Creature Killed" and General Population Kills
+
+On Completion, a Reward Chest is given basically at your feet about 1-5 seconds after the last kill required. It appears to just be loot from the Zone you are hunting in, unsure on how much was regular loot and which are bonuses from Rare Kills.
+[[File:dungeon_crawl_rewardchest.png|thumb|Dungeon Crawl Reward Chest]]
+
+'''Teleporting rules apply:''' Using Gate, Ring, Circle, Portals, Succor:Location, Evac:Location, and their Rituals will drop you out of the instance (though you can re-enter the instance).<br>
+''However'', [[Druid|Druids]] and [[Wizard|Wizards]] have an advantage because [[Lesser Succor]] and [[Lesser Evacuate]] do ''not'' take you out of the instance- They will take you back to the Evac point. If porting to the Evac point makes the crawl quicker, use it!
+
+===Completion Reward===
+Presumably based on the zone: rewards for Lower Guk at level 48, at 0 difficulty
+
+<pre>
+[Wed Sep 09 14:59:02 2026] You have completed the Dungeon Crawl and earned reward loot!
+[Wed Sep 09 14:59:02 2026] You gained reward experience from the Dungeon Crawl!
+[Wed Sep 09 14:59:02 2026] You earned a refund of your instance charge.
+[Wed Sep 09 14:59:02 2026] You looted a Fine Steel Morning Star from Reward Chest
+[Wed Sep 09 14:59:02 2026] You looted 3 Undead Froglok Tongue from Reward Chest
+[Wed Sep 09 14:59:02 2026] You looted a Crystallized Marrow from Reward Chest
+[Wed Sep 09 14:59:02 2026] You looted a Guise of the Deceiver from Reward Chest
+[Wed Sep 09 14:59:02 2026] You looted an Enameled Black Chestplate from Reward Chest
+[Wed Sep 09 14:59:02 2026] You looted 4 Mote of Infinitesimal Potential from Reward Chest
+[Wed Sep 09 14:59:03 2026] You looted 2 Spider Silk from Reward Chest
+[Wed Sep 09 14:59:05 2026] You looted 8 Phosphorous Powder from Reward Chest
+[Wed Sep 09 14:59:06 2026] You looted a Fine Steel Warhammer from Reward Chest
+[Wed Sep 09 14:59:07 2026] You looted an Ivory from Reward Chest
+[Wed Sep 09 14:59:08 2026] You looted a Topaz from Reward Chest
+[Wed Sep 09 15:01:20 2026] You looted a Braided Cinch Cord from Reward Chest
+[Wed Sep 09 15:01:23 2026] You have looted a Shining Metallic Robes from Reward Chest.
+[Wed Sep 09 15:01:29 2026] You have looted a White Gold Necklace from Reward Chest.
+[Wed Sep 09 15:01:31 2026] You looted 2 Spider Venom Sac from Reward Chest
+[Wed Sep 09 15:01:35 2026] You have looted an Embroidered Black Cape +1 from Reward Chest.
+</pre>

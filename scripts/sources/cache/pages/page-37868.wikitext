@@ -1,0 +1,110 @@
+{{Factionpage|
+
+| description = The guards of Highhold and Highpass. Like many human guard factions, they are corrupt, paid off by the local mob boss, [[Carson McCabe]]. They are allied with the [[Corrupt Qeynos Guards]], [[Freeport Militia]], and [[Merchants of Highpass]].
+
+| zones_raise = 
+
+* [[Eastern Plains of Karana]]
+* [[Highpass Hold]]
+* [[Kithicor Forest]]
+* [[Northern Karana]]
+* [[Toxxulia Forest]]
+* [[Western Plains of Karana]]
+
+| zones_lower = 
+
+* [[Erudin]]
+* [[Highpass Keep]]
+* [[Highpass Hold]]
+* [[Rathe Mountains]]
+* [[Northern Karana]]
+* [[Qeynos|North Qeynos]]
+
+| quests_raise = 
+
+* [[Call of Flames]]
+* [[Gnoll Scalp Collecting]]
+* [[High Guard Battlestaff]]
+* [[Left Goblin Ears]]
+* [[Orc Scalp Collecting]]
+* [[Rogue Errands]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[a bandit]]  <span class='fmz' style="color: black;">(East Karana)</span>
+* [[a gnoll brawler]]  <span class='fmz' style="color: black;">(Highpass Hold)</span>
+* [[a gnoll champion]]  <span class='fmz' style="color: black;">(Highpass Hold)</span>
+* [[a gnoll soothsayer]]  <span class='fmz' style="color: black;">(Highpass Hold)</span>
+* [[a raider]]  <span class='fmz' style="color: black;">(North Karana)</span>
+* [[an orc conscript]]  <span class='fmz' style="color: black;">(Highpass Hold)</span>
+* [[an orc fanatic]]  <span class='fmz' style="color: black;">(Highpass Hold)</span>
+* [[an orc medic]]  <span class='fmz' style="color: black;">(Highpass Hold)</span>
+* [[an orc mercenary]]  <span class='fmz' style="color: black;">(Highpass Hold)</span>
+* [[an orc soldier]]  <span class='fmz' style="color: black;">(Highpass Hold)</span>
+* [[Beanu Mucktail]] <span class='fmz' style="color: black;">(East Karana)</span>
+* [[Brenon]] <span class='fmz' style="color: black;">(Highpass Hold - NPC, Non-Quest)</span>
+* [[Burah Mucktail]] <span class='fmz' style="color: black;">(East Karana)</span>
+* [[Chief Gan`Shralok]]  <span class='fmz' style="color: black;">(Kithicor Forest)</span>
+* [[Chief Sanre`Rexsa]]  <span class='fmz' style="color: black;">(East Karana)</span>
+* [[Curkur Shralok]]  <span class='fmz' style="color: black;">(Kithicor Forest)</span>
+* [[Dalishea]] <span class='fmz' style="color: black;">(Highpass Hold - NPC, Non-Quest)</span>
+* [[Emhu Mucktail]] <span class='fmz' style="color: black;">(East Karana)</span>
+* [[Grenix Mucktail]]  <span class='fmz' style="color: black;">(East Karana)</span>
+* [[Greth Truksorn]] <span class='fmz' style="color: black;">(Highpass Hold - NPC, Non-Quest)</span>
+* [[Hukex Mucktail]]  <span class='fmz' style="color: black;">(East Karana)</span>
+* [[Jekca Mucktail]]  <span class='fmz' style="color: black;">(East Karana)</span>
+* [[Klage Mucktail]]  <span class='fmz' style="color: black;">(East Karana)</span>
+* [[Mechi Mucktail]]  <span class='fmz' style="color: black;">(East Karana)</span>
+* [[Nre`Loxe Mucktail]]  <span class='fmz' style="color: black;">(East Karana)</span>
+* [[Olixen Mucktail]]  <span class='fmz' style="color: black;">(East Karana)</span>
+* [[Plur Mucktail]]  <span class='fmz' style="color: black;">(East Karana)</span>
+* [[Poacher Dell]]  <span class='fmz' style="color: black;">(Toxxulia Forest)</span>
+* [[Poacher Shelli]]  <span class='fmz' style="color: black;">(Toxxulia Forest)</span>
+* [[Poacher Topi]]  <span class='fmz' style="color: black;">(Toxxulia Forest)</span>
+* [[Poacher Willa]]  <span class='fmz' style="color: black;">(Toxxulia Forest)</span>
+* [[Tallus Holton]]  <span class='fmz' style="color: black;">(East Karana)</span>
+* [[Thrackin Griften]] <span class='fmz' style="color: black;">(West Karana - Quest NPC)</span>
+* [[Tregil Mucktail]]  <span class='fmz' style="color: black;">(East Karana)</span>
+* [[Vexven Mucktail]]  <span class='fmz' style="color: black;">(East Karana)</span>
+* [[Vopuk Shralok]]  <span class='fmz' style="color: black;">(Highpass Hold)</span>
+* [[Yahg Mucktail]]  <span class='fmz' style="color: black;">(East Karana)</span>
+
+| mobs_lower = 
+
+* [[a guard]] <span class='fmz' style="color: black;">(Highpass Hold)</span>
+* [[a Highpass citizen]] <span class='fmz' style="color: black;">(Highpass Hold - NPC, Non-Quest)</span>
+* [[a maid]] <span class='fmz' style="color: black;">(High Keep - NPC, Non-Quest)</span>
+* [[a noble]] (Highpass Keep) <span class='fmz' style="color: black;">(High Keep - NPC, Non-Quest)</span>
+* [[a smuggler]] <span class='fmz' style="color: black;">(Highpass Hold - NPC, Non-Quest)</span>
+* [[Bank Clerk Jaylin]] <span class='fmz' style="color: black;">(High Keep - Banker)</span>
+* [[Captain Orben]] <span class='fmz' style="color: black;">(Highpass Hold)</span>
+* [[Delila]] <span class='fmz' style="color: black;">(Mountains of Rathe - Quest NPC)</span>
+* [[Dyrna Nlith]] <span class='fmz' style="color: black;">(High Keep - NPC, Non-Quest)</span>
+* [[Flayer Hopkins]] <span class='fmz' style="color: black;">(High Keep - NPC, Non-Quest)</span>
+* [[Guard Bicker]] <span class='fmz' style="color: black;">(High Keep)</span>
+* [[Guard Blayle]] <span class='fmz' style="color: black;">(High Keep)</span>
+* [[Guard Duras]] <span class='fmz' style="color: black;">(High Keep)</span>
+* [[Guard Folton]] <span class='fmz' style="color: black;">(High Keep)</span>
+* [[Guard Lancel]] <span class='fmz' style="color: black;">(High Keep)</span>
+* [[Guard Lorton]] <span class='fmz' style="color: black;">(High Keep)</span>
+* [[Guard Rance]] <span class='fmz' style="color: black;">(High Keep)</span>
+* [[Guard Stald]] <span class='fmz' style="color: black;">(Highpass Hold)</span>
+* [[Jracol Brestiage]] <span class='fmz' style="color: black;">(North Qeynos - Quest NPC)</span>
+* [[Jras Solsier]] <span class='fmz' style="color: black;">(Erudin - Quest NPC)</span>
+* [[Lady McCabe]] <span class='fmz' style="color: black;">(High Keep - Quest NPC)</span>
+* [[Lieutenant Midraim]] <span class='fmz' style="color: black;">(North Karana - NPC, Non-Quest)</span>
+* [[Lyn Tarburner]] <span class='fmz' style="color: black;">(Highpass Hold - Merchant)</span>
+* [[Meridith Tindle]]  <span class='fmz' style="color: black;">(Mountains of Rathe)</span>
+* [[Tyrana Slil]] <span class='fmz' style="color: black;">(High Keep - Quest NPC)</span>
+* [[Volunteer Renlor]] <span class='fmz' style="color: black;">(Highpass Hold - NPC, Non-Quest)</span>
+* [[Wres Corber]] <span class='fmz' style="color: black;">(Highpass Hold - NPC, Non-Quest)</span>
+
+}}
+
+= Suggested Route =
+*[[Rogue Errands]] Part 1: (+[[Carson McCabe]], +[[Coalition of Tradefolk Underground]], +[[Highpass Guards]], +[[Merchants of Highpass]], -[[Ring of Scale]])
+
+[[Category:Significant Factions]]

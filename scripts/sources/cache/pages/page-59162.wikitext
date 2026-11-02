@@ -1,0 +1,165 @@
+In EverQuest Legends, several zones have been updated with new gear and new NPCs.  Some zones have also been updated to have placeholders for rare and named mobs removed. There are also completely brand new zones that do not appear in the main EverQuest game. More updates, adjustments, and zones are planned in the future.
+
+All tables are organized chronologically.
+
+== Updated Zones ==
+
+{| class="wikitable"
+!Zone
+!Level Range
+!Connected Zone(s)
+!Date Updated
+!Notable Changes
+|-
+|[[Befallen]]
+|7-25
+|[[West Commonlands]]
+|May 6, 2026
+|Higher level enemies added in the lower section including new loot.
+|-
+|[[Blackburrow]]
+|5-20
+|[[Qeynos Hills]] & [[Everfrost Peaks]]
+|[[Patch Notes#2026-06-09 - Patch Notes|June 9, 2026]]
+|Zone population updated, existing loot upgraded and new loot added.
+|-
+|[[Najena]]
+|15-30
+|[[Lavastorm Mountains]]
+|[[Patch Notes#2026-06-23 - Patch Notes|June 23, 2026]]
+|Smoother NPC level progression, new named NPCs, improvement to existing loot and new loot added.
+|-
+|[[Crushbone]]
+|4-22
+|[[Greater Faydark]]
+|[[Patch Notes#2026-06-23 - Patch Notes|July 14, 2026]]
+|Named NPCs added and placeholders removed, as well as new loot added.
+|-
+|[[Splitpaw Lair]]
+|25-42
+|[[Southern Plains of Karana]]
+|[[Patch Notes#2026-06-23 - Patch Notes|July 14, 2026]]
+|Enemies balanced through five different difficulty bands.  New rare spawns and equipment drops added.
+|-
+|[[Kerra Island]]
+|1-15
+|[[Toxxulia Forest]]
+|[[Patch Notes#2026-07-28 - Launch day Patch Notes|July 28, 2026]]
+|New character starting zone and quest hub for the [[Kerra]] playable race.  Lots of new quests and gear. 
+|-
+|[[Mistmoore Castle]]
+|20-45
+|[[Lesser Faydark]]
+|[[Patch Notes#2026-08-18 - Patch Notes|August 18, 2026]]
+|New NPCs, new loot, improvements to drop rate consistency.
+|-
+|[[The Estate of Unrest|Estate of Unrest]]
+|10-35
+|[[Dagnor's Cauldron]]
+|[[Patch Notes#2026-08-25 - Patch Notes|August 25, 2026]]
+|New loot, improved loot, added Fine Steel weapons to some mobs.
+|}
+
+== New Zones ==
+
+{| class="wikitable"
+!Zone
+!Level Range
+!Connected Zone(s)
+!Date Added
+!Notes
+|-
+|[[New Sebilis Expedition]]
+|1-15
+|[[The Northern Desert of Ro|North Ro]]
+|[[Patch Notes#2026-07-28 - Launch day Patch Notes|July 28, 2026]]
+|Added in closed beta as the starting home for the [[Iksar]] playable race.
+An expanded dungeon area was added with the launch day patch. 
+|-
+|[[Nektropos Castle]]
+|Unknown
+|Unknown
+|Unknown
+|Announced during the [https://www.youtube.com/watch?v=y4MfpDpyKD8 June 22, 2026] livestream.  
+San Diego Comic Con roadmap places this in Fall 2026.
+|-
+|Rujarkian Hills
+|35-50
+|Unknown
+|Unknown
+|Announced during San Diego Comic Con for a Summer/Q3 release (end of September).
+|}
+
+== Placeholders Removed ==
+
+{| class="wikitable"
+!Zone
+!Level Range
+!Date Updated
+!Connected Zone(s)
+|-
+|[[Befallen]]
+|7-25
+|May 6, 2026
+|[[West Commonlands]]
+|-
+|[[Blackburrow]]
+|5-20
+|[[Patch Notes#2026-06-09 - Patch Notes|June 9, 2026]]
+|[[Qeynos Hills]], [[Everfrost Peaks|Everfrost]]
+|-
+|[[Najena]]
+|15-30
+|[[Patch Notes#2026-06-23 - Patch Notes|June 23, 2026]]
+|[[Lavastorm Mountains]]
+|-
+|[[Crushbone]]
+|4-22
+|[[Patch Notes#2026-06-23 - Patch Notes|July 14, 2026]]
+|[[Greater Faydark]]
+|-
+|[[Splitpaw Lair]]
+|25-42
+|[[Patch Notes#2026-06-23 - Patch Notes|July 14, 2026]]
+|[[Southern Plains of Karana]]
+|-
+|[[The Warrens]]
+|4-25
+|[[Patch Notes#2026-07-28 - Launch day Patch Notes|July 28, 2026]]
+|[[Paineel]], [[Stonebrunt Mountains]]
+|-
+|[[Mistmoore Castle]]
+|20-45
+|[[Patch Notes#2026-07-28 - Launch day Patch Notes|July 28, 2026]]
+|[[Lesser Faydark]]
+|-
+|[[Lower Guk]]
+|30-50
+|[[Patch Notes#2026-07-28 - Launch day Patch Notes|July 28, 2026]]
+|[[Upper Guk]]
+|-
+|[[The Hole]]
+|39-56
+|[[Patch Notes#2026-07-28 - Launch day Patch Notes|July 28, 2026]]
+|[[Paineel]], [[Neriak Third Gate]] (teleporter) & [[Erudin]] (teleporter)
+|-
+|[[Nagafen's Lair]]
+|40-55
+|[[Patch Notes#2026-07-28 - Launch day Patch Notes|July 28, 2026]]
+|[[Lavastorm Mountains]], [[Solusek's Eye]]
+|-
+|[[Upper Guk]]
+|4-25+
+|[[Patch Notes#2026-08-04 - Patch Notes|August 4, 2026]]
+|[[Lower Guk]]
+|-
+|Estate of Unrest
+|10-35
+|[[Patch Notes#2026-08-25 - Patch Notes|August 25, 2026]]
+|[[Dagnor's Cauldron]]
+|-
+|[[Solusek's Eye]]
+|20-40
+|[[Patch Notes#2026-08-25 - Patch Notes|August 25, 2026]]
+|[[Lavastorm Mountains]], [[Nagafen's Lair]]
+|}

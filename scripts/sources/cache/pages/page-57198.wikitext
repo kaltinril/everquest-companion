@@ -1,0 +1,16 @@
+These patch notes are from the Official EverQuest Legends discord, posted on May 31, 2026
+
+= May 31, 2026 =
+
+= Hotfix =
+
+* Lay on Hands has been updated to function with implied targeting and related systems.
+* Dragoon Zytl will now give experience when killed.
+* Fix a crash on zone servers.
+* Fix an issue where, as a charmed player, you would be suicided as an NPC clone when the caster of the charm dies.
+* Paineel Armor and Weapon merchants should once again sell adventuring gear, instead of spells!
+* Reduced difficulty scaling of mob haste.
+* Amplification (Bard Song) no longer amplifies itself.
+* Amplification has been buffed slightly.
+* Fixed an issue where loot lockouts in dynamic zones were not using the proper type of dynamic timer.
+* Fix an issue where players would not be counted as actual players for personal loot purposes when charmed, feared or linkdead.

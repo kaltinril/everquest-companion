@@ -1,0 +1,2797 @@
+<div style="float:left;margin-right:20px;">
+__TOC__
+</div>
+== '''L'Teir'Dal Zhaun'ol''' ==
+(The Teir'Dal Dictionary)
+''An Adaptation of the Drow Tongue for use in EverQuest''
+
+
+This dictionary is an adaption of the Drow Dictionary which was assembled from excerpts from "[http://en.wikipedia.org/wiki/Drow_of_the_Underdark The Drow of the Underdark]" by TSR, Inc. and other authorized D&D sources. This is by no means an attempt to rewrite that known as "Drow", only to serve as a reference for use in Everquest by those known as Teir'Dal (Dark Elves). No intent to infringe on any copyright or to plagiarize previous work has been made. Changes from Drow to Teir'Dal include renaming references to Lloth with reference to [[Innoruuk]] (as appropriate) and any Drow and D&D specific terms have been removed or modified.
+
+
+This dictionary has been prepared by the Sorcere for the use of the Drow in dealing with other races and as a guide for other races in the proper dealings with the Drow. To facilitate such use, the majority of this Dictionary has been translated into Common.
+
+
+Any Drow allowed contact with other races should have received training in proper conduct elsewhere, thus no effort has been made to supplement such training here. Non-Drow are advised to pay heed to these Usage Notes. Many Drow societies welcome mutually profitable or pleasurable dealings with other races or societies. However, the Drow are a justly proud people and are quick to take offense -- often fatal offense -- at what they perceive to be insults or breaches of etiquette.
+
+
+You have been warned.
+
+
+This 2nd Edition Version was converted to HTML by Veldrindel with additional content contributions from Cyriex, Dkama, Nymxara, Xxtayce and others of the Fennin Ro server. As with any of these ''Teir'Dal Dictionaries'' there may be some slight differences in words that have been modified or newly created. Feel free to edit this wiki page if you think of something else that should be added here.
+
+
+{| cellspacing="0" cellpadding="4" width="100%" border="0" 
+|-
+|align="right" |--[[User:Xxtayce|Xxtayce]] 22:46, 1 July 2011 (UTC)
+|}
+
+== General, Grammar ==
+
+
+'''PLURALIZATION'''
+
+Withstanding irregular forms, a plural is completed by "en" if it ends in a consonant or "n" if it ends in a vowel.
+
+
+{| cellspacing="0" cellpadding="4" width="50%" border="0" 
+|-
+| ! style="background:rgba(201,201,201,0.6);" | '''Singular''' ||! style="background:rgba(201,201,201,0.6);" |	'''Plural'''
+|-
+| Jabbress ||  Mistress	
+|-
+| ! style="background:rgba(180,184,194,0.6);" |Jabbressen ||! style="background:rgba(180,184,194,0.6);" |	Mistresses
+|-
+| Velve ||	Blade 	
+|-
+| ! style="background:rgba(180,184,194,0.6);" |Velven ||! style="background:rgba(180,184,194,0.6);" |	Blades
+|}
+
+
+
+'''POSSESSIVE CASE'''
+
+
+Coincidentally, the possessive case in the Drow language is very similar to the Common Tongue used by most races. The possessive case is completed with "'s" except if the word ends in "s" where upon "'" is added.
+
+
+{| cellspacing="0" cellpadding="4" width="50%" border="0" 
+|-
+| Sarn lil velg'larn's inthen || Beware the assassin's schemes
+|-
+| Nindil zhah lil Valsharess' elgluth || That is the Valsharess' whip
+|}
+
+
+'''VERBS'''
+
+
+A verb has different forms depending on its number (singular or plural); person (first, second, third); voice (active, passive); tense (present, past, future, present perfect, past perfect, future perfect); and mood (indicative, imperative, subjunctive).
+
+
+'''NUMBER:''' Withstanding irregular verbs, the singular form is completed with "ar".
+
+
+{| cellspacing="0" cellpadding="4" width="50%" border="0" 
+|-
+| ! style="background:rgba(201,201,201,0.6);" | '''Singular''' ||! style="background:rgba(201,201,201,0.6);" |	'''Plural'''
+|-
+| Lil sargtlin elggar  ||  The warrior kills
+|-
+| ! style="background:rgba(180,184,194,0.6);" |Lil sargtlinen elgg  || ! style="background:rgba(180,184,194,0.6);" | The warriors kill
+|-
+| Uss jaluk elar  ||  One male dies
+|-
+| ! style="background:rgba(180,184,194,0.6);" |Draa jaluken el  ||! style="background:rgba(180,184,194,0.6);" |  Two males die
+|}
+
+
+'''PERSON:''' Verbs usually have a different form only in the third person singular of the present tense. Withstanding irregular verbs, the third person singular of the present tense is completed with "e".
+
+
+{| cellspacing="0" cellpadding="4" width="50%" border="0" 
+|-
+| Usstan belbau  ||  I give 	
+|-
+| ! style="background:rgba(180,184,194,0.6);" |Dos belbau  ||! style="background:rgba(180,184,194,0.6);" |  You give	
+|-
+| Uk belbaue  ||  He gives
+|-
+| ! style="background:rgba(180,184,194,0.6);" |Usstan luth  ||! style="background:rgba(180,184,194,0.6);" |  I cast	
+|-
+| Dos luth  ||  You cast	
+|-
+| ! style="background:rgba(180,184,194,0.6);" |Il luthe  ||! style="background:rgba(180,184,194,0.6);" |  She casts
+|}
+
+
+'''VOICE:''' A passive verb is a combination of a "be" verb and a past participle.
+
+
+{| cellspacing="0" cellpadding="4" width="50%" border="0" 
+|-
+| ! style="background:rgba(201,201,201,0.6);" | '''Active''' ||! style="background:rgba(201,201,201,0.6);" |	'''Passive'''
+|-
+| L'Yathrin harventhe ukt karliik || Ukt karliik zhahus harventhus a'lil Yathrin
+|-
+| ''The Yathrin severs his head'' || ''His head was severed by the Yathrin''
+|}
+
+
+'''TENSE:''' Withstanding irregular verbs, the past tense is completed with "us".
+
+
+{| cellspacing="0" cellpadding="4" width="50%" border="0" 
+|-
+| ! style="background:rgba(201,201,201,0.6);" | '''Active Voice ''' ||! style="background:rgba(201,201,201,0.6);" |	'''Passive Voice'''
+|-
+| ! colspan="2" style="background:rgba(189,193,199,0.6);" align="center"|'''Present Tense'''	
+|-
+| Uk phlithe || He hates	
+|-
+| Uk zhah phlithus || He is hated
+|-
+| ! colspan="2" style="background:rgba(189,193,199,0.6);" align="center" |'''Past Tense''' 	
+|-
+| Usstan phlithus || I hated	
+|-
+| Usstan zhahus phlithus || I was hated
+|-
+| ! colspan="2" style="background:rgba(189,193,199,0.6);" align="center"  |'''Future Tense''' 	
+|-
+| Dos orn phlith || You will hate
+|-
+| Dos orn tlu phlithus || You will be hated
+|-
+| ! colspan="2" style="background:rgba(189,193,199,0.6);" align="center"  |'''Present Perfect''' 	
+|-
+| Dos inbal phlithus || You have hated	
+|-
+| Dos inbal tlus phlithus || You have been hated
+|-
+| ! colspan="2" style="background:rgba(189,193,199,0.6);" align="center"  |'''Past Perfect'''	
+|-
+| Il inbalus phlithus || She had hated
+|-
+| Il inbalus tlus phlithus || She had been hated
+|-
+| ! colspan="2" style="background:rgba(189,193,199,0.6);" align="center"  |'''Future Perfect''' 	
+|-
+| Usstan zhal inbal phlithus || I shall have hated
+|-
+| Usstan zhal inbal tlus phlithus || I shall have been hated
+|}
+
+
+'''MOOD:''' The mood of the verb indicates the tone in which the statement is made. The common "-ing" ending found in many verbs of the indicative mood is completed with "-in". There are no other endings for the imperative or subjunctive moods.
+
+
+Indicative 	Udos phuul raldarin l'waess da'fol rivvin.
+(We are stripping the skin from some humans)
+
+
+'''-ER SUFFIX:''' Many common verbs can use the suffix -ER, such as play''er'', hat''er'', the Teir'dal equivelent is "x" or "xa", depending on the verbs ending.
+
+
+ends in noun  - x
+ends in conn  - xa
+ie. player hater  - jivvinxa phlithxa
+
+
+'''ADJECTIVES'''
+
+Adjectives have three forms: positive, comparative, and superlative. Withstanding irregular forms, the comparative form is completed with "ur" while the superlative is completed with "url". The common "-ful" suffix for many adjectives is indicated by "'urn".
+
+
+{| cellspacing="0" cellpadding="4" width="80%" border="0" 
+|-
+| ! style="background:rgba(201,201,201,0.6);" | '''Positive''' || ! style="background:rgba(201,201,201,0.6);" | '''Comparative''' || ! style="background:rgba(201,201,201,0.6);" | '''Superlative'''
+|-
+| Olath - ''Dark'' || Olathur - ''Darker'' ||| Olathurl - ''Darkest''
+|-
+| Ssin'urn - ''Beautiful'' || Mzild ssin'urn - ''More beautiful'' ||| Mzilst ssin'urn - ''Most beautiful''
+|}
+
+
+'''-LESS SUFFIX:''' Many adverbs use the negative suffix -LEB to denote the common equivelent of - LESS
+
+ie. heartless - xukuthleb 
+
+
+
+'''ADVERBS'''
+
+
+Adverbs, like adjectives, have three forms: positive, comparative, and superlative. Withstanding irregular forms, the comparative form is completed with "ur" while the superlative is completed with "url". The common "-ly" suffix for many adverbs is indicated by "ne" (or "e" if ending in "n").
+
+
+{| cellspacing="0" cellpadding="4" width="80%" border="0" 
+|-
+| ! style="background:rgba(201,201,201,0.6);" | '''Positive''' || ! style="background:rgba(201,201,201,0.6);" | '''Comparative''' || ! style="background:rgba(201,201,201,0.6);" | '''Superlative'''
+|- 
+|Al - ''Well''  || Alur - ''Better'' ||| Alurl - ''Best''
+|- 
+|Ssin'urne - ''Beautifully'' || Mzild ssin'urne - ''More beautifully'' ||| Mzilst ssin'urne - ''Most beautifully''
+|}
+
+
+{| cellspacing="0" cellpadding="4" width="100%" border="0" 
+|-
+|align="right" |[[#top|Back to Top]]
+|}
+
+== General, City Institutes ==
+
+{| cellspacing="0" cellpadding="4" width="80%" border="0" 
+|-
+| L'Elghinyrr ||  The Dead ([[Shadow_Knight|Shadowknights]], [[Necromancer|Necromancers]])
+|-
+| Melee-Magthere || Academy of Warfare - The Indigo Brotherhood ([[Warrior|Warriors]])
+|-
+| Ol'elghinn-Magthere || Academy of Assassination - The Ebon Mask ([[Rogue|Rogues]])	
+|-
+| Sorcere || Academy of Wizardry - The Spurned ([[Enchanter|Enchanters]], [[Magician|Mages]] [[Wizard|Wizards]])
+|-
+| Yath d'Quarval-sharuk || The Spires of Innoruuk ([[Cleric|Clerics]])
+|-
+| El'lar d'Ssinssrigg || The Maiden's Fancy (Drow Pleasure House)
+|}
+
+
+{| cellspacing="0" cellpadding="4" width="100%" border="0" 
+|-
+|align="right" |[[#top|Back to Top]]
+|}
+
+== General, Deities ==
+
+Dark Elf Deities:
+
+[[Innoruuk]] Prince of Hate, creator of the Teir'Dal race
+
+Nilonim (Demi-god) Prince of Shadows, patron god of assassins (esp. Teir'Dal), grandson of Innoruuk
+
+
+
+Other Deities:
+
+[[Bertoxxulous]] the Plaguebringer.
+
+[[Brell Serilis]] the Duke of Below.
+
+[[Bristlebane Fizzlethrope]] the King of Thieves.
+
+[[Cazic-Thule]] the Faceless.
+
+[[Erollisi Marr]] the Queen of Love.
+
+[[Karana]] the Rainkeeper.
+
+[[Mithaniel Marr]] the Lightbringer.
+
+[[Prexus]] the Oceanlord.
+
+[[Quellious]] the Tranquil.
+
+[[Rallos Zek]] the Warlord.
+
+[[Rodcet Nife]] the Prime Healer.
+
+[[Solusek Ro]] the Burning Prince.
+
+[[The Tribunal]] the Six Hammers.
+
+[[Tunare]] the Mother of All.
+
+[[Veeshan]] the Wurmqueen.
+
+
+{| cellspacing="0" cellpadding="4" width="100%" border="0" 
+|-
+|align="right" |[[#top|Back to Top]]
+|}
+
+== General, Titles and Professions ==
+
+
+''Titles are given in their Male, Female, or General forms where appropriate (in that order)''
+
+''e.g. Velguk / Velgess / Velg'larn''
+'' - Male Assassin / Female Assassin / Assassin (either sex)''
+
+
+'''TITLES'''
+
+{| cellspacing="0" cellpadding="4" width="80%" border="0" 
+|-
+| C'rintri ||  noble Teir'Dal (C'rintrin - nobles)
+|-
+|! style="background:rgba(180,184,194,0.6);" | Ilharess ||	! style="background:rgba(180,184,194,0.6);" |Matron (Used for female leaders of a House)
+|-
+| Ilharn ||  Patron (Used for male leaders of a House)
+|-
+| ! style="background:rgba(180,184,194,0.6);" |Jabbress ||	! style="background:rgba(180,184,194,0.6);" |Mistress (female in charge of some task or office)
+|-
+| Jabbuk || Master (male in charge of some task or office)
+|-
+| ! style="background:rgba(180,184,194,0.6);" |Malla  || ! style="background:rgba(180,184,194,0.6);" |honored (a term of respect preceding a title)
+|-
+| Dalharuk / Dalharil || Son/Daughter
+|-
+| ! style="background:rgba(180,184,194,0.6);" |Ulathtallar  || ! style="background:rgba(180,184,194,0.6);" |Arch Priestess
+|-
+| Ul'Saruk  || Warlord
+|-
+| ! style="background:rgba(180,184,194,0.6);" |Ul'Veldriss/Veldruk  || ! style="background:rgba(180,184,194,0.6);" |Arch Shadow Mistress/Master
+|-
+| Valess/Valuk  || female/male monarch (reference for non-Teir'Dal races)
+|-
+| ! style="background:rgba(180,184,194,0.6);" |Valsharess/Valsharuk || Q! style="background:rgba(180,184,194,0.6);" | Queen/King
+|-
+| Veldriss/Veldruk || Shadow Mistress/Master
+|-
+| ! style="background:rgba(180,184,194,0.6);" |Yathtallar  || ! style="background:rgba(180,184,194,0.6);" |High Priestess of Innoruuk
+|-
+| Shebali  || rogue, non-noble Teir'Dal
+|}
+
+
+
+'''PROFESSIONS'''
+
+{| cellspacing="0" cellpadding="4" width="80%" border="0" 
+|-
+| Abban || Agent
+|-
+|  ! style="background:rgba(180,184,194,0.6);" |Faeruk / Faeress / Faern ||  ! style="background:rgba(180,184,194,0.6);" |Caster (Wizard, Enchanter or Mage)
+|-
+| Elghinyrruk / Elghinyrress / Elghinyrrn  || Necromancer
+|-
+|  ! style="background:rgba(180,184,194,0.6);" |Ssins d'Aerth ||  ! style="background:rgba(180,184,194,0.6);" |Professional Entertainer (prostitute)
+|-
+| Velguk / Velgess / Velg'larn  || Assassin / Shadow Master
+|-
+|  ! style="background:rgba(180,184,194,0.6);" |Ul'Veldruk / Ul'Veldriss  ||  ! style="background:rgba(180,184,194,0.6);" |Arch Shadow Master/Mistress
+|-
+| Vel'Saruk / Vel'Saress / Vel'Sargtlin  ||Shadowknight
+|-
+|  ! style="background:rgba(180,184,194,0.6);" |Yathrin ||  ! style="background:rgba(180,184,194,0.6);" |Cleric
+|-
+|  Saruk / Saress / Sargtlin  ||  Warrior
+|-
+| ! style="background:rgba(180,184,194,0.6);" | Faerz'un'uk / Faerz'un'arr  || ! style="background:rgba(180,184,194,0.6);" | Seer/Seeress
+|-
+|  Ul'faerz'un'uk / Ul'faerz'un'arr  ||  Arch Seer/Seeress of the Spurned
+|}
+
+
+''Modifications to professions are placed before the name and can include:''
+
+
+{| cellspacing="0" cellpadding="4" width="60%" border="0" 
+|-
+| Qu'el' || Of a House
+|-
+| ! style="background:rgba(180,184,194,0.6);" |Ul' || ! style="background:rgba(180,184,194,0.6);" |Arch or Highest
+|-
+| Valshar' || Royal
+|-
+| ! style="background:rgba(180,184,194,0.6);" |Yath'  || ! style="background:rgba(180,184,194,0.6);" |Of the Temple
+|}
+
+
+''Examples:''
+
+Qu'el'Sargtlin = House Warrior
+
+Ul'Velg'larn = Arch Assassin
+
+Valshar'Faern = Royal Magic User
+
+Yath'Abban = Temple Agent
+
+
+
+'''HOUSE TITLES'''
+
+{| cellspacing="0" cellpadding="4" width="80%" border="0" 
+|-
+| Qu'abban  ||  House Agent
+|-
+| ! style="background:rgba(180,184,194,0.6);" | Qu'el'velguk / Qu'el'velgess / Qu'el'velgl'arn  || ! style="background:rgba(180,184,194,0.6);" |  House Assassin
+|-
+| Qu'el'faeruk / Qu'el'faeress / Qu'el'faern  ||  House Caster
+|-
+| ! style="background:rgba(180,184,194,0.6);" | Qu'el'saruk / Qu'el'saress / Qu'el'sargtilin  || ! style="background:rgba(180,184,194,0.6);" |  House Warrior
+|-
+| Qu'el'velsaruk / Qu'el'velsaress / Qu'el'velsargtilin  ||  House Shadowknight
+|-
+| ! style="background:rgba(180,184,194,0.6);" | Qu'el'elghinyrruk / Qu'el'elghinyrress / Qu'el'elghinyrrn  || ! style="background:rgba(180,184,194,0.6);" |  House Necromancer
+|-
+| Qu'el'arthruk / Qu'el'arthrin  ||  House Cleric
+|-
+| ! style="background:rgba(180,184,194,0.6);" | Ul'Velguk / Ul'Velgess / Ul'Velgl'arn  || ! style="background:rgba(180,184,194,0.6);" |  Arch Assassin
+|-
+| Ul'faeruk / Ul'faeress / Ul'faern  ||  Arch Caster
+|-
+| ! style="background:rgba(180,184,194,0.6);" | Ul'saruk / Ul'saress / Ul'sargtilin  || ! style="background:rgba(180,184,194,0.6);" |  Arch Warrior
+|-
+| Ul'velsaruk / Ul'velsaress / Ul'velsargtilin  ||  Arch Shadowknight
+|-
+| ! style="background:rgba(180,184,194,0.6);" | Ul'elghinyrruk / Ul'elghinyrress / Ul'elghinyrrn  || ! style="background:rgba(180,184,194,0.6);" |  Arch Liche/Necromancer
+|}
+
+
+
+'''RELIGIOUS TITLES'''
+
+{| cellspacing="0" cellpadding="4" width="60%" border="0" 
+|-
+| Yath'Abban  ||  Temple Agent
+|-
+| ! style="background:rgba(180,184,194,0.6);" | Yarthruk / Yathrin  || ! style="background:rgba(180,184,194,0.6);" |  Priest/Priestess of Innoruuk
+|-
+| Yarthtalluk / Yathtallar  ||  High Priest/Priestess of Innoruuk
+|-
+| ! style="background:rgba(180,184,194,0.6);" | Ul'athtalluk / Ul'athtallar  || ! style="background:rgba(180,184,194,0.6);" |  Arch Priest/Priestess of Innoruuk
+|-
+| Yochlol  ||  Handmaiden of Innoruuk
+|}
+
+
+
+'''IMPERIAL / ROYAL TITLES'''
+
+{| cellspacing="0" cellpadding="4" width="60%" border="0" 
+|-
+| Valshar'abban  ||  Imperial Agent
+|-
+| ! style="background:rgba(180,184,194,0.6);" | Valshar'velguk / Valshar'velgess / Valshar'velgl'arn  || ! style="background:rgba(180,184,194,0.6);" |  Imperial Assassin
+|-
+| Valshar'faeruk / Valshar'faeress / Valshar'faern  ||  Imperial Caster
+|-
+| ! style="background:rgba(180,184,194,0.6);" | Valshar'saruk / Valshar'saress / Valshar'sargtilin  || ! style="background:rgba(180,184,194,0.6);" |  Imperial Warrior
+|-
+| Valshar'velsaruk / Valshar'velsaress / Valshar'velsargtilin  ||  Imperial Shadowknight
+|-
+| ! style="background:rgba(180,184,194,0.6);" | Valshar'elghinyrruk/Valshar'elghinyrress/Valshar'elghinyrrn  || ! style="background:rgba(180,184,194,0.6);" |  Imperial Necromancer
+|-
+| Valshar'arthruk / Valshar'arthrin  ||  Imperial Priest
+|-
+| ! style="background:rgba(180,184,194,0.6);" | Valuk / Valess  || ! style="background:rgba(180,184,194,0.6);" |  Leader
+|-
+| Valshar'arn  ||  Imperator, Emperor
+|-
+| ! style="background:rgba(180,184,194,0.6);" | Valshar'aress  || ! style="background:rgba(180,184,194,0.6);" |  Imperess, Empress
+|-
+| Valsharuk  ||  King
+|-
+| ! style="background:rgba(180,184,194,0.6);" | Valsharess  || ! style="background:rgba(180,184,194,0.6);" |  Queen
+|}
+
+
+{| cellspacing="0" cellpadding="4" width="100%" border="0" 
+|-
+|align="right" |[[#top|Back to Top]]
+|}
+
+== General, Races ==
+
+{| cellspacing="0" cellpadding="4" width="50%" border="0" 
+|-
+|  ! style="background:rgba(189,193,199,0.6);" | Darthiir ||  ! style="background:rgba(189,193,199,0.6);" | surface elves (all non-Teir'Dal elves)
+|-
+| Feir'Dal || [[Wood_Elf|wood elf/elves]]
+|-
+| ! style="background:rgba(189,193,199,0.6);" |Gol ||! style="background:rgba(189,193,199,0.6);" | [[Clan_Runnyeye|goblin ''(Goln - goblins)'']]
+|-
+| Hargluk || [[Dwarf|dwarf ''(Harglukkin - dwarves)'']]
+|-
+| ! style="background:rgba(189,193,199,0.6);" |Koada'Dal ||! style="background:rgba(189,193,199,0.6);" | [[High_Elf|high elf/elves]]
+|-
+| Rivvil || [[Human|human ''(Rivvin - humans)]]'', [[Barbarian|barbarian]], [[Erudite|erudites]]
+|-
+| ! style="background:rgba(189,193,199,0.6);" |Sakphul ||! style="background:rgba(189,193,199,0.6);" | [[Halfling|halfling/halflings]]
+|-
+| Tagnik'zur || [[Veeshan|dragon/dragons]], [[Iksar|iksar]]
+|-
+| ! bgcolor="#B4BDCC" |Teir'Dal ||! bgcolor="#B4BDCC" | **[[Dark_Elf|Dark Elf/Elves]]
+|-
+| Tu'rilthiir || [[Half_Elf|half-elf/elves]]
+|-
+| ! style="background:rgba(189,193,199,0.6);" |Yingil  || ! style="background:rgba(189,193,199,0.6);" |[[Gnome|gnome ''(yingilin - gnomes)'']]
+|-
+| Duergar || velious/coldain dwarves
+|}
+
+
+{| cellspacing="0" cellpadding="4" width="100%" border="0" 
+|-
+|align="right" |[[#top|Back to Top]]
+|}
+
+== General, Directions ==
+
+[[Skill_Sense_Heading|Compass directions]]: 
+
+{| cellspacing="0" cellpadding="4" width="40%" border="0" 
+|-
+| East  ||  Luent
+|-
+| ! style="background:rgba(189,193,199,0.6);" |North  ||! style="background:rgba(189,193,199,0.6);" |  Trezen
+|-
+| Northeast  ||  Trez'nt
+|-
+| ! style="background:rgba(189,193,199,0.6);" |Northwest  ||! style="background:rgba(189,193,199,0.6);" |  Trez'in
+|-
+| South  ||  Werneth
+|-
+| ! style="background:rgba(189,193,199,0.6);" |Southeast  || ! style="background:rgba(189,193,199,0.6);" | Wern'nt
+|-
+| Southwest  ||  Wern'in
+|-
+| ! style="background:rgba(189,193,199,0.6);" |West  ||! style="background:rgba(189,193,199,0.6);" |  Linoin
+|}
+
+
+{| cellspacing="0" cellpadding="4" width="100%" border="0" 
+|-
+|align="right" |[[#top|Back to Top]]
+|}
+
+== General, Numbers ==
+
+
+{| cellspacing="0" cellpadding="4" width="50%" border="0" 
+|-
+| uss || '''one''' |||  ust || '''first'''
+|-
+| ! style="background:rgba(189,193,199,0.6);" |draa ||! style="background:rgba(189,193,199,0.6);" | '''two''' ||! style="background:rgba(189,193,199,0.6);" |  drada ||! style="background:rgba(189,193,199,0.6);" | '''second'''
+|-
+| llar || '''three''' |||  llarnbuss || '''third'''
+|-
+| ! style="background:rgba(189,193,199,0.6);" |quen ||! style="background:rgba(189,193,199,0.6);" | '''four''' ||! style="background:rgba(189,193,199,0.6);" |  quenar ||! style="background:rgba(189,193,199,0.6);" | '''fourth'''
+|-
+| huela || '''five''' |||  huelar || '''fifth'''
+|-
+| ! style="background:rgba(189,193,199,0.6);" |rraun ||! style="background:rgba(189,193,199,0.6);" | '''six''' ||! style="background:rgba(189,193,199,0.6);" |  rraunar ||! style="background:rgba(189,193,199,0.6);" | '''sixth'''
+|-
+| blyn || '''seven''' |||  blynar || '''seventh'''
+|-
+| ! style="background:rgba(189,193,199,0.6);" |lael ||! style="background:rgba(189,193,199,0.6);" | '''eight''' ||! style="background:rgba(189,193,199,0.6);" |  laelar ||! style="background:rgba(189,193,199,0.6);" | '''eighth'''
+|-
+| thal || '''nine''' |||  thalar || '''ninth'''
+|-
+| ! style="background:rgba(189,193,199,0.6);" |szith ||! style="background:rgba(189,193,199,0.6);" | '''ten''' ||! style="background:rgba(189,193,199,0.6);" |  szithar ||! style="background:rgba(189,193,199,0.6);" | '''tenth'''
+|-
+| szithus || '''eleven''' |||  szithusar || '''eleventh'''
+|-
+| ! style="background:rgba(189,193,199,0.6);" |szithdra ||! style="background:rgba(189,193,199,0.6);" | '''twelve''' ||! style="background:rgba(189,193,199,0.6);" |  szithdrar ||! style="background:rgba(189,193,199,0.6);" | '''twelfth'''
+|-
+| szithla || '''thirteen''' |||  szithlar || '''thirteenth'''
+|-
+| ! style="background:rgba(189,193,199,0.6);" |szithuen ||! style="background:rgba(189,193,199,0.6);" | '''fourteen''' ||! style="background:rgba(189,193,199,0.6);" |  szithuenar ||! style="background:rgba(189,193,199,0.6);" | '''fourteenth'''
+|-
+| szithuel || '''fifteen''' |||  szithuelar || '''fifteenth'''
+|-
+| ! style="background:rgba(189,193,199,0.6);" |szithraun ||! style="background:rgba(189,193,199,0.6);" | '''sixteen''' ||! style="background:rgba(189,193,199,0.6);" |  szithraunar ||! style="background:rgba(189,193,199,0.6);" | '''sixteenth'''
+|-
+| szithlyn || '''seventeen''' |||  szithlynar || '''seventeenth'''
+|-
+| ! style="background:rgba(189,193,199,0.6);" |szithael ||! style="background:rgba(189,193,199,0.6);" | '''eighteen''' ||! style="background:rgba(189,193,199,0.6);" |  szithaelar ||! style="background:rgba(189,193,199,0.6);" | '''eighteenth'''
+|-
+| szithal || '''nineteen''' |||  szithalar || '''nineteenth'''
+|-
+| ! style="background:rgba(189,193,199,0.6);" |draszith ||! style="background:rgba(189,193,199,0.6);" | '''twenty''' ||! style="background:rgba(189,193,199,0.6);" |  draszithar ||! style="background:rgba(189,193,199,0.6);" | '''twentieth'''
+|-
+| hueszith || '''fifty''' |||  hueszithar || '''fiftieth'''
+|-
+| ! style="background:rgba(189,193,199,0.6);" |ravhel ||! style="background:rgba(189,193,199,0.6);" | '''hundred''' ||! style="background:rgba(189,193,199,0.6);" |  ravhelar ||! style="background:rgba(189,193,199,0.6);" | '''hundredth'''
+|-
+| szithrel || '''thousand''' |||  szithrelar  || '''thousandth'''
+|}
+
+
+{| cellspacing="0" cellpadding="4" width="100%" border="0" 
+|-
+|align="right" |[[#top|Back to Top]]
+|}
+
+== Spoken, Common Words ==
+
+
+{| cellspacing="0" cellpadding="4" width="40%" border="0" 
+|-
+| olartae || ceremonial rod/staff
+|-
+|  ! style="background:rgba(189,193,199,0.6);" | orlenggin ||  ! style="background:rgba(189,193,199,0.6);" | sacrificial altar
+|-
+| orshal || sacrificial chalice
+|-
+|  ! style="background:rgba(189,193,199,0.6);" | orvelve ||  ! style="background:rgba(189,193,199,0.6);" | sacrificial dagger
+|-
+| qu'ilinsar || House insignia
+|-
+|  ! style="background:rgba(189,193,199,0.6);" | sithyrr ||  ! style="background:rgba(189,193,199,0.6);" | Teir'Dal assassination bow
+|}
+
+{| cellspacing="0" cellpadding="4" width="100%" border="0" 
+|-
+|align="right" |[[#top|Back to Top]]
+|}
+
+
+
+== Spoken, Common Phrases ==
+
+{| cellspacing="0" cellpadding="4" width="100%" border="0" 
+|-
+| !width="40%"| Vendui' || width="60%" |I/we greet you
+|-
+| ! style="background:rgba(189,193,199,0.6);" | Aluve' ||! style="background:rgba(189,193,199,0.6);" |  I/we leave you
+|-
+| Jal khaless zhah waela || All trust is foolish
+|-
+| ! style="background:rgba(189,193,199,0.6);" | Oloth zhah tuth abbil lueth ogglin ||! style="background:rgba(189,193,199,0.6);" |  Darkness is both friend and enemy
+|-
+| Xun izil dos phuul quarthen, lueth dro || Do as you are ordered, and live
+|-
+| ! style="background:rgba(189,193,199,0.6);" | Innoruuk tlu malla, jal ultrinnan zhah ukt xunin ||! style="background:rgba(189,193,199,0.6);" |  Innoruuk be praised; all victory is his doing
+|-
+| Ilharessen zhaunil alurl || Matrons know best
+|-
+| ! style="background:rgba(189,193,199,0.6);" | L'alurl velve zhal lil velkyn uss ||! style="background:rgba(189,193,199,0.6);" |  The best knife is the unseen one
+|-
+| Lil waela lueth vaela ragar brorna lueth wund nind, kyorlin elghinn || The foolish and unwary find surprises and among them, waiting death
+|-
+| ! style="background:rgba(189,193,199,0.6);" | Khaless nau uss mzild taga dosstan ||! style="background:rgba(189,193,199,0.6);" |  Trust no one more than yourself
+|-
+| Nindyn vel'uss kyorl nind ratha thalra elghinn dal l'alust || Those who watch their backs meet death from the front
+|-
+| ! style="background:rgba(189,193,199,0.6);" | Ulu z'hin maglust dal qu'ellar lueth valsharuk zhah ulu z'hin wund lil phalar ||! style="background:rgba(189,193,199,0.6);" |  To walk apart from House and King is to walk into the grave
+|-
+| Kyorl jal bauth, kyone, lueth lil quarval-sharuk xal balbau dos lil belbol del elendar dro || Watch all about, warily, and the God (Innoruuk) may give you the gift of continued life
+|-
+| ! style="background:rgba(189,193,199,0.6);" | Vel'uss zhaun alur taga lil quarval-sharuk? ||! style="background:rgba(189,193,199,0.6);" |  Who knows better than the God (Innoruuk)?
+|-
+| Zhaunil dal Waerr'ess || Knowledge from deceipt
+|-
+| ! style="background:rgba(189,193,199,0.6);" | Dal ultrinnan ulu el'inssrigg ||! style="background:rgba(189,193,199,0.6);" |  From victory to an inn (battle cry)
+|-
+| Ssinssrigg lueth Belaern || Lust and Profit (House of Pleasure motto)
+|-
+| ! style="background:rgba(189,193,199,0.6);" | Jiv'elgg lueth jiv'undus phuul jivvin ||! style="background:rgba(189,193,199,0.6);" |  Torture and pain are fun
+|-
+| Ssussun pholor dos! ''or'' Ssussun! (shortened) || Light upon you! (curse to Teir'Dal)
+|-
+| ! style="background:rgba(189,193,199,0.6);" | Oloth plynn dos! ''or'' Olot dos! (shortened) ||! style="background:rgba(189,193,199,0.6);" |  Darkness take you! (curse to non-Teir'Dal)
+|-
+| (House Name) ultrin! || (House Name) supreme! (battle cry)
+|-
+| ! style="background:rgba(189,193,199,0.6);" | A'dos quarth! ||! style="background:rgba(189,193,199,0.6);" |  At your command!
+|-
+| Innoruuk kyorl dos (d'jal) || Innoruuk guard you (you all)
+|-
+| ! style="background:rgba(189,193,199,0.6);" | Vith'os! ||! style="background:rgba(189,193,199,0.6);" |  (see "vith" and "dos")
+|-
+| Vith'ir! || (see "vith" and "tir")
+|}
+
+
+{| cellspacing="0" cellpadding="4" width="100%" border="0" 
+|-
+|align="right" |[[#top|Back to Top]]
+|}
+
+== Spoken, Common Proverbs ==
+
+{| cellspacing="0" cellpadding="4" width="80%" border="0" 
+|-
+|  L'alurl khalus abbil zhah dosstan || The best trusted friend is yourself
+|-
+| ! style="background:rgba(189,193,199,0.6);" |Khal wun dossta belaern ||! style="background:rgba(189,193,199,0.6);" | Trust in your wealth
+|-
+| Jala cahallin xal tlu elg'cahlin || Any food may be poison
+|-
+| ! style="background:rgba(189,193,199,0.6);" |Sargh lueth kyona phuul dro'xundus ||! style="background:rgba(189,193,199,0.6);" | Strength at arms and wariness are survival
+|-
+| L'elamshin d'lil Teir'Dal zhah ulu har'luth jal || The destiny of the Teir'Dal is to conquer all
+|-
+| ! style="background:rgba(189,193,199,0.6);" |L'elend zhah alurl ||! style="background:rgba(189,193,199,0.6);" | The traditional is best
+|-
+| L'alurl faerbol zhah mrimm (mrann) d'ssinss || The best magic item is a female (male) lover
+|-
+| ! style="background:rgba(189,193,199,0.6);" |L'alurl gol zhah elghinyrr gol ||! style="background:rgba(189,193,199,0.6);" | The best goblin is a dead goblin
+|}
+
+
+{| cellspacing="0" cellpadding="4" width="100%" border="0" 
+|-
+|align="right" |[[#top|Back to Top]]
+|}
+
+== Common to Drow ==
+
+{| cellspacing="0" cellpadding="4" width="80%" border="0"
+! colspan="2" | Common to Drow
+[[#CD_A|A]] [[#CD_B|B]] [[#CD_C|C]] [[#CD_D|D]] [[#CD_E|E]] [[#CD_F|F]] [[#CD_G|G]] [[#CD_H|H]] [[#CD_I|I]] [[#CD_J|J]] [[#CD_K|K]] [[#CD_L|L]] [[#CD_M|M]] [[#CD_N|N]] [[#CD_O|O]] [[#CD_P|P]] '''Q''' [[#CD_R|R]] [[#CD_S|S]] [[#CD_T|T]] [[#CD_U|U]] [[#CD_V|V]] [[#CD_W|W]] '''X''' '''Y''' '''Z'''
+|-
+| style="background:rgba(163,149,232,0.6);"| '''<span id="CD_A">A</span>'''  || align="right"  style="background:rgba(163,149,232,0.6);"| [[#top|Back to Top]] :: [[#Common_to_Drow|Back to Dictionary]] 
+|-
+| ''a''      || natha (seldom used) 
+|-
+|  style="background:rgba(194,194,194,0.6);"| ''about''      ||  style="background:rgba(194,194,194,0.6);"| bauth 
+|-
+| ''above''        || phor
+|-
+|  style="background:rgba(194,194,194,0.6);"| ''accomplish''  ||  style="background:rgba(194,194,194,0.6);"| xun 
+|-
+| ''accomplishment''  || xundus
+|-
+|  style="background:rgba(194,194,194,0.6);"| ''accomplishments''  ||  style="background:rgba(194,194,194,0.6);"| xundussa
+|-
+| ''achievement ''  ||  xundus
+|-
+| style="background:rgba(194,194,194,0.6);"|  ''achievements''  ||     style="background:rgba(194,194,194,0.6);"|  xundussa
+|-
+|  ''across''  ||      naudal
+|-
+| style="background:rgba(194,194,194,0.6);"| ''additional''  ||    style="background:rgba(194,194,194,0.6);"|  mzlin
+|-
+|  ''after''  ||      p'luin
+|-
+| style="background:rgba(194,194,194,0.6);"| ''against''  ||   style="background:rgba(194,194,194,0.6);"|   qua'laen
+|-
+|  ''agree''  ||      qua'l
+|-
+| style="background:rgba(194,194,194,0.6);"| ''agreement''  ||   style="background:rgba(194,194,194,0.6);"|   inthigg
+|-
+|  ''aim (goal)''  ||      ilindith
+|-
+| style="background:rgba(194,194,194,0.6);"| ''alert''  ||    style="background:rgba(194,194,194,0.6);"|  kyone
+|-
+|  ''alertly''  ||      kyone
+|-
+| style="background:rgba(194,194,194,0.6);"| ''alike''  ||     style="background:rgba(194,194,194,0.6);"| esaph
+|-
+|  ''alive''  ||      dro
+|-
+| style="background:rgba(194,194,194,0.6);"| ''all''  ||    style="background:rgba(194,194,194,0.6);"|  jal
+|-
+|  ''allure''  ||      ssinss
+|-
+| style="background:rgba(194,194,194,0.6);"| ''ally''  ||    style="background:rgba(194,194,194,0.6);"|  abban
+|-
+|  ''alone''  ||      maglust
+|-
+| style="background:rgba(194,194,194,0.6);"| ''also''  || style="background:rgba(194,194,194,0.6);"| mziln
+|-
+|  ''although''  ||  d'ril
+|-
+| style="background:rgba(194,194,194,0.6);"| ''am''  || style="background:rgba(194,194,194,0.6);"| uil
+|-
+|  ''ambush''  ||  thalack'vel 
+|-
+| style="background:rgba(194,194,194,0.6);"| ''among''  || style="background:rgba(194,194,194,0.6);"| wund
+|-
+|  ''amulet''  ||  ilinsar
+|-
+| style="background:rgba(194,194,194,0.6);"| ''and''  || style="background:rgba(194,194,194,0.6);"|  lueth
+|-
+|  ''another''  ||  jalbyr
+|-
+| style="background:rgba(194,194,194,0.6);"| ''any''  || style="background:rgba(194,194,194,0.6);"| jala
+|-
+|  ''anybody''  ||  jalkhel
+|-
+| style="background:rgba(194,194,194,0.6);"| ''anyone''  || style="background:rgba(194,194,194,0.6);"| jaluss
+|-
+|  ''anything''  ||  jalbol
+|-
+| style="background:rgba(194,194,194,0.6);"| ''apart''  ||style="background:rgba(194,194,194,0.6);"|  maglust
+|-
+|  ''apprentice''  ||  wanre
+|-
+| ''are''  || phuul
+|-
+| style="background:rgba(194,194,194,0.6);"| ''argument''  ||  style="background:rgba(194,194,194,0.6);"| qua'laelay
+|-
+| ''arm''  || da're
+|-
+|  style="background:rgba(194,194,194,0.6);"| ''armor''  || style="background:rgba(194,194,194,0.6);"|  ky'ostal
+|-
+| ''around''  ||   bauth
+|-
+|  style="background:rgba(194,194,194,0.6);"| ''arrest''  || style="background:rgba(194,194,194,0.6);"|  ply'uss
+|-
+| ''arrow''  || b'luth'ol
+|-
+|  style="background:rgba(194,194,194,0.6);"| ''as''  ||  style="background:rgba(194,194,194,0.6);"| izil
+|-
+| ''assassin''  || velg'larn 
+|-
+| style="background:rgba(194,194,194,0.6);"|  ''assassinate''  || style="background:rgba(194,194,194,0.6);"|  ol'elg
+|-
+| ''assassination''  || ol'elghinn
+|-
+|  style="background:rgba(194,194,194,0.6);"| ''at''  ||style="background:rgba(194,194,194,0.6);"|   a
+|-
+| ''attractive''  || ssin'urn
+|-
+| style="background:rgba(194,194,194,0.6);"|  ''avoid''  || style="background:rgba(194,194,194,0.6);"|  bautha
+|-
+| ''avoiding''  || bauthin
+|-
+| style="background:rgba(163,149,232,0.6);"| '''<span id="CD_B">B</span>'''  || align="right"  style="background:rgba(163,149,232,0.6);"| [[#top|Back to Top]] :: [[#Common_to_Drow|Back to Dictionary]]
+|-
+| ''back''  || rath
+|-
+| style="background:rgba(194,194,194,0.6);"| ''backs''  ||  style="background:rgba(194,194,194,0.6);"| ratha
+|-
+| '' backstab ''  || rath'elg
+|-
+| style="background:rgba(194,194,194,0.6);"| '' band ''  || style="background:rgba(194,194,194,0.6);"| akh
+|-
+| '' barrier ''  || kulggen  
+|-
+| style="background:rgba(194,194,194,0.6);"| '' battle ''  || style="background:rgba(194,194,194,0.6);"| thalack
+|-
+| '' battle-might ''  || sargh
+|-
+| style="background:rgba(194,194,194,0.6);"| '' be ''  || style="background:rgba(194,194,194,0.6);"| tlu
+|-
+| '' beauty ''  ||ssin 
+|-
+| style="background:rgba(194,194,194,0.6);"| '' beautiful ''  || style="background:rgba(194,194,194,0.6);"| ssin'urn
+|-
+| '' because ''  || p'wal
+|-
+| style="background:rgba(194,194,194,0.6);"| '' been ''  || style="background:rgba(194,194,194,0.6);"| tlus
+|-
+| '' before ''  || p'los
+|-
+| style="background:rgba(194,194,194,0.6);"| '' behind ''  || style="background:rgba(194,194,194,0.6);"| rathrae
+|-
+| '' below ''  || harl
+|-
+| style="background:rgba(194,194,194,0.6);"| '' beneath ''  || style="background:rgba(194,194,194,0.6);"| harl
+|-
+| '' beside ''  || tu'suul
+|-
+| style="background:rgba(194,194,194,0.6);"| '' best ''  || style="background:rgba(194,194,194,0.6);"| alurl
+|-
+| '' better ''  || alur
+|-
+| style="background:rgba(194,194,194,0.6);"| '' between ''  || style="background:rgba(194,194,194,0.6);"| tu'fyr
+|-
+| '' beware ''  || sarn
+|-
+| style="background:rgba(194,194,194,0.6);"| '' beyond ''  || style="background:rgba(194,194,194,0.6);"| tu'jol
+|-
+| '' birth ''  || ilhar
+|-
+| style="background:rgba(194,194,194,0.6);"| '' bitch ''  || style="background:rgba(194,194,194,0.6);"| elg'caress
+|-
+| '' bite ''  || tril
+|-
+| style="background:rgba(194,194,194,0.6);"| '' bitter ''  || style="background:rgba(194,194,194,0.6);"| riknueth
+|-
+| '' blade ''  || velve
+|-
+| style="background:rgba(194,194,194,0.6);"| '' bless ''  || style="background:rgba(194,194,194,0.6);"| bel'la
+|-
+| '' block ''  || kulg
+|-
+| style="background:rgba(194,194,194,0.6);"| '' blockage ''  || style="background:rgba(194,194,194,0.6);"| kulg
+|-
+| '' blood ''  || vlos
+|-
+| style="background:rgba(194,194,194,0.6);"| '' brazier ''  || style="background:rgba(194,194,194,0.6);"| linthre
+|-
+| '' break ''  || harventh
+|-
+| style="background:rgba(194,194,194,0.6);"| '' brother ''  || style="background:rgba(194,194,194,0.6);"| dalninuk
+|-
+| '' body ''  || khel
+|-
+| style="background:rgba(194,194,194,0.6);"| '' bond ''  || style="background:rgba(194,194,194,0.6);"| valm
+|-
+| '' book ''  || zhuan'ol
+|-
+| style="background:rgba(194,194,194,0.6);"| '' both ''  || style="background:rgba(194,194,194,0.6);"| tuth
+|-
+| '' bow ''  || b'luthyrr
+|-
+| style="background:rgba(194,194,194,0.6);"| '' bravery ''  || style="background:rgba(194,194,194,0.6);"| honglath
+|-
+| '' brightness ''  || ssussun
+|-
+| style="background:rgba(194,194,194,0.6);"| '' but ''  || style="background:rgba(194,194,194,0.6);"| jhal
+|-
+| '' by ''  || a
+|-
+| style="background:rgba(163,149,232,0.6);"| '''<span id="CD_C">C</span>'''  || align="right"  style="background:rgba(163,149,232,0.6);"| [[#top|Back to Top]] :: [[#Common_to_Drow|Back to Dictionary]]
+|-
+| '' calm''  || honglath
+|-
+| style="background:rgba(194,194,194,0.6);" | '' captive''  || style="background:rgba(194,194,194,0.6);" | kul'gobuss
+|-
+| '' capture''  || ply'uss
+|-
+| style="background:rgba(194,194,194,0.6);" | '' care ''  || style="background:rgba(194,194,194,0.6);" | kyon
+|-
+| '' careful''  || kyone
+|-
+| style="background:rgba(194,194,194,0.6);" | '' carefully''  || style="background:rgba(194,194,194,0.6);" | kyone
+|-
+| ''carefulness ''  || kyona
+|-
+| style="background:rgba(194,194,194,0.6);" | '' carrion''  || style="background:rgba(194,194,194,0.6);" | iblith
+|-
+| '' cast''  || luth
+|-
+| style="background:rgba(194,194,194,0.6);" | ''cattle ''  || style="background:rgba(194,194,194,0.6);" | rothe
+|-
+| '' cauldron''  || linth'el
+|-
+| style="background:rgba(194,194,194,0.6);" | '' caution (distrust)''  || style="background:rgba(194,194,194,0.6);" | ne'kales
+|-
+| '' caution (stealth)''  || olist
+|-
+| style="background:rgba(194,194,194,0.6);" | '' cave''  || style="background:rgba(194,194,194,0.6);" | har'ol
+|-
+| '' cavern''  || har'ol
+|-
+| style="background:rgba(194,194,194,0.6);" | '' chalice''  || style="background:rgba(194,194,194,0.6);" | shanaal
+|-
+| ''charm ''  || ssinss
+|-
+| style="background:rgba(194,194,194,0.6);" | '' chest''  || style="background:rgba(194,194,194,0.6);" | mamulen
+|-
+| '' child''  || dalhar
+|-
+| style="background:rgba(194,194,194,0.6);" | '' children''  || style="background:rgba(194,194,194,0.6);" | dalharen
+|-
+| '' city''  || che'el
+|-
+| style="background:rgba(194,194,194,0.6);" | '' climb''  || style="background:rgba(194,194,194,0.6);" | z'orr
+|-
+| '' cloak''  || piwafwi
+|-
+| style="background:rgba(194,194,194,0.6);" | '' coinage''  || style="background:rgba(194,194,194,0.6);" | belaern
+|-
+| '' cold''  || inthuul
+|-
+| style="background:rgba(194,194,194,0.6);" | '' come''  || style="background:rgba(194,194,194,0.6);" | doer
+|-
+| '' command''  || quarth
+|-
+| style="background:rgba(194,194,194,0.6);" | '' commanded''  || style="background:rgba(194,194,194,0.6);" | quarthen
+|-
+| '' commission''  || a'quarth
+|-
+| style="background:rgba(194,194,194,0.6);" | '' commissioned''  || style="background:rgba(194,194,194,0.6);" | a'quarthus
+|-
+| '' complain''  || elg'car
+|-
+| style="background:rgba(194,194,194,0.6);" | '' complaining''  || style="background:rgba(194,194,194,0.6);" | elg'carin
+|-
+| '' complete (n)''  || xundus
+|-
+| style="background:rgba(194,194,194,0.6);" | '' complete (v)''  || style="background:rgba(194,194,194,0.6);" | xun
+|-
+| '' comrade''  || abbil
+|-
+| style="background:rgba(194,194,194,0.6);" | '' concealment''  || style="background:rgba(194,194,194,0.6);" | veldrin
+|-
+| '' confrontation''  || qua'laelay
+|-
+| style="background:rgba(194,194,194,0.6);" | '' conquer''  || style="background:rgba(194,194,194,0.6);" | har'luth
+|-
+| '' conquering''  || ultrinnan
+|-
+| style="background:rgba(194,194,194,0.6);" | '' conqueror''  || style="background:rgba(194,194,194,0.6);" | ultrin
+|-
+| '' conqueror (Innoruuk)''  || ultrine
+|-
+| style="background:rgba(194,194,194,0.6);" | '' consider''  || style="background:rgba(194,194,194,0.6);" | talinth
+|-
+| '' considering''  || talinthin
+|-
+| style="background:rgba(194,194,194,0.6);" | '' conspiracy''  || style="background:rgba(194,194,194,0.6);" | olis'inth
+|-
+| '' continue''  || elendar
+|-
+| style="background:rgba(194,194,194,0.6);" | '' continued''  || style="background:rgba(194,194,194,0.6);" | elendar
+|-
+| '' continuing''  || elendarin
+|-
+| style="background:rgba(194,194,194,0.6);" | '' contribution''  || style="background:rgba(194,194,194,0.6);" | fielthal
+|-
+| '' council''  || talthalra
+|-
+| style="background:rgba(194,194,194,0.6);" | '' coup''  || style="background:rgba(194,194,194,0.6);" | olis'inthigg
+|-
+| '' coward''  || rath'arg
+|-
+| style="background:rgba(194,194,194,0.6);" | '' cowardice''  || style="background:rgba(194,194,194,0.6);" | rath'argh
+|-
+| '' create''  || beldro
+|-
+| style="background:rgba(194,194,194,0.6);" | '' cut''  || style="background:rgba(194,194,194,0.6);" | harventh
+|-
+| style="background:rgba(163,149,232,0.6);"| '''<span id="CD_D">D</span>'''  || align="right"  style="background:rgba(163,149,232,0.6);"| [[#top|Back to Top]] :: [[#Common_to_Drow|Back to Dictionary]]
+|-
+| ''dagger''  || velve
+|-
+| style="background:rgba(194,194,194,0.6);" | ''danger''  || style="background:rgba(194,194,194,0.6);" | sreen
+|-
+| ''dark''  || olath
+|-
+| style="background:rgba(194,194,194,0.6);" | ''darkness''  || style="background:rgba(194,194,194,0.6);" | oloth
+|-
+| ''dart''  || kyil
+|-
+| style="background:rgba(194,194,194,0.6);" | ''darts''  || style="background:rgba(194,194,194,0.6);" | kyilen
+|-
+| ''daughter''  || dalharil
+|-
+| style="background:rgba(194,194,194,0.6);" | ''dead''  || style="background:rgba(194,194,194,0.6);" | elghinyrr
+|-
+| ''death''  || elghinn
+|-
+| style="background:rgba(194,194,194,0.6);" | ''death (in Innoruuk's name)''  || style="background:rgba(194,194,194,0.6);" | streea
+|-
+| ''deceit''  || waerr'ess
+|-
+| style="background:rgba(194,194,194,0.6);" | ''dedicate''  || style="background:rgba(194,194,194,0.6);" | bel'la
+|-
+| ''despise''  || plith
+|-
+| style="background:rgba(194,194,194,0.6);" | ''destiny''  || style="background:rgba(194,194,194,0.6);" | ul-ilindith
+|-
+| ''destiny (of Innoruuk)''  || elamshin
+|-
+| style="background:rgba(194,194,194,0.6);" | ''destroy''  || style="background:rgba(194,194,194,0.6);" | elgg
+|-
+| ''did''  || xunus
+|-
+| style="background:rgba(194,194,194,0.6);" | ''die''  || style="background:rgba(194,194,194,0.6);" | el
+|-
+| ''different''  || endar
+|-
+| style="background:rgba(194,194,194,0.6);" | ''disagree''  || style="background:rgba(194,194,194,0.6);" | qua'lae
+|-
+| ''disagreement''  || qua'laelay
+|-
+| style="background:rgba(194,194,194,0.6);" | ''discover''  || style="background:rgba(194,194,194,0.6);" | ragar
+|-
+| ''dishonor''  || rath'argh
+|-
+| style="background:rgba(194,194,194,0.6);" | ''distrust (n)''  || style="background:rgba(194,194,194,0.6);" | ne'kales
+|-
+| ''distrust (v)''  || ne'kalsa
+|-
+| style="background:rgba(194,194,194,0.6);" | ''do''  || style="background:rgba(194,194,194,0.6);" | xun
+|-
+| ''dodge''  || bautha
+|-
+| style="background:rgba(194,194,194,0.6);" | ''dodging''  || style="background:rgba(194,194,194,0.6);" | bauthin
+|-
+| ''doing''  || xunin
+|-
+| style="background:rgba(194,194,194,0.6);" | ''dominance''  || style="background:rgba(194,194,194,0.6);" | z'ress
+|-
+| ''done''  || xunor
+|-
+| style="background:rgba(194,194,194,0.6);" | ''don't''  || style="background:rgba(194,194,194,0.6);" | xuat
+|-
+| ''door''  || obsul
+|-
+| style="background:rgba(194,194,194,0.6);" | ''down''  || style="background:rgba(194,194,194,0.6);" | harl
+|-
+| ''dragon''  || tagnik'zur
+|-
+| style="background:rgba(194,194,194,0.6);" | ''dwelling''  || style="background:rgba(194,194,194,0.6);" | el'lar
+|-
+| style="background:rgba(163,149,232,0.6);"| '''<span id="CD_E">E</span>'''  || align="right"  style="background:rgba(163,149,232,0.6);"| [[#top|Back to Top]] :: [[#Common_to_Drow|Back to Dictionary]]
+|-
+| ''each''  || weth
+|-
+| style="background:rgba(194,194,194,0.6);" | ''earth (element)''  || style="background:rgba(194,194,194,0.6);" | har'dro
+|-
+| ''eat''  || cal
+|-
+| style="background:rgba(194,194,194,0.6);" | ''effort''  || style="background:rgba(194,194,194,0.6);" | xund
+|-
+| ''either''  || usbyr
+|-
+| style="background:rgba(194,194,194,0.6);" | ''electricity''  || style="background:rgba(194,194,194,0.6);" | nizzre'
+|-
+| ''encounter''  || thalra
+|-
+| style="background:rgba(194,194,194,0.6);" | ''endure''  || style="background:rgba(194,194,194,0.6);" | elendar
+|-
+| ''enemy''  || ogglin
+|-
+| style="background:rgba(194,194,194,0.6);" | ''escape''  || style="background:rgba(194,194,194,0.6);" | do'bauth
+|-
+| ''escaping''  || do'bauthin
+|-
+| style="background:rgba(194,194,194,0.6);" | ''esp''  || style="background:rgba(194,194,194,0.6);" | z'talin
+|-
+| ''every''  || ril
+|-
+| style="background:rgba(194,194,194,0.6);" | ''everybody''  || style="background:rgba(194,194,194,0.6);" | rilkhel
+|-
+| ''everyone''  || riluss
+|-
+| style="background:rgba(194,194,194,0.6);" | ''everything''  || style="background:rgba(194,194,194,0.6);" | rilbol
+|-
+| ''evil''  || verin
+|-
+| style="background:rgba(194,194,194,0.6);" | ''excrement''  || style="background:rgba(194,194,194,0.6);" | iblith
+|-
+| ''expedition''  || z'hind
+|-
+| style="background:rgba(194,194,194,0.6);" | ''extra''  || style="background:rgba(194,194,194,0.6);" | mzlin
+|-
+| ''eye''  || sol
+|-
+| style="background:rgba(194,194,194,0.6);" | ''eyes''  || style="background:rgba(194,194,194,0.6);" | solen
+|-
+| style="background:rgba(163,149,232,0.6);"| '''<span id="CD_F">F</span>'''  || align="right"  style="background:rgba(163,149,232,0.6);"| [[#top|Back to Top]] :: [[#Common_to_Drow|Back to Dictionary]]
+|-
+| ''face''  || jindurn
+|-
+| style="background:rgba(194,194,194,0.6);" | ''facing''  || style="background:rgba(194,194,194,0.6);" | alust
+|-
+| ''father''  || ilharn
+|-
+| style="background:rgba(194,194,194,0.6);" | ''favor''  || style="background:rgba(194,194,194,0.6);" | elamshinae
+|-
+| ''fawn''  || s'lurpp
+|-
+| style="background:rgba(194,194,194,0.6);" | ''fawning''  || style="background:rgba(194,194,194,0.6);" | s'lurppin
+|-
+| ''fearless''  || streeaka
+|-
+| style="background:rgba(194,194,194,0.6);" | ''fearlessness''  || style="background:rgba(194,194,194,0.6);" | streeaka
+|-
+| ''female''  || jalil
+|-
+| style="background:rgba(194,194,194,0.6);" | ''few''  || style="background:rgba(194,194,194,0.6);" | stath
+|-
+| ''fighting''  || melee
+|-
+| style="background:rgba(194,194,194,0.6);" | ''fighting (magical)''  || style="background:rgba(194,194,194,0.6);" | melaer
+|-
+| ''find''  || ragar
+|-
+| style="background:rgba(194,194,194,0.6);" | ''fire''  || style="background:rgba(194,194,194,0.6);" | chath
+|-
+| ''flame''  || chath
+|-
+| style="background:rgba(194,194,194,0.6);" | ''flatter''  || style="background:rgba(194,194,194,0.6);" | s'lurpp
+|-
+| ''flattering''  || s'lurppin
+|-
+| style="background:rgba(194,194,194,0.6);" | ''flesh''  || style="background:rgba(194,194,194,0.6);" | siltrin
+|-
+| ''food''  || cahallin
+|-
+| style="background:rgba(194,194,194,0.6);" | ''fool''  || style="background:rgba(194,194,194,0.6);" | wael
+|-
+| ''foolish''  || waela
+|-
+| style="background:rgba(194,194,194,0.6);" | ''for''  || style="background:rgba(194,194,194,0.6);" | whol
+|-
+| ''force''  || z'ress
+|-
+| style="background:rgba(194,194,194,0.6);" | ''forefront''  || style="background:rgba(194,194,194,0.6);" | alust
+|-
+| ''forgive''  || nelgeth
+|-
+| style="background:rgba(194,194,194,0.6);" | ''forgiveness''  || style="background:rgba(194,194,194,0.6);" | nelgetha
+|-
+| ''friend''  || abbil
+|-
+| style="background:rgba(194,194,194,0.6);" | ''from''  || style="background:rgba(194,194,194,0.6);" | dal (often shortened to da')
+|-
+| ''fun''  || jivvin
+|-
+| style="background:rgba(194,194,194,0.6);"  | ''future''''  || style="background:rgba(194,194,194,0.6);"  | ulin
+|-
+ |  style="background:rgba(163,149,232,0.6);" |  '''<span id="CD_G">G</span>''' || align="right"  style="background:rgba(163,149,232,0.6);" |  [[#top|Back to Top]] :: [[#Common_to_Drow|Back to Dictionary]]
+|- 
+ |  ''gap'' || obsul
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''gem'' || style="background:rgba(194,194,194,0.6);" | eoul
+|- 
+ |  ''get'' || inbau
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''gift'' || style="background:rgba(194,194,194,0.6);" | belbol
+|- 
+ |  ''give'' || belbau
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''glass'' || style="background:rgba(194,194,194,0.6);" | shanaal
+|- 
+ |  ''go'' || alu
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''goal'' || style="background:rgba(194,194,194,0.6);" | ilindith
+|- 
+ |  ''goblet'' || shanaal
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''going'' || style="background:rgba(194,194,194,0.6);" | aluin
+|- 
+ |  ''god (generic)'' || quar'valshar
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''god (Innoruuk)'' || style="background:rgba(194,194,194,0.6);" | quarval-shar
+|- 
+ |  ''gone'' || alus
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''good'' || style="background:rgba(194,194,194,0.6);" | bwael
+|- 
+ |  ''grace (holy)'' || elamshinae
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''grace'' || style="background:rgba(194,194,194,0.6);" | suliss
+|- 
+ |  ''graceful'' || suliss'urn
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''grave (tomb)'' || style="background:rgba(194,194,194,0.6);" | phalar
+|- 
+ |  ''greed'' || ssinssrigg
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''group'' || style="background:rgba(194,194,194,0.6);" | akh
+|- 
+ |  ''guard'' || kyorl
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''guarding'' || style="background:rgba(194,194,194,0.6);" | kyorlin
+|- 
+ |  ''guide (n)'' || mrimm
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''guide (v)'' || style="background:rgba(194,194,194,0.6);" | mrigg
+|-
+ |  style="background:rgba(163,149,232,0.6);" |  '''<span id="CD_H">H</span>''' || align="right"  style="background:rgba(163,149,232,0.6);" |  [[#top|Back to Top]] :: [[#Common_to_Drow|Back to Dictionary]]
+|- 
+ |  ''had'' || inbalus
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''hag'' || style="background:rgba(194,194,194,0.6);" | elg'caress
+|- 
+ |  ''handsome'' || ssin'urn
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''have'' || style="background:rgba(194,194,194,0.6);" | inbal
+|- 
+ |  ''hate'' || phlith
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''he'' || style="background:rgba(194,194,194,0.6);" | uk
+|- 
+ |  ''head'' || karliik
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''heart'' || style="background:rgba(194,194,194,0.6);" | xukuth
+|- 
+ |  ''help'' || xxizz
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''her'' || style="background:rgba(194,194,194,0.6);" | ilta
+|- 
+ |  ''here'' || ghil
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''heresy'' || style="background:rgba(194,194,194,0.6);" | og'elendar
+|- 
+ |  ''heretic'' || og'elend
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''hers'' || style="background:rgba(194,194,194,0.6);" | ilt
+|- 
+ |  ''herself'' || iltan
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''hidden'' || style="background:rgba(194,194,194,0.6);" | velkyn
+|- 
+ |  ''highest'' || ultrin
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''highest (Innoruuk)'' || style="background:rgba(194,194,194,0.6);" | ultrine
+|- 
+ |  ''him'' || ukta
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''himself'' || style="background:rgba(194,194,194,0.6);" | uktan
+|- 
+ |  ''his'' || ukt
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''hit'' || style="background:rgba(194,194,194,0.6);" | zotreth
+|- 
+ |  ''hitch'' || kulg
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''hold'' || style="background:rgba(194,194,194,0.6);" |  mir
+|- 
+ |  ''holy'' || orthae
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''honor'' || style="background:rgba(194,194,194,0.6);" | bel'la
+|- 
+ |  ''hot'' || sseren
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''house (noble)'' || style="background:rgba(194,194,194,0.6);" | qu'ellar
+|- 
+ |  ''house (non-noble)'' || el'lar
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''hurl'' || style="background:rgba(194,194,194,0.6);" | luth
+|-
+ |  style="background:rgba(163,149,232,0.6);" |  '''<span id="CD_I">I</span>''' || align="right"  style="background:rgba(163,149,232,0.6);" |  [[#top|Back to Top]] :: [[#Common_to_Drow|Back to Dictionary]]
+|- 
+ |  ''i'' || usstan
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''if'' || style="background:rgba(194,194,194,0.6);" | ka
+|- 
+ |  ''imperial'' || valsharen
+|- 
+ | style="background:rgba(194,194,194,0.6);" |  ''in'' || style="background:rgba(194,194,194,0.6);" | wun
+|- 
+ |  ''incense'' || cha'ol
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''inn'' || style="background:rgba(194,194,194,0.6);" | el'inssrigg
+|- 
+ |  ''inside'' || wu'suul
+|- 
+ | style="background:rgba(194,194,194,0.6);" |  ''inspiration'' || style="background:rgba(194,194,194,0.6);" | mrimm
+|- 
+ |  ''inspire'' || mrigg
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''institute'' || style="background:rgba(194,194,194,0.6);" | magthere
+|- 
+ |  ''instrument'' || velnarin
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''intelligence (recon)'' || style="background:rgba(194,194,194,0.6);" | vel'xundussa
+|- 
+ |  ''intelligent'' || ne'kalsa
+|- 
+ | style="background:rgba(194,194,194,0.6);" |  ''intercourse (slang)'' || style="background:rgba(194,194,194,0.6);" |  vith
+|- 
+ |  ''into'' || wund
+|- 
+ | style="background:rgba(194,194,194,0.6);" |  ''invisible'' || style="background:rgba(194,194,194,0.6);" | velkyn
+|- 
+ |  ''is'' || zhah
+|- 
+ | style="background:rgba(194,194,194,0.6);" |  ''it'' || style="background:rgba(194,194,194,0.6);" | ol
+|- 
+ |  ''its'' || olt
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''itself'' || style="background:rgba(194,194,194,0.6);" | oltan
+|- 
+ |  ''item'' || bol
+|-
+ |  style="background:rgba(163,149,232,0.6);" |  '''<span id="CD_J">J</span>''' || align="right"  style="background:rgba(163,149,232,0.6);" |  [[#top|Back to Top]] :: [[#Common_to_Drow|Back to Dictionary]]
+|-
+ |  ''javelin'' || luth'ol
+|- 
+ | style="background:rgba(194,194,194,0.6);" |  ''join'' || style="background:rgba(194,194,194,0.6);" | valm
+|- 
+ |  ''journey'' || z'hind
+|-
+ |  style="background:rgba(163,149,232,0.6);" |  '''<span id="CD_K">K</span>''' || align="right"  style="background:rgba(163,149,232,0.6);" |  [[#top|Back to Top]] :: [[#Common_to_Drow|Back to Dictionary]]
+|-
+ |  ''key'' || mrim'ol
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''kidnap'' || style="background:rgba(194,194,194,0.6);" | ply'usaerth
+|- 
+ |  ''kill'' || elgg
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''kneel'' ||style="background:rgba(194,194,194,0.6);" |  harl'il'cik
+|- 
+ |  ''knife'' || velve
+|- 
+ | style="background:rgba(194,194,194,0.6);" |  ''know'' || style="background:rgba(194,194,194,0.6);" | zhaun
+|- 
+ |  ''knowledge'' || zhaunil
+|-
+ |  style="background:rgba(163,149,232,0.6);" |  '''<span id="CD_L">L</span>''' || align="right"  style="background:rgba(163,149,232,0.6);" |  [[#top|Back to Top]] :: [[#Common_to_Drow|Back to Dictionary]]
+|-
+ |  ''large'' || izznarg
+|- 
+ | style="background:rgba(194,194,194,0.6);" |  ''learn'' || style="background:rgba(194,194,194,0.6);" |  zhaun
+|- 
+ |  ''leg'' || da'ur
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''life'' || style="background:rgba(194,194,194,0.6);" | dro
+|- 
+ |  ''light'' || ssussun
+|- 
+ | style="background:rgba(194,194,194,0.6);" |  ''lightning'' || style="background:rgba(194,194,194,0.6);" |  nizzre'
+|- 
+ |  ''like'' || saph
+|- 
+ | style="background:rgba(194,194,194,0.6);" |  ''Innoruuk's power/servants'' ||style="background:rgba(194,194,194,0.6);" |  yorn
+|- 
+ |  ''Innoruuk's will'' || elamshin
+|- 
+ | style="background:rgba(194,194,194,0.6);" |  ''location'' || style="background:rgba(194,194,194,0.6);" |  k'lar
+|- 
+ |  ''lock (n)'' || mri'kul
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''lock (v)'' || style="background:rgba(194,194,194,0.6);" | mri'kul
+|- 
+ |  ''lost'' || noamuth
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''love'' ||style="background:rgba(194,194,194,0.6);" |  ssinssrigg
+|- 
+ |  ''lover (female)'' || mrimm d'ssinss
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''lover (male)'' || style="background:rgba(194,194,194,0.6);" | mrann d'ssinss
+|- 
+ |  ''loving'' || ssinssriggin
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''lust'' ||style="background:rgba(194,194,194,0.6);" |  ssinssrigg
+|- 
+ |  ''lusting'' || ssinssriggin
+|-
+ |  style="background:rgba(163,149,232,0.6);" |  '''<span id="CD_M">M</span>''' || align="right"  style="background:rgba(163,149,232,0.6);" |  [[#top|Back to Top]] :: [[#Common_to_Drow|Back to Dictionary]]
+|-
+ |  ''mage'' || faern
+|- 
+ | style="background:rgba(194,194,194,0.6);" |  ''magic'' ||style="background:rgba(194,194,194,0.6);" |  faer
+|- 
+ |  ''magic item'' || faerbol
+|- 
+ | style="background:rgba(194,194,194,0.6);" |  ''magical'' ||style="background:rgba(194,194,194,0.6);" |  faerl
+|- 
+ |  ''male'' || jaluk
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''many'' ||style="background:rgba(194,194,194,0.6);" |  mzil
+|- 
+ |  ''may'' || xal
+|- 
+ | style="background:rgba(194,194,194,0.6);" |  ''me'' ||style="background:rgba(194,194,194,0.6);" |  ussa
+|- 
+ |  ''medallion'' || ilinsar
+|- 
+ | style="background:rgba(194,194,194,0.6);" |  ''meet'' || style="background:rgba(194,194,194,0.6);" | thalra
+|- 
+ |  ''meeting'' || talthalra
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''memory'' || style="background:rgba(194,194,194,0.6);" | zha'linth
+|- 
+ |  ''mine'' || usst
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''monster'' || style="background:rgba(194,194,194,0.6);" | phindar
+|- 
+ |  ''more'' || mzild
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''most'' || style="background:rgba(194,194,194,0.6);" | mzilst
+|- 
+ |  ''mother'' || ilhar
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''much'' || style="background:rgba(194,194,194,0.6);" | mzilt
+|- 
+ |  ''music'' || ssinsuurul
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''my'' || style="background:rgba(194,194,194,0.6);" | ussta
+|- 
+ |  ''myself'' || usstan
+|-
+ |  style="background:rgba(163,149,232,0.6);" |  '''<span id="CD_N">N</span>''' || align="right"  style="background:rgba(163,149,232,0.6);" |  [[#top|Back to Top]] :: [[#Common_to_Drow|Back to Dictionary]]
+|-
+ |  ''neither'' || nausbyr
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''neutral'' || style="background:rgba(194,194,194,0.6);" | noalith
+|- 
+ |  ''no'' || nau
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''nobody'' || style="background:rgba(194,194,194,0.6);" | naukhel
+|- 
+ |  ''none'' || naust
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''not'' || style="background:rgba(194,194,194,0.6);" | naut
+|- 
+ |  ''nothing'' || naubol
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''now'' || style="background:rgba(194,194,194,0.6);" | nin
+|-
+ |  style="background:rgba(163,149,232,0.6);" |  '''<span id="CD_O">O</span>''' || align="right"  style="background:rgba(163,149,232,0.6);" |  [[#top|Back to Top]] :: [[#Common_to_Drow|Back to Dictionary]]
+|- 
+ |  ''of'' || del (often shortened to d')
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''off'' || style="background:rgba(194,194,194,0.6);" | tir
+|- 
+ |  ''offal'' || iblith
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''old'' || style="background:rgba(194,194,194,0.6);" | zhuanth
+|- 
+ |  ''on'' || pholor
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''onto'' || style="background:rgba(194,194,194,0.6);" | pholod
+|- 
+ |  ''opening'' || obsul
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''opponent'' || style="background:rgba(194,194,194,0.6);" | ogglin
+|- 
+ |  ''oppose'' || ogglir
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''opposing'' || style="background:rgba(194,194,194,0.6);" | ogglirin
+|- 
+ |  ''opposite'' || indarae
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''or'' || style="background:rgba(194,194,194,0.6);" | xor
+|- 
+ |  ''other'' || byr
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''our'' || style="background:rgba(194,194,194,0.6);" | udossta
+|- 
+ |  ''ours'' || udosst
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''ourselves'' || style="background:rgba(194,194,194,0.6);" | udosstan
+|- 
+ |  ''out'' || doeb
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''outcast'' || style="background:rgba(194,194,194,0.6);" | dobluth
+|- 
+ |  ''outside'' || do'suul
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''over'' || style="background:rgba(194,194,194,0.6);" | phor
+|-
+ |  style="background:rgba(163,149,232,0.6);" |  '''<span id="CD_P">P</span>''' || align="right"  style="background:rgba(163,149,232,0.6);" |  [[#top|Back to Top]] :: [[#Common_to_Drow|Back to Dictionary]]
+|-
+ |  ''pain'' || jiv'undus
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''pardon'' || style="background:rgba(194,194,194,0.6);" | nelgetha
+|- 
+ |  ''pariah'' || dobluth
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''passion'' || style="background:rgba(194,194,194,0.6);" | ssinssrigg
+|- 
+ |  ''past (time)'' || zhahn
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''path'' || style="background:rgba(194,194,194,0.6);" | colbauth
+|- 
+ |  ''perhaps'' || xal
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''piracy'' || style="background:rgba(194,194,194,0.6);" | op'elgin
+|- 
+ |  ''pirate'' || op'elg
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''place'' || style="background:rgba(194,194,194,0.6);" | k'lar
+|- 
+ |  ''plan'' || inth
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''plane'' || style="background:rgba(194,194,194,0.6);" | zik'den'vever
+|- 
+ |  ''platter'' || lintaguth
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''play'' || style="background:rgba(194,194,194,0.6);" | jivvin
+|- 
+ |  ''plot'' || olis'inth
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''poison (n)'' || style="background:rgba(194,194,194,0.6);" | elg'cahl
+|- 
+ |  ''poison (v)'' || elg'cahal
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''power'' || style="background:rgba(194,194,194,0.6);" | z'ress
+|- 
+ |  ''praise'' || bel'la
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''prevail'' || style="background:rgba(194,194,194,0.6);" | ultrinnan
+|- 
+ |  ''present (time)'' || nin
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''prison'' || style="background:rgba(194,194,194,0.6);" | kul'gobsula
+|- 
+ |  ''prisoner'' || kul'gobuss
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''profit'' || style="background:rgba(194,194,194,0.6);" | belaern
+|- 
+ |  ''punch'' || zotreth
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''punish'' || style="background:rgba(194,194,194,0.6);" | sarn'elgg
+|-
+ |  style="background:rgba(163,149,232,0.6);" |  '''<span id="CD_R">R</span>''' || align="right"  style="background:rgba(163,149,232,0.6);" |  [[#top|Back to Top]] :: [[#Common_to_Drow|Back to Dictionary]]
+|-
+ |  ''raid'' || thalackz'hind
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''ransom'' || style="background:rgba(194,194,194,0.6);" | ply'usaerth
+|- 
+ |  ''reckless'' || streeaka
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''recklessness'' || style="background:rgba(194,194,194,0.6);" | streeaka
+|- 
+ |  ''reconnaissance'' || vel'xundussa
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''remove'' || style="background:rgba(194,194,194,0.6);" | drewst
+|- 
+ |  ''ride'' || z'har
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''rival (n)'' || style="background:rgba(194,194,194,0.6);" | ogglin
+|- 
+ |  ''rival (v)'' || ogglir
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''rivaling'' || style="background:rgba(194,194,194,0.6);" | ogglirin
+|- 
+ |  ''royal'' || valsharen
+|-
+ |  style="background:rgba(194,194,194,0.6);" | '' royal seal'' || style="background:rgba(194,194,194,0.6);" | sharulg
+|- 
+ |  ''ruse'' || golhyrr
+|-
+ |  style="background:rgba(163,149,232,0.6);" |  '''<span id="CD_S">S</span>''' || align="right"  style="background:rgba(163,149,232,0.6);" |  [[#top|Back to Top]] :: [[#Common_to_Drow|Back to Dictionary]]
+|- 
+ |  ''sacred'' || orthae
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''safe'' || style="background:rgba(194,194,194,0.6);" | sreen'aur
+|- 
+ |  ''safety'' || sreen'aur
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''scheme'' || style="background:rgba(194,194,194,0.6);" | inth
+|- 
+ |  ''school'' || magthere
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''scourge'' || style="background:rgba(194,194,194,0.6);" | elgluth
+|- 
+ |  ''scroll'' || narkuth
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''security'' || style="background:rgba(194,194,194,0.6);" | vel'xundussa
+|- 
+ |  ''seduction'' || ssinss
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''seize'' || style="background:rgba(194,194,194,0.6);" | plynn
+|- 
+ |  ''servant'' || wanre
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''sever'' || style="background:rgba(194,194,194,0.6);" | harventh
+|- 
+ |  ''several'' || blynol
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''sex'' || style="background:rgba(194,194,194,0.6);" | vith
+|- 
+ |  ''shadows'' || veldrin
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''shall'' || style="background:rgba(194,194,194,0.6);" | zhal
+|- 
+ |  ''she'' || il
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''shield'' || style="background:rgba(194,194,194,0.6);" | kulggen
+|- 
+ |  ''side'' || suul
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''silence'' || style="background:rgba(194,194,194,0.6);" | venorsh
+|- 
+ |  ''silent'' || venorik
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''since'' || style="background:rgba(194,194,194,0.6);" | yol
+|- 
+ |  ''similar'' || indar
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''sister'' || style="background:rgba(194,194,194,0.6);" | dalninil
+|- 
+ |  ''skin'' || waess
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''slave'' || style="background:rgba(194,194,194,0.6);" | rothe
+|- 
+ |  ''slay'' || elgg
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''small'' || style="background:rgba(194,194,194,0.6);" | inlul
+|- 
+ |  ''smart'' || ne'kalsa
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''snag'' || style="background:rgba(194,194,194,0.6);" | kulg
+|- 
+ |  ''so'' || ji
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''some'' || style="background:rgba(194,194,194,0.6);" | fol
+|- 
+ |  ''somebody'' || folkhel
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''someone'' || style="background:rgba(194,194,194,0.6);" | foluss
+|- 
+ |  ''something'' || folbol
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''son'' || style="background:rgba(194,194,194,0.6);" | dalharuk
+|- 
+ |  ''spear'' || luth'ol
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''spell'' || style="background:rgba(194,194,194,0.6);" | faerz'undus
+|- 
+ |  ''spell book'' || faerz'ol
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''spider'' || style="background:rgba(194,194,194,0.6);" | orbb
+|- 
+ |  ''spy (n)'' || vel'xunyrr
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''spy (v)'' || style="background:rgba(194,194,194,0.6);" | vel'xunyrr
+|- 
+ |  ''steal'' || olplynir
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''stealth'' || style="background:rgba(194,194,194,0.6);" | olist
+|- 
+ |  ''stratagem'' || inth
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''strength'' || style="background:rgba(194,194,194,0.6);" | z'ress
+|- 
+ |  ''strength-at-arms'' || sargh
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''strike'' || style="background:rgba(194,194,194,0.6);" | zotreth
+|- 
+ |  ''strip'' || raldar
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''striving'' || style="background:rgba(194,194,194,0.6);" | xund
+|- 
+ |  ''subjugate'' || har'luth
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''such'' || style="background:rgba(194,194,194,0.6);" | folt
+|- 
+ |  ''suicide'' || streea
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''superior'' || style="background:rgba(194,194,194,0.6);" | alur
+|- 
+ |  ''supreme'' || ultrin
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''supreme (Innoruuk)'' || style="background:rgba(194,194,194,0.6);" | ultrine
+|- 
+ |  ''surprise'' || brorn
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''surprises'' || style="background:rgba(194,194,194,0.6);" | brorna
+|- 
+ |  ''survival'' || dro'xundus
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''survive'' || style="background:rgba(194,194,194,0.6);" | dro'xun
+|- 
+ |  ''sweet'' || ssinjin
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''sword'' || style="background:rgba(194,194,194,0.6);" | velve
+|- 
+ |  ''sycophant'' || s'lurppuk
+|-
+ |  style="background:rgba(163,149,232,0.6);" |  '''<span id="CD_T">T</span>''' || align="right"  style="background:rgba(163,149,232,0.6);" |  [[#top|Back to Top]] :: [[#Common_to_Drow|Back to Dictionary]]
+|-
+ |  ''take'' || plynn
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''tavern'' || style="background:rgba(194,194,194,0.6);" | el'inssrigg
+|- 
+ |  ''telepathy'' || z'talin
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''temple'' || style="background:rgba(194,194,194,0.6);" | yath (property, work or decree)
+|- 
+ |  ''than'' || taga
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''thank'' || style="background:rgba(194,194,194,0.6);" | bel'la
+|- 
+ |  ''that'' || nindel
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''the'' || style="background:rgba(194,194,194,0.6);" | lil
+|- 
+ |  ''their'' || ninta
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''theirs'' || style="background:rgba(194,194,194,0.6);" | nint
+|- 
+ |  ''them'' || nina
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''themselves'' || style="background:rgba(194,194,194,0.6);" | nintan
+|- 
+ |  ''there'' || gaer
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''these'' || style="background:rgba(194,194,194,0.6);" | nindolen
+|- 
+ |  ''they'' || nind
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''then'' || style="background:rgba(194,194,194,0.6);" | zhahn
+|- 
+ |  ''thief'' || olplyn
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''thieving'' || style="background:rgba(194,194,194,0.6);" | op'elgin
+|- 
+ |  ''thing'' || bol
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''think'' || style="background:rgba(194,194,194,0.6);" | talinth
+|- 
+ |  ''this'' || nindol
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''those'' || style="background:rgba(194,194,194,0.6);" | nindyn
+|- 
+ |  ''throat'' || rinteith
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''throne'' || style="background:rgba(194,194,194,0.6);" | sharorr
+|- 
+ |  ''throw'' || luth
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''time'' || style="background:rgba(194,194,194,0.6);" | draeval
+|- 
+ |  ''to'' || ulu
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''together'' || style="background:rgba(194,194,194,0.6);" | ul'naus
+|- 
+ |  ''torture'' || jiv'elgg
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''toward'' || style="background:rgba(194,194,194,0.6);" | ulan
+|- 
+ |  ''traditional'' || elend
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''traitor'' || style="background:rgba(194,194,194,0.6);" | og'elend
+|- 
+ |  ''trap'' || golhyrr
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''trapdoor'' || style="background:rgba(194,194,194,0.6);" | obsu'arl
+|- 
+ |  ''treason'' || og'elendar
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''treasure'' || style="background:rgba(194,194,194,0.6);" | belaern
+|- 
+ |  ''treatise'' || zhuan'ol
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''treaty'' || style="background:rgba(194,194,194,0.6);" | inthigg
+|- 
+ |  ''trick'' || golhyrr
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''trip'' || style="background:rgba(194,194,194,0.6);" | z'hind
+|- 
+ |  ''trust (n)'' || khaless
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''trust (v)'' || style="background:rgba(194,194,194,0.6);" | khal
+|-
+ |  style="background:rgba(163,149,232,0.6);" |  '''<span id="CD_U">U</span>''' || align="right"  style="background:rgba(163,149,232,0.6);" |  [[#top|Back to Top]] :: [[#Common_to_Drow|Back to Dictionary]]
+|-
+ |  ''unaware'' || waela
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''uncover'' || style="background:rgba(194,194,194,0.6);" | ragar
+|- 
+ |  ''under'' || harl
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''underdark'' || style="background:rgba(194,194,194,0.6);" | har'oloth
+|- 
+ |  ''unknown'' || noamuth
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''unseen'' || style="background:rgba(194,194,194,0.6);" | velkyn
+|- 
+ |  ''until'' || hwuen
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''up'' || style="background:rgba(194,194,194,0.6);" | phor
+|- 
+ |  ''upon'' || pholor
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''us'' || style="background:rgba(194,194,194,0.6);" | udossa
+|- 
+ |  ''usual'' || elend
+|-
+ |  style="background:rgba(163,149,232,0.6);" |  '''<span id="CD_V">V</span>''' || align="right"  style="background:rgba(163,149,232,0.6);" |  [[#top|Back to Top]] :: [[#Common_to_Drow|Back to Dictionary]]
+|- 
+ |  ''valor'' || sargh
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''victory'' || style="background:rgba(194,194,194,0.6);" | ultrinnan
+|-
+ |  style="background:rgba(163,149,232,0.6);" |  '''<span id="CD_W">W</span>''' || align="right"  style="background:rgba(163,149,232,0.6);" |  [[#top|Back to Top]] :: [[#Common_to_Drow|Back to Dictionary]]
+|-
+ |  ''wait'' || kyorl
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''waiting'' || style="background:rgba(194,194,194,0.6);" | kyorlin
+|- 
+ |  ''walk'' || z'hin
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''wanderer'' || style="background:rgba(194,194,194,0.6);" | noamuth
+|- 
+ |  ''war'' || thalack
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''wards'' || style="background:rgba(194,194,194,0.6);" | ky'ov'aer
+|- 
+ |  ''wariness'' || kyona
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''warning'' || style="background:rgba(194,194,194,0.6);" | sarn
+|- 
+ |  ''wary'' || kyone
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''was'' || style="background:rgba(194,194,194,0.6);" | zhahus
+|- 
+ |  ''watch'' || kyorl
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''watchful'' || style="background:rgba(194,194,194,0.6);" | kyorl'urn
+|- 
+ |  ''watching'' || kyorlin
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''water'' || style="background:rgba(194,194,194,0.6);" | niar
+|- 
+ |  ''way'' || colbauth
+|- 
+ |  style="background:rgba(194,194,194,0.6);" | ''we'' || style="background:rgba(194,194,194,0.6);" | udos
+|- 
+ |  ''wealth'' || belaern
+|}
+
+{| cellspacing="0" cellpadding="4" width="100%" border="0" 
+|-
+|align="right" |[[#top|Back to Top]]
+|}
+
+== Drow to Common ==
+
+
+{| cellspacing="0" cellpadding="4" width="80%" border="0"
+! colspan="2" | Drow to Common
+[[#DC_A|A]] [[#DC_B|B]] [[#DC_C|C]] [[#DC_D|D]] [[#DC_E|E]] [[#DC_F|F]] [[#DC_G|G]] [[#DC_H|H]] [[#DC_I|I]] [[#DC_J|J]] [[#DC_K|K]] [[#DC_L|L]] [[#DC_M|M]] [[#DC_N|N]] [[#DC_O|O]] [[#DC_P|P]] [[#DC_Q|Q]] [[#DC_R|R]] [[#DC_S|S]] [[#DC_T|T]] [[#DC_U|U]] [[#DC_V|V]] [[#DC_W|W]] [[#DC_X|X]] [[#DC_DC_Y|Y]] [[#DC_DC_Z|Z]] 
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_A">A</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|-
+ |  valign=top width="30%"  | ''a''   ||  valign=top  | at, by
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''a'quarth''   ||   style="background:rgba(194,194,194,0.6);"   valign=top  | commission
+|- 
+ |  valign=top  | ''a'quarthus''   ||   valign=top  | commissioned
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''abban''   ||    style="background:rgba(194,194,194,0.6);"  valign=top  | ally, not-enemy
+|- 
+ |  valign=top  | ''abbil''   ||    valign=top  | comrade, "trusted" friend
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''akh''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | band, group
+|- 
+ |  valign=top  | ''al''   ||   valign=top  | well
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''alu''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | go
+|- 
+ |  valign=top  | ''aluin''   ||   valign=top  | going
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''alur''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | better, superior
+|- 
+ |  valign=top  | ''alurl''   ||  valign=top  | best, foremost
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''alus''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | went, gone
+|- 
+ |  valign=top  | ''alust''   ||  valign=top  | in front, facing, in the forefront
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''asanque''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | likewise, as you wish
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_B">B</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|-
+ |  valign=top  | ''bauth''   ||  valign=top  | around, about
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''bautha''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | dodge, to dodge
+|- 
+ |  valign=top  | ''bauthin''   ||  valign=top  | dodging, avoiding
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''belaern''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | wealth, coinage, treasure, profit
+|- 
+ |  valign=top  | ''belbau''   ||  valign=top  | to give
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''belbol''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | gift
+|- 
+ |  valign=top  | ''beldro''   ||  valign=top  | to create
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''bel'la''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | to honor, to dedicate, to praise, to thank, to bless
+|- 
+ |  valign=top  | ''b'luth'ol''   ||  valign=top  | arrow
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''b'luthyrr''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | bow
+|- 
+ |  valign=top  | ''blynol''   ||  valign=top  | several
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''bol''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | (unknown, unidentified, mysterious or important)
+|- 
+ |  valign=top  | ''brorn''   ||  valign=top  | surprise
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''brorna''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | surprises
+|- 
+ |  valign=top  | ''bwael''   ||  valign=top  | good, a good person
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''byr''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | other
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_C">C</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|-
+ |  valign=top  | ''cal''   ||  valign=top  | eat
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''cahallin''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | food (produce or harvest, including raid-spoils, but not hunted game or cooking)
+|- 
+ |  valign=top  | ''cha'ol''   ||  valign=top  | incense
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''chath''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | fire, flame
+|- 
+ |  valign=top  | ''che'el''   ||  valign=top  | city (generic)
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''colbauth''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | path, known way
+|- 
+ |  valign=top  | ''colnbluth''   ||  valign=top  | outsider, non-drow
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_D">D</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|-
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''d'ril''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | although
+|- 
+ |  valign=top  | ''da're''   ||  valign=top  | arm
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''da'ur''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | leg
+|- 
+ |  valign=top  | ''dal''   ||  valign=top  | from (sometimes shortened to da')
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''dalhar''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | child
+|- 
+ |  valign=top  | ''dalharen''   ||  valign=top  | children
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''dalharil''   ||    style="background:rgba(194,194,194,0.6);"  valign=top  | daughter
+|- 
+ |  valign=top  | ''dalharuk''   ||  valign=top  | son
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''dalninil''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | sister
+|- 
+ |  valign=top  | ''dalninuk''   ||  valign=top  | brother
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''del''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | of (sometimes shortened to d' or de')
+|- 
+ |  valign=top  | ''do'bauth''   ||  valign=top  | escape, to escape
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''do'bauthin''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | escaping
+|- 
+ |  valign=top  | ''do'suul''   ||  valign=top  | outside
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''dobluth''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | outcast
+|- 
+ |  valign=top  | ''doeb''   ||  valign=top  | out
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''doer''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | come
+|- 
+ |  valign=top  | ''dos''   ||  valign=top  | you
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''dosst''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | yours
+|- 
+ |  valign=top  | ''dossta''   ||  valign=top  | your
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''dosstan''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | yourself
+|- 
+ |  valign=top  | ''draeval''   ||  valign=top  | time
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''drewst''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | remove
+|- 
+ |  valign=top  | ''dro''   ||  valign=top  | life, alive
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''dro'xun''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | survive, to survive
+|- 
+ |  valign=top  | ''dro'xundus''   ||  valign=top  | survival
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_E">E</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|-
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''el''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | die
+|- 
+ |  valign=top  | ''elamshin''   ||  valign=top  | destiny, the will of Innoruuk
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''elamshinae''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | favor, grace (esp. with Innoruuk)
+|- 
+ |  valign=top  | ''el'lar''   ||  valign=top  | dwelling, non-noble house
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''elend''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | usual, traditional
+|- 
+ |  valign=top  | ''elendar''   ||  valign=top  | continue, continued, endure
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''elg'cahal''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | to poison
+|- 
+ |  valign=top  | ''elg'cahl''   ||  valign=top  | poison
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''elg'car''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | whine, complain
+|- 
+ |  valign=top  | ''elg'carin''   ||  valign=top  | whining, complaining
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''elg'caress''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | hag, harpy, bitch (directed to a female)
+|- 
+ |  valign=top  | ''elgg''   ||  valign=top  | kill, slay, destroy
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''elggor''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | dying
+|- 
+ |  valign=top  | ''elghinn''   ||  valign=top  | death
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''elghinyrr''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | dead
+|- 
+ |  valign=top  | ''elgluth''   ||  valign=top  | whip, scourge
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''el'inssrigg''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | inn, tavern
+|- 
+ |  valign=top  | ''endar''   ||  valign=top  | opposite, different
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''esaph''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | alike
+|- 
+ |  valign=top  | ''euol''   ||  valign=top  | gem
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_F">F</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|-
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''faer''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | magic
+|- 
+ |  valign=top  | ''faerbol''   ||  valign=top  | magical item
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''faerl''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | magical
+|- 
+ |  valign=top  | ''faern''   ||  valign=top  | wizard, magic-worker (of either sex, any race)
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''faerz'ol''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | grimoire, spell book
+|- 
+ |  valign=top  | ''faerz'undus''   ||  valign=top  | magic spell
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''fielthal''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | contribution
+|- 
+ |  valign=top  | ''fol''   ||  valign=top  | some
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''folbol''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | something
+|- 
+ |  valign=top  | ''folkhel''   ||  valign=top  | somebody
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''foluss''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | someone
+|- 
+ |  valign=top  | ''folt''   ||  valign=top  | such
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_G">G</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|-
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''gaer''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | there
+|- 
+ |  valign=top  | ''ghil''   ||  valign=top  | here
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''golhyrr''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | trick, ruse, trap
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_H">H</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|-
+ |  valign=top  | ''harl''   ||  valign=top  | down, under, below, beneath
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''harl'il'cik''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | to kneel
+|- 
+ |  valign=top  | ''har'dro''   ||  valign=top  | earth (element)
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''har'luth''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | subjugate, conquer
+|- 
+ |  valign=top  | ''har'ol''   ||  valign=top  | cave, cavern
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''har'oloth''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | the underdark
+|- 
+ |  valign=top  | ''harventh''   ||  valign=top  | cut, sever, break
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''honglath''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | clear thinking, calm, bravery, good behavior
+|- 
+ |  valign=top  | ''hwuen''   ||  valign=top  | until
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''hyrr''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | item (abstract)
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_I">I</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|- 
+ |  valign=top  | ''iblith''   ||  valign=top  | excrement, offal, carrion
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''il''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | she
+|- 
+ |  valign=top  | ''ilt''   ||  valign=top  | hers
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''ilta''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | her
+|- 
+ |  valign=top  | ''iltan''   ||  valign=top  | herself
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''ilhar''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | (to give birth to young, not to comfort or rear)
+|- 
+ |  valign=top  | ''ilindith''   ||  valign=top  | aim, goal, hoped-for event
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''ilinsar''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | medallion, amulet
+|- 
+ |  valign=top  | ''inbal''   ||  valign=top  | have
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''inbalus''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | had
+|- 
+ |  valign=top  | ''inbau''   ||  valign=top  | get
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''indar''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | similar
+|- 
+ |  valign=top  | ''indarae''   ||  valign=top  | opposite
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''inlul''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | small
+|- 
+ |  valign=top  | ''inth''   ||  valign=top  | plan, stratagem, scheme
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''inthigg''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | agreement, treaty
+|- 
+ |  valign=top  | ''inthuul''   ||  valign=top  | cold
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''izil''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | as (often shortened to iz' or 'zil)
+|- 
+ |  valign=top  | ''izznarg''   ||  valign=top  | large
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_J">J</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|-
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''jal''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | all
+|- 
+ |  valign=top  | ''jala''   ||  valign=top  | any
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''jalbol''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | anything
+|- 
+ |  valign=top  | ''jalbyr''   ||  valign=top  | another
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''jalil''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | female (gender)
+|- 
+ |  valign=top  | ''jalkhel''   ||  valign=top  | anybody
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''jaluk''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | male (gender)
+|- 
+ |  valign=top  | ''jaluss''   ||  valign=top  | anyone
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''jhal''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | but
+|- 
+ |  valign=top  | ''jhinrae''   ||  valign=top  | wine
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''ji''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | so
+|- 
+ |  valign=top  | ''jindurn''   ||  valign=top  | face
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''jivvin''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | fun, play (amusing cruelty, "animal spirits")
+|- 
+ |  valign=top  | ''jiv'elgg''   ||  valign=top  | torture
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''jiv'undus''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | [severe] pain
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_K">K</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|- 
+ |  valign=top  | ''ka''   ||  valign=top  | if
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''karliik''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | head
+|- 
+ |  valign=top  | ''khal''   ||  valign=top  | to trust (especially misplaced or foolish)
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''khaless''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | trust (especially misplaced or foolish)
+|- 
+ |  valign=top  | ''khel''   ||  valign=top  | body
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''k'lar''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | place. location
+|- 
+ |  valign=top  | ''kulg''   ||  valign=top  | snag, hitch, blockage (to will or actual blockage)
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''kulggen''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | deliberate rampart, shield, or other barrier
+|- 
+ |  valign=top  | ''kul'gobsula''   ||  valign=top  | prison
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''kul'gobuss''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | prisoner, captive
+|- 
+ |  valign=top  | ''kyil''   ||  valign=top  | dart
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''kyilen''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | darts
+|- 
+ |  valign=top  | ''kyon''   ||  valign=top  | care
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''kyone''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | alert/alertly, wary/warily, careful/carefully
+|- 
+ |  valign=top  | ''kyona''   ||  valign=top  | carefulness, wariness
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''kyorl''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | watch, wait, guard
+|- 
+ |  valign=top  | ''kyorlin''   ||  valign=top  | watching, waiting, guarding
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''kyorl'urn''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | watchful
+|- 
+ |  valign=top  | ''ky'ostal''   ||  valign=top  | armor (magical or physical)
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''ky'ov'aer''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | magical wards (esp. of a house)
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_L">L</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|-
+ |  valign=top  | ''lil''   ||  valign=top  | the (often shortened to l')
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''lintaguth''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | platter
+|- 
+ |  valign=top  | ''linth'el''   ||  valign=top  | cauldron
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''linthre''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | brazier
+|- 
+ |  valign=top  | ''loniar''   ||  valign=top  | wet
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''lueth''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | and (often shortened to lu')
+|- 
+ |  valign=top  | ''luth''   ||  valign=top  | cast, throw, hurl
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''luth'ol''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | spear, javelin
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_M">M</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|-
+ |  valign=top  | ''maglust''   ||  valign=top  | apart, alone
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''magthere''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | school, institute (generic)
+|- 
+ |  valign=top  | ''mamulen''   ||  valign=top  | chest
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''melaer''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | fighting with magic
+|- 
+ |  valign=top  | ''melee''   ||  valign=top  | fighting with weapons or hand-to hand
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''mir''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | to hold
+|- 
+ |  valign=top  | ''mrann d'ssinss''   ||  valign=top  | lover (male)
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''mrigg''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | to inspire, to guide
+|- 
+ |  valign=top  | ''mri'kul''   ||  valign=top  | lock, to lock
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''mrim'ol''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | key
+|- 
+ |  valign=top  | ''mrimm''   ||  valign=top  | guide, key, inspiration
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''mrimm d'ssinss''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | lover (female)
+|- 
+ |  valign=top  | ''mzil''   ||  valign=top  | many
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''mzild''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | more
+|- 
+ |  valign=top  | ''mziln''   ||  valign=top  | also, extra, additional
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''mzilst''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | most
+|- 
+ |  valign=top  | ''mzilt''   ||  valign=top  | much
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_N">N</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|-
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''narkuth''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | scroll
+|- 
+ |  valign=top  | ''natha''   ||  valign=top  | a (seldom used, except for emphasis)
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''nau''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | no
+|- 
+ |  valign=top  | ''naubol''   ||  valign=top  | nothing
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''naudal''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | across
+|- 
+ |  valign=top  | ''naukhel''   ||  valign=top  | nobody
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''nausbyr''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | neither
+|- 
+ |  valign=top  | ''naust''   ||  valign=top  | none
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''naut''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | not
+|- 
+ |  valign=top  | ''ne'kales''   ||  valign=top  | caution, distrust
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''ne'kalsa''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | smart, not trusting
+|- 
+ |  valign=top  | ''nelgeth''   ||  valign=top  | to forgive (rarely used)
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''nelgetha''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | forgiveness, pardon
+|- 
+ |  valign=top  | ''niar''   ||  valign=top  | water
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''nin''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | now, present (time)
+|- 
+ |  valign=top  | ''nina''   ||  valign=top  | them
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''nind''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | they
+|- 
+ |  valign=top  | ''nindel''   ||  valign=top  | that
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''nindyn''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | those
+|- 
+ |  valign=top  | ''nindol''   ||  valign=top  | this
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''nindolen''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | these
+|- 
+ |  valign=top  | ''nint''   ||  valign=top  | theirs
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''ninta''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | their
+|- 
+ |  valign=top  | ''nintan''   ||   valign=top  | themselves
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''nizzre'''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | electricity, lightning
+|- 
+ |  valign=top  | ''noalith''   ||  valign=top  | neutral
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''noamuth''   ||    style="background:rgba(194,194,194,0.6);"  valign=top  | wanderer, lost, unknown
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_O">O</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|-
+ |  valign=top  | ''obsul''   ||  valign=top  | opening, door, gap
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''obsu'arl''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | trapdoor
+|- 
+ |  valign=top  | ''og'elend''   ||  valign=top  | heretic, traitor, non-follower of Innoruuk
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''og'elendar''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | treason, heresy, opposition to Innoruuk's will
+|- 
+ |  valign=top  | ''ogglin (n)''   ||  valign=top  | rival, opponent, enemy
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''ogglir''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | to rival, to oppose
+|- 
+ |  valign=top  | ''ogglirin''   ||  valign=top  | rivaling, opposing
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''ol''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | it
+|- 
+ |  valign=top  | ''olath''   ||  valign=top  | dark
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''ol'elg''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | assassinate, to kill by treachery
+|- 
+ |  valign=top  | ''ol'elghinn''   ||  valign=top  | assassination, death by treachery
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''olis'inth''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | plot, conspiracy
+|- 
+ |  valign=top  | ''olis'inthigg''   ||  valign=top  | coup
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''olist''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | caution, stealth
+|- 
+ |  valign=top  | ''oloth''   ||  valign=top  | darkness (natural or magical)
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''olplyn''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | thief
+|- 
+ |  valign=top  | ''olplynir''   ||  valign=top  | steal
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''olt''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | its
+|- 
+ |  valign=top  | ''oltan''   ||  valign=top  | itself
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''op'elg''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | pirate
+|- 
+ |  valign=top  | ''op'elgin''   ||  valign=top  | piracy, thieving
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''orbb''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | spider
+|- 
+ |  valign=top  | ''orn''   ||  valign=top  | will
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''orthae''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | holy, sacred
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_P">P</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|-
+ |  valign=top  | ''p'los''   ||  valign=top  | before
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''p'luin''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | after
+|- 
+ |  valign=top  | ''p'wal''   ||  valign=top  | because
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''phalar''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | grave, battle-marker
+|- 
+ |  valign=top  | ''phindar''   ||  valign=top  | monster, dangerous being (especially a non-intelligent creature)
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''pholod''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | onto
+|- 
+ |  valign=top  | ''pholor''   ||  valign=top  | on, upon
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''phor''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | above, up, over
+|- 
+ |  valign=top  | ''phlith''   ||  valign=top  | hate, despise
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''phuul''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | are (often shortened to ph' or phu')
+|- 
+ |  valign=top  | ''piwafwi''   ||  valign=top  | magical cloak
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''plynn''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | take, seize
+|- 
+ |  valign=top  | ''ply'usaerth''   ||  valign=top  | kidnap, hold for ransom
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''ply'uss''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | arrest, capture
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_Q">Q</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|-
+ |  valign=top  | ''qua'l''   ||  valign=top  | agree
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''qua'lae''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | disagree
+|- 
+ |  valign=top  | ''qua'laen''   ||  valign=top  | against
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''qua'laelay''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | disagreement, argument, confrontation (not yet open conflict)
+|- 
+ |  valign=top  | ''qu'ellar''   ||  valign=top  | house (of a titled noble family)
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''quarth''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | order (exercise of authority)
+|- 
+ |  valign=top  | ''quarthen''   ||  valign=top  | ordered, commanded
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''quarval-shar''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | god - Innoruuk
+|- 
+ |  valign=top  | ''quar'valshar''   ||  valign=top  | god (other than Innoruuk)
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''quin''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | yet
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_R">R</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|- 
+ |  valign=top  | ''ragar''   ||  valign=top  | find, discover, uncover
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''raldar''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | strip
+|- 
+ |  valign=top  | ''rath''   ||  valign=top  | back
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''ratha''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | backs
+|- 
+ |  valign=top  | ''rath'arg''   ||  valign=top  | coward
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''rath'elg''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | backstab
+|- 
+ |  valign=top  | ''rathrae''   ||  valign=top  | behind
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''rath'argh''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | cowardice, dishonor
+|- 
+ |  valign=top  | ''ril''   ||  valign=top  | every
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''rilbol''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | everything
+|- 
+ |  valign=top  | ''rilkhel''   ||  valign=top  | everybody
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''riluss''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | everyone
+|- 
+ |  valign=top  | ''riknueth''   ||  valign=top  | bitter
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''rinteith''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | throat
+|- 
+ |  valign=top  | ''rothe''   ||  valign=top  | underdark cattle, slave (esp. non drow)
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_S">S</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|-
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''saph''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | like
+|- 
+ |  valign=top  | ''sargh''   ||  valign=top  | confidence in weapons, battle might, strength-at-arms, valor
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''sarol''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | weapon
+|- 
+ |  valign=top  | ''sarn!''   ||  valign=top  | beware! - warning!
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''sarn'elgg''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | punish
+|- 
+ |  valign=top  | ''s'lurpp''   ||  valign=top  | fawn, flatter, curry favor
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''s'lurppin''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | fawning, flattering
+|- 
+ |  valign=top  | ''s'lurppuk''   ||  valign=top  | sycophant
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''shanaal''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | chalice, goblet, glass
+|- 
+ |  valign=top  | ''sharorr''   ||  valign=top  | throne
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''sharulg''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | royal seal
+|- 
+ |  valign=top  | ''siltrin''   ||  valign=top  | flesh
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''sol''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | eye
+|- 
+ |  valign=top  | ''solen''   ||  valign=top  | eyes
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''sreen''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | danger
+|- 
+ |  valign=top  | ''sreen'aur''   ||  valign=top  | safe, safety
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''sseren''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | hot
+|- 
+ |  valign=top  | ''ssin''   ||  valign=top  | beauty
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''ssinjin''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | sweet
+|- 
+ |  valign=top  | ''ssinss''   ||  valign=top  | seduction, allure, charm
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''ssin'urn''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | attractive, beautiful, handsome
+|- 
+ |  valign=top  | ''ssinssrigg''   ||  valign=top  | passion, lust, greed
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''ssinssriggin''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | lusting, loving
+|- 
+ |  valign=top  | ''ssinsuurul''   ||  valign=top  | music
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''ssussun''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | light, brightness
+|- 
+ |  valign=top  | ''stath''   ||  valign=top  | few
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''streea''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | suicide, death in the service of Innoruuk, a house, or a community
+|- 
+ |  valign=top  | ''streeka''   ||  valign=top  | reckless(ness), fearless(ness)
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''suliss''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | grace
+|- 
+ |  valign=top  | ''suliss'urn''   ||  valign=top  | graceful
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''suul''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | side
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_T">T</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|-
+ |  valign=top  | ''taga''   ||  valign=top  | than
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''tagnik'zur''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | dragon
+|- 
+ |  valign=top  | ''talinth''   ||  valign=top  | to think, to consider
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''talinthin''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | considering
+|- 
+ |  valign=top  | ''talthalra''   ||  valign=top  | meeting, council, parley
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''thalack''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | war, open fighting
+|- 
+ |  valign=top  | ''thalackz'hind''   ||  valign=top  | raid, attack from afar
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''thalack'vel''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | ambush, sneak attack
+|- 
+ |  valign=top  | ''thalra''   ||  valign=top  | meet, encounter
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''tir''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | off
+|- 
+ |  valign=top  | ''tlu''   ||  valign=top  | be, to be
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''tlus''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | been
+|- 
+ |  valign=top  | ''tril''   ||  valign=top  | bite
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''tu'fyr''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | between
+|- 
+ |  valign=top  | ''tu'jol''   ||  valign=top  | beyond
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''tu'suul''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | beside
+|- 
+ |  valign=top  | ''tuth''   ||  valign=top  | both (often shortened to tu')
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_U">U</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''udos''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | we
+|- 
+ |  valign=top  | ''udossa''   ||  valign=top  | us
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''udosst''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | ours
+|- 
+ |  valign=top  | ''udossta''   ||  valign=top  | our
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''udosstan''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | ourselves
+|- 
+ |  valign=top  | ''uil''   ||  valign=top  | am
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''uk''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | he
+|- 
+ |  valign=top  | ''ukt''   ||  valign=top  | his
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''ukta''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | him
+|- 
+ |  valign=top  | ''uktan''   ||  valign=top  | himself
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''ul-ilindith''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | destiny
+|- 
+ |  valign=top  | ''ul'naus''   ||  valign=top  | together
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''ulan''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | toward
+|- 
+ |  valign=top  | ''ulin''   ||  valign=top  | future (time)
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''ulnar''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | lie (untruth)
+|- 
+ |  valign=top  | ''uln'hyrr''   ||  valign=top  | liar
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''ultrin''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | supreme, highest, conqueror
+|- 
+ |  valign=top  | ''ultrine''   ||  valign=top  | ultrin when applied to Innoruuk only
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''ultrinnan''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | conquering, victory, to win or prevail
+|- 
+ |  valign=top  | ''ulu''   ||  valign=top  | to
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''usbyr''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | either
+|- 
+ |  valign=top  | ''ussa''   ||  valign=top  | me
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''usst''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | mine
+|- 
+ |  valign=top  | ''ussta''   ||  valign=top  | my
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''usstan''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | i, this one, myself
+|- 
+ |  valign=top  | ''usstil''   ||  valign=top  | one in my place
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_V">V</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|-
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''valm''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | join, bond
+|- 
+ |  valign=top  | ''valsharen''   ||  valign=top  | royal, imperial
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''vel'bol''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | what
+|- 
+ |  valign=top  | ''vel'bolen''   ||  valign=top  | which
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''vel'dos''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | whose
+|- 
+ |  valign=top  | ''vel'drav''   ||  valign=top  | when
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''vel'klar''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | where
+|- 
+ |  valign=top  | ''vel'uss''   ||  valign=top  | who
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''vel'ussa''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | whom
+|- 
+ |  valign=top  | ''vel'xundussa''   ||  valign=top  | security, intelligence, reconnaissance
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''vel'xunyrr''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | spy, to spy
+|- 
+ |  valign=top  | ''veldrin''   ||  valign=top  | shadows, concealment afforded by varying light
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''velg'larn''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | assassin
+|- 
+ |  valign=top  | ''velkyn''   ||  valign=top  | unseen, hidden, invisible
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''velnarin''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | instrument
+|- 
+ |  valign=top  | ''velve''   ||  valign=top  | blade (dagger, knife, sword)
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''venorik''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | silent
+|- 
+ |  valign=top  | ''venorsh''   ||  valign=top  | silence
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''verin''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | evil
+|- 
+ |  valign=top  | ''vith''   ||  valign=top  | to perform sexual intercourse (slang)
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''vlos''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | blood
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_W">W</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|-
+ |  valign=top  | ''wael''   ||  valign=top  | fool
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''waela''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | foolish, unaware/unwary
+|- 
+ |  valign=top  | ''waelin''   ||  valign=top  | young
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''waerr'ess''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | deceipt
+|- 
+ |  valign=top  | ''waess''   ||  valign=top  | skin
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''wanre''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | apprentice, servant
+|- 
+ |  valign=top  | ''weth''   ||  valign=top  | each
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''whol''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | for
+|- 
+ |  valign=top  | ''wu'suul''   ||  valign=top  | inside
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''wun''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | in
+|- 
+ |  valign=top  | ''wund''   ||  valign=top  | among, within, into
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_X">X</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|-
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''xal''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | may, might, perhaps
+|- 
+ |  valign=top  | ''xas''   ||  valign=top  | yes
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''xor''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | or
+|- 
+ |  valign=top  | ''xuat''   ||   valign=top  | don't
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''xuil''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | with
+|- 
+ |  valign=top  | ''xuileb''   ||  valign=top  | without
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''xukuth''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | heart
+|- 
+ |  valign=top  | ''xun''   ||  valign=top  | do, to complete or accomplish
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''xund''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | striving, effort, work
+|- 
+ |  valign=top  | ''xunin''   ||  valign=top  | doing
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''xunor''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | done
+|- 
+ |  valign=top  | ''xunus''   ||  valign=top  | did
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''xundus''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | achievement, work completed
+|- 
+ |  valign=top  | ''xundussa''   ||  valign=top  | achievements, works completed
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''xxizz''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | help
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_Y">Y</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|- 
+ |  valign=top  | ''yath''   ||  valign=top  | temple, of the temple (property, work, or decree)
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''yibin''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | weak
+|- 
+ |  valign=top  | ''yol''   ||  valign=top  | since
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''yorn''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | power/will/servant-creature of the god (Innoruuk)
+|-
+ | style="background:rgba(162,145,242,0.6);"  | '''<span id="DC_Z">Z</span>''' || align="right"  style="background:rgba(162,145,242,0.6);"  | [[#top|Back to Top]] :: [[#Drow_to_Common|Back to Dictionary]] 
+|-
+ |  valign=top  | ''z'har''   ||  valign=top  | to ride
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''z'hin''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | to walk
+|- 
+ |  valign=top  | ''z'hind''   ||  valign=top  | trip, journey, expedition
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''z'orr''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | climb
+|- 
+ |  valign=top  | ''z'ress''   ||  valign=top  | power, strength, force, dominance (esp. of the will - i.e. success in manipulation)
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''z'talin''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | esp, telepathy
+|- 
+ |  valign=top  | ''zhah''   ||  valign=top  | is
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''zhahn''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | then, past (time)
+|- 
+ |  valign=top  | ''zhahen''   ||  valign=top  | were
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''zhahus''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | was
+|- 
+ |  valign=top  | ''zhal''   ||  valign=top  | shall
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''zhaun''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | to learn, to know
+|- 
+ |  valign=top  | ''zhaunil''   ||  valign=top  | wisdom, knowledge
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''zhuanth''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | old
+|- 
+ |  valign=top  | ''zhaun'ol''   ||  valign=top  | book, treatise, work of knowledge
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''zha'linth''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | memory
+|- 
+ |  valign=top  | ''zik'den'vever''   ||   valign=top  | plane
+|- 
+ |   style="background:rgba(194,194,194,0.6);"  valign=top  | ''zotreth''   ||   style="background:rgba(194,194,194,0.6);"  valign=top  | strike, punch, hit
+|}
+
+[[Category:Lore]]

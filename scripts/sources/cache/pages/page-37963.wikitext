@@ -1,0 +1,27 @@
+{{Factionpage|
+
+| description = The faction held by the three Ghouls in [[Neriak]], at the entrance to the Lodge of the dead.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[The Estate of Unrest]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* three Ghouls in Neriak <span class='fmz'>(?)</span>
+* [[a ghoul]] <span class='fmz'>(Estate of Unrest - Undead)</span>
+* [[ghoul boss]] <span class='fmz'>(Lesser Faydark - Undead)</span>
+
+}}

@@ -1,0 +1,23 @@
+{{Factionpage|
+
+| description = Some of the undead NPCs found inside Befallen are on this faction.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Befallen]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+}}

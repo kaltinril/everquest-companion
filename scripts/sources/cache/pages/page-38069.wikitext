@@ -1,0 +1,34 @@
+{{Velious Era}}
+{{Factionpage|
+
+| description = A handful of snow gnolls in [[Iceclad Ocean]] have banded together.
+
+| zones_raise = 
+
+* [[Eastern Wastes]]
+
+| zones_lower = 
+
+* [[Iceclad Ocean]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[a walrus]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[an ulthork hunter]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[an ulthork warrior]]  <span class='fmz'>(Eastern Wastes)</span>
+
+| mobs_lower = 
+
+* [[Balix Misteyes]] <span class='fmz'>(Iceclad Ocean - Quest NPC)</span>
+* [[Ergrez Shortpaw]] <span class='fmz'>(Iceclad Ocean - Quest NPC)</span>
+* [[Snowfang fisher]]  <span class='fmz'>(Iceclad Ocean)</span>
+* [[Snowfang icehunter]]  <span class='fmz'>(Iceclad Ocean)</span>
+* [[Snowfang spearguard]]  <span class='fmz'>(Iceclad Ocean)</span>
+
+}}

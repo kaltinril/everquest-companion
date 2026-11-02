@@ -1,0 +1,306 @@
+EverQuest Legends introduced a number of new action abilities, one of which is referred to as "Rituals". 
+
+Rituals are an alternative way for spellcasting classes to commit select spells to memory that are able to be cast even when that class is not part of your current active loadout.
+
+To access rituals press "L" to open the 'Actions' window, then select the "Rituals" tab.
+
+=== Requirements ===
+* In order for the ritual version of an eligible spell to be initially created, a player must reach the level required to scribe the spell. For example once you reach level 5 on a cleric and scribe the spell "Gate", it will automatically create the Ritual version. If multiple classes gain access to a common spell that can become a ritual, whichever class reaches the minimum required level to scribe the spell is what will create the ritual version.
+
+* You must be out of combat and in a 'resting' state to cast a ritual.
+
+* Rituals will take 20 seconds to cast, regardless of what the individual spell descriptions state.
+
+* Upon completion of the ritual, player will lose ALL mana. 
+
+== Notes ==
+* While it is possible to cast a ritual even when the original spell is available on a class in a players active loadout, it is not recommended as it will still result in draining 100% of your mana pool.
+
+== Rituals ==
+As of 2026 June 20:
+
+{| class="eoTable2 sortable"
+|+
+!Ritual
+!Description
+!Required Class and Minimum Level to Unlock
+!Eligible Targets
+|-
+|[[Alter Plane: Hate]]
+|Opens an arcane portal that teleports your entire group to the Plane of Hate. Consumes a Fuligan Soulstone of Innoruuk when cast.
+|WIZ (46)
+|Group
+|-
+|[[Alter Plane: Sky]]
+|Opens an arcane portal that teleports your entire group to the Plane of Sky. Consumes a Cloudy Stone of Veeshan when cast.
+|WIZ (46)
+|Group
+|-
+|[[Bind Affinity]]
+|Binds the soul of your target to their current location. Use of this spell is often limited to towns and cities.
+|CLR (14), DRU (14), ENC (12), MAG (12), NEC (12), SHM (14), WIZ (12)
+|Self, Group Member
+|-
+|[[Cazic Temple Gate]]
+|Opens an arcane portal that teleports you to the Temple of Cazic-Thule.
+|WIZ (23)
+|Self
+|-
+|[[Cazic Temple Portal]]
+|Opens an arcane portal that teleports your entire group to the Temple of Cazic-Thule.
+|WIZ (33)
+|Group
+|-
+|[[Circle of Butcherblock]]
+|Opens a mystical portal that transports your group to the Butcherblock Mountains.
+|DRU (25)
+|Group
+|-
+|[[Circle of Feerrott]]
+|Opens a mystical portal that transports your group to the Feerrott Jungle.
+|DRU (32)
+|Group
+|-
+|[[Circle of Lavastorm]]
+|Opens a mystical portal that transports your group to the Lavastorm Mountains.
+|DRU (30)
+|Group
+|-
+|[[Circle of Misty Thicket]]
+|Opens a mystical portal that transports your group to the Misty Thicket.
+|DRU (36)
+|Group
+|-
+|[[Circle of North Karana]]
+|Opens a mystical portal that transports your group to the Northern Plains of Karana.
+|DRU (25)
+|Group
+|-
+|[[Circle of South Ro]]
+|Opens a mystical portal that transports your group to the Southern Desert of Ro.
+|DRU (32)
+|Group
+|-
+|[[Circle of Steamfont]]
+|Opens a mystical portal that transports your group to the Steamfont Mountains.
+|DRU (31)
+|Group
+|-
+|[[Circle of Stonebrunt]]
+|Opens a mystical portal that transports your group to the Stonebrunt Mountains.
+|DRU (28)
+|Group
+|-
+|[[Circle of Surefall Glade]]
+|Opens a mystical portal that transports your group to Surefall Glade.
+|DRU (26)
+|Group
+|-
+|[[Circle of Toxxulia]]
+|Opens a mystical portal that transports your group to the Toxxulia Forest.
+|DRU (25)
+|Group
+|-
+|[[Circle of West Commons]]
+|Opens a mystical portal that transports your group to the Western Commonlands.
+|DRU (27)
+|Group
+|-
+|[[Evacuate: Greater Faydark]]
+|Evacuates your group to the Greater Faydark. While faster casting than normal portal spells, it is more likely to leave one or more of your group members behind.
+|WIZ (32)
+|Group
+|-
+|[[Evacuate: Nektulos]]
+|Evacuates your group to the Nektulos Forest. While faster casting than normal portal spells, it is more likely to leave one or more of your group members behind.
+|WIZ (42)
+|Group
+|-
+|[[Evacuate: North Karana]]
+|Evacuates your group to the Northern Plains of Karana. While faster casting than normal portal spells, it is more likely to leave one or more of your group members behind.
+|WIZ (26)
+|Group
+|-
+|[[Evacuate: South Ro]]
+|Evacuates your group to the Southern Desert of Ro. While faster casting than normal portal spells, it is more likely to leave one or more of your group members behind.
+|WIZ (38)
+|Group
+|-
+|[[Evacuate: West Karana]]
+|Evacuates your group to the Western Plains of Karana. While faster casting than normal portal spells, it is more likely to leave one or more of your group members behind.
+|WIZ (47)
+|Group
+|-
+|[[Gate]]
+|Opens a magical portal that returns you to your bind point.
+|CLR (5), DRU (5), ENC (4), MAG (4), NEC (4), SHM (5), WIZ (4)
+|Self
+|-
+|[[Greater Faydark Gate]]
+|Opens an arcane portal that teleports you to the Greater Faydark.
+|WIZ (20)
+|Self
+|-
+|[[Greater Faydark Portal]]
+|Opens an arcane portal that teleports your entire group to the Greater Faydark.
+|WIZ (27)
+|Group
+|-
+|[[Nektulos Gate]]
+|Opens an arcane portal that teleports you to Nektulos Forest.
+|WIZ (22)
+|Self
+|-
+|[[Nektulos Portal]]
+|Opens an arcane portal that teleports your entire group to Nektulos Forest.
+|WIZ (32)
+|Group
+|-
+|[[North Karana Gate]]
+|Opens an arcane portal that teleports you to the Northern Plains of Karana.
+|WIZ (18)
+|Self
+|-
+|[[North Karana Portal]]
+|Opens an arcane portal that teleports your entire group to the Northern Plains of Karana.
+|WIZ (25)
+|Group
+|-
+|[[North Ro Gate]]
+|Opens an arcane portal that teleports you to the Northern Desert of Ro.
+|WIZ (22)
+|Self
+|-
+|[[North Ro Portal]]
+|Opens an arcane portal that teleports your entire group to the Northern Desert of Ro.
+|WIZ (36)
+|Group
+|-
+|[[Ring of Butcherblock]]
+|Opens a mystical portal that transports you to the Butcherblock Mountains.
+|DRU (16)
+|Self
+|-
+|[[Ring of Feerrott]]
+|Opens a mystical portal that transports you to the Feerrott Jungle.
+|DRU (22)
+|Self
+|-
+|[[Ring of Lavastorm]]
+|Opens a mystical portal that transports you to the Lavastorm Mountains.
+|DRU (22)
+|Self
+|-
+|[[Ring of Misty Thicket]]
+|Opens a mystical portal that transports you to the Misty Thicket.
+|DRU (25)
+|Self
+|-
+|[[Ring of North Karana]]
+|Opens a mystical portal that transports you to the Northern Plains of Karana.
+|DRU (15)
+|Self
+|-
+|[[Ring of South Ro]]
+|Opens a mystical portal that transports you to the Southern Desert of Ro.
+|DRU (20)
+|Self
+|-
+|[[Ring of Steamfont]]
+|Opens a mystical portal that transports you to the Steamfont Mountains.
+|DRU (21)
+|Self
+|-
+|[[Ring of Stonebrunt]]
+|Opens a mystical portal that transports you to the Stonebrunt Mountains.
+|DRU (20)
+|Self
+|-
+|[[Ring of Surefall Glade]]
+|Opens a mystical portal that transports you to Surefall Glade.
+|DRU (15)
+|Self
+|-
+|[[Ring of Toxxulia]]
+|Opens a mystical portal that transports you to the Toxxulia Forest.
+|DRU (17)
+|Self
+|-
+|[[Ring of West Commons]]
+|Opens a mystical portal that transports you to the Western Commonlands.
+|DRU (17)
+|Self
+|-
+|[[Shrink]]
+|Shrinks your target, allowing them greater mobility in tight quarters.
+|BST (23), SHM (15)
+|Self, Group Member
+|-
+|[[Stonebrunt Gate]]
+|Opens an arcane portal that teleports you to the Stonebrunt Mountains.
+|WIZ (21)
+|Self
+|-
+|[[Stonebrunt Portal]]
+|Opens an arcane portal that teleports your entire group to the Stonebrunt Mountains.
+|WIZ (27)
+|Group
+|-
+|[[Succor: Butcherblock]]
+|Opens a mystical portal that transports your group to the Butcherblock Mountains.
+|DRU (32)
+|Group
+|-
+|[[Succor: East Karana]]
+|Opens a mystical portal that transports your group to the Eastern Plains of Karana.
+|DRU (26)
+|Group
+|-
+|[[Succor: Lavastorm]]
+|Opens a mystical portal that transports your group to the Lavastorm Mountains.
+|DRU (41)
+|Group
+|-
+|[[Succor: North Karana]]
+|Opens a mystical portal that transports your group to the Northern Plains of Karana.
+|DRU (46)
+|Group
+|-
+|[[Succor: South Ro]]
+|Opens a mystical portal that transports your group to the Southern Desert of Ro.
+|DRU (38)
+|Group
+|-
+|[[Toxxulia Gate]]
+|Opens an arcane portal that teleports you to Toxxulia Forest.
+|WIZ (19)
+|Self
+|-
+|[[Toxxulia Portal]]
+|Opens an arcane portal that teleports your entire group to Toxxulia Forest.
+|WIZ (28)
+|Group
+|-
+|[[West Commons Gate]]
+|Opens an arcane portal that teleports you to the Western Commonlands.
+|WIZ (21)
+|Self
+|-
+|[[West Commons Portal]]
+|Opens an arcane portal that teleports your entire group to the Western Commonlands.
+|WIZ (35)
+|Group
+|-
+|[[West Karana Gate]]
+|Opens an arcane portal that teleports you to the Western Plains of Karana.
+|WIZ (23)
+|Self
+|-
+|[[West Karana Portal]]
+|Opens an arcane portal that teleports your entire group to the Western Plains of Karana.
+|WIZ (37)
+|Group
+|-
+
+[[Category:Character]]
+|}

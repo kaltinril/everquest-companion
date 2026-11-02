@@ -1,0 +1,37 @@
+[[File:NakedHDF.jpg|right]]
+__NOTOC__
+==Description==
+The mix of [[Dark Elf]] and [[Human]] is a rarity. Recently, a community of Half-Dark Elves calling themselves the Ayr'Haeth were discovered living in [[Nektropos Undercrofts]] under [[Nektropos Castle]]. They had lived there for generations, hidden, but were forced to seek help from the other races once [[Lord Rikantus Everling]] went mad due to the death of his daughters. [[Freeport]] Humans, [[Neriak]] Dark Elves, and the members of the [[Temple of Solusek Ro]] denied sending help. 
+
+==Basic Information==
+*<b>[[Faction Alignment|Faction Alignment:]]</b> Neutral
+*<b>Racial(s):</b> [[Hide]], [[Sneak]], [[Infravision]], [[Cursed Heritage]], [[Life Tracking]]
+*<b>Starting City:</b> [[Nektropos Undercrofts]]
+*<b>Primary Class Choices:</b> [[Bard]], [[Berserker]], [[Enchanter]], [[Necromancer]], [[Ranger]], [[Rogue]], [[Shadow Knight]] (Based on Guild Masters in [[Nektropos Undercrofts]]).
+
+==Base Stats==
+{| class="eoTable2" style="text-align:left"
+|-
+! STR !! STA !! AGI !! DEX !! WIS !! INT !! CHA
+|-
+|| 75 || 75 || 80 || 80 || 55 || 95 || 70
+|}
+Notably the worst Wisdom of all races.
+
+==Infravision==
+Slightly improved night vision, not as good as the [[Dark Elf|Dark Elf]]'s [[Character Races#Ultravision|Ultravision]].
+
+==Cursed Heritage==
+10% increased effectiveness of lifetaps (such as [[Drain Soul]] or [[Life Leech]]) and runes (such as [[Diamondskin]] or [[Rune IV]]). 20% reduced base health regeneration, when outdoors in the day.
+
+==Life Tracking==
+Increased sensory range for living NPCs on your map -- roughly double in radius.
+
+== Unlock Conditions ==
+
+* Complete [[Something Fishy]], [[Alchemical Solution]], [[What's Going On Here]], [[Call for Aid]], and [[Unfortunate News]]. 
+
+
+{{Navbox Race}}
+
+[[Category:Character Races]]

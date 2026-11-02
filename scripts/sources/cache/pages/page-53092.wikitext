@@ -1,0 +1,23 @@
+{{Cleanup Needed}}
+
+To summon is to cause an item, character, or other object to be transported to the summoner, usually through magical means. 
+
+==NPC Ability==
+Some level 50+ NPCs (including most raid targets) have an ability to instantly summon distant players to their position when their health is reduced to a certain percentage (perhaps 95%). They select whichever player is at the top of their [[hate]] table, not considering subtractions due to range but including additions due to sitting. The player is summoned to precisely the same position as the NPC. This mechanic is very dangerous for casters and is usually effective at preventing killing NPCs solo with [[kite|kiting]] tactics.
+
+There is a cooldown before a creature can summon again but it is very short (perhaps one server tick).
+
+There does not seem to be a range limit on this ability, but [[Aggro#Eliminating_Aggro|leash limits]] may eliminate aggro and make summoning moot.
+
+It is possible for players to exploit this ability to get transported through locked doors or other obstacles if the NPC position and aggro can be carefully controlled.
+
+See also: [[Enrage]], [[Flurry (NPC Ability)]]
+
+==Summoning spells==
+
+Many items and pets may be summoned, often by [[Magician]]s, as well as other casters. Typically these items are [[Newbie_Guide#Gear|NO RENT]], meaning that they disappear after being logged out of the character for more than 30 minutes.
+
+
+[[Category:Guides]]
+[[Category:Technical]]
+[[Category:Game Mechanics]]

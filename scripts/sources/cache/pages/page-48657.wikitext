@@ -1,0 +1,15 @@
+Causes your conjuration spells to succeed more often. Only one specialization can skill past 50.
+
+== Classes ==
+
+*[[Enchanter]] (Level 20) (Max 200 or 50)
+*[[Magician]] (Level 20) (Max 200 or 50)
+*[[Necromancer]] (Level 20) (Max 200 or 50)
+*[[Wizard]] (Level 20) (Max 200 or 50)
+*[[Cleric]] (Level 30) (Max 200 or 50)
+*[[Druid]] (Level 30) (Max 200 or 50)
+*[[Shaman]] (Level 30) (Max 200 or 50)
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

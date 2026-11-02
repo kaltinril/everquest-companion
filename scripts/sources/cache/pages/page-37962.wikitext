@@ -1,0 +1,35 @@
+{{Factionpage|
+
+| description = This faction covers the kobolds in Nagafen's Lair.  It is directly opposed to the [[Solusek Mining Co]] faction.  Killing any Kobold in Nagefen's Lair will lower this faction.
+
+Interestingly, this faction is fairly redundant, since there is no known way to raise the faction; and the Kobolds of Firepit hate everyone from the get-go.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Nagafen's Lair]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[A Greater Kobold]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[a greater kobold shaman]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[greater kobold]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[kobold champion]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[kobold noble]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[kobold priest]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[Solusek kobold]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[Solusek kobold king]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[Solusek kobold shaman]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+
+}}

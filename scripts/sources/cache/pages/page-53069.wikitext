@@ -1,0 +1,30 @@
+A '''tick''' is a unit of [[time]] in EverQuest. A tick occurs every 6 seconds (server-side). At that instant, many different game mechanics can occur such as:
+* Regeneration of HP, Mana, or Endurance is incrementally applied
+* Damage over Time is similarly applied
+* Spell effects like buffs and debuffs may expire if their duration has run out
+* Spell effects with random duration or a chance of breaking early will roll that chance to break
+* Initial aggro occurrence of Kill on Sight NPCs (but not social aggro). This is aligned to the aggroing player's ticks, not the aggressive NPC.
+* Expiration of NPC-only special abilities such as Enrage
+* Expiration of player disciplines
+
+====Advanced Tick Information====
+:''See also: [[Skill Meditate|Meditate]], [[Character Races#Increased HP Regeneration|HP Regeneration]] and [[Aggro]]''
+
+Every entity (player/npc) has their own tick timer associated with them. The timer on the server side will run regardless of what is occurring.
+
+This means that if a buff lasts 3 ticks, it could really last anywhere from 12-18 seconds depending on the alignment of the tick timer and when the buff lands.
+
+Certain effects like charm breaking appear to only be possible when a tick occurs on that entity. An entity's tick timer can be identified by applying a DOT since DOTs will only apply on ticks.
+
+Ticks do not appear to be perfectly 6 seconds apart so when attempting to track a tick timer over time, your timer will need to be resync'ed often. Server lag can cause tick timers to become slightly out of sync.
+
+====Other notes====
+
+If a group buff is applied (ex. bard song), the tick timer used for all players who receive this buff will be based off of the player who casted the buff. This way, if a group buff is applied, all members should lose the buff at the same time. Entering a new zone and logging seem to reinitialize your player's tick timer.
+
+=== See also ===
+* [[Time]]
+
+
+[[Category:Guides]]
+[[Category:Technical]]

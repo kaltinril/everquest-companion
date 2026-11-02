@@ -1,0 +1,74 @@
+{{Factionpage|
+
+| description = Commons Guards inside the city of Neriak.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Grobb]]
+* [[Rathe Mountains]]
+* [[Nektulos Forest]]
+* [[Neriak|Neriak Commons]]
+* [[Neriak|Neriak Foreign Quarter]]
+* [[Neriak|Neriak Third Gate]]
+
+| quests_raise = 
+
+* [[Book of Turmoil Quest]]
+* [[Bottle of Red Wine]]
+* [[Evil Research]]
+* [[Shadow Knight Epic Quest]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Canarie]] <span class='fmz'>(Neriak Foreign Quarter - Merchant)</span>
+* [[Captain N`Farre]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Chizzlik]] <span class='fmz'>(Mountains of Rathe - Merchant)</span>
+* [[Corporal D`Abth]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Corporal J`Rais]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Corporal X`Tis]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Divn L`Crit]]  <span class='fmz'>(Neriak Foreign Quarter)</span>
+* [[Dragoon J`Len]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Dragoon Tsanne]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Dragoon X`Lottl]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Dragoon Zytl]] <span class='fmz'>(Commonlands - NPC, Non-Quest)</span>
+* [[Genzal R`Jyen]] <span class='fmz'>(Neriak Commons - Merchant)</span>
+* [[Glazn D`Unnar]] <span class='fmz'>(Neriak Commons - Merchant)</span>
+* [[Guard E`Brona]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard E`Tru]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard F`Lok]] <span class='fmz'>(Neriak Commons)</span>
+* [[Guard K`Jartan]] <span class='fmz'>(Neriak Commons)</span>
+* [[Guard N`Lan]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard T`Aba]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard V`Ehn]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard X`Onnu]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard Z`Den]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guzzla]] <span class='fmz'>(Mountains of Rathe - Merchant)</span>
+* [[Kirak Vil]] <span class='fmz'>(Nektulos Forest - Quest NPC)</span>
+* [[Lokar To`Biath]] <span class='fmz'>(Neriak Third Gate - Quest NPC)</span>
+* [[an iron guardian]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Pungla]]  <span class='fmz'>(Neriak Foreign Quarter)</span>
+* [[Putad]] <span class='fmz'>(Neriak Foreign Quarter - Merchant)</span>
+* [[Ratraz]] <span class='fmz'>(Neriak Third Gate - Quest NPC)</span>
+* [[Sergeant C`orm]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Smaka]] <span class='fmz'>(Neriak Foreign Quarter - Merchant)</span>
+* [[Ukla]] <span class='fmz'>(Mountains of Rathe - Merchant)</span>
+* [[Ungia]] <span class='fmz'>(Grobb - Merchant)</span>
+
+}}
+= Suggested Route =
+*[[Bottle of Red Wine]] (+[[Dreadguard Outer]], +[[Dreadguard Inner]], +[[Dark Bargainers]])
+*[[Track, Stalk, Hunt]] (+[[Dread Slayers]], +[[Indigo Brotherhood]], +[[Dreadguard Outer]], +[[Dreadguard Inner]], -[[Guardians of the Vale]], -[[Wolves of the North]])
+
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

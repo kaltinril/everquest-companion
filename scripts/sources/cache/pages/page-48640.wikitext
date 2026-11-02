@@ -1,0 +1,10 @@
+One of the many bard instrument skills.
+The Wind Skill is trained at level 1, although the 1st Wind song is [[Cinda's Charismatic Carillon]] at level 11.
+
+== Classes ==
+
+* [[Bard]] (Max: 255)
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

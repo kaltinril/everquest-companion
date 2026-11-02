@@ -1,0 +1,67 @@
+{{Factionpage|
+
+| description = The Deep Muses are found in the Hall of Deep Musing in Ak'Anon.  This combined Cleric and Rogue guild is lead by the unlikely partnership of the Cleric Iony Gredlong and the Rogue Welno Tanboots.  The Deep Muses are in general peaceful, but do support both the [[Gem Choppers]] and the [[Merchants of AkAnon]].  The Deep Muses have little to do in the affairs of the land, offering only the starting quest to young rogues and clerics.
+
+| zones_raise = 
+
+* [[Ak'Anon]]
+* [[The Estate of Unrest]]
+* [[Steamfont Mountains]]
+
+
+| zones_lower = 
+
+* [[Ak'Anon]]
+* [[Steamfont Mountains]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[Berinsan]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[Eonis Mournunder]] <span class='fmz'>(Ak'Anon - NPC, Non-Quest)</span>
+* [[Evah Xokez]] <span class='fmz'>(Ak'Anon - Cleric Guildmaster)</span>
+* [[Kaxon Frennor]] <span class='fmz'>(Ak'Anon - NPC, Non-Quest)</span>
+* [[Khrix Abomination]]  <span class='fmz'>(Estate of Unrest)</span>
+* [[Khrix Fritchoff]]  <span class='fmz'>(Estate of Unrest)</span>
+* [[Naygog Mitope]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Vaenor Husga]] <span class='fmz'>(Ak'Anon - NPC, Non-Quest)</span>
+
+| mobs_lower = 
+
+* [[a clockwork alchemist]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork armorer]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork banker]] <span class='fmz'>(Ak'Anon - Banker)</span>
+* [[a clockwork barkeep]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork bowyer]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[a clockwork cobbler]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork grocer]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork jeweler]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork merchant]] (1265, -775) <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork tailor]] (760, 155) <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork tanner]] (954, -37, -38) <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork torturer]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork weaponsmith]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[Bom Knotwood]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[Digetha Chogaller]] <span class='fmz'>(Ak'Anon - NPC, Non-Quest)</span>
+* [[Finkel Rardobaen]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[Fodin Frugrin]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[Freed Fimplefur]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[Genda Minyte]] <span class='fmz'>(Steamfont Mountains - NPC, Non-Quest)</span>
+* [[Glen Garginburr]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[Godbin Strumharp]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[Iony Gredlong]] <span class='fmz'>(Ak'Anon - Cleric Guildmaster)</span>
+* [[Lobal Postugger]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Oren Furdenbline]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[Phiz Frugrin]] <span class='fmz'>(Steamfont Mountains - NPC, Non-Quest)</span>
+* [[Tindo Frugrin]] <span class='fmz'>(Steamfont Mountains - Quest NPC)</span>
+* [[Torodrane Frompwaddle]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[Welno Tanboots]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Zenrel Ottonoggin]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+
+}}
+[[Category:Achievement Faction]]

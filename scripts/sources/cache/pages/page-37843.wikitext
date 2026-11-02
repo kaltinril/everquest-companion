@@ -1,0 +1,125 @@
+{{Classic Era}}[[File:Npc_xon_quexill.PNG|thumb]]{{Factionpage|
+
+| description = Deep within Neriak's 3rd Gate lies the Temple of The Dead, ghouls guard the entrance passageway where the power of Neriak appears strongest.  
+Here [[Necromancer]]s train under [[Xon Quexill]] alongside of [[Shadow Knight]]s under Nexxka Tolax. The Dead are Loyal to the Dark Elven [[Queen Cristanos Thex]] and directly oppose the Dark Elven [[King Naythox Thex]].  
+They despise the lesser magics, and though they are opposed by [[The Spurned]] (Dark Elf magic users) they reserve the bulk of their hate for the Gnome magic users of the [[Eldritch Collective]] and the High Elf magic users of the Felwithe, [[Keepers of the Art]].
+
+It is difficult to raise this faction from KOS, but several isolated NPCs can be farmed such as [[Linara Parlone]], [[Retlon Brenclog]] and [[Zondo Hyzill]]. The fastest way to raise this is to do the quest: [[Messages For Neriak]] the notes are not lore and you get +10 the dead for each note.
+
+| zones_raise = 
+
+* [[Ak'Anon]]
+* [[Crushbone]]
+* [[Dagnor's Cauldron]]
+* [[Erudin|Erudin Palace]]
+* [[Highpass Keep]]
+* [[Lesser Faydark]]
+* [[Najena]]
+* [[Nektulos Forest]]
+* [[Neriak|Neriak Commons]]
+* [[Neriak|Neriak Third Gate]]
+* [[Felwithe]]
+* [[Felwithe]]
+* [[Steamfont Mountains]]
+
+| zones_lower = 
+
+* [[Freeport|East Freeport]]
+* [[Highpass Keep]]
+* [[Highpass Hold]]
+* [[Lesser Faydark]]
+* [[Neriak|Neriak Commons]]
+* [[Neriak|Neriak Foreign Quarter]]
+* [[Neriak|Neriak Third Gate]]
+* [[Ocean of Tears]]
+* [[Steamfont Mountains]]
+* [[West Commonlands]]
+
+| quests_raise = 
+
+* [[Bertoxxulous Symbol Quests|Bertoxxulous Initiate]]
+* [[Crude Stein Quest]]
+* [[Fire Beetle Eyes]]
+* [[Mammoth Tusks Quest]]
+* [[Necromancer Words - X`Ta Tempi]]
+* [[Sir Lindeal's Testimony]]
+* [[The Bridge]]
+* [[Thex Mallet Quest]]
+* [[Messages For Neriak]]
+
+| quests_lower = 
+
+* [[Air Tight Box Quest]]
+* [[Basilisk Tongues]]
+* [[Bat Wings]]
+* [[Black Wolf Skin Quest]]
+* [[Bugglegupp (Quest)|Bugglegupp]]
+* [[Innoruuk Symbol Quests|Innoruuk Disciple]]
+* [[Minotaur Horns]]
+* [[Rogue Redemption]]
+* [[Series C Black Boxes]]
+* [[Slave Keys]]
+* [[Telescope Lenses]]
+* [[Tergon's Spellbook Quest]]
+* [[The Mystic Cloak]]
+* [[Tunare Symbol Quests|Tunare Disciple]]
+* [[Tunare Symbol Quests|Tunare Warden]]
+
+| mobs_raise = 
+
+* [[Belux J`Ver]] <span class='fmz'>(Neriak Commons - NPC, Non-Quest)</span>
+* [[Bin Fiddlekins]] <span class='fmz'>(Lesser Faydark)</span>
+* [[Camia V`Retta]] <span class='fmz'>(Neriak Commons - NPC, Non-Quest)</span>
+* [[Cizzar J`Axx]] <span class='fmz'>(Neriak Commons - Merchant)</span>
+* [[Dragoon Szorn]] <span class='fmz'>(Lesser Faydark - Quest NPC)</span>
+* [[Drizm J`Axx]] <span class='fmz'>(Neriak Commons - NPC, Non-Quest)</span>
+* [[Gath N`Mare]] <span class='fmz'>(Neriak Commons - NPC, Non-Quest)</span>
+* [[Ghilanbiddle Nylwadil]] <span class='fmz'>(Dagnor's Cauldron - Quest NPC)</span>
+* [[Jayna D`Bious]] <span class='fmz'>(Neriak Commons - NPC, Non-Quest)</span>
+* [[Jogl Doobraugh]] <span class='fmz'>(Steamfont Mountains - Quest NPC)</span>
+* [[Juline Urncaller]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Kinool Goldsinger]] <span class='fmz'>(Southern Felwithe - Enchanter Guildmaster)</span>
+* [[Linara Parlone]] <span class='fmz'>(Najena - Quest NPC)</span>
+* [[Lozani]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Mavin D`Dbth]] <span class='fmz'>(Neriak Commons - NPC, Non-Quest)</span>
+* [[Niola Impholder]] <span class='fmz'>(Southern Felwithe - Magician Guildmaster)</span>
+* [[Opizel G`Efia]] <span class='fmz'>(Neriak Commons - NPC, Non-Quest)</span>
+* [[Ranza S`Ion]] <span class='fmz'>(Neriak Commons - Merchant)</span>
+* [[Retlon Brenclog]] <span class='fmz'>(Crushbone - Quest NPC)</span>
+* [[Shanez X`Teria]] <span class='fmz'>(Neriak Commons - NPC, Non-Quest)</span>
+* [[Tarker Blazetoss]] <span class='fmz'>(Southern Felwithe - Wizard Guildmaster)</span>
+* [[Tobon Starpyre]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Tolkar Parlone]] <span class='fmz'>(Northern Felwithe - Quest NPC)</span>
+* [[Trudo Frugrin]] <span class='fmz'>(Lesser Faydark - Quest NPC)</span>
+* [[Utvex D`Jerna]] <span class='fmz'>(Neriak Commons - NPC, Non-Quest)</span>
+* [[Veca S`Karn]] <span class='fmz'>(Neriak Commons - Merchant)</span>
+* [[Wuggan Azusphere]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Zondo Hyzill]] <span class='fmz'>(Steamfont Mountains - NPC)</span>
+
+| mobs_lower = 
+
+* [[Capee]] <span class='fmz'>(Neriak Foreign Quarter - NPC, Non-Quest)</span>
+* [[Degarran Kixl]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Kizdean Gix]] <span class='fmz'>(West Commonlands - Quest NPC)</span>
+* [[Kszan Punox]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Larik Z`Vole]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[Lisvan X`Lottl]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Loveal S`Nez]] <span class='fmz'>(Neriak Third Gate - Shadowknight Guildmaster)</span>
+* [[Noxhil V`Sek]] <span class='fmz'>(Neriak Third Gate - Quest NPC)</span>
+* [[Olavn N`Mar]] <span class='fmz'>(Neriak Commons - NPC, Non-Quest)</span>
+* [[Opal Darkbriar]] <span class='fmz'>(East Freeport - Cleric Guildmaster)</span>
+* [[Razran F`Lok]] <span class='fmz'>(Neriak Commons - NPC, Non-Quest)</span>
+* [[Svunsa]] <span class='fmz'>(Neriak Foreign Quarter - NPC, Non-Quest)</span>
+* [[Uglan]] <span class='fmz'>(Neriak Foreign Quarter - Quest NPC)</span>
+* [[X`Ta Tempi]] <span class='fmz'>(Neriak Foreign Quarter - Quest NPC)</span>
+* [[X`Ta Timpi]] <span class='fmz'>(Neriak Foreign Quarter - Quest NPC)</span>
+* [[X`Ta Tompi]] <span class='fmz'>(Neriak Foreign Quarter - Quest NPC)</span>
+* [[Zhem Xecia]] <span class='fmz'>(East Freeport - Cleric Guildmaster)</span>
+
+}}
+= Suggested Route =
+*Kill [[Linara Parlone]] ([[Najena]] - 4min) or [[Tolkar Parlone]] ([[North Felwithe]] - 2min) (-[[Keepers of the Art]], -[[King Tearis Thex]], -[[Faydarks Champions]], +[[The Dead]]). <br>Do [[Bat Wings]] (+[[Keepers of the Art]], +[[King Tearis Thex]], +[[Faydarks Champions]], -[[The Dead]]) to Fix Felwithe (Net gain for [[The Dead]]).
+
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]

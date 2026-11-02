@@ -1,0 +1,27 @@
+{{Factionpage|
+
+| description = The faction of the oracle of the Ocean of Tears. Paladins need indifferent to quest for [[The Fiery Avenger]].
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Ocean of Tears]]
+
+| quests_raise = 
+
+* [[Tome of Ages]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Guardian of K`Arnon]] <span class='fmz'>(Ocean of Tears)</span>
+* [[Oracle of K`Arnon]] <span class='fmz'>(Ocean of Tears - Quest NPC)</span>
+
+}}

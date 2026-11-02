@@ -1,0 +1,12 @@
+This skill involves mastering the wrist and stance to get three attacks from a swing. This can increase a melee fighter's damage.
+
+== Classes ==
+
+* [[Monk]] - Level 46 '''(Max 100)'''
+* [[Warrior]] - Level 46 '''(Max 100)'''
+* [[Rogue]] - Level 46 '''(Max 100)'''
+* [[Ranger]] - Level 46 '''(Max 100)'''
+* [[Berserker]] - Level 46 '''(Max 100)'''
+{{Navbox Skills}}
+
+[[Category: Skills]]

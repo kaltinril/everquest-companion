@@ -1,0 +1,1740 @@
+{{TOC limit|2}}
+
+The latest patch notes can always be found on the EverQuest Legends official discord in the [https://discord.com/channels/1435786469968183456/1507492046296977548 #patch-notes channel] and on the [https://www.everquestlegends.com/patch-notes Official EverQuest Legends Website]
+
+= Classic Era Patch Notes =
+EverQuest Legends launched on July 28, 2026.  With a Level cap of 50, this is what the wiki will call the "Classic Era"
+
+== 2026-10-23 - Hotfix ==
+These patch notes are from the Official EverQuest Legends discord, posted on October 29, 2026
+
+=== General ===
+* Quests and dialogue in [[Nektropos Castle]] have been reworked for clarity and to protect players from being unable to progress.
+* Reduced the respawn timers of [[Plimptos]] and [[Lady Sileniu Everling]].
+* The debuffs applied by [[Alexa Everling]] during her encounter are now removed from players upon her death.
+* Quests in [[Nektropos Castle]] that require you to have an item to progress can now find items that are in Equipment Storage.
+
+== 2026-10-27 - Patch Notes ==
+These patch notes are from the Official EverQuest Legends discord, posted on October 27, 2026
+
+=== Gameplay === 
+* Nektropos Crypt Guardian is now properly marked as undead.
+* Killing enemies on the [[Host of Nektropos]] faction now increases faction with the [[Everling Dynasty]].
+* Quest-related NPCs in [[Nektropos Castle]] will no longer refuse to talk to you due to perceived faction issues.
+* Killing certain NPCs in [[Nektropos Castle]] will no longer display confusing faction loss messages.
+
+=== Items === 
+* Added a missing ornamentation socket to Cryptguard.
+
+=== Instances === 
+* The High Priestess of Ullkorruuk step of the quest Hate, Betrayal, and Trust should now be completable in solo or multiplayer personal (non-raid) instances.
+
+=== Loadouts === 
+* Players should no longer lose certain skills like Hide, Sneak, and Foraging when swapping to a Level 1 loadout.
+
+== 2026-10-23 - Hotfix ==
+These patch notes are from the Official EverQuest Legends discord, posted on October 23, 2026
+
+=== General ===
+* The Nektropos Head Librarian, [[Lady Everling]], [[Alexa's Handmaiden]] and [[Plimptos]] are more likely to talk to castle visitors, even if they dislike them.
+* The [[Handmaiden's Handwrap]] is now useful as a weapon with the correct skill.
+* The '[[Bloodsoaked Gauntlets]]' are now spelled correctly.
+* [[Schemer's Guise]] now properly applies the intended illusion, and the effect now works from your inventory.
+* [[Torturer's Signature]] now properly displays as a weapon when wielded.
+* Undead creatures in [[Nektropos Castle]] are now properly marked as undead.
+* Fixed an issue where [[C'Rate]] in [[Nektropos Castle]] would not fire its intended ability.
+* Addressed a few misaligned doors in [[Nektropos Castle]].
+* Fixed an issue where a door in [[Nektropos Castle]] could be unlocked from one side, preventing players from exiting the room.
+* [[Dorian G`Wyn|Dorian]] should now properly state that he ran 'westward' from the Freeport Militia building, not 'eastward' with regards to the scroll crate he lost.
+* In the Holiday event text, [[Vlad Sterovich|Vlad]] will now correctly specify a hint about a creature that slithers, correcting a typo.
+* The Zombie Petamoprh wand should now show up correctly instead of displaying a human.
+
+== 2026-10-22 - Patch Notes - Nektropos Castle ==
+These patch notes are from the Official EverQuest Legends discord, posted on October 22, 2026
+
+=== NEKTROPOS RELEASE === 
+
+[https://www.everquestlegends.com/news/eql-nektropos-castle The Secrets Behind Nektropos Castle's Doors Await You]
+
+=== General === 
+* [[Vlad Sterovich]] at the [[Lake Nerius]] Trading Center needs a few ingredients for a 'healing potion'. His idea of healing, of course, is soothing the soul with the macabre.
+* The [[Petamorph Wand: Werewolf]] item is available for FREE through the in-game Marketplace for a limited time.
+
+=== AA === 
+* Rank 2 of Rampage is now available at level 40 for [[Warrior|Warriors]] and [[Berserker|Berserkers]].
+
+=== Gameplay === 
+* Increased the base damage of Frenzy based on the primary weapon ratio.
+* NPCs (including pets) that can backstab are now also able to [[kick]] and [[bash]].
+
+=== Spells & Pets === 
+* Pet commands like Attack, Back off, etc. will put a temporary hold on the pet, preventing it from reacting to other hostile actions for 6 seconds.
+* Turning on pet taunt will now increase the pet's threat generation by 75%.
+* Turning off pet taunt will now decrease the pet's threat generation by 50%.
+* NPCs who were immune to pet taunt will no longer have this immunity in public zones or solo instances.
+* The taunt toggle is now enabled for use with charmed pets, however it will only provide the increase or decrease in aggro generation, and not enable the taunt action.
+* Fixed an issue with damage bonus when pets equipped a weapon with exactly 28 delay.
+* Fixed pet weapon choice preferences to better follow the new pet weapon bonus system.
+* Fixed an issue where several pet toggles (like Pet Taunt) would not retain its previous state on spawn.
+* Pets summoned via [[Monster Summoning I|Monster Summoning]] will now be [[Warrior]]/[[Berserker]].
+* Summoned pets will now gain additional mana from [[Wisdom]] and [[Intelligence]].
+* Summoned pet HP calculations now include a [[stamina]] dependence.
+
+=== Stances & Invocations === 
+* Berserker Stance has had its swing speed modifier increased slightly, its self-damage removed, and its bonuses to avoidance and mitigation removed.
+* Stances that reduce spell damage will now include damage over time effects.
+
+=== UI === 
+* Spell window and tooltip descriptions have been adjusted to provide more specific and accurate information about their various effects. More effects will be implemented over time.
+* Fixed a typo on [[Slugs Healing]] 'Cast on you' message.
+* Fixed a client hang in specific scenarios related to the UI.
+
+== 2026-10-13 - Patch Notes ==
+These patch notes are from the Official EverQuest Legends discord, posted on October 13, 2026
+
+=== General ===
+* Fixed an issue where attempting to save [[Barbarian]] face customizations would fail.
+
+=== Raid Resuming ===
+* Each boss in a raid with a lockout timer is now a checkpoint and once killed. Any spawn point tied to this boss's timer will not spawn when you resume the raid. While this is not particularly useful in today's content, this will be useful in later content.
+* The replay timer requirement for joining a group member's raid has also been removed. However, you will not receive loot from bosses if you have already killed that boss today.
+** NOTE: If a player joins another player's resumed raid and has a boss you shouldn't get loot on yet due to lockouts you will be able to kill the boss but will receive no loot for that boss. 
+** You will receive the same total possible loot per day/week as before, but there are now more options to assist your friends.
+
+=== [[Alternate Advancement|AAs]] ===
+* Widened Perceptions now works correctly after you switch to a low-level loadout.
+* Unbound Cascade now adds to your base critical damage. Before this fix, it actually lowered your crit damage.
+
+=== Pets ===
+* Pets with equipped items now use new and improved damage and delay calculations. When picking a pet weapon, its ratio now matters much more than its base damage.
+* Player pet damage no longer applies weapon damage bonus to items that no longer exist.
+* Increased the level cap for upgraded player pets from player level - 1 to player level.
+
+=== [[Achievements]] ===
+* The Kobold-slaying achievement now names the continent of Odus instead of Gloomingdeep.
+
+=== Spells ===
+* Magical Monologue no longer appears in the [[Bard]] song list.
+
+== 2026-09-28 - Patch Notes ==
+These patch notes are from the Official EverQuest Legends discord, posted on September 28, 2026
+
+=== General ===
+* Fixed an issue where Languages were not set on character creation correctly for [[Half-Elf|Half Elves]].
+* Common Tongue for [[Iksar|Iksars]], [[Ogre|Ogres]] and [[Troll|Trolls]] now defaults to 100. Existing characters have been updated to this value.
+
+== 2026-09-24 - Hotfix ==
+These patch notes are from the Official EverQuest Legends discord, posted on September 24, 2026
+
+=== General === 
+* Fixed an issue where flying creatures in the [[Plane of Sky]] could aggro erroneously.
+* Fixed an issue where the toggled portion of Point Blank Fire would impact melee auto attacks upon swapping to a Loadout that is unable to utilize Point Blank Fire.
+* [[Thornstinger]] is now Secondary equippable.
+
+== 2026-09-22 - Patch Notes ==
+These patch notes are from the Official EverQuest Legends discord, posted on September 22, 2026
+
+=== General ===
+* Falling damage and knockback effects are no longer affected by the game's performance on your machine.
+* Knockbacks are now capped on damage for pressure based on the distance that could actually have been traveled, and falls are now capped at a reasonably high amount of damage.
+
+=== Melee Combat Improvements ===
+* The formula for [[Skill Strategy|strategy]] skill was modified, and the endurance reduction curve is now less rough. Endurance costs are much lower at lower levels compared to before, and they are slightly lower by level 50.
+* Modified [[Stances & Invocations|Offensive]], [[Stances|Ranged]] and [[Stances|Striker Stance]] endurance costs. They now use the endurance costs before all item upgrades.
+* Added accuracy bonuses to upgraded weapons. This is additive with Stance Bonuses. Both melee and ranged weapons gain additional accuracy bonus.
+* [[Skill Backstab|Backstab]] damage on items now scales with weapon upgrades.
+
+=== AAs ===
+* Added a new AA, Widened Perception, that increases the amount of loadouts available to your character by 1.
+* A new toggleable AA called 'Point Blank Fire' has been added for [[Ranger|Rangers]], [[Rogue|Rogues]], [[Monk|Monks]] and [[Berserker|Berserkers]].
+** The new, auto-granted Point Blank Fire AA ( Rangers, Monks, Rogues, Berserkers) provides always-active passive benefits (no minimum ranged distance & grants the ability to double and triple attack ranged attacks). This ability can also be toggled on to always prioritize ranged attacks over melee attacks when autoattack is activated.
+* The Weapon Mastery of the Scout AA has had it's damage percentages lowered to 20/40/60%.
+
+=== Stances ===
+* [[Stances & Invocations|Ranged Stance]] has been revamped. Ranged Stance will now parallel Offensive Stance:
+** "Outgoing ranged damage is increased by 100% and your chance to hit is increased by 25%. Every point of bonus damage dealt consumes an equal amount of endurance, with a reduction based on your strategy skill."
+
+=== Spells ===
+* [[Cancel Magic|Cancel magic]] will now dispel detrimental buffs on allies and beneficial buffs on hostiles.
+** If a hostile cast (PC/pet on NPC or NPC on PC/pet), then only strip beneficial buffs
+** If a friendly cast (PC/pet on PC/pet ), then only strip detrimental buffs.
+** If NPC on NPC or any information can't be found, use legacy strip first buff logic.
+** This does not impact the behavior of cures for buffs not removable by cancel magic.
+* The spells [[Alter Plane: Hate]] and [[Alter Plane: Sky]] now benefit from the reagent cost reduction granted by spell ranks. At rank 10, it is not required for the player to possess the reagent at all.
+* Heart Harpies in the [[Plane of Sky]] will proc their AoE mesmerization much less frequently.
+
+=== Loadouts ===
+* Swapping Loadouts with an item equipped that is not Keyring Compatible (ie; stackables like [[Fishing Grubs]]) will now send the item into the Inventory.
+
+=== Achievements ===
+* The achievement "Drawing Life from a Stone" is now marked as optional for the achievement Highly Decorated.
+
+=== Zone Population === 
+* [[Hand of the Maestro]] will no longer spawn in non-raid [[Plane of Hate]].
+* The following NPCs are no longer required for dungeon crawls.
+* [[Crushbone]]:
+** [[Ambassador DVinn|Ambassador D`Vinn]]
+** [[Retlon Brenclog]]
+
+* [[Befallen]]:
+**[[Boondin Babbinsbort]]
+
+* [[Mistmoore Castle|Castle Mistmoore]]:
+** [[Ssynthi]]
+
+* [[Plane of Hate]]:
+** [[Corrupter of Life]]
+
+* [[Najena]]:
+** [[Linara Parlone]]
+
+* [[Splitpaw]]:
+** [[Brother Hayle]]
+** [[Brother Gruff]]
+
+* [[Kedge Keep]]:
+** [[Auraline]]
+
+* [[The Warrens]]: 
+** [[Aderius Rhenar]]
+
+== 2026-09-15 - Patch Notes ==
+These patch notes are from the Official EverQuest Legends discord, posted on September 15, 2026
+
+=== AA === 
+* The "Quick Buff" Alternate Ability Timer will now reset upon player death.
+* [[Weapon Procs]] that normally work with the AA 'Symphonic Aura' will no longer be prevented from firing while Symphonic Aura is active.
+* Symphonic Aura spell sounds should now be silenced while grouped, not just while solo.
+* The AA "Master of All" is now one rank, with a cost of 10 AAs. The one rank allows you to increase all of your specialization skills beyond the limit.
+** NOTE: Those who have previously had ranks beyond Rank 1 in this spell have been refunded the cost of those AAs.
+ 
+=== Achievements === 
+* "I'm Boared", "Herbicide" and "Living Stone, I presume?" are now marked as optional achievements for completing the meta achievement "Highly Decorated."
+* Guild Halls, Housing, and Special Events are now marked as optional achievements for completing the meta achievement "Norrathian Explorer".
+
+=== Items === 
+* The description of the spell effect of [[Greater Potion of Antibody]] ([[Aura of Antibody]]) now reports that it increases Charisma as well as Disease Resistance.
+
+=== Gameplay === 
+* Player pets now respect lore equipped restrictions when transferring items from the player pet inventory.
+* Fixed an issue where group members while charmed or feared may not receive loot.
+
+=== UI === 
+* Spell upgrade suffixes will now also appear correctly in chat for status updates such as interrupts, fizzles, missed notes, wore-off, and damage.
+* The Magician AA Ability Turn Summoned should no longer show unobtainable ranks.
+* Maps have been added for the [[Plane of Hate]], [[The Hole]], [[Rathe Mountains]], and [[Runnyeye]].
+
+== 2026-09-09 - Patch Notes ==
+These patch notes are from the Official EverQuest Legends discord, posted on September 9, 2026
+
+=== [[Dungeon Crawl|Dungeon Crawls]] ===
+* Non-Respawning Zones are now known as [[Dungeon Crawl|Dungeon Crawls]]!
+* [[Dungeon Crawl|Dungeon Crawls]] are active in indoor Dungeons. They function similarly to the old Non-Respawning Zones, but with special rewards for clearing the Dungeon Crawl.
+** To finish, slay every rare creature and enough of the zone's original population. Nothing you kill will respawn naturally.
+** You'll earn motes and experience upon completion, and anything you killed may add its loot and coin to the Bonus Chest on completion.
+** The easier the zone is for you, the smaller the payout.
+** Finish the Dungeon Crawl, and you get your instance charge back.
+** Rare creatures will appear on your map while in a Dungeon Crawl.
+
+=== AAs === 
+* Spell Casting Subtlety, Symphonic Aura, and Reaching Notes are now toggleable without the rank of the AA changing.
+* The 'Disabled' Ranks of AAs have been removed, and 'Enabled' removed from the names of the AAs.
+** There should be no change in the amount of AAs spent or assigned.
+** When these AAs are purchased, and a hotkey is created, the player may press the hotkey to enable the AA, which will be indicated by a green ring around the hotkey. Pressing the button again will disable the ability.
+* Fixed a bug where Blood Rune's cap was 5/8/10 instead of 5%/8%/10% of player's maximum HP.
+* Symphonic Aura now suppresses spell instrument animations and sounds.
+** NOTE: Spell particle effects remain controlled by the existing Beneficial Songs option.
+
+=== Achievements === 
+* The "You're Faunny!" and "It's Plane to See" achievements should now be properly labeled as optional.
+
+=== Gameplay === 
+* Fixed the running animation acting strange when using instruments or attacking.
+* Bosses in the [[Plane of Sky]] are now all flagged as rare creatures.
+* Fixed an issue that made pets not able to proc AOE spells.
+* The [[levitation]] fall rate has been normalized for smoother falling experiences.
+
+=== Items === 
+* [[Spider Silk Cap]] can now once again be upgraded.
+
+=== Spells ===
+* Further prevented detrimental spells from stripping beneficial spells when their effects collide.
+
+=== UI ===
+* Fixed an erroneous string when attempting to leave an instance while in combat.
+* Added a message about the failure to earn an instance recharge if a dungeon crawl is too easy.
+* The non-existent zone line from [[Mistmoore Castle]] to The Bloodfalls no longer appears in the Find window.
+
+== 2026-09-02 - Hotfix ==
+These patch notes are from the Official EverQuest Legends discord, posted on September 2, 2026
+
+=== General ===
+* Fixed a rare client crash.
+* Nameplate/Extended target window will no longer show you as having aggro while [[Feign Death|feigned death]], or if enemies have forgotten you.
+* Fixed an issue with the [[Monk]] AA Unbound Alacrity (+10% overhaste)
+
+== 2026-09-01 - Patch Notes ==
+These patch notes are from the Official EverQuest Legends discord, posted on September 1, 2026
+
+=== [[Plane of Sky]] Changes ===
+* Players can now receive bonus quest loot drops in the Plane of Sky for the classes in their current loadout. The drops will go into your Personal Loot pool and are affected by your loot filters such as auto-store and auto-destroy.
+** These bonus drops extend to all enemies that drop items used in [[Plane of Sky]] [[Plane of Sky#Plane of Sky Class Quests|class quests]] except for the lettered "Wind Rune" items. That means main bosses, Efreeti, and even regular enemies that are needed for specific drops like many of the enemies on Islands 6 and 7.
+** The bonus drops are not guaranteed but there are separate chances for all of the classes in your loadout - meaning that on occasion you can have three additional items added to your personal loot for a single kill!
+
+=== Loadout Improvements ===
+* You can now change your gender as part of configuring a loadout.
+* Your currently selected face and eyes now save and can be stored as part of Loadouts.
+
+=== General ===
+* [[Levitation]] spells have had their descent rate adjusted to be consistent when slowly floating down.
+
+=== Achievements ===
+* [[Kerra|Kerran]] now count for the "Not a Kerran the World!" Achievement.
+* Various Achievements are now marked optional that are not completable in the current expansion.
+* The achievements relating to zones Freeport Sewers, Jaggedpine Forest, Caverns of Exile, and Nedaria's Landing are no longer active as they are inaccessible.
+* The achievement Hunter of Toxxulia Forest is no longer active as it no longer has any valid targets.
+
+=== AAs ===
+* Full Potential will now autogrant at level 50. If you previously did not receive this AA, swap to any level 50 Loadout and zone.
+* The Valiant Steed and Abyssal Steed AA abilities have been removed and the points refunded to all players who had these abilities.
+* Existing Valiant Steed and Abyssal Steed items have been converted into Holy Steed and Unholy Steed items, respectively.
+
+=== Zones & Population ===
+* Fixed an issue where 3 NPCs in [[The Northern Desert of Ro|North Ro]] were flagged as named, despite the fact that they are obviously just Troopers.
+* [[Malloy the Songbird]] in [[West Freeport|West Freepor]]<nowiki/>t no longer is tagged as a rare creature.
+* [[Clockwork XIVB]] in [[Ak'Anon|Akanon]] should no longer show up as a humanoid.
+
+=== Items ===
+* [[Enchanted Fine Steel Morning Star]] is now usable by [[Beastlord|Beastlords]]
+* Added a missing ornamentation socket to [[Ancient Spurned Waistcoat]].
+* The various [[Soldier's Brooch Quest|Brooch]] rewards from the [[Rathe Mountains]] Froglok quest lines no longer have a level requirement.
+
+=== Spells ===
+* Improved spell stacking to prevent detrimental spells overwriting beneficial buffs when they impact, such as Hastes vs Slows, Movement Speed Buffs vs Snares, and Heal-Over-Time vs Damage-Over-Time spells. 
+** In addition, detrimental spells will no longer strip beneficial spells from players when they contain the same effect type.
+* Dispel spells are treated as detrimental for targeting in Spellblade procs.
+
+=== Stances & Invocations ===
+* The SpellBlade Invocation has been updated to work within a 2 second margin.
+** e.g. If a spell's cast time is 4 seconds and it's re-use time is 6 seconds, this is a valid spell for SpellBlade.
+
+=== UI ===
+* Fixed an issue where some checkboxes and labels were word wrapping too soon when using fractional scaling.
+* Right clicking on the spell gem in the actions window will now operate the same as right clicking else where in the list. Added an upgrade hint to the description section.
+* Added a toggle to smooth out camera motion while in first person mode.
+* Fixed an issue where an improper message would appear when trying to leave an instance in combat.
+
+== 2026-08-25 - Patch Notes ==
+These patch notes are from the Official EverQuest Legends discord, posted on August 25, 2026
+
+=== [[The Estate of Unrest]] Revamp ===
+* Added new items to most rare creatures within the zone.
+* Improved some existing items within the zone.
+* Undead monsters commonly seen on the first floor of the estate interior now occasionally drop Fine Steel weaponry.
+* Rare monsters are now guaranteed to spawn with no placeholders.
+* Several additional monsters recognizable as named are now flagged as rare creatures, and will benefit from increased mote drop rates.
+
+=== [[Solusek's Eye]] ===
+* Rare creatures in [[Solusek's Eye]] are now guaranteed spawns with no placeholders.
+* Several additional monsters recognizable as named are now flagged as rare creatures, and will benefit from increased [[Mote Guide|mote drop]] rates.
+
+=== Gameplay ===
+* Decreased the amount of hitpoints that raid bosses have in multiplayer play within raid ([[voidling]]) zones.
+* Fixed an issue where receiving an instance charge reset the timer to 1 hour when it should have been a remainder.
+* Pets will no longer have their own faction and will no longer have their own aggro range.
+
+=== Zones & Population ===
+* Killing [[Pickclaw Goblins]] will now raise faction with [[Priests of Mischief]].
+* NPC pets should no longer be capable of summoning a pet.
+
+=== Quests ===
+* Experience, faction, coin, items, and stats are now bulk calculated.
+** Bulk quest item and coin turn-ins now pre-calculate results and display clearly in chat (max 4 'chat' blocks).
+** Bulk quest turn-ins prevent FPS drops and resolve instantly.
+** Coin quest NPCs now accept bulk quest turn-ins and will refund overage in the highest denomination.
+* Quest NPCs will now accept coin in any denomination.
+* Receiving multiple item rewards will display how many rewards you received.
+
+=== Items ===
+* Increased the runspeed of the [[Bristly Boar Reins]] by one speed tier.
+* Players who have acquired the [[Torrid Corruptor]] can now retroactively grant themselves the quest title by right-clicking the item while it is equipped. Title may require zoning before it propagates.
+* Increased the AC value of armor drops from [[Warlord Skarlon]].
+* Added endurance to the [[Verishe Mal Greataxe]].
+* Corrected tint on the Dark Mail items from [[Najena]].
+
+===  AAs ===
+* Fixed an issue where Full Potential would not be granted in some cases. 
+** Affected players can swap loadouts once to receive this AA if they are missing the AA and their highest loadout is level 50.
+* Added a new [[Beastlord]] AA Ability: Strike As One.
+** This passive AA can be trained at level 35 or above for a cost of 6 AA points.
+* Once trained, the [[Beastlord]] will have a chance on hit to proc the Strike As One buff, granted their Warder a 30% increased flurry chance for 12 seconds.
+
+=== Spells ===
+* Pets can now gain benefits from pet proc spell upgrades (damage, resists).
+* Fixed an issue where summoning a familiar was interfering with pets properly re-leveling to their upgraded state after zoning.
+* Fixed F1 (Target myself) targeting to always select the pet if both a pet and familiar are present.
+* Added preview of updated spell effects when motes are added to the merge slot in the spell display window.
+* Fixed a bug that can cause erratic spell cooldowns for instant-cast spells.
+
+=== UI ===
+* Fixed a bug where the instance menu could become unresponsive when editing keybinds.
+* Right clicking on the spell gem in the actions window will now operate the same as right clicking else where in the list. Added an upgrade hint to the description section.
+* Added the next charge time to the instance menu.
+* Prevented tooltips from going off-screen while using window scaling.
+* Fixed map centering when using scaling options.
+* Fixed UI window scaling issues in modern UI where "keep on screen" settings were not being properly applied on full UI reload.
+* Fixed UI reloading when not using "keep my settings."
+* Fixed quantity drawing on the [[tradeskill]] window.
+* Increased the maximum draw range of nameplate scaling in Options.
+* Removed nameplate fonts from UI scaling to maintain readability.
+* Resolved an issue with fonts that was contributing to issues with line breaks occurring too soon.
+* Added modern input fields to the Social Hotkeys edit window (cut, copy, paste, cursor movement without shift, etc).
+* Added 2 new nameplate options for aggro indicators:
+** Mode 1 - Aggro mode. Nameplates will now have an outline and pulse their outline shadow in if the NPC has you targeted. This also applies a red, pulsing 'lasso' on the Extended Target window.
+** Mode 2 - No-aggro mode. Applies the same styles, but only when the NPC is targeting a member of your group, or a group member's pet.
+
+== 2026-08-18 - Patch Notes ==
+These patch notes are from the Official EverQuest Legends discord, posted on August 18, 2026
+
+=== Mistmoore Castle Revamped === 
+* [[Mistmoore Castle]] has received a major upgrade!
+* In addition to named NPCs being guaranteed spawns, they now all have a guaranteed loot drop of a common or rare item with stat bonuses. While some of these items are familiar to explorers of the castle in years past, many are brand new. Some include exciting new effects ready for you to enjoy as they are or turn into exaltations.
+* All named enemies in the zone have now also been designated as rare creatures, vastly increasing their chances of dropping motes of potential.
+* Additionally, the residents of the main castle are now somewhat less aggressive and will not react to your presence from extreme ranges... during the daytime. Exploring the castle at night, however, will still be a harrowing affair once the castle denizens have shown their true forms.
+
+=== Fractional UI Scaling & Cursor Scaling === 
+* The UI Scaling system now supports fractional ui scaling in .25 increments, ranging from 0.75x to 4.00x.
+* The Cursor now has its own scaling factor in the in-game Options (O).
+* A toggle now exists in the in-game Options (O) to use the Operating System cursor, rather than the in-game cursor.
+
+=== Group Experience Bonus === 
+* Grouping will now give a small experience bonus as intended.
+
+=== Gameplay === 
+* Increased the melee combat potential of [[Beastlord]] Warders substantially.
+* Fixed an issue where raid invites would fail in certain circumstances.
+* Non attackable NPCs can no longer multiclass.
+* Address an issue where NPC corpses could continue walking even after they have died.
+* Restored the original, Classic two-handed blunt animations to the game.
+* You will no longer gain skillups from skills you haven't used when riposting.
+* Creatures in the [[Plane of Fear]] and beyond should no longer fear or charm you so hard that you're unable to approach the game again for 24 hours.
+* Fix for players getting charmed, and then shrunk by the pet scaling option ingame.
+* Addressed an issue where NPCs would continue attacking each other after charm fades.
+* Fixed a bug where [[Skill Cleave|cleave]] wasn't working with 1HB weapons.
+* Updated the messages that appear while being stunned to clarify that you are now immune and that you are currently immune on subsequent hits.
+* Fix an issue where zone specific music tracks would skip over music tracks if environmental sounds were disabled.
+* Fix an issue where music would need to completely come to a stop before being able to resume the same track. The same track will now be able to resume the same sequence without having to fully have the track come to a stop.
+
+=== Spells & AAs === 
+* Targeted area effect lull spells, such as [[Harmony]], can now take effect on NPCs you have not engaged in combat.
+* Mounts that are obtained from AAs will now only grant the Mount speed when you are a valid class for using that AA.
+* Fixed an issue where a long (5-10 sec) recovery cooldown would fire if you used the Stop Action keybind with a Bard as one of your classes.
+* Fixed an issue where range checks on contact [[Proc|procs]] like [[Vampiric Embrace]] would not work properly on NPCs with large hit boxes.
+* The [[Lifespike]] spell has been moved from level 8 to level 5 for [[Shadow Knight|Shadowknights]].
+* A new lifetap spell, [[Lifebite]], has been added at level 10 for [[Shadow Knight|Shadowknights]], and level 8 for [[Necromancer|Necromancers]]. 
+** This new spell has been added to the autogrant list for both classes, and to the appropriate spell vendors.
+
+=== Zones & Population === 
+* The Wasps/Bees of [[Plane of Sky]] have seen had their stingers filed down while charmed.
+* The Wasp/Bee in Plane of Sky known as 'Murderbee' should be a bit easier to exterminate in solo instances.
+* Shimmering Meteors have also had their damage tuned downwards while charmed.
+* Snow no longer overwrites the zone's precipitation type, preventing rain from falling. Praise Karana.
+* Rain is no longer too small to see.
+* Many wild animals should now be friendly towards [[Kerran]], similar to how they react to [[Ranger|Rangers]] & [[Druid|Druids]].
+* Monsters should no longer try to patrol through walls in [[Runnyeye]].
+* [[Seplawishinl Bladeblight]] in the [[Ocean of Tears]] now has a considerably shorter respawn timer.
+* Fixed an issue where high level named monsters in [[Kedge Keep]] were taking an excessively long time to respawn.
+* Non-raid boss NPCs are now restricted from casting charm if they already have a pet.
+
+=== Quests === 
+* The [[Soldier's Brooch Quest|Soldier's Brooch quest]] in [[Rathe Mountains]] will now allow the player to choose their reward.
+* Updated the [[Torrid Corruptor]] final turn in to properly grant the quest completion title to some players that do not meet the 'lore' requirements of the quest.
+* Players are now given the corresponding [[Potential of the Void]] task when they enter a raid instance.
+* Upon entering a raid instance, all other [[Potential of the Void]] tasks are removed from the task list.
+
+=== Items === 
+* Corrected an issue that allowed Player Illusions to be used as Pet Illusions.
+* As a result of this change, we have added a Conversion button to [[Guise of the Deceiver]] and [[Amulet of Necropotence]] that allows these items to be turned into a Pet Illusion version.
+* [[Bloodmoon]] now has the Focus Effect [[Improved Vampirism III]].
+* Fixed an issue preventing Armor [[Ornamentation Token|Ornamentation Tokens]] from working created from Cloth armor.
+* [[Copper Band]] now has +1 AC.
+* The Unholy Steed, Holy Steed, Abyssal Steed, and Valiant Steed AAs will now summon bridles, which can be used to summon the mount, instead of directly summoning the mount.
+* Fix an issue where various item animations (such as whips and bows) were not animating on attack.
+* Player pets are now prevented from equipping secondary-only items when they utilize a two-hander in their primary hand.
+
+=== UI === 
+* The search feature for spell inside the actions window has had its data expanded to be able to search many more fields.
+* Added UI Scaling to the server selection screen.
+* Fix an observed issue with spacing and scaling.
+* Fix an observed issue where windows would not keep relative position and not keep on screen when resizing or rescaling.
+* Adjusted inventory AC and weight labels to not include erroneous spacing.
+* Scaling now applies before character select so that loading screen also scales properly.
+* Fixed a Layout calculation bug that was causing the Actions window to produce graphical artifacts when shrinking the window vertically.
+* On fresh installations of EverQuest Legends, a value for UI Scaling is now automatically detected and used.
+* Changed UI Font Scaling to use dynamic re-rasterization.
+* The map window should now be more compatible with UI Scaling.
+* All context menus will now be fully kept on screen. This includes the spell list when you right click an empty gem.
+* The Personal Instance window now properly shows respawning/non-respawning selections correctly.
+* Fixed a display issue with the item inspection window that occurs after viewing an item that is convertible, such as the [[Gnoll Slayer]] item.
+* A batch of new maps have arrived for the Maps window.
+* Fixed a bug causing the Control Option 'momentary duck toggle' to not load its saved state.
+* Added a new Options toggle in Interface->general to use the Actions/Spells window instead of the spellbook for the "Open Spellbook" keybind, and the Book Button on your spell bar.
+* Added a button in the Spellbook to open the actions window to the Spells tab.
+* Added that same toggle option from Options in the Spellbook for visibility.
+
+
+== 2026-08-05 - Hotfix ==
+These patch notes are from the Official EverQuest Legends discord, posted on August 5, 2026
+
+=== General ===
+* Corrected an issue where the weekly timer was incorrectly set for the [[Void-Touched Potential]] weekly task.
+* Affected players who were unable to get their [[Void-Touched Potential]] will now be able to obtain it.
+* The server will once again reset at 8:00 AM PDT on Tuesdays.
+
+== 2026-08-04 - Patch Notes ==
+These patch notes are from the Official EverQuest Legends discord, posted on August 4, 2026
+
+=== General ===
+* Fixed an issue that was causing instances to close prematurely.
+* Fixed an issue where changing loadout to [[Kerra|Kerran]] for the first time resulted in no textures being displayed.
+* Fixed an issue that prevented Armor Ornamentations from being inserted into certain item types, such as chain arms on monk arms, or robes on chestplates.
+* Updated the grave marker for Aradune in [[East Karana]].
+* Fixed an issue preventing autoinventory from working in certain circumstances.
+
+=== AA === 
+* Using Harm Touch IX will no longer unintentionally damage the player.
+* The Full Potential AA should now remain effective after swapping to a loadout that is not level 50.
+
+=== Gameplay === 
+* The inhabitants of [[Kerra Isle]] will now consider players slaying [[Erudite|Erudites]] favorably. They will also celebrate in the slaying of local kobolds in the [[The Warrens|Warrens]].
+* [[Shanis MacDarren]] should no longer tell new [[Barbarian]] [[Berserker|Berserkers]] to talk to Haladorf.
+* Fixed a bug where [[Skill Cleave|cleave]] wasn't working with 1HB weapons.
+* [[Kerra|Kerran]] [[Beastlord|Beastlords]] should now be using the proper summoned Tiger model.
+* Guild Masters in the [[New Sebilisian Expedition]] should now train all of the appropriate skills.
+* The [[Froglok]] [[Monk]] Guildmaster in the [[Rathe Mountains]] will now properly train Monk skills such as Feign Death and Mend.
+* The orc appentice in [[Crushbone]] has finished his training, and become a fullblown apprentice!
+* Some misbehaving quest NPCs in [[Kerra Isle]] can no longer be inadvertently lured into combat
+* It is now possible to read a specific "note" type item used in a [[Kerra Isle]] quest by right-clicking on it.
+* [[Upper Guk]] will no longer have placeholders for named creatures, such as the froglok gaz squire and the froglok shin lord.
+* The Ishva Mal will no longer proc Harm Touch.
+* The [[Gloomwater Arrow]] will now drop one at a time in [[Kedge Keep|Kedge]].
+
+=== Spells === 
+* Damage spells that have a stun component should now properly apply the stun (subject to stun immunities from recent stuns)
+* The [[Shaman]] spells [[Tortoises Healing]], and [[Slugs Healing]], have had their prices adjusted to be in the correct order.
+* [[Necromancer]] NPCs and pets should no longer cast [[Dark Empathy]], [[Shadow Compact]], [[Corporeal Empathy]], or [[Pact of Shadow]].
+
+== 2026-07-29 - Hotfix ==
+These patch notes are from the Official EverQuest Legends discord, posted on July 29, 2026
+
+=== General ===
+* Buff charge counters should be properly displayed (e.g., "17" will be displayed instead of "1").
+* Original [[Kerra Isle]] music should play more frequently.
+* Original [[Plane of Sky]] music should play more frequently.
+* Loot drops will correspond to the difficulty tier you’re in, plus a diminishing chance to roll higher tiers. 
+** For example, in D1, you will roll +1 or higher. In D4, you will roll +4 or higher.
+* Improved backend stability for instances.
+
+== 2026-07-28 - Launch day Patch Notes ==
+These patch notes are from the Official EverQuest Legends discord, posted on July 28, 2026
+Patch notes are also available on the EverQuest Legends website [https://www.everquestlegends.com/patch-notes/eql-update-notes-7-28-2026 here]
+
+=== General ===
+
+* [[Kerra|Kerran]] [are] now available as a player character race. Kerran primary race unlocks are achievable by exploring [[Kerra Isle]].
+* The Troopers have removed the barricades in the [[New Sebilisian Expedition]], allowing for adventurers to venture forth, and discover what lies beyond, and maybe figure out just what this place is....
+* Introducing [[Void-touched Potential]], a new token that can be earned up to 3 times per week from raid activities through [[voidlings]]. A Void-Touched Potential can be merged like [[Mote Guide|motes]] to increase an item or spell's rank by +1.
+* Auto attack will no longer persist if your target's death causes their owned pet to subsequentially despawn.
+* Fixed NPC spell casting logic so that it respects spell reuse and recovery times and prioritizes damage over harmful spells.
+* Stunned players now receive a short-term immunity from additional stuns that lasts beyond the duration of the current stun. This will prevent chain stunning. However players beware, NPCs also learned the basics of this skill.
+* Loss of player control spells (such as NPC charm) are now capped to 30 seconds duration.
+* Improved casting behavior of multi-class [[Bard|bards]] to better prevent stuck-states between songs and casting spells.
+
+=== AAs / Skills / Disciplines ===
+* Added the Unbound Alacrity AA, a new autogranted class AA for [[Monk]] 
+** Gives a passive 3/6/10% increase in your current and maximum haste value.
+* Added the Unbound Life AA, a new autogranted class AA for [[Paladin]] 
+** Gives a passive 2/4/6% increase to your direct healing spells.
+* Added the Unbound Ferocity AA, a new autogranted class AA for [[Beastlord]] 
+** Gives a passive 3/6/9% chance for your pet to flurry.
+* Added the Unbound Versatility AA, a new autogranted class AA for [[Bard]] 
+** Gives a passive 5/10/15% chance for you to continue casting through a stun.
+* Added the Unbound Drain AA, a new autogranted class AA for [[Shadow Knight]] 
+** Gives a passive 2/4/6% increase in damage for lifetap spells.
+* Added the Unbound Lethality AA, a new autogranted class AA for [[Rogue]] 
+** Gives a passive 10/15/20% bonus to the duration of all poisons. Additionally lowers the resist value of all poisons by 25/50/75.
+* Added the Tricksters Misdirection AA, a new class AA for [[Enchanter|Enchanters]]. 
+** When used, the AA applies a buff with a 1 minute duration. That buff is a defensive proc with 1 charge, and a 100% trigger chance. When triggered, a simulacrum of the player is summoned, and the player is teleported backwards, out of harms way. The simulacrum spawns with all of the players aggro from the target, and then the players aggro is reduced drastically. The simulacrum will live for up to 15 seconds.
+* Ranks 9 and 10 of [[Harm Touch]] will now add a Damage Over Time effect to their target.
+* The Leech Touch AA is now a passive ability. Once purchased, it gives [[Harm Touch]] a permanent, passive lifetap component to both instant and damage over time components.
+* Flesh To Bone will now create NODROP [[Bone Chips]], that can still be used for summoning spells.
+* Activating skills [[Skill Cleave|Cleave]] or [[Skill Frenzy|Frenzy]] will reduce the cooldown time of the Rampage AA
+* The Improved Bash AA can now utilize the best item (weapon or shield) from the primary, secondary, or Any slots. If no valid item is in any of those slots, it will still activate for minimal damage but with the interrupt potential.
+* Quickbuff now excludes lull / pacify spells.
+* Alternate Ability Timers should no longer have collisions, such as Cannibalize triggering Harm Touch or vice-versa.
+
+=== Audio ===
+* [[Froglok|Frogloks]] now use Classic appropriate sounds!
+
+=== Gameplay ===
+* Removed placeholders from and lowered maximum respawn times in several dungeons:
+** [[The Hole]]
+** [[Nagafen's Lair]]
+** [[Lower Guk]]
+** [[Splitpaw Lair|Lair of the Splitpaw]]
+** [[The Warrens]]
+** [[Castle Mistmoore]]
+* More dungeon treatments will take place over time.
+* Rare monsters in [[Crushbone]] flagged as rare monsters
+* Crushbone's [[Orc Scoutsman (Crushbone)|Orc Scoutsman]] and [[Orc Warden]] respawn timers substantially reduced
+* [[Chokehold]] in [[Crushbone]] is now susceptible to melee attacks.
+* Reduced the kicking vigor of low level NPC monks.
+* Players will no longer receive motes while at the class lock cap. 
+** (NOTE: this is when you must lock in your primary class when you get to level 11)
+* Motes will no longer drop for players unless they were eligible to gain exp from the kill.
+* All races are now eligible to equip items, such as for charm pets.
+* One of the bees in [[Plane of Sky]] should no longer become a murder bee upon being charmed.
+* Guild Masters should no longer point new characters towards NPC that don't exist, to complete quests that don't exist.
+
+===  Instances === 
+* All methods of quitting an instance will now also cause you to leave that zone.
+* Killing a raid boss while you have a loot lockout will now give one guaranteed drop from that boss’s unique treasure tables, along with possible drops from its standard loot pool.
+
+===  Items === 
+* [[Shield of the Immaculate]] now requires being equipped to use the activated effect, and has a 6 second recast time.
+* [[Headsplitter|Headsplitter Axe]] no longer sillily usable by [[Monk|Monks]], [[Rogue|Rogues]], or [[Beastlord|Beastlords]].
+* [[Slave Trammels]] now properly reflect being leg irons.
+* [[Spiky Splintmail]] now has a worn graphic and its clicky has been shifted to [[Bramblecoat]]
+* Ornamentation slots added to new model-visible items from [[Crushbone]]
+* Several [[Crushbone]] items have received worn graphics.
+* [[Rib-bone Stiletto]] graphics have been updated.
+
+===  Spells === 
+* Improved [[Beastlord]] Warder mana regeneration values.
+* Pets can now be summoned with a permanent illusion using illusion items in activated item storage.
+* Upgraded pet spell level base damage bonus now applies to some pet skill attacks and will more reliably increase base melee damage.
+* The [[Shaman]] spells [[Tortoises Healing]], [[Slugs Healing]], and [[Snails Healing]] are now all tied to the correct spell scroll.
+* Familiars will no longer show pet statistics.
+
+===  Tradeskills === 
+* Disabled the remaining throwable Concoctions made by Alchemy.
+
+===  UI === 
+* UI Scaling and text filtering have been added to options window. 
+** Text filtering can change the way text appears on screen making it sharper or a little more blurry depending on the setting you prefer. 
+** Scaling options are 1, 2, 3 ,4 ,5
+* Updated the Help options in game to remove incorrect information and remove the out of date tips.
+* Tinted the pet inventory slot border red if you have an active pet and the item is not equip-able due to class or level.
+* Windows size is no longer saved if the window is in the minimized state allowing you to restore properly on next game open.
+* Auto Add Hater Targets has been changed to Auto Add Hate Targets.
+
+===  Kerra Isle ===
+* [[Kerra Isle]] has been redesigned as a home for new [[Kerra|Kerran]] characters in Norrath. Visitors to the Isle will find Guildmasters, Spell Merchants, a Banker, Constructed Potential, an Adventuring Supplies merchant, and a number of friendly felines with quests to complete!
+* Newly created [[Kerra|Kerran]] characters will receive a "note" item that can be traded directly to their Guild Master for a small amount of experience and faction. Don't forget to hail your Guild Master afterwards, as they will provide an important task for an achievement on the Isle
+* Quests on [[Kerra Isle]] have been altered to take place on the continent of [[Odus]], including Kerra Isle itself as well as [[Toxxulia Forest]] Some familiar quest rewards have been updated to fit the level range of the new area and the design of EverQuest Legends
+* These quests are also built using the "Task" system for easy tracking of your progress. 
+** You can always press [Alt+Q] (default) to open the [[Quest Journal]] where you can check how your quests are going
+* Non-Kerran visitors to the region should also consider hailing a Guild Master to receive the task for the achievement (because they just might decide they'd like to try the cat lifestyle in a future loadout)
+
+= Pre-Order Beta Patch Notes =
+The EverQuest Legends Pre-Order beta is available to anyone who has pre-ordered the game.
+The Pre-Order Beta ran from July 1st through July 21st.
+
+== 2026-07-14 - Pre-Order Beta Patch Notes ==
+These patch notes are from the Official EverQuest Legends discord, posted on July 14, 2026
+Patch notes are also available on the EverQuest Legends website [https://www.everquestlegends.com/patch-notes/eql-update-notes-7-14-2026 here]
+
+=== General ===
+* [[Crushbone]] has received a significant update!
+** While the elves of Faydark were distracted with politics and intrigue, Clan Crushbone has been ceaselessly fortifying and multiplying it's army.
+** The inhabitants of Faydark seek aid to quell the iron fist of [[Emperor Crush]] and the threat of open war.
+** Let alone it's invaluable nostalgia, this early game dungeon features plenty of fresh loot and new enemies for adventurers to experience from levels 4 through 22.
+
+* The [[Splitpaw Lair|Lair of the Splitpaw]] has received a significant update!
+** Beginning with enemies from levels 25-28 at the entrance, the dungeon ramps through five difficulty bands. 
+** In the highest level areas of the zone, standard enemies are levels 40-42. In each of these areas, named enemies can somewhat exceed the levels of the standard population.
+** New rare spawns have been added, along with new and improved equipment drops. Rare spawn rates and equipment drop rates have also been substantially increased. 
+** Expect to see guaranteed rare spawns in the lowest level areas of the dungeons, decreasing gradually until the highest level areas. 
+** Named enemies will still appear very frequently even at the end of the dungeon!
+
+=== AAs ===
+* Quick buffing will now turn off any invocation then restore it after the quick buff finishes.
+
+=== Gameplay ===
+* Fixed an issue preventing weapon procs from triggering.
+* NPCs with secondary melee classes will now be able to use those class combat skills like [[bash]], [[kick]], [[Skill Cleave|cleave]], [[frenzy]], [[backstab]], and monk kicks.
+* Fixed an issue where your target was not cached when you start a cast, causing spells to land on the current target.
+* [[Overseer Rael]] should now properly spawn in The Arena
+* [[Chesgard Sydwen]] should no longer direct you to himself when asking him about the [[Bloodsabers]].
+* [[The Estate of Unrest]] has seen fit to keep some its doors locked, meaning that adventurers should plan to go find the keys they need to navigate the estate.
+* [[Tranixx Darkpaw]] will no longer terrorize the zonelines of [[Blackburrow]].
+* [[Zok Zribb]], in the [[Froglok]] encampment in the [[Rathe Mountains]], has a new quest.
+* [[Master Yael]] should no longer flee at low health.
+* Added ladder to open grave, and gates across the false exit in [[Tutorial Zone|Tutorial]].
+* [[The Muglwump]] will now actually spawn in a reasonable amount of time from instance creation.
+* [[Mignar Mi' Draskch]] in [[Neriak]] Commons now sells the [[Wizard#Spells|Wizard Spells]] master list.
+* [[Puntar Sandfisher|Puntar Sandfisher's]] corpse should no longer stand up and start creating pets. The body should also no longer be considerable.
+* In Instance [[Voidlings]] can now See Invisible players.
+* [[Lewis Reldnok|Lewis Reldnok's]] message for new [[Gnome|Gnomish]] [[Paladin|Paladins]] should be less confusing now.
+* The [[voidlings]] that create raid instances should no longer appear inside of [[Personal Instance|personal instances]].
+* Fixed a bug causing group EXP to not be calculated correctly in some scenarios
+* Implemented changes to raid targets to better scale with group size<br />
+
+===  Items ===
+* All [[Item Upgrade System#Motes of Potential Experience Rules|Motes of Potential]] are no longer tradable.
+* Drakkin no longer appears as an option when using a [[User:Alanna/Alanna's Race Unlock Guide|Race Unlock Token]].
+
+===  Skills & Disciplines ===
+* Added [[Disrupting Shot]], a new Discipline/Combat Ability for [[Ranger|Rangers]].
+** Available at level 20.
+** Does a small amount of damage, and interrupts the targets casting.
+* Added [[Tendon Slice]], a new Discipline/Combat Ability for [[Berserker|Berserkers]].
+** Available at level 14.
+** Snares your opponent, lowering their movement speed.
+* Added [[Skull Bash]], a new Discipline/Combat Ability for [[Berserker|Berserkers]].
+** Available at level 20.
+** Stuns your opponent.
+* Players should no longer forage up out of era items in the [[Tutorial Zone|Tutorial]], or the [[New Sebilisian Expedition]].
+
+===  Spells & Spell Upgrading ===
+* Fix tier 1 upgraded summon item spells so they properly create +1 items.
+* The [[Spell Upgrading|spell upgrade]] boost to summoned item tiers now applies to items summoned within a container, such as Summon: Phantom Plate.
+* [[Spell Upgrading|Spell upgrades]] now boost damage to bard AoE songs, such as [[Denon's Disruptive Discord]].
+* Upgraded pets will now remain upgraded across zonelines.
+* Upgraded pets will now cast spells at their upgraded level.
+* [[Spell Upgrading|Spell upgrades]] will now increase the level cap efficiency for pacify, fear, & stun spells.
+* The [[Ranger]] spells [[Firefist]], [[Nature's Precision]], and [[Force of Nature]] will no longer try to overwrite the lower level spells in the book as you attempt to scribe them.
+
+===  Stances & Invocations ===
+* Fixed an issue impacting resist interactions with OverChannel [[Stances & Invocations#Invocations|Invocation]].
+* Re-enabled OverChannel resistance bonuses for buff-based resistance checks
+* Empower now applies to bard AoE songs, such as [[Denon's Disruptive Discord]].
+* The divine invocation will now target self pets and group pets (at 20% and 40% lower HP priority, respectively)
+
+===  UI ===
+* Updated Actions Window macros (socials) tab to a scrollable list instead of paged buttons.
+** The Actions window macros tab is now a scrollable list with searchable and sortable entries.
+** Right click on any row to open the editor.
+** Left click on the button activates the macro while right click either cancels an active macro or if not busy opens the editor.
+** Macro keys on the hotbuttons bar now colorize their text per their macro editor assignment and show as depressed as long as an activated macro is running with /pause delays.
+** The use of a /timer with a macro still creates the cooldown overlay.
+* [[Stances & Invocations|Stance/Invocation]] bar hidden context menu should now sync properly allowing you to unhide stances and invocations.
+* Fix [[Item Upgrade System|merging]] to equipment items and allow merging to activated items inventory (including from loot window).
+* [[Spell Upgrading|Spell upgrades]]: Motes to-be-consumed will now appear with a red border in the inventory (similar to item merging).
+* Ethernere Tainted Karana will no longer show up in the find window in the [[Western Plains of Karana]].
+* Renamed the "Augmentation" Tab to "[[Exaltations|Exaltation]]" on the Storage tab for default / default_light / default_modern.
+
+== 2026-07-07 - Pre-Order Beta Patch Notes ==
+These patch notes are from the Official EverQuest Legends discord, posted on July 7, 2026
+
+Patch notes are also available on the EverQuest Legends website [https://www.everquestlegends.com/patch-notes/eql-update-notes-7-7-2026 here]
+
+=== Instances === 
+All instances should now work properly! 
+
+Today's patch addressed several issues preventing instances from spinning up ingame and displaying errors on attempting to enter. These include, but are not limited to:
+* Removed errant charge check for DZ invites to multiplayer raid instance.
+* When you leave a personal instance you will now be placed at zone safe coords.
+* Leaving an instance will now put you in the base zone. ([[Difficulty Level#Difficulty 0: The Beginner's Comfort Zone|Difficulty 0]])
+* A personal instance charge is now only consumed upon successful entry to the zone.
+* Fixed replay timers occurring on adding a group member to a [[Personal Instance|personal instance zone]].
+* Players can now enter instances of the zone they are in, regardless of [[Difficulty Level|difficulty]] or pickzone.
+
+=== General===
+'''Spell Tiering Phase 2'''
+* Pet Upgrades
+** Summon Pet / Warder spells will now add the rank of the spell to the summoned pet's level, capped at player level -1.
+** Each upgraded pet level will increase hp by 6%, add 1 base damage, and add 5 skill points.
+** Enabled pet inventory for charmed NPC pets.
+** Charmed pets now equip from the pet inventory slots and those items are removed when charm breaks.
+** Charmed pets now report their inventory of player given equipped items.
+
+* Spell Upgrades
+** Spell upgrades now have damage and healing bonuses.
+** Spellblade, Quickbuff and Symphonic Aura now trigger upgraded spells/songs.
+** Spell upgrade duration effects now work for lull effects.
+** Added rounding to spell upgrade duration calculations to help scaling of small values. (2 or 3 ticks)
+** Max level of crowd control effects (mez, charm) increased by spell tier.
+** 10% chance per spell tier to not consume reagents for spells that require reagents. Reagent costs are skipped at tier 10.
+** Summon item spells will now summon item's tier to the spell tier if the item is upgradable.
+*** e.g. - Summoned Dagger X will now summon a Summoned: Dagger +10
+** Combat Innate Buffs with procs are cast at one half of the buff's spell tier level.
+*** e.g. [[Vampiric Embrace]] X (Buff) will cast Vampiric Embrace V (Proc)
+=== Alternate Advancement (AAs) === 
+* Added the following [[Alternate Advancement#Class AAs|Class AAs]].  Note that the AAs themselves have no effect, just give visibility and explanation to pre-existing passive bonuses to the listed class.
+** Innate Divine Healing - Cleric
+** Innate Fighters Tenacity - Warrior
+** Innate Called Shot - Ranger
+** Innate Power Strike - Berserker
+** Innate Sneakiness - Rogue
+=== Gameplay === 
+* Locked doors in [[Najena]] will now search bags for keys instead of requiring the key to be held on the cursor.
+* [[Drelzna]] will no longer rapidly proc [[Harm Touch]].
+* Zombies in [[Misty Thicket]] should now appear slightly more zombie-like.
+* Tradeskill vendors in the [[New Sebilisian Expedition]] are now on the proper faction.
+* While in [[Plane of Sky]] you can now summon normal non-scaled pets.
+* Doing quests for [[Da Bashers|Da Bashers of Grobb]] will now also increase your standing with the [[Grobb Merchants]].
+* Buff effects on players and pets with upgraded levels now persist across camping and zoning.
+
+=== Items === 
+* Removed low level item haste cap. Standard haste cap rules still apply.
+* The various Wind Runes from the [[Plane of Sky]] can now be held in [[Currency Storage]].
+* The [[Golden Crescent Key]] used in the [[Najena]] dungeon is no longer Temporary/NO RENT
+
+=== Skills & Disciplines === 
+* Improved [[taunt]] success rates, most no`[[Skill Cleave|Cleave]] and [[Bash]] are no longer on shared timers.
+* [[Blood Draw Venom]] should now correctly do more damage than Blood Siphon Venom.
+* [[Paralytic Poison]] now correctly triggers the Weakening Strike, instead of Hobbling Strike.
+
+=== Spells === 
+*The following spells can now only be casted on group members, your pet, or your self.
+** [[Scale of Wolf]]
+** [[Boon of the Garou]]
+** [[Spirit of the Puma]]
+** [[Impassivity]]
+** [[Stoicism]]
+** [[Nonchalance]]
+** [[Snails Healing]]
+** [[Tortoises Healing|Tortoises healing]]
+** [[Slugs Healing|Slugs healing]]
+* [[Stoicism]] and [[Slugs Healing]] have both had their heal per tick increased from 160 to 200.
+* The final heal of the [[Druid|Druid's]] "[[Blooming Heal|Bloom]]" spells is now affected by AAs.
+* [[Druid]] "[[Blooming Heal|Bloom]]" heals now have a more appropriate visual effect when they Bloom.
+* [[Blooming Heal]] description now accurately reports that its Bloom heals for 300, not 200.
+* Rain spells will no longer hit npc's not on the aggro list.
+* [[Beastlord]] Warders will now have mana, allowing them to actually cast their spells.
+* Significantly increased the melee capabilities of [[Beastlord]] Warders.
+
+=== Stances & Invocations === 
+* Regeneration modifiers from [[Stances & Invocations|stances and invocations]] always apply even if they are not active while out of combat as long as you have access to the stance/invocation.
+* Empowering and Overchannel invocations now work on damage over time and heal over time spells.
+* Empowering effects and costs were reduced to balance out spell upgrade bonuses.
+* Reverted Arcane Mastery to prior values.
+
+=== UI === 
+* Display summoned pet stats on inventory window pet tab.
+** Summoned pets will show their HP, Mana, AC, Regens, and other stats on pet inventory tab.
+** Pets will now benefit from for the following equipped item bonuses: Attack, HP Regen,  Mana Regen
+** Pets should now better show the impact of buffs to: HP, Mana
+** Improved HP management when adding/removing items from pets.
+** Improved HP adjustments when entering/exiting charm.
+* Improved Colors of Login Server Text
+* Fixed a missing flag preventing heal crits from showing up in logs.
+* Fixed an issue where client showed incorrect max level for some toggleable AAs.
+* [[Difficulty Level|Difficulty]] button menu will now function properly after right clicking on the difficulty button.
+* Opacity and spell filtering now work for spell particles.
+* Added a toggle to filter beneficial [[Bard#Songs|bard songs]] to make symphonic auras less bulky.
+* Fixed clients display of alternate ability caps.
+* [[Stances & Invocations|Stance/Invocation]] bar visibility should now save properly.
+* Fixed which default INI file the UI should use based on resolution of the game window.
+* The message for shielding now goes to the skills filter.
+* Options window context menu's will now function properly such as alpha.
+* [[Stances & Invocations|Stance/Invocation]] ability hot buttons and buttons in actions window now use matching icons from stance bar.
+* Actions Window stances/invocation highlight boxes will no longer be rendered when not on abilities tab. Gate ritual now shows your bind location rather than your origin.
+* Buff effects now indicate the upgrade level of the cast spell (spell names, tooltips, display info window).
+* Updated various displayed spell names in ui and chat to use the upgraded spell name (appends suffix).
+* Spell display window now shows resistance debuff benefits for detrimental spells.
+* Added the upgraded spell title to the 'begin casting' chat messages.
+* Fixed intermittent "must select target to cast spell" for item [[Clickies|clicky]] effects & [[rituals]].
+
+== 2026-07-03 - Hotfix ==
+These patch notes are from the Official EverQuest Legends discord, posted on July 3, 2026
+
+=== General ===
+* The Planes and the Hole should now be accessible on every server.
+
+== 2026-07-01 - Hotfix ==
+These patch notes are from the Official EverQuest Legends discord, posted on July 1, 2026
+
+=== General ===
+* Addressed an issue affecting the ability to create instances.
+
+== 2026-07-01 - Pre-Order Beta Patch Notes ==
+This is the official launch day patch for the EverQuest Legends Pre-Order Beta!
+
+These patch notes are from the Official EverQuest Legends discord, posted on July 1, 2026
+
+=== General ===
+* The Stance Bar now has new icons available for all texture variants.
+* Fixed an issue preventing default positions from being picked up.
+* Adjusted the default window position of the stance bar.
+
+= Closed Beta Patch Notes =
+Patch notes for the closed beta were available from May 22, 2026 to June 29th, 2026.
+Closed Beta ran from April 24, 2026 through noon EST on July 1st, 2026.
+
+== 2026-06-29 - Patch Notes ==
+These patch notes are from the Official EverQuest Legends discord, posted on June 29, 2026
+
+=== New [[Stances & Invocations|Stance/Invocation]] window ===
+* Automatically shows new/all learned [[Stances & Invocations|invocations and stances]].
+* Hide any stance or invocation by right clicking on the button and clicking hide.
+* Unhide any stance or invocation by right clicking and looking in the "hidden" submenu.
+** Hold left click to make a hotbutton.
+** Left click to activate.
+
+=== Stance/Invocation Window Coloring === 
+* Stance Button Highlight - The overlay color of the button when the stance is active.
+* Stance Button Lasso - The outline color of all stance buttons.
+* Invocation Button Highlight - The overlay color of the button when the invocation is active.
+* Invocation Button Lasso - The outline color of all invocation buttons.
+
+=== Stance/Invocation Keybinding === 
+* Each invocation and stance is bindable.
+* Stance bar toggle is also bindable here.
+
+=== [[Spell Upgrade System]] Implementation === 
+* Players can now upgrade spells using motes. Upgrading spells can be done through inspecting spells (via right-click hold) and adding motes, similar to [[Item Upgrade System|upgrading items with motes]].
+* Upgraded spells currently gain the following benefits, with more added later.:
+** Reduced mana cost.
+** Reduced cast, recovery and re-use time.
+** Increased durations.
+** Increased potential for the spells to not be resisted.
+* Dev Note: The spell upgrade system is a work in progress and we expect the second part of spell upgrades to hit during the first week of Preorder Beta. However, we wanted to give players the ability to upgrade their spells now, so that a new jarring system is not introduced mid-Preorder Beta. This will include values including, but not limited to, Hitpoints, Damage, etc, which were not completed for this patch cycle. We look forward to introducing more of this system soon.
+
+=== General === 
+* Fixed observed crashing related to a dead Moth.
+
+=== Disciplines & Skills === 
+* The Stunning Poison [[Rogue]] ability has been adjusted down to level 14.
+* The Concussive Poison [[Rogue]] ability has seen an increase in it's chance to proc.
+* [[Rogue|Rogues]] have a new poison available to them, starting at level 18.
+** Clumsiness Poison - Slows the spell cast time of enemies inflicted with this poison.
+* Starting at level 23 [[Rogue|Rogues]] will begin gaining access to the following combination utility poisons, that provide the benefits of two of their existing utility poisons, in one buff.
+** Level 23 - Fettering Poison - Root & Snare 
+** Level 25 - Binding Poison - Snare & Slow 
+** Level 28 - Neurotoxic Poison - Mana Drain & Slow 
+** Level 30 - Mind Break Poison - Spell Slow & Interrupt 
+** Level 33 - Thought Drain Poison - Mana Drain & Spell Slow 
+** Level 36 - Antimagic Poison - Dispel & Interrupt 
+** Level 39 - Mage Bane Poison - Dispel & Mana Drain
+** Level 42 - Paralytic Poison - Slow & Spell Slow 
+* Reduced [[Forage]] cooldown to 60 Seconds.
+
+=== Instances === 
+* Essence Carriers in the Solo instance of [[Plane of Sky]] should no longer spawn on island 1.
+* Wind Runes should now drop in Solo instances of [[Plane of Sky]].
+* Adjusted placement of enemies on Island 3 (Gorgalosk) in Solo instances of [[Plane of Sky]].
+* Mobs in instances of [[Plane of Sky]] should no longer flee.
+
+=== Items === 
+* [[Necklace of Resolution]] now has a reuse time of 5 minutes.
+
+=== Gameplay === 
+* [[Lizard Tails]] now drop from the lizardmen in the [[Temple of Cazic Thule]].
+* [[Clurg]], the wonderous bartender of [[Oggok]], has a new task.
+* Fixed pets equipping a shield with a 2H weapon and remove visible weapons when unequipped.
+* NPCs will no longer proc mez/fear/charm style innates on solo players.
+* Adjusted social aggro ranges in [[Najena]].
+* Fixed [[Drelzna|Drelzna's]] drop rates.
+* [[Moosh]] in [[Najena]] is now guaranteed to drop [[Guard's Keyring|his key]].
+
+=== Spells === 
+* Reduced the usable level of the following [[Enchanter]] spells:
+** [[Enchant Clay]] to level 7.
+** [[Enchant Steel]] to level 21.
+* A new line of healing spells has been added for the [[Druid]] class.
+** This line, starting with Budding Heal at level 4, provides a Heal over Time effect followed a larger burst of healing when it expires.
+** Level 4: Budding Heal
+** Level 10: Sprouting Heal
+** Level 20: Flowering Heal
+** Level 30: Blooming Heal
+** Level 40: Blossoming Heal
+** Level 48: Efflorescing Heal
+* [[Shaman|Shamans]] have access to four new spells. These are meant to be alternatives to [[Rancor]] and [[Stoicism]].
+** Level 14 - Snails Healing - Heal over time, and a 100% snare.
+** Level 28 - Slugs Healing - Heal over time, with a 100% snare.
+** Level 30 - Nonchalance- Heal over time, with a 30% attack speed decrease.
+** Level 42 - Sloths Healing - Heal over time, and a 100% snare.
+* The [[Shaman]] spell [[Rancor]] has been renamed to [[Impassivity]].
+* [[Beastlord]] pets are now, themselves, also Beastlords in addition to Warriors, instead of Berserkers and Warriors.
+* Reduced the mana cost of the [[Cleric|Cleric's]] Duration Heal spells ([[Celestial Remedy]], [[Celestial Health]], and [[Celestial Healing]])
+* [[Promised Renewal]] now has a 1 second cast time, an increased mana cost, and heals for 5000.
+
+=== [[Stances & Invocations]] === 
+* Pure melees can now toggle off Unyielding Invocation.
+* Pure casters can now toggle off Channeler's Stance.
+
+=== Tradeskills === 
+* The ability to produce the following items has been removed.
+** Concoction of Flame 1-6
+** Concoction of Ice 1-6
+** Concoction of Corrosion 1-6
+
+=== UI === 
+* Fixed an issue where you could get negative charges by having a group member invite you to their instance while you have 0 charges.
+** You will not receive lockouts for the failed invite and if you gain a charge while your group is in an instance they can invite you to it.
+* Fixed an issue where after loading a loadout, keyrings in the storage tab would not update until you click different tabs inside the storage tab.
+* Fix black screen flicker when entering game from character select.
+* Spell upgrades will not reflect on items that have a spell proc that is also an upgraded spell. These will default to the base spell.
+* Added spell upgrade information to inspected spell windows.
+* Fix spell gem swapping and suppress already memorized messages.
+* [[Exaltations]] in the Augmentation Storage will now be correctly labeled as Exaltations.
+* Added toggle in group windows context menu to allow for it to expand upwards instead of downward.
+* Fix floating combat text filtering for misses/dodge/block/etc.
+
+=== World === 
+* A [[loom]] and [[forge]] have been set up in the [[New Sebilisian Expedition]]. A couple of merchants have scrounged some supplies and are selling them near the loom and forge. In addition, some of the spell vendors in the New Sebilisian Expedition have taken up residence in the next room down the hall, as an extra defense against whatever is behind the barricade.
+
+== 2026-06-24 - Hotfix ==
+These patch notes are from the Official EverQuest Legends discord, posted on June 24, 2026
+
+=== General === 
+* Blood Siphon and Blood Draw Venoms should once again heal for the DoT damage they deal.
+* Fixed an issue with loot lockouts in groups that could cause them to award only one item on the initial lockout.
+
+=== Spells, Abilities and AAs ===
+* Blood Draw Venom now correctly has its direct damage component.
+* Spiritual Light now correctly shows Endurance in its description.
+* War Cry ranks 2 and 3 have  been hidden.
+
+=== UI === 
+* The Personal Instance window will now update current instance properly after quitting an instance.
+* [[Barbarian]] [[Berserker|Berserkers]] will no longer get a message on creation about Tomes.
+
+=== Zone Population === 
+* [[Constructed Potential]] should now show up on Find.
+* The [[Voidling]] has disappeared from [[East Freeport]].
+* Azaracks and Essence Carriers in the [[Plane of Sky]] have been staked down to their island, and should go wandering less often
+* The quest efreeti in [[Plane of Sky]] should no longer assist any other NPCs that may find their way into their room.
+* [[Noble Dojorn]] has one less blade storm guardian in solo instances.
+* Damage numbers in Solo [[Plane of Sky]] have been adjusted to be a bit less oppressive.
+* a presence has been gated from spawning in Personal [[Plane of Sky]] instances.
+* [[Inte Akera]] has been properly tuned for solo instances of [[Plane of Sky]].
+* Gorgons/Harpies in [[Plane of Sky]] should no longer proc a mez in Solo instances.
+* [[Strandar Pinemist]] now asks for the correct number of items.
+* [[Hekzin G`Zule]] should now respond to rogues he's less friendly with.
+* [[Dason Goldblade]] can now properly summon [[Inte Akera]] in solo instances of [[Plane of Sky]].
+* Slightly lowered the assist ranges of Spirocs in open world/group Plane of Sky.
+* [[Cazic-Thule]] now properly calls for his minions when he is engaged in an instance of the [[Plane of Fear]].
+* Killing [[Dread]], [[Fright]], [[Terror]], and/or a [[Dracoliche]] will decrease the range that [[Cazic-Thule|Cazic-Thules]] call for aid can be heard.
+* Reduced the social aggro range of many enemies in [[Najena]].
+
+=== Items === 
+* [[Bloodstained Key]] in [[Najena]] is no longer NO RENT/Temporary
+* [[Flaming Fist]] is no longer NO TRADE
+* [[Skeletal Rod]] is no longer NO STORAGE
+* [[Dark Mail Gauntlets (Najena)|Dark Mail Gauntlets]] renamed to [[Dark Mail Mittens]] (no longer conflicts with Dark Mail Gaunlets from Lower Guk)
+* [[Silver Stud]] now has +1 AC.
+* The following items are no longer incorrectly flagged as quest items:
+** [[Drop of Crystallized Flame]]
+** [[Signet Ring of the Lost Crusader]]
+** [[Sword of the Lost]]
+** [[The Artist's Brush]]
+** [[Sleeves of the Spurned Necromancer]]
+** [[Crimson Cape]]
+
+== 2026-06-23 - Patch Notes ==
+These patch notes are from the Official EverQuest Legends discord, posted on June 23, 2026
+
+=== General ===
+* [[Zone Experience Modifier]] Changes
+** Most cities now reward normal experience for those who don't mind ruining someone else's lands to level.
+** Most open world zones have had their [[ZEMs|ZEM]] increased and many dungeons have been slightly decreased to provide more viable leveling paths.
+** [[Kedge Keep|Kedge]] has retained its original modifier for those willing to brave the depths.
+** Boosted the ZEM on instanced versions of [[Plane of Hate|Hate]], [[Plane of Fear|Fear]] and [[Plane of Sky|Sky]] to match that of the open world version.
+* Removed all Continent and Primary Class channels from autojoin.
+
+=== World & Dungeons ===
+* [[Najena]] has received a touch-up!
+** Adventurers level 15-30 exploring the zone can expect to see smoother NPC level progression, new named, new drops, loot improvements, and a striking lack of placeholders for named mobs.
+** On a completely unrelated note, I could swear my [[Journeyman's Boots]] are 1% faster...
+* The hastily built barricades in [[New Sebilis Expedition|New Sebilis]] have started to rattle...
+** The hemmed-in monstrosities are becoming restless, and are nearly ready to take the fight beyond the defenses laid by the Expedition.
+** But for now, the barricades hold...
+
+=== AAs ===
+* The [[Warrior|Warrior's]] Endurance AA has been re-enabled.
+* The Escape AA for [[Rogue|Rogues]] has been fixed to not be autogranted.
+
+=== Disciplines ===
+* [[Rogue|Rogues]] now gain two new [[disciplines]] at level 46.
+** Cobra Venom, which is an upgraded replacement for Asp Venom.
+** Blood Draw Venom, which is an upgraded replacement for Blood Siphon Venom.
+ 
+=== Gameplay ===
+* A mysterious presence has been spotted lingering near one of the voidlings. Brave adventurers should probably investigate.
+* Voidlings can now see through nearly every from of invisiblity and stealth.
+* [[The Arena]] has been reverted to it's original form.
+** The Soulbinder and [[Overseer Rael]] reside near the gates to the arena, allowing for setting your bind point, and summoning sparring partners (training dummies), respectively. 
+* A [[Constructed Potential]] now exists in [[Surefall Glade]] & [[New Sebilis Expedition]].
+* Updated Dialogue for [[Sulgar]] in [[Everfrost Peaks]].
+* [[Innoruuk]] should now do less damage in melee than [[Cazic Thule]], per round.
+
+=== Instances ===
+* Personal instance charges are now implemented. 
+** You gain a charge every hour with a maximum of 2 charges.
+** A charge is consumed when you enter personal instances. 
+** If you run out of charges, you can no longer enter a personal instance until you gain at least 1 charge.
+* Raids now have a bonus loot lockout system where if you are in that lockout you will only receive 1 piece of loot per named raid creature that has its own lockout.
+** The raid bonus loot lockouts reset every Tuesday at 8AM PST
+* Fixed an issue where raid recreation could put you in the wrong difficulty.
+* The difficulty button has been revamped to be more intuitive.
+* Personal instances of the [[Plane of Sky]] are now operational.
+* Removed 2 enemies from the [[Lady Vox]] room in [[Permafrost]] Solo Raid instances.
+
+=== Items ===
+* [[Golden Pendant]] now has +1 AC.
+* [[Rain Caller|Rain Caller's]] [[Firestrike]] effect now has unlimited charges, with a 2 minute recast time.
+* [[Kedge Backbone]] should no longer drop from [[Phinigel Autropos|Phinegal Autropos]].
+* The change to weapon upgrade scaling has been reverted back to before the nerf bat swung.
+
+=== Loadouts ===
+* Players can no longer swap [[loadouts]] while hiding or sneaking.
+* Players can no longer swap [[loadouts]] while trading or using a world container. (Forge, Loom, etc.)
+ 
+=== Spells ===
+* The [[Beastlord]] spell "[[Spiritual Light]]" now also provides endurance regeneration.
+* The [[Beastlord]] spell "[[Sha's Lethargy]]" is now a 40% slow, increased from 30%.
+* [[Beastlord|Beastlords]] now have access to the spell Languid Pace, starting at level 35.
+* The [[Ranger]] spell [[Force of Nature]] is now a permanent self-only buff. 
+** Force of Nature's hit Point regeneration has been increased, and it has been given Endurance regeneration as well, at the same scaling as [[Chloroplast]]. 
+** The damage shield and attack values have also been increased slightly.
+** To correspond with these changes, it has been increased to be the level 50 capstone spell for Rangers.
+* [[Call of Earth]], the previous level 50 spell for Rangers, has been pushed down to level 48.
+* Adjusted debuff stats on [[Suffocating Sphere]] so that [[Shallow Breath]] won't overwrite it.
+* Deity specific spells can now be scribed without having the proper deity, however you cannot cast or memorize that spell unless you are actively the correct deity.
+
+=== Tradeskill ===
+* Potion/Philter of the Bone Field should no longer be craftable.
+ 
+=== UI ===
+* Dropdown menus will now properly close when the parent window is closed.
+* [[Constructed Potential]] should now show up on Find in zones they inhabit.
+* [[Loom|Looms]] should now show up in the Find Window like the other in world tradeskill containers.
+* Hodstock Hills and Plane of Knowledge should no longer show up in the Find Window in [[Nektulos Forest]].
+* Fixed a client visual desync for unusable items caused by [[exaltations]] with deity requirements.
+* [[Key Ring]] has been renamed to [[Alternate Storage]].
+* Expeditions have been renamed to [[Instances]].
+
+
+== 2026-06-21 - Hotfix ==
+These patch notes are from the Official EverQuest Legends discord, posted on June 21, 2026
+
+=== General ===
+* More memory optimizations. This also fixes an issue with [[Alternate Advancement|AA]] requirements, such as Harm Touch being out-of-era.
+
+*  You will no longer find [[Priest of Discord|Priests of Discord]] hanging about the cities. In their place is a construct of pure potential! This construct can condense your [[Item Upgrade System|motes]] into stronger versions, at a two-to-one rate!
+** NOTE: For the moment, he can only accept ranks 1-8.
+
+== 2026-06-18 - Hotfix ==
+These patch notes are from the Official EverQuest Legends discord, posted on June 18, 2026
+
+=== General ===
+* More memory optimizations.
+* The previous patch that increased raid target health pools has been reverted.
+
+=== AAs ===
+* [[Warrior|Warriors]] Endurance [[Alternate Advancement|AA]] is temporarily disabled.
+* Unbound Wrath is now working. Critical Damage modifications are now working again.
+
+=== Achievements ===
+* The [[Beastlord]] Class Unlock [[achievement]] will now properly use the quest check.
+
+=== Audio ===
+* Swapped the opening character music to another version that supports initial 'fanfare' swapping on the first intro fade. Instrument track muting should no longer persist past character creation / selection. The character select section of the game will now play race-specific music as character creation does.
+
+=== Gameplay ===
+* [[Crusader Iktra]] now properly stops taking Metal Bits at Amiable.
+* Translocator Gnomes now no longer charge for characters who've never passed level 20.
+
+== 2026-06-16 - Patch Notes ==
+These patch notes are from the Official EverQuest Legends discord, posted on June 16, 2026
+
+=== General ===
+''Plane of Sky Overhaul''
+* [[Plane of Sky]] island trash will no longer drop key quest parts.
+* Each boss in [[Plane of Sky]] now drops the keys to the next island (two keys in the case of the Thunder Spirit Princess)
+* [[Sirran the Lunatic|Sirran]] will no longer spawn when the boss of an island in [[Plane of Sky]] is killed.
+* [[Keeper of Souls]] is now a static spawn.
+* [[Sister of the Spire]] is now a static spawn.
+* [[The Spiroc Guardian]] and [[The Spiroc Lord]] are no longer static spawns. Killing Spirocs on the island will spawn the Guardian, and killing the Guardian will spawn the Lord.
+* All [[Plane of Sky]] quests are now completable at their respective Efreeti, instead of having to spawn additional NPCs.
+
+===  AAs === 
+* Added the Warriors Endurance AA, a new class AA for [[Warrior|Warriors]].
+**   Gives an additional 1% HP per tick of regen, at all times. Cost: 6 AAs; Requirements: Level 30
+* Added the Unbound Wrath AA, a new autogranted class AA for [[Warrior|Warriors]].
+**   Gives a passive 10/20/30% bonus to melee crit damage, at levels 12, 30, and 50.
+* Added the Unbound Strikethrough AA, a new autogranted class AA for [[Ranger|Rangers]].
+**   Gives a passive 10/20/30% chance for you to strike through your opponent's active defenses, such as dodge, block, parry, and riposte.
+* Added the Playing Possum AA, a new class AA for [[Beastlord|Beastlords]]. Allows the player to feign death.
+* Added the Shroud of Stealth AA to [[Rogue|Rogues]], available at level 35.
+* The Persistent Casting AA is now only 6 ranks, with a cost of 1/2/3/4/5/6, for 11% chance to regain concentration and complete a spell cast when stunned, per rank.
+* The [[Bard]] AA Reaching Notes has been expanded to the first 6 ranks (3 active, 3 inactive). The cost has also been adjusted from 3/6/9 to 2/4/6.
+* Escape, the [[Rogue]] AA, is now effective against NPCs up to 20 levels higher than the rogue.
+
+===  Achievements === 
+* Updated the Description of the '[[Hide Your Brains!]]` [[achievement]].
+* Cleaned up a number of unobtainable [[Slayer]] achievements, and adjusted others to fit in era for accomplishing.
+* The Class Unlock achievements now trigger from the quest completion, instead of owning the items. This will force a re-evaluation of the achievements, but players shouldn't lose access to any classes.
+* Banestrike should be getting rewarded for Slayer Achievements again, for real this time.
+
+===  Audio === 
+* Added in correction to reset pitch bends occurring when playing new tracks.
+* Restored functionality that mute/unmutes character creation music instrument tracks, dependent on race you've selected, after the initial fanfare.
+* Restored music to [[Plane of Sky]].
+* Added music to the [[Tutorial Zone]]!
+
+===  Gameplay === 
+* [[Crusader Iktra]] in the [[The Northern Desert of Ro|Northern Desert of Ro]] has some requests.
+* Fixed an issue where implied targeting would ignore your pet making you not able to cast spells on it during combat.
+* Reduced the assist radius of most of the enemies in [[Blackburrow]]. This does not mean nothing will notice you from a bit further away. A couple of sharp-eyed gnolls are on the lookout, and you should use caution when engaging enemies in wide-open areas.
+* [[Lich of Miragul]] will now spawn upon the zone starting up.
+* The respawn times at the Ogre monument in [[West Karana]] have been normalized a bit.
+* [[Lord Grimrot]] and [[Ghanex Drah]] in [[South Karana]] is now a bit more likely to spawn.
+* [[High Shaman Phido]] and [[High Shaman Grisok]] should now spawn in [[South Karana]].
+* All locked doors in [[Befallen]] now share behavior: they can find their keys in your bags, and you can click lockpicks on them to attempt to pick the lock if you have rogue or bard and the appropriate skill level.
+
+===  Instances === 
+* Raid Loot lockouts should no longer trigger improperly, for example, in [[The Hole|The Ruins of Old Paineel]] (The Hole)
+* [[Maestro of Rancor]], [[Innoruuk]], the Prince of Hate, [[Cazic Thule]], [[Fright]], [[Terror]], [[Dread]], and [[a dracoliche]] no longer spawn in the open world & personal instances of [[Plane of Hate|Planes of Hate]] and [[Plane of Fear|Fear]].
+* Multiplayer instance raid bosses have been buffed.
+* Personal instances for [[Plane of Hate]] and [[Plane of Fear]] are now available!
+* Entering a personal instance of or changing difficulty in [[Runnyeye]] or [[Solusek's Eye]] will now face you into the zone, rather than out towards the exit.
+
+===  Items === 
+* Reduced the effectiveness of item tier increases for weapon damage.
+* Adjusted stats on the [[Runed Sabertooth Girdle]].
+* [[Berserker]] has been removed from [[Keg Mallet]].
+* The [[Smoked Glass Key]] is no longer Temporary.
+* Many jewelry "trash" drops (e.g. [[Copper Amulet]], [[Silver Ring]]) now have 1 AC making them slightly more useful
+
+===  Stances & Invocations === 
+* Fixed a bug causing [[Invocations|Overchannel]] to increase mana costs.
+* Halved the endurance costs of [[Invocations|Overchannel]], [[Invocations|Inversion]] and [[Invocations|Spellblade]].
+* Slightly reduced effectiveness of [[Invocations|Empower]] for healing.
+* Greatly increased effectiveness of [[Invocations|Empower]] for damage.
+* Improved Arcane Mastery all around.
+* Fixed an erroneous calculation in Berserker Stance conditionally affecting damage.
+
+===  Skills & Spells === 
+* All classes should now have access to the [[Strategy]] skill.
+* [[Feign Death]] will now break songs, including melodies. Symphonic Aura pauses on unconscious and resumes on standing. Songs are prevented while in the Feign Death state.
+* Research skill has been removed. You may still see it in your skills window, but you'll no longer be able to increase its skill.
+* [[Pack Chloroplast]] will now increase Endurance regeneration.
+* [[Ethereal Cleansing]] will now only lock out spells for 1.5 seconds, instead of 5.
+
+===  UI === 
+* [[Vision of Sebilite]] now shows up when 'Show only items I can use' is selected, for [[Enchanter|Enchanters]].
+* Pet size slider shouldn't effect random things anymore.
+* Equipment from [[Befallen]] that goes into visible equipment slots but was missing [[Ornamentation]] sockets now has those sockets.
+* The spell [[Illusion: Scaled Wolf]] is now listed under Utility Beneficial -> Illusion: Other
+* Removed Spell: [[Imbue Fire Opal]] and Spell: [[Mass Imbue Fire Opal]] from the [[Wizard]] Spells merchant master list.
+* Adjusted the description of Spell: [[Feign Death]] to emphasize that you need to stand. "Causes you to stop breathing and appear dead to most creatures, until you stand up."
+* Fix buff sorting issue with ward of the divine proc and other similar buffs.
+
+== 2026-06-11 - Hotfix #2 ==
+These patch notes are from the Official EverQuest Legends discord, posted on June 11, 2026
+
+=== General ===
+* Fixed an issue where some server requirement flags were failing on the server dependent on specific expansions being open.
+
+=== AAs ===
+* The Unbound Nature AAs for [[Druid|Druids]] should now properly allow for Crits from direct damage, instant heal, heal over time, and damage over time spells.
+
+=== Instances ===
+* Enabled Personal Instances of [[Nagafen's Lair]], [[Permafrost]], [[The Hole]], and [[Kedge Keep]].
+* [[Phinigel Autropos]], [[Lord Nagafen]], [[Lady Vox]], and [[Master Yael]] will no longer spawn in open world and personal instances.
+
+=== Spells ===
+* Permanent buffs should no longer be dispelled by duration reducing effects.
+* [[Shallow Breath]] should now appear under 'Utility Detrimental -> Disempowering'
+
+=== UI ===
+* Fixed [[Rogue]] Poison descriptions.
+* Fixed an issue where the Tradeskill Depot had the wrong Item Cap applied for Closed Beta.
+
+== 2026-06-11 - Hotfix #1 ==
+These patch notes are from the Official EverQuest Legends discord, posted on June 11, 2026
+
+=== General ===
+* More crash fixes and memory optimizations.
+ 
+=== Gameplay ===
+* Fixed aggro and social ranges in [[Blackburrow]].
+* [[Shaman]] spirit wolves are now [[Beastlord|Beastlords]] in addition to being [[Warrior|Warriors]]. They should also correctly use the original wolf models.
+* Reave, Cleave, [[Smite]], [[Stances]], and [[Invocations]] are now all usable while mounting.
+* [[Cazic Thule]] will now remember targets from further away.
+* NPCs in [[Befallen]] that drop keys for the doors in the zone can no longer be charmed.
+* [[Monk|Monks]] rejoice! Gnoll pups in [[Qeynos Hills]] & [[Qeynos]] newbie yard can once again be killed for scalping.
+
+=== Items ===
+* [[Sharp Claws]] now have the combat effect "[[Laceration]]".
+* Corrected the stats on the [[Keg Mallet]].
+* Reduced the AC values on the Lustrous Russet set of armor.
+* [[Blood-Drawn Runes]] is now Lore Equipped.
+* The planar armor sets, with the exception of the wrist slots, are now Lore Equipped.
+* Adding missing armor graphics to [[Raw-Hide Arm Guard]], [[Vagrant's Tunic]], [[Ill-Fitting Slippers]], [[Ill-Fitting Robes]], [[Dark Runed Leggings]], [[Wicked Sallet]], [[Pub Pants]], [[Hardened Bark Breastplate]], and [[Well Worn Boots]].
+* Added missing stats to [[Ill-Fitting Robes]].
+* Newly added standard NPCs in [[Blackburrow]] now have their loot tables.
+
+=== Loadouts ===
+* Players can now swap loadouts in [[the Arena]].
+
+=== Spells ===
+* [[Paladin]], [[Shadow Knight]], and [[Ranger]] combat innates should now properly stack with [[Rogue]] poisons.
+* Buffs should no longer become permanent from having their duration be taken under 0 seconds due to dispel.
+* Lifetaps should now properly heal the amount it taps for. Lifetap damage will continue to receive bonuses from Improved Damage, Soul Abrasion and Empower. The Heal component will always match the damage dealt.
+
+=== UI ===
+* Fixed personal instance toggle and state, the other personal instance elements now enable/disable as intended.
+* [[Plane of Hate]] should now show up in the [[Zone Guide]].
+== 2026-06-09 - Patch Notes ==
+These patch notes are from the Official EverQuest Legends discord, posted on June 9, 2026
+
+=== General ===
+*  Improvements to server memory optimization.
+*  Added Client Update for Partial Dispel (Duration Reduction)
+**  Note: This currently only updates the Spell Window and not the Player and Target Window. Retargeting should update correctly.
+*  Added the Audio Triggers button back to the EQ button.
+*  Improved the pet weapon equipping logic.
+**  A primary only weapon will be blocked from equipping if there is an already equipped  weapon in the primary slot with a better score,  but a better primary / secondary will be equipped in the secondary slot if the primary-only weapon is equipped first.
+**  A 1H weapon given to a dual wield capable pet that already has a 2H weapon equipped will always replace the 2H weapon to allow dual wielding.
+**  A 2H weapon given to a pet that already has a 1H weapon equipped will replace the 1H only if it has a stronger score and the secondary slot is empty.
+
+=== AA ===
+*  The Burst of Power AA is now not purchasable until level 46.
+
+=== Achievements ===
+*  Slayer Achievements should once again be able to award Banestrike.
+
+===  Gameplay ===
+*  Charmed NPCs will no longer unsummon themselves if the owner dies.
+*  Changed the out of combat timer to 9 seconds from 12 seconds, to give some leeway on ticks.
+*  [[Avatar Power]], [[Lava Breath]], [[Frost Breath]], [[Beholder Dispel]], and [[Phobocancel]] now only reduce the duration of the effected buff, instead of removing it entirely.
+*  Planar armor from the planes of [[Plane of Hate|Hate]] and [[Plane of Fear|Fear]] has been shuffled around!
+*  There may even be a new set of armor floating around to be found...
+*  Characters should no longer consume [[Azarack Blood]] and [[Azarack Skin]].
+*  [[Styria Fearnon]] in [[Ocean of Tears]] will now properly continue her dialogue as you converse with her.
+*  Implied targeting will now use the determined target from start of cast if that target is available at end of cast time.
+
+=== Instances & Picks / Difficulties ===
+*  Players should no longer sometimes be accosted by giants upon zoning into [[Lord Nagafen|Naggy]] raid instances.
+*  Zoning into alternate difficulties of [[Kedge Keep]] no longer points you towards the exit.
+
+=== Loadouts ===
+*  Resolved an issue where [[Augmentations]] may not save correctly in a [[Loadout]] Swap.
+
+=== Spells ===
+*  [[Lifetap]] spells will no longer double-dip on the heal component through criticals, focus effects, healing AAs, or the Empower [[Invocations|Invocation]].
+**  This also takes into account partial resistances. The damage dealt by [[Lifetap|lifetaps]] should always be the amount healed, including criticals and the Soul Abrasion AA.
+*  [[Gnome]] [[Beastlord|Beastlords]] should notice their warders have had more legs bolted on!
+*  [[Gnome]] [[Beastlord]] Warders have changed from Clockwork Rats to Clockward Spiders.
+*  [[Beastlord]] Warders should now properly reflect your base race, instead of your illusioned race.
+*  The Combat Innate self buffs from [[Paladin]], [[Shadow Knight]], and [[Ranger]] should now all stack. Those same spells should also stack with [[Boon of the Garou]].
+*  [[Iksar]] skeleton pets are now anatomically correct.
+*  The [[Wizard]] spell [[Thunderclap]] now has an AoE range of 30.
+
+=== Stances & Invocations ===
+*  Added Arcane Mastery [[Invocations|Invocation]]
+**  "Spell cast and recovery times are reduced by 20% plus 10% per additional intelligence class. The mana cost of detrimental spells is reduced by 10% plus 5% per additional intelligence class."
+
+*  Added Channelers [[Stances|Stance]]
+**  "All incoming damage is reduced by 40% and your chance to successfully channel is increased. Half of the mitigated damage is charged to both mana and endurance, with a reduction based on your strategy skill."
+
+*  Added Unyielding [[Invocations|Invocation]]
+**  "Health regen excluding out of combat bonus regen is doubled with a 25% resistance increase to loss of control from fear, mez, and charm. There is no mana cost to upkeep this stance."
+
+=== UI ===
+*  Add accessibility tab to options and included a new pet size slider which will control all summoned pet sizes.
+*  Added checkboxes under combat text for loot and sell.
+*  Spell damage filtering will now work properly when you have bard in your loadout and use the bard song filter.
+*  Invalid loot items that no longer exist on the corpse are properly removed from the loot window when a loot request fails.
+*  Fixed error message wording for zooming in and out while in find mode on the map.
+*  Fixed an issue where your spell bar columns/rows weren't loaded properly making your spellbar change shape and size on each relog/UI reload.
+*  Fixed an issue with loading screen tips where several tips were merged together.
+
+=== Dungeon Revamp! ===
+*  [[Blackburrow]] has been revamped!
+**  Zone population has been adjusted to provide a smoother leveling experience for characters levels 5-20. Some familiar loot has been upgraded for the EverQuest Legends era, and some spicy new loot has been added.
+
+== 2026-06-02 - Patch Notes ==
+
+These patch notes are from the Official EverQuest Legends discord, posted on June 2, 2026
+
+=== General ===
+* Addressed several crash and stability issues.
+* Fixed /gems to use the reordered draw.
+* Speculative fix for keys sticking with ALT-TAB
+* Zones that had a difficulty threshold of 10 now have a threshold of 12.
+* Increased difficulty instance spindown time.
+* Fix an issue where on zoning you'd pick zones that are of higher difficulty, if not in a group, or when grouped and your group wasn't already in a zone greater than difficulty 0.
+* Addressed an issue where zones would constantly spin up and spin down at less than 10 players in a single difficulty at minimum.
+* Fixed a crash that would occur while you have charm memorized as a bard, you become charmed, and then your character attempts to land a charm on an NPC.
+
+=== AAs===
+* [[Berserker]] Blood Rune [[Alternate Advancement|AA]] will no longer trigger on normal spell critical hits.
+
+=== Achievements ===
+* Newly created [[Human|Humans]] should now properly unlock the achievement for their starting city, instead of always unlocking [[Freeport]]. ([[Surefall Glade]] is considered part of [[Qeynos]], for these purposes.)
+
+=== Audio ===
+* Fixed an observed crash on autofire related to starting and stopping the combat music.
+* Attempted an additional fix issue with midi audio handles.
+
+=== Gameplay ===
+* Pets/Charmed players will no longer cast charm spells.
+* NPC's will no longer [[mesmerize]] your entire group.
+* [[Large Bowl Sketch|Large Bowl Sketches]] are now for sale on some pottery merchants.
+* The isle goblin chieftain has returned to the island in Ocean of Tears.
+* Wind Runes from [[Plane of Sky|Sky]] should no longer mention Classes in their lore.
+* Fixed an issue preventing fast regen from working for characters with less than 180 hp/mana/endurance.
+* Removed enemy resist bonus from enemies that are yellow considered.
+
+=== Instances ===
+* Balance changes to Solo Raid versions of [[Innoruuk]], [[Cazic-Thule]], [[Maestro of Rancor]], and [[Lord of Loathing]].
+* Enemies in the Planar raids will now path back to their spawn points when they get bored.
+
+=== Loadouts ===
+* Reverted a change that was preventing weapons from being equipped during loadout swaps in certain situations.
+
+=== Skills & Stances ===
+* Fixed an observed crash on checking skillups when charmed after a failed dual wield, double attack or triple attack.
+* [[Disciplines#Berserker|Berserker stance]] will no longer receive the attack speed boost and ranged stance will no longer receive the double and triple attack bonus when endurance drops below 2% remaining.
+
+=== Spells ===
+* Pets will now have unique classes.
+* [[Magician]] Earth Pets will now be [[Ranger|Rangers]].
+* [[Necromancer]] and [[Shadow Knight]] pets will now be [[Shadow Knight|Shadow Knights]].
+* [[Enchanter]] Animation pets will now be [[Paladin|Paladins]].
+* [[Beastlord]] Warders will now be [[Berserker|Berserkers]].
+* Summoned player pets now always add [[Warrior]] class if they are not already a Warrior.
+* Multi-class player pets get doubled health.
+* Additionally, the Magician Fire pet has more mana and better mana regen now.
+* [[Iksar|Iksar's]] Skeleton Illusion spells will now instead turn them into an Iksar skeleton. The head is consistent with their gender. (Iksar Skeleton pets coming soon!)
+
+=== UI ===
+* Fixed inconsistent spell cast timers used for UI displays between your target and self.
+* Fix the /doability helper tips for stances and invocations in the actions window descriptions.
+* Changed /doability for invocations and stances so they no longer toggle off (back to recover or balance) if activated when already active.
+* Added additional default Textures variants (Alternative 1, 2, 3) to the game.
+* "Texture" was renamed to "Spell Gem Textures" on the options menu to be more concise.
+
+== 2026-05-31 - Hotfix ==
+
+These patch notes are from the Official EverQuest Legends discord, posted on May 31, 2026
+
+=== Hotfix ===
+
+* [[Lay on Hands]] has been updated to function with implied targeting and related systems.
+* [[Dragoon Zytl]] will now give experience when killed.
+* Fix a crash on zone servers.
+* Fix an issue where, as a charmed player, you would be suicided as an NPC clone when the caster of the charm dies.
+* [[Paineel]] Armor and Weapon merchants should once again sell adventuring gear, instead of spells!
+* Reduced difficulty scaling of mob haste.
+* [[Amplification]] (Bard Song) no longer amplifies itself.
+* Amplification has been buffed slightly.
+* Fixed an issue where loot lockouts in dynamic zones were not using the proper type of dynamic timer.
+* Fix an issue where players would not be counted as actual players for personal loot purposes when charmed, feared or linkdead.
+
+== 2026-05-29 - Hotfix ==
+
+These patch notes are from the Official EverQuest Legends discord, posted on May 29, 2026
+ 
+=== Hotfix ===
+
+* Fixed an issue where under certain scenarios you could lose an item(s) while trading if you crash/lose internet/lose power/game and/or PC abruptly closes.
+* The Raid instance version of [[Maestro of Rancor]] has had his lifetap proc rate greatly reduced.
+* Open world Maestro of Rancor has had his lifetap proc reduced.
+* Fixed an issue where personal instances were still not 1 hour. This should be corrected.
+* You can once again request a raid instance of [[The Hole]].
+* Re-added 2Handed Bash to [[Fiery Avenger]].
+* The [[Lay on Hands|Lay On Hands]] and [[Harm Touch]] cooldown bonuses from smite and reave now only trigger on successful hits.
+* Allow the use of [[Smite]] and [[Reave]] while mounted.
+* Sky Teleport Pads from Quest Room and Island 8 now work.
+* Fix overly optimistic client side melee range code that was allowing autoskills to trigger a cooldown but were blocked by the server.
+* Smite (Paladin Ability) mana cost reduced to 2%, damage increased to 3.5x.
+* Block invocation changes while casting and improve client / server invocation and stance cooldown synchronization.
+* Multiplayer Raid for [[Nagafen]] zone in location is no longer inside a wall.
+* The group instance for [[Nagafen's Lair]] can now contain more than one player.
+* [[Obsidian Shard (Sky)|Obsidian Shard]] should no longer drop from the bees in [[Plane of Sky]].
+* [[Torc of Veeshan]] should no longer drop from [[Noble Dojorn]] in [[Plane of Sky]].
+
+== 2026-05-28 - Patch Notes ==
+
+These patch notes are from the Official EverQuest Legends discord, posted on May 28, 2026
+ 
+=== AAs ===
+* Quick Buff can no longer be used in combat.
+* [[Lay on hands|Lay On Hands]] and [[Harm Touch]] [[Alternate Advancement|AAs]] will no longer show ranks 11 and 12, which were unobtainable.
+* The Abyssal, Holy, Unholy, and Valiant Steed [[Alternate Advancement|AAs]] now directly summon a horse, instead of creating a bridle.
+* Valiant/Abyssal Steed is actually fixed this time.
+
+=== Achievements ===
+* Fixed missing connection in the Race Unlock - Erudite achievement for [[High Council of Erudin]].
+* [[Plane of Hate]] Explorer Achievement should now trigger from Plane of Hate, instead of Plane of Hate B.
+
+=== Abilities ===
+* Add [[Paladin]] [[Smite]] and [[Shadow Knight|Shadowknight]] [[Reave]] abilities.
+* Added Skill Caps for Smite (Paladin) and Reave (Shadow Knight). Starting at level 9, they gain 5 points per level.
+
+=== Difficulty ===
+* Multiclass mobs can no longer cast unobtainable player spells.
+* Reduced multiclass mob health scaling in solo instances by 66%
+* Reduced casting speed of difficulty-scaled raid mobs slightly.
+* Fixed mob difficulty haste scaling not working correctly.
+* Removed difficulty-scaling of aggro range from solo instances.
+* Reduced difficulty-scaling of aggro range everywhere else.
+* Reduced resist penetration of difficulty-scaled raid mobs in solo instances.
+* Reduced difficulty-scaled mob health by 33%
+* Reduced multiclass mob health scaling everywhere else by 50%
+* Reduced difficulty-scaling damage by 33%
+ 
+=== Gameplay ===
+* [[Monk]] animations now exist for [[Troll|Trolls]], [[Ogre|Ogres]], [[Dwarf|Dwarves]], [[Gnome|Gnomes]], and [[Halfling|Halflings]]. Kickin'!
+* [[Bard]] animations now exist for [[Troll|Trolls]], [[Ogre|Ogres]], [[Dwarf|Dwarves]], [[Gnome|Gnomes]], [[Halfling|Halflings]], and [[Iksar|Iksars]]. Sing your heart out!
+* The Translocators at the docks, provided by the Academy of Arcane Sciences, have grown tired of standing around all day for no pay, and have started charging 1 platinum piece per level, to send you on your way.
+* The Translocators charge based on your highest level achieved.
+* A new translocator route has been added between [[Freeport]] and [[Qeynos]].
+* Fixed reciprocal attack range when you are levitated.
+* [[Item Upgrade System|Motes]] now drop in a 10 level range instead of 5.
+* Fixed an issue causing Learned Recipes to disappear after zoning.
+* [[Frederic Calermin]] will now ask if you wish to "test your skills", instead of powers.
+* [[Paineel]] NPCs will no longer give more than 100 faction per hit.
+* Due to population increases, open world difficulty 0 zones will now spawn additional picks.
+* Resurrections during combat is now allowed. All other same-zone respawns are blocked while in combat.
+* Ranged and throwing attacks no longer consume ammo.
+* Fixed an issue with reloading pet equipment if a pet item is merge upgraded.
+* NPC pets will now despawn if the owner is killed.
+* [[Voidlings]] can now see you if you're invisible.
+
+=== Instances ===
+* [[Plane of Hate]] and [[Plane of Fear]] raids are now available!
+* Group raids for all currently available raid content are now available (including Hate and Fear)!
+* NOTE: [[Plane of Sky]] will be coming at a later date. Personal instances of Hate and Fear for trash clears are coming at a later date.
+* Raid instance Loot Lockouts removed from all non-raid-target mobs. In raid instances, loot should now drop from kills of all mobs that don't trigger a mob-specific lockout timer shown in the Expedition window.
+* Personal Instance lockout timers have been reduced to 1 hour from 3 hours.
+* Fixed an issue that was blocking looting from solo kills of mobs with loot lockouts in dynamic instances.
+* Solo raid instances should now properly apply lockouts for replay and individual NPC lockout timers.
+
+=== Invocations ===
+* Fix [[Beastlord|beastlords]] not being considered wisdom casters.
+* Updated [[Disciplines#Invocations|Invocation]] Descriptions:
+** Recovery: You regenerate mana twice as fast and spells have a 5% reduced mana cost. Out of combat regen bonus is not effected.
+** Empower: Adds 25% plus 10% per additional non-hybrid casting class to HP spell effects at the cost of 20% more mana.
+** Inversion: Shifts two-thirds of spell cast time into the global recovery time and 20% of the mana cost into endurance cost.
+** Spellblade: Treats the first spell-gem slot as a proc that consumes both mana and endurance on activation. 40% of the spells mana cost is paid as mana and endurance. The spell must have a reuse time less than or equal to its cast time.
+** Overchannel: Cast spells have a -150 resist adjust plus another -15 for every non-hybrid caster class at a cost of 20% of the mana cost in endurance.
+** Inviolable: Cast spells are uninterruptible at the cost of 100% more mana and the same amount as endurance.
+** Divine: Spending mana will heal the group member with the lowest hp percentage by that amount. For every additional wisdom class, this will repeat with a heal for 33% of the mana spent.
+
+=== Items ===
+* [[Fiery Avenger]]'s Two-Handed Bash worn effect has been replaced with [[Virtuous Bash]], increasing [[Bash]] minimum damage by 15 and reducing Bash cooldown by 1 second.
+* Removed the Magic Resist from [[Pristine Studded Leather Tunic]].
+ 
+=== Loadouts ===
+* Resolved a client stuck state when attempting to save the current loadout in a non-swap zone.
+* Resolved some situations where Items or [[Exaltations]] could disappear during [[Bandolier]] or [[Loadout]] swaps.
+* Resolved an issue with Loadout Equipment swapping caused by invalid [[exaltations]] prior to their removal.
+* [[Bandolier]] swapping will now verify that an item is still valid for the destination slot.
+
+=== NPCs ===
+* Dramatically reduced the assist radius of [[Gynok Moltor]] in [[Befallen]].
+* [[Dark Assassin]] in [[The Feerrott|Feerrott]] should now give XP.
+ 
+=== Spells ===
+* Change per-spell resist hardcaps to resist softcaps.
+* Added [[Statistics#Endurance (ENDR)|Endurance]] Regeneration to [[Chloroplast]].
+* Descriptions updated for the following spells, as they are no longer limited to outdoors:
+** [[Whirling Wind]], [[Invoke Lightning]], [[Dizzying Wind]], [[Harmony of Nature]], [[Lightning Strike]] and [[Lightning Blast]]
+
+=== UI ===
+* Added a new slider under nameplate tab in options to scale the size of nameplates.
+* [[Feign Death]] -- Toggle option under general to enable/disable standing when pressing the skill again while already feigning also made the camera pan when using right click while feign death.
+* [[Ward of the Divine]] buff icon is now fixed.
+* Lull spells tooltip durations have been fixed.
+* Ineligible [[disciplines]] from other loadouts no longer appear in the actions window.
+* Fixed issues with raid window filtering.
+* Fixed an issue with storage tab on inventory updating.
+* Added CTRL and SHIFT key modifiers for clicking items in your storage to pickup 1 or a stack of the item.
+* Removed TAB stops from hidden buttons on server select screen.
+* Tutorial text updated for clarity around Primary race changing.
+* Fix spelling/grammar errors in ability descriptions.
+ 
+=== World ===
+* Added a [[banker]] to [[Plane of Sky]], next to the fire.
+
+== 2026-05-26 - Hotfix ==
+
+These patch notes are from the Official EverQuest Legends discord, posted on May 26, 2026
+
+=== Hotfix ===
+
+* [[Dark Assassin]] in [[Feerrott]] should now give XP.
+* [[Amplification]] (Bard Song) will no longer be affected by any singing mods, including itself.
+* Updated [[Plane of Sky]] quests one more time, to use a set of Wind Runes, instead of class specific runes.
+* Also updated the usable classes on old, and new, PoSky items, they should be correct now! If not, lodge a formal complaint at the nearest booth.
+* Each quest within a class will use a different wind rune, so be sure to stock up!
+* [[Lord Nagafen|Naggy]] raid instance zone-in point moved slightly to avoid some races getting stuck in the wall.
+* Point blank AOE spells will now hit a maximum of 8 targets.
+* Players will no longer spawn facing the zone exit when entering a personal instance of Befallen
+* Adjusted some backend server configuration settings for performance.
+
+== 2026-05-22 - Hotfix ==
+
+These hotfix patch notes are from the Official EverQuest Legends discord, posted on May 22, 2026
+
+=== Hotfix ===
+
+* Detrimental Target AOEs will no longer hit the caster.
+* Fixed a crash issue on zone swapping loadouts.
+* Fixed an issue where all Personal Instances would disable respawning.
+* Fixed an issue where when leaving a Personal Instance via the Difficulty Indicator, you would be punted to the East Commonlands Tunnel.
+* Fixed an issue where you did not leave an assigned "Personal Instance".
+* Attack range is now reciprocal with your target. If it can hit you, then you can hit it.
+* Fixed an issue related to item swapping.
+* Added classic horse texture variants.
+
+== 2026-05-22 - Patch Notes ==
+
+These patch notes are from the Official EverQuest Legends discord, posted on May 22, 2026
+
+=== General ===
+
+* [[Dragon Hoard]] will no longer delete high-tier items that can populate exaltations.
+* [[Rathe Mountains]] has become significantly more colorful. [[Froglok]] skins are in!
+* Froglok Plate Armor should now correctly tint.
+* Classic horse models have been added for [[mounts]], along with new riding animations for each playable race.
+* Mounts have been re-enabled.
+* Fixed chat channel bad word filtering.
+* [[Exaltations]] in items that were traded are now attuned on trade completion.
+* Several issues with item attunement have been fixed.
+* Reduce flickering of the screen while zoning without the splash screen visible.
+* Third person camera detachment should be less frequent in many zones.
+* Players using Return Home from Character Select will now end up in [[East Commonlands]] Tunnel as a fallback failsafe.
+* Fixed an issue with [[loadout]] swapping resetting skills to 1.
+* The minimum faction hit has been increased to 5.
+* All Aqua Goblins in [[Butcherblock Mountains|Butcherblock]] are now properly goblins.
+* Giants in Nagafen's Lair and Permafrost now count as valid raid targets.
+* Removed Song: Magical Monologue from the [[Bard#Songs|Bard Songs]] master list.
+* [[Justin Rhymes]] in [[High Keep]] now properly sells from the [[Bard#Songs|Bard Songs]] master list.
+* [[Tarn Visilin]] in [[High Keep]] now sells spells from the Enchanter Spells master list.
+* Ranger Spell vendors in [[Neriak]] now sell from the [[Ranger#Spells|Ranger Spells]] master list.
+* Moved the 'Safe Spot' in [[East Freeport]] to be outside of the city walls.
+* Added Faction achievements for major Playable Race factions.
+* Updated the Race Unlock achievements to check against those faction achievements, instead of characters current faction standing.
+* [[Golem Metal Wand]] now has infinite charges, with a 4 minute recast timer.
+* [[Mask of Deception]] no longer drops.
+* [[Guise of the Deceiver]] now drops again.
+* The Footman's Blade has received a new name ([[The Baron's Blade]]) and lore text.
+** The Baron's Blade now correctly has an Ornamentation Slot.
+** Removed the NO STORAGE tag from The Baron's Blade that was breaking its compatibility with exaltations.
+
+=== Gameplay ===
+
+* [[Disciplines#Invocations|Invocations]] are in and can be used in tandem with Melee Stances.
+** Recovery: "You regenerate mana (excluding out of combat bonus) at twice the rate and spells have a 5% reduced mana cost."
+** Empowering: "Adds 25% plus 10% per additional non-hybrid casting class to HP spell effects at the cost of 50% more mana."
+** Inversion: "Shifts two-thirds of spell cast time into the global recovery time at a cost of 10% more mana and endurance."
+** Spellblade: "Treats the first spell-gem slot (must be a spell with a reuse time <= the cast time) as a proc that consumes both mana and endurance (33% of the normal spell mana cost).";
+** Overchannel: "Cast spells have a -100 resist adjust plus another -15 for every non-hybrid caster class at a cost of 33% more mana and 10% of the total mana cost from endurance."
+** Inviolable: "Cast spells are uninterruptible due to movement, stuns, or interrupt effects at the cost of 100% more mana and 50% of the total mana cost from endurance."
+** Divine: "All spell casts with a mana cost will heal the group member with the lowest hp percentage by that cost. For every additional wisdom class, this will repeat with a heal for 33% of the mana cost."
+* [[Stances]] and [[Disciplines#Invocations|Invocations]] should now robustly synchronize after zoning and loadout swapping.
+* Rogues can now backstab with the best backstabbing weapon between Primary, Secondary, or either Any slot.
+* Players will no longer autoswitch to range attack if a valid range weapon is not equipped.
+* Froglok [[Beastlord|Beastlords]] will now have Leeches for pets, instead of Mosquitos.
+* Rathe Mountain worms have been replaced with leeches for consistancy.
+* Approximately doubled the spawn chance of The Froglok Shin Lord.
+* Insufficient mana check will properly use focus now.
+* All doors in [[Befallen]] should now be properly pickable with lockpicks, but they aren't all the doors you may remember.
+* A new, high level population of enemies has been added to the deepest part of Befallen. This includes several new named creatures as well as some very mean dark elves.
+* There has been a slight adjustment to Befallen loot distribution.
+
+=== AA ===
+
+* New autogranted passive [[Alternate Advancement|AAs]] have been added to a number of classes.
+** Unbound Affliction - Necromancer DoT critical chance
+** Unbound Cascade - Shaman DoT critical damage
+** Unbound Boon - Cleric Heal critical chance
+** Unbound Nature - Druid Spell critical chance
+** Unbound Clarity - Enchanter Mana Regen
+** Unbound Companion - Magician pet critical chance
+* Changed [[Origin]] and [[Gather Party]] to not be on the same loadout timer.
+* Group members with Gather Party on cooldown can now receive and accept Gather Party invitations. Accepting an invitation will restart their cooldown.
+* Gather Party and Quick Buff should no longer go on cooldown when changing loadouts.
+* Origin should only go on cooldown when changing Race.
+* Leech Touch, Purify Body, Escape and Rampage are now all on separate timers.
+* Removed ranks of Elemental Form beyond the first.
+* The Bestow Divine Aura AA for Clerics should now properly smart cast.
+
+=== Spells ===
+
+* Modified the Ranger fast-casting fire nuke line. These now deal instant damage and apply a 1-tick DoT, causing 50% of the initial damage again 6 seconds later. Their mana costs have been balanced accordingly. 2 additional spells have been added to this line and are available at levels 15 and 46.
+** [[Searing Arrow]]: level 15, 35 mana, 58 instant damage, 29 DoT damage
+** [[Flaming Arrow]]: level 26 (reduced from 29), 55 mana, 102 instant damage, 51 DoT damage
+** [[Burning Arrow]]: level 36 (reduced from 39), 85 mana, 155 instant damage, 78 DoT damage
+** [[Scorching Arrow]]: level 46, 100 mana, 210 instant damage, 105 DoT damage
+* Adjusted [[Promised Renewal]]
+** Decreased Promised Renewal's timer to trigger down to 12 seconds, but it now adds a lingering debuff that prevents Promised Renewal from landing for a further 12 seconds.
+** Also increased the mana cost of Promised Renewal from 500 to 550.
+** Promised Renewal also now prevents itself from landing again.
+* Adjusted recast time of [[Frost Shard]] (Beastlord level 47) to 10 seconds, consistent with the rest of the spells in its line.
+* Removed the ability to [[treeform]] in areas without trees.
+* [[Iksar]] and [[Troll]] Illusions will now give 1 point of HP regen.
+* [[Call of Flame]] will now properly damage the target.
+* [[Mantle of the Song Weaver]] clicky effect should now properly boost stats.
+* [[Ethereal Cleansing]] will now act like most other heals, and attempt to heal a friendly target, or yourself, unless you have 'Implied Healing' turned on in options, in which case it will heal your targets target, if your target is an enemy.
+
+=== UI ===
+
+* The [[Bandolier]] has been re-enabled.
+** Please Note! Due to the changes below, all existing Bandoliers and Loadout Equipment Sets have been erased. They will need to be re-saved before working again.
+* Loadout Equipment Sets and Bandolier are now much more specific about the items they will save and load. They will now grab the exact item that they were saved with, even if you have duplicates.
+* This also includes [[Augmentations|Augmentation]]/[[Exaltations]]; The exact Exaltation that was in an item when a Loadout was saved (Swapped away from) will return to that item upon swapping back.
+* This will also work if an Item was upgraded or merged, unless both items being merged together were actively being used in the same saved Loadout.
+* Loadout Equipment Sets and Bandolier can now load from the Equipment [[Keyring]] and Augmentation Keying.
+* Loadout Equipment Sets and Bandolier will now use the following priority order when storing unequipped Items or Augmentations:
+* The Item or Augmentation will attempt to be placed in the Equipment or Augmentation Keyring, respectively, until it reaches the cap.
+** The Item or Augmentation will then attempt to be placed in the inventory/bags.
+** If both spots above no longer have room, the Item or Augmentation will be placed in their respective Keyring, overcapping that Keyring.
+* Loadout Swapping will not be allowed while a Keyring is overcapped.
+* Mount Key Ring has been Disabled.
+* Illusion Key Ring has been Disabled.
+* Familiar Key Ring has been Disabled.
+* Teleportation Key Ring has been Disabled.
+** Note: These disabled key rings will still show in UI currently.
+* Augmentation Key Ring has been enabled with 50 slots.
+* Activated Items Key Ring has been enabled with 10 slots.
+* Equipment Items Key Ring has been enabled with 50 slots.
+* [[Rituals]] have been implemented. It is available from the Actions window (Default: L).
+* Rituals will allow you to cast most portal-type spells that you have scribed in your spell book, bypassing Class and Level requirements as long as you have at least one class that meets the level requirements of the spell, even if that class is not currently being used in your Loadout.
+** For example, as a Level 12 Warrior/Monk/Rogue, I could use a Ritual to cast West Commons Gate, a level 21 Wizard Spell, if I had previously leveled a Wizard to level 21 or higher.
+* When using Rituals, you must be in a resting state (out of combat). The cast time for all Rituals is 20 seconds, and you will lose all Mana and Endurance when it completes casting.
+* Added Level Filtering to the Spell Search in Actions Window.
+* Fixed an issue where combat skill timers would desync visually.
+* Auto-[[merging]] is now supported for the Equipment Keyring.
+* Items in the [[Item Overflow]] will no longer disappear when reloading UI or swapping loadouts.
+* Added Y pitch offset slider for the 3rd person camera, allowing you to aim the camera higher up.
+* Added "TYPE" column to lockout information on raid request window.
+* Added an auto attack range auto-switch option that will switch between range and melee attacks based on in or out of melee range.
+* Tutorial 'Item Merging' window duplicate text removed.
+* Monks have been added as a valid class on the [[Soldier's Brooch of the Stealthy]]
+* The map source directory can now be selected from the right-click context menu for Compact Maps.
+* Group window auto resizing should work under any circumstance now.
+* Minimized the sell value on floating text.
+* Merged raid invite and group invite into a singular invite on player name context menu in chat windows.
+* Items hidden in merchant lists by UI will no longer popup tooltips.
+* [[Shadow Vortex]] & [[Scream of Pain]] are now in the same spell dropdown category.
+* Updated player race illusion descriptions to be more accurate.
+* All Zephyr and Translocate spell scrolls will now properly stack to 20.
+* Windows with size snapping such as cast bar will now load properly sized
+
+=== Instances ===
+
+* Enabled [[Personal Instances]] from the Difficulty UI (/pick) - these are temporarily disabled for zones that are also Raid zones. ([[The Hole]], [[Kedge Keep|Kedge]], [[Nagafen's Lair]], [[Permafrost]], [[Plane of Hate]], [[Plane of Fear]] and [[Plane of Sky]])
+* Raid instances for [[Master Yael]] (The Hole) are now available through voidlings in [[Paineel]].
+* 'Trash' giants in Naggy's chamber in solo raid instances removed.
+* [[Magus Rokyl|Magus Rokyl's]] pathing removed in Naggy Solo Raid instance.
+* Fixed an issue where difficulty normal 0 was appended to the Personal lockout on the dynamic zone lockout list.
+* Instances should now follow a "per NPC" loot lockout for player and group members.
+
+Individual pages (may be removed at a later date):
+
+* [[Patch notes June 2 2026|June 2]]
+* [[Patch notes May 31 2026|May 31]]
+* [[Patch notes May 29 2026|May 29]]
+* [[Patch notes May 28 2026|May 28]]
+* [[Patch notes May 26 2026|May 26]]
+* [[Patch notes May 22 2026|May 22]]

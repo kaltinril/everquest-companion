@@ -1,0 +1,9 @@
+'''Spell: Overthere''' is a self-gate to [[The Overthere]]. Teleports to 2675, 3394, -131 in [[Overthere]], on an abandoned boat at the docks.
+
+[[File:worker_mallet_location.png]]
+
+===Items which have Overthere gate===
+* [[Worker Sledgemallet]]
+* [[Courier`s Potion]]
+
+[[Category:Spells]]

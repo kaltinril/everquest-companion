@@ -1,0 +1,75 @@
+Welcome to the New Player Guide for EverQuest Legends.
+
+This page reflects information shared by the developers during the EQ Legends Beta and is subject to change as development continues. We plan to update this page as new details become available and will provide more content and guidance here on launch day.
+
+<div style="margin: 0 10% 1em 10%; text-align: center;">
+{| style="background: #8bafff; border: 1px solid #999; padding: 0.1em; margin: 0.5em auto;"
+|-
+| valign="top" style="padding-left: 0.3em;padding-right: 0.7em;padding-top: 0.3em;;padding-bottom: 0.3em" | [[File:WarningIcon.png|center]]
+| style="padding: 0.1em" | <div style="text-align: left;">'''{{{Title|Caution}}}:''' {{{1|This page is under heavy construction.<br>The information contained here is subject to change.}}}</div>
+|}
+</div>
+
+EverQuest Legends has taken a new approach to the series by designing the game from the ground up to appeal to players who enjoy playing their games solo and/or casually. While groups (up to 4 players) and raids (up to 8 players) are available, the entire game can be played, enjoyed, and experienced solo if that's your playstyle.
+
+Their game formula includes introducing modern game features such as a streamlined user interface, upgraded spell and ability management, and countless quality of life enhancements to the magic and nostalgia of classic EverQuest, including the original art style, graphics, zones, spell effects, loot, and music.
+
+To accomplish this, the team generally focused on fun instead of balance and created an experience that allows solo players the ability to experience 100% of the game (on the easiest difficulty).
+
+Grouping is still an option for those who want to and the team has put in higher difficulties to make it more exciting if players want to challenge themselves, solo or group. Players are incentivized to group with personal loot, meaning players won't compete with each other over drops from a mob - everyone has their own loot pool for each mob.
+
+Turning up the difficulty will reward players with a chance at better drops, instead of receiving the base item as loot, players may receive "Merged" items that are +1 to +4 - upgrades to the base version of that item, which can improve the stats and bonuses, and even grant new and additional stats and bonuses to an item.
+
+This is a modern take on loot because it means that players who stick to the baseline difficulty aren't going to miss out on group or raid loot, it may just take them longer which is fair to all.
+
+
+
+----
+
+
+
+Unsorted FAQs:
+
+'Research' and 'Poison Making' trade skills have been retired in Legends. Rogue poisons are now spells, allowing up to three combat poisons and one utility poison to be run at the same time as "permanent" buffs that do not require consumables or trade skilling.
+
+You can view all of the different spells that you can use, including the ones you haven't scribed yet. You can also browse all of the spell info for each class in game.
+
+Multiple auto-skills can be toggled on and off at will (press the 'L' key to open the actions window).
+
+Race restrictions have been effectively removed from certain items, by allowing ALL races to use them. This was done to ensure players can use as much of their loot as possible.
+
+Legends has a multi-menu available in game that is like the menu button in EQ Live/TLP but more streamlined and filled with features. You can check out the [[User Interface Guide|user interface guide]] for more details.
+
+When you raise the difficulty level you are altering reality; NPCs start to multiclass and may have larger aggro radius and become more aggressive.
+
+Higher level difficulties have higher level emotes.
+
+The Map has several new display variations and options. Nearby NPC's can be displayed on the map (right click on the map and choose NPCs). You can also toggle the 'Ring' that displays the radius in which NPC's and Players will be displayed should you choose to display them on the map.
+
+Sitting does not increase generation, players are "always meditating."
+
+Auto Loot, Auto Merge, Auto Store, and Auto Sell are available as loot settings.
+
+Destroying an item gives you the baseline vendor value for an item, which is convenient but if you want the best prices, you will still want to visit a vendor and sell to them based on your charisma value.
+
+Everyone has personal loot, you have your own loot pool for each mob.
+
+Attunable items - once they are attuned to your character, they become "No Trade"
+
+UI scaling will be available.
+
+Zone Difficulty works similar to an instancing system where if the difficulties get crowded, the server will start spinning up additional difficulties of that specific difficulty. So if you encounter a busy zone, you will have the option of going to a less populated instance of that zone at the same difficulty or you can spin up a private instance with the option to choose respawns or non-respawns.
+
+Auto-scribing is enabled on new characters up to level 20 which provides your critical class spells while you are leveling.
+
+When you create a new character, all of your classes level up with you to level 10 and from there you lock in your class choices and only level up the classes in your current load out.
+
+Death does not make you lose experience and you can choose to respawn at your current bind location or respawn at the zone safe point if your party is out of combat.
+
+The Out Of Combat timer is 12 seconds.
+
+Motes are used to upgrade your gear and can drop from named and can also drop infrequently from trash mobs as well. Higher level motes will drop from higher level difficulties (though you must be a certain level for higher level motes). Motes can be upgraded.
+
+A lot of commands have been streamlined into settings and options in the UI so you can toggle or modify them without having to hunt down chat commands to always hide NPC corpses, for example.
+
+The minimum level to enter the 'planes' is 46.

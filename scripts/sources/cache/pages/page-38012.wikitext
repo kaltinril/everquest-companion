@@ -1,0 +1,26 @@
+{{Factionpage|
+
+| description = Appears to be an isolated monk faction.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Dreadlands]]
+
+| quests_raise = 
+
+* [[The Lost Circle]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Brother Balatin]] <span class='fmz'>(Dreadlands - Undead)</span>
+
+}}

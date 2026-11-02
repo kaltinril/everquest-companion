@@ -1,0 +1,62 @@
+{{Factionpage|
+
+| description = In South Kaladim past the mines and bank, is a tunnel leading to the cleric and paladin guilds.  
+The [[Cleric]] guildhall is a small building in front of the long Paladin guildhall, and here you can meet Priestess Ghalea.  
+The Clerics of Underfoot are peaceful folk that support the Dwarven King Kazon Stormhammer and the Paladin guild called Miners Guild 249.  
+In fact to raise faction with the Clerics, Ghalea will send you to the Paladin Guildhall where you will be given the job of fighting undead and returning bone chips.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Crushbone]]
+* [[Dagnor's Cauldron]]
+* [[Rathe Mountains]]
+* [[Kaladim|North Kaladim]]
+
+| quests_raise = 
+
+* [[Aviak Chicks]]
+* [[Bone Chips Kaladim]]
+* [[Brell Serilis Symbol Quests|Brell Serilis Initiate]]
+* [[Chalice of Conquest Quest]]
+* [[Skunk Hunting]]
+* [[Slave Keys]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a dwarven slave (male)]]  <span class='fmz'>(Crushbone)</span>
+* [[Axa Stormshield]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Baleki Nightseer]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Darthur Nightseer]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Datur Nightseer]] <span class='fmz'>(North Kaladim - Paladin Guildmaster)</span>
+* [[Dru Razbind]] <span class='fmz'>(Butcherblock Mountains - Quest NPC)</span>
+* [[Dunony Chestire]] <span class='fmz'>(North Kaladim - Paladin Guildmaster)</span>
+* [[Duppa Pickstone]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Fettar Steelwield]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Gralpa Axeheft]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Gundalthur Izuran]] <span class='fmz'>(Dagnor's Cauldron - NPC, Non-Quest)</span>
+* [[Gunlok Jure]] <span class='fmz'>(North Kaladim - Paladin Guildmaster)</span>
+* [[Krako Stonesplitter]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Nancine]] <span class='fmz'>(Mountains of Rathe - NPC, Non-Quest)</span>
+* [[Nultal Malfoot]] <span class='fmz'>(North Kaladim - Cleric Guildmaster)</span>
+* [[Priestess Ghalea]] <span class='fmz'>(North Kaladim - Cleric Guildmaster)</span>
+* [[Resron Silvern]] <span class='fmz'>(North Kaladim - Cleric Guildmaster)</span>
+* [[Storn Trueblade]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Tempia Lauley]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Zeffan Holdsman]] <span class='fmz'>(North Kaladim - Merchant)</span>
+
+}}
+
+= Suggested Route =
+*[[Bone Chips (Kaladim)]] (+[[Clerics of Underfoot]], +[[Kazon Stormhammer]], +[[Miners Guild 249]])
+
+[[Category:Achievement Faction]]

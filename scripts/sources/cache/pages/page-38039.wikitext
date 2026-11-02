@@ -1,0 +1,463 @@
+{{Classic Era}}[[File:npc_guard_miles.png|right]]{{Factionpage|
+
+| description = The good guards of the [[Human]] city of Qeynos who are allied with [[Antonius Bayle]] and the [[Merchants of Qeynos]] against [[Kane Bayle]] and his [[Corrupt Qeynos Guards]], the roguish [[Circle of Unseen Hands]] and the dastardly [[Bloodsabers]].
+
+| zones_raise = 
+
+* [[Blackburrow]]
+* [[Freeport|East Freeport]]
+* [[Eastern Plains of Karana]]
+* [[Erudin]]
+* [[Greater Faydark]]
+* [[Halas]]
+* [[Highpass Hold]]
+* [[Kithicor Forest]]
+* [[Lake Rathetear]]
+* [[Rathe Mountains]]
+* [[Neriak|Neriak Third Gate]]
+* [[Northern Karana]]
+* [[Qeynos|North Qeynos]]
+* [[Qeynos Aqueducts]]
+* [[Qeynos Hills]]
+* [[Southern Karana]]
+* [[Qeynos|South Qeynos]]
+* [[Steamfont Mountains]]
+* [[Surefall Glade]]
+* [[Toxxulia Forest]]
+* [[Western Plains of Karana]]
+
+| zones_lower = 
+
+* [[Ak'Anon]]
+* [[Blackburrow]]
+* [[Butcherblock Mountains]]
+* [[Freeport|East Freeport]]
+* [[Eastern Plains of Karana]]
+* [[Erudin]]
+* [[Greater Faydark]]
+* [[Halas]]
+* [[Highpass Keep]]
+* [[Innothule Swamp]]
+* [[Kithicor Forest]]
+* [[Lake Rathetear]]
+* [[Lavastorm Mountains]]
+* [[Lesser Faydark]]
+* [[Rathe Mountains]]
+* [[Nektulos Forest]]
+* [[Neriak|Neriak Third Gate]]
+* [[Northern Karana]]
+* [[Qeynos|North Qeynos]]
+* [[Northern Desert of Ro]]
+* [[Qeynos Aqueducts]]
+* [[Qeynos Hills]]
+* [[Rivervale]]
+* [[Kaladim|South Kaladim]]
+* [[Southern Karana]]
+* [[Qeynos|South Qeynos]]
+* [[Surefall Glade]]
+* [[The Feerrott]]
+* [[Freeport|West Freeport]]
+* [[Western Plains of Karana]]
+
+| quests_raise = 
+
+* [[Aegis of Life Quest]]
+* [[Aenia and Behroe]]
+* [[Bandit Sashes]]
+* [[Bard Reports]]
+* [[Bat Fur Quest]]
+* [[Bear Hide Armor]]
+* [[Blackburrow Stout Shipment]]
+* [[Blank Scrolls]]
+* [[Blessed Oil Quest]]
+* [[Blurred Map Quest]]
+* [[Bone Chips Qeynos]]
+* [[Brother Trintle]]
+* [[Call of Flame Quest]]
+* [[Cheslin's Illusion Cards]]
+* [[Cleanse the Ocean]]
+* [[Corrupt Guards]]
+* [[Crush the Undead]]
+* [[Cure for Lempeck Hargrin]]
+* [[Deathfist Slashed Belts, Good Version]]
+* [[Drosco the Zombie (evil)]]
+* [[Drosco the Zombie (good)]]
+* [[Errand for Tonmerk]]
+* [[Fabian's Strings]]
+* [[Faren's Tacklebox]]
+* [[Find Lucie Elron]]
+* [[Fleshy Orbs]]
+* [[Fresh Baked Muffins]]
+* [[Frostbite's Fish]]
+* [[Gathering Grain]]
+* [[Gharin's Note (Good)]]
+* [[Gnasher's Head]]
+* [[Going Postal|Going Postal (Ak'Anon to Kelethin)]]
+* [[Going Postal|Going Postal (Butcherblock to Kelethin)]]
+* [[Going Postal|Going Postal (East Freeport)]]
+* [[Going Postal|Going Postal (Erudin to Qeynos)]]
+* [[Going Postal|Going Postal (Feerrott to Freeport)]]
+* [[Going Postal|Going Postal (Felwithe to Kelethin)]]
+* [[Going Postal|Going Postal (Halas to Qeynos)]]
+* [[Going Postal|Going Postal (Highpass)]]
+* [[Going Postal|Going Postal (Innothule)]]
+* [[Going Postal|Going Postal (Kaladim to Kelethin)]]
+* [[Going Postal|Going Postal (Kelethin to Freeport)]]
+* [[Going Postal|Going Postal (Nektulos)]]
+* [[Going Postal|Going Postal (Qeynos)]]
+* [[Going Postal|Going Postal (Rivervale)]]
+* [[Going Postal|Going Postal (Surefall Glade to Qeynos)]]
+* [[Going Postal|Going Postal (West Karana to Qeynos)]]
+* [[Hero Bracers Quest]]
+* [[High Guard Battlestaff]]
+* [[Holy Armor Scroll]]
+* [[Indaria's Doll]]
+* [[Qeynos Badge Quests|Interrogator's Badge (Badge #2)]]
+* [[Qeynos Badge Quests|Investigator's Badge (Badge #1)]]
+* [[Jagged Pine Crook Staff]]
+* [[Karana's Blessing]]
+* [[Kobold Killing]]
+* [[Kwint's Kwest]]
+* [[Library Book]]
+* [[Merona's Brother]]
+* [[Monk Headband Quests|Monk Orange Headband]]
+* [[Monk Headband Quests|Monk Purple Headband]]
+* [[Monk Headband Quests|Monk Red Headband]]
+* [[Monk Headband Quests|Monk White Headband]]
+* [[Monk Headband Quests|Monk Yellow Headband]]
+* [[Moonstones]]
+* [[Nesiff's Statue]]
+* [[Note for Konem]]
+* [[Note to Neclo Quest]]
+* [[Package from Lomarc]]
+* [[Peacekeeper Staff Quest]]
+* [[Poacher's Head Quest (Surefall Glade)]]
+* [[Qeynos Badge Quests|Qeynos Badge of Honor (Badge #4)]]
+* [[Quench Lasen's Thirst]]
+* [[Rabid Grizzlies]]
+* [[Rabid Wolves]]
+* [[Qeynos Badge Quests|Researcher's Badge (Badge #3)]]
+* [[Rohand's Brandy]]
+* [[Scout Blade]]
+* [[Sneed's Rat Infestation]]
+* [[Steel Warrior Initiation]]
+* [[Talym Shoontar's Head]]
+* [[Taxes]]
+* [[Tayla Ironforge]]
+* [[Temple Blankets Quest]]
+* [[The Bread Shipment]]
+* [[The Clothspinner Sisters (good)]]
+* [[The Crate (evil)]]
+* [[The Crate (good)]]
+* [[The Donations]]
+* [[The Escaped Catman]]
+* [[The Gnoll Slayer]]
+* [[The Nitrates and the Assassin]]
+* [[The Package]]
+* [[The Rat King]]
+* [[Trumpy's Head]]
+* [[Unser's Call]]
+* [[Vasty Deep Water]]
+* [[Weapons Delivery]]
+* [[Wenbie's Muffins]]
+* [[Werewolf Hunters]]
+* [[Winds of Karana]]
+* [[Wolf Hide Armor]]
+* [[Zimel's Blades (SoulFire)]]
+
+| quests_lower = 
+
+* [[Blackburrow Stout Shipment]]
+* [[Blank Scrolls]]
+* [[Child of Innoruuk]]
+* [[Death of Lyda Nasin]]
+* [[Drosco the Zombie (evil)]]
+* [[Honey Mead for Trumpy]]
+* [[Honeybugger Assassin]]
+* [[Hurrieta's Tunic Quest]]
+* [[Moss Snakes]]
+* [[Rogue Errands]]
+* [[The Clothspinner Sisters (evil)]]
+* [[The Crate (evil)]]
+* [[The Package]]
+* [[The Tattered Pouch]]
+* [[Trumpy's Head]]
+* [[Trumpy's Skull]]
+
+| mobs_raise = 
+
+* [[a bandit]]  <span class='fmz'>(East Karana)</span>
+* [[a burly gnoll]]  <span class='fmz'>(Blackburrow)</span>
+* [[a gnoll]]  <span class='fmz'>(Blackburrow)</span>
+* [[a gnoll brewer]]  <span class='fmz'>(Blackburrow)</span>
+* [[a gnoll commander]]  <span class='fmz'>(Blackburrow)</span>
+* [[a gnoll guardsman]]  <span class='fmz'>(Blackburrow)</span>
+* [[a gnoll pup]]  <span class='fmz'>(Blackburrow)</span>
+* [[a gnoll scout]]  <span class='fmz'>(Blackburrow)</span>
+* [[a gnoll shaman]]  <span class='fmz'>(Lake Rathetear)</span>
+* [[a necromancer]]  <span class='fmz'>(Qeynos Catacombs)</span>
+* [[a patrolling gnoll]]  <span class='fmz'>(Blackburrow)</span>
+* [[a poacher]]  <span class='fmz'>(Surefall Glade)</span>
+* [[a raider]]  <span class='fmz'>(North Karana)</span>
+* [[a razorgill]]  <span class='fmz'>(Blackburrow)</span>
+* [[a rotting sentry]]  <span class='fmz'>(Qeynos Catacombs)</span>
+* [[a scrawny gnoll]]  <span class='fmz'>(Blackburrow)</span>
+* [[a sepsis rat]] <span class='fmz'>(Qeynos Catacombs)</span>
+* [[Albain Tinderbrand]] <span class='fmz'>(Mountains of Rathe - NPC, Non-Quest)</span>
+* [[an elite gnoll guard]]  <span class='fmz'>(Blackburrow)</span>
+* [[an escaped Splitpaw gnoll]]  <span class='fmz'>(South Karana)</span>
+* [[Argyn Shieldstan]] <span class='fmz'>(Qeynos Catacombs - NPC, Non-Quest)</span>
+* [[Brenon]] <span class='fmz'>(Highpass Hold)</span>
+* [[Bruax Grengar]] <span class='fmz'>(Qeynos Catacombs - Necromancer Guildmaster)</span>
+* [[Chan Whinstone]] <span class='fmz'>(Qeynos Catacombs)</span>
+* [[Chou Whinstone]] <span class='fmz'>(Qeynos Catacombs)</span>
+* [[Commander Kane]] <span class='fmz'>(Qeynos Catacombs - Warrior Guildmaster)</span>
+* [[Crow]] <span class='fmz'>(North Qeynos - Merchant)</span>
+* [[Dalishea]] <span class='fmz'>(Highpass Hold - NPC, Non-Quest)</span>
+* [[Dallisen Xalladyr]] <span class='fmz'>(Qeynos Catacombs - Merchant)</span>
+* [[Djerr Darkpaw]]  <span class='fmz'>(North Qeynos)</span>
+* [[Dranot Harbin]] <span class='fmz'>(Qeynos Catacombs - Merchant)</span>
+* [[Driana Poxsbourne]]  <span class='fmz'>(East Freeport)</span>
+* [[Fippy Darkpaw]]  <span class='fmz'>(North Qeynos)</span>
+* [[Flynn Merrington]] <span class='fmz'>(North Qeynos - Quest NPC)</span>
+* [[Garuc Anehm]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Ghil Starn]] <span class='fmz'>(North Qeynos - Merchant)</span>
+* [[Giz Dinree]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Grendin Maze]]  <span class='fmz'>(Erudin)</span>
+* [[Greth Truksorn]] <span class='fmz'>(Highpass Hold - NPC, Non-Quest)</span>
+* [[Grizzleknot]]  <span class='fmz'>(South Karana)</span>
+* [[Guard Beris]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Guard Donlan]] <span class='fmz'>(West Karana)</span>
+* [[Guard Jerith]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard McCluskey]] <span class='fmz'>(West Karana)</span>
+* [[Guard Oleph]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Perin]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Quedal]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Shilster]] <span class='fmz'>(North Karana - Quest NPC)</span>
+* [[Guard Sironan]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Guard Tyrak]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Yalroen]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Hanns Krieghor]] <span class='fmz'>(North Qeynos - Rogue Guildmaster)</span>
+* [[Hekzin G`Zule]] <span class='fmz'>(Neriak Third Gate - Quest NPC)</span>
+* [[Klieb Torne]] <span class='fmz'>(South Qeynos)</span>
+* [[Knargon Lanenda]] <span class='fmz'>(North Qeynos - Rogue Guildmaster)</span>
+* [[Krytn Redstepp]] <span class='fmz'>(Qeynos Catacombs)</span>
+* [[Kurne Rextula]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Lieutenant Dagarok]]  <span class='fmz'>(North Qeynos)</span>
+* [[Lord Elgnub]]  <span class='fmz'>(Blackburrow)</span>
+* [[Lyris Moonbane]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Marn Darkson]] <span class='fmz'>(Qeynos Catacombs)</span>
+* [[Molon Tplth]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Nax Ghruna]] <span class='fmz'>(North Qeynos - NPC, Non-Quest)</span>
+* [[Neab]] <span class='fmz'>(Qeynos Catacombs - NPC, Non-Quest)</span>
+* [[Nola Thistleborn]] <span class='fmz'>(Mountains of Rathe - NPC, Non-Quest)</span>
+* [[Nulima Opalis]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Omorb]] <span class='fmz'>(Qeynos Catacombs - NPC, Non-Quest)</span>
+* [[Pelshia Thuxpire]] <span class='fmz'>(North Qeynos - Merchant)</span>
+* [[Perkon Malok]] <span class='fmz'>(Qeynos Catacombs - NPC, Non-Quest)</span>
+* [[Poacher Dell]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Poacher Shelli]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Poacher Topi]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Poacher Willa]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Pyzjn]]  <span class='fmz'>(Qeynos Hills)</span>
+* [[Raz The Rat Misk]]  <span class='fmz'>(South Qeynos)</span>
+* [[Reania Jukle]] <span class='fmz'>(Qeynos Catacombs - Enchanter Guildmaster)</span>
+* [[Refugee Splitpaw]]  <span class='fmz'>(Blackburrow)</span>
+* [[Renux Herkanor]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[Renux Herkanor]] <span class='fmz'>(West Karana - Quest NPC)</span>
+* [[Riggin Vix]]  <span class='fmz'>(Qeynos Catacombs)</span>
+* [[Rihtur Fullome]] <span class='fmz'>(Qeynos Catacombs)</span>
+* [[Rocthar Bekesna]] <span class='fmz'>(Qeynos Catacombs - Warrior Guildmaster)</span>
+* [[Senst Ereek]] <span class='fmz'>(Qeynos Catacombs - Merchant)</span>
+* [[Shaman Lenrel]]  <span class='fmz'>(South Karana)</span>
+* [[Solvedi Aldeberan]] <span class='fmz'>(Mountains of Rathe - Quest NPC)</span>
+* [[Splitpaw Commander]]  <span class='fmz'>(Blackburrow)</span>
+* [[Sragg Bloodheart]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Tallus Holton]]  <span class='fmz'>(East Karana)</span>
+* [[Teydar]] <span class='fmz'>(Qeynos Catacombs - Shadowknight Guildmaster)</span>
+* [[Thadres Thyme]] <span class='fmz'>(Halas - Quest NPC)</span>
+* [[Tholia Fastbond]] <span class='fmz'>(Mountains of Rathe - NPC, Non-Quest)</span>
+* [[Thrackin Griften]] <span class='fmz'>(West Karana - Quest NPC)</span>
+* [[Tovax Vmar]] <span class='fmz'>(Qeynos Hills - Quest NPC)</span>
+* [[Tranixx Darkpaw]]  <span class='fmz'>(Blackburrow)</span>
+* [[Trenon Callust]] <span class='fmz'>(Qeynos Catacombs)</span>
+* [[Trumpy Irontoe (NPC)|Trumpy Irontoe]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[Tubal Weaver]] <span class='fmz'>(North Qeynos - Merchant)</span>
+* [[Unkempt Preserver]] <span class='fmz'>(Mountains of Rathe)</span>
+* [[Vun Shatblack]] <span class='fmz'>(Qeynos Catacombs)</span>
+* [[Vidurlyn Aeminee]] <span class='fmz'>(Qeynos Catacombs - Merchant)</span>
+* [[Zaen Kalystir]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Zannsin Resdinet]] <span class='fmz'>(North Qeynos - Rogue Guildmaster)</span>
+* [[A beggar (Qeynos Catacombs)]] <span class='fmz'>(Qeynos Catacombs)</span>
+
+| mobs_lower = 
+
+* [[a bear cub]]  <span class='fmz'>(Surefall Glade)</span>
+* [[a druid]] <span class='fmz'>(East Karana - NPC, Non-Quest)</span>
+* [[a koalindl]]  <span class='fmz'>(North Qeynos)</span>
+* [[a pixie jongleur]] <span class='fmz'>(Lesser Faydark)</span>
+* [[a sewer sentinel]] <span class='fmz'>(Qeynos Catacombs)</span>
+* [[a treant]]  <span class='fmz'>(South Karana)</span>
+* [[Aagron]] <span class='fmz'>(East Karana - NPC, Non-Quest)</span>
+* [[Alysa]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[an exhausted guard]] <span class='fmz'>(Qeynos Catacombs)</span>
+* [[an investigator]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[Anderia]]  <span class='fmz'>(West Karana)</span>
+* [[Arinna Trueblade]] <span class='fmz'>(West Freeport - Warrior Guildmaster)</span>
+* [[Astaed Wemor]] <span class='fmz'>(North Qeynos - Paladin Guildmaster)</span>
+* [[Atwin Keladryn]] <span class='fmz'>(Butcherblock Mountains - Quest NPC)</span>
+* [[Axe Broadsmith]] <span class='fmz'>(Qeynos Hills - Quest NPC)</span>
+* [[Baobob Miller]] <span class='fmz'>(Qeynos Hills - Quest NPC)</span>
+* [[Bilbis Briar]] <span class='fmz'>(North Karana - Merchant)</span>
+* [[Bren Treeclimber]] <span class='fmz'>(Surefall Glade - Quest NPC)</span>
+* [[Brena Donyld]] <span class='fmz'>(East Freeport - Warrior Guildmaster)</span>
+* [[Brina Foxtripper]] <span class='fmz'>(East Freeport - Warrior Guildmaster)</span>
+* [[Brother Chintle]] <span class='fmz'>(West Karana - NPC, Non-Quest)</span>
+* [[Brother Drash]]  <span class='fmz'>(South Karana)</span>
+* [[Brother Estle]] <span class='fmz'>(West Karana - Quest NPC)</span>
+* [[Brother Gruff]] <span class='fmz'>(South Karana - NPC, Non-Quest)</span>
+* [[Brother Nallin]] <span class='fmz'>(North Karana - Quest NPC)</span>
+* [[Cain Darkmoore]] <span class='fmz'>(East Freeport - Warrior Guildmaster)</span>
+* [[Camlend Serbold]] <span class='fmz'>(North Qeynos - Paladin Guildmaster)</span>
+* [[Canlan Talespinner]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Capt Linarius]] <span class='fmz'>(North Karana)</span>
+* [[Chanda Miller]] <span class='fmz'>(Qeynos Hills - Quest NPC)</span>
+* [[Chesgard Sydwen]] <span class='fmz'>(South Qeynos)</span>
+* [[Chrislin Baker]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Cleet Miller]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Cleet Miller Jr]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Clomen Walker]] <span class='fmz'>(Kithicor Forest - Merchant)</span>
+* [[Cordelia Minster]] <span class='fmz'>(North Karana - Quest NPC)</span>
+* [[Corporal Lancot]] <span class='fmz'>(North Qeynos)</span>
+* [[Cyanelle]] <span class='fmz'>(Lake Rathetear - NPC, Non-Quest)</span>
+* [[Dark Deathsinger]] <span class='fmz'>(Innothule Swamp - Quest NPC)</span>
+* [[Dionna]] <span class='fmz'>(South Qeynos)</span>
+* [[Drizda Tunesinger]] <span class='fmz'>(The Feerrott - Quest NPC)</span>
+* [[Eithne Walker]] <span class='fmz'>(Kithicor Forest - Merchant)</span>
+* [[Eldreth]] <span class='fmz'>(Lake Rathetear - Quest NPC)</span>
+* [[Endric]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[Enic Ruklin]] <span class='fmz'>(North Qeynos - Quest NPC)</span>
+* [[Frenway Marthank]] <span class='fmz'>(Surefall Glade - Quest NPC)</span>
+* [[Furball Miller]]  <span class='fmz'>(West Karana)</span>
+* [[Gash Flockwalker]] <span class='fmz'>(South Qeynos)</span>
+* [[Gerael Woodone]] <span class='fmz'>(Surefall Glade - Druid Guildmaster)</span>
+* [[Gharin]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[Ghul Rustem]] <span class='fmz'>(South Qeynos - Merchant)</span>
+* [[Grahan Rothkar]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[Guard Bartley]] <span class='fmz'>(North Karana)</span>
+* [[Guard Beren]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Bixby]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Guard Carnita]] <span class='fmz'>(Mountains of Rathe)</span>
+* [[Guard Corshin]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Dunix]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Fernaldo]] <span class='fmz'>(Mountains of Rathe)</span>
+* [[Guard Fredrick]] <span class='fmz'>(North Karana)</span>
+* [[Guard Gehnus]] <span class='fmz'>(North Qeynos)</span>
+* [[Guard Hezlan]] <span class='fmz'>(North Qeynos)</span>
+* [[Guard Justyn]] <span class='fmz'>(West Karana)</span>
+* [[Guard Kilson]] <span class='fmz'>(West Karana)</span>
+* [[Guard Lasen]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Naret]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Nash]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Guard Oystin]] <span class='fmz'>(North Karana)</span>
+* [[Guard Philbin]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Guard Pryde]] <span class='fmz'>(West Karana)</span>
+* [[Guard Rianna]] <span class='fmz'>(Lake Rathetear)</span>
+* [[Guard Stanard]] <span class='fmz'>(North Karana)</span>
+* [[Guard Treal]] <span class='fmz'>(Lake Rathetear)</span>
+* [[Guard Urius]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Westyn]] <span class='fmz'>(North Karana)</span>
+* [[Gwynn Marthank]]  <span class='fmz'>(Innothule Swamp)</span>
+* [[Hadden]]  <span class='fmz'>(Qeynos Hills)</span>
+* [[Hager Sureshot]] <span class='fmz'>(Surefall Glade - Ranger Guildmaster)</span>
+* [[Hefax Tinmar]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Henina Miller]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Holly Windstalker]] <span class='fmz'>(Qeynos Hills - NPC, Non-Quest)</span>
+* [[Idia]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Innkeep Danin]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Innkeep Rislarn]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Jakom Herolon]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Jakum Webdancer]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Joffin Sinclay]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Jras Solsier]] <span class='fmz'>(Erudin - Quest NPC)</span>
+* [[Juni Sandfisher]] <span class='fmz'>(North Ro - Merchant)</span>
+* [[Kilam Oresinger]] <span class='fmz'>(South Kaladim - Quest NPC)</span>
+* [[Koalindl (Rodcet Nife)]] <span class='fmz'>(North Qeynos - NPC, Non-Quest)</span>
+* [[Konem Matse]]  <span class='fmz'>(Qeynos Hills)</span>
+* [[Larn Brugal]] <span class='fmz'>(East Freeport - Warrior Guildmaster)</span>
+* [[Larsk Juton]] <span class='fmz'>(Surefall Glade - Ranger Guildmaster)</span>
+* [[Lashun Novashine]] <span class='fmz'>(North Qeynos - Quest NPC)</span>
+* [[Lempeck Hargrin]]  <span class='fmz'>(West Karana)</span>
+* [[Lieutenant Midraim]] <span class='fmz'>(North Karana - NPC, Non-Quest)</span>
+* [[Lislia Goldtune]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[LuSun]] <span class='fmz'>(North Qeynos - Monk Guildmaster)</span>
+* [[Lyra Lyrestringer]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Lysandra]] <span class='fmz'>(Mountains of Rathe)</span>
+* [[Maldin the Old]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Marton Stringsinger]] <span class='fmz'>(Halas - Quest NPC)</span>
+* [[Marus Kemson]] <span class='fmz'>(East Freeport - Bard Guildmaster)</span>
+* [[Meera Lylon]] <span class='fmz'>(South Qeynos - Merchant)</span>
+* [[Milea Clothspinner]] <span class='fmz'>(East Karana - Quest NPC)</span>
+* [[Minda]] <span class='fmz'>(West Karana)</span>
+* [[Mistrana Two Notes]] <span class='fmz'>(West Karana - Quest NPC)</span>
+* [[Misty Storyswapper]] <span class='fmz'>(Qeynos Hills - NPC, Non-Quest)</span>
+* [[Monia Oakstone]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Narra Tanith]]  <span class='fmz'>(South Karana)</span>
+* [[Neclo Rheslar]]  <span class='fmz'>(Qeynos Hills)</span>
+* [[Niclaus Ressinn]]  <span class='fmz'>(Qeynos Hills)</span>
+* [[Nomsoe Jusagta]] <span class='fmz'>(North Qeynos - Cleric Guildmaster)</span>
+* [[Nul Aleswiller]] <span class='fmz'>(North Karana - NPC, Non-Quest)</span>
+* [[Ollysa Bladefinder]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Philicia Drinn]] <span class='fmz'>(Mountains of Rathe - Merchant)</span>
+* [[Phin Esrinap]] <span class='fmz'>(North Qeynos - Monk Guildmaster)</span>
+* [[Plagus Ladeson]] <span class='fmz'>(East Freeport - Warrior Guildmaster)</span>
+* [[Plnorrick Spinecracker]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Cros Treewind]] <span class='fmz'>(Mob Graveyard)</span>
+* [[Rell Ostodl]]  <span class='fmz'>(Innothule Swamp)</span>
+* [[Rinna Lightshadow]] <span class='fmz'>(Commonlands - Cleric Guildmaster)</span>
+* [[Roesager Thusten]] <span class='fmz'>(North Qeynos - Paladin Guildmaster)</span>
+* [[Rongol]] <span class='fmz'>(West Karana - Quest NPC)</span>
+* [[Seta Bakindo]] <span class='fmz'>(North Qeynos - Monk Guildmaster)</span>
+* [[Shalena Roan]] <span class='fmz'>(East Karana - NPC, Non-Quest)</span>
+* [[Silna Songsmith]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Siltria Marwind]] <span class='fmz'>(Butcherblock Mountains - Quest NPC)</span>
+* [[Sir Edwin Motte]]  <span class='fmz'>(East Freeport)</span>
+* [[Sir Lindeal]]  <span class='fmz'>(Lavastorm Mountains)</span>
+* [[Sir Morgan]] <span class='fmz'>(East Karana)</span>
+* [[Sivina Lutewhisper]] <span class='fmz'>(Surefall Glade - Quest NPC)</span>
+* [[Snitch]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Spoolie Gee]] <span class='fmz'>(North Ro - Merchant)</span>
+* [[Squire Wimbley]] <span class='fmz'>(East Karana - Quest NPC)</span>
+* [[Suuspa Clanim]] <span class='fmz'>(North Qeynos - Paladin Guildmaster)</span>
+* [[Sven Drinn]] <span class='fmz'>(Mountains of Rathe - Merchant)</span>
+* [[Talym Shoontar]]  <span class='fmz'>(East Freeport)</span>
+* [[Tann Cellus]]  <span class='fmz'>(Innothule Swamp)</span>
+* [[Tayla Ironforge]] <span class='fmz'>(Neriak Third Gate - Quest NPC)</span>
+* [[TeAnara]] <span class='fmz'>(Surefall Glade - Druid Guildmaster)</span>
+* [[Thomas]] <span class='fmz'>(Mountains of Rathe - Quest NPC)</span>
+* [[Thumpy]] <span class='fmz'>(Qeynos Catacombs - NPC, Non-Quest)</span>
+* [[Ticar Lorestring]] <span class='fmz'>(Erudin - Quest NPC)</span>
+* [[Tiny Miller]] <span class='fmz'>(West Karana - NPC, Non-Quest)</span>
+* [[Tira Sandfisher]] <span class='fmz'>(North Ro - Merchant)</span>
+* [[Toala Nehron]] <span class='fmz'>(East Freeport - Warrior Guildmaster)</span>
+* [[Togahn Sorast]] <span class='fmz'>(North Qeynos - Monk Guildmaster)</span>
+* [[Tomer Instogle]] <span class='fmz'>(North Qeynos - Quest NPC)</span>
+* [[Trancil Clearpond]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Travis Two Tone]] <span class='fmz'>(Nektulos Forest - Quest NPC)</span>
+* [[Trissa Whistlesong]] <span class='fmz'>(West Freeport - NPC, Non-Quest)</span>
+* [[Tukk]] <span class='fmz'>(West Karana)</span>
+* [[Vesteri Nomanoi]] <span class='fmz'>(Surefall Glade - Quest NPC)</span>
+* [[Vhalen Nostrolo]] <span class='fmz'>(South Karana - Quest NPC)</span>
+* [[Vicus Nonad]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[Vin Moltor]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Vun Winstone]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Zepin Winsle]]  <span class='fmz'>(Innothule Swamp)</span>
+
+}}
+= Suggested Route =
+*[[Bone Chips Qeynos]] Quest with [[Bone Chips]] or Gold (+[[Priests of Life]], +[[Knights of Thunder]], +[[Guards of Qeynos]], +[[Antonius Bayle]], -[[Bloodsabers]])
+*[[The Crate (evil)]] Part 1: (+[[Merchants of Qeynos]], +[[Antonius Bayle]], +[[Coalition of Tradefolk]], +[[Guards of Qeynos]], -[[Circle Of Unseen Hands]]) 
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

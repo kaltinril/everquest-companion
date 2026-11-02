@@ -1,0 +1,61 @@
+{{Classic Era}}
+<div style="display: flex;">
+  <div style="flex: 1;">
+    <ul>
+    <li>Summoning Spell: [[Pendril's Animation]]</li>
+    <li>Pet Type: Animation</li>
+    <li>Pet Classes: [[Paladin]] / [[Warrior]]</li>
+    <li>Pet Level: 1</li>
+    <li>Hit Points: 22 (+1/tick)</li>
+    <li>Mana: 100 (+4/tick)</li>
+    </ul>
+  </div>
+  <div style="flex: 1;">
+  [[File:animated_dagger_summon.png|left|x175px]]
+  </div>
+</div>
+<div style="display: flex;">
+  <div style="flex: 1;">
+    <ul>
+    <li>Defensive Stats</li>
+       <ul>
+       <li>Mitigation: 5</li>
+       <li>Evasion: 31</li>
+       </ul>
+    </ul>
+    <ul>
+    <li>Offensive Stats</li>
+       <ul>
+       <li>Offense: 5</li>
+       <li>Accuracy: 26</li>
+       <li>Max Damage: 8</li>
+       <li>Dual Wield Skill: None</li>
+       </ul>
+     </ul>
+  </div>
+  <div style="flex: 1;">
+    <ul><li>Strength: 75</li>
+    <li>Stamina: 75</li>
+    <li>Intelligence: 10</li>
+    <li>Wisdom: 10</li>
+    <li>Agility: 90</li>
+    <li>Dexterity: 75</li>
+    <li>Charisma: 75</li></ul>
+  </div>
+</div>
+
+== Abilities ==
+* [[Skill_Block|Block]]
+* [[Skill_Lay_on_Hands|Lay On Hands]]
+* [[Skill_Taunt|Taunt]]
+
+== Spell List ==
+* [[Minor Healing|<span class='itemeff'>Minor Healing</span>]]
+* [[Strike|<span class='itemeff'>Strike</span>]]
+== Focus Items ==
+* None
+== Notes ==
+* None
+
+[[Category: Summoned Pet]]
+[[Category: Enchanter Pet]]

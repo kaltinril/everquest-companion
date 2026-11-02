@@ -1,0 +1,61 @@
+{{Classic Era}}
+ Help us exterminate these vile creatures. They call themselves the [Pickclaw] Clan.. I call them annoying.
+ - Captain Bosec
+[[File:Npc_lord_pickclaw.png|right]]{{Factionpage|
+| description = The slime [[goblin]] faction led by [[Lord Pickclaw]]. They cohabit [[Runnyeye]] with [[Clan Runnyeye]], and can also be found in the [[Highkeep]] basement. Despite causing trouble for Highkeep residents, they do not give Highkeep or Highpass faction hits directly upon death, though [[Captain Bosec]] will award you faction, exp and coin for [[Left Goblin Ears]]. The [[Guardians of the Vale]] however appreciate every dead goblin.
+
+Note: in Everquest Legends it is possible to become non-KOS with both [[King Xorbb]]<nowiki> and the []Pickclaw Goblins]]. If you ruin you faction by hunting in the Runnyeye basement, you can kill Mudittes and Minotaurs in </nowiki>[[Gorge of King Xorbb]] to improve your Goblin faction without completely tanking your [[King Xorbb]] faction.
+
+| zones_raise = 
+
+<s>* [[Eastern Plains of Karana]]</s>  (feel free to remove strikeout but put how)
+* [[Beholder's Maze]]
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Clan Runnyeye]]
+* [[Beholder's Maze]]
+* [[Highpass Keep]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[a chasm minotaur]]  <span class='fmz'>(Gorge of King Xorbb (Beholder's Maze))</span>
+* [[a gorge minotaur]]  <span class='fmz'>(Gorge of King Xorbb (Beholder's Maze))</span>
+* [[a muddite elder]]  <span class='fmz'>(Gorge of King Xorbb (Beholder's Maze))</span>
+* [[a muddite minor]]  <span class='fmz'>(Gorge of King Xorbb (Beholder's Maze))</span>
+* [[Lord Syrkl]]  <span class='fmz'>(Gorge of King Xorbb (Beholder's Maze))</span>
+
+| mobs_lower = 
+
+* [[a crazed goblin]]  <span class='fmz'>(High Keep)</span>
+* [[a goblin lookout]]  <span class='fmz'>(Gorge of King Xorbb (Beholder's Maze))</span>
+* [[a goblin sentry]]  <span class='fmz'>(Gorge of King Xorbb (Beholder's Maze))</span>
+* [[A Goblin Thief]]  <span class='fmz'>(High Keep)</span>
+* [[a goblin whelp]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[a Pickclaw Ambushbaiter]] <span class='fmz'>(Clan RunnyEye)</span>
+* [[a Pickclaw bonemender]]  <span class='fmz'>(Clan RunnyEye)</span>
+* [[A Pickclaw Cabalist]] <span class='fmz'>(High Keep)</span>
+* [[a Pickclaw Destroyer]]  <span class='fmz'>(Clan RunnyEye)</span>
+* [[a Pickclaw Fleshburner]] <span class='fmz'>(Clan RunnyEye)</span>
+* [[a Pickclaw Foechopper]] <span class='fmz'>(Clan RunnyEye)</span>
+* [[A Pickclaw Foeseeker]]  <span class='fmz'>(Clan RunnyEye)</span>
+* [[a Pickclaw Foeslicer]]  <span class='fmz'>(Clan RunnyEye)</span>
+* [[a pickclaw guard]]  <span class='fmz'>(High Keep)</span>
+* [[A Pickclaw Lookout]] <span class='fmz'>(High Keep)</span>
+* [[a Pickclaw mindripper]]  <span class='fmz'>(Clan RunnyEye)</span>
+* [[A Pickclaw Raider]] <span class='fmz'>(High Keep)</span>
+* [[a Pickclaw seer]]  <span class='fmz'>(High Keep)</span>
+* [[a Pickclaw Slayspell]]  <span class='fmz'>(Clan RunnyEye)</span>
+* [[A Pickclaw Spiritist]] <span class='fmz'>(High Keep)</span>
+* [[A Pickclaw Visionary]]  <span class='fmz'>(High Keep)</span>
+* [[a pickclaw warrior]]  <span class='fmz'>(High Keep)</span>
+* [[a Pickclaw Zekspeaker]] <span class='fmz'>(Clan RunnyEye)</span>
+
+}}

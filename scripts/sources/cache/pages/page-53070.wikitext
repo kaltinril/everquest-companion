@@ -1,0 +1,25 @@
+'''NOTE:''' As of this time, the Enrage ability seems to have been removed from raid targets in Everquest Legends. Any NPC that lists this ability should be double checked and have their details corrected.
+
+Enrage is an ability of certain raid targets and other high level NPCs, generally limited to those level 55+. (There are exceptions of lower level enragers, such as [[Bzzazzt]]). It is automatically, immediately triggered when the NPC's hit points have been reduced to a percentage value near 10% (please confirm exact percentage). 
+
+When triggered, the NPC will emote "Someone has become ENRAGED." and proceed to riposte all melee auto-attacks and special attacks (such as slam, bash, kick, flying kick, etc.) made towards their front from players, pets, and other NPCs for a short duration (probably 2 or 3 server [[tick]]s). Enrage does not block or reflect spells or ranged attacks, or any melee made to their rear. If an NPC casts a spell, it will not start an enrage until it finishes casting. However if the enrage already started before casting, casting does not hinder their ability to riposte. Enrage seems to have a cooldown of several minutes, at most 7.5 minutes.
+
+Similar to melee [[push]] mechanics, the program determines rear or front attacks by comparing the direction the player is facing to the direction the NPC is facing, rather than positions where the player and NPC stand. If the player is facing a direction within 180 degrees of the NPC's faced direction, then it counts as rear.
+
+As the tank must turn off auto-attack to avoid the incredible damage spike, they lose a significant source of hate generation. They should anticipate this and use aggro generation clickies such as [[Midnight Mallet]], or instruct melee DPS to back off a bit, even if they could avoid ripostes by attacking the NPC in the back. If any melee DPS grab top hate from the tank, the NPC would naturally turn to face the DPS and immediately riposte everyone who were attacking his back before. However, if an NPC also CHs or gates and must be interrupted by melee push, special consideration must be taken to make sure the NPC can continue to be pushed from the rear.
+
+Secondary tanks and speed-bumps should take care to position themselves during an enrage so that the NPC continues to face the best direction if they gain aggro after a tank death.
+
+
+== Strategy ==
+
+* Shout warnings at 20% and 15% for melee to back off before an impending enrage. This is fine for most moderately challenging warrior NPCs.
+* '''Wall lock''': The tank faces the NPC to the side and melee push the mob into a wall. When it enrages, melee will not be riposted if they face very slightly towards the tank. This is the preferred method for most situations in raiding guilds, especially when healers need to stay out of line of sight and in healing range.
+* '''Wall crawl''': Similar to the above method, but when the NPC reaches 40%, the tank moves to push the NPC into the wall himself, allowing the NPC to face away from the wall slightly (at perhaps a 45 degree angle or less). Melee DPS will re-position to push the mob from the rear along the wall, while the tank keeps the NPC embedded in the wall with his own push (and does not oppose the gathered melee push). At enrage, the tank turns off his attack, but maintains his position relative to the pushed NPC. This is an excellent method for NPCs who use both enrage and CH or gate simultaneously.
+* '''Circle push''': The tank stands still (or moves very little) while the melee push the NPC in a circle around him while he turns to face the NPC. This is a chaotic method that's only used when no wall is available to push the NPC into (such as Spiroc Lord on bird island in Plane of Sky). If the melee push the NPC through the tank, or out of range of the tank, the NPC may turn to face the group of melee DPS and riposte them. NPCs who stun the tank (like Spiroc Lord) can complicate their control of the NPC considerably.
+* '''Straight push''': The tank walks backwards while the melee simply push the mob towards him in a single, continued direction. This method is simple to organize but complicates the duties of clerics and other casters who may have trouble keeping up or staying in healing range. It also requires a lot of room, especially with a brisk push. Some push can be minimized by encouraging melee to attack at oblique angles on opposite flanks of the NPC.
+
+
+[[Category:Guides]]
+[[Category:Technical]]
+[[Category:Game Mechanics]]

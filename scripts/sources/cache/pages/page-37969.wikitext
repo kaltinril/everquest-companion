@@ -1,0 +1,38 @@
+{{Factionpage|
+
+| description = The fairies and faeries of Lesser Faydark.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Greater Faydark]]
+* [[Lesser Faydark]]
+
+| quests_raise = 
+
+* [[Rain Caller Quest]]
+
+| quests_lower = 
+
+* [[Gearheart]]
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a faerie]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[a faerie courtier]]  <span class='fmz'>(Greater Faydark)</span>
+* [[a faerie duchess]]  <span class='fmz'>(Greater Faydark)</span>
+* [[a faerie guard]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[a faerie maiden]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[a faerie noble]]  <span class='fmz'>(Greater Faydark)</span>
+* [[a faerie royal guard]]  <span class='fmz'>(Greater Faydark)</span>
+* [[a fairy guard]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[Cognoggin]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[Gearheart]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[Princess Joleena]]  <span class='fmz'>(Lesser Faydark)</span>
+
+}}

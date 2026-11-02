@@ -1,0 +1,138 @@
+{{Factionpage|
+
+| description = The Dark Reflection are followers of the Plaguebringer hidden deep in the Mines of Malfunction at the very back of Ak'Anon.  While most think of only the gnomish Necromancers, this guild has gnomish followers from many classes.  Evah Xokez leads the Clerics, Rilgor Plegnog the Enchanters, Vaenor Husga the Magicians, Eonis Mournunder the Necromancers, Kaxon Frennor the Rogues, Naygog Mitope the Warriors, and Velena Corgtec the Wizards.  This concentration of Evil makes the mines a very unsafe place for the forces of good.  '''Care should be taken not to harm the skeletons that roam the mines, for the wrath of these seven guildmasters is often swift and deadly.'''  The Dark Reflection is opposed by The Eldritch Collective and the Gemchoppers of Ak'Anon.
+
+| zones_raise = 
+
+* [[Ak'Anon]]
+* [[Crushbone]]
+* [[Dagnor's Cauldron]]
+* [[Erudin|Erudin Palace]]
+* [[High Keep]]
+* [[Lesser Faydark]]
+* [[Steamfont Mountains]]
+* [[Freeport|West Freeport]]
+
+| zones_lower = 
+
+* [[Ak'Anon]]
+* [[Freeport|East Freeport]]
+* [[The Estate of Unrest]]
+* [[High Keep]]
+* [[Steamfont Mountains]]
+* [[Western Plains of Karana]]
+
+| quests_raise = 
+
+* [[Bertoxxulous Symbol Quests|Bertoxxulous Initiate]]
+* [[The Bridge]]
+
+| quests_lower = 
+
+* [[Air Tight Box Quest]]
+* [[Basilisk Tongues]]
+* [[Bugglegupp (Quest)|Bugglegupp]]
+* [[Cargo Clockwork]]
+* [[Gearheart]]
+* [[Minotaur Horns]]
+* [[Red V Clockwork]]
+* [[Rusted Black Boxes]]
+* [[Scrap Metal Quest]]
+* [[Series C Black Boxes]]
+* [[Shondo and the Tonic]]
+* [[Slave Keys]]
+* [[Telescope Lenses]]
+* [[Tergon's Spellbook Quest]]
+* [[The Regurgitonic]]
+* [[Tiny Skeletons]]
+
+| mobs_raise = 
+
+* [[a mechanic]]  <span class='fmz'>(Ak'Anon)</span>
+* [[clockwork scrubber]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIIC]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIIE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIVE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIXA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVD]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVID]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIIA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIIC]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIIIE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXD]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXID]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIIIA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIVD]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIXB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVD]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVIC]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVIIC]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVIIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXXD]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Forpar Fizfla]] <span class='fmz'>(Steamfont Mountains - Quest NPC)</span>
+* [[Ghilanbiddle Nylwadil]] <span class='fmz'>(Dagnor's Cauldron - Quest NPC)</span>
+* [[Jogl Doobraugh]] <span class='fmz'>(Steamfont Mountains - Quest NPC)</span>
+* [[Juline Urncaller]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Kimble Nogflop]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[King Ak`Anon]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Lodrand Dindlenod]] <span class='fmz'>(Steamfont Mountains - NPC, Non-Quest)</span>
+* [[Lozani]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Nonnie Texaker]] <span class='fmz'>(Ak'Anon - NPC, Non-Quest)</span>
+* [[Retlon Brenclog]] <span class='fmz'>(Crushbone - Quest NPC)</span>
+* [[Sanfyrd Featherhead]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Shondo Billin]] <span class='fmz'>(Erudin Palace - Quest NPC)</span>
+* [[Watchman Halv]] <span class='fmz'>(Mob Graveyard)</span>
+* [[Tergon Brenclog]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Thetherthag Wakintrob]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[Tobon Starpyre]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Trudo Frugrin]] <span class='fmz'>(Lesser Faydark - Quest NPC)</span>
+* [[Watchman Dreeb]] <span class='fmz'>(Steamfont Mountains)</span>
+* [[Watchman Mylz]] <span class='fmz'>(Steamfont Mountains)</span>
+* [[Watchman Prenn]] <span class='fmz'>(Steamfont Mountains)</span>
+* [[Watchman Prynn]] <span class='fmz'>(Steamfont Mountains)</span>
+* [[Wuggan Azusphere]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Zenrel Ottonoggin]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[Zigg Flin]]  <span class='fmz'>(West Freeport)</span>
+
+| mobs_lower = 
+
+* [[Eonis Mournunder]] <span class='fmz'>(Ak'Anon - NPC, Non-Quest)</span>
+* [[Ennixy Frennor]] <span class='fmz'>(Steamfont - Quest NPC)</span>
+* [[Evah Xokez]] <span class='fmz'>(Ak'Anon - Cleric Guildmaster)</span>
+* [[Kaxon Frennor]] <span class='fmz'>(Ak'Anon - NPC, Non-Quest)</span>
+* [[Khrix Abomination]]  <span class='fmz'>(Estate of Unrest)</span>
+* [[Khrix Fritchoff]]  <span class='fmz'>(Estate of Unrest)</span>
+* [[Naygog Mitope]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Oobnopterbevny Biddilets]] <span class='fmz'>(West Karana - Quest NPC)</span>
+* [[Opal Darkbriar]] <span class='fmz'>(East Freeport - Cleric Guildmaster)</span>
+* [[Rilgor Plegnog]] <span class='fmz'>(Ak'Anon - Enchanter Guildmaster)</span>
+* [[Vaenor Husga]] <span class='fmz'>(Ak'Anon - NPC, Non-Quest)</span>
+* [[Velena Corgtec]] <span class='fmz'>(Ak'Anon - NPC, Non-Quest)</span>
+* [[Zhem Xecia]] <span class='fmz'>(East Freeport - Cleric Guildmaster)</span>
+
+}}
+
+= Suggested Route =
+*Kill [[Shondo Billin]] (+5 [[Dark Reflection]], -10 [[Gem Choppers]], -2 [[Merchants of Ak'Anon]], -2 [[King Ak'Anon]]) - Other NPCs give negative [[Eldritch Collective]] faction.<br>Do [[Shondo and the Tonic]] or first step of [[The Regurgitonic]] (+[[Gem Choppers]], +[[Merchants of Ak'Anon]], +[[King Ak'Anon]], -[[Dark Reflection]], -[[Clan Grikbar]]) to Fix Ak'Anon (Net gain for [[Dark Reflection]]).
+
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]

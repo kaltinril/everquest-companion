@@ -1,0 +1,80 @@
+'''Exaltations''' are a gear customization system in EverQuest Legends that allow you to transfer special properties (even the visual appearance) from one piece of gear to another. This lets you wear the item with the best stats while still benefiting from the effects or looks you prefer from other items you've collected.
+
+__TOC__
+
+==Overview==
+
+Every item in EverQuest Legends has a number of Exaltation slots determined by its '''item level'''. A higher item level means more slots, and therefore more ways to customize the item. Each slot type is distinct, and only certain kinds of effects can be placed in each one.
+
+There is no penalty for upgrading an item's level.  Doing so simply unlocks more Exaltation slots, giving you more options.
+
+==Exaltation Slot Types==
+
+The five Exaltation slot types unlock progressively as an item's level increases:
+
+{| class="wikitable"
+! Slot Type !! Item level Required !! What It Does
+|-
+| '''Ornamentation''' || Level +0 (base) || Changes the visual appearance of the item to match another item. Applies to visible equipment only.
+|-
+| '''Focus''' || Level +1 || Transfers a [[:Category:Focus_Effects|Focus Effect]] from another item onto this one.
+|-
+| '''Click''' || Level +2 || Transfers a [[Clickies|Click Effect]] from another item onto this one.
+|-
+| '''Worn''' || Level +3 || Transfers a passive [[:Category:Worn Effects|Worn Effect]] from another item onto this one.
+|-
+| '''Proc''' || Level +4 || Transfers a [[Weapon Procs|Proc Effect]] from another item onto this one.
+|}
+
+A fully upgraded (+4 Level) item will have all five slot types available simultaneously.
+
+==How to Use Exaltations==
+
+===Ornamentation===
+<pre style="color: red">Ornamentation Tokens are not currently available to earn in-game. They must be purchased, for cash, through the P2W Marketplace.</pre>
+The Ornamentation slot is unique in how it works. It uses '''Ornamentation Tokens''' rather than duplicate items.
+
+# Obtain either an '''Armor Ornamentation Token''' or a '''Weapon Ornamentation Token''' (depending on the item type whose appearance you want to copy).
+# Apply the token to the appearance-source item. This creates an '''Ornamentation''' of that item.
+# Place the Ornamentation into the Ornamentation Exaltation slot of your target item.
+
+The target item will now display the appearance of the source item.
+
+'''Example:''' You have a plain-looking chest piece with excellent stats, but you've always loved the look of the [[Barnacle Breastplate]] you found early in your adventures. Using an Armor Ornamentation Token, you create an Ornamentation of the breastplate and slot it into your chest piece's Ornamentation slot. Your stats stay the same, but now you look the way you want.
+
+===Focus, Click, Worn, and Proc Exaltations===
+
+All other Exaltation types follow the same process:
+
+# Level up an item whose effect you want to transfer.
+# Once the item reaches the appropriate level, the effect (Focus, Click, Worn, or Proc) becomes a removable Exaltation - you may click the slot it resides in to remove it as if it were an item.
+# You can either leave the Exaltation in that item, or remove it and place it into the corresponding slot on a completely different item.
+
+'''Note:''' The original item loses the transferred effect when you move it to another item. Plan accordingly before committing... or don't, you can always move it back!
+
+'''Example (Focus):''' You have two copies of the [[Bone-Clasped Girdle]], which carries the [[Burning Affliction III]] focus effect. You combine them, creating a +1 item, and turning that focus effect into a removable Exaltation. You then slot it into a belt with better base stats that previously had no focus effect at all. Now your upgraded belt has both the stats you wanted and the focus effect you needed.
+
+'''Example (Proc):''' You're playing a [[Necromancer]]/[[Shaman]]/[[Warrior]] and you want a passive life drain to complement your DoT build. You have a weapon with a lifetap proc. Level it up and extract the proc as an Exaltation, which you then slot into your primary weapon - even though that weapon never had a lifetap proc originally.
+
+==Restrictions==
+Exaltations carry their own class and slot restrictions, and these are applied to the item they are inserted into. This has two important implications:
+* '''Class restrictions:''' An Exaltation can only be inserted into an item if there is at least some overlap between the classes that can use the Exaltation and the classes that can use the item. Once inserted, the item's usable classes will change to match the overlapping classes of them Item + Exaltation, becoming more restrictive if the Exaltation applies to fewer classes than the original item.
+
+::: '''Example:''' You have a [[Short Sword of the Ykesha]] (Usable by WAR/PAL/RNG/SHD/BRD/ROG) and would like to insert the [[Earthquake]] proc from [[Earthshaker]] (Usable by WAR/PAL/RNG/SHD) into it.  Rogues and Bards can no longer equip the sword, but the rest can (Only in their primary slot, though, as noted in Slot Restrictions.)
+
+* '''Slot restrictions:''' Exaltations also carry the equipment slot restrictions of their source item. A two-handed weapon Exaltation, for example, is Primary slot only. Inserting it into another item will make that item Primary slot only as well. This means a two-handed weapon proc cannot be moved into a weapon you intend to use in your secondary hand.<br>Because of this, it is worth checking the class and slot tags of an Exaltation carefully before committing to equipping it. The changes to the destination item are not cosmetic, and may affect where it can be equipped.
+
+==Important Notes==
+
+* '''Visible items only''' for Ornamentation - the slot does not appear on items that have no visible model (e.g. certain rings or earrings).
+* Exaltation slots are '''not lost''' when swapping Loadouts. The exact Exaltation socketed when you last used a Loadout will be restored when you switch back to it.
+* Items stored in the Equipment Keyring or Augmentation Keyring are managed automatically when Loadouts are swapped.
+
+==Tips for New Players==
+
+* Don't overlook low level items just because they seem weak. If they have a strong Focus or Proc effect, you may be able to extract that effect later and move it to a better piece of gear.
+* Ornamentation is entirely cosmetic and has no impact on stats.  Use it to personalize your character's appearance without any gameplay trade-off.
+* Farming a second copy of a desirable item to extract its effect is a valid and worthwhile goal. Keep an eye out for gear with effects that complement your build.
+
+
+[[Category:Items]]

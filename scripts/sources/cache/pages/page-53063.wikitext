@@ -1,0 +1,22 @@
+Fleeing describes the behavior of most NPCs when they reach low health (under 20% HP?). If the NPC regenerates above a threshold (30% HP?), they cease fleeing and resume normal behavior. This behavior is similar to the temporary effect of [[Fear]] and similar spells. 
+
+While fleeing, the NPC will begin pathing in a random direction, or in tight spaces, in a prescribed path. Sometimes the NPC may change directions. In open areas, NPCs will always change directions while fleeing if they reach a certain distance from the player. The effect of this is that a fleeing NPC will never run too far away, and should always be within visible range (though they may still be obscured by objects, terrain, or fog).
+
+Fleeing presents a constant danger to dungeon groups, as monsters are likely to flee into other rooms which may be populated with additional monsters that the group isn't ready for. On the other hand, fleeing can also ease the difficulty of monsters if their path of travel is not dangerous, as they won't fight back for the last fifth of the battle.
+
+* NPCs with [[social]] aggro mechanics usually won't start fleeing if they are near other NPCs of the same primary faction. (Perhaps to avoid appearing a coward before their peers). This is a simple range check, and is '''not''' blocked by line of sight obstructions like walls. They won't stop fleeing if they come within range, however. Use this to your advantage in areas where fleeing enemies are dangerous such as densely packed dungeons. [[Fear]]ed NPCs ignore this rule.
+* Fleeing NPCs at very low health will move more slowly, until the point of almost stopping.
+* [[Snare]] has no direct effect on NPC behavior, but it can further reduce movement speed to zero.
+* Likewise [[Stun]] spells and [[Bash]] or [[Slam]] skills can halt movement (and any other action) of fleeing NPCs temporarily.
+* While [[Root]]ed NPCs always prioritize rooted behavior over flee or feared behavior, they immediately resume such behavior once the root breaks. Though NPCs will fight back against melee players while rooted, this is sometimes preferable in dangerous environments such as densely packed dungeons.
+* Pets never flee. Undead enemies usually do not flee. Animals and humanoids usually do.
+* NPCs which are fleeing '''must''' be aggroed on someone or something. NPCs whose aggro is cleared will immediately cease fleeing, though if they re-aggro they might start fleeing again right away. Note that NPCs with cleared aggro will return to their static spawn points at reduced movement speed and snares will compound this reduction, possibly to zero.
+* NPCs will not begin fleeing if their aggro table lists one or more characters with low health. The threshold for this seems to be the same or close to the same percentage as for low health [[aggro]]. However, this will not cause an NPC to stop fleeing once they've started.
+* NPCs who are healed or regenerate might not immediately cease fleeing. They may wait for one or more server ticks before regaining their courage.
+* NPCs who are casting will not start fleeing. The check for flee occurs at the next server tick, rather than when they immediately finish casting a spell. If an NPC heals themselves back over the threshold for fleeing, then they won't start fleeing.
+
+==See also==
+* [[Run Speed Comparison]]
+
+[[Category:Technical]]
+[[Category:Game Mechanics]]

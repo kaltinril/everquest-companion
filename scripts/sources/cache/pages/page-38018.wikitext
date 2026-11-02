@@ -1,0 +1,30 @@
+{{Factionpage|
+
+| description = Appears to be an isolated lizard man faction in the Rathe Mountains. It's actual in-game name is "LizardMan", with no space.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Rathe Mountains]] [[The Feerrott]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a lizard man guard]]  <span class='fmz'>(Mountains of Rathe)</span>
+* [[a lizard man scout]]  <span class='fmz'>(Mountains of Rathe)</span>
+* [[a lizardman mystic]]  <span class='fmz'>(Mountains of Rathe)</span>
+* [[a lizardman warrior]]  <span class='fmz'>(Mountains of Rathe)</span>
+* [[Mortificator Syythrak]]  <span class='fmz'>(Mountains of Rathe)</span>
+
+
+}}

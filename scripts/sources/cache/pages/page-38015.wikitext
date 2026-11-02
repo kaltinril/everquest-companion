@@ -1,0 +1,33 @@
+{{Factionpage|
+
+| description = The Paladin guild of Kaladim. Also known as [[Miners Guild 249]].
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Dagnor's Cauldron]]
+* [[Kaladim|North Kaladim]]
+
+| quests_raise = 
+
+* [[Chalice of Conquest Quest]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Axa Stormshield]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Darthur Nightseer]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Dru Razbind]] <span class='fmz'>(Butcherblock Mountains - Quest NPC)</span>
+* [[Gundalthur Izuran]] <span class='fmz'>(Dagnor's Cauldron - NPC, Non-Quest)</span>
+* [[Storn Trueblade]] <span class='fmz'>(North Kaladim - Merchant)</span>
+
+}}
+[[Category:Achievement Faction]]

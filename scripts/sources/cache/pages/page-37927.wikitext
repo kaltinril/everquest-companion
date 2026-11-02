@@ -1,0 +1,138 @@
+{{Factionpage|
+
+| description = Faction for merchants found throughout [[Kelethin]], except for those residing in guild halls.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Crushbone]]
+* [[Greater Faydark]]
+* [[Innothule Swamp]]
+* [[Lesser Faydark]]
+* [[Felwithe]]
+* [[Ocean of Tears]]
+* [[Timorous Deep]]
+
+| quests_raise = 
+
+* [[Emerald Warriors' Items]]
+* [[Kilij's Plans]]
+* [[Orc Vest]]
+* [[Shark Meat Quest]]
+* [[Slave Keys]]
+* [[Red Wine to Lady Shae]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[an elven slave (male)]]  <span class='fmz'>(Crushbone)</span>
+* [[Anelia Thrywiel]] <span class='fmz'>(Lesser Faydark - Merchant)</span>
+* [[Banker Willaen]] <span class='fmz'>(Greater Faydark - Banker)</span>
+* [[Barkeep Aanlawen]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Lysslan]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Manlawen]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Myrisa]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Sissya]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Syntan]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Tuviena]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Tvanla]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Uulianu]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Bilrio Surecut]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Bryn Fynndel]] <span class='fmz'>(Lesser Faydark - Quest NPC)</span>
+* [[Cylas Delbrin]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+* [[Deldryn Splendyr]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Fandl Arathin]] <span class='fmz'>(Innothule Swamp - Quest NPC)</span>
+* [[Faril Elvebryn]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+* [[Gallin Woodwind]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Galwyn Geldin]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+* [[Glyndur Tindel]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[Guard Briarstorm]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Brookrock]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Crystalwind]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Dayblaze]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Eaglesong]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Fayfear]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Fayfield]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Fireblight]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Frostfallen]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Marshmoor]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Meadom]] <span class='fmz'>(Northern Felwithe)</span>
+* [[Guard Moonwind]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Nitegazer]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Noonshadow]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Oakwillow]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Orcflayer]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Pinebramble]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Pineshade]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Rainstrider]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Starstrike]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Streamtree]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Sunblaze]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Sunweaver]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Tangleroot]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Treestrider]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Valewatcher]] <span class='fmz'>(Greater Faydark)</span>
+* [[Gundel Elorion]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+* [[Hendricks]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Hogus Durmas]] <span class='fmz'>(Innothule Swamp - Quest NPC)</span>
+* [[Innkeep Anisyla]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Innkeep Larya]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Innkeep Linen]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Innkeep Wuleran]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Jars Legola]]  <span class='fmz'>(Innothule Swamp)</span>
+* [[Jyle Windstorm]]  <span class='fmz'>(Innothule Swamp)</span>
+* [[Linadian]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Aianya]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Aildien]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Ainaiana]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Aluuvila]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Aluwenae]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Gaeadin]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Gerienae]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Iludarae]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Kaeluase]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Kanoldar]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Kweili]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Kwein]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Laedar]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Lanin]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Legweien]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Linolyen]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Minamas]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Muvien]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Neaien]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Nildar]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Nluolian]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Sylnis]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Tananie]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Tegdian]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Tiladinya]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Tilluen]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Tinolwenya]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Uaylain]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Ueaas]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Weaolanae]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Winerasea]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Mywyn Tinendel]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+* [[Regren]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Sarawyn Amorfin]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+* [[Seloris Windweaver]] <span class='fmz'>(Timorous Deep - Merchant)</span>
+* [[Sindl Talonstrike]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Valaryn Elben]] <span class='fmz'>(Ocean of Tears - NPC, Non-Quest)</span>
+* [[Vynn Thrildur]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+
+}}
+= Suggested Route =
+*[[Red Wine to Lady Shae]] (+[[Emerald Warriors]], +[[Merchants of Felwithe]], +[[Kelethin Merchants]], -[[Indigo Brotherhood]]) 
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

@@ -1,0 +1,10 @@
+The skill that governs Stance Endurance Costs
+
+Strategy is a skill in EQL that all classes get at level 1 and increases per level.
+
+The Strategy skill determines the efficiency of the [[Stances & Invocations|stance system]]
+
+== Navigation ==
+
+{{Navbox Skills}}
+[[Category: Skills]]

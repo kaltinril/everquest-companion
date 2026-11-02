@@ -1,0 +1,40 @@
+{{Factionpage|
+
+| description = The "Shamen of War" are the [[Ogre]] [[Shaman]] guild Oggok.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Oggok]]
+
+| quests_raise = 
+
+* [[Froglock Tadpole Fleshies]]
+* [[Marda's Secret Mission]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Barsk]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Chamt]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Cralk - Ogre|Cralk]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Crilt - Ogre|Crilt]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Fuga]] <span class='fmz'>(Oggok - Shaman Guildmaster)</span>
+* [[Hoart]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Korff]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Marda]] <span class='fmz'>(Oggok - Quest NPC)</span>
+* [[Tokun]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Uoola]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Zarchoomi]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Zulort]] <span class='fmz'>(Oggok - Quest NPC)</span>
+
+}}
+[[Category:Achievement Faction]]

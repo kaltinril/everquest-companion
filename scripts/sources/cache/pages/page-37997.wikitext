@@ -1,0 +1,29 @@
+{{Factionpage|
+
+| description = The spirocs who reside on one island in Timorous Deep. Not related to the [[Plane of Sky]] spirocs.
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Timorous Deep]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a Spiroc Lightbringer]]  <span class='fmz'>(Timorous Deep)</span>
+* [[a Spiroc Lightfoot]]  <span class='fmz'>(Timorous Deep)</span>
+* [[a Spiroc Proven]]  <span class='fmz'>(Timorous Deep)</span>
+* [[a Spiroc Warrior]]  <span class='fmz'>(Timorous Deep)</span>
+* [[a Spiroc Watcher]]  <span class='fmz'>(Timorous Deep)</span>
+
+
+}}

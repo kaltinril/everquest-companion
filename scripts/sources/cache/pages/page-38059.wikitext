@@ -1,0 +1,32 @@
+{{Velious Era}}
+{{Factionpage|
+
+| description = Mermaids in [[Siren's Grotto]], likely some missing mobs here / needs some additions.
+
+| zones_raise =
+
+
+| zones_lower =
+
+* [[Siren's Grotto]]
+
+| quests_raise =
+
+
+| quests_lower =
+
+
+| mobs_raise =
+
+| mobs_lower =
+
+* [[a servant manatee]]  <span class='fmz'>(Siren's Grotto)</span>
+* [[a siren enticer]]  <span class='fmz'>(Siren's Grotto)</span>
+* [[an enthralled bulthar]]  <span class='fmz'>(Siren's Grotto)</span>
+* [[an enthralled molkor]]  <span class='fmz'>(Siren's Grotto)</span>
+* [[an enthralled ulthork]]  <span class='fmz'>(Siren's Grotto)</span>
+* [[Fellspine]]  <span class='fmz'>(Siren's Grotto)</span>
+* [[Mistress Latazura]]  <span class='fmz'>(Siren's Grotto)</span>
+* [[Elna Kelpweaver]]  <span class='fmz'>(Siren's Grotto)</span>
+
+}}

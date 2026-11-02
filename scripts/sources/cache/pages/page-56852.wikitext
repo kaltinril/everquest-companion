@@ -1,0 +1,402 @@
+{{DISPLAYTITLE:Enchanter-Necromancer-Ranger}}
+
+<div style="float:left;margin-right:20px;">
+__TOC__
+</div>
+
+= Enchanter / Necromancer / Ranger Guide - "Occult Decay Archer" =
+
+This guide covers the [[Enchanter]], [[Necromancer]], and [[Ranger]] loadout combination.
+
+= Overview =
+
+The ENR build is a premier choice for playing a lethally charged ranged character with strong support and combat control capability. This loadout is great at:
+
+* Ranged Damage
+* Puller
+* Crowd control
+* Buffs and debuffs
+* Solo and group flexibility
+
+= High Level Roles by Class in Loadout =
+
+{| class="eoTable2"
+! Class
+! Offense
+! Defense
+! Support
+|-
+| [[Enchanter]]
+| Dots, pet, buffs
+| Stuns, pet, debuffs
+| Mesmerization, clarity
+|-
+| [[Necromancer]]
+| Dots, lifetaps, pet
+| Feign Death, pet
+| Lifetaps
+|-
+| [[Ranger]]
+| Archery
+| Evasive stance
+| Track, forage, mobility
+|}
+
+= Core Strategies =
+
+* Offense - at its core, ENR gameplay revolves around stacking your dots and filling dead space with archery shots. You will excel at tearing down mobs one by one. Additionally, you'll have access to a strong pet or charmed companion but you will want to be mobile in the event agro control is weak.
+* Defense - ENR loadouts provide you evasive stance, feign death, a pet, and stuns. These are your core tools for surviving inevitable damage. 
+* Support - ENR loadouts have access to snares, roots, mesmerization, charms, and a slew of important buffs and debuffs. Learn which tools matter when to efficiently perform in group situations.
+
+= Considerations =
+
+* This loadout does not tank. You have a healthy selection of escape tools, but ENR characters do not tank.
+* There are buffs between your kits that do not stack. Learn the interactions and what buffs are good for your group, but not for you.
+* Your optimal damaging attack rotation will depend on how good your bow is.
+* Your only AoE tools can include you as a target. Learn their ranges and effect areas so you don't knock yourself out of a fight.
+
+= Leveling Guide by Jokon =
+
+== Early Levels: 1-10 ==
+
+The first thing you need to prioritize is the acquisition of a bow - any bow in the 1-10 range, thankfully. A bow is a critical tool for the ENR build because it represents both your filler and your backup damage. Your highest damaging tools are going to be spells until the high level game and so you're going to be encouraged to overuse them, draining your mana bar. A bow is what you use between spell casts, a bow is what you use when spell casting is not possible, and a bow will be your best tool at the high end game. Therefore, regardless of all other starting considerations you should be acquiring a bow and getting used to how it works.
+
+With that said, bow itemization is pretty weak until you get to the end game. Your playstyle for the first 46 levels is super likely going to be relying on melee in offensive stance; itemization simply scales out of control until you can get planar loot. Ranged stance will take over after 46 when you can get [[Bow of the Underfoot]] or [[Windstriker]].
+
+With your that sorted, start identifying which of your various spells are going to be your standards. For most level ranges, you're going to want to do dot, melee/bow, dot, melee/bow ad nauseum as a general rhythm. This may not be true for any given level; having said that, prior to level 10 you're going to want to get used to casting these spells, dropping an arrow, and then repeating the rhythm until it's natural. You'll also want to level in outdoor zones for this practice as you'll have much more room to use the other tools in your kit, like snares, roots, mesmerization, fear, and charm.
+
+Start working with Divine Invocation as well; this loadout will give you 133% of the mana spent on a spell back as healing, whether the actual spells you cast are heals or not. This means you can have loads of passive healing - until you run out of mana. Get a feel for what you can get away with in a fight.
+
+== Emergent Levels: 11-25 ==
+
+Congratulations on reaching 11 and locking in the ENR loadout! From here on, you'll be collecting the core tools that make you function as an archer of occult rot. Here you should have the basic tools of the loadout; a few necromancer dots, a few enchanter dots, and lots of archery. Your play should focus on controlling a monster and then burning it down, preferably before it gets to you. You will have access to necromancer pets and enchanter charms to help hold monsters in place, however, count on these assistants not always being able to hold agro. This is a problem for ENR loadouts because archery does double damage for you while mobs hold still. Group play will likely allow you to double your archery damage thanks to consistent threat management of a dedicated tank. Plan on your pet being a positionally disadvantaged damage over time effect.
+
+You will also start to see the core challenge of the ENR loadout; you lack good AoE tools. This doesn't mean you are helpless; rather, you will need to focus on swapping targets quickly and learning how to not mesmerize yourself starting at level 16 when too many mobs get close.
+
+== Mid Levels: 26-45 ==
+
+In this level range you will continue to gain access to new tools and more powerful spells. You will also start to understand the various dynamics that play out in your loadout. In particular, you'll be moving through level bands where certain spells make sense to use for yourself, but not others. These synergies will be indicated down below, but as a general strategy you should be very capable of fear kiting, dot rotting, and mob control by the time you ascend into the end game.
+
+It is also in this level range that you should start to appreciate the benefits of archery over your direct damage spells. Even at their best your direct damage spells will cap out around 500 damage without focus items or invocations, while your archery in archery stance can and will passively triple for far more. If your bow does not keep pace with your level this may not be strictly true; as you approach the end game and improve your equipment it will become clear that spells like [[Incinerate Bones]] and [[Discordant Mind]] are best left off your bars in favor of more damage over time effects.
+
+== High Levels: 46+ ==
+
+You've done it! Here, the true power of the ENR loadout can come to bear. [[Envenomed Bolt]], [[Gasping Embrace]], and [[Archery]] will be your go-to attacks. Your best damage will come from maintaining as many different DoTs as possible while using archery to fill the gaps between spell casts. Each target will wither before your very eyes, and there will be little that you can't annihilate.
+
+In group play, you will provide extremely powerful ranged damage and crowd controlling utility. Split your kit between dots, de/buffs, and mez/charm. All that time you spent earlier learning to switch between targets will help you greatly, as your core challenge will likely be switching between targets.
+
+= Specific Strategies =
+While leveling you will find that the flexibility of the ENR kit lends itself to different solo and group strategies. This section will detail what strategies work best in what zones. With that said, the ENR loadout will function in any situation that doesn't require intense tanking, so do have fun with it!
+
+Note; in the end game, the ENR loadout will prefer to be in the [[Stances|ranged stance]]. This greatly frees up your itemization choices to better play to your necromancer and enchanter kits, as your primary and secondary weapon slots can have stat sticks. Until the end game though you'll be swinging whatever you've got in melee.
+
+== Solo Strategy: Fear Kiting ==
+
+Starting at level 2, you'll gain access to [[Fear]]. It is not recommended to embrace this strategy until at least level 4 when you get [[Clinging Darkness]], as this spell allows you to snare the enemy and keep them from running quickly. You gain access to [[Chase the Moon]] at 16 and finally [[Invoke Fear]] at 30 which provide longer durations. None of the other fears in your kit will surpass these, save [[Spook the Dead]] situationally when immunities apply.
+
+Your snare kit will continue to grow, with ranger snares coming online at higher levels. Having a selection of different snaring effects means you can use the necromancer based lines which are typically shorter duration with a dot effect, or the ranger lines that last far longer with stronger movement reductions. Although the leveling path will have multiple interesting choices, at a high level your snare choices will be [[Insidious Retrogression]] or [[Entrap]] (an AA). These will remain interesting as while use of Entrap frees up a spell gem, Insidious Retrogression will provide a stronger movement speed reduction.
+
+While feared, all mobs will present their backside to you for imminent kicking. Use your damage over time effects and then archery or melee depending on your available gear. At most levels of play you will likely only ever use archery in ranged stance to fill gaps during fear kiting; not only are your hands are better used holding caster weapons that have inefficient melee ratios, your chosen pet companion will likely be able to better use the melee weapons you do have.
+
+== Solo Strategy: Face Tanking ==
+
+One of the unique things that the ranger adds to the ENR loadout is the ability to deal lots of archery damage to targets that are free to move but are choosing not to. You can convince monsters to not roam around by standing still yourself and letting them hit you. This strategy gives you the highest possible single target DPS from archery; however, you'll need to adjust your spell loadouts to include your lifetaps from your necromancer kit as part of your sustainment. As a result, it might not be the fastest way to kill a monster unless you have really, really good weapons for your level (for example, if you acquired a [[Windstriker]] or PoSky melee weapons while using another loadout).
+
+It's also worth noting that the ranger component of your kit gives you access to the [[Divine Invocation]] - this will cause all your spells cast to give you additional healing, which can be leveraged hard when you are using lifetaps.
+
+== Group Strategy: Dot Rotting ==
+
+At around level 11 you'll have enough spells to really start putting the hurt on things and consequently you'll find a spot in groups that need more dead monsters. Your most efficient contribution in these groups is to A) lock down extra mobs with your enchanter kit and B) annihilate mobs with your ranger and necromancer kits. You also bring buffs to the group; try to setup responsibilities here with other players in your group to avoid duplication of efforts and non-stacking buffs.
+
+When damaging, focus on loading up your damage over time effects after any necessary debuffs like Tash, then fill the air with arrows. You may need to swap targets situationally for mesmerization, root, charm, and/or stuns; carefully monitor your archery use so that you do not accidentally and/or automatically shoot a monster you just blanked.
+
+= Recommended Spell Loadouts =
+
+In this section, the following spell loadouts will be recommended for major level bands. Your mileage may vary by zone and situation (such as if there are lots of undead), but the following chart will give you a good baseline to work with. Additionally, AA for additional spell slots is not considered here; this is your Top 8 list for most situations.
+
+==== Damage Focus Spell Loadouts by Level - Top 8 ====
+{| class="wikitable"
+!1
+|Minor Healing
+|Minor Shielding
+|Lifetap
+|Disease Cloud
+|Lifetap
+|Strengthen
+|Cavorting Bones
+|Invis vrs Undead
+|-
+|11
+|Engulfing Darkness
+|Heat Blood
+|Leech
+|Choke
+|Flame Lick
+|Grim Aura
+|Bone Walk
+|Poison Bolt
+|-
+|16
+|Engulfing Darkness
+|Heart Flutter
+|Leech
+|Choke
+|Heat Blood
+|Grim Aura
+|Restless Bones
+|Lifedraw
+|-
+|21
+|Engulfing Darkness
+|Heart Flutter
+|Siphon Life
+|Choke
+|Heat Blood
+|Grim Aura
+|Animate Dead
+|Shock of Poison
+|-
+|26
+|Engulfing Darkness
+|Heart Flutter
+|Siphon Life
+|Suffocate
+|Heat Blood
+|Grim Aura
+|Haunting Corpse
+|Spirit Tap
+|-
+|31
+|Dooming Darkness
+|Heart Flutter
+|Boil Blood
+|Suffocate
+|Heat Blood
+|Grim Aura
+|Summon Dead
+|Vampiric Curse
+|-
+|36
+|Dooming Darkness
+|Chilling Embrace
+|Venom of the Snake
+|Suffocate
+|Scourge
+|Grim Aura
+|Invoke Shadow
+|Vampiric Curse
+|-
+|41
+|Dooming Darkness
+|Chilling Embrace
+|Venom of the Snake
+|Suffocate
+|Scourge
+|Asystole
+|Malignant Dead
+|Dark Soul
+|-
+|46
+|Dooming Darkness
+|Chilling Embrace
+|Venom of the Snake
+|Suffocate
+|Scourge
+|Asystole
+|Cackling Bones
+|Dark Soul
+|-
+|50
+|Cascading Darkness
+|Chilling Embrace
+|Venom of the Snake
+|Gasping Embrace
+|Scourge
+|Envenomed Bolt
+|Invoke Death
+|Dark Soul
+|}
+
+==== Self-Buff Focus Spell Loadouts by Level - Top 8 ====
+{| class="wikitable"
+!1
+|
+|Minor Shielding
+|
+|
+|
+|
+|Strengthen
+|Invis vrs Undead
+|-
+|11
+|Focus Death
+|Lesser Shielding
+|Skin like Wood
+|Hawk Eye
+|Mist
+|Grim Aura
+|Strengthen
+|Intellectual Advancement
+|-
+|16
+|Focus Death
+|Shielding
+|Skin like Wood
+|Hawk Eye
+|Breeze
+|Grim Aura
+|Quickness
+|Intellectual Advancement
+|-
+|21
+|Focus Death
+|Shielding
+|Skin like Rock
+|Hawk Eye
+|Breeze
+|Grim Aura
+|Alacrity
+|Intellectual Superiority
+|-
+|26
+|Intensify Death
+|Major Shielding
+|Skin like Rock
+|Hawk Eye
+|Clarity
+|Grim Aura
+|Alacrity
+|Intellectual Superiority
+|-
+|31
+|Intensify Death
+|Major Shielding
+|Skin Like Rock
+|Hawk Eye
+|Clarity
+|Grim Aura
+|Alacrity
+|Intellectual Superiority
+|-
+|36
+|Augment Death
+|Greater Shielding
+|Skin Like Rock
+|Hawk Eye
+|Clarity
+|Grim Aura
+|Alacrity
+|Intellectual Superiority
+|-
+|41
+|Augment Death
+|Arch Shielding
+|Boon of the Garou
+|Hawk Eye
+|Clarity
+|Grim Aura
+|Celerity
+|Intellectual Superiority
+|-
+|46
+|Augment Death
+|Arch Shielding
+|Boon of the Garou
+|Hawk Eye
+|Clarity
+|Grim Aura
+|Celerity
+|Intellectual Superiority
+|-
+|50
+|Augment Death
+|Arch Shielding
+|Boon of the Garou
+|Hawk Eye
+|Clarity
+|Force of Nature
+|Swift Like Wind
+|Intellectual Superiority
+|}
+
+== Important Notes ==
+
+* The majority of your damaging spells will be from your Necromancer kit. There are some important offensive spells in the Enchanter and Ranger kits, but they are situational or inferior to your damaging Necromancer spells.
+* Conversely, all your good buffs and debuffs are from the Ranger and Enchanter kits. Pay careful attention to the ATK stacking of effects in particular; you will have access to multiple ATK buffs that will stack in interesting ways.
+* Grim Aura is a major play from the Necromancer kit that is easy to overlook for the entirety of your leveling experience, only losing out in the end game.
+
+== Important Gaps ==
+
+* You do not have strong Area of Effect damaging spells. A single DoT line. You won't likely want to use it anyway in favor of AoE Mesmerization.
+
+= AA Priorities =
+
+*Extra spell gems
+*Archery damage
+
+= Gear Priorities =
+
+As mentioned above, your first and most important piece of equipment is going to be your bow. You can and should review the list below to see what bows are available, but as a general theme you'll find that unless you are pursuing fletching your best bet is to get a [[Runed Oak Bow]] from South Karana with an objective of getting the [[Windstriker]] from Plane of Sky. Fletching should still be considered for arrow improvements even if you don't want the fletched bows. Until you get the Windstriker a +10 (Mithril/Steel) Champion Arrow will double your bow's damage output. 
+
+* [[Special:ClassSlotEquip/Ranger/Archery/AllItems|Chart of Bows]]
+
+With a bow solved for, your general statistic priority is going to be Intelligence, Dexterity, and then Strength. This statistic priority focuses on improving your mana pool, spell casting, archery accuracy, and archery damage. Any gear that improves those statistics will be your preference. Attack power bonuses will also help your archery damage. 
+
+= Quests and Items of Interest to ENR Loadouts =
+
+Rather than duplicate the list of quests on the [[Enchanter]], [[Necromancer]], and [[Ranger]] pages, here we will discuss items that benefit the ENR loadout but aren't specifically tied to one of the three constituent kits. As most of your best items will be from the three above lists, the following is more oriented towards leveling targets and not end-game goals.
+
+{| class="eoTable2"
+! Item / Quest
+! Loadout Focus
+! Why It Matters
+!Source
+!Level
+|-
+| [[Black Lace Sash]]
+| ALL
+| Excellent low level itemization, easy to upgrade
+|Paineel Quest through Warrens
+|15+
+|-
+| [[Penumbral Rod]]
+| ALL
+| Rapid lich-like mana regen
+|Quest in Castle Mistmoore
+|30+
+|-
+|[[Poacher's Head Quest (Surefall Glade)|Poacher's Head]]
+|Archery
+|Early way to get bow through quests
+|Surefall Glade Quest
+|5+
+|-
+|[[Heretic Heads]]
+|Archery
+|Early and easy way to get haste belt
+|Quest in Stonebrunt Mountains
+|20+
+|-
+|[[Runed Oak Bow]]
+|Archery
+|Easiest good bow pre-planar
+|Drop in South Karana
+|25+
+|}
+
+= Tips =
+
+* Although most of your attention will be consumed by spell management, don't neglect your archery. It scales far better than your spell casting.
+* You have access to evasive stance AND feign death AND memory blur if things get nasty! Try to get more spell gems ASAP.
+
+= See Also =
+
+* [[Class_Guides]]
+* [[Enchanter]]
+* [[Necromancer]]
+* [[Ranger]]
+* [[Players:Gear|Gear Reference]]
+* [[Stances]]
+
+{{Navbox Classes}}

@@ -1,0 +1,92 @@
+{{Classic Era}}
+ The army of the Crushbone orcs is deadly indeed. They are great military strategists.
+ - Canloe Nusback
+
+{{Factionpage|
+
+| description = The orcs of the Faydark, allied under [[Emperor Crush]], have their stronghold of [[Crushbone]] constantly in a state of war with the armies of [[Felwithe]] and [[Kelethin]] and [[Kaladim]]. The Crushbone Orcs are allied with the [[Indigo Brotherhood]] of [[Neriak]], the Guild of Warriors from the Drow city.  The Ambassador of the Dark Elves can often be found in consultation with Emperor Crush himself. Perhaps it is their habit of enslaving their enemies which upsets the [[Emerald Warriors]] and [[Faydarks Champions]] so, but the warrior guilds of Kelethin and Felwithe have aligned with [[Storm Guard]] from Kaladim in a valiant effort to wipe the orcs from their pristine forests.
+
+| zones_raise = 
+
+* [[Dagnor's Cauldron]]
+* [[Freeport|East Freeport]]
+* [[Eastern Plains of Karana]]
+* [[Greater Faydark]]
+* [[Highpass Keep]]
+* [[Rathe Mountains]]
+* [[Ocean of Tears]]
+* [[Steamfont Mountains]]
+* [[Freeport|West Freeport]]
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Crushbone]]
+* [[Dagnor's Cauldron]]
+* [[Greater Faydark]]
+* [[Lesser Faydark]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+* [[Bracers of Erollisi Quest]]
+* [[Call of Flames]]
+* [[Muffin for Pandos]]
+* [[Orc Hatchets]]
+* [[Orc Runner (Kelethin)]]
+* [[Pirate Earrings]]
+* [[Pixie Dust #1]]
+* [[The Frightlings]]
+* [[Trueshot Longbow Quest]]
+
+| mobs_raise = 
+
+* [[Aleena Lightleaf]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Antinime]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Ascania Halvbin]] <span class='fmz'>(Ocean of Tears - NPC, Non-Quest)</span>
+* [[Cerila Windrider]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Cleonae Kalen]] <span class='fmz'>(Ocean of Tears - Merchant)</span>
+* [[Devin Ashwood]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Dill Fireshine]] <span class='fmz'>(Greater Faydark - Ranger Guildmaster)</span>
+* [[Elmion Hendrys]] <span class='fmz'>(Dagnor's Cauldron - NPC, Non-Quest)</span>
+* [[Euboea Delewyn]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Ganelorn Oast]] <span class='fmz'>(East Karana - Quest NPC)</span>
+* [[Guard Dykalin]] <span class='fmz'>(Mountains of Rathe)</span>
+* [[Larisa Gelrith]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Legyn Sarawyn]] <span class='fmz'>(Steamfont Mountains - NPC, Non-Quest)</span>
+* [[Lily Ashwood]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Maesyn Trueshot]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Merchant Tuluvdar]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Paeonia Purnn]] <span class='fmz'>(Ocean of Tears - NPC, Non-Quest)</span>
+* [[Ran Sunfire]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Rodrick Marslett]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Sister of Erollisi]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Styria Fearnon]] <span class='fmz'>(Ocean of Tears - Warrior Guildmaster)</span>
+* [[Verth Mistwielder]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+
+| mobs_lower = 
+
+* [[an orc scout ]] <span class='fmz'>(Dagnor's Cauldron)</span>
+* [[an orc witchdoctor]]  <span class='fmz'>(Greater Faydark)</span>
+* [[Centurion Relgle]]  <span class='fmz'>(Greater Faydark)</span>
+* [[Emperor Crush]]  <span class='fmz'>(Crushbone)</span>
+* [[Lord Darish]]  <span class='fmz'>(Crushbone)</span>
+* [[Orc Pawn (Crushbone)|Orc Pawn]]  <span class='fmz'>(Crushbone)</span>
+* [[Orc Centurion (Crushbone)|Orc Centurion]]  <span class='fmz'>(Crushbone)</span>
+* [[Orc Oracle (Crushbone)|Orc Oracle]]  <span class='fmz'>(Crushbone)</span>
+* [[Orc Legionnaire (Crushbone)|Orc Legionnaire]]  <span class='fmz'>(Crushbone)</span>
+* [[orc chief]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[orc emissary]]  <span class='fmz'>(Crushbone)</span>
+* [[orc hatchetman]]  <span class='fmz'>(Greater Faydark)</span>
+* [[orc slaver]]  <span class='fmz'>(Crushbone)</span>
+* [[orc taskmaster]]  <span class='fmz'>(Crushbone)</span>
+* [[orc trainer]]  <span class='fmz'>(Crushbone)</span>
+* [[orc warlord]]  <span class='fmz'>(Crushbone)</span>
+* [[royal guard]]  <span class='fmz'>(Crushbone)</span>
+* [[The Prophet]]  <span class='fmz'>(Crushbone)</span>
+
+}}
+
+[[Category:Monster factions]]

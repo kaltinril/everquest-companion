@@ -1,0 +1,38 @@
+'''DISCLAIMER''': MacOS is not officially supported by the Developer of EverQuest Legends (EQL). Any modifications related to your environment to get EQL working properly should be taken at your own risk. This guide is simply here to help document what is known to have worked for other EQL players. Results may vary wildly based on differing hardware, MacOS Version, and middleware used to run EQL.
+
+= Introduction =
+Apple Silicon Macs can play the game with minimal issues using tools such as CrossOver, Sikarugir (formerly Kegworks, successor to Wineskin), or the Game Porting Toolkit.
+
+''WARNING: MacOS Golden Gate will be the last release to support Rosetta so the overall approach to playing the game will likely drastically in the coming MacOS releases. Always confirm compatibility before updating MacOS.''
+
+== Devices Tested ==
+The game has been tested to run on an M1 MacBook Air running MacOS Tahoe 26.3 meaning it should run no problem on all Apple Silicon Macs.
+
+== CrossOver ==
+These instructions were tested on CrossOver 26.2 on a M1 MacBook Air running MacOS Tahoe 26.3. 
+
+# Download the EQL Setup: https://launch.daybreakgames.com/installer/EQLegends_setup.exe
+# Open Crossover and click "+ Install" and select EverQuest.
+# Create a new bottle and install EverQuest. Select the EQLegends_setup.exe file as the installer.
+# Progress through the various installers that pop up. 
+# Eventually the EQLegends setup will run and this will directly launch the launchpad.
+# Login and let the game patch. Exit the launcher. If a popup comes up saying the task has failed, click "Skip This Step"
+# Select the bottle and toggle MSync on under Advanced Settings
+
+At this point the game should be installed and runnable.
+
+==== Troubleshooting: ====
+
+* Resolution Issues - The Retina scaling results in the game rendering at a lower-than-native resolution.
+** Recommended: "Wine Configuration" Graphics -> DPI adjust the slider to change system scaling. Start with small increases - higher DPIs will make the window appear larger on your screen.
+** Not Recommended: Advanced Settings -> High Resolution Mode - this will use the physical resolution of the display.
+*** On Retina displays because the game's UI becomes very difficult to use at higher resolutions.
+* Cursor position does not match where clicks occur in-game - When in windowed mode, if the window is resized from the starting resolution, the game is instead stretched, and mouse clicks do not register at the same position where the mouse is drawn. If the resolution is repeatedly changed it typically gets lower and more stretched. It looks like t the window size and the render size diverge due to scaling being unaccounted for - this is a common issue seen in games with Retina scaling.
+** Quick "fix":  Run the game in full-screen you can turn on fullscreen in options or by pressing Command+Return, do NOT maximize the window.
+** There may be some other workarounds out there for this.
+
+== Sikarugir ==
+TODO
+
+== Game Porting Toolkit ==
+TODO

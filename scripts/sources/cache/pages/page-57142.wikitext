@@ -1,0 +1,34 @@
+{{Classic Era}}
+[[File:kerran.jpg|thumb|right]]
+__NOTOC__
+==Description==
+The Kerran are a regal feline race that walk upright. They are the ruling class of other similar cat-like races on Odus. Kerran are as tall as Barbarians and display a variety of different markings on their fur. In spite of their height, they are very agile and graceful. They are known for their integrity and the destructive feral power they bring down on their enemies.
+
+Kerrans became available as a playable race with the July 28, 2026 launch-day patch. Their starting area, [[Kerra Island|Kerra Isle]], was redesigned with guildmasters, spell merchants, a banker, vendors, and Task-based quests for new characters. [https://www.everquestlegends.com/patch-notes/eql-update-notes-7-28-2026 Official launch-day patch notes]
+
+==Basic Information==
+*<b>[[Faction Alignment|Faction Alignment:]]</b> Neutral
+*<b>Racial(s):</b> [[Sneak]], [[Skill_Safe_Fall|Safe Fall]]
+*<b>Starting City:</b> [[Kerra Island|Kerra Isle]]
+*<b>Primary Class Choices:</b> [[Bard]], [[Berserker]], [[Beastlord]], [[Druid]], [[Rogue]], [[Shaman]], [[Warrior]]
+*<b>Abbreviation:</b> KER
+
+==Base Stats==
+{| class="eoTable2" style="text-align:left"
+|-
+! STR !! STA !! AGI !! DEX !! WIS !! INT !! CHA
+|-
+|| 90 || 75 || 90 || 70 || 70 || 65 || 65
+|}
+
+==Unlock Conditions==
+Complete the [[Aid the Kerrans of Kerra Isle]] Task. The task must be accepted before completing its component quests because credit is not retroactive.
+
+==See also==
+* [[Kerra Island]]
+* [[Quest Journal]]
+* [[Patch Notes#2026-07-28 - Launch day Patch Notes|July 28, 2026 launch-day patch notes]]
+
+{{Navbox Race}}
+
+[[Category:Character Races]]

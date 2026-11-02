@@ -1,0 +1,57 @@
+{{Classic Era}}
+{{Factionpage|
+
+| description = The Kobolds of the Warrens.  Clan Kolbok is opposed by both the water knights (Erudin Guards) and the Heretics (all of Paineel).
+
+| zones_raise =
+
+
+| zones_lower =
+
+* [[Paineel]]
+* [[Steamfont Mountains]]
+* [[The Warrens]]
+
+| quests_raise =
+
+
+| quests_lower =
+
+
+| mobs_raise =
+
+
+| mobs_lower =
+
+* [[a burly kobold]]  <span class='fmz'>(Stonebrunt Mountains)</span>
+* [[a fierce kobold]]  <span class='fmz'>(The Warrens)</span>
+* [[A Frothing Kobold]]  <span class='fmz'>(The Warrens)</span>
+* [[a greater kobold shaman]]  <span class='fmz'>(Stonebrunt Mountains)</span>
+* [[a greater shaman]]  <span class='fmz'>(The Warrens)</span>
+* [[a howler]]  <span class='fmz'>(The Warrens)</span>
+* [[A Huge Kobold]]  <span class='fmz'>(The Warrens)</span>
+* [[a hunting kobold]]  <span class='fmz'>(Stonebrunt Mountains)</span>
+* [[a kobold (Warrens)]]  <span class='fmz'>(The Warrens)</span>
+* [[A Kobold Archer]]  <span class='fmz'>(The Warrens)</span>
+* [[A Kobold Guard]]  <span class='fmz'>(The Warrens)</span>
+* [[a kobold missionary]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[A Kobold Outcast]]  <span class='fmz'>(The Warrens)</span>
+* [[A Kobold Pit Fighter]]  <span class='fmz'>(The Warrens)</span>
+* [[a kobold protector]]  <span class='fmz'>(The Warrens)</span>
+* [[A Kobold Runt]]  <span class='fmz'>(The Warrens)</span>
+* [[A Kobold Sentinel]]  <span class='fmz'>(The Warrens)</span>
+* [[A Kobold Sentry]]  <span class='fmz'>(The Warrens)</span>
+* [[a kobold wanderer]]  <span class='fmz'>(Stonebrunt Mountains)</span>
+* [[A Large Kobold]]  <span class='fmz'>(The Warrens)</span>
+* [[a lesser shaman]]  <span class='fmz'>(The Warrens)</span>
+* [[a pack elder]]  <span class='fmz'>(The Warrens)</span>
+* [[A Pack Leader]]  <span class='fmz'>(The Warrens)</span>
+* [[a rabid kobold]]  <span class='fmz'>(The Warrens)</span>
+* [[a raging kobold savage]]  <span class='fmz'>(Stonebrunt Mountains)</span>
+* [[a scouting kobold]]  <span class='fmz'>(Stonebrunt Mountains)</span>
+* [[Arglar the Tormentor]]  <span class='fmz'>(Stonebrunt Mountains)</span>
+* [[High Shaman Drogik]]  <span class='fmz'>(The Warrens)</span>
+* [[Smithy Rrarrgin]]  <span class='fmz'>(The Warrens)</span>
+* [[Girgak the Bloody]] <span class='fmz'>(Stonebrunt Mountains)</span>
+
+}}

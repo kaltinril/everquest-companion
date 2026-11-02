@@ -1,0 +1,41 @@
+'''This skill allows you to attempt to steal an item or coin from an enemy's pockets.'''
+
+== Classes ==
+
+* [[Rogue]] '''Level 7''' (Max 235 at level 50)
+
+== General ==
+
+In EQ Legends: To know if you can raise skill on an NPC, you must see messages between dashes. --Player stole coin from NPC--, --Player failed to steal from NPC--, or --Player stole item from NPC--. You may not get these messages every time, but if you only see "Your attempt at stealing was unsuccessful" you may not be able to raise the skill. Befallen is a great place to raise the skill, on any live humanoid NPC. 
+
+A failed attempt at pick pocketing will cause the NPC to say the message. 
+
+"Stop Thief! <your_character_name>"
+
+
+A few critical notes on pick pocketing:
+
+* You can't Pickpocket with attack on.
+
+* You can't pickpocket magic items. That excludes a lot.
+
+* You can't pickpocket wielded items.
+
+* You can only pick pocket enemies internally tagged as Humanoid. It's not always clear which mobs are humanoids, even if they have a humanoid body shape. Slimes in City of Mist (and other zones) are humanoid tagged and able to be stolen from, for example. Undead mobs, even if they have humanoid body types and similar living variants, such as undead frogloks and living frogloks, are unable to be stolen from.
+
+* You can only successfully steal from enemies level 45 and below. Starting at level 51, this cap raises by 1 per level, up to 55 at player level 60. You ''may'' still trigger "Stop Thief! <name>" messages on mobs above your current cap, but that is not an indicator that they ''can'' be stolen from. It only means you got a critical failure on your pick pocket skill check.
+
+* It doesn't always work, even if it's maxed. Pick Pocket is not some magical shortcut to riches.
+
+* Pick pocket does work on gems however it is considered bad form to steal all the gems in a group. Don't be surprised if your group objects. Don't be surprised if they accuse you of stealing, either, even in camps where the enemies are unable to be stolen from, such as the NGE camp in Sebilis; direct them to this wiki entry if they complain.
+
+* The skill maximum is capped at (your level * 5 + 5)
+
+* Pick pocket shares a cooldown timer with Begging.
+
+== Training ==
+* Pick pocket can be skilled up on any monster that can be stolen from, regardless of con. So, for example, you can pick pocket a level 1 goblin indefinitely (even after you take all its items) for skillups.
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

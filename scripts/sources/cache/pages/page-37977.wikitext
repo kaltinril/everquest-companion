@@ -1,0 +1,89 @@
+{{Factionpage|
+
+| description = Merchants, Guards, and other NPCs in Firiona Vie's "good" outpost are on this faction.
+
+| zones_raise = 
+
+* [[Firiona Vie]]
+* [[Frontier Mountains]]
+* [[Lake of Ill Omen]]
+* [[Ocean of Tears]]
+* [[Timorous Deep]]
+* [[Trakanon's Teeth]]
+* [[Warsliks Woods]]
+
+| zones_lower = 
+
+* [[Firiona Vie]]
+* [[Lake of Ill Omen]]
+
+| quests_raise = 
+
+* [[Beguile Plants]]
+* [[Brain Bite (Good)]]
+* [[Drolvarg Teeth]]
+* [[Goblin Raiders]]
+* [[Illusion: Iksar Quest]]
+* [[Shaman Epic Quest]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[a bandit]] <span class='fmz'>(Timorous Deep)</span>
+* [[a bandit leader]] <span class='fmz'>(Timorous Deep)</span>
+* [[a goblin bloodtracer]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin bonecaster]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin hextracer]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin hunter]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin mosstrooper]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a goblin outrider]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[A Goblin Pillager]] <span class='fmz'>(Firiona Vie)</span>
+* [[a goblin scout]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin skirmisher]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a goblin skirmisher]] <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin soothsayer]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin thief]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin warrior]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a goblin watcher]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a goblin whelp]] <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin whelp]] <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a goblin witchdoctor]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[A Pirate]] <span class='fmz'>(Firiona Vie - NPC, Non-Quest)</span>
+* [[A Pirate Cartographer]] <span class='fmz'>(Firiona Vie - NPC, Non-Quest)</span>
+* [[Capt Surestout]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Dayle Jornin]] <span class='fmz'>(Ocean of Tears - Quest NPC)</span>
+* [[Dixl Drool]] <span class='fmz'>(Ocean of Tears)</span>
+* [[goblin battlemaster]]  <span class='fmz'>(Firiona Vie)</span>
+* [[goblin raider]]  <span class='fmz'>(Firiona Vie)</span>
+* [[goblin spirit caller]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[goblin warlord]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[Gornit]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Grachnist the Destroyer]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[Lord Gorelik]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[Red Eye Jack]]  <span class='fmz'>(Firiona Vie)</span>
+* [[Toko Binlittle]]  <span class='fmz'>(Ocean of Tears)</span>
+
+| mobs_lower = 
+
+* [[a pilgrim]]  <span class='fmz'>(Firiona Vie)</span>
+* [[an explorer]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[Firiona drixie]]  <span class='fmz'>(Firiona Vie)</span>
+* [[Guard Frandan]] <span class='fmz'>(Firiona Vie)</span>
+* [[Hiptal Frizzleboth]] <span class='fmz'>(Firiona Vie - Magician Guildmaster)</span>
+* [[Lady Chromoire]]  <span class='fmz'>(Firiona Vie)</span>
+* [[Luminare Pasinia]] <span class='fmz'>(Firiona Vie - Quest NPC)</span>
+* [[Scout Treekill]]  <span class='fmz'>(Firiona Vie)</span>
+* [[Sergeant Daelione]] <span class='fmz'>(Firiona Vie)</span>
+* [[Sergeant Greenblade]] <span class='fmz'>(Firiona Vie)</span>
+* [[Shieldbearer Buerd]] <span class='fmz'>(Firiona Vie)</span>
+* [[Shieldbearer Relios]] <span class='fmz'>(Firiona Vie)</span>
+* [[Tracker Azeal]] <span class='fmz'>(Firiona Vie - NPC, Non-Quest)</span>
+* [[Vrionele]]  <span class='fmz'>(Firiona Vie)</span>
+* [[Wella Fargin]] <span class='fmz'>(Firiona Vie - Banker)</span>
+* [[Wellford Fargin]] <span class='fmz'>(Firiona Vie - Banker)</span>
+
+}}
+[[Category:Significant Factions]]
+[[Category:Significant Factions]]

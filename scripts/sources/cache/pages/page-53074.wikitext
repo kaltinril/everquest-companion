@@ -1,0 +1,6 @@
+{{Expand}}
+
+An item with a NO DROP flag cannot be dropped or traded by the player. It also cannot be sold to merchants. This mechanic is often applied to quest items and valuable raid rewards in Everquest and many other MMORPGs.
+
+
+[[Category: Technical]]

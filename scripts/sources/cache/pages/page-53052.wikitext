@@ -1,0 +1,159 @@
+{{Cleanup Needed}}
+
+The following table describes the combined bonuses and penalties of every race/class combination.
+
+{|class="eoTable3 sortable"
+! Race
+! Class
+! Starting City
+! Deity
+|-
+|rowspan="3"| [[Barbarian]] || [[Rogue]]         || [[Halas]]                              || [[Agnostic]], [[Bristlebane]], [[The Tribunal]]
+|-
+                            || [[Shaman]]        || [[Halas]]                              || [[The Tribunal]]
+|-
+                            || [[Warrior]]       || [[Halas]]                              || [[Agnostic]], [[Rallos Zek]], [[The Tribunal]]
+|-
+|rowspan="8"| [[Dark Elf]]  || [[Cleric]]        || [[Neriak]]                             || [[Innoruuk]]
+|-
+                            || [[Enchanter]]     || [[Neriak]]                             || [[Agnostic]], [[Innoruuk]]
+|-
+                            || [[Magician]]      || [[Neriak]]                             || [[Agnostic]], [[Innoruuk]]
+|-
+                            || [[Necromancer]]   || [[Neriak]]                             || [[Innoruuk]]
+|-
+                            || [[Rogue]]         || [[Neriak]]                             || [[Agnostic]], [[Bristlebane]], [[Innoruuk]]
+|-
+                            || [[Shadow Knight]] || [[Neriak]]                             || [[Innoruuk]]
+|-
+                            || [[Warrior]]       || [[Neriak]]                             || [[Agnostic]], [[Innoruuk]], [[Rallos Zek]]
+|-
+                            || [[Wizard]]        || [[Neriak]]                             || [[Agnostic]], [[Innoruuk]], [[Solusek Ro]]
+|-
+|rowspan="4"| [[Dwarf]]     || [[Cleric]]        || [[Kaladim]]                            || [[Brell Serilis]]
+|-
+                            || [[Paladin]]       || [[Kaladim]]                            || [[Brell Serilis]]
+|-
+                            || [[Rogue]]         || [[Kaladim]]                            || [[Agnostic]], [[Brell Serilis]], [[Bristlebane]]
+|-
+                            || [[Warrior]]       || [[Kaladim]]                            || [[Agnostic]], [[Brell Serilis]]
+|-
+|rowspan="7"| [[Erudite]]   || [[Cleric]]        || [[Erudin]] , [[Paineel]]               || [[Cazic-Thule (Lore)|Cazic-Thule]], [[Prexus]], [[Quellious]]
+|-
+                            || [[Enchanter]]     || [[Erudin]]                             || [[Agnostic]], [[Prexus]], [[Quellious]]
+|-
+                            || [[Magician]]      || [[Erudin]]                             || [[Agnostic]], [[Prexus]], [[Quellious]]
+|-
+                            || [[Necromancer]]   || [[Paineel]]                             || [[Cazic-Thule (Lore)|Cazic-Thule]]
+|-
+                            || [[Paladin]]       || [[Erudin]]                             || [[Prexus]], [[Quellious]]
+|-
+                            || [[Shadow Knight]] || [[Paineel]]                             || [[Cazic-Thule (Lore)|Cazic-Thule]]
+|-
+                            || [[Wizard]]        || [[Erudin]]                             || [[Agnostic]], [[Prexus]], [[Quellious]], [[Solusek Ro]]
+|-
+|rowspan="7"| [[Gnome]]     || [[Cleric]]        || [[Ak'Anon]]                            || [[Bertoxxulous]], [[Brell Serilis]], [[Bristlebane]]
+|-
+                            || [[Enchanter]]     || [[Ak'Anon]]                            || [[Agnostic]], [[Bertoxxulous]], [[Brell Serilis]]
+|-
+                            || [[Magician]]      || [[Ak'Anon]]                            || [[Agnostic]], [[Bertoxxulous]], [[Brell Serilis]]
+|-
+                            || [[Necromancer]]   || [[Ak'Anon]]                            || [[Bertoxxulous]]
+|-
+                            || [[Rogue]]         || [[Ak'Anon]]                            || [[Agnostic]], [[Bertoxxulous]], [[Brell Serilis]], [[Bristlebane]]
+|-
+                            || [[Warrior]]       || [[Ak'Anon]]                            || [[Agnostic]], [[Bertoxxulous]], [[Brell Serilis]], [[Rallos Zek]]
+|-
+                            || [[Wizard]]        || [[Ak'Anon]]                            || [[Agnostic]], [[Bertoxxulous]], [[Brell Serilis]], [[Solusek Ro]]
+|-
+|rowspan="6"| [[Half Elf]]  || [[Bard]]          || [[Qeynos]], [[Freeport]], [[Kelethin]] || [[Agnostic]], [[Brell Serilis]], [[Bristlebane]], [[Erollisi Marr]], [[Karana]], [[Mithaniel Marr]], [[Prexus]], [[Quellious]], [[Rallos Zek]], [[Rodcet Nife]], [[Solusek Ro]], [[The Tribunal]], [[Tunare (Lore)|Tunare]], [[Veeshan]]
+|-
+                            || [[Druid]]         || [[Surefall Glade]], [[Kelethin]]       || [[Karana]], [[Tunare (Lore)|Tunare]]
+|-
+                            || [[Paladin]]       || [[Qeynos]], [[Freeport]], [[Felwithe]] || [[Erollisi Marr]], [[Karana]], [[Mithaniel Marr]], [[Rodcet Nife]], [[Tunare (Lore)|Tunare]]
+|-
+                            || [[Ranger]]        || [[Surefall Glade]], [[Kelethin]]       || [[Karana]], [[Tunare (Lore)|Tunare]]
+|-
+                            || [[Rogue]]         || [[Qeynos]], [[Freeport]], [[Kelethin]] || [[Agnostic]], [[Bertoxxulous]], [[Bristlebane]], [[Erollisi Marr]], [[Karana]], [[Rodcet Nife]], [[Tunare (Lore)|Tunare]]
+|-
+                            || [[Warrior]]       || [[Qeynos]], [[Freeport]], [[Kelethin]] || [[Agnostic]], [[Bertoxxulous]], [[Erollisi Marr]], [[Innoruuk]], [[Karana]], [[Mithaniel Marr]], [[Prexus]], [[Rallos Zek]], [[Rodcet Nife]], [[The Tribunal]], [[Tunare (Lore)|Tunare]]
+|-
+|rowspan="4"| [[Halfling]]  || [[Cleric]]        || [[Rivervale]]                          || [[Bristlebane]]
+|-
+                            || [[Druid]]         || [[Rivervale]]                          || [[Karana]]
+|-
+                            || [[Rogue]]         || [[Rivervale]]                          || [[Agnostic]], [[Brell Serilis]], [[Bristlebane]]
+|-
+                            || [[Warrior]]       || [[Rivervale]]                          || [[Agnostic]], [[Brell Serilis]], [[Rallos Zek]]
+|-
+|rowspan="5"| [[High Elf]]  || [[Cleric]]        || [[Felwithe]]                           || [[Tunare (Lore)|Tunare]]
+|-
+                            || [[Enchanter]]     || [[Felwithe]]                           || [[Agnostic]], [[Erollisi Marr]], [[Karana]], [[Mithaniel Marr]], [[Tunare (Lore)|Tunare]]
+|-
+                            || [[Magician]]      || [[Felwithe]]                           || [[Agnostic]], [[Erollisi Marr]], [[Karana]], [[Mithaniel Marr]], [[Tunare (Lore)|Tunare]]
+|-
+                            || [[Paladin]]       || [[Felwithe]]                           || [[Tunare (Lore)|Tunare]]
+|-
+                            || [[Wizard]]        || [[Felwithe]]                           || [[Agnostic]], [[Erollisi Marr]], [[Karana]], [[Mithaniel Marr]], [[Solusek Ro]], [[Tunare (Lore)|Tunare]]
+|-
+|rowspan="13"| [[Human]]    || [[Bard]]          || [[Freeport]], [[Qeynos]]               || [[Agnostic]], [[Brell Serilis]], [[Bristlebane]], [[Erollisi Marr]], [[Karana]], [[Mithaniel Marr]], [[Prexus]], [[Quellious]], [[Rallos Zek]], [[Rodcet Nife]], [[Solusek Ro]], [[The Tribunal]], [[Tunare (Lore)|Tunare]], [[Veeshan]]
+|-
+                            || [[Cleric]]        || [[Freeport]], [[Qeynos]]               || [[Bertoxxulous]], [[Erollisi Marr]], [[Innoruuk]], [[Karana]], [[Mithaniel Marr]], [[Rodcet Nife]]
+|-
+                            || [[Druid]]         || [[Surefall Glade]]                     || [[Karana]], [[Tunare (Lore)|Tunare]]
+|-
+                            || [[Enchanter]]     || [[Freeport]], [[Qeynos]]               || [[Agnostic]], [[Bertoxxulous]], [[Erollisi Marr]], [[Innoruuk]], [[Karana]], [[Mithaniel Marr]], [[Rodcet Nife]]
+|-
+                            || [[Magician]]      || [[Freeport]], [[Qeynos]]               || [[Agnostic]], [[Bertoxxulous]], [[Erollisi Marr]], [[Innoruuk]], [[Karana]], [[Mithaniel Marr]], [[Rodcet Nife]]
+|-
+                            || [[Monk]]          || [[Freeport]], [[Qeynos]]               || [[Agnostic]], [[Quellious]]
+|-
+                            || [[Necromancer]]   || [[Freeport]], [[Qeynos]]               || [[Bertoxxulous]], [[Innoruuk]]
+|-
+                            || [[Paladin]]       || [[Freeport]], [[Qeynos]]               || [[Erollisi Marr]], [[Karana]], [[Mithaniel Marr]], [[Rodcet Nife]]
+|-
+                            || [[Ranger]]        || [[Surefall Glade]]                     || [[Karana]], [[Tunare (Lore)|Tunare]]
+|-
+                            || [[Rogue]]         || [[Freeport]], [[Qeynos]]               || [[Agnostic]], [[Bertoxxulous]], [[Bristlebane]], [[Erollisi Marr]], [[Innoruuk]], [[Karana]], [[Rodcet Nife]]
+|-
+                            || [[Shadow Knight]] || [[Freeport]], [[Qeynos]]               || [[Bertoxxulous]], [[Innoruuk]]
+|-
+                            || [[Warrior]]       || [[Freeport]], [[Qeynos]]               || [[Agnostic]], [[Bertoxxulous]], [[Erollisi Marr]], [[Innoruuk]], [[Karana]], [[Mithaniel Marr]], [[Rallos Zek]], [[Rodcet Nife]]
+|-
+                            || [[Wizard]]        || [[Freeport]], [[Qeynos]]               || [[Agnostic]], [[Bertoxxulous]], [[Erollisi Marr]], [[Innoruuk]], [[Karana]], [[Mithaniel Marr]], [[Rodcet Nife]], [[Solusek Ro]]
+|-
+|rowspan="5"| [[Iksar]]     || [[Monk]]          || [[New Sebilis Expedition]]|| [[Cazic-Thule (Lore)|Cazic-Thule]]
+|-
+                            || [[Necromancer]]   || [[New Sebilis Expedition]]|| [[Cazic-Thule (Lore)|Cazic-Thule]]
+|-
+                            || [[Shadow Knight]] || [[New Sebilis Expedition]]|| [[Cazic-Thule (Lore)|Cazic-Thule]]
+|-
+                            || [[Shaman]]        || [[New Sebilis Expedition]]|| [[Cazic-Thule (Lore)|Cazic-Thule]]
+|-
+                            || [[Warrior]]       || [[New Sebilis Expedition]]|| [[Cazic-Thule (Lore)|Cazic-Thule]]
+|-
+|rowspan="3"| [[Ogre]]      || [[Shadow Knight]] || [[Oggok]]                              || [[Cazic-Thule (Lore)|Cazic-Thule]], [[Rallos Zek]]
+|-
+                            || [[Shaman]]        || [[Oggok]]                              || [[Rallos Zek]]
+|-
+                            || [[Warrior]]       || [[Oggok]]                              || [[Agnostic]], [[Cazic-Thule (Lore)|Cazic-Thule]], [[Rallos Zek]]
+|-
+|rowspan="3"| [[Troll]]     || [[Shadow Knight]] || [[Grobb]]                              || [[Cazic-Thule (Lore)|Cazic-Thule]], [[Innoruuk]]
+|-
+                            || [[Shaman]]        || [[Grobb]]                              || [[Cazic-Thule (Lore)|Cazic-Thule]], [[Innoruuk]]
+|-
+                            || [[Warrior]]       || [[Grobb]]                              || [[Agnostic]], [[Cazic-Thule (Lore)|Cazic-Thule]], [[Innoruuk]], [[Rallos Zek]]
+|-
+|rowspan="5"| [[Wood Elf]]  || [[Bard]]          || [[Kelethin]]                           || [[Agnostic]], [[Brell Serilis]], [[Bristlebane]], [[Erollisi Marr]], [[Karana]], [[Mithaniel Marr]], [[Prexus]], [[Quellious]], [[Rallos Zek]], [[Rodcet Nife]], [[Solusek Ro]], [[The Tribunal]], [[Tunare (Lore)|Tunare]], [[Veeshan]]
+|-
+                            || [[Druid]]         || [[Kelethin]]                           || [[Tunare (Lore)|Tunare]]
+|-
+                            || [[Ranger]]        || [[Kelethin]]                           || [[Tunare (Lore)|Tunare]]
+|-
+                            || [[Rogue]]         || [[Kelethin]]                           || [[Agnostic]], [[Bristlebane]], [[Karana]], [[Tunare (Lore)|Tunare]]
+|-
+                            || [[Warrior]]       || [[Kelethin]]                           || [[Agnostic]], [[Karana]], [[Rallos Zek]], [[Tunare (Lore)|Tunare]]
+|-
+|}
+
+[[Category:Technical]]

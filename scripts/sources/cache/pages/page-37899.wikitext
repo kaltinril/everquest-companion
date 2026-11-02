@@ -1,0 +1,25 @@
+{{Factionpage|
+
+| description = The leaders of the three caster guilds of Erudin. This faction is supposedly the leaders of the [[Gate Callers]], [[Crimson Hands]], and [[Craftkeepers]] combined. 
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+* [[The Fisherman]]
+* [[The Lost Pet]]
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+
+}}

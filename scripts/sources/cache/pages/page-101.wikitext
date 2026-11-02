@@ -1,0 +1,229 @@
+{{disambig3|[[Monster Races]]}}
+
+'''Note: This page contains outdated information and needs updating!'''
+
+[[User:Alanna/Alanna's Race Unlock Guide|Click here for Alanna's Race Unlock Guide]]
+
+==Base Stats==
+{| class="eoTable2" style="text-align:left"
+|-
+! Race !! STR !! STA !! AGI !! DEX !! WIS !! INT !! CHA
+|-
+|| [[Barbarian]] || 103 || 95 || 82 || 70 || 70 || 60 || 55
+|-
+|| [[Dark Elf]] || 60 || 65 || 90 || 75 || 83 || 99 || 60
+|-
+|| [[Dwarf]] || 90 || 90 || 70 || 90 || 83 || 60 || 45
+|-
+|| [[Erudite]] || 60 || 70 || 70 || 70 || 83 || 107 || 70
+|-
+|| [[Froglok]] || 70 || 80 || 100 || 100 || 75 || 75 || 50
+|-
+|| [[Gnome]] || 60 || 70 || 85 || 85 || 67 || 98 || 60
+|-
+|| [[Half-Elf]] || 70 || 70 || 90 || 85 || 60 || 75 || 75
+|-
+|| [[Half Dark Elf]] || 75 || 75 || 80 || 80 || 55 || 95 || 70
+|-
+|| [[Halfling]] || 70 || 75 || 95 || 90 || 80 || 67 || 50
+|-
+|| [[High Elf]] || 55 || 65 || 85 || 70 || 95 || 92 || 80
+|-
+|| [[Human]] || 75 || 75 || 75 || 75 || 75 || 75 || 75
+|-
+|| [[Iksar]] || 70 || 70 || 90 || 85 || 80 || 75 || 55
+|-
+|| [[Kerran]] || 90 || 75 || 90 || 70 || 70 || 65 || 65
+|-
+|| [[Ogre]] || 130 || 122 || 70 || 70 || 67 || 60 || 37
+|-
+|| [[Troll]] || 108 || 109 || 83 || 75 || 60 || 52 || 40
+|-
+|| [[Wood Elf]] || 65 || 65 || 95 || 80 || 80 || 75 || 75
+|}
+__NOTOC__
+==[[Barbarian]] BAR==
+: <b>Faction Alignment:</b> Good
+: <b>Racial(s):</b> [[#Increased Consumption Rate|Increased Consumption Rate]], [[Slam]], +10 Cold Resist
+: <b>Starting City:</b> [[Halas]]
+: <b>Primary Class Choices:</b> [[Beastlord]], [[Berserker]], [[Rogue]], [[Shaman]], [[Warrior]]
+
+==[[Dark Elf]] DEF==
+: <b>Faction Alignment:</b> Evil
+: <b>Racial(s):</b> [[Hide]], [[#Ultravision|Ultravision]]
+: <b>Starting City:</b> [[Neriak]]
+: <b>Primary Class Choices:</b> [[Cleric]], [[Enchanter]], [[Magician]], [[Necromancer]], [[Rogue]], [[Shadow Knight]], [[Warrior]], [[Wizard]]
+
+==[[Dwarf]] DWF==
+: <b>Faction Alignment:</b> Good
+: <b>Racial(s):</b> [[#Barrel Roll|Barrel Roll]], [[#Infravision|Infravision]], [[Sense Heading]] (50), +5 Magic Resist, +5 Poison Resist
+: <b>Starting City:</b> [[South Kaladim|Kaladim]]
+: <b>Primary Class Choices:</b> [[Berserker]], [[Cleric]], [[Paladin]], [[Rogue]], [[Warrior]]
+
+==[[Erudite]] ERU==
+: <b>Faction Alignment:</b> Neutral
+: <b>Racial(s):</b> -5 Disease Resist, +5 Magic Resist
+: <b>Starting City:</b> [[Erudin]], [[Paineel]]
+: <b>Primary Class Choices:</b> [[Cleric]], [[Enchanter]], [[Magician]], [[Necromancer]], [[Paladin]], [[Shadow Knight]], [[Wizard]]
+
+==[[Froglok]] FRG==
+: <b>Faction Alignment:</b> Neutral
+: <b>Racial(s):</b> Increased Swimming, +15 Poison Resist
+: <b>Starting City:</b> [[Rathe Mountains]]
+: <b>Primary Class Choices:</b> [[Cleric]], [[Monk]], [[Necromancer]], [[Paladin]], [[Rogue]], [[Shadowknight]], [[Shaman]], [[Warrior]], [[Wizard]]
+
+==[[Gnome]] GNM==
+: <b>Faction Alignment:</b> Neutral
+: <b>Racial(s):</b> [[Skill Tinkering|Tinkering]], [[#Infravision|Infravision]]
+: <b>Starting City:</b> [[Ak'Anon]]
+: <b>Primary Class Choices:</b> [[Cleric]], [[Enchanter]], [[Magician]], [[Necromancer]], [[Paladin]], [[Rogue]], [[Shadowknight]], [[Warrior]], [[Wizard]]
+
+==[[Half-Elf]] HEF==
+: <b>Faction Alignment:</b> Neutral
+: <b>Racial(s):</b> [[#Infravision|Infravision]]
+: <b>Starting Cities:</b> [[Freeport]], [[Kelethin]], [[Felwithe]], [[Surefall Glade]], [[Qeynos]] 
+: <b>Primary Class Choices:</b> [[Bard]], [[Druid]], [[Paladin]], [[Ranger]], [[Rogue]], [[Warrior]]
+
+==[[Half Dark Elf]] HDE==
+: <b>[[Faction Alignment|Faction Alignment:]]</b> Neutral
+: <b>Racial(s):</b> [[Hide]], [[Sneak]], [[Infravision]], [[#Cursed Heritage|Cursed Heritage]], [[#Life Tracking|Life Tracking]]
+: <b>Starting City:</b> [[Nektropos Undercrofts]]
+: <b>Primary Class Choices:</b> [[Bard]], [[Berserker]], [[Enchanter]], [[Necromancer]], [[Ranger]], [[Rogue]], [[Shadow Knight]] (Based on Guild Masters in [[The Nektropos Undercroft]])
+
+==[[Halfling]] HFL==
+: <b>Faction Alignment:</b> Good
+: <b>Racial(s):</b> [[Hide]] (50), [[#Increased Consumption Rate|Increased Consumption Rate]], [[#Infravision|Infravision]], [[Sneak]] (50),  +5 Disease Resist, +5 Poison Resist
+: <b>Starting City:</b> [[Rivervale]]
+: <b>Primary Class Choices:</b> [[Cleric]], [[Druid]], [[Paladin]], [[Ranger]], [[Rogue]], [[Warrior]]
+
+==[[High_Elf|High Elf]] HIE==
+: <b>Faction Alignment:</b> Good
+: <b>Racial(s):</b> [[#Infravision|Infravision]]
+: <b>Starting City:</b> [[Felwithe]]
+: <b>Primary Class Choices:</b> [[Cleric]], [[Enchanter]], [[Magician]], [[Paladin]], [[Wizard]]
+
+==[[Human]] HUM==
+: <b>Faction Alignment:</b> Neutral
+: <b>Racial(s):</b> None
+: <b>Starting Cities:</b> [[Freeport]], [[Qeynos]]
+: <b>Primary Class Choices:</b> [[Bard]], [[Cleric]], [[Druid]], [[Enchanter]], [[Magician]], [[Monk]], [[Necromancer]], [[Paladin]], [[Ranger]], [[Rogue]], [[Shadow Knight]], [[Warrior]], [[Wizard]]
+
+==[[Iksar]] IKS==
+: <b>Faction Alignment:</b> Evil ("super evil", not friendly with the other evil races of Antonica)
+: <b>Racial(s):</b> [[Forage]], [[#Increased Armor Class|Increased Armor Class]], [[#Increased HP Regeneration|Increased HP Regeneration]], [[#Infravision|Infravision]], [[Swimming]] (100), -10 Cold Resist, +5 Fire Resist 
+: <b>Starting City:</b> [[New Sebilis Expedition]] ([[Northern Desert of Ro|North Ro]])
+: <b>Primary Class Choices:</b> [[Beastlord]], [[Monk]], [[Necromancer]], [[Shadow Knight]], [[Shaman]], [[Warrior]]
+
+==[[Kerran]] KER==
+: <b>Faction Alignment:</b> Neutral
+: <b>Racial(s):</b> [[Skill_Safe_Fall|Safe Fall]], [[Sneak]]
+: <b>Starting City:</b> [[Kerra Isle]]
+: <b>Primary Class Choices: [[Bard]], [[Berserker]], [[Beastlord]], [[Druid]], [[Rogue]], [[Shaman]], [[Warrior]]</b>
+
+==[[Ogre]] OGR==
+: <b>Faction Alignment:</b> Evil
+: <b>Racial(s):</b> [[#Increased Consumption Rate|Increased Consumption Rate]], [[#Infravision|Infravision]], [[#Frontal Stun Immunity|Frontal Stun Immunity]], [[Slam]]   
+: <b>Starting City:</b> [[Oggok]]
+: <b>Primary Class Choices:</b> [[Beastlord]], [[Berserker]], [[Shadow Knight]], [[Shaman]], [[Warrior]]
+
+==[[Troll]] TRL==
+: <b>Faction Alignment:</b> Evil
+: <b>Racial(s):</b> [[#Increased Consumption Rate|Increased Consumption Rate]], [[#Increased HP Regeneration|Increased HP Regeneration]], [[#Infravision|Infravision]], [[Slam]], -20 Fire Resist
+: <b>Starting City:</b> [[Grobb]]
+: <b>Primary Class Choices:</b> [[Beastlord]], [[Berserker]], [[Shadow Knight]], [[Shaman]], [[Warrior]]
+
+==[[Wood_Elf|Wood Elf]] ELF==
+: <b>Faction Alignment:</b> Good
+: <b>Racial(s):</b> [[Forage]], [[Hide]], [[#Infravision|Infravision]]
+: <b>Starting City:</b> [[Kelethin]]
+: <b>Primary Class Choices:</b> [[Bard]], [[Druid]], [[Ranger]], [[Rogue]], [[Warrior]]
+
+= Choosing a Race =
+
+See [[Choosing a Race]].
+
+=Faction Alignment=
+
+A brief explanation:
+
+* Races that are <i>Good</i> can typically enter other <i>Good</i> cities without being attacked.
+* Races that are <i>Evil</i> can typically enter other <i>Evil</i> cities without being attacked.
+* <i>Neutral</i> races can typically enter any city, and <i>Good/Evil</i> races can typically enter theirs.
+* Iksar are hated by every race, and other races will likely be attacked upon entering their city.
+* There ARE other factors, including Deity and Class choice, completed quests, etc.
+
+=* Listed below are all of the innate (non-skill) racials: *=
+==Barrel Roll==
+Male Dwarves have a unique jump animation, and while it is purely cosmetic (ie. has no in-game benefit), it ''is'' pretty cool.
+
+==Cursed Heritage==
+10% increased effectiveness of taps and runes. 20% reduced base health regen when outdoors in the day.
+
+Cursed Heritage works on: 
+* DD Lifetap Spells
+* DD Lifetap Procs (both weapon and VE)
+* Cast Runes
+* Click Runes (Bladestopper)
+
+Cursed Heritage stacks with Improved Vampirism III or Improved Damage III with:
+* DD Lifetap Spells
+* DD Lifetap Procs (Weapon only, not VE)
+
+Cursed Heritage does not work on: 
+* DoT Lifetaps
+* Berserker Blood Runes
+
+==Frontal Stun Immunity==
+[[Ogre|Ogres]] cannot be stunned from the front, which gives them an advantage over other races.
+
+* Enemy attacks can still push you backwards, which will interrupt your spell casting.
+* Tip: You can stand in a corner to avoid being pushed back.
+* Enemy attacks still have a chance to interrupt on hit. This chance is increased on some attacks such as bash.
+Steadfast Will is an [[Alternate Advancement|AA]] you can purchase that gives you Stun Immunity.
+
+==Increased Armor Class==
+[[Iksar]] start with a +15 AC bonus (+17 if they are a [[Warrior]]) over other races, which scales with level, increasing up to a maximum of +35.
+
+==Increased Consumption Rate==
+[[Barbarian]]s, [[Halfling]]s, [[Ogre]]s, and [[Troll]]s all consume one unit of food and drink every 30 mins, while the remaining races consume one per hour.
+
+==Increased HP Regeneration==
+
+'''Note: this table is incorrect and needs to be updated for EQL - sitting does not improve regen rates.'''
+
+Both [[Iksar]] and [[Troll]]s have higher HP regeneration rates (per tick):
+
+{| class="eoTable2" style="text-align: center; width: 0%"
+|-
+! colspan="3" style="text-align: center"|Other Races!! !!colspan="3" style="text-align: center"|Iksar/Troll
+|-
+! Standing !! Feigned !! Sitting !! Level Range !! Standing !! Feigned !! Sitting
+|-
+|  1 || 1 || 2 || 1-19 ||  2 || 2 || 4
+|-
+| 1 || 1 || 3 || 20-49 || 2 || 2 || 6
+|-
+| 1 || 1 || 4 || 50 || 2 || 2 || 8
+|-
+| 2 || 3 || 5 || 51-55 || 6 || 8 || 12
+|-
+| 3 || 4 || 6 || 56-59 || 10 || 12 || 16
+|-
+| 4 || 5 || 7 || 60 || 12 || 14 || 18
+|-
+|}
+
+A "tick" happens every 6 seconds (server side).
+
+==Infravision==
+Slightly improved night vision, but not as good as the [[Dark Elf|Dark Elf]]'s Ultravision. Has a slightly reddish tint.
+
+==Life Tracking==
+Increased sensory range for living NPCs on your map.
+
+==Ultravision==
+:''See also: [[Ultravision]] (Spell)''
+Extremely improved night vision, better than Infravision.  Ultravision has a slightly purple tint to it.
+
+
+[[Category:Character]]

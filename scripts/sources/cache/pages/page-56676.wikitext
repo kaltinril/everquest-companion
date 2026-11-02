@@ -1,0 +1,13 @@
+EverQuest includes a few chat variables which are mostly useful for pronouns.
+
+%m :: You, or your target's pet.
+
+%o :: Outputs the objective gender-specific pronoun of your target (Him, Her, It).
+
+%p :: Outputs the possessive gender-specific pronoun of your target (His, Her, Its).
+
+%r :: The race of your target.
+
+%s :: Outputs the subjective gender-specific pronoun for the target (He, She, It).
+
+%t :: Outputs the name of your current target.

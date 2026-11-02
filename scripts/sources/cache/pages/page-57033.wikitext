@@ -1,0 +1,7 @@
+local p = {}
+
+function p.hello(frame)
+	return "Module test works"
+end
+
+return p

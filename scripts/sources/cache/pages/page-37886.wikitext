@@ -1,0 +1,132 @@
+{{Factionpage|
+
+| description = The Dwarven King of Kaladim.
+
+| zones_raise = 
+
+* [[Oggok]]
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Crushbone]]
+* [[Dagnor's Cauldron]]
+* [[Innothule Swamp]]
+* [[Rathe Mountains]]
+* [[Kaladim|North Kaladim]]
+* [[Qeynos Hills]]
+* [[Kaladim|South Kaladim]]
+* [[Steamfont Mountains]]
+
+| quests_raise = 
+
+* [[Aviak Chicks]]
+* [[Blyle Bundin's Head]]
+* [[Bone Chips Kaladim]]
+* [[Brell Serilis Symbol Quests|Brell Serilis Initiate]]
+* [[Chalice of Conquest Quest]]
+* [[Cleaner Clockwork]]
+* [[Crushbone Belts]]
+* [[Crushbone Shoulderpads Quest]]
+* [[Knight Card Quest]]
+* [[Ogre Heads]]
+* [[Rat Pelts]]
+* [[Runnyeye Warbeads (Kaladim Warrior)]]
+* [[Scarab Armor Quests]]
+* [[Skunk Hunting]]
+* [[Slave Keys]]
+* [[Trueshot Longbow Quest]]
+* [[Trumpy Irontoe]]
+* [[Tumpy Tonics]]
+
+| quests_lower = 
+
+* [[Clurg's New Creation]]
+* [[Clurg's Revenge]]
+* [[Exotic Drinks]]
+* [[Feeding Dooga]]
+* [[Pickled Frogloks]]
+* [[The Bridge]]
+
+| mobs_raise = 
+
+* [[Chef Dooga]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Clurg]] <span class='fmz'>(Oggok - Merchant)</span>
+
+| mobs_lower = 
+
+* [[a dwarven slave (male)]]  <span class='fmz'>(Crushbone)</span>
+* [[a dwarven smith]]  <span class='fmz'>(Crushbone)</span>
+* [[Aanina Rockfinder]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Axa Stormshield]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Baleki Nightseer]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Bndainy Everhot]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Bunk Odon]]  <span class='fmz'>(Innothule Swamp)</span>
+* [[Darthur Nightseer]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Datur Nightseer]] <span class='fmz'>(North Kaladim - Paladin Guildmaster)</span>
+* [[Dimlore Stormhammer]] <span class='fmz'>(Steamfont Mountains - NPC, Non-Quest)</span>
+* [[Dindaek Everhot]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Dru Razbind]] <span class='fmz'>(Butcherblock Mountains - Quest NPC)</span>
+* [[Dunony Chestire]] <span class='fmz'>(North Kaladim - Paladin Guildmaster)</span>
+* [[Duppa Pickstone]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Fettar Steelwield]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Furtog Ogrebane]] <span class='fmz'>(South Kaladim - Warrior Guildmaster)</span>
+* [[Gand Truelink]] <span class='fmz'>(Butcherblock Mountains - Merchant)</span>
+* [[Gralpa Axeheft]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Guard Adolar]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Adolmer]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Anathur]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Badmer]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Bobbin]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Cardaff]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Clendin]] <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Guard Dalammer]] <span class='fmz'>(North Kaladim)</span>
+* [[Guard Dalthur]] <span class='fmz'>(North Kaladim)</span>
+* [[Guard Didek]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Dinamin]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Dinler]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Doradek]] <span class='fmz'>(North Kaladim)</span>
+* [[Guard Gabbles]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Hinolmer]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Humkor]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Humphet]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Kaldolar]] <span class='fmz'>(North Kaladim)</span>
+* [[Guard Kanuf]] <span class='fmz'>(North Kaladim)</span>
+* [[Guard Kathur]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Kindor]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Koranin]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Mandin]] <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Guard Ninadek]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Ninaf]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Stump]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Tantan]] <span class='fmz'>(South Kaladim)</span>
+* [[Gundalthur Izuran]] <span class='fmz'>(Dagnor's Cauldron - NPC, Non-Quest)</span>
+* [[Gunlok Jure]] <span class='fmz'>(North Kaladim - Paladin Guildmaster)</span>
+* [[Karam Dragonforge]] <span class='fmz'>(Mountains of Rathe - Merchant)</span>
+* [[King Kazon Stormhammer]]  <span class='fmz'>(South Kaladim)</span>
+* [[Krako Stonesplitter]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Murlond Everhot]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Nancine]] <span class='fmz'>(Mountains of Rathe - NPC, Non-Quest)</span>
+* [[Nultal Malfoot]] <span class='fmz'>(North Kaladim - Cleric Guildmaster)</span>
+* [[Priestess Ghalea]] <span class='fmz'>(North Kaladim - Cleric Guildmaster)</span>
+* [[Ragunk Everhot]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Resron Silvern]] <span class='fmz'>(North Kaladim - Cleric Guildmaster)</span>
+* [[Serenk Greybloom]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Sigan Ilbirkun]] <span class='fmz'>(Dagnor's Cauldron - NPC, Non-Quest)</span>
+* [[Storn Trueblade]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Tagnis Ginfarr]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Tempia Lauley]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Thar Kelgand]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Tissin Greybloom]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Tortuk Everhot]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Trantor Everhot]]  <span class='fmz'>(North Kaladim)</span>
+* [[Zeffan Holdsman]] <span class='fmz'>(North Kaladim - Merchant)</span>
+
+}}
+= Suggested Route =
+*[[Tumpy Tonics]] (+[[Storm Guard]], +[[Kazon Stormhammer]], +[[Miners Guild 249]], +[[Merchants of Kaladim]], -[[Craknek Warriors]])
+*[[Bone Chips (Kaladim)]] (+[[Clerics of Underfoot]], +[[Kazon Stormhammer]], +[[Miners Guild 249]])
+
+
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

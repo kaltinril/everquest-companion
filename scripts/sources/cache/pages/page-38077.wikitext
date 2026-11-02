@@ -1,0 +1,26 @@
+{{Factionpage|
+
+| description = Non-KOS NPCs in the Plane of Sky are on this faction (including Sirran the Lunatic).
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Plane of Sky]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Sirran the Lunatic]] <span class='fmz'>(Plane of Sky - Quest NPC)</span>
+* [[Torgon Blademaster]] <span class='fmz'>(Plane of Sky - Quest NPC)</span>
+
+}}

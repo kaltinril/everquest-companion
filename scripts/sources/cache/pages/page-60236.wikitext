@@ -1,0 +1,77 @@
+Class armor sets from the [[Plane of Fear]] and [[Plane of Hate]] drop differently than they did in classic Everquest.  Instead of a single type of mob dropping every armor piece for a specific class, most planar mobs can drop a single armor piece from a group of classes.  The result is that every class needs to kill many different enemies across Fear and Hate to collect a full set, rather than trying to farm all their drops from a single type of enemy in only one Plane.
+
+== Groups ==
+{| class="wikitable"
+|+
+!Group 1 Classes
+!Group 2 Classes
+|-
+|[[Lustrous Russet Armor|Any Plate/Chain]]
+|[[Midnight Clad Armor|Any Leather/Cloth]]
+|-
+|[[Anthemion Armor|Beastlord]]
+|[[Imbrued Armor|Bard]]
+|-
+|[[Shadow Rage Armor|Berserker]]
+|[[Insidious Armor|Enchanter]]
+|-
+|[[Ethereal Mist Armor|Cleric]]
+|[[Apothic Armor|Magician]]
+|-
+|[[Vermiculated Armor|Druid]]
+|[[Blighted Armor|Necromancer]]
+|-
+|[[Shiverback-hide Armor|Monk]]
+|[[Woven Shadow Armor|Rogue]]
+|-
+|[[Valorium Armor|Paladin]]
+|[[Umbral Platemail|Shadow Knight]]
+|-
+|[[Thorny Vine Armor|Ranger]]
+|[[Indicolite Armor|Warrior]]
+|-
+|[[Rune Etched Armor|Shaman]]
+|[[Carmine Armor|Wizard]]
+|}
+
+== Group 1 Mobs ==
+
+=== Plane of Fear ===
+Chest, Hands, Feet, and Wrist armor drop in the [[Plane of Fear]].
+{| class="wikitable"
+|+
+!Armor Slot
+!Mobs
+|-
+|Chest
+|[[a glare lord]]<br>[[a tentacle tormentor]]
+|-
+|Hands
+|[[a scareling]]<br>[[a shiverback]]
+|-
+|Feet
+|[[a boogeyman]]<br>[[a phantasm]]
+|-
+|Wrist
+|[[a decrepit warder]]<br>[[a samhain]]
+|}
+
+=== Plane of Hate ===
+Arms, Head, Legs, and Wrist armor drop in the [[Plane of Hate]].
+{| class="wikitable"
+|+
+!Armor Slot
+!Mobs
+|-
+|Arms
+|[[a forsaken revenant]] (female)<br>[[an ire ghast]]
+|-
+|Head
+|[[Cleric of Innoruuk]]
+|-
+|Legs
+|[[an elite dragoon]] (male)<br>[[Innoruuk's Chosen]] (male)<br>[[a Disciple of Innoruuk]]<br>[[a Knight of Innoruuk]]
+|-
+|Wrist
+|[[an abhorrent]]<br>[[a scorn banshee]]
+|}

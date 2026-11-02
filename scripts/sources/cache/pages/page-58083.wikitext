@@ -1,0 +1,20 @@
+Classes: [[Paladin]]
+
+Level requirement: 9
+
+Reuse: 15 seconds
+
+Autoskill: Yes 
+
+This ability smites your current target, dealing physical damage as well as converting 6% (rounded down) of your maximum mana into amplified magic damage.
+
+Smite can [[Double Attack|Double]] and [[Triple Attack]].
+
+Smite also reduces the [[Lay on Hands]] cooldown by 60 seconds every time it lands, including the extra hits from double and triple attack.
+
+Macro command: <code>/doability Smite</code>
+
+Skill Cap: 210 at level 50.
+
+{{Navbox Skills}}
+[[Category: Skills]]

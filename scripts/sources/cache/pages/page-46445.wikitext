@@ -1,0 +1,29 @@
+The merchants listed here buy and sell items at usurious rates- Buying at half price, and selling for double. 
+
+=== Greedy Merchants ===
+
+{| class="eoTable3 sortable"
+|-
+! Zone                 !! Name                     !! Location      !! Alignment !! Description !! Notes
+|-
+| [[East Commonlands]] || [[A Shady Swashbuckler]] || (-1677, -141) || Neutral   || Human       || Well-Balanced Weapons; Food; Located in the tunnel
+|-
+| [[Greater Faydark ]] || [[Merchant Ueaas]]       || (-85, 601)    || Good      || Wood Elf    || ...
+|-
+| [[North Freeport]]   || [[Aimie Moonspin]]       || (-54, -246)   || Good      || Human       || Convenient vendor in North Freeport Bank - sells gems
+|-
+| [[North Qeynos]]     || [[Tubal Weaver]]         || (216, 94)     || Good      || Human       || ...
+|- 
+| [[South Qeynos]]     || [[Meera Lylon]]          || (187, -315)   || Good      || Human       || Would need invis to reach as is inside Qeynos
+|-
+| [[West Commonlands]] || [[Noresa Sparkle]]       || (-701, 268)   || Neutral   || Human       || Gems; Located in hut
+|-
+| [[West Freeport]]    || [[Boomba the Big]]       || (-17, -44)    || Good      || Ogre        || Sells pickles within the gates of the West Freeport newbie area
+|- 
+| [[West Freeport]]    || [[Ping Fuzzlecutter]]    || (-253, 525)   || Good      || Gnome       || On the outskirts of West Freeport newbie area
+|- 
+| [[Misty Thicket]]    || [[Sonsa Fromp]]          || (670 , -2211) || Good      || Halfling    || tailoring supplies
+|}
+
+
+[[Category:Player Guides]]

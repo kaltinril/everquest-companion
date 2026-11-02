@@ -1,0 +1,28 @@
+{{Factionpage|
+
+| description = The Hornets of Burning Woods.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Burning Woods]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a cinder hornet]]  <span class='fmz'>(Burning Woods)</span>
+* [[a scoriae hornet]]  <span class='fmz'>(Burning Woods)</span>
+* [[an ash hornet]]  <span class='fmz'>(Burning Woods)</span>
+* [[an ember hornet]] <span class='fmz'>(Burning Woods - Summoned)</span>
+
+}}

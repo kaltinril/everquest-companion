@@ -1,0 +1,12 @@
+Classes: WAR
+
+This ability cleaves your target with your primary and optionally secondary weapon, then attacks up to 3 additional enemies in front of you. Reduces the cooldown time of the Rampage AA.
+
+Cleave will double and triple attack based on your skill.
+
+Macro command: <code>/doability Cleave</code>
+
+Skill Cap at level 50: 200
+
+{{Navbox Skills}}
+[[Category: Skills]]

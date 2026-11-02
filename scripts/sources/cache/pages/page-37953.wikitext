@@ -1,0 +1,84 @@
+{{Factionpage|
+
+| description = Powerful [[Necromancer]] in Steamfont, enemy of the gnomes.
+
+| zones_raise = 
+
+* [[Ak'Anon]]
+* [[Steamfont Mountains]]
+
+| zones_lower = 
+
+* [[Ak'Anon]]
+* [[Lesser Faydark]]
+* [[Steamfont Mountains]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[a mechanic]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork Cleaner]] <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork IIIZ]] <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork IIZ]] <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork IVB]] <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork IZ]] <span class='fmz'>(Ak'Anon)</span>
+* [[clockwork scrubber]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork Sweeper]] <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XE]] <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIIC]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIIE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIVE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIXA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVD]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVID]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIIA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIIC]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIIIE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXD]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXID]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIIIA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIVD]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIXB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVD]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVIC]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVIIC]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVIIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXXD]]  <span class='fmz'>(Ak'Anon)</span>
+* [[King Ak`Anon]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Lodrand Dindlenod]] <span class='fmz'>(Steamfont Mountains - NPC, Non-Quest)</span>
+* [[Thetherthag Wakintrob]]  <span class='fmz'>(Steamfont Mountains)</span>
+
+| mobs_lower = 
+
+* [[a minotaur slaver]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[Feddi Dooger]] <span class='fmz'>(Steamfont Mountains)</span>
+* [[Meldrath The Malignant]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[Minotaur Guard]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[Minotaur Hero]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[Minotaur Lord]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[Minotaur Sentry]]  <span class='fmz'>(Steamfont Mountains)</span>
+
+}}

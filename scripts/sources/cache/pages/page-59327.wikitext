@@ -1,0 +1,11 @@
+{{Classic Era}}
+The '''Quest Journal''' tracks Task-system quests and objectives in EverQuest Legends. By default, press '''Alt+Q''' to open it.
+
+The launch-day redesign of [[Kerra Island|Kerra Isle]] uses this Task system for its new-character quests.
+
+==See also==
+* [[Aid the Kerrans of Kerra Isle]]
+* [[Patch Notes#2026-07-28 - Launch Day Patch Notes|July 28, 2026 launch-day patch notes]]
+
+[[Category:Game Mechanics]]
+[[Category:Technical]]

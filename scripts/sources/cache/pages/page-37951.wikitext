@@ -1,0 +1,53 @@
+{{Factionpage|
+
+| description = This tribe of Kunark Goblins are aligned with the [[Goblins of Mountain Death]].
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Firiona Vie]]
+* [[Frontier Mountains]]
+* [[Lake of Ill Omen]]
+* [[Warsliks Woods]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a goblin bloodtracer]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin bonecaster]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin fanatic]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a goblin hextracer]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin hunter]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[A goblin legate]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a goblin mosstrooper]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a goblin outrider]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[A Goblin Pillager]] <span class='fmz'>(Firiona Vie)</span>
+* [[a goblin scout]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin skirmisher]] <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin skirmisher]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[A Goblin Slinker]]  <span class='fmz'>(?)</span>
+* [[a goblin soothsayer]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin stalagknight]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a goblin thief]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin watcher]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a goblin whelp]] <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a goblin whelp]] <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin witchdoctor]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[goblin battlemaster]]  <span class='fmz'>(Firiona Vie)</span>
+* [[goblin raider]]  <span class='fmz'>(Firiona Vie)</span>
+* [[goblin spirit caller]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[goblin warlord]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[Grachnist the Destroyer]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[Lord Gorelik]]  <span class='fmz'>(Lake of Ill Omen)</span>
+
+}}

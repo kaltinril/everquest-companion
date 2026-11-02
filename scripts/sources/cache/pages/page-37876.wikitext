@@ -1,0 +1,208 @@
+{{Factionpage|
+
+| description = This is the faction of the dragons split from the Claws of Veeshan and have taken up residence in Kunark. Their greatest enemies are [[Venril Sathir]], [[Mayong Mistmoore]], and the [[League of Antonican Bards]]. Ideologically, the Ring of Scale is a much more aggressive faction which actively seeks to subjugate and destroy the mortal races and other enemies of dragons. In contrast, the [[Claws of Veeshan]] are merely intolerant of non-dragons and seek to seclude themselves and worship Veeshan from their cities and temples on Velious.
+
+This is the primary faction of most of the powerful dragons on Kunark, but not the primary faction of lesser dragonkin which are assigned to [[Minions of Scale]].
+
+| zones_raise = 
+
+* [[Ak'Anon]]
+* [[Butcherblock Mountains]]
+* [[Mistmoore Castle]]
+* {{VeliousGray| [[Dragon Necropolis]] }}
+* [[Freeport|East Freeport]]
+* [[Erudin]]
+* [[Everfrost Peaks]]
+* [[Greater Faydark]]
+* [[Halas]]
+* [[Highpass Keep]]
+* [[Highpass Hold]]
+* [[Innothule Swamp]]
+* [[Nektulos Forest]]
+* [[Northern Karana]]
+* [[Ocean of Tears]]
+* [[Permafrost]]
+* [[Qeynos Hills]]
+* [[Rivervale]]
+* [[Kaladim|South Kaladim]]
+* [[Southern Karana]]
+* [[Qeynos|South Qeynos]]
+* [[Steamfont Mountains]]
+* [[Surefall Glade]]
+* [[The Feerrott]]
+* [[Freeport|West Freeport]]
+* [[Western Plains of Karana]]
+
+| zones_lower = 
+
+* [[Burning Woods]]
+* {{VeliousGray| [[Dragon Necropolis]] }}
+* [[Dreadlands]]
+* [[Emerald Jungle]]
+* [[Skyfire Mountains]]
+* [[Timorous Deep]]
+* [[Veeshan's Peak]]
+* {{VeliousGray| [[Western Wastes]] }}
+
+| quests_raise = 
+
+* [[Rogue Redemption]]
+
+| quests_lower = 
+
+* [[Aenia and Behroe]]
+* [[Bard Reports]]
+* [[Fabian's Strings]]
+* [[Going Postal|Going Postal (Ak'Anon to Kelethin)]]
+* [[Going Postal|Going Postal (Butcherblock to Kelethin)]]
+* [[Going Postal|Going Postal (East Freeport)]]
+* [[Going Postal|Going Postal (Erudin to Qeynos)]]
+* [[Going Postal|Going Postal (Feerrott to Freeport)]]
+* [[Going Postal|Going Postal (Felwithe to Kelethin)]]
+* [[Going Postal|Going Postal (Halas to Qeynos)]]
+* [[Going Postal|Going Postal (Highpass)]]
+* [[Going Postal|Going Postal (Innothule)]]
+* [[Going Postal|Going Postal (Kaladim to Kelethin)]]
+* [[Going Postal|Going Postal (Kelethin to Freeport)]]
+* [[Going Postal|Going Postal (Nektulos)]]
+* [[Going Postal|Going Postal (Qeynos)]]
+* [[Going Postal|Going Postal (Rivervale)]]
+* [[Going Postal|Going Postal (Surefall Glade to Qeynos)]]
+* [[Going Postal|Going Postal (West Karana to Qeynos)]]
+* [[Qeynos Badge Quests|Investigator's Badge (Badge #1)]]
+* [[Qeynos Badge Quests|Qeynos Badge of Honor (Badge #4)]]
+* [[Rogue Errands]]
+* [[Taxes]]
+* [[Winds of Karana]]
+
+| mobs_raise = 
+
+* [[a cloaked dhampyre]] <span class='fmz'>(Castle Mistmoore - Undead)</span>
+* [[a dark elf noble]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a dark offerer]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a dark ritualist]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a dark sacrificer]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a deathly harbinger]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a deathly herald]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a deathly usher]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a flouting gargoyle]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a gargoyle]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[a ghastish ancille]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a ghostly ancille]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a ghoulish ancille]] <span class='fmz'>(Castle Mistmoore - Undead)</span>
+* [[a glyphed custodian]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed familiar]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed forbidder]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed ghoul]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed guard]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed sentry]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed warder]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a goblin alchemist]]  <span class='fmz'>(Permafrost Keep)</span>
+* [[a goblin archeologist]]  <span class='fmz'>(Permafrost Keep)</span>
+* [[a goblin preacher]]  <span class='fmz'>(Permafrost Keep)</span>
+* [[a goblin wizard (Permafrost)]] <span class='fmz'>(Permafrost Keep)</span>
+* [[a grinning gargoyle]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a hemo enologist]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a jeering gargoyle]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a leering gargoyle]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a Mistmoore guard]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a negotiator]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a noble]] <span class='fmz'>(High Keep - NPC, Non-Quest)</span>
+* [[a pledge familiar]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a shadowy sage]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a shadowy scribe]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a shadowy scrivener]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a sneering gargoyle]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a soul seductress]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a spectral ancille]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a spiritish ancille]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a thought defiler]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a thought spoiler]] <span class='fmz'>(Castle Mistmoore - Undead)</span>
+* [[a vampiric ancille]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a will pillager]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a will sapper]] <span class='fmz'>(Castle Mistmoore - Undead)</span>
+* [[an advisor]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[an ancille cook]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[an ice giant youth]]  <span class='fmz'>(Permafrost Keep)</span>
+* [[an imp familiar]] <span class='fmz'>(Castle Mistmoore - Summoned)</span>
+* [[an initiate familiar]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[an investigator]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[an orcish mountaineer]]  <span class='fmz'>(Everfrost Peaks)</span>
+* [[Butler Syncall]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Canlan Talespinner]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Cordelia Minster]] <span class='fmz'>(North Karana - Quest NPC)</span>
+* [[Dark Deathsinger]] <span class='fmz'>(Innothule Swamp - Quest NPC)</span>
+* [[Dimlore Stormhammer]] <span class='fmz'>(Steamfont Mountains - NPC, Non-Quest)</span>
+* [[Dionna]] <span class='fmz'>(South Qeynos)</span>
+* [[Drizda Tunesinger]] <span class='fmz'>(The Feerrott - Quest NPC)</span>
+* [[Dyrna Nlith]] <span class='fmz'>(High Keep - NPC, Non-Quest)</span>
+* [[Enynti]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Flayer Hopkins]] <span class='fmz'>(High Keep - NPC, Non-Quest)</span>
+* [[Garton Viswin]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Idia]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Jakum Webdancer]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Kilam Oresinger]] <span class='fmz'>(South Kaladim - Quest NPC)</span>
+* [[King Kazon Stormhammer]]  <span class='fmz'>(South Kaladim)</span>
+* [[Lady Vox]]  <span class='fmz'>(Permafrost Keep)</span>
+* [[Lasna Cheroon]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Lislia Goldtune]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Lyra Lyrestringer]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Maid Issis]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Marton Stringsinger]] <span class='fmz'>(Halas - Quest NPC)</span>
+* [[Marus Kemson]] <span class='fmz'>(East Freeport - Bard Guildmaster)</span>
+* [[Mistrana Two Notes]] <span class='fmz'>(West Karana - Quest NPC)</span>
+* [[Misty Storyswapper]] <span class='fmz'>(Qeynos Hills - NPC, Non-Quest)</span>
+* [[Mynthi Davissi]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Princess Cherista]] <span class='fmz'>(Castle Mistmoore - Undead)</span>
+* [[Silna Songsmith]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Siltria Marwind]] <span class='fmz'>(Butcherblock Mountains - Quest NPC)</span>
+* [[Sivina Lutewhisper]] <span class='fmz'>(Surefall Glade - Quest NPC)</span>
+* [[Ticar Lorestring]] <span class='fmz'>(Erudin - Quest NPC)</span>
+* [[Travis Two Tone]] <span class='fmz'>(Nektulos Forest - Quest NPC)</span>
+* [[Trissa Whistlesong]] <span class='fmz'>(West Freeport - NPC, Non-Quest)</span>
+* [[Tyrana Slil]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Vhalen Nostrolo]] <span class='fmz'>(South Karana - Quest NPC)</span>
+* [[Vicus Nonad]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[Wres Corber]] <span class='fmz'>(Highpass Hold - NPC, Non-Quest)</span>
+* [[Zlandicar]] <span class='fmz'>(Dragon Necropolis)</span>
+
+| mobs_lower = 
+
+* [[a chromadrac]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[a guardian wurm]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[a lava walker (Wyvern)]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[a mature chromadrac]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[a mature wurm]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[a mature wyvern]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[a racnar]] <span class='fmz'>(Veeshan's Peak)</span>
+* [[a shadow drake]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[a skyash drake]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[a skycinder drake]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[a wandering wurm]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[a wurm spirit]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[a wyvern]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[an ancient wyvern]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[an elder wyvern]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[an old wurm]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[Azdalin]]  <span class='fmz'>(Burning Woods)</span>
+* [[Black Scar]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[Eldrig the Old]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[Entalon]] <span class='fmz'>(Burning Woods)</span>
+* [[Esorpa of the Ring]]  <span class='fmz'>(Western Wastes)</span>
+* [[Faerie of Dismay]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[Faydedar]]  <span class='fmz'>(Timorous Deep)</span>
+* [[Gorenaire]]  <span class='fmz'>(Dreadlands)</span>
+* [[Guardian of Felia]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[Gylton]]  <span class='fmz'>(Burning Woods)</span>
+* [[Hoshkar]]  <span class='fmz'>(Veeshan's Peak)</span>
+* [[Jaled Dar`s shade]] <span class='fmz'>(Dragon Necropolis - Quest NPC)</span>
+* [[Nezekezena]]  <span class='fmz'>(Burning Woods)</span>
+* [[Phara Dar]]  <span class='fmz'>(Veeshan's Peak)</span>
+* [[Phurzikon]]  <span class='fmz'>(Burning Woods)</span>
+* [[Severilous]]  <span class='fmz'>(Emerald Jungle)</span>
+* [[Silverwing]]  <span class='fmz'>(Veeshan's Peak)</span>
+* [[Talendor]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[Xygoz]]  <span class='fmz'>(Veeshan's Peak)</span>
+
+}}
+[[Category:Significant Factions]]

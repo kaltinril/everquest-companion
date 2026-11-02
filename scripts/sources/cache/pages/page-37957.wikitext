@@ -1,0 +1,78 @@
+{{Factionpage|
+
+| description = Temple of Solusek Ro inhabitants, important for the many class quests there.
+
+| zones_raise = 
+
+* [[Lesser Faydark]]
+* [[Nektulos Forest]]
+* [[Lavastorm]]
+* [[Innothule Swamp]]
+
+
+| zones_lower = 
+
+* [[Mistmoore Castle]]
+* [[Lake Rathetear]]
+* [[Southern Desert of Ro]]
+* [[Temple of Solusek Ro]]
+* {{VeliousGray| [[Western Wastes]] }}
+
+| quests_raise = 
+
+* [[Acumen Mask Quest]]
+* [[Lambent Armor Quests|Bard Lambent Gems]]
+* [[Lambent Armor Quests|Bard Lambent Helm]]
+* [[Broom Of Trilon Quest]]
+* [[Clay Bracelet Quest]]
+* [[Coin of Tash (Tashania)]]
+* [[Darkwood Staff Quest]]
+* [[Earthen Boots Quest]]
+* [[Ortallius' Cutthroat Rings]]
+* [[Rathmana's Traveling Offer]]
+* [[Respecialization]]
+* [[Rod of Insidious Glamour Quest]]
+* [[Rogue Redemption]]
+* [[Runescale Cloak Quest]]
+* [[Shovel Of Ponz Quest]]
+* [[Solusek's Flower]]
+* [[Stein Of Ulissa Quest]]
+* [[Torch Of Alna Quest]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[a shadowed man]] <span class='fmz'>(Lesser Faydark - Summoned)</span>
+
+| mobs_lower = 
+
+* [[a keeper]]  <span class='fmz'>(Temple of Solusek Ro)</span>
+* [[a seeker]]  <span class='fmz'>(Temple of Solusek Ro)</span>
+* [[a ward of ro]] <span class='fmz'>(Temple of Solusek Ro - Summoned)</span>
+* [[an undead knight]] <span class='fmz'>(Temple of Solusek Ro - Quest NPC)</span>
+* [[Blaize The Radiant]] <span class='fmz'>(Temple of Solusek Ro - Quest NPC)</span>
+* [[Cryssia Stardreamer]] <span class='fmz'>(Temple of Solusek Ro - Quest NPC)</span>
+* [[Gardern]] <span class='fmz'>(Temple of Solusek Ro - Quest NPC)</span>
+* [[Gavel the Temperant]] <span class='fmz'>(Temple of Solusek Ro - Quest NPC)</span>
+* [[Genni]] <span class='fmz'>(Temple of Solusek Ro - Quest NPC)</span>
+* [[Joyce]] <span class='fmz'>(Temple of Solusek Ro - Quest NPC)</span>
+* [[Lon the redeemed]] <span class='fmz'>(Temple of Solusek Ro - Quest NPC)</span>
+* [[Lord Lyfyx of Burwood]] <span class='fmz'>(Temple of Solusek Ro - Quest NPC)</span>
+* [[Lord Searfire]] <span class='fmz'>(Temple of Solusek Ro - Quest NPC)</span>
+* [[Makil Rargon]]
+* [[Ortallius]] <span class='fmz'>(South Ro - Quest NPC)</span>
+* [[Ostorm]] <span class='fmz'>(Temple of Solusek Ro - Quest NPC)</span>
+* [[Romar Sunto]] <span class='fmz'>(Temple of Solusek Ro - Quest NPC)</span>
+* [[Ssynthi]] <span class='fmz'>(Castle Mistmoore - Quest NPC)</span>
+* [[Sultin]] <span class='fmz'>(Temple of Solusek Ro - Quest NPC)</span>
+* [[Syllina]] <span class='fmz'>(Temple of Solusek Ro - Quest NPC)</span>
+* [[Tazgar]] <span class='fmz'>(Temple of Solusek Ro - NPC, Non-Quest)</span>
+* [[Turgan]] <span class='fmz'>(Lake Rathetear)</span>
+* [[Vilissia]] <span class='fmz'>(Temple of Solusek Ro - Quest NPC)</span>
+* [[Vrynn]] <span class='fmz'>(Lake Rathetear - Quest NPC)</span>
+* [[Vurgo]] <span class='fmz'>(Temple of Solusek Ro - Quest NPC)</span>
+* [[Walthin Fireweaver]] <span class='fmz'>(Temple of Solusek Ro - Quest NPC)</span>
+
+}}

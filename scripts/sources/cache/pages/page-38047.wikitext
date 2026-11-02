@@ -1,0 +1,207 @@
+{{Velious Era}}
+{{Factionpage|
+
+| description = Faction of the Lord of the Dragons of Velious, [[Lord Yelinak]]. Only one other NPC, the rare spawn Wyvern [[Tsiraka]] of Western Wastes, share this faction.
+
+| zones_raise =
+
+* [[Kael Drakkel]]
+* [[Temple of Veeshan]]
+
+| zones_lower =
+
+* [[Cobalt Scar]]
+* [[Dragon Necropolis]]
+* [[Great Divide]]
+* [[Skyshrine]]
+* [[Temple of Veeshan]]
+* [[The Wakening Land]]
+* [[Western Wastes]]
+
+| quests_raise =
+
+* [[Aid the Dar Brood]]
+* [[Emil's Report]]
+* [[Friend of the Kin]]
+* [[Helms of Giant Warriors]]
+* [[Hsagra's Wrath Quest]]
+* [[Leuz's Task]]
+* [[Mercenary Assignments Quest]]
+* [[Ralgyn's Promise]]
+* [[Request of the Arcane]]
+* [[Spider Legs Quest]]
+* [[Test of the Fire Storm]]
+* [[Test of the Ruby Tear]]
+* [[The Spirit of Garzicor]]
+* [[Tormax's Head - Dragons]]
+* [[Velium Retrieval]]
+
+* [[Bard Skyshrine Armor Quests]]
+* [[Cleric Skyshrine Armor Quests]]
+* [[Druid Skyshrine Armor Quests]]
+* [[Enchanter Skyshrine Armor Quests]]
+* [[Magician Skyshrine Armor Quests]]
+* [[Monk Skyshrine Armor Quests]]
+* [[Necromancer Skyshrine Armor Quests]]
+* [[Paladin Skyshrine Armor Quests]]
+* [[Ranger Skyshrine Armor Quests]]
+* [[Rogue Skyshrine Armor Quests]]
+* [[Shadowknight Skyshrine Armor Quests]]
+* [[Shaman Skyshrine Armor Quests]]
+* [[Warrior Skyshrine Armor Quests]]
+* [[Wizard Skyshrine Armor Quests]]
+
+| quests_lower =
+
+* [[Crest of the Drixie Quest]]
+* [[Dragon Heads]]
+
+| mobs_raise =
+
+* [[Dlammaz Stormslayer]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Drendar Blackblade]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Fjokar Frozenshard]] <span class='fmz'>(Kael Drakkel - Quest NPC)</span>
+* [[Keldor Dek`Torek]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[King Tormax]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Velden Dragonbane]]  <span class='fmz'>(Kael Drakkel)</span>
+
+| mobs_lower =
+
+* [[a cerulean sky gazer]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[a cragwyrm]]  <span class='fmz'>(Western Wastes)</span>
+* [[A Dalgortha]]  <span class='fmz'>(Skyshrine)</span>
+* [[a fiery temple guardian]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[a fiery watcher]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[A Gargoyle Guardian]]  <span class='fmz'>(Skyshrine)</span>
+* [[a glimmer drake]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[a gravid drake]]  <span class='fmz'>(Western Wastes)</span>
+* [[A Hungry Cube]]  <span class='fmz'>(Skyshrine)</span>
+* [[A Large Velium Statue]]  <span class='fmz'>(Skyshrine)</span>
+* [[a lava dancer]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[A Shambling Cube]]  <span class='fmz'>(Skyshrine)</span>
+* [[a shimmering green drake]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[a Velious Drake]]  <span class='fmz'>(Western Wastes)</span>
+* [[Abudan Fe`Dhar]] <span class='fmz'>(Skyshrine - Quest NPC)</span>
+* [[Adwetram Fe`Dhar]] <span class='fmz'>(Skyshrine - Quest NPC)</span>
+* [[Ahcaz]]  <span class='fmz'>(Skyshrine)</span>
+* [[an ancient ice wurm defender]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[An Ancient Sky Drake]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[An Elder Onyx Drake]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[an emerald sky defender]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[an onyx sky drake]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[Arreken Skyward]] <span class='fmz'>(Temple of Veeshan - NPC, Non-Quest)</span>
+* [[Asteinnon Fe`Dhar]] <span class='fmz'>(Skyshrine - Quest NPC)</span>
+* [[Ayillish]]  <span class='fmz'>(Western Wastes)</span>
+* [[Azureake]]  <span class='fmz'>(Cobalt Scar)</span>
+* [[Bezeb]]  <span class='fmz'>(Skyshrine)</span>
+* [[Bouncer Boulder]]  <span class='fmz'>(Skyshrine)</span>
+* [[Bratavar]]  <span class='fmz'>(Western Wastes)</span>
+* [[Bufa]]  <span class='fmz'>(Western Wastes)</span>
+* [[Cargalia]]  <span class='fmz'>(Western Wastes)</span>
+* [[Chymot]]  <span class='fmz'>(Skyshrine)</span>
+* [[Commander Leuz]] <span class='fmz'>(Skyshrine - Quest NPC)</span>
+* [[Crendatha Fe`Dhar]] <span class='fmz'>(Skyshrine - Quest NPC)</span>
+* [[Dalshim Fe`Dhar]]  <span class='fmz'>(Skyshrine)</span>
+* [[Del Sapara]]  <span class='fmz'>(Western Wastes)</span>
+* [[Deoryn Fe`Dhar]]  <span class='fmz'>(Skyshrine)</span>
+* [[Derasinal]]  <span class='fmz'>(Western Wastes)</span>
+* [[Draazak]]  <span class='fmz'>(Western Wastes)</span>
+* [[Dygwyn Fe`Dhar]]  <span class='fmz'>(Skyshrine)</span>
+* [[Dyr Fe`Dhar]]  <span class='fmz'>(Skyshrine)</span>
+* [[Elaend Fe`Dhar]] <span class='fmz'>(Skyshrine - Quest NPC)</span>
+* [[Elder Hajnix]]  <span class='fmz'>(Skyshrine)</span>
+* [[Elder Kajind]]  <span class='fmz'>(Skyshrine)</span>
+* [[Elder Kalur]]  <span class='fmz'>(Skyshrine)</span>
+* [[Eldriaks Fe`Dhar]]  <span class='fmz'>(Skyshrine)</span>
+* [[Elyshum Fe`Dhar]]  <span class='fmz'>(Skyshrine)</span>
+* [[Entariz]]  <span class='fmz'>(Western Wastes)</span>
+* [[Fardonad Fe`Dhar]] <span class='fmz'>(Skyshrine - Quest NPC)</span>
+* [[Gafala]]  <span class='fmz'>(Western Wastes)</span>
+* [[Gangel]]  <span class='fmz'>(Western Wastes)</span>
+* [[Glati]]  <span class='fmz'>(Western Wastes)</span>
+* [[Glydoc Fe`Dhar]]  <span class='fmz'>(Skyshrine)</span>
+* [[Gozzrem]] <span class='fmz'>(Temple of Veeshan - Quest NPC)</span>
+* [[Grudash the Baker]] <span class='fmz'>(Skyshrine - Merchant)</span>
+* [[Harla Dar]]  <span class='fmz'>(Western Wastes)</span>
+* [[Honvar]]  <span class='fmz'>(Western Wastes)</span>
+* [[Ionat]]  <span class='fmz'>(Western Wastes)</span>
+* [[Jaelk]]  <span class='fmz'>(Skyshrine)</span>
+* [[Jaylorx]]  <span class='fmz'>(Skyshrine)</span>
+* [[Jen Sapara]]  <span class='fmz'>(Western Wastes)</span>
+* [[Jendavudd Fe`Dhar]] <span class='fmz'>(Skyshrine - Quest NPC)</span>
+* [[Jualicn]]  <span class='fmz'>(Skyshrine)</span>
+* [[Kalacs Fe`Dhar]]  <span class='fmz'>(Skyshrine)</span>
+* [[Kardakor]]  <span class='fmz'>(Great Divide)</span>
+* [[Karkona]]  <span class='fmz'>(Western Wastes)</span>
+* [[Kelorek`Dar]]  <span class='fmz'>(Cobalt Scar)</span>
+* [[Klandicar]]  <span class='fmz'>(Western Wastes)</span>
+* [[Komawin Fe`Dhar]] <span class='fmz'>(Skyshrine - Quest NPC)</span>
+* [[Laegdric Fe`Dhar]]  <span class='fmz'>(Skyshrine)</span>
+* [[Lararith]]  <span class='fmz'>(Skyshrine)</span>
+* [[Lawyla]]  <span class='fmz'>(Skyshrine)</span>
+* [[Lendiniara the Keeper]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[Lignark]]  <span class='fmz'>(Skyshrine)</span>
+* [[Linbrak]]  <span class='fmz'>(Western Wastes)</span>
+* [[Lord Yelinak]]  <span class='fmz'>(Skyshrine)</span>
+* [[Lothieder Fe`Dhar]] <span class='fmz'>(Skyshrine - Quest NPC)</span>
+* [[Makala]]  <span class='fmz'>(Western Wastes)</span>
+* [[Mazi]]  <span class='fmz'>(Western Wastes)</span>
+* [[Medry Fe`Dhar]]  <span class='fmz'>(Skyshrine)</span>
+* [[Morachii Fe`Dhar]]  <span class='fmz'>(Skyshrine)</span>
+* [[Mraaka]]  <span class='fmz'>(Western Wastes)</span>
+* [[Myga]]  <span class='fmz'>(Western Wastes)</span>
+* [[Nalelin Fe`Dhar]] <span class='fmz'>(Skyshrine - Quest NPC)</span>
+* [[Nalginor Fe`Dhar]]  <span class='fmz'>(Skyshrine)</span>
+* [[Neordla]]  <span class='fmz'>(Western Wastes)</span>
+* [[Norsirx]]  <span class='fmz'>(Skyshrine)</span>
+* [[Ocoenydd Fe`Dhar]] <span class='fmz'>(Skyshrine - Quest NPC)</span>
+* [[Oct Velic]]  <span class='fmz'>(Skyshrine)</span>
+* [[Oglard]]  <span class='fmz'>(Skyshrine)</span>
+* [[Onava]]  <span class='fmz'>(Western Wastes)</span>
+* [[Onerind Fe`Dhar]] <span class='fmz'>(Skyshrine - Quest NPC)</span>
+* [[Pantrilla]]  <span class='fmz'>(Western Wastes)</span>
+* [[Placlis]]  <span class='fmz'>(Skyshrine)</span>
+* [[Poalgin Fe`Dhar]]  <span class='fmz'>(Skyshrine)</span>
+* [[Qalcnic Fe`Dhar]]  <span class='fmz'>(Skyshrine)</span>
+* [[Quadrix Velic]]  <span class='fmz'>(Skyshrine)</span>
+* [[Qynydd Fe`Dhar]] <span class='fmz'>(Skyshrine - Quest NPC)</span>
+* [[Ralgyn]]  <span class='fmz'>(Skyshrine)</span>
+* [[Riran Fe`Dhar]]  <span class='fmz'>(Skyshrine)</span>
+* [[Rolandal]]  <span class='fmz'>(The Wakening Land)</span>
+* [[Scout Charisa]] <span class='fmz'>(Western Wastes - Quest NPC)</span>
+* [[Sentry Kale]]  <span class='fmz'>(Skyshrine)</span>
+* [[Sontalak]]  <span class='fmz'>(Western Wastes)</span>
+* [[Suez]]  <span class='fmz'>(Skyshrine)</span>
+* [[Taegria Fe`Dhar]]  <span class='fmz'>(Skyshrine)</span>
+* [[Talgixn Fe`Dhar]]  <span class='fmz'>(Skyshrine)</span>
+* [[Talnifs]]  <span class='fmz'>(Skyshrine)</span>
+* [[Talon Velic]]  <span class='fmz'>(Skyshrine)</span>
+* [[Telkorenar]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[Telnaq]]  <span class='fmz'>(Skyshrine)</span>
+* [[Tetragon Velic]]  <span class='fmz'>(Skyshrine)</span>
+* [[The Seer]]  <span class='fmz'>(Skyshrine)</span>
+* [[Tonvan Fe`Dhar]]  <span class='fmz'>(Skyshrine)</span>
+* [[Tranala]]  <span class='fmz'>(Western Wastes)</span>
+* [[Tri Velic]]  <span class='fmz'>(Skyshrine)</span>
+* [[Tsiraka]]  <span class='fmz'>(Western Wastes)</span>
+* [[Tyddyn Fe`Dhar]]  <span class='fmz'>(Skyshrine)</span>
+* [[Ualkic Fe`Dhar]]  <span class='fmz'>(Skyshrine)</span>
+* [[Uiliak]]  <span class='fmz'>(Western Wastes)</span>
+* [[Umykith Fe`Dhar]] <span class='fmz'>(Skyshrine - Quest NPC)</span>
+* [[Vellyn Fe`Dhar]]  <span class='fmz'>(Skyshrine)</span>
+* [[Vitaela]]  <span class='fmz'>(Western Wastes)</span>
+* [[Vobryn Fe`Dhar]]  <span class='fmz'>(Skyshrine)</span>
+* [[Von]]  <span class='fmz'>(Western Wastes)</span>
+* [[Wuoshi]]  <span class='fmz'>(The Wakening Land)</span>
+* [[Yaced]]  <span class='fmz'>(Skyshrine)</span>
+* [[Yal]]  <span class='fmz'>(Western Wastes)</span>
+* [[Yeldema]]  <span class='fmz'>(Western Wastes)</span>
+* [[Yvolcarn]]  <span class='fmz'>(Cobalt Scar)</span>
+* [[Zaldin Fe`Dhar]]  <span class='fmz'>(Skyshrine)</span>
+* [[Zalerez]]  <span class='fmz'>(Skyshrine)</span>
+* [[Zemm]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[Ziglark Whisperwing]] <span class='fmz'>(Skyshrine - Quest NPC)</span>
+* [[Zil Sapara]]  <span class='fmz'>(Western Wastes)</span>
+* [[Zynil]]  <span class='fmz'>(Skyshrine)</span>
+
+}}

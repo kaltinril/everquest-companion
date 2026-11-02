@@ -1,0 +1,32 @@
+The skill that governs the use of [[:Category:2H_Slashing | 2-handed slash weapons]].
+
+== Classes ==
+
+{| class="wikitable"
+!Class
+!Cap Until 50
+!Cap Above 50
+!Feb 21, 2001
+|-
+|[[Warrior]]
+|200
+|250
+|-
+|[[Ranger]]
+|200
+|240
+|250
+|-
+|[[Paladin]]
+|200
+|225
+|-
+|[[Shadow Knight]]
+|200
+|225
+|-
+|}
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

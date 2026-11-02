@@ -1,0 +1,27 @@
+{{Factionpage|
+
+| description = A small gnome faction.
+
+| zones_raise = 
+* [[Rathe Mountains]]
+
+| zones_lower = 
+
+* [[Kaladim|North Kaladim]]
+* [[Steamfont Mountains]]
+
+| quests_raise = 
+* [[Armor of Ro|Bracers of Ro]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Charlotte]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[Cleaner VII]]  <span class='fmz'>(North Kaladim)</span>
+
+}}

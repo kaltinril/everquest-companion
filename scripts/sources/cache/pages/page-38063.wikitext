@@ -1,0 +1,50 @@
+{{Velious Era}}
+{{Factionpage|
+
+| description = Orcs of the Ry'gorr Clan in Velious.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Crystal Caverns]]
+* [[Eastern Wastes]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+* [[Coldain Ring Quests]]
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a blacksmith of Ry`Gorr]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[a Ry`Gorr Avenger]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[a Ry`Gorr centurion]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[a Ry`Gorr clan lookout]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[a Ry`Gorr clan scout]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[a Ry`Gorr herbalist]]  <span class='fmz'>(Crystal Caverns)</span>
+* [[a Ry`Gorr inspector]]  <span class='fmz'>(Crystal Caverns)</span>
+* [[a Ry`Gorr invader]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[a Ry`Gorr legionaire]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[a Ry`Gorr messenger]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[a Ry`Gorr miner]]  <span class='fmz'>(Crystal Caverns)</span>
+* [[a Ry`Gorr prison guard]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[a Ry`Gorr snow trooper]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[a Ry`Gorr watchman]]  <span class='fmz'>(Crystal Caverns)</span>
+* [[Chief Ry`Gorr]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[Firbrand the Black]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[Foreman Smason]]  <span class='fmz'>(Crystal Caverns)</span>
+* [[mystic of Ry`Gorr]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[Oracle of Ry`Gorr]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[Rodrick Tardok]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[Ry`Gorr Basher]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[Ry`Gorr elite guard]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[Ry`Gorr Emissary]]  <span class='fmz'>(Eastern Wastes)</span>
+
+}}

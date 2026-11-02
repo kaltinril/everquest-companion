@@ -1,0 +1,35 @@
+[[File:banker_example.png|frame|Banker Example]]
+== Description ==
+
+Bankers are found in the major cities throughout Norrath, offering adventurers access to their stored items within the Norrath banking exchange.
+In '''EverQuest Legends''', bankers grant players access to several new bank vaults.
+
+The default player back comes with slots for 16 items or containers.  There is no shared bank, but there are separate banks for Shrouds, Dragon's Hoard, and Tradeskil Depot.
+
+'''These NPCs can not be charmed and do not give exp when killed.'''
+
+
+== Shrouds ==
+
+NEED INFORMATION ABOUT SHROUDS BANK
+
+== Dragon's Hoard ==
+
+Dragon's Hoard is an additional bank that a player can send items to directly from the loot window.  Items with exaltations on them cannot be stored in the Dragon's Hoard.  Items can be added to the Dragon's Hoard or removed from it at any banker.
+
+The Dragon's Hoard starts with 50 slots of additional storage space.  The first time a player hits level 50, an additional 25 slots with be unlocked, increasing the storage capacity to 75.
+
+Further slots may be purchased via the in-game shop, in 25 slot increments, for 500 Iridium, up to a maximum of 5000 slots.
+
+== Tradeskill Depot ==
+
+Tradeskill Depot is an inventory solely for tradeskill items.  Tradeskill items looted from enemies can be sent directly to the Tradeskill Depot from the loot window via the store button.  Just like the Dragon's Hoard, the Depot may be accessed at any banker.
+
+The Tradeskill Depot begins with 100 slots of storage space for tradeskill items.  The first time a player hits level 50, and additional 50 slots will be unlocked, increasing the storage capacity to 150.
+
+Further slots may be purchased via the in-game shop, in 50 slot increments, for 500 Iridium, up to a maximum of 5000 slots.
+
+
+
+
+For a complete list of bankers currently on the wiki, see [[:Category:Banker]].

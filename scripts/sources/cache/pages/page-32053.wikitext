@@ -1,0 +1,91 @@
+Each rusty weapon can be combined with  a sharpening stone in a forge to create a tarnished weapon of the same type.
+
+* [[Tarnished Axe]]
+* [[Tarnished Bastard Sword]]
+* [[Tarnished Battle Axe]]
+* [[Tarnished Broad Sword]]
+* [[Tarnished Dagger]]
+* [[Tarnished Fer`Esh]]
+* [[Tarnished Flail]]
+* [[Tarnished Halberd]]
+* [[Tarnished Long Sword]]
+* [[Tarnished Mace]]
+* [[Tarnished Mining Pick]]
+* [[Tarnished Morning Star]]
+* [[Tarnished Rapier]]
+* [[Tarnished Scimitar]]
+* [[Tarnished Scythe]]
+* [[Tarnished Shan`Tok]]
+* [[Tarnished Sheer Blade]]
+* [[Tarnished Short Sword]]
+* [[Tarnished Shortened Spear]]
+* [[Tarnished Spear]]
+* [[Tarnished Two Handed Battle Axe]]
+* [[Tarnished Two Handed Sword]]
+* [[Tarnished Warhammer]]
+
+Not all tarnished weapons are created equal. The following table shows which have the best ratios. Since these weapons lack stats, use the highest ratio you can find/blacksmith. Something else to think about, is the [[Mechanics#Melee_damage | Damage cap]]. Between levels 1-9, the maximum base damage a weapon can have is 10. Therefore, the Tarnished halberd is capped at 10 damage with 55 delay, giving it a damage to delay of 0.182. This is less than both the [[Tarnished Two Handed Battle Axe]] and [[Tarnished Two Handed Sword]].
+
+{| class="wikitable sortable"
+|-
+! Name
+! Damage
+! Delay
+! Ratio
+! Type
+! Notes
+|-
+| Tarnished Axe||5||34||0.1470588235||1 Hand Slashing||
+|-
+| Tarnished Bastard Sword||6||40||0.15||1 Hand Slashing||
+|-
+| Tarnished Battle Axe||6||40||0.15||1 Hand Slashing||
+|-
+| Tarnished Broad Sword||5||34||0.1470588235||1 Hand Slashing||
+|-
+| Tarnished Dagger||3||22||0.1363636364||Piercing||
+|-
+| Tarnished Fer`Esh||5||32||0.15625||1 Hand Slashing||Kunark
+|-
+| Tarnished Flail||5||35||0.1428571429||1 Hand Blunt||
+|-
+| Tarnished Halberd||11||55||0.2||2 Hand Slashing||
+|-
+| Tarnished Long Sword||5||33||0.1515151515||1 Hand Slashing||
+|-
+| Tarnished Mace||5||36||0.1388888889||1 Hand Blunt||
+|-
+| Tarnished Mining Pick||4||36||0.1111111111||Piercing||
+|-
+| Tarnished Morning Star||6||42||0.1428571429||1 Hand Blunt||
+|-
+| Tarnished Rapier||4||29||0.1379310345||Piercing||
+|-
+| Tarnished Scimitar||5||33||0.1515151515||1 Hand Slashing||
+|-
+| Tarnished Scythe||8||49||0.1632653061||2 Hand Slashing||
+|-
+| Tarnished Shan`Tok||8||40||0.2||1 Hand Slashing||Kunark
+|-
+| Tarnished Sheer Blade||6||33||0.1818181818||1 Hand Slashing||Kunark
+|-
+| Tarnished Short Sword||4||26||0.1538461538||1 Hand Slashing||
+|-
+| Tarnished Shortened Spear||4||30||0.1333333333||Piercing||
+|-
+| Tarnished Spear||5||36||0.1388888889||Piercing||
+|-
+| Tarnished Two Handed Battle Axe||9||47||0.1914893617||2 Hand Slashing||
+|-
+| Tarnished Two Handed Sword||9||48||0.1875||2 Hand Slashing||
+|-
+| Tarnished Warhammer||4||28||0.1428571429||1 Hand Blunt||
+|}
+
+[[Category: Armor Sets]]
+
+== See also ==
+
+* [[Blacksmithing]]
+
+[[Category:Armor Sets]]

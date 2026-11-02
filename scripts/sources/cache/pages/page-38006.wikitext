@@ -1,0 +1,28 @@
+{{expand}}
+{{Factionpage|
+
+| description = The faction of the Qeynos bankers, and their barbarian guards.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* None
+
+| quests_raise = 
+
+* [[Tribunal Symbol Quests]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Dun]] (South Qeynos)
+* [[Eracon Krengon]] (South Qeynos)
+
+}}

@@ -1,0 +1,661 @@
+These are the commands for EverQuest.
+
+ Note: EverQuest supports abbreviated versions of many commands - for example, /emote can be shortened to /emot, /emo, or /em. We will not document all abbreviations here, but some alternative commands will be included (such as "/me" and ":", which are alternatives for /emote).
+
+= A = 
+; <code>/achievements</code>: Toggle the Achievements window.
+
+; <code>/aclearcompare</code>: Clears the PC (Player Character) you are currently comparing achievements with.
+
+; <code>/acompare</code>: Compares your achievements with the targeted Player Character (PC). Note: range dependent.
+
+; <code>/addraidlooter <name></code>: Add your current target, or specified character name, to the list of valid looters in the raid.
+
+; <code>/advloot {personal | shared} setallto <loot option></code>: The /advloot command toggles the Advanced Loot System window. It can also set loot options for all items in the personal or shared loot lists.
+
+; <code>/afk [on | off | <message>]</code>: This is a toggle that sets your A.F.K (Away From Keyboard) status to either on or off. By default, /tell messages sent to your character will reply 'Player is temporarily Away From Keyboard.' You may customize the auto-reply message.
+
+; <code>/aggrolock</code>: Related to Aggro Meter (/aggrometer) The /aggrolock functions as 'Set Aggro Target' on the Aggro Meter. Must be level 20+
+
+; <code>/aggrometer</code>: Toggles the Aggro Meter window. The window displays your current percentage of hate compared to the entity that is most hated by the NPC that is the focus of the meter. By default, this shows your current target, but the current aggro target can also be locked with /aggrolock so that it won't change when you change your current target.
+
+; <code>/airlute</code>: Plays the air lute emote.
+
+; <code>/alarm</code>: Toggles Alarm Window. Use to setup an in-game timer (hours+mins).
+
+; <code>/alternateadv {on <#> | off | list | activate <id | name> | buy | buyall}</code>: Use, list, or purchase Alternate Advancements (AA). This can also be carried out in the Alternate Advancement window (found in the Inventory window.) Commonly abbreviated: /alt, /alt act
+:*On <#> - Sets the level of experience gained going towards AA at 100%, unless you specify a different percentage.
+:*Off - All experience gained will be set to go towards your normal experience bar. Experience to AA will be 0%.
+:*List - Provides a list of all Alternate Advancement (AA) abilities available to this character; their respective number, title, description, and AA (point) cost per level.
+:*Activate <id_or_name> - Can be used to activate an AA ability using its corresponding AA number or name. Note: For toggle AAs, this command will toggle the state (enable or disable) but cannot specify the desired state. Be cautious when using partial name matching as it may not activate the intended AA. Abbreviated: act
+:*Buy <#> - This option is used to buy AA points in a specified AA ability group (the same ID used for alt activate, the one found with "list")
+:*Buyall <#> - This option is used to buy out the entire AA ability group specified, assuming you have enough points.
+
+; <code>/announce</code>: Toggles the current status of the announce join/leavefeature for chat channels.
+
+; <code>/anonymous [on|off]</code>: Toggle. When on, prevents others from seeing your class, level, race, guild, and current zone through /who and /who all queries. Common abbreviation: <code>/anon</code>
+
+; <span id="assist"></span><section begin="assist" /><code>/assist [<name> | group | raid | main | on/off]</code>: Assists a player or NPC, changing your current target to their target. All variants of the /assist command function at the same distance. Also toggles auto-attack on assist. If no option specified, it will assist your current target.
+:*<name> - The name of who you'd like to assist.
+:*group - Will assist whoever is assigned "main assist" in your group.
+:*raid - Will assist whoever is assigned "main assist" in your raid.
+:*main - Will assist the nearest player who is assigned "main assist", whether group or raid.
+:*[on|off] - Toggles auto-attack on assist.
+<section end="assist" />
+
+; <code>/attack</code>: Toggle attack mode, or specify on/off.
+
+; <code>/auction <message></code>: Message the auction channel in the current zone. Note: On the detail window of an item, you can click on the item's icon to make a clickable-link in your messages.
+
+; <code>/autobank</code>: With the Bank window open and with an item on your cursor, will attempt to place the item into a spare bank slot.
+
+; <code>/autoconsent [ group | guild | raid | fellowship ]</code>: Gives permission to drag your current and future corpses.
+
+; <code>/autofire [on|off]</code>: Toggle automatic firing of your ranged weapon. Note: Turning on /attack will turn off autofire and switch to melee.
+
+; <span id="autoinventory"></span><code>/autoinventory</code>: Places the item on your cursor into the first available slot in your inventory.
+
+; <code>/autojoin [add | remove] <channel1>[:<password>] [,<channel2>] ... [,<channel10>]</code>: Always join a channel or up to 10 channels every session, information is saved to eqclient.ini as <code>ChannelAutoJoin=</code>
+
+; <code>/autoskill [<skill name> [on|off]]</code>: Toggle combat skills to automatically activate while using /attack. If no name is supplied, it will list available skills for your character. You can also activate these by right-clicking in the combat skills menu.
+
+; <code>/autosplit [on|off]</code>: Toggle. Automatically 'splits' money looted between party members.
+
+= B =
+
+; <code>/bandolier [add | delete | activate] <SetName></code>: Add, delete, and activate sets of weapons.
+
+; <code>/barter</code>: Opens the Barter window, allowing you to see who is buying items.
+
+; <code>/bazaar</code>: Toggles the Bazaar window to search for items that are for sale in the Bazaar zone. Note: If purchased outside of the Bazaar zone, buyers must use tokens (deliver to inventory) or plat (deliver to parcel).
+
+; <code>/beta</code>: Will flag the current character on the live servers to be copied to the Beta server.
+
+; <code>/betabuff <level></code>: Buff the level of your character on the Beta server. Level must be in increments of 5, e.g. 10, 15, 20, 25, 30, etc.
+
+; <code>/blockspell [display | add | remove | clear] [me | pet] <spellnumber>...</code>: Toggle blocking beneficial spells from being cast on you or your pet. The blocklist is written to the [BlockedSpells] section of your <character>_<server>.ini
+
+; <code>/bodytint</code>: Toggles the Armor Dye window. Note: Does not affect Type 12 ornaments.
+
+; <code>/book <1-140></code>: Opens your spell book to the specified page.
+
+; <code>/bugreport</code>: Toggles the "Report a bug" window, capable of sending EQ devs detailed information about the issue automatically.
+
+; <code>/buyer</code>: Toggles the Barter Buyer window. Create "want to buy" bids for items.
+
+= C =
+
+; <code>/calendar</code>: Opens the in-game Calendar window. The calendar displays all event alerts for the year. For progression servers, it also indicates when future expansions will unlock.
+
+; <code>/camp [desktop | server] [fast]</code>: Used to camp your character out of the game, either to the character selection screen (default), server selection screen, or your desktop. It takes 30 seconds to camp if you're in a normal zone. In certain safe zones you'll be given the option to camp immediately (e.g Guild Hall, Plane of Knowledge, etc.)
+
+; <code>/cast <slot# | spellname></code>: Casts the spell in the specified gem slot or by the name of a memorized spell. Partial spell names are accepted.
+
+; <code>/changefamiliar</code>: Opens the "Change Familiar Name" window. Only works if you are eligible for a familiar name change.
+
+; <code>/changemercname</code>: Opens the "Change Mercenary Name" window. Only works if you are eligible for a familiar name change. Note: Changing your mercenary's name will change the name of the mercenary in the active slot. When that mercenary is dismissed, the name will be moved to the next empty slot.
+
+; <code>/changename</code>: Will open the "Change Name" window. Only works if you are eligible for a name change.
+
+; <code>/changepetname</code>: Opens the "Change Pet Name" window. Only works if you are eligible for a pet name change.
+
+; <code>/channel [say | gsay | guildsay | tell | auction | ooc | chat] [<name>]</code>: Sets the default chat channel from "Say" to the option specified. In the case of "tell" or "chat", specify the name of the player or chatroom.
+
+; <code>/charinfo</code>: Outputs your bind point(s) and current origin city. The origin city reflects any changes made with the /setstartcity command.
+
+; <code>/chat [ [1-10] <message> ] | [ join | leave | leaveall | list | set | announce | invisible | afk | buddy | namespace | invite | grant | password | kick | moderate | voice | local | oplist | opadd | opremove | setowner ] <options></code>: Controls chat channels. All options in this syntax can instead be used as standalone commands with a ";" e.g. ;join, ;set, ;kick, etc. For cross-server chat, use <server short name>.<name> for channels and players.
+
+; <code>/chatfontsize <0-10></code>: Adjust the size of the font in the chat window, from size 0 to size 10, with 0 being the smallest. 3 is default.
+
+; <code>/claim</code>: Opens the Claim Window where you can claim in-game prizes. (Prizes are often from special game editions, events, and promotions.)
+
+; <code>/clearallchat</code>: Clears all chat from all chat windows.
+
+; <code>/clearchat</code>: Clears current chat window. Common abbreviation: /clear
+
+; <code>/clearmarks</code>: Clears all current NPC markers, whether set with the UI or /gmarknpc
+
+; <code>/clickthrough</code>: Unknown
+
+; <code>/combatmusic [on | off]</code>: Play combat music during combat. Default is ON.
+
+; <code>/consent [ <player> | group | guild | raid | fellowship ]</code>: Gives permission to drag your current corpse. For current and future corpses, see /autoconsent
+
+; <code>/consider [<name>]</code> : Considers your current target, which displays an indication of your faction standing as well as an indication of the target's relative level and strength. The target can be specified by name, including pet names, and can use [[chat variables]]. Common abbreviation: /con
+
+; <code>/copylayout [<layout> <inifile>] [restore]</code>: With no parameters, opens "Copy Layout" window. Otherwise, it will copy the specified layout and INI file. Restore will copy the layout from your current INI and desktop resolution.
+
+; <code>/corpse [<name>]</code>: Summons your own, or another's corpse that you specify. Must be within a certain radius and have permission to drag. Will also use the current target if it's a permitted corpse. If you need to drag a long distance, use /corpsedrag.
+
+; <code>/corpsedrag</code>: Will auto-drag your current targeted corpse, if permitted. You can drag up to two corpses.
+
+; <code>/corpsedrop</code>: Used to stop dragging a corpse that you're holding with /corpsedrag. Will use currently targeted corpse if selected.
+
+= D =
+
+; <code>/decaycorpse</code>: Remove one of your own, targeted corpses. Will become ineligible for resurrection as well.
+
+; <code>/decline</code>: Decline a duel after you've been challenged by another player.
+
+; <code>/delegategmarknpc</code>: Delegate the marking of NPCs to a targeted group member. Must be leader to use this ability.
+
+; <code>/delegategmasterlooter</code>: Delegate looting to a targeted group member. Must be leader to use this ability.
+
+; <code>/delegatermarknpc</code>: Delegate the marking of NPCs to a targeted raid member. Must be raid leader to use this ability.
+
+; <code>/delegatermasterlooter</code>: Delegate looting to a targeted raid member. Must be raid leader to use this ability.
+
+; <code>/deny [ <player> | group | raid | guild | fellowship ]</code>: Revokes permission to drag your corpse.
+
+; <code>/destroyitem</code>: Will attempt to destroy the item on your cursor.
+
+; <code>/disband [<name>]</code>: Will disband from your group, or if no group, will decline a group invitation. The group leader can remove a targeted player from the group, or remove the specified <name> from the group.
+
+; <code>/discipline <discipline name></code> : Performs the given <discipline>. To see a list of abilities, disciplines, spells, and macros available, bring up the "Actions" window. (<code>L</code> by default). Common abbreviation: /disc
+
+; <code>/discord</code> : Does a thing.
+
+;<code>/dismount</code> : Removes your character from their mount.
+
+; <code>/doability [1-10]</code>: Activates a key from the "Actions" window.
+
+; <code>/duck</code>: Emotes that you 'duck'. (Does not actually make your character duck or crouch.)
+
+; <code>/duel</code>: Initiates a duel between you and the currently targeted player. Duel is in effect until one "dies" (is knocked unconscious) or flees the zone.
+
+; <code>/dynamiclights [on|off]</code>: Toggles dynamic lights ON/OFF the next time you zone. Note: Dynamic Lights refers to specially rendered lighting, like when your character holds a lantern or another item that emits a glow.
+
+; <code>/dzaddplayer [<name>]</code>: Invites your current target or <name> to the expedition. Must be leader.
+
+; <code>/dzhelp</code>: Outputs a list of all Expedition commands with a brief description of each.
+
+; <code>/dzlisttimers</code>: List any outstanding replay timers you have for all expeditions. This is the amount of time you must wait before being allowed to enter another instance of that zone.
+
+; <code>/dzmakeleader <name></code>: Transfer expedition leadership to a new player. Must be leader.
+
+; <code>/dzplayerlist</code>: List all the members of the expedition.
+
+; <code>/dzquit</code>: Removes you from your currently assigned expedition.
+
+; <code>/dzremoveplayer <name></code>: Remove a player from their expedition instance. Must be leader to use.
+
+; <code>/dzswapplayer <character to remove> <character to add></code>: Swap out one player for another. Must be leader. The player to be added has to approve, or the command fails.
+
+= E =
+
+; <code>/emote <text></code>: Emotes the <text>. Alternate commands: <code>/me,</code> <code>:</code>
+
+; <code>/exit</code>: Immediately exit you from the game. The /quit command provides identical functionality. The command must be typed in its entirety; partial commands are not accepted.
+
+; <code>/extralife</code>: Opens your browser to the Darkpaw Games team page for Extra Life.
+
+= F =
+
+; <code>/facepalm</code>: Performs the facepalm emote.
+
+; <code>/faction</code>: Toggles the "Factions" window. Here you can view your character's standing with various factions.
+
+; <code>/faint</code>: Causes your character to perform a fainting animation.
+
+; <code>/familiar leave</code>: Tell your familiar to go away.
+
+; <code>/fastdrop { on | off | never }</code>: Controls the ability to drop items with or without confirmation, or at all. The default and recommended setting is off, which will ask for confirmation before dropping an item.
+
+; <code>/feedback</code>: Opens the official EverQuest forums in an external browser for submitting feedback.
+
+; <code>/fight</code>: Triggers the fight emote animation.
+
+; <code>/filter</code>: Opens the "Options" window? <code>Alt+O</code> does the same thing.
+
+; <code>/finditem</code>: Opens the "Find Item Window", allowing searches through your: bank, equipped items, inventory, real estate, item overflow and parcel. Note: This will not search your Dragon's Hoard.
+
+; <code>/findpc <name></code>: Used to show a yellow path toward a player character. The player must be visible in the find window, such as when they're in your group or raid.
+
+; <code>/fistbump</code>: Performs a fist bump emote.
+
+; <code>/fontface <fontname></code>: Changes the font of the chat window to <code><fontname></code>
+
+; <code>/freakout</code>: Performs the freakout emote.
+
+; <code>/friends [<name>]</code>: Will list your entire friends list. If <name> is supplied it's a toggle; it will add that character to your friends list, or remove them from the list if they're already a friend. Alternate command: <code>;buddy</code>
+
+; <code>/fsay <message></code>: Send a message to your fellowship.
+
+; <code>/fullscreen {on|off}</code>: Toggles between Fullscreen mode and Windowed mode.
+
+= G =
+
+; <code>/gems</code>: Opens the 'EQ Gems' game window.
+
+; <code>/getguildmotd</code>: Displays the Guild Message of the Day (MOTD).
+
+; <code>/gmarknpc <1-3></code>: Mark an NPC for your group with a number from 1 to 3. Alternate: <code>/marknpc</code>
+
+; <code>/groupleader</code>: Will output the name of the current Group leader. You must be in a group to perform this action.
+
+; <code>/grouproles [ list | set | unset | roleset ] <options></code>: Manage group roles, and create sets of roles you can load or unload for specific groups of characters.
+
+; <code>/growl</code>: Causes your character to perform a growl emote.
+
+; <code>/gsay <text></code>: Sends <text> to group chat. Seen by all in your group. Common abbreviation: <code>/g</code>
+
+; <code>/guidehelp <text></code>: For quest/event feedback, wedding requests, and questions regarding quests/events. Please be aware that all Customer Service issues must go through /petition for resolution.
+
+; <code>/guildcreate <GuildName></code>: Will create a new guild if requirements are met.
+
+; <code>/guilddelete</code>: Disbands the entire guild. You must be the guild leader.
+
+; <code>/guilddemote <playername></code>: Demotes the targeted or named player's ranking in the guild.
+
+; <code>/guildinvite <playername></code>: Invites a player to your guild.
+
+; <code>/guildleader <playername></code>: Make another member of the guild the new guild leader.
+
+; <code>/guildmotd <text></code>: Set the Guild Message of the Day (MOTD) to <code><text></code>
+
+; <code>/guildpromote <playername></code>: Promotes the targeted or named player's guild rank.
+
+; <code>/guildremove <playername></code>: Remove a player from the guild.
+
+; <code>/guildsay <text></code>: Sends <code><text></code> to guild chat. Seen by all in your guild. Common abbreviation: <code>/gu</code>
+
+; <code>/guildstatus <playername></code>: Will display the player's current guild and rank. Must be in the same zone.
+
+= H =
+
+; <code>/hail</code>: Hails your current target.
+
+; <code>/help [ normal | emote | guild | voice | chat ]</code>: Will list help and commands for the specified option.
+
+; <code>/hidecorpse [none | all | always | alwaysnpc | allbutgroup | npc | looted | listed | listedunlocked]</code>: Controls the hiding of corpses in the game world. Your own corpse(s) will never be hidden, except when using always.
+
+; <code>/hidemodels { none | players | pets | mercenaries | familiars | all } [ none | afk | afk noncombat | noncombat ]</code>: Hide or un-hide the specified models based on conditions.
+:* none - Un-hide all players, pets, mercenaries, and familiars.
+:* players <code>[none | afk | afk noncombat | noncombat]</code> - Hide player models
+:* pets <code>[none | afk | afk noncombat | noncombat]</code> - Hide pets models
+:* mercenaries <code>[none | afk | afk noncombat | noncombat]</code> - Hide mercenary models
+:* familiars <code>[none | afk | afk noncombat | noncombat]</code> - Hide familiar models
+:* all <code>[none | afk | afk noncombat | noncombat]</code> - Hide all models, including players, pets, mercenaries, and familiars.
+
+; <code>/hotbutton <name> [<color>] [<text>]</code>: Create or edit a hotbutton named <code><name></code>, optionally change the color <0-19> and/or the body <code><text></code>.
+
+= I =
+
+; <code>/ignore [<name>]</code>: Lists the names currently being ignored. If a player <name> is supplied, it will toggle their inclusion on the list; a new name will be added, an existing name removed.
+
+; <code>/indicator {on | off}</code>: Turns on/off the target reticle; the ring around the feet of your target.
+
+; <code>/inspect</code>: Inspect a targeted player's equipped items.
+
+; <code>/inspectbuffs [mine]</code>: Shows your target's buffs and debuffs, including caster name and remaining duration. Optionally, filter to show only those cast by you.
+
+; <code>/invite [<name>]</code>: Invites your current target or supplied player name to the group. Can also be used to accept an invitation.
+
+; <code>/itemoverflow</code>: Opens the Item Overflow window.
+
+= J = 
+
+= K = 
+
+; <code>/keyrings [<tab>]</code>: Opens the Key Rings window. If a tab name is specified, that tab is displayed.
+
+; <code>/keys</code>: Toggles the display of the General > Keys achievements category in the achievement window.
+
+; <code>/kickplayers [ exp | task | raid ]</code>: Removes all players from a shared task, expedition or raid. Commonly abbreviated: /kickplayer, /kickp
+
+= L = 
+
+; <code>/language [<#> | help]</code>: Displays the current language for the chat window. If a number <#> is supplied, it will change your language, and help will show a list of languages.
+
+; <code>/leaverealestate</code>: Used to exit a real estate zone.
+
+; <code>/lfgroup [on|off]</code>: Opens the "Group Search" window. Adding on or off will toggle your 'looking for group' status.
+
+; <code>/lfguild</code>: Opens the Guild Search window.
+
+; <code>/list</code>: List the current channels you are in.
+
+; <code>/loadskin <foldername> <0|1></code>: Opens the "Load a skin" window when used without arguments, or loads a specified skin from your EverQuest's uifiles folder.
+
+; <code>/location</code>: Returns your Y, X, Z coordinates. Typically abbreviated as /loc
+
+; <code>/lockconfirm</code>: Allows you to confirm your selection.
+
+; <code>/log [on|off]</code>: Toggles output to Logs\eqlog_<name>_<server>.txt. The logging state persists across logins.
+
+; <code>/loginterval [seconds]</code>: Throttles log file writes by setting the interval between file operations to reduce frequent writes. A value of 0 disables throttling and writes immediately. The default interval is 1 second.
+
+; <code>/loot</code>: Loot a corpse from a short distance. The corpse must be targeted.
+
+; <code>/lootnodrop [ always | usable | never ]</code>: When looting a "No Drop" item you can always display a loot confirmation, only display a loot confirmation if they're not usable, or never display loot confirmation. Default is always. If no option is supplied, it will output your current setting.
+
+= M =
+
+; <code>/makeleader [<name>]</code>: Make target or <code><name></code> the leader of your group. Must be in the group, and you must be leader.
+
+; <code>/map [ startline | endline | addpoint | automap | color ]</code>: For editing and marking up maps within EverQuest. Only available when Map window is open.
+
+; <code>/marketplace</code>: Opens the in-game marketplace for special services and items. Not to be confused with the player-driven /bazaar
+
+; <code>/maybe</code>: Performs the "maybe" emote.
+
+; <code>/mcicontrol <option> <device></code> : Allows a player to control sound devices such as cdaudio or mp3s to play when in-game, supposedly.
+
+; <code>/melody [#] [#]...</code>: Bard will play the song gem #'s in the order specified and will repeat the songs from the beginning.
+
+; <span id="memspellset"></span><code>/memspellset {index|<name>}</code>: Loads the specified spellset index or name. Spell sets are created with the spell gems window.
+
+; <span id="memspellslot"></span><code>/memspellslot <gem slot> {<spell name>|<spell #>}</code>: In the specified gem slot, memorize a spell. Can use spell name or ID number. To forget a gem slot, provide a "0" for spell.
+
+; <code>/mercassist [on|off]</code>: Calls for your mercenary to assist when auto-assist is not activated. To automatically assist, provide the <code>on</code> option.
+
+; <code>/merclog</code>: Generates a server-side mercenary log for debugging. Send in a /bug report after logging the issue.
+
+; <code>/mercswitch <index></code>: Change your mercenary by index number. A list of your mercenaries, their types and indices can be found in the "Switch" tab of your /merc window.
+
+; <code>/mercwindows</code>: Toggle the Manage Mercenaries window. Common abbreviation: /merc
+
+; <code>/mixahead <1-100></code>: The amount of sound to pre-mix, default = 8, lower = better.
+
+; <code>/motd</code>: Displays the Message of the Day for your server.
+
+; <code>/mousespeed <multiplier></code>: Increase the speed of the mouse cursor in multiples of the amount specified. Default multiplier is 0, use 0 or 1 for default, 2 = double the speed, 3 = triple, etc.
+
+= N = 
+
+; <code>/netstats</code>: Display network ping times and packet loss. Output is directed to a single chat filter. Common abbreviation: /netstat
+
+; <code>/no</code>: Emotes your character's disagree.
+
+; <code>/node</code>: Emotes your character nodding in agreement or acknowledgment.
+
+; <code>/note [<text>]</code>: Opens the "Notes Window" unless optional <text> is provided. Any <text> provided will be date/time stamped. The information is saved in the file notes.txt and is available across all characters on an account.
+
+= O =
+
+; <code>/offlinemode</code>: When in Trader or Buyer mode, this command will log you off but leave your character in-game trading.
+
+; <code>/ooc <text></code>: A zone-wide communication channel for speaking out of character.
+
+; <code>/open</code>: Attempts to open the targeted object.
+
+; <code>/outputfile [ achievements [<filter>] | faction | guild | guildbank | guildhall | guildlobby | inventory | missingspells | raid | realestate | recipes <argument> | spellbook ] [<filename>]</code>: Export data to the default or specified file. The file is saved as <player>_<server>-<parameter>.txt in the root folder. If a filename is specified and does not end with '.txt', the extension is automatically appended.
+:* <code>achievements [<filter>]</code> - Outputs a filtered list of achievements. The filter specifies which states to include: Complete, Open, and/or Locked. If no filter is provided, all states are included.
+:* <code>faction</code> - Faction data
+:* <code>guild</code> - Name, level, class, rank, date, zone, note
+:* <code>guildbank</code> - Guild bank contents
+:* <code>guildhall</code> - You may only dump the real estate guild hall while you are on the guild plot or in the real estate guild hall.
+:* <code>guildlobby</code> - Exports data for the Guild Lobby.
+:* <code>inventory</code> - Inventory items, items from all keyrings, Dragon's Hoard items if the Dragon's Hoard window is open, and Personal Tradeskill Depot items if the depot is loaded.
+:* <code>missingspells</code> - Outputs a list of all spells and combat abilities usable by your class up to your current level that you haven't yet scribed in your spellbook. Entries are sorted by level and then alphabetically by name. Does not include spells that cannot be scribed.
+:* <code>raid</code> - Raid data
+:* <code>realestate</code> - Real estate data
+:* <code>recipes [all | alchemy | baking | blacksmithing | brewing | fishing | fletching | jewelcrafting | poisonmaking | pottery | research | tailoring | tinkering] <[filename]></code> - Outputs the names of tradeskill recipes you know if they qualify you for additional skill points past the cap. If 'all' is specified, a separate file is created for each tradeskill, forcing the default file names.
+:* <code>spellbook</code> - Outputs all spells and combat abilities in your spell book. Entries are sorted by level and then alphabetically by name.
+
+; <code>/overseer</code>: Toggles the Overseer window, enabling you to manage Agents and send them on quests to combat Discord across Norrath's history and earn rewards. Requires level 85+ and the Seeds of Destruction expansion on your server.
+
+; <code>/overseermassconvert <rarity> <keep_count></code>: Converts duplicate agents of a specified rarity, leaving a specified number of duplicates unconverted with a minimum of 1 remaining.
+
+= P =
+
+; <code>/particledensity [off | low | med | high]</code>: Set visual particle density. Can be further refined on the Options window -> Display tab -> 'Particles.'
+
+; <code>/pause <1-600>[,]</code>: Pause a social macro from 1 to 600 deciseconds (600 is equal to 60 seconds). Can add other commands with a comma but will always be executed last. Can only be used within social buttons.
+
+; <span id="pet"></span><code>/pet <action> [<target>]</code>: Control actions for your combat pet.
+:* <code>attack [<name>]</code> - Pet will attack the targeted or specified creature.
+:* <code>qattack [<name>]</code> - Pet will queue an attack on the targeted or specified creature.
+:* <code>back</code> - Pet will clear its hatelist.
+:* <code>focus</code> - Tells pet to focus on current target.
+:* <code>feign</code> - A necromancer's pet will attempt to play dead, if they have the relevant AA.
+:* <code>follow</code> - Pet will start to follow you.
+:* <code>get lost | leave</code> - Pet will leave.
+:* <code>guard here</code> - Will stand here, and return here after fights.
+:* <code>guard me</code> - Pet will attack anything you attack and anything that attacks you.
+:* <code>health report | report health</code> - Orders your pet to say its health in percent and any spells currently affecting it.
+:* <code>ghold</code> - Greater holding. Will only attack something new if ordered and will not build a hate list of other mobs. If told to attack, will do so in reverse order.
+:* <code>hold</code> - Holding. Will not start attacks until ordered. Once it attacks, the pet will build a hate list and attack other mobs as usual.
+:* <code>inventory check</code> - Returns a list of your pet's currently equipped items.
+:* <code>inventory destroy <slot></code> - Destroys the item your pet has in the chosen slot.
+:* <code>leader</code> - Pet will report who summoned it.
+:* <code>regroup</code> - Toggle. Pet returns to you whether its target is alive or not. Does not clear hatelist.
+:* <code>resume</code>
+:* <code>stop</code> - Will stop attacking. Seems to trigger its resting regeneration.
+:* <code>spellhold</code> - Toggle. Prevents pet from casting.
+:* <code>sit</code> - Toggle sit.
+:* <code>swarm</code> - Swarm attack.
+:* <code>qswarm</code> - Queue swarm attack.
+:* <code>swarmleave | swleave</code> - Causes the swarm to leave.
+:* <code>target</code> - Targets your pet. Can also use F1 key (toggles between you and your pet).
+:* <code>taunt | no taunt</code> - Toggles whether your pet will taunt in battle.
+
+; <code>/petition</code>: Opens a dialog box: 'Would you like to open a browser to the help and petition webpage?'
+
+; <code>/pickzone [fewestplayers]</code>: Opens the Pick Zone window if available at the moment in the current zone. Common abbreviation: /pic
+
+; <code>/pickzonefewestplayers</code>: Will attempt to join the pick with fewest players.
+
+; <code>/pie</code>: Triggers the pie emote.
+
+; <code>/pizza</code>: Performs the pizza emote. (This emote returned in a March 13, 2019 update, but no longer opens a web order page, it's a standard emote now)
+
+; <code>/played</code>: Shows character's birthdate, age (Earth time and game time), total time played, and time this session.
+
+= Q = 
+
+; <code>/queuemelody <song> [song]...</code>: Arranges a series of songs to be executed based on priority. This command is similar to /melody except it plays songs in priority order depending on the song's recast time, your current buffs, and your target's current debuffs. The earlier a song is in the list, the higher priority it is.
+
+; <code>/quit</code>: Immediately closes the game. The full command name must be used. This command is functionally identical to /exit.
+
+= R = 
+
+; <code>/racechange</code>: Change your character's race if you've purchased a Transmogrification Scroll from the marketplace.
+
+; <code>/random <#> [<#>]</code>: Rolls a magic die from 0 to <#>. Optionally add another <#> to specify the complete range.
+
+; <code>/realestate [items | manage | trophies | plot]</code>: Opens windows to manage your house(s) and plot(s).
+
+; <code>/renameguild <name></code>: Renames guild to <name>, if a rename is allowed.
+
+; <code>/reply <text></code>: Reply to the latest received /tell. Can also bind replies to a key, "R" by default, and then cycle through names with "Tab".
+
+; <code>/report <playername></code>: The first 20 lines of visible text in each chat window will be attached to a player report. Scroll to display the text you wish to report. This name can be referenced in a petition to allow a GM to view the report. Note that reporting by itself does nothing.
+
+; <code>/reservename</code>: pulls up the name reservation window, allowing you to reserve a name on an upcoming server if you qualify and if any servers are available.
+
+; <code>/reveal</code>:  used to cancel stealth-style hiding states, making your character visible again.
+
+; <code>/rewards</code>: Toggles "Select a Reward" window, for instance, to get the class selection window to reopen after using a class unlock token.
+
+; <code>/rewind</code>: Will move your character to a previous nearby position, helpful if you've become stuck. Must stand still for a period before using again.
+
+; <code>/rmarknpc <1-3></code>: Raid Mark an NPC for your raid with a number from 1 to 3.
+
+; <code>/ro</code>: Performs the roll on the floor laughing emote.
+
+; <code>/roleplay [on|off]</code>: Anonymizes information from /who, but unlike /anon, your guild tag is still displayed.
+
+; <code>/rps</code>: Performs the rock-paper-scissors emote.
+
+; <code>/rsay <text></code>: Communicate <text> to your raid.
+
+; <code>/rtarget</code>: Target the player who sent you the most recent /tell, provided they're in range.
+
+; <code>/run</code>: Enables "always run", not a toggle.
+
+= S = 
+
+; <code>/safelock <password></code>: Toggle. Locks the interface with <password>. To unlock the interface, repeat the command with the same password. The full command must be typed to function. Not case-sensitive. (Good uses for this are to prevent children and pets from playing your game if you need to AFK)
+
+; <code>/say <text></code>: Communicate <text> with everyone within a small radius.
+
+; <code>/servertransfer</code>: Toggles the Server Transfer List window. Some transfers are free, others will require a token from the marketplace.
+
+; <code>/setloottype <1-3></code>: Sets who can loot npc corpses during a raid: 1=Raid Leader, 2=Raid Leader and Group Leaders, 3=Raid Leader and Selected Raid Looters (used in conjunction with /addraidlooter)
+
+; <code>/setstartcity [<ID>]</code>: Set your starting city. Can be used once by some characters with multiple starting cities or those whose starting city was reset accidentally.
+
+; <code>/shadows [on|off [<distance>] ]</code>: Control the display of shadows on characters, and their respective 'clip distance.'
+
+; <code>/shield <playername></code>: Allows Warriors to intercept part of the damage intended for another. If no <name> supplied, will use target.
+
+; <code>/shieldgroup</code>: Allows a Warrior to shield his group from damage, provided they have the group shielding spell affect.
+
+; <code>/shout <text></code>: Communicate <text> throughout the entire zone.
+
+; <code>/showgrass [on | off]</code>: Using this command will turn "radial flora" on or off.
+
+; <code>/shownames [ off | 1 | 2 | 3 | 4 | 5 | 6 | 7 ]</code>: Toggle visible player names, or shorten them. "4" is default. Common abbreviation: /show
+:* <code>off</code> - Don't show player names over their heads
+:* <code>1</code> - Show only First Names of players
+:* <code>2</code> - Show First and Last Names
+:* <code>3</code> - Show First, Last, and Guild names
+:* <code>4</code> - Show everything (default)
+:* <code>5</code> - Show Title (if any) and First names
+:* <code>6</code> - Show Title (if any), First, Last names
+:* <code>7</code> - Show First name and Guild (if any) names
+
+; <code>/shownpcnames [ on | off ]</code>: Turn NPC names 'on' or 'off'.
+
+; <code>/showspelleffects [on|off]</code>: Toggle spell particle effects.
+
+; <code>/sit [on|off]</code>: Toggle sitting when no option provided. On will always sit, Off will always stand.
+
+; <code>/split <#> [<#> <#> <#>]</code>: Split the defined amount of your Plat#, Gold#, Silver#, Copper# (in that order) with the group. Use 0 for coins you don't wish to split. (Specifying just 1 number will split just plat)
+
+; <code>/stance [ Aggressive | Balanced | Burn | Burn AE | Efficient | Passive | Reactive ]</code>: Change your mercenary's stance. Must be a valid stance for mercenary type.
+
+; <code>/stand</code>: Makes your character stand up from a crouch or sit position. Unlike /sit, it's not a toggle.
+
+; <code>/stopcast</code>: Interrupt the current spell during its casting period.
+
+; <code>/stopdisc</code>: Cancel any currently running discipline.
+
+; <code>/stopsocial</code>: Using the command /stopsocial will immediately stop any 'social' animations or can be used to cancel a hot-key sequence, that may for instance have a long pause in it. Typing /stopsocial will stop processing the hotkey command sequence.
+
+; <code>/stopsong</code>: Stop singing the current song or certain Alternate Advancement abilities that behave like songs. Mostly a concern for Bards.
+
+; <code>/stoptracking</code>: Stop tracking current target.
+
+; <code>/surname [<name>]</code>: Adds a last name, <name>, to your character. If no <name> is provided, your last name will be cleared. Adding, changing, or clearing a surname has a 7-day (168 hour) cooldown.
+
+; <code>/swapdisc <name|id></code>: Removes the currently active combat ability and activates the specified ability.
+
+; <code>/swarm [ attack | qattack | leave ]</code>: Allows control over your swarm. Identical to /pet swarm arguments.
+
+; <code>/system <cmd> [arguments]</code>: Run commands on your computer, as if from the Windows command prompt. To use, <code>EnableSystemCommand=1</code> must be set in the <code>[default]</code> section of eqclient.ini
+
+= T =
+
+; <code>/target [<name> | group <1-6>]</code>: Targets <code><name></code> or group member <code><#></code>.
+
+; <code>/targetoftarget</code>: Toggles the "Target's Target" window.
+
+; <code>/taskaddplayer <name></code>: Send an invitation to the named player to join the shared task. The player may then accept or decline the invitation.
+
+; <code>/taskhelp</code>: Outputs help for shared task commands.
+
+; <code>/taskmakeleader <player name></code>: The shared task leader can use this command to assign leadership to another player.
+
+; <code>/taskoverlay</code>: Toggles the "Task Overlay" window, which gives a summary of quests and your progress.
+
+; <code>/taskplayerlist</code>: A list of the players in your shared task.
+
+; <code>/taskquit</code>: Leave your shared task.
+
+; <code>/taskremoveplayer <name></code>: Remove a player from the shared task. Must be task/mission leader.
+
+; <code>/tasktimers</code>: Time left before you're able to repeat certain missions or tasks.
+
+; <code>/tell <playername> <message></code>: Send a direct, private message to another player. Alternate commands: <code>/msg</code>, <code>/send</code>
+:* cross server /tells use <code>;tell <server>.<character> <message></code>
+
+; <code>/testbuffme</code>: Used only on the Test Server, boost your character to level 25 and gives you a set of items.
+
+; <code>/testcopy</code>: Copies character to the Test Server.
+
+; <code>/time</code>: Displays game time: <code>Weekday, Month DD, YYYY - H</code> and Earth Time: <code>Weekday, Month DD, YYYY HH:MM:SS</code>
+
+; <code>/toggleinspect [on|off]</code>: Inspect other player's equipment by right-clicking.
+
+; <code>/trackfilter [ red | yellow | white | blue | green ]</code>: Toggle the NPCs to display in your tracking window, categorized by [[Consider|/consider]] colors.
+
+; <code>/trackmercs [on|off]</code>: Toggle the display of mercenaries in your tracking list.
+
+; <code>/trackpets [on|off]</code>: Toggles the display of pets in your tracking list.
+
+; <code>/trackplayers [on | off | group]</code>: Toggles the display of players in your tracking list, including those in group.
+
+; <code>/tracksort [ normal | distance | consider | alpha | rdistance | rconsider | ralpha ]</code>: Control sorting on your tracking list.
+:* <code>normal</code> - How long they've been in the zone (oldest NPCs first)
+:* <code>distance</code> - Closest NPC is at the top of the tracking list
+:* <code>consider</code> - Highest level NPCs on top
+:* <code>rdistance</code> - Furthest NPC first and closest NPC listed last
+:* <code>rconsider</code> - Low level at top, with high level at bottom
+:* <code>alpha</code> - Alphabetic order, A to Z
+:* <code>ralpha</code> - Reverse alphabetic order, Z to A
+
+; <code>/trader</code>: Toggles the Bazaar Vendor window, used if you're in the bazaar and have something to sell.
+
+; <code>/tribute {personal | guild} {on | off | favor}</code>: Turn personal and guild tribute on or off, or list how much favor is available in each.
+
+; <code>/trophy {personal | guild} {on | off}</code>: Toggle personal or guild trophy tribute.
+
+; <code>/ttell <message></code>: Send <code><message></code> to the targeted player or player corpse.
+
+; <code>/ttth</code>: Triggers the ttth emote.
+
+= U =
+
+; <code>/ui [ scale <#> | reloadhtml ]</code>: If no option provided, displays your current UI scale (1.00 default.) Can also adjust your UI scale or reload the HTML to apply changes made to UI configuration files, including the CSS. You can only adjust the UI using the new UI engine.
+
+; <code>/url [<url> | <file>]</code>: Open a URL or file.
+:* <code><url></code> - The URL to open. Must prefix the domain with <code>https://</code> or <code>http://</code> or <code>www</code>
+
+; <code>/useadvlooting [on|off]</code>: Toggles the Advanced Looting System. The Legends loot system is a modern take on the advanced system used on Live and TLP servers.
+
+; <code>/useitem <slot> [subindex] or /useitem "<item name>"</code>
+Activates the use effect on items. You can specify an inventory slot number or the "exact name" of the item. When using the item name, it activates the item regardless of its inventory slot, including items in your key ring.
+:* <slot> <code>[subindex]</code> - The slot number. If a bag, the subindex as well.
+:* "<code><item name></code>" - The full name of the item to activate. Works for items in any inventory slot or key ring.
+
+; <code>/usercolor <channel#> <R G B></code>: Change the text color of chat channels. For a GUI alternative, use Options window -> Chat. See [[Usercolor|usercolor]] for channel details.
+
+; <code>/usetarget</code>: Simulates a 'right-click' on a targeted NPC, or left click on targeted player. Useful when merchants are covered in other players, making them hard to click.
+
+; <code>/usurp</code>: A guild officer can become leader if more senior leadership has been offline for at least a year.
+
+= V =
+
+; <code>/vgroup <1-12></code>: Play a voice macro for your group, with accompanying text.
+
+; <code>/viewport <x> <y> <w> <h> [<scale>] | [reset]</code>: Change the size of the area within your game window.
+
+; <code>/vplay <1-12></code>: Play a voice macro for your computer only.
+
+; <code>/vraid <1-12></code>: Play a voice macro for your raid, with accompanying text.
+
+; <code>/vtell <player> <1-12></code>: Play a voice macro for a player, with accompanying text.
+
+= W =
+
+; <code>/waypoint <y>, <x>, [<z>]</code>: Draw a find path to the location specified by <y>, <x>, and optionally <z> coordinates. Must use commas. The location is also marked on your map.
+
+; <code>/who [<name | class | race>] [all] [afk] [lfg] [corpse] [count] [guild] [raid] [<"guild name">] [<level> [<level>]]</code>: Search for characters in the current zone or across all zones. The command can also be invoked on a player by clicking their name in a chat window.
+
+; <code>/whotarget</code>: Displays a /who lookup for the targeted player.
+
+= X =
+
+; <code>/xtarget show | set <slot> <role/name> | target <slot> | auto [on|off] | add | remove | save <name> | load <name></code>: Add spawns to the Extended Target window by name, role, automatically, or from saved target sets. Common abbreviation: /xtar
+
+= Y =
+
+; <span id="yell"></span><code>/yell</code>: Unlock all Encounter Locked NPCs that you're able to. One second timer. Also displays, 'You yell for help.' People around you see "XXX yells for help from <direction>".
+
+; <code>/yes</code>: Performs the yes emote.
+
+
+
+Many of the command definitions were taken in part or in whole from: [https://www.redguides.com/docs/projects/everquest/commands/ link]

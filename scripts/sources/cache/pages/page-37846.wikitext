@@ -1,0 +1,71 @@
+{{Classic Era}}{{Factionpage|
+
+| description = In the High Elf City of South Felwithe can be found the Keepers of the Art.  Three seperate guildhalls connected by magic teleporters are set peacfully around a small lake.  Kinool Goldsinger leads the [[Enchanter]]s, Niola Impholder the [[Magician]]s, and Tarker Blazetoss the [[Wizard]]s.  The Keepers support the Elven [[King Tearis Thex]] and the Kelethin Rangers guild called [[Faydarks Champions]].  They are opposed to the Dark Elf necromancers and shadowknights of [[The Dead]] faction in [[Neriak]].
+
+| zones_raise = 
+
+* [[Highpass Hold]]
+* [[Lesser Faydark]]
+* [[Neriak|Neriak Commons]]
+* [[Neriak|Neriak Foreign Quarter]]
+* [[Neriak|Neriak Third Gate]]
+* [[Ocean of Tears]]
+
+| zones_lower = 
+
+* [[Erudin|Erudin Palace]]
+* [[Najena]]
+* [[Nektulos Forest]]
+* [[Felwithe]]
+* [[Felwithe]]
+* [[Timorous Deep]]
+
+| quests_raise = 
+
+* [[Bat Wings]]
+* [[Black Wolf Skin Quest]]
+* [[Rogue Redemption]]
+* [[Slave Keys]]
+* [[The Mystic Cloak]]
+
+| quests_lower = 
+
+* [[Crude Stein Quest]]
+* [[Fire Beetle Eyes]]
+* [[Kerran Fire Beetle Eyes]]
+* [[Mammoth Tusks Quest]]
+* [[Necromancer Words - X`Ta Tempi]]
+* [[Sir Lindeal's Testimony]]
+* [[Thex Mallet Quest]]
+
+| mobs_raise = 
+
+* [[Capee]] <span class='fmz'>(Neriak Foreign Quarter - NPC, Non-Quest)</span>
+* [[Degarran Kixl]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Kizdean Gix]] <span class='fmz'>(Commonlands - Quest NPC)</span>
+* [[Kszan Punox]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Larik Z`Vole]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[Lisvan X`Lottl]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Loveal S`Nez]] <span class='fmz'>(Neriak Third Gate - Shadowknight Guildmaster)</span>
+* [[Noxhil V`Sek]] <span class='fmz'>(Neriak Third Gate - Quest NPC)</span>
+* [[Olavn N`Mar]] <span class='fmz'>(Neriak Commons - NPC, Non-Quest)</span>
+* [[Svunsa]] <span class='fmz'>(Neriak Foreign Quarter - NPC, Non-Quest)</span>
+* [[Uglan]] <span class='fmz'>(Neriak Foreign Quarter - Quest NPC)</span>
+* [[X`Ta Tempi]] <span class='fmz'>(Neriak Foreign Quarter - Quest NPC)</span>
+* [[X`Ta Timpi]] <span class='fmz'>(Neriak Foreign Quarter - Quest NPC)</span>
+* [[X`Ta Tompi]] <span class='fmz'>(Neriak Foreign Quarter - Quest NPC)</span>
+
+| mobs_lower = 
+
+* [[Linara Parlone]] <span class='fmz'>(Najena - Quest NPC)</span>
+* [[Niola Impholder]] <span class='fmz'>(Southern Felwithe - Magician Guildmaster)</span>
+* [[Tarker Blazetoss]] <span class='fmz'>(Southern Felwithe - Wizard Guildmaster)</span>
+* [[Tolkar Parlone]] <span class='fmz'>(Northern Felwithe - Quest NPC)</span>
+
+}}
+= Suggested Route =
+*[[Bat Wings]] (+[[Keepers of the Art]], +[[King Tearis Thex]], +[[Faydarks Champions]], -[[The Dead]])
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

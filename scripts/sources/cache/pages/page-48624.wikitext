@@ -1,0 +1,18 @@
+Divination is primarily used for vision spells and illusions.
+
+== Classes ==
+
+*[[Cleric]] (Level 1) (Max 235)
+*[[Druid]] (Level 1) (Max 235)
+*[[Shaman]] (Level 1) (Max 235)
+*[[Enchanter]] (Level 1) (Max 235)
+*[[Magician]] (Level 1) (Max 235)
+*[[Necromancer]] (Level 1) (Max 235)
+*[[Wizard]] (Level 1) (Max 235)
+*[[Paladin]] (Level 9) (Max 235)
+*[[Ranger]] (Level 9) (Max 235)
+*[[Shadow Knight]] (Level 9) (Max 235)
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

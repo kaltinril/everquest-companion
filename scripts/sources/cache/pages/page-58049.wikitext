@@ -1,0 +1,102 @@
+<div class="eql-mobpage">
+
+<div class="eql-mobpage-hero">
+
+<div class="eql-mobpage-stats">
+<h2 id="Stat_Block">Stat Block</h2>
+{{Mobstatsbox
+| name              = 
+| race              = Froglock
+| class             = Shaman
+| level             = 7
+
+| zone              = The Rathe Mountains
+| location          = South West Hill (~454, 1591, 131)
+
+| attacks_per_round = {{{attacks_per_round|}}}
+| attack_speed      = {{{attack_speed|}}}
+| damage_per_hit    = {{{damage_per_hit|}}}
+| special           = {{{special|}}}
+}}
+</div>
+
+<div class="eql-mobpage-section eql-mobpage-loot eql-mobpage-hero-loot">
+<h2 id="Known_Loot">{{#if:{{{common_loot|Small Magical Artifact}}}|Unique Loot|Known Loot}}</h2>
+<ul><li>  {{:Small Magical Artifact}}              <span class='drare'>(Common)</span> </li>
+<li>  {{:Muddied Yellow Shawl}}              <span class='drare'>(Rare)</span>
+</div>
+
+<div class="eql-mobpage-media">
+{{#if:{{{imagefilename|}}}
+ | {{#ifexist:File:{{{imagefilename}}}
+   | <div class="eql-mobpage-image">[[File:{{{imagefilename}}}|900px|frameless|alt={{{name|{{PAGENAME}}}}}]]{{#if:{{{caption|}}}|<div class="eql-mobpage-caption">{{{caption}}}</div>}}</div>
+   | <div class="eql-mobpage-image-missing">
+       <div class="eql-mobpage-image-missing-title">Image needed</div>
+       <div>[{{fullurl:Special:Upload|wpDestFile={{{imagefilename}}}&eqlReturnTo={{FULLPAGENAMEE}}}} Upload image]</div>
+       <div class="eql-mobpage-image-missing-file">Expected file:<br />{{{imagefilename}}}</div>
+     </div>
+   }}
+ | <div class="eql-mobpage-image-missing">
+     <div class="eql-mobpage-image-missing-title">Image needed</div>
+     <div class="eql-mobpage-image-missing-file">No image filename set.</div>
+   </div>
+}}
+
+{{#if:{{{second_image|}}}
+ | <div class="eql-mobpage-secondary-image">[[File:{{{second_image}}}|{{{second_width|300px}}}|frameless|alt={{{second_imagetext|Additional image}}}]]{{#if:{{{second_imagetext|}}}|<div class="eql-mobpage-caption">{{{second_imagetext}}}</div>}}</div>
+}}
+</div>
+
+</div>
+
+<div class="mobPageDiv eql-mobpage-content">
+
+<div class="eql-mobpage-section eql-mobpage-description">
+<h2 id="Description">Description</h2>
+{{{description|Description needed! Replace this text with characteristics of the mob.}}}
+</div>
+
+{{#if:{{{common_loot|}}}
+ | <div class="eql-mobpage-section eql-mobpage-common-loot">
+     <h2 id="Common_Loot">Common Loot</h2>
+     {{{common_loot}}}
+   </div>
+}}
+
+<div class="eql-mobpage-info-grid">
+
+<div class="eql-mobpage-section">
+<h2 id="Factions">Factions</h2>
+{{{factions|* None}}}
+</div>
+
+<div class="eql-mobpage-section">
+<h2 id="Opposing_Factions">Opposing Factions</h2>
+{{{opposing_factions|* None}}}
+</div>
+
+<div class="eql-mobpage-section">
+<h2 id="Related_Quests">Related Quests</h2>
+{{{related_quests|* None}}}
+</div>
+
+</div>
+
+{{#if:{{{videos|}}}
+ | <div class="eql-mobpage-section eql-mobpage-videos">
+     <h2 id="Videos">Videos</h2>
+     {{{videos}}}
+   </div>
+}}
+
+</div>
+
+</div>
+
+<div style="clear:both;"></div>
+
+<includeonly>
+__NOEDITSECTION__
+[[Category:NPCs]]
+[[Category:Named Mobs]]
+</includeonly>

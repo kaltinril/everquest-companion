@@ -1,0 +1,15 @@
+These patch notes are from the Official EverQuest Legends discord, posted on May 26, 2026
+
+= May 26, 2026 =
+
+= Hotfix =
+
+* Dark Assassin in Feerrott should now give XP.
+* Amplification (Bard Song) will no longer be affected by any singing mods, including itself.
+* Updated Plane of Sky quests one more time, to use a set of Wind Runes, instead of class specific runes.
+* Also updated the usable classes on old, and new, PoSky items, they should be correct now! If not, lodge a formal complaint at the nearest booth.
+* Each quest within a class will use a different wind rune, so be sure to stock up!
+* Naggy raid instance zone-in point moved slightly to avoid some races getting stuck in the wall.
+* Point blank AOE spells will now hit a maximum of 8 targets.
+* Players will no longer spawn facing the zone exit when entering a personal instance of Befallen
+* Adjusted some backend server configuration settings for performance.

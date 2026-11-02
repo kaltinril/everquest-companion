@@ -1,0 +1,140 @@
+{{Factionpage|
+
+| description = Foreign Quarters Guards inside the city of Neriak.
+
+| zones_raise = 
+
+* [[Butcherblock Mountains]]
+* [[Misty Thicket]]
+* [[Najena]]
+* [[Nektulos Forest]]
+* [[Neriak|Neriak Commons]]
+* [[Rivervale]]
+
+| zones_lower = 
+
+* [[Grobb]]
+* [[Rathe Mountains]]
+* [[Nektulos Forest]]
+* [[Neriak|Neriak Commons]]
+* [[Neriak|Neriak Foreign Quarter]]
+* [[Neriak|Neriak Third Gate]]
+
+| quests_raise = 
+
+* [[Book of Turmoil Quest]]
+* [[Bottle of Red Wine]]
+* [[Evil Research]]
+* [[Innoruuk Symbol Quests|Innoruuk Disciple]]
+* [[Shadow Knight Epic Quest]]
+
+| quests_lower = 
+
+* [[Hungry Deputy]]
+* [[Jillin's Stew]]
+* [[Orc Belts]]
+* [[Runnyeye Warbeads (Rivervale)]]
+* [[Leatherfoot Raiders]]
+
+| mobs_raise = 
+
+* [[a greedy beggar]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[a leatherfoot spy]]  <span class='fmz'>(Neriak Commons)</span>
+* [[a shady halfling]] <span class='fmz'>(Rivervale - NPC, Non-Quest)</span>
+* [[an injured halfling]]  <span class='fmz'>(Najena)</span>
+* [[Blinza Toepopal]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Deputy Alltin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Antana]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Asler]] <span class='fmz'>(Misty Thicket)</span>
+* [[Deputy Banto]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Budo]] <span class='fmz'>(Misty Thicket)</span>
+* [[Deputy Chopo]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Dopkin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Drebo]] <span class='fmz'>(Misty Thicket)</span>
+* [[Deputy Felp]] <span class='fmz'>(Misty Thicket)</span>
+* [[Deputy Goltin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Higley]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Higrin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Hiltop]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Kapop]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Keld]] <span class='fmz'>(Misty Thicket)</span>
+* [[Deputy Leeot]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Looh]] <span class='fmz'>(Misty Thicket)</span>
+* [[Deputy Lowmot]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Millin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Percin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Poolt]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Quillto]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Raynin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Regno]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Rollin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Sertlin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Shelmy]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Tagil]] <span class='fmz'>(Misty Thicket)</span>
+* [[Deputy Tonlo]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Vastin]] <span class='fmz'>(Misty Thicket)</span>
+* [[Ella Foodcrafter]] <span class='fmz'>(Misty Thicket - Quest NPC)</span>
+* [[Gollee]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Hamer]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Himmel]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Initiate Abber]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Initiate Pool]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Initiate Umbra]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Jossle]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Leatherfoot Deputy]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Leatherfoot Sergeant]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Marshal Anrey]] <span class='fmz'>(Rivervale - NPC, Non-Quest)</span>
+* [[Marshal Ghobber]] <span class='fmz'>(Rivervale - Warrior Guildmaster)</span>
+* [[Marshal Lanena]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Master Whoopal]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Neophyte Halle]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Quester Dunden]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Quester Hannin]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Reebo Leafsway]] <span class='fmz'>(Rivervale - Druid Guildmaster)</span>
+* [[Rollis]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Sheriff Roglio]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Snitch]]  <span class='fmz'>(Nektulos Forest)</span>
+
+| mobs_lower = 
+
+* [[Canarie]] <span class='fmz'>(Neriak Foreign Quarter - Merchant)</span>
+* [[Captain N`Farre]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Chizzlik]] <span class='fmz'>(Mountains of Rathe - Merchant)</span>
+* [[Corporal D`Abth]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Corporal J`Rais]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Corporal X`Tis]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Dragoon J`Len]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Dragoon Tsanne]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Dragoon X`Lottl]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Dragoon Zytl]] <span class='fmz'>(Commonlands - NPC, Non-Quest)</span>
+* [[Genzal R`Jyen]] <span class='fmz'>(Neriak Commons - Merchant)</span>
+* [[Glazn D`Unnar]] <span class='fmz'>(Neriak Commons - Merchant)</span>
+* [[Guard E`Brona]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard E`Tru]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard F`Lok]] <span class='fmz'>(Neriak Commons)</span>
+* [[Guard K`Jartan]] <span class='fmz'>(Neriak Commons)</span>
+* [[Guard N`Lan]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard T`Aba]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard V`Ehn]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard X`Onnu]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard Z`Den]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guzzla]] <span class='fmz'>(Mountains of Rathe - Merchant)</span>
+* [[Kirak Vil]] <span class='fmz'>(Nektulos Forest - Quest NPC)</span>
+* [[Lokar To`Biath]] <span class='fmz'>(Neriak Third Gate - Quest NPC)</span>
+* [[an iron guardian]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Pungla]]  <span class='fmz'>(Neriak Foreign Quarter)</span>
+* [[Putad]] <span class='fmz'>(Neriak Foreign Quarter - Merchant)</span>
+* [[Ratraz]] <span class='fmz'>(Neriak Third Gate - Quest NPC)</span>
+* [[Sergeant C`orm]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Smaka]] <span class='fmz'>(Neriak Foreign Quarter - Merchant)</span>
+* [[Ukla]] <span class='fmz'>(Mountains of Rathe - Merchant)</span>
+* [[Ungia]] <span class='fmz'>(Grobb - Merchant)</span>
+
+}}
+= Suggested Route =
+*[[Bottle of Red Wine]] (+[[Dreadguard Outer]], +[[Dreadguard Inner]], +[[Dark Bargainers]])
+*[[Track, Stalk, Hunt]] (+[[Dread Slayers]], +[[Indigo Brotherhood]], +[[Dreadguard Outer]], +[[Dreadguard Inner]], -[[Guardians of the Vale]], -[[Wolves of the North]])
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

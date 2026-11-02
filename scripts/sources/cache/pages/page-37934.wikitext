@@ -1,0 +1,29 @@
+{{Factionpage|
+
+| description = The Ogre population in Neriak.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Neriak|Neriak Foreign Quarter]]
+* [[Neriak|Neriak Third Gate]]
+
+| quests_raise = 
+
+* [[Preserved Meat Delivery]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Guard Swang]] <span class='fmz'>(Neriak Foreign Quarter)</span>
+* [[Jacker]] <span class='fmz'>(Neriak Foreign Quarter - NPC, Non-Quest)</span>
+* [[Spice]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+
+}}

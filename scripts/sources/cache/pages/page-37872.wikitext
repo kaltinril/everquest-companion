@@ -1,0 +1,272 @@
+{{Factionpage|
+
+| description = The guard (rather corrupt) faction of [[Freeport]].
+
+| zones_raise = 
+
+* [[Butcherblock Mountains]]
+* [[Freeport|East Freeport]]
+* [[Eastern Plains of Karana]]
+* [[High Keep]]
+* [[Lake Rathetear]]
+* [[Rathe Mountains]]
+* [[Freeport|North Freeport]]
+* [[Qeynos Aqueducts]]
+* [[Qeynos Hills]]
+* [[Southern Karana]]
+* [[Qeynos|South Qeynos]]
+* [[Freeport|West Freeport]]
+
+| zones_lower = 
+
+* [[Freeport|East Freeport]]
+* [[High Keep]]
+* [[Highpass Hold]]
+* [[Northern Desert of Ro]]
+* [[Qeynos Hills]]
+* [[Southern Desert of Ro]]
+* [[Freeport|West Freeport]]
+
+| quests_raise = 
+
+* [[Cutthroat Rings]]
+* [[Deathfist Slashed Belts, Evil Version]]
+* [[Exotic Drinks]]
+* [[Gnoll Scalp Collecting]]
+* [[Inert Potion Quest]]
+* [[Left Goblin Ears]]
+* [[Marr Minnows for Palon]]
+* [[Note for Rebby]]
+* [[Note for Janam]]
+* [[Orc Picks]]
+* [[Orc Scalp Collecting]]
+* [[Reserve Militia]]
+* [[Rogue Redemption]]
+* [[The Bridge]]
+* [[The Frikniller Family]]
+* [[The Traitor]]
+
+| quests_lower = 
+
+* [[Blurred Map Quest]]
+* [[Corrupt Guards (Cleric version)]]
+* [[Corrupt Guards (Paladin Version)]]
+* [[Deathfist Slashed Belts, Good Version]]
+* [[Errand for Tonmerk]]
+* [[Errand for Wolten]]
+* [[Hero Bracers Quest]]
+* [[Illegible Cantrip Quest]]
+* [[Journal Strongbox]]
+* [[Kobold Killing]]
+* [[Lydl Mastat]]
+* [[Paladin Message]]
+* [[Piranha Hunting]]
+* [[Rat Ear Pie Quest]]
+* [[Steel Warrior Initiation]]
+* [[The Bones of Darak Lightforge]]
+* [[The Clothspinner Sisters (good)]]
+* [[The Escaped Catman]]
+* [[Weapons Delivery]]
+* [[Zimel's Blades (SoulFire)]]
+
+| mobs_raise = 
+
+* [[Altunic Jartin]] <span style="color:gray">(Commonlands - Merchant)</span>
+* [[Arem Ulosia]] <span style="color:gray">(West Freeport - NPC, Non-Quest)</span>
+* [[Arinna Trueblade]] <span style="color:gray">(West Freeport - Warrior Guildmaster)</span>
+* [[Atvo Siro]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Atwin Keladryn]] <span style="color:gray">(Butcherblock Mountains - Quest NPC)</span>
+* [[Axe Broadsmith]] <span style="color:gray">(Qeynos Hills - Quest NPC)</span>
+* [[Besklor Tyrenson]] <span style="color:gray">(West Freeport - Quest NPC)</span>
+* [[Brena Donyld]] <span style="color:gray">(East Freeport - Warrior Guildmaster)</span>
+* [[Brina Foxtripper]] <span style="color:gray">(East Freeport - Warrior Guildmaster)</span>
+* [[Cain Darkmoore]] <span style="color:gray">(East Freeport - Warrior Guildmaster)</span>
+* [[Celsar Vestagon]] <span style="color:gray">(West Freeport - Cleric Guildmaster)</span>
+* [[Chardo Ahdelia]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Charia Betou]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Cronte Deloru]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Dooly Jonkers]] <span style="color:gray">(West Freeport - NPC, Non-Quest)</span>
+* [[Dulia Jestes]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Eestyana Naestra]] <span style="color:gray">(West Freeport - Cleric Guildmaster)</span>
+* [[Ghonic Erharn]] <span style="color:gray">(West Freeport - Cleric Guildmaster)</span>
+* [[Glyssa Sonshaw]] <span style="color:gray">(West Freeport - Quest NPC)</span>
+* [[Grahan Rothkar]] <span style="color:gray">(South Qeynos - Quest NPC)</span>
+* [[Guard Fernaldo]] <span style="color:gray">(Mountains of Rathe)</span>
+* [[Guard Rianna]] <span style="color:gray">(Lake Rathetear)</span>
+* [[Guard Treal]] <span style="color:gray">(Lake Rathetear)</span>
+* [[Gygus Remnara]] <span style="color:gray">(West Freeport - Paladin Guildmaster)</span>
+* [[Hemia Skemner]] <span style="color:gray">(West Freeport - Quest NPC)</span>
+* [[Jakom Herolon]] <span style="color:gray">(East Freeport - NPC, Non-Quest)</span>
+* [[Jarel Ranin]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Jemoz Lerkarson]] <span style="color:gray">(West Freeport - Cleric Guildmaster)</span>
+* [[Joffin Sinclay]] <span style="color:gray">(East Freeport - Quest NPC)</span>
+* [[Jonbe Kressi]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Jusia Vapious]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Kalatrina Plossen]] <span style="color:gray">(West Freeport - Paladin Guildmaster)</span>
+* [[Knight of Truth]] <span style="color:gray">(West Freeport)</span>
+* [[Larn Brugal]] <span style="color:gray">(East Freeport - Warrior Guildmaster)</span>
+* [[Lasiris Oncre]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Lorme Tredore]] <span style="color:gray">(West Freeport - Magician Guildmaster)</span>
+* [[Lynce Renardo]] <span style="color:gray">(West Freeport - NPC, Non-Quest)</span>
+* [[Lysa Truegreen]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Lysin Smokkan]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Markin Ironwhite]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Merko Quetalis]] <span style="color:gray">(West Freeport - Paladin Guildmaster)</span>
+* [[Milea Clothspinner]] <span style="color:gray">(East Karana - Quest NPC)</span>
+* [[Mirpa Arana]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Mojax Hikspin]] <span style="color:gray">(Commonlands - Quest NPC)</span>
+* [[Monat D`Larme]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Monia Oakstone]] <span style="color:gray">(East Freeport - NPC, Non-Quest)</span>
+* [[Narra Tanith]]  <span style="color:gray">(South Karana)</span>
+* [[Nusk Treton]] <span style="color:gray">(West Freeport - NPC, Non-Quest)</span>
+* [[Odemi Partun]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Palious Jarten]] <span style="color:gray">(West Freeport - Cleric Guildmaster)</span>
+* [[Palon Deskeb]] <span style="color:gray">(West Freeport - Quest NPC)</span>
+* [[Plagus Ladeson]] <span style="color:gray">(East Freeport - Warrior Guildmaster)</span>
+* [[Plnorrick Spinecracker]] <span style="color:gray">(East Freeport - NPC, Non-Quest)</span>
+* [[Purchin Oddsbot]] <span style="color:gray">(High Keep - Quest NPC)</span>
+* [[Ran Flamespinner]] <span style="color:gray">(High Keep - Wizard Guildmaster)</span>
+* [[Rashinda Elore]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Remon Zarga]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Rephas]] <span style="color:gray">(Qeynos Hills - Quest NPC)</span>
+* [[Respin Yawg]] <span style="color:gray">(West Freeport - NPC, Non-Quest)</span>
+* [[Romiak Jusathorn]] <span style="color:gray">(West Freeport - Quest NPC)</span>
+* [[Sentry Alechin]] <span style="color:gray">(South Karana - Quest NPC)</span>
+* [[Sentry Andlin]] <span style="color:gray">(North Freeport)</span>
+* [[Sentry Boris]] <span style="color:gray">(West Freeport)</span>
+* [[Sentry Gallius]] <span style="color:gray">(West Freeport)</span>
+* [[Sentry Janeal]] <span style="color:gray">(West Freeport)</span>
+* [[Sentry Meighan]] <span style="color:gray">(West Freeport)</span>
+* [[Sentry Theo]] <span style="color:gray">(North Freeport)</span>
+* [[Sentry Warren]] <span style="color:gray">(North Freeport)</span>
+* [[Serna Tasknon]] <span style="color:gray">(West Freeport - Cleric Guildmaster)</span>
+* [[Sir Ackmin]] <span style="color:gray">(North Freeport)</span>
+* [[Sir Arlin]] <span style="color:gray">(North Freeport)</span>
+* [[Sir Artanis]] <span style="color:gray">(West Freeport)</span>
+* [[Sir Breel]] <span style="color:gray">(North Freeport)</span>
+* [[Sir Costkin]] <span style="color:gray">(North Freeport)</span>
+* [[Sir Drolfis]] <span style="color:gray">(North Freeport)</span>
+* [[Sir Edwin Motte]]  <span style="color:gray">(East Freeport)</span>
+* [[Sir Folon]] <span style="color:gray">(West Freeport)</span>
+* [[Sir Fosco]] <span style="color:gray">(West Freeport)</span>
+* [[Sir Glimmon]] <span style="color:gray">(West Freeport)</span>
+* [[Sir Hallis]] <span style="color:gray">(North Freeport)</span>
+* [[Sir Hogo]] <span style="color:gray">(West Freeport)</span>
+* [[Sir Iot]] <span style="color:gray">(West Freeport)</span>
+* [[Sir Lishmin]] <span style="color:gray">(North Freeport)</span>
+* [[Sir Mollin]] <span style="color:gray">(North Freeport)</span>
+* [[Sir Noshon]] <span style="color:gray">(North Freeport)</span>
+* [[Sir Ollin]] <span style="color:gray">(North Freeport)</span>
+* [[Sir Penan]] <span style="color:gray">(North Freeport)</span>
+* [[Sir Phallin]] <span style="color:gray">(North Freeport)</span>
+* [[Sir Rophol]] <span style="color:gray">(North Freeport)</span>
+* [[Sir Shalint]] <span style="color:gray">(North Freeport)</span>
+* [[Sir Willam]] <span style="color:gray">(North Freeport)</span>
+* [[Sir Xantille]] <span style="color:gray">(West Freeport)</span>
+* [[Tara Neklene]] <span style="color:gray">(West Freeport - Magician Guildmaster)</span>
+* [[Tharma Jaremi]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Theron Rolius]] <span style="color:gray">(West Freeport - Paladin Guildmaster)</span>
+* [[Tholius Quey]] <span style="color:gray">(West Freeport - Cleric Guildmaster)</span>
+* [[Thumpy]] <span style="color:gray">(Qeynos Catacombs - NPC, Non-Quest)</span>
+* [[Thurion Desius]] <span style="color:gray">(West Freeport - Paladin Guildmaster)</span>
+* [[Toala Nehron]] <span style="color:gray">(East Freeport - Warrior Guildmaster)</span>
+* [[Trancil Clearpond]] <span style="color:gray">(East Freeport - NPC, Non-Quest)</span>
+* [[Trepo Merrop]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Valeron Dushire]] <span style="color:gray">(West Freeport - Paladin Guildmaster)</span>
+* [[Voglan Dransed]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Vun Winstone]] <span style="color:gray">(East Freeport - NPC, Non-Quest)</span>
+* [[Xinari Anara]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Yarina Zarampo]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Zasrin Blueflame]] <span style="color:gray">(West Freeport - Merchant)</span>
+
+| mobs_lower = 
+
+* [[a guard]] <span style="color:gray">(Highpass Hold)</span>
+* [[a Highpass citizen]] <span style="color:gray">(Highpass Hold - NPC, Non-Quest)</span>
+* [[a maid]] <span style="color:gray">(High Keep - NPC, Non-Quest)</span>
+* [[a smuggler]] <span style="color:gray">(Highpass Hold - NPC, Non-Quest)</span>
+* [[Beur Tenlah]] <span style="color:gray">(East Freeport - Rogue Guildmaster)</span>
+* [[Brother Jentry]] <span style="color:gray">(East Freeport)</span>
+* [[Brunar Rankin]] <span style="color:gray">(East Freeport - Quest NPC)</span>
+* [[Bryan Mcgee]] <span style="color:gray">(Highpass Hold - Quest NPC)</span>
+* [[Captain Hazran]] <span style="color:gray">(East Freeport - Warrior Guildmaster)</span>
+* [[Captain Orben]] <span style="color:gray">(Highpass Hold)</span>
+* [[Carson Mccabe]] <span style="color:gray">(High Keep - Quest NPC)</span>
+* [[Elisi Nasin]] <span style="color:gray">(East Freeport - Rogue Guildmaster)</span>
+* [[Guard Dreikin]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Fentallin]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Hirazen]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Nekropo]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Nlool]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Popal]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Quallith]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Topplo]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Ullindin]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Wytiffin]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Xyxax]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Yandellen]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Zintrin]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Bonlo]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Corpillius]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Dungwatch]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Effel]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Hrakin]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Imillin]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Inofus]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Jacsen]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Jendl]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Ledshin]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Mizraen]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Munden]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Cozak]] <span style="color:gray">(West Freeport)</span>
+* [[Gren Frikniller]] <span style="color:gray">(East Freeport - Quest NPC)</span>
+* [[Guard Bicker]] <span style="color:gray">(High Keep)</span>
+* [[Guard Blayle]] <span style="color:gray">(High Keep)</span>
+* [[Guard Brendyl]] <span style="color:gray">(North Ro)</span>
+* [[Guard Colin]] <span style="color:gray">(Commonlands)</span>
+* [[Guard Doolin]] <span style="color:gray">(North Ro)</span>
+* [[Guard Drake]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Drazden]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Duras]] <span style="color:gray">(High Keep)</span>
+* [[Guard Folton]] <span style="color:gray">(High Keep)</span>
+* [[Guard Fralldo]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Goemin]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Gollus]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Greedin]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Hiron]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Jup]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Kroon]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Lancel]] <span style="color:gray">(High Keep)</span>
+* [[Guard Lithnon]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Lorton]] <span style="color:gray">(High Keep)</span>
+* [[Guard Ogo]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Orpheen]] <span style="color:gray">(East Freeport)</span>
+* [[Guard Rance]] <span style="color:gray">(High Keep)</span>
+* [[Guard Reskin]] <span style="color:gray">(Commonlands)</span>
+* [[Guard Tolus]] <span style="color:gray">(Commonlands)</span>
+* [[Guard Valon]] <span style="color:gray">(Commonlands)</span>
+* [[Guard Zeph]] <span style="color:gray">(East Freeport)</span>
+* [[Harkin Duskfoot]] <span style="color:gray">(East Freeport - Rogue Guildmaster)</span>
+* [[Hollish Tnoops]]  <span style="color:gray">(West Freeport)</span>
+* [[Imxil Tbrow]] <span style="color:gray">(East Freeport - NPC, Non-Quest)</span>
+* [[Innkeep Harold]] <span style="color:gray">(Commonlands - Merchant)</span>
+* [[Innkeep Marnan]] <span style="color:gray">(South Ro - Merchant)</span>
+* [[Innkeep Valon]] <span style="color:gray">(North Ro - Merchant)</span>
+* [[Lady McCabe]] <span style="color:gray">(High Keep - Quest NPC)</span>
+* [[Nestral TGaza]] <span style="color:gray">(East Freeport - Rogue Guildmaster)</span>
+* [[Olunea Miltin]] <span style="color:gray">(East Freeport - NPC, Non-Quest)</span>
+* [[Runthar]] <span style="color:gray">(East Freeport - NPC, Non-Quest)</span>
+* [[Sergeant Slate]] <span style="color:gray">(Commonlands)</span>
+* [[Shintl Lowbrew]]  <span style="color:gray">(West Freeport)</span>
+* [[Sir Lucan D`Lere]] <span style="color:gray">(East Freeport - Quest NPC)</span>
+* [[Tenni Kohern]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Volunteer Renlor]] <span style="color:gray">(Highpass Hold - NPC, Non-Quest)</span>
+* [[Zenita D`Rin]] <span style="color:gray">(East Freeport - Quest NPC)</span>
+
+}}
+= Suggested Route =
+*[[The Frikniller Family]] (+[[Coalition of Tradefolk Underground]], +[[Coalition of Tradefolk]], +[[Carson McCabe]], +[[Corrupt Qeynos Guards]], +[[The Freeport Militia]])  
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

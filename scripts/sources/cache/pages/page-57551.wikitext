@@ -1,0 +1,163 @@
+{{Factionpage|
+
+| description = A new faction of the iksar has emerged within The Northern Desert of Ro known as the New Sebilisian Expedition. They generally regard outsiders dubiously, however [[Crusader Iktra]] may have some tasks to increase ones standing with the group..
+
+| zones_raise = 
+
+* [[The Northern Desert of Ro]]
+
+| zones_lower = 
+
+| quests_raise = 
+
+*[[Supplies for the New Sebilisian Expedition]]
+
+| quests_lower = 
+
+| mobs_raise = 
+
+| mobs_lower = 
+*[[Crusader Iktra]] (-100)
+*[[Trooper Axlia]] (-100)
+*[[Trooper Kraer]] (-100)
+*[[Trooper Tygin]] (-100)
+
+}}
+
+
+==Reaction Modifiers==
+''See also: [[Game Mechanics#Faction System and Levels]] for a breakdown of the different Reaction Modifiers''
+
+In addition to the Standing Value, some modifiers are applied to determine the final value that would result in a given NPC belonging to that Primary Faction. A number of mods apply. The standard reaction mods are: Race, Class and Deity. Other mods may apply.
+
+{| class="eoTable2 mw-collapsible mw-collapsed" style="width:100%; max-width:100%; margin:1rem 0;"
+! style="text-align:left;" | <span class="mw-collapsible-toggle eql-spell-lazy-heading" title="Race Mod" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Race Mod<div style="font-size:0.75rem;font-weight:400; margin:0 0 0.75rem 0;">''Click to Expand or Collapse''</div></span>
+|-
+| style="padding:0.75rem;" |
+<div style="font-size:0.95rem; margin:0 0 0.75rem 0;">
+{| class="eoTable2 sortable" style="text-align:center"
+|-
+! '''Race''' !! Mod
+|-
+| style="text-align:left;" | '''Barbarian''' || -200
+|-
+| style="text-align:left;" | '''Dark Elf''' || -200
+|-
+| style="text-align:left;" | '''Dwarf''' || -200
+|-
+| style="text-align:left;" | '''Erudite''' || -200
+|-
+| style="text-align:left;" | '''Gnome''' || -200
+|-
+| style="text-align:left;" | '''Half Elf''' || -200
+|-
+| style="text-align:left;" | '''Halfling''' || -200
+|-
+| style="text-align:left;" | '''High Elf''' || -200
+|-
+| style="text-align:left;" | '''Human''' || -200
+|-
+| style="text-align:left;" | '''Iksar''' || +50
+|-
+| style="text-align:left;" | '''Ogre''' || -200
+|-
+| style="text-align:left;" | '''Troll''' || -200
+|-
+| style="text-align:left;" | '''Kerran''' || -200
+|-
+| style="text-align:left;" | '''Wood Elf''' || -200
+|-
+| style="text-align:left;" | '''Froglok''' || ?
+|-
+| style="text-align:left;" | '''Half Dark Elf''' || ?
+|}
+</div>
+|}
+{| class="eoTable2 mw-collapsible mw-collapsed" style="width:100%; max-width:100%; margin:1rem 0;"
+! style="text-align:left;" | <span class="mw-collapsible-toggle eql-spell-lazy-heading" title="Class Mod" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Class Mod<div style="font-size:0.75rem;font-weight:400; margin:0 0 0.75rem 0;">''Click to Expand or Collapse''</div></span>
+|-
+| style="padding:0.75rem;" |
+<div style="font-size:0.95rem; margin:0 0 0.75rem 0;">
+{| class="eoTable2 sortable" style="text-align:center"
+|-
+! '''Race''' !! Mod
+|-
+| style="text-align:left;" | '''Barbarian''' || ? 
+|-
+| style="text-align:left;" | '''Dark Elf''' || ?
+|-
+| style="text-align:left;" | '''Dwarf''' || ?
+|-
+| style="text-align:left;" | '''Erudite''' || ?
+|-
+| style="text-align:left;" | '''Gnome''' || ?
+|-
+| style="text-align:left;" | '''Half Elf''' || ?
+|-
+| style="text-align:left;" | '''Halfling''' || ?
+|-
+| style="text-align:left;" | '''High Elf''' || ?
+|-
+| style="text-align:left;" | '''Human''' || ? 
+|-
+| style="text-align:left;" | '''Iksar''' || ?
+|-
+| style="text-align:left;" | '''Ogre''' || ?
+|-
+| style="text-align:left;" | '''Troll''' || ?
+|-
+| style="text-align:left;" | '''Kerran''' || ?
+|-
+| style="text-align:left;" | '''Froglok''' || ?
+|-
+| style="text-align:left;" | '''HalfDE''' || ?
+|}
+</div>
+|}
+{| class="eoTable2 mw-collapsible mw-collapsed" style="width:100%; max-width:100%; margin:1rem 0;"
+! style="text-align:left;" | <span class="mw-collapsible-toggle eql-spell-lazy-heading" title="Deity Mod" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Deity Mod<div style="font-size:0.75rem;font-weight:400; margin:0 0 0.75rem 0;">''Click to Expand or Collapse''</div></span>
+|-
+| style="padding:0.75rem;" |
+<div style="font-size:0.95rem; margin:0 0 0.75rem 0;">
+{| class="eoTable2 sortable" style="text-align:center"
+|-
+! '''Race''' !! Mod
+|-
+| style="text-align:left;" | '''Agnostic''' || 0
+|-
+| style="text-align:left;" | '''Bertoxxulous''' || ?
+|-
+| style="text-align:left;" | '''Brell Serilis''' || ?
+|-
+| style="text-align:left;" | '''Bristlebane''' || ?
+|-
+| style="text-align:left;" | '''Cazic Thule''' || ?
+|-
+| style="text-align:left;" | '''Erollisi Marr''' || ?
+|-
+| style="text-align:left;" | '''Innoruuk''' || ?
+|-
+| style="text-align:left;" | '''Karana''' || ?
+|-
+| style="text-align:left;" | '''Mithaniel Marr''' || ? 
+|-
+| style="text-align:left;" | '''Prexus''' || ?
+|-
+| style="text-align:left;" | '''Quellious''' || ?
+|-
+| style="text-align:left;" | '''Rallos Zek''' || -200
+|-
+| style="text-align:left;" | '''Rodcet Nice''' || ?
+|-
+| style="text-align:left;" | '''Solusek Ro''' || ?
+|-
+| style="text-align:left;" | '''The Tribunal''' || ?
+|-
+| style="text-align:left;" | '''Tunare''' || ?
+|-
+| style="text-align:left;" | '''Veeshan''' || -1500
+|}
+</div>
+|}
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

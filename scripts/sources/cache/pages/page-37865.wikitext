@@ -1,0 +1,147 @@
+{{Factionpage|
+
+| description = Rivervale Merchants are on this faction.
+
+| zones_raise = 
+
+* [[Freeport|East Freeport]]
+* [[Misty Thicket]]
+* [[Rivervale]]
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Misty Thicket]]
+* [[Najena]]
+* [[Nektulos Forest]]
+* [[Neriak|Neriak Commons]]
+* [[Northern Karana]]
+* [[Rivervale]]
+* [[Freeport|West Freeport]]
+
+| quests_raise = 
+
+* [[Bandages for Honeybugger]]
+* [[Bug Collection]]
+* [[Deputy Tagil's Debt]]
+* [[Honey Jum Quest]]
+* [[Hungry Deputy]]
+* [[Jillin's Stew]]
+* [[Nillipuss the Brownie]]
+* [[Orc Belts]]
+* [[Reebo's Carrots]]
+* [[Runnyeye Warbeads (Rivervale)]]
+* [[The Bind]]
+* [[The Fishslayers]]
+
+| quests_lower = 
+
+* [[Chomper]]
+* [[Innoruuk Symbol Quests|Innoruuk Disciple]]
+* [[The Torn Pouch]]
+
+| mobs_raise = 
+
+* [[Bouncer Bigboot]] <span class='fmz'>(Rivervale)</span>
+* [[Bouncer Bogglebin]] <span class='fmz'>(Rivervale)</span>
+* [[Gunrich]] <span class='fmz'>(Misty Thicket)</span>
+* [[Hebber Druneny]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Lendel Deeppockets]] <span class='fmz'>(Rivervale - Rogue Guildmaster)</span>
+* [[Mooto]]  <span class='fmz'>(Misty Thicket)</span>
+* [[Rueppy Kutpurse]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Toelia Snuckery]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+
+| mobs_lower = 
+
+* [[a greedy beggar]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[a leatherfoot spy]]  <span class='fmz'>(Neriak Commons)</span>
+* [[a mangy rat]] <span class='fmz'>(Misty Thicket)</span>
+* [[a shady halfling]] <span class='fmz'>(Rivervale - NPC, Non-Quest)</span>
+* [[an injured halfling]]  <span class='fmz'>(Najena)</span>
+* [[Bim Buskin]] <span class='fmz'>(Misty Thicket - Merchant)</span>
+* [[Bimble Babbinsbort]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Bink]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Blinza Toepopal]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Blixkin Entopop]] <span class='fmz'>(Misty Thicket - Quest NPC)</span>
+* [[Daleen Leafsway]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Deputy Alltin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Antana]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Asler]] <span class='fmz'>(Misty Thicket)</span>
+* [[Deputy Banto]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Budo]] <span class='fmz'>(Misty Thicket)</span>
+* [[Deputy Chopo]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Dopkin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Drebo]] <span class='fmz'>(Misty Thicket)</span>
+* [[Deputy Felp]] <span class='fmz'>(Misty Thicket)</span>
+* [[Deputy Goltin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Higley]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Higrin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Hiltop]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Kapop]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Keld]] <span class='fmz'>(Misty Thicket)</span>
+* [[Deputy Leeot]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Looh]] <span class='fmz'>(Misty Thicket)</span>
+* [[Deputy Lowmot]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Millin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Percin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Poolt]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Quillto]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Raynin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Regno]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Rollin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Sertlin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Shelmy]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Tagil]] <span class='fmz'>(Misty Thicket)</span>
+* [[Deputy Tonlo]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Vastin]] <span class='fmz'>(Misty Thicket)</span>
+* [[Donlo Goobler]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Ella Foodcrafter]] <span class='fmz'>(Misty Thicket - Quest NPC)</span>
+* [[Ember]] <span class='fmz'>(Misty Thicket)</span>
+* [[Falia Frikniller]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Fiddy Bobick]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Gollee]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Hamer]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Hanga Wiskin]] <span class='fmz'>(Misty Thicket - Merchant)</span>
+* [[Himmel]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Ilscent Tagglefoot]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Initiate Guanin]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Initiate Pool]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Initiate Rambel]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Initiate Umbra]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Joogl Honeybugger]] <span class='fmz'>(Misty Thicket - Quest NPC)</span>
+* [[Jossle]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Kevlin Diggs]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Kizzie Mintopp]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Klimmer]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Leatherfoot Deputy]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Lil Honeybugger]] <span class='fmz'>(Misty Thicket - Quest NPC)</span>
+* [[Mangler]] <span class='fmz'>(Rivervale)</span>
+* [[Marshal Anrey]] <span class='fmz'>(Rivervale - NPC, Non-Quest)</span>
+* [[Marshal Ghobber]] <span class='fmz'>(Rivervale - Warrior Guildmaster)</span>
+* [[Marshal Lanena]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Master Whoopal]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Meeka Diggs]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Neophyte Edel]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Neophyte Halle]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Neophyte Hazel]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Quester Dunden]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Quester Hannin]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Rantho Goobler]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Reebo Leafsway]] <span class='fmz'>(Rivervale - Druid Guildmaster)</span>
+* [[Shakey Scarecrow]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Sheriff Roglio]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Snitch]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Sonsa Fromp]] <span class='fmz'>(Misty Thicket - Merchant)</span>
+* [[Tipa Lighten]] <span class='fmz'>(Misty Thicket - Merchant)</span>
+* [[Topper Drodo]] <span class='fmz'>(Misty Thicket - Merchant)</span>
+* [[Twippie Diggs]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Uner Gnarltrunk]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Xanuusus]] <span class='fmz'>(North Karana - Quest NPC)</span>
+
+}}
+= Suggested Route =
+*[[Jillin's Stew]] (+[[Guardians of the Vale]], +[[Mayor Gubbin]], +[[Storm Reapers]], +[[Mayor Gubbin]], +[[Merchants of Rivervale]], -[[Dreadguard Outer]])
+*[[Bandages for Honeybugger]] (+[[Merchants of Rivervale]], +[[DeepPockets]], +[[Guardians of the Vale]], +[[Mayor Gubbin]], -[[Coalition of Tradefolk Underground]]
+
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

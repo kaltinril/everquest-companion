@@ -1,0 +1,28 @@
+{{Factionpage|
+
+| description = Faction of three gnome necromancers in [[Rathe Mountains]] (for the [[Clay Bracelet Quest]] quest).
+
+| zones_raise = 
+
+
+
+| zones_lower = 
+
+* [[Rathe Mountains]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Bindlegrob]] <span class='fmz'>(Rathe Mountains)</span>
+* [[Findlegrob]] <span class='fmz'>(Rathe Mountains)</span>
+* [[Sindlegrob]] <span class='fmz'>(Rathe Mountains)</span>
+
+}}

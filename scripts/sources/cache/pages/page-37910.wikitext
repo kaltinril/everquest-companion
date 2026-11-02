@@ -1,0 +1,27 @@
+{{Factionpage|
+
+| description = [[Bixie]]s in the area around [[Misty Thicket]]. Note that the bixies in the Commonlands are neutral and will not change this faction.
+
+| zones_raise = 
+
+* none
+
+| zones_lower = 
+
+* [[Misty Thicket]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* none
+
+| mobs_lower = 
+
+* [[a bixie drone]]  <span class='fmz'>(Misty Thicket)</span>
+
+}}

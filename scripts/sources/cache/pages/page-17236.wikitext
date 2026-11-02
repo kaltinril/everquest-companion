@@ -1,0 +1,32 @@
+The [[Plane of Mischief]] offers several classes a unique suit of armor.  Unlike most [[Velious Class Armor]] however, not every class gets a suit, only monks and casters.
+<section begin=classes/>
+{| class="eoTable3" style="width:725px;"
+!Class
+!Armor Set
+|-
+|[[Cleric]]
+| [[Crazy Cleric Armor]]
+|-
+|[[Druid]]
+|[[Twisted Nature Armor]]
+|-
+|[[Enchanter]]
+|[[Mischievous Dazzler Armor]]
+|-
+|[[Magician]]
+|[[Sly Summoners Armor]]
+|-
+|[[Monk]]
+|[[Monkey Hide Armor]]
+|-
+|[[Necromancer]]
+|[[Maleficent Armor]]
+|-
+|[[Shaman]]
+|[[Shamanistic Shenannigan Armor]]
+|-
+|[[Wizard]]
+|[[Wily Warlock Armor]]
+|-
+|}
+<section end=classes/>

@@ -1,0 +1,54 @@
+The skill that governs the use of [[:Category:1H_Slashing | 1-handed slash weapons]].
+
+== Classes ==
+
+{| class="wikitable"
+!Class
+!Cap Until 50
+!Cap Above 50
+!Feb 21, 2001
+!Oct 8, 2001
+|-
+|[[Warrior]]
+|200
+|250
+|-
+|[[Rogue]]
+|200
+|250
+|-
+|[[Ranger]]
+|200
+|240
+|250
+|-
+|[[Paladin]]
+|200
+|225
+|-
+|[[Shadow Knight]]
+|200
+|225
+|-
+|[[Bard]]
+|200?
+|225?
+|
+|250
+|-
+|[[Druid]]
+|175
+|175
+|-
+|}
+
+== Ratios ==
+
+[[File:1H_Damage_Ratios.jpg|link=]]
+
+
+== Navigation ==
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

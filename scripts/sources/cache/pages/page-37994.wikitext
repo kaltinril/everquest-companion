@@ -1,0 +1,37 @@
+{{Factionpage|
+
+| description = The lizardmen of Cazic Thule.
+
+| zones_raise = 
+
+* [[Rathe Mountains]]
+* [[The Feerrott]]
+* [[Cazic Thule]]
+
+| zones_lower = 
+
+* [[The Feerrott]]
+* [[Cazic Thule]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[A Hatchling]] <span class='fmz'>(The Feerrott)</span>
+* [[a lizardman forager]]  <span class='fmz'>(The Feerrott)</span>
+* [[a lizardman scout]]  <span class='fmz'>(The Feerrott)</span>
+* [[a lizardman watcher]]  <span class='fmz'>(The Feerrott)</span>
+* [[lizardman mystic]]  <span class='fmz'>(Mountains of Rathe)</span>
+
+| mobs_lower = 
+
+* [[Radiant]]  <span class='fmz'>(Cazic Thule)</span>
+* [[Tae Ew Archon]]  <span class='fmz'>(Cazic Thule)</span>
+* [[Tae Ew Diviner]]  <span class='fmz'>(Cazic Thule)</span>
+* [[Tae Ew Templar]]  <span class='fmz'>(Cazic Thule)</span>
+* [[A Steel Golem]] <span class='fmz '>(Cazic Thule)</span>
+}}

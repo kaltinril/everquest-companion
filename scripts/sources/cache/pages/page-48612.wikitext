@@ -1,0 +1,127 @@
+Alteration is most often used for healing, roots and some DoTs. Teleports also cast through alteration. 
+
+== Classes ==
+{| class="wikitable"
+!Class
+!Trainable
+!Cap Until 50
+!Cap Above 50
+|-
+|[[Cleric]]
+|Level 1
+|235
+|235
+|-
+|[[Druid]]
+|Level 1
+|235
+|235
+|-
+|[[Enchanter]]
+|Level 1
+|235
+|235
+|-
+|[[Magician]]
+|Level 1
+|235
+|235
+|-
+|[[Necromancer]]
+|Level 1
+|235
+|235
+|-
+|[[Paladin]]
+|Level 9
+|235
+|235
+|-
+|[[Ranger]]
+|Level 9
+|235
+|235
+|-
+|[[Shadow Knight]]
+|Level 9
+|235
+|235
+|-
+|[[Shaman]]
+|Level 1
+|235
+|235
+|-
+|[[Wizard]]
+|Level 1
+|235
+|235
+|}
+
+== Training ==
+Classes that can train Alteration can do so intentionally by repeat casting the following spell.
+
+Remember to have your Wis or Int as high as possible, respective to your classes main mana stat.
+
+These spells are based on what is fastest and then cheapest to cast for max casts per hour. 
+
+{| class="wikitable"
+!Class
+!Level
+!Spell
+!Target
+|-
+|[[Cleric]]
+|Level 1
+|[[Minor Healing]]
+|Self
+|-
+|[[Druid]]
+|Level 1
+|[[Minor Healing]]
+|Self
+|-
+|[[Enchanter]]
+|Level 1
+|[[Weaken]]
+|Self
+|-
+|[[Magician]]
+|Level 8
+|[[Renew Elements]]
+|Self
+|-
+|[[Necromancer]]
+|Level 1
+|[[Lifetap]]
+|Self
+|-
+|[[Paladin]]
+|Level 9
+|[[Minor Healing]]
+|Self
+|-
+|[[Ranger]]
+|Level 9
+|[[Minor Healing]]
+|Self
+|-
+|[[Shadow Knight]]
+|Level 9
+|[[Lifetap]]
+|Self
+|-
+|[[Shaman]]
+|Level 1
+|[[Minor Healing]]
+|Self
+|-
+|[[Wizard]]
+|Level 8
+|[[Shadow Step]]
+|Self
+|}
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

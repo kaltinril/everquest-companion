@@ -1,0 +1,27 @@
+The skill that governs the use of [[:Category:Piercing|piercing weapons]].
+
+Two-hand Piercing (2HP) is available on some Velious-era weapons (example: [[Tantor's Tusk]]).
+
+== Classes ==
+{{expand}}
+*[[Bard]] (Max 210?) (Oct 8, 2001 (Max 240)) 
+*[[Enchanter]] (Max 110)
+*[[Magician]] (Max 110)
+*[[Necromancer]] (Max 110)
+*[[Paladin]] (Max 225)
+*[[Ranger]] (Max 240)
+*[[Rogue]] (Max 250)
+*[[Shadow Knight]] (Max 210)
+*[[Shaman]] (Max 200)
+*[[Warrior]] (Max 240)
+*[[Wizard]] (Max 110)
+
+== Ratios ==
+
+[[File:1H_Damage_Ratios.jpg|link=]]
+
+== Navigation ==
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

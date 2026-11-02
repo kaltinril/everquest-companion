@@ -1,0 +1,41 @@
+{{Factionpage|
+
+| description = Tunare's Scouts can be found in the Treetop city of [[Kelethin]].  This rogues guild under guildmaster Tylfon remain neutral with no declared allies or enemies.
+
+| zones_raise = 
+
+* [[Greater Faydark]]
+
+| zones_lower = 
+
+* [[Crushbone]]
+* [[Greater Faydark]]
+
+| quests_raise = 
+
+* [[Pixie_Dust_(Kelethin_Rogue)|Pixie Dust]]
+* [[Tunare Scouts Dagger]]
+* [[Scouts Cape Quest]]
+* [[Scout Blade]]
+* [[Scouts Leggings]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Expin]] <span class='fmz'>(Greater Faydark - Rogue Guildmaster)</span>
+* [[Geeda]] <span class='fmz'>(Greater Faydark - Rogue Guildmaster)</span>
+* [[Tylfon]] <span class='fmz'>(Greater Faydark - Rogue Guildmaster)</span>
+* [[Laren]] <span class='fmz'>(Greater Faydark - Rogue Guildmaster)</span>
+* [[Merchant Gililya]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Kelynn]] <span class='fmz'>(Crushbone - Quest NPC)</span>
+
+}}
+= Note =
+[[Scouts Cape Quest]] can not be completed due to Kelynn's absence.
+
+[[Category:Achievement Faction]]

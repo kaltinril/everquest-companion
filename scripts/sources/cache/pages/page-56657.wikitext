@@ -1,0 +1,11 @@
+This is a dumping ground for all things Wiki Requests.
+
+
+'''Features:'''
+
+Consolidated "list view" item search by slot (Like search [[Special:ClassSlotEquip/Enchanter/2H Blunt/AllItems|by class by slot]], but just for [[:Category:Piercing|by slot]])
+
+
+'''Page Updates:'''
+
+The [[Game Mechanics]] page is going to need a lot of help.

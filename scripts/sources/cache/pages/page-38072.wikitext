@@ -1,0 +1,36 @@
+{{Classic Era}}
+{{Factionpage|
+
+| description = Faction of the Kejek people in Stonebrunt Mtns.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+
+| quests_raise = 
+
+* [[Heretic Heads]]
+* [[Miranda's Dice]]
+* [[Miranda's Chocolate]]
+* [[Rognarog's Head]]
+* [[Spirit Aid]]
+* [[Yuio's Illness]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a kejekan amir]]  <span class='fmz'>(Stonebrunt Mountains)</span>
+* [[a kejekan archer]]  <span class='fmz'>(Stonebrunt Mountains)</span>
+* [[Giang Yin]]  <span class='fmz'>(Stonebrunt Mountains)</span>
+* [[Prowler of the Jungle]]  <span class='fmz'>(Stonebrunt Mountains)</span>
+* [[Slyder the Ancient]]  <span class='fmz'>(Stonebrunt Mountains)</span>
+* [[Snowbeast]]  <span class='fmz'>(Stonebrunt Mountains)</span>
+
+}}

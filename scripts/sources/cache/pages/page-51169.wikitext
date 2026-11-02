@@ -1,0 +1,19 @@
+{{disambiguation}}
+'''Fear''' is a general term to describe spells where the player loses control ("You flee in terror") and walks/runs randomly around. 
+
+===Various fear spells===
+
+* [[Dragon Roar]]
+* [[Dread of Night]]
+* [[Fear]]
+* [[Inspire Fear]]
+* [[Instill Doubt]]
+* [[Intimidation]]
+* [[Invoke Fear]]
+* [[Spook the Dead]]
+* [[Panic]]
+* [[Panic the Dead]]
+* [[Trepidation]]
+* [[Wave of Fear]]
+
+[[Category:Spells]]

@@ -1,0 +1,43 @@
+{{Velious Era}}
+{{Factionpage|
+
+| description =
+
+| zones_raise =
+
+
+| zones_lower =
+
+* [[Plane of Growth]]
+
+| quests_raise =
+
+
+| quests_lower =
+
+
+| mobs_raise =
+
+
+| mobs_lower =
+
+* [[a contemplative thifling]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a feral amalgam]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a gale wolf]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a phase puma]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a rolling plains steed]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a sylvan protector]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a thifling lord]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a tranquil treant]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a whorl of natural energy]]  <span class='fmz'>(Plane of Growth)</span>
+* [[an abstruse phantasm]]  <span class='fmz'>(Plane of Growth)</span>
+* [[an entoling culler]]  <span class='fmz'>(Plane of Growth)</span>
+* [[An Entoling Essense Channeller]]  <span class='fmz'>(Plane of Growth)</span>
+
+* [[an entoling harvester]]  <span class='fmz'>(Plane of Growth)</span>
+* [[Galiel Spirithoof]]  <span class='fmz'>(Plane of Growth)</span>
+* [[Grahl Strongback]]  <span class='fmz'>(Plane of Growth)</span>
+* [[Guardian of Takish]] <span class='fmz'>(Plane of Growth - Quest NPC)</span>
+* [[Tunare]]  <span class='fmz'>(Plane of Growth)</span>
+
+}}

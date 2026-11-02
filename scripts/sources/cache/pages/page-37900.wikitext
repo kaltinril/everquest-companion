@@ -1,0 +1,79 @@
+{{Factionpage|
+
+| description = Followers of the Oceanlord [[Prexus]], The Deepwater Knights are led by the Paladin Weligon Steelherder and the Cleric Gans Paust.  For the Knights, swimming is a mandatory skill, as many of their quests lead them beneath the waves.  These Knights are allied with the [[High Council of Erudin]] and oppose the [[Heretics]] who live in Paineel now.<br><br>
+Note: You can't do any of the quests such as [[Bracer of Ro]] until amiable. To raise it, you either have to kill [[Elial Brook]] (guy on the beach) every six minutes over and over, or better yet, kill the two sharks that spawn at the [[Erudin]] docks. They are placeholders for [[a diseased shark]]. Kill it and a bunch of [[a young shark|young sharks]] spawn. Kill them all! Every one of them gives +5 faction (took roughly 50 kills to go from barely kindly to warmly). Plus you can turn in their quest parts for a [[Barnacle Breastplate]] once you hit amiable.
+
+| zones_raise = 
+
+* [[Lavastorm Mountains]]
+* [[Paineel]]
+* [[The Hole]]
+* [[Toxxulia Forest]]
+
+| zones_lower = 
+
+* [[Freeport|East Freeport]]
+* [[Erud's Crossing]]
+* [[Erudin]]
+* [[Plane of Sky]]
+* [[Toxxulia Forest]]
+
+| quests_raise = 
+
+* [[Barnacle Breastplate Quest]]
+* [[Cleanse the Ocean]]
+* [[Fisherman Convert]]
+* [[Heretic Battle]]
+* [[Kobold Molars (Good)]]
+* [[Kobold Shaman Artifacts]]
+* [[Odus Pearls]]
+* [[The Bridge]]
+* [[The Fiery Avenger]]
+* [[Zombie Flesh Quest]]
+
+| quests_lower = 
+
+* [[Azzar's Dreadful Hat Quest]]
+* [[Bat Fur and Beetle Legs]]
+* [[Cazic Thule Initiate]]
+* [[Cold Iron]]
+* [[Kobold Molars (evil)]]
+* [[The Fisherman]]
+* [[The Lost Pet]]
+* [[The Waylaid Courier]]
+
+| mobs_raise = 
+
+* [[Azzar Habbib]] <span class='fmz'>(Paineel)</span>
+* [[Derena Leflor]] <span class='fmz'>(Paineel)</span>
+* [[Elial Brook]]  <span class='fmz'>(Toxxulia Forest)</span>
+* <s>[[Guard Korlack]]  <span class='fmz'>(Paineel)</span></s>
+* <s>[[Guard Menbuknar]]  <span class='fmz'>(Paineel)</span></s>
+* [[Hykallen]]  <span class='fmz'>(Lavastorm Mountains)</span>
+* [[Jelquar the Soulslayer]]  <span class='fmz'>(Stonebrunt Mountains)</span>
+* [[Keeper of the Tombs]] <span class='fmz'>(Ruins of Old Paineel (The Hole))</span>
+* [[Keeshla Levlora]] <span class='fmz'>(Paineel)</span>
+* [[Noclin Saah]] <span class='fmz'>(Paineel)</span>
+* [[Rallia Hapera]] <span class='fmz'>(Paineel)</span>
+* [[Telan Buvare]] <span class='fmz'>(Paineel)</span>
+* [[Velana Kelmuza]] <span class='fmz'>(Paineel)</span>
+* [[Verolk Kishneal]] <span class='fmz'>(Paineel)</span>
+* [[A kerran `amir]] <span class='fmz'>(Kerra Island)</span>
+* [[A kerran puma]] <span class='fmz'>(Kerra Island)</span>
+* [[A kerran pasdar]] <span class='fmz'>(Kerra Island)</span>
+* [[A kerran mujahed]] <span class='fmz'>(Kerra Island)</span>
+* [[Kerran tiger spahi]] <span class='fmz'>(Kerra Island)</span>
+
+| mobs_lower = 
+
+* [[Bait Masterson]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Dleria Mausrel]] <span class='fmz'>(Erudin - Cleric Guildmaster)</span>
+* [[Gans Paust]] <span class='fmz'>(Erudin - Cleric Guildmaster)</span>
+* [[Inte Akera]] <span class='fmz'>(Plane of Sky - Quest NPC)</span>
+* [[Tiam Khonsir]] <span class='fmz'>(Erudin - Paladin Guildmaster)</span>
+* [[Tol Nicelot]] <span class='fmz'>(Erudin - Quest NPC)</span>
+* [[Weligon Steelherder]] <span class='fmz'>(Erudin - Quest NPC)</span>
+
+}}
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

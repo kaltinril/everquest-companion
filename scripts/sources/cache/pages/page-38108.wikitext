@@ -1,0 +1,236 @@
+{{See Also| Patch Notes| EverQuest Legends Patch History }}
+{{See Also| Non-Classic Compendium | Non-Classic Compendium }}
+
+
+== EverQuest Legends Timeline ==
+The following timeline outlines the intended progression for the EverQuest Legends server.
+
+'''NOTE:''' Dates and progression phases are placeholders and will be finalized as the server evolves. This timeline may not align exactly with original live patch chronology, as progression pacing and feature releases may differ.
+
+{| class="eoTable2" style="width:auto;"
+|-
+! #
+! EQ Legends Date
+! Corresponding Classic Period
+! Notes
+|-
+| [[:Category:Patch_0|0]]
+| July 28th, 2026
+| March 1999
+| Server Launch
+|-
+| [[:Category:Patch_1|1]]
+| ???
+| April 1999
+|
+|-
+| [[:Category:Patch_2|2]]
+| ???
+| May 1999
+|
+|-
+| [[:Category:Patch_3|3]]
+| ???
+| June 1999
+|
+|-
+| [[:Category:Patch_4|4]]
+| ???
+| July 1999
+| [[Plane of Fear]] opens
+|-
+| [[:Category:Patch_5|5]]
+| ???
+| August 1999
+|
+|-
+| [[:Category:Patch_6|6]]
+| ???
+| September 1999
+|
+|-
+| [[:Category:Patch_7|7]]
+| ???
+| October 1999
+| [[The Temple of Solusek Ro]] opens, [[Journeyman's Boots Quest]]
+|-
+| [[:Category:Patch_8|8]]
+| ???
+| November 1999
+|
+|-
+| [[:Category:Patch_9|9]]
+| ???
+| December 1999
+|
+|-
+| [[:Category:Patch_10|10]]
+| ???
+| January 2000
+| [[Plane of Sky]] opens
+|-
+| [[:Category:Patch_11|11]]
+| ???
+| February 2000
+| [[Paineel]] opens
+|-
+| [[:Category:Patch_12|12]]
+| ???
+| March 2000
+|
+|-
+| [[:Category:Patch_13|13]]
+| ???
+| April 2000
+| '''[[Ruins of Kunark]] Expansion'''
+|-
+| [[:Category:Patch_14|14]]
+| ???
+| May 2000
+|
+|-
+| [[:Category:Patch_15|15]]
+| ???
+| June 2000
+| [[The Hole]], [[Veeshan's Peak]]
+|-
+| [[:Category:Patch_16|16]]
+| ???
+| July 2000
+|
+|-
+| [[:Category:Patch_17|17]]
+| ???
+| August 2000
+|
+|-
+| [[:Category:Patch_18|18]]
+| ???
+| September 2000
+| [[Epics]] Released
+|-
+| [[:Category:Patch_19|19]]
+| ???
+| October 2000
+|
+|-
+| [[:Category:Patch_20|20]]
+| ???
+| November 2000
+|
+|-
+| [[:Category:Patch_21|21]]
+| ???
+| December 2000
+| '''[[Scars of Velious]] Expansion'''
+|-
+|}
+
+== Development Timeline ==
+
+This section tracks the progression of EverQuest Legends compared to original live-era milestones.
+
+{| class="eoTable2" style="width:auto;"
+|-
+! Live Date
+! EQ Legends Date
+! Event
+|-
+| Mar 1999
+| July 28th, 2026
+| <big>Game Launch</big>
+|-
+| Jul 1999
+| July 28th, 2026
+| [[Plane of Fear]]
+|-
+| Oct 1999
+| July 28th, 2026
+| [[Plane of Hate]]
+|-
+| Jan 2000
+| July 28th, 2026
+| [[Plane of Sky]]
+|-
+| Feb 2000
+| July 28th, 2026
+| [[Paineel]]
+|-
+| Apr 2000
+| ???
+| <big>''[[Ruins of Kunark]] Expansion''</big>
+|-
+| Jun 2000
+| July 28th, 2026
+| [[The Hole]]
+|-
+| Sep 2000
+| ???
+| [[Class Epic Quest List|Epic Quests]]
+|-
+| Dec 2000
+| ???
+| <big>''[[Scars of Velious]] Expansion''</big>
+|-
+|}
+
+== Eras ==
+
+The wiki organizes its content into "eras" based on major expansions and key progression milestones.
+
+{| class="eoTable2" style="width:auto;"
+|-
+! Major Era
+! Start Date
+! End Date
+! Duration
+! Minor Era
+! Start Date
+! End Date
+! Duration
+|-
+|class="classic-era" rowspan=3|{{Classic Era Inline}}
+|class="classic-era" rowspan=3|???
+|class="classic-era" rowspan=3|???
+|class="classic-era" rowspan=3|???
+|-
+|class="classic-era"|Classic Core Era
+|class="classic-era"|???
+|class="classic-era"|???
+|class="classic-era"|???
+|-
+|class="fear-era"|{{Fear Era Inline}}
+|class="fear-era"|???
+|class="fear-era"|???
+|class="fear-era"|???
+|-
+|class="kunark-era" rowspan=2|{{Kunark Era Inline}}
+|class="kunark-era" rowspan=2|???
+|class="kunark-era" rowspan=2|???
+|class="kunark-era" rowspan=2|???
+|-
+|class="kunark-era"|Kunark Core Era
+|class="kunark-era"|???
+|class="kunark-era"|???
+|class="kunark-era"|???
+|-
+|class="velious-era" rowspan=2|{{Velious Era Inline}}
+|class="velious-era" rowspan=2|???
+|class="velious-era" rowspan=2|???
+|class="velious-era" rowspan=2|???
+|-
+|class="velious-era"|Velious Core Era
+|class="velious-era"|???
+|class="velious-era"|???
+|class="velious-era"|???
+|}
+
+= Patch Notes =
+
+The wiki maintains a collection of [[Patch Notes]] documenting changes specific to the EverQuest Legends server, as well as references to original live-era updates.
+
+== See also ==
+* [[Removed Items]]
+
+[[Category:Timeline]]
+[[Category:Technical]]

@@ -1,0 +1,100 @@
+__NOTOC__
+===Faction===
+Faction in EverQuest represents how much a group of NPCs or creatures likes or dislikes your character. Most NPCs belong to one or more faction groups and is assigned to one primary faction. Your standing with a given faction has a meaningful impact on whether its members will assist you, ignore you, trade with you, offer quests, or attack you on sight.
+
+Your standing with a given faction also depends on race, class, and sometimes deity. This value shift over time through your actions—primarily killing NPCs, completing quests, and finishing tasks or missions.
+
+===How Factions Work===
+Most NPCs belong to a specific faction or multiple factions. When you target them and enter "/con" into chat, you receive two pieces of information:
+
+Their reaction toward you, as a measure of your modified standing with them
+
+Their relative difficulty (combat strength)
+
+An individually considered NPC’s (/con) Reaction to you ranges from deeply hostile to allied. Improving the primary faction the NPC belongs to typically requires helping that group or harming its enemies; harming a group usually benefits its rival factions.
+
+Some NPCs will not speak to you, trade with you, or offer quests unless you reach a required attitude level. Others will attack immediately if your final standing with them is too low. This is called 'Kill on sight' or KOS.
+
+The table below shows the Reaction ranges you will encounter in game.
+{|
+! style="text-align:left;"| Reaction
+! Amount
+! Net
+! Consequences
+|-
+| style="color: green;" | Ally
+| style="color: green;" | +1100 to +2000
+| style="color: green;" | 900
+| - Regards you as an ally.
+|-
+| style="color: green;" | Warmly
+| style="color: green;" | +750 to +1099
+| style="color: green;" | 349
+| - Looks upon you warmly.
+|-
+| style="color: blue;" | Kindly
+| style="color: blue;" | +500 to +749
+| style="color: blue;" | 249
+| - Kindly considers you.
+|-
+| style="color: blue;" | Amiable
+| style="color: blue;" | +100 to +499 
+| style="color: blue;" | 399
+| - Judges you amiably. Your pet is set to this faction level.
+|-
+| Indifferent
+| 0 to +99
+| 99
+| - Regards you indifferently. [[Sneak]]/[[Invisibility]] sets your faction to this level. Favorable [[vendor]] prices.
+|-
+| style="color: yellow;" | Apprehensive
+| style="color: yellow;" | -100 to -1
+| style="color: yellow;" | 99
+| - Looks your way apprehensively. [[Vendor]]s will have unfavorable prices.
+|-
+| style="color: orange;" | Dubious
+| style="color: orange;" | -500 to -101
+| style="color: orange;" | 399
+| - Glowers at you dubiously. (Not KOS) Vendors will not deal with you.
+|-
+| style="color: red;" | Threatening
+| style="color: red;" | -750 to -501
+| style="color: red;" | 249
+| - Glares are you threateningly! Kill on sight. (KOS)
+|-
+| style="color: red;" | Scowls
+| style="color: red;" | -2000 to -751
+| style="color: red;" | 1249
+| - Scowls at you ready to attack! Kill on sight. (KOS)
+|}
+
+'''Note:''' Please note that these numbers are approximate values, not exact values. There is no available accurate official source to quote currently. If an official source becomes available, it will linked here and this table will be updated.
+
+===Did You Know?===
+
+* Undead will almost always [[aggro]], no matter what the level difference is.
+* Most NPCs who are low enough level below yours will often not [[aggro]].
+* Threateningly NPCs will eventually [[aggro]], but may delay for several [[server tick]]s depending on your distance.
+* Sneaking in front of an NPC will improve your chance for avoiding aggro on a server tick.
+* Scowls will immediately [[aggro]] on server ticks.
+* Sitting negates faction modifiers and level advantages to avoid [[aggro]].
+
+==See also==
+
+* [[Game Mechanics#Faction System and Levels]] for a breakdown of the different faction levels
+* [[All Positive Faction Quests]]
+* [[Faction Quests]] for a list of quests commonly used to fix faction
+* [[Significant Factions]] for a list of factions which have some in-game benefit
+* [[Starting Faction Standings]] for a list of initial faction standings based on race, class, and deity.
+* [https://wiki.project1999.com/Faction_Guide Faction Guide]
+* [https://wiki.project1999.com/Glumf's_Spectacular_Faction_Guide Glumf's Spectacular Faction Guide]
+* [https://wiki.project1999.com/An_Iksar's_Guide_To_Love_and_Friendship_Through_Murder An Iksar's Guide To Love and Friendship Through Murder]
+* [https://wiki.project1999.com/Faction_Tricks Faction Tricks] for a list of techniques for correcting faction even when your current faction is so low it prevents quest completion
+* [https://wiki.project1999.com/Faction_Guide_for_Playable_Races Faction Guide for Playable Races]
+* [https://everquest.allakhazam.com/db/factionlist.html Allakhazam's Faction List]
+* [https://web.archive.org/web/20030325235327/http://www.twenkill.net/anezka/Factions.html Anezka's Faction Guide]
+
+
+[[Category:Guides]]
+[[Category:Factions]]
+[[Category:Game Mechanics]]

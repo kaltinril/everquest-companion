@@ -1,0 +1,112 @@
+== Permanent Duration Spells ==
+
+The following buffs have a permanent duration; this means that they normally do not need to be recast unless your character dies or changes loadouts.
+<br>Each spell is followed by the level at which the corresponding class learns it.
+
+=== Beastlord ===
+{{SpellHoverLink|Frenzy|Frenzy (47)}}
+
+=== Cleric ===
+{{SpellHoverLink|Yaulp|Yaulp (1)}},&nbsp;
+{{SpellHoverLink|Yaulp II|Yaulp II (16)}},&nbsp;
+{{SpellHoverLink|Armor of Protection|Armor of Protection (34)}},&nbsp;
+{{SpellHoverLink|Yaulp III|Yaulp III (41)}},&nbsp;
+{{SpellHoverLink|Armor of the Faithful|Armor of the Faithful (49)}}
+
+=== Druid ===
+{{SpellHoverLink|Firefist|Firefist (6)}},&nbsp;
+{{SpellHoverLink|Thistlecoat|Thistlecoat (7)}},&nbsp;
+{{SpellHoverLink|Barbcoat|Barbcoat (17)}},&nbsp;
+{{SpellHoverLink|Wolf Form|Wolf Form (20)}},&nbsp;
+{{SpellHoverLink|Bramblecoat|Bramblecoat (27)}},&nbsp;
+{{SpellHoverLink|Greater Wolf Form|Greater Wolf Form (30)}},&nbsp;
+{{SpellHoverLink|Spikecoat|Spikecoat (37)}},&nbsp;
+{{SpellHoverLink|Form of the Great Wolf|Form of the Great Wolf (40)}},&nbsp;
+{{SpellHoverLink|Thorncoat|Thorncoat (47)}}
+
+=== Enchanter ===
+{{SpellHoverLink|Minor Shielding|Minor Shielding (1)}},&nbsp;
+{{SpellHoverLink|Lesser Shielding|Lesser Shielding (6)}},&nbsp;
+{{SpellHoverLink|Shielding|Shielding (16)}},&nbsp;
+{{SpellHoverLink|Major Shielding|Major Shielding (23)}},&nbsp;
+{{SpellHoverLink|Greater Shielding|Greater Shielding (31)}},&nbsp;
+{{SpellHoverLink|Arch Shielding|Arch Shielding (40)}}
+
+=== Magician ===
+{{SpellHoverLink|Minor Shielding|Minor Shielding (1)}},&nbsp;
+{{SpellHoverLink|Lesser Shielding|Lesser Shielding (5)}},&nbsp;
+{{SpellHoverLink|Phantom Leather|Phantom Leather (13)}},&nbsp;
+{{SpellHoverLink|Shielding|Shielding (16)}},&nbsp;
+{{SpellHoverLink|Elemental Shield|Elemental Shield (19)}},&nbsp;
+{{SpellHoverLink|Major Shielding|Major Shielding (24)}},&nbsp;
+{{SpellHoverLink|Phantom Chain|Phantom Chain (25)}},&nbsp;
+{{SpellHoverLink|Greater Shielding|Greater Shielding (32)}},&nbsp;
+{{SpellHoverLink|Elemental Armor|Elemental Armor (41)}},&nbsp;
+{{SpellHoverLink|Phantom Plate|Phantom Plate (41)}},&nbsp;
+{{SpellHoverLink|Arch Shielding|Arch Shielding (43)}}
+
+=== Necromancer ===
+{{SpellHoverLink|Minor Shielding|Minor Shielding (1)}},&nbsp;
+{{SpellHoverLink|Grim Aura|Grim Aura (3)}},&nbsp;
+{{SpellHoverLink|Deadeye|Deadeye (5)}},&nbsp;
+{{SpellHoverLink|Dark Pact|Dark Pact (6)}},&nbsp;
+{{SpellHoverLink|Vampiric Embrace|Vampiric Embrace (7)}},&nbsp;
+{{SpellHoverLink|Lesser Shielding|Lesser Shielding (8)}},&nbsp;
+{{SpellHoverLink|Banshee Aura|Banshee Aura (15)}},&nbsp;
+{{SpellHoverLink|Shielding|Shielding (16)}},&nbsp;
+{{SpellHoverLink|Allure of Death|Allure of Death (18)}},&nbsp;
+{{SpellHoverLink|Breath of the Dead|Breath of the Dead (21)}},&nbsp;
+{{SpellHoverLink|Shadow Sight|Shadow Sight (22)}},&nbsp;
+{{SpellHoverLink|Major Shielding|Major Shielding (24)}},&nbsp;
+{{SpellHoverLink|Call of Bones|Call of Bones (31)}},&nbsp;
+{{SpellHoverLink|Greater Shielding|Greater Shielding (33)}},&nbsp;
+{{SpellHoverLink|Arch Shielding|Arch Shielding (41)}},&nbsp;
+{{SpellHoverLink|Lich|Lich (48)}}
+
+=== Paladin ===
+{{SpellHoverLink|Yaulp|Yaulp (9)}},&nbsp;
+{{SpellHoverLink|Instrument of Nife|Instrument of Nife (15)}},&nbsp;
+{{SpellHoverLink|Divine Purpose|Divine Purpose (37)}},&nbsp;
+{{SpellHoverLink|Yaulp II|Yaulp II (38)}},&nbsp;
+{{SpellHoverLink|Valor of Marr|Valor of Marr (44)}},&nbsp;
+{{SpellHoverLink|Divine Might|Divine Might (45)}}
+
+=== Ranger ===
+{{SpellHoverLink|Hawk Eye|Hawk Eye (11)}},&nbsp;
+{{SpellHoverLink|Thistlecoat|Thistlecoat (13)}},&nbsp;
+{{SpellHoverLink|Firefist|Firefist (17)}},&nbsp;
+{{SpellHoverLink|Eyes of the Cat|Eyes of the Cat (27)}},&nbsp;
+{{SpellHoverLink|Barbcoat|Barbcoat (30)}},&nbsp;
+{{SpellHoverLink|Bramblecoat|Bramblecoat (34)}},&nbsp;
+{{SpellHoverLink|Call of Sky|Call of Sky (36)}},&nbsp;
+{{SpellHoverLink|Nature's Precision|Nature's Precision (37)}},&nbsp;
+{{SpellHoverLink|Spikecoat|Spikecoat (42)}},&nbsp;
+{{SpellHoverLink|Wolf Form|Wolf Form (48)}},&nbsp;
+{{SpellHoverLink|Force of Nature|Force of Nature (50)}}
+
+=== Shadow Knight ===
+{{SpellHoverLink|Vampiric Embrace|Vampiric Embrace (15)}},&nbsp;
+{{SpellHoverLink|Grim Aura|Grim Aura (16)}},&nbsp;
+{{SpellHoverLink|Deadeye|Deadeye (17)}},&nbsp;
+{{SpellHoverLink|Dark Temptation|Dark Temptation (32)}},&nbsp;
+{{SpellHoverLink|Scream of Death|Scream of Death (37)}},&nbsp;
+{{SpellHoverLink|Shadow Sight|Shadow Sight (40)}},&nbsp;
+{{SpellHoverLink|Breath of the Dead|Breath of the Dead (45)}}
+
+=== Shaman ===
+{{SpellHoverLink|Frenzy|Frenzy (16)}},&nbsp;
+{{SpellHoverLink|Fury|Fury (30)}},&nbsp;
+{{SpellHoverLink|Rage|Rage (45)}}
+
+=== Wizard ===
+{{SpellHoverLink|Minor Shielding|Minor Shielding (1)}},&nbsp;
+{{SpellHoverLink|Lesser Shielding|Lesser Shielding (6)}},&nbsp;
+{{SpellHoverLink|Resistant Skin|Resistant Skin (9)}},&nbsp;
+{{SpellHoverLink|Shielding|Shielding (15)}},&nbsp;
+{{SpellHoverLink|Elemental Shield|Elemental Shield (20)}},&nbsp;
+{{SpellHoverLink|Major Shielding|Major Shielding (23)}},&nbsp;
+{{SpellHoverLink|O`Keil's Levity|O`Keil's Levity (25)}},&nbsp;
+{{SpellHoverLink|Greater Shielding|Greater Shielding (33)}},&nbsp;
+{{SpellHoverLink|Chill Sight|Chill Sight (38)}},&nbsp;
+{{SpellHoverLink|Elemental Armor|Elemental Armor (42)}},&nbsp;
+{{SpellHoverLink|Arch Shielding|Arch Shielding (44)}}

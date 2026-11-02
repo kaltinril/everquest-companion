@@ -1,0 +1,108 @@
+{{Factionpage|
+
+| description = This goblin clan in Kunark is aligned with the [[Goblins of Cleaving Tooth]]. Killing goblins in [[Temple of Droga]] lowers your reputation with them and raises your faction with [[Brood of Di`Zok]]. Killing goblins in other Kunark zones lowers your reputation with both Goblins of Mountain Death and Cleaving Tooth but raises your faction with Legion of Cabilis and [[Firiona Vie]] .
+
+| zones_raise = 
+
+* [[Chardok]]
+* [[Frontier Mountains]]
+* [[Lake of Ill Omen]]
+
+| zones_lower = 
+
+* [[Firiona Vie]]
+* [[Frontier Mountains]]
+* [[Lake of Ill Omen]]
+* [[Mines of Nurga]]
+* [[Temple of Droga]]
+* [[Warsliks Woods]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[a chardoki golem]]  <span class='fmz'>(Chardok)</span>
+* [[a chokidai mangler]]  <span class='fmz'>(Chardok)</span>
+* [[a Chokidai Sniffer]]  <span class='fmz'>(Chardok)</span>
+* [[a Chokidai Whelp]]  <span class='fmz'>(Chardok)</span>
+* [[a Di`zok Invoker]]  <span class='fmz'>(Chardok)</span>
+* [[a Di`Zok Partisan]]  <span class='fmz'>(Chardok)</span>
+* [[a Di`zok Recruit]]  <span class='fmz'>(Chardok)</span>
+* [[a Di`zok Underling]]  <span class='fmz'>(Chardok)</span>
+* [[a sarnak janissary]]  <span class='fmz'>(Chardok)</span>
+* [[A Sarnak Vindicator]]  <span class='fmz'>(Chardok)</span>
+* [[an Ancient Guardian]]  <span class='fmz'>(Chardok)</span>
+* [[an iksar betrayer]]  <span class='fmz'>(Chardok)</span>
+* [[An Iksar Trustee]]  <span class='fmz'>(Chardok)</span>
+* [[Arch Inspector Nibi`zi]]  <span class='fmz'>(Chardok)</span>
+* [[Battle Master Ska`tu]]  <span class='fmz'>(Chardok)</span>
+* [[Captain Di`ouz]]  <span class='fmz'>(Chardok)</span>
+* [[Chancellor of Di`Zok]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[Deathfang]]  <span class='fmz'>(Chardok)</span>
+* [[Di`zok royal guard]]  <span class='fmz'>(Chardok)</span>
+* [[Drill Master Dih`roul]]  <span class='fmz'>(Chardok)</span>
+* [[Foreman Ku`lul]]  <span class='fmz'>(Chardok)</span>
+* [[Foreman Mirt`akk]]  <span class='fmz'>(Chardok)</span>
+* [[Grand Herbalist Mak`ha]]  <span class='fmz'>(Chardok)</span>
+* [[Grave Master Zo`lun]]  <span class='fmz'>(Chardok)</span>
+* [[Herald Telcha]] <span class='fmz'>(Chardok)</span>
+* [[Interrogator Gi`mok]]  <span class='fmz'>(Chardok)</span>
+* [[judicator of Di`zok]]  <span class='fmz'>(Chardok)</span>
+* [[Kennel Master Al`ele]]  <span class='fmz'>(Chardok)</span>
+* [[Korocust]]  <span class='fmz'>(Chardok)</span>
+* [[Korucust`s Courier]]  <span class='fmz'>(Chardok)</span>
+* [[Observer Aq`touz]]  <span class='fmz'>(Chardok)</span>
+* [[Overking Bathezid]]  <span class='fmz'>(Chardok)</span>
+* [[Overseer Dal`guur]]  <span class='fmz'>(Chardok)</span>
+* [[Prince Selrach Di`zok]]  <span class='fmz'>(Chardok)</span>
+* [[Queen Velazul Di`zok]]  <span class='fmz'>(Chardok)</span>
+* [[Royal Sarnak Herbalist]]  <span class='fmz'>(Chardok)</span>
+* [[Sarnak Collective Auditor]]  <span class='fmz'>(Chardok)</span>
+* [[sorcerer of Di`zok]]  <span class='fmz'>(Chardok)</span>
+* [[The Bridge Keeper]]  <span class='fmz'>(Chardok)</span>
+* [[Underboss Myli`ki]]  <span class='fmz'>(Chardok)</span>
+* [[Watch Captain Hir`roul]]  <span class='fmz'>(Chardok)</span>
+* [[Watch Sergeant Riz`oul]]  <span class='fmz'>(Chardok)</span>
+
+| mobs_lower = 
+
+* [[a goblin bloodtracer]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin bonecaster]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin bonecharmer]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a goblin cavehunter]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a goblin depredator]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a goblin dirtcaller]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a goblin flamedrowser]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a goblin hextracer]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin hunter]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin interrogator]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[A goblin legate]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a goblin mosstrooper]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a goblin outrider]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[A Goblin Pillager]] <span class='fmz'>(Firiona Vie)</span>
+* [[a goblin plaguebringer]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a goblin rockchanter]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a goblin scout]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin skirmisher]] <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin skirmisher]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a goblin soothsayer]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin stalagknight]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a goblin taskmaster]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a goblin thief]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin watcher]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a goblin whelp]] <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a goblin whelp]] <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin witchdoctor]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a maddened Burynai]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[goblin battlemaster]]  <span class='fmz'>(Firiona Vie)</span>
+* [[goblin raider]]  <span class='fmz'>(Firiona Vie)</span>
+* [[goblin spirit caller]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[goblin warlord]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[Grachnist the Destroyer]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[Lord Gorelik]]  <span class='fmz'>(Lake of Ill Omen)</span>
+
+}}

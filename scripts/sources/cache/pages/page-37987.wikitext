@@ -1,0 +1,61 @@
+{{Kunark Era}}
+{{Factionpage|
+
+| description = The frogloks who inhabit the outdoor areas of Kunark.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Cabilis|East Cabilis]]
+* [[Firiona Vie]]
+* [[Swamp of No Hope]]
+* [[Trakanon's Teeth]]
+* [[Upper Guk]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a froglok bounder]]  <span class='fmz'>(Swamp of No Hope)</span>
+* [[Froglok Escort]] <span class='fmz'>(?)</span>
+* [[a froglok fisher]]  <span class='fmz'>(Swamp of No Hope)</span>
+* [[a froglok gaz warrior]] <span class='fmz'>(Swamp of No Hope)</span>
+* [[a froglok outlander]]  <span class='fmz'>(Swamp of No Hope)</span>
+* [[a froglok skipper]]  <span class='fmz'>(Swamp of No Hope)</span>
+* [[a froglok slave]] <span class='fmz'>(East Cabilis)</span>
+* [[a froglok tad]]  <span class='fmz'>(Swamp of No Hope)</span>
+* [[a froglok yun shaman]]  <span class='fmz'>(Trakanon's Teeth)</span>
+* [[Frayk]]  <span class='fmz'>(Swamp of No Hope)</span>
+* [[Froglok Escort]]  <span class='fmz'>(Swamp of No Hope)</span>
+* [[froglok forager]]  <span class='fmz'>(Trakanon's Teeth)</span>
+* [[froglok gaz knight]]  <span class='fmz'>(Swamp of No Hope)</span>
+* [[froglok gaz shaman]]  <span class='fmz'>(Swamp of No Hope)</span>
+* [[froglok gaz warrior]]  <span class='fmz'>(Swamp of No Hope)</span>
+* [[froglok hunter]]  <span class='fmz'>(Trakanon's Teeth)</span>
+* [[froglok nok shaman]]  <span class='fmz'>(Firiona Vie)</span>
+* [[froglok raider]]  <span class='fmz'>(Swamp of No Hope)</span>
+* [[froglok shin knight]]  <span class='fmz'>(Trakanon's Teeth)</span>
+* [[froglok shin shaman]]  <span class='fmz'>(Swamp of No Hope)</span>
+* [[froglok shin warrior]]  <span class='fmz'>(Trakanon's Teeth)</span>
+* [[froglok tal shaman]]  <span class='fmz'>(Trakanon's Teeth)</span>
+* [[froglok ton shaman]]  <span class='fmz'>(Swamp of No Hope)</span>
+* [[froglok ton warrior]]  <span class='fmz'>(Swamp of No Hope)</span>
+* [[froglok tsu shaman]]  <span class='fmz'>(Firiona Vie)</span>
+* [[froglok tuk knight]]  <span class='fmz'>(Swamp of No Hope)</span>
+* [[froglok tuk shaman]]  <span class='fmz'>(Swamp of No Hope)</span>
+* [[froglok tuk warder]] <span class='fmz'>(Swamp of No Hope)</span>
+* [[froglok tuk warrior]]  <span class='fmz'>(Swamp of No Hope)</span>
+* [[Froglok Urd Shaman]]  <span class='fmz'>(Trakanon's Teeth)</span>
+* [[Froglok Vis Knight]]  <span class='fmz'>(Trakanon's Teeth)</span>
+* [[Froglok Wan Knight]]  <span class='fmz'>(Trakanon's Teeth)</span>
+
+}}

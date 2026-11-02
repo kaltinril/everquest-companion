@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-10-29T07:43:17.455Z",
+  "scrapedAt": "2026-11-02T05:55:54.313Z",
   "source": "eqlwiki.com — Category:NPCs/Named Mobs/Merchants/Raid Encounters ∪ embeddedin Template:Namedmobpage/MerchantPage, filtered to pages opening a mob template + recentchanges delta (scripts/scrape-delta.mts)",
   "mobs": [
     {
@@ -11007,7 +11007,8 @@
         "Shiverback-hide Leggings",
         "Thorny Vine Greaves",
         "Valorium Greaves",
-        "Vermiculated Leggings"
+        "Vermiculated Leggings",
+        "Cryosilk Choker"
       ],
       "loc": [
         {
@@ -14577,6 +14578,7 @@
         "Pearl",
         "Pearl Ring",
         "Russet Oxide",
+        "Saltpeter",
         "Star Rose Quartz",
         "Words of Eradication"
       ],
@@ -28987,8 +28989,7 @@
         "-30",
         "10"
       ],
-      "image": "npc_a_hatchling.png",
-      "noImage": true
+      "image": "npc_a_hatchling.png"
     },
     {
       "page": "A Hatebone Drake",
@@ -30735,8 +30736,7 @@
         "Chunk of Meat",
         "Wolf Meat"
       ],
-      "image": "npc_a_jackal.png",
-      "noImage": true
+      "image": "npc_a_jackal.png"
     },
     {
       "page": "A Jeering Gargoyle",
@@ -35675,8 +35675,7 @@
       "factionAmounts": [
         "-30"
       ],
-      "image": "npc_a_lizardman_mystic.png",
-      "noImage": true
+      "image": "npc_a_lizardman_mystic.png"
     },
     {
       "page": "A lizard man warrior",
@@ -36891,8 +36890,7 @@
         "Thick Grizzly Bear Skin",
         "Ruined Bear Pelt"
       ],
-      "image": "npc_a_marsh_bear.png",
-      "noImage": true
+      "image": "npc_a_marsh_bear.png"
     },
     {
       "page": "A marsh bear cub",
@@ -37547,8 +37545,7 @@
         "Fire Beetle Eye",
         "Fire Beetle Leg"
       ],
-      "image": "npc_a_minor_scarab.png",
-      "noImage": true
+      "image": "npc_a_minor_scarab.png"
     },
     {
       "page": "A Minotaur",
@@ -59714,8 +59711,7 @@
           "ew": -2210
         }
       ],
-      "image": "npc_a_widow_hatchling.png",
-      "noImage": true
+      "image": "npc_a_widow_hatchling.png"
     },
     {
       "page": "A Widow Hatchling (Toxxulia Forest)",
@@ -59730,8 +59726,7 @@
         "Spiderling Legs",
         "Spiderling Silk"
       ],
-      "image": "npc_a_widow_hatchling.png",
-      "noImage": true
+      "image": "npc_a_widow_hatchling.png"
     },
     {
       "page": "A Wightish Ancille",
@@ -68575,7 +68570,10 @@
       "factionAmounts": [
         "-2"
       ],
-      "image": "npc_an_embalmed_vicar.png"
+      "image": "npc_an_embalmed_vicar.png",
+      "commonDrops": [
+        "Ruby"
+      ]
     },
     {
       "page": "An Ember Hornet",
@@ -88511,8 +88509,7 @@
         }
       ],
       "merchant": true,
-      "image": "npc_bull_crusher.png",
-      "noImage": true
+      "image": "npc_bull_crusher.png"
     },
     {
       "page": "Bulsgor",
@@ -98167,6 +98164,13 @@
       "drops": [
         "Ancient Signet Ring of House Everling",
         "Angler's Finery"
+      ],
+      "loc": [
+        {
+          "ns": 2640,
+          "ew": 1226,
+          "z": -120
+        }
       ],
       "image": "npc_corrupted_kedgespawn.png"
     },
@@ -132021,8 +132025,7 @@
         "-30",
         "10"
       ],
-      "image": "npc_guard_dykalin.png",
-      "noImage": true
+      "image": "npc_guard_dykalin.png"
     },
     {
       "page": "Guard E`Brona",
@@ -154532,6 +154535,23 @@
       "image": "npc_jeet.png"
     },
     {
+      "page": "Jeim",
+      "eraTag": "Classic",
+      "name": "Jeim",
+      "level": "50",
+      "zones": [
+        "Rathe Mountains"
+      ],
+      "loc": [
+        {
+          "ns": 1662,
+          "ew": -834
+        }
+      ],
+      "merchant": true,
+      "image": "npc_jeim.png"
+    },
+    {
       "page": "Jekca Mucktail",
       "name": "Jekca Mucktail",
       "level": "12",
@@ -160060,8 +160080,7 @@
           "pct": 100
         }
       ],
-      "image": "npc_kindra_farseer.png",
-      "noImage": true
+      "image": "npc_kindra_farseer.png"
     },
     {
       "page": "King Ak`Anon",
@@ -190814,8 +190833,7 @@
         "-30",
         "-30"
       ],
-      "image": "npc_philicia_drinn.png",
-      "noImage": true
+      "image": "npc_philicia_drinn.png"
     },
     {
       "page": "Philip Tallman",
@@ -197363,8 +197381,7 @@
         "-30",
         "-30"
       ],
-      "image": "npc_rell_ostodl.png",
-      "noImage": true
+      "image": "npc_rell_ostodl.png"
     },
     {
       "page": "Rem Knarjon",
@@ -209698,6 +209715,7 @@
       "page": "Sergeant Tvyn",
       "eraTag": "Classic",
       "name": "Sergeant Tvyn",
+      "level": "50",
       "zones": [
         "Nektropos Castle"
       ],
@@ -212234,8 +212252,7 @@
         "10",
         "10"
       ],
-      "image": "npc_sir_edwin_motte.png",
-      "noImage": true
+      "image": "npc_sir_edwin_motte.png"
     },
     {
       "page": "Sir Folon",
@@ -239668,8 +239685,7 @@
         }
       ],
       "merchant": true,
-      "image": "npc_viira_bali.png",
-      "noImage": true
+      "image": "npc_viira_bali.png"
     },
     {
       "page": "Vilefang",

@@ -1,0 +1,38 @@
+{{Factionpage|
+
+| description = The dervish bandits found in the deserts of Ro as well as in the faydarks.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Lesser Faydark]]
+* [[Northern Desert of Ro]]
+* [[Southern Desert of Ro]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+* [[Bandit Sisters]]
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a Dervish Cutthroat]]  <span class='fmz'>(North Ro)</span>
+* [[a Dervish Thug]]  <span class='fmz'>(North Ro)</span>
+* [[a young ronin]]  <span class='fmz'>(South Ro)</span>
+* [[Erg Bluntbruiser]]  <span class='fmz'>(South Ro)</span>
+* [[Jayla Nybright]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[Kayla Nybright]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[Murissa Sandwhisper]] <span class='fmz'>(North Ro - Merchant)</span>
+* [[Shayla Nybright]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[Tayla Nybright]]  <span class='fmz'>(Lesser Faydark)</span>
+
+}}
+
+[[Category:Monster factions]]

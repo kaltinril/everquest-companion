@@ -1,0 +1,126 @@
+{{Factionpage|
+
+| description = The [[Rivervale]] [[Druid]] guild devotes themselves to [[Karana]], god of the Storms, to ensure the timely arrival of rain to raise their precious Jumjum crops. They are naturally allied with [[Mayor Gubbin]], mayor of Rivervale, the local sheriff and his [[Guardians of the Vale]], and the [[Merchants of Rivervale]]. They fight alongside other halflings in their war against the vile, existential threat: [[Clan Runnyeye]] and [[Pickclaw Goblins]].
+
+* Iksar Monk - 505 Storm Reaper increases to get to Dubious (with [[Ella Foodcrafter]]).  11 [[Mooto]] kills, 55 [[Orc Belts]], 16 [[Runnyeye Warbeads (Rivervale)]], the rest were Goblin kills in Misty, Butcherblock, and Runnyeye.  I used [[Bandages for Honeybugger]] to enable me to bank and talk to the Sheriff.
+
+| zones_raise = 
+
+* [[Butcherblock Mountains]]
+* [[Clan Runnyeye]]
+* [[Misty Thicket]]
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Misty Thicket]]
+* [[Najena]]
+* [[Nektulos Forest]]
+* [[Neriak|Neriak Commons]]
+* [[Northern Karana]]
+* [[Rivervale]]
+
+| quests_raise = 
+
+* [[Deputy Tagil's Debt]]
+* [[Hungry Deputy]]
+* [[Jillin's Stew]]
+* [[Nillipuss the Brownie]]
+* [[Orc Belts]]
+* [[Runnyeye Warbeads (Rivervale)]]
+* [[The Bind]]
+
+| quests_lower = 
+
+* [[Innoruuk Symbol Quests|Innoruuk Disciple]]
+
+| mobs_raise = 
+
+* [[a goblin]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[an enraged goblin]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[a goblin whelp]] <span class='fmz'>(Butcherblock Mountains / Misty Thicket)</span>
+* [[A Goblin Shaman]] <span class='fmz'>(Misty Thicket)</span>
+* [[A Goblin Warrior]] <span class='fmz'>(Misty Thicket)</span>
+* [[A Goblin Worker]] <span class='fmz'>(Misty Thicket)</span>
+* [[Mooto]]  <span class='fmz'>(Misty Thicket)</span>
+* [[a goblin alchemist]] <span class='fmz'> (Misty Thicket></span>
+* [[a Pickclaw Arroweater]] <span class='fmz'>(Clan RunnyEye)</span>
+* [[a Pickclaw Bladestopper]] <span class='fmz'>(Clan RunnyEye)</span>
+* [[Sludge Dankmire]]  <span class='fmz'>(Clan RunnyEye)</span>
+* [[a goblin trainee]] <span class='fmz'>(Clan RunnyEye)</span>
+
+
+
+
+| mobs_lower = 
+
+* [[a greedy beggar]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[a leatherfoot spy]]  <span class='fmz'>(Neriak Commons)</span>
+* [[a shady halfling]] <span class='fmz'>(Rivervale - NPC, Non-Quest)</span>
+* [[an injured halfling]]  <span class='fmz'>(Najena)</span>
+* [[Bink]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Blinza Toepopal]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Daleen Leafsway]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Deputy Alltin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Antana]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Asler]] <span class='fmz'>(Misty Thicket)</span>
+* [[Deputy Banto]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Budo]] <span class='fmz'>(Misty Thicket)</span>
+* [[Deputy Chopo]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Dopkin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Drebo]] <span class='fmz'>(Misty Thicket)</span>
+* [[Deputy Felp]] <span class='fmz'>(Misty Thicket)</span>
+* [[Deputy Goltin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Higley]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Higrin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Hiltop]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Kapop]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Keld]] <span class='fmz'>(Misty Thicket)</span>
+* [[Deputy Leeot]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Looh]] <span class='fmz'>(Misty Thicket)</span>
+* [[Deputy Lowmot]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Millin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Percin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Poolt]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Quillto]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Raynin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Regno]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Rollin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Sertlin]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Shelmy]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Tagil]] <span class='fmz'>(Misty Thicket)</span>
+* [[Deputy Tonlo]] <span class='fmz'>(Rivervale)</span>
+* [[Deputy Vastin]] <span class='fmz'>(Misty Thicket)</span>
+* [[Ella Foodcrafter]] <span class='fmz'>(Misty Thicket - Quest NPC)</span>
+* [[Fiddy Bobick]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Gollee]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Hamer]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Himmel]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Ilscent Tagglefoot]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Initiate Guanin]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Initiate Pool]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Initiate Rambel]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Initiate Umbra]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Jossle]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Klimmer]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Leatherfoot Deputy]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Marshal Anrey]] <span class='fmz'>(Rivervale - NPC, Non-Quest)</span>
+* [[Marshal Ghobber]] <span class='fmz'>(Rivervale - Warrior Guildmaster)</span>
+* [[Marshal Lanena]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Master Whoopal]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Neophyte Edel]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Neophyte Halle]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Neophyte Hazel]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Quester Dunden]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Quester Hannin]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Reebo Leafsway]] <span class='fmz'>(Rivervale - Druid Guildmaster)</span>
+* [[Shakey Scarecrow]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Sheriff Roglio]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Snitch]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Uner Gnarltrunk]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Xanuusus]] <span class='fmz'>(North Karana - Quest NPC)</span>
+
+}}
+= Suggested Route =
+*[[Jillin's Stew]] (+[[Guardians of the Vale]], +[[Mayor Gubbin]], +[[Storm Reapers]], +[[Mayor Gubbin]], +[[Merchants of Rivervale]], -[[Dreadguard Outer]])
+[[Category:Achievement Faction]]

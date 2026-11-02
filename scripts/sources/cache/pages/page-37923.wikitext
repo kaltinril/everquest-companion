@@ -1,0 +1,65 @@
+{{Factionpage|
+
+| description = Bandits in the Plains of Karana.
+
+| zones_raise = 
+
+* [[Eastern Plains of Karana]]
+* [[Erudin]]
+* [[Highpass Hold]]
+* [[Northern Karana]]
+* [[Surefall Glade]]
+
+| zones_lower = 
+
+* [[Eastern Plains of Karana]]
+* [[Highpass Hold]]
+* [[Northern Karana]]
+* [[Toxxulia Forest]]
+* [[Western Plains of Karana]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+* [[Call of Flames]]
+* [[High Guard Battlestaff]]
+
+| mobs_raise = 
+
+* [[a bear cub]]  <span class='fmz'>(Surefall Glade)</span>
+* [[a gnoll brawler]]  <span class='fmz'>(Highpass Hold)</span>
+* [[a gnoll champion]]  <span class='fmz'>(Highpass Hold)</span>
+* [[a gnoll soothsayer]]  <span class='fmz'>(Highpass Hold)</span>
+* [[Beanu Mucktail]] <span class='fmz'>(East Karana)</span>
+* [[Burah Mucktail]] <span class='fmz'>(East Karana)</span>
+* [[Chief Sanre`Rexsa]]  <span class='fmz'>(East Karana)</span>
+* [[Emhu Mucktail]] <span class='fmz'>(East Karana)</span>
+* [[Hukex Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Jekca Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Jras Solsier]] <span class='fmz'>(Erudin - Quest NPC)</span>
+* [[Klage Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Lieutenant Midraim]] <span class='fmz'>(North Karana - NPC, Non-Quest)</span>
+* [[Mammoth]]  <span class='fmz'>(Surefall Glade)</span>
+* [[Mechi Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Nre`Loxe Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Olixen Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Plur Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Tregil Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Yahg Mucktail]]  <span class='fmz'>(East Karana)</span>
+
+| mobs_lower = 
+
+* [[a bandit]]  <span class='fmz'>(East Karana)</span>
+* [[a raider]]  <span class='fmz'>(North Karana)</span>
+* [[Dalishea]] <span class='fmz'>(Highpass Hold - NPC, Non-Quest)</span>
+* [[Greth Truksorn]] <span class='fmz'>(Highpass Hold - NPC, Non-Quest)</span>
+* [[Poacher Dell]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Poacher Shelli]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Poacher Topi]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Poacher Willa]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Tallus Holton]]  <span class='fmz'>(East Karana)</span>
+* [[Thrackin Griften]] <span class='fmz'>(West Karana - Quest NPC)</span>
+
+}}

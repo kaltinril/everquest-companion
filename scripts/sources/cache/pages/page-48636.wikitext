@@ -1,0 +1,68 @@
+{{Classic Era}}<div style="margin-bottom: 20px;">
+[[File:spellicon_C.png|link=|border|left]]
+A [[Shadow Knight]] only ability which deals a large amount of damage to a single target, with a 20-minute timer. It has a range somewhat larger than melee range, but much shorter than the usual range of most spells. 
+
+Once used the Ability key will not display the cooldown correctly.  You can reset it by zoning or camping and then it will display correctly.
+
+'''The damage formula is: '''
+:'''DMG = (LEVEL * 10) + 1''' for levels up until 1 to 40. Harm Touch gains 10 damage per level until level 40.
+:'''DMG = ((LEVEL - 40) * 30) + 401''' for levels 41 to 60. Harm Touch gains 30 damage per level after level 40.
+ 
+</div>
+
+NPC Shadow Knights will use this ability immediately, as soon as a valid target aggros them and is within range. Many players strategize the use of pets or tanks to '''eat''' the HT, so it is not used on weaker pullers or casters. HTs from multiple NPCs can be a significant hazard to pullers, especially in areas heavily populated by shadow knights such as [[Charasis]].
+
+This ability may be enhanced by players using the [[Disciplines#Shadow_Knight|Unholy Aura Discipline]] for 25% or 50% (depending on the timeline) increased damage and decreased resistance.
+
+== Classes ==
+
+* [[Shadow Knight]] - Level 1 (Max:200 @ lv39)
+
+== Details ==
+
+{| border="0" width="40%" cellpadding="1" style="margin: 5px; border:1px solid #becfe2;"
+{{SpellSlotRow | 1 | Decrease Hitpoints by 11 (L1) to 1001 (L60) }}
+|}
+
+{| border="0" width="40%" cellpadding="1" style="margin: 5px; border:1px solid #becfe2;"
+|  bgcolor="#cedff2" | <b>Mana</b>
+| 0
+|  bgcolor="#cedff2" | <b>Skill</b>
+| Ability
+|- 
+|  bgcolor="#cedff2" | <b>Casting Time</b>
+| Instant
+|  bgcolor="#cedff2" | <b>Recast Time</b>
+| 20 Minutes
+|- 
+|  bgcolor="#cedff2" | <b>Fizzle Time</b>
+| n/a
+|  bgcolor="#cedff2" | <b>Resist</b>
+| Magic (-200)
+|- 
+|  bgcolor="#cedff2" | <b>Range</b>
+| 50
+|  bgcolor="#cedff2" | <b>Target Type</b>
+| Target
+|- 
+|  bgcolor="#cedff2" | <b>Spell Type</b>
+| Detrimental
+|  bgcolor="#cedff2" | <b>Duration</b>
+| Instant
+|}
+
+{| border="0" width="40%" cellpadding="1" style="margin: 5px; border:1px solid #becfe2;"
+|- 
+|  bgcolor="#cedff2" | <b>Cast on You</b>
+|  colspan="3" | You writhe in the grip of agony
+|- 
+|  bgcolor="#cedff2" | <b>Cast on Other</b>
+|  colspan="3" | Someone writhes in the grip of agony.
+|- 
+|  bgcolor="#cedff2" | <b>Wears Off</b>
+|  colspan="3" | 
+|}
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

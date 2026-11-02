@@ -1,0 +1,55 @@
+{{Factionpage|
+
+| description = Formerly Known as Faction 420.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Kithicor Forest]]
+
+| quests_raise = 
+
+* [[Stanos' Head]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Adjutant D`kan]] <span class='fmz'>(Kithicor Forest)</span>
+* [[Advisor C`Zatl]] <span class='fmz'>(Kithicor Forest)</span>
+* [[Brigadier G`tav]] <span class='fmz'>(Kithicor Forest)</span>
+* [[Coercer Q`ioul]] <span class='fmz'>(Kithicor Forest)</span>
+* [[decaying healer]] <span class='fmz'>(Kithicor Forest - Undead)</span>
+* [[Decaying Swordsman]] <span class='fmz'>(Kithicor Forest - Undead)</span>
+* [[decaying officer]] <span class='fmz'>(Kithicor Forest - Undead)</span>
+* [[General V`ghera]]  <span class='fmz'>(Kithicor Forest)</span>
+* [[Ioltos V`ghera]] <span class='fmz'>(Kithicor Forest)</span>
+* [[Laarthik K`Shin]] <span class='fmz'>(Kithicor Forest - Undead)</span>
+* [[Risen corporal]] <span class='fmz'>(Kithicor Forest - Undead)</span>
+* [[Rotting knight]] <span class='fmz'>(Kithicor Forest - Undead)</span>
+* [[Rotting priest]] <span class='fmz'>(Kithicor Forest - Undead)</span>
+* [[Skeleton Infantry]] <span class='fmz'>(Kithicor Forest - Undead)</span>
+* [[Skeleton Officer]] <span class='fmz'>(Kithicor Forest - Undead)</span>
+* [[Skeleton Squad Leader]] <span class='fmz'>(Kithicor Forest - Undead)</span>
+* [[Skeleton Trooper]] <span class='fmz'>(Kithicor Forest - Undead)</span>
+* [[Skeleton advisor]] <span class='fmz'>(Kithicor Forest - Undead)</span>
+* [[Skeleton private]] <span class='fmz'>(Kithicor Forest - Undead)</span>
+* [[Tainted swordsman]] <span class='fmz'>(Kithicor Forest - Undead)</span>
+* [[Tasi V`ghera]]  <span class='fmz'>(Kithicor Forest)</span>
+* [[Tortured healer]] <span class='fmz'>(Kithicor Forest - Undead)</span>
+* [[Undead Cleric]] <span class='fmz'>(Kithicor Forest - Undead)</span>
+* [[Undead mendicant]] <span class='fmz'>(Kithicor Forest - Undead)</span>
+* [[War Priestess T`zan]] <span class='fmz'>(Kithicor Forest)</span>
+* [[Zombie Advisor]] <span class='fmz'>(Kithicor Forest - Undead)</span>
+* [[Zombie Commander]] <span class='fmz'>(Kithicor Forest - Undead)</span>
+* [[Zombie Infantry]] <span class='fmz'>(Kithicor Forest - Undead)</span>
+* [[Zombie Trooper]] <span class='fmz'>(Kithicor Forest - Undead)</span>
+* [[Zombie guard]] <span class='fmz'>(Kithicor Forest - Undead)</span>
+
+}}

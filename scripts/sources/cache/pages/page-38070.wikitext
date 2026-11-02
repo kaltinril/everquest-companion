@@ -1,0 +1,28 @@
+{{Velious Era}}
+{{Factionpage|
+
+| description = The [[Flying Monkey]]s of the Wakening Land.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[The Wakening Land]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a holgresh conjurer]]  <span class='fmz'>(The Wakening Land)</span>
+* [[a holgresh elementalist]]  <span class='fmz'>(The Wakening Land)</span>
+* [[an elder holgresh]]  <span class='fmz'>(The Wakening Land)</span>
+
+}}

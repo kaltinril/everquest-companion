@@ -1,0 +1,137 @@
+{{Classic Era}}
+ Mister big ruler of the world... I hate him.
+ -[[Lady Shae]]
+
+ Antonius Bayle has no ties to me any more!! Good riddance! Oooooh! I love him.'
+ -[[Lady Shae]]
+{{Factionpage|
+
+| description = Mayor of [[Qeynos]] and his loyal followers. He does not appear in classic EverQuest as an NPC.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Blackburrow]]
+* [[Erudin]]
+* [[Innothule Swamp]]
+* [[Kithicor Forest]]
+* [[Nektulos Forest]]
+* [[Neriak|Neriak Third Gate]]
+* [[Northern Karana]]
+* [[Qeynos|North Qeynos]]
+* [[Northern Desert of Ro]]
+* [[Qeynos Aqueducts]]
+* [[Qeynos Hills]]
+* [[Southern Karana]]
+* [[Qeynos|South Qeynos]]
+* [[Western Plains of Karana]]
+
+| quests_raise = 
+
+* [[Aegis of Life Quest]]
+* [[Blessed Oil Quest]]
+* [[Bone Chips Qeynos]]
+* [[Brother Trintle]]
+* [[Cheslin's Illusion Cards]]
+* [[Corrupt Guards]]
+* [[Cure for Lempeck Hargrin]]
+* [[Errand for Tonmerk]]
+* [[Faren's Tacklebox]]
+* [[Find Lucie Elron]]
+* [[Fleshy Orbs]]
+* [[Fresh Baked Muffins]]
+* [[Frostbite's Fish]]
+* [[Gharin's Note (evil)]]
+* [[Gharin's Note (Good)]]
+* [[Indaria's Doll]]
+* [[Qeynos Badge Quests|Investigator's Badge (Badge #1)]]
+* [[Kwint's Kwest]]
+* [[Moonstones]]
+* [[Nesiff's Statue]]
+* [[Peacekeeper Staff Quest]]
+* [[Qeynos Badge Quests|Qeynos Badge of Honor (Badge #4)]]
+* [[Quench Lasen's Thirst]]
+* [[Rabid Grizzlies]]
+* [[Rabid Wolves]]
+* [[Rohand's Brandy]]
+* [[Sneed's Rat Infestation]]
+* [[Taxes]]
+* [[Tayla Ironforge]]
+* [[The Bread Shipment]]
+* [[The Clothspinner Sisters (good)]]
+* [[The Crate (evil)]]
+* [[The Crate (good)]]
+* [[The Donations]]
+* [[The Gnoll Slayer]]
+* [[The Nitrates and the Assassin]]
+* [[The Package]]
+* [[Wenbie's Muffins]]
+* [[Zimel's Blades (SoulFire)]]
+* [[Qeynos Badge Quests|Researcher's Badge (Badge #3)]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a koalindl]]  <span class='fmz'>(North Qeynos)</span>
+* [[a sewer sentinel]] <span class='fmz'>(Qeynos Catacombs)</span>
+* [[Alysa]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[an investigator]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[Brother Chintle]] <span class='fmz'>(West Karana - NPC, Non-Quest)</span>
+* [[Brother Drash]]  <span class='fmz'>(South Karana)</span>
+* [[Brother Estle]] <span class='fmz'>(West Karana - Quest NPC)</span>
+* [[Brother Gruff]] <span class='fmz'>(South Karana - NPC, Non-Quest)</span>
+* [[Brother Nallin]] <span class='fmz'>(North Karana - Quest NPC)</span>
+* [[Capt Linarius]] <span class='fmz'>(North Karana)</span>
+* [[Clomen Walker]] <span class='fmz'>(Kithicor Forest - Merchant)</span>
+* [[Corporal Lancot]] <span class='fmz'>(North Qeynos)</span>
+* [[Eithne Walker]] <span class='fmz'>(Kithicor Forest - Merchant)</span>
+* [[Endric]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[Enic Ruklin]] <span class='fmz'>(North Qeynos - Quest NPC)</span>
+* [[Gharin]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[Ghul Rustem]] <span class='fmz'>(South Qeynos - Merchant)</span>
+* [[Guard Beren]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Bixby]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Guard Corshin]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Dunix]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Fredrick]] <span class='fmz'>(North Karana)</span>
+* [[Guard Gehnus]] <span class='fmz'>(North Qeynos)</span>
+* [[Guard Hezlan]] <span class='fmz'>(North Qeynos)</span>
+* [[Guard Justyn]] <span class='fmz'>(West Karana)</span>
+* [[Guard Kilson]] <span class='fmz'>(West Karana)</span>
+* [[Guard Lasen]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Naret]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Nash]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Guard Philbin]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Guard Pryde]] <span class='fmz'>(West Karana)</span>
+* [[Guard Urius]] <span class='fmz'>(South Qeynos)</span>
+* [[Hadden]]  <span class='fmz'>(Qeynos Hills)</span>
+* [[Innkeep Danin]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Innkeep Rislarn]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Koalindl (Rodcet Nife)]] <span class='fmz'>(North Qeynos - NPC, Non-Quest)</span>
+* [[Lashun Novashine]] <span class='fmz'>(North Qeynos - Quest NPC)</span>
+* [[Lempeck Hargrin]]  <span class='fmz'>(West Karana)</span>
+* [[Meera Lylon]] <span class='fmz'>(South Qeynos - Merchant)</span>
+* [[Niclaus Ressinn]]  <span class='fmz'>(Qeynos Hills)</span>
+* [[Nomsoe Jusagta]] <span class='fmz'>(North Qeynos - Cleric Guildmaster)</span>
+* [[Ollysa Bladefinder]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Rinna Lightshadow]] <span class='fmz'>(Commonlands - Cleric Guildmaster)</span>
+* [[Spoolie Gee]] <span class='fmz'>(North Ro - Merchant)</span>
+* [[Tayla Ironforge]] <span class='fmz'>(Neriak Third Gate - Quest NPC)</span>
+* [[Ticar Lorestring]] <span class='fmz'>(Erudin - Quest NPC)</span>
+* [[Tira Sandfisher]] <span class='fmz'>(North Ro - Merchant)</span>
+* [[Vegalys Keldrane]] <span class='fmz'>(North Qeynos - Quest NPC)</span>
+* [[Vicus Nonad]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[Vin Moltor]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Zepin Winsle]]  <span class='fmz'>(Innothule Swamp)</span>
+
+}}
+= Suggested Route =
+*[[Bone Chips Qeynos]] Quest with [[Bone Chips]] or Gold (+[[Priests of Life]], +[[Knights of Thunder]], +[[Guards of Qeynos]], +[[Antonius Bayle]], -[[Bloodsabers]])
+*[[The Crate (evil)]] Part 1: (+[[Merchants of Qeynos]], +[[Antonius Bayle]], +[[Coalition of Tradefolk]], +[[Guards of Qeynos]], -[[Circle Of Unseen Hands]])

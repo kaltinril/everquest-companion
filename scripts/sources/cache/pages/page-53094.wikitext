@@ -1,0 +1,12 @@
+{{Delete}}
+
+{{Disambig3|[[Weapon Procs]]}}
+
+Procmod (shown in [[Lucy]] raws as the '''procratemod''' field) is a hidden item stat which describes a modified rate that the weapon will issue a combat [[proc]]. One notable postclassic item with a procmod of 155% is Bloodfrenzy (Ssra temple drop in Luclin). [https://lucy.allakhazam.com/item.html?id=28855] This attribute was added to weapons with combat [[proc]]s early in EverQuest's history, certainly by Luclin but possibly earlier within the classic timeline. Documentation of procmod's addition and procmod values on various items in classic EQ is very scarce. One possible example was the [[Scimitar of the Mistwalker]] which had its procmod nerfed, then unnerfed in the Paineel Era according to [[Patch_Notes#Mistwalker]]. Since Mistwalker was always a very scarce weapon which was removed from Vox's drop table, P99 verification of these changes would be difficult.
+
+In 2013, nilbog removed several default procmod values from items inherited from eqemu due to lack of classic documentation of procmod's existence. This means that in 2013, all procmod values were normalized to be the same on P99. [https://www.project1999.com/forums/showthread.php?t=125483]
+
+Nevertheless, some players have observed higher than usual proc rates on certain weapons, especially rain-type AOE procs like [[Adamantite Bo Stick]]. It remains to parse these weapons to demonstrate this.
+
+[[Category:Technical]]
+[[Category:Game Mechanics]]

@@ -1,0 +1,27 @@
+{{Factionpage|
+
+| description = The Bloodgill Goblins of Lake of Ill Omen, Everyone starts at indifferent with them.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Lake of Ill Omen]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a bloodgill goblin]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a bloodgill marauder]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a deepwater barracuda]] <span class='fmz'>(Lake of Ill Omen)</span>
+
+}}

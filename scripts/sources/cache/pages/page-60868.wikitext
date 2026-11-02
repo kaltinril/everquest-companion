@@ -1,0 +1,36 @@
+{{Classic Era}}
+{{Factionpage|
+
+| description = 
+
+| zones_raise =
+
+* [[Rathe Mountains]]
+
+| zones_lower =
+
+* None known
+
+| quests_raise =
+
+* [[Phosphorous Powder for Zok Zribb]]
+
+| quests_lower =
+
+* None known
+
+| mobs_raise =
+
+* None known
+
+| mobs_lower =
+
+
+}}
+
+= Suggested Route =
+*[[Phosphorous Powder for Zok Zribb]] (+[[Guktan Suppliers]], +[[Protectors of Gukta]], +[[High Council of Gukta]], +[[Lorekeepers of Gukta]], +[[Guktan Elders]])
+
+
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

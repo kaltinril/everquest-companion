@@ -1,0 +1,5 @@
+Here you will find lists of items usable by particular classes or combinations of classes.
+
+For a big list of everything, see [[:Category:Items]].
+
+<div id="eql-equipment-trio-builder"></div>

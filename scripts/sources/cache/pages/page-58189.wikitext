@@ -1,0 +1,62 @@
+{{Classic Era}}
+<div style="display: flex;">
+  <div style="flex: 1;">
+    <ul>
+    <li>Summoning Spell: [[Tame Spirit]]</li>
+    <li>Pet Type: [[Beastlord#Your Race & Warder|Beastlord Warder]]</li>
+    <li>Pet Classes: [[Beastlord]] / [[Warrior]]</li>
+    <li>Pet Level: 5</li>
+    <li>Hit Points: 320 (+1/tick)</li>
+    <li>Mana: 100 (+10/tick)</li>
+    </ul>
+  </div>
+  <div style="flex: 1;">
+  [[File:small_warder_summon.png|left|x175px]]
+  </div>
+</div>
+<div style="display: flex;">
+  <div style="flex: 1;">
+    <ul>
+    <li>Defensive Stats</li>
+       <ul>
+       <li>Mitigation: 12</li>
+       <li>Evasion: 67</li>
+       </ul>
+    </ul>
+    <ul>
+    <li>Offensive Stats</li>
+       <ul>
+       <li>Offense: 37</li>
+       <li>Accuracy: 50</li>
+       <li>Max Damage: 8</li>
+       <li>Dual Wield: 5%</li>
+       </ul>
+     </ul>
+  </div>
+  <div style="flex: 1;">
+    <ul><li>Strength: 93</li>
+    <li>Stamina: 93</li>
+    <li>Intelligence: 10</li>
+    <li>Wisdom: 10</li>
+    <li>Agility: 90</li>
+    <li>Dexterity: 75</li>
+    <li>Charisma: 8</li></ul>
+  </div>
+</div>
+
+== Abilities ==
+* [[Skill_Block|Block]]
+* [[Skill_Cleave|Cleave]]
+* [[Skill_Dodge|Dodge]]
+* [[Skill_Taunt|Taunt]]
+
+== Spell List ==
+* [[Minor Healing|<span class='itemeff'>Minor Healing</span>]]
+
+== Focus Items ==
+* None
+== Notes ==
+* None
+
+[[Category: Summoned Pet]]
+[[Category: Beastlord Pet]]

@@ -1,0 +1,359 @@
+The Item Upgrade System is a core new feature introduced in EverQuest Legends. This is a new system first introduced in one of the [https://www.youtube.com/watch?v=QPlWEbfedh4 EverQuest Legends Insight series videos on youtube].
+
+All gear can be upgraded from a starting tier of 0, to a max tier of 10. You do this though a process called Item Merging, where you use an item of the same name, or a new item called a [[Mote of Potential]] to upgrade the item's tier level. Each item or mote merged into your item adds experience to that item, and when that experience meets a certain amount then the item will upgrade to the next tier.
+
+== How Tiers impact gear stats ==
+
+Each time you merge enough exp into an item, it levels up, increasing that item's tier level. As the item gains experience towards the next tier, its stats will slowly increase.
+
+* Each tier represents a cumulative 10% bonus to the item's stats
+* The bonus is increased based on the experience added to the item, and not by the item's tier.
+* All calculations round down to the nearest whole number.  For example, 42.9 AC becomes 42 AC.
+* A minimum increase of +1 to a stat is guaranteed at the start of each tier.
+* Weight is reduced in a similar way, but never below 0.1.
+* Weapon damage is increased at +5% per Tier.
+* Weapon accuracy is increased 2.5% per Tier
+* Weapon Delay is never reduced
+
+== Cumulative Stat Bonus ==
+
+The tier upgrade system has some moments where smaller bonuses can occur while you are adding exp to an item.  The overall stat bonus to an item is based on the amount of exp on that item, rather than the exact tier the item is at. This follows some simple math rules as follows.
+
+* Add the percentage towards the next tier, divided by 10, to the current tier's cumulative bonus (see table below).
+* If the cumulative bonus would result in a stat increasing, that stat will increase when that point is reached.
+* Mid-Tier bonuses like this do NOT award the minimum bonus to a stat.
+* Remember, the calculations round down to the nearest whole number!
+
+::: Example: The [[Umbral Platemail Breastplate]] has an AC of 30.  At Tier 1, it gains 3 AC (cumulative bonus of +10%) for a total of 33 AC. If this item gains 1 item exp, then it is 50% of the way to Tier 2. This means the cumulative bonus is now 10 + (50/10) = 15% cumulative bonus.  It's AC will now be 34.  At Tier 2, it will be 36 (+20%).
+
+Due to this, it is always a good idea to add exp to your gear, as every little bit accumulates and increases the gear's stats.
+
+== Gear Experience Rules ==
+Gear provides experience equivalent to the experience needed to reach that gear's Tier Level. The following level details the exp gained when you merge a piece of gear into another.  Unlike motes, gear does not have a maximum tier for merging.
+{| class="wikitable sortable"
+|+
+!Gear Tier
+!Exp When Merged
+|-
+|0
+|1
+|-
+|1
+|2
+|-
+|2
+|4
+|-
+|3
+|8
+|-
+|4
+|16
+|-
+|5
+|32
+|-
+|6
+|64
+|-
+|7
+|128
+|-
+|8
+|256
+|-
+|9
+|512
+|-
+|10
+| -
+|}
+
+== Motes of Potential Upgrade Rules ==
+
+Motes can also be used to upgrade items. The [[Mote Guide]] has additional details on how motes work.
+* Motes add a fixed amount of experience to an item
+* Motes cannot add experience to an item above the designated tier for that mote
+
+{| class="wikitable sortable"
+|+
+!Mote Name
+!Mote Maximum Tier
+|-
+|[[Mote of Infinitesimal Potential]]
+|0
+|-
+|[[Mote of Minor Potential]]
+|1
+|-
+|[[Mote of Lesser Potential]]
+|2
+|-
+|[[Mote of Potential]]
+|3
+|-
+|[[Mote of Major Potential]]
+|4
+|-
+|[[Mote of Greater Potential]]
+|5
+|-
+|[[Mote of Superior Potential]]
+|6
+|-
+|[[Mote of Grand Potential]]
+|7
+|-
+|[[Mote of Ascendant Potential]]
+|8
+|-
+|[[Mote of Infinite Potential]]
+|9
+|-
+|}
+
+[[Void-Touched Potential]] are special motes that will upgrade any piece of gear one full level.
+
+== Tiers ==
+
+Each Tier requires an increasing amount of exp to reach.  This table lays out each tier's requirement. (Bonus per Exp is rounded to 3 decimal places).
+
+{| class="wikitable sortable"
+|+
+!Tier
+!Total XP Required
+!Exp to Next Level
+!Cumulative Bonus
+!Bonus Per Exp
+|-
+| 0
+| 0
+| 1
+| +0%
+| +10%
+|-
+| 1
+| 1
+| 2
+| +10%
+| +5%
+|-
+| 2
+| 3
+| 4
+| +20%
+| +2.5%
+|-
+| 3
+| 7
+| 8
+| +30%
+| +1.25%
+|-
+| 4
+| 15
+| 16
+| +40%
+| +0.625%
+|-
+| 5
+| 31
+| 32
+| +50%
+| +0.313%
+|-
+| 6
+| 63
+| 64
+| +60%
+| +0.156%
+|-
+| 7
+| 127
+| 128
+| +70%
+| +0.078%
+|-
+| 8
+| 255
+| 256
+| +80%
+| +0.039%
+|-
+| 9
+| 511
+| 512
+| +90%
+| +0.020%
+|-
+| 10
+| 1023
+| -
+| +100%
+| -
+|}
+
+== Item Upgrade Matrix ==
+This matrix shows the combines of like items necessary to reach a specific item tier. 
+
+For example, it requires 16 +0 items to create a +4 item whereas it requires 64 +4 items to create a +10 item. 
+{| class="wikitable"
+|+
+!Tier
+!+0
+!+1
+!+2
+!+3
+!+4
+!+5
+!+6
+!+7
+!+8
+!+9
+!+10
+|-
+|'''+0'''
+|0
+|2
+|4
+|8
+|16
+|32
+|64
+|128
+|256
+|512
+|1024
+|-
+|'''+1'''
+|
+|0
+|2
+|4
+|8
+|16
+|32
+|64
+|128
+|256
+|512
+|-
+|'''+2'''
+|
+|
+|0
+|2
+|4
+|8
+|16
+|32
+|64
+|128
+|256
+|-
+|'''+3'''
+|
+|
+|
+|0
+|2
+|4
+|8
+|16
+|32
+|64
+|128
+|-
+|'''+4'''
+|
+|
+|
+|
+|0
+|2
+|4
+|8
+|16
+|32
+|64
+|-
+|'''+5'''
+|
+|
+|
+|
+|
+|0
+|2
+|4
+|8
+|16
+|32
+|-
+|'''+6'''
+|
+|
+|
+|
+|
+|
+|0
+|2
+|4
+|8
+|16
+|-
+|'''+7'''
+|
+|
+|
+|
+|
+|
+|
+|0
+|2
+|4
+|8
+|-
+|'''+8'''
+|
+|
+|
+|
+|
+|
+|
+|
+|0
+|2
+|4
+|-
+|'''+9'''
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|0
+|2
+|-
+|'''+10'''
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|0
+|}
+This is helpful when planning how many items are required at different difficulty levels. If, for example, you are in difficulty III and wantto level an item up to +10, you can plan on needing approximately 128 drops of that item to accomplish that. Keep in mind this is only an approximate because you may get lucky and get a +4 or even a +5 to drop while farming, decreasing the amount of +3 items needed.
+[[Category:Guides]]

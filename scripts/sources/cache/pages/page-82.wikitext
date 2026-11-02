@@ -1,0 +1,104 @@
+<noinclude>These gems drop in various zones of Velious.
+
+''See [[Velious Class Armor]] for more information''.
+
+''See [[Velious Armor Checklist]] for a checklist you can use to track your gems/armor pieces''.
+
+Useless/Vendor gems include: [[Chipped Black Marble]], [[Coral Crescent]], [[Crushed Chrysolite]], [[Crushed Diamond Dust]], [[Crushed Emerald]], [[Crushed Nephrite]], [[Crushed Sea Sapphire]], [[Flawed Chrysolite]], [[Flawed Flame Emerald]], [[Flawed Flame Opal]], [[Flawed Lava Ruby]], [[Flawed Opal]], [[Imperfect Diamond]]
+</noinclude>
+{| class="eoTable" class="wikitable sortable"
+! Icon
+! Gem Name
+! Usage
+! Usage
+|-
+| style="background-color:black;" | {{MedIcon|966}}
+| style="padding-right:10px;" | [[Flawless Diamond]]
+| Melee Breastplate
+| 
+|-
+| style="background-color:black;" | {{MedIcon|963}}
+| style="padding-right:10px;" | [[Flawed Sea Sapphire]]
+| Melee Legs
+| 
+|-
+| style="background-color:black;" | {{MedIcon|958}}
+| style="padding-right:10px;" | [[Flawed Emerald]]
+| Melee Arms 
+| 
+|-
+| style="background-color:black;" | {{MedIcon|953}}
+| style="padding-right:10px;" | [[Crushed Coral]]
+| Melee Helm
+| 
+|-
+| style="background-color:black;" | {{MedIcon|954}}
+| style="padding-right:10px;" | [[Crushed Topaz]]
+| Melee Gloves
+| Caster Gloves
+|-
+| style="background-color:black;" | {{MedIcon|956}}
+| style="padding-right:10px;" | [[Crushed Black Marble]]
+| Melee Boots
+| 
+|-
+| style="background-color:black;" | {{MedIcon|962}}
+| style="padding-right:10px;" | [[Crushed Flame Emerald]]
+| Melee Bracer
+| Priest Boots
+|-
+| style="background-color:black;" | {{MedIcon|956}}
+| style="padding-right:10px;" | [[Black Marble]]
+|
+| Priest Breastplate	
+|-
+| style="background-color:black;" | {{MedIcon|965}}
+| style="padding-right:10px;" | [[Chipped Onyx Sapphire]]
+| 
+| Priest Legs
+|-
+| style="background-color:black;" | {{MedIcon|951}}
+| style="padding-right:10px;" | [[Jaundice Gem]]
+| 
+| Priest Arms
+|-
+| style="background-color:black;" | {{MedIcon|964}}
+| style="padding-right:10px;" | [[Crushed Lava Ruby]]
+| 
+| Priest Gloves
+|-
+| style="background-color:black;" | {{MedIcon|959}}
+| style="padding-right:10px;" | [[Crushed Opal]]
+| 
+| Priest Bracer
+|-
+| style="background-color:black;" | {{MedIcon|965}}
+| style="padding-right:10px;" | [[Crushed Onyx Sapphire]]
+| Caster Bracer
+| Priest Helm
+|-
+| style="background-color:black;" | {{MedIcon|958}}
+| style="padding-right:10px;" | [[Pristine Emerald]]
+| Caster Robe
+| 
+|-
+| style="background-color:black;" | {{MedIcon|952}}
+| style="padding-right:10px;" | [[Nephrite]]
+| Caster Legs 
+| 
+|-
+| style="background-color:black;" | {{MedIcon|954}}
+| style="padding-right:10px;" | [[Flawed Topaz]]
+| Caster Arms
+| 
+|-
+| style="background-color:black;" | {{MedIcon|960}}
+| style="padding-right:10px;" | [[Crushed Flame Opal]]
+| Caster Helm
+| 
+|-
+| style="background-color:black;" | {{MedIcon|951}}
+| style="padding-right:10px;" | [[Crushed Jaundice Gem]]
+| Caster Boots
+| 
+|}

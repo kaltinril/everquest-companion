@@ -1,0 +1,43 @@
+{{Classic Era}}[[File:Npc_signus_boran.png|right]]{{Factionpage|
+
+| description = Dwarven citizens of [[Butcherblock Mountains]] near the city of [[Kaladim]]. Notably, almost all are level 35 women warriors who wield the [[Bronze Two Handed Battle Axe]]. Strangely, their implemented faction hits have no implication of alliances nor enemies of any other faction. As such, many casters such as [[Druid]]s and [[Wizard]]s are fond of kiting them without fear of becoming alienated in [[Kaladim]] proper.
+
+[[File:Kaladim_citizens.jpg]]
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Ocean of Tears]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+* [[Alun Bilgum]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Blyle Bundin]] <span class='fmz'>(Butcherblock Mountains - Quest NPC)</span>
+* [[Darm Dundam]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Delin Ironblend]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Den Ironblend]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Lann Dabldrin]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Dalbar Tarbrind]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Ganbar Dundam]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Gann Dunbull]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Glendl Vargnus]] <span class='fmz'>(Ocean of Tears - NPC, Non-Quest)</span>
+* [[Glorin Binfurr]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Gibi Bilgum]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Signus Boran]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Magnus Boran]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Doran Glosglen]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Elona Tunbrin]] <span class='fmz'>(Ocean of Tears - NPC, Non-Quest)</span>
+* [[Hugan Tunbrin]] <span class='fmz'>(Ocean of Tears - NPC, Non-Quest)</span>
+
+}}

@@ -1,0 +1,74 @@
+{{Factionpage|
+
+| description = [[Ranger]] Guild in Surefall Glade.
+
+| zones_raise = 
+
+* [[Surefall Glade]]
+
+| zones_lower = 
+
+* [[Eastern Plains of Karana]]
+* [[Kithicor Forest]]
+* [[Lesser Faydark]]
+* [[Northern Karana]]
+* [[Qeynos Hills]]
+* [[Southern Karana]]
+* [[Qeynos|South Qeynos]]
+* [[Surefall Glade]]
+
+| quests_raise = 
+
+* [[Call of Flame Quest]]
+* [[Gharin's Note (Good)]]
+* [[Gnasher's Head]]
+* [[Ivy Etched Armor Quests|Ivy Etched Helm]]
+* [[Ivy Etched Armor Quests|Ivy Etched Leggings]]
+* [[Jagged Pine Crook Staff]]
+* [[Merona's Brother]]
+* [[Nesiff's Statue]]
+* [[Poacher's Head Quest (Surefall Glade)]]
+* [[Ratskin Gloves Quest]]
+* [[Talym Shoontar's Head]]
+* [[The Nitrates and the Assassin]]
+
+| quests_lower = 
+
+* [[Gharin's Note (evil)]]
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a bear cub]]  <span class='fmz'>(Surefall Glade)</span>
+* [[a druid]] <span class='fmz'>(East Karana - NPC, Non-Quest)</span>
+* [[a pixie jongleur]] <span class='fmz'>(Lesser Faydark)</span>
+* [[a treant]]  <span class='fmz'>(South Karana)</span>
+* [[Bren Treeclimber]] <span class='fmz'>(Surefall Glade - Quest NPC)</span>
+* [[Briana Treewhisper]] <span class='fmz'>(North Karana - NPC, Non-Quest)</span>
+* [[Ceel Moonwhisper]] <span class='fmz'>(Commonlands - NPC, Non-Quest)</span>
+* [[Corun Finisc]] <span class='fmz'>(Surefall Glade - Quest NPC)</span>
+* [[Frenway Marthank]] <span class='fmz'>(Surefall Glade - Quest NPC)</span>
+* [[Gash Flockwalker]] <span class='fmz'>(South Qeynos)</span>
+* [[Ged Twigborn]] <span class='fmz'>(Kithicor Forest - Quest NPC)</span>
+* [[Gerael Woodone]] <span class='fmz'>(Surefall Glade - Druid Guildmaster)</span>
+* [[Hager Sureshot]] <span class='fmz'>(Surefall Glade - Ranger Guildmaster)</span>
+* [[Holly Windstalker]] <span class='fmz'>(Qeynos Hills - NPC, Non-Quest)</span>
+* [[Irin Lunis]] <span class='fmz'>(Kithicor Forest - NPC, Non-Quest)</span>
+* [[Kithicor]] <span class='fmz'>(Kithicor Forest - Ranger Guildmaster)</span>
+* [[Larsk Juton]] <span class='fmz'>(Surefall Glade - Ranger Guildmaster)</span>
+* [[Leaf Falldim]] <span class='fmz'>(Kithicor Forest - Quest NPC)</span>
+* [[Mammoth]]  <span class='fmz'>(Surefall Glade)</span>
+* [[Metha Wintersong]] <span class='fmz'>(Commonlands - NPC, Non-Quest)</span>
+* [[Morin Shadowbane]] <span class='fmz'>(Kithicor Forest - Quest NPC)</span>
+* [[Cros Treewind]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Shadow Treebright]] <span class='fmz'>(Commonlands - NPC, Non-Quest)</span>
+* [[Sil Silverstar]] <span class='fmz'>(Commonlands - NPC, Non-Quest)</span>
+* [[TeAnara]] <span class='fmz'>(Surefall Glade - Druid Guildmaster)</span>
+* [[Veli Greenwhisper]] <span class='fmz'>(Commonlands - NPC, Non-Quest)</span>
+* [[Vesteri Nomanoi]] <span class='fmz'>(Surefall Glade - Quest NPC)</span>
+* [[Vuli Greenwhisper]] <span class='fmz'>(Commonlands - NPC, Non-Quest)</span>
+
+}}
+[[Category:Significant Factions]]

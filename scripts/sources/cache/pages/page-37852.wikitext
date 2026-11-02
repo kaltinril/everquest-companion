@@ -1,0 +1,62 @@
+{{Factionpage|
+
+| description = The faction of [[Iksar]] [[Monk]]s. Can only be raised via newbie quests.
+
+| zones_raise = 
+
+* [[Dreadlands]]
+
+| zones_lower = 
+
+* [[Dreadlands]]
+* [[Cabilis|East Cabilis]]
+* [[Field of Bone]]
+* [[Firiona Vie]]
+* [[Howling Stones]]
+* [[Lake of Ill Omen]]
+* [[Swamp of No Hope]]
+* [[Timorous Deep]]
+* [[Warsliks Woods]]
+
+| quests_raise = 
+
+* [[Blood Ink]]
+* [[Bone Chips Quests]]
+* [[Curscale Shield]]
+* [[Frogloc Tad Tongues]]
+* [[Granite Pebbles]]
+* [[Illweed Parchment Quest]]
+* [[Legion Lager Quest]]
+* [[Marauder Armor]]
+* [[Sarnak Hatchling Brains]]
+* [[Scorpion Pincers]]
+* [[Monk Shackle Quests|Shackle of Bronze]]
+* [[Monk Shackle Quests|Shackle of Clay]]
+* [[Monk Shackle Quests|Shackle of Rock]]
+* [[Monk Shackle Quests|Shackle of Stone]]
+* [[The Restraining Order]]
+* [[Warrior Pike Quests|Warrior Pike #1 (Militia Pike)]]
+* [[Warrior Pike Quests|Warrior Pike #2 (Footman's Pike)]]
+* [[Warrior Pike Quests|Warrior Pike #4 (Trooper's Pike)]]
+* [[Watcher Torches]]
+
+| quests_lower = 
+
+* [[The Lost Circle]]
+
+| mobs_raise = 
+
+* [[Brother Balatin]] <span class='fmz'>(Dreadlands - Undead)</span>
+
+| mobs_lower = 
+
+* [[an Iksar master]] <span class='fmz'>(Timorous Deep - Monk Guildmaster)</span>
+* [[Captain Gideen]] <span class='fmz'>(Warsliks Wood)</span>
+* [[Captain Nedar]] <span class='fmz'>(Swamp of No Hope)</span>
+* [[Trooper Taer]] <span class='fmz'>(Field of Bone)</span>
+* [[Vekis]] <span class='fmz'>(Firiona Vie - Quest NPC)</span>
+* [[Vessel Drozlin]] <span class='fmz'>(East Cabilis - Quest NPC)</span>
+* [[Warlord Hikyg]] <span class='fmz'>(Swamp of No Hope)</span>
+* [[Warlord Zyzz]] <span class='fmz'>(Field of Bone)</span>
+
+}}

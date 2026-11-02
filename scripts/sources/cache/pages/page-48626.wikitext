@@ -1,0 +1,15 @@
+This skill involves mastering the wrist and stance to get two attacks from a swing. This can increase a melee fighter's damage.
+
+== Classes ==
+
+* [[Monk]] - Level 15 '''(Max 250)'''
+* [[Warrior]] - Level 15 '''(Max 245)'''
+* [[Rogue]] - Level 16 '''(Max 240)'''
+* [[Paladin]] - Level 20 '''(Max 235)'''
+* [[Shadowknight]] - Level 20 '''(Max 235)'''
+* [[Ranger]] - Level 20 '''(Max 235)'''
+* [[Berserker]] - Level 15 '''(Max 250)'''
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

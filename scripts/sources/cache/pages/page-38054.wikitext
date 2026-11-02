@@ -1,0 +1,54 @@
+{{Velious Era}}
+{{Factionpage|
+
+| description = The Pirates of Iceclad Ocean, the gnomes found from North Ro through to the Icy Fingers of Iceclad.
+
+They are a vengeful bunch, as it is rumoured that killing even one of these little gnomes will place you on their "kill on sight" list. They also have a particular disdain for Air Elementals, possibly other elementals as well; enchanters looking to levitate over the water near them with [[Illusion: Air Elemental]] beware.
+
+
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Iceclad Ocean]]
+* [[Western Wastes]]
+
+| quests_raise = 
+
+* [[The Mighty Snowfang Hero]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Adisson Stubblechin]] <span class='fmz'>(Iceclad Ocean - NPC, Non-Quest)</span>
+* [[bloody gnome captive]]  <span class='fmz'>(Iceclad Ocean)</span>
+* [[Bilf]]  <span class='fmz'>(Iceclad Ocean)</span>
+* [[Blik]]  <span class='fmz'>(Iceclad Ocean)</span>
+* [[Captain Nalot]] <span class='fmz'>(Iceclad Ocean - NPC, Non-Quest)</span>
+* [[Feld]]  <span class='fmz'>(Iceclad Ocean)</span>
+* [[gnomish pirate]] <span class='fmz'>(Iceclad Ocean - NPC, Non-Quest)</span>
+* [[Joshel the Large]]  <span class='fmz'>(Iceclad Ocean)</span>
+* [[Madan Eflik]]  <span class='fmz'>(Iceclad Ocean)</span>
+* [[Masurt Dok]]  <span class='fmz'>(Iceclad Ocean)</span>
+* [[Nelet Durzit]]  <span class='fmz'>(Iceclad Ocean)</span>
+* [[Nilham the Chef]] <span class='fmz'>(Iceclad Ocean - Quest NPC)</span>
+* [[Frankel the Pirate]] <span class='fmz'>(North Ro - NPC, Non-Quest)</span>
+* [[patrolling sentry]]  <span class='fmz'>(Iceclad Ocean)</span>
+* [[pirate lookout]]  <span class='fmz'>(Iceclad Ocean)</span>
+* [[pirate sentry]]  <span class='fmz'>(Iceclad Ocean)</span>
+* [[Relit]] <span class='fmz'>(Iceclad Ocean - NPC, Non-Quest)</span>
+* [[Rendap]]  <span class='fmz'>(Iceclad Ocean)</span>
+* [[Ritap]]  <span class='fmz'>(Iceclad Ocean)</span>
+* [[a shipwrecked pirate]] <span class='fmz'>(Western Wastes)</span>
+* [[Traboh]] <span class='fmz'>(Iceclad Ocean - NPC, Non-Quest)</span>
+* [[Tsilos the Swabby]] <span class='fmz'>(Iceclad Ocean - NPC, Non-Quest)</span>
+* [[Xorbinasticalus Zimralicus]] <span class='fmz'>(Iceclad Ocean - Merchant)</span>
+
+}}

@@ -1,0 +1,66 @@
+{{Factionpage|
+
+| description = The [[Iksar]] [[Necromancer]]s in Cabilis West are known as the Brood of Kotiz.  
+
+The easiest way to gain faction with them is to slay the Outcast Iksar of [[The Forsaken]] faction.  They are closely linked to the faction of the rest of the Iksars.
+
+| zones_raise = 
+
+* [[Emerald Jungle]]
+* [[Field of Bone]]
+* [[Mines of Nurga]]
+* [[Swamp of No Hope]]
+* [[Trakanon's Teeth]]
+* [[Warsliks Woods]]
+
+| zones_lower = 
+
+* [[Chardok]]
+* [[Cabilis|East Cabilis]]
+* [[Kaesora]]
+
+| quests_raise = 
+
+* [[Bone Granite Powder Quest]]
+* [[Crusader's Tests|Crusaders of Greenmist]]
+* [[Necro Spells]]
+* [[Necromancer Skullcap Quests|Necromancer 1st Rank]]
+* [[Necromancer Skullcap Quests|Necromancer 2nd Rank]]
+* [[Necromancer Skullcap Quests|Necromancer 3rd Rank]]
+* [[Necromancer Skullcap Quests|Necromancer 4th Rank]]
+* [[Necromancer Skullcap Quests|Necromancer 6th Rank]]
+* [[Necromancer Skullcap Quests|Necromancer 7th Rank]]
+* [[Necromancer Skullcap Quests|Necromancer 8th Rank]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[a rogue shaman]]  <span class='fmz'>(Field of Bone)</span>
+* [[an Iksar abductor]] <span class='fmz'>(Emerald Jungle)</span>
+* [[an Iksar anchoret]] <span class='fmz'>(Emerald Jungle)</span>
+* [[an iksar anchorite]] <span class='fmz'>(Emerald Jungle)</span>
+* [[an iksar bandit]]  <span class='fmz'>(Field of Bone)</span>
+* [[an Iksar footpad]]  <span class='fmz'>(Field of Bone)</span>
+* [[an iksar footpad]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[an iksar manslayer]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[an iksar marauder]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[an Iksar pariah]] <span class='fmz'>(Field of Bone)</span>
+* [[an iksar picaroon]] <span class='fmz'>(Emerald Jungle)</span>
+* [[an iksar slave]]  <span class='fmz'>(Mines of Nurga)</span>
+* [[Deadeye]] <span class='fmz'>(Swamp of No Hope)</span>
+* [[Iksar exile]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[Iksar Mercenary]] <span class='fmz'>(Trakanon's Teeth)</span>
+* [[iksar pariah]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[Iksar treasure hunter]] <span class='fmz'>(Trakanon's Teeth)</span>
+* [[Zagran the Mad]] <span class='fmz'>(Swamp of No Hope)</span>
+
+| mobs_lower = 
+
+* [[Grype]]  <span class='fmz'>(East Cabilis)</span>
+* [[Librarian Zimor]] <span class='fmz'>(East Cabilis - Quest NPC)</span>
+* [[sorcerer of Di`zok]]  <span class='fmz'>(Chardok)</span>
+* [[tortured librarian]] <span class='fmz'>(Kaesora - Quest NPC)</span>
+
+}}

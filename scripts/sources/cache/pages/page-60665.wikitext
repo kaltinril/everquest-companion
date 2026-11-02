@@ -1,0 +1,728 @@
+== Summary ==
+The key points:
+* To sell at 100% Value with Indifferent+ [[Faction]] you'll need at least 104 [[Statistics#Charisma (CHA)|Charisma]]. 
+* To sell at 100% Value with Apprehensive [[Faction]] you'll need at least 132 [[Statistics#Charisma (CHA)|Charisma]]. 
+* Destroying an item or auto-selling sells it at 75% Value.
+* [[Greedy Merchants]] give poor deals.
+
+== Overview ==
+When buying and selling items with a vendor, the pricing can vary widely- Vendors of course charge much more than they pay for items, but those buy/sell prices can also change depending on your faction with that vendor, and your charisma when you open the merchant window. (On top of that, some merchants are "[[Greedy Merchants|greedy]]," giving you much less money and charging you far more.)
+
+When you inspect or mouse over an item, if it can be sold, it will show a "Value" of some amount of platinum, gold, silver, and copper pieces. That amount is the highest price you can sell it to a vendor, after taking into consideration and the vendor's faction towards you and your character's [[Charisma]]. "Value" will be used for the rest of this page to refer to that price shown in the tooltip/inspect window.
+
+When Vendors ''sell'' items, their pricing can vary even ''more''. Two items can have very similar Values and sell to a vendor for almost the same amount, but afterwards some items will be priced to sell back from the vendor with much, much higher prices. They seem to give equippable gear a much higher markup, though it changes drastically from item to item.
+
+[[Faction]] is the first main point: Vendors will not deal with you at Dubious or lower faction. [[Statistics#Charisma (CHA)|Charisma]] is the next: Higher Charisma can earn you up to the full Value when selling. However, keep in mind that if you have an upgraded item shose [[Exaltations]] can be removed, vendors won't buy it, so you'll only get that 75% of the Value because you only option is to destroy it or sell it when looting.
+
+= Original Testing =
+[[User:Caliente|Caliente]] and [[User:Alanna|Alanna]] did extensive testing to find the details for this process:
+
+== Scope ==
+Using [https://www.eqtraders.com/articles/article_page.php?article=g190&menust EQ Traders Vendor Pricing] as a reliable'ish source, we can assume the following:
+
+* Charisma has meaningful breakpoints, especially between ~61-76 and ~100+, after which additional CHA has diminishing or no effect.
+* Faction breaks into three functional tiers for pricing:
+# Apprehensive, Indifferent or better, and Dubious or worse. (Indifferent-or-better vendors give identical prices for the same charisma--Ally does not improve prices beyond Indifferent.)
+# Dubious-or-worse vendors won’t sell to you at all.
+# Apprehensive vendors will sell, but prices are significantly worse unless charisma is very high.
+
+These two facts define the scope of our current testing: you only need to test Apprehensive and Indifferent factions across a range of charisma values.
+
+== Control Variables ==
+
+'''Vendor''': Use one vendor for the entire test.
+
+'''Item''': Use one item with a stable base price (e.g., Water Flask, Bandage, but the higher priced the better).
+
+'''Faction level''': You must be able to reliably set your faction to:
+
+* Apprehensive
+* Indifferent
+* (Optional) Amiable / Kindly / Warmly / Ally -- but these will all give identical prices.
+
+'''Charisma value''': You need a reproducible way to set CHA to specific values (e.g., 50, 75, 85, 100, 120, 125, 150, 175, 200) -- (recommend crafted CHA jewelry and farming some CHA armor)
+
+== CHA Test Table ==
+'''Item Tested: [[Diamond]]'''
+
+'''Base Price:''' 200p
+
+'''Max Sell Price:''' 194.476p
+
+'''Merchant: [[Serenk Greybloom]]'''
+{| class="wikitable"
+|
+! colspan="2" |Raw  Plat Cost
+! colspan="2" |Percent
+! colspan="2" |Inverted
+|-
+!Charisma
+!Apprehensive
+!Indifferent
+!Apprehensive
+!Indifferent
+!Apprehensive
+!Indifferent
+|-
+| align="right" |57
+| align="right" |138.819
+| align="right" |155.477
+| align="right" |69.4095%
+| align="right" |77.7385%
+| align="right" |144.0725%
+| align="right" |128.6364%
+|-
+| align="right" |58
+| align="right" |139.311
+| align="right" |156.028
+| align="right" |69.6555%
+| align="right" |78.0140%
+| align="right" |143.5637%
+| align="right" |128.1821%
+|-
+| align="right" |59
+| align="right" |139.807
+| align="right" |156.584
+| align="right" |69.9035%
+| align="right" |78.2920%
+| align="right" |143.0544%
+| align="right" |127.7270%
+|-
+| align="right" |60
+| align="right" |140.306
+| align="right" |157.143
+| align="right" |70.1530%
+| align="right" |78.5715%
+| align="right" |142.5456%
+| align="right" |127.2726%
+|-
+| align="right" |61
+| align="right" |142.807
+| align="right" |160
+| align="right" |71.4035%
+| align="right" |80.0000%
+| align="right" |140.0492%
+| align="right" |125.0000%
+|-
+| align="right" |62
+| align="right" |142.867
+| align="right" |160
+| align="right" |71.4335%
+| align="right" |80.0000%
+| align="right" |139.9903%
+| align="right" |125.0000%
+|-
+| align="right" |63
+| align="right" |142.857
+| align="right" |160
+| align="right" |71.4285%
+| align="right" |80.0000%
+| align="right" |140.0001%
+| align="right" |125.0000%
+|-
+| align="right" |64
+| align="right" |142.857
+| align="right" |160
+| align="right" |71.4285%
+| align="right" |80.0000%
+| align="right" |140.0001%
+| align="right" |125.0000%
+|-
+| align="right" |65
+| align="right" |142.857
+| align="right" |160
+| align="right" |71.4285%
+| align="right" |80.0000%
+| align="right" |140.0001%
+| align="right" |125.0000%
+|-
+| align="right" |66
+| align="right" |142.857
+| align="right" |160
+| align="right" |71.4285%
+| align="right" |80.0000%
+| align="right" |140.0001%
+| align="right" |125.0000%
+|-
+| align="right" |67
+| align="right" |142.857
+| align="right" |160
+| align="right" |71.4285%
+| align="right" |80.0000%
+| align="right" |140.0001%
+| align="right" |125.0000%
+|-
+| align="right" |68
+| align="right" |142.857
+| align="right" |160
+| align="right" |71.4285%
+| align="right" |80.0000%
+| align="right" |140.0001%
+| align="right" |125.0000%
+|-
+| align="right" |69
+| align="right" |142.857
+| align="right" |160
+| align="right" |71.4285%
+| align="right" |80.0000%
+| align="right" |140.0001%
+| align="right" |125.0000%
+|-
+| align="right" |70
+| align="right" |142.857
+| align="right" |160
+| align="right" |71.4285%
+| align="right" |80.0000%
+| align="right" |140.0001%
+| align="right" |125.0000%
+|-
+| align="right" |71
+| align="right" |142.857
+| align="right" |160
+| align="right" |71.4285%
+| align="right" |80.0000%
+| align="right" |140.0001%
+| align="right" |125.0000%
+|-
+| align="right" |72
+| align="right" |142.857
+| align="right" |160
+| align="right" |71.4285%
+| align="right" |80.0000%
+| align="right" |140.0001%
+| align="right" |125.0000%
+|-
+| align="right" |73
+| align="right" |142.857
+| align="right" |160
+| align="right" |71.4285%
+| align="right" |80.0000%
+| align="right" |140.0001%
+| align="right" |125.0000%
+|-
+| align="right" |74
+| align="right" |142.857
+| align="right" |160
+| align="right" |71.4285%
+| align="right" |80.0000%
+| align="right" |140.0001%
+| align="right" |125.0000%
+|-
+| align="right" |75
+| align="right" |142.857
+| align="right" |160
+| align="right" |71.4285%
+| align="right" |80.0000%
+| align="right" |140.0001%
+| align="right" |125.0000%
+|-
+| align="right" |76
+| align="right" |150.714
+| align="right" |168.8
+| align="right" |75.3570%
+| align="right" |84.4000%
+| align="right" |132.7017%
+| align="right" |118.4834%
+|-
+| align="right" |77
+| align="right" |151.429
+| align="right" |169.6
+| align="right" |75.7145%
+| align="right" |84.8000%
+| align="right" |132.0751%
+| align="right" |117.9245%
+|-
+| align="right" |78
+| align="right" |152.143
+| align="right" |170.4
+| align="right" |76.0715%
+| align="right" |85.2000%
+| align="right" |131.4553%
+| align="right" |117.3709%
+|-
+| align="right" |79
+| align="right" |152.857
+| align="right" |171.2
+| align="right" |76.4285%
+| align="right" |85.6000%
+| align="right" |130.8412%
+| align="right" |116.8224%
+|-
+| align="right" |80
+| align="right" |153.571
+| align="right" |172
+| align="right" |76.7855%
+| align="right" |86.0000%
+| align="right" |130.2329%
+| align="right" |116.2791%
+|-
+| align="right" |81
+| align="right" |154.286
+| align="right" |172.8
+| align="right" |77.1430%
+| align="right" |86.4000%
+| align="right" |129.6294%
+| align="right" |115.7407%
+|-
+| align="right" |82
+| align="right" |155
+| align="right" |173.6
+| align="right" |77.5000%
+| align="right" |86.8000%
+| align="right" |129.0323%
+| align="right" |115.2074%
+|-
+| align="right" |83
+| align="right" |155.714
+| align="right" |174.4
+| align="right" |77.8570%
+| align="right" |87.2000%
+| align="right" |128.4406%
+| align="right" |114.6789%
+|-
+| align="right" |84
+| align="right" |156.429
+| align="right" |175.2
+| align="right" |78.2145%
+| align="right" |87.6000%
+| align="right" |127.8535%
+| align="right" |114.1553%
+|-
+| align="right" |85
+| align="right" |157.143
+| align="right" |176
+| align="right" |78.5715%
+| align="right" |88.0000%
+| align="right" |127.2726%
+| align="right" |113.6364%
+|-
+| align="right" |86
+| align="right" |157.857
+| align="right" |176.8
+| align="right" |78.9285%
+| align="right" |88.4000%
+| align="right" |126.6969%
+| align="right" |113.1222%
+|-
+| align="right" |87
+| align="right" |158.571
+| align="right" |177.6
+| align="right" |79.2855%
+| align="right" |88.8000%
+| align="right" |126.1265%
+| align="right" |112.6126%
+|-
+| align="right" |88
+| align="right" |159.286
+| align="right" |178.4
+| align="right" |79.6430%
+| align="right" |89.2000%
+| align="right" |125.5603%
+| align="right" |112.1076%
+|-
+| align="right" |89
+| align="right" |160
+| align="right" |179.2
+| align="right" |80.0000%
+| align="right" |89.6000%
+| align="right" |125.0000%
+| align="right" |111.6071%
+|-
+| align="right" |90
+| align="right" |160.714
+| align="right" |180
+| align="right" |80.3570%
+| align="right" |90.0000%
+| align="right" |124.4447%
+| align="right" |111.1111%
+|-
+| align="right" |91
+| align="right" |161.429
+| align="right" |180.8
+| align="right" |80.7145%
+| align="right" |90.4000%
+| align="right" |123.8935%
+| align="right" |110.6195%
+|-
+| align="right" |92
+| align="right" |162.143
+| align="right" |181.6
+| align="right" |81.0715%
+| align="right" |90.8000%
+| align="right" |123.3479%
+| align="right" |110.1322%
+|-
+| align="right" |93
+| align="right" |162.857
+| align="right" |182.4
+| align="right" |81.4285%
+| align="right" |91.2000%
+| align="right" |122.8071%
+| align="right" |109.6491%
+|-
+| align="right" |94
+| align="right" |163.571
+| align="right" |183.2
+| align="right" |81.7855%
+| align="right" |91.6000%
+| align="right" |122.2711%
+| align="right" |109.1703%
+|-
+| align="right" |95
+| align="right" |164.286
+| align="right" |184
+| align="right" |82.1430%
+| align="right" |92.0000%
+| align="right" |121.7389%
+| align="right" |108.6957%
+|-
+| align="right" |96
+| align="right" |165
+| align="right" |184.8
+| align="right" |82.5000%
+| align="right" |92.4000%
+| align="right" |121.2121%
+| align="right" |108.2251%
+|-
+| align="right" |97
+| align="right" |165.714
+| align="right" |185.6
+| align="right" |82.8570%
+| align="right" |92.8000%
+| align="right" |120.6899%
+| align="right" |107.7586%
+|-
+| align="right" |98
+| align="right" |166.429
+| align="right" |186.4
+| align="right" |83.2145%
+| align="right" |93.2000%
+| align="right" |120.1714%
+| align="right" |107.2961%
+|-
+| align="right" |99
+| align="right" |167.143
+| align="right" |187.2
+| align="right" |83.5715%
+| align="right" |93.6000%
+| align="right" |119.6580%
+| align="right" |106.8376%
+|-
+| align="right" |100
+| align="right" |167.857
+| align="right" |188
+| align="right" |83.9285%
+| align="right" |94.0000%
+| align="right" |119.1490%
+| align="right" |106.3830%
+|-
+| align="right" |101
+| align="right" |168.571
+| align="right" |188.8
+| align="right" |84.2855%
+| align="right" |94.4000%
+| align="right" |118.6444%
+| align="right" |105.9322%
+|-
+| align="right" |102
+| align="right" |169.286
+| align="right" |189.6
+| align="right" |84.6430%
+| align="right" |94.8000%
+| align="right" |118.1433%
+| align="right" |105.4852%
+|-
+| align="right" |103
+| align="right" |170
+| align="right" |190.4
+| align="right" |85.0000%
+| align="right" |95.2000%
+| align="right" |117.6471%
+| align="right" |105.0420%
+|-
+| align="right" |104
+| align="right" |170.714
+| align="right" |190.476
+| align="right" |85.3570%
+| align="right" |95.2380%
+| align="right" |117.1550%
+| align="right" |105.0001%
+|-
+| align="right" |105
+| align="right" |171.429
+|
+| align="right" |85.7145%
+|
+| align="right" |116.6664%
+|
+|-
+| align="right" |106
+| align="right" |172.143
+|
+| align="right" |86.0715%
+|
+| align="right" |116.1825%
+|
+|-
+| align="right" |107
+| align="right" |172.857
+|
+| align="right" |86.4285%
+|
+| align="right" |115.7026%
+|
+|-
+| align="right" |108
+| align="right" |173.571
+|
+| align="right" |86.7855%
+|
+| align="right" |115.2266%
+|
+|-
+| align="right" |109
+| align="right" |174.286
+|
+| align="right" |87.1430%
+|
+| align="right" |114.7539%
+|
+|-
+| align="right" |110
+| align="right" |175
+|
+| align="right" |87.5000%
+|
+| align="right" |114.2857%
+|
+|-
+| align="right" |111
+| align="right" |175.714
+|
+| align="right" |87.8570%
+|
+| align="right" |113.8213%
+|
+|-
+| align="right" |112
+| align="right" |176.429
+|
+| align="right" |88.2145%
+|
+| align="right" |113.3600%
+|
+|-
+| align="right" |113
+| align="right" |177.143
+|
+| align="right" |88.5715%
+|
+| align="right" |112.9031%
+|
+|-
+| align="right" |114
+| align="right" |177.857
+|
+| align="right" |88.9285%
+|
+| align="right" |112.4499%
+|
+|-
+| align="right" |115
+| align="right" |178.571
+|
+| align="right" |89.2855%
+|
+| align="right" |112.0003%
+|
+|-
+| align="right" |116
+| align="right" |179.286
+|
+| align="right" |89.6430%
+|
+| align="right" |111.5536%
+|
+|-
+| align="right" |117
+| align="right" |180
+|
+| align="right" |90.0000%
+|
+| align="right" |111.1111%
+|
+|-
+| align="right" |118
+| align="right" |180.714
+|
+| align="right" |90.3570%
+|
+| align="right" |110.6721%
+|
+|-
+| align="right" |119
+| align="right" |181.429
+|
+| align="right" |90.7145%
+|
+| align="right" |110.2360%
+|
+|-
+| align="right" |120
+| align="right" |182.143
+|
+| align="right" |91.0715%
+|
+| align="right" |109.8038%
+|
+|-
+| align="right" |121
+| align="right" |182.857
+|
+| align="right" |91.4285%
+|
+| align="right" |109.3751%
+|
+|-
+| align="right" |122
+| align="right" |183.571
+|
+| align="right" |91.7855%
+|
+| align="right" |108.9497%
+|
+|-
+| align="right" |123
+| align="right" |184.286
+|
+| align="right" |92.1430%
+|
+| align="right" |108.5270%
+|
+|-
+| align="right" |124
+| align="right" |185
+|
+| align="right" |92.5000%
+|
+| align="right" |108.1081%
+|
+|-
+| align="right" |125
+| align="right" |185.714
+|
+| align="right" |92.8570%
+|
+| align="right" |107.6925%
+|
+|-
+| align="right" |126
+| align="right" |186.429
+|
+| align="right" |93.2145%
+|
+| align="right" |107.2794%
+|
+|-
+| align="right" |127
+| align="right" |187.143
+|
+| align="right" |93.5715%
+|
+| align="right" |106.8701%
+|
+|-
+| align="right" |128
+| align="right" |187.857
+|
+| align="right" |93.9285%
+|
+| align="right" |106.4640%
+|
+|-
+| align="right" |129
+| align="right" |188.571
+|
+| align="right" |94.2855%
+|
+| align="right" |106.0608%
+|
+|-
+| align="right" |130
+| align="right" |189.286
+|
+| align="right" |94.6430%
+|
+| align="right" |105.6602%
+|
+|-
+| align="right" |131
+| align="right" |190
+|
+| align="right" |95.0000%
+|
+| align="right" |105.2632%
+|
+|-
+| align="right" |132
+| align="right" |190.476
+|
+| align="right" |95.2380%
+|
+| align="right" |105.0001%
+|
+|}
+Tested as a Barbarian BRD/NEC/SHM with a combination of positive and negative charisma gear. Later tests done as a Human BRD/NEC/SHM.
+
+'''Testing steps:'''
+
+# Equipped negative charisma gear to drop from 75 base charisma to 58
+# Confirmed sell price with several merchants to rule out the merchant being greedy
+# Checked sell price with merchant, then changed gear to increase charisma by 1 and checked again
+# Repeated this process until I reached the max sell price and confirmed it kept going.
+# Turned in Tumpy Tonics to increase faction from Apprehensive to Indifferent
+# Repeated tests
+# Increased faction to Amiable
+# Repeated first few tests and received same indifferent results. Proceeded to test breakpoints and every 5 charisma to confirm
+# Increased faction to Kindly
+# Repeated Amiable tests to confirm faction did not matter
+# Sold Diamond to vendor
+# Tested prices at several points to confirm that the merchant's buy and sell modifiers are inverted
+# Equipped all CHA gear and destroyed a Diamond to confirm destroy rate
+# Tested with Barbarian Shaman vendor at Ally. Received Indifferent+ prices with a +11 CHA bonus
+# Tested a non-class Barbarian vendor and received the same results
+# Tested a Human Bard vendor at Ally. Received normal Indifferent+ prices.
+# Changed race from Barbarian to Human with an Origin of South Qeynos
+# Tested Human Bard vendor. Received +11 CHA
+# Tested non-Bard Human vendor. Received +11 CHA
+# Tested several vendors in North Qeynos. +11 CHA
+# Travelled to Freeport and tested human merchants. +11 CHA
+# Tested [[Linadian]] at Ally. No CHA bonus
+# Used Sneak to test an [[Arcane Scientists]] merchant at Indifferent. +11 CHA
+# Travelled to Neriak Foreign Quarter
+# Human merchants at Ally gave +11 CHA
+# Halflings merchants at Ally give no bonus
+# Dark Elf merchants at Ally give no bonus
+# Used [[Guise of the Deceiver]] to Illusion: Dark Elf
+# Merchants gave the same results as previous
+# Travelled to Qeynos and increased faction with Bloodsabers to Apprehensive
+# Tested and got the same +11 CHA bonus
+
+== Findings ==
+
+* Apprehensive and Indifferent use completely different functions
+* Sell and buy multipliers are inverted
+* Max sell value is 1/1.05 (~95.24%)
+* Merchants of the same race give a +11 CHA bonus
+* Apprehensive Breakpoints
+** 62-75 CHA - 1/1.4 buy rate (~71.43%)
+** 132 CHA - Max sell value
+* Indifferent+ Breakpoints
+** 62-75 CHA - 1/1.25 buy rate (80%)
+** 104 CHA - Max sell value
+* Destroying an item sells it at the equivalent of Apprehensive with 75 CHA: 1/1.4 (~71.43%)
+* Indifferent+ is 0.4% extra sell value per point of CHA from 76-103. Unknown why the function breaks at 79.
+* Apprehensive is 0.357% per point of CHA from 76-131. Every 3-4 levels will get an extra 0.0005%, but that's likely just rounding to copper values
+Testing seems to match the formulas used by TAKP, whose code is licensed under GPLv2. May be wise to just source them from there with attribution.
+
+https://github.com/EQMacEmu/Server/blob/57cd20ec7fed8883f0984b12957da4afe0812c83/zone/client.cpp#L3062

@@ -1,0 +1,213 @@
+Motes of Potential are new items added to Everquest Legends.  These are used to [[Item Upgrade System|upgrade items]] and [[Spell Upgrade System|upgrade spells]]. While items can be upgraded by merging duplicate items and by merging motes, spells can only be upgraded with motes.
+
+== Motes of Potential Tiers ==
+
+* Motes add points toward upgrading an item or spell to its next tier.
+** For example, a +4 item showing Tier 4 and 1/16 has 1 of the 16 points needed to reach +5.
+* Motes range from Rank 1 to Rank 10, from Infinitesimal through Infinite. A mote's Rank determines the highest item tier it can be used on.
+* Spells have no restrictions for motes. Any Rank can be used at any + level, and motes generally add significantly more points to spells than items.
+
+<div style="display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap;">
+
+<div>
+
+'''Items'''
+
+{| class="wikitable sortable"
+!Mote Name
+!Points Added*
+!Item Tier Limit
+|-
+| [[Mote of Infinitesimal Potential]]
+| 1
+| +0
+|-
+| [[Mote of Minor Potential]]
+| 1
+| +1
+|-
+| [[Mote of Lesser Potential]]
+| 2
+| +2
+|-
+| [[Mote of Potential]]
+| 4
+| +3
+|-
+| [[Mote of Major Potential]]
+| 5
+| +4
+|-
+| [[Mote of Greater Potential]]
+| 6
+| +5
+|-
+| [[Mote of Superior Potential]]
+| 7
+| +6
+|-
+| [[Mote of Grand Potential]]
+| 8
+| +7
+|-
+| [[Mote of Ascendant Potential]]
+| 9
+| +8
+|-
+| [[Mote of Infinite Potential]]
+| 10
+| +9
+|}
+</div>
+
+<div>
+'''Spells'''
+
+{| class="wikitable sortable"
+!Mote Name
+!Points Added
+|-
+| [[Mote of Infinitesimal Potential]]
+| 1
+|-
+| [[Mote of Minor Potential]]
+| 2
+|-
+| [[Mote of Lesser Potential]]
+| 4
+|-
+| [[Mote of Potential]]
+| 8
+|-
+| [[Mote of Major Potential]]
+| 16
+|-
+| [[Mote of Greater Potential]]
+| 32
+|-
+| [[Mote of Superior Potential]]
+| 64
+|-
+| [[Mote of Grand Potential]]
+| 128
+|-
+| [[Mote of Ascendant Potential]]
+| 256
+|-
+| [[Mote of Infinite Potential]]
+| 512
+|}
+</div>
+
+</div>
+
+'''* BUG: For items only:''' Motes do not show progress beyond their item-tier limit. Any excess points will not show. For example, using a [[Mote of Major Potential|Major mote]] (5 points, maximum tier +5) on a +4 item at 15/16 only shows that it advances to +5, but the remaining 4 points are not shown (but will be added in once the mote is consumed).
+
+=== Void-Touched Potential ===
+
+* [[Void-Touched Potential]] are special motes earned from raids that instantly advance an item or spell to its next tier, regardless of its current upgrade progress.
+** For example, using one on a +1 item will raise it directly to +2, while using one on a +9 item will raise it directly to +10.
+* A maximum of three can be earned each week from solo and group raids combined. The week resets Tuesdays at approximately 8:00 AM PT / 11:00 AM ET / 4:00 PM UK time.
+* Because they bypass the points normally required, they are most valuable when used for higher-tier upgrades.
+* '''Only three Void-Touched Potential can be held at a time.'''
+
+== Condensing Motes ==
+
+Motes can be combined by giving them to a [[Constructed Potential]] found in cities around Norrath. Two motes of the same tier will be combined into one mote of the next tier up. The Construct will accept up to [[Mote of Grand Potential]] to condense into a [[Mote of Ascendant Potential]] ('''Needs Confirmed'''). You can give the Construct a stack of 100 motes and it will condense all of them and give you back 50 of the next tier up.
+
+=== '''WARNING''' === 
+It is generally a bad idea to condense most motes into higher motes. Most motes don't double in value. Increasing two Motes of Superior Potential (7 exp) only gives one Mote of Grand Potential (8 exp).  The two exceptions are motes of minor and lesser potential. Condensing these motes results in a mote with double experience.
+
+* For upgrading spells don't combine at all (other than minor and lesser motes to reduce the number of merges).
+* For upgrading items, avoid combining if you have any other option. You may be forced to condense your motes to use them to upgrade high tier item, but before you do consider farming more of the item first. If you have no other choice or just have an abundance of motes you can condense them as a last resort.
+{| class="wikitable"
+!Item Level
+!Mote Requirement (Nominal)
+!Tier Down — Condensing Motes
+|-
+|0 → 1
+|1× T1 Infinitesimal
+|—
+|-
+|1 → 2
+|2× T2 Minor
+|4× T1 → 2× T2
+|-
+|2 → 3
+|2× T3 Lesser
+|4× T2 → 2× T3
+|-
+|3 → 4
+|2× T4 Potential
+|4× T3 → 2× T4
+|-
+|4 → 5
+|4× T5 Major
+|8× T4 → 4× T5
+|-
+|5 → 6
+|5× T6 Greater
+|10× T5 → 5× T6
+|-
+|6 → 7
+|9× T7 Superior
+|18× T6 → 9× T7
+|-
+|7 → 8
+|16× T8 Grand
+|32× T7 → 16× T8
+|-
+|8 → 9
+|29× T9 Ascendant
+|58× T8 → 29× T9
+|-
+|9 → 10
+|51× T10 Infinite
+|102× T9 → 51× T10
+|}
+
+== Obtaining Motes ==
+Motes have a chance to drop from any monster killed that is high enough to give you experience.  The higher the difficulty of the zone will increase the minimum level of the mote that will drop.  Killing mobs of a higher level (yellow or red) will also increase the chance of motes dropping.  Additionally, the player's level will affect the level of the motes that drop - at level 15, typically the highest that will drop in a Difficulty 4 is a Tier 3 mote.  There is always a chance for motes to roll higher.
+
+Additionally, multiclass mobs get a bonus based on the number of their classes.  Rare or unique mobs double the chance of a mote dropping, and raid targets triple the chance.  It is possible for the chance to reach 100% when farming the right combination of mobs.
+
+{| class="wikitable sortable"
+|+
+!Player Level
+!Mote level
+|-
+|1
+|1
+|-
+|10
+|2
+|-
+|15
+|3
+|-
+|20
+|4
+|-
+|25
+|5
+|-
+|30
+|6
+|-
+|35
+|7
+|-
+|40
+|8
+|-
+|45
+|9
+|-
+|50
+|10
+|-
+|}
+
+*Note: Tiers 1-3 need confirmation on level drop. Seems to be Monster Level not Player Level, or it may be based on both the Player and Monster level. When under level 20, you can't get higher than a Tier 3 mote, even on D4. But once you hit 20, killing anything under 20 will still only give up to Tier 3 motes.  Needs more testing to confirm.
+
+[[Category:Guides]]

@@ -1,0 +1,72 @@
+{{Factionpage|
+
+| description = The Jaevins school of magic is where young magicians in Erudin go to practice their art under the guidance of Guildmaster Markus Jaevins.  Located in the Erudin Palace in the Gatecallers hall, [[Magician]]s of all ages study their art.  The Gatecallers support the [[High Council of Erudin]] and the [[High Guard of Erudin]].  Like most every guild in Erudin they oppose the [[Heretics]] of Paineel.
+
+| zones_raise = 
+
+* [[Lavastorm Mountains]]
+* [[Paineel]]
+* [[The Hole]]
+* [[Toxxulia Forest]]
+
+| zones_lower = 
+
+* [[Erudin|Erudin Palace]]
+* [[Toxxulia Forest]]
+
+| quests_raise = 
+
+* [[Heretic Battle]]
+* [[Rungupp (Quest)|Rungupp]]
+* [[The Power of the Gatecallers]]
+
+| quests_lower = 
+
+* [[Azzar's Dreadful Hat Quest]]
+* [[Bat Fur and Beetle Legs]]
+* [[Cazic Thule Initiate]]
+* [[Cold Iron]]
+* [[Kobold Molars (evil)]]
+* [[The Waylaid Courier]]
+
+| mobs_raise = 
+
+* [[Aglthin Dasmore]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Azzar Habbib]] <span class='fmz'>(Paineel - Quest NPC)</span>
+* [[Dunvan Mercwinn]] <span class='fmz'>(Ocean of Tears)</span>
+* [[Elial Brook]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Guard Korlack]]  <span class='fmz'>(Paineel)</span>
+* [[Guard Menbuknar]]  <span class='fmz'>(Paineel)</span>
+* [[Hykallen]]  <span class='fmz'>(Lavastorm Mountains)</span>
+* [[Jelquar the Soulslayer]]  <span class='fmz'>(Stonebrunt Mountains)</span>
+* [[Keeper of the Tombs]] <span class='fmz'>(Ruins of Old Paineel (The Hole) - Undead)</span>
+* [[Lorna Shearsin]] <span class='fmz'>(Ocean of Tears)</span>
+* [[Noclin Saah]] <span class='fmz'>(Paineel - Quest NPC)</span>
+* [[Rallia Hapera]] <span class='fmz'>(Paineel - Merchant)</span>
+* [[Telan Buvare]]  <span class='fmz'>(Paineel)</span>
+* [[Keeshla Levlora]]  <span class='fmz'>(Paineel)</span>
+* [[Velana Kelmuza]]  <span class='fmz'>(Paineel)</span>
+* [[Verolk Kishneal]]  <span class='fmz'>(Paineel)</span>
+* [[Derena Leflor]]  <span class='fmz'>(Paineel)</span>
+* [[A kerran `amir]] <span class='fmz'>(Kerra Island)</span>
+* [[A kerran puma]] <span class='fmz'>(Kerra Island)</span>
+* [[A kerran pasdar]] <span class='fmz'>(Kerra Island)</span>
+* [[A kerran mujahed]] <span class='fmz'>(Kerra Island)</span>
+* [[Kerran tiger spahi]] <span class='fmz'>(Kerra Island)</span>
+
+| mobs_lower = 
+
+* [[Harban Ranflash]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Kestall Tulenci]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Killi Frillep]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Markus Jaevins]] <span class='fmz'>(Erudin Palace - Magician Guildmaster)</span>
+* [[Onyssa Vroce]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Reba Garus]] <span class='fmz'>(Erudin Palace - Magician Guildmaster)</span>
+* [[Shintar Vinlail]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Tran Lilspin]] <span class='fmz'>(Toxxulia Forest - Merchant)</span>
+* [[Tuballi Stellari]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Vasile Jahnir]] <span class='fmz'>(Erudin Palace - Magician Guildmaster)</span>
+* [[Wistcona]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+
+}}
+[[Category:Achievement Faction]]

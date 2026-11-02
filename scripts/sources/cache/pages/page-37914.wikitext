@@ -1,0 +1,148 @@
+{{Classic Era}}
+{{Factionpage|
+
+| description = These swamp loving creatures would like no more than to be left alone but the Trolls of [[Grobb]] will have no such thing. Deep within the ancient Trollish city of Guk, which the Frogloks reclaimed from the Innothule, they fight a never ending battle against legions of Trolls and other humanoids of ill morals who, in their quests for lost riches, seem intent on exterminating every living [[Froglok]]. The lower reaches of Guk are infested by the [[Undead Frogloks of Guk]] whom the living Frogloks hate.
+
+The Frogloks are also cursed by the fact that it is only within the swampland of the Innothule where they can deposit and hatch their young. Few Froglok Tadpoles can avoid the ever-stomping Trollish boots long enough to reach adulthood.
+
+| zones_raise = 
+
+* [[Grobb]]
+* [[Lower Guk]]
+* [[Rathe Mountains]]
+* [[Neriak|Neriak Foreign Quarter]]
+* [[Old Sebilis]]
+* [[Toxxulia Forest]]
+
+| zones_lower = 
+
+* [[Innothule Swamp]]
+* [[Lower Guk]]
+* [[Qeynos Aqueducts]]
+* [[Upper Guk]]
+
+| quests_raise = 
+
+* [[Rungupp (Quest)|Rungupp]]
+
+| quests_lower = 
+
+* [[More Help for Innoruuk]]
+
+
+| mobs_raise = 
+
+* [[a basalt gargoyle]]  <span class='fmz'>(Lower Guk)</span>
+* [[a bloodthirsty ghoul]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[a clay gargoyle]]  <span class='fmz'>(Lower Guk)</span>
+* [[a frenzied ghoul]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[a ghoul assassin]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[a ghoul cavalier]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[a ghoul executioner]] <span class='fmz'>(Lower Guk - Undead)</span>
+* A Ghoul Ritualist Pet <span class='fmz'>(Lower Guk - Summoned)</span>
+* [[a ghoul sage]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[a ghoul savant]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[a ghoul scribe]]  <span class='fmz'>(Lower Guk)</span>
+* [[a ghoul sentinel]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[A guk ghoul wizard]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[a shin ghoul knight]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[A Shin Ghoul Warrior]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[Bregna]] <span class='fmz'>(Grobb - Shaman Guildmaster)</span>
+* [[dar ghoul knight]] <span class='fmz'>(Old Sebilis - Undead)</span>
+* [[froglok bok knight]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok bok shaman]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok bok wizard]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok commander]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok dar knight]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok ilis knight]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok ilis shaman]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok jin shaman]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok jin wizard]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok kor shaman]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok krup knight]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok krup shaman]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok krup wizard]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok ostiary]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok pickler]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok reet knight]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok reet shaman]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok reet wizard]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok zol knight]]  <span class='fmz'>(Old Sebilis)</span>
+* [[Guard Gruilka]] <span class='fmz'>(Mountains of Rathe)</span>
+* [[Hukulk]] <span class='fmz'>(Grobb - Shadowknight Guildmaster)</span>
+* [[Jokca]] <span class='fmz'>(Grobb - Shaman Guildmaster)</span>
+* [[Kaglari]] <span class='fmz'>(Grobb - Shaman Guildmaster)</span>
+* [[krup ghoul knight]] <span class='fmz'>(Old Sebilis - Undead)</span>
+* [[Rungupp]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[the ghoul arch magus]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[the ghoul lord]] <span class='fmz'>(Lower Guk - Undead)</span>
+* The Ghoul Lord Pet <span class='fmz'>(Lower Guk - Summoned)</span>
+* [[Tolapumj]]  <span class='fmz'>(Old Sebilis)</span>
+* [[Treskar]] <span class='fmz'>(Grobb - Shadowknight Guildmaster)</span>
+* [[Urako]] <span class='fmz'>(Grobb - Shaman Guildmaster)</span>
+
+| mobs_lower = 
+
+* [[a froglok]]  <span class='fmz'>(Innothule Swamp)</span>
+* [[A Froglok Bok Knight]]  <span class='fmz'>(Lower Guk)</span>
+* [[a froglok crusader]]  <span class='fmz'>(Lower Guk)</span>
+* [[a froglok gaz knight]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok gaz shaman]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok gaz squire]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok gaz warrior]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok guard]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok guk knight]]  <span class='fmz'>(Lower Guk)</span>
+* [[a froglok herbalist]]  <span class='fmz'>(Lower Guk)</span>
+* [[a froglok idealist]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok kor shaman]]  <span class='fmz'>(Lower Guk)</span>
+* [[a froglok necromancer]]  <span class='fmz'>(Upper Guk)</span>
+* a froglok necromancer pet <span class='fmz'>(Upper Guk - Summoned)</span>
+* [[a froglok neophyte]]  <span class='fmz'>(Upper Guk)</span>
+* [[A Froglok Noble]]  <span class='fmz'>(Lower Guk)</span>
+* [[a froglok nokta shaman]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok novice]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok priest]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok realist]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok scryer]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok sentinel]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok sentry]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok shin knight]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok shin shaman]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok shin warrior]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[a froglok shinta warrior]]  <span class='fmz'>(Upper Guk)</span>
+* [[A Froglok Slave]]  <span class='fmz'>(Lower Guk)</span>
+* [[a froglok summoner]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok tactician]]  <span class='fmz'>(Lower Guk)</span>
+* [[a froglok tad]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok tal shaman]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok ton knight]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok ton shaman]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok ton warrior]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok tonta knight]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok tuk knight]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok tuk shaman]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok tuk warrior]]  <span class='fmz'>(Upper Guk)</span>
+* [[A Froglok Urd Shaman]]  <span class='fmz'>(Lower Guk)</span>
+* [[a froglok vis knight]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok vis shaman]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok witch doctor]]  <span class='fmz'>(Upper Guk)</span>
+* [[a froglok yun priest]]  <span class='fmz'>(Upper Guk)</span>
+* [[a fungus ancient]] <span class='fmz'>(Upper Guk - Plant)</span>
+* [[a fungus breeder]] <span class='fmz'>(Upper Guk - Plant)</span>
+* [[a fungus drone]] <span class='fmz'>(Upper Guk - Plant)</span>
+* [[a fungus mutant]] <span class='fmz'>(Upper Guk - Plant)</span>
+* [[a fungus soldier]] <span class='fmz'>(Upper Guk - Plant)</span>
+* [[a greater minotaur]]  <span class='fmz'>(Lower Guk)</span>
+* [[a huge water elemental]] <span class='fmz'>(Lower Guk - Summoned)</span>
+* [[a minotaur patriarch]]  <span class='fmz'>(Lower Guk)</span>
+* [[a minotaur elder]]  <span class='fmz'>(Lower Guk)</span>
+* [[A Yun Priest]]  <span class='fmz'>(Lower Guk)</span>
+* [[an evil eye]]  <span class='fmz'>(Lower Guk)</span>
+* [[Mon`Sarna]]  <span class='fmz'>(Qeynos Catacombs)</span>
+* [[Raster of Guk]] <span class='fmz'>(Lower Guk - Quest NPC)</span>
+* [[the froglok king]]  <span class='fmz'>(Lower Guk)</span>
+* [[the froglok shin lord]]  <span class='fmz'>(Upper Guk)</span>
+
+}}
+
+[[Category:Monster factions]]

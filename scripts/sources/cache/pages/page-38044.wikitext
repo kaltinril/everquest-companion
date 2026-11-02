@@ -1,0 +1,183 @@
+{{Velious Era}}
+{{Factionpage|
+
+| description = Faction of the King of the Coldain Dwarves, [[Dain Frostreaver IV]].
+
+| zones_raise =
+
+* [[Kael Drakkel]]
+
+| zones_lower =
+
+* [[Eastern Wastes]]
+* [[Great Divide]]
+* [[Iceclad Ocean]]
+* [[Icewell Keep]]
+* [[Thurgadin]]
+
+| quests_raise =
+
+* [[Coldain Ring Quests]]
+* [[Coldain Prayer Shawl Quests]]
+* [[Giant Helmets]]
+* [[The Velium Focus]]
+
+* [[Bard Thurgadin Armor Quests]]
+* [[Cleric Thurgadin Armor Quests]]
+* [[Druid Thurgadin Armor Quests]]
+* [[Enchanter Thurgadin Armor Quests]]
+* [[Magician Thurgadin Armor Quests]]
+* [[Monk Thurgadin Armor Quests]]
+* [[Necromancer Thurgadin Armor Quests]]
+* [[Paladin Thurgadin Armor Quests]]
+* [[Ranger Thurgadin Armor Quests]]
+* [[Rogue Thurgadin Armor Quests]]
+* [[Shaman Thurgadin Armor Quests]]
+* [[Shadowknight Thurgadin Armor Quests]]
+* [[Warrior Thurgadin Armor Quests]]
+* [[Wizard Thurgadin Armor Quests]]
+
+| quests_lower =
+
+* [[Dragon Heads]]
+* [[Reinforcements for The Tunarean Regiment]]
+
+| mobs_raise =
+
+* [[Dlammaz Stormslayer]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Drendar Blackblade]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Fjokar Frozenshard]] <span class='fmz'>(Kael Drakkel - Quest NPC)</span>
+* [[Keldor Dek`Torek]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[King Tormax]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Klraggek the Slayer]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Velden Dragonbane]]  <span class='fmz'>(Kael Drakkel)</span>
+* [[Vkjen Thunderslayer]] <span class='fmz'>(Kael Drakkel)</span>
+
+| mobs_lower =
+
+* [[a coldain hunter]] <span class='fmz'>(Eastern Wastes - NPC, Non-Quest)</span>
+* [[a coldain lookout]] <span class='fmz'>(Eastern Wastes - Quest NPC)</span>
+* [[a Coldain miner]]  <span class='fmz'>(Great Divide)</span>
+* [[a coldain missionary]] <span class='fmz'>(Eastern Wastes - NPC, Non-Quest)</span>
+* [[a coldain skinner]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[a Coldain tracking wolf]]  <span class='fmz'>(Great Divide)</span>
+* [[a coldain warrior]] <span class='fmz'>(Eastern Wastes - NPC, Non-Quest)</span>
+* [[a coldain wolfmaster]] <span class='fmz'>(Great Divide - NPC, Non-Quest)</span>
+* [[a velium miner]]  <span class='fmz'>(Great Divide)</span>
+* [[Adia Coldbeard]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[an expedition guard]]  <span class='fmz'>(Great Divide)</span>
+* [[An Icewell Sentinel]] <span class='fmz'>(Icewell Keep)</span>
+* [[an injured warrior]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[Argash]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Betti Frostweaver]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Bixx Bartleby]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Brimgald Brightsteel]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Brina Snowfox]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Brynjar]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Captain Stonefist]]  <span class='fmz'>(Great Divide)</span>
+* [[Celtir Gronback]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Chamberlain Krystorf]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Clara]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Coldain Outcast]] <span class='fmz'>(Icewell Keep - Merchant)</span>
+* [[Corbin Blackwell]] <span class='fmz'>(Eastern Wastes - Quest NPC)</span>
+* [[Councilor Amberfeld]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Councilor Coldember]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Councilor Darakor]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Councilor Darkfrost]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Councilor Deynekn]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Councilor Dirkins]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Councilor Glacierbane]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Councilor Icelok]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Councilor Icepike]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Councilor Thubins]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Councilor Wintershade]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Dain Frostreaver IV]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Darts O`Gavin]] <span class='fmz'>(Thurgadin - NPC, Non-Quest)</span>
+* [[Deaen Greyforge]] <span class='fmz'>(Eastern Wastes - Quest NPC)</span>
+* [[Doogle McBanick]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Durgan Bottlenip]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Fogerty Bottlenip]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Frundle Frenkler]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Gage]] <span class='fmz'>(Thurgadin - Banker)</span>
+* [[Garadain Glacierbane]] <span class='fmz'>(Eastern Wastes - Quest NPC)</span>
+* [[Garish Ironhelm]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Gilthan Brittleblade]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Grand Historian Thoridain]] <span class='fmz'>(Thurgadin - Quest NPC)</span>
+* [[Grand Huntsman Darral]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Guard Audun]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Baldvin]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Bergur]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Bjorn]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Clorn]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Dagur]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Dobbs]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Eirikur]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Elin]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Enre]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Eyvindur]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Fjola]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Gord]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Halldor]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Iris]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Jonas]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Karl]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Kilandur]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Korik]] <span class='fmz'>(Great Divide)</span>
+* [[Guard Krag]] <span class='fmz'>(Great Divide)</span>
+* [[Guard Kristrun]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Larus]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Leif]] <span class='fmz'>(Thurgadin - Quest NPC)</span>
+* [[Guard Mason]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Oskar]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Pert]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Rakel]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Royt]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Sigrun]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Suuna]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Teitur]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Thorbin]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Tinna]]  <span class='fmz'>(Thurgadin)</span>
+* [[Guard Valdis]]  <span class='fmz'>(Thurgadin)</span>
+* [[Hakon Brightsteel]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Hulda]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Jeril Kettletop]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Karey]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Klarp Bartleby]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Korf Brokenhammer]]  <span class='fmz'>(Great Divide)</span>
+* [[Korrigain]] <span class='fmz'>(Eastern Wastes - Quest NPC)</span>
+* [[Leifur]] <span class='fmz'>(Thurgadin - Quest NPC)</span>
+* [[Lorekeeper Derrin]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Lorekeeper Einar]]  <span class='fmz'>(Thurgadin)</span>
+* [[Lorekeeper Taben]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Loremaster Borannin]] <span class='fmz'>(Thurgadin - Quest NPC)</span>
+* [[Loremaster Dorinan]] <span class='fmz'>(Thurgadin - Quest NPC)</span>
+* [[Loremaster Fronden]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Loremaster Solstrin]] <span class='fmz'>(Icewell Keep - Quest NPC)</span>
+* [[Meg Tucter]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Mordin Frostcleaver]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Nimren Stonecutter]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Pearce Icefang]]  <span class='fmz'>(Thurgadin)</span>
+* [[Perkins Doughbeard]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Petcas Coldbeard]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Relik]] <span class='fmz'>(Great Divide - Quest NPC)</span>
+* [[Rexx Frostweaver]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Royal Guardsman Braxis]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Royal Guardsman Hauten]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Royal Guardsman Horix]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Royal Guardsman Nial]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Royal Guardsman Raxine]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Royal Guardsman Rhion]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Royal Scribe Kaavin]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Seneschal Aldikar]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Sentinel Paxin]]  <span class='fmz'>(Icewell Keep)</span>
+* [[Seril Kettletop]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Talem Tucter]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Tavir]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Tobart Dirkins]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Trademaster Kroven]]  <span class='fmz'>(Thurgadin)</span>
+* [[Vores the Hunter]]  <span class='fmz'>(Great Divide)</span>
+* [[Wevil Doughbeard]] <span class='fmz'>(Thurgadin - Merchant)</span>
+* [[Wolfmaster Finnur]]  <span class='fmz'>(Thurgadin)</span>
+* [[Zrelik the Scout]] <span class='fmz'>(Thurgadin - Quest NPC)</span>
+
+}}

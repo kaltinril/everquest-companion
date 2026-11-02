@@ -1,0 +1,28 @@
+Using a high resolution will result in the UI of the game to appear small which can make the game difficult to display.
+
+Resolutions above 2560x1440 can be difficult to play at until proper UI scaling is implemented (this is actively being worked on, but will likely take some time).
+
+== Change Desktop Resolution, or Different Monitor ==
+The simplest workarounds are to change the system resolution or use a different monitor but these are often not desirable for one reason or another.
+
+== Apply Windows Display Scaling to the Game ==
+The display scale chosen for the display can be applied to the game through use of the compatibility properties for the game executable. This will allow the game window to maximize or full screen at the correct resolution for the display, but render at a lower resolution. The main downsides to this is that the game may look fuzzy and that you may have to adjust the display scaling when you play the game to an appropriate value whenever you launch the game.
+
+An easy way to think about this is that the game will render at the chosen system resolution, divided by the display scale For example - at a 3840x2160 (4K) resolution, a 150% display scale will bring the game down to a 2560x1440 resolution (3840/1.50=2560, 2160/1.5=1440), and a 200% display scale will bring the game down to a 1920x1080 resolution.
+
+''As a caveat, at 4K a 300% game scale will result in a 1280x720 game resolution which is likely not enough screen space to show all of the UI. So the best results will likely be with 150% or 200% at 4K.''
+
+With the game open right click on the task bar and open up the menu and click Properties. Or find the eqgame.exe file in the folder for EverQuest Legends and right click on it to access the properties from there.
+[[File:Image.png|none|thumb]]
+Navigate to the Compatibility tab and click "Change settings for all users" (optional) and then "Change high DPI settings"
+[[File:Image-compatibility-tab.png|none|thumb]]
+Change the settings to the following:
+[[File:Image-high-dpi-settings.png|none|thumb]]
+Then set the display scale in the system display settings
+[[File:Display-settings.png|none|thumb]]
+After making these changes, restart the game.
+
+== UI Workarounds ==
+TODO - are there any custom UIs around that are being worked on that create larger elements for high DPI displays?
+
+{{DEFAULTSORT:High DPI Display Workarounds}}

@@ -1,0 +1,114 @@
+The Spell Upgrade System is a core new feature introduced in EverQuest Legends. This was introduced in Beta but adjustments and improvements are still being added (as of 7/31/2026). Additionally the exact impact on spells is still being tested. Details on this page may not be entirely accurate and prone to change in the near future.
+
+All spells can be upgraded from a starting rank of 0, to a max rank of 10. You do this with [[Mote Guide|motes]] though [[Spell Upgrading]]. The system is similar to [[Item Upgrade System|item upgrades]], but there is no option other than motes for upgrading spells.
+
+== Upgrading Spell Tiers ==
+Spells are upgraded using motes, each mote gives a fixed amount of experience towards upgrading the spell. More details about finding and using motes can be found in the [[Mote Guide]].
+
+{| class="wikitable sortable"
+|+Experience Required to Upgrade
+!Spell Tier
+!Experience
+|-
+|0
+|1
+|-
+|1
+|2
+|-
+|2
+|4
+|-
+|3
+|8
+|-
+|4
+|16
+|-
+|5
+|32
+|-
+|6
+|64
+|-
+|7
+|128
+|-
+|8
+|256
+|-
+|9
+|512
+|-
+|}
+
+This chart should be correct but needs double checked in game.
+
+== Spell Tier Upgrades ==
+
+'''Reagents:''' Any spell that uses reagents has a 10% chance to not consume the reagent per spell rank.
+
+=== Buffs ===
+* -4% Cast Time
+* -2% Mana Cost
+* +10% Duration
+
+=== Debuffs ===
+* -4% Cast Time
+* -4% Mana Cost
+* +10% Duration
+* -15 Resist
+
+=== Direct Damage ===
+* -2% Cast Time
+* -2% Mana Cost
+* -X% Reuse
+* +6% Damage
+* -15 Resist
+
+=== Heals ===
+* -4% Cast Time
+* -2% Mana Cost
+* +3% Healing
+
+=== Damage/Healing Over Time ===
+* -4% Cast Time
+* -2% Mana Cost
+* +5% Duration
+* +3% Damage/Healing
+* -15 Resist
+
+=== Combat Innates (Proc buffs) ===
+* -2% Cast Time
+* -2% Mana Cost
+* -X% Reuse
+* +10%? Duration
+* +1/2 Spell Rank to Proc
+
+For example, [[Spirit of the Puma]] at +10 procs a +5 version of its Direct Damage proc, giving it +30% damage and -75 Resist.
+
+=== Summon Items ===
+* -? Cast Time
+* -? Mana Cost
+* +1 Tier Rank to item summoned
+
+=== Crowd Control ===
+Applies to Charm, Fear, Lull/Pacify, Mez, Root, and Stun spells
+
+* -2% Cast Time
+* -2% Mana Cost
+* +5-10%? Duration
+* +1? Level Cap
+* -15 Resist
+
+=== Pets ===
+* -? Cast Time
+* -? Mana Cost
+* Pet level increased +1 (max pet level = Character Level)
+* Benefits per pet level:
+** +6% Hit Points
+** +5 points to skills
+** +1 unarmed damage (a pet that normally hits for a max of 18 will instead hit for a max of 20)
+** Spells available for spell casting pets is adjusted by the pet's level
+
+[[Category:Guides]]

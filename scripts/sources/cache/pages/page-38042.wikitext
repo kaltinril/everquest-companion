@@ -1,0 +1,41 @@
+{{Factionpage|
+
+| description = Many of the residents of [[Unrest]]. Is this faction classic? Can't find it on alla.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Estate of Unrest]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* Unknown, any?
+
+| mobs_lower = 
+
+* [[An undead barkeep]]
+* [[A reanimated hand]]
+* [[An undead knight of Unrest]]
+* [[Garanel Rucksif]]
+* [[Torklar Battlemaster]]
+* [[Reclusive ghoul magus]]
+* [[Mortuary Fungus]]
+* [[An Undead Brewer]]
+* [[A werebat]]
+* [[A Carrion Ghoul]]
+* [[A Dark Terror]]
+* [[A Festering Hag]]
+* [[A Dusty Werebat]]
+* [[Zombie of an Unrest Noble]]
+* [[A Crazed Ghoul]]
+* definitely others...
+
+}}

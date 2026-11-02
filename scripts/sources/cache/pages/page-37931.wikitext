@@ -1,0 +1,161 @@
+{{Factionpage|
+
+| description = The [[Dark Elf]] Warriors Guild.  The Indigo Brotherhood has struck an alliance with the [[Crushbone Orcs]], sending their Ambassador to Emperor Crush himself. 
+It remains to be seen what will come of it.
+
+The Guildhall of the Indigo Brotherhood can be found in the [[Neriak]] Commons.  The guildmaster [[Seloxia Punox]] leads the guild in the opposition of the [[Emerald Warriors]] of 
+Kelethin and the [[Steel Warriors]] of Qeynos and Freeport.  Dark Elf warriors also learn young to hunt the Halfling Leatherfoot Raiders who have invaded their Nektulos Forest.
+
+As a rule, you can gain faction with most of the Human and Elvish warrior guilds by annoying these folk.
+
+| zones_raise = 
+
+* [[Crushbone]]
+* [[Greater Faydark]]
+* [[Innothule Swamp]]
+* [[Lesser Faydark]]
+* [[Felwithe]]
+* [[Timorous Deep]]
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Mistmoore Castle]]
+* [[Crushbone]]
+* [[Dagnor's Cauldron]]
+* [[Eastern Plains of Karana]]
+* [[Greater Faydark]]
+* [[Lesser Faydark]]
+* [[Nektulos Forest]]
+* [[Neriak|Neriak Commons]]
+* [[Neriak|Neriak Foreign Quarter]]
+* [[Neriak|Neriak Third Gate]]
+* [[Northern Desert of Ro]]
+* [[Oggok]]
+
+| quests_raise = 
+
+* [[Fire Goblin Runner]]
+* [[Halfling Raider Helms]]
+* [[Orc Pawn Picks]]
+* [[Yegek's Test, Part 1]]
+* [[Yegek's Test, Part 2]]
+* [[Track, Stalk, Hunt]]
+
+| quests_lower = 
+
+* [[Druid Epic Quest]]
+* [[Emerald Warriors' Items]]
+*[[Red Wine to Lady Shae]]
+* [[Shark Meat Quest]]
+* [[Slave Keys]]
+
+| mobs_raise = 
+
+* [[an elven slave (male)]]  <span class='fmz'>(Crushbone)</span> lvl 3
+* [[An Elven Priest]] <span class='fmz'>(Crushbone)</span> lvl ??
+* [[Bryn Fynndel]] <span class='fmz'>(Lesser Faydark - Quest NPC)</span> lvl 25
+* [[Cylas Delbrin]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span> lvl 25
+* [[Fandl Arathin]] <span class='fmz'>(Innothule Swamp - Quest NPC)</span> lvl 10-12
+* [[Faril Elvebryn]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span> lvl 25
+* [[Gallin Woodwind]] <span class='fmz'>(Greater Faydark - Quest NPC)</span> lvl 61 GM
+* [[Galwyn Geldin]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span> lvl 25
+* [[Glyndur Tindel]]  <span class='fmz'>(Lesser Faydark)</span> lvl 25
+* [[Guard Briarstorm]] <span class='fmz'>(Greater Faydark)</span> lvl 40
+* [[Guard Brookrock]] <span class='fmz'>(Greater Faydark)</span> lvl 50
+* [[Guard Crystalwind]] <span class='fmz'>(Greater Faydark)</span> lvl 50
+* [[Guard Dayblaze]] <span class='fmz'>(Greater Faydark)</span> lvl 40-41
+* [[Guard Eaglesong]] <span class='fmz'>(Greater Faydark)</span> lvl 40-41
+* [[Guard Fayfear]] <span class='fmz'>(Greater Faydark)</span> lvl 50
+* [[Guard Fayfield]] <span class='fmz'>(Greater Faydark)</span> lvl 40-41
+* [[Guard Fireblight]] <span class='fmz'>(Greater Faydark)</span> lvl 50
+* [[Guard Frostfallen]] <span class='fmz'>(Greater Faydark)</span> lvl 40-41
+* [[Guard Marshmoor]] <span class='fmz'>(Greater Faydark)</span> lvl 40
+* [[Guard Meadom]] <span class='fmz'>(Northern Felwithe)</span> lvl 40
+* [[Guard Moonwind]] <span class='fmz'>(Greater Faydark)</span> lvl 41
+* [[Guard Nitegazer]] <span class='fmz'>(Greater Faydark)</span> lvl 40-41
+* [[Guard Noonshadow]] <span class='fmz'>(Greater Faydark)</span> lvl 40-41
+* [[Guard Oakwillow]] <span class='fmz'>(Greater Faydark)</span> lvl 41-42
+* [[Guard Orcflayer]] <span class='fmz'>(Greater Faydark)</span> lvl 39
+* [[Guard Pinebramble]] <span class='fmz'>(Greater Faydark)</span> lvl 38
+* [[Guard Pineshade]] <span class='fmz'>(Greater Faydark)</span> lvl 50
+* [[Guard Rainstrider]] <span class='fmz'>(Greater Faydark)</span> lvl 50
+* [[Guard Starstrike]] <span class='fmz'>(Greater Faydark)</span> lvl 39
+* [[Guard Streamtree]] <span class='fmz'>(Greater Faydark)</span> lvl 41
+* [[Guard Sunblaze]] <span class='fmz'>(Greater Faydark)</span> lvl 41
+* [[Guard Sunweaver]] <span class='fmz'>(Greater Faydark)</span> lvl 41
+* [[Guard Tangleroot]] <span class='fmz'>(Greater Faydark)</span> lvl 41
+* [[Guard Treestrider]] <span class='fmz'>(Greater Faydark)</span> lvl 39
+* [[Guard Valewatcher]] <span class='fmz'>(Greater Faydark)</span> lvl 40-41
+* [[Gundel Elorion]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span> lvl 25
+* [[Hogus Durmas]] <span class='fmz'>(Innothule Swamp - Quest NPC)</span> lvl 12
+* [[Jars Legola]]  <span class='fmz'>(Innothule Swamp)</span> lvl 11
+* [[Jyle Windstorm]]  <span class='fmz'>(Innothule Swamp)</span> lvl 8
+* [[Merchant Muvien]] <span class='fmz'>(Greater Faydark - Merchant)</span> lvl 40
+* [[Mywyn Tinendel]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span> lvl 25
+* [[Regren]] <span class='fmz'>(Greater Faydark - Quest NPC)</span> lvl 61 GM
+* [[Sarawyn Amorfin]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span> lvl 25
+* [[Sindl Talonstrike]] <span class='fmz'>(Greater Faydark - Quest NPC)</span> lvl 61 GM
+* [[Vynn Thrildur]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span> lvl 25
+* High Elf Guards <span class='fmz'>(Felwithe)</span>
+
+| mobs_lower = 
+
+* [[Ambassador DVinn]]  <span class='fmz'>(Crushbone)</span>
+* [[Ambassador K`Ryn]]  <span class='fmz'>(Oggok)</span>
+* [[Ambassador Rylan]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[an orc scout]]  <span class='fmz'>(Dagnor's Cauldron)</span>
+* [[an orc witchdoctor]]  <span class='fmz'>(Greater Faydark)</span>
+* [[Captain N`Farre]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Centurion Relgle]]  <span class='fmz'>(Greater Faydark)</span>
+* [[Corporal D`Abth]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Corporal J`Rais]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Corporal X`Tis]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Dark Elf Corruptor]]  <span class='fmz'>(East Karana)</span>
+* [[Dark Elf Reaver]] <span class='fmz'>(East Karana)</span>
+* [[Divn L`Crit]]  <span class='fmz'>(Neriak Foreign Quarter)</span>
+* [[Dorn B`Dynn]] <span class='fmz'>(North Ro - NPC, Non-Quest)</span>
+* [[Dragoon J`Len]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Dragoon Szorn]] <span class='fmz'>(Lesser Faydark - Quest NPC)</span>
+* [[Dragoon Tsanne]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Dragoon X`Lottl]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Dragoon Zytl]] <span class='fmz'>(Commonlands - NPC, Non-Quest)</span>
+* [[Emperor Crush]]  <span class='fmz'>(Crushbone)</span>
+* [[Guard E`Brona]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard E`Tru]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard N`Lan]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard T`Aba]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard V`Ehn]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard X`Onnu]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard Z`Den]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Kirak Vil]] <span class='fmz'>(Nektulos Forest - Quest NPC)</span>
+* [[Lord Darish]]  <span class='fmz'>(Crushbone)</span>
+* [[Narex T`Vem]] <span class='fmz'>(Neriak Commons - Quest NPC)</span>
+* [[an iron guardian]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Orc Centurion (Crushbone)|Orc Centurion]]  <span class='fmz'>(Crushbone)</span>
+* [[Orc Legionnaire (Crushbone)|Orc Legionnaire]]  <span class='fmz'>(Crushbone)</span>
+* [[Orc Oracle (Crushbone)|Orc Oracle]]  <span class='fmz'>(Crushbone)</span>
+* [[Orc Pawn (Crushbone)|Orc Pawn]]  <span class='fmz'>(Crushbone)</span>
+* [[orc chief]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[orc emissary]]  <span class='fmz'>(Crushbone)</span>
+* [[orc hatchetman]]  <span class='fmz'>(Greater Faydark)</span>
+* [[orc slaver]]  <span class='fmz'>(Crushbone)</span>
+* [[orc taskmaster]]  <span class='fmz'>(Crushbone)</span>
+* [[orc trainer]]  <span class='fmz'>(Crushbone)</span>
+* [[orc warlord]]  <span class='fmz'>(Crushbone)</span>
+* [[royal guard]]  <span class='fmz'>(Crushbone)</span>
+* [[Seloxia Punox]] <span class='fmz'>(Neriak Commons - Quest NPC)</span>
+* [[Sergeant C`orm]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Teir`Dal Elite]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[The Prophet]]  <span class='fmz'>(Crushbone)</span>
+* [[Trizam N`Tan]] <span class='fmz'>(Neriak Commons - Quest NPC)</span>
+* [[Xicotl]]  <span class='fmz'>(Castle Mistmoore)</span>
+
+}}
+
+= Suggested Route =
+*[[Track, Stalk, Hunt]] (+[[Dread Slayers]], +[[Indigo Brotherhood]], +[[Dreadguard Outer]], +[[Dreadguard Inner]], -[[Guardians of the Vale]], -[[Wolves of the North]])
+
+
+
+[[Category:Achievement Faction]]

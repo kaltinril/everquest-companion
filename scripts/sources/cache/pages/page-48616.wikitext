@@ -1,0 +1,35 @@
+Classes: CLR, PAL, SHD, WAR
+
+Autoskill: Yes
+
+This ability uses a shield to bash your current target, giving a chance to stun. The AC of the shield impacts the damage amount.
+
+Bash will double and triple attack based on your skill.
+
+Macro command: <code>/doability Bash</code>
+
+Large races (Ogre, Troll, Barbarian) gain access to the related ability [[Slam]], which can be used without a shield. If you do have a shield equipped and possess the Bash skill, Slam will use the shield's AC when calculating damage.
+
+Bash shares the same cooldown as [[Skill_Slam|Slam]].
+
+== Classes ==
+
+{| class="wikitable sortable"
+!Class
+!Skill Cap
+|-
+|[[Cleric]]
+|0
+|-
+|[[Paladin]]
+|0
+|-
+|[[Shadow Knight]]
+|0
+|-
+|[[Warrior]]
+|0
+|}
+
+{{Navbox Skills}}
+[[Category: Skills]]

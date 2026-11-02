@@ -1,0 +1,395 @@
+{| class="wikitable"
+|
+|Slayer: Special
+|-
+|
+|
+|-
+|
+|This guide is how i would do it, it's not set in stone and can be done in  other ways to. 
+|-
+|
+|
+|-
+| colspan="2" |Nice  to know: FD if pet can kill your target, then you wont get faction hit.
+|-
+|
+|
+|-
+|
+|I'm a People Person!
+|-
+| align="right" |10
+|Humans
+|-
+| align="right" |10
+|Barbarians
+|-
+| align="right" |10
+|Erudites
+|-
+| align="right" |10
+|Wood Elves
+|-
+| align="right" |10
+|High Elves
+|-
+| align="right" |10
+|Dark Elves
+|-
+| align="right" |10
+|Half Elves
+|-
+| align="right" |10
+|Dwarves
+|-
+| align="right" |10
+|Halflings
+|-
+| align="right" |10
+|Gnomes
+|-
+| align="right" |10
+|Trolls
+|-
+| align="right" |10
+|Ogres
+|-
+| align="right" |10
+|Iksars....For some reason, the undead don't count here, so you have to kill guards. Only 10, and turn in Iron Ravit quest to fix it 
+between 3 kills.
+|-
+| align="right" |10
+|Frogloks
+|-
+|Where:
+|Do the others achievement and this is done to :)
+|-
+|
+|
+|-
+|
+|What Keeps Mankind Alive?
+|-
+| align="right" |1000
+|Barbarians, Drakkin, Erudites, and Humans.
+|-
+|Where:
+|Classic: West Karana, bandit camps
+Kunark: 
+|-
+|
+|
+|-
+|
+|
+|-
+|
+|Three Letter Word for Dead...
+|-
+| align="right" |1000
+|Dark Elves, Elddar Elves, Fire Elves, Half Elves, High Elves, Sand Elves,  and Wood Elves.
+|-
+|Where:
+|Classic: Castle Mistmoore, Plane of Hate
+Kunark: 
+|-
+|
+|
+|-
+|
+|Short People
+|-
+| align="right" |1000
+|Coldain, Dwarves, Gnomes, and Halflings.
+|-
+|Where:
+|Classic: Rivervale -400, 40 nice spot. Butchblock for bandits.
+Kunark: 
+|-
+|
+|
+|-
+|
+|Simple Folk of the Ykesha
+|-
+| align="right" |1000
+|Trolls
+|-
+|Where:
+|Classic: West Commonlands - dervish camp
+Kunark: 
+|-
+|
+|
+|-
+|
+|Bounced!
+|-
+| align="right" |1000
+|Ogres
+|-
+|Where:
+|Classic: West Commonlands,
+Kunark: 
+|-
+|
+|
+|-
+|
+|Mostly Kunzar
+|-
+| align="right" |1000
+|Iksars and Kylong Iksars of Veksar.
+|-
+|Where:
+|Classic: New Seb - kill the undeads in the zone
+Kunark: 
+|-
+|
+|
+|-
+|
+|Catnipped In the Bud
+|-
+| align="right" |1000
+|Kerrans and Vah Shir.
+|-
+|Where:
+|Classic: Stonebrunt Mountains, cat camp up north. Kirra Island: do the Amulet quest at the same time.
+Kunark: 
+|-
+|
+|
+|-
+|
+|Amphibicide
+|-
+| align="right" |1000
+|Frogloks, Frogs, Guktans, and Tadpoles.
+|-
+|Where:
+|Classic: Upper, Lower Guk
+Kunark: 
+|-
+|
+|
+|-
+|
+|Rats!
+|-
+| align="right" |1000
+|Armadillos, Bubonians, Burynai, Molerats, Rabbits, Ratmen, Rats, and  Skunks.
+|-
+|Where:
+|Classic: Warrens have a spot with a lot of rats on top of each other, Plane of Hate, Steamfont NE corner
+Kunark: 
+|-
+|
+|
+|-
+|
+|Eight Legs Are Better Than One!
+|-
+| align="right" |1000
+|Drachnids, Scorpions, Spiders, and Ursarachnids.
+|-
+|Where:
+|Classic: Najena - spider room, Steamfont NE corner (best)
+Kunark: 
+|-
+|
+|
+|-
+|
+|The Hounds
+|-
+| align="right" |1000
+|Chokidais, Drolvargs, Hynids, Rotdogs, Werewolves, Wolves, and Worgs.
+|-
+|Where:
+|Classic: Permafrost caverns, Kithicor Forest, Everfrost Peaks, East Karana (Gorge Hounds)
+Kunark: 
+|-
+|
+|
+|-
+|
+|The Cat's Pajamas
+|-
+| align="right" |1000
+|Cats, Lions, Pumas, Sabertooths, Scarlet Cheetahs, Tigers, Topiary Lions,  and Wrulons.
+|-
+|Where:
+|Classic: Stonebrunt Mountains, oasis of Marr, North & West Karana
+Kunark: 
+|-
+|
+|
+|-
+|
+|Bird Flew
+|-
+| align="right" |500
+|Aviaks, Blood Ravens, Cockatrices, Hawks, and Parrots.
+|-
+|Where:
+|Classic: South Karana, PoSky, Steamfont NE corner
+Kunark: 
+|-
+|
+|
+|-
+|
+|Monkey Business
+|-
+| align="right" |500
+|Gorillas, Holgresh, and Yetis.
+|-
+|Where:
+|Classic: Plane of Fear, Temple of Caciz Thile, Stonebrunt
+Kunark: 
+|-
+|
+|
+|-
+|
+|Orc Kill!
+|-
+| align="right" |1000
+|Orcs and Wereorcs.
+|-
+|Where:
+|Classic: Clan Crushbone
+Kunark: 
+|-
+|
+|
+|-
+|
+|Me Thinks That You'll Be Good to Eat!
+|-
+| align="right" |1000
+|Goblins and Nightmare Goblins.
+|-
+|Where:
+|Classic: Permafrost Caverns, Temple of Runnyeye
+Kunark: 
+|-
+|
+|
+|-
+|
+|Gnolling is Half the Battle
+|-
+| align="right" |1000
+|Gnolls
+|-
+|Where:
+|Classic:Blackburrow, Splitpar Lair, Runnyeye
+Kunark: 
+|-
+|
+|
+|-
+|
+|Kobolded Killer
+|-
+| align="right" |1000
+|Kobolds
+|-
+|Where:
+|Classic: Warrens
+Kunark: 
+|-
+|
+|
+|-
+|
+|Gooooooooooooooolem!
+|-
+| align="right" |1000
+|Gingerbread Men, Golems, Muddites, and Statues.
+|-
+|Where:
+|Classic: The Hole, Plane of Fear, Gorge of King Xorbb, New Seb golems (5 spawn)
+Kunark: 
+|-
+|
+|
+|-
+|
+|Dragonbane
+|-
+| align="right" |250
+|True Dragons
+|-
+|Where:
+|Classic: Lady Vox and Naggy (10 kill each day max)
+Kunark: 
+|-
+|
+|
+|-
+|
+|You Call That a Dragon?
+|-
+| align="right" |1000
+|Dinosaurs, Dracoliches, Lesser Dragons, Drakes, Drixies, Raptors,  Witherans, Wurms, 
+|-
+|Where:
+|Classic: Rathe Mountains, Lavastorm Mountains, Steamfont NE corner
+Kunark: 
+|-
+|
+|
+|-
+|
+|A Giant Problem
+|-
+| align="right" |1000
+|Giants
+|-
+|Where:
+|Classic: Rathe Mountains, The Ocean of Tears, or get them then killing Vox &  Naggy
+Kunark: 
+|-
+|
+|
+|-
+|
+|Shorter People
+|-
+| align="right" |1000
+|Bixies, Brownies, Dryads, Fairies, and Pixies.
+|-
+|Where:
+|Classic: Lesser Faydark, Steamfont NE corner
+Kunark: 
+|-
+|
+|
+|-
+|
+|Slayer of Mystical Horses
+|-
+| align="right" |250
+|Kirins, Nightmares, Pegasus, and Unicorns.
+|-
+|Where:
+|Classic: Plane of Fear and Plane of Sky
+Kunark: 
+|-
+|
+|
+|-
+|
+|Breakdown Dead Ahead
+|-
+| align="right" |100
+|Clockwork: Beetles, Boars, Dragons, Rats, Snakes, Spiders, Gnomeworks,  Copters, 
+|-
+|Where:
+|Classic: Steamfon Mountains NE corner outside Mino caves, Solusek's Eye + Ak'Anono  zoo&mines
+Kunark: 
+|}

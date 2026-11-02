@@ -1,0 +1,64 @@
+{{Factionpage|
+
+| description = The King of Neriak, and those loyal to him. The king seems to be allied with the [[Priests of Innoruuk]] and [[The Spurned]] while opposed to [[Queen Cristanos Thex]] and [[The Dead]].
+
+| zones_raise = 
+
+* [[Mistmoore Castle]]
+* [[Highpass Hold]]
+* [[Lesser Faydark]]
+* [[Neriak|Neriak Commons]]
+* [[Neriak|Neriak Foreign Quarter]]
+* [[Neriak|Neriak Third Gate]]
+* [[Ocean of Tears]]
+
+| zones_lower = 
+
+* [[Freeport|East Freeport]]
+* [[Lesser Faydark]]
+* [[Najena]]
+* [[Neriak|Neriak Third Gate]]
+
+| quests_raise = 
+
+* [[Innoruuk Symbol Quests|Innoruuk Disciple]]
+* [[Innoruuk Symbol Quests|Innoruuk Initiate]]
+* [[Innoruuk Symbol Quests|Innoruuk Regent]]
+* [[Rogue Redemption]]
+* [[The Visiting Priestess]]
+
+| quests_lower = 
+
+* [[Crude Stein Quest]]
+* [[Fire Beetle Eyes]]
+* [[Kerran Fire Beetle Eyes]]
+* [[Necromancer Words - X`Ta Tempi]]
+* [[Thex Mallet Quest]]
+
+| mobs_raise = 
+
+* [[Capee]] <span class='fmz'>(Neriak Foreign Quarter - NPC, Non-Quest)</span>
+* [[Degarran Kixl]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Kizdean Gix]] <span class='fmz'>(Commonlands - Quest NPC)</span>
+* [[Kszan Punox]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Larik Z`Vole]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[Lisvan X`Lottl]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Olavn N`Mar]] <span class='fmz'>(Neriak Commons - NPC, Non-Quest)</span>
+* [[Svunsa]] <span class='fmz'>(Neriak Foreign Quarter - NPC, Non-Quest)</span>
+* [[Uglan]] <span class='fmz'>(Neriak Foreign Quarter - Quest NPC)</span>
+* [[X`Ta Tempi]] <span class='fmz'>(Neriak Foreign Quarter - Quest NPC)</span>
+* [[X`Ta Timpi]] <span class='fmz'>(Neriak Foreign Quarter - Quest NPC)</span>
+* [[X`Ta Tompi]] <span class='fmz'>(Neriak Foreign Quarter - Quest NPC)</span>
+
+| mobs_lower = 
+
+* [[A Visiting Priestess]] <span class='fmz'>(Najena - Quest NPC)</span>
+* [[Dragoon Szorn]] <span class='fmz'>(Lesser Faydark - Quest NPC)</span>
+* [[Issia H`Rugla]] <span class='fmz'>(Neriak Third Gate - Merchant)</span>
+* [[Jsvan Zexus]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Perrir Zexus]] <span class='fmz'>(Neriak Third Gate - Cleric Guildmaster)</span>
+* [[Priestess Llandra]] <span class='fmz'>(Lesser Faydark - Quest NPC)</span>
+* [[Teir`Dal Prophet]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[Tzanso S`Tai]] <span class='fmz'>(Neriak Third Gate - Merchant)</span>
+
+}}

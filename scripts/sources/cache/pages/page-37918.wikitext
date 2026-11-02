@@ -1,0 +1,120 @@
+{{Factionpage|
+
+| description = Merchants of the city of [[Halas]] are on this faction.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Freeport|East Freeport]]
+* [[Everfrost Peaks]]
+* [[Firiona Vie]]
+* [[Halas]]
+* [[Western Plains of Karana]]
+
+| quests_raise = 
+
+* [[Cindl's Polar Bear Collection]]
+* [[Cindl's Wristband Collection]]
+* [[Gnoll Bounty]]
+* [[Goblin Caster Necklace]]
+* [[Head of Granin O'Gill]]
+* [[Ice Goblin Necklaces]]
+* [[Ivan McMannus' Remains]]
+* [[Karana Clovers]]
+* [[Langseax Quest]]
+* [[Lenka's Pouch]]
+* [[Lion Meat Shipment Quest]]
+* [[Magic Elixir for the Warriors]]
+* [[The Cigar]]
+* [[The Painting]]
+* [[The Seax]]
+* [[Tribunal Initiate]]
+* [[Wooly Fungus Quest]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Adon McMarrin]] <span class='fmz'>(Halas)</span>
+* [[Alec McMarrin]] <span class='fmz'>(Halas)</span>
+* [[Alex McDarnin]] <span class='fmz'>(Firiona Vie - Quest NPC)</span>
+* [[Ambril McRohrer]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Andres McMarrin]] <span class='fmz'>(Halas)</span>
+* [[Bandl McMarrin]] <span class='fmz'>(Everfrost Peaks)</span>
+* [[Bolace]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Bonn McMarrin]] <span class='fmz'>(Everfrost Peaks)</span>
+* [[Boraskor]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Brandyn McDonald]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Brenzl McMannus]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Brin McQuaid]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Cian McMarrin]] <span class='fmz'>(Halas)</span>
+* [[Cindl]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Clovan McMarrin]] <span class='fmz'>(Halas)</span>
+* [[Corak]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Dargon McPherson]] <span class='fmz'>(Halas - Warrior Guildmaster)</span>
+* [[Dok]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Dom McMarrin]] <span class='fmz'>(Everfrost Peaks)</span>
+* [[Donald McQuaid]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Einhorst McMannus]] <span class='fmz'>(West Karana - Quest NPC)</span>
+* [[Elona McMahon]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Garn McMarrin]] <span class='fmz'>(Everfrost Peaks)</span>
+* [[Greta Terrilon]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Guthan Shawnasy]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Hetie McDonald]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Holana Oleary]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Iceberg]]  <span class='fmz'>(Everfrost Peaks)</span>
+* [[Jac MacGrove]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Jil McDaniel]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Jinkus Felligan]] <span class='fmz'>(Halas - Shaman Guildmaster)</span>
+* [[Kar O`Dansin]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Kevan McPherson]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Kylan O`Danos]] <span class='fmz'>(Halas - Warrior Guildmaster)</span>
+* [[Lars McMannus]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Lenka Stoutheart]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Leopok Terrilon]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Lish McMarrin]] <span class='fmz'>(Everfrost Peaks)</span>
+* [[Lysbith McNaff]] <span class='fmz'>(Halas - Warrior Guildmaster)</span>
+* [[Mac]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Maggie Shawnasy]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Margyn McCann]] <span class='fmz'>(Halas - Quest NPC)</span>
+* [[Merin]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Mils McMarrin]] <span class='fmz'>(Halas)</span>
+* [[Misla McMannus]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Murtog MacYee]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Nal McMarrin]] <span class='fmz'>(Halas)</span>
+* [[Oli McMarrin]] <span class='fmz'>(Halas)</span>
+* [[Quillion O`Zinn]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Rain]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Renth McLanis]] <span class='fmz'>(Halas - Warrior Guildmaster)</span>
+* [[Rose McDowell]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Rosin MacGrove]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Scon McDaniel]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Sera McMannus]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Sissia]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Skoni]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Spirita]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Telvina]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Teria O`Danos]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Toralia]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Tukanta]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Tundra Jack]] <span class='fmz'>(Everfrost Peaks - NPC, Non-Quest)</span>
+* [[Ulrich McMannus]] <span class='fmz'>(West Karana - NPC, Non-Quest)</span>
+* [[Waltor Felligan]] <span class='fmz'>(Halas - Shaman Guildmaster)</span>
+
+}}
+= Suggested Route =
+*[[Lion Meat Shipment Quest]] (+[[Merchants of Halas]], +[[Wolves of the North]], +[[Shamen of Justice]], +[[Rogues of the White Rose]])
+**Keep [[Lion Delight]] for [[Langseax_Quest]]
+*[[Langseax_Quest]] Part 2 (+[[Wolves of the North]], +[[Shamen of Justice]], +[[Merchants of Halas]], +[[Rogues of the White Rose]], +[[Steel Warriors]])
+
+
+[[Category:Significant Factions]]
+[[Category:Halas Factions]]
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

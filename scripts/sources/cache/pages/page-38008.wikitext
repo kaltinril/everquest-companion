@@ -1,0 +1,39 @@
+{{Factionpage|
+
+| description = [[Venril Sathir|Emperor Sathir]]'s beloved, [[Drusella Sathir|Drusella]], rests within a grand crypt in Charasis' depths. 
+
+After her funeral and burial, Emperor Sathir cast all citizens from the cliff city, and forbade them from returning on pain of death. Only the royal guard and servants where allowed to stay.
+
+Note the classic spelling of the faction is '''DrusselSathir'''.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Howling Stones]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a bile golem]]  <span class='fmz'>(Howling Stones (Charasis))</span>
+* [[A Crypt Golem]]  <span class='fmz'>(Howling Stones (Charasis))</span>
+* [[A Crypt Spectre]]  <span class='fmz'>(Howling Stones (Charasis))</span>
+* [[a helot skeleton]] <span class='fmz'>(Howling Stones (Charasis) - Undead)</span>
+* [[a pyre golem]]  <span class='fmz'>(Howling Stones (Charasis))</span>
+* [[a sepulcher skeleton]] <span class='fmz'>(Howling Stones (Charasis) - Undead)</span>
+* [[Drusella Sathir]]  <span class='fmz'>(Howling Stones (Charasis))</span>
+* [[Embalming Fluid]]  <span class='fmz'>(Howling Stones (Charasis))</span>
+* [[Swirling Goo]] <span class='fmz'>(Howling Stones (Charasis))</span>
+* [[the Crypt Keeper]] <span class='fmz'>(Howling Stones (Charasis) - Undead)</span>
+* [[The Spectre Spiritualist]]  <span class='fmz'>(Howling Stones (Charasis))</span>
+
+}}

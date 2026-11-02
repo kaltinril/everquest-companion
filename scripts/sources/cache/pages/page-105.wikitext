@@ -1,0 +1,31 @@
+[[File:RallosZek.JPG|thumb|200px|Rallos Zek, The Warlord]]
+Norrath is ruled by many deities. When creating your character you are given the option to follow a deity, or to be agnostic (depending on your class and race).
+
+=Deity List=
+*[[Bertoxxulous]] the Plaguebringer.
+*[[Brell Serilis]] the Duke of Below.
+*[[Bristlebane Fizzlethrope]] the King of Thieves.
+*[[Cazic-Thule_(Lore)|Cazic Thule]] the Faceless.
+*[[Erollisi Marr]] the Queen of Love.
+*[[Innoruuk]] the Prince of Hate.
+*[[Karana]] the Rainkeeper.
+*[[Luclin]] the Mistress of Shadow.
+*[[Mithaniel Marr]] the Lightbearer.
+*[[Prexus]] the Oceanlord.
+*[[Quellious]] the Tranquil.
+*[[Rallos Zek]] the Warlord.
+*[[Rodcet Nife]] the Prime Healer.
+*[[Solusek Ro]] the Burning Prince.
+*[[The Tribunal]] the Six Hammers.
+*[[Tunare]] the Mother of All.
+*[[Ulkorruuk]] the Lady of Betrayal.
+*[[Veeshan]] the Wurmqueen.
+
+Curious about deity specific items?  See this [[Deity Specific Items|list]]. 
+
+
+{{Navbox Deity}}
+
+
+[[Category:Character]]
+[[Category:Lore]]

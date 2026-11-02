@@ -1,0 +1,10 @@
+One of the many bard instrument skills.
+The String Skill is trained at level 1, although the 1st String Song is [[Chords of Dissonance]] at level 2.
+
+== Classes ==
+
+* [[Bard]] (Max: 255)
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

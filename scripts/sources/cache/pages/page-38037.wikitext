@@ -1,0 +1,73 @@
+{{delete|not present in game}}
+{{Disambig3|[[Beta Neutral]] (Quest)}}
+{{Factionpage|
+
+| description = A faction for people who are supposedly neutral, and beyond faction.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Ak'Anon]]
+* [[Butcherblock Mountains]]
+* [[Cazic Thule]]
+* [[Crypt of Dalnir]]
+* [[Cabilis|East Cabilis]]
+* [[Freeport|East Freeport]]
+* [[Erudin]]
+* [[Erudin|Erudin Palace]]
+* [[Everfrost Peaks]]
+* [[Greater Faydark]]
+* [[Halas]]
+* {{VeliousGray| [[Iceclad Ocean]] }}
+* [[Innothule Swamp]]
+* [[Lake Rathetear]]
+* [[Lavastorm Mountains]]
+* [[Rathe Mountains]]
+* [[Nektulos Forest]]
+* [[Neriak|Neriak Foreign Quarter]]
+* [[Northern Desert of Ro]]
+* [[Ocean of Tears]]
+* [[Oggok]]
+* [[Rivervale]]
+* [[Kaladim|South Kaladim]]
+* [[Qeynos|South Qeynos]]
+* [[Southern Desert of Ro]]
+* [[Steamfont Mountains]]
+* [[Swamp of No Hope]]
+* [[The Feerrott]]
+* [[The Overthere]]
+* [[Toxxulia Forest]]
+* [[Cabilis|West Cabilis]]
+
+| quests_raise = 
+
+* [[Beta Neutral]]
+* [[Incandescent Armor Quests|Incandescent Gloves]]
+* [[The Treant Fists]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a banished kerran]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[a coerced channeler]] <span class='fmz'>(Crypt of Dalnir - Quest NPC)</span>
+* [[Crisyn]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[Cynthia]] <span class='fmz'>(Mountains of Rathe - Quest NPC)</span>
+* [[Deep]] <span class='fmz'>(Lake Rathetear - Quest NPC)</span>
+* [[Dugroz]] <span class='fmz'>(Swamp of No Hope - Quest NPC)</span>
+* [[Ellona]] <span class='fmz'>(Butcherblock Mountains - Merchant)</span>
+* [[Galdon Vok Nir]] <span class='fmz'>(The Overthere - Quest NPC)</span>
+* [[Nylianne the True]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Ruathey]] <span class='fmz'>(Lavastorm Mountains - Quest NPC)</span>
+* [[Sartar the Unrivaled]] <span class='fmz'>(West Cabilis - Quest NPC)</span>
+* [[Slea Pinewhisper]] <span class='fmz'>(Commonlands - Merchant)</span>
+* [[Tisiana]] <span class='fmz'>(Lavastorm Mountains - Merchant)</span>
+* [[Tizina]] <span class='fmz'>(Lavastorm Mountains - Quest NPC)</span>
+
+}}

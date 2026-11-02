@@ -1,0 +1,2 @@
+{{Classic Era}}{{Factionpage||description=The clockwork scrubbers in Ak`Anon.|zones_raise=|zones_lower=* [[Ak'Anon]]
+* [[Kaladim|North Kaladim]]|quests_raise=|quests_lower=* [[The Gnome Take]]|mobs_raise=|mobs_lower=* [[clockwork scrubber]] <span class='fmz'>(Ak`Anon)</span>}}

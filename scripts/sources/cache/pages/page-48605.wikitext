@@ -1,0 +1,24 @@
+The skill that governs how efficiently you fight without weapons. Fists become magical by equipping a Hands slot (i.e. gloves) item that is "MAGIC ITEM" (which will defeat the magical invulnerabilities of mummies, wisps, and the magical undead).
+
+''Note: There seems to have been a bug about how the cap check is calculated - it was possible for certain classes (e.g., Clerics) to reach skills higher than the cap if they continued to obtain skill-ups after passing the cap as long as the character does not camp or zone[https://i.imgur.com/I2DRByT.png]; this bug seems to be still in the game as of 2024-01-24''
+
+== Classes ==
+
+*[[Monk]] (Max 245) (252?)
+*[[Warrior]] (Max 200)
+*[[Paladin]] (Max 100)
+*[[Shadow Knight]] (Max 100)
+*[[Rogue]] (Max 100)
+*[[Ranger]] (Max 100)
+*[[Bard]] (Max 100)
+*[[Shaman]] (Max 135)
+*[[Cleric]] (Max 75)
+*[[Druid]] (Max 135)
+*[[Enchanter]] (Max 75)
+*[[Magician]] (Max 75)
+*[[Necromancer]] (Max 75)
+*[[Wizard]] (Max 75)
+
+{{Navbox Skills}}
+
+[[Category:Skills]]

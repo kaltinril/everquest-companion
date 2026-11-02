@@ -1,0 +1,25 @@
+{{Factionpage|
+
+| description = The Evil Eyes of Runnyeye.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Clan Runnyeye]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[an Evil Eye prisoner]]  <span class='fmz'>(Clan RunnyEye)</span>
+
+}}

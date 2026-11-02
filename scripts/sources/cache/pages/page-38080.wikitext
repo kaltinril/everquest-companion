@@ -1,0 +1,32 @@
+{{Velious Era}}
+{{Factionpage|
+
+| description = This is one of the central factions of the Plane of Mischief.
+
+| zones_raise = 
+
+* [[Plane of Mischief]]
+
+| zones_lower = 
+
+* [[Plane of Mischief]]
+
+| quests_raise = 
+
+* [[Plane of Mischief Faction Quest]]
+
+| quests_lower = 
+
+* Any?
+
+| mobs_raise = 
+
+* Any?
+
+| mobs_lower = 
+
+* [[Stomples]]
+
+* [[Debbis the Fish]]
+
+}}

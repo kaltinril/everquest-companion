@@ -1,0 +1,157 @@
+{{Delete}}
+
+== Problem: Frame Rate Issues (eg. Rapid or Slow Movement) ==
+
+=== Possible Solution: Correct Energy Saver Settings ===
+"Slow motion" effects could be caused by your computer's CPU not having enough power due to Windows energy-saving settings.  To fix this:
+
+# Go to the control panel
+# Choose power options
+# Change the power options from the default balanced setting to "high performance". 
+
+=== Possible Solution: Lower Your Max FPS ===
+
+Many graphics problems can be fixed by changing the FPS (frames per second).  You can adjust this by pressing ALT + O to bring up the options menu, then click on the "Display" tab, then slide the "Max. Frames Per Second" slider.
+
+==== Possible Solution: Run in Compatibility Mode ====
+
+# Right-click the shortcut you click on to start EverQuest and select Properties.
+# Click the Compatibility tab
+# Change the compatibility settings to a different version (Windows 98 is recommended)
+
+[[File:Compatibility Mode Screenshot.jpeg |250px]]
+
+==== Possible Solution: Use WinEQ2 ====
+
+One popular (but not free) program, [Http://www.lavishsoft.com WinEQ2] is known to solve a variety of issues, and has often been recommend by Project 1999 co-manager Rogean.
+
+===== Problem: WinEQ2 Doesn't Work ("eqgame.exe has encountered a problem") =====
+
+If you encounter the error "eqgame.exe has encountered a problem and needs to close. We are sorry for the inconvenience." when trying to run WinEQ2 and you have previously set EverQuest to run in compatibility mode, disable compatibility.  If this doesn't help check the forum or contact WinEQ2 support.
+
+==== Possible Solution: Disable a Core Using /Affinity Batch File ====
+
+The following steps will create a shortcut to launch <code>eqgame.exe</code> bound to only a single CPU core.  They will not work for Windows XP but are known to work for Windows 7.
+# Create a new txt file and put the following text inside:
+#* <code>start /affinity 1 eqgame.exe patchme</code>
+# Save the file as <code>eqonecore.bat</code> (or any name ending in <code>.bat</code>) in your EverQuest folder.
+# Cretae a shortcut to that batch file.
+# Use that shortcut to launch the game from now on.
+
+==== Possible Solution: Disable a Core in System Configuration ====
+Bases on [http://en.kioskea.net/faq/616-multicore-cpu-how-to-disable-a-core Multicore CPU: how to disable a core]:
+
+# Open the start menu, click on Run,type in msconfig and click on OK
+# In the System Configuration window click on the start sub menu and the on Advanced Options button.
+# In the second window that appear, you should be provide with an option for enabling and disabling the number of processors you want to use.
+# Validate your entry by clicking on OK.
+# Restart your PC and it should be fine.
+
+====Further Suggestions====
+If you have a multi-core processor (which is very likely for newer and more powerful computers) the thread on [http://www.project1999.com/forums/showthread.php?t=3609 Multi/Dual/Quad-Core Issues] also offers further ideas.
+
+== Problem: A "Slice" of Graphics Aren't Rendered ==
+[https://www.project1999.com/forums/showthread.php?t=359085 A forum user reported]:
+
+: im having issues with all npcs, mobs etc rendering with huge blur lines across the screen
+[[File:Graphics Slice Problem.png| 300px]]
+
+Other users suggested installing a fresh copy EverQuest, but the user discovered that:
+
+:The issue is coming from the RenderEffects folder
+:Just overwrite the RenderEffects folder with the original installation files
+:and you good to go. No need for me to reinstall everything.
+
+== Problem: Sporadic Delays ==
+
+[http://www.project1999.com/forums/showthread.php?t=275870 A forum user reported]:
+
+: sometimes when i do something in game - can be anything (/con a mob, casting a spell, opening a door, sending a tell/hailing etc.) sometimes there is a second or two delay before it goes through
+
+After further research they found a way to identify that the problem was coming from packet loss:
+
+:http://winmtr.net/download-winmtr/
+:plug straight into your modem, disable other devices, run this software and connect to one of p99's IP 66.55.145.2. also try google's 8.8.8.8
+
+:the 2nd number in the column after the host name shows the % of packets lost.
+
+This wound up revealing a problem, which they were able to correct:
+
+: got a tech out here, turns out it was a damaged line up by the telephone poll. could have gotten wrecked in the last hail storm idk. annoying delay is gone and im at 0% loss now. im so happy its fixed!
+
+: if u having packetloss symptoms run the program above, and let your isp know
+
+== Problem: Crashing While Zoning ==
+
+Many have reported that running the game in '''Administrator Mode''' or setting the file '''eqgame.exe''' to run in '''Compatibility Mode''' for '''Windows XP Service Pack 2''' has solved (or at least reduced) the problem. To set Compatibility Mode:
+
+# Locate the file '''eqgame.exe''' in the folder where you stored your Everquest installation files.
+# Right click and select '''Properties'''.
+# Click the '''Compatibility''' tab.
+# Click "'''Run this program in compatibility mode for:'''" 
+# Select '''Windows XP (Service Pack 2)'''
+
+Note: Some have reported still having issues after changing the settings, so this is not a guaranteed fix.
+
+Hopefully a better answer will get added here soon, but for now the thread [http://www.project1999.com/forums/showthread.php?t=3604 Crashing while zoning] has many suggestion.
+
+== Problem: Slow Wolf Form Animation ==
+
+User Zaela has created a tool to fix  this problem, which you can read about in the [http://www.project1999.com/forums/showthread.php?t=235597&#post2248499 Default Wolf Form - Slow Animation (running forward)] thread
+
+
+== Problem: Can't Adjust Gamma (on Mac OS, Using Wineskin) ==
+
+See [https://www.project1999.com/forums/showthread.php?t=276151 this forum thread]
+
+== Problem: Can't Adjust Gamma in Windowed Mode, but Can in Fullscreen (on Windows) ==
+
+{{Player Quote
+| player=Maelonic
+| url=https://www.project1999.com/forums/showthread.php?t=331386
+| quote=So before this last weekend i was able to change the gamma in windows mode as that is what i play in so i can look up stuff on the webs while playing.. and for some reason out of no where i have not been able to change it.. only in full screen mode which i don't want to play in. I can be in windowed mode and turn the gamma up all the way but it don't change how dark it is at all.. and now it seems that I am forced in to playing in full screen...
+}}
+
+{{Player Quote
+| player=monkeydoc
+| url=https://www.project1999.com/forums/showthread.php?t=331386
+| direction=right
+| quote=This happened with the most recent Windows update. The solution I've come up with is to open the Windows Display Color Calibration application. You can find it by hitting the Windows key, then type "calibration" or "gamma" and it should pop up. Click next a couple of times, and you should have control over the gamma. You still can't control it from within EQ, but it's a workaround for the time being.
+}}
+
+==Problem: Can't See Other Player's Spell Effects==
+
+Some players report problems with spell effects/animations not displaying properly when cast by other players. This occurs when the spell is cast on a different PC or NPC than the player having the issue. 
+
+'''Potential Solution:''' It has been reported that this is a big caused by the UI when a player changes spell filters on the main chat window. Possible solutions include resetting the UI or turning on all spell messages in the main chat window.
+
+==Problem: Meditate Button Not Appearing or is Blacked Out==
+
+'''Potential Solution #1:''' It has been reported that this issue can be fixed by reloading the UI. To do this type '''/loadskin 1''' while in game.
+
+'''Potential Solution #2:''' Another suggestion is to delete the Velious UI skin from the EQ Directory.
+
+==Problem: Game Experiences Intermittent Stuttering==
+It has been reported that this problem may be caused by the log file gets too big. 
+
+'''Potential Solution:''' You can move your existing log file to a backup folder, causing the game to start a new one.
+
+==Problem: Game Stutters When Combat Ends==
+
+For one user this problem was the same as the above ("Intermittent Stuttering") issue, and thus the solution was also the same.
+
+However, for another user the problem turned out to be music files: the user had deleted the file combattheme.mp3, and when the game tried (and failed) to play that file, it evidently caused the stutter.  Restoring the file fixed the issue. [https://project1999.com/forums/showthread.php?t=434429 Original forum thread]
+
+== Problem: Anti-Aliasing Not Working in Linux/WINE/Lutris ==
+It has been reported that EverQuest on Linux (using WINE/Lutris) can have fonts with jagged edges. [https://www.project1999.com/forums/showthread.php?t=378898]
+
+The reported solution was ...
+
+{{Player Quote
+| date=2/22/21
+| url=https://www.project1999.com/forums/showthread.php?t=378898
+| quote=I had been using lutris to launch the game. I uninstalled lutris and all versions of wine, then installed the newest wine version and created the needed scripts/links to run the game. This was with a 32bit wine prefix. Then installed winetricks and enabled multisampling through it as well as using regedit to set the sample rate. No more jaggies !
+}}
+
+[[Category:Technical]]
+[[Category:Tech Support]]

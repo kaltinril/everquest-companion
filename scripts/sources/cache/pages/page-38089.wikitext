@@ -1,0 +1,27 @@
+{{Velious Era}}
+{{Factionpage|
+
+| description = The faction for [[Lady Gelistial]].
+
+| zones_raise =
+
+
+| zones_lower =
+
+* [[The Wakening Land]]
+
+| quests_raise =
+
+
+| quests_lower =
+
+
+| mobs_raise =
+
+
+| mobs_lower =
+
+* [[a unicorn]]  <span class='fmz'>(The Wakening Land)</span>
+* [[Lady Gelistial]]  <span class='fmz'>(The Wakening Land)</span>
+
+}}

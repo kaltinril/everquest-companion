@@ -1,0 +1,16 @@
+2H Pierce is available in EQL for the following classes.
+
+== Classes ==
+*[[Berserker]] (Max Skill ?)
+*[[Paladin]] (Max Skill ?)
+*[[Ranger]] (Max Skill ?)
+*[[Shadow Knight]] (Max Skill ?)
+*[[Warrior]] (Max Skill ?)
+
+2H Pierce weapons are very limited but do exist for some classes, such as the [[Soulfiend_Lance|Soulfiend Lance]] but it is a [[Shadow Knight]] only weapon.
+
+== Navigation ==
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

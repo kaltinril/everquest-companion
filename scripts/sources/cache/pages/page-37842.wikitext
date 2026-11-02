@@ -1,0 +1,118 @@
+{{Factionpage|
+
+| description = People (mostly merchants) who live in the four Karanas.
+
+In Everquest legends, the fastest way to max this faction is to complete the quest [[Blackburrow Stout Shipment]]. Each final turn in gives +30 faction, so starting from 0 faction you will need to start with 67 [[a tattered note]] to get to max.
+
+| zones_raise = 
+
+* [[Blackburrow]]
+* [[Eastern Plains of Karana]]
+* [[Highpass Hold]]
+* [[Northern Karana]]
+* [[Southern Karana]]
+* [[Toxxulia Forest]]
+* [[Western Plains of Karana]]
+
+| zones_lower = 
+
+* [[Freeport|East Freeport]]
+* [[Eastern Plains of Karana]]
+* [[Erudin]]
+* [[Innothule Swamp]]
+* [[Rathe Mountains]]
+* [[Northern Karana]]
+* [[Qeynos|North Qeynos]]
+* [[Qeynos Hills]]
+* [[Western Plains of Karana]]
+
+| quests_raise = 
+
+* [[Bear Hide Armor]]
+* [[Blackburrow Stout Shipment]]
+* [[Call of Flame Quest]]
+* [[Gathering Grain]]
+* [[High Guard Battlestaff]]
+* [[Karana's Blessing]]
+* [[Moonstones]]
+* [[Temple Blankets Quest]]
+* [[Werewolf Hunters]]
+* [[Wolf Hide Armor]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[a bandit]]  <span class='fmz'>(East Karana)</span>
+* [[a gnoll brawler]]  (?) <span class='fmz'>(Highpass Hold)</span>
+* [[a gnoll champion]]  (?) <span class='fmz'>(Highpass Hold)</span>
+* [[a gnoll commander]]  <span class='fmz'>(Blackburrow)</span>
+* [[a gnoll reaver]]  <span class='fmz'>(East Karana)</span>
+* [[a gnoll soothsayer]]  (?) <span class='fmz'>(Highpass Hold)</span>
+* [[a raider]]  <span class='fmz'>(North Karana)</span>
+* [[an escaped Splitpaw gnoll]]  <span class='fmz'>(South Karana)</span>
+* [[Beanu Mucktail]] <span class='fmz'>(East Karana)</span>
+* [[Brenon]] <span class='fmz'>(Highpass Hold)</span>
+* [[Burah Mucktail]] <span class='fmz'>(East Karana)</span>
+* [[Chief Sanre`Rexsa]]  <span class='fmz'>(East Karana)</span>
+* [[Dalishea]] <span class='fmz'>(Highpass Hold - NPC, Non-Quest)</span>
+* [[Emhu Mucktail]] <span class='fmz'>(East Karana)</span>
+* [[Greth Truksorn]] <span class='fmz'>(Highpass Hold - NPC, Non-Quest)</span>
+* [[Hibber Mucktail]] <span class='fmz'>(East Karana)</span>
+* [[Hukex Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Jekca Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Klage Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Lord Elgnub]]  <span class='fmz'>(Blackburrow)</span>
+* [[Mechi Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Nre`Loxe Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Olixen Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Plur Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Poacher Shelli]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Poacher Topi]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Poacher Willa]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Refugee Splitpaw]]  <span class='fmz'>(Blackburrow)</span>
+* [[Shaman Lenrel]]  <span class='fmz'>(South Karana)</span>
+* [[Splitpaw Commander]]  <span class='fmz'>(Blackburrow)</span>
+* [[Tallus Holton]]  <span class='fmz'>(East Karana)</span>
+* [[Thrackin Griften]] <span class='fmz'>(West Karana - Quest NPC)</span>
+* [[Tregil Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Yahg Mucktail]]  <span class='fmz'>(East Karana)</span>
+
+| mobs_lower = 
+
+* [[Aagron]] <span class='fmz'>(East Karana - NPC, Non-Quest)</span>
+* [[Anderia]]  <span class='fmz'>(West Karana)</span>
+* [[Astaed Wemor]] <span class='fmz'>(North Qeynos - Paladin Guildmaster)</span>
+* [[Baobob Miller]] <span class='fmz'>(Qeynos Hills - Quest NPC)</span>
+* [[Bilbis Briar]] <span class='fmz'>(North Karana - Merchant)</span>
+* [[Camlend Serbold]] <span class='fmz'>(North Qeynos - Paladin Guildmaster)</span>
+* [[Chanda Miller]] <span class='fmz'>(Qeynos Hills - Quest NPC)</span>
+* [[Chrislin Baker]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Cleet Miller]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Cleet Miller Jr]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Furball Miller]]  <span class='fmz'>(West Karana)</span>
+* [[Guard Carnita]] <span class='fmz'>(Mountains of Rathe)</span>
+* [[Gwynn Marthank]]  <span class='fmz'>(Innothule Swamp)</span>
+* [[Henina Miller]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Jras Solsier]] <span class='fmz'>(Erudin - Quest NPC)</span>
+* [[Lieutenant Midraim]] <span class='fmz'>(North Karana - NPC, Non-Quest)</span>
+* [[Lysandra]] <span class='fmz'>(Mountains of Rathe)</span>
+* [[Maldin the Old]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Minda]] <span class='fmz'>(West Karana)</span>
+* [[Nul Aleswiller]] <span class='fmz'>(North Karana - NPC, Non-Quest)</span>
+* [[Philicia Drinn]] <span class='fmz'>(Mountains of Rathe - Merchant)</span>
+* [[Rell Ostodl]]  <span class='fmz'>(Innothule Swamp)</span>
+* [[Roesager Thusten]] <span class='fmz'>(North Qeynos - Paladin Guildmaster)</span>
+* [[Rongol]] <span class='fmz'>(West Karana - Quest NPC)</span>
+* [[Shalena Roan]] <span class='fmz'>(East Karana - NPC, Non-Quest)</span>
+* [[Sir Morgan]] <span class='fmz'>(East Karana)</span>
+* [[Squire Wimbley]] <span class='fmz'>(East Karana - Quest NPC)</span>
+* [[Suuspa Clanim]] <span class='fmz'>(North Qeynos - Paladin Guildmaster)</span>
+* [[Sven Drinn]] <span class='fmz'>(Mountains of Rathe - Merchant)</span>
+* [[Talym Shoontar]]  <span class='fmz'>(East Freeport)</span>
+* [[Tann Cellus]]  <span class='fmz'>(Innothule Swamp)</span>
+* [[Tiny Miller]] <span class='fmz'>(West Karana - NPC, Non-Quest)</span>
+* [[Tukk]] <span class='fmz'>(West Karana)</span>
+
+}}

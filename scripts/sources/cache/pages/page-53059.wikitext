@@ -1,0 +1,49 @@
+{{Cleanup Needed}}
+
+===Locating your logfile (Windows)===
+
+For [[EverQuest Titanium]] client, the player event & chat logs are helpful for various research and investigation. Here is some helpful info on the subject of logging.
+
+Typically, it is located in
+   C:\Program Files (x86)\Sony\EverQuest\Logs\
+
+====Windows 10====
+:'''''See also: [[Windows 10]]'''''
+
+On more recent versions of Windows 10 (2017 and beyond), files are located in User Profile info:
+
+ C:\Users\<your username>\AppData\Local\VirtualStore\Program Files (x86)\Sony\EverQuest\Logs\
+
+   C:\ (logical drive)
+    '''Users'''
+     '''<your username>'''
+      '''AppData''' (hidden folder)
+       '''Local'''
+        '''VirtualStore'''
+         Program Files (x86)
+          Sony
+           EverQuest
+            Logs
+
+====Other issues====
+
+Administrative privileges and [https://support.microsoft.com/en-us/help/975787/guided-help-adjust-user-account-control-settings-in-windows-7-and-wind User Account Control] often mess with eqgame.exe. There are lots of helpful posts in the [https://www.project1999.com/forums/forumdisplay.php?f=40 Technical Discussion] forum.
+
+===Enabling Logging===
+
+You can type <code>/log on</code> to enable logging for a session, or edit the <code>eqclient.ini</code> file to reflect <code>Log=TRUE</code> if you wish to enable it permanently. The <code>eqclient.ini</code> file will be located in the EverQuest folder noted in the section above according to your OS.
+
+==Resources==
+
+* EQLogTools (https://www.project1999.com/forums/showthread.php?t=153423)
+* GamParse (https://gambosoft.eqresource.com/gamparse.php)
+** GamLogSplitter (https://gambosoft.eqresource.com/downloads.php)
+* Gimagukk's Incantatory Notation Apparatus (http://eq.gimasoft.com/gina)
+
+==Notes==
+* https://www.project1999.com/forums/showthread.php?t=166077
+* https://www.project1999.com/forums/showthread.php?t=171799 ("Write logs to a different drive")
+* https://www.project1999.com/forums/showthread.php?p=1617997
+* https://www.project1999.com/forums/showthread.php?t=68607
+
+[[Category:Technical]]

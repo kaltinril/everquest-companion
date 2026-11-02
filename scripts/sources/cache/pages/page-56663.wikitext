@@ -1,0 +1,29 @@
+=== Unrest Keys ===
+#[[Small Stone Key]] - Go up the stairs in the main room on the first floor, then up the central stairs on the second floor to reach [[a reanimated hand (Unrest)|a reanimated hand]]. Unlocks the magus room.
+#[[Polished Brass Key]] - Back on the second floor, northwest corner of the house you will find the [[reclusive ghoul magus]]. Unlocks the bar room.
+#[[Scuffed Silver Key]] - Now go to the northeast corner of the third floor to find [[an undead barkeep]]. Unlocks the tower.
+#[[Cracked Glass Key]] - Keep going up the tower to the fourth floor to find the door to the top of the tower and [[an undead knight of Unrest]]. Unlocks the basement - which is on the first floor of the house and hidden behind a bookcase.
+
+*[[Tarnished Bronze Key]] - drops from 'a priest of najena', unlocks nothing. (You need it for [[The Mystic Cloak]] quest in [[Najena]]).
+
+=== Befallen Keys ===
+
+#[[Splintered Wooden Key]] - drops from [[a shadowknight (Dark Elf Male)]], in the room to the west of the well room. Unlocks the door east of [[Skeleton L`rodd]].
+#[[Charred Bone Key]] - drops from [[a shadowknight (Ogre)]] in the west wing at the top of the stairs, near [[the thaumaturgist]]. Unlocks the door at the bottom of the stairs guarded by [[Footman of V`Zher]].
+#[[Smoked Glass Key]] - also drops from [[a shadowknight (Ogre)]]. Unlocks the Dark Elf area that includes [[Baron Telyx V`Zher]].
+
+Note: If you're sufficiently high level and heading to Befallen to farm an item, you don't need to keep the keys permanently. When you enter the zone, run to [[Asaka L`Rei]]'s room, hop down the well and find the [[a shadowknight (Troll)]] the cave system. They drop all three keys.
+
+=== Najena Keys ===
+
+#[[Dull Bone Key]] - Drops from [[BoneCracker]] (found by passing through the fake wall behind [[The Tenderizer]].  Opens [[Rathyl]]'s room.
+#[[Shiny Metal Key]] - Drops from [[the guard captain]] (found near [[BoneCracker]]. Opens [[Ekeros]]'s room.
+#[[Bloodstained Key]] - Drops from [[Rathyl]] near the jail cells. Opens [[Drelzna]]'s room.
+#[[Golden Crescent Key]] - Drops from [[Drelzna]]. Opens [[Najena_(NPC)|Nagena's]] room.
+
+*[[Guard's Keyring]] - Drops from [[Moosh]] or random [[a guard officer]]s. Opens the jail cells.
+
+=== Plane of Sky Keys ===
+Once you use these keys they are added to your keyring, giving you the ability to easily move through the Plane of Sky.
+
+{{Plane of Sky Keys}}

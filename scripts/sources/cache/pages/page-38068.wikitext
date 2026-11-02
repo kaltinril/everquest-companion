@@ -1,0 +1,47 @@
+{{Velious Era}}
+{{Factionpage|
+
+| description = Faction of the druadic creatures of the Wakening Land.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[The Wakening Land]]
+
+| quests_raise = 
+
+* [[Crest of the Drixie Quest]]
+* [[Crest of the Faerie Dragons Quest]]
+* [[Crest of the Fauns Quest]]
+* [[Crest of the Sifaye Quest]]
+* [[Crest of the Wood Nymphs Quest]]
+* [[Emil's Report]]
+* [[Friend of the Tunarean Court]]
+* [[Tunarean Tasks]]
+
+| quests_lower = 
+
+* [[Reinforcements for The Tunarean Regiment]]
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a drixie thane]]  <span class='fmz'>(The Wakening Land)</span>
+* [[A Faerie Dragon]]  <span class='fmz'>(The Wakening Land)</span>
+* [[A Faun]]  <span class='fmz'>(The Wakening Land)</span>
+* [[A Sifaye Chancellor]]  <span class='fmz'>(The Wakening Land)</span>
+* [[A Sifaye Thane]]  <span class='fmz'>(The Wakening Land)</span>
+* [[A Sifaye troubadour]]  <span class='fmz'>(The Wakening Land)</span>
+* [[A wood nymph]]  <span class='fmz'>(The Wakening Land)</span>
+* [[Eysa Florawhisper]] <span class='fmz'>(The Wakening Land - Quest NPC)</span>
+* [[Felisiana of Tunare]]  <span class='fmz'>(The Wakening Land)</span>
+* [[Lord Prismwing]]  <span class='fmz'>(The Wakening Land)</span>
+* [[Phillip Aghllsews]] <span class='fmz'>(The Wakening Land - Merchant)</span>
+* [[Shamus Aghllsews]] <span class='fmz'>(The Wakening Land - Quest NPC)</span>
+* [[Weinna Oakchild]] <span class='fmz'>(The Wakening Land - Merchant)</span>
+
+}}

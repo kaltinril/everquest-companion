@@ -1,0 +1,46 @@
+{{Factionpage|
+
+| description = The faction of Grobb's merchants.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Grobb]]
+* [[Innothule Swamp]]
+
+| quests_raise = 
+* [[A Job for Nanrum]]
+* [[HEHE Meat Quest]]
+* [[Wolf Meat for Wista]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Beztopi]] <span class='fmz'>(Grobb - Merchant)</span>
+* [[Bukton]] <span class='fmz'>(Grobb - Merchant)</span>
+* [[Gartonka]] <span class='fmz'>(Grobb - Merchant)</span>
+* [[Gluku]] <span class='fmz'>(Grobb - Merchant)</span>
+* [[Grabah]] <span class='fmz'>(Grobb - Merchant)</span>
+* [[Hartok]] <span class='fmz'>(Grobb - Merchant)</span>
+* [[Iskopa]] <span class='fmz'>(Grobb - Merchant)</span>
+* [[Jarlok]] <span class='fmz'>(Grobb - Merchant)</span>
+* [[Kagbkek]] <span class='fmz'>(Grobb - Merchant)</span>
+* [[Okun]] <span class='fmz'>(Grobb - Merchant)</span>
+* [[Ootok]] <span class='fmz'>(Grobb - Merchant)</span>
+* [[Raztara]] <span class='fmz'>(Grobb - Merchant)</span>
+* [[Sanfik]] <span class='fmz'>(Grobb - Merchant)</span>
+* [[Spinkit]] <span class='fmz'>(Grobb - Banker)</span>
+* [[Tangiz]] <span class='fmz'>(Grobb - Merchant)</span>
+* [[Uzak]] <span class='fmz'>(Grobb - Merchant)</span>
+* [[Zumzal]] <span class='fmz'>(Grobb - Merchant)</span>
+
+}}
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

@@ -1,0 +1,837 @@
+{{Cleanup Needed}}
+
+* also see [[Buff Lines]] & [[Haste Guide]] which inspired this page.
+
+{{Expand}}
+
+== Description ==
+This guide is meant to cover the various ways players can debuff. Including but not limited to Spells, Clickies, Procs and Poisons.
+
+AoE = Area of Effect, Targeted.
+
+PB AE = Point Blank Area Effect, around self.
+
+See something missing? Add it! 
+
+See something wrong? Fix it!
+
+=== Details ===
+Debuffing is an important aspect of everquest. It will make your adventure easier and safer.
+
+Some examples
+
+Debuffing a mob's magic resistance will make them less resistant to magic based spells, such as enchanter's charm or magic based damage spells.<br>
+Debuffing a mob's AC will increase on average the melee damage it takes.<br>
+Debuffing a mob's STR will decrease on average the melee damage it does.<br>
+Debuffing a mob's Attack Speed will essentially reduce it's melee damage by that #% by making it swing slower.<br>
+
+== Attributes ==
+
+=== Agility ===
+* 75 [[Cripple]] ([[Shaman]] 53, [[Enchanter]] 53)<br>
+* 55 [[Incapacitate]] ([[Shaman]] 44, [[Enchanter]] 44, Proc: [[Cracked Claw of Zlandicar]])<br>
+* 50 [[Largo's Absonant Binding]] ([[Bard]] 51)<br>
+* 40 [[Asphyxiate]] ([[Enchanter]] 59)<br>
+* 35 [[Listless Power]] ([[Shaman]] 29, [[Enchanter]] 29)<br>
+* 30 [[Gasping Embrace]] ([[Enchanter]] 49, Click: [[Robe of Asphyxiation]], [[Robe of Smothering]])<br>
+* 20 [[Suffocate]] ([[Enchanter]] 29, Proc: [[Nevederia's Horn]])<br>
+* 10 [[Choke]] ([[Enchanter]] 12)<br>
+* 5 [[Shallow Breath]] ([[Enchanter]] 1)<br>
+* 5 [[Suffocating Sphere]] ([[Enchanter]] 4)<br>
+
+{| class="eoTable3 wikitable"
+! Spell Name
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Cripple]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Incapacitate]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Largo's Absonant Binding]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Asphyxiate]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Listless Power]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Gasping Embrace]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Suffocate]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Choke]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Shallow Breath]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Suffocating Sphere]]
+|-
+| [[Cripple]] (75) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Incapacitate]] (55) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Largo's Absonant Binding]] (50) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Asphyxiate]] (40) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Listless Power]] (35) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Gasping Embrace]] (30) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Suffocate]] (20) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Choke]] (10) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Shallow Breath]] (5) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Suffocating Sphere]] (5) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+|}
+''Initial chart filled with NO''
+
+=== Charisma ===
+?
+
+=== Dexterity ===
+* 65 [[Cripple]] ([[Shaman]] 53, [[Enchanter]] 53)<br>
+* 63 [[Flesh Rot III]] (Poison: [[Visceral Rot]])<br>
+* 51 [[Flesh Rot II]] (Proc: [[Fester]])<br>
+* 43 [[Flesh Rot I]] (Poison: [[Solvent Gangrene]])<br>
+
+{| class="eoTable3 wikitable"
+! Spell Name
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Cripple]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Flesh Rot III]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Flesh Rot II]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Flesh Rot I]]
+|-
+| [[Cripple]] (65) ||NO ||NO ||NO ||NO
+|-
+| [[Flesh Rot III]] (63) ||NO ||NO ||NO ||NO
+|-
+| [[Flesh Rot II]] (51) ||NO ||NO ||NO ||NO
+|-
+| [[Flesh Rot I]] (43) ||NO ||NO ||NO ||NO
+|-
+|}
+''Initial chart filled with NO''
+
+=== Intelligence ===
+* 20 [[Curse of the Simple Mind]] ([[Enchanter]] 29)<br>
+* 16 [[Cassindra's Insipid Ditty]] ([[Bard]] 57)<br>
+
+=== Stamina ===
+* 20 [[Disempower]] ([[Shaman]] 14, [[Enchanter]] 16)<br>
+
+=== Strength ===
+* 75 [[Cripple]] ([[Shaman]] 53, [[Enchanter]] 53)<br>
+* 70 [[Brittle Haste IV]] (Poison: [[Rending Swiftness]])<br>
+* 69 [[Brittle Haste III]] (Poison: [[Paradoxical Peptide]])<br>
+* 65 [[Weakness]] ([[Enchanter]] 44)<br>
+* 61 [[Weakening Poison IV]] (Poison: [[Horrendous Atrophy]])<br>
+* 58 [[Brittle Haste II]] (Poison: [[Xegony's Curse]])<br>
+* 55 [[Incapacitate]] ([[Shaman]] 44, [[Enchanter]] 44, Proc: [[Cracked Claw of Zlandicar]])<br>
+* 55 [[Brittle Haste I]] (Poison: [[Delusional Swiftness]])<br>
+* 54 [[Weakening Poison III]] (Poison: [[Monk's Hood Aconite]])<br>
+* 51 [[Insipid Weakness]] ([[Enchanter]] 34, Click: [[Withered Staff]])<br>
+* 50 [[Cessation of Cor]] ([[Necromancer]] 56)<br>
+* 43 [[Weakening Poison II]] (Poison: [[Atrophic Sap]])<br>
+* 40 [[Asystole]] ([[Necromancer]] 44, [[Shadow Knight]] 60)<br>
+* 40 [[Asphyxiate]] ([[Enchanter]] 59)<br>
+* 35 [[Listless Power]] ([[Shaman]] 29, [[Enchanter]] 29)<br>
+* 30 [[Feckless Might]] ([[Enchanter]] 20)<br>
+* 30 [[Surge of Enfeeblement]] (PB AE) ([[Necromancer]] 34)<br>
+* 30 [[Gasping Embrace]] ([[Enchanter]] 49, Click: [[Robe of Asphyxiation]], [[Robe of Smothering]])<br>
+* 27 [[Steal Strength]] (Proc: [[A Dark Reaver]], [[Beetle Stinger]], [[Shaded Torch]])<br>
+* 25 [[Ebbing Strength]] ([[Enchanter]] 12)<br>
+* 20 [[Enfeeblement]] ([[Enchanter]] 4)<br>
+* 20 [[Heart Flutter]] ([[Necromancer]] 16, [[Shadow Knight]] 39)<br>
+* 20 [[Suffocate]] ([[Enchanter]] 29, Proc: [[Nevederia's Horn]])<br>
+* 20 [[Greenmist (Spell)]] (Proc: [[Greenmist]])<br>
+* 15 [[Weaken]] ([[Enchanter]] 1)<br>
+* 15 [[Wave of Enfeeblement]] (PB AE) ([[Necromancer]] 12, [[Shadow Knight]] 30)<br>
+* 15 [[Disempower]] ([[Shaman]] 14, [[Enchanter]] 16)<br>
+* 10 [[Siphon Strength]] ([[Necromancer]] 1, [[Shadow Knight]] 9, Click: [[Disciple Symbol of Innoruuk]])<br>
+* 10 [[Choke]] ([[Enchanter]] 12)<br>
+* 5 [[Shallow Breath]] ([[Enchanter]] 1)<br>
+* 5 [[Suffocating Sphere]] ([[Enchanter]] 4)<br>
+
+{| class="eoTable3 wikitable"
+! Spell Name
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Cripple]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Brittle Haste IV]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Brittle Haste III]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Weakness]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Weakening Poison IV]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Brittle Haste II]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Incapacitate]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Brittle Haste I]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Weakening Poison III]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Insipid Weakness]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Cessation of Cor]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Weakening Poison II]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Asystole]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Asphyxiate]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Listless Power]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Feckless Might]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Surge of Enfeeblement]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Gasping Embrace]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Steal Strength]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Ebbing Strength]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Enfeeblement]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Heart Flutter]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Suffocate]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Greenmist (Spell)]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Weaken]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Wave of Enfeeblement]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Disempower]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Siphon Strength]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Choke]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Shallow Breath]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Suffocating Sphere]]
+|-
+| [[Cripple]] (75) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Brittle Haste IV]] (70) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Brittle Haste III]] (69) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Weakness]] (65) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Weakening Poison IV]] (61) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Brittle Haste II]] (58) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Incapacitate]] (55) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Brittle Haste I]] (55) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Weakening Poison III]] (54) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Insipid Weakness]] (51) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Cessation of Cor]] (50) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Weakening Poison II]] (43) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Asystole]] (40) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Asphyxiate]] (40) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Listless Power]] (35) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Feckless Might]] (30) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Surge of Enfeeblement]] (30) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Gasping Embrace]] (30) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Steal Strength]] (27) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Ebbing Strength]] (25) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Enfeeblement]] (20) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Heart Flutter]] (20) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Suffocate]] (20) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Greenmist (Spell)]] (20) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Weaken]] (15) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Wave of Enfeeblement]] (15) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Disempower]] (15) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Siphon Strength]] (10) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Choke]] (10) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Shallow Breath]] (5) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+| [[Suffocating Sphere]] (5) ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO ||NO
+|-
+|}
+''Initial chart filled with NO''
+
+=== Wisdom ===
+* 20 [[Curse of the Simple Mind]] ([[Enchanter]] 29)<br>
+* 16 [[Cassindra's Insipid Ditty]] ([[Bard]] 57)<br>
+
+== Resistances ==
+
+=== Cold ===
+* 60 [[Malosi]] ([[Shaman]] 49, [[Magician]] 51)<br>
+* 60 [[Malosini]] ([[Shaman]] 57, [[Magician]] 58)<br>
+* 50 [[Fire]] (AoE) ([[Druid]] 49)<br>
+* 45 [[Malo]] ([[Shaman]] 60, Unresistable)<br>
+* 35 [[Mala]] ([[Magician]] 60, Unresistable)<br>
+* 30 [[Lower Resists IV]] (Poison: [[Susceptible Essence]])<br>
+* 40 [[Malaisement]] ([[Shaman]] 34, [[Magician]] 44, Click: [[Rod of Malisement]], Proc: [[Withered Totem of Widdershins]])<br>
+* 20 [[Malaise]] ([[Shaman]] 19, [[Magician]] 24, Click: [[Drake-Hide Amice]])<br>
+* 20 [[Lower Resists III]] (Poison: [[Cyclic Vertigo]])<br>
+* 17 [[Tuyen's Chant of Frost]] ([[Bard]] 46)<br>
+* 15 [[Lower Resists II]] (Poison: [[Dilapidating Ash]])<br>
+* 10 [[Occlusion of Sound]] ([[Bard]] 55, Unresistable)<br>
+* 10 [[Lower Resists I]] (Poison: [[Festering Nettle]])<br>
+* 6 [[Lower Element]] (Click: [[Staff of Temperate Flux]])<br>
+
+=== Disease ===
+* 60 [[Insidious Malady]] ([[Shaman]] 39)<br>
+* 42 [[Insidious Decay]] ([[Shaman]] 52, Unresistable)<br>
+* 36 [[Scent of Terris]] ([[Necromancer]] 52)<br>
+* 35 [[Insidious Fever]] ([[Shaman]] 19)<br>
+* 30 [[Lower Resists IV]] (Poison: [[Susceptible Essence]])<br>
+* 27 [[Scent of Darkness]] ([[Necromancer]] 39, Click: [[Nightshade Scented Staff]])<br>
+* 20 [[Lower Resists III]] (Poison: [[Cyclic Vertigo]])<br>
+* 18 [[Scent of Shadow]] ([[Necromancer]] 24)<br>
+* 15 [[Lower Resists II]] (Poison: [[Dilapidating Ash]])<br>
+* 10 [[Lower Resists I]] (Poison: [[Festering Nettle]])<br>
+* 9 [[Scent of Dusk]] ([[Necromancer]] 12)<br>
+
+=== Fire ===
+* 60 [[Malosi]] ([[Shaman]] 49, [[Magician]] 51)<br>
+* 60 [[Malosini]] ([[Shaman]] 57, [[Magician]] 58)<br>
+* 50 [[Ice]] ([[Druid]] 49)<br>
+* 45 [[Malo]] ([[Shaman]] 60, Unresistable)<br>
+* 40 [[Malaisement]] ([[Shaman]] 34, [[Magician]] 44, Click: [[Rod of Malisement]], Proc: [[Withered Totem of Widdershins]])<br>
+* 40 [[Ro's Fiery Sundering]] ([[Druid]] 39)<br>
+* 36 [[Scent of Terris]] ([[Necromancer]] 52)<br>
+* 31 [[Tuyen's Chant of Flame]] ([[Bard]] 38)<br>
+* 35 [[Mala]] ([[Magician]] 60, Unresistable)<br>
+* 30 [[Breath of Ro]] ([[Druid]] 52)<br>
+* 30 [[Lower Resists IV]] (Poison: [[Susceptible Essence]])<br>
+* 27 [[Scent of Darkness]] ([[Necromancer]] 39, Click: [[Nightshade Scented Staff]])<br>
+* 20 [[Malaise]] ([[Shaman]] 19, [[Magician]] 24, Click: [[Drake-Hide Amice]])<br>
+* 20 [[Lower Resists III]] (Poison: [[Cyclic Vertigo]])<br>
+* 18 [[Scent of Shadow]] ([[Necromancer]] 24)<br>
+* 15 [[Lower Resists II]] (Poison: [[Dilapidating Ash]])<br>
+* 10 [[Occlusion of Sound]] ([[Bard]] 55, Unresistable)<br>
+* 10 [[Lower Resists I]] (Poison: [[Festering Nettle]])<br>
+* 9 [[Scent of Dusk]] ([[Necromancer]] 12)<br>
+* 6 [[Lower Element]] (Click: [[Staff of Temperate Flux]])<br>
+
+=== Magic ===
+Magic Resist reduction is important for charms or magic based spells in general.
+* 60 [[Malosi]] ([[Shaman]] 49, [[Magician]] 51)<br>
+* 60 [[Malosini]] ([[Shaman]] 57, [[Magician]] 58)<br>
+* 45 [[Malo]] ([[Shaman]] 60, Unresistable)<br>
+* 40 [[Malaisement]] ([[Shaman]] 34, [[Magician]] 44, Click: [[Rod of Malisement]], Proc: [[Withered Totem of Widdershins]])<br>
+* 40 [[Wind of Tishanian]] (AoE) ([[Enchanter]] 60, Unresistable)<br>
+* 39 [[Tashanian]] ([[Enchanter]] 57, Unresistable)<br>
+* 35 [[Mala]] ([[Magician]] 60, Unresistable)<br>
+* 33 [[Tashania]] ([[Enchanter]] 44, Click: [[Shissar Nullifier Staff]], Proc: [[Orb of Tishan]], Unresistable)<br>
+* 30 [[Lower Resists IV]] (Poison: [[Susceptible Essence]])<br>
+* 23 [[Tashani]] ([[Enchanter]] 20, Proc: [[Falgiron Staff]], [[Journeyman's Walking Stick]], Unresistable)<br>
+* 23 [[Wind of Tishani]] (AoE) ([[Enchanter]] 55, Unresistable)<br>
+* 20 [[Malaise]] ([[Shaman]] 19, [[Magician]] 24, Click: [[Drake-Hide Amice]])<br>
+* 20 [[Lower Resists III]] (Poison: [[Cyclic Vertigo]])<br>
+* 20 [[Glamour of Tunare]] ([[Druid]] 53, Unresistable, Animal)<br>
+* 16 [[Fufil's Curtailing Chant]] ([[Bard]] 30)<br>
+* 15 [[Lower Resists II]] (Poison: [[Dilapidating Ash]])<br>
+* 15 [[Denon's Bereavement]] (PB AE) ([[Bard]] 59)<br>
+* 13 [[Tashan]] ([[Enchanter]] 4, Proc: [[Howling Werewolf Claws]], Unresistable)<br>
+* 13 [[Crission's Pixie Strike]] ([[Bard]] 28)<br>
+* 10 [[Occlusion of Sound]] ([[Bard]] 55, Unresistable)<br>
+* 10 [[Lower Resists I]] (Poison: [[Festering Nettle]])<br>
+* 8 [[Solon's Song of the Sirens]] ([[Bard]] 27)<br>
+* 8 [[Solon's Bewitching Bravura]] [[Solon's Bravura]] ([[Bard]] 39)<br>
+
+=== Poison ===
+Poison Resist reduction is important for poison based spells in general. Improves chance to land things like poison based Dots.
+* 60 [[Malosi]] ([[Shaman]] 49, [[Magician]] 51)<br>
+* 60 [[Malosini]] ([[Shaman]] 57, [[Magician]] 58)<br>
+* 45 [[Malo]] ([[Shaman]] 60, Unresistable)<br>
+* 40 [[Malaisement]] ([[Shaman]] 34, [[Magician]] 44, Click: [[Rod of Malisement]], Proc: [[Withered Totem of Widdershins]])<br>
+* 36 [[Scent of Terris]] ([[Necromancer]] 52)<br>
+* 35 [[Mala]] ([[Magician]] 60, Unresistable)<br>
+* 27 [[Scent of Darkness]] ([[Necromancer]] 39, Click: [[Nightshade Scented Staff]])<br>
+* 20 [[Malaise]] ([[Shaman]] 19, [[Magician]] 24, Click: [[Drake-Hide Amice]])<br>
+* 18 [[Scent of Shadow]] ([[Necromancer]] 24)<br>
+* 9 [[Scent of Dusk]] ([[Necromancer]] 12)<br>
+
+== Other Debuffs ==
+
+=== AC ===
+Armour Class this will let melee hit harder on average.
+* 33 [[Cripple]] ([[Shaman]] 53, [[Enchanter]] 53)<br>
+* 24 [[Incapacitate]] ([[Shaman]] 44, [[Enchanter]] 44, Proc: [[Cracked Claw of Zlandicar]])<br>
+* 21 [[Cessation of Cor]] ([[Necromancer]] 56)<br>
+* 20 [[Breath of Ro]] ([[Druid]] 52)<br>
+* 19 [[Brittle Haste IV]] (Poison: [[Rending Swiftness]])<br>
+* 19 [[Largo's Absonant Binding]] ([[Bard]] 51)<br>
+* 18 [[Shroud of Pain]] ([[Shadow Knight]] 50)<br>
+* 18 [[Listless Power]] ([[Shaman]] 29, [[Enchanter]] 29)<br>
+* 18 [[Fixation of Ro]] ([[Druid]] 44)<br>
+* 18 [[Asystole]] ([[Necromancer]] 44, [[Shadow Knight]] 60)<br>
+* 17 [[Brittle Haste III]] (Poison: [[Paradoxical Peptide]])<br>
+* 15 [[Brittle Haste II]] (Poison: [[Xegony's Curse]])<br>
+* 13 [[Brittle Haste I]] (Poison: [[Delusional Swiftness]])<br>
+* 12 [[Shadow Vortex]] ([[Necromancer]] 20, [[Shadow Knight]] 39)<br>
+* 9 [[Disempower]] ([[Shaman]] 14, [[Enchanter]] 16)<br>
+* 9 [[Heart Flutter]] ([[Necromancer]] 16, [[Shadow Knight]] 39)<br>
+* 7 [[Ro's Fiery Sundering]] ([[Druid]] 39)<br>
+* 4 [[Greenmist (Spell)]] (Proc: [[Greenmist]])<br>
+* 3 [[Enfeeblement]] ([[Enchanter]] 4)<br>
+
+=== Atk ===
+General reduction of attack damage.
+* 60 [[Fixation of Ro]] ([[Druid]] 44)<br>
+* 20 [[Shroud of Hate]] ([[Shadow Knight]] 39)<br>
+* 20 [[Garzicor's Vengeance]] (Proc: [[Ethereal Bladed Naginata]])<br>
+* 5 [[Flash of Light]] ([[Cleric]] 1, [[Shaman]] 1, [[Paladin]] 9)<br>
+* 5 [[Blinding Luminance]] ([[Cleric]] 34, [[Shaman]] 39, Click: [[Bioluminescent Orb]])<br>
+* 5 [[Blinding Poison I]] (Poison: [[Retinal Deactivator]])<br>
+* 5 [[Blinding Poison II]] (Poison: [[Eyeburn Solution]])<br>
+* 5 [[Blinding Poison III]] (Proc: [[Wrapped Entropy Serpent Spine]], Poison: [[Shadowveil Hemlock]])<br>
+
+=== Attack Speed ===
+Slow is one of the most overpower spells in EverQuest. Essentially reduces melee damage output by that %.
+* 75 [[Turgur's Insects]] ([[Shaman]] 51)<br>
+* 70 [[Togor's Insects]] ([[Shaman]] 39, Proc: [[Di`zok Oracle Shillelagh]])<br>
+* 70 [[Forlorn Deeds]] ([[Enchanter]] 57)<br>
+* 65 [[Shiftless Deeds]] ([[Enchanter]] 44, Click: [[Slowstone Amber]], Proc: [[Writ of Di`zok]])<br>
+* 50 [[Tepid Deeds]] ([[Enchanter]] 24, Proc: [[Truncheon of Doom]])<br>
+* 50 [[Tagar's Insects]] ([[Shaman]] 29, Proc: [[Garduk]], [[Swarmcaller]])<br>
+* 50 [[Tigir's Insects]] (AoE) ([[Shaman]] 58)<br>
+* 50 [[Paralyzing Poison I]] (Poison: [[Spine Break]])<br>
+* 50 [[Paralyzing Poison II]] (Poison: [[Kinetic Suppressant]])<br>
+* 50 [[Paralyzing Poison III]] (Poison: [[Stiffening Ergot]])<br>
+* 35 [[Walking Sleep]] ([[Shaman]] 14, Click: [[Midnight Mallet]], Proc: [[Locustlure]])<br>
+* 35 [[Selo's Consonant Chain]] ([[Bard]] 23)<br>
+* 35 [[Largo's Absonant Binding]] ([[Bard]] 51)<br>
+* 30 [[Languid Pace]] ([[Enchanter]] 12)<br>
+* 25 [[Drowsy]] ([[Shaman]] 5, Proc: [[Canyoneer Pike]])<br>
+* 25 [[Brittle Haste IV]] (Poison: [[Rending Swiftness]])<br>
+* 25 [[Selo's Assonant Strane]] ([[Bard]] 54)<br>
+* 20 [[Brittle Haste III]] (Poison: [[Paradoxical Peptide]])<br>
+* 15 [[Brittle Haste II]] (Poison: [[Xegony's Curse]])<br>
+* 10 [[Brittle Haste I]] (Poison: [[Delusional Swiftness]])<br>
+
+=== Movement Speed ===
+Snares and the like reduce movement speed. This can be useful for fleeing mobs or any mobile you want to keep their movement speed down on. For example you can snare a charm before you charm it. Or in the bards case Snaring a whole pack on mobs.
+* 95 [[Paralyzing Poison I]] (Poison: [[Spine Break]])<br>
+* 95 [[Paralyzing Poison II]] (Poison: [[Kinetic Suppressant]])<br>
+* 95 [[Paralyzing Poison III]] (Poison: [[Stiffening Ergot]])<br>
+* 90 [[Selo's Consonant Chain]] ([[Bard]] 23)<br>
+* 70 [[Devouring Darkness]] ([[Necromancer]] 59)<br>
+* 65 [[Bonds of Tunare]] (AoE) ([[Druid]] 57)<br>
+* 65 [[Torment of Shadows]] (Click: [[Scythe of the Shadowed Soul]])<br>
+* 61 [[Largo's Absonant Binding]] ([[Bard]] 51)<br>
+* 60 [[Dooming Darkness]] ([[Necromancer]] 29, [[Shadow Knight]] 49, Proc: [[Nightfall]], [[Obtenebrate Short Sword]])<br>
+* 60 [[Cascading Darkness]] ([[Necromancer]] 49, [[Shadow Knight]] 59, Click: [[Wand of Darkness]])<br>
+* 60 [[Wrath of Nature]] (Click: [[Nature Walkers Scimitar]])<br>
+* 60 [[Atol's Spectral Shackles]] (AoE) ([[Wizard]] 51)<br>
+* 60 [[Muscle Lock IV]] (Poison: [[Spirit of Sloth]])<br>
+* 56 [[Ensnare]] ([[Druid]] 29, [[Ranger]] 51)<br>
+* 55 [[Snare]] ([[Druid]] 1, [[Ranger]] 9)<br>
+* 55 [[Bonds of Force]] (AoE) ([[Wizard]] 29, Click: [[Al`Kabor's Cap of Binding]])<br>
+* 55 [[Muscle Lock III]] (Poison: [[Pacifying Whisper]])<br>
+* 50 [[Muscle Lock II]] (Poison: [[Lethargic Bliss]])<br>
+* 45 [[Selo's Assonant Strane]] ([[Bard]] 54)<br>
+* 40 [[Engulfing Darkness]] ([[Necromancer]] 12, [[Shadow Knight]] 22, Click: [[Blood Ember Gauntlets]], Proc: [[Blood Riven Axe]], [[Kunzar Ku'juch]], [[Obtenebrate Claymore]], [[Serrated Bone Dirk]])<br>
+* 40 [[Muscle Lock I]] (Proc: [[Tserrina's Whip]])<br>
+* 35 [[Kylie's Venom]] (Proc: [[Dragonspine Rapier]])<br>
+* 30 [[Clinging Darkness]] ([[Necromancer]] 4, [[Shadow Knight]] 15, Click: [[Regent Symbol of Innoruuk]], [[Scepter of the Forlorn]])<br>
+
+== DoT Counters ==
+
+=== Disease ===
+Helps keep disease on the target.
+* +9 [[Insidious Malady]] ([[Shaman]] 39)<br>
+* +9 [[Insidious Decay]] ([[Shaman]] 52, Unresistable)<br>
+* +5 [[Cessation of Cor]] ([[Necromancer]] 56)<br>
+* +4 [[Insidious Fever]] ([[Shaman]] 19)<br>
+* +4 [[Asystole]] ([[Necromancer]] 44, [[Shadow Knight]] 60)<br>
+
+=== Poison ===
+Helps keep poison on the target.
+* +9 [[Scent of Terris]] ([[Necromancer]] 52)<br>
+* +9 [[Scent of Darkness]] ([[Necromancer]] 39, Click: [[Nightshade Scented Staff]])<br>
+* +5 [[Brittle Haste IV]] (Poison: [[Rending Swiftness]])<br>
+* +5 [[Weakening Poison IV]] (Poison: [[Horrendous Atrophy]])<br>
+* +5 [[Muscle Lock IV]] (Poison: [[Spirit of Sloth]])<br>
+* +4 [[Weakening Poison III]] (Poison: [[Monk's Hood Aconite]])<br>
+* +4 [[Scent of Shadow]] ([[Necromancer]] 24)<br>
+* +4 [[Brittle Haste III]] (Poison: [[Paradoxical Peptide]])<br>
+* +4 [[Blinding Poison III]] (Proc: [[Wrapped Entropy Serpent Spine]], Poison: [[Shadowveil Hemlock]])<br>
+* +4 [[Muscle Lock III]] (Poison: [[Pacifying Whisper]])<br>
+* +4 [[Paralyzing Poison III]] (Poison: [[Stiffening Ergot]])<br>
+* +4 [[Flesh Rot III]] (Poison: [[Visceral Rot]])<br>
+* +4 [[Denon's Bereavement]] (PB AE) ([[Bard]] 59)<br>
+* +3 [[Brittle Haste II]] (Poison: [[Xegony's Curse]])<br>
+* +3 [[Weakening Poison II]] (Poison: [[Atrophic Sap]])<br>
+* +3 [[Blinding Poison II]] (Poison: [[Eyeburn Solution]])<br>
+* +3 [[Muscle Lock II]] (Poison: [[Lethargic Bliss]])<br>
+* +3 [[Paralyzing Poison II]] (Poison: [[Kinetic Suppressant]])<br>
+* +3 [[Flesh Rot II]] (Proc: [[Fester]])<br>
+* +2 [[Brittle Haste I]] (Poison: [[Delusional Swiftness]])<br>
+* +2 [[Blinding Poison I]] (Poison: [[Retinal Deactivator]])<br>
+* +2 [[Weakening Poison I]] (Poison: [[Spider Venom]], [[Regalis Poison]])<br>
+* +2 [[Muscle Lock I]] (Proc: [[Tserrina's Whip]])<br>
+* +2 [[Paralyzing Poison I]] (Poison: [[Spine Break]])<br>
+* +2 [[Flesh Rot I]] (Poison: [[Solvent Gangrene]])<br>
+* +1 [[Tashan]] ([[Enchanter]] 4, Proc: [[Howling Werewolf Claws]], Unresistable)<br>
+* +1 [[Scent of Dusk]] ([[Necromancer]] 12)<br>
+* +1 [[Tashani]] ([[Enchanter]] 20, Proc: [[Falgiron Staff]], [[Journeyman's Walking Stick]], Unresistable)<br>
+* +1 [[Tashania]] ([[Enchanter]] 44, Click: [[Shissar Nullifier Staff]], Proc: [[Orb of Tishan]], Unresistable)<br>
+* +1 [[Wind of Tishani]] (AoE) ([[Enchanter]] 55, Unresistable)<br>
+* +1 [[Tashanian]] ([[Enchanter]] 57, Unresistable)<br>
+* +1 [[Wind of Tishanian]] (AoE) ([[Enchanter]] 60, Unresistable)<br>
+* +1 [[Glamour of Tunare]] ([[Druid]] 53, Unresistable, Animal)<br>
+
+== Debuff Stacking ==
+When multiple spells are used on the same mob they can behave in different manners. The table below indicates which spells stack with the other spells. All spells were added to make chart easier to see.
+
+=== Table ===
+{| class="eoTable3 wikitable"
+! Spell Name
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Asphyxiate]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Asystole]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Atol's Spectral Shackles]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Blinding Luminance]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Blinding Poison I]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Blinding Poison II]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Blinding Poison III]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Bonds of Force]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Bonds of Tunare]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Breath of Ro]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Brittle Haste I]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Brittle Haste II]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Brittle Haste III]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Brittle Haste IV]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Cascading Darkness]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Cassindra's Insipid Ditty]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Cessation of Cor]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Choke]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Clinging Darkness]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Cripple]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Crission's Pixie Strike]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Curse of the Simple Mind]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Denon's Bereavement]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Devouring Darkness]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Disempower]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Dooming Darkness]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Drowsy]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Ebbing Strength]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Enfeeblement]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Engulfing Darkness]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Ensnare]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Feckless Might]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Fire]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Fixation of Ro]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Flash of Light]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Flesh Rot I]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Flesh Rot II]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Flesh Rot III]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Forlorn Deeds]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Fufil's Curtailing Chant]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Garzicor's Vengeance]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Gasping Embrace]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Glamour of Tunare]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Greenmist (Spell)]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Heart Flutter]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Ice]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Incapacitate]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Insidious Decay]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Insidious Fever]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Insidious Malady]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Insipid Weakness]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Kylie's Venom]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Languid Pace]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Largo's Absonant Binding]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Listless Power]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Lower Element]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Lower Resists I]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Lower Resists II]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Lower Resists III]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Lower Resists IV]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Mala]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Malaise]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Malaisement]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Malo]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Malosi]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Malosini]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Muscle Lock I]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Muscle Lock II]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Muscle Lock III]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Muscle Lock IV]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Occlusion of Sound]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Paralyzing Poison I]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Paralyzing Poison II]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Paralyzing Poison III]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Ro's Fiery Sundering]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Scent of Darkness]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Scent of Dusk]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Scent of Shadow]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Scent of Terris]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Selo's Assonant Strane]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Selo's Consonant Chain]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Shadow Vortex]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Shallow Breath]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Shiftless Deeds]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Shroud of Hate]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Shroud of Pain]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Siphon Strength]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Snare]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Solon's Bewitching Bravura]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Solon's Song of the Sirens]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Steal Strength]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Suffocate]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Suffocating Sphere]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Surge of Enfeeblement]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Tagar's Insects]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Tashan]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Tashani]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Tashania]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Tashanian]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Tepid Deeds]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Tigir's Insects]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Togor's Insects]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Torment of Shadows]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Turgur's Insects]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Tuyen's Chant of Flame]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Tuyen's Chant of Frost]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Walking Sleep]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Wave of Enfeeblement]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Weaken]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Weakening Poison II]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Weakening Poison III]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Weakening Poison IV]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Weakness]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Wind of Tishani]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Wind of Tishanian]]
+! style="writing-mode: vertical-lr; white-space: nowrap; min-width: 20px;transform: rotate(180deg);text-align:left;"|[[Wrath of Nature]]
+|-
+| [[Asphyxiate]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Asystole]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||Y||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Atol's Spectral Shackles]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Blinding Luminance]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Blinding Poison I]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Blinding Poison II]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Blinding Poison III]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Bonds of Force]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Bonds of Tunare]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Breath of Ro]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Brittle Haste I]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Brittle Haste II]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Brittle Haste III]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Brittle Haste IV]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Cascading Darkness]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Cassindra's Insipid Ditty]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Cessation of Cor]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Choke]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Clinging Darkness]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Cripple]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Crission's Pixie Strike]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Curse of the Simple Mind]]||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Denon's Bereavement]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Devouring Darkness]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Disempower]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Dooming Darkness]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Drowsy]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Ebbing Strength]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Enfeeblement]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Engulfing Darkness]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Ensnare]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Feckless Might]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Fire]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Fixation of Ro]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Flash of Light]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Flesh Rot I]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Flesh Rot II]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Flesh Rot III]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Forlorn Deeds]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Fufil's Curtailing Chant]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Garzicor's Vengeance]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Gasping Embrace]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Glamour of Tunare]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Greenmist (Spell)]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Heart Flutter]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Ice]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Incapacitate]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Insidious Decay]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Insidious Fever]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Insidious Malady]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Insipid Weakness]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Kylie's Venom]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Languid Pace]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Largo's Absonant Binding]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Listless Power]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Lower Element]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Lower Resists I]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Lower Resists II]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Lower Resists III]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+| 
+|-[[Lower Resists IV]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Mala]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Malaise]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Malaisement]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Malo]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Malosi]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Malosini]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Muscle Lock I]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Muscle Lock II]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Muscle Lock III]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Muscle Lock IV]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Occlusion of Sound]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Paralyzing Poison I]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Paralyzing Poison II]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Paralyzing Poison III]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Ro's Fiery Sundering]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Scent of Darkness]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Scent of Dusk]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Scent of Shadow]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Scent of Terris]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Selo's Assonant Strane]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Selo's Consonant Chain]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Shadow Vortex]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Shallow Breath]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Shiftless Deeds]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Shroud of Hate]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Shroud of Pain]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Siphon Strength]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Snare]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Solon's Bewitching Bravura]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Solon's Song of the Sirens]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Steal Strength]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Suffocate]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Suffocating Sphere]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Surge of Enfeeblement]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Tagar's Insects]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Tashan]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Tashani]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Tashania]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Tashanian]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Tepid Deeds]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+|-
+| [[Tigir's Insects]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Togor's Insects]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Torment of Shadows]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Turgur's Insects]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Tuyen's Chant of Flame]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Tuyen's Chant of Frost]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Walking Sleep]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Wave of Enfeeblement]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Weaken]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Weakening Poison II]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Weakening Poison III]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Weakening Poison IV]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Weakness]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Wind of Tishani]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Wind of Tishanian]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+| [[Wrath of Nature]] ||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO||NO
+|-
+|}
+''Initial chart filled with NO''
+
+== To Do ==
+* Missing Information
+* Filters? (Class, Click, Proc, Unresistable, Poison, Animal)(PB AE, AOE)
+* Debuff Stacking
+* Improve the Description to be more professional and fall in line with the rest of the wiki.
+* Possible new sections (Mez, Root, Fear, Blind, Stun, Charm)
+
+[[Category:Technical]]
+[[Category:Guides]]

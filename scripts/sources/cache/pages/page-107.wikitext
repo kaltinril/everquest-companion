@@ -1,0 +1,56 @@
+__NOTOC__
+Here you will find a list of all items equippable in a particular slot. Each page contains links to all the items that can be used in that slow, regardless of class restrictions. Each page also contains links to subpages for lists of all items for that particular slot usable by a particular class. For a big list of everything, see [[:Category:Items]]. 
+
+This page needs a major overhaul, so [[Equipment By Class]] is recommended.
+
+<center>
+{| border="0" cellpadding="20" cellspacing="0" style="vertical-align:top;"
+| style="vertical-align:top;" |
+{| 
+| <h2>Equipment</h2> 
+
+;[[:Category:Arms|Arms]]
+;[[:Category:Back|Back]]
+;[[:Category:Chest|Chest]]
+;[[:Category:Ear|Ear]]
+;[[:Category:Face|Face]]
+;[[:Category:Feet|Feet]]
+;[[:Category:Fingers|Fingers]]
+;[[:Category:Hands|Hands]]
+;[[:Category:Head|Head]]
+;[[:Category:Legs|Legs]]
+;[[:Category:Neck|Neck]]
+;[[:Category:Shoulders|Shoulders]]
+;[[:Category:Waist|Waist]]
+;[[:Category:Wrist|Wrist]]
+
+
+;[[:Category:Inventory Items|Inventory Items]]
+|}
+| style="vertical-align:top;" |
+{|
+| <h2> Weapons </h2>
+
+;[[:Category:1H Blunt|1H Blunt]]
+;[[:Category:2H Blunt|2H Blunt]]
+;[[:Category:1H Slashing|1H Slashing]]
+;[[:Category:2H Slashing|2H Slashing]]
+;[[:Category:Piercing|Piercing]]
+;[[:Category:2H Piercing|2H Piercing]]
+;[[:Category:Archery|Archery (Bows)]]
+;[[:Category:Throwing|Throwing]]
+;[[:Category:Bard Instrument|Instrument]]
+;[[:Category:Hand to Hand|Hand to Hand]]
+
+<h2> Held (non-Weapons) </h2>
+
+;[[:Category:Primary|Primary]]
+;[[:Category:Secondary|Secondary]]
+;[[:Category:Range|Range]]
+;[[:Category:Ammo|Ammo]]
+
+
+
+|}
+|}
+</center>

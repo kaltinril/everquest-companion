@@ -1,0 +1,42 @@
+{{Factionpage|
+
+| description = A small faction for citizens of Qeynos. Killing beggars in the sewers lowers this faction.
+
+<s>Possibly redundant with [[Citizens of Qeynos]], or is this its own faction?</s> This is its own faction of a handful of NPCs that are in Qeynos, including [[Menkes Tabolet]] and doing his quests will raise this faction. 
+
+<s>Edvard Tommels can be killed to increase this faction and is also apart of said faction.</s> This is not true, in EQL Edvard gives you a negative faction hit, which I assume was always intended.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Qeynos Aqueducts]]
+* [[Qeynos|South Qeynos]]
+* [[Western Plains of Karana]]
+
+| quests_raise = 
+
+* [[Rat Fur Cap Quest]]
+* [[Rat Pelt Cape Quest]]
+* [[Rat's Foot Necklace Quest]]
+* [[Snake Fang Necklace Quest]]
+* [[Tesch Val Scrolls]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+
+| mobs_lower = 
+
+* [[a beggar]]  <span class='fmz'>(Qeynos Catacombs)</span>
+* [[Marlin Bizmite]] <span class='fmz'>(South Qeynos)</span>
+* [[Largon Welsh]] <span class='fmz'>(South Qeynos)</span>
+* [[Willie Garrote]] <span class='fmz'>(South Qeynos)</span>
+* [[Riley Shplots]] <span class='fmz'>(South Qeynos)</span>
+* [[Edvard Tommels]] <span class='fmz'>(South Qeynos)</span>
+
+}}

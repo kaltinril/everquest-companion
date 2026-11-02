@@ -1,0 +1,107 @@
+{{Classic Era}}
+
+[[File:brewbarrel.jpg|thumb|right|A brewbarrel in Kelethin]]
+A brew barrel is a stationary object with which players can interact in order to attempt a [[Brewing]] recipe.  They are available in many locations around Norrath.
+
+==Locations==
+<span style="color:red; font-size:150%;">'''Locations listed in italics are unconfirmed for EverQuest Legends. Please update as you confirm them.'''</span>
+
+* ''[[Ak'Anon]]''
+** ''brew barrel @ (1258, -901), inside bar''
+
+* ''[[Cabilis East]]''
+** ''brew barrel @ (915, -66), side room in the Tink N Babble''
+** ''brew barrel @ (678, -14)''
+
+* ''[[City of Mist]]''
+** ''brew barrel @ (-125, -640, 75), in small room in the pathway on top of the wall in Stables area. ''
+*** ''This is the "upstairs" part of the zone. Several upper-30s level KoS mobs guard it and wander through the room. ''
+
+* ''[[Cobalt Scar]] ''
+** ''brew barrel @ (235, -1481), in othmir camp ''
+
+* ''[[East Freeport]] ''
+** ''brew barrel @ (163, -813), in Grub N Grog Tavern ''
+** ''brew barrel @ (147, -316), in Trader's Holiday ''
+** ''brew barrel @ (-1116, -1163), in Seafarer's Roost ''
+
+* ''[[Erudin]] ''
+** ''brew barrel @ (-999, -86), second floor (through 2nd entrance) of Erudin Surplus ''
+** ''brew barrel @ (-1213, -311), in Blue Hawks, first building to right of Toxxulia Forest zoneline ''
+
+* ''[[Firiona Vie]] ''
+** ''brew barrel @ (-2940, 2980) ''
+
+* [[Halas]]
+** brew barrel @ (121, -265, 4), in McQuaid's Dark & Stout
+** brew barrel @ (222, -137, 4), in McDonald's Fire Cider
+
+* ''[[High Keep]] ''
+** ''brew barrel @ (50, -220), upstairs in kitchen (second floor) ''
+
+* ''[[Highpass Hold]] ''
+** ''brew barrel @ (61, 303(, in hidden smugglers' area ''
+** ''brew barrel @ (-78, 425), in Tiger's Roar ''
+** ''brew barrel @ (-214, 37), in The Lumberyard ''
+** ''brew barrel @ (-187, 14), upstairs in The Lumberyard ''
+
+* ''[[Kelethin]] (in Greater Faydark) ''
+** ''brew barrel @ (-520, 210), near Soldiers of Tunare (druids' guild)''
+
+* ''[[Neriak Third Gate]] ''
+** ''brew barrel @ (900, -1410), in The Maiden's Fancy ''
+
+* ''[[Neriak Commons]] ''
+** ''brew barrel @ (23, -830), in The Blind Fish, Neriak Down Under ''
+
+* ''[[Neriak Foreign Quarter]] ''
+** ''brew barrel @ (225, -175), outside Slugs Tavern ''
+
+* ''[[North Freeport]] ''
+** ''brew barrel @ (60, 0), inside Tassel's Tavern ''
+
+* ''[[North Kaladim]] ''
+** ''brew barrel @ (670, -160), Greybloom Farms ''
+
+* [[North Qeynos]]
+** brew barrel @ (65, 310), inside Crow's Pub & Casino
+
+* ''[[Northern Felwithe]] ''
+** ''brew barrel @ (65, -375), downstairs, Tovaniks Venom ''
+
+* ''[[Oggok]] ''
+** ''brew barrel @ (264, -259), inside Meet and Drink tew Bie ''
+
+* ''[[Overthere]] ''
+** ''brew barrel @ (2683, 2383) ''
+
+* ''[[Paineel]] ''
+** ''brew barrel @ (955, 788), in Shackled Spirits Tavern & Inn ''
+*** ''Down hallway to the right of (while facing) and before entering 2nd portal in main city portion of Paineel. ''
+
+* ''[[Rathe Mountains]] (see also Gukta) ''
+** ''brew barrel @ (-1255, 7)''
+
+* [[Rivervale]]
+** brew barrel @ (-61,-161, 16), second floor of Fool's Gold
+** brew barrel @ (-33,-255, 4) 
+
+* ''[[Skyshrine]] ''
+** ''brew barrel @ (515, -705)''
+
+* ''[[South Kaladim]] ''
+** ''brew barrel @ (105, 248), Pub Kal. ''
+
+* [[South Qeynos]]
+** brew barrel @ (-265, -300), inside Fish's Ale
+** brew barrel @ (275, -155), inside Lion's Mane Tavern
+
+* ''[[Thurgadin]] ''
+** ''brew barrel @ (96, -386, -1), inside The Velium Keg ''
+
+* [[West Freeport]] 
+** ''brew barrel @ (-167, -482), outside Hogcallers' Inn ''
+
+{{Navbox Tradeskill Containers}}
+
+[[Category:Tradeskill Containers]]

@@ -1,0 +1,229 @@
+{{Velious Era}}
+[[File:Npc_garadain_glacierbane.png|right]]{{Factionpage|
+
+| description = Faction of the [[Velious]] [[dwarves]] who reside in [[Thurgadin]]. They are enemies of the [[Kromrif]] and [[Kromzek]] giants, especially the [[Kromrif]] who hunt them in the wastes. They have little contact with the [[Claws of Veeshan]] nor the [[Tunarean Court]]. Their king, [[Dain Frostreaver IV]], has his own faction. An isolated community of related dwarves, [[Citizens of Froststone]] resides in [[Crystal Caverns]].
+
+Kindly faction is required for all [[Thurgadin Armor Quests]].
+
+| zones_raise =
+
+* [[Eastern Wastes]]
+* [[Great Divide]]
+* [[Iceclad Ocean]]
+* [[Kael Drakkel]]
+* [[The Wakening Land]]
+
+| zones_lower =
+
+* [[Eastern Wastes]]
+* [[Great Divide]]
+* [[Iceclad Ocean]]
+* [[Icewell Keep]]
+* [[Kael Drakkel]]
+* [[Thurgadin]]
+
+| quests_raise =
+
+* [[Coldain Ring Quests]]
+* [[Coldain Prayer Shawl Quests]]
+* [[Giant Helmets]]
+* [[The Velium Focus]]
+
+* [[Bard Thurgadin Armor Quests]]
+* [[Cleric Thurgadin Armor Quests]]
+* [[Druid Thurgadin Armor Quests]]
+* [[Enchanter Thurgadin Armor Quests]]
+* [[Magician Thurgadin Armor Quests]]
+* [[Monk Thurgadin Armor Quests]]
+* [[Necromancer Thurgadin Armor Quests]]
+* [[Paladin Thurgadin Armor Quests]]
+* [[Ranger Thurgadin Armor Quests]]
+* [[Rogue Thurgadin Armor Quests]]
+* [[Shaman Thurgadin Armor Quests]]
+* [[Shadowknight Thurgadin Armor Quests]]
+* [[Warrior Thurgadin Armor Quests]]
+* [[Wizard Thurgadin Armor Quests]]
+
+| quests_lower =
+
+* [[Coldain Skulls]]
+* [[Demise of Blizzent]]
+* [[Mechanical Net Delivery]]
+* [[Reinforcements for The Tunarean Regiment]]
+* [[Slaggak's Bounty]]
+* [[Strife to the Coldain]]
+* [[The Family Chest Straps]]
+
+| mobs_raise =
+
+* [[a domesticated direwolf]]  <span class='000'>(Kael Drakkel)</span>
+* [[a drakkel dire wolf]]  <span class='000'>(Great Divide)</span>
+* [[a frost giant]]  <span class='000'>(Eastern Wastes)</span>
+* [[a frost giant berserker]]  <span class='000'>(Kael Drakkel)</span>
+* [[a frost giant captain]]  <span class='000'>(Eastern Wastes)</span>
+* [[a frost giant commoner]]  <span class='000'>(Kael Drakkel)</span>
+* [[a frost giant elite]]  <span class='000'>(Great Divide)</span>
+* [[a frost giant gladiator]]  <span class='000'>(Kael Drakkel)</span>
+* [[a frost giant laborer]]  <span class='000'>(The Wakening Land)</span>
+* [[a Frost Giant Lord]]  <span class='000'>(Kael Drakkel)</span>
+* [[a frost giant savage]]  <span class='000'>(Eastern Wastes)</span>
+* [[a frost giant scout]]  <span class='000'>(Great Divide)</span>
+* [[a frost giant sentinel]]  <span class='000'>(The Wakening Land)</span>
+* [[a frost giant sentry]]  <span class='000'>(The Wakening Land)</span>
+* [[a frost giant trainer]]  <span class='000'>(Kael Drakkel)</span>
+* [[a frost giant wolf tamer]] <span class='000'>(Kael Drakkel - Quest NPC)</span>
+* [[a Kromrif recruiter]] <span class='000'>(Kael Drakkel - Quest NPC)</span>
+* [[A Storm Giant Foreman]]  <span class='000'>(The Wakening Land)</span>
+* [[Adjutant Skjell]]  <span class='000'>(Kael Drakkel)</span>
+* [[an angry commoner]]  <span class='000'>(Kael Drakkel)</span>
+* [[Bekerak Coldbones]] <span class='000'>(Great Divide - Quest NPC)</span>
+* [[Clrakk Blackfist]]  <span class='000'>(Kael Drakkel)</span>
+* [[Fergul Frostsky]]  <span class='000'>(Great Divide)</span>
+* [[Fjloaren Icebane]]  <span class='000'>(Eastern Wastes)</span>
+* [[Frostgiant Overseer]]  <span class='000'>(The Wakening Land)</span>
+* [[Gorul Longshanks]]  <span class='000'>(Great Divide)</span>
+* [[Guard Blaesek]]  <span class='000'>(Kael Drakkel)</span>
+* [[Guard Fjleed]]  <span class='000'>(Kael Drakkel)</span>
+* [[Guard Kkrean]]  <span class='000'>(Kael Drakkel)</span>
+* [[Guard Vydel]]  <span class='000'>(Kael Drakkel)</span>
+* [[Klaggan Iceshard]]  <span class='000'>(Kael Drakkel)</span>
+* [[Korzak Stonehammer]] <span class='000'>(The Wakening Land - Quest NPC)</span>
+* [[kromriff guardsman]]  <span class='000'>(Eastern Wastes)</span>
+* [[Senior Guard Eihorn]]  <span class='000'>(Kael Drakkel)</span>
+* [[Senior Guard Glendir]]  <span class='000'>(Kael Drakkel)</span>
+* [[Senior Guard Grelden]]  <span class='000'>(Kael Drakkel)</span>
+* [[Senior Guard Icemead]]  <span class='000'>(Kael Drakkel)</span>
+* [[Senior Guard Redbones]]  <span class='000'>(Kael Drakkel)</span>
+* [[Watcher Thrensheld]]  <span class='000'>(Kael Drakkel)</span>
+* [[Watcher Zedlek]]  <span class='000'>(Kael Drakkel)</span>
+
+| mobs_lower =
+
+* [[a coldain hunter]] <span class='000'>(Eastern Wastes - NPC, Non-Quest)</span>
+* [[a coldain lookout]] <span class='000'>(Eastern Wastes - Quest NPC)</span>
+* [[a Coldain miner]]  <span class='000'>(Great Divide)</span>
+* [[a coldain missionary]] <span class='000'>(Eastern Wastes - NPC, Non-Quest)</span>
+* [[a coldain skinner]]  <span class='000'>(Eastern Wastes)</span>
+* [[a Coldain tracking wolf]]  <span class='000'>(Great Divide)</span>
+* [[a coldain warrior]] <span class='000'>(Eastern Wastes - NPC, Non-Quest)</span>
+* [[a coldain wolfmaster]] <span class='000'>(Great Divide - NPC, Non-Quest)</span>
+* [[a velium miner]]  <span class='000'>(Great Divide)</span>
+* [[Adia Coldbeard]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[an expedition guard]]  <span class='000'>(Great Divide)</span>
+* [[An Icewell Sentinel]] <span class='000'>(Icewell Keep)</span>
+* [[an injured warrior]]  <span class='000'>(Eastern Wastes)</span>
+* [[Argash]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Betti Frostweaver]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Bixx Bartleby]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Brimgald Brightsteel]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Brina Snowfox]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Brynjar]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Captain Njall]]  <span class='000'>(Thurgadin)</span>
+* [[Captain Stonefist]]  <span class='000'>(Great Divide)</span>
+* [[Celtir Gronback]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Chamberlain Krystorf]]  <span class='000'>(Icewell Keep)</span>
+* [[Clara]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Coldain Outcast]] <span class='000'>(Icewell Keep - Merchant)</span>
+* [[Corbin Blackwell]] <span class='000'>(Eastern Wastes - Quest NPC)</span>
+* [[Councilor Amberfeld]]  <span class='000'>(Icewell Keep)</span>
+* [[Councilor Coldember]]  <span class='000'>(Icewell Keep)</span>
+* [[Councilor Darakor]]  <span class='000'>(Icewell Keep)</span>
+* [[Councilor Darkfrost]]  <span class='000'>(Icewell Keep)</span>
+* [[Councilor Deynekn]]  <span class='000'>(Icewell Keep)</span>
+* [[Councilor Dirkins]]  <span class='000'>(Icewell Keep)</span>
+* [[Councilor Glacierbane]]  <span class='000'>(Icewell Keep)</span>
+* [[Councilor Icelok]]  <span class='000'>(Icewell Keep)</span>
+* [[Councilor Icepike]]  <span class='000'>(Icewell Keep)</span>
+* [[Councilor Thubins]]  <span class='000'>(Icewell Keep)</span>
+* [[Councilor Wintershade]]  <span class='000'>(Icewell Keep)</span>
+* [[Dain Frostreaver IV]]  <span class='000'>(Icewell Keep)</span>
+* [[Darts O`Gavin]] <span class='000'>(Thurgadin - NPC, Non-Quest)</span>
+* [[Deaen Greyforge]] <span class='000'>(Eastern Wastes - Quest NPC)</span>
+* [[Doogle McBanick]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Durgan Bottlenip]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Fogerty Bottlenip]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Frundle Frenkler]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Gage]] <span class='000'>(Thurgadin - Banker)</span>
+* [[Garadain Glacierbane]] <span class='000'>(Eastern Wastes - Quest NPC)</span>
+* [[Garish Ironhelm]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Gilthan Brittleblade]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Grand Historian Thoridain]] <span class='000'>(Thurgadin - Quest NPC)</span>
+* [[Grand Huntsman Darral]]  <span class='000'>(Icewell Keep)</span>
+* [[Guard Audun]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Baldvin]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Bergur]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Bjorn]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Clorn]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Dagur]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Dobbs]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Eirikur]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Elin]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Enre]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Eyvindur]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Fjola]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Gord]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Halldor]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Iris]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Karl]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Kilandur]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Korik]] <span class='000'>(Great Divide)</span>
+* [[Guard Krag]] <span class='000'>(Great Divide)</span>
+* [[Guard Kristrun]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Larus]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Leif]] <span class='000'>(Thurgadin - Quest NPC)</span>
+* [[Guard Mason]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Oskar]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Pert]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Rakel]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Royt]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Sigrun]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Suuna]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Teitur]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Thorbin]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Tinna]]  <span class='000'>(Thurgadin)</span>
+* [[Guard Valdis]]  <span class='000'>(Thurgadin)</span>
+* [[Hakon Brightsteel]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Hulda]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Jeril Kettletop]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Karey]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Klarp Bartleby]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Korf Brokenhammer]]  <span class='000'>(Great Divide)</span>
+* [[Korrigain]] <span class='000'>(Eastern Wastes - Quest NPC)</span>
+* [[Leifur]] <span class='000'>(Thurgadin - Quest NPC)</span>
+* [[Lorekeeper Derrin]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Lorekeeper Einar]]  <span class='000'>(Thurgadin)</span>
+* [[Lorekeeper Taben]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Loremaster Borannin]] <span class='000'>(Thurgadin - Quest NPC)</span>
+* [[Loremaster Dorinan]] <span class='000'>(Thurgadin - Quest NPC)</span>
+* [[Loremaster Fronden]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Loremaster Solstrin]] <span class='000'>(Icewell Keep - Quest NPC)</span>
+* [[Meg Tucter]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Mordin Frostcleaver]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Nimren Stonecutter]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Normon Stonetooth]] <span class='000'>(Thurgadin - Quest NPC)</span>
+* [[Pearce Icefang]]  <span class='000'>(Thurgadin)</span>
+* [[Perkins Doughbeard]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Petcas Coldbeard]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Relik]] <span class='000'>(Great Divide - Quest NPC)</span>
+* [[Rexx Frostweaver]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Royal Guardsman Braxis]]  <span class='000'>(Icewell Keep)</span>
+* [[Royal Guardsman Hauten]]  <span class='000'>(Icewell Keep)</span>
+* [[Royal Guardsman Horix]]  <span class='000'>(Icewell Keep)</span>
+* [[Royal Guardsman Nial]]  <span class='000'>(Icewell Keep)</span>
+* [[Royal Guardsman Raxine]]  <span class='000'>(Icewell Keep)</span>
+* [[Royal Guardsman Rhion]]  <span class='000'>(Icewell Keep)</span>
+* [[Royal Scribe Kaavin]]  <span class='000'>(Icewell Keep)</span>
+* [[Seneschal Aldikar]]  <span class='000'>(Icewell Keep)</span>
+* [[Sentinel Paxin]]  <span class='000'>(Icewell Keep)</span>
+* [[Seril Kettletop]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Talem Tucter]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Tavir]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Tobart Dirkins]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Trademaster Kroven]]  <span class='000'>(Thurgadin)</span>
+* [[Vores the Hunter]]  <span class='000'>(Great Divide)</span>
+* [[Wevil Doughbeard]] <span class='000'>(Thurgadin - Merchant)</span>
+* [[Wolfmaster Finnur]]  <span class='000'>(Thurgadin)</span>
+* [[Zrelik the Scout]] <span class='000'>(Thurgadin - Quest NPC)</span>
+
+}}
+[[Category:Significant Factions]]

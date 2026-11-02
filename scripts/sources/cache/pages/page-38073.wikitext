@@ -1,0 +1,34 @@
+{{Classic Era}}
+{{Factionpage|
+
+| description = Faction of the sphinx in Rathe Mountains. Opposes the [[Zazamoukh (Faction)|Zazamoukh]] faction.
+
+Aligned, or a duplicate of, the [[Ankhefenmut (Faction)]]?
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Rathe Mountains]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[Zazamaharet]]
+* [[Zazamenhu]]
+* [[Zazaphenebti]]
+
+| mobs_lower = 
+
+* [[Ankhetperure]]
+* [[Ankhnesmerira]]
+* [[Ankhesenaten]]
+
+
+}}

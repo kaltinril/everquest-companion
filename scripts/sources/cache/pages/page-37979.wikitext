@@ -1,0 +1,109 @@
+{{Factionpage|
+
+| description = The Sarnaks, a race which was created by the meddling of the Iksar Necromancers are in an ongoing state of war with the [[Legion of Cabilis]] (the Trooper Guards).
+
+They have a fortress at the Lake of Ill Omen, as well as their ancestral home - the city of Chardok - which is within the burning woods. Another closely related faction is the [[Brood of Di`Zok]].
+
+Sarnaks are highly intelligent, and have a strong presence of magic users within their ranks.  
+
+Their warrior classes also tend to have a high magical resistance rate.
+
+Before the Chardok 2.0 patch there was no way to raise this faction.
+
+| zones_raise = 
+* [[Chardok]]
+
+| zones_lower = 
+
+* [[Burning Woods]]
+* [[Chardok]]
+* [[Frontier Mountains]]
+* [[Lake of Ill Omen]]
+* [[The Overthere]]
+
+| quests_raise = 
+* [[Di'Zok Signet of Service Quest]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a chardoki golem]]  <span class='fmz'>(Chardok)</span>
+* [[a chokidai lacerator]]  <span class='fmz'>(Chardok)</span>
+* [[a chokidai mangler]]  <span class='fmz'>(Chardok)</span>
+* [[a Chokidai Sniffer]]  <span class='fmz'>(Chardok)</span>
+* [[a Chokidai Whelp]]  <span class='fmz'>(Chardok)</span>
+* [[a Di`zok Invoker]]  <span class='fmz'>(Chardok)</span>
+* [[a Di`Zok Partisan]]  <span class='fmz'>(Chardok)</span>
+* [[a Di`zok Recruit]]  <span class='fmz'>(Chardok)</span>
+* [[a Di`zok Underling]]  <span class='fmz'>(Chardok)</span>
+* [[a Sarnak adherant]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[A Sarnak Arbiter]]  <span class='fmz'>(Chardok)</span>
+* [[A Sarnak Assassin]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a sarnak avenger]]  <span class='fmz'>(Burning Woods)</span>
+* [[a Sarnak berserker]]  <span class='fmz'>(The Overthere)</span>
+* [[a Sarnak broodling]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a sarnak champion]]  <span class='fmz'>(Burning Woods)</span>
+* [[a Sarnak conscript]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a Sarnak courier]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a Sarnak dragoon]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a Sarnak enthusiast]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a sarnak extremist]]  <span class='fmz'>(Burning Woods)</span>
+* [[a Sarnak flunkie]]  <span class='fmz'>(The Overthere)</span>
+* [[a Sarnak gem oracle]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a Sarnak hatchling]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a sarnak janissary]]  <span class='fmz'>(Chardok)</span>
+* [[a sarnak knight]]  <span class='fmz'>(Burning Woods)</span>
+* [[a Sarnak legionnaire]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[A Sarnak Mystic]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a sarnak partisan]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a Sarnak recruit]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a Sarnak revenant]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[A sarnak scavenger]] <span class='fmz'>(Frontier Mountains)</span>
+* [[A Sarnak Vindicator]]  <span class='fmz'>(Chardok)</span>
+* [[A Sarnak Warlord]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a Sarnak youth]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a sarnak zealot]]  <span class='fmz'>(Burning Woods)</span>
+* [[an Ancient Guardian]]  <span class='fmz'>(Chardok)</span>
+* [[an iksar betrayer]]  <span class='fmz'>(Chardok)</span>
+* [[An Iksar Trustee]]  <span class='fmz'>(Chardok)</span>
+* [[Arch Inspector Nibi`zi]]  <span class='fmz'>(Chardok)</span>
+* [[Battle Master Ska`tu]]  <span class='fmz'>(Chardok)</span>
+* [[Captain Di`ouz]]  <span class='fmz'>(Chardok)</span>
+* [[Chancellor of Di`Zok]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[Clazxiss]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[Deathfang]]  <span class='fmz'>(Chardok)</span>
+* [[Di`zok royal guard]]  <span class='fmz'>(Chardok)</span>
+* [[Draketamer]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[Drill Master Dih`roul]]  <span class='fmz'>(Chardok)</span>
+* [[Foreman Ku`lul]]  <span class='fmz'>(Chardok)</span>
+* [[Foreman Mirt`akk]]  <span class='fmz'>(Chardok)</span>
+* [[Grand Herbalist Mak`ha]]  <span class='fmz'>(Chardok)</span>
+* [[Grave Master Zo`lun]]  <span class='fmz'>(Chardok)</span>
+* [[Herald Telcha]] <span class='fmz'>(Chardok)</span>
+* [[Interrogator Gi`mok]]  <span class='fmz'>(Chardok)</span>
+* [[judicator of Di`zok]]  <span class='fmz'>(Chardok)</span>
+* [[Kennel Master Al`ele]]  <span class='fmz'>(Chardok)</span>
+* [[Korasal Klyseer]]  <span class='fmz'>(Burning Woods)</span>
+* [[Korocust]]  <span class='fmz'>(Chardok)</span>
+* [[Korucust`s Courier]]  <span class='fmz'>(Chardok)</span>
+* [[Observer Aq`touz]]  <span class='fmz'>(Chardok)</span>
+* [[Overking Bathezid]]  <span class='fmz'>(Chardok)</span>
+* [[Overseer Dal`guur]]  <span class='fmz'>(Chardok)</span>
+* [[Prince Selrach Di`zok]]  <span class='fmz'>(Chardok)</span>
+* [[Queen Velazul Di`zok]]  <span class='fmz'>(Chardok)</span>
+* [[Royal Sarnak Herbalist]]  <span class='fmz'>(Chardok)</span>
+* [[Sarnak Collective Auditor]]  <span class='fmz'>(Chardok)</span>
+* [[Sarnak crypt raider]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[Slithinis]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[sorcerer of Di`zok]]  <span class='fmz'>(Chardok)</span>
+* [[The Bridge Keeper]]  <span class='fmz'>(Chardok)</span>
+* [[Underboss Myli`ki]]  <span class='fmz'>(Chardok)</span>
+* [[Watch Captain Hir`roul]]  <span class='fmz'>(Chardok)</span>
+* [[Watch Sergeant Riz`oul]]  <span class='fmz'>(Chardok)</span>
+
+}}

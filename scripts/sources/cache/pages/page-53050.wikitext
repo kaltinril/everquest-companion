@@ -1,0 +1,396 @@
+{{Cleanup Needed}}
+
+This page is a list of the default zone wide respawn timers. Note that many exceptions occur in each zone. All times are listed in HH:MM:SS unless otherwise noted.
+<br>
+Keep in mind for regions of the planet earth practicing '''daylight savings''' that these times are relative to the ToD of a mob (ie mobs dont speed up by an hour when an hour is gained, or take an hour longer when lost)
+<br>
+1 in game hour = 3 real minutes<br>
+Night time is 8pm - 6am in game
+<br><br>
+
+<table cellspacing=5 cellpadding=3 style="border: 1px solid #dddddd;" width=90% align="left">
+<tr> 
+          <th align=center colspan="4" bgcolor="#cedff2" style="border: 1px solid gray"><span id="Antonica"></span>Antonica
+
+</tr>        
+
+        <tr> 
+          <td colspan="1" valign="top"> 
+
+            <p><b>Outdoors</b></p>
+
+{| class="eoTable3 sortable"
+! Zone || Time
+|-
+| [[The Arena]] || N/A (no NPCs)
+|-
+| [[Beholder's Maze|Beholder's Maze (Gorge of King Xorbb)]]  || 6:00
+
+|-
+| [[East Commonlands]] || 6:40
+|-
+| [[Eastern Plains of Karana|Eastern Karana]] || 6:40
+|-
+| [[Erud's Crossing]] || 6:40
+|-
+| [[Everfrost Peaks]] || 6:40
+|-
+| [[Highpass Hold]] || 5:00 (Mucktail Gnolls/Shralok Orcs); 22:00 (named)
+|- 
+| [[Innothule Swamp]] || 6:40
+|-
+| [[Kithicor Forest]] || 6:40
+|-
+| [[Lake Rathetear]] || 6:40
+|-
+| [[Lavastorm Mountains]] || 6:40
+|-
+| [[Misty Thicket]] || 6:40 (Wall Guards ~20:00)
+|-
+| [[Nektulos Forest]] || 6:40
+|-
+| [[Northern Desert of Ro]] || 6:40
+|-
+| [[Northern Plains of Karana|Northern Karana]] || 6:40
+|-
+| [[Oasis of Marr]] || 16:30
+|-
+| [[Ocean of Tears]] || 6:00
+|-
+| [[Qeynos Hills]] || 6:40
+|-
+| [[Rathe Mountains]] || 6:40
+|-
+| [[Southern Desert of Ro]] || 6:40
+|-
+| [[Southern Karana]] || 6:00
+|-
+| [[The Feerrott]] || 6:40
+|-
+| [[West Commonlands]] || 6:40
+|-
+| [[Western Plains of Karana|Western Karana]] || 6:40
+|}
+</td>
+
+          <td colspan="1"> 
+
+            <p><b>Cities</b></p>
+
+{| class="eoTable3 sortable"
+! Zone || Time
+|-
+| [[Grobb]] || 24:00
+|-
+| [[Halas]] || 24:00
+|-
+| [[Neriak]] || 24:00
+|-
+| [[Freeport]] || 24:00
+|-
+| [[Qeynos]] || 6:40
+|-
+| [[Oggok]] || 24:00
+|-
+| [[Rivervale]] || 22:00
+|-
+| [[Surefall Glade]] || 6:40
+|}
+
+<br>
+
+ <p><b>Dungeons</b></p>
+
+{| class="eoTable3 sortable"
+! Zone || Time
+|-
+| [[Befallen]] || 19:00
+|-
+| [[Blackburrow]] || 22:00
+|-
+| [[Cazic Thule]] || 22:00
+|-
+| [[Clan Runnyeye]] || 22:00
+|-
+| [[High Keep]] || 10:00 (Goblins) 18:00 (Main Floor Guards) 24:00 (Entrance Guards) 6:00 (Nobles) 18:00 (Bards)
+|-
+| [[Lower Guk]] || 9:27
+|-
+| [[Nagafen's Lair|Nagafen's Lair (Sol B)]] || 8:50
+|-
+| [[Najena]] || 18:30
+|-
+| [[Permafrost]] || 22:00
+|-
+| [[Qeynos Catacombs]] || 12:00 (Argyn Shieldstan) 24:00 (Spectres)
+|-
+| [[Solusek's Eye|Solusek's Eye (Sol A)]] || 18:00
+|-
+| [[Splitpaw Lair]] || 22:00 (Gnolls) 28:00 (The Ishva Mal / An Ishva Lteth gnoll)
+|-
+| [[The Temple of Solusek Ro]] || 5:00 (Rough estimate)
+|-
+| [[Upper Guk]] || 8:00
+|}
+
+</td>
+</tr>
+
+<tr> 
+          <th align=center colspan="4" bgcolor="#cedff2" style="border: 1px solid gray;"><span id="Odus"><span id="Faydwer"></span></span>Odus & Faydwer
+</th>
+        </tr>
+
+        <tr> 
+          <td height="72" valign="top" colspan="1"> 
+            <p><b>Odus Cities</b></p>
+
+{| class="eoTable3 sortable"
+! Zone || Time
+|-
+| [[Erudin]] || 6:40 (Sharks)
+|-
+| [[Erudin|Erudin Palace]] || 25:00
+|-
+| [[Paineel]] || 10:30
+|}
+
+            <p><b>Odus Outdoors / Dungeons</b></p>
+
+{| class="eoTable3 sortable"
+! Zone || Time
+|-
+| [[Erud's Crossing]] || 6:40
+|-
+| [[Kerra Island]] || 17:45
+|-
+| [[Toxxulia Forest]] || 6:40
+|-
+| [[The Hole]] || 7:48
+|-
+| [[Stonebrunt Mountains]] || 11:10
+|-
+| [[The Warrens]] || 6:40
+|}
+
+          </td>
+
+          <td height="72" valign="middle" colspan="1"> 
+            <p><b>Faydwer Cities</b></p>
+
+{| class="eoTable3 sortable"
+! Zone || Time
+|-
+| [[Ak'Anon]] || 6:40
+|-
+| [[Felwithe]] || 24:00
+|-
+| [[Kaladim]] || 6:40
+|-
+| [[Kelethin|Kelethin (Greater Faydark)]] || MM:SS
+|}
+
+            <p><b>Faydwer Outdoors / Dungeons</b></p>
+
+{| class="eoTable3 sortable"
+! Zone || Time
+|-
+| [[Butcherblock Mountains]] || 10:00 / 14:00 / 22:00
+|-
+| [[Dagnor's Cauldron]] || MM:SS
+|-
+| [[Greater Faydark]] || 7:05
+|-
+| [[Lesser Faydark]] || 6:30
+|-
+| [[Ocean of Tears]] || 6:00
+|-
+| [[Steamfont Mountains]] || 6:40
+|-
+| [[Crushbone]] || 9:00
+|-
+| [[Kedge Keep]] || 22:00
+|-
+| [[Mistmoore Castle]] || 22:00 *
+|-
+| [[The Estate of Unrest]] || 22:00
+|}
+* Mistmoore castle has both 6AM/8PM respawns for vampires which reset the timer
+
+ <tr> 
+          <th align=center colspan="4" bgcolor="#cedff2" style="border: 1px solid gray;"><span id="Kunark"></span> Kunark
+ </th>
+
+        </tr>
+
+        <tr> 
+
+          <td colspan="1" valign="top"> 
+
+            <p><b>Outdoors</b></p>
+
+{| class="eoTable3 sortable"
+! Zone || Time
+|-
+| [[Burning Wood]] || 6:40
+|-
+| [[Dreadlands]] || 6:40
+|-
+| [[Emerald Jungle]] || MM:SS
+|-
+| [[Field of Bone]] || 6:40
+|-
+| [[Firiona Vie]] || 6:40
+|-
+| [[Frontier Mountains]] || 6:40
+|-
+| [[Lake of Ill Omen]] || 6:40
+|-
+| [[The Overthere]] || 6:40
+|-
+| [[Skyfire Mountains]] || 13:00
+|-
+| [[Swamp of No Hope]] || 6:40
+|-
+| [[Timorous Deep]] || 12:00
+|-
+| [[Trakanon's Teeth]] || 6:40
+|-
+| [[Warsliks Woods]] || 6:40
+|}
+          </td>
+
+          <td colspan="1"> 
+
+            <p><b>Cities</b></p>
+{| class="eoTable3 sortable"
+! Zone || Time
+|-
+| [[Cabilis]] || 6:40
+|}
+
+
+            <p><b>Dungeons</b></p>
+{| class="eoTable3 sortable"
+! Zone || Time
+|-
+| [[Chardok]] || 18:00
+|-
+| [[City of Mist]] || 22:00 (CoM is actually an outdoor zone)
+|-
+| [[Dalnir]] || 12:00
+|-
+| [[Howling Stones|Howling Stones (Charasis)]] || 20:30
+|-
+| [[Kaesora]] || 18:00
+|-
+| [[Karnor's Castle]] || 27:00
+|-
+| [[Kurn's Tower]] || 18:20
+|-
+| [[Mines of Nurga]] || 20:30
+|-
+| [[Old Sebilis]] || 27:00
+|-
+| [[Temple of Droga]] || 20:30
+|-
+| [[Veeshan's Peak]] || MM:SS
+|}
+
+          </td>
+        </tr>
+
+        <tr> 
+            <th  align=center colspan="4" bgcolor="#cedff2" style="border: 1px solid gray;"><span id="Velious"></span> Velious
+ </th>
+
+        </tr>
+
+        <tr> 
+
+          <td  colspan="1" valign="top"> 
+
+            <p><b>Outdoors</b></p>
+{| class="eoTable3 sortable"
+! Zone || Time
+|-
+| [[Cobalt Scar]] || 20:00
+|-
+| [[Eastern Wastes]] || 6:40
+|-
+| [[The Great Divide]] || 10:40
+|-
+| [[Iceclad Ocean]] || 6:40
+|-
+| [[Wakening Land]] || 6:40, 7:00 (Faerie Dragons), 14:30 (Tar Goos, Sifaye), 14:30 (Suits)
+|-
+| [[Western Wastes]] || MM:SS
+|}
+
+          </td>
+
+          <td  colspan="1" > 
+
+            <p><b>Cities</b></p>
+{| class="eoTable3 sortable"
+! Zone || Time
+|-
+| [[Icewell Keep]] || 21:00
+|-
+| [[Kael Drakkal]] || 28:00
+|-
+| [[Skyshrine]] || 30:00
+|-
+| [[Thurgadin]] || 7:00
+|}
+
+
+            <p><b>Dungeons</b></p>
+{| class="eoTable3 sortable"
+! Zone || Time
+|-
+| [[Crystal Caverns]] || 14:45
+|-
+| [[Dragon Necropolis]] || 27:00
+|-
+| [[Siren's Grotto]] || 28:00
+|-
+| [[Sleeper's Tomb]] || 8:00:00
+|-
+| [[Temple of Veeshan]] || 72:00
+|-
+| [[Tower of Frozen Shadow]] || 20:00
+|-
+| [[Velketor's Labyrinth]] || 32:50
+|}
+
+          </td>
+        </tr>
+
+        <tr> 
+          <th align=center colspan=4 bgcolor="#cedff2" style="border: 1px solid gray;"><span id="Planes"></span> Planes
+ </th>
+        </tr>
+        <tr> 
+          <td colspan=4 valign="top"> 
+
+{| class="eoTable3 sortable"
+! Zone || Time
+|-
+| [[Plane of Fear]] || 8:00:00
+|-
+| [[Plane of Hate]] || 8:00:00
+|-
+| [[Plane of Sky]] || 8:00:00
+|-
+| [[Plane of Growth]] || 12:00:00
+|-
+| [[Plane of Mischief]] || 01:10:10
+|}
+
+          </td>
+        </tr>
+
+      </table>
+
+[[Category:Technical]]

@@ -1,0 +1,20 @@
+Taunting can trick an enemy into focusing on you, rather than other party members who may be more susceptible to damage and death.
+
+Each taunt has a small chance of moving the taunting player to the top of the aggro list. A successful taunt will, thus, cause the mob to turn its attention towards that player. However this also means that ''taunting a mob which is already attacking you has no effect'' - i.e., it doesn't increase your amount of aggro. Follow up with a [[Kick]], [[Bash]] or [[Slam]] after taunting to secure your new aggro position.
+
+The success rate of Taunt is quite low, especially against targets which are higher level than the tank, and against any target when the tank is lower level. For Warriors, the most reliable source of hate generation is generally white dps.
+
+When most humanoid NPCs are successfully taunted, they publicly emote "I'll teach you to interfere with me %t." If an NPC is a non-humanoid, or if the taunt is unsuccessful, then they won't say anything.
+
+Taunt is '''not''' recommended for controlling [[wife aggro]].
+
+== Classes ==
+
+* [[Warrior]] (Max 200) (Oct 8, 2001 (Max 230 at lvl 60))
+* [[Shadow Knight]] (Max 180) (Oct 8, 2001 (Max 220)) 
+* [[Paladin]] (Max 180) (Oct 8, 2001 (Max 220)) 
+* [[Ranger]] (Max 150)
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

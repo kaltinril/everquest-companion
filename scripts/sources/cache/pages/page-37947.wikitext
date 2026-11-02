@@ -1,0 +1,54 @@
+{{Factionpage|
+
+| description = [[Cleric]] Guild in Rivervale.
+
+A recent Everquest Legends unique change makes all Pickclaw and Runnyeye Goblins give +5 faction on kill. ((WILL UPDATE MOD LIST IN NEAR FUTURE))
+
+| zones_raise =* [[Misty Thicket]]
+* [[RunnyEye]]
+* [[Gorge of King Xorbb]] 
+
+
+| zones_lower = 
+
+* [[Rivervale]]
+
+| quests_raise = 
+
+* [[Cleric Supplies]]
+* [[The Acolyte]]
+
+| quests_lower = 
+
+
+| mobs_raise =* [[a goblin peon]]
+* [[a goblin neophyte]]
+* [[a goblin scavenger]]
+* [[a goblin trainee]]
+* [[a goblin runt]]
+* [[a goblin lookout]]
+* [[a goblin sentry]]
+* [[A Pickclaw Bladestopper]]
+* [[A Pickclaw Arroweater]]
+* [[A Pickclaw Mindripper]]
+* [[A Pickclaw Thoughtshaper]]
+* [[A Pickclaw bonemender]]
+* [[Goblin Janitor]]
+* [[A Pickclaw Foeseeker]]
+* [[A Pickclaw Crusader]]
+* [[A Pickclaw Foechopper]]
+* [[A Pickclaw Zekspeaker]]
+* [[A Pickclaw Foeslicer]]
+* [[A Pickclaw Destroyer]]
+* [[Battlelord Paluk]]
+* [[Lord Pickclaw]]
+* [[Battlewizard Unak]] 
+
+
+| mobs_lower = 
+
+* [[Thekela Meepup]] <span class='fmz'>(Rivervale - Cleric Guildmaster)</span>
+
+}}
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

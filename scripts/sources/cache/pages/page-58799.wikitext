@@ -1,0 +1,65 @@
+{{Classic Era}}
+<div style="display: flex;">
+  <div style="flex: 1;">
+    <ul>
+    <li>Summoning Spell: [[Leering Corpse]]</li>
+    <li>Pet Type: Chilled Bones Skeleton</li>
+    <li>Pet Classes: [[Shadow Knight]] / [[Warrior]]</li>
+    <li>Pet Level: 5</li>
+    <li>Hit Points: 168 (+1/tick)</li>
+    <li>Mana: 100 (+10/tick)</li>
+    </ul>
+  </div>
+  <div style="flex: 1;">
+  [[File:medium_chill_bones_summon.png|left|x175px]]
+  </div>
+</div>
+<div style="display: flex;">
+  <div style="flex: 1;">
+    <ul>
+    <li>Defensive Stats</li>
+       <ul>
+       <li>Mitigation: 12</li>
+       <li>Evasion: 66</li>
+       </ul>
+    </ul>
+    <ul>
+    <li>Offensive Stats</li>
+       <ul>
+       <li>Offense: 34</li>
+       <li>Accuracy: 50</li>
+       <li>Max Damage: 14</li>
+       <li>Dual Wield: 8%</li>
+       </ul>
+     </ul>
+  </div>
+  <div style="flex: 1;">
+    <ul><li>Strength: 89</li>
+    <li>Stamina: 89</li>
+    <li>Intelligence: 10</li>
+    <li>Wisdom: 10</li>
+    <li>Agility: 89</li>
+    <li>Dexterity: 85</li>
+    <li>Charisma: 8</li></ul>
+  </div>
+</div>
+
+== Abilities ==
+* [[Skill_Cleave|Cleave]]
+* [[Skill_Dodge|Dodge]]
+* [[Skill_Double_Attack|Double Attack]]
+* [[Skill_Harm_Touch|Harm Touch]]
+* [[Skill_Taunt|Taunt]]
+
+== Spell List ==
+* [[Disease Cloud|<span class='itemeff'>Disease Cloud</span>]]
+* [[Lifetap|<span class='itemeff'>Lifetap</span>]]
+== Focus Items ==
+* None
+
+== Notes ==
+* None
+
+[[Category: Summoned Pet]]
+[[Category: Necromancer Pet]]
+[[Category: Shadow Knight Pet]]

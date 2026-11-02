@@ -1,0 +1,149 @@
+{{Factionpage|
+
+| description = [[Opal Darkbriar]] is perhaps one of the strangest oddities in Norrath. According to the tabletop RPG, she is a dark elf cleric guildmaster in East Freeport who uses an artifact to pose as a high elf wizard guildmaster in West Freeport. The artifact affects her mind if she uses it for too long, making her faction alliances tend more toward the high elf version.
+
+| zones_raise = 
+
+* [[High Keep]]
+* [[Lake Rathetear]]
+* [[Qeynos Hills]]
+* [[Qeynos|South Qeynos]]
+* [[Freeport|West Freeport]]
+* [[Western Plains of Karana]]
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Freeport|East Freeport]]
+* [[High Keep]]
+* [[Qeynos Aqueducts]]
+* [[Qeynos Hills]]
+* [[Southern Karana]]
+* [[Surefall Glade]]
+
+| quests_raise = 
+
+* [[Assist the Great Xelha]]
+* [[Drosco the Zombie (evil)]]
+* [[Gharin's Note (evil)]]
+* [[Groflah Steadirt's Death]]
+* [[Hurrieta's Tunic Quest]]
+* [[Message Intercept]]
+* [[The Bridge]]
+* [[The Clothspinner Sisters (evil)]]
+* [[Trumpy's Head]]
+* [[Trumpy's Skull]]
+* [[Xelha's Cyclops Eye]]
+
+| quests_lower = 
+
+* [[Bat Fur Quest]]
+* [[Blank Scrolls]]
+* [[Drosco the Zombie (evil)]]
+* [[Drosco the Zombie (good)]]
+* [[Illegible Cantrip Quest]]
+* [[Qeynos Badge Quests|Interrogator's Badge (Badge #2)]]
+* [[Journal Strongbox]]
+* [[Lydl Mastat]]
+* [[Merona's Brother]]
+* [[Note to Neclo Quest]]
+* [[Qeynos Badge Quests|Qeynos Badge of Honor (Badge #4)]]
+* [[Rat Ear Pie Quest]]
+* [[Unser's Call]]
+
+| mobs_raise = 
+
+* [[Atvo Siro]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Besklor Tyrenson]] <span class='fmz'>(West Freeport - Quest NPC)</span>
+* [[Chardo Ahdelia]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Charia Betou]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Cronte Deloru]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Cyanelle]] <span class='fmz'>(Lake Rathetear - NPC, Non-Quest)</span>
+* [[Dooly Jonkers]] <span class='fmz'>(West Freeport - NPC, Non-Quest)</span>
+* [[Dulia Jestes]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Eldreth]] <span class='fmz'>(Lake Rathetear - Quest NPC)</span>
+* [[Glyssa Sonshaw]] <span class='fmz'>(West Freeport - Quest NPC)</span>
+* [[Hemia Skemner]] <span class='fmz'>(West Freeport - Quest NPC)</span>
+* [[Jarel Ranin]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Jonbe Kressi]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Kazlo Naedra]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[Lasiris Oncre]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Lorme Tredore]] <span class='fmz'>(West Freeport - Magician Guildmaster)</span>
+* [[Lynce Renardo]] <span class='fmz'>(West Freeport - NPC, Non-Quest)</span>
+* [[Lysa Truegreen]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Lysin Smokkan]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Mirpa Arana]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Monat D`Larme]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Neclo Rheslar]]  <span class='fmz'>(Qeynos Hills)</span>
+* [[Nusk Treton]] <span class='fmz'>(West Freeport - NPC, Non-Quest)</span>
+* [[Odemi Partun]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Palon Deskeb]] <span class='fmz'>(West Freeport - Quest NPC)</span>
+* [[Purchin Oddsbot]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Ran Flamespinner]] <span class='fmz'>(High Keep - Wizard Guildmaster)</span>
+* [[Remon Zarga]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Rephas]] <span class='fmz'>(Qeynos Hills - Quest NPC)</span>
+* [[Respin Yawg]] <span class='fmz'>(West Freeport - NPC, Non-Quest)</span>
+* [[Romiak Jusathorn]] <span class='fmz'>(West Freeport - Quest NPC)</span>
+* [[Tara Neklene]] <span class='fmz'>(West Freeport - Magician Guildmaster)</span>
+* [[Tharma Jaremi]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Trepo Merrop]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Voglan Dransed]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Xinari Anara]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Yarina Zarampo]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Zasrin Blueflame]] <span class='fmz'>(West Freeport - Merchant)</span>
+
+| mobs_lower = 
+
+* [[a necromancer]]  <span class='fmz'>(Qeynos Catacombs)</span>
+* [[a rotting sentry]]  <span class='fmz'>(Qeynos Catacombs)</span>
+* [[Ainla Yurimar]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Argyn Shieldstan]] <span class='fmz'>(Qeynos Catacombs - NPC, Non-Quest)</span>
+* [[Brek Stolrus]] <span class='fmz'>(East Freeport - Cleric Guildmaster)</span>
+* [[Bruax Grengar]] <span class='fmz'>(Qeynos Catacombs - Necromancer Guildmaster)</span>
+* [[Brutol Rhaksen]] <span class='fmz'>(East Freeport - Warrior Guildmaster)</span>
+* [[Celanie Xtoria]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Commander Kane]] <span class='fmz'>(Qeynos Catacombs - Warrior Guildmaster)</span>
+* [[Dallisen Xalladyr]] <span class='fmz'>(Qeynos Catacombs - Merchant)</span>
+* [[Dranot Harbin]] <span class='fmz'>(Qeynos Catacombs - Merchant)</span>
+* [[Driana Poxsbourne]]  <span class='fmz'>(East Freeport)</span>
+* [[Garuc Anehm]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Gunex Eklar]] <span class='fmz'>(East Freeport - Shadowknight Guildmaster)</span>
+* [[Heneva Jexsped]] <span class='fmz'>(East Freeport - Magician Guildmaster)</span>
+* [[Hundle Quatvel]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Itzia Vunpe]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Jak Sindin]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Konious Eranon]] <span class='fmz'>(East Freeport - Enchanter Guildmaster)</span>
+* [[Kurne Rextula]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Lydl the Great]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Lyris Moonbane]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Mheno Raveus]] <span class='fmz'>(East Freeport - Necromancer Guildmaster)</span>
+* [[Mika Fugas]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Netuk Phenzon]] <span class='fmz'>(East Freeport - Shadowknight Guildmaster)</span>
+* [[Nexvok Thirod]] <span class='fmz'>(East Freeport - Wizard Guildmaster)</span>
+* [[Nulima Opalis]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Opal Darkbriar]] <span class='fmz'>(East Freeport - Cleric Guildmaster)</span>
+* [[Peku Croxe]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Perkon Malok]] <span class='fmz'>(Qeynos Catacombs - NPC, Non-Quest)</span>
+* [[Pietro Zarn]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Prasen Rusgor]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Pyzjn]]  <span class='fmz'>(Qeynos Hills)</span>
+* [[Raltur Caliskon]] <span class='fmz'>(East Freeport - Shadowknight Guildmaster)</span>
+* [[Reania Jukle]] <span class='fmz'>(Qeynos Catacombs - Enchanter Guildmaster)</span>
+* [[Rocthar Bekesna]] <span class='fmz'>(Qeynos Catacombs - Warrior Guildmaster)</span>
+* [[Senst Ereek]] <span class='fmz'>(Qeynos Catacombs - Merchant)</span>
+* [[Sermio Capret]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Sragg Bloodheart]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Tagus Wunne]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Teydar]] <span class='fmz'>(Qeynos Catacombs - Shadowknight Guildmaster)</span>
+* [[Thuzin Kaver]] <span class='fmz'>(East Freeport - Necromancer Guildmaster)</span>
+* [[Tovax Vmar]] <span class='fmz'>(Qeynos Hills - Quest NPC)</span>
+* [[Venox Tarkog]] <span class='fmz'>(East Freeport - Cleric Guildmaster)</span>
+* [[Vesagar Nekio]] <span class='fmz'>(East Freeport - Cleric Guildmaster)</span>
+* [[Vidurlyn Aeminee]] <span class='fmz'>(Qeynos Catacombs - Merchant)</span>
+* [[Xelha Nevagon]] <span class='fmz'>(East Freeport - Necromancer Guildmaster)</span>
+* [[Zaen Kalystir]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Zhem Xecia]] <span class='fmz'>(East Freeport - Cleric Guildmaster)</span>
+
+}}
+= Suggested Route =
+*[[Assist the Great Xelha]] with [[Bone Chips]] or [[Spiderling Silk]] (+[[Dismal Rage]], +[[Opal Dark Briar]], -[[Knights of Truth]])

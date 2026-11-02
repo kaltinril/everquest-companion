@@ -1,0 +1,63 @@
+{{Factionpage|
+
+| description = The faction of [[Iksar]] [[Shadow Knight]]s.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Cabilis|East Cabilis]]
+* [[Field of Bone]]
+* [[Firiona Vie]]
+* [[Lake of Ill Omen]]
+* [[Swamp of No Hope]]
+* [[Warsliks Woods]]
+
+| quests_raise = 
+
+* [[Blood Ink]]
+* [[Bone Chips (Cabilis)]]
+* [[Crusader's Tests|Crusader's Test of Betrayal (#5)]]
+* [[Crusader's Tests|Crusader's Test of Pain (#2)]]
+* [[Crusader's Tests|Crusader's Test of Suffering (#3)]]
+* [[Crusader's Tests|Crusader's Test of the Hero (#6)]]
+* [[Crusader's Tests|Crusader's Test of the Pawn (#1)]]
+* [[Crusader's Tests|Crusader's Test of the Zealot (#4)]]
+* [[Curscale Shield]]
+* [[Frogloc Tad Tongues]]
+* [[Geozite Tool Quest]]
+* [[Granite Pebbles]]
+* [[Illweed Parchment Quest]]
+* [[Legion Lager Quest]]
+* [[Marauder Armor]]
+* [[Sarnak Hatchling Brains]]
+* [[Scorpion Pincers]]
+* [[The Restraining Order]]
+* [[Warrior Pike Quests|Warrior Pike #1 (Militia Pike)]]
+* [[Warrior Pike Quests|Warrior Pike #2 (Footman's Pike)]]
+* [[Warrior Pike Quests|Warrior Pike #4 (Trooper's Pike)]]
+* [[Watcher Torches]]
+
+| quests_lower = 
+* [[Iksar Prisoner Quest]]
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Arch Duke Xog]] <span class='fmz'>(East Cabilis - Shadowknight Guildmaster)</span>
+* [[Captain Gideen]] <span class='fmz'>(Warsliks Wood)</span>
+* [[Captain Nedar]] <span class='fmz'>(Swamp of No Hope)</span>
+* [[Lord Gikzic]] <span class='fmz'>(East Cabilis - Quest NPC)</span>
+* [[Lord Korzin]] <span class='fmz'>(East Cabilis - Quest NPC)</span>
+* [[Lord Qyzar]] <span class='fmz'>(East Cabilis - Quest NPC)</span>
+* [[Trooper Taer]] <span class='fmz'>(Field of Bone)</span>
+* [[Vekis]] <span class='fmz'>(Firiona Vie - Quest NPC)</span>
+* [[Vessel Drozlin]] <span class='fmz'>(East Cabilis - Quest NPC)</span>
+* [[Warlord Hikyg]] <span class='fmz'>(Swamp of No Hope)</span>
+* [[Warlord Zyzz]] <span class='fmz'>(Field of Bone)</span>
+
+}}
+[[Category:Significant Factions]]

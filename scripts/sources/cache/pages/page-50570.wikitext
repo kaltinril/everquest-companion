@@ -1,0 +1,38 @@
+[[File:NakedHEF.jpg|right]]
+__NOTOC__
+ As Human-Elf hybrids, Half Elves share the prominent physical features of both races. <br>Their intellect is a notch above most other races, though they suffer a lack of strength as compared to the other Norrathian races. 
+ - EverQuest manual
+==Description==
+The mix of Elf and [[Human]] is a common tale. Many stories of romance between these two races can be heard around Norrath. As a result, Half Elves are taller than their Elven ancestors and carry some of the strength of their human bloodlines. They have slightly harsher features than Elves, but the mix still makes them pleasant to lay eyes upon.
+
+Unfortunately, the children of these forbidden romances are often shunned, becoming victims of prejudice by Humans and Elves alike. Most Half Elves are unaffected by the discrimination and retain a pleasant manner. Usually, Half Elves will develop a very close and trusted group of friends that act as a surrogate family.
+
+The difficult lives of the Half Elves and their lack of ties to any one place make them adept travelers and exceptional friends and storytellers. Sadly, some Half Elves become embittered by the constant difficulty of finding a place in the world and choose a path of thievery. The Half Elves are on amicable terms with most races in Norrath, but have no affection for the evil races.
+
+While Half Elves can be seen in many areas of the world, they are primarily found in the Wood Elf city of Kelethin and within the Surefall Glade.
+
+==Basic Information==
+*<b>[[Faction Alignment|Faction Alignment:]]</b> Neutral
+*<b>Racial(s):</b> Infravision
+*<b>Starting Cities:</b> [[Freeport]], [[Kelethin]], [[Surefall Glade]], [[Qeynos]], [[Felwithe]]
+*<b>Primary Class Choices:</b> [[Bard]], [[Druid]], [[Paladin]], [[Ranger]], [[Rogue]], [[Warrior]]
+
+==Base Stats==
+{| class="eoTable2" style="text-align:left"
+|-
+! STR !! STA !! AGI !! DEX !! WIS !! INT !! CHA
+|-
+|| 70 || 70 || 90 || 85 || 60 || 75 || 75
+|}
+
+==Infravision==
+Slightly improved night vision, not as good as the [[Dark Elf|Dark Elf]]'s [[Character Races#Ultravision|Ultravision]].
+
+== Unlock Conditions ==
+
+* Unlock [[Human]] or [[Wood Elf]] as a race
+
+
+{{Navbox Race}}
+
+[[Category:Character Races]]

@@ -1,0 +1,14 @@
+{{Disambig3|the potion effect, [[Flurry]]}}
+
+Flurry is a special, uncommon NPC ability performed by certain raid targets in [[Velious]]. A flurry randomly occurs on melee attacks which causes the NPC to do additional melee attacks (similar to a double attack, but a double attack can also cause a flurry).
+
+Flurries serve to complicate hard-hitting monster fights by adding an incredible amount of random spike damage which healers will need to plan for. On the most dangerous raid targets a flurry can deal so much damage that it's effectively a melee-range death touch when it occurs. Considering flurries have no cooldown this can turn a routine fight into a desperate struggle in a matter of seconds.
+
+Guilds who go after these targets who flurry should make detailed contingency plans for bringing in a new tank quickly, getting CH chains switched to them, and getting their hate up. This takes incredible attention, coordination and cooperation to avert the deaths of melee DPS.
+
+''See also:'' [[Rampage (NPC Ability)]], [[Enrage]], [[Summon]], [[NTOV Flurries]], [[Tunare (God)]], [[The Avatar of War]], [[Sontalak]], [[Vaniki]]
+
+
+[[Category:Guides]]
+[[Category:Technical]]
+[[Category:Game Mechanics]]

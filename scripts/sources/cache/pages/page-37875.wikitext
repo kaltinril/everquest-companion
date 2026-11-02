@@ -1,0 +1,154 @@
+{{Factionpage|
+
+| description = This faction covers the bards across [[Antonica]], they are known for delivering mail, and being sought after by [[Mayong Mistmoore]] himself.  It remains to be seen if Mayong's hatred for the Bards has anything to do with poor [[Going Postal | mail service]].
+
+The League has two guildhalls, one in [[Qeynos]] and the other in [[Freeport]].  In North Freeport  can be found Marsheart's Chords, where [[Caskin Marsheart]] trains young bards.  In South Qeynos can be found The Wind Spirit's Song where guildmaster [[Belious Naliedin]] teaches.  The League supports the [[Knights of Truth]] and the [[Guards of Qeynos]] in their fight against corruption.  In addition to [[Mayong Mistmoore (Faction)|Mayong Mistmoore]], the bards oppose the [[Ring of Scale]].
+
+| zones_raise = 
+
+* [[Mistmoore Castle]]
+* [[Dreadlands]]
+* [[Emerald Jungle]]
+* [[Ocean of Tears]]
+* [[Skyfire Mountains]]
+* [[Timorous Deep]]
+* [[Veeshan's Peak]]
+* {{VeliousGray|Western Wastes}}
+
+| zones_lower = 
+
+* [[Ak'Anon]]
+* [[Butcherblock Mountains]]
+* [[Freeport|East Freeport]]
+* [[Erudin]]
+* [[Greater Faydark]]
+* [[Halas]]
+* [[Highpass Keep]]
+* [[Innothule Swamp]]
+* [[Nektulos Forest]]
+* [[Northern Karana]]
+* [[Qeynos Hills]]
+* [[Rivervale]]
+* [[Kaladim|South Kaladim]]
+* [[Southern Karana]]
+* [[Qeynos|South Qeynos]]
+* [[Surefall Glade]]
+* [[The Feerrott]]
+* [[Freeport|West Freeport]]
+* [[Western Plains of Karana]]
+
+| quests_raise = 
+
+* [[Aenia and Behroe]]
+* [[Bard Reports]]
+* [[Fabian's Strings]]
+* [[Going Postal|Going Postal (Ak'Anon to Kelethin)]]
+* [[Going Postal|Going Postal (Butcherblock to Kelethin)]]
+* [[Going Postal|Going Postal (East Freeport)]]
+* [[Going Postal|Going Postal (Erudin to Qeynos)]]
+* [[Going Postal|Going Postal (Feerrott to Freeport)]]
+* [[Going Postal|Going Postal (Felwithe to Kelethin)]]
+* [[Going Postal|Going Postal (Halas to Qeynos)]]
+* [[Going Postal|Going Postal (Highpass)]]
+* [[Going Postal|Going Postal (Innothule)]]
+* [[Going Postal|Going Postal (Kaladim to Kelethin)]]
+* [[Going Postal|Going Postal (Kelethin to Freeport)]]
+* [[Going Postal|Going Postal (Nektulos)]]
+* [[Going Postal|Going Postal (Qeynos)]]
+* [[Going Postal|Going Postal (Rivervale)]]
+* [[Going Postal|Going Postal (Surefall Glade to Qeynos)]]
+* [[Going Postal|Going Postal (West Karana to Qeynos)]]
+* [[Rogue Redemption]]
+* [[Winds of Karana]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[a cloaked dhampyre]] <span class='fmz'>(Castle Mistmoore - Undead)</span>
+* [[a dark elf noble]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a dark offerer]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a dark ritualist]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a dark sacrificer]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a deathly harbinger]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a deathly herald]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a deathly usher]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a flouting gargoyle]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a gargoyle]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[a ghastish ancille]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a ghostly ancille]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a ghoulish ancille]] <span class='fmz'>(Castle Mistmoore - Undead)</span>
+* [[a glyphed custodian]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed familiar]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed forbidder]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed ghoul]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed guard]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed sentry]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed warder]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a grinning gargoyle]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a hemo enologist]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a jeering gargoyle]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a leering gargoyle]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a Mistmoore guard]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a negotiator]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a pledge familiar]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a shadowy sage]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a shadowy scribe]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a shadowy scrivener]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a sneering gargoyle]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a soul seductress]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a spectral ancille]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a spiritish ancille]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a thought defiler]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a thought spoiler]] <span class='fmz'>(Castle Mistmoore - Undead)</span>
+* [[a vampiric ancille]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a will pillager]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a will sapper]] <span class='fmz'>(Castle Mistmoore - Undead)</span>
+* [[an advisor]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[an ancille cook]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[an imp familiar]] <span class='fmz'>(Castle Mistmoore - Summoned)</span>
+* [[an initiate familiar]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Butler Syncall]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Enynti]]  <span class='fmz'>(Castle Mistmoore)</span>
+* <span class="grayout"> [[Esorpa of the Ring]]  <span class='fmz'>(Western Wastes)</span> </span>
+* [[Faydedar]]  <span class='fmz'>(Timorous Deep)</span>
+* [[Garton Viswin]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Gorenaire]]  <span class='fmz'>(Dreadlands)</span>
+* [[Hoshkar]]  <span class='fmz'>(Veeshan's Peak)</span>
+* [[Lasna Cheroon]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Maid Issis]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Mynthi Davissi]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Phara Dar]]  <span class='fmz'>(Veeshan's Peak)</span>
+* [[Princess Cherista]] <span class='fmz'>(Castle Mistmoore - Undead)</span>
+* [[Severilous]]  <span class='fmz'>(Emerald Jungle)</span>
+* [[Silverwing]]  <span class='fmz'>(Veeshan's Peak)</span>
+* [[Talendor]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[Xygoz]]  <span class='fmz'>(Veeshan's Peak)</span>
+
+| mobs_lower = 
+
+* [[Canlan Talespinner]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Cordelia Minster]] <span class='fmz'>(North Karana - Quest NPC)</span>
+* [[Dark Deathsinger]] <span class='fmz'>(Innothule Swamp - Quest NPC)</span>
+* [[Drizda Tunesinger]] <span class='fmz'>(The Feerrott - Quest NPC)</span>
+* [[Idia]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Jakum Webdancer]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Kilam Oresinger]] <span class='fmz'>(South Kaladim - Quest NPC)</span>
+* [[Lislia Goldtune]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Lyra Lyrestringer]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Marton Stringsinger]] <span class='fmz'>(Halas - Quest NPC)</span>
+* [[Marus Kemson]] <span class='fmz'>(East Freeport - Bard Guildmaster)</span>
+* [[Mistrana Two Notes]] <span class='fmz'>(West Karana - Quest NPC)</span>
+* [[Misty Storyswapper]] <span class='fmz'>(Qeynos Hills - NPC, Non-Quest)</span>
+* [[Silna Songsmith]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Siltria Marwind]] <span class='fmz'>(Butcherblock Mountains - Quest NPC)</span>
+* [[Sivina Lutewhisper]] <span class='fmz'>(Surefall Glade - Quest NPC)</span>
+* [[Starr Dreamspinner]] <span class='fmz'>(High Keep - NPC, Non-Quest)</span>
+* [[Storm Dragonchaser]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Ticar Lorestring]] <span class='fmz'>(Erudin - Quest NPC)</span>
+* [[Travis Two Tone]] <span class='fmz'>(Nektulos Forest - Quest NPC)</span>
+* [[Trissa Whistlesong]] <span class='fmz'>(West Freeport - NPC, Non-Quest)</span>
+* [[Vhalen Nostrolo]] <span class='fmz'>(South Karana - Quest NPC)</span>
+
+}}

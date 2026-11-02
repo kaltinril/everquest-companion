@@ -1,0 +1,48 @@
+{{Factionpage|
+
+| description = A curious mispelling. Still, these are Oggok's merchants.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Oggok]]
+* [[The Feerrott]]
+
+| quests_raise = 
+
+* [[The Bread Shipment (Feerrott)]]
+* [[Muffin Quests|Fresh Baked Muffins (Feerrott)]]
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Angrog]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Brana]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Brokk Boxtripper]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Cikoona]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Crunga]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Duuga Tearstopper]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Erung]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Grop]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Hrak]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Innkeep Morpa]] <span class='fmz'>(The Feerrott - Merchant)</span>
+* [[Innkeep Gub]] <span class='fmz'>(The Feerrott - Merchant)</span>
+* [[Lopuka]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Murga]] <span class='fmz'>(The Feerrott - Merchant)</span>
+* [[Rora Dirtstamp]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Sinsaal]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Snarg Bonesmacker]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Squeea]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Ungral Silverstomp]] <span class='fmz'>(Oggok - Banker)</span>
+* [[Varrok Neckchopper]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Zarg Knightbane]] <span class='fmz'>(Oggok - Merchant)</span>
+
+}}
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

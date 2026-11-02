@@ -1,0 +1,45 @@
+{{Factionpage|
+
+| description = The Halas Rogue Guild, this faction is affected by doing quests in the rest of Halas with the exception of the Shamen guild. 
+The Rogue Guildmaster is Dun McDowell leads the Guild in quiet neutrality, not supporting or hindering any other factions.
+
+Of interesting note is that the Banker in Halas holds this faction, and if you do many of the quests offered by the warrior and merchant guilds, you will be unable to bank in Halas.
+
+| zones_raise = 
+* [[Western Plains of Karana]]
+
+| zones_lower = 
+
+* [[Halas]]
+* [[Lake Rathetear]]
+
+| quests_raise = 
+
+* [[Gnoll Fur]]
+* [[Mammoth Calf Hides]]
+
+| quests_lower = 
+
+* [[Langseax Quest]]
+
+| mobs_raise = 
+* [[Frostbite]]
+* [[Einhorst McMannus]]
+
+| mobs_lower = 
+
+* [[Cappi McTarnigal]] <span class='fmz'>(Halas - Rogue Guildmaster)</span>
+* [[Dun McDowell]] <span class='fmz'>(Halas - Rogue Guildmaster)</span>
+* [[Ysanna MacGibbon]] <span class='fmz'>(Halas - Rogue Guildmaster)</span>
+
+}}
+= Suggested Route =
+*[[Lion Meat Shipment Quest]] (+[[Merchants of Halas]], +[[Wolves of the North]], +[[Shamen of Justice]], +[[Rogues of the White Rose]])
+**Keep [[Lion Delight]] for [[Langseax_Quest]]
+*[[Langseax_Quest]] Part 2 (+[[Wolves of the North]], +[[Shamen of Justice]], +[[Merchants of Halas]], +[[Rogues of the White Rose]], +[[Steel Warriors]])
+
+
+[[Category:Significant Factions]]
+[[Category:Halas Factions]]
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

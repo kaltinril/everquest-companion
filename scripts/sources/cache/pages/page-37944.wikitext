@@ -1,0 +1,263 @@
+{{Kunark Era}}
+{{Factionpage|
+
+| description = Warrior guards ("troopers") of the [[Iksar]] city of Cabilis. The other guard faction is [[Crusaders Of Greenmist]].
+
+| zones_raise = 
+
+* [[Burning Woods]]
+* [[Emerald Jungle]]
+* [[Field of Bone]]
+* [[Firiona Vie]]
+* [[Frontier Mountains]]
+* [[Lake of Ill Omen]]
+* [[Mines of Nurga]]
+* [[Old Sebilis]]
+* [[Swamp of No Hope]]
+* [[The Overthere]]
+* [[Trakanon's Teeth]]
+* [[Warsliks Woods]]
+
+| zones_lower = 
+
+* [[Cabilis|East Cabilis]]
+* [[Field of Bone]]
+* [[Firiona Vie]]
+* [[Frontier Mountains]]
+* [[Howling Stones]]
+* [[Kaesora]]
+* [[Lake of Ill Omen]]
+* [[Swamp of No Hope]]
+* [[The Overthere]]
+* [[Timorous Deep]]
+* [[Warsliks Woods]]
+* [[Cabilis|West Cabilis]]
+
+| quests_raise = 
+
+* [[Blood Ink]]
+* [[Bone Chips (Quest)|Bone Chips]]
+* [[Bone Granite Powder Quest]]
+* [[Catfish Croak Sandwich Quest]]
+* [[Crusader's Tests|Crusader's Test of Betrayal (#5)]]
+* [[Crusader's Tests|Crusader's Test of Pain (#2)]]
+* [[Crusader's Tests|Crusader's Test of Suffering (#3)]]
+* [[Crusader's Tests|Crusader's Test of the Hero (#6)]]
+* [[Crusader's Tests|Crusader's Test of the Pawn (#1)]]
+* [[Crusader's Tests|Crusader's Test of the Zealot (#4)]]
+* [[Crusaders of Greenmist]]
+* [[Cures]]
+* [[Curscale Shield]]
+* [[Cursed Wafers Quest]]
+* [[Frogloc Tad Tongues]]
+* [[Geozite Tool Quest]]
+* [[Granite Pebbles]]
+* [[Illweed Parchment Quest]]
+* [[Legion Lager Quest]]
+* [[Marauder Armor]]
+* [[Necro Spells]]
+* [[Necromancer Skullcap Quests|Necromancer 1st Rank]]
+* [[Necromancer Skullcap Quests|Necromancer 2nd Rank]]
+* [[Necromancer Skullcap Quests|Necromancer 3rd Rank]]
+* [[Necromancer Skullcap Quests|Necromancer 4th Rank]]
+* [[Necromancer Skullcap Quests|Necromancer 6th Rank]]
+* [[Necromancer Skullcap Quests|Necromancer 7th Rank]]
+* [[Necromancer Skullcap Quests|Necromancer 8th Rank]]
+* [[Sarnak Hatchling Brains]]
+* [[Scaled Curskins]]
+* [[Scorpion Pincers]]
+* [[Monk Shackle Quests|Shackle of Bronze]]
+* [[Monk Shackle Quests|Shackle of Clay]]
+* [[Monk Shackle Quests|Shackle of Rock]]
+* [[Monk Shackle Quests|Shackle of Stone]]
+* [[The Penance]]
+* [[The Restraining Order]]
+* [[Warrior Pike Quests|Warrior Pike #1 (Militia Pike)]]
+* [[Warrior Pike Quests|Warrior Pike #2 (Footman's Pike)]]
+* [[Warrior Pike Quests|Warrior Pike #4 (Trooper's Pike)]]
+* [[Watcher Torches]]
+
+| quests_lower = 
+
+* [[Beguile Plants]]
+* [[Brain Bite (Good)]]
+* [[Drolvarg Teeth]]
+* [[Goblin Raiders]]
+* [[Illusion: Iksar Quest]]
+
+| mobs_raise = 
+
+* [[a goblin bloodtracer]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin bonecaster]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin hextracer]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin hunter]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin mosstrooper]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a goblin outrider]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[A Goblin Pillager]] <span class='fmz'>(Firiona Vie)</span>
+* [[a goblin scout]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin skirmisher]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a goblin skirmisher]] <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin soothsayer]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin stalagknight]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a goblin thief]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin warrior]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a goblin watcher]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a goblin whelp]] <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a goblin whelp]] <span class='fmz'>(Warsliks Wood)</span>
+* [[a goblin witchdoctor]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[a pilgrim]]  <span class='fmz'>(Firiona Vie)</span>
+* [[a pox scarab]]  <span class='fmz'>(Old Sebilis)</span>
+* [[a rogue shaman]]  <span class='fmz'>(Field of Bone)</span>
+* [[a Sarnak adherant]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[A Sarnak Assassin]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a sarnak avenger]]  <span class='fmz'>(Burning Woods)</span>
+* [[a Sarnak berserker]]  <span class='fmz'>(The Overthere)</span>
+* [[a Sarnak broodling]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a sarnak champion]]  <span class='fmz'>(Burning Woods)</span>
+* [[a Sarnak conscript]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a Sarnak courier]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a Sarnak dragoon]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a Sarnak enthusiast]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a sarnak extremist]]  <span class='fmz'>(Burning Woods)</span>
+* [[a Sarnak flunkie]]  <span class='fmz'>(The Overthere)</span>
+* [[a Sarnak gem oracle]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a Sarnak hatchling]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a sarnak knight]]  <span class='fmz'>(Burning Woods)</span>
+* [[a Sarnak legionnaire]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[A Sarnak Mystic]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a sarnak partisan]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a Sarnak recruit]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a Sarnak revenant]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[A sarnak scavenger]] <span class='fmz'>(Frontier Mountains)</span>
+* [[A Sarnak Warlord]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a Sarnak youth]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a sarnak zealot]]  <span class='fmz'>(Burning Woods)</span>
+* [[a sebilite golem]]  <span class='fmz'>(Old Sebilis)</span>
+* [[a sepsis scarab]]  <span class='fmz'>(Old Sebilis)</span>
+* [[an explorer]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[an Iksar abductor]] <span class='fmz'>(Emerald Jungle)</span>
+* [[an Iksar anchoret]] <span class='fmz'>(Emerald Jungle)</span>
+* [[an iksar anchorite]] <span class='fmz'>(Emerald Jungle)</span>
+* [[an iksar bandit]]  <span class='fmz'>(Field of Bone)</span>
+* [[an iksar footpad]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[an Iksar footpad]]  <span class='fmz'>(Field of Bone)</span>
+* [[an iksar manslayer]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[an iksar marauder]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[an iksar necromancer]]  <span class='fmz'>(Old Sebilis)</span>
+* [[an Iksar pariah]] <span class='fmz'>(Field of Bone)</span>
+* [[an iksar picaroon]] <span class='fmz'>(Emerald Jungle)</span>
+* [[an iksar slave]]  <span class='fmz'>(Mines of Nurga)</span>
+* [[Brogg]]  <span class='fmz'>(Old Sebilis)</span>
+* [[Clazxiss]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[crypt caretaker]] <span class='fmz'>(Old Sebilis - Undead)</span>
+* [[dar ghoul knight]] <span class='fmz'>(Old Sebilis - Undead)</span>
+* [[Deadeye]] <span class='fmz'>(Swamp of No Hope)</span>
+* [[Draketamer]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[Firiona drixie]]  <span class='fmz'>(Firiona Vie)</span>
+* [[frenzied pox scarab]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok armsman]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok bok knight]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok bok shaman]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok bok wizard]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok commander]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok dar knight]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok dar wizard]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok ilis knight]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok ilis shaman]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok jin shaman]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok jin wizard]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok kor shaman]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok krup knight]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok krup shaman]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok krup wizard]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok ostiary]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok pickler]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok reet knight]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok repairer]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok zol knight]]  <span class='fmz'>(Old Sebilis)</span>
+* [[Gangrenous Scarab]]  <span class='fmz'>(Old Sebilis)</span>
+* [[goblin battlemaster]]  <span class='fmz'>(Firiona Vie)</span>
+* [[goblin raider]]  <span class='fmz'>(Firiona Vie)</span>
+* [[goblin spirit caller]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[goblin warlord]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[Grachnist the Destroyer]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[Guard Frandan]] <span class='fmz'>(Firiona Vie)</span>
+* [[Harbinger Freglor]]  <span class='fmz'>(Old Sebilis)</span>
+* [[Hierophant Prime Grekal]] <span class='fmz'>(Old Sebilis - Undead)</span>
+* [[Hiptal Frizzleboth]] <span class='fmz'>(Firiona Vie - Magician Guildmaster)</span>
+* [[Iksar exile]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[Iksar Mercenary]] <span class='fmz'>(Trakanon's Teeth)</span>
+* [[iksar pariah]]  <span class='fmz'>(Warsliks Wood)</span>
+* [[Iksar treasure hunter]] <span class='fmz'>(Trakanon's Teeth)</span>
+* [[Imperial Crypt Guardian]]  <span class='fmz'>(Old Sebilis)</span>
+* [[Korasal Klyseer]]  <span class='fmz'>(Burning Woods)</span>
+* [[krup ghoul knight]] <span class='fmz'>(Old Sebilis - Undead)</span>
+* [[Lady Chromoire]]  <span class='fmz'>(Firiona Vie)</span>
+* [[Lord Gorelik]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[Luminare Pasinia]] <span class='fmz'>(Firiona Vie - Quest NPC)</span>
+* [[Myconid Adept]]  <span class='fmz'>(Old Sebilis)</span>
+* [[Myconid Priest]]  <span class='fmz'>(Old Sebilis)</span>
+* [[myconid reaver]]  <span class='fmz'>(Old Sebilis)</span>
+* [[myconid warrior]]  <span class='fmz'>(Old Sebilis)</span>
+* [[Sarnak crypt raider]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[Scout Treekill]]  <span class='fmz'>(Firiona Vie)</span>
+* [[sebilite juggernaut]]  <span class='fmz'>(Old Sebilis)</span>
+* [[Sergeant Daelione]] <span class='fmz'>(Firiona Vie)</span>
+* [[Sergeant Greenblade]] <span class='fmz'>(Firiona Vie)</span>
+* [[Shieldbearer Buerd]] <span class='fmz'>(Firiona Vie)</span>
+* [[Shieldbearer Relios]] <span class='fmz'>(Firiona Vie)</span>
+* [[skeletal duke]] <span class='fmz'>(Old Sebilis - Undead)</span>
+* [[skeletal harbinger]] <span class='fmz'>(Old Sebilis - Undead)</span>
+* [[skeletal hierophant]] <span class='fmz'>(Old Sebilis - Undead)</span>
+* [[Slithinis]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[Tolapumj]]  <span class='fmz'>(Old Sebilis)</span>
+* [[Tracker Azeal]] <span class='fmz'>(Firiona Vie - NPC, Non-Quest)</span>
+* [[Trakanon]]  <span class='fmz'>(Old Sebilis)</span>
+* [[Vrionele]]  <span class='fmz'>(Firiona Vie)</span>
+* [[Wella Fargin]] <span class='fmz'>(Firiona Vie - Banker)</span>
+* [[Wellford Fargin]] <span class='fmz'>(Firiona Vie - Banker)</span>
+* [[Zagran the Mad]] <span class='fmz'>(Swamp of No Hope)</span>
+
+| mobs_lower = 
+
+* [[Alchemist Granika]] <span class='fmz'>(The Overthere)</span>
+* [[an enslaved iksar]] <span class='fmz'>(Frontier Mountains - Quest NPC)</span>
+* [[an Iksar master]] <span class='fmz'>(Timorous Deep - Monk Guildmaster)</span>
+* [[Arch Duke Xog]] <span class='fmz'>(East Cabilis - Shadowknight Guildmaster)</span>
+* [[Captain Gideen]] <span class='fmz'>(Warsliks Wood)</span>
+* [[Captain Nedar]] <span class='fmz'>(Swamp of No Hope)</span>
+* [[Crusader Axmo]] <span class='fmz'>(West Cabilis)</span>
+* [[Crusader Bodli]] <span class='fmz'>(Field of Bone)</span>
+* [[Crusader Cotat]] <span class='fmz'>(East Cabilis)</span>
+* [[Crusader Daehod]] <span class='fmz'>(East Cabilis)</span>
+* [[Crusader Deezin]] <span class='fmz'>(Lake of Ill Omen)</span>
+* [[Crusader Eaxl]] <span class='fmz'>(Warsliks Wood)</span>
+* [[Crusader Ezrogz]] <span class='fmz'>(West Cabilis)</span>
+* [[Crusader Golia]] <span class='fmz'>(East Cabilis)</span>
+* [[Crusader Hitol]] <span class='fmz'>(East Cabilis)</span>
+* [[Crusader Litia]] <span class='fmz'>(Swamp of No Hope)</span>
+* [[Crusader Mocdi]] <span class='fmz'>(West Cabilis)</span>
+* [[Crusader Myxl]] <span class='fmz'>(Warsliks Wood)</span>
+* [[Crusader Olos]] <span class='fmz'>(East Cabilis)</span>
+* [[Crusader Quarg]] <span class='fmz'>(Field of Bone)</span>
+* [[Crusader Reidak]] <span class='fmz'>(East Cabilis)</span>
+* [[Crusader Savot]] <span class='fmz'>(Swamp of No Hope)</span>
+* [[Crusader Swype]] <span class='fmz'>(Lake of Ill Omen)</span>
+* [[Crusader Wonku]] <span class='fmz'>(East Cabilis)</span>
+* [[Crusader Zixo]] <span class='fmz'>(East Cabilis - Quest NPC)</span>
+* [[Frizazz]] <span class='fmz'>(East Cabilis - Quest NPC)</span>
+* [[Grype]]  <span class='fmz'>(East Cabilis)</span>
+* [[Hierophant Oxyn]] <span class='fmz'>(East Cabilis)</span>
+* [[Jozter]] <span class='fmz'>(East Cabilis - Quest NPC)</span>
+* [[Lord Gikzic]] <span class='fmz'>(East Cabilis - Quest NPC)</span>
+* [[Lord Korzin]] <span class='fmz'>(East Cabilis - Quest NPC)</span>
+* [[Lord Qyzar]] <span class='fmz'>(East Cabilis - Quest NPC)</span>
+* [[tortured librarian]] <span class='fmz'>(Kaesora - Quest NPC)</span>
+* [[Trooper Taer]] <span class='fmz'>(Field of Bone)</span>
+* [[Vekis]] <span class='fmz'>(Firiona Vie - Quest NPC)</span>
+* [[Vessel Drozlin]] <span class='fmz'>(East Cabilis - Quest NPC)</span>
+* [[Warlord Hikyg]] <span class='fmz'>(Swamp of No Hope)</span>
+* [[Warlord Zyzz]] <span class='fmz'>(Field of Bone)</span>
+
+}}
+[[Category:Significant Factions]]

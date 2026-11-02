@@ -1,0 +1,67 @@
+{{Factionpage|
+
+| description = The faction of those friendly with [[King Xorbb]], including his muddite and minotaur army. Enemy of [[Clan Runnyeye]] and [[Pickclaw Goblins]].
+
+Note: in Everquest Legends it is possible to become non-KOS with both [[King Xorbb]]<nowiki> and the []Pickclaw Goblins]] as Non-eye mobs in the Gorge give you +5 Pickclaw faction but only -1/-2 King Xorbb faction. </nowiki>
+
+| zones_raise = 
+
+* [[Butcherblock Mountains]]
+* [[Clan Runnyeye]]
+* [[Beholder's Maze]]
+* [[Highpass Keep]]
+
+| zones_lower = 
+
+* [[Eastern Plains of Karana]]
+* [[Beholder's Maze]]
+* [[Runnyeye]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[a crazed goblin]]  <span class='fmz'>(High Keep)</span>
+* [[a goblin]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[a goblin lookout]]  <span class='fmz'>(Gorge of King Xorbb (Beholder's Maze))</span>
+* [[a goblin sentry]]  <span class='fmz'>(Gorge of King Xorbb (Beholder's Maze))</span>
+* [[A Goblin Thief]]  <span class='fmz'>(High Keep)</span>
+* [[a goblin whelp]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[a Pickclaw Ambushbaiter]] <span class='fmz'>(Clan RunnyEye)</span>
+* [[a Pickclaw Arroweater]] <span class='fmz'>(Clan RunnyEye)</span>
+* [[a Pickclaw Bladestopper]] <span class='fmz'>(Clan RunnyEye)</span>
+* [[a Pickclaw bonemender]]  <span class='fmz'>(Clan RunnyEye)</span>
+* [[A Pickclaw Cabalist]] <span class='fmz'>(High Keep)</span>
+* [[a Pickclaw Destroyer]]  <span class='fmz'>(Clan RunnyEye)</span>
+* [[a Pickclaw Fleshburner]] <span class='fmz'>(Clan RunnyEye)</span>
+* [[a Pickclaw Foechopper]] <span class='fmz'>(Clan RunnyEye)</span>
+* [[a Pickclaw Foeslicer]]  <span class='fmz'>(Clan RunnyEye)</span>
+* [[a pickclaw guard]]  <span class='fmz'>(High Keep)</span>
+* [[A Pickclaw Lookout]] <span class='fmz'>(High Keep)</span>
+* [[a Pickclaw mindripper]]  <span class='fmz'>(Clan RunnyEye)</span>
+* [[A Pickclaw Raider]] <span class='fmz'>(High Keep)</span>
+* [[a Pickclaw seer]]  <span class='fmz'>(High Keep)</span>
+* [[a Pickclaw Slayspell]]  <span class='fmz'>(Clan RunnyEye)</span>
+* [[A Pickclaw Spiritist]] <span class='fmz'>(High Keep)</span>
+* [[A Pickclaw Visionary]]  <span class='fmz'>(High Keep)</span>
+* [[a pickclaw warrior]]  <span class='fmz'>(High Keep)</span>
+* [[a Pickclaw Zekspeaker]] <span class='fmz'>(Clan RunnyEye)</span>
+* [[an enraged goblin]]  <span class='fmz'>(Butcherblock Mountains)</span>
+
+| mobs_lower = 
+
+* [[a chasm minotaur]]  <span class='fmz'>(Gorge of King Xorbb (Beholder's Maze))</span>
+* [[a gorge minotaur]]  <span class='fmz'>(Gorge of King Xorbb (Beholder's Maze))</span>
+* [[a muddite elder]]  <span class='fmz'>(Gorge of King Xorbb (Beholder's Maze))</span>
+* [[a muddite minor]]  <span class='fmz'>(Gorge of King Xorbb (Beholder's Maze))</span>
+* [[Lord Syrkl]]  <span class='fmz'>(Gorge of King Xorbb (Beholder's Maze))</span>
+* [[Lord Sviir]]  <span class='fmz'>(Gorge of King Xorbb (Beholder's Maze))</span>
+* [[Lord Soptyvr]]  <span class='fmz'>(Gorge of King Xorbb (Beholder's Maze))</span>
+* [[King Xorbb]]  <span class='fmz'>(Gorge of King Xorbb (Beholder's Maze))</span>
+* [[Borxx]]  <span class='fmz'>(Runnyeye Citadel)</span>
+
+}}

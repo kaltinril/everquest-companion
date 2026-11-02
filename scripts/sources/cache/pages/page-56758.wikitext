@@ -1,0 +1,24 @@
+== Basic Information ==
+
+* '''Faction Alignment:''' _______
+* '''Racial(s):''' Increased Swimming, +15 Poison Resist
+* '''Starting City:''' Lake Rathe
+* '''Primary Class Choices:''' [[Cleric]], [[Monk]], [[Necromancer]], [[Paladin]], [[Rogue]], [[Shadowknight]], [[Shaman]], [[Warrior]], [[Wizard]]
+
+==Base Stats==
+{| class="eoTable2" style="text-align:left"
+|-
+! STR !! STA !! AGI !! DEX !! WIS !! INT !! CHA
+|-
+|| 70 || 80 || 100 || 100 || 75 || 75 || 50
+|}
+
+== Unlock Conditions ==
+
+* Get maximum faction with [[Protectors of Gukta]]
+* Get maximum faction with [[Guktan Elders]]
+* Get maximum faction with [[Guktan Suppliers]]
+
+{{Navbox Race}}
+
+[[Category:Character Races]]

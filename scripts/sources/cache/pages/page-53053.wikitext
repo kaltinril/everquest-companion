@@ -1,0 +1,91 @@
+{{Delete}}
+
+So you want to add your guild to the [[Guild List]] on the wiki, but you've never edited a wiki before?  That's ok, it's not hard.  All you have to do is ...
+
+=== Important Note ===
+
+The "Forum Link" on the guild list page is designed to be used for your *www.project1999.com/forums* guild thread, NOT to a forum on your guild website.
+
+== Instructions ==
+
+=== How to Add a Guild ===
+
+# copy/paste the "wiki text" template at the bottom of the page
+#* you can do this in the web page itself, but it might be easier to copy/paste to a separate program like Notepad
+# replace the fake information in it with your guild's
+# go to the [[Guild List]] page
+# find the appropriate section for your guild: Casual, Class C or Class R
+# click the edit link for that section
+#* you must be logged in to the wiki to see the edit link
+# find the spot where your guild should be added (the guilds are sorted alphabetically by their name)
+#* for instance, if your guild was named Fake Guild, you might find the "Example Guild" and "Great Guild" rows:
+
+
+<nowiki>
+|-
+</nowiki>
+
+<nowiki>
+| Example Guild || ...
+</nowiki>
+
+<nowiki>
+|-
+</nowiki>
+
+<nowiki>
+| Great Guild || ...
+</nowiki>
+
+
+and then add the wiki text for your guild in-between:
+
+
+<nowiki>
+|-
+</nowiki>
+
+<nowiki>
+| Example Guild || ...
+</nowiki>
+
+<nowiki>
+|-
+</nowiki>
+
+<nowiki>
+| Fake Guild || ...
+</nowiki>
+
+<nowiki>
+|-
+</nowiki>
+
+<nowiki>
+| Great Guild || ...
+</nowiki>
+
+
+# after you make your changes be sure to click the "Show preview" button (not the "Save page" button) so that you can see how your changes look before making them permanent
+# if anything is off you can correct the problem in the text box at the bottom, and then hit "Show Preview" and repeat again
+# once everything looks ok click "Save page"
+# admire your wiki-editing handiwork
+
+== Getting Help ==
+If you need help (eg. if the page looks messed up after your changes) try asking in the Project 1999 forum.  As long as you ask politely, someone will probably be happy to help.
+
+
+== Example/Template For Casual Guilds ==
+<nowiki>
+|-
+</nowiki>
+
+<nowiki>
+| Fake Guild  || EST || Having fun while leveling together || Any except Clerics || Ventrilo (optional) || Bob, Sue, Kelthrax || http://www.fakeguild.com || [http://www.project1999.com/forums/showthread.php?t=555555 Forum] || 555
+</nowiki>
+
+== Non-Casual Guilds ==
+
+The above process is exactly the same for non-casual guilds, except that the columns in their tables are slightly different.  Instead of using the template above, just copy/paste an existing guild's row and use that as the template.
+
+[[Category:Technical]]

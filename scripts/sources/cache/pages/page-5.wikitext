@@ -1,0 +1,79 @@
+All players will need to use the spell [[Bind Affinity]] to set their respawn location and must rely on classes with the spell. If you do not have this spell you cannot set your own bind location. Send a tell to a level 12 caster. You have to talk to them. You meet them. Then group with them. Then he or she has to target you. Then he or she casts a spell on you that makes you bound to the area.  Classic locations that allowed players without the spell to be bound can be found in the table below.
+{| class="eoTable2 sortable" style="text-align: center; border-width: 1px;" |
+! Continent || Zone || Limited Area
+|-
+| [[Zones#Antonica|Antonica]]
+| [[The Arena|Arena]]
+| 
+|-
+| [[Zones#Antonica|Antonica]]
+| [[Freeport]]
+| 
+|-
+| [[Zones#Antonica|Antonica]]
+| [[Grobb]]
+| 
+|-
+| [[Zones#Antonica|Antonica]]
+| [[Halas]]
+| 
+|-
+| [[Zones#Antonica|Antonica]]
+| [[High Keep]] 
+| Bindable, but due to it once being unbindable, it gives a false error message. If you re-log or zone, your /charinfo will update.
+|-
+| [[Zones#Antonica|Antonica]]
+| [[Highpass Hold]]
+| 
+|-
+| [[Zones#Antonica|Antonica]]
+| [[Neriak]]
+| 
+|-
+| [[Zones#Antonica|Antonica]]
+| [[Northern Plains of Karana]]
+| Gypsy Camp (#6)
+|-
+| [[Zones#Antonica|Antonica]]
+| [[Oggok]]
+| 
+|-
+| [[Zones#Antonica|Antonica]]
+| [[Qeynos]]
+| 
+|-
+| [[Zones#Antonica|Antonica]]
+| [[Rivervale]]
+| 
+|-
+| [[Zones#Antonica|Antonica]]
+| [[Surefall Glade]]
+| 
+|-
+| [[Zones#Faydwer|Faydwer]]
+| [[Ak'Anon]]
+| 
+|-
+| [[Zones#Faydwer|Faydwer]]
+| [[Felwithe]]
+| 
+|-
+| [[Zones#Faydwer|Faydwer]]
+| [[Greater Faydark]] 
+| Entire zone bindable including Kelethin
+|-
+| [[Zones#Faydwer|Faydwer]]
+| [[Kaladim]]
+| 
+|-
+| [[Zones#Odus|Odus]]
+| [[Erudin]]
+| 
+|-
+| [[Zones#Odus|Odus]]
+| [[Paineel]]
+| 
+|}
+
+
+[[Category:Guides]]

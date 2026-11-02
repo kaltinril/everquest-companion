@@ -1,0 +1,76 @@
+{{Factionpage|
+
+| description = Guards of the city of Oggok. 
+
+Despite its name, this faction does not include the bouncers inside Oggok, but rather the bouncers out in the [[Feerrott]]. The bouncers inside Oggok are on the [[Clurg]] faction.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Oggok]]
+* [[The Feerrott]]
+
+| quests_raise = 
+
+* [[Clurg's New Creation]]
+* [[Clurg's Revenge]]
+* [[Exotic Drinks]]
+* [[Feeding Dooga]]
+* [[Pickled Frogloks]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Angrog]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Bouncer Bak]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Druk]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Flerb]] <span class='fmz'>(The Feerrott)</span>
+* [[Bouncer Fug]] <span class='fmz'>(The Feerrott)</span>
+* [[Bouncer Gronk]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Haraan]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Hurd]] <span class='fmz'>(The Feerrott)</span>
+* [[Bouncer Krik]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Mrang]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Praag]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Prud]] <span class='fmz'>(The Feerrott)</span>
+* [[Bouncer Raan]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Scaar]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Skon]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Skuk]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Tazak]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Thrang]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Wrok]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Xak]] <span class='fmz'>(Oggok)</span>
+* [[Brana]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Brokk Boxtripper]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Chef Dooga]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Cikoona]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Clurg]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Crunga]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Duuga Tearstopper]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Erung]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Grop]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Guntrik]] <span class='fmz'>(Oggok - Quest NPC)</span>
+* [[Hrak]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Innkeep Morpa]] <span class='fmz'>(The Feerrott - Merchant)</span>
+* [[Lopuka]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Murga]] <span class='fmz'>(The Feerrott - Merchant)</span>
+* [[Rora Dirtstamp]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Sinsaal]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Snarg Bonesmacker]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Squeea]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Ungral Silverstomp]] <span class='fmz'>(Oggok - Banker)</span>
+* [[Varrok Neckchopper]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Zarg Knightbane]] <span class='fmz'>(Oggok - Merchant)</span>
+
+}}
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

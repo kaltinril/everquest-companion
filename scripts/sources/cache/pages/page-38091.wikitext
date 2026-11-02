@@ -1,0 +1,25 @@
+{{Classic Era}}
+This faction only happens during winter holidays. -to gain faction give a present to another player, to lose faction open a present.
+
+{{Factionpage|
+
+| description = Presents drop off every single mob but only during winter holidays
+
+| zones_raise = All
+
+
+| zones_lower = All
+
+
+| quests_raise =  
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+| mobs_lower =
+
+
+}}
