@@ -1,0 +1,36 @@
+This page contains information about the /consider command.
+
+=== Description ===
+
+Considers your current target, which displays an indication of your [[Faction Standing|faction standing]] as well as an indication of the target's relative level and strength.
+
+The target can be specified by name, including pet names, and can use chat variables.
+
+Common abbreviation: /con
+
+The /con check gives you a quick read on how tough a creature is compared to your character. Each color corresponds to a level range, and those ranges determine both danger and expected experience. Most colors follow fixed level gaps, while a few shift slightly depending on your level as described below.
+
+=== Fixed Ranges ===
+Red - The target is 4 or more levels above you.
+<br>Very dangerous, but excellent experience.
+
+Yellow - 1-3 levels above you.
+<br>Challenging, strong experience.
+
+White - Same level as you.
+<br>Even match, solid experience.
+
+Dark Blue - 1-5 levels below you.
+<br>Manageable fights, still worthwhile experience.
+
+=== Variable Ranges ===
+Light Blue - Roughly 6-15 levels below you.
+<br>Moderate experience.
+<br>Light Blue begins appearing once you reach level 25. The exact point where Light Blue ends (and Green begins) shifts slightly by level.
+
+Green - About 6-20 levels below you.
+<br>Minimal experience.
+<br>The upper end of Green varies depending on when Grey becomes available for your level.
+
+Grey - Too low to award experience.
+<br>Grey appears once a creature is far enough below your level that it no longer grants XP; this threshold changes as you level up.

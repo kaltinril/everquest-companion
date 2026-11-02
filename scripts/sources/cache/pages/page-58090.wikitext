@@ -1,0 +1,135 @@
+== Difficulty Levels ==
+
+Difficulty levels in EverQuest Legends determine how challenging the world feels and what kinds of rewards you'll earn. Players often shorten these to D0 through D4, and you'll see those abbreviations used in chat and in discord.
+
+The five difficulty levels (or tiers of you prefer) are:
+
+* Difficulty 0 (D0)
+* Difficulty 1 – Awakened (D1)
+* Difficulty 2 – Adaptive (D2)
+* Difficulty 3 – Fused (D3)
+* Difficulty 4 – Refined (D4)
+
+Each step up increases both the danger and the rewards, so you can choose the pace that feels right for your playstyle.
+
+== How Difficulty Matters ==
+
+Higher difficulties offer three major benefits:
+
+* More experience
+* Higher‑level loot
+* Higher‑level motes
+
+This makes difficulty a core part of progression. Even if you’re still learning the game, understanding how difficulty affects drops will help you plan your gearing path.
+
+== Difficulty 0: The Beginner's Comfort Zone ==
+
+D0, or “difficulty zero,” is the most relaxed and forgiving version of any zone. It’s perfect for new players, casual leveling, or experimenting with class combinations. Any group composition can succeed here, and solo players will find it very manageable.
+
+Loot in D0 is base level (+0), though there is always a small chance for higher‑level items to appear.
+
+== How Loot Scales With Difficulty ==
+
+When you raise the difficulty above D0, the loot level in that zone also increases.
+
+* Armor
+* Weapons
+* Jewelry
+* Motes
+
+* Each difficulty has an initial modifier range and after that, there is a chance for random upgrades on top of that modifier. Random upgrades are higher in higher difficulties.
+
+D0: 0
+
+D1: +1
+
+D2: +2
+
+D3: +3
+
+D4: +4 
+
+* There is also a chance for even higher‑level versions to drop, depending on the zone and mob type
+
+This scaling makes higher difficulties extremely rewarding once you’re comfortable with your class and ready for more challenge.
+
+== Enemies Scale With Difficulty ==
+
+Increasing difficulty doesn’t just improve loot, it also changes how enemies behave and how dangerous they are.
+
+Here’s what you can expect as you scale the diffculty higher:
+* '''Aggro ranges increase''', so enemies notice you from farther away
+* '''More enemies become multi‑class''', similar to how players can combine classes
+* '''Named mobs in D2''' are often multi‑class
+* '''Raid bosses in D3''' begin appearing as triple‑class mobs
+* '''D4’s aggro range is extremely large''', which can be risky — but also exciting, especially for coordinated groups
+
+Higher difficulties reward awareness, teamwork, and good tactics. They’re not just “harder”; they’re also a bit more dynamic and unpredictable. Just the challenge some players are looking for!
+
+=== Enemy Health and Difficulty ===
+In the following tables, the differences in enemy health pool are indicated by reductions (-) and increases (+) over the baseline health '''between different difficulty tiers within a given instance type''' and they don't necessarily translate in variances of similar amount or percentages over the baseline health.
+*Enemy health is under constant adjustments by the Development Team for balancing purposes.
+*Enemy health also scales with party size in Multiplayer Raid Instances.
+==== '''Health for Single Class Enemies''' ====
+{| class="wikitable" style="text-align:center;"
+|-
+! style="vertical-align: middle !important; text-align: center !important;" | '''Difficulty'''
+! style="vertical-align: middle !important; text-align: center !important;" | '''Public'''
+! style="vertical-align: middle !important; text-align: center !important;" | '''Personal<br>Solo'''
+! style="vertical-align: middle !important; text-align: center !important;" | '''Personal<br>Multiplayer'''
+! style="vertical-align: middle !important; text-align: center !important;" | '''Raid<br>Solo'''
+! style="vertical-align: middle !important; text-align: center !important;" | '''Raid<br>Multiplayer'''
+|-
+| style="vertical-align: middle;" | '''D0''' || '''Baseline''' || <span style="color: green;">'''Reduced --'''</span> || <span style="color: green;">'''Reduced -'''</span> || <span style="color: green;">'''Reduced --'''</span>|| <span style="color: red;">'''Increased +'''</span>
+|-
+| style="vertical-align: middle;" | '''D1''' || <span style="color: red;">'''Increased +'''</span> || <span style="color: green;">'''Reduced -'''</span>|| '''Baseline'''|| <span style="color: green;">'''Reduced -'''</span>||<span style="color: red;"> '''Increased ++'''</span>
+|-
+| style="vertical-align: middle;" | '''D2''' || <span style="color: red;">'''Increased ++'''</span>|| '''Baseline''' || <span style="color: red;">'''Increased +'''</span>|| '''Baseline''' || <span style="color: red;">'''Increased +++'''</span> 
+|-
+| style="vertical-align: middle;" | '''D3''' || <span style="color: red;">'''Increased +++'''</span>|| <span style="color: red;">'''Increased +'''</span>|| <span style="color: red;">'''Increased ++'''</span>|| <span style="color: red;">'''Increased +'''</span>|| <span style="color: red;">'''Increased ++++'''</span>
+|-
+| style="vertical-align: middle;" | '''D4''' || '''N/A'''|| '''N/A''' || '''N/A''' || '''N/A'''|| '''N/A'''
+|}
+
+==== '''Health for Multi Class Enemies''' ====
+{| class="wikitable" style="text-align:center;"
+|-
+! style="vertical-align: middle !important; text-align: center !important;" | '''Difficulty'''
+! style="vertical-align: middle !important; text-align: center !important;" | '''Public'''
+! style="vertical-align: middle !important; text-align: center !important;" | '''Personal<br>Solo'''
+! style="vertical-align: middle !important; text-align: center !important;" | '''Personal<br>Multiplayer'''
+! style="vertical-align: middle !important; text-align: center !important;" | '''Raid<br>Solo'''
+! style="vertical-align: middle !important; text-align: center !important;" | '''Raid<br>Multiplayer'''
+|-
+| style="vertical-align: middle;" | '''D0''' ||  '''N/A'''|| '''N/A''' || '''N/A''' || '''N/A'''|| '''N/A'''
+|-
+| style="vertical-align: middle;" | '''D1''' || '''Baseline'''|| <span style="color: green;">'''Reduced -'''</span>|| '''Baseline'''|| <span style="color: green;">'''Reduced -'''</span>|| <span style="color: red;">'''Increased ++'''</span>
+|-
+| style="vertical-align: middle;" | '''D2''' || <span style="color: red;">'''Increased +'''</span>|| '''Baseline'''|| <span style="color: red;">'''Increased +'''</span>|| '''Baseline'''|| <span style="color: red;">'''Increased +++'''</span>
+|-
+| style="vertical-align: middle;" | '''D3''' || <span style="color: red;">'''Increased ++'''</span>|| <span style="color: red;">'''Increased +'''</span>|| <span style="color: red;">'''Increased ++'''</span>|| <span style="color: red;">'''Increased +'''</span>|| <span style="color: red;">'''Increased ++++'''</span>
+|-
+| style="vertical-align: middle;" | '''D4''' || <span style="color: red;">'''Increased +++'''</span>|| <span style="color: red;">'''Increased ++'''</span>|| <span style="color: red;">'''Increased +++'''</span>|| <span style="color: red;">'''Increased ++'''</span>|| <span style="color: red;">'''Increased +++++'''</span>
+|}
+
+== How to Change Your Difficulty ==
+
+Switching difficulties is quick and intuitive:
+# Open the multi‑menu and click the big 0 button (the same menu where the EQL button is).
+# Choose “Pick Difficulty”.
+# Select the difficulty you want, and you’ll instantly zone over or “pick” into that instance.
+
+This menu also shows how many players are currently in each difficulty, which helps you choose a quieter or more active version of the zone.
+
+=== Group Options ===
+
+* Group members can pick over individually
+* Or the group leader can move everyone in the zone at once
+
+All difficulty instances are public zones, so you may see other players adventuring alongside you.
+
+== Want Your Own Instance? ==
+
+If you’d like to create personal instances or raid instances, either solo or with a group, visit the [[Personal Instance]] page for a full walkthrough.
+
+You might also be interested in: [[Item_Upgrade_System|Item Upgrade System]]

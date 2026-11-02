@@ -1,0 +1,26 @@
+{{Velious Era}}
+{{Factionpage|
+
+| description =
+
+| zones_raise =
+
+
+| zones_lower =
+
+* [[Plane of Growth]]
+
+| quests_raise =
+
+
+| quests_lower =
+
+
+| mobs_raise =
+
+
+| mobs_lower =
+
+* [[A protector of growth]]  <span class='fmz'>(Plane of Growth)</span>
+
+}}

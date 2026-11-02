@@ -1,0 +1,27 @@
+{{Factionpage|
+
+| description = The Pixies of Greater Faydark.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Lesser Faydark]]
+* [[Greater Faydark]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a pixie prankster]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[a pixie trickster]]  <span class='fmz'>(Lesser Faydark)</span>
+
+}}

@@ -1,0 +1,241 @@
+{{Factionpage|
+
+| description = The corrupt faction of guards in charge of the city of Qeynos.
+
+| zones_raise = 
+
+* [[Butcherblock Mountains]]
+* [[Freeport|East Freeport]]
+* [[Eastern Plains of Karana]]
+* [[Innothule Swamp]]
+* [[Lake Rathetear]]
+* [[Rathe Mountains]]
+* [[Northern Karana]]
+* [[Qeynos|North Qeynos]]
+* [[Qeynos Aqueducts]]
+* [[Qeynos Hills]]
+* [[Southern Karana]]
+* [[Qeynos|South Qeynos]]
+* [[Freeport|West Freeport]]
+* [[Western Plains of Karana]]
+
+| zones_lower = 
+
+* [[Freeport|East Freeport]]
+* [[Erudin]]
+* [[Halas]]
+* [[Highpass Keep]]
+* [[Highpass Hold]]
+* [[Northern Karana]]
+* [[Qeynos|North Qeynos]]
+* [[Qeynos Aqueducts]]
+* [[Qeynos Hills]]
+* [[Southern Karana]]
+* [[Qeynos|South Qeynos]]
+* [[Steamfont Mountains]]
+* [[Surefall Glade]]
+* [[Freeport|West Freeport]]
+* [[Western Plains of Karana]]
+
+| quests_raise = 
+
+* [[Blackburrow Stout Shipment]]
+* [[Blank Scrolls]]
+* [[Drosco the Zombie (evil)]]
+* [[Exotic Drinks]]
+* [[Gnoll Scalp Collecting]]
+* [[Guard Shilster's Stout]]
+* [[Honey Mead for Trumpy]]
+* [[Hurrieta's Tunic Quest]]
+* [[Inert Potion Quest]]
+* [[Left Goblin Ears]]
+* [[Note for Rebby]]
+* [[Orc Scalp Collecting]]
+* [[Package from Lomarc]]
+* [[Rogue Redemption]]
+* [[The Clothspinner Sisters (evil)]]
+* [[The Crate (evil)]]
+* [[The Frikniller Family]]
+* [[The Package]]
+* [[The Tattered Pouch]]
+* [[Trumpy's Head]]
+* [[Trumpy's Skull]]
+
+| quests_lower = 
+
+* [[Blurred Map Quest]]
+* [[Cheslin's Illusion Cards]]
+* [[Cleanse the Ocean]]
+* [[Corrupt Guards]]
+* [[Deathfist Slashed Belts, Good Version]]
+* [[Drosco the Zombie (evil)]]
+* [[Drosco the Zombie (good)]]
+* [[Faren's Tacklebox]]
+* [[Find Lucie Elron]]
+* [[Gharin's Note (Good)]]
+* [[Hero Bracers Quest]]
+* [[Indaria's Doll]]
+* [[Qeynos Badge Quests|Interrogator's Badge (Badge #2)]]
+* [[Kobold Killing]]
+* [[Kwint's Kwest]]
+* [[Library Book]]
+* [[Merona's Brother]]
+* [[Moonstones]]
+* [[Package from Lomarc]]
+* [[Qeynos Badge Quests|Qeynos Badge of Honor (Badge #4)]]
+* [[Quench Lasen's Thirst]]
+* [[Scout Blade]]
+* [[Steel Warrior Initiation]]
+* [[The Clothspinner Sisters (good)]]
+* [[The Crate (good)]]
+* [[The Escaped Catman]]
+* [[The Nitrates and the Assassin]]
+* [[Trumpy's Head]]
+* [[Vasty Deep Water]]
+* [[Weapons Delivery]]
+* [[Wenbie's Muffins]]
+* [[Zimel's Blades (SoulFire)]]
+
+| mobs_raise = 
+
+* [[a sewer sentinel]] <span class='fmz'>(Qeynos Catacombs)</span>
+* [[Arinna Trueblade]] <span class='fmz'>(West Freeport - Warrior Guildmaster)</span>
+* [[Atwin Keladryn]] <span class='fmz'>(Butcherblock Mountains - Quest NPC)</span>
+* [[Axe Broadsmith]] <span class='fmz'>(Qeynos Hills - Quest NPC)</span>
+* [[Brena Donyld]] <span class='fmz'>(East Freeport - Warrior Guildmaster)</span>
+* [[Brina Foxtripper]] <span class='fmz'>(East Freeport - Warrior Guildmaster)</span>
+* [[Cain Darkmoore]] <span class='fmz'>(East Freeport - Warrior Guildmaster)</span>
+* [[Capt Linarius]] <span class='fmz'>(North Karana)</span>
+* [[Corporal Lancot]] <span class='fmz'>(North Qeynos)</span>
+* [[Endric]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[Gharin]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[Grahan Rothkar]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[Guard Beren]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Bixby]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Guard Corshin]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Dunix]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Fernaldo]] <span class='fmz'>(Mountains of Rathe)</span>
+* [[Guard Fredrick]] <span class='fmz'>(North Karana)</span>
+* [[Guard Gehnus]] <span class='fmz'>(North Qeynos)</span>
+* [[Guard Hezlan]] <span class='fmz'>(North Qeynos)</span>
+* [[Guard Justyn]] <span class='fmz'>(West Karana)</span>
+* [[Guard Kilson]] <span class='fmz'>(West Karana)</span>
+* [[Guard Lasen]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Naret]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Nash]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Guard Philbin]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Guard Pryde]] <span class='fmz'>(West Karana)</span>
+* [[Guard Rianna]] <span class='fmz'>(Lake Rathetear)</span>
+* [[Guard Treal]] <span class='fmz'>(Lake Rathetear)</span>
+* [[Guard Urius]] <span class='fmz'>(South Qeynos)</span>
+* [[Jakom Herolon]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Jusia Vapious]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Larn Brugal]] <span class='fmz'>(East Freeport - Warrior Guildmaster)</span>
+* [[Markin Ironwhite]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Milea Clothspinner]] <span class='fmz'>(East Karana - Quest NPC)</span>
+* [[Monia Oakstone]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Narra Tanith]]  <span class='fmz'>(South Karana)</span>
+* [[Plagus Ladeson]] <span class='fmz'>(East Freeport - Warrior Guildmaster)</span>
+* [[Plnorrick Spinecracker]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Sir Edwin Motte]]  <span class='fmz'>(East Freeport)</span>
+* [[Tumpy Irontoe]] <span class='fmz'>(Qeynos Catacombs - NPC, Non-Quest)</span>
+* [[Toala Nehron]] <span class='fmz'>(East Freeport - Warrior Guildmaster)</span>
+* [[Trancil Clearpond]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Vun Winstone]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Zepin Winsle]]  <span class='fmz'>(Innothule Swamp)</span>
+
+| mobs_lower = 
+
+* [[a guard]] <span class='fmz'>(Highpass Hold)</span>
+* [[a Highpass citizen]] <span class='fmz'>(Highpass Hold - NPC, Non-Quest)</span>
+* [[a maid]] <span class='fmz'>(High Keep - NPC, Non-Quest)</span>
+* [[a necromancer]]  <span class='fmz'>(Qeynos Catacombs)</span>
+* [[A Poacher]]  <span class='fmz'>(Surefall Glade)</span>
+* [[a rotting sentry]]  <span class='fmz'>(Qeynos Catacombs)</span>
+* [[a smuggler]] <span class='fmz'>(Highpass Hold - NPC, Non-Quest)</span>
+* [[Argyn Shieldstan]] <span class='fmz'>(Qeynos Catacombs - NPC, Non-Quest)</span>
+* [[Beur Tenlah]] <span class='fmz'>(East Freeport - Rogue Guildmaster)</span>
+* [[Bruax Grengar]] <span class='fmz'>(Qeynos Catacombs - Necromancer Guildmaster)</span>
+* [[Brunar Rankin]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Bryan Mcgee]] <span class='fmz'>(Highpass Hold - Quest NPC)</span>
+* [[Captain Orben]] <span class='fmz'>(Highpass Hold)</span>
+* [[Carson Mccabe]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Commander Kane]] <span class='fmz'>(Qeynos Catacombs - Warrior Guildmaster)</span>
+* [[Crow]] <span class='fmz'>(North Qeynos - Merchant)</span>
+* [[Dallisen Xalladyr]] <span class='fmz'>(Qeynos Catacombs - Merchant)</span>
+* [[Dranot Harbin]] <span class='fmz'>(Qeynos Catacombs - Merchant)</span>
+* [[Driana Poxsbourne]]  <span class='fmz'>(East Freeport)</span>
+* [[Dyllin Starsine]] <span class='fmz'>(Highpass Hold - Quest NPC)</span>
+* [[Elisi Nasin]] <span class='fmz'>(East Freeport - Rogue Guildmaster)</span>
+* [[Flynn Merrington]] <span class='fmz'>(North Qeynos - Quest NPC)</span>
+* [[Garuc Anehm]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Ghil Starn]] <span class='fmz'>(North Qeynos - Merchant)</span>
+* [[Gren Frikniller]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Grendin Maze]]  <span class='fmz'>(Erudin)</span>
+* [[Guard Augos]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Beris]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Guard Bicker]] <span class='fmz'>(High Keep)</span>
+* [[Guard Blayle]] <span class='fmz'>(High Keep)</span>
+* [[Guard Donlan]] <span class='fmz'>(West Karana)</span>
+* [[Guard Duras]] <span class='fmz'>(High Keep)</span>
+* [[Guard Folton]] <span class='fmz'>(High Keep)</span>
+* [[Guard Jerith]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Lancel]] <span class='fmz'>(High Keep)</span>
+* [[Guard Lorton]] <span class='fmz'>(High Keep)</span>
+* [[Guard McCluskey]] <span class='fmz'>(West Karana)</span>
+* [[Guard Mezzt]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Oleph]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Perin]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Quedal]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Rance]] <span class='fmz'>(High Keep)</span>
+* [[Guard Shilster]] <span class='fmz'>(North Karana - Quest NPC)</span>
+* [[Guard Sironan]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Guard Tyrak]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Yalroen]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Hanns Krieghor]] <span class='fmz'>(North Qeynos - Rogue Guildmaster)</span>
+* [[Harkin Duskfoot]] <span class='fmz'>(East Freeport - Rogue Guildmaster)</span>
+* [[Imxil Tbrow]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Knargon Lanenda]] <span class='fmz'>(North Qeynos - Rogue Guildmaster)</span>
+* [[Kurne Rextula]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Lady McCabe]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Lieutenant Dagarok]]  <span class='fmz'>(North Qeynos)</span>
+* [[Lucky the Beggar]] <span class='fmz'>(High Keep - NPC, Non-Quest)</span>
+* [[Lyris Moonbane]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Nax Ghruna]] <span class='fmz'>(North Qeynos - NPC, Non-Quest)</span>
+* [[Neab]] <span class='fmz'>(Qeynos Catacombs - NPC, Non-Quest)</span>
+* [[Nestral TGaza]] <span class='fmz'>(East Freeport - Rogue Guildmaster)</span>
+* [[Nulima Opalis]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Omorb]] <span class='fmz'>(Qeynos Catacombs - NPC, Non-Quest)</span>
+* [[Pelshia Thuxpire]] <span class='fmz'>(North Qeynos - Merchant)</span>
+* [[Perkon Malok]] <span class='fmz'>(Qeynos Catacombs - NPC, Non-Quest)</span>
+* [[Poacher]]  <span class='fmz'>(Surefall Glade)</span>
+* [[Pyzjn]]  <span class='fmz'>(Qeynos Hills)</span>
+* [[Raz The Rat Misk]]  <span class='fmz'>(South Qeynos)</span>
+* [[Reania Jukle]] <span class='fmz'>(Qeynos Catacombs - Enchanter Guildmaster)</span>
+* [[Renux Herkanor]] <span class='fmz'>(West Karana - Quest NPC)</span>
+* [[Renux Herkanor]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[Riggin Vix]]  <span class='fmz'>(Qeynos Catacombs)</span>
+* [[Rocthar Bekesna]] <span class='fmz'>(Qeynos Catacombs - Warrior Guildmaster)</span>
+* [[Senst Ereek]] <span class='fmz'>(Qeynos Catacombs - Merchant)</span>
+* [[Shintl Lowbrew]]  <span class='fmz'>(West Freeport)</span>
+* [[Sragg Bloodheart]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Tenni Kohern]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Teydar]] <span class='fmz'>(Qeynos Catacombs - Shadowknight Guildmaster)</span>
+* [[Thadres Thyme]] <span class='fmz'>(Halas - Quest NPC)</span>
+* [[Tovax Vmar]] <span class='fmz'>(Qeynos Hills - Quest NPC)</span>
+* [[Tumpy Irontoe]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[Tubal Weaver]] <span class='fmz'>(North Qeynos - Merchant)</span>
+* [[Vidurlyn Aeminee]] <span class='fmz'>(Qeynos Catacombs - Merchant)</span>
+* [[Zaen Kalystir]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Zannsin Resdinet]] <span class='fmz'>(North Qeynos - Rogue Guildmaster)</span>
+* [[Zenita D`Rin]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+
+}}
+= Suggested Route =
+*[[The Frikniller Family]] (+[[Coalition of Tradefolk Underground]], +[[Coalition of Tradefolk]], +[[Carson McCabe]], +[[Corrupt Qeynos Guards]], +[[The Freeport Militia]])
+*[[Guard Shilster's Stout]] (+[[Corrupt Qeynos Guards]], -[[Guards of Qeynos]], +[[Kane Bayle]], +[[Circle Of Unseen Hands]], +[[Bloodsabers]])
+*[[The Crate (evil)]] Part 1: (+[[Merchants of Qeynos]], +[[Antonius Bayle]], +[[Coalition of Tradefolk]], +[[Guards of Qeynos]], -[[Circle Of Unseen Hands]]) Part 2: (+[[Corrupt Qeynos Guards]], +[[Kane Bayle]], +[[Circle Of Unseen Hands]], +[[Bloodsabers]], -[[Guards of Qeynos]])
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

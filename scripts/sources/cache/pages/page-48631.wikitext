@@ -1,0 +1,108 @@
+__NOTOC__
+Specialization is the means by which a spellcaster increases their mana efficiency in a given area of magic. Granted to intelligence-based casters (wizard, enchanter, necromancer, and magician) at level 20 and priest classes (cleric, shaman, and druid) at level 30, they obtain the ability to specialize in the five fields of magic. Whilst a caster can gain skill in all five, at first, only one can exceed a skill of 125. Whichever skill first exceeds 125 becomes the primary Specialization of the caster from then on. If you choose the wrong specialty, you can purchase the Master of All Archetype [[Alternate Advancement|AA]] to unlock additional specializations. This AA costs 5 points, so you can specialize in all five schools of magic by spending 20 AA total.
+
+Note on specialization: As of this writing, there is a known bug in EQL with Spell Specialization. When using the "loadout swap" feature, will reset your specializations to alphabetical order. The only way to actually Specialize in Conjuration (for example), is to blow 10 AA points on "Master of All" which will unlock Abjuration (1st, default), Alteration, and finally Conjuration. In other iterations of Everquest there was a quest in the Temple of Solusek Ro that would allow you to reset your specializations. However, this quest is not available in Everquest Legends. Considering that you can get full specialization in all schools of magic for 20 AAs, its unlikely the developers intend to ever include this quest.
+
+==How does it work?==
+
+In other versions of Everquest, the formula is approximately 1% mana preservation per 18.7 skill points, resulting in a savings of just under 3% mana preservation at skill 50, and 12% at skill 230. Depending on a player's tactics and style, this benefit can have a tremendous effect on the mana efficiency of their spells. It is currently assumed that EQ Legends uses the same or similar formula for calculating mana reductions. Though it is likely applied ''after'' mana reductions from [[Spell Upgrade System|spell upgrades]] and [[Focus Effects]].
+
+The mana savings is NOT applied to the initial mana cost required to cast. A spell's full mana cost is required from the caster's mana pool upon casting and then the amount 'saved' by specialization is returned after a successful cast.
+
+Note:  It has been confirmed by Geoffrey Zatkin, the once Arch-Magi at Verant that:
+
+    * Specialization does not increase chance of recovering after interruption.  This is based purely on Channelling
+    * Specialization does not make spells cast faster.  This is a fixed amount.
+
+To raise your skill you may want to spend one practice point in the skill initially.  This will raise your skill to 20.  Spend 1 point in each of the five skills. If you don't put a point in the skills, they will still raise normally but will start at 1.  After this the best idea is to pick the Specialization you want, memorize a Level 1 spell of that type and cast it on yourself for ten minutes or so until you reach 51 skill.  After that you can simply go and play normally safe in the knowledge your primary Specialization is set.  It rises fairy quickly so don't be surprised to see it climb up fast.  The max skill limit on Specialization is 5 + (5 x Level), with a maximum of 200.
+
+=What should I specialize in?=
+
+This is of course the big question.  In some cases, such as wizards, the answer is clear.  However, the other classes have a bit of a tougher time in making their decision.  Firstly it is recommended you examine the spell lists on this site and search by spell type to get an idea of exactly what spells are in what class.  For example if you were an Enchanter thinking of specializing in Evocation, you would notice that only 5 of the 200+ spells use this skill.  It would be ill advised to specialize in Evocation as an enchanter. 
+
+When deciding between competing Specializations you have to weigh up the number of spells which will benefit from it, the situation those spells will be used in, how often you will use those spells, and the average mana cost of that class of spells.
+
+==Enchanter==
+
+Enchanters really only have two choices to go for in Specialization: Alteration and Conjuration.  
+
+[[Skill Alteration|Alteration]] is by far the more popular choice as 80% of enchanter spells are of this nature.  It includes roots, hastes, slows, DoTs, charms, and most buffs and debuffs.  Most enchanters choose this as their field of Specialization.
+
+[[Skill Conjuration|Conjuration]] is used for the mesmerisation series of spells.  This is the major use of crowd control in the game.  Some Enchanters once they reach Level 50, complete the quest at the Temple of Sol Ro and switch to this Specialization as they find they are casting more mes-based spells than any other type.  It is really a question of gameplay.
+
+Generally speaking, unless you are very sure, if you are making an Enchanter I recommend you specialize in Alteration.
+
+==Magician==
+
+There are two main choices when choosing what to specialize in as a magician: Evocation or Conjuration. Your final decision is really a matter of personal strategy.
+
+[[Skill Evocation|Evocation]]-based spells are used almost exclusively during battle, where specialization will give you the most benefit, and among the magician's repertoire only the Shock of Blades line are Conjuration-based DD spells. All the AE and rain spells, as well as the remainder of DD spells, use Evocation. A mage who prefers grouping, or burning down enemies as fast as possible when soloing, will benefit most from specializing in Evocation.
+
+[[Skill Conjuration|Conjuration]] is another option for mages to master. Magicians have more Conjuration-based spells than any other class. Whether it's summoning up some food or making that fire pet, a magician uses Conjuration ''a lot''. However, unless your combat strategy involves chain-summoning pets, the majority of your Conjuration casting will take place during downtime, reducing the effectiveness of having it as your specialization.
+
+There is an argument to be made to specialize in [[Skill Alteration|Alteration]] for a mage who prefers healing his pets to re-summoning or chain-casting them. However, this would cater only to a very specific playstyle that becomes less viable as you rise in levels, when NPC damage begins to outpace the amount healed by the Renew Summoning line of spells.
+
+==Wizard==
+
+There is really no choice with wizards.  Wizards do one thing - nuke.  And they do it big time.  Simply stated wizards should specialize in [[Skill Evocation|Evocation]].  I did hear of one wizard who specialized in Alteration so that they could do more successful evacs.  This is a serious commitment as you are basically forgoing a very serious nuking advantage to be a professional evacer but it is a question of player preference.
+
+'''Modern update:'''
+Evocation is obviously the only choice for any wizard playing the game in a normal fashion. However if a wizard character is being used solely for the purposes of teleporting, it may be beneficial to respecialize in Alteration after leveling that character. Some examples: a Dial a Port alternate character , or a guild's teleport bot.
+
+==Necromancer==
+
+Necromancers have maybe the hardest choice of all.   There are three classes of magic which would all be powerful additions for a necromancer. 
+
+Firstly there is [[Skill Alteration|Alteration]].  This covers many of the Lifetaps, debuffs, and Undead Charms. A select few DoTs remain with Alteration, the rest shifted to Conjuration.  These spells are used a lot by necromancers, often in heavy combat situations. 
+
+Secondly there is [[Skill Evocation|Evocation]].  Whilst necromancers don't get a lot of nukes, they still pack quite a punch and can be quite nice with a primary Specialization.  Whilst soloing necromancers tend to rely on their DoTs more, a necromancer with a good solid guild may find it worthwhile to specialize in Evocation. 
+
+Lastly there is [[Skill Conjuration|Conjuration]].  This series covers the pet summonings, darkness and disease series of spells.  It is probably the second most popular Specialization for the class after Alteration. In EQL, most of Necromancer's DoTs moved to Conjuration. A few remain Alteration.
+
+I would recommend going with Alteration myself since you will use these spells as a Necromancer more than any other. In EQL I would recommend Conjuration if you plan to DoT most of the time.
+
+==Cleric==
+
+Clerics have two primary choices of Specialization: Alteration and Evocation.
+
+[[Skill Alteration|Alteration]] is by far the most popular choice. It covers heals, cures, roots, and resurrection spells. This means you'll be able to heal more damage for every point of your mana, the most important consideration for any cleric outside of soloing. It can also reduce the cost of mana-intensive resurrection spells.
+
+[[Skill Evocation|Evocation]] is a choice that many clerics attempting to solo decide to go for.  All the cleric direct damage spells are Evocation, and apart from the Ward Undead and Ward Summoned line are inherently inefficient. The cleric's stun line is also evocation-based, providing some utility for a cleric in a group, as every point of damage a stunned mob doesn't do is one that doesn't need to be healed.
+
+For Clerics Alteration is almost certainly the correct Specialization to choose: Evocation is only for the (extremely rare) solo-only Clerics.
+
+==Druid==
+
+Druids have 3 choices of Specialization: Conjuration, Alteration and Evocation.
+
+[[Skill Conjuration|Conjuration]] is mainly useful for druids who kite, as it is the basis for their low-resist DoT line (Stinging Swarm, etc). As the primary means of damage for a druid kiting or root-rotting individual mobs, this can save you considerable mana and make you much more effective.
+
+[[Skill Evocation|Evocation]] is the basis of all the druid DD spells. These are quite mana hungry, and druids certainly get some nasty spells in this line.  Evocation is good for both grouping (as DPS) and soloing druids.
+
+[[Skill Alteration|Alteration]] is the basis of a druid's teleports, roots, certain buffs (SoW, strength), as well as their charms, heals and regeneration spells. Because of how frequently these spells are cast, especially in a group, Alteration is a very viable choice for druids.
+
+If you are a druid deciding on a specialization, you must consider your preferred style of play. Evocation and Conjuration each enhance very specific strategies, while Alteration is a good choice if you want to retain the most versatility.
+
+For further discussion of Druid specialization choices see:
+
+* https://www.project1999.com/forums/showthread.php?t=70455 (2012, advocates Evocation)
+
+* https://www.project1999.com/forums/showthread.php?t=190125 (2015, advocates Alteration, with dissent for Evocation)
+
+==Shaman==
+
+Shamans have two real choices: Alteration and Conjuration.
+
+[[Skill Conjuration|Conjuration]] is mainly useful for shamans who solo or kite a lot. This is a good Specialization to take if you plan on soloing up until around level 35, or plan on using DoTs a lot.
+
+[[Skill Alteration|Alteration]] is used for almost all of a shaman's buffs, heals, regenerations, hastes, slows, roots, and the like. These are cast far more often in groups, and you can save a great deal of mana with this as your Specialization.  
+
+Alteration is a pretty safe bet, but if you attack more, and enhance less, then Conjuration is still worth considering.
+
+== Note ==
+
+Keep in mind in the spell lists you can list the spells by Alteration, Evocation, etc.  This is very useful to see exactly what Specialization will benefit.
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

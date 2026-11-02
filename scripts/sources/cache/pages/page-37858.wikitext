@@ -1,0 +1,62 @@
+{{Factionpage|
+
+| description = [[Troll]] [[Shadow Knight]] guild in [[Grobb]] called Shadowknights of Night Keep. Led by Hukulk these knights like [[DaBashers]] and hate the [[Broken Skull Clan]].  They hate the Ogre Shadow Knights of Oggok called the [[Green Blood Knights]] even more.
+
+| zones_raise = 
+
+* [[Butcherblock Mountains]]
+* [[Innothule Swamp]]
+* [[Ocean of Tears]]
+* [[Oggok]]
+* [[Steamfont Mountains]]
+* [[Western Plains of Karana]]
+
+| zones_lower = 
+
+* [[Grobb]]
+* [[Rathe Mountains]]
+* [[Neriak|Neriak Foreign Quarter]]
+* [[Toxxulia Forest]]
+
+| quests_raise = 
+
+* [[Bone Chips Grobb]]
+* [[Bugglegupp (Quest)]]
+* [[Majik Power]]
+* [[More Help for Innoruuk]]
+
+| quests_lower = 
+
+* [[Lizard Meat No 2]]
+* [[Lizard Tails No 2]]
+* [[Lynuga's Gem Collection]]
+* [[Rungupp (Quest)]]
+
+| mobs_raise = 
+
+* [[Bonlarg]] <span class='fmz'>(Oggok - Shadowknight Guildmaster)</span>
+* [[Bugglegupp]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[Chief Goonda]] <span class='fmz'>(West Karana - Shaman Guildmaster)</span>
+* [[Crilt]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Goob Mudtoe]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Grevak]] <span class='fmz'>(Oggok - Shadowknight Guildmaster)</span>
+* [[Lynuga]] <span class='fmz'>(Innothule Swamp - Quest NPC)</span>
+* [[Soonog]] <span class='fmz'>(Oggok - Shadowknight Guildmaster)</span>
+* [[Trusk]] <span class='fmz'>(Oggok - Merchant)</span>
+
+| mobs_lower = 
+
+* [[Bregna]] <span class='fmz'>(Grobb - Shaman Guildmaster)</span>
+* [[Guard Gruilka]] <span class='fmz'>(Mountains of Rathe)</span>
+* [[Guard Shiznak]] <span class='fmz'>(Mountains of Rathe)</span>
+* [[Hukulk]] <span class='fmz'>(Grobb - Shadowknight Guildmaster)</span>
+* [[Jokca]] <span class='fmz'>(Grobb - Shaman Guildmaster)</span>
+* [[Kaglari]] <span class='fmz'>(Grobb - Shaman Guildmaster)</span>
+* [[Rohga]] <span class='fmz'>(Grobb - Shadowknight Guildmaster)</span>
+* [[Rungupp]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Treskar]] <span class='fmz'>(Grobb - Shadowknight Guildmaster)</span>
+* [[Urako]] <span class='fmz'>(Grobb - Shaman Guildmaster)</span>
+* [[Vergad]] <span class='fmz'>(Grobb - Shadowknight Guildmaster)</span>
+
+}}
+[[Category:Achievement Faction]]

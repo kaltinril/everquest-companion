@@ -1,0 +1,62 @@
+{{Classic Era}}
+<div style="display: flex;">
+  <div style="flex: 1;">
+    <ul>
+    <li>Summoning Spell: [[Elementalkin: Air]]</li>
+    <li>Pet Type: Air Elemental</li>
+    <li>Pet Classes: [[Monk]] / [[Warrior]]</li>
+    <li>Pet Level: 5</li>
+    <li>Hit Points: 118 (+1/tick)</li>
+    <li>Mana: 0 (+4/tick)</li>
+    </ul>
+  </div>
+  <div style="flex: 1;">
+  [[File:small_air_elemental_summon.png|left|x175px]]
+  </div>
+</div>
+<div style="display: flex;">
+  <div style="flex: 1;">
+    <ul>
+    <li>Defensive Stats</li>
+       <ul>
+       <li>Mitigation: 27</li>
+       <li>Evasion: 74</li>
+       </ul>
+    </ul>
+    <ul>
+    <li>Offensive Stats</li>
+       <ul>
+       <li>Offense: 41</li>
+       <li>Accuracy: 50</li>
+       <li>Max Damage: 12</li>
+       <li>Dual Wield: 8%</li>
+       </ul>
+     </ul>
+  </div>
+  <div style="flex: 1;">
+    <ul><li>Strength: 99</li>
+    <li>Stamina: 94</li>
+    <li>Intelligence: 50</li>
+    <li>Wisdom: 50</li>
+    <li>Agility: 124</li>
+    <li>Dexterity: 120</li>
+    <li>Charisma: 20</li></ul>
+  </div>
+</div>
+
+== Abilities ==
+* [[Skill_Cleave|Cleave]]
+* [[Skill_Dodge|Dodge]]
+* [[Skill_Double_Attack|Double Attack]]
+* [[Skill_Kick|Kick]]
+* [[Skill_Taunt|Taunt]]
+
+== Spell List ==
+* [[Air Elemental Attack|<span class='itemeff'>Air Elemental Attack</span>]]
+== Focus Items ==
+* [[Broom of Trilon]]
+== Notes ==
+* None
+
+[[Category: Summoned Pet]]
+[[Category: Magician Pet]]

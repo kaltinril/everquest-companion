@@ -1,0 +1,233 @@
+__NOTOC__
+= Spell Icon Duplicates =
+
+In the '''Default''' spell icon set, many <code>new_icon</code> ids render identical art: 130 of the 145 ids used by in-game spells collapse into the 19 groups below (the remaining 15 ids are unique). [[Icon_List]] shows one icon per group, labeled with the group's lowest id.
+
+Spell pages always use the spell's '''true''' <code>new_icon</code>, not the group's lowest id: the in-game '''Alternate 1''' and '''Alternate 2''' icon sets (Options &rarr; Interface &rarr; General &rarr; Alternative Textures) assign distinct art to every id, so ids that look identical below are different icons for players using those sets. The duplication is a property of the Default skin only.
+
+Each group shows every member id rendered from its own uploaded file, lowest (canonical) id first. Ids marked &asymp; are stored as slightly different image files that render the same art.
+
+== 0 ==
+
+<div class="eql-lucy-images-grid">
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_0.png|96x96px|link=File:Spellicon_0.png]]</div><div class="eql-lucy-image-label">'''0'''</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_99.png|96x96px|link=File:Spellicon_99.png]]</div><div class="eql-lucy-image-label">99</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_101.png|96x96px|link=File:Spellicon_101.png]]</div><div class="eql-lucy-image-label">101</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_118.png|96x96px|link=File:Spellicon_118.png]]</div><div class="eql-lucy-image-label">118</div></div>
+</div>
+
+== 1 ==
+
+<div class="eql-lucy-images-grid">
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_1.png|96x96px|link=File:Spellicon_1.png]]</div><div class="eql-lucy-image-label">'''1'''</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_46.png|96x96px|link=File:Spellicon_46.png]]</div><div class="eql-lucy-image-label">46</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_52.png|96x96px|link=File:Spellicon_52.png]]</div><div class="eql-lucy-image-label">52</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_57.png|96x96px|link=File:Spellicon_57.png]]</div><div class="eql-lucy-image-label">57</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_61.png|96x96px|link=File:Spellicon_61.png]]</div><div class="eql-lucy-image-label">61</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_65.png|96x96px|link=File:Spellicon_65.png]]</div><div class="eql-lucy-image-label">65</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_69.png|96x96px|link=File:Spellicon_69.png]]</div><div class="eql-lucy-image-label">69</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_77.png|96x96px|link=File:Spellicon_77.png]]</div><div class="eql-lucy-image-label">77</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_78.png|96x96px|link=File:Spellicon_78.png]]</div><div class="eql-lucy-image-label">78</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_82.png|96x96px|link=File:Spellicon_82.png]]</div><div class="eql-lucy-image-label">82</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_90.png|96x96px|link=File:Spellicon_90.png]]</div><div class="eql-lucy-image-label">90</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_98.png|96x96px|link=File:Spellicon_98.png]]</div><div class="eql-lucy-image-label">98</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_128.png|96x96px|link=File:Spellicon_128.png]]</div><div class="eql-lucy-image-label">128</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_130.png|96x96px|link=File:Spellicon_130.png]]</div><div class="eql-lucy-image-label">130</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_131.png|96x96px|link=File:Spellicon_131.png]]</div><div class="eql-lucy-image-label">131</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_132.png|96x96px|link=File:Spellicon_132.png]]</div><div class="eql-lucy-image-label">132</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_133.png|96x96px|link=File:Spellicon_133.png]]</div><div class="eql-lucy-image-label">133</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_148.png|96x96px|link=File:Spellicon_148.png]]</div><div class="eql-lucy-image-label">148</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_149.png|96x96px|link=File:Spellicon_149.png]]</div><div class="eql-lucy-image-label">149</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_150.png|96x96px|link=File:Spellicon_150.png]]</div><div class="eql-lucy-image-label">150</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_151.png|96x96px|link=File:Spellicon_151.png]]</div><div class="eql-lucy-image-label">151</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_152.png|96x96px|link=File:Spellicon_152.png]]</div><div class="eql-lucy-image-label">152</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_156.png|96x96px|link=File:Spellicon_156.png]]</div><div class="eql-lucy-image-label">156</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_158.png|96x96px|link=File:Spellicon_158.png]]</div><div class="eql-lucy-image-label">158</div></div>
+</div>
+
+== 2 ==
+
+<div class="eql-lucy-images-grid">
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_2.png|96x96px|link=File:Spellicon_2.png]]</div><div class="eql-lucy-image-label">'''2'''</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_30.png|96x96px|link=File:Spellicon_30.png]]</div><div class="eql-lucy-image-label">30 &asymp;</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_32.png|96x96px|link=File:Spellicon_32.png]]</div><div class="eql-lucy-image-label">32 &asymp;</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_83.png|96x96px|link=File:Spellicon_83.png]]</div><div class="eql-lucy-image-label">83</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_95.png|96x96px|link=File:Spellicon_95.png]]</div><div class="eql-lucy-image-label">95</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_100.png|96x96px|link=File:Spellicon_100.png]]</div><div class="eql-lucy-image-label">100</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_108.png|96x96px|link=File:Spellicon_108.png]]</div><div class="eql-lucy-image-label">108</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_163.png|96x96px|link=File:Spellicon_163.png]]</div><div class="eql-lucy-image-label">163</div></div>
+</div>
+
+== 3 ==
+
+<div class="eql-lucy-images-grid">
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_3.png|96x96px|link=File:Spellicon_3.png]]</div><div class="eql-lucy-image-label">'''3'''</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_7.png|96x96px|link=File:Spellicon_7.png]]</div><div class="eql-lucy-image-label">7</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_50.png|96x96px|link=File:Spellicon_50.png]]</div><div class="eql-lucy-image-label">50</div></div>
+</div>
+
+== 4 ==
+
+<div class="eql-lucy-images-grid">
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_4.png|96x96px|link=File:Spellicon_4.png]]</div><div class="eql-lucy-image-label">'''4'''</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_5.png|96x96px|link=File:Spellicon_5.png]]</div><div class="eql-lucy-image-label">5</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_9.png|96x96px|link=File:Spellicon_9.png]]</div><div class="eql-lucy-image-label">9</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_17.png|96x96px|link=File:Spellicon_17.png]]</div><div class="eql-lucy-image-label">17</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_112.png|96x96px|link=File:Spellicon_112.png]]</div><div class="eql-lucy-image-label">112</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_138.png|96x96px|link=File:Spellicon_138.png]]</div><div class="eql-lucy-image-label">138</div></div>
+</div>
+
+== 6 ==
+
+<div class="eql-lucy-images-grid">
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_6.png|96x96px|link=File:Spellicon_6.png]]</div><div class="eql-lucy-image-label">'''6'''</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_8.png|96x96px|link=File:Spellicon_8.png]]</div><div class="eql-lucy-image-label">8</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_10.png|96x96px|link=File:Spellicon_10.png]]</div><div class="eql-lucy-image-label">10</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_16.png|96x96px|link=File:Spellicon_16.png]]</div><div class="eql-lucy-image-label">16</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_49.png|96x96px|link=File:Spellicon_49.png]]</div><div class="eql-lucy-image-label">49</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_123.png|96x96px|link=File:Spellicon_123.png]]</div><div class="eql-lucy-image-label">123</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_134.png|96x96px|link=File:Spellicon_134.png]]</div><div class="eql-lucy-image-label">134</div></div>
+</div>
+
+== 11 ==
+
+<div class="eql-lucy-images-grid">
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_11.png|96x96px|link=File:Spellicon_11.png]]</div><div class="eql-lucy-image-label">'''11'''</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_13.png|96x96px|link=File:Spellicon_13.png]]</div><div class="eql-lucy-image-label">13</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_21.png|96x96px|link=File:Spellicon_21.png]]</div><div class="eql-lucy-image-label">21</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_22.png|96x96px|link=File:Spellicon_22.png]]</div><div class="eql-lucy-image-label">22</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_24.png|96x96px|link=File:Spellicon_24.png]]</div><div class="eql-lucy-image-label">24</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_26.png|96x96px|link=File:Spellicon_26.png]]</div><div class="eql-lucy-image-label">26</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_35.png|96x96px|link=File:Spellicon_35.png]]</div><div class="eql-lucy-image-label">35 &asymp;</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_115.png|96x96px|link=File:Spellicon_115.png]]</div><div class="eql-lucy-image-label">115</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_141.png|96x96px|link=File:Spellicon_141.png]]</div><div class="eql-lucy-image-label">141</div></div>
+</div>
+
+== 12 ==
+
+<div class="eql-lucy-images-grid">
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_12.png|96x96px|link=File:Spellicon_12.png]]</div><div class="eql-lucy-image-label">'''12'''</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_15.png|96x96px|link=File:Spellicon_15.png]]</div><div class="eql-lucy-image-label">15</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_25.png|96x96px|link=File:Spellicon_25.png]]</div><div class="eql-lucy-image-label">25</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_27.png|96x96px|link=File:Spellicon_27.png]]</div><div class="eql-lucy-image-label">27</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_39.png|96x96px|link=File:Spellicon_39.png]]</div><div class="eql-lucy-image-label">39</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_40.png|96x96px|link=File:Spellicon_40.png]]</div><div class="eql-lucy-image-label">40</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_104.png|96x96px|link=File:Spellicon_104.png]]</div><div class="eql-lucy-image-label">104</div></div>
+</div>
+
+== 18 ==
+
+<div class="eql-lucy-images-grid">
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_18.png|96x96px|link=File:Spellicon_18.png]]</div><div class="eql-lucy-image-label">'''18'''</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_19.png|96x96px|link=File:Spellicon_19.png]]</div><div class="eql-lucy-image-label">19</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_23.png|96x96px|link=File:Spellicon_23.png]]</div><div class="eql-lucy-image-label">23</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_33.png|96x96px|link=File:Spellicon_33.png]]</div><div class="eql-lucy-image-label">33 &asymp;</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_34.png|96x96px|link=File:Spellicon_34.png]]</div><div class="eql-lucy-image-label">34 &asymp;</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_44.png|96x96px|link=File:Spellicon_44.png]]</div><div class="eql-lucy-image-label">44</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_75.png|96x96px|link=File:Spellicon_75.png]]</div><div class="eql-lucy-image-label">75</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_76.png|96x96px|link=File:Spellicon_76.png]]</div><div class="eql-lucy-image-label">76</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_79.png|96x96px|link=File:Spellicon_79.png]]</div><div class="eql-lucy-image-label">79</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_86.png|96x96px|link=File:Spellicon_86.png]]</div><div class="eql-lucy-image-label">86</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_87.png|96x96px|link=File:Spellicon_87.png]]</div><div class="eql-lucy-image-label">87</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_88.png|96x96px|link=File:Spellicon_88.png]]</div><div class="eql-lucy-image-label">88</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_93.png|96x96px|link=File:Spellicon_93.png]]</div><div class="eql-lucy-image-label">93</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_106.png|96x96px|link=File:Spellicon_106.png]]</div><div class="eql-lucy-image-label">106</div></div>
+</div>
+
+== 28 ==
+
+<div class="eql-lucy-images-grid">
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_28.png|96x96px|link=File:Spellicon_28.png]]</div><div class="eql-lucy-image-label">'''28'''</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_47.png|96x96px|link=File:Spellicon_47.png]]</div><div class="eql-lucy-image-label">47</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_55.png|96x96px|link=File:Spellicon_55.png]]</div><div class="eql-lucy-image-label">55 &asymp;</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_74.png|96x96px|link=File:Spellicon_74.png]]</div><div class="eql-lucy-image-label">74</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_91.png|96x96px|link=File:Spellicon_91.png]]</div><div class="eql-lucy-image-label">91</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_94.png|96x96px|link=File:Spellicon_94.png]]</div><div class="eql-lucy-image-label">94</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_140.png|96x96px|link=File:Spellicon_140.png]]</div><div class="eql-lucy-image-label">140</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_154.png|96x96px|link=File:Spellicon_154.png]]</div><div class="eql-lucy-image-label">154</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_164.png|96x96px|link=File:Spellicon_164.png]]</div><div class="eql-lucy-image-label">164</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_165.png|96x96px|link=File:Spellicon_165.png]]</div><div class="eql-lucy-image-label">165</div></div>
+</div>
+
+== 31 ==
+
+<div class="eql-lucy-images-grid">
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_31.png|96x96px|link=File:Spellicon_31.png]]</div><div class="eql-lucy-image-label">'''31''' &asymp;</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_48.png|96x96px|link=File:Spellicon_48.png]]</div><div class="eql-lucy-image-label">48</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_103.png|96x96px|link=File:Spellicon_103.png]]</div><div class="eql-lucy-image-label">103</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_107.png|96x96px|link=File:Spellicon_107.png]]</div><div class="eql-lucy-image-label">107</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_121.png|96x96px|link=File:Spellicon_121.png]]</div><div class="eql-lucy-image-label">121</div></div>
+</div>
+
+== 37 ==
+
+<div class="eql-lucy-images-grid">
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_37.png|96x96px|link=File:Spellicon_37.png]]</div><div class="eql-lucy-image-label">'''37'''</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_38.png|96x96px|link=File:Spellicon_38.png]]</div><div class="eql-lucy-image-label">38</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_89.png|96x96px|link=File:Spellicon_89.png]]</div><div class="eql-lucy-image-label">89</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_96.png|96x96px|link=File:Spellicon_96.png]]</div><div class="eql-lucy-image-label">96</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_105.png|96x96px|link=File:Spellicon_105.png]]</div><div class="eql-lucy-image-label">105</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_120.png|96x96px|link=File:Spellicon_120.png]]</div><div class="eql-lucy-image-label">120</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_125.png|96x96px|link=File:Spellicon_125.png]]</div><div class="eql-lucy-image-label">125</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_126.png|96x96px|link=File:Spellicon_126.png]]</div><div class="eql-lucy-image-label">126</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_127.png|96x96px|link=File:Spellicon_127.png]]</div><div class="eql-lucy-image-label">127</div></div>
+</div>
+
+== 41 ==
+
+<div class="eql-lucy-images-grid">
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_41.png|96x96px|link=File:Spellicon_41.png]]</div><div class="eql-lucy-image-label">'''41'''</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_43.png|96x96px|link=File:Spellicon_43.png]]</div><div class="eql-lucy-image-label">43</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_68.png|96x96px|link=File:Spellicon_68.png]]</div><div class="eql-lucy-image-label">68</div></div>
+</div>
+
+== 42 ==
+
+<div class="eql-lucy-images-grid">
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_42.png|96x96px|link=File:Spellicon_42.png]]</div><div class="eql-lucy-image-label">'''42'''</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_63.png|96x96px|link=File:Spellicon_63.png]]</div><div class="eql-lucy-image-label">63</div></div>
+</div>
+
+== 51 ==
+
+<div class="eql-lucy-images-grid">
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_51.png|96x96px|link=File:Spellicon_51.png]]</div><div class="eql-lucy-image-label">'''51'''</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_53.png|96x96px|link=File:Spellicon_53.png]]</div><div class="eql-lucy-image-label">53</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_54.png|96x96px|link=File:Spellicon_54.png]]</div><div class="eql-lucy-image-label">54</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_157.png|96x96px|link=File:Spellicon_157.png]]</div><div class="eql-lucy-image-label">157</div></div>
+</div>
+
+== 72 ==
+
+<div class="eql-lucy-images-grid">
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_72.png|96x96px|link=File:Spellicon_72.png]]</div><div class="eql-lucy-image-label">'''72'''</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_81.png|96x96px|link=File:Spellicon_81.png]]</div><div class="eql-lucy-image-label">81</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_144.png|96x96px|link=File:Spellicon_144.png]]</div><div class="eql-lucy-image-label">144</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_159.png|96x96px|link=File:Spellicon_159.png]]</div><div class="eql-lucy-image-label">159</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_160.png|96x96px|link=File:Spellicon_160.png]]</div><div class="eql-lucy-image-label">160</div></div>
+</div>
+
+== 80 ==
+
+<div class="eql-lucy-images-grid">
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_80.png|96x96px|link=File:Spellicon_80.png]]</div><div class="eql-lucy-image-label">'''80'''</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_85.png|96x96px|link=File:Spellicon_85.png]]</div><div class="eql-lucy-image-label">85</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_137.png|96x96px|link=File:Spellicon_137.png]]</div><div class="eql-lucy-image-label">137</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_162.png|96x96px|link=File:Spellicon_162.png]]</div><div class="eql-lucy-image-label">162</div></div>
+</div>
+
+== 117 ==
+
+<div class="eql-lucy-images-grid">
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_117.png|96x96px|link=File:Spellicon_117.png]]</div><div class="eql-lucy-image-label">'''117'''</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_145.png|96x96px|link=File:Spellicon_145.png]]</div><div class="eql-lucy-image-label">145</div></div>
+</div>
+
+== 139 ==
+
+<div class="eql-lucy-images-grid">
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_139.png|96x96px|link=File:Spellicon_139.png]]</div><div class="eql-lucy-image-label">'''139'''</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_143.png|96x96px|link=File:Spellicon_143.png]]</div><div class="eql-lucy-image-label">143</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_153.png|96x96px|link=File:Spellicon_153.png]]</div><div class="eql-lucy-image-label">153</div></div>
+<div class="eql-lucy-image-cell"><div class="eql-lucy-image-wrap">[[File:Spellicon_161.png|96x96px|link=File:Spellicon_161.png]]</div><div class="eql-lucy-image-label">161</div></div>
+</div>

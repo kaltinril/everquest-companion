@@ -1,0 +1,19 @@
+Riposte is a native skill to seize the opportunity of an opening. With this ability, every time you are hit and riposte, you get one free attack. Only works on attacks in front of you.
+
+Generates Swing Agro [https://project1999.com/forums/showthread.php?t=412540]
+
+== Classes ==
+
+* [[Warrior]] '''Level 15''' (Max 175)
+* [[Rogue]] '''Level 25''' (Max 125)
+* [[Paladin]] '''Level 20''' (Max 150)
+* [[Monk]] '''Level 20''' (Max 155)
+* [[Ranger]] '''Level 20''' (Max 155)
+* [[Shadow Knight]] '''Level 20''' (Max 150)
+* [[Bard]] '''Level 30''' (Max 100)
+* [[Beastlord]] '''Level 30''' (Max 100)
+
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

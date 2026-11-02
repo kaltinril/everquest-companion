@@ -1,0 +1,31 @@
+{{Factionpage|
+
+| description = 
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Lake Rathetear]]
+* [[Southern Karana]]
+* [[Splitpaw Lair]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a gnoll embalmer]]  <span class='fmz'>(Lake Rathetear)</span>
+* [[a gnoll high shaman]]  <span class='fmz'>(Lake Rathetear)</span>
+* [[a gnoll shaman]]  <span class='fmz'>(Lake Rathetear)</span>
+* [[a one-eyed gnoll]]  <span class='fmz'>(Splitpaw Lair)</span>
+* [[A Lteth Val Scribe]]  <span class='fmz'>(Splitpaw Lair)</span>
+
+}}

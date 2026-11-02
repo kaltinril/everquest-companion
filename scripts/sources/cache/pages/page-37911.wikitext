@@ -1,0 +1,70 @@
+{{Factionpage|
+
+| description = Spellcaster guild in West Freeport, made up of [[Enchanter]]s under Guildmaster Romiak Jusathorn, [[Magician]]s under Lorme Tredore and [[Wizard]]s under Opal Darkbriar.  Opal Darkbriar also heads the [[Necromancer]] Guild in East Freeport.  The Arcane Scientists have allied with the [[Knights of Truth]] against the Freeport Milita, and are opposed to the [[Opal Dark Briar]] faction as well, leading many to wonder if there are actually two Opal Darkbriars.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Highpass Keep]]
+* [[Qeynos Hills]]
+* [[Freeport|West Freeport]]
+
+| quests_raise = 
+
+* [[Illegible Cantrip Quest]]
+* [[Journal Strongbox]]
+* [[Lydl Mastat]]
+* [[Rat Ear Pie Quest]]
+
+| quests_lower = 
+
+* [[The Bridge]]
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Atvo Siro]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Besklor Tyrenson]] <span class='fmz'>(West Freeport - Quest NPC)</span>
+* [[Chardo Ahdelia]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Charia Betou]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Cronte Deloru]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Dooly Jonkers]] <span class='fmz'>(West Freeport - NPC, Non-Quest)</span>
+* [[Dulia Jestes]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Glyssa Sonshaw]] <span class='fmz'>(West Freeport - Quest NPC)</span>
+* [[Hemia Skemner]] <span class='fmz'>(West Freeport - Quest NPC)</span>
+* [[Jarel Ranin]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Jonbe Kressi]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Lasiris Oncre]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Lorme Tredore]] <span class='fmz'>(West Freeport - Magician Guildmaster)</span>
+* [[Lynce Renardo]] <span class='fmz'>(West Freeport - NPC, Non-Quest)</span>
+* [[Lysa Truegreen]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Lysin Smokkan]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Mirpa Arana]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Monat D`Larme]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Nusk Treton]] <span class='fmz'>(West Freeport - NPC, Non-Quest)</span>
+* [[Odemi Partun]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Palon Deskeb]] <span class='fmz'>(West Freeport - Quest NPC)</span>
+* [[Purchin Oddsbot]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Ran Flamespinner]] <span class='fmz'>(High Keep - Wizard Guildmaster)</span>
+* [[Remon Zarga]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Rephas]] <span class='fmz'>(Qeynos Hills - Quest NPC)</span>
+* [[Respin Yawg]] <span class='fmz'>(West Freeport - NPC, Non-Quest)</span>
+* [[Romiak Jusathorn]] <span class='fmz'>(West Freeport - Quest NPC)</span>
+* [[Tara Neklene]] <span class='fmz'>(West Freeport - Magician Guildmaster)</span>
+* [[Tharma Jaremi]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Trepo Merrop]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Voglan Dransed]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Xinari Anara]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Yarina Zarampo]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Zasrin Blueflame]] <span class='fmz'>(West Freeport - Merchant)</span>
+
+}}
+
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

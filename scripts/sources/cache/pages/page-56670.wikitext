@@ -1,0 +1,105 @@
+<div style="clear:both; color:#d6d6c0; max-width:1400px; margin:0 auto; box-sizing:border-box;">
+
+<div style="width:100%; box-sizing:border-box; border:1px solid #4b4a2f; background:#0d1118; margin:0 0 18px 0; padding:22px 28px; text-align:center;">
+<div style="max-width:1050px; margin:0 auto;">
+<div style="font-family:Georgia,'Times New Roman',serif; font-size:220%; font-weight:bold; letter-spacing:4px; color:#d8ca72; line-height:1.15;">CLASS COMBINATION GUIDES</div>
+<div style="margin-top:14px; color:#e2e2cf; font-size:125%; line-height:1.35;">
+Use this page to find or create three-class build guides.
+</div>
+<div style="margin:18px auto 0 auto; color:#d6d6c0; font-size:112%; line-height:1.45; max-width:1100px;">
+Select three classes below. If a guide already exists, you will be taken to it. If it does not exist yet, logged-in users with page creation permissions can create it.
+</div>
+</div>
+</div>
+
+<div style="width:100%; box-sizing:border-box; border:1px solid #5f5a34; background:#10151d; margin:0 0 24px 0; padding:24px 28px 28px 28px; text-align:center;">
+<div style="max-width:1050px; margin:0 auto;">
+<div style="font-family:Georgia,'Times New Roman',serif; font-size:185%; font-weight:bold; letter-spacing:2px; color:#d8ca72; border-bottom:2px solid #706b3d; padding-bottom:8px; margin:0 auto 12px auto; max-width:760px;">FIND OR CREATE A GUIDE</div>
+<div style="color:#e2e2cf; font-size:110%; margin-bottom:18px;">
+Choose three classes to open an existing trio guide or create a new one.
+</div>
+<div style="display:inline-block; border:1px solid #3f4029; background:#0b1017; padding:18px 22px; min-width:520px; max-width:900px; font-size:120%; color:#e2e2cf; box-sizing:border-box;">
+{{ClassGuidesDropdown}}
+</div>
+</div>
+</div>
+
+== About Build Guides ==
+
+{| style="width:100%; border:1px solid #4b4a2f; background:#10151d; margin:0 0 18px 0;"
+| style="padding:14px 18px; color:#e2e2cf;" |
+Build guides are meant to help players understand how three classes work together as a practical trio.
+
+{| style="width:100%; margin-top:14px; border-spacing:10px;"
+| style="width:25%; vertical-align:top; border:1px solid #3f4029; background:#0b1017; padding:12px; color:#d6d6c0;" |
+<div style="font-family:Georgia,serif; font-size:120%; font-weight:bold; color:#d8ca72; border-bottom:1px solid #625d35; margin-bottom:8px;">GROUP ROLES</div>
+<span style="color:#d6d6c0;">Main tank, main healer, puller, crowd control, damage, travel, recovery tools, and utility.</span>
+
+| style="width:25%; vertical-align:top; border:1px solid #3f4029; background:#0b1017; padding:12px; color:#d6d6c0;" |
+<div style="font-family:Georgia,serif; font-size:120%; font-weight:bold; color:#d8ca72; border-bottom:1px solid #625d35; margin-bottom:8px;">COMBAT TOOLS</div>
+<span style="color:#d6d6c0;">Pulling, healing, crowd control, tanking, damage, buffs, debuffs, active skills, disciplines, and emergency tools.</span>
+
+| style="width:25%; vertical-align:top; border:1px solid #3f4029; background:#0b1017; padding:12px; color:#d6d6c0;" |
+<div style="font-family:Georgia,serif; font-size:120%; font-weight:bold; color:#d8ca72; border-bottom:1px solid #625d35; margin-bottom:8px;">PROGRESSION</div>
+<span style="color:#d6d6c0;">Leveling strategy, dungeon camps, outdoor camps, gear priorities, AA priorities, quests, and items.</span>
+
+| style="width:25%; vertical-align:top; border:1px solid #3f4029; background:#0b1017; padding:12px; color:#d6d6c0;" |
+<div style="font-family:Georgia,serif; font-size:120%; font-weight:bold; color:#d8ca72; border-bottom:1px solid #625d35; margin-bottom:8px;">SYNERGY</div>
+<span style="color:#d6d6c0;">Spell, song, active skill, discipline, pet, heal, buff, debuff, and utility interactions between the three classes.</span>
+|}
+
+<span style="color:#e2e2cf;">There are '''540 possible three-class combinations''', so many pages may not exist yet. If your combination does not exist, feel free to create it using the template below.</span>
+|}
+
+== Available Classes ==
+
+{| style="width:100%; border:1px solid #4b4a2f; background:#10151d; margin:0 0 18px 0;"
+| style="padding:14px 18px; color:#d6d6c0;" |
+<div style="font-family:Georgia,serif; font-size:135%; font-weight:bold; letter-spacing:2px; color:#d8ca72; border-bottom:2px solid #706b3d; padding-bottom:4px; margin-bottom:12px;">AVAILABLE CLASSES</div>
+
+{| style="width:100%; text-align:center; border-spacing:8px;"
+| style="border:1px solid #3f4029; background:#0b1017; padding:8px;" | [[Bard|<span style="color:#b9c8ff;">Bard</span>]] <span style="white-space:nowrap; color:#d6d6c0;">([[:Category:Bard Build|<span style="color:#d8ca72;">Builds</span>]])</span>
+| style="border:1px solid #3f4029; background:#0b1017; padding:8px;" | [[Beastlord|<span style="color:#b9c8ff;">Beastlord</span>]] <span style="white-space:nowrap; color:#d6d6c0;">([[:Category:Beastlord Build|<span style="color:#d8ca72;">Builds</span>]])</span>
+| style="border:1px solid #3f4029; background:#0b1017; padding:8px;" | [[Berserker|<span style="color:#b9c8ff;">Berserker</span>]] <span style="white-space:nowrap; color:#d6d6c0;">([[:Category:Berserker Build|<span style="color:#d8ca72;">Builds</span>]])</span>
+| style="border:1px solid #3f4029; background:#0b1017; padding:8px;" | [[Cleric|<span style="color:#b9c8ff;">Cleric</span>]] <span style="white-space:nowrap; color:#d6d6c0;">([[:Category:Cleric Build|<span style="color:#d8ca72;">Builds</span>]])</span>
+|-
+| style="border:1px solid #3f4029; background:#0b1017; padding:8px;" | [[Druid|<span style="color:#b9c8ff;">Druid</span>]] <span style="white-space:nowrap; color:#d6d6c0;">([[:Category:Druid Build|<span style="color:#d8ca72;">Builds</span>]])</span>
+| style="border:1px solid #3f4029; background:#0b1017; padding:8px;" | [[Enchanter|<span style="color:#b9c8ff;">Enchanter</span>]] <span style="white-space:nowrap; color:#d6d6c0;">([[:Category:Enchanter Build|<span style="color:#d8ca72;">Builds</span>]])</span>
+| style="border:1px solid #3f4029; background:#0b1017; padding:8px;" | [[Magician|<span style="color:#b9c8ff;">Magician</span>]] <span style="white-space:nowrap; color:#d6d6c0;">([[:Category:Magician Build|<span style="color:#d8ca72;">Builds</span>]])</span>
+| style="border:1px solid #3f4029; background:#0b1017; padding:8px;" | [[Monk|<span style="color:#b9c8ff;">Monk</span>]] <span style="white-space:nowrap; color:#d6d6c0;">([[:Category:Monk Build|<span style="color:#d8ca72;">Builds</span>]])</span>
+|-
+| style="border:1px solid #3f4029; background:#0b1017; padding:8px;" | [[Necromancer|<span style="color:#b9c8ff;">Necromancer</span>]] <span style="white-space:nowrap; color:#d6d6c0;">([[:Category:Necromancer Build|<span style="color:#d8ca72;">Builds</span>]])</span>
+| style="border:1px solid #3f4029; background:#0b1017; padding:8px;" | [[Paladin|<span style="color:#b9c8ff;">Paladin</span>]] <span style="white-space:nowrap; color:#d6d6c0;">([[:Category:Paladin Build|<span style="color:#d8ca72;">Builds</span>]])</span>
+| style="border:1px solid #3f4029; background:#0b1017; padding:8px;" | [[Ranger|<span style="color:#b9c8ff;">Ranger</span>]] <span style="white-space:nowrap; color:#d6d6c0;">([[:Category:Ranger Build|<span style="color:#d8ca72;">Builds</span>]])</span>
+| style="border:1px solid #3f4029; background:#0b1017; padding:8px;" | [[Rogue|<span style="color:#b9c8ff;">Rogue</span>]] <span style="white-space:nowrap; color:#d6d6c0;">([[:Category:Rogue Build|<span style="color:#d8ca72;">Builds</span>]])</span>
+|-
+| style="border:1px solid #3f4029; background:#0b1017; padding:8px;" | [[Shadow Knight|<span style="color:#b9c8ff;">Shadow Knight</span>]] <span style="white-space:nowrap; color:#d6d6c0;">([[:Category:Shadow Knight Build|<span style="color:#d8ca72;">Builds</span>]])</span>
+| style="border:1px solid #3f4029; background:#0b1017; padding:8px;" | [[Shaman|<span style="color:#b9c8ff;">Shaman</span>]] <span style="white-space:nowrap; color:#d6d6c0;">([[:Category:Shaman Build|<span style="color:#d8ca72;">Builds</span>]])</span>
+| style="border:1px solid #3f4029; background:#0b1017; padding:8px;" | [[Warrior|<span style="color:#b9c8ff;">Warrior</span>]] <span style="white-space:nowrap; color:#d6d6c0;">([[:Category:Warrior Build|<span style="color:#d8ca72;">Builds</span>]])</span>
+| style="border:1px solid #3f4029; background:#0b1017; padding:8px;" | [[Wizard|<span style="color:#b9c8ff;">Wizard</span>]] <span style="white-space:nowrap; color:#d6d6c0;">([[:Category:Wizard Build|<span style="color:#d8ca72;">Builds</span>]])</span>
+|}
+|}
+
+== Contributor Guidelines ==
+
+{| style="width:100%; border:1px solid #4b4a2f; background:#10151d; margin:0 0 18px 0;"
+| style="padding:14px 18px; color:#e2e2cf;" |
+<div style="font-family:Georgia,serif; font-size:135%; font-weight:bold; letter-spacing:2px; color:#d8ca72; border-bottom:2px solid #706b3d; padding-bottom:4px; margin-bottom:12px;">CONTRIBUTOR GUIDELINES</div>
+
+When creating a new class-combination guide:
+
+* Use the page name generated by the selector.
+* Focus on how the classes work together rather than rewriting the individual class pages.
+* Link back to the individual class pages for class-specific details, such as spell lists, song lists, active skills, disciplines, and AAs.
+* Use existing single-class pages as references, but do not copy large sections from them unless they directly apply to the combination.
+* Add practical advice: camps, roles, tactics, strengths, weaknesses, and gear priorities.
+* See the [[Sample Build]] for formatting help.
+|}
+
+== New Guide Starter Template ==
+
+The template can be found here:
+
+https://eqlwiki.com/Template:Build_Guide_Preload
+
+Please be mindful of the transcluded sections -- they're not meant to be touched.

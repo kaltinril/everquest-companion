@@ -1,0 +1,41 @@
+{{Kunark Era}}
+{{Factionpage|
+
+| description = Creatures under the enchantment of the kly in Dalnir.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Crypt of Dalnir]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a coerced crusader]]  <span class='fmz'>(Crypt of Dalnir)</span>
+* [[a coerced dwarf (female)]]  <span class='fmz'>(Crypt of Dalnir)</span>
+* [[a coerced Erudite]]  <span class='fmz'>(Crypt of Dalnir)</span>
+* [[a coerced gnome]]  <span class='fmz'>(Crypt of Dalnir)</span>
+* [[a coerced goblin]]  <span class='fmz'>(Crypt of Dalnir)</span>
+* [[a coerced Iksar]]  <span class='fmz'>(Crypt of Dalnir)</span>
+* [[a coerced penkeeper]]  <span class='fmz'>(Crypt of Dalnir)</span>
+* [[a kly cohort]]  <span class='fmz'>(Crypt of Dalnir)</span>
+* [[a kly evoker]]  <span class='fmz'>(Crypt of Dalnir)</span>
+* [[a kly follower]]  <span class='fmz'>(Crypt of Dalnir)</span>
+* [[a kly imprecator]]  <span class='fmz'>(Crypt of Dalnir)</span>
+* [[a kly invoker]]  <span class='fmz'>(Crypt of Dalnir)</span>
+* [[an undead blacksmith]]  <span class='fmz'>(Crypt of Dalnir)</span>
+* [[lumpy goo]]  <span class='fmz'>(Crypt of Dalnir)</span>
+* [[The Kly]]  <span class='fmz'>(Crypt of Dalnir)</span>
+* [[the Kly Overseer]]  <span class='fmz'>(Crypt of Dalnir)</span>
+
+}}

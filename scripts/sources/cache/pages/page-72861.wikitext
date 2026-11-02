@@ -1,0 +1,40 @@
+{{Classic Era}}
+
+= Overview =
+
+Describe the faction, where it is encountered, and why players may care about it.
+
+= Raise Faction =
+
+== Zones ==
+
+* None
+
+== Quests ==
+
+* None
+
+== Mobs ==
+
+* None
+
+= Lower Faction =
+
+== Zones ==
+
+[[Nektropos Castle]]
+
+== Quests ==
+
+* None
+
+== Mobs ==
+
+* None
+
+= See Also =
+
+* [[Faction]]
+* [[Faction Quests]]
+
+[[Category:Factions]]

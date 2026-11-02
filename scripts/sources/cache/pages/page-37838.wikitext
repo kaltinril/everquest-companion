@@ -1,0 +1,164 @@
+{{Factionpage|
+
+| description = [[Cleric]] and [[Paladin]] Guild for followers of [[Rodcet Nife]].
+
+| zones_raise = 
+
+* [[Freeport|East Freeport]]
+* [[Lesser Faydark]]
+* [[Najena]]
+* [[Neriak|Neriak Third Gate]]
+* [[Qeynos Aqueducts]]
+* [[Qeynos Hills]]
+* [[Southern Karana]]
+* [[Surefall Glade]]
+
+| zones_lower = 
+
+* [[Blackburrow]]
+* [[Freeport|East Freeport]]
+* [[Eastern Plains of Karana]]
+* [[Innothule Swamp]]
+* [[Lavastorm Mountains]]
+* [[Rathe Mountains]]
+* [[Nektulos Forest]]
+* [[Northern Karana]]
+* [[Qeynos|North Qeynos]]
+* [[Qeynos Hills]]
+* [[Southern Karana]]
+* [[Qeynos|South Qeynos]]
+* [[Freeport|West Freeport]]
+* [[Western Plains of Karana]]
+
+| quests_raise = 
+
+* [[Aegis of Life Quest]]
+* [[Bandit Sashes]]
+* [[Bear Hide Armor]]
+* [[Blackburrow Stout Shipment]]
+* [[Blessed Oil Quest]]
+* [[Bone Chips Qeynos]]
+* [[Brother Trintle]]
+* [[Cheslin's Illusion Cards]]
+* [[Crush the Undead]]
+* [[Cure for Lempeck Hargrin]]
+* [[Drosco the Zombie (evil)]]
+* [[Drosco the Zombie (good)]]
+* [[Errand for Tonmerk]]
+* [[Fleshy Orbs]]
+* [[Frostbite's Fish]]
+* [[Gathering Grain]]
+* [[Holy Armor Scroll]]
+* [[Qeynos Badge Quests|Interrogator's Badge (Badge #2)]]
+* [[Karana's Blessing]]
+* [[Merona's Brother]]
+* [[Moonstones]]
+* [[Qeynos Badge Quests|Qeynos Badge of Honor (Badge #4)]]
+* [[Rabid Grizzlies]]
+* [[Rabid Wolves]]
+* [[Rat Shaped Rings]]
+* [[Qeynos Badge Quests|Researcher's Badge (Badge #3)]]
+* [[Temple Blankets Quest]]
+* [[The Clothspinner Sisters (good)]]
+* [[The Donations]]
+* [[The Rat King]]
+* [[Werewolf Hunters]]
+* [[Wolf Hide Armor]]
+* [[Zimel's Blades (SoulFire)]]
+
+| quests_lower = 
+
+* [[Drosco the Zombie (evil)]]
+* [[Gharin's Note (evil)]]
+* [[Hurrieta's Tunic Quest]]
+* [[Innoruuk Symbol Quests|Innoruuk Disciple]]
+* [[Innoruuk Symbol Quests|Innoruuk Initiate]]
+* [[Innoruuk Symbol Quests|Innoruuk Regent]]
+* [[The Clothspinner Sisters (evil)]]
+* [[The Visiting Priestess]]
+* [[Trumpy's Head]]
+* [[Trumpy's Skull]]
+
+| mobs_raise = 
+
+* [[a necromancer]]  <span style="color:gray">(Qeynos Catacombs)</span>
+* [[a rotting sentry]]  <span style="color:gray">(Qeynos Catacombs)</span>
+* [[a putrid skeleton]]  <span style="color:gray">(South Karana)</span>
+* [[Argyn Shieldstan]] <span style="color:gray">(Qeynos Catacombs - NPC, Non-Quest)</span>
+* [[Bruax Grengar]] <span style="color:gray">(Qeynos Catacombs - Necromancer Guildmaster)</span>
+* [[Commander Kane]] <span style="color:gray">(Qeynos Catacombs - Warrior Guildmaster)</span>
+* [[Dallisen Xalladyr]] <span style="color:gray">(Qeynos Catacombs - Merchant)</span>
+* [[Dranot Harbin]] <span style="color:gray">(Qeynos Catacombs - Merchant)</span>
+* [[Driana Poxsbourne]]  <span style="color:gray">(East Freeport)</span>
+* [[Garuc Anehm]] <span style="color:gray">(Qeynos Catacombs - Quest NPC)</span>
+* [[Issia H`Rugla]] <span style="color:gray">(Neriak Third Gate - Merchant)</span>
+* [[Jsvan Zexus]] <span style="color:gray">(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Kurne Rextula]] <span style="color:gray">(Qeynos Catacombs - Quest NPC)</span>
+* [[Lyris Moonbane]] <span style="color:gray">(Qeynos Catacombs - Quest NPC)</span>
+* [[Nulima Opalis]] <span style="color:gray">(Qeynos Catacombs - Quest NPC)</span>
+* [[Perkon Malok]] <span style="color:gray">(Qeynos Catacombs - NPC, Non-Quest)</span>
+* [[Perrir Zexus]] <span style="color:gray">(Neriak Third Gate - Cleric Guildmaster)</span>
+* [[Priestess Llandra]] <span style="color:gray">(Lesser Faydark - Quest NPC)</span>
+* [[Pyzjn]]  <span style="color:gray">(Qeynos Hills)</span>
+* [[Reania Jukle]] <span style="color:gray">(Qeynos Catacombs - Enchanter Guildmaster)</span>
+* [[Rocthar Bekesna]] <span style="color:gray">(Qeynos Catacombs - Warrior Guildmaster)</span>
+* [[Senst Ereek]] <span style="color:gray">(Qeynos Catacombs - Merchant)</span>
+* [[Sragg Bloodheart]] <span style="color:gray">(Qeynos Catacombs - Quest NPC)</span>
+* [[Teir`Dal Prophet]]  <span style="color:gray">(Lesser Faydark)</span>
+* [[Teydar]] <span style="color:gray">(Qeynos Catacombs - Shadowknight Guildmaster)</span>
+* [[Tovax Vmar]] <span style="color:gray">(Qeynos Hills - Quest NPC)</span>
+* [[Tzanso S`Tai]] <span style="color:gray">(Neriak Third Gate - Merchant)</span>
+* [[Vidurlyn Aeminee]] <span style="color:gray">(Qeynos Catacombs - Merchant)</span>
+* [[Zaen Kalystir]] <span style="color:gray">(Qeynos Catacombs - Quest NPC)</span>
+
+| mobs_lower = 
+
+* [[a koalindl]]  <span style="color:gray">(North Qeynos)</span>
+* [[Anderia]]  <span style="color:gray">(West Karana)</span>
+* [[Astaed Wemor]] <span style="color:gray">(North Qeynos - Paladin Guildmaster)</span>
+* [[Baobob Miller]] <span style="color:gray">(Qeynos Hills - Quest NPC)</span>
+* [[Bilbis Briar]] <span style="color:gray">(North Karana - Merchant)</span>
+* [[Brother Chintle]] <span style="color:gray">(West Karana - NPC, Non-Quest)</span>
+* [[Brother Drash]]  <span style="color:gray">(South Karana)</span>
+* [[Brother Estle]] <span style="color:gray">(West Karana - Quest NPC)</span>
+* [[Brother Gruff]] <span style="color:gray">(South Karana - NPC, Non-Quest)</span>
+* [[Brother Nallin]] <span style="color:gray">(North Karana - Quest NPC)</span>
+* [[Camlend Serbold]] <span style="color:gray">(North Qeynos - Paladin Guildmaster)</span>
+* [[Chanda Miller]] <span style="color:gray">(Qeynos Hills - Quest NPC)</span>
+* [[Chrislin Baker]] <span style="color:gray">(West Karana - Merchant)</span>
+* [[Cleet Miller]] <span style="color:gray">(West Karana - Merchant)</span>
+* [[Cleet Miller Jr]] <span style="color:gray">(West Karana - Merchant)</span>
+* [[Enic Ruklin]] <span style="color:gray">(North Qeynos - Quest NPC)</span>
+* [[Furball Miller]]  <span style="color:gray">(West Karana)</span>
+* [[Guard Carnita]] <span style="color:gray">(Mountains of Rathe)</span>
+* [[Gwynn Marthank]]  <span style="color:gray">(Innothule Swamp)</span>
+* [[Henina Miller]] <span style="color:gray">(West Karana - Merchant)</span>
+* [[Koalindl (Rodcet Nife)]] <span style="color:gray">(North Qeynos - NPC, Non-Quest)</span>
+* [[Lashun Novashine]] <span style="color:gray">(North Qeynos - Quest NPC)</span>
+* [[Lempeck Hargrin]]  <span style="color:gray">(West Karana)</span>
+* [[Niclaus Ressinn]]  <span style="color:gray">(Qeynos Hills)</span>
+* [[Nomsoe Jusagta]] <span style="color:gray">(North Qeynos - Cleric Guildmaster)</span>
+* [[Nul Aleswiller]] <span style="color:gray">(North Karana - NPC, Non-Quest)</span>
+* [[Philicia Drinn]] <span style="color:gray">(Mountains of Rathe - Merchant)</span>
+* [[Ping Fuzzlecutter]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Rell Ostodl]]  <span style="color:gray">(Innothule Swamp)</span>
+* [[Rinna Lightshadow]] <span style="color:gray">(Commonlands - Cleric Guildmaster)</span>
+* [[Roesager Thusten]] <span style="color:gray">(North Qeynos - Paladin Guildmaster)</span>
+* [[Rongol]] <span style="color:gray">(West Karana - Quest NPC)</span>
+* [[Shalena Roan]] <span style="color:gray">(East Karana - NPC, Non-Quest)</span>
+* [[Sir Lindeal]]  <span style="color:gray">(Lavastorm Mountains)</span>
+* [[Sir Morgan]] <span style="color:gray">(East Karana)</span>
+* [[Squire Wimbley]] <span style="color:gray">(East Karana - Quest NPC)</span>
+* [[Suuspa Clanim]] <span style="color:gray">(North Qeynos - Paladin Guildmaster)</span>
+* [[Sven Drinn]] <span style="color:gray">(Mountains of Rathe - Merchant)</span>
+* [[Talym Shoontar]]  <span style="color:gray">(Qeynos Hills)</span>
+* [[Tann Cellus]]  <span style="color:gray">(Innothule Swamp)</span>
+* [[Thomas]] <span style="color:gray">(Mountains of Rathe - Quest NPC)</span>
+* [[Tiny Miller]] <span style="color:gray">(West Karana - NPC, Non-Quest)</span>
+
+}}
+= Suggested Route =
+*[[Bone Chips Qeynos]] Quest with [[Bone Chips]] or Gold (+[[Priests of Life]], +[[Knights of Thunder]], +[[Guards of Qeynos]], +[[Antonius Bayle]], -[[Bloodsabers]])
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]

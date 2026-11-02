@@ -1,0 +1,49 @@
+{{Factionpage|
+
+| description = In Erudin, at the Temple of Divine Light, you can find the Peace Keepers. These followers of the Tranquil are taught their ways by the Cleric Leraena Shelyrak and the Paladin Depnar Bulrious. The Peace Keepers are allied with the [[High Council of Erudin]] and oppose the [[Heretics]] greatly. They seem quite distrustful of outsiders though and raising standing with them is not easy for anyone not of their guild.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* {{VeliousGray|The Warrens}}
+
+| quests_raise = 
+
+* [[Catfish Tail]]
+* [[Catman Alliance]]
+* [[Heretic Heads]]
+* [[Kobold Shaman Paws]]
+* [[Library Book]]
+* [[Miranda's Dice]]
+* [[Peacekeeper Staff Quest]]
+* [[Poacher's Head Quest (Erudin)]]
+* [[Poacher Leader]]
+* [[Rognarog's Head]]
+* [[Skeleton Killing]]
+* [[Spirit Aid]]
+* [[Yuio's Illness]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+<div class="grayout">
+* [[a kejekan amir ]] <span class='fmz'>(Stonebrunt Mountains)</span>
+* [[Giang Yin ]] <span class='fmz'>(Stonebrunt Mountains)</span>
+* [[Prowler of the Jungle ]] <span class='fmz'>(Stonebrunt Mountains)</span>
+* [[Slyder the Ancient ]] <span class='fmz'>(Stonebrunt Mountains)</span>
+* [[Snowbeast ]] <span class='fmz'>(Stonebrunt Mountains)</span>
+* [[Fishmaster Jajoshi ]] <span class='fmz'>(Stonebrunt Mountains)</span>
+</div>
+
+}}
+
+= Suggested Route =
+*[[Catman Alliance]] (requires amiable) (+[[Peace Keepers]], +[[High Council of Erudin]], -[[Heretics]])
+*[[Skeleton Killing]] (+[[Peace Keepers]], +[[High Council of Erudin]], -[[Heretics]])

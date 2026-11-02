@@ -1,0 +1,73 @@
+{{Classic Era}}
+<div style="display: flex;">
+  <div style="flex: 1;">
+    <ul>
+    <li>Summoning Spell: [[Haunting Corpse]]</li>
+    <li>Pet Type: Dry Bones Skeleton</li>
+    <li>Pet Classes: [[Shadow Knight]] / [[Warrior]]</li>
+    <li>Pet Level: 22</li>
+    <li>Hit Points: 1478 (+1/tick)</li>
+    <li>Mana: 440 (+44/tick)</li>
+    </ul>
+  </div>
+  <div style="flex: 1;">
+  [[File:medium_dry_bones_summon.png|left|x175px]]
+  </div>
+</div>
+<div style="display: flex;">
+  <div style="flex: 1;">
+    <ul>
+    <li>Defensive Stats</li>
+       <ul>
+       <li>Mitigation: 81</li>
+       <li>Evasion: 233</li>
+       </ul>
+    </ul>
+    <ul>
+    <li>Offensive Stats</li>
+       <ul>
+       <li>Offense: 130</li>
+       <li>Accuracy: 153</li>
+       <li>Max Damage: 24?</li>
+       <li>Dual Wield Skill: Medium?</li>
+       </ul>
+     </ul>
+  </div>
+  <div style="flex: 1;">
+    <ul><li>Strength: 105</li>
+    <li>Stamina: 105</li>
+    <li>Intelligence: 10</li>
+    <li>Wisdom: 10</li>
+    <li>Agility: 105</li>
+    <li>Dexterity: 85</li>
+    <li>Charisma: 8</li></ul>
+  </div>
+</div>
+
+== Abilities ==
+'''Needs to be Verified'''
+* [[Skill_Bash|Bash]]
+* [[Skill_Block|Block]]
+* [[Skill_Cleave|Cleave]]
+* [[Skill_Dodge|Dodge]]
+* [[Skill_Double_Attack|Double Attack]]
+* [[Skill_Harm_Touch|Harm Touch]]
+* [[Skill_Kick|Kick]]
+* [[Skill_Parry|Parry]]
+* [[Skill_Riposte|Riposte]]
+* [[Skill_Taunt|Taunt]]
+
+== Spell List ==
+'''Needs to be Verified'''
+* [[Disease Cloud|<span class='itemeff'>Disease Cloud</span>]]
+* [[Engulfing Darkness|<span class='itemeff'>Engulfing Darkness</span>]]??
+* [[Lifespike|<span class='itemeff'>Lifedraw</span>]]??
+
+== Focus Items ==
+* None
+
+== Notes ==
+* None
+
+[[Category: Summoned Pet]]
+[[Category: Necromancer Pet]]

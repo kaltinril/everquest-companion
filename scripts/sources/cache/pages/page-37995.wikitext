@@ -1,0 +1,37 @@
+{{Factionpage|
+
+| description = The lizards of the Feerrott. The enemy of the lizards of Cazic Thule: We Love Zilla.
+
+| zones_raise = 
+
+* [[Cazic Thule]]
+
+| zones_lower = 
+
+* [[Rathe Mountains]]
+* [[The Feerrott]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* All lizards in [[Cazic Thule]]
+* [[Radiant]]  <span class='fmz'>(Cazic Thule)</span>
+* [[Tae Ew Archon]]  <span class='fmz'>(Cazic Thule)</span>
+* [[Tae Ew Diviner]]  <span class='fmz'>(Cazic Thule)</span>
+* [[Tae Ew Templar]]  <span class='fmz'>(Cazic Thule)</span>
+* [[A Steel Golem]]  <span class='fmz'>(Cazic Thule)</span>
+
+| mobs_lower = 
+
+* [[A Hatchling]] <span class='fmz'>(The Feerrott)</span>
+* [[a lizardman forager]]  <span class='fmz'>(The Feerrott)</span>
+* [[a lizardman scout]]  <span class='fmz'>(The Feerrott)</span>
+* [[a lizardman watcher]]  <span class='fmz'>(The Feerrott)</span>
+* [[lizardman mystic]]  <span class='fmz'>(Mountains of Rathe)</span>
+
+}}

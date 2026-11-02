@@ -1,0 +1,47 @@
+{{Factionpage|
+
+| description = Creatures loyal to [[Xalgoz]].
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Kaesora]]
+* [[Trakanon's Teeth]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Briarweb Spider]]  <span class='fmz'>(Kaesora)</span>
+* [[Bristleweb Spider]]  <span class='fmz'>(Kaesora)</span>
+* [[enraged ravener]]  <span class='fmz'>(Kaesora)</span>
+* [[Enraged spectral librarian]] <span class='fmz'>(Kaesora - Undead)</span>
+* [[famished ravener]]  <span class='fmz'>(Kaesora)</span>
+* [[Frenzied Strathbone]]  <span class='fmz'>(Kaesora)</span>
+* [[Guardian Of Xalgoz]]  <span class='fmz'>(Kaesora)</span>
+* [[Hungered Ravener]]  <span class='fmz'>(Kaesora)</span>
+* [[Minion Of Xalgoz]] <span class='fmz'>(Kaesora - Undead)</span>
+* [[Ravener]]  <span class='fmz'>(Kaesora)</span>
+* [[Reaver of Xalgoz]]  <span class='fmz'>(Kaesora)</span>
+* [[Skeletal Guardian]] <span class='fmz'>(Kaesora - Undead)</span>
+* [[skeletal minion]] <span class='fmz'>(Kaesora - Undead)</span>
+* [[Skeletal Warder]] <span class='fmz'>(Kaesora - Undead)</span>
+* [[spectral guardian]] <span class='fmz'>(Kaesora - Undead)</span>
+* [[Spectral Legionnaire]] <span class='fmz'>(Trakanon's Teeth - Undead)</span>
+* [[spectral librarian]] <span class='fmz'>(Kaesora - Undead)</span>
+* [[Strathbone Healer]]  <span class='fmz'>(Kaesora)</span>
+* [[Strathbone Runelord]]  <span class='fmz'>(Kaesora)</span>
+* [[strathbone spider]]  <span class='fmz'>(Kaesora)</span>
+* [[Warder of Xalgoz]]  <span class='fmz'>(Kaesora)</span>
+* [[Xalgoz]]  <span class='fmz'>(Kaesora)</span>
+
+}}

@@ -1,0 +1,95 @@
+{{Factionpage|
+
+| description = Guntrik leads the Craknek Warriors of [[Oggok]].  Craknek Warriors like Clurg and hate the Ogre Shadow Knights who are called the [[Green Blood Knights]].
+
+| zones_raise = 
+
+* [[Butcherblock Mountains]]
+* [[Crushbone]]
+* [[Dagnor's Cauldron]]
+* [[Innothule Swamp]]
+* [[Kaladim|North Kaladim]]
+* [[Qeynos Hills]]
+* [[Kaladim|South Kaladim]]
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Ocean of Tears]]
+* [[Oggok]]
+
+| quests_raise = 
+
+* [[Clurg's New Creation]]
+* [[Clurg's Revenge]]
+* [[Crude Stein Quest]]
+* [[Exotic Drinks]]
+* [[Feeding Dooga]]
+* [[Lizard Meat Quest]]
+* [[Lizard Tails]]
+* [[Noble Hunters]]
+* [[Pickled Frogloks]]
+* [[The Bridge]]
+
+| quests_lower = 
+
+* [[Blyle Bundin's Head]]
+* [[Cleaner Clockwork]]
+* [[Crushbone Belts]]
+* [[Crushbone Shoulderpads Quest]]
+* [[Knight Card Quest]]
+* [[Ogre Heads]]
+* [[Rat Pelts]]
+* [[Runnyeye Warbeads (Kaladim Warrior)]]
+* [[Scarab Armor Quests]]
+* [[Slave Keys]]
+* [[Trueshot Longbow Quest]]
+* [[Trumpy Irontoe]]
+
+| mobs_raise = 
+
+* [[a dwarven smith]]  <span class='fmz'>(Crushbone)</span>
+* [[Bunk Odon]]  <span class='fmz'>(Innothule Swamp)</span>
+* [[Furtog Ogrebane]] <span class='fmz'>(South Kaladim - Warrior Guildmaster)</span>
+* [[Guard Adolar]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Adolmer]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Anathur]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Badmer]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Bobbin]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Cardaff]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Clendin]] <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Guard Dalammer]] <span class='fmz'>(North Kaladim)</span>
+* [[Guard Dalthur]] <span class='fmz'>(North Kaladim)</span>
+* [[Guard Didek]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Dinamin]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Dinler]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Doradek]] <span class='fmz'>(North Kaladim)</span>
+* [[Guard Gabbles]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Hinolmer]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Humkor]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Humphet]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Kaldolar]] <span class='fmz'>(North Kaladim)</span>
+* [[Guard Kanuf]] <span class='fmz'>(North Kaladim)</span>
+* [[Guard Kathur]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Kindor]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Koranin]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Mandin]] <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Guard Ninadek]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Ninaf]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Stump]] <span class='fmz'>(South Kaladim)</span>
+* [[Guard Tantan]] <span class='fmz'>(South Kaladim)</span>
+* [[Sigan Ilbirkun]] <span class='fmz'>(Dagnor's Cauldron - NPC, Non-Quest)</span>
+* [[Tagnis Ginfarr]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Thar Kelgand]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Trantor Everhot]]  <span class='fmz'>(North Kaladim)</span>
+
+| mobs_lower = 
+
+* [[Boog Mudtoe]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Chef Dooga]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Clurg]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Corflunk]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Guntrik]] <span class='fmz'>(Oggok - Quest NPC)</span>
+
+}}
+[[Category:Achievement Faction]]

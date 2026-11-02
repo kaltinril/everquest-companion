@@ -1,0 +1,51 @@
+{{Factionpage|
+
+| description = The faction of the followers of [[Lady Vox]], the dragon.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Everfrost Peaks]]
+* [[Nagafen's Lair]]
+* [[Permafrost]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a goblin alchemist (Permafrost)]]  <span class='fmz'>(Permafrost Keep)</span>
+* [[a goblin archeologist]]  <span class='fmz'>(Permafrost Keep)</span>
+* [[a goblin preacher]]  <span class='fmz'>(Permafrost Keep)</span>
+* [[a goblin prelate]]  <span class='fmz'>(Permafrost Keep)</span>
+* [[a goblin priest]]  <span class='fmz'>(Permafrost Keep)</span>
+* [[a goblin wizard (Permafrost)]]  <span class='fmz'>(Permafrost Keep)</span>
+* [[an elite goblin guard]]  <span class='fmz'>(Permafrost Keep)</span>
+* [[an elite honor guard]]  <span class='fmz'>(Permafrost Keep)</span>
+* [[an ice giant]]  <span class='fmz'>(Everfrost Peaks)</span>
+* [[an ice giant diplomat]]  <span class='fmz'>(Permafrost Keep)</span>
+* [[an ice giant magus]]  <span class='fmz'>(Permafrost Keep)</span>
+* [[an ice giant priest]]  <span class='fmz'>(Permafrost Keep)</span>
+* [[an ice giant youth]]  <span class='fmz'>(Permafrost Keep)</span>
+* [[an ice goblin]]  <span class='fmz'>(Permafrost Keep)</span>
+* [[an orcish mountaineer]]  <span class='fmz'>(Everfrost Peaks)</span>
+* [[fire giant warrior]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[fire giant wizard]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[King Tranix]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[Lady Vox]]  <span class='fmz'>(Permafrost Keep)</span>
+* [[Lord Nagafen]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[Magus Rokyl]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[Redwind]]  <span class='fmz'>(Everfrost Peaks)</span>
+* [[Sulon McMoor]] <span class='fmz'>(Everfrost Peaks - Wizard Guildmaster)</span>
+* [[the goblin sage]]  <span class='fmz'>(Permafrost Keep)</span>
+* [[Warlord Skarlon]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+
+}}

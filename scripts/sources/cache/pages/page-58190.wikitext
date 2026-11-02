@@ -1,0 +1,67 @@
+{{Classic Era}}
+<div style="display: flex;">
+  <div style="flex: 1;">
+    <ul>
+    <li>Summoning Spell: [[Spirit of Sharik]]</li>
+    <li>Pet Type: [[Beastlord#Your Race & Warder|Beastlord Warder]]</li>
+    <li>Pet Classes: [[Beastlord]] / [[Warrior]]</li>
+    <li>Pet Level: 9</li>
+    <li>Hit Points: 380 (+1/tick)</li>
+    <li>Mana: 180 (+18/tick)</li>
+    </ul>
+  </div>
+  <div style="flex: 1;">
+  [[File:medium_warder_summon.png|left|x175px]]
+  </div>
+</div>
+<div style="display: flex;">
+  <div style="flex: 1;">
+    <ul>
+    <li>Defensive Stats</li>
+       <ul>
+       <li>Mitigation: 19</li>
+       <li>Evasion: 106</li>
+       </ul>
+    </ul>
+    <ul>
+    <li>Offensive Stats</li>
+       <ul>
+       <li>Offense: 57</li>
+       <li>Accuracy: 75</li>
+       <li>Max Damage: 10</li>
+       <li>Dual Wield: 14%</li>
+       </ul>
+     </ul>
+  </div>
+  <div style="flex: 1;">
+    <ul><li>Strength: 93</li>
+    <li>Stamina: 93</li>
+    <li>Intelligence: 10</li>
+    <li>Wisdom: 10</li>
+    <li>Agility: 93</li>
+    <li>Dexterity: 85</li>
+    <li>Charisma: 8</li></ul>
+  </div>
+</div>
+
+== Abilities ==
+* [[Skill_Bash|Bash]]
+* [[Skill_Block|Block]]
+* [[Skill_Cleave|Cleave]]
+* [[Skill_Dodge|Dodge]]
+* [[Skill_Kick|Kick]]
+* [[Skill_Parry|Parry]]
+* [[Skill_Riposte|Riposte]]
+* [[Skill_Taunt|Taunt]]
+
+== Spell List ==
+* [[Inner Fire|<span class='itemeff'>Inner Fire</span>]]
+* [[Minor Healing|<span class='itemeff'>Minor Healing</span>]]
+
+== Focus Items ==
+* None
+== Notes ==
+* None
+
+[[Category: Summoned Pet]]
+[[Category: Beastlord Pet]]

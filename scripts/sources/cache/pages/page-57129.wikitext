@@ -1,0 +1,13 @@
+A sewing kit is a tradeskill container with which players may attempt a [[tailoring]] recipe.  A [[loom]] may also be used for this purpose, but the former is portable with limited slots and the latter is stationary in cities and with a larger capacity.  There are multiple types of sewing kits:
+
+== General Sewing Kits ==
+* [[Small Sewing Kit]]
+* [[Large Sewing Kit]]
+* [[Deluxe Sewing Kit]]
+
+== Cultural Sewing Kits ==
+These kits are used to craft the varying sets of cultural tailoring armor
+
+* [[Erudite Sewing Kit]]
+* [[Feir'Dal Sewing Kit]]
+* [[Vale Sewing Kit]]

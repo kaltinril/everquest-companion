@@ -1,0 +1,23 @@
+This skill grants you a chance to dodge an incoming attack.
+
+== Classes ==
+
+*[[Monk]] '''Level 1''' (Max 230)
+*[[Rogue]] '''Level 4''' (Max 210)
+*[[Beastlord]] '''Level 5''' (Max 230)
+*[[Warrior]] '''Level 6''' (Max 175)
+*[[Ranger]]  '''Level 8''' (Max 170)
+*[[Paladin]] '''Level 10''' (Max 155)
+*[[Bard]] '''Level 10''' (Max 155)
+*[[Shadow Knight]] '''Level 10''' (Max 155)
+*[[Shaman]] '''Level 15''' (Max 75)
+*[[Cleric]] '''Level 15''' (Max 75)
+*[[Druid]] '''Level 15''' (Max 75)
+*[[Enchanter]] '''Level 22''' (Max 75)
+*[[Magician]] '''Level 22''' (Max 75)
+*[[Necromancer]] '''Level 22''' (Max 75)
+*[[Wizard]] '''Level 22''' (Max 75)
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

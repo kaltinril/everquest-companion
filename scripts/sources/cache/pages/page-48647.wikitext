@@ -1,0 +1,9 @@
+One of the many bard instrument skills. The Percussion Skill is trained at level 1. 
+
+== Classes ==
+
+* [[Bard]] (Max: 255)
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

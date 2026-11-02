@@ -1,0 +1,57 @@
+{{Classic Era}}
+ Without the [Volunteer Watch] helping us out, Highpass would probably be overrun by those vile beasts.
+ - Captain Ashlan
+{{Factionpage|
+
+| description = '''Shralock Orcs''' are an orc tribe that inhabit [[Kithicor]] Forest and aspire to expand into [[High Pass]]. Noted members include the '''Shralok''' [sic] clan.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Highpass Hold]]
+* [[Kithicor Forest]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[an orc conscript]]  <span class='fmz'>(Highpass Hold)</span>
+* [[an orc fanatic]]  <span class='fmz'>(Highpass Hold)</span>
+* [[an orc medic]]  <span class='fmz'>(Highpass Hold)</span>
+* [[an orc mercenary]]  <span class='fmz'>(Highpass Hold)</span>
+* [[an orc soldier]]  <span class='fmz'>(Highpass Hold)</span>
+* [[Barg Shralok]]  <span class='fmz'>(Kithicor Forest)</span>
+* [[Bashil Shralok]]  <span class='fmz'>(Kithicor Forest)</span>
+* [[Bevlok Shralok]]  <span class='fmz'>(Kithicor Forest)</span>
+* [[C`Habrel Shralok]]  <span class='fmz'>(Kithicor Forest)</span>
+* [[Captain Shralok]]  <span class='fmz'>(Kithicor Forest)</span>
+* [[Chief Gan`Shralok]]  <span class='fmz'>(Kithicor Forest)</span>
+* [[Curkur Shralok]]  <span class='fmz'>(Kithicor Forest)</span>
+* [[Grigga Shralok]]  <span class='fmz'>(Kithicor Forest)</span>
+* [[Hagnis Shralok]]  <span class='fmz'>(Kithicor Forest)</span>
+* [[Hargvex Shralok]]  <span class='fmz'>(Kithicor Forest)</span>
+* [[Kladnog Shralok]]  <span class='fmz'>(Kithicor Forest)</span>
+* [[Kornek Shralok]]  <span class='fmz'>(Kithicor Forest)</span>
+* [[Recfek Shralok (Highpass Hold)]]  <span class='fmz'>(Highpass Hold)</span>
+* [[Recfek Shralok (Kithicor Forest)]]  <span class='fmz'>(Kithicor Forest)</span>
+* [[Renkil Shralok]]  <span class='fmz'>(Kithicor Forest)</span>
+* [[Talok Shralok]]  <span class='fmz'>(Kithicor Forest)</span>
+* [[Tulonk Shralok]]  <span class='fmz'>(Kithicor Forest)</span>
+* [[Unked Shralok]]  <span class='fmz'>(Kithicor Forest)</span>
+* [[Vopuk Shralok]]  <span class='fmz'>(Highpass Hold)</span>
+* [[Vehgar Shralok]]  <span class='fmz'>(Kithicor Forest)</span>
+* [[Wrek Shralok]]  <span class='fmz'>(Kithicor Forest)</span>
+* [[Wrom Shralok]]  <span class='fmz'>(Kithicor Forest)</span>
+
+}}
+
+[[Category:Monster factions]]

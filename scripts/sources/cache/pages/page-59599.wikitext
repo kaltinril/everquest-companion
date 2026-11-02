@@ -1,0 +1,493 @@
+<div style="float:left;margin-right:20px;"></div>
+
+= Berserker / Monk / Rogue Guide =
+
+Hello there! This guide seeks to help you *blender your way to victory.* Asterisk
+
+= Overview =
+
+This class combo presents some interesting challenges and niche strengths (especially powerful in Duos) enabled by some friendly buffs and a full-melee approach, assuming your gear and stance-dance game is on point.
+
+
+= Class Roles =
+
+{| class="eoTable2"
+! Class
+! Primary Role
+! Secondary Role
+! Notes
+|-
+| [[Berserker]]
+| Damage
+| Damage. That's kinda it.
+| Rampage provides the backbone of your offensive gains alongside the endurance-efficient Berserker stance, the costs of which are offset by late game Blood Runes. This also provides early access to chonky 2-handers until dual wield takes over, as well as Mage Hunter to beat out those pesky wizard bosses.
+|-
+| [[Monk]]
+| Damage
+| Survivability
+| Feign Death, Mend, Evasive Stance and an excellent suite of skill caps make Monk the best splash in the game, IMO. 
+|-
+| [[Rogue]]
+| Damage
+| Sneakiness/Lockpicking
+| Backstab is a really fun way to do a really large amount of damage. This makes a jaunt into Striker Stance to wipe out a boss 30-50% faster very viable. Also has a fun suite of much needed utility from slows to lifetaps thanks to poisons.
+|}
+
+
+= Stats =
+
+{| class="eoTable2"
+! Stat / Scaling
+! Value / Formula
+! Applies To
+! Notes
+|-
+| HP per point of Stamina
+| Placeholder
+| Placeholder
+| Placeholder
+|-
+| Endurance per point of Stamina
+| Placeholder
+| Placeholder
+| Placeholder
+|-
+| Armor Class per level
+| Placeholder
+| Placeholder
+| Placeholder
+|-
+| Placeholder
+| Placeholder
+| Placeholder
+| Placeholder
+|}
+
+= Passive Skills =
+
+{| class="eoTable2"
+! Passive Skill
+! What It Does
+! Stat Cap
+! Notes
+|-
+| Placeholder
+| Placeholder
+| Placeholder
+| Placeholder
+|-
+| Placeholder
+| Placeholder
+| Placeholder
+| Placeholder
+|-
+| Placeholder
+| Placeholder
+| Placeholder
+| Placeholder
+|}
+
+= Strengths =
+
+* Highest possible melee damage in the game, most likely.
+* Despite being pure melee, has a splattering of useful utility
+* Gear versatility lets you wear pretty much whatever gives the melee stats you need and AC will stay high. 
+
+= Weaknesses =
+
+* Utility is going to get trumped by any real utility
+* Poor HP Management tools
+* Endurance struggles without proper downtime and short enough fights
+
+= Core Strategy =
+
+Ultimately, your strategy is simple: Toggle auto attack and auto skill on, try to switch into Striker if you know you won't need to stretch your endurance. If you run into something particularly challenging, you can FD in between active-skill combos and "FD Joust" the mob, avoiding virtually all auto attacks in between your rounds of burst.
+
+== Pulling ==
+
+FD presents a challenge on this server without a duo partner, but it's still your best tool. The classic tricks of snare, root, mez, etc work well enough to split mobs, but the "forget" mechanics on this server do make it painfully slow to get the mob you want out of a stack. Take advantage of pulling back to corners or other places where you can take advantage of Line of Sight. When something starts going back home, unfeign and refeign immediately to potentially force the threat list window to reset. This window is your only way to have a clue what's going on with mob resets.
+
+== Tanking ==
+
+Unfortunately, the ways in which this class minimizes incoming damage is offset by the strongest tank tool sharing the only BER/MNK/ROG resource pool. You don't take a lot of damage, but if you're wiping out your endurance, you won't have any left for Evasive. If you lean on evasive, you won't have any for your damage stances. Even then, you're going to find yourself switching between either offensive or berserker until you're at around 50% hp and mend is on cooldown, and evasive to buy time for mend to come back up. If you run out of endurance, you should be switching into balanced and switching between balanced and evasive. Outside of evasive, you're killable.
+
+== Healing ==
+
+You get heals over time from Blood Rune and from Lifetap Poison. Both of which require being somewhat injured, so starting out in evasive isn't super helpful. Your best bet to take full advantage is to burst until you're at half health, mend to 75-90, and then lifetap poison/blood rune yourself stable until mend is off cooldown, burn the mob, repeat. Mend is your savior and you should get it on cooldown ASAP. Your other heals will total ~20 heals per second at best at the top end. That's currently not enough to sustain, so every fight is a race between your HP/Endurance and their HP.
+
+== Crowd Control ==
+
+lol. You get an interrupt and a snare with berserker, and some stun proc in rogue, but no hard CC is a big weakness of this build.
+
+== Damage ==
+
+This is all you do. Don't toggle auto attack on too soon or your active abilities will all swing at the air and be wasted for the first round. 
+
+== Buffs and Debuffs ==
+
+Rely on clickies and gear for this. Rogue poisons as seen below are a great tool and you can run multiple of them. Slow, Stun, Mana Drain, Snare, Cast Speed Reduction, Interrupt and a pushback from a junk Monk AA are all you have.
+
+== Emergency Tools ==
+
+Managing your threat in a duo is kind of a breeze. Escape AA is very powerful for this, on a long cooldown, with hide and FD making up the bulk of your in-fight "get it off me" mechanics. 
+
+= Leveling Strategy =
+
+Overall, you're just going to be slow killing one mob at a time. A duo with a shaman would be great for speeding things up, but it washes out if they're not doing almost as much DPS as you do.
+
+== Early Levels ==
+
+Placeholder text.
+
+== Mid Levels ==
+
+Placeholder text.
+
+== High Levels ==
+
+Placeholder text.
+
+= Suggested Zones and Camps =
+
+{| class="eoTable2"
+! Level Range
+! Zone
+! Camp / Target
+! Notes
+|-
+| Placeholder
+| Placeholder
+| Placeholder
+| Placeholder
+|-
+| Placeholder
+| Placeholder
+| Placeholder
+| Placeholder
+|-
+| Placeholder
+| Placeholder
+| Placeholder
+| Placeholder
+|}
+
+= Abilities =
+
+This section collects the relevant spell, song, and active-skill lists for this class combination.
+
+
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" | <span class="mw-collapsible-toggle" title="Expand or collapse Berserker Active Skills" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Berserker Active Skills</span>
+|-
+| style="padding:0.75rem;" |
+<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:visible;">
+<div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">
+{{#lst:Skills|ActiveSkills:Berserker}}
+</div>
+</div>
+|}
+
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" | <span class="mw-collapsible-toggle" title="Expand or collapse Berserker Spells or Songs" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Berserker Spells or Songs</span>
+|-
+| style="padding:0.75rem;" |
+<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:visible;">
+<div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">
+{{#lsth:Berserker|Spells}}
+{{#lsth:Berserker|Songs}}
+</div>
+</div>
+|}
+
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" | <span class="mw-collapsible-toggle" title="Expand or collapse Monk Active Skills" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Monk Active Skills</span>
+|-
+| style="padding:0.75rem;" |
+<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:visible;">
+<div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">
+{{#lst:Skills|ActiveSkills:Monk}}
+</div>
+</div>
+|}
+
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" | <span class="mw-collapsible-toggle" title="Expand or collapse Monk Spells or Songs" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Monk Spells or Songs</span>
+|-
+| style="padding:0.75rem;" |
+<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:visible;">
+<div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">
+{{#lsth:Monk|Spells}}
+{{#lsth:Monk|Songs}}
+</div>
+</div>
+|}
+
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" | <span class="mw-collapsible-toggle" title="Expand or collapse Rogue Active Skills" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Rogue Active Skills</span>
+|-
+| style="padding:0.75rem;" |
+<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:visible;">
+<div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">
+{{#lst:Skills|ActiveSkills:Rogue}}
+</div>
+</div>
+|}
+
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" | <span class="mw-collapsible-toggle" title="Expand or collapse Rogue Spells or Songs" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Rogue Spells or Songs</span>
+|-
+| style="padding:0.75rem;" |
+<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:visible;">
+<div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">
+{{#lsth:Rogue|Spells}}
+{{#lsth:Rogue|Songs}}
+</div>
+</div>
+|}
+
+= Disciplines =
+
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" | <span class="mw-collapsible-toggle" title="Expand or collapse Berserker Disciplines" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Berserker Disciplines</span>
+|-
+| style="padding:0.75rem;" |
+<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:visible;">
+<div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">
+{{#lsth:Disciplines|[[Berserker]]}}
+</div>
+</div>
+|}
+
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" | <span class="mw-collapsible-toggle" title="Expand or collapse Monk Disciplines" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Monk Disciplines</span>
+|-
+| style="padding:0.75rem;" |
+<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:visible;">
+<div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">
+{{#lsth:Disciplines|[[Monk]]}}
+</div>
+</div>
+|}
+
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" | <span class="mw-collapsible-toggle" title="Expand or collapse Rogue Disciplines" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Rogue Disciplines</span>
+|-
+| style="padding:0.75rem;" |
+<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:visible;">
+<div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">
+{{#lsth:Disciplines|[[Rogue]]}}
+</div>
+</div>
+|}
+
+= Stances & Invocations =
+
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" | <span class="mw-collapsible-toggle" title="Expand or collapse Berserker Stances and Invocations" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Berserker Stances & Invocations</span>
+|-
+| style="padding:0.75rem;" |
+<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:visible;">
+<div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">
+{{#lsth:Stances & Invocations|[[Berserker]]}}
+</div>
+</div>
+|}
+
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" | <span class="mw-collapsible-toggle" title="Expand or collapse Monk Stances and Invocations" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Monk Stances & Invocations</span>
+|-
+| style="padding:0.75rem;" |
+<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:visible;">
+<div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">
+{{#lsth:Stances & Invocations|[[Monk]]}}
+</div>
+</div>
+|}
+
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" | <span class="mw-collapsible-toggle" title="Expand or collapse Rogue Stances and Invocations" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Rogue Stances & Invocations</span>
+|-
+| style="padding:0.75rem;" |
+<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:visible;">
+<div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">
+{{#lsth:Stances & Invocations|[[Rogue]]}}
+</div>
+</div>
+|}
+
+= Alternate Advancement =
+
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" | <span class="mw-collapsible-toggle" title="Expand or collapse General AAs" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">General AAs</span>
+|-
+|
+<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:hidden;">
+<div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">
+{{#lsth:Alternate Advancement|General AAs}}
+</div>
+</div>
+|}
+
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" | <span class="mw-collapsible-toggle" title="Expand or collapse Archetype AAs" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Archetype AAs</span>
+|-
+|
+<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:hidden;">
+<div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">
+{{#lsth:Alternate Advancement|Archetype AAs}}
+</div>
+</div>
+|}
+
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" | <span class="mw-collapsible-toggle" title="Expand or collapse Berserker AAs" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Berserker AAs</span>
+|-
+|
+<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:hidden;">
+<div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">
+{{#lsth:Alternate Advancement|Berserker Class AAs}}
+</div>
+</div>
+|}
+
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" | <span class="mw-collapsible-toggle" title="Expand or collapse Monk AAs" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Monk AAs</span>
+|-
+|
+<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:hidden;">
+<div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">
+{{#lsth:Alternate Advancement|Monk Class AAs}}
+</div>
+</div>
+|}
+
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" | <span class="mw-collapsible-toggle" title="Expand or collapse Rogue AAs" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Rogue AAs</span>
+|-
+|
+<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:hidden;">
+<div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">
+{{#lsth:Alternate Advancement|Rogue Class AAs}}
+</div>
+</div>
+|}
+
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" | <span class="mw-collapsible-toggle" title="Expand or collapse Special AAs" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Special AAs</span>
+|-
+|
+<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:hidden;">
+<div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">
+{{#lsth:Alternate Advancement|Special AAs}}
+</div>
+</div>
+|}
+
+= Important Synergies =
+
+Placeholder text.
+
+* Placeholder
+* Placeholder
+* Placeholder
+
+= Gear Priorities =
+
+Placeholder text.
+
+{| class="eoTable2"
+! Class
+! Priority
+! Notes
+|-
+| [[Berserker]]
+| Placeholder
+| Placeholder
+|-
+| [[Monk]]
+| Placeholder
+| Placeholder
+|-
+| [[Rogue]]
+| Placeholder
+| Placeholder
+|}
+
+For class-specific gear references, see:
+
+* [[:Category:Berserker Equipment|Berserker Equipment]]
+* [[:Category:Monk Equipment|Monk Equipment]]
+* [[:Category:Rogue Equipment|Rogue Equipment]]
+* [[Players:Gear|Gear Reference]]
+
+= Useful Quests and Items =
+
+Placeholder text.
+
+{| class="eoTable2"
+! Item / Quest
+! Class
+! Why It Matters
+|-
+| Placeholder
+| Placeholder
+| Placeholder
+|-
+| Placeholder
+| Placeholder
+| Placeholder
+|-
+| Placeholder
+| Placeholder
+| Placeholder
+|}
+
+Class-specific quest references:
+
+* [[Berserker-Specific Quests|Berserker-Specific Quests]]
+* [[Monk-Specific Quests|Monk-Specific Quests]]
+* [[Rogue-Specific Quests|Rogue-Specific Quests]]
+
+= Example Group Tactics =
+
+Placeholder text.
+
+== Standard Fight ==
+
+# Placeholder
+# Placeholder
+# Placeholder
+
+== Multiple Pulls ==
+
+# Placeholder
+# Placeholder
+# Placeholder
+
+== Named / Difficult Mobs ==
+
+# Placeholder
+# Placeholder
+# Placeholder
+
+= See Also =
+
+* [[Class_Guides]]
+* [[Berserker]]
+* [[Monk]]
+* [[Rogue]]
+* [[Players:Gear|Gear Reference]]
+* [[Skills]]
+* [[Disciplines]]
+* [[Stances & Invocations]]
+* [[Alternate Advancement]]
+
+{{Navbox Classes}}
+
+[[Category:Berserker Build]]
+
+[[Category:Monk Build]]
+
+[[Category:Rogue Build]]
+
+[[Category:Build Guides]]

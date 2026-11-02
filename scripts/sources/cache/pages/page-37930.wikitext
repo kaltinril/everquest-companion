@@ -1,0 +1,162 @@
+{{Factionpage|
+
+| description = Vampire Ruler. Fashion icon. The [[Mayong Mistmoore | elf himself]].  See also [[Agents of Mistmoore]] faction.
+
+| zones_raise = 
+
+* [[Ak'Anon]]
+* [[Butcherblock Mountains]]
+* [[Dreadlands]]
+* [[Freeport|East Freeport]]
+* [[Emerald Jungle]]
+* [[Erudin]]
+* [[Greater Faydark]]
+* [[Halas]]
+* [[Highpass Keep]]
+* [[Howling Stones]]
+* [[Innothule Swamp]]
+* [[Nektulos Forest]]
+* [[Northern Karana]]
+* [[Qeynos Hills]]
+* [[Rivervale]]
+* [[Skyfire Mountains]]
+* [[Kaladim|South Kaladim]]
+* [[Southern Karana]]
+* [[Qeynos|South Qeynos]]
+* [[Steamfont Mountains]]
+* [[Surefall Glade]]
+* [[The Feerrott]]
+* [[Timorous Deep]]
+* [[Veeshan's Peak]]
+* [[Freeport|West Freeport]]
+* [[Western Plains of Karana]]
+* {{VeliousGray| [[Western Wastes]] }}
+
+| zones_lower = 
+
+* [[Mistmoore Castle]]
+* [[Dreadlands]]
+* [[Firiona Vie]]
+* [[Ocean of Tears]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+* [[Aenia and Behroe]]
+* [[Bard Reports]]
+* [[Fabian's Strings]]
+* [[Going Postal]] (Mail Delivery)
+* [[Rogue Redemption]] (Burning Rapier)
+* [[Winds of Karana]]
+
+| mobs_raise = 
+
+* [[a bile golem]]  <span class='fmz'>(Howling Stones (Charasis))</span>
+* [[A Crypt Golem]]  <span class='fmz'>(Howling Stones (Charasis))</span>
+* [[A Crypt Spectre]]  <span class='fmz'>(Howling Stones (Charasis))</span>
+* [[a helot skeleton]] <span class='fmz'>(Howling Stones (Charasis) - Undead)</span>
+* [[a pyre golem]]  <span class='fmz'>(Howling Stones (Charasis))</span>
+* [[a sepulcher skeleton]] <span class='fmz'>(Howling Stones (Charasis) - Undead)</span>
+* [[Canlan Talespinner]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Cordelia Minster]] <span class='fmz'>(North Karana - Quest NPC)</span>
+* [[Dark Deathsinger]] <span class='fmz'>(Innothule Swamp - Quest NPC)</span>
+* [[Dimlore Stormhammer]] <span class='fmz'>(Steamfont Mountains - NPC, Non-Quest)</span>
+* [[Drizda Tunesinger]] <span class='fmz'>(The Feerrott - Quest NPC)</span>
+* [[Drusella Sathir]]  <span class='fmz'>(Howling Stones (Charasis))</span>
+* [[Embalming Fluid]]  <span class='fmz'>(Howling Stones (Charasis))</span>
+* <span class="grayout"> [[Esorpa of the Ring]]  <span class='fmz'>(Western Wastes)</span> </span>
+* [[Faydedar]]  <span class='fmz'>(Timorous Deep)</span>
+* [[Gorenaire]]  <span class='fmz'>(Dreadlands)</span>
+* [[Hoshkar]]  <span class='fmz'>(Veeshan's Peak)</span>
+* [[Idia]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Jakum Webdancer]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Kilam Oresinger]] <span class='fmz'>(South Kaladim - Quest NPC)</span>
+* [[King Kazon Stormhammer]]  <span class='fmz'>(South Kaladim)</span>
+* [[Lislia Goldtune]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Lyra Lyrestringer]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Marton Stringsinger]] <span class='fmz'>(Halas - Quest NPC)</span>
+* [[Marus Kemson]] <span class='fmz'>(East Freeport - Bard Guildmaster)</span>
+* [[Mistrana Two Notes]] <span class='fmz'>(West Karana - Quest NPC)</span>
+* [[Misty Storyswapper]] <span class='fmz'>(Qeynos Hills - NPC, Non-Quest)</span>
+* [[Phara Dar]]  <span class='fmz'>(Veeshan's Peak)</span>
+* [[Severilous]]  <span class='fmz'>(Emerald Jungle)</span>
+* [[Silna Songsmith]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Siltria Marwind]] <span class='fmz'>(Butcherblock Mountains - Quest NPC)</span>
+* [[Silverwing]]  <span class='fmz'>(Veeshan's Peak)</span>
+* [[Sivina Lutewhisper]] <span class='fmz'>(Surefall Glade - Quest NPC)</span>
+* [[Starr Dreamspinner]] <span class='fmz'>(High Keep - NPC, Non-Quest)</span>
+* [[Talendor]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[the Crypt Keeper]] <span class='fmz'>(Howling Stones (Charasis) - Undead)</span>
+* [[The Spectre Spiritualist]]  <span class='fmz'>(Howling Stones (Charasis))</span>
+* [[Ticar Lorestring]] <span class='fmz'>(Erudin - Quest NPC)</span>
+* [[Travis Two Tone]] <span class='fmz'>(Nektulos Forest - Quest NPC)</span>
+* [[Trissa Whistlesong]] <span class='fmz'>(West Freeport - NPC, Non-Quest)</span>
+* [[Vhalen Nostrolo]] <span class='fmz'>(South Karana - Quest NPC)</span>
+* [[Xygoz]]  <span class='fmz'>(Veeshan's Peak)</span>
+
+| mobs_lower = 
+
+* [[a cloaked dhampyre]] <span class='fmz'>(Castle Mistmoore - Undead)</span>
+* [[a dark elf noble]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a dark offerer]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a dark ritualist]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a dark sacrificer]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a deathly harbinger]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a deathly herald]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a deathly usher]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a drachnid recluse]]  <span class='fmz'>(Dreadlands)</span>
+* [[a drachnid silklurker]]  <span class='fmz'>(Firiona Vie)</span>
+* [[a drachnid silkmistress]]  <span class='fmz'>(Dreadlands)</span>
+* [[a drachnid silkspinner]]  <span class='fmz'>(Firiona Vie)</span>
+* [[a drachnid silkstrander]]  <span class='fmz'>(Dreadlands)</span>
+* [[a drachnid webmaster]]  <span class='fmz'>(Dreadlands)</span>
+* [[a drachnid webspinner]]  <span class='fmz'>(Firiona Vie)</span>
+* [[a drachnid webstrander]]  <span class='fmz'>(Firiona Vie)</span>
+* [[a drachnid widow]]  <span class='fmz'>(Dreadlands)</span>
+* [[a dread widow]]  <span class='fmz'>(Dreadlands)</span>
+* [[a flouting gargoyle]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a gargoyle]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[a ghastish ancille]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a ghostly ancille]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a ghoulish ancille]] <span class='fmz'>(Castle Mistmoore - Undead)</span>
+* [[a glyphed custodian]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed familiar]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed forbidder]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed ghoul]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed guard]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed sentry]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed warder]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a grinning gargoyle]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a hemo enologist]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a jeering gargoyle]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a leering gargoyle]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a Mistmoore guard]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a negotiator]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a pledge familiar]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a shadowy sage]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a shadowy scribe]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a shadowy scrivener]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a sneering gargoyle]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a soul seductress]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a spectral ancille]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a spiritish ancille]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a thought defiler]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a thought spoiler]] <span class='fmz'>(Castle Mistmoore - Undead)</span>
+* [[a vampiric ancille]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a will pillager]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a will sapper]] <span class='fmz'>(Castle Mistmoore - Undead)</span>
+* [[an advisor]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[an ancille cook]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[an imp familiar]] <span class='fmz'>(Castle Mistmoore - Summoned)</span>
+* [[an initiate familiar]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Butler Syncall]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Enynti]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Garton Viswin]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Lasna Cheroon]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Maid Issis]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Mynthi Davissi]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Princess Cherista]] <span class='fmz'>(Castle Mistmoore - Undead)</span>
+
+}}

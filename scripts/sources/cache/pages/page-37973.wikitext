@@ -1,0 +1,46 @@
+{{Factionpage|
+
+| description = A clan of Gnolls found in [[East Karana]] and [[Highpass Hold]]. They deal war with the [[Highpass Guards]], [[Karana Bandits]] and [[Karana Residents]].
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Eastern Plains of Karana]]
+* [[Highpass Hold]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a gnoll brawler]]  <span class='fmz'>(Highpass Hold)</span>
+* [[a gnoll champion]]  <span class='fmz'>(Highpass Hold)</span>
+* [[a gnoll soothsayer]]  <span class='fmz'>(Highpass Hold)</span>
+* [[Beanu Mucktail]] <span class='fmz'>(East Karana)</span>
+* [[Burah Mucktail]] <span class='fmz'>(East Karana)</span>
+* [[Chief Sanre`Rexsa]]  <span class='fmz'>(East Karana)</span>
+* [[Emhu Mucktail]] <span class='fmz'>(East Karana)</span>
+* [[Grenix Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Hibber Mucktail]] <span class='fmz'>(East Karana)</span>
+* [[Hukex Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Jekca Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Klage Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Mechi Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Nre`Loxe Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Olixen Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Plur Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Tregil Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Vexven Mucktail]]  <span class='fmz'>(East Karana)</span>
+* [[Yahg Mucktail]]  <span class='fmz'>(East Karana)</span>
+
+}}
+
+[[Category:Monster factions]]

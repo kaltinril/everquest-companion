@@ -1,0 +1,218 @@
+{{Classic Era}}
+{{Factionpage|
+
+| description = '''Note:''' Some newer quests may refer to this faction as Coalition of Tradefolk Underground. It was originally called Coalition of Tradefolk Illegal (shortened to Coalition of Tradefolk ILL). 
+
+In [[East Freeport]] hidden beneath the docks under the Seafarer's Roost, is an entrance to the passages holding the Rogues Guild called Coalition of Tradefolk, Illegal.  These Rogues under Guildmaster [[Elisi Nasin]] walk the dangerous edge of Neutrality. Care should be taken visiting them, as they are not far from the evil guild called the [[Dismal Rage]].  Their activities support the [[Coalition of Tradefolk]], who are the merchants of Freeport, and [[Carson McCabe]] the Leader of [[High Keep]].  In addition they support the [[Corrupt Qeynos Guards]] and the [[Freeport Militia]], who are also quite corrupt.  If one does not stand upon principals, helping this guild can raise your standing in some of the darker elements of society without lowering your standing with the forces of good.
+
+| zones_raise = 
+
+* [[Freeport|East Freeport]]
+* [[Halas]]
+* [[Misty Thicket]]
+* [[Rivervale]]
+* [[Freeport|West Freeport]]
+
+| zones_lower = 
+
+* [[Freeport|East Freeport]]
+* [[High Keep]]
+* [[Highpass Hold]]
+* [[Misty Thicket]]
+* [[Neriak|Neriak Third Gate]]
+* [[Qeynos|North Qeynos]]
+* [[Northern Desert of Ro]]
+* [[Qeynos Hills]]
+* [[Rivervale]]
+* [[Freeport|West Freeport]]
+
+| quests_raise = 
+
+* [[Chomper]]
+* [[Cutthroat Rings]]
+* [[Deathfist Slashed Belts, Evil Version]]
+* [[Exotic Drinks]]
+* [[Inert Potion Quest]]
+* [[Note for Rebby]]
+* [[Note for Janam]]
+* [[Orc Picks]]
+* [[Reserve Militia]]
+* [[Rogue Errands]]
+* [[Rogue Redemption]]
+* [[The Frikniller Family]]
+* [[The Lottery Ticket]]
+* [[The Torn Pouch]]
+* [[The Traitor]]
+* [[Tonics for Groflah]]
+* [[Weapons Delivery]]
+
+| quests_lower = 
+
+* [[Bandages for Honeybugger]]
+* [[Bug Collection]]
+* [[Corrupt Guards (Cleric version)]]
+* [[Death of Lyda Nasin]]
+* [[Goblin Caster Necklace]]
+* [[Head of Granin O'Gill]]
+* [[Honey Jum Quest]]
+* [[Paladin Message]]
+* [[Reebo's Carrots]]
+* [[The Fishslayers]]
+* [[Tribunal Initiate]]
+* [[Wooly Fungus Quest]]
+* [[Zimel's Blades (SoulFire)]]
+
+| mobs_raise = 
+
+* [[Bim Buskin]] <span class='fmz'>(Misty Thicket - Merchant)</span>
+* [[Bimble Babbinsbort]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Blixkin Entopop]] <span class='fmz'>(Misty Thicket - Quest NPC)</span>
+* [[Daleen Leafsway]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Donlo Goobler]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Falia Frikniller]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Fiddy Bobick]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Hanga Wiskin]] <span class='fmz'>(Misty Thicket - Merchant)</span>
+* [[Joffin Sinclay]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Joogl Honeybugger]] <span class='fmz'>(Misty Thicket - Quest NPC)</span>
+* [[Kevlin Diggs]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Kizzie Mintopp]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Lil Honeybugger]] <span class='fmz'>(Misty Thicket - Quest NPC)</span>
+* [[Meeka Diggs]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Rantho Goobler]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Sonsa Fromp]] <span class='fmz'>(Misty Thicket - Merchant)</span>
+* [[Tipa Lighten]] <span class='fmz'>(Misty Thicket - Merchant)</span>
+* [[Topper Drodo]] <span class='fmz'>(Misty Thicket - Merchant)</span>
+* [[Twippie Diggs]] <span class='fmz'>(Rivervale - Merchant)</span>
+
+| mobs_lower = 
+
+* [[a noble]] <span class='fmz'>(High Keep - NPC, Non-Quest)</span>
+* [[Aimie Moonspin]] <span class='fmz'>(North Freeport - Merchant)</span>
+* [[Alec Greenglade]] <span class='fmz'>(North Freeport - Merchant)</span>
+* [[Amber (NPC)|Amber]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Ardiflah Steadirt]] <span class='fmz'>(North Freeport - Merchant)</span>
+* [[Beur Tenlah]] <span class='fmz'>(East Freeport - Rogue Guildmaster)</span>
+* [[Boomba the Big]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Bouncer Bigboot]] <span class='fmz'>(Rivervale)</span>
+* [[Bouncer Bogglebin]] <span class='fmz'>(Rivervale)</span>
+* [[Brother Jentry]] <span class='fmz'>(East Freeport)</span>
+* [[Brunar Rankin]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Captain Hazran]] <span class='fmz'>(East Freeport - Warrior Guildmaster)</span>
+* [[Cloud Alemaker]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Drona Whystlethin]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Dyrna Nlith]] <span class='fmz'>(High Keep - NPC, Non-Quest)</span>
+* [[Elisi Nasin]] <span class='fmz'>(East Freeport - Rogue Guildmaster)</span>
+* [[Flayer Hopkins]] <span class='fmz'>(High Keep - NPC, Non-Quest)</span>
+* [[Guard Dreikin]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Fentallin]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Hirazen]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Nekropo]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Nlool]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Popal]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Quallith]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Topplo]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Ullindin]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Wytiffin]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Xyxax]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Yandellen]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Zintrin]] <span class='fmz'>(East Freeport)</span>
+* [[Roghur Muleson]] <span class='fmz'>(? - Merchant)</span>
+* [[Guard Bonlo]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Corpillius]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Dungwatch]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Effel]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Hrakin]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Imillin]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Inofus]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Jacsen]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Jendl]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Ledshin]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Mizraen]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Munden]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Cozak]] <span class='fmz'>(East Freeport)</span>
+* [[Gord Smith]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Gregor Nasin]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Gren Frikniller]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Groflah Steadirt]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Guard Brendyl]] <span class='fmz'>(North Ro)</span>
+* [[Guard Colin]] <span class='fmz'>(Commonlands)</span>
+* [[Guard Doolin]] <span class='fmz'>(North Ro)</span>
+* [[Guard Drake]] <span class='fmz'>(?)</span>
+* [[Guard Drazden]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Fralldo]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Goemin]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Gollus]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Greedin]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Hiron]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Jup]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Kroon]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Lithnon]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Ogo]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Orpheen]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Reskin]] <span class='fmz'>(Commonlands)</span>
+* [[Guard Tolus]] <span class='fmz'>(Commonlands)</span>
+* [[Guard Valon]] <span class='fmz'>(Commonlands)</span>
+* [[Guard Zeph]] <span class='fmz'>(East Freeport)</span>
+* [[Gurb Smithson]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Harkin Duskfoot]] <span class='fmz'>(East Freeport - Rogue Guildmaster)</span>
+* [[Hebber Druneny]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Henna Treghost]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Hollish Tnoops]]  <span class='fmz'>(West Freeport)</span>
+* [[Ikthar Fireheart]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Imxil Tbrow]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Innkeep Evelona]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Innkeep Palola]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Innkeep Rille]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Issilyn Ristan]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Jade]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Jallen Nooz]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Jenna Smith]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Jracol Brestiage]] <span class='fmz'>(North Qeynos - Quest NPC)</span>
+* [[Judicla Riverfield]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Juni Sandfisher]] <span class='fmz'>(North Ro - Merchant)</span>
+* [[Jynsa Smithson]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Klan Smith]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Krystin Charcoal]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Lendel Deeppockets]] <span class='fmz'>(Rivervale - Rogue Guildmaster)</span>
+* [[Lyda Nasin]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Lylea]] <span class='fmz'>(Highpass Hold - NPC, Non-Quest)</span>
+* [[Lystyn Wyspin]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Mistress Anna]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Nestral TGaza]] <span class='fmz'>(East Freeport - Rogue Guildmaster)</span>
+* [[Olunea Miltin]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Peran Silverfield]] <span class='fmz'>(West Freeport - Banker)</span>
+* [[Ping Fuzzlecutter]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Ponila Quickfingers]] <span class='fmz'>(Commonlands - Merchant)</span>
+* [[Ranvigoz Tonsmith]] <span class='fmz'>(Commonlands - Quest NPC)</span>
+* [[Rashinda Elore]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Rueppy Kutpurse]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Runthar]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Sergeant Slate]] <span class='fmz'>(Commonlands)</span>
+* [[Shania Tassel]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Shintl Lowbrew]]  <span class='fmz'>(West Freeport)</span>
+* [[Sir Lucan D`Lere]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Slan ODonner]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Soris Silverfield]] <span class='fmz'>(West Freeport - Banker)</span>
+* [[Svinal Wyspin]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Swin Blackeye]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Tayla Ironforge]] <span class='fmz'>(Neriak Third Gate - Quest NPC)</span>
+* [[Tenni Kohern]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Timtok Tonsmith]] <span class='fmz'>(Commonlands - Quest NPC)</span>
+* [[Toelia Snuckery]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Tohsan Hallard]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Tradesman Lyna]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Tradesman Tulan]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Tyrana Slil]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Wahnig Nooz]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Winoyn]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Wres Corber]] <span class='fmz'>(Highpass Hold - NPC, Non-Quest)</span>
+* [[Yellus Gravien]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Zenita D`Rin]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+
+}}
+= Suggested Route =
+*[[The Frikniller Family]] (+[[Coalition of Tradefolk Underground]], +[[Coalition of Tradefolk]], +[[Carson McCabe]], +[[Corrupt Qeynos Guards]], +[[The Freeport Militia]])
+*[[Tonics for Groflah]] (+[[Coalition of Tradefolk]], +[[Knights of Truth]], +[[Merchants of Qeynos]], +[[Coalition of Tradefolk Underground]])
+*[[Rogue Errands]] Part 1: (+[[Carson McCabe]], +[[Coalition of Tradefolk Underground]], +[[Highpass Guards]], +[[Merchants of Highpass]], -[[Ring of Scale]])
+
+[[Category:Achievement Faction]]

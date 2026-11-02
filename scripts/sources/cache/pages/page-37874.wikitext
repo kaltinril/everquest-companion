@@ -1,0 +1,27 @@
+{{Factionpage|
+
+| description = The only known mob on this faction is Lady Shae.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Freeport|West Freeport]]
+
+| quests_raise = 
+
+* [[Red Wine to Lady Shae]]
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Lady Shae]] <span class='fmz'>(West Freeport)</span>
+
+}}

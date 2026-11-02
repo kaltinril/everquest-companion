@@ -1,0 +1,369 @@
+= Berserker / Rogue / Shadow Knight Guide =
+Placeholder text.
+
+= Overview =
+Placeholder text.
+
+= Class Roles =
+{| class="eoTable2"
+!Class
+!Primary Role
+!Secondary Role
+!Notes
+|-
+|[[Berserker]]
+|DPS
+|N/A
+|Placeholder
+|-
+|[[Rogue]]
+|DPS
+|Scouting
+|Placeholder
+|-
+|[[Shadow knight]]
+|Tank
+|DPS/Spells/Pets
+|Placeholder
+|}
+
+= Stats =
+{| class="eoTable2"
+!Stat / Scaling
+!Value / Formula
+!Applies To
+!Notes
+|-
+|HP per point of Stamina
+|Placeholder
+|Placeholder
+|Placeholder
+|-
+|Mana per point of primary casting stat
+|Placeholder
+|Placeholder
+|Placeholder
+|-
+|Endurance per point of Stamina
+|Placeholder
+|Placeholder
+|Placeholder
+|-
+|Armor Class per level
+|Placeholder
+|Placeholder
+|Placeholder
+|-
+|Placeholder
+|Placeholder
+|Placeholder
+|Placeholder
+|}
+
+= Passive Skills =
+{| class="eoTable2"
+!Passive Skill
+!What It Does
+!Stat Cap
+!Notes
+|-
+|Placeholder
+|Placeholder
+|Placeholder
+|Placeholder
+|-
+|Placeholder
+|Placeholder
+|Placeholder
+|Placeholder
+|-
+|Placeholder
+|Placeholder
+|Placeholder
+|Placeholder
+|}
+
+= Strengths =
+
+* Placeholder
+
+* Placeholder
+
+* Placeholder
+
+= Weaknesses =
+
+* Placeholder
+
+* Placeholder
+
+* Placeholder
+
+= Core Strategy =
+Placeholder text.
+
+== Pulling ==
+Placeholder text.
+
+== Tanking ==
+Placeholder text.
+
+== Healing ==
+Placeholder text.
+
+== Crowd Control ==
+Placeholder text.
+
+== Damage ==
+Placeholder text.
+
+== Buffs and Debuffs ==
+Placeholder text.
+
+== Emergency Tools ==
+Placeholder text.
+
+= Leveling Strategy =
+Placeholder text.
+
+== Early Levels ==
+Placeholder text.
+
+== Mid Levels ==
+Placeholder text.
+
+== High Levels ==
+Placeholder text.
+
+= Suggested Zones and Camps =
+{| class="eoTable2"
+!Level Range
+!Zone
+!Camp / Target
+!Notes
+|-
+|Placeholder
+|Placeholder
+|Placeholder
+|Placeholder
+|-
+|Placeholder
+|Placeholder
+|Placeholder
+|Placeholder
+|-
+|Placeholder
+|Placeholder
+|Placeholder
+|Placeholder
+|}
+
+= Abilities =
+This section collects the relevant spell, song, and active-skill lists for this class combination.
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" |<span class="mw-collapsible-toggle" title="Expand or collapse Berserker Active Skills" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Berserker Active Skills</span>
+|-
+| style="padding:0.75rem;" |<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:visible;"><div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">{{#lst:Skills|ActiveSkills:Berserker}}</div></div>
+|}
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" |<span class="mw-collapsible-toggle" title="Expand or collapse Berserker Spells" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Berserker Spells</span>
+|-
+| style="padding:0.75rem;" |<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:visible;"><div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">{{#lsth:Berserker|Spells}}<!-- For Bard, use this instead:
+
+{{#lsth:Bard|Songs}}
+
+--> 
+</div></div>
+|}
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" |<span class="mw-collapsible-toggle" title="Expand or collapse Rogue Active Skills" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Rogue Active Skills</span>
+|-
+| style="padding:0.75rem;" |<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:visible;"><div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">{{#lst:Skills|ActiveSkills:Rogue}}</div></div>
+|}
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" |<span class="mw-collapsible-toggle" title="Expand or collapse Rogue Spells" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Rogue Spells</span>
+|-
+| style="padding:0.75rem;" |<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:visible;"><div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">{{#lsth:Rogue|Spells}}<!-- For Bard, use this instead:
+
+{{#lsth:Bard|Songs}}
+
+--> 
+</div></div>
+|}
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" |<span class="mw-collapsible-toggle" title="Expand or collapse Shadow knight Active Skills" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Shadow knight Active Skills</span>
+|-
+| style="padding:0.75rem;" |<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:visible;"><div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">{{#lst:Skills|ActiveSkills:Shadow knight}}</div></div>
+|}
+{| class="eoTable2 mw-collapsible mw-collapsed eql-build-ability-panel" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" |<span class="mw-collapsible-toggle" title="Expand or collapse Shadow knight Spells" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Shadow knight Spells</span>
+|-
+| style="padding:0.75rem;" |<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:visible;"><div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">
+{{#lsth:Shadow knight|Spells}}<!-- For Bard, use this instead:
+
+{{#lsth:Bard|Songs}}
+
+--> 
+
+</div></div>
+|}
+
+= Disciplines/Stances =
+{| class="eoTable2 mw-collapsible mw-collapsed" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" |<span class="mw-collapsible-toggle" title="Expand or collapse Berserker" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Berserker</span>
+|-
+|<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:hidden;"><div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">{{#lsth:Disciplines|[[Berserker]]}}</div></div>
+|}
+{| class="eoTable2 mw-collapsible mw-collapsed" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" |<span class="mw-collapsible-toggle" title="Expand or collapse Rogue" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Rogue</span>
+|-
+|<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:hidden;"><div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">{{#lsth:Disciplines|[[Rogue]]}}</div></div>
+|}
+{| class="eoTable2 mw-collapsible mw-collapsed" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" |<span class="mw-collapsible-toggle" title="Expand or collapse Shadow knight" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Shadow knight</span>
+|-
+|<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:hidden;"><div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">{{#lsth:Disciplines|[[Shadow knight]]}}</div></div>
+|}
+
+= Alternate Advancement =
+{| class="eoTable2 mw-collapsible mw-collapsed" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" |<span class="mw-collapsible-toggle" title="Expand or collapse General AAs" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">General AAs</span>
+|-
+|<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:hidden;"><div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">{{#lsth:Alternate Advancement|General AAs}}</div></div>
+|}
+{| class="eoTable2 mw-collapsible mw-collapsed" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" |<span class="mw-collapsible-toggle" title="Expand or collapse Archetype AAs" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Archetype AAs</span>
+|-
+|<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:hidden;"><div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">{{#lsth:Alternate Advancement|Archetype AAs}}</div></div>
+|}
+{| class="eoTable2 mw-collapsible mw-collapsed" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" |<span class="mw-collapsible-toggle" title="Expand or collapse Berserker AAs" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Berserker AAs</span>
+|-
+|<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:hidden;"><div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">{{#lsth:Alternate Advancement|Berserker Class AAs}}</div></div>
+|}
+{| class="eoTable2 mw-collapsible mw-collapsed" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" |<span class="mw-collapsible-toggle" title="Expand or collapse Rogue AAs" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Rogue AAs</span>
+|-
+|<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:hidden;"><div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">{{#lsth:Alternate Advancement|Rogue Class AAs}}</div></div>
+|}
+{| class="eoTable2 mw-collapsible mw-collapsed" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" |<span class="mw-collapsible-toggle" title="Expand or collapse Shadow knight AAs" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Shadow knight AAs</span>
+|-
+|<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:hidden;"><div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">{{#lsth:Alternate Advancement|Shadow knight Class AAs}}</div></div>
+|}
+{| class="eoTable2 mw-collapsible mw-collapsed" style="width:100%; max-width:100%; margin:1rem 0; table-layout:fixed;"
+! style="text-align:left;" |<span class="mw-collapsible-toggle" title="Expand or collapse Special AAs" style="display:block; float:none !important; width:100%; cursor:pointer; font-family:Georgia,'Times New Roman',serif; color:#d8b75c; font-size:1.25rem; font-weight:700; letter-spacing:0.04em;">Special AAs</span>
+|-
+|<div style="display:block; width:100%; max-width:calc(100vw - 6rem); overflow-x:auto; overflow-y:hidden;"><div class="eql-build-ability-panel-content" style="display:block; min-width:0; max-width:100%;">{{#lsth:Alternate Advancement|Special AAs}}</div></div>
+|}
+
+= Important Synergies =
+Placeholder text.
+
+* Placeholder
+
+* Placeholder
+
+* Placeholder
+
+= Gear Priorities =
+Placeholder text.
+{| class="eoTable2"
+!Class
+!Priority
+!Notes
+|-
+|[[Berserker]]
+|Placeholder
+|Placeholder
+|-
+|[[Rogue]]
+|Placeholder
+|Placeholder
+|-
+|[[Shadow knight]]
+|Placeholder
+|Placeholder
+|}
+For class-specific gear references, see:
+
+* [[:Category:Berserker Equipment|Berserker Equipment]]
+
+* [[:Category:Rogue Equipment|Rogue Equipment]]
+
+* [[:Category:Shadow knight Equipment|Shadow knight Equipment]]
+
+* [[Players:Gear|Gear Reference]]
+
+= Useful Quests and Items =
+Placeholder text.
+{| class="eoTable2"
+!Item / Quest
+!Class
+!Why It Matters
+|-
+|Placeholder
+|Placeholder
+|Placeholder
+|-
+|Placeholder
+|Placeholder
+|Placeholder
+|-
+|Placeholder
+|Placeholder
+|Placeholder
+|}
+Class-specific quest references:
+
+* [[Berserker-Specific Quests]]
+
+* [[Rogue-Specific Quests]]
+
+* [[Shadow knight-Specific Quests]]
+
+= Example Group Tactics =
+Placeholder text.
+
+== Standard Fight ==
+
+# Placeholder
+
+# Placeholder
+
+# Placeholder
+
+== Multiple Pulls ==
+
+# Placeholder
+
+# Placeholder
+
+# Placeholder
+
+== Named / Difficult Mobs ==
+
+# Placeholder
+
+# Placeholder
+
+# Placeholder
+
+= See Also =
+
+* [[Class_Guides]]
+
+* [[Berserker]]
+
+* [[Rogue]]
+
+* [[Shadow knight]]
+
+* [[Players:Gear|Gear Reference]]
+
+* [[Skills]]
+
+* [[Disciplines]]
+
+* [[Alternate Advancement]]
+{{Navbox Classes}}

@@ -1,0 +1,20 @@
+Bard AA
+
+Activate-able Passive Ability.
+
+Costs: 3/0/3/0/3/0/3/0/3/0
+
+Enabling and Disabling the ability each time you buy it. Effective cost at 10 of 10 level is 15AAs.
+
+
+ <nowiki>
+This passive ability allows five Bard songs to auto pulse. (permanently)
+
+In order for a song to be eligible, it must have no mana cost, have no cooldown, and be a non-targeted area of effect song.
+Any song that meets these criter(i)a cannot be played manually while the ability is turned on.
+This ability chooses the first eligible song, starting from the final spell gem, and working backwards.
+
+Requirements: Level 1, No previous ability requirements.
+ </nowiki>
+
+Effectively, starting at the bottom spell gem, and working towards spell gem #1 it will pulse each song in order up to 5, and repeat. /melody on permanent uninterruptible repeat.

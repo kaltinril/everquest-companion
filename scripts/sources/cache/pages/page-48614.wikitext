@@ -1,0 +1,208 @@
+{{Classic Era}}
+'''The skill that governs the use of bow-type ranged weapons.''' Archery provides [[Warrior]]s and [[Rogue]]s with a ranged attack skill to safely pull enemies, gives [[Shadow Knight]]s and [[Paladin]]s a long-range attack that does not use mana, and is especially useful to [[Ranger]]s for kiting, pulling, and ranged DPS.
+
+== Classes ==
+
+*[[Ranger]] (Max 270)
+*[[Warrior]] (Max 240)
+*[[Rogue]] (Max 240)
+*[[Shadow Knight]] (Max 75)
+*[[Paladin]] (Max 75)
+
+== Archery and Stats ==
+
+ATK affects archery the same way it affects melee. Higher Archery ATK compared to the target's Mitigation AC improves the chance of landing hits closer to maximum damage, increasing average damage per hit.
+
+Archery also uses Dexterity. The ATK number shown in the inventory is main-hand melee ATK and does not represent offhand or archery ATK. Archery uses its own skill and Dexterity-based attack value.
+
+Archery ATK is not currently shown on the character sheet, but items, AAs, and buffs that increase ATK also affect archery.
+
+=== Archery and Dexterity ===
+
+This test was performed by a level 43 RNG/ENC/SHM against a level 55 [[Test Dummy]] using Mitigation of the Mighty 1 and ten mitigation increases. Each test lasted approximately 45 minutes.
+
+{| class="wikitable"
+|-
+! Strength
+! Dexterity
+! Hit Chance
+! Crit Chance
+! Average Damage
+! Max Hit
+! DPS
+|-
+| 198
+| 139
+| 67.1%
+| 15.2%
+| 118
+| 738
+| 34
+|-
+| 199
+| 338
+| 68.9%
+| 19.4%
+| 153
+| 738
+| 45
+|-
+| 299
+| 340
+| 66.5%
+| 18.3%
+| 151
+| 738
+| 43
+|}
+
+== Archery and Haste ==
+
+Worn haste, spell haste, and bard song haste affect bow delay the same way they affect melee delay.
+
+=== Quiver Haste ===
+
+A quiver provides quiver haste when placed in the top-level inventory. If multiple quivers are carried, only the first applicable quiver is used.
+
+An arrow is '''not''' required inside the quiver. An empty quiver provides the same haste as a quiver containing arrows. Only the container type matters.
+
+This was confirmed by EQL developer [[Secrets]] on Discord on September 25, 2026:
+
+'''"Haste from Quivers is not dependent on the contents, only the container type."'''
+
+[https://discord.com/channels/1435786469968183456/1483589348027793408/1553133192842580070 Developer confirmation]
+
+Quiver haste can be estimated from weight reduction:
+
+'''Quiver Haste = Weight Reduction / 3'''
+
+Quiver haste reduces bow delay before other haste is applied, so it is not affected by ordinary haste caps.
+
+=== Available Quivers ===
+
+{| class="wikitable"
+|-
+! Quiver
+! Haste
+! Source
+|-
+| [[Quiver]]
+| 6.6%
+| Vendor
+|-
+| [[Tailored Quiver]]
+| 7.3%
+| [[Skill Tailoring|Tailoring]]
+|-
+| [[Thunderhoof Quiver]]
+| 11%
+| [[Kroldir Thunderhoof]]
+|-
+| [[Summoned: Quiver of Marr|Quiver of Marr]]
+| 16.6%
+| [[Quiver of Marr|Mage summoned]]
+|-
+| [[Fleeting Quiver]]
+| 20%
+| [[Skill Tailoring|Tailoring]]
+|}
+
+== Player Quiver Test ==
+
+=== Test Conditions ===
+
+Testing took place on September 28th, 2026 in the arena against a level 35 [[Test Dummy]] using a level 50 SHD/RNG/WIZ with no buffs, 142% displayed attack speed with the 42% haste from [[Cloak of Flames]] +6. The setup used a [[Windstriker]] +5, [[Mithril Champion Arrows]] +0, and a [[Fleeting Quiver]] listed at 20% haste.
+
+The first three rounds lasted about two minutes per setup, the fourth lasted about five minutes, and the fifth lasted ten minutes. Each percentage compares that setup with the no-quiver result from the same round.
+
+=== Individual Rounds and Averages ===
+
+The average attack rate includes all five rounds. The average observed haste is the average of the five round-by-round haste percentages.
+
+{| class="wikitable" style="width:auto; font-size:90%;"
+|-
+! Setup
+! R1<br>2m
+! R2<br>2m
+! R3<br>2m
+! R4<br>5m
+! R5<br>10m
+! Avg. Attacks/min
+! Avg. Haste
+|-
+| '''No quiver'''
+| 42<br>Baseline
+| 43<br>Baseline
+| 43<br>Baseline
+| 118<br>Baseline
+| 241<br>Baseline
+| 23.19
+| Baseline
+|-
+| '''Mismatched arrow'''
+| 53<br>+26.2%
+| 54<br>+25.6%
+| 55<br>+27.9%
+| 138<br>+16.9%
+| 273<br>+13.3%
+| 27.29
+| +22.0%
+|-
+| '''Matching arrow'''
+| 51<br>+21.4%
+| 53<br>+23.3%
+| 52<br>+20.9%
+| 127<br>+7.6%
+| 264<br>+9.5%
+| 26.05
+| +16.5%
+|-
+| '''Empty quiver'''
+| 47<br>+11.9%
+| 52<br>+20.9%
+| 54<br>+25.6%
+| 144<br>+22.0%
+| 278<br>+15.4%
+| 27.38
+| +19.2%
+|}
+
+Across all five rounds, the quiver setups averaged approximately 20% more bow attacks than the no-quiver setup, matching the listed haste of [[Fleeting Quiver]]. The lower matching-arrow results are normal test variance caused by combat-log timing and uneven attack entries, not evidence of a different haste value.
+
+Overall, the testing supports approximately 20% bow haste from the quiver, whether it contains a matching arrow, a mismatched arrow, or no arrow at all.
+
+== Damage Calculation ==
+
+Archery damage is based on the bow and the arrow being fired.
+
+A bow with 10 damage, 40 delay, and 100 range combined with an arrow with 5 damage and 50 range functions as a weapon with:
+
+*15 damage.
+*40 delay.
+*150 range.
+
+The arrow fired from the bow affects damage and range. The arrow stored inside the quiver does not affect quiver haste or the damage of the shot.
+
+== Range ==
+
+Archery range does not cap at 300.
+
+Testing confirmed that a 200-range bow combined with 150-range arrows has a total range of 350. Larger hitboxes increase the distance from which a target can be shot, and Z-axis distance also affects archery range.
+
+This is useful against [[Dragon_Roar]], which has a PBAoE range of 300. A player can potentially stand outside fear range and continue dealing ranged damage with careful positioning.
+
+== Trueshot and Ranger DPS ==
+
+'''Trueshot is not currently part of EQ Legends.'''
+
+Rangers can deal respectable DPS with a good bow and the [[Trueshot Discipline]]. This is especially useful when area effects, poor hitboxes, or other mechanics make it difficult for melee characters to stay engaged.
+
+Rangers receive innate double damage against non-rooted, stationary mobs starting at level 51. This helps offset the fact that archery does not double attack power in the same way as melee.
+
+A Ranger using an [[Exquisite Velium Reinforced Bow]] and [[Mithril Champion Arrows]] is effectively using the equivalent of a 38/36 two-handed weapon with 340 range, without damage bonus or double attack.
+
+[[Trueshot Discipline]] slightly more than doubles Ranger bow damage for two minutes. With Trueshot active, the result is approximately equivalent to a 38/36 two-handed weapon that always double attacks, can critically hit, and does not have a damage bonus.
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

@@ -1,0 +1,49 @@
+{{Delete}}
+
+{{expand}}
+
+From Haynar via: https://www.project1999.com/forums/showthread.php?t=172383
+
+
+ Ok. Since there will be so many questions. Here are basics. 
+ 
+ A weak spell will have a strength of one. 
+ It will have this number of counters 90% of the time. 
+ 10% of the time it will have 1 to 8 counters, random. 
+ 
+ A strength 2 spell has 1 or 2 counters 90% of time. 
+ The other 10% it will be random 1 to 8.
+ 
+ Thats the basic pattern. 
+ 
+ 
+ Example:
+ 
+ If a count 1 is in top slot, one cast of cancel magic will clear it. 
+ 
+ If a str 3 is top slot, str 2 in second slot, a single cancel magic wont clear slot 1. 
+ That single cast will start at top slot and remove one counter per buff until it clears a buff or goes thru them all. 
+ 
+ So in this case, one cast of cancel magic does nothing. Two casts clears slot 2. Three casts clears slot 1. 
+ 
+ Another case, imagine buffs that have these counters in buff slots 1 to 4:
+ 
+ 1 3 2 1
+ 
+ First cast of cancel magic - slot 1 isgone.
+ Second casts, slot 4 gone. But slots 2 and 3 will also have counters remaining reduced by one. 
+ Third cast and slot 3 poofs.
+ Fourth cast and last slot is gone. 
+ 
+ 
+ Stronger dispell spells can remove more counters each pass, and can do multiple passes. 
+ 
+ No dispellable spell has more than 8 counters. A cancel magic(9) remove up to 9 counters per spell. And will always take out top dispellable. 
+ 
+ H
+
+
+''See also: [[Cancel Magic]]''
+
+[[Category:Technical]]
+[[Category:Game Mechanics]]

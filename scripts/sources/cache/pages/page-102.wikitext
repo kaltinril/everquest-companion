@@ -1,0 +1,891 @@
+<div style="float:right;margin:5px 0px 10px 20px;">
+__TOC__
+</div>
+
+There are a variety of skills in EverQuest, and learning and developing those skills are the keys to a character's success in the game. How a skill works in game depends on the type of skill. Some skills are triggered automatically, while others are used at the player's discretion. Also, some skills are very general and shared by all, while others are specific to certain races and classes. In general, the more the character attempts to use a skill, the better he or she will become at it.
+
+== Skill Ups ==
+
+* Grey mob (no xp) = no skill ups.
+* Green mob (xp) = very little skill ups.
+* Blue mob = some skill ups
+* Dark blue mob = below average skill ups.
+* White/Yellow mob = sweet spot, tons of skill ups.
+* Red mob = lots of skill ups but potentially lethal
+
+
+== Passive Skills ==
+
+The table below consolidates the general passive, weapon, trade, casting, racial, and utility skills into one sortable list. The class/access column is a practical summary; individual skill caps and exact availability may vary by class, race, and era.
+
+{| class="eoTable2 sortable passive-skills-list" style="width:100%; max-width:100%; margin:0.75rem 0; table-layout:auto;"
+! style="width:18%;" | Skill
+! style="width:22%;" | Classes / Access
+! style="width:16%;" | Type
+! style="width:44%;" | Description
+|-
+| [[Skill_Abjuration|Abjuration]]
+| All spellcasting classes
+| Casting school
+| Defensive magic, such as spells that reduce damage from hostile effects or protect against environmental damage.
+|-
+| [[Skill_Alcohol_Tolerance|Alcohol Tolerance]]
+| All
+| General
+| The ability to hold one's drink.
+|-
+| [[Skill_Alteration|Alteration]]
+| All spellcasting classes
+| Casting school
+| Magic that changes things, including illusions, movement changes, teleports, slows, and similar effects.
+|-
+| [[Skill_Archery|Archery]]
+| Class access varies
+| Combat
+| Improves effectiveness with bows, crossbows, and similar ranged weapons.
+|-
+| [[Skill_Block|Block]]
+| Monk, Warrior, Beastlord, Berserker
+| Defense
+| Allows a monk to avoid damage by deflecting attacks with the body.
+|-
+| [[Skill_Brewing|Brewing]]
+| All
+| Tradeskill
+| Crafting skill for alcoholic drinks, non-alcoholic drinks, blacksmithing tempers, and tanning agents.
+|-
+| [[Skill_Channeling|Channeling]]
+| All spellcasting classes
+| Casting skill
+| Helps a caster continue casting without being interrupted when hit.
+|-
+| [[Skill_Conjuration|Conjuration]]
+| All spellcasting classes
+| Casting school
+| Magic that summons creatures, items, or other effects into the world.
+|-
+| [[Skill_Defense|Defense]]
+| All
+| Defense
+| Improves survivability in melee combat. Raising Defense raises AC.
+|-
+| [[Skill_Divination|Divination]]
+| All spellcasting classes
+| Casting school
+| Magic that detects hidden things or conceals visible things.
+|-
+| [[Skill_Dodge|Dodge]]
+| Class access varies
+| Defense
+| Allows a combatant to avoid a blow entirely.
+|-
+| [[Skill_Double_Attack|Double Attack]]
+| Shadow Knight, Warrior, Monk, Paladin, Ranger, Berserker.
+| Combat
+| Gives a chance to make an additional attack in combat.
+|-
+| [[Skill_Triple_Attack|Triple Attack]]
+| Warrior, Monk, Rogue, Ranger, Berserker
+| Combat
+| Gives a chance to make an additional attack in combat.
+|-
+| [[Skill_Dual_Wield|Dual Wield]]
+| Bard, Beastlord, Rogue, Monk, Ranger, Warrior.
+| Combat
+| Allows a character to fight effectively with a weapon in each hand.
+|-
+| [[Skill_Evocation|Evocation]]
+| All spellcasting classes
+| Casting school
+| Offensive magic such as fireballs, force spells, and direct damage effects.
+|-
+| [[Skill_Fishing|Fishing]]
+| All
+| Tradeskill / General
+| The art of pulling useful or interesting things from bodies of water with a fishing pole.
+|-
+| [[Skill_Hand_to_Hand|Hand to Hand]]
+| All; Monk has the highest focus
+| Combat
+| Improves unarmed attacks. Monks specialize in this skill, while many other classes can still punch when unarmed.
+|-
+| [[Skill_Hide|Hide]]
+| Rogue, Bard, Ranger; selected races where available
+| Utility
+| Attempts to hide from enemies. Some creatures can see through hide.
+|-
+| [[Skill_Meditate|Meditate]]
+| All mana users
+| Casting skill
+| Allows casters to memorize spells and regain mana more quickly.
+|-
+| [[Skill_Offense|Offense]]
+| All
+| Combat
+| Improves the ability to inflict damage in combat. Raising Offense raises Attack.
+|-
+| [[Skill_1H_Slash|1H Slash]]
+| Class access varies
+| Weapon skill
+| Improves effectiveness with one-handed slashing weapons.
+|-
+| [[Skill_1H_Blunt|1H Blunt]]
+| Class access varies
+| Weapon skill
+| Improves effectiveness with one-handed blunt weapons.
+|-
+| [[Skill_2H_Slash|2H Slash]]
+| Class access varies
+| Weapon skill
+| Improves effectiveness with two-handed slashing weapons.
+|-
+| [[Skill_2H_Blunt|2H Blunt]]
+| Class access varies
+| Weapon skill
+| Improves effectiveness with two-handed blunt weapons.
+|-
+| [[Skill_Piercing|Piercing]]
+| Class access varies
+| Weapon skill
+| Improves effectiveness with piercing weapons.
+|-
+| [[Skill_Parry|Parry]]
+| Melee and hybrid classes
+| Defense
+| Allows a character to deflect incoming attacks with a weapon.
+|-
+| [[Skill_Pottery|Pottery]]
+| All
+| Tradeskill
+| Crafting skill for making items from clay using pottery wheels and kilns.
+|-
+| [[Skill_Riposte|Riposte]]
+| Melee and hybrid classes
+| Defense / Counterattack
+| A counterattack that can block an incoming attack and grant a free swing against the attacker.
+|-
+| [[Skill_Safe_Fall|Safe Fall]]
+| Monk, Bard, Rogue
+| Utility
+| Reduces or prevents damage from long falls.
+|-
+| [[Skill_Specialization|Specialization]]
+| Advanced spellcasters
+| Casting specialization
+| Allows advanced casters to specialize in a magic school, reducing mana cost and improving casting success.
+|-
+| [[Skill_Specialize_Abjuration|Specialize Abjuration]]
+| Advanced spellcasters
+| Casting specialization
+| Specialization for abjuration spells.
+|-
+| [[Skill_Specialize_Alteration|Specialize Alteration]]
+| Advanced spellcasters
+| Casting specialization
+| Specialization for alteration spells.
+|-
+| [[Skill_Specialize_Conjuration|Specialize Conjuration]]
+| Advanced spellcasters
+| Casting specialization
+| Specialization for conjuration spells.
+|-
+| [[Skill_Specialize_Divination|Specialize Divination]]
+| Advanced spellcasters
+| Casting specialization
+| Specialization for divination spells.
+|-
+| [[Skill_Specialize_Evocation|Specialize Evocation]]
+| Advanced spellcasters
+| Casting specialization
+| Specialization for evocation spells.
+|-
+| [[Skill_Swimming|Swimming]]
+| All
+| General
+| Improves movement in water and may help a character remain underwater longer.
+|-
+| [[Skill_Tailoring|Tailoring]]
+| All
+| Tradeskill
+| Crafting skill for cloth armor, leather armor, backpacks, and similar items made from silk, hides, and related components.
+|-
+| [[Racial: Infravision]]
+| Racial
+| Racial vision
+| Slightly improved night vision.
+|-
+| [[Racial: Ultravision]]
+| Racial
+| Racial vision
+| Greatly improved night vision.
+|-
+| [[Skill_Brass_Instruments|Brass Instruments]]
+| Bard
+| Bard instrument
+| Improves the effectiveness of bard songs that use brass instruments.
+|-
+| [[Skill_Percussion|Percussion]]
+| Bard
+| Bard instrument
+| Improves the effectiveness of bard songs that use percussion instruments.
+|-
+| [[Skill_Stringed_Instruments|Stringed Instruments]]
+| Bard
+| Bard instrument
+| Improves the effectiveness of bard songs that use stringed instruments.
+|-
+| [[Skill_Wind_Instruments|Wind Instruments]]
+| Bard
+| Bard instrument
+| Improves the effectiveness of bard songs that use wind instruments.
+|-
+| [[Skill_Singing|Singing]]
+| Bard
+| Bard skill
+| Improves the effectiveness of bard songs, especially songs based on singing rather than instruments.
+|}
+
+== Active Skills ==
+
+This section is for class-specific active abilities that should appear in build guides alongside spells. Build guides transclude the labeled sections named <code>ActiveSkills:Class Name</code>. Empty class placeholders are visible here for editors, but they are intentionally outside the labeled sections so they do not appear in build guides.
+
+Rows should be limited to actively triggered abilities, such as combat buttons, emergency abilities, class utility buttons, and racial activated abilities. Passive skills, weapon skills, trade skills, and casting schools should remain in the general [[#Passive_Skills|Passive Skills]] table above unless they also have an actively triggered use.
+
+=== General Active ===
+
+The following active skills are broadly available or access-dependent and are not transcluded into class build guides unless they are also listed in a class-specific section below.
+
+{| class="eoTable2 sortable active-skills-list" style="width:100%; max-width:100%; margin:0.75rem 0; table-layout:auto;"
+! style="width:8%;" | Level
+! style="width:18%;" | Ability
+! style="width:14%;" | Skill
+! style="width:14%;" | Cooldown
+! style="width:30%;" | Description
+! style="width:16%;" | Notes
+|-
+| 1
+| [[Skill_Begging|Begging]]
+| General
+| —
+| Beg an NPC for money.
+| Broadly available where the skill exists.
+|-
+| 1
+| [[Skill_Bind_Wound|Bind Wound]]
+| General
+| Bandage timer
+| Uses bandages to heal a seriously injured target that is not actively doing something else.
+| Broadly available where the skill exists.
+|-
+| 10
+| [[Skill_Disarm|Disarm]]
+| Active combat
+| Shared combat timer
+| Attempts to knock a wielded weapon from an opponent's hands.
+| Melee class access varies.
+|-
+| X
+| [[Skill_Forage|Foraging]]
+| Utility
+| Forage timer
+| Allows a character to find food and other items from the local environment.
+| Druid, Ranger, and selected races where available.
+|-
+| X
+| [[Skill_Instill_Doubt|Instill Doubt]]
+| Active combat
+| Skill timer
+| May cause a target to doubt its chance of victory and flee.
+| Class access varies.
+|-
+| X
+| [[Skill_Intimidate|Intimidate]]
+| Active combat
+| Skill timer
+| May create fear or impending doom, causing the target to turn and flee.
+| Class access varies.
+|-
+| 1
+| [[Skill_Sense_Heading|Sense Heading]]
+| General
+| Short skill timer
+| Helps a character determine direction without a compass.
+| Broadly available.
+|-
+| X
+| [[Skill_Slam|Slam]]
+| Racial active ability
+| Shared combat timer
+| A racial bash-like attack that can interrupt spell casting.
+| Barbarian, Ogre, and Troll. Shares cooldown behavior with [[Skill_Bash|Bash]], [[Skill_Kick|Kick]], and [[Skill_Backstab|Backstab]].
+|-
+| 1
+| [[Skill_Throwing|Throwing]]
+| Combat
+| Throwing attack timer
+| Improves use of throwing weapons such as daggers, throwing axes, spears, and shuriken.
+| Class access varies.
+|}
+
+=== [[Bard]] ===
+
+<section begin="ActiveSkills:Bard" />
+{| class="eoTable2 sortable active-skills-list" style="width:100%; max-width:100%; margin:0.75rem 0; table-layout:auto;"
+! style="width:8%;" | Level
+! style="width:18%;" | Ability
+! style="width:14%;" | Skill
+! style="width:14%;" | Cooldown
+! style="width:30%;" | Description
+! style="width:16%;" | Notes
+|-
+| 15
+| [[Skill_Sense_Traps|Sense Traps]]
+| Utility
+| Skill timer
+| Allows detection of traps on objects or in passageways.
+| Also available to Rogue.
+|-
+| 17
+| [[Skill_Sneak|Sneak]]
+| Utility
+| Skill timer
+| Allows cautious movement that can help bypass enemies when successful.
+| Also available to Rogue, Monk, Ranger, and selected races where available.
+|-
+| 15
+| [[Skill_Tracking|Tracking]]
+| Utility
+| Tracking refresh
+| Allows a character to follow traces of other creatures over distance.
+| Also available to Ranger and Druid.
+|-
+| 16
+| [[Skill_Intimidation|Intimidation]]
+| Utility
+| Skill timer
+| x
+| x
+|-
+| 20
+| [[Skill_Disarm_Traps|Disarm Traps]]
+| Utility
+| Skill timer
+| x
+| x
+|-
+| 17
+| [[Skill_Kick|Kick]]
+| Utility
+| Skill timer
+| x
+| x
+|-
+| 25
+| [[Skill_Hide|Hide]]
+| Utility
+| Skill timer
+| x
+| x
+|}
+<section end="ActiveSkills:Bard" />
+
+=== [[Beastlord]] ===
+
+<section begin="ActiveSkills:Beastlord" /><section end="ActiveSkills:Beastlord" />
+{| class="eoTable2 sortable active-skills-list" style="width:100%; max-width:100%; margin:0.75rem 0; table-layout:auto;"
+! style="width:8%;" | Level
+! style="width:18%;" | Ability
+! style="width:14%;" | Skill
+! style="width:14%;" | Cooldown
+! style="width:30%;" | Description
+! style="width:16%;" | Notes
+|-
+| colspan="6" class="esec" | No active skills listed yet.
+<!--
+When this class gets real active skills, move the real table between:
+<section begin="ActiveSkills:Beastlord" />
+and:
+<section end="ActiveSkills:Beastlord" />
+Build guides transclude only that labeled section, so this placeholder does not appear in build guides.
+-->
+|}
+
+=== [[Berserker]] ===
+
+<section begin="ActiveSkills:Berserker" /><section end="ActiveSkills:Berserker" />
+{| class="eoTable2 sortable active-skills-list" style="width:100%; max-width:100%; margin:0.75rem 0; table-layout:auto;"
+! style="width:8%;" | Level
+! style="width:18%;" | Ability
+! style="width:14%;" | Skill
+! style="width:14%;" | Cooldown
+! style="width:30%;" | Description
+! style="width:16%;" | Notes
+|-
+| colspan="6" class="esec" | No active skills listed yet.
+<!--
+When this class gets real active skills, move the real table between:
+<section begin="ActiveSkills:Berserker" />
+and:
+<section end="ActiveSkills:Berserker" />
+Build guides transclude only that labeled section, so this placeholder does not appear in build guides.
+-->
+|-
+| 1
+| [[Skill_Frenzy|Frenzy]]
+| Combat
+| Combat Timer
+| Attacks multiple times in a row.
+|}
+
+=== [[Cleric]] ===
+
+<section begin="ActiveSkills:Cleric" /><section end="ActiveSkills:Cleric" />
+{| class="eoTable2 sortable active-skills-list" style="width:100%; max-width:100%; margin:0.75rem 0; table-layout:auto;"
+! style="width:8%;" | Level
+! style="width:18%;" | Ability
+! style="width:14%;" | Skill
+! style="width:14%;" | Cooldown
+! style="width:30%;" | Description
+! style="width:16%;" | Notes
+|-
+| 1
+| [[Skill_Bash|Bash]]
+| Active combat
+| Bash timer (8s)
+| Shield bash that can damage and potentially stun an enemy, interrupting spell casting.
+| Also available to Paladin and Shadow Knight. Shares cooldown behavior with [[Skill_Kick|Kick]] and [[Skill_Slam|Slam]].
+|}
+<section end="ActiveSkills:Cleric" />
+
+=== [[Druid]] ===
+
+<section begin="ActiveSkills:Druid" />
+{| class="eoTable2 sortable active-skills-list" style="width:100%; max-width:100%; margin:0.75rem 0; table-layout:auto;"
+! style="width:8%;" | Level
+! style="width:18%;" | Ability
+! style="width:14%;" | Skill
+! style="width:14%;" | Cooldown
+! style="width:30%;" | Description
+! style="width:16%;" | Notes
+|-
+| 5
+| [[Skill_Forage|Foraging]]
+| Utility
+| Forage timer
+| Allows a character to find food and other items from the local environment.
+| Also available to Ranger and selected races where available.
+|-
+| 20
+| [[Skill_Tracking|Tracking]]
+| Utility
+| Tracking refresh
+| Allows a character to follow traces of other creatures over distance.
+| Also available to Ranger and Bard.
+|}
+<section end="ActiveSkills:Druid" />
+
+=== [[Enchanter]] ===
+
+<section begin="ActiveSkills:Enchanter" /><section end="ActiveSkills:Enchanter" />
+{| class="eoTable2 sortable active-skills-list" style="width:100%; max-width:100%; margin:0.75rem 0; table-layout:auto;"
+! style="width:8%;" | Level
+! style="width:18%;" | Ability
+! style="width:14%;" | Skill
+! style="width:14%;" | Cooldown
+! style="width:30%;" | Description
+! style="width:16%;" | Notes
+|-
+| colspan="6" class="esec" | No active skills listed yet.
+<!--
+When this class gets real active skills, move the real table between:
+<section begin="ActiveSkills:Enchanter" />
+and:
+<section end="ActiveSkills:Enchanter" />
+Build guides transclude only that labeled section, so this placeholder does not appear in build guides.
+-->
+|}
+
+=== [[Magician]] ===
+
+<section begin="ActiveSkills:Magician" /><section end="ActiveSkills:Magician" />
+{| class="eoTable2 sortable active-skills-list" style="width:100%; max-width:100%; margin:0.75rem 0; table-layout:auto;"
+! style="width:8%;" | Level
+! style="width:18%;" | Ability
+! style="width:14%;" | Skill
+! style="width:14%;" | Cooldown
+! style="width:30%;" | Description
+! style="width:16%;" | Notes
+|-
+| colspan="6" class="esec" | No active skills listed yet.
+<!--
+When this class gets real active skills, move the real table between:
+<section begin="ActiveSkills:Magician" />
+and:
+<section end="ActiveSkills:Magician" />
+Build guides transclude only that labeled section, so this placeholder does not appear in build guides.
+-->
+|}
+
+=== [[Monk]] ===
+
+<section begin="ActiveSkills:Monk" />
+{| class="eoTable2 sortable active-skills-list" style="width:100%; max-width:100%; margin:0.75rem 0; table-layout:auto;"
+! style="width:8%;" | Level
+! style="width:18%;" | Ability
+! style="width:14%;" | Skill
+! style="width:14%;" | Cooldown
+! style="width:30%;" | Description
+! style="width:16%;" | Notes
+|-
+| 25
+| [[Skill_Dragon_Punch|Dragon Punch]]
+| Active combat
+| Shared special attack timer
+| Monk special attack.
+| Shares monk special-attack cooldown behavior where applicable.
+|-
+| 20
+| [[Skill_Eagle_Strike|Eagle Strike]]
+| Active combat
+| Shared special attack timer
+| Monk special attack.
+| Shares monk special-attack cooldown behavior where applicable.
+|-
+| 17
+| [[Skill_Feign_Death|Feign Death]]
+| Active utility
+| Feign Death timer
+| Allows a monk to pretend to be dead, often causing enemies to stop attacking.
+| Success depends on skill and circumstances.
+|-
+| 30
+| [[Skill_Flying_Kick|Flying Kick]]
+| Active combat
+| Shared special attack timer
+| A powerful acrobatic monk attack using the force of the legs.
+| Shares monk special-attack cooldown behavior where applicable.
+|-
+| X
+| [[Skill_Kick|Kick]]
+| Active combat
+| Shared combat timer
+| Damages an enemy. Some enemies require magic footwear.
+| Also available to Ranger and Warrior. Shares cooldown behavior with [[Skill_Bash|Bash]] and [[Skill_Slam|Slam]].
+|-
+| X
+| [[Skill_Mend|Mend]]
+| Active class ability
+| Mend timer
+| Allows a monk to heal themself. At lower skill levels, failure can cause damage instead.
+| Monk class ability.
+|-
+| 5
+| [[Skill_Round_Kick|Round Kick]]
+| Active combat
+| Shared special attack timer
+| Monk special attack.
+| Shares monk special-attack cooldown behavior where applicable.
+|-
+| 8
+| [[Skill_Sneak|Sneak]]
+| Utility
+| Skill timer
+| Allows cautious movement that can help bypass enemies when successful.
+| Also available to Rogue, Bard, Ranger, and selected races where available.
+|-
+| 10
+| [[Skill_Tiger_Claw|Tiger Claw]]
+| Active combat
+| Shared special attack timer
+| Monk special attack.
+| Shares monk special-attack cooldown behavior where applicable.
+|}
+<section end="ActiveSkills:Monk" />
+
+=== [[Necromancer]] ===
+
+<section begin="ActiveSkills:Necromancer" /><section end="ActiveSkills:Necromancer" />
+{| class="eoTable2 sortable active-skills-list" style="width:100%; max-width:100%; margin:0.75rem 0; table-layout:auto;"
+! style="width:8%;" | Level
+! style="width:18%;" | Ability
+! style="width:14%;" | Skill
+! style="width:14%;" | Cooldown
+! style="width:30%;" | Description
+! style="width:16%;" | Notes
+|-
+| colspan="6" class="esec" | No active skills listed yet.
+<!--
+When this class gets real active skills, move the real table between:
+<section begin="ActiveSkills:Necromancer" />
+and:
+<section end="ActiveSkills:Necromancer" />
+Build guides transclude only that labeled section, so this placeholder does not appear in build guides.
+-->
+|}
+
+=== [[Paladin]] ===
+
+<section begin="ActiveSkills:Paladin" />
+{| class="eoTable2 sortable active-skills-list" style="width:100%; max-width:100%; margin:0.75rem 0; table-layout:auto;"
+! style="width:8%;" | Level
+! style="width:18%;" | Ability
+! style="width:14%;" | Skill
+! style="width:14%;" | Cooldown
+! style="width:30%;" | Description
+! style="width:16%;" | Notes
+|-
+| X
+| [[Skill_Bash|Bash]]
+| Active combat
+| Shared combat timer
+| Shield bash that can damage and potentially stun an enemy, interrupting spell casting.
+| Also available to Shadow Knight and Warrior. Shares cooldown behavior with [[Skill_Kick|Kick]] and [[Skill_Slam|Slam]].
+|-
+| X
+| [[Skill_Lay_on_Hands|Lay on Hands]]
+| Active class ability
+| Long recast
+| A paladin ability that heals a single target for a large amount with a long recast timer.
+| Paladin class ability.
+|-
+| X
+| [[Skill_Taunt|Taunt]]
+| Active combat
+| Taunt timer
+| Attempts to make an enemy attack the taunting character instead of another target.
+| Also available to Warrior and Shadow Knight.
+|-
+| 9
+| [[Skill_Smite|Smite]]
+| Active class ability
+| Smite timer. 15s
+| This ability smites your current target, dealing physical damage as well as converting 3% of your maximum mana into amplified magic damage.  Smite will also reduce the reuse cooldown of Lay on Hands by 60 seconds every time it lands.
+| Paladin class ability.
+|}
+<section end="ActiveSkills:Paladin" />
+
+
+=== [[Ranger]] ===
+
+<section begin="ActiveSkills:Ranger" />
+{| class="eoTable2 sortable active-skills-list" style="width:100%; max-width:100%; margin:0.75rem 0; table-layout:auto;"
+! style="width:8%;" | Level
+! style="width:18%;" | Ability
+! style="width:14%;" | Skill
+! style="width:14%;" | Cooldown
+! style="width:30%;" | Description
+! style="width:16%;" | Notes
+|-
+| X
+| [[Skill_Kick|Kick]]
+| Active combat
+| Shared combat timer
+| Damages an enemy. Some enemies require magic footwear.
+| Also available to Monk and Warrior. Shares cooldown behavior with [[Skill_Bash|Bash]] and [[Skill_Slam|Slam]].
+|-
+| X
+| [[Skill_Sneak|Sneak]]
+| Utility
+| Skill timer
+| Allows cautious movement that can help bypass enemies when successful.
+| Also available to Rogue, Bard, Monk, and selected races where available.
+|-
+| X
+| [[Skill_Tracking|Tracking]]
+| Utility
+| Tracking refresh
+| Allows a character to follow traces of other creatures over distance.
+| Also available to Druid and Bard.
+|}
+<section end="ActiveSkills:Ranger" />
+
+=== [[Rogue]] ===
+
+<section begin="ActiveSkills:Rogue" />
+{| class="eoTable2 sortable active-skills-list" style="width:100%; max-width:100%; margin:0.75rem 0; table-layout:auto;"
+! style="width:8%;" | Level
+! style="width:18%;" | Ability
+! style="width:14%;" | Skill
+! style="width:14%;" | Cooldown
+! style="width:30%;" | Description
+! style="width:16%;" | Notes
+|-
+| 10
+| [[Skill_Backstab|Backstab]]
+| Active combat
+| 10 seconds
+| A rogue special attack that deals high burst damage with a piercing weapon. On EQLegends, Backstab can be used from the front, so rogues can “frontstab” without needing to stand behind the target.
+| Requires a piercing weapon. Shares cooldown behavior with other rogue combat actions where applicable.
+|-
+| X
+| [[Skill_Disarm_Trap|Disarm Trap]]
+| Utility
+| Skill timer
+| Allows a rogue to disarm dangerous traps on objects or in passages.
+| Rogue utility ability.
+|-
+| X
+| [[Skill_Sense_Traps|Sense Traps]]
+| Utility
+| Skill timer
+| Allows detection of traps on objects or in passageways.
+| Also available to Bard.
+|-
+| X
+| [[Skill_Sneak|Sneak]]
+| Utility
+| Skill timer
+| Allows cautious movement that can help bypass enemies when successful.
+| Also available to Bard, Monk, Ranger, and selected races where available.
+|-
+| X
+| [[Skill_Pick_Lock|Pick Lock]]
+| Utility
+| Skill timer
+| Allows locked doors or containers to be opened without the exact key.
+| Also available to Bard where applicable.
+|-
+| X
+| [[Skill_Pick_Pocket|Pick Pocket]]
+| Utility
+| Skill timer
+| Allows a rogue to attempt to steal coins or items from nearby targets.
+| Rogue utility ability.
+|}
+<section end="ActiveSkills:Rogue" />
+
+=== [[Shadow Knight]] ===
+
+<section begin="ActiveSkills:Shadow Knight" />
+{| class="eoTable2 sortable active-skills-list" style="width:100%; max-width:100%; margin:0.75rem 0; table-layout:auto;"
+! style="width:8%;" | Level
+! style="width:18%;" | Ability
+! style="width:14%;" | Skill
+! style="width:14%;" | Cooldown
+! style="width:30%;" | Description
+! style="width:16%;" | Notes
+|-
+| X
+| [[Skill_Bash|Bash]]
+| Active combat
+| Shared combat timer
+| Shield bash that can damage and potentially stun an enemy, interrupting spell casting.
+| Also available to Paladin and Warrior. Shares cooldown behavior with [[Skill_Kick|Kick]] and [[Skill_Slam|Slam]].
+|-
+| X
+| [[Skill_Harm_Touch|Harm Touch]]
+| Active class ability
+| Long recast
+| A shadow knight ability that deals a large amount of damage to a single target with a long recast timer.
+| Shadow Knight class ability.
+|-
+| X
+| [[Skill_Taunt|Taunt]]
+| Active combat
+| Taunt timer
+| Attempts to make an enemy attack the taunting character instead of another target.
+| Also available to Warrior and Paladin.
+|-
+| 9
+| [[Skill_Reave|Reave]]
+| Active combat
+| Combat timer
+| This Ability reaves your current target, dealing physical damage as well as converting 3% of your maximum hit points into amplified magical damage. Reave will also reduce the cooldown of Harm Touch by 60 seconds every time it lands. 
+| Shadow Knight class ability.
+|}
+<section end="ActiveSkills:Shadow Knight" />
+
+=== [[Shaman]] ===
+
+<section begin="ActiveSkills:Shaman" /><section end="ActiveSkills:Shaman" />
+{| class="eoTable2 sortable active-skills-list" style="width:100%; max-width:100%; margin:0.75rem 0; table-layout:auto;"
+! style="width:8%;" | Level
+! style="width:18%;" | Ability
+! style="width:14%;" | Skill
+! style="width:14%;" | Cooldown
+! style="width:30%;" | Description
+! style="width:16%;" | Notes
+|-
+| colspan="6" class="esec" | No active skills listed yet.
+<!--
+When this class gets real active skills, move the real table between:
+<section begin="ActiveSkills:Shaman" />
+and:
+<section end="ActiveSkills:Shaman" />
+Build guides transclude only that labeled section, so this placeholder does not appear in build guides.
+-->
+|}
+
+=== [[Warrior]] ===
+
+<section begin="ActiveSkills:Warrior" />
+{| class="eoTable2 sortable active-skills-list" style="width:100%; max-width:100%; margin:0.75rem 0; table-layout:auto;"
+! style="width:8%;" | Level
+! style="width:18%;" | Ability
+! style="width:14%;" | Skill
+! style="width:14%;" | Cooldown
+! style="width:30%;" | Description
+! style="width:16%;" | Notes
+|-
+| 1
+| [[Skill_Bash|Bash]]
+| Active combat
+| Bash timer (8s)
+| Shield bash that can damage and potentially stun an enemy, interrupting spell casting.
+| Also available to Paladin and Shadow Knight. Shares cooldown behavior with [[Skill_Kick|Kick]] and [[Skill_Slam|Slam]].
+|-
+| 1
+| [[Skill_Kick|Kick]]
+| Active combat
+| Shared combat timer
+| Damages an enemy. Some enemies require magic footwear.
+| Also available to Monk and Ranger. Shares cooldown behavior with [[Skill_Bash|Bash]] and [[Skill_Slam|Slam]].
+|-
+| 1
+| [[Skill_Taunt|Taunt]]
+| Active combat
+| Taunt timer
+| Attempts to make an enemy attack the taunting character instead of another target.
+| Also available to Paladin and Shadow Knight.
+|-
+| 10
+| [[Skill_Disarm|Disarm]]
+| Active combat
+| Disarm timer
+| x
+|-
+| 5
+| [[Skill_Cleave|Cleave]]
+| Active combat
+| Cleave timer (12s)
+| This ability cleaves your current target with your primary and optionally secondary weapon, then attacks up to 3 additional enemies in front of you. Cleave will double and triple attack based on your skill. Cleave and Bash no longer share a timer in EQL.
+|}
+<section end="ActiveSkills:Warrior" />
+
+=== [[Wizard]] ===
+
+<section begin="ActiveSkills:Wizard" /><section end="ActiveSkills:Wizard" />
+{| class="eoTable2 sortable active-skills-list" style="width:100%; max-width:100%; margin:0.75rem 0; table-layout:auto;"
+! style="width:8%;" | Level
+! style="width:18%;" | Ability
+! style="width:14%;" | Skill
+! style="width:14%;" | Cooldown
+! style="width:30%;" | Description
+! style="width:16%;" | Notes
+|-
+| colspan="6" class="esec" | No active skills listed yet.
+<!--
+When this class gets real active skills, move the real table between:
+<section begin="ActiveSkills:Wizard" />
+and:
+<section end="ActiveSkills:Wizard" />
+Build guides transclude only that labeled section, so this placeholder does not appear in build guides.
+-->
+|}
+
+
+{{Navbox Skills}}
+
+[[Category:Skills]]
+[[Category:Guides]]
+[[Category:Character]]

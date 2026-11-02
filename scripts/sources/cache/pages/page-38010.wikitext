@@ -1,0 +1,25 @@
+{{Factionpage|
+
+| description = Faction of, you guessed it, [[Cazic Thule (God)|Cazic Thule]] in the Plane of Fear.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Plane of Fear]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Cazic Thule (God)|Cazic Thule]]  <span class='fmz'>(Plane of Fear)</span>
+
+}}

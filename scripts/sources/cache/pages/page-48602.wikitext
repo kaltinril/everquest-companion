@@ -1,0 +1,15 @@
+Sense Heading is a skill that lets you naturally sense which direction you're facing. The higher your Sense Heading, the greater chance it will successfully inform you in your chat-box about the general direction you are facing (North/South/East/West/NorthWest/NorthEast/SouthWest/SouthEast). A failure will simply report that you can't tell the direction you are facing, rather than giving an inaccurate direction.
+
+== Classes ==
+
+* All (Max 200)
+This skill can be maxed out from level 1
+
+== Tips ==
+This skill now starts at 200 for every character and no longer needs to be leveled up.
+
+'''Trick:''' When you drop a weapon on the ground it always faces north.
+
+{{Navbox Skills}}
+
+[[Category:Skills]]

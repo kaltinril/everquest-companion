@@ -1,0 +1,61 @@
+These patch notes are from the Official EverQuest Legends discord, posted on June 2, 2026
+
+= June 2, 2026 =
+
+=== General ===
+* Addressed several crash and stability issues.
+* Fixed /gems to use the reordered draw.
+* Speculative fix for keys sticking with ALT-TAB
+* Zones that had a difficulty threshold of 10 now have a threshold of 12.
+* Increased difficulty instance spindown time.
+* Fix an issue where on zoning you'd pick zones that are of higher difficulty, if not in a group, or when grouped and your group wasn't already in a zone greater than difficulty 0.
+* Addressed an issue where zones would constantly spin up and spin down at less than 10 players in a single difficulty at minimum.
+* Fixed a crash that would occur while you have charm memorized as a bard, you become charmed, and then your character attempts to land a charm on an NPC.
+
+=== AAs===
+* Berserker Blood Rune AA will no longer trigger on normal spell critical hits.
+
+=== Achievements ===
+* Newly created Humans should now properly unlock the achievement for their starting city, instead of always unlocking Freeport. (Surefall Glade is considered part of Qeynos, for these purposes.)
+
+=== Audio ===
+* Fixed an observed crash on autofire related to starting and stopping the combat music.
+* Attempted an additional fix issue with midi audio handles.
+
+=== Gameplay ===
+* Pets/Charmed players will no longer cast charm spells.
+* NPC's will no longer mesmerize your entire group.
+* Large Bowl Sketches are now for sale on some pottery merchants.
+* The isle goblin chieftain has returned to the island in Ocean of Tears.
+* Wind Runes from Sky should no longer mention Classes in their lore.
+* Fixed an issue preventing fast regen from working for characters with less than 180 hp/mana/endurance.
+* Removed enemy resist bonus from enemies that are yellow considered.
+
+=== Instances ===
+* Balance changes to Solo Raid versions of Innoruuk, Cazic-Thule, Maestro of Rancor, and Lord of Loathing.
+* Enemies in the Planar raids will now path back to their spawn points when they get bored.
+
+=== Loadouts ===
+* Reverted a change that was preventing weapons from being equipped during loadout swaps in certain situations.
+
+=== Skills & Stances ===
+* Fixed an observed crash on checking skillups when charmed after a failed dual wield, double attack or triple attack.
+* Berserker stance will no longer receive the attack speed boost and ranged stance will no longer receive the double and triple attack bonus when endurance drops below 2% remaining.
+
+=== Spells ===
+* Pets will now have unique classes.
+* Magician Earth Pets will now be Rangers.
+* Necromancer and Shadow Knight pets will now be Shadow Knights.
+* Enchanter Animation pets will now be Paladins.
+* Beastlord Warders will now be Berserkers.
+* Summoned player pets now always add Warrior class if they are not already a Warrior.
+* Multi-class player pets get doubled health.
+* Additionally, the Magician Fire pet has more mana and better mana regen now.
+* Iksar's Skeleton Illusion spells will now instead turn them into an Iksar skeleton. The head is consistent with their gender. (Iksar Skeleton pets coming soon!)
+
+=== UI ===
+* Fixed inconsistent spell cast timers used for UI displays between your target and self.
+* Fix the /doability helper tips for stances and invocations in the actions window descriptions.
+* Changed /doability for invocations and stances so they no longer toggle off (back to recover or balance) if activated when already active.
+* Added additional default Textures variants (Alternative 1, 2, 3) to the game.
+* "Texture" was renamed to "Spell Gem Textures" on the options menu to be more concise.

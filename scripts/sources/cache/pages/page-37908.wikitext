@@ -1,0 +1,177 @@
+{{Factionpage|
+
+| description = The Steel Warriors have two guildhalls, one in South [[Qeynos]] and one in West [[Freeport]].  Both are situated around PvP Areas, so care should be taken when visiting them.  In Freeport, Cain Darkmoore heads the guildhall called The Bunker.  In Qeynos Ebon Strongbear leads the warrior guildhall there.  The Steel warriors support the [[Knights of Truth]] in Freeport and the [[Guards of Qeynos]] in their fights against the corruption of [[The Freeport Militia]] and the [[Corrupt Qeynos Guards]].
+
+| zones_raise = 
+
+* [[Mistmoore Castle]]
+* [[Crushbone]]
+* [[Eastern Plains of Karana]]
+* [[Lesser Faydark]]
+* [[Neriak|Neriak Commons]]
+* [[Neriak|Neriak Third Gate]]
+* [[Northern Desert of Ro]]
+* [[Oggok]]
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Freeport|East Freeport]]
+* [[Eastern Plains of Karana]]
+* [[Everfrost Peaks]]
+* [[Halas]]
+* [[Lake Rathetear]]
+* [[Rathe Mountains]]
+* [[Freeport|North Freeport]]
+* [[Qeynos Aqueducts]]
+* [[Qeynos Hills]]
+* [[Southern Karana]]
+* [[Qeynos|South Qeynos]]
+* [[Southern Desert of Ro]]
+* [[Freeport|West Freeport]]
+* [[Western Plains of Karana]]
+
+| quests_raise = 
+
+* [[Blurred Map Quest]]
+* [[Corrupt Guards (Paladin Version)]]
+* [[Deathfist Slashed Belts, Good Version]]
+* [[Druid Epic Quest]]
+* [[Errand for Wolten]]
+* [[Gnoll Bounty]]
+* [[Hero Bracers Quest]]
+* [[Ice Goblin Necklaces]]
+* [[Ivan McMannus' Remains]]
+* [[Karana Clovers]]
+* [[Kobold Killing]]
+* [[Langseax Quest]]
+* [[Lenka's Pouch]]
+* [[Magic Elixir for the Warriors]]
+* [[Paladin Message]]
+* [[Piranha Hunting]]
+* [[Steel Warrior Initiation]]
+* [[The Clothspinner Sisters (good)]]
+* [[The Escaped Catman]]
+* [[The Painting]]
+* [[The Seax]]
+* [[Weapons Delivery]]
+* [[Zimel's Blades (SoulFire)]]
+
+| quests_lower = 
+
+* [[Fire Goblin Runner]]
+* [[Halfling Raider Helms]]
+* [[Marr Minnows for Palon]]
+* [[Orc Pawn Picks]]
+* [[Yegek's Test, Part 1]]
+* [[Yegek's Test, Part 2]]
+
+| mobs_raise = 
+
+* [[Ambassador DVinn]]  <span class='fmz'>(Crushbone)</span>
+* [[Ambassador K`Ryn]]  <span class='fmz'>(Oggok)</span>
+* [[Ambassador Rylan]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Dark Elf Corruptor]]  <span class='fmz'>(East Karana)</span>
+* [[Dark Elf Reaver]] <span class='fmz'>(East Karana)</span>
+* [[Dorn B`Dynn]] <span class='fmz'>(North Ro - NPC, Non-Quest)</span>
+* [[Narex T`Vem]] <span class='fmz'>(Neriak Commons - Quest NPC)</span>
+* [[Teir`Dal Elite]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[Xicotl]]  <span class='fmz'>(Castle Mistmoore)</span>
+
+| mobs_lower = 
+
+* [[a minnow]] <span class='fmz'>(North Freeport - Quest NPC)</span>
+* [[Adon McMarrin]] <span class='fmz'>(Halas)</span>
+* [[Alec McMarrin]] <span class='fmz'>(Halas)</span>
+* [[Altunic Jartin]] <span class='fmz'>(Commonlands - Merchant)</span>
+* [[Andres McMarrin]] <span class='fmz'>(Halas)</span>
+* [[Arem Ulosia]] <span class='fmz'>(West Freeport - NPC, Non-Quest)</span>
+* [[Arinna Trueblade]] <span class='fmz'>(West Freeport - Warrior Guildmaster)</span>
+* [[Atwin Keladryn]] <span class='fmz'>(Butcherblock Mountains - Quest NPC)</span>
+* [[Axe Broadsmith]] <span class='fmz'>(Qeynos Hills - Quest NPC)</span>
+* [[Bandl McMarrin]] <span class='fmz'>(Everfrost Peaks)</span>
+* [[Bonn McMarrin]] <span class='fmz'>(Everfrost Peaks)</span>
+* [[Brena Donyld]] <span class='fmz'>(East Freeport - Warrior Guildmaster)</span>
+* [[Brenzl McMannus]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Brina Foxtripper]] <span class='fmz'>(East Freeport - Warrior Guildmaster)</span>
+* [[Cain Darkmoore]] <span class='fmz'>(East Freeport - Warrior Guildmaster)</span>
+* [[Celsar Vestagon]] <span class='fmz'>(West Freeport - Cleric Guildmaster)</span>
+* [[Cian McMarrin]] <span class='fmz'>(Halas)</span>
+* [[Clovan McMarrin]] <span class='fmz'>(Halas)</span>
+* [[Dargon McPherson]] <span class='fmz'>(Halas - Warrior Guildmaster)</span>
+* [[Dom McMarrin]] <span class='fmz'>(Everfrost Peaks)</span>
+* [[Eestyana Naestra]] <span class='fmz'>(West Freeport - Cleric Guildmaster)</span>
+* [[Einhorst McMannus]] <span class='fmz'>(West Karana - Quest NPC)</span>
+* [[Garn McMarrin]] <span class='fmz'>(Everfrost Peaks)</span>
+* [[Ghonic Erharn]] <span class='fmz'>(West Freeport - Cleric Guildmaster)</span>
+* [[Grahan Rothkar]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[Guard Fernaldo]] <span class='fmz'>(Mountains of Rathe)</span>
+* [[Guard Rianna]] <span class='fmz'>(Lake Rathetear)</span>
+* [[Guard Treal]] <span class='fmz'>(Lake Rathetear)</span>
+* [[Gygus Remnara]] <span class='fmz'>(West Freeport - Paladin Guildmaster)</span>
+* [[Holana Oleary]] <span class='fmz'>(Halas - Merchant)</span>
+* [[Iceberg]]  <span class='fmz'>(Everfrost Peaks)</span>
+* [[Jakom Herolon]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Jemoz Lerkarson]] <span class='fmz'>(West Freeport - Cleric Guildmaster)</span>
+* [[Jinkus Felligan]] <span class='fmz'>(Halas - Shaman Guildmaster)</span>
+* [[Joffin Sinclay]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Jusia Vapious]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Kalatrina Plossen]] <span class='fmz'>(West Freeport - Paladin Guildmaster)</span>
+* [[Knight of Truth]] <span class='fmz'>(West Freeport)</span>
+* [[Kylan O`Danos]] <span class='fmz'>(Halas - Warrior Guildmaster)</span>
+* [[Larn Brugal]] <span class='fmz'>(East Freeport - Warrior Guildmaster)</span>
+* [[Lars McMannus]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Lenka Stoutheart]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Lish McMarrin]] <span class='fmz'>(Everfrost Peaks)</span>
+* [[Lysbith McNaff]] <span class='fmz'>(Halas - Warrior Guildmaster)</span>
+* [[Markin Ironwhite]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Merko Quetalis]] <span class='fmz'>(West Freeport - Paladin Guildmaster)</span>
+* [[Milea Clothspinner]] <span class='fmz'>(East Karana - Quest NPC)</span>
+* [[Mils McMarrin]] <span class='fmz'>(Halas)</span>
+* [[Misla McMannus]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Mojax Hikspin]] <span class='fmz'>(Commonlands - Quest NPC)</span>
+* [[Monia Oakstone]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Nal McMarrin]] <span class='fmz'>(Halas)</span>
+* [[Narra Tanith]]  <span class='fmz'>(South Karana)</span>
+* [[Oli McMarrin]] <span class='fmz'>(Halas)</span>
+* [[Palious Jarten]] <span class='fmz'>(West Freeport - Cleric Guildmaster)</span>
+* [[Plagus Ladeson]] <span class='fmz'>(East Freeport - Warrior Guildmaster)</span>
+* [[Plnorrick Spinecracker]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Renth McLanis]] <span class='fmz'>(Halas - Warrior Guildmaster)</span>
+* [[Sera McMannus]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Sir Ackmin]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Arlin]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Artanis]] <span class='fmz'>(West Freeport)</span>
+* [[Sir Breel]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Costkin]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Drolfis]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Edwin Motte]]  <span class='fmz'>(East Freeport)</span>
+* [[Sir Folon]] <span class='fmz'>(West Freeport)</span>
+* [[Sir Fosco]] <span class='fmz'>(West Freeport)</span>
+* [[Sir Glimmon]] <span class='fmz'>(West Freeport)</span>
+* [[Sir Hallis]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Hogo]] <span class='fmz'>(West Freeport)</span>
+* [[Sir Iot]] <span class='fmz'>(West Freeport)</span>
+* [[Sir Lishmin]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Mollin]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Noshon]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Ollin]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Penan]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Phallin]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Rophol]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Shalint]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Willam]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Xantille]] <span class='fmz'>(West Freeport)</span>
+* [[Theron Rolius]] <span class='fmz'>(West Freeport - Paladin Guildmaster)</span>
+* [[Thumpy]] <span class='fmz'>(Qeynos Catacombs - NPC, Non-Quest)</span>
+* [[Thurion Desius]] <span class='fmz'>(West Freeport - Paladin Guildmaster)</span>
+* [[Toala Nehron]] <span class='fmz'>(East Freeport - Warrior Guildmaster)</span>
+* [[Trancil Clearpond]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Tundra Jack]] <span class='fmz'>(Everfrost Peaks - NPC, Non-Quest)</span>
+* [[Ulrich McMannus]] <span class='fmz'>(West Karana - NPC, Non-Quest)</span>
+* [[Valeron Dushire]] <span class='fmz'>(West Freeport - Paladin Guildmaster)</span>
+* [[Vun Winstone]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+
+}}
+[[Category:Halas Factions]]
+[[Category:Achievement Faction]]

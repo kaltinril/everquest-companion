@@ -1,0 +1,35 @@
+{{Factionpage|
+
+| description = A generic-sounding faction for goblins in the Ocean of Tears and Dagnor's Cauldron. May be related to the [[Riptide Goblins]] of [[Butcherblock Mountains]].
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Dagnor's Cauldron]]
+* [[Ocean of Tears]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a goblin headmaster]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[an isle goblin]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[an isle goblin headhunter]] <span class='fmz'>(Ocean of Tears)</span>
+* [[an isle goblin shaman]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[an isle goblin warrior]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[an isle goblin wizard]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[aqua goblin bosun]]  <span class='fmz'>(Dagnor's Cauldron)</span>
+* [[aqua goblin mariner]]  <span class='fmz'>(Dagnor's Cauldron)</span>
+* [[aqua goblin shaman]]  <span class='fmz'>(Dagnor's Cauldron)</span>
+* [[aqua goblin tidal lord]]  <span class='fmz'>(Dagnor's Cauldron)</span>
+
+}}

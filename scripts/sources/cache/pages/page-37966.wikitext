@@ -1,0 +1,31 @@
+{{Factionpage|
+
+| description = As named, this faction affects those vile little creatures in Lesser Faydark. Use [[Benevolence]] to go from Threatening to Glower. [[a brownie merchant]], who is on this faction, can only be traded with when sneaking.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Greater Faydark]]
+* [[Lesser Faydark]]
+* [[Steamfont Mountains]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a brownie]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[a brownie farmer]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[a brownie guard]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[a brownie merchant]] <span class='fmz'>(Lesser Faydark - Merchant)</span>
+* [[a brownie scout]]  <span class='fmz'>(Greater Faydark)</span>
+* [[Brownie Scout]]  <span class='fmz'>(Lesser Faydark)</span>
+}}

@@ -1,0 +1,124 @@
+{{Factionpage|
+
+| description = The outpost of dark elves in the Overthere are loyal to Venril.
+
+| zones_raise = 
+
+* [[Dreadlands]]
+* [[Emerald Jungle]]
+* [[Skyfire Mountains]]
+* [[Timorous Deep]]
+* [[Veeshan's Peak]]
+* {{VeliousGray| [[Western Wastes]] }}
+
+| zones_lower = 
+
+* [[Howling Stones]]
+* [[Kaesora]]
+* [[Karnor's Castle]]
+* [[The Overthere]]
+* [[Timorous Deep]]
+* [[Trakanon's Teeth]]
+
+| quests_raise = 
+
+* [[Brain Bite (Evil)]]
+* [[Protect the Shipyard]]
+
+| quests_lower = 
+
+* [[Crusader's Tests|Crusaders of Greenmist]]
+
+| mobs_raise = 
+
+* [[a racnar]] <span class='fmz'>(Veeshan's Peak)</span>
+* [[guardian wurm]] <span class='fmz'>(Veeshan's Peak)</span>
+* {{VeliousGray| [[Esorpa of the Ring]]}} <span class='fmz'>(Western Wastes)</span>
+* [[Faydedar]]  <span class='fmz'>(Timorous Deep)</span>
+* [[Gorenaire]]  <span class='fmz'>(Dreadlands)</span>
+* [[Hoshkar]]  <span class='fmz'>(Veeshan's Peak)</span>
+* [[Phara Dar]]  <span class='fmz'>(Veeshan's Peak)</span>
+* [[Severilous]]  <span class='fmz'>(Emerald Jungle)</span>
+* [[Silverwing]]  <span class='fmz'>(Veeshan's Peak)</span>
+* [[Talendor]]  <span class='fmz'>(Skyfire Mountains)</span>
+* [[Xygoz]]  <span class='fmz'>(Veeshan's Peak)</span>
+
+| mobs_lower = 
+
+* [[a bile golem]]  <span class='fmz'>(Howling Stones (Charasis))</span>
+* [[a cliff golem]]  <span class='fmz'>(The Overthere)</span>
+* [[A Crypt Golem]]  <span class='fmz'>(Howling Stones (Charasis))</span>
+* [[A Crypt Spectre]]  <span class='fmz'>(Howling Stones (Charasis))</span>
+* [[a drolvarg bodyguard]]  <span class='fmz'>(Karnor's Castle)</span>
+* [[a drolvarg captain]]  <span class='fmz'>(Karnor's Castle)</span>
+* [[a drolvarg guardian]]  <span class='fmz'>(Karnor's Castle)</span>
+* [[a drolvarg sentry]]  <span class='fmz'>(Karnor's Castle)</span>
+* [[a helot skeleton]] <span class='fmz'>(Howling Stones (Charasis) - Undead)</span>
+* [[a human skeleton]]  <span class='fmz'>(Karnor's Castle)</span>
+* [[a pyre golem]]  <span class='fmz'>(Howling Stones (Charasis))</span>
+* [[a scorpikis]]  <span class='fmz'>(The Overthere)</span>
+* [[a scorpikis scrounger]]  <span class='fmz'>(The Overthere)</span>
+* [[a sepulcher skeleton]] <span class='fmz'>(Howling Stones (Charasis) - Undead)</span>
+* [[a skeleton worker]] <span class='fmz'>(The Overthere - NPC, Non-Quest)</span>
+* [[Admiral Tylix]] <span class='fmz'>(The Overthere)</span>
+* [[an Ogre Raider]] <span class='fmz'>(Timorous Deep)</span>
+* [[Briarweb Spider]]  <span class='fmz'>(Kaesora)</span>
+* [[Bristleweb Spider]]  <span class='fmz'>(Kaesora)</span>
+* [[Captain Rottgrime]] <span class='fmz'>(The Overthere - Quest NPC)</span>
+* [[Corundium]] <span class='fmz'>(The Overthere)</span>
+* [[Dragoon Barber W`Selo]] <span class='fmz'>(The Overthere)</span>
+* [[Dragoon T`Vem]] <span class='fmz'>(The Overthere)</span>
+* [[Dragoon T`Vex]] <span class='fmz'>(The Overthere)</span>
+* [[Dragoon V`Lask]] <span class='fmz'>(The Overthere)</span>
+* [[Dragoon V`Resh]] <span class='fmz'>(The Overthere)</span>
+* [[Drusella Sathir]]  <span class='fmz'>(Howling Stones (Charasis))</span>
+* [[Embalming Fluid]]  <span class='fmz'>(Howling Stones (Charasis))</span>
+* [[enraged ravener]]  <span class='fmz'>(Kaesora)</span>
+* [[Enraged spectral librarian]] <span class='fmz'>(Kaesora - Undead)</span>
+* [[famished ravener]]  <span class='fmz'>(Kaesora)</span>
+* [[Frenzied Strathbone]]  <span class='fmz'>(Kaesora)</span>
+* [[General V`Deers]] <span class='fmz'>(The Overthere)</span>
+* [[Guardian Of Xalgoz]]  <span class='fmz'>(Kaesora)</span>
+* [[Hungered Ravener]]  <span class='fmz'>(Kaesora)</span>
+* [[Impaler Tzilug]] <span class='fmz'>(The Overthere)</span>
+* [[Iron Sentinel]] <span class='fmz'>(The Overthere)</span>
+* [[Minion Of Xalgoz]] <span class='fmz'>(Kaesora - Undead)</span>
+* [[Ogre Wise One]] <span class='fmz'>(Timorous Deep)</span>
+* [[Ravener]]  <span class='fmz'>(Kaesora)</span>
+* [[Reaver of Xalgoz]]  <span class='fmz'>(Kaesora)</span>
+* [[Scorpikis Guardian]]  <span class='fmz'>(The Overthere)</span>
+* [[Skeletal Guardian]] <span class='fmz'>(Kaesora - Undead)</span>
+* [[skeletal minion]] <span class='fmz'>(Kaesora - Undead)</span>
+* [[Skeletal Warder]] <span class='fmz'>(Kaesora - Undead)</span>
+* [[spectral guardian]] <span class='fmz'>(Kaesora - Undead)</span>
+* [[Spectral Legionnaire]] <span class='fmz'>(Trakanon's Teeth - Undead)</span>
+* [[spectral librarian]] <span class='fmz'>(Kaesora - Undead)</span>
+* [[Stishovite]] <span class='fmz'>(The Overthere)</span>
+* [[Strathbone Healer]]  <span class='fmz'>(Kaesora)</span>
+* [[Strathbone Runelord]]  <span class='fmz'>(Kaesora)</span>
+* [[strathbone spider]]  <span class='fmz'>(Kaesora)</span>
+* [[Swirling Goo]] <span class='fmz'>(Howling Stones (Charasis))</span>
+* [[Tektite]] <span class='fmz'>(The Overthere)</span>
+* [[the Crypt Keeper]] <span class='fmz'>(Howling Stones (Charasis) - Undead)</span>
+* [[The Spectre Spiritualist]]  <span class='fmz'>(Howling Stones (Charasis))</span>
+* [[Tin Banker I]] <span class='fmz'>(The Overthere - Banker)</span>
+* [[Tin Banker II]] <span class='fmz'>(The Overthere - Banker)</span>
+* [[Tin Merchant I]] <span class='fmz'>(The Overthere - Merchant)</span>
+* [[Tin Merchant II]] <span class='fmz'>(The Overthere - Merchant)</span>
+* [[Tin Merchant III]] <span class='fmz'>(The Overthere - Merchant)</span>
+* [[Tin Merchant IV]] <span class='fmz'>(The Overthere - Merchant)</span>
+* [[Tin Merchant IX]] <span class='fmz'>(The Overthere - Merchant)</span>
+* [[Tin Merchant V]] <span class='fmz'>(The Overthere - Merchant)</span>
+* [[Tin Merchant VI]] <span class='fmz'>(The Overthere - Merchant)</span>
+* [[Tin Merchant VII]] <span class='fmz'>(The Overthere - Merchant)</span>
+* [[Tin Merchant XI]] <span class='fmz'>(The Overthere - Merchant)</span>
+* [[Tourmaline]] <span class='fmz'>(The Overthere)</span>
+* [[Ugrak da Raider]]  <span class='fmz'>(Timorous Deep)</span>
+* [[undead jailer]]  <span class='fmz'>(Karnor's Castle)</span>
+* [[Venril Sathir]]  <span class='fmz'>(Karnor's Castle)</span>
+* [[Verix Kyloxs Remains]]  <span class='fmz'>(Karnor's Castle)</span>
+* [[Warder of Xalgoz]]  <span class='fmz'>(Kaesora)</span>
+* [[Xalgoz]]  <span class='fmz'>(Kaesora)</span>
+
+}}
+[[Category:Significant Factions]]

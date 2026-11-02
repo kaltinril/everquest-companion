@@ -1,0 +1,147 @@
+{{Factionpage|
+
+| description = Evil Cult of [[Bertoxxulous]] the Plaguebringer headquartered in the Qeynos sewers.<br><br>You can raise Bloodsabers faction by turning in 5 gold at a time to [[Guard Shilster]] in [[North Karana]] @ +1385, -2720 in the far north east corner of the zone.
+
+| zones_raise = 
+
+* [[Blackburrow]]
+* [[Lake Rathetear]]
+* [[Lavastorm Mountains]]
+* [[Rathe Mountains]]
+* [[Nektulos Forest]]
+* [[Northern Karana]]
+* [[Qeynos|North Qeynos]]
+* [[Qeynos Hills]]
+* [[Southern Karana]]
+* [[Qeynos|South Qeynos]]
+* [[Western Plains of Karana]]
+
+| zones_lower = 
+
+* [[Freeport|East Freeport]]
+* [[Highpass Keep]]
+* [[Highpass Hold]]
+* [[Northern Karana]]
+* [[Qeynos|North Qeynos]]
+* [[Qeynos Aqueducts]]
+* [[Qeynos Hills]]
+* [[Southern Karana]]
+* [[Qeynos|South Qeynos]]
+* [[Surefall Glade]]
+* [[Western Plains of Karana]]
+
+| quests_raise = 
+
+* [[Drosco the Zombie (evil)]]
+* [[Gharin's Note (evil)]]
+* [[Guard Shilster's Stout]]
+* [[Hurrieta's Tunic Quest]]
+* [[The Clothspinner Sisters (evil)]]
+* [[The Crate (evil)]]
+* [[Trumpy's Head]]
+* [[Trumpy's Skull]]
+
+| quests_lower = 
+
+* [[Aegis of Life Quest]]
+* [[Bat Fur Quest]]
+* [[Blank Scrolls]]
+* [[Blessed Oil Quest]]
+* [[Bone Chips Qeynos]]
+* [[Brother Trintle]]
+* [[Cheslin's Illusion Cards]]
+* [[Corrupt Guards]]
+* [[Crush the Undead]]
+* [[Cure for Lempeck Hargrin]]
+* [[Drosco the Zombie (evil)]]
+* [[Drosco the Zombie (good)]]
+* [[Errand for Tonmerk]]
+* [[Fleshy Orbs]]
+* [[Frostbite's Fish]]
+* [[Holy Armor Scroll]]
+* [[Qeynos Badge Quests|Interrogator's Badge (Badge #2)]]
+* [[Karana's Blessing]]
+* [[Library Book]]
+* [[Merona's Brother]]
+* [[Note to Neclo Quest]]
+* [[Qeynos Badge Quests|Qeynos Badge of Honor (Badge #4)]]
+* [[Rabid Grizzlies]]
+* [[Rabid Wolves]]
+* [[Rat Shaped Rings]]
+* [[Qeynos Badge Quests|Researcher's Badge (Badge #3)]]
+* [[The Clothspinner Sisters (good)]]
+* [[The Donations]]
+* [[The Rat King]]
+* [[Unser's Call]]
+* [[Zimel's Blades (SoulFire)]]
+
+| mobs_raise = 
+
+* [[a koalindl]]  <span class='fmz'>(North Qeynos)</span>
+* [[Brother Chintle]] <span class='fmz'>(West Karana - NPC, Non-Quest)</span>
+* [[Brother Drash]]  <span class='fmz'>(South Karana)</span>
+* [[Brother Estle]] <span class='fmz'>(West Karana - Quest NPC)</span>
+* [[Brother Gruff]] <span class='fmz'>(South Karana - NPC, Non-Quest)</span>
+* [[Brother Nallin]] <span class='fmz'>(North Karana - Quest NPC)</span>
+* [[Cyanelle]] <span class='fmz'>(Lake Rathetear - NPC, Non-Quest)</span>
+* [[Eldreth]] <span class='fmz'>(Lake Rathetear - Quest NPC)</span>
+* [[Enic Ruklin]] <span class='fmz'>(North Qeynos - Quest NPC)</span>
+* [[Koalindl (Rodcet Nife)]] <span class='fmz'>(North Qeynos - NPC, Non-Quest)</span>
+* [[Lashun Novashine]] <span class='fmz'>(North Qeynos - Quest NPC)</span>
+* [[Lempeck Hargrin]]  <span class='fmz'>(West Karana)</span>
+* [[Neclo Rheslar]]  <span class='fmz'>(Qeynos Hills)</span>
+* [[Niclaus Ressinn]]  <span class='fmz'>(Qeynos Hills)</span>
+* [[Nomsoe Jusagta]] <span class='fmz'>(North Qeynos - Cleric Guildmaster)</span>
+* [[Rinna Lightshadow]] <span class='fmz'>(Commonlands - Cleric Guildmaster)</span>
+* [[Sir Lindeal]]  <span class='fmz'>(Lavastorm Mountains)</span>
+* [[Thomas]] <span class='fmz'>(Mountains of Rathe - Quest NPC)</span>
+
+| mobs_lower = 
+
+* [[a necromancer]]  <span class='fmz'>(Qeynos Catacombs)</span>
+* [[a rotting sentry]]  <span class='fmz'>(Qeynos Catacombs)</span>
+* [[Argyn Shieldstan]] <span class='fmz'>(Qeynos Catacombs - NPC, Non-Quest)</span>
+* [[Bruax Grengar]] <span class='fmz'>(Qeynos Catacombs - Necromancer Guildmaster)</span>
+* [[Commander Kane]] <span class='fmz'>(Qeynos Catacombs - Warrior Guildmaster)</span>
+* [[Dallisen Xalladyr]] <span class='fmz'>(Qeynos Catacombs - Merchant)</span>
+* [[Dranot Harbin]] <span class='fmz'>(Qeynos Catacombs - Merchant)</span>
+* [[Driana Poxsbourne]]  <span class='fmz'>(East Freeport)</span>
+* [[Dyllin Starsine]] <span class='fmz'>(Highpass Hold - Quest NPC)</span>
+* [[Garuc Anehm]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Guard Augos]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Beris]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Guard Donlan]] <span class='fmz'>(West Karana)</span>
+* [[Guard Jerith]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard McCluskey]] <span class='fmz'>(West Karana)</span>
+* [[Guard Oleph]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Perin]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Quedal]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Shilster]] <span class='fmz'>(North Karana - Quest NPC)</span>
+* [[Guard Sironan]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Guard Tyrak]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Yalroen]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Kurne Rextula]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Lieutenant Dagarok]]  <span class='fmz'>(North Qeynos)</span>
+* [[Lyris Moonbane]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Nulima Opalis]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Opal Darkbriar]] <span class='fmz'>(East Freeport - Cleric Guildmaster)</span>
+* [[Perkon Malok]] <span class='fmz'>(Qeynos Catacombs - NPC, Non-Quest)</span>
+* [[Pyzjn]]  <span class='fmz'>(Qeynos Hills)</span>
+* [[Reania Jukle]] <span class='fmz'>(Qeynos Catacombs - Enchanter Guildmaster)</span>
+* [[Rocthar Bekesna]] <span class='fmz'>(Qeynos Catacombs - Warrior Guildmaster)</span>
+* [[Senst Ereek]] <span class='fmz'>(Qeynos Catacombs - Merchant)</span>
+* [[Sragg Bloodheart]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Teydar]] <span class='fmz'>(Qeynos Catacombs - Shadowknight Guildmaster)</span>
+* [[Tovax Vmar]] <span class='fmz'>(Qeynos Hills - Quest NPC)</span>
+* [[Vidurlyn Aeminee]] <span class='fmz'>(Qeynos Catacombs - Merchant)</span>
+* [[Zaen Kalystir]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Zhem Xecia]] <span class='fmz'>(East Freeport - Cleric Guildmaster)</span>
+
+}}
+
+= Suggested Route =
+*[[Guard Shilster's Stout]] (+[[Corrupt Qeynos Guards]], -[[Guards of Qeynos]], +[[Kane Bayle]], +[[Circle Of Unseen Hands]], +[[Bloodsabers]])
+*[[The Crate (evil)]] Part 1: (+[[Merchants of Qeynos]], +[[Antonius Bayle]], +[[Coalition of Tradefolk]], +[[Guards of Qeynos]], -[[Circle Of Unseen Hands]]) Part 2: (+[[Corrupt Qeynos Guards]], +[[Kane Bayle]], +[[Circle Of Unseen Hands]], +[[Bloodsabers]], -[[Guards of Qeynos]])
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]

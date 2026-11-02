@@ -1,0 +1,182 @@
+== Description ==
+This page lists the currently available slow effects available.
+
+=== Spells ===
+
+==== Bard ====
+Note *: All Bard songs are based on their base slow.
+<table class="eoTable3 wikitable">
+  <tr>
+    <th>Name</th>
+    <th>Level</th>
+    <th>Target</th>
+    <th>Percentage</th>
+  </tr>
+  <tr>
+    <td>[[Largo's Melodic Binding]]</td>
+    <td>20</td>
+    <td>Caster PB AoE</td>
+    <td>35% *</td>
+  </tr>
+  <tr>
+    <td>[[Selo's Consonant Chain]]</td>
+    <td>23</td>
+    <td>Single</td>
+    <td>40% *</td>
+  </tr>
+  <tr>
+    <td>[[Selo's Chords of Cessation]]</td>
+    <td>48</td>
+    <td>Caster PB AoE</td>
+    <td>25% *</td>
+  </tr>
+</table>
+
+==== Beastlord ====
+<table class="eoTable3 wikitable">
+  <tr>
+    <th>Name</th>
+    <th>Level</th>
+    <th>Target</th>
+    <th>Percentage</th>
+  </tr>
+  <tr>
+    <td>[[Drowsy]]</td>
+    <td>20</td>
+    <td>Single</td>
+    <td>25%</td>
+  </tr>
+  <tr>
+    <td>[[Languid Pace]]</td>
+    <td>35</td>
+    <td>Single</td>
+    <td>30%</td>
+  </tr>
+  <tr>
+    <td>[[Sha's Lethargy]]</td>
+    <td>50</td>
+    <td>Single</td>
+    <td>40%</td>
+  </tr>
+</table>
+
+==== Enchanter ====
+<table class="eoTable3 wikitable">
+  <tr>
+    <th>Name</th>
+    <th>Level</th>
+    <th>Target</th>
+    <th>Percentage</th>
+  </tr>
+  <tr>
+    <td>[[Languid Pace]]</td>
+    <td>9</td>
+    <td>Single</td>
+    <td>30%</td>
+  </tr>
+  <tr>
+    <td>[[Tepid Deeds]]</td>
+    <td>23</td>
+    <td>Single</td>
+    <td>50%</td>
+  </tr>
+  <tr>
+    <td>[[Shiftless Deeds]]</td>
+    <td>41</td>
+    <td>Single</td>
+    <td>65%</td>
+  </tr>
+</table>
+
+==== Necromancer ====
+<table class="eoTable3 wikitable">
+  <tr>
+    <th>Name</th>
+    <th>Level</th>
+    <th>Target</th>
+    <th>Percentage</th>
+  </tr>
+  <tr>
+    <td>[[Shackle of Bone]]</td>
+    <td>17</td>
+    <td>Single Undead</td>
+    <td>35%</td>
+  </tr>
+  <tr>
+    <td>[[Shackle of Spirit]]</td>
+    <td>38</td>
+    <td>Single Undead</td>
+    <td>70%</td>
+  </tr>
+</table>
+
+==== Rogue ====
+Note: All Rogue slows are from their innate posion abilities.
+<table class="eoTable3 wikitable">
+  <tr>
+    <th>Name</th>
+    <th>Level</th>
+    <th>Target</th>
+    <th>Percentage</th>
+  </tr>
+  <tr>
+    <td>[[Weakening Strike]]</td>
+    <td>4</td>
+    <td>Melee Proc</td>
+    <td>35%</td>
+  </tr>
+</table>
+
+==== Shaman ====
+<table class="eoTable3 wikitable">
+  <tr>
+    <th>Name</th>
+    <th>Level</th>
+    <th>Target</th>
+    <th>Percentage</th>
+  </tr>
+  <tr>
+    <td>[[Drowsy]]</td>
+    <td>5</td>
+    <td>Single</td>
+    <td>25%</td>
+  </tr>
+  <tr>
+    <td>[[Walking Sleep]]</td>
+    <td>13</td>
+    <td>Single</td>
+    <td>35%</td>
+  </tr>
+  <tr>
+    <td>[[Impassivity]]</td>
+    <td>16</td>
+    <td>Single Group or Self</td>
+    <td>30%</td>
+  </tr>
+  <tr>
+    <td>[[Tagar's Insects]]</td>
+    <td>27</td>
+    <td>Single</td>
+    <td>50%</td>
+  </tr>
+  <tr>
+    <td>[[Nonchalance]]</td>
+    <td>30</td>
+    <td>Single Group or Self</td>
+    <td>30%</td>
+  </tr>
+  <tr>
+    <td>[[Togor's Insects]]</td>
+    <td>38</td>
+    <td>Single</td>
+    <td>70%</td>
+  </tr>
+  <tr>
+    <td>[[Stoicism]]</td>
+    <td>44</td>
+    <td>Single Group or Self</td>
+    <td>30%</td>
+  </tr>
+</table>
+
+ See discussion page for raw list.

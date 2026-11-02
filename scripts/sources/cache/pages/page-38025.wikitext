@@ -1,0 +1,32 @@
+{{Factionpage|
+
+| description = The cats in Erud's Crossing. Suspected of being an offshoot of the [[Deepwater Knights]] due to both entities using the incorrect spelling of Prexus (Prexuz).
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Erud's Crossing]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Hojo]]  <span class='fmz'>(Erud's Crossing)</span>
+* [[Jarra]]  <span class='fmz'>(Erud's Crossing)</span>
+* [[Kala]]  <span class='fmz'>(Erud's Crossing)</span>
+* [[Milla]]  <span class='fmz'>(Erud's Crossing)</span>
+* [[Monala]]  <span class='fmz'>(Erud's Crossing)</span>
+* [[Nifta]]  <span class='fmz'>(Erud's Crossing)</span>
+* [[Nomala]]  <span class='fmz'>(Erud's Crossing)</span>
+* [[Tolo]]  <span class='fmz'>(Erud's Crossing)</span>
+
+}}

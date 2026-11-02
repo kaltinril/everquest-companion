@@ -1,0 +1,72 @@
+{{Classic Era}}
+<div style="display: flex;">
+  <div style="flex: 1;">
+    <ul>
+    <li>Summoning Spell: [[Spirit of Herikol]]</li>
+    <li>Pet Type: [[Beastlord#Your Race & Warder|Beastlord Warder]]</li>
+    <li>Pet Classes: [[Beastlord]] / [[Warrior]]</li>
+    <li>Pet Level: 26</li>
+    <li>Hit Points: 1638 (+1/tick)</li>
+    <li>Mana: 490 (+50/tick)</li>
+    </ul>
+  </div>
+  <div style="flex: 1;">
+  [[File:medium_warder_summon.png|left|x175px]]
+  </div>
+</div>
+<div style="display: flex;">
+  <div style="flex: 1;">
+    <ul>
+    <li>Defensive Stats</li>
+       <ul>
+       <li>Mitigation: 116</li>
+       <li>Evasion: 271</li>
+       </ul>
+    </ul>
+    <ul>
+    <li>Offensive Stats</li>
+       <ul>
+       <li>Offense: 154</li>
+       <li>Accuracy: 177</li>
+       <li>Max Damage: 32</li>
+       <li>Dual Wield Skill: Medium</li>
+       </ul>
+     </ul>
+  </div>
+  <div style="flex: 1;">
+    <ul><li>Strength: 108</li>
+    <li>Stamina: 108</li>
+    <li>Intelligence: 10</li>
+    <li>Wisdom: 10</li>
+    <li>Agility: 108</li>
+    <li>Dexterity: 100</li>
+    <li>Charisma: 8</li></ul>
+  </div>
+</div>
+
+== Abilities ==
+* [[Skill_Bash|Bash]]
+* [[Skill_Block|Block]]
+* [[Skill_Cleave|Cleave]]
+* [[Skill_Dodge|Dodge]]
+* [[Skill_Double Attack|Double Attack]]
+* [[Skill_Kick|Kick]]
+* [[Skill_Parry|Parry]]
+* [[Skill_Riposte|Riposte]]
+* [[Skill_Taunt|Taunt]]
+
+== Spell List ==
+* [[Frost Dagger|<span class='itemeff'>Frost Dagger</span>]]
+* [[Drowsy|<span class='itemeff'>Drowsy</span>]]
+* [[Inner Fire|<span class='itemeff'>Inner Fire</span>]]
+* [[Sicken|<span class='itemeff'>Sicken</span>]]
+* [[Spirit of Wolf|<span class='itemeff'>Spirit of Wolf</span>]]
+* [[Tainted Breath|<span class='itemeff'>Tainted Breath</span>]]
+
+== Focus Items ==
+* None
+== Notes ==
+* None
+
+[[Category: Summoned Pet]]
+[[Category: Beastlord Pet]]

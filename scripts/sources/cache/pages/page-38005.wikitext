@@ -1,0 +1,29 @@
+{{Factionpage|
+
+| description = The beasts from the Underworld of [[Brell Serilis]] are on this faction.  Mostly elementals and their ilk, they are found exclusively in the hole.
+
+Dwarves and Halflings who follow Brell are not considered Enemies of this faction.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[The Hole]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a mimic]]  <span class='fmz'>(Ruins of Old Paineel (The Hole))</span>
+* [[a fallen erudite]] <span class='fmz'>(Ruins of Old Paineel (The Hole) - Undead)</span>
+* [[an elemental warrior]] <span class='fmz'>(Ruins of Old Paineel (The Hole) - Summoned)</span>
+* [[Master Yael]] <span class='fmz'>(Ruins of Old Paineel (The Hole) - Wizard)</span>
+}}

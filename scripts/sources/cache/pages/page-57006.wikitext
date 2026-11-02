@@ -1,0 +1,149 @@
+<div style="float:right;margin:5px 0px 10px 20px;">
+__TOC__
+</div>
+
+List of instruments for bards.
+
+Instruments act as a multiplier for certain effects from bard songs. <br>
+For example, if you're playing a percussion song and are using [[Drums of the Beast]], the song will have a 2.6x multiplier (+1.6x, aka Percussion Resonance 16).
+
+Also see [[Equipment_By_Class|Bard Equipment]].
+
+== Percussion ==
+
+{| class="eoTable3 sortable" style="white-space: nowrap;"
+! Item || Slots || Resonance
+|-
+| [[Drums of the Beast]] || Primary || 16
+|-
+| [[Selo`s Drums of the March]] || Secondary || 14
+|-
+| [[Walrus Skin Drum]] || Secondary || 13
+|-
+| [[Sharkskin Drum]] || Secondary || 12
+|-
+| [[Nostrolo Tambourine]] || Secondary || 12
+|-
+| [[Mistmoore Battle Drums]] || Secondary || 11
+|-
+| [[Mahlin's Mystical Bongos]] || Secondary || 11
+|-
+| [[Hand Drum]] || Secondary || 8
+|-
+| [[Singing Short Sword]] || Primary, Secondary || 8
+|-
+|}
+
+== Stringed ==
+
+{| class="eoTable3 sortable" style="white-space: nowrap;"
+! Item || Slots || Resonance
+|-
+| [[Lyran's Mystical Lute]] || Primary, Secondary || 15
+|-
+| [[Kelin`s Seven Stringed Lute]] || Secondary || 14
+|-
+| [[Lyendlln's Lute]] || Secondary || 14
+|-
+| [[Lute of the Howler]] || Primary || 12
+|-
+| [[Lute of the Gypsy Princess]] || Secondary || 11
+|-
+| [[Gypsy Lute]] || Secondary || 11
+|-
+| [[Mystical Lute]] || Secondary || 11
+|-
+| [[Mandolin]] || Secondary || 10
+|-
+| [[Lute]] || Secondary || 10
+|-
+| [[Singing Short Sword]] || Primary, Secondary || 8
+|-
+|}
+
+== Brass ==
+
+{| class="eoTable3 sortable" style="white-space: nowrap;"
+! Item || Slots || Resonance
+|-
+| [[Denon's Horn of Disaster]] || Primary || 14
+|-
+| [[Immaculate Shell Horn]] || Secondary || 14
+|-
+| [[McVaxius` Horn of War]] || Secondary || 13
+|-
+| [[Verlekarnorm's Horn of Disaster]] || Primary || 12
+|-
+| [[Efreeti War Horn]] || Primary || 12
+|-
+| [[Conch Shell Horn]] || Secondary || 11
+|-
+| [[Horn]] || Secondary || 11
+|-
+| [[Alluring Horn]] || Secondary || 8
+|-
+| [[Singing Short Sword]] || Primary, Secondary || 8
+|-
+|}
+
+== Wind ==
+
+{| class="eoTable3 sortable" style="white-space: nowrap;"
+! Item || Slots || Resonance
+|-
+| [[Flute of the Sacred Glade]] || Secondary || 15
+|-
+| [[Lyssa`s Darkwood Piccolo]] || Secondary || 14
+|-
+| [[Ervaj's Flute of Flight]] || Primary || 12
+|-
+| [[Agilmente's Flute of Flight]] || Primary || 12
+|-
+| [[Unicorn Horn]] || Secondary || 12
+|-
+| [[Faun Flute]] || Secondary || 11
+|-
+| [[Brahhms Horn]] || Secondary || 11
+|-
+| [[Scorpion Pincer]] || Secondary || 10
+|-
+| [[Minotaur Horn]] || Secondary || 10
+|-
+| [[Wooden Flute]] || Secondary || 8
+|-
+| [[Singing Short Sword]] || Primary, Secondary || 8
+|-
+|}
+
+== Instrument Components and Quest Pieces ==
+
+These items are related to bard instruments or instrument quests, but may not function as instrument modifiers themselves.
+
+{| class="eoTable3 sortable" style="white-space: nowrap;"
+! Item || Notes
+|-
+| [[Fine Lute Tuners]] || 
+|-
+| [[Flute Mouthpiece]] || 
+|-
+| [[Horn Mouthpiece]] || 
+|-
+| [[Raw Bamboo]] || 
+|-
+| [[Trumpet Valves]] || 
+|-
+| [[Unfinished Brass Trumpet]] || 
+|-
+| [[Unfinished Lute Body]] || 
+|-
+| [[Unfinished Lute Neck]] || 
+|-
+| [[Broken Minotaur Lord's Horn]]
+|-
+| [[Crude Wooden Flute]] || 
+|-
+| [[Lianna's Flute]] || 
+|-
+|}
+
+[[Category:Bard Equipment]]

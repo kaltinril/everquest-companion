@@ -1,0 +1,88 @@
+{{Factionpage|
+
+| description = Most notably, this faction is the Drachnids in both [[Firiona Vie]] and the [[Dreadlands]].  Most creatures in [[Castle Mistmoore]] are also aligned with this faction and the related [[Mayong Mistmoore (Faction)|Mayong Mistmoore faction]].  
+
+As per the name, it is aligned with the NPC [[Mayong Mistmoore]].
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Mistmoore Castle]]
+* [[Dreadlands]]
+* [[Firiona Vie]]
+* [[Ocean of Tears]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+* [[Rogue Redemption]]
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a cloaked dhampyre]] <span class='fmz'>(Castle Mistmoore - Undead)</span>
+* [[a dark elf noble]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a dark offerer]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a dark ritualist]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a dark sacrificer]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a deathly harbinger]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a deathly herald]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a drachnid recluse]]  <span class='fmz'>(Dreadlands)</span>
+* [[a drachnid silklurker]]  <span class='fmz'>(Firiona Vie)</span>
+* [[a drachnid silkmistress]]  <span class='fmz'>(Dreadlands)</span>
+* [[a drachnid silkspinner]]  <span class='fmz'>(Firiona Vie)</span>
+* [[a drachnid silkstrander]]  <span class='fmz'>(Dreadlands)</span>
+* [[a drachnid webmaster]]  <span class='fmz'>(Dreadlands)</span>
+* [[a drachnid webspinner]]  <span class='fmz'>(Firiona Vie)</span>
+* [[a drachnid webstrander]]  <span class='fmz'>(Firiona Vie)</span>
+* [[a drachnid widow]]  <span class='fmz'>(Dreadlands)</span>
+* [[a dread widow]]  <span class='fmz'>(Dreadlands)</span>
+* [[a flouting gargoyle]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a gargoyle]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[a ghastish ancille]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a ghostly ancille]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a ghoulish ancille]] <span class='fmz'>(Castle Mistmoore - Undead)</span>
+* [[a glyphed custodian]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed familiar]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed forbidder]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed ghoul]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed guard]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed sentry]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a glyphed warder]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a grinning gargoyle]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a hemo enologist]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a jeering gargoyle]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a leering gargoyle]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a Mistmoore guard]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a pledge familiar]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a shadowy sage]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a shadowy scribe]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a shadowy scrivener]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a sneering gargoyle]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a soul seductress]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a spectral ancille]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a spiritish ancille]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a thought defiler]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a thought spoiler]] <span class='fmz'>(Castle Mistmoore - Undead)</span>
+* [[a vampiric ancille]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a will pillager]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[a will sapper]] <span class='fmz'>(Castle Mistmoore - Undead)</span>
+* [[an advisor]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[an ancille cook]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[an imp familiar]] <span class='fmz'>(Castle Mistmoore - Summoned)</span>
+* [[an initiate familiar]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Butler Syncall]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Enynti]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Garton Viswin]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Lasna Cheroon]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Maid Issis]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Mynthi Davissi]]  <span class='fmz'>(Castle Mistmoore)</span>
+* [[Princess Cherista]] <span class='fmz'>(Castle Mistmoore - Undead)</span>
+
+}}

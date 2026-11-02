@@ -1,0 +1,166 @@
+Everquest Legends features an In-Game Marketplace, where a variety of In-Game items can be purchased for Iridium.  Iridium can be purchased from the EverQuest Legends main website.
+
+== Bags ==
+
+{| class="wikitable"
+|+
+!Item
+!Iridium Cost
+!Description
+|-
+|[[File:item_884.png|link=]] [[Lightweight Bag]]
+|[[File:Iridium_18x18.png|link=]] 500
+|This lightweight bag will hold 12 items at 100% weight reduction.  Perfect for heavy lifting on your travels.  This item cannot be traded and is bound to the character you purchased it on.
+|-
+|[[File:item_1444.png|link=]] [[Spacious Rucksack]]
+|[[File:Iridium_18x18.png|link=]] 750
+|This lightweight rucksack will hold 24 items at 80% weight reduction.  Perfect for the adventurer who needs to hold just a little bit more, and doesn't mind a bit of lift.  This items cannot be traded, and is bound to the character you purchased it on.
+|-
+|[[File:item_5910.png|link=]] [[Storage Trunk]]
+|[[File:Iridium_18x18.png|link=]] 1000
+|This weighted trunk will hold 50 items.  It provides no weight reductions, weights 50 stones, and is fairly heavy!  Your character may be weighed down after purchasing it.  Any contents in the Trunk will be considerably heavier.  Perfect for the adventurer who banks frequently.  This item cannot be traded, and is bound to the character you purchased it on.
+|}
+
+== Cosmetics ==
+
+{| class="wikitable"
+|+
+!Item
+!Iridium Cost
+!Description
+|-
+|[[File:item_5797.png|link=]] [[Armor Ornamentation Token]]
+|[[File:Iridium_18x18.png|link=]] 500
+|This token can be merged into a piece of visible armor to copy its appearance into the form of an Armor Ornamentation Exaltation.  This does not destroy the item you are copying the appearance from.  WARNING: Does not work on Robe items.  The Token and generated Ornamentation cannot be traded, and can only be used on the character you purchase the Token on.
+|-
+|[[File:item_5791.png|link=]] [[Robe Ornamentation Token]]
+|[[File:Iridium_18x18.png|link=]] 1000
+|This token can be merged into a piece of visible robe (chest) armor to copy its appearance into the form of a Robe Ornamentation Exaltation.  This does not destroy the item you are copying the appearance from.  WARNING: Does not work on other types of armor.  The Token and the generated Ornamentation cannot be traded, and can only be used on the character you purchase the Token on.
+|-
+|[[File:item_5864.png|link=]] [[Weapon Ornamentation Token]]
+|[[File:Iridium_18x18.png|link=]] 750
+|This token can be merged into a weapon to copy its appearance into the form of a Weapon Ornamentation Exaltation.  This does not destroy the item you are copying the appearance from.  Primary and Secondary only Weapons can be used in either hand.  This also applies to other items, such as Shields and Symbols.  The Token and the generated Ornamentation cannot be traded, and can only be used on the character you purchase the Token on.
+|}
+
+== Items ==
+
+{| class="wikitable"
+|+
+!Item
+!Iridium Cost
+!Description
+|-
+|[[File:item_2045.png|link=]] [[Bottle of Alternate Adventure]]
+|[[File:Iridium_18x18.png|link=]] 500
+|Consumable potion that applies a buff with 5 charges to your current character.  When you gain an Alternate Adventure Point, you will gain an additional Point and consume on charge.  This effect can be applied to the player multiple times to increase the amount of charges.  This potion lasts forever and persists through death, loadout swap and cannot be dispelled.  This item cannot be traded, and is bound to the character you have purchased it on.
+|}
+
+== Mounts ==
+
+{| class="wikitable"
+|+
+!Item
+!Iridium Cost
+!Description
+|-
+|[[File:item_1634.png|link=]] [[Bristly Boar Reins]]
+|[[File:Iridium_18x18.png|link=]] 1500
+|Summons a Bristly Boar mount.  This mount increases your run speed and let's you travel around Norrath in boarish style.  This mount's default run speed is roughly equivalent to Spirit of the Wolf and, like all mounts, its speed will increase to the highest level of any summoned mount you unlock on your character.  This Mount cannot be traded and is bound to the character you have purchased it on.
+|}
+
+== Services ==
+
+{| class="wikitable"
+|+
+!Item
+!Iridium Cost
+!Description
+|-
+|[[File:item_3327.png|link=]] [[Token of Reclamation]]
+|[[File:Iridium_18x18.png|link=]] 100
+|Each token will allow you to recover one destroyed item from the destroyed item list by visiting a merchant and using the recovery tab.  NOTE: Items recovered through Tokens of Reclaimation are attuned to your character, are no longer tradeable and lose all in-game sell value.  This Token cannot be traded and is bound to the character you purchased it on.
+|-
+|[[File:item_3204.png|link=]] [[Potion of Amnesia]]
+|[[File:Iridium_18x18.png|link=]] 1000
+|Using this item will allow you to change your character's current name.  Once you change your name the change is permanent.  This Token cannot be traded and is bound to the character you have purchased it on.
+|}
+
+== Slots ==
+
+{| class="wikitable"
+|+
+!Item
+!Number of Slots
+!Iridium Cost
+!Description
+|-
+|[[File:item_836.png|link=]] Tradeskill Depot Slots
+|50 Slots
+|[[File:Iridium_18x18.png|link=]] 500
+|Expands the Tradeskill Depot by 50.  Current slots can be viewed by accessing a bank of Norrath in any major city.  This purchase applies to your account, and can be used on any character on your account.  A maximum of 5000 Tradeskill Depot Slots can be purchased through the marketplace per account.
+|-
+|[[File:item_7574.png|link=]] Inventory Slot
+|1 Slot
+|[[File:Iridium_18x18.png|link=]] 500
+|Expands your Main Inventory Slots by 1. Current slots can be viewed by accessing the Inventory panel.  This purchase applies to your account, and can be used by any character on your account.  A maximum of 4 Inventory Slots can be purchased through the marketplace per account.
+|-
+|[[File:item_7574.png|link=]] Dragon's Hoard Slots
+|25 Slots
+|[[File:Iridium_18x18.png|link=]] 500
+|Expands your Dragon's Hoard by 25 slots. Current slots can be viewed by accessing any bank of Norrath in any major city.  This purchase applies to your account, and can be used by any character on your account.  A maximum of 5000 Dragon's Hoard Slots can be purchased through the marketplace per account.
+|-
+|[[File:item_7574.png|link=]] Activated Item Storage Slots
+|5 Slots
+|[[File:Iridium_18x18.png|link=]] 500
+|Expands your Activated Item Storage by 5 Slots. Current slots can be viewed by accessing the Storage Tab Inventory panel.  This purchase applies to your account, and can be used by any character on your account.  A maximum of 500 Activated Storage Slots can be purchased through the marketplace per account.
+|-
+|[[File:item_7574.png|link=]] Equipment Storage Slots
+|25 Slots
+|[[File:Iridium_18x18.png|link=]] 500
+|Expands your Equipment Storage by 25 Slots. Current slots can be viewed by accessing the Storage Tab Inventory panel.  This purchase applies to your account, and can be used by any character on your account.  A maximum of 750 Equipment Storage Slots can be purchased through the marketplace per account.
+|-
+|[[File:item_7574.png|link=]] Exaltation Storage Slots
+|25 Slots
+|[[File:Iridium_18x18.png|link=]] 500
+|Expands your Exaltation Storage by 25 Slots. Current slots can be viewed by accessing the Storage Tab Inventory panel.  This purchase applies to your account, and can be used by any character on your account.  A maximum of 750 Exaltation Storage Slots can be purchased through the marketplace per account.
+|-
+|[[File:item_7574.png|link=]] Loadout Slot
+|1 Slot
+|[[File:Iridium_18x18.png|link=]] 500
+|Expands your Loadout Slots by 1. Current slots can be viewed by accessing the Loadout Tab on your Inventory panel.  This purchase applies to your account, and can be used by any character on your account.  A maximum of 16 Loadout Slots can be purchased through the marketplace per account.
+|}
+
+== Tokens ==
+
+{| class="wikitable"
+|+
+!Item
+!Iridium Cost
+!Description
+|-
+|[[File:item_6214.png|link=]] [[Primary Class Unlock Token]]
+|[[File:Iridium_18x18.png|link=]] 1500
+|Upon consumption, this token will allow you to select and unlock one Primary Class for your character.  The Token's unlocks only apply to the character you purchase the Token on.
+|-
+|[[File:item_6217.png|link=]] [[Race Unlock Token]]
+|[[File:Iridium_18x18.png|link=]] 1000
+|Upon consumption, this token will allow you to select and unlock one Race for your character.  The Token's unlocks only apply to the character you purchase the Token on.
+|-
+|[[File:item_6219.png|link=]] [[Deity Unlock Token]]
+|[[File:Iridium_18x18.png|link=]] 500
+|Upon consumption, this token will allow you to select and unlock one Deity for your character.  The Token's unlocks only apply to the character you purchase the Token on.
+|}
+
+== Unavailable ==
+Some items were available only for a limited time, though may be made available for purchase again in the future. 
+
+{| class="wikitable"
+|+
+!Item
+!Iridium Cost
+!Description
+|-
+|[[File:item_909.png|link=]] [[Petamorph Wand: Murderbee]]
+|[[File:Iridium_18x18.png|link=]] 0 (Free)
+|Available FREE for a limited time! This item will change your pet into a Murderbee from the Plane of Sky. (Was available September 4-7, 2026.)
+|}

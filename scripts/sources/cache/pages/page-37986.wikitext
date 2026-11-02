@@ -1,0 +1,33 @@
+{{Kunark Era}}
+{{Factionpage|
+
+| description = The Mountain Giants of Kunark.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Dreadlands]]
+* [[Frontier Mountains]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a mountain giant brae]]  <span class='fmz'>(Dreadlands)</span>
+* [[a mountain giant craig]]  <span class='fmz'>(Dreadlands)</span>
+* [[a mountain giant hillock]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a mountain giant patriarch]]  <span class='fmz'>(Dreadlands)</span>
+* [[a mountain giant steep]]  <span class='fmz'>(Dreadlands)</span>
+* [[a mountain giant tump]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[mountain giant prospector]]  <span class='fmz'>(Frontier Mountains)</span>
+
+}}

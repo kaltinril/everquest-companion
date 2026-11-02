@@ -1,0 +1,46 @@
+{{Factionpage|
+
+| description = The merchants of the east and west commonlands.
+
+| zones_raise = 
+
+* [[Misty Thicket]]
+* [[Nektulos Forest]]
+* [[Northern Desert of Ro]]
+* [[Southern Desert of Ro]]
+* [[Freeport|West Freeport]]
+* [[East Commonlands]]
+* [[West Commonlands]]
+
+| zones_lower = 
+
+* [[Northern Desert of Ro]]
+* [[Southern Desert of Ro]]
+* [[East Commonlands]]
+* [[West Commonlands]]
+
+| quests_raise = 
+
+* [[Weapons Delivery]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[Deathfist Pawn]]  <span class='fmz'>(West Freeport)</span>
+* [[Orc Apprentice]]  <span class='fmz'>(Commonlands)</span>
+* [[Orc Centurion (Deathfist)|Orc Centurion]]  <span class='fmz'>(Misty Thicket and Commonlands)</span>
+* [[Orc Legionnaire (Deathfist)|Orc Legionnaire]]  <span class='fmz'>(Commonlands)</span>
+* [[Orc Oracle (Deathfist)|Orc Oracle]]  <span class='fmz'>(Commonlands)</span>
+* [[Orc Pawn (Deathfist)|Orc Pawn]]  <span class='fmz'>(Misty Thicket and Commonlands)</span>
+
+| mobs_lower = 
+
+* [[Innkeep Harold]] <span class='fmz'>(Commonlands - Merchant)</span>
+* [[Innkeep Marnan]] <span class='fmz'>(South Ro - Merchant)</span>
+* [[Innkeep Valon]] <span class='fmz'>(North Ro - Merchant)</span>
+* [[Romya]] <span class='fmz'>(Commonlands - Merchant)</span>
+* [[Skipynn Stoneshear]] <span class='fmz'>(Commonlands - NPC, Non-Quest)</span>
+* [[Hyrill Pon]] <span class='fmz'>(West Freeport - Quest NPC)</span>
+}}

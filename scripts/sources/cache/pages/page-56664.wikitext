@@ -1,0 +1,38 @@
+==Classic Era==
+
+===Plane of Fear===
+* [[Cazic Thule]] - 3 to 3.5 days
+* [[a dracoliche]] - 3 days with 12 hour variance?
+* [[Fright]]/[[Dread]]/[[Terror]] - 3 days, no variance
+* [[a broken golem]] - 3 days, no variance
+* [[Wraith of a Shissar]] - 7 days OR 24 hours after CT is killed
+
+===Plane of Hate===
+* [[Innoruuk]] - 3 days with 12 hour variance
+* [[Hand of the Maestro]] - 12 hours
+
+===Plane of Sky===
+* Noble Dojorn - 5 days?
+
+===Cazic Thule===
+* Ring of Fear - 3 days with 12 hour variance
+
+===Permafrost===
+* Lady Vox - 3 days with 12 hour variance
+
+===SolB===
+* [[Lord Nagafen]] - 3 days with 12 hour variance
+* [[Zordak Ragefire]] - 24 hours?
+* All Fire Giants - 12 hours
+
+===Qeynos Hills===
+* Hadden - 6 hours
+
+===The Hole===
+* Guardian of the Seal - 24 hours
+
+===Kedge Keep===
+* Phinigel Autropos - 10 to 12 hours
+
+
+Reference: https://everquest.allakhazam.com/wiki/EQ:Respawn_Timers

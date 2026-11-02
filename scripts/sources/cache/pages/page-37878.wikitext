@@ -1,0 +1,64 @@
+{{Factionpage|
+
+| description = Located within the Theater of the Tranquil in West Freeport this peaceful [[Monk]]'s guild under the direction of Guildmaster Puab Closk trains many a young monk, as well as the experienced ones.  Colored Sashes are awarded  by the guild trainers to mark a monks progress in training.  The Ashen Order is Allied with the [[Knights of Truth]] in North Freeport and the [[Silent Fist Clan]], a second order of Monks in North Qeynos.  They do not claim any other factions as enemies.
+
+| zones_raise = 
+
+* [[Misty Thicket]]
+* [[Nektulos Forest]]
+* [[Northern Desert of Ro]]
+* [[Southern Desert of Ro]]
+* [[Freeport|West Freeport]]
+
+| zones_lower = 
+
+* [[Qeynos|North Qeynos]]
+* [[Qeynos Hills]]
+* [[Freeport|West Freeport]]
+
+| quests_raise = 
+
+* [[Monk Headband Quests|Monk Orange Headband]]
+* [[Monk Headband Quests|Monk Purple Headband]]
+* [[Monk Headband Quests|Monk Red Headband]]
+* [[Monk Headband Quests|Monk White Headband]]
+* [[Monk Headband Quests|Monk Yellow Headband]]
+* [[Note for Konem]]
+* [[Monk Sash Quests|Orange Sash of Order]]
+* [[Monk Sash Quests|Red Sash]]
+* [[Tomer's Rescue]]
+* [[Weapons Delivery]]
+* [[Monk Sash Quests|White Sash]]
+* [[Monk Sash Quests|Yellow Sash]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[Deathfist Pawn]]  <span class='fmz'>(West Freeport)</span>
+* [[Orc Apprentice]]  <span class='fmz'>(Commonlands)</span>
+* [[Orc Centurion (Deathfist)|Orc Centurion]]  <span class='fmz'>(Misty Thicket and Commonlands)</span>
+* [[Orc Legionnaire (Deathfist)|Orc Legionnaire]]  <span class='fmz'>(Commonlands)</span>
+* [[Orc Oracle (Deathfist)|Orc Oracle]]  <span class='fmz'>(Commonlands)</span>
+* [[Orc Pawn (Deathfist)|Orc Pawn]]  <span class='fmz'>(Misty Thicket and Commonlands)</span>
+
+| mobs_lower = 
+
+* [[Asnod Marnoc]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Fania Esruc]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Klom Jysun]] <span class='fmz'>(West Freeport - Quest NPC)</span>
+* [[Konem Matse]]  <span class='fmz'>(Qeynos Hills)</span>
+* [[LuSun]] <span class='fmz'>(North Qeynos - Monk Guildmaster)</span>
+* [[Phin Esrinap]] <span class='fmz'>(North Qeynos - Monk Guildmaster)</span>
+* [[Puab Closk]] <span class='fmz'>(West Freeport - Quest NPC)</span>
+* [[Ran`Un]] <span class='fmz'>(West Freeport - NPC, Non-Quest)</span>
+* [[Reyia Beslin]] <span class='fmz'>(West Freeport - Quest NPC)</span>
+* [[Seta Bakindo]] <span class='fmz'>(North Qeynos - Monk Guildmaster)</span>
+* [[Thena Lonnes]] <span class='fmz'>(West Freeport - NPC, Non-Quest)</span>
+* [[Togahn Sorast]] <span class='fmz'>(North Qeynos - Monk Guildmaster)</span>
+* [[Tomer Instogle]] <span class='fmz'>(North Qeynos - Quest NPC)</span>
+
+}}
+
+[[Category:Achievement Faction]]

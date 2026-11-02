@@ -1,0 +1,41 @@
+{{Velious Era}}
+{{Factionpage|
+
+| description = The one way faction in the Northern area of the Temple of Veeshan.  Killing these has the effect of lowering Claws of Veeshan very quickly as well.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Temple of Veeshan]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Aaryonar]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[Belijor the Emerald Eye]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[Cekenar]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[Dagarn the Destroyer]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[Eashen of the Sky]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[Jorlleag]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[Lady Mirenilla]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[Lady Nevederia]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[Lord Feshlak]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[Lord Koi`Doken]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[Lord Kreizenn]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[Sevalak]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[Theldek the Stinger]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[Vulak`Aerr]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[Yendilor the Cerulean Wing]]  <span class='fmz'>(Temple of Veeshan)</span>
+* [[Zlexak]]  <span class='fmz'>(Temple of Veeshan)</span>
+
+}}

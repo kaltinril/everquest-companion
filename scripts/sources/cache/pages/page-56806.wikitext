@@ -1,0 +1,3 @@
+<div class="eql-connection-map-wrap">
+[[File:Connections.png|1490px|alt=EverQuest zone connection world map|link=]]
+</div>

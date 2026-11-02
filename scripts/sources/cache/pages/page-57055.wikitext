@@ -1,0 +1,157 @@
+These patch notes are from the Official EverQuest Legends discord, posted on May 22, 2026
+
+= May 22, 2026 =
+
+=== General ===
+
+* [[Dragon Hoard]] will no longer delete high-tier items that can populate exaltations.
+* [[Rathe Mountains]] has become significantly more colorful. [[Froglok]] skins are in!
+* Froglok Plate Armor should now correctly tint.
+* Classic horse models have been added for [[mounts]], along with new riding animations for each playable race.
+* Mounts have been re-enabled.
+* Fixed chat channel bad word filtering.
+* [[Exaltations]] in items that were traded are now attuned on trade completion.
+* Several issues with item attunement have been fixed.
+* Reduce flickering of the screen while zoning without the splash screen visible.
+* Third person camera detachment should be less frequent in many zones.
+* Players using Return Home from Character Select will now end up in [[East Commonlands]] Tunnel as a fallback failsafe.
+* Fixed an issue with [[loadout]] swapping resetting skills to 1.
+* The minimum faction hit has been increased to 5.
+* All Aqua Goblins in [[Butcherblock Mountains|Butcherblock]] are now properly goblins.
+* Giants in Nagafen's Lair and Permafrost now count as valid raid targets.
+* Removed Song: Magical Monologue from the [[Bard#Songs|Bard Songs]] master list.
+* [[Justin Rhymes]] in [[High Keep]] now properly sells from the [[Bard#Songs|Bard Songs]] master list.
+* [[Tarn Visilin]] in [[High Keep]] now sells spells from the Enchanter Spells master list.
+* Ranger Spell vendors in [[Neriak]] now sell from the [[Ranger#Spells|Ranger Spells]] master list.
+* Moved the 'Safe Spot' in [[East Freeport]] to be outside of the city walls.
+* Added Faction achievements for major Playable Race factions.
+* Updated the Race Unlock achievements to check against those faction achievements, instead of characters current faction standing.
+* [[Golem Metal Wand]] now has infinite charges, with a 4 minute recast timer.
+* [[Mask of Deception]] no longer drops.
+* [[Guise of the Deceiver]] now drops again.
+* The Footman's Blade has received a new name ([[The Baron's Blade]]) and lore text.
+** The Baron's Blade now correctly has an Ornamentation Slot.
+** Removed the NO STORAGE tag from The Baron's Blade that was breaking its compatibility with exaltations.
+
+=== Gameplay ===
+
+* [[Disciplines#Invocations|Invocations]] are in and can be used in tandem with Melee Stances.
+** Recovery: "You regenerate mana (excluding out of combat bonus) at twice the rate and spells have a 5% reduced mana cost."
+** Empowering: "Adds 25% plus 10% per additional non-hybrid casting class to HP spell effects at the cost of 50% more mana."
+** Inversion: "Shifts two-thirds of spell cast time into the global recovery time at a cost of 10% more mana and endurance."
+** Spellblade: "Treats the first spell-gem slot (must be a spell with a reuse time <= the cast time) as a proc that consumes both mana and endurance (33% of the normal spell mana cost).";
+** Overchannel: "Cast spells have a -100 resist adjust plus another -15 for every non-hybrid caster class at a cost of 33% more mana and 10% of the total mana cost from endurance."
+** Inviolable: "Cast spells are uninterruptible due to movement, stuns, or interrupt effects at the cost of 100% more mana and 50% of the total mana cost from endurance."
+** Divine: "All spell casts with a mana cost will heal the group member with the lowest hp percentage by that cost. For every additional wisdom class, this will repeat with a heal for 33% of the mana cost."
+* [[Stances]] and [[Disciplines#Invocations|Invocations]] should now robustly synchronize after zoning and loadout swapping.
+* Rogues can now backstab with the best backstabbing weapon between Primary, Secondary, or either Any slot.
+* Players will no longer autoswitch to range attack if a valid range weapon is not equipped.
+* Froglok [[Beastlord|Beastlords]] will now have Leeches for pets, instead of Mosquitos.
+* Rathe Mountain worms have been replaced with leeches for consistancy.
+* Approximately doubled the spawn chance of The Froglok Shin Lord.
+* Insufficient mana check will properly use focus now.
+* All doors in [[Befallen]] should now be properly pickable with lockpicks, but they aren't all the doors you may remember.
+* A new, high level population of enemies has been added to the deepest part of Befallen. This includes several new named creatures as well as some very mean dark elves.
+* There has been a slight adjustment to Befallen loot distribution.
+
+=== AA ===
+
+* New autogranted passive [[Alternate Advancement|AAs]] have been added to a number of classes.
+** Unbound Affliction - Necromancer DoT critical chance
+** Unbound Cascade - Shaman DoT critical damage
+** Unbound Boon - Cleric Heal critical chance
+** Unbound Nature - Druid Spell critical chance
+** Unbound Clarity - Enchanter Mana Regen
+** Unbound Companion - Magician pet critical chance
+* Changed [[Origin]] and [[Gather Party]] to not be on the same loadout timer.
+* Group members with Gather Party on cooldown can now receive and accept Gather Party invitations. Accepting an invitation will restart their cooldown.
+* Gather Party and Quick Buff should no longer go on cooldown when changing loadouts.
+* Origin should only go on cooldown when changing Race.
+* Leech Touch, Purify Body, Escape and Rampage are now all on separate timers.
+* Removed ranks of Elemental Form beyond the first.
+* The Bestow Divine Aura AA for Clerics should now properly smart cast.
+
+=== Spells ===
+
+* Modified the Ranger fast-casting fire nuke line. These now deal instant damage and apply a 1-tick DoT, causing 50% of the initial damage again 6 seconds later. Their mana costs have been balanced accordingly. 2 additional spells have been added to this line and are available at levels 15 and 46.
+** [[Searing Arrow]]: level 15, 35 mana, 58 instant damage, 29 DoT damage
+** [[Flaming Arrow]]: level 26 (reduced from 29), 55 mana, 102 instant damage, 51 DoT damage
+** [[Burning Arrow]]: level 36 (reduced from 39), 85 mana, 155 instant damage, 78 DoT damage
+** [[Scorching Arrow]]: level 46, 100 mana, 210 instant damage, 105 DoT damage
+* Adjusted [[Promised Renewal]]
+** Decreased Promised Renewal's timer to trigger down to 12 seconds, but it now adds a lingering debuff that prevents Promised Renewal from landing for a further 12 seconds.
+** Also increased the mana cost of Promised Renewal from 500 to 550.
+** Promised Renewal also now prevents itself from landing again.
+* Adjusted recast time of [[Frost Shard]] (Beastlord level 47) to 10 seconds, consistent with the rest of the spells in its line.
+* Removed the ability to [[treeform]] in areas without trees.
+* [[Iksar]] and [[Troll]] Illusions will now give 1 point of HP regen.
+* [[Call of Flame]] will now properly damage the target.
+* [[Mantle of the Song Weaver]] clicky effect should now properly boost stats.
+* [[Ethereal Cleansing]] will now act like most other heals, and attempt to heal a friendly target, or yourself, unless you have 'Implied Healing' turned on in options, in which case it will heal your targets target, if your target is an enemy.
+
+=== UI ===
+
+* The [[Bandolier]] has been re-enabled.
+** Please Note! Due to the changes below, all existing Bandoliers and Loadout Equipment Sets have been erased. They will need to be re-saved before working again.
+* Loadout Equipment Sets and Bandolier are now much more specific about the items they will save and load. They will now grab the exact item that they were saved with, even if you have duplicates.
+* This also includes [[Augmentations|Augmentation]]/[[Exaltations]]; The exact Exaltation that was in an item when a Loadout was saved (Swapped away from) will return to that item upon swapping back.
+* This will also work if an Item was upgraded or merged, unless both items being merged together were actively being used in the same saved Loadout.
+* Loadout Equipment Sets and Bandolier can now load from the Equipment [[Keyring]] and Augmentation Keying.
+* Loadout Equipment Sets and Bandolier will now use the following priority order when storing unequipped Items or Augmentations:
+* The Item or Augmentation will attempt to be placed in the Equipment or Augmentation Keyring, respectively, until it reaches the cap.
+** The Item or Augmentation will then attempt to be placed in the inventory/bags.
+** If both spots above no longer have room, the Item or Augmentation will be placed in their respective Keyring, overcapping that Keyring.
+* Loadout Swapping will not be allowed while a Keyring is overcapped.
+* Mount Key Ring has been Disabled.
+* Illusion Key Ring has been Disabled.
+* Familiar Key Ring has been Disabled.
+* Teleportation Key Ring has been Disabled.
+** Note: These disabled key rings will still show in UI currently.
+* Augmentation Key Ring has been enabled with 50 slots.
+* Activated Items Key Ring has been enabled with 10 slots.
+* Equipment Items Key Ring has been enabled with 50 slots.
+* [[Rituals]] have been implemented. It is available from the Actions window (Default: L).
+* Rituals will allow you to cast most portal-type spells that you have scribed in your spell book, bypassing Class and Level requirements as long as you have at least one class that meets the level requirements of the spell, even if that class is not currently being used in your Loadout.
+** For example, as a Level 12 Warrior/Monk/Rogue, I could use a Ritual to cast West Commons Gate, a level 21 Wizard Spell, if I had previously leveled a Wizard to level 21 or higher.
+* When using Rituals, you must be in a resting state (out of combat). The cast time for all Rituals is 20 seconds, and you will lose all Mana and Endurance when it completes casting.
+* Added Level Filtering to the Spell Search in Actions Window.
+* Fixed an issue where combat skill timers would desync visually.
+* Auto-[[merging]] is now supported for the Equipment Keyring.
+* Items in the [[Item Overflow]] will no longer disappear when reloading UI or swapping loadouts.
+* Added Y pitch offset slider for the 3rd person camera, allowing you to aim the camera higher up.
+* Added "TYPE" column to lockout information on raid request window.
+* Added an auto attack range auto-switch option that will switch between range and melee attacks based on in or out of melee range.
+* Tutorial 'Item Merging' window duplicate text removed.
+* Monks have been added as a valid class on the [[Soldier's Brooch of the Stealthy]]
+* The map source directory can now be selected from the right-click context menu for Compact Maps.
+* Group window auto resizing should work under any circumstance now.
+* Minimized the sell value on floating text.
+* Merged raid invite and group invite into a singular invite on player name context menu in chat windows.
+* Items hidden in merchant lists by UI will no longer popup tooltips.
+* [[Shadow Vortex]] & [[Scream of Pain]] are now in the same spell dropdown category.
+* Updated player race illusion descriptions to be more accurate.
+* All Zephyr and Translocate spell scrolls will now properly stack to 20.
+* Windows with size snapping such as cast bar will now load properly sized
+
+=== Instances ===
+
+* Enabled [[Personal Instances]] from the Difficulty UI (/pick) - these are temporarily disabled for zones that are also Raid zones. ([[The Hole]], [[Kedge Keep|Kedge]], [[Nagafen's Lair]], [[Permafrost]], [[Plane of Hate]], [[Plane of Fear]] and [[Plane of Sky]])
+* Raid instances for [[Master Yael]] (The Hole) are now available through voidlings in [[Paineel]].
+* 'Trash' giants in Naggy's chamber in solo raid instances removed.
+* [[Magus Rokyl|Magus Rokyl's]] pathing removed in Naggy Solo Raid instance.
+* Fixed an issue where difficulty normal 0 was appended to the Personal lockout on the dynamic zone lockout list.
+* Instances should now follow a "per NPC" loot lockout for player and group members.
+
+= Hotfix =
+
+* Detrimental Target AOEs will no longer hit the caster.
+* Fixed a crash issue on zone swapping loadouts.
+* Fixed an issue where all Personal Instances would disable respawning.
+* Fixed an issue where when leaving a Personal Instance via the Difficulty Indicator, you would be punted to the East Commonlands Tunnel.
+* Fixed an issue where you did not leave an assigned "Personal Instance".
+* Attack range is now reciprocal with your target. If it can hit you, then you can hit it.
+* Fixed an issue related to item swapping.
+* Added classic horse texture variants.
+
+
+[[Category: Patch Notes]]

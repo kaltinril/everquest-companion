@@ -1,0 +1,51 @@
+{{Factionpage|
+
+| description = All residents of Kithicor Forest.
+
+| zones_raise = 
+
+* [[Highpass Hold]]
+* [[Kithicor Forest]]
+
+| zones_lower = 
+
+* [[Kithicor Forest]]
+* [[Northern Karana]]
+
+| quests_raise = 
+
+* [[Call of Flame Quest]]
+* [[Ivy Etched Armor Quests|Ivy Etched Helm]]
+* [[Ivy Etched Armor Quests|Ivy Etched Leggings]]
+* [[Ratskin Gloves Quest]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[an orc conscript]]  <span class='fmz'>(Highpass Hold)</span>
+* [[an orc fanatic]]  <span class='fmz'>(Highpass Hold)</span>
+* [[an orc medic]]  <span class='fmz'>(Highpass Hold)</span>
+* [[an orc mercenary]]  <span class='fmz'>(Highpass Hold)</span>
+* [[an orc soldier]]  <span class='fmz'>(Highpass Hold)</span>
+* [[Chief Gan`Shralok]]  <span class='fmz'>(Kithicor Forest)</span>
+* [[Curkur Shralok]]  <span class='fmz'>(Kithicor Forest)</span>
+* [[Vopuk Shralok]]  <span class='fmz'>(Highpass Hold)</span>
+
+| mobs_lower = 
+
+* [[Briana Treewhisper]] <span class='fmz'>(North Karana - NPC, Non-Quest)</span>
+* [[Ceel Moonwhisper]] <span class='fmz'>(Commonlands - NPC, Non-Quest)</span>
+* [[Ged Twigborn]] <span class='fmz'>(Kithicor Forest - Quest NPC)</span>
+* [[Irin Lunis]] <span class='fmz'>(Kithicor Forest - NPC, Non-Quest)</span>
+* [[Kithicor]] <span class='fmz'>(Kithicor Forest - Ranger Guildmaster)</span>
+* [[Leaf Falldim]] <span class='fmz'>(Kithicor Forest - Quest NPC)</span>
+* [[Metha Wintersong]] <span class='fmz'>(Commonlands - NPC, Non-Quest)</span>
+* [[Morin Shadowbane]] <span class='fmz'>(Kithicor Forest - Quest NPC)</span>
+* [[Shadow Treebright]] <span class='fmz'>(Commonlands - NPC, Non-Quest)</span>
+* [[Sil Silverstar]] <span class='fmz'>(Commonlands - NPC, Non-Quest)</span>
+* [[Veli Greenwhisper]] <span class='fmz'>(Commonlands - NPC, Non-Quest)</span>
+* [[Vuli Greenwhisper]] <span class='fmz'>(Commonlands - NPC, Non-Quest)</span>
+
+}}

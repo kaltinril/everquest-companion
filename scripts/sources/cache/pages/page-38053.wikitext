@@ -1,0 +1,33 @@
+{{Factionpage|
+
+| description = One of two Sphynxs living in the Rathe Mountains, opposes [[Ankhefenmut (Faction)]]. Originally to be used in the Paladin Fiery Avenger quest line but was never written into the game.
+
+| zones_raise = 
+
+* [[Rathe Mountains]]
+
+| zones_lower = 
+
+* [[Rathe Mountains]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[Ankhefenmut]]    <span class='fmz'>(Mountains of Rathe)</span>
+* [[Ankhesenaten]]   <span class='fmz'>(Mountains of Rathe)</span>
+* [[Ankhetperure]]   <span class='fmz'>(Mountains of Rathe)</span>
+* [[Ankhnesmerira]]  <span class='fmz'>(Mountains of Rathe)</span>
+
+| mobs_lower = 
+
+* [[Zazamaharet]]   <span class='fmz'>(Mountains of Rathe)</span>
+* [[Zazamenhu]]     <span class='fmz'>(Mountains of Rathe)</span>
+* [[Zazaphenebti]]  <span class='fmz'>(Mountains of Rathe)</span>
+* [[Zazamoukh]]     <span class='fmz'>(Mountains of Rathe)</span>
+
+}}

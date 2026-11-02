@@ -1,0 +1,112 @@
+== 10/25/2026 ==
+
+=== [https://eqlwiki.com/Nektropos_Castle Nektropos Castle is Live!]===
+
+This is a great opportunity to try out the Wiki's latest tool:
+
+[[File:Eye of Zomm 1.0 showcase.gif|center|frameless|1600px|alt=Eye of Zomm 1.0 maps, combat overview, character and wiki contribution tools]]
+
+
+'''Introducing Eye of Zomm 1.0'''
+
+Eye of Zomm (EoZ) is a desktop companion for EverQuest Legends, available for Windows and Linux. It combines your game log with EQLWiki information to put useful tools beside your game.
+
+''' PLEASE NOTE: This is a feature-rich, somewhat experimental tool. Please review everything, critique certain flows, find gaps, and report them in discord.'''
+
+=== What can you do with EoZ? ===
+
+* '''Arrange your workspace.''' Move, resize and dock small panels around your game window. Keep your map, combat reports and reminders where you want them, then lock your layout in place.
+* '''Explore and find loot.''' Browse 2D and 3D maps, display your logged position, and look up notable enemies and their drops. '''Crawl''' mode helps track which notable enemies you have defeated during a dungeon run.
+* '''Understand your fights.''' Review damage, damage per second, healing and damage taken for combatants recorded in your log. Explore individual fights or your whole session, and track the alternate advancement points you gain.
+* '''Create alerts and reminders.''' Turn game log messages into custom sound or speech alerts, and set countdowns to keep track of important timings while you play.
+* '''Keep and share your characters.''' Import equipped gear, review character stats, browse items and preview tier upgrades. Save an inspect image or share an interactive character sheet on your wiki user page.
+* '''Help build the wiki.''' Contribute item details, loot sources and NPC locations discovered on your adventures. Optional examine-window reading helps fill out item forms, and Contribution History lets you review and edit your submissions.
+
+=== Wiki updates since October 23 ===
+
+* '''Improved item previews:''' more accurate tier calculations for Backstab, weapon Accuracy and weight.
+* '''Better loot links:''' item and NPC pages connect drops and their sources more consistently, including normal and raid loot.
+* '''Clickable coordinates:''' waypoint links copy a ready-to-paste <code>/way</code> command for use in the game.
+
+'''[https://github.com/Maergoth/EQL-EOZ/releases/tag/v1.0.0 Download EoZ 1.0 for Windows or Linux]''' · [https://github.com/Maergoth/EQL-EOZ#readme Setup guide]
+
+To get started, install EoZ, choose your game folder and enable game logging. The setup guide walks you through connecting your character and arranging your panels. Questions and feedback are welcome in [https://discord.com/channels/1435786469968183456/1521564179587268649 the wiki Discord].
+
+== 10/23/2026 ==
+
+A few useful wiki updates are now live!
+* '''Edit Consolidation:''' The single '''Edit''' button opens the source editor. The regular editor was breaking stuff. Might add a toggle within the page if demand arises.
+* '''A header that stays with you:''' Search, page actions, and your account menu remain within reach while you scroll.
+* '''Your own todo list:''' Click the new icon when mousing over a page title or section heading and confirm to add it.
+Each entry links back to its source, and you can collapse it, mark it complete, or remove it.
+New icon replaces the watchlist icon in the main bar. Watchlist remains available in your user menu.
+
+When you're logged out, your todo list stays in this browser. When you're logged in, it saves to your wiki account. These are separate lists; signing in does not copy your logged-out list into your account.
+
+* '''Search selected text:''' Highlight a short piece of article text, then choose '''Search wiki''' to search for it.
+* '''Partial title searches:''' Submitting a partial name such as '''Raku''' now finds [[Rakusha Cloak]] in the search results.
+
+Please report feedback in [https://discord.com/channels/1435786469968183456/1521564179587268649 the wiki Discord].
+
+Special Thanks to the people who have [https://ko-fi.com/eqlwiki Donated] to buy time, attention, and hosting for all of this.
+
+== 10/8/2026 ==
+
+Hi everyone! Good news update. 
+
+* Talk pages now accept logged-out contributions, credited to your public IP. Article editing still requires an account with a confirmed email. The green Talk counter shows changes since your last visit in this browser.
+
+* Search shrinks more smoothly, and page actions stay visible on mobile. Talk sits before Read with a small divider (these are two different pages for each URL, while read, edit, edit source, etc are modifiers on one view or the other. Sorry for the confusion!)
+
+* Icon Finder has easier icon/ID copying and more results. 
+
+* Sky reward numerical values on the Plane of Sky quest list save more reliably. Probably. Log in and it works fine :)
+
+* Spell level caps scale with rank, ranged weapons/ammo gain range with upgrades, and weapon damage bonuses now show on weapons. They calculate via the formula for level 50 unless an override is provided.
+
+The wiki's code recently moved to [https://github.com/Maergoth/EQLWiki GitHub]! You can [https://github.com/Maergoth/EQLWiki/issues submit code issues] for bugs or feature ideas. Article corrections still belong on the wiki. General wiki issues go on discord.
+
+Want to contribute code or help test? Ask in [https://discord.com/channels/1435786469968183456/1521564179587268649 the wiki Discord] for contributor and test server access. Will select people eventually.
+
+== 8/21/2026 ==
+=== Wiki Patch Notes from the past week or so :) ===
+
+- The [https://eqlwiki.com/Skill_Dual_Wield Dual-Wield Page] now has a rough draft of a calculator using our best stab at the formulas. The code is explained in the body of the page, mostly.
+
+- The Wiki Source editor now has both "blueprints" to make adding things easier, and a paste-from-clipboard "icon finder" which will help you avoid the giant icon database. 
+
+- Added Spell Level Sliders using our best guess at data. The override functionality is currently not working, but known spell types/formulas should be fine. 
+
+- The [https://eqlwiki.com/Zone_Connection_World Connection Map] has been updated to be a little less sloppy and properly distance the source from the current version without failing to provide credit where its due.
+
+- We have an in-site [https://eqlwiki.com/Special:ZoneViewer Zone Viewer] that uses your own local game files to let you explore the world offline. Neat!
+
+- A new "Raid View" option has been added to [https://eqlwiki.com/Nagafen%27s_Lair any zone page] with a raid instance. To interact with it, simply edit the "Raid Instance" header on the main page.
+
+- Checkboxes and similar fields now prioritize account-level storage on the wiki over local storage. Log in if you want some more resilience from browser wipes and such. It should snapshot your local data to your wiki account immediately.
+
+- Also added a tracker for the level of the [https://eqlwiki.com/Plane_of_Sky Plane of Sky] quest rewards you've collected.
+
+- Some sweeping performance optimizations that will hopefully remove ~95% of all page hangs. Please report any weird page load times or caching issues on the [https://discord.com/channels/1435786469968183456/1521551355402125514 discord.]
+
+- EQLegends patch notes can be tracked [https://eqlwiki.com/Patch_Notes here].
+
+''' Any feedback at all is excellent and appreciated in the [https://discord.com/channels/1435786469968183456/1521564179587268649 official discord wiki channel].
+
+== 6/05/2026 ==
+The "Era Filter" to the left of your username (at the top right) now has a fourth mode: HIDE!<br>
+Be warned -- Because not every era tag is correct, you might be missing out on some in-era items/mobs and the visibility needed to correct it.
+<br><br>
+There was a pretty big behind-the-scenes rework of wikistuff so if you run into anything extra weird, please report it in discord!
+
+
+== 5/24/2026 ==
+https://eqlwiki.com/Build_Guides
+
+Anyone interested in digging into the build meta, please take a swing at building a wiki guide for your build and let us know in the [https://discord.gg/QqhuBgyMUG discord] how the template works out. <br>
+There's a nonsense sample build [[Sample_Build|here]] to show off most of the formatting examples, but not every section is required. 
+
+There is an eventual goal to auto-calculate and transclude the skill/stat caps of the specific build, but for now that part is manual.<br>
+If you're working out the calculations for stats/skill totals for classes, please reach out. Would love to see some formulas.
+
+ '''All of the discs, spells, stances, active abilities should otherwise be pulled in by the template'''

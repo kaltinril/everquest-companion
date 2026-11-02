@@ -1,0 +1,26 @@
+{{Factionpage|
+
+| description = The mortal enemies of the Goblins of Solusek's Eye, these Giants are supposedly found on the continent of Kunark.  The goblins in Lavastorm tend to effect this faction as well.
+
+| zones_raise = 
+
+* [[Solusek's Eye]]
+
+| zones_lower = 
+
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[goblin merchant]] <span class='fmz'>(Solusek's Eye (Solusek A) - Merchant)</span>
+* [[inferno goblin shaman]] <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+
+| mobs_lower = 
+
+
+}}

@@ -1,0 +1,11 @@
+{{expand}}
+An '''Iksar''' [[Monk]] special attack. Tail Rake is trainable at level 25, where it replaces [[Eagle Strike]] as the Monk special punch attack. It is the last punch attack Monks get during the Classic Era.
+
+Human Monks get [[Skill Dragon Punch|Dragon Punch]] instead.
+== Classes ==
+
+* [[Monk]] - Level 25 '''(Max 225)'''
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

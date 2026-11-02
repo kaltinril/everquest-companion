@@ -1,0 +1,140 @@
+Many of the EverQuest races have their own unique language. Languages can be taught to other races.
+
+Players are able to talk to each other in different languages, however the messages will be encoded with an insufficient skill level.
+
+Some races have their own unique languages, which are more difficult to discern than the more common variants.
+
+If a player speaks that language back to you while your skill is low enough, you will see it as "an unknown tongue" until you reach a skill level of 25 in that language.
+
+=== Languages ===
+
+A table of languages and who speaks them is found below. The number behind some races is the language skill those races start out with. For example Gnomes start with 54 skill in Dwarvish and Dwarves with 25 skill in Gnomish. 
+
+Races/Classes without a number behind them start with that language maxed out at 100.
+
+NB: Below Language Codes assume that all languages are known. For example if you do not know #11 Thieves Cant, then Old Erudian will be 11, Elder Elvish will be 12 etc.
+{| class="eoTable2" |
+! Language Code
+! Language
+! Spoken By
+! Use
+|-
+| 1
+| Common Tongue
+| All Players
+|-
+| 2
+| Barbarian
+| [[Barbarian|Barbarians]]
+|-
+| 3
+| Erudian
+| [[Erudite|Erudites]]
+|-
+| 4
+| [[Elvish]]
+| [[Dark_Elf|Dark Elves]] (25), [[Half_Elf|Half-Elves]], [[Wood_Elf|Wood Elves]]
+|-
+| 5
+| [[Teir'dal|Dark Elvish]]
+| [[Dark_Elf|Dark Elves]], [[High_Elf|High Elves]] (51)
+|-
+| 6
+| [[Dwarvish_Dictionary|Dwarvish]]
+| [[Dwarf|Dwarves]], [[Gnome|Gnomes]] (54)
+|-
+| 7
+| Troll
+| [[Troll|Trolls]]
+|-
+| 8
+| Ogre
+| [[Ogre|Ogres]]
+|
+|-
+| 9
+| [[Gnomish]]
+| [[Gnome|Gnomes]], [[Dwarf|Dwarves]] (25)
+|-
+| 10
+| Halfling
+| [[Halfling|Halflings]]
+|-
+| 11
+| Thieves Cant
+| All [[Rogue|Rogues]]
+|-
+| 12
+| Old Erudian
+| Needs to be learned
+|-
+| 13
+| Elder Elvish
+| [[Dark_Elf|Dark Elves]], [[High_Elf|High Elves]] (51)
+|-
+| 14
+| Froglok
+| Froglok
+|-
+| 15
+| Goblin
+| Needs to be learned
+|-
+| 16
+| Gnoll
+| Needs to be learned
+| Lets you read [[Tanned Split Paw Skin]]s
+|-
+| 17
+| Combine Tongue
+| Needs to be learned
+|-
+| 18
+| Elder Teir'Dal
+| Needs to be learned
+| Lets you read [[Dusty Kobold Scroll]]s
+|-
+| 19
+| Lizardman
+| [[Iksar]]
+|-
+| 20
+| Orcish
+| Needs to be learned
+|-
+| 21
+| Faerie
+| Needs to be learned
+|-
+| 22
+| Dragon
+| Needs to be learned
+|-
+| 23
+| Elder Dragon
+| Needs to be learned
+|-
+| 24
+| Dark Speech
+| [[Dark_Elf|Dark Elves]], [[Iksar]], [[Ogre|Ogres]], [[Troll|Trolls]]
+|-
+|25
+|Vah Shir
+|Vah Shir
+|}
+
+== Training Languages ==
+
+The primary method of learning languages is to have them spoken to a player through the chat command "/gs <text>". The fastest way to learn a language is to find someone who already has learned the skill up to 100, change the chat channel language (using the UI or /language N). And spam an all lower case macro in group chat.
+
+If neither you nor your partner have the language up to 100 all is not lost. You can train your partner(s) up to one skill level above your own. So as long as you put one point into the language at your class trainer then you can train your partner up to a skill of 2. Once you have done this, both zone and your partner's skill will have increased in their UI. Once you have zoned your partner can now train you up from skill 1 to skill 3. Then you zone and so on, each time jumping two skill points each.
+
+You do not need to be in the same zone to learn languages if you are learning from a groupmate.
+
+The way to tell whether a skill has been maximized is to make sure that training macros are completely lower case. When the skill is less than 100, the first character is auto-capitalized, when the text comes through clear of capital letters, you know you've hit 100.
+
+At level 60 you should have something like 250 points at your trainer. You could burn these training points on languages, however it's recommended to save them for doing the last few points of trade skills [[Blacksmithing]] etc. (Note: you can only train about 20 points into trade skills like Blacksmithing, but silk casters might save those last few points for [[Research]].)
+{{Navbox Skills}}
+
+[[Category:Skills]]
+[[Category:Guides]]

@@ -1,0 +1,25 @@
+{{Factionpage|
+
+| description = Small faction on Erud's Crossing.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Erud's Crossing]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Hastashi]]  <span class='fmz'>(Erud's Crossing)</span>
+
+}}

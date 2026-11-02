@@ -1,0 +1,591 @@
+Dual Wield is the combat skill that allows a character to make attacks with an eligible weapon equipped in the secondary slot while continuing to attack with the primary slot.
+
+== Dual Wield Calculator ==
+
+<div id="eql-dual-wield-calculator"></div>
+
+The calculator provides a target-neutral comparison between two one-handed weapons and one two-handed weapon.
+
+It is a '''normalized weapon comparison''', not a complete average-DPS simulator. Its result is most useful when comparing weapons on the same character against the same target when the relevant weapon skills are similarly trained.
+
+=== Calculator Score ===
+
+The calculator uses the traditional normalized weapon-score comparison:
+
+<pre>
+Primary round multiplier =
+    1
+    + P(Double Attack)
+    + P(Double Attack) × P(Triple Attack)
+      × Flurry Factor
+
+Main-hand score =
+    (((2 × Main Damage) + Main-Hand Damage Bonus)
+    ÷ Main Delay)
+    × Primary round multiplier
+
+Offhand round multiplier =
+    1 + P(Double Attack)
+
+Offhand score =
+    Modeled Dual Wield Chance
+    × ((2 × Offhand Damage) ÷ Offhand Delay)
+    × Offhand round multiplier
+
+Dual Wield score =
+    Main-hand score + Offhand score
+
+Two-Hander score =
+    (((2 × Two-Hander Damage) + Two-Hand Damage Bonus)
+    ÷ Two-Hander Delay)
+    × Primary round multiplier
+</pre>
+
+The <code>Flurry Factor</code> is <code>1</code> without Burst of Power and <code>1.225</code> with Burst of Power under the current working model.
+
+The factor of <code>2 × damage</code> is a comparison benchmark, not the exact average damage of every successful hit.
+
+The calculator automatically tests both one-handed arrangements:
+
+* Weapon A in primary and Weapon B in secondary.
+* Weapon B in primary and Weapon A in secondary.
+
+This matters because the primary and secondary weapons swing independently, but the secondary weapon's attack opportunity is additionally gated by the Dual Wield check.
+
+The calculator does not currently model:
+
+* Target avoidance or exact hit rate.
+* Unequal weapon-skill values.
+* STR, ATK, Offense, or target mitigation.
+* Critical hits and special attacks other than Double Attack, Triple Attack, and Burst of Power.
+* Proc damage or hand-specific proc behavior.
+* Haste rounding, minimum-delay rules, or other timer rounding.
+* Stances, invocations, disciplines, or temporary combat modifiers.
+* Encounter-specific weaknesses, resistances, or armor.
+
+These omitted mechanics can change actual combat performance, especially when the calculator reports a close result.
+
+== Core Mechanics ==
+
+=== Independent Weapon Timers ===
+
+'''Confirmed on EverQuest Legends:''' the primary and secondary weapons use independent attack timers.
+
+Each weapon uses its own delay. A fast secondary weapon can therefore reach multiple offhand attack opportunities before a slower primary weapon reaches its next attack.
+
+Equipping a slower primary weapon does not directly slow the secondary weapon, and equipping a slower secondary weapon does not directly slow the primary weapon.
+
+=== Offhand Attack Opportunities ===
+
+When the secondary weapon's timer becomes ready, the game performs a Dual Wield check.
+
+A successful check permits the secondary attack opportunity to proceed. A failed check produces no secondary attack for that timer cycle.
+
+Higher Dual Wield skill therefore increases the percentage of secondary timer opportunities that become attacks. It does not change the secondary weapon's listed delay.
+
+=== Damage Bonus Is a Separate Flat Addition ===
+
+Weapon damage bonus is treated separately from the rolled weapon-damage portion of an attack.
+
+STR, ATK, Offense, weapon skill, and target mitigation affect the variable weapon-damage roll. They do not directly determine the displayed weapon damage-bonus value.
+
+Under the ordinary EverQuest hand model used by the calculator:
+
+* An eligible primary-hand attack receives the weapon's damage bonus.
+* The ordinary secondary-hand attack receives no damage bonus.
+* A two-handed primary weapon receives its own damage bonus.
+* Damage bonus is applied per eligible primary-hand hit.
+
+This means the damage bonus must be calculated for the '''specific weapon placed in primary'''. It is not a single universal one-handed value.
+
+=== Primary and Secondary Hand Assignment ===
+
+At less than 100% Dual Wield chance, hand assignment matters because:
+
+# The primary weapon attacks whenever its own timer is ready.
+# The secondary weapon attacks only when its own timer is ready '''and''' the Dual Wield check succeeds.
+
+The calculator therefore tests both hand assignments automatically.
+
+In general, the stronger base weapon score becomes more valuable in primary as Dual Wield chance falls, because primary attacks are not reduced by the Dual Wield success check.
+
+=== Primary-Hand Choice at High Dual Wield Chance ===
+
+The higher the Dual Wield chance becomes, the less hand assignment matters because fewer offhand timer opportunities are lost.
+
+Under the current Legends working chance model, a capped Monk at 252 Dual Wield skill has:
+
+<pre>
+252 ÷ 400 = 63.00% base chance
+
+63.00% × 1.32 Ambidexterity
+= 83.16% modeled chance
+</pre>
+
+This means even a capped Monk with Ambidexterity is not currently expected to reach 100% Dual Wield chance.
+
+Because the offhand is still losing some attack opportunities, the weapon with the stronger base <code>(2 × Damage) ÷ Delay</code> value will generally benefit from being placed in the primary hand.
+
+Once Triple Attack is available, primary-hand placement becomes even more important because the primary weapon can receive Triple Attack and Burst of Power flurries while the offhand cannot.
+
+The calculator nevertheless tests both arrangements because Damage Bonus, unusual weapon damage, delays above the Damage Bonus cap, and other hand-specific mechanics can affect the result.
+
+Under the unrounded working Damage Bonus formula, ordinary one-handed weapons with damage at or below character level and delay at or below 50 receive approximately the same Damage Bonus contribution per unit time. For this reason, speculative integer Damage Bonus rounding should not normally override the advantage of putting the stronger-ratio weapon in primary.
+=== Double Attack, Triple Attack, and Burst of Power ===
+
+The calculator now includes additional melee attacks because Triple Attack is not available to the offhand and therefore does '''not''' cancel evenly between Dual Wield and two-handed setups.
+
+==== Double Attack ====
+
+Double Attack is modeled as available to both primary-hand and secondary-hand attack rounds.
+
+The current working chance formula is:
+
+<pre>
+Double Attack Chance =
+    (Character Level + Current Double Attack Skill)
+    ÷ 500
+</pre>
+
+The currently documented Legends acquisition levels and maximum skills are:
+
+{| class="eoTable2" style="width:75%"
+|-
+! Class !! Minimum Level !! Maximum Skill
+|-
+| '''[[Monk]]''' || 15 || 250
+|-
+| '''[[Warrior]]''' || 15 || 245
+|-
+| '''[[Rogue]]''' || 16 || 240
+|-
+| '''[[Paladin]]''' || 20 || 235
+|-
+| '''[[Shadowknight]]''' || 20 || 235
+|-
+| '''[[Ranger]]''' || 20 || 235
+|-
+| '''[[Berserker]]''' || 15 || 250
+|}
+
+When Actual DA Skill is blank, the calculator provisionally uses <code>Level × 5</code>, capped by the class maximum. Entering the actual skill overrides this assumption.
+
+==== Triple Attack ====
+
+'''Current Legends observation: Triple Attack does not occur from the offhand.'''
+
+The calculator therefore allows Triple Attack only on the primary hand and on two-handed attack rounds.
+
+{| class="eoTable2" style="width:70%"
+|-
+! Class !! Minimum Level !! Maximum Skill
+|-
+| '''[[Monk]]''' || 46 || 100
+|-
+| '''[[Warrior]]''' || 46 || 100
+|-
+| '''[[Rogue]]''' || 46 || 100
+|-
+| '''[[Ranger]]''' || 46 || 100
+|-
+| '''[[Berserker]]''' || 46 || 100
+|}
+
+The current working chance is:
+
+<pre>
+Triple Attack Chance =
+    Triple Attack Skill
+    ÷ (Triple Attack Skill + 800)
+</pre>
+
+Triple Attack is modeled as being checked only after a successful Double Attack.
+
+Therefore:
+
+<pre>
+Expected primary / 2H attacks per timer opportunity =
+    1
+    + P(Double Attack)
+    + P(Double Attack) × P(Triple Attack)
+</pre>
+
+At 100 Triple Attack skill:
+
+<pre>
+100 ÷ (100 + 800)
+= 11.11%
+</pre>
+
+That 11.11% is conditional on Double Attack already succeeding.
+
+When Actual TA Skill is blank, the calculator provisionally models 5 skill points per level beginning at level 46, capped at 100. Entering the actual skill overrides this assumption.
+
+==== Burst of Power / Flurry ====
+
+Burst of Power is available as a calculator checkbox.
+
+The current working interpretation is:
+
+* Flurry is checked only after a successful Triple Attack.
+* Burst of Power grants a '''15%''' chance to flurry.
+* A successful flurry produces either one or two additional attacks.
+* The calculator assumes a 50% chance of either outcome.
+
+The expected flurry contribution per successful Triple Attack is:
+
+<pre>
+0.15 × (0.50 × 1 + 0.50 × 2)
+= 0.225 extra attacks
+</pre>
+
+With Burst of Power enabled:
+
+<pre>
+Primary / 2H multiplier =
+    1
+    + P(DA)
+    + P(DA) × P(TA) × 1.225
+</pre>
+
+The offhand receives Double Attack but does not receive Triple Attack or this Triple-Attack-triggered flurry in the current model:
+
+<pre>
+Offhand multiplier =
+    1 + P(Double Attack)
+</pre>
+
+This creates a real post-level-46 disadvantage for the offhand relative to the primary hand and a two-handed weapon.
+
+=== Shared Modifiers ===
+
+A modifier that affects both compared setups by the same proportion does not change which setup wins a normalized comparison.
+
+Ordinary haste is therefore omitted from the calculator when the same haste applies to all compared weapons.
+
+STR and ATK are also omitted from the simple comparison because the calculator is intended as a target-neutral weapon comparison rather than a complete melee simulator. A full expected-DPS model would require the attacker's combat statistics, the target's mitigation and avoidance, weapon skills, and the damage-roll distribution.
+
+== Working Legends Damage Bonus Model ==
+
+EverQuest damage-bonus formulas have changed over time.
+
+The older classic-era one-handed formula and historical two-handed lookup tables do '''not''' match observed EverQuest Legends damage bonuses well.
+
+The calculator therefore uses a later/live EverQuest damage-bonus formula published by a Daybreak developer. This model closely matches the currently observed Legends values across a range of one-handed and two-handed weapon delays.
+
+The working formula is:
+
+<pre>
+Damage Bonus =
+    Hand Modifier
+    × max(Character Level, Weapon Damage)
+    × (min(Weapon Delay, 50) ÷ 40)
+    × (Character Level ÷ 100)
+</pre>
+
+Where:
+
+* '''1H Hand Modifier = 0.8'''
+* '''2H Hand Modifier = 1.1'''
+* Weapon delay contributes only up to '''50 delay'''.
+* If weapon damage exceeds character level, weapon damage is used instead of character level for that portion of the formula.
+* Damage bonus begins at level 28 in the reference implementation.
+
+The exact Legends integer rounding rule has not yet been proven.
+
+For weapon comparison, the calculator therefore uses the '''unrounded''' working Damage Bonus value internally:
+
+<pre>
+Modifier
+× max(Level, Damage)
+× (min(Delay, 50) ÷ 40)
+× (Level ÷ 100)
+</pre>
+
+This avoids allowing a speculative rounding rule to determine which one-handed weapon should be placed in primary. The calculator may display an integer Damage Bonus estimate for readability, but the normalized comparison itself uses the raw modeled value.
+
+=== Why Delay Matters ===
+
+Unlike the older classic one-handed damage-bonus formula, the newer formula scales the damage bonus with weapon delay.
+
+This explains why two one-handed weapons at the same character level can display different damage bonuses and why slower two-handed weapons can receive much larger bonuses.
+
+Because delay contribution caps at 50:
+
+* Increasing delay from 20 to 40 increases modeled damage bonus.
+* Increasing delay from 50 to 70 does '''not''' increase the delay portion further.
+* A weapon with damage greater than character level can still receive a larger bonus because the formula uses <code>max(Level, Damage)</code>.
+
+== Classes and Skill Caps on Legends ==
+
+The calculator recognizes the following classes as Dual Wield-granting classes:
+
+* [[Bard]]
+* [[Beastlord]]
+* [[Monk]]
+* [[Ranger]]
+* [[Rogue]]
+* [[Warrior]]
+
+On a three-class character, the calculator uses the highest applicable Dual Wield cap supplied by any selected class. Class caps are not added together.
+
+The current working level-50 cap model is:
+
+{| class="eoTable2" style="width:70%"
+|-
+! Class
+! Working per-level formula
+! Modeled cap through level 50
+! Status
+|-
+| style="text-align:left"| '''[[Bard]]'''
+| <code>(Level × 5) + 5</code>
+| 210
+| Working model
+|-
+| style="text-align:left"| '''[[Beastlord]]'''
+| <code>(Level × 5) + 5</code>
+| 210
+| Working model
+|-
+| style="text-align:left"| '''[[Monk]]'''
+| <code>(Level × 7) + 5</code>
+| 252
+| Supported by observed caps of 89 at level 12 and 96 at level 13
+|-
+| style="text-align:left"| '''[[Ranger]]'''
+| <code>(Level × 5) + 5</code>
+| 210
+| Working model
+|-
+| style="text-align:left"| '''[[Rogue]]'''
+| <code>(Level × 6) + 5</code>
+| 210
+| Working model
+|-
+| style="text-align:left"| '''[[Warrior]]'''
+| <code>(Level × 5) + 5</code>
+| 210
+| Working model
+|}
+
+The class-specific cap is applied after the per-level calculation.
+
+For example, the observed Monk progression is:
+
+<pre>
+Level 12: (12 × 7) + 5 = 89
+Level 13: (13 × 7) + 5 = 96
+</pre>
+
+The calculator assumes the character's Dual Wield skill is trained to the applicable cap unless an actual skill value is entered.
+
+== Era-Dependent and Unconfirmed Mechanics ==
+
+The following mechanics have changed between EverQuest eras or differ among community servers and emulator implementations. Their exact behavior on EverQuest Legends should be confirmed directly rather than inherited from another era.
+
+=== Current Dual Wield Chance Model ===
+
+The exact server formula has not been proven from source code, but direct Legends parsing now gives a substantially better working model than the inherited historical formulas.
+
+The calculator currently uses:
+
+<pre>
+Base Dual Wield Chance =
+    Current Dual Wield Skill ÷ 400
+</pre>
+
+Character level is '''not''' added directly to the numerator in this model.
+
+Level still matters indirectly because it determines how much Dual Wield skill the character can obtain.
+
+For a Monk with 252 Dual Wield skill:
+
+<pre>
+252 ÷ 400 = 63.00%
+</pre>
+
+With the current Ambidexterity working model:
+
+<pre>
+63.00% × 1.32 = 83.16%
+</pre>
+
+==== Legends Parse Evidence ====
+
+A level-50 Monk with:
+
+* '''252 Dual Wield skill'''
+* '''Ambidexterity'''
+* '''27-delay primary weapon'''
+* '''28-delay secondary weapon'''
+* '''+50% haste'''
+
+produced a parse of approximately:
+
+* '''1,057 primary-hand pierce swings'''
+* '''860 offhand punches'''
+
+The small 27-versus-28 delay difference is nowhere near large enough to explain the observed swing-count gap by itself.
+
+After accounting approximately for the independent 27/28 weapon timers, the parse implies an offhand success rate in the low-to-mid 80% range.
+
+That is inconsistent with the previous calculator model:
+
+<pre>
+(Level + Skill) ÷ 400 × 1.32
+</pre>
+
+which predicted almost 100% for a capped level-50 Monk.
+
+It is instead closely consistent with:
+
+<pre>
+Skill ÷ 400 × 1.32
+</pre>
+
+which predicts:
+
+<pre>
+252 ÷ 400 × 1.32
+= 83.16%
+</pre>
+
+This remains a '''working Legends formula''' rather than a proven server-side equation, but it is currently the model best supported by direct in-game evidence.
+
+Historical formulas such as <code>(Level + Skill) ÷ 400</code>, the Project 1999 Warrior <code>÷475</code> estimate, and current EQEmu implementations should therefore be treated as historical references rather than the active Legends calculator model.
+=== Ambidexterity ===
+
+'''Confirmed on EverQuest Legends:''' [[Alternate Advancement|Ambidexterity]] is listed as increasing successful Dual Wield chance by '''32%'''.
+
+The calculator currently treats that value as a multiplicative increase:
+
+<pre>
+Effective Dual Wield Chance =
+    Base Dual Wield Chance × 1.32
+</pre>
+
+This interpretation is not proven from Legends source code, but when paired with the skill-only base formula it closely matches current parse evidence.
+
+For a capped Monk:
+
+<pre>
+Base:
+252 ÷ 400
+= 63.00%
+
+With Ambidexterity:
+63.00% × 1.32
+= 83.16%
+</pre>
+
+Additional controlled parses without Ambidexterity would be especially useful for separating the base Dual Wield formula from the exact Ambidexterity implementation.
+=== Exact Damage-Bonus Formula and Rounding ===
+
+The later/live formula used by the calculator is currently the best match to observed Legends damage bonuses.
+
+However, Legends-specific confirmation is still needed for:
+
+* exact integer rounding or truncation,
+* whether level 28 is the exact activation level,
+* whether the 0.8 and 1.1 handedness modifiers are identical on Legends,
+* whether the 50-delay cap is identical,
+* whether all multiclass combinations receive damage bonus identically,
+* whether any Legends AA, stance, invocation, or item effect grants secondary-hand damage bonus.
+
+The older classic formula:
+
+<pre>
+floor((Level − 25) ÷ 3)
+</pre>
+
+and historical two-handed lookup tables should be treated as '''historical mechanics''', not as the current Legends calculator model.
+
+=== Additional-Attack Formula Verification ===
+
+Double Attack, Triple Attack, and Burst of Power are now included in the calculator using the working formulas above.
+
+The following still need direct Legends verification:
+
+* Exact Double Attack probability formula and divisor.
+* Exact per-level Double Attack caps.
+* Exact Triple Attack probability formula.
+* Exact per-level Triple Attack caps.
+* Confirmation across eligible multiclass combinations that Triple Attack remains primary-only.
+* Exact Burst of Power fourth/fifth-swing procedure.
+* Any AA, item, discipline, or stance that changes additional-attack eligibility by hand.
+
+=== Proc Rates ===
+
+Proc damage is not included because proc behavior may differ by:
+
+* primary versus secondary hand,
+* weapon delay,
+* Dexterity,
+* proc-per-minute normalization,
+* Legends-specific item or AA effects.
+
+A weaker normalized weapon score can still produce better actual DPS when its proc contribution is sufficiently strong.
+
+=== Skill Acquisition Levels ===
+
+Historical class tables disagree about the level at which several classes acquire Dual Wield.
+
+EverQuest Legends multiclassing also differs from historical EverQuest.
+
+The calculator therefore assumes the character already possesses Dual Wield and focuses on the applicable skill cap.
+
+=== Post-Level-50 Skill Caps ===
+
+Historical EverQuest sources commonly list later caps such as:
+
+* Bard: 210
+* Beastlord: 210
+* Monk: 252
+* Ranger: 240
+* Rogue: 245
+* Warrior: 240
+
+These should not be treated as confirmed future Legends caps. They should be retested if the Legends level cap increases.
+
+=== Empty-Hand and Primary-Slot Requirements ===
+
+Historical implementations have differed in their treatment of an empty primary slot, Hand to Hand, and secondary-only weapons.
+
+The following should be tested directly on Legends:
+
+* Whether a non-Monk can attack with a secondary weapon while primary is empty.
+* Whether a Monk can use an empty primary hand with a secondary weapon.
+* Whether an empty secondary slot can still trigger Dual Wield checks.
+* Whether Hand to Hand uses the same independent-timer behavior as equipped weapons.
+
+== Legends Verification Priorities ==
+
+The highest-priority remaining tests are:
+
+# '''Dual Wield chance:''' repeat long primary/offhand swing-count parses at several known Dual Wield skill values to test the current <code>Skill ÷ 400</code> model.
+# '''Ambidexterity:''' repeat the same controlled parse with and without Ambidexterity to verify the current multiplicative <code>×1.32</code> model.
+# '''Damage bonus rounding:''' record level, weapon damage, delay, handedness, and displayed damage bonus for many weapons.
+# '''Damage bonus activation:''' test levels immediately below and above level 28.
+# '''Double Attack:''' parse characters with known DA skill values to test <code>(Level + Skill) ÷ 500</code> and confirm offhand Double Attack.
+# '''Triple Attack:''' record primary attack-round distributions at several known TA skill values to test <code>Skill ÷ (Skill + 800)</code>.
+# '''Triple Attack hand rule:''' continue checking offhand logs to confirm that Triple Attack never occurs from secondary.
+# '''Burst of Power:''' measure fourth- and fifth-swing frequencies after successful Triple Attacks to determine the exact flurry procedure.
+# '''Class skill caps:''' record displayed caps by level for every Dual Wield-granting class.
+
+For Dual Wield testing, attempted swings should be distinguished from successful hits whenever possible because hit rate is separate from the Dual Wield check.
+
+== References ==
+
+* [[Alternate Advancement]] — Legends Ambidexterity description.
+* [[Game Mechanics]] — inherited combat-mechanics notes.
+* [https://forums.everquest.com/index.php?threads/ratio-calculation-with-elemental-damage.274525/ EverQuest Forums — Daybreak developer explanation of the normalized weapon damage-bonus formula]
+* [https://wiki.project1999.com/Game_Mechanics#Comparing_Weapons Project 1999 Game Mechanics — Comparing Weapons]
+* [https://wiki.project1999.com/Game_Mechanics#Dual_Wield Project 1999 Game Mechanics — Dual Wield]
+* [https://github.com/EQEmu/EQEmu/blob/master/zone/attack.cpp Current EQEmu combat reference implementation]
+* [https://github.com/EQEmu/EQEmu/blob/master/zone/client_process.cpp Current EQEmu primary and secondary timer processing]
+
+{{Navbox Skills}}
+
+[[Category: Skills]]
+[[Category: Mechanics Requiring Verification]]

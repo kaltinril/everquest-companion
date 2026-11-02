@@ -1,0 +1,71 @@
+{{Kunark Era}}
+{{Factionpage|
+
+| description = Those creatures loyal to the undead dragon, [[Trakanon]].  Mostly his guards and the population of Old Sebilis.
+
+| zones_raise = 
+
+* {{VeliousGray| [[Dragon Necropolis]] }}
+
+| zones_lower = 
+
+* [[Old Sebilis]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[Jaled Dar`s Shade ]] <span class='fmz'>(Dragon Necropolis - Quest NPC)</span>
+* [[Zixx Nenix ]] <span class='fmz'>(Splitpaw - Quest NPC)</span>
+
+| mobs_lower = 
+
+* [[a pox scarab]]  <span class='fmz'>(Old Sebilis)</span>
+* [[a sebilite golem]]  <span class='fmz'>(Old Sebilis)</span>
+* [[a sepsis scarab]]  <span class='fmz'>(Old Sebilis)</span>
+* [[an iksar necromancer]]  <span class='fmz'>(Old Sebilis)</span>
+* [[Brogg]]  <span class='fmz'>(Old Sebilis)</span>
+* [[crypt caretaker]] <span class='fmz'>(Old Sebilis - Undead)</span>
+* [[dar ghoul knight]] <span class='fmz'>(Old Sebilis - Undead)</span>
+* [[frenzied pox scarab]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok armsman]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok bok knight]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok bok shaman]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok bok wizard]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok commander]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok dar knight]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok dar wizard]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok ilis knight]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok ilis shaman]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok jin shaman]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok jin wizard]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok kor shaman]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok krup knight]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok krup shaman]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok krup wizard]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok ostiary]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok pickler]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok reet knight]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok repairer]]  <span class='fmz'>(Old Sebilis)</span>
+* [[froglok zol knight]]  <span class='fmz'>(Old Sebilis)</span>
+* [[Gangrenous Scarab]]  <span class='fmz'>(Old Sebilis)</span>
+* [[Harbinger Freglor]]  <span class='fmz'>(Old Sebilis)</span>
+* [[Hierophant Prime Grekal]] <span class='fmz'>(Old Sebilis - Undead)</span>
+* [[Imperial Crypt Guardian]]  <span class='fmz'>(Old Sebilis)</span>
+* [[krup ghoul knight]] <span class='fmz'>(Old Sebilis - Undead)</span>
+* [[Myconid Adept]]  <span class='fmz'>(Old Sebilis)</span>
+* [[Myconid Priest]]  <span class='fmz'>(Old Sebilis)</span>
+* [[myconid reaver]]  <span class='fmz'>(Old Sebilis)</span>
+* [[myconid warrior]]  <span class='fmz'>(Old Sebilis)</span>
+* [[sebilite juggernaut]]  <span class='fmz'>(Old Sebilis)</span>
+* [[skeletal duke]] <span class='fmz'>(Old Sebilis - Undead)</span>
+* [[skeletal harbinger]] <span class='fmz'>(Old Sebilis - Undead)</span>
+* [[skeletal hierophant]] <span class='fmz'>(Old Sebilis - Undead)</span>
+* [[Tolapumj]]  <span class='fmz'>(Old Sebilis)</span>
+* [[Trakanon]]  <span class='fmz'>(Old Sebilis)</span>
+
+}}

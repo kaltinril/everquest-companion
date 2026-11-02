@@ -1,0 +1,110 @@
+[[File:Drunk Selfie.png|400px|thumb|right|The effects of alcohol.]]
+Consuming an alcoholic beverage temporarily lowers your Displayed AC, ATK, WIS and INT, while raising your STR and STA. The decreases to WIS/INT are far greater than the increase to STR/STA. All types of alcoholic beverages are equal in terms of effects (e.g. 1 short beer has the same effect as 1 vodka).
+
+A higher Alcohol Tolerance skill will reduce the impact on these stats (i.e. amount of WIS/INT lost per-drink), and will also reduce the recovery time. At 255 skill level you will need to consume 20+ drinks before seeing a single point increase to STR.
+
+You recover a little from these effects every 6-second server tick. The following are the recovery times per-drink at various Alcohol Tolerance skill levels:
+
+* Skill 1: 4:00
+* Skill 45: 3:20
+* Skill 50: 3:10
+* Skill 56: 3:00
+* Skill 65: 2:59
+* Skill 70: 2:53
+* Skill 75: 2:49
+* Skill 90: 2:33
+* Skill 100: 2:31
+* Skill 115: 2:08
+* Skill 125: 2:00
+* Skill 130: 1:55	
+* Skill 145: 1:45
+* Skill 150: 1:37
+* Skill 155: 1:34
+* Skill 170: 1:23
+* Skill 175: 1:14
+* Skill 180: 1:15
+* Skill 185: 1:09
+* Skill 190: 1:05
+* Skill 200: 0:59
+* Skill 210: 0:50
+* Skill 220: 0:37
+* Skill 230: 0:31
+* Skill 240: 0:21
+* Skill 250: 0:15 (3 server ticks) (Observed 11/15/23)
+* Skill 255: 0:06 (2 server ticks) (Observed 11/16/23)
+
+Even if you have fully recovered from alcohol effects, and your stats have fully returned to normal, if you zone too soon after, your stats will be reduced substantially.
+
+There is a "ghost" recovery period that exists. So even though you recover your stats within X amount of time. If you zone before (X * 3) time has elapsed, your adverse effects will be tripled, even if your stats have fully returned to normal. Additionally, casting any spell, even clicky items with no mana cost, will enact the same effect as zoning on your mana pool (not on wis/int), no matter how many times you do it.
+
+Examples:
+With starting WIS of 248:
+
+1 drink = 245 WIS (-3 WIS)
+* Zoning immediately after drinking = 236 WIS (-9 WIS, 3x effect)
+* Recover fully to 248 WIS, then zone, = 239 WIS (-9 WIS, 3x effect)
+* Recover fully to 248 WIS, wait 1 tick, then zone = 240 WIS
+* Recover fully to 248 WIS, wait 2 ticks, then zone = 240 WIS
+* Recover fully to 248 WIS, wait 3 ticks, then zone = 241 WIS
+* Recover fully to 248 WIS, wait 4 ticks, then zone = 243 WIS
+* Recover fully to 248 WIS, wait 5 ticks, then zone = 245 WIS
+* Recover fully to 248 WIS, wait 6 ticks, then zone = 245 WIS
+* Recover fully to 248 WIS, wait 7 tick, then zone = 246 WIS
+
+
+2 drinks = 243 WIS (-5 WIS)
+* Zoning immediately after drinking = 221 WIS (-22 WIS, 4.4x effect)
+* Recover fully to 248 WIS, then zone, = 226 WIS (-22 WIS, 4.4x effect)
+
+
+3 drinks = 240 WIS (-8 WIS)
+* Zoning immediately after drinking = 210 WIS (-30 WIS, 3.75x effect)
+* Recover fully to 248 WIS, then zone, = 217 WIS (-31 WIS, 3.75x effect)
+
+
+Subsequent drinks simply add a single drink’s worth of recovery time (i.e. the effects of multiple drinks are not exponential).
+
+Regarding the effects of more than one drink at lvl 255:
+
+X drinks = Y ticks to recover stats fully
+
+* 1 drink = 2 ticks
+* 2 drinks = 4 ticks
+* 3 drinks = 6 ticks
+* 4 drinks = 8 ticks
+* 5 drinks = 10 ticks
+* 6 drinks = 12 ticks
+* 7 drinks to 230 WIS = 14 ticks
+* 8 drinks to 228 WIS = 16 ticks
+* 9 drinks to 225 WIS = 18 ticks
+* 10 drinks to 223 WIS = 20 ticks
+* 11 drinks to 220 WIS = 22 ticks
+
+Reaching a certain level of intoxication (dependent upon skill) will make your character stagger from side to side when you attempt to move. This effect does not impact your forward run speed. Reaching a further level of intoxication will lock your character in first person mode and distort your field of view with a tunnel vision effect until you recover a little. This visual effect is amplified with further drinks until you finally reach max intoxication.
+
+A bug currently exists whereby zoning with any level of intoxication (even a single drink) will amplify the adverse effects to your stats upon entering the new zone. For example, if you zone immediately after consuming 1 drink then your WIS/INT will be decreased by the same amount as having consumed 3-4 drinks. The same is true for logging out and back in while intoxicated.
+
+== Classes ==
+* All (Max 255)
+Alcohol Tolerance is level capped (5*level)+5 through level 45 (at skill 220), after which the cap increases by 3 per level until level 50, and then 2 per level until level 60. So if you are level 20, you can only build your Alcohol Tolerance skill to 105 (and if you are level 52, you can only build your Alcohol Tolerance skill to 239).
+
+* Cap at Level 45: 220
+* Cap at Level 46: 223
+* Cap at Level 47: 226
+* Cap at Level 48: 229
+* Cap at Level 49: 232
+* Cap at Level 50: 235
+* Cap at Level 51: 237
+* Cap at Level 52: 239
+* Cap at Level 53: 241
+* Cap at Level 54: 243
+* Cap at Level 55: 245
+* Cap at Level 56: 247
+* Cap at Level 57: 249
+* Cap at Level 58: 251
+* Cap at Level 59: 253
+* Cap at Level 60: 255
+
+{{Navbox Skills}}
+
+[[Category:Skills]]

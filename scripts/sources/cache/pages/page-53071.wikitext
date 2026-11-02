@@ -1,0 +1,10 @@
+{{Classic Era}}{{bug}}
+
+When a melee attack is made against an NPC by a player or another NPC, the targeted NPC moves slightly in the direction that the pushing attacker is facing. The position of the attacker and receiver is irrelevant to this direction of push. In solo or small groups, melee push is often tactically irrelevant, but in raids and other difficult encounters it is a factor that must be managed closely by raid leaders. A mismanaged raid may quickly push a target to a disadvantageous or dangerous location.
+
+Push, like knockback spells and regular movement, also has a chance of interrupting a player's spells, but not an NPC's spells (as made classic by a recent patch in 2019 [https://www.project1999.com/forums/showpost.php?p=2858319&postcount=112]). It seems that the more distance a player is moved by push or knockback while they cast, the more likely they will be interrupted. Position yourself so that an NPC pushes you against a corner and you'll not be moved, increasing your chance of shrugging off possible spell interruption. Bashes and kicks can still interrupt you, of course.
+
+Like normal player movement, pushing an NPC at an angle into an oblique, solid wall will reduce, deflect and/or remove melee push. Some walls, corners, terrain, objects and zone geometry throughout Norrath are bugged, and allow NPCs to be pushed through them. This can either be harmless, annoying or extremely dangerous depending on the situation and location. A froglok pushed through a wall in Sebilis' King camp will often warp to disco. They then proceed to run back, social-[[aggro]]ing everything between disco and NG, often wiping any groups in-between in a god-awful mess of a train. This behavior has also been observed in parts of [[Lower Guk]], [[Kael Drakkel]], [[Great Divide]] and previously in [[Plane of Sky]] and [[Plane of Fear]] as well as many other locations. There is no way to easily distinguish such dangerous areas except through (often painful) experience or shared knowledge.
+
+[[Category:Technical]]
+[[Category:Game Mechanics]]

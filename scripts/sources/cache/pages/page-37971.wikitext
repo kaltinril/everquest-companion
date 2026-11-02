@@ -1,0 +1,45 @@
+{{Factionpage|
+
+| description = The Goblins and hangers on in [[Runnyeye]], as well as most everything in [[Beholders Maze]]. They are opposed by the halflings of [[Rivervale]], especially the [[Guardians of the Vale]] and [[Storm Reapers]] who struggle to keep them beyond The Wall of [[Misty Thicket]]. They have also established camps in the distant [[Butcherblock Mountains]] and are opposed by the [[Storm Guard]] dwarves there.
+
+They seem to be associated with or subjugated by the [[Pickclaw Goblins]] found deeper within [[Runnyeye]] and the [[Highkeep]] basement.
+
+It takes ''a lot'' of work to raise this faction: even 385 kills in [[Gorge of King Xorbb]] (enough to raise [[Pickclaw Goblins]] to non-KOS) isn't even enough to raise this faction to "threatening".
+
+| zones_raise = 
+
+* [[Eastern Plains of Karana]]
+* [[Beholder's Maze]]
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Clan Runnyeye]]
+* [[Misty Thicket]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[a chasm minotaur]] <span class='fmz'>(Gorge of King Xorbb (Beholder's Maze))</span>
+* [[a gorge minotaur]]  <span class='fmz'>(Gorge of King Xorbb (Beholder's Maze))</span>
+* [[a muddite elder]]   <span class='fmz'>(Gorge of King Xorbb (Beholder's Maze))</span>
+* [[a muddite minor]]  <span class='fmz'>(Gorge of King Xorbb (Beholder's Maze))</span>
+* [[Lord Syrkl]]  <span class='fmz'>(Gorge of King Xorbb (Beholder's Maze))</span>
+
+| mobs_lower = 
+
+* [[a goblin]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[a goblin trainee]] <span class='fmz'>(Clan RunnyEye)</span>
+* [[a goblin whelp]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[a Pickclaw Arroweater]] <span class='fmz'>(Clan RunnyEye)</span>
+* [[a Pickclaw Bladestopper]] <span class='fmz'>(Clan RunnyEye)</span>
+* [[an enraged goblin]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Mooto]]  <span class='fmz'>(Misty Thicket)</span>
+* [[Sludge Dankmire]]  <span class='fmz'>(Clan RunnyEye)</span>
+
+}}

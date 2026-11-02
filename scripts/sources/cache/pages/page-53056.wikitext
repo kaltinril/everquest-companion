@@ -1,0 +1,32 @@
+{{Delete}}
+
+:''See also: [[Everquest Titanium Installation Guide]]''
+<span style="color: red">'''Important Reminder:''' This is a player-edited wiki page designed to help new players to the server.  It is not official in any way and does not represent the views of the Project 1999 team.</span>
+
+<span style="color: red">'''Important Reminder:''' This is a player-edited wiki page designed to help new players to the server.  It is not official in any way and does not represent the views of the Project 1999 team.</span>
+
+== Where to Get the Software ==
+
+As it says on the [https://www.project1999.com/forums/showthread.php?t=2651 Project 1999 Guidebook]:
+
+
+::''In order to play on Project 1999 you must obtain a copy of Everquest: Titanium Edition. Only a clean Titanium install will work. You must acquire this on your own as we cannot distribute it, however there are many places to accomplish this. You do not need a valid CD Key.''
+
+
+Because Project 1999 can't distribute the client, one very common question newcomers ask is "where can I get it?"  This question is slightly tricky to answer, but you basically have two options: physical or digital.
+
+== Option #1: Acquire The Physical Disks ==
+
+This option is simple: beg, borrow or buy the Titanium Installation CDs.  If you aren't lucky enough to still have some from long ago, perhaps one of your gaming friends do? A quick social media post might turn up an unexpected copy.
+
+If you can't get a copy in your social network, you'll need to buy it, and since it's such a specific item, you're unlikely to find it at a local garage sale or flea market (though you could try).  That means you'll want EBay, where [http://www.ebay.com/sch/i.html?_nkw=everquest+titanium copies of the discs can sell for $50- $150]
+
+Keep in mind that after you install EQ, you ''can'' backup your installation folder or make copies of the discs themselves, and then re-sell the original discs.
+
+== Option 2: Acquire a Digital Copy ==
+
+If you don't own a copy, or know someone who does, and don't want to spend $100+ on 15+ year obsolete software, you'll have to go digital.  Again, the easiest solution is friends: if you know anyone who plays on P99, they can simply "zip up" their installation directory and share it with you.
+
+But if not, you need something like EBay for digital downloads, but you won't find Titanium on Steam or any official app store.
+
+[[Category:Technical]]

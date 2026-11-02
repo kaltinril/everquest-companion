@@ -1,0 +1,521 @@
+{{Velious Era}}
+[[File:Npc_captain_bvellos.png|right|200px]]
+[[File:Npc_watchman_gardal.jpg|right|200px]]
+{{Factionpage|
+
+| description = The Storm Giants are the upper class of Kael Drakkel. They are naturally allied with the [[Kromrif]] and their king, [[Tormax]]. They are opposed to the [[Claws of Veeshan]], but usually will not give positive faction with [[Coldain]] when killed. Most Kromzek giants appear with plate armor resembling Lorica segmentata [https://en.wikipedia.org/wiki/Lorica_segmentata] or noble robes and reside within [[Kael Drakkel]] and [[The Wakening Land]].
+
+Most characters will start as kill on sight to this faction, except [[Rallos Zek]] [[Ogre]]s.
+
+Note: the wiki faction values for Thurgadin mobs are wrong. Most, if not all, are +1 Kromzek, not +10.
+
+| zones_raise =
+
+* [[Cobalt Scar]]
+* [[Dragon Necropolis]]
+* [[Eastern Wastes]]
+* [[Great Divide]]
+* [[Iceclad Ocean]]
+* [[Icewell Keep]]
+* [[Kael Drakkel]]
+* [[Skyshrine]]
+* [[Temple of Veeshan]]
+* [[The Wakening Land]]
+* [[Thurgadin]]
+* [[Western Wastes]]
+
+| zones_lower =
+
+* [[Eastern Wastes]]
+* [[Great Divide]]
+* [[Iceclad Ocean]]
+* [[Kael Drakkel]]
+* [[Kerafyrm's Lair]]
+* [[The Wakening Land]]
+* [[Western Wastes]]
+
+| quests_raise =
+
+* [[Bvellos' Bounty]]
+* [[Coldain Books of Tactics]]
+* [[Coldain Skulls]]
+* [[Crest of the Drixie Quest]]
+* [[Demise of Blizzent]]
+* [[Dragon Heads]]
+* [[Faerie Dragon Wings]]
+* [[Field Supplies Quest]]
+* [[Living Dragons]]
+* [[Living Granite Quest]]
+* [[Mechanical Net Delivery]]
+* [[Reinforcements for The Tunarean Regiment]]
+* [[Slaggak's Bounty]]
+* [[Strife to the Coldain]]
+* [[The Family Chest Straps]]
+* [[The Supply Run - Eastern Wastes]]
+* [[Tiny Savages]]
+* [[Vkjor's Major Task]]
+
+* [[Bard Kael Armor Quests]]
+* [[Cleric Kael Armor Quests]]
+* [[Druid Kael Armor Quests]]
+* [[Enchanter Kael Armor Quests]]
+* [[Magician Kael Armor Quests]]
+* [[Monk Kael Armor Quests]]
+* [[Necromancer Kael Armor Quests]]
+* [[Paladin Kael Armor Quests]]
+* [[Ranger Kael Armor Quests]]
+* [[Rogue Kael Armor Quests]]
+* [[Shaman Kael Armor Quests]]
+* [[Shadowknight Kael Armor Quests]]
+* [[Warrior Kael Armor Quests]]
+* [[Wizard Kael Armor Quests]]
+
+| quests_lower =
+
+* [[Aid the Dar Brood]]
+* [[Coldain Ring Quests]]
+* [[Coldain Prayer Shawl Quests]]
+* [[Emil's Report]]
+* [[Helms of Giant Warriors]]
+* [[Hsagra's Wrath]]
+* [[Leuz's Task]]
+* [[Ralgyn's Promise]]
+* [[Request of the Arcane]]
+* [[Spider Legs Quest]]
+* [[Test of the Fire Storm]]
+* [[Test of the Ruby Tear]]
+* [[The Spirit of Garzicor]]
+* [[The Velium Focus]]
+* [[Velium Retrieval]]
+
+* [[Bard Skyshrine Armor Quests]]
+* [[Cleric Skyshrine Armor Quests]]
+* [[Druid Skyshrine Armor Quests]]
+* [[Enchanter Skyshrine Armor Quests]]
+* [[Magician Skyshrine Armor Quests]]
+* [[Monk Skyshrine Armor Quests]]
+* [[Necromancer Skyshrine Armor Quests]]
+* [[Paladin Skyshrine Armor Quests]]
+* [[Ranger Skyshrine Armor Quests]]
+* [[Rogue Skyshrine Armor Quests]]
+* [[Shadowknight Skyshrine Armor Quests]]
+* [[Shaman Skyshrine Armor Quests]]
+* [[Warrior Skyshrine Armor Quests]]
+* [[Wizard Skyshrine Armor Quests]]
+
+* [[Bard Thurgadin Armor Quests]]
+* [[Cleric Thurgadin Armor Quests]]
+* [[Druid Thurgadin Armor Quests]]
+* [[Enchanter Thurgadin Armor Quests]]
+* [[Magician Thurgadin Armor Quests]]
+* [[Monk Thurgadin Armor Quests]]
+* [[Necromancer Thurgadin Armor Quests]]
+* [[Paladin Thurgadin Armor Quests]]
+* [[Ranger Thurgadin Armor Quests]]
+* [[Rogue Thurgadin Armor Quests]]
+* [[Shaman Thurgadin Armor Quests]]
+* [[Shadowknight Thurgadin Armor Quests]]
+* [[Warrior Thurgadin Armor Quests]]
+* [[Wizard Thurgadin Armor Quests]]
+
+| mobs_raise =
+
+* [[a cerulean sky gazer]]  <span style="color:gray">(Temple of Veeshan)</span>
+* [[a coldain hunter]] <span style="color:gray">(Eastern Wastes - NPC, Non-Quest)</span>
+* [[a coldain lookout]] <span style="color:gray">(Eastern Wastes - Quest NPC)</span>
+* [[a Coldain miner]]  <span style="color:gray">(Great Divide)</span>
+* [[a coldain missionary]] <span style="color:gray">(Eastern Wastes - NPC, Non-Quest)</span>
+* [[a coldain skinner]]  <span style="color:gray">(Eastern Wastes)</span>
+* [[a Coldain tracking wolf]]  <span style="color:gray">(Great Divide)</span>
+* [[a coldain warrior]] <span style="color:gray">(Eastern Wastes - NPC, Non-Quest)</span>
+* [[a coldain wolfmaster]] <span style="color:gray">(Great Divide - NPC, Non-Quest)</span>
+* [[a cragwyrm]]  <span style="color:gray">(Western Wastes)</span>
+* [[A Dalgortha]]  <span style="color:gray">(Skyshrine)</span>
+* [[a fiery temple guardian]]  <span style="color:gray">(Temple of Veeshan)</span>
+* [[a fiery watcher]]  <span style="color:gray">(Temple of Veeshan)</span>
+* [[A Gargoyle Guardian]]  <span style="color:gray">(Skyshrine)</span>
+* [[a glimmer drake]]  <span style="color:gray">(Temple of Veeshan)</span>
+* [[a gravid drake]]  <span style="color:gray">(Western Wastes)</span>
+* [[A Hungry Cube]]  <span style="color:gray">(Skyshrine)</span>
+* [[A Large Velium Statue]]  <span style="color:gray">(Skyshrine)</span>
+* [[a lava dancer]]  <span style="color:gray">(Temple of Veeshan)</span>
+* [[A Shambling Cube]]  <span style="color:gray">(Skyshrine)</span>
+* [[a shimmering green drake]]  <span style="color:gray">(Temple of Veeshan)</span>
+* [[a Velious Drake]]  <span style="color:gray">(Western Wastes)</span>
+* [[a velium miner]]  <span style="color:gray">(Great Divide)</span>
+* [[Abudan Fe`Dhar]] <span style="color:gray">(Skyshrine - Quest NPC)</span>
+* [[Adia Coldbeard]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Adwetram Fe`Dhar]] <span style="color:gray">(Skyshrine - Quest NPC)</span>
+* [[Ahcaz]]  <span style="color:gray">(Skyshrine)</span>
+* [[an ancient ice wurm defender]]  <span style="color:gray">(Temple of Veeshan)</span>
+* [[An Ancient Sky Drake]]  <span style="color:gray">(Temple of Veeshan)</span>
+* [[An Elder Onyx Drake]]  <span style="color:gray">(Temple of Veeshan)</span>
+* [[an emerald sky defender]]  <span style="color:gray">(Temple of Veeshan)</span>
+* [[an expedition guard]]  <span style="color:gray">(Great Divide)</span>
+* [[An Icewell Sentinel]] <span style="color:gray">(Icewell Keep)</span>
+* [[an injured warrior]]  <span style="color:gray">(Eastern Wastes)</span>
+* [[an onyx sky drake]]  <span style="color:gray">(Temple of Veeshan)</span>
+* [[Argash]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Arreken Skyward]] <span style="color:gray">(Temple of Veeshan - NPC, Non-Quest)</span>
+* [[Asteinnon Fe`Dhar]] <span style="color:gray">(Skyshrine - Quest NPC)</span>
+* [[Ayillish]]  <span style="color:gray">(Western Wastes)</span>
+* [[Azureake]]  <span style="color:gray">(Cobalt Scar)</span>
+* [[Betti Frostweaver]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Bezeb]]  <span style="color:gray">(Skyshrine)</span>
+* [[Bixx Bartleby]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Bouncer Boulder]]  <span style="color:gray">(Skyshrine)</span>
+* [[Bratavar]]  <span style="color:gray">(Western Wastes)</span>
+* [[Brimgald Brightsteel]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Brina Snowfox]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Brynjar]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Bufa]]  <span style="color:gray">(Western Wastes)</span>
+* [[Captain Stonefist]]  <span style="color:gray">(Great Divide)</span>
+* [[Cargalia]]  <span style="color:gray">(Western Wastes)</span>
+* [[Celtir Gronback]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Chamberlain Krystorf]]  <span style="color:gray">(Icewell Keep)</span>
+* [[Chymot]]  <span style="color:gray">(Skyshrine)</span>
+* [[Clara]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Coldain Outcast]] <span style="color:gray">(Icewell Keep - Merchant)</span>
+* [[Commander Leuz]] <span style="color:gray">(Skyshrine - Quest NPC)</span>
+* [[Corbin Blackwell]] <span style="color:gray">(Eastern Wastes - Quest NPC)</span>
+* [[Councilor Amberfeld]]  <span style="color:gray">(Icewell Keep)</span>
+* [[Councilor Coldember]]  <span style="color:gray">(Icewell Keep)</span>
+* [[Councilor Darakor]]  <span style="color:gray">(Icewell Keep)</span>
+* [[Councilor Darkfrost]]  <span style="color:gray">(Icewell Keep)</span>
+* [[Councilor Deynekn]]  <span style="color:gray">(Icewell Keep)</span>
+* [[Councilor Dirkins]]  <span style="color:gray">(Icewell Keep)</span>
+* [[Councilor Glacierbane]]  <span style="color:gray">(Icewell Keep)</span>
+* [[Councilor Icelok]]  <span style="color:gray">(Icewell Keep)</span>
+* [[Councilor Icepike]]  <span style="color:gray">(Icewell Keep)</span>
+* [[Councilor Thubins]]  <span style="color:gray">(Icewell Keep)</span>
+* [[Councilor Wintershade]]  <span style="color:gray">(Icewell Keep)</span>
+* [[Crendatha Fe`Dhar]] <span style="color:gray">(Skyshrine - Quest NPC)</span>
+* [[Dalshim Fe`Dhar]]  <span style="color:gray">(Skyshrine)</span>
+* [[Darts O`Gavin]] <span style="color:gray">(Thurgadin - NPC, Non-Quest)</span>
+* [[Deaen Greyforge]] <span style="color:gray">(Eastern Wastes - Quest NPC)</span>
+* [[Del Sapara]]  <span style="color:gray">(Western Wastes)</span>
+* [[Deoryn Fe`Dhar]]  <span style="color:gray">(Skyshrine)</span>
+* [[Derasinal]]  <span style="color:gray">(Western Wastes)</span>
+* [[Doogle McBanick]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Draazak]]  <span style="color:gray">(Western Wastes)</span>
+* [[Durgan Bottlenip]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Dygwyn Fe`Dhar]]  <span style="color:gray">(Skyshrine)</span>
+* [[Dyr Fe`Dhar]]  <span style="color:gray">(Skyshrine)</span>
+* [[Elaend Fe`Dhar]] <span style="color:gray">(Skyshrine - Quest NPC)</span>
+* [[Elder Hajnix]]  <span style="color:gray">(Skyshrine)</span>
+* [[Elder Kajind]]  <span style="color:gray">(Skyshrine)</span>
+* [[Elder Kalur]]  <span style="color:gray">(Skyshrine)</span>
+* [[Eldriaks Fe`Dhar]]  <span style="color:gray">(Skyshrine)</span>
+* [[Elyshum Fe`Dhar]]  <span style="color:gray">(Skyshrine)</span>
+* [[Entariz]]  <span style="color:gray">(Western Wastes)</span>
+* [[Fardonad Fe`Dhar]] <span style="color:gray">(Skyshrine - Quest NPC)</span>
+* [[Fogerty Bottlenip]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Frundle Frenkler]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Gafala]]  <span style="color:gray">(Western Wastes)</span>
+* [[Gage]] <span style="color:gray">(Thurgadin - Banker)</span>
+* [[Gangel]]  <span style="color:gray">(Western Wastes)</span>
+* [[Garadain Glacierbane]] <span style="color:gray">(Eastern Wastes - Quest NPC)</span>
+* [[Garish Ironhelm]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Gilthan Brittleblade]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Glati]]  <span style="color:gray">(Western Wastes)</span>
+* [[Glydoc Fe`Dhar]]  <span style="color:gray">(Skyshrine)</span>
+* [[Gozzrem]] <span style="color:gray">(Temple of Veeshan - Quest NPC)</span>
+* [[Grand Historian Thoridain]] <span style="color:gray">(Thurgadin - Quest NPC)</span>
+* [[Grand Huntsman Darral]]  <span style="color:gray">(Icewell Keep)</span>
+* [[Grudash the Baker]] <span style="color:gray">(Skyshrine - Merchant)</span>
+* [[Guard Audun]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Baldvin]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Bergur]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Bjorn]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Clorn]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Dagur]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Dobbs]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Eirikur]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Elin]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Enre]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Eyvindur]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Fjola]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Gord]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Halldor]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Iris]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Jonas]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Karl]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Kilandur]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Korik]] <span style="color:gray">(Great Divide)</span>
+* [[Guard Krag]] <span style="color:gray">(Great Divide)</span>
+* [[Guard Kristrun]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Larus]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Leif]] <span style="color:gray">(Thurgadin - Quest NPC)</span>
+* [[Guard Mason]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Oskar]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Pert]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Rakel]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Royt]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Sigrun]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Suuna]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Teitur]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Thorbin]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Tinna]]  <span style="color:gray">(Thurgadin)</span>
+* [[Guard Valdis]]  <span style="color:gray">(Thurgadin)</span>
+* [[Hakon Brightsteel]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Harla Dar]]  <span style="color:gray">(Western Wastes)</span>
+* [[Honvar]]  <span style="color:gray">(Western Wastes)</span>
+* [[Hulda]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Ionat]]  <span style="color:gray">(Western Wastes)</span>
+* [[Jaelk]]  <span style="color:gray">(Skyshrine)</span>
+* [[Jaylorx]]  <span style="color:gray">(Skyshrine)</span>
+* [[Jen Sapara]]  <span style="color:gray">(Western Wastes)</span>
+* [[Jendavudd Fe`Dhar]] <span style="color:gray">(Skyshrine - Quest NPC)</span>
+* [[Jeril Kettletop]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Jualicn]]  <span style="color:gray">(Skyshrine)</span>
+* [[Kalacs Fe`Dhar]]  <span style="color:gray">(Skyshrine)</span>
+* [[Kardakor]]  <span style="color:gray">(Great Divide)</span>
+* [[Karey]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Karkona]]  <span style="color:gray">(Western Wastes)</span>
+* [[Kelorek`Dar]]  <span style="color:gray">(Cobalt Scar)</span>
+* [[Klandicar]]  <span style="color:gray">(Western Wastes)</span>
+* [[Klarp Bartleby]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Komawin Fe`Dhar]] <span style="color:gray">(Skyshrine - Quest NPC)</span>
+* [[Korf Brokenhammer]]  <span style="color:gray">(Great Divide)</span>
+* [[Korrigain]] <span style="color:gray">(Eastern Wastes - Quest NPC)</span>
+* [[Laegdric Fe`Dhar]]  <span style="color:gray">(Skyshrine)</span>
+* [[Lararith]]  <span style="color:gray">(Skyshrine)</span>
+* [[Lawyla]]  <span style="color:gray">(Skyshrine)</span>
+* [[Leifur]] <span style="color:gray">(Thurgadin - Quest NPC)</span>
+* [[Lendiniara the Keeper]]  <span style="color:gray">(Temple of Veeshan)</span>
+* [[Lignark]]  <span style="color:gray">(Skyshrine)</span>
+* [[Linbrak]]  <span style="color:gray">(Western Wastes)</span>
+* [[Lorekeeper Derrin]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Lorekeeper Einar]]  <span style="color:gray">(Thurgadin)</span>
+* [[Lorekeeper Taben]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Loremaster Borannin]] <span style="color:gray">(Thurgadin - Quest NPC)</span>
+* [[Loremaster Dorinan]] <span style="color:gray">(Thurgadin - Quest NPC)</span>
+* [[Loremaster Fronden]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Loremaster Solstrin]] <span style="color:gray">(Icewell Keep - Quest NPC)</span>
+* [[Lothieder Fe`Dhar]] <span style="color:gray">(Skyshrine - Quest NPC)</span>
+* [[Makala]]  <span style="color:gray">(Western Wastes)</span>
+* [[Mazi]]  <span style="color:gray">(Western Wastes)</span>
+* [[Medry Fe`Dhar]]  <span style="color:gray">(Skyshrine)</span>
+* [[Meg Tucter]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Morachii Fe`Dhar]]  <span style="color:gray">(Skyshrine)</span>
+* [[Mordin Frostcleaver]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Mraaka]]  <span style="color:gray">(Western Wastes)</span>
+* [[Myga]]  <span style="color:gray">(Western Wastes)</span>
+* [[Nalelin Fe`Dhar]] <span style="color:gray">(Skyshrine - Quest NPC)</span>
+* [[Nalginor Fe`Dhar]]  <span style="color:gray">(Skyshrine)</span>
+* [[Neordla]]  <span style="color:gray">(Western Wastes)</span>
+* [[Nimren Stonecutter]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Norsirx]]  <span style="color:gray">(Skyshrine)</span>
+* [[Ocoenydd Fe`Dhar]] <span style="color:gray">(Skyshrine - Quest NPC)</span>
+* [[Oct Velic]]  <span style="color:gray">(Skyshrine)</span>
+* [[Oglard]]  <span style="color:gray">(Skyshrine)</span>
+* [[Onava]]  <span style="color:gray">(Western Wastes)</span>
+* [[Onerind Fe`Dhar]] <span style="color:gray">(Skyshrine - Quest NPC)</span>
+* [[Orthor Velic]]  <span style="color:gray">(Skyshrine)</span>
+* [[Pantrilla]]  <span style="color:gray">(Western Wastes)</span>
+* [[Pearce Icefang]]  <span style="color:gray">(Thurgadin)</span>
+* [[Perkins Doughbeard]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Petcas Coldbeard]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Placlis]]  <span style="color:gray">(Skyshrine)</span>
+* [[Poalgin Fe`Dhar]]  <span style="color:gray">(Skyshrine)</span>
+* [[Qalcnic Fe`Dhar]]  <span style="color:gray">(Skyshrine)</span>
+* [[Quadrix Velic]]  <span style="color:gray">(Skyshrine)</span>
+* [[Qynydd Fe`Dhar]] <span style="color:gray">(Skyshrine - Quest NPC)</span>
+* [[Ralgyn]]  <span style="color:gray">(Skyshrine)</span>
+* [[Relik]] <span style="color:gray">(Great Divide - Quest NPC)</span>
+* [[Rexx Frostweaver]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Riran Fe`Dhar]]  <span style="color:gray">(Skyshrine)</span>
+* [[Rolandal]]  <span style="color:gray">(The Wakening Land)</span>
+* [[Scout Charisa]] <span style="color:gray">(Western Wastes - Quest NPC)</span>
+* [[Seneschal Aldikar]]  <span style="color:gray">(Icewell Keep)</span>
+* [[Sentinel Paxin]]  <span style="color:gray">(Icewell Keep)</span>
+* [[Sentry Kale]]  <span style="color:gray">(Skyshrine)</span>
+* [[Seril Kettletop]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Sontalak]]  <span style="color:gray">(Western Wastes)</span>
+* [[Suez]]  <span style="color:gray">(Skyshrine)</span>
+* [[Taegria Fe`Dhar]]  <span style="color:gray">(Skyshrine)</span>
+* [[Talem Tucter]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Talgixn Fe`Dhar]]  <span style="color:gray">(Skyshrine)</span>
+* [[Talnifs]]  <span style="color:gray">(Skyshrine)</span>
+* [[Talon Velic]]  <span style="color:gray">(Skyshrine)</span>
+* [[Tavir]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Telkorenar]]  <span style="color:gray">(Temple of Veeshan)</span>
+* [[Telnaq]]  <span style="color:gray">(Skyshrine)</span>
+* [[Tetragon Velic]]  <span style="color:gray">(Skyshrine)</span>
+* [[The Seer]]  <span style="color:gray">(Skyshrine)</span>
+* [[Tobart Dirkins]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Tonvan Fe`Dhar]]  <span style="color:gray">(Skyshrine)</span>
+* [[Trademaster Kroven]]  <span style="color:gray">(Thurgadin)</span>
+* [[Tranala]]  <span style="color:gray">(Western Wastes)</span>
+* [[Tri Velic]]  <span style="color:gray">(Skyshrine)</span>
+* [[Tsiraka]]  <span style="color:gray">(Western Wastes)</span>
+* [[Tyddyn Fe`Dhar]]  <span style="color:gray">(Skyshrine)</span>
+* [[Ualkic Fe`Dhar]]  <span style="color:gray">(Skyshrine)</span>
+* [[Uiliak]]  <span style="color:gray">(Western Wastes)</span>
+* [[Umykith Fe`Dhar]] <span style="color:gray">(Skyshrine - Quest NPC)</span>
+* [[Vellyn Fe`Dhar]]  <span style="color:gray">(Skyshrine)</span>
+* [[Vitaela]]  <span style="color:gray">(Western Wastes)</span>
+* [[Vobryn Fe`Dhar]]  <span style="color:gray">(Skyshrine)</span>
+* [[Von]]  <span style="color:gray">(Western Wastes)</span>
+* [[Vores the Hunter]]  <span style="color:gray">(Great Divide)</span>
+* [[Wevil Doughbeard]] <span style="color:gray">(Thurgadin - Merchant)</span>
+* [[Wolfmaster Finnur]]  <span style="color:gray">(Thurgadin)</span>
+* [[Wuoshi]]  <span style="color:gray">(The Wakening Land)</span>
+* [[Yaced]]  <span style="color:gray">(Skyshrine)</span>
+* [[Yal]]  <span style="color:gray">(Western Wastes)</span>
+* [[Yeldema]]  <span style="color:gray">(Western Wastes)</span>
+* [[Yvolcarn]]  <span style="color:gray">(Cobalt Scar)</span>
+* [[Zaldin Fe`Dhar]]  <span style="color:gray">(Skyshrine)</span>
+* [[Zalerez]]  <span style="color:gray">(Skyshrine)</span>
+* [[Zemm]]  <span style="color:gray">(Temple of Veeshan)</span>
+* [[Ziglark Whisperwing]] <span style="color:gray">(Skyshrine - Quest NPC)</span>
+* [[Zil Sapara]]  <span style="color:gray">(Western Wastes)</span>
+* [[Zrelik the Scout]] <span style="color:gray">(Thurgadin - Quest NPC)</span>
+* [[Zynil]]  <span style="color:gray">(Skyshrine)</span>
+
+| mobs_lower =
+
+* [[a cleric of Vallon Zek]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[a domesticated direwolf]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[a drakkel dire wolf]]  <span style="color:gray">(Great Divide)</span>
+* [[a frost giant]]  <span style="color:gray">(Eastern Wastes)</span>
+* [[a frost giant berserker]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[a frost giant captain]]  <span style="color:gray">(Eastern Wastes)</span>
+* [[a frost giant commoner]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[a frost giant elite]]  <span style="color:gray">(Great Divide)</span>
+* [[a frost giant gladiator]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[a frost giant laborer]]  <span style="color:gray">(The Wakening Land)</span>
+* [[a Frost Giant Lord]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[a frost giant savage]]  <span style="color:gray">(Eastern Wastes)</span>
+* [[a frost giant scout]]  <span style="color:gray">(Great Divide)</span>
+* [[a frost giant sentinel]]  <span style="color:gray">(The Wakening Land)</span>
+* [[a frost giant sentry]]  <span style="color:gray">(The Wakening Land)</span>
+* [[a frost giant trainer]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[a frost giant wolf tamer]] <span style="color:gray">(Kael Drakkel - Quest NPC)</span>
+* [[a guardian of Zek]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[a Kromrif recruiter]] <span style="color:gray">(Kael Drakkel - Quest NPC)</span>
+* [[a Kromzek Captain]] <span style="color:gray">(Western Wastes - Quest NPC)</span>
+* [[a lesser storm giant noble]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[a priest of Tallon Zek]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[a Protector of Zek]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[a storm giant berserker]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[a storm giant commoner]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[A Storm Giant Foreman]]  <span style="color:gray">(The Wakening Land)</span>
+* [[a storm giant gladiator]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[a storm giant surveyor]]  <span style="color:gray">(The Wakening Land)</span>
+* [[a temple guardian]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[a visiting noble]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[a wounded storm giant]]  <span style="color:gray">(The Wakening Land)</span>
+* [[Adjutant Cryyrn]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Adjutant Derkan]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Adjutant Droggren]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Adjutant Frinevrn]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Adjutant Hekrandor]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Adjutant Hoggren]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Adjutant Jharll]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Adjutant Skjell]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Adjutant Stormkeeper]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Adjutant Thyek]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[an angry commoner]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Armor of Zek]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Barbarian Mercenary]] <span style="color:gray">(The Wakening Land - Quest NPC)</span>
+* [[Bekerak Coldbones]] <span style="color:gray">(Great Divide - Quest NPC)</span>
+* [[Bjorak Stonefist]] <span style="color:gray">(Kael Drakkel - Merchant)</span>
+* [[Bjrakor the Cold]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Captain Bvellos]] <span style="color:gray">(Kael Drakkel - Quest NPC)</span>
+* [[Clrakk Blackfist]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Commander Bahreck]]  <span style="color:gray">(Eastern Wastes)</span>
+* [[Derakor the Vindicator]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Dlammaz Stormslayer]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Drendar Blackblade]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Fergul Frostsky]]  <span style="color:gray">(Great Divide)</span>
+* [[Fjloaren Icebane]]  <span style="color:gray">(Eastern Wastes)</span>
+* [[Frostgiant Overseer]]  <span style="color:gray">(The Wakening Land)</span>
+* [[Gkrean Prophet of Tallon]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Gnome Mercenary]]  <span style="color:gray">(The Wakening Land)</span>
+* [[Gorul Longshanks]]  <span style="color:gray">(Great Divide)</span>
+* [[Guard Blaesek]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Guard Fjleed]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Guard Fjorlek]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Guard Fleshflayer]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Guard Greybeard]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Guard Hallenban]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Guard Khyosr]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Guard Kkrean]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Guard Ragern]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Guard Rolkin]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Guard Sjior]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Guard Stonebender]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Guard Ulfhedinn]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Guard Vydel]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Human Mercenary]]  <span style="color:gray">(The Wakening Land)</span>
+* [[Kallis Stormcaller]] <span style="color:gray">(Kael Drakkel - Quest NPC)</span>
+* [[Keldor Dek`Torek]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[King Tormax]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Klaggan Iceshard]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Korakaz]] <span style="color:gray">(Kael Drakkel - Quest NPC)</span>
+* [[Korzak Stonehammer]] <span style="color:gray">(The Wakening Land - Quest NPC)</span>
+* [[kromriff guardsman]]  <span style="color:gray">(Eastern Wastes)</span>
+* [[Legionnaire Byltor]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Legionnaire Icebender]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Legionnaire Renarn]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Legionnaire Sjeldor]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Legionnaire Yvedrn]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Lieutenant Krofer]]  <span style="color:gray">(The Wakening Land)</span>
+* [[Lieutenant Stormeye]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Noble Helssen]] <span style="color:gray">(Kael Drakkel - Quest NPC)</span>
+* [[Pollos Stormkeeper]] <span style="color:gray">(Kael Drakkel - Banker)</span>
+* [[Priest Grenk]] <span style="color:gray">(The Wakening Land - Quest NPC)</span>
+* [[protector of Zek]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Semkak Prophet of Vallon]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Senior Guard Akurr]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Senior Guard Dhryell]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Senior Guard Eihorn]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Senior Guard Grelden]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Senior Guard Icemead]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Senior Guard Randeil]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Senior Guard Tymul]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Senior Guard Whiteaxe]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Sentinel Sunderdrake]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Sergeant Blestrom]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Sergeant Brunfel]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Sergeant Fjrak]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Sergeant Miidenaer]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Sergeant Tellsren]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Sergeant Yggrellnik]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Teir`Dal Mercenary]]  <span style="color:gray">(The Wakening Land)</span>
+* [[The Avatar of War]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[The Statue of Rallos Zek]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Troll Mercenary]]  <span style="color:gray">(The Wakening Land)</span>
+* [[Trooper Derheim]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Trooper Dlemdimor]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Trooper Ebonblade]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Trooper Gyarll]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Trooper Jhonev]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Trooper Khyren]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Trooper Mjflean]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Trooper Nyorll]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Trooper Relhjorn]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Trooper Sardek]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Vealok the Angry]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Velden Dragonbane]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Veteran Icecaller]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Veteran Skeldek]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Veteran Surlren]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Veteran Yllhaydm]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Vkjor]] <span style="color:gray">(Kael Drakkel - Quest NPC)</span>
+* [[Watcher Thrensheld]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Watcher Zedlek]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Watchman Bexlend]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Watchman Erendor]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Watchman Gardal]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Watchman Njella]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Watchman Reglekar]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Watchman Sunderthorn]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Watchman Thyek]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Watchman Vedravik]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Watchman Weyaen]]  <span style="color:gray">(Kael Drakkel)</span>
+* [[Weyrevar Bluehammer]] <span style="color:gray">(Kael Drakkel - Merchant)</span>
+
+}}
+[[Category:Significant Factions]]

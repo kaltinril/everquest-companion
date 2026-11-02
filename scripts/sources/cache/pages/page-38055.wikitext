@@ -1,0 +1,27 @@
+{{Velious Era}}
+
+{{Factionpage|
+
+| description = 
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Velketor's Labyrinth]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Velketor the Sorcerer]]  <span class='fmz'>(Velketor's Labyrinth)</span>
+
+}}

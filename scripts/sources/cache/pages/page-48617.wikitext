@@ -1,0 +1,13 @@
+Like Dodge, Block allows a character to avoid all damage from a physical attack. However, unlike other defensive skills, block can defend against attacks from behind the character.
+
+== Classes ==
+
+* [[Monk]] - Level 10 '''(Max 200)'''
+* [[Ranger]] - Level 15 '''(Max 180)'''
+* [[Warrior]] - Level 15 '''(Max 175)'''
+* [[Berserker]] - Level 20 '''(Max 150)'''
+* [[Beastlord]] - Level 20 '''(Max 150)'''
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

@@ -1,0 +1,197 @@
+{{Factionpage|
+
+| description = In the underground city of Ak'Anon, gnomish warriors gather in the Gem Chopper's hall.  Here under the leadership of Baxok Curhunter, warriors of all ages train. The Gem Choppers are Loyal to the Gnomish King Ak'Anon and support the Merchants of Ak'Anon. The Gem Choppers oppose the evil group of gnomes called the Dark Reflection.
+
+| zones_raise = 
+
+* [[Ak'Anon]]
+* [[Butcherblock Mountains]]
+* [[The Estate of Unrest]]
+* [[Innothule Swamp]]
+* [[Kedge Keep]]
+* [[Lake Rathetear]]
+* [[Lesser Faydark]]
+* [[Southern Desert of Ro]]
+* [[Steamfont Mountains]]
+* [[Western Plains of Karana]]
+
+| zones_lower = 
+
+* [[Ak'Anon]]
+* [[Crushbone]]
+* [[Erudin|Erudin Palace]]
+* [[Highpass Keep]]
+* [[Lesser Faydark]]
+* [[Northern Karana]]
+* [[Solusek's Eye]]
+* [[Steamfont Mountains]]
+* [[Freeport|West Freeport]]
+
+| quests_raise = 
+
+* [[Air Tight Box Quest]]
+* [[Basilisk Tongues]]
+* [[Bugglegupp (Quest)|Bugglegupp]]
+* [[Gearheart]]
+* [[Minotaur Horns]]
+* [[Red V Clockwork]]
+* [[Rusted Black Boxes]]
+* [[Scrap Metal Quest]]
+* [[Series C Black Boxes]]
+* [[Slave Keys]]
+* [[Telescope Lenses]]
+* [[Tergon's Spellbook Quest]]
+* [[The Regurgitonic]]
+* [[Tiny Skeletons]]
+
+| quests_lower = 
+
+* [[Bertoxxulous Symbol Quests|Bertoxxulous Initiate]]
+* [[The Bridge]]
+
+| mobs_raise = 
+
+* [[a brownie outcast]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[a deepwater goblin]]  <span class='fmz'>(South Ro)</span>
+* [[a kobold runt]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[a kobold scout]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[a kobold shaman]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[a minotaur slaver]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[an aqua goblin]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[an aqua goblin shaman]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[an aqua goblin wizard]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[aqua goblin prisoner]]  <span class='fmz'>(Kedge Keep)</span>
+* [[Berinsan]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[Eonis Mournunder]] <span class='fmz'>(Ak'Anon - NPC, Non-Quest)</span>
+* [[Evah Xokez]] <span class='fmz'>(Ak'Anon - Cleric Guildmaster)</span>
+* [[Kaxon Frennor]] <span class='fmz'>(Ak'Anon - NPC, Non-Quest)</span>
+* [[Khrix Abomination]]  <span class='fmz'>(Estate of Unrest)</span>
+* [[Khrix Fritchoff]]  <span class='fmz'>(Estate of Unrest)</span>
+* [[Meldrath The Malignant]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[Minotaur Guard]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[Minotaur Hero]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[Minotaur Lord]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[Minotaur Sentry]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[Naygog Mitope]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Oobnopterbevny Biddilets]] <span class='fmz'>(West Karana - Quest NPC)</span>
+* [[Rilgor Plegnog]] <span class='fmz'>(Ak'Anon - Enchanter Guildmaster)</span>
+* [[Vaenor Husga]] <span class='fmz'>(Ak'Anon - NPC, Non-Quest)</span>
+* [[Velena Corgtec]] <span class='fmz'>(Ak'Anon - NPC, Non-Quest)</span>
+
+| mobs_lower = 
+
+* [[a clockwork alchemist]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork armorer]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork banker]] <span class='fmz'>(Ak'Anon - Banker)</span>
+* [[a clockwork barkeep]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork bowyer]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[a clockwork cobbler]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork grocer]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork jeweler]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork merchant]] (1265, -775) <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork tailor]] (760, 155) <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork tanner]] (954, -37, -38) <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork torturer]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork weaponsmith]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a mechanic]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Bom Knotwood]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[clockwork scrubber]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIIC]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIIE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIVE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XIXA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVD]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVID]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIIA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIIC]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XVIIIE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXD]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXE]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXID]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIIIA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIVD]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXIXB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVA]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVD]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVIC]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVIIC]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXVIIIB]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Clockwork XXXD]]  <span class='fmz'>(Ak'Anon)</span>
+* [[CWG Model CB]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model CC]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model CX]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model EXG]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model MB]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model MC]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model XB]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model XC]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[Digetha Chogaller]] <span class='fmz'>(Ak'Anon - NPC, Non-Quest)</span>
+* [[Finkel Rardobaen]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[Fodin Frugrin]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[Forpar Fizfla]] <span class='fmz'>(Steamfont Mountains - Quest NPC)</span>
+* [[Freed Fimplefur]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[Gabbie Mardoddle]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[Genda Minyte]] <span class='fmz'>(Steamfont Mountains - NPC, Non-Quest)</span>
+* [[Glen Garginburr]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[Godbin Strumharp]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[Iony Gredlong]] <span class='fmz'>(Ak'Anon - Cleric Guildmaster)</span>
+* [[Jogl Doobraugh]] <span class='fmz'>(Steamfont Mountains - Quest NPC)</span>
+* [[Juline Urncaller]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Kimble Nogflop]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[King Ak`Anon]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Lobal Postugger]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Lodrand Dindlenod]] <span class='fmz'>(Steamfont Mountains - NPC, Non-Quest)</span>
+* [[Lozani]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Marfen Binkdirple]]] <span class='fmz'>(Solusek's Eye (Solusek A) - Merchant)</span>
+* [[Nonnie Texaker]] <span class='fmz'>(Ak'Anon - NPC, Non-Quest)</span>
+* [[Oren Furdenbline]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[Phiz Frugrin]] <span class='fmz'>(Steamfont Mountains - NPC, Non-Quest)</span>
+* [[Retlon Brenclog]] <span class='fmz'>(Crushbone - Quest NPC)</span>
+* [[Saben Tucross]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+* [[Sanfyrd Featherhead]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Shondo Billin]] <span class='fmz'>(Erudin Palace - Quest NPC)</span>
+* [[Watchman Halv]] <span class='fmz'>(Mob Graveyard)</span>
+* [[Tergon Brenclog]]  <span class='fmz'>(Ak'Anon)</span>
+* [[Thetherthag Wakintrob]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[Tindo Frugrin]] <span class='fmz'>(Steamfont Mountains - Quest NPC)</span>
+* [[Tobon Starpyre]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Torodrane Frompwaddle]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[Trudo Frugrin]] <span class='fmz'>(Lesser Faydark - Quest NPC)</span>
+* [[Watchman Dexlin]] <span class='fmz'>(North Karana - Quest NPC)</span>
+* [[Watchman Dreeb]] <span class='fmz'>(Steamfont Mountains)</span>
+* [[Watchman Mylz]] <span class='fmz'>(Steamfont Mountains)</span>
+* [[Watchman Prenn]] <span class='fmz'>(Steamfont Mountains)</span>
+* [[Watchman Prynn]] <span class='fmz'>(Steamfont Mountains)</span>
+* [[Welno Tanboots]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Wuggan Azusphere]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Zenrel Ottonoggin]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[Zigg Flin]]  <span class='fmz'>(West Freeport)</span>
+
+}}
+= Suggested Route =
+*[[Series C Black Boxes]] - Part 1 (+[[King Ak'Anon (Faction)]], +[[Eldritch Collective]], +[[Gem Choppers]], -[[Dark Reflection]], -[[Meldrath]])
+*[[Shondo and the Tonic]] (+[[Gem Choppers]], +[[Merchants of Ak'Anon]], +[[King Ak'Anon (Faction)]], -[[Dark Reflection]], -[[Clan Grikbar]]) 
+*[[The Regurgitonic]] (+[[Gem Choppers]], +[[Merchants of Ak'Anon]], +[[King Ak'Anon (Faction)]], -[[Dark Reflection]], -[[Clan Grikbar]]). 
+**See [[The Regurgitonic]] for complete list of sub quests
+
+
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

@@ -1,0 +1,27 @@
+{{Factionpage|
+
+| description = Almost every mob in the zone of [[Najena]] lowers this faction.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Najena]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[an ogre guard]]  <span class='fmz'>(Najena)</span>
+* [[dark-boned skeleton]] <span class='fmz'>(Najena - Undead)</span>
+* [[Drelzna]]  <span class='fmz'>(Najena)</span>
+
+}}

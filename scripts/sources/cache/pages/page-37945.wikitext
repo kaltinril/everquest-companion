@@ -1,0 +1,25 @@
+{{Factionpage|
+
+| description = Residents of the [[Human]] city of Qeynos. May be identical to the [[QeynosCitizen]] faction?
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Qeynos|South Qeynos]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Menkes Tabolet]] <span class='fmz'>(South Qeynos - Merchant)</span>
+
+}}

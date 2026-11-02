@@ -1,0 +1,14 @@
+This skill grants you a chance to parry an incoming melee attack.  Thereby turning aside the blow and receiving no damage.
+
+== Classes ==
+
+*[[Warrior]] '''Level 5''' (Max 225)
+*[[Rogue]] '''Level 10''' (Max 200)
+*[[Ranger]] '''Level 10''' (Max 200)
+*[[Paladin]] '''Level 15''' (Max 175)
+*[[Shadow Knight]] '''Level 15''' (Max 175)
+*[[Bard]] '''Level 25''' (Max 125)
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

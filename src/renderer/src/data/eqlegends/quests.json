@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-10-29T07:43:17.455Z",
+  "scrapedAt": "2026-11-02T05:55:54.313Z",
   "source": "eqlwiki.com — Category:Quests + quest subcategories + recentchanges delta (scripts/scrape-delta.mts)",
   "quests": [
     {
@@ -36725,7 +36725,7 @@
       "page": "The Visiting Priestess",
       "eraTag": "Classic",
       "startZone": "Najena",
-      "giver": "A Visiting Priestess",
+      "giver": "a visiting priestess",
       "minLevel": 30,
       "classes": [
         "All except BRD ROG NEC WIZ MAG ENC"
@@ -36755,6 +36755,30 @@
       ],
       "expReward": true,
       "factions": [
+        {
+          "name": "Priests of Innoruuk",
+          "up": true
+        },
+        {
+          "name": "King Naythox Thex",
+          "up": true
+        },
+        {
+          "name": "Priests of Marr",
+          "up": false
+        },
+        {
+          "name": "Clerics of Tunare",
+          "up": false
+        },
+        {
+          "name": "Priests of Life",
+          "up": false
+        },
+        {
+          "name": "Primordial Malice",
+          "up": false
+        },
         {
           "name": "Dark Bargainers",
           "up": true

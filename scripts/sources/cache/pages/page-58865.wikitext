@@ -1,0 +1,70 @@
+{{Classic Era}}
+<div style="display: flex;">
+  <div style="flex: 1;">
+    <ul>
+    <li>Summoning Spell: [[Frenzied Spirit]]</li>
+    <li>Pet Type: Wolf Spirit</li>
+    <li>Pet Classes: [[Beastlord]] / [[Warrior]]</li>
+    <li>Pet Level: 36</li>
+    <li>Hit Points: 3246 (+1/tick)</li>
+    <li>Mana: 720 (+72/tick)</li>
+    </ul>
+  </div>
+  <div style="flex: 1;">
+  [[File:wolf_spirit_summon.png|left|x175px]]
+  </div>
+</div>
+<div style="display: flex;">
+  <div style="flex: 1;">
+    <ul>
+    <li>Defensive Stats</li>
+       <ul>
+       <li>Mitigation: 178</li>
+       <li>Evasion: 373</li>
+       </ul>
+    </ul>
+    <ul>
+    <li>Offensive Stats</li>
+       <ul>
+       <li>Offense: 225</li>
+       <li>Accuracy: 274</li>
+       <li>Max Damage: 51</li>
+       <li>Dual Wield: 55%</li>
+       </ul>
+     </ul>
+  </div>
+  <div style="flex: 1;">
+    <ul><li>Strength: 120</li>
+    <li>Stamina: 120</li>
+    <li>Intelligence: 75</li>
+    <li>Wisdom: 75</li>
+    <li>Agility: 120</li>
+    <li>Dexterity: 85</li>
+    <li>Charisma: 100</li></ul>
+  </div>
+</div>
+
+== Abilities ==
+* [[Skill_Bash|Bash]]
+* [[Skill_Block|Block]]
+* [[Skill_Cleave|Cleave]]
+* [[Skill_Dodge|Dodge]]
+* [[Skill_Double Attack|Double Attack]]
+* [[Skill_Parry|Parry]]
+* [[Skill_Riposte|Riposte]]
+* [[Skill_Taunt|Taunt]]
+
+== Spell List ==
+* [[Drowsy|<span class='itemeff'>Drowsy</span>]]
+* [[Inner Fire|<span class='itemeff'>Inner Fire</span>]]
+* [[Ice Spear|<span class='itemeff'>Ice Spear</span>]]
+* [[Sicken|<span class='itemeff'>Sicken</span>]]
+* [[Spirit of Wolf|<span class='itemeff'>Spirit of Wolf</span>]]
+
+== Focus Items ==
+* None
+== Notes ==
+* None
+
+[[Category: Summoned Pet]]
+[[Category: Shaman Pet]]

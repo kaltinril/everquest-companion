@@ -1,0 +1,32 @@
+{{Factionpage|
+
+| description = Yes, this is the "Human" faction... It seems to only apply to a few NPCs in the [[Ocean of Tears]] and [[Oasis of Marr]].
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Ocean of Tears]]
+* [[Oasis of Marr]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Craven Jonsbrow]] <span class='fmz'>(Ocean of Tears - Merchant)</span>
+* [[Donoven Blurr]] <span class='fmz'>(Ocean of Tears - NPC, Non-Quest)</span>
+* [[Dunvan Mercwinn]] <span class='fmz'>(Ocean of Tears - NPC, Non-Quest)</span>
+* [[Hurgo Felcind]] <span class='fmz'>(South Ro - NPC, Non-Quest)</span>
+* [[Mantrek Needlebender]] <span class='fmz'>(South Ro - NPC, Non-Quest)</span>
+* [[Ranzall Netcaster]] <span class='fmz'>(South Ro - NPC, Non-Quest)</span>
+* [[Zachariah Reigh]] <span class='fmz'>(Ocean of Tears - NPC, Non-Quest)</span>
+
+}}

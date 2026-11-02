@@ -1,0 +1,113 @@
+{{Factionpage|
+
+| description = Within an abandoned warehouse in the slums of East Freeport can be found an entrance to the dark underground.  Here, followers of the Prince of Hate gather under the name Dismal Rage.  This unholy alliance is led by six guildmasters.  Venox Tarkog Leads the [[Cleric]]s, Konious Eranon the [[Enchanter]]s, Heneva Jexsped the [[Magician]]s, Opal Darkbriar the [[Necromancer]]s, Pietro Zarn the  [[Shadow Knight]]s, and Nexvok Thirod the [[Wizard]]s.  The Dismal Rage openly oppose the [[Knights of Truth]] in North Freeport, and support the [[Opal Dark Briar]] Faction.  Opal Darkbiar has her hands in many things evil going on in Freeport, and her relationship to the Arcane Scientists as the wizard guildmaster makes people wonder if there are two Opal Darkbiars, which may be her plan.
+
+| zones_raise = 
+
+* [[Freeport|East Freeport]]
+* [[Rathe Mountains]]
+* [[Freeport|North Freeport]]
+* [[Freeport|West Freeport]]
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Freeport|East Freeport]]
+* [[Highpass Keep]]
+* [[Northern Desert of Ro]]
+* [[Southern Desert of Ro]]
+
+| quests_raise = 
+
+* [[Assist the Great Xelha]]
+* [[Groflah Steadirt's Death]]
+* [[Marr Minnows for Palon]]
+* [[Message Intercept]]
+* [[Xelha's Cyclops Eye]]
+
+| quests_lower = 
+
+* [[Corrupt Guards (Paladin Version)]]
+* [[Errand for Wolten]]
+* [[Lydl Mastat]]
+* [[Paladin Message]]
+* [[Piranha Hunting]]
+* [[Zimel's Blades (SoulFire)]]
+
+| mobs_raise = 
+
+* [[a minnow]] <span class='fmz'>(North Freeport - Quest NPC)</span>
+* [[Arem Ulosia]] <span class='fmz'>(West Freeport - NPC, Non-Quest)</span>
+* [[Celsar Vestagon]] <span class='fmz'>(West Freeport - Cleric Guildmaster)</span>
+* [[Eestyana Naestra]] <span class='fmz'>(West Freeport - Cleric Guildmaster)</span>
+* [[Ghonic Erharn]] <span class='fmz'>(West Freeport - Cleric Guildmaster)</span>
+* [[Gygus Remnara]] <span class='fmz'>(West Freeport - Paladin Guildmaster)</span>
+* [[Jemoz Lerkarson]] <span class='fmz'>(West Freeport - Cleric Guildmaster)</span>
+* [[Kalatrina Plossen]] <span class='fmz'>(West Freeport - Paladin Guildmaster)</span>
+* [[Knight of Truth]] <span class='fmz'>(West Freeport)</span>
+* [[Merko Quetalis]] <span class='fmz'>(West Freeport - Paladin Guildmaster)</span>
+* [[Mojax Hikspin]] <span class='fmz'>(Commonlands - Quest NPC)</span>
+* [[Palious Jarten]] <span class='fmz'>(West Freeport - Cleric Guildmaster)</span>
+* [[Sir Ackmin]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Arlin]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Artanis]] <span class='fmz'>(West Freeport)</span>
+* [[Sir Breel]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Costkin]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Drolfis]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Folon]] <span class='fmz'>(West Freeport)</span>
+* [[Sir Fosco]] <span class='fmz'>(West Freeport)</span>
+* [[Sir Glimmon]] <span class='fmz'>(West Freeport)</span>
+* [[Sir Hallis]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Hogo]] <span class='fmz'>(West Freeport)</span>
+* [[Sir Iot]] <span class='fmz'>(West Freeport)</span>
+* [[Sir Lishmin]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Mollin]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Noshon]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Ollin]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Penan]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Phallin]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Rophol]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Shalint]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Willam]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Xantille]] <span class='fmz'>(West Freeport)</span>
+* [[Theron Rolius]] <span class='fmz'>(West Freeport - Paladin Guildmaster)</span>
+* [[Thurion Desius]] <span class='fmz'>(West Freeport - Paladin Guildmaster)</span>
+* [[Valeron Dushire]] <span class='fmz'>(West Freeport - Paladin Guildmaster)</span>
+
+| mobs_lower = 
+
+* [[A_piranha|a piranha]] <span class='fmz'>(North Freeport - Quest NPC)</span>
+* [[Ainla Yurimar]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Brek Stolrus]] <span class='fmz'>(East Freeport - Cleric Guildmaster)</span>
+* [[Brutol Rhaksen]] <span class='fmz'>(East Freeport - Warrior Guildmaster)</span>
+* [[Celanie Xtoria]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Gunex Eklar]] <span class='fmz'>(East Freeport - Shadowknight Guildmaster)</span>
+* [[Heneva Jexsped]] <span class='fmz'>(East Freeport - Magician Guildmaster)</span>
+* [[Hundle Quatvel]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Itzia Vunpe]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Jak Sindin]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Konious Eranon]] <span class='fmz'>(East Freeport - Enchanter Guildmaster)</span>
+* [[Lydl the Great]] <span class='fmz'>(North Ro - Quest NPC)</span>
+* [[Mheno Raveus]] <span class='fmz'>(East Freeport - Necromancer Guildmaster)</span>
+* [[Mika Fugas]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Netuk Phenzon]] <span class='fmz'>(East Freeport - Shadowknight Guildmaster)</span>
+* [[Nexvok Thirod]] <span class='fmz'>(East Freeport - Wizard Guildmaster)</span>
+* [[Opal Darkbriar]] <span class='fmz'>(East Freeport - Cleric Guildmaster)</span>
+* [[Peku Croxe]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Pietro Zarn]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Prasen Rusgor]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Raltur Caliskon]] <span class='fmz'>(East Freeport - Shadowknight Guildmaster)</span>
+* [[Sermio Capret]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Tagus Wunne]] <span class='fmz'>(East Freeport - Merchant)</span>
+* [[Thuzin Kaver]] <span class='fmz'>(East Freeport - Necromancer Guildmaster)</span>
+* [[Venox Tarkog]] <span class='fmz'>(East Freeport - Cleric Guildmaster)</span>
+* [[Vesagar Nekio]] <span class='fmz'>(East Freeport - Cleric Guildmaster)</span>
+* [[Xelha Nevagon]] <span class='fmz'>(East Freeport - Necromancer Guildmaster)</span>
+* [[Zhem Xecia]] <span class='fmz'>(East Freeport - Cleric Guildmaster)</span>
+
+}}
+= Suggested Route =
+*[[Assist the Great Xelha]] Bone Chips or Spiderling Silk (+[[Dismal Rage]], +[[Opal Dark Briar]], -[[Knights of Truth]])
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]

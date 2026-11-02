@@ -1,0 +1,76 @@
+{{Classic Era}}{{Factionpage|
+
+| description =
+
+The followers of Innoruuk's daughter, Lanys T’Vyl, who seek her resurrection. (This faction was added around Aug 2001, just prior to Luclin. However, there are no NPCs on the faction prior to Luclin launch.)
+
+| zones_raise = 
+
+* [[Mistmoore Castle]]
+* [[Crushbone]]
+* [[Freeport|East Freeport]]
+* [[Eastern Plains of Karana]]
+* [[Lesser Faydark]]
+* [[Najena]]
+* [[Neriak|Neriak Commons]]
+* [[Neriak|Neriak Foreign Quarter]]
+* [[Neriak|Neriak Third Gate]]
+* [[Northern Desert of Ro]]
+* [[Ocean of Tears]]
+
+| zones_lower = 
+
+
+| quests_raise = 
+
+* [[Druid Epic Quest]]
+* [[Rogue Redemption]]
+
+| quests_lower = 
+
+* [[Fire Beetle Eyes]]
+* [[Fire Goblin Runner]]
+* [[Halfling Raider Helms]]
+* [[Innoruuk Symbol Quests|Innoruuk Disciple]]
+* [[Innoruuk Symbol Quests|Innoruuk Initiate]]
+* [[Innoruuk Symbol Quests|Innoruuk Regent]]
+* [[Kerran Fire Beetle Eyes]]
+* [[Necromancer Words - X`Ta Tempi]]
+* [[The Visiting Priestess]]
+* [[Thex Mallet Quest]]
+
+| mobs_raise = 
+
+* [[Ambassador DVinn]]  <span class='fmz'>(Crushbone)</span>
+* [[Ambassador Rylan]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Capee]] <span class='fmz'>(Neriak Foreign Quarter - NPC, Non-Quest)</span>
+* [[Dark Elf Reaver]] <span class='fmz'>(East Karana)</span>
+* [[Degarran Kixl]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Divn L`Crit]]  <span class='fmz'>(Neriak Foreign Quarter)</span>
+* [[Dorn B`Dynn]] <span class='fmz'>(North Ro - NPC, Non-Quest)</span>
+* [[Issia H`Rugla]] <span class='fmz'>(Neriak Third Gate - Merchant)</span>
+* [[Jsvan Zexus]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Kizdean Gix]] <span class='fmz'>(Commonlands - Quest NPC)</span>
+* [[Klan K`Jartan]] <span class='fmz'>(Neriak Commons)</span>
+* [[Kszan Punox]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Lisv D`Unnar]] <span class='fmz'>(Neriak Foreign Quarter)</span>
+* [[Lisvan X`Lottl]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Perrir Zexus]] <span class='fmz'>(Neriak Third Gate - Cleric Guildmaster)</span>
+* [[Priestess Llandra]] <span class='fmz'>(Lesser Faydark - Quest NPC)</span>
+* [[Razran F`Lok]] <span class='fmz'>(Neriak Commons)</span>
+* [[Svunsa]] <span class='fmz'>(Neriak Foreign Quarter - NPC, Non-Quest)</span>
+* [[Teir`Dal Elite]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[Teir`Dal Prophet]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[Tzanso S`Tai]] <span class='fmz'>(Neriak Third Gate - Merchant)</span>
+* [[Uglan]] <span class='fmz'>(Neriak Foreign Quarter - Quest NPC)</span>
+* [[X`Ta Tempi]] <span class='fmz'>(Neriak Foreign Quarter - Quest NPC)</span>
+* [[X`Ta Timpi]] <span class='fmz'>(Neriak Foreign Quarter - Quest NPC)</span>
+* [[X`Ta Tompi]] <span class='fmz'>(Neriak Foreign Quarter - Quest NPC)</span>
+
+| mobs_lower = 
+
+
+}}
+
+= Suggested Route =
+*Kill [[Priestess Llandra]] (+[[Primordial Malice]], +[[Priests of Marr]], +[[Priests of Life]], +[[Clerics of Tunare]], -[[Priests of Innoruuk]], -[[King Naythox Thex]])

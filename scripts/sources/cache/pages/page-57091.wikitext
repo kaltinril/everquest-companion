@@ -1,0 +1,7 @@
+[[File:loom.jpg|thumb|right|A loom in Kelethin]]
+A loom is a stationary object with which the player may interact in order to attempt [[Tailoring]] recipes.  They are available in major cities.
+
+(Consider comprehensive list of locations.  Copy p99 wiki code versus create from scratch.)
+
+{{Navbox Tradeskill Containers}}
+[[Category:Tradeskill Containers]]

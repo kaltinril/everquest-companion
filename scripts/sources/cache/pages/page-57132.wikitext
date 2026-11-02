@@ -1,0 +1,7 @@
+[[File:kiln.jpg|right|thumb|A kiln in Kelethin]]
+A '''kiln''' is a stationary object with which the player may interact in order to fire certain [[pottery]] recipes.  They are available in most cities.
+
+(Consider comprehensive list of locations)
+
+{{Navbox Tradeskill Containers}}
+[[Category:Tradeskill Containers]]

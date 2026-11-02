@@ -1,0 +1,104 @@
+{{Factionpage|
+
+| description = The merchants of Ak'Anon.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Ak'Anon]]
+* [[Dagnor's Cauldron]]
+* [[Erudin|Erudin Palace]]
+* [[Highpass Keep]]
+* [[Lesser Faydark]]
+* [[Northern Karana]]
+* [[Solusek's Eye]]
+* [[Steamfont Mountains]]
+* [[Freeport|West Freeport]]
+
+| quests_raise = 
+
+* [[Gearheart_(Quest)]]
+* [[Red V Clockwork]]
+* [[Rusted Black Boxes]]
+* [[Scrap Metal Quest]]
+* [[The Regurgitonic]]
+* [[Tiny Skeletons]]
+* [[Shondo and the Tonic]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a clockwork alchemist]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork armorer]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork banker]] <span class='fmz'>(Ak'Anon - Banker)</span>
+* [[a clockwork barkeep]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork bowyer]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[a clockwork cobbler]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork grocer]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork jeweler]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork merchant]]  (1170, -745, -26) <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork merchant]]  (1265, -775) <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork tailor]] (760, 155) <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork tanner]]  (954, -37, -38) <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork torturer]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[a clockwork weaponsmith]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[Bom Knotwood]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[CWG Model CB]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model CC]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model CX]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model EXG]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model MB]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model MC]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model XB]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model XC]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[Digetha Chogaller]] <span class='fmz'>(Ak'Anon - NPC, Non-Quest)</span>
+* [[Finkel Rardobaen]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[Fodin Frugrin]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[Forpar Fizfla]] <span class='fmz'>(Steamfont Mountains - Quest NPC)</span>
+* [[Freed Fimplefur]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[Gabbie Mardoddle]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[Genda Minyte]] <span class='fmz'>(Steamfont Mountains - NPC, Non-Quest)</span>
+* [[Ghilanbiddle Nylwadil]] <span class='fmz'>(Dagnor's Cauldron - Quest NPC)</span>
+* [[Glen Garginburr]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[Godbin Strumharp]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[Iony Gredlong]] <span class='fmz'>(Ak'Anon - Cleric Guildmaster)</span>
+* [[Kimble Nogflop]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Lobal Postugger]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Lozani]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Marfen Binkdirple]] <span class='fmz'>(Solusek's Eye (Solusek A) - Merchant)</span>
+* [[Nonnie Texaker]] <span class='fmz'>(Ak'Anon - NPC, Non-Quest)</span>
+* [[Oren Furdenbline]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[Phiz Frugrin]] <span class='fmz'>(Steamfont Mountains - NPC, Non-Quest)</span>
+* [[Saben Tucross]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+* [[Sanfyrd Featherhead]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Shondo Billin]] <span class='fmz'>(Erudin Palace - Quest NPC)</span>
+* [[Watchman Halv]] <span class='fmz'>(Steamfont Mountains)</span>
+* [[Tindo Frugrin]] <span class='fmz'>(Steamfont Mountains - Quest NPC)</span>
+* [[Tobon Starpyre]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Torodrane Frompwaddle]] <span class='fmz'>(Steamfont Mountains - Merchant)</span>
+* [[Watchman Dexlin]] <span class='fmz'>(North Karana - Quest NPC)</span>
+* [[Watchman Dreeb]] <span class='fmz'>(Steamfont Mountains)</span>
+* [[Watchman Mylz]] <span class='fmz'>(Steamfont Mountains)</span>
+* [[Watchman Prenn]] <span class='fmz'>(Steamfont Mountains)</span>
+* [[Watchman Prynn]] <span class='fmz'>(Steamfont Mountains)</span>
+* [[Welno Tanboots]] <span class='fmz'>(Ak'Anon - Quest NPC)</span>
+* [[Zenrel Ottonoggin]] <span class='fmz'>(Ak'Anon - Merchant)</span>
+* [[Zigg Flin]]  <span class='fmz'>(West Freeport)</span>
+
+}}
+= Suggested Route =
+*[[Shondo and the Tonic]] (+[[Gem Choppers]], +[[Merchants of Ak'Anon]], +[[King Ak'Anon (Faction)]], -[[Dark Reflection]], -[[Clan Grikbar]]) 
+*[[The Regurgitonic]] (+[[Gem Choppers]], +[[Merchants of Ak'Anon]], +[[King Ak'Anon (Faction)]], -[[Dark Reflection]], -[[Clan Grikbar]]). 
+**See [[The Regurgitonic]] for complete list of sub quests
+
+
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]

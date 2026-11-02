@@ -1,0 +1,212 @@
+This page is designed to be a repository of Steam Deck controller layouts. If you have a layout you would like to add, please follow the example format of the layouts already on this page, and make sure to include a link for users to acces and use your layout!
+
+== StackTrace ==
+
+
+This layout can be found under community layouts, named <code>EverQuest Legends - StackTrace - v1.3</code>. '''Please make sure your game is named "EverQuest Legends" in order to see the layout!'''
+
+
+This layout is designed to mimic the FFXIV Cross Hotbar system. In this system, what the buttons on your Steam Deck do changes whether or not you have the Left Trigger, Right Trigger, or Neither Trigger Held. To better explain how this works, please refer to the image provided below:[[File:StackTrace Steam Deck Controller Layout.jpg|alt=StackTrace Steam Deck Controller Layout|center|thumb|643x643px|StackTrace Steam Deck Controller Layout]]
+
+=== Overview ===
+In the image above, look at the hot bar placement at the bottom of the screen. Notice how there are 3 hotbars, arranged in 4x3 grids. Each of these hotbars corresponds with a different group of inputs on your Steam Deck
+
+* D-Pad Grid (Hotbar 1)
+** Represents the D-Pad on the left side of your Steam Deck Screen
+* Back Button Grid (Hotbar 3)
+** Represents the 4 back buttons on the rear of your Steam Deck
+* Button Grid (Hotbar 2)
+** Represents the 4 face buttons on the right side of your Steam Deck Screen
+
+For each of these Hotbars, the rows of each hotbar are arranged in a very specific way. For each grid, each row of 4 buttons corresponds to a specific order of the buttons in each input group
+
+* D-Pad Grid (Hotbar 1)
+** From Left to Right: '''Left, Down, Right, Up'''
+* Back Button Grid (Hotbar 2)
+** From Left to Right: '''L4, L5, R4, R5'''
+* Button Grid
+** From Left to Right: '''X, A, B, Y'''
+
+For example, for the Back Buttons Grid, for the top row of the grid, the button mappings are as follows:
+
+* L4 - Hail
+* L5 - Consider
+* R4 - Time
+* R5 - Who
+
+=== Cross Hotbar ===
+For those who have not played FFXIV, the cross hotbar allows the buttons on your controller to change into different actions, based on if you are holding the left trigger or right trigger. What this means is that for this layout, most of your actual hotbar actions will be accessed by pressing and holding either the left trigger, or right trigger, and then pressing the corresponding button. The buttons serve other purposes when these two triggers are not held down, which I will go into more detail with later. For now, look at the hotbar grids in the image. Notice the 3 labels with arrows. These represent which row of buttons will be active when a trigger is pressed.
+
+* Left Trigger Pulled
+** The hotbar items in the first row of each grid will be active and will be used when the corresponding button is pressed.
+* Right Trigger Pulled
+** The hotbar items in the second row of each grid will be active and will be used when the corresponding button is pressed.
+* No Trigger Pulled
+** The hotbar items in the third row of each grid will be active and will be used when the corresponding button is pressed.
+** <code>Note that for this mode, the D-Pad and Button Pad DO NOT HAVE ANY bindings. This is intentional, as they serve other purposes when the triggers are not held.</code>
+
+As an example, let's look at the D-Pad button grid:
+
+* Left Trigger Pulled
+** Pressing Left would cast a poison DD (green spell icon)
+** Pressing Down would cast a Cleric DD (red spell icon)
+** Pressing Right would cast Minor Heal (pink spell icon)
+** Pressing Up would cast Courage (shield spell icon)
+* Right Trigger Pulled
+** Pressing Left would cast Origin
+** Pressing Down would activate Sense Heading
+** Pressing Right would make your character Sit
+** Pressing Up would cast Taunt
+* Neither Trigger Pulled
+** Will not do anything - the D-Pad serves a different function when the triggers are not held.
+
+
+The D-Pad and Button pad function when neither trigger is pulled will be outlined in the following section.
+
+=== Controller Layout Tips ===
+To get up to speed as quick as possible with this layout, keep in mind the following tips:
+
+* Most hotbar abilities are activated by holding either left or right trigger. If you want to perform an action, hold one of the triggers and press either the face buttons or D-Pad
+* Without either trigger held, the buttons provide quick-access to commonly used functions
+** D-Pad is generally used for camera control and targetting
+** Face buttons are used for interaction (Hail, consider, etc.)
+** Right shoulder and Left shoulder are always Left and Right mouse clicks, respectively
+** Right trackpad is always the mouse
+*** Tap and hold on the trackpad while in Third Person camera to pan the camera around your character
+*** Quickly Tap the left shoulder button to snap your character to looking the direction the camera is facing
+** Left trackpad is a radial menu to open various UI elements
+*** Bags, Inventory, AAs, Abilities, etc.
+** Clicking the Right thumbstick allows you to pan the camera, similar to the Right trackpad. Click again to exit mouse look mode.
+*** Right thumbstick also acts as mouse movement, if you prefer it over right trackpad
+* The back buttons have 4 buttons available when no trigger is held. Use these for common actions, like macros for forage, sense heading, etc.
+* It can be challenging to press L4/L5 when the left trigger is held, or R4/R5 when the right trigger is held, I usually do the following:
+** Only map L4/L5 when right trigger is held
+** Only map R4/R5 when left trigger is held.
+
+=== Button Mappings Table ===
+This table describes what each button does, including it's function, and the actuall keyboard key and modifier it maps to.
+
+NOTE: When a button says something like <code>Hotbar (1,9) (1)</code> it means Hotbar 1, position 9, bound to "1" on the keyboard.
+
+{| class="wikitable"
+|+
+!Button
+!No Trigger Held
+!Left Trigger Held
+!Right Trigger Held
+|-
+|D-Pad: Left
+|Quick Tap - Cycle Nearby PCs (Shift + F1)
+Long Press - Target Self (F1)
+|Hotbar (1,9) (1)
+|Hotbar (1,5) (Shift + 1)
+|-
+|D-Pad: Down
+|Scrollwheel Down
+Used to zoom in/out and go from 1st to 3rd person view
+|Hotbar (1, 10) (2)
+|Hotbar (1,6) (Shift + 2)
+|-
+|D-Pad: Right
+|Quick Tap - Cycle Nearby NPCs (Tab)
+|Hotbar (1,11) (3)
+|Hotbar (1,7) (Shift + 3)
+|-
+|D-Pad: Up
+|Scrollwheel Up
+Used to zoom in/out and go from 1st to 3rd person view
+|Hotbar (1, 12) (4)
+|Hotbar (1,8) (Shift + 4)
+|-
+|L4
+|Hotbar (3, 1) (Ctrl + 9)
+|Hotbar (3, 9) (9)
+|Hotbar (3,5) (Shift + 9)
+|-
+|L5
+|Hotbar (3, 2) (Ctrl + 0)
+|Hotbar (3, 10) (0)
+|Hotbar (3,6) (Shift + 0)
+|-
+|R4
+|Hotbar (3, 3) (Ctrl + -)
+|Hotbar (3, 11) (-)
+|Hotbar (3,7) (Shift + -)
+|-
+|R5
+|Hotbar (3, 4) (Ctrl + =)
+|Hotbar (3, 12) (=)
+|Hotbar (3,6) (Shift + =)
+|-
+|X
+|Auto Attack (Q)
+|Hotbar (2,9) (5)
+|Hotbar (2, 5) (Shift + 5)
+|-
+|A
+|Consider (C)
+|Hotbar (2, 10) (6)
+|Hotbar (2,6) (Shift + 6)
+|-
+|B
+|Hail (H)
+|Hotbar (2,11) (7)
+|Hotbar (2,7) (Shift + 7)
+|-
+|Y
+|Jump (Spacebar)
+|Hotbar (2, 12) (8)
+|Hotbar (2,8) (Shift + 8)
+|-
+|Select Button
+(Two Squares)
+|Quick tap - Cycle Extended Targets (Ctrl + F1)
+Long Press - Open Bags (B)
+| -
+| -
+|-
+|Start Button
+(3 horizontal lines)
+|Quick tap - Esc
+Long Press - Toggle Auto Run (Shift + X)
+| -
+| -
+|-
+|Left Shoulder Button (L1)
+|Mouse Right Click
+| -
+| -
+|-
+|Right Shoulder Button (R1)
+|Mouse Left Click
+| -
+| -
+|-
+|Left Trackpad
+|Radial Menu
+Quick access to common actions (Map, Inventory, AAs, etc)
+| -
+| -
+|-
+|Left Thumbstick
+|Moving Stick - W / A / S / D Movement
+Click Stick - Toggle Crouch (X)
+| -
+| -
+|-
+|Right Trackpad
+|Acts as Mouse
+Press the pad - Left Mouse Click
+Press and hold the pad to enable mouse look. Release to stop mouse look.
+This allows for things like looking up to get up ladders, or move around underwater.
+| -
+| -
+|-
+|Right Thumbstick
+|Acts as mouse
+Click Stick - Hold Right mouse
+Click the stick to enable mouse look. Click again to disable mouse look.
+This allows for things like looking up to get up ladders, or move around underwater.
+| -
+| -
+|}

@@ -1,0 +1,206 @@
+
+[[File:Unseenhands.png|thumb|200px]]
+{{Factionpage|
+
+| description = 
+Rogue's Guild of [[Qeynos]], a most shadowy affair.
+
+| zones_raise = 
+
+* [[Butcherblock Mountains]]
+* [[Eastern Plains of Karana]]
+* [[Halas]]
+* [[Highpass Hold]]
+* [[Innothule Swamp]]
+* [[Kithicor Forest]]
+* [[Neriak|Neriak Third Gate]]
+* [[Kaladim|North Kaladim]]
+* [[Northern Karana]]
+* [[Qeynos|North Qeynos]]
+* [[Northern Desert of Ro]]
+* [[Qeynos Aqueducts]]
+* [[Qeynos Hills]]
+* [[Qeynos|South Qeynos]]
+* [[Toxxulia Forest]]
+* [[Western Plains of Karana]]
+
+| zones_lower = 
+
+* [[Freeport|East Freeport]]
+* [[Erudin]]
+* [[Halas]]
+* [[Highpass Hold]]
+* [[Misty Thicket]]
+* [[Northern Karana]]
+* [[Qeynos|North Qeynos]]
+* [[Qeynos Aqueducts]]
+* [[Qeynos Hills]]
+* [[Rivervale]]
+* [[Qeynos|South Qeynos]]
+* [[Steamfont Mountains]]
+* [[Surefall Glade]]
+* [[Western Plains of Karana]]
+
+| quests_raise = 
+
+* [[Blackburrow Stout Shipment]]
+* [[Blank Scrolls]]
+* [[Call of Flame Quest]]
+* [[Guard Shilster's Stout]]
+* [[High Guard Battlestaff]]
+* [[Honey Mead for Trumpy]]
+* [[Hurrieta's Tunic Quest]]
+* [[Package from Lomarc]]
+* [[Rogue Errands]]
+* [[The Crate (evil)]]
+* [[The Package]]
+* [[The Tattered Pouch]]
+* [[The Torn Pouch]]
+
+| quests_lower = 
+
+* [[Cheslin's Illusion Cards]]
+* [[Cleanse the Ocean]]
+* [[Corrupt Guards]]
+* [[Faren's Tacklebox]]
+* [[Find Lucie Elron]]
+* [[Fresh Baked Muffins]]
+* [[Gharin's Note (evil)]]
+* [[Gharin's Note (Good)]]
+* [[Goblin Caster Necklace]]
+* [[Head of Granin O'Gill]]
+* [[Indaria's Doll]]
+* [[Kwint's Kwest]]
+* [[Library Book]]
+* [[Moonstones]]
+* [[Nesiff's Statue]]
+* [[Package from Lomarc]]
+* [[Peacekeeper Staff Quest]]
+* [[Quench Lasen's Thirst]]
+* [[Rat Patrol]]
+* [[Reebo's Carrots]]
+* [[Rohand's Brandy]]
+* [[Runnyeye Warbeads (Kaladim Rogue)]]
+* [[Scout Blade]]
+* [[Sneed's Rat Infestation]]
+* [[Tayla Ironforge]]
+* [[The Bread Shipment]]
+* [[The Clothspinner Sisters (good)]]
+* [[The Crate (evil)]]
+* [[The Crate (good)]]
+* [[The Donations]]
+* [[The Gnoll Slayer]]
+* [[The Gnome Take]]
+* [[The Nitrates and the Assassin]]
+* [[The Package]]
+* [[Tribunal Symbol Quests|Tribunal Initiate]]
+* [[Trumpy's Head]]
+* [[Vasty Deep Water]]
+* [[Wenbie's Muffins]]
+* [[Wooly Fungus Quest]]
+
+| mobs_raise = 
+
+* [[A bandit (Eastern Karana)|a bandit]]  <span class='fmz'>(East Karana)</span>
+* [[a raider]]  <span class='fmz'>(North Karana)</span>
+* [[a sewer sentinel]] <span class='fmz'>(Qeynos Catacombs)</span>
+* [[Alysa]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Capt Linarius]] <span class='fmz'>(North Karana)</span>
+* [[Clomen Walker]] <span class='fmz'>(Kithicor Forest - Merchant)</span>
+* [[Corporal Lancot]] <span class='fmz'>(North Qeynos)</span>
+* [[Dalishea]] <span class='fmz'>(Highpass Hold - NPC, Non-Quest)</span>
+* [[Diggins]] <span class='fmz'>(North Kaladim - Quest NPC)</span>
+* [[Eithne Walker]] <span class='fmz'>(Kithicor Forest - Merchant)</span>
+* [[Endric]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[Gharin]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[Ghul Rustem]] <span class='fmz'>(South Qeynos - Merchant)</span>
+* [[Greth Truksorn]] <span class='fmz'>(Highpass Hold - NPC, Non-Quest)</span>
+* [[Guard Beren]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Bixby]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Guard Corshin]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Dunix]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Fredrick]] <span class='fmz'>(North Karana)</span>
+* [[Guard Gehnus]] <span class='fmz'>(North Qeynos)</span>
+* [[Guard Gonin]] <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Guard Hezlan]] <span class='fmz'>(North Qeynos)</span>
+* [[Guard Justyn]] <span class='fmz'>(West Karana)</span>
+* [[Guard Kilson]] <span class='fmz'>(West Karana)</span>
+* [[Guard Kyte]] <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Guard Lasen]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Naret]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Nash]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Guard Philbin]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Guard Pryde]] <span class='fmz'>(West Karana)</span>
+* [[Guard Urius]] <span class='fmz'>(South Qeynos)</span>
+* [[Hadden]]  <span class='fmz'>(Qeynos Hills)</span>
+* [[Innkeep Danin]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Innkeep Rislarn]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Juni Sandfisher]] <span class='fmz'>(North Ro - Merchant)</span>
+* [[Kafia Ratsbone]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Mater]] <span class='fmz'>(North Kaladim - NPC, Non-Quest)</span>
+* [[Meera Lylon]] <span class='fmz'>(South Qeynos - Merchant)</span>
+* [[Myre]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Ollysa Bladefinder]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Poacher Dell]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Poacher Shelli]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Poacher Topi]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Poacher Willa]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Spoolie Gee]] <span class='fmz'>(North Ro - Merchant)</span>
+* [[Tallus Holton]]  <span class='fmz'>(East Karana)</span>
+* [[Tayla Ironforge]] <span class='fmz'>(Neriak Third Gate - Quest NPC)</span>
+* [[Thrackin Griften]] <span class='fmz'>(West Karana - Quest NPC)</span>
+* [[Tira Sandfisher]] <span class='fmz'>(North Ro - Merchant)</span>
+* [[Vin Moltor]] <span class='fmz'>(Qeynos Catacombs - Quest NPC)</span>
+* [[Zepin Winsle]]  <span class='fmz'>(Innothule Swamp)</span>
+
+| mobs_lower = 
+
+* [[A Poacher]]  <span class='fmz'>(Surefall Glade)</span>
+* [[Bouncer Bigboot]] <span class='fmz'>(Rivervale)</span>
+* [[Bouncer Bogglebin]] <span class='fmz'>(Rivervale)</span>
+* [[Crow]] <span class='fmz'>(North Qeynos - Merchant)</span>
+* [[Dyllin Starsine]] <span class='fmz'>(Highpass Hold - Quest NPC)</span>
+* [[Flynn Merrington]] <span class='fmz'>(North Qeynos - Quest NPC)</span>
+* [[Ghil Starn]] <span class='fmz'>(North Qeynos - Merchant)</span>
+* [[Grendin Maze]]  <span class='fmz'>(Erudin)</span>
+* [[Guard Augos]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Beris]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Guard Donlan]] <span class='fmz'>(West Karana)</span>
+* [[Guard Jerith]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard McCluskey]] <span class='fmz'>(West Karana)</span>
+* [[Guard Oleph]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Perin]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Quedal]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Shilster]] <span class='fmz'>(North Karana - Quest NPC)</span>
+* [[Guard Sironan]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Guard Tyrak]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Yalroen]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Hanns Krieghor]] <span class='fmz'>(North Qeynos - Rogue Guildmaster)</span>
+* [[Hebber Druneny]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Jras Solsier]] <span class='fmz'>(Erudin - Quest NPC)</span>
+* [[Knargon Lanenda]] <span class='fmz'>(North Qeynos - Rogue Guildmaster)</span>
+* [[Lendel Deeppockets]] <span class='fmz'>(Rivervale - Rogue Guildmaster)</span>
+* [[Lieutenant Dagarok]]  <span class='fmz'>(North Qeynos)</span>
+* [[Nax Ghruna]] <span class='fmz'>(North Qeynos - NPC, Non-Quest)</span>
+* [[Neab]] <span class='fmz'>(Qeynos Catacombs - NPC, Non-Quest)</span>
+* [[Omorb]] <span class='fmz'>(Qeynos Catacombs - NPC, Non-Quest)</span>
+* [[Pelshia Thuxpire]] <span class='fmz'>(North Qeynos - Merchant)</span>
+* [[Poacher]]  <span class='fmz'>(Surefall Glade)</span>
+* [[Ponila Quickfingers]]  <span class='fmz'>(East Commons - Merchant)</span>
+* [[Raz The Rat Misk]]  <span class='fmz'>(South Qeynos)</span>
+* [[Renux Herkanor]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[Renux Herkanor]] <span class='fmz'>(West Karana - Quest NPC)</span>
+* [[Riggin Vix]]  <span class='fmz'>(Qeynos Catacombs)</span>
+* [[Rueppy Kutpurse]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Thadres Thyme]] <span class='fmz'>(Halas - Quest NPC)</span>
+* [[Toelia Snuckery]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Trumpy Irontoe (NPC)|Trumpy Irontoe]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[Zannsin Resdinet]] <span class='fmz'>(North Qeynos - Rogue Guildmaster)</span>
+
+}}
+= Suggested Route =
+*[[Honey Mead for Trumpy]] (+[[Circle of Unseen Hands]], -[[Merchants of Qeynos]], +[[Corrupt Qeynos Guards]], -[[Guards of Qeynos]], +[[Kane Bayle]])
+*[[Guard Shilster's Stout]] (+[[Corrupt Qeynos Guards]], -[[Guards of Qeynos]], +[[Kane Bayle]], +[[Circle of Unseen Hands]], +[[Bloodsabers]])
+*[[The Crate (evil)]] Part 1: (+[[Merchants of Qeynos]], +[[Antonius Bayle]], +[[Coalition of Tradefolk]], +[[Guards of Qeynos]], -[[Circle Of Unseen Hands]]) Part 2: (+[[Corrupt Qeynos Guards]], +[[Kane Bayle]], +[[Circle of Unseen Hands]], +[[Bloodsabers]], -[[Guards of Qeynos]]) (Net gain of +4)
+
+[[Category:Achievement Faction]]

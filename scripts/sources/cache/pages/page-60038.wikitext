@@ -1,0 +1,89 @@
+
+== Dropped - (All/All) ==
+{| class="eoTable2 sortable"
+|+
+!Item                        || Size Capacity  || WT || Capacity || Weight Reduction  || Where  || Mob  || Merchant Value
+|-
+|  [[Archaeologist Pack]]    || LARGE  || 0.4 || 6 || 25% || Permafrost Keep  || a goblin archaeologist  || 2pp 6gp 0sp 0cp
+|-
+|  [[Bag of Sewn Evil-Eye]]  || LARGE  || 3.0 || 8 || 70% || Lower Guk        || an evil eye  || 9pp 3gp 0sp 0cp
+|-
+|  [[Box of Abu-Kar]]  || GIANT  || 2.0 || 10 || 100% || Various Zones        || Various Mobs || 7pp 5gp 0sp 0cp
+|-
+|  [[Darkwood Trunk]]        || GIANT  || 2.0 || 10 || 100% || Plane of Fear    || Dread, Fright & Terror  || 75pp 0gp 0sp 0cp
+|-
+|  [[Kavruul's Mystic Pouch]] || GIANT  || 0.4  || 10  || 100% || Permafrost Keep || Lady Vox || 0pp 0gp 0sp 0cp
+|-
+|  [[Large Soiled Bag]]      || SMALL  || 1.0  || 10  || 100% || Nagafen's Lair   || guano harvester  || 0pp 0gp 0sp 0cp
+|-
+|  [[Light Burlap Sack]]     || LARGE  || 3.0 || 8 || 65% || Lower Guk        || a ghoul supplier  || 8pp 4gp 0sp 0cp
+|-
+|  [[Lionhide Backpack]]     || LARGE  || 0.4 || 8 || 35% || South Karana     || Groi Gutblade     || 6pp 8gp 0sp 0cp
+|-
+|  [[Memento Box]]           || SMALL  || 2.0 || 6 || 75% || Soulsek's Eye (Soulsek A)  || inferno goblin torturer  || 7pp 5gp 0sp 0cp
+|-
+|  [[Shralok Pack]]          || GIANT  || 0.4 || 8 || 25% || Highpass Hold   || Recfek Shralok  || 2pp 6gp 0sp 0cp
+|-
+|  [[Treasure Hunter's Satchel]]  || GIANT  || 0.4 || 10 || 100% || Negafen's Lair  || Lord Nagafen    || 150pp 0gp 0sp 0cp
+|}
+
+== Purchased - (All/All) ==
+{| class="eoTable2 sortable"
+|+
+!Item                        || Size Capacity  || WT || Capacity || Weight Reduction  || Where  || Mob  || Merchant Value
+|-
+|  [[Backpack]]    || LARGE || 3.0 || 8 || 0%               || Various Zones    || Various Vendors ||0pp 5gp 5sp 0cp
+|-
+|  [[Bag of the Tinkerers]]    || GIANT || 1.0 || 10 || 100%               || Soulsek's Eye (Sol A)    || Marfen Binkdirple (Gnome vendor)    ||5000pp 0gp 0sp 0cp
+|-
+|  [[Belt Pouch]]    || SMALL  || 0.4 || 4  || 0%               || Various Zones    || Various Vendors & Lootable   ||0pp 1gp 5sp 0cp
+|-
+|  [[Large Bag]]    || LARGE  || 1.0 || 6  || 0%               || Various Zones    || Various Vendors & Lootable   ||0pp 3gp 0sp 0cp
+|-
+|  [[Medicine Bag]]    || LARGE  || 0.4 || 8  || 0%               || Various Zones    || Various Tradeskill Vendors    ||0pp 9gp 2sp 3cp
+|-
+|  [[Small Bag]]    || MEDIUM  || 0.5 || 4  || 0%               || Various Zones    || Various Vendors & Lootable ||0pp 1gp 8sp 3cp
+|}
+== Quest - (All/All) ==
+{| class="eoTable2 sortable"
+|+
+!Item                        || Size Capacity  || WT || Capacity || Weight Reduction  || Zone  || Quest  || Merchant Value
+|-
+|  [[Forager Bag]]    || MEDIUM || 1.0 || 10 || 50% || Oggok || The Emissary || 0pp 0gp 0sp 0cp
+|-
+|  [[Travelers Pack]]    || LARGE || 0.4 || 8 || 20% || Rivervale || Nillipuss the Brownie || 10pp 0gp 0sp 0cp
+|-
+|  [[Travelers Pouch]]    || SMALL || 0.4 || 4 || 25% || Rivervale || Nillipuss the Brownie || 7pp 5gp 0sp 0cp
+|}
+
+== Summoned - (All/All) ==
+{| class="eoTable2 sortable"
+|+
+!Item                        || Size Capacity  || WT || Capacity || Weight Reduction  || Class  || Level || Spell  ||  Special Attribute || Merchant Value
+|-
+|  [[Dimensional Hole]]    || GIANT || 0.1 || 6 || 100% || MAG || 30 || Dimensional Hole  || NO Rent ||0pp 0gp 0sp 0cp
+|}
+
+== Tradeskill - (All/All) ==
+{| class="eoTable2 sortable"
+|+
+!Item                        || Size Capacity     ||  WT || Capacity || Weight Reduction || Skill  || Trivial  || Merchant Value
+|-
+|  [[Fleeting Quiver]]    || MEDIUM   || 0.4  || 6  || 60% || Tailoring    || 222    ||98pp 0gp 0sp 0cp
+|-
+|  [[Hand Made Backpack]]    || LARGE   || 3.0  || 10  || 10% || Tailoring    || 88    ||0pp 9gp 0sp 0cp
+|-
+|  [[Quiver]]    || MEDIUM   || 0.4  || 4  || 20% || Tailoring    || 115    || 1pp 5gp 0sp 0cp
+|-
+|  [[Reinforced Medicine Bag]]    || GIANT   || 2.5  ||10  || 10% || Tailoring    || 68    ||0pp 5gp 5sp 0cp
+|-
+|  [[Tailored Large Bag]]    || LARGE      || 0.8  || 6   || 10% || Tailoring    || 41    ||0pp 0gp 0sp 0cp
+|-
+|  [[Tailored Large Belt Pouch]]    || MEDIUM      || 0.6  || 6   || 10% || Tailoring    || 36    ||0pp 1gp 3sp 0cp
+|-
+|  [[Tailored Quiver]]    || MEDIUM       || 0.4  || 6   || 22% || Tailoring    || 115    ||1pp 8gp 0sp 0cp
+|-
+|  [[Tailored Small Bag]]    || MEDIUM       || 0.4  || 4   || 10% || Tailoring    || 31    ||0pp 1gp 3sp 0cp
+|-
+|  [[Tailored Wrist Pouch]]    || TINY       || 0.3  || 4   || 10% || Tailoring    || 26    ||0pp 0gp 7sp 5cp
+|}

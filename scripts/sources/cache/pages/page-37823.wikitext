@@ -1,0 +1,18 @@
+[[File:merchant_listing_example.png|frame|Merchant Listing Example]]
+== Description ==
+
+Shopkeepers, or merchants, are found throughout Norrath, offering their wares for those with sufficient money. '''These NPCs can not be charmed and do not give exp when killed.'''
+
+Charisma and Faction are both critical factors in determining the price a shopkeeper will demand for any given item. Every item has a "best price", which is generally listed on the merchant pages where known. To obtain this price, you will have to meet a combination of minimum charisma and faction. For more information, see the [[Game Mechanics#Vendor Pricing, Charisma, and Faction|Game Mechanics]] section.
+
+For a complete list of merchants currently on the wiki, see [[:Category:Merchants]].
+
+For a complete list of vendor-sold items on the wiki, see [[:Category:Vendor Sold]].
+
+== Infamous Shopkeepers ==
+
+Some of the most famous in all of Norrath, these merchants have long enjoyed a special reputation.
+
+* [[A Shady Swashbuckler]]
+* [[Boomba the Big]]
+* [[Key Master]]

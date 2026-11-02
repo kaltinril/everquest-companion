@@ -1,0 +1,27 @@
+{{Factionpage|
+
+| description = Description needed.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+
+| quests_raise = 
+
+* [[The Velium Focus]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[A Geonid]]
+* [[A Geonid Shaman]]
+* [[Phenocryst]]
+
+}}

@@ -1,0 +1,169 @@
+{{Factionpage|
+
+| description = In North Freeport can be found the Temple of Marr.  This temple is dedicated to the trinity of Marr.  The Queen of Love, [[Erollisi Marr]] is worshiped here, [[The Lightbearer]] has a seperate gathering place in the Hall of Truth, and her other brother diety remains a mystery.  Under the guidance of Tholius Quey, clerics receive their training, and Paladins dedicated to the Queen of Love receive their training from Gygus Remnara.  The Priests of Marr are Allied with their brothers in the [[Knights of Truth]] in fighting off [[The Freeport Militia]].  Talking with the priests will reveal how a crusade into the Ocean of Tears, left Freeport undefended, and allowed the Freeport Militia to come to power under [[Sir Lucan D`Lere]].
+
+| zones_raise = 
+
+* [[Freeport|East Freeport]]
+* [[Lesser Faydark]]
+* [[Najena]]
+* [[Neriak|Neriak Third Gate]]
+* [[Northern Desert of Ro]]
+* [[Freeport|West Freeport]]
+
+| zones_lower = 
+
+* [[Freeport|East Freeport]]
+* [[Rathe Mountains]]
+* [[Freeport|North Freeport]]
+* [[Northern Desert of Ro]]
+* [[Southern Karana]]
+* [[Southern Desert of Ro]]
+* [[Freeport|West Freeport]]
+* [[Western Plains of Karana]]
+
+| quests_raise = 
+
+* [[Corrupt Guards (Cleric version)]]
+* [[Corrupt Guards (Paladin Version)]]
+* [[Errand for Tonmerk]]
+* [[Errand for Wolten]]
+* [[Paladin Message]]
+* [[Piranha Hunting]]
+* [[The Bones of Darak Lightforge]]
+* [[Zimel's Blades (SoulFire)]]
+
+| quests_lower = 
+
+* [[Cutthroat Rings]]
+* [[Deathfist Slashed Belts, Evil Version]]
+* [[Innoruuk Symbol Quests|Innoruuk Disciple]]
+* [[Innoruuk Symbol Quests|Innoruuk Initiate]]
+* [[Innoruuk Symbol Quests|Innoruuk Regent]]
+* [[Marr Minnows for Palon]]
+* [[Orc Picks]]
+* [[Reserve Militia]]
+* [[The Traitor]]
+* [[The Visiting Priestess]]
+
+| mobs_raise = 
+
+* [[Brother Jentry]] <span class='fmz'>(Freeport)</span>
+* [[Captain Hazran]] <span class='fmz'>(Freeport - Warrior Guildmaster)</span>
+* [[Guard Dreikin]] <span class='fmz'>(Freeport)</span>
+* [[Guard Fentallin]] <span class='fmz'>(Freeport)</span>
+* [[Guard Hirazen]] <span class='fmz'>(Freeport)</span>
+* [[Guard Nekropo]] <span class='fmz'>(Freeport)</span>
+* [[Guard Nlool]] <span class='fmz'>(Freeport)</span>
+* [[Guard Popal]] <span class='fmz'>(Freeport)</span>
+* [[Guard Quallith]] <span class='fmz'>(Freeport)</span>
+* [[Guard Topplo]] <span class='fmz'>(Freeport)</span>
+* [[Guard Ullindin]] <span class='fmz'>(Freeport)</span>
+* [[Guard Wytiffin]] <span class='fmz'>(Freeport)</span>
+* [[Guard Xyxax]] <span class='fmz'>(Freeport)</span>
+* [[Guard Yandellen]] <span class='fmz'>(Freeport)</span>
+* [[Guard Zintrin]] <span class='fmz'>(Freeport)</span>
+* [[Guard Bonlo]] <span class='fmz'>(Freeport)</span>
+* [[Guard Corpillius]] <span class='fmz'>(Freeport)</span>
+* [[Guard Dungwatch]] <span class='fmz'>(Freeport)</span>
+* [[Guard Effel]] <span class='fmz'>(Freeport)</span>
+* [[Guard Hrakin]] <span class='fmz'>(Freeport)</span>
+* [[Guard Imillin]] <span class='fmz'>(Freeport)</span>
+* [[Guard Inofus]] <span class='fmz'>(Freeport)</span>
+* [[Guard Jacsen]] <span class='fmz'>(Freeport)</span>
+* [[Guard Jendl]] <span class='fmz'>(Freeport)</span>
+* [[Guard Ledshin]] <span class='fmz'>(Freeport)</span>
+* [[Guard Mizraen]] <span class='fmz'>(Freeport)</span>
+* [[Guard Munden]] <span class='fmz'>(Freeport)</span>
+* [[Guard Cozak]] <span class='fmz'>(West Freeport)</span>
+* [[Guard Brendyl]] <span class='fmz'>(North Ro)</span>
+* [[Guard Colin]] <span class='fmz'>(Commonlands)</span>
+* [[Guard Doolin]] <span class='fmz'>(North Ro)</span>
+* [[Guard Drake]] <span class='fmz'>(Freeport)</span>
+* [[Guard Drazden]] <span class='fmz'>(Freeport)</span>
+* [[Guard Fralldo]] <span class='fmz'>(Freeport)</span>
+* [[Guard Goemin]] <span class='fmz'>(Freeport)</span>
+* [[Guard Gollus]] <span class='fmz'>(Freeport)</span>
+* [[Guard Greedin]] <span class='fmz'>(Freeport)</span>
+* [[Guard Hiron]] <span class='fmz'>(Freeport)</span>
+* [[Guard Jup]] <span class='fmz'>(Freeport)</span>
+* [[Guard Kroon]] <span class='fmz'>(Freeport)</span>
+* [[Guard Lithnon]] <span class='fmz'>(Freeport)</span>
+* [[Guard Ogo]] <span class='fmz'>(East Freeport)</span>
+* [[Guard Orpheen]] <span class='fmz'>(Freeport)</span>
+* [[Guard Reskin]] <span class='fmz'>(Commonlands)</span>
+* [[Guard Tolus]] <span class='fmz'>(Commonlands)</span>
+* [[Guard Valon]] <span class='fmz'>(Commonlands)</span>
+* [[Guard Zeph]] <span class='fmz'>(East Freeport)</span>
+* [[Hollish Tnoops]]  <span class='fmz'>(West Freeport)</span>
+* [[Issia H`Rugla]] <span class='fmz'>(Neriak Third Gate - Merchant)</span>
+* [[Jsvan Zexus]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Olunea Miltin]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Perrir Zexus]] <span class='fmz'>(Neriak Third Gate - Cleric Guildmaster)</span>
+* [[Priestess Llandra]] <span class='fmz'>(Lesser Faydark - Quest NPC)</span>
+* [[Runthar]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Sergeant Slate]] <span class='fmz'>(Commonlands)</span>
+* [[Sir Lucan D`Lere]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Teir`Dal Prophet]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[Tzanso S`Tai]] <span class='fmz'>(Neriak Third Gate - Merchant)</span>
+
+| mobs_lower = 
+
+* [[a minnow]] <span class='fmz'>(North Freeport - Quest NPC)</span>
+* [[Altunic Jartin]] <span class='fmz'>(Commonlands - Merchant)</span>
+* [[Arem Ulosia]] <span class='fmz'>(West Freeport - NPC, Non-Quest)</span>
+* [[Celsar Vestagon]] <span class='fmz'>(West Freeport - Cleric Guildmaster)</span>
+* [[Eestyana Naestra]] <span class='fmz'>(West Freeport - Cleric Guildmaster)</span>
+* [[Ghonic Erharn]] <span class='fmz'>(West Freeport - Cleric Guildmaster)</span>
+* [[Gygus Remnara]] <span class='fmz'>(West Freeport - Paladin Guildmaster)</span>
+* [[Innkeep Harold]] <span class='fmz'>(Commonlands - Merchant)</span>
+* [[Innkeep Marnan]] <span class='fmz'>(South Ro - Merchant)</span>
+* [[Innkeep Valon]] <span class='fmz'>(North Ro - Merchant)</span>
+* [[Jemoz Lerkarson]] <span class='fmz'>(West Freeport - Cleric Guildmaster)</span>
+* [[Jusia Vapious]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Kalatrina Plossen]] <span class='fmz'>(West Freeport - Paladin Guildmaster)</span>
+* [[Knight of Truth]] <span class='fmz'>(West Freeport)</span>
+* [[Maldin the Old]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Markin Ironwhite]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Merko Quetalis]] <span class='fmz'>(West Freeport - Paladin Guildmaster)</span>
+* [[Mojax Hikspin]] <span class='fmz'>(Commonlands - Quest NPC)</span>
+* [[Palious Jarten]] <span class='fmz'>(West Freeport - Cleric Guildmaster)</span>
+* [[Rashinda Elore]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Sentry Alechin]] <span class='fmz'>(South Karana - Quest NPC)</span>
+* [[Sentry Andlin]] <span class='fmz'>(North Freeport)</span>
+* [[Sentry Boris]] <span class='fmz'>(West Freeport)</span>
+* [[Sentry Gallius]] <span class='fmz'>(West Freeport)</span>
+* [[Sentry Janeal]] <span class='fmz'>(West Freeport)</span>
+* [[Sentry Meighan]] <span class='fmz'>(West Freeport)</span>
+* [[Sentry Theo]] <span class='fmz'>(North Freeport)</span>
+* [[Sentry Warren]] <span class='fmz'>(North Freeport)</span>
+* [[Serna Tasknon]] <span class='fmz'>(West Freeport - Cleric Guildmaster)</span>
+* [[Sir Ackmin]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Arlin]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Artanis]] <span class='fmz'>(West Freeport)</span>
+* [[Sir Breel]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Costkin]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Drolfis]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Folon]] <span class='fmz'>(West Freeport)</span>
+* [[Sir Fosco]] <span class='fmz'>(West Freeport)</span>
+* [[Sir Glimmon]] <span class='fmz'>(West Freeport)</span>
+* [[Sir Hallis]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Hogo]] <span class='fmz'>(West Freeport)</span>
+* [[Sir Iot]] <span class='fmz'>(West Freeport)</span>
+* [[Sir Lishmin]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Mollin]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Noshon]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Ollin]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Penan]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Phallin]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Rophol]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Shalint]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Willam]] <span class='fmz'>(North Freeport)</span>
+* [[Sir Xantille]] <span class='fmz'>(West Freeport)</span>
+* [[Theron Rolius]] <span class='fmz'>(West Freeport - Paladin Guildmaster)</span>
+* [[Tholius Quey]] <span class='fmz'>(West Freeport - Cleric Guildmaster)</span>
+* [[Thurion Desius]] <span class='fmz'>(West Freeport - Paladin Guildmaster)</span>
+* [[Valeron Dushire]] <span class='fmz'>(West Freeport - Paladin Guildmaster)</span>
+
+}}
+[[Category:Achievement Faction]]

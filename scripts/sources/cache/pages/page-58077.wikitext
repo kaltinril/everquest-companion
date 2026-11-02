@@ -1,0 +1,20 @@
+Classes: [[Shadow Knight]]
+
+Level requirement: 9
+
+Reuse: 15 seconds
+
+Autoskill: Yes
+
+This ability reaves your current target, dealing physical damage as well as converting 6% (rounded down) of your maximum hit points into amplified magic damage.
+
+Reave can [[Double Attack|Double]] and [[Triple Attack]].
+
+Reave also reduces the [[Harm Touch]] cooldown by 60 seconds every time it lands, including the extra hits from double and triple attack.
+
+Macro command: <code>/doability Reave</code>
+
+Skill Cap: 210 at level 50.
+
+{{Navbox Skills}}
+[[Category: Skills]]

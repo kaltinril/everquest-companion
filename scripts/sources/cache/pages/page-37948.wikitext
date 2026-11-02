@@ -1,0 +1,191 @@
+{{Factionpage|
+
+| description = The Guardians serve as the [[Warrior]] guild and primary guard faction in [[Rivervale]] and [[Misty Thicket]]. They are commanded by [[Sheriff Roglio]], who works closely with [[Mayor Gubbin]] to protect the Vale from [[Clan Runnyeye]] and the [[Pickclaw Goblins]]. They are allied with other halflings, such as the [[Storm Reapers]] and the dwarven [[Storm Guard]] in this effort.
+
+Simultaneously, the halflings also skirmish with dark elves in [[Nektulos Forest]], and are recognized as a threat by the [[Dreadguard Outer]] faction of dark elf guards. Most other dark elves seem unconcerned.
+
+Guards in the Vale are known as deputies, and can be identified by their Zorro-esque masks and puffy shirts. Although this may lead to a misconception that halflings are protected by [[Rogue]]-class guards, they are in fact [[Warrior]]s.
+
+| zones_raise = 
+
+* [[Butcherblock Mountains]]
+* [[Clan Runnyeye]]
+* [[Freeport|East Freeport]]
+* [[Beholder's Maze]]
+* [[Greater Faydark]]
+* [[Highpass Keep]]
+* [[Kithicor Forest]]
+* [[Misty Thicket]]
+* [[Nektulos Forest]]
+* [[Neriak|Neriak Third Gate]]
+* [[Northern Desert of Ro]]
+* [[Southern Desert of Ro]]
+* [[Freeport|West Freeport]]
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Misty Thicket]]
+* [[Najena]]
+* [[Nektulos Forest]]
+* [[Neriak|Neriak Commons]]
+* [[Rivervale]]
+* [[Freeport|West Freeport]]
+
+| quests_raise = 
+
+* [[Bandages for Honeybugger]]
+* [[Bug Collection]]
+* [[Cleric Supplies]]
+* [[Honey Jum Quest]]
+* [[Hungry Deputy]]
+* [[Jillin's Stew]]
+* [[Orc Belts]]
+* [[Runnyeye Warbeads (Rivervale)]]
+* [[The Acolyte]]
+* [[The Fishslayers]]
+* [[Weapons Delivery]]
+
+| quests_lower = 
+
+* [[Child of Innoruuk]]
+* [[Death of Lyda Nasin]]
+* [[Honeybugger Assassin]]
+* [[Innoruuk Symbol Quests|Innoruuk Disciple]]
+* [[Moss Snakes]]
+* [[Wall Squad Ring]]
+
+| mobs_raise = 
+
+* [[a bixie drone]]  <span style="color:gray">(Misty Thicket)</span>
+* [[a crazed goblin]]  <span style="color:gray">(High Keep)</span>
+* [[a goblin]]  <span style="color:gray">(Butcherblock Mountains)</span>
+* [[a goblin lookout]]  <span style="color:gray">(Gorge of King Xorbb (Beholder's Maze))</span>
+* [[a goblin sentry]]  <span style="color:gray">(Gorge of King Xorbb (Beholder's Maze))</span>
+* [[A Goblin Thief]]  <span style="color:gray">(High Keep)</span>
+* [[a goblin trainee]] <span style="color:gray">(Clan RunnyEye)</span>
+* [[a goblin whelp]]  <span style="color:gray">(Butcherblock Mountains)</span>
+* [[a Pickclaw Ambushbaiter]] <span style="color:gray">(Clan RunnyEye)</span>
+* [[a Pickclaw Arroweater]] <span style="color:gray">(Clan RunnyEye)</span>
+* [[a Pickclaw Bladestopper]] <span style="color:gray">(Clan RunnyEye)</span>
+* [[a Pickclaw bonemender]]  <span style="color:gray">(Clan RunnyEye)</span>
+* [[A Pickclaw Cabalist]] <span style="color:gray">(High Keep)</span>
+* [[a Pickclaw Destroyer]]  <span style="color:gray">(Clan RunnyEye)</span>
+* [[a Pickclaw Fleshburner]] <span style="color:gray">(Clan RunnyEye)</span>
+* [[a Pickclaw Foechopper]] <span style="color:gray">(Clan RunnyEye)</span>
+* [[a Pickclaw Foeslicer]]  <span style="color:gray">(Clan RunnyEye)</span>
+* [[a pickclaw guard]]  <span style="color:gray">(High Keep)</span>
+* [[A Pickclaw Lookout]] <span style="color:gray">(High Keep)</span>
+* [[a Pickclaw mindripper]]  <span style="color:gray">(Clan RunnyEye)</span>
+* [[A Pickclaw Raider]] <span style="color:gray">(High Keep)</span>
+* [[a Pickclaw seer]]  <span style="color:gray">(High Keep)</span>
+* [[a Pickclaw Slayspell]]  <span style="color:gray">(Clan RunnyEye)</span>
+* [[A Pickclaw Spiritist]] <span style="color:gray">(High Keep)</span>
+* [[A Pickclaw Visionary]]  <span style="color:gray">(High Keep)</span>
+* [[a pickclaw warrior]]  <span style="color:gray">(High Keep)</span>
+* [[a Pickclaw Zekspeaker]] <span style="color:gray">(Clan RunnyEye)</span>
+* [[an enraged goblin]]  <span style="color:gray">(Butcherblock Mountains)</span>
+* [[an orc legionnaire]]  <span style="color:gray">(Commonlands)</span>
+* [[Deathfist Pawn]]  <span style="color:gray">(West Freeport)</span>
+* [[Giz Dinree]] <span style="color:gray">(East Freeport - Quest NPC)</span>
+* [[Hekzin G`Zule]] <span style="color:gray">(Neriak Third Gate - Quest NPC)</span>
+* [[Lord Shin Ree]] <span style="color:gray">(Commonlands)</span>
+* [[Molon Tplth]] <span style="color:gray">(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Mooto]]  <span style="color:gray">(Misty Thicket)</span>
+* [[Orc Apprentice]]  <span style="color:gray">(Commonlands)</span>
+* [[Orc Centurion (Deathfist)|Orc Centurion]]  <span style="color:gray">(Misty Thicket and Commonlands)</span>
+* [[Orc Legionnaire (Deathfist)|Orc Legionnaire]]  <span style="color:gray">(Commonlands)</span>
+* [[Orc Oracle (Deathfist)|Orc Oracle]]  <span style="color:gray">(Commonlands)</span>
+* [[Orc Pawn (Deathfist)|Orc Pawn]]  <span style="color:gray">(Misty Thicket and Commonlands)</span>
+* [[Pazin Punox]] <span style="color:gray">(Neriak Third Gate - Rogue Guildmaster)</span>
+* [[Sazan K`Jartan]] <span style="color:gray">(Neriak Third Gate - Quest NPC)</span>
+* [[Sludge Dankmire]]  <span style="color:gray">(Clan RunnyEye)</span>
+* [[Vivish Slon]] <span style="color:gray">(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Yaz Tolax]] <span style="color:gray">(Neriak Third Gate - NPC, Non-Quest)</span>
+
+| mobs_lower = 
+
+* [[a greedy beggar]] <span style="color:gray">(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[a leatherfoot spy]]  <span style="color:gray">(Neriak Commons)</span>
+* [[a mangy rat]] <span style="color:gray">(Misty Thicket)</span>
+* [[a shady halfling]] <span style="color:gray">(Rivervale - NPC, Non-Quest)</span>
+* [[an injured halfling]]  <span style="color:gray">(Najena)</span>
+* [[Bim Buskin]] <span style="color:gray">(Misty Thicket - Merchant)</span>
+* [[Bimble Babbinsbort]] <span style="color:gray">(Rivervale - Merchant)</span>
+* [[Bink]] <span style="color:gray">(Nektulos Forest)</span>
+* [[Blinza Toepopal]] <span style="color:gray">(Rivervale - Quest NPC)</span>
+* [[Blixkin Entopop]] <span style="color:gray">(Misty Thicket - Quest NPC)</span>
+* [[Daleen Leafsway]] <span style="color:gray">(Rivervale - Merchant)</span>
+* [[Deputy Alltin]] <span style="color:gray">(Rivervale)</span>
+* [[Deputy Antana]] <span style="color:gray">(Rivervale)</span>
+* [[Deputy Asler]] <span style="color:gray">(Misty Thicket)</span>
+* [[Deputy Banto]] <span style="color:gray">(Rivervale)</span>
+* [[Deputy Budo]] <span style="color:gray">(Misty Thicket)</span>
+* [[Deputy Chopo]] <span style="color:gray">(Rivervale)</span>
+* [[Deputy Dopkin]] <span style="color:gray">(Rivervale)</span>
+* [[Deputy Drebo]] <span style="color:gray">(Misty Thicket)</span>
+* [[Deputy Felp]] <span style="color:gray">(Misty Thicket)</span>
+* [[Deputy Goltin]] <span style="color:gray">(Rivervale)</span>
+* [[Deputy Higley]] <span style="color:gray">(Rivervale)</span>
+* [[Deputy Higrin]] <span style="color:gray">(Rivervale)</span>
+* [[Deputy Hiltop]] <span style="color:gray">(Rivervale)</span>
+* [[Deputy Kapop]] <span style="color:gray">(Rivervale)</span>
+* [[Deputy Keld]] <span style="color:gray">(Misty Thicket)</span>
+* [[Deputy Leeot]] <span style="color:gray">(Rivervale)</span>
+* [[Deputy Looh]] <span style="color:gray">(Misty Thicket)</span>
+* [[Deputy Lowmot]] <span style="color:gray">(Rivervale)</span>
+* [[Deputy Millin]] <span style="color:gray">(Rivervale)</span>
+* [[Deputy Percin]] <span style="color:gray">(Rivervale)</span>
+* [[Deputy Poolt]] <span style="color:gray">(Rivervale)</span>
+* [[Deputy Quillto]] <span style="color:gray">(Rivervale)</span>
+* [[Deputy Raynin]] <span style="color:gray">(Rivervale)</span>
+* [[Deputy Regno]] <span style="color:gray">(Rivervale)</span>
+* [[Deputy Rollin]] <span style="color:gray">(Rivervale)</span>
+* [[Deputy Sertlin]] <span style="color:gray">(Rivervale)</span>
+* [[Deputy Shelmy]] <span style="color:gray">(Rivervale)</span>
+* [[Deputy Tagil]] <span style="color:gray">(Misty Thicket)</span>
+* [[Deputy Tonlo]] <span style="color:gray">(Rivervale)</span>
+* [[Deputy Vastin]] <span style="color:gray">(Misty Thicket)</span>
+* [[Donlo Goobler]] <span style="color:gray">(Rivervale - Quest NPC)</span>
+* [[Ella Foodcrafter]] <span style="color:gray">(Misty Thicket - Quest NPC)</span>
+* [[Ember]] <span style="color:gray">(Misty Thicket)</span>
+* [[Falia Frikniller]] <span style="color:gray">(West Freeport - Merchant)</span>
+* [[Fiddy Bobick]] <span style="color:gray">(Rivervale - Merchant)</span>
+* [[Gollee]]  <span style="color:gray">(Nektulos Forest)</span>
+* [[Hamer]]  <span style="color:gray">(Nektulos Forest)</span>
+* [[Hanga Wiskin]] <span style="color:gray">(Misty Thicket - Merchant)</span>
+* [[Himmel]]  <span style="color:gray">(Nektulos Forest)</span>
+* [[Initiate Pool]]  <span style="color:gray">(Nektulos Forest)</span>
+* [[Initiate Umbra]]  <span style="color:gray">(Nektulos Forest)</span>
+* [[Joogl Honeybugger]] <span style="color:gray">(Misty Thicket - Quest NPC)</span>
+* [[Jossle]]  <span style="color:gray">(Nektulos Forest)</span>
+* [[Kevlin Diggs]] <span style="color:gray">(Rivervale - Merchant)</span>
+* [[Kizzie Mintopp]] <span style="color:gray">(Rivervale - Merchant)</span>
+* [[Klimmer]] <span style="color:gray">(Nektulos Forest)</span>
+* [[Leatherfoot Deputy]]  <span style="color:gray">(Nektulos Forest)</span>
+* [[Lil Honeybugger]] <span style="color:gray">(Misty Thicket - Quest NPC)</span>
+* [[Mangler]] <span style="color:gray">(Rivervale)</span>
+* [[Marshal Anrey]] <span style="color:gray">(Rivervale - NPC, Non-Quest)</span>
+* [[Marshal Ghobber]] <span style="color:gray">(Rivervale - Warrior Guildmaster)</span>
+* [[Marshal Lanena]] <span style="color:gray">(Rivervale - Quest NPC)</span>
+* [[Master Whoopal]]  <span style="color:gray">(Nektulos Forest)</span>
+* [[Meeka Diggs]] <span style="color:gray">(Rivervale - Merchant)</span>
+* [[Quester Dunden]]  <span style="color:gray">(Nektulos Forest)</span>
+* [[Quester Hannin]]  <span style="color:gray">(Nektulos Forest)</span>
+* [[Rantho Goobler]] <span style="color:gray">(Rivervale - Merchant)</span>
+* [[Reebo Leafsway]] <span style="color:gray">(Rivervale - Druid Guildmaster)</span>
+* [[Sheriff Roglio]] <span style="color:gray">(Rivervale - Quest NPC)</span>
+* [[Sonsa Fromp]] <span style="color:gray">(Misty Thicket - Merchant)</span>
+* [[Thekela Meepup]] <span style="color:gray">(Rivervale - Cleric Guildmaster)</span>
+* [[Tipa Lighten]] <span style="color:gray">(Misty Thicket - Merchant)</span>
+* [[Topper Drodo]] <span style="color:gray">(Misty Thicket - Merchant)</span>
+* [[Twippie Diggs]] <span style="color:gray">(Rivervale - Merchant)</span>
+
+}}
+= Suggested Route =
+*[[Jillin's Stew]] (+[[Guardians of the Vale]], +[[Mayor Gubbin]], +[[Storm Reapers]], +[[Mayor Gubbin]], +[[Merchants of Rivervale]], -[[Dreadguard Outer]])
+*[[Bandages for Honeybugger]] (+[[Merchants of Rivervale]], +[[DeepPockets]], +[[Guardians of the Vale]], +[[Mayor Gubbin]], -[[Coalition of Tradefolk Underground]]
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

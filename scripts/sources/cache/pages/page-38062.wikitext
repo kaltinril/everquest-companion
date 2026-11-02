@@ -1,0 +1,26 @@
+{{Velious Era}}
+{{Factionpage|
+
+| description = The shaded dragon in Dragon Necropolis.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Dragon Necropolis]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Jaled Dar`s shade]] <span class='fmz'>(Dragon Necropolis - Quest NPC)</span>
+
+}}

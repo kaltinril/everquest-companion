@@ -1,0 +1,27 @@
+{{Factionpage|
+
+| description = Fungus People in Upper Guk and Innothule.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Innothule Swamp]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a fungus spore]]  <span class='fmz'>(Innothule Swamp)</span>
+* [[fungus man tracker]]  <span class='fmz'>(Innothule Swamp)</span>
+* [[Spore Guardian]]  <span class='fmz'>(Innothule Swamp)</span>
+
+}}

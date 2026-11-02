@@ -1,0 +1,46 @@
+[[Image:npc_burynai_excavator.png|right]]
+{{Factionpage|
+
+| description = The Burynai are a race of badger-like creatures found in [[Kunark]], specifically [[Field of Bone]] and [[Frontier Mountains]] and the dungeons contained therein. They tend to be Warriors and Clerics. In Kurn's Tower, they are Warriors, Shamans, and Shadow Knights.
+
+Players start out at dubious faction standing, and just one kill will turn you threatening without any way to raise your faction. It is for this reason some players choose not to kill the Burynai in Kurn's Tower so that they can more safely traverse its basement.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Field of Bone]]
+* [[Frontier Mountains]]
+* [[Kurn's Tower]]
+* [[Mines of Nurga]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a burynai cenobite]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a burynai cutter]]  <span class='fmz'>(Field of Bone)</span>
+* [[a burynai digmaster]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a burynai miner]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[a burynai rockshaper]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[Burynai burrower]]  <span class='fmz'>(Kurn's Tower)</span>
+* [[Burynai Excavator]] <span class='fmz'>(Field of Bone, Kurn's Tower)</span>
+* [[Burynai Sapper]] <span class='fmz'>(Kurn's Tower)</span>
+* [[burynai squad leader]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[Burynai Treasure Seeker]] <span class='fmz'>(Frontier Mountains)</span>
+* [[Eboneyes]]  <span class='fmz'>(Frontier Mountains)</span>
+* [[thick boned skeleton]] <span class='fmz'>(Kurn's Tower - Undead)</span>
+
+}}
+
+==See Also==
+
+[[Burynai]]

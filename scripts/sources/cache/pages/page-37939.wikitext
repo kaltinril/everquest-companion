@@ -1,0 +1,97 @@
+{{Factionpage|
+
+| description = [[Clurg (NPC)|Clurg the Bartender]], and those who would not be found without his drink. 
+
+This faction includes some NPCs inside Oggok, such as the banker. The bouncers are on the [[Oggok Guards]] faction.
+
+| zones_raise = 
+
+* [[Kaladim|South Kaladim]]
+* [[Steamfont Mountains]]
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Ocean of Tears]]
+* [[Oggok]]
+* [[The Feerrott]]
+* [[Western Plains of Karana]]
+
+| quests_raise = 
+
+* [[Clurg's New Creation]]
+* [[Clurg's Revenge]]
+* [[Crude Stein Quest]]
+* [[Exotic Drinks]]
+* [[Feeding Dooga]]
+* [[Lizard Meat Quest]]
+* [[Lizard Meat No 2]]
+* [[Lizard Tails]]
+* [[Lizard Tails No 2]]
+* [[Noble Hunters]]
+* [[Pickled Frogloks]]
+* [[The Bread Shipment (Feerrott)]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[Dimlore Stormhammer]] <span class='fmz'>(Steamfont Mountains - NPC, Non-Quest)</span>
+* [[King Kazon Stormhammer]]  <span class='fmz'>(South Kaladim)</span>
+
+| mobs_lower = 
+
+* [[Angrog]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Bonlarg]] <span class='fmz'>(Oggok - Shadowknight Guildmaster)</span>
+* [[Boog Mudtoe]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Bouncer Bak]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Druk]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Flerb]] <span class='fmz'>(The Feerrott)</span>
+* [[Bouncer Fug]] <span class='fmz'>(The Feerrott)</span>
+* [[Bouncer Gronk]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Haraan]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Hurd]] <span class='fmz'>(The Feerrott)</span>
+* [[Bouncer Krik]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Mrang]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Praag]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Prud]] <span class='fmz'>(The Feerrott)</span>
+* [[Bouncer Raan]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Scaar]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Skon]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Skuk]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Tazak]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Thrang]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Wrok]] <span class='fmz'>(Oggok)</span>
+* [[Bouncer Xak]] <span class='fmz'>(Oggok)</span>
+* [[Brana]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Brokk Boxtripper]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Chef Dooga]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Chief Goonda]] <span class='fmz'>(West Karana - Shaman Guildmaster)</span>
+* [[Cikoona]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Clurg (NPC)]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Corflunk]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Crilt]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Crunga]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Duuga Tearstopper]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Erung]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Goob Mudtoe]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Grevak]] <span class='fmz'>(Oggok - Shadowknight Guildmaster)</span>
+* [[Grop]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Hrak]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Innkeep Morpa]] <span class='fmz'>(The Feerrott - Merchant)</span>
+* [[Lopuka]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Murga]] <span class='fmz'>(The Feerrott - Merchant)</span>
+* [[Rora Dirtstamp]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Sinsaal]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Snarg Bonesmacker]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Soonog]] <span class='fmz'>(Oggok - Shadowknight Guildmaster)</span>
+* [[Squeea]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Trusk]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Ungral Silverstomp]] <span class='fmz'>(Oggok - Banker)</span>
+* [[Varrok Neckchopper]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Zarg Knightbane]] <span class='fmz'>(Oggok - Merchant)</span>
+
+}}
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

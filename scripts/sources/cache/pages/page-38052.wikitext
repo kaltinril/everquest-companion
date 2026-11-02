@@ -1,0 +1,33 @@
+{{Factionpage|
+
+| description = One of the Griffin factions in Rathe Mtns, opposes [[Zazamoukh (Faction)]].
+
+| zones_raise = 
+
+* [[Rathe Mountains]]
+
+| zones_lower = 
+
+* [[Rathe Mountains]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[Zazamaharet]]  <span class='fmz'>(Mountains of Rathe)</span>
+* [[Zazamenhu]]  <span class='fmz'>(Mountains of Rathe)</span>
+* [[Zazaphenebti]]  <span class='fmz'>(Mountains of Rathe)</span>
+* [[Zazamoukh]]     <span class='fmz'>(Mountains of Rathe)</span>
+
+| mobs_lower = 
+
+* [[Ankhefenmut]]  <span class='fmz'>(Mountains of Rathe)</span>
+* [[Ankhesenaten]]  <span class='fmz'>(Mountains of Rathe)</span>
+* [[Ankhetperure]]  <span class='fmz'>(Mountains of Rathe)</span>
+* [[Ankhnesmerira]]  <span class='fmz'>(Mountains of Rathe)</span>
+
+}}

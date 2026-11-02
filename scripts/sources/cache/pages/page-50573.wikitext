@@ -1,0 +1,45 @@
+{{Classic Era}}
+[[File:NakedHUM.jpg|right]]
+[[File:npc_guard_miles.png|right]]
+__NOTOC__
+ Humans epitomize the norm in Norrath. 
+ - EverQuest manual
+==Description==
+The strength of the Human race lies in its diversity of thought, belief, and profession; though they tend be weaker than many other races. They have no particular specialty with the sword or arcane magic. While that is true, Humans are cunning and possess great ingenuity, which gives them an advantage. The Human mind is sharp enough to adapt to nearly all forms of study and this gives them a great range of options when choosing a profession.
+
+Humans often divide themselves with their own squabbles, but they will always return to their brother's side in times of crisis, or to protect a mutual interest.  Humans are also notable because of their ability to have a moustache, making them objectively superior to all other races (while it is true [[Halfling|Halfings]] can have moustaches, they are short, which is not a desirable leadership trait).  Furthermore, it must be noted Humans are the premier race for [[FashionQuest]], the pinnacle of the EverQuest experience.
+
+Humans generally get along well with most good and neutral races, depending on their beliefs and the path of their profession. Humans are not so friendly toward [[Troll|Trolls]], [[Ogre|Ogres]], and [[Iksar]]. [[Dark Elves]] are tolerated within Freeport, but they tend to be mistrusted, even feared.
+
+The port cities of [[Qeynos]] and [[Freeport]] lie on opposite coasts of [[Antonica]], and are the most common homes for the Humans. These two cities are the center of Human activity, though this race can be found wandering on virtually every continent of [[Norrath]] and beyond.
+
+==Basic Information==
+*<b>[[Faction Alignment|Faction Alignment:]]</b> Neutral
+*<b>Racial(s):</b> None
+*<b>Starting Cities:</b> [[Freeport]], [[Qeynos]]
+*<b>Primary Class Choices:</b> [[Bard]], [[Cleric]], [[Druid]], [[Enchanter]], [[Magician]], [[Monk]], [[Necromancer]], [[Paladin]], [[Ranger]], [[Rogue]], [[Shadow Knight]], [[Warrior]], [[Wizard]]
+
+==Base Stats==
+{| class="eoTable2" style="text-align:left"
+|-
+! STR !! STA !! AGI !! DEX !! WIS !! INT !! CHA
+|-
+|| 75 || 75 || 75 || 75 || 75 || 75 || 75
+|}
+
+== Unlock Conditions (Freeport) ==
+
+* Get maximum faction with [[Coalition of Tradefolk]]
+* Get maximum faction with [[The Freeport Militia|Freeport Militia]]
+* Get maximum faction with [[Knights of Truth]]
+
+== Unlock Conditions (Qeynos) ==
+
+* Get maximum faction with [[Merchants of Qeynos]]
+* Get maximum faction with [[Guards of Qeynos]]
+* Get maximum faction with [[Corrupt Qeynos Guards]]
+
+
+{{Navbox Race}}
+
+[[Category:Character Races]]

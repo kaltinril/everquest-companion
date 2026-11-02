@@ -1,0 +1,112 @@
+{{Factionpage|
+
+| description = The Clerics of Tunare can be found in the [[High Elf]] city of [[Felwithe]].  The Paladins under the guidance of Guildmaster Tynkale can be found out front in a large hall, and around back a small hall is reserved for the Clerics under Guildmaster Yeolarn Bronzeleaf.  The members of this fine guild dedicated to the Mother of All, [[Tunare]], support The Elven [[King Tearis Thex]].  The Paladin Lord Jyleel is in charge of a secret elven order called the Koada'Vie and not all of their tasks would normally be associated with Paladins.
+
+| zones_raise = 
+
+* [[Freeport|East Freeport]]
+* [[Lesser Faydark]]
+* [[Najena]]
+* [[Neriak|Neriak Third Gate]]
+
+| zones_lower = 
+
+* [[Crushbone]]
+* [[Dagnor's Cauldron]]
+* [[Freeport|East Freeport]]
+* [[Eastern Plains of Karana]]
+* [[Greater Faydark]]
+* [[Highpass Keep]]
+* [[Lake Rathetear]]
+* [[Rathe Mountains]]
+* [[Felwithe]]
+* [[Ocean of Tears]]
+* {{VeliousGray|Plane of Growth}}
+* [[Steamfont Mountains]]
+* [[Freeport|West Freeport]]
+
+| quests_raise = 
+
+* [[Bandit Sisters]]
+* [[Bone Chips Felwithe]]
+* [[Bracers of Erollisi Quest]]
+* [[Call of Flame Quest]]
+* [[Hogcaller's Inn| Hogcaller's Inn (White Wine for Lady Shae)]]
+* [[Illegible Scroll Quest]]
+* [[Muffin for Pandos]]
+* [[Orc Hatchets]]
+* [[Orc Runner (Felwithe)]]
+* [[Orc Runner (Kelethin)]]
+* [[Pirate Earrings]]
+* [[Pixie Dust #1]]
+* [[Princess Lenya (Quest)|Princess Lenya]]
+* [[The Frightlings]]
+* [[Trueshot Longbow Quest]]
+* [[Tunare Symbol Quests|Tunare Disciple]]
+* [[Tunare Symbol Quests|Tunare Initiate]]
+* [[Tunare Symbol Quests|Tunare Warden]]
+
+| quests_lower = 
+
+* [[Innoruuk Symbol Quests|Innoruuk Disciple]]
+* [[Innoruuk Symbol Quests|Innoruuk Initiate]]
+* [[Innoruuk Symbol Quests|Innoruuk Regent]]
+* [[The Visiting Priestess]]
+
+| mobs_raise = 
+
+* [[Issia H`Rugla]] <span class='fmz'>(Neriak Third Gate - Merchant)</span>
+* [[Perrir Zexus]] <span class='fmz'>(Neriak Third Gate - Cleric Guildmaster)</span>
+* [[Priestess Llandra]] <span class='fmz'>(Lesser Faydark - Quest NPC)</span>
+* [[Teir`Dal Prophet]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[Tzanso S`Tai]] <span class='fmz'>(Neriak Third Gate - Merchant)</span>
+
+| mobs_lower = 
+
+<div class="grayout">
+* [[a contemplative thifling]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a drunkard]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[a feral amalgam]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a gale wolf]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a phase puma]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a protector of growth]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a rolling plains steed]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a sylvan protector]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a tranquil treant]]  <span class='fmz'>(Plane of Growth)</span>
+</div>
+* [[Abigail]] <span class='fmz'>(Mountains of Rathe - Quest NPC)</span>
+* [[Aleena Lightleaf]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[an elven priest]]  <span class='fmz'>(Crushbone)</span>
+* <span class="grayout"> [[An Entoling Essense Channeller]]  <span class='fmz'>(Plane of Growth)</span> </span>
+* <span class="grayout"> [[an entoling harvester]]  <span class='fmz'>(Plane of Growth)</span> </span>
+* [[Antinime]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Ascania Halvbin]] <span class='fmz'>(Ocean of Tears - NPC, Non-Quest)</span>
+* [[Cerila Windrider]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Cleonae Kalen]] <span class='fmz'>(Ocean of Tears - Merchant)</span>
+* [[Dill Fireshine]] <span class='fmz'>(Greater Faydark - Ranger Guildmaster)</span>
+* [[Elia the Pure]] <span class='fmz'>(Northern Felwithe - Quest NPC)</span>
+* [[Elmion Hendrys]] <span class='fmz'>(Dagnor's Cauldron - NPC, Non-Quest)</span>
+* [[Euboea Delewyn]]  <span class='fmz'>(Ocean of Tears)</span>
+* <span class="grayout"> [[Galiel Spirithoof]]  <span class='fmz'>(Plane of Growth)</span> </span>
+* [[Ganelorn Oast]] <span class='fmz'>(East Karana - Quest NPC)</span>
+* <span class="grayout"> [[Grahl Strongback]]  <span class='fmz'>(Plane of Growth)</span> </span>
+* [[Guard Dykalin]] <span class='fmz'>(Mountains of Rathe)</span>
+* <span class="grayout"> [[Guardian of Takish]] <span class='fmz'>(Plane of Growth - Quest NPC)</span> </span>
+* [[Larisa Gelrith]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Legyn Sarawyn]] <span class='fmz'>(Steamfont Mountains - NPC, Non-Quest)</span>
+* [[Lieutenant Rosaed]] <span class='fmz'>(Northern Felwithe)</span>
+* [[Maesyn Trueshot]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Merchant Tuluvdar]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Nyrien Lyrdarniel]] <span class='fmz'>(Dagnor's Cauldron - NPC, Non-Quest)</span>
+* [[Paeonia Purnn]] <span class='fmz'>(Ocean of Tears - NPC, Non-Quest)</span>
+* [[Ran Sunfire]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Rodrick Marslett]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Sister of Erollisi]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Styria Fearnon]] <span class='fmz'>(Ocean of Tears - Warrior Guildmaster)</span>
+* <span class="grayout">[[Tunare (God)|Tunare]] <span class='fmz'>(Plane of Growth)</span> </span>
+* [[Verth Mistwielder]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Yeolarn Bronzeleaf]] <span class='fmz'>(Northern Felwithe - Cleric Guildmaster)</span>
+
+}}
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

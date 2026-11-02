@@ -1,0 +1,76 @@
+WIP
+
+== Creating a Character ==
+
+In EverQuest Legends a character can be a combination of up to three classes, also known as multi-classing. This allows your character to simultaneously gain the benefits (i.e., attributes, skills, spells, etc.) of all three! You can find the original Multiclassing and Loadouts announcement on the EverQuest Legends YouTube [https://www.youtube.com/watch?v=xr-mTacowLM Insight Series].
+
+=== Primary & Secondary Class ===
+At character creation, you will first choose your [[Character Races|Race]]. The main functional consideration with this choice is that you will only be able to choose from the classes available to that race as your primary class.  One secondary consideration is that the "Evil" races have a somewhat harder time traveling around, as some of the major connection points are in cities generally hostile to Evil races, especially with regard to the boats between continents.  However, given that all of your classes will level up to level 10 simultaneously (more below), everyone will quickly have the option to use Illusions to temporarily change their race.  Thus being an Evil race is not as much of a concern as it was in classic EQ.  Beyond those two factors, the choice is mostly cosmetic.  There are some differences in base stats between the races, but with multi-classing and AAs (both discussed below), these differences are also not as much of a concern as previously.  In most cases, you'll be fine to pick a race based on the class you want to play as your primary class and your favorite appearance.
+
+You then choose your '''Primary''' class from those available to your race, and then ''any'' class, regardless of race, as your '''Secondary'''. Until Level 11, you may change your Primary class and Deity at any time (while in a "city" area) to any of the other classes or deities available to the Race you picked. '''Note''': There are no gameplay differences between Primary and non-Primary (i.e., Secondary and Tertiary) classes. More races can be unlocked through achievements, and primary class unlock tokens can be earned later at end game, the first one being given to you for free upon reaching level 50.
+
+=== Deity & Home City ===
+In addition to choosing your race and Primary and Secondary classes, you will also choose your deity and starting city.  Your deity choice may have some impact on how some NPCs interact with you and there are some rare sets of gear specifically for followers of a certain deity.  However, additional deities can also be unlocked later in gameplay.  If your class allows, choosing Agnostic is always a safe bet.
+
+=== Level 10 (Tertiary Class) ===
+At level 10, you can choose ''any'' class, regardless of race, as your '''Tertiary'''.
+
+=== Level 11 ===
+'''Important''': At level 11, you must commit to a race, deity, and Primary class. This cannot be changed until you've unlocked other races, deities, and Primary classes by completing the respective achievements, or purchasing and using an unlock token from the Marketplace. It is recommended your first Primary class be one you expect to use often with other multi-class combinations until you decide to unlock other Primary classes.
+
+* '''Note:''' You will stop earning experience until you lock your primary class in, but will still be able to play the game.  If you are trying to unlock a specific race in order to lock a chosen race/class combination in, you will be able to progress on the race unlock without locking the class in, but will not progress in level.
+
+== Unlocking Primary Classes ==
+Unlocking Primary classes both enables you to change your existing Primary class, as well as makes them available to choose from for ''any'' race (e.g., unlocking Shaman as a Primary class would allow you to choose it as a Dark Elf, Gnome, etc). You will be able to unlock one additional primary class for free after reaching level 50 for the first time.  Thereafter, each class can be unlocked by completing an Achievement related to that class, which is generally gathering the Plane of Sky Quest items for that class, and thus requires a character capable of doing end-game content.  You can view the Achievements in the Achievements window under "Unbound Potential" and within the Class subsection.  You may also view the requirements for unlocking other Races and Deities in this same window.
+
+[[:Category:Achievements#bard_unlock|Click here to see the class unlock achievements]]
+
+[[Plane of Sky#Plane of Sky Class Quests|Click here to see the Sky Quest items]]
+
+== Unlocking Races ==
+Races can be unlocked by completing their respective achievement in the Races subsection of Untapped Potential achievements.
+
+Each race will have a list of factions that you will need to get maximum faction with to unlock the race. They are usually the town guards, merchants, and one of the class factions. You are automatically granted the achievement if you start as that race and you can use Race Unlock Tokens (not yet implemented) to bypass them.
+
+The achievements work by checking your completion of the faction specific achievements that can be found in EverQuest > Progression in the achievement menu. You gain these achievements by achieving +2000 personal faction with the associated faction.
+
+You do not need all the factions maxed at the same time to unlock the achievement. 
+
+[[:Category:Achievements#barbarian_unlock|Click here to see the race unlock achievements]]
+
+[[User:Alanna/Alanna's Race Unlock Guide|Alanna's Race Unlock Guide]]
+
+== Loadouts ==
+Loadouts are previously saved character templates, or presets, of race and multi-class combinations. Loadouts are accessed from the '''Loadouts''' tab on the Inventory screen. Loadouts may only be changed within certain zones: cities and zones adjacent to cities with a "newbie area".  As noted above, after level 11 your race and primary class cannot be changed until you unlock other options.  Secondary and Tertiary classes may be changed at will.  Loadouts are intended to allow you to save commonly used combinations for rapid swapping when in a zone where your loadout may be changed.
+
+NOTE: If you copy equipment from one loadout to an existing loadout, and you are wondering where some of your items in the latter went, check your '''Storage -> Equipment''' tab on the Inventory screen.
+
+== Leveling Classes ==
+Up to level 10, all 16 classes will level at the same time, regardless of which combination you are actively playing. Beginning at level 10, ''only'' the classes you are actively playing will gain experience, and at they do so at the same rate. If at any time you switch to a different loadout, or edit your current loadout, your character level will be adjusted to the ''lowest'' of the three classes that you chose.  Also in this case, only the lowest class will gain experience.  If two classes are at equal level, but lower than the third, then both lower classes will gain experience.  If all three are the same level, then all three will gain experience.
+
+== Alternate Advancement (AA) ==
+[[Alternate Advancement]] (AA) is an additional form of character progression that is (mostly) independent of your Loadout.  They are accessed via the '''Alternate Advancement''' section of your character screen (default hotkey v).  In general, they are various additional abilities or passive buffs which will be applied to your character when unlocked.  Certain AAs are automatically unlocked for certain classes.  Most will be unlocked by earning AA points to spend on the various AAs you decide would be beneficial to you.  AA points are earned similarly to character levels in that you gain AA experience from killing mobs and questing.  You will earn this experience alongside and simultaneously to your leveling experience.  Once purchased and unlocked, AAs will apply to your character across all loadouts for general AAs.  If an AA has a class requirement, it will only be active if an appropriate class is in your current Loadout.  Disabled AAs are not lost; they will remain dormant and reactivate when an appropriate class is loaded.
+
+AAs are also organized into three broad categories: General, Archetype, and Class.  General AAs are available to everyone in all loadouts.  Archetype AAs apply to certain broad categories of classes, such as meelee dps, tanks, casters, etc.  Naturally, Class AAs are specific to each class.  As noted above, AAs that require a class you do not currently have loaded will be disabled until an appropriate class is active.
+
+Of note, AA experience appears to be earned faster as lower levels than higher levels.  As such if you want to maximize the number of AA points you will eventually earn, then you should attempt to always be leveling one class at a time, i.e. have one class in your loadout be lower than both of the others, as much as possible.  If such min-maxing doesn't appeal to you, then don't worry.  You'll still get plenty of AA points even if you do not strictly follow this recommendation.
+
+== Leveling Zones ==
+
+While there is no one best place to level, many of the [[Updated Zones]] offer a better leveling experience, as well as updated and improved gear.  The [[Recommended Levels and ZEM List]] also provides for a visual guide of zones and levels ranges.
+
+== Frequently Asked Questions ==
+
+'''Q. Do quests matter?'''<br>
+A. While there are many quests in EverQuest Legends, quests are not the primary way to level in the game.  Quests are beneficial for rewards, which can include gear and faction, but more experience is gained by killing monsters of an appropriate level.
+
+'''Q. What is the best class combination?'''<br>
+A. This is a highly subjective question, and there is no one best answer.  All class combinations are viable, and aside from your primary class, can be changed at will.  While not every combination may be able to clear all the content in the game, all are playable, so try different combinations to find one you enjoy.
+
+'''Q. What are Motes, and how do I use them?'''<br>
+A. Motes can be used in-game to upgrade gear and spells.  Check out the [[Mote Guide]] for more detailed information.
+
+'''Q. Where can I buy spells?'''<br>
+A. Spells can be bought from spell vendors for that class in most major cities.  Not every city has vendors for every class.  [[New Sebilis Expedition]] is a popular one as it does have vendors for every class.
+
+[[Category:Guides]]

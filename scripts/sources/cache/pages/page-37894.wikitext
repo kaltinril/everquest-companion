@@ -1,0 +1,30 @@
+{{Factionpage|
+
+| description = Defective clockworks of Ak'Anon.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Ak'Anon]]
+* [[Steamfont Mountains]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Nilits Contraption]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[obsolete model]]  <span class='fmz'>(Ak'Anon)</span>
+* [[rogue cleaner]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[rogue clockwork]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[runaway clockwork]]  <span class='fmz'>(Steamfont Mountains)</span>
+
+}}

@@ -1,0 +1,32 @@
+{{Factionpage|
+
+| description = A faction, oddly named, that only applies to a few dwarves in classic.
+
+| zones_raise = 
+
+* [[Dagnor's Cauldron]]
+* [[Kaladim|North Kaladim]]
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+
+| quests_raise = 
+
+* [[Chalice of Conquest Quest]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[Axa Stormshield]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Darthur Nightseer]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Gundalthur Izuran]] <span class='fmz'>(Dagnor's Cauldron - NPC, Non-Quest)</span>
+* [[Storn Trueblade]] <span class='fmz'>(North Kaladim - Merchant)</span>
+
+| mobs_lower = 
+
+* [[Dru Razbind]] <span class='fmz'>(Butcherblock Mountains - Quest NPC)</span>
+
+}}

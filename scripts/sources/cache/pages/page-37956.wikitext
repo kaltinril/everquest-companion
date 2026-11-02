@@ -1,0 +1,54 @@
+{{Factionpage|
+
+| description = Animals that inhabite Surefall Glade are protected by the druids and rangers living there.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Eastern Plains of Karana]]
+* [[Lesser Faydark]]
+* [[Rathe Mountains]]
+* [[Qeynos Hills]]
+* [[Southern Karana]]
+* [[Qeynos|South Qeynos]]
+* [[Surefall Glade]]
+
+| quests_raise = 
+
+* [[Gharin's Note (Good)]]
+* [[Jagged Pine Crook Staff]]
+* [[Nesiff's Statue]]
+* [[The Nitrates and the Assassin]]
+* [[Unkempt Druids (Quest)]]
+
+| quests_lower = 
+
+* [[Gharin's Note (evil)]]
+* [[The Nitrates and the Assassin]]
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a druid]] <span class='fmz'>(East Karana - NPC, Non-Quest)</span>
+* [[a pixie jongleur]] <span class='fmz'>(Lesser Faydark)</span>
+* [[a treant]]  <span class='fmz'>(South Karana)</span>
+* [[Albain Tinderbrand]] <span class='fmz'>(Mountains of Rathe - NPC, Non-Quest)</span>
+* [[Corun Finisc]] <span class='fmz'>(Surefall Glade - Quest NPC)</span>
+* [[Frenway Marthank]] <span class='fmz'>(Surefall Glade - Quest NPC)</span>
+* [[Gash Flockwalker]] <span class='fmz'>(South Qeynos)</span>
+* [[Grizzleknot]]  <span class='fmz'>(South Karana)</span>
+* [[Larsk Juton]] <span class='fmz'>(Surefall Glade - Ranger Guildmaster)</span>
+* [[Mammoth]]  <span class='fmz'>(Surefall Glade)</span>
+* [[Nola Thistleborn]] <span class='fmz'>(Mountains of Rathe - NPC, Non-Quest)</span>
+* [[Solvedi Aldeberan]] <span class='fmz'>(Mountains of Rathe - Quest NPC)</span>
+* [[TeAnara]] <span class='fmz'>(Surefall Glade - Druid Guildmaster)</span>
+* [[Tholia Fastbond]] <span class='fmz'>(Mountains of Rathe - NPC, Non-Quest)</span>
+* [[Unkempt Preserver]] <span class='fmz'>(Mountains of Rathe)</span>
+* [[Vesteri Nomanoi]] <span class='fmz'>(Surefall Glade - Quest NPC)</span>
+* [[A beggar (Qeynos Catacombs)]] <span class='fmz'>(Qeynos Catacombs)</span>
+
+}}

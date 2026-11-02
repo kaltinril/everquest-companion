@@ -1,0 +1,310 @@
+{{Epics Era}}
+{| class="questTopTable"
+!''' Start Zone: '''
+|[[Lake of Ill Omen]]
+|-
+!''' Quest Giver: '''
+|[[Keras McArik]]
+|-
+!''' Recommended Level: '''
+|46+
+|-
+!''' Classes: '''
+|[[Berserker]]
+|-
+!''' Related Zones: '''
+|Dagnor's Cauldron
+Plane of Fear
+Stonebrunt Mountains
+The Emerald Jungle
+The Field of Bone
+Toxxulia Forest
+Warsliks Woods
+|-
+!''' Related NPCs: '''
+|Berserker's Image
+Disease-Ridden Gorills
+Enraged Imp
+Essence of Rage
+Ferocious Goblin
+Gnashing Kobold
+Impervious Bloodbeast
+Ireblind Imp
+Lingering Axefall
+Lurking Hopeful
+Mardic Crimsonsteel
+Praklion of the Cauldron
+Raving Goblinmaster
+Reeking Skunk
+Treanik Ireblade
+a frantic goblin
+a scareling
+|}
+[[Kerasian Axe of Ire]] - Berserker Epic 1.0 Checklist
+
+Pre-lootable:
+[ ] Decaying Liver
+[ ] Gnashing Kobold Paw
+[ ] Scent Gland
+[ ] Philter of Major Translocation
+[ ] Burning Essence of Rage
+
+[ ] A Great Stride:
+   [ ] Lake of Ill Omen (LoIO): Hail Keras McArik follow dialog receive Throwing Axe of the Spirit and Medal of Blood
+
+[ ] Trial of Blood:
+   [ ] LoIO: Give Lingering Axefall Throwing Axe of the Spirit receive Bore Axes of the Spirit x3, Impervious Bloodbeast will spawn a bit North
+   [ ] Kill Impervious Bloodbeast loot Bloodbeast Tooth
+   [ ] Give Keras McArik Bloodbeast Tooth and Medal of Blood receive McArik-Crafted Bandage x3 and Medal of Mirages
+
+[ ] Trial of the Mirages:
+    [ ] LoIO: Follow dialog with Keras McArik receive Sealed Note for Mardic
+    [ ] Field of Bone: Hail Mardic Crimsonsteel
+    [ ] Give Mardic Crimsonsteel Sealed Note for Mardic and be ported to room with Berserkers Image
+    [ ] Kill Berserkers Image loot Axe of Lost Souls. Say "Return" to return to Mardic Crimsonsteel
+    [ ] Hail Mardic Crimsonsteel receive Image Essence
+    [ ] LoIO: Give Keras McArik Medal of Mirages and Image Essence receive Medal of Strategy
+
+[ ] Trial of Strategy:
+    [ ] LoIO: Follow dialog with Keras McArik receive Note for Treanik
+    [ ] Dagnors Cauldron: Give Treanik Ireblade Note for Treanik follow dialog
+    [ ] Kill Praklion of the Cauldron loot Treaniks Tarnished Axe
+    [ ] Give Treanik Ireblade Treaniks Tarnished Axe receive Bone Trinket
+    [ ] LoIO: Give Keras McArik Bone Trinket and Medal of Strategy receive Medal of Fervid Rage
+
+[ ] Trial of Fervid Rage:
+    [ ] LoIO: Follow dialog with Keras McArik
+    [ ] Plane of Fear: Kill Ireblind Imp loot Burning Essence of Rage (a scareling > Enraged Imp (indifferent until attacked) > Ireblind Imp)
+    [ ] LoIO: Give Keras McArik Burning Essence of Rage and Medal of Fervid Rage receive Medal of Hunting
+
+[ ] Trial of Hunting:
+    [ ] LoIO: Follow dialog with Keras McArik receive McArik Reagent Bag
+    [ ] Emerald Jungle: Kill Disease-Ridden Gorilla loot Decaying Liver
+    [ ] Stonebrunt Mountains: Kill Gnashing Kobold loot Gnashing Kobold Paw
+    [ ] Toxxulia Forest: Kill Reeking Skunk loot Scent Gland
+    [ ] Procure Philter of Major Translocation (Alchemy)
+    [ ] Combine Decaying Liver, Gnashing Kobold Paw, Scent Gland, and Philter in McArik Reagent Bag receive Bag of Image Essence Dust
+    [ ] LoIO: Give Keras McArik Bag of Image Essence Dust and Medal of Hunting receive Medal of Mastery
+
+[ ] Trial of Mastery:
+    [ ] LoIO: Follow dialog with Keras McArik
+    [ ] Warsliks Woods: Hail Lurking Hopeful
+    [ ] Give Lurking Hopeful 1000 platinum to spawn Raving Goblinmaster to the North
+    [ ] Target Raving Goblinmaster and say "I am a berserker and I am ready" to start timed event. 60 seconds per wave
+    [ ] Move North defeat wave 1
+    [ ] Move North defeat wave 2
+    [ ] Move North defeat wave 3
+    [ ] Move North defeat wave 4
+    [ ] Move North hail Raving Goblinmaster to start final fight
+    [ ] Kill Raving Goblinmaster loot Maniac's Garbled Tome
+
+[ ] Kerasian Axe of Ire:
+    [ ] LoIO: Give Keras McArik Maniac's Garbled Tome and Medal of Mastery receive Kerasian Axe of Ire
+
+==Quest Details==
+
+Axe Me No Questions
+
+Keras McArik is located at -110, -3400, +235 in the Lake of Ill Omen.
+
+You say, 'Hail, Keras McArik'
+
+Keras McArik says 'Aye, I see a familiar look in yer eye. Ye are much like me, friend. If ye truly wish to [master the fires] within ye and become a true berserker, ye must learn many lessons.'
+
+You say, 'I wish to master the fires.'
+
+Keras McArik says 'Much as ye are now, I was once saddled with unbridled rage, and now with age and experience, I have learned to master the power that comes with my anger. Once ye have mastered yer abilities, ye will be rewarded with a gift that only a true berserker can control. It is a gift that will harness yer rage and use it to yer advantage. This is why ye must walk the same path I did in me youth. Do ye wish to take this [great stride]?'
+
+You say, 'I wish to take this great stride.'
+
+Keras McArik says 'Ye do understand there is no turning back? I hope so. This is a journey -- and sometimes a long one -- depending on what ye've leared so far. Yer skills and wisdom in battle will be tested. Go talk to an old, fallen friend of mine, Lingering Axefall. We call him that because he reguses to let his spirit rest. He failed his task and remains bound here to lead others into the trial he lost. Be wary, though. He is elusive. The foe he stood against and lost to still wishes to extinguish his spirit. Take this axe and give it to him so he will know that ye are ready for the test and that I sent ye. Also, take this medal with you. It will help me keep track of your progress. Best of luck, friend.'
+
+You receive Throwing Axe of the Spirit and Medal of Blood.
+
+Trial of Blood
+
+Lingering Axefall may be found at +65, +2490, +210. He does not respond to hails. Give him the Throwing Axe of the Spirit.
+
+Lingering Axefall says 'Ah, yes. The signature axe of my good friend, McArik. Here to test your control, hm? I hope you have better luck than I did. As you can see, I didn't fare so well against the enemy I was sent to [defeat]. Here, take these. I fashioned them for you from McArik's throwing axe. You will need them.'
+
+You receive 3 TEMPORARY Bore Axes of the Spirit.
+
+You say, 'What were you sent to defeat?'
+
+Lingering Axefall turns and begins to shiver. 'Argh, it has sensed my presence. It is near! You must protect me and save me from this beast. If you do, you will pass this test. You must yourself take a tooth from its mouth as evidence to show to McArik that you've passed this trial.'
+
+He begins to follow you around as though he were a pet. An Impervious Bloodbeast, a large chokidai-looking mob, spawns near +635, +2455, +260. Your best bet is to stay out of melee range and throw Bore Axes of the Spirit at it. When you've depleted your three axes, hail Lingering Axefall for three more. The Bloodbeast does not aggro or summon. Upon killing the beast:
+
+You gain experience!!
+Impervious Bloodbeast's corpse roars in pain as its fixed gaze on the spirit begins to dim.
+Lingering Axefall says, 'You have indeed proven your worth, my friend. McArik will be very pleased. Now I can rest and set my spirit free. I am all too pleased to have played a part on your glorious path of becoming a true berserker.'
+
+Loot a Bloodbeast Tooth from the corpse and head back to Keras McArik. Give him the tooth and the Medal of Blood.
+
+Keras McArik says 'Aye, ye have done well, ______. However, that was a simple task and I'm sure ye had much help with it. Now ye must go alone. Ye may want to take some bandages with ye and be sure yer skill with them is top-notch. Ye'll likely need 'em. Here, take some o'mine. Ye may find 'em to be most useful. Do ye believe ye're [ready for this challenge]?'
+You gain experience!!
+
+You receive McArik-Crafted Bandage (3 charges of Greater Healing) and a new Medal of Mirages.
+
+Trial of Mirages
+
+You say, 'I am ready for this challenge.'
+
+Keras McArik says 'The challange is for ye, and ye alone. If you have anyone try to assist ye, ye will fail. Do not attempt to cheat yerself of yer own development. Ye must seek out Mardic Crimsonsteel and get his guidance. He will prepare ye to fight a mirage of a berserker that has been created through years of refined magic. I cannot tell ye the source of such magic, but ye must know that I used that mirage as me sparring partner, constantly improving me skills against it and advancing. Perhaps now it's yer turn to face it... alone. Take this sealed note to Mardic. It will give him instructions for yer test.'
+
+You receive A Sealed Note for Mardic. You can find Mardic in the Field of Bone at +2115, +3625, -145.
+
+You say, 'Hail, Mardic Crimsonsteel'
+
+Mardic Crimsonsteel says 'Hail to you, feared one. I see the glint of rage in them eyes of yours there. One day you'll be able to recognize the same in others. I suppose now is the time to talk to you about the mirage around here. Tell you the truth, I wasn't able to beat it myself... that's why I'm out here and not establishing myself as a berserker. I wasn't meant for that path. I'm here to guide folk like yourself and help you gain control of the insane beast that lurks inside you. You must be prepared to fight one like yourself. All ye need are your wits, brawn, and skill, nought else. When you are ready give me the note McArik gave you and I'll send you to the training grounds.'
+
+Give him the note. You get teleported to a sealed room by yourself. You will have a vah shir female called "Berserker's Image" spawn. The image cons dark blue at 46. You have to fight it one-on-one. At certain health percentage intervals, the Image stops fighting to let you heal, bandage, etc.
+
+You have slain Berserker's Image!
+You gain experience!
+Berserker's Image's corpse nods and grins at you as you release its essence and falls. As its hands rest on the ground, one unfurls, revealing an essence vial. A notion enters your mind. It says, 'Speak return and you shall be back.'
+
+Loot Axe of Lost Souls from Berserker Image's corpse.
+
+You say, 'Return.'
+
+You are teleported back to Mardic Crimsonsteel.
+
+You say, 'Hail, Mardic Crimsonsteel'
+
+Mardic Crimsonsteel says 'Hail, ______. Run along and give McArik the items he requested.'
+
+You receive Image Essence. Head back to Keras.
+
+You say, 'Hail, Keras McArik'
+
+Keras McArik says 'Don't just stand there! Ha! Give me the essence and medal if you have them!'
+
+Give him the Image Essence and Medal of Mirages.
+
+Keras McArik says 'Well, I am indeed hopeful and pleased about yer progress, ______. Ye should be proud that you have now attained the Medal of Strategy. Well done, indeed! It seems that ye can best yer equal now. The next test of yer masters of yer abilities is much more difficult, however, and may require ye to ask yer friends for some 'elp... but it must be the right kind of 'elp. This test will determine how well ye [strategize in battle]. Ye must gather trustworthy friends and they must be willing to work under yer command.'
+You gain experience!!
+
+You receive the Medal of Strategy.
+
+Trial of Strategy
+
+You say, 'I will strategize in battle.'
+
+Keras McArik says 'One of the best strategists I've ever met is ready and willing to help any who attempt to prove their skills in battle. Seek out Treanik Ireblade. She won't give ye any advantage, however. This is yer fight to win, not hers, though she'll be itchin' to get her blade bloodied. Take this note and give it to her.'
+
+You receive Note for Treanik. Treanik Ireblade is located in Dagnor's Cauldron at -1585, +210, +180. Hailing her doesn't do much, so give her the note.
+
+Treanik Ireblade says 'Me hopes you can hold your breath, ______. Me make sure to stock up before makin' dat long swim. Pesky goblins all over. Treanik must tell dat dere is much more dan pests here to taunt da likes of us. Dere be a beast down dere dat me not killed yet. Me much younger dan you, but me learn how dat [beast fights] -- it smarter dan da average creature, you know. Don't be fooled.'
+You gain experience!!
+
+You say, 'How what beast fights?'
+
+Treanik Ireblade says 'Da only way to learn is to fight. It called Praklion of the Cauldron or sometin. Me hear it live here very long time, but rarely come out. It feed at weird times. Course, dat when it most mad. McArik found it traveling through deep craggy lands. Dat is how he decided it was good beast to test his ability to beat a baddy dat had some [sense of strategy]. It even took him long time to defeat it.'
+
+You say, 'What sense of strategy?'
+
+Treanik Ireblade says 'It do have sense of stragegy. It a creature dat has got smartz wit da magic too. Da way it mixes its abilities is good stuffs. You gots to try to catch it when it eats. It usually comes out when it dark out. And when you kill it, can you get my axe back? Me lost it to dat beast. Plus me needs proof you killed it so me can give you sumtin to give to McArik.'
+
+You must find and kill Praklion of the Cauldron (location -525, -1400). Loot Treanik's Tarnished Axe and give it to Treanik Ireblade.
+
+Treanik Ireblade says 'My axe! Me so happy! You are big force to be rekoned with, ______. Me wasn't sure... but now, look at you, like spiroc fluffing feathers. McArik be so pleased! Take dis amulet me made. I know not much, but me swore to McArik that anyone who passes dis test would get a trinket from me.'
+You gain experience!!
+
+You receive A Bone Trinket. Go back to Keras.
+
+You say, 'Hail, Keras McArik'
+
+Keras McArik says 'Seems ye need to hand over some goods to me still. How about ye give me the Medal of Strategy and the trinket me friend gave ye?'
+
+Give him the items.
+
+Keras McArik says 'Ye are well on the way, me friend. I knew the moment I saw ye that ye were going to get through this. I'm just not convinced that yer as powerful as even ye may think. So, are ye [ready] for the next trial ye must face?'
+You gain experience!!
+
+You receive the Medal of Fervid Rage.
+
+Trial of Fervid Rage
+
+You say, 'I am ready.'
+
+Keras McArik says 'Eager one, aren't ye? Good to see, but do not underestimate how volatile our rage is. In me youth, it snuck up on me and in a blind rage, I had slain me sparring partner. It was then that I knew I was different and shouldn't keep close friends until I'ad my rage under control. There are some, though, that will [never control the rage].'
+
+You say, 'Never control the rage?'
+
+Keras McArik says 'Well, you see, the fire that drives the rage through us and into our muscles and minds can burn out of control in come creatures. I have encountered several in my travels, aye. They are merciless and blind to the rage, which makes 'em poor at strategy, but deadly in combat. Ye will have to [face one] of 'em so that ye may learn how dangerous ye can truly become if ye do not complete these trials and master the rage. I do 'ope ye appreciate this lesson.'
+
+You say, 'Face one?'
+
+Keras McArik says 'This creature is unlike any you have seen wandering the lands. this beast is fearsome and ethereal. It strikes out with its rage without thought or care. Ye must learn to recognize this type of beast if ye are to learn how to master it and yer own abilities. It will try to disguise itself so ye don't recognize the fury it holds within it -- it has an [enraged essence] within it and I want ye to bring it to me. Remember, ______, do not be fooled and always be aware.'
+
+You say, 'Enraged essence?'
+
+Keras McArik says 'I will give ye no more hints. Ye must seek this creature out alone. Look far and use your mind and brawn to beat it. Yer noggin will give ye an advantage o'er this un.'
+
+The creature he is referring to is Ireblind Imp, found in the Plane of Fear. Kill A Scareling (/cons scowling) until Enraged Imp (/cons indifferent) spawns. Kill Enraged Imp to spawn Ireblind Imp (/cons scowling, has near-zonewide aggro and nasty AE mez). Kill Ireblind Imp and loot Burning Essence of Rage. Head back to Keras and give him the Medal of Fervid Rage and Burning Essence of Rage.
+
+Keras McArik says, 'I am indeed impressed by yer control and ability to best such a horrific beast, my friend. Ye are certainly well on yer way to mastering yer rage and taking advantage of the abilities ye were born with. Here is your Medal of Hunting. Ye are nearly there -- nearly complete with yer trials, but there are a few more things ye [must do] for me.'
+You gain experience!!
+
+Trial of Hunting
+
+You say, 'What must I do?'
+
+Keras McArik says, 'For my mirage to remain part of my trials, I need some very specific reagents. There is a sickly gorilla that carries a rotting organ which I am in need of. Also, I need a paw of a very special and dangerous kobold. Lastly, bring me the poison sac of a dangerous spider. A potion that allows us to create a gate from one place to another is also required. If ye believe ye can do this for me, tell me so, and I will give ye a bag to hold them in. When ye have all of the ingredients, combine them in the bag I've given ye, and bring it back to me. Good luck in your hunt!'
+
+You receive McArik Reagent Satchel.
+
+You say, 'Hail, Keras McArik'
+
+Keras McArik says 'Hello again, ______. If you needed yer memory refreshed, I'll tell ye what I need for ye to move on with your trials. Ye need to gather a decaying liver from a sickly gorilla, the paw of a fierce kobold, and a poison sac from a very rigid spider.'
+
+The first item is Decaying Liver from Disease-Ridden Gorilla in Emerald Jungle. The placeholder is "a tottering ape" that spawns at or near -1525, -90 and wanders from there (note there are several tottering ape spawns in the zone, but only one of them is the PH). It is immune to snare/root/slow and is pure melee.
+
+The second item is Gnashing Kobold Paw from Gnashing Kobold in Stonebrunt Mountains. The placeholder is A Kobold. It appears to be a static spawn at location +1885, +2340. It is immune to snare/root/slow and is pure melee.
+
+The third item is Scent Gland from Reeking Skunk in Toxxulia Forest (not a spider as indicated).
+
+Combine the three items and a Philter of Major Translocation (shaman made) in the bag to craft Bag of Image Essence Dust. Hand this to Keras McArik along with your medal.
+
+Keras McArik says, 'Wonderful. Ye have earned yer Medal of Mastery, but ye are not done yet. There is one final test ye must complete before I can recognize ye as a true berserker. Ye must prove that in the face of great adversity, ye can keep yer wits about ye. This final test, naturally, is the most difficult, but I would not present this [next challenge] to ye if I thought ye could not finish yer journey.'
+You gain experience!!
+
+Trial of Mastery
+
+You say, 'What next challenge?'
+
+Keras McArik says 'For this encounter, ye must be prepared for the unexpected and, in the face of chaos, be able to focus on the task at hand. Yer stamina will also be tested. When I first encountered this wicked trap in me travels, even I had to attempt it a couple of times. However, I do have faith in ye. With my advance warning, ye shouldn't be caught off guard. This challenge will also prove how loyal and skilled yer own friends are. One thing is for certain, ye can't complete this [next test] alone.'
+
+You say, 'What next test?'
+
+Keras McArik says, 'Make your way to the woods in Kunark. Use the hunting skills ye have gained to find a most unusual and war-hungry creature. It has a very unique magic in its battle repertoire that will definitely test yer mettle. Off with ye, then. I do hope I see ye again...I've become quite fond of ye. I recently sent another like ye to do this trial and I haven't heard from him...'
+
+The woods he speaks of are the Warsliks Woods. The berserker recently sent is the Lurking Hopeful, who is a female troll found at +175, +630 just north of where the river splits. She spawns at approximately 11 PM game time and despawns at 7 AM.
+
+You say, 'Hail, Lurking Hopeful'
+
+Lurking Hopeful says 'Ah, me also got one of dose medal tings. Me guess you here for da same reason me is -- to finish da final berserker trial. Me been waiting for someone to come by here. Me need to figure out how to do dis challenge. Me tried once and didn't have a chance. Me ran. Dat goblin is mad. Hey, if you give me 1000 platinum, me save you some time and show you where da crazy goblin is. Me hate to ask for money, but me needs to hire help for dis.'
+
+Give her 1000 platinum pieces.
+
+Lurking Hopeful says 'Good timing. Me can hear him giggling. Go down to da stream's end where it opens into a big river between da cliffs. Crazy goblin is usually in dat area stirring up troubles. Go tell him dat you are a berserker and be ready. He go nuts. Good lucks. Me go find help.'
+
+She despawns. Go north along the river to where it widens into a gorge, and you will see a large goblin standing on the shore. He /cons blue and scowling to level 65, but will not attack.
+
+Raving Goblinmaster shouts, 'Yes, I see you, you wander in the trees. If you cross me, I will bring you to your knees.'
+
+You can hail him but he will not respond other than to turn toward you. This is the time when you should buff your groups and make sure you have some form of levitation on.
+
+You say, 'I am a berserker and I am ready.'
+
+Raving Goblinmaster says 'Why you come here is a mystery to me. If you are brave, chase me as I flee. Watch to the front and behind. To your right and left do not be blind!'
+
+He begins running down the shore. Once he gets to approximately +1500, 0, he will stop and five of "a frantic goblin" will spawn. There are three waves of these goblins, and you have one minute per wave to kill them all. They are highly magic resistant, so bring melee help. Once the first wave is down, move further north along the shore until the next wave spawns: dispatch it. Once you have killed the first three waves, a wave of three larger goblins called "Ferocious Goblin" will spawn. You have one minute to kill all three. All of the goblins up until this point are green and can be assassinated by rogues or killed with headshot by rangers. Once this wave is down, move further along the shore and hug the left-hand wall until you come to the Raving Goblinmaster. When you ready, hail him and he will attack.
+
+Raving Goblinmaster says 'Yes, indeed. This has been a surprise. You are better than most and more wise. However, you are not yet complete. Be prepared to try to knock me off my feet!'
+
+Once he's dead, loot A Maniac's Garbled Tome and return to Keras. Give him the Medal of Mastery and the tome.
+
+Keras McArik bows and holds your hand in his own. 'I am so impressed and proud of ye, ______. This had been a long journey, hasn't it? That said, this will be the most important adventure of yer life, for now you are a true berserker and a master of all of yer skills. As I promised, the completion of these trials would not only bring ye the honor of being recognized as a true berserker, but also a weapon only a true berserker can wield -- one that I fashioned myself. Use this weapon in yer travels and may it serve ye well in battle. Be well, ______ -- ______ the Berserker.'
+You gain experience!!

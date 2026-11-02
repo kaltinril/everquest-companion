@@ -1,0 +1,442 @@
+<!-- Enchanter spells, levels 1-50 as of 2026-08-05 -->
+=== All Spells ===
+* Damage listed @ Rank 0 and L50
+<div style="overflow-x:auto;">
+{| class="wikitable sortable"
+! ID !! Spell !! Lvl !! Mana !! Cast !! Resist !! RA !! Target !! Damage !! Duration !! DPM !! DPS !! Effect
+|-
+| 40 || [[Strengthen]] || 1 || 10 || 2.0s || &mdash; || 0 || Single (Ally) || &mdash; || 27m || &mdash; || &mdash; || Increases your target's strength for 27m.
+|-
+| 41 || [[Weaken]] || 1 || 8 || 1.5s || Magic || 0 || Single || &mdash; || 6m || &mdash; || &mdash; || Weakens your opponent, lowering their strength.
+|-
+| 205 || [[True North]] || 1 || 5 || 2.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Provides a magical sense of direction, changing your heading to point directly North.
+|-
+| 208 || [[Lull]] || 1 || 10 || 1.5s || Magic || 0 || Single || &mdash; || 120s || &mdash; || &mdash; || Lulls the mind of your target, lowering its aggressiveness for 120s. Affects creatures up to level 15.
+|-
+| 285 || [[Pendril's Animation]] || 1 || 12 || 1.5s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Animates a weapon and shield to attack your enemies.  Consumes a tiny dagger when cast.
+|-
+| 286 || [[Shallow Breath]] || 1 || 7 || 1.5s || Magic || 0 || Single || 5 || 12s || 0.71 || 3.3 || Constricts your target's throat, causing between 3 and 5 damage, as well as lowering their strength and agility for 12s.
+|-
+| 287 || [[Minor Illusion]] || 1 || 10 || 3.0s || &mdash; || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be a nearby inanimate object.
+|-
+| 288 || [[Minor Shielding]] || 1 || 10 || 2.5s || &mdash; || 0 || Self || &mdash; || Perm || &mdash; || &mdash; || Surrounds your body in a magical shield, increasing your hit points and armor class.
+|-
+| 289 || [[Taper Enchantment]] || 1 || 5 || 3.0s || &mdash; || 0 || Single || &mdash; || &mdash; || &mdash; || &mdash; || Tears the magic from your target, causing their enchantments to fade.
+|-
+| 331 || [[Reclaim Energy]] || 1 || 5 || 2.5s || &mdash; || 0 || Pet || &mdash; || &mdash; || &mdash; || &mdash; || Reclaims the energy needed to maintain your pet, causing the pet to dissipate and restore 75% of the mana cost spent to summon it.
+|-
+| 292 || [[Mesmerize]] || 2 || 15 || 2.5s || Magic || 0 || Single || &mdash; || 24s || &mdash; || &mdash; || Causes your opponent to fall into an enchanted sleep for up to 24s.  This spell works on creatures up to level 2.
+|-
+| 582 || [[Illusion: Human]] || 2 || 10 || 3.0s || &mdash; || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be a Human.
+|-
+| 676 || [[Tashina]] || 2 || 10 || 1.0s || &mdash; || 0 || Single || &mdash; || 11m || &mdash; || &mdash; || Causes your target's ears to echo with the barking of Tashan, lowering their magic resistance.
+|-
+| 681 || [[Juli's Animation]] || 2 || 24 || 2.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Animates a weapon and shield to attack your enemies.  Consumes a tiny dagger when cast.
+|-
+| 229 || [[Fear]] || 3 || 40 || 3.5s || Magic || 0 || Single || &mdash; || 18s || &mdash; || &mdash; || A booming voice fills your target's ears, causing them to flee in terror.
+|-
+| 290 || [[Color Flux]] || 3 || 20 || 1.0s || Magic || 0 || PB AE || &mdash; || &mdash; || &mdash; || &mdash; || Creates a wave of intense color around you that assaults your opponent's senses, briefly stunning up to 8 nearby targets up to level 55 for 4000 seconds.
+|-
+| 293 || [[Haze]] || 3 || 25 || 2.0s || &mdash; || 0 || Single (Ally) || &mdash; || 27m || &mdash; || &mdash; || Causes your target's image to blur, making it harder for your opponents to hit you by increasing your armor class.
+|-
+| 583 || [[Illusion: Half-Elf]] || 3 || 10 || 3.0s || &mdash; || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be a Half-Elf.
+|-
+| 36 || [[Gate]] || 4 || 70 || 5.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Opens a magical portal that returns you to your bind point.
+|-
+| 42 || [[Invisibility]] || 4 || 30 || 5.0s || &mdash; || 0 || Single (Ally) || &mdash; || 20m || &mdash; || &mdash; || Cloaks your target in a mystic veil, making them invisible to many creatures.
+|-
+| 291 || [[Enfeeblement]] || 4 || 20 || 1.8s || Magic || 0 || Single || &mdash; || 6m || &mdash; || &mdash; || Weakens your opponent, lowering their strength and armor class.
+|-
+| 294 || [[Suffocating Sphere]] || 4 || 38 || 2.5s || Magic || 0 || Single || 13 + 10/tk || 42s || 2.18 || 2 || Constricts your target's throat, causing between 13 and 13 damage initially and 6 damage every six seconds for 42s, as well as lowering their strength and agility.
+|-
+| 297 || [[Eye of Confusion]] || 5 || 25 || 3.0s || Magic || 0 || Single || &mdash; || 12s || &mdash; || &mdash; || Darkens your target's sight, often causing them to run about blindly.
+|-
+| 299 || [[Sentinel]] || 5 || 25 || 2.5s || &mdash; || 0 || Free Target || &mdash; || &mdash; || &mdash; || &mdash; || Creates a watchful ward at a location you choose, which will alert you to movement in the area every 2 seconds for up to 360 seconds.
+|-
+| 588 || [[Illusion: Wood Elf]] || 5 || 10 || 3.0s || &mdash; || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be a Wood Elf.
+|-
+| 80 || [[See Invisible]] || 6 || 25 || 2.0s || &mdash; || 0 || Single (Ally) || &mdash; || 27m || &mdash; || &mdash; || Places a magical enchantment upon your target's eyes, allowing them to see otherwise invisible creatures for 27m.
+|-
+| 230 || [[Root]] || 6 || 30 || 2.0s || Magic || 0 || Single || &mdash; || 30s || &mdash; || &mdash; || Causes the earth to adhere to your target's feet, preventing them from moving.
+|-
+| 246 || [[Lesser Shielding]] || 6 || 25 || 4.0s || &mdash; || 0 || Self || &mdash; || Perm || &mdash; || &mdash; || Surrounds your body in a magical shield, increasing your hit points, armor class, and magic resistance.
+|-
+| 501 || [[Soothe]] || 6 || 30 || 2.0s || Magic || 0 || Single || &mdash; || 150s || &mdash; || &mdash; || Soothes the mind of your target, lowering its aggressiveness for 150s. Affects creatures up to level 10.
+|-
+| 48 || [[Cancel Magic]] || 7 || 30 || 3.5s || &mdash; || 0 || Single || &mdash; || &mdash; || &mdash; || &mdash; || Cancels magical enchantments affecting your target.
+|-
+| 295 || [[Mircyl's Animation]] || 7 || 45 || 3.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Animates a weapon and shield to attack your enemies.  Consumes a tiny dagger when cast.
+|-
+| 296 || [[Chaotic Feedback]] || 7 || 16 || 2.0s || Magic || 0 || Single || 32 || &mdash; || 2.00 || 16 || Strikes your target with a chaotic burst of mental energy, causing between 25 and 32 damage and stunning targets below 55 for 1000 seconds.
+|-
+| 667 || [[Enchant Silver]] || 7 || 60 || 6.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants a bar of silver with magical energy.  Consumes a bar of silver when cast.
+|-
+| 1359 || [[Enchant Clay]] || 7 || 60 || 6.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants a large block of clay with magical energy. Consumes a large block of clay when cast.
+|-
+| 3991 || [[Mass Enchant Silver]] || 7 || 180 || 10.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants five bars of silver with magical energy.  Consumes five bars of silver when cast.
+|-
+| 298 || [[Alliance]] || 8 || 35 || 3.5s || Magic || 0 || Single || &mdash; || &mdash; || &mdash; || &mdash; || Cloaks you in an amiable aura, causing creatures of your target's faction to view you more favorably.
+|-
+| 500 || [[Bind Sight]] || 8 || 15 || 4.0s || &mdash; || 0 || Single || &mdash; || 11m || &mdash; || &mdash; || Covers your face in magical strands,  allowing you to see through your target's eyes.
+|-
+| 595 || [[Illusion: Gnome]] || 8 || 10 || 3.0s || &mdash; || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be a Gnome.
+|-
+| 3986 || [[Mass Enchant Clay]] || 8 || 180 || 10.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants five large blocks of clay with magical energy. Consumes five large blocks of clay when cast.
+|-
+| 302 || [[Languid Pace]] || 9 || 50 || 2.2s || Magic || 0 || Single || &mdash; || 150s || &mdash; || &mdash; || Constricts your target's muscles, causing their attack speed to slow for 150s.
+|-
+| 303 || [[Whirl Till You Hurl]] || 9 || 55 || 2.5s || Magic || 0 || Single || &mdash; || &mdash; || &mdash; || &mdash; || Spins a targeted creature up to level 55 in a circle, preventing them from taking any action for 7500 seconds.
+|-
+| 645 || [[Ebbing Strength]] || 9 || 35 || 2.0s || Magic || 0 || Single || &mdash; || 6m || &mdash; || &mdash; || Weakens your opponent, lowering their strength.
+|-
+| 682 || [[Kilan's Animation]] || 9 || 65 || 4.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Animates a weapon and shield to attack your enemies.  Consumes a tiny dagger when cast.
+|-
+| 276 || [[Serpent Sight]] || 10 || 30 || 5.0s || &mdash; || 0 || Single (Ally) || &mdash; || 27m || &mdash; || &mdash; || Fills your target's eyes with the sight of the serpent, granting them improved night vision.
+|-
+| 301 || [[Memory Blur]] || 10 || 40 || 2.5s || Magic || 0 || Single || &mdash; || &mdash; || &mdash; || &mdash; || Attacks your target's mind, providing a chance to forget those that have done them harm.
+|-
+| 590 || [[Illusion: Dark Elf]] || 10 || 30 || 3.0s || &mdash; || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be a Dark Elf.
+|-
+| 650 || [[Mist]] || 10 || 30 || 3.0s || &mdash; || 0 || Single (Ally) || &mdash; || 27m || &mdash; || &mdash; || Causes your target's image to blur, making it harder for your opponents to hit you by increasing your armor class.
+|-
+| 300 || [[Charm]] || 11 || 60 || 2.4s || Magic || 0 || Single || &mdash; || 16m || &mdash; || &mdash; || Dominates your target's mind, allowing you to control them for a short time. This spell works on creatures up to level 1.
+|-
+| 390 || [[Thicken Mana]] || 11 || 100 || 6.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Thickens mana into a physical form.  Consumes a poison vial and a pearl when cast.
+|-
+| 521 || [[Choke]] || 11 || 73 || 3.0s || Magic || 0 || Single || 35 + 22/tk || 48s || 2.89 || 4.4 || Constricts your target's throat, causing between 27 and 35 damage initially and between 14 and 22 damage every six seconds for 48s, as well as lowering their strength and agility.
+|-
+| 589 || [[Illusion: High Elf]] || 11 || 30 || 3.0s || &mdash; || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be a High Elf.
+|-
+| 2561 || [[Intellectual Advancement]] || 11 || 35 || 4.0s || &mdash; || 0 || Single (Ally) || &mdash; || 27m || &mdash; || &mdash; || Focuses your target's mental faculties, reducing their fizzle rate.
+|-
+| 4010 || [[Mass Thicken Mana]] || 11 || 300 || 10.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Thickens mana into a physical form, creating five vials of viscous mana.  Consumes five poison vials and five pearls when cast.
+|-
+| 7988 || [[Greater Mass Enchant Silver]] || 11 || 720 || 20.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants twenty bars of silver with magical energy.  Consumes twenty bars of silver when cast.
+|-
+| 35 || [[Bind Affinity]] || 12 || 100 || 6.0s || &mdash; || 0 || Single || &mdash; || &mdash; || &mdash; || &mdash; || Binds the soul of your target to their current location.   Use of this spell is often limited to towns and cities.
+|-
+| 86 || [[Enduring Breath]] || 12 || 35 || 4.0s || &mdash; || 0 || Single (Ally) || &mdash; || 27m || &mdash; || &mdash; || Magically fills your lungs with air, removing your need to breathe for 27m.  Consumes a handful of fish scales to cast.
+|-
+| 587 || [[Illusion: Erudite]] || 12 || 30 || 3.0s || &mdash; || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be an Erudite.
+|-
+| 594 || [[Illusion: Halfling]] || 12 || 30 || 3.0s || &mdash; || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be a Halfling.
+|-
+| 53115 || [[Greater Mass Enchant Clay]] || 12 || 720 || 10.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants twenty large blocks of clay with magical energy. Consumes twenty large blocks of clay when cast.
+|-
+| 187 || [[Enthrall]] || 13 || 45 || 2.5s || Magic || 0 || Single || &mdash; || 48s || &mdash; || &mdash; || Causes your opponent to fall into an enchanted sleep for up to 48s.  This spell works on creatures up to level 2.
+|-
+| 481 || [[Rune I]] || 13 || 41 || 3.5s || &mdash; || 0 || Single (Ally) || &mdash; || 36m || &mdash; || &mdash; || Covers your target in a shimmer of runes that absorb damage.  Consumes a cat's eye agate when cast.
+|-
+| 591 || [[Illusion: Dwarf]] || 13 || 30 || 3.0s || &mdash; || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be a Dwarf.
+|-
+| 235 || [[Invisibility Versus Undead]] || 14 || 40 || 4.0s || &mdash; || 0 || Single (Ally) || &mdash; || 27m || &mdash; || &mdash; || Cloaks your target in a light aura, rendering them invisible to most undead creatures for up to 27m.
+|-
+| 668 || [[Enchant Electrum]] || 14 || 75 || 6.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants a bar of electrum with magical energy.  Consumes a bar of electrum when cast.
+|-
+| 683 || [[Shalee's Animation]] || 14 || 85 || 5.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Animates a weapon and shield to attack your enemies.  Consumes a tiny dagger when cast.
+|-
+| 697 || [[Breeze]] || 14 || 35 || 2.5s || &mdash; || 0 || Single (Ally) || &mdash; || 27m || &mdash; || &mdash; || Calms your target's thoughts, allowing them to regenerate mana more quickly.
+|-
+| 3987 || [[Mass Enchant Electrum]] || 14 || 225 || 10.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants five bars of electrum with magical energy.  Consumes five bars of electrum when cast.
+|-
+| 39 || [[Quickness]] || 15 || 80 || 3.1s || &mdash; || 0 || Single (Ally) || &mdash; || 11m || &mdash; || &mdash; || Grants your target quickened movement, increasing their attack speed for 11m.
+|-
+| 261 || [[Levitate]] || 15 || 30 || 3.0s || &mdash; || 0 || Single (Ally) || &mdash; || 16m || &mdash; || &mdash; || Forms a cloud of dense air around your feet, allowing you to float slightly off the ground for up to 16m. Consumes a bat wing when cast.
+|-
+| 586 || [[Illusion: Barbarian]] || 15 || 30 || 3.0s || &mdash; || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be a Barbarian.
+|-
+| 601 || [[Illusion: Tree]] || 15 || 30 || 3.0s || &mdash; || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be a tree. This spell can only be cast outdoors.
+|-
+| 281 || [[Disempower]] || 16 || 45 || 2.2s || Magic || 0 || Single || &mdash; || 120s || &mdash; || &mdash; || Strips the willpower from your target, decreasing their strength, stamina, and armor class for 120s.
+|-
+| 304 || [[Chase the Moon]] || 16 || 70 || 3.5s || Magic || 0 || Single || &mdash; || 24s || &mdash; || &mdash; || Fills your enemies' mind with confusion, causing them to flee.
+|-
+| 306 || [[Sanity Warp]] || 16 || 38 || 2.5s || Magic || 0 || Single || 87 || &mdash; || 2.29 || 35 || Strikes your target with a chaotic burst of mental energy, causing between 65 and 87 damage and stunning targets up to level 55 for 1000 second.
+|-
+| 307 || [[Mesmerization]] || 16 || 60 || 3.0s || Magic || 0 || Targeted AE || &mdash; || 24s || &mdash; || &mdash; || Cause up to 30 enemies in a small area around your target to fall into an enchanted sleep for up to 24s.  This spell works on creatures up to level 2.
+|-
+| 309 || [[Shielding]] || 16 || 50 || 5.0s || &mdash; || 0 || Self || &mdash; || Perm || &mdash; || &mdash; || Surrounds your body in a magical shield, increasing your hit points, armor class, and magic resistance.
+|-
+| 7674 || [[Focus Primitive Spellcaster's Empowering Essence]] || 16 || 50 || 6.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Focuses the casters mana into a form that can be physically handled.
+|-
+| 228 || [[Endure Magic]] || 17 || 40 || 2.5s || &mdash; || 0 || Single (Ally) || &mdash; || 27m || &mdash; || &mdash; || Surrounds your target with an aura of protection, warding away magic for 27m.
+|-
+| 593 || [[Illusion: Ogre]] || 17 || 50 || 3.0s || &mdash; || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be an Ogre.
+|-
+| 651 || [[Cloud]] || 17 || 40 || 4.0s || &mdash; || 0 || Single (Ally) || &mdash; || 36m || &mdash; || &mdash; || Causes your target's image to blur, making it harder for your opponents to hit you by increasing your armor class.
+|-
+| 684 || [[Sisna's Animation]] || 17 || 105 || 6.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Animates a weapon and shield to attack your enemies.  Consumes a tiny dagger when cast.
+|-
+| 2562 || [[Intellectual Superiority]] || 17 || 70 || 4.0s || &mdash; || 0 || Single (Ally) || &mdash; || 27m || &mdash; || &mdash; || Focuses your target's mental faculties, reducing their fizzle rate.
+|-
+| 53134 || [[Greater Mass Thicken Mana]] || 17 || 1200 || 10.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Thickens mana into a physical form, creating twenty vials of viscous mana.  Consumes twenty poison vials and twenty pearls when cast.
+|-
+| 47 || [[Calm]] || 18 || 50 || 2.5s || Magic || 0 || Single || &mdash; || 42s || &mdash; || &mdash; || Calms the mind of your target, lowering its aggressiveness for 42s. Affects creatures up to level 5.
+|-
+| 489 || [[Sympathetic Aura]] || 18 || 40 || 5.0s || &mdash; || 0 || Single (Ally) || &mdash; || 36m || &mdash; || &mdash; || Cloaks your target in a sympathetic aura, increasing their charisma.
+|-
+| 592 || [[Illusion: Troll]] || 18 || 100 || 3.0s || &mdash; || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be a Troll.  This spell also increases your regeneration rate slightly.
+|-
+| 677 || [[Tashani]] || 18 || 20 || 1.0s || &mdash; || 0 || Single || &mdash; || 11m || &mdash; || &mdash; || Causes your target's ears to echo with the barking of Tashan, lowering their magic resistance.
+|-
+| 21 || [[Berserker Strength]] || 19 || 45 || 3.0s || &mdash; || 0 || Single (Ally) || &mdash; || 180s || &mdash; || &mdash; || Hardens your skin and fills your arms with energy, increasing strength and absorbing damage, while also decreasing your agility.
+|-
+| 179 || [[Feckless Might]] || 19 || 45 || 2.5s || Magic || 0 || Single || &mdash; || 5m || &mdash; || &mdash; || Weakens your opponent, lowering their strength.
+|-
+| 439 || [[Crystallize Mana]] || 19 || 200 || 6.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Crystallizes mana into a physical form.  Consumes a poison vial and a peridot when cast.
+|-
+| 3583 || [[Tiny Companion]] || 19 || 50 || 4.0s || &mdash; || 0 || Pet || &mdash; || &mdash; || &mdash; || &mdash; || Shrinks your pet, allowing it better mobility in tight quarters.
+|-
+| 7985 || [[Greater Mass Enchant Electrum]] || 19 || 900 || 20.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants twenty bars of electrum with magical energy.  Consumes twenty bars of electrum when cast.
+|-
+| 84 || [[Shifting Sight]] || 20 || 30 || 4.0s || &mdash; || 0 || Single (Ally) || &mdash; || 16m || &mdash; || &mdash; || Shifts your vision to your target's eyes, increasing vision range, as well as vastly improving night vision.
+|-
+| 173 || [[Benevolence]] || 20 || 50 || 4.0s || Magic || 0 || Single || &mdash; || &mdash; || &mdash; || &mdash; || Cloaks you in an amiable aura, causing creatures of your target's faction to view you more favorably.
+|-
+| 177 || [[Color Shift]] || 20 || 40 || 1.5s || Magic || 0 || PB AE || &mdash; || &mdash; || &mdash; || &mdash; || Creates a wave of intense color around you that assaults your opponent's senses, briefly stunning up to 8 nearby creatures up to level 55 for 6000 seconds.
+|-
+| 243 || [[Illusion: Iksar]] || 20 || 50 || 3.0s || &mdash; || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be an Iksar.  This spell also increases your regeneration rate slightly.
+|-
+| 3982 || [[Mass Crystallize Mana]] || 20 || 600 || 10.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Crystallizes mana into a physical form, creating five vials of crystallized mana.  Consumes five poison vials and five peridots when cast.
+|-
+| 170 || [[Alacrity]] || 21 || 115 || 4.0s || &mdash; || 0 || Single (Ally) || &mdash; || 11m || &mdash; || &mdash; || Grants your target quickened movement, increasing their attack speed for 11m.
+|-
+| 350 || [[Chaos Flux]] || 21 || 67 || 3.0s || Magic || 0 || Single || 175 || &mdash; || 2.61 || 58 || Strikes your target with a chaotic burst of mental energy, causing between 110 and 175 damage and stunning targets up to level 55 for 1000 second.
+|-
+| 584 || [[Illusion: Earth Elemental]] || 21 || 50 || 3.0s || &mdash; || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be an Earth Elemental.  This spell also grants you increased strength.
+|-
+| 1892 || [[Enchant Steel]] || 21 || 325 || 6.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants a large brick of Steel with magical energy. Consumes a large brick of high quality ore when cast.
+|-
+| 24 || [[Strip Enchantment]] || 22 || 70 || 3.5s || Magic || 0 || Single || &mdash; || &mdash; || &mdash; || &mdash; || Tears the magic from your target, causing their enchantments to fade.
+|-
+| 482 || [[Rune II]] || 22 || 83 || 4.0s || &mdash; || 0 || Single (Ally) || &mdash; || 54m || &mdash; || &mdash; || Covers your target in a shimmer of runes that absorb damage.  Consumes a bloodstone when cast.
+|-
+| 685 || [[Sagar's Animation]] || 22 || 130 || 7.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Animates a weapon and shield to attack your enemies.  Consumes a tiny dagger when cast.
+|-
+| 65 || [[Major Shielding]] || 23 || 80 || 5.0s || &mdash; || 0 || Self || &mdash; || Perm || &mdash; || &mdash; || Surrounds your body in a magical shield, increasing your hit points, armor class, and magic resistance.
+|-
+| 182 || [[Beguile]] || 23 || 120 || 3.5s || Magic || 0 || Single || &mdash; || 16m || &mdash; || &mdash; || Dominates your target's mind, allowing you to control them for a short time. This spell works on creatures up to level 4.
+|-
+| 185 || [[Tepid Deeds]] || 23 || 100 || 3.5s || Magic || 0 || Single || &mdash; || 150s || &mdash; || &mdash; || Constricts your target's muscles, reducing attack speed by 80% for 150s.
+|-
+| 4256 || [[Wuggan's Appraisal]] || 23 || 145 || 4.0s || Magic || -100 || Single || &mdash; || &mdash; || &mdash; || &mdash; || Attempts to sense the presence of a trap on the targeted object.
+|-
+| 581 || [[Illusion: Skeleton]] || 24 || 50 || 3.0s || &mdash; || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be a Skeleton.
+|-
+| 669 || [[Enchant Gold]] || 24 || 150 || 6.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants a bar of gold with magical energy. Consumes a bar of gold when cast.
+|-
+| 3988 || [[Mass Enchant Gold]] || 24 || 450 || 10.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants five bars of gold with magical energy. Consumes five bars of gold when cast.
+|-
+| 4268 || [[Wuggan's Discombobulation]] || 24 || 145 || 4.0s || Magic || -100 || Single || &mdash; || &mdash; || &mdash; || &mdash; || Attempts to disarm a trap on the targeted object.  Consumes a scrying stone when cast.
+|-
+| 4280 || [[Wuggan's Extrication]] || 24 || 145 || 4.0s || Fire || -100 || Single || &mdash; || &mdash; || &mdash; || &mdash; || Attempts to destroy any lock present on the targeted object.
+|-
+| 131 || [[Instill]] || 25 || 60 || 2.5s || Magic || 0 || Single || &mdash; || 60s || &mdash; || &mdash; || Causes the earth to adhere to your target's feet, preventing them from moving for up to 60s.
+|-
+| 162 || [[Listless Power]] || 25 || 90 || 2.8s || Magic || 0 || Single || &mdash; || 5m || &mdash; || &mdash; || Saps your target's power, decreasing their agility, strength, and armor class for 5m.
+|-
+| 191 || [[Feedback]] || 25 || 75 || 4.0s || Fire || 0 || Single (Ally) || &mdash; || 15m || &mdash; || &mdash; || Wraps your target in chaotic energy that damages anything that attacks them.
+|-
+| 174 || [[Clarity]] || 26 || 75 || 3.1s || &mdash; || 0 || Single (Ally) || &mdash; || 27m || &mdash; || &mdash; || Calms your target's thoughts, allowing them to regenerate mana more quickly.
+|-
+| 408 || [[Curse of the Simple Mind]] || 26 || 35 || 2.0s || Magic || 0 || Single || &mdash; || 6m || &mdash; || &mdash; || Weakens your opponents mind, lowering their intelligence and wisdom.
+|-
+| 450 || [[Suffocate]] || 26 || 115 || 3.0s || Magic || 0 || Single || 86 + 42/tk || 48s || 3.67 || 8.8 || Constricts your target's throat, causing between 55 and 86 damage initially and between 27 and 42 damage every six seconds for 48s, as well as lowering their strength and agility.
+|-
+| 2563 || [[Haunting Visage]] || 26 || 100 || 2.0s || &mdash; || 0 || Single (Ally) || &mdash; || 36s || &mdash; || &mdash; || Cloaks your target in a haunting visage, drawing more attention to any action they take.
+|-
+| 46 || [[Ultravision]] || 27 || 55 || 5.0s || &mdash; || 0 || Single (Ally) || &mdash; || 36m || &mdash; || &mdash; || Provides vastly improved night vision.
+|-
+| 540 || [[Clarify Mana]] || 27 || 300 || 6.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Crystallizes mana into a physical form.  Consumes a poison vial and an emerald when cast.
+|-
+| 652 || [[Obscure]] || 27 || 50 || 5.0s || &mdash; || 0 || Single (Ally) || &mdash; || 45m || &mdash; || &mdash; || Causes your target's image to blur, making it harder for your opponents to hit you by increasing your armor class.
+|-
+| 10 || [[Augmentation]] || 28 || 90 || 5.0s || &mdash; || 0 || Single (Ally) || &mdash; || 27m || &mdash; || &mdash; || Fills your target with energy, increasing their attack speed, agility, and stamina regeneration.
+|-
+| 49 || [[Nullify Magic]] || 28 || 50 || 4.5s || Magic || 0 || Single || &mdash; || &mdash; || &mdash; || &mdash; || Cancels magical enchantments affecting your target.
+|-
+| 599 || [[Illusion: Water Elemental]] || 28 || 50 || 3.0s || &mdash; || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be a Water Elemental, This spell also grants you magical breathing.
+|-
+| 619 || [[Dyn's Dizzying Draught]] || 28 || 150 || 3.0s || Magic || 0 || Single || &mdash; || 12s || &mdash; || &mdash; || Spins your target in a circle, preventing them from taking any action for  7500 seconds up to level 55.
+|-
+| 7986 || [[Greater Mass Enchant Gold]] || 28 || 1800 || 20.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants twenty bars of gold with magical energy. Consumes twenty bars of gold when cast.
+|-
+| 597 || [[Illusion: Air Elemental]] || 29 || 50 || 3.0s || &mdash; || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be an Air Elemental.  This spell also grants you levitation.
+|-
+| 686 || [[Uleen's Animation]] || 29 || 150 || 8.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Animates a weapon and shield to attack your enemies.  Consumes a tiny dagger when cast.
+|-
+| 3981 || [[Mass Clarify Mana]] || 29 || 900 || 10.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Crystallizes mana into a physical form, creating five vials of clear mana.  Consumes five poison vials and five emeralds when cast.
+|-
+| 4073 || [[Ward of Alendar]] || 29 || 150 || 2.0s || &mdash; || 0 || Single (Ally) || &mdash; || 36m || &mdash; || &mdash; || Places the Ward of Alendar on your target, absorbing a portion of incoming spell damage.  This spell absorbs a set amount of damage before dissipating.  Consumes a bloodstone when cast.
+|-
+| 74 || [[Mana Sieve]] || 30 || 150 || 3.0s || Magic || -1000 || Single || &mdash; || &mdash; || &mdash; || &mdash; || Tears at the mind of your opponent, draining their mana.
+|-
+| 188 || [[Entrance]] || 30 || 75 || 2.5s || Magic || 0 || Single || &mdash; || 72s || &mdash; || &mdash; || Causes your opponent to fall into an enchanted sleep for up to 72s.  This spell works on creatures up to level 2.
+|-
+| 3585 || [[Entrancing Lights]] || 30 || 75 || 1.5s || Magic || 0 || PB AE || &mdash; || 6s || &mdash; || &mdash; || Cause up to 8 nearby creatures to fall into an enchanted sleep for up to 6s.  This spell works on creatures up to level 1.
+|-
+| 53111 || [[Greater Mass Crystallize Mana]] || 30 || 2400 || 10.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Crystallizes mana into a physical form, creating twenty vials of crystallized mana.  Consumes twenty poison vials and twenty peridots when cast.
+|-
+| 66 || [[Greater Shielding]] || 31 || 120 || 6.0s || &mdash; || 0 || Self || &mdash; || Perm || &mdash; || &mdash; || Surrounds your body in a magical shield, increasing your hit points, armor class, and magic resistance.
+|-
+| 646 || [[Radiant Visage]] || 31 || 65 || 5.0s || &mdash; || 0 || Single (Ally) || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a radiant visage, increasing your charisma.
+|-
+| 687 || [[Boltran's Animation]] || 31 || 175 || 9.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Animates a weapon and shield to attack your enemies.  Consumes a tiny dagger when cast.
+|-
+| 71 || [[Anarchy]] || 32 || 99 || 3.5s || Magic || 0 || Single || 275 || &mdash; || 2.78 || 79 || Strikes your target with a chaotic burst of mental energy, causing between 200 and 275 damage. Stuns targets up to level 55 for 1000 second.
+|-
+| 407 || [[Cast Sight]] || 32 || 45 || 4.0s || &mdash; || 0 || Single || &mdash; || 150m || &mdash; || &mdash; || Allows you to see through your target's eyes with greatly increased night vision.
+|-
+| 670 || [[Enchant Platinum]] || 32 || 225 || 6.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants a bar of platinum with magical energy. Consumes a bar of platinum when cast.
+|-
+| 3990 || [[Mass Enchant Platinum]] || 32 || 675 || 10.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants five bars of platinum with magical energy. Consumes five bars of platinum when cast.
+|-
+| 483 || [[Rune III]] || 33 || 149 || 4.5s || &mdash; || 0 || Single (Ally) || &mdash; || 72m || &mdash; || &mdash; || Covers your target in a shimmer of runes that absorb damage.  Consumes a jasper when cast.
+|-
+| 598 || [[Illusion: Fire Elemental]] || 33 || 70 || 3.0s || Fire || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be a Fire Elemental.  This spell also provides you with a shield of flame that harms those who attack you.
+|-
+| 4257 || [[Wuggan's Greater Appraisal]] || 33 || 240 || 4.0s || Magic || -100 || Single || &mdash; || &mdash; || &mdash; || &mdash; || Attempts to sense the presence of a trap on the targeted object.
+|-
+| 180 || [[Insipid Weakness]] || 34 || 80 || 3.0s || Magic || 0 || Single || &mdash; || 144s || &mdash; || &mdash; || Weakens your opponent, lowering their strength.
+|-
+| 1408 || [[Gift of Magic]] || 34 || 150 || 5.0s || &mdash; || 0 || Single (Ally) || &mdash; || 60m || &mdash; || &mdash; || Grants your target increased mental capacities, increasing their mana pool.
+|-
+| 4269 || [[Wuggan's Greater Discombobulation]] || 34 || 240 || 4.0s || Magic || -100 || Single || &mdash; || &mdash; || &mdash; || &mdash; || Attempts to disarm a trap on the targeted object.  Consumes a greater scrying stone when cast.
+|-
+| 4281 || [[Wuggan's Greater Extrication]] || 34 || 240 || 4.0s || Fire || -100 || Single || &mdash; || &mdash; || &mdash; || &mdash; || Attempts to destroy any lock present on the targeted object.
+|-
+| 45 || [[Pacify]] || 35 || 100 || 3.0s || Magic || 0 || Single || &mdash; || 42s || &mdash; || &mdash; || Pacifies your target, lowering its aggressiveness for 42s. Affects creatures up to level 1.
+|-
+| 127 || [[Invoke Fear]] || 35 || 100 || 2.5s || Magic || -20 || Single || &mdash; || 30s || &mdash; || &mdash; || A booming voice fills your target's ears, causing them to flee in terror.
+|-
+| 175 || [[Insight]] || 35 || 125 || 4.2s || &mdash; || 0 || Single (Ally) || &mdash; || 40m || &mdash; || &mdash; || Expands your target's mind, increasing their intelligence and wisdom.
+|-
+| 73 || [[Gravity Flux]] || 36 || 337 || 5.9s || Magic || 0 || Targeted AE || 270 || &mdash; || 0.80 || 46 || Causes a sudden reversal in the gravity around your target, doing  170 damage to up to 4 entities.
+|-
+| 192 || [[Mind Wipe]] || 36 || 100 || 4.5s || Magic || 0 || Targeted AE || &mdash; || &mdash; || &mdash; || &mdash; || Attacks your target's mind, providing a chance to forget those that have done them harm.
+|-
+| 2564 || [[Calming Visage]] || 36 || 100 || 2.0s || &mdash; || 0 || Single (Ally) || &mdash; || 36s || &mdash; || &mdash; || Cloaks your target in a calming visage, diverting attention from any action they take.
+|-
+| 64 || [[Resist Magic]] || 37 || 85 || 4.5s || &mdash; || 0 || Single (Ally) || &mdash; || 36m || &mdash; || &mdash; || Surrounds your target with an aura of protection, warding away magic for 36m.
+|-
+| 183 || [[Cajoling Whispers]] || 37 || 195 || 5.5s || Magic || 0 || Single || &mdash; || 16m || &mdash; || &mdash; || Dominates your target's mind, allowing you to control them for a short time. This spell works on creatures up to level 9.
+|-
+| 596 || [[Illusion: Dry Bone]] || 37 || 70 || 3.0s || &mdash; || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be a Drybone Skeleton.  This spell also grants increased fire resistance.
+|-
+| 653 || [[Shade]] || 37 || 60 || 6.0s || &mdash; || 0 || Single (Ally) || &mdash; || 72m || &mdash; || &mdash; || Causes your target's image to blur, making it harder for your opponents to hit you by increasing your armor class.
+|-
+| 688 || [[Aanya's Animation]] || 37 || 200 || 10.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Animates a weapon and shield to attack your enemies.  Consumes a tiny dagger when cast.
+|-
+| 600 || [[Illusion: Spirit Wolf]] || 38 || 70 || 3.0s || &mdash; || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be a Spirit Wolf. This spell can only be cast outdoors.
+|-
+| 648 || [[Rampage]] || 38 || 90 || 3.0s || &mdash; || 0 || Single (Ally) || &mdash; || 5m || &mdash; || &mdash; || Hardens your skin and fills your arms with energy, increasing strength and absorbing damage, while also decreasing your agility.
+|-
+| 695 || [[Distill Mana]] || 38 || 400 || 6.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Distills mana into a physical form.  Consumes a poison vial and two sapphires when cast.
+|-
+| 1407 || [[Wandering Mind]] || 38 || 5 || 4.5s || Magic || -100 || Single || &mdash; || 120s || &mdash; || &mdash; || Draws the energy from your target's mind, draining their mana and giving it to you.
+|-
+| 7987 || [[Greater Mass Enchant Platinum]] || 38 || 2700 || 20.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants twenty bars of platinum with magical energy. Consumes twenty bars of platinum when cast.
+|-
+| 132 || [[Immobilize]] || 39 || 80 || 1.8s || Magic || 0 || Single || &mdash; || 60s || &mdash; || &mdash; || Causes the earth to adhere to your target's feet, preventing them from moving for up to 60s.
+|-
+| 171 || [[Celerity]] || 39 || 185 || 8.0s || &mdash; || 0 || Single (Ally) || &mdash; || 16m || &mdash; || &mdash; || Grants your target quickened movement, increasing their attack speed for 16m.
+|-
+| 3983 || [[Mass Distill Mana]] || 39 || 1200 || 10.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Distills mana into a physical form, creating five vials of distilled mana.  Consumes five poison vials and ten sapphires when cast.
+|-
+| 67 || [[Arch Shielding]] || 40 || 200 || 12.0s || &mdash; || 0 || Self || &mdash; || Perm || &mdash; || &mdash; || Surrounds your body in a magical shield, increasing your hit points, armor class, and magic resistance.
+|-
+| 163 || [[Incapacitate]] || 40 || 150 || 3.2s || Magic || 0 || Single || &mdash; || 5m || &mdash; || &mdash; || Saps your target's power, decreasing their agility, strength, and armor class for 5m.
+|-
+| 484 || [[Rune IV]] || 40 || 236 || 5.0s || &mdash; || 0 || Single (Ally) || &mdash; || 90m || &mdash; || &mdash; || Covers your target in a shimmer of runes that absorb damage.  Consumes a peridot when cast.
+|-
+| 1474 || [[Boon of the Garou]] || 40 || 100 || 1.5s || &mdash; || 0 || Single (Ally) || &mdash; || 5m || &mdash; || &mdash; || Transforms your target into a feral werewolf, increasing their attack rating, dexterity, and allowing a chance to perform a life draining attack.
+|-
+| 33 || [[Brilliance]] || 41 || 125 || 4.2s || &mdash; || 0 || Single (Ally) || &mdash; || 40m || &mdash; || &mdash; || Expands your target's mind, increasing their intelligence and wisdom.
+|-
+| 186 || [[Shiftless Deeds]] || 41 || 200 || 6.0s || Magic || 0 || Single || &mdash; || 150s || &mdash; || &mdash; || Constricts your target's muscles, causing their attack speed to slow for 150s.
+|-
+| 678 || [[Tashania]] || 41 || 30 || 1.0s || &mdash; || 0 || Single || &mdash; || 11m || &mdash; || &mdash; || Causes your target's ears to echo with the barking of Tashan, lowering their magic resistance.
+|-
+| 689 || [[Yegoreff's Animation]] || 41 || 250 || 11.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Animates a weapon and shield to attack your enemies.  Consumes a tiny dagger when cast.
+|-
+| 25 || [[Pillage Enchantment]] || 42 || 70 || 3.5s || Magic || 0 || Single || &mdash; || &mdash; || &mdash; || &mdash; || Tears the magic from your target, causing their enchantments to fade.
+|-
+| 181 || [[Weakness]] || 42 || 120 || 3.5s || Magic || 0 || Single || &mdash; || 144s || &mdash; || &mdash; || Weakens your opponent, lowering their strength.
+|-
+| 585 || [[Illusion: Werewolf]] || 42 || 90 || 3.0s || &mdash; || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be a Werewolf.
+|-
+| 1694 || [[Boon of the Clear Mind]] || 42 || 175 || 3.5s || &mdash; || 0 || Group || &mdash; || 27m || &mdash; || &mdash; || Calms your group's thoughts, allowing them to regenerate mana more quickly.
+|-
+| 178 || [[Color Skew]] || 43 || 60 || 2.0s || Magic || 0 || PB AE || &mdash; || &mdash; || &mdash; || &mdash; || Creates a wave of intense color around you that assaults your opponent's senses, briefly stunning up to 8 nearby creatures up to level 55 for 8000 seconds.
+|-
+| 673 || [[Discordant Mind]] || 43 || 126 || 4.0s || Magic || 0 || Single || 387 || &mdash; || 3.07 || 97 || Strikes your target with a chaotic burst of mental energy, causing between 288 and 387 damage and stunning them up to level 55 for 1000 second.
+|-
+| 1285 || [[Summon Companion]] || 43 || 50 || 5.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Summons your pet to your current location.
+|-
+| 1797 || [[Enchant Velium]] || 43 || 200 || 6.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants a bar of velium with magical energy.  Consumes a bar of velium when cast.
+|-
+| 4099 || [[Bounce]] || 43 || 100 || 1.5s || &mdash; || 0 || Self || &mdash; || 12s || &mdash; || &mdash; || Surrounds your body in a reflective aura, providing a chance for all incoming spells to rebound back against the caster.
+|-
+| 3586 || [[Illusion: Scaled Wolf]] || 44 || 150 || 4.0s || &mdash; || 0 || Self || &mdash; || 72m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be a Scaled Wolf.
+|-
+| 3696 || [[Leviathan Eyes]] || 44 || 100 || 3.0s || &mdash; || 0 || Single (Ally) || &mdash; || 36m || &mdash; || &mdash; || Fills your target's eyes with the spirit of the deep, granting them water breathing, greatly improved night vision, and the ability to see otherwise invisible creatures.
+|-
+| 3993 || [[Mass Enchant Velium]] || 44 || 600 || 10.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants five bars of velium with magical energy. Consumes five bars of velium when cast.
+|-
+| 4074 || [[Guard of Alendar]] || 44 || 175 || 2.0s || &mdash; || 0 || Single (Ally) || &mdash; || 36m || &mdash; || &mdash; || Places the Guard of Alendar on your target, absorbing a portion of incoming spell damage.  This spell absorbs a set amount of damage before dissipating.  Consumes a jasper when cast.
+|-
+| 7989 || [[Greater Mass Enchant Velium]] || 44 || 2400 || 20.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants twenty bars of velium with magical energy. Consumes twenty bars of velium when cast.
+|-
+| 53110 || [[Greater Mass Clarify Mana]] || 44 || 3600 || 10.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Crystallizes mana into a physical form, creating twenty vials of clear mana.  Consumes twenty poison vials and twenty emeralds when cast.
+|-
+| 133 || [[Paralyzing Earth]] || 45 || 100 || 2.5s || Magic || 0 || Single || &mdash; || 180s || &mdash; || &mdash; || Causes the earth to adhere to your target's feet, preventing them from moving for up to 180s.
+|-
+| 194 || [[Reoccurring Amnesia]] || 45 || 100 || 3.0s || Magic || 0 || Single || &mdash; || 24s || &mdash; || &mdash; || Attacks your target's mind, providing a chance to forget those that have done them harm.
+|-
+| 696 || [[Purify Mana]] || 45 || 500 || 6.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Distills mana into a physical form.  Consumes a poison vial and four rubies when cast.
+|-
+| 2565 || [[Illusion: Imp]] || 45 || 110 || 3.5s || &mdash; || 0 || Self || &mdash; || 36m || &mdash; || &mdash; || Cloaks you in a shimmering illusion that makes you appear to be an Imp. This spell also grants you levitation.
+|-
+| 184 || [[Allure]] || 46 || 245 || 6.0s || Magic || 0 || Single || &mdash; || 16m || &mdash; || &mdash; || Dominates your target's mind, allowing you to control them for a short time. This spell works on creatures up to level 16.
+|-
+| 193 || [[Blanket of Forgetfulness]] || 46 || 175 || 4.0s || Magic || 0 || Targeted AE || &mdash; || &mdash; || &mdash; || &mdash; || Attacks the minds of all enemies in the vicinity of your target, providing a chance to forget those that have done them harm.
+|-
+| 647 || [[Adorning Grace]] || 46 || 110 || 5.0s || &mdash; || 0 || Single (Ally) || &mdash; || 72m || &mdash; || &mdash; || Cloaks you in adorning grace, increasing your charisma.
+|-
+| 172 || [[Swift Like the Wind]] || 47 || 250 || 8.0s || &mdash; || 0 || Single (Ally) || &mdash; || 16m || &mdash; || &mdash; || Grants your target quickened movement, increasing their attack speed for 16m.
+|-
+| 176 || [[Berserker Spirit]] || 47 || 150 || 3.0s || &mdash; || 0 || Single (Ally) || &mdash; || 5m || &mdash; || &mdash; || Hardens your skin and fills your arms with energy, increasing strength and absorbing damage, while also decreasing your agility.
+|-
+| 190 || [[Dazzle]] || 47 || 110 || 2.5s || Magic || 0 || Single || &mdash; || 96s || &mdash; || &mdash; || Causes your opponent to fall into an enchanted sleep for up to 96s.  This spell works on creatures up to level 2.
+|-
+| 195 || [[Gasping Embrace]] || 47 || 150 || 3.0s || Magic || 0 || Single || 113 + 89/tk || 48s || 5.50 || 17 || Constricts your target's throat, causing between 113 and 113 damage initially and between 39 and 89 damage every six seconds for 48s, as well as lowering their strength and agility.
+|-
+| 4009 || [[Mass Purify Mana]] || 47 || 1500 || 10.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Purify's mana into a physical form, creating five vials of purified mana.  Consumes five poison vials and twenty rubies when cast.
+|-
+| 72 || [[Group Resist Magic]] || 48 || 200 || 6.0s || &mdash; || 0 || Group || &mdash; || 36m || &mdash; || &mdash; || Covers your group in a protective shield, increasing their magic resistance.
+|-
+| 654 || [[Shadow]] || 48 || 70 || 7.0s || &mdash; || 0 || Single (Ally) || &mdash; || 90m || &mdash; || &mdash; || Causes your target's image to blur, making it harder for your opponents to hit you by increasing your armor class.
+|-
+| 690 || [[Kintaz's Animation]] || 48 || 300 || 12.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Animates a weapon and shield to attack your enemies.  Consumes a tiny dagger when cast.
+|-
+| 1889 || [[Enchant Mithril]] || 48 || 325 || 6.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants a large brick of Mithril with magical energy.  Consumes a large brick of Mithril when cast.
+|-
+| 1890 || [[Enchant Adamantite]] || 48 || 325 || 6.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants a large brick of Adamantite with magical energy.  Consumes a large brick of Adamantite when cast.
+|-
+| 1893 || [[Enchant Brellium]] || 49 || 325 || 6.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants a large brick of Brellium with magical energy.  Consumes a large brick of Brellium when cast.
+|-
+| 3984 || [[Mass Enchant Adamantite]] || 49 || 975 || 10.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants five large bricks of Adamantite with magical energy.  Consumes five large bricks of Adamantite when cast.
+|-
+| 3985 || [[Mass Enchant Brellium]] || 49 || 975 || 10.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants five large bricks of Brellium with magical energy.  Consumes five large bricks of Brellium when cast.
+|-
+| 3989 || [[Mass Enchant Mithril]] || 49 || 975 || 10.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants five large bricks of Mithril with magical energy.  Consumes five large bricks of Mithril when cast.
+|-
+| 3992 || [[Mass Enchant Steel]] || 49 || 975 || 10.0s || &mdash; || 0 || Self || &mdash; || &mdash; || &mdash; || &mdash; || Enchants five large bricks of Steel with magical energy. Consumes five large bricks of high quality ore when cast.
+|-
+| 1406 || [[Improved Invisibility]] || 50 || 75 || 4.0s || &mdash; || 0 || Self || &mdash; || 10m || &mdash; || &mdash; || Cloaks you in a mystic veil, rendering you invisible to many creatures for 10m.
+|-
+| 1686 || [[Theft of Thought]] || 50 || 25 || 2.0s || Magic || -1000 || '''Tap''' || &mdash; || &mdash; || &mdash; || &mdash; || Tears the energy from your target's mind, draining their mana and adding it to yours.
+|-
+| 1687 || [[Collaboration]] || 50 || 75 || 3.5s || Magic || 0 || Single || &mdash; || &mdash; || &mdash; || &mdash; || Cloaks you in an amiable aura, causing creatures of your target's faction to view you more favorably.
+|}
+</div>

@@ -1,0 +1,39 @@
+{{Velious Era}}
+{{Factionpage|
+
+| description = The Warders of the Claw guard [[Kerafyrm]] inside of [[Sleeper's Tomb]] to ensure that the Sleeper does not awake.
+
+| zones_raise =
+
+* None
+
+| zones_lower =
+
+* [[Sleeper's Tomb]]
+
+| quests_raise =
+
+* None
+
+| quests_lower =
+
+* None
+
+| mobs_raise =
+
+* None
+
+| mobs_lower =
+
+* [[Hraashna the Warder]]  <span class='fmz'>(Sleeper's Tomb)</span>
+* [[Nanzata the Warder]]  <span class='fmz'>(Sleeper's Tomb)</span>
+* [[Tukaarak the Warder]]  <span class='fmz'>(Sleeper's Tomb)</span>
+* [[Ventani the Warder]]  <span class='fmz'>(Sleeper's Tomb)</span>
+* [[The Progenitor]]  <span class='fmz'>(Sleeper's Tomb)</span>
+* [[The Final Arbiter]]  <span class='fmz'>(Sleeper's Tomb)</span>
+* [[Master of the Guard]]  <span class='fmz'>(Sleeper's Tomb)</span>
+* [[an ancient sentry]]  <span class='fmz'>(Sleeper's Tomb)</span>
+* [[a tireless servitor]]  <span class='fmz'>(Sleeper's Tomb)</span>
+
+}}
+[[Category:Significant Factions]]

@@ -1,0 +1,23 @@
+{{allakhazam}}
+{{Factionpage|
+
+| description = http://everquest.allakhazam.com/db/npc.html?id=2536&p=2#m97819022731901
+
+| zones_raise = 
+
+
+| zones_lower = 
+[[Ocean of Tears]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+[[an alluring siren]]
+}}

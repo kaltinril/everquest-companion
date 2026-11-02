@@ -1,0 +1,52 @@
+{{Factionpage|
+
+| description = These slimy dwarves are exiled from both the rogues guild and Kaladim society in general.
+
+| zones_raise = 
+
+* [[Butcherblock Mountains]]
+* [[Kaladim|North Kaladim]]
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Crushbone]]
+* [[Cazic Thule (Zone)]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+* [[Rat Patrol]]
+* [[Runnyeye Warbeads (Kaladim Rogue)]]
+* [[The Gnome Take]]
+
+| mobs_raise = 
+
+* [[Diggins]] <span class='fmz'>(North Kaladim - Quest NPC)</span>
+* [[Founy Jestands]] <span class='fmz'>(North Kaladim)</span>
+* [[Guard Gonin]] <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Guard Kyte]] <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Jeet]] <span class='fmz'>(North Kaladim)</span>
+* [[Kafia Ratsbone]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Mater]] <span class='fmz'>(North Kaladim - NPC, Non-Quest)</span>
+* [[Myre]] <span class='fmz'>(North Kaladim - Merchant)</span>
+
+| mobs_lower = 
+
+* [[a dwarven mercenary]] <span class='fmz'>(Cazic Thule (Zone))</span>
+* [[a dwarven bandit]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Barma Dunfire]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Crytil Dunfire]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Glynda Smeltpot]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Glynn Smeltpot]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Gundl]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Keldyn Dunfire]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Margyl Darklin]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Peg Leg]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Qued]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Rondo Dunfire]]  <span class='fmz'>(Crushbone)</span>
+* [[Stump Rundl]]  <span class='fmz'>(Butcherblock Mountains)</span>
+
+}}

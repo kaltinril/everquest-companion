@@ -1,0 +1,2774 @@
+{{cleanup}}
+<div style="float:left;margin-right:20px;">__TOC__</div>
+
+
+The "Starting Faction Standing" guide provides a comprehensive overview of the initial faction standings for characters in Everquest. This guide details how a character’s [[race | '''RACE''']], [[class | '''CLASS''']], and chosen [[deities | '''DEITY''']] influence their relationships with the major [[faction | factions]] across Norrath. Whether you're navigating the complex political landscape of city-states or simply trying to avoid hostile guards, understanding your starting faction standing is essential for every new adventurer. This resource allows players to plan their journey more effectively by offering insights into which factions will view them favorably—or with hostility—from the moment they enter the game.
+
+
+'''Contributions are welcome! Please ensure that all entries reflect initial standings only. If [[illusions | ILLUSIONS]] or other effects are used to alter race, please update the race accordingly to reflect the change.'''
+
+
+==Norrath==
+Norrath is a vast and intricate world where numerous factions transcend the boundaries of individual cities or continents. These global factions wield influence across multiple regions, and a player's interactions with them can affect their standing in distant lands, regardless of their origin. Some of these factions are tied to religious orders, powerful guilds, or wide-reaching organizations with a presence in various cities.
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[League of Antonican Bards]]</big><br>Antonica Bards
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Dark Elf
+| Wizard
+| Solusek Ro
+| '''Apprehensively'''
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Indifferent'''
+|-
+| Erudite
+| Shadow Knight
+| Cazic Thule
+| '''Apprehensive'''
+|-
+| Erudite
+| Necromancer
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Cleric
+| Cazic Thule
+| '''Apprehensive'''
+|-
+| Erudite
+| Cleric
+| Prexus
+| '''Indifferently'''
+|-
+| Erudite
+| Cleric
+| Quellious
+| '''Indifferently'''
+|-
+| Human
+| Rogue
+| Innoruuk
+| '''Apprehensively'''
+|-
+| Ogre
+| Warrior
+| Rallos Zek
+| style="color: red;" |'''Threatening'''
+|}
+<br>
+
+==Antonica==
+Antonica, the largest continent in Norrath, is home to a wide array of diverse factions that transcend individual cities or specific regions. Many of these factions represent broad interests, ideologies, or organizations whose influence can be felt across the continent—and sometimes beyond.
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Steel Warriors]]</big><br>Freeport & Qeynos Warriors
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Dark Elf
+| Wizard
+| Solusek Ro
+| '''Dubious'''
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Apprehensively'''
+|-
+| Erudite
+| Cleric
+| Cazic Thule
+| '''Apprehensively'''
+|-
+| Human
+| Rogue
+| Innoruuk
+| '''Apprehensively'''
+|}
+<br>
+
+===[[Freeport]]===
+Freeport, one of the most significant cities in Norrath, is divided into three districts—West Freeport, North Freeport, and East Freeport—and is home to several key factions, each with their own influence over different areas of the city. Navigating Freeport’s various factions is essential for characters, as these groups determine how NPCs will interact with you, from welcoming gestures to outright hostility. 
+
+'''See [[Starting Faction Standings#Antonica| Antonica]] for [[Steel Warriors]] (Freeport Warriors).'''
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Arcane Scientists]]</big><br>Freeport Good Casters
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Dark Elf
+| Wizard
+| Solusek Ro
+| '''Dubious'''
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| style="color: blue;" |'''Amiably'''
+|-
+| Human
+| Rogue
+| Innoruuk
+| '''Apprehensively'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Ashen Order]]</big><br>Freeport Monks
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Dark Elf
+| Wizard
+| Solusek Ro
+| style="color: red;" |'''Threatening'''
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Indifferent'''
+|-
+| Human
+| Rogue
+| Innoruuk
+| '''Apprehensively'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Coalition of Tradefolk]]</big><br>Freeport Merchants & Banker
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Dark Elf
+| Wizard
+| Solusek Ro
+| '''Dubious'''
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Indifferent'''
+|-
+| Human
+| Rogue
+| Innoruuk
+| style="color: blue;" |'''Amiable'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Coalition of Tradefolk Ill]]egal</big><br>Freeport Rogues
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Dark Elf
+| Wizard
+| Solusek Ro
+| '''Apprehensively'''
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Apprehensively'''
+|-
+| Human
+| Rogue
+| Innoruuk
+| style="color: blue;" |'''Amiable'''
+|-
+| Ogre
+| Warrior
+| Rallos Zek
+| '''Dubious'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Dismal Rage]]</big><br>Freeport Evil Casters
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Dark Elf
+| Wizard
+| Solusek Ro
+| '''Apprehensively'''
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Apprehensively'''
+|-
+| Human
+| Rogue
+| Innoruuk
+| '''Indifferent'''
+|-
+| Iksar
+| Necromancer
+| Cazic Thule
+| '''Dubious'''
+|-
+| Ogre
+| Warrior
+| Rallos Zek
+| '''Apprehensively'''
+|-
+| Wood Elf
+| Ranger
+| Tunare
+| style="color: red;" |'''Threatening'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Knights of Truth]]</big><br>Hall of Truth Clerics & Paladins<br>North Freeport Guards ("Sir")
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Dark Elf
+| Wizard
+| Solusek Ro
+| '''Dubious'''
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Indifferent'''
+|-
+| Human
+| Rogue
+| Innoruuk
+| '''Apprehensively'''
+|-
+| Wood Elf
+| Ranger
+| Tunare
+| style="color: blue;" |'''Amiable'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Priests of Marr]]</big><br>Temple of Marr Clerics & Paladins ("Sentry")
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Dark Elf
+| Wizard
+| Solusek Ro
+| '''Dubious'''
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Indifferent'''
+|-
+| Human
+| Rogue
+| Innoruuk
+| '''Apprehensively'''
+|-
+| Wood Elf
+| Ranger
+| Tunare
+| '''Indifferent'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[The Freeport Militia]]</big><br>East & West Freeport Corrupt Guards
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Dark Elf
+| Wizard
+| Solusek Ro
+| '''Dubious'''
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Apprehensively'''
+|-
+| Human
+| Rogue
+| Innoruuk
+| '''Apprehensively'''
+|-
+| Human
+| Shadowknight
+| Innoruuk
+| style="color: black;" |'''Apprehensively'''
+|-
+| Ogre
+| Warrior
+| Rallos Zek
+| style="color: red;" |'''Threatening'''
+|-
+| Wood Elf
+| Ranger
+| Tunare
+| '''Dubious'''
+|}
+<br>
+
+===[[Grobb]]===
+Grobb is the home city of the Trolls, located in the southern swamps of Antonica. As a stronghold of the Troll race, Grobb's factions reflect its brutish and warlike nature. Characters aligned with Grobb can expect favorable treatment from its inhabitants, but outsiders—especially those of certain races and classes—will likely face hostility.
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Da Bashers]]</big><br>Troll Warriors/Guards
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Ogre
+| Shadowknight
+| Cazic-Thule
+| '''Dubious'''
+|-
+| Ogre
+| Shaman
+| Rallos Zek
+| '''Apprehensively'''
+|-
+| Ogre
+| Warrior
+| Rallos Zek
+| '''Apprehensively'''
+|-
+| Human
+| Rogue
+| Innoruuk
+| style="color: red;" |'''Ready to Attack'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Dark Ones]]</big><br>Troll Shamans
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Human
+| Rogue
+| Innoruuk
+| style="color: red;" |'''Threatening'''
+|-
+| Erudite
+| Shadow Knight
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Necromancer
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Cleric
+| Cazic Thule
+| style="color: red;" |'''Threatening'''
+|-
+| Erudite
+| Cleric
+| Prexus
+| style="color: red;" |'''Threatening'''
+|-
+| Erudite
+| Cleric
+| Quellious
+| style="color: red;" |'''Ready to attack'''
+|-
+| Erudite
+| Wizard
+| Agnostic
+| style="color: red;" |'''Threatening'''
+|-
+| Ogre
+| Shadowknight
+| Cazic-Thule
+| '''Apprehensively'''
+|-
+| Ogre
+| Shaman
+| Rallos Zek
+| style="color: red;" |'''Threatening'''
+|-
+| Ogre
+| Warrior
+| Rallos Zek
+| style="color: red;" |'''Threatening'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Grobb Merchants]]</big><br>Troll Merchants
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Human
+| Rogue
+| Innoruuk
+| '''Dubious'''
+|-
+| Ogre
+| Shadowknight
+| Cazic-Thule
+| '''Indifferent'''
+|-
+| Ogre
+| Shaman
+| Rallos Zek
+| '''Indifferent'''
+|-
+| Ogre
+| Warrior
+| Rallos Zek
+| '''Indifferent'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Shadowknights of Night Keep]]</big><br>Troll Shadowknights
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Human
+| Rogue
+| Innoruuk
+| style="color: red;" |'''Threatening'''
+|-
+| Ogre
+| Shadowknight
+| Cazic-Thule
+| '''Apprehensively'''
+|-
+| Ogre
+| Shaman
+| Rallos Zek
+| '''Dubious'''
+|-
+| Ogre
+| Warrior
+| Rallos Zek
+| '''Dubious'''
+|}
+<br>
+
+===[[Halas]]===
+Halas, the icy home of the Barbarians, is a rugged and isolated city located in the northwestern region of Everfrost. The residents of Halas are fiercely loyal to their own kind and hold deep cultural and religious ties to The Tribunal.
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Merchants of Halas]]</big><br>Barbarian Merchants
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Barbarian
+| Rogue
+| '''ALL'''
+| style="color: black;" |'''Apprehensively'''
+|-
+| Barbarian
+| Shaman
+| '''ALL'''
+| style="color: blue;" |'''Amiably'''
+|-
+| Barbarian
+| Warrior
+| Agnostic
+| style="color: black;" |'''Indifferent'''
+|-
+| Barbarian
+| Warrior
+| The Tribunal
+| style="color: blue;" |'''Amiably'''
+|-
+| Barbarian
+| Warrior
+| Rallos Zek
+| style="color: black;" |'''Indifferent'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Rogues of the White Rose]]</big><br>Barbarian Rogues & Banker
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Barbarian
+| Rogue
+| '''ALL'''
+| style="color: blue;" |'''Amiably'''
+|-
+| Barbarian
+| Shaman
+| '''ALL'''
+| style="color: black;" |'''Indifferent'''
+|-
+| Barbarian
+| Warrior
+| '''ALL'''
+| style="color: black;" |'''Indifferent'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Shamen of Justice]]</big><br>Barbarian Shaman
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Barbarian
+| Rogue
+| Agnostic
+| style="color: black;" |'''Dubious'''
+|-
+| Barbarian
+| Rogue
+| Bristlebane
+| style="color: black;" |'''Dubious'''
+|-
+| Barbarian
+| Rogue
+| The Tribunal
+| style="color: Black;" |'''Apprehensively'''
+|-
+| Barbarian
+| Shaman
+| '''ALL'''
+| style="color: blue;" |'''Amiably'''
+|-
+| Barbarian
+| Warrior
+| Agnostic
+| style="color: black;" |'''Indifferent'''
+|-
+| Barbarian
+| Warrior
+| Rallos Zek
+| style="color: black;" |'''Indifferent'''
+|-
+| Barbarian
+| Warrior
+| The Tribunal
+| style="color: blue;" |'''Amiably'''
+
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Wolves of the North]]</big><br>Barbarian Warriors & Guards
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Barbarian
+| Rogue
+| '''ALL'''
+| style="color: black;" |'''Apprehensively'''
+|-
+| Barbarian
+| Shaman
+| '''ALL'''
+| style="color: blue;" |'''Amiably'''
+|-
+| Barbarian
+| Warrior
+| '''ALL'''
+| style="color: blue;" |'''Amiably'''
+
+|}
+<br>
+
+===[[High Keep]]===
+High Keep, located in the mountains between the Karanas and the lands of Antonica, serves as a bustling trade hub and stronghold for the Highpass Guards. The factions within High Keep influence both the safety of travelers and the activities within the keep's walls.
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Highpass Guards]]</big><br>High Keep Guards
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Merchants of Highpass]]</big><br>High Keep Merchants & Banker
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+<br>
+===[[Neriak]]===
+Neriak, the capital of the Teir'Dal (Dark Elves), is a sprawling underground city divided into three distinct zones: Neriak Foreign Quarter, Neriak Commons, and Neriak Third Gate. Each zone represents a deeper and more secure part of the city, with increasing restrictions on who can enter. The city is home to various factions that govern its social and political life.
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Dark Bargainers]]</big><br>Dark Elf Merchants & Banker
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Dark Elf
+| Rogue
+| Innoruuk
+| style="color: blue;" |'''Amiably'''
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Indifferent'''
+|-
+| Human
+| Rogue
+| Innoruuk
+| '''Indifferent'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Dreadguard Inner]]</big><br>Dark Elf Inner Guards
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Dark Elf
+| Rogue
+| Bristlebane
+|'''Apprehensively'''
+|-
+| Dark Elf
+| Rogue
+| Innoruuk
+| style="color: blue;" |'''Amiably'''
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Dubious'''
+|-
+| Human
+| Rogue
+| Innoruuk
+| '''Dubious'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Dreadguard Outer]]</big><br>Dark Elf Outer Guards
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Dark Elf
+| Rogue
+| Innoruuk
+| style="color: blue;" |'''Amiably'''
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Dubious'''
+|-
+| Human
+| Rogue
+| Innoruuk
+| '''Apprehensively'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Hall of the Ebon Mask]]</big><br>Dark Elf Rogues
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Dark Elf
+| Rogue
+| Bristlebane
+| style="color: blue;" |'''Amiably'''
+|-
+| Dark Elf
+| Rogue
+| Innoruuk
+| style="color: blue;" |'''Amiably'''
+|-
+| Human
+| Rogue
+| Innoruuk
+| '''Dubious'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Indigo Brotherhood]]</big><br>Dark Elf Warriors
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Dark Elf
+| Rogue
+| Innoruuk
+| style="color: blue;" |'''Amiably'''
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| style="color: red;" |'''Threatening'''
+|-
+| Human
+| Rogue
+| Innoruuk
+| '''Dubious'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Priests of Innoruuk]]</big><br>Dark Elf Clerics<br>Supporters of [[King Naythox Thex]]
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Dark Elf
+| Rogue
+| Bristlebane
+| style="color: blue;" |'''Amiably'''
+|-
+| Dark Elf
+| Rogue
+| Innoruuk
+| style="color: blue;" |'''Amiably'''
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| style="color: red;" |'''Threatening'''
+|-
+| Human
+| Rogue
+| Innoruuk
+| style="color: red;" |'''Threatening'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[The Dead]]</big><br>Dark Elf Necromancers, Shadowknights, & Wizards<br>Supporters of [[Queen Cristanos Thex]]
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Dark Elf
+| Rogue
+| Innoruuk
+| style="color: blue;" |'''Amiably'''
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Dubious'''
+|-
+| Human
+| Rogue
+| Innoruuk
+| style="color: red;" |'''Threatening'''
+|}
+
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[The Spurned]]</big><br>Dark Elf Enchanters, Magicians, & Wizards<br>Supporters of [[King Naythox Thex]]
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Dark Elf
+| Rogue
+| Innoruuk
+| style="color: blue;" |'''Amiably'''
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Dubious'''
+|-
+| Human
+| Rogue
+| Innoruuk
+| '''Dubious'''
+|}
+<br>
+
+===[[Oggok]]===
+Oggok, the stronghold of the Ogre race, is located in the southwestern swamps of Antonica. As a city controlled by the brutish Ogres, it harbors a handful of factions that reflect their militaristic and primal culture. The main factions in Oggok are largely concerned with maintaining order and strength within the Ogre community, while also keeping outsiders—particularly "good-aligned" races—at bay.
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Clurg]]</big><br>Ogre Bartender, Guards (Oggok), & Banker
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Human
+| Rogue
+| Innoruuk
+| style="color: red;" |'''Threatening'''
+|-
+| Ogre
+| Shadowknight
+| Cazic-Thule
+| style="color: blue;" |'''Amiably'''
+|-
+| Ogre
+| Shaman
+| Rallos Zek
+| style="color: blue;" |'''Kindly'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Craknek Warriors]]</big><br>Ogre Warriors
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Human
+| Rogue
+| Innoruuk
+| style="color: red;" |'''Ready to Attack'''
+|-
+| Ogre
+| Shadowknight
+| Cazic-Thule
+| style="color: blue;" |'''Kindly'''
+|-
+| Ogre
+| Shaman
+| Rallos Zek
+| style="color: blue;" |'''Kindly'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Green Blood Knights]]</big><br>Ogre Shadowknights
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Human
+| Rogue
+| Innoruuk
+| style="color: red;" |'''Ready to Attack'''
+|-
+| Ogre
+| Shadowknight
+| Cazic-Thule
+| style="color: blue;" |'''Amiably'''
+|-
+| Ogre
+| Shaman
+| Rallos Zek
+| '''Indifferent'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Merchants of Ogguk]]</big><br>Ogre Merchants
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Human
+| Rogue
+| Innoruuk
+| '''Dubious'''
+|-
+| Ogre
+| Shadowknight
+| Cazic-Thule
+| style="color: blue;" |'''Warmly'''
+|-
+| Ogre
+| Shaman
+| Rallos Zek
+| style="color: blue;" |'''Warmly'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Oggok Citizens | Oggok Residents]]</big><br>Ogre Citizens
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Human
+| Rogue
+| Innoruuk
+| '''Indifferent'''
+|-
+| Ogre
+| Shadowknight
+| Cazic-Thule
+| '''Indifferent'''
+|-
+| Ogre
+| Shaman
+| Rallos Zek
+| '''Indifferent'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Oggok Guards]]</big><br>Ogre Guards (Feerrott)
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Human
+| Rogue
+| Innoruuk
+| style="color: red;" |'''Threatening'''
+|-
+| Ogre
+| Shadowknight
+| Cazic-Thule
+| style="color: blue;" |'''Amiably'''
+|-
+| Ogre
+| Shaman
+| Rallos Zek
+| style="color: blue;" |'''Kindly'''
+|-
+| Wood Elf
+| Ranger
+| Tunare
+| style="color: red;" |'''Ready to Attack'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Shamen of War]]</big><br>Ogre Shaman
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Human
+| Rogue
+| Innoruuk
+| style="color: red;" |'''Threatening'''
+|-
+| Ogre
+| Shadowknight
+| Cazic-Thule
+| style="color: blue;" |'''Amiably'''
+|-
+| Ogre
+| Shaman
+| Rallos Zek
+| style="color: blue;" |'''Amiably'''
+|}
+<br>
+
+===[[Qeynos]]===
+Qeynos, one of the major human cities, is home to a variety of factions that govern the daily life, politics, and security within its walls and surrounding territories. Characters entering Qeynos will encounter a number of prominent factions that determine their ability to safely move through the city and interact with its inhabitants.
+
+'''See [[Starting Faction Standings#Antonica| Antonica]] for [[Steel Warriors]] (Qeynos Warriors).'''
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Banker]]</big><br>Qeynos Banker & Barbarian Bodyguards
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Indifferent'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Bloodsabers]]</big><br>Qeynos Sewer Bertoxxuous-Worshipers 
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Dubious'''
+|-
+| Erudite
+| Cleric
+| Cazic Thule
+| '''Apprehensive'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Circle Of Unseen Hands]]</big><br>Qeynos Rogues
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Indifferent'''
+|-
+| Erudite
+| Wizard
+| Agnostic
+| '''Indifferent'''
+|-
+| Erudite
+| Cleric
+| Prexus
+| '''Indifferent'''
+|-
+| Erudite
+| Cleric
+| Quellious
+| '''Indifferent'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Corrupt Qeynos Guards]]</big><br>Qeynos Evil Guards
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Apprehensively'''
+|-
+| Erudite
+| Cleric
+| Cazic Thule
+| '''Apprehensively'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Guards of Qeynos]]</big><br>Qeynos Good Guards 
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Apprehensively'''
+|-
+| Erudite
+| Cleric
+| Cazic Thule
+| '''Dubious'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Knights of Thunder]]</big><br>Qeynos Paladins & Clerics (Karana)
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Apprehensively'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Order of Three]]</big><br>Qeynos Casters
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Apprehensively'''
+|-
+| Erudite
+| Cleric
+| Cazic Thule
+| style="color: blue;" |'''Threatening'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Priests of Life]]</big><br>Qeynos Paladins & Clerics (Rodcet Nife)
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Apprehensively'''
+|-
+| Erudite
+| Cleric
+| Cazic Thule
+| '''Dubiously'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[QeynosCitizen | Qeynos Citizen]]</big><br>Qeynos  Citizens
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| style="color: blue;" |'''Amiably'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Silent Fist Clan]]</big><br>Qeynos  Monks
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| style="color: blue;" |'''Amiably'''
+|-
+| Erudite
+| Cleric
+| Cazic
+| style="color: blue;" |'''Amiably'''
+|}
+<br>
+
+===[[Rivervale]]===
+Rivervale, the quaint home of the Halflings, is a small but vibrant community nestled in the Misty Thicket. Despite its size, the town boasts a variety of factions that govern the social, political, and religious life of its inhabitants.
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[DeepPockets]]</big><br>Halfling Rogues
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Guardians of the Vale]]</big><br>Halfling Guards
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Mayor Gubbin]]</big><br>Halfling Mayor
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Merchants of Rivervale]]</big><br>Halfling Merchants & Banker
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Priests of Mischief]]</big><br>Halfling Clerics
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Storm Reapers]]</big><br>Halfling Druids 
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+<br>
+===[[Surefall Glade]]===
+Surefall Glade is a serene and secluded settlement located in the Qeynos Hills, home to the Rangers and Druids who dedicate their lives to the protection of nature. The glade is guarded by towering trees, and its denizens are closely aligned with the natural order, reflecting their deep bond with the environment.
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Jaggedpine Treefolk]]</big><br>Surefall Glade Druids
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Dubious'''
+|-
+| Erudite
+| Cleric
+| Cazic Thule
+| style="color: red;" |'''Threatening'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Protectors of Pine]]</big><br>Surefall Glade Rangers
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| style="color: blue;" |'''Amiably'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[QRG Protected Animals]]</big><br>Surefall Glade Animals
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| style="color: red;" |'''Threatening'''
+|}
+<br>
+==Faydark==
+Faydark is a densely forested region divided into Greater Faydark and Lesser Faydark, home to a variety of factions that influence players beyond the scope of specific cities or continents. The area is a central hub for both Wood Elves and High Elves, but also hosts multiple factions that travelers and adventurers will interact with as they traverse this vast woodland.
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Emerald Warriors]]</big><br>Felwithe & Kelethin Guards
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Dark Elf
+| Wizard
+| Solusek Ro
+| style="color: red;" |'''Ready to Attack'''
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Apprehensive'''
+|-
+| Ogre
+| Warrior
+| Rallos Zek
+| style="color: red;" |'''Threatening'''
+|}
+<br>
+===[[Ak'Anon]]===
+Ak'Anon, the subterranean city of Gnomes, is home to various factions that represent the diverse interests and political groups of the city. These factions include mechanical innovators, religious sects, and law enforcers, all of which shape the internal workings of Ak'Anon. 
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Dark Reflection]]</big><br>Gnome Evil Casters
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Apprehensive'''
+|-
+| Wood Elf
+| Ranger
+| Tunare
+| style="color: red;" |'''Ready to Attack'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Deep Muses]]</big><br>Gnome Clerics & Rogues
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Apprehensive'''
+|-
+| Wood Elf
+| Ranger
+| Tunare
+| '''Apprehensive'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Eldritch Collective]]</big><br>Gnome Good Casters
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Apprehensive'''
+|-
+| Wood Elf
+| Ranger
+| Tunare
+| '''Apprehensive'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Gem Choppers]]</big><br>Gnome Warriors & Guards
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Dark Elf
+| Wizard
+| Solusek Ro
+| '''Dubious'''
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Apprehensive'''
+|-
+| Erudite
+| Wizard
+| Agnostic
+| style="color: blue;" |'''Apprehensive'''
+|-
+| Wood Elf
+| Ranger
+| Tunare
+| '''Apprehensive'''
+|-
+| Erudite
+| Cleric
+| Cazic Thule
+| '''Dubious'''
+|-
+| Erudite
+| Necromancer
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Cleric
+| Prexus
+| '''Apprehensive'''
+|-
+| Erudite
+| Cleric
+| Quellious
+| '''Apprehensive'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[King Ak'Anon]]</big><br>Clockwork Guards
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Indifferent'''
+|-
+| Wood Elf
+| Ranger
+| Tunare
+| '''Indifferent'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Merchants of AkAnon]]</big><br>Gnome Merchants
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Indifferent'''
+|-
+| Wood Elf
+| Ranger
+| Tunare
+| '''Indifferent'''
+|}
+<br>
+
+===[[Felwithe]]===
+Felwithe, the elegant city of the High Elves (Koada'Dal), is nestled in the forest of Faydwer and serves as a haven for followers of Tunare, the goddess of nature. It is a place of peace and beauty, but like all cities in Norrath, it is governed by strict faction alignments.
+
+'''See [[Starting Faction Standings#Faydark| Faydark]] for [[Emerald Warriors]] (High Elf Guards).'''
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Clerics of Tunare]]</big><br>High Elf Paladins & Clerics
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Apprehensive'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Keepers of the Art]]</big><br>High Elf Casters
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| style="color: blue;" |'''Amiably'''
+|-
+| Erudite
+| Wizard
+| Agnostic
+| style="color: blue;" |'''Amiably'''
+|-
+| Erudite
+| Shadow Knight
+| Cazic Thule
+| style="color: red;" |'''Threatening'''
+|-
+| Erudite
+| Necromancer
+| Cazic Thule
+| style="color: red;" |'''Threatening'''
+|-
+| Erudite
+| Cleric
+| Cazic Thule
+| style="color: blue;" |'''Apprehensive'''
+|-
+| Erudite
+| Cleric
+| Prexus
+| style="color: blue;" |'''Indifferent'''
+|-
+| Erudite
+| Cleric
+| Quellious
+| style="color: blue;" |'''Indifferent'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Merchants of Felwithe]]</big><br>High Elf Merchants & Banker
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Indifferent'''
+|}
+<br>
+
+===[[Kaladim]]===
+Kaladim is the stronghold of the Dwarves, located in the Butcherblock Mountains, and serves as the primary hub for Dwarven characters. The city is governed by the Kingdom of Underfoot, and its denizens are deeply loyal to their deity, Brell Serilis
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Clerics of Underfoot]]</big><br>Dwarf Clerics & Paladins
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Ogre
+| Warrior
+| Rallos Zek
+| style="color: red;" |'''Threatening'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Kazon Stormhammer]]</big><br>Dwarf King
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Miners Guild 249]]</big><br>Dwarf Miners [[Kalamin Norkhitter]] and [[Atheki Norkhitter]]
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Miners Guild 628]]</big><br>Dwarf Rogues
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Dark Elf
+| Wizard
+| Solusek Ro
+| style="color: red;" |'''Threatening'''
+|-
+| Half Elf
+| Bard
+| Agnostic
+| style="color: blue;" |'''Amiable'''
+|-
+| Human
+| Rogue
+| Bristlebane
+| style="color: blue;" |'''Amiable'''
+|-
+| Ogre
+| Warrior
+| Rallos Zek
+| style="color: red;" |'''Threatening'''
+|-
+| Wood Elf
+| Ranger
+| Tunare
+| style="color: blue;" |'''Amiable'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Storm Guard]]</big><br>Dwarf Warriors/Guards
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Dark Elf
+| Wizard
+| Solusek Ro
+| style="color: red;" |'''Threatening'''
+|-
+| Dwarf
+| Warrior
+| Agnostic
+| style="color: blue;" |'''Amiably'''
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Apprehensive'''
+|-
+| Gnome
+| Necromancer
+| Bertoxxulous
+| style="color: red;" |'''Threatening'''
+|-
+| Half Elf
+| Bard
+| Agnostic
+| '''Apprehensive'''
+|-
+| Human
+| Rogue
+| Bristlebane
+| '''Apprehensive'''
+|-
+| Ogre
+| Warrior
+| Rallos Zek
+| style="color: red;" |'''Ready to Attack'''
+|-
+| Wood Elf
+| Ranger
+| Tunare
+| '''Apprehensive'''
+|}
+<br>
+
+===[[Kelethin]]===
+Kelethin, the treetop city of the Wood Elves, is nestled in the forests of Greater Faydark. Its primary factions are aligned with nature and the elven way of life, welcoming those who share their values while showing caution or outright hostility toward outsiders.
+
+'''See [[Starting Faction Standings#Faydark| Faydark]] for [[Emerald Warriors]] (Wood Elf Warriors & Guards).'''
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Faydarks Champions]]</big><br>Wood Elf Rangers
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Kelethin Merchants]]</big><br>Wood Elf Merchants
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Soldiers of Tunare]]</big><br>Wood Elf Druids
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Songweavers]]</big><br>Wood Elf Bards
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Tunare's Scouts]]</big><br>Wood Elf Rogues
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+<br>
+
+==Odus==
+Odus, the remote continent inhabited primarily by the Erudites, is home to unique factions that play a significant role in shaping its political and social structure. However, several factions on Odus extend beyond the borders of the continent, influencing relationships with characters from other regions of Norrath.
+<br>
+===[[Erudin]]===
+Erudin, the capital city of the Erudites, is a hub of intellectualism and magical study located on the western island of Odus. Governed by a scholarly and peaceful society, Erudin is home to several influential factions that shape the city's structure and politics.
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Craftkeepers]]</big><br>Erudite Enchanters
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Indifferent'''
+|-
+| Erudite
+| Wizard
+| Agnostic
+| '''Indifferent'''
+|-
+| Erudite
+| Shadow Knight
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Necromancer
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Cleric
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Cleric
+| Prexus
+| style="color: blue;" |'''Amiable'''
+|-
+| Wood Elf
+| Ranger
+| Tunare
+| '''Apprehensively'''
+|-
+| Erudite
+| Cleric
+| Quellious
+| style="color: blue;" |'''Amiable'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Crimson Hands]]</big><br>Erudite Wizards
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| style="color: blue;" |'''Amiable'''
+|-
+| Erudite
+| Wizard
+| Agnostic
+| style="color: blue;" |'''Amiable'''
+|-
+| Erudite
+| Shadow Knight
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Necromancer
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Cleric
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Cleric
+| Prexus
+| style="color: blue;" |'''Amiable'''
+|-
+| Erudite
+| Cleric
+| Quellious
+| style="color: blue;" |'''Amiable'''
+|-
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Erudite Citzen]]</big><br>Erudite Citizens
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Cleric
+| Cazic Thule
+| '''Indifferently'''
+|-
+| Erudite
+| Cleric
+| Prexus
+| '''Indifferently'''
+|-
+| Erudite
+| Cleric
+| Quellious
+| '''Indifferently'''
+|-
+| Erudite
+| Wizard
+| Agnostic
+| '''Indifferently'''
+|-
+|}
+
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Deepwater Knights]]</big><br>Erudite Paladins & Clerics (Prexus)
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Apprehensively'''
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Indifferent'''
+|-
+| Erudite
+| Shadow Knight
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Necromancer
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Cleric
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Cleric
+| Prexus
+| style="color: blue;" |'''Amiable'''
+|-
+| Erudite
+| Cleric
+| Quellious
+| style="color: blue;" |'''Amiable'''
+|-
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Gate Callers]]</big><br>Erudite Magicians
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Indifferent'''
+|-
+| Erudite
+| Wizard
+| Agnostic
+| '''Indifferent'''
+|-
+| Erudite
+| Shadow Knight
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Necromancer
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Cleric
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Cleric
+| Prexus
+| style="color: blue;" |'''Amiable'''
+|-
+| Erudite
+| Cleric
+| Quellious
+| style="color: blue;" |'''Amiable'''
+|-
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[High Council of Erudin]]</big><br>Erudite Rulers
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Indifferent'''
+|-
+| Erudite
+| Shadow Knight
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Necromancer
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Cleric
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Cleric
+| Prexus
+| style="color: blue;" |'''Amiable'''
+|-
+| Erudite
+| Cleric
+| Quellious
+| '''Amiably'''
+|-
+| Erudite
+| Wizard
+| Agnostic
+| style="color: blue;" |'''Amiable'''
+|-
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[High Guard of Erudin]]</big><br>Erudite Guards
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Indifferent'''
+|-
+| Erudite
+| Shadow Knight
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Necromancer
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Cleric
+| Cazic Thule
+| '''Apprehensively'''
+|-
+| Erudite
+| Cleric
+| Prexus
+| '''Indifferently'''
+|-
+| Erudite
+| Cleric
+| Quellious
+| '''Indifferently'''
+|-
+| Erudite
+| Wizard
+| Agnostic
+| '''Indifferently'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Merchants of Erudin]]</big><br>Erudite Merchants
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Indifferent'''
+|-
+| Erudite
+| Wizard
+| Agnostic
+| '''Indifferently'''
+|-
+| Erudite
+| Shadow Knight
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Necromancer
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Cleric
+| Cazic Thule
+| '''Indifferent'''
+|-
+| Erudite
+| Cleric
+| Prexus
+| style="color: blue;" |'''Amiable'''
+|-
+| Erudite
+| Cleric
+| Quellious
+| style="color: blue;" |'''Amiable'''
+|-
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Peace Keepers]]</big><br>Erudite Paladins & Clerics (Quellious)
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| '''Indifferent'''
+|-
+| Erudite
+| Wizard
+| Agnostic
+| '''Indifferently'''
+|-
+| Erudite
+| Shadow Knight
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Necromancer
+| Cazic Thule
+| '''Dubiously'''
+|-
+| Erudite
+| Cleric
+| Cazic Thule
+| '''Indifferently'''
+|-
+| Erudite
+| Cleric
+| Prexus
+| style="color: blue;" |'''Amiable'''
+|-
+| Erudite
+| Cleric
+| Quellious
+| style="color: blue;" |'''Amiable'''
+|}
+<br>
+
+===[[Paineel]]===
+Paineel, the dark city of the Heretics, serves as the home of Erudite Necromancers and Shadow Knights who rejected the teachings of Erudin. This secluded and forbidden city is deeply rooted in the worship of Cazic-Thule, the god of fear. Its residents live in isolation, shunned by most of Norrath’s surface civilizations.
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Heretics]]</big><br>Evil Erudites
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Cleric
+| Cazic Thule
+| style="color: blue;" |'''Amiably'''
+|-
+| Erudite
+| Shadow Knight
+| Cazic Thule
+| style="color: blue;" |'''Amiably'''
+|-
+| Erudite
+| Necromancer
+| Cazic Thule
+| style="color: blue;" |'''Amiably'''
+|-
+| Erudite
+| Cleric
+| Prexus
+| style="color: red;" |'''Threatening'''
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| style="color: red;" |'''Threatening'''
+|-
+| Erudite
+| Wizard
+| Agnostic
+| '''Dubiously*'''
+|-
+| Erudite
+| Cleric
+| Quellious
+| style="color: red;" |'''Threatening'''
+|}
+<br>
+
+*Note one kobold kill took my agnostic wizard to apprehensive. But Heretic faction hits might be added only with Paineel or Warrens Era.
+Cazic Clerics Can also survive the Erudin faction hit of handing in guild note but SK's and Necros cannot.
+
+==Kunark==
+Kunark is a dangerous and untamed continent, home to various powerful factions that are not bound by any particular city or landmass, making them unique in Norrath’s complex political and social landscape. The factions found in Kunark often represent ancient empires, warring tribes, and primal forces, each vying for dominance over this vast and wild continent. 
+<br>
+===[[Cabilis]]===
+Cabilis, the city of the Iksar, is a fortified stronghold located in the southeastern part of Kunark. As the central hub for Iksar players, the city is home to several major factions that govern the different aspects of Iksar society.
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Brood of Kotiz]]</big><br>Iksar Necromancers
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Cabilis Residents]]</big><br>Iksar Merchants & Banker
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Crusaders of Greenmist]]</big><br>Iksar Shadowknights & Crusaders
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Legion of Cabilis]]</big><br>Iksar Warriors & Troopers
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| style="color: red;" |'''Ready to Attack'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Scaled Mystics]]</big><br>Iksar Shaman
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Swift Tails]]</big><br>Iksar Monks
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+<br>
+
+===[[Firiona Vie]]===
+Firiona Vie, a coastal elven outpost on Kunark, serves as the home base for the forces of good in the region. Controlled primarily by High Elves and their allies, the city is aligned with noble factions, making it a safe haven for those who follow virtuous paths.
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Inhabitants of Firiona Vie]]</big><br>Good Inhabitants
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Erudite
+| Wizard
+| Solusek Ro
+| style="color: blue;" |'''Amiably'''
+|}
+<br>
+
+===[[Overthere]]===
+Overthere is a vast and dangerous outpost located on the western edge of the continent of Kunark. It serves as a key hub for both adventurers and the dark forces that control the region.
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Venril Sathir]]</big><br>Evil Inhabitants
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+
+==Velious==
+In the icy lands of Velious, factions take on a unique role compared to other continents, as they are not tied to specific cities but to powerful factions vying for dominance across the continent.
+<br>
+===[[Kael Drakkal]]===
+Kael Drakkal, often referred to as the city of the Kromzek giants, is a massive stronghold located in the frozen wastelands of Velious. This imposing fortress is home to the giants who serve the god of war, Rallos Zek.
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[King Tormax (Faction)| King Tormax]]</big><br>Giant King
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Kromrif]]</big><br>Frost Giants
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Kromzek]]</big><br>Storm Giants
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+<br>
+
+===[[Skyshrine]]===
+Skyshrine is a towering, ancient city located in the frozen lands of the Western Wastes, serving as the stronghold of the Claws of Veeshan, the dragon faction. Dominated by powerful dragons, wurms, and dragonkin, Skyshrine is a place of immense significance to those aligned with the dragonkind of Velious.
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Claws of Veeshan]]</big><br>Velious Dragons
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Yelinak]]</big><br>Lord of the Dragons
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+<br>
+===[[Thurgadin]]===
+Thurgadin is the home city of the Coldain dwarves, located within the frozen lands of Velious. As one of the major faction hubs, Thurgadin plays a pivotal role in the intricate faction dynamics of the continent. The Coldain, a proud and resilient people, are generally welcoming to adventurers who do not bear allegiance to their sworn enemies.
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Coldain]]</big><br>Thurgadin Dwarves
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Dain Frostreaver IV (Faction)| Dain Frostreaver IV]]</big><br>King of the Thurgadin Dwarves
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| TBA
+| TBA
+| TBA
+| '''TBA'''
+|}
+<br>
+==Miscellaneous==
+There are numerous miscellaneous factions scattered across the world, each with its own reputation system that players must manage. These factions range from local enemies in certain regions to neutral or obscure groups that may not have as much impact on the game's main storylines but can still influence your gameplay experience.
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Allize Taeew]]</big><br>Lizardmen of Cazic Thule.
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Wood Elf
+| Ranger
+| Tunare
+| style="color: red;" |'''Threatening'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Allize Volew]]</big><br>Lizardmen of Feerrott.
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Wood Elf
+| Ranger
+| Tunare
+| style="color: black;" |'''Dubious'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Brownie]]</big><br>Brownies of Lesser Faydark.
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Wood Elf
+| Ranger
+| Tunare
+| style="color: red;" |'''Ready to Attack'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Crushbone Orcs]]</big><br>Orcs of the Crushbone Clan.
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Wood Elf
+| Ranger
+| Tunare
+| style="color: red;" |'''Ready to Attack'''
+|}
+
+
+{| class="eoTable3 sortable"
+|-
+!colspan="18" style="text-align: center;" | <big>[[Skytalons]]</big><br>The Fae Drakes of Faydark.
+|- style="font-size: 75%;"
+! style="width:15em;" |Race
+! style="width:15em;" |Class
+! style="width:15em;" |Deity
+! style="width:15em;" |Standing
+|-
+| Wood Elf
+| Ranger
+| Tunare
+| style="color: blue;" |'''Kindly'''
+|}
+
+
+[[Category:Guides]]
+[[Category:Factions]]

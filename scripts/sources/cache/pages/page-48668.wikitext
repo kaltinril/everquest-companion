@@ -1,0 +1,6 @@
+{{Epics Era}}
+
+Half elves do not have any unique cultural tradeskills, although they can use many items crafted by other races.
+
+{{Navbox Cultural Tradeskills}}
+[[Category:Tradeskills]]

@@ -1,0 +1,44 @@
+{{Velious Era}}
+{{Factionpage|
+
+| description = Faction of the Othmir race. (5-11-22 I was in wolf form and went from apprehensive to dubious and the Othmir attacked me)
+
+| zones_raise =
+
+* [[Eastern Wastes]]
+
+| zones_lower =
+
+* [[Cobalt Scar]]
+
+| quests_raise =
+
+* [[Bulthar Trunks]]
+* [[Emerald Dragonscale]]
+* [[Lodizal Shell Shield Quest]]
+* [[Saucy Salted Seadragon Steak]]
+* [[Ulthork Tusks Quest]]
+
+| quests_lower =
+
+
+| mobs_raise =
+
+* [[a ulthork man o war]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[a walrus]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[an ulthork hunter]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[an ulthork warrior]]  <span class='fmz'>(Eastern Wastes)</span>
+
+| mobs_lower =
+
+* [[a shellfish collector]]  <span class='fmz'>(Cobalt Scar)</span>
+* [[an Othmir Pup]]  <span class='fmz'>(Cobalt Scar)</span>
+* [[an Othmir Shaman]]  <span class='fmz'>(Cobalt Scar)</span>
+* [[an Othmir Warrior]]  <span class='fmz'>(Cobalt Scar)</span>
+* [[Bloogy Shellcracker]] <span class='fmz'>(Cobalt Scar - Merchant)</span>
+* [[Blumblum Swigwater]] <span class='fmz'>(Cobalt Scar - Merchant)</span>
+* [[Bungre Crawcrusher]] <span class='fmz'>(Cobalt Scar - Quest NPC)</span>
+* [[Chief Kalan]] <span class='fmz'>(Cobalt Scar - Quest NPC)</span>
+* [[Qarrgy Scallopgobbler]] <span class='fmz'>(Cobalt Scar - Quest NPC)</span>
+
+}}

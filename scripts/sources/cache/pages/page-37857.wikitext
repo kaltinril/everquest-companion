@@ -1,0 +1,79 @@
+{{Factionpage|
+
+| description = Broken Skull is the fading remnants of the founding Clan of the trolls on Antonica. The legendary troll hero, Nalikor - chosen by the dragon, [[Trakanon]], to wield the 
+"Flaming Sword of Nalikor" - led his 'people' from Kunark and landed on Broken Skull Rock. This rock is seen on the game map as off the coast from the Greenblood River, and is actually 
+the island where the Temple of [[Cazic Thule]] now stands in ruin surrounded by the Greenblood River within Feerott.
+
+Nalikor's body and sword was entombed on the rock, by his fellow clansmen. According to Trakanon, as told to Edril the ElfLord, the sword combined with Edril's pendant and the 'treasures' 
+of the lich [[Miragul]] would enable one to achieve demigod status. None have yet to be recovered, if they even exist. 
+
+| zones_raise = 
+
+* [[Grobb]]
+* [[Innothule Swamp]]
+* [[Rathe Mountains]]
+* [[Neriak|Neriak Foreign Quarter]]
+* [[Ocean of Tears]]
+
+| zones_lower = 
+
+* [[Innothule Swamp]]
+* [[Steamfont Mountains]]
+
+| quests_raise = 
+
+* [[Lynuga's Gem Collection]]
+
+| quests_lower = 
+
+* [[Bugglegupp]]
+* [[HEHE Meat Quest]]
+* [[Ranjor's Test]]
+
+| mobs_raise = 
+
+* [[a troll slayer]]  <span class='fmz'>(Innothule Swamp)</span>
+* [[Basher Avisk]] <span class='fmz'>(Grobb)</span>
+* [[Basher Banzuk]] <span class='fmz'>(Grobb)</span>
+* [[Basher Bugak]] <span class='fmz'>(Grobb)</span>
+* [[Basher Ganbaku]] <span class='fmz'>(Grobb)</span>
+* [[Basher Glaum]] <span class='fmz'>(Grobb)</span>
+* [[Basher Gobzin]] <span class='fmz'>(Grobb)</span>
+* [[Basher Gubaku]] <span class='fmz'>(Grobb)</span>
+* [[Basher Kankuk]] <span class='fmz'>(Grobb)</span>
+* [[Basher Kigak]] <span class='fmz'>(Grobb)</span>
+* [[Basher Nagkuma]] <span class='fmz'>(Grobb)</span>
+* [[Basher Nanrum]] <span class='fmz'>(Grobb)</span>
+* [[Basher Rakguk]] <span class='fmz'>(Grobb)</span>
+* [[Basher Razbaz]] <span class='fmz'>(Grobb)</span>
+* [[Basher Roruma]] <span class='fmz'>(Grobb)</span>
+* [[Basher Scintok]] <span class='fmz'>(Grobb)</span>
+* [[Basher Sklama]] <span class='fmz'>(Innothule Swamp)</span>
+* [[Basher Smag]] <span class='fmz'>(Innothule Swamp)</span>
+* [[Basher Stizik]] <span class='fmz'>(Grobb)</span>
+* [[Basher Sutok]] <span class='fmz'>(Grobb)</span>
+* [[Basher Thintan]] <span class='fmz'>(Grobb)</span>
+* [[Basher Trak]] <span class='fmz'>(Innothule Swamp)</span>
+* [[Basher Wisthak]] <span class='fmz'>(Grobb)</span>
+* [[Basher Zabaak]] <span class='fmz'>(Grobb)</span>
+* [[Basher Zazluk]] <span class='fmz'>(Grobb)</span>
+* [[Basher Bibeka]] <span class='fmz'>(Grobb)</span>
+* [[Basher Kumek]] <span class='fmz'>(Grobb)</span>
+* [[Basher Uvgin]] <span class='fmz'>(Grobb)</span>
+* [[Guard Shiznak]] <span class='fmz'>(Mountains of Rathe)</span>
+* [[Hergor]] <span class='fmz'>(Grobb - Warrior Guildmaster)</span>
+* [[Hukulk]] <span class='fmz'>(Grobb - Shadowknight Guildmaster)</span>
+* [[Basher Oggrik]] <span class='fmz'>(Innothule Swamp)</span>
+* [[Kragia]] <span class='fmz'>(Grobb - Warrior Guildmaster)</span>
+* [[Nerbilik]] <span class='fmz'>(Ocean of Tears - Quest NPC)</span>
+* [[Ranjor]] <span class='fmz'>(Grobb - Warrior Guildmaster)</span>
+* [[Wista]] <span class='fmz'>(Grobb - Merchant)</span>
+* [[Zatok]] <span class='fmz'>(Grobb - Merchant)</span>
+* [[Zimbittle]]  <span class='fmz'>(Innothule Swamp)</span>
+
+| mobs_lower = 
+
+* [[Bugglegupp]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[Lynuga]] <span class='fmz'>(Innothule Swamp - Quest NPC)</span>
+
+}}

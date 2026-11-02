@@ -1,0 +1,64 @@
+{{Factionpage|
+
+| description = Bandits that prey on travellers in [[Timorous Deep]] and [[Ocean of Tears]].
+
+| zones_raise = 
+
+* [[Firiona Vie]]
+* [[Lake of Ill Omen]]
+
+| zones_lower = 
+
+* [[Firiona Vie]]
+* [[Lake of Ill Omen]]
+* [[Ocean of Tears]]
+* [[Timorous Deep]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+* [[Beguile Plants]]
+* [[Brain Bite (Good)]]
+* [[Drolvarg Teeth]]
+* [[Goblin Raiders]]
+* [[Illusion: Iksar Quest]]
+* [[Shaman Epic Quest]]
+
+| mobs_raise = 
+
+* [[a bloodgill goblin]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a bloodgill marauder]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a deepwater barracuda]] <span class='fmz'>(Lake of Ill Omen)</span>
+* [[a pilgrim]]  <span class='fmz'>(Firiona Vie)</span>
+* [[an explorer]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[Firiona drixie]]  <span class='fmz'>(Firiona Vie)</span>
+* [[Guard Frandan]] <span class='fmz'>(Firiona Vie)</span>
+* [[Hiptal Frizzleboth]] <span class='fmz'>(Firiona Vie - Magician Guildmaster)</span>
+* [[Lady Chromoire]]  <span class='fmz'>(Firiona Vie)</span>
+* [[Luminare Pasinia]] <span class='fmz'>(Firiona Vie - Quest NPC)</span>
+* [[Scout Treekill]]  <span class='fmz'>(Firiona Vie)</span>
+* [[Sergeant Daelione]] <span class='fmz'>(Firiona Vie)</span>
+* [[Sergeant Greenblade]] <span class='fmz'>(Firiona Vie)</span>
+* [[Shieldbearer Buerd]] <span class='fmz'>(Firiona Vie)</span>
+* [[Shieldbearer Relios]] <span class='fmz'>(Firiona Vie)</span>
+* [[Tracker Azeal]] <span class='fmz'>(Firiona Vie - NPC, Non-Quest)</span>
+* [[Vrionele]]  <span class='fmz'>(Firiona Vie)</span>
+* [[Wella Fargin]] <span class='fmz'>(Firiona Vie - Banker)</span>
+* [[Wellford Fargin]] <span class='fmz'>(Firiona Vie - Banker)</span>
+
+| mobs_lower = 
+
+* [[a bandit]] <span class='fmz'>(Timorous Deep)</span>
+* [[a bandit leader]] <span class='fmz'>(Timorous Deep)</span>
+* [[A Pirate]] <span class='fmz'>(Firiona Vie - NPC, Non-Quest)</span>
+* [[A Pirate Cartographer]] <span class='fmz'>(Firiona Vie - NPC, Non-Quest)</span>
+* [[Capt Surestout]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Dayle Jornin]] <span class='fmz'>(Ocean of Tears - Quest NPC)</span>
+* [[Dixl Drool]] <span class='fmz'>(Ocean of Tears)</span>
+* [[Gornit]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Red Eye Jack]]  <span class='fmz'>(Firiona Vie)</span>
+* [[Toko Binlittle]]  <span class='fmz'>(Ocean of Tears)</span>
+
+}}

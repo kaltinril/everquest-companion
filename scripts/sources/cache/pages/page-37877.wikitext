@@ -1,0 +1,70 @@
+{{Factionpage|
+
+| description = [[Monk]] Guild in Qeynos.
+
+| zones_raise = 
+
+* [[Blackburrow]]
+* [[Lake Rathetear]]
+* [[Qeynos|North Qeynos]]
+* [[Surefall Glade]]
+
+| zones_lower = 
+
+* [[Qeynos|North Qeynos]]
+* [[Qeynos Hills]]
+* [[Freeport|West Freeport]]
+
+| quests_raise = 
+
+* [[Jagged Pine Crook Staff]]
+* [[Monk Headband Quests|Monk Orange Headband]]
+* [[Monk Headband Quests|Monk Purple Headband]]
+* [[Monk Headband Quests|Monk Red Headband]]
+* [[Monk Headband Quests|Monk White Headband]]
+* [[Monk Headband Quests|Monk Yellow Headband]]
+* [[Note for Konem]]
+* [[Monk Sash Quests|Orange Sash of Order]]
+* [[Monk Sash Quests|Red Sash]]
+* [[Tomer's Rescue]]
+* [[Monk Sash Quests|White Sash]]
+* [[Monk Sash Quests|Yellow Sash]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[a burly gnoll]]  <span class='fmz'>(Blackburrow)</span>
+* [[a gnoll]]  <span class='fmz'>(Blackburrow)</span>
+* [[a gnoll brewer]]  <span class='fmz'>(Blackburrow)</span>
+* [[a gnoll guardsman]]  <span class='fmz'>(Blackburrow)</span>
+* [[a gnoll pup]]  <span class='fmz'>(Blackburrow)</span>
+* [[a gnoll scout]]  <span class='fmz'>(Blackburrow)</span>
+* [[a gnoll shaman]]  <span class='fmz'>(Lake Rathetear)</span>
+* [[a patrolling gnoll]]  <span class='fmz'>(Blackburrow)</span>
+* [[a razorgill]]  <span class='fmz'>(Blackburrow)</span>
+* [[a scrawny gnoll]]  <span class='fmz'>(Blackburrow)</span>
+* [[an elite gnoll guard]]  <span class='fmz'>(Blackburrow)</span>
+* [[Djerr Darkpaw]]  <span class='fmz'>(North Qeynos)</span>
+* [[Fippy Darkpaw]]  <span class='fmz'>(North Qeynos)</span>
+* [[Tranixx Darkpaw]]  <span class='fmz'>(Blackburrow)</span>
+
+| mobs_lower = 
+
+* [[Asnod Marnoc]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Fania Esruc]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Klom Jysun]] <span class='fmz'>(West Freeport - Quest NPC)</span>
+* [[Konem Matse]]  <span class='fmz'>(Qeynos Hills)</span>
+* [[LuSun]] <span class='fmz'>(North Qeynos - Monk Guildmaster)</span>
+* [[Phin Esrinap]] <span class='fmz'>(North Qeynos - Monk Guildmaster)</span>
+* [[Puab Closk]] <span class='fmz'>(West Freeport - Quest NPC)</span>
+* [[Ran`Un]] <span class='fmz'>(West Freeport - NPC, Non-Quest)</span>
+* [[Reyia Beslin]] <span class='fmz'>(West Freeport - Quest NPC)</span>
+* [[Seta Bakindo]] <span class='fmz'>(North Qeynos - Monk Guildmaster)</span>
+* [[Thena Lonnes]] <span class='fmz'>(West Freeport - NPC, Non-Quest)</span>
+* [[Togahn Sorast]] <span class='fmz'>(North Qeynos - Monk Guildmaster)</span>
+* [[Tomer Instogle]] <span class='fmz'>(North Qeynos - Quest NPC)</span>
+
+}}
+[[Category:Achievement Faction]]

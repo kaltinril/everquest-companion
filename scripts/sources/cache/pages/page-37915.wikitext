@@ -1,0 +1,46 @@
+{{Classic Era}}[[File:Ghoul_lord.png|right]]{{Factionpage|
+
+| description = This is the faction of the undead [[froglok]]s of Guk, found exclusively in [[Lower Guk]]. Presumably led by [[the ghoul lord]]. They are a tremendous nuisance to the living [[Frogloks of Guk]].
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Lower Guk]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a basalt gargoyle]]  <span class='fmz'>(Lower Guk)</span>
+* [[a bloodthirsty ghoul]] (Lower Guk) <span class='fmz'>(Lower Guk - Undead)</span>
+* [[a clay gargoyle]]  <span class='fmz'>(Lower Guk)</span>
+* [[a frenzied ghoul]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[a ghoul assassin]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[a ghoul cavalier]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[a ghoul executioner]] <span class='fmz'>(Lower Guk - Undead)</span>
+* A Ghoul Ritualist Pet <span class='fmz'>(Lower Guk - Summoned)</span>
+* [[a ghoul sage]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[a ghoul savant]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[a ghoul scribe]]  <span class='fmz'>(Lower Guk)</span>
+* [[a ghoul sentinel]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[a nok ghoul wizard]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[a shin ghoul knight]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[a shin ghoul warrior]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[a vis ghoul knight]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[a wan ghoul knight]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[the ghoul arch magus]] <span class='fmz'>(Lower Guk - Undead)</span>
+* [[the ghoul lord]] <span class='fmz'>(Lower Guk - Undead)</span>
+* The Ghoul Lord Pet <span class='fmz'>(Lower Guk - Summoned)</span>
+
+}}
+
+[[Category:Monster factions]]

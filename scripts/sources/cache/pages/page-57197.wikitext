@@ -1,0 +1,22 @@
+These patch notes are from the Official EverQuest Legends discord, posted on May 29, 2026
+
+= May 29, 2026 =
+ 
+= Hotfix =
+
+* Fixed an issue where under certain scenarios you could lose an item(s) while trading if you crash/lose internet/lose power/game and/or PC abruptly closes.
+* The Raid instance version of Maestro of Rancor has had his lifetap proc rate greatly reduced.
+* Open world Maestro of Rancor has had his lifetap proc reduced.
+* Fixed an issue where personal instances were still not 1 hour. This should be corrected.
+* You can once again request a raid instance of The Hole.
+* Re-added 2Handed Bash to Fiery Avenger.
+* The Lay On Hands and Harm Touch cooldown bonuses from smite and reave now only trigger on successful hits.
+* Allow the use of Smite and Reave while mounted.
+* Sky Teleport Pads from Quest Room and Island 8 now work.
+* Fix overly optimistic client side melee range code that was allowing autoskills to trigger a cooldown but were blocked by the server.
+* Smite (Paladin Ability) mana cost reduced to 2%, damage increased to 3.5x.
+* Block invocation changes while casting and improve client / server invocation and stance cooldown synchronization.
+* Multiplayer Raid for Nagafen zone in location is no longer inside a wall.
+* The group instance for Nagafen's Lair can now contain more than one player.
+* Obsidian Shard should no longer drop from the bees in Plane of Sky.
+* Torc of Veeshan should no longer drop from Noble Dojorn in Plane of Sky.

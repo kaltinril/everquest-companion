@@ -1,0 +1,71 @@
+{{Classic Era}}
+<div style="display: flex;">
+  <div style="flex: 1;">
+    <ul>
+    <li>Summoning Spell: [[Convoke Shadow]]</li>
+    <li>Pet Type: Chilled Bones Skeleton</li>
+    <li>Pet Classes: [[Shadow Knight]] / [[Warrior]]</li>
+    <li>Pet Level: 11</li>
+    <li>Hit Points: 576 (+1/tick)</li>
+    <li>Mana: 220 (+22/tick)</li>
+    </ul>
+  </div>
+  <div style="flex: 1;">
+  [[File:large_chill_bones_summon.png|left|x175px]]
+  </div>
+</div>
+<div style="display: flex;">
+  <div style="flex: 1;">
+    <ul>
+    <li>Defensive Stats</li>
+       <ul>
+       <li>Mitigation: 22</li>
+       <li>Evasion: 127</li>
+       </ul>
+    </ul>
+    <ul>
+    <li>Offensive Stats</li>
+       <ul>
+       <li>Offense: 70</li>
+       <li>Accuracy: 87</li>
+       <li>Max Damage: 18</li>
+       <li>Dual Wield Skill: Low</li>
+       </ul>
+     </ul>
+  </div>
+  <div style="flex: 1;">
+    <ul><li>Strength: 95</li>
+    <li>Stamina: 95</li>
+    <li>Intelligence: 10</li>
+    <li>Wisdom: 10</li>
+    <li>Agility: 95</li>
+    <li>Dexterity: 85</li>
+    <li>Charisma: 8</li></ul>
+  </div>
+</div>
+
+== Abilities ==
+* [[Skill_Bash|Bash]]
+* [[Skill_Block|Block]]
+* [[Skill_Cleave|Cleave]]
+* [[Skill_Dodge|Dodge]]
+* [[Skill_Double_Attack|Double Attack]]
+* [[Skill_Harm_Touch|Harm Touch]]
+* [[Skill_Kick|Kick]]
+* [[Skill_Parry|Parry]]
+* [[Skill_Riposte|Riposte]]
+* [[Skill_Taunt|Taunt]]
+
+== Spell List ==
+* [[Clinging Darkness|<span class='itemeff'>Clinging Darkness</span>]]
+* [[Disease Cloud|<span class='itemeff'>Disease Cloud</span>]]
+* [[Lifespike|<span class='itemeff'>Lifespike</span>]]
+== Focus Items ==
+* None
+
+== Notes ==
+* None
+
+[[Category: Summoned Pet]]
+[[Category: Necromancer Pet]]
+[[Category: Shadow Knight Pet]]

@@ -1,0 +1,232 @@
+{{expand}}
+
+== Relationship Between Models and Races ==
+
+In EverQuest player races can appear with different appearances (faces/gear), in any zone.  Monster races that appeared in multiple zones could only have a single model though, because all such models had to fit inside a "global" monster model file.  There were different models for some monsters, but those models were limited to specific zones.
+
+All of the numbered races below were in the global file.  A user with sufficient privileges on an emulated server can spawn an NPC with that model (anywhere) by using it's number.  Races without a number (eg. [[Clockwork Rat]]) are only found in specific zones.
+
+== Races ==
+
+Each monster race page has a bit of history, lore, and a list of creatures of that race.
+
+<div style="float:left;padding: 0 10px;">
+'''Classic:'''
+* 0 Soldier '''(Unused)'''
+* 1 [[Human]]
+* 2 [[Barbarian]]
+* 3 [[Erudite]]
+* 4 [[Wood Elf]]
+* 5 [[High Elf]]
+* 6 [[Dark Elf]]
+* 7 [[Half Elf]]
+* 8 [[Dwarf]]
+* 9 [[Troll]]
+* 10 [[Ogre]]
+* 11 [[Halfling]]
+* 12 [[Gnome]]
+* 13 [[Aviaks]]
+* 14 [[Werewolves]]
+* 15 [[Brownie]]
+* 16 [[Centaur]]
+* 17 [[Golem]]
+* 18 [[Giant]] / [[Cyclops]]
+* 19 [[Trakanon]]
+* 20 [[Doppleganger]]
+* 21 [[Evil Eye]]
+* 22 [[Beetle]]
+* 23 [[Kerra]]
+* 24 [[Fish]]
+* 25 [[Fairy]]
+* 26 [[Froglok]]
+* 27 [[Froglok Ghoul]]
+* 28 [[Fungusman]]
+* 29 [[Gargoyle]]
+* 30 Gasbag '''(Unused)'''
+* 31 [[Gelatinous Cube]]
+* 32 [[Ghost]]
+* 33 [[Ghoul]]
+* 34 [[Giant Bat]]
+* 35 Giant Eel '''(Unused)'''
+* 36 [[Giant Rats]]
+* 37 [[Giant Snake]]
+* 38 [[Giant Spider]]
+* 39 [[Gnoll]]
+* 40 [[Goblin]]
+* 41 [[Gorilla]]
+</div><div style="float:left;padding: 0 10px;">
+* 42 [[Wolf]]
+* 43 [[Bear]]
+* 44 [[Freeport]] Guards
+* 45 [[Demi Lich]]
+* 46 [[Imp]]
+* 47 [[Griffin]]
+* 48 [[Kobold]]
+* 49 Lava [[Dragon]] ([[Lord Nagafen]])
+* 50 [[Lion]]
+* 51 [[Lizard Man]]
+* 52 [[Mimic]]
+* 53 [[Minotaur]]
+* 54 [[Orc]]
+* 55 [[Human]] Beggar
+* 56 [[Pixie]]
+* 57 [[Dracnid]]
+* 58 [[Solusek Ro]]
+* 59 [[Bloodgills|Bloodgill]] [[Goblin]]
+* 60 [[Skeletons]]
+* 61 [[Shark]]
+* 62 [[Tunare (Race)]]
+* 63 [[Tiger]]
+* 64 [[Treant]]
+* 65 [[Vampire]]
+* 66 [[Rallos Zek]]
+* 67 [[Highpass Keep|Highpass]] Citizen
+* 68 [[Tentacle (Terror)]]
+* 69 [[Will O Wisp]]
+* 70 [[Zombie]]s
+* 71 [[Qeynos]] Citizen
+* 72 [[Travel Guide|Ship]]
+* 73 Launch '''(Unused)'''
+* 74 [[Piranha]]
+* 75 [[Elemental]]
+* 76 [[Puma]]
+* 77 [[Neriak]] Citizen
+* 78 [[Erudin]] Citizen
+* 79 [[Bixie]]
+* 80 [[Reanimated Hand]]
+* 81 [[Rivervale]] Citizen
+* 82 [[Scarecrow]]
+* 83 [[Skunk]]
+* 84 Snake Elemental '''(Unused)'''
+</div><div style="float:left;padding: 0 10px;">
+* 85 [[Spectre]]
+* 86 [[Sphinx]]
+* 87 [[Armadillo]]
+* 88 [[Clockwork]] [[Gnome]]
+* 89 [[Drake]]
+* 90 [[Halas]] Citizen
+* 91 [[Alligator]]
+* 92 [[Grobb]] Citizen
+* 93 [[Oggok]] Citizen
+* 94 [[Kaladim]] Citizen
+* 95 [[Cazic Thule (God)|Cazic Thule]]
+* 96 [[Cockatrice]]
+* 97 Daisy Man '''(Unused)'''
+* 98 [[Elf Vampire]]
+* 99 [[Denizen]] (Amygdalan)
+* 100 [[Dervish]]
+* 101 [[Efreeti]]
+* 102 [[Froglok]] Tadpole
+* 103 [[Kedge]]
+* 104 [[Leech]]
+* 105 [[Swordfish]]
+* 106 [[Felguard]]
+* 107 [[Mammoth]]
+* 108 [[Eye of Zomm]]
+* 109 [[Wasp]]
+* 110 [[Mermaid]]
+* 111 [[Harpie]]
+* 112 [[Fayguard]]
+* 113 [[Drixie]]
+* 114 [[Travel Guide|Ghost Ship]]
+* 115 Clam '''(Unused)'''
+* 116 [[Sea Horse]]
+* 117 [[Ghost]] Dwarf
+* 118 Erudite [[Ghost]]
+* 119 [[Sabertooth Cat]]
+* 120 [[Wolf Elemental]]
+* 121 [[Gorgon]]
+* 122 [[Dragon]] [[Skeleton]] ([[Dracoliche]])
+* 123 [[Innoruuk (God)|Innoruuk]]
+* 124 [[Unicorn]]
+* 125 [[Pegasus]]
+* 126 [[Djinn]]
+* 127 [[Invisible Man]] ([[Shadowed Man]])
+
+</div><div style="float:left;padding: 0 10px;">
+'''Kunark:'''
+
+* 128 [[Iksar]]
+* 129 [[Scorpion]]
+* 130 [[Vah Shir]]
+* 131 [[Sarnak]]
+* 132 Draglock '''(Unused)'''
+* 133 [[Lycanthrope]]
+* 134 [[Mosquito]]
+* 135 [[Rhino]]
+* 136 [[Xalgoz]]
+* 137 [[Kunark Goblin]]
+* 138 [[Yeti]]
+* 139 [[Iksar]] Citizen
+* 140 [[Forest Giant]]
+* 141 [[Travel Guide|Boat]]
+* 142 Nearest Object in sight.
+* 143 Nearest Tree in sight.
+* 144 [[Burynai]]
+* 145 [[Goo]]
+* 146 [[Spectral]] [[Sarnak]]
+* 147 [[Spectral]] [[Iksar]]
+* 148 Kunark [[Fish]]
+* 149 [[Iksar Scorpion]]
+* 150 [[Erollisi]]
+* 151 [[Tribunal]]
+* 152 [[Bertoxxulous]]
+* 153 [[Bristlebane]]
+* 154 [[Fay Drake]]
+* 155 [[Sarnak]] [[Skeleton]]
+* 156 [[Ratman]]
+* 157 [[Wyvern]]
+* 158 [[Wurm]]
+* 159 [[Devourer]]
+* 160 [[Iksar]] [[Golem]]
+* 161 [[Iksar]] [[Skeleton]]
+* 162 [[Man Eating Plant]]
+* 163 [[Raptor]]
+* 164 [[Sarnak]] [[Golem]]
+* 165 Water [[Dragon]]
+* 166 [[Iksar Hand]]
+* 167 [[Succulent]]
+
+</div><div style="float:left;padding: 0 10px;">
+'''Velious:'''
+
+* 168 [[Flying Monkey]]
+* 169 [[Brontotherium]]
+* 170 [[Snow Dervish]]
+* 171 [[Dire Wolf]]
+* 172 [[Manticore]]
+* 173 [[Totem]]
+* 174 Cold [[Spectre]]
+* 175 [[Enchanted Armor]]
+* 176 [[Snow Bunny]]
+* 177 [[Walrus]]
+* 178 [[Rock-gem Men]]
+* 181 [[Yak Man]]
+* 182 Faun '''(Unused)'''
+* 183 [[Coldain]]
+* 184 Velious [[Dragon]]
+* 185 [[Hag]]
+* 186 Hippogriff '''(Unused)'''
+* 187 [[Siren]]
+* 188 [[Frost Giant]]
+* 189 [[Storm Giant]]
+* 190 [[Ottermen]]
+* 191 [[Walrus Man]] ([[Ulthork]])
+* 192 [[Clockwork]] [[Dragon]]
+* 193 [[Abhorent]] ([[Tserrina]])
+* 194 [[Sea Turtle]] ([[Lodizal]])
+* 195 Black and White [[Dragon]]s
+* 196 [[Ghost]] [[Dragon]]
+* 197 Ronnie Test '''(Unused)'''
+* 198 Prismatic [[Dragon]] ([[Kerafyrm]])
+
+</div><div style="float:left;padding: 0 10px;">
+'''Specific Zone:'''
+
+* [[Clockwork Rat]]
+</div>
+
+
+
+[[Category:Technical]]
+[[Category:Lore]]

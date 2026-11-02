@@ -1,0 +1,59 @@
+{{Factionpage|
+
+| description = Black Burrow Gnolls
+
+| zones_raise = 
+
+* [[Qeynos Hills]]
+* [[Surefall Glade]]
+
+| zones_lower = 
+
+* [[Blackburrow]]
+* [[Lake Rathetear]]
+* [[Qeynos|North Qeynos]]
+* [[Southern Karana]]
+* [[Surefall Glade]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+* [[Gnasher's Head]]
+* [[Jagged Pine Crook Staff]]
+* [[Merona's Brother]]
+* [[Poacher's Head Quest (Surefall Glade)]]
+* [[Talym Shoontar's Head]]
+
+| mobs_raise = 
+
+* [[Bren Treeclimber]] <span class='fmz'>(Surefall Glade - Quest NPC)</span>
+* [[Gerael Woodone]] <span class='fmz'>(Surefall Glade - Druid Guildmaster)</span>
+* [[Hager Sureshot]] <span class='fmz'>(Surefall Glade - Ranger Guildmaster)</span>
+* [[Holly Windstalker]] <span class='fmz'>(Qeynos Hills - NPC, Non-Quest)</span>
+
+| mobs_lower = 
+
+* [[a burly gnoll ]] <span class='fmz'>(Blackburrow)</span>
+* [[a gnoll ]] <span class='fmz'>(Blackburrow)</span>
+* [[a gnoll brewer ]] <span class='fmz'>(Blackburrow)</span>
+* [[a gnoll commander ]] <span class='fmz'>(Blackburrow)</span>
+* [[a gnoll guardsman ]] <span class='fmz'>(Blackburrow)</span>
+* [[a gnoll pup ]] <span class='fmz'>(Blackburrow)</span>
+* [[a gnoll scout ]] <span class='fmz'>(Blackburrow)</span>
+* [[a gnoll shaman ]] <span class='fmz'>(Lake Rathetear)</span>
+* [[a patrolling gnoll ]] <span class='fmz'>(Blackburrow)</span>
+* [[a razorgill ]] <span class='fmz'>(Blackburrow)</span>
+* [[a scrawny gnoll ]] <span class='fmz'>(Blackburrow)</span>
+* [[an elite gnoll guard ]] <span class='fmz'>(Blackburrow)</span>
+* [[an escaped Splitpaw gnoll]]  <span class='fmz'>(South Karana)</span>
+* [[Djerr Darkpaw]]  <span class='fmz'>(North Qeynos)</span>
+* [[Fippy Darkpaw]]  <span class='fmz'>(North Qeynos)</span>
+* [[Lord Elgnub]]  <span class='fmz'>(Blackburrow)</span>
+* [[Refugee Splitpaw]]  <span class='fmz'>(Blackburrow)</span>
+* [[Shaman Lenrel]]  <span class='fmz'>(South Karana)</span>
+* [[Splitpaw Commander]]  <span class='fmz'>(Blackburrow)</span>
+* [[Tranixx Darkpaw]]  <span class='fmz'>(Blackburrow)</span>
+
+}}

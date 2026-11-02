@@ -1,0 +1,41 @@
+{{Classic Era}}
+ They have committed many vile acts upon the residents of the Commonlands as well as persons traveling to and from Freeport. They must be destroyed.
+ - Cain Darkmoore
+
+{{Factionpage|
+
+| description = Orcs in Vicinity of Freeport and Commonlands.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Misty Thicket]]
+* [[Nektulos Forest]]
+* [[Northern Desert of Ro]]
+* [[Southern Desert of Ro]]
+* [[Freeport|West Freeport]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+* [[Weapons Delivery]]
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Deathfist Pawn]]  <span style="color:gray">(West Freeport)</span>
+* [[Orc Apprentice]]  <span style="color:gray">(Commonlands)</span>
+* [[Orc Centurion (Deathfist)|Orc Centurion]]  <span style="color:gray">(Misty Thicket and Commonlands)</span>
+* [[Orc Legionnaire (Deathfist)|Orc Legionnaire]]  <span style="color:gray">(Commonlands)</span>
+* [[Orc Oracle (Deathfist)|Orc Oracle]]  <span style="color:gray">(Commonlands)</span>
+* [[Orc Pawn (Deathfist)|Orc Pawn]]  <span style="color:gray">(Misty Thicket and Commonlands)</span>
+
+}}
+
+[[Category:Monster factions]]

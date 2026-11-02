@@ -1,0 +1,26 @@
+{{Factionpage|
+
+| description = The Troll population in Neriak.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Neriak|Neriak Foreign Quarter]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Guard Lumpin]] <span class='fmz'>(Neriak Foreign Quarter)</span>
+* [[Oosa Shadowthumper]] <span class='fmz'>(Neriak Foreign Quarter)</span>
+* [[Karnan]] <span class='fmz'>(Neriak Foreign Quarter)</span>
+}}

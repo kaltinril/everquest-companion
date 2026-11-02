@@ -1,0 +1,18 @@
+<includeonly>[[Category:Non-P99 Content]]</includeonly><div style="margin: 0 10% 1em 10%; text-align: center;"><small>N O T [[Legends|L E G E N D S]] !</small>
+{| style="background: #ffaf8b; border: 1px solid #999; padding: 0.1em; margin: 0.5em auto;"
+|-
+| valign="top" style="padding: 0.2em" | [[File:WarningIcon.png]]
+| style="padding: 0.1em" | <div style="text-align: center; font-size:large;">'''Notice:''' THE ARTICLE CONTAINS ''NON-LEGENDS'' CONTENT.<br>
+
+</div>
+|}</div><noinclude>
+==Template Documentation==
+This template is for use on any article that is non-classic content. Wiki code usage: '''<nowiki>{{:Does Not Exist}}</nowiki>'''
+Alternate 
+* '''<nowiki>{{DNE}}</nowiki>'''
+* '''<nowiki>{{Luclin Era}}</nowiki>'''
+
+It would be helpful for people if content that was not in game and never going to be in game had a clear indication of that. It may help people transitioning from the live servers or EQMac to EQLegends. They might search for an article, not find what they were looking for, and think the wiki was incomplete, even though it is excluded on purpose.
+
+Adding [[Does Not Exist]] to commonly searched for non-Legends content would give people more confidence in the search results.
+[[Category:Templates]]</noinclude>

@@ -1,0 +1,118 @@
+{{Factionpage|
+
+| description = [[Cleric]] and [[Paladin]] Guild for followers of [[Karana]].
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Blackburrow]]
+* [[Freeport|East Freeport]]
+* [[Eastern Plains of Karana]]
+* [[Innothule Swamp]]
+* [[Lavastorm Mountains]]
+* [[Rathe Mountains]]
+* [[Nektulos Forest]]
+* [[Northern Karana]]
+* [[Qeynos|North Qeynos]]
+* [[Qeynos Hills]]
+* [[Southern Karana]]
+* [[Qeynos|South Qeynos]]
+* [[Freeport|West Freeport]]
+* [[Western Plains of Karana]]
+
+| quests_raise = 
+
+* [[Aegis of Life Quest]]
+* [[Bandit Sashes]]
+* [[Bear Hide Armor]]
+* [[Blackburrow Stout Shipment]]
+* [[Blessed Oil Quest]]
+* [[Bone Chips Qeynos]]
+* [[Brother Trintle]]
+* [[Cheslin's Illusion Cards]]
+* [[Crush the Undead]]
+* [[Cure for Lempeck Hargrin]]
+* [[Drosco the Zombie (good)]]
+* [[Errand for Tonmerk]]
+* [[Fleshy Orbs]]
+* [[Frostbite's Fish]]
+* [[Gathering Grain]]
+* [[Holy Armor Scroll]]
+* [[Karana's Blessing]]
+* [[Moonstones]]
+* [[Rabid Grizzlies]]
+* [[Rabid Wolves]]
+* [[Qeynos Badge Quests|Researcher's Badge (Badge #3)]]
+* [[Temple Blankets Quest]]
+* [[The Clothspinner Sisters (good)]]
+* [[The Donations]]
+* [[The Rat King]]
+* [[Werewolf Hunters]]
+* [[Wolf Hide Armor]]
+* [[Zimel's Blades (SoulFire)]]
+
+| quests_lower = 
+
+* [[Sir Lindeal's Testimony]]
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a koalindl]]  <span class='fmz'>(North Qeynos)</span>
+* [[Aagron]] <span class='fmz'>(East Karana - NPC, Non-Quest)</span>
+* [[Anderia]]  <span class='fmz'>(West Karana)</span>
+* [[Astaed Wemor]] <span class='fmz'>(North Qeynos - Paladin Guildmaster)</span>
+* [[Baobob Miller]] <span class='fmz'>(Qeynos Hills - Quest NPC)</span>
+* [[Bilbis Briar]] <span class='fmz'>(North Karana - Merchant)</span>
+* [[Brother Chintle]] <span class='fmz'>(West Karana - NPC, Non-Quest)</span>
+* [[Brother Drash]]  <span class='fmz'>(South Karana)</span>
+* [[Brother Estle]] <span class='fmz'>(West Karana - Quest NPC)</span>
+* [[Brother Gruff]] <span class='fmz'>(South Karana - NPC, Non-Quest)</span>
+* [[Brother Nallin]] <span class='fmz'>(North Karana - Quest NPC)</span>
+* [[Camlend Serbold]] <span class='fmz'>(North Qeynos - Paladin Guildmaster)</span>
+* [[Chanda Miller]] <span class='fmz'>(Qeynos Hills - Quest NPC)</span>
+* [[Chesgard Sydwen]] <span class='fmz'>(South Qeynos)</span>
+* [[Chrislin Baker]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Cleet Miller]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Cleet Miller Jr]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Enic Ruklin]] <span class='fmz'>(North Qeynos - Quest NPC)</span>
+* [[Furball Miller]]  <span class='fmz'>(West Karana)</span>
+* [[Guard Carnita]] <span class='fmz'>(Mountains of Rathe)</span>
+* [[Gwynn Marthank]]  <span class='fmz'>(Innothule Swamp)</span>
+* [[Henina Miller]] <span class='fmz'>(West Karana - Merchant)</span>
+* [[Koalindl (Rodcet Nife)]] <span class='fmz'>(North Qeynos - NPC, Non-Quest)</span>
+* [[Lashun Novashine]] <span class='fmz'>(North Qeynos - Quest NPC)</span>
+* [[Lempeck Hargrin]]  <span class='fmz'>(West Karana)</span>
+* [[Lysandra]] <span class='fmz'>(Mountains of Rathe)</span>
+* [[Minda]] <span class='fmz'>(West Karana)</span>
+* [[Niclaus Ressinn]]  <span class='fmz'>(Qeynos Hills)</span>
+* [[Nomsoe Jusagta]] <span class='fmz'>(North Qeynos - Cleric Guildmaster)</span>
+* [[Nul Aleswiller]] <span class='fmz'>(North Karana - NPC, Non-Quest)</span>
+* [[Philicia Drinn]] <span class='fmz'>(Mountains of Rathe - Merchant)</span>
+* [[Ping Fuzzlecutter]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Rell Ostodl]]  <span class='fmz'>(Innothule Swamp)</span>
+* [[Rinna Lightshadow]] <span class='fmz'>(Commonlands - Cleric Guildmaster)</span>
+* [[Roesager Thusten]] <span class='fmz'>(North Qeynos - Paladin Guildmaster)</span>
+* [[Rongol]] <span class='fmz'>(West Karana - Quest NPC)</span>
+* [[Shalena Roan]] <span class='fmz'>(East Karana - NPC, Non-Quest)</span>
+* [[Sir Lindeal]]  <span class='fmz'>(Lavastorm Mountains)</span>
+* [[Sir Morgan]] <span class='fmz'>(East Karana)</span>
+* [[Squire Wimbley]] <span class='fmz'>(East Karana - Quest NPC)</span>
+* [[Suuspa Clanim]] <span class='fmz'>(North Qeynos - Paladin Guildmaster)</span>
+* [[Sven Drinn]] <span class='fmz'>(Mountains of Rathe - Merchant)</span>
+* [[Talym Shoontar]]  <span class='fmz'>(East Freeport)</span>
+* [[Tann Cellus]]  <span class='fmz'>(Innothule Swamp)</span>
+* [[Thomas]] <span class='fmz'>(Mountains of Rathe - Quest NPC)</span>
+* [[Tiny Miller]] <span class='fmz'>(West Karana - NPC, Non-Quest)</span>
+* [[Tukk]] <span class='fmz'>(West Karana)</span>
+
+}}
+= Suggested Route =
+*[[Bone Chips Qeynos]] Quest with [[Bone Chips]] or Gold (+[[Priests of Life]], +[[Knights of Thunder]], +[[Guards of Qeynos]], +[[Antonius Bayle]], -[[Bloodsabers]])
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]

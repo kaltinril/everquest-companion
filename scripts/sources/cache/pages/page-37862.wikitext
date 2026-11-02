@@ -1,0 +1,89 @@
+{{Factionpage|
+
+| description = The [[Kelethin]] [[Druid]]s guild is called the Soldiers of Tunare.  Their guildmaster is named Heartwood Master.  
+While dedicated to The Mother of All, [[Tunare]], they remain loyal to the Elven [[King Tearis Thex]] and support the [[Emerald Warriors]].
+
+| zones_raise = 
+
+* [[Greater Faydark]]
+
+| zones_lower = 
+
+* [[Dagnor's Cauldron]]
+* [[Freeport|East Freeport]]
+* [[Eastern Plains of Karana]]
+* [[Greater Faydark]]
+* [[Highpass Keep]]
+* [[Lesser Faydark]]
+* [[Rathe Mountains]]
+* [[Felwithe]]
+* [[Ocean of Tears]]
+* {{VeliousGray|Plane of Growth}}
+* [[Steamfont Mountains]]
+* [[Freeport|West Freeport]]
+
+| quests_raise = 
+
+* [[Bladed Weapons]]
+* [[Bracers of Erollisi Quest]]
+* [[Call of Flame Quest]]
+* [[Hogcaller's Inn| Hogcaller's Inn (White Wine for Lady Shae)]]
+* [[Muffin for Pandos]]
+* [[Orc Hatchets]]
+* [[Orc Runner (Kelethin)]]
+* [[Pirate Earrings]]
+* [[Pixie Dust #1]]
+* [[Tarnished scimitar]]
+* [[The Frightlings]]
+* [[Trueshot Longbow Quest]]
+
+| quests_lower = 
+
+* [[Innoruuk Symbol Quests|Innoruuk Regent]]
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+<div class="grayout">
+* [[a contemplative thifling]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a feral amalgam]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a gale wolf]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a phase puma]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a protector of growth]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a rolling plains steed]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a sylvan protector]]  <span class='fmz'>(Plane of Growth)</span>
+* [[a tranquil treant]]  <span class='fmz'>(Plane of Growth)</span>
+</div>
+* [[Aleena Lightleaf]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* <span class="grayout"> [[An Entoling Essense Channeller]]  <span class='fmz'>(Plane of Growth)</span> </span>
+* <span class="grayout"> [[an entoling harvester]]  <span class='fmz'>(Plane of Growth)</span> </span>
+* [[Antinime]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Ascania Halvbin]] <span class='fmz'>(Ocean of Tears - NPC, Non-Quest)</span>
+* [[Cerila Windrider]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Cleonae Kalen]] <span class='fmz'>(Ocean of Tears - Merchant)</span>
+* [[Dill Fireshine]] <span class='fmz'>(Greater Faydark - Ranger Guildmaster)</span>
+* [[Elia the Pure]] <span class='fmz'>(Northern Felwithe - Quest NPC)</span>
+* [[Elmion Hendrys]] <span class='fmz'>(Dagnor's Cauldron - NPC, Non-Quest)</span>
+* [[Euboea Delewyn]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Ganelorn Oast]] <span class='fmz'>(East Karana - Quest NPC)</span>
+* <span class="grayout"> [[Grahl Strongback]]  <span class='fmz'>(Plane of Growth)</span> </span>
+* [[Guard Dykalin]] <span class='fmz'>(Mountains of Rathe)</span>
+* [[Heartwood Master]] <span class='fmz'>(Greater Faydark - Druid Guildmaster)</span>
+* [[Larisa Gelrith]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Legyn Sarawyn]] <span class='fmz'>(Steamfont Mountains - NPC, Non-Quest)</span>
+* [[Maesyn Trueshot]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Merchant Tuluvdar]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Paeonia Purnn]] <span class='fmz'>(Ocean of Tears - NPC, Non-Quest)</span>
+* [[pained unicorn]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[Ran Sunfire]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Rodrick Marslett]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Sister of Erollisi]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Styria Fearnon]] <span class='fmz'>(Ocean of Tears - Warrior Guildmaster)</span>
+* <span class="grayout"> [[Tunare (God)|Tunare]]  <span class='fmz'>(Plane of Growth)</span> </span>
+* [[Verth Mistwielder]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+
+}}
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

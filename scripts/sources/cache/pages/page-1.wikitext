@@ -1,0 +1,176 @@
+<div class="eql-home" align="center">
+
+[[File:EQLLogo.png|400x400px|link=https://www.everquestlegends.com]]<br>
+[[Player_List|Character Database]]
+
+<div class="eql-announcements" style="width: 85%; max-width: 1000px; height: 1000px; overflow-y: auto; margin: 0 auto 20px auto; padding: 12px 16px; border: 1px solid #666; text-align: left;">
+<div class="eql-announcements-title" style="font-size: 120%; font-weight: bold; text-align: center; margin-bottom: 10px;">Announcements</div>
+{{:News}}
+</div>
+
+<div class="eql-immersive-card-grid">
+
+<div class="eql-immersive-card">
+<div class="eql-card-art">[[File:Quests@512.webp|200px|link=Category:Quests]]</div>
+<div class="eql-card-copy">
+<div class="eql-card-title">QUESTING</div>
+<div class="eql-card-links eql-card-link-columns">
+<div class="eql-card-link-col">
+<span class="eql-card-link">[[Class Race Quest List|By Class]]</span>
+<span class="eql-card-link">[[Item Reward Quest List|By Reward]]</span>
+<span class="eql-card-link">[[:Category:Quest Items|By Item]]</span>
+</div>
+<div class="eql-card-link-col">
+<span class="eql-card-link">[[:Category:Achievements|Achievements]]</span>
+<span class="eql-card-link">[[Class Epic Quest List|Epic Quests]]</span>
+<span class="eql-card-link">[[Velious Class Armor|Velious AQs]]</span>
+</div>
+</div>
+</div>
+</div>
+
+<div class="eql-immersive-card">
+<div class="eql-card-art">[[File:Zones@512.webp|200px|link=Zones]]</div>
+<div class="eql-card-copy">
+<div class="eql-card-title">ZONES</div>
+<div class="eql-card-links eql-card-link-columns">
+<div class="eql-card-link-col">
+<span class="eql-card-link">[[Zones]]</span>
+<span class="eql-card-link">[[Updated Zones|Revamps]]</span>
+<span class="eql-card-link">[[:Category:Raid Encounters|Raids]]</span>
+</div>
+<div class="eql-card-link-col">
+<span class="eql-card-link">[[Recommended Levels and ZEM List|Levels / ZEM]]</span>
+<span class="eql-card-link">[[Special:ZoneViewer|Zone Viewer]]</span>
+<span class="eql-card-link">[[Zone Connection World|Connections]]</span>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="eql-immersive-card">
+<div class="eql-card-art">[[File:NPCs@512.webp|200px|link=Category:NPCs]]</div>
+<div class="eql-card-copy">
+<div class="eql-card-title">NPCS</div>
+<div class="eql-card-links eql-card-link-columns">
+<div class="eql-card-link-col">
+<span class="eql-card-link">[[:Category:NPCs|All NPCs]]</span>
+<span class="eql-card-link">[[:Category:Factions|Factions]]</span>
+<span class="eql-card-link">[[:Category:Merchants|Merchants]]</span>
+</div>
+<div class="eql-card-link-col">
+<span class="eql-card-link">[[:Category:Named Mobs|Named Mobs]]</span>
+<span class="eql-card-link">[[:Category:Raid Encounters|Raid]]</span>
+</div>
+</div>
+</div>
+</div>
+
+<div class="eql-immersive-card">
+<div class="eql-card-art">[[File:UserGuide@512.webp|200px|link=Category:Guides]]</div>
+<div class="eql-card-copy">
+<div class="eql-card-title">USER GUIDE</div>
+<div class="eql-card-links eql-card-link-columns">
+<div class="eql-card-link-col">
+<span class="eql-card-link">[[City Starting Guides|City Guides]]</span>
+<span class="eql-card-link">[[Game Mechanics|Mechanics]]</span>
+<span class="eql-card-link">[[Linux Setup Guide|Linux Guide]]</span>
+<span class="eql-card-link">[[Newbie Guide]]</span>
+</div>
+<div class="eql-card-link-col">
+<span class="eql-card-link">[[Patch Notes]]</span>
+<span class="eql-card-link">[[Per-Level Hunting Guide|Hunt By Lvl]]</span>
+<span class="eql-card-link">[[Travel Guide]]</span>
+</div>
+</div>
+</div>
+</div>
+
+<div class="eql-immersive-card">
+<div class="eql-card-art">[[File:Classes@512.webp|200px|link=Category:Character]]</div>
+<div class="eql-card-copy">
+<div class="eql-card-title">CHARACTER</div>
+<div class="eql-card-links eql-card-link-columns">
+<div class="eql-card-link-col">
+<span class="eql-card-link">[[Alternate_Advancement|AAs]]</span>
+<span class="eql-card-link">[[Build Guides| Builds]]</span>
+<span class="eql-card-link">[[Character Classes|Class List]]</span>
+<span class="eql-card-link">[[Deities]]</span>
+</div>
+<div class="eql-card-link-col">
+<span class="eql-card-link">[[Character Races|Races]]</span>
+<span class="eql-card-link">[[Skills]]</span>
+<span class="eql-card-link">[[Stances & Invocations|Stances]]</span>
+<span class="eql-card-link">[[Statistics]]</span>
+</div>
+</div>
+</div>
+</div>
+
+<div class="eql-immersive-card">
+<div class="eql-card-art">[[File:Equipment@512.webp|200px|link=Category:Items]]</div>
+<div class="eql-card-copy">
+<div class="eql-card-title">EQUIPMENT</div>
+<div class="eql-card-links eql-card-link-columns">
+<div class="eql-card-link-col">
+<span class="eql-card-link">[[Clickies]]</span>
+<span class="eql-card-link">[[Equipment By Class|By Class]]</span>
+<span class="eql-card-link">[[Exaltations]]</span>
+<span class="eql-card-link">[[Focus_Effects|Focus Effects]]</span>
+</div>
+<div class="eql-card-link-col">
+<span class="eql-card-link">[[Focus Items]]</span>
+<span class="eql-card-link">[[Item Upgrade System|Item Upgrade]]</span>
+<span class="eql-card-link">[[Weapon_Procs|Procs]]</span>
+<span class="eql-card-link">[[Spell Upgrading|Spell Upgrade]]</span>
+</div>
+</div>
+</div>
+</div>
+
+<div class="eql-immersive-card">
+<div class="eql-card-art">[[File:Spells@512.webp|200px|link=Category:Spells]]</div>
+<div class="eql-card-copy">
+<div class="eql-card-title">SPELLS</div>
+<div class="eql-card-links eql-card-link-columns">
+<div class="eql-card-link-col">
+<span class="eql-card-link">[[:Category:Spells|All Spells]]</span>
+<span class="eql-card-link">[[Buff Lines]]</span>
+<span class="eql-card-link">[[Haste Guide]]</span>
+</div>
+<div class="eql-card-link-col">
+<span class="eql-card-link">[[Languages]]</span>
+<span class="eql-card-link">[[Pet Guide]]</span>
+<span class="eql-card-link">[[Rituals]]</span>
+</div>
+</div>
+</div>
+</div>
+
+<div class="eql-immersive-card">
+<div class="eql-card-art">[[File:Tradeskills@512.webp|200px|link=Tradeskills]]</div>
+<div class="eql-card-copy">
+<div class="eql-card-title">TRADESKILLS</div>
+<div class="eql-card-links eql-card-link-columns">
+<div class="eql-card-link-col">
+<span class="eql-card-link">[[Skill Alchemy|Alchemy]]</span>
+<span class="eql-card-link">[[Skill Baking|Baking]]</span>
+<span class="eql-card-link">[[Skill Blacksmithing|Blacksmithing]]</span>
+<span class="eql-card-link">[[Skill Brewing|Brewing]]</span>
+<span class="eql-card-link">[[Skill Fletching|Fletching]]</span>
+</div>
+<div class="eql-card-link-col">
+<span class="eql-card-link">[[Skill Jewelcrafting|Jewelcrafting]]</span>
+<span class="eql-card-link">[[Skill Pottery|Pottery]]</span>
+<span class="eql-card-link">[[Skill Tailoring|Tailoring]]</span>
+<span class="eql-card-link">[[Skill Tinkering|Tinkering]]</span>
+<span class="eql-card-link">[[Tradeskills]]</span>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+</div>

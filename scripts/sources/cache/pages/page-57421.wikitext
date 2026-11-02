@@ -1,0 +1,52 @@
+=== A lot of spells to manage ===
+
+With 3 classes in every loadout, it can be difficult to keep track of every spell that goes with every situation, and switching between combat, buff, travel, and utility spells can take up a lot of time and energy.
+
+However, it's possible to save batches of spells to help keep track of everything, and even set macros to speed everything up. It's much quicker to switch to another hotbar page, press a hotkey, and load a set of spells. Cast Quick Buff, press another hotkey to load the spells for the current activity, and get back into the action.
+
+=== Saving spell sets ===
+
+To save the current set of spells, load up the spell gems with the desired spells, then right-click the little book icon on the spell bar to see the menu. Click "Save spell set", then give it a unique name and confirm. Each set requires a unique name. Leaving spell gems empty is also an option for specific purposes as mentioned below.
+
+'''Please note:'''
+* '''Each loadout can have its own batch of spell sets.'''<br>
+* '''When editing a loadout and using the "Copy Current UI to this Loadout" option, it ''will'' overwrite any other spell sets in the other loadout.'''
+
+The spell sets can be loaded from that same right-click menu, but macros are also possible to make it even faster:
+
+<code>/memspellset <name></code>
+
+When loading that set, the character will sit down, forget any spell that doesn't match the set, and memorize the spells from the set. If a spell set has a currently loaded spell in a different gem, it will be forgotten from the current gem, and re-memorized in the new gem. If the set has empty spell gems, it won't forget the spells in those gems unless (they're memmed in other gems in the set). 
+
+=== Examples===
+
+==== Main sets ====
+
+* '''Base''' set for general purpose wandering
+* '''Perm''' set for permanent buffs after a loadout change or death
+* '''Raid''' set for spells used more often in raids. 
+** It's also possible to set up different sets for different raids
+
+==== Banks of slots that work together ====
+
+* '''Buff''' set for frequently-used buffs, in gems 1-8
+* '''Short''' set for short spells that need to be refreshed sooner than the main buffs, in gems 9-13
+** The '''Buff''' and '''Short''' sets are in different slots so that they can be loaded at the same time for Quick Buff, but when the main buffs still have plenty of time, the '''Short''' set can be loaded on its own before quick buff, to save mana and memorization time.
+
+==== Single spell sets ====
+
+Each of these sets contains only a single spell in gem 14, saved with all other spell gems empty. When set up this way, the spell sets can be memorized quickly and ''only'' change the spell in gem 14:
+* '''Invis''' set with an invisibility spell
+* '''IvU''' set with invisibility versus undead
+
+==== Macros ====
+
+Create a macro for each spell set that needs a hotkey. As an example from the the spell sets above, the Macros could be:
+
+<code>/memspellset Base</code><br>
+<code>/memspellset Perm</code><br>
+<code>/memspellset Raid</code><br>
+<code>/memspellset Buff</code><br>
+
+
+[[Category:Guides]]

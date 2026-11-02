@@ -1,0 +1,232 @@
+{{Classic Era}}[[File:Npc_regren.png|right]]{{Factionpage|
+
+| description = In the treetop city of [[Kelethin]] in Greater Faydark can be found the Hall of the Emerald Warriors.  
+Under the direction of Warrior Guildmaster [[Regren]], these warriors support and defend the [[Kelethin Merchants]] and the [[Merchants of Felwithe]].  
+They also oppose the Dark Elf Warrior Guild in Neriak called the [[Indigo Brotherhood]], as well as [[Riptide Goblins]] and [[Crushbone Orcs]].
+
+| zones_raise = 
+
+* [[Butcherblock Mountains]]
+* [[Mistmoore Castle]]
+* [[Crushbone]]
+* [[Dagnor's Cauldron]]
+* [[Eastern Plains of Karana]]
+* [[Greater Faydark]]
+* [[Kedge Keep]]
+* [[Lake Rathetear]]
+* [[Lesser Faydark]]
+* [[Nektulos Forest]]
+* [[Neriak|Neriak Commons]]
+* [[Neriak|Neriak Third Gate]]
+* [[Northern Desert of Ro]]
+* [[Oggok]]
+* [[Southern Desert of Ro]]
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Crushbone]]
+* [[Firiona Vie]]
+* [[Greater Faydark]]
+* [[Innothule Swamp]]
+* [[Lake of Ill Omen]]
+* [[Lesser Faydark]]
+* [[Felwithe]]
+* [[Ocean of Tears]]
+* [[Timorous Deep]]
+
+| quests_raise = 
+
+* [[Beguile Plants Quest]]
+* [[Brain Bite (Good)]]
+* [[Drolvarg Teeth]]
+* [[Druid Epic Quest]]
+* [[Emerald Warriors' Items]]
+* [[Goblin Raiders]]
+* [[Illusion: Iksar Quest]]
+* [[Kilij's Plans]]
+* [[Orc Vest]]
+*[[Red Wine to Lady Shae]]
+* [[Shark Meat Quest]]
+* [[Slave Keys]]
+
+| quests_lower = 
+
+* [[Fire Goblin Runner]]
+* [[Halfling Raider Helms]]
+* [[Orc Pawn Picks]]
+* [[Yegek's Test, Part 1]]
+* [[Yegek's Test, Part 2]]
+
+| mobs_raise = 
+
+* [[a deepwater goblin]]  <span class='fmz'>(South Ro)</span>
+* [[Ambassador DVinn]]  <span class='fmz'>(Crushbone)</span>
+* [[Ambassador K`Ryn]]  <span class='fmz'>(Oggok)</span>
+* [[Ambassador Rylan]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[an aqua goblin]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[an aqua goblin shaman]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[an orc scout]]  <span class='fmz'>(Dagnor's Cauldron)</span>
+* [[an orc witchdoctor]]  <span class='fmz'>(Greater Faydark)</span>
+* [[aqua goblin prisoner]]  <span class='fmz'>(Kedge Keep)</span>
+* [[Captain N`Farre]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Centurion Relgle]]  <span class='fmz'>(Greater Faydark)</span>
+* [[Corporal D`Abth]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Corporal J`Rais]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Corporal X`Tis]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Dark Elf Corruptor]]  <span class='fmz'>(East Karana)</span>
+* [[Dark Elf Reaver]] <span class='fmz'>(East Karana)</span>
+* [[Dorn B`Dynn]] <span class='fmz'>(North Ro - NPC, Non-Quest)</span>
+* [[Dragoon J`Len]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Dragoon Tsanne]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Dragoon X`Lottl]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Dragoon Zytl]] <span class='fmz'>(Commonlands - NPC, Non-Quest)</span>
+* [[Emperor Crush]]  <span class='fmz'>(Crushbone)</span>
+* [[Guard E`Brona]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard E`Tru]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard N`Lan]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard T`Aba]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard V`Ehn]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard X`Onnu]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Guard Z`Den]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Kirak Vil]] <span class='fmz'>(Nektulos Forest - Quest NPC)</span>
+* [[Lord Darish]]  <span class='fmz'>(Crushbone)</span>
+* [[Narex T`Vem]] <span class='fmz'>(Neriak Commons - Quest NPC)</span>
+* [[an iron guardian]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Orc Centurion (Crushbone)|Orc Centurion]]  <span class='fmz'>(Crushbone)</span>
+* [[Orc Legionnaire (Crushbone)|Orc Legionnaire]]  <span class='fmz'>(Crushbone)</span>
+* [[Orc Oracle (Crushbone)|Orc Oracle]]  <span class='fmz'>(Crushbone)</span>
+* [[Orc Pawn (Crushbone)|Orc Pawn]]  <span class='fmz'>(Crushbone)</span>
+* [[orc chief]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[orc emissary]]  <span class='fmz'>(Crushbone)</span>
+* [[orc hatchetman]]  <span class='fmz'>(Greater Faydark)</span>
+* [[orc slaver]]  <span class='fmz'>(Crushbone)</span>
+* [[orc taskmaster]]  <span class='fmz'>(Crushbone)</span>
+* [[orc trainer]]  <span class='fmz'>(Crushbone)</span>
+* [[orc warlord]]  <span class='fmz'>(Crushbone)</span>
+* [[royal guard]]  <span class='fmz'>(Crushbone)</span>
+* [[Sergeant C`orm]] <span class='fmz'>(Nektulos Forest)</span>
+* [[Teir`Dal Elite]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[The Prophet]]  <span class='fmz'>(Crushbone)</span>
+* [[Xicotl]]  <span class='fmz'>(Castle Mistmoore)</span>
+
+| mobs_lower = 
+
+* [[a pilgrim]]  <span class='fmz'>(Firiona Vie)</span>
+* [[an elven slave (male)]]  <span class='fmz'>(Crushbone)</span>
+* [[an explorer]]  <span class='fmz'>(Lake of Ill Omen)</span>
+* [[Anelia Thrywiel]] <span class='fmz'>(Lesser Faydark - Merchant)</span>
+* [[Banker Willaen]] <span class='fmz'>(Greater Faydark - Banker)</span>
+* [[Barkeep Aanlawen]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Lysslan]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Manlawen]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Myrisa]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Sissya]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Syntan]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Tuviena]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Tvanla]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Barkeep Uulianu]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Bilrio Surecut]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Bryn Fynndel]] <span class='fmz'>(Lesser Faydark - Quest NPC)</span>
+* [[Cylas Delbrin]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+* [[Deldryn Splendyr]] <span class='fmz'>(Butcherblock Mountains - NPC, Non-Quest)</span>
+* [[Fandl Arathin]] <span class='fmz'>(Innothule Swamp - Quest NPC)</span>
+* [[Faril Elvebryn]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+* [[Firiona drixie]]  <span class='fmz'>(Firiona Vie)</span>
+* [[Gallin Woodwind]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Galwyn Geldin]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+* [[Glyndur Tindel]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[Guard Briarstorm]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Brookrock]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Crystalwind]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Dayblaze]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Eaglesong]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Fayfear]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Fayfield]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Fireblight]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Frandan]] <span class='fmz'>(Firiona Vie)</span>
+* [[Guard Frostfallen]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Marshmoor]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Meadom]] <span class='fmz'>(Northern Felwithe)</span>
+* [[Guard Moonwind]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Nitegazer]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Noonshadow]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Oakwillow]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Orcflayer]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Pinebramble]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Pineshade]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Rainstrider]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Starstrike]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Streamtree]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Sunblaze]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Sunweaver]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Tangleroot]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Treestrider]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Valewatcher]] <span class='fmz'>(Greater Faydark)</span>
+* [[Gundel Elorion]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+* [[Hendricks]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Hiptal Frizzleboth]] <span class='fmz'>(Firiona Vie - Magician Guildmaster)</span>
+* [[Hogus Durmas]] <span class='fmz'>(Innothule Swamp - Quest NPC)</span>
+* [[Innkeep Anisyla]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Innkeep Larya]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Innkeep Linen]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Innkeep Wuleran]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Jars Legola]]  <span class='fmz'>(Innothule Swamp)</span>
+* [[Jyle Windstorm]]  <span class='fmz'>(Innothule Swamp)</span>
+* [[Lady Chromoire]]  <span class='fmz'>(Firiona Vie)</span>
+* [[Linadian]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Luminare Pasinia]] <span class='fmz'>(Firiona Vie - Quest NPC)</span>
+* [[Merchant Aianya]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Aildien]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Ainaiana]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Aluuvila]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Aluwenae]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Gaeadin]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Gerienae]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Iludarae]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Kaeluase]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Kanoldar]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Kweili]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Kwein]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Laedar]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Lanin]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Legweien]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Linolyen]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Minamas]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Muvien]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Neaien]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Nildar]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Nluolian]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Sylnis]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Tananie]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Tegdian]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Tiladinya]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Tilluen]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Tinolwenya]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Uaylain]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Ueaas]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Weaolanae]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Merchant Winerasea]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Mywyn Tinendel]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+* [[Regren]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Sarawyn Amorfin]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+* [[Scout Treekill]]  <span class='fmz'>(Firiona Vie)</span>
+* [[Seloris Windweaver]] <span class='fmz'>(Timorous Deep - Merchant)</span>
+* [[Sergeant Daelione]] <span class='fmz'>(Firiona Vie)</span>
+* [[Sergeant Greenblade]] <span class='fmz'>(Firiona Vie)</span>
+* [[Shieldbearer Relios]] <span class='fmz'>(Firiona Vie)</span>
+* [[Sindl Talonstrike]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Tracker Azeal]] <span class='fmz'>(Firiona Vie - NPC, Non-Quest)</span>
+* [[Valaryn Elben]] <span class='fmz'>(Ocean of Tears - NPC, Non-Quest)</span>
+* [[Vrionele]]  <span class='fmz'>(Firiona Vie)</span>
+* [[Vynn Thrildur]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+* [[Wella Fargin]] <span class='fmz'>(Firiona Vie - Banker)</span>
+* [[Wellford Fargin]] <span class='fmz'>(Firiona Vie - Banker)</span>
+
+}}
+= Suggested Route =
+*[[Red Wine to Lady Shae]] (+[[Emerald Warriors]], +[[Merchants of Felwithe]], +[[Kelethin Merchants]], -[[Indigo Brotherhood]]) 
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

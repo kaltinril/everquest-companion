@@ -1,0 +1,15 @@
+Skill: '''Kick''' uses the player's leg to damage an enemy. Monks, Rangers, and Warriors can use this ability to damage enemies. Certain enemies require MAGIC footwear in order for it to work. Starting at lvl 55 Warrior kick [[stun]]s, which can interrupt a spell process.
+
+Kick shares the same cooldown as [[Skill_Bash|Bash]], [[Skill_Slam|Slam]], [[Skill_Round_Kick|Round Kick]], [[Skill_Tiger_Claw|Tiger Claw]], [[Skill_Eagle_Strike|Eagle Strike]], [[Skill_Dragon_Punch|Dragon Punch]], [[Skill_Tail_Rake|Tail Rake]] and [[Skill_Flying_Kick|Flying Kick]]
+
+Autoskill: Yes
+
+==Classes==
+* [[Monk]] - Level 1 '''(Max 250)'''
+* [[Warrior]] - Level 1 '''(Max 210)'''
+* [[Ranger]] - Level 5 '''(Max 205)'''
+* [[Berserker]] - Level 5 '''(Max 205)'''
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

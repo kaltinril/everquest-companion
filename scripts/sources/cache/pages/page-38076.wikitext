@@ -1,0 +1,27 @@
+{{Factionpage|
+
+| description = Description needed.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Southern Karana]]
+* [[Kerra Island]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Groi Gutblade]]
+* [[a heretic necromancer]]
+
+}}

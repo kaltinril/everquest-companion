@@ -1,0 +1,42 @@
+{{Velious Era}}
+:''For the NPC, see [[Tserrina Syl'Tor (NPC)]].''
+{{Factionpage|
+
+| description = The inhabitants of the Tower of Frozen Shadow are on this faction.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Tower of Frozen Shadow]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a blood familiar]]  <span class='fmz'>(Tower of Frozen Shadow)</span>
+* [[a frost familiar]]  <span class='fmz'>(Tower of Frozen Shadow)</span>
+* [[a ghostly student]] <span class='fmz'>(Tower of Frozen Shadow - Undead)</span>
+* [[a golem usher]] <span class='fmz'>(Tower of Frozen Shadow - Undead)</span>
+* [[a shadow]]  <span class='fmz'>(Tower of Frozen Shadow)</span>
+* [[a shadow beast]]  <span class='fmz'>(Tower of Frozen Shadow)</span>
+* [[a shadow familiar]]  <span class='fmz'>(Tower of Frozen Shadow)</span>
+* [[a shadowbone]] <span class='fmz'>(Tower of Frozen Shadow - Undead)</span>
+* [[an armored shadow]] <span class='fmz'>(Tower of Frozen Shadow - Summoned)</span>
+* [[an emerald familiar]]  <span class='fmz'>(Tower of Frozen Shadow)</span>
+* [[Incoherent spirit]]  <span class='fmz'>(Tower of Frozen Shadow)</span>
+* [[Nosja]]  <span class='fmz'>(Tower of Frozen Shadow)</span>
+* [[The Head Usher]]  <span class='fmz'>(Tower of Frozen Shadow)</span>
+* [[Tserrina Syl`Tor]]  <span class='fmz'>(Tower of Frozen Shadow)</span>
+* [[VhalSera]]  <span class='fmz'>(Tower of Frozen Shadow)</span>
+* [[Zorglim the Dead]] <span class='fmz'>(Tower of Frozen Shadow - Undead)</span>
+
+}}

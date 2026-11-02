@@ -1,0 +1,227 @@
+This is a chart covering what kind of arrows you should have and what bows you can get to make archery competitive during the EQL journey. Item enhancements are not considered here; rather, the intent is to identify when upgrades ''become'' available. Levels for fletched items assume you're earning about 5 skill points per level.
+
+First, we'll take a selection of bows.
+{| class="wikitable"
+|+
+!Bow
+!Damage
+!Delay
+!Level
+!Fletching Trivial
+|-
+|[[Sabertooth Short Bow]]
+|6
+|30
+|20
+|N/A
+|-
+|[[Deteriorated Ancient Faydark Longbow]]
+|15
+|55
+|16
+|N/A
+|-
+|[[Hemp Hickory Bow]]
+|10
+|50
+|3
+|16
+|-
+|[[Hemp Elm Bow]]
+|13
+|51
+|13
+|68
+|-
+|[[Carved Hemp Elm Bow]]
+|12
+|47
+|20
+|102
+|-
+|[[Runed Oak Bow]]
+|21
+|43
+|25
+|N/A
+|-
+|[[Trueshot Longbow]]
+|20
+|45
+|47
+|235
+|-
+|[[Bow of the Underfoot]]
+|33
+|60
+|}
+Next, here's arrows you can acquire or fletch:
+{| class="wikitable"
+|+
+!Arrow
+!Damage
+!Level
+!Fletching Trivial
+|-
+|[[Arrow]]
+|1
+|1
+|N/A
+|-
+|[[CLASS 1 Wood Point Arrow]]
+|1
+|3
+|16
+|-
+|[[CLASS 1 Bone Point Arrow]]
+|2
+|13
+|68
+|-
+|[[CLASS 3 Bone Point Arrow]]
+|3
+|16
+|82
+|-
+|[[Crude Arrow]]
+|3
+|10
+|N/A
+|-
+|[[Forlorn Arrow]]
+|4
+|20
+|N/A
+|-
+|[[CLASS 3 Bone Hooked Arrow]]
+|4
+|20
+|102
+|-
+|[[CLASS 2 Ceramic Hooked Arrow]]
+|5
+|27
+|135
+|-
+|[[CLASS 3 Ceramic Silver Tip Arrow]]
+|6
+|36
+|182
+|-
+|[[CLASS 3 Steel Silver Tip Arrow]]
+|7
+|40
+|202
+|-
+|[[CLASS 6 Steel Silver Tip Arrow]]
+|8
+|40
+|202
+|-
+|[[Gloomwater Arrow]]
+|10
+|46
+|N/A
+|-
+|[[Steel Guardian Arrows]]
+|14*
+|50
+|335
+|-
+|[[Blessed Guardian Arrows]]
+|15*
+|50
+|335
+|-
+|[[Mithril Champion Arrows]]
+|14*
+|50
+|335
+|-
+|[[Blessed Champion Arrows]]
+|15*
+|50
+|335
+|}
+Now for the fun part - let's look at comparable combinations for things based on available 2H weapons, which most cleanly maps to what we do with archery.
+{| class="wikitable"
+|+
+!2H
+!Damage
+!Delay
+!Level
+|-
+|[[Headsplitter]]
+|11
+|43
+|18
+|-
+|[[Silver Plated War Sword]]
+|15
+|38
+|20
+|-
+|[[Bone Bladed Claymore]]
+|17
+|45
+|15
+|-
+|[[Enchanted Fine Steel Bastard Sword]]
+|20
+|42
+|24
+|-
+|[[Verishe Mal Greataxe]]
+|26
+|52
+|42
+|-
+|[[TornEar Thumper]]
+|16
+|30
+|37
+|}
+With that, we can now do our comparison. In order to determine if the base damage of the item is better, we just have to add the arrow to the bow and compare it to a weapon in the same range. Here's an example chart.
+{| class="wikitable"
+|+
+!Bow + Arrow
+!Ratio
+!Level
+!Ratio
+!2H
+|-
+|Sabertooth Short Bow + Crude Arrow
+|0.3
+|20
+|'''0.39'''
+|'''Silver Plated War Sword'''
+|-
+|Sabertooth Short Bow + Forlorn Arrow
+|0.333
+|20
+|'''0.39'''
+|'''Silver Plated War Sword'''
+|-
+|'''Sabertooth Short Bow + Ceramic Silver Tip Arrow'''
+|'''0.4'''
+|'''36'''
+|0.39
+|Silver Plated War Sword
+|}
+What we see is that without changing your bow, you can incrementally get past 2H. However, you also have to ratchet up the other side of the table to see where the comparable options really are. Based on the last table, let's advance the bow and 2H to 36 (or as close to, because there aren't many bows).
+{| class="wikitable"
+!Bow + Arrow
+!Ratio
+!Level
+!Ratio
+!2H
+|-
+|'''Runed Oak Bow + Class 3 Ceramic Silver Tip Arrow'''
+|'''0.63'''
+|'''36'''
+|0.53
+|TornEar Thumper
+|}
+What happened? Well, the classic EQ itemization paradigm treats Archery the same as 2H weapons, but discounts the arrow entirely - reasons are for the reader to divine. This results in a damage potential that's actually rather insane - in practice players can acquire a max level arrow, a simple bow, and be rocking archery far above their weight class because of the way the calculations work. Rather than assault you further with copious sheets of data, I want to point out that as of July 24, 2026, archery is actually quite impressive. Use the methodology described here to find your own breakpoints, but the rule to follow that if your bow+arrow is better than a comparable 2H/DW rig, it's archery time.
+
+- Jokon

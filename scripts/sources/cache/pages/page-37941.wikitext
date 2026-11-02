@@ -1,0 +1,94 @@
+{{Factionpage|
+
+| description = Brother of Antonius Bayle (prominent member of the Blood Sabres).
+
+| zones_raise = 
+
+* [[Qeynos|South Qeynos]]
+
+| zones_lower = 
+
+* [[Erudin]]
+* [[Halas]]
+* [[Highpass Hold]]
+* [[Northern Karana]]
+* [[Qeynos|North Qeynos]]
+* [[Qeynos Aqueducts]]
+* [[Qeynos Hills]]
+* [[Qeynos|South Qeynos]]
+* [[Steamfont Mountains]]
+* [[Surefall Glade]]
+* [[Western Plains of Karana]]
+
+| quests_raise = 
+
+* [[Blackburrow Stout Shipment]]
+* [[Blank Scrolls]]
+* [[Guard Shilster's Stout]]
+* [[Honey Mead for Trumpy]]
+* [[Hurrieta's Tunic Quest]]
+* [[Package from Lomarc]]
+* [[Rogue Errands]]
+* [[The Crate (evil)]]
+* [[The Package]]
+* [[The Tattered Pouch]]
+
+| quests_lower = 
+
+* [[Cleanse the Ocean]]
+* [[Corrupt Guards]]
+* [[Qeynos Badge Quests|Investigator's Badge (Badge #1)]]
+* [[Library Book]]
+* [[Package from Lomarc]]
+* [[Qeynos Badge Quests|Qeynos Badge of Honor (Badge #4)]]
+* [[Scout Blade]]
+* [[Taxes]]
+* [[Trumpy's Head]]
+* [[Vasty Deep Water]]
+
+| mobs_raise = 
+
+* [[an investigator]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[Vicus Nonad]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[a poacher]]
+
+| mobs_lower = 
+
+* [[A Poacher]]  <span class='fmz'>(Surefall Glade)</span>
+* [[Crow]] <span class='fmz'>(North Qeynos - Merchant)</span>
+* [[Dyllin Starsine]] <span class='fmz'>(Highpass Hold - Quest NPC)</span>
+* [[Flynn Merrington]] <span class='fmz'>(North Qeynos - Quest NPC)</span>
+* [[Ghil Starn]] <span class='fmz'>(North Qeynos - Merchant)</span>
+* [[Grendin Maze]]  <span class='fmz'>(Erudin)</span>
+* [[Guard Augos]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Beris]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Guard Donlan]] <span class='fmz'>(West Karana)</span>
+* [[Guard Jerith]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard McCluskey]] <span class='fmz'>(West Karana)</span>
+* [[Guard Oleph]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Perin]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Quedal]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Shilster]] <span class='fmz'>(North Karana - Quest NPC)</span>
+* [[Guard Sironan]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Guard Tyrak]] <span class='fmz'>(South Qeynos)</span>
+* [[Guard Yalroen]] <span class='fmz'>(Qeynos Hills)</span>
+* [[Hanns Krieghor]] <span class='fmz'>(North Qeynos - Rogue Guildmaster)</span>
+* [[Knargon Lanenda]] <span class='fmz'>(North Qeynos - Rogue Guildmaster)</span>
+* [[Lieutenant Dagarok]]  <span class='fmz'>(North Qeynos)</span>
+* [[Nax Ghruna]] <span class='fmz'>(North Qeynos - NPC, Non-Quest)</span>
+* [[Neab]] <span class='fmz'>(Qeynos Catacombs - NPC, Non-Quest)</span>
+* [[Omorb]] <span class='fmz'>(Qeynos Catacombs - NPC, Non-Quest)</span>
+* [[Pelshia Thuxpire]] <span class='fmz'>(North Qeynos - Merchant)</span>
+* [[Poacher]]  <span class='fmz'>(Surefall Glade)</span>
+* [[Raz The Rat Misk]]  <span class='fmz'>(South Qeynos)</span>
+* [[Renux Herkanor]] <span class='fmz'>(West Karana - Quest NPC)</span>
+* [[Renux Herkanor]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[Riggin Vix]]  <span class='fmz'>(Qeynos Catacombs)</span>
+* [[Thadres Thyme]] <span class='fmz'>(Halas - Quest NPC)</span>
+* [[Trumpy Irontoe (NPC)|Trumpy Irontoe]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[Zannsin Resdinet]] <span class='fmz'>(North Qeynos - Rogue Guildmaster)</span>
+
+}}
+= Suggested Route =
+*[[Guard Shilster's Stout]] (+[[Corrupt Qeynos Guards]], -[[Guards of Qeynos]], +[[Kane Bayle]], +[[Circle Of Unseen Hands]], +[[Bloodsabers]])
+*[[The Crate (evil)]] Part 1: (+[[Merchants of Qeynos]], +[[Antonius Bayle]], +[[Coalition of Tradefolk]], +[[Guards of Qeynos]], -[[Circle Of Unseen Hands]]) Part 2: (+[[Corrupt Qeynos Guards]], +[[Kane Bayle]], +[[Circle Of Unseen Hands]], +[[Bloodsabers]], -[[Guards of Qeynos]])

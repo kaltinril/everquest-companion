@@ -1,0 +1,19 @@
+This skill governs the use of throwing weapons. Its mainly used for "tagging" while remaining outside the aggro range of a mob.
+
+'''Note:''' Rogues have an ability to land critical hits with throwing after level 13.
+
+== Classes ==
+
+* Bard (Max 113)
+* Ranger (Max 113)
+* Rogue (Max 250)
+* Monk (Max 200)
+* Warrior (Max 200)
+* Wizard (Max 75)
+* Enchanter (Max 75)
+* Magician (Max 75)
+* Necromancer (Max 75)
+
+{{Navbox Skills}}
+
+[[Category:Skills]]

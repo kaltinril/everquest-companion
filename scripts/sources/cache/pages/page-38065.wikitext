@@ -1,0 +1,41 @@
+{{Velious Era}}
+{{Factionpage|
+
+| description = 
+
+| zones_raise = 
+
+* [[Iceclad Ocean]]
+* [[Cobalt Scar]]
+
+| zones_lower = 
+
+* [[Eastern Wastes]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+* [[Bulthar Trunks]]
+* [[Lodizal Shell Shield Quest]]
+* [[Saucy Salted Seadragon Steak]]
+* [[Ulthork Tusks Quest]]
+
+| mobs_raise = 
+
+* [[Ergrez Shortpaw]] <span class='fmz'>(Iceclad Ocean - Quest NPC)</span>
+* [[Snowfang fisher]]  <span class='fmz'>(Iceclad Ocean)</span>
+* [[Snowfang icehunter]]  <span class='fmz'>(Iceclad Ocean)</span>
+* [[Snowfang spearguard]]  <span class='fmz'>(Iceclad Ocean)</span>
+* [[an Othmir Warrior]] <span class='fmz'>(Cobalt Scar)</span>
+* [[an Othmir Shaman]] <span class='fmz'>(Cobalt Scar)</span>
+
+| mobs_lower = 
+
+* [[a ulthork man o war]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[a walrus]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[an ulthork hunter]]  <span class='fmz'>(Eastern Wastes)</span>
+* [[an ulthork warrior]]  <span class='fmz'>(Eastern Wastes)</span>
+
+}}

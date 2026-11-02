@@ -1,0 +1,32 @@
+{{Velious Era}}
+{{Factionpage|
+
+| description = A clan of half human, half bull people who only appear to be located in Great Divide.  Players start out as indifferent to them, and killing them will cause you to become KOS to them.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Great Divide]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a furious tizmak warrior]]  <span class='fmz'>(Great Divide)</span>
+* [[a tizmak champion]]  <span class='fmz'>(Great Divide)</span>
+* [[a tizmak augur]]  <span class='fmz'>(Great Divide)</span>
+* [[a tizmak shaman]]  <span class='fmz'>(Great Divide)</span>
+* [[a tizmak spiritcaller]]  <span class='fmz'>(Great Divide)</span>
+* [[a tizmak warrior]]  <span class='fmz'>(Great Divide)</span>
+* [[Yaka Razorhoof]]  <span class='fmz'>(Great Divide)</span>
+
+}}

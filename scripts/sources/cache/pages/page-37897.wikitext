@@ -1,0 +1,80 @@
+{{Factionpage|
+
+| description = In the Erudin Palace can be found the Hall of the Craftkeepers.  Inside [[Enchanter]]s practice their art under the guidance of Guildmaster Lanken Rjarn.  The Craftkeepers Support the [[High Council of Erudin]] and the the [[High Guard of Erudin]].  They oppose the [[Heretics]] found in Paineel.
+
+| zones_raise = 
+
+* [[Lavastorm Mountains]]
+* [[Paineel]]
+* [[The Hole]]
+* [[Toxxulia Forest]]
+
+| zones_lower = 
+
+* [[Dagnor's Cauldron]]
+* [[Freeport|East Freeport]]
+* [[Erudin]]
+* [[Erudin|Erudin Palace]]
+* [[Toxxulia Forest]]
+
+| quests_raise = 
+
+* [[Heretic Battle]]
+* [[The Painting]]
+* [[Vasty Deep Water]]
+
+| quests_lower = 
+
+* [[Azzar's Dreadful Hat Quest]]
+* [[Bat Fur and Beetle Legs]]
+* [[Cazic Thule Initiate]]
+* [[Cold Iron]]
+* [[Kobold Molars (evil)]]
+* [[The Fisherman]]
+* [[The Lost Pet]]
+* [[The Waylaid Courier]]
+
+| mobs_raise = 
+
+* [[Aglthin Dasmore]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Azzar Habbib]] <span class='fmz'>(Paineel - Quest NPC)</span>
+* [[Elial Brook]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Guard Korlack]]  <span class='fmz'>(Paineel)</span>
+* [[Guard Menbuknar]]  <span class='fmz'>(Paineel)</span>
+* [[Hykallen]]  <span class='fmz'>(Lavastorm Mountains)</span>
+* [[Jelquar the Soulslayer]]  <span class='fmz'>(Stonebrunt Mountains)</span>
+* [[Keeper of the Tombs]] <span class='fmz'>(Ruins of Old Paineel (The Hole) - Undead)</span>
+* [[Noclin Saah]] <span class='fmz'>(Paineel - Quest NPC)</span>
+* [[Rallia Hapera]] <span class='fmz'>(Paineel - Merchant)</span>
+* [[Telan Buvare]]  <span class='fmz'>(Paineel)</span>
+* [[Keeshla Levlora]]  <span class='fmz'>(Paineel)</span>
+* [[Velana Kelmuza]]  <span class='fmz'>(Paineel)</span>
+* [[Verolk Kishneal]]  <span class='fmz'>(Paineel)</span>
+* [[Derena Leflor]]  <span class='fmz'>(Paineel)</span>
+* [[A kerran `amir]] <span class='fmz'>(Kerra Island)</span>
+* [[A kerran puma]] <span class='fmz'>(Kerra Island)</span>
+* [[A kerran pasdar]] <span class='fmz'>(Kerra Island)</span>
+* [[A kerran mujahed]] <span class='fmz'>(Kerra Island)</span>
+* [[Kerran tiger spahi]] <span class='fmz'>(Kerra Island)</span>
+
+| mobs_lower = 
+
+* [[Danilla Delucic]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Elentar Bealtarik]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Estra Nancer]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Gwynora Armista]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Horacia Garnellia]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Jeliala Glimmercharm]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Jinalis Andir]] <span class='fmz'>(Dagnor's Cauldron - Quest NPC)</span>
+* [[Lanken Rjarn]] <span class='fmz'>(Erudin Palace - Enchanter Guildmaster)</span>
+* [[Nikina Sparlek]] <span class='fmz'>(Erudin Palace - Enchanter Guildmaster)</span>
+* [[Nolusia Finharn]] <span class='fmz'>(Erudin Palace - Enchanter Guildmaster)</span>
+* [[Palatos Kynarn]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Pinilla]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Raine Beteria]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Toresian Fhabel]] <span class='fmz'>(Erudin Palace - Enchanter Guildmaster)</span>
+* [[Vellenon Harrance]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Xylania Rainsparkle]] <span class='fmz'>(Toxxulia Forest - Merchant)</span>
+
+}}
+[[Category:Achievement Faction]]

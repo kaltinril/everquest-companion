@@ -1,0 +1,87 @@
+{{Classic Era}}{{disambig3|the zone [[Kerra Island]]}}
+{{Factionpage|
+
+| description = The inhabitants of [[Kerra Island]].  These cat like people are indifferent to most everyone with the notable exception of Erudites and some other evil races.  The Erudites tend to treat the Kerrans as nothing more than animals, and have stolen a number of Kerran artifacts.  It is not known at this time which of these races arrived first on their shared continent.
+
+| zones_raise = 
+
+* [[Erudin]]
+* [[Erudin|Erudin Palace]]
+* [[Highpass Hold]]
+* [[Toxxulia Forest]]
+
+| zones_lower = 
+
+* [[Erud's Crossing]]
+* [[Kerra Island]]
+* [[Toxxulia Forest]]
+
+| quests_raise = 
+
+* [[Feskr's Supplies]]
+* [[First Test of Kejaar]]
+* [[Second Test of Kejaar]]
+* [[Gnomish Toy]]
+* [[Rat Teeth]]
+* [[Health Potion]]
+
+| quests_lower = 
+
+* [[Catfish Tail]]
+
+| mobs_raise = 
+
+* [[An Erudin Emissary]] <span class='fmz'>(Toxxulia Forest)</span>
+* [[Chief Adair]] <span class='fmz'>(Erudin Palace)</span>
+* [[Malik Zaren]] <span class='fmz'>(Highpass Hold)</span>
+* [[Sentinel Adrial]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Aegeo]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Balthar]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Belario]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Charin]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Cholis]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Colm]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Corin]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Creot]] <span class='fmz'>(Toxxulia Forest)</span>
+* [[Sentinel Cymbelin]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Dadil]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Demitri]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Desde]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Drom]] <span class='fmz'>(Toxxulia Forest)</span>
+* [[Sentinel Edan]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Flavius]] <span class='fmz'>(Toxxulia Forest)</span>
+* [[Sentinel Golas]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Hylin]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Jeast]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Knox]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Laphis]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Lixen]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Malvol]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Mercutil]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Nolbain]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Ogen]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Phis]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Phylos]] <span class='fmz'>(Erudin - Quest NPC)</span>
+* [[Sentinel Polix]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Rysin]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Silvis]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Thron]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Tigonus]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Tybal]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Ursulo]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Vanil]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Venci]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Wren]] <span class='fmz'>(Erudin Palace)</span>
+* [[Warden Lius]] <span class='fmz'>(Erudin Palace)</span>
+
+| mobs_lower = 
+
+* [[a kerran 'amir]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[a kerran ispusar]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[a kerran pasdar]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Falthrik Lothoro]] <span class='fmz'>(Toxxulia Forest - Quest NPC)</span>
+* [[kerran tseq]] <span class='fmz'>(Toxxulia Forest - Quest NPC)</span>
+* [[Khonza Mitty of Kerra]]  <span class='fmz'>(Kerra Isle)</span>
+
+}}
+[[Category:Achievement Faction]]

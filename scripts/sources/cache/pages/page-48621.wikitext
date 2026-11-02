@@ -1,0 +1,163 @@
+Defense improves your survivability by increasing your AC.
+
+== Classes ==
+
+*[[Warrior]] (Max 252)
+*[[Monk]] (Max 252)
+*[[Rogue]] (Max 252)
+*[[Paladin]] (Max 230)/ 252
+*[[Shadow Knight]] (Max 230) / 252 
+*[[Bard]] (Max 252)
+*[[Cleric]] (Max 200)
+*[[Ranger]] (Max 220)
+*[[Shaman]] (Max 200)
+*[[Druid]] (Max 200)
+*[[Enchanter]] (Max 145)
+*[[Magician]] (Max 145)
+*[[Necromancer]] (Max 145)
+*[[Wizard]] (Max 145)
+
+{| class="wikitable"
+!Class
+!Trainable
+!Cap Until 50
+!Cap Above 50
+!Feb 21, 2001
+!Oct 8, 2001 
+|-
+|[[Warrior]]
+|Level 1
+|?
+|252
+|
+|
+|-
+|[[Monk]]
+|Level 1
+|230
+|252
+|
+|
+|-
+|[[Rogue]]
+|Level 1
+|?
+|252
+|
+|
+|-
+|[[Paladin]]
+|Level 9
+|?
+|230
+|252
+|
+|-
+|[[Shadow Knight]]
+|Level 9
+|?
+|230
+|252
+|
+|-
+|[[Bard]]
+|Level 1?
+|200
+|200
+|252
+|
+|-
+|[[Ranger]]
+|Level 9
+|200
+|200
+|
+|220
+|-
+|[[Cleric]]
+|Level 1
+|200
+|200
+|
+|
+|-
+|[[Shaman]]
+|Level 1
+|200
+|200
+|
+|
+|-
+|[[Druid]]
+|Level 1
+|200
+|200
+|
+|
+|-
+|[[Enchanter]]
+|Level 1
+|145
+|145
+|
+|
+|-
+|[[Magician]]
+|Level 1
+|145
+|145
+|
+|
+|-
+|[[Necromancer]]
+|Level 1
+|145
+|145
+|
+|
+|-
+|[[Wizard]]
+|Level 1
+|145
+|145
+|
+|
+|-
+|}
+
+== Defense Cap Per Level ==
+
+For the cloth casters, it appeared for their Defense skill up to level 10:
+
+Defense(max) = ((level x 4) + 5)
+
+since my three casters had Defense = 45 at level 10. But from what I have gathered since a few have experienced into higher levels, the Defense skill drops to three points per level gain. That is, level 11 = 48, level 12 = 51, level 13 = 54, level 14 = 57. But since the maximum of all maximum is 145, three per level does not evenly divide into (145 - 45) = 100.
+
+Anybody have any insight, especially at higher levels? Does it reach a point to dropping to two points per level, down to one?
+
+So far, this is consistent with my experience as a cloth caster:
+
+{| class="wikitable"
+|-
+! Level !! Defense Cap
+|-
+| 10      || 45
+|-
+| 15      || 60
+|-
+| 20      || 75
+|-
+| 25      || 90
+|-
+| 30      || 105
+|-
+| 35      || 120
+|-
+| 40      || 135
+|-
+| 41      || 138
+|}
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

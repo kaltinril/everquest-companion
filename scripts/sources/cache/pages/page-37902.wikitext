@@ -1,0 +1,112 @@
+{{Factionpage|
+
+| description = Merchants of the city of Erudin.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Erudin]]
+* [[Erudin|Erudin Palace]]
+* [[Innothule Swamp]]
+* [[Qeynos|South Qeynos]]
+* [[Toxxulia Forest]]
+
+| quests_raise = 
+
+* [[Peacekeeper Staff Quest]]
+* [[The Lorekeeper's Scrolls]]
+
+| quests_lower = 
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Anite Gemcutter]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Ayth Niphiria]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Beth Breadmaker]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Borge Finleather]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Chief Adair]] <span class='fmz'>(Erudin Palace)</span>
+* [[Danaria Hollin]] <span class='fmz'>(South Qeynos - Merchant)</span>
+* [[Demicla Tanner]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Dunore Steelfinger]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Elbsin Denuen]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Fhania Aserdon]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Frena Runeflash]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Galbasi Weaver]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Gayle Weaven]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Geoard Bluehawk]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Ghemna Nyjuss]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Glysin Denuen]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Helia Bluehawk]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Jagen Kindlor]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Judge Monosty]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Kisrin Breezeshadow]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Luren Renthalis]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Monita Weaver]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Myrcin Denuen]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Nerth Sailwind]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Palus Weaponsmith]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Reko Saltamer]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Rem Knarjon]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Sahana Heartlyn]] <span class='fmz'>(Erudin Palace - Banker)</span>
+* [[Sentinel Adrial]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Aegeo]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Balthar]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Belario]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Cholis]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Colm]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Corin]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Creot]] <span class='fmz'>(Toxxulia Forest)</span>
+* [[Sentinel Cymbelin]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Dadil]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Demitri]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Desde]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Drom]] <span class='fmz'>(Toxxulia Forest)</span>
+* [[Sentinel Edan]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Flavius]] <span class='fmz'>(Toxxulia Forest)</span>
+* [[Sentinel Golas]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Hylin]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Jeast]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Knox]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Laphis]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Lixen]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Malvol]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Mercutil]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Nolbain]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Ogen]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Phis]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Phylos]] <span class='fmz'>(Erudin - Quest NPC)</span>
+* [[Sentinel Polix]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Rysin]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Silvis]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Thron]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Tigonus]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Tybal]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Ursulo]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Vanil]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sentinel Venci]] <span class='fmz'>(Erudin)</span>
+* [[Sentinel Wren]] <span class='fmz'>(Erudin Palace)</span>
+* [[Sharin Denuen]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Shinan Orefinder]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Sothure Gemcutter]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Sparlus Penfold]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Stella Breezemoon]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Stolace Printell]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Tan Monosty]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Telor Beteria]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Teria Finleather]] <span class='fmz'>(Erudin - Merchant)</span>
+* [[Tyrena Monosty]] <span class='fmz'>(Erudin Palace - Banker)</span>
+* [[Vall Stonewisp]] <span class='fmz'>(Erudin Palace - Merchant)</span>
+* [[Warden Lius]] <span class='fmz'>(Erudin Palace)</span>
+* [[Wick Ashfield]] <span class='fmz'>(Erudin Palace - Banker)</span>
+
+}}
+
+= Suggested Route =
+*[[Peacekeeper Staff Quest]] Part 1: (+[[Merchants of Erudin]], +[[High Council of Erudin]], +[[High Guard of Erudin]]
+
+[[Category:Achievement Faction]]

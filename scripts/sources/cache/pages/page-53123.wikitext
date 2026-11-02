@@ -1,0 +1,9 @@
+Agnostics will not commit to a belief in the existence or non-existence of any diety.
+
+Like followers of Veeshan, agnostics have no items that require agnosticism to wear, which means they cannot wear any [[Deity Specific Items]].
+
+Agnostic has no known faction bonuses or penalties, effectively removing faction adjustments due to deity. Since baseline faction is indifferent, which means no one will attack you, merchants will give you the best prices, and most quests will be available, agnosticism is very convenient, especially when combined with a more neutral race, or a good selection of racial illusions (mostly [[Enchanter]]s, but also [[Bard]]s and [[Rogue]]s to some extent). The only real in game trade-off is the loss of deity items, which usually have better alternatives, so agnosticism tends to be a popular choice, and other deities are often chosen for flavor or role-play reasons.
+
+{{Navbox Deity}}
+
+[[Category:Deity]]

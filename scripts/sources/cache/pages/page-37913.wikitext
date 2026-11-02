@@ -1,0 +1,81 @@
+{{Classic Era}}
+ Those who play with da Basher always get bashed good!!
+[[File:npc_basher_nanrum.png|right]]{{Factionpage|
+
+| description = Da Bashers strong.  Bashers come from [[Grobb]], find Ranjor, he make weak troll be strong Basher Warrior.  Da Bashers hate [[Broken Skull Clan]], Broken Skull clan not strong like Da Bashers.
+
+| zones_raise = 
+
+* [[Innothule Swamp]]
+* [[Steamfont Mountains]]
+
+| zones_lower = 
+
+* [[Grobb]]
+* [[Innothule Swamp]]
+* [[Rathe Mountains]]
+* [[Neriak|Neriak Foreign Quarter]]
+* [[Ocean of Tears]]
+
+| quests_raise = 
+* [[A Job for Nanrum]]
+* [[Bone Chips Grobb]]
+* [[Froglok Skin Mask Quest]]
+* [[HEHE Meat Quest]]
+* [[Ranjor's Test]]
+
+| quests_lower = 
+
+* [[Lynuga's Gem Collection]]
+
+| mobs_raise = 
+
+* [[Bugglegupp]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[Lynuga]] <span class='fmz'>(Innothule Swamp - Quest NPC)</span>
+
+| mobs_lower = 
+
+* [[a troll slayer]]  <span class='fmz'>(Innothule Swamp)</span>
+* [[Basher Avisk]] <span class='fmz'>(Grobb)</span>
+* [[Basher Banzuk]] <span class='fmz'>(Grobb)</span>
+* [[Basher Bugak]] <span class='fmz'>(Grobb)</span>
+* [[Basher Ganbaku]] <span class='fmz'>(Grobb)</span>
+* [[Basher Glaum]] <span class='fmz'>(Grobb)</span>
+* [[Basher Gobzin]] <span class='fmz'>(Grobb)</span>
+* [[Basher Gubaku]] <span class='fmz'>(Grobb)</span>
+* [[Basher Kankuk]] <span class='fmz'>(Grobb)</span>
+* [[Basher Kigak]] <span class='fmz'>(Grobb)</span>
+* [[Basher Nagkuma]] <span class='fmz'>(Grobb)</span>
+* [[Basher Nanrum]] <span class='fmz'>(Grobb)</span>
+* [[Basher Rakguk]] <span class='fmz'>(Grobb)</span>
+* [[Basher Razbaz]] <span class='fmz'>(Grobb)</span>
+* [[Basher Roruma]] <span class='fmz'>(Grobb)</span>
+* [[Basher Scintok]] <span class='fmz'>(Grobb)</span>
+* [[Basher Sklama]] <span class='fmz'>(Innothule Swamp)</span>
+* [[Basher Smag]] <span class='fmz'>(Innothule Swamp)</span>
+* [[Basher Stizik]] <span class='fmz'>(Grobb)</span>
+* [[Basher Sutok]] <span class='fmz'>(Grobb)</span>
+* [[Basher Thintan]] <span class='fmz'>(Grobb)</span>
+* [[Basher Trak]] <span class='fmz'>(Innothule Swamp)</span>
+* [[Basher Wisthak]] <span class='fmz'>(Grobb)</span>
+* [[Basher Zabaak]] <span class='fmz'>(Grobb)</span>
+* [[Basher Zazluk]] <span class='fmz'>(Grobb)</span>
+* [[Graktak]] <span class='fmz'>(Grobb - Merchant)</span>
+* [[Basher Bibeka]] <span class='fmz'>(Grobb)</span>
+* [[Basher Kumek]] <span class='fmz'>(Grobb)</span>
+* [[Basher Uvgin]] <span class='fmz'>(Grobb)</span>
+* [[Guard Shiznak]] <span class='fmz'>(Mountains of Rathe)</span>
+* [[Hergor]] <span class='fmz'>(Grobb - Warrior Guildmaster)</span>
+* [[Hukulk]] <span class='fmz'>(Grobb - Shadowknight Guildmaster)</span>
+* [[Basher Oggrik]] <span class='fmz'>(Innothule Swamp)</span>
+* [[Kragia]] <span class='fmz'>(Grobb - Warrior Guildmaster)</span>
+* [[Nerbilik]] <span class='fmz'>(Ocean of Tears - Quest NPC)</span>
+* [[Ranjor]] <span class='fmz'>(Grobb - Warrior Guildmaster)</span>
+* [[Wista]] <span class='fmz'>(Grobb - Merchant)</span>
+* [[Zatok]] <span class='fmz'>(Grobb - Merchant)</span>
+* [[Zimbittle]]  <span class='fmz'>(Innothule Swamp)</span>
+
+}}
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

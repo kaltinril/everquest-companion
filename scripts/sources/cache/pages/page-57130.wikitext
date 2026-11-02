@@ -1,0 +1,7 @@
+[[File:potterywheel.jpg|thumb|right]]
+A '''pottery wheel''' is a stationary item with which a player may interact to attempt a [[pottery]] recipe.  They are available in many places around Norrath.
+
+(Consider comprehensive list of locations)
+
+{{Navbox Tradeskill Containers}}
+[[Category:Tradeskill Containers]]

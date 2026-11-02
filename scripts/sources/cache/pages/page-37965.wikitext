@@ -1,0 +1,35 @@
+{{Classic Era}}
+[[File:Npc_an_aqua_goblin_shaman.png|right]]{{Factionpage|
+
+| description = The Aqua Goblins and deepwater goblins of Norrath. It appears that many goblins live under the waves, but may come ashore to set up crude camps and hunt unsuspecting newbies. Their skin is pale blueish-green, their expressions quizzical, their lust for blood insatiable. 
+
+As a scourge of [[Faydwer]], Riptides are opposed by the [[Storm Guard]], [[Gem Choppers]], and [[Emerald Warriors]]. Some aqua goblins belong to the [[Goblin (Faction)]] instead. Their relationship is unclear. 
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Kedge Keep]]
+* [[Lake Rathetear]]
+* [[Oasis of Marr]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a deepwater goblin]]  <span class='fmz'>(Oasis of Marr)</span>
+* [[an aqua goblin]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[an aqua goblin shaman]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[an aqua goblin wizard]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[aqua goblin prisoner]]  <span class='fmz'>(Kedge Keep)</span>
+
+}}

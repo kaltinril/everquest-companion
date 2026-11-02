@@ -1,0 +1,29 @@
+{{Factionpage|
+
+| description = The faction for residents of [[Highpass Hold]] and [[Highpass Keep]].
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Highpass Hold]]
+* [[Rathe Mountains]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Delila]] <span class='fmz'>(Mountains of Rathe - Quest NPC)</span>
+* [[Guard Stald]] <span class='fmz'>(Highpass Hold)</span>
+* [[Lyn Tarburner]] <span class='fmz'>(Highpass Hold - Merchant)</span>
+* [[Brill]] <span class='fmz'>(Mountains of Rathe - NPC, Non Quest)</span>
+
+}}

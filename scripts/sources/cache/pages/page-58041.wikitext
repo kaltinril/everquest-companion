@@ -1,0 +1,37 @@
+[[File:translocator.jpg|right|thumb|300px|Translocator on the Erudin docks]]
+Translocators are NPCs standing at the docks to each of the major boat routes who can instantly transport you to other locations.  They give transport to one or two specific locations, such as one of the stops along the boat route or to the final destination on either side. 
+
+Translocators are free to use below level 20.  Starting at level 20, translocators will have a cost, up to 50pp, which will be noted in the confirmation window before transporting.
+
+To use, simply Hail the translocator.  They will tell you the available options, and you can either respond in Say or click the link.  You'll then get a confirmation box before being transported.  
+
+{| class="wikitable"
+|+Translocator Locations
+!Translocator Name
+!Location
+!Destination
+|-
+|[[Translocator Eniela]]
+|[[Erudin]]
+|[[Erud's Crossing]]
+|-
+|[[Translocator Jempar]]
+|[[Erud's Crossing]]
+|[[Erudin]], [[South Qeynos]]
+|-
+|[[Translocator Sedina]]
+|[[South Qeynos]]
+|[[Erud's Crossing]], [[East Freeport]]
+|-
+|[[Translocator Setikan]]
+|[[East Freeport]]
+|[[South Qeynos]], [[Ocean of Tears]]
+|-
+|[[Translocator Narrik]]
+|[[Ocean of Tears]]
+|[[East Freeport]], [[Butcherblock Mountains]]
+|-
+|[[Translocator Fithop]]
+|[[Butcherblock Mountains]]
+|[[Ocean of Tears]]
+|}

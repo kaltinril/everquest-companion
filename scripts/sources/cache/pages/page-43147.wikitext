@@ -1,0 +1,36 @@
+== Spawn information on Hasten Bootstrutter and Brother Zephyl ==
+
+Zone: [[Rathe Mountains]]
+
+This spawn has 5 possible mobs that can spawn:
+
+* [[a drake]] 
+* [[a grizzly bear]]
+* [[Maldyn the Unkempt]]
+* [[Hasten Bootstrutter]] 
+* [[Brother Zephyl]] 
+
+===Pathing===
+'''They have numerous spawn points all over the hill giant hill and around the ruins at the base of the hill (/waypoint 2812, -1945.) They path south from the hill into the canyon, then west, then north to the Inns. They walk back the same way they came and then despawn after a few minutes. The PH respawns after 2 minutes and 20 seconds and the best place to wait for them to spawn is where the canyon opens up to the hill giant hill (/waypoint 2004, -2316.) If you don't have tracking I recommend waiting in the canyon because if you're on the hill a spawn may pop near the ruins and could walk by without you seeing it.
+
+Their spawn cycle is very different on EQL so disregard any other source of information from other servers and wikis. The giants will kill any bear they see so you may not see any bears at all if you are camped in the canyon.''' 
+
+Hasten Bootstrutter stops at 4421, 1510, 4.17 and -166, -78, 2.66 for around 1 minute each, before despawning at 1593, -2431, 1.6
+
+Brother Zephyl stops at 4290, 1460, 6.72 and 1016, -41.5, 11.96 for around 30 seconds each, before despawning at 3160, -3436.5, 2
+
+The image below:
+
+* The blue circle in this picture represents the area where they spawn.
+* The blue line represents the path they walk.
+* The green circle is my tracking radius, please ignore it.
+
+
+
+[[File:BrotherZephylHastenSpawn.png|thumb]]
+
+===Factions===
+* None for Hasten Bootstrutter, major faction hit for killing Brother Zephyl.
+
+[[Category:Rathe Mountains]]
+[[Category:Zone Guides]]

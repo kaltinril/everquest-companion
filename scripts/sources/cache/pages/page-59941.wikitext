@@ -1,0 +1,37 @@
+{{Classic Era}}
+{{Factionpage|
+
+| description = The soldiers of the Guktan army. Under the banner of Marr, the frogloks of Gukta stand watch against the trolls and their Tier'Dal allies. In the [[Rathe Mountains]], the faction is represented by [[Gaz Commander Faltip]], who rewards adventurers for dispatching the rogue troll/dark-elf scouting groups probing the mountains.
+
+| zones_raise =
+
+* [[Rathe Mountains]]
+
+| zones_lower =
+
+* None known
+
+| quests_raise =
+
+* [[Phosphorous Powder for Zok Zribb]]
+* [[Rathe Mountains Spiders]]
+* [[Soldier's Brooch Quest]]
+
+| quests_lower =
+
+* None known
+
+| mobs_raise =
+
+* None known
+
+| mobs_lower =
+
+* [[Gaz Commander Faltip]] <span style="color:gray">(Rathe Mountains - Quest NPC, cannot be attacked)</span>
+
+}}
+= Suggested Route =
+*[[Phosphorous Powder for Zok Zribb]] (+[[Guktan Suppliers]], +[[Protectors of Gukta]], +[[High Council of Gukta]], +[[Lorekeepers of Gukta]], +[[Guktan Elders]])
+
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

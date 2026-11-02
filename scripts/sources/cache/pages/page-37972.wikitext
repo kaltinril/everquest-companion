@@ -1,0 +1,42 @@
+{{Factionpage|
+
+| description = Consists of [[Troll]] Shamans in [[Grobb]] and [[Neriak]]'s Foreign Quarter.
+
+The Dark Ones are allied with the Shadow Knights of Nightkeep and despise the [[Frogloks of Guk]].
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Grobb]]
+* [[Rathe Mountains]]
+* [[Neriak|Neriak Foreign Quarter]]
+* [[Toxxulia Forest]]
+
+| quests_raise = 
+
+* [[Urako's Big Mistake]]
+* [[Majik Power]]
+* [[More Help for Innoruuk]]
+
+| quests_lower = 
+
+* [[Rungupp (Quest)|Rungupp]]
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Bregna]] <span class='fmz'>(Grobb - Shaman Guildmaster)</span>
+* [[Guard Gruilka]] <span class='fmz'>(Mountains of Rathe)</span>
+* [[Jokca]] <span class='fmz'>(Grobb - Shaman Guildmaster)</span>
+* [[Kaglari]] <span class='fmz'>(Grobb - Shaman Guildmaster)</span>
+* [[Rungupp]]  <span class='fmz'>(Toxxulia Forest)</span>
+* [[Treskar]] <span class='fmz'>(Grobb - Shadowknight Guildmaster)</span>
+* [[Urako]] <span class='fmz'>(Grobb - Shaman Guildmaster)</span>
+
+}}
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

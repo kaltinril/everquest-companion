@@ -1,0 +1,20 @@
+This class combination is perfect for one thing, and one thing only. Kiting. 
+
+If you need to group with other players this combination also works as pure dps.
+
+
+'''Be aware''' before using this combonation that Damage over Time spells deal 66% damage to moving targets in EverQuest Legends.
+
+==Bard==
+When only kiting one mob at a time, the bard mainly consists of just running selo's for movement speed and other stat boosting songs, but when kiting multiple enemies has an AoE snare to fall back on.
+
+==Necromancer==
+Powerful damaging snare, and damage over time spells, that can whittle away a single or large groups of enemies. With bonus damage from the pet which should have taunt turned off.
+
+==Ranger==
+A powerful ranged auto attack that can be used while moving and does not interfere with the other classes. Has some healing abilities for if you get hit during your kite.
+
+==Equipment==
+Bards wear plate armor and should consist of most of your equipped armor, Hp/Mana Regen should take presedence over AC.
+
+You will want the strongest bow and arrows you can obtain. For primary and secondary overall stats should be preferred, Stat Staff and a shield recommended.

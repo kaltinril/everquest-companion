@@ -1,0 +1,40 @@
+{{Classic Era}}
+ We were forged from the Earth by the hands of our lord, Brell Serilis. He molded us into an image that suited him, and we were glad. Such is our role to learn and expand, and be one with the underworld.
+ - History of the Verishe Mal, Vol. 1
+{{Factionpage|
+
+| description = The clan of gnolls which live in Splitpaw Lair. They apparently are divided into a rigid social caste system led by [[The Ishva Mal]].
+
+The Splitpaw Gnolls are aligned with the [[Sabertooths of Blackburrow]].
+
+Both the [[Guards of Qeynos]] and the [[Karana Residents]] take a dim view of these gnolls.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Blackburrow]]
+* [[Splitpaw Lair]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a gnoll commander]]  <span class='fmz'>(Blackburrow)</span>
+* [[an escaped Splitpaw gnoll]]  <span class='fmz'>(Splitpaw Lair)</span>
+* [[Lord Elgnub]]  <span class='fmz'>(Blackburrow)</span>
+* [[Refugee Splitpaw]]  <span class='fmz'>(Blackburrow)</span>
+* [[Shaman Lenrel]]  <span class='fmz'>(Splitpaw Lair)</span>
+* [[Splitpaw Commander]]  <span class='fmz'>(Blackburrow)</span>
+
+}}
+
+[[Category:Monster factions]]

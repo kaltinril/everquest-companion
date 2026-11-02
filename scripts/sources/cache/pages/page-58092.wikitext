@@ -1,0 +1,109 @@
+== Personal Instances ==
+
+Instances in EverQuest Legends are special versions of zones that you can enter alone or with others. They give you control over difficulty, respawns, and whether you want a solo, group, or raid experience. New players only need to understand a few core ideas before creating their first one.
+
+There are '''two kinds''' of instances and '''three ways to play them''':
+
+* Public Instances (open world zones, these are already created)
+* Personal Instances (you create an instance just for you or optionally multiplayer)
+
+Instance types:
+* Solo
+* Multiplayer
+* Raids (these are created differently, explained below)
+
+== Public Instances ==
+
+Public instances are the default version of a zone—the same open world you’re used to if you have played EverQuest Live or TLP servers. Other players can freely enter, leave, and engage mobs as they wish. The amount of people that can be in a public zone varies from zone to zone.
+
+== Personal Instances ==
+
+A personal instance is your own private version of a zone. Only you (and anyone you invite) can enter it. This is helpful whether you want a controlled environment or you just want to be alone.
+
+== Creating a Personal Instance ==
+
+You create a personal instance by left-clicking the difficulty button on the multi‑menu. (It’s the red button on the same menu as the EQL button.) 
+
+When you click ‘Create Instance’, a window appears with three drop‑down menus:
+
+'''Difficulty'''
+
+Choose how challenging the zone will be.
+
+* Difficulty 0 (D0)
+* Difficulty 1 – Awakened (D1)
+* Difficulty 2 – Adaptive (D2)
+* Difficulty 3 – Fused (D3)
+* Difficulty 4 – Refined (D4)
+
+Each step up increases both the danger and the rewards, so you can choose the pace that feels right for your playstyle.
+
+If you want a deeper explanation of how difficulty affects enemies, loot, and experience, see the [[Difficulty Level]] guide.
+
+'''Type'''
+
+Choosing whether the instance is '''solo''' or '''multiplayer''' is simple:
+* Solo: Only you may enter.
+* Multiplayer: You can invite other players.
+
+'''Spawn Options'''
+
+Choose whether NPCs respawn or not.
+(Non‑respawning instances are not available yet, but will be added soon.)
+
+== Instance Charges ==
+
+The Instance Options window also shows two important indicators:
+
+'''Current Charges'''
+
+How many instance charges you currently have.<br>
+You can hold up to 2 charges at a time.
+
+'''Next Charge'''
+
+Displays how long until you earn your next charge.<br>
+You gain one charge per hour, and you may spend them back‑to‑back if you desire.
+
+Once both charges are spent, you must wait '''60 minutes''' to gain another before creating a new instance (or whatever time is left on the timer).
+
+== Leaving and Re‑Entering ==
+
+Inside a personal instance, you’ll see options to:
+* '''Leave Instance'''
+* '''Leave & Quit Instance'''
+* '''Manage Instance'''
+
+If you leave an instance without quitting it, the game still considers it active. This is good if you plan on returning shortly but will prevent you from creating a new one.
+
+If you ever try to create an instance and the game won’t let you, check your active instance:
+
+# Press Alt+Z to open the instance window
+# Click Quit Instance if one is still running
+
+To '''re‑enter''' your personal instance:
+# Return to the public version of the zone
+# Click the difficulty button
+# Choose Enter Instance
+
+This will place you back inside your personal instance.
+
+== Raid Instances ==
+
+Raid instances are created differently from personal ones. Instead of using the difficulty button, you speak to special NPCs called [[voidlings]]—dark, shadowy blobs sometimes found near or inside dungeons.
+
+Voidlings allow you to enter instanced raid zones, where you can fight raid bosses either solo or with friends.
+
+'''Important Note''': Open‑world raid bosses no longer spawn in EverQuest Legends. If you want to fight a raid boss, you must enter an instanced raid zone.
+
+== Creating a Raid Instance ==
+
+To start a raid:
+
+# Hail the voidling
+# Click (or say) “danger”
+# The raid options window will appear
+# Choose your difficulty
+# Choose solo or multiplayer
+
+Once created, you and your group can enter the raid instance and face the challenges that await.

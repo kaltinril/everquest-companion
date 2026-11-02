@@ -1,0 +1,10 @@
+{{expand}}
+
+[[File:Spellicon G.png|left]]'''Undead''' is a classification of mobs (NPCs) to indicate they are susceptible to anti-undead spells. For instance, [[paladin]]s are specialists in fighting the undead with spells like [[Spook the Dead]] and [[Expel Undead]].
+
+Some examples of undead mobs are [[a skeleton]], [[a spectre]], a [[Krup Ghoul Knight]], and [[The Ghoul Lord]].  For the full list see [[:Category:Undead]].
+
+===See also===
+* [[Ward Undead]]
+
+[[Category:Technical]]

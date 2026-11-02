@@ -1,0 +1,18 @@
+Everquest has a system of Time with '''day''' and '''night''' cycles. The time of day affects many things, most notably certain NPCs pathing or Spawns based around in game time.
+
+There are also days, months, and year increments.
+
+== Time Scale examples ==
+:''See also: [[Tick (mechanic)]]''
+
+* 6 Earth seconds = 1 EverQuest game "tick"
+* 1 Earth minute = 20 Everquest game minutes
+* 3 minutes = 1 game hour
+* 72 minutes = 1 game day
+* 1 real day = 20 game days
+
+== Day and Night ==
+
+Classic '''night''' begins at '''6 PM'''. Classic daytime begins at '''6 AM'''.
+
+[[Category:Technical]]

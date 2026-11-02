@@ -1,0 +1,38 @@
+[[File:NakedDWF.jpg|right]]
+__NOTOC__
+ Short but strong, Dwarves outperform Humans in nearly all physical tasks. <br>Their prominent facial hair is their trademark, seconded by their dexterity. 
+ - EverQuest manual
+==Description==
+Though made lower to the ground than most races, the Dwarves created by Brell Serilis burst with pride and determination. The stout and sturdy Dwarves are extremely strong, making them one of the best-suited to endure long and intense battles
+
+Dwarves have broad faces, usually with a prominent nose, and take extraordinary pride in their hair. Males often take great care to grow long beards and mustaches and females often tie their hair up in a bun. Some females also sport a finely trimmed beard.
+
+==Basic Information==
+*<b>[[Faction Alignment|Faction Alignment:]]</b> Good
+*<b>Racial(s):</b> Barrel Roll, Infravision, [[Sense Heading]] (50), +5 Magic Resist, +5 Poison Resist
+*<b>Starting City:</b> [[Kaladim]]
+*<b>Primary Class Choices:</b> [[Berserker]], [[Cleric]], [[Paladin]], [[Rogue]], [[Warrior]]
+
+==Base Stats==
+{| class="eoTable2" style="text-align:left"
+|-
+! STR !! STA !! AGI !! DEX !! WIS !! INT !! CHA
+|-
+|| 90 || 90 || 70 || 90 || 83 || 60 || 45
+|}
+
+==Barrel Roll==
+
+Male dwarves have a unique jumping graphic, often referred to as a "barrel roll". While purely cosmetic, it offers no in-game benefit; it is a uniquely (male) dwarven behavior.
+
+==Infravision==
+Slightly improved night vision, not as good as the [[Dark Elf|Dark Elf]]'s [[Dark Elf#Ultravision|Ultravision]].
+
+== Unlock Conditions ==
+
+* Get maximum faction with [[Storm Guard]]
+* Get maximum faction with [[Merchants of Kaladim]]
+* Get maximum faction with [[Kazon Stormhammer]]
+{{Navbox Race}}
+
+[[Category:Character Races]]

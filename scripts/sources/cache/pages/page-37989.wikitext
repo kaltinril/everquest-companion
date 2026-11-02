@@ -1,0 +1,33 @@
+{{Factionpage|
+
+| description = The faction of drolvarg's in Dreadlands and Firiona Vie.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Dreadlands]]
+* [[Firiona Vie]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a drolvarg gnasher]]  <span class='fmz'>(Dreadlands)</span>
+* [[a drolvarg growler]]  <span class='fmz'>(Firiona Vie)</span>
+* [[a drolvarg rager]]  <span class='fmz'>(Dreadlands)</span>
+* [[a drolvarg savage]]  <span class='fmz'>(Firiona Vie)</span>
+* [[a drolvarg scavenger]]  <span class='fmz'>(Firiona Vie)</span>
+* [[a drolvarg snarler]]  <span class='fmz'>(Dreadlands)</span>
+* [[a ravishing drolvarg]]  <span class='fmz'>(Dreadlands)</span>
+* [[a wulfware lonewolf]]  <span class='fmz'>(Dreadlands)</span>
+
+}}

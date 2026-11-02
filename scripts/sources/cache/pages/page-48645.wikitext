@@ -1,0 +1,22 @@
+The skill that governs the effectiveness of your attacks.
+
+== Classes ==
+{{expand}}
+*[[Warrior]] (Max 252)
+*[[Monk]] (Max 252)
+*[[Rogue]] (Max 252)
+*[[Paladin]] (Max 225)
+*[[Shadow Knight]] (Max 225)
+*[[Bard]] (Max 215) (Oct 8, 2001 (Max 252))
+*[[Ranger]] (Max 252)
+*[[Shaman]] (Max 200)
+*[[Cleric]] (Max 200)
+*[[Druid]] (Max 200)
+*[[Enchanter]] (Max 140)
+*[[Magician]] (Max 140)
+*[[Necromancer]] (Max 140)
+*[[Wizard]] (Max 140)
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

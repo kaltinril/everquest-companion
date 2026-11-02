@@ -1,0 +1,24 @@
+{{Classic Era}}
+
+An Medium Sized Chain armor set from [[Stonebrunt Mountains]] which drop off of the Highland Kobolds.
+
+<ul><li>  [[Bamboo Splint Boots]]
+</li><li> [[Bamboo Splint Bracelet]]
+</li><li> [[Bamboo Splint Cape]]
+</li><li> [[Bamboo Splint Coat]]
+</li><li> [[Bamboo Splint Coif]]
+</li><li> [[Bamboo Splint Gloves]]
+</li><li> [[Bamboo Splint Mantle]]
+</li><li> [[Bamboo Splint Neckguard]]
+</li><li> [[Bamboo Splint Pants]]
+</li><li> [[Bamboo Splint Skirt]]
+</li><li> [[Bamboo Splint Sleeves]]
+</li><li> [[Bamboo Splint Visor]]
+</li></ul>
+
+== Highland Kobolds that drop Blue Bamboo ==
+
+[[Stonebrunt Mountains]]
+*[[A highland kobold shaman]]
+
+[[Category:Armor Sets]]

@@ -1,0 +1,81 @@
+{{Classic Era}}
+{{Factionpage|
+
+| description = The [[rogue]]'s guild of [[Rivervale]] runs the local casino, Fool's Gold. Although involved in thievery and extortion, they generally stand with the other halflings.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Freeport|East Freeport]]
+* [[Misty Thicket]]
+* [[Kaladim|North Kaladim]]
+* [[Rivervale]]
+* [[Freeport|West Freeport]]
+
+| quests_raise = 
+
+* [[Bandages for Honeybugger]]
+* [[Bug Collection]]
+* [[Chomper]]
+* [[Honey Jum Quest]]
+* [[Rat Patrol]]
+* [[Reebo's Carrots]]
+* [[Runnyeye Warbeads (Kaladim Rogue)]]
+* [[The Fishslayers]]
+* [[The Gnome Take]]
+* [[The Torn Pouch]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a mangy rat]] <span class='fmz'>(Misty Thicket)</span>
+* [[Bim Buskin]] <span class='fmz'>(Misty Thicket - Merchant)</span>
+* [[Bimble Babbinsbort]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Blinza Toepopal]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Blixkin Entopop]] <span class='fmz'>(Misty Thicket - Quest NPC)</span>
+* [[Bouncer Bigboot]] <span class='fmz'>(Rivervale)</span>
+* [[Bouncer Bogglebin]] <span class='fmz'>(Rivervale)</span>
+* [[Daleen Leafsway]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Diggins]] <span class='fmz'>(North Kaladim - Quest NPC)</span>
+* [[Donlo Goobler]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Ember]] <span class='fmz'>(Misty Thicket)</span>
+* [[Falia Frikniller]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Fiddy Bobick]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Founy Jestands]] <span class='fmz'>(North Kaladim)</span>
+* [[Guard Gonin]] <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Guard Kyte]] <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Gunrich]] <span class='fmz'>(Misty Thicket)</span>
+* [[Hanga Wiskin]] <span class='fmz'>(Misty Thicket - Merchant)</span>
+* [[Hebber Druneny]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Jeet]] <span class='fmz'>(North Kaladim)</span>
+* [[Joogl Honeybugger]] <span class='fmz'>(Misty Thicket - Quest NPC)</span>
+* [[Kafia Ratsbone]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Kevlin Diggs]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Kizzie Mintopp]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Lendel Deeppockets]] <span class='fmz'>(Rivervale - Rogue Guildmaster)</span>
+* [[Lil Honeybugger]] <span class='fmz'>(Misty Thicket - Quest NPC)</span>
+* [[Mangler]] <span class='fmz'>(Rivervale)</span>
+* [[Mater]] <span class='fmz'>(North Kaladim - NPC, Non-Quest)</span>
+* [[Meeka Diggs]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Myre]] <span class='fmz'>(North Kaladim - Merchant)</span>
+* [[Rantho Goobler]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Rueppy Kutpurse]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Sonsa Fromp]] <span class='fmz'>(Misty Thicket - Merchant)</span>
+* [[Tipa Lighten]] <span class='fmz'>(Misty Thicket - Merchant)</span>
+* [[Toelia Snuckery]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Topper Drodo]] <span class='fmz'>(Misty Thicket - Merchant)</span>
+* [[Twippie Diggs]] <span class='fmz'>(Rivervale - Merchant)</span>
+
+}}
+= Suggested Route =
+*[[Bandages for Honeybugger]] (+[[Merchants of Rivervale]], +[[DeepPockets]], +[[Guardians of the Vale]], +[[Mayor Gubbin]], -[[Coalition of Tradefolk Underground]]
+
+[[Category:Achievement Faction]]

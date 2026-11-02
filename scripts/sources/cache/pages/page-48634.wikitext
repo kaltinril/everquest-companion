@@ -1,0 +1,13 @@
+{{expand}}
+A [[Monk]] special attack. Flying Kick is trainable at level 30 and is used alongside [[Dragon Punch]] / [[Tail Rake]] as the main Monk special attacks. This is the last special attack for Monks in the classic era.
+
+
+Damage starts at 50 and increases with skill.
+
+== Classes ==
+
+* [[Monk]] - Level 30 '''(Max 225)'''
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

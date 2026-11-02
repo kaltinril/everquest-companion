@@ -1,0 +1,25 @@
+{{Factionpage|
+
+| description = Those stricken by Lycanthropy, the werewolves.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Southern Karana]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a werewolf]]  <span class='fmz'>(South Karana)</span>
+
+}}

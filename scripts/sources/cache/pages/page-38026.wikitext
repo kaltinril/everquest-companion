@@ -1,0 +1,30 @@
+{{Disambig3|[[Karana Residents]]}}
+{{Factionpage|
+
+| description = The NPCs found at the fisherman's village in North Ro are tied to this faction.
+
+Worshipers of the diety [[Karana]].
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Northern Desert of Ro]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Juni Sandfisher]] <span class='fmz'>(North Ro - Merchant)</span>
+* [[Puntar Sandfisher]] <span class='fmz'>(North Ro - NPC, Non-Quest)</span>
+* [[Modren Fishcatcher]] <span class='fmz'>(West Commonlands - NPC, Non-Quest)</span>
+
+}}

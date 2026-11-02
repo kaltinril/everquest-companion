@@ -1,0 +1,109 @@
+These patch notes are from the Official EverQuest Legends discord, posted on May 28, 2026 
+
+= May 28, 2026 =
+ 
+=== AAs ===
+* Quick Buff can no longer be used in combat.
+* Lay On Hands and Harm Touch AAs will no longer show ranks 11 and 12, which were unobtainable.
+* The Abyssal, Holy, Unholy, and Valiant Steed AAs now directly summon a horse, instead of creating a bridle.
+* Valiant/Abyssal Steed is actually fixed this time.
+
+=== Achievements ===
+* Fixed missing connection in the Race Unlock - Erudite achievement for High Council of Erudin.
+* Plane of Hate Explorer Achievement should now trigger from Plane of Hate, instead of Plane of Hate B.
+
+=== Abilities ===
+* Add Paladin Smite and Shadowknight Reave abilities.
+* Added Skill Caps for Smite (Paladin) and Reave (Shadow Knight). Starting at level 9, they gain 5 points per level.
+
+=== Difficulty ===
+* Multiclass mobs can no longer cast unobtainable player spells.
+* Reduced multiclass mob health scaling in solo instances by 66%
+* Reduced casting speed of difficulty-scaled raid mobs slightly.
+* Fixed mob difficulty haste scaling not working correctly.
+* Removed difficulty-scaling of aggro range from solo instances.
+* Reduced difficulty-scaling of aggro range everywhere else.
+* Reduced resist penetration of difficulty-scaled raid mobs in solo instances.
+* Reduced difficulty-scaled mob health by 33%
+* Reduced multiclass mob health scaling everywhere else by 50%
+* Reduced difficulty-scaling damage by 33%
+ 
+=== Gameplay ===
+* Monk animations now exist for Trolls, Ogres, Dwarves, Gnomes, and Halflings. Kickin'!
+* Bard animations now exist for Trolls, Ogres, Dwarves, Gnomes, Halflings, and Iksars. Sing your heart out!
+* The Translocators at the docks, provided by the Academy of Arcane Sciences, have grown tired of standing around all day for no pay, and have started charging 1 platinum piece per level, to send you on your way.
+* The Translocators charge based on your highest level achieved.
+* A new translocator route has been added between Freeport and Qeynos.
+* Fixed reciprocal attack range when you are levitated.
+* Motes now drop in a 10 level range instead of 5.
+* Fixed an issue causing Learned Recipes to disappear after zoning.
+* Frederic Calermin will now ask if you wish to "test your skills", instead of powers.
+* Paineel NPCs will no longer give more than 100 faction per hit.
+* Due to population increases, open world difficulty 0 zones will now spawn additional picks.
+* Resurrections during combat is now allowed. All other same-zone respawns are blocked while in combat.
+* Ranged and throwing attacks no longer consume ammo.
+* Fixed an issue with reloading pet equipment if a pet item is merge upgraded.
+* NPC pets will now despawn if the owner is killed.
+* Voidlings can now see you if you're invisible.
+
+=== Instances ===
+* Plane of Hate and Plane of Fear raids are now available!
+* Group raids for all currently available raid content are now available (including Hate and Fear)!
+* NOTE: Plane of Sky will be coming at a later date. Personal instances of Hate and Fear for trash clears are coming at a later date.
+* Raid instance Loot Lockouts removed from all non-raid-target mobs. In raid instances, loot should now drop from kills of all mobs that don't trigger a mob-specific lockout timer shown in the Expedition window.
+* Personal Instance lockout timers have been reduced to 1 hour from 3 hours.
+* Fixed an issue that was blocking looting from solo kills of mobs with loot lockouts in dynamic instances.
+* Solo raid instances should now properly apply lockouts for replay and individual NPC lockout timers.
+
+=== Invocations ===
+* Fix beastlords not being considered wisdom casters.
+* Updated Invocation Descriptions:
+* Recovery: You regenerate mana twice as fast and spells have a 5% reduced mana cost. Out of combat regen bonus is not effected.
+* 
+* Empower: Adds 25% plus 10% per additional non-hybrid casting class to HP spell effects at the cost of 20% more mana.
+* 
+* Inversion: Shifts two-thirds of spell cast time into the global recovery time and 20% of the mana cost into endurance cost.
+* 
+* Spellblade: Treats the first spell-gem slot as a proc that consumes both mana and endurance on activation. 40% of the spells mana cost is paid as mana and endurance. The spell must have a reuse time less than or equal to its cast time.
+* 
+* Overchannel: Cast spells have a -150 resist adjust plus another -15 for every non-hybrid caster class at a cost of 20% of the mana cost in endurance.
+* 
+* Inviolable: Cast spells are uninterruptible at the cost of 100% more mana and the same amount as endurance.
+* 
+* Divine: Spending mana will heal the group member with the lowest hp percentage by that amount. For every additional wisdom class, this will repeat with a heal for 33% of the mana spent.
+
+=== Items ===
+* Fiery Avenger's Two-Handed Bash worn effect has been replaced with Virtuous Bash, increasing Bash minimum damage by 15 and reducing Bash cooldown by 1 second.
+* Removed the Magic Resist from Pristine Studded Leather Tunic.
+ 
+=== Loadouts ===
+* Resolved a client stuck state when attempting to save the current loadout in a non-swap zone.
+* Resolved some situations where Items or Exaltations could disappear during Bandolier or Loadout swaps.
+* Resolved an issue with Loadout Equipment swapping caused by invalid exaltations prior to their removal.
+* Bandolier swapping will now verify that an item is still valid for the destination slot.
+
+=== NPCs ===
+* Dramatically reduced the assist radius of Gynok Moltor in Befallen.
+* Dark Assassin in Feerrott should now give XP.
+ 
+=== Spells ===
+* Change per-spell resist hardcaps to resist softcaps.
+* Added Endurance Regeneration to Chloroplast.
+* Descriptions updated for the following spells, as they are no longer limited to outdoors:
+* Whirling Wind, Invoke Lightning, Dizzying Wind, Harmony of Nature, Lightning Strike and Lightning Blast
+
+=== UI ===
+* Added a new slider under nameplate tab in options to scale the size of nameplates.
+* Feign Death -- Toggle option under general to enable/disable standing when pressing the skill again while already feigning also made the camera pan when using right click while feign death.
+* Ward of the Divine buff icon is now fixed.
+* Lull spells tooltip durations have been fixed.
+* Ineligible disciplines from other loadouts no longer appear in the actions window.
+* Fixed issues with raid window filtering.
+* Fixed an issue with storage tab on inventory updating.
+* Added CTRL and SHIFT key modifiers for clicking items in your storage to pickup 1 or a stack of the item.
+* Removed TAB stops from hidden buttons on server select screen.
+* Tutorial text updated for clarity around Primary race changing.
+* Fix spelling/grammar errors in ability descriptions.
+ 
+=== World ===
+* Added a banker to Plane of Sky, next to the fire.

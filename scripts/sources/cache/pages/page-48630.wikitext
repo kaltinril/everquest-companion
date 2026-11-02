@@ -1,0 +1,14 @@
+{{Disambig3|[[Feign Death (Ability)]]}}
+{{Disambig3|spell version of [[Feign Death]]}}
+
+This skill grants the [[Feign Death (Ability)]], allowing the character a chance convince enemies that they are dead.  If successful, all enemies currently engaged will lose interest, and (after a delay) return to what they were doing.  After enough uses of the skill enemies will completely forget the character, and once used successfully it can be maintained for an indefinite amount of time.
+
+For further details see [[Feign Death (Ability)]].
+
+== Classes ==
+
+* [[Monk]] - Level 17 '''(Max 200)'''
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

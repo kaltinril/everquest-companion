@@ -1,0 +1,99 @@
+'''*WARNING*'''  Get the task '''FIRST''' or you will have to repeat every subquest (credit is '''not''' retroactive)
+{| class="questTopTable"
+! ''' Start Zone: '''
+| [[Kerra Island]]
+|-
+! ''' Quest Giver: '''
+| Hail any class guild master NPC
+|-
+! ''' Minimum Level: '''
+| 1
+|-
+! ''' Classes: '''
+| All
+|-
+! ''' Related Zones: '''
+| [[Kerra Island]], [[Toxxulia Forest]]
+|-
+! ''' Related NPCs: '''
+| [[Allix]], [[Errrak Thickshank]], [[Feren]], [[Feskr Drinkmaker]], [[Kerran tseq]], [[Roary Fishpouncer]], [[Shazda Asad]], [[Thalith Mamluk]], [[The Kerran Sha`rr]], [[Urkath Greyface]]
+|} 	
+
+== General Information ==
+
+This "Task" is required to unlock the Kerran race as a primary race within EQ Legends.  The Task consists of completing multiple smaller quests for various Kerrans around Kerra Isle
+
+Do note that Erudites start off KoS to Kerrans and will need to work on factions or use low level illusions to do this Task
+
+=== Sub-Quests to Complete ===
+
+{{CheckboxList}}
+* Aid [[Allix]] on Kerra Isle: '[[The Luck of Allix]]'
+* Aid [[Errrak Thickshank]] on Kerra Isle:'[[Health Potion]]'
+* Aid [[Feren]] on Kerra Isle: '[[Razortooth]]'
+* Aid [[Feskr Drinkmaker]] on Kerra Isle: '[[Feskr's Supplies]]'
+* Aid [[Kerran tseq]] on Kerra Isle: '[[Heretic's Toy]]'
+* Aid [[Roary Fishpouncer]] on Kerra Isle: '[[Fish Dinner]]'
+* Aid [[Shazda Asad]] on Kerra Isle: '[[First Test of Kejaar]]' & '[[Second Test of Kejaar]]'
+* Aid [[Thalith Mamluk]] on Kerra Isle: '[[Fang Tooth (quest)]]'
+* Aid [[The Kerran Sha`rr]] on Kerra Isle: '[[Something is Wrrrong]]' & '[[This Means Warrr]]'
+* Aid [[Urkath Greyface]] on Kerra Isle: '[[Skunk Scent Gland (quest)]]'
+
+=== Details ===
+Task: Fang Tooth
+* Kill 2 wharf rats in Kerra Isle
+* Kill Fang Tooth
+* Collect 1 Sharp Tooth(s)
+* Give Thalith the Tooth
+
+Task: Feskr's Supplies
+* Aquire a Backpack
+* Loot Kerran Fish Oil
+* Loot a Fire Beetle Leg
+* Deliver the components to Feskr Drinkmaker
+
+Task: First Test of Kejaar
+* Claim the head of the Erudin Emissary in Toxxulia Forest
+* Deliver Emissary Head to Shazda
+** Grants follow-up Quest (Second Test of Kejaar)
+
+Task: Second Test of Kejaar
+* Claim the head of Sentinel Creot in Toxxulia Forest
+* Deliver the head of Sentinel Creot to Shazda
+
+Task: Fish Dinner
+* Collect 1 Raw Darkwater Piranha(s)
+* Deliver the piranha meat to Roary
+
+Task: Health Potion
+* Collect 1 Tiger Skin(s)
+* Collect 1 Odd Kobold Paw(s)
+* Collect 1 Snake Fang(s)
+* Deliver the ingredients to Errrak
+
+Task: Heretic's Toy
+* Smash a heretic's pet and gather up the remains
+* Deliver the heretic's toy to the kerran tseq
+
+Task: Razortooth
+* Kill Razortooth, the meanest fish in Kerra Isle
+* Collect Razortooth's remains
+* Collect 3 Scrrrumptious Fish Meat
+* Deliver the remains of Razortooth, along with 3 [[Scrrrumptious Fish Meat]], to Feren in Kerra Isle.
+
+Task: Skunk Scent Gland
+* Acquire a Skunk Scent Gland. Many of these creatures can be found in Toxxulia Forest
+* Deliver gland to Ulkath
+
+Task: Somethng is Wrrrong
+* Search the north side of the island for clues
+* Deliver the Desecrated Kejaar Totem to The Kerran Sha`rr
+** Grants follow-up Quest (This Means Warrr)
+
+Task: This Means Warrr
+* Slay one of the Heretics at the Tiger Training Pits and collect their orders.
+* Show the Heretics orders to The Kerran Sha`rr
+
+Task: The Luck of Allix
+* Collect 1 [[Ajrah Leaf]](s)
+* Deliver the [[Ajrah Leaf]] to Allix

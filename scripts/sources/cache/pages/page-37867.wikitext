@@ -1,0 +1,91 @@
+ Long live the green!!
+ - [[Jale Phlintoes]]
+
+{{Factionpage|
+
+| description = The Unkempt Druids are a secretive, crazed group of druids and rangers who protect the natural order in the uncivilized wilds of Antonica. They are active in [[Rathe Mountains]] and various Plains of Karanas. It is led by [[Jale Phlintoes]].
+
+| zones_raise = 
+
+* [[Eastern Plains of Karana]]
+* [[Kithicor Forest]]
+* [[Lesser Faydark]]
+* [[Nektulos Forest]]
+* [[Northern Karana]]
+* [[Qeynos Hills]]
+* [[Rivervale]]
+* [[Southern Karana]]
+* [[Qeynos|South Qeynos]]
+* [[Surefall Glade]]
+
+| zones_lower = 
+
+* [[Rathe Mountains]]
+* [[Southern Karana]]
+* [[Qeynos|South Qeynos]]
+
+| quests_raise = 
+
+* [[Gharin's Note (evil)]]
+* [[Innoruuk Symbol Quests|Innoruuk Disciple]]
+
+| quests_lower = 
+
+* [[Call of Flame Quest]]
+* [[Deputy Tagil's Debt]]
+* [[Gharin's Note (Good)]]
+* [[Ivy Etched Armor Quests|Ivy Etched Helm]]
+* [[Ivy Etched Armor Quests|Ivy Etched Leggings]]
+* [[Jagged Pine Crook Staff]]
+* [[Nesiff's Statue]]
+* [[Nillipuss the Brownie]]
+* [[Ratskin Gloves Quest]]
+* [[The Bind]]
+* [[The Nitrates and the Assassin]]
+
+| mobs_raise = 
+
+* [[a druid]] <span class='fmz'>(East Karana - NPC, Non-Quest)</span>
+* [[a treant]]  <span class='fmz'>(South Karana)</span>
+* [[Briana Treewhisper]] <span class='fmz'>(North Karana - NPC, Non-Quest)</span>
+* [[Ceel Moonwhisper]] <span class='fmz'>(Commonlands - NPC, Non-Quest)</span>
+* [[Corun Finisc]] <span class='fmz'>(Surefall Glade - Quest NPC)</span>
+* [[Frenway Marthank]] <span class='fmz'>(Surefall Glade - Quest NPC)</span>
+* [[Gash Flockwalker]] <span class='fmz'>(South Qeynos)</span>
+* [[Ged Twigborn]] <span class='fmz'>(Kithicor Forest - Quest NPC)</span>
+* [[Ilscent Tagglefoot]] <span class='fmz'>(Rivervale - Merchant)</span>
+* [[Initiate Guanin]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Initiate Hart]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Initiate Rambel]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Initiate Umbra]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Irin Lunis]] <span class='fmz'>(Kithicor Forest - NPC, Non-Quest)</span>
+* [[Kithicor]] <span class='fmz'>(Kithicor Forest - Ranger Guildmaster)</span>
+* [[Larsk Juton]] <span class='fmz'>(Surefall Glade - Ranger Guildmaster)</span>
+* [[Leaf Falldim]] <span class='fmz'>(Kithicor Forest - Quest NPC)</span>
+* [[Metha Wintersong]] <span class='fmz'>(Commonlands - NPC, Non-Quest)</span>
+* [[Morin Shadowbane]] <span class='fmz'>(Kithicor Forest - Quest NPC)</span>
+* [[Neophyte Edel]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Neophyte Halle]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Neophyte Hazel]]  <span class='fmz'>(Nektulos Forest)</span>
+* [[Shadow Treebright]] <span class='fmz'>(Commonlands - NPC, Non-Quest)</span>
+* [[Shakey Scarecrow]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Sil Silverstar]] <span class='fmz'>(Commonlands - NPC, Non-Quest)</span>
+* [[TeAnara]] <span class='fmz'>(Surefall Glade - Druid Guildmaster)</span>
+* [[Uner Gnarltrunk]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Veli Greenwhisper]] <span class='fmz'>(Commonlands - NPC, Non-Quest)</span>
+* [[Vesteri Nomanoi]] <span class='fmz'>(Surefall Glade - Quest NPC)</span>
+* [[Vuli Greenwhisper]] <span class='fmz'>(Commonlands - NPC, Non-Quest)</span>
+* [[Xanuusus]] <span class='fmz'>(North Karana - Quest NPC)</span>
+
+| mobs_lower = 
+
+* [[Albain Tinderbrand]] <span class='fmz'>(Mountains of Rathe - NPC, Non-Quest)</span>
+* [[Grizzleknot]]  <span class='fmz'>(South Karana)</span>
+* [[Nola Thistleborn]] <span class='fmz'>(Mountains of Rathe - NPC, Non-Quest)</span>
+* [[Solvedi Aldeberan]] <span class='fmz'>(Mountains of Rathe - Quest NPC)</span>
+* [[Tholia Fastbond]] <span class='fmz'>(Mountains of Rathe - NPC, Non-Quest)</span>
+* [[Unkempt Preserver]] <span class='fmz'>(Mountains of Rathe)</span>
+
+}}
+= Suggested Route =
+*Kill Halflings in Nektulos Forest (+[[Unkempt Druids]], -[[Storm Reapers]], -[[Mayor Gubbin]], -[[Merchants of Rivervale]]).  <br>Fix killing Halflings: Do [[Jillin's Stew]] (+[[Guardians of the Vale]], +[[Mayor Gubbin]], +[[Storm Reapers]], +[[Mayor Gubbin]], +[[Merchants of Rivervale]], -[[Dreadguard Outer]])

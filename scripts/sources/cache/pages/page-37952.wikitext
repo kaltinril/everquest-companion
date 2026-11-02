@@ -1,0 +1,64 @@
+{{Factionpage|
+
+| description = [[File:Npc_gnomish_miner.png|right]]The company of Gnomes living and working in [[Solusek's Eye]] form this group. 
+
+They are connected to the main gnomes in [[Ak'Anon]], but this faction can be enough to be able to barter and trade with them.
+
+You can raise this faction by killing the [[Kobolds of Fire Pit]] in [[Nagafen's Lair]]. Killing the foul but relatively harmless [[Goblins of Fire Peak]] will '''not''' raise this faction.
+
+| zones_raise = 
+
+* [[Nagafen's Lair]]
+
+| zones_lower = 
+
+* [[Lesser Faydark]]
+* [[Solusek's Eye]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+* [[Greater Kobold]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[a greater kobold shaman]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[fire giant warrior]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[fire giant wizard]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[greater kobold]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[King Tranix]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[kobold champion]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[kobold noble]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[kobold priest]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[Lord Nagafen]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[Magus Rokyl]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[Solusek kobold]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[Solusek kobold king]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[Solusek kobold shaman]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[stone spider]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+* [[Warlord Skarlon]]  <span class='fmz'>(Nagafen's Lair (Solusek B))</span>
+
+| mobs_lower = 
+
+* [[CWG Model CA]] <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model CB]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model CC]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model CX]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model EXG]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model MA]] <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model MB]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model MC]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model SX]] <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model XA]] <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model XB]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[CWG Model XC]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[Gabbie Mardoddle]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[gnomish conjurer]] <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[gnomish curator]] <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[gnomish miner]] <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[Marfen Binkdirple]] <span class='fmz'>(Solusek's Eye (Solusek A) - Merchant)</span>
+* [[Saben Tucross]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+
+}}

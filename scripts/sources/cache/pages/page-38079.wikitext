@@ -1,0 +1,48 @@
+{{Classic Era}}
+{{Factionpage|
+
+| description = The fungus men faction in [[RunnyEye Citadel]].
+
+| zones_raise = 
+
+* unknown
+
+| zones_lower = 
+
+* [[RunnyEye Citadel]]
+
+| quests_raise = 
+
+* unknown
+
+| quests_lower = 
+
+* unknown
+
+| mobs_raise = 
+
+* unknown
+
+| mobs_lower = 
+
+* [[A Sporali Miner]]  <span class='fmz'>(RunnyEye Citadel)</span>
+* [[A Sporali Scavenger]]  <span class='fmz'>(RunnyEye Citadel)</span>
+* [[A Sporali Defender]]  <span class='fmz'>(RunnyEye Citadel)</span>
+* [[A Sporali worker]]  <span class='fmz'>(RunnyEye Citadel)</span>
+* [[A Sporali Gatherer]]  <span class='fmz'>(RunnyEye Citadel)</span>
+* [[A sporeling]]  <span class='fmz'>(RunnyEye Citadel)</span>
+* [[The Sporali Moldmaster]]  <span class='fmz'>(RunnyEye Citadel)</span>
+
+}}
+
+=== Lore ===
+
+[[File:MoNSporali.png|right]]
+
+Sporali are a race of fungus men common in several areas of Norrath. They resemble giant mushrooms with arms and legs. A typical sporali stands around 9 feet tall, with a wide cap at the top of its head that can reach 4 or 5 feet in diameter, although the eldest sporali can reach heights approaching 30 feet. A sporali has what appear to be two angled slashes in the upper third of its stalk that serve as eyes, and thick, greyish skin covering its whole body. A sporali often grooms itself to whatever task it performs most often: soldier sporali grow hard, knobby growths over their hands and slightly tougher hides, while crafters — those engaged in a particular trades useful to the sporali as a whole — adapt in diferent ways. Otherwise, soldiers and crafters are virtually identical.
+
+Sporali generally gather in colonies, each of which can include anywhere from 50 to 500 sporali. Each colony is self-sufficient, able to feed and equip its members well enough to maintain its size and wealth, though colonies rarely try to expand their territories. Each sporali has a specific task within the colony, though these tasks can change as the sporali grows in size and experience.
+
+Sporali continue to grow slowly over the course of their lives and apparently do not die of old age. Rather, as grow, they gain rank and power within their society. Still, many sporali are killed by predators (and even large herbivores), disease, or other mishaps before reaching their full size. Others are encouraged to split themselves into smaller sporali (this is how they reproduce) to maintain a colony's population. Once a sporali has reached a respectable height, generally around 16 feet, it gains the honorific title of Moldmaster. Each plot is usually ruled by a single Moldmaster, and any new Moldmaster that develops within that plot must set out to form a new one, usually taking a few other sporali along to assist. Colonies are ruled by the largest and eldest Moldmaster present.
+
+Sporali are not naturally warlike, and most colonies manage to mine ores, grow tools, and farm various fungi and molds without attracting the attention of other races. Unfortunately, their passivity makes them easy targets for warlike groups, who have been known to enslave entire colonies of sporali. It is not unusual for a goblin tribe to threaten to exterminate a colony unless it agrees to work for the goblins, for instance, as miners. Once the residing Moldmaster agrees to such a deal, the sporali colony essentially becomes slave labor for the goblins and will tend to defend the goblins and their mines out of fear of reprisal.

@@ -1,0 +1,26 @@
+{{Factionpage|
+
+| description = The outcast Frogloks in [[Innothule Swamp]] and [[Swamp of No Hope]].
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Rathe Mountains]]
+* [[Swamp of No Hope]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+* [[a froglok bounder]]  <span class='fmz'>(Swamp of No Hope)</span>
+* [[Froglok Raider]]  <span class='fmz'>(Swamp of No Hope)</span>
+
+}}

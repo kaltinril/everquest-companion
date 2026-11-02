@@ -1,0 +1,27 @@
+{{Factionpage|
+
+| description = All denizens of the Plane of Fear belong to this faction.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Plane of Fear]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a turmoil toad]]       <span class='fmz'>(Plane of Fear)</span>
+* [[Wraith of a Shissir]]  <span class='fmz'>(Plane of Fear)</span>
+* others (list incomplete)
+
+}}

@@ -1,0 +1,47 @@
+{{Classic Era}}[[File:Npc_perrir_zexus.png|thumb|right]]{{Factionpage|
+
+| description = Just inside the entrance of Neriak's 3rd Gate, surrounded by a nice moat is the Temple dedicated to the [[Prince of Hate]]. Here the Priests of Innoruuk, under the leadership of [[Perrir Zexus]] train clerics of all seasons. 
+
+The priests are loyal to the Dark Elf [[King Naythox Thex]]. Dedicated to Hate, there is no Love lost on the Dark Elven [[Queen Cristanos Thex]] and her allies, [[The Dead]]. The Priests of Innoruk oppose the [[Priests of Marr]] in North Freeport, the [[Clerics of Tunare]] in Felwithe, and the [[Priests of Life]] in Qeynos.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Freeport|East Freeport]]
+* [[Lesser Faydark]]
+* [[Najena]]
+* [[Neriak|Neriak Third Gate]]
+
+| quests_raise = 
+
+* [[Innoruuk Symbol Quests|Innoruuk Disciple]]
+* [[Innoruuk Symbol Quests|Innoruuk Initiate]]
+* [[Innoruuk Symbol Quests|Innoruuk Regent]]
+* [[Innoruuk Recommendation]]
+* [[The Visiting Priestess]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Eruvin T`Kix]] <span class='fmz'>(Neriak Third Gate)</span>
+* [[Issia H`Rugla]] <span class='fmz'>(Neriak Third Gate - Merchant)</span>
+* [[Jsvan Zexus]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Perrir Zexus]] <span class='fmz'>(Neriak Third Gate - Cleric Guildmaster)</span>
+* [[Priestess Llandra]] <span class='fmz'>(Lesser Faydark - Quest NPC)</span>
+* [[Teir`Dal Prophet]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[Tzanso S`Tai]] <span class='fmz'>(Neriak Third Gate - Merchant)</span>
+
+}}
+
+= Suggested Route =
+*[[Innoruuk Recommendation]] (+[[Priests of Innoruuk]], +[[King Naythox Thex]], -[[Priests of Marr]], -[[Clerics of Tunare]], -[[Priests of Life]], -[[Primordial Malice]])<br>Will need to fix [[Primordial Malice]] (-400 per), if desired. Other hits are minor compared.
+
+
+[[Category:Achievement Faction]]

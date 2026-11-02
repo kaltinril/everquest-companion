@@ -1,0 +1,54 @@
+{{Factionpage|
+
+| description = Predominantly fire goblins in Lavastorm Mountains and environs.
+
+| zones_raise = 
+
+* [[Lavastorm Mountains]]
+* [[Solusek's Eye]]
+
+| zones_lower = 
+
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+* [[Rogue Redemption]]
+
+| mobs_raise = 
+
+* [[a fire goblin scout]]  <span class='fmz'>(Lavastorm Mountains)</span>
+* [[cinder goblin]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[cinder goblin shaman]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[cinder goblin wizard]] <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[fire goblin]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[fire goblin bartender]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[fire goblin shaman]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[a fire goblin wizard]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[flame goblin]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[flame goblin foreman]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[flame goblin shaman]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[flame goblin wizard]] <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[goblin high shaman]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[goblin warrior]]  <span class='fmz'>(Lavastorm Mountains)</span>
+* [[inferno goblin]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[inferno goblin captain]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[inferno goblin shaman]] <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[inferno goblin torturer]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[inferno goblin wizard]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[large fire goblin]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[Solusek champion]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[Solusek goblin]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[Solusek mage]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[Solusek priest]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[Tisella]]  <span class='fmz'>(Lavastorm Mountains)</span>
+* [[young goblin]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[young goblin shaman]]  <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+* [[young goblin wizard]] <span class='fmz'>(Solusek's Eye (Solusek A))</span>
+
+| mobs_lower = 
+
+
+}}

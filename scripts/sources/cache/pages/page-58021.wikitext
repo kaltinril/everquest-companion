@@ -1,0 +1,435 @@
+'''DISCLAIMER''': Linux is not officially supported by the Developer of EverQuest Legends (EQL). Any modifications related to your Linux environment to get EQL working properly should be taken at your own risk. This guide is simply here to help document what is known to have worked for other EQL players.  Results may vary wildly based on differing hardware, Linux Distribution and Version, and middleware used to run EQL.
+
+= Introduction =
+Linux gaming support has come an extremely long way in the past 5 years thanks to the Proton compatibility layer. Due to this, a lot of gamers are moving over to Linux for gaming, especially as Windows starts adding features that slow down the gaming experience or make it worse or more frustrating.  Whatever your reason may be, getting Windows games such as EverQuest Legends running on Linux has never been easier! It still requires more steps that it would on Windows, but this is increasingly becoming easier.
+
+The guidance here is a work in progress! 
+
+If you are encountering any issues, please check the Common Issues section near the bottom of this article for a potential fix. 
+
+If you get EQL working on Linux via a different method not currently documented, please consider contributing! 
+
+== Bottles ==
+Bottles is a graphical application intended to simplify Wine setup by automating installation of Wine runners, dependencies, and compatibility layers.
+
+* Download the EQ Legends installer as usual from their website.
+	
+* In Bottles, click the menu button in the top right (three lines, "hamburger") and open Preferences. Open the Runners tab, and click the download icon for a runner '''newer than version 9.7''', since that version fixed pure-white character models in EQ.  (The person writing this uses kron4ek with no issues.)  Close Preferences.
+	
+* Click the "+" to create a new bottle.
+	
+* Name it as you like, select the "Gaming" type, and choose the runner you just downloaded.  Click Create.  Setup will take a few minutes.
+	
+* Click on the entry for the bottle you just created.  Scroll down and click Settings.  Change Windows Version to 11.  Click the back icon (left arrow).
+	
+* Click "Run Executable".  Navigate to the EQ Legends installer file you downloaded and run it.  Walk through the installer as usual.
+	
+* Click "Add Shortcuts" and navigate to where EQ Legends was installed - probably "drive_c/users/Public/Daybreak Game Company/Installed Games/EverQuest Legends/".  Select LaunchPad.exe and click Add.  You now have LaunchPad as a "Program" in this bottle.
+	
+* Click the three dots to the right of the LaunchPad entry, and you can add a desktop entry for the game, or add it to Steam.  Or you can just open Bottles and click the play icon for LaunchPad when you want to play.
+* Note, if the launchpad opens and then closes you may be missing some dependencies, particularly if you are on an intel-xe machine. Installing steam seems install any missing dependencies.
+
+=== MIDI Music w/Bottles (Optional) ===
+
+* sudo apt install -y qsynth alsa-utils fluidsynth flatpak
+* Download the sf2 file from below and copy it into your ~/Documents folder ie "$HOME/Documents/SC-55 Roland SOUNDCanvas Up.sf2" 
+* Direct link to the specific file: https://archive.org/download/500-soundfonts-full-gm-sets/500_Soundfonts_Full_GM_Sets.zip/SC-55%20Roland%20SOUNDCanvas%20Up.sf2
+* Create two scripts to set your bottles pre-launch and post-launch script (ie  eq-midi-start.sh,  eq-midi-stop.sh). 
+* Go into your bottle and set the launch parameters pre and post scripts you just created
+* chmod +x $HOME/bin/eq-midi-stop.sh $HOME/bin/eq-midi-start.sh or wherever you put them
+* Set the file contents of each file below
+
+==== eq-midi-start.sh ====
+
+<pre>
+#!/usr/bin/env bash
+set -euo pipefail
+
+SOUNDFONT="$HOME/Documents/SC-55 Roland SOUNDCanvas Up.sf2" 
+PIDFILE="/tmp/eq-fluidsynth.pid"
+LOGFILE="/tmp/eq-fluidsynth.log"
+
+# Reuse an existing FluidSynth instance if one is already running.
+if pgrep -f "fluidsynth.*SC-55 Roland SOUNDCanvas Up.sf2" >/dev/null; then
+    exit 0
+fi
+
+flatpak-spawn --host sh -c \
+  'fluidsynth -is -a pipewire "$1" >"$2" 2>&1 & echo $! >"$3"' \
+  sh "$SOUNDFONT" "$LOGFILE" "$PIDFILE"
+
+# Give FluidSynth a moment to create its MIDI port.
+sleep 2
+</pre>
+
+==== eq-midi-stop.sh ====
+
+<pre>
+#!/usr/bin/env bash
+
+flatpak-spawn --host \
+  pkill -f "fluidsynth.*SC-55 Roland SOUNDCanvas Up.sf2" \
+  2>/dev/null || true
+</pre>
+
+== Lutris ==
+Lutris is an open source video game preservation platform providing emulators, compatibility layers, and game engine re-implementations, targeting support for Linux.
+
+Lutris Install Scripts are typically maintained on the Lutris website.
+As of July 1st, 2026 there is a script available on the EverQuest game listing here: https://lutris.net/games/everquest/
+Here is a direct link to the install script source code: https://lutris.net/games/install/39924/view
+
+=== MIDI Music w/Lutris (Optional) ===
+:::'''Note:''' This will only work with native installs of Lutris.  Flatpak installations will not work.  This should work for Ubuntu/Debian distros.  Tested with Linux Mint 22.3 and Lutris 0.5.22
+
+This guide is a modification of the steps already set out for setting up MIDI for Steam deck.  Big thanks to the author of that guide.
+
+Download Soundfonts
+# Download the SC-55 Roland SOUNDCanvas Up MIDI pack from the 500 SOundfonts General MIDI set on Archive.org.
+## Link to the full MIDI set: https://archive.org/details/500-soundfonts-full-gm-sets
+## Direct link to the specific file: https://archive.org/download/500-soundfonts-full-gm-sets/500_Soundfonts_Full_GM_Sets.zip/SC-55%20Roland%20SOUNDCanvas%20Up.sf2
+## Note the path where you saved the file "SC-55 Roland SOUNDCanvas Up.sf2", it will be used in the next step
+
+Download QSynth
+# Open terminal and run:
+## sudo apt update
+## sudo apt install -y qsynth
+## verify install with qsynth --version
+
+Configure QSynth
+# Open qsynth from applications menu or by running qsynth in terminal.  You may get an error about JACK driver not being setup, ignore it and continue.
+# In the far left, set the Master Gain Input to "20"
+# Click "Setup" in the bottom right. Go to the Audio tab, and change "Audio Driver" to "alsa"
+# Go to "Soundfonts" tab. Click "open". Browse to the soundfont "SC-55 Roland SOUNDCanvas Up.sf2" you downloaded. Click on it and select "Open".
+# Click "Ok". It will ask you to restart the engine - click "Yes"
+# Click on "Options" button on the far right of the QSynth panel
+# Check "Enable system tray icon" and "Start minimized to system tray"
+# Click "Ok"
+# Do a quick test. Leave QSynth running, and open Lutris, and then play EQL.
+# If you hear that sweet, sweet EQL loading screen music, you'll know it worked.
+# Exit out of EQL
+# Close QSynth. Right click the orange drop on the far right of your task bar, and select "Quit" and then "Ok"
+
+Create Launch and Exit Scripts
+# Open a terminal and run:
+## mkdir -p ~/.local/share/lutris/scripts
+## printf '#!/bin/bash\nqsynth &\n' > ~/.local/share/lutris/scripts/qsynth-start.sh
+## printf '#!/bin/bash\nkillall -9 qsynth\n' > ~/.local/share/lutris/scripts/qsynth-stop.sh
+## chmod +x ~/.local/share/lutris/scripts/qsynth-start.sh ~/.local/share/lutris/scripts/qsynth-stop.sh
+
+Configure Lutris
+# Open Lutris, right click on Everquest install and select Configure
+# Select 'System Options' tab
+# Activate advanced toggle at top left
+# set Pre-Launch script to ~/.local/share/lutris/scripts/qsynth-start.sh
+# Set Post-Exit script to ~/.local/share/lutris/scripts/qsynth-stop.sh
+# Click Save button at top left.
+
+Verify setup
+# Start EQL from Lutris. Ensure that Qsynth is not running prior to starting.  Scripts should start qsynth on EQL start, and quit qsynth on EQL close.
+
+=== Acknowledgements ===
+
+Steam deck install instructions got me on the right track for this, big thanks to that author.
+
+== Steam ==
+
+::: '''Note:''' This is one way to install EQL (how I installed it); I am sure there are other methods.
+
+This method has been used successfully on the following distributions:
+
+* Bazzite
+* KDE Neon User Edition
+* CachyOS Desktop Edition
+* Ubuntu 24.04 LTS
+* Ubuntu 26.04 LTS
+
+Installing EQL via the Steam app is very similar to SteamOS except without the added complication of different runtime modes. There are two "phases" to getting EQL running through Steam: installation and execution. If you already have an extracted installation folder, you can skip the Installation phase.
+
+=== Installation ===
+
+# Open Steam.
+# Navigate to your Library.
+# Click "Add a Game".
+# Select "Add a Non-Steam Game".
+# Click "Browse..." and locate the installer file (<code>EQLegends_setup.exe</code>).
+# Click "Add Selected Programs".
+# Locate the new "game" in the Library list; it might be named "EQLegends_setup.exe".
+# Right-click the game and select Properties.
+# Select Compatibility from the left-hand navigation menu.
+# Check the "Force the use of a specific Steam Play compatibility tool" checkbox.
+# Select a compatibility library. The following options are known to work:
+#* Proton 10.0-4
+#* Proton Experimental
+# Click Play. The installer should run, step through the installation process and install the game normally.
+
+::: '''Note:''' You may want to rename the game to something like "EverQuest Legends".
+
+Now the game is installed and available in Steam, but it is configured to run the installer, which is much less fun to play than the actual game, so let's fix that.
+
+=== Execution ===
+
+First, we need to discover the location to which the game was installed. If you already know this, you can skip this step. For example:
+
+  $ find ~ -name LaunchPad.exe
+  /home/user/.local/share/Steam/steamapps/.../drive_c/users/Public/Daybreak Game Company/Installed Games/EverQuest Legends/LaunchPad.exe
+
+With this path in hand, we can continue:
+
+# Locate your new EQL game in the Library game list (e.g. "EverQuest Legends").
+# Right-click the game and select Properties.
+# Select "Shortcut" from the left-hand navigation menu.
+# Change "Target" to point to the path of the <code>LaunchPad.exe</code> file (above).
+# Change "Start In" to the directory containing the <code>LaunchPad.exe</code> file (above). In other words, the full path to the <code>EverQuest Legends</code> folder.
+
+That's it! You should be able to start and play the game as normal from Steam.
+
+:Additional note on Execution shortcut if EQL fails to launch after the above change:
+:# If, after changing the shortcut location to <code>LaunchPad.exe</code>, the game fails to launch. You may need to re-add the game to steam targeting <code>LaunchPad.exe</code> directly. 
+:# '''Fix: Create a shortcut to LaunchPad.exe Directly.'''
+:## Rename the Non-Steam game that was added to install the game for the sake of clarity. It has been observed that removing the Non-Steam target for the launcher, prompts Steam to assume the game is no longer wanted and will remove it entirely. ''This may not be a problem on all systems/versions of Steam, but was observed on version 21.3 of Linux Mint running Steam version 1785187029''
+:## Library → '''Add a Game''' → '''Add a Non-Steam Game'''.
+:## Click '''Browse...''', navigate directly to <code>LaunchPad.exe</code> in <code>.../Daybreak Game Company/Installed Games/EverQuest Legends/</code>, and select it directly (don't add the installer this time — skip straight to adding LaunchPad.exe itself).
+:## Be sure that both the path to the executable and the '''Start In''' path are both enclosed in "quotation" marks. 
+:## Add it, then be sure to set Compatibility → Proton 10.0-4 or Proton Experimental again.
+:## Try launching.
+:::'''Note:''' The MIDI music steps below (for SteamOS) work for Bazzite as well, just install Qsynth via the Bazaar before continuing with the other steps.
+
+== SteamOS / Steam Deck ==
+:::'''NOTE:''' Steam Deck users must access Desktop Mode through use of the Steam Button to follow these steps. As EverQuest has official Proton support, this method is the same method used to originally install EverQuest before the simplified Steam version was released.
+
+All steps can be performed via touch screen, virtual mouse, and virtual keyboard (Steam Button + X by default). Use of a mouse and keyboard is suggested but not required.
+
+Do not be intimidated by the number of steps, these have been broken down into very small steps!
+
+# Access Desktop Mode
+## Press the Steam Button
+## Navigate to "Power"
+## Select "Switch to Desktop"
+# Use Discover to download an Internet Browser
+## Discover has a shopping bag style icon
+# Use the internet browser to download the installer from https://www.everquestlegends.com/shop, find the “Download the game” link
+# Locate the downloaded '''EQLegends_setup.exe''' file.
+## Open up "Dolphin" (blue folder) to browse your files.
+## Navigate to "Downloads".
+## Right click (Steam Deck: L2) and select 'Add to Steam'.
+# Open Steam in desktop mode (DO NOT RETURN TO GAMING MODE!), locate '''EQLegends_setup.exe''' in your games library
+## Right click (Steam Deck: L2) and select 'Properties'.
+## Locate 'Compatibility'.
+## Check 'Force use of specific Steam Play compatibility tool.
+## Choose Proton Experimental. You may need to select it a few times for it to work.
+# Run '''EQLegends_setup.exe''' (the installer) from Steam. 
+## For ease of this guide, allow the EverQuest Legends installer to use the default installation location. (advanced users may change this if you want to)
+## Take note of the location, as Proton will virtualize a Windows (x86) installation, and you must follow the file path for the next step.
+## If the launcher opens automatically, close it.
+# Once installed, locate '''LaunchPad.exe''' in the installed folder, right click (Steam Deck: L2) and select 'Add to Steam'. 
+## Open the dolphin file explorer (looks like a big blue folder)
+## Tap on “home” under “places”
+## If you don’t see “.local” as a folder, then click on the hamburger icon (3 lines) in the top right and click on “show hidden files”
+## Keep navigating down to /home/deck/.local/share/Steam/steamapps/compatdata
+## Click on the magnifying glass in the top right corner. Make sure that the option “from here (compatdata)” is selected. 
+## Search for “LaunchPad.exe”
+## There should only be one with the daybreak logo (Red background, yellow eye). If not, look at the path value - it should contain the word “EverQuest Legends” somewhere.
+## Click on the correct LaunchPad.exe once, then right click and select “Add to Steam”
+## Close the file explorer window
+# In Steam, locate '''LaunchPad.exe''' in your games library. 
+## Select and click 'Properties'.
+## Locate 'Compatibility'.
+## Check 'Force use of specific Steam Play comptiibility tool.
+## Choose Proton Experimental. You may need to select it a few times for it to work.
+## Select “Shortcut”, change the name (the top input bar) from “LaunchPad.exe” to “EverQuest Legends”
+## Close the properties window
+# Run '''LaunchPad.exe''' from Steam. 
+# Log in and allow patcher to download files. 
+# Once completed, hit 'Play'. 
+# Make sure you can get to the character select screen
+# Log out of the game
+# At this point you may close Launchpad (Steam Deck: Hit Steam Button to change windows, and you may close Launchpad from here.)
+# If you don't want MIDI music, you're done and can return to Gaming mode by opening the shortcut on the desktop. If you do want MIDI music, DO NOT RETURN TO GAMING MODE and continue on to the next section
+
+=== MIDI Music (Optional) ===
+EverQuest has some great MIDI music that a lot of us have nostalgia for. In order to get the music working on Steam Deck, you will need to do some additional steps
+# Download the SC-55 Roland SOUNDCanvas Up MIDI pack from the 500 SOundfonts General MIDI set on Archive.org.
+## Link to the full MIDI set: https://archive.org/details/500-soundfonts-full-gm-sets
+## Direct link to the specific file: https://archive.org/download/500-soundfonts-full-gm-sets/500_Soundfonts_Full_GM_Sets.zip/SC-55%20Roland%20SOUNDCanvas%20Up.sf2
+## Note the path where you saved the file "SC-55 Roland SOUNDCanvas Up.sf2", it will be used in the next step
+# Download QSynth through Dolphin
+## Note it might take a long time to download - be patient!
+# Open QSynth. In the far left, set the Master Gain Input to "20"
+# Click "Setup" in the bottom right. Go to the Audio tab, and change "Audio Driver" to "alsa"
+# Go to "Soundfonts" tab. Click "open". Browse to the soundfont "SC-55 Roland SOUNDCanvas Up.sf2" you downloaded. Click on it and select "Open".
+# Click "Ok". It will ask you to restart the engine - click "Yes"
+# Click on "Options" button on the far right of the QSynth panel
+# Check "Enable system tray icon" and "Start minimized to system tray"
+# Click "Ok"
+# Do a quick test. Leave QSynth running, and open steam, and then play EQL in desktop mode
+## Note that if your game opens in a smaller window and you're having trouble clicking things, right click the EQL application in the task bar, select more > full screen
+# If you hear that sweet, sweet EQL loading screen music, you'll know it worked.
+# Exit out of EQL
+# Close QSynth. Right click the orange drop on the far right of your task bar, and select "Quit" and then "Ok"
+# Return to Steam. Navigate to EverQuest Legends
+# Click on the gear icon, and click "Properties"
+# In the "Launch Options" input box, put the following: <code>LD_PRELOAD=/usr/lib/libcurl.so.4 flatpak run org.rncbc.qsynth & %command% ; killall -9 qsynth</code>
+## Alternative, if not using flatpak: <code>qsynth & %command% ; killall -9 qsynth</code>
+# Close the properties window
+# Exit out of desktop mode, and return to gaming mode.
+# Navigate to EverQuest Legends, and run it. If you hear that sweet loading music again, you're all set!
+
+=== Controller Layouts ===
+There are various community controller layouts. To see all of them and to pick one that's best for you, please go to this page: [[Steam Deck Controller Layouts]]
+
+=== Acknowlegements ===
+This guide was made with the help of the following sources:
+
+* https://www.reddit.com/r/EQLegends/comments/1ujh3ae/steam_deck_install_guide_need_some_testers_before/
+* https://steamcommunity.com/sharedfiles/filedetails/?id=2809933598
+
+== Wine ==
+This section is hopefully a catchall for running EQL via Wine. Please consider documenting known working linux flavors / release to add to the body of knowledge here. You can find your release with "cat /etc/os-release/" and your wine version by running "wine --version" 
+
+{| class="wikitable"
+|+Known Working Environments
+!Flavor
+!Release / Version
+!Wine Version
+!Added / Updated
+|-
+|Kubuntu
+|26.04 LTS
+|wine-10.0 (Ubuntu 10.0~repack-12ubuntu1)
+|July 1st, 2026
+|-
+|
+|
+|
+|
+|-
+|
+|
+|
+|
+|}
+The following steps were used to setup EverQuest Legends with Wine in Kubuntu
+# Create a directory to store related files and configurations for EQL
+## mkdir ~/wine
+## mkdir ~/wine/EverQuest-Legends
+# Use winecfg to initialize the directory
+## WINEPREFIX=~/wine/EverQuest-Legends/ winecfg
+# Download the EverQuest Legends installer executable. For this walkthrough, we'll say it was saved at /home/user1/EQLegends_setup.exe
+# Use winetricks to add a few supporting packages.  Note, these were suggested from some threads on regular EverQuest.
+## WINEPREFIX=~/wine/EverQuest-Legends/ winetricks d3dx9
+## WINEPREFIX=~/wine/EverQuest-Legends/ winetricks d3dx9_43
+## WINEPREFIX=~/wine/EverQuest-Legends/ winetricks vcrun2022
+## WINEPREFIX=~/wine/EverQuest-Legends/ winetricks d3dx11_43
+## WINEPREFIX=~/wine/EverQuest-Legends/ winetricks corefonts
+## WINEPREFIX=~/wine/EverQuest-Legends/ winetricks dxvk
+# Run the EQL installer in our Wine directory
+## WINEPREFIX=~/wine/EverQuest-Legends/ wine /home/user1/EQLegends_setup.exe
+# Once it's done installing, you can run the LaunchPad directly. Feel free to cancel and test this.
+## WINEPREFIX=~/wine/EverQuest-Legends/ wine-stable C:\\\\users\\\\Public\\\\Daybreak\\ Game\\ Company\\\\Installed\\ Games\\\\EverQuest\\ Legends\\\\LaunchPad.exe
+# (Optional) Create a Desktop Shortcut to make launching easier
+## nano ~/.local/share/applications/EverQuest-Legends.desktop
+## Use the following config
+### [Desktop Entry]
+### Name=EverQuest Legends
+### Exec=env WINEPREFIX="/home/user1/wine/EverQuest-Legends" wine-stable C:\\\\users\\\\Public\\\\Daybreak\\ Game\\ Company\\\\Installed\\ Games\\\\EverQuest\\ Legends\\\\LaunchPad.exe
+### Type=Application
+### StartupNotify=true
+### Path=/home/user1/wine/EverQuest-Legends/dosdevices/c:/users/Public/Daybreak Game Company/Installed Games/EverQuest Legends
+### Icon=FF36_LaunchPad.0
+### StartupWMClass=launchpad.exe
+
+= Common Issues = 
+This section is meant to document common issues people have encountered when trying to get EQL running on Linux, and the fixes they found to resolve those issues.
+
+== No Audio / No Combat Music ==
+
+Much of the music in the game requires a MIDI synthesizer to be setup and running while playing the game. The most commonly recommended choice on Linux for a software synthesizer is Fluidsynth and can installed through your distribution's package manager.
+
+When running EQL via Proton and not hearing sounds like Combat Music, a potential fix is to manually download a MIDI pack and use the Fluidsynth MIDI synthesizer to load the sounds for EQL to use
+
+=== Generic Instructions ===
+# Download a soundfont for the MIDI synthesizer
+## SC-55 Roland SOUNDCanvas Up MIDI pack from the 500 Soundfonts General MIDI set on Archive.org. 
+### Link to the full MIDI set: https://archive.org/details/500-soundfonts-full-gm-sets
+### Direct link to the specific file: https://archive.org/download/500-soundfonts-full-gm-sets/500_Soundfonts_Full_GM_Sets.zip/SC-55%20Roland%20SOUNDCanvas%20Up.sf2
+### Note the path where you saved the file "SC-55 Roland SOUNDCanvas Up.sf2", it will be used in the next step
+## The FluidR3 soundfont from your distribution's package manager (these will typically end up in a location like /usr/share/soundfonts)
+# Use Fluidsynth to load the MIDI pack
+## /usr/bin/fluidsynth -is -a pipewire "/path/to/downloaded/file/SC-55 Roland SOUNDCanvas Up.sf2"
+## ''Note that this application needs to be running before starting the game, and needs to be run each time you restart the computer. Some distributions install a systemd user service that can be used to run fluidsynth automatically when a user logs in.''
+# Launch EQL
+
+=== Arch Linux / CachyOS ===
+
+
+Install required packages: -
+ pacman -S fluidsynth soundfont-fluid
+Edit /etc/conf.d/fluidsynth -
+ SOUND_FONT=/usr/share/soundfonts/FluidR3_GM.sf2
+
+ OTHER_OPTS='-a pipewire'
+Enable and start the fluidsynth user service:
+ systemctl --user enable --now fluidsynth
+After this the MIDI music should work within EQL and fluidsynth should start for the current user whenever they login.
+
+
+== Character Models Are White / Not Rendering ==
+
+* Old Wine / Proton Version (<9.11): White character models were previously caused by a missing texture conversion (https://bugs.winehq.org/show_bug.cgi?id=56755) and was fixed as of the 9.11 wine release.
+* Lutris: This issue was noted when running via Lutris. So far the known resolution is to remove and re-run the Lutris script. This appears to be an issue during install. Another option is to switch the Wine Version to DW-Proton Latest
+* Bottles: This issue was noted when running via Bottles. The noted fix was to switch the runner to ge-proton9-20 or kron4ek (any recent version).
+
+== 4K Display Challenges ==
+
+Running a 4K display in fullscreen mode presents a number of challenges under Linux.
+
+* The fonts are far too small by default.
+* Fullscreen display can result in capture issues when tabbing out of EQL, causing crashes.
+* Not using mouse capture can cause mouselook and mouse steering difficulties when moving the mouse and clicking simultaneously in a windowed fullscreen display.
+
+=== Tips for Running on a 4K 16:9 display ===
+Assuming a native packaged Steam is installed with EQL set up as a non-Steam game, the following options can be useful to run EQL without changing your native resolution or running in a framed window.
+
+* Note that these tips have been tested and verified to work on an up-to-date Arch linux system, running KDE under Wayland with an AMD Radeon 7900XT video card.  Your mileage may vary based on your environment and hardware, but some of these options may still be useful.
+* Additionally, the tips below assume running the game in a windowed 1440p resolution that is upscaled to 4K.  The end result for you may still be fonts that are too small, however in testing, it was a nice balance of relatively clear fonts when combined with a more legible font that is not the default Arial.
+* You may need to substitue the 2560x1440 resolution to something lower for your own preference/vision capabilities.  e.g. 1920x1080.  This will produce a similar upscaled result, but it will likely be more blurry.
+
+==== Set your in-game options to an appropriate resolution and change the default font ====
+* Both of these options are '''subjective'''.  You may find the example 1440p upscaled to 4K still a bit too small.  You may find that Arial works well for you and you don't want to change your font.
+** In Options->System->Display, change to Windowed mode and select an appropriate resolution for you.  Gamescope will upscale this to your monitor's native resolution.
+** In Options->Interface->General, select a different font.
+** A recommended font is '''Noto Sans Black'''.  While still small at 1440p, it is a relatively bold font without being too clunky.
+*** You can likely find this font in a system installed Noto Fonts package if it is not already installed, you can download and/or preview it and change weights on this page: [https://fonts.google.com/noto/specimen/Noto+Sans Google Fonts Noto Sans]  
+*** Steam should expose your system installed fonts for you, however if not, you'll need to manually copy the font file into the prefix for your windows installation in the Windows/Fonts path.
+*** While fonts other than the chat windows cannot be sized up with any options, any sans serif bold-ish font should work well.  Experiment and select one that looks good to you.
+
+==== Install Gamescope ====
+* Gamescope is a compositor that will allow a game to be run at a lower than native resolution and upscale it to the native display resolution in a fullscreen windowed mode.
+* Most Linux distributions have a native gamescope package.  Under pacman managed systems: <code>sudo pacman -S gamescope</code>
+
+==== Set your launch options to use Gamescope ====
+* In the preferences menu for your EQL installation: <code>__GLX_VENDOR_LIBRARY_NAME=mesa MESA_LOADER_DRIVER_OVERRIDE=zink GALLIUM_DRIVER=zink gamescope -f -w 2560 -h 1440 -r 60  --force-grab-cursor -- %command%</code>
+
+* The launch options above are described as follows:
+* <code>__GLX_VENDOR_LIBRARY_NAME=mesa MESA_LOADER_DRIVER_OVERRIDE=zink GALLIUM_DRIVER=zink</code>
+** These environment variables force the usage of zink (included with the mesa libraries) as a workaround for crashes under gamescope when these variables are omitted.
+*** NOTE: You may be able to omit these environment variables if gamescope does not crash without them.  In theory they shouldn't be necessary to use, but on a test system, they were.
+* <code>-f</code>
+** Fullscreen mode
+* <code>-w 2560 -h 1440</code>
+** The window width and height that you have set EQL to run via the in-game options menu or manually in <code>eqclient.ini</code>.
+* <code>-r</code>
+** The refresh rate at which gamescope should run.
+* <code>--force-grab-cursor</code>
+** This allows the fullscreen rendered EQL to properly capture mouse input, preventing issues like the camera teleporting overhead when clicking to mouselook or when steering direction  with a mouse.
+* <code>--</code>
+** Indicates the end of the gamescope command line.
+* <code>%command%</code>
+** This is  a macro for the command Steam is running to launch the game executable.
+
+==== Enjoy squinting less ====
+These tips will not result in perfectly clear, scaled fonts.  The choices within are subjective, but should allow you to experiment with some options that may boost your headache resistance.
+[[File:Example of 1440p upscaled to 4k and using Noto Sans Black.png|alt=Screenshot|none|thumb|314x314px|A screenshot snippet of the resulting text clarity and size.  Chat font size here is 5.  Default Modern UI skin.Click to enlarge on the linked page.]]
+[[Category:Guides]]
+[[Category:Technical]]

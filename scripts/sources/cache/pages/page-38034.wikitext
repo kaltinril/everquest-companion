@@ -1,0 +1,28 @@
+{{Factionpage|
+
+| description = This small faction seems to consist of only two citizens in all of Erudin, the Highbrow siblings.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Erudin]]
+
+| quests_raise = 
+
+* [[Erud's Tonic Quest]]
+* [[Vasty Deep Water]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Phloatin Highbrow]] <span class='fmz'>(Erudin - Quest NPC)</span>
+* [[Sinnkin Highbrow]] <span class='fmz'>(Erudin - Quest NPC)</span>
+
+}}

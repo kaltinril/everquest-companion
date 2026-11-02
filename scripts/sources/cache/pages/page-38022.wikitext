@@ -1,0 +1,40 @@
+{{Factionpage|
+
+| description = A Tribe of Kobolds living in the Steamfont Mountains.
+
+| zones_raise = 
+
+* [[Steamfont Mountains]]
+* [[Freeport|West Freeport]]
+
+| zones_lower = 
+
+* [[Innothule Swamp]]
+* [[Steamfont Mountains]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+* [[Cargo Clockwork]]
+* [[Exotic Drinks]]
+* [[Gearheart]]
+* [[Red V Clockwork]]
+* [[Rusted Black Boxes]]
+* [[Scrap Metal Quest]]
+* [[The Regurgitonic]]
+* [[Shondo and the Tonic]]
+
+| mobs_raise = 
+
+* [[Watchman Halv]] <span class='fmz'>(?)</span>
+* [[Zigg Flin]]  <span class='fmz'>(West Freeport)</span>
+
+| mobs_lower = 
+
+* [[a kobold runt]] <span class='fmz'>(Steamfont Mountains)</span>
+* [[a kobold scout]]  <span class='fmz'>(Steamfont Mountains)</span>
+* [[a kobold shaman]] <span class='fmz'>(Steamfont Mountains)</span>
+
+}}

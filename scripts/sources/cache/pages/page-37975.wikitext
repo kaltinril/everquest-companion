@@ -1,0 +1,89 @@
+{{Factionpage|
+
+| description = Merchants who reside in the high elf city of Felwithe.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Crushbone]]
+* [[Greater Faydark]]
+* [[Innothule Swamp]]
+* [[Lesser Faydark]]
+* [[Felwithe]]
+* [[Ocean of Tears]]
+* [[Timorous Deep]]
+
+| quests_raise = 
+
+* [[Emerald Warriors' Items]]
+*[[Red Wine to Lady Shae]]
+* [[Shark Meat Quest]]
+* [[Slave Keys]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[an elven ranger]] <span class='fmz'>(Timorous Deep)</span>
+* [[an elven scout]] <span class='fmz'>(Timorous Deep)</span>
+* [[an elven slave (male)]]  <span class='fmz'>(Crushbone)</span>
+* [[an elven war scout]] <span class='fmz'>(Timorous Deep)</span>
+* [[Banker Rylisan]] <span class='fmz'>(Northern Felwithe - Banker)</span>
+* [[Bryn Fynndel]] <span class='fmz'>(Lesser Faydark - Quest NPC)</span>
+* [[Cylas Delbrin]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+* [[Elesseryl Terussar]] <span class='fmz'>(Ocean of Tears - Merchant)</span>
+* [[Fandl Arathin]] <span class='fmz'>(Innothule Swamp - Quest NPC)</span>
+* [[Faril Elvebryn]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+* [[Gallin Woodwind]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Galwyn Geldin]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+* [[Glyndur Tindel]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[Guard Briarstorm]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Brookrock]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Crystalwind]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Dayblaze]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Eaglesong]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Fayfear]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Fayfield]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Fireblight]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Frostfallen]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Marshmoor]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Meadom]] <span class='fmz'>(Northern Felwithe)</span>
+* [[Guard Moonwind]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Nitegazer]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Noonshadow]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Oakwillow]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Orcflayer]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Pinebramble]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Pineshade]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Rainstrider]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Starstrike]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Streamtree]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Sunblaze]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Sunweaver]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Tangleroot]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Treestrider]] <span class='fmz'>(Greater Faydark)</span>
+* [[Guard Valewatcher]] <span class='fmz'>(Greater Faydark)</span>
+* [[Gundel Elorion]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+* [[Hogus Durmas]] <span class='fmz'>(Innothule Swamp - Quest NPC)</span>
+* [[Jars Legola]]  <span class='fmz'>(Innothule Swamp)</span>
+* [[Jyle Windstorm]]  <span class='fmz'>(Innothule Swamp)</span>
+* [[Merchant Muvien]] <span class='fmz'>(Greater Faydark - Merchant)</span>
+* [[Mywyn Tinendel]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+* [[Regren]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Sarawyn Amorfin]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+* [[Sindl Talonstrike]] <span class='fmz'>(Greater Faydark - Quest NPC)</span>
+* [[Vynn Thrildur]] <span class='fmz'>(Lesser Faydark - NPC, Non-Quest)</span>
+
+}}
+= Suggested Route =
+*[[Red Wine to Lady Shae]] (+[[Emerald Warriors]], +[[Merchants of Felwithe]], +[[Kelethin Merchants]], -[[Indigo Brotherhood]]) 
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]
+[[Category:Achievement Race Unlock]]

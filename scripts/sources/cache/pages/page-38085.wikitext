@@ -1,0 +1,26 @@
+{{allakhazam}}
+{{Factionpage|
+
+| description = 
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Western Wastes]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Melalafen]]
+
+}}

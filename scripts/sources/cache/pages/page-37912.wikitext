@@ -1,0 +1,29 @@
+{{Classic Era}}
+{{Factionpage|
+
+| description = A faction for bandits. Related to followers of [[Bristlebane]]?
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Greater Faydark]]
+* [[Ocean of Tears]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a bandit]]
+* [[a pirate]]
+* [[a buccaneer]]
+
+}}

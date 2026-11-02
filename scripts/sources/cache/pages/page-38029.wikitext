@@ -1,0 +1,26 @@
+{{Factionpage|
+
+| description = Necromancers and shadowknights in Befallen. No known way to raise this faction.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Befallen]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a necro neophyte]]  <span class='fmz'>(Befallen)</span>
+* [[a necro theurgist]]  <span class='fmz'>(Befallen)</span>
+
+}}

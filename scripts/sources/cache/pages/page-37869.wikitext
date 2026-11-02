@@ -1,0 +1,104 @@
+{{Factionpage|
+
+| description = Leader of HighHold Keep.
+
+| zones_raise = 
+
+* [[Freeport|East Freeport]]
+* [[Greater Faydark]]
+* [[Kithicor Forest]]
+* [[Neriak|Neriak Third Gate]]
+
+| zones_lower = 
+
+* [[Freeport|East Freeport]]
+* [[Highpass Keep]]
+* [[Highpass Hold]]
+* [[Misty Thicket]]
+* [[Rathe Mountains]]
+* [[Qeynos|North Qeynos]]
+* [[Qeynos Hills]]
+* [[Rivervale]]
+* [[Freeport|West Freeport]]
+
+| quests_raise = 
+
+* [[Chomper]]
+* [[Exotic Drinks]]
+* [[Gnoll Scalp Collecting]]
+* [[Inert Potion Quest]]
+* [[Left Goblin Ears]]
+* [[Note for Rebby]]
+* [[Orc Scalp Collecting]]
+* [[Rogue Errands]]
+* [[Rogue Redemption]]
+* [[The Frikniller Family]]
+* [[The Torn Pouch]]
+
+| quests_lower = 
+
+* [[Child of Innoruuk]]
+* [[Death of Lyda Nasin]]
+* [[Moss Snakes]]
+* [[Reebo's Carrots]]
+
+| mobs_raise = 
+
+* [[Giz Dinree]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Hekzin G`Zule]] <span class='fmz'>(Neriak Third Gate - Quest NPC)</span>
+* [[Molon Tplth]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Pazin Punox]] <span class='fmz'>(Neriak Third Gate - Rogue Guildmaster)</span>
+* [[Sazan K`Jartan]] <span class='fmz'>(Neriak Third Gate - Quest NPC)</span>
+* [[Vivish Slon]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+* [[Yaz Tolax]] <span class='fmz'>(Neriak Third Gate - NPC, Non-Quest)</span>
+
+| mobs_lower = 
+
+* [[a guard]] <span class='fmz'>(Highpass Hold)</span>
+* [[a Highpass citizen]] <span class='fmz'>(Highpass Hold - NPC, Non-Quest)</span>
+* [[a maid]] <span class='fmz'>(High Keep - NPC, Non-Quest)</span>
+* [[a noble]] (Highpass Keep) <span class='fmz'>(High Keep - NPC, Non-Quest)</span>
+* [[a smuggler]] <span class='fmz'>(Highpass Hold - NPC, Non-Quest)</span>
+* [[Bank Clerk Jaylin]] <span class='fmz'>(High Keep - Banker)</span>
+* [[Beur Tenlah]] <span class='fmz'>(East Freeport - Rogue Guildmaster)</span>
+* [[Bouncer Bigboot]] <span class='fmz'>(Rivervale)</span>
+* [[Bouncer Bogglebin]] <span class='fmz'>(Rivervale)</span>
+* [[Brunar Rankin]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Bryan Mcgee]] <span class='fmz'>(Highpass Hold - Quest NPC)</span>
+* [[Captain Orben]] <span class='fmz'>(Highpass Hold)</span>
+* [[Carson Mccabe]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Delila]] <span class='fmz'>(Mountains of Rathe - Quest NPC)</span>
+* [[Dyrna Nlith]] <span class='fmz'>(High Keep - NPC, Non-Quest)</span>
+* [[Elisi Nasin]] <span class='fmz'>(East Freeport - Rogue Guildmaster)</span>
+* [[Flayer Hopkins]] <span class='fmz'>(High Keep - NPC, Non-Quest)</span>
+* [[Gren Frikniller]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+* [[Guard Blayle]] <span class='fmz'>(High Keep)</span>
+* [[Guard Duras]] <span class='fmz'>(High Keep)</span>
+* [[Guard Folton]] <span class='fmz'>(High Keep)</span>
+* [[Guard Lancel]] <span class='fmz'>(High Keep)</span>
+* [[Guard Lorton]] <span class='fmz'>(High Keep)</span>
+* [[Guard Rance]] <span class='fmz'>(High Keep)</span>
+* [[Harkin Duskfoot]] <span class='fmz'>(East Freeport - Rogue Guildmaster)</span>
+* [[Hebber Druneny]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Imxil Tbrow]] <span class='fmz'>(East Freeport - NPC, Non-Quest)</span>
+* [[Jracol Brestiage]] <span class='fmz'>(North Qeynos - Quest NPC)</span>
+* [[Lady McCabe]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Lendel Deeppockets]] <span class='fmz'>(Rivervale - Rogue Guildmaster)</span>
+* [[Lyn Tarburner]] <span class='fmz'>(Highpass Hold - Merchant)</span>
+* [[Meridith Tindle]]  <span class='fmz'>(Mountains of Rathe)</span>
+* [[Nestral TGaza]] <span class='fmz'>(East Freeport - Rogue Guildmaster)</span>
+* [[Rueppy Kutpurse]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Shintl Lowbrew]]  <span class='fmz'>(West Freeport)</span>
+* [[Tenni Kohern]] <span class='fmz'>(West Freeport - Merchant)</span>
+* [[Toelia Snuckery]] <span class='fmz'>(Rivervale - Quest NPC)</span>
+* [[Tyrana Slil]] <span class='fmz'>(High Keep - Quest NPC)</span>
+* [[Volunteer Renlor]] <span class='fmz'>(Highpass Hold - NPC, Non-Quest)</span>
+* [[Wres Corber]] <span class='fmz'>(Highpass Hold - NPC, Non-Quest)</span>
+* [[Zenita D`Rin]] <span class='fmz'>(East Freeport - Quest NPC)</span>
+
+}}
+= Suggested Route =
+*[[The Frikniller Family]] (+[[Coalition of Tradefolk Underground]], +[[Coalition of Tradefolk]], +[[Carson McCabe]], +[[Corrupt Qeynos Guards]], +[[The Freeport Militia]])
+*[[Rogue Errands]] Part 1: (+[[Carson McCabe]], +[[Coalition of Tradefolk Underground]], +[[Highpass Guards]], +[[Merchants of Highpass]], -[[Ring of Scale]])
+
+[[Category:Achievement Faction]]

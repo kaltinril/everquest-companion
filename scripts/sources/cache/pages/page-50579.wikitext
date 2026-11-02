@@ -1,0 +1,69 @@
+{{Classic Era}}
+ The spell system was the worst. 
+ - developer Todd Schmidt, 2020 [https://www.youtube.com/watch?v=z6E-u5NHNgw]
+
+A ubiquitous action within many role playing games such as EverQuest is the use of magical spells. A spell is an effect, performance, incantation, process, or instance of using magic, performed by a magic user such as a priest, caster, bard, dragon, other mythical creature or magical equipment. The basis of magical spells varies considerably: a priest requests assistance from their god and/or spirits through prayer, wisdom and faith, a caster evokes spells through recitation of words of the elder dragon tongue which they discovered through intelligence and countless hours of research, bards perform magical songs through dance and dexterous use of instruments, mythical beasts such as dragons are naturally magical and may emit spells through mere speech, magical items exude auras which effect spells when their owners use them.
+
+= Mana =
+Mana Points (MP) are a measure of magical energy resources available to the player or NPC for casting spells. Pure melee classes who do not cast spells such as [[Warrior]]s, [[Monk]]s, and [[Rogue]]s always have zero MP. All other classes will regenerate MP slowly over time. The rate of regeneration can be increased by sitting and using the [[Meditate]] skill. Additional skill levels in [[Meditate]] increase the regeneration rate further. Certain spells also increase mana or mana regeneration, such as the [[Enchanter]]'s [[Clarity]] line, [[Wizard]]'s [[Harvest]], [[Necromancer]]'s mana dumps like [[Rapacious Subversion]] on targets and lich spells like [[Call of Bones]] for themselves, [[Druid]]'s [[Mask of the Hunter]], [[Bard]] mana regen songs like [[Cassindra's Chant of Clarity]] and the coveted [[Manastone]].
+
+Compared to more modern MMOs, Everquest has '''much slower''' MP regeneration rates, which results in a '''much slower''' paced game. Some newer players may be frustrated by this, while many veterans appreciate the extended downtime as opportunity for social interaction. Nevertheless, all players come to understand the importance of having an [[Enchanter]] or [[Bard]] or both in their group for mana regeneration.
+
+= Types =
+
+== Buffs ==
+:See also ''[[Buff Lines]]''
+Buffs are beneficial spells which enhance a player's effectiveness in combat, magical ability, or provide some other utility. Some attributes commonly enhanced by buffs include [[statistics]], [[haste]], [[HP]], [[AC]], [[Damage Shield]]s, Movement Speed, and more. Classes known for casting lots of buffs include [[Cleric]]s, [[Shaman]]s, and [[Enchanter]]s. Many [[Bard]] songs are also thought of as temporary buffs.
+
+== Debuffs ==
+These are the opposite of buffs, which detriment an enemy's abilities in combat in some way. They include [[Stun]]s, [[Root]]s, [[Snare]]s, [[Mezzes]], slows and statistic reducing spells. [[Necromancer]]s, [[Shaman]]s and [[Enchanter]]s are commonly known to employ debuffs, but most magic users can at least use some form of [[Root]].
+
+== Heals ==
+These are spells which increase the current health points of a friendly target. Buffs which increase the regeneration rate of health over time are called [[regen]]s.
+
+== Nukes ==
+A.k.a. direct damage spells, these immediately decrease the current health points of one or more enemy target(s). Nukes may break root spells early. Nukes include bouts of flame, blasts of cold, strikes of lightning, smites of holy energy, gusts of wind, undead-only and summoned-only dismissal spells and other immediate damaging effects. A few [[Necromancer]] poison spells are also considered nukes, such as [[Shock of Poison]].
+
+== Damage over time ==
+Spells which decrease health gradually are called damage over time (DoTs). These include most poisons and venoms, diseases, curses, asphyxiations, and darkness. When an NPC is DoTted, the damage occurs on server ticks (every six seconds). This damage is reduced by one third when the NPC is moving (but not [[flee]]ing or feared) on the tick since the September 1999 patch into Velious Era.
+
+Many DoT spells begin with a nuke component, such as [[Scourge]] and [[Venom of the Snake]]. Many debuff spells also include a DoT component, such as [[Heart Flutter]] and [[Suffocate]]. Nearly all DoTs deal consistent damage over time, except for a few like [[Splurt]] and [[Curse of the Spirits]] which have increasing damage on each tick.
+
+== Area of Effect ==
+AoE spells affect more than one proximate opponent at a time. There are several types of AoE spells:
+* Point Blank AoE or PBAoE - When cast by a player, affects up to 25 NPCs within a certain distance of that player. The caster is never affected by his own PBAoE. When cast by NPCs, the number of players affected is unlimited. This includes [[Enchanter]] [[stun]]s, the [[Cleric]]'s Word (PBAOE) line of spells, [[Earthquake]] and similar priest spells, and certain [[Wizard]] and [[Magician]] spells such as [[Project Lightning]] and [[Fire Flux]]. Many dragons and other strong mythical creatures cast this type of AoE, usually as a proc on their melee swings or rarely as a casted spell.
+** PBAoE dispel - Many dragons have an AoE breath attack which also removes one or several buffs. The mechanic of these is such that the removed buffs are usually the top buff (but not always). They can be protected (usually) by junk buffs. AoE dispels cast by faerie dragons and evil eyes are targeted AoEs instead of PBAoE.
+** AoE fear - a.k.a [[Dragon Roar]] simply fears all nearby players. It is often very difficult to resist. If the tank or too many healers are feared, an encounter will be significantly complicated.
+* Targetted AoE - A.k.a. splash damage, these spells affect a designated target and a number of nearby targets. If the caster is close enough to their target, they may themselves be also affected by it instead of one of their enemies. There are several subtypes:
+** Quad-kiting nukes - These spells affect up to four enemies at once. [[Wizard]]s and [[Druid]]s can cast the most efficient quad-kiting nukes, such as [[Pillar of Frost]] and [[Lightning Blast]].
+** Rain AoE - These affect a number of enemies near the target in several delayed waves of damage. They include spells like [[Cascade of Hail]] and [[Tears of Solusek]].
+** Cone AoE - This is an informal name for a Targeted AoE cast by a raid target such as [[Ixiblat Fer]]'s [[Efreeti Fire]]. It's apparent that there are no true cone AoEs like in other games, but rather they are technically just targeted AoE spells with a wide radius centered on the tank.
+** Other targetted AoE nukes - There are other nukes that affect a different number of enemies such as the [[Wizard]] Al'Kabor (PBAOE) line which affects five. These spells are usually very mana-inefficient and not recommended to use.
+
+== Procs ==
+''See: [[Weapon Procs]] for formulas and a list of weapons with procs.''
+
+Procs (a term originating in MUD games, short for "special procedure") are effects on melee weapons which randomly fire when the weapon is swung. With [[DEX]] capped at 255, a melee character can expect their main hand weapon to proc twice per minute on average, and their offhand to proc once per minute on average. Procs are  always instantaneous (no cast time) and usually target the player's target. Procs never consume MP.
+
+Weapons with procs are massively popular tools used to extend the abilities of melee classes and sometimes casters as well. Weapons like the [[Silken Whip of Ensnaring]] and [[Serrated Bone Dirk]] can mitigate the dangers of [[flee]]ing monsters without a snare casting class in the group. [[Worker Sledgemallet]] can be used to escape deep dungeons and planar hells without the aid of porters. Warriors rely on aggro-generating proc weapons such as [[Frostbringer]], [[Short Sword of the Ykesha]] and [[Obsidian Shard]]s to keep the attention of their targets. Rangers can slow their targets with [[Earthcaller]]. And of course, many procs simply increase the damage output of the weapon, such as [[Venomous Axe of the Velium Brood]], [[Steel Hilted Flint Dagger]], [[Baton of Flame]] and many common velium weapons.
+
+== Clickies ==
+Clickies are magical items which apply an effect to the player or their target. Some clickies are instantaneous, some have the same cast time as a normal spell, and some may have a specifically set cast time (usually much longer). Clickies never consume MP. Clickies may consume reagents (usually true on [[Velious Class Armor]]), but not always. 
+
+=== Charged clickies ===
+Charged clickies cease to function as clickies after a prescribed number of charges but may still be equipped for stats if they are equippable. EXPENDABLE clickies, including most potions, are charged clickies that will disappear when the last charge is used. Many charged clickies (but not all) can be recharged by selling a charged clicky to a vendor, then selling more uncharged clickies of the same type to the same vendor, forcing the vendor to stack them in their inventory, charging them. NO DROP clickies can never be recharged by vendors. Clickies with no vendor value cannot be sold to vendors and cannot be recharged this way, either. The buyback of clickies represents a significant plat sink and is considered by many expert elf-economists to be a positive feature of classic Everquest.
+
+''See: [[Guide to Recharging Items]]''
+
+= Resistance =
+A defensive attribute of all characters is resistance. This determines how likely a character is to avoid or mitigate the effects of a spell. If a spell is beneficial, it is irresistible. Spells may be categorized by five types of resistance in EverQuest.
+
+* POISON - Covers all forms of venom and poison, conjured or natural, which burn, paralyze or deteriorate a victim's blood and organs.
+* MAGIC - A catch-all category for any general form of magic, such as roots, snares, slows, mezzes, wind, earth, and lightning.
+* DISEASE - Infections and parasites of all kinds, conjured or natural, which sicken or rot the victim.
+* FIRE - All manner of flames, heat and fire, including natural sources of heat like lava.
+* COLD - All manner of frost, cold, ice and hail. Many forms of water magic fall under this as well.
+
+The overall chance of resisting a spell or partially resisting a nuke depends on the relative level of the target to the caster, the resist value of the spell, and the relevant resistance attribute of the target. See the PEQ article [https://www.eqemulator.org/forums/showthread.php?t=38673|EverQuest Spell Resist Data Analysis] to get an idea of the mechanics.
+
+[[Category:Game Mechanics]]

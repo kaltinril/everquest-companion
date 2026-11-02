@@ -1,0 +1,226 @@
+''Written by Manii Names of Halas — Last updated July 26, 2026''
+
+This guide provides a path to obtaining a [[Trueshot Longbow]] at an extremely low character level, starting from a fresh character in [[Kelethin]].
+
+The route combines early leveling, platinum farming, Fletching progression, and gathering enough quest materials to make several Trueshot Longbow attempts.
+
+== Plan at a Glance ==
+
+# Levels 1–6: Level quickly in [[Crushbone]] as DRU/MNK.
+# Levels 6–10: Move to [[Steamfont Mountains]]. Farm Micro Servos, Fine Steel weapons, platinum, and Fletching skill.
+# Level 10: Switch into your intended RNG/X/X build.
+# Gather the remaining Trueshot materials. Travel to Freeport, use the translocator network to visit the Ocean of Tears for Kiola Nuts, then return to Freeport for Wooden Shards.
+# Use Origin to return to Kelethin, then travel to Kaladim for Tumpy Tonics and Dwarven Wire.
+# Return to Kelethin, finish raising Fletching, and attempt the Trueshot Longbow.
+# Return to Crushbone with the bow and farm approximately 250 pp for the next stage of the archery progression.
+
+== Levels 1–6 — Crushbone ==
+
+Start as DRU/MNK in [[Kelethin]] and go directly to [[Crushbone]].
+
+This gives you sustain, buffs, and strong melee while you are still naked and afraid. You can change your loadout at any time, and will pick up RNG later.
+
+Level to approximately 6. The objective is fast XP rather than serious gear farming.
+
+You will return to Crushbone later with much better equipment.
+
+== Levels 6–10 — Steamfont Mountains ==
+
+Move to [[Steamfont Mountains]] and stay here until roughly level 10.
+
+=== Micro Servos ===
+
+Farm rogue clockworks for [[Micro Servo|Micro Servos]].
+
+Try to gather eight Micro Servos so you do not have to return if the Trueshot combines fail.
+
+You need two Micro Servos for each complete attempt: one for the Pack of Materials and another for the final Trueshot Longbow combine. Eight Servos therefore provide enough material for four complete attempts.
+
+=== Highway Bandits ===
+
+Also watch for the highway bandits:
+
+* Hector the highway bandit
+* Jerald the highway bandit
+* Renaldo the highway bandit
+
+They attack the Cargo Clockwork near the windmills/crossroads and can provide valuable Fine Steel weapons.
+
+Cycle D0–D4 plus both instances to take advantage of their once-per-day spawn opportunities.
+
+=== Platinum and Fletching ===
+
+Your cash target before leaving Steamfont is approximately 80 pp, enough to fund Fletching through roughly 150 skill.
+
+Use A Clockwork Fletcher near the Steamfont windmills to work on Fletching while regenerating health or mana, or while waiting for bandit spawns.
+
+Enable Fast Merge in Options before beginning the crafting grind.
+
+Also kill spiderlings in Steamfont and save at least four [[Spiderling Silk]] for the Trueshot quest.
+
+== Level 10 — Become RNG/X/X ==
+
+At approximately level 10, switch into your intended RNG/X/X build.
+
+You are now ready to gather the remaining Trueshot materials.
+
+== Gather the Trueshot Materials ==
+
+The remaining materials can be gathered efficiently by combining the EQL translocator network with Origin.
+
+The planned route is:
+
+:Kelethin → Butcherblock Mountains → Ocean of Tears → East Freeport → West Freeport → Origin to Kelethin → Kaladim → Kelethin
+
+At this level the translocators should still be free, making this much faster than waiting for boats.
+
+=== Ocean of Tears — Kiola Nuts ===
+
+From [[Kelethin]], travel through [[Greater Faydark]] to [[Butcherblock Mountains]].
+
+Go to the Butcherblock docks and use the translocator to travel to the [[Ocean of Tears]].
+
+Eight Dwarven Wires require 16 Tumpy Tonics.
+
+Each Tumpy Tonic requires:
+
+* 1 [[Kiola Nut]]
+* 2 Flasks of Water
+
+For 16 Tumpy Tonics, you therefore need:
+
+* 16 [[Kiola Nut]]<nowiki/>s
+* 32 Flasks of Water
+
+Buy at least 16 Kiola Nuts from [[Cleonae Kalen]] while in the Ocean of Tears.
+
+Once you have the Kiola Nuts, use the Ocean of Tears translocator to travel directly to East Freeport.
+
+=== Freeport — Lanterns and Wooden Shards ===
+
+In East Freeport, buy Small Lanterns from [[Innkeep Hunter]] at the Freeport Inn. He is the closest known lantern merchant to Jyle Windshot.
+
+Then travel to [[West Freeport]] and find [[Jyle Windshot]] at Hogcaller's Inn.
+
+He is on the second floor, first room on the left, approximately:
+
+:(-160, -532)
+
+Give Jyle Small Lanterns one at a time until you have four Wooden Shards, enough for four Trueshot attempts.
+
+Jyle has roughly a 90% chance per lantern to give Wooden Shards and roughly a 10% chance to give A Wooden Heart, identified as a Treant Heart.
+
+Save any Wooden Hearts you obtain. One is later required for the [[Rain Caller Quest]], so getting one now can save another trip later.
+
+Once you have four Wooden Shards, use Origin to return directly to [[Kelethin]].
+
+=== Kaladim — Tumpy Tonics and Dwarven Wire ===
+
+From Kelethin, travel through [[Greater Faydark]] and [[Butcherblock Mountains]] to [[Kaladim]].
+
+You need a total of:
+
+* 16 Kiola Nuts
+* 32 Flasks of Water
+
+Use these ingredients to obtain 16 Tumpy Tonics through [[Tumpy Irontoe]].
+
+Each Tumpy Tonic requires:
+
+:1 Kiola Nut + 2 Flasks of Water → 1 Tumpy Tonic
+
+Once you have 16 Tumpy Tonics, find [[Trantor Everhot]] in North Kaladim.
+
+Turn in:
+
+:2 Tumpy Tonics → 1 Dwarven Wire
+
+Repeat until you have eight Dwarven Wires.
+
+You need two Dwarven Wires for each complete Trueshot attempt: one for the Pack of Materials and another for the final bow combine.
+
+When finished, return to [[Kelethin]].
+
+== Back to Kelethin — Make the Bow ==
+
+Return to [[Kelethin]] and finish raising Fletching to approximately 150+.
+
+Buy Fletching Mastery I and Fletching Mastery II if you have not already done so.
+
+Make sure you also have a Planing Tool.
+
+The Planing Tool is returned on both successful and failed Trueshot combines, so only one is required.
+
+=== Pack of Materials ===
+
+Find [[Maesyn Trueshot]] in Kelethin.
+
+For each attempt, first combine:
+
+:[[Spiderling Silk]] + Dwarven Wire + [[Micro Servo]] + Wooden Shards
+:→ Pack of Materials
+
+Turn the Pack of Materials in to Maesyn Trueshot to receive:
+
+:Treant Bow Staff
+
+=== Trueshot Longbow ===
+
+Now attempt the final Fletching combine:
+
+:Treant Bow Staff + Dwarven Wire + [[Micro Servo]] + Planing Tool
+:→ [[Trueshot Longbow]]
+
+The Trueshot Longbow is:
+
+:20 damage / 45 delay
+
+The final combine has a Fletching trivial of 235.
+
+At this early skill level, your raw success chance should be around 5%. With Fletching Mastery II, the practical success chance should improve to approximately 29%.
+
+For four complete attempts, the important quest-material stockpile is:
+
+* 8 Micro Servos
+* 8 Dwarven Wires
+* 4 Wooden Shards
+* 4 Spiderling Silks
+* 1 Planing Tool
+
+With luck, you will not need all four attempts.
+
+== Once It Succeeds — Time to Profit ==
+
+Once the [[Trueshot Longbow]] succeeds, go back to [[Crushbone]].
+
+This time you are not here merely to level.
+
+Start clearing the upgraded named mobs for equipment and vendor cash. Your next target is approximately 250 pp to fund the Smithing and Fletching progression required for high-end arrows.
+
+Pay particular attention to:
+
+* Bonefire — An approximately level 18 Paladin found in the throne-room area of Castle Crushbone. He commonly drops Headsplitter, an 11/43 two-handed axe that has been observed vendoring for approximately 12 pp on EQL.
+* Emperor Crush — Found in the rear alcove behind the throne room. Valuable drops include the Dwarven Ringmail Tunic and Crown of Crush.
+* The other upgraded named mobs throughout the zone.
+
+Crushbone supports content roughly through level 22 and contains a substantial expanded loot table, making it an excellent place to turn your newly acquired combat power into equipment and platinum.
+
+In practical terms:
+
+:Kill them all in the name of our Goddess Tunare.
+
+== Next Step — Mithril Champion Arrows ==
+
+Once you have approximately 250 pp, return to [[Kelethin]] and begin the Smithing and Fletching progression toward your first +0 Blessed Mithril Champion Arrow.
+
+When that succeeds, your basic archery package becomes:
+
+* Trueshot Longbow: 20 damage / 45 delay
+* +0 Blessed Mithril Champion Arrow: 11 physical + 4 fire damage
+* Combined attack: 31 physical + 4 fire / 45 delay
+
+That is 35 total damage / 45 delay when physical and fire damage are considered together.
+
+This is the point where the early investment pays off: an extremely strong archery package at a very low character level, with both the bow and arrow still having substantial upgrade paths ahead.
+
+[[Category:Guides]]

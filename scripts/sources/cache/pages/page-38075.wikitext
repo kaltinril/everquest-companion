@@ -1,0 +1,30 @@
+{{Factionpage|
+
+| description = The Fae drakes of Faydark.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Greater Faydark]]
+* [[Lesser Faydark]]
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[a fae drake]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[a fae drake hatchling]] <span class='fmz'>(Greater Faydark) and (Lesser Faydark)</span>
+* [[a monarch fae drake]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[an emperor fae drake]]  <span class='fmz'>(Lesser Faydark)</span>
+* [[Old Dimshimmer]]  <span class='fmz'>(Lesser Faydark)</span>
+
+}}

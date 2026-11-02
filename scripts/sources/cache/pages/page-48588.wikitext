@@ -1,0 +1,623 @@
+
+Alchemy allows the practitioner to combine ingredients to create potions with various effects, enabling the user to "cast" spells not normally available to them. Alchemy isn't exactly cheap- Learning the trade can cost lots of time and platinum. Choosing to pursue alchemy to its maximum can be very expensive, but it does have rewards in the end. 
+
+== Getting Started ==
+
+If you have the skill points, you may want to visit one of your class Guildmasters to train Alchemy up to 20, saving a few combines at the beginning. 
+
+Buy a [[Medicine Bag]] from a vendor, or obtain a [[Reinforced Medicine Bag]] (made via [[Tailoring]] from a [[Thick Grizzly Bear Skin]] and a [[Silk Cord]]). Next, you'll need to buy the correct ingredients for the potion you want to make. Let's say you want to make a "[[Potion of Lesser Stability]]". This potion requires combining [[Lucerne]] and [[Sage Leaf]] in your Medicine Bag. It becomes trivial to make (granting no further skill increases) at skill 25. If you trained 20 points into Alchemy, and as tradeskill success depends on the comparison of your skill to the created item's trivial, the chance of successfully making this potion are rather good. 
+
+'''Skilling Up:'''<br>
+'''Intelligence or Wisdom, whichever is higher, governs your chance to gain skill increases.'''
+
+== Skill Progression ==
+
+One possible crafting path is listed here. These recipes require less merchant micro-managing while still staying highly efficient on vendor costs:
+
+{| class="wikitable"
+|-
+! Trivial !! Recipe !! Ingredient 1 !! Ingredient 2 !! Ingredient 3
+|- 
+| 1-83 || [[Potion of Accuracy]] || [[Birthwort]] || [[Fenugreek]] || [[Blue Vervain Bulb]]
+|-
+| 84-150 || [[Greater Potion of Accuracy]] || [[Birthwort]] || [[Fenugreek]] || [[Valerian Root]]
+|-
+| 151-212 || [[Elixir of Concentration]] || [[Violet Tri-Tube Sap]] || [[Yerbhimba]] ||
+|-
+| 213-244 || [[Elixir of Greater Concentration]] || [[Violet Tri-Tube Sap]] || [[Duskglow Vine]] ||
+|-
+| 245-255 || [[Potion of Mystical Aptitude]] || [[Yerbhimba]] || [[Duskglow Vine]] ||
+|}
+
+=== Simple Path to 255 ===
+
+This will take a lot of manual combines until you manage to succeed on a potion and learn the recipe, but it only requires three ingredients and each combine only costs about 1pp. All three can be bought from [[Sithgok]] in [[Innothule Swamp]] or [[Sven Felligan]] in [[Everfrost Peaks]].
+
+'''1 - 202 Skill'''
+* [[Mystical Infusion]]
+** 2x [[Sickle Leaf]]
+
+'''202 - 255 Skill'''
+* [[Potion of Mystical Aptitude]]
+** 1x [[Yerbhimba]]
+** 1x [[Duskglow Vine]]
+
+=== After Skill 255 ===
+
+After the [[Potion of Mystical Aptitude]] at trivial 255, there is a large gap in what can be crafted, and the next craftable recipes are at trivial 302. They do require more ingredients, but most can be purchased at vendors. One does require farming in [[Kedge Keep]]. However, since these are the highest level recipes craftable, the Alchemy leveling journey could be considered complete any time after skill 255. **Note: The Distillate IX recipes do not appear to work at this time, with the exception of Distillate of Replenishment IX (level 60 to use). Alchemy 255 and AA Alchemy mastery maxxed out and they will not combine.
+
+Any of the following recipes can take Alchemy up to skill 300:
+
+{| class="wikitable"
+|-
+! Trivial !! Recipe !! !! !! !! Ingredient 1 !! Ingredient 2 !! Ingredient 3 !! Ingredient 4 
+|- 
+| 302 || [[Distillate of Alacrity IX]] || Buff || Combat || Haste || [[Comfrey]] || [[Deepwater Ink]] || [[Arnworth]]|| [[Small Vial]] x5 
+|- 
+| 302 || [[Distillate of Celestial Healing IX]] || Buff || Regen || Health || [[Comfrey]] || [[Deepwater Ink]] || [[Gerti Blossom]]|| [[Small Vial]] x5 
+|- 
+| 302 || [[Distillate of Clarity IX]] || Buff || Regen || Mana || [[Comfrey]] || [[Deepwater Ink]] || [[Katuka Bark]]|| [[Small Vial]] x5 
+|- 
+| 302 || [[Distillate of Divine Healing IX]] || Utility || Heal || Health || [[Comfrey]] || [[Deepwater Ink]] || [[Tregrum]]|| [[Small Vial]] x5 
+|- 
+| 302 || [[Distillate of Replenishment IX]] || Buff || Regen || Health || [[Comfrey]] || [[Deepwater Ink]]|| [[Clivers]]|| [[Small Vial]] x5 
+|- 
+| 302 || [[Distillate of Spirituality IX]] || Buff || Regen || Mana, Health || [[Comfrey]] || [[Deepwater Ink]]|| [[Methysticum]] || [[Small Vial]] x5 
+
+|}
+
+== Recipes ==
+
+These are the recipes available in EverQuest Legends. Some are not necessarily from the "original" or "classic" era, but the ingredients are available, the recipes combine, and they are visible in the trivial list inside the [[Medicine Bag]] or [[Reinforced Medicine Bag]].
+
+'''Please note''' that the [[Medicine Bag]] only has 8 slots for combines, so any recipe with more than 8 ingredients requires the [[Reinforced Medicine Bag]]!
+
+=== A note on potion stacking and inventory space ===
+
+Unlike P99 and classic EverQuest, there are no 5-dose or 10-dose potions in EverQuest Legends; most potions instead stack to 10 by default. As an alternative to storing multiple stacks of potions in inventory, the tradeskill depot can store very large stacks of ingredients and can be used during recipe combinations.
+
+=== Recipes listed by trivial ===
+<div class="mw-collapsible><div class="mw-collapsible-toggle toccolours" style="float: none;">
+'''Click to expand/collapse'''
+</div>
+
+<div class="mw-collapsible-content">
+{| class="wikitable sortable"
+|-
+! Trivial !! Recipe !! Func. !! Type !! Effect !! Ingredient 1 !! Ingredient 2 !! Ingredient 3 !! Ingredient 4 !! Ingredient 5 
+|- 
+| 17 || [[Potion of Lesser Cohesion]] || Buff || Stat || Stamina, Dexterity || [[Sage Leaf]] || [[Fenugreek]] ||  ||  ||  
+|- 
+| 17 || [[Potion of Lesser Stability]] || Buff || Stat || Stamina, Strength || [[Lucerne]] || [[Sage Leaf]] ||  ||  ||  
+|- 
+| 17 || [[Potion of Lesser Vigor]] || Buff || Stat || Strength, Agility || [[Lucerne]] || [[Birthwort]] ||  ||  ||  
+|- 
+| 22 || [[Potion of Charming Deceit]] || Buff || Stat || Charisma || [[Mugwart]] || [[Undead Froglok Tongue]] ||  ||  ||  
+|- 
+| 22 || [[Potion of Lesser Accuracy]] || Buff || Stat || Agility, Dexterity || [[Birthwort]] || [[Fenugreek]] ||  ||  ||  
+|- 
+| 22 || [[Potion of Lesser Adroitness]] || Buff || Stat || Agility, Stamina || [[Sage Leaf]] || [[Birthwort]] ||  ||  ||  
+|- 
+| 22 || [[Potion of Lesser Power]] || Buff || Stat || Dexterity, Strength || [[Lucerne]] || [[Fenugreek]] ||  ||  ||  
+|- 
+| 27 || [[Minor Null Potion]] || Buff || Resist || Magic, Dexterity || [[Fenugreek]] || [[Mandrake Root]] ||  ||  ||  
+|- 
+| 27 || [[Minor Potion of Antibody]] || Buff || Resist || Disease || [[Maidenhair Fern]] || [[Mullein]] ||  ||  ||  
+|- 
+| 27 || [[Minor Potion of Cold]] || Buff || Resist || Fire, Agility || [[Birthwort]] || [[Allspice]] ||  ||  ||  
+|- 
+| 31 || [[Distillate of Alacrity I]] || Buff || Combat || Haste || [[Arnworth]]|| [[Small Vial]] x5 || || ||
+|- 
+| 31 || [[Distillate of Celestial Healing I]] || Utility || Regen || Health || [[Gerti Blossom]]|| [[Small Vial]] x5 || || ||
+|- 
+| 31 || [[Distillate of Clarity I]] || Utility || Regen || Mana || [[Katuka Bark]]|| [[Small Vial]] x5 || || ||
+|- 
+| 31 || [[Distillate of Divine Healing I]] || Utility || Heal || Health || [[Tregrum]]|| [[Small Vial]] x5 || || ||
+|- 
+| 31 || [[Distillate of Replenishment I]] || Utility || Regen || Health || [[Clivers]]|| [[Small Vial]] x5 || || ||
+|- 
+| 31 || [[Distillate of Spirituality I]] || Utility || Regen || Mana, Health || [[Methysticum]]|| [[Small Vial]] x5 || || ||
+|- 
+| 32 || [[Minor Potion of Heat]] || Buff || Resist || Cold, Stamina || [[Sage Leaf]] || [[Benzoin]] ||  ||  ||  
+|- 
+| 32 || [[Minor Potion of Purity]] || Buff || Resist || Poison, Strength || [[Lucerne]] || [[Night Shade]] ||  ||  ||  
+|- 
+| 37 || [[Blood of the Wolf]] || Buff || Utility || Movement Speed || [[Birthwort]] || [[Fenugreek]] || [[Wolf Blood]] ||  ||  
+|- 
+| 37 || [[Potion of Lesser Rejuvenation]] || Buff || Regen || Health || [[Lucerne]] || [[Sage Leaf]] || [[Yarrow]] ||  ||  
+|- 
+| 37 || [[Potion of Wolves Blood]] || Buff || Utility || Night Vision || [[High Quality Wolf Skin]] || [[Sticklewort]] ||  ||  ||  
+|- 
+| 41 || [[Distillate of Alacrity II]] || Buff || Combat || Haste || [[Pixie Dust]] || [[Thorny Ergot]] || [[Arnworth]]|| [[Small Vial]] x5 ||
+|- 
+| 41 || [[Distillate of Celestial Healing II]] || Utility || Regen || Health || [[Pixie Dust]] || [[Thorny Ergot]] || [[Gerti Blossom]]|| [[Small Vial]] x5 ||
+|- 
+| 41 || [[Distillate of Clarity II]] || Utility || Regen || Mana || [[Pixie Dust]] || [[Thorny Ergot]] || [[Katuka Bark]]|| [[Small Vial]] x5 ||
+|- 
+| 41 || [[Distillate of Divine Healing II]] || Utility || Heal || Health || [[Pixie Dust]] || [[Thorny Ergot]] || [[Tregrum]]|| [[Small Vial]] x5 ||
+|- 
+| 41 || [[Distillate of Replenishment II]] || Utility || Regen || Health || [[Pixie Dust]] || [[Thorny Ergot]] || [[Clivers]] || [[Small Vial]] x5 ||
+|- 
+| 41 || [[Distillate of Spirituality II]] || Utility || Regen || Mana, Health || [[Pixie Dust]] || [[Thorny Ergot]] || [[Methysticum]] || [[Small Vial]] x5 ||
+|- 
+| 42 || [[Potion of Frosty Insurgency]] || Buff || Resist || Cold || [[Polar Bear Skin]] || [[Bistort]] ||  ||  ||  
+|- 
+| 42 || [[Potion of Unlife Awareness]] || Utility || Invisibility || Undead || [[Elderberry]] || [[Fennel]] ||  ||  ||  
+|- 
+| 47 || [[Potion of Aquatic Haunt]] || Buff || Utility || Water Breathing || [[Jatamasi]] || [[Hydrangea]] ||  ||  ||  
+|- 
+| 47 || [[Potion of Fleeting Languor]] || Buff || Utility || Night Vision || [[White Wolf Skin]] || [[Burdock Root]] ||  ||  ||  
+|- 
+| 47 || [[Potion of Gorging Toxin]] || Utility || Cure || Poison || [[Giant Wasp Venom Sac]] || [[Boneset]] ||  ||  ||  
+|- 
+| 47 || [[Potion of Negation]] || Utility || Dispel || Magic || [[Mercury]] || [[Mystic Ash]] ||  ||  ||  
+|- 
+| 50 || [[Benefit Awareness I]] || Buff || Mana Cost || Beneficial || [[Sage Leaf]] || [[Sumbul]] || [[Aloe]] ||  ||  
+|- 
+| 50 || [[Cold Awareness I]] || Buff || Mana Cost || Cold || [[Benzoin]] || [[Sumbul]] || [[Aloe]] ||  ||  
+|- 
+| 50 || [[Disease Awareness I]] || Buff || Mana Cost || Disease || [[Birthwort]] || [[Sumbul]] || [[Aloe]] ||  ||  
+|- 
+| 50 || [[Magic Awareness I]] || Buff || Mana Cost || Magic || [[Mandrake Root]] || [[Sumbul]] || [[Aloe]] ||  ||  
+|- 
+| 50 || [[Poison Awareness I]] || Buff || Mana Cost || Poison || [[Night Shade]] || [[Sumbul]] || [[Aloe]] ||  ||  
+|- 
+| 51 || [[Heat Awareness I]] || Buff || Mana Cost || Fire || [[Lucerne]] || [[Sumbul]] || [[Aloe]] ||  ||  
+|- 
+| 52 || [[Kilva's Blistering Flesh]] || Buff || Combat || Damage Shield || [[Clubmoss]] || [[Jatamasi]] ||  ||  ||  
+|- 
+| 52 || [[Potion Skin of Ro]] || Buff || Resist || Fire || [[Vox's Dust]] || [[Fire Drake Scale]] ||  ||  ||  
+|- 
+| 52 || [[Potion of Antiweight]] || Buff || Utility || Levitation || [[Sumbul]] || [[Hydrangea]] ||  ||  ||  
+|- 
+| 57 || [[Ethira's Poison Antidote]] || Utility || Cure || Poison || [[Hyssop]] || [[Lady's Mantle]] ||  ||  ||  
+|- 
+| 57 || [[Kithar's Disease Treatment]] || Utility || Cure || Disease || [[Echinacea]] || [[Lady's Mantle]] ||  ||  ||  
+|- 
+| 57 || [[Potion of Gnomish Boils]] || Buff || Utility || Night Vision || [[Bat Fur]] || [[Eyebright]] ||  ||  ||  
+|- 
+| 62 || [[Distillate of Alacrity III]] || Buff || Combat || Haste || [[Red Hellebore]] || [[Amanita Phalloide]] || [[Arnworth]]|| [[Small Vial]] x5 ||
+|- 
+| 62 || [[Distillate of Celestial Healing III]] || Buff || Regen || Health || [[Red Hellebore]] || [[Amanita Phalloide]] || [[Gerti Blossom]]|| [[Small Vial]] x5 ||
+|- 
+| 62 || [[Distillate of Clarity III]] || Buff || Regen || Mana || [[Red Hellebore]] || [[Amanita Phalloide]] || [[Katuka Bark]]|| [[Small Vial]] x5 ||
+|- 
+| 62 || [[Distillate of Divine Healing III]] || Utility || Heal || Health || [[Red Hellebore]] || [[Amanita Phalloide]] || [[Tregrum]]|| [[Small Vial]] x5 ||
+|- 
+| 62 || [[Distillate of Replenishment III]] || Buff || Regen || Health || [[Red Hellebore]] || [[Amanita Phalloide]] || [[Clivers]] || [[Small Vial]] x5 ||
+|- 
+| 62 || [[Distillate of Spirituality III]] || Buff || Regen || Mana, Health || [[Red Hellebore]] || [[Amanita Phalloide]] || [[Methysticum]] || [[Small Vial]] x5 ||
+|- 
+| 63 || [[Potion of Vox's Vitality]] || Buff || Utility || Water Breathing || [[Froglok Leg]] || [[Sea Spirit]] ||  ||  ||  
+|- 
+| 63 || [[Serpent's Conviction]] || Buff || Utility || Night Vision || [[Fennel]] || [[Eucalyptus Leaf]] ||  ||  ||  
+|- 
+| 63 || [[Turtle's Drink]] || Buff || Combat || Armor Class || [[Clubmoss]] || [[Sumbul]] ||  ||  ||  
+|- 
+| 70 || [[Ant's Potion]] || Utility || Utility || Shrink || [[Sumbul]] || [[Celandine Herb]] ||  ||  ||  
+|- 
+| 70 || [[Vial of Tamed Mercury]] || Buff || Combat || Haste || [[Mercury]] || [[Comfrey]] ||  ||  ||  
+|- 
+| 76 || [[Potion of Cohesion]] || Buff || Stat || Stamina, Dexterity || [[Sage Leaf]] || [[Fenugreek]] || [[Blue Vervain Bulb]] ||  ||  
+|- 
+| 76 || [[Potion of Stability]] || Buff || Stat || Stamina, Strength || [[Lucerne]] || [[Sage Leaf]] || [[Blue Vervain Bulb]] ||  ||  
+|- 
+| 76 || [[Potion of Vigor]] || Buff || Stat || Strength, Agility || [[Lucerne]] || [[Birthwort]] || [[Blue Vervain Bulb]] ||  ||  
+|- 
+| 83 || [[Potion of Accuracy]] || Buff || Stat || Agility, Dexterity || [[Birthwort]] || [[Fenugreek]] || [[Blue Vervain Bulb]] ||  ||  
+|- 
+| 83 || [[Potion of Adroitness]] || Buff || Stat || Agility, Stamina || [[Sage Leaf]] || [[Birthwort]] || [[Blue Vervain Bulb]] ||  ||  
+|- 
+| 83 || [[Potion of Gulon's Impunity]] || Buff || Utility || Levitation || [[Lightstone]] || [[Ground Figwort]] ||  ||  ||  
+|- 
+| 83 || [[Potion of Power]] || Buff || Stat || Dexterity, Strength || [[Lucerne]] || [[Fenugreek]] || [[Blue Vervain Bulb]] ||  ||  
+|- 
+| 88 || [[Distillate of Alacrity IV]] || Buff || Combat || Haste || [[White Hellebore]] || [[Snakes Head Iris]] || [[Arnworth]]|| [[Small Vial]] x5 ||
+|- 
+| 88 || [[Distillate of Celestial Healing IV]] || Buff || Regen || Health || [[White Hellebore]] || [[Snakes Head Iris]] || [[Gerti Blossom]]|| [[Small Vial]] x5 ||
+|- 
+| 88 || [[Distillate of Clarity IV]] || Buff || Regen || Mana || [[White Hellebore]] || [[Snakes Head Iris]] || [[Katuka Bark]]|| [[Small Vial]] x5 ||
+|- 
+| 88 || [[Distillate of Divine Healing IV]] || Utility || Heal || Health || [[White Hellebore]] || [[Snakes Head Iris]] || [[Tregrum]]|| [[Small Vial]] x5 ||
+|- 
+| 88 || [[Distillate of Replenishment IV]] || Buff || Regen || Health || [[White Hellebore]] || [[Snakes Head Iris]] || [[Clivers]] || [[Small Vial]] x5 ||
+|- 
+| 88 || [[Distillate of Spirituality IV]] || Buff || Regen || Mana, Health || [[White Hellebore]] || [[Snakes Head Iris]] || [[Methysticum]] || [[Small Vial]] x5 ||
+|- 
+| 90 || [[Null Potion]] || Buff || Resist || Magic, Dexterity || [[Fenugreek]] || [[Mandrake Root]] || [[Blue Vervain Bulb]] ||  ||  
+|- 
+| 90 || [[Potion of Antibody]] || Buff || Resist || Disease || [[Maidenhair Fern]] || [[Mullein]] || [[Blue Vervain Bulb]] ||  ||  
+|- 
+| 90 || [[Potion of Copal's Demise]] || Utility || Dispel || Magic || [[Horehound]] || [[Evil Eye Eyestalk]] ||  ||  ||  
+|- 
+| 96 || [[Potion of Cold]] || Buff || Resist || Fire, Agility || [[Birthwort]] || [[Allspice]] || [[Blue Vervain Bulb]] ||  ||  
+|- 
+| 96 || [[Potion of Heat]] || Buff || Resist || Cold, Stamina || [[Sage Leaf]] || [[Benzoin]] || [[Blue Vervain Bulb]] ||  ||  
+|- 
+| 103 || [[Potion of Purity]] || Buff || Resist || Poison, Strength || [[Lucerne]] || [[Night Shade]] || [[Blue Vervain Bulb]] ||  ||  
+|- 
+| 103 || [[Potion of Rejuvenation]] || Buff || Regen || Health || [[Lucerne]] || [[Sage Leaf]] || [[Figwort]] ||  ||  
+|- 
+| 103 || [[Potion of Shumar's Breath]] || Buff || Resist || Magic || [[Horehound]] || [[Vampire Dust]] ||  ||  ||  
+|- 
+| 110 || [[Potion of Spirit Shield]] || Buff || Stat || Armor Class || [[Clubmoss]] || [[Sumbul]] || [[Clover]] ||  ||  
+|- 
+| 116 || [[Benefit Awareness II]] || Buff || Mana Cost || Beneficial || [[Sage Leaf]] || [[Elderberry]] || [[Aloe]] ||  ||  
+|- 
+| 116 || [[Cold Awareness II]] || Buff || Mana Cost || Cold || [[Benzoin]] || [[Elderberry]] || [[Aloe]] ||  ||  
+|- 
+| 116 || [[Disease Awareness II]] || Buff || Mana Cost || Disease || [[Birthwort]] || [[Elderberry]] || [[Aloe]] ||  ||  
+|- 
+| 116 || [[Heat Awareness II]] || Buff || Mana Cost || Fire || [[Lucerne]] || [[Elderberry]] || [[Aloe]] ||  ||  
+|- 
+| 116 || [[Magic Awareness II]] || Buff || Mana Cost || Magic || [[Mandrake Root]] || [[Elderberry]] || [[Aloe]] ||  ||  
+|- 
+| 116 || [[Poison Awareness II]] || Buff || Mana Cost || Poison || [[Night Shade]] || [[Elderberry]] || [[Aloe]] ||  ||  
+|- 
+| 116 || [[Potion of Vampiric Spirit]] || Utility || Convert || Health to Mana || [[Feverfew]] || [[Griffon Feathers]] ||  ||  ||  
+|- 
+| 123 || [[Greater Potion of Negation]] || Utility || Dispel || Magic || [[Mercury]] || [[Mystic Ash]] || [[Mystic Ash]] ||  ||  
+|- 
+| 123 || [[Potion of Wrackbane]] || Utility || Convert || Mana to Health || [[Mammoth Meat]] || [[Woundwart]] ||  ||  ||  
+|- 
+| 136 || [[Kilva's Skin of Flame]] || Buff || Utility || Damage Shield || [[Clubmoss]] || [[Jatamasi]] || [[Clover]] ||  ||  
+|- 
+| 136 || [[Potion of Prince's Root]] || Utility || Cure || Poison || [[Giant Wasp Venom Sac]] || [[Elf Leaf]] ||  ||  ||  
+|-
+| 143 || [[Greater Potion of Cohesion]] || Buff || Stat || Stamina, Dexterity || [[Sage Leaf]] || [[Fenugreek]] || [[Valerian Root]] ||  ||  
+|-
+| 143 || [[Greater Potion of Stability]] || Buff || Stat || Stamina, Strength || [[Lucerne]] || [[Sage Leaf]] || [[Valerian Root]] ||  ||  
+|-
+| 143 || [[Greater Potion of Vigor]] || Buff || Stat || Strength, Agility || [[Lucerne]] || [[Birthwort]] || [[Valerian Root]] ||  ||  
+|-
+| 150 || [[Greater Potion of Accuracy]] || Buff || Stat || Agility, Dexterity || [[Birthwort]] || [[Fenugreek]] || [[Valerian Root]] ||  ||  
+|-
+| 150 || [[Greater Potion of Adroitness]] || Buff || Stat || Agility, Stamina || [[Sage Leaf]] || [[Birthwort]] || [[Valerian Root]] ||  ||  
+|-
+| 150 || [[Greater Potion of Power]] || Buff || Stat || Dexterity, Strength || [[Lucerne]] || [[Fenugreek]] || [[Valerian Root]] ||  ||  
+|-
+| 156 || [[Greater Null Potion]] || Buff || Resist || Magic, Dexterity || [[Fenugreek]] || [[Mandrake Root]] || [[Valerian Root]] ||  ||  
+|-
+| 156 || [[Greater Potion of Antibody]] || Buff || Resist || Disease || [[Maidenhair Fern]] || [[Mullein]] || [[Valerian Root]] ||  ||  
+|-
+| 156 || [[Greater Potion of Cold]] || Buff || Resist || Fire, Agility || [[Birthwort]] || [[Allspice]] || [[Valerian Root]] ||  ||  
+|-
+| 162 || [[Distillate of Alacrity VI]] || Buff || Combat || Haste || [[Mugwart]] || [[Black Henbane]] || [[Arnworth]]|| [[Small Vial]] x5 ||
+|-
+| 162 || [[Distillate of Celestial Healing VI]] || Buff || Regen || Health || [[Mugwart]] || [[Black Henbane]] || [[Gerti Blossom]]|| [[Small Vial]] x5 ||
+|-
+| 162 || [[Distillate of Clarity VI]] || Buff || Regen || Mana || [[Mugwart]] || [[Black Henbane]] || [[Katuka Bark]]|| [[Small Vial]] x5 ||
+|-
+| 162 || [[Distillate of Divine Healing VI]] || Utility || Heal || Health || [[Mugwart]] || [[Black Henbane]] || [[Tregrum]]|| [[Small Vial]] x5 ||
+|-
+| 162 || [[Distillate of Replenishment VI]] || Buff || Regen || Health || [[Mugwart]] || [[Black Henbane]] || [[Clivers]] || [[Small Vial]] x5 ||
+|-
+| 162 || [[Distillate of Spirituality VI]] || Buff || Regen || Mana, Health || [[Mugwart]] || [[Black Henbane]] || [[Methysticum]] || [[Small Vial]] x5 ||
+|-
+| 162 || [[Essence of Barbarian (Wormwood)]] || Utility || Illusion || Barbarian || [[Barbarian Meat]] || [[Wormwood]] ||  ||  ||  
+|-
+| 162 || [[Essence of Erudite (Wormwood)]] || Utility || Illusion || Erudite || [[Erudite Meat]] || [[Wormwood]] ||  ||  ||  
+|-
+| 162 || [[Essence of Human (Wormwood)]] || Utility || Illusion || Human || [[Wormwood]] || [[Human Parts]] ||  ||  ||  
+|-
+| 163 || [[Greater Potion of Heat]] || Buff || Resist || Cold, Stamina || [[Sage Leaf]] || [[Benzoin]] || [[Valerian Root]] ||  ||  
+|-
+| 163 || [[Greater Potion of Purity]] || Buff || Resist || Poison, Strength || [[Lucerne]] || [[Night Shade]] || [[Valerian Root]] ||  ||  
+|-
+| 163 || [[Potion of Greater Rejuvenation]] || Buff || Regen || Health || [[Lucerne]] || [[Sage Leaf]] || [[Agrimony]] ||  ||  
+|-
+| 163 || [[Potion of Hathcoat's Spirit]] || Utility || Dispel || Magic || [[Larkspur]] || [[Evil Eye Eyestalk]] ||  ||  ||  
+|-
+| 164 || [[Essence of Dark Elf (Wormwood)]] || Utility || Illusion || Dark Elf || [[Dark Elf Parts]] || [[Wormwood]] ||  ||  ||  
+|-
+| 164 || [[Essence of Ogre (Wormwood)]] || Utility || Illusion || Ogre || [[Ogre Meat]] || [[Wormwood]] ||  ||  ||  
+|-
+| 164 || [[Essence of Wood Elf (Wormwood)]] || Utility || Illusion || Wood Elf || [[Wood Elf Parts]] || [[Wormwood]] ||  ||  ||  
+|-
+| 166 || [[Essence of Half Elf (Wormwood)]] || Utility || Illusion || Half Elf || [[Half Elf Meat]] || [[Wormwood]] ||  ||  ||  
+|-
+| 167 || [[Essence of Gukta (Wormwood)]] || Utility || Illusion || Guktan || [[Wormwood]] || [[Froglok Blood]] ||  ||  ||  
+|-
+| 168 || [[Essence of High Elf (Wormwood)]] || Utility || Illusion || High Elf || [[High Elf Parts]] || [[Wormwood]] ||  ||  ||  
+|-
+| 170 || [[Adrenaline Tap]] || Buff || Combat || Haste || [[Dhea]] || [[Comfrey]] ||  ||  ||  
+|-
+| 170 || [[Essence of Halfling (Wormwood)]] || Utility || Illusion || Halfling || [[Halfling Parts]] || [[Wormwood]] ||  ||  ||  
+|-
+| 170 || [[Potion of the Frost]] || Utility || Teleport || Everfrost Peaks || [[Heliotrope]] || [[Oakmoss]] ||  ||  ||  
+|-
+| 170 || [[Potion of the Swamp]] || Utility || Teleport || Innothule Swamp || [[Heliotrope]] || [[Bladderwrack]] ||  ||  ||  
+|-
+| 171 || [[Essence of Dwarf (Wormwood)]] || Utility || Illusion || Dwarf || [[Dwarf Meat]] || [[Wormwood]] ||  ||  ||  
+|-
+| 172 || [[Essence of Gnome (Wormwood)]] || Utility || Illusion || Gnome || [[Gnome Meat]] || [[Wormwood]] ||  ||  ||  
+|-
+| 174 || [[Essence of Troll (Wormwood)]] || Utility || Illusion || Troll || [[Troll Parts]] || [[Wormwood]] ||  ||  ||  
+|-
+| 176 || [[Gate Potion]] || Utility || Teleport || Gate || [[Heliotrope]] || [[Heliotrope]] || [[Heliotrope]] ||  ||  
+|-
+| 180 || [[Titan Potion]] || Utility || Utility || Grow || [[Tri-Fern Leaf]] || [[Maliak Leaf]] ||  ||  ||  
+|-
+| 187 || [[Army Ant Potion]] || Utility || Utility || Shrink || [[Valerian Root]] || [[Sumbul]] || [[Celandine Herb]] || [[Feverfew]] ||  
+|-
+| 191 || [[Hawks Eye Tonic]] || Buff || Stat || Archery || [[Tri-Fern Leaf]] || [[Star Reach Clover]] ||  ||  ||  
+|-
+| 196 || [[Benefit Awareness III]] || Buff || Mana Cost || Beneficial || [[Sage Leaf]] || [[Figwort]] || [[Briar Thistle]] ||  ||  
+|-
+| 196 || [[Cold Awareness III]] || Buff || Mana Cost || Cold || [[Benzoin]] || [[Figwort]] || [[Briar Thistle]] ||  ||  
+|-
+| 196 || [[Disease Awareness III]] || Buff || Mana Cost || Disease || [[Birthwort]] || [[Figwort]] || [[Briar Thistle]] ||  ||  
+|-
+| 196 || [[Heat Awareness III]] || Buff || Mana Cost || Fire || [[Lucerne]] || [[Figwort]] || [[Briar Thistle]] ||  ||  
+|-
+| 196 || [[Magic Awareness III]] || Buff || Mana Cost || Magic || [[Mandrake Root]] || [[Figwort]] || [[Briar Thistle]] ||  ||  
+|-
+| 196 || [[Poison Awareness III]] || Buff || Mana Cost || Poison || [[Night Shade]] || [[Figwort]] || [[Briar Thistle]] ||  ||  
+|-
+| 202 || [[Distillate of Clarity VII]] || Buff || Regen || Mana || [[Bistort]] || [[Autumn Crocus]] || [[Katuka Bark]]|| [[Small Vial]] x4 ||
+|-
+| 202 || [[Essence of Froglok]] || Utility || Illusion || Froglok || [[Wormwood]] || [[Green Froglok Skin]] ||  ||  ||  
+|-
+| 202 || [[Mystical Infusion]] || Buff || Stat || Mana || [[Sickle Leaf]] || [[Sickle Leaf]] ||  ||  ||  
+|-
+| 212 || [[Elixir of Concentration]] || Buff || Regen || Mana || [[Violet Tri-Tube Sap]] || [[Yerbhimba]] ||  ||  ||  
+|-
+| 223 || [[Elixir of Divine Endurance]] || Buff || Resist || All || [[Betherium Bark]] || [[Blade Leaf]] ||  ||  ||  
+|-
+| 228 || [[Benefit Awareness IV]] || Buff || Mana Cost || Beneficial || [[Sage Leaf]] || [[Dhea]] || [[Agrimony]] || [[Clover]] || [[Briar Thistle]] 
+|-
+| 228 || [[Cold Awareness IV]] || Buff || Mana Cost || Cold || [[Benzoin]] || [[Dhea]] || [[Agrimony]] || [[Clover]] || [[Briar Thistle]] 
+|-
+| 228 || [[Disease Awareness IV]] || Buff || Mana Cost || Disease || [[Birthwort]] || [[Dhea]] || [[Agrimony]] || [[Clover]] || [[Briar Thistle]] 
+|-
+| 228 || [[Heat Awareness IV]] || Buff || Mana Cost || Fire || [[Lucerne]] || [[Dhea]] || [[Agrimony]] || [[Clover]] || [[Briar Thistle]] 
+|-
+| 228 || [[Magic Awareness IV]] || Buff || Mana Cost || Magic || [[Mandrake Root]] || [[Dhea]] || [[Agrimony]] || [[Clover]] || [[Briar Thistle]] 
+|-
+| 228 || [[Poison Awareness IV]] || Buff || Mana Cost || Poison || [[Night Shade]] || [[Dhea]] || [[Agrimony]] || [[Clover]] || [[Briar Thistle]] 
+|-
+| 234 || [[Greater Mystical Infusion]] || Buff || Stat || Mana || [[Sickle Leaf]] || [[Yerbhimba]] ||  ||  ||  
+|-
+| 244 || [[Elixir of Greater Concentration]] || Buff || Regen || Mana || [[Violet Tri-Tube Sap]] || [[Duskglow Vine]] ||  ||  ||  
+|-
+| 255 || [[Potion of Mystical Aptitude]] || Buff || Resist || Fizzles || [[Yerbhimba]] || [[Duskglow Vine]] ||  ||  ||  
+|-
+| 302 || [[Distillate of Alacrity IX]] || Buff || Combat || Haste || [[Comfrey]] || [[Deepwater Ink]] || [[Arnworth]]|| [[Small Vial]] x5 ||
+|-
+| 302 || [[Distillate of Celestial Healing IX]] || Buff || Regen || Health || [[Comfrey]] || [[Deepwater Ink]] || [[Gerti Blossom]]|| [[Small Vial]] x5 ||
+|-
+| 302 || [[Distillate of Clarity IX]] || Buff || Regen || Mana || [[Comfrey]] || [[Deepwater Ink]] || [[Katuka Bark]]|| [[Small Vial]] x5 ||
+|-
+| 302 || [[Distillate of Divine Healing IX]] || Utility || Heal || Health || [[Comfrey]] || [[Deepwater Ink]] || [[Tregrum]]|| [[Small Vial]] x5 ||
+|-
+| 302 || [[Distillate of Replenishment IX]] || Buff || Regen || Health || [[Comfrey]] || [[Deepwater Ink]] || [[Clivers]] || [[Small Vial]] x5 ||
+|-
+| 302 || [[Distillate of Spirituality IX]] || Buff || Regen || Mana, Health || [[Comfrey]] || [[Deepwater Ink]] || [[Methysticum]] || [[Small Vial]] x5 ||
+
+|} </div>
+</div>
+
+=== Recipes listed by function ===
+<div class="mw-collapsible><div class="mw-collapsible-toggle toccolours" style="float: none;">
+'''Click to expand/collapse'''
+</div>
+
+<div class="mw-collapsible-content">
+Coming Soon
+</div>
+</div>
+
+==== Extracts ====
+
+Alchemy can also be used to make extracts, which can be used to make dyes.
+
+{| class="wikitable"
+|-
+! Trivial !! Recipe !! Ingredient 1 !! Ingredient 2 !! Ingredient 3
+|- 
+| 36 || [[Black Extract]] || [[Empty Vial]] || [[Water Flask]] || [[Charcoal]]
+|- 
+| 36 || [[Black Extract]] (Blue Slumber) || [[Empty Vial]] || [[Water Flask]] || [[Blue Slumber Fungus]]
+|- 
+| 36 || [[Black Extract]] (Green Froglok) || [[Empty Vial]] || [[Water Flask]] || [[Green Froglok Skin]]
+|- 
+| 36 || [[Black Extract]] (Green Goblin)|| [[Empty Vial]] || [[Water Flask]] || [[Green Goblin Skin]]
+|- 
+| 36 || [[Black Extract]] (Red Cockatrice) || [[Empty Vial]] || [[Water Flask]] || [[Red Cockatrice Feather]]
+|- 
+| 36 || [[Evergreen Extract]] || [[Empty Vial]] || [[Water Flask]] || [[Evergreen Leaf]]
+|- 
+| 36 || [[Jack-O-Lantern Extract]] || [[Empty Vial]] || [[Water Flask]] || [[Jack-O-Lantern Fungus]]
+|- 
+| 36 || [[Permafrost Extract]] || [[Empty Vial]] || [[Water Flask]] || [[Permafrost Crystals]]
+|- 
+| 36 || [[Red Rust Extract]] || [[Empty Vial]] || [[Water Flask]] || [[Iron Oxide]]
+|- 
+| 36 || [[Russet Extract]] || [[Empty Vial]] || [[Water Flask]] || [[Russet Oxide]]
+|- 
+| 36 || [[Sarcoscypha Extract]] || [[Empty Vial]] || [[Water Flask]] || [[Sarcoscypha Fungus]]
+|}
+
+== Supplies ==
+
+Alchemy reagents are sold all over Norrath, and different vendors sell different ingredients. It may require a bit of travel to find what you need. As always, Charisma and faction with the vendor can drastically sway material prices. 
+
+=== Vendors ===
+
+==== Evil ====
+
+* [[Innothule Swamp]] has three Troll vendors which have ''most'' of the ingredients
+** [[Clork]], [[Murak]], and [[Sithgok]] on the Northern stone hand
+* [[Grobb]] has five vendors 
+** [[Bahagg]], [[Blergagg]], [[Blergab]], and [[Grabah]] are near the Shaman guild
+** [[Raztara]] is around the corner to the North
+* [[Oggok]] has four vendors
+** [[Bardopa]], [[Garakbar]], [[Garakpor]], and [[Pordopa]] are just Northwest of the bank, in a room with a floating decorative skull
+* [[Paineel]] has a single vendor
+**  [[Yvonne Ani]] is in a store called "Poison Petal" in an upstairs building near the bank
+
+==== Good ====
+
+* [[Ak'Anon]] has one vendor
+** [[A Clockwork Alchemist]], with the clockwork grocer and baker on the way to the palace, at #12 on the map
+* [[Halas]] has five vendors
+** [[Berit]], [[Dargon]], [[Petra]], and [[Spirita]] arelocated right next to the Shaman guild on the West side of Halas
+** [[Murtog MacYee]] is on the East side, in Yee Majik
+* [[Everfrost Peaks]] has three vendors 
+** [[Guri]], [[Hern Bearjumper]], and [[Sven Felligan]] are at the Temple to the North, just West of the West-most ice river branch
+* [[Rivervale]] has one vendor
+** [[Kizzie Mintopp]] is directly South of the bank
+
+==== Independent ====
+
+Colorful merchants around the world have a smaller set of lesser-used ingredients such as [[Balm Leaves]], [[Dragonwart]], [[Elf Leaf]], and [[Larkspur]]
+* [[Kithicor Forest]]
+** [[Elsbyth]], in a small building on the South wall in the West quadrant
+* [[Lake Rathetear]]
+** [[Dreana]], in the camp on the South wall
+* [[Northern Karana]]
+** [[Romella]], in the camp in the center of the zone
+* [[Oasis of Marr]]
+** [[Isslana]], in the camp just North of the lake
+* [[Rathe Mountains]]
+** [[Viira Bali]] and [[Susanna]] at the  Paladin camp
+** [[Chandra Kali]], just East of the [[Lake Rathetear]] zone line
+
+==== Out of Era ====
+
+* Some vendors are not available now, but may be in game when the lands appear
+** [[Kerra Island]] - located right next to the Temple of Kerrans.
+** [[Firiona Vie]] - [[Shelae Wolfkin]] and [[Marlyn McMerin]], located on the docks.
+** [[Cabilis]] - [[Jaxxtz]], in the middle of [[West Cabilis]] in a small hut. [Velious]
+** [[Cabilis]] - [[Klok Scaleroot]] in [[West Cabilis]], (400, 515) near the necromancer guild
+
+=== Alchemy Bags ===
+
+* [[Reinforced Medicine Bag]]: Crafted with [[Skill Tailoring|Tailoring]], Trivial 68
+** '''Yield: Reinforced Medicine Bag''' x1
+** In [[Loom]] or [[Large Sewing Kit]]:
+** {{SmIcon|554}} 1 x [[Thick Grizzly Bear Skin]] - Dropped
+** {{SmIcon|572}} 1 x [[Silk Cord]] - Crafted
+
+* [[Medicine Bag]]: Purchased at a vendor
+** [[Ak'Anon]]- [[a clockwork weaponsmith]], inside the metal building at the smithy, 1313/-886 and 1330/-708
+** [[Grobb]]- [[Blergagg]], shaman guild
+** [[Grobb]]- [[Grabah]], shaman guild
+** [[Grobb]]- [[Zumzal]], shaman guild
+** [[Halas]]- [[Dargon]], outside of the shaman guild
+** [[Halas]]- [[Spirita]], outside of the shaman guild
+** [[Halas]]- [[Holana O'Leary]], at Yee Majik
+** [[Highpass Keep]]- [[Mardon Smith]], at Greenbane's Weapons
+** [[Oggok]]- [[Garakbar]], in the floating skull room
+** [[Oggok]]- [[Pordopa]], in the floating skull room
+** [[Oggok]]- [[Rora Dirtstamp]], in the floating skull room
+** [[Paineel]]- [[Yvonne Ani]], in The Poisoned Petal, upstairs from Superior Supplies
+** [[West Cabilis]]- [[Jaxxtz]], (-37, 518)
+** [[West Cabilis]]- [[Klok Scaleroot]], (400, 515) near the necromancer guild
+** [[Firiona Vie]]- [[Shelae Wolfkin]], (-3898, 1663) inside the building
+** [[Firiona Vie]]- [[Marlyn McMerin]], (-3898, 1663) inside the building
+
+=== Trade Supplier Locations ===
+
+There are a few other less commonly used reagents, or currently unused reagents, available at various vendors: 
+
+* [[How to Dye and Stain]], [[Jar of Lacquer]], [[resin]], [[Empty Vial]], and [[Jar of Acid]] 
+** [[Ukla]] in [[Rathe Mountains]] (1730, 1300) at the ogre and troll camp
+** [[Godbin Strumharp]] in [[Steamfont Mountains]] (51, -611) at the windmill
+
+=== Reagent Pricing ===
+<span style="color:#ee0000">'''Needs updating'''</span>
+
+{| class="eoTable2 sortable" style="width:50%;"
+! Reagent || Plat || Gold || Silver || Copper
+|-
+| [[Agrimony]]||132||2||9||9
+|-
+| [[Allspice]]||2||6||4||5
+|-
+| [[Arnworth]]||1||6||7||9
+|-
+| [[Balm Leaves]] || 66 || 8 || 4 || 0
+|-
+| [[Benzoin]]||2||6||4||5
+|-
+| [[Birthwort]]||2||6||4||5
+|-
+| [[Bladderwrack]]||135||4||7||5
+|-
+| [[Blue Vervain Bulb]]||8||4||6||7
+|-
+| [[Celandine Herb]]||8||4||6||7
+|-
+| [[Cententialspore]]||0||5||2||4
+|-
+| [[Clover]]||22||4||9||0
+|-
+| [[Clubmoss]]||8||4||6||7
+|-
+| [[Comfrey]]||33||0||7||4
+|-
+| [[Dhea]]||39||6||8||9
+|-
+| [[Echinacea]]||6||7||7||3
+|-
+| [[Elderberry]]||10||5||8||3
+|-
+| [[Eucalyptus Leaf]]||6||7||7||6
+|-
+| [[Fennel]]||3||3||8||5
+|-
+| [[Fenugreek]]||2||6||4||9
+|-
+| [[Figwort]]||66||1||4||5
+|-
+| [[Heliotrope]]||135||4||7||4
+|-
+| [[Hydrangea]]||11||8||5||3
+|-
+| [[Hyssop]]||6||7||7||6
+|-
+| [[Jatamasi]]||6||7||7||5
+|-
+| [[Katuka Bark]]||0||5||2||4
+|-
+| [[Lady's Mantle]]||3||3||8||6
+|-
+| [[Lucerne]]||2||6||4||5
+|-
+| [[Maidenhair Fern]]||2||6||4||5
+|-
+| [[Mandrake Root]]||2||6||4||5
+|-
+| [[Mercury]]||10||1||6||0
+|-
+| [[Mugwart]]||7||3||4||9
+|-
+| [[Mullein]]||2||6||4||5
+|-
+| [[Mystic Ash]]||20||3||2||1
+|-
+| [[Night Shade]]||2||6||4||5
+|-
+| [[Oakmoss]]||135||4||7||5
+|-
+| [[Sage Leaf]]||2||6||4||8
+|-
+| [[Small Vial]]||0||0||1||0
+|-
+| [[Snakes Head Iris]]||2||8||3||9
+|-
+| [[Sumbul]]||6||7||7||3
+|-
+| [[Valerian Root]]||27||5||1||8
+|-
+| [[Wolf Blood]]||1||0||5||8
+|-
+| [[Yarrow]]||25||1||9||9
+|}
+
+{{Navbox Tradeskill}}
+
+[[Category:Skills]]
+[[Category:Tradeskills]]
+[[Category:Alchemy]]

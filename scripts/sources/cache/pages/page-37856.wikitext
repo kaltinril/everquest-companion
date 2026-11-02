@@ -1,0 +1,196 @@
+{{Factionpage|
+
+| description = Guards of the city of [[Erudin]]. Like the [[Knights of Truth]] these guards are all [[paladin]]s, as [[Erudite]]s cannot become [[Warrior]]s. Each is equipped with a standard-issue [[Battle Staff]]. 
+
+They consider [[Clan Kolbok]] a grave threat to [[Erudin]] and are hated by the residents of [[Kerra Isle]].
+
+| zones_raise = 
+
+* [[Paineel]]
+* [[Steamfont Mountains]]
+* [[The Warrens]]
+
+| zones_lower = 
+
+* [[Dagnor's Cauldron]]
+* [[Freeport|East Freeport]]
+* [[Erudin]]
+* [[Erudin|Erudin Palace]]
+* [[Highpass Hold]]
+* [[Innothule Swamp]]
+* [[Qeynos|North Qeynos]]
+* [[Qeynos|South Qeynos]]
+* [[Toxxulia Forest]]
+
+| quests_raise = 
+
+* [[Ice Goblin Beads]]
+* [[Ilanic's Scroll]]
+* [[Peacekeeper Staff Quest]]
+* [[Rungupp (Quest)]]
+* [[The Lorekeeper's Scrolls]]
+* [[The Painting]]
+* [[The Power of the Gatecallers]]
+* [[Vasty Deep Water]]
+
+| quests_lower = 
+
+* [[Inert Potion Quest]]
+
+| mobs_raise = 
+
+* [[a burly kobold ]] <span style="color:gray">(Stonebrunt Mountains)</span>
+* [[a fierce kobold ]] <span style="color:gray">(The Warrens)</span>
+* [[A Frothing Kobold ]] <span style="color:gray">(The Warrens)</span>
+* [[a greater kobold shaman ]] <span style="color:gray">(Stonebrunt Mountains)</span>
+* [[a greater shaman ]] <span style="color:gray">(The Warrens)</span>
+* [[a howler ]] <span style="color:gray">(The Warrens)</span>
+* [[A Huge Kobold ]] <span style="color:gray">(The Warrens)</span>
+* [[a hunting kobold ]] <span style="color:gray">(Stonebrunt Mountains)</span>
+* [[a kobold (Warrens) ]] <span style="color:gray">(The Warrens)</span>
+* [[A Kobold Archer ]] <span style="color:gray">(The Warrens)</span>
+* [[A Kobold Guard ]] <span style="color:gray">(The Warrens)</span>
+* [[a kobold missionary]]  <span style="color:gray">(Steamfont Mountains)</span>
+* [[A Kobold Outcast ]] <span style="color:gray">(The Warrens)</span>
+* [[A Kobold Pit Fighter ]] <span style="color:gray">(The Warrens)</span>
+* [[a kobold protector ]] <span style="color:gray">(The Warrens)</span>
+* [[A Kobold Runt ]] <span style="color:gray">(The Warrens)</span>
+* [[A Kobold Sentinel ]] <span style="color:gray">(The Warrens)</span>
+* [[A Kobold Sentry ]] <span style="color:gray">(The Warrens)</span>
+* [[a kobold wanderer ]] <span style="color:gray">(Stonebrunt Mountains)</span>
+* [[A Large Kobold ]] <span style="color:gray">(The Warrens)</span>
+* [[a lesser shaman ]] <span style="color:gray">(The Warrens)</span>
+* [[a pack elder ]] <span style="color:gray">(The Warrens)</span>
+* [[A Pack Leader ]] <span style="color:gray">(The Warrens)</span>
+* [[a rabid kobold ]] <span style="color:gray">(The Warrens)</span>
+* [[a raging kobold savage ]] <span style="color:gray">(Stonebrunt Mountains)</span>
+* [[a scouting kobold ]] <span style="color:gray">(Stonebrunt Mountains)</span>
+* [[Arglar the Tormentor ]] <span style="color:gray">(Stonebrunt Mountains)</span>
+* [[High Shaman Drogik ]] <span style="color:gray">(The Warrens)</span>
+* [[Smithy Rrarrgin ]] <span style="color:gray">(The Warrens)</span>
+
+| mobs_lower = 
+
+* [[Andane Starinen]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Anite Gemcutter]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Ayth Niphiria]] <span style="color:gray">(Erudin - Merchant)</span>
+* [[Barstall Methinon]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Beth Breadmaker]] <span style="color:gray">(Erudin - Merchant)</span>
+* [[Borge Finleather]] <span style="color:gray">(Erudin - Merchant)</span>
+* [[Chief Adair]] <span style="color:gray">(Erudin Palace)</span>
+* [[Danaria Hollin]] <span style="color:gray">(South Qeynos - Merchant)</span>
+* [[Danilla Delucic]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Demicla Tanner]] <span style="color:gray">(Erudin - Merchant)</span>
+* [[Dunore Steelfinger]] <span style="color:gray">(Erudin - Merchant)</span>
+* [[Elbsin Denuen]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Elentar Bealtarik]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Estra Nancer]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Fhania Aserdon]] <span style="color:gray">(Erudin - Merchant)</span>
+* [[Frena Runeflash]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Galbasi Weaver]] <span style="color:gray">(Erudin - Merchant)</span>
+* [[Gayle Weaven]] <span style="color:gray">(Erudin - Merchant)</span>
+* [[Geoard Bluehawk]] <span style="color:gray">(Erudin - Merchant)</span>
+* [[Ghanlin Skyphire]] <span style="color:gray">(Erudin Palace - Wizard Guildmaster)</span>
+* [[Ghemna Nyjuss]] <span style="color:gray">(Erudin - Merchant)</span>
+* [[Gissa Brist]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Glysin Denuen]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Gwynora Armista]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Harban Ranflash]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Helia Bluehawk]] <span style="color:gray">(Erudin - Merchant)</span>
+* [[Horacia Garnellia]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Ilanics Skeleton]] <span style="color:gray">(Toxxulia Forest - Quest NPC)</span>
+* [[Jagen Kindlor]] <span style="color:gray">(Erudin - Merchant)</span>
+* [[Jeliala Glimmercharm]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Jinalis Andir]] <span style="color:gray">(Dagnor's Cauldron - Quest NPC)</span>
+* [[Josper Kenshed]] <span style="color:gray">(Erudin Palace - Wizard Guildmaster)</span>
+* [[Judge Monosty]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Kestall Tulenci]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Killi Frillep]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Kisrin Breezeshadow]] <span style="color:gray">(Erudin - Merchant)</span>
+* [[Lanken Rjarn]] <span style="color:gray">(Erudin Palace - Enchanter Guildmaster)</span>
+* [[Luren Renthalis]] <span style="color:gray">(Erudin - Merchant)</span>
+* [[Markus Jaevins]] <span style="color:gray">(Erudin Palace - Magician Guildmaster)</span>
+* [[Monita Weaver]] <span style="color:gray">(Erudin - Merchant)</span>
+* [[Moodoro Finharn]] <span style="color:gray">(North Qeynos - Quest NPC)</span>
+* [[Myrcin Denuen]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Nerth Sailwind]] <span style="color:gray">(Erudin - Merchant)</span>
+* [[Nikina Sparlek]] <span style="color:gray">(Erudin Palace - Enchanter Guildmaster)</span>
+* [[Nolusia Finharn]] <span style="color:gray">(Erudin Palace - Enchanter Guildmaster)</span>
+* [[Onyssa Vroce]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Palatos Kynarn]] <span style="color:gray">(East Freeport - Quest NPC)</span>
+* [[Palus Weaponsmith]] <span style="color:gray">(Erudin - Merchant)</span>
+* [[Pinilla]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Quana Rainsparkle]] <span style="color:gray">(Toxxulia Forest - Merchant)</span>
+* [[Raskena Djor]] <span style="color:gray">(Erudin Palace - Wizard Guildmaster)</span>
+* [[Reba Garus]] <span style="color:gray">(Erudin Palace - Magician Guildmaster)</span>
+* [[Reko Saltamer]] <span style="color:gray">(Erudin - Merchant)</span>
+* [[Rem Knarjon]] <span style="color:gray">(Erudin - Merchant)</span>
+* [[Sahana Heartlyn]] <span style="color:gray">(Erudin Palace - Banker)</span>
+* [[Sentinel Adrial]] <span style="color:gray">(Erudin)</span>
+* [[Sentinel Aegeo]] <span style="color:gray">(Erudin)</span>
+* [[Sentinel Balthar]] <span style="color:gray">(Erudin Palace)</span>
+* [[Sentinel Belario]] <span style="color:gray">(Erudin)</span>
+* [[Sentinel Charin]] <span style="color:gray">(Erudin Palace)</span>
+* [[Sentinel Cholis]] <span style="color:gray">(Erudin Palace)</span>
+* [[Sentinel Colm]] <span style="color:gray">(Erudin Palace)</span>
+* [[Sentinel Corin]] <span style="color:gray">(Erudin Palace)</span>
+* [[Sentinel Creot]] <span style="color:gray">(Toxxulia Forest)</span>
+* [[Sentinel Cymbelin]] <span style="color:gray">(Erudin)</span>
+* [[Sentinel Dadil]] <span style="color:gray">(Erudin Palace)</span>
+* [[Sentinel Demitri]] <span style="color:gray">(Erudin)</span>
+* [[Sentinel Desde]] <span style="color:gray">(Erudin Palace)</span>
+* [[Sentinel Drom]] <span style="color:gray">(Toxxulia Forest)</span>
+* [[Sentinel Edan]] <span style="color:gray">(Erudin Palace)</span>
+* [[Sentinel Flavius]] <span style="color:gray">(Toxxulia Forest)</span>
+* [[Sentinel Golas]] <span style="color:gray">(Erudin Palace)</span>
+* [[Sentinel Hylin]] <span style="color:gray">(Erudin Palace)</span>
+* [[Sentinel Jeast]] <span style="color:gray">(Erudin Palace)</span>
+* [[Sentinel Knox]] <span style="color:gray">(Erudin Palace)</span>
+* [[Sentinel Laphis]] <span style="color:gray">(Erudin Palace)</span>
+* [[Sentinel Lixen]] <span style="color:gray">(Erudin Palace)</span>
+* [[Sentinel Malvol]] <span style="color:gray">(Erudin)</span>
+* [[Sentinel Mercutil]] <span style="color:gray">(Erudin)</span>
+* [[Sentinel Nolbain]] <span style="color:gray">(Erudin Palace)</span>
+* [[Sentinel Ogen]] <span style="color:gray">(Erudin Palace)</span>
+* [[Sentinel Phis]] <span style="color:gray">(Erudin Palace)</span>
+* [[Sentinel Phylos]] <span style="color:gray">(Erudin - Quest NPC)</span>
+* [[Sentinel Polix]] <span style="color:gray">(Erudin)</span>
+* [[Sentinel Rysin]] <span style="color:gray">(Erudin Palace)</span>
+* [[Sentinel Silvis]] <span style="color:gray">(Erudin)</span>
+* [[Sentinel Thron]] <span style="color:gray">(Erudin Palace)</span>
+* [[Sentinel Tigonus]] <span style="color:gray">(Erudin Palace)</span>
+* [[Sentinel Tybal]] <span style="color:gray">(Erudin)</span>
+* [[Sentinel Ursulo]] <span style="color:gray">(Erudin)</span>
+* [[Sentinel Vanil]] <span style="color:gray">(Erudin Palace)</span>
+* [[Sentinel Venci]] <span style="color:gray">(Erudin)</span>
+* [[Sentinel Wren]] <span style="color:gray">(Erudin Palace)</span>
+* [[Sharin Denuen]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Shinan Orefinder]] <span style="color:gray">(Erudin - Merchant)</span>
+* [[Shintar Vinlail]]  <span style="color:gray">(Toxxulia Forest)</span>
+* [[Sothure Gemcutter]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Sparlus Penfold]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Stella Breezemoon]] <span style="color:gray">(Erudin - Merchant)</span>
+* [[Stolace Printell]] <span style="color:gray">(Erudin - Merchant)</span>
+* [[Tan Monosty]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Telor Beteria]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Teria Finleather]] <span style="color:gray">(Erudin - Merchant)</span>
+* [[Tika Shockstep]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Toresian Fhabel]] <span style="color:gray">(Erudin Palace - Enchanter Guildmaster)</span>
+* [[Tran Lilspin]] <span style="color:gray">(Toxxulia Forest - Merchant)</span>
+* [[Tuballi Stellari]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Tyrena Monosty]] <span style="color:gray">(Erudin Palace - Banker)</span>
+* [[Vall Stonewisp]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Vasile Jahnir]] <span style="color:gray">(Erudin Palace - Magician Guildmaster)</span>
+* [[Vellenon Harrance]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Warden Lius]] <span style="color:gray">(Erudin Palace)</span>
+* [[Whes Nareya]] <span style="color:gray">(Erudin Palace - Wizard Guildmaster)</span>
+* [[Wick Ashfield]] <span style="color:gray">(Erudin Palace - Banker)</span>
+* [[Wistcona]] <span style="color:gray">(Erudin Palace - Merchant)</span>
+* [[Xylania Rainsparkle]] <span style="color:gray">(Toxxulia Forest - Merchant)</span>
+
+}}
+= Suggested Route =
+*[[Peacekeeper Staff Quest]] Part 1: (+[[Merchants of Erudin]], +[[High Council of Erudin]], +[[High Guard of Erudin]]
+
+[[Category:Significant Factions]]
+[[Category:Achievement Faction]]

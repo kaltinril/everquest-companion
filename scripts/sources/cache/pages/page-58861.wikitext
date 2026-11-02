@@ -1,0 +1,75 @@
+{{Classic Era}}
+<div style="display: flex;">
+  <div style="flex: 1;">
+    <ul>
+    <li>Summoning Spell: [[Invoke Death]]</li>
+    <li>Pet Type: Dry Bones Skeleton</li>
+    <li>Pet Classes: [[Shadow Knight]] / [[Warrior]]</li>
+    <li>Pet Level: 41</li>
+    <li>Hit Points: 5230 (+1/tick)</li>
+    <li>Mana: 820 (+82/tick)</li>
+    </ul>
+  </div>
+  <div style="flex: 1;">
+  [[File:extra_large_dry_bones_summon.png|left|x175px]]
+  </div>
+</div>
+<div style="display: flex;">
+  <div style="flex: 1;">
+    <ul>
+    <li>Defensive Stats</li>
+       <ul>
+       <li>Mitigation: 182</li>
+       <li>Evasion: 439</li>
+       </ul>
+    </ul>
+    <ul>
+    <li>Offensive Stats</li>
+       <ul>
+       <li>Offense: 252</li>
+       <li>Accuracy: 268</li>
+       <li>Max Damage: 55</li>
+       <li>Dual Wield Skill: High?</li>
+       </ul>
+     </ul>
+  </div>
+  <div style="flex: 1;">
+    <ul><li>Strength: 122</li>
+    <li>Stamina: 122</li>
+    <li>Intelligence: 10</li>
+    <li>Wisdom: 10</li>
+    <li>Agility: 122</li>
+    <li>Dexterity: 85</li>
+    <li>Charisma: 8</li></ul>
+  </div>
+</div>
+
+== Abilities ==
+* [[Skill_Bash|Bash]]
+* [[Skill_Block|Block]]
+* [[Skill_Cleave|Cleave]]
+* [[Skill_Dodge|Dodge]]
+* [[Skill_Double_Attack|Double Attack]]
+* [[Skill_Harm_Touch|Harm Touch]]
+* [[Skill_Kick|Kick]]
+* [[Skill_Parry|Parry]]
+* [[Skill_Riposte|Riposte]]
+* [[Skill_Taunt|Taunt]]
+
+== Spell List ==
+* [[Blood of Pain|<span class='itemeff'>Blood of Pain</span>]]
+* [[Heat Blood|<span class='itemeff'>Heat Blood</span>]]
+* [[Engulfing Darkness|<span class='itemeff'>Engulfing Darkness</span>]]
+* [[Lifedraw|<span class='itemeff'>Lifedraw</span>]]
+* [[Negation of Life|<span class='itemeff'>Negation of Life</span>]]
+* [[Shadow Vortex|<span class='itemeff'>Shadow Vortex</span>]]
+* [[Specter Lifetap|<span class='itemeff'>Specter Lifetap</span>]]
+
+== Focus Items ==
+* [[Encyclopedia Necrotheurgia]]
+
+== Notes ==
+* None
+
+[[Category: Summoned Pet]]
+[[Category: Necromancer Pet]]

@@ -1,0 +1,50 @@
+{{Velious Era}}
+{{Factionpage|
+
+| description = The "Lost" community of Ice Dwarves, found deep within the [[Crystal Caverns]]. Note: Any Gnome or Dwarf can sell here as they are a creature of [[Brell Serilis]]. All other Races will start out dubious, and must repeat quests to gain faction in order to sell to merchants. The easiest quest would be to turn in the [[Worn Coldain Tome]] over and over for 50pp. Anyone may use the bank, regardless of faction. No orcs or other NPCs give positive faction hits on death.
+
+| zones_raise = 
+
+* [[Crystal Caverns]]
+* [[Eastern Wastes]]
+
+| zones_lower = 
+
+* [[Crystal Caverns]]
+
+| quests_raise = 
+
+* [[The Spirit of Garzicor]]
+
+| quests_lower = 
+
+| mobs_raise = 
+
+| mobs_lower = 
+
+* [[Gilliad Coldheart]] <span class='fmz'>(Crystal Caverns - Merchant)</span>
+* [[Guard Kristen]] <span class='fmz'>(Crystal Caverns)</span>
+* [[Historian Baenek]] <span class='fmz'>(Crystal Caverns - Quest NPC)</span>
+* [[Kramble Gemshard]] <span class='fmz'>(Crystal Caverns - Banker)</span>
+* [[Praps Gemshard]] <span class='fmz'>(Crystal Caverns - Merchant)</span>
+* [[Scout Grandan]]  <span class='fmz'>(Crystal Caverns)</span>
+* [[Guard Justik]]  <span class='fmz'>(Crystal Caverns)</span>
+* [[Guard Kevin‎]]  <span class='fmz'>(Crystal Caverns)</span>
+* [[Guard Solistak]]  <span class='fmz'>(Crystal Caverns)</span>
+* [[Fuller Velweaver‎]]  <span class='fmz'>(Crystal Caverns)</span>
+* [[Flint Velweaver]]  <span class='fmz'>(Crystal Caverns)</span>
+* [[Guard Evercold]]  <span class='fmz'>(Crystal Caverns)</span>
+* [[Guard Slacey]]  <span class='fmz'>(Crystal Caverns)</span>
+* [[Derron Coldmist]]  <span class='fmz'>(Crystal Caverns)</span>
+* [[Grabble Coldheart]]  <span class='fmz'>(Crystal Caverns)</span>
+* [[Hardat Gemshard]]  <span class='fmz'>(Crystal Caverns)</span>
+* [[Milliace Gemshard]]  <span class='fmz'>(Crystal Caverns)</span>
+* [[Captain Dunstan Coldheart]]  <span class='fmz'>(Crystal Caverns)</span>
+* [[Vevina Velweaver]]  <span class='fmz'>(Crystal Caverns)</span>
+* [[Tacy Mistheart]]  <span class='fmz'>(Crystal Caverns)</span>
+* [[Nadalia Coldmist]]  <span class='fmz'>(Crystal Caverns)</span>
+* [[Cassia Gemshard]]  <span class='fmz'>(Crystal Caverns)</span>
+* [[Guard Grabadin]]  <span class='fmz'>(Crystal Caverns)</span>
+* [[Guard Hollander]]  <span class='fmz'>(Crystal Caverns)</span>
+
+}}

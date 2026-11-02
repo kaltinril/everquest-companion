@@ -1,0 +1,5 @@
+{{Velious Era}}
+
+There are several mobs within the North [[Temple of Veeshan]] which can use the ability [[Flurry]].  They all share the same loot table.  There are also some mobs known as "fake flurries" which share the same loot table, but do not flurry.
+
+'''Editor Note:''' This page did not copy over from the p99 wiki.  Beyond a basic description similar to above, the page was a list of the items on the loot table and all mobs in both categories.  Given that this information is out of era for EQL, we can wait until later to recreate everything with any differences in the loot table.

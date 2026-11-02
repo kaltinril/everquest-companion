@@ -1,0 +1,92 @@
+[[Research]]
+{{CheckboxList}}
+'''Lvl 16 spells'''<br>
+
+*Proximity - [[Pillar of Fire]] Good Quad
+*Nagafen - [[Pillar of Fire]] Good Quad
+*Learned?
+<br>
+*Fulguration - [[Project Lightning]] PBAoE
+*Periphery - [[Project Lightning]] PBAoE
+*Learned?
+<br>
+'''Lvl 20 spells'''<br>
+
+*Rune of Al'Kabor - [[Fire Spiral of Al'Kabor]] BAD QUAD
+*Rune of Velious - [[Fire Spiral of Al'Kabor]] BAD QUAD
+*Learned?
+<br>
+'''Lvl 24 spells'''<br>
+
+*Disassociation - [[Cast Force]] PBAoE
+*Presence - [[Cast Force]] PBAoE
+*Learned?
+<br>
+*Trauma - [[Column of Lightning]] Good Quad
+*Xegony - [[Column of Lightning]] Good Quad
+*Learned?
+<br>
+*Karana - [[Lightning Storm]] Wave
+*Xegony - [[Lightning Storm]] Wave
+*Learned?
+<br>
+'''Lvl 29 spells'''<br>
+
+*Fulguration - [[Energy Storm]] Wave
+*Karana - [[Energy Storm]] Wave
+*Xegony - [[Energy Storm]] Wave
+*Learned?
+<br>
+*Al'Kabor - [[Shock Spiral of Al'Kabor]] BAD QUAD
+*Helix - [[Shock Spiral of Al'Kabor]] BAD QUAD
+*Rallos Zek - [[Shock Spiral of Al'Kabor]] BAD QUAD
+*Learned?
+<br>
+'''Lvl 34 spells'''<br>
+
+*Banding - [[Circle of Force]] Good Quad
+*Catalyst - [[Circle of Force]] Good Quad
+*Concussion - [[Circle of Force]] Good Quad
+*Learned?
+<br>
+*Concussion - [[Lava Storm]] Wave
+*Cyclone - [[Lava Storm]] Wave
+*Solusek Ro - [[Lava Storm]] Wave
+*Learned?
+<br>
+*Conception - [[Thunderclap]] PBAoE
+*Contortion - [[Thunderclap]] PBAoE
+*Howling - [[Thunderclap]] PBAoE
+*Learned?
+<br>
+'''Lvl 39 spells'''<br>
+
+*Al'Kabor - [[Force Spiral of Al'Kabor]] BAD QUAD
+*Helix - [[Force Spiral of Al'Kabor]] BAD QUAD
+*Infraction - [[Force Spiral of Al'Kabor]] BAD QUAD
+*Learned?
+<br>
+'''Lvl 44 spells'''<br>
+*Attraction - [[Gravity Flux]] BAD QUAD
+*Inverse - [[Gravity Flux]] BAD QUAD
+*Rathe - [[Gravity Flux]] BAD QUAD
+*Learned?
+<br>
+'''Lvl 49 spells'''<br>
+
+*Astral - [[Ice Comet]] Huge Nuke
+*Frost - [[Ice Comet]] Huge Nuke
+*Learned?
+<br>
+*Astral - [[Supernova]] PBAoE
+*Impetus - [[Supernova]] PBAoE
+*Learned?
+<br>
+*Ap'Sagor - [[Wrath of Al'Kabor]] BAD QUAD
+*Concussion - [[Wrath of Al'Kabor]] BAD QUAD
+*Learned?
+<br>
+*Crippling - [[Paralyzing Earth]] Root
+*Rathe - [[Paralyzing Earth]] Root
+*Learned?
+{{End}}

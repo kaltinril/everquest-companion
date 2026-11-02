@@ -1,0 +1,9 @@
+This skill can be used by air elemental [[Pet Guide|pets]]. Air Elemental pets gain an additional attack that is unique among the pets in Everquest Legends. When they use this ability, it shows up in the combat log as a "strike" against their target. This attack is used alongside their normal weapon attacks, cleaves, kicks, and bashes. There is no way to confirm whether or not this skill is actually one of the known [[Monk]] attacks, such as [[Skill_Tiger_Claw|Tiger Claw]] or just a similar attack skill unique to monk pets (and possibly NPCs).
+
+== Classes ==
+
+* [[Magician]] Air Elementals
+
+{{Navbox Skills}}
+
+[[Category: Skills]]

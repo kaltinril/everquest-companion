@@ -1,0 +1,71 @@
+{{Factionpage|
+
+| description = Leaders of the 3 magic guilds.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+* [[Lake Rathetear]]
+* [[Qeynos Hills]]
+* [[Qeynos|South Qeynos]]
+* [[Western Plains of Karana]]
+
+| quests_raise = 
+
+* [[Bat Fur Quest]]
+* [[Blank Scrolls]]
+* [[Note to Neclo Quest]]
+* [[Unsar's Glory]]
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+* [[Cyanelle]] <span class='fmz'>(Lake Rathetear - NPC, Non-Quest)</span>
+* [[Eldreth]] <span class='fmz'>(Lake Rathetear - Quest NPC)</span>
+* [[Nostahla Westfend]] <span class='fmz'>(South Qeynos - Wiz GM)</span>
+* [[Kazlo Naedra]] <span class='fmz'>(South Qeynos - Quest NPC)</span>
+* [[Neclo Rheslar]]  <span class='fmz'>(Qeynos Hills)</span>
+* [[Larkin Tolman]] <span class='fmz'>(Western Plains of Karana)</span>
+
+}}
+
+=== Strategy to Raise From KOS ===
+
+1. Create a new character who isn't KOS, or ask a non-KOS friend for help.
+
+2. Have them go to the Hall of Sorcery and find [[Daenor Casthopur]].
+
+3. Say "Tell me about Neclo." to receive the Lore Quest item, which is ''not'' No-Drop.
+
+4. Transfer the note to your KOS character.
+
+5. Go to [[Qeynos Hills]] and be a high enough level above [[Neclo Rheslar ]] that he will not attack you when you approach him.
+
+6. Put the note in trade, drink a [[Cloudy Potion]] or have a friend cast invisibility on you, then hit Accept ... .
+
+7. Repeat steps 2-6 until you are are considered dubious in wolf form
+
+8. Do [[Unsar's Glory]] instead
+
+=== Skeleton Strategy ===
+
+This strategy involves spam-hailing [[Den Magason]] and [[Kazlo Naedra]] when they get close to each other, giving 2g to Den in exchange for a [[Blank Scroll Sheets]] (which is LORE), then giving Kazlo the scroll for reputation.
+
+1. Have access to a skeleton illusion; [[Lich]], [[Amulet of Necropotence]], etc. This will bring you to Dubious with the Order of Three even as something like an Iksar Necromancer.
+
+2. Head to the bank and withdraw 299 platinum and convert it into gold (by having the platinum on your cursor and clicking on the gold in your inventory).
+
+3. Find [[Den Magason]] who is only in Qeynos during the daylight hours. Try and find him near -110, 46, as this is where Kazlo will eventually path close to. He will give you a [[Blank Scroll Sheets]] in exchange for 2g. They are '''lore''' but also droppable. The reason having ~2990 gold is useful here is that you can simply hit backspace 3x & then hit enter to withdraw 2g.
+
+4. [[Kazlo Naedra]] will eventually path close to [[Den Magason]]'s spot at the docks. Lock the two in place near each other by spam hailing them.
+
+5. Hand the purchased [[Blank Scroll Sheets]] to [[Kazlo Naedra]], then buy another from [[Den Magason]]. Repeat ad-nauseam.
+
+If preferred, you can also purchase scrolls from Den & then drop them over and over, then pick them up and hand them to Kazlo. This is probably a bit easier on the hands and only requires you to hail lock one NPC in place at a time.

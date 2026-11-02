@@ -1,0 +1,16 @@
+A [[mob]] in EQ is considered a belly caster if casting a detrimental spell on it will always result in the spell being resisted unless the caster is standing within melee range of the mob in question.
+
+== Determining which mobs are belly casters ==
+The resistance message given by a belly caster when it resists spells due to range is no different from that given by spells that are resisted as a result of ordinary resistance checks.  This can mask the mechanic's existence and make detecting it counterintuitive, particularly when the mob in question still has reasonably high resistances even when its belly-casting protection is being bypassed.
+
+Communication among casters and hybrids about how well spells are landing can help make the phenomenon more obvious.  If even low-resistance spells like wizard lure spells are being resisted when cast at range, but relatively easy to resist effects (e.g. most offensive bard songs) are sometimes landing when sung by a bard fighting in melee range, then there is strong reason to suspect that the mob in question is a belly caster.
+
+== Origin of the term ==
+In EQ's original release, the most common foes who required such close-range spell casting were giants and dragons - very large enemies who would loom over the players fighting them.  This probably led to the observation that casters needed to be standing directly under the mob's "belly" in order to land spells.
+
+''Entry copied from http://everquest.wikia.com/wiki/Belly_caster''
+
+
+[[Category:Guides]]
+[[Category:Technical]]
+[[Category:Game Mechanics]]

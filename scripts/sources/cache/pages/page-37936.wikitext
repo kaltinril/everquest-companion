@@ -1,0 +1,56 @@
+{{Factionpage|
+
+| description = This is the [[Ogre]] [[Shadow Knight]] guild in [[Oggok]]. They are led by Soonog and are enemies with the Shadowknights of Nightkeep from Grobb and the Warrior guild of Kaladim, Stormguard.
+
+| zones_raise = 
+
+* [[Butcherblock Mountains]]
+* [[Rathe Mountains]]
+* [[Ocean of Tears]]
+
+| zones_lower = 
+
+* [[Butcherblock Mountains]]
+* [[Ocean of Tears]]
+* [[Oggok]]
+* [[Western Plains of Karana]]
+
+| quests_raise = 
+
+* [[Exotic Drinks]]
+* [[Feeding Dooga]]
+* [[Lizard Meat No 2]]
+* [[Lizard Tails No 2]]
+* [[Pickled Frogloks]]
+* [[Clurg's New Creation]]
+* [[Clurg's Revenge]]
+
+| quests_lower = 
+
+* [[Crude Stein Quest]]
+* [[Lizard Meat Quest]]
+* [[Lizard Tails]]
+* [[Noble Hunters]]
+
+| mobs_raise = 
+
+* [[Boog Mudtoe]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Corflunk]]  <span class='fmz'>(Butcherblock Mountains)</span>
+* [[Guard Shiznak]] <span class='fmz'>(Mountains of Rathe)</span>
+
+| mobs_lower = 
+
+* [[Bonlarg]] <span class='fmz'>(Oggok - Shadowknight Guildmaster)</span>
+* [[Chef Dooga]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Chief Goonda]] <span class='fmz'>(West Karana - Shaman Guildmaster)</span>
+* [[Clurg]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Crilt]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Goob Mudtoe]]  <span class='fmz'>(Ocean of Tears)</span>
+* [[Grevak]] <span class='fmz'>(Oggok - Shadowknight Guildmaster)</span>
+* [[Iksob Darkchaser]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Kramf]] <span class='fmz'>(Oggok - Merchant)</span>
+* [[Soonog]] <span class='fmz'>(Oggok - Shadowknight Guildmaster)</span>
+* [[Trusk]] <span class='fmz'>(Oggok - Merchant)</span>
+
+}}
+[[Category:Achievement Faction]]

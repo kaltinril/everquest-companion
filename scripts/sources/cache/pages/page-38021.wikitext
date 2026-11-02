@@ -1,0 +1,25 @@
+{{Factionpage|
+
+| description = Not to be confused with the diety [[Rallos Zek]], a faction for his worshipers.
+
+| zones_raise = 
+
+
+| zones_lower = 
+
+
+
+| quests_raise = 
+
+
+| quests_lower = 
+
+
+| mobs_raise = 
+
+
+| mobs_lower = 
+
+
+
+}}

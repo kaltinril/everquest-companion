@@ -1,0 +1,188 @@
+[[File:oven.jpg|thumb|right|An oven in Kelethin]]
+An oven is a stationary object with which the player may interact in order to attempt a [[Baking]] recipe.  They are available in major cities.
+
+=== Locations ===
+
+{| class="wikitable sortable"
+!Zone
+!Location
+!Map Number
+!Notes
+|-
+|[[Ak'Anon]]
+|{{Loc|Ak'Anon|723, -116}}
+|13
+|Inside palace
+|-
+|[[Cabilis East]]
+|{{Loc|Cabilis East|529, 154}}
+|7
+|Merchant sells Cooking Supplies, Oven is inside
+|-
+|[[Cobalt Scar]]
+|{{Loc|Cobalt Scar|151, -1522}}
+|3
+|In Othmir camp
+|-
+|[[Droga]]
+|{{Loc|Droga|740, 1960}}
+|1
+|Inner sanctum, near [[Soothsayer Dregzak]]
+|-
+|[[East Freeport]]
+|{{Loc|East Freeport|-1216, 346}}
+|16
+|in Chops N Hops
+|-
+|[[East Freeport]]
+|{{Loc|East Freeport|200, -793}}
+|7
+|in Grub N Grog Tavern
+|-
+|[[East Freeport]]
+|{{Loc|East Freeport|97, -253}}
+|2
+|in Trader's Holiday 
+|-
+|[[Erudin]]
+|{{Loc|Erudin|-892, -123}}
+|7
+|Outside Erudin Surplus
+|-
+|[[Erudin]]
+|{{Loc|Erudin|-1158, -296}}
+|11
+|Outside BlueHawk's Food
+|-
+|[[Firiona Vie]]
+|{{Loc|Firiona Vie|-2865, 2659}}
+|3 (docks)
+|
+|-
+|[[Grobb]]
+|{{Loc|Grobb|220, 180}}
+|4
+|near Dismembered Dwarf
+|-
+|[[Grobb]]
+|{{Loc|Grobb|534, -400}}
+|
+|
+|-
+|[[Halas]]
+|{{Loc|Halas|302, -256}}
+|9
+|Outside McDaniels Smokes & Spirits
+|-
+|[[High Keep]]
+|{{Loc|High Keep|30, -240}}
+|1 (Level Two)
+|Kitchen on level two, near [[Baker Jena]]
+|-
+|[[Highpass Hold]]
+|{{Loc|Highpass Hold|-123, 483}}
+|4
+|in [[Tiger's Roar]]
+|-
+|[[Highpass Hold]]
+|{{Loc|Highpass Hold|-245, 49}}
+|7
+|deck of [[The Lumberyard]]
+|-
+|[[Highpass Hold]]
+|{{Loc|Highpass Hold|35, 154}}
+|4
+|in hidden smugglers' area
+|-
+|[[Highpass Hold]]
+|{{Loc|Highpass Hold|55, 330}}
+|4
+|in hidden smugglers' area
+|-
+|[[Kelethin]] (in [[Greater Faydark]])
+|{{Loc|Kelethin|400, 340}}
+|8 (upper)
+|Near Sparkling Glass
+|-
+|[[Neriak Third Gate]]
+|{{Loc|Neriak Third Gate|740, -1475}}
+|8
+|Outside Cuisine Excelsior
+|-
+|[[Neriak Commons]]
+|{{Loc|Neriak Commons|65, -865}}
+|2
+|The Refined Palate, Neriak Down Under 
+|-
+|[[Neriak Foreign Quarter]]
+|{{Loc|Neriak Foreign Quarter|145, -275}}
+|4
+|Outside Drana's Bread N Butcher
+|-
+|[[Neriak Foreign Quarter]]
+|{{Loc|Neriak Foreign Quarter|-362, -160}}
+|16
+|Outside Bites N Pieces
+|-
+|[[North Freeport]]
+|{{Loc|North Freeport|-65, -40}}
+|17
+|Empty building, Oven outside
+|-
+|[[North Kaladim]]
+|{{Loc|North Kaladim|660, -202}}
+|9
+|outside Greybloom Farms 
+|-
+|[[Northern Felwithe]]
+|{{Loc|Northern Felwithe|240, -600}}
+|11
+|outside Felwithe Fish House 
+|-
+|[[Oggok]]
+|{{Loc|Oggok|240, -600}}
+|12
+|
+|-
+|[[Overthere]]
+| {{Loc|Overthere|2693, 2360}}
+|3 
+|
+|-
+|[[Rivervale]]
+|{{Loc|Rivervale|-75, -420}}
+|13
+|Druid area
+|-
+|[[Rivervale]]
+|{{Loc|Rivervale|-188, -157}}
+|14
+|
+|-
+|[[South Kaladim]]
+|{{Loc|South Kaladim|239, -234}}
+|11
+|outside Gurtha's Ware 
+|-
+|[[South Qeynos]]
+|{{Loc|South Qeynos|-150, -285}}
+|22
+|Inside Voleens Fine Baked Goods
+|-
+|[[Stonebrunt Mountains]]
+|{{Loc|Stonebrunt Mountains|1345, -500}}
+|2
+|in Town of Kejek
+|-
+|[[Thurgadin]]
+|{{Loc|Thurgadin|-225, -205}}
+|10
+|Inside Mordin's Meats 
+|-
+|[[West Freeport]]
+|{{Loc|West Freeport|-49 , -1019}}
+|14
+|in the Empty Building across from Torlig's Herbs and Medicines
+|}
+{{Navbox Tradeskill Containers}}
+[[Category:Tradeskill Containers]]
