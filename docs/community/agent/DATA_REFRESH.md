@@ -299,6 +299,10 @@ rest alias pages and NPC spells; before the re-derive, 118.
   not).
 - The Itempage template renders a weapon's `DMG Bonus: N @ lvl 50` itself, after the statsblock's
   last `<br>`; scrape-posky turns every `<br>` into a line break so it keeps its own line.
+- It also draws `BACKSTAB: <DMG>` for a rogue-usable `Skill: Piercing` weapon whose block states
+  none (WIKI.md, Conventions). A wikitext parse adds it (`wikiDefaultBackstab`); a full offline
+  `scrape:items` drops the records later deltas added (2026-11-01: 129), so take a re-parsed record
+  only where it differs from the stored one by the new field alone.
 
 ## Wiki facts that matter to parsers (as of 2026-09-27)
 
