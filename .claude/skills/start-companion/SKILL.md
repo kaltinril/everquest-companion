@@ -34,10 +34,15 @@ it with `powershell -ExecutionPolicy Bypass -File .\start_companion.ps1`.
 ## When the owner is playing on it: `-Prod`
 
 `-Prod` builds once and runs the build (`electron-vite preview`) instead of the dev server. It is
-about twice as fast on every tab switch (measured 2.2x, 2026-10-20), uses the same settings and data,
+about twice as fast on every tab switch (measured 2.2x, 2026-10-20), uses the same userData files,
 and nothing a merge does in this clone reaches it until the next launch, so no hot reload lands on
-the owner mid-play. The build adds a minute or so to the launch. Use it when the owner is going to
-play; use the dev server when a change needs hot reload.
+the owner mid-play. The build adds a minute or so to the launch.
+
+TRAP (2026-11-01): the renderer's localStorage is keyed by page origin. The dev server serves
+`http://localhost:5173`, the build serves `file://`, so `-Prod` sees a separate, nearly empty store:
+the Gaps tab's Done marks, kept pictures, filters and every other remembered view choice look gone
+(the owner: "why are all my dones gone?"). Nothing is lost; a dev launch shows them again. Launch
+the dev server unless the owner asks for `-Prod`, and say this when they do.
 
 ## If it is already running
 
