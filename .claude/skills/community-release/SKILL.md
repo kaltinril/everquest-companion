@@ -43,6 +43,10 @@ reaches players within hours: only publish what the owner has asked for.
    this build adds" list: test.20, the first release, carries it, and the script links to it from
    every later release (it stops if the heading reappears). The script takes the NEWEST `Test build <version>:` commit, so a correction is
    a new empty commit (`--allow-empty`), never an amend of a pushed one.
+   Then, on the same branch, `node scripts/community/community-release-notes.mjs` and commit
+   `src/shared/communityReleaseNotes.ts` as `What's new: 0.1.0-test.<N+1>` (the in-app list is
+   generated from the `Test build` commit; `tests/communityReleaseNotes.test.mts` fails without
+   it). A correction to the notes means regenerating again.
 4. **Merge the work branch into `main_community`** from the main tree (`git merge --no-ff --no-edit`),
    then remove the worktree and the branch (RULES.md rule 18).
 5. **Gate locally:** `npm run typecheck`, `npm run lint`, `bash scripts/community/known-reds.sh`

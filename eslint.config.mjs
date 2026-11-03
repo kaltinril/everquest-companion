@@ -376,7 +376,7 @@ export default tseslint.config(
 
   // ---- carve-out: release notes ------------------------------------------
   {
-    files: ['src/shared/releaseNotes.ts'],
+    files: ['src/shared/releaseNotes.ts', 'src/shared/communityReleaseNotes.ts'],
     rules: {
       // The notes are committed DATA that grows by one release entry per tag,
       // forever (a tag may not ship without one — AGENTS.md, Shipping). A line

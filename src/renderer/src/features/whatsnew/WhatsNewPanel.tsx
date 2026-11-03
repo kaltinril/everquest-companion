@@ -44,6 +44,7 @@ import {
 import { DEV_TOOLS } from '../../devFlags'
 import { formatCalendarDate } from '../../lib/formatDate'
 import type { PrefSection } from '../preferences/PreferencesView'
+import { CommunityReleases } from './CommunityReleases'
 import { markReleaseNotesSeen, useWhatsNew } from './session'
 import { WhatsNewDevRow } from './WhatsNewDevRow'
 
@@ -244,6 +245,7 @@ export function WhatsNewPanel(): JSX.Element {
           gap: 1.5
         }}
       >
+        <CommunityReleases />
         {RELEASE_NOTES.map((note, i) => (
           <Box key={note.version}>
             {i > 0 && <Divider sx={{ mb: 1.5 }} />}

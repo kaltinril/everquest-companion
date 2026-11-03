@@ -75,7 +75,10 @@ step 4.
    a work branch off `main_community` (they become the release notes, so they are written for players,
    and hold only what changed since the previous version plus the known issues: the full list of
    what the community build adds lives once, on the test.20 release, and every later release links
-   to it), merge it into `main_community`, and run the gate (`bash scripts/community/known-reds.sh` is the unit suite with only
+   to it). Then regenerate the in-app What's new list on the same branch,
+   `node scripts/community/community-release-notes.mjs`, and commit
+   `src/shared/communityReleaseNotes.ts` (the unit suite fails without it). Merge the branch into
+   `main_community`, and run the gate (`bash scripts/community/known-reds.sh` is the unit suite with only
    the known reds allowed).
 2. **The owner says to release.** A release is public the moment it exists, reaches every install
    from test.20 on within hours, and may be mirrored or indexed, so this is always the owner's word.
