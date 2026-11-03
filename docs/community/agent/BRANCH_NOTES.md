@@ -240,10 +240,16 @@ where one exists.
 
 - The community build is a continuation, not a test of the official app. Nothing points a user at
   the official app by default; the original is credited, clearly labelled "no longer updated".
-- Open: sweep remaining links to the creator's repo; What's new entries for every test build
-  (`communityReleaseNotes.ts` proposed, separate from the creator's `releaseNotes.ts`); notes for
-  test.1-12 are under tag `archive/local_all_changes_testing-2026-09-15`, test.6/7 as
-  `local test:` commits.
+- What's new: the community releases (test.20 on, the public ones) render above the creator's
+  history from `src/shared/communityReleaseNotes.ts`, generated from the `Test build` commits by
+  `node scripts/community/community-release-notes.mjs` (never hand-edited; the creator's
+  `releaseNotes.ts` stays untouched, rule 13). Its known issues show for the newest release only.
+  `tests/communityReleaseNotes.test.mts` fails when the newest entry is not the `package.json`
+  version. The parser reads the notes' shape: ALL-CAPS sections (`NEW IN TEST.N`, `KNOWN ISSUES`),
+  plain-text group headings, `- ` bullets, `  - ` sub-bullets; keep new notes in that shape.
+- Open: sweep remaining links to the creator's repo; the NEW chip and the teaser strip still key
+  off the creator's versions only; notes for test.1-12 are under tag
+  `archive/local_all_changes_testing-2026-09-15`, test.6/7 as `local test:` commits.
 
 ## Installer size and dependencies (was installer-size, deps-refresh)
 
