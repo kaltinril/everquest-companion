@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-04T05:27:44.697Z",
+  "scrapedAt": "2026-11-04T07:49:27.189Z",
   "source": "eqlwiki.com — Category:NPCs/Named Mobs/Merchants/Raid Encounters ∪ embeddedin Template:Namedmobpage/MerchantPage, filtered to pages opening a mob template + recentchanges delta (scripts/scrape-delta.mts)",
   "mobs": [
     {
@@ -14829,8 +14829,7 @@
       "zones": [
         "Various Zones"
       ],
-      "image": "npc_a_fish.png",
-      "noImage": true
+      "image": "npc_a_fish.png"
     },
     {
       "page": "A flighty fiend",
