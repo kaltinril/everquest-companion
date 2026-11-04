@@ -28,6 +28,56 @@ export interface CommunityRelease {
 
 export const COMMUNITY_RELEASE_NOTES: readonly CommunityRelease[] = [
   {
+    "version": "0.1.0-test.40",
+    "date": "2026-11-03",
+    "title": "respawn clocks per instance, the Respawn overlay across a zone's places",
+    "groups": [
+      {
+        "heading": "Timers and the Respawn overlay",
+        "items": [
+          {
+            "text": "Respawn clocks are kept per place: each open pickzone tier (+0 to +4) and a private instance you create have their own clock, so the +4, the +3 and your instance each show their own time."
+          },
+          {
+            "text": "The Respawn overlay shows, for every mob you track, its clock in every place of the zone where you killed it recently (within twice its respawn): \"open +3\", \"inst +4\" and so on, blue where you stand. You can see which instance to jump to without going there."
+          },
+          {
+            "text": "Two layouts, from the overlay's own footer while it is unlocked: rows (the clock where you stand big, the other places under it; the sort glyph lets the soonest place lead) or a grid (mobs down, places across). Fold the other places away with the fold glyph; a grid column hides on a click of its header. A locked overlay stays click-through, with nothing to click."
+          },
+          {
+            "text": "One respawn estimate per mob across the zone's places: a gap measured in the +4 times the +3's clock too."
+          },
+          {
+            "text": "Creating a new private instance drops the clocks of the previous one. In a fresh private instance, a tracked mob you have not killed there reads \"up\"."
+          },
+          {
+            "text": "With nothing killed in the zone, the overlay says what you track and where its clocks run, not \"No clocks running\"."
+          },
+          {
+            "text": "Map pins: a timer pin shows only the clock of the place you stand in."
+          }
+        ]
+      },
+      {
+        "heading": "What's new",
+        "items": [
+          {
+            "text": "The What's new panel lists the community build's own releases."
+          }
+        ]
+      },
+      {
+        "heading": "Data",
+        "items": [
+          {
+            "text": "Wiki pages refreshed to tonight: 21 items updated (the Pyrosilk set's descriptions, stat re-reads), Corrupted Kedgespawn is now named by the Nektropos Castle access quest \"Hate, Betrayal, and Trust\" and has a respawn time, 2 mobs and 1 quest updated, one more mob picture."
+          }
+        ]
+      }
+    ],
+    "knownIssues": "Joining another player's private instance is not told apart from the open world of that zone; only an instance you create yourself is. A pet summoned shortly before its first \"My leader is\" line can carry a \"(2)\" after its name in the meters until the next restart. Another player's spells never count toward a mob's resists: the game prints only your own resists to you. The con card does not list a mob's immunities yet (the mob page does). Saved characters read \"needs refresh\" on Wiki Gaps until logged in once with this build. A +0 worked back from a window often leaves Weight as ?. A groupmate's charmed pet can still lose its credit when a damage-over-time it cast before the charm ticks on a groupmate. A mob or item added to the wiki after this build shows no wiki details until the next build (or a Copy click in Wiki Gaps). Copy on a wiki page that still holds the template's placeholders keeps them. A merchant page the wiki already has gets no \"items sold\" check. Capture finds the game window only when it is titled \"EverQuest Legends\" or \"EverQuest\". All characters needs each character logged in here once with this build. The screenshot reader reads English only. The installer is not code-signed, so Windows shows \"Windows protected your PC\" the first time (More info, then Run anyway). Builds before test.20 do not update themselves; install one by hand once."
+  },
+  {
     "version": "0.1.0-test.39",
     "date": "2026-11-01",
     "title": "death recap, swing timer, map heading arrow, rogue backstab from the wiki",
