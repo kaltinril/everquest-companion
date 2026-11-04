@@ -5,6 +5,10 @@ use super::respawn::{RespawnModule, RespawnPrefs, RespawnRow, RespawnWatchPref};
 use crate::event::Event;
 use crate::EqModule;
 
+/// The places of a zone (2026-11-03): the tiers, a private instance, the estimate pooled across them.
+#[path = "respawn_places_tests.rs"]
+mod places;
+
 /// The zone line the stay begins with. Every timestamp below is derived from this one, so the
 /// arithmetic in the assertions reads instead of being a set of magic epochs.
 const T_ZONE: i64 = 1_787_181_000_000;
@@ -422,79 +426,4 @@ fn a_mob_unwatched_mid_gap_still_ends_its_gap_at_its_first_sign_of_life() {
     m.on_event(&ev(&hits_you(3, T_UP)), true);
     m.on_event(&ev(&death(4, T_SECOND_DEATH)), true);
     assert_eq!(learned_of(&m)[0]["gapsMs"], serde_json::json!([570_000]));
-}
-
-fn zone_named(ts: i64, name: &str) -> String {
-    format!(r#"{{"kind":"zone","seq":0,"ts":{ts},"raw":"z","zone":"{name}"}}"#)
-}
-
-/// Each instance tier keeps its own clock, kept across a visit elsewhere (owner, 2026-11-03:
-/// "Timers should be retained across instances but be ISOLATED to that instance"): a kill in the
-/// +4, out to the +3 and a kill there, back to the +4 — two rows, the +4's still counting.
-#[test]
-fn each_instance_tier_keeps_its_own_clock_across_a_visit_elsewhere() {
-    let mut m = RespawnModule::new(NOW, watching_the_knight());
-    m.on_event(&ev(&zone_named(T_ZONE, "The Ruins of Old Guk 4 (Refined)")), false);
-    m.on_event(&ev(&death(1, T_DEATH)), false);
-    m.on_event(&ev(&zone_named(T_DEATH + 60_000, "The Ruins of Old Guk 3 (Fused)")), false);
-    m.on_event(&ev(&death(2, T_DEATH + 90_000)), false);
-    m.on_event(&ev(&zone_named(T_DEATH + 120_000, "The Ruins of Old Guk 4 (Refined)")), false);
-    let mut rows = m.watch_rows(NOW);
-    rows.sort_by(|a, b| a.zone.cmp(&b.zone));
-    let got: Vec<(&str, i64, i64)> = rows.iter().map(|r| (r.zone.as_str(), r.base_ts, r.kills)).collect();
-    assert_eq!(
-        got,
-        vec![
-            ("The Ruins of Old Guk 3 (Fused)", T_DEATH + 90_000, 1),
-            ("The Ruins of Old Guk 4 (Refined)", T_DEATH, 1),
-        ]
-    );
-}
-
-/// The open world is one place: zoning out and back keeps the clock.
-#[test]
-fn re_entering_the_open_world_keeps_the_clock() {
-    let mut m = RespawnModule::new(NOW, watching_the_knight());
-    m.on_event(&ev(&zone(T_ZONE)), false);
-    m.on_event(&ev(&death(1, T_DEATH)), false);
-    m.on_event(&ev(&zone(T_DEATH + 60_000)), false);
-    assert_eq!(m.watch_rows(NOW).len(), 1);
-}
-
-fn instance_created(ts: i64, zone: &str, id: i64) -> String {
-    format!(r#"{{"kind":"instanceCreate","seq":0,"ts":{ts},"raw":"i","player":"Drywrought","zone":"{zone}","instance":{id}}}"#)
-}
-
-/// A private instance prints the open world's zone line; the creation notice before it keeps the
-/// clocks apart (owner, 2026-11-03: "i'm in an INSTANCE +4 and the timer is showing the time from
-/// the previous kill in the +4 OPEN WORLD").
-#[test]
-fn a_private_instance_never_shows_the_open_worlds_clock() {
-    let mut m = RespawnModule::new(NOW, watching_the_knight());
-    m.on_event(&ev(&zone_named(T_ZONE, "Lake Nerius 4 (Refined)")), false);
-    m.on_event(&ev(&death(1, T_DEATH)), false);
-    m.on_event(&ev(&instance_created(T_DEATH + 50_000, "Lake Nerius", 17)), false);
-    m.on_event(&ev(&zone_named(T_DEATH + 60_000, "Lake Nerius 4 (Refined)")), false);
-    let snap = m.snapshot();
-    assert_eq!(snap["state"]["zone"], "Lake Nerius 4 (Refined) [instance 17]");
-    let rows = m.watch_rows(NOW);
-    assert_eq!(rows.len(), 1);
-    assert_eq!(rows[0].zone, "Lake Nerius 4 (Refined)", "the open world's clock stays the open world's");
-    // A kill in the instance is the instance's own clock.
-    m.on_event(&ev(&death(2, T_SECOND_DEATH)), false);
-    let mut zones: Vec<String> = m.watch_rows(NOW).into_iter().map(|r| r.zone).collect();
-    zones.sort();
-    assert_eq!(zones, vec!["Lake Nerius 4 (Refined)", "Lake Nerius 4 (Refined) [instance 17]"]);
-    // Back out to the open world: no notice, so it is the open world again.
-    m.on_event(&ev(&zone_named(T_SECOND_DEATH + 60_000, "Lake Nerius 4 (Refined)")), false);
-    assert_eq!(m.snapshot()["state"]["zone"], "Lake Nerius 4 (Refined)");
-}
-
-/// A notice for another zone does not tag the zone you walk into.
-#[test]
-fn an_instance_notice_for_another_zone_tags_nothing() {
-    let mut m = RespawnModule::new(NOW, watching_the_knight());
-    m.on_event(&ev(&instance_created(T_ZONE, "The Plane of Fear", 572)), false);
-    m.on_event(&ev(&zone_named(T_ZONE + 10_000, "Lake Nerius 4 (Refined)")), false);
-    assert_eq!(m.snapshot()["state"]["zone"], "Lake Nerius 4 (Refined)");
 }

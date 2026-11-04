@@ -42,6 +42,11 @@ use eqlog::names::id_key;
 use serde::Serialize;
 use serde_json::{json, Value};
 
+/// The places of a zone (owner, 2026-11-03): a private instance's stay, the estimate pooled across
+/// the zone's tiers and instances. A child module, for the fields.
+#[path = "respawn_places.rs"]
+mod places;
+
 /// `shared/respawn.ts RESPAWN_SHAPE_VERSION`.
 const RESPAWN_SHAPE_VERSION: i64 = 4;
 /// The shortest gap this module will read as a spawn cycle, and the earliest sign of life (header).
@@ -299,11 +304,6 @@ pub struct RespawnModule {
     pending_instance: Option<(String, i64)>,
 }
 
-/// A zone line's base name, lowercase: the tier and any `- Solo`/`- Group` stripped.
-fn zone_base(zone: &str) -> String {
-    crate::jsfn::zone_tier(zone).0.to_lowercase()
-}
-
 impl RespawnModule {
     pub fn new(construction_now_ms: i64, prefs: RespawnPrefs) -> Self {
         let mut m = RespawnModule {
@@ -514,7 +514,8 @@ impl RespawnModule {
         let custom_ms = self.watch_of(&h.key)?;
         let wiki_row = wiki().get(&h.key);
         let wiki_ms = wiki_row.and_then(|w| w.seconds).map(|s| s * 1000);
-        let (estimate_ms, source) = resolve_respawn(custom_ms, h.min_gap_ms, h.samples, wiki_ms);
+        let (min_gap_ms, samples) = self.pooled_gaps(h);
+        let (estimate_ms, source) = resolve_respawn(custom_ms, min_gap_ms, samples, wiki_ms);
         let base = base_of(h);
         let mut row = RespawnRow {
             id: format!("{}::{}", id_key(&h.zone), h.key),
@@ -528,12 +529,12 @@ impl RespawnModule {
                 "sighting"
             },
             source,
-            samples: h.samples,
+            samples,
             kills: h.kills,
             seen_ts: None,
             seen_via: None,
             estimate_ms,
-            observed_ms: h.min_gap_ms,
+            observed_ms: min_gap_ms,
             gaps_ms: None,
             custom_ms,
             wiki_text: wiki_row.map(|w| w.text.clone()),
@@ -726,26 +727,8 @@ impl EqModule for RespawnModule {
                 self.learned.clear();
                 self.rev += 1;
             }
-            "instanceCreate" => {
-                if let (Some(zone), Some(id)) = (ev.str("zone"), ev.int("instance")) {
-                    self.pending_instance = Some((zone_base(zone), id));
-                }
-            }
-            "zone" => {
-                let entered = ev.str("zone").unwrap_or_default();
-                // Entering the zone an instance was just created for is entering that instance: its
-                // clocks are its own, never the open world's under the same zone line.
-                self.zone = match self.pending_instance.take() {
-                    Some((base, id)) if base == zone_base(entered) => format!("{entered} [instance {id}]"),
-                    _ => entered.to_string(),
-                };
-                self.zone_since = ev.ts();
-                // A new stay: no gap spans it, so nothing is awaiting a sign of life any more.
-                self.awaiting.clear();
-                // The revision moves, because the zone is part of what the screen shows: without
-                // this both surfaces keep drawing the old zone's clocks while the log stays quiet.
-                self.rev += 1;
-            }
+            "instanceCreate" => self.instance_created(ev),
+            "zone" => self.entered(ev),
             "death" if is_counted_kill(ev) => {
                 let name = ev.str("name").unwrap_or_default();
                 self.record_death(&id_key(name), name, ev.ts());
