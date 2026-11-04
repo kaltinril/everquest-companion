@@ -27,9 +27,10 @@ export function zoneMobPins(stem: string | null, catalog: MobEntry[]): CatalogPi
   return mobRows(name, catalog).flatMap((r) => r.pins.map((p, i) => ({ key: `${r.id}#${String(i)}`, name: r.name, x: p.x, y: p.y })))
 }
 
-/** The respawn clocks the catalog can place in this zone, as the red timer pins. */
-export function zoneTimerPins(stem: string | null, rows: readonly RespawnRow[], catalog: MobEntry[]): TimerPin[] {
-  return placeableTimerPins(timerPinRows(rows, timerZone(stem, catalog)))
+/** The respawn clocks the catalog can place in this zone, as the red timer pins; `here` as
+ *  `timerPinRows` takes it (only the tier you stand in, on its map). */
+export function zoneTimerPins(stem: string | null, rows: readonly RespawnRow[], catalog: MobEntry[], here?: string): TimerPin[] {
+  return placeableTimerPins(timerPinRows(rows, timerZone(stem, catalog), here))
 }
 
 /** The Timers tab's watched mobs in this zone, as tracked points. */

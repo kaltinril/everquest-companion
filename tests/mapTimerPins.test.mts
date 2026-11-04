@@ -142,3 +142,16 @@ test('a clock pulses from the moment it comes due, for JUST_DUE_MS, and never be
   assert.equal(justDue(t, 60_000 + JUST_DUE_MS), true)
   assert.equal(justDue(t, 60_000 + JUST_DUE_MS + 1), false)
 })
+
+test('on the map you stand in, only your instance tier’s clock wins a pin (owner, 2026-11-03)', () => {
+  const plus4 = row('Fippy Darkpaw', { id: 'qeynos hills 4 (refined)::fippy darkpaw', zone: 'Qeynos Hills 4 (Refined)' })
+  const plus3 = row('Fippy Darkpaw', { id: 'qeynos hills 3 (fused)::fippy darkpaw', zone: 'Qeynos Hills 3 (Fused)' })
+  const here = timerPinRows([plus4, plus3], QH, 'Qeynos Hills 4 (Refined)')
+  assert.deepEqual(
+    placeableTimerPins(here).map((t) => t.id),
+    ['qeynos hills 4 (refined)::fippy darkpaw']
+  )
+  // Browsing the map from somewhere else: the stem alone decides, as before.
+  const away = timerPinRows([plus4, plus3], QH, 'West Commonlands')
+  assert.equal(placeableTimerPins(away).length, 2)
+})

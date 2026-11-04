@@ -45,7 +45,7 @@ const PIN_PX = 8
 export function useTimerPins(zoneStem: ZoneShort | null): TimerPin[] {
   const snap = useRespawnSnap()
   const zone = useMemo(() => timerZone(zoneStem, MOB_CATALOG), [zoneStem])
-  return useMemo(() => timerPinRows(snap.rows, zone), [snap.rows, zone])
+  return useMemo(() => timerPinRows(snap.rows, zone, snap.zone), [snap.rows, zone, snap.zone])
 }
 
 export function MapTimerPins({ timers, vp }: { timers: readonly TimerPin[]; vp: MapViewport }): JSX.Element {

@@ -141,7 +141,10 @@ function useZoneMarks(zone: string | null, layers: PinLayers) {
     [state, zone, catalog, respawn.prefs.watches]
   )
   const mobs = useMemo(() => (layers.poi ? zoneMobPins(zone, catalog) : []), [zone, catalog, layers.poi])
-  const timers = useMemo(() => zoneTimerPins(zone, respawn.rows, catalog), [zone, respawn.rows, catalog])
+  const timers = useMemo(
+    () => zoneTimerPins(zone, respawn.rows, catalog, respawn.zone),
+    [zone, respawn.rows, catalog, respawn.zone]
+  )
   const ext: ZoneExtent | undefined = data?.bounds ?? (zone == null ? undefined : state.extents[zone])
   // The Achievements areas the main window wrote for this zone (as the Maps tab's).
   const slayer = useSlayerOverlay()

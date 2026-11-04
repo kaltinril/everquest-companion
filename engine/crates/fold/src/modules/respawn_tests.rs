@@ -423,3 +423,36 @@ fn a_mob_unwatched_mid_gap_still_ends_its_gap_at_its_first_sign_of_life() {
     m.on_event(&ev(&death(4, T_SECOND_DEATH)), true);
     assert_eq!(learned_of(&m)[0]["gapsMs"], serde_json::json!([570_000]));
 }
+
+fn zone_named(ts: i64, name: &str) -> String {
+    format!(r#"{{"kind":"zone","seq":0,"ts":{ts},"raw":"z","zone":"{name}"}}"#)
+}
+
+/// The owner's Lake Nerius night (2026-11-03): a kill in the +4, out to the +3, back to the +4. The
+/// second +4 is a new instance with the mob up, so the first one's clock must not run there.
+#[test]
+fn re_entering_an_instance_tier_voids_the_clock_from_the_last_instance() {
+    let mut m = RespawnModule::new(NOW, watching_the_knight());
+    m.on_event(&ev(&zone_named(T_ZONE, "The Ruins of Old Guk 4 (Refined)")), false);
+    m.on_event(&ev(&death(1, T_DEATH)), false);
+    assert_eq!(m.watch_rows(NOW).len(), 1);
+    m.on_event(&ev(&zone_named(T_DEATH + 60_000, "The Ruins of Old Guk 3 (Fused)")), false);
+    assert_eq!(m.watch_rows(NOW).len(), 1, "the +4 clock stays while you are elsewhere");
+    m.on_event(&ev(&zone_named(T_DEATH + 120_000, "The Ruins of Old Guk 4 (Refined)")), false);
+    assert!(m.watch_rows(NOW).is_empty(), "the new +4 instance has no clock yet");
+    // The next kill there starts it again, and keeps the count.
+    m.on_event(&ev(&death(2, T_SECOND_DEATH)), true);
+    let row = only_row(&m);
+    assert_eq!(row.kills, 2);
+    assert_eq!(row.samples, 0, "no gap spans two instances");
+}
+
+/// The open world is one place: zoning out and back keeps the clock.
+#[test]
+fn re_entering_the_open_world_keeps_the_clock() {
+    let mut m = RespawnModule::new(NOW, watching_the_knight());
+    m.on_event(&ev(&zone(T_ZONE)), false);
+    m.on_event(&ev(&death(1, T_DEATH)), false);
+    m.on_event(&ev(&zone(T_DEATH + 60_000)), false);
+    assert_eq!(m.watch_rows(NOW).len(), 1);
+}

@@ -28,7 +28,7 @@
 import type { MobEntry } from '@shared/types'
 import type { ZoneShort } from '@shared/maps'
 import type { RespawnRow } from '@shared/respawn'
-import { formatRespawnDuration, respawnReading } from '../../../../shared/respawn'
+import { formatRespawnDuration, respawnReading, respawnZoneKey } from '../../../../shared/respawn'
 import { ZONES, zoneShortName } from '../../../../shared/zones'
 import { mobKey } from '../../../../shared/mobKey'
 import { mobsInZone } from '../mobs/mobZone'
@@ -80,13 +80,20 @@ export function timerZone(stem: ZoneShort | null, catalog: MobEntry[]): TimerZon
 /**
  * The timer rows that belong to the map on screen, joined to their spawn points. Null-safe on
  * the zone: no map, no lane.
+ *
+ * `here` is the zone the fold stands in (`RespawnSnap.zone`, raw). A map stem folds every
+ * instance tier onto one map (`Lake Nerius 4 (Refined)` and `3 (Fused)` are both `lakenerius`),
+ * so on the map of where you stand only that exact tier's clocks win pins: the +3's clock is not
+ * the +4's mob (owner, 2026-11-03). On any other map the stem alone decides, as before.
  */
-export function timerPinRows(rows: readonly RespawnRow[], zone: TimerZone | null): TimerPin[] {
+export function timerPinRows(rows: readonly RespawnRow[], zone: TimerZone | null, here?: string): TimerPin[] {
   if (zone == null || rows.length === 0) return []
+  const exact = here !== undefined && zoneShortName(here) === zone.stem ? respawnZoneKey(here) : null
   // Every served row is mapped; one off this map carries no pins and the lane draws pinned rows only,
   // so the rows themselves are never filtered here (ruling 4).
   return rows.map((r) => {
-    const entry = zoneShortName(r.zone) === zone.stem ? zone.byKey.get(mobKey(r.display)) : undefined
+    const onMap = zoneShortName(r.zone) === zone.stem && (exact === null || respawnZoneKey(r.zone) === exact)
+    const entry = onMap ? zone.byKey.get(mobKey(r.display)) : undefined
     // A multi-zone page's numbers cannot be attributed to this map — mobRows' rule, restated
     // here because this lane reads the catalog directly rather than through the pane's rows.
     const pins = entry === undefined || (entry.zones?.length ?? 0) > 1 ? [] : mobPins(entry)

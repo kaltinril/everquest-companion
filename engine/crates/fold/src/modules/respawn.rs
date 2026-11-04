@@ -246,6 +246,18 @@ struct MobHistory {
     /// A sighting the user confirmed as the spawn. Competes with `last_ts` for the clock's base and
     /// the LATER one wins, which is why a death needs no code to undo it.
     confirmed_ts: Option<i64>,
+    /// The instance this clock ran in was left and its tier entered again: a fresh instance with
+    /// its spawns up, so the clock is void and serves no row until the next kill (`zone` below).
+    instance_left: bool,
+}
+
+/// An instance tier (`Lake Nerius 4 (Refined)`, `X - Group`), as against the open world.
+/// Entering one again opens a new instance with every spawn up (owner's logs, 2026-11-03: Chief
+/// Goonda killed 4:34 after his last death, 1 min after a re-entry, against a 14-21 min respawn;
+/// Slizik the Mighty 3:15; Corrupted Kedgespawn 7:54 against 12 min).
+fn is_instance(zone: &str) -> bool {
+    let tier = crate::jsfn::zone_tier(zone).1;
+    tier != crate::jsfn::TIER_OPEN_WORLD && tier != crate::jsfn::TIER_UNKNOWN
 }
 
 /// The clock's base for one history entry: the death, or a later confirmed sighting.
@@ -472,8 +484,10 @@ impl RespawnModule {
                 seen_via: None,
                 seen_pub_ts: None,
                 confirmed_ts: None,
+                instance_left: false,
             },
         };
+        h.instance_left = false;
         h.last_ts = ts;
         h.kills += 1;
         h.display = display.to_string();
@@ -499,6 +513,9 @@ impl RespawnModule {
     /// returns `None`. It never sweeps stale rows, and it takes no clock: nothing it computes
     /// depends on `now`.
     fn row_for(&self, h: &MobHistory) -> Option<RespawnRow> {
+        if h.instance_left {
+            return None;
+        }
         let custom_ms = self.watch_of(&h.key)?;
         let wiki_row = wiki().get(&h.key);
         let wiki_ms = wiki_row.and_then(|w| w.seconds).map(|s| s * 1000);
@@ -718,6 +735,17 @@ impl EqModule for RespawnModule {
                 self.zone_since = ev.ts();
                 // A new stay: no gap spans it, so nothing is awaiting a sign of life any more.
                 self.awaiting.clear();
+                // Back in an instance tier is a new instance: the clocks from the last one in it
+                // are void (owner, 2026-11-03: "went into a +4 then +3 then +2 and back to the +4
+                // and it said the spawn was overdue"). Their kills and gaps are kept.
+                if is_instance(&self.zone) {
+                    let here = id_key(&self.zone);
+                    for h in self.history.values_mut() {
+                        if id_key(&h.zone) == here {
+                            h.instance_left = true;
+                        }
+                    }
+                }
                 // The revision moves, because the zone is part of what the screen shows: without
                 // this both surfaces keep drawing the old zone's clocks while the log stays quiet.
                 self.rev += 1;

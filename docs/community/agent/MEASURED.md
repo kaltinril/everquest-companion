@@ -151,6 +151,10 @@ SK, others).
   2 Adaptive, 3 Fused, 4 Refined. A `- Group` variant is the short 4-kill mission. Dungeon Crawl
   completion prints `You have completed the Dungeon Crawl and earned reward loot!`; its loot reads
   `... from Reward Chest`.
+- **Re-entering an instance tier opens a new instance, spawns up** (owner's logs, 2026-11-03): Chief
+  Goonda (WK 4) killed again 4:34 after his last death, 1 min after a re-entry, against 14-21 min
+  cycles; Slizik the Mighty (Old Paineel 1) 3:15; Asaka L`Rei (Befallen 4) 5:15; Corrupted
+  Kedgespawn (Lake Nerius 4) 7:54 against 12 min. A respawn clock dies with its instance.
 - **Motes:** grade order Infinitesimal < Minor < Lesser < Major < Greater (< Superior). Yellow/red
   cons drop ~7-10 per 100 kills vs blue 4.2, green 3.1. Player level caps grade (~1 tier per 5
   levels). Party XP lines carry the percent: `You gain party experience! (0.718%)`.
