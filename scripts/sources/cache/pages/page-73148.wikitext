@@ -1,0 +1,18 @@
+Pyrosilk Armor is a caster-only set that drops from the 7 sisters in [[Nektropos Castle]]. 
+
+{{Gear Set
+|Pyrosilk Amice
+|Pyrosilk Bracelet
+|Pyrosilk Choker
+|Pyrosilk Cloak
+|Pyrosilk Gloves
+|Pyrosilk Headband
+|Pyrosilk Leggings
+|Pyrosilk Lined Shoes
+|Pyrosilk Robe
+|Pyrosilk Sash
+|Pyrosilk Sleeves
+|Pyrosilk Veil
+}}
+
+[[Category: Armor Sets]]

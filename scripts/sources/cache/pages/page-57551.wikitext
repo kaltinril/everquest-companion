@@ -80,37 +80,39 @@ In addition to the Standing Value, some modifiers are applied to determine the f
 <div style="font-size:0.95rem; margin:0 0 0.75rem 0;">
 {| class="eoTable2 sortable" style="text-align:center"
 |-
-! '''Race''' !! Mod
+! '''Class''' !! Mod
 |-
-| style="text-align:left;" | '''Barbarian''' || ? 
+| style="text-align:left;" | '''Bard''' || ? 
 |-
-| style="text-align:left;" | '''Dark Elf''' || ?
+| style="text-align:left;" | '''Beastlord''' || ?
 |-
-| style="text-align:left;" | '''Dwarf''' || ?
+| style="text-align:left;" | '''Berserker''' || ?
 |-
-| style="text-align:left;" | '''Erudite''' || ?
+| style="text-align:left;" | '''Cleric''' || ?
 |-
-| style="text-align:left;" | '''Gnome''' || ?
+| style="text-align:left;" | '''Druid''' || ?
 |-
-| style="text-align:left;" | '''Half Elf''' || ?
+| style="text-align:left;" | '''Enchanter''' || ?
 |-
-| style="text-align:left;" | '''Halfling''' || ?
+| style="text-align:left;" | '''Magician''' || ?
 |-
-| style="text-align:left;" | '''High Elf''' || ?
+| style="text-align:left;" | '''Monk''' || ?
 |-
-| style="text-align:left;" | '''Human''' || ? 
+| style="text-align:left;" | '''Necromancer''' || ? 
 |-
-| style="text-align:left;" | '''Iksar''' || ?
+| style="text-align:left;" | '''Paladin''' || ?
 |-
-| style="text-align:left;" | '''Ogre''' || ?
+| style="text-align:left;" | '''Ranger''' || ?
 |-
-| style="text-align:left;" | '''Troll''' || ?
+| style="text-align:left;" | '''Rogue''' || ?
 |-
-| style="text-align:left;" | '''Kerran''' || ?
+| style="text-align:left;" | '''Shadow Knight''' || ?
 |-
-| style="text-align:left;" | '''Froglok''' || ?
+| style="text-align:left;" | '''Shaman''' || ?
 |-
-| style="text-align:left;" | '''HalfDE''' || ?
+| style="text-align:left;" | '''Warrior''' || ?
+|-
+| style="text-align:left;" | '''Wizard''' || ?
 |}
 </div>
 |}

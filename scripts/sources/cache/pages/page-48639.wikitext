@@ -34,7 +34,7 @@ A few critical notes on pick pocketing:
 * Pick pocket shares a cooldown timer with Begging.
 
 == Training ==
-* Pick pocket can be skilled up on any monster that can be stolen from, regardless of con. So, for example, you can pick pocket a level 1 goblin indefinitely (even after you take all its items) for skillups.
+* Pick pocket can be skilled up on any monster that can be stolen from, regardless of con. So, for example, you can pick pocket a level 1 goblin indefinitely (even after you take all its items) for skillups.  This includes non-aggressive npc's (soul binder).
 
 {{Navbox Skills}}
 

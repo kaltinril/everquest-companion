@@ -23,6 +23,7 @@
 {"pageid":105,"title":"Deities"},
 {"pageid":106,"title":"Equipment By Class"},
 {"pageid":107,"title":"Equipment By Slot"},
+{"pageid":110,"title":"Resist Gear"},
 {"pageid":15172,"title":"Necromancer Spells"},
 {"pageid":15205,"title":"Druid Spells"},
 {"pageid":16514,"title":"Does Not Exist"},
@@ -327,6 +328,8 @@
 {"pageid":48585,"title":"Skill Begging"},
 {"pageid":48587,"title":"Cultural Tradeskills"},
 {"pageid":48588,"title":"Skill Alchemy"},
+{"pageid":48589,"title":"Skill Baking"},
+{"pageid":48590,"title":"Skill Blacksmithing"},
 {"pageid":48598,"title":"Skill Throwing"},
 {"pageid":48599,"title":"Skill Bind Wound"},
 {"pageid":48600,"title":"Skill Alcohol Tolerance"},
@@ -715,5 +718,6 @@
 {"pageid":73030,"title":"Nektropos Undercrofts"},
 {"pageid":73048,"title":"Luclin"},
 {"pageid":73050,"title":"Ulkorruuk"},
-{"pageid":73102,"title":"Player List"}
+{"pageid":73102,"title":"Player List"},
+{"pageid":73148,"title":"Pyrosilk Armor"}
 ]

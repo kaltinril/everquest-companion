@@ -1,0 +1,1281 @@
+<div style="float:right;margin-left:20px;">__TOC__</div>
+Welcome to the wonderful (if slightly gruesome) world of EQ Baking! To be an adventurer means more than going where no civilian would dare to tread. It also means having adventurous tastebuds!
+
+Although it is perfectly feasible for some to buy food from merchants, others will find it easier to make meals on the go. Many baking recipes can be anything from snacks to hearty meals, and there are even special recipes that can give the average adventurer a temporary boost in abilities, or assist in quests. Whether it's an easy wolf sandwich while you're on your way to somewhere, or a wedding cake for a ceremony, baking has a lot to offer to those who aren't content with the standard fare sold by merchants.Baking requires a number of products from other tradeskills for certain recipes, but the good news is that most can be purchased from other players and may be used more than once, so there's no need to go out and master, say, blacksmithing before you start.
+
+== Cookware ==
+
+Baking has several items required for the various recipes.
+
+* '''[[Oven]]''' may be found in any starting city and are usually located near the baking merchants.
+
+* '''[[Spit]]s''' and '''[[Mixing Bowl]]s''' may be found on merchants along with the basic ingredients. Spits work just like portable ovens and can be used as extra storage in a pinch. Mixing bowls, also able to be made by potters, are for cold preparation and are often needed for preliminary steps. In P1999, it's best to switch to the Experiment window before attempting to use these objects.
+
+* '''[[Muffin Tin]]s, Cookie Cutters, [[Pie Tin]]s, [[Cake Round]]s, [[Skewers]], [[Pot]]s, and [[Smoker]]s can be made with pottery or blacksmithing skills. Filleting knives, bread tins, non-stick frying pans, and dairy spoons''' require blacksmithing skills to create. All these items are good for multiple uses and will be returned upon both success and failure.
+
+== Ingredients ==
+
+Bakers collect their ingredients from four basic sources: Merchants, [[fishing]], looting, and foraging or ground spawns. For instance, various meats will be found on their respective animals (or people, ahem), as well as eggs and other body parts. Foraging can get a baker the ingredients for a salad or stew. Merchants sell processed ingredients, like [[vinegar]], [[Cup of Flour|flour]], [[garnish]], [[jug of sauces]], [[frosting]], [[spices]], and so on.
+
+== Quick Leveling Guide ==
+'''Intelligence or Wisdom, whichever is higher governs your chance to gain skill increases.'''
+
+For more info see [[Skill_Baking#Baking_Leveling_Guide_.28Detailed.29|Baking Leveling Guide]]
+
+<table class="eoTable2 sortable" style="width:90%;">
+              <tr> 
+                <th>Item</th>
+                <th>Ingredients</th>
+                <th>Trivial</th>
+              </tr>
+ <tr> 
+  <td>[[Batwing Crunchies]]</td>
+<td> 
+* 1 [[Bat Wing]]
+* 1 [[Frosting]]
+</td>
+  <td colspan="4"> 
+   <p>46</p>
+  </td>
+ </tr>
+ <tr> 
+  <td>[[Fish Fillets]]</td>
+<td> 
+* 1 [[Jug of Sauces]]
+* 1 [[Fresh Fish]]
+</td>
+  <td colspan="4"> 
+   <p>82</p>
+  </td>
+ </tr>
+ <tr> 
+  <td>[[Fish Rolls]]</td>
+<td> 
+* 1 [[Bat Wing]]
+* 1 [[Fresh Fish]]
+</td>
+  <td colspan="4"> 
+   <p>135</p>
+  </td>
+ </tr>
+ <tr> 
+  <td>[[Batwing Pie]]</td>
+<td> 
+* 1 [[Bat Wing]]
+* 1 [[Clump of Dough]]
+* 1 [[Spices]]
+* 1 [[Pie Tin]] (returned)
+</td>
+  <td colspan="4"> 
+   <p>142</p>
+  </td>
+ </tr>
+ <tr> 
+  <td>[[Wedding Cake]]</td>
+<td> 
+* 1 [[White Chocolate]]
+* 1 [[Frosting]]
+* 1 [[Clump of Dough]]
+* 1 [[Cake Round]] (returned)
+</td>
+  <td colspan="4"> 
+   <p>162</p>
+  </td>
+ </tr>
+
+ <tr> 
+  <td>[[Birthday Cake]]</td>
+<td> 
+* 1 [[Winter Chocolate]]
+* 1 [[Frosting]]
+* 1 [[Clump of Dough]]
+* 1 [[Cake Round]] (returned)
+</td>
+  <td colspan="4"> 
+   <p>162</p>
+  </td>
+ </tr>
+
+ <tr> 
+  <td>[[Dragon Steak]]</td>
+<td> 
+* 1 [[Dragon Meat]]
+* 1 [[Jug of Sauces]]
+* 1 [[Spices]]
+</td>
+  <td colspan="4"> 
+   <p>242</p>
+  </td>
+ </tr>
+
+
+</table>
+
+== Baking Recipes ==
+
+Note: These recipes and trivials were taken from EQTraders near the end of Velious. Some minor corrections for p1999 may be in order; please make them.
+      *Some recipe books discuss foods that cannot be made in this era, such as "Ice Cream is Good" parts 1 and 2.
+      There are also ingredients for which there are no recipes. (This is probably due to when the
+      recipes were taken from EQTraders, as they were likely preparing for Luclin recipes.)
+
+            <table class="eoTable3 sortable" style="width:90%;">
+              <tr> 
+                <th>Item</th>
+                <th>Ingredients</th>
+                <th>Implements</th>
+                <th>Yield</th>
+                <th>Trivial</th>
+                <th>Use</th>
+              </tr>
+              <tr> 
+                <td>{{:Batwing Crunchies}}</td>
+                <td>[[Bat Wing]], [[Frosting]]</td>
+                <td>spit/oven</td>
+                <td>1</td>
+                <td>46</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Bear Sandwich}}</td>
+                <td>[[Bear Meat]], [[Loaf of Bread]]</td>
+                <td>spit/oven</td>
+                <td>1</td>
+                <td>31</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Bear Steaks}}</td>
+                <td>[[Bear Meat]], [[Jug of Sauces]], [[Spices]]</td>
+                <td>spit/oven</td>
+                <td>1</td>
+                <td>41</td>
+                <td>STR +1</td>
+              </tr>
+              <tr> 
+                <td>[[Beer Braised Bear]]</td>
+                <td>[[Bear Meat]], [[Spices]], [[Short Beer]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>68</td>
+                <td>STR +2, INT -1</td>
+              </tr>
+              <tr> 
+                <td>{{:Beer Braised Gator}}</td>
+                <td>[[Gator Meat]], [[Spices]], [[Short Beer]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>68</td>
+                <td>STR +2, INT -1</td>
+              </tr>
+              <tr> 
+                <td>{{:Beer Braised Mammoth}}</td>
+                <td>[[Mammoth Meat]], [[Spices]], [[Short Beer]] </td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>68</td>
+                <td>STR +3, INT -1</td>
+              </tr>
+              <tr> 
+                <td>{{:Beer Braised Lion}}</td>
+                <td>[[Lion Meat]], [[Spices]], [[Short Beer]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>68</td>
+                <td>AGI +2, INT -1</td>
+              </tr>
+              <tr> 
+                <td>{{:Beer Braised Rat}}</td>
+                <td>[[Rat Meat]], [[Spices]], [[Short Beer]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>68</td>
+                <td>DEX +2, INT -1</td>
+              </tr>
+              <tr> 
+                <td>{{:Beer Braised Wolf}}</td>
+                <td>[[Wolf Meat]], [[Spices]], [[Short Beer]]</td>
+                <td>spit/oven</td>
+                <td>2 </td>
+                <td>68</td>
+                <td>STA +2, INT -1</td>
+              </tr>
+              <tr> 
+                <td>{{:Beetle Eye Pie}}</td>
+                <td>[[Clump of Dough]], [[Fire Beetle Eye]], [[Spices]]</td>
+                <td><b>[[Pie Tin]]</b>, spit/oven</td>
+                <td>5</td>
+                <td>142</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Berry Pie}}</td>
+                <td>[[Clump of Dough]], ([[Skill Forage|foraged]]) berries</td>
+                <td><b>[[Pie Tin]]</b>, spit/oven</td>
+                <td>2</td>
+                <td>142</td> 
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Birthday Cake}}</td>
+                <td>[[Winter Chocolate]], [[Frosting]], [[Clump of Dough]]
+                </td>
+                <td><b>{{:Cake Round}}</b>, spit/oven </td>
+                <td>2</td>
+                <td>162</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Birthday Cake Slice}}</td>
+                <td>[[Birthday Cake]]</td>
+                <td>spit/oven</td>
+                <td>10</td>
+                <td>15</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Bixie Crunchies}}</td>
+                <td>[[Bixie Parts]], [[Frosting]]</td>
+                <td>spit/oven</td>
+                <td>1</td>
+                <td>46</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Blackened Teir'Dal}}</td>
+                <td>[[Dark Elf Parts]], [[Spices]], [[Garnish]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>62</td>
+                <td>DEX +1, INT +2, AGI +1</td>
+              </tr>
+              <tr> 
+                <td>{{:Loaf of Bread}}</td>
+                <td> 
+                  <p>[[Clump of Dough]] <i>(weight 0.5), random chance of ending up with 
+                    a burnt loaf of bread and losing your bread tin</i></p>
+                </td>
+                <td ><b>[[Bread Tin]],</b> spit/oven</td>
+                <td >1</td>
+                <td >115 </td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Candied Spider}}</td>
+                <td>[[Spider Legs]], [[Frosting]], [[Spices]]</td>
+                <td>spit/oven</td>
+                <td>8</td>
+                <td>88</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Caynar Nut Stuffed Trout}}</td>
+                <td>Trout ("any type" - but Rivervale trout does not work), ([[Skill Forage|foraged]]) [[Bag of Caynar Nuts]], [[Garnish]], [[Spices]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>128</td>
+                <td>STA +2, SV DISEASE +2</td>
+              </tr>
+              <tr> 
+                <td>{{:Chocolate Cookies}}</td>
+                <td>[[Clump of Dough]], [[Spices]], [[Frosting]], [[Winter Chocolate]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>148</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Chocolate Marr Cherries}}</td>
+                <td>3 ([[Skill Forage|foraged]]) [[Marr Cherries]], [[Winter Chocolate]]</td>
+                <td>[[Mixing Bowl]]</td>
+                <td>6</td>
+                <td>126</td>
+                <td>CHA +3</td>
+              </tr>
+              <tr> 
+                <td>{{:Chocolate Muffins}}</td>
+                <td>[[Clump of Dough]], ([[Skill Forage|foraged]]) [[Fruit]], [[Winter Chocolate]]</td>
+                <td><b>[[Muffin Tin]]</b>, spit/oven</td>
+                <td>2</td>
+                <td>155</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Clump of Dough}}</td>
+                <td>[[Cup of Flour]], [[Bottle of Milk]], Egg (snake - yield 1, aviak - looted yield 7, foraged yield 5, wurm yield 15, alligator - yield 5, cockatrice - yield 5, griffon - yield 7, basilisk egg (note the lack of "s") - looted ones yield 15, basilisk eggs (note the "s") - foraged yields 5</td>
+                <td><b>[[Mixing Bowl]]</b></td>
+                <td><b>varies</b></td>
+                <td>17</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Cookies}}</td>
+                <td>[[Clump of Dough]], [[Spices]], [[Frosting]] <i>(shaped cookie cutter optional) -<b>with shaped cookies, all yield 5</b></i></td>
+                <td>spit/oven</td>
+                <td>5/1*</td>
+                <td>102 normal, 115 for shaped</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Cup Cakes}}</td>
+                <td>[[Clump of Dough]], [[Spices]], [[Frosting]]</td>
+                <td><b>[[Muffin Tin]]</b>, spit/oven</td>
+                <td>3</td>
+                <td>135</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Dwarf Chops}}</td>
+                <td>[[Dwarf Meat]], [[Spices]], [[Garnish]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>36</td>
+                <td>STR +2, STA +2</td>
+              </tr>
+              <tr> 
+                <td>{{:Edible Goo}}</td>
+                <td>[[Rat Ears]], [[Fire Beetle Eye]]</td>
+                <td>spit/oven</td>
+                <td>1</td>
+                <td>21</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Elven Veal}}</td>
+                <td>[[High Elf Parts]], [[Spices]], [[Garnish]]</td>
+                <td>spit/oven</td>
+                <td>2 </td>
+                <td>115</td>
+                <td>DEX +1, WIS +1, INT +1, AGI +1</td>
+              </tr>
+              <tr> 
+                <td> 
+                  <p>Fillets</p>
+                </td>
+                <td> 
+                  <ul>
+
+                    <li>Fish fillet: [[Skill Fishing|Fresh Fish]], [[Jug of Sauces]]</li>
+                    <li>Carp fillet: [[Skill Fishing|Boar carp]], [[Jug of Sauces]]</li>
+                    <li>Chub fillet: [[Skill Fishing|Despair Chub]], [[Jug of Sauces]]</li>
+                    <li>Chub fillet: [[Skill Fishing|Rujarkian chub]], [[Jug of Sauces]]</li>
+                    <li>{{:Shark fillet}}: [[Shark Meat]], [[Jug of Sauces]], [[Spices]]</li>
+                    <li>Pike fillet: [[Skill Fishing|Highland pike]], [[Jug of Sauces]]</li>
+                    <li>Pike fillet: [[Skill Fishing|Hound pike]], [[Jug of Sauces]]</li>
+                    <li>Salmon fillet: [[Skill Fishing|Greengill salmon]], [[Jug of Sauces]]</li>
+                    <li>Salmon fillet: [[Skill Fishing|Thunder salmon]], [[Jug of Sauces]]</li>
+
+                    <li>Trout fillet: [[Skill Fishing|Bloodfin trout]], [[Jug of Sauces]]</li>
+                    <li>Trout fillet: [[Skill Fishing|Cauldron trout]], [[Jug of Sauces]]</li>
+                    <li>Trout fillet: [[Skill Fishing|Fogwater trout]], [[Jug of Sauces]]</li>
+                  </ul>
+                  plain fillet now reported as yield 2</td>
+                <td>spit/oven</td>
+                <td>2/1*</td>
+                <td>82</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Fish Head Soup}}</td>
+                <td>[[Fresh Fish]], [[Jug of Sauces]], [[Flask of Water]]</td>
+                <td><b>pot</b>, spit/oven</td>
+                <td>1</td>
+                <td>68</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Fish Rolls}}</td>
+                <td>[[Fresh Fish]], [[Bat Wing]]</td>
+                <td>spit/oven</td>
+                <td>1</td>
+                <td>135</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Fruit Pie}}</td>
+                <td>[[Clump of Dough]], [[Skill Forage|(foraged) fruit]]</td>
+                <td><b>pie tin</b>, spit/oven</td>
+                <td>3</td>
+                <td>142</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Gator Rolls}}</td>
+                <td>[[Gator Meat]], [[Wasp Wing]]</td>
+                <td>spit/oven</td>
+                <td>1</td>
+                <td>135</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Gator Steaks}}</td>
+                <td>[[Gator Meat]], [[Jug of Sauces]], [[Spices]]</td>
+                <td>spit/oven</td>
+                <td>1</td>
+                <td>41</td>
+                <td>STR +1</td>
+              </tr>
+              <tr> 
+                <td>{{:Gnome Kabobs}}</td>
+                <td>[[Gnome Meat]], [[Jug of Sauces]], [[Spices]]</td>
+                <td><b>[[Skewers]]</b>, spit/oven</td>
+                <td>2</td>
+                <td>56</td>
+                <td>DEX +2, INT +2</td>
+              </tr>
+              <tr> 
+                <td>{{:Hot-N-Spicy Toelings}}</td>
+                <td>[[Halfling Parts]], [[Spices]], [[Garnish]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>56</td>
+                <td>DEX +2, AGI +2</td>
+              </tr>
+              <tr> 
+                <td>{{:Hot Cross Buns}}</td>
+                <td>[[Skill Forage|(foraged) fruit]], [[Clump of Dough]], [[Frosting]]</td>
+                <td>spit/oven, <b>[[Muffin Tin]]</b></td>
+                <td>8</td>
+                <td>142</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Kobold Steaks}}</td>
+                <td>[[Kobold Meat]], [[Jug of Sauces]], [[Spices]]</td>
+                <td>spit/oven</td>
+                <td>1</td>
+                <td>41</td>
+                <td>STR +1, STA +1</td>
+              </tr>
+              <tr> 
+                <td>{{:Lion Steaks}}</td>
+                <td>[[Lion Meat]], [[Jug of Sauces]], [[Spices]]</td>
+                <td>spit/oven</td>
+                <td>1</td>
+                <td>41</td>
+                <td>AGI +1</td>
+              </tr>
+              <tr> 
+                <td>{{:Lizard-on-a-Stick}}</td>
+                <td>[[Lizard Meat]], [[Jug of Sauces]], [[Spices]]</td>
+                <td><b>[[Skewers]]</b>, spit/oven</td>
+                <td>2</td>
+                <td>56</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Mammoth Sandwich}}</td>
+                <td>[[Mammoth Meat]], [[Loaf of Bread]]</td>
+                <td>spit/oven</td>
+                <td>5</td>
+                <td>31</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Mammoth Steaks}}</td>
+                <td>[[Mammoth Meat]], [[Jug of Sauces]], [[Spices]]</td>
+                <td>spit/oven</td>
+                <td>5</td>
+                <td>41</td>
+                <td>STR +2</td>
+              </tr>
+              <tr> 
+                <td>{{:Muskie Marinade}}</td>
+                <td>[[Skill Fishing|Rathe Muskie]], [[Vinegar]], [[Spices]], [[Skill Brewing|Snake Egg Oil]], [[Fish Wine]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>142</td>
+                <td>STR +1, SV DISEASE +2, SV POISON +2</td>
+              </tr>
+              <tr> 
+                <td>{{:Meat-Filled Pie}}</td>
+                <td>[[Clump of Dough]], [[Chunk of Meat]]</td>
+                <td><b>[[Pie Tin]]</b>, spit/oven</td>
+                <td>3</td>
+                <td>142</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Muffin}}</td>
+                <td>[[Clump of Dough]], [[Skill Forage|(foraged) fruit]], [[Muffin Tin]]</td>
+                <td><b>[[Muffin Tin]]</b>, spit/oven</td>
+                <td>6</td>
+                <td>135</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Pickled Bixie}}</td>
+                <td>[[Bixie Parts]], [[Vinegar]], [[Jug of Sauces]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>51</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Pickled Froglok}}</td>
+                <td>[[Froglok Meat]], [[Vinegar]], [[Jug of Sauces]]</td>
+                <td>spit/oven</td>
+                <td>1</td>
+                <td>51</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Pickled Gator}}</td>
+                <td>[[Gator Meat]], [[Vinegar]], [[Jug of Sauces]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>51</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Pickled Lizard}}</td>
+                <td>[[Lizard Meat]], [[Vinegar]], [[Jug of Sauces]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>51</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Pickled Troll}}</td>
+                <td>[[Troll Parts]], [[Vinegar]], [[Jug of Sauces]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>51</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Pixie Powder Cinnesticks}}</td>
+                <td>3x [[Pixie Dust]], 1x [[Cinnamon Sticks]]</td>
+                <td><b>[[Mixing Bowl]]</b></td>
+                <td>6</td>
+                <td>202</td>
+                <td>AGI +2, SV MAGIC +2</td>
+              </tr>
+              <tr> 
+                <td>{{:Pound Cake}}</td>
+                <td>[[Clump of Dough]], [[Berry Pie]], [[Spices]]</td>
+                <td>spit/oven</td>
+                <td>4</td>
+                <td>135</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Rabbit Stew}}</td>
+                <td>[[Rabbit Meat]], [[Flask of Water]]</td>
+                <td><b>[[Pot]],</b> spit/oven</td>
+                <td>1</td>
+                <td>68</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Rat Ear Turnovers}}</td>
+                <td>[[Clump of Dough]], [[Rat Ears]]</td>
+                <td><b>[[Pie Tin]], </b>spit/oven</td>
+                <td>2</td>
+                <td>142</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Rat Ear Sandwich}}</td>
+                <td>[[Rat Ears]], [[Jug of Sauces]], [[Loaf of Bread]]</td>
+                <td>spit/oven</td>
+                <td>1</td>
+                <td>36</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Rat Kabobs}}</td>
+                <td>[[Rat Meat]], [[Jug of Sauces]], [[Spices]]</td>
+                <td>[[Skewers]], spit/oven</td>
+                <td>1</td>
+                <td>26</td>
+                <td>DEX +1, AGI +1</td>
+              </tr>
+              <tr> 
+                <td>{{:Rat Sandwich}}</td>
+                <td>[[Rat Meat]], [[Loaf of Bread]]</td>
+                <td>spit/oven</td>
+                <td>1</td>
+                <td>26</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Scorpion Sandwich}}</td>
+                <td>[[Scorpion Meat]], [[Loaf of Bread]]</td>
+                <td>spit/oven</td>
+                <td>1</td>
+                <td>26</td>
+                <td>SV POISON +1</td>
+              </tr>
+              <tr> 
+                <td>{{:Shark Fillet}}</td>
+                <td>[[Shark Meat]], [[Jug of Sauces]], [[Spices]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>82</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Shark Rolls}}</td>
+                <td>[[Shark Meat]], [[Bat Wing]]</td>
+                <td>spit/oven</td>
+                <td>1 </td>
+                <td>135</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Smoked Shark}}</td>
+                <td>[[Shark Meat]], [[Spices]]</td>
+                <td><b>[[Smoker]], </b>spit/oven</td>
+                <td>2</td>
+                <td>95</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Smoked Wood Elf}}</td>
+                <td>[[Wood Elf Parts]], [[Spices]]</td>
+                <td><b>[[Smoker]],</b> spit/oven</td>
+                <td>2</td>
+                <td>95</td>
+                <td>WIS +2, AGI +2</td>
+              </tr>
+              <tr> 
+                <td>{{:Snake Pickles}}</td>
+                <td>[[Snake Meat]], [[Jug of Sauces]], [[Vinegar]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>51</td>
+                <td>AGI +1, SV POISON +1</td>
+              </tr>
+              <tr> 
+                <td>{{:Snake Steak}}</td>
+                <td>[[Snake Meat]], [[Jug of Sauces]], [[Spices]]</td>
+                <td>spit/oven</td>
+                <td>1</td>
+                <td>41</td>
+                <td>SV POISON +2</td>
+              </tr>
+              <tr> 
+                <td>{{:Vegetable Pie}}</td>
+                <td>[[Clump of Dough]], [[Skill Forage|(foraged) vegetables]]</td>
+                <td><b>[[Pie Tin]]</b>, spit/oven </td>
+                <td>6</td>
+                <td>142</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Vegetable Soup}}</td>
+                <td>[[Skill Forage|(foraged) vegetables]], [[Jug of Sauces]], [[Flask of Water]]</td>
+                <td><b>[[Pot]],</b> spit/oven</td>
+                <td>1</td>
+                <td>68</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Wedding Cake}}</td>
+                <td>[[White Chocolate]], [[Frosting]], [[Clump of Dough]]</td>
+                <td><b>[[Cake Round]]</b>, spit/oven</td>
+                <td>2</td>
+                <td>162</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Wedding Cake Slices}}</td>
+                <td>[[Wedding Cake]]</td>
+                <td>spit/oven</td>
+                <td>10</td>
+                <td>115</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:White Chocolate}}</td>
+                <td>2x [[Frosting]], [[Brownie Parts]], [[Spices]]</td>
+                <td><b>[[Mixing Bowl]]</b></td>
+                <td>1</td>
+                <td>95</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:White Chocolate Cookies}}</td>
+                <td>[[Clump of Dough]], [[Spices]], [[Frosting]], [[White Chocolate]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>148</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:White Chocolate Muffins}}</td>
+                <td>[[Clump of Dough]], [[Skill Forage|(foraged) fruit]], [[White Chocolate]]</td>
+                <td><b>[[Muffin Tin]]</b>,[[Mixing Bowl]] or spit/oven</td>
+                <td>2</td>
+                <td>155</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Winter Chocolate}}</td>
+                <td>2x [[Frosting]], [[Brownie Parts]]</td>
+                <td><b>[[Mixing Bowl]] or spit/oven</b></td>
+                <td>1</td>
+                <td>95</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Wolf Sandwich}}</td>
+                <td>[[Wolf Meat]], [[Loaf of Bread]]</td>
+                <td>spit/oven</td>
+                <td>1</td>
+                <td>31</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Wolf Steaks}}</td>
+                <td>[[Wolf Meat]], [[Jug of Sauces]], [[Spices]]</td>
+                <td>spit/oven</td>
+                <td>1</td>
+                <td>41</td>
+                <td>STA +1</td>
+              </tr>
+              <tr> 
+                <td>{{:Wooly Spider Crunchies}}</td>
+                <td>[[Spider Legs]], [[Frosting]] <i>(no need to chase woolie spiders, any stackable spider legs will do)</i></td>
+                <td>spit/oven</td>
+                <td>1</td>
+                <td>46</td>
+                <td>SV FIRE -1, SV COLD +2</td>
+              </tr>
+
+
+
+                <td colspan="6"> 
+                  <div align="center"><h3>Velious Recipes</h3></div>
+                </td>
+
+
+
+              <tr> 
+                <td>{{:Beer Braised Mammoth}}</td>
+                <td>[[Mammoth Meat]], [[Othmir Algae Ale]], [[Algae Spices]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>68</td>
+                <td>STR +3, INT -1</td>
+              </tr>
+              <tr> 
+                <td>{{:Beer Braised Wolf}}</td>
+                <td>[[Wolf Meat]], [[Othmir Algae Ale]], [[Algae Spices]]</td>
+                <td>spit/oven</td>
+                <td>2 </td>
+                <td>68</td>
+                <td>STA +2, INT -1</td>
+              </tr>
+              <tr> 
+                <td>{{:Blackened Panther}}</td>
+                <td>[[Panther Meat]] (from black panthers in Wakening Lands), [[spices]], [[garnish]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>62</td>
+                <td>STA +1, AGI +2</td>
+              </tr>
+              <tr> 
+                <td>{{:Cobalt Cup Cakes}}</td>
+                <td>[[Clump of Dough]], [[Algae Spices]], [[Plankton Frosting]]</td>
+                <td><b>muffin tin</b>, spit/oven</td>
+                <td>4</td>
+                <td>135</td>
+                <td>SV DISEASE +3, SV POISON +3</td>
+              </tr>
+              <tr> 
+                <td>{{:Dragon Steak}}</td>
+                <td>[[Dragon Meat]], [[Jug of Sauces]], [[Spices]]</td>
+                <td>spit/oven</td>
+                <td>5</td>
+                <td>242</td>
+                <td>STR +4, DEX +4, STA +4, CHA +4, WIS +4, INT +4, AGI +4</td>
+              </tr>
+              <tr> 
+                <td>{{:Frost Giant Steak}}</td>
+                <td> 
+                  <p>[[Frost Giant Meat]], [[Jug of Sauces]], [[Spices]]<br><b>**OR**</b><br>[[Frost Giant Meat]], [[Algae Spices]], [[Jug of Oyster Sauces]]     (yields 5)           </p>
+                </td>
+                <td>spit/oven</td>
+                <td>1/5*</td>
+                <td>142</td>
+                <td>STR +4, STA +1</td>
+              </tr>
+              <tr> 
+                <td>{{:Mammoth Steaks}}</td>
+                <td>[[Mammoth Meat]], [[Algae Spices]], [[Jug of Oyster Sauces]]</td>
+                <td>spit/oven</td>
+                <td>5</td>
+                <td>41</td>
+                <td>STR +2</td>
+              </tr>
+              <tr> 
+                <td>{{:Orange Flavored Cod}}</td>
+                <td>[[Cobalt Cod]], [[Jug of Oyster Sauces]], [[Kelp Garnish]], [[Emerald Orange]] ([[Skill Forage|foraged]])</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>102</td>
+                <td>SV DISEASE +2, SV POISON +1</td>
+              </tr>
+              <tr> 
+                <td>[[Pickled Dragon]]</td>
+                <td>[[Dragon Meat]], [[Jug of Oyster Sauces]], [[Seaweed Vinegar]]
+                </td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>115</td>
+                <td>STR +3, DEX +3, STA +3, CHA +3, WIS +3, INT +3, AGI +3</td>
+              </tr>
+              <tr> 
+                <td>{{:Pickled Drake}}</td>
+                <td>[[Drake Meat]], [[Jug of Oyster Sauces]], [[Seaweed Vinegar]] 
+                </td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>75</td>
+                <td>WIS +2, INT +2</td>
+              </tr>
+              <tr> 
+                <td>{{:Pickled Faun}}</td>
+                <td>[[Faun Meat]], [[Jug of Oyster Sauces]], [[Seaweed Vinegar]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>95</td>
+                <td>STA +3, CHA +1, INT +2</td>
+              </tr>
+              <tr> 
+                <td>{{:Pickled Frost Giant}}</td>
+                <td>[[Frost Giant Meat]], [[Jug of Oyster Sauces]], [[Seaweed Vinegar]]   </td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>88</td>
+                <td>STR +3, STA +3</td>
+              </tr>
+              <tr> 
+                <td>{{:Siren Pickles}}</td>
+                <td>[[Siren Parts]], [[Jug of Oyster Sauces]], [[Seaweed Vinegar]]</td>
+                <td>spit/oven</td>
+                <td>2 </td>
+                <td>75</td>
+                <td>CHA +4</td>
+              </tr>
+              <tr> 
+                <td>{{:Pickled Storm Giant}}</td>
+                <td>[[Storm Giant Meat]], [[Jug of Oyster Sauces]], [[Seaweed Vinegar]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>88</td>
+                <td>STR +3, STA +3</td>
+              </tr>
+              <tr> 
+                <td>{{:Pickled Unicorn}}</td>
+                <td>[[Unicorn Meat]], [[Jug of Oyster Sauces]], [[Seaweed Vinegar]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>108</td>
+                <td>CHA +2, WIS +2, SV MAGIC +2</td>
+              </tr>
+              <tr> 
+                <td>{{:Pickled Wurm}}</td>
+                <td>[[Wurm Meat]], [[Jug of Oyster Sauces]], [[Seaweed Vinegar]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>75</td>
+                <td>STR +1, DEX +1, STA +1, CHA +1, WIS +1, INT +1, AGI +1</td>
+              </tr>
+              <tr> 
+                <td>{{:Pickled Wyvern}}</td>
+                <td>[[Wyvern Meat]], [[Jug of Oyster Sauces]], [[Seaweed Vinegar]] 
+                </td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>75</td>
+                <td>SV MAGIC +3</td>
+              </tr>
+              <tr> 
+                <td>{{:Raptor Steaks}}</td>
+                <td>[[Raptor Meat]], [[Jug of Sauces]], [[Spices]]</td>
+                <td>spit/oven</td>
+                <td>1</td>
+                <td>41</td>
+                <td>STR +2, STA +1</td>
+              </tr>
+              <tr> 
+                <td>{{:Rolled Cutlassfish}}</td>
+                <td>[[Skill Fishing|Iceclad cutlassfish]],[[Bat Wing]]</td>
+                <td>spit/oven</td>
+                <td>1</td>
+                <td>142</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Salty Whitefish Fillets}} </td>
+                <td>[[Skill Fishing|Salty whitefish]], [[Jug of Oyster Sauces]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>88</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Sea Green Cookies}}</td>
+                <td>[[Algae Spices]], [[Plankton Frosting]], [[Clump of Dough]]</td>
+                <td>spit/oven</td>
+                <td>1</td>
+                <td>102</td>
+                <td>SV DISEASE +2, SV POISON +2</td>
+              </tr>
+              <tr> 
+                <td>{{:Shark Fillet}}</td>
+                <td>[[Shark Meat]], [[Algae Spices]], [[Jug of Oyster Sauces]]</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>82</td>
+                <td >&nbsp;</td>
+              </tr>
+              <tr> 
+                <td>{{:Shellcracker's Seaside Salad}}</td>
+                <td>[[Arctic King Crab]], [[Arctic Mussels]], [[Arctic Scallop]], [[Cobalt Abalone]], [[Cobalt Rock Crab]], [[Small Clam]], [[Snapper Oil]], [[Vegetables]]</td>
+                <td>oven</td>
+                <td>6</td>
+                <td>180</td>
+                <td>DEX +5, CHA +5, SV COLD +5</td>
+              </tr>
+              <tr> 
+                <td>{{:Sifaye Pickles}}</td>
+                <td>[[Sifaye Parts]], oyster sauces, seaweed vinegar</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>75</td>
+                <td>DEX +2, WIS +1, SV MAGIC +2</td>
+              </tr>
+              <tr> 
+                <td>{{:Storm Giant Steaks}}</td>
+                <td> 
+                  <p align="left">Storm giant meat, spices, jug of sauces<br><b>**OR**</b>
+                  <br>Storm giant meat, algae spices, oyster sauces (*yields 5)</p>
+                </td>
+                <td>spit/oven</td>
+                <td>1/5*</td>
+                <td>142</td>
+                <td>STR +4, STA +1</td>
+              </tr>
+              <tr> 
+                <td>{{:Vegetable Roughy}}</td>
+                <td> [[Skill Fishing|red roughy]], vegetables ([[Skill Forage|foraged]]), jug of oyster sauces, kelp garnish</td>
+                <td>spit/oven</td>
+                <td>2</td>
+                <td>115</td>
+                <td>SV DISEASE +2, SV POISON +2</td>
+              </tr>
+              <tr> 
+                <td>{{:Yakman Steak}}</td>
+                <td>[[Yakman Parts]] (from tizmaks), jug of sauce, spices <br><b>**OR**</b><br>[[Yakman Parts]], jug of oyster sauce, algae spices (*yields 5)</td>
+                <td>spit/oven</td>
+                <td>1/5*</td>
+                <td>75</td>
+                <td>STR +2, STA +1</td>
+              </tr>
+
+
+              <tr> 
+                <td colspan="6"> 
+                  <div align="center"><h3>Quest Recipes</h3></div>
+                </td>
+              </tr>
+
+
+              <tr> 
+                <td>[[Uncooked Rat Ear Pie]]</td>
+                <td>giant rat ear or 2 regular rat ears, flour (from S Qeynos merchant), baking spirits (found in S Qeynos) 
+                  <i>(for the [[Paw of Opolla Quest]] -- must then be baked in a spit or oven)</i></td>
+                <td>[[Mixing Bowl]] /oven</td>
+                <td>1</td>
+                <td>28 for unfinished, 142 to bake it</td>
+                <td></td>
+              </tr>
+              <tr> 
+                <td>[[HEHE Meat]]</td>
+                <td>human (&quot;chunk of&quot;?) meat, erudite meat, high elf meat, flaming Pungla <i>(for [[HEHE Meat Quest|Grobb Cleaver quest]], no trivial info available)</i></td>
+                <td>spit/oven </td>
+                <td>1</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+              <tr> 
+                <td>[[Spine Poison Extract]]</td>
+                <td>gray ice (ground spawn in Frontier Mts), 2 pondfish spines (off pond sturgeon in Lake of Ill Omen) <i>(for [[Trooper Scale Armor|iksar warrior quest]]) (is this a poison or baking combine?)</i></td>
+                <td>[[Pot]], spit/oven</td>
+                <td>1</td>
+                <td>21</td>
+                <td></td>
+              </tr>
+
+              <tr> 
+                <td colspan="6"> 
+                  <div align="center"><h3>[[Coldain Prayer Shawl Quests|Thurgadin Prayer Shawl]] Baking Quests</h3></div>
+                </td>
+              </tr>
+
+<tr>
+<td>[[Saucy Bearmeat]]</td>
+<td>[[Tundra Kodiak Meat]], [[Jug of Sauces]]</td>
+<td>Spit/Oven</td>
+<td>1</td>
+<td>26</td>
+<td>-</td>
+</tr>
+
+<tr>
+<td>[[Tundrabear Sandwich]]</td>
+<td>[[Saucy Bearmeat]], [[Loaf of Bread]]</td>
+<td>Mixing Bowl</td>
+<td>1</td>
+<td>51</td>
+<td>-</td>
+</tr>
+
+<tr>
+<td>[[Saucy Bunnymeat]]</td>
+<td>2x [[Snow Bunny Meat]], [[Jug of Sauces]]</td>
+<td>Mixing Bowl</td>
+<td>1</td>
+<td>63</td>
+<td>-</td>
+</tr>
+
+<tr>
+<td>[[Snow Bunny Stew]]</td>
+<td>[[Saucy Bunnymeat]], [[Spices]], 2x [[Water Flask]]</td>
+<td>[[Pot]], Spit/Oven</td>
+<td>1</td>
+<td>68</td>
+<td>-</td>
+</tr>
+
+<tr>
+<td>[[Spicy Ulthork Meat]]</td>
+<td>2x [[Ulthork Meat]], [[Vinegar]], [[Spices]]</td>
+<td>Mixing Bowl</td>
+<td>1</td>
+<td>82</td>
+<td>-</td>
+</tr>
+
+<tr>
+<td>[[Ulthork Meat Pie]]</td>
+<td>[[Spicy Ulthork Meat]], [[Clump of Dough]]</td>
+<td>[[Pie Tin]], Oven</td>
+<td>1</td>
+<td>95</td>
+<td>-</td>
+</tr>
+
+<tr> 
+<td>[[Snow Griffin Souffle]]</td>
+<td>4x [[Snow Griffin Egg]], [[Spices]]</td>
+<td>Spit/Oven</td>
+<td>1</td>
+<td>122</td>
+<td></td>
+</tr>
+</table>
+
+== Baking Leveling Guide (Detailed) ==
+
+[[File:BakingDuxa.png|right|frame|An oven in Freeport]]
+[[File:Npc katha firespinner.png|alt=Katha Firespinner|thumb|380x380px|Batwing Merchant in EC]]
+You need about 10pp and an hour of your time to get to skill 135 (assuming you sell back what you make). Skill ups after that become more time consuming and costly. Evil races, including Iksars, can take advantage of the [[Rohand's Brandy]] quest in Qeynos in order to raise faction with Freeport merchants.
+NB : get your Int or Wis to a decent level, for this not being a hell to upgrade. you can go from 1 hour only to 4 hour clicking to get it upgraded if you have like no more than 60 int.
+
+''Ingredients for 1-135:''
+* [[Bat Wing]]
+* [[Frosting]]
+* [[Fresh Fish]]
+* [[Jug of Sauces]]
+
+
+Note on "stacks": When reading below you will be instructed to buy stacks of items. Keep in mind this guide was written when the maximum stack of an item was 20. On EQL most trade skill items can stack to 1000. So when the guide says "buy 10 stacks of <item>" what they mean is buy 200 of that item.
+
+Note on skills on EQL: Skills on EQL occur much more often than other versions of Everquest. Keep that in mind when collecting/buying items. You will likely need far less that this guide suggests!
+=== Step 1: [[Batwing Crunchies]] ===
+
+If '''Good:'''
+
+* Go to [[West Freeport]]
+* [[Lysa Truegreen]] (2nd floor of caster guild): buy 10 stacks of [[Bat Wing]]s (Make sure you read the note just above about stacks!)
+* [[Pincia Brownloe]] (Building across from monk guild): buy 10 stacks of [[frosting]]
+
+'''''Note:''' [[Pincia Brownloe]] appears to be willing to sell to anyone. (Every character I've tried so far anyway, including an iksar necromancer.)
+''
+
+If '''Evil:'''
+
+* Go to [[East Commonlands]]
+* [[Katha Firespinner]] (Inn near WC zoneline - She doesn't sell to Trolls.): buy 10 stacks of [[Bat Wing]]s - 3/2022 Would not sell to Rallos Zek Ogre Shaman with dubious faction.
+* Go to [[Neriak|Neriak Commons]]
+* [[Niz L`Crit]] (refined palate, next to bank): buy 10 stacks of [[frosting]] - 3/2022 Beware of [[Razran F`Lok]]. He paths at the Neriak Down Under entrance to bank area.
+
+If '''Iksar:'''
+
+* Go to [[Field of Bone]]
+* [[Klok Acet]] (near entrance to Cabilis): buy 10 stacks of [[Bat Wing]]s
+* Go to [[East Cabilis]]
+* [[Klok Sweetzie]] (near bank): buy 10 stacks of [[Frosting]]
+
+THEN:
+
+* Go to your favorite oven (or use a [[spit]] if you want to lug one around)
+* Make [[Batwing Crunchies]] till skill '''46''': 1 [[Bat Wing]], 1 [[Frosting]].
+* Sell leftover [[Frosting]] and [[Batwing Crunchies]].
+* '''KEEP extra [[Bat Wing]]s'''
+
+=== Step 2: [[Fish Fillets]] ===
+
+If '''Good:'''
+
+* Go to [[East Freeport]]
+* [[Tanlok Harson]] (port authority at dock, second floor): buy 10 stacks of [[Fresh Fish]]
+* [[Sun Alemaker]] (Trader's Holiday - the oven is right behind her) : buy 10 stacks of [[Jug of Sauces]]
+
+If '''Evil:'''
+
+* Go to [[Neriak|Neriak Commons]]
+* [[Niz L'Crit]] (refined palate, next to bank): buy 10 stacks of [[Jug of Sauces]]
+* [[Mariz Ixtaz]] (near Toadstool): buy 30 stacks of [[Fresh Fish]]
+
+If '''Iksar'''
+
+* Go to [[Cabilis|East Cabilis]]
+* [[Klok Sweetzie]] (near bank): buy 10 stacks of [[Jug of Sauces]]
+* Check all vendors, and try to buy as much [[Fresh Fish]] as you can find.
+* Then grab a pole and hit the fishing button till you have 30 stacks. (I told you to go to Freeport)
+
+'''''Note:''' Iksar necromancers level 34+ with [[Call of Bones]] (skeleton illusion) can buy [[Fresh Fish]] from the merchants inside the Port Authority
+''
+
+THEN:
+
+* Go to your favorite oven (or use a spit if you want to lug one around)
+* Make [[Fish Fillets]] till skill '''82''': 1 [[Fresh Fish]], 1 [[Jug of Sauces]]
+* Sell extra [[Jug of Sauces|Jugs of Sauces]] and [[Fish Fillets]].
+* '''KEEP extra [[Fresh Fish]]'''
+
+=== Step 3: [[Fish Rolls]] ===
+
+If '''Good:'''
+
+* Go to [[West Freeport]]
+* [[Lysa Truegreen]] (2nd floor of caster guild): buy 20 stacks of [[Bat Wing]]s 
+* Go to [[East Freeport]]
+* [[Tanlok Harson]] (port authority at dock): buy 20 stacks of [[Fresh Fish]] (including leftovers from step 2)
+
+If '''Evil:'''
+
+* Go to [[East Commonlands]]
+* [[Katha Firespinner]] (Inn near [[West Commonlands]] zoneline): buy 20 stacks of [[Bat Wing]]s (including leftovers from step 1)
+* Go to [[Neriak|Neriak Commons]]
+* [[Mariz Ixtaz]] (near Toadstool): buy 20 stacks of [[Fresh Fish]] (including leftovers from step 2)
+
+If '''Iksar:'''
+
+* Go to [[Field of Bone]]
+* [[Klok Acet]] (near entrance to [[Cabilis|East Cabilis]]): buy 20 stacks of [[Bat Wing]]s (including leftovers from step 1)
+* Check all vendors, and try to buy as much [[Fresh Fish]] as you can find.
+* Then grab a pole and hit the fishing button till you have 20 stacks of [[Fresh Fish]] (including leftovers from step 2). (I told you to go to Freeport)
+
+THEN:
+
+* Go to your favorite [[oven]] (or use a [[spit]] if you want to lug one around)
+* Make [[Fish Rolls]] till skill '''135''': 1 [[Bat Wing]], 1 [[Fresh Fish]]
+* Sell all leftover [[Fresh Fish]]
+* '''KEEP extra [[Bat Wing]]s'''
+* Use [[Fish Rolls]] (these are very popular items, especially among monks)
+
+=== Step 4: [[Batwing Pie]] ===
+
+This is where it starts to become more expensive and time consuming. ''Note: On p1999 you can/may need to use Snake Eggs to make clumps of dough until 142.''
+
+'''Good/Evil''': 
+
+''(It should be noted that [[Clump of Dough|Clumps of Dough]] can be created from different kinds of eggs, which yield different quantities of dough. Basilisk eggs (farmed in [[Lavastorm Mountains]]) have a great drop rate and provide 15 [[Clump of Dough|Clumps of Dough]] per successful combine.)''
+* Go to [[Lavastorm Mountains]]
+* Kill [[A Lava Basilisk|Lava Basilisk]]s till you get 15 [[Basilisk Egg]]s
+* Acquire a [[Pie Tin]] (see smithing or pottery recipes for more info. Personally, I recommend pottery. It is far easier and cheaper).
+
+If '''Good:'''
+* Go to [[West Freeport]]
+* [[Pincia Brownloe]] (unlabeled building next to monk's guild, W Freeport): buy a [[Mixing Bowl]], 15 [[Bottle of Milk|Bottles of Milk]], 15 [[Cup of Flour|Cups of Flour]], and 10 stacks of [[Spices]].
+* [[Lysa Truegreen]] (2nd level of caster building): buy 10 stacks of [[Bat Wing]]s (including leftovers from step 3)
+* Remember these 2 merchants, if/when you run out of stacks just return and stock again.
+
+If '''Evil:'''
+
+* Go to Neriak Foreign Quarter
+* [[Sal Drana]] (human side): buy a [[Mixing Bowl]]
+* Go to [[Neriak|Neriak Commons]]
+* [[Niz L`Crit]] (refined palate, next to bank): buy 15 [[Bottle of Milk|Bottles of Milk]], 15 [[Cup of Flour|Cups of Flour]], and 10 stacks of [[Spices]]
+* Go to [[East Commonlands]]
+* [[Katha Firespinner]] (inn 3): buy 10 stacks of [[Bat Wing]]s (including leftovers from step 3)
+
+If '''Iksar:'''
+
+''It is much easier if you go to [[Freeport]], but if you insist on staying in [[Kunark]]...''
+* Go to [[The Overthere]]
+* Hunt [[A stonegazer cockatrice|Stonegazer Cockatrice]] or [[Forage]] till you get 45 [[Cockatrice Egg]]s 
+
+''3 times as many eggs are needed as the '''Good/Evil''' routes because [[Cockatrice Egg]]s only yield 5 [[Clump of Dough|Clumps of Dough]] per successful combine, whereas [[Basilisk Egg]]s yield 15''
+* Go to [[Field of Bone]]
+* [[Klok Acet]] (near entrance to [[Cabilis|East Cabilis]]): buy 10 stacks of [[Bat Wing]]s (including leftovers from step 3)
+* Go to [[Cabilis|East Cabilis]]
+* [[Klok Sweetzie]] (near bank): buy 45 [[Bottle of Milk|Bottles of Milk]], 45 [[Cup of Flour|Cups of Flour]], and 10 stacks of [[Spices]]
+
+THEN:
+
+* Make [[Clump of Dough|Clumps of Dough]] in [[Mixing Bowl]]. They are long since trivial for you: 1 [[Basilisk Egg]], 1 [[Cup of Flour]], 1 [[Bottle of Milk]] (yields 15 [[Clump of Dough|Clumps of Dough]])
+* Make [[Batwing Pie]] (in [[Oven]]) until skill '''142''': 1 [[Bat Wing]], 1 [[Clump of Dough]], 1 [[Spices]], 1 [[Pie Tin]] (you get the tin back).
+* All this can be done in [[West Freeport]]. An [[Oven]] is located in an unnamed building behind the monk guild, over the bridge.
+* Sell extra [[Bat Wing]]s and [[Batwing Pie]]s.
+* '''KEEP extra [[Clump of Dough|Clumps of Dough]]'''.
+
+=== Step 5: Cakes ===
+
+All people:
+
+* Go to Greater or Lesser Faydark
+* Hunt Brownies for their parts.
+* Make White Chocolate: 2 frosting, 1 spices, 1 brownie parts (in a mixing bowl)
+* And/or Make Winter Chocolate: 2 frosting, 1 brownie parts (in a mixing bowl)
+
+THEN:
+
+* Make Wedding  cakes till '''162''': 1 White Chocolate, 1 Frosting, 1 Clump of Dough  
+* OR -- Make Birthday cakes till '''162''': 1 Winter Chocolate, 1 Frosting, 1 Clump of Dough
+* Both require a Cake Round (Smithing or Pottery) which you get back after combine
+
+=== Step 6: Pixie Powdered Cinnesticks ===
+
+All people:
+
+* Go to Greater or Lesser Faydark
+* Buy or Forage [[Cinnamon Sticks]]
+* Hunt Pixies for Pixie dust
+* Make Pixie Powder Cinnesticks till trivial '''(>200)''': 3 Pixie Dust, 1 Cinnamon Stick (in a mixing bowl)
+
+'''NOTE: [[A pixie jongleur]] gives you negative faction hits to: Guards of Qeynos (-30), Jaggedpine Treefolk (-30), Protectors of Pine (-30). QRG Protected Animals (-30).  Kill with a character that doesn't care about those faction hits or find a way to kill these pixies without getting a faction hit if this is a concern with you.  You will have to kill hundreds, maybe thousands to get enough pixie dusts to get to 202 skill! '''
+
+=== Step 7: Dragon Steaks ===
+
+All people:
+
+* Get Dragon meat however you can (it is a rare drop off Velious dragons), and make Dragon Steaks till trivial.
+
+Then come back and tell us what the trivial is: 1 Dragon Meat, 1 Jug of Sauces, 1 Spices.
+
+== See also ==
+
+* [[Oven|Oven Locations]]
+
+{{Navbox Tradeskill}}
+
+[[Category:Skills]]
+[[Category:Tradeskills]]

@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-02T05:55:54.313Z",
+  "scrapedAt": "2026-11-04T03:51:41.628Z",
   "source": "eqlwiki.com — Category:NPCs/Named Mobs/Merchants/Raid Encounters ∪ embeddedin Template:Namedmobpage/MerchantPage, filtered to pages opening a mob template + recentchanges delta (scripts/scrape-delta.mts)",
   "mobs": [
     {
@@ -119815,11 +119815,11 @@
         "Rogues of the White Rose"
       ],
       "factionAmounts": [
-        "-30",
-        "-30",
-        "-30",
-        "-100",
-        "1"
+        "-50",
+        "-40",
+        "-10",
+        "-200",
+        "-40"
       ],
       "image": "npc_frostbite.png"
     },
@@ -126937,6 +126937,7 @@
         "Nagafen's Lair"
       ],
       "drops": [
+        "Box of Abu-Kar",
         "Bronze Helm",
         "Bronze Mask",
         "Bronze Collar",
@@ -126982,9 +126983,6 @@
         "Jade Earring",
         "Pearl"
       ],
-      "otherNames": [
-        "A Greater Kobold"
-      ],
       "factions": [
         "Kobolds of Fire Pit",
         "Solusek Mining Co"
@@ -126993,7 +126991,10 @@
         "-3",
         "5"
       ],
-      "image": "npc_greater_kobold.png"
+      "image": "npc_greater_kobold.png",
+      "otherNames": [
+        "A Greater Kobold"
+      ]
     },
     {
       "page": "Greater kobold shaman",

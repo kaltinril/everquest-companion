@@ -1,0 +1,707 @@
+As an alternative to full raid gearing, characters often carry a set of "resist gear" tuned to specific encounters. Again this isn't from any comprehensive list I found for classic, just things as I see them. Feel free to add things. (See also : [[Negative Resist Gear]])
+
+== Buyable Starter Pack ==
+
+{| class="eoTable2 sortable"
+! Item                                || Slot     || MR || FR || CR || PR || DR
+|-
+| {{:Earring of Essence}}
+| [[:Category:Ear|Ear]]   || 10 || - || - || - || -
+|-
+| {{:Blue Diamond Electrum Earring}}  
+| [[:Category:Ear|Ear]]         || 4  || 6  || 6  || 11 || 11
+|-
+| {{:Platinum Blue Diamond Tiara}}    
+| [[:Category:Head|Head]]       || 8  || 8  || 8  || 8  || 8
+|-
+| {{:Golden Diamond Mask}}            
+| [[:Category:Face|Face]]       || 3  || 10 || 10 || 5  || 5
+|-
+| {{:Golden Blue Diamond Pendant}}    
+| [[:Category:Neck|Neck]]       || 4  || 11 || 11 || 6  || 6
+|-
+| {{:Velium Blue Diamond Bracelet}}  
+| [[:Category:Wrist|Wrist]]           || 9  || 9  || 11  || 9 || 9 
+|-
+| {{:Velium Blue Diamond Bracelet}}  
+| [[:Category:Wrist|Wrist]]           || 9  || 9  || 11  || 9 || 9 
+|-
+| {{:Velium Diamond Wedding Ring}}  
+| [[:Category:Fingers|Fingers]]         || 8  || 8  || 8  || 8 || 8
+|-
+| {{:Velium Diamond Wedding Ring}}  
+| [[:Category:Fingers|Fingers]]         || 8  || 8  || 8  || 8 || 8
+|-
+| <b>Total</b> || <b>-</b> || <b>63</b> || <b>69</b> || <b>69</b> || <b>64</b> || <b>64</b>
+|-
+|}
+
+== Jewelcrafted - (All/All) ==
+
+Seek out your local [[Enchanter]] after acquiring the necessary gem. BDs currently only drop off of level 50+ mobs in the planes and [[Allizewsaur]] in the Ocean of Tears, as well as the scarabs in Sebilis. (Update: In Velious, Blue Diamonds drop off of many mobs including some that are 45+)
+
+{| class="eoTable2 sortable"
+! Item                                || Slot     || MR || FR || CR || PR || DR
+|-
+| {{:Blue Diamond Electrum Earring}}  
+| [[:Category:Ear|Ear]]         || 4  || 6  || 6  || 11 || 11
+|-
+| {{:Diamond Electrum Mask}}          
+| [[:Category:Face|Face]]       || 3  || 5  || 5  || 10 || 10
+|-
+| {{:Golden Diamond Mask}}            
+| [[:Category:Face|Face]]       || 3  || 10 || 10 || 5  || 5
+|-
+| {{:Electrum Hematite Choker}}    
+| [[:Category:Neck|Neck]]       || .  || 4 || . || .  || .
+|-
+| {{:Electrum Malachite Bracelet}}    
+| [[:Category:Wrist|Wrist]]       || .  || . || . || 3  || .
+|-
+| {{:Electrum Pearl Choker}}    
+| [[:Category:Neck|Neck]]       || .  || . || . || 6  || .
+|-
+| {{:Electrum Peridot Bracelet}}    
+| [[:Category:Wrist|Wrist]]       || .  || . || 4 || .  || .
+|-
+| {{:Electrum Turquoise Engagement Ring}}    
+| [[:Category:Fingers|Fingers]]       || .  || . || 3 || .  || .
+|-
+| {{:Gold Malachite Bracelet}}    
+| [[:Category:Wrist|Wrist]]       || .  || . || . || 5  || .
+|-
+| {{:Gold Turquoise Engagement Ring}}    
+| [[:Category:Fingers|Fingers]]       || .  || . || 5 || .  || .
+|-
+| {{:Golden Blue Diamond Pendant}}    
+| [[:Category:Neck|Neck]]       || 4  || 11 || 11 || 6  || 6
+|-
+| {{:Golden Emerald Bracelet}}    
+| [[:Category:Wrist|Wrist]]       || .  || 6 || . || .  || .
+|-
+| {{:Golden Jacinth Wedding Ring}}    
+| [[:Category:Fingers|Fingers]]       || 7  || . || . || .  || .
+|-
+| {{:Golden Peridot Bracelet}}    
+| [[:Category:Wrist|Wrist]]       || .  || . || 6 || .  || .
+|-
+| {{:Golden Pearl Choker}}    
+| [[:Category:Neck|Neck]]       || .  || . || . || 9 || .
+|-
+| {{:Platinum Blue Diamond Tiara}}    
+| [[:Category:Head|Head]]       || 8  || 8  || 8  || 8  || 8
+|-
+| {{:Platinum Diamond Wedding Ring}}  
+| [[:Category:Fingers|Fingers]] || 7  || 7  || 7  || 7  || 7
+|-
+| {{:Platinum Emerald Ring}}  
+| [[:Category:Fingers|Fingers]] || . || 10  || .  || .  || .
+|-
+| {{:Platinum Hematite Ring}}  
+| [[:Category:Fingers|Fingers]] || . || 7  || .  || .  || .
+|-
+| {{:Platinum Jacinth Wedding Ring}}  
+| [[:Category:Fingers|Fingers]] || 13 || .  || .  || .  || .
+|-
+| {{:Platinum Lapis Lazuli Necklace}}    
+| [[:Category:Neck|Neck]]       || .  || . || . || .  || 7
+|-
+| {{:Platinum Malachite Ring}}  
+| [[:Category:Fingers|Fingers]] || . || .  || .  || 7  || .
+|-
+| {{:Platinum Pearl Ring}}  
+| [[:Category:Fingers|Fingers]] || . || .  || .  || 10 || .
+|-
+| {{:Platinum Peridot Ring}}  
+| [[:Category:Fingers|Fingers]] || . || .  || 10  || . || .
+|-
+| {{:Platinum Turquoise Bracelet}}  
+| [[:Category:Wrist|Wrist]] || . || .  || 7  || .  || .
+|-
+| {{:Silver Diamond Wedding Ring}}  
+| [[:Category:Fingers|Fingers]] || 3 || 3  || 3  || 3 || 3
+|-
+| {{:Silver Emerald Ring}}  
+| [[:Category:Fingers|Fingers]]         || .  || 5  || .  || . || .
+|-
+| {{:Silver Hematite Ring}}  
+| [[:Category:Fingers|Fingers]]         || .  || 2  || .  || . || .
+|-
+| {{:Silver Malachite Ring}}  
+| [[:Category:Fingers|Fingers]]         || .  || .  || .  || 2 || .
+|-
+| {{:Silver Turquoise Bracelet}}  
+| [[:Category:Wrist|Wrist]]         || .  || .  || 2  || . || .
+|-
+| {{:Silvered Pearl Ring}}  
+| [[:Category:Fingers|Fingers]]         || .  || .  || .  || 4 || .
+|-
+| {{:Silvered Peridot Ring}}  
+| [[:Category:Fingers|Fingers]]         || .  || .  || 5  || . || .
+|-
+| {{:Velium Blue Diamond Bracelet}}  
+| [[:Category:Wrist|Wrist]]           || 9  || 9  || 11  || 9 || 9 
+|-
+| {{:Velium Diamond Wedding Ring}}  
+| [[:Category:Fingers|Fingers]]         || 8  || 8  || 8  || 8 || 8
+|-
+| {{:Velium Jacinth Wedding Ring}}  
+| [[:Category:Fingers|Fingers]]         || 14  || .  || .  || . || .
+|-
+| {{:Wolf's Eye Electrum Bracelet}}    
+| [[:Category:Wrist|Wrist]]       || 4  || . || . || .  || .
+|-
+| {{:Wolf's Eye Golden Bracelet}}    
+| [[:Category:Wrist|Wrist]]       || 7  || . || . || .  || .
+|-
+| {{:Wolf's Eye Platinum Necklace}}    
+| [[:Category:Neck|Neck]]       || 9  || . || . || .  || .
+|-
+| {{:Velium Wolf's Eye Necklace}}    
+| [[:Category:Neck|Neck]]       || 10  || . || . || .  || .
+|}
+
+== Class specific (Melee) ==
+
+{| class="eoTable2 sortable"
+! Item                                || Slot || Class  || Where     || MR || FR || CR || PR || DR
+|-
+| {{:Atramentous Shield}}
+| [[:Category:Secondary|Sec]]           || SHD || [[Lord Rak`Ashiir]]        || 10  || 5  || 5  || .  || .
+|-
+| {{:Belt of Concordance}}
+| [[:Category:Waist|Waist]]         || BRD || [[Plane of Sky]]            || . || . || . || 5  || .
+|-
+| {{:Belt of Contention}}
+| [[:Category:Waist|Waist]]         || War || [[Plane of Sky]]            || . || 5 || . || .  || .
+|-
+| {{:Belt of Iniquity}}
+| [[:Category:Waist|Waist]]         || SHD || [[Plane of Sky]]            || 5 || . || . || .  || .
+|-
+| {{:Belt of the Pine}}
+| [[:Category:Waist|Waist]]         || RNG || [[Plane of Sky]]            || . || . || . || .  || 5
+|-
+| {{:Belt of Transience}}
+| [[:Category:Waist|Waist]]         || Rog || [[Plane of Sky]]            || . || . || . || 10  || .
+|-
+| {{:Belt of Tranquility}}
+| [[:Category:Waist|Waist]]         || MNK || [[Plane of Sky]]            || . || . || 5 || .  || .
+|-
+| {{:Belt of Virtue}}
+| [[:Category:Waist|Waist]]         || Pal || [[Plane of Sky]]            || 5 || . || . || .  || .
+|-
+| {{:Blade of Strategy}}            
+| [[:Category:Primary|Pri]]/[[:Category:Secondary|Sec]]  || War || [[Warrior Epic Quest]]     || 5 || 5 || 5 || 5 || 5
+|-
+| {{:Blade of Tactics}}            
+| [[:Category:Primary|Pri]]/[[:Category:Secondary|Sec]]  || War || [[Warrior Epic Quest]]     || 5 || 5 || 5 || 5 || 5
+|-
+| {{:Crafted Vambraces}}
+| [[:Category:Arms|Arms]]         || War || [[Crafted Armor Quests]]            || . || . || . || 2  || 2
+|-
+| {{:Enchanted Dwarven Plate Greaves}}
+| [[:Category:Legs|Legs]]         || War SHD Pal BRD CLR || [[Cultural Tradeskills: Dwarf]]            || 2 || 4 || . || .  || .
+|-
+| {{:Enchanted Elven Chainmail Sleeves}}
+| [[:Category:Arms|Arms]]         || Excpt SHD MNK SHM NEC || [[Cultural Tradeskills: High Elf]]            || 4 || . || . || .  || .
+|-
+| {{:Enchanted Seafarers Harpoon}}            
+| [[:Category:Primary|Pri]] || War RNG SHD BRD Rog SHM || [[Blacksmithing]]     || . || . || 3 || . || .
+|-
+| {{:Gnoll Slayer (final)}}
+| [[:Category:Primary|Pri]]/[[:Category:Secondary|Sec]]         || WAR PAL RNG SHD BRD ROG|| [[The Gnoll Slayer]]            || . || . || . || .  || 25
+|-
+| {{:Helm of the Tracker}}
+| [[:Category:Head|Head]]         || RNG || [[Helm of the Tracker Quest]]            || . || 15 || 15 || .  || .
+|-
+| {{:Ivy Etched Bracer}}
+| [[:Category:Wrist|Wrist]]         || RNG || [[Ivy Etched Armor Quests]]            || . || . || . || 3  || .
+|-
+| {{:Ivy Etched Gauntlets}}
+| [[:Category:Hands|Hands]]         || RNG || [[Ivy Etched Armor Quests]]            || . || 7 || 7 || .  || .
+|-
+| {{:Ivy Etched Helm}}
+| [[:Category:Head|Head]]         || RNG || [[Ivy Etched Armor Quests]]            || . || . || . || .  || 5
+|-
+| {{:Ivy Etched Leggings}}
+| [[:Category:Legs|Legs]]         || RNG || [[Ivy Etched Armor Quests]]            || . || 5 || 5 || .  || .
+|-
+| {{:Lambent Boots}}
+| [[:Category:Feet|Feet]]         || BRD || [[Lambent Armor Quests]]            || 2 || 2 || 2 || 2  || 2
+|-
+| {{:Lambent Vambraces}}
+| [[:Category:Arms|Arms]]         || BRD || [[Lambent Armor Quests]]            || 2 || 2 || 2 || 2  || 2
+|-
+| {{:Ravenscale Armguards}}
+| [[:Category:Arms|Arms]]         || Rog || [[Cazic Thule]]            || . || 5 || . || .  || .
+|-
+| {{:Ravenscale Boots}}
+| [[:Category:Feet|Feet]]         || Rog || [[Cazic Thule]]            || . || . || . || 2  || 2
+|-
+| {{:Ravenscale Bracer}}
+| [[:Category:Wrist|Wrist]]         || Rog || [[Cazic Thule]]            || . || . || . || .  || 3
+|-
+| {{:Ravenscale Chestguard}}
+| [[:Category:Chest|Chest]]         || Rog || [[Cazic Thule]]            || . || . || . || 5  || 5
+|-
+| {{:Ravenscale Cloak}}
+| [[:Category:Back|Back]]         || Rog || [[Cazic Thule]]            || . || . || 5 || .  || .
+|-
+| {{:Ravenscale Coif}}
+| [[:Category:Head|Head]]         || Rog || [[Cazic Thule]]            || 5 || . || . || .  || .
+|-
+| {{:Ravenscale Gloves}}
+| [[:Category:Hands|Hands]]         || Rog || [[Cazic Thule]]            || 3 || . || . || .  || .
+|-
+| {{:Ravenscale Leggings}}
+| [[:Category:Legs|Legs]]         || Rog || [[Cazic Thule]]            || . || . || . || .  || 5
+|-
+| {{:Ravenscale Mask}}
+| [[:Category:Face|Face]]         || Rog || [[Cazic Thule]]            || . || . || . || 10  || .
+|-
+| {{:Ravenscale Neckguard}}
+| [[:Category:Neck|Neck]]         || Rog || [[Cazic Thule]]            || . || . || . || .  || 10
+|-
+| {{:Ravenscale Shoulderpads}}
+| [[:Category:Shoulders|Shoulders]]         || Rog || [[Cazic Thule]]            || 5 || . || . || .  || .
+|-
+| {{:Shiverback-hide Armbands}}
+| [[:Category:Arms|Arms]]         || MNK || [[Plane of Fear]]            || . || . || 7 || .  || .
+|-
+| {{:Singing Short Sword}}            
+| [[:Category:Primary|Pri]]/[[:Category:Secondary|Sec]]  || BRD || [[Bard Epic Quest]]     || 10 || 10 || 10 || 10 || 10
+|-
+| {{:Sionachie's Partisan}}            
+| [[:Category:Primary|Pri]]/[[:Category:Secondary|Sec]]  || BRD || [[Karnor's Castle]]     || 5 || . || . || . || .
+|-
+| {{:Thorny Vine Vambraces}}
+| [[:Category:Arms|Arms]]         || RNG || [[Plane of Fear]]            || 7 || . || . || .  || .
+|-
+| {{:Trooper Scale Breastplate}}
+| [[:Category:Chest|Chest]]         || War || [[Trooper Scale Armor Quests]]            || 5 || . || . || .  || .
+|-
+| {{:Trooper Scale Vambraces}}
+| [[:Category:Arms|Arms]]         || War || [[Trooper Scale Armor Quests]]            || . || . || . || 2  || 2
+|-
+| {{:Umbral Platemail Vambraces}}
+| [[:Category:Arms|Arms]]         || SHD || [[Plane of Fear]]            || . || 10 || . || .  || .
+|-
+| {{:Valorium Vambraces}}
+| [[:Category:Arms|Arms]]         || Pal || [[Plane of Fear]]            || . || . || 10 || .  || .
+|-
+| {{:Vambraces of Ro}}
+| [[:Category:Arms|Arms]]         || Pal || [[Armor of Ro Quests]]            || . || . || . || .  || 10
+|}
+
+== Class specific (Casters) ==
+
+{| class="eoTable2 sortable"
+! Item                                 || Slot || Class || Where || MR || FR || CR || PR || DR
+|-
+| {{:Ancient Wurm Hide Robe}}            
+|| [[:Category:Chest|Che]]   || Nec Wiz Mag Enc || [[Temple of Veeshan]]  || 15  || 15  || 15  || 15 || 15
+|-
+| {{:Apothic Sleeves}}            
+|| [[:Category:Arms|Arms]]   || Mag || [[Plane of Hate]]  || .  || 10  || .  || . || .
+|-
+| {{:Barrier of Sound}}            
+|| [[:Category:Secondary|Sec]]   || Nec Wiz Mag Enc || [[Temple of Veeshan]]  || 15  || 15  || 15  || 15 || 15
+|-
+| {{:Blighted Sleeves}}            
+|| [[:Category:Arms|Arms]]   || Nec || [[Plane of Fear]]  || .  || 10  || .  || . || .
+|-
+| {{:Blighted Trousers}}            
+|| [[:Category:Legs|Legs]]   || Nec || [[Plane of Fear]]  || .  || .  || 10  || . || .
+|-
+| {{:Carmine Sleeves}}            
+|| [[:Category:Arms|Arms]]   || Wiz || [[Plane of Fear]]  || .  || 10  || .  || . || .
+|-
+| {{:Ebon War Spear}}
+| [[:Category:Range|Range]]           || SHM || [[Ocean of Tears]] || 5  || .  || . || .  || .
+|-
+| {{:Ethereal Mist Vambraces}}            
+|| [[:Category:Arms|Arms]]   || CLR || [[Plane of Hate]]  || 7  || .  || .  || . || .
+|-
+| {{:Eye of Innoruuk}}            
+| [[:Category:Primary|Pri]]/[[:Category:Secondary|Sec]]  || Wiz || [[Plane of Hate]]     || 10 || . || . || . || .
+|-
+| {{:Gorgon Head Staff}}            
+| [[:Category:Primary|Pri]]  || Nec || [[Necromancer Plane of Sky Tests]]     || . || . || . || . || 25
+|-
+| {{:Incandescent Wand}}
+||[[:Category:Primary|Pri]] || Enc || [[Incandescent Armor Quests]]     || 5 || . || . || . || .
+|-
+| {{:Insidious Pantaloons}}            
+|| [[:Category:Legs|Legs]]   || Enc || [[Plane of Fear]]  || .  || .  || 10  || . || .
+|-
+| {{:Insidious Sleeves}}            
+|| [[:Category:Arms|Arms]]   || Enc || [[Plane of Hate]]  || .  || 10  || .  || . || .
+|-
+| {{:Jeweled Skull}}            
+| [[:Category:Primary|Pri]]/[[:Category:Secondary|Sec]]  || Nec Wiz Mag Enc || [[Hollow Skull]]     || 5 || . || -5 || . || .
+|-
+| {{:Orb of Mastery}}            
+| [[:Category:Primary|Pri]]  || Mag || [[Magician Epic Quest]]     || 10 || 20 || 20 || . || .
+|-
+| {{:Phenocryst's Focus}}            
+| [[:Category:Primary|Pri]]/[[:Category:Secondary|Sec]]  || Nec Wiz Mag Enc || [[The Velium Focus | The Velium Focus Quest]]     || 5 || 3 || 3 || 3 || 3
+|-
+| {{:Rune Etched Vambraces}}            
+|| [[:Category:Arms|Arms]]   || SHM || [[Plane of Hate]]  || 7  || .  || .  || . || .
+|-
+| {{:Stein of Ulissa}}
+||[[:Category:Primary|Pri]] || Mag || [[Stein of Ulissa Quest]]     || . || . || 5 || . || .
+|-
+| {{:Torch of Alna}}
+||[[:Category:Primary|Pri]] || Mag || [[Torch of Alna Quest]]     || . || 5 || . || . || .
+|-
+| {{:Treant Tear}}
+|| [[:Category:Ear|Ear]]       || Dru || [[Plane of Sky]]    || 5  || 5  || 5  || 5  || 5
+|-
+| {{:Vambraces of the Fervent}}            
+|| [[:Category:Arms|Arms]]   || CLR || [[Armor of the Priest Quests]]  || .  || 5  || .  || . || .
+|-
+| {{:Vermiculated Armplates}}            
+|| [[:Category:Arms|Arms]]   || Dru || [[Plane of Fear]]  || 7  || .  || .  || . || .
+|-
+| {{:Weight of the Gods}}            
+|| [[:Category:Shoulders|Shoulders]]   || CLR || [[Plane of Sky]]  || 25  || .  || .  || . || .
+|}
+
+== Dropped - (All/All) ==
+
+{| class="eoTable2 sortable"
+! Item                                || Slot || Where     || MR || FR || CR || PR || DR
+|-
+| {{:Allize Volew Medicine Bag}}
+| [[:Category:Neck|Neck]]  || [[The Feerrott]]     || . || . || . || 1 || 1
+|-
+| {{:Anti-Poison_Amulet}}
+| [[:Category:Neck|Neck]]     || Quested  || .  || . || . || 15  || .
+|-
+| {{:Aviak Charm}}
+| [[:Category:Neck|Neck]]  || [[Southern Karana]]     || . || . || . || 2 || .
+|-
+| {{:Band of Eternal Flame}}
+| [[:Category:Fingers|Fingers]]     || [[Karnor's Castle]]  || .  || 10 || -10 || .  || .
+|-
+| {{:Bargynn's Torch}}
+| [[:Category:Primary|Pri]]/[[:Category:Secondary|Sec]]  || [[Kurn's Tower]]     || . || 2 || . || . || .
+|-
+| {{:Bone Talisman}}
+| [[:Category:Secondary|Sec]]  || [[Health Potion]]     || 10 || . || . || . || .
+|-
+| {{:Burynaibane Charm}}
+| [[:Category:Neck|Neck]]  || [[Field of Bone]]     || . || . || . || 2 || 2
+|-
+| {{:Chitin Shell Armor}}
+| [[:Category:Chest|Chest]]  || [[Upper Guk]]     || . || . || . || 10 || .
+|-
+| {{:Collar of Undead Protection}}
+| [[:Category:Neck|Neck]]     || [[A froglok gaz squire]]  || .  || . || . || 7  || 7
+|- 
+| {{:Crown of King Tranix}}           
+| [[:Category:Head|Head]]     || [[King Tranix]]       || 20 || .  || .  || .  || .
+|-
+| {{:Crown of the Froglok Kings}}
+| [[:Category:Head|Head]]     || [[the froglok king]]  || .  || 20 || 20 || .  || .
+|-
+| {{:Cloak of the Ice Bear}}
+| [[:Category:Back|Back]]     || [[Everfrost Peaks]]   || .  || .  || 20 || .  || .
+|-
+| {{:Drakescale Belt}}
+| [[:Category:Waist|Waist]]     || [[Solusek's Eye]]  || .  || 10 || . || .  || .
+|-
+| {{:Earring of Essence}}
+| [[:Category:Ear|Ear]]   || [[Temple of Droga]]      || 10 || . || . || .  || .
+|-
+| {{:Everburn Candle}}
+| [[:Category:Secondary|Sec]]  || [[The Cigar]]     || . || . || 5 || 5 || .
+|-
+| {{:Fine Silk Turban}}            
+| [[:Category:Head|Head]]  || [[Hatar]]   || . || 10  || .  || .  || .
+|-
+| {{:Glowing Black Stone}}            
+| [[:Category:Primary|Pri]]/[[:Category:Secondary|Sec]]  || [[Pyzjn]]   || 10 || .  || .  || .  || .
+|-
+| {{:Goblin Gazughi Ring}}    
+| [[:Category:Fingers|Fingers]]  || [[Lake of Ill Omen]]      || 5  || . || . || .  || .
+|-
+| {{:Gypsy Medallion}}           
+| [[:Category:Neck|Neck]]     || [[Korvik the Cursed]]       || . || .  || .  || .  || 10
+|-
+| {{:Hamed's Ring of Tears}}
+| [[:Category:Fingers|Fingers]]     || [[Kerra Island]]  || 3  || 3 || 3 || .  || .
+|-
+| {{:Hand Woven Leggings}}          
+| [[:Category:Legs|Legs]]   || [[Lake of Ill Omen]]     || . || 10 || . || . || .
+|-
+| {{:Iony's Absorber}}
+| [[:Category:Secondary|Sec]]  || [[Red V Clockwork]]     || . || . || . || 5 || 5
+|-
+| {{:Necklace of Superiority}}          
+| [[:Category:Neck|Neck]]   || [[Drusella Sathir]]     || 5 || 5 || 5 || 5 || 5
+|-
+| {{:Robe of the Azure Sky}}
+| [[:Category:Chest|Chest]]  || [[Veeshan's Peak]]     || 15 || 15 || 15 || 15 || 15
+|-
+| {{:Sarnak Staff of Glyphs}}
+| [[:Category:Primary|Pri]] || [[The Overthere]]     || 10 || . || . || . || .
+|-
+| {{:Serpent Insignia Collar}}    
+| [[:Category:Neck|Neck]]  || [[Western Karana]]      || 5   || 5 || 5 || 5  || 5
+|-
+| {{:Scarab Ring}}    
+| [[:Category:Fingers|Fingers]]  || [[Northern Desert of Ro]]      || 2  || 2 || 2 || 2  || 2
+|-
+| {{:Skull of Jhen`Tra}}
+| [[:Category:Primary|Pri]]/[[:Category:Secondary|Sec]]  || [[Lake Rathetear]]     || 3 || . || . || . || .
+|-
+| {{:Spectral Shroud}}
+| [[:Category:Back|Back]]     || [[Kaesora]]   || 5  || .  || . || 5  || .
+|-
+| {{:Spiked Goblin Ring}}  
+| [[:Category:Fingers|Fingers]]    ||  [[Temple of Droga]]    || .  || .  || .  || . || 5
+|-
+| {{:Stein of Moggok}}
+| [[:Category:Primary|Pri]]/[[:Category:Secondary|Sec]]  || [[Exotic Drinks]]     || . || . || . || . || 25
+|-
+| {{:Symbol of Loyalty to Vox}}
+| [[:Category:Wrist|Wrist]]     || [[Permafrost]]   || .  || .  || 7 || .  || .
+|-
+| {{:White Gold Necklace}}            
+| [[:Category:Neck|Neck]]     || [[A froglok noble]]   || 7  || 7  || 7  || .  || .
+|-
+| {{:White Satin Gloves}}
+| [[:Category:Hands|Hands]]   || [[Plane of Sky]]      || -5  || 30 || -5  || -5  || -5
+|-
+| {{:Wurm Scale Coat}}
+| [[:Category:Shoulders|Shoulders]] || [[Burning Wood]]  || 10 || 20 || . || . || .
+|-
+| {{:A Froststone Stein}}
+| [[:Category:Primary|Pri]]/[[:Category:Secondary|Sec]] || [[Crystal Caverns]]  || .|| . || 20 || . || .
+|-
+| {{:Lizardskin Tribal Mask}}
+| [[:Category:Face|Face]] || [[Cazic Thule]]  || 5|| . || . || . || .
+
+|}
+
+== Dropped - (Melee) ==
+
+{| class="eoTable2 sortable"
+! Item                                || Slot || Class || Where     || MR || FR || CR || PR || DR
+|-
+| {{:Aegis of Life}}
+| [[:Category:Secondary|Sec]]/[[:Category:Back|Back]] || CLR Pal || [[Aegis of Life Quest]] || . || . || . || . || 25
+|-
+| {{:Barnacle Breastplate}}
+| [[:Category:Chest|Chest]]         || War CLR Pal RNG SHD BRD SHM || [[Barnacle Breastplate Quest]]            || . || 3 || 3 || .  || .
+|-
+| {{:Blackened Iron Coif}}
+| [[:Category:Head|Head]]           || except Dru Enc Mag Nec Wiz || [[Clan Runnyeye]]        || 5  || 5  || 5  || 5  || 5
+|-
+| {{:Blazing Boots of Fennin Ro}}
+| [[:Category:Feet|Feet]]         || War CLR Pal SHD BRD || [[Nagafen's Lair]]            || . || 10 || . || .  || .
+|-
+| {{:Blazing Bracer of Fennin Ro}}
+| [[:Category:Wrist|Wrist]]         || War CLR Pal SHD BRD || [[Nagafen's Lair]]            || . || 6 || . || .  || .
+|-
+| {{:Blazing Breastplate of Fennin Ro}}
+| [[:Category:Chest|Chest]]         || War CLR Pal SHD BRD || [[Nagafen's Lair]]            || . || 20 || . || .  || .
+|-
+| {{:Blazing Gauntlets of Fennin Ro}}
+| [[:Category:Hands|Hands]]         || War CLR Pal SHD BRD || [[Nagafen's Lair]]            || . || 8 || . || .  || .
+|-
+| {{:Blazing Greaves of Fennin Ro}}
+| [[:Category:Legs|Legs]]         || War CLR Pal SHD BRD || [[Nagafen's Lair]]            || . || 15 || . || .  || .
+|-
+| {{:Blazing Helm of Fennin Ro}}
+| [[:Category:Head|Head]]         || War CLR Pal SHD BRD || [[Nagafen's Lair]]            || . || 10 || . || .  || .
+|-
+| {{:Blazing Vambraces}}
+| [[:Category:Arms|Arms]]         || War CLR Pal SHD BRD || [[Nagafen's Lair]]            || . || 20 || . || .  || .
+|-
+| {{:Bloodstained Mantle}} 
+| [[:Category:Shoulders|Shoulders]] || War CLR Pal RNG SHD BRD Rog SHM || [[Unrest]]               || 10 || .  || .  || .  || .
+|-
+| {{:Blued Two-Handed Hammer}}            
+| [[:Category:Primary|Pri]]  || except BRD Rog Enc Mag Nec Wiz || [[The Visiting Priestess]]     || . || 10 || . || . || .
+|-
+| {{:Carrion Beetle Leggings}} 
+| [[:Category:Legs|Legs]] || except Enc Mag Nec Wiz || [[Field of Bone]]               || . || .  || .  || 5 || 5
+|-
+| {{:Charred Boots}}
+| [[:Category:Feet|Feet]]           || War CLR Pal SHD BRD || [[Solusek's Eye]] || .  || 5  || . || 5  || .
+|-
+| {{:Chitin Shell Shield}}
+| [[:Category:Secondary|Sec]]       || . || [[a giant heart spider]]      || . || .  || .  || 10 || . 
+|-
+| {{:Crested Mistmoore Shield}}
+| [[:Category:Secondary|Sec]]       || . || [[a glyphed ghoul]]      || 10 || .  || .  || 10 || 10
+|-
+| {{:Dark Scale Greaves}}
+| [[:Category:Legs|Legs]]         || . || [[Old Sebilis]]            || 2 || 2 || 2 || 2  || 2
+|-
+| {{:Dwarven Ringmail Tunic}}
+| [[:Category:Chest|Chest]]         || . || [[Crushbone]]            || 8 || 8 || 8 || .  || .
+|-
+| {{:Ebon Razor}}            
+| [[:Category:Primary|Pri]]  || . || [[Frontier Mountains]]     || 4 || 4 || 4 || . || .
+|-
+| {{:Fiery Vambraces}}
+| [[:Category:Arms|Arms]]         || . || [[Solusek's Eye]]            || . || 5 || . || .  || .
+|-
+| {{:Giant Foreman's Tunic}}
+| [[:Category:Chest|Chest]]         || . || [[Frontier Mountains]]            || . || . || 5 || .  || .
+|-
+| {{:Giant Lord's Tunic}}
+| [[:Category:Chest|Chest]]         || . || [[Frontier Mountains]]            || . || . || 5 || .  || .
+|-
+| {{:Gnomish Environment Suit}}
+| [[:Category:Chest|Chest]]           || . || [[Solusek's Eye]] || .  || 10  || 10 || 10  || .
+|-
+| {{:Goblin Juntah Harvester}}            
+| [[:Category:Primary|Pri]]  || . || [[Chardok]]     || . || . || . || 15 || .
+|-
+| {{:Goblin Head-Spear}}            
+| [[:Category:Primary|Pri]]  || . || [[Frontier Mountains]]     || . || . || . || 10 || 10
+|-
+| {{:Goblin Skull Crusher}}            
+| [[:Category:Primary|Pri]]/[[:Category:Secondary|Sec]] || . || [[A sarnak knight]]     || . || . || 6 || . || .
+|-
+| {{:Green Jade Broadsword}}            
+| [[:Category:Primary|Pri]]/[[:Category:Secondary|Sec]] || . || [[City of Mist]]     || . || . || . || 10 || 10
+|-
+| {{:Green Jade Axe}}            
+| [[:Category:Primary|Pri]]/[[:Category:Secondary|Sec]] || . || [[Old Sebilis]]     || . || . || . || 15 || 5
+|-
+| {{:Gunthak Dagger}}            
+| [[:Category:Primary|Pri]]/[[:Category:Secondary|Sec]]  || . || [[Timorous Deep]]   || . || .  || .  || 5  || .
+|-
+| {{:Gunthak Scimitar}}            
+| [[:Category:Primary|Pri]]/[[:Category:Secondary|Sec]]  || . || [[Timorous Deep]]   || . || .  || .  || 5  || .
+|-
+| {{:Hero Bracers}}
+| [[:Category:Wrist|Wrist]]       || . || [[Hero Bracers Quest]]      || . || .  || .  || 5 || 5 
+|-
+| {{:Living Thunder Earring}}
+| [[:Category:Ear|Ear]]       || . || [[Derakor the Vindicator]]      || 10 || .  || .  || . || . 
+|-
+| {{:Katana of Endurance}}            
+| [[:Category:Primary|Pri]]/[[:Category:Secondary|Sec]]  || . || [[Veeshan's Peak]]   || . || .  || .  || 10  || 10
+|-
+| {{:Katana of Flowing Water}}            
+| [[:Category:Primary|Pri]]/[[:Category:Secondary|Sec]]  || . || [[Veeshan's Peak]]   || 10 || 10  || 10  || 10  || 10
+|-
+| {{:Kylong Arm Guards}}
+| [[:Category:Arms|Arms]]           || . || [[Howling Stones]] || .  || 6  || . || 2  || .
+|-
+| {{:Kylong Boots}}
+| [[:Category:Feet|Feet]]           || . || [[Howling Stones]] || 5  || .  || 5 || .  || .
+|-
+| {{:Lodizal Shell Shield}}
+| [[:Category:Back|Back]]/[[:Category:Secondary|Secondary]] || . || [[Iceclad Ocean]] || 10  || 20 || 20 || .  || .
+|-
+| {{:Mithril Helm}}            
+|| [[:Category:Secondary|Head]]   || except Nec Wiz Mag Enc || [[Temple of Veeshan]]  || 15  || 15  || 15  || 15 || 15
+|-
+| {{:Mithril Greaves}}
+| [[:Category:Legs|Legs]]         || . || [[Nagafen's Lair]]            || 5 || . || . || .  || .
+|-
+| {{:Mithril Vambraces}}
+| [[:Category:Arms|Arms]]         || . || [[Nagafen's Lair]]            || 5 || . || . || .  || .
+|-
+| {{:Ogre Butcher Gloves}}
+| [[:Category:Hands|Hands]]         || . || [[Preserved Meat Delivery]] || .  || . || . || 25 || 25
+|-
+| {{:Pearlescent Mask}}
+| [[:Category:Face|Face]]         || . || [[Kedge Keep]]            || 10 || . || . || .  || .
+|-
+| {{:Imbued Granite Spauldors}}
+| [[:Category:Shoulders|Shoulders]] || . || [[The Hole]] || 10 || 10 || 10 || 10 || 10 
+|-
+| {{:Rat Shaped Ring}}
+| [[:Category:Fingers|Fingers]]      || . || [[Hurrieta's Tunic Quest]] || . || . || . || 10 || 10
+|-
+| {{:Red Dragonscale Armor}}
+| [[:Category:Chest|Chest]]         || . || [[Red Dragonscale Armor Quest]]            || 10 || 10 || . || .  || .
+|-
+| {{:Riptide Spear}}            
+| [[:Category:Primary|Pri]]  || . || [[Butcherblock Mountains]]     || -5 || . || 2 || . || .
+|-
+| {{:Runed Bone Fork}}
+| [[:Category:Range|Range]]         || . || [[Upper Guk]]            || 10 || 10 || 10 || .  || .
+|-
+| {{:Runed Morning Star}}            
+| [[:Category:Primary|Pri]]/[[:Category:Secondary|Sec]] || . || [[Howling Stones]]     || 6 || . || . || . || .
+|-
+| {{:Sarnak Battle Shield}}
+| [[:Category:Secondary|Sec]]         || . || [[Chardok]]            || 10 || 10 || 10 || .  || .
+|-
+| {{:Sarnak Emblazened Tabard}}
+| [[:Category:Chest|Chest]] || . ||  [[Kunark]] Sarnaks   || 10 || . || . || . || . 
+|-
+| {{:Sarnak Skullsplitter}}            
+| [[:Category:Primary|Pri]]/[[:Category:Secondary|Sec]]  || . || [[Chardok]]   || . || .  || .  || 8  || 8
+|-
+| {{:Scaled Wolf Hide Leggings}}
+| [[:Category:Legs|Legs]]         || . || [[Warsliks Wood]]            || . || 5 || 5 || .  || .
+|-
+| {{:Scepter of Flame}}            
+| [[:Category:Primary|Pri]] || . || [[Solusek's Eye]]   || 5 || 5  || .  || .  || .
+|-
+| {{:Sebilite Croaking Dirk}}            
+| [[:Category:Primary|Pri]]/[[:Category:Secondary|Sec]]  || . || [[Old Sebilis]]   || 5 || .  || .  || 5  || .
+|-
+| {{:Sebilite Scale Coat}}
+| [[:Category:Chest|Chest]]         || . || [[Old Sebilis]]            || 2 || . || 2 || . || 2
+|-
+| {{:Sebilite Scale Leggings}}
+| [[:Category:Legs|Legs]]         || . || [[Old Sebilis]]            || . || 2 || . || 2  || .
+|-
+| {{:Sebilite Scale Vambraces}}
+| [[:Category:Arms|Arms]]         || . || [[Old Sebilis]]            || . || 2 || . || 2 || .
+|-
+| {{:Seahorse Scale Cloak}}
+| [[:Category:Back|Back]]           || . || [[a seahorse patriarch]] || .  || .  || 35 || .  || .
+|-
+| {{:Shiny Brass Shield}}
+| [[:Category:Secondary|Sec]]         || . || [[Crushbone]],[[Southern Felwithe]]  || 10 || . || . || .  || .
+|-
+| {{:Silver-Plated Bracer}}
+| [[:Category:Wrist|Wrist]]       || . || [[Upper Guk]]      || . || .  || .  || 5 || 5 
+|-
+| {{:Skull-shaped Barbute}}
+| [[:Category:Head|Head]]         || . || [[the ghoul lord]]            || 10 || . || . || .  || .
+|-
+| {{:Smoldering Cudgel}}            
+| [[:Category:Primary|Pri]] || . || [[Veeshan's Peak]]   || . || 25  || .  || .  || .
+|-
+| {{:Small Scarab Breastplate}}
+| [[:Category:Chest|Chest]]         || . || [[Scarab Armor Quests]]            || . || . || . || . || 2
+|-
+| {{:Snakeskin Mask}}
+| [[:Category:Face|Face]]         || . || [[Lake Rathetear]]            || 5 || . || . || . || .
+|-
+| {{:Split Paw Hide Belt}}
+| [[:Category:Waist|Waist]]         || . || [[Southern Karana]]            || . || . || . || 5  || .
+|-
+| {{:Split Paw Hide Tunic}}
+| [[:Category:Chest|Chest]]         || . || [[Southern Karana]]            || . || . || . || 10  || .
+|-
+| {{:Sword of Skyfire}}            
+| [[:Category:Primary|Pri]] || . || [[Old Sebilis]]   || . || .  || 15  || .  || .
+|-
+| {{:Stone of Morid}}            
+| [[:Category:Range|Range]] || . || [[Temple of Droga]]   || . || 30  || 30  || .  || .
+|-
+| {{:Triumphant Mask}}            
+| [[:Category:Face|Face]] || WAR PAL RNG DRU BRD ROG || [[Plane of Hate]]   || 20 || .  || .  || .  || .
+|-
+| {{:Wurmslayer}}            
+| [[:Category:Primary|Pri]] || . || [[Dragon Scales Quest]]   || 5 || .  || .  || .  || .
+|}
+{{:Resist_Gear_Casters}}
+
+
+[[Category:Guides]]

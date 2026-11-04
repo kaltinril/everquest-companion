@@ -29,7 +29,7 @@ Increased sensory range for living NPCs on your map -- roughly double in radius.
 
 == Unlock Conditions ==
 
-* Complete [[Something Fishy]], [[Alchemical Solution]], [[What's Going On Here]], [[Call for Aid]], and [[Unfortunate News]]. 
+* Complete [[Something Fishy]], [[Alchemical Solution]], [[What%27s_going_on_here|What's Going On Here]], [[Call for Aid]], and [[Unfortunate News]]. 
 
 
 {{Navbox Race}}

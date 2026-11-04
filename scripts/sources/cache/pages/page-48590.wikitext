@@ -1,0 +1,1384 @@
+<div style="float:right; margin-left: 20px;">__TOC__</div>
+'''Note about trivials!''' ''The kunark era pages at eqtraders.com list the trivials in the "Classic Trivial".
+
+Blacksmithing is an ancient craft.  Through its teachings you will learn to forge the primal elements of our lands into useful tools, as well as arms and armor.  Those highly skilled in the trade are even known to be able to create magical items.
+
+== Overview ==
+
+To forge an item, you must collect all the components required, and then place them within a [[forge]].  Once this is completed, you simply combine them (click the combine button on the forge) and you will either create the item, or fail. It is important to note that items must not be stacked when attempting to combine them (Hold CTRL when you click a stack to take just one item from the stack).  Either way you will lose the base components.
+
+When you first enter the learning cycle of smithing, you have two options available to you:
+
+1) You can go to your guildmaster and ask them to train you.  By saving up the training points given to you, you can achieve an elementary skill (21 points) without ever seeing a forge.
+
+2) Learn on your own and not waste those precious training points.  I suggest this route.  Why? Because while smithing is an expensive craft to master, learning its basics is very inexpensive.  Simply find a merchant selling sharpening stones and buy a few packs full.  Then park your behind at the forge of choice, and offer to sharpen the rusty weapons of those adventurers around you.  This alone will progress your skill beyond that which your guildmaster can teach you.
+
+Many of the components required for your smithing, will be purchased either from various Merchants (NPCs), or from other Craftsmen.  However, as you progress in skill and start making the more difficult items, you will find that many things you need can only be found by adventuring, or by purchasing them from others who have adventured.  Your search for these more elusive components will literally span the known lands, but fret not, as the results of your trials will be worth it.   Imagine holding that magical war hammer in your hand, knowing that you forged it yourself with sweat and tears!
+
+=== Quests ===
+
+* [[Totemic Armor Quests]] ([[Shaman]]).
+* [[The Spirit of Garzicor]]
+* [[Coldain Prayer Shawl Quests]] (part 8).
+
+== Blacksmithing Leveling Guide ==
+'''Strength or Intelligence or Wisdom, whichever is higher governs your chance to gain skill increases.'''
+=== Getting Started (Up to 68) ===
+(Updated for EQL recipes/trivials)
+
+* '''1 to 21:''' [[Metal Bits]] and [[File]] 
+** Buy 3 [[File Mold]], 53 [[Water Flask]], 100 [[Small Piece of Ore]] (~20pp). 
+*** Do ~50 [[Metal Bits]] combines, and then 3 [[File]]. (Keep 1, sell extras)
+*** You will want ~50 metal bits left after making your file.
+* '''21 to 31:''' [[Sheet Metal]]
+** Buy 30 [[Small Brick of Ore]], and some [[Water Flask]] if you don't have left over from the previous step. (keep sheet metal for later)
+* '''41 to 68:''' [[Large Lantern]]
+** Need to buy 50 [[Lantern Casing Mold]] and 50 [[Bottle|Bottles]] (~6pp). 
+** Around fifty combines will use up your metal bits from earlier and get you to around 68. Sell Lanterns after to get some money back.
+
+=== Banded Armor (Up to 115) ===
+(Updated for EQL recipes/trivials)
+
+Note: For [[Sheet Metal]] use what you made earlier, but once you run out it is quicker/cheaper to just buy from a vendor.
+
+You will need to do about 100 combines to go from 68 to 115. If you plan on wearing the armor, your best bet is going to still follow the cheapest path and then make each item you need to wear once or twice after it is trivial.
+<ul><li> '''69 to 90:''' {{:Banded Belt}}, {{:Banded Boots}}, {{:Banded Bracer}}, {{:Banded Gorget}}, {{:Banded Mantle}}, {{:Banded Mask}}
+<ul><li> Gorget, followed by Bracers are the cheapest. The others are substantially more expensive. Expect it to take about 50 combines to reach 90+. (Only needed 41 gorget combines to progress from 68 to 92 at 370 Strength.)
+<ul><li> Sheet Metal: 50 total</li>
+<li> Estimated Cost: 60pp</li></ul>
+</li></ul>
+</li></ul>
+<ul><li> '''90 to 106:''' {{:Banded Cloak}}, {{:Banded Gauntlets}}, {{:Banded Helm}}, {{:Banded Leggings}}, {{:Banded Sleeves}}
+<ul><li> Gauntlets, followed very closely by Helms are the cheapest. You will probably need 20 gauntlets to hit 100 and about 12 Helms to get 106. (Only needed 23 gauntlet combines to progress from 92 to 102 at 370 Strength.)
+<ul><li> Sheet Metal: 64 total</li>
+<li> Estimated Cost: 90pp</li></ul>
+</li></ul>
+</li></ul>
+<ul><li> '''106 to 115:''' {{:Banded Mail}}
+<ul><li> Other than getting a few levels above 105 out of leggings, you'll have to rely on Mail for most of this. Expect to make 20 or so. (Needed 30 mail combines to progress from 102 to 115, with a total of 177 sheet metal for all banded progress at 370 Strength.)
+<ul><li> Sheet Metal: 60 total</li>
+<li> Estimated Cost: 100pp</li></ul>
+</li></ul>
+</li></ul>
+
+=== Feir`Dal Fletching Kit (up to 163) ===
+If you are not agro to Wood Elves, I would highly recommend making [[Feir`Dal Fletching Kit]]s up to 163.  This costs about 7pp per combine and will take you higher than Ornate Chain.  Don't be like me and burn 3000pp just to get to 133. I could have probably gotten to 163 for less than 2000pp if I had started with the kits.
+
+You do NOT have to be a Wood Elf to use the Feir`Dal Forge or make Feir`Dal cultural crafting.
+
+If you can't go to Kelethin, Ornate (below) is going to be your best bet. But just know it's really annoying to get materials for, and extremely expensive.
+
+=== Ornate Chain (up to 142) ===
+[[Ornate Chain Armor]] can get you to 142. It requires [[High Quality Metal Rings]] which are made from [[Large Brick of High Quality Ore]] which are a pain to get. You can sometimes find them on merchants that players sold to, along with [[Small Brick of High Quality Ore]] which can be turned into the Large Bricks. These are all extremely expensive - about 60pp for a single brick which will make 2 rings, if you don't fail.
+
+So far the only merchant confirmed to always sell these in EQ Legends is [[Greta Terrilon]] in [[Halas]]. Unfortunately, no one in Halas seems to sell silver bars.
+
+From the looks of it, the best path to 142 is:
+
+* [[Ornate Chain Bracelet]] to 122 (~32pp per combine)
+* [[Ornate Chain Coif]] to 132  (~65pp per combine)
+* [[Ornate Chain Mail]] to 142  (~98pp per combine)
+
+I spent about 3000pp on Ore, Silver Bars, and Patterns. It got me to 133 skill.
+
+=== Fine Plate (up to 188) ===
+* '''142 to 168:''' [[Fine Plate Bracer]]
+* '''168 to 179:''' [[Fine Plate Helm]]
+* '''179 to 188:''' [[Fine Plate Breastplate]]
+
+== Skilling up Recommendations ==
+The following recommendations are designed to strike a solid balance between saving time and saving money.
+
+=== Basics ===
+
+* Bypass [[Scaler]] in favor of [[Studs]], and then on to [[Skewers]]. This path avoids making multiple trips between merchants for molds <s>and eventually bottles</s> because you only require [[Metal Bits]] and [[Water Flask]] until you hit [[Skewers]] (which still use the supply of bits you will have acquired, as well as a single mold), but will cost a little more. Total cost to get from 1 to 100 skill (only 1 point put into it) using this method was approximately 100 plat (50 CHA, 161 WIS). '''~~NOTE~~''': Studs are trivial at 41, so you still need to do Large Lanterns (or similar i.e. Forged Javelins). Studs are a good stand-in for Scaler, though. 
+
+* You CAN bypass ornate chain armors in favor of fine plate, or alternate between ornate and fine plate visors as you get in supplies for either. Getting your tailoring skills up high enough to make your own leather padding will save lots of money in the long run, and people often have silks and skins to sell-you can also reliable farm your own in newbie zones (There's a decent spot in Eastern Commons near the tunnel to farm spiderlings and random bear/wolf/cat skins for padding while you buy/sell with players). By making your own leather padding and selling your wares to merchants (if you can't find buyers), you will make back most of what you spend. Ornate chain requires more trips between the farming locale and bank/forge, but may be cheaper overall.
+
+=== Banded ===
+
+* For banded armor, Banded mask trivial 90, Banded Gorget (92), Banded Belt, boots, bracer or Mantle (95), Banded Cloak, Gauntlets, Helm or Sleeves (102), banded Leggings (108) and finally banded Mail at 115.
+
+All Banded combines require a mold, water flask and some number of pieces of sheet metal. I would suggest gorget (1 piece sheet metal), any of gauntlets sleeve or cloak (all require 2 sheet metal), Helm (2 pieces sheet metal, then mail (requires 3 pieces of sheet metal)
+
+* When working on banded armor, work in [[East Freeport]], [[Toxxulia Forest]], [[Qeynos Hills]], [[Greater Faydark]], or [[East Cabilis]]. These areas have [[Sheet Metal]] pre-made, which reduces your time spent as well as your losses due to sub-combine failure. I suggest Greater Faydark or East Freeport for most people. Trolls, Ogres, and Dark Elves have nowhere to buy it and must make their own.'''
+
+=== Ornate Chain (Mantle, Boots, or Gloves) ===
+* Banded covers you to 115 but there is a path to go from 175 -182 where you can make Ornate Chain.  
+
+* It takes about 40-55 attempts with a HE Cleric having 198 WIS to go from 175 to 182 trivial.
+
+*Ornate Chain is made with an unenchanted silver bar and High Quality Ore dropped by goblins in SolA or Permafrost and maybe Runnyeye. 
+
+* It is easiest to farm SolA. Why SolA? There is a Gnome vendor (if you aren't KOS) in zone you can sell FS weapons and gems that drop off the goblins so you don't have to leave the zone.  If you can do the tricks to sell to the [[Goblin Merchant]] that is an option too.  Often either/both merchants will have HQ ore you can buy if you just want to spend the plat.  This is handy after making good coin selling FS weapons, gems, and jewelry the goblins like to drop.
+
+* This takes time but may be less time and money than getting materials and beginning Fine Plate before you absolutely must do plate.
+
+* The vendor in Freeport listed to sell the medium sized chain mold patterns does not exist at this time, use a different city. Felwithe and Neriak are good options because they sell patterns and silver bars.
+
+* the HQ ore can frequently be found on merchants in Highkeep, and there is a forge in Highpass Hold just outside of Highkeep and to the left.
+
+* High Quality Rings are not stackable, and 1 large brick of HQ ore turns in to 2 rings, so plan your bag space around this.  A good option is to pre purchase the stackable silver bars and patterns and convert bricks and immediately use the 2 rings to make an attempt at a mantle.
+
+=== Fine Plate ===
+* When working on fine plate armor, work in [[Highkeep]], or [[Qeynos]]. These are the only three cities where both the molds, AND the medium quality ores can be bought for 20pp each.
+* Folded MQ sheets are stackable
+* Get stacks and stacks and stacks of spiderling silks and make stacks and stacks of silk thread.  This is the most difficult part of doing fine steel besides having a couple thousand platinum to hit it hard (which you don't burn through too fast with reselling to vendor what you make, it just takes a good chunk of plat to start with).
+* Once you have stacks and stacks and stacks (12-20 stacks) of [[Silk Thread]] made from spiderling silks take a [[Large Sewing Kit]], a [[Skinning Knife]], and all your stacks of silk thread to [[Stonebrunt Mountains]] to farm cat pelts.  The leopards almost always drop a LQ or MQ cat pelt.  You need the skinning knife to down grade MQ pelts to LQ.  Out of 200 pelts I just farmed I received 5 HQ pelts so don't expect many HQ if needing for other purposes.  As you get a pelt immediately turn it into stackable [[Leather Padding]].  Why do it this way?  Stonebrunt is far from everything and the pelts drop on almost every kill but do not stack.  It is only efficient to go here if you bring everything to convert the pelts into leather padding so you can walk in with stacks of silk thread and walk out with stacks of leather padding for fine plate smithing.
+
+== Basic Blacksmithing Recipe List ==
+
+{{MajorEraTableFilter}}
+
+=== The Basics === 
+
+{| class="eoTable3 sortable"
+! Item                                   || Components                                                                      || p99 Trivial || Classic Trivial || Era
+|-
+| [[Metal Bits]]                         || 2x [[Small Piece of Ore]], [[Water Flask]] (Yield: 2)                           || 21          || 21 || {{Classic Short}}
+|- 
+| [[Velium Bits]]                        || 2x [[Small Piece of Velium]], [[Coldain Velium Temper]]                         || <67         || ? || {{Velious Short}}
+|-
+| [[Small Brick of Ore]]                 || 3x [[Small Piece of Ore]], [[Water Flask]]                                      || 27          || 27 || {{Classic Short}}
+|-
+| [[Block of Ore]]                       || 3x [[Large Brick of Ore]], [[Water Flask]]                                      || 21          || ?? || {{Classic Short}}
+|-
+| [[Sheet Metal]]                        || 2x [[Small Brick of Ore]], [[Water Flask]]                                      || 56          || 56 || {{Classic Short}}
+|- 
+| [[Sheet of Velium]]                    || 2x [[Small Brick of Velium]], [[Coldain Velium Temper]]                         || ?           || ? || {{Velious Short}}
+|-
+| [[Studs]]                              || 3x [[Metal Bits]], [[File]], [[Water Flask]] (Yield: 2)                         || 41          || 41 || {{Classic Short}}
+|- 
+| [[Velium Studs]]                       || 3x [[Velium Bits]], [[File]], [[Coldain Velium Temper]] (Yield: 2)              || >41<67      || ? || {{Velious Short}}
+|- 
+| [[Steel Boning]]                       || [[Small Brick of Ore]], [[File]], [[Water Flask]]                               || 41          || 41 || {{Classic Short}}
+|- 
+| [[Velium Boning]]                      || [[Small Brick of Velium]], [[File]], [[Coldain Velium Temper]]                  || 45         || ? || {{Velious Short}}
+|-
+| [[Folded Sheet Metal]]                 || [[Block of Ore]], [[Smithy Hammer]], [[Water Flask]]                            || 33          || ?? || {{Classic Short}}
+|-
+| [[Medium Quality Folded Sheet Metal]]  || [[Block of Medium Quality Ore]], [[Smithy Hammer]], [[Water Flask]]             || 37          || <109 || {{Classic Short}}
+|-
+| [[High Quality Folded Sheet Metal]]    || [[Block of High Quality Ore]], [[Smithy Hammer]], [[Water Flask]]               || ?           || ? || {{Classic Short}}
+|-
+| [[Velium Rings]]                       || [[Large Brick of Velium]], [[File]], [[Coldain Velium Temper]]                  || 49          || 49 || {{Velious Short}}
+|-
+| [[Tarnished Axe]]                      || [[Rusty Axe]], [[Sharpening Stone]]                                             ||           || 22 || {{Classic Short}}
+|-
+| [[Tarnished Bastard Sword]]           || [[Rusty Bastard Sword]], [[Sharpening Stone]]                                    ||           || 24 || {{Classic Short}}
+|-
+| [[Tarnished Battle Axe]]           || [[Rusty Battle Axe]], [[Sharpening Stone]]                                    ||           || 24 || {{Classic Short}}
+|-
+| [[Tarnished Bastard Sword]]           || [[Rusty Bastard Sword]], [[Sharpening Stone]]                                    ||           || 22 || {{Classic Short}}
+|-
+| [[Tarnished Bastard Sword]]           || [[Rusty Bastard Sword]], [[Sharpening Stone]]                                    ||           || 22 || {{Classic Short}}
+|-
+| [[Tarnished Broad Sword]]           || [[Rusty Broad Sword]], [[Sharpening Stone]]                                    ||           || 22 || {{Classic Short}}
+|-
+| [[Tarnished Dagger]]           || [[Rusty Dagger]], [[Sharpening Stone]]                                    ||           || 18 || {{Classic Short}}
+|-
+| [[Tarnished Dagger (Dervish)]]           || [[Rusty Dagger]], [[Sharpening Stone]]                                    ||           || 18 || {{Classic Short}}
+|-
+| [[Tarnished Fer`Esh]]           || [[Rusty Fer`Esh]], [[Sharpening Stone]]                                    ||           || 23 || {{Kunark Short}}
+|-
+| [[Tarnished Flail]]           || [[Rusty Flail]], [[Sharpening Stone]]                                    ||           || 21 || {{Classic Short}}
+|-
+| [[Tarnished Halberd]]           || [[Rusty Halberd]], [[Sharpening Stone]]                                    ||           || 24 || {{Classic Short}}
+|-
+| [[Tarnished Long Sword]]           || [[Rusty Long Sword]], [[Sharpening Stone]]                                    ||           || 23 || {{Classic Short}}
+|-
+| [[Tarnished Mace]]           || [[Rusty Mace]], [[Sharpening Stone]]                                    ||           || 21 || {{Classic Short}}
+|-
+| [[Tarnished Mining Pick]]           || [[Rusty Mining Pick]], [[Sharpening Stone]]                                    ||           || 19 || {{Classic Short}}
+|-
+| [[Tarnished Morning Star]]           || [[Rusty Morning Star]], [[Sharpening Stone]]                                    ||           || 24 || {{Classic Short}}
+|-
+| [[Tarnished Rapier]]           || [[Rusty Rapier]], [[Sharpening Stone]]                                    ||           || 20 || {{Classic Short}}
+|-
+| [[Tarnished Scimitar]]           || [[Rusty Scimitar]], [[Sharpening Stone]]                                    ||           || 23 || {{Classic Short}}
+|-
+| [[Tarnished Scythe]]           || [[Rusty Scythe]], [[Sharpening Stone]]                                    ||           || 25 || {{Classic Short}}
+|-
+| [[Tarnished Scythe (Lempeck's Rusty Scythe]]           || [[Rusty Scythe]], [[Sharpening Stone]]                                    ||           || 25 || {{Classic Short}}
+|-
+| [[Tarnished Scythe (N/A - Lempeck's Rusty Scythe ]]           || [[Rusty Scythe]], [[Sharpening Stone]]                                    ||           || 25 || {{Classic Short}}
+|-
+| [[Tarnished Shan`Tok]]           || [[Rusty Shan`Tok]], [[Sharpening Stone]]                                    ||           || 26 || {{Kunark Short}}
+|-
+| [[Tarnished Sheer Blade]]           || [[Rusty Sheer Blade]], [[Sharpening Stone]]                                    ||           || 25 || {{Kunark Short}}
+|-
+| [[Tarnished Short Sword]]           || [[Rusty Short Sword]], [[Sharpening Stone]]                                    ||           || 20 || {{Classic Short}}
+|-
+| [[Tarnished Shortened Spear]]           || [[Rusty Shortened Spear]], [[Sharpening Stone]]                                    ||           || 19 || {{Classic Short}}
+|-
+| [[Tarnished Spear]]           || [[Rusty Spear]], [[Sharpening Stone]]                                    ||           || 21 || {{Classic Short}}
+|-
+| [[Tarnished Two Handed Battle Axe]]           || [[Rusty Two Handed Battle Axe]], [[Sharpening Stone]]                                    ||           || 26 || {{Classic Short}}
+|-
+| [[Tarnished Two Handed Sword]]           || [[Rusty Two Handed Sword]], [[Sharpening Stone]]                                    ||           || 25 || {{Classic Short}}
+|-
+| [[Tarnished Warhammer]]           || [[Rusty Warhammer]], [[Sharpening Stone]]                                    ||           || 20 || {{Classic Short}}
+|-
+| [[Small Brick of Ore]]                 || [[Tarnished Battle Axe]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+|-
+| [[Small Brick of Ore]]                 || [[Tarnished Scimitar]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+|-
+| [[Small Brick of Ore]]                 || [[Tarnished Warhammer]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+|-
+| [[Small Piece of Ore]]                 || [[Tarnished Shortened Spear]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+|-
+| 2x [[Small Piece of Ore]]                 || [[Tarnished Axe]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+|-
+| [[Small Piece of Ore]]                 || [[Tarnished Dagger]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+|-
+| 2x [[Small Piece of Ore]]                 || [[Tarnished Spear]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+|-
+| 2x [[Small Piece of Ore]]                 || [[Tarnished Rapier]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+|-
+| [[Small Brick of Ore]]                 || [[Tarnished Long Sword]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+|-
+| [[Small Brick of Ore]]                 || [[Tarnished Scythe]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+|-
+| [[Small Brick of Ore]]                 || [[Tarnished Bastard Sword]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+|-
+| [[Small Brick of Ore]]                 || [[Tarnished Broad Sword]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+|-
+| 2X [[Small Piece of Ore]]                 || [[Tarnished Mining Pick]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+|-
+| [[Small Brick of Ore]]                 || [[Tarnished Mace]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+|-
+| [[Small Brick of Ore]]                 || [[Tarnished Flail]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+|-
+| [[Small Brick of Ore]]                 || [[Tarnished Fer`Esh]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+|-
+| [[Small Brick of Ore]]                 || [[Tarnished Shan`Tok]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+
+|}
+
+<span>''A note on the velium ores: This ore is a loot drop in Velious only. Common sources for it are: orc miners in crystal caverns, various mobs in Tower of Frozen Shadow (5th floor, especially), sentries and such in Skyshrine, and various spider and golem-type creatures in other zones (Velketor's Labyrinth, underneath Icewell Keep, etc.)''</span>
+
+===  Other Basics ===
+Use a [[Smithing Chisel]] to break apart bricks.
+
+{| class="eoTable3 sortable"
+! Item                                               || Components                                                                      || p99 Trivial || Classic Trivial || Era
+|-
+| [[Large Brick of Ore]] (conversion)                || 3x [[Small Brick of Ore]], [[Water Flask]]                                      || 27   || 21 || {{Classic Short}}
+|-
+| [[Large Brick of Medium Quality Ore]] (conversion) || 3x [[Small Brick of Medium Quality Ore]], [[Water Flask]]                       || 27          || <=136 || {{Classic Short}}
+|- 
+| [[Large Brick of High Quality Ore]] (conversion)   || 3x [[Small Brick of High Quality Ore]], [[Water Flask]]                         || 27          || <=81 || {{Classic Short}}
+|- 
+| [[Large Brick of Velium]] (conversion)             || 3x [[Small Brick of Velium]], [[Coldain Velium Temper]]                         || 27?         || - || {{Velious Short}}
+|-
+| [[Block of Ore]] (conversion)                      || 3x [[Large Brick of Ore]], [[Water Flask]]                                      || 27          || 56 || {{Classic Short}}
+|-
+| [[Block of Medium Quality Ore]] (conversion)       || 3x [[Large Brick of Medium Quality Ore]], [[Water Flask]]                       || 27          || <124 || {{Classic Short}}
+|-
+| [[Block of High Quality Ore]] (conversion)         || 3x [[Large Brick of High Quality Ore]]                                          || 27          || <124 || {{Classic Short}}
+|- 
+| [[Block of Velium]]                                || 3x [[Large Brick of Velium]], [[Coldain Velium Temper]]                         || 27           || - || {{Velious Short}}
+|-
+| [[Metal Rings]]                                    || [[Large Brick of Ore]], [[File]], [[Water Flask]]                            || 40          || 82 || {{Classic Short}}
+|-
+| [[Medium Quality Metal Rings]]                     || [[Large Brick of Medium Quality Ore]], [[File]], [[Water Flask]]                || 43          || <=115 || {{Classic Short}}
+|-
+| [[High Quality Metal Rings]]                       || [[Large Brick of High Quality Ore]], [[File]], [[Water Flask]]                  || 46          || <=81 || {{Classic Short}}
+|- 
+| [[Velium Rings]] (Yield: 2)                        || [[Large Brick of Velium]], [[File]], [[Coldain Velium Temper]]                  || >48         || - || {{Velious Short}}
+|-
+| [[Chain Jointing]]                                 || [[Metal Rings]], [[Smithy Hammer]], [[File]], [[Water Flask]]                   || 95          || ? || {{Classic Short}}
+|-
+| [[Medium Quality Chain Jointing]]                  || [[Medium Quality Metal Rings]], [[Smithy Hammer]], [[File]], [[Water Flask]]    || 100         || ? || {{Classic Short}}
+|-
+|2x [[Small Brick of High Quality Ore]]                 || [[Fine Steel Great Staff]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+|-
+|2x [[Small Brick of High Quality Ore]]                 || [[Fine Steel Long Sword]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+|-
+|2x [[Small Brick of High Quality Ore]]                 || [[Fine Steel Morning Star]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+|-
+|2x [[Small Brick of High Quality Ore]]                 || [[Fine Steel Rapier]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+|-
+| [[Small Brick of High Quality Ore]], 2x [[Small Piece of High Quality Ore]]                 || [[Fine Steel Short Sword]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+|-
+| [[Small Brick of High Quality Ore]],  [[Small Piece of High Quality Ore ]]                 || [[Fine Steel Spear]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+|-
+| [[Small Brick of High Quality Ore]], 2x [[Small Piece of High Quality Ore ]]                 || [[Fine Steel Warhammer]], [[Water Flask]]                                      ||         || 21 || {{Classic Short}}
+|}
+
+===  Enchanted Components === 
+
+Note: In general, enchanted ore or metals are created by having an enchanter enchant the ore ''before'' forging. Enchanted components are sometimes for Human Cultural.
+
+{| class="eoTable3 sortable"
+! Item                                      || Components                                                                     || p99 Trivial || Classic Trivial || Era
+|-
+| [[Enchanted Metal Rings]]                 || [[Large Brick of Enchanted Ore]], [[File]], [[Water Flask]]                    || 51          || ? || {{Kunark Short}}
+|-
+| [[Enchanted Chain Jointing]]              || [[Enchanted Metal Rings]], [[Water Flask]], [[Smithy Hammer]], [[File]]        || 106         || ? || {{Kunark Short}}
+|-
+| [[Block of Enchanted Ore]]                || 3x [[Large Brick of Enchanted Ore]], [[Water Flask]]                           || 32          || ? || {{Kunark Short}}
+|-
+| [[Enchanted Folded Sheet Metal]]          || [[Block of Enchanted Ore]], [[Smithy Hammer]], [[Water Flask]]                 || 44          || ? || {{Kunark Short}}
+|-
+| [[Small Brick of Enchanted Ore]] (*)      || 1x [[Large Brick of Enchanted Ore]], [[Water Flask]]                           || 21          || ? || {{Kunark Short}}
+|-
+| [[Enchanted Sheet Metal]] (*)             || 2x [[Small Brick of Enchanted Ore]], [[Water Flask]]                           || 42          || ? || {{Kunark Short}}
+|}
+
+''(*) Note: These last two items can be used by ANY smith to make silver weapons, but both of them must first be made by a human smith in a human cultural forge.''
+
+===  Tools and Implements === 
+{{Era Short|Classic}}
+
+All recipes require a [[Water Flask]] and a [[Metal Bits]], except where noted.
+
+{| class="eoTable3 sortable" style="width: 92%;"
+! Item                       || Components                                                                      || Trivial
+|-
+| [[File]]                   || [[File Mold]]                                  || 21
+|-
+| [[Small Metal Container]]  || [[Hinge Mold]], [[Small Container Base Mold]], [[Small Container Lid Mold]]   || 31
+|-
+| [[Medium Metal Container]] || [[Hinge Mold]], [[Container Base Mold]], [[Container Lid Mold]]               || 40
+|-
+| [[Large Metal Container]]  || [[Hinge Mold]], [[Large Container Base Mold]], [[Large Container Lid Mold]]   || 46
+|-
+| [[Skinning Knife]]         || [[Small Brick of Ore]], [[Dagger Blade Mold]], [[Hilt Mold]] * (no Metal Bits)   || 41
+|-
+| [[Scaler]]                 || [[Scaler Mold]]                                || 41
+|-
+| [[Toolbox]]                || [[Small Brick of Ore]], [[Toolbox Mold]]       || 51
+|-
+| [[Shaped Cookie Cutters]]  || Shaped Mold                                    || 40
+|-
+| [[Large Lantern]]          || [[Lantern Casing Mold]], [[Bottle]]            || 68
+|-
+| [[Muffin Tin]]             || [[Muffin Tin Mold]], [[Ceramic Lining]]        || 35
+|-
+| [[Pie Tin]]                || [[Pie Tin Mold]], [[Ceramic Lining]]           || 36
+|-
+| [[Cake Round]]             || [[Cake Round Mold]], [[Ceramic Lining]]        || 37
+|-
+| [[Smoker]]                 || [[Skewers]], [[Smoke Base Mold]], [[Smoker Support Mold]]    || 50
+|-
+| [[Skewers]]                || [[Skewer Mold]]                                || 38
+|-
+| [[Pot]]                    || [[Pot Mold]], [[Standing Legs Mold]]           || 50
+|-
+| [[Sewing Kit]]             || [[Needle Mold]], [[Thimble Mold]]              || 52
+|-
+| [[Bread Tin]]              || [[Bread Tin Mold]], [[Ceramic Lining]]         || 38
+|-
+| [[Lockpicks]]              || [[Lockpick Mold]]                              || 88
+|}
+
+=== Weapons === 
+==== Tarnished ====
+All recipes require a [[Sharpening Stone]].<br>
+Prices are a Work In Progress. I am making profit whole numbers so it sorts better.<br>
+Note: The Sell prices listed are what the NPC buy from you for, NOT WHAT THEY SELL THEM FOR. Keep this in mind<br>
+With 75 CHA and amiable faction, a sharpening stone is 3cp.
+
+{| class="eoTable3 sortable" style="width: 80%;"
+! Item
+! Weapon
+! Trivial
+! Rusty<br> sell price*
+! Tarnished<br> sell price*
+! Extra Profit? *<br> (Not including Stone)
+|-
+| [[Tarnished Dagger]]
+| [[Rusty Dagger]]
+| 18
+| 2s 9c
+| 2s 9c
+| 0
+|-
+| [[Tarnished Mining Pick]]
+| [[Rusty Mining Pick]]
+| 19
+|
+|
+|
+|-
+| [[Tarnished Shortened Spear]]
+| [[Rusty Shortened Spear]]
+| 19
+| 1g 2s 3c
+| 1g 2s 3c
+| 0
+|-
+| [[Tarnished Rapier]]
+| [[Rusty Rapier]]
+| 20
+|
+|
+|
+|-
+| [[Tarnished Short Sword]]
+| [[Rusty Short Sword]]
+| 20
+| 2s 8c
+| 3s 2c
+| 4
+|-
+| [[Tarnished Warhammer]]
+| [[Rusty Warhammer]]
+| 20
+| 1g 7s 1c
+| 1g 7s 1c
+| 0
+|-
+| [[Tarnished Flail]]
+| [[Rusty Flail]]
+| 21
+|
+| 1g 8s 1c
+|
+|-
+| [[Tarnished Mace]] 
+| [[Rusty Mace]]
+| 21
+| 9s 5c
+| 9s 5c
+| 0
+|-
+| [[Tarnished Spear]]
+| [[Rusty Spear]]
+| 21
+| 1g 9s
+| 1g 9s
+| 0
+|-
+| [[Tarnished Axe]]
+| [[Rusty Axe]]
+| 22
+| 2s 9c
+| 9s 5c
+| 66
+|-
+| [[Tarnished Broad Sword]]
+| [[Rusty Broad Sword]]
+| 22
+| 5s 7c
+| 6s 3c
+| 6
+|-
+| [[Tarnished Long Sword]]
+| [[Rusty Long Sword]]
+| 23
+| 1g 9s 
+| 2g 3c
+| 13
+|-
+| [[Tarnished Scimitar]]
+| [[Rusty Scimitar]]
+| 23
+| 1g 8s 1c
+| 1g 9s 2c
+| 11
+|-
+| [[Tarnished Battle Axe]]
+| [[Rusty Battle Axe]]
+| 24
+| 1g 8s 1c
+| 1g 9s 2c
+| 11
+|-
+| [[Tarnished Halberd]]
+| [[Rusty Halberd]]
+| 24
+|
+|
+|
+|-
+| [[Tarnished Morning Star]]
+| [[Rusty Morning Star]]
+| 24
+|
+|
+|
+|-
+| [[Tarnished Bastard Sword]]
+| [[Rusty Bastard Sword]]
+| 25
+|
+|
+|
+|-
+| [[Tarnished Scythe]]
+| [[Rusty Scythe]]
+| 25
+| 1g 9s
+| 4c
+| -186 (aka never do this)
+|-
+| [[Tarnished Two Handed Sword]]
+| [[Rusty Two Handed Sword]]
+| 25
+| 2g 8s 6c
+| 2g 8s 6c
+| 0
+|-
+| [[Tarnished Two Handed Battle Axe]]
+| [[Rusty Two Handed Battle Axe]]
+| 26
+|
+|
+|
+|}
+
+<nowiki>*All was done with indifferent faction with 110 CHA</nowiki>
+
+==== Forged ====
+{| class="eoTable3 sortable"
+! Item                         || Components                                                                      || p99 Trivial || Classic Trivial || Era
+|-
+| [[Forged Bastard Sword]]        || [[Dual-Edged Blade Mold]], [[Hilt Mold]], [[Pommel Mold]], [[Sheet Metal]], [[Water Flask]]                        ||  72  || ? || {{Era Short|Classic}}
+|-
+| [[Forged Battle Axe]]        || [[Axe Head Mold]], [[Oak Shaft]], [[Sheet Metal]], [[Water Flask]]                        ||   72   || ? || {{Era Short|Classic}}
+|-
+| [[Forged Dagger]]        || [[Dagger Blade Mold]], [[Hilt Mold]], [[Pommel Mold]], [[Sheet Metal]], [[Water Flask]]                        ||  48 || ? ||  {{Era Short|Classic}}
+|-
+| [[Forged Fer`Esh]]        || [[Fer`Esh Blade Mold]], [[Hilt Mold]], [[Pommel Mold]], [[Folded Sheet Metal]], [[Flask of Bloodwater]]                        ||   115   || ? || {{Era Short|Kunark}}
+|-
+| [[Forged Halberd]]        || [[Halberd Head Mold]], [[Oak Shaft]], [[Sheet Metal]], [[Water Flask]]                        ||   82   || ? || {{Era Short|Classic}}
+|-
+| [[Forged Javelin]](x2)        || [[Javelin Mold]], [[Sheet Metal]], [[Water Flask]]                        ||   60   || ? || {{Era Short|Classic}}
+|-
+| [[Forged Long Sword]]        || [[Long Blade Mold]], [[Hilt Mold]], [[Pommel Mold]], [[Sheet Metal]], [[Water Flask]]                        ||   68   || ? || {{Era Short|Classic}}
+|-
+| [[Forged Mace]]        || [[Mace Head Mold]], [[Oak Shaft]], [[Sheet Metal]], [[Water Flask]]                        ||   66   || ? || {{Era Short|Classic}}
+|-
+| [[Forged Morning Star]]        || [[Spiked Ball Mold]], [[Hilt Mold]], [[Sheet Metal]], [[Water Flask]]                        ||   72   || ? || {{Era Short|Classic}}
+|-
+| [[Forged Pick]]        || [[Pick Head Mold]], [[Oak Shaft]], [[Sheet Metal]], [[Water Flask]]                        ||   49   || ? || {{Era Short|Classic}}
+|-
+| [[Forged Rapier]]        || [[Thin Blade Mold]], [[Hilt Mold]], [[Pommel Mold]], [[Sheet Metal]], [[Water Flask]]                        ||   62   || ? || {{Era Short|Classic}}
+|-
+| [[Forged Scimitar]]        || [[Curved Blade Mold]], [[Hilt Mold]], [[Pommel Mold]], [[Sheet Metal]], [[Water Flask]]                        ||   68   || ? || {{Era Short|Classic}}
+|-
+| [[Forged Shan`Tok]]        || [[Shan`Tok Blade Mold]], [[Hilt Mold]], [[Pommel Mold]], [[Folded Sheet Metal]], [[Flask of Bloodwater]]                        ||   82   || ? || {{Era Short|Kunark}}
+|-
+| [[Forged Sheer Blade]]        || [[Sheer Blade Mold]], [[Hilt Mold]], [[Pommel Mold]], [[Folded Sheet Metal]], [[Flask of Bloodwater]]                        ||   115   || ? || {{Era Short|Kunark}}
+|-
+| [[Forged Short Sword]]        || [[Short Blade Mold]], [[Hilt Mold]], [[Pommel Mold]], [[Sheet Metal]], [[Water Flask]]                        ||   62   || ? || {{Era Short|Classic}}
+|-
+| [[Forged Shuriken]](x10)        || [[Shuriken Mold]], [[Sheet Metal]], [[Water Flask]]                        ||   58   || ? || {{Era Short|Classic}}
+|-
+| [[Forged Spear]]        || [[Spear Head Mold]], [[Oak Shaft]], [[Sheet Metal]], [[Water Flask]]                        ||   66   || ? || {{Era Short|Classic}}
+|-
+| [[Forged Throwing Axe]](x5)        || [[Throwing Axe Mold]], [[Sheet Metal]], [[Water Flask]]                        ||   56   || ? || {{Era Short|Classic}}
+|-
+| [[Forged Throwing Knife]](x10?)        || [[Throwing Knife Mold]], [[Sheet Metal]], [[Water Flask]]                        ||   53   || ? || {{Era Short|Classic}}
+|-
+| [[Forged Two Handed Sword]]        || [[Heavy Steel Blade Mold]], [[Hilt Mold]], [[Pommel Mold]], [[Sheet Metal]], [[Water Flask]]                        ||   75   || ? || {{Era Short|Classic}}
+|-
+| [[Forged Warhammer]]        || [[Hammer Head Mold]], [[Oak Shaft]], [[Sheet Metal]], [[Water Flask]]                        ||   62   || ? || {{Era Short|Classic}}
+|}
+
+==== Velium ====
+{{Era|Velious}}
+
+All pieces require a [[Sheet of Velium]] and a [[Coldain Velium Temper]].
+
+{| class="eoTable3 sortable"
+! Item
+! Components
+! p99 Trivial
+|-
+| [[Forged Velium 2-Handed Sword]]
+| [[Heavy Steel Blade Mold]], [[Hilt Mold]], [[Pommel Mold]]
+| style="text-align: center;" | 122
+|-
+| [[Forged Velium Dagger]]
+| [[Dagger Blade Mold]], [[Hilt Mold]], [[Pommel Mold]]
+| style="text-align: center;" | 95
+|-
+| [[Forged Velium Long Sword]]
+| [[Long Blade Mold]], [[Hilt Mold]], [[Pommel Mold]]
+| style="text-align: center;" | 115
+|-
+| [[Forged Velium Morning Star]]
+| [[Spiked Ball Mold]], [[Hilt Mold]]
+| style="text-align: center;" | 119
+|-
+| [[Forged Velium Scimitar]]
+| [[Curved Blade Mold]], [[Hilt Mold]], [[Pommel Mold]]
+| style="text-align: center;" | 115
+|-
+| [[Forged Velium Short Sword]]
+| [[Short Blade Mold]], [[Hilt Mold]], [[Pommel Mold]]
+| style="text-align: center;" | 108
+|-
+| [[Forged Velium Shuriken]](x20?)
+| [[Shuriken Mold]]
+| style="text-align: center;" | 104
+|-
+| [[Forged Velium Throwing Axe]](x15?)
+| [[Throwing Axe Mold]]
+| style="text-align: center;" | 102
+|-
+| [[Forged Velium Throwing Knife]](x20?)
+| [[Throwing Knife Mold]]
+| style="text-align: center;" | 98
+|-
+| [[Forged Velium Throwing Spear]](x15?)
+| [[Javelin Mold]]
+| style="text-align: center;" | 106
+|}
+
+==== Silvered ====
+{{Era|Kunark}}
+
+All pieces require an [[Enchanted Sheet Metal]], an [[Enchanted Silver Bar]], and a [[Water Flask]].
+
+{| class="eoTable3 sortable" style="text-align: left;"
+! Item
+! Components
+! p99 Trivial
+|-
+| [[Silvered Battle Axe]]
+| [[Axe Head Mold]], [[Oak Shaft]]
+| style="text-align: center;" | 115
+|-
+| [[Silvered Dagger]]
+| [[Dagger Blade Mold]], [[Hilt Mold]], [[Pommel Mold]]
+| style="text-align: center;" | 115
+|-
+| [[Silvered Javelin]]
+| [[Javelin Mold]]
+| style="text-align: center;" | 115
+|-
+| [[Silvered Long Sword]]
+| [[Long Blade Mold]], [[Hilt Mold]], [[Pommel Mold]]
+| style="text-align: center;" | 115
+|-
+| [[Silvered Mace]]
+| [[Mace Head Mold]], [[Oak Shaft]]
+| style="text-align: center;" | 115
+|-
+| [[Silvered Pick]]
+| [[Pick Head Mold]], [[Oak Shaft]]
+| style="text-align: center;" | 115
+|-
+| [[Silvered Rapier]]
+| [[Thin Blade Mold]], [[Hilt Mold]], [[Pommel Mold]]
+| style="text-align: center;" | 115
+|-
+| [[Silvered Scimitar]]
+| [[Curved Blade Mold]], [[Hilt Mold]], [[Pommel Mold]]
+| style="text-align: center;" | 115
+|-
+| [[Silvered Short Sword]]
+| [[Short Blade Mold]], [[Hilt Mold]], [[Pommel Mold]]
+| style="text-align: center;" | 115
+|-
+| [[Silvered Shuriken]](x1)
+| [[Shuriken Mold]]
+| style="text-align: center;" | 115
+|-
+| [[Silvered Spear]]
+| [[Spear Head Mold]], [[Oak Shaft]]
+| style="text-align: center;" | 115
+|-
+| [[Silvered Throwing Axe]](x1)
+| [[Throwing Axe Mold]]
+| style="text-align: center;" | 115
+|-
+| [[Silvered Throwing Knife]](x1)
+| [[Throwing Knife Mold]]
+| style="text-align: center;" | 115
+|-
+| [[Silvered Warhammer]]
+| [[Hammer Head Mold]], [[Oak Shaft]]
+| style="text-align: center;" | 115
+|}
+
+==== Misc ====
+All recipes require a [[Water Flask]].
+{| class="eoTable3 sortable"
+! Item                         || Components                                                                      || p99 Trivial || Classic Trivial || Era
+|-
+| [[Field Point Arrowheads]](x20)   || [[Metal Bits]], [[File]] || 41          || 41 || {{Era Short|Classic}}
+|-
+| [[Hooked Arrowheads]](x5)        || 3x [[Small Brick of Ore]], [[File]] || 44          || 68 || {{Era Short|Classic}}
+|-
+| [[Antonian Javelin]] (cultural, made by HUM only)         || 1x [[Medium Quality Sheet Metal]], [[Javelin Mold]] || 112          || ?? || {{Era Short|Classic}}
+|-
+| [[Bundled Steel Arrow Shafts]]  || 2x [[Large Brick of Medium Quality Ore]], [[File]] || 44          || 135 || {{Era Short|Classic}}
+|-
+| [[Silver Tipped Arrowheads]](x5) || 1x [[Silver Bar]], 1x [[Block of Medium Quality Ore]], [[File]] || 79          || 168 || {{Era Short|Classic}}
+|}
+
+=== Banded Armor === 
+All recipes require a [[Water Flask]].
+
+{| class="eoTable3 sortable" style="text-align: center;"
+! Banded Item
+! [[Sheet Metal]]
+! Mold
+! AC
+! Wt
+! Trivial
+! Era
+|-
+| style="text-align: left;" | [[Banded Mask | Mask]]
+| 2
+| style="text-align: left;" | [[Mask Mold| Mask]]
+| 4
+| 1.0
+| 90
+| {{Era Short|Classic}}
+|-
+| style="text-align: left;" | [[Banded Gorget |Gorget]]
+| 1
+| style="text-align: left;" | [[Gorget Mold|Gorget]]
+| 5
+| 2.0
+| 92
+| {{Era Short|Classic}}
+|-
+| style="text-align: left;" | [[Banded Bracer |Bracer]]
+| 1
+| style="text-align: left;" | [[Bracer Sectional Mold |Bracer Sectional]]
+| 6
+| 2.0
+| 95
+| {{Era Short|Classic}}
+|-
+| style="text-align: left;" | [[Banded Boots |Boots]]
+| 1
+| style="text-align: left;" | [[Boot Mold |Boot]]
+| 6
+| 5.0
+| 95
+| {{Era Short|Classic}}
+|-
+| style="text-align: left;" | [[Banded Belt |Belt]]
+| 2
+| style="text-align: left;" | [[Belt Sectional Mold|Belt Sectional]]
+| 6
+| 2.5
+| 95
+| {{Era Short|Classic}}
+|-
+| style="text-align: left;" | [[Banded Mantle |Mantle]]
+| 2
+| style="text-align: left;" | [[Mantle Sectional Mold |Mantle Sectional]]
+| 6
+| 3.5
+| 95
+| {{Era Short|Classic}}
+|-
+| style="text-align: left;" | [[Banded Cloak |Cloak]]
+| 2
+| style="text-align: left;" | [[Cloak Sectional Mold | Cloak Sectional]]
+| 7
+| 4.0
+| 102
+| {{Era Short|Classic}}
+|-
+| style="text-align: left;" | [[Banded Gauntlets |Gauntlets]]
+| 2
+| style="text-align: left;" | [[Gauntlet Mold |Gauntlet]]
+| 7
+| 4.0
+| 102
+| {{Era Short|Classic}} (Oct 1999)
+|-
+| style="text-align: left;" | [[Banded Sleeves |Sleeves]]
+| 2
+| style="text-align: left;" | [[Sleeves Sectional Mold |Sleeves Sectional]]
+| 7
+| 3.5
+| 102
+| {{Era Short|Classic}}
+|-  
+| style="text-align: left;" | [[Banded Helm |Helm]]
+| 2
+| style="text-align: left;" | [[Helm Mold |Helm]]
+| 8
+| 4.5
+| 106
+| {{Era Short|Classic}}
+|-
+| style="text-align: left;" | [[Banded Leggings |Leggings]]
+| 3
+| style="text-align: left;" | [[Leggings Sectional Mold |Leggings Sectional]]
+| 8
+| 5.5
+| 108
+| {{Era Short|Classic}}
+|-
+| style="text-align: left;" | [[Banded Mail |Mail]]
+| 3
+| style="text-align: left;" | [[Mail Sectional Mold |Mail Sectional]]
+| 15
+| 7.5
+| 115
+| {{Era Short|Classic}}
+|-
+! style="text-align: right;" | Total
+! style="text-align: center;" | 23
+!
+! style="text-align: center;" | 85
+! style="text-align: center;" | 45
+!
+!
+|-
+! style="text-align: right;" | Both Bracers
+! style="text-align: center;" | 24
+!
+! style="text-align: center;" | 91
+! style="text-align: center;" | 47
+!
+!
+|-
+! style="text-align: right;" | Visible Set
+! style="text-align: center;" | 15
+!
+! style="text-align: center;" | 57
+! style="text-align: center;" | -
+!
+!
+|}
+
+=== Shields === 
+All recipes require a [[Water Flask]] and a [[Smithy Hammer]], which is returned on success or failure. In classic Everquest the Blacksmithed version of shields were better AC than their vendor purchased / npc dropped counterparts and had different vendor values.
+
+{| class="eoTable3 sortable" style="text-align: left;"
+! style="text-align: center;" | Item
+! style="text-align: center;" | Mold
+! style="text-align: center;" | Metal
+! style="text-align: center;" | Trivial
+|-
+| [[Buckler]]
+| [[Buckler Mold]]
+| [[Sheet Metal]] 1x
+| style="text-align: center;" | 62
+|-
+| [[Round Shield]]
+| [[Round Shield Mold]]
+| [[Sheet Metal]] 2x
+| style="text-align: center;" | 68
+|-
+| [[Targ Shield]]
+| [[Targ Shield Mold]]
+| [[Folded Sheet Metal]] 1x
+| style="text-align: center;" | 79
+|-
+| [[Kite Shield]]
+| [[Kite Shield Mold]]
+| [[Medium Quality Sheet Metal]] 2x
+| style="text-align: center;" | 82
+|-
+| [[Tower Shield]]
+| [[Tower Shield Mold]]
+| [[Medium Quality Folded Sheet Metal]] 1x
+| style="text-align: center;" | 88
+|}
+
+Small and large size shields are made similarly, just with the appropriate sized mold.
+
+== Advanced Blacksmithing Recipe List ==
+
+=== Ornate Chain Armor ===
+All recipes require an appropriate Chainmail Pattern, [[Silver Bar]], [[Water Flask]], and [[Smithy Hammer]], which is returned on success or failure.
+{{Era|Epics}}
+
+{| class="eoTable3 sortable" style="width:100%; text-align: center;"
+|-
+! Ornate Chain Item
+! Chainmail Pattern
+! [[High Quality Metal Rings|HQ Metal]] [[High Quality Metal Rings|Rings]]
+! AC
+! Wt<br />
+! EQ Legends<br/>Trivial 
+! Classic<br/>Trivial
+|-
+| style="text-align: left;" | [[Ornate Chain Gorget|Gorget]]
+| style="text-align: left;" | [[Chainmail Neckguard Pattern|Neckguard]]
+| 1
+| 6
+| 1.5
+| 119
+| 155
+|-
+| style="text-align: left;" | [[Ornate Chain Bracelet|Bracelet]]
+| style="text-align: left;" | [[Chainmail Bracelet Pattern|Bracelet]]
+| 1
+| 7
+| 1.5
+| 122
+| 155
+|-
+| style="text-align: left;" | [[Ornate Chain Veil|Veil]]
+| style="text-align: left;" | [[Chainmail Veil Pattern|Veil]]
+| 1
+| 5
+| 0.5
+| 116
+| 155
+|-
+| style="text-align: left;" | [[Ornate Chain Skirt|Skirt]]
+| style="text-align: left;" | [[Chainmail Skirt Pattern|Skirt]]
+| 2
+| 7
+| 2.0
+| 122
+| >165 <= 168
+|-
+| style="text-align: left;" | [[Ornate Chain Coif|Coif]]
+| style="text-align: left;" | [[Chainmail Coif Pattern|Coif]]
+| 2
+| 9
+| 4.0
+| 132
+| 170
+|-
+| style="text-align: left;" | [[Ornate Chain Mantle|Mantle]]
+| style="text-align: left;" | [[Chainmail Mantle Pattern|Mantle]]
+| 2
+| 7
+| 3.0
+| 122
+| 182
+|-
+| style="text-align: left;" | [[Ornate Chain Sleeves|Sleeves]]
+| style="text-align: left;" | [[Chainmail Sleeve Pattern|Sleeve]]
+| 2
+| 8
+| 3.0
+| 128
+| >165 <= 168
+|-
+| style="text-align: left;" | [[Ornate Chain Gloves|Gloves]]
+| style="text-align: left;" | [[Chainmail Glove Pattern|Glove]]
+| 2
+| 8
+| 3.5
+| 128
+| 182
+|-
+| style="text-align: left;" | [[Ornate Chain Boots|Boots]]
+| style="text-align: left;" | [[Chainmail Boot Pattern|Boots]]
+| 2
+| 7
+| 4.5
+| 122
+| 182
+|-
+| style="text-align: left;" | [[Ornate Chain Leggings|Leggings]]
+| style="text-align: left;" | [[Chainmail Pant Pattern|Pant]]
+| 3
+| 9
+| 5.0
+| 135
+| >166 & <= 175
+|-
+| style="text-align: left;" | [[Ornate Chain Cloak|Cloak]]
+| style="text-align: left;" | [[Chainmail Cloak Pattern|Cloak]]
+| 3
+| 8
+| 3.5
+| 128
+| 222
+|-
+| style="text-align: left;" | [[Ornate Chain Mail|Mail]]
+| style="text-align: left;" | [[Chainmail Tunic Pattern|Tunic]]
+| 3
+| 16
+| 7.0
+| 142
+| 195
+|-
+!Total
+! 
+! 23
+! 97
+! 40.0
+!
+!
+|-
+!Both Bracelets
+! 
+! 24
+! 104
+! 41.5
+!
+!
+|}
+
+''Note: Enchanted Silver Bars do not work for these recipes.''
+
+=== Fine Plate Armor ===
+All recipes require [[Leather Padding]] (see below for farming notes), a [[Water Flask]], and a [[Smithy Hammer]], which is returned on success or failure.
+{{Era|Hole}}
+
+{| class="eoTable3 sortable" style="text-align: center;"
+! Fine Plate Item
+! [[Medium Quality Folded Sheet Metal | Medium Quality<br/>Folded Sheet Metal]]
+! Mold
+! AC
+! Wt
+! Trivial
+|-
+| style="text-align: left;" | [[Fine Plate Collar|Collar]]
+| 1
+| style="text-align: left;" | [[Plate Gorget Mold|Plate Gorget]]
+| 8
+| 4.0
+| 166
+|-
+| style="text-align: left;" | [[Fine Plate Visor|Visor]]
+| 1
+| style="text-align: left;" | [[Plate Visor Mold|Plate Visor]]
+| 7
+| 1.5
+| 163
+|-
+| style="text-align: left;" | [[Fine Plate Bracer|Bracer]]
+| 1
+| style="text-align: left;" | [[Plate Bracer Mold|Plate Bracer]]
+| 9
+| 4.0
+| 168
+|-
+| style="text-align: left;" | [[Fine Plate Helm|Helm]]
+| 2
+| style="text-align: left;" | [[Plate Helm Mold|Plate Helm]]
+| 12
+| 6.0
+| 179
+|-
+| style="text-align: left;" | [[Fine Plate Pauldron|Pauldron]]
+| 2
+| style="text-align: left;" | [[Plate Pauldron Mold|Plate Pauldron]]
+| 10
+| 4.5
+| 168
+|-
+| style="text-align: left;" | [[Fine Plate Girdle|Girdle]]
+| 2
+| style="text-align: left;" | [[Plate Belt Mold|Plate Belt]]
+| 9
+| 4.0
+| 168
+|-
+| style="text-align: left;" | [[Fine Plate Vambraces|Vambraces]]
+| 2
+| style="text-align: left;" | [[Plate Vambrace Mold|Plate Vambrace]]
+| 10
+| 6.5
+| 175
+|-
+| style="text-align: left;" | [[Fine Plate Gauntlets|Gauntlets]]
+| 2
+| style="text-align: left;" | [[Plate Gauntlet Mold|Plate Gauntlet]]
+| 11
+| 5.0
+| 175
+|-
+| style="text-align: left;" | [[Fine Plate Boots|Boots]]
+| 2
+| style="text-align: left;" | [[Plate Boot Mold|Plate Boot]]
+| 10
+| 6.5
+| 168
+|-
+| style="text-align: left;" | [[Fine Plate Breastplate|Breastplate]]
+| 3
+| style="text-align: left;" | [[Breastplate Mold|Plate Breastplate]]
+| 19
+| 10.0
+| 188
+|-
+| style="text-align: left;" | [[Fine Splinted Cloak|Fine Splinted Cloak]]
+| 3
+| style="text-align: left;" | [[Field Splinted Cloak Mold|Field Splinted Cloak]]
+| 10
+| 5.5
+| 175
+|-
+| style="text-align: left;" | [[Fine Plate Greaves|Greaves]]
+| 3
+| style="text-align: left;" | [[Plate Greaves Mold|Plate Greaves]]
+| 12
+| 7.5
+| 182
+|-
+! style="text-align: right;" | Total
+! 24
+!
+! 127
+! 65
+!
+|-
+! style="text-align: right;" | Both Bracers
+! 25
+!
+! 136
+! 69
+!
+|}
+
+=== Fine Plate Dyes ===
+
+[[File:Dwarfsmallpalebluefineplatearmor.png|200px|thumb|Small Pale (Light) Blue Fine Plate armor set on female dwarf model]]
+[[File:bile_dyes01.png|200px|thumb|Three different dyes on a male troll - pale green breastplate, normal green legs/arms/wrists, and normal yellow helm/gloves/boots.]]
+
+Armor dyes are used on fine steel plate armor only (no other armor will accept a dye). The color of the armor can be changed, while the stats are unmodified. The extracts needed for the dyes are made by either a [[Shaman]] using [[Alchemy]] or a [[Rogue]] using [[Make Poison]]. These extracts are then usable by anyone (no skill check) to be combined into dyes. There is an in game book [[How to Dye and Stain]] that describes part of this.
+
+;The general process involves three steps:
+
+;1. Make the Extract
+
+Extracts can be combined in either an alchemist's [[Medicine Bag]], or in a rogue's [[Mortar and Pestle]] (trivial of 36 for both shaman and rogue). The [[Empty Vial]] needed is sold by the dye supply merchants, and is combined with a water flask and the main extract ingredient. While this step can be done by anyone, for a higher success rate it is better to have a shaman or a rogue perform this combine.
+
+;2. Make the Dye
+
+Can be made by anyone (no-fail), using the above extracts, and combining them in a [[Medium Clay Jar]] with some [[Resin]] (made by [[pottery]], this is a combineable container. You lose the jar on combine)
+
+* dark color  - [[resin]] x1, extract x1.  (e.g. [[Dark Green Dye]])
+* base color  - [[resin]] x2, extract x1.  (e.g. [[Green Dye]])
+* light color - [[resin]] x3, extract x1.  (e.g. [[Light Green Dye]])
+
+;3. Dye the Armor
+
+Take a completed piece of fine steel plate armor, place it in the forge along with 1 dye, 1 [[Jar of Acid]], 1 [[Jar of Lacquer]] and hit combine. Once dyed, the color cannot be removed. You CAN fail on this part of the process (it's a skill check versus your smithing skill), read your combine message carefully. On a failure, the armor will be returned to you, undyed, and you lose the dye, lacquer and acid.
+
+<table class="eoTable3" style="width:100%;">
+  <tr>
+    <th colspan="6">Dye Table</th>
+  </tr>
+  <tr>
+    <th rowspan="2">Material</th>
+    <th rowspan="2">Extract</th>
+    <th style="text-align:center" colspan="3">Colors</th>
+    <th rowspan="2">Drop Locations</th>
+  </tr>
+  <tr>
+    <th>[[Resin]] x1</th>
+    <th>[[Resin]] x2</th>
+    <th>[[Resin]] x3</th>
+  </tr>
+  <tr>
+    <td>[[Permafrost Crystals]]</td>
+    <td>[[Permafrost Extract]]</td>
+    <td>[[Dark Blue Dye|Dark Blue]]</td>
+    <td>[[Blue Dye|Blue]]</td>
+    <td>[[Light Blue Dye|Pale Blue]]</td>
+    <td>Mobs in [[Permafrost]], Ground Spawn in Dire wolf pens</td>
+  </tr>
+  <tr>
+    <td>[[Evergreen Leaf]]</td>
+    <td>[[Evergreen Extract]]</td>
+    <td>[[Dark Green Dye|Dark Green]]</td>
+    <td>[[Green Dye|Green]]</td>
+    <td>[[Light Green Dye|Pale Green]]</td>
+    <td>Ground Spawn in [[Greater Faydark]] at (2400, 2400) and [[The Wakening Land]] at (2900, 4300)</td>
+  </tr>
+  <tr>
+    <td>[[Sarcoscypha Fungus]]</td>
+    <td>[[Sarcoscypha Extract]]</td>
+    <td>[[Dark Red Dye|Crimson]]</td>
+    <td>[[Red Dye|Red]]</td>
+    <td>[[Light Red Dye|Rose]]</td>
+    <td>Fungus mobs in [[Upper Guk]], [[Innothule Swamp|Innothule]]. Ground Spawn in [[Lesser Faydark|LFay]] at the Faerie camp (199, 3613)</td>
+  </tr>
+  <tr>
+    <td>[[Jack-O-Lantern Fungus]]</td>
+    <td>[[Jack-O-Lantern Extract]]</td>
+    <td>[[Dark Yellow Dye|Dark Yellow]]</td>
+    <td>[[Yellow Dye|Yellow]]</td>
+    <td>[[Light Yellow Dye|Pale Yellow]]</td>
+    <td>Scarecrows in [[Western Karana|WK]], [[Unrest]].  Ground Spawn in [[Lesser Faydark|LFay]] at the Faerie camp (1101, 3594)</td>
+  </tr>
+  <tr>
+    <td>[[Charcoal]] or [[Red Cockatrice Feather]]</td>
+    <td rowspan="2">[[Black Extract]]</td>
+    <td rowspan="2">[[Black Dye|Black]]</td>
+    <td rowspan="2">[[Grey Dye|Grey]]</td>
+    <td rowspan="2">[[Light Grey Dye|Slate]]</td>
+    <td rowspan="2">Various elementals.  Kunark Cockatrice, Frogloks, Goblins</td>
+  </tr>
+  <tr>
+    <td>[[Green Froglok Skin]] or [[Green Goblin Skin]]</td>
+  </tr>
+  <tr>
+    <td>[[Russet Oxide]]</td>
+    <td>[[Russet Extract]]</td>
+    <td>[[Brown Rust Dye|Brown Rust]]</td>
+    <td>none</td>
+    <td>none</td>
+    <td>Various elementals. Ground Spawn in [[Steamfont]] at (1950, -1200)</td>
+  </tr>
+  <tr>
+    <td>[[Iron Oxide]]</td>
+    <td>[[Red Rust Extract]]</td>
+    <td>[[Red Rust Dye|Red Rust]]</td>
+    <td>none</td>
+    <td>none</td>
+    <td>Various elementals. Ground Spawn in [[Steamfont]] at (1950, -1200)</td>
+  </tr>
+</table>
+
+== Cultural Smithing ==
+
+Cultural smithing involves several sets of armor unique to each race. This includes the use of tempers, imbued gems, and [[Forge|cultural forges (see for locations)]].
+
+All cultural armor requires smithing by the race listed, and must be forged within the race-specific forge located in their home city.
+
+''Note: [[Erudite]]s and [[Halfling]]s do not have any cultural smithing armor sets since they are instead [[Tailoring|cultural tailoring]] races. [[Wood Elf]]s have smithed weapons, though their primary cultural tradeskills are [[tailoring]] and [[fletching]]. [[Half-Elves]] do not have any unique cultural tradeskills for their race, though they can use some of the items made by others.''
+
+'''Imbued Gems:''' Are converted from normal gems by an "Imbue Gem" spell. Each imbued gem gives different bonuses to the resulting armor, and restricts it to a particular deity. Healers (cleric, druid, shaman) can call down the blessing of their deity upon a gem with the use of a level 29 spell. (For Solusek Ro, it is a wizard spell.) Each healer can only scribe and cast the imbue spell for the gem specific to their deity, after which a tradesperson can use the imbued gem in crafting deity-specific items. (The tradesperson does not need to worship a specific deity in order to craft items for that deity.)
+
+{| class="eoTable"
+! Imbued Gem                || Deity Restriction   || Used for?                          || Creation Spell           || Spell Caster Class
+|-
+| [[Imbued Amber]]          || [[Cazic Thule]]     || Ogre & Iksar & Erudite Smithing              || [[Imbue Amber]]          || [[Cleric]], [[Shaman]]
+|-
+| [[Imbued Black Sapphire]] || [[Bertoxxulous]]    || Human Smithing                     || [[Imbue Black Sapphire]] || [[Cleric]]
+|-
+| [[Imbued Diamond]]        || [[Mithaniel Marr]]  || Human Smithing                     || [[Imbue Diamond]]        || [[Cleric]], [[Shaman]]
+|-
+| [[Imbued Emerald]]        || [[Tunare]]          || High Elf {{VeliousGray|& Gnome Smithing}} || [[Imbue Emerald]]        || [[Cleric]], [[Druid]]
+|-
+| [[Imbued Ivory]]          || [[The Tribunal]]    || Barbarian Smithing                 || [[Imbue Ivory]]          || [[Shaman]]
+|-
+| [[Imbued Jade]]           || [[Rallos Zek]]      || Ogre, Barbarian, Human Smithing          || [[Imbue Jade]]           || [[Shaman]]
+|-
+| [[Imbued Opal]]           || [[Rodcet Nife]]     || Human Smithing                     || [[Imbue Opal]]           || [[Cleric]]
+|-
+| [[Imbued Peridot]]        || [[Bristlebane]]     || Dwarf Smithing                     || [[Imbue Peridot]]        || [[Cleric]]
+|-
+| [[Imbued Plains Pebble]]  || [[Karana]]          || Halfling Tailoring, Human Smithing || [[Imbue Plains Pebble]]  || [[Cleric]], [[Druid]]
+|-
+| [[Imbued Rose Quartz]]    || [[Erollisi Marr]]   || Human Smithing                     || [[Imbue Rose Quartz]]    || [[Cleric]]
+|-
+| [[Imbued Ruby]]           || [[Brell Serilis]]   || Dwarf Smithing                     || [[Imbue Ruby]]           || [[Cleric]]
+|-
+| [[Imbued Sapphire]]       || [[Innoruuk]]        || Dark Elf Smithing                  || [[Imbue Sapphire]]       || [[Shaman]], [[Cleric]]
+|- 
+| [[Imbued Topaz]]          || [[Quellious]]       || Erudite Tailoring                  || [[Imbue Topaz]]          || [[Cleric]]
+|}
+
+'''Tempers:''' Are made with the [[Brewing#Tempers|brewing]] skill (see the brewing page for more information), and can be made by any race.
+
+
+
+'''Cultural Tradeskill Table'''
+
+{| class="eoTable"
+! Cultural Tradeskill                           || Discription   
+|-
+| [[Cultural Tradeskills: Barbarian|Barbarian]] || Can forge a chain-class armor, plus weapons. The armor can be worn by all chain-wearing non-small, non-large folk, including iksar (no dwarves, gnomes, halflings, trolls or ogres). Use a [[Northman Forge]].
+|-
+| [[Cultural Tradeskills: Dark Elf|Dark Elf]]   || Can forge Adamantite Armor - both chain and plate varieties, plus weapons. The armor can also be worn by half elves. Use a [[Teir`dal Forge]].
+|-
+| [[Cultural Tradeskills: Dwarf|Dwarf]]         || Can forge Brellium Armor - wearable by plate classes, plus weapons. The armor can also be worn by gnomes and halflings. Use a [[Stormguard Forge]].
+|-
+| [[Cultural Tradeskills: Erudite|Erudite]]     || Can make Steelsilk Armor (tailored with smithing components). Use a [[Erud Forge]] for the smithing.
+|-
+| Gnomes                                        || Gnome cultural smithing is not yet in the game.
+|-
+| [[Cultural Tradeskills: Halfling|Halfling]]   || Can make Vale Leather Armor (tailored with smithing components). Use a [[Vale Forge]] for the smithing.
+|-
+| [[Cultural Tradeskills: High Elf|High Elf]]   || Can make Mithril Armor which can also be worn by wood elves and half elves. Use a [[Koada`dal Forge]] for the smithing.
+|-
+| [[Cultural Tradeskills: Human|Human]]         || Can make Seafarers' Ringmail (Freeport), Field Plate (Freeport), Full Plate (Qeynos) armor sets. These can also be worn by barbarians, erudites, and half elves. Note that humans have TWO cultural forges, one in Freeport and one in Qeynos. They can make armor in both locations, but must use the proper forge with the proper recipe. Use either a [[Antonican Forge]] or a [[Royal Qeynos Forge]] for the smithing.
+|-
+| [[Cultural Tradeskills: Iksar|Iksar]]         || Can make Skyiron Armor, weapons, and shields. Use a [[Iksar Forge]] for the smithing.
+|-
+| [[Cultural Tradeskills: Ogre|Ogre]]           || Can make Ogre War Plate and Ogre Splintmail armor sets, which can also be worn by trolls. Use a [[Oggok Forge]] for the smithing.
+|-
+| Trolls                                        || Troll cultural smithing is not yet in game.
+|-
+| [[Cultural Tradeskills: Wood Elf|Wood Elf]]   || Can make Mithril Studded Leather and Mithril Reinforced Leather (tailored with smithing components) as well as Mithril Feir`dal weapons. Use a [[Fier`dal Forge]] for the smithing.
+|}
+
+== Finding Materials ==
+
+Most blacksmithing materials can be purchased from vendors, but a few require killing stuff.
+
+=== Fine Plate: Leather Padding === 
+
+Leather Paddings are one of the most frustrating aspects of mastering blacksmithing: they require farming several different items ''and'' doing multiple combines, just to produce a single padding ... and they're not even Blacksmithing combines (they're [[Tailoring]])!
+
+Fortunately, there are a few key locations in Norath that can at least make the farming part easier.
+
+==== Leather Padding: Spiderling Silk ====
+
+By far the best place to collect {{:Spiderling Silk}} is the [[Field of Bone]].  Other newbie zones might have a few spiderlings to kill, but Field of Bone features a "secret" crypt full of colorfully named ones (eg. [[A bonebinder]]), perhaps twenty in total.
+
+Field of Bone can be easily reached by heading west from the zone-in location in [[Emerald Jungle]].  Once in the zone the crypt entrance is on the opposite side, at {{Loc | Field of Bone| 210, 2500}}.
+
+Because it's a newbie zone, the respawn timer is short, only 6:40.  This means that after you finish clearing the crypt, you have just enough time to buff a few newbies or take a bathroom break, before the whole place respawns again.
+
+Until Kunark becomes available on EQ Legends, another option is [[The Feerrott]]. Both the [[a jungle spider]] and [[a jungle spiderling]] drop {{:Spiderling Silk}}. They are a little more spread out, not as concentrated in one area, but they are plentiful.
+
+==== Leather Padding: Low Quality Pelts ====
+
+By far the best place to farm pelts is [[Stonebrunt Mountains]].  Elsewhere in Norath animals only drop pelts infrequently, and many are ruined.  In Stonebrunt though the leopards almost always have a drop, it's never ruined, and usually it's a pelt (≈20% have a skin instead).  You can easily spend an evening here and grind out 200 pelt drops for making leather padding.
+
+Unfortunately, many of the pelts you get won't be low quality, but you can easily fix that by combining them with a [[Skinning Knife]].
+
+'''Also, bring your stacks of [[Silk Thread]] with you so you can convert the unstackable pelts directly into stackable [[Leather Padding]]!!!!  Stonebrunt is way out of the way so this is the only efficient way to make the trips here count.'''
+
+There are two main areas to hunt.  
+
+'''First Path'''
+The best technique is to go from the zone entrance to the First red X location just running straight out along the ground that looks like jungle until you start getting towards the sea, they wont spawn by the sea.
+This is (roughly {{Loc | Stonebrunt Mountains| -4000, -500}}), and it contains approximately ten+ leopards and they like to bunch up so searching is not difficult.  There are also kobolds, wisps, and snakes in the valley, but they're all low level and shouldn't bother you.  Being a high level pet class makes this very easy.
+
+'''Second Path'''
+From the zone entrance travel north along the left zone wall into the mountains where the ground turns forest like and you see snow covered trees all the way to roughly {{Loc | Stonebrunt Mountains| 200, 2600}}. You'll find leopards all along this area in the trees and then again when when the ground changes to rock.  At least a similar number leopards or more that also like to path together.  There are slightly higher level mobs here, but again nothing to worry about unless you are low level. Again being a high level pet class makes this a cake walk to kill it all
+
+'''Additional Areas'''
+After the first 2 pathing areas you can run all around the rock colored floor areas to the other side of the zone and see tigers and more leopards.  The tigers are higher level and fewer of them.  But you can easily just run from leopard to leopard in the rocky areas of the zone and then just back track the first pathing area or second pathing area.  This zone is filled to the brim with leopards and again you can grind out 200 pelt drops in an evening if you want.
+
+'''There is no need to be a tracking class''' with the high number of leopards in this zone but [[Tracking]] (especially from a Ranger) is highly recommended if you want to really have nonstop killing, but non-trackers will still find plenty leopards just by wandering around; they spawn together and are packed fairly densely.
+
+== Of Smithing and Grime and Sweat... ==
+
+''by Janus Xanathis, Necrobane (Tunare server) ([http://web.archive.org/web/20001206083900/http://www.eqtraders.com/ Dec 2000])''
+
+There are books you can read, and other documents to view that can tell you HOW to use the skill of the hammer and the forge. I am not going to do that today. What I am going to do is tell you WHAT to make when your body is layered in sweat and grime, and the smoke of the bellows is against your face. If you follow this plan, you shall have the skill to create the armor that everyone wants, in only as long as your gold holds true. For once you start selling the armor... gold is not something you need to want for again.
+
+First off, let me tell you this. To walk on the road to become a master of this skill requires much time, and a greater amount of gold. Unlike skills such as baking, or jewelcraft, in which you can start to recoup some of your gold loss at a lower skill, you cannot do that with the hammer and the forge. How many people do you know of walking around town shouting for skewers, or metal bits? Exactly.
+
+But as I said above, once you get the skill to start creating the banded armor that sells so well, you will start to gain your gold back, and you shall get many an order for more. With that said, what is the quickest road to gaining the skill to become an armor-smith, you ask? Well, I shall tell you. The easiest jump, on the road to creating glorious armor, is to save up your trainings for four levels. Once you have all twenty trainings, dump them all into Smithing. Since you won't have the skill to kill the monsters that have the loot that you can sell for the amount of gold you'll need... until you are in the low teens... saving up the trainings shouldn't be a problem. But, if for some reason, you need all of your trainings, there are other ways to get to the twentieth level of skill. Two to be exact.
+
+You '''sharpen rusty weapons''' that are taken from the dead hands of monsters that hold them... or you make the '''metal bits''' that are needed for some of the later items. I don't want to replace the part of the book, but, some basics to know when you are doing anything with the forge. NEVER stack anything in it. If it calls for multiples of something that stacks, put them in different slots. The last item you will always be placing in the forge, is a flask of water. Hunting down madmen in the desert of Ro is a good way to gain the huge amounts of water that you will need for this skill. Whether you are making metal bits, or a banded helm... each step of the way has a single flask of water as the last item to place in the forge.
+
+Also, not matter if you succeed, or fail, when you are using the forge ... All items you place in it will be lost. If you succeeded, you will have the item you were creating. If you failed, you have nothing, but some more skill on the road to becoming a hammer master. Once you have been ranked as having a skill of the twentieth level, you will see the message that making the metal bits, or sharpening the weapons is beneath you. It's quite uppity to tell you this, but what it means is that you will gain no more learning from doing these tasks. So, you now switch over to making a different item....
+
+'''A metal sheet.'''
+
+But can't you buy those, you ask? Why yes, you can, and they are about the same price, if not lower, to buy then they are to make. So when you are making the more difficult items that require the sheets to make, simply buy the sheets, that way you don't have to worry about the random failure in making them. BUT... they are the easiest thing to make to get you up the ladder of skill at this point. Making metal sheets will get you to rank fifty in smithy. Again, you will fail, more then you succeed at first... and you will make a LOT of sheets by the time you get to fifty. But a good note is that you can sell them back to the vendors that you are buying the parts that you need to make them from. You won't get back all of your money... maybe half... maybe three quarters... but it's still something back. Once you get to the level in which the metal sheets are gaining you no skill... what should you make next?
+
+'''Banded Armor?'''
+
+Sadly... not yet. You can try... and you will fail... greatly. And you may be able to make a piece every twenty or thirty tries. But your learning will not go up that fast, and the money you will loose will be insane. So, stick to simpler items, such as Large Lanterns.
+
+If you are at 68... NOW are you going to try to make the banded armor? Aye. You can.
+
+I, so far, have been able to make five banded helms, and two banded shirts. The shirts I did at with my skill of eighty. Two tries per shirt. I know I was lucky to only have a single failure per item. But it goes to show you that having the patience to walk the long road will pay off. With the going rate being about forty plat for a shirt, if not more... You can see that even with a few failures per item, you will be making your gold back, and more. Don't just worry about getting to the skill to make banded, and stopping there. There are rumors around that smiths shall soon have the ability to start to make plate, or a type of plate armor. I have also heard that you are going to need a skill up around one hundred and thirty, if not more, if you want to pull this off.
+
+All I can say is... start making your banded wares... and continue to make them. Also... out of any of the skills... none are as physically rewarding as this one. Having spent hours over the hot coals, pounding away with your hammer... and creating an item that will help save someone from those extra slices and blows... is also a very good feeling to have. Of course, so is feeling the weight of your purse after you just sold off a full suit to someone. 
+
+== Resources ==
+
+There are several ingame books which originally provided the recipes for blacksmithing:
+
+* [[Ikthars Fine Steel Skin]] by Ikthar Fireheart
+* [[Fireprides Guide to Shield Craft]] by Ton Firepride
+* [[Rings, Chains, and Arrowheads]] by Gord Smith
+* [http://www.less3d.com/smithing.htm Less3D's Smithing List]
+
+{{Navbox Tradeskill}}
+
+[[Category:Skills]]
+[[Category:Tradeskills]]

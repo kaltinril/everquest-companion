@@ -5,7 +5,27 @@ The latest patch notes can always be found on the EverQuest Legends official dis
 = Classic Era Patch Notes =
 EverQuest Legends launched on July 28, 2026.  With a Level cap of 50, this is what the wiki will call the "Classic Era"
 
-== 2026-10-23 - Hotfix ==
+== 2026-11-3 - Patch Notes ==
+These patch notes are from the Official EverQuest Legends discord, posted on November 3, 2026
+
+=== Extra Life === 
+* Extra Life [[Kerran]] Face Texture previews are now available in-game or at character creation. You will not be able to save the new Face Texture appearances until the milestone is achieved for that respective texture, but will be able to preview the unlock.
+ 
+=== Gameplay === 
+* The lighting in [[Nektropos Castle]] has changed... the atmosphere looks a bit more spooky.
+* The [[Lord Rikantus Everling]] encounter in [[Nektropos Castle]] now operates much more reliably. Additionally, timing of mechanics during the fight has been adjusted to provide a better experience for players who rapidly deal large amounts of damage to the boss.
+* Pathing has been improved in the narrower hallways of the second floor of [[Nektropos Castle]].
+* [[The Head Librarian]] encounter in [[Nektropos Castle]] will no longer reset if all players engaged in the encounter are gnomes.
+* All undead in the [[Nektropos Castle]] now see through standard invisibility.
+
+=== Items === 
+* [[Handmaiden's Handwrap]] and [[Unbroken Golem Core]] now have proper ornamentation sockets
+
+=== Spells & Pets === 
+* A newly charmed pet now starts with taunt off, and the owner's pet window now reflects that state.
+* [[Iksar]]-owned skeleton petamorph illusions and skeleton familiars now show the standard skeleton model as intended, instead of the [[Iksar]] skeleton model.
+
+== 2026-10-29 - Hotfix ==
 These patch notes are from the Official EverQuest Legends discord, posted on October 29, 2026
 
 === General ===

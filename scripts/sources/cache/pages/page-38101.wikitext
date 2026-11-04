@@ -2336,3 +2336,9 @@ A_Mountain_Lion
 Small_Cloth_Shirt
 Skill_Pick_Pocket
 Fine_Plate
+Golden_Pendant
+Griffenne_Blood
+Death_Scarab_Gland
+Box_of_Abu-Kar
+Greater_Kobold
+Decorative_Mask
