@@ -428,23 +428,27 @@ fn zone_named(ts: i64, name: &str) -> String {
     format!(r#"{{"kind":"zone","seq":0,"ts":{ts},"raw":"z","zone":"{name}"}}"#)
 }
 
-/// The owner's Lake Nerius night (2026-11-03): a kill in the +4, out to the +3, back to the +4. The
-/// second +4 is a new instance with the mob up, so the first one's clock must not run there.
+/// Each instance tier keeps its own clock, kept across a visit elsewhere (owner, 2026-11-03:
+/// "Timers should be retained across instances but be ISOLATED to that instance"): a kill in the
+/// +4, out to the +3 and a kill there, back to the +4 — two rows, the +4's still counting.
 #[test]
-fn re_entering_an_instance_tier_voids_the_clock_from_the_last_instance() {
+fn each_instance_tier_keeps_its_own_clock_across_a_visit_elsewhere() {
     let mut m = RespawnModule::new(NOW, watching_the_knight());
     m.on_event(&ev(&zone_named(T_ZONE, "The Ruins of Old Guk 4 (Refined)")), false);
     m.on_event(&ev(&death(1, T_DEATH)), false);
-    assert_eq!(m.watch_rows(NOW).len(), 1);
     m.on_event(&ev(&zone_named(T_DEATH + 60_000, "The Ruins of Old Guk 3 (Fused)")), false);
-    assert_eq!(m.watch_rows(NOW).len(), 1, "the +4 clock stays while you are elsewhere");
+    m.on_event(&ev(&death(2, T_DEATH + 90_000)), false);
     m.on_event(&ev(&zone_named(T_DEATH + 120_000, "The Ruins of Old Guk 4 (Refined)")), false);
-    assert!(m.watch_rows(NOW).is_empty(), "the new +4 instance has no clock yet");
-    // The next kill there starts it again, and keeps the count.
-    m.on_event(&ev(&death(2, T_SECOND_DEATH)), true);
-    let row = only_row(&m);
-    assert_eq!(row.kills, 2);
-    assert_eq!(row.samples, 0, "no gap spans two instances");
+    let mut rows = m.watch_rows(NOW);
+    rows.sort_by(|a, b| a.zone.cmp(&b.zone));
+    let got: Vec<(&str, i64, i64)> = rows.iter().map(|r| (r.zone.as_str(), r.base_ts, r.kills)).collect();
+    assert_eq!(
+        got,
+        vec![
+            ("The Ruins of Old Guk 3 (Fused)", T_DEATH + 90_000, 1),
+            ("The Ruins of Old Guk 4 (Refined)", T_DEATH, 1),
+        ]
+    );
 }
 
 /// The open world is one place: zoning out and back keeps the clock.

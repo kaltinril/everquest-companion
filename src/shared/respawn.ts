@@ -347,6 +347,8 @@
 // writes through) gets the same promise: main restores a kept number onto a name the list newly
 // watches and sets aside the number of one it stopped watching (`respawnWithWatchList`).
 
+import { zoneKey } from './zones'
+
 /** Which rung of the ladder produced the estimate on a row. `'none'` = no rung had anything. */
 export type RespawnSource = 'custom' | 'observed' | 'wiki' | 'none'
 
@@ -769,6 +771,33 @@ export function respawnZoneKey(zone: string): string {
 export function respawnInZone<T extends { zone: string }>(items: readonly T[], zone: string): T[] {
   const want = respawnZoneKey(zone)
   return items.filter((i) => respawnZoneKey(i.zone) === want)
+}
+
+/**
+ * The same zone's OTHER instance tiers (and its open world), out of a list of rows: what the
+ * Timers tab lists under the clocks of the tier you stand in (owner, 2026-11-03: "Timers should be
+ * retained across instances but be ISOLATED to that instance"; "It would also be nice to see the
+ * time for each zone if i've killed it this session"). Each tier is its own clock; this only
+ * gathers them. `zoneKey` strips the tier, so `Lake Nerius 3 (Fused)` sits beside the `4 (Refined)`.
+ * The empty zone has no siblings.
+ */
+export function respawnOtherTiers<T extends { zone: string }>(items: readonly T[], zone: string): T[] {
+  const base = zoneKey(zone)
+  if (base === '') return []
+  const here = respawnZoneKey(zone)
+  return items.filter((i) => respawnZoneKey(i.zone) !== here && zoneKey(i.zone) === base)
+}
+
+/**
+ * The other tiers' clocks the Timers tab shows at `nowMs`: `respawnOtherTiers` less the stale ones
+ * (long due, or a kill from an earlier session), which the all-zones view still lists, in the
+ * tab's own order.
+ */
+export function respawnOtherTierClocks(rows: readonly RespawnRow[], zone: string, nowMs: number): RespawnRow[] {
+  return orderRespawnRows(
+    respawnOtherTiers(rows, zone).filter((r) => !respawnReading(r, nowMs).stale),
+    nowMs
+  )
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
