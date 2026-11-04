@@ -31,6 +31,7 @@ import { normalizeTelemetryPrefs, type TelemetryPrefs } from '../shared/telemetr
 import { DEFAULT_TOAST_CONFIG, normalizeToastConfig } from '../shared/toast'
 import { DEFAULT_ALERT_BANNER_CONFIG, normalizeAlertBannerConfig } from '../shared/alertBanner'
 import { DEFAULT_CON_CARD_CONFIG, applyConCardKnob } from '../shared/conCard'
+import { DEFAULT_RESPAWN_OVERLAY_CONFIG, applyRespawnOverlayKnobs } from '../shared/respawnOverlayConfig'
 import { normalizePerfHudPrefs, type PerfHudPrefs } from '../shared/perf'
 import { normalizeGraphicsPrefs, type GraphicsPrefs } from '../shared/graphicsPrefs'
 import { normalizeBuffTrustPrefs, type BuffTrustPrefs } from '../shared/buffTrust'
@@ -437,7 +438,7 @@ export const DEFAULT_OVERLAY_CONFIG: Record<OverlayKind, OverlayConfig> = {
   // RESPAWN CLOCKS (JOS-194). Default off, no migration — the fourth restatement of the same
   // policy, and the argument above holds verbatim: `overlays.respawn` has never been written by
   // any build, so every existing store reads this default and gets the window off for free.
-  respawn: { open: false, locked: false, bgAlpha: 0.72, bounds: undefined, drill: null },
+  respawn: { open: false, locked: false, bgAlpha: 0.72, bounds: undefined, drill: null, respawn: { ...DEFAULT_RESPAWN_OVERLAY_CONFIG } },
   // The map pin overlay (map-waypoints). Default off, no migration, as above.
   mapPins: { open: false, locked: false, bgAlpha: 0.72, bounds: undefined, drill: null },
   // The Sky quest overlay (sky-quest-overlay). Default off, no migration, as above.
@@ -493,6 +494,8 @@ export function getOverlayConfig(kind: OverlayKind): OverlayConfig {
   // The con card's one knob, on the same terms (JOS-383) — in its own file, beside the kind's own
   // vocabulary, because this one is at the 400-code-line ceiling (`applyTimerOverlayKnobs`' rule).
   applyConCardKnob(kind, cfg)
+  // The respawn overlay's layout knobs, on the same terms (owner, 2026-11-03).
+  applyRespawnOverlayKnobs(kind, cfg)
   // Text scale postdates every other field, so it is ABSENT in most stores and out of range in a
   // hand-edited one — both answered here rather than repeated six times above, because the
   // default (1) does not differ per kind. Clamped on the way out as well as in: see
@@ -539,6 +542,7 @@ export function setOverlayConfig(kind: OverlayKind, patch: Partial<OverlayConfig
   // The con card's knob is renderer-writable too (Preferences owns the auto-hide), so it is clamped
   // by its own normalizer rather than trusted — the two blobs above, through one shared applier.
   applyConCardKnob(kind, next)
+  applyRespawnOverlayKnobs(kind, next)
   // THE TWO TIMER WINDOWS' OWN KNOBS — the row arrangement (JOS-140) and the permanent-buff switch
   // (JOS-215). Both are rebuilt rather than trusted, on the same argument as the drill above; the
   // rule lives beside `isTimerOverlayKind` in shared/buffTimers.ts, which is what "which kinds

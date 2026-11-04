@@ -161,6 +161,12 @@ SK, others).
   private instance prints the same zone line. A group invite (`X has asked you to join the
   instance: ...`) has no accept line. So the 2026-11-03 "re-entry is fresh" rows above may be
   private instances.
+- **Places of a zone** (owner, 2026-11-03): open (anyone can join; the pickzone tiers `Zone`, `Zone 2
+  (Adaptive)` ... `4 (Refined)`, `/pickzone` between them, 5 min apart) against a private instance
+  (`Player <You> creating instance <Zone> <Id>.`, one at a time, the next closes the last, every mob
+  up at creation), the difficulty +0 to +4 on either. A dungeon crawl is the `<Zone> - Group[ N
+  (Adj)]` zone line (the log's only crawl shape; `You have completed the Dungeon Crawl` follows);
+  nothing respawns inside. The respawn time is the same in every place of a zone (owner).
 - **Respawn across a visit elsewhere runs longer** (Corrupted Kedgespawn, open-world Lake Nerius 4,
   2026-11-03): death to first sighting 12:11-13:15 in one stay; 14:55-15:03 when you left the zone
   and came back (the owner waiting at the spawn).

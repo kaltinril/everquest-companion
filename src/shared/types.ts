@@ -14,6 +14,7 @@ import type { AlertBannerOverlayConfig } from './alertBanner'
 // closes is erased at compile time, and the kind's own vocabulary (its payload, its suppression
 // window, its chip projection) lives beside the code that gives it meaning.
 import type { ConCardOverlayConfig } from './conCard'
+import type { RespawnOverlayConfig } from './respawnOverlayConfig'
 // TYPE-ONLY, and the cycle it closes (buffTimers.ts imports `OverlayKind` from here) is erased at
 // compile time. The union lives beside the function that applies it, which is where the argument
 // for each value is written down.
@@ -186,6 +187,13 @@ export interface OverlayConfig {
    * `getOverlayConfig` fills it from the defaults — the two blobs above, arranged the same way.
    */
   conCard?: ConCardOverlayConfig
+  /**
+   * The 'respawn' kind's own knobs (layout, which clock leads, folding — shared/respawnOverlayConfig.ts),
+   * set from its own footer while unlocked (owner, 2026-11-03). Present only on that kind;
+   * `setOverlayConfig` deletes it everywhere else, and `getOverlayConfig` fills it from the
+   * defaults — the three blobs above, arranged the same way.
+   */
+  respawn?: RespawnOverlayConfig
   /**
    * TEXT SIZE for this overlay, as a CSS `zoom` factor on its CONTENT pane (1 = as shipped;
    * owner feedback, 2026-08-05: "text size scaling for overlays. we are old folks now."). It

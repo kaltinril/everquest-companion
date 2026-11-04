@@ -105,6 +105,7 @@ import {
   type RespawnRow
 } from '@shared/respawn'
 import { respawnClearPlan } from '@shared/respawnWatchList'
+import { respawnZoneTitle } from '@shared/respawnTiers'
 import type { ZoneShort } from '@shared/maps'
 import type { MobTarget } from '../mobs/mobTarget'
 import Tooltip from '../../lib/Tooltip'
@@ -449,7 +450,8 @@ export default function TimersView({
 
   // The zone name as the switch and the empty states say it. The fold has no zone before the log
   // states one, and "this zone" is then a claim it cannot make.
-  const zoneName = snap.zone.length > 0 ? snap.zone : 'Unknown zone'
+  // A private instance reads ` · inst`, never its number (owner, 2026-11-03).
+  const zoneName = snap.zone.length > 0 ? respawnZoneTitle(snap.zone) : 'Unknown zone'
   const hereRows = respawnInZone(snap.rows, snap.zone)
   const hereRecent = respawnInZone(snap.recent, snap.zone)
   const scoped = scope === 'zone' ? hereRows : snap.rows
@@ -467,7 +469,7 @@ export default function TimersView({
             the nav row has said Timers since the tab existed, and two names for one surface is the
             thing VIEW_LABELS exists to prevent one floor up. */}
         <Typography variant="h6">Timers</Typography>
-        {snap.zone.length > 0 && <Chip size="small" label={snap.zone} variant="outlined" />}
+        {snap.zone.length > 0 && <Chip size="small" label={zoneName} variant="outlined" />}
       </Stack>
       <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2, mt: 1.5 }}>
         <ScopeSwitch
