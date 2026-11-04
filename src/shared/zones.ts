@@ -114,6 +114,9 @@ export interface ZoneEntry {
 // trace to `zoneTier()` in `src/main/log/parseWorld.ts`, which stays where it is (map-viewer.md
 // §5.3 blocker 1).
 
+/** ` [instance 17]`: the respawn fold's tag for a private instance's stay (`respawn.rs`), whose
+ *  zone line is the open world's. Never part of a name. */
+const INSTANCE_TAG_RE = /\s*\[instance \d+\]\s*$/i
 /** ` - Solo` / ` - Group 2` and everything after it — instance selection, never part of a name. */
 const SOLO_GROUP_RE = /\s*-\s*(Solo|Group)\b.*$/i
 /** A trailing tier parenthetical, with or without the instance ordinal: ` 4 (Refined)`. */
@@ -132,6 +135,7 @@ const LEADING_ARTICLE_RE = /^the /
  */
 export function zoneKey(zone: string | undefined | null): string {
   return (zone ?? '')
+    .replace(INSTANCE_TAG_RE, '')
     .replace(SOLO_GROUP_RE, '')
     .replace(TIER_ORDINAL_RE, '')
     .replace(TIER_PAREN_RE, '')

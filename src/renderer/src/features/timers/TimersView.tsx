@@ -101,7 +101,6 @@ import {
   orderRespawnRows,
   respawnCandidateNote,
   respawnInZone,
-  respawnOtherTierClocks,
   type RespawnCandidate,
   type RespawnRow
 } from '@shared/respawn'
@@ -454,14 +453,11 @@ export default function TimersView({
   const hereRows = respawnInZone(snap.rows, snap.zone)
   const hereRecent = respawnInZone(snap.recent, snap.zone)
   const scoped = scope === 'zone' ? hereRows : snap.rows
-  // The clock runs only while a row is there to count down. In zone scope that includes this
-  // zone's other tiers, listed under the clocks here (owner, 2026-11-03).
-  const nowMs = useSecondsClock(scoped.length > 0 || (scope === 'zone' && snap.rows.length > hereRows.length))
+  // The clock runs only while a row is there to count down.
+  const nowMs = useSecondsClock(scoped.length > 0)
   // Scoped first, then ordered against THIS renderer's clock — see the header: the ranking moves
   // every second whether or not the log does.
   const rows = orderRespawnRows(scoped, nowMs)
-  // Each tier is its own clock; a stale one is left to the all-zones view, which lists them all.
-  const tierRows = scope === 'zone' ? respawnOtherTierClocks(snap.rows, snap.zone, nowMs) : []
   const recent = scope === 'zone' ? hereRecent : snap.recent
 
   return (
@@ -505,26 +501,6 @@ export default function TimersView({
             onSetCustom={onSetCustom}
             links={links}
           />
-          {tierRows.length > 0 && (
-            <Box sx={{ mt: 2 }} data-testid="respawn-other-tiers">
-              <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                Other tiers of this zone
-              </Typography>
-              <Stack spacing={0.75}>
-                {tierRows.map((row) => (
-                  <RespawnRowBar
-                    key={row.id}
-                    row={row}
-                    nowMs={nowMs}
-                    onConfirmSighting={confirmSighting}
-                    onUnwatch={unwatch}
-                    onSetCustom={onSetCustom}
-                    links={links}
-                  />
-                ))}
-              </Stack>
-            </Box>
-          )}
         </Box>
 
         <DiscoveryPanel

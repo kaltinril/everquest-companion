@@ -156,6 +156,14 @@ SK, others).
   cycles; Slizik the Mighty (Old Paineel 1) 3:15; Asaka L`Rei (Befallen 4) 5:15; Corrupted
   Kedgespawn (Lake Nerius 4) 7:54 against 12 min. Owner ruling (same day): clocks are still kept
   per tier across visits, so a re-entry can show a clock for a mob that is already up.
+- **A tier's zone line is the open world too** (owner, 2026-11-03): `Lake Nerius 4 (Refined)` is the
+  open-world +4 unless `Player <You> creating instance Lake Nerius <Id>.` came just before; the
+  private instance prints the same zone line. A group invite (`X has asked you to join the
+  instance: ...`) has no accept line. So the 2026-11-03 "re-entry is fresh" rows above may be
+  private instances.
+- **Respawn across a visit elsewhere runs longer** (Corrupted Kedgespawn, open-world Lake Nerius 4,
+  2026-11-03): death to first sighting 12:11-13:15 in one stay; 14:55-15:03 when you left the zone
+  and came back (the owner waiting at the spawn).
 - **Motes:** grade order Infinitesimal < Minor < Lesser < Major < Greater (< Superior). Yellow/red
   cons drop ~7-10 per 100 kills vs blue 4.2, green 3.1. Player level caps grade (~1 tier per 5
   levels). Party XP lines carry the percent: `You gain party experience! (0.718%)`.

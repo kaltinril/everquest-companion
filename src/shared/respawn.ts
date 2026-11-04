@@ -788,18 +788,6 @@ export function respawnOtherTiers<T extends { zone: string }>(items: readonly T[
   return items.filter((i) => respawnZoneKey(i.zone) !== here && zoneKey(i.zone) === base)
 }
 
-/**
- * The other tiers' clocks the Timers tab shows at `nowMs`: `respawnOtherTiers` less the stale ones
- * (long due, or a kill from an earlier session), which the all-zones view still lists, in the
- * tab's own order.
- */
-export function respawnOtherTierClocks(rows: readonly RespawnRow[], zone: string, nowMs: number): RespawnRow[] {
-  return orderRespawnRows(
-    respawnOtherTiers(rows, zone).filter((r) => !respawnReading(r, nowMs).stale),
-    nowMs
-  )
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // SEARCHING RECENTLY KILLED (owner ruling, round 7 — see the header)
 // ─────────────────────────────────────────────────────────────────────────────

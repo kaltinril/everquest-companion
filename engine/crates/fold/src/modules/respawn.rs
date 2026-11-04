@@ -291,6 +291,17 @@ pub struct RespawnModule {
     awaiting: std::collections::HashSet<String>,
     /// The learned evidence (`respawn_learned.rs`): every mob's gaps, apart from the history.
     learned: LearnedStore,
+    /// `Player X creating instance <Zone> <Id>.` not yet followed by a zone line: the base zone
+    /// (lowercase) and the id. A private instance's zone line is byte-identical to the open world's
+    /// (`Lake Nerius 4 (Refined)` both ways), so this notice is what keeps their clocks apart
+    /// (owner, 2026-11-03: "i'm in an INSTANCE +4 and the timer is showing the time from the
+    /// previous kill in the +4 OPEN WORLD non instance").
+    pending_instance: Option<(String, i64)>,
+}
+
+/// A zone line's base name, lowercase: the tier and any `- Solo`/`- Group` stripped.
+fn zone_base(zone: &str) -> String {
+    crate::jsfn::zone_tier(zone).0.to_lowercase()
 }
 
 impl RespawnModule {
@@ -305,6 +316,7 @@ impl RespawnModule {
             now_ms: construction_now_ms,
             watch_index: std::collections::HashMap::new(),
             awaiting: std::collections::HashSet::new(),
+            pending_instance: None,
             learned: LearnedStore::default(),
         };
         m.reindex_watches();
@@ -695,6 +707,7 @@ impl EqModule for RespawnModule {
         self.learned.clear();
         self.zone = String::new();
         self.zone_since = 0;
+        self.pending_instance = None;
         // Re-read the "wall clock", which here is the pinned construction instant — see the
         // header. Over there this line is `Date.now()`.
         self.now_ms = self.construction_now_ms;
@@ -713,8 +726,19 @@ impl EqModule for RespawnModule {
                 self.learned.clear();
                 self.rev += 1;
             }
+            "instanceCreate" => {
+                if let (Some(zone), Some(id)) = (ev.str("zone"), ev.int("instance")) {
+                    self.pending_instance = Some((zone_base(zone), id));
+                }
+            }
             "zone" => {
-                self.zone = ev.str("zone").unwrap_or_default().to_string();
+                let entered = ev.str("zone").unwrap_or_default();
+                // Entering the zone an instance was just created for is entering that instance: its
+                // clocks are its own, never the open world's under the same zone line.
+                self.zone = match self.pending_instance.take() {
+                    Some((base, id)) if base == zone_base(entered) => format!("{entered} [instance {id}]"),
+                    _ => entered.to_string(),
+                };
                 self.zone_since = ev.ts();
                 // A new stay: no gap spans it, so nothing is awaiting a sign of life any more.
                 self.awaiting.clear();

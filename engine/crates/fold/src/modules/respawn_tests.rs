@@ -460,3 +460,41 @@ fn re_entering_the_open_world_keeps_the_clock() {
     m.on_event(&ev(&zone(T_DEATH + 60_000)), false);
     assert_eq!(m.watch_rows(NOW).len(), 1);
 }
+
+fn instance_created(ts: i64, zone: &str, id: i64) -> String {
+    format!(r#"{{"kind":"instanceCreate","seq":0,"ts":{ts},"raw":"i","player":"Drywrought","zone":"{zone}","instance":{id}}}"#)
+}
+
+/// A private instance prints the open world's zone line; the creation notice before it keeps the
+/// clocks apart (owner, 2026-11-03: "i'm in an INSTANCE +4 and the timer is showing the time from
+/// the previous kill in the +4 OPEN WORLD").
+#[test]
+fn a_private_instance_never_shows_the_open_worlds_clock() {
+    let mut m = RespawnModule::new(NOW, watching_the_knight());
+    m.on_event(&ev(&zone_named(T_ZONE, "Lake Nerius 4 (Refined)")), false);
+    m.on_event(&ev(&death(1, T_DEATH)), false);
+    m.on_event(&ev(&instance_created(T_DEATH + 50_000, "Lake Nerius", 17)), false);
+    m.on_event(&ev(&zone_named(T_DEATH + 60_000, "Lake Nerius 4 (Refined)")), false);
+    let snap = m.snapshot();
+    assert_eq!(snap["state"]["zone"], "Lake Nerius 4 (Refined) [instance 17]");
+    let rows = m.watch_rows(NOW);
+    assert_eq!(rows.len(), 1);
+    assert_eq!(rows[0].zone, "Lake Nerius 4 (Refined)", "the open world's clock stays the open world's");
+    // A kill in the instance is the instance's own clock.
+    m.on_event(&ev(&death(2, T_SECOND_DEATH)), false);
+    let mut zones: Vec<String> = m.watch_rows(NOW).into_iter().map(|r| r.zone).collect();
+    zones.sort();
+    assert_eq!(zones, vec!["Lake Nerius 4 (Refined)", "Lake Nerius 4 (Refined) [instance 17]"]);
+    // Back out to the open world: no notice, so it is the open world again.
+    m.on_event(&ev(&zone_named(T_SECOND_DEATH + 60_000, "Lake Nerius 4 (Refined)")), false);
+    assert_eq!(m.snapshot()["state"]["zone"], "Lake Nerius 4 (Refined)");
+}
+
+/// A notice for another zone does not tag the zone you walk into.
+#[test]
+fn an_instance_notice_for_another_zone_tags_nothing() {
+    let mut m = RespawnModule::new(NOW, watching_the_knight());
+    m.on_event(&ev(&instance_created(T_ZONE, "The Plane of Fear", 572)), false);
+    m.on_event(&ev(&zone_named(T_ZONE + 10_000, "Lake Nerius 4 (Refined)")), false);
+    assert_eq!(m.snapshot()["state"]["zone"], "Lake Nerius 4 (Refined)");
+}
