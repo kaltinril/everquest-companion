@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-04T03:51:41.628Z",
+  "scrapedAt": "2026-11-04T05:27:44.697Z",
   "source": "eqlwiki.com — Category:Quests + quest subcategories + recentchanges delta (scripts/scrape-delta.mts)",
   "quests": [
     {
@@ -16039,6 +16039,7 @@
       ],
       "relatedNpcs": [
         "Retainer Ozval",
+        "Corrupted Kedgespawn",
         "Rylin Coil",
         "Merchant Tyslin (North Felwithe)"
       ],
