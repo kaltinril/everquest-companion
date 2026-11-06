@@ -307,3 +307,28 @@ test("A MOB'S FIGHT NUMBERS JOIN TIER BY TIER ACROSS CHARACTERS, NEVER MIXED ACR
     t4
   ])
 })
+
+test("A ROW'S SERVED FIELDS TAKE THE NEWER SIDE: A MERCHANT MET IN AN ARCHIVED LOG KEEPS THE LIVE ROW'S ITEMS SOLD, ROLE AND HAIL ANSWER (OWNER, 2026-11-05: KLOK SASZ COPIED WITH NO ITEMS)", () => {
+  const archived = snap([row('merchant', 'Klok Sasz', 2, { kinds: ['spoke', 'hailed'], first: '2026-09-25 22:43:32', last: '2026-10-01 22:57:44', details: { samples: ['[1] a'] } })])
+  const live = snap([
+    {
+      ...row('merchant', 'Klok Sasz', 20, { kinds: ['quoted', 'bought'], first: '2026-11-05 19:59:46', last: '2026-11-05 20:10:50', details: { samples: ['[2] b'] } }),
+      role: 'Merchant',
+      greeting: 'Welcome, friend.',
+      itemsSold: [{ item: 'Ale' }, { item: 'Mead', copper: 52 }]
+    } as Row
+  ])
+  const m = mergeGaps(archived, live) as Snap
+  assert.equal(m.rows.length, 1)
+  const r = m.rows[0] as Row & { role?: string; greeting?: string; itemsSold?: unknown }
+  assert.deepEqual(r.itemsSold, [{ item: 'Ale' }, { item: 'Mead', copper: 52 }], 'the live quotes are on the joined row')
+  assert.equal(r.role, 'Merchant')
+  assert.equal(r.greeting, 'Welcome, friend.')
+  assert.equal(r.count, 22)
+  assert.deepEqual(r.kinds, ['spoke', 'hailed', 'quoted', 'bought'])
+  assert.equal(r.first, '2026-09-25 22:43:32')
+  assert.equal(r.last, '2026-11-05 20:10:50')
+  // The other way round, an archived-only field is still kept: the newer side's absence is not a removal.
+  const back = mergeGaps(live, archived) as Snap
+  assert.deepEqual((back.rows[0] as Row & { itemsSold?: unknown }).itemsSold, [{ item: 'Ale' }, { item: 'Mead', copper: 52 }])
+})

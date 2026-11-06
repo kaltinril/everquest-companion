@@ -409,6 +409,14 @@ where one exists.
   text should be crafted by real human contributors". Told the owner about Copy wiki page.
 - No generated merchant item list (owner, decided): vendor stock and player resells cannot be told
   apart, and quoted prices carry the player's faction and Charisma.
+- The archive merge takes a row's served fields from the NEWER side (`mergeGaps.ts mergeRow`,
+  2026-11-05). A name on both sides joins its tallies; `itemsSold`, `greeting`, `role`,
+  `questFacts`, `suggest` and the like are the live fold's current reading. Before, `...had` kept
+  the archived row's fields and dropped the live row's: Klok Sasz, met once in a 2026-09 archived
+  log, copied as a merchant page with every quote on the live row and no `items_sold`. The on-disk
+  segments show no `gaps` module (captured before it existed); the running app folds the archived
+  log for it, so an offline check against the segment files misses this path. Ask for the row as the
+  tab shows it (kinds, first seen) before reasoning from files.
 - `event_feed.rs` is 431 code lines, near the 440 bar. The npm gate does not run the size check
   on the real tree.
 - "I have it" (`eq.gaps.heldOnly`, off by default): Items only; filters through `useHeldOnly` before
