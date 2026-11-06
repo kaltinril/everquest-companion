@@ -409,6 +409,12 @@ where one exists.
   text should be crafted by real human contributors". Told the owner about Copy wiki page.
 - No generated merchant item list (owner, decided): vendor stock and player resells cannot be told
   apart, and quoted prices carry the player's faction and Charisma.
+- Respawn learning files a gap under the zone WITHOUT its `[instance N]` tag (`respawn.rs
+  record_death` → `respawn_places.rs learned_place`, 2026-11-05). test.40's per-place clocks had
+  put each place's gaps in their own `learned` series (`nektropos castle 4 (refined) [instance
+  709]::the game master` beside `nektropos castle 4 (refined)::the game master`), so the owner's
+  three Nektropos 4 nameds showed one gap per place and never reached the three-gap wiki rule. The
+  clocks stay per place; only the learned series is pooled, as the estimate already was.
 - The archive merge takes a row's served fields from the NEWER side (`mergeGaps.ts mergeRow`,
   2026-11-05). A name on both sides joins its tallies; `itemsSold`, `greeting`, `role`,
   `questFacts`, `suggest` and the like are the live fold's current reading. Before, `...had` kept
