@@ -238,10 +238,19 @@ function mergeFight(a: FightTier[] | undefined, b: FightTier[] | undefined): Fig
   return [...byTier.values()].sort((x, y) => x.tier - y.tier)
 }
 
+/**
+ * One name on both sides. The tallied fields join; every other field the fold serves on a row (a
+ * merchant's `itemsSold`, `greeting` and `role`, an NPC's `questFacts`, a `suggest`, `maybePlayer`)
+ * takes the NEWER side, which is the live fold's current reading. The older side used to win them
+ * (owner, 2026-11-05: a merchant met once in an archived log copied as a page with no items sold,
+ * though the live row carried every quote: `...had` kept the archive row's fields and never saw the
+ * live row's).
+ */
 function mergeRow(had: Row, r: Row): Row {
   const fight = mergeFight(had.fight, r.fight)
   return {
     ...had,
+    ...r,
     ...(fight === undefined ? {} : { fight }),
     name: nameOf(had, r),
     kinds: [...had.kinds, ...r.kinds.filter((k) => !had.kinds.includes(k))],
