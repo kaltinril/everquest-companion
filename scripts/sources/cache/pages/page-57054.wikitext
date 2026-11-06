@@ -5,6 +5,24 @@ The latest patch notes can always be found on the EverQuest Legends official dis
 = Classic Era Patch Notes =
 EverQuest Legends launched on July 28, 2026.  With a Level cap of 50, this is what the wiki will call the "Classic Era"
 
+== 2026-11-4 - Hotfix ==
+These patch notes are from the Official EverQuest Legends discord, posted on November 4, 2026
+
+=== General ===
+* Fixed an issue where cooldowns for [[Lay on Hands]] and [[Harm Touch]] would trigger but not fire their ability.
+* Hailing [[Ollix Everling]] in [[Nektropos Castle]] so that you can restart [[The Tragic Tale of House Everling]] will no longer remove your access to the castle towers if you had already earned it. This fix is not retroactive, so if you have previously had access and lost it, you will need to regain that access one more time but will keep it in the future.
+* Undead NPCs in [[Nektropos Castle]] now see through normal invisibility but do not see through invisibility vs undead.
+* Living NPCs in [[Nektropos Castle]] now see through invisibility vs undead but do not see through normal invisibility.
+* Mimics in [[Nektropos Castle]] see food.
+* Shroud of Stealth is generally effective in [[Nektropos Castle]].
+* Some rare/named creatures in [[Nektropos Castle]] are capable of seeing through all types of invisibility.
+
+== 2026-11-3 - Hotfix ==
+These patch notes are from the Official EverQuest Legends discord, posted on November 3, 2026
+
+=== AA ===
+* Fixed an issue with various alternate ability activation requirements when deleveled.
+
 == 2026-11-3 - Patch Notes ==
 These patch notes are from the Official EverQuest Legends discord, posted on November 3, 2026
 

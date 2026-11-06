@@ -44,7 +44,7 @@
 |Dwarves
 |-
 | align="right" |10
-|Halflings
+|Halflings .. Wallin Slyfoot in WC has no faction hit
 |-
 | align="right" |10
 |Gnomes
@@ -75,7 +75,7 @@ between 3 kills.
 |Barbarians, Drakkin, Erudites, and Humans.
 |-
 |Where:
-|Classic: West Karana, bandit camps
+|Classic: West Karana, bandit camps. West Commonlands Dervish camp.
 Kunark: 
 |-
 |
@@ -91,7 +91,7 @@ Kunark:
 |Dark Elves, Elddar Elves, Fire Elves, Half Elves, High Elves, Sand Elves,  and Wood Elves.
 |-
 |Where:
-|Classic: Castle Mistmoore, Plane of Hate
+|Classic: Castle Mistmoore, Plane of Hate, Befallen, Najena, Greater Faydark bandit camp
 Kunark: 
 |-
 |
@@ -104,7 +104,7 @@ Kunark:
 |Coldain, Dwarves, Gnomes, and Halflings.
 |-
 |Where:
-|Classic: Rivervale -400, 40 nice spot. Butchblock for bandits.
+|Classic: Rivervale x: 400, y: -400 nice spot. Butcherblock bandits.
 Kunark: 
 |-
 |
@@ -117,7 +117,7 @@ Kunark:
 |Trolls
 |-
 |Where:
-|Classic: West Commonlands - dervish camp
+|Classic: West Commonlands - dervish camp. Rathe Mountains newbie area by guard tower - a troll invader, a troll raider, a troll scout spawn at night (7PM - 5 AM) game time, kill fast and you can get 200+ kills per  game night.
 Kunark: 
 |-
 |
@@ -130,7 +130,7 @@ Kunark:
 |Ogres
 |-
 |Where:
-|Classic: West Commonlands,
+|Classic: West Commonlands, Najena, West Karana
 Kunark: 
 |-
 |
@@ -156,7 +156,7 @@ Kunark:
 |Kerrans and Vah Shir.
 |-
 |Where:
-|Classic: Stonebrunt Mountains, cat camp up north. Kirra Island: do the Amulet quest at the same time.
+|Classic: Stonebrunt Mountains, cat camp up north. Kerra Island: do the Amulet quest at the same time. Warrens: Kerran prisoners, no faction hits.
 Kunark: 
 |-
 |
@@ -169,7 +169,7 @@ Kunark:
 |Frogloks, Frogs, Guktans, and Tadpoles.
 |-
 |Where:
-|Classic: Upper, Lower Guk
+|Classic: Upper, Lower Guk, Rathe Mountains newbie area by Guard Tower
 Kunark: 
 |-
 |
@@ -195,7 +195,7 @@ Kunark:
 |Drachnids, Scorpions, Spiders, and Ursarachnids.
 |-
 |Where:
-|Classic: Najena - spider room, Steamfont NE corner (best)
+|Classic: Najena - spider room, Steamfont NE corner (best), Upper Guk, Lower Guk, East Karana (great spot to farm silk too)
 Kunark: 
 |-
 |
@@ -221,7 +221,7 @@ Kunark:
 |Cats, Lions, Pumas, Sabertooths, Scarlet Cheetahs, Tigers, Topiary Lions,  and Wrulons.
 |-
 |Where:
-|Classic: Stonebrunt Mountains, oasis of Marr, North & West Karana
+|Classic: Stonebrunt Mountains, Oasis of Marr, North & West Karana
 Kunark: 
 |-
 |
@@ -247,7 +247,7 @@ Kunark:
 |Gorillas, Holgresh, and Yetis.
 |-
 |Where:
-|Classic: Plane of Fear, Temple of Caciz Thile, Stonebrunt
+|Classic: Plane of Fear, Feerrott, Temple of Cazic Thule, Stonebrunt, Kerra Isle
 Kunark: 
 |-
 |
@@ -260,7 +260,7 @@ Kunark:
 |Orcs and Wereorcs.
 |-
 |Where:
-|Classic: Clan Crushbone
+|Classic: Clan Crushbone (best), East Commonlands, West Commonlands
 Kunark: 
 |-
 |
@@ -286,7 +286,7 @@ Kunark:
 |Gnolls
 |-
 |Where:
-|Classic:Blackburrow, Splitpar Lair, Runnyeye
+|Classic: Blackburrow, Splitpaw Lair, Runnyeye
 Kunark: 
 |-
 |
@@ -351,7 +351,7 @@ Kunark:
 |Giants
 |-
 |Where:
-|Classic: Rathe Mountains, The Ocean of Tears, or get them then killing Vox &  Naggy
+|Classic: Rathe Mountains, The Ocean of Tears, or get them then killing Vox & Naggy
 Kunark: 
 |-
 |
