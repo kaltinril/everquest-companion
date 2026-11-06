@@ -5,7 +5,7 @@ The mix of [[Dark Elf]] and [[Human]] is a rarity. Recently, a community of Half
 
 ==Basic Information==
 *<b>[[Faction Alignment|Faction Alignment:]]</b> Neutral
-*<b>Racial(s):</b> [[Hide]], [[Sneak]], [[Infravision]], [[Cursed Heritage]], [[Life Tracking]]
+*<b>Racial(s):</b> [[Hide]], [[Sneak]], [[Ultravision]], [[Cursed Heritage]], [[Life Tracking]]
 *<b>Starting City:</b> [[Nektropos Undercrofts]]
 *<b>Primary Class Choices:</b> [[Bard]], [[Berserker]], [[Enchanter]], [[Necromancer]], [[Ranger]], [[Rogue]], [[Shadow Knight]] (Based on Guild Masters in [[Nektropos Undercrofts]]).
 

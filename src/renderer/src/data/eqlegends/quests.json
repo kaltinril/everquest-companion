@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-04T07:49:27.189Z",
+  "scrapedAt": "2026-11-06T06:26:38.363Z",
   "source": "eqlwiki.com — Category:Quests + quest subcategories + recentchanges delta (scripts/scrape-delta.mts)",
   "quests": [
     {
@@ -375,7 +375,8 @@
       "page": "Alchemical Solution",
       "eraTag": "Classic",
       "startZone": "Lake Nerius",
-      "giver": "Dorian G`Wym",
+      "giver": "Dorian G`Wyn",
+      "minLevel": 10,
       "classes": [
         "ALL"
       ],
@@ -383,7 +384,7 @@
         "Lavastorm Mountains"
       ],
       "relatedNpcs": [
-        "NPC_NAME"
+        "Ty`Klerr"
       ],
       "requiredItems": [
         "Defiled Fish Scales",
@@ -38425,12 +38426,9 @@
       "name": "Unfortunate News",
       "page": "Unfortunate News",
       "eraTag": "Classic",
-      "startZone": "Finishing the quest Call for Aid",
+      "startZone": "Lake Nerius",
       "classes": [
         "ALL"
-      ],
-      "relatedZones": [
-        "Lake Nerius"
       ],
       "relatedNpcs": [
         "Dorian G`Wyn"
@@ -39730,6 +39728,38 @@
       ],
       "requiredItems": [
         "Werewolf Pelt"
+      ]
+    },
+    {
+      "name": "What Happened Here?",
+      "page": "What Happened Here?",
+      "startZone": "New Sebilis Expedition",
+      "giver": "Commander Riteb (Warrior Guildmaster)",
+      "minLevel": 1,
+      "classes": [
+        "Beastlord",
+        "Monk",
+        "Necromancer",
+        "Shadow Knight",
+        "Shaman",
+        "Warrior"
+      ],
+      "relatedNpcs": [
+        "Defector Jabitzu",
+        "Orator Zikorisy",
+        "Flaming Wraith"
+      ],
+      "rewards": [
+        {
+          "name": "New Sebilisian Bindings"
+        }
+      ],
+      "factions": [
+        {
+          "name": "New Sebilisian Expedition",
+          "up": true,
+          "amount": 250
+        }
       ]
     },
     {

@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-04T07:49:27.189Z",
+  "scrapedAt": "2026-11-06T06:26:38.363Z",
   "source": "eqlwiki.com — Category:NPCs/Named Mobs/Merchants/Raid Encounters ∪ embeddedin Template:Namedmobpage/MerchantPage, filtered to pages opening a mob template + recentchanges delta (scripts/scrape-delta.mts)",
   "mobs": [
     {
@@ -2112,6 +2112,22 @@
       "noImage": true
     },
     {
+      "page": "A brown asp",
+      "eraTag": "Classic",
+      "name": "a brown asp",
+      "level": "8",
+      "zones": [
+        "Northern Desert of Ro"
+      ],
+      "loc": [
+        {
+          "ns": -38,
+          "ew": 270
+        }
+      ],
+      "image": "npc_a_brown_asp.png"
+    },
+    {
       "page": "A Brown Bear",
       "name": "a Brown Bear",
       "level": "3-8",
@@ -2656,7 +2672,10 @@
         "New Sebilis Expedition"
       ],
       "drops": [
+        "Bone Chips",
         "Cracked Femur",
+        "Iksar Targ Shield",
+        "Rusty Sheer Blade",
         "Tarnished Sheer Blade"
       ],
       "image": "a_burnt_scalebone.jpg"
@@ -7320,8 +7339,11 @@
         "Northern Desert of Ro",
         "Southern Desert of Ro"
       ],
-      "image": "npc_a_coyote.png",
-      "noImage": true
+      "drops": [
+        "Blackrock Lichen",
+        "Chunk of Meat"
+      ],
+      "image": "npc_a_coyote.png"
     },
     {
       "page": "A Cracked Skeleton",
@@ -7710,13 +7732,12 @@
         "Southern Desert of Ro"
       ],
       "drops": [
+        "Embalming Dust",
         "Raw-hide Gorget",
-        "Rusty Mace",
-        "Rusty Scythe",
         "Round Shield",
-        "Wooden Shield",
+        "Rusty Weapons",
         "Star Rose Quartz",
-        "Embalming Dust"
+        "Wooden Shield"
       ],
       "image": "npc_a_crypt_mummy.png"
     },
@@ -9575,6 +9596,40 @@
       "image": "npc_a_deathfist_templar.png"
     },
     {
+      "page": "A Deathfist warrior",
+      "eraTag": "Classic",
+      "name": "a Deathfist warrior",
+      "level": "8-9",
+      "zones": [
+        "Northern Desert of Ro"
+      ],
+      "drops": [
+        "Rusty Short Sword",
+        "Rusty Spear"
+      ],
+      "loc": [
+        {
+          "ns": -672,
+          "ew": 421
+        }
+      ],
+      "factions": [
+        "Death Fist Orcs",
+        "Ashen Order",
+        "Commons Residents",
+        "Guardians of the Vale",
+        "Knights of Truth"
+      ],
+      "factionAmounts": [
+        "-1",
+        "+",
+        "+",
+        "+",
+        "+"
+      ],
+      "image": "npc_a_deathfist_warrior.png"
+    },
+    {
       "page": "A Deathly Harbinger",
       "name": "a deathly harbinger",
       "level": "35",
@@ -9959,7 +10014,7 @@
         "Dervish Cutthroats"
       ],
       "factionAmounts": [
-        "-30"
+        "-2"
       ],
       "image": "npc_a_dervish_cutthroat.png",
       "commonDrops": [
@@ -9976,8 +10031,7 @@
         "Rusty Weapons",
         "Short Beer",
         "Silver Amulet"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "A Dervish Thug",
@@ -10050,6 +10104,27 @@
         "Loaf of Bread"
       ],
       "image": "npc_a_desert_madman.png"
+    },
+    {
+      "page": "A desert spiderling",
+      "eraTag": "Classic",
+      "name": "a desert spiderling",
+      "level": "1-3",
+      "zones": [
+        "Northern Desert of Ro"
+      ],
+      "drops": [
+        "Spiderling Eye",
+        "Spiderling Legs",
+        "Spiderling Silk"
+      ],
+      "loc": [
+        {
+          "ns": 3589,
+          "ew": 181
+        }
+      ],
+      "image": "npc_a_desert_spiderling.png"
     },
     {
       "page": "A Desert Tarantula",
@@ -12716,6 +12791,27 @@
       "image": "npc_a_dry_bone_skeleton.png"
     },
     {
+      "page": "A dune spiderling",
+      "eraTag": "Classic",
+      "name": "a dune spiderling",
+      "level": "4-6",
+      "zones": [
+        "Northern Desert of Ro"
+      ],
+      "drops": [
+        "Spiderling Eye",
+        "Spiderling Legs",
+        "Spiderling Silk"
+      ],
+      "loc": [
+        {
+          "ns": 3520,
+          "ew": 808
+        }
+      ],
+      "image": "npc_a_dune_spiderling.png"
+    },
+    {
       "page": "A Dune Tarantula",
       "name": "a dune tarantula",
       "level": "11-13",
@@ -13563,6 +13659,10 @@
       "name": "a failed experiment",
       "zones": [
         "New Sebilis Expedition"
+      ],
+      "drops": [
+        "Charcoal",
+        "Iron Oxide"
       ],
       "image": "a_failed_experiment.jpg"
     },
@@ -21426,8 +21526,10 @@
       "zones": [
         "South Ro"
       ],
-      "image": "npc_a_giant_rattlesnake.png",
-      "noImage": true
+      "drops": [
+        "Snake Meat"
+      ],
+      "image": "npc_a_giant_rattlesnake.png"
     },
     {
       "page": "A Giant Scarab",
@@ -21912,6 +22014,41 @@
         }
       ],
       "image": "npc_a_gigantic_wooly_spider.png"
+    },
+    {
+      "page": "A gila monster",
+      "eraTag": "Classic",
+      "name": "a gila monster",
+      "level": "9",
+      "zones": [
+        "Northern Desert of Ro"
+      ],
+      "drops": [
+        "Chunk of Meat"
+      ],
+      "loc": [
+        {
+          "ns": -1258,
+          "ew": -472
+        }
+      ],
+      "image": "npc_a_gila_monster.png"
+    },
+    {
+      "page": "A gila monster hatchling",
+      "eraTag": "Classic",
+      "name": "a gila monster hatchling",
+      "level": "4-5",
+      "zones": [
+        "Northern Desert of Ro"
+      ],
+      "loc": [
+        {
+          "ns": 2918,
+          "ew": 518
+        }
+      ],
+      "image": "npc_a_gila_monster_hatchling.png"
     },
     {
       "page": "A Glacier Bear",
@@ -34197,9 +34334,11 @@
         "West Commonlands"
       ],
       "drops": [
-        "Snake Egg",
+        "Large Rattlesnake Skin",
         "Large Snake Rattle",
-        "Large Rattlesnake Skin"
+        "Snake Egg",
+        "Snake Fang",
+        "Snake Rattle Pieces"
       ],
       "loc": [
         {
@@ -34208,8 +34347,7 @@
           "pct": 100
         }
       ],
-      "image": "npc_a_large_rattlesnake.png",
-      "noImage": true
+      "image": "npc_a_large_rattlesnake.png"
     },
     {
       "page": "A large scorpion",
@@ -36660,6 +36798,8 @@
         "Northern Desert of Ro"
       ],
       "drops": [
+        "Bronze Weapons",
+        "Splintering Club",
         "Raw-hide Skullcap",
         "Raw-hide Mask",
         "Raw-hide Gorget",
@@ -36685,8 +36825,7 @@
           "pct": 7
         }
       ],
-      "image": "npc_a_madman.png",
-      "noImage": true
+      "image": "npc_a_madman.png"
     },
     {
       "page": "A Magician",
@@ -39718,8 +39857,7 @@
         "Rusty Long Sword",
         "Zombie Skin"
       ],
-      "image": "npc_a_parched_zombie.png",
-      "noImage": true
+      "image": "npc_a_parched_zombie.png"
     },
     {
       "page": "A passage of flame",
@@ -42031,8 +42169,7 @@
         "Puma Skin",
         "Ruined Cat Pelt"
       ],
-      "image": "npc_a_puma.png",
-      "noImage": true
+      "image": "npc_a_puma.png"
     },
     {
       "page": "A Putrid Skeleton",
@@ -42861,9 +42998,11 @@
         "South Ro"
       ],
       "drops": [
+        "Dry Eye Weed",
         "Snake Egg",
         "Snake Fang",
-        "Rattlesnake Skin"
+        "Rattlesnake Skin",
+        "Snake Rattle Pieces"
       ],
       "loc": [
         {
@@ -42872,8 +43011,7 @@
           "pct": 100
         }
       ],
-      "image": "npc_a_rattlesnake.png",
-      "noImage": true
+      "image": "npc_a_rattlesnake.png"
     },
     {
       "page": "A ravenous brute",
@@ -44993,8 +45131,10 @@
         "Oasis of Marr"
       ],
       "drops": [
+        "Cracked Giant Scarab Carapace",
         "Giant Scarab Egg Sac",
         "Giant Scarab Eye",
+        "Giant Scarab Legs",
         "Pristine Giant Scarab Carapace",
         "Scarab Carapace"
       ],
@@ -50610,6 +50750,8 @@
       ],
       "image": "npc_a_shriveled_mummy.png",
       "commonDrops": [
+        "Blackrock Lichen",
+        "Bloodstone Ring",
         "Bloodstone",
         "Rawhide Armor",
         "Rusty Weapons",
@@ -55577,7 +55719,8 @@
       ],
       "commonDrops": [
         "Fine Steel Warhammer",
-        "Steel Knuckles"
+        "Steel Knuckles",
+        "Fine Steel Long Sword"
       ],
       "noImage": true
     },
@@ -55659,7 +55802,12 @@
         "Iron Visor",
         "Jade",
         "Ringmail Coat",
-        "Ringmail Coif"
+        "Ringmail Coif",
+        "Amber",
+        "Ringmail Gloves",
+        "Fine Steel Long Sword",
+        "Ringmail Mantle",
+        "Fine Steel Morning Star"
       ]
     },
     {
@@ -57399,6 +57547,25 @@
       ],
       "image": "npc_a_tizmak_warrior.png",
       "noImage": true
+    },
+    {
+      "page": "A tomb spiderling",
+      "eraTag": "Classic",
+      "name": "a tomb spiderling",
+      "level": "6",
+      "zones": [
+        "New Sebilis Expedition"
+      ],
+      "drops": [
+        "Spiderling Silk"
+      ],
+      "loc": [
+        {
+          "ns": -304,
+          "ew": -162
+        }
+      ],
+      "image": "npc_a_tomb_spiderling.png"
     },
     {
       "page": "A tormented tradesman",
@@ -59948,6 +60115,21 @@
       "image": "npc_a_windrider_drake.png"
     },
     {
+      "page": "A withering skeleton",
+      "eraTag": "Classic",
+      "name": "a withering skeleton",
+      "level": "5",
+      "zones": [
+        "New Sebilis Expedition"
+      ],
+      "drops": [
+        "Bone Chips",
+        "Rusty Sheer Blade",
+        "Tarnished Shan`Tok"
+      ],
+      "image": "npc_a_withering_skeleton.png"
+    },
+    {
       "page": "A Wizened Herb Collector",
       "eraTag": "Chardok Revamp",
       "name": "a Wizened Herb Collector",
@@ -60560,6 +60742,25 @@
       "noImage": true
     },
     {
+      "page": "A young gila monster",
+      "eraTag": "Classic",
+      "name": "a young gila monster",
+      "level": "7",
+      "zones": [
+        "Northern Desert of Ro"
+      ],
+      "drops": [
+        "Chunk of Meat"
+      ],
+      "loc": [
+        {
+          "ns": 1884,
+          "ew": -325
+        }
+      ],
+      "image": "npc_a_young_gila_monster.png"
+    },
+    {
       "page": "A young gorilla",
       "eraTag": "Classic",
       "name": "a young gorilla",
@@ -60806,6 +61007,28 @@
       ],
       "image": "npc_a_young_plains_lioness.png",
       "noImage": true
+    },
+    {
+      "page": "A young puma",
+      "eraTag": "Classic",
+      "name": "a young puma",
+      "level": "4-5",
+      "zones": [
+        "Northern Desert of Ro"
+      ],
+      "drops": [
+        "Chunk of Meat",
+        "Low Quality Cat Pelt",
+        "Medium Quality Cat Pelt",
+        "Ruined Cat Pelt"
+      ],
+      "loc": [
+        {
+          "ns": 3525,
+          "ew": 694
+        }
+      ],
+      "image": "npc_a_young_puma.png"
     },
     {
       "page": "A young ronin",
@@ -66728,6 +66951,7 @@
         "Oggok"
       ],
       "drops": [
+        "Armadillo Meat",
         "Chunk of Meat",
         "Armadillo Husk"
       ],
@@ -66748,8 +66972,7 @@
           "pct": 34
         }
       ],
-      "image": "npc_an_armadillo.png",
-      "noImage": true
+      "image": "npc_an_armadillo.png"
     },
     {
       "page": "An Armored Shadow",
@@ -71641,6 +71864,22 @@
       "noImage": true
     },
     {
+      "page": "An iksar ghost",
+      "eraTag": "Classic",
+      "name": "an iksar ghost",
+      "level": "11-13",
+      "zones": [
+        "New Sebilis Expedition"
+      ],
+      "loc": [
+        {
+          "ns": -753,
+          "ew": -187
+        }
+      ],
+      "image": "npc_an_iksar_ghost.png"
+    },
+    {
       "page": "An iksar hermit",
       "eraTag": "Kunark",
       "name": "an Iksar hermit",
@@ -74120,10 +74359,18 @@
         }
       ],
       "factions": [
-        "Orc"
+        "Death Fist Orcs",
+        "Ashen Order",
+        "Commons Residents",
+        "Guardians of the Vale",
+        "Knights of Truth"
       ],
       "factionAmounts": [
-        "-30"
+        "-1",
+        "5",
+        "5",
+        "5",
+        "5"
       ],
       "image": "npc_an_orc_raider.png"
     },
@@ -99565,6 +99812,22 @@
       ],
       "image": "npc_crusader_golia.png",
       "noImage": true
+    },
+    {
+      "page": "Crusader Graez",
+      "eraTag": "Classic",
+      "name": "Crusader Graez",
+      "level": "50",
+      "zones": [
+        "New Sebilis Expedition"
+      ],
+      "loc": [
+        {
+          "ns": 164,
+          "ew": 17
+        }
+      ],
+      "image": "npc_crusader_graez.png"
     },
     {
       "page": "Crusader Hitol",
@@ -129928,8 +130191,7 @@
         "+",
         "+"
       ],
-      "image": "npc_guard_brendyl.png",
-      "noImage": true
+      "image": "npc_guard_brendyl.png"
     },
     {
       "page": "Guard Briarstorm",
@@ -132880,8 +133142,7 @@
         "+",
         "+"
       ],
-      "image": "npc_guard_fintran.png",
-      "noImage": true
+      "image": "npc_guard_fintran.png"
     },
     {
       "page": "Guard Fireblight",
@@ -141130,8 +141391,7 @@
         "+",
         "+"
       ],
-      "image": "npc_guard_stoutman.png",
-      "noImage": true
+      "image": "npc_guard_stoutman.png"
     },
     {
       "page": "Guard Streamtree",
@@ -152172,8 +152432,7 @@
         "-30",
         "-30"
       ],
-      "image": "npc_innkeep_valon.png",
-      "noImage": true
+      "image": "npc_innkeep_valon.png"
     },
     {
       "page": "Innkeep Wuleran",
@@ -152833,7 +153092,7 @@
           "z": 4
         }
       ],
-      "noImage": true
+      "image": "npc_irum_halazaloski.png"
     },
     {
       "page": "Isabella Cellus",
@@ -161834,6 +162093,23 @@
       "merchant": true,
       "image": "npc_klok_sass.png",
       "noImage": true
+    },
+    {
+      "page": "Klok Sasz",
+      "eraTag": "Classic",
+      "name": "Klok Sasz",
+      "level": "50",
+      "zones": [
+        "Northern Desert of Ro"
+      ],
+      "loc": [
+        {
+          "ns": 2306,
+          "ew": -772
+        }
+      ],
+      "merchant": true,
+      "image": "npc_klok_sasz.png"
     },
     {
       "page": "Klok Scaleroot",
@@ -191375,7 +191651,9 @@
     },
     {
       "page": "Pishtian F`Lok",
-      "name": "Pishtian F'Lok",
+      "eraTag": "Classic",
+      "name": "Pishtian F`Lok",
+      "level": "60",
       "zones": [
         "Neriak - Commons"
       ],
@@ -191384,12 +191662,12 @@
       ],
       "loc": [
         {
-          "ns": 47.2,
-          "ew": -928.5,
-          "z": -52.78
+          "ns": 53,
+          "ew": -931,
+          "z": -52
         }
       ],
-      "image": "PhistianFLok.jpg"
+      "image": "npc_pishtian_f`lok.png"
     },
     {
       "page": "Pisna H`Rugla",
@@ -193885,6 +194163,15 @@
       ],
       "image": "npc_puntar_sandfisher.png",
       "noImage": true
+    },
+    {
+      "page": "Puntar Sandfisher`s corpse",
+      "eraTag": "Classic",
+      "name": "Puntar Sandfisher`s corpse",
+      "zones": [
+        "Northern Desert of Ro"
+      ],
+      "image": "npc_puntar_sandfisher`s_corpse.png"
     },
     {
       "page": "Purchin Oddsbot",
@@ -216412,6 +216699,22 @@
       "image": "npc_soulbinder_jarle.png"
     },
     {
+      "page": "Soulbinder Rakahs",
+      "eraTag": "Classic",
+      "name": "Soulbinder Rakahs",
+      "level": "1",
+      "zones": [
+        "Northern Desert of Ro"
+      ],
+      "loc": [
+        {
+          "ns": 2192,
+          "ew": -763
+        }
+      ],
+      "image": "npc_soulbinder_rakahs.png"
+    },
+    {
       "page": "Soulbinder Trurg",
       "eraTag": "Classic",
       "name": "Soulbinder Trurg",
@@ -229798,6 +230101,42 @@
       "noImage": true
     },
     {
+      "page": "Trooper Axlia",
+      "eraTag": "Classic",
+      "name": "Trooper Axlia",
+      "level": "50",
+      "zones": [
+        "Northern Desert of Ro"
+      ],
+      "loc": [
+        {
+          "ns": 2284,
+          "ew": -745
+        }
+      ],
+      "image": "npc_trooper_axlia.png"
+    },
+    {
+      "page": "Trooper Axyl",
+      "eraTag": "Classic",
+      "name": "Trooper Axyl",
+      "level": "50",
+      "zones": [
+        "New Sebilis Expedition"
+      ],
+      "loc": [
+        {
+          "ns": 177,
+          "ew": 66
+        },
+        {
+          "ns": 137,
+          "ew": 65
+        }
+      ],
+      "image": "npc_trooper_axyl.png"
+    },
+    {
       "page": "Trooper Azalin",
       "eraTag": "Kunark",
       "name": "Trooper Azalin",
@@ -231625,6 +231964,9 @@
       "zones": [
         "New Sebilis Expedition"
       ],
+      "drops": [
+        "Finely Crafted Shan`Tok"
+      ],
       "loc": [
         {
           "ns": 485,
@@ -231773,6 +232115,22 @@
       ],
       "image": "npc_trooper_lorgen.png",
       "noImage": true
+    },
+    {
+      "page": "Trooper Loxra",
+      "eraTag": "Classic",
+      "name": "Trooper Loxra",
+      "level": "50",
+      "zones": [
+        "New Sebilis Expedition"
+      ],
+      "loc": [
+        {
+          "ns": 177,
+          "ew": 66
+        }
+      ],
+      "image": "npc_trooper_loxra.png"
     },
     {
       "page": "Trooper Lunmiz",
@@ -233307,6 +233665,22 @@
       "noImage": true
     },
     {
+      "page": "Trooper Tygin",
+      "eraTag": "Classic",
+      "name": "Trooper Tygin",
+      "level": "50",
+      "zones": [
+        "Northern Desert of Ro"
+      ],
+      "loc": [
+        {
+          "ns": 2207,
+          "ew": -725
+        }
+      ],
+      "image": "npc_trooper_tygin.png"
+    },
+    {
       "page": "Trooper Uthmytel",
       "eraTag": "Velious",
       "name": "Trooper Uthmytel",
@@ -234605,6 +234979,7 @@
     },
     {
       "page": "Ty`Klerr",
+      "eraTag": "Classic",
       "name": "Ty`Klerr",
       "level": "50",
       "zones": [
@@ -234620,8 +234995,7 @@
           "z": 5
         }
       ],
-      "image": "npc_name.png",
-      "noImage": true
+      "image": "npc_ty`klerr.png"
     },
     {
       "page": "Tycyn Fe`Dhar",
