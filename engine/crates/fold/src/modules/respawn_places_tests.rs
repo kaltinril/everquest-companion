@@ -132,3 +132,24 @@ fn another_zones_instance_notice_keeps_this_zones_private_clock() {
     m.on_event(&ev(&instance_created(T_DEATH + 1_000, "The Plane of Fear", 572)), false);
     assert_eq!(m.watch_rows(NOW).len(), 1);
 }
+
+/// Gaps learned in the open zone and in a private instance of it are one series for the wiki number
+/// (owner, 2026-11-05: Nektropos Castle 4's nameds showed one gap per place and never reached three).
+#[test]
+fn gaps_learned_in_a_private_instance_and_in_the_open_zone_file_under_one_zone() {
+    let mut m = RespawnModule::new(NOW, RespawnPrefs::default());
+    m.on_event(&ev(&zone_named(T_ZONE, "Nektropos Castle 4 (Refined)")), false);
+    m.on_event(&ev(&death(1, T_DEATH)), false);
+    m.on_event(&ev(&death(2, T_SECOND_DEATH)), false);
+    m.on_event(&ev(&instance_created(T_SECOND_DEATH + 1_000, "Nektropos Castle", 709)), false);
+    m.on_event(&ev(&zone_named(T_SECOND_DEATH + 2_000, "Nektropos Castle 4 (Refined)")), false);
+    m.on_event(&ev(&death(3, T_SECOND_DEATH + 60_000)), false);
+    m.on_event(&ev(&death(4, T_SECOND_DEATH + 60_000 + 700_000)), false);
+    assert_eq!(m.snapshot()["state"]["zone"], "Nektropos Castle 4 (Refined) [instance 709]");
+    let learned = learned_of(&m);
+    assert_eq!(learned.len(), 1, "one entry for the zone, whatever the place: {learned:?}");
+    assert_eq!(learned[0]["zone"], "Nektropos Castle 4 (Refined)");
+    assert_eq!(learned[0]["id"], "nektropos castle 4 (refined)::a vis ghoul knight");
+    assert_eq!(learned[0]["gapsMs"].as_array().map(Vec::len), Some(2));
+}
+

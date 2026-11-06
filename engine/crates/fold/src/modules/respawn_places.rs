@@ -13,6 +13,14 @@ fn zone_base(zone: &str) -> String {
     crate::jsfn::zone_tier(bare).0.to_lowercase()
 }
 
+/// The zone a learned gap files under: the stay's zone without a private instance's `[instance N]`
+/// tag, since the respawn is the same in every instance (owner, 2026-11-03) and the wiki number
+/// needs every place's gaps in one series (owner, 2026-11-05: three nameds in Nektropos Castle 4,
+/// one gap in a joined instance and one in an own instance, each read as one gap on its own).
+pub(super) fn learned_place(zone: &str) -> &str {
+    zone.split(" [instance ").next().unwrap_or(zone)
+}
+
 /// The stay was a private instance (`zone` above tags it so).
 fn is_private_instance(zone: &str) -> bool {
     zone.contains(" [instance ")

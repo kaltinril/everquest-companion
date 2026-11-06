@@ -490,8 +490,11 @@ impl RespawnModule {
         h.kills += 1;
         h.display = display.to_string();
         if let Some(gap) = learned_gap {
+            // Filed under the zone without its instance tag: one series across the zone's places.
+            let place = places::learned_place(&h.zone);
+            let learned_id = format!("{}::{}", id_key(place), key);
             self.learned
-                .record(&id, (&h.key, &h.display, &h.zone), h.last_ts, gap);
+                .record(&learned_id, (&h.key, &h.display, place), h.last_ts, gap);
         }
         self.history.insert(id, h);
         // Its next gap ends at its first sign of life, which only a line in this stay can give.
