@@ -28,6 +28,38 @@ export interface CommunityRelease {
 
 export const COMMUNITY_RELEASE_NOTES: readonly CommunityRelease[] = [
   {
+    "version": "0.1.0-test.41",
+    "date": "2026-11-05",
+    "title": "merchant pages keep their items sold, respawn learning pools a zone's instances",
+    "groups": [
+      {
+        "heading": "Wiki Gaps",
+        "items": [
+          {
+            "text": "A merchant you had met in an archived log (one the app summarized and archived) copied as a page with an empty items_sold, whatever you clicked at the vendor: the archived row's fields won over the live ones. The live row's items sold, its role and its hail answer now carry into the merged row, so Copy wiki page lists every item it quoted you."
+          }
+        ]
+      },
+      {
+        "heading": "Timers and the Respawn overlay",
+        "items": [
+          {
+            "text": "Respawn gaps learned in a private instance and in the open zone (or another instance) are one series again. Since test.40 each place kept its own series, so a named killed once in your instance and once in a joined one never reached the three agreeing gaps the wiki number needs. The clocks stay per place; only what they teach is pooled."
+          }
+        ]
+      },
+      {
+        "heading": "Data",
+        "items": [
+          {
+            "text": "Wiki pages refreshed to tonight: 20 new mobs (the Northern Desert of Ro's asps, spiderlings, gila monsters, a Deathfist warrior), 24 mobs and 24 items updated, snake rattle pieces added, the quest \"What Happened Here?\" added, Alchemical Solution and Unfortunate News updated."
+          }
+        ]
+      }
+    ],
+    "knownIssues": "Joining another player's private instance is not told apart from the open world of that zone; only an instance you create yourself is. A pet summoned shortly before its first \"My leader is\" line can carry a \"(2)\" after its name in the meters until the next restart. Another player's spells never count toward a mob's resists: the game prints only your own resists to you. The con card does not list a mob's immunities yet (the mob page does). Saved characters read \"needs refresh\" on Wiki Gaps until logged in once with this build. A +0 worked back from a window often leaves Weight as ?. A groupmate's charmed pet can still lose its credit when a damage-over-time it cast before the charm ticks on a groupmate. A mob or item added to the wiki after this build shows no wiki details until the next build (or a Copy click in Wiki Gaps). Copy on a wiki page that still holds the template's placeholders keeps them. A merchant page the wiki already has gets no \"items sold\" check. Capture finds the game window only when it is titled \"EverQuest Legends\" or \"EverQuest\". All characters needs each character logged in here once with this build. The screenshot reader reads English only. The installer is not code-signed, so Windows shows \"Windows protected your PC\" the first time (More info, then Run anyway). Builds before test.20 do not update themselves; install one by hand once."
+  },
+  {
     "version": "0.1.0-test.40",
     "date": "2026-11-03",
     "title": "respawn clocks per instance, the Respawn overlay across a zone's places",
