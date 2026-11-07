@@ -18,7 +18,7 @@
 use crate::event::{Event, Key, Kind};
 use crate::modules::buff_anchors::CastAnchors;
 use crate::modules::buff_landing::Candidate;
-use eqlog::names::id_key;
+use eqlog::names::id_key_ref;
 
 /// A swing may follow its proc's landing by this much and still be the same swing. EQ stamps to
 /// the second; the slack is one second boundary.
@@ -65,11 +65,17 @@ impl ProcStash {
         };
         let ts = ev.ts();
         anchors.note_melee(target, ts);
-        let key = id_key(target);
+        // Every swing of yours reaches here and almost none has a landing waiting on it.
+        if self.pending.is_empty() {
+            return Vec::new();
+        }
+        let key = id_key_ref(target);
         let (hit, keep): (Vec<_>, Vec<_>) = std::mem::take(&mut self.pending)
             .into_iter()
             .filter(|p| ts - p.ts <= HOLD_MS)
-            .partition(|p| ts >= p.ts && ts - p.ts <= SAME_SECOND_MS && id_key(&p.target) == key);
+            .partition(|p| {
+                ts >= p.ts && ts - p.ts <= SAME_SECOND_MS && id_key_ref(&p.target) == key
+            });
         self.pending = keep;
         hit
     }
@@ -87,7 +93,10 @@ impl ProcStash {
 
 /// The target of a swing YOU made, or nothing when this line is not one.
 fn swing_target<'a>(anchors: &CastAnchors, ev: &'a Event) -> Option<&'a str> {
-    if id_key(ev.str(Key::Attacker).unwrap_or_default()) != "you" {
+    // The identity compare answers almost every line without a key; the fold is the fallback for
+    // the spellings that reach here unnormalised.
+    let attacker = ev.str(Key::Attacker).unwrap_or_default();
+    if attacker != "You" && id_key_ref(attacker) != "you" {
         return None;
     }
     let swing = match ev.kind_of() {

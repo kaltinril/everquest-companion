@@ -80,8 +80,8 @@ impl OverlayMining {
     fn feed(&mut self, ev: &Event) -> bool {
         match ev.kind_of() {
             Kind::CastBegin => {
-                let spell = ev.str(Key::Spell).unwrap_or_default().to_string();
-                self.miner.observe_cast(&spell, ev.ts());
+                let spell = ev.str(Key::Spell).unwrap_or_default();
+                self.miner.observe_cast(spell, ev.ts());
                 true
             }
             Kind::BuffApply | Kind::SpellEmote => {
@@ -100,9 +100,11 @@ impl OverlayMining {
                 // message, where the wiki's own cast-on-you text is wrong and the DB never matched
                 // it. Only flavor-SHAPED lines are fed; the miner's unambiguous-anchor and count
                 // rules discard coincidental pairings, so a wrong candidate never verifies.
-                let t = message_text_of(ev.raw()).to_string();
-                if looks_landing_message(&t) {
-                    self.miner.observe_message(&t, ev.ts(), "landing");
+                // Borrowed: this arm runs on every unclaimed line and the miner copies the text
+                // only when it files it.
+                let t = message_text_of(ev.raw());
+                if looks_landing_message(t) {
+                    self.miner.observe_message(t, ev.ts(), "landing");
                     return true;
                 }
                 false
@@ -112,8 +114,8 @@ impl OverlayMining {
     }
 
     fn note(&mut self, ev: &Event, role: &'static str) {
-        let text = message_text_of(ev.raw()).to_string();
-        self.miner.observe_message(&text, ev.ts(), role);
+        self.miner
+            .observe_message(message_text_of(ev.raw()), ev.ts(), role);
     }
 
     /// Seed one persisted bucket, through the same `merge` the committed baseline arrives by.

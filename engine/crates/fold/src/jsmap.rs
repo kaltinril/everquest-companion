@@ -139,6 +139,20 @@ impl<V> JsMap<V> {
         true
     }
 
+    /// Keep the entries `keep` says to, in their order; one pass and one index rebuild, where a
+    /// `remove` per entry would be a pass each.
+    pub fn retain(&mut self, mut keep: impl FnMut(&str, &V) -> bool) {
+        let before = self.entries.len();
+        self.entries.retain(|(k, v)| keep(k, v));
+        if self.entries.len() == before {
+            return;
+        }
+        self.at.clear();
+        for (i, (k, _)) in self.entries.iter().enumerate() {
+            self.at.insert(k.clone(), i);
+        }
+    }
+
     pub fn iter(&self) -> impl Iterator<Item = (&str, &V)> {
         self.entries.iter().map(|(k, v)| (k.as_str(), v))
     }
