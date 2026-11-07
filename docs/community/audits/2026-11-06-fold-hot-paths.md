@@ -114,3 +114,55 @@ The per-module attribution is the part to watch; the stage lines above it are th
 functional check, `parity <log>` and `parity <log> --snapshots` to files before and after, and
 diff them (the snapshots with a deep compare that ignores `meta.ms`). Contended numbers are 1.3-1.5x
 higher across the board, so measure with nothing else building.
+
+## Second pass, 2026-11-06: items 4, 5 and 6
+
+Same method, same corpus, same functional check (event stream byte-identical, every module
+snapshot deep-equal, both logs). Stopwatches inside the three paths first, then the fixes.
+
+What the stopwatches said (68 MB log, before this pass):
+
+| Path | Inside it | Cost |
+| --- | --- | --- |
+| Parser classify (2,540 ms) | the damage battery 1,211 (melee regex 296, its body 390, the three refusals ahead of a melee line 304), the miss classifier 485, the ~35 other classifiers' prefilters 588, cast lifecycle 116 | |
+| Damage route (1,335 ms) | the aggregate writes 576 (two `JsMap` hashes per lookup, a dozen lookups per hit, the round accumulator's six allocations per swing), incoming 195, `resolve` 117, the ignore path 98, timeline 74, the ring `format!` built while not recording 75 | |
+| Miss path (803 ms) | building the owned `MissLine` ~300, the aggregate writes 186, incoming 148, `miss_fold` clones and `note_presence`'s copy of the engaged set 119 | |
+
+Fixed, each exact:
+
+4. **Parser.** The melee line (220k of the log's 824k events) is split by hand (`parse/melee.rs`):
+   the pattern read as the regex engine reads it, leftmost-first and lazy, pinned by a
+   differential test against the regex over the corner cases (two sentences on one line, empty
+   target, `(a) (b)`, `()`, verb inside a name, singular `point`, the four irregular forms,
+   non-ASCII names). The verb lookup dispatches on its first letter. A line is offered only to the
+   damage shapes it could match (the damage-shield, typed-spell and melee sentences each need a
+   substring the others never carry), in the old order. `norm`, `melee_verb_base` and
+   `melee_skill` borrow when the lowering is the identity (the ASCII fold is exact: no non-ASCII
+   character lowercases to the letters of `you`/`yourself`/`your`). parse 1,780 to ~1,300 ms.
+5. **Damage route.** `JsMap::get_or_insert_with` (one hash on the hit path) under every aggregate
+   lookup; the round accumulator keeps its key buffer, lowers verb and target in place when that
+   is the identity, and rewrites a lane's label only when it changed; the one-lane flush counts
+   without copying the lane; the two redundant clones of the resolved target are gone; the hot
+   ring lines go through `log_lazy`, which builds the text only while recording. combat
+   3,000 to ~2,500 ms.
+6. **Miss path.** `MissLine` and `MissFold` borrow the event like `DamageEvent` does (five
+   allocations per miss line gone); `note_presence` walks the engaged set in place instead of
+   copying the matching ids out. Counted inside the combat figure above.
+
+Tried and dropped: a reusable `CaptureLocations` for the melee regex (no measurable change; the
+search is the cost, not the `Captures` allocation).
+
+Quiet machine, back to back, trunk `410db609c` against this branch, two runs each:
+
+| Measure | Before | After |
+| --- | --- | --- |
+| Full fold, 68 MB | 7,740 / 7,925 ms | 5,959 / 6,777 ms |
+| Parse | 1,781 / 1,787 ms | 1,261 / 1,377 ms |
+| Attribution: combat | 2,916 / 3,523 ms | 2,471 / 2,482 ms |
+| `meta.ms`, 68 MB / 18 MB | 14,148 / 3,735 ms (trunk `22d97a86b`) | 6,386 / 1,640 ms |
+
+Against the original trunk the whole-log fold is now 14.5 s to about 6.4 s. Still open from the
+table above: the miss classifier's regex (485 ms), the other classifiers' prefilter cascade
+(588 ms), the resist and respawn modules, the NDJSON string per event, and the encounter
+timeline's `Vec::remove(0)` past 8,000 events (small here, a memmove per line in a very long
+fight).

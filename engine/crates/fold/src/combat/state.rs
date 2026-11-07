@@ -681,17 +681,25 @@ impl EngineState {
         // staleness retirement ages an instance out on exactly the evidence closure calls presence.
         self.world.note_seen(&key, ts);
         self.drain_retirements();
-        let ids: Vec<String> = match &self.current {
-            Some(enc) => enc
-                .engaged
-                .iter()
-                .filter(|id| name_key_of(id) == Some(key.as_ref()))
-                .cloned()
-                .collect(),
-            None => return,
+        // `note_presence_id` over the matching ids, without copying them out first: every id here
+        // names `key`, which the two refusals above already cleared, and is in `engaged` by
+        // construction, so what is left of that method is the pet test and the clock.
+        let world = &self.world;
+        let Some(enc) = self.current.as_mut() else {
+            return;
         };
-        for id in ids {
-            self.note_presence_id(&id, ts);
+        let matching = enc
+            .engaged
+            .iter()
+            .filter(|id| name_key_of(id) == Some(key.as_ref()));
+        for id in matching {
+            if world.is_live_pet(id) {
+                continue;
+            }
+            let prev = enc.engaged_seen.get(id.as_str()).copied();
+            if prev.is_none_or(|p| ts > p) {
+                enc.engaged_seen.insert(id.clone(), ts);
+            }
         }
     }
 
@@ -764,6 +772,19 @@ impl EngineState {
         if !self.recording {
             return;
         }
+        self.log_line(ts, cat, role, text);
+    }
+
+    /// [`EngineState::log`] with the line built only while the ring is open. A historical fold
+    /// never records, and the hot combat paths were formatting a line for every event anyway.
+    pub fn log_lazy(&mut self, ts: i64, cat: &str, role: &str, text: impl FnOnce() -> String) {
+        if !self.recording {
+            return;
+        }
+        self.log_line(ts, cat, role, text());
+    }
+
+    fn log_line(&mut self, ts: i64, cat: &str, role: &str, text: String) {
         self.recent.push(ClassifiedLine {
             ts,
             cat: cat.to_owned(),

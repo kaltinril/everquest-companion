@@ -10,6 +10,7 @@ pub mod casts;
 pub mod combat;
 pub mod data;
 pub mod group;
+pub mod melee;
 pub mod session;
 pub mod who;
 pub mod world;

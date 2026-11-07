@@ -9,15 +9,13 @@ use crate::event::{Ev, Key, Kind};
 use crate::names::norm;
 use crate::taxonomy::{damage_category, has_critical, parse_modifiers};
 use regex::Regex;
+use std::borrow::Cow;
 
 use super::Ctx;
 
-/// Every verb must match both first-person ("You slash") and third-person ("A mob slashes").
-const MELEE_VERBS: &str = "hit(?:s)?|slash(?:es)?|pierce(?:s)?|crush(?:es)?|bash(?:es)?|kick(?:s)?|bite(?:s)?|claw(?:s)?|gore(?:s)?|maul(?:s)?|punch(?:es)?|strike(?:s)?|slice(?:s)?|backstab(?:s)?|slam(?:s)?|sting(?:s)?|rend(?:s)?|smash(?:es)?|gnaw(?:s)?|lash(?:es)?|smite(?:s)?|cleave(?:s)?|reave(?:s)?|shoot(?:s)?|frenzies on|frenzy on|flurries|flurry";
-
+/// The melee verbs, first- and third-person, are `melee.rs`'s tables: the melee line is split by
+/// hand there, and the two patterns it replaces are that file's test oracle.
 pub struct CombatRes {
-    melee: Regex,
-    melee_verb: Regex,
     spell: Regex,
     ds: Regex,
     ds_inc: Regex,
@@ -51,11 +49,6 @@ impl Default for CombatRes {
 impl CombatRes {
     pub fn new() -> Self {
         CombatRes {
-            melee: Regex::new(&format!(
-                r"^(.+?) (?:{MELEE_VERBS}) (.+?) for ([0-9]+) points? of damage\.(?: \((.+?)\))?$"
-            ))
-            .unwrap(),
-            melee_verb: Regex::new(&format!(r" ({MELEE_VERBS}) ")).unwrap(),
             spell: Regex::new(
                 r"^(.+?) (?:hits?) (.+?) for ([0-9]+) points of ([0-9A-Za-z_-]+) damage by (.+?)\.(?: \((.+?)\))?$",
             )
@@ -117,33 +110,49 @@ impl CombatRes {
     }
 }
 
-/// The base (first-person) form of every verb `MELEE_VERBS` spells out.
-const MELEE_VERB_BASES: [&str; 26] = [
+/// The base (first-person) form of every melee verb (`melee.rs`).
+pub(crate) const MELEE_VERB_BASES: [&str; 26] = [
     "hit", "slash", "pierce", "crush", "bash", "kick", "bite", "claw", "gore", "maul", "punch",
     "strike", "slice", "backstab", "slam", "sting", "rend", "smash", "gnaw", "lash", "smite",
     "cleave", "reave", "shoot", "frenzy", "flurry",
 ];
 
+/// Lowercasing is the identity on a string with no ASCII uppercase and nothing outside ASCII —
+/// which is every verb a regex here hands over, since the alternations are spelled in lowercase.
+/// The two helpers below take that string as it is and lowercase only anything else.
+fn already_lower(s: &str) -> bool {
+    s.bytes().all(|b| b.is_ascii() && !b.is_ascii_uppercase())
+}
+
 /// Un-conjugate: longest suffix rule first, each confirmed against the base set.
-pub fn melee_verb_base(verb: &str) -> String {
+pub fn melee_verb_base(verb: &str) -> Cow<'_, str> {
+    if already_lower(verb) {
+        return Cow::Borrowed(melee_verb_base_lower(verb));
+    }
     let v = verb.to_lowercase();
+    Cow::Owned(melee_verb_base_lower(&v).to_string())
+}
+
+/// [`melee_verb_base`] over an already-lowercased verb; the answer is a base from the table or
+/// the verb itself.
+fn melee_verb_base_lower(v: &str) -> &str {
     if v.starts_with("frenz") {
-        return "frenzy".to_string();
+        return "frenzy";
     }
     if v.starts_with("flurr") {
-        return "flurry".to_string();
+        return "flurry";
     }
-    if MELEE_VERB_BASES.contains(&v.as_str()) {
+    if MELEE_VERB_BASES.contains(&v) {
         return v;
     }
     if let Some(stem) = v.strip_suffix("es") {
         if MELEE_VERB_BASES.contains(&stem) {
-            return stem.to_string();
+            return stem;
         }
     }
     if let Some(stem) = v.strip_suffix('s') {
         if MELEE_VERB_BASES.contains(&stem) {
-            return stem.to_string();
+            return stem;
         }
     }
     v
@@ -151,7 +160,13 @@ pub fn melee_verb_base(verb: &str) -> String {
 
 /// A named class skill gets its own lane; a weapon-in-a-hand verb shares one.
 pub fn melee_skill(verb: &str) -> &'static str {
-    let v = verb.to_lowercase();
+    if already_lower(verb) {
+        return melee_skill_lower(verb);
+    }
+    melee_skill_lower(&verb.to_lowercase())
+}
+
+fn melee_skill_lower(v: &str) -> &'static str {
     if v.starts_with("backstab") {
         return "Backstab";
     }
@@ -217,7 +232,7 @@ pub fn classify_miss(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
         let attacker = norm(&m[1]);
         // Group map: 3=miss|misses 4=defender 5=3rd-verb 6=YOU 7=base-verb 8=absorbs(possessive)
         // 9=YOUR(self)
-        let (mtype, target): (&str, String) = if m.get(3).is_some() {
+        let (mtype, target): (&str, Cow<str>) = if m.get(3).is_some() {
             ("miss", norm(&m[2]))
         } else if let Some(v) = m.get(5) {
             let t = match v.as_str() {
@@ -236,11 +251,11 @@ pub fn classify_miss(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
                     "riposte" => "riposte",
                     _ => "block",
                 },
-                "You".to_string(),
+                Cow::Borrowed("You"),
             )
         } else if m.get(9).is_some() {
             // Self rune absorb: YOUR skin means the swing was aimed at you.
-            ("absorb", "You".to_string())
+            ("absorb", Cow::Borrowed("You"))
         } else {
             ("absorb", norm(&m[2]))
         };
@@ -338,11 +353,53 @@ pub fn classify_resist(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
 /// The "points of damage" half of the battery: damage shield, spell nuke, melee.
 fn points_damage(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
     let text = c.text;
-    if let Some(m) = r.ds.captures(text) {
+    // Each shape's pattern needs a substring the other shapes' lines never carry, so a line is
+    // offered only to the shapes it could match, in the same order as before: the two damage-shield
+    // sentences end in "non-melee damage", a typed spell hit says " damage by ", a melee hit ends
+    // its sentence " of damage.". (Measured 2026-11-06: the three refusals ahead of every melee
+    // line were ~300 ms of a 68 MB fold.)
+    let non_melee = text.contains("non-melee damage");
+    if non_melee {
+        if let Some(m) = r.ds.captures(text) {
+            return ds_damage(c, out, r, &m);
+        }
+        if let Some(m) = r.ds_inc.captures(text) {
+            dmg(
+                c,
+                out,
+                Dmg {
+                    attacker: &norm(&m[1]),
+                    target: "You",
+                    amount: m[3].parse().unwrap_or(0),
+                    dtype: "ds",
+                    skill: crate::jsstr::js_trim(&m[2]),
+                    crit: false,
+                },
+            );
+            return true;
+        }
+    }
+    if text.contains(" damage by ") {
+        if let Some(m) = r.spell.captures(text) {
+            return spell_damage(c, out, &m);
+        }
+    }
+    if text.contains(" of damage.") {
+        if let Some(hit) = super::melee::split(text) {
+            return melee_damage(c, out, &hit);
+        }
+    }
+    false
+}
+
+/// The damage-shield sentence (`<target> is burned by YOUR/<owner>'s <skill> for N points of
+/// non-melee damage.`).
+fn ds_damage(c: &Ctx, out: &mut Ev, r: &CombatRes, m: &regex::Captures<'_>) -> bool {
+    {
         let owner = if &m[2] == "YOUR" {
             "You".to_string()
         } else {
-            norm(&r.ds_owner_poss.replace(&m[2], ""))
+            norm(&r.ds_owner_poss.replace(&m[2], "")).into_owned()
         };
         dmg(
             c,
@@ -356,24 +413,13 @@ fn points_damage(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
                 crit: false,
             },
         );
-        return true;
+        true
     }
-    if let Some(m) = r.ds_inc.captures(text) {
-        dmg(
-            c,
-            out,
-            Dmg {
-                attacker: &norm(&m[1]),
-                target: "You",
-                amount: m[3].parse().unwrap_or(0),
-                dtype: "ds",
-                skill: crate::jsstr::js_trim(&m[2]),
-                crit: false,
-            },
-        );
-        return true;
-    }
-    if let Some(m) = r.spell.captures(text) {
+}
+
+/// The typed spell hit (`<caster> hits <target> for N points of <class> damage by <spell>.`).
+fn spell_damage(c: &Ctx, out: &mut Ev, m: &regex::Captures<'_>) -> bool {
+    {
         let modifier = m.get(6).map(|g| g.as_str());
         let mods = parse_modifiers(modifier);
         out.begin(Kind::Damage);
@@ -388,23 +434,22 @@ fn points_damage(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
         out.s_opt(Key::Modifier, modifier);
         out.strs(Key::Modifiers, &mods);
         out.s(Key::Category, damage_category("spell", &mods));
-        return true;
+        true
     }
-    if let Some(m) = r.melee.captures(text) {
-        let modifier = m.get(4).map(|g| g.as_str());
+}
+
+/// The melee hit (`<attacker> <verb> <target> for N points of damage.`). The verb is the FIRST
+/// conjugated verb on the line (`melee::first_verb`), as the separate pattern found it.
+fn melee_damage(c: &Ctx, out: &mut Ev, hit: &super::melee::Hit<'_>) -> bool {
+    {
+        let modifier = hit.modifier;
         let mods = parse_modifiers(modifier);
-        let verb = melee_verb_base(
-            r.melee_verb
-                .captures(text)
-                .map(|v| v[1].to_string())
-                .unwrap_or_else(|| "hit".to_string())
-                .as_str(),
-        );
+        let verb = melee_verb_base(super::melee::first_verb(c.text).unwrap_or("hit"));
         out.begin(Kind::Damage);
         out.envelope(c.seq, c.ts, c.raw);
-        out.s(Key::Attacker, &norm(&m[1]));
-        out.s(Key::Target, &norm(&m[2]));
-        out.i(Key::Amount, m[3].parse().unwrap_or(0));
+        out.s(Key::Attacker, &norm(hit.attacker));
+        out.s(Key::Target, &norm(hit.target));
+        out.i(Key::Amount, hit.amount.parse().unwrap_or(0));
         out.s(Key::Dtype, "melee");
         out.s(Key::Skill, melee_skill(&verb));
         out.s(Key::Verb, &verb);
@@ -412,9 +457,8 @@ fn points_damage(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
         out.s_opt(Key::Modifier, modifier);
         out.strs(Key::Modifiers, &mods);
         out.s(Key::Category, damage_category("melee", &mods));
-        return true;
+        true
     }
-    false
 }
 
 /// The "has taken N damage" half: DoTs, with and without a caster.
@@ -426,13 +470,13 @@ fn taken_damage(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
         let rest = &m[3];
         let modifier = m.get(4).map(|g| g.as_str());
         let crit = r.critical.is_match(modifier.unwrap_or(""));
-        let mut attacker: Option<String> = None;
+        let mut attacker: Option<Cow<str>> = None;
         let mut skill: String = rest.to_string();
         if r.your_prefix.is_match(rest) {
-            attacker = Some("You".to_string());
+            attacker = Some(Cow::Borrowed("You"));
             skill = r.your_prefix.replace(rest, "").to_string();
         } else if let Some(by) = r.dot_by.captures(rest) {
-            attacker = Some(norm(&by[1]));
+            attacker = Some(Cow::Owned(norm(&by[1]).into_owned()));
             let at = by.get(0).expect("group 0").start();
             skill = rest[..at].to_string();
         }
