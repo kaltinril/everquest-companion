@@ -29,6 +29,7 @@
 //! `Encounter.cc_active_until` claims a mez'd mob is still alive; once the instance is retired that
 //! claim is false forever, because a later sighting of the name spawns a fresh `nameKey#gen`.
 
+use crate::combat::state::name_key_of;
 use crate::jsmap::JsMap;
 use eqlog::names::{id_key, id_key_ref};
 use std::collections::{HashMap, HashSet};
@@ -61,6 +62,11 @@ pub struct Instance {
     pub instance_id: String,
     pub name_key: String,
     pub display: String,
+    /// The label the meter row carries — `display` for the first generation of a name, `display
+    /// (gen)` for every later one so twins read apart. A function of `display` and `gen` only (see
+    /// `label_of`), refreshed with `display` and otherwise fixed, so a resolve copies it rather than
+    /// formatting it.
+    pub label: String,
     pub charmed: bool,
     /// Set while `charmed` is true; distinguishes zone behaviour. `None` = hostile.
     pub pet_kind: Option<PetKind>,
@@ -73,14 +79,28 @@ pub struct Instance {
     pub gen: u32,
 }
 
-/// An instance resolved for attribution: the aggregate key, the name key the membership sets are
-/// asked about, and the display label the meter row carries. All three always travel together, so
-/// callers never hold an index into a model they would have to ask again.
+/// An instance resolved for attribution: the aggregate key and the display label the meter row
+/// carries, travelling together so callers never hold an index into a model they would have to ask
+/// again. The name key the membership sets are asked about is read off the id (`name_key`): an id
+/// is `<nameKey>#<gen>` by construction, and the `you` sentinel is its own key.
 #[derive(Debug, Clone)]
 pub struct Resolved {
     pub instance_id: String,
-    pub name_key: String,
     pub label: String,
+}
+
+impl Resolved {
+    /// The name key half of the id — exactly what the world model keyed the instance by.
+    pub fn name_key(&self) -> &str {
+        name_key_of(&self.instance_id).unwrap_or(&self.instance_id)
+    }
+}
+
+/// The spawn-order handle and generation of the newest instance of one name.
+#[derive(Debug, Clone, Copy)]
+struct Newest {
+    gen: u32,
+    at: usize,
 }
 
 /// Result of a `death()` decision, for the engine's processing line and ambiguity surfacing.
@@ -105,8 +125,8 @@ pub struct WorldModel {
     /// in — stays what it was when this walked the spawn history.
     active_by_name: JsMap<Vec<usize>>,
     by_id: HashMap<String, usize>,
-    /// gen counter per nameKey.
-    gens: HashMap<String, u32>,
+    /// gen counter per nameKey, with the handle of the instance that carries it.
+    gens: HashMap<String, Newest>,
     /// Killers each charmed pet has been observed tanking (pet handle → attacker nameKeys that hit
     /// it / that it hit). Drives death case (b).
     pet_tanked_by: HashMap<usize, HashSet<String>>,
@@ -168,12 +188,14 @@ impl WorldModel {
         ts: i64,
         pet_kind: Option<PetKind>,
     ) -> usize {
-        let gen = self.gens.get(name_key).copied().unwrap_or(0) + 1;
-        self.gens.insert(name_key.to_string(), gen);
+        let gen = self.gens.get(name_key).map_or(0, |n| n.gen) + 1;
+        let at = self.insts.len();
+        self.gens.insert(name_key.to_string(), Newest { gen, at });
         let inst = Instance {
             instance_id: format!("{name_key}#{gen}"),
             name_key: name_key.to_string(),
             display: display.to_string(),
+            label: label_of(display, gen),
             charmed: pet_kind.is_some(),
             pet_kind,
             first_seen_ts: ts,
@@ -182,7 +204,6 @@ impl WorldModel {
             ended: false,
             gen,
         };
-        let at = self.insts.len();
         self.by_id.insert(inst.instance_id.clone(), at);
         self.insts.push(inst);
         match self.active_by_name.get_mut(name_key) {
@@ -219,7 +240,9 @@ impl WorldModel {
             .next()
             .is_some_and(|c| c.is_ascii_lowercase());
         if incoming_lower || !current_lower {
-            self.insts[at].display = name.to_string();
+            let inst = &mut self.insts[at];
+            inst.display = name.to_string();
+            inst.label = label_of(name, inst.gen);
         }
     }
 
@@ -236,7 +259,6 @@ impl WorldModel {
             // caller can crash on a `None`.
             return Resolved {
                 instance_id: "you".to_string(),
-                name_key: "you".to_string(),
                 label: "You".to_string(),
             };
         }
@@ -291,11 +313,12 @@ impl WorldModel {
     /// world-model side effects (law 8).
     pub fn note_seen(&mut self, name: &str, ts: i64) {
         let key = id_key_ref(name);
-        let live: Vec<usize> = match self.active_by_name.get(key.as_ref()) {
-            Some(l) => l.clone(),
-            None => return,
+        // The live list and the instances are two fields, so the walk borrows one and writes the
+        // other without copying the list out first.
+        let Some(live) = self.active_by_name.get(key.as_ref()) else {
+            return;
         };
-        for at in live {
+        for &at in live {
             if ts > self.insts[at].last_seen_ts {
                 self.insts[at].last_seen_ts = ts;
             }
@@ -308,8 +331,14 @@ impl WorldModel {
     /// rooted) is not dead, and a break in the cadence is a fresh cast by a same-name successor:
     /// both are resolved and fought. Records the tick either way.
     pub fn is_dead_casters_tick(&mut self, name: &str, ts: i64) -> bool {
-        let key = id_key(name);
-        let prev = self.last_tick.insert(key.clone(), ts).unwrap_or(i64::MIN);
+        let key = id_key_ref(name);
+        let prev = match self.last_tick.get_mut(key.as_ref()) {
+            Some(slot) => std::mem::replace(slot, ts),
+            None => {
+                self.last_tick.insert(key.to_string(), ts);
+                i64::MIN
+            }
+        };
         if !self.active(&key).is_empty() {
             return false;
         }
@@ -326,8 +355,7 @@ impl WorldModel {
     }
 
     fn newest_at(&self, key: &str) -> Option<usize> {
-        let gen = self.gens.get(key)?;
-        self.by_id.get(&format!("{key}#{gen}")).copied()
+        self.gens.get(key).map(|n| n.at)
     }
 
     /// The charmed pet instance for a name (attribution helper). No staleness sweep — pets are
@@ -681,30 +709,44 @@ impl WorldModel {
         out
     }
 
-    /// The display name of every live pet, in the order `pet_instances` reports.
+    /// The name key of every live pet, in the order `pet_instances` reports. Read off the instances
+    /// themselves, so no resolved copy is made to be thrown away.
     pub fn pet_name_keys(&self) -> Vec<String> {
-        self.pet_instances()
-            .into_iter()
-            .map(|r| r.name_key)
-            .collect()
+        let mut out = Vec::new();
+        for (_, list) in self.active_by_name.iter() {
+            for &at in list {
+                let inst = &self.insts[at];
+                if inst.charmed {
+                    out.push(inst.name_key.clone());
+                }
+            }
+        }
+        out
     }
 
-    /// Display label for an instance in encounter views. When more than one instance of a nameKey
-    /// has ever been spawned, later gens get a ` (N)` suffix so twins are visually distinct; the
-    /// first gen keeps the bare name.
+    /// The instance as attribution sees it: its id and its cached label (`label_of`).
     fn resolved(&self, at: usize) -> Resolved {
         let inst = &self.insts[at];
-        let total = self.gens.get(&inst.name_key).copied().unwrap_or(1);
-        let label = if total <= 1 || inst.gen == 1 {
-            inst.display.clone()
-        } else {
-            format!("{} ({})", inst.display, inst.gen)
-        };
         Resolved {
             instance_id: inst.instance_id.clone(),
-            name_key: inst.name_key.clone(),
-            label,
+            label: inst.label.clone(),
         }
+    }
+}
+
+/// Display label for an instance in encounter views: later gens get a ` (N)` suffix so twins are
+/// visually distinct, and the first gen keeps the bare name.
+///
+/// The rule used to read "the bare name when the name has only ever spawned once OR this is gen 1",
+/// against the live gen counter. The first half is the second: the counter is the gen the newest
+/// spawn was given and only ever grows, so a name with one spawn has gen 1 and nothing else can.
+/// That makes the label a function of the display and the gen alone, fixed at spawn and refreshed
+/// only when the display is, so it is stored rather than formatted on every resolve.
+fn label_of(display: &str, gen: u32) -> String {
+    if gen == 1 {
+        display.to_string()
+    } else {
+        format!("{display} ({gen})")
     }
 }
 

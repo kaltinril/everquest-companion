@@ -197,7 +197,8 @@ pub(crate) fn pet_source(instance_id: &str, label: String) -> SourceRef {
 /// schedule — would hold a pull open indefinitely. Members reach this function on the ordinary
 /// outgoing path via `You → <member>`: a member's TARGET engages, the member never does.
 fn engage_hostile(st: &mut EngineState, inst: &Resolved, ts: i64) {
-    if st.is_known_player(&inst.name_key) || st.is_member(&inst.name_key) {
+    let name_key = inst.name_key();
+    if st.is_known_player(name_key) || st.is_member(name_key) {
         return;
     }
     let Some(enc) = st.current.as_mut() else {

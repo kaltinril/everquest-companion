@@ -134,7 +134,7 @@ fn ingest_world(st: &mut EngineState, ev: &Event) -> bool {
             // class pets persist, so the survivors are what the fast pet-name index is rebuilt from.
             let survivors = st.world.zone(ev.ts());
             st.drain_retirements();
-            let keys: Vec<String> = survivors.into_iter().map(|s| s.name_key).collect();
+            let keys: Vec<String> = survivors.iter().map(|s| s.name_key().to_string()).collect();
             st.pet_names = keys.iter().cloned().collect();
             st.charm.zone(&keys);
             // Somebody else's charm cannot survive a zone either, and neither can a cast in flight.
