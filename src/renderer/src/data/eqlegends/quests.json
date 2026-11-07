@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-06T06:26:38.363Z",
+  "scrapedAt": "2026-11-07T08:17:11.833Z",
   "source": "eqlwiki.com — Category:Quests + quest subcategories + recentchanges delta (scripts/scrape-delta.mts)",
   "quests": [
     {
@@ -18947,20 +18947,22 @@
         },
         {
           "name": "Guards of Qeynos",
-          "up": true
-        },
-        {
-          "name": "Knights of Truth",
-          "up": true
-        },
-        {
-          "name": "The Freeport Militia",
-          "up": false
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Corrupt Qeynos Guards",
           "up": false,
           "amount": -3
+        },
+        {
+          "name": "The Freeport Militia",
+          "up": false,
+          "amount": -3
+        },
+        {
+          "name": "Knights of Truth",
+          "up": true
         }
       ]
     },
@@ -21255,7 +21257,33 @@
         "Mojax Hikspin",
         "Sir Lucan D`Lere"
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "The Freeport Militia",
+          "up": true
+        },
+        {
+          "name": "Coalition of Tradefolk Underground",
+          "up": true
+        },
+        {
+          "name": "Knights of Truth",
+          "up": false
+        },
+        {
+          "name": "Priests of Marr",
+          "up": false
+        },
+        {
+          "name": "Dismal Rage",
+          "up": true
+        },
+        {
+          "name": "Opal Dark Briar",
+          "up": true
+        }
+      ]
     },
     {
       "name": "Messages For Neriak",

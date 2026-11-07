@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-06T06:26:38.363Z",
+  "scrapedAt": "2026-11-07T08:17:11.833Z",
   "source": "eqlwiki.com — Category:NPCs/Named Mobs/Merchants/Raid Encounters ∪ embeddedin Template:Namedmobpage/MerchantPage, filtered to pages opening a mob template + recentchanges delta (scripts/scrape-delta.mts)",
   "mobs": [
     {
@@ -14315,8 +14315,7 @@
         "-3",
         "1"
       ],
-      "image": "npc_a_ferocious_kobold.png",
-      "noImage": true
+      "image": "npc_a_ferocious_kobold.png"
     },
     {
       "page": "A Festering Hag",
@@ -33451,8 +33450,7 @@
         "+",
         "+"
       ],
-      "image": "npc_a_kobold_wanderer.png",
-      "noImage": true
+      "image": "npc_a_kobold_wanderer.png"
     },
     {
       "page": "A Kobold Watcher",
@@ -47666,8 +47664,7 @@
         "+",
         "+"
       ],
-      "image": "npc_a_scouting_kobold.png",
-      "noImage": true
+      "image": "npc_a_scouting_kobold.png"
     },
     {
       "page": "A Scrawny Gnoll",

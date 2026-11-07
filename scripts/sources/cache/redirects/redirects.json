@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-06T06:26:38.372Z",
+ "updatedAt": "2026-11-07T08:17:11.841Z",
  "redirects": [
   {
    "from": "1 Hand Blunt",
@@ -4148,6 +4148,10 @@
   {
    "from": "Arch magi",
    "to": "The ghoul arch magus"
+  },
+  {
+   "from": "Archeologist Pack",
+   "to": "Archaeologist Pack"
   },
   {
    "from": "Archery",

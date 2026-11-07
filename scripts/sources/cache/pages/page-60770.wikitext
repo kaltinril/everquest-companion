@@ -2,14 +2,14 @@
 | colspan="2" |Slayer: Conquest
 8 achievements can be completed in Steamfont mountains NE. 
 
-4 achievements can be completed in Rathe Mounatains, next to Froglok city. (I Hate Snakes, Puttin' On The Dog, Plants Concrete and Stone & We are the Dead)
+5 achievements can be completed in Rathe Mounatains, next to Froglok city. (I Hate Snakes, Don't Bug Me, Puttin' On The Dog, Plants Concrete and Stone & We are the Dead)
 
 3 achievements can be completed in Rathe Mounatains, at giants area. (Might They Be Giants, Orc Stromp!, I Hate Snakes)
 |-
 |
 |
 |-
-| colspan="2" |This guide  is how i would do it, it's not set in stone and can be done in other ways  to. 
+| colspan="2" |This guide is how I would do it, it's not set in stone and can be done in other ways to. 
 |-
 |
 |This guide in for Classic era.
@@ -17,7 +17,7 @@
 |
 |
 |-
-| colspan="2" |Nice  to know: FD if pet can kill your target, then you wont get faction hit.
+| colspan="2" |Nice to know: FD if pet can kill your target, then you won't get faction hit.
 |-
 |
 |
@@ -41,10 +41,10 @@ Kunark:
 |Don't Bug Me
 |-
 | align="right" |5000
-|Beetles, Cliknars, Corathus Beasts, Drachnids, Insects, Leeches,  Mosquitoes, Spiders, Ursarachnids.
+|Beetles, Cliknars, Corathus Beasts, Drachnids, Insects, Leeches, Mosquitoes, Spiders, Ursarachnids.
 |-
 |Where:
-|Classic: Najena, Solusek Eye, Paineel Newbie Area, Steamfont NE corner
+|Classic: Najena, Solusek Eye, Paineel Newbie Area, Steamfont NE area
 Kunark: 
 |-
 |
@@ -57,7 +57,7 @@ Kunark:
 |Alligators, Basilisks, Crocodiles, Lizard Men, Sarnaks, Shissar, Snakes,  Sokokar, and Turtles.
 |-
 |Where:
-|Classic: Cazic Thule, Paineel newbie area, Rathe Mountains Basilisks area
+|Classic: Temple of Cazic Thule, Paineel newbie area, Rathe Mountains basilisks area
 Kunark: 
 |-
 |
@@ -70,7 +70,7 @@ Kunark:
 |Armadillos, Bats, Bubonians, Burynai, Molerats, Rabbits, Ratmen, Rats,  Skunks and Werebats.
 |-
 |Where:
-|Classic: Warrens, Najena, Paineel newbie area, Steamfont NE
+|Classic: Warrens, Najena, Paineel newbie area, Steamfont NE area
 Kunark: 
 |-
 |
@@ -96,7 +96,7 @@ Kunark:
 |Chokidais, Drolvargs, Hynids, Lions, Pumas, Rotdogs, Tigers, Werewolves,  Wolves, Worgs, 
 |-
 |Where:
-|Classic: North & West Kanara, Kithicor Forest
+|Classic: North, West, and East Kanara, Kithicor Forest
 Kunark: 
 |-
 |
@@ -135,7 +135,7 @@ Kunark:
 |Orcs and Wereorcs.
 |-
 |Where:
-|Classic: Clan Crushbone
+|Classic: Clan Crushbone, East Commonlands
 Kunark: 
 |-
 |
@@ -148,7 +148,7 @@ Kunark:
 |Goblins and Nightmare Goblins.
 |-
 |Where:
-|Classic: Permafrost Caverns, Solusek Eye, Clan Runnyeye,
+|Classic: Permafrost Keep, Solusek's Eye, Clan Runnyeye
 Kunark: 
 |-
 |
@@ -161,7 +161,7 @@ Kunark:
 |Gnolls
 |-
 |Where:
-|Classic: Blackburrow
+|Classic: Blackburrow, Splitpaw
 Kunark: 
 |-
 |
@@ -174,7 +174,7 @@ Kunark:
 |Kobolds
 |-
 |Where:
-|Classic: Rather Mountains, Warrens
+|Classic: Rathe Mountains, The Warrens
 Kunark: 
 |-
 |
@@ -200,7 +200,7 @@ Kunark:
 |Crystal Creatures, Grekens, Living Plants, Shriekers, Sporalis,  Stonegrabbers, and Treants.
 |-
 |Where:
-|Classic: Runnyeye, The Temple of Solisek Ro, Solusek Eye, Rathe Mountains froglok newbie area
+|Classic: Runnyeye, Upper Guk, Innothule Swamp, Rathe Mountains froglok newbie area
 Kunark: 
 |-
 |
@@ -213,7 +213,7 @@ Kunark:
 |Dinosaurs, Dracoliches, Dragons, Drakes, Drixies, Raptors, Witherans,  Wurms, and Wyverns.
 |-
 |Where:
-|Classic: Lavastorm, Plane of Sky,Rathe Mountains, Steamfont NE area
+|Classic: Lavastorm, Plane of Sky, Rathe Mountains, Steamfont NE area
 Kunark: 
 |-
 |
@@ -226,7 +226,7 @@ Kunark:
 |Giants
 |-
 |Where:
-|Classic: Rathe Mountains
+|Classic: Rathe Mountains, Ocean of Tears, Nagafen's Lair, Permafrost Keep
 Kunark: 
 |-
 |
@@ -239,7 +239,7 @@ Kunark:
 |Bixies, Brownies, Centaurs, Fairies, Griffins, Manticores, Minotaurs,  Pixies, Satyr, and Sphinxes.
 |-
 |Where:
-|Classic: Lesser Faydark, Steamfont NE area
+|Classic: Lesser Faydark, South Karana, Steamfont NE area
 Kunark: 
 |-
 |
@@ -249,10 +249,10 @@ Kunark:
 |Planes, Trains and Element-iles
 |-
 | align="right" |10000
-|Dervishes, Efreetis, Elementals, Imps, Nilborien, Riftseekers, Scrykin,  Stormriders, and Wraiths.
+|Dervishes, Efreetis, Elementals, Imps, Nilborien, Riftseekers, Scrykin, Stormriders, and Wraiths.
 |-
 |Where:
-|Classic: Lavastorm, Plane of Sky, Steamfont NE area
+|Classic: Lavastorm, Nagafen's Lair, The Hole, Plane of Sky, Steamfont NE area
 Kunark: 
 |-
 |
@@ -262,10 +262,10 @@ Kunark:
 |A Sight for Sore Eyes
 |-
 | align="right" |5000
-|Amygdalans, Cubes, Eyes, Goos, Gorgons, Harpies, Luggalds, Shiliskins,  Tentacle Terrors, and Xulous.
+|Amygdalans, Cubes, Eyes, Goos, Gorgons, Harpies, Luggalds, Shiliskins, Tentacle Terrors, and Xulous.
 |-
 |Where:
-|Classic: Plane of Fear, The Gorge of King Xorbb, Steamfont NE area
+|Classic: Plane of Fear, The Gorge of King Xorbb, Runnyeye, Steamfont NE area
 Kunark: 
 |-
 |
@@ -291,7 +291,7 @@ Kunark:
 |The avatar of a deity.
 |-
 |Where:
-|Classic: CT, Inny
+|Classic: Cazic Thule (Fear), Innoruuk (Hate), Avatar of Fear (Temple of Cazic Thule)
 Kunark: 
 |-
 |
@@ -304,6 +304,6 @@ Kunark:
 |Barrels, Bones, Boxes, Chests, Clocks, Coffins, Mimics, Tables, Totems,  Traps, Vases, and Webs.
 |-
 |Where:
-|Classic: The hole, Plane of Hate, Runnyeye Bank (1 mimic) on 60 sec respawn.
+|Classic: The Hole, Plane of Hate, Runnyeye Bank (1 mimic) on 66 sec respawn.
 Kunark: 
 |}
