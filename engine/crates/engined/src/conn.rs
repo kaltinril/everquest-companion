@@ -26,7 +26,7 @@ use protocol::transport::{Transport, TransportError};
 
 use crate::ops::{self, Outcome, Session, Unreadable};
 use crate::spawn::DIAGNOSTIC_PREFIX;
-use crate::wire::{self, Outgoing};
+use crate::wire::{self, Outbound, Outgoing};
 use crate::world::{ListenerId, World};
 
 /// The engine binary's own version, reported at hello. Informational only — `protocolVersion` is the
@@ -93,7 +93,7 @@ impl Server {
         &self,
         listener: ListenerId,
         incoming: &mut wire::Incoming,
-        outbox: &Sender<EngineMessage>,
+        outbox: &Sender<Outbound>,
     ) -> Option<String> {
         match self.handshake(incoming, outbox) {
             Ok(true) => {}
@@ -136,7 +136,7 @@ impl Server {
             match outcome {
                 Outcome::Send(messages) => {
                     for message in messages {
-                        if outbox.send(message).is_err() {
+                        if outbox.send(Outbound::Message(message)).is_err() {
                             return Some("the connection's writer is gone".to_owned());
                         }
                     }
@@ -151,7 +151,7 @@ impl Server {
     fn handshake(
         &self,
         incoming: &mut wire::Incoming,
-        outbox: &Sender<EngineMessage>,
+        outbox: &Sender<Outbound>,
     ) -> Result<bool, String> {
         let raw = match incoming.recv() {
             Ok(Some(raw)) => raw,
@@ -163,7 +163,7 @@ impl Server {
         // the socket closes. A first frame that is a perfectly good `echo` is still a handshake
         // failure, because nothing may precede the hello.
         let refuse = |why: String| -> Result<bool, String> {
-            let _ignored = outbox.send(EngineMessage::HelloReply(hello_reply(false)));
+            let _ignored = outbox.send(EngineMessage::HelloReply(hello_reply(false)).into());
             Err(why)
         };
 
@@ -186,7 +186,7 @@ impl Server {
         }
 
         if outbox
-            .send(EngineMessage::HelloReply(hello_reply(true)))
+            .send(EngineMessage::HelloReply(hello_reply(true)).into())
             .is_err()
         {
             return Err("the connection's writer is gone".to_owned());
@@ -207,10 +207,15 @@ fn hello_reply(ok: bool) -> HelloReply {
     }
 }
 
-/// Drain one connection's outbox onto its socket until the queue closes or the wire fails.
-fn pump(mut outgoing: Outgoing, inbox: &Receiver<EngineMessage>) {
-    for message in inbox {
-        match outgoing.send(&message) {
+/// Drain one connection's outbox onto its socket until the queue closes or the wire fails. A line
+/// the world already encoded goes out as it is.
+fn pump(mut outgoing: Outgoing, inbox: &Receiver<Outbound>) {
+    for outbound in inbox {
+        let sent = match outbound {
+            Outbound::Message(message) => outgoing.send(&message),
+            Outbound::Line(line) => outgoing.send_line(&line),
+        };
+        match sent {
             Ok(()) => {}
             // A write failure ends the writer, not the engine: the reader finds out when its own
             // socket fails, and the world drops this listener the next time it broadcasts.

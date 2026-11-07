@@ -17,7 +17,46 @@ use std::io::{self, BufReader};
 use std::net::TcpStream;
 
 use protocol::generated::EngineMessage;
-use protocol::transport::ndjson::NdjsonTransport;
+use protocol::transport::ndjson::{encode_line, NdjsonTransport};
+use protocol::transport::TransportError;
+
+/// What a connection's writer queue carries: a message as typed, or one already encoded as its
+/// wire line. The serving loop measures a frame's bytes off the encoding it sends, so the writer
+/// must send that encoding rather than make a second one.
+pub enum Outbound {
+    Message(EngineMessage),
+    /// One NDJSON line, delimiter included, as `encode_line` produces it.
+    Line(String),
+}
+
+impl Outbound {
+    /// The message, decoding an encoded line — for a test reading a queue directly.
+    ///
+    /// # Panics
+    /// If an encoded line does not decode, which a line this engine encoded cannot do.
+    #[cfg(test)]
+    pub fn into_message(self) -> EngineMessage {
+        match self {
+            Outbound::Message(message) => message,
+            Outbound::Line(line) => protocol::transport::ndjson::decode_line(line.trim_end())
+                .expect("a line this engine encoded decodes"),
+        }
+    }
+}
+
+impl From<EngineMessage> for Outbound {
+    fn from(message: EngineMessage) -> Self {
+        Outbound::Message(message)
+    }
+}
+
+/// Encode one message once, for every queue it is about to be sent on.
+///
+/// # Errors
+/// [`TransportError::Encode`] if the message will not serialize.
+pub fn encode(message: &EngineMessage) -> Result<String, TransportError> {
+    encode_line(message)
+}
 
 /// The read half: requests in, nothing out.
 pub type Incoming =

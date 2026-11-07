@@ -98,6 +98,17 @@ impl<R: BufRead, W: Write, Out: Serialize, In: DeserializeOwned> NdjsonTransport
     pub fn into_inner(self) -> (R, W) {
         (self.reader, self.writer)
     }
+
+    /// Send a message already in its wire form — one [`encode_line`] output, delimiter included.
+    /// For a sender that measured the frame off its encoding and must not pay for a second one.
+    ///
+    /// # Errors
+    /// [`TransportError::Io`] if the write fails.
+    pub fn send_line(&mut self, line: &str) -> Result<(), TransportError> {
+        self.writer.write_all(line.as_bytes())?;
+        self.writer.flush()?;
+        Ok(())
+    }
 }
 
 impl<R: BufRead, W: Write, Out: Serialize, In: DeserializeOwned> Transport

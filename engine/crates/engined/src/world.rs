@@ -37,6 +37,7 @@ use crate::clock::clock_source;
 use crate::ingest::{self, Starter};
 use crate::translate::{clamp_i64, moment_row, perf_status, serve_rows};
 use crate::views::{self, FrameKind, Meter, Prepared, SourceDef};
+use crate::wire::Outbound;
 
 /// The generation a fresh process starts in.
 ///
@@ -280,7 +281,7 @@ pub struct Mark {
 
 struct Listener {
     id: ListenerId,
-    outbox: Sender<EngineMessage>,
+    outbox: Sender<Outbound>,
     /// The subscriptions open on this connection, by the id of the request that opened each.
     ///
     /// They live here, not on the connection, for two reasons: a landing fold must reset every open
@@ -344,9 +345,9 @@ pub struct Membership {
     /// The connection's outbox. Its reader thread pushes replies here; the world pushes
     /// connection-wide messages here. One queue, so the order a connection observes is the order
     /// things happened.
-    pub outbox: Sender<EngineMessage>,
+    pub outbox: Sender<Outbound>,
     /// The other end, drained by the connection's writer thread.
-    pub inbox: Receiver<EngineMessage>,
+    pub inbox: Receiver<Outbound>,
 }
 
 impl World {
@@ -1539,9 +1540,15 @@ fn subscriber_counts(state: &State) -> BTreeMap<&'static str, i64> {
 /// when the socket closes, and the world notices here rather than by being told. `leave` remains
 /// the tidy path; this is the fallback for every other way a connection can die.
 fn broadcast(state: &mut State, message: &EngineMessage) {
-    state
-        .listeners
-        .retain(|listener| listener.outbox.send(message.clone()).is_ok());
+    // Encoded once for every connection rather than copied and encoded per connection.
+    let line = crate::wire::encode(message).ok();
+    state.listeners.retain(|listener| {
+        let outbound = match &line {
+            Some(line) => Outbound::Line(line.clone()),
+            None => Outbound::Message(message.clone()),
+        };
+        listener.outbox.send(outbound).is_ok()
+    });
 }
 
 /// Serve every subscription over a prepared source — the whole of reset-then-diffs, in one place.
@@ -1574,19 +1581,18 @@ fn serve(
             }
             let (rows, total) = views::cut(&sub.view, &source.rows);
             let owed = reset_all || sub.held.is_none();
-            let message = if owed {
-                Some((
-                    FrameKind::Reset,
-                    rows.len(),
-                    0,
-                    EngineMessage::ResetMessage(ResetMessage {
-                        kind: ResetMessageKind::Reset,
-                        id: RequestId(*id),
-                        epoch: Epoch(landed),
-                        total,
-                        rows: rows.clone(),
-                    }),
-                ))
+            // The reset carries the rows themselves and hands them back once encoded; a diff keeps
+            // them here. Either way the window is copied out of the source exactly once.
+            let (kind, row_count, ops, message, kept) = if owed {
+                let row_count = rows.len();
+                let message = EngineMessage::ResetMessage(ResetMessage {
+                    kind: ResetMessageKind::Reset,
+                    id: RequestId(*id),
+                    epoch: Epoch(landed),
+                    total,
+                    rows,
+                });
+                (FrameKind::Reset, row_count, 0, message, None)
             } else {
                 let held = sub.held.as_deref().unwrap_or_default();
                 let ops = views::diff(held, &rows);
@@ -1597,30 +1603,33 @@ fn serve(
                     sub.revision = Some(source.revision);
                     continue;
                 }
-                Some((
-                    FrameKind::Diff,
-                    0,
-                    ops.len(),
-                    EngineMessage::DiffMessage(DiffMessage {
-                        kind: DiffMessageKind::Diff,
-                        id: RequestId(*id),
-                        epoch: Epoch(landed),
-                        // Present only when it moved — the schema says so, and fixture 03 is a
-                        // meter tick with no `total` for exactly this reason.
-                        total: (total != sub.total).then_some(total),
-                        ops,
-                    }),
-                ))
+                let ops_count = ops.len();
+                let message = EngineMessage::DiffMessage(DiffMessage {
+                    kind: DiffMessageKind::Diff,
+                    id: RequestId(*id),
+                    epoch: Epoch(landed),
+                    // Present only when it moved — the schema says so, and fixture 03 is a
+                    // meter tick with no `total` for exactly this reason.
+                    total: (total != sub.total).then_some(total),
+                    ops,
+                });
+                (FrameKind::Diff, 0, ops_count, message, Some(rows))
             };
-            if let Some((kind, row_count, ops, message)) = message {
-                // The bytes are the frame's own: measured from the message about to go out rather
-                // than estimated from the rows, because an estimated payload budget is a payload
-                // budget nobody is keeping (see `views::meter`).
-                let bytes = serde_json::to_string(&message).map_or(0, |json| json.len());
-                meter.frame(source.source, kind, row_count, ops, bytes, folded_at);
-                alive = listener.outbox.send(message).is_ok();
-            }
-            sub.held = Some(rows);
+            // Encoded once, here: the bytes the meter records are the bytes the writer sends,
+            // measured from the frame about to go out rather than estimated from the rows, because
+            // an estimated payload budget is a payload budget nobody is keeping (see
+            // `views::meter`). A message that will not encode (none can) goes out typed, as before.
+            let (bytes, outbound) = match crate::wire::encode(&message) {
+                Ok(line) => (line.len(), Outbound::Line(line)),
+                Err(_) => (0, Outbound::Message(message.clone())),
+            };
+            meter.frame(source.source, kind, row_count, ops, bytes, folded_at);
+            alive = listener.outbox.send(outbound).is_ok();
+            sub.held = Some(match (kept, message) {
+                (Some(rows), _) => rows,
+                (None, EngineMessage::ResetMessage(reset)) => reset.rows,
+                (None, _) => Vec::new(),
+            });
             sub.total = total;
             sub.revision = Some(source.revision);
         }
@@ -1708,7 +1717,8 @@ mod tests {
 
         let mut flags = Vec::new();
         for _ in 0..2 {
-            let EngineMessage::EpochMessage(epoch) = membership.inbox.recv().expect("a frame")
+            let EngineMessage::EpochMessage(epoch) =
+                membership.inbox.recv().expect("a frame").into_message()
             else {
                 panic!("a progress announcement is an epoch message");
             };
@@ -1748,7 +1758,11 @@ mod tests {
         assert_eq!(*result.epoch, 2);
 
         for membership in [&one, &two] {
-            let message = membership.inbox.recv().expect("an announcement");
+            let message = membership
+                .inbox
+                .recv()
+                .expect("an announcement")
+                .into_message();
             let EngineMessage::EpochMessage(epoch) = message else {
                 panic!("a connection-wide announcement is an epoch message");
             };
@@ -1815,7 +1829,9 @@ mod tests {
 
         assert!(world.report_progress(generation, mark(1571, 62.4)));
         loop {
-            let EngineMessage::EpochMessage(frame) = listener.inbox.recv().expect("a frame") else {
+            let EngineMessage::EpochMessage(frame) =
+                listener.inbox.recv().expect("a frame").into_message()
+            else {
                 panic!("progress rides an epoch message");
             };
             if matches!(frame.reason, EpochReason::Attach) {
@@ -1850,7 +1866,7 @@ mod tests {
 
         let mut reset_ids = Vec::new();
         while let Ok(message) = listener.inbox.try_recv() {
-            if let EngineMessage::ResetMessage(reset) = message {
+            if let EngineMessage::ResetMessage(reset) = message.into_message() {
                 assert_eq!(*reset.epoch, 2, "a reset names the generation that landed");
                 assert!(reset.rows.is_empty());
                 assert_eq!(reset.total, 0);
@@ -1862,7 +1878,7 @@ mod tests {
         // A connection with no subscriptions is told about the epoch and nothing else.
         let mut bystander_resets = 0;
         while let Ok(message) = bystander.inbox.try_recv() {
-            if matches!(message, EngineMessage::ResetMessage(_)) {
+            if matches!(message.into_message(), EngineMessage::ResetMessage(_)) {
                 bystander_resets += 1;
             }
         }
