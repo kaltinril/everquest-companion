@@ -7,7 +7,7 @@
 
 import { DEFAULT_ALERT_PACK_ID, DEFAULT_ALERT_SOUNDS } from './data/defaultPacks'
 import { seedAlertsWith } from './alertSeeds'
-import type Store from 'electron-store'
+import type { CachedStore } from './storeCache'
 import type { StoreShape } from './storeShape'
 import type { AlertDef } from '../shared/types'
 
@@ -37,7 +37,7 @@ export function withBazaarAlert(alerts: AlertDef[], storedPrefs: unknown): Alert
  * The stored list with the Bazaar alert added the first time only. Takes the store as an argument
  * for alertSeeds.ts's import-cycle reason.
  */
-export function seedBazaarAlertOnce(alerts: AlertDef[], store: Pick<Store<StoreShape>, 'get' | 'set'>): AlertDef[] {
+export function seedBazaarAlertOnce(alerts: AlertDef[], store: Pick<CachedStore<StoreShape>, 'get' | 'set'>): AlertDef[] {
   if (store.get('alertBazaarSeed') === true) return alerts
   const next = withBazaarAlert(alerts, store.get('soundPacks'))
   if (next !== alerts) store.set('alerts', next)
