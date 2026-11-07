@@ -188,6 +188,11 @@ export function setProgress(charId: string, next: ProgressState): ProgressState 
   return next
 }
 
+/** Every store write inside `fn` lands in one file write when it returns (storeCache.ts `batch`). */
+export function batchStore<R>(fn: () => R): R {
+  return store.batch(fn)
+}
+
 export function setInventory(
   charId: string,
   counts: HeldCounts,

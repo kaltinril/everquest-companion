@@ -18,6 +18,8 @@ export interface StoreBacking<T extends object> {
   /** The whole store, parsed fresh from disk. */
   readonly store: T
   set<K extends keyof T>(key: K, value: T[K]): void
+  /** Several keys in ONE file write (conf's object form); what `batch` flushes through. */
+  set(patch: Partial<T>): void
   delete(key: keyof T): void
 }
 
@@ -26,6 +28,12 @@ export interface CachedStore<T extends object> {
   get<K extends keyof T>(key: K, defaultValue: Required<T>[K]): Required<T>[K]
   set<K extends keyof T>(key: K, value: T[K]): void
   delete(key: keyof T): void
+  /**
+   * Run `fn` with every `set` landing in the copy only; the keys it touched reach the file in ONE
+   * write when the outermost batch ends (a nested batch joins the outer one). The attach path
+   * wrote the 141 KB store six times back to back, 11 ms of fsync each (audit item 1).
+   */
+  batch<R>(fn: () => R): R
   /** How many times the file was read — the test's proof, and nothing else reads it. */
   readonly reads: number
 }
@@ -40,6 +48,9 @@ function copy<V>(value: V): V {
 export function cachedStore<T extends object>(backing: StoreBacking<T>): CachedStore<T> {
   let snapshot: T | undefined
   let reads = 0
+  let batchDepth = 0
+  // Keys set inside the open batch, flushed together when it closes.
+  const dirty = new Set<keyof T>()
   const loaded = (): T => {
     if (snapshot === undefined) {
       snapshot = backing.store
@@ -47,18 +58,41 @@ export function cachedStore<T extends object>(backing: StoreBacking<T>): CachedS
     }
     return snapshot
   }
+  const flush = (): void => {
+    if (dirty.size === 0) return
+    const patch: Partial<T> = {}
+    for (const key of dirty) patch[key] = loaded()[key]
+    dirty.clear()
+    backing.set(patch)
+  }
   return {
     get<K extends keyof T>(key: K, defaultValue?: Required<T>[K]) {
       const value = loaded()[key]
       return value === undefined ? defaultValue : copy(value)
     },
     set(key, value) {
+      if (batchDepth > 0) {
+        loaded()[key] = copy(value)
+        dirty.add(key)
+        return
+      }
       backing.set(key, value)
       loaded()[key] = copy(value)
     },
     delete(key) {
+      // A delete mid-batch flushes the pending sets first, so the file never sees them reordered.
+      flush()
       backing.delete(key)
       Reflect.deleteProperty(loaded(), key)
+    },
+    batch(fn) {
+      batchDepth += 1
+      try {
+        return fn()
+      } finally {
+        batchDepth -= 1
+        if (batchDepth === 0) flush()
+      }
     },
     get reads() {
       return reads

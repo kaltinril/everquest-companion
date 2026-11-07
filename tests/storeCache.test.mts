@@ -18,7 +18,12 @@ function fake(initial: Shape): StoreBacking<Shape> & { reads: number; writes: st
       backing.reads += 1
       return structuredClone(file)
     },
-    set<K extends keyof Shape>(key: K, value: Shape[K]): void {
+    set<K extends keyof Shape>(key: K | Partial<Shape>, value?: Shape[K]): void {
+      if (typeof key === 'object') {
+        backing.writes.push('{' + Object.keys(key).join(',') + '}')
+        for (const [k, v] of Object.entries(key)) file[k] = structuredClone(v)
+        return
+      }
       backing.writes.push(String(key))
       file[key] = structuredClone(value)
     },
@@ -71,5 +76,38 @@ describe('storeCache', () => {
     assert.equal(store.get('gone'), undefined)
     assert.deepEqual(backing.writes, ['-gone'])
     assert.equal(backing.store.gone, undefined)
+  })
+
+  it('a batch lands every key it set in one write, and reads inside it see the pending values', () => {
+    const backing = fake({ count: 1 })
+    const store = cachedStore(backing)
+    const seen = store.batch(() => {
+      store.set('count', 2)
+      store.set('count', 3)
+      store.set('overlays', { toast: { open: true } })
+      store.batch(() => {
+        store.set('gone', 'inner')
+      })
+      assert.deepEqual(backing.writes, [], 'nothing reaches the file before the outer batch ends')
+      return store.get('count')
+    })
+    assert.equal(seen, 3)
+    assert.deepEqual(backing.writes, ['{count,overlays,gone}'])
+    assert.equal(backing.store.count, 3)
+    assert.equal(backing.store.gone, 'inner')
+    store.set('count', 4)
+    assert.deepEqual(backing.writes, ['{count,overlays,gone}', 'count'], 'outside a batch a set is its own write')
+  })
+
+  it('a batch that throws still flushes what it set', () => {
+    const backing = fake({ count: 1 })
+    const store = cachedStore(backing)
+    assert.throws(() =>
+      store.batch(() => {
+        store.set('count', 9)
+        throw new Error('boom')
+      })
+    )
+    assert.equal(backing.store.count, 9)
   })
 })
