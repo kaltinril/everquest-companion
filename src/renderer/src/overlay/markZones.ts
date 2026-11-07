@@ -37,6 +37,15 @@ export function timerLabel(t: TimerPin, nowMs: number): string {
   return `${t.display} ${timerPinLabels(t, nowMs).clock}`
 }
 
+/**
+ * What the clock can change about the zones: the timer labels' LENGTHS (a zone is sized from its
+ * label's character count, `labelWidth`). One short string per second, so the overlay re-places
+ * its zones only when a label grew or shrank a character, not on every tick.
+ */
+export function timerLabelLengths(timers: readonly TimerPin[], nowMs: number): string {
+  return timers.map((t) => String(timerLabel(t, nowMs).length)).join(',')
+}
+
 export interface MarkZoneInput {
   ext: ZoneExtent
   fit: ExtentFit

@@ -41,20 +41,30 @@ function shotStore<T extends object>(key: string): {
     }
   }
   const listeners = new Set<() => void>()
-  let cached: { raw: string | null; shots: Readonly<Record<string, Stored<T>>> } = { raw: null, shots: {} }
+  // A VERSION, NOT A STORAGE READ PER RENDER (the 2026-11-06 renderer pass): `useSyncExternalStore`
+  // calls the snapshot on every render of every reader, and this read localStorage each time. The
+  // store's own saves and the other windows' storage events are the only two ways the text moves,
+  // so each bumps the version and the snapshot re-reads only when it has.
+  let version = 0
+  let cached: { version: number; raw: string | null; shots: Readonly<Record<string, Stored<T>>> } = { version: -1, raw: null, shots: {} }
   const snapshot = (): Readonly<Record<string, Stored<T>>> => {
+    if (cached.version === version) return cached.shots
     let raw: string | null = null
     try {
       raw = localStorage.getItem(key)
     } catch {
+      cached = { ...cached, version }
       return cached.shots
     }
-    if (raw !== cached.raw) cached = { raw, shots: load() }
+    cached = { version, raw, shots: raw === cached.raw ? cached.shots : load() }
     return cached.shots
   }
   const subscribe = (onChange: () => void): (() => void) => {
     const onStorage = (e: StorageEvent): void => {
-      if (e.key === null || e.key === key) onChange()
+      if (e.key === null || e.key === key) {
+        version++
+        onChange()
+      }
     }
     listeners.add(onChange)
     window.addEventListener('storage', onStorage)
@@ -72,6 +82,7 @@ function shotStore<T extends object>(key: string): {
     } catch {
       // A blocked store keeps nothing; the reading stays on screen for this paste.
     }
+    version++
     for (const l of listeners) l()
   }
   return {
