@@ -175,6 +175,23 @@ export function stopLiveProbe(): void {
   workerRunning = false
 }
 
+/**
+ * WHO WANTS THE CLOCKS (audit item 8). Two 250 ms timers, one of them a thread, ran from
+ * `replayDone` to quit on every install, and their readings go two places: the telemetry riders
+ * (`takeLiveProbeReading`, sent only when collection is on) and the perf HUD's attribution rings.
+ * With neither on they measured for nobody. The probes now run while the launch is past
+ * `replayDone` AND the HUD is open or telemetry collection is enabled; `perf.ts` and the telemetry
+ * toggle report those facts here, and this module, which imports nothing Electron, decides.
+ */
+const demand = { armed: false, hud: false, telemetry: false }
+
+export function setLiveProbeDemand(key: keyof typeof demand, on: boolean): void {
+  demand[key] = on
+  const wanted = demand.armed && (demand.hud || demand.telemetry)
+  if (wanted) startLiveProbe()
+  else stopLiveProbe()
+}
+
 // ---- the two readers -----------------------------------------------------------------------
 
 /**

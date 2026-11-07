@@ -112,3 +112,61 @@ export function watchForOutputFile(
   watcher.on('error', handlers.onError)
   return watcher
 }
+
+interface DirSubscriber {
+  def: OutputKindDef
+  handlers: OutputWatchHandlers
+}
+
+/** One chokidar watcher per directory, shared by every kind subscribed to it. */
+const sharedDirWatchers = new Map<string, { watcher: FSWatcher; subs: Set<DirSubscriber> }>()
+
+/**
+ * `watchForOutputFile`, SHARED: the three graduated kinds each armed their own depth-0 watcher on
+ * the same install root (three directory listings, three sets of fs handles, three settle polls
+ * per write). One watcher per directory now fans each `add` out to every subscribed kind's
+ * filter; the chokidar instance closes when the last subscriber leaves. A character switch
+ * closes and re-arms the kinds one at a time, so the shared watcher never drops to zero mid-switch.
+ */
+export function subscribeOutputDir(
+  dir: string,
+  def: OutputKindDef,
+  handlers: OutputWatchHandlers
+): { close: () => void } {
+  let entry = sharedDirWatchers.get(dir)
+  if (entry === undefined) {
+    const subs = new Set<DirSubscriber>()
+    const watcher = watch(dir, {
+      ignoreInitial: true,
+      depth: 0,
+      awaitWriteFinish: {
+        stabilityThreshold: STABILITY_THRESHOLD_MS,
+        pollInterval: POLL_INTERVAL_MS
+      }
+    })
+    watcher.on('add', (path: string) => {
+      const name = basename(path)
+      for (const sub of subs) if (isOutputFileName(sub.def, name)) sub.handlers.onChange()
+    })
+    watcher.on('error', (err: unknown) => {
+      for (const sub of subs) sub.handlers.onError(err)
+    })
+    entry = { watcher, subs }
+    sharedDirWatchers.set(dir, entry)
+  }
+  const live = entry
+  const sub: DirSubscriber = { def, handlers }
+  live.subs.add(sub)
+  return {
+    close: () => {
+      if (!live.subs.delete(sub) || live.subs.size > 0) return
+      if (sharedDirWatchers.get(dir) === live) sharedDirWatchers.delete(dir)
+      void live.watcher.close()
+    }
+  }
+}
+
+/** How many directories have a shared watcher open: the test's witness, nothing else reads it. */
+export function openOutputDirWatchers(): number {
+  return sharedDirWatchers.size
+}

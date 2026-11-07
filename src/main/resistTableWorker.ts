@@ -23,6 +23,7 @@
 import { readFileSync } from 'node:fs'
 import { dirname } from 'node:path'
 import { parentPort, workerData } from 'node:worker_threads'
+import { chunkMessages } from './jsonChunks'
 import { parseSpellsUs } from './resist/spellsUsParse'
 import { writeFileDurable } from './telemetry/durableWrite'
 import type { SpellResistTable } from '../shared/resistTypes'
@@ -41,10 +42,12 @@ export interface ResistTableWorkerInit {
   cache?: ResistTableCacheTarget
 }
 
-export interface ResistTableWorkerReply {
-  ok: boolean
-  table?: SpellResistTable
-  error?: string
+/**
+ * THE TABLE GOES BACK IN SLICES (jsonChunks.ts), not as one object: posting the parsed table cost
+ * main 223 ms of structured-clone deserialization, more than parsing the cache file itself. The
+ * `head` carries what used to ride the reply beside the table.
+ */
+export interface ResistTableWorkerHead {
   /** The cache write failed; the table is still good. */
   cacheError?: string
 }
@@ -65,13 +68,11 @@ function writeCache(target: ResistTableCacheTarget, table: SpellResistTable): st
   }
 }
 
-let reply: ResistTableWorkerReply
 try {
   const table = parseSpellsUs(readFileSync(init.path, 'latin1'))
-  reply = { ok: true, table }
   const cacheError = init.cache === undefined ? null : writeCache(init.cache, table)
-  if (cacheError !== null) reply.cacheError = cacheError
+  const head: ResistTableWorkerHead = cacheError === null ? {} : { cacheError }
+  for (const m of chunkMessages({ ...head, table }, { key: 'table' })) port?.postMessage(m)
 } catch (err) {
-  reply = { ok: false, error: message(err) }
+  port?.postMessage({ kind: 'error', stage: 'parse', error: message(err) })
 }
-port?.postMessage(reply)

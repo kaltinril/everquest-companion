@@ -98,5 +98,10 @@ export function buildFocusBenefit(spells: readonly SpellEntry[]): (focus: string
     byName.get(focus.trim().toLowerCase()) ?? byFamily.get(parseFocusEffect(focus).family.toLowerCase()) ?? null
 }
 
-/** The committed list's answer, built once for the process. */
-export const COMMITTED_FOCUS_BENEFIT = buildFocusBenefit((spellsJson as SpellDbFile).spells)
+let committed: ((focus: string) => FocusBenefit | null) | null = null
+
+/** The committed list's answer, built once for the process, on the first ask (audit item 6). */
+export const COMMITTED_FOCUS_BENEFIT = (focus: string): FocusBenefit | null => {
+  committed ??= buildFocusBenefit((spellsJson as SpellDbFile).spells)
+  return committed(focus)
+}

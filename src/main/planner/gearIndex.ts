@@ -38,7 +38,7 @@ import {
   type ItemResearchFile,
   type ResearchedKnowledge
 } from '../itemsResearch'
-import { COMMITTED_SPELL_FACTS, slotsOf, type SpellFactsIndex } from './effectIndex'
+import { committedSpellFacts, slotsOf, type SpellFactsIndex } from './effectIndex'
 import { COMMITTED_FOCUS_BENEFIT } from './focusBenefit'
 import { eraDerivationSteps } from './eraDerive'
 import { runSteps, type Steps } from '../yieldingSteps'
@@ -456,7 +456,7 @@ function committedSources(): SourceIndex {
 export function buildGearIndex(
   file: ItemDbFile,
   research: ItemResearchFile = ITEMS_RESEARCH,
-  spells: SpellFactsIndex = COMMITTED_SPELL_FACTS,
+  spells: SpellFactsIndex = committedSpellFacts(),
   sources: SourceIndex = committedSources()
 ): GearIndexPayload {
   return runSteps(gearIndexSteps(file, research, spells, sources))
@@ -476,7 +476,7 @@ const PAGES_PER_STEP = 64
 export function* gearIndexSteps(
   file: ItemDbFile,
   research: ItemResearchFile = ITEMS_RESEARCH,
-  spells: SpellFactsIndex = COMMITTED_SPELL_FACTS,
+  spells: SpellFactsIndex = committedSpellFacts(),
   sources: SourceIndex = committedSources()
 ): Steps<GearIndexPayload> {
   const acc = newAcc(yield* eraDerivationSteps(file))

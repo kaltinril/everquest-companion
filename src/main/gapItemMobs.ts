@@ -6,19 +6,20 @@
 //
 // ELECTRON-FREE, the mobDropEra.ts precedent: tests/gapDrops.test.mts drives it under the node runner.
 
-import { itemKey, type ItemDbFile } from './itemsDb'
+import { itemKey, type ItemDbEntry, type ItemDbFile } from './itemsDb'
 import type { ItemPageMobs } from '../shared/gaps'
 import itemsJson from './data/items.json'
 import { itemsByAnyName } from './itemOtherNames'
 
-// By any name the wiki gives the page: a redirect to it finds it (itemOtherNames.ts).
-const items = itemsByAnyName((itemsJson as unknown as ItemDbFile).items)
+// By any name the wiki gives the page: a redirect to it finds it (itemOtherNames.ts). Memoized per
+// corpus there and asked for on the first call, so the build is shared and never at import.
+const items = (): Readonly<Record<string, ItemDbEntry>> => itemsByAnyName((itemsJson as unknown as ItemDbFile).items)
 
 /** Each name's item page mobs, page order, deduped; null when the corpus has no page for it. */
 export function itemPageMobs(names: readonly string[]): ItemPageMobs {
   const out: ItemPageMobs = {}
   for (const name of names) {
-    const entry = items[itemKey(name)]
+    const entry = items()[itemKey(name)]
     out[name] = entry === undefined ? null : [...new Set((entry.dropsFrom ?? []).map((d) => d.mob))]
   }
   return out

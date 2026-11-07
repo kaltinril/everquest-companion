@@ -12,8 +12,10 @@ import { itemsByAnyName } from './itemOtherNames'
 /** A record's forage fields (wiki-scraper-fixes' parser); absent on a corpus parsed before them. */
 type ForageEntry = ItemDbEntry & { foraged?: string[]; foragedNote?: string; foragedCategory?: boolean; ingredientCategory?: boolean }
 
-// By any name the wiki gives the page: a redirect to it finds it (itemOtherNames.ts).
-const items = itemsByAnyName((itemsJson as unknown as ItemDbFile).items as Record<string, ForageEntry>)
+// By any name the wiki gives the page: a redirect to it finds it (itemOtherNames.ts). Memoized per
+// corpus there and asked for on the first call, so the build is shared and never at import.
+const items = (): Readonly<Record<string, ForageEntry>> =>
+  itemsByAnyName((itemsJson as unknown as ItemDbFile).items as Record<string, ForageEntry>)
 
 /** One record → what its page states; the page title is the edit link's. */
 export function pageForage(entry: ForageEntry): ItemPageForage {
@@ -24,7 +26,7 @@ export function pageForage(entry: ForageEntry): ItemPageForage {
 }
 
 /** Each name's page forage statement; null when the corpus has no page for it. */
-export function itemPageForage(names: readonly string[], corpus: Readonly<Record<string, ForageEntry>> = items): Record<string, ItemPageForage | null> {
+export function itemPageForage(names: readonly string[], corpus: Readonly<Record<string, ForageEntry>> = items()): Record<string, ItemPageForage | null> {
   const out: Record<string, ItemPageForage | null> = {}
   for (const name of names) {
     const entry = corpus[itemKey(name)]

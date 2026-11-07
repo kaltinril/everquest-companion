@@ -86,6 +86,10 @@ const emptyProgress: ProgressState = {
  * keeps what it holds across the first session boundary rather than clearing it: until JOS-272 this
  * line was recorded and then thrown away, every launch, on every install in the fleet.
  */
+/** When the store's open began (migration, then `new Store()`), ms since process start: what
+ *  separates the store's own cost from the bundle evaluation before it in the startup summary. */
+export const STORE_OPEN_START_MS = performance.now()
+
 const schemaMigration = migrateStoreFile(join(USER_DATA, `${STORE_NAME}.json`), {
   info: (message) => logInfo(`[everquest-companion] ${message}`),
   error: (message) => logError('main:storeSchema', message)
@@ -186,6 +190,11 @@ export function setProgress(charId: string, next: ProgressState): ProgressState 
   all[charId] = next
   store.set('byCharacter', all)
   return next
+}
+
+/** Every store write inside `fn` lands in one file write when it returns (storeCache.ts `batch`). */
+export function batchStore<R>(fn: () => R): R {
+  return store.batch(fn)
 }
 
 export function setInventory(

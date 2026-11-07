@@ -38,17 +38,14 @@ import {
 } from '../../shared/characterSheet'
 import { loadInventoryDump } from '../outputs'
 import { getActiveCharacter } from '../session'
-import { buildItemDbIndex, itemKey, type ItemDbEntry, type ItemDbFile } from '../itemsDb'
-// The COMMITTED wiki item database — the same module itemLookup.ts imports, so the JSON is
-// inlined into the main bundle exactly once.
-import itemsJson from '../data/items.json'
-
-let index: Map<string, ItemDbEntry> | null = null
+import { itemKey, type ItemDbEntry } from '../itemsDb'
+// The COMMITTED wiki item database's lookup index, the one itemLookup.ts builds on first use: this
+// file built an identical second copy of it (audit item 7).
+import { itemDb } from '../itemLookup'
 
 /** The name→record index, built on first use and kept for the process's life (planner precedent). */
 function itemIndex(): Map<string, ItemDbEntry> {
-  index ??= buildItemDbIndex(itemsJson as unknown as ItemDbFile)
-  return index
+  return itemDb()
 }
 
 /** One cell's item, joined to the committed DB. A miss is RECORDED, never smoothed over (law 12). */

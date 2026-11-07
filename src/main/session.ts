@@ -41,6 +41,7 @@ import { sendWorldRebuilt } from './worldRebuilt'
 import {
   getActiveLogPath,
   getEqInstallDir,
+  batchStore,
   getProgress,
   setActiveLogPath,
   setInventory
@@ -408,6 +409,31 @@ export async function tailCharacter(ref: CharacterRef): Promise<boolean> {
   await Promise.resolve()
   if (!turn.owns()) return preempted(ref, turn) !== null
   character = ref
+  // ONE STORE WRITE FOR THE WHOLE ATTACH. The log path and the three dump loads below each wrote
+  // `byCharacter` (141 KB, fsync) on their own: six rewrites back to back. The batch lands them
+  // together once the last load has run (audit item 1); the reads inside see the pending values.
+  batchStore(() => {
+    attachCharacter(ref)
+  })
+  // THE ATTACH RIDES THIS CALL, and that is the whole of what "tailing a character" means now.
+  //
+  // `sendWorldRebuilt` tells every window that folds a module to re-hydrate, and — through the one
+  // in-process observer slot (`worldRebuilt.ts setWorldRebuiltObserver`) — tells the data-server
+  // client, which sends `session.attach` for this log. So the engine learns which character to
+  // fold from the same signal the windows learn to ask again from, which is exactly the property
+  // JOS-172 fought for: ONE answer to "the world for this character was rebuilt".
+  //
+  // THE WINDOWS ARE TOLD FIRST AND WILL BRIEFLY GET NOTHING, and that is the honest state rather
+  // than a race. They re-ask immediately, the engine is still attaching or folding, and
+  // `module:getSnapshot` answers null until it goes live — which `useModule` draws as loading. The
+  // alternative would be showing the previous character's rows under this character's name.
+  sendWorldRebuilt(ref)
+  return true
+}
+
+/** The synchronous half of the attach: remember the log, start the quiet clock, read and follow
+ *  the three dumps. Runs inside `batchStore`, so its store writes reach the file once. */
+function attachCharacter(ref: CharacterRef): void {
   setActiveLogPath(ref.logPath)
   logInfo(`[everquest-companion] Tailing ${ref.name}@${ref.server}: ${ref.logPath}`)
   // THE FIRST-RUN FUNNEL'S `logDetected`, at the one moment that is unambiguously "we found a log
@@ -437,21 +463,6 @@ export async function tailCharacter(ref: CharacterRef): Promise<boolean> {
   // The third graduated kind (factions), same two steps.
   loadFactionsNow(ref, 'startup')
   startFactionsWatch(ref)
-
-  // THE ATTACH RIDES THIS CALL, and that is the whole of what "tailing a character" means now.
-  //
-  // `sendWorldRebuilt` tells every window that folds a module to re-hydrate, and — through the one
-  // in-process observer slot (`worldRebuilt.ts setWorldRebuiltObserver`) — tells the data-server
-  // client, which sends `session.attach` for this log. So the engine learns which character to
-  // fold from the same signal the windows learn to ask again from, which is exactly the property
-  // JOS-172 fought for: ONE answer to "the world for this character was rebuilt".
-  //
-  // THE WINDOWS ARE TOLD FIRST AND WILL BRIEFLY GET NOTHING, and that is the honest state rather
-  // than a race. They re-ask immediately, the engine is still attaching or folding, and
-  // `module:getSnapshot` answers null until it goes live — which `useModule` draws as loading. The
-  // alternative would be showing the previous character's rows under this character's name.
-  sendWorldRebuilt(character)
-  return true
 }
 
 /**

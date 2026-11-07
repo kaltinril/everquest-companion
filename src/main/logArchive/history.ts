@@ -60,6 +60,8 @@ export interface HistoryDeps {
   comboCorrections?: () => readonly ComboCorrection[]
   /** What each mob's page says of its respawn today; absent, archived learned evidence keeps its own. */
   respawnWiki?: RespawnWikiNow
+  /** Start reading the segments ahead of the attach (segmentStore.ts `prewarmSegments`). */
+  prewarm?: () => void
 }
 
 interface Context {
@@ -240,6 +242,8 @@ export function createHistoryMerge(deps: HistoryDeps): HistoryMerge {
       cache.clear()
     },
     engineAttaching: () => {
+      // The context is rebuilt after this attach; the files it will list are read now, off main.
+      deps.prewarm?.()
       const before = [...sealedThisAttach]
       return () => {
         for (const id of before) sealedThisAttach.delete(id)

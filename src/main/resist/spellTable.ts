@@ -19,13 +19,14 @@
 // on every profile goes false, and the mob page says so instead of showing an empty card.
 
 import { app } from 'electron'
-import { readFileSync, statSync } from 'node:fs'
+import { statSync } from 'node:fs'
 import { join } from 'node:path'
 import { Worker } from 'node:worker_threads'
 import { effectiveEqRoot } from '../log/config'
 import { logError } from '../errorLog'
+import { readJsonChunked, receiveJsonChunks, type JsonChunkSink } from '../jsonChunkRead'
 import type { SpellResistTable } from '../../shared/resistTypes'
-import type { ResistTableCacheTarget, ResistTableWorkerReply } from '../resistTableWorker'
+import type { ResistTableCacheTarget, ResistTableWorkerHead } from '../resistTableWorker'
 
 /**
  * Bump to invalidate every cached table in the field (a parser change, not a game patch).
@@ -74,13 +75,6 @@ import type { ResistTableCacheTarget, ResistTableWorkerReply } from '../resistTa
  */
 export const SPELL_RESIST_CACHE_VERSION = 9
 
-interface CacheFile {
-  version: number
-  size: number
-  mtimeMs: number
-  table: SpellResistTable
-}
-
 /** The client file, as it sits in the install this app resolved. */
 export function spellsUsPath(): string {
   return join(effectiveEqRoot(), 'spells_us.txt')
@@ -99,15 +93,37 @@ function sourceStamp(path: string): { size: number; mtimeMs: number } | null {
   }
 }
 
-function readCache(stamp: { size: number; mtimeMs: number }): SpellResistTable | null {
-  try {
-    const file = JSON.parse(readFileSync(cachePath(), 'utf8')) as CacheFile
-    if (file.version !== SPELL_RESIST_CACHE_VERSION) return null
-    if (file.size !== stamp.size || file.mtimeMs !== stamp.mtimeMs) return null
-    return file.table
-  } catch {
-    return null
+/** A sink that assembles the table from its slices, whichever worker is posting them. */
+function tableSink(): { table: SpellResistTable; sink: JsonChunkSink } {
+  const table: SpellResistTable = {}
+  return {
+    table,
+    sink: {
+      head: (head) => {
+        const { cacheError } = head as ResistTableWorkerHead
+        if (cacheError !== undefined) logError('main:resistTable', { message: `spell-resist-cache write failed: ${cacheError}` })
+      },
+      chunk: (value) => {
+        Object.assign(table, value as SpellResistTable)
+      }
+    }
   }
+}
+
+/**
+ * The cache, read and parsed on a worker and handed back in slices (jsonChunkRead.ts): the 18 MB
+ * file used to be a ~130 ms synchronous read-and-parse on this thread at the first con of a
+ * session. Null for a missing, stale, torn or unreadable cache, exactly as before: the parse path
+ * below then rebuilds it.
+ */
+async function readCache(stamp: { size: number; mtimeMs: number }): Promise<SpellResistTable | null> {
+  const { table, sink } = tableSink()
+  const res = await readJsonChunked(
+    cachePath(),
+    { key: 'table', expectHead: { version: SPELL_RESIST_CACHE_VERSION, size: stamp.size, mtimeMs: stamp.mtimeMs } },
+    sink
+  )
+  return res.ok ? table : null
 }
 
 /**
@@ -116,38 +132,19 @@ function readCache(stamp: { size: number; mtimeMs: number }): SpellResistTable |
  * 2026-10-20; `resistTableWorker.ts` has the rest). Still best-effort: a failed write is logged and
  * costs one re-parse next launch, nothing else.
  */
-function parseOnWorker(path: string, cache: ResistTableCacheTarget): Promise<SpellResistTable | null> {
-  return new Promise((resolve) => {
-    let worker: Worker
-    try {
-      worker = new Worker(join(__dirname, 'resistTableWorker.js'), { workerData: { path, cache } })
-    } catch (err) {
-      logError('main:resistTable', { message: 'resist table worker failed to start', err })
-      resolve(null)
-      return
-    }
-    let settled = false
-    const finish = (table: SpellResistTable | null): void => {
-      if (settled) return
-      settled = true
-      resolve(table)
-      void worker.terminate()
-    }
-    worker.on('message', (reply: ResistTableWorkerReply) => {
-      if (!reply.ok) logError('main:resistTable', { message: reply.error ?? 'parse failed' })
-      if (reply.cacheError !== undefined) {
-        logError('main:resistTable', { message: `spell-resist-cache write failed: ${reply.cacheError}` })
-      }
-      finish(reply.table ?? null)
-    })
-    worker.on('error', (err: unknown) => {
-      logError('main:resistTable', { message: 'resist table worker error', err })
-      finish(null)
-    })
-    worker.on('exit', () => {
-      finish(null)
-    })
-  })
+async function parseOnWorker(path: string, cache: ResistTableCacheTarget): Promise<SpellResistTable | null> {
+  let worker: Worker
+  try {
+    worker = new Worker(join(__dirname, 'resistTableWorker.js'), { workerData: { path, cache } })
+  } catch (err) {
+    logError('main:resistTable', { message: 'resist table worker failed to start', err })
+    return null
+  }
+  const { table, sink } = tableSink()
+  const res = await receiveJsonChunks(worker, sink)
+  if (res.ok) return table
+  logError('main:resistTable', { message: res.stage === 'worker' ? `resist table worker error: ${res.error}` : res.error })
+  return null
 }
 
 /**
@@ -189,7 +186,7 @@ async function load(): Promise<SpellResistTable | null> {
     return null
   }
   sourceMtime = stamp.mtimeMs
-  const cached = readCache(stamp)
+  const cached = await readCache(stamp)
   if (cached) {
     loaded = cached
     state = 'ok'
