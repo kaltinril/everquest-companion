@@ -13,7 +13,7 @@
 //! `active` is a `HashSet` and its order is never published: every consumer either looks a key up or
 //! folds the keys into a set that is sorted before it reaches a string.
 
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, HashSet, VecDeque};
 
 use serde::Serialize;
 
@@ -104,12 +104,18 @@ pub struct OpenState<'a> {
 }
 
 /// The session-level span ring plus its live open index.
+///
+/// Spans are addressed by a SEQUENCE NUMBER — the count of spans ever opened before it — rather
+/// than by their position in the ring: `base` is the sequence number of the oldest span still held,
+/// so a drop-oldest moves `base` and leaves every open-index entry valid as it stands.
 #[derive(Debug, Default)]
 pub struct StateTimeline {
-    spans: Vec<SpanRecord>,
+    spans: VecDeque<SpanRecord>,
+    /// Sequence number of `spans[0]`; the number of spans the cap has dropped.
+    base: usize,
     /// `<kind>:<key>` of every open span. Read-only to callers; mutated here only.
     pub active: HashSet<String>,
-    /// group → index of the one open span in that group; the exclusivity index.
+    /// group → sequence number of the one open span in that group; the exclusivity index.
     open: HashMap<String, usize>,
 }
 
@@ -120,8 +126,14 @@ impl StateTimeline {
 
     pub fn reset(&mut self) {
         self.spans.clear();
+        self.base = 0;
         self.active.clear();
         self.open.clear();
+    }
+
+    /// The record with sequence number `seq`, which every entry of `open` names a live one of.
+    fn span_at(&self, seq: usize) -> &SpanRecord {
+        &self.spans[seq - self.base]
     }
 
     /// Open a span, closing whatever open span shares its exclusivity group as `inferred` — the only
@@ -135,7 +147,7 @@ impl StateTimeline {
         if let Some(&prev) = self.open.get(&group) {
             self.finish(prev, a.ts, EdgeEvidence::Inferred);
         }
-        self.spans.push(SpanRecord {
+        self.spans.push_back(SpanRecord {
             span: StateSpan {
                 kind: a.kind,
                 key: a.key.to_string(),
@@ -147,10 +159,11 @@ impl StateTimeline {
             },
             group: group.clone(),
         });
+        let seq = self.base + self.spans.len() - 1;
         if self.spans.len() > STATE_SPAN_CAP {
             self.drop_oldest();
         }
-        self.open.insert(group, self.spans.len() - 1);
+        self.open.insert(group, seq);
         self.active.insert(state_key_of(a.kind, a.key));
     }
 
@@ -158,11 +171,10 @@ impl StateTimeline {
     /// no-op: the game can print a wears-off for a buff whose landing predates the replay, and
     /// fabricating a zero-width span for it would be an invention.
     pub fn close_state(&mut self, kind: StateKind, key: &str, ts: i64, evidence: EdgeEvidence) {
-        let found = self
-            .open
-            .values()
-            .copied()
-            .find(|&i| self.spans[i].span.kind == kind && self.spans[i].span.key == key);
+        let found = self.open.values().copied().find(|&i| {
+            let s = &self.span_at(i).span;
+            s.kind == kind && s.key == key
+        });
         if let Some(i) = found {
             self.finish(i, ts, evidence);
         }
@@ -175,7 +187,7 @@ impl StateTimeline {
             .open
             .values()
             .copied()
-            .filter(|&i| self.spans[i].group.starts_with(prefix))
+            .filter(|&i| self.span_at(i).group.starts_with(prefix))
             .collect();
         for i in hits {
             self.finish(i, ts, evidence);
@@ -205,8 +217,8 @@ impl StateTimeline {
             .collect()
     }
 
-    fn finish(&mut self, idx: usize, ts: i64, evidence: EdgeEvidence) {
-        let rec = &mut self.spans[idx];
+    fn finish(&mut self, seq: usize, ts: i64, evidence: EdgeEvidence) {
+        let rec = &mut self.spans[seq - self.base];
         rec.span.end_ts = Some(ts);
         rec.span.end_evidence = evidence;
         let group = rec.group.clone();
@@ -216,20 +228,19 @@ impl StateTimeline {
     }
 
     /// Drop-oldest under the cap. A dropped span may still be the open one for its group — a
-    /// permanent buff can outlive every later commit — so the open index is repaired rather than left
-    /// pointing at a record no longer in the ring.
+    /// permanent buff can outlive every later commit — so its open entry goes with it rather than
+    /// being left naming a record no longer in the ring. Every other entry stays as it is: the
+    /// index holds sequence numbers, and only `base` moves.
     fn drop_oldest(&mut self) {
-        if self.spans.is_empty() {
+        let Some(gone) = self.spans.pop_front() else {
             return;
-        }
-        let gone = self.spans.remove(0);
-        if self.open.get(&gone.group) == Some(&0) {
+        };
+        let gone_seq = self.base;
+        self.base += 1;
+        if self.open.get(&gone.group) == Some(&gone_seq) {
             self.open.remove(&gone.group);
             self.active
                 .remove(&state_key_of(gone.span.kind, &gone.span.key));
-        }
-        for i in self.open.values_mut() {
-            *i = i.saturating_sub(1);
         }
     }
 }
@@ -298,6 +309,39 @@ mod tests {
             EdgeEvidence::Observed,
         );
         assert!(t.spans_overlapping(0, 9_999).is_empty());
+    }
+
+    /// Past the cap the oldest span goes, open or not: a permanent buff that outlived two thousand
+    /// later commits leaves the open index and the active set with it, and every span still held
+    /// keeps closing by its own name.
+    #[test]
+    fn the_cap_drops_the_oldest_span_and_its_open_entry_and_the_rest_still_close() {
+        let mut t = StateTimeline::new();
+        t.note_state(&open(StateKind::Buff, "permanent", 0, None));
+        for i in 0..STATE_SPAN_CAP {
+            let key = format!("b{i}");
+            t.note_state(&open(StateKind::Buff, &key, 1_000 + i as i64, None));
+        }
+        assert_eq!(t.spans_overlapping(0, i64::MAX).len(), STATE_SPAN_CAP);
+        assert!(!t.active.contains("buff:permanent"));
+        assert_eq!(t.active.len(), STATE_SPAN_CAP);
+        // The newest and the oldest survivor both close by name, through the index as it stands.
+        let last = format!("b{}", STATE_SPAN_CAP - 1);
+        t.close_state(StateKind::Buff, &last, 9_000, EdgeEvidence::Observed);
+        t.close_state(StateKind::Buff, "b0", 9_000, EdgeEvidence::Observed);
+        assert_eq!(t.active.len(), STATE_SPAN_CAP - 2);
+        let closed: Vec<_> = t
+            .spans_overlapping(0, i64::MAX)
+            .into_iter()
+            .filter(|s| s.end_ts == Some(9_000))
+            .map(|s| s.key)
+            .collect();
+        assert_eq!(closed, vec!["b0".to_string(), last]);
+        // …and a commit after the drop lands in its own group like any other.
+        t.note_state(&open(StateKind::Stance, "offensive", 9_500, Some("stance")));
+        t.note_state(&open(StateKind::Stance, "defensive", 9_600, Some("stance")));
+        assert!(t.active.contains("stance:defensive"));
+        assert!(!t.active.contains("stance:offensive"));
     }
 
     /// An open span overlaps any window that ends after it started; a closed one only its own span.

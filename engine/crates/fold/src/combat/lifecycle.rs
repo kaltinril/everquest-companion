@@ -225,13 +225,13 @@ pub fn finalize_current(st: &mut EngineState) {
         .is_some_and(|c| is_slow_capable(&c.poison))
     {
         let first = enc.agg.procs.first_slow_ts;
-        st.slow_samples.push(if first > 0 {
+        st.slow_samples.push_back(if first > 0 {
             Some((first - enc.start_ts).max(0))
         } else {
             None
         });
         if st.slow_samples.len() > SLOW_SAMPLE_CAP {
-            st.slow_samples.remove(0);
+            st.slow_samples.pop_front();
         }
     }
     st.zone_finalized_ms += (enc.last_ts - enc.start_ts).max(0);

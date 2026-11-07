@@ -30,7 +30,7 @@ use crate::combat::statetimeline::StateTimeline;
 use crate::combat::swing::SwingTrack;
 use crate::combat::world::{Resolved, WorldModel};
 use eqlog::names::{id_key, id_key_ref};
-use std::collections::HashSet;
+use std::collections::{HashSet, VecDeque};
 
 /// One half of the combat-modifier pair — the last stance (or invocation) the player committed to,
 /// with the ts of that commit. Session-scoped: a stance is not tied to a zone, so it survives every
@@ -130,7 +130,8 @@ pub struct EngineState {
     /// First/last attributed-damage ts in the LIVE zone session (0 = none yet).
     pub zone_start_ts: i64,
     pub zone_last_ts: i64,
-    pub zone_history: Vec<ZoneSession>,
+    /// Finalized stays, oldest first, capped drop-oldest at `ZONE_HISTORY_CAP`.
+    pub zone_history: VecDeque<ZoneSession>,
     pub zone_seq: u64,
 
     /// True from `reset()` until `set_live()`; gates the snapshot-time sweeps.
@@ -139,7 +140,7 @@ pub struct EngineState {
     pub recording: bool,
     /// The classification ring — one row per line the engine had something to say about, newest
     /// last, capped drop-oldest at [`RECENT_CAP`]. Written only while `recording`.
-    pub recent: Vec<ClassifiedLine>,
+    pub recent: VecDeque<ClassifiedLine>,
     /// ts of the last encounter-relevant activity (attributed damage OR a CC event). Drives the
     /// `FALLBACK_IDLE_MS` closure independent of the damage timeline.
     pub last_activity_ts: i64,
@@ -152,7 +153,7 @@ pub struct EngineState {
     /// finalized pull that opened with a slow-capable coat on: the ms to the first slow landing, or
     /// `None` when the pull ended without one. The `None`s are why this is a list of samples rather
     /// than a running mean — they are counted, never averaged in as zero.
-    pub slow_samples: Vec<Option<i64>>,
+    pub slow_samples: VecDeque<Option<i64>>,
 
     /// Blade coats, four concurrent because that is what the game has: `coat_utility` is the one
     /// active utility poison and `coat_combat` holds at most one venom per mutually-exclusive line
@@ -224,16 +225,16 @@ impl EngineState {
             zone_active_ms: 0,
             zone_start_ts: 0,
             zone_last_ts: 0,
-            zone_history: Vec::new(),
+            zone_history: VecDeque::new(),
             zone_seq: 0,
             hydrating: true,
             recording: false,
-            recent: Vec::new(),
+            recent: VecDeque::new(),
             last_activity_ts: 0,
             stance: None,
             invocation: None,
             specials: SpecialAttacks::new(),
-            slow_samples: Vec::new(),
+            slow_samples: VecDeque::new(),
             coat_utility: None,
             coat_combat: Vec::new(),
             coat_class_checked_ts: 0,
@@ -252,9 +253,9 @@ impl EngineState {
     /// Append a point annotation to an encounter's marker ring, drop-oldest at `MARKER_CAP`.
     /// Draw-only: no count, DPS or attribution ever reads this.
     pub fn push_marker(enc: &mut Encounter, m: MarkerRaw) {
-        enc.markers.push(m);
+        enc.markers.push_back(m);
         if enc.markers.len() > MARKER_CAP {
-            enc.markers.remove(0);
+            enc.markers.pop_front();
         }
     }
 
@@ -263,10 +264,10 @@ impl EngineState {
     /// instant count and the view can declare the loss rather than report the ring length as the
     /// fight (law 1). Display metadata only.
     pub fn push_timeline(enc: &mut Encounter, rec: TimelineRaw) {
-        enc.events.push(rec);
+        enc.events.push_back(rec);
         enc.events_total += 1;
         if enc.events.len() > TIMELINE_CAP {
-            enc.events.remove(0);
+            enc.events.pop_front();
         }
     }
 
@@ -767,14 +768,14 @@ impl EngineState {
     }
 
     fn log_line(&mut self, ts: i64, cat: &str, role: &str, text: String) {
-        self.recent.push(ClassifiedLine {
+        self.recent.push_back(ClassifiedLine {
             ts,
             cat: cat.to_owned(),
             role: role.to_owned(),
             text,
         });
         if self.recent.len() > RECENT_CAP {
-            self.recent.remove(0);
+            self.recent.pop_front();
         }
     }
 
@@ -789,7 +790,7 @@ impl EngineState {
         let id = format!("zs{}", self.zone_seq);
         let zone = self.zone.clone().unwrap_or_else(|| "Session".to_string());
         let agg = std::mem::replace(&mut self.zone_agg, Agg::new());
-        self.zone_history.push(ZoneSession {
+        self.zone_history.push_back(ZoneSession {
             id,
             zone,
             agg,
@@ -800,7 +801,7 @@ impl EngineState {
             active_ms: self.zone_active_ms,
         });
         if self.zone_history.len() > crate::combat::encounter::ZONE_HISTORY_CAP {
-            self.zone_history.remove(0);
+            self.zone_history.pop_front();
         }
     }
 

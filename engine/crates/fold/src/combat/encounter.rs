@@ -20,7 +20,7 @@
 use crate::combat::aggregate::Agg;
 use crate::jsmap::JsMap;
 use serde::Serialize;
-use std::collections::HashSet;
+use std::collections::{HashSet, VecDeque};
 
 /// One coated poison and when it went on.
 #[derive(Debug, Clone, Serialize)]
@@ -143,8 +143,9 @@ pub struct Encounter {
     /// immutable thereafter. Recomputing it per history entry per snapshot dominated snapshot cost.
     pub summary: Option<crate::combat::lifecycle::SegmentSummary>,
     /// Per-encounter timeline event ring (absolute ts), capped drop-oldest at `TIMELINE_CAP`.
-    /// Retained only for the most recent `TIMELINE_HISTORY_CAP` finalized encounters.
-    pub events: Vec<TimelineRaw>,
+    /// Retained only for the most recent `TIMELINE_HISTORY_CAP` finalized encounters. A deque, so
+    /// the drop past the cap is a pop and not a memmove of the ring per line of a long fight.
+    pub events: VecDeque<TimelineRaw>,
     /// True count of every instant ever pushed, including ones the cap evicted. The only way a
     /// consumer can tell "the ring is full" from "the fight was that long", since `events.len()`
     /// saturates. No aggregate, total or attribution reads it.
@@ -154,7 +155,7 @@ pub struct Encounter {
     pub stance_spans: Vec<StanceRaw>,
     /// Point annotations on this fight's clock: stance/invocation commits, blade coats, slow
     /// landings. Never downsampled and never counted from; the cap is purely a memory bound.
-    pub markers: Vec<MarkerRaw>,
+    pub markers: VecDeque<MarkerRaw>,
     /// The utility blade coat on at open and the combat venoms alongside it, snapshotted here
     /// because "could this pull have been slowed?" is a question about the moment of ENGAGE —
     /// re-reading today's coat at render would re-label every past fight after a poison swap.
@@ -178,10 +179,10 @@ impl Encounter {
             cc_active_until: JsMap::new(),
             last_out_target: None,
             summary: None,
-            events: Vec::new(),
+            events: VecDeque::new(),
             events_total: 0,
             stance_spans: Vec::new(),
-            markers: Vec::new(),
+            markers: VecDeque::new(),
             coat_at_engage: None,
             combat_at_engage: Vec::new(),
         }
