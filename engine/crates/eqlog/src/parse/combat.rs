@@ -5,6 +5,7 @@
 //! ASCII-only in JavaScript and Unicode-aware in the `regex` crate, and a mob name with a
 //! non-ASCII letter is exactly the line that would part company.
 
+use super::dot::{dot_source, has_critical_word, strip_possessive};
 use crate::event::{Ev, Key, Kind};
 use crate::names::norm;
 use crate::taxonomy::{damage_category, has_critical, parse_modifiers};
@@ -32,11 +33,7 @@ pub struct CombatRes {
     resist_yours: Regex,
     resist_caster: Regex,
     resist_incoming: Regex,
-    your_prefix: Regex,
-    dot_by: Regex,
-    critical: Regex,
     reflexive: Regex,
-    ds_owner_poss: Regex,
 }
 
 impl Default for CombatRes {
@@ -86,11 +83,7 @@ impl CombatRes {
             resist_yours: Regex::new(r"^(.+?) resisted your (.+?)!$").unwrap(),
             resist_caster: Regex::new(r"^(.+?) resisted (.+?)'s (.+?)!$").unwrap(),
             resist_incoming: Regex::new(r"^You resist(?:ed)? (.+?)'s (.+?)!$").unwrap(),
-            your_prefix: Regex::new(r"(?i)^your ").unwrap(),
-            dot_by: Regex::new(r" by (.+)$").unwrap(),
-            critical: Regex::new(r"(?i)critical").unwrap(),
             reflexive: Regex::new(r"(?i)^(itself|himself|herself|themselves)$").unwrap(),
-            ds_owner_poss: Regex::new(r"'s$").unwrap(),
         }
     }
 }
@@ -222,9 +215,7 @@ fn avoid_type(verb: &str) -> &'static str {
 
 /// Misses / avoided swings (by far the most common combat line).
 pub fn classify_miss(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
-    if !(c.has(Needle::ButComma)
-        && (c.text.starts_with("You try to ") || c.has(Needle::TriesTo)))
-    {
+    if !(c.has(Needle::ButComma) && (c.text.starts_with("You try to ") || c.has(Needle::TriesTo))) {
         return false;
     }
     if let Some(m) = super::miss::split(c.text) {
@@ -339,11 +330,14 @@ fn points_damage(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
     // sentences end in "non-melee damage", a typed spell hit says " damage by ", a melee hit ends
     // its sentence " of damage.". (Measured 2026-11-06: the three refusals ahead of every melee
     // line were ~300 ms of a 68 MB fold.)
+    // Of the two damage-shield sentences the outgoing one ends in `.` and the incoming one in
+    // `!`, so the terminal byte says which pattern could match at all.
     let non_melee = c.has(Needle::NonMeleeDamage);
-    if non_melee {
+    if non_melee && text.ends_with('.') {
         if let Some(m) = r.ds.captures(text) {
-            return ds_damage(c, out, r, &m);
+            return ds_damage(c, out, &m);
         }
+    } else if non_melee && text.ends_with('!') {
         if let Some(m) = r.ds_inc.captures(text) {
             dmg(
                 c,
@@ -375,12 +369,13 @@ fn points_damage(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
 
 /// The damage-shield sentence (`<target> is burned by YOUR/<owner>'s <skill> for N points of
 /// non-melee damage.`).
-fn ds_damage(c: &Ctx, out: &mut Ev, r: &CombatRes, m: &regex::Captures<'_>) -> bool {
+fn ds_damage(c: &Ctx, out: &mut Ev, m: &regex::Captures<'_>) -> bool {
     {
-        let owner = if &m[2] == "YOUR" {
-            "You".to_string()
+        let owner_group = &m[2];
+        let owner: Cow<str> = if owner_group == "YOUR" {
+            Cow::Borrowed("You")
         } else {
-            norm(&r.ds_owner_poss.replace(&m[2], "")).into_owned()
+            norm(strip_possessive(owner_group))
         };
         dmg(
             c,
@@ -448,21 +443,11 @@ fn taken_damage(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
     if let Some(m) = r.dot.captures(text) {
         let target = norm(&m[1]);
         let amount: i64 = m[2].parse().unwrap_or(0);
-        let rest = &m[3];
+        let rest = m.get(3).expect("group 3").as_str();
         let modifier = m.get(4).map(|g| g.as_str());
-        let crit = r.critical.is_match(modifier.unwrap_or(""));
-        let mut attacker: Option<Cow<str>> = None;
-        let mut skill: String = rest.to_string();
-        if r.your_prefix.is_match(rest) {
-            attacker = Some(Cow::Borrowed("You"));
-            skill = r.your_prefix.replace(rest, "").to_string();
-        } else if let Some(by) = r.dot_by.captures(rest) {
-            attacker = Some(Cow::Owned(norm(&by[1]).into_owned()));
-            let at = by.get(0).expect("group 0").start();
-            skill = rest[..at].to_string();
-        }
+        let crit = has_critical_word(modifier.unwrap_or(""));
         // "from <Spell>" with no "by <caster>" and not "your" falls through to the caster-less form.
-        if let Some(attacker) = attacker {
+        if let Some((attacker, skill)) = dot_source(rest) {
             let mods = parse_modifiers(modifier);
             out.begin(Kind::Damage);
             out.envelope(c.seq, c.ts, c.raw);
@@ -470,7 +455,7 @@ fn taken_damage(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
             out.s(Key::Target, &target);
             out.i(Key::Amount, amount);
             out.s(Key::Dtype, "dot");
-            out.s(Key::Skill, crate::jsstr::js_trim(&skill));
+            out.s(Key::Skill, crate::jsstr::js_trim(skill));
             out.b(Key::Crit, crit);
             out.s_opt(Key::Modifier, modifier);
             out.strs(Key::Modifiers, &mods);
@@ -480,7 +465,7 @@ fn taken_damage(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
     }
     if let Some(m) = r.dot_nocaster.captures(text) {
         let modifier = m.get(4).map(|g| g.as_str());
-        let crit = r.critical.is_match(modifier.unwrap_or(""));
+        let crit = has_critical_word(modifier.unwrap_or(""));
         let mods = parse_modifiers(modifier);
         out.begin(Kind::Damage);
         out.envelope(c.seq, c.ts, c.raw);
@@ -568,7 +553,7 @@ pub fn classify_heal(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
     out.s(Key::Healer, &healer);
     out.b(
         Key::Crit,
-        r.critical.is_match(m.get(7).map_or("", |g| g.as_str())),
+        has_critical_word(m.get(7).map_or("", |g| g.as_str())),
     );
     if m.get(3).is_some() {
         out.b(Key::OverTime, true);

@@ -1066,11 +1066,12 @@ impl Ev {
         self.note(k, Slot::Float(v));
     }
 
-    pub fn strs(&mut self, k: Key, v: &[String]) {
+    pub fn strs<S: AsRef<str>>(&mut self, k: Key, v: &[S]) {
         self.json_key(k);
         self.buf.push('[');
         let at = u32::try_from(self.p.strs.len()).unwrap_or(u32::MAX);
         for (i, s) in v.iter().enumerate() {
+            let s = s.as_ref();
             if i > 0 {
                 self.buf.push(',');
             }

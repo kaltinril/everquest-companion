@@ -9,6 +9,7 @@ pub mod acquire;
 pub mod casts;
 pub mod combat;
 pub mod data;
+pub mod dot;
 pub mod group;
 pub mod melee;
 pub mod miss;
