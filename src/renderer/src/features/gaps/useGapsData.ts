@@ -53,21 +53,61 @@ export const GAPS_DATA_DATE = ((mobsJson as { scrapedAt?: string }).scrapedAt ??
 /** When the wiki data was scraped, to the second: a Done mark made before it clears (keptDoneMarks). */
 export const GAPS_DATA_STAMP = (mobsJson as { scrapedAt?: string }).scrapedAt ?? ''
 
-const ZONE_COUNTS = catalogZoneCounts(MOB_CATALOG)
-const ZONE_NAME: ZoneNamer = wikiZoneNamer(ZONE_COUNTS)
+// THE CATALOG FOLDS ARE LAZY (the 2026-11-06 renderer pass). Each of these walks the 5.4 MB mob
+// catalog once per session; as module constants they all ran at the chunk's import, before the
+// first row could be derived, and every importer of this module (the details panel, the zone
+// links, the ready check) paid for all of them whether or not its reader needed any. Each fold now
+// runs on its first read (`??=`), and `PAGE_EXTRAS` reads them through getters, so a surface that
+// asks for the zone namer alone folds the zone counts alone. The answers are the same objects for
+// the session, which is what the caches keyed on them need.
+let zoneCounts: ReturnType<typeof catalogZoneCounts> | undefined
+const zoneCountsOf = (): ReturnType<typeof catalogZoneCounts> => (zoneCounts ??= catalogZoneCounts(MOB_CATALOG))
+let zoneName: ZoneNamer | undefined
+const zoneNameOf = (): ZoneNamer => (zoneName ??= wikiZoneNamer(zoneCountsOf()))
 /** The zone spellings the mob catalog links: a page by that name exists, so no redirect is offered (gapZoneRedirects.ts). */
-const CATALOG_ZONES: ReadonlySet<string> = new Set([...ZONE_COUNTS.keys()].map(zoneKey))
-const IS_MOB = catalogNameTest(MOB_CATALOG)
+let catalogZones: ReadonlySet<string> | undefined
+const catalogZonesOf = (): ReadonlySet<string> => (catalogZones ??= new Set([...zoneCountsOf().keys()].map(zoneKey)))
+let isMob: ReturnType<typeof catalogNameTest> | undefined
+const isMobOf = (): ReturnType<typeof catalogNameTest> => (isMob ??= catalogNameTest(MOB_CATALOG))
 /** A quest's catalog entry when the wiki has its page (the Quests rows' Make page / Update page). */
-const QUEST_ENTRY = questCatalogFinder((questsJson as { quests: QuestCatalogEntry[] }).quests)
+let questEntry: ReturnType<typeof questCatalogFinder> | undefined
+const questEntryOf = (): ReturnType<typeof questCatalogFinder> => (questEntry ??= questCatalogFinder((questsJson as { quests: QuestCatalogEntry[] }).quests))
+let commonLoot: ReturnType<typeof commonLootNames> | undefined
+let vendorAt: ReturnType<typeof vendorFinder> | undefined
+let mobPage: ReturnType<typeof mobPageFinder> | undefined
+let pageStates: ReturnType<typeof catalogStates> | undefined
 /** The catalog's quest titles: names "Add quest" offers, so a page the wiki has can be picked. */
 export const QUEST_TITLES: readonly string[] = (questsJson as { quests: QuestCatalogEntry[] }).quests.map((q) => q.page)
 /** The catalog's entry, else a page a Copy click found on the wiki this session (questLivePages.ts). */
 const questPageOf = (live: ReadonlyMap<string, string>) => (name: string): QuestCatalogEntry | undefined => {
-  const found = QUEST_ENTRY(name) === undefined ? live.get(questTitleKey(name)) : undefined
-  return found === undefined ? QUEST_ENTRY(name) : { name: found, page: found }
+  const entry = questEntryOf()
+  const found = entry(name) === undefined ? live.get(questTitleKey(name)) : undefined
+  return found === undefined ? entry(name) : { name: found, page: found }
 }
-export const PAGE_EXTRAS: PageExtras = { zoneName: ZONE_NAME, isMob: IS_MOB, commonLoot: commonLootNames(MOB_CATALOG), vendorAt: vendorFinder(MOB_CATALOG), mobPage: mobPageFinder(MOB_CATALOG), questEntry: QUEST_ENTRY, questJournal: questJournalNow, pageStates: catalogStates(MOB_CATALOG) }
+export const PAGE_EXTRAS: PageExtras = {
+  get zoneName() {
+    return zoneNameOf()
+  },
+  get isMob() {
+    return isMobOf()
+  },
+  get commonLoot() {
+    return (commonLoot ??= commonLootNames(MOB_CATALOG))
+  },
+  get vendorAt() {
+    return (vendorAt ??= vendorFinder(MOB_CATALOG))
+  },
+  get mobPage() {
+    return (mobPage ??= mobPageFinder(MOB_CATALOG))
+  },
+  get questEntry() {
+    return questEntryOf()
+  },
+  questJournal: questJournalNow,
+  get pageStates() {
+    return (pageStates ??= catalogStates(MOB_CATALOG))
+  }
+}
 
 /** The wiki side, one object for the session: the caches key on it. */
 const WIKI: GapsWiki = { catalog: MOB_CATALOG, groups: DROPS.groups, aliases: DROPS.aliases ?? {} }
@@ -200,7 +240,7 @@ function joinedSnap(derived: GapsSnap, x: JoinInputs): GapsSnap {
     // The live snapshot's talks and chains: a joined or day-cut snapshot is rebuilt without them.
     const named = withForcedQuests({ ...derived, talks: x.live?.talks ?? [], questThreads: x.live?.questThreads ?? [] }, x.forced)
     const linked = { ...named, rows: withQuestLinks(named.rows, popupLinksOfRows(named.rows, (q) => x.journals[questTitleKey(q)]?.popups)) }
-    return withZoneRedirects(withQuestPages(linked, questPageOf(x.livePages)), CATALOG_ZONES)
+    return withZoneRedirects(withQuestPages(linked, questPageOf(x.livePages)), catalogZonesOf())
   })
 }
 
@@ -219,14 +259,19 @@ function useForcedScope(forced: ForcedQuests, snap: (GapsSnap & TalkSnap) | null
 }
 
 const lastRespawn = memoLast<{ learned: readonly LearnedEvidence[] }>()
+const lastRespawnSnap = memoLast<{ learned: readonly LearnedEvidence[] }>()
 /**
  * The respawn snapshot's evidence, held by identity while no mob's gap count moved, across remounts
  * too: the derivation is keyed on this object, so a fresh one per visit re-derived the whole tab.
+ * The signature is read once per SNAPSHOT (the outer slot): it was rebuilt on every render of the
+ * tab, a walk over every learned mob for an answer the snapshot's identity already decides.
  */
 function learnedRespawn(snap: unknown): { learned: readonly LearnedEvidence[] } {
-  const learned = learnedOf(snap)
-  const sig = learned.map((l) => `${l.id}:${String(l.gapsMs.length)}:${String(l.gapsMs[0] ?? 0)}`).join('|')
-  return lastRespawn([sig], () => ({ learned }))
+  return lastRespawnSnap([snap], () => {
+    const learned = learnedOf(snap)
+    const sig = learned.map((l) => `${l.id}:${String(l.gapsMs.length)}:${String(l.gapsMs[0] ?? 0)}`).join('|')
+    return lastRespawn([sig], () => ({ learned }))
+  })
 }
 
 export function useGapsData(all: AllCharacters | null = null, opts: GapsDataOptions = {}): GapsData {
@@ -239,7 +284,7 @@ export function useGapsData(all: AllCharacters | null = null, opts: GapsDataOpti
   const joined = useMemo(() => {
     if (deferredAll === null || liveEngine == null) return null
     const live = { label: deferredAll.liveLabel, gaps: liveEngine, loot: liveLoot, kills: liveKills ?? null }
-    return joinCharacters([live, ...otherInputs(deferredAll.others, IS_MOB)], deferredAll.cut)
+    return joinCharacters([live, ...otherInputs(deferredAll.others, isMobOf())], deferredAll.cut)
   }, [deferredAll, liveEngine, liveLoot, liveKills])
   const feeds = { engine: liveEngine, loot: liveLoot, kills: liveKills }
   const { engine, loot, killMobs } = joined === null ? ownInputs(feeds, cut, only === undefined ? lastOwnCut : lastOwnCutOnly) : joinedInputs(joined)

@@ -24,7 +24,7 @@ import { slayerOverlayAreasFor } from '@shared/slayerOverlay'
 import { OverlayHeader } from './OverlayHeader'
 import { useOverlayChrome } from './useOverlayChrome'
 import { FOOTER_ROW } from './overlayScale'
-import { markZones, type MarkZoneInput } from './markZones'
+import { markZones, type MarkZoneInput, timerLabelLengths } from './markZones'
 import { labelRows } from '../features/maps/mobPins'
 import { useOverlayModule } from './useOverlayModule'
 import { TRACK_COLOR, trackedIn, viewFit, type ExtentFit, type TrackedPin, type TrackedPoint, type ZoneExtent } from '../features/maps/mapTrack'
@@ -273,9 +273,18 @@ function PinsChrome({
  * rest of the window stays click-through. Sent only when the set changes; nothing while unlocked
  * (the window owns the mouse then) and nothing once the window is gone.
  */
-function usePinnedMarkZones(input: MarkZoneInput | null, locked: boolean, hidden: boolean): void {
+function usePinnedMarkZones(input: Omit<MarkZoneInput, 'nowMs'> | null, nowMs: number, locked: boolean, hidden: boolean): void {
   const sent = useRef('')
-  const zones = useMemo(() => (locked && !hidden && input != null ? markZones(input) : []), [locked, hidden, input])
+  // THE CLOCK IS NOT A DEPENDENCY (the 2026-11-06 renderer pass): the zones are geometry, and the
+  // only thing a tick can change about them is a timer label's length (markZones.ts). The zones
+  // are rebuilt and re-stringified when that moved, and read the current clock when they are.
+  const nowRef = useRef(nowMs)
+  nowRef.current = nowMs
+  const lengths = input == null ? '' : timerLabelLengths(input.timers, nowMs)
+  const zones = useMemo(() => {
+    void lengths
+    return locked && !hidden && input != null ? markZones({ ...input, nowMs: nowRef.current }) : []
+  }, [locked, hidden, input, lengths])
   useEffect(() => {
     const key = `${String(hidden)}|${JSON.stringify(zones)}`
     if (key === sent.current) return
@@ -334,12 +343,12 @@ export default function MapPinsOverlay(): JSX.Element {
   const note = emptyNote(zone, ext)
   const labels = useMemo(() => labelRows(data?.points ?? []).map((r) => r.point), [data])
   const zoneInput = useMemo(
-    () => (ext == null || fit == null ? null : { ext, fit, w, h, layers, labels, mobs, timers, tracked, areas, nowMs }),
-    [ext, fit, w, h, layers, labels, mobs, timers, tracked, areas, nowMs]
+    () => (ext == null || fit == null ? null : { ext, fit, w, h, layers, labels, mobs, timers, tracked, areas }),
+    [ext, fit, w, h, layers, labels, mobs, timers, tracked, areas]
   )
   const [follow, toggleFollow] = usePinsFollow()
   const { hidden, note: autoHideNote } = useFollowHidden(follow, locked)
-  usePinnedMarkZones(zoneInput, locked, hidden)
+  usePinnedMarkZones(zoneInput, nowMs, locked, hidden)
   const strip = useTopStrip(locked, chrome.hovering)
   const shownNote = unlockedNote(locked, note, autoHideNote)
   const clip = barClip(locked, strip.shown)

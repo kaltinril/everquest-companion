@@ -21,7 +21,20 @@ import { useMemo } from 'react'
 import type { LootEvent, ProgressionSnap } from '@shared/types'
 import type { Timeslice } from '@shared/timeslice'
 import { rangeStats } from '@shared/progressionStats'
-import { windowLootRates, type WindowLootRates } from '@shared/lootRates'
+import { lootRatesOf, windowLootTotals, type WindowLootRates, type WindowLootTotals } from '@shared/lootRates'
+import { effectiveRange, ledgerSpan, type LedgerSpan } from '@shared/lootSlice'
+import { kept, type Kept } from '../../lib/kept'
+import { characterEpoch } from '../../lib/characterEpoch'
+
+// THE LEDGER PASS OUTLIVES THE VIEW (lib/kept.ts, the 2026-11-06 renderer pass). The numerator is
+// one walk over the whole history; the denominators come from `prog`, which moves every second
+// lines arrive. They used to be one memo, so the walk ran per push. Now the walk is keyed on the
+// history's identity and the window CLAMPED TO THE ROWS (shared/lootSlice.ts): under `All` the
+// range's top end follows `lastTs` every second, but no row lives past the last row, so the
+// clamped key holds still and the walk runs once per ledger. The slots are module-scope so a
+// tab revisit over the same held history pays nothing either.
+const spanSlot: Kept<LedgerSpan | null> = { last: null }
+const totalsSlot: Kept<WindowLootTotals> = { last: null }
 
 /**
  * Loot per hour over the slice, both denominators, or null when there is no history at all.
@@ -35,25 +48,19 @@ export function useSliceLootRates(
   slice: Timeslice,
   prog: ProgressionSnap
 ): WindowLootRates | null {
+  const span = kept(spanSlot, [history], () => ledgerSpan(history))
+  const { t0, t1 } = effectiveRange(slice, span)
+  const { zoneKey, zoneExactKey } = slice
+  const totals = kept(totalsSlot, [history, t0, t1, zoneKey, zoneExactKey, characterEpoch()], () =>
+    windowLootTotals({ events: history, t0, t1, zoneKey, zoneExactKey })
+  )
   return useMemo(() => {
     if (history.length === 0) return null
     // ONE query, over the slice's OWN range and zone — the denominators are then the same spans
-    // every other number about this slice divides by, on this tab and on the Leveling one.
-    const spans = rangeStats({
-      snap: prog,
-      range: slice.range,
-      // BOTH halves of the zone membership (JOS-130 / JOS-291), so the denominator below is the
-      // time spent in exactly the visits the rows are counted from.
-      zoneKey: slice.zoneKey,
-      zoneExactKey: slice.zoneExactKey
-    })
-    return windowLootRates({
-      events: history,
-      t0: slice.range.t0,
-      t1: slice.range.t1,
-      spans,
-      zoneKey: slice.zoneKey,
-      zoneExactKey: slice.zoneExactKey
-    })
-  }, [history, slice, prog])
+    // every other number about this slice divides by, on this tab and on the Leveling one. BOTH
+    // halves of the zone membership (JOS-130 / JOS-291), so the denominator is the time spent in
+    // exactly the visits the rows were counted from.
+    const spans = rangeStats({ snap: prog, range: slice.range, zoneKey, zoneExactKey })
+    return lootRatesOf(totals, spans)
+  }, [history, slice, prog, totals, zoneKey, zoneExactKey])
 }

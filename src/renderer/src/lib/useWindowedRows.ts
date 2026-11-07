@@ -34,6 +34,12 @@
 // node when its identity changes (the `setEl` bails on `Object.is`, so a steady container costs
 // one ref read per commit and no render). Every consumer whose container mounts and unmounts with
 // the hook was already immune; this makes the whole class impossible rather than conventional.
+//
+// A LIST THAT STARTS PARTWAY DOWN ITS SCROLLER (the Maps sidebar's three sections share one
+// scroll box) passes `anchorRef`: the element the list's first row sits at. Its distance from the
+// scroller's content top is read after every commit (the sections above it grow and shrink with
+// the query) and subtracted from `scrollTop`, so the slice is counted from the list's own first
+// row rather than the scroller's. A list at the top of its scroller passes nothing and pays nothing.
 
 import { useCallback, useEffect, useLayoutEffect, useState, type RefObject } from 'react'
 
@@ -72,6 +78,9 @@ export interface UseWindowedRowsOptions {
   scrollRef: RefObject<HTMLElement | null>
   /** Extra rows rendered above/below the viewport to hide scroll seams. Default 8. */
   overscan?: number
+  /** The element the list's first row starts at, when that is not the scroller's content top
+   *  (see the header). Its offset is measured after every commit. */
+  anchorRef?: RefObject<HTMLElement | null>
 }
 
 /** The measured facts a slice is computed from — everything the hook learns from the DOM. */
@@ -83,6 +92,8 @@ export interface WindowedRowsInput {
   /** Measured `clientHeight` of the container (px); 0 means "never measured". */
   viewport: number
   overscan: number
+  /** Where the list's first row sits below the scroller's content top (px). Default 0. */
+  offset?: number
 }
 
 /**
@@ -99,7 +110,8 @@ export function windowSlice({
   rowHeight,
   scrollTop,
   viewport,
-  overscan
+  overscan,
+  offset = 0
 }: WindowedRowsInput): WindowedRows {
   const row = rowHeight > 0 ? rowHeight : 1
   const rows = Math.max(0, Math.floor(count))
@@ -108,7 +120,9 @@ export function windowSlice({
   // ResizeObserver has not reported on yet still shows a usable list (see UNMEASURED_VIEWPORT).
   const visibleCount = Math.max(1, Math.ceil((viewport > 0 ? viewport : UNMEASURED_VIEWPORT) / row))
   const maxStart = Math.max(0, rows - 1)
-  const wanted = Math.floor(Math.max(0, scrollTop) / row) - overscan
+  // Counted from the list's own first row: a list anchored below the scroller's top has not
+  // scrolled at all until the scroller has moved past its anchor.
+  const wanted = Math.floor(Math.max(0, scrollTop - offset) / row) - overscan
   const start = Math.min(maxStart, Math.max(0, wanted))
   const end = Math.max(start, Math.min(rows, start + visibleCount + overscan * 2))
 
@@ -126,10 +140,12 @@ export function useWindowedRows({
   count,
   rowHeight,
   scrollRef,
-  overscan = 8
+  overscan = 8,
+  anchorRef
 }: UseWindowedRowsOptions): WindowedRows {
   const [scrollTop, setScrollTop] = useState(0)
   const [viewport, setViewport] = useState(0)
+  const [offset, setOffset] = useState(0)
   // THE CONTAINER ITSELF, held in state — see the header. `scrollRef.current` is read after every
   // commit and adopted only when the NODE changes, so the effects below re-bind to a replaced
   // container instead of stranding on the detached one.
@@ -148,6 +164,14 @@ export function useWindowedRows({
     // re-measuring a row) it re-queued a render per commit until React's update-depth limit threw.
     const node = scrollRef.current
     if (node !== el) setEl(node)
+    // The anchor's distance from the content top, re-read per commit for the same reason: what
+    // sits above the list changes height without any event this hook could listen for. One
+    // layout read per commit, and a write only when the number moved.
+    const anchor = anchorRef?.current
+    if (anchor != null && node != null) {
+      const next = Math.round(anchor.getBoundingClientRect().top - node.getBoundingClientRect().top + node.scrollTop)
+      if (next !== offset) setOffset(next)
+    }
   })
 
   const measure = useCallback(() => {
@@ -173,5 +197,5 @@ export function useWindowedRows({
     return () => el.removeEventListener('scroll', onScroll)
   }, [el])
 
-  return windowSlice({ count, rowHeight, scrollTop, viewport, overscan })
+  return windowSlice({ count, rowHeight, scrollTop, viewport, overscan, offset })
 }

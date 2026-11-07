@@ -466,6 +466,27 @@ function zoneHalfOf(
  * The zone half is `zoneScope.zoneAdmits` — the SAME predicate `rangeStats` and `lootRates` run, so
  * the exact-tier choice (JOS-291) cannot reach one of the three and miss the others.
  */
+/**
+ * Do two resolved slices say the same thing? Every field, the range's two instants included.
+ * `useTimesliceOn` hands back the PREVIOUS object when the new one says the same thing, so a
+ * progression push that moved nothing the slice reads (a closed custom range, a segment already
+ * ended) does not hand every consumer a fresh identity to re-derive from.
+ */
+export function sameTimeslice(a: Timeslice, b: Timeslice): boolean {
+  return (
+    a.id === b.id &&
+    a.label === b.label &&
+    a.caption === b.caption &&
+    a.range.t0 === b.range.t0 &&
+    a.range.t1 === b.range.t1 &&
+    a.zoneKey === b.zoneKey &&
+    a.zoneName === b.zoneName &&
+    a.zoneScope === b.zoneScope &&
+    a.zoneExactKey === b.zoneExactKey &&
+    a.zoneCaption === b.zoneCaption
+  )
+}
+
 export function inSlice(slice: Timeslice, ts: number, zone?: string): boolean {
   if (ts < slice.range.t0 || ts >= slice.range.t1) return false
   if (slice.zoneKey === null) return true

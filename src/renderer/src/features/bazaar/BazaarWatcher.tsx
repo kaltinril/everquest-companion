@@ -7,10 +7,16 @@
 // the 'bazaarWatch' app signal, so the Alerts tab's "Bazaar watchlist match" alert says it with
 // its own sound, voice, banner and cooldown, and is kept in a short list the tab shows, so one
 // missed with the banner closed is still there to read.
+//
+// IT WATCHES THE MODULE ONLY WHILE THERE IS A WATCHLIST (the 2026-11-06 renderer pass). The
+// module subscription is a hydration over IPC and a re-read of the bazaar snapshot on every push,
+// paid for the life of the window; with nothing on the list there is nothing an offer could
+// match, so the reader below is mounted only while the list is non-empty. A list that becomes
+// non-empty mounts it fresh, and its first snapshot is the baseline, exactly as at launch.
 
-import { useEffect, useRef, useSyncExternalStore } from 'react'
+import { useEffect, useRef, useSyncExternalStore, type JSX } from 'react'
 import { BAZAAR_MODULE_ID, type BazaarSnap, type LiveOffer } from '@shared/bazaar'
-import { freshWatchAlerts, watchAlertCaptures } from '@shared/bazaarWatch'
+import { freshWatchAlerts, watchAlertCaptures, type BazaarWatchlist } from '@shared/bazaarWatch'
 import { useModule } from '../../lib/useModule'
 import { fireAppSignal } from '../alerts/player'
 import { useBazaarWatch } from './useBazaarWatch'
@@ -47,9 +53,14 @@ function raise(o: LiveOffer, reason: string, text: string): void {
   record({ seq: o.seq, at: o.at, text })
 }
 
-export default function BazaarWatcher(): null {
-  const snap = useModule<BazaarSnap>(BAZAAR_MODULE_ID)
+export default function BazaarWatcher(): JSX.Element | null {
   const { list } = useBazaarWatch()
+  return list.entries.length === 0 ? null : <OffersReader list={list} />
+}
+
+/** The module reader, alive only while the watchlist has an entry (file header). */
+function OffersReader({ list }: { list: BazaarWatchlist }): null {
+  const snap = useModule<BazaarSnap>(BAZAAR_MODULE_ID)
   const seen = useRef<number | null>(null)
 
   useEffect(() => {

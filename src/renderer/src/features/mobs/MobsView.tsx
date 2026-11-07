@@ -32,7 +32,7 @@
 // filter runs on a deferred value, and the catalog is an ES-imported JSON already bundled for
 // main's mob lookup. No IPC, no network, works offline.
 
-import { type JSX, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
+import { type JSX, memo, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Box,
   Button,
@@ -57,6 +57,7 @@ import type { NavBack } from '../../appRouting'
 import { useBackTarget } from '../../appBack'
 import { parkReturn, takeReturn } from '../../lib/navReturn'
 import { useModule } from '../../lib/useModule'
+import { useWindowedRows } from '../../lib/useWindowedRows'
 import { CellLink } from '../../lib/CellLink'
 import { dropZoneTarget } from '../gear/dropLinks'
 import { useMetVersion } from '../../lib/useMetInLog'
@@ -83,12 +84,20 @@ function useKills(): KillMap {
 }
 
 
-/** ONE search result. The catalog row IS the row — level, zones and drop count, all local. */
-function MobResultRow({
+/** Every result row is this tall: one line (the zones are `noWrap`), so the roster can window. */
+const RESULT_ROW_HEIGHT = 30
+
+/** ONE search result. The catalog row IS the row — level, zones and drop count, all local.
+ *  Memoized on the entry, the kills index and the met version (the 2026-11-06 renderer pass): the
+ *  zone roster is a few hundred rows of a name, chips and a link each, and it redrew whole on every
+ *  kills push and every keystroke in the search box. `met` is read ONCE above (useMetVersion) and
+ *  handed down, so a met-in-log bump still redraws the era chips. */
+const MobResultRow = memo(function MobResultRow({
   entry,
   kills,
   onOpen,
-  onOpenMapZone
+  onOpenMapZone,
+  met
 }: {
   entry: MobEntry
   kills: KillMap
@@ -96,7 +105,10 @@ function MobResultRow({
    *  own click still opens the mob — CellLink stops the propagation */
   onOpenMapZone?: ((zone: ZoneShort) => void) | undefined
   onOpen: (t: MobTarget) => void
+  /** The met-in-log version the parent read; a bump redraws the row's era chip. */
+  met: number
 }): JSX.Element {
+  void met
   const drops = entry.drops?.length ?? 0
   // THE ONE JOIN (JOS-350). The catalog spells `Innoruuk's Chosen` with an apostrophe and the log
   // spells it with a backtick; `killsFor` folds both, so this row and the page it opens agree.
@@ -105,7 +117,7 @@ function MobResultRow({
     <Stack
       direction="row"
       spacing={1}
-      alignItems="baseline"
+      alignItems="center"
       role="button"
       tabIndex={0}
       data-testid="mobs-result-row"
@@ -114,7 +126,9 @@ function MobResultRow({
         if (e.key === 'Enter' || e.key === ' ') onOpen({ mob: entry.name, entry })
       }}
       sx={{
-        py: 0.4,
+        height: RESULT_ROW_HEIGHT,
+        boxSizing: 'border-box',
+        py: 0,
         px: 0.75,
         borderRadius: 1,
         cursor: 'pointer',
@@ -166,7 +180,7 @@ function MobResultRow({
       )}
     </Stack>
   )
-}
+})
 
 /**
  * IN <ZONE> — the roster of the place you are standing in, lowest level first.
@@ -190,14 +204,19 @@ function ZoneRoster({
   zone,
   rows,
   kills,
-  onOpen
+  onOpen,
+  met
 }: {
   zone: string
   rows: MobEntry[]
   kills: KillMap
   onOpen: (t: MobTarget) => void
+  met: number
 }): JSX.Element {
   const empty = rows.length === 0
+  // Windowed the Loot ledger's way: a zone's few hundred rows mount a screenful (useWindowedRows).
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const win = useWindowedRows({ count: rows.length, rowHeight: RESULT_ROW_HEIGHT, scrollRef })
   return (
     <Paper
       variant="outlined"
@@ -217,10 +236,12 @@ function ZoneRoster({
         )}
       </Typography>
       {rows.length > 0 ? (
-        <Box sx={{ flexGrow: 1, minHeight: 0, overflow: 'auto' }}>
-          {rows.map((e) => (
-            <MobResultRow key={e.page} entry={e} kills={kills} onOpen={onOpen} />
+        <Box ref={scrollRef} sx={{ flexGrow: 1, minHeight: 0, overflow: 'auto' }}>
+          <div style={{ height: win.topPad }} />
+          {rows.slice(win.start, win.end).map((e) => (
+            <MobResultRow key={e.page} entry={e} kills={kills} onOpen={onOpen} met={met} />
           ))}
+          <div style={{ height: win.bottomPad }} />
         </Box>
       ) : (
         // The catalog and the game don't always spell a place the same way (mobZone documents
@@ -452,7 +473,7 @@ export default function MobsView({
                 {hits.length} of {MOB_CATALOG.length} mobs
               </Typography>
               {hits.map((h) => (
-                <MobResultRow key={h.entry.page} entry={h.entry} kills={kills} onOpen={openNative}
+                <MobResultRow key={h.entry.page} entry={h.entry} kills={kills} onOpen={openNative} met={met}
                   onOpenMapZone={onOpenMapZone} />
               ))}
             </>
@@ -476,7 +497,7 @@ export default function MobsView({
         <>
           {zone ? (
             <>
-              <ZoneRoster zone={zone} rows={zoneRows} kills={kills} onOpen={openNative} />
+              <ZoneRoster zone={zone} rows={zoneRows} kills={kills} onOpen={openNative} met={met} />
               {zoneRows.length === 0 ? (
                 <Box sx={{ flexGrow: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
                   <RecentlyConsidered rows={considered} onOpen={openNative} />

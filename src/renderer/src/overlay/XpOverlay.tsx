@@ -48,9 +48,17 @@
 // SLOW here (30 s, not 1 s) because nothing in this window is a countdown — a rate over an hour
 // does not visibly move in a second, and the cost of asking is a whole `rangeStats` fold.
 //
+// AND IT REFOLDS NO FASTER THAN THAT CLOCK FOR A PUSH THAT MOVED ONLY THE CLOCK (the 2026-11-06
+// renderer pass). `progression` republishes every active second for `lastTs` alone, and every
+// such push re-ran the whole fold above for columns that had not gained a sample. A push that
+// reads the same as the folded snapshot in every field but `lastTs` (shared/progressionSettle.ts)
+// is held back until the slow clock's next tick; a push with a new sample is taken at once. The
+// `loot` module — a megabyte on a long log, re-read per kill — is read only while a row that
+// needs it (motes, coin) is switched on.
+//
 // MUI-FREE, plain divs and inline styles, like every file in this bundle.
 
-import { type JSX, useEffect, useMemo, useState } from 'react'
+import { type JSX, useEffect, useMemo, useRef, useState } from 'react'
 import type {
   CharacterSnap,
   LootEvent,
@@ -67,6 +75,7 @@ import {
   type Timeslice
 } from '@shared/timeslice'
 import { attributeSales } from '@shared/coinAttribution'
+import { sameButLastTs } from '@shared/progressionSettle'
 import { toggleXpRow, XP_ROW_IDS, xpRowVisible, type XpRowId } from '@shared/xpOverlay'
 import { toggleRateBasis, type RateBasis } from '@shared/rateBasis'
 import { ZONE_SCOPE_LABEL, toggleZoneScope, type ZoneScope } from '@shared/zoneScope'
@@ -104,6 +113,17 @@ const TICK_MS = 30_000
 /** The row checklist's button labels. The ids are `XpRowId`; these are what a user reads. 'xp' is
  *  the PACE entry — one button over however many pace lines the log can currently state. */
 const ROW_LABEL: Record<XpRowId, string> = { xp: 'xp', eta: 'next', motes: 'motes', coin: 'coin' }
+
+/**
+ * The snapshot the fold reads: the newest push when it carries a new sample, else the one already
+ * folded until the slow clock ticks (file header). A ref, not state: nothing re-renders for it.
+ */
+function useSettledProgression(prog: ProgressionSnap, now: number): ProgressionSnap {
+  const held = useRef({ prog, at: now })
+  const cur = held.current
+  if (cur.prog !== prog && (cur.at !== now || !sameButLastTs(cur.prog, prog))) held.current = { prog, at: now }
+  return held.current.prog
+}
 
 /** A slow local clock, so a slice that ends at the live edge keeps re-reading while nothing
  *  arrives. It asks main for nothing — the fold is over state this window already holds. */
@@ -449,18 +469,21 @@ function useXpSlice(
 }
 
 export default function XpOverlay(): JSX.Element {
+  const { locked, bgAlpha, textScale, hovering, config, patch, toggleLock, capture, dragRegion, noDrag } =
+    useOverlayChrome()
+  const visible = config?.xpRows
+  const now = useSlowClock()
   // TWO MODULES, and both of them the ones the app itself reads — `progression` for the pace and
-  // the projection, `loot` for the mote rates. Neither is re-folded here.
-  const prog = useOverlayModule<ProgressionSnap>('progression', EMPTY_PROGRESSION)
-  const loot = useOverlayModule<LootSnap>('loot', NO_LOOT)
+  // the projection, `loot` for the mote rates and the coin row, read only while one of those rows
+  // is on (file header). Neither is re-folded here.
+  const prog = useSettledProgression(useOverlayModule<ProgressionSnap>('progression', EMPTY_PROGRESSION), now)
+  const lootOn = xpRowVisible('motes', visible) || xpRowVisible('coin', visible)
+  const loot = useOverlayModule<LootSnap>('loot', NO_LOOT, lootOn)
   // THE THIRD (JOS-192) — `character`, for one field: the level the log last STATED. The ding
   // series is silent across a loadout swap, so a floating window that reads only the dings keeps
   // announcing the level of a class you are no longer running; your own `/who` row is what
   // corrects it, and it arrives here.
   const who = useOverlayModule<CharacterSnap>('character', NO_CHARACTER)
-  const { locked, bgAlpha, textScale, hovering, config, patch, toggleLock, capture, dragRegion, noDrag } =
-    useOverlayChrome()
-  useSlowClock()
 
   // THE TWO KNOBS THIS WINDOW SHARES WITH THE APP (JOS-332) — which tiers count, and which hour
   // the rates divide by. They come from main through the SAME hook the Leveling tab's toggle row
@@ -473,7 +496,6 @@ export default function XpOverlay(): JSX.Element {
   // The scope both knobs describe, resolved together (see `useXpSlice`) — so the caption and every
   // number below travel with the same slice AND the same membership by construction.
   const { id, slice } = useXpSlice(prog, bounds, config, zoneScope)
-  const visible = config?.xpRows
   const view = useMemo(
     // Merchant sales credited to where their items dropped (shared/coinAttribution.ts).
     () => xpOverlayView({ snap: attributeSales(prog, loot), loot, slice, visible, level: who.level, basis }),

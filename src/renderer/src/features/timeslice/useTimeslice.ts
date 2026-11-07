@@ -58,12 +58,13 @@
 // the value is two scalars, and `useSyncExternalStore` over a VERSION counter is the whole thing (a
 // getSnapshot returning a fresh object would re-render forever).
 
-import { useCallback, useMemo, useSyncExternalStore } from 'react'
+import { useCallback, useMemo, useRef, useSyncExternalStore } from 'react'
 import type { ProgressionSnap } from '@shared/types'
 import {
   availableSlices,
   resolveSlice,
   resolveSliceId,
+  sameTimeslice,
   type SliceId,
   type SliceRange,
   type Timeslice
@@ -257,10 +258,18 @@ export function useTimesliceOn(
   // only while the custom slice is actually the one in force.
   const segmentIndex = id === 'custom' ? pickedSegment : null
   const customCaption = segments.find((s) => s.n === segmentIndex)?.caption ?? null
-  const slice = useMemo(
+  const resolved = useMemo(
     () => resolveSlice({ snap: prog, bounds, id, custom, customCaption, zoneScope }),
     [prog, bounds, id, custom, customCaption, zoneScope]
   )
+  // ONE IDENTITY PER ANSWER (the 2026-11-06 renderer pass). `prog` moves every second lines
+  // arrive and `bounds` is rebuilt from it, so the memo above re-resolves per push; when what it
+  // resolved to says the same thing as last time — a closed custom range, a segment that has
+  // ended, any slice while the log is quiet — the previous object is handed back, and every
+  // consumer memoized on the slice keeps its answer. A ref, not state: nothing re-renders for it.
+  const lastSlice = useRef(resolved)
+  const slice = sameTimeslice(lastSlice.current, resolved) ? lastSlice.current : resolved
+  lastSlice.current = slice
 
   const setId = useCallback((next: SliceId) => {
     pickedId = next

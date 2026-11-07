@@ -5,7 +5,7 @@
 //
 // A row click opens the details, so every compact button stops its click there.
 
-import { type JSX, type MouseEvent, type ReactNode, useRef, useState } from 'react'
+import { type JSX, type MouseEvent, type ReactNode, memo, useRef, useState } from 'react'
 import { Button, IconButton, Stack } from '@mui/material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import DoneIcon from '@mui/icons-material/Done'
@@ -207,8 +207,10 @@ function RemoveCaptureButton({ row }: { row: GapRow }): JSX.Element | null {
   )
 }
 
-/** The four work buttons, worded in the details pane, icons on a row. */
-export default function GapRowButtons({
+/** The four work buttons, worded in the details pane, icons on a row. Memoized: the strip is
+ *  four icon buttons with tooltips per row, and its props are the row and three stable callbacks
+ *  (GapsTable holds `pageText` behind a ref), so a push redraws only the rows it changed. */
+export default memo(function GapRowButtons({
   row,
   pageText,
   isDone,
@@ -237,4 +239,4 @@ export default function GapRowButtons({
       {buttons}
     </Stack>
   )
-}
+})

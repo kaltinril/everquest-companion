@@ -11,8 +11,15 @@
 //   * ONE IN-FLIGHT ANSWER WINS, AND IT IS THE LATEST QUESTION'S. Zoning twice quickly (or
 //     clicking two search hits) fires two `maps:get` calls, and IPC gives no ordering guarantee
 //     across invokes. Each effect run captures a `cancelled` flag, so a superseded reply is
-//     dropped rather than painted over the newer map. There is no renderer-side cache to
-//     invalidate: re-asking is an LRU hit in main.
+//     dropped rather than painted over the newer map.
+//
+// ONE ANSWER IS HELD ACROSS A REMOUNT (the 2026-11-06 renderer pass). Re-asking is an LRU hit in
+// main, but the hit still crosses IPC, is parsed again (a zone's `MapData` is hundreds of KB) and
+// lands a render after the tab's first paint, so every Maps visit painted the empty state and
+// then the map. The last zone answered and the pack listing are held at module scope and handed
+// to the next mount under the same key (zone and the two pack prefs; the listing has no key).
+// Both slots are dropped when main says the EQ folder changed (`onEqConfigChanged`), which is
+// the one event that can make a held answer wrong: packs do not install themselves in v1 (§9.2).
 //   * A FAILURE IS DATA. `maps:get` answers `{ok:false, error}` for the ordinary "this machine
 //     has no map file for that zone" case, and the view renders that as a quiet state. Nothing
 //     in this module throws, and the `.catch` exists only for a torn-down bridge.
@@ -124,21 +131,46 @@ export interface MapPacksState {
 
 const NO_PACKS: MapPacksState = { packs: [], zones: [], error: null, ready: false }
 
+/** The held answers (file header): the pack listing, and the last zone's load under its key. */
+let heldPacks: MapPacksState | null = null
+let heldLoad: { key: readonly [ZoneShort, string | undefined, string | undefined]; load: MapLoad } | null = null
+let watchingEqConfig = false
+
+/** Drop both held answers; main's EQ-folder change is the one event that can stale them. */
+export function forgetMapAnswers(): void {
+  heldPacks = null
+  heldLoad = null
+}
+
+/** Attach the one listener that drops the held answers, on the first hold (as characterEpoch does). */
+function watchEqConfig(): void {
+  if (watchingEqConfig || typeof window === 'undefined') return
+  const eq = (window as { eq?: { onEqConfigChanged?: (cb: () => void) => () => void } }).eq
+  if (eq?.onEqConfigChanged === undefined) return
+  watchingEqConfig = true
+  eq.onEqConfigChanged(forgetMapAnswers)
+}
+
 /**
- * List the packs and the zone corpus ONCE per mount.
+ * List the packs and the zone corpus ONCE per EQ folder.
  *
- * Both are main-side scans behind a memoized library keyed on the EQ root, so a remount is
- * cheap; there is no push channel for pack changes in v1 (nothing installs packs yet — §9.2),
- * and re-entering the tab re-lists.
+ * Both are main-side scans behind a memoized library keyed on the EQ root, so a remount was
+ * already cheap in main; the held listing saves the IPC round trip and the render it landed in.
+ * There is no push channel for pack changes in v1 (nothing installs packs yet — §9.2); the EQ
+ * folder changing is the one event that re-lists (`forgetMapAnswers`).
  */
 export function useMapPacks(): MapPacksState {
-  const [state, setState] = useState<MapPacksState>(NO_PACKS)
+  const [state, setState] = useState<MapPacksState>(() => heldPacks ?? NO_PACKS)
   useEffect(() => {
+    if (heldPacks !== null) return
     let cancelled = false
     void Promise.all([window.eq.listMapPacks(), window.eq.listMapZones()])
       .then(([list, zones]) => {
         if (cancelled) return
-        setState({ packs: list.packs, zones, error: list.error ?? null, ready: true })
+        const next = { packs: list.packs, zones, error: list.error ?? null, ready: true }
+        watchEqConfig()
+        heldPacks = next
+        setState(next)
       })
       .catch(() => {
         if (!cancelled) setState({ ...NO_PACKS, ready: true })
@@ -158,18 +190,33 @@ export interface MapLoad {
   loading: boolean
 }
 
+/** The held load when it answered exactly this question, else null. */
+function heldLoadFor(zone: ZoneShort | null, geometry: string | undefined, labels: string | undefined): MapLoad | null {
+  if (zone == null || heldLoad === null) return null
+  const [z, g, l] = heldLoad.key
+  return z === zone && g === geometry && l === labels ? heldLoad.load : null
+}
+
 /**
  * Fetch one zone under a per-layer pack preference.
  *
  * The effect depends on the two pref FIELDS rather than on the `prefs` object, so a caller that
  * rebuilds the object each render (every caller does) doesn't re-fetch a map it already has.
+ * A mount that asks the held question (file header) starts with the answer and asks nothing.
  */
 export function useMapData(zone: ZoneShort | null, prefs: MapPackPrefs): MapLoad {
-  const [load, setLoad] = useState<MapLoad>({ data: null, error: null, loading: zone != null })
   const { geometry, labels } = prefs
+  const [load, setLoad] = useState<MapLoad>(
+    () => heldLoadFor(zone, geometry, labels) ?? { data: null, error: null, loading: zone != null }
+  )
   useEffect(() => {
     if (zone == null) {
       setLoad({ data: null, error: null, loading: false })
+      return
+    }
+    const held = heldLoadFor(zone, geometry, labels)
+    if (held !== null) {
+      setLoad(held)
       return
     }
     let cancelled = false
@@ -181,11 +228,12 @@ export function useMapData(zone: ZoneShort | null, prefs: MapPackPrefs): MapLoad
       })
       .then((res) => {
         if (cancelled) return
-        setLoad(
-          res.ok
-            ? { data: res.data, error: null, loading: false }
-            : { data: null, error: res.error, loading: false }
-        )
+        const next: MapLoad = res.ok
+          ? { data: res.data, error: null, loading: false }
+          : { data: null, error: res.error, loading: false }
+        watchEqConfig()
+        heldLoad = { key: [zone, geometry, labels], load: next }
+        setLoad(next)
       })
       .catch((err: unknown) => {
         if (!cancelled) setLoad({ data: null, error: String(err), loading: false })
