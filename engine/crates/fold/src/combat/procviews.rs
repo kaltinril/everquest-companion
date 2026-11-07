@@ -18,12 +18,12 @@
 //! a slay lane's `direct_damage` is not damage the proc added. Both keep an empty list rather than a
 //! zero-filled one.
 
-use crate::combat::aggregate::{Agg, SourceStat};
+use crate::combat::aggregate::{strike_keys, Agg, SourceStat};
 use crate::combat::collate::compare_names;
 use crate::combat::encounter::{CoatSlot, Encounter};
 use crate::combat::poisons::{is_slow_capable, POISONS};
 use crate::combat::procbuffs::PROC_BUFF_CATALOG;
-use crate::combat::procdetect::{is_castless_lane_name, lane_canon_key, lane_count};
+use crate::combat::procdetect::{is_castless_lane_name, lane_count};
 use crate::combat::procwindows::{
     build_attribution_report, links_for, proc_rate, AttributionReport, LaneForDirect, ProcLink,
     ProcRateView, ProcSourceWindow, RateInput,
@@ -134,6 +134,8 @@ pub struct ProcsViewSpec<'a> {
     pub end_ts: i64,
     /// Present only for a fight.
     pub enc: Option<&'a Encounter>,
+    /// `effect_landings` over `agg`, built once by the caller for the whole segment view.
+    pub landings: &'a JsMap<(String, i64)>,
 }
 
 /// The denominators every lane in a segment shares. Resolved once.
@@ -277,26 +279,23 @@ fn lane_rate(count: i64, b: &RateBase, origin: &str, label: &str) -> ProcRateVie
     })
 }
 
-/// An emote label may name several Strikes — one emote sentence is shared by two venoms — and the
-/// ledger keeps both in one ` / `-joined label. Every candidate is joined against the damage lanes
-/// and every candidate suppresses its spell-proc twin.
+/// The Strike keys an emote label names — see `aggregate::strike_keys`, which the ledger stores on
+/// every Strike lane; this is for a lane the ledger does not hold (a slay or AA lane's name).
 fn candidate_keys(label: &str) -> Vec<String> {
-    label
-        .split(" / ")
-        .map(|n| spell_canon_key(n.trim()))
-        .collect()
+    strike_keys(label)
 }
 
 /// Your damage rows recorded under any of `keys` — the one place a proc lane is matched against the
 /// meter's own skill lanes, so "which rows is this lane" cannot come to mean two things.
 ///
-/// Names are matched rank-normalized and proc-marker-stripped, so both halves of a split spell
-/// match, and returned raw because the raw string is what the drill row is labelled with.
+/// Names are matched rank-normalized and proc-marker-stripped (the lane's stored canon key), so
+/// both halves of a split spell match, and returned raw because the raw string is what the drill
+/// row is labelled with.
 fn skills_matching<'a>(you: Option<&'a SourceStat>, keys: &[String]) -> Vec<(&'a str, i64, i64)> {
     let mut out = Vec::new();
     let Some(you) = you else { return out };
     for s in you.by_skill.values() {
-        if keys.contains(&lane_canon_key(&s.name)) {
+        if keys.contains(&s.canon) {
             out.push((s.name.as_str(), s.total, s.hits));
         }
     }
@@ -315,7 +314,7 @@ fn resisted_by(you: Option<&SourceStat>, keys: &[String]) -> i64 {
     let Some(you) = you else { return 0 };
     you.by_skill
         .values()
-        .filter(|s| keys.contains(&lane_canon_key(&s.name)))
+        .filter(|s| keys.contains(&s.canon))
         .map(|s| s.resists)
         .sum()
 }
@@ -342,11 +341,10 @@ pub fn effect_landings(agg: &Agg) -> JsMap<(String, i64)> {
     let you = agg.out.get("you");
     let mut out: JsMap<(String, i64)> = JsMap::new();
     for s in agg.procs.strikes.values() {
-        let keys = candidate_keys(&s.name);
-        if skills_matching(you, &keys).iter().any(|r| r.2 > 0) {
+        if skills_matching(you, &s.keys).iter().any(|r| r.2 > 0) {
             continue;
         }
-        out.insert(keys[0].clone(), (s.name.clone(), s.count));
+        out.insert(s.keys[0].clone(), (s.name.clone(), s.count));
     }
     out
 }
@@ -395,15 +393,15 @@ fn lane(s: LaneSpec, b: &RateBase) -> ProcLaneView {
 fn poison_lanes(spec: &ProcsViewSpec, you: Option<&SourceStat>, b: &RateBase) -> Vec<ProcLaneView> {
     let mut out: Vec<ProcLaneView> = Vec::new();
     for s in spec.agg.procs.strikes.values() {
-        let keys = candidate_keys(&s.name);
+        let keys = &s.keys;
         let mut l = lane(
             LaneSpec {
                 name: &s.name,
                 origin: "poison",
                 count: s.count,
-                damage: delivered_by(you, &keys),
-                heal: healed_by(spec.agg, &keys),
-                resisted: resisted_by(you, &keys),
+                damage: delivered_by(you, keys),
+                heal: healed_by(spec.agg, keys),
+                resisted: resisted_by(you, keys),
                 linked: Vec::new(),
             },
             b,
@@ -547,10 +545,11 @@ fn build_lanes(spec: &ProcsViewSpec, states: &[StateSpan]) -> Vec<ProcLaneView> 
     let b = rate_base(spec, states);
     let you = spec.agg.out.get("you");
     let poison = poison_lanes(spec, you, &b);
+    // One poison lane per Strike lane, named after it, so its keys are the ledger's own.
     let mut covered: HashSet<String> = HashSet::new();
-    for l in &poison {
-        for k in candidate_keys(&l.name) {
-            covered.insert(k);
+    for s in spec.agg.procs.strikes.values() {
+        for k in &s.keys {
+            covered.insert(k.clone());
         }
     }
     // One entry per distinct `<kind>:<key>`, in the order the spans first appear.
@@ -602,7 +601,7 @@ fn tagged_skills(you: Option<&SourceStat>, l: &ProcLaneView) -> Vec<String> {
 /// category, so no row IS the proc.
 fn proc_skill_tags(spec: &ProcsViewSpec, lanes: &[ProcLaneView]) -> Vec<ProcSkillTag> {
     let you = spec.agg.out.get("you");
-    let landed = effect_landings(spec.agg);
+    let landed = spec.landings;
     let mut out = Vec::new();
     for l in lanes {
         if l.origin == "aa" {

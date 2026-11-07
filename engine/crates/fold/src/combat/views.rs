@@ -20,7 +20,6 @@ use crate::combat::collate::compare_names;
 use crate::combat::encounter::{encounter_name, Encounter, ACTIVE_MS};
 use crate::combat::healing::{build_healing_view, HealingView};
 use crate::combat::lifecycle::{zone_active_sec, zone_duration_sec};
-use crate::combat::procdetect::lane_canon_key;
 use crate::combat::procviews::{build_procs_view, effect_landings, ProcsView, ProcsViewSpec};
 use crate::combat::rounds::round_confidence;
 use crate::combat::state::EngineState;
@@ -45,9 +44,13 @@ const SKILL_CAP: usize = 12;
 const GENERIC_LANE: &str = "Melee";
 
 /// A per-skill lane as the view sees it: the accumulator's counters plus the effect-landing graft.
+/// It borrows the lane's name and canon key from the aggregate it projects, so projecting a source
+/// copies numbers and never strings.
 #[derive(Clone)]
-struct SkillRow {
-    name: String,
+struct SkillRow<'a> {
+    name: &'a str,
+    /// `lane_canon_key(name)`, carried for the landing graft's join.
+    canon: &'a str,
     total: i64,
     hits: i64,
     crits: i64,
@@ -60,10 +63,11 @@ struct SkillRow {
     lands: i64,
 }
 
-impl SkillRow {
-    fn of(s: &SkillStat) -> SkillRow {
+impl<'a> SkillRow<'a> {
+    fn of(s: &'a SkillStat) -> SkillRow<'a> {
         SkillRow {
-            name: s.name.clone(),
+            name: &s.name,
+            canon: &s.canon,
             total: s.total,
             hits: s.hits,
             crits: s.crits,
@@ -75,9 +79,10 @@ impl SkillRow {
         }
     }
 
-    fn new(name: &str) -> SkillRow {
+    fn new(name: &'a str, canon: &'a str) -> SkillRow<'a> {
         SkillRow {
-            name: name.to_string(),
+            name,
+            canon,
             total: 0,
             hits: 0,
             crits: 0,
@@ -90,96 +95,105 @@ impl SkillRow {
     }
 }
 
+/// One category's rows, in the aggregate's lane order. A list rather than a map: a source has a
+/// few dozen lanes at most, every reader ranks or sums them, and the one lookup by name (the
+/// landing graft) is a short scan.
 #[derive(Clone)]
-struct CatRow {
-    category: String,
+struct CatRow<'a> {
+    category: &'a str,
     total: i64,
     hits: i64,
     crits: i64,
     max: i64,
     resists: i64,
-    by_skill: JsMap<SkillRow>,
+    by_skill: Vec<SkillRow<'a>>,
 }
 
-impl CatRow {
-    fn of(c: &CategoryStat) -> CatRow {
-        let mut by_skill = JsMap::new();
-        for (k, v) in c.by_skill.iter() {
-            by_skill.insert(k.to_string(), SkillRow::of(v));
-        }
+impl<'a> CatRow<'a> {
+    fn of(c: &'a CategoryStat) -> CatRow<'a> {
         CatRow {
-            category: c.category.clone(),
+            category: &c.category,
             total: c.total,
             hits: c.hits,
             crits: c.crits,
             max: c.max,
             resists: c.resists,
-            by_skill,
+            by_skill: c.by_skill.values().map(SkillRow::of).collect(),
         }
     }
 
-    fn new(category: &str) -> CatRow {
+    fn new(category: &'a str) -> CatRow<'a> {
         CatRow {
-            category: category.to_string(),
+            category,
             total: 0,
             hits: 0,
             crits: 0,
             max: 0,
             resists: 0,
-            by_skill: JsMap::new(),
+            by_skill: Vec::new(),
         }
     }
 }
 
-/// One source, projected into the view's own row shape. Always a copy — the source is live state.
-struct SourceRows {
-    by_skill: JsMap<SkillRow>,
-    by_category: JsMap<CatRow>,
+/// One source, projected into the view's own row shape — a view over the live source, so no write
+/// here can reach it, and no string is copied to take one.
+struct SourceRows<'a> {
+    by_skill: Vec<SkillRow<'a>>,
+    by_category: Vec<CatRow<'a>>,
 }
 
-fn project(s: &SourceStat) -> SourceRows {
-    let mut by_skill = JsMap::new();
-    for (k, v) in s.by_skill.iter() {
-        by_skill.insert(k.to_string(), SkillRow::of(v));
-    }
-    let mut by_category = JsMap::new();
-    for (k, v) in s.by_category.iter() {
-        by_category.insert(k.to_string(), CatRow::of(v));
-    }
+fn project(s: &SourceStat) -> SourceRows<'_> {
     SourceRows {
-        by_skill,
-        by_category,
+        by_skill: s.by_skill.values().map(SkillRow::of).collect(),
+        by_category: s.by_category.values().map(CatRow::of).collect(),
     }
 }
 
-/// A copy of `s`'s lanes carrying the effect landings.
+/// The hits of one category of a projected source, 0 when it has none.
+fn category_hits(rows: &[CatRow<'_>], category: &str) -> i64 {
+    rows.iter()
+        .find(|c| c.category == category)
+        .map_or(0, |c| c.hits)
+}
+
+/// `s`'s lanes carrying the effect landings.
 ///
 /// A lane the resists already created simply gains its `lands`; a lane with landings and no resists
 /// is created in the `spell` category, the same one a resist lands in. Its total is 0, so it sorts
 /// to the bottom of the ranked list.
 ///
-/// `lane_canon_key`, not `spell_canon_key`: a cast-less lane carries the origin marker in its name,
-/// and a landing belongs to the spell either half of a split is about.
-fn with_landings(s: &SourceStat, lands: &JsMap<(String, i64)>) -> SourceRows {
+/// The join is on the lane's canon key (`lane_canon_key`, not `spell_canon_key`: a cast-less lane
+/// carries the origin marker in its name, and a landing belongs to the spell either half of a
+/// split is about), over the lanes the source had before any landing was grafted, and the LAST
+/// lane keying to a landing takes it — both exactly as the name map this replaced behaved.
+fn with_landings<'a>(s: &'a SourceStat, lands: &'a JsMap<(String, i64)>) -> SourceRows<'a> {
     let mut rows = project(s);
-    let mut spell = match rows.by_category.get("spell") {
-        Some(c) => c.clone(),
+    let spell_at = rows.by_category.iter().position(|c| c.category == "spell");
+    let mut spell = match spell_at {
+        Some(i) => rows.by_category[i].clone(),
         None => CatRow::new("spell"),
     };
-    let mut by_key: JsMap<String> = JsMap::new();
-    for (k, v) in rows.by_skill.iter() {
-        by_key.insert(lane_canon_key(&v.name), k.to_string());
-    }
+    let projected = rows.by_skill.len();
     for (key, (raw_name, count)) in lands.iter() {
-        let name = by_key.get(key).cloned().unwrap_or_else(|| raw_name.clone());
+        let (name, canon): (&'a str, &'a str) = rows.by_skill[..projected]
+            .iter()
+            .rev()
+            .find(|r| r.canon == key)
+            .map_or((raw_name.as_str(), key), |r| (r.name, r.canon));
         for m in [&mut rows.by_skill, &mut spell.by_skill] {
-            if !m.contains_key(&name) {
-                m.insert(name.clone(), SkillRow::new(&name));
+            if !m.iter().any(|r| r.name == name) {
+                m.push(SkillRow::new(name, canon));
             }
-            m.get_mut(&name).expect("just inserted").lands += count;
+            m.iter_mut()
+                .find(|r| r.name == name)
+                .expect("just pushed")
+                .lands += count;
         }
     }
-    rows.by_category.insert("spell".to_string(), spell);
+    match spell_at {
+        Some(i) => rows.by_category[i] = spell,
+        None => rows.by_category.push(spell),
+    }
     rows
 }
 
@@ -399,9 +413,9 @@ pub struct SegmentView {
     procs: ProcsView,
 }
 
-fn skill_view(k: &SkillRow, sk_max: i64) -> SkillView {
+fn skill_view(k: &SkillRow<'_>, sk_max: i64) -> SkillView {
     SkillView {
-        name: k.name.clone(),
+        name: k.name.to_string(),
         total: k.total,
         pct: (k.total as f64 / sk_max as f64) * 100.0,
         hits: k.hits,
@@ -416,8 +430,8 @@ fn skill_view(k: &SkillRow, sk_max: i64) -> SkillView {
 
 /// Rank per-skill lanes for the drill: damage first. The tiebreak only reorders rows with no damage
 /// at all, where the lane with the most observations is the one worth a slot under the row cap.
-fn rank_skills(rows: &JsMap<SkillRow>) -> Vec<&SkillRow> {
-    let mut v: Vec<&SkillRow> = rows.values().collect();
+fn rank_skills<'r, 'a>(rows: &'r [SkillRow<'a>]) -> Vec<&'r SkillRow<'a>> {
+    let mut v: Vec<&SkillRow<'a>> = rows.iter().collect();
     v.sort_by(|a, b| {
         b.total
             .cmp(&a.total)
@@ -426,22 +440,22 @@ fn rank_skills(rows: &JsMap<SkillRow>) -> Vec<&SkillRow> {
     v
 }
 
-fn max_total(rows: &JsMap<SkillRow>) -> i64 {
-    rows.values().map(|k| k.total).max().unwrap_or(0).max(1)
+fn max_total(rows: &[SkillRow<'_>]) -> i64 {
+    rows.iter().map(|k| k.total).max().unwrap_or(0).max(1)
 }
 
 /// Build the per-category drill-down views, ordered by `CATEGORY_ORDER`, each with its own per-skill
 /// breakdown under the same row cap.
-fn category_views(by_cat: &JsMap<CatRow>) -> Vec<CategoryView> {
-    let cat_max = by_cat.values().map(|c| c.total).max().unwrap_or(0).max(1) as f64;
-    let mut cats: Vec<&CatRow> = by_cat.values().collect();
-    cats.sort_by_key(|c| category_rank(&c.category));
+fn category_views(by_cat: &[CatRow<'_>]) -> Vec<CategoryView> {
+    let cat_max = by_cat.iter().map(|c| c.total).max().unwrap_or(0).max(1) as f64;
+    let mut cats: Vec<&CatRow<'_>> = by_cat.iter().collect();
+    cats.sort_by_key(|c| category_rank(c.category));
     cats.into_iter()
         .map(|c| {
             let sk_max = max_total(&c.by_skill);
             let casts = c.hits + c.resists;
             CategoryView {
-                category: c.category.clone(),
+                category: c.category.to_string(),
                 total: c.total,
                 pct: (c.total as f64 / cat_max) * 100.0,
                 hits: c.hits,
@@ -633,8 +647,8 @@ fn source_views(
             let swings = s.hits + s.misses;
             // Resist rate is over cast attempts of detrimental spells: landed spell/dot hits plus
             // resists. Melee, slay and damage-shield hits cannot be resisted.
-            let spell_hits = rows.by_category.get("spell").map_or(0, |c| c.hits)
-                + rows.by_category.get("dot").map_or(0, |c| c.hits);
+            let spell_hits =
+                category_hits(&rows.by_category, "spell") + category_hits(&rows.by_category, "dot");
             let casts = spell_hits + s.resists;
             SourceView {
                 id: id.to_string(),
@@ -842,6 +856,7 @@ fn build_view(spec: ViewSpec) -> SegmentView {
             start_ts: spec.start_ts,
             end_ts: spec.end_ts,
             enc: spec.enc,
+            landings: &lands,
         }),
         id: spec.id,
         kind: spec.kind,

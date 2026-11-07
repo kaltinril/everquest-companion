@@ -1397,8 +1397,8 @@ mod tests {
             &mut st,
             &HealLine {
                 ts: 2_000,
-                target: "a spite golem".into(),
-                healer: Some("a spite golem".into()),
+                target: "a spite golem",
+                healer: Some("a spite golem"),
                 amount: 15,
                 raw_amount: None,
                 spell: None,
@@ -1416,8 +1416,8 @@ mod tests {
             &mut st,
             &HealLine {
                 ts: 3_000,
-                target: "a bat".into(),
-                healer: Some("a bat".into()),
+                target: "a bat",
+                healer: Some("a bat"),
                 amount: 15,
                 raw_amount: None,
                 spell: None,

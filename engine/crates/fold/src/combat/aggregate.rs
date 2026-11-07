@@ -10,7 +10,7 @@
 //! `out` / `inc` / `targets` publish their iteration order, so they are `JsMap`s, never `HashMap`s.
 
 use crate::combat::healing::HealAccum;
-use crate::combat::procdetect::{add_spell_proc, SpellProcFold, SpellProcLane};
+use crate::combat::procdetect::{add_spell_proc, lane_canon_key, SpellProcFold, SpellProcLane};
 use crate::combat::procwindows::WindowAccum;
 use crate::combat::rounds::{lower, RoundAccum, SwingRecord};
 use crate::jsmap::JsMap;
@@ -141,6 +141,9 @@ pub struct MissFold<'a> {
 #[derive(Debug, Clone, Default)]
 pub struct SkillStat {
     pub name: String,
+    /// `lane_canon_key(name)`, fixed with the name: the key every proc-lane join compares against,
+    /// computed once when the lane opens rather than through a regex per lane per join per view.
+    pub canon: String,
     pub total: i64,
     pub hits: i64,
     pub crits: i64,
@@ -154,6 +157,7 @@ pub struct SkillStat {
 fn new_skill(name: &str) -> SkillStat {
     SkillStat {
         name: name.to_string(),
+        canon: lane_canon_key(name),
         ..SkillStat::default()
     }
 }
@@ -330,8 +334,20 @@ pub struct NamedTotal {
 #[derive(Debug, Clone)]
 pub struct StrikeLane {
     pub name: String,
+    /// The canon key of every Strike the label may name (`strike_keys`), fixed with the label.
+    pub keys: Vec<String>,
     pub count: i64,
     pub ambiguous: bool,
+}
+
+/// An emote label may name several Strikes — one emote sentence is shared by two venoms — and the
+/// ledger keeps both in one ` / `-joined label. Every candidate is joined against the damage lanes
+/// and every candidate suppresses its spell-proc twin.
+pub fn strike_keys(label: &str) -> Vec<String> {
+    label
+        .split(" / ")
+        .map(|n| eqlog::names::spell_canon_key(n.trim()))
+        .collect()
 }
 
 /// A poison-typed damage lane. The game states the damage type on every typed spell line, so this
@@ -422,6 +438,7 @@ impl ProcAccum {
                 name.to_string(),
                 StrikeLane {
                     name: name.to_string(),
+                    keys: strike_keys(name),
                     count: 0,
                     ambiguous,
                 },
