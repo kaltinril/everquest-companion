@@ -161,7 +161,11 @@ pub fn classify_cast_lifecycle(r: &CastRes, c: &Ctx, out: &mut Ev) -> bool {
     // 2026-09-25 log, every one preceded by `You begin singing <X>.`), and it is the same event.
     for (gate, re, kind) in [
         (Needle::SpellFizzles, &r.cast_fizzle, Kind::CastFizzle),
-        (Needle::Interrupted, &r.cast_interrupt, Kind::CastInterrupted),
+        (
+            Needle::Interrupted,
+            &r.cast_interrupt,
+            Kind::CastInterrupted,
+        ),
         (Needle::ToAClose, &r.song_close, Kind::CastInterrupted),
     ] {
         if c.has(gate) {
@@ -359,34 +363,17 @@ pub fn classify_pet_say(r: &CastRes, c: &Ctx, out: &mut Ev) -> bool {
 }
 
 /// `<Name> says, 'My leader is <You>.'` — the `/pet who leader` answer, which binds.
-pub fn classify_pet_leader(r: &CastRes, character: Option<&str>, c: &Ctx, out: &mut Ev) -> bool {
-    let Some(self_name) = character.filter(|s| !s.is_empty()) else {
-        return false;
-    };
-    if !c.has(Needle::SaysMyLeaderIs) {
-        return false;
-    }
-    let Some(m) = r.pet_leader.captures(c.text) else {
-        return false;
-    };
-    if m[2].to_lowercase() != crate::jsstr::js_trim(self_name).to_lowercase() {
-        return false;
-    }
-    out.begin(Kind::PetClaim);
-    out.envelope(c.seq, c.ts, c.raw);
-    out.s(Key::Name, &norm(&m[1]));
-    out.s(Key::Via, "leader");
-    true
-}
-
-/// The same answer about somebody else; must run after `classify_pet_leader`.
-pub fn classify_ally_pet_leader(
+/// `<pet> says, 'My leader is <owner>.'`: yours when the owner is you (`petClaim`), somebody
+/// else's when the owner is a player-shaped name (`allyPetLeader`), in that order. One capture
+/// answers both, and `character_key` is the character's trimmed, lowercased name, lowered once by
+/// the parser rather than on every such line (the two used to capture and lower twice).
+pub fn classify_pet_leaders(
     r: &CastRes,
-    character: Option<&str>,
+    character_key: Option<&str>,
     c: &Ctx,
     out: &mut Ev,
 ) -> bool {
-    let Some(self_name) = character.filter(|s| !s.is_empty()) else {
+    let Some(self_key) = character_key else {
         return false;
     };
     if !c.has(Needle::SaysMyLeaderIs) {
@@ -396,8 +383,12 @@ pub fn classify_ally_pet_leader(
         return false;
     };
     let owner = &m[2];
-    if owner.to_lowercase() == crate::jsstr::js_trim(self_name).to_lowercase() {
-        return false;
+    if owner.to_lowercase() == self_key {
+        out.begin(Kind::PetClaim);
+        out.envelope(c.seq, c.ts, c.raw);
+        out.s(Key::Name, &norm(&m[1]));
+        out.s(Key::Via, "leader");
+        return true;
     }
     if !crate::names::is_player_shaped_name(owner) {
         return false;

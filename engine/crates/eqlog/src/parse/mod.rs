@@ -112,6 +112,9 @@ pub struct Parser {
     clock: Clock,
     db: Option<Arc<SpellDb>>,
     character: Option<String>,
+    /// The character's trimmed, lowercased name, for the pet-leader line's owner test; `None` when
+    /// there is no character (the line is then never claimed).
+    character_key: Option<String>,
     /// The last stamp read and what it resolved to. The game writes many lines a second and every
     /// line of one second carries the same 24 bytes, so the regex and the zone lookup run once per
     /// second of play rather than once per line. (Measured 2026-11-06: 430 ms of a 68 MB fold.)
@@ -146,10 +149,15 @@ impl Parser {
     }
 
     pub fn new(clock: Clock, db: Option<Arc<SpellDb>>, character: Option<String>) -> Self {
+        let character_key = character
+            .as_deref()
+            .filter(|s| !s.is_empty())
+            .map(|s| crate::jsstr::js_trim(s).to_lowercase());
         Parser {
             clock,
             db,
             character,
+            character_key,
             stamp_memo: RefCell::new(None),
             needles: needles::Needles::new(),
             combat: combat::CombatRes::new(),
@@ -222,8 +230,7 @@ impl Parser {
             || casts::classify_cc_wake(&self.casts, c, out)
             || casts::classify_pet_claim(&self.casts, c, out)
             || casts::classify_pet_say(&self.casts, c, out)
-            || casts::classify_pet_leader(&self.casts, name, c, out)
-            || casts::classify_ally_pet_leader(&self.casts, name, c, out)
+            || casts::classify_pet_leaders(&self.casts, self.character_key.as_deref(), c, out)
             || world::classify_death(&self.world, c, out)
             || world::classify_zone(&self.world, c, out)
             || world::classify_instance_create(&self.world, c, out)
