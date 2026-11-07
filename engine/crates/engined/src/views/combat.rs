@@ -18,8 +18,10 @@
 //! would put a hard-hitting mob among your group; a drill into a source's ability lanes is a
 //! different row shape with its own key space. Each gets its own source when its surface arrives.
 
+use fold::combat::views::LiveRow;
 use protocol::cell::Cell;
 use protocol::generated::Cells;
+#[cfg(test)]
 use serde_json::Value;
 
 use super::{Field, Order, SourceDef, SourceRow};
@@ -44,8 +46,9 @@ pub const LIVE: SourceDef = SourceDef {
 /// `selected` is one `SegmentView` as JSON, or `null` when the selection resolves to no fight at
 /// all. Read as JSON rather than as a struct because `SourceView`'s fields are private to
 /// `fold::combat::views` and its serialization is its published contract — the same one the app's
-/// renderer reads.
-#[must_use]
+/// renderer reads. The serving loop reads the typed door instead (`rows_of`); this one is the
+/// oracle it is pinned to, and lives for that test.
+#[cfg(test)]
 pub fn rows(selected: &Value) -> Vec<SourceRow> {
     let Some(entities) = selected.get("entities").and_then(Value::as_array) else {
         return Vec::new();
@@ -53,15 +56,75 @@ pub fn rows(selected: &Value) -> Vec<SourceRow> {
     entities
         .iter()
         .enumerate()
-        .map(|(index, e)| row(index, e))
+        .map(|(index, e)| row(index, &Numbers::of_json(e)))
         .collect()
 }
 
-fn row(index: usize, e: &Value) -> SourceRow {
-    let id = str_of(e, "id");
-    let name = str_of(e, "name");
-    let kind = str_of(e, "kind");
-    let total = int_of(e, "total");
+/// The same rows off the engine's typed door, `CombatEngine::live_rows`: the segment's outgoing
+/// rows and nothing else, so the serve beat builds no snapshot to read twelve numbers out of.
+#[must_use]
+pub fn rows_of(live: &[LiveRow]) -> Vec<SourceRow> {
+    live.iter()
+        .enumerate()
+        .map(|(index, e)| row(index, &Numbers::of_live(e)))
+        .collect()
+}
+
+/// The numbers one row is cut from, read off either shape of the selected segment.
+struct Numbers<'a> {
+    id: &'a str,
+    name: &'a str,
+    kind: &'a str,
+    total: i64,
+    pct: f64,
+    dps: f64,
+    crit_pct: f64,
+    misses: i64,
+    hit_pct: f64,
+    resists: i64,
+    resist_pct: f64,
+    ambiguous: i64,
+}
+
+impl<'a> Numbers<'a> {
+    #[cfg(test)]
+    fn of_json(e: &'a Value) -> Numbers<'a> {
+        Numbers {
+            id: str_of(e, "id"),
+            name: str_of(e, "name"),
+            kind: str_of(e, "kind"),
+            total: int_of(e, "total"),
+            pct: float_of(e, "pct"),
+            dps: float_of(e, "dps"),
+            crit_pct: float_of(e, "critPct"),
+            misses: int_of(e, "misses"),
+            hit_pct: float_of(e, "hitPct"),
+            resists: int_of(e, "resists"),
+            resist_pct: float_of(e, "resistPct"),
+            ambiguous: int_of(e, "ambiguousHits"),
+        }
+    }
+
+    fn of_live(e: &'a LiveRow) -> Numbers<'a> {
+        Numbers {
+            id: &e.id,
+            name: &e.name,
+            kind: e.kind,
+            total: e.total,
+            pct: e.pct,
+            dps: e.dps,
+            crit_pct: e.crit_pct,
+            misses: e.misses,
+            hit_pct: e.hit_pct,
+            resists: e.resists,
+            resist_pct: e.resist_pct,
+            ambiguous: e.ambiguous_hits,
+        }
+    }
+}
+
+fn row(index: usize, e: &Numbers<'_>) -> SourceRow {
+    let (id, name, kind, total) = (e.id, e.name, e.kind, e.total);
     // The rank is the meter's, not the window's: both renderers number the fold's already-ranked
     // array, so a client that sorts by name does not renumber the meter.
     let rank = i64::try_from(index).unwrap_or(i64::MAX).saturating_add(1);
@@ -74,41 +137,35 @@ fn row(index: usize, e: &Value) -> SourceRow {
         "tag".to_owned(),
         kind_tag(kind).map_or(Cell::null(), Cell::text),
     );
-    cells.insert("pct".to_owned(), Cell::float(float_of(e, "pct")));
+    cells.insert("pct".to_owned(), Cell::float(e.pct));
     cells.insert(
         "total".to_owned(),
         Cell::text(format_num(int_to_f64(total))),
     );
-    cells.insert(
-        "dps".to_owned(),
-        Cell::text(format_rate(float_of(e, "dps"))),
-    );
+    cells.insert("dps".to_owned(), Cell::text(format_rate(e.dps)));
     // The three conditional badges. Each gate is the renderer's own, and each absence is a `null`
     // because the diff protocol needs a cell it can clear.
     cells.insert(
         "crit".to_owned(),
         gated(
-            float_of(e, "critPct") >= 1.0,
-            &format!("{}% crit", js_round(float_of(e, "critPct"))),
+            e.crit_pct >= 1.0,
+            &format!("{}% crit", js_round(e.crit_pct)),
         ),
     );
     cells.insert(
         "hit".to_owned(),
-        gated(
-            int_of(e, "misses") > 0,
-            &format!("{}% hit", js_round(float_of(e, "hitPct"))),
-        ),
+        gated(e.misses > 0, &format!("{}% hit", js_round(e.hit_pct))),
     );
     cells.insert(
         "resist".to_owned(),
         gated(
-            int_of(e, "resists") > 0,
-            &format!("{}% resist", js_round(float_of(e, "resistPct"))),
+            e.resists > 0,
+            &format!("{}% resist", js_round(e.resist_pct)),
         ),
     );
     // The `~` badge stands for a hit count on both surfaces, so the count is the cell. The sentence
     // the Combat tab's tooltip composes is a tab-only affordance; the overlay bars have no hover.
-    let ambiguous = int_of(e, "ambiguousHits");
+    let ambiguous = e.ambiguous;
     cells.insert(
         "ambiguous".to_owned(),
         if ambiguous > 0 {
@@ -230,14 +287,17 @@ fn js_round(v: f64) -> i64 {
     n
 }
 
+#[cfg(test)]
 fn str_of<'a>(value: &'a Value, key: &str) -> &'a str {
     value.get(key).and_then(Value::as_str).unwrap_or_default()
 }
 
+#[cfg(test)]
 fn int_of(value: &Value, key: &str) -> i64 {
     value.get(key).and_then(Value::as_i64).unwrap_or_default()
 }
 
+#[cfg(test)]
 fn float_of(value: &Value, key: &str) -> f64 {
     value.get(key).and_then(Value::as_f64).unwrap_or_default()
 }
@@ -249,10 +309,56 @@ fn int_to_f64(n: i64) -> f64 {
 
 #[cfg(test)]
 mod tests {
-    use super::{format_num, format_rate, rows, to_fixed, LIVE};
+    use super::{format_num, format_rate, rows, rows_of, to_fixed, LIVE};
     use crate::views::{cut, validate, Field};
     use protocol::generated::ViewDescriptor;
     use serde_json::json;
+
+    /// The typed door cuts what the snapshot door cuts: one engine, folded with a crit, a whiff, a
+    /// resist and a mob's swings, read both ways at one instant, row for row — the
+    /// keys, every cell and every field, in the same order.
+    #[test]
+    fn the_typed_door_cuts_the_rows_the_snapshot_cuts() {
+        use fold::combat::{CombatEngine, SnapshotOpts};
+        use fold::event::Event;
+        let mut e = CombatEngine::new();
+        e.set_player_name("Primitive");
+        for line in [
+            r#"{"kind":"zone","seq":0,"ts":0,"raw":"z","zone":"Najena"}"#,
+            r#"{"kind":"damage","seq":1,"ts":1000,"raw":"d","attacker":"You","target":"a kodiak","amount":1250,"dtype":"melee","skill":"Melee","verb":"slash","crit":true}"#,
+            r#"{"kind":"damage","seq":2,"ts":1500,"raw":"d","attacker":"a kodiak","target":"You","amount":42,"dtype":"melee","skill":"bite","crit":false}"#,
+            r#"{"kind":"miss","seq":3,"ts":2000,"raw":"m","attacker":"You","target":"a kodiak","mtype":"dodge","verb":"slash"}"#,
+            r#"{"kind":"damage","seq":4,"ts":2500,"raw":"d","attacker":"You","target":"a kodiak","amount":500,"dtype":"spell","skill":"Smiting Strike","crit":false}"#,
+            r#"{"kind":"resist","seq":5,"ts":3000,"raw":"r","caster":"You","target":"a kodiak","spell":"Fear","incoming":false}"#,
+            r#"{"kind":"damage","seq":6,"ts":3500,"raw":"d","attacker":"a kodiak","target":"You","amount":7,"dtype":"melee","skill":"bite","crit":false}"#,
+        ] {
+            let ev = Event::from_json(line).expect("a JSON object");
+            e.on_event(&ev, false, None);
+        }
+        let now = 4_000;
+        let opts = SnapshotOpts {
+            max_segments: 0,
+            ..SnapshotOpts::default()
+        };
+        let from_json = rows(&e.snapshot(now, &opts, None)["selected"]);
+        let typed = rows_of(&e.live_rows(now));
+        assert_eq!(from_json.len(), typed.len());
+        assert!(!typed.is_empty(), "the fixture has a row");
+        for (a, b) in from_json.iter().zip(&typed) {
+            assert_eq!(a.key, b.key);
+            assert_eq!(a.cells.0, b.cells.0, "{}", a.key);
+            assert_eq!(a.fields, b.fields, "{}", a.key);
+        }
+        // The badges the fixture was built to light are lit the same way through both doors.
+        let you = &typed[0].cells;
+        assert_eq!(you["crit"], protocol::Cell::text("50% crit"));
+        assert_eq!(you["hit"], protocol::Cell::text("67% hit"));
+        assert_eq!(you["resist"], protocol::Cell::text("50% resist"));
+        // …and an engine with nothing folded cuts nothing through either.
+        let empty = CombatEngine::new();
+        assert!(rows(&empty.snapshot(0, &opts, None)["selected"]).is_empty());
+        assert!(rows_of(&empty.live_rows(0)).is_empty());
+    }
 
     /// One `SegmentView`, stated with only the fields the row builder reads; the real one carries
     /// twenty more.

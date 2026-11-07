@@ -359,16 +359,13 @@ impl EventSink for FoldSink {
             id if id == views::event_feed::RECENT.id => {
                 Some(views::event_feed::rows(registry.event_feed()?))
             }
-            // The meter's rows come out of the snapshot's own `selected`, at the cheapest options
-            // that produce one: no finalized-fight list, no timeline, no unparsed ring. The current
-            // encounter and the zone summary are included whatever the cap, so the selection
-            // resolves exactly as a full-fat call resolves it.
+            // The meter's rows come through the engine's typed door: the same sweeps and the same
+            // default selection a snapshot resolves, and then the selected segment's outgoing rows
+            // and nothing else — no segment list, no drill, no ledgers and no JSON, on a source
+            // that is re-cut on every serve beat something moved.
             id if id == views::combat::LIVE.id => {
-                let snapshot = self.combat_snapshot(&CombatOpts {
-                    max_segments: 0,
-                    ..CombatOpts::default()
-                })?;
-                Some(views::combat::rows(&snapshot.state["selected"]))
+                let engine = self.fold.combat.as_ref()?;
+                Some(views::combat::rows_of(&engine.live_rows(self.combat_now())))
             }
             _ => None,
         }
