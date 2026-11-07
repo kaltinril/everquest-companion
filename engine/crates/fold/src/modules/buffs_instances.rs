@@ -28,6 +28,7 @@ use crate::modules::buffs_shapes::{
 };
 use crate::modules::buffs_stats::SpellStats;
 use crate::modules::buffs_view::{build_active, ActiveBuff, ActiveSpec};
+use crate::versioned::Versioned;
 use eqlog::names::id_key;
 
 /// Everything a LANDING states about itself.
@@ -60,12 +61,51 @@ pub struct Expiry {
 pub struct BuffInstances {
     /// The single cast currently in flight, or none.
     pub pending: Option<Pending>,
-    /// Landed casts awaiting their fade, keyed by INSTANCE key.
-    pub open: JsMap<OpenCast>,
-    /// Currently-active buff instances, keyed by INSTANCE key.
-    pub active: JsMap<ActiveBuff>,
+    /// Landed casts awaiting their fade, keyed by INSTANCE key. Versioned for the sweep memo.
+    pub open: Versioned<JsMap<OpenCast>>,
+    /// Currently-active buff instances, keyed by INSTANCE key. Versioned for the sweep memo.
+    pub active: Versioned<JsMap<ActiveBuff>>,
     /// Resolved expiries produced while folding the current event, in emission order.
     pub expired: Vec<Expiry>,
+    /// What the last sweep that retired nothing learned — see [`BuffInstances::sweep_hygiene`].
+    sweep_memo: Option<SweepMemo>,
+}
+
+/// The hygiene sweep's memo: the state a quiet sweep ran over, and the last log instant at which
+/// it is still quiet. Any later `now` past `next_due`, or any change to a map, the stats or the
+/// hold, throws it away.
+#[derive(Debug, Clone, Copy)]
+struct SweepMemo {
+    active_version: u64,
+    open_version: u64,
+    stats_version: u64,
+    held_before_ts: i64,
+    /// Nothing is due while `now <= next_due`.
+    next_due: i64,
+}
+
+/// What one active row owes the sweep, decided read-only before anything is touched.
+enum Due {
+    /// Past the long stop: retire the landings up to the cutoff.
+    Retire(i64),
+    /// Past its unwitnessed-expiry cull.
+    Cull,
+}
+
+/// The last instant `now` at which `(now - started_ts) as f64 > cap` is still FALSE.
+///
+/// `now - started_ts` is an integer and exact as an `f64` at any span a log can hold, so for a
+/// finite cap the test is `now - started_ts <= floor(cap)`. A cap that is not finite (the
+/// unwitnessed cull's "never") can never be exceeded.
+fn quiet_until(started_ts: i64, cap: f64) -> i64 {
+    if !cap.is_finite() {
+        return i64::MAX;
+    }
+    // `as i64` saturates, and so does the add, so an absurd cap reads as "never" rather than
+    // wrapping into the past.
+    #[allow(clippy::cast_possible_truncation)]
+    let whole = cap.floor() as i64;
+    started_ts.saturating_add(whole)
 }
 
 impl BuffInstances {
@@ -673,21 +713,77 @@ impl BuffInstances {
         stats: &SpellStats,
         pets: &PetEntities,
     ) -> bool {
-        let mut changed = false;
-        // Called once per event, so its cost is paid on every line of a full replay: nothing here
-        // may copy the map, and the loop deletes only the entry it is standing on.
-        let keys: Vec<String> = self.active.iter().map(|(ik, _)| ik.to_string()).collect();
-        for ik in keys {
-            let Some(a) = self.active.get(&ik) else {
-                continue;
-            };
+        // Called once per event, so its cost is paid on every line of a full replay. A sweep that
+        // retires nothing is a pure function of `now` over the two maps, the stats and the hold,
+        // and every row's test is monotone in `now`: so until one of those inputs moves, the sweep
+        // stays quiet through the earliest instant any row could come due, and that instant is
+        // what the last full pass wrote down. (Measured 2026-11-06: 3.1 s of a 14.5 s fold of the
+        // owner's 68 MB log went to this sweep walking every active row on every line.)
+        if self.sweep_is_quiet(now, held_before_ts, stats) {
+            return false;
+        }
+        self.sweep_memo = None;
+        let (due, next_due) = self.hygiene_plan(now, held_before_ts, stats);
+        // Pass two: the retirements, in map order, as the one-pass loop made them.
+        let changed = !due.is_empty();
+        for (ik, what) in due {
+            match what {
+                Due::Retire(cutoff) => self.retire_expired(&ik, cutoff, stats, pets),
+                Due::Cull => {
+                    self.active.remove(&ik);
+                }
+            }
+        }
+        // The loop above can only reach a record through its active row, so the records the cull
+        // left behind need their own reaper.
+        let (reaped, orphans_quiet_until) =
+            reap_orphaned_open(&mut self.open, &self.active, stats, now);
+        if !changed && !reaped {
+            self.sweep_memo = Some(SweepMemo {
+                active_version: self.active.version(),
+                open_version: self.open.version(),
+                stats_version: stats.version(),
+                held_before_ts,
+                next_due: next_due.min(orphans_quiet_until),
+            });
+        }
+        changed
+    }
+
+    /// The long-stop path: shed the landings older than `cutoff_ts`, and drop the record when empty.
+    /// The memo's verdict: nothing it was computed over has moved, and `now` is not past the
+    /// earliest instant anything could come due.
+    fn sweep_is_quiet(&self, now: i64, held_before_ts: i64, stats: &SpellStats) -> bool {
+        let Some(m) = self.sweep_memo else {
+            return false;
+        };
+        m.active_version == self.active.version()
+            && m.open_version == self.open.version()
+            && m.stats_version == stats.version()
+            && m.held_before_ts == held_before_ts
+            && now <= m.next_due
+    }
+
+    /// Pass one of the sweep, read-only: what each active row owes, in map order, and the earliest
+    /// instant a row that owes nothing could. Decided before anything is touched because
+    /// `retire_expired` and the cull each reach only the row they are handed, so no row's verdict
+    /// depends on another's.
+    fn hygiene_plan(
+        &self,
+        now: i64,
+        held_before_ts: i64,
+        stats: &SpellStats,
+    ) -> (Vec<(String, Due)>, i64) {
+        let mut due: Vec<(String, Due)> = Vec::new();
+        let mut next_due = i64::MAX;
+        for (ik, a) in self.active.iter() {
             if a.permanent == Some(true) {
                 continue;
             }
             if held_before_ts > 0 && a.cls != BuffClass::Debuff && a.started_ts <= held_before_ts {
                 continue;
             }
-            let db_ms = stats.db_duration_for(instance_spell_key(&ik));
+            let db_ms = stats.db_duration_for(instance_spell_key(ik));
             // The long stop goes first, because it means "we lost the thread" and is the only one
             // that takes the PAIRING RECORD with it. A multiset retires ONE landing at a time, so
             // the row keeps whichever landings are still inside the cap.
@@ -698,22 +794,21 @@ impl BuffInstances {
                 // `drop_expired` compares an integer ts against it. For an integer x, `x <= r` is
                 // `x <= floor(r)`, so the floor is the exact answer rather than a rounding of one.
                 let cutoff = (now as f64 - long_cap).floor() as i64;
-                self.retire_expired(&ik, cutoff, stats, pets);
-                changed = true;
+                due.push((ik.to_string(), Due::Retire(cutoff)));
                 continue;
             }
-            if elapsed > unwitnessed_cull_cap(a) {
-                self.active.remove(&ik);
-                changed = true;
+            let cull_cap = unwitnessed_cull_cap(a);
+            if elapsed > cull_cap {
+                due.push((ik.to_string(), Due::Cull));
+                continue;
             }
+            next_due = next_due
+                .min(quiet_until(a.started_ts, long_cap))
+                .min(quiet_until(a.started_ts, cull_cap));
         }
-        // The loop above can only reach a record through its active row, so the records the cull
-        // left behind need their own reaper.
-        reap_orphaned_open(&mut self.open, &self.active, stats, now);
-        changed
+        (due, next_due)
     }
 
-    /// The long-stop path: shed the landings older than `cutoff_ts`, and drop the record when empty.
     fn retire_expired(&mut self, ik: &str, cutoff_ts: i64, stats: &SpellStats, pets: &PetEntities) {
         if self.open.contains_key(ik) {
             let empty = {
