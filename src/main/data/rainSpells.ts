@@ -51,7 +51,7 @@
 //   Rain of Swords "Your skin shreds as swords rain down from above."
 //   Poison Storm   "Your skin blisters as poison rains down on you."
 //
-// `\brains? down\b` over the DB's two cast messages gives 17 spells (`MESSAGE_RAIN_NAMES`). It is
+// `\brains? down\b` over the DB's two cast messages gives 17 spells (`messageRainNames`). It is
 // word-anchored at both ends on purpose: without the leading `\b` it matches the whole `drain`
 // family (`You feel your life force drain away.` — 42 rows, every lifetap in the game).
 //
@@ -154,8 +154,12 @@ import type { SpellDbFile, SpellEntry } from '../../shared/types'
  * `tests/spellRemovals.test.mts` greps for), and the corrections overlay is applied to what is
  * left so `raw[i]` and `corrected[i]` stay in INDEX LOCKSTEP.
  */
-const RAW: readonly SpellEntry[] = applySpellRemovals((spellsJson as SpellDbFile).spells).spells
-const CORRECTED: readonly SpellEntry[] = applySpellCorrections(RAW).spells
+// Both passes run on the first wave lookup, not at import (audit item 6): a removals pass and a
+// corrections overlay over the whole spell DB sat on the pre-`ready` path for a map of 24 keys.
+function correctedPair(): { raw: readonly SpellEntry[]; corrected: readonly SpellEntry[] } {
+  const raw = applySpellRemovals((spellsJson as SpellDbFile).spells).spells
+  return { raw, corrected: applySpellCorrections(raw).spells }
+}
 
 /** One registry row: the spell, how many waves it delivers, and the page sentence that says so. */
 export interface RainPage {
@@ -219,12 +223,18 @@ const saysRain = (s: SpellEntry): boolean =>
  * down. A strict SUBSET of `RAIN_PAGES` (the audit test asserts it), kept because it is the one
  * signal that costs nothing and would notice a re-scrape rewriting a message.
  */
-export const MESSAGE_RAIN_NAMES: readonly string[] = [
-  ...new Set(RAW.filter(saysRain).map((s) => s.name))
-].sort()
+export function messageRainNames(): readonly string[] {
+  return [...new Set(correctedPair().raw.filter(saysRain).map((s) => s.name))].sort()
+}
 
 /** Canonical keys (rank tail stripped, lowercased — law 2) to wave count, for both spellings. */
-const RAIN_WAVES: ReadonlyMap<string, number> = (() => {
+let rainWaveKeys: ReadonlyMap<string, number> | null = null
+function RAIN_WAVES(): ReadonlyMap<string, number> {
+  rainWaveKeys ??= buildRainWaves()
+  return rainWaveKeys
+}
+function buildRainWaves(): ReadonlyMap<string, number> {
+  const { raw, corrected } = correctedPair()
   const byName = new Map(RAIN_PAGES.map((p) => [p.name, p.waves]))
   const keys = new Map<string, number>()
   const add = (name: string, waves: number): void => {
@@ -235,13 +245,13 @@ const RAIN_WAVES: ReadonlyMap<string, number> = (() => {
   // key, the corrections overlay can rename a row (`Solon's Bravura` -> `Solon's Bewitching
   // Bravura`), and the parser only ever sees the LOG's spelling. Nothing in today's rain family
   // is corrected — this is the invariant kept, not a fix for an observed miss.
-  RAW.forEach((s, i) => {
+  raw.forEach((s, i) => {
     const waves = byName.get(s.name)
     if (waves === undefined) return
-    add(CORRECTED[i]?.name ?? s.name, waves)
+    add(corrected[i]?.name ?? s.name, waves)
   })
   return keys
-})()
+}
 
 /** Display names of the roster, sorted — the audit test's subject. */
 export const RAIN_SPELL_NAMES: readonly string[] = RAIN_PAGES.map((p) => p.name).sort()
@@ -257,10 +267,10 @@ export const RAIN_SPELL_NAMES: readonly string[] = RAIN_PAGES.map((p) => p.name)
  * line may carry the numeral — the same boundary rule every other name join in this engine uses.
  */
 export function rainWaves(spell: string): number {
-  return RAIN_WAVES.get(spellCanonKey(spell)) ?? 1
+  return RAIN_WAVES().get(spellCanonKey(spell)) ?? 1
 }
 
 /** True when a spell delivers its damage in WAVES from one cast. */
 export function isRainSpell(spell: string): boolean {
-  return RAIN_WAVES.has(spellCanonKey(spell))
+  return RAIN_WAVES().has(spellCanonKey(spell))
 }

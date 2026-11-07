@@ -68,7 +68,7 @@ export function parseSpellClassString(classes: string | undefined): ClassAbbr[] 
   return [...found].sort()
 }
 
-/** Build the canon-key → class-set index once, at module init. */
+/** Build the canon-key → class-set index once, on the first ask (audit item 6: not at import). */
 function buildIndex(): Map<string, Set<ClassAbbr>> {
   const index = new Map<string, Set<ClassAbbr>>()
   const present = applySpellRemovals((spellsJson as SpellDbFile).spells).spells
@@ -83,10 +83,11 @@ function buildIndex(): Map<string, Set<ClassAbbr>> {
   return index
 }
 
-const INDEX: ReadonlyMap<string, ReadonlySet<ClassAbbr>> = buildIndex()
+let INDEX: ReadonlyMap<string, ReadonlySet<ClassAbbr>> | null = null
 
 /** The whole table: rank-normalized spell key → the classes that can cast it. */
 export function spellClassIndex(): ReadonlyMap<string, ReadonlySet<ClassAbbr>> {
+  INDEX ??= buildIndex()
   return INDEX
 }
 
@@ -97,6 +98,6 @@ export function spellClassIndex(): ReadonlyMap<string, ReadonlySet<ClassAbbr>> {
  * Template:Spellpage pages (those live in classes.json's `abilities`).
  */
 export function classesForSpell(spell: string): ClassAbbr[] {
-  const set = INDEX.get(spellCanonKey(spell))
+  const set = spellClassIndex().get(spellCanonKey(spell))
   return set === undefined ? [] : [...set].sort()
 }

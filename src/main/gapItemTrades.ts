@@ -9,12 +9,13 @@
 //
 // ELECTRON-FREE, the gapItemMobs.ts precedent: tests drive it under the node runner.
 
-import { itemKey, type ItemDbFile } from './itemsDb'
+import { itemKey, type ItemDbEntry, type ItemDbFile } from './itemsDb'
 import itemsJson from './data/items.json'
 import { itemsByAnyName } from './itemOtherNames'
 import type { ItemRecipeUse } from '../shared/types'
 
-const items = itemsByAnyName((itemsJson as unknown as ItemDbFile).items)
+// Memoized per corpus in itemOtherNames.ts and asked for on the first call: shared, never at import.
+const items = (): Readonly<Record<string, ItemDbEntry>> => itemsByAnyName((itemsJson as unknown as ItemDbFile).items)
 
 /** A recipe use's tradeskill: its group's, else the skill page it links (`Skill Alchemy` → `Alchemy`). */
 const tradeOf = (r: ItemRecipeUse): string | undefined => r.tradeskill ?? (r.page?.startsWith('Skill ') === true ? r.page.slice('Skill '.length) : undefined)
@@ -23,7 +24,7 @@ const tradeOf = (r: ItemRecipeUse): string | undefined => r.tradeskill ?? (r.pag
 export function itemTrades(names: readonly string[]): Record<string, string[]> {
   const out: Record<string, string[]> = {}
   for (const name of names) {
-    const uses = items[itemKey(name)]?.recipes ?? []
+    const uses = items()[itemKey(name)]?.recipes ?? []
     out[name] = [...new Set(uses.map(tradeOf).filter((t): t is string => t !== undefined && t !== ''))]
   }
   return out

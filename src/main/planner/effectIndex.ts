@@ -229,10 +229,13 @@ export function buildSpellFacts(spells: readonly SpellEntry[]): SpellFactsIndex 
  * effect rows, and a second `buildSpellFacts` call there would be a second answer to "which spell
  * page does this effect name join" — one home, one first-wins ordering.
  */
-export const COMMITTED_SPELL_FACTS: SpellFactsIndex = buildSpellFacts(
-  (spellsJson as SpellDbFile).spells
-)
-const SPELL_FACTS = COMMITTED_SPELL_FACTS
+let committed: SpellFactsIndex | null = null
+export function committedSpellFacts(): SpellFactsIndex {
+  // On the first ask, not at import (audit item 6): the planner index is built on a prewarm
+  // after the window exists, and the pass over the spell DB belongs there, not before `ready`.
+  committed ??= buildSpellFacts((spellsJson as SpellDbFile).spells)
+  return committed
+}
 
 /**
  * The `Summoned:` NAME PREFIX — the one automatic exclusion rule (V9), and it is not an inference:
@@ -446,7 +449,7 @@ function addPage(
 export function buildPlannerIndex(
   file: ItemDbFile,
   research: ItemResearchFile = ITEMS_RESEARCH,
-  spells: SpellFactsIndex = SPELL_FACTS
+  spells: SpellFactsIndex = committedSpellFacts()
 ): PlannerIndex {
   const acc = newAcc()
   // Through the rename overlay (JOS-415), so a donor's row carries the name the wiki uses now.

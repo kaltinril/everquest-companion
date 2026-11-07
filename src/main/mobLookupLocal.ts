@@ -36,26 +36,30 @@ const mobData = mobsRaw as MobData
  * mobs. The page-title pass runs SECOND and only fills gaps, so a real mob's own name can
  * never be displaced by another page's title.
  */
-const mobByName = new Map<string, MobEntry>()
-for (const m of mobData.mobs ?? []) {
-  const key = mobKey(m.name)
-  if (key && !mobByName.has(key)) mobByName.set(key, m)
+// BUILT ON FIRST ASK, not at import (audit item 6): the three passes over 7.9k mobs ran during
+// module evaluation, before Electron's `ready`, for a lookup nothing makes until a line arrives.
+let mobIndex: Map<string, MobEntry> | null = null
+function mobByName(): Map<string, MobEntry> {
+  mobIndex ??= buildMobIndex()
+  return mobIndex
 }
-for (const m of mobData.mobs ?? []) {
-  const key = mobKey(m.page)
-  if (key && !mobByName.has(key)) mobByName.set(key, m)
-}
-// Then the wiki redirects that land on the page, also only filling gaps.
-for (const m of mobData.mobs ?? []) {
-  for (const other of m.otherNames ?? []) {
-    const key = mobKey(other)
-    if (key && !mobByName.has(key)) mobByName.set(key, m)
+function buildMobIndex(): Map<string, MobEntry> {
+  const index = new Map<string, MobEntry>()
+  const mobs = mobData.mobs ?? []
+  const fill = (m: MobEntry, name: string): void => {
+    const key = mobKey(name)
+    if (key && !index.has(key)) index.set(key, m)
   }
+  for (const m of mobs) fill(m, m.name)
+  for (const m of mobs) fill(m, m.page)
+  // Then the wiki redirects that land on the page, also only filling gaps.
+  for (const m of mobs) for (const other of m.otherNames ?? []) fill(m, other)
+  return index
 }
 
 /** The catalog's entry for a mob, or null when it has none (⇒ the cache; the wiki only on a Copy click). */
 export function localMobEntry(name: string): MobEntry | null {
-  return mobByName.get(mobKey(name)) ?? null
+  return mobByName().get(mobKey(name)) ?? null
 }
 
 /** How many mobs the committed catalog holds (diagnostic / startup log). */
@@ -95,22 +99,30 @@ const questData = questsJson as unknown as QuestData
  * Keyed by `mobKey` so the catalog's casing ("A Giant Rat") folds onto the log's ("a giant rat")
  * — the same canonicalize-at-the-boundary rule the KillMap uses (world-model law 2).
  */
-const questsByMob = new Map<string, MobQuestUse[]>()
-for (const q of questData.quests ?? []) {
-  for (const npc of q.relatedNpcs ?? []) {
-    const key = mobKey(npc)
-    if (!key) continue
-    const uses = questsByMob.get(key) ?? []
-    if (!uses.some((u) => u.quest === q.name)) {
-      uses.push({ quest: q.name, page: q.page, giver: q.giver, zone: q.startZone })
+let questIndex: Map<string, MobQuestUse[]> | null = null
+function questsByMob(): Map<string, MobQuestUse[]> {
+  questIndex ??= buildQuestIndex()
+  return questIndex
+}
+function buildQuestIndex(): Map<string, MobQuestUse[]> {
+  const index = new Map<string, MobQuestUse[]>()
+  for (const q of questData.quests ?? []) {
+    for (const npc of q.relatedNpcs ?? []) {
+      const key = mobKey(npc)
+      if (!key) continue
+      const uses = index.get(key) ?? []
+      if (!uses.some((u) => u.quest === q.name)) {
+        uses.push({ quest: q.name, page: q.page, giver: q.giver, zone: q.startZone })
+      }
+      index.set(key, uses)
     }
-    questsByMob.set(key, uses)
   }
+  return index
 }
 
 /** Quests the LOCAL catalog ties to this mob. Null when it knows none (never an empty claim). */
 export function localMobQuests(name: string): MobQuestUse[] | null {
-  const uses = questsByMob.get(mobKey(name))
+  const uses = questsByMob().get(mobKey(name))
   return uses?.length ? uses : null
 }
 

@@ -131,10 +131,8 @@ const GEAR_PREWARM_DELAY_MS = 5_000
 // (see shared/perf.ts STARTUP_PHASES for the full table).
 markStartupPhase('storeLoaded', { atMs: STORE_READY_MS })
 markStartupPhase('dataLoaded', { atMs: DATA_READY_MS })
-// The committed spell data's boot summary. It printed at `pipeline.ts` module scope until
-// JOS-499; the catalog is built lazily now, so the root asks for it rather than a side effect
-// happening during an import.
-logSpellDbSummary()
+// The committed spell data's boot summary is printed after the window exists (below): it forces
+// the catalog build plus a 2.9 MB overlay read, which used to sit here, before `ready`.
 // …and the one figure in the data-weight ledger that is measured on THIS machine (JOS-458). Here,
 // and only here: this statement is the first moment after every committed corpus has been parsed
 // and the last moment before the app allocates anything of its own, so the reading describes the
@@ -308,6 +306,10 @@ if (!gotSingleInstanceLock) {
     }
     createMainWindow()
     markStartupPhase('windowCreated')
+    // The spell data's boot summary, off the pre-`ready` path (audit item 6). It printed at
+    // `pipeline.ts` module scope until JOS-499; the catalog is built lazily, so the root asks for
+    // it rather than a side effect happening during an import, and asks once the window is up.
+    setTimeout(logSpellDbSummary, 0)
     // THE TRAY, AND WHAT THE X MEANS (JOS-139). Straight after the window exists, because the
     // icon's whole job is to bring that window back — and because the quitting latch it arms has
     // to be in place before anything can ask this process to quit. It creates no icon under

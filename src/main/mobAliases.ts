@@ -66,20 +66,31 @@ const bossData = bossesJson as unknown as BossData
  * no such collision today, but silently merging two gods on a later scrape is not a thing this
  * boundary should be able to do by accident.
  */
-const identityByKey = new Map<string, MobIdentity>()
-for (const t of bossData.targets ?? []) {
-  const keys: string[] = []
-  for (const spelling of [t.name, ...(t.match ?? [])]) {
-    const k = mobKey(spelling)
-    if (k && !keys.includes(k)) keys.push(k)
+let aliasIndex: Map<string, MobIdentity> | null = null
+// Built on the first resolution rather than at import (audit item 6), the same map either way.
+function identityByKey(): Map<string, MobIdentity> {
+  aliasIndex ??= buildAliasIndex()
+  return aliasIndex
+}
+function buildAliasIndex(): Map<string, MobIdentity> {
+  const index = new Map<string, MobIdentity>()
+  for (const t of bossData.targets ?? []) {
+    const keys: string[] = []
+    for (const spelling of [t.name, ...(t.match ?? [])]) {
+      const k = mobKey(spelling)
+      if (k && !keys.includes(k)) keys.push(k)
+    }
+    if (keys.length < 2) continue
+    const id: MobIdentity = { canonical: t.name, keys, aliased: true }
+    for (const k of keys) if (!index.has(k)) index.set(k, id)
   }
-  if (keys.length < 2) continue
-  const id: MobIdentity = { canonical: t.name, keys, aliased: true }
-  for (const k of keys) if (!identityByKey.has(k)) identityByKey.set(k, id)
+  return index
 }
 
 /** How many roster targets the roster spells more than one way (diagnostic / regression pin). */
-export const ALIASED_TARGET_COUNT = new Set(identityByKey.values()).size
+export function aliasedTargetCount(): number {
+  return new Set(identityByKey().values()).size
+}
 
 /**
  * THE BOUNDARY. Resolve any mob name — a log spelling, a roster spelling, a catalog spelling — to
@@ -91,7 +102,7 @@ export const ALIASED_TARGET_COUNT = new Set(identityByKey.values()).size
  */
 export function resolveMobIdentity(name: string): MobIdentity {
   const key = mobKey(name)
-  const known = identityByKey.get(key)
+  const known = identityByKey().get(key)
   if (known) return known
   return { canonical: name, keys: key ? [key] : [], aliased: false }
 }
