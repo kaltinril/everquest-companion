@@ -22,7 +22,7 @@
 
 use serde_json::{json, Map, Value};
 
-use crate::names::item_key;
+use crate::names::{item_key, mob_key_ref};
 use fold::knowledge::{OwnLoot, SeenDrop};
 use fold::modules::consider::mob_key;
 // The scraped mob catalog — local source 1, the definitive drop table. The fold embeds these bytes
@@ -37,7 +37,10 @@ pub use fold::modules::resist::catalog::MobIdentity as Identity;
 
 /// The catalog, keyed BOTH ways a mob can be named. The alias table is the fold's.
 pub struct MobIndex {
-    by_name: std::collections::HashMap<String, Value>,
+    /// The catalog's records in file order; `by_name` holds positions into it, so a record keyed
+    /// three ways (its name, its page title, its redirects) is held once.
+    records: Vec<Value>,
+    by_name: std::collections::HashMap<String, usize>,
     /// Catalog display names in file order, for `knowledge.search`.
     names: Vec<String>,
 }
@@ -58,29 +61,36 @@ impl MobIndex {
     #[must_use]
     pub fn from_json(json: &str) -> Self {
         let file: Value = serde_json::from_str(json).expect("mobs.json is not readable");
-        let mobs = file["mobs"].as_array().cloned().unwrap_or_default();
-        let mut by_name: std::collections::HashMap<String, Value> =
-            std::collections::HashMap::with_capacity(mobs.len() * 2);
-        let mut names: Vec<String> = Vec::with_capacity(mobs.len());
-        for m in &mobs {
+        // Taken out of the parse rather than cloned: the array is the index's own store.
+        let records: Vec<Value> = match file {
+            Value::Object(mut o) => match o.remove("mobs") {
+                Some(Value::Array(v)) => v,
+                _ => Vec::new(),
+            },
+            _ => Vec::new(),
+        };
+        let mut by_name: std::collections::HashMap<String, usize> =
+            std::collections::HashMap::with_capacity(records.len() * 2);
+        let mut names: Vec<String> = Vec::with_capacity(records.len());
+        for (i, m) in records.iter().enumerate() {
             if let Some(name) = m["name"].as_str() {
                 let key = mob_key(name);
                 if !key.is_empty() {
                     names.push(name.to_owned());
-                    by_name.entry(key).or_insert_with(|| m.clone());
+                    by_name.entry(key).or_insert(i);
                 }
             }
         }
-        for m in &mobs {
+        for (i, m) in records.iter().enumerate() {
             if let Some(page) = m["page"].as_str() {
                 let key = mob_key(page);
                 if !key.is_empty() {
-                    by_name.entry(key).or_insert_with(|| m.clone());
+                    by_name.entry(key).or_insert(i);
                 }
             }
         }
         // Then the wiki redirects that land on the page (`otherNames`), also only filling gaps.
-        for m in &mobs {
+        for (i, m) in records.iter().enumerate() {
             for other in m["otherNames"]
                 .as_array()
                 .into_iter()
@@ -89,17 +99,28 @@ impl MobIndex {
             {
                 let key = mob_key(other);
                 if !key.is_empty() {
-                    by_name.entry(key).or_insert_with(|| m.clone());
+                    by_name.entry(key).or_insert(i);
                 }
             }
         }
-        Self { by_name, names }
+        Self {
+            records,
+            by_name,
+            names,
+        }
     }
 
-    /// The catalog's entry for a mob, or `None` when it has none.
+    /// The catalog's entry for a mob, or `None` when it has none. The key is borrowed from the
+    /// name wherever the name is already its own key (`mob_key_ref`).
     #[must_use]
     pub fn entry(&self, name: &str) -> Option<&Value> {
-        self.by_name.get(&mob_key(name))
+        self.entry_keyed(&mob_key_ref(name))
+    }
+
+    /// [`Self::entry`] for a caller that already holds the `mob_key`.
+    #[must_use]
+    pub fn entry_keyed(&self, key: &str) -> Option<&Value> {
+        self.by_name.get(key).map(|&i| &self.records[i])
     }
 
     /// Resolve any spelling to the one identity the roster states, or to itself when the roster has

@@ -9,8 +9,11 @@ pub mod acquire;
 pub mod casts;
 pub mod combat;
 pub mod data;
+pub mod dot;
 pub mod group;
 pub mod melee;
+pub mod miss;
+pub mod needles;
 pub mod session;
 pub mod who;
 pub mod world;
@@ -25,20 +28,18 @@ use std::sync::Arc;
 
 /// JavaScript's four line terminators, the characters its `.` refuses (`jsstr::JS_DOT`), looked for
 /// as bytes: U+2028 and U+2029 are `E2 80 A8` and `E2 80 A9`, and a valid UTF-8 string holds no
-/// other byte run that spells them.
+/// other byte run that spells them. The three lead bytes are found with one vectorised search.
 fn has_line_terminator(bytes: &[u8]) -> bool {
-    let mut i = 0;
-    while i < bytes.len() {
-        match bytes[i] {
-            b'\n' | b'\r' => return true,
-            0xE2 if bytes.get(i + 1) == Some(&0x80)
-                && matches!(bytes.get(i + 2), Some(&0xA8) | Some(&0xA9)) =>
-            {
-                return true;
-            }
-            _ => {}
+    let mut from = 0;
+    while let Some(off) = memchr::memchr3(b'\n', b'\r', 0xE2, &bytes[from..]) {
+        let i = from + off;
+        if bytes[i] != 0xE2
+            || (bytes.get(i + 1) == Some(&0x80)
+                && matches!(bytes.get(i + 2), Some(&0xA8) | Some(&0xA9)))
+        {
+            return true;
         }
-        i += 1;
+        from = i + 1;
     }
     false
 }
@@ -88,6 +89,16 @@ pub struct Ctx<'a> {
     pub ts: i64,
     pub seq: i64,
     pub raw: &'a str,
+    /// Which gate substrings the line carries, found in one pass (`needles.rs`).
+    pub hits: needles::Hits,
+}
+
+impl Ctx<'_> {
+    /// `self.text.contains(needle)`, answered from the one pass.
+    #[inline]
+    pub fn has(&self, n: needles::Needle) -> bool {
+        self.hits.has(n)
+    }
 }
 
 /// The parser, and everything a parse is a pure function of: the bytes, the spell DB, and the
@@ -99,10 +110,14 @@ pub struct Parser {
     clock: Clock,
     db: Option<Arc<SpellDb>>,
     character: Option<String>,
+    /// The character's trimmed, lowercased name, for the pet-leader line's owner test; `None` when
+    /// there is no character (the line is then never claimed).
+    character_key: Option<String>,
     /// The last stamp read and what it resolved to. The game writes many lines a second and every
     /// line of one second carries the same 24 bytes, so the regex and the zone lookup run once per
     /// second of play rather than once per line. (Measured 2026-11-06: 430 ms of a 68 MB fold.)
     stamp_memo: RefCell<Option<(String, i64)>>,
+    needles: needles::Needles,
     combat: combat::CombatRes,
     casts: casts::CastRes,
     world: world::WorldRes,
@@ -132,11 +147,17 @@ impl Parser {
     }
 
     pub fn new(clock: Clock, db: Option<Arc<SpellDb>>, character: Option<String>) -> Self {
+        let character_key = character
+            .as_deref()
+            .filter(|s| !s.is_empty())
+            .map(|s| crate::jsstr::js_trim(s).to_lowercase());
         Parser {
             clock,
             db,
             character,
+            character_key,
             stamp_memo: RefCell::new(None),
+            needles: needles::Needles::new(),
             combat: combat::CombatRes::new(),
             casts: casts::CastRes::new(),
             world: world::WorldRes::new(),
@@ -157,7 +178,14 @@ impl Parser {
         if ts == 0 {
             self.unparsed_stamps.set(self.unparsed_stamps.get() + 1);
         }
-        let c = Ctx { text, ts, seq, raw };
+        let hits = self.needles.scan(text);
+        let c = Ctx {
+            text,
+            ts,
+            seq,
+            raw,
+            hits,
+        };
         self.classify(&c, out);
         true
     }
@@ -200,8 +228,7 @@ impl Parser {
             || casts::classify_cc_wake(&self.casts, c, out)
             || casts::classify_pet_claim(&self.casts, c, out)
             || casts::classify_pet_say(&self.casts, c, out)
-            || casts::classify_pet_leader(&self.casts, name, c, out)
-            || casts::classify_ally_pet_leader(&self.casts, name, c, out)
+            || casts::classify_pet_leaders(&self.casts, self.character_key.as_deref(), c, out)
             || world::classify_death(&self.world, c, out)
             || world::classify_zone(&self.world, c, out)
             || world::classify_instance_create(&self.world, c, out)

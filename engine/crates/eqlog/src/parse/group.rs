@@ -7,6 +7,7 @@
 use crate::event::{Ev, Key, Kind};
 use regex::Regex;
 
+use super::needles::Needle;
 use super::Ctx;
 
 const SELF_JOIN_LINE: &str = "You have joined the group.";
@@ -65,7 +66,7 @@ impl GroupRes {
 
 pub fn classify_group(r: &GroupRes, c: &Ctx, out: &mut Ev) -> bool {
     let text = c.text;
-    if !text.contains("group") && !text.contains("party") {
+    if !c.has(Needle::Group) && !c.has(Needle::Party) {
         return false;
     }
     // The two exact self lines are compared before any regex runs, so `You have joined the group.`

@@ -8,6 +8,7 @@ use regex::{Captures, Regex};
 
 use super::acquire::{sale_price, AcquireRes};
 use super::data::CONSIDER_FACTION_RUNGS;
+use super::needles::Needle;
 use super::Ctx;
 
 const YOU_DIED: &str = "You died.";
@@ -182,7 +183,7 @@ fn item_and_source<'t>(text: &'t str, m: &Captures<'t>) -> (&'t str, Option<&'t 
 }
 
 pub fn classify_consider(r: &WorldRes, c: &Ctx, out: &mut Ev) -> bool {
-    if !c.text.contains("(Lvl: ") {
+    if !c.has(Needle::Lvl) {
         return false;
     }
     let Some(m) = r.consider.captures(c.text) else {
@@ -208,7 +209,7 @@ pub fn classify_death(r: &WorldRes, c: &Ctx, out: &mut Ev) -> bool {
         out.envelope(c.seq, c.ts, c.raw);
         return true;
     }
-    if text.contains("slain") {
+    if c.has(Needle::Slain) {
         if let Some(pd) = r.player_death.captures(text) {
             out.begin(Kind::PlayerDeath);
             out.envelope(c.seq, c.ts, c.raw);
@@ -245,7 +246,7 @@ pub fn classify_death(r: &WorldRes, c: &Ctx, out: &mut Ev) -> bool {
 }
 
 pub fn classify_zone(r: &WorldRes, c: &Ctx, out: &mut Ev) -> bool {
-    if !c.text.contains("entered") {
+    if !c.has(Needle::Entered) {
         return false;
     }
     let Some(m) = r.zone.captures(c.text) else {
@@ -304,7 +305,7 @@ pub fn classify_loot(r: &WorldRes, a: &AcquireRes, c: &Ctx, out: &mut Ev) -> boo
             return true;
         }
     }
-    if !text.contains("looted") {
+    if !c.has(Needle::Looted) {
         return false;
     }
     if let Some(m) = r
@@ -347,7 +348,7 @@ pub fn classify_loot(r: &WorldRes, a: &AcquireRes, c: &Ctx, out: &mut Ev) -> boo
 
 pub fn classify_item_merge(r: &WorldRes, c: &Ctx, out: &mut Ev) -> bool {
     let text = c.text;
-    if !(text.contains("merge") || text.starts_with("The item you are trying to add")) {
+    if !(c.has(Needle::Merge) || text.starts_with("The item you are trying to add")) {
         return false;
     }
     if let Some(m) = r.item_merge.captures(text) {
@@ -390,7 +391,7 @@ pub fn classify_item_merge(r: &WorldRes, c: &Ctx, out: &mut Ev) -> bool {
 }
 
 pub fn classify_turn_in(r: &WorldRes, c: &Ctx, out: &mut Ev) -> bool {
-    if c.text.contains("offered") {
+    if c.has(Needle::Offered) {
         if let Some(m) = r.offer.captures(c.text) {
             out.begin(Kind::Offer);
             out.envelope(c.seq, c.ts, c.raw);
@@ -401,7 +402,7 @@ pub fn classify_turn_in(r: &WorldRes, c: &Ctx, out: &mut Ev) -> bool {
             return true;
         }
     }
-    if c.text.contains("complete the trade") {
+    if c.has(Needle::CompleteTheTrade) {
         if let Some(m) = r.trade_done.captures(c.text) {
             out.begin(Kind::Trade);
             out.envelope(c.seq, c.ts, c.raw);
@@ -413,7 +414,7 @@ pub fn classify_turn_in(r: &WorldRes, c: &Ctx, out: &mut Ev) -> bool {
 }
 
 pub fn classify_level(r: &WorldRes, c: &Ctx, out: &mut Ev) -> bool {
-    if !c.text.contains("gained a level") {
+    if !c.has(Needle::GainedALevel) {
         return false;
     }
     let Some(m) = r.level.captures(c.text) else {
@@ -449,7 +450,7 @@ pub fn classify_exp(r: &WorldRes, c: &Ctx, out: &mut Ev) -> bool {
 }
 
 pub fn classify_aa(r: &WorldRes, c: &Ctx, out: &mut Ev) -> bool {
-    if !c.text.contains("ability point") {
+    if !c.has(Needle::AbilityPoint) {
         return false;
     }
     if let Some(g) = r.aa.captures(c.text) {

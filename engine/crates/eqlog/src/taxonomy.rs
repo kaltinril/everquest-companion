@@ -6,8 +6,9 @@ use crate::jsstr::{is_js_space, js_trim};
 /// load-bearing: the pull is greedy and runs first.
 const TWO_WORD: [&str; 3] = ["Slay Undead", "Finishing Blow", "Crippling Blow"];
 
-/// `"Riposte Critical"` → `["Riposte", "Critical"]`.
-pub fn parse_modifiers(modifier: Option<&str>) -> Vec<String> {
+/// `"Riposte Critical"` → `["Riposte", "Critical"]`, each token borrowed from the modifier (or
+/// one of the three phrases).
+pub fn parse_modifiers(modifier: Option<&str>) -> Vec<&str> {
     // The app's falsy test covers undefined and the empty string, hence two checks rather than one.
     let Some(modifier) = modifier else {
         return Vec::new();
@@ -19,35 +20,44 @@ pub fn parse_modifiers(modifier: Option<&str>) -> Vec<String> {
     if raw.is_empty() {
         return Vec::new();
     }
-    let mut mods: Vec<String> = Vec::new();
+    if !TWO_WORD.iter().any(|tw| raw.contains(tw)) {
+        return raw.split(is_js_space).filter(|t| !t.is_empty()).collect();
+    }
+    parse_with_phrases(raw)
+}
+
+/// The rare annotation carrying a two-word proc: the app's algorithm verbatim on an owned copy,
+/// each token then mapped back onto `raw`. Every token is a run of the original characters, since
+/// the only character the pull inserts is a space and a token holds none, so the map always lands.
+fn parse_with_phrases(raw: &str) -> Vec<&str> {
+    let mut mods: Vec<&str> = Vec::new();
     let mut rest = raw.to_string();
     for tw in TWO_WORD {
-        if rest.contains(tw) {
-            mods.push(tw.to_string());
+        if let Some(at) = rest.find(tw) {
+            mods.push(tw);
             // The app's string `replace` cuts the first occurrence only.
-            let replaced = match rest.find(tw) {
-                Some(at) => {
-                    let mut s = String::with_capacity(rest.len());
-                    s.push_str(&rest[..at]);
-                    s.push(' ');
-                    s.push_str(&rest[at + tw.len()..]);
-                    s
-                }
-                None => rest.clone(),
-            };
-            rest = js_trim(&replaced).to_string();
+            let mut s = String::with_capacity(rest.len());
+            s.push_str(&rest[..at]);
+            s.push(' ');
+            s.push_str(&rest[at + tw.len()..]);
+            rest = js_trim(&s).to_string();
         }
     }
     for tok in rest.split(is_js_space) {
-        if !tok.is_empty() {
-            mods.push(tok.to_string());
+        if tok.is_empty() {
+            continue;
         }
+        let at = raw
+            .find(tok)
+            .expect("a token is a run of the original characters");
+        mods.push(&raw[at..at + tok.len()]);
     }
     mods
 }
 
-pub fn has_critical(mods: &[String]) -> bool {
-    mods.iter().any(|m| m.eq_ignore_ascii_case("critical"))
+pub fn has_critical<S: AsRef<str>>(mods: &[S]) -> bool {
+    mods.iter()
+        .any(|m| m.as_ref().eq_ignore_ascii_case("critical"))
 }
 
 /// Element-generic so the parser's owned token list and the fold's borrowed one can both ask

@@ -57,28 +57,43 @@ pub fn js_trim(s: &str) -> &str {
 }
 
 /// `JSON.stringify` on a string, including the surrounding quotes.
+///
+/// Clean runs are copied whole and only the rare byte is escaped: the escaped set is `"`, `\` and
+/// the C0 controls, all ASCII, so a cut at one of them is a character boundary and every byte of a
+/// multi-byte character is part of a run. (The string is written for every event; this was a
+/// `push` per char.)
 pub fn write_json_string(out: &mut String, s: &str) {
     out.push('"');
-    for c in s.chars() {
-        match c {
-            '"' => out.push_str("\\\""),
-            '\\' => out.push_str("\\\\"),
-            '\u{8}' => out.push_str("\\b"),
-            '\u{9}' => out.push_str("\\t"),
-            '\u{A}' => out.push_str("\\n"),
-            '\u{C}' => out.push_str("\\f"),
-            '\u{D}' => out.push_str("\\r"),
-            c if (c as u32) < 0x20 => {
-                const HEX: &[u8; 16] = b"0123456789abcdef";
-                let n = c as u32;
-                out.push_str("\\u00");
-                out.push(HEX[((n >> 4) & 0xf) as usize] as char);
-                out.push(HEX[(n & 0xf) as usize] as char);
-            }
-            c => out.push(c),
+    let mut run = 0;
+    for (i, &b) in s.as_bytes().iter().enumerate() {
+        if b >= 0x20 && b != b'"' && b != b'\\' {
+            continue;
+        }
+        out.push_str(&s[run..i]);
+        push_escape(out, b);
+        run = i + 1;
+    }
+    out.push_str(&s[run..]);
+    out.push('"');
+}
+
+/// The escape for one byte of the escaped set.
+fn push_escape(out: &mut String, b: u8) {
+    const HEX: &[u8; 16] = b"0123456789abcdef";
+    match b {
+        b'"' => out.push_str("\\\""),
+        b'\\' => out.push_str("\\\\"),
+        0x08 => out.push_str("\\b"),
+        0x09 => out.push_str("\\t"),
+        0x0A => out.push_str("\\n"),
+        0x0C => out.push_str("\\f"),
+        0x0D => out.push_str("\\r"),
+        _ => {
+            out.push_str("\\u00");
+            out.push(HEX[usize::from(b >> 4)] as char);
+            out.push(HEX[usize::from(b & 0xf)] as char);
         }
     }
-    out.push('"');
 }
 
 /// `JSON.stringify` on a number.
@@ -93,5 +108,67 @@ pub fn write_js_number(out: &mut String, v: f64) {
         // Rust's `Display` for f64 is shortest-round-trip, the same guarantee V8 makes. The two
         // notations only part company past 1e21 / below 1e-6, which no percentage reaches.
         out.push_str(&format!("{v}"));
+    }
+}
+
+#[cfg(test)]
+mod json_string_tests {
+    use super::write_json_string;
+
+    /// The character-at-a-time writer this replaced, kept as the oracle.
+    fn by_char(s: &str) -> String {
+        let mut out = String::from("\"");
+        for c in s.chars() {
+            match c {
+                '"' => out.push_str("\\\""),
+                '\\' => out.push_str("\\\\"),
+                '\u{8}' => out.push_str("\\b"),
+                '\u{9}' => out.push_str("\\t"),
+                '\u{A}' => out.push_str("\\n"),
+                '\u{C}' => out.push_str("\\f"),
+                '\u{D}' => out.push_str("\\r"),
+                c if (c as u32) < 0x20 => {
+                    out.push_str(&format!("\\u{:04x}", c as u32));
+                }
+                c => out.push(c),
+            }
+        }
+        out.push('"');
+        out
+    }
+
+    /// Every escape class, each at the start, in the middle and at the end of a run, beside the
+    /// bytes that are NOT escaped (`/`, DEL, every non-ASCII character), and `serde_json` as a
+    /// second witness that this is `JSON.stringify`'s set.
+    #[test]
+    fn the_run_writer_is_the_char_writer_byte_for_byte() {
+        let cases = [
+            "",
+            "plain",
+            "\"",
+            "\\",
+            "a\"b",
+            "a\\b",
+            "\"\\\"",
+            "\u{8}\t\n\u{C}\r",
+            "tab\there",
+            "nl\n",
+            "\rcr",
+            "\u{0}",
+            "\u{1}x\u{1f}",
+            "\u{B}vertical tab",
+            "del\u{7f}",
+            "slash/",
+            "Ünïcödé mob",
+            "日本語 \"quoted\" \u{2028}",
+            "a rat tries to bite YOU, but misses! (Lucky)",
+            "Velkator tells general2:1, 'rebaseline\rCount items from'",
+        ];
+        for s in cases {
+            let mut got = String::new();
+            write_json_string(&mut got, s);
+            assert_eq!(got, by_char(s), "{s:?}");
+            assert_eq!(got, serde_json::to_string(s).unwrap(), "{s:?}");
+        }
     }
 }
