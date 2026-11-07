@@ -88,6 +88,19 @@ test('an unmeasured viewport renders a SCREENFUL, not a handful', () => {
   assert.ok(unmeasured.end >= 21, `only ${String(unmeasured.end)} rows on an unmeasured first paint`)
 })
 
+test('a list anchored partway down its scroller counts its slice from its own first row', () => {
+  // The Maps sidebar's sections share one scroll box: a section 500px down has not scrolled at
+  // all while the box's scrollTop is under 500, and at scrollTop 500 + 37 * 20 its row 20 is at
+  // the top of the viewport.
+  const atTop = windowSlice({ count: 600, rowHeight: 37, scrollTop: 300, viewport: 600, overscan: 8, offset: 500 })
+  assert.equal(atTop.start, 0)
+  assert.equal(atTop.topPad, 0)
+  const scrolled = windowSlice({ count: 600, rowHeight: 37, scrollTop: 500 + 37 * 20, viewport: 600, overscan: 8, offset: 500 })
+  assert.equal(scrolled.start, 12)
+  assert.ok(scrolled.end >= 20 + 17, `the viewport's own rows are not all in the slice (end=${String(scrolled.end)})`)
+  assertAccountsForEveryPixel(scrolled, 37, 'an anchored window')
+})
+
 // ── the binding ────────────────────────────────────────────────────────────────────────
 
 /** A scroll container, as much of one as the hook actually touches. */
