@@ -21,6 +21,7 @@
 //! form's omitted defaults.
 
 use serde_json::{json, Map, Value};
+use std::borrow::Cow;
 
 use crate::names::{item_key, normalize_item_name, quest_item_key};
 
@@ -61,9 +62,26 @@ pub fn item_names(db: &ItemDb) -> Vec<String> {
     names
 }
 
+/// One local quest use: the row the card shows, with the identity it de-dupes by computed once
+/// at index build rather than on every lookup (a loot burst asks per item).
+#[derive(Clone, Debug)]
+pub struct LocalUse {
+    pub identity: String,
+    pub row: Value,
+}
+
+impl LocalUse {
+    /// A row and its [`quest_identity`].
+    #[must_use]
+    pub fn of(row: Value) -> Self {
+        let identity = quest_identity(row["quest"].as_str().unwrap_or_default());
+        LocalUse { identity, row }
+    }
+}
+
 /// item key → the quests that use it, from both local catalogs: posky FIRST (it carries the
 /// island/giver detail), then the quest catalog, deduped by quest identity.
-pub type QuestUseIndex = std::collections::HashMap<String, Vec<Value>>;
+pub type QuestUseIndex = std::collections::HashMap<String, Vec<LocalUse>>;
 
 /// Index the Plane of Sky dataset by item key → the quests that require it.
 #[must_use]
@@ -80,14 +98,14 @@ fn posky_by_item() -> QuestUseIndex {
                 continue;
             };
             let uses = built.entry(item_key(item)).or_default();
-            if uses.iter().any(|u| u["quest"] == quest.as_str()) {
+            if uses.iter().any(|u| u.row["quest"] == quest.as_str()) {
                 continue;
             }
             let mut use_row = json!({ "quest": quest, "page": q["source"], "source": "posky" });
             if let Some(giver) = q["giver"].as_str() {
                 use_row["giver"] = json!(giver);
             }
-            uses.push(use_row);
+            uses.push(LocalUse::of(use_row));
         }
     }
     built
@@ -118,7 +136,7 @@ fn quests_by_item(quests: &[Value]) -> QuestUseIndex {
             let uses = by_item.entry(quest_item_key(item)).or_default();
             if uses
                 .iter()
-                .any(|u| u["page"] == q["page"] && u["role"] == role)
+                .any(|u| u.row["page"] == q["page"] && u.row["role"] == role)
             {
                 return;
             }
@@ -133,7 +151,7 @@ fn quests_by_item(quests: &[Value]) -> QuestUseIndex {
             if role == "required" && !reward_names.is_empty() {
                 use_row["rewards"] = json!(reward_names);
             }
-            uses.push(use_row);
+            uses.push(LocalUse::of(use_row));
         };
         for it in q["requiredItems"].as_array().unwrap_or(&empty) {
             if let Some(name) = it.as_str() {
@@ -173,22 +191,18 @@ impl LocalQuests {
     }
 
     /// The Plane of Sky dataset FIRST, then the wiki quest catalog, deduped by quest identity.
-    /// Empty when neither local source knows this item — never an empty claim.
+    /// Empty when neither local source knows this item — never an empty claim. `key` is the item's
+    /// [`item_key`], which the caller already holds.
     #[must_use]
-    pub fn for_item(&self, name: &str) -> Vec<Value> {
-        let key = item_key(name);
-        let posky = self.posky.get(&key);
-        let quests = self.quests.get(&key);
+    pub fn for_key(&self, key: &str) -> Vec<LocalUse> {
+        let posky = self.posky.get(key);
+        let quests = self.quests.get(key);
         if posky.is_none() && quests.is_none() {
             return Vec::new();
         }
-        let mut uses: Vec<Value> = posky.cloned().unwrap_or_default();
+        let mut uses: Vec<LocalUse> = posky.cloned().unwrap_or_default();
         for u in quests.into_iter().flatten() {
-            let nu = quest_identity(u["quest"].as_str().unwrap_or_default());
-            if !uses
-                .iter()
-                .any(|x| quest_identity(x["quest"].as_str().unwrap_or_default()) == nu)
-            {
+            if !uses.iter().any(|x| x.identity == u.identity) {
                 uses.push(u.clone());
             }
         }
@@ -238,19 +252,25 @@ pub fn knowledge_from_db(entry: &Value, display: &str) -> Value {
 /// posky labels a quest `Class · Quest Name` where the name often already carries the class
 /// ("Paladin · Paladin Test of Love"), while a wiki link label is the bare "Paladin Test of Love".
 #[must_use]
-pub fn merge_local(base: Value, local: &[Value]) -> Value {
+pub fn merge_local(base: Value, local: &[LocalUse]) -> Value {
     if local.is_empty() {
         return base;
     }
-    let mut uses: Vec<Value> = local.to_vec();
+    let mut uses: Vec<Value> = local.iter().map(|u| u.row.clone()).collect();
+    // The identities of `uses`, kept in step with it: a page-stated quest is compared against the
+    // local rows AND the page rows already kept, as the growing list was before.
+    let mut ids: Vec<Cow<str>> = local
+        .iter()
+        .map(|u| Cow::Borrowed(u.identity.as_str()))
+        .collect();
     let existing = base["questUses"].as_array().cloned().unwrap_or_default();
     for u in existing {
         let nu = quest_identity(u["quest"].as_str().unwrap_or_default());
-        let known = uses.iter().any(|x| {
-            let nx = quest_identity(x["quest"].as_str().unwrap_or_default());
-            nx == nu || nx.contains(&nu) || nu.contains(&nx)
-        });
+        let known = ids
+            .iter()
+            .any(|nx| nx.as_ref() == nu || nx.contains(nu.as_str()) || nu.contains(nx.as_ref()));
         if !known {
+            ids.push(Cow::Owned(nu));
             uses.push(u);
         }
     }
@@ -268,7 +288,7 @@ pub fn merge_local(base: Value, local: &[Value]) -> Value {
 /// answered", which is exactly true and is the state the renderer treats as retryable — and the
 /// retry is the `knowledgeMiss` frame.
 #[must_use]
-pub fn unanswered(display: &str, local: &[Value]) -> Value {
+pub fn unanswered(display: &str, local: &[LocalUse]) -> Value {
     merge_local(
         json!({
             "name": display,
@@ -289,7 +309,7 @@ pub fn display_of(name: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::{knowledge_from_db, merge_local, quest_identity, unanswered};
+    use super::{knowledge_from_db, merge_local, quest_identity, unanswered, LocalUse};
     use serde_json::json;
 
     #[test]
@@ -324,7 +344,9 @@ mod tests {
             "name": "Guard Bracelet", "lore": false, "quest": false,
             "questUses": [{ "quest": "Corrupt Guards", "source": "wiki" }]
         });
-        let local = vec![json!({ "quest": "Guards · Corrupt Guards", "source": "quests" })];
+        let local = vec![LocalUse::of(
+            json!({ "quest": "Guards · Corrupt Guards", "source": "quests" }),
+        )];
         let out = merge_local(base, &local);
         assert_eq!(out["quest"], true);
         assert_eq!(
@@ -337,7 +359,9 @@ mod tests {
 
     #[test]
     fn an_unanswered_name_still_carries_what_the_local_sources_knew() {
-        let local = vec![json!({ "quest": "Bard · Bard Test of Tone", "source": "posky" })];
+        let local = vec![LocalUse::of(
+            json!({ "quest": "Bard · Bard Test of Tone", "source": "posky" }),
+        )];
         let out = unanswered("Wind Rune Meda", &local);
         assert_eq!(
             out["offline"], true,
