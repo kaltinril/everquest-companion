@@ -62,7 +62,7 @@ mod tests {
     }
 
     #[test]
-    fn the_overlay_is_served_here_not_in_buffs_and_a_mined_line_moves_only_its_cursor() {
+    fn the_overlay_is_served_here_not_in_buffs_and_a_fed_line_moves_only_its_cursor() {
         let facts = SpellFacts::default();
         let core = super::super::buffs::shared_core(facts.clone());
         let mut buffs = super::super::buffs::BuffsModule::new(facts, core);
@@ -74,8 +74,10 @@ mod tests {
         let cast = r#"{"kind":"castBegin","spell":"Bramblecoat","ts":1000,"seq":7,"raw":"[Mon Oct 26 12:00:00 2026] You begin casting Bramblecoat."}"#;
         feed(&mut buffs, cast);
         feed(&mut overlay, cast);
-        // The anchor alone moves no count, so nothing a client can read has changed.
-        assert_eq!(overlay.published_seq(), before);
+        // The anchor moved the miner's clock, so the cursor moves with it (a kept answer at the
+        // old cursor would carry a stale `updatedAt`).
+        let anchored = overlay.published_seq();
+        assert!(anchored > before, "{before:?} -> {anchored:?}");
         let landing = r#"{"kind":"buffApply","target":"self","ts":2000,"seq":8,"raw":"[Mon Oct 26 12:00:01 2026] Your skin sprouts brambles.","candidates":[{"name":"Bramblecoat"}]}"#;
         feed(&mut buffs, landing);
         feed(&mut overlay, landing);
