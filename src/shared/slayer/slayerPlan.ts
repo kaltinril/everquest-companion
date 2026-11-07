@@ -41,7 +41,6 @@ import { eraVerdict } from '../planner/era'
 import { ZONES, zoneKey, zoneShortNameFromCatalog } from '../zones'
 import {
   labelMatcher,
-  matchMob,
   mobFacts,
   strictMatcher,
   type LabelMatcher,
@@ -219,17 +218,53 @@ export function keptMob(mob: SlayerMob, cap: MobCap): boolean {
   return withinLevel(mob, cap.maxLevel) && !(cap.noFactionHits && mob.factionHit)
 }
 
-/** The mob as one zone row's line, or null when it counts toward nothing picked. */
-function planMob(mob: SlayerMob, targets: readonly SlayerTarget[]): PlanMob | null {
-  const hits: string[] = []
-  let basis: MatchBasis = 'race'
-  for (const t of targets) {
-    const how = matchMob(t.matcher, mob.facts)
-    if (how === null) continue
-    hits.push(t.id)
-    if (how === 'name') basis = 'name'
+/** The picked counters inverted: each wiki race and each term to the counters (by position) that
+ *  claim it, so a mob reads its few counters instead of being matched against every one (whole-app
+ *  review 2026-11-06). Positions ascend in each list, so the hits keep the pick order. */
+interface TargetIndex {
+  targets: readonly SlayerTarget[]
+  byRace: ReadonlyMap<string, readonly number[]>
+  byTerm: ReadonlyMap<string, readonly number[]>
+}
+
+function targetIndex(targets: readonly SlayerTarget[]): TargetIndex {
+  const byRace = new Map<string, number[]>()
+  const byTerm = new Map<string, number[]>()
+  const add = (m: Map<string, number[]>, k: string, i: number): void => {
+    const had = m.get(k)
+    if (had === undefined) m.set(k, [i])
+    else had.push(i)
   }
-  if (hits.length === 0) return null
+  targets.forEach((t, i) => {
+    for (const race of t.matcher.races) add(byRace, race, i)
+    for (const term of t.matcher.terms) add(byTerm, term, i)
+  })
+  return { targets, byRace, byTerm }
+}
+
+/** The counters (by position, ascending) a mob counts toward, and the row's basis: the same answer
+ *  as `matchMob` per counter. A race claim is 'race'; a counter reached by a term alone is 'name',
+ *  and one such counter makes the row's basis 'name'. Null when it counts toward nothing picked. */
+function hitsOf(facts: MobFacts, index: TargetIndex): { at: readonly number[]; basis: MatchBasis } | null {
+  const raced = facts.race === '' ? undefined : index.byRace.get(facts.race)
+  let named: number[] | undefined
+  for (const term of facts.nameTerm === null ? facts.always : [...facts.always, facts.nameTerm]) {
+    const claimed = index.byTerm.get(term)
+    if (claimed !== undefined) (named ??= []).push(...claimed)
+  }
+  // Most of the catalog counts toward nothing picked: no allocation on that path.
+  if (raced === undefined && named === undefined) return null
+  if (named === undefined) return { at: raced ?? [], basis: 'race' }
+  const basis: MatchBasis = named.some((i) => !raced?.includes(i)) ? 'name' : 'race'
+  return { at: [...new Set([...(raced ?? []), ...named])].sort((a, b) => a - b), basis }
+}
+
+/** The mob as one zone row's line, or null when it counts toward nothing picked. */
+function planMob(mob: SlayerMob, index: TargetIndex): PlanMob | null {
+  const found = hitsOf(mob.facts, index)
+  if (found === null) return null
+  const { basis } = found
+  const hits = found.at.map((i) => index.targets[i].id)
   const { entry } = mob
   return {
     entry,
@@ -274,9 +309,10 @@ export function planZones(
 ): PlanZone[] {
   const zones = new Map<string, PlanZone>()
   const levels = new Map<PlanZone, { sum: number; spawns: number }>()
+  const index = targetIndex(targets)
   for (const mob of mobs) {
     if (!keptMob(mob, opts)) continue
-    const row = planMob(mob, targets)
+    const row = planMob(mob, index)
     if (row === null) continue
     for (const place of keptPlaces(mob, opts)) {
       const { key } = place
