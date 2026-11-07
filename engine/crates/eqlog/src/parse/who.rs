@@ -5,6 +5,7 @@ use crate::event::{Ev, Key, Kind};
 use crate::jsstr::js_trim;
 use regex::Regex;
 
+use super::needles::Needle;
 use super::Ctx;
 
 const CLASS_UNLOCK_PREFIX: &str = "You have completed achievement: Primary Class Unlock - ";
@@ -52,7 +53,7 @@ pub fn classify_self_who(r: &WhoRes, character: Option<&str>, c: &Ctx, out: &mut
     let Some(self_name) = character.filter(|s| !s.is_empty()) else {
         return false;
     };
-    if !c.text.contains("ZONE: ") {
+    if !c.has(Needle::Zone) {
         return false;
     }
     let Some(m) = r.who_row.captures(c.text) else {

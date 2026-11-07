@@ -11,6 +11,7 @@ use crate::taxonomy::{damage_category, has_critical, parse_modifiers};
 use regex::Regex;
 use std::borrow::Cow;
 
+use super::needles::Needle;
 use super::Ctx;
 
 /// The melee verbs, first- and third-person, are `melee.rs`'s tables: the melee line is split by
@@ -221,8 +222,8 @@ fn avoid_type(verb: &str) -> &'static str {
 
 /// Misses / avoided swings (by far the most common combat line).
 pub fn classify_miss(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
-    if !(c.text.contains(", but ")
-        && (c.text.starts_with("You try to ") || c.text.contains(" tries to ")))
+    if !(c.has(Needle::ButComma)
+        && (c.text.starts_with("You try to ") || c.has(Needle::TriesTo)))
     {
         return false;
     }
@@ -293,7 +294,7 @@ pub fn classify_mitigation(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
 /// Spell resists — the caster-side "miss".
 pub fn classify_resist(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
     let text = c.text;
-    if !(text.contains("resist") && !text.contains("points of") && text.ends_with('!')) {
+    if !(c.has(Needle::Resist) && !c.has(Needle::PointsOf) && text.ends_with('!')) {
         return false;
     }
     if text.starts_with("You resist") {
@@ -338,7 +339,7 @@ fn points_damage(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
     // sentences end in "non-melee damage", a typed spell hit says " damage by ", a melee hit ends
     // its sentence " of damage.". (Measured 2026-11-06: the three refusals ahead of every melee
     // line were ~300 ms of a 68 MB fold.)
-    let non_melee = text.contains("non-melee damage");
+    let non_melee = c.has(Needle::NonMeleeDamage);
     if non_melee {
         if let Some(m) = r.ds.captures(text) {
             return ds_damage(c, out, r, &m);
@@ -359,12 +360,12 @@ fn points_damage(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
             return true;
         }
     }
-    if text.contains(" damage by ") {
+    if c.has(Needle::DamageBy) {
         if let Some(m) = r.spell.captures(text) {
             return spell_damage(c, out, &m);
         }
     }
-    if text.contains(" of damage.") {
+    if c.has(Needle::OfDamageStop) {
         if let Some(hit) = super::melee::split(text) {
             return melee_damage(c, out, &hit);
         }
@@ -518,8 +519,8 @@ fn sourceless_damage(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
 
 /// Damage: melee / spell / dot / damage-shield, behind the shared substring gates.
 pub fn classify_damage(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
-    let has_points = c.text.contains("points of") || c.text.contains("point of");
-    let has_taken = c.text.contains("has taken") || c.text.contains("have taken");
+    let has_points = c.has(Needle::PointsOf) || c.has(Needle::PointOf);
+    let has_taken = c.has(Needle::HasTaken) || c.has(Needle::HaveTaken);
     if has_points && points_damage(r, c, out) {
         return true;
     }
@@ -538,7 +539,7 @@ pub fn classify_heal(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
         out.s(Key::Target, "You");
         return true;
     }
-    if !c.text.contains(" healed ") {
+    if !c.has(Needle::Healed) {
         return false;
     }
     let Some(m) = r.heal.captures(c.text) else {

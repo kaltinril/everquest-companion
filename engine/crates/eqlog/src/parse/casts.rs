@@ -10,6 +10,7 @@ use regex::Regex;
 use std::collections::HashMap;
 
 use super::data::{POISON_BY_COAT_MSG, POISON_DRY_MSG, POISON_PROCS};
+use super::needles::Needle;
 use super::Ctx;
 
 /// The six exact sentences a pet speaks out loud, in order.
@@ -143,7 +144,7 @@ pub fn classify_cast_lifecycle(r: &CastRes, c: &Ctx, out: &mut Ev) -> bool {
     if text.starts_with("You begin ") && own_cast_begin(r, c, out) {
         return true;
     }
-    if text.contains(" begins casting ") || text.contains(" begins singing ") {
+    if c.has(Needle::BeginsCasting) || c.has(Needle::BeginsSinging) {
         if let Some(m) = r.other_cast_begin.captures(text) {
             if id_key(&m[1]) != "you" {
                 out.begin(Kind::OtherCastBegin);
@@ -159,11 +160,11 @@ pub fn classify_cast_lifecycle(r: &CastRes, c: &Ctx, out: &mut Ev) -> bool {
     // `You miss a note, bringing your <X> to a close!` (190 lines over 6 songs in the owner's
     // 2026-09-25 log, every one preceded by `You begin singing <X>.`), and it is the same event.
     for (gate, re, kind) in [
-        ("spell fizzles!", &r.cast_fizzle, Kind::CastFizzle),
-        ("interrupted.", &r.cast_interrupt, Kind::CastInterrupted),
-        (" to a close!", &r.song_close, Kind::CastInterrupted),
+        (Needle::SpellFizzles, &r.cast_fizzle, Kind::CastFizzle),
+        (Needle::Interrupted, &r.cast_interrupt, Kind::CastInterrupted),
+        (Needle::ToAClose, &r.song_close, Kind::CastInterrupted),
     ] {
-        if text.contains(gate) {
+        if c.has(gate) {
             if let Some(m) = re.captures(text) {
                 out.begin(kind);
                 out.envelope(c.seq, c.ts, c.raw);
@@ -182,7 +183,7 @@ pub fn classify_cast_lifecycle(r: &CastRes, c: &Ctx, out: &mut Ev) -> bool {
 
 /// Charm application, with the DB-gated candidate list.
 pub fn classify_charm(r: &CastRes, db: Option<&SpellDb>, c: &Ctx, out: &mut Ev) -> bool {
-    if c.text.contains("has been charmed") {
+    if c.has(Needle::HasBeenCharmed) {
         let Some(m) = r.charm.captures(c.text) else {
             return false;
         };
@@ -239,7 +240,7 @@ fn classify_non_enchanter_charm(db: Option<&SpellDb>, c: &Ctx, out: &mut Ev) -> 
 /// "worn off" — uncharm, CC refresh or named-target fade, else the targetless self/pet fade.
 pub fn classify_worn_off(r: &CastRes, db: Option<&SpellDb>, c: &Ctx, out: &mut Ev) -> bool {
     let text = c.text;
-    if text.contains("worn off of") {
+    if c.has(Needle::WornOffOf) {
         let Some(m) = r.uncharm.captures(text) else {
             return false;
         };
@@ -268,7 +269,7 @@ pub fn classify_worn_off(r: &CastRes, db: Option<&SpellDb>, c: &Ctx, out: &mut E
         out.s(Key::Spell, crate::jsstr::js_trim(&m[1]));
         out.s(Key::Target, &norm(&m[2]));
         return true;
-    } else if text.contains("worn off.") {
+    } else if c.has(Needle::WornOffStop) {
         if let Some(m) = r.buff_fade_pet.captures(text) {
             out.begin(Kind::BuffFade);
             out.envelope(c.seq, c.ts, c.raw);
@@ -288,7 +289,7 @@ pub fn classify_worn_off(r: &CastRes, db: Option<&SpellDb>, c: &Ctx, out: &mut E
 
 /// Crowd-control application (mez/root, not charm), with the DB-gated candidate list.
 pub fn classify_cc_apply(r: &CastRes, db: Option<&SpellDb>, c: &Ctx, out: &mut Ev) -> bool {
-    if !c.text.contains("has been ") {
+    if !c.has(Needle::HasBeen) {
         return false;
     }
     let Some(m) = r.cc_apply.captures(c.text) else {
@@ -313,7 +314,7 @@ pub fn classify_cc_apply(r: &CastRes, db: Option<&SpellDb>, c: &Ctx, out: &mut E
 }
 
 pub fn classify_cc_wake(r: &CastRes, c: &Ctx, out: &mut Ev) -> bool {
-    if !c.text.contains(" has been awakened by ") {
+    if !c.has(Needle::HasBeenAwakenedBy) {
         return false;
     }
     let Some(m) = r.cc_wake.captures(c.text) else {
@@ -327,7 +328,7 @@ pub fn classify_cc_wake(r: &CastRes, c: &Ctx, out: &mut Ev) -> bool {
 }
 
 pub fn classify_pet_claim(r: &CastRes, c: &Ctx, out: &mut Ev) -> bool {
-    if !c.text.contains(" told you, '") {
+    if !c.has(Needle::ToldYou) {
         return false;
     }
     let Some(m) = r.pet_claim.captures(c.text) else {
@@ -341,7 +342,7 @@ pub fn classify_pet_claim(r: &CastRes, c: &Ctx, out: &mut Ev) -> bool {
 }
 
 pub fn classify_pet_say(r: &CastRes, c: &Ctx, out: &mut Ev) -> bool {
-    if !c.text.contains(" says, '") {
+    if !c.has(Needle::Says) {
         return false;
     }
     let Some(m) = r.pet_say.captures(c.text) else {
@@ -362,7 +363,7 @@ pub fn classify_pet_leader(r: &CastRes, character: Option<&str>, c: &Ctx, out: &
     let Some(self_name) = character.filter(|s| !s.is_empty()) else {
         return false;
     };
-    if !c.text.contains(" says, 'My leader is ") {
+    if !c.has(Needle::SaysMyLeaderIs) {
         return false;
     }
     let Some(m) = r.pet_leader.captures(c.text) else {
@@ -388,7 +389,7 @@ pub fn classify_ally_pet_leader(
     let Some(self_name) = character.filter(|s| !s.is_empty()) else {
         return false;
     };
-    if !c.text.contains(" says, 'My leader is ") {
+    if !c.has(Needle::SaysMyLeaderIs) {
         return false;
     }
     let Some(m) = r.pet_leader.captures(c.text) else {
@@ -519,7 +520,7 @@ pub fn classify_poison_coat(r: &CastRes, c: &Ctx, out: &mut Ev) -> bool {
         out.s(Key::Who, "you");
         return true;
     }
-    if text.contains("coats their blades in ") {
+    if c.has(Needle::CoatsTheirBladesIn) {
         if let Some(m) = r.coat_other_named.captures(text) {
             let probe = format!("You coat your blades in {}.", crate::jsstr::js_trim(&m[2]));
             let p = POISON_BY_COAT_MSG.iter().find(|(msg, _, _)| *msg == probe);

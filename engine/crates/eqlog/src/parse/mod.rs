@@ -12,6 +12,7 @@ pub mod data;
 pub mod group;
 pub mod melee;
 pub mod miss;
+pub mod needles;
 pub mod session;
 pub mod who;
 pub mod world;
@@ -89,6 +90,16 @@ pub struct Ctx<'a> {
     pub ts: i64,
     pub seq: i64,
     pub raw: &'a str,
+    /// Which gate substrings the line carries, found in one pass (`needles.rs`).
+    pub hits: needles::Hits,
+}
+
+impl Ctx<'_> {
+    /// `self.text.contains(needle)`, answered from the one pass.
+    #[inline]
+    pub fn has(&self, n: needles::Needle) -> bool {
+        self.hits.has(n)
+    }
 }
 
 /// The parser, and everything a parse is a pure function of: the bytes, the spell DB, and the
@@ -104,6 +115,7 @@ pub struct Parser {
     /// line of one second carries the same 24 bytes, so the regex and the zone lookup run once per
     /// second of play rather than once per line. (Measured 2026-11-06: 430 ms of a 68 MB fold.)
     stamp_memo: RefCell<Option<(String, i64)>>,
+    needles: needles::Needles,
     combat: combat::CombatRes,
     casts: casts::CastRes,
     world: world::WorldRes,
@@ -138,6 +150,7 @@ impl Parser {
             db,
             character,
             stamp_memo: RefCell::new(None),
+            needles: needles::Needles::new(),
             combat: combat::CombatRes::new(),
             casts: casts::CastRes::new(),
             world: world::WorldRes::new(),
@@ -158,7 +171,14 @@ impl Parser {
         if ts == 0 {
             self.unparsed_stamps.set(self.unparsed_stamps.get() + 1);
         }
-        let c = Ctx { text, ts, seq, raw };
+        let hits = self.needles.scan(text);
+        let c = Ctx {
+            text,
+            ts,
+            seq,
+            raw,
+            hits,
+        };
         self.classify(&c, out);
         true
     }
