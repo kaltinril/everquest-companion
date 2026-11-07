@@ -146,16 +146,16 @@ pub fn note_hit(st: &mut EngineState, ev: &DamageEvent<'_>) {
 }
 
 /// A heal, kept when it landed on you (`You` or your own name).
-pub fn note_heal(st: &mut EngineState, ev: &HealLine) {
-    let target = id_key_ref(&ev.target);
+pub fn note_heal(st: &mut EngineState, ev: &HealLine<'_>) {
+    let target = id_key_ref(ev.target);
     let on_you = target == "you" || st.player_key.as_deref() == Some(target.as_ref());
     if ev.amount <= 0 || !on_you {
         return;
     }
     st.recaps.heal(RecapHeal {
         ts: ev.ts,
-        source: ev.healer.clone().unwrap_or_else(|| "Unknown".to_string()),
-        spell: ev.spell.clone(),
+        source: ev.healer.unwrap_or("Unknown").to_string(),
+        spell: ev.spell.map(str::to_string),
         amount: ev.amount,
     });
 }

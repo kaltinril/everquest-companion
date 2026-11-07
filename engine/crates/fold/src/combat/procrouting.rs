@@ -81,12 +81,9 @@ pub fn route_coat(st: &mut EngineState, ev: &CoatLine) {
     if id_key(ev.who) != "you" {
         // Somebody else's blades: nothing models a stranger's poison, but the line is worth showing
         // to a person scanning the processing log.
-        st.log(
-            ev.ts,
-            "poison",
-            "info",
-            format!("☠ {} coated their blades", ev.who),
-        );
+        st.log_lazy(ev.ts, "poison", "info", || {
+            format!("☠ {} coated their blades", ev.who)
+        });
         return;
     }
     let slot = CoatSlot {
@@ -137,12 +134,14 @@ pub fn route_coat(st: &mut EngineState, ev: &CoatLine) {
         let name = ev.poison.to_string();
         commit_state(st, StateKind::Coat, &key, &name, ev.ts, Some(group));
     }
-    let group = if ev.group == "unknown" {
-        String::new()
-    } else {
-        format!(" ({})", ev.group)
-    };
-    st.log(ev.ts, "poison", "info", format!("☠ coated: {label}{group}"));
+    st.log_lazy(ev.ts, "poison", "info", || {
+        let group = if ev.group == "unknown" {
+            String::new()
+        } else {
+            format!(" ({})", ev.group)
+        };
+        format!("☠ coated: {label}{group}")
+    });
 }
 
 /// A coat wore off or was replaced. The line names no poison, only which family dried:
@@ -168,7 +167,7 @@ pub fn route_dry(st: &mut EngineState, group: &str, ts: i64) {
     };
     st.state_timeline.close_group_prefix(prefix, ts, evidence);
     note_state_transition(st, prefix, ts);
-    st.log(ts, "poison", "info", format!("☠ {group} coat dried"));
+    st.log_lazy(ts, "poison", "info", || format!("☠ {group} coat dried"));
 }
 
 /// Strip every blade coat, both families, and end their open spans at `ts`.
@@ -196,12 +195,9 @@ pub fn clear_coats(st: &mut EngineState, ts: i64, reason: CoatClearReason) -> bo
     // Coats come back only when a new coat line is folded. No clear writes a coat observation, which
     // keeps this one-directional against the class model that triggers it — a coat is ROG evidence,
     // so a clear feeding back into the inference would be a loop.
-    st.log(
-        ts,
-        "poison",
-        "info",
-        format!("☠ blades bare - {}", reason.note()),
-    );
+    st.log_lazy(ts, "poison", "info", || {
+        format!("☠ blades bare - {}", reason.note())
+    });
     true
 }
 
@@ -343,7 +339,7 @@ pub fn route_proc(st: &mut EngineState, ev: &ProcLine) {
     st.zone_agg
         .procs
         .add_strike(&label, ambiguous, ev.ts, is_slow);
-    st.log(ev.ts, "poison", "you", format!("☠ {label} → {target}"));
+    st.log_lazy(ev.ts, "poison", "you", || format!("☠ {label} → {target}"));
 }
 
 /// Count a dispel landing on an engaged hostile.

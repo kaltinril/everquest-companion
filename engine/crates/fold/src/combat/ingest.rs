@@ -140,8 +140,9 @@ fn ingest_world(st: &mut EngineState, ev: &Event) -> bool {
             // Somebody else's charm cannot survive a zone either, and neither can a cast in flight.
             // The friendly set survives — it is about people, not about the room.
             st.ally.zone();
-            let zone = ev.str(Key::Zone).unwrap_or_default().to_owned();
-            st.log(ev.ts(), "zone", "info", format!("▸ entered {zone}"));
+            st.log_lazy(ev.ts(), "zone", "info", || {
+                format!("▸ entered {}", ev.str(Key::Zone).unwrap_or_default())
+            });
             true
         }
         Kind::Charm => {
@@ -190,7 +191,9 @@ fn ingest_world(st: &mut EngineState, ev: &Event) -> bool {
                 st.drain_retirements();
                 st.pet_names.remove(&key);
                 st.charm.release(&key);
-                st.log(ev.ts(), "uncharm", "info", format!("✕ charm broke: {mob}"));
+                st.log_lazy(ev.ts(), "uncharm", "info", || {
+                    format!("✕ charm broke: {mob}")
+                });
             }
             true
         }
@@ -253,12 +256,9 @@ fn ingest_charm(st: &mut EngineState, ev: &Event) {
     let (label, id) = (inst.label.clone(), inst.instance_id.clone());
     st.drain_retirements();
     st.note_pet(&key);
-    st.log(
-        ev.ts(),
-        "charm",
-        "info",
-        format!("⚡ charmed {label} [{id}]"),
-    );
+    st.log_lazy(ev.ts(), "charm", "info", || {
+        format!("⚡ charmed {label} [{id}]")
+    });
 }
 
 /// The parenthetical a claim's ring line carries, one per route.
@@ -287,12 +287,9 @@ fn bind_pet_claim(st: &mut EngineState, name: &str, ts: i64, via: &str) {
     let key = id_key(name);
     // `says` is forgeable: a person saying it is no pet, and binding one retires the real pet.
     if via == "leader" && st.is_player_side(&key) {
-        st.log(
-            ts,
-            "pet",
-            "info",
-            format!("✕ {name} named you its leader but is a player - not bound"),
-        );
+        st.log_lazy(ts, "pet", "info", || {
+            format!("✕ {name} named you its leader but is a player - not bound")
+        });
         return;
     }
     // Anything that names itself yours stops being anybody else's. All three claim routes are
@@ -321,23 +318,17 @@ fn bind_pet_claim(st: &mut EngineState, name: &str, ts: i64, via: &str) {
     // claim inside the grace window means the nudge was never drawn at all.
     st.pet_nudge.note_bound();
     let what = if promote { "charm claim" } else { "pet claim" };
-    st.log(
-        ts,
-        if promote { "charm" } else { "pet" },
-        "info",
-        format!("⚡ {what} {label} [{id}]{}", claim_note(via)),
-    );
+    st.log_lazy(ts, if promote { "charm" } else { "pet" }, "info", || {
+        format!("⚡ {what} {label} [{id}]{}", claim_note(via))
+    });
     // Single-pet succession: claiming a new summoned pet retires the previous one inside the world
     // model, and the name index has to follow it out or routing would go on admitting the retired
     // pet's swings as yours. The world model decides; the index and the charm model are told.
     for gone in st.sync_pet_names() {
         st.charm.release(&gone);
-        st.log(
-            ts,
-            "pet",
-            "info",
-            format!("✕ {gone} retired - one pet at a time; {name} is yours now"),
-        );
+        st.log_lazy(ts, "pet", "info", || {
+            format!("✕ {gone} retired - one pet at a time; {name} is yours now")
+        });
     }
 }
 
@@ -396,15 +387,12 @@ fn ingest_ally_pet_leader(st: &mut EngineState, ev: &Event) -> Option<SourceRef>
     } else {
         "charmed"
     };
-    st.log(
-        ev.ts(),
-        "charm",
-        "info",
+    st.log_lazy(ev.ts(), "charm", "info", || {
         format!(
             "⚡ {pet} named {} its leader ({shape}) - crediting its damage to them",
             bind.charmer
-        ),
-    );
+        )
+    });
     Some(routing::ally_pet_source(&bind))
 }
 
@@ -423,13 +411,12 @@ fn ingest_cc(st: &mut EngineState, ev: &Event) {
         // A stranger's crowd control is an observation about the room, not an event in our fight,
         // and the refusal is said out loud — a line dropped on purpose is otherwise invisible to a
         // bug report.
-        let mob = ev.str(Key::Mob).unwrap_or_default().to_owned();
-        st.log(
-            ev.ts(),
-            "cc",
-            "dropped",
-            format!("✜ CC on {mob} - not ours (no own cast to resolve)"),
-        );
+        st.log_lazy(ev.ts(), "cc", "dropped", || {
+            format!(
+                "✜ CC on {} - not ours (no own cast to resolve)",
+                ev.str(Key::Mob).unwrap_or_default()
+            )
+        });
         return;
     }
     let Some(mob) = ev.str(Key::Mob).map(str::to_string) else {
@@ -440,7 +427,6 @@ fn ingest_cc(st: &mut EngineState, ev: &Event) {
     if inst.instance_id == "you" {
         return;
     }
-    let label = inst.label.clone();
     ensure_encounter(st, ev.ts());
     let enc = st.current.as_mut().expect("just ensured");
     enc.engage(&inst.instance_id, ev.ts());
@@ -448,11 +434,13 @@ fn ingest_cc(st: &mut EngineState, ev: &Event) {
         .insert(inst.instance_id, ev.ts() + CC_HOLD_MS);
     st.last_activity_ts = ev.ts();
     let tag = if refresh { "refresh" } else { "applied" };
-    let spell = match ev.str(Key::Spell) {
-        Some(s) => format!(" ({s})"),
-        None => String::new(),
-    };
-    st.log(ev.ts(), "cc", "info", format!("✜ CC {tag}: {label}{spell}"));
+    st.log_lazy(ev.ts(), "cc", "info", || {
+        let spell = match ev.str(Key::Spell) {
+            Some(s) => format!(" ({s})"),
+            None => String::new(),
+        };
+        format!("✜ CC {tag}: {}{spell}", inst.label)
+    });
 }
 
 fn ingest_death(st: &mut EngineState, ev: &Event) {
@@ -465,12 +453,9 @@ fn ingest_death(st: &mut EngineState, ev: &Event) {
     // direction: it risks losing a few seconds of a survivor's damage rather than crediting a
     // stranger with a corpse's.
     if let Some(gone) = st.ally.release(&key) {
-        st.log(
-            ev.ts(),
-            "charm",
-            "dropped",
-            format!("✕ {} died - {}'s pet is gone", gone.display, gone.charmer),
-        );
+        st.log_lazy(ev.ts(), "charm", "dropped", || {
+            format!("✕ {} died - {}'s pet is gone", gone.display, gone.charmer)
+        });
     }
     let killer_key = if ev.bool(Key::BySelf) {
         Some("you".to_string())
@@ -478,14 +463,11 @@ fn ingest_death(st: &mut EngineState, ev: &Event) {
         ev.str(Key::Killer).map(id_key)
     };
     let res = st.world.death(&name, ev.ts(), killer_key.as_deref());
-    let pet_note = if res.was_pet { " (pet)" } else { "" };
-    let amb_note = if res.ambiguous { " ~ambiguous" } else { "" };
-    st.log(
-        ev.ts(),
-        "death",
-        "info",
-        format!("☠ {name} died{pet_note}{amb_note} - {}", res.reason),
-    );
+    st.log_lazy(ev.ts(), "death", "info", || {
+        let pet_note = if res.was_pet { " (pet)" } else { "" };
+        let amb_note = if res.ambiguous { " ~ambiguous" } else { "" };
+        format!("☠ {name} died{pet_note}{amb_note} - {}", res.reason)
+    });
     // The retired instance stays in `engaged` — so an in-fight heal on the corpse still counts —
     // because closure consults `is_retired`, not set membership. Its CC hold is cleared by the world
     // model's retirement announcement, which is what makes death and staleness agree.
@@ -517,24 +499,24 @@ fn ingest_combat(st: &mut EngineState, ev: &Event) -> bool {
         Kind::Heal => {
             let line = HealLine {
                 ts: ev.ts(),
-                target: ev.str(Key::Target).unwrap_or_default().to_string(),
-                healer: ev.str(Key::Healer).map(str::to_string),
+                target: ev.str(Key::Target).unwrap_or_default(),
+                healer: ev.str(Key::Healer),
                 amount: ev.int(Key::Amount).unwrap_or(0),
                 raw_amount: ev.int(Key::RawAmount),
-                spell: ev.str(Key::Spell).map(str::to_string),
+                spell: ev.str(Key::Spell),
                 crit: ev.bool(Key::Crit),
             };
             routing::route_heal(st, &line);
             deathrecap::note_heal(st, &line);
             fold_heal_analytics(st, &line, ev.bool(Key::OverTime));
             st.log_lazy(line.ts, "heal", "info", || {
-                let spell = match &line.spell {
+                let spell = match line.spell {
                     Some(s) => format!(" ({s})"),
                     None => String::new(),
                 };
                 format!(
                     "+ {} → {} {}{spell}",
-                    line.healer.as_deref().unwrap_or("?"),
+                    line.healer.unwrap_or("?"),
                     line.target,
                     line.amount
                 )
@@ -547,16 +529,13 @@ fn ingest_combat(st: &mut EngineState, ev: &Event) -> bool {
         Kind::HealUnstated => {
             routing::route_heal_unstated(st, ev.ts(), ev.str(Key::Skill).unwrap_or_default());
             // …and the ring says so rather than printing a 0 that reads like a measurement.
-            let (target, skill) = (
-                ev.str(Key::Target).unwrap_or_default().to_owned(),
-                ev.str(Key::Skill).unwrap_or_default().to_owned(),
-            );
-            st.log(
-                ev.ts(),
-                "heal",
-                "info",
-                format!("+ {target} {skill} (amount not stated)"),
-            );
+            st.log_lazy(ev.ts(), "heal", "info", || {
+                format!(
+                    "+ {} {} (amount not stated)",
+                    ev.str(Key::Target).unwrap_or_default(),
+                    ev.str(Key::Skill).unwrap_or_default()
+                )
+            });
             true
         }
         // Damage PREVENTED, not hit points restored: it never touches a damage total, but it does
@@ -570,7 +549,7 @@ fn ingest_combat(st: &mut EngineState, ev: &Event) -> bool {
                     amount: ev.int(Key::Amount),
                 },
             );
-            st.log(ev.ts(), "mitigation", "info", mitigation_line(ev));
+            st.log_lazy(ev.ts(), "mitigation", "info", || mitigation_line(ev));
             true
         }
         Kind::Miss => {
@@ -612,24 +591,24 @@ fn ingest_combat(st: &mut EngineState, ev: &Event) -> bool {
             true
         }
         Kind::Resist => {
-            let caster = ev.str(Key::Caster).unwrap_or_default().to_string();
-            let spell = ev.str(Key::Spell).unwrap_or_default().to_string();
+            let caster = ev.str(Key::Caster).unwrap_or_default();
+            let spell = ev.str(Key::Spell).unwrap_or_default();
             let incoming = ev.bool(Key::Incoming);
             // `<mob> resisted your <Charm>!` is the third way an armed cast fails to land. Only our
             // own outgoing resist counts; an incoming one says nothing about what we were casting.
-            if !incoming && id_key_ref(&caster) == "you" {
+            if !incoming && id_key_ref(caster) == "you" {
                 // A fully-resisted cast landed nothing, so like a fizzle it must not stay in the
                 // window to claim the next proc of the same name. `forget` drops only an UNCLAIMED
                 // record, which keeps a partially-resisted AoE honest.
-                st.recent_casts.forget(&spell);
-                st.charm.note_cast_failed(&spell, ev.ts());
+                st.recent_casts.forget(spell);
+                st.charm.note_cast_failed(spell, ev.ts());
             }
             routing::route_resist(
                 st,
                 &ResistLine {
                     ts: ev.ts(),
                     caster,
-                    target: ev.str(Key::Target).unwrap_or_default().to_string(),
+                    target: ev.str(Key::Target).unwrap_or_default(),
                     spell,
                     incoming,
                 },
@@ -656,7 +635,7 @@ fn ingest_damage(st: &mut EngineState, ev: &Event) {
             routing::route_environment_damage(st, &dmg);
             return;
         }
-        st.log(ev.ts(), "other", "dropped", ev.raw().to_owned());
+        st.log_lazy(ev.ts(), "other", "dropped", || ev.raw().to_owned());
         return;
     };
     eval_closure(st, ev.ts());
@@ -805,18 +784,18 @@ fn fold_damage_analytics(
 /// A heal with no own cast behind it — the healing half of the same inference. Gated to your own
 /// heals (another player's cast-less heal is their proc) and to the two refusals `is_castless_heal`
 /// owns: a HoT tick and a Quick Buff burst landing.
-fn fold_heal_analytics(st: &mut EngineState, ev: &HealLine, over_time: bool) {
-    let Some(spell) = ev.spell.clone() else {
+fn fold_heal_analytics(st: &mut EngineState, ev: &HealLine<'_>, over_time: bool) {
+    let Some(spell) = ev.spell else {
         return;
     };
-    if id_key_ref(ev.healer.as_deref().unwrap_or("")) != "you" {
+    if id_key_ref(ev.healer.unwrap_or("")) != "you" {
         return;
     }
     let quick_buff_ts = st.quick_buff_ts;
     if !is_castless_heal(
         &mut st.recent_casts,
         &HealProcInput {
-            spell: &spell,
+            spell,
             ts: ev.ts,
             over_time,
             quick_buff_ts,
@@ -827,13 +806,13 @@ fn fold_heal_analytics(st: &mut EngineState, ev: &HealLine, over_time: bool) {
     // The gate above has already reached `proc`; the held set is what would promote it to a click.
     let click = castless_kind(
         crate::combat::procdetect::CastVerdict::Proc,
-        &spell,
+        spell,
         &st.held_clickies,
     ) == SpellOrigin::Click;
     let amount = ev.amount;
     fold_both(st, ev.ts, |agg, active| {
         agg.procs.add_spell_proc(&SpellProcFold {
-            spell: &spell,
+            spell,
             side: ProcSide::Heal,
             amount: Some(amount),
             active,
@@ -965,19 +944,16 @@ fn ingest_choice(st: &mut EngineState, ev: &Event) -> bool {
         Kind::StanceChange => {
             if let Some(name) = ev.str(Key::Stance).map(str::to_string) {
                 apply_stance(st, "stance", &name, ev.ts());
-                st.log(ev.ts(), "stance", "info", format!("▸ stance: {name}"));
+                st.log_lazy(ev.ts(), "stance", "info", || format!("▸ stance: {name}"));
             }
             true
         }
         Kind::InvocationChange => {
             if let Some(name) = ev.str(Key::Invocation).map(str::to_string) {
                 apply_stance(st, "invocation", &name, ev.ts());
-                st.log(
-                    ev.ts(),
-                    "invocation",
-                    "info",
-                    format!("▸ invocation: {name}"),
-                );
+                st.log_lazy(ev.ts(), "invocation", "info", || {
+                    format!("▸ invocation: {name}")
+                });
             }
             true
         }
@@ -989,20 +965,17 @@ fn ingest_choice(st: &mut EngineState, ev: &Event) -> bool {
                 let lane = st.specials.note(&skill);
                 // A special outside the verified lane table is still seen and still logged: the line
                 // was read and deliberately not acted on.
-                let note = match lane {
-                    None => " (no verb lane - label unchanged)".to_owned(),
-                    Some(l) => format!(" ({l} lane)"),
-                };
-                let from = match ev.str(Key::Replaces) {
-                    Some(r) => format!(" instead of {r}"),
-                    None => String::new(),
-                };
-                st.log(
-                    ev.ts(),
-                    "special",
-                    "info",
-                    format!("▸ special attack: {skill}{from}{note}"),
-                );
+                st.log_lazy(ev.ts(), "special", "info", || {
+                    let note = match lane {
+                        None => " (no verb lane - label unchanged)".to_owned(),
+                        Some(l) => format!(" ({l} lane)"),
+                    };
+                    let from = match ev.str(Key::Replaces) {
+                        Some(r) => format!(" instead of {r}"),
+                        None => String::new(),
+                    };
+                    format!("▸ special attack: {skill}{from}{note}")
+                });
             }
             true
         }

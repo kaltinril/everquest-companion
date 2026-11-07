@@ -518,12 +518,9 @@ impl EngineState {
         // The last activity ts, not a clock: a retraction is triggered by a line the engine folded,
         // so it is stamped with the fight's own last instant.
         let ts = self.last_activity_ts;
-        self.log(
-            ts,
-            "charm",
-            "dropped",
-            format!("✕ {name_key}: {why} - its recorded row is now the pet's"),
-        );
+        self.log_lazy(ts, "charm", "dropped", || {
+            format!("✕ {name_key}: {why} - its recorded row is now the pet's")
+        });
     }
 
     /// Re-index `pet_names` off the world model's live pets, and report the name keys that fell out.
@@ -556,12 +553,9 @@ impl EngineState {
             self.world.uncharm(&d.display, now);
             self.drain_retirements();
             self.pet_names.remove(&d.name_key);
-            self.log(
-                now,
-                "charm",
-                "dropped",
-                format!("✕ {}: charm bind never corroborated - unbound", d.display),
-            );
+            self.log_lazy(now, "charm", "dropped", || {
+                format!("✕ {}: charm bind never corroborated - unbound", d.display)
+            });
         }
     }
 
@@ -571,15 +565,12 @@ impl EngineState {
             return;
         }
         for e in self.ally.sweep(now) {
-            self.log(
-                now,
-                "charm",
-                "dropped",
+            self.log_lazy(now, "charm", "dropped", || {
                 format!(
                     "✕ {}: {}'s charm has run its full duration - unbound",
                     e.display, e.charmer
-                ),
-            );
+                )
+            });
         }
     }
 

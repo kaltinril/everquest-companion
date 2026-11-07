@@ -55,15 +55,12 @@ impl EngineState {
             }
         }
         let ts = self.last_activity_ts;
-        self.log(
-            ts,
-            "charm",
-            "info",
+        self.log_lazy(ts, "charm", "info", || {
             format!(
                 "➜ {name_key}: {why} - its recorded damage moved to {}",
                 to.name
-            ),
-        );
+            )
+        });
     }
 }
 
