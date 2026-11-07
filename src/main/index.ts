@@ -21,9 +21,12 @@
 // `registerSchemesAsPrivileged` running at module scope (before `ready`), and graphics safe mode
 // being applied at module scope for the same before-`ready` reason (graphics.ts).
 
-// FIRST import on purpose: channel.ts picks this process's `userData` dir (prod / dev /
-// e2e — Task #58) and runs the one-time state seed, before electron-store is constructed
-// (module-level) further down this import list.
+// ZEROTH: a clock stamp and nothing else (bundleStart.ts has no imports and no effect), so the
+// startup summary can say how much of `storeLoaded` was this bundle's own evaluation.
+import { BUNDLE_START_MS } from './bundleStart'
+// FIRST import that does anything, on purpose: channel.ts picks this process's `userData` dir
+// (prod / dev / e2e — Task #58) and runs the one-time state seed, before electron-store is
+// constructed (module-level) further down this import list.
 import { CHANNEL, USER_DATA } from './channel'
 // SECOND on purpose: installs the uncaughtException/unhandledRejection sinks before any
 // module body below can throw. See crashGuards.ts.
@@ -47,7 +50,7 @@ import { installSpeechCacheProtocol } from './speech/cache'
 import { registerIpc } from './ipc'
 import { prewarmGearIndex } from './ipc/planner'
 import { DATA_READY_MS, logSpellDbSummary } from './appSpellDb'
-import { markStartupPhase, startPerfSampler, stopPerf } from './perf'
+import { markStartupPhase, noteEvaluationMarks, startPerfSampler, stopPerf } from './perf'
 import { stopEnginePerfWatch } from './enginePerfWatch'
 import { noteHeapAfterData } from './dataWeight'
 import { initProcessPriority } from './processPriority'
@@ -63,7 +66,7 @@ import { removedPackIds } from './storeSoundPacks'
 import { scheduleResistWarm } from './resist/warm'
 import { startTailing, stopSession } from './session'
 import { runSmokeFeedback } from './smokeFeedback'
-import { STORE_READY_MS, getOverlayConfig, getPerfHudPrefs } from './store'
+import { STORE_OPEN_START_MS, STORE_READY_MS, getOverlayConfig, getPerfHudPrefs } from './store'
 // The z-order guard's tally, read once at quit (JOS-368; see `logTopmostSavings`).
 import { topmostStats } from './topmost'
 // The notification-area icon and the close interceptor (JOS-139). Its own module beside windows.ts
@@ -129,6 +132,9 @@ const GEAR_PREWARM_DELAY_MS = 5_000
 // disagrees with the boot it describes would put three zeroes in the breakdown and hide the real
 // cost of opening the store and parsing the spell DB inside `appReady`. Measured beats guessed
 // (see shared/perf.ts STARTUP_PHASES for the full table).
+// The inside of `storeLoaded` for the summary line: Electron's boot, this bundle's evaluation up to
+// the store, and the store's own open (perf.ts `evaluated`). The phase itself is unchanged.
+noteEvaluationMarks({ bundleStartMs: BUNDLE_START_MS, storeOpenStartMs: STORE_OPEN_START_MS })
 markStartupPhase('storeLoaded', { atMs: STORE_READY_MS })
 markStartupPhase('dataLoaded', { atMs: DATA_READY_MS })
 // The committed spell data's boot summary is printed after the window exists (below): it forces

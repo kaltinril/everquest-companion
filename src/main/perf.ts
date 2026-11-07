@@ -394,6 +394,30 @@ export function startupProfile(): StartupProfile {
 
 /** One line per launch, in the same voice as the other boot logs: total, replay size, and the
  *  three costliest phases — enough to know from `errors.log` alone whether a launch was slow. */
+/**
+ * THE INSIDE OF `storeLoaded` (audit item 16). That phase is "process start to the store open",
+ * which is three different things: Electron's own boot, the evaluation of this bundle up to
+ * store.ts, and the store's migration and open. The phase names are a wire schema (STARTUP_PHASES,
+ * pinned by tests and read by the renderer and telemetry), so the split rides the summary line
+ * rather than a new phase. `channel.ts` stamps the first and `store.ts` the second.
+ */
+let evaluation: { bundleStartMs: number; storeOpenStartMs: number } | null = null
+
+export function noteEvaluationMarks(marks: { bundleStartMs: number; storeOpenStartMs: number }): void {
+  evaluation = marks
+}
+
+function evaluated(profile: StartupProfile): string {
+  const storeLoaded = profile.phases.find((p) => p.phase === 'storeLoaded')
+  if (evaluation === null || storeLoaded === undefined) return ''
+  const ms = (n: number): string => String(Math.round(n))
+  return (
+    `, storeLoaded = electron boot ${ms(evaluation.bundleStartMs)}ms` +
+    ` + bundle evaluation ${ms(evaluation.storeOpenStartMs - evaluation.bundleStartMs)}ms` +
+    ` + store open ${ms(storeLoaded.atMs - evaluation.storeOpenStartMs)}ms`
+  )
+}
+
 function logStartupSummary(profile: StartupProfile): void {
   const worst = [...profile.phases]
     .sort((a, b) => b.durationMs - a.durationMs)
@@ -421,7 +445,7 @@ function logStartupSummary(profile: StartupProfile): void {
         ` over ${String(profile.replay.slices)} slices)`
   logInfo(
     `[everquest-companion] Startup ${String(Math.round(profile.totalMs))}ms` +
-      `${replayed}${blocked}${duty}${coldRead(profile)} (${worst}) - profile at ${profilePath()}`
+      `${replayed}${blocked}${duty}${coldRead(profile)}${evaluated(profile)} (${worst}) - profile at ${profilePath()}`
   )
   // THE DATA LEDGER GETS ITS OWN LINE (JOS-458) rather than another clause on the one above. The
   // line above describes THIS launch; this one describes the BUILD, and it is the same every time
