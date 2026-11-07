@@ -40,8 +40,9 @@ pub fn scan_bytes(parser: &Parser, bytes: &[u8], mut emit: impl FnMut(&str, &Pay
     seq as u64
 }
 
-/// Hand-rolled rather than a dependency: one byte, one scan. Shared with `tail.rs` so the scan and
-/// the live tail cannot split on different bytes.
+/// One byte, one scan, the `memchr` crate's vectorised search. Shared with `tail.rs` so the scan
+/// and the live tail cannot split on different bytes.
+#[inline]
 pub(crate) fn memchr(needle: u8, haystack: &[u8]) -> Option<usize> {
-    haystack.iter().position(|&b| b == needle)
+    memchr::memchr(needle, haystack)
 }

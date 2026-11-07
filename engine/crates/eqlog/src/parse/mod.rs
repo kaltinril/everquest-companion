@@ -28,20 +28,18 @@ use std::sync::Arc;
 
 /// JavaScript's four line terminators, the characters its `.` refuses (`jsstr::JS_DOT`), looked for
 /// as bytes: U+2028 and U+2029 are `E2 80 A8` and `E2 80 A9`, and a valid UTF-8 string holds no
-/// other byte run that spells them.
+/// other byte run that spells them. The three lead bytes are found with one vectorised search.
 fn has_line_terminator(bytes: &[u8]) -> bool {
-    let mut i = 0;
-    while i < bytes.len() {
-        match bytes[i] {
-            b'\n' | b'\r' => return true,
-            0xE2 if bytes.get(i + 1) == Some(&0x80)
-                && matches!(bytes.get(i + 2), Some(&0xA8) | Some(&0xA9)) =>
-            {
-                return true;
-            }
-            _ => {}
+    let mut from = 0;
+    while let Some(off) = memchr::memchr3(b'\n', b'\r', 0xE2, &bytes[from..]) {
+        let i = from + off;
+        if bytes[i] != 0xE2
+            || (bytes.get(i + 1) == Some(&0x80)
+                && matches!(bytes.get(i + 2), Some(&0xA8) | Some(&0xA9)))
+        {
+            return true;
         }
-        i += 1;
+        from = i + 1;
     }
     false
 }

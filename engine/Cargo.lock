@@ -143,6 +143,7 @@ dependencies = [
  "chrono",
  "chrono-tz",
  "iana-time-zone",
+ "memchr",
  "regex",
  "serde",
  "serde_json",
