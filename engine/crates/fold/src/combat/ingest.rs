@@ -557,6 +557,8 @@ fn ingest_combat(st: &mut EngineState, ev: &Event) -> bool {
                 return true;
             };
             let attacker = ev.str(Key::Attacker).unwrap_or_default();
+            // Built once here: the routing record and the swing timer both borrow it.
+            let modifiers = ev.arr_str(Key::Modifiers);
             routing::route_miss(
                 st,
                 &MissLine {
@@ -569,13 +571,13 @@ fn ingest_combat(st: &mut EngineState, ev: &Event) -> bool {
                     // `melee_skill(verb)` answer, asked through the parser's port so the two ends
                     // cannot answer differently.
                     verb_skill: ev.str(Key::Verb).map(eqlog::parse::combat::melee_skill),
-                    modifiers: ev.arr_str(Key::Modifiers),
+                    modifiers: &modifiers,
                 },
             );
             // Your avoided swing is still an ATTEMPT, and the mechanical proc denominator is
             // attempts — a proc that cannot fire on a miss still had the chance to.
             if id_key_ref(attacker) == "you" {
-                swing::note(st, ev);
+                swing::note(st, ev, &modifiers);
                 fold_both(st, ev.ts(), |agg, active| {
                     agg.windows.fold(
                         &WindowFold {
@@ -622,7 +624,6 @@ fn ingest_combat(st: &mut EngineState, ev: &Event) -> bool {
 /// One canonical `damage` line: close any pending encounter at this ts BEFORE routing, so attributed
 /// damage after a closure starts a fresh encounter rather than reviving the old one.
 fn ingest_damage(st: &mut EngineState, ev: &Event) {
-    swing::note(st, ev);
     // Caster-less other-player DoTs (`attacker: null`) are not our fight, and the raw line is what
     // the ring keeps: there is nothing else to say about a line nobody owns.
     let Some(attacker) = ev.str(Key::Attacker) else {
@@ -639,8 +640,11 @@ fn ingest_damage(st: &mut EngineState, ev: &Event) {
         return;
     };
     eval_closure(st, ev.ts());
-    // Built here rather than inside `to_damage_event` so the record can borrow it.
+    // Built here rather than inside `to_damage_event` so the record can borrow it. The swing timer
+    // reads it too: a line with no attacker is never your swing, so noting it after the gate above
+    // is the same as noting it first.
     let modifiers = ev.arr_str(Key::Modifiers);
+    swing::note(st, ev, &modifiers);
     let dmg = to_damage_event(st, ev, attacker, &modifiers);
     deathrecap::note_hit(st, &dmg);
     // The origin verdict names the LANE, so it is reached before `route()` folds the hit — and

@@ -451,7 +451,7 @@ pub struct MissLine<'a> {
     pub verb: Option<&'a str>,
     /// The parser's own `meleeSkill(verb)` answer, carried on the event.
     pub verb_skill: Option<&'static str>,
-    pub modifiers: Vec<&'a str>,
+    pub modifiers: &'a [&'a str],
 }
 
 fn miss_fold<'a>(st: &EngineState, ev: &'a MissLine<'a>, is_you: bool) -> MissFold<'a> {
@@ -471,7 +471,7 @@ fn miss_fold<'a>(st: &EngineState, ev: &'a MissLine<'a>, is_you: bool) -> MissFo
         skill: "Melee",
         verb: ev.verb,
         lane_skill,
-        modifiers: &ev.modifiers,
+        modifiers: ev.modifiers,
         target: ev.target,
         ts: ev.ts,
     }
@@ -1444,7 +1444,7 @@ mod tests {
                 mtype: MissType::Dodge,
                 verb: Some("slash"),
                 verb_skill: Some("Melee"),
-                modifiers: Vec::new(),
+                modifiers: &[],
             },
         );
         assert!(st.current.is_none());
@@ -1465,7 +1465,7 @@ mod tests {
             mtype: MissType::Miss,
             verb: Some("strike"),
             verb_skill: Some("Strike"),
-            modifiers: Vec::new(),
+            modifiers: &[],
         };
         let mine = miss_fold(&st, &line, true);
         assert_eq!(mine.skill, "Melee");

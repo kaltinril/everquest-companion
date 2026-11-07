@@ -68,14 +68,22 @@ fn excluded_verb(verb_lower: &str) -> Option<RoundExclusion> {
     }
 }
 
-/// Base modifiers that mark a swing as an EXTRA swing rather than part of an attack round. Keyed
-/// lowercase; the parser has already decomposed every compound form before anything here sees it.
-pub(crate) fn extra_swing_mod(m_lower: &str) -> Option<RoundExclusion> {
-    match m_lower {
-        "riposte" => Some(RoundExclusion::Riposte),
-        "flurry" => Some(RoundExclusion::Flurry),
-        "rampage" => Some(RoundExclusion::Rampage),
-        _ => None,
+/// Base modifiers that mark a swing as an EXTRA swing rather than part of an attack round. The
+/// parser has already decomposed every compound form before anything here sees it.
+///
+/// Matched ASCII-case-insensitively against the raw token, which is exactly the old
+/// `to_lowercase() == name` without the allocation per modifier per swing: the three names are
+/// ASCII, and the one non-ASCII character whose lowercase is an ASCII letter (the Kelvin sign, to
+/// `k`) cannot spell any of them.
+pub(crate) fn extra_swing_mod(m: &str) -> Option<RoundExclusion> {
+    if m.eq_ignore_ascii_case("riposte") {
+        Some(RoundExclusion::Riposte)
+    } else if m.eq_ignore_ascii_case("flurry") {
+        Some(RoundExclusion::Flurry)
+    } else if m.eq_ignore_ascii_case("rampage") {
+        Some(RoundExclusion::Rampage)
+    } else {
+        None
     }
 }
 
@@ -88,7 +96,7 @@ pub fn round_exclusion<S: AsRef<str>>(verb_lower: &str, modifiers: &[S]) -> Opti
         return Some(why);
     }
     for m in modifiers {
-        if let Some(why) = extra_swing_mod(&m.as_ref().to_lowercase()) {
+        if let Some(why) = extra_swing_mod(m.as_ref()) {
             return Some(why);
         }
     }
