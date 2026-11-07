@@ -12,7 +12,7 @@
 use crate::combat::healing::HealAccum;
 use crate::combat::procdetect::{add_spell_proc, SpellProcFold, SpellProcLane};
 use crate::combat::procwindows::WindowAccum;
-use crate::combat::rounds::{RoundAccum, SwingRecord};
+use crate::combat::rounds::{lower, RoundAccum, SwingRecord};
 use crate::jsmap::JsMap;
 use std::borrow::Cow;
 use std::collections::{HashMap, HashSet};
@@ -201,35 +201,74 @@ pub struct ModifierTally {
     pub total: i64,
 }
 
-/// The legacy melee-rounds heuristic: `skill_lower` → (`floor(ts/1000)` → hits in that bucket).
+/// The legacy melee-rounds heuristic: `skill_lower` → (`floor(ts/1000)` → hits in that bucket),
+/// with the hits-per-round histogram over those buckets kept in step with them.
 ///
-/// The buckets are the only state; the hits-per-round histogram is derived at view time and not
-/// cached back, because a view build may not write to the aggregate. `HashMap` and not `JsMap`
-/// because `finalize_rounds` counts the values and never publishes an order.
+/// The histogram used to be derived at view time by walking every second of every lane, which a
+/// zone session makes unbounded. It is now folded on ingest: a hit that takes a bucket from `n` to
+/// `n + 1` moves that bucket from `hist[n - 1]` to `hist[n]`, which is exactly the recount
+/// (`finalize_rounds` is pinned to it by a test). `HashMap` and not `JsMap` because nothing here
+/// publishes an order.
 #[derive(Debug, Clone, Default)]
 pub struct RoundsAccum {
-    pub bucket: HashMap<String, HashMap<i64, i64>>,
+    bucket: HashMap<String, HashMap<i64, i64>>,
+    /// `hist[k - 1]` = buckets holding exactly `k` hits. Its length is the largest bucket, which
+    /// only ever grows, so it never carries a trailing zero.
+    hist: Vec<i64>,
+}
+
+impl RoundsAccum {
+    /// Add `hits` to the `(skill_lower, second)` bucket, moving it along the histogram.
+    fn add_hits(&mut self, skill_lower: &str, second: i64, hits: i64) {
+        // One hash on the common path: the lane exists and is found by the borrowed key. Only a
+        // lane's first hit pays for the owned key.
+        let slot = match self.bucket.get_mut(skill_lower) {
+            Some(seconds) => seconds.entry(second).or_insert(0),
+            None => self
+                .bucket
+                .entry(skill_lower.to_string())
+                .or_default()
+                .entry(second)
+                .or_insert(0),
+        };
+        let before = *slot;
+        *slot += hits;
+        let after = *slot;
+        if before > 0 {
+            self.hist[(before - 1) as usize] -= 1;
+        }
+        let idx = (after - 1).max(0) as usize;
+        if self.hist.len() <= idx {
+            self.hist.resize(idx + 1, 0);
+        }
+        self.hist[idx] += 1;
+    }
+
+    /// Fold another accumulator's buckets into this one — the row move a pet claim makes.
+    pub fn merge(&mut self, from: RoundsAccum) {
+        for (skill, seconds) in from.bucket {
+            for (second, hits) in seconds {
+                self.add_hits(&skill, second, hits);
+            }
+        }
+    }
+
+    /// The buckets as they stand: `skill_lower` → (second → hits). Read-only; the tests recount
+    /// the histogram from it.
+    #[cfg(test)]
+    fn buckets(&self) -> &HashMap<String, HashMap<i64, i64>> {
+        &self.bucket
+    }
 }
 
 fn accrue_round(r: &mut RoundsAccum, skill: &str, ts: i64) {
-    let seconds = r.bucket.entry(skill.to_lowercase()).or_default();
-    *seconds.entry(ts.div_euclid(1_000)).or_insert(0) += 1;
+    r.add_hits(&lower(skill), ts.div_euclid(1_000), 1);
 }
 
-/// Collapse the in-progress buckets into the hits-per-round histogram. Read-only, so calling it at
-/// snapshot or finalize is safe and repeatable.
+/// The hits-per-round histogram over the buckets. Read-only and repeatable: it is the histogram
+/// the accumulator keeps, so calling it at snapshot or finalize walks nothing.
 pub fn finalize_rounds(r: &RoundsAccum) -> Vec<i64> {
-    let mut hist: Vec<i64> = Vec::new();
-    for seconds in r.bucket.values() {
-        for &hits in seconds.values() {
-            let idx = (hits - 1).max(0) as usize;
-            if hist.len() <= idx {
-                hist.resize(idx + 1, 0);
-            }
-            hist[idx] += 1;
-        }
-    }
-    hist
+    r.hist.clone()
 }
 
 #[derive(Debug, Clone)]
@@ -832,5 +871,62 @@ mod tests {
         assert_eq!(a.inc_heal.get("dranix").expect("row").amount, 150);
         assert_eq!(a.enemy_heal.get("a bat#1").expect("row").count, 0);
         assert_eq!(Agg::sum_heal(&a.enemy_heal), 20);
+    }
+
+    /// The histogram as it used to be derived: a walk over every (skill, second) bucket.
+    fn recount(r: &RoundsAccum) -> Vec<i64> {
+        let mut hist: Vec<i64> = Vec::new();
+        for seconds in r.buckets().values() {
+            for &hits in seconds.values() {
+                let idx = (hits - 1).max(0) as usize;
+                if hist.len() <= idx {
+                    hist.resize(idx + 1, 0);
+                }
+                hist[idx] += 1;
+            }
+        }
+        hist
+    }
+
+    /// A fixture fold: a deterministic spread of hits over four lanes (spelled in mixed case, as
+    /// the log does) and a few hundred seconds, clustered so buckets reach one to six hits.
+    fn rounds_fixture(seed: u64, hits: usize) -> RoundsAccum {
+        const LANES: [&str; 4] = ["Melee", "Backstab", "KICK", "Flying Kick"];
+        let mut r = RoundsAccum::default();
+        let mut x = seed;
+        for _ in 0..hits {
+            x = x
+                .wrapping_mul(6_364_136_223_846_793_005)
+                .wrapping_add(1_442_695_040_888_963_407);
+            let lane = LANES[(x >> 60) as usize % LANES.len()];
+            let second = ((x >> 33) % 300) as i64;
+            accrue_round(&mut r, lane, second * 1_000 + ((x >> 20) % 1_000) as i64);
+        }
+        r
+    }
+
+    /// The incremental histogram is the recount, on a fold and after a merge.
+    #[test]
+    fn the_rounds_histogram_kept_on_ingest_is_the_recount_of_the_buckets() {
+        let r = rounds_fixture(7, 900);
+        let hist = finalize_rounds(&r);
+        assert_eq!(hist, recount(&r));
+        assert!(
+            hist.len() >= 3,
+            "the fixture reaches multi-hit buckets: {hist:?}"
+        );
+        assert_ne!(*hist.last().expect("some bucket"), 0, "no trailing zero");
+        // Lanes are keyed lowercase whatever the line's casing, so a `KICK` and a `kick` share.
+        assert!(r.buckets().contains_key("kick"));
+        assert!(!r.buckets().contains_key("KICK"));
+
+        let mut into = rounds_fixture(11, 400);
+        into.merge(rounds_fixture(13, 500));
+        assert_eq!(finalize_rounds(&into), recount(&into));
+        // …and an empty merge into anything, or anything into empty, is the recount too.
+        let mut empty = RoundsAccum::default();
+        empty.merge(rounds_fixture(17, 50));
+        assert_eq!(finalize_rounds(&empty), recount(&empty));
+        assert!(finalize_rounds(&RoundsAccum::default()).is_empty());
     }
 }

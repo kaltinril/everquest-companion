@@ -231,7 +231,7 @@ pub struct RoundAccum {
 
 /// Lowercase, borrowed when the lowering is the identity: no ASCII uppercase and nothing outside
 /// ASCII, which is what every verb and nearly every target name here is.
-fn lower(s: &str) -> std::borrow::Cow<'_, str> {
+pub(crate) fn lower(s: &str) -> std::borrow::Cow<'_, str> {
     if s.bytes().all(|b| b.is_ascii() && !b.is_ascii_uppercase()) {
         std::borrow::Cow::Borrowed(s)
     } else {
