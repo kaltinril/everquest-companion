@@ -14,7 +14,7 @@
 //! The other two stay off the bus: `noteAlertFire` and `report` arrive out of band from main and
 //! the renderer, and a fold that invented either would be inventing a row.
 
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::knowledge::Knowledge;
 use crate::modules::gaps::marks::{marks_for, ConMarks, FeedMarks};
 use crate::EqModule;
@@ -332,10 +332,10 @@ impl EqModule for EventFeedModule {
         if !live {
             return;
         }
-        match ev.kind() {
-            "consider" => self.note_consider(ev),
-            "loot" => self.probe_loot(ev),
-            "unknown" => self.note_offer(ev),
+        match ev.kind_of() {
+            Kind::Consider => self.note_consider(ev),
+            Kind::Loot => self.probe_loot(ev),
+            Kind::Unknown => self.note_offer(ev),
             _ => {}
         }
     }

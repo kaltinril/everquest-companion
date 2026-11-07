@@ -21,7 +21,7 @@
 
 use super::consider::mob_key;
 use super::resist::catalog::BOSSES_JSON;
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::jsmap::JsMap;
 use crate::EqModule;
 use serde::{Deserialize, Serialize};
@@ -147,17 +147,17 @@ impl MetModule {
 
     /// A loot, con or zone line; true when it named something new.
     fn line(&mut self, ev: &Event) -> bool {
-        match ev.kind() {
-            "zone" => {
+        match ev.kind_of() {
+            Kind::Zone => {
                 self.zone = ev.str("zone").map(str::to_string);
                 self.zones.add(ev.str("zone").unwrap_or_default())
             }
-            "loot" => {
+            Kind::Loot => {
                 let item = self.items.add(ev.str("item").unwrap_or_default());
                 let mob = self.mobs.add(ev.str("source").unwrap_or_default());
                 self.stamped() || mob || item
             }
-            "consider" => {
+            Kind::Consider => {
                 let mob = ev.str("mob").unwrap_or_default();
                 !mob_key(mob).is_empty() && (self.mobs.add(mob) | self.stamped())
             }
@@ -199,7 +199,7 @@ impl EqModule for MetModule {
 
     fn on_event(&mut self, ev: &Event, _live: bool) {
         self.seq = ev.seq();
-        if ev.kind() == "epoch" {
+        if ev.kind_of() == Kind::Epoch {
             self.clear();
             self.announce.changed(self.seq);
             return;

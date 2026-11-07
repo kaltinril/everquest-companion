@@ -14,7 +14,7 @@
 //! a pair `gaps` never names is simply never asked for.
 
 use super::gaps_trade::{faction_of, KILL_FACTION_MS};
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::message_overlay::message_text_of;
 use crate::EqModule;
 use serde_json::{json, Value};
@@ -96,13 +96,13 @@ impl EqModule for KillFactionSamplesModule {
 
     fn on_event(&mut self, ev: &Event, _live: bool) {
         self.seq = ev.seq();
-        match ev.kind() {
-            "epoch" => {
+        match ev.kind_of() {
+            Kind::Epoch => {
                 self.clear();
                 self.announce.changed(self.seq);
             }
-            "unknown" => self.line(ev),
-            "death" if self.death(ev) => self.announce.changed(self.seq),
+            Kind::Unknown => self.line(ev),
+            Kind::Death if self.death(ev) => self.announce.changed(self.seq),
             _ => {}
         }
     }

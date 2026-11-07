@@ -33,7 +33,7 @@
 //! evidence. Skill-ups, stances and poison coats are the only way to see them.
 
 use super::{as_class_abbr, ClassAbbr};
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use eqlog::jsstr::JS_S;
 use eqlog::names::{spell_canon_key, strip_rank_tail};
 use regex::Regex;
@@ -262,26 +262,26 @@ pub fn who_classes(ev: &Event) -> Vec<ClassAbbr> {
 /// Turn one event into class evidence. Context-free — every input it needs is on the event, which
 /// is what keeps it pure.
 pub fn class_observation(index: &SpellClassIndex, ev: &Event) -> Option<ClassObservation> {
-    match ev.kind() {
-        "selfWho" => make(ev, "who", "who".to_string(), who_classes(ev)),
-        "stanceChange" => {
+    match ev.kind_of() {
+        Kind::SelfWho => make(ev, "who", "who".to_string(), who_classes(ev)),
+        Kind::StanceChange => {
             let stance = ev.str("stance").unwrap_or_default().to_string();
             let cands = tables().stances.get(&stance).cloned().unwrap_or_default();
             make(ev, "stance", stance, cands)
         }
-        "invocationChange" => {
+        Kind::InvocationChange => {
             let inv = ev.str("invocation").unwrap_or_default().to_string();
             let cands = tables().invocations.get(&inv).cloned().unwrap_or_default();
             make(ev, "invocation", inv, cands)
         }
-        "skillUp" => {
+        Kind::SkillUp => {
             // `skills` only — see the header. An unlisted skill (every `Specialize <school>`, which
             // the wiki carries as one "Specialization" row) yields nothing rather than a guess.
             let skill = ev.str("skill").unwrap_or_default().to_string();
             let cands = tables().skills.get(&skill).cloned().unwrap_or_default();
             make(ev, "skillUp", skill, cands)
         }
-        "poisonCoat" => {
+        Kind::PoisonCoat => {
             // Only rogue poison disciplines exist on Legends (eqlwiki Disciplines). Somebody else's
             // blades — the third-person shapes — say nothing about this character.
             if ev.str("who") != Some("you") {
@@ -294,7 +294,7 @@ pub fn class_observation(index: &SpellClassIndex, ev: &Event) -> Option<ClassObs
                 vec!["ROG"],
             )
         }
-        "castBegin" => {
+        Kind::CastBegin => {
             let spell = ev.str("spell").unwrap_or_default();
             // The display label strips the Roman rank and trims; `spellCanonKey` does the same and
             // lowercases, which is why the two are separate calls.

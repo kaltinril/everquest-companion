@@ -7,7 +7,7 @@
 //! The current session only: a login or an epoch clears it. At most `CAPACITY` rows, the least
 //! recently seen evicted first.
 
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::message_overlay::message_text_of;
 use crate::EqModule;
 use eqlog::names::id_key;
@@ -127,9 +127,9 @@ impl EqModule for BuffConflictsModule {
 
     fn on_event(&mut self, ev: &Event, _live: bool) {
         self.seq = ev.seq();
-        match ev.kind() {
-            "epoch" | "sessionStart" => self.clear(),
-            "unknown" => {
+        match ev.kind_of() {
+            Kind::Epoch | Kind::SessionStart => self.clear(),
+            Kind::Unknown => {
                 if let Some(row) = self.read(message_text_of(ev.raw()), ev.ts()) {
                     self.record(row);
                     self.announce.changed(self.seq);

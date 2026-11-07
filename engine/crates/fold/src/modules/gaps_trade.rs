@@ -11,7 +11,7 @@
 //! by the `killFactionSamples` module (`gaps_samples.rs`), so a Gaps fetch does not carry them.
 
 use super::gaps_offers::offer_of;
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::message_overlay::message_text_of;
 use serde_json::{json, Value};
 use std::collections::HashMap;
@@ -21,11 +21,11 @@ pub(crate) const KILL_FACTION_MS: i64 = 2_500;
 
 /// The merchant an event shows trading, and how: `quoted`, `bought` (from it), `sold` (to it).
 pub fn merchant_of<'a>(ev: &'a Event) -> Option<(&'a str, &'static str)> {
-    match ev.kind() {
-        "purchase" => ev.str("npc").map(|n| (n, "bought")),
-        "coin" if ev.str("source") == Some("vendor") => ev.str("npc").map(|n| (n, "sold")),
+    match ev.kind_of() {
+        Kind::Purchase => ev.str("npc").map(|n| (n, "bought")),
+        Kind::Coin if ev.str("source") == Some("vendor") => ev.str("npc").map(|n| (n, "sold")),
         // A sell offer (`X told you, 'I'll give you …`) shows a merchant too (owner, 2026-10-20).
-        "unknown" => {
+        Kind::Unknown => {
             let text = message_text_of(ev.raw());
             let quote = text.split_once(" told you, 'That'll be ").map(|(n, _)| (n, "quoted"));
             quote.or_else(|| offer_of(text).map(|o| (o.merchant, "appraised")))

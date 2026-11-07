@@ -13,7 +13,7 @@
 //! over a stamp in the log's own grammar, so the anchor and the timestamps it is compared against
 //! cannot drift apart.
 
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use eqlog::Clock;
 use serde_json::json;
 
@@ -43,7 +43,7 @@ impl EpochDetector {
     /// The `EpochEvent` to emit, or `None`. Fires at most once per log; an event whose stamp the
     /// parser could not read (`ts` 0) never trips it, which falls out of the comparison.
     pub fn observe(&mut self, ev: &Event) -> Option<Event<'static>> {
-        if ev.kind() == "epoch" || self.fired || ev.ts() < self.launch_ms {
+        if ev.kind_of() == Kind::Epoch || self.fired || ev.ts() < self.launch_ms {
             return None;
         }
         self.fired = true;

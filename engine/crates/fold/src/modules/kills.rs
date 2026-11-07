@@ -22,7 +22,7 @@
 //! instance, and `TIER_UNKNOWN` stays unknown — law 1); it expires, checked at use so nothing has
 //! to sweep; and it is character-scoped, cleared by the epoch alongside the KillMap.
 
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::jsfn::{starts_with_you_word, zone_id_key, zone_tier, TIER_OPEN_WORLD, TIER_UNKNOWN};
 use crate::jsmap::JsMap;
 use crate::knowledge::Knowledge;
@@ -248,8 +248,8 @@ impl EqModule for KillsModule {
 
     fn on_event(&mut self, ev: &Event, _live: bool) {
         self.seq = ev.seq();
-        match ev.kind() {
-            "epoch" => {
+        match ev.kind_of() {
+            Kind::Epoch => {
                 // Character rebirth: the KillMap belongs to the dead character, and so do the
                 // instances it stood in — a notice names a player, and that player is gone.
                 self.kills.clear();
@@ -259,11 +259,11 @@ impl EqModule for KillsModule {
                 self.announce.changed(self.seq);
                 return;
             }
-            "zone" => {
+            Kind::Zone => {
                 self.zone = ev.str("zone").map(str::to_string);
                 return;
             }
-            "instanceCreate" => {
+            Kind::InstanceCreate => {
                 if let Some(zone) = ev.str("zone") {
                     // A max, not an assignment: a replay is chronological, but a fold must not
                     // depend on it, and a late older notice must not un-refresh the entry.
@@ -272,11 +272,11 @@ impl EqModule for KillsModule {
                 }
                 return;
             }
-            "expGain" => {
+            Kind::ExpGain => {
                 self.pending_exp_ts = Some(ev.ts());
                 return;
             }
-            "petClaim" | "petSay" | "allyPetLeader" => {
+            Kind::PetClaim | Kind::PetSay | Kind::AllyPetLeader => {
                 let pet = ev.str("name").or_else(|| ev.str("pet"));
                 // An article-led name (a charmed `a gnoll`) is every other `a gnoll` too.
                 if let Some(pet) = pet.filter(|p| is_player_shaped_name(p)) {
@@ -284,7 +284,7 @@ impl EqModule for KillsModule {
                 }
                 return;
             }
-            "death" => {}
+            Kind::Death => {}
             _ => return,
         }
         // Consumed BEFORE the counted filter, as progression.ts does: the line belongs to the kill

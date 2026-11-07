@@ -539,19 +539,19 @@ impl EqModule for BuffsModule {
         self.seq = ev.seq();
         // A derived `buffExpired` is our own synthesized event — never fold it. It exists purely for
         // the alerts module to match.
-        if ev.kind() == "buffExpired" {
+        if ev.kind_of() == Kind::BuffExpired {
             return;
         }
         let core_rc = Rc::clone(&self.core);
         let mut core = core_rc.borrow_mut();
-        if ev.kind() == "epoch" {
+        if ev.kind_of() == Kind::Epoch {
             self.frame.close_hole();
             self.inst.clear_for_gap();
             self.pets.clear_for_gap();
             self.announce.changed(self.seq);
             return;
         }
-        if ev.kind() == "offlineGap" {
+        if ev.kind_of() == Kind::OfflineGap {
             let from_ts = ev.int(Key::FromTs).unwrap_or(0);
             let to_ts = ev.int(Key::ToTs).unwrap_or(0);
             self.frame.close_hole();

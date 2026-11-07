@@ -4,7 +4,7 @@
 //! Deduped by class, first sighting wins (law 2: keys are case-folded, displays are raw). The
 //! achievement fires once per class per character, so the first instant is the fact worth keeping.
 
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::EqModule;
 use serde::Serialize;
 use serde_json::{json, Value};
@@ -47,13 +47,13 @@ impl EqModule for ClassUnlocksModule {
 
     fn on_event(&mut self, ev: &Event, _live: bool) {
         self.seq = ev.seq();
-        if ev.kind() == "epoch" {
+        if ev.kind_of() == Kind::Epoch {
             self.unlocks.clear();
             self.seen.clear();
             self.announce.changed(self.seq);
             return;
         }
-        if ev.kind() != "classUnlock" {
+        if ev.kind_of() != Kind::ClassUnlock {
             return;
         }
         let name = ev.str("className").unwrap_or_default();

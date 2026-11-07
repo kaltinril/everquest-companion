@@ -21,7 +21,7 @@
 //! AFTER the `seq = ev.seq` at the top of `on_event`. So this module reports seq 0 between the
 //! epoch event and the next event it folds. That is faithful, not a bug to tidy.
 
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::jsfn::memo_key;
 use crate::jsmap::JsMap;
 use crate::EqModule;
@@ -176,7 +176,7 @@ impl EqModule for SpellSetsModule {
 
     fn on_event(&mut self, ev: &Event, _live: bool) {
         self.seq = ev.seq();
-        if ev.kind() == "epoch" {
+        if ev.kind_of() == Kind::Epoch {
             // A rebirth behind the same name is a different character's bar. See the header on
             // what this does to `seq`.
             self.reset();
@@ -189,16 +189,16 @@ impl EqModule for SpellSetsModule {
         }
         let ts = ev.ts();
         self.settle_if_idle(ts);
-        match ev.kind() {
-            "spellMemorize" => {
+        match ev.kind_of() {
+            Kind::SpellMemorize => {
                 let spell = ev.str("spell").unwrap_or_default().to_string();
                 self.on_memorize(ts, &spell, ev.bool("done"));
             }
-            "spellForget" => {
+            Kind::SpellForget => {
                 let spell = ev.str("spell").unwrap_or_default().to_string();
                 self.on_forget(ts, &spell);
             }
-            "spellSet" => {
+            Kind::SpellSet => {
                 let set = ev.str("set").unwrap_or_default().to_string();
                 let action = ev.str("action").unwrap_or_default().to_string();
                 self.on_spell_set(ts, &set, &action);

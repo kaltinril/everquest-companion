@@ -22,7 +22,7 @@
 //! while the catalog probe is `spellDb.byKey`, keyed by the DB's case-INSENSITIVE `canonKey`.
 //! `wiring.ts` composes them exactly that way, so the port does too.
 
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::jsfn::parse_spell_rank;
 use crate::jsmap::JsMap;
 use crate::EqModule;
@@ -134,25 +134,25 @@ impl EqModule for ObservedSpellRanksModule {
 
     fn on_event(&mut self, ev: &Event, _live: bool) {
         self.seq = ev.seq();
-        match ev.kind() {
+        match ev.kind_of() {
             // Character rebirth: every rank before the boundary belongs to the dead beta character.
-            "epoch" => {
+            Kind::Epoch => {
                 self.rows.clear();
                 self.announce.changed(self.seq);
             }
             // A ` +N` result is an item level (itemTiers owns it) and carries no numeral, so it
             // falls out of `observe` on the rank test with no second check here.
-            "itemMerge" => {
+            Kind::ItemMerge => {
                 let item = ev.str("item").unwrap_or_default().to_string();
                 self.observe(&item, ev.ts(), Witness::Merge);
             }
-            "castBegin" => {
+            Kind::CastBegin => {
                 let spell = ev.str("spell").unwrap_or_default().to_string();
                 self.observe(&spell, ev.ts(), Witness::Cast);
             }
             // `<target> resisted your <Spell> <rank>!` — your cast, named with its numeral. The
             // other two resist shapes are somebody else's spell and say nothing about what you own.
-            "resist" if !ev.bool("incoming") && ev.str("caster") == Some("you") => {
+            Kind::Resist if !ev.bool("incoming") && ev.str("caster") == Some("you") => {
                 let spell = ev.str("spell").unwrap_or_default().to_string();
                 self.observe(&spell, ev.ts(), Witness::Cast);
             }

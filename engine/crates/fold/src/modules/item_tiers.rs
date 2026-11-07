@@ -13,7 +13,7 @@
 //! Absent means unknown, never tier 0 — a `'held'` first sighting with no tier creates no row, and
 //! a row with no tier omits both `tier` and `lastTier` rather than writing zero.
 
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::jsfn::{item_base_name, item_tier_from_name, item_tier_key};
 use crate::jsmap::JsMap;
 use crate::EqModule;
@@ -123,22 +123,22 @@ impl EqModule for ItemTiersModule {
 
     fn on_event(&mut self, ev: &Event, _live: bool) {
         self.seq = ev.seq();
-        match ev.kind() {
+        match ev.kind_of() {
             // Character rebirth: merges before the boundary belong to a dead same-name character,
             // and their upgrades are not in this character's bags.
-            "epoch" => {
+            Kind::Epoch => {
                 self.rows.clear();
                 self.announce.changed(self.seq);
             }
             // A tier-less result is a spell-scroll merge (Roman rank), which observedSpellRanks
             // owns. Still a merge we observed, so it is recorded as one with no tier.
-            "itemMerge" => {
+            Kind::ItemMerge => {
                 let item = ev.str("item").unwrap_or_default().to_string();
                 self.observe(&item, ev.ts(), How::Merge);
             }
             // Only the 'mismatch' shape names items; it is an inventory statement, not an upgrade,
             // so it never counts as a merge — it can only reveal a tier we hadn't seen.
-            "itemMergeFailed" => {
+            Kind::ItemMergeFailed => {
                 if ev.str("reason") == Some("mismatch") {
                     if let Some(target) = ev.str("target").map(str::to_string) {
                         // `ev.target &&` — an empty string is falsy over there.
@@ -149,7 +149,7 @@ impl EqModule for ItemTiersModule {
                 }
             }
             // The auto-merge-on-pickup line, whose `created` name is the result of the merge.
-            "loot" if ev.str("disposition") == Some("combined") => {
+            Kind::Loot if ev.str("disposition") == Some("combined") => {
                 if let Some(created) = ev.str("created").map(str::to_string) {
                     if !created.is_empty() {
                         self.observe(&created, ev.ts(), How::Merge);

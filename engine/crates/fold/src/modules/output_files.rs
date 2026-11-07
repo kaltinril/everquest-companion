@@ -9,7 +9,7 @@
 //! `flushDelta` always returns null over there (nothing in the renderer subscribes; main reads it
 //! through `writtenAt()`), which is what the trait's default `None` is.
 
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::jsfn::base_name;
 use crate::jsmap::JsMap;
 use crate::EqModule;
@@ -52,7 +52,7 @@ impl EqModule for OutputFilesModule {
 
     fn on_event(&mut self, ev: &Event, _live: bool) {
         self.seq = ev.seq();
-        if ev.kind() != "outputFile" {
+        if ev.kind_of() != Kind::OutputFile {
             return;
         }
         let key = file_key(ev.str("file").unwrap_or_default());

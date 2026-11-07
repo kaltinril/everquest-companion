@@ -428,8 +428,7 @@ impl ProcAccum {
 }
 
 fn bump_state(map: &mut JsMap<i64>, key: &str, by: i64) {
-    let n = map.get(key).copied().unwrap_or(0);
-    map.insert(key.to_string(), n + by);
+    *map.get_or_insert_with(key, || 0) += by;
 }
 
 /// The per-segment aggregate. Keyed by instance id (or `you` / `pet:<instanceId>` / `member:<key>` /

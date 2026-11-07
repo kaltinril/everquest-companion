@@ -38,7 +38,7 @@
 //! published and are kept in full.
 
 use super::progression_ledger::Ledger;
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::jsfn::starts_with_you_word;
 use crate::EqModule;
 use eqlog::names::id_key;
@@ -447,16 +447,16 @@ impl ProgressionModule {
             self.trim();
             self.announce.changed(self.seq);
         }
-        match ev.kind() {
-            "expGain" => self.push_exp(ev.ts(), ev.f64("pct"), ev.bool("party")),
-            "death" => self.on_death(ev),
-            "zone" => self.on_zone(ev.ts(), ev.str("zone").unwrap_or_default()),
-            "offlineGap" => self.push_offline(
+        match ev.kind_of() {
+            Kind::ExpGain => self.push_exp(ev.ts(), ev.f64("pct"), ev.bool("party")),
+            Kind::Death => self.on_death(ev),
+            Kind::Zone => self.on_zone(ev.ts(), ev.str("zone").unwrap_or_default()),
+            Kind::OfflineGap => self.push_offline(
                 ev.int("fromTs").unwrap_or(0),
                 ev.int("toTs").unwrap_or(0),
                 ev.bool("camped"),
             ),
-            "loot" => {
+            Kind::Loot => {
                 // A destroy counts here: `lootTs` is timestamps only, an ACTIVITY signal for the
                 // idle heuristic and the zone bands, never a drop count. Emptying your bags is you
                 // at the keyboard, so excluding it would manufacture idle time out of real play.
@@ -464,26 +464,26 @@ impl ProgressionModule {
                 self.trim();
                 self.announce.changed(self.seq);
             }
-            "level" => {
+            Kind::Level => {
                 // Uncapped (with aaGain): ~5k rows/year, and the chart needs every ding.
                 self.s.level_ts.push(ev.ts());
                 self.s.level_value.push(ev.int("level").unwrap_or(0));
                 self.announce.changed(self.seq);
             }
-            "aaGain" => {
+            Kind::AaGain => {
                 self.s.aa_gain_ts.push(ev.ts());
                 self.s.aa_gain_amount.push(ev.int("amount").unwrap_or(0));
                 self.announce.changed(self.seq);
             }
             // The three pet arms publish nothing: they move the claimed/charmed/ever-charmed sets,
             // which decide whether a LATER kill is credited or witnessed and appear in no snapshot.
-            "petClaim" => self.on_claim(id_key(ev.str("name").unwrap_or_default())),
-            "charm" => {
+            Kind::PetClaim => self.on_claim(id_key(ev.str("name").unwrap_or_default())),
+            Kind::Charm => {
                 let key = id_key(ev.str("mob").unwrap_or_default());
                 self.charmed.insert(key.clone());
                 self.ever_charmed.insert(key);
             }
-            "uncharm" => {
+            Kind::Uncharm => {
                 self.charmed
                     .remove(&id_key(ev.str("mob").unwrap_or_default()));
             }
@@ -508,7 +508,7 @@ impl EqModule for ProgressionModule {
         // Character rebirth: everything before the boundary belongs to a dead same-name character
         // and would contaminate every rate. Note the early return — `lastTs` is not advanced by
         // the boundary event itself.
-        if ev.kind() == "epoch" {
+        if ev.kind_of() == Kind::Epoch {
             self.clear();
             self.announce.changed(self.seq);
             return;

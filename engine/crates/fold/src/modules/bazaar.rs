@@ -10,7 +10,7 @@
 //! player's calendar day and never shifts with a time zone.
 
 use super::bazaar_parse::{parse_trade, Dir, ItemIndex, Offer};
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::knowledge::Knowledge;
 use crate::message_overlay::message_text_of;
 use crate::EqModule;
@@ -261,12 +261,12 @@ impl EqModule for BazaarModule {
 
     fn on_event(&mut self, ev: &Event, live: bool) {
         self.seq = ev.seq();
-        if ev.kind() == "epoch" {
+        if ev.kind_of() == Kind::Epoch {
             self.clear();
             self.announce.changed(self.seq);
             return;
         }
-        if ev.kind() == "unknown" && self.fold_line(ev.raw(), live) {
+        if ev.kind_of() == Kind::Unknown && self.fold_line(ev.raw(), live) {
             self.announce.changed(self.seq);
         }
     }

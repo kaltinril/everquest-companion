@@ -18,7 +18,7 @@
 //! a `raw` trigger compiles to a pattern that can never match — so the failure mode is one the app
 //! already has a rule for. Only the SET of patterns falling into it is bigger on this side.
 
-use crate::event::{Event, Key};
+use crate::event::{Event, Key, Kind};
 use crate::jsmap::JsMap;
 use crate::modules::alerts_captures::{
     harvest_captures, merge_captures, wants_target_token, with_auto_captures, CaptureMap,
@@ -184,7 +184,7 @@ fn fold_reaches(field: &Field, ev: &Event) -> bool {
     if field.key != "skill" {
         return true;
     }
-    ev.kind() == "damage" && matches!(ev.str("dtype"), Some("spell" | "dot"))
+    ev.kind_of() == Kind::Damage && matches!(ev.str("dtype"), Some("spell" | "dot"))
 }
 
 /// The spell names one event can honestly answer to — every name in its `candidates` list, string
@@ -680,7 +680,7 @@ fn spell_field_of(kind: &str) -> Option<&'static str> {
 /// The spell that set this event off, display form with the rank suffix INTACT, or `None` when the
 /// family names none.
 fn firing_spell(ev: &Event) -> Option<String> {
-    if ev.kind() == "damage" {
+    if ev.kind_of() == Kind::Damage {
         if !matches!(ev.str("dtype"), Some("spell" | "dot")) {
             return None;
         }

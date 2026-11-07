@@ -35,7 +35,7 @@ use super::gaps_specials::MobSpecials;
 use super::gaps_suggest::{item_candidates, spell_candidates, suggest, Candidate, Suggest};
 use super::gaps_locs::MobLocs;
 use super::gaps_trade::{merchant_of, KillFactions};
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::jsfn::item_base_name;
 use crate::knowledge::Knowledge;
 use crate::message_overlay::message_text_of;
@@ -201,25 +201,25 @@ impl GapsModule {
     }
 
     fn fold(&mut self, ev: &Event) -> bool {
-        match ev.kind() {
-            "zone" => {
+        match ev.kind_of() {
+            Kind::Zone => {
                 self.zone = ev.str("zone").map(str::to_string);
                 self.specials.zone(ev.str("zone"))
             }
             // The player's own `/who` row, parsed apart, names a player like any /who row (gaps_players.rs),
             // so a self-con (a /con with nothing targeted) is never a row (owner, 2026-10-22: "this is me").
-            "selfWho" => self.unparsed(ev),
-            "loot" | "itemReceived" | "itemMerge" => self.fought(ev) | self.item_event(ev),
-            "purchase" | "coin" | "unknown" => self.fought(ev) | self.trade(ev),
-            "death" => self.fought(ev) | self.kill_factions_of(ev) | self.specials.death(ev) | self.death(ev),
-            "consider" => self.considered(ev),
-            "damage" | "miss" => self.specials.event(ev),
-            "castBegin" | "otherCastBegin" => self.spell(ev),
-            "petClaim" | "petSay" => self.own_pet(ev.str("name")),
+            Kind::SelfWho => self.unparsed(ev),
+            Kind::Loot | Kind::ItemReceived | Kind::ItemMerge => self.fought(ev) | self.item_event(ev),
+            Kind::Purchase | Kind::Coin | Kind::Unknown => self.fought(ev) | self.trade(ev),
+            Kind::Death => self.fought(ev) | self.kill_factions_of(ev) | self.specials.death(ev) | self.death(ev),
+            Kind::Consider => self.considered(ev),
+            Kind::Damage | Kind::Miss => self.specials.event(ev),
+            Kind::CastBegin | Kind::OtherCastBegin => self.spell(ev),
+            Kind::PetClaim | Kind::PetSay => self.own_pet(ev.str("name")),
             // Handing an item to it is meeting it (owner, 2026-10-19: a fallen froglok, only traded with).
-            "offer" => self.turn_in(ev) | self.npc_met(ev.str("npc"), "offered", ev),
-            "allyPetLeader" => self.player_pet(ev.str("pet")),
-            "skillUp" => self.skill_up(ev),
+            Kind::Offer => self.turn_in(ev) | self.npc_met(ev.str("npc"), "offered", ev),
+            Kind::AllyPetLeader => self.player_pet(ev.str("pet")),
+            Kind::SkillUp => self.skill_up(ev),
             // A trade's end and experience, for the quest log (gaps_quest_log.rs); nothing else.
             _ => self.quest_event(ev),
         }
@@ -227,13 +227,13 @@ impl GapsModule {
 
     /// The four events that name an item; a loot line names its corpse too.
     fn item_event(&mut self, ev: &Event) -> bool {
-        match ev.kind() {
+        match ev.kind_of() {
             // A destroy line is the parser's one loot shape that is a later disposal rather than
             // the loot itself: it says what became of the item, not where it came from.
-            "loot" if ev.str("disposition") == Some("destroyed") => self.disposal(ev),
-            "loot" => self.item(ev, "looted") | self.stored(ev) | self.mob(ev.str("source"), "dropped-by", ev),
-            "itemReceived" => self.quest_give(ev) | self.received(ev),
-            "purchase" => self.item(ev, "bought"),
+            Kind::Loot if ev.str("disposition") == Some("destroyed") => self.disposal(ev),
+            Kind::Loot => self.item(ev, "looted") | self.stored(ev) | self.mob(ev.str("source"), "dropped-by", ev),
+            Kind::ItemReceived => self.quest_give(ev) | self.received(ev),
+            Kind::Purchase => self.item(ev, "bought"),
             _ => self.merge(ev),
         }
     }
@@ -288,13 +288,13 @@ impl GapsModule {
     /// A purchase (an item and its merchant), a vendor sale or a corpse's coin (held for the kill
     /// after it), or an unparsed line (a price quote, or a faction line held for the kill after it).
     fn trade(&mut self, ev: &Event) -> bool {
-        match ev.kind() {
-            "purchase" => self.item_event(ev) | self.merchant(ev) | self.stocked(ev),
-            "coin" => {
+        match ev.kind_of() {
+            Kind::Purchase => self.item_event(ev) | self.merchant(ev) | self.stocked(ev),
+            Kind::Coin => {
                 self.kill_coin.line(ev);
                 self.merchant(ev)
             }
-            "unknown" => {
+            Kind::Unknown => {
                 self.kill_factions.line(ev);
                 let zone = self.zone.clone();
                 self.mob_locs.line(ev, zone.as_deref()) | self.quest_line(ev) | self.unparsed(ev) | self.merchant(ev) | self.offered(ev) | self.stocked(ev)
@@ -533,7 +533,7 @@ impl EqModule for GapsModule {
 
     fn on_event(&mut self, ev: &Event, _live: bool) {
         self.seq = ev.seq();
-        if ev.kind() == "epoch" {
+        if ev.kind_of() == Kind::Epoch {
             self.clear();
             self.announce.changed(self.seq);
             return;

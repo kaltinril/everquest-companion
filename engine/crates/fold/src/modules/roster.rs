@@ -30,7 +30,7 @@
 //! — RETROACTIVELY for that rung only, because the claim tell routinely lands after you finished
 //! buffing. `joined` / `stated` / `user` are never touched: those the game or the user said outright.
 
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::jsmap::JsMap;
 use crate::EqModule;
 use eqlog::names::id_key;
@@ -453,8 +453,8 @@ impl EqModule for RosterModule {
 
     fn on_event(&mut self, ev: &Event, _live: bool) {
         self.seq = ev.seq();
-        match ev.kind() {
-            "epoch" => {
+        match ev.kind_of() {
+            Kind::Epoch => {
                 // Character rebirth: this group belonged to the wiped character. Everything goes,
                 // the persisted edits included — and they go by DATE rather than by deletion,
                 // because the list belongs to the app and the fold does not get to edit it.
@@ -467,7 +467,7 @@ impl EqModule for RosterModule {
                 // there.
                 self.announce.changed(ev.seq());
             }
-            "offlineGap" => {
+            Kind::OfflineGap => {
                 // The world stopped being observable. Nothing SAID the group broke — EQ never does
                 // — so every member is marked stale rather than removed, and stays in the
                 // allowlist.
@@ -490,17 +490,17 @@ impl EqModule for RosterModule {
             }
             // `You gain party experience!` — the game's own statement that you are in a group right
             // now. IT NAMES NOBODY, so it opens the gate and touches nothing else.
-            "expGain" => {
+            Kind::ExpGain => {
                 if ev.bool("party") {
                     self.party_exp = true;
                 }
             }
-            "charm" | "uncharm" => self.refuse_pet(ev.str("mob").unwrap_or_default()),
-            "petClaim" => self.refuse_pet(ev.str("name").unwrap_or_default()),
+            Kind::Charm | Kind::Uncharm => self.refuse_pet(ev.str("mob").unwrap_or_default()),
+            Kind::PetClaim => self.refuse_pet(ev.str("name").unwrap_or_default()),
             // A group mate's pet naming its leader is a pet too (owner, 2026-10-22: Malkil's Jeber).
-            "allyPetLeader" => self.refuse_pet(ev.str("pet").unwrap_or_default()),
-            "heal" => self.fold_heal(ev),
-            "group" => self.fold_group(ev),
+            Kind::AllyPetLeader => self.refuse_pet(ev.str("pet").unwrap_or_default()),
+            Kind::Heal => self.fold_heal(ev),
+            Kind::Group => self.fold_group(ev),
             _ => self.fold_who(ev),
         }
     }

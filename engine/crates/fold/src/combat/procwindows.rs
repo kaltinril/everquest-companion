@@ -111,6 +111,9 @@ pub struct WindowFold {
 pub struct WindowAccum {
     /// Keyed by minute, insertion-ordered because the drop-oldest cap evicts the first key inserted.
     windows: JsMap<ProcWindow>,
+    /// The minute `ensure` last answered and its key, so a run of hits inside one window (the
+    /// ordinary case: this is asked twice per attributed line) formats and hashes nothing new.
+    last: Option<(i64, String)>,
 }
 
 impl WindowAccum {
@@ -146,34 +149,42 @@ impl WindowAccum {
 
     fn ensure(&mut self, ts: i64, active: &HashSet<String>) -> &mut ProcWindow {
         let minute = ts.div_euclid(WINDOW_MS);
-        let key = minute.to_string();
-        if self.windows.contains_key(&key) {
-            let w = self.windows.get_mut(&key).expect("present");
+        let key = match self.last.take() {
+            Some((m, k)) if m == minute => k,
+            _ => minute.to_string(),
+        };
+        let present = self.windows.contains_key(&key);
+        if !present {
+            self.windows.insert(
+                key.clone(),
+                ProcWindow {
+                    minute,
+                    active_ms: 0,
+                    swings: 0,
+                    out_damage: 0,
+                    proc_damage: 0,
+                    transition_groups: HashSet::new(),
+                    state_keys: active.clone(),
+                },
+            );
+            if self.windows.len() > WINDOW_CAP {
+                let oldest = self.windows.keys().next().map(str::to_string);
+                if let Some(k) = oldest {
+                    self.windows.remove(&k);
+                }
+            }
+        }
+        let w = self.windows.get_mut(&key).expect("present or just inserted");
+        if present {
             // A state can turn on mid-window; the set is a union over the window, not a snapshot.
             for k in active {
-                w.state_keys.insert(k.clone());
-            }
-            return w;
-        }
-        self.windows.insert(
-            key.clone(),
-            ProcWindow {
-                minute,
-                active_ms: 0,
-                swings: 0,
-                out_damage: 0,
-                proc_damage: 0,
-                transition_groups: HashSet::new(),
-                state_keys: active.clone(),
-            },
-        );
-        if self.windows.len() > WINDOW_CAP {
-            let oldest = self.windows.keys().next().map(str::to_string);
-            if let Some(k) = oldest {
-                self.windows.remove(&k);
+                if !w.state_keys.contains(k) {
+                    w.state_keys.insert(k.clone());
+                }
             }
         }
-        self.windows.get_mut(&key).expect("just inserted")
+        self.last = Some((minute, key));
+        w
     }
 }
 

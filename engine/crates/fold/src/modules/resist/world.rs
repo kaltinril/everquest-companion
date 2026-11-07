@@ -28,7 +28,7 @@ use super::catalog::{catalog_knows, local_mob_entry, parse_catalog_level, resolv
 use super::mob_key;
 use crate::jsmap::JsMap;
 use eqlog::jsstr::{js_trim, JS_S};
-use eqlog::names::{id_key, mob_article_re};
+use eqlog::names::{id_key, id_key_ref, mob_article_re};
 use regex::Regex;
 use std::collections::HashMap;
 use std::sync::OnceLock;
@@ -178,9 +178,14 @@ impl CasterIndex {
 
     /// You landed damage on it, so it is a mob. One direction only; this never un-files a player.
     pub fn note_struck(&mut self, name: &str) {
-        let key = id_key(name);
-        self.verdicts.remove(&key);
-        self.struck.insert(key);
+        let key = id_key_ref(name);
+        // Every swing of yours lands here; once the name is struck and holds no verdict, the two
+        // writes below would change nothing.
+        if self.struck.contains(key.as_ref()) && !self.verdicts.contains_key(key.as_ref()) {
+            return;
+        }
+        self.verdicts.remove(key.as_ref());
+        self.struck.insert(key.into_owned());
     }
 
     pub fn kind_of(&mut self, name: &str) -> super::ledger::CasterKind {
@@ -189,15 +194,15 @@ impl CasterIndex {
         if name == "You" {
             return super::ledger::CasterKind::SelfCast;
         }
-        let key = id_key(name);
+        let key = id_key_ref(name);
         if key == "you" {
             return super::ledger::CasterKind::SelfCast;
         }
-        if let Some(&cached) = self.verdicts.get(&key) {
+        if let Some(&cached) = self.verdicts.get(key.as_ref()) {
             return kind_from(cached);
         }
         let verdict = self.judge(&key, name);
-        self.verdicts.insert(key, verdict);
+        self.verdicts.insert(key.into_owned(), verdict);
         kind_from(verdict)
     }
 

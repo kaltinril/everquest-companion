@@ -12,7 +12,7 @@
 //! `seq` is this module's own revision, monotonic and never reset: state here moves without a log
 //! event (`set_character`), and `useModule` dedupes with `d.seq <= knownSeq`.
 
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::message_overlay::message_text_of;
 use crate::modules::gaps_locs::loc_of;
 use crate::EqModule;
@@ -138,8 +138,8 @@ impl EqModule for CharacterModule {
     }
 
     fn on_event(&mut self, ev: &Event, _live: bool) {
-        match ev.kind() {
-            "epoch" => {
+        match ev.kind_of() {
+            Kind::Epoch => {
                 // Character rebirth: the wiped character's level and zone say nothing about this
                 // one. The ref is pushed in and stays.
                 self.zone = None;
@@ -147,7 +147,7 @@ impl EqModule for CharacterModule {
                 self.level = None;
                 self.rev += 1;
             }
-            "zone" => {
+            Kind::Zone => {
                 let zone = ev.str("zone").map(str::to_string);
                 // Any zone line, the same zone again included: a position from before it is not
                 // where you are now.
@@ -158,13 +158,13 @@ impl EqModule for CharacterModule {
                     self.rev += 1;
                 }
             }
-            "unknown" => self.logged_loc(ev),
-            "level" => self.state_level(LevelStatement {
+            Kind::Unknown => self.logged_loc(ev),
+            Kind::Level => self.state_level(LevelStatement {
                 level: ev.int("level").unwrap_or(0),
                 ts: ev.ts(),
                 source: "ding",
             }),
-            "selfWho" => self.state_level(LevelStatement {
+            Kind::SelfWho => self.state_level(LevelStatement {
                 level: ev.int("level").unwrap_or(0),
                 ts: ev.ts(),
                 source: "who",

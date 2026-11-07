@@ -37,7 +37,7 @@ use crate::modules::gaps_details::coin_of;
 use crate::modules::gaps_players::{hail_of, ANSWER_MS};
 use crate::modules::gaps_keys::ItemIndex;
 use super::{Domain, GapsModule};
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::message_overlay::message_text_of;
 use crate::modules::consider::mob_key;
 use serde_json::{json, Value};
@@ -199,12 +199,12 @@ impl GapsModule {
 
     /// A quote or a purchase: the item goes on its merchant's stock. True when the stock changed.
     pub(super) fn stocked(&mut self, ev: &Event) -> bool {
-        match ev.kind() {
-            "purchase" => match (ev.str("npc"), ev.str("item")) {
+        match ev.kind_of() {
+            Kind::Purchase => match (ev.str("npc"), ev.str("item")) {
                 (Some(npc), Some(item)) => self.stock.sold(npc, item, None),
                 _ => false,
             },
-            "unknown" => {
+            Kind::Unknown => {
                 let text = message_text_of(ev.raw());
                 let Some((merchant, item, copper)) = quote_of(text) else {
                     return self.stock.heard(text, ev.ts());

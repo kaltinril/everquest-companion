@@ -188,6 +188,7 @@ impl Kind {
     /// The discriminant for a `kind` string. [`Kind::Other`] for anything this build does not know —
     /// which a parse cannot produce, so it only ever describes a hand-built value.
     #[must_use]
+    #[inline]
     pub fn parse(s: &str) -> Kind {
         // A match on the string, not a map: a call with a literal argument folds away at compile
         // time.
@@ -514,8 +515,9 @@ impl Key {
     }
 
     /// The discriminant for a field-name string, or `None` for a name no event carries. `None`
-    /// means absent.
+    /// means absent. Inlined so a call with a literal folds to the constant across the crate line.
     #[must_use]
+    #[inline]
     pub fn parse(s: &str) -> Option<Key> {
         // A match on the string, not a map — a call site passing a literal folds to a constant.
         Some(match s {

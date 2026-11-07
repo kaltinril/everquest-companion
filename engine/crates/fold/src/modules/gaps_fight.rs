@@ -34,7 +34,7 @@
 //! Bounded: per name and tier a few numbers, the verbs seen, and the last SAMPLES_KEPT fight totals.
 
 use super::consider::mob_key;
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::jsfn::{zone_tier, TIER_UNKNOWN};
 use eqlog::names::id_key_ref;
 use serde_json::{json, Value};
@@ -301,7 +301,7 @@ impl MobFights {
     pub fn event(&mut self, ev: &Event) {
         let ts = ev.ts();
         let amount = ev.int("amount").unwrap_or(0);
-        let hit = ev.kind() == "damage";
+        let hit = ev.kind_of() == Kind::Damage;
         if let Some(o) = self.fight(ev.str("target"), ts) {
             o.total += if hit { amount } else { 0 };
         }

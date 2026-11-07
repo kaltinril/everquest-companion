@@ -10,7 +10,7 @@
 //! out of a zone and sold elsewhere is still that zone's income).
 
 use super::progression::cap_drop;
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use serde::Serialize;
 
 /// Coin lines run ~300 a day on the owner's log, so this covers months.
@@ -73,21 +73,21 @@ fn body(raw: &str) -> &str {
 impl Ledger {
     /// Folds one event. True when a column moved.
     pub fn fold(&mut self, ev: &Event) -> bool {
-        let copper = match ev.kind() {
+        let copper = match ev.kind_of() {
             // Only the clause before `from`: a merchant's name or the item sold follows it.
-            "coin" => copper_in(body(ev.raw()).split(" from ").next().unwrap_or_default()),
-            "loot" if ev.str("disposition") == Some("sold") => ev
+            Kind::Coin => copper_in(body(ev.raw()).split(" from ").next().unwrap_or_default()),
+            Kind::Loot if ev.str("disposition") == Some("sold") => ev
                 .raw()
                 .split_once(" sold it for ")
                 .and_then(|(_, price)| copper_in(price)),
-            "playerDeath" => return self.push_death(ev.ts(), ev.str("killer").unwrap_or_default()),
+            Kind::PlayerDeath => return self.push_death(ev.ts(), ev.str("killer").unwrap_or_default()),
             _ => return false,
         };
         match copper {
             Some(c) if c > 0 => {
                 self.coin_ts.push(ev.ts());
                 self.coin_copper.push(c);
-                self.coin_sold.push(if ev.kind() == "coin" { sold_item(ev) } else { String::new() });
+                self.coin_sold.push(if ev.kind_of() == Kind::Coin { sold_item(ev) } else { String::new() });
                 true
             }
             _ => false,

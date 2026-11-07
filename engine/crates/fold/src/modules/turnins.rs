@@ -9,7 +9,7 @@
 //! `gaps_quest_log.rs` reads them). `items` keeps every offer as before; Sky quest crediting reads
 //! `given` (`turnInCelebration.ts`), so a cancelled or refused offer is no turn-in there either.
 
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::message_overlay::message_text_of;
 use crate::modules::gaps::quests::{refused_here, trade_cancelled, REFUSAL, REFUSE_MS};
 use crate::modules::gaps_players::speaker_of;
@@ -118,18 +118,18 @@ impl EqModule for TurnInsModule {
 
     fn on_event(&mut self, ev: &Event, _live: bool) {
         self.seq = ev.seq();
-        match ev.kind() {
+        match ev.kind_of() {
             // Character rebirth. A half-formed offer group goes with it.
-            "epoch" => {
+            Kind::Epoch => {
                 self.turn_ins.clear();
                 self.pending_offer = None;
                 self.announce.changed(self.seq);
             }
             // An offer publishes nothing: it opens or extends the pending group, which is not in
             // `snapshot()`. Handing items to an NPC and walking away leaves the ledger as it was.
-            "offer" => self.offer(ev),
-            "unknown" => self.line(ev),
-            "trade" => {
+            Kind::Offer => self.offer(ev),
+            Kind::Unknown => self.line(ev),
+            Kind::Trade => {
                 let npc = ev.str("npc").unwrap_or_default();
                 if let Some(open) = self.pending_offer.take() {
                     if open.npc == npc {
