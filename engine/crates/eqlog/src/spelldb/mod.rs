@@ -77,6 +77,9 @@ pub struct SpellDb {
     wears_off: HashMap<String, Vec<usize>>,
     cast_on_other_by_last_word: HashMap<String, Vec<SuffixEntry>>,
     cast_on_other_unkeyed: Vec<SuffixEntry>,
+    /// The cast-on-other tails of the keyed entries (the rows `by_key_values` walks), each once:
+    /// what the overlay's "would this landing line fire on a mob" test ends-with-tests against.
+    keyed_other_tails: Vec<String>,
     /// The derived charm roster, keyed by `spell_canon_key`.
     charm_keys: std::collections::HashSet<String>,
 }
@@ -106,6 +109,15 @@ impl SpellDb {
         self.charm_keys
             .contains(&crate::names::spell_canon_key(name))
             || crate::stems::charm_stems_test(name)
+    }
+
+    /// True when `text` ends with the cast-on-other tail of any keyed entry, by the same test
+    /// `match_cast_on_other` makes. The overlay asks this for every mined landing message; it used
+    /// to re-derive every keyed entry's suffix (three regexes) per message, ~2.8M regex runs a load.
+    pub(crate) fn ends_with_keyed_other_tail(&self, text: &str) -> bool {
+        self.keyed_other_tails
+            .iter()
+            .any(|tail| text.ends_with(tail.as_str()) && text.len() > tail.len())
     }
 
     /// One bucket lookup, then table order within it, then the (measured-empty) unkeyable list
@@ -240,21 +252,45 @@ pub fn load() -> SpellDb {
     db
 }
 
+/// The cast-on-other suffix table as it is built: insertion-ordered, because an entry's position
+/// is its precedence, with the keyed entries' tails alongside.
+#[derive(Default)]
+struct SuffixTable {
+    order: Vec<(String, Vec<usize>)>,
+    at: HashMap<String, usize>,
+    keyed_tails: Vec<String>,
+}
+
+impl SuffixTable {
+    /// Record spell `i`'s suffix; `keyed` says whether `i` is its canonical name's first row.
+    fn note(&mut self, suf: String, i: usize, keyed: bool, spells: &[SpellEntry]) {
+        if keyed {
+            self.keyed_tails.push(match_tail(&suf));
+        }
+        match self.at.get(&suf) {
+            Some(&at) => push_candidate_vec(&mut self.order[at].1, i, spells),
+            None => {
+                self.at.insert(suf.clone(), self.order.len());
+                self.order.push((suf, vec![i]));
+            }
+        }
+    }
+}
+
 /// The four tables, plus the last-word index over the fourth.
 fn build(spells: Vec<SpellEntry>) -> SpellDb {
     let mut by_key: HashMap<String, usize> = HashMap::new();
     let mut by_key_order: Vec<usize> = Vec::new();
     let mut cast_on_you: HashMap<String, Vec<usize>> = HashMap::new();
     let mut wears_off: HashMap<String, Vec<usize>> = HashMap::new();
-    // Insertion-ordered, because an entry's position in this table is its precedence.
-    let mut suffix_order: Vec<(String, Vec<usize>)> = Vec::new();
-    let mut suffix_at: HashMap<String, usize> = HashMap::new();
+    let mut suffixes = SuffixTable::default();
 
     for (i, s) in spells.iter().enumerate() {
         let key = db_canon_key(&s.name);
         // The first row per canonical name wins.
-        if let std::collections::hash_map::Entry::Vacant(slot) = by_key.entry(key) {
-            slot.insert(i);
+        let keyed = !by_key.contains_key(&key);
+        if keyed {
+            by_key.insert(key, i);
             by_key_order.push(i);
         }
         if let Some(msg) = s.msg_cast_on_you.as_deref() {
@@ -263,22 +299,14 @@ fn build(spells: Vec<SpellEntry>) -> SpellDb {
         if let Some(msg) = s.msg_wears_off.as_deref() {
             push_candidate_map(&mut wears_off, msg, i, &spells);
         }
-        if let Some(msg) = s.msg_cast_on_other.as_deref() {
-            if let Some(suf) = cast_on_other_suffix(msg) {
-                match suffix_at.get(&suf) {
-                    Some(&at) => push_candidate_vec(&mut suffix_order[at].1, i, &spells),
-                    None => {
-                        suffix_at.insert(suf.clone(), suffix_order.len());
-                        suffix_order.push((suf, vec![i]));
-                    }
-                }
-            }
+        if let Some(suf) = s.msg_cast_on_other.as_deref().and_then(cast_on_other_suffix) {
+            suffixes.note(suf, i, keyed, &spells);
         }
     }
 
     let mut cast_on_other_by_last_word: HashMap<String, Vec<SuffixEntry>> = HashMap::new();
     let mut cast_on_other_unkeyed: Vec<SuffixEntry> = Vec::new();
-    for (index, (suffix, cands)) in suffix_order.into_iter().enumerate() {
+    for (index, (suffix, cands)) in suffixes.order.into_iter().enumerate() {
         let entry = SuffixEntry {
             tail: match_tail(&suffix),
             index,
@@ -293,6 +321,10 @@ fn build(spells: Vec<SpellEntry>) -> SpellDb {
         }
     }
 
+    let mut keyed_other_tails = suffixes.keyed_tails;
+    keyed_other_tails.sort_unstable();
+    keyed_other_tails.dedup();
+
     let charm_keys = charm_roster(&spells);
     SpellDb {
         spells,
@@ -302,6 +334,7 @@ fn build(spells: Vec<SpellEntry>) -> SpellDb {
         wears_off,
         cast_on_other_by_last_word,
         cast_on_other_unkeyed,
+        keyed_other_tails,
         charm_keys,
     }
 }
@@ -395,5 +428,24 @@ impl SpellDb {
         self.by_key
             .iter()
             .map(move |(k, &i)| (k.as_str(), &self.spells[i]))
+    }
+}
+
+#[cfg(test)]
+mod load_timing {
+    /// `cargo test -p eqlog --release -- --ignored --nocapture load_timing`: the load chain's wall
+    /// time, for before/after measurements of a load-path change.
+    #[test]
+    #[ignore]
+    fn load_timing() {
+        for _ in 0..3 {
+            let t = std::time::Instant::now();
+            let db = super::load();
+            eprintln!(
+                "spelldb::load: {} ms ({} spells)",
+                t.elapsed().as_millis(),
+                db.spells.len()
+            );
+        }
     }
 }

@@ -139,7 +139,9 @@ pub fn derive_landing_corrections(db: &SpellDb) -> Vec<(String, String, Option<S
         if m.role != "landing" {
             continue;
         }
-        if looks_cast_on_other(db, &m.text) {
+        // A line ending with any keyed cast-on-other suffix, registered as a self-landing message,
+        // would fire a self `buffApply` for a debuff on a mob.
+        if db.ends_with_keyed_other_tail(&m.text) {
             continue;
         }
         match m.verdict {
@@ -208,18 +210,41 @@ fn message_matches_other_suffix(text: &str, suffix: &str) -> bool {
     text.ends_with(&tail) && text.len() > tail.len()
 }
 
-/// True when a line ends with any cast-on-other suffix, in which case registering it as a
-/// self-landing message would fire a self `buffApply` for a debuff on a mob.
-fn looks_cast_on_other(db: &SpellDb, text: &str) -> bool {
-    for s in db.by_key_values() {
-        let Some(msg) = s.msg_cast_on_other.as_deref() else {
-            continue;
+#[cfg(test)]
+mod tests {
+    /// The precomputed tails answer what the per-pair derivation answered: for every keyed entry's
+    /// cast-on-other suffix, the tail test on a line built to end with it, and on lines that do
+    /// not, agrees with the suffix-by-suffix walk this replaced.
+    #[test]
+    fn the_keyed_tails_are_the_keyed_entries_suffixes() {
+        let db = crate::spelldb::shared();
+        let walk = |text: &str| {
+            db.by_key_values().any(|s| {
+                s.msg_cast_on_other
+                    .as_deref()
+                    .and_then(super::super::cast_on_other_suffix)
+                    .is_some_and(|suffix| super::message_matches_other_suffix(text, &suffix))
+            })
         };
-        if let Some(suffix) = super::cast_on_other_suffix(msg) {
-            if message_matches_other_suffix(text, &suffix) {
-                return true;
+        let mut probes: Vec<String> = vec![
+            String::new(),
+            "You feel much faster.".to_string(),
+            "a rat looks powerful.".to_string(),
+            "'s skin shimmers.".to_string(),
+        ];
+        for s in db.by_key_values().take(400) {
+            if let Some(suffix) = s
+                .msg_cast_on_other
+                .as_deref()
+                .and_then(super::super::cast_on_other_suffix)
+            {
+                probes.push(format!("a rat {suffix}"));
+                probes.push(format!("a rat's {suffix}"));
+                probes.push(suffix);
             }
         }
+        for text in &probes {
+            assert_eq!(db.ends_with_keyed_other_tail(text), walk(text), "{text:?}");
+        }
     }
-    false
 }
