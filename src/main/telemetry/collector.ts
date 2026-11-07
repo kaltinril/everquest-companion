@@ -29,6 +29,7 @@ import {
 import { CHANNEL } from '../channel'
 import { logInfo } from '../errorLog'
 import { getTelemetryPrefs, setTelemetryPrefs } from '../store'
+import { setLiveProbeDemand } from '../livePerfProbe'
 import { telemetryCollectEnabled, telemetryEndpointConfigured } from './net'
 import { resetHealth } from './health'
 import { resetErrorReports } from './errorReports'
@@ -271,12 +272,17 @@ export function pendingBatch(): TelemetryBatch | null {
 export function setTelemetryEnabled(enabled: boolean): TelemetryPrefs {
   if (!enabled) {
     dropRing()
-    return setTelemetryPrefs({ enabled: false, analyticsId: null })
+    const off = setTelemetryPrefs({ enabled: false, analyticsId: null })
+    // The live probes measure for the riders; with collection off they have no reader (perf.ts).
+    setLiveProbeDemand('telemetry', false)
+    return off
   }
   setTelemetryPrefs({ enabled: true })
   ensureAnalyticsId()
   // Re-read: `ensureAnalyticsId` writes the id through the store, not through this call.
-  return getTelemetryPrefs()
+  const on = getTelemetryPrefs()
+  setLiveProbeDemand('telemetry', telemetryCollectEnabled(on))
+  return on
 }
 
 /**
