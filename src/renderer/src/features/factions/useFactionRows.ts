@@ -26,6 +26,7 @@ import { rulesOf } from '@shared/unlocks/unlockGraph'
 import { FACTION_TIER_FLOORS, factionTier } from './factionTiers'
 import { factionWorkIndex, type FactionWork } from './factionQuests'
 import { trailingRefresh } from './evidenceRefresh'
+import { useHeldProgress } from '../posky/progressStore'
 
 /** The dump's floor — the far end every bar is measured from (measured ±2000, factions.ts). */
 const SCALE_FLOOR = -2000
@@ -205,11 +206,17 @@ function useFactionEvidence(progress: ProgressState | null, recentMinutes: numbe
   const loadedAt = progress?.factionsSource?.loadedAt
   useEffect(() => {
     const refresh = trailingRefresh(() => setAsks((n) => n + 1))
+    // ONLY WHILE THE WINDOW CAN BE SEEN (the 2026-11-06 renderer pass): each ask reads the log
+    // tail on main, and a minimized app re-asked it per combat ping and per minute for a tab
+    // nobody was looking at. The focus nudge below re-asks the moment it is looked at again.
+    const nudge = (): void => {
+      if (document.visibilityState === 'visible') refresh.nudge()
+    }
     // The engine's "a module moved" ping is the existing signal that the log has new lines.
-    const off = window.eq.onCombatActivity(refresh.nudge)
+    const off = window.eq.onCombatActivity(nudge)
     window.addEventListener('focus', refresh.nudge)
     // A quiet log still ages the recent window: re-ask once a minute so old moves drop out.
-    const tick = setInterval(refresh.nudge, 60_000)
+    const tick = setInterval(nudge, 60_000)
     return () => {
       refresh.cancel()
       off()
@@ -222,7 +229,9 @@ function useFactionEvidence(progress: ProgressState | null, recentMinutes: numbe
     window.eq
       .factionsEvidence(recentMinutes)
       .then((r) => {
-        if (alive) setReport(r)
+        // The same report as last time keeps its identity, so the rows memoized on it hold: a
+        // combat ping that moved no standing is the ordinary answer.
+        if (alive) setReport((prev) => (prev !== null && r !== null && JSON.stringify(prev) === JSON.stringify(r) ? prev : r))
       })
       .catch(() => {
         // A build whose handler is absent (packaged: the gate) or a read that failed — the dump
@@ -239,29 +248,9 @@ function useFactionEvidence(progress: ProgressState | null, recentMinutes: numbe
 /** Everything the tab draws, live on the same push every progress consumer rides. `recentMinutes`
  *  sizes each row's recent tally (the "moved recently" filter's window). */
 export function useFactionData(recentMinutes = 30): FactionsData {
-  const [progress, setProgress] = useState<ProgressState | null>(null)
-  useEffect(() => {
-    let alive = true
-    // A push is always the newer snapshot: the initial reply may have been read before it and
-    // still land after it, so once a push has arrived the reply is dropped.
-    let pushed = false
-    window.eq
-      .getProgress()
-      .then((p) => {
-        if (alive && !pushed) setProgress(p)
-      })
-      .catch(() => {
-        // A failed first read leaves the tab empty until the next push, which is what it shows.
-      })
-    const off = window.eq.onProgress((p) => {
-      pushed = true
-      setProgress(p)
-    })
-    return () => {
-      alive = false
-      off()
-    }
-  }, [])
+  // THE WINDOW'S ONE HELD PROGRESS (posky/progressStore.ts; the 2026-11-06 renderer pass): the tab
+  // used to ask main for the whole state on every mount and render once empty and once filled.
+  const [progress] = useHeldProgress()
   const evidence = useFactionEvidence(progress, recentMinutes)
   const standings = progress?.factionStandings
   const races = progress?.raceUnlocks
