@@ -395,14 +395,12 @@ impl EngineState {
         self.roster.admitted.contains(name_key)
     }
 
-    /// True if `name_key` currently resolves to an engaged hostile instance.
+    /// True if `name_key` currently resolves to an engaged hostile instance. A set lookup on the
+    /// encounter's name index, which `Encounter::engage` keeps in step with `engaged`.
     pub fn is_engaged_hostile(&self, name_key: &str) -> bool {
-        let Some(enc) = &self.current else {
-            return false;
-        };
-        enc.engaged
-            .iter()
-            .any(|id| name_key_of(id) == Some(name_key))
+        self.current
+            .as_ref()
+            .is_some_and(|enc| enc.engaged_names.contains(name_key))
     }
 
     /// The in-progress encounter, but only while it is fresh — the rule `route_miss` uses, so a
@@ -746,14 +744,7 @@ impl EngineState {
         if key == "you" {
             return "You".to_string();
         }
-        let engaged = match &self.current {
-            Some(enc) => enc
-                .engaged
-                .iter()
-                .any(|id| name_key_of(id) == Some(key.as_ref())),
-            None => false,
-        };
-        if engaged {
+        if self.is_engaged_hostile(&key) {
             self.resolve(name, ts, false).label
         } else {
             name.to_string()

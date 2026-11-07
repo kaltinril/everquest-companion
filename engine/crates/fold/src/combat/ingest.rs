@@ -443,8 +443,7 @@ fn ingest_cc(st: &mut EngineState, ev: &Event) {
     let label = inst.label.clone();
     ensure_encounter(st, ev.ts());
     let enc = st.current.as_mut().expect("just ensured");
-    enc.engaged.insert(inst.instance_id.clone());
-    enc.engaged_seen.insert(inst.instance_id.clone(), ev.ts());
+    enc.engage(&inst.instance_id, ev.ts());
     enc.cc_active_until
         .insert(inst.instance_id, ev.ts() + CC_HOLD_MS);
     st.last_activity_ts = ev.ts();

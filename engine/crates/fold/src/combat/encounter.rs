@@ -118,6 +118,11 @@ pub struct Encounter {
     pub agg: Agg,
     /// Instance ids engaged as hostiles. The one thing that can veto closure.
     pub engaged: HashSet<String>,
+    /// The name key of every id in `engaged` — the same set projected through `name_key_of`, kept
+    /// beside it because the proc, dispel, heal and defender paths ask "is this NAME engaged" on
+    /// every line, and walking the ids to answer was O(engaged) per ask. Insert-only, like
+    /// `engaged`, and written only through [`Encounter::engage`].
+    pub engaged_names: HashSet<String>,
     /// instanceId → ts of the last evidence this instance is still in the fight. The presence axis:
     /// misses, resists, CC and heals refresh it as well as damage, because a mob that whiffs for
     /// eight seconds is still here. It drives only the "gone" staleness in `eval_closure` and never
@@ -166,6 +171,7 @@ impl Encounter {
             last_ts: ts,
             agg: Agg::new(),
             engaged: HashSet::new(),
+            engaged_names: HashSet::new(),
             engaged_seen: JsMap::new(),
             active_ms: 0,
             prev_damage_ts: None,
@@ -179,6 +185,20 @@ impl Encounter {
             coat_at_engage: None,
             combat_at_engage: Vec::new(),
         }
+    }
+
+    /// Engage an instance and stamp its presence at `ts` — the one writer of `engaged`,
+    /// `engaged_names` and (for this door) `engaged_seen`, so the id set and its name index cannot
+    /// drift. The id's name key is what `is_engaged_hostile` is asked about; an id with none (the
+    /// `you` sentinel) is never asked after, so it is kept out of the index as the old walk left it.
+    pub fn engage(&mut self, instance_id: &str, ts: i64) {
+        if let Some(name_key) = crate::combat::state::name_key_of(instance_id) {
+            if !self.engaged_names.contains(name_key) {
+                self.engaged_names.insert(name_key.to_string());
+            }
+        }
+        self.engaged.insert(instance_id.to_string());
+        self.engaged_seen.insert(instance_id.to_string(), ts);
     }
 }
 

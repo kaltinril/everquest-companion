@@ -203,8 +203,7 @@ fn engage_hostile(st: &mut EngineState, inst: &Resolved, ts: i64) {
     let Some(enc) = st.current.as_mut() else {
         return;
     };
-    enc.engaged.insert(inst.instance_id.clone());
-    enc.engaged_seen.insert(inst.instance_id.clone(), ts);
+    enc.engage(&inst.instance_id, ts);
 }
 
 /// Resolve the defender's label. The CALL is not optional even where nothing reads the result:
