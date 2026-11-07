@@ -581,31 +581,25 @@ fn ingest_combat(st: &mut EngineState, ev: &Event) -> bool {
             let Some(mtype) = ev.str(Key::Mtype).and_then(MissType::parse) else {
                 return true;
             };
-            let attacker = ev.str(Key::Attacker).unwrap_or_default().to_string();
+            let attacker = ev.str(Key::Attacker).unwrap_or_default();
             routing::route_miss(
                 st,
                 &MissLine {
                     ts: ev.ts(),
-                    attacker: attacker.clone(),
-                    target: ev.str(Key::Target).unwrap_or_default().to_string(),
+                    attacker,
+                    target: ev.str(Key::Target).unwrap_or_default(),
                     mtype,
-                    verb: ev.str(Key::Verb).map(str::to_string),
+                    verb: ev.str(Key::Verb),
                     // A miss line names no skill, so the round lane's floor is the parser's own
                     // `melee_skill(verb)` answer, asked through the parser's port so the two ends
                     // cannot answer differently.
-                    verb_skill: ev
-                        .str(Key::Verb)
-                        .map(|v| eqlog::parse::combat::melee_skill(v).to_string()),
-                    modifiers: ev
-                        .arr_str(Key::Modifiers)
-                        .iter()
-                        .map(|s| s.to_string())
-                        .collect(),
+                    verb_skill: ev.str(Key::Verb).map(eqlog::parse::combat::melee_skill),
+                    modifiers: ev.arr_str(Key::Modifiers),
                 },
             );
             // Your avoided swing is still an ATTEMPT, and the mechanical proc denominator is
             // attempts — a proc that cannot fire on a miss still had the chance to.
-            if id_key_ref(&attacker) == "you" {
+            if id_key_ref(attacker) == "you" {
                 swing::note(st, ev);
                 fold_both(st, ev.ts(), |agg, active| {
                     agg.windows.fold(

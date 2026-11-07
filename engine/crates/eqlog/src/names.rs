@@ -5,16 +5,24 @@
 
 use crate::jsstr::js_trim;
 use regex::Regex;
+use std::borrow::Cow;
 use std::sync::OnceLock;
 
 /// 'you'/'yourself'/'your' fold to the canonical `You`; everything else is trimmed.
-pub fn norm(name: &str) -> String {
+///
+/// Borrowed, and the fold is the ASCII one, which is exact: `to_lowercase` reaches `you`,
+/// `yourself` or `your` from their ASCII spellings alone, because the one non-ASCII character
+/// that lowercases into ASCII (the Kelvin sign) becomes `k`. Every damage, miss and heal line
+/// asked this twice, and each answer was an allocation thrown away after one write.
+pub fn norm(name: &str) -> Cow<'_, str> {
     let n = js_trim(name);
-    let l = n.to_lowercase();
-    if l == "you" || l == "yourself" || l == "your" {
-        return "You".to_string();
+    if n.eq_ignore_ascii_case("you")
+        || n.eq_ignore_ascii_case("yourself")
+        || n.eq_ignore_ascii_case("your")
+    {
+        return Cow::Borrowed("You");
     }
-    n.to_string()
+    Cow::Borrowed(n)
 }
 
 /// The lowercased identity key. Unicode default case conversion, not ASCII-only.

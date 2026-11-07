@@ -124,17 +124,17 @@ impl MissType {
 /// One avoided swing as the aggregate folds it. `verb` / `lane_skill` / `modifiers` / `target` are
 /// the additive, amount-free inputs to the round grouper and the modifier tallies.
 #[derive(Debug, Clone)]
-pub struct MissFold {
+pub struct MissFold<'a> {
     pub mtype: MissType,
     /// The accuracy lane the miss counts against — `Melee` for every avoided swing.
-    pub skill: String,
+    pub skill: &'static str,
     /// Un-conjugated verb off the miss line, when it named one.
-    pub verb: Option<String>,
+    pub verb: Option<&'a str>,
     /// The round lane's display name for that verb (special-attack renamed) — never the aggregation
-    /// lane above, which stays `Melee`.
+    /// lane above, which stays `Melee`. Owned: it is the engine's state, not the line's.
     pub lane_skill: Option<String>,
-    pub modifiers: Vec<String>,
-    pub target: String,
+    pub modifiers: &'a [&'a str],
+    pub target: &'a str,
     pub ts: i64,
 }
 
@@ -496,20 +496,16 @@ impl Agg {
     }
 
     fn out_row(&mut self, r: &SourceRef) -> &mut SourceStat {
-        if !self.out.contains_key(&r.id) {
-            self.out.insert(r.id.clone(), new_source(&r.name, r.kind));
-        }
-        let s = self.out.get_mut(&r.id).expect("just inserted");
+        let s = self
+            .out
+            .get_or_insert_with(&r.id, || new_source(&r.name, r.kind));
         Agg::reid(s, r);
         s
     }
 
     fn inc_row(&mut self, id: &str, name: &str) -> &mut SourceStat {
-        if !self.inc.contains_key(id) {
-            self.inc
-                .insert(id.to_string(), new_source(name, SourceKind::Enemy));
-        }
-        self.inc.get_mut(id).expect("just inserted")
+        self.inc
+            .get_or_insert_with(id, || new_source(name, SourceKind::Enemy))
     }
 
     /// Drop a recorded row. The one caller is `retract_other`: a name a stronger model has just
@@ -527,11 +523,11 @@ impl Agg {
         add_to_source(self.inc_row(id, name), ev, false);
     }
 
-    pub fn add_out_miss(&mut self, r: &SourceRef, m: &MissFold) {
+    pub fn add_out_miss(&mut self, r: &SourceRef, m: &MissFold<'_>) {
         add_miss_to_source(self.out_row(r), m);
     }
 
-    pub fn add_inc_miss(&mut self, id: &str, name: &str, m: &MissFold) {
+    pub fn add_inc_miss(&mut self, id: &str, name: &str, m: &MissFold<'_>) {
         add_miss_to_source(self.inc_row(id, name), m);
     }
 
@@ -557,17 +553,11 @@ impl Agg {
 }
 
 fn bump(map: &mut JsMap<NamedTotal>, id: &str, name: &str, amount: i64, counted: bool) {
-    if !map.contains_key(id) {
-        map.insert(
-            id.to_string(),
-            NamedTotal {
-                name: name.to_string(),
-                amount: 0,
-                count: 0,
-            },
-        );
-    }
-    let t = map.get_mut(id).expect("just inserted");
+    let t = map.get_or_insert_with(id, || NamedTotal {
+        name: name.to_string(),
+        amount: 0,
+        count: 0,
+    });
     t.amount += amount;
     if counted {
         t.count += 1;
@@ -630,18 +620,12 @@ fn add_swing_counters(src: &mut SourceStat, ev: &DamageEvent<'_>) {
 fn tally_modifiers<S: AsRef<str>>(src: &mut SourceStat, mods: &[S], avoided: bool, amount: i64) {
     for name in mods {
         let name = name.as_ref();
-        if !src.mods.contains_key(name) {
-            src.mods.insert(
-                name.to_string(),
-                ModifierTally {
-                    name: name.to_string(),
-                    count: 0,
-                    avoided: 0,
-                    total: 0,
-                },
-            );
-        }
-        let t = src.mods.get_mut(name).expect("just inserted");
+        let t = src.mods.get_or_insert_with(name, || ModifierTally {
+            name: name.to_string(),
+            count: 0,
+            avoided: 0,
+            total: 0,
+        });
         t.count += 1;
         if avoided {
             t.avoided += 1;
@@ -654,19 +638,12 @@ fn tally_modifiers<S: AsRef<str>>(src: &mut SourceStat, mods: &[S], avoided: boo
 /// Category rollup: the same skill breakdown, partitioned by taxonomy category so a source can be
 /// opened into melee/slay/spell/dot/ds.
 fn add_to_category(src: &mut SourceStat, ev: &DamageEvent<'_>) {
-    if !src.by_category.contains_key(ev.category.as_ref()) {
-        src.by_category.insert(
-            ev.category.to_string(),
-            CategoryStat {
-                category: ev.category.to_string(),
-                ..CategoryStat::default()
-            },
-        );
-    }
     let c = src
         .by_category
-        .get_mut(ev.category.as_ref())
-        .expect("just inserted");
+        .get_or_insert_with(ev.category.as_ref(), || CategoryStat {
+            category: ev.category.to_string(),
+            ..CategoryStat::default()
+        });
     c.total += ev.amount;
     c.hits += 1;
     if ev.crit {
@@ -685,22 +662,22 @@ fn add_to_category(src: &mut SourceStat, ev: &DamageEvent<'_>) {
 
 /// Fold a miss (avoided swing) into a source's accuracy stats. The lane is created lazily, which is
 /// what makes an encounter of nothing but whiffs a real encounter rather than an empty one.
-fn add_miss_to_source(src: &mut SourceStat, m: &MissFold) {
+fn add_miss_to_source(src: &mut SourceStat, m: &MissFold<'_>) {
     src.misses += 1;
     src.miss[m.mtype.slot()] += 1;
-    lane(&mut src.by_skill, &m.skill).misses += 1;
+    lane(&mut src.by_skill, m.skill).misses += 1;
     // A miss line can carry an annotation (`… but miss! (Flurry)`), and roughly half the log's
     // flurry annotations are on miss lines, so counting only landed ones would halve the stat.
-    tally_modifiers(src, &m.modifiers, true, 0);
-    if let Some(verb) = &m.verb {
+    tally_modifiers(src, m.modifiers, true, 0);
+    if let Some(verb) = m.verb {
         src.round_acc.add(&SwingRecord {
             ts: m.ts,
             verb,
-            skill: m.lane_skill.as_deref().unwrap_or(&m.skill),
-            target: &m.target,
+            skill: m.lane_skill.as_deref().unwrap_or(m.skill),
+            target: m.target,
             amount: 0,
             avoided: true,
-            modifiers: &m.modifiers,
+            modifiers: m.modifiers,
         });
     }
 }
@@ -730,10 +707,7 @@ fn add_resist_to_source(src: &mut SourceStat, spell: &str, category: &str) {
 pub const MISS_KEYS: [usize; 6] = [0, 1, 2, 3, 4, 5];
 
 fn lane<'a>(map: &'a mut JsMap<SkillStat>, name: &str) -> &'a mut SkillStat {
-    if !map.contains_key(name) {
-        map.insert(name.to_string(), new_skill(name));
-    }
-    map.get_mut(name).expect("just inserted")
+    map.get_or_insert_with(name, || new_skill(name))
 }
 
 #[cfg(test)]
@@ -784,11 +758,11 @@ mod tests {
             &you(),
             &MissFold {
                 mtype: MissType::Dodge,
-                skill: "Melee".into(),
+                skill: "Melee",
                 verb: None,
                 lane_skill: None,
-                modifiers: Vec::new(),
-                target: "a bat".into(),
+                modifiers: &[],
+                target: "a bat",
                 ts: 0,
             },
         );

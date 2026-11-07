@@ -77,6 +77,22 @@ impl<V> JsMap<V> {
         }
     }
 
+    /// The value under `key`, minted from `make` when absent — `map.get(k) ?? map.set(k, make())`.
+    /// One hash on the hit path, where `contains_key` then `get_mut` paid two; the aggregates ask
+    /// this a dozen times per damage line. A minted value takes the position `insert` gives it.
+    pub fn get_or_insert_with(&mut self, key: &str, make: impl FnOnce() -> V) -> &mut V {
+        let i = match self.at.get(key) {
+            Some(&i) => i,
+            None => {
+                let i = self.entries.len();
+                self.at.insert(key.to_string(), i);
+                self.entries.push((key.to_string(), make()));
+                i
+            }
+        };
+        &mut self.entries[i].1
+    }
+
     /// `remove`, handing the value back; None when the key is absent. Same cost.
     pub fn take(&mut self, key: &str) -> Option<V> {
         let i = self.at.remove(key)?;

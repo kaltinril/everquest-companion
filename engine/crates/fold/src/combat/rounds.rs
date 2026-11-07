@@ -216,6 +216,19 @@ pub struct RoundAccum {
     pending: JsMap<PendingLane>,
     /// Swings kept out of round counting, by reason — the denominator's honesty.
     pub excluded: [i64; 4],
+    /// The `verb|target` key, composed here so a swing that extends an open lane allocates
+    /// nothing; it is copied out only when a lane is opened.
+    key_buf: String,
+}
+
+/// Lowercase, borrowed when the lowering is the identity: no ASCII uppercase and nothing outside
+/// ASCII, which is what every verb and nearly every target name here is.
+fn lower(s: &str) -> std::borrow::Cow<'_, str> {
+    if s.bytes().all(|b| b.is_ascii() && !b.is_ascii_uppercase()) {
+        std::borrow::Cow::Borrowed(s)
+    } else {
+        std::borrow::Cow::Owned(s.to_lowercase())
+    }
 }
 
 impl Default for RoundAccum {
@@ -231,12 +244,18 @@ impl RoundAccum {
             open_second: -1,
             pending: JsMap::new(),
             excluded: [0; 4],
+            key_buf: String::new(),
         }
     }
 
     /// Fold one logged swing attempt. Excluded swings are tallied, never dropped silently.
+    ///
+    /// Every attributed melee line reaches this twice (the fight's aggregate and the zone's), so it
+    /// allocates only when it opens a lane: the verb and the target are lowered in place when the
+    /// lowering is the identity, the key lives in `key_buf`, and a lane's label is rewritten only
+    /// when the line spells a different one.
     pub fn add<S: AsRef<str>>(&mut self, rec: &SwingRecord<'_, S>) {
-        let verb = rec.verb.to_lowercase();
+        let verb = lower(rec.verb);
         if let Some(why) = round_exclusion(&verb, rec.modifiers) {
             self.excluded[why.slot()] += 1;
             return;
@@ -246,24 +265,31 @@ impl RoundAccum {
             self.flush();
             self.open_second = sec;
         }
-        let key = format!("{}|{}", verb, rec.target.trim().to_lowercase());
+        let mut key = std::mem::take(&mut self.key_buf);
+        key.clear();
+        key.push_str(&verb);
+        key.push('|');
+        key.push_str(&lower(rec.target.trim()));
         let token = signature_token(rec.amount, rec.avoided);
         match self.pending.get_mut(&key) {
             Some(lane) => {
-                lane.skill = rec.skill.to_string();
+                if lane.skill != rec.skill {
+                    lane.skill = rec.skill.to_string();
+                }
                 lane.seq.push(token);
             }
             None => {
                 self.pending.insert(
-                    key,
+                    key.clone(),
                     PendingLane {
-                        verb,
+                        verb: verb.into_owned(),
                         skill: rec.skill.to_string(),
                         seq: vec![token],
                     },
                 );
             }
         }
+        self.key_buf = key;
     }
 
     /// Close the open second into the counters. Idempotent on an empty pending map.
@@ -275,21 +301,13 @@ impl RoundAccum {
         if n == 0 {
             return;
         }
-        let groups: Vec<CollapsedRound> = if n == 1 {
-            self.pending
-                .values()
-                .map(|lane| CollapsedRound {
-                    verb: lane.verb.clone(),
-                    skill: lane.skill.clone(),
-                    swings: lane.seq.len(),
-                    targets: 1,
-                })
-                .collect()
+        if n == 1 {
+            let lane = self.pending.values().next().expect("one lane");
+            count_lane(&mut self.lanes, &lane.verb, &lane.skill, lane.seq.len(), 1);
         } else {
-            collapse_fan_out(self.pending.values())
-        };
-        for g in groups {
-            count_into(&mut self.lanes, &g);
+            for g in collapse_fan_out(self.pending.values()) {
+                count_into(&mut self.lanes, &g);
+            }
         }
         self.pending.clear();
     }
@@ -319,17 +337,22 @@ impl RoundAccum {
 
 /// Fold ONE collapsed round into a lane tally (shared by `flush` and the pure snapshot).
 fn count_into(into: &mut JsMap<RoundLaneTally>, g: &CollapsedRound) {
-    if !into.contains_key(&g.verb) {
-        into.insert(g.verb.clone(), new_lane(&g.verb, &g.skill));
+    count_lane(into, &g.verb, &g.skill, g.swings, g.targets);
+}
+
+/// [`count_into`] by parts, so the one-lane flush can count without first copying the lane into a
+/// `CollapsedRound`.
+fn count_lane(into: &mut JsMap<RoundLaneTally>, verb: &str, skill: &str, swings: usize, targets: i64) {
+    let lane = into.get_or_insert_with(verb, || new_lane(verb, skill));
+    if lane.skill != skill {
+        lane.skill = skill.to_string();
     }
-    let lane = into.get_mut(&g.verb).expect("just inserted");
-    lane.skill = g.skill.clone();
-    lane.buckets[round_bucket(g.swings)] += 1;
+    lane.buckets[round_bucket(swings)] += 1;
     lane.rounds += 1;
-    if g.swings >= 2 {
+    if swings >= 2 {
         lane.multi_rounds += 1;
     }
-    if g.targets > 1 {
+    if targets > 1 {
         lane.fanned_rounds += 1;
     }
 }

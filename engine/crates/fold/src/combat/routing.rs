@@ -321,8 +321,9 @@ pub fn route(st: &mut EngineState, ev: &DamageEvent<'_>) -> Option<Attribution> 
 /// incoming list.
 fn route_incoming_damage(st: &mut EngineState, ev: &DamageEvent<'_>) {
     let att = st.resolve(ev.attacker, ev.ts, false);
-    let (id, name) = (att.instance_id.clone(), att.label.clone());
-    both(st, ev.ts, false, |agg| agg.add_inc(&id, &name, ev));
+    both(st, ev.ts, false, |agg| {
+        agg.add_inc(&att.instance_id, &att.label, ev)
+    });
     engage_hostile(st, &att, ev.ts);
     // An incoming instant lanes under the attacker's skill, so it gets its own row.
     if let Some(enc) = st.current.as_mut() {
@@ -342,17 +343,15 @@ fn route_incoming_damage(st: &mut EngineState, ev: &DamageEvent<'_>) {
             },
         );
     }
-    st.log(
-        ev.ts,
-        ev.dtype,
-        "enemy",
+    st.log_lazy(ev.ts, ev.dtype, "enemy", || {
         format!(
-            "{name} → You  {}{}  {}",
+            "{} → You  {}{}  {}",
+            att.label,
             ev.amount,
             if ev.crit { "*" } else { "" },
             ev.skill
-        ),
-    );
+        )
+    });
 }
 
 /// You, your pet or a group member landed a hit.
@@ -390,16 +389,15 @@ fn route_outgoing_damage(st: &mut EngineState, ev: &DamageEvent<'_>, at: &Attrib
     // Resolve the target to an instance. For a same-name ambiguous pet hit the target is the hostile
     // twin (`prefer_charmed = false` picks it).
     let tgt = st.resolve(ev.target, ev.ts, false);
-    let (tid, tname) = (tgt.instance_id.clone(), tgt.label.clone());
     both(st, ev.ts, false, |agg| {
         agg.add_out(&src, ev, ambiguous);
-        agg.bump_target(&tid, &tname, ev.amount);
+        agg.bump_target(&tgt.instance_id, &tgt.label, ev.amount);
     });
     engage_hostile(st, &tgt, ev.ts);
     // The live fight is named after whatever you are presently swinging at; finalize switches to the
     // largest target.
     if let Some(enc) = st.current.as_mut() {
-        enc.last_out_target = Some(tname.clone());
+        enc.last_out_target = Some(tgt.label.clone());
         // An outgoing instant lanes under the skill/spell name, and `target` carries the
         // instance-resolved defender label — the same value `bump_target` aggregates under, so the
         // per-mob breakdown can answer "what did I land on THIS mob".
@@ -415,7 +413,7 @@ fn route_outgoing_damage(st: &mut EngineState, ev: &DamageEvent<'_>, at: &Attrib
                 kind: src.kind.as_str(),
                 outcome: None,
                 detail: None,
-                target: Some(tname.clone()),
+                target: Some(tgt.label.clone()),
             },
         );
     }
@@ -429,12 +427,12 @@ fn route_outgoing_damage(st: &mut EngineState, ev: &DamageEvent<'_>, at: &Attrib
     } else {
         ""
     };
-    st.log(
-        ev.ts,
-        cat,
-        src.kind.as_str(),
-        format!("{} → {tname}  {}{mark}  {}", src.name, ev.amount, ev.skill),
-    );
+    st.log_lazy(ev.ts, cat, src.kind.as_str(), || {
+        format!(
+            "{} → {}  {}{mark}  {}",
+            src.name, tgt.label, ev.amount, ev.skill
+        )
+    });
 }
 
 /// The avoided swing as the aggregates fold it. `skill` stays `Melee` for every miss — that is the
@@ -442,19 +440,22 @@ fn route_outgoing_damage(st: &mut EngineState, ev: &DamageEvent<'_>, at: &Attrib
 /// round grouper and the modifier tallies. The lane label goes through the same two steps a landed
 /// swing does: the parser's melee-skill answer, then the log's statement of which special is live in
 /// that verb lane, gated on the attacker being You because the state line is first-person-only.
-pub struct MissLine {
+///
+/// Borrowed from the event, like `DamageEvent`: a miss line is a sixth of the owner's log, and
+/// owning its five strings cost more than routing it did.
+pub struct MissLine<'a> {
     pub ts: i64,
-    pub attacker: String,
-    pub target: String,
+    pub attacker: &'a str,
+    pub target: &'a str,
     pub mtype: MissType,
-    pub verb: Option<String>,
+    pub verb: Option<&'a str>,
     /// The parser's own `meleeSkill(verb)` answer, carried on the event.
-    pub verb_skill: Option<String>,
-    pub modifiers: Vec<String>,
+    pub verb_skill: Option<&'static str>,
+    pub modifiers: Vec<&'a str>,
 }
 
-fn miss_fold(st: &EngineState, ev: &MissLine, is_you: bool) -> MissFold {
-    let lane_skill = match &ev.verb {
+fn miss_fold<'a>(st: &EngineState, ev: &'a MissLine<'a>, is_you: bool) -> MissFold<'a> {
+    let lane_skill = match ev.verb {
         None => None,
         Some(verb) => {
             let special = if is_you {
@@ -462,16 +463,16 @@ fn miss_fold(st: &EngineState, ev: &MissLine, is_you: bool) -> MissFold {
             } else {
                 None
             };
-            special.or_else(|| ev.verb_skill.clone())
+            special.or_else(|| ev.verb_skill.map(str::to_string))
         }
     };
     MissFold {
         mtype: ev.mtype,
-        skill: "Melee".to_string(),
-        verb: ev.verb.clone(),
+        skill: "Melee",
+        verb: ev.verb,
         lane_skill,
-        modifiers: ev.modifiers.clone(),
-        target: ev.target.clone(),
+        modifiers: &ev.modifiers,
+        target: ev.target,
         ts: ev.ts,
     }
 }
@@ -479,10 +480,10 @@ fn miss_fold(st: &EngineState, ev: &MissLine, is_you: bool) -> MissFold {
 /// Consume a miss (avoided swing) with the same attribution rules as damage. A zero-amount damage
 /// probe is synthesized so `classify` is asked exactly the question it was asked for the landed
 /// twin; a melee skill name is not in the miss line, so avoided swings bucket under `Melee`.
-pub fn route_miss(st: &mut EngineState, ev: &MissLine) {
-    let at = classify(st, &ev.attacker, &ev.target);
+pub fn route_miss(st: &mut EngineState, ev: &MissLine<'_>) {
+    let at = classify(st, ev.attacker, ev.target);
     // An ally pet's swing at a friendly proves the break whether or not it connected.
-    note_ally_pet_evidence(st, &ev.attacker, &ev.target, ev.ts);
+    note_ally_pet_evidence(st, ev.attacker, ev.target, ev.ts);
     if at == Attribution::Ignore {
         // The same two offers the damage path makes, in the same order. No hostile-evidence read on
         // the incoming side: that rung was measured on landed damage, and a swing that connected
@@ -497,14 +498,14 @@ pub fn route_miss(st: &mut EngineState, ev: &MissLine) {
     // Presence: a swing exchanged with an already-engaged mob proves it is still in the fight even
     // though nothing landed. Liveness only; no damage timing moves.
     let who = if at == Attribution::Incoming {
-        ev.attacker.clone()
+        ev.attacker
     } else {
-        ev.target.clone()
+        ev.target
     };
-    st.note_presence(&who, ev.ts);
+    st.note_presence(who, ev.ts);
 
     if at == Attribution::Incoming {
-        let att = st.resolve(&ev.attacker, ev.ts, false);
+        let att = st.resolve(ev.attacker, ev.ts, false);
         let (id, name) = (att.instance_id, att.label);
         both(st, ev.ts, true, |agg| agg.add_inc_miss(&id, &name, &fold));
         // An incoming swing absorbed by YOUR rune is a mitigation instant and belongs to the healing
@@ -514,29 +515,31 @@ pub fn route_miss(st: &mut EngineState, ev: &MissLine) {
         if ev.mtype == MissType::Absorb {
             both(st, ev.ts, true, |agg| agg.heal.add_absorbed_swing());
         }
-        st.log(
-            ev.ts,
-            "miss",
-            "enemy",
-            format!("{name} ✕ You ({})", ev.mtype.as_str()),
-        );
+        st.log_lazy(ev.ts, "miss", "enemy", || {
+            format!("{name} ✕ You ({})", ev.mtype.as_str())
+        });
         return;
     }
     route_outgoing_miss(st, ev, &fold, at.out_kind());
 }
 
 /// A miss YOU, your pet or a group member swung.
-fn route_outgoing_miss(st: &mut EngineState, ev: &MissLine, fold: &MissFold, kind: OutKind) {
-    let src = out_source(st, &ev.attacker, kind, ev.ts);
+fn route_outgoing_miss(
+    st: &mut EngineState,
+    ev: &MissLine<'_>,
+    fold: &MissFold<'_>,
+    kind: OutKind,
+) {
+    let src = out_source(st, ev.attacker, kind, ev.ts);
     // A pet whiffing is as much proof it is fighting for us as a landed hit. A member's whiff proves
     // nothing about charm: they are bound by a group line, not by evidence.
     if kind == OutKind::Pet {
-        st.charm.note_pet_evidence(&id_key_ref(&ev.attacker));
+        st.charm.note_pet_evidence(&id_key_ref(ev.attacker));
     }
     both(st, ev.ts, true, |agg| agg.add_out_miss(&src, fold));
     // A miss tick lanes under `Melee`. The defender goes through `defender_label` so it matches the
     // instance label the damage path writes; a raw name piles every whiff at a twin onto a bare row.
-    let tgt_name = note_defender(st, &ev.target, ev.ts);
+    let tgt_name = note_defender(st, ev.target, ev.ts);
     push_fresh_timeline(
         st,
         ev.ts,
@@ -553,12 +556,9 @@ fn route_outgoing_miss(st: &mut EngineState, ev: &MissLine, fold: &MissFold, kin
             target: Some(tgt_name.clone()),
         },
     );
-    st.log(
-        ev.ts,
-        "miss",
-        src.kind.as_str(),
-        format!("{} ✕ {tgt_name} ({})", src.name, ev.mtype.as_str()),
-    );
+    st.log_lazy(ev.ts, "miss", src.kind.as_str(), || {
+        format!("{} ✕ {tgt_name} ({})", src.name, ev.mtype.as_str())
+    });
 }
 
 pub struct ResistLine {
@@ -980,29 +980,26 @@ fn route_other_damage(st: &mut EngineState, ev: &DamageEvent<'_>) -> bool {
     both(st, ev.ts, true, |agg| agg.add_out(&src, ev, false));
     let tgt_name = note_defender(st, ev.target, ev.ts);
     push_fresh_timeline(st, ev.ts, damage_instant(ev, "other", tgt_name.clone()));
-    st.log(
-        ev.ts,
-        ev.dtype,
-        "other",
+    st.log_lazy(ev.ts, ev.dtype, "other", || {
         format!(
             "{} → {tgt_name}  {}{}  {}",
             src.name,
             ev.amount,
             if ev.crit { "*" } else { "" },
             ev.skill
-        ),
-    );
+        )
+    });
     true
 }
 
-fn route_other_miss(st: &mut EngineState, ev: &MissLine, fold: &MissFold) -> bool {
-    let Some(key) = records_other(st, &ev.attacker, &ev.target) else {
+fn route_other_miss(st: &mut EngineState, ev: &MissLine<'_>, fold: &MissFold<'_>) -> bool {
+    let Some(key) = records_other(st, ev.attacker, ev.target) else {
         return false;
     };
-    st.others.note(&key, &ev.attacker);
-    let src = other_source(st, &ev.attacker, &key, false);
+    st.others.note(&key, ev.attacker);
+    let src = other_source(st, ev.attacker, &key, false);
     both(st, ev.ts, true, |agg| agg.add_out_miss(&src, fold));
-    let tgt_name = note_defender(st, &ev.target, ev.ts);
+    let tgt_name = note_defender(st, ev.target, ev.ts);
     push_fresh_timeline(st, ev.ts, miss_instant(ev, "other", tgt_name.clone()));
     st.log(
         ev.ts,
@@ -1072,7 +1069,7 @@ fn damage_instant(ev: &DamageEvent<'_>, kind: &'static str, target: String) -> T
 }
 
 /// …and the avoided-swing twin, which lanes under `Melee` like every other whiff.
-fn miss_instant(ev: &MissLine, kind: &'static str, target: String) -> TimelineRaw {
+fn miss_instant(ev: &MissLine<'_>, kind: &'static str, target: String) -> TimelineRaw {
     TimelineRaw {
         ts: ev.ts,
         lane: "Melee".to_string(),
@@ -1196,16 +1193,16 @@ fn route_ally_pet_damage(st: &mut EngineState, ev: &DamageEvent<'_>) {
 
 /// The avoided-swing twin, on the same aggregate-only terms. A miss carries no amount, so it can
 /// move no total anywhere (law 8).
-fn route_ally_pet_miss(st: &mut EngineState, ev: &MissLine, fold: &MissFold) {
+fn route_ally_pet_miss(st: &mut EngineState, ev: &MissLine<'_>, fold: &MissFold<'_>) {
     if st.ally.idle() {
         return;
     }
-    let Some(bind) = st.ally.creditable(&id_key_ref(&ev.attacker)) else {
+    let Some(bind) = st.ally.creditable(&id_key_ref(ev.attacker)) else {
         return;
     };
     let src = ally_pet_source(bind);
     both(st, ev.ts, true, |agg| agg.add_out_miss(&src, fold));
-    let tgt_name = note_defender(st, &ev.target, ev.ts);
+    let tgt_name = note_defender(st, ev.target, ev.ts);
     push_fresh_timeline(st, ev.ts, miss_instant(ev, "allyPet", tgt_name.clone()));
     st.log(
         ev.ts,
@@ -1477,11 +1474,11 @@ mod tests {
             &mut st,
             &MissLine {
                 ts: 1_000,
-                attacker: "You".into(),
-                target: "a spite golem".into(),
+                attacker: "You",
+                target: "a spite golem",
                 mtype: MissType::Dodge,
-                verb: Some("slash".into()),
-                verb_skill: Some("Melee".into()),
+                verb: Some("slash"),
+                verb_skill: Some("Melee"),
                 modifiers: Vec::new(),
             },
         );
@@ -1498,11 +1495,11 @@ mod tests {
         st.specials.note("Dragon Punch");
         let line = MissLine {
             ts: 1_000,
-            attacker: "You".into(),
-            target: "a spite golem".into(),
+            attacker: "You",
+            target: "a spite golem",
             mtype: MissType::Miss,
-            verb: Some("strike".into()),
-            verb_skill: Some("Strike".into()),
+            verb: Some("strike"),
+            verb_skill: Some("Strike"),
             modifiers: Vec::new(),
         };
         let mine = miss_fold(&st, &line, true);
