@@ -7,6 +7,7 @@
 // under the zones it was named in. A row seen in no zone is filed under ZONE_NOT_SEEN, last.
 
 import { factionOf, onMobPage, type GapRow } from './gaps'
+import { perObject } from './gapMemo'
 import { itemBaseName } from './itemStats'
 import { mobSourceOf } from './rewardChest'
 import type { LootEvent } from './types'
@@ -71,8 +72,9 @@ function zonesOf(row: GapRow): string[] {
   return row.details.zones?.all ?? row.details.zones?.entries.map((e) => e.name) ?? []
 }
 
-/** Every (zone, mob) each item was looted from, by lowercase item name: one pass over the ledger. A chest payout has no mob. */
-function lootPlaces(loot: readonly LootEvent[]): Map<string, Place[]> {
+/** Every (zone, mob) each item was looted from, by lowercase item name: one pass over the ledger, kept
+ *  per ledger object (whole-app review 2026-11-06: a regroup refolded the whole ledger). A chest payout has no mob. */
+const lootPlaces = perObject((loot: readonly LootEvent[]): ReadonlyMap<string, readonly Place[]> => {
   const out = new Map<string, Place[]>()
   const seen = new Set<string>()
   for (const e of loot) {
@@ -88,10 +90,10 @@ function lootPlaces(loot: readonly LootEvent[]): Map<string, Place[]> {
     out.set(key, places)
   }
   return out
-}
+})
 
 /** The (zone, mob) pairs a row belongs under; `mob` is '' for none. */
-function placesOf(row: GapRow, looted: ReadonlyMap<string, Place[]>): Place[] {
+function placesOf(row: GapRow, looted: ReadonlyMap<string, readonly Place[]>): readonly Place[] {
   // A faction or drop row belongs under the mob whose page lacks it; an image row is that mob.
   if (row.domain === 'image') return [{ zone: zonesOf(row)[0] ?? '', mob: '' }]
   if (onMobPage(row)) return [{ zone: zonesOf(row)[0] ?? '', mob: row.details.sources?.entries[0]?.name ?? '' }]
@@ -105,7 +107,7 @@ function placesOf(row: GapRow, looted: ReadonlyMap<string, Place[]>): Place[] {
  * row seen here and elsewhere files under here alone, any tier of it, and one the filter let in on
  * a sighting its places do not carry (an item named here but looted elsewhere) files under here too.
  */
-function placesHere(places: Place[], here: string | null): Place[] {
+function placesHere(places: readonly Place[], here: string | null): readonly Place[] {
   if (here === null) return places
   const key = zoneKey(here)
   const kept = places.filter((p) => zoneKey(p.zone) === key)
@@ -127,6 +129,8 @@ function groupOptions(opts: GapGroupOrder | GapGroupOptions): { order: GapGroupO
 interface MobGroup {
   mob: string
   rows: GapRow[]
+  /** `rows` as a set: an item looted twice from one mob is filed once, without a scan per row. */
+  seen: Set<GapRow>
 }
 type Tree = Map<string, { zone: string; mobs: Map<string, MobGroup> }>
 
@@ -135,9 +139,11 @@ function addTo(tree: Tree, p: Place, row: GapRow, zoneName: (raw: string) => str
   const zone = p.zone === '' ? ZONE_NOT_SEEN : zoneName(p.zone) || p.zone
   const z = tree.get(zone.toLowerCase()) ?? { zone, mobs: new Map<string, MobGroup>() }
   tree.set(zone.toLowerCase(), z)
-  const m = z.mobs.get(p.mob.toLowerCase()) ?? { mob: p.mob, rows: [] }
+  const m = z.mobs.get(p.mob.toLowerCase()) ?? { mob: p.mob, rows: [], seen: new Set<GapRow>() }
   z.mobs.set(p.mob.toLowerCase(), m)
-  if (!m.rows.includes(row)) m.rows.push(row)
+  if (m.seen.has(row)) return
+  m.seen.add(row)
+  m.rows.push(row)
 }
 
 /**
