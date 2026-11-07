@@ -15,8 +15,8 @@
 //! Nothing here reads a wall clock, so a replay reconstructs every historical gap exactly as the
 //! live tail would.
 
-use crate::event::{Event, Kind};
-use eqlog::names::id_key;
+use crate::event::{Event, Key, Kind};
+use eqlog::names::id_key_ref;
 use serde_json::json;
 
 /// Minimum absence worth reporting. Below this a relog is a blip — real logs show sub-minute
@@ -29,78 +29,85 @@ pub const CAMP_PAIRING_MS: i64 = 60_000;
 
 /// The first-person families: the log prints no third-person twin of any of these, so the sentence
 /// can only be about the tailed character. `petClaim` is here because both of its shapes name you;
-/// the ally form is its own kind and deliberately absent.
-const FIRST_PERSON_KINDS: &[Kind] = &[
-    Kind::SessionStart,
-    Kind::Zone,
-    Kind::Loot,
-    Kind::Coin,
-    Kind::ItemReceived,
-    Kind::Purchase,
-    Kind::Offer,
-    Kind::Trade,
-    Kind::Level,
-    Kind::ExpGain,
-    Kind::AaGain,
-    Kind::AaSpend,
-    Kind::AaPotion,
-    Kind::AaActivate,
-    Kind::CastBegin,
-    Kind::CastFizzle,
-    Kind::CastInterrupted,
-    Kind::CastResumed,
-    Kind::BuffFade,
-    Kind::BuffWearOff,
-    Kind::IllusionFade,
-    Kind::PlayerDeath,
-    Kind::HealUnstated,
-    Kind::Mitigation,
-    Kind::CampStart,
-    Kind::CampAbort,
-    Kind::OutputFile,
-    Kind::SelfWho,
-    Kind::SkillUp,
-    Kind::SpecialAttack,
-    Kind::ClassUnlock,
-    Kind::ItemActivate,
-    Kind::ItemMerge,
-    Kind::ItemMergeFailed,
-    Kind::Consider,
-    Kind::StanceChange,
-    Kind::InvocationChange,
-    Kind::PetClaim,
-];
+/// the ally form is its own kind and deliberately absent. One `matches!` rather than a slice scan:
+/// this is asked on every event of the fold.
+fn is_first_person(kind: Kind) -> bool {
+    matches!(
+        kind,
+        Kind::SessionStart
+            | Kind::Zone
+            | Kind::Loot
+            | Kind::Coin
+            | Kind::ItemReceived
+            | Kind::Purchase
+            | Kind::Offer
+            | Kind::Trade
+            | Kind::Level
+            | Kind::ExpGain
+            | Kind::AaGain
+            | Kind::AaSpend
+            | Kind::AaPotion
+            | Kind::AaActivate
+            | Kind::CastBegin
+            | Kind::CastFizzle
+            | Kind::CastInterrupted
+            | Kind::CastResumed
+            | Kind::BuffFade
+            | Kind::BuffWearOff
+            | Kind::IllusionFade
+            | Kind::PlayerDeath
+            | Kind::HealUnstated
+            | Kind::Mitigation
+            | Kind::CampStart
+            | Kind::CampAbort
+            | Kind::OutputFile
+            | Kind::SelfWho
+            | Kind::SkillUp
+            | Kind::SpecialAttack
+            | Kind::ClassUnlock
+            | Kind::ItemActivate
+            | Kind::ItemMerge
+            | Kind::ItemMergeFailed
+            | Kind::Consider
+            | Kind::StanceChange
+            | Kind::InvocationChange
+            | Kind::PetClaim
+    )
+}
 
-/// `isYou` — every casing canonicalizes here. An absent field is not you.
+/// `isYou` — every casing canonicalizes here. An absent field is not you. The identity compare
+/// answers the normalised spelling the parser produces without folding; the key is the fallback.
 fn is_you(name: Option<&str>) -> bool {
     match name {
-        Some(n) => id_key(n) == "you",
+        Some(n) => n == "You" || id_key_ref(n) == "you",
         None => false,
     }
 }
 
 /// The combat families exist for everyone: only a line that names you is evidence.
-fn combat_names_you(ev: &Event) -> bool {
-    match ev.kind_of() {
-        Kind::Damage | Kind::Miss => is_you(ev.str("attacker")) || is_you(ev.str("target")),
-        Kind::Heal => is_you(ev.str("healer")) || is_you(ev.str("target")),
+fn combat_names_you(kind: Kind, ev: &Event) -> bool {
+    match kind {
+        Kind::Damage | Kind::Miss => is_you(ev.str(Key::Attacker)) || is_you(ev.str(Key::Target)),
+        Kind::Heal => is_you(ev.str(Key::Healer)) || is_you(ev.str(Key::Target)),
         // The incoming form (`You resist <mob>'s <Spell>!`) names you as the resister.
-        Kind::Resist => ev.bool("incoming") || is_you(ev.str("caster")) || is_you(ev.str("target")),
+        Kind::Resist => {
+            ev.bool(Key::Incoming) || is_you(ev.str(Key::Caster)) || is_you(ev.str(Key::Target))
+        }
         // `You have slain <X>!`. The other two shapes are somebody else's kill (or nobody's).
-        Kind::Death => ev.bool("bySelf"),
+        Kind::Death => ev.bool(Key::BySelf),
         _ => false,
     }
 }
 
 /// Families with a self form and a broadcast form; only the self form is about you.
-fn self_form_of(ev: &Event) -> bool {
-    match ev.kind_of() {
+fn self_form_of(kind: Kind, ev: &Event) -> bool {
+    match kind {
         // A `msg_cast_on_you` match. A named target is the third-person broadcast, which every
         // player in earshot receives — including one who is not in the world yet.
-        Kind::BuffApply => ev.str("target") == Some("self"),
-        Kind::SpellEmote => ev.str("subject") == Some("self"),
+        Kind::BuffApply => ev.str(Key::Target) == Some("self"),
+        Kind::SpellEmote => ev.str(Key::Subject) == Some("self"),
         // `name` is absent for exactly the two self shapes.
-        Kind::Group => matches!(ev.str("change"), Some("selfJoin") | Some("selfLeave")),
+        Kind::Group => matches!(ev.str(Key::Change), Some("selfJoin") | Some("selfLeave")),
         _ => false,
     }
 }
@@ -108,7 +115,8 @@ fn self_form_of(ev: &Event) -> bool {
 /// `inWorldEvidence` — could this line only have been printed because the tailed character was
 /// standing in the world? Stricter than "did the parser type this line"; see the header.
 pub fn in_world_evidence(ev: &Event) -> bool {
-    FIRST_PERSON_KINDS.contains(&ev.kind_of()) || combat_names_you(ev) || self_form_of(ev)
+    let kind = ev.kind_of();
+    is_first_person(kind) || combat_names_you(kind, ev) || self_form_of(kind, ev)
 }
 
 /// Stateful, single-character. Feed it every event in stream order, exactly as the bus does.
@@ -136,26 +144,28 @@ impl SessionDetector {
     /// Derived events are ignored: an `offlineGap` is this detector's own output, and an
     /// `epoch`/`buffExpired` restates a primary event whose timestamp is already recorded.
     pub fn observe(&mut self, ev: &Event) -> Option<Event<'static>> {
-        if matches!(ev.kind_of(), Kind::OfflineGap | Kind::Epoch | Kind::BuffExpired) {
+        let kind = ev.kind_of();
+        if matches!(kind, Kind::OfflineGap | Kind::Epoch | Kind::BuffExpired) {
             return None;
         }
         // An unparseable timestamp (0) can neither anchor a gap nor advance the anchor.
         if ev.ts() <= 0 {
             return None;
         }
-        if ev.kind_of() == Kind::CampStart {
-            self.camp_ts = ev.ts();
-        }
-        // The game states the cancellation outright — an abandoned camp is not a logout.
-        if ev.kind_of() == Kind::CampAbort {
-            self.camp_ts = 0;
-        }
-        // The gap is built before the Welcome advances the anchor: it is measured against the
-        // previous session, and it is also the login that ended the absence.
-        let gap = if ev.kind_of() == Kind::SessionStart {
-            self.build_gap(ev.ts(), ev.seq(), ev.raw())
-        } else {
-            None
+        // The game states the cancellation outright — an abandoned camp is not a logout. The gap
+        // is built before the Welcome advances the anchor: it is measured against the previous
+        // session, and it is also the login that ended the absence.
+        let gap = match kind {
+            Kind::CampStart => {
+                self.camp_ts = ev.ts();
+                None
+            }
+            Kind::CampAbort => {
+                self.camp_ts = 0;
+                None
+            }
+            Kind::SessionStart => self.build_gap(ev.ts(), ev.seq(), ev.raw()),
+            _ => None,
         };
         if in_world_evidence(ev) {
             self.evidence_ts = ev.ts();

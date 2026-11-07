@@ -127,8 +127,9 @@ const cacheKey = itemKey
 
 let itemDbIndex: Map<string, ItemDbEntry> | null = null
 
-/** The committed corpus keyed for lookup, built on first use. See the section header. */
-function itemDb(): Map<string, ItemDbEntry> {
+/** The committed corpus keyed for lookup, built on first use. See the section header. EXPORTED for
+ *  the character sheet (ipc/characterSheet.ts), which built the same index a second time. */
+export function itemDb(): Map<string, ItemDbEntry> {
   itemDbIndex ??= buildItemDbIndex(itemsJson as unknown as ItemDbFile)
   return itemDbIndex
 }

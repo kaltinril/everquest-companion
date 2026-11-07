@@ -1,5 +1,5 @@
 import type { JSX } from 'react'
-import { useEffect, useMemo, useState } from 'react'
+import { memo, useEffect, useMemo, useState } from 'react'
 import {
   Box,
   Chip,
@@ -181,7 +181,8 @@ function ActiveHeader({
   )
 }
 
-/** One entity's live buffs: its label, a count chip, and the row grid. */
+/** One entity's live buffs: its label, a count chip, and the row grid. Each card is handed its
+ *  elapsed SECOND, which is what its memo compares (ActiveBuffRow.tsx). */
 function ActiveGroup({
   label,
   buffs,
@@ -206,12 +207,50 @@ function ActiveGroup({
       </Stack>
       <Box sx={{ display: 'grid', gap: 1, gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))' }}>
         {buffs.map((b) => (
-          <ActiveRow key={`${b.spell}@${b.self ? 'self' : b.target ?? '?'}`} buff={b} now={now} />
+          <ActiveRow
+            key={`${b.spell}@${b.self ? 'self' : b.target ?? '?'}`}
+            buff={b}
+            elapsedSec={Math.max(0, Math.floor((now - b.startedTs) / 1000))}
+          />
         ))}
       </Box>
     </Box>
   )
 }
+
+/** The grouped active rows, in the order the page draws them (`activeGroups` below). */
+interface ActiveGroupRows {
+  key: string
+  buffs: ActiveBuff[]
+}
+
+/**
+ * THE ACTIVE CARDS, AND THE CLOCK THEY READ (the 2026-11-06 renderer pass; whole-app review #5).
+ *
+ * The 1 Hz tick used to live in BuffsView, so every second the tab was open re-rendered the whole
+ * page — the header, the conflicts table, the durations block (memoized, but still diffed) — for
+ * two numbers per card. The tick lives here now, in the one component whose output changes with
+ * it, and only while a card is there to count down: with none, the page has no clock to redraw.
+ * Memoized, so a push that left the groups alone (the allow-mode switch, a stats-only delta) does
+ * not redraw the cards either.
+ */
+const ActiveSection = memo(function ActiveSection({ groups }: { groups: readonly ActiveGroupRows[] }): JSX.Element {
+  const [now, setNow] = useState(() => Date.now())
+  const ticking = groups.length > 0
+  useEffect(() => {
+    if (!ticking) return
+    setNow(Date.now())
+    const id = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(id)
+  }, [ticking])
+  return (
+    <Stack spacing={1.5}>
+      {groups.map((g) => (
+        <ActiveGroup key={g.key} label={groupLabel(g.key)} buffs={g.buffs} now={now} />
+      ))}
+    </Stack>
+  )
+})
 
 /**
  * THE MODE SWITCH, AND IT LIVES HERE RATHER THAN IN PREFERENCES (JOS-168, owner amendment
@@ -251,16 +290,7 @@ function AllowModeSwitch({ optIn, onChange }: { optIn: boolean; onChange: (v: bo
 
 export default function BuffsView(): JSX.Element {
   const snap = useModule<BuffsSnap>('buffs') ?? EMPTY_BUFFS
-  // Tick once a second so active-buff elapsed/remaining stay live between deltas, and only while a
-  // row is there to count down: with none, the page has no clock to redraw.
-  const [now, setNow] = useState(() => Date.now())
-  const ticking = snap.active.length > 0
-  useEffect(() => {
-    if (!ticking) return
-    setNow(Date.now())
-    const id = setInterval(() => setNow(Date.now()), 1000)
-    return () => clearInterval(id)
-  }, [ticking])
+  // The countdown clock lives in ActiveSection, with the cards that read it.
 
   // HIDDEN BY DEFAULT (JOS-215) — a display filter over the snapshot, never a request to the
   // model. `snap.active` keeps every row; this page just chooses which to draw.
@@ -281,7 +311,7 @@ export default function BuffsView(): JSX.Element {
   // PRIORITY layout (Task #35): "Your buffs" (self) FIRST, then one group per bound entity
   // sorted by liveliness/recency (most-recently-refreshed entity first — the current pet
   // naturally tops this). Buff vs debuff is a per-row style (classAccent), not a group.
-  const activeGroups = useMemo(() => {
+  const activeGroups = useMemo<ActiveGroupRows[]>(() => {
     const byKey = new Map<string, ActiveBuff[]>()
     for (const b of active) {
       const k = groupKey(b)
@@ -333,11 +363,7 @@ export default function BuffsView(): JSX.Element {
             No active buffs.
           </Typography>
         ) : (
-          <Stack spacing={1.5}>
-            {activeGroups.map((g) => (
-              <ActiveGroup key={g.key} label={groupLabel(g.key)} buffs={g.buffs} now={now} />
-            ))}
-          </Stack>
+          <ActiveSection groups={activeGroups} />
         )}
       </Box>
 

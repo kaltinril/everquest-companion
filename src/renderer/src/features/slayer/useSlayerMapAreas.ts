@@ -6,7 +6,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { CharacterSnap } from '@shared/characterTypes'
 import type { ZoneShort } from '@shared/maps'
-import { metVersion } from '@shared/metInLog'
+import { eraVersion } from '@shared/metInLog'
 import { useModule } from '../../lib/useModule'
 import { slayerAreas, type SlayerArea } from './slayerAreas'
 import { slayerCatalog, useSlayerData } from './slayerData'
@@ -56,7 +56,7 @@ export function useSlayerMapAreas(zone: ZoneShort | null): SlayerMapAreas {
   const maxLevel = levelCap(loadMaxLevel(), own)
   const noFactionHits = loadFlag(NO_FACTION_HITS_KEY)
   const outOfEra = loadFlag(OUT_OF_ERA_KEY)
-  const met = metVersion()
+  const met = eraVersion()
   const cap = useMemo(
     () => ({ maxLevel, noFactionHits, outOfEra, met }),
     [maxLevel, noFactionHits, outOfEra, met]

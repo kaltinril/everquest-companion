@@ -2,7 +2,7 @@
 // buffs on someone that were overwritten, as the log stated them. Absent when there are none.
 
 import type { JSX } from 'react'
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import {
   Box,
   Chip,
@@ -40,7 +40,9 @@ function ConflictRow({ row }: { row: BuffConflictRow }): JSX.Element {
   )
 }
 
-export function BuffConflicts(): JSX.Element | null {
+// Memoized with no props: it subscribes to its own module, so a re-render of the page above it
+// (a buffs push, the allow-mode switch) has nothing to tell it.
+export const BuffConflicts = memo(function BuffConflicts(): JSX.Element | null {
   const rows = useModule<BuffConflictsSnap>('buffConflicts')?.rows ?? []
   const [open, setOpen] = useState(true)
   if (rows.length === 0) return null
@@ -86,4 +88,4 @@ export function BuffConflicts(): JSX.Element | null {
       </Collapse>
     </Box>
   )
-}
+})

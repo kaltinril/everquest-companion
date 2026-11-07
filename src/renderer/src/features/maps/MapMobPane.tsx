@@ -41,7 +41,7 @@
 // MapBody floats over the map, because a control that hides a panel has to live somewhere the
 // panel is not.
 
-import { memo, type JSX } from 'react'
+import { memo, useRef, type JSX, type RefObject } from 'react'
 import {
   Box,
   Chip,
@@ -59,7 +59,7 @@ import PlaceIcon from '@mui/icons-material/Place'
 import { mobKey } from '@shared/mobKey'
 import { jumpTarget, type CrossZoneRow, type JumpTarget } from './crossZone'
 // A row's caption and its page door live next door (the file is at the line ceiling).
-import { WithPageDoor, WithRowActions, rowCaption, type RowActions } from './MapMobPaneRow'
+import { PANE_ROW_HEIGHT, WithPageDoor, WithRowActions, rowCaption, type RowActions } from './MapMobPaneRow'
 import { MapTrackedSection } from './MapTrackedSection'
 import type { ZoneTrack } from './useZoneTrack'
 import type { CrawlMode } from './useCrawlMode'
@@ -73,13 +73,11 @@ import {
 } from './mobPins'
 import type { MobTarget } from '../mobs/mobTarget'
 import { Tooltip } from '../../lib/Tooltip'
+import { useWindowedRows } from '../../lib/useWindowedRows'
 import { MobEraChip } from '../planner/PlannerChips'
 
 /** The pane's width. Fixed and `flexShrink:0` so the map, not the list, absorbs a window resize. */
 export const PANE_WIDTH = 268
-
-/** Rendered rows per section. The list is a filter, not a pager; typing is how you reach row 400. */
-const SECTION_ROWS = 300
 
 export interface MapMobPaneProps {
   /** Null ⇒ no zone is open, which the mob section states rather than showing an empty list. */
@@ -135,26 +133,30 @@ function PinMark({ locatable, wished }: { locatable: boolean; wished?: boolean }
   )
 }
 
-function Row({
-  row,
-  selected,
-  wished,
-  crawled,
-  actions,
-  onSelect,
-  onOpenMob,
-  onOpenLoot
-}: {
+/** What one row renders from, every entry a primitive or a held reference, so `memo` holds. */
+interface RowProps {
   row: MapPaneRow
   selected: boolean
-  wished?: readonly string[]
+  wished?: readonly string[] | undefined
   /** Crawl mode: you killed this mob on this visit, so the row is dimmed. */
   crawled: boolean
-  actions: RowActions
+  tracked: boolean
+  auto: boolean
+  /** On the Timers tab; undefined for a label row, which carries no timer button. */
+  timed?: boolean | undefined
+  onToggleTrack: RowActions['onToggleTrack']
+  onToggleTimer?: RowActions['onToggleTimer'] | undefined
+  onCopy: RowActions['onCopy']
   onSelect: (row: MapPaneRow) => void
   onOpenMob?: ((target: MobTarget) => void) | undefined
   onOpenLoot?: ((name: string) => void) | undefined
-}): JSX.Element {
+}
+
+// Memoized on its primitives: a zone's few hundred rows used to rebuild their action object and
+// re-render on every pane render (a keystroke, a selection, a track toggle); now a row redraws
+// only when something it shows moved. Fixed height (PANE_ROW_HEIGHT) so the section can window.
+const Row = memo(function Row(p: RowProps): JSX.Element {
+  const { row, selected, wished, crawled, onSelect, onOpenMob, onOpenLoot } = p
   const locatable = isLocatable(row)
   const level = row.kind === 'mob' ? row.level : undefined
   const button = (
@@ -167,40 +169,36 @@ function Row({
       onClick={() => {
         onSelect(row)
       }}
-      sx={{ gap: 0.75, alignItems: 'flex-start', ...(crawled ? { opacity: 0.4 } : {}) }}
+      sx={{ gap: 0.75, alignItems: 'center', height: PANE_ROW_HEIGHT, py: 0, ...(crawled ? { opacity: 0.4 } : {}) }}
     >
       <PinMark locatable={locatable} wished={wished != null && wished.length > 0} />
       <ListItemText
         primary={row.name}
         secondary={rowCaption(row, wished, onOpenLoot)}
-        slotProps={{ primary: { variant: 'body2', noWrap: true }, secondary: { variant: 'caption' } }}
+        sx={{ my: 0 }}
+        slotProps={{ primary: { variant: 'body2', noWrap: true }, secondary: { variant: 'caption', noWrap: true } }}
       />
       {level !== undefined && level !== '' && (
-        <Typography variant="caption" color="text.disabled" sx={{ flexShrink: 0, pt: 0.25 }}>
+        <Typography variant="caption" color="text.disabled" sx={{ flexShrink: 0 }}>
           {level}
         </Typography>
       )}
     </ListItemButton>
   )
   const onOpen = row.kind === 'mob' && onOpenMob != null ? () => { onOpenMob({ mob: row.name, entry: row.entry }) } : undefined
+  const actions: RowActions = {
+    tracked: p.tracked,
+    auto: p.auto,
+    onToggleTrack: p.onToggleTrack,
+    onCopy: p.onCopy,
+    ...(p.timed === undefined ? {} : { timed: p.timed, onToggleTimer: p.onToggleTimer })
+  }
   return (
     <WithRowActions row={row} actions={actions} onOpen={onOpen}>
       {button}
     </WithRowActions>
   )
-}
-
-/** A row's buttons: copy, track, and (a mob) its Timers toggle. */
-function rowActions(acts: Pick<MapMobPaneProps, 'track' | 'onCopy'>, r: MapPaneRow): RowActions {
-  const { track, onCopy } = acts
-  return {
-    tracked: track.ids.has(r.id),
-    auto: track.autoIds.has(r.id),
-    onToggleTrack: track.toggle,
-    onCopy,
-    ...(r.kind === 'mob' ? { timed: track.isTimed(r.name), onToggleTimer: track.toggleTimer } : {})
-  }
-}
+})
 
 /** Crawl mode's switch (competitor-quick-wins, 2026-10-29): off by default, useCrawlMode.ts. */
 function CrawlChip({ crawl }: { crawl: CrawlMode }): JSX.Element {
@@ -233,7 +231,15 @@ function SectionHead({ title, note }: { title: string; note: string }): JSX.Elem
   )
 }
 
-/** One titled section with its own list. An empty section still renders its title and says why. */
+/**
+ * One titled section with its own list. An empty section still renders its title and says why.
+ *
+ * WINDOWED INSIDE THE SHARED SCROLLER: the three sections scroll as one column (the file header),
+ * so each windows its own rows against the pane's scroll box through `anchorRef` — the slice is
+ * counted from the section's own first row. A zone's 600 mobs and labels therefore mount a
+ * screenful of rows, not 600 rows of three buttons each; the 300-row cap the sections used to
+ * carry is gone with the reason for it.
+ */
 function Section({
   title,
   note,
@@ -243,7 +249,9 @@ function Section({
   wishes,
   onOpenMob,
   onOpenLoot,
-  acts,
+  track,
+  onCopy,
+  scrollRef,
   crawled,
   empty
 }: {
@@ -252,7 +260,10 @@ function Section({
   rows: readonly MapPaneRow[]
   selectedId: string | null
   /** The track list and the /waypoint copy every row's buttons act on. */
-  acts: Pick<MapMobPaneProps, 'track' | 'onCopy'>
+  track: ZoneTrack
+  onCopy: RowActions['onCopy']
+  /** The pane's one scroll box, which every section windows against. */
+  scrollRef: RefObject<HTMLDivElement | null>
   onSelect: (row: MapPaneRow) => void
   wishes?: ReadonlyMap<string, readonly string[]>
   /** Crawl mode's killed-this-visit mobs (`mobKey`s); the mob section only. */
@@ -261,25 +272,36 @@ function Section({
   onOpenLoot?: ((name: string) => void) | undefined
   empty: string
 }): JSX.Element {
+  const anchorRef = useRef<HTMLDivElement>(null)
+  const win = useWindowedRows({ count: rows.length, rowHeight: PANE_ROW_HEIGHT, scrollRef, anchorRef })
   return (
     <Stack spacing={0.5} sx={{ mb: 1 }}>
       <SectionHead title={title} note={note} />
       {rows.length > 0 ? (
-        <List dense disablePadding>
-          {rows.slice(0, SECTION_ROWS).map((r) => (
-            <Row
-              key={r.id}
-              row={r}
-              selected={r.id === selectedId}
-              wished={wishes?.get(r.id)}
-              crawled={crawled != null && crawled.size > 0 && crawled.has(mobKey(r.name))}
-              actions={rowActions(acts, r)}
-              onSelect={onSelect}
-              onOpenMob={onOpenMob}
-              onOpenLoot={onOpenLoot}
-            />
-          ))}
-        </List>
+        <div ref={anchorRef}>
+          <div style={{ height: win.topPad }} />
+          <List dense disablePadding>
+            {rows.slice(win.start, win.end).map((r) => (
+              <Row
+                key={r.id}
+                row={r}
+                selected={r.id === selectedId}
+                wished={wishes?.get(r.id)}
+                crawled={crawled != null && crawled.size > 0 && crawled.has(mobKey(r.name))}
+                tracked={track.ids.has(r.id)}
+                auto={track.autoIds.has(r.id)}
+                timed={r.kind === 'mob' ? track.isTimed(r.name) : undefined}
+                onToggleTrack={track.toggle}
+                onToggleTimer={r.kind === 'mob' ? track.toggleTimer : undefined}
+                onCopy={onCopy}
+                onSelect={onSelect}
+                onOpenMob={onOpenMob}
+                onOpenLoot={onOpenLoot}
+              />
+            ))}
+          </List>
+          <div style={{ height: win.bottomPad }} />
+        </div>
       ) : (
         <Typography variant="caption" color="text.disabled" sx={{ px: 1, pb: 0.5 }}>
           {empty}
@@ -397,6 +419,7 @@ function HitSection({
 export default memo(function MapMobPane(props: MapMobPaneProps): JSX.Element {
   const { zoneName, hasMap, mobs, labels, hits, counts, query, onQuery } = props
   const { selectedId, onSelect, onHit, wishes, onOpenMob, onOpenLoot, pinsCapped, onClose } = props
+  const scrollRef = useRef<HTMLDivElement>(null)
   return (
     <Paper
       variant="outlined"
@@ -455,7 +478,7 @@ export default memo(function MapMobPane(props: MapMobPaneProps): JSX.Element {
         </Stack>
       </Box>
 
-      <Box sx={{ flexGrow: 1, minHeight: 0, overflow: 'auto' }} data-testid="maps-pane-scroll">
+      <Box ref={scrollRef} sx={{ flexGrow: 1, minHeight: 0, overflow: 'auto' }} data-testid="maps-pane-scroll">
         <MapTrackedSection track={props.track} onCopy={props.onCopy} onCenter={props.onCenter} />
         <Section
           title="Named mobs"
@@ -463,7 +486,9 @@ export default memo(function MapMobPane(props: MapMobPaneProps): JSX.Element {
           rows={mobs}
           selectedId={selectedId}
           onSelect={onSelect}
-          acts={props}
+          track={props.track}
+          onCopy={props.onCopy}
+          scrollRef={scrollRef}
           wishes={wishes}
           crawled={props.crawl.killed}
           onOpenMob={onOpenMob}
@@ -482,7 +507,9 @@ export default memo(function MapMobPane(props: MapMobPaneProps): JSX.Element {
           rows={labels}
           selectedId={selectedId}
           onSelect={onSelect}
-          acts={props}
+          track={props.track}
+          onCopy={props.onCopy}
+          scrollRef={scrollRef}
           empty={
             !hasMap
               ? 'No map is open.'

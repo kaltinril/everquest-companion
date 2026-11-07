@@ -2,6 +2,7 @@
 // each with a tooltip saying why; a chip with somewhere to go is a link that opens in the browser.
 
 import type { JSX, MouseEvent } from 'react'
+import { memo } from 'react'
 import { Chip, Stack } from '@mui/material'
 import { Tooltip } from '../../lib/Tooltip'
 import { gapActions, type GapAction, type GapActionContext, type GapRow, type GapVerdict } from '@shared/gaps'
@@ -30,7 +31,9 @@ function ActionChip({ a }: { a: GapAction }): JSX.Element {
   return <Tooltip title={a.why}>{chip}</Tooltip>
 }
 
-export default function GapActionChips({ row, verdict, ctx }: { row: GapRow; verdict: GapVerdict; ctx?: GapActionContext }): JSX.Element {
+// Memoized on the row, its verdict and the context: the chips and their tooltips are most of a
+// row's elements, and a push that left this row alone must not rebuild them.
+export default memo(function GapActionChips({ row, verdict, ctx }: { row: GapRow; verdict: GapVerdict; ctx?: GapActionContext }): JSX.Element {
   return (
     <Stack direction="row" spacing={0.5} sx={{ flexWrap: 'nowrap' }}>
       {gapActions(row, verdict, ctx).map((a) => (
@@ -38,4 +41,4 @@ export default function GapActionChips({ row, verdict, ctx }: { row: GapRow; ver
       ))}
     </Stack>
   )
-}
+})

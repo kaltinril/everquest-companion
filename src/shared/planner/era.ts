@@ -86,7 +86,7 @@
 // directly (the shared/planner house style).
 
 import { ZONES, zoneKey, type ZoneEntry, type ZoneEra } from '../zones'
-import { wasMet } from '../metInLog'
+import { eraVersion, wasMet } from '../metInLog'
 import { mobOutOfEra } from '../mobEra'
 
 /** What the mob era predicate reads off a row (`shared/mobEra.ts mobOutOfEra`). */
@@ -184,10 +184,28 @@ function index(): Map<string, ZoneEntry> {
  * never a guess.
  */
 export function zoneEra(zoneName: string): Era | null {
+  const held = eraAnswers()
+  const hit = held.get(zoneName)
+  if (hit !== undefined) return hit
   const key = zoneKey(zoneName)
-  if (key === '') return null
-  if (wasMet('zones', zoneName)) return CURRENT_ERA
-  return index().get(key)?.era ?? null
+  const era = key === '' ? null : wasMet('zones', zoneName) ? CURRENT_ERA : (index().get(key)?.era ?? null)
+  held.set(zoneName, era)
+  return era
+}
+
+/** `zoneEra` per zone string, kept while `eraVersion()` stands (whole-app review 2026-11-06: the
+ *  plan fold asked it per source per row per pool). The evidence is the only input that moves, and
+ *  every answer in here read it through `wasMet`, so the version moves before any of them could. */
+let ANSWERS = new Map<string, Era | null>()
+let ANSWERS_AT = -1
+
+function eraAnswers(): Map<string, Era | null> {
+  const now = eraVersion()
+  if (now !== ANSWERS_AT) {
+    ANSWERS = new Map()
+    ANSWERS_AT = now
+  }
+  return ANSWERS
 }
 
 /** How a donor's drop zones read against the era the server is on. */

@@ -45,10 +45,12 @@
 
 pub mod cast_state;
 pub mod catalog;
+mod filing;
 #[cfg(test)]
 mod immunity_tests;
 pub mod ledger;
 pub mod ledger_file;
+pub mod row_cache;
 pub mod songs;
 pub mod world;
 
@@ -57,13 +59,15 @@ use crate::modules::consider::mob_key;
 use crate::EqModule;
 use cast_state::{Armed, ArmedCasts, CastState};
 use eqlog::names::{id_key_ref, spell_canon_key, spell_rank};
-use ledger::{
-    add_damage, iso_week_key, CasterKind, Family, ResistBucket, ResistLedgerStore, RowSpec,
-};
+use filing::{Deferred, Observation};
+use ledger::{add_damage, CasterKind, Family, ResistBucket, ResistLedgerStore};
+use row_cache::RowCache;
 use serde_json::{json, Value};
 use songs::{SongFold, SongOut, SONG_CONTACT_MS};
 use std::collections::HashSet;
-use world::{CasterIndex, DebuffWindows, MeleeContact, MobLevels, MobNames, TargetVerdicts};
+use world::{
+    CasterIndex, DebuffWindows, KeyMemo, MeleeContact, MobLevels, MobNames, TargetVerdicts,
+};
 
 /// How long a deferred emote-landing waits to see whether a damage line cancels it.
 pub const LAND_DEFER_MS: i64 = 3_000;
@@ -122,37 +126,6 @@ fn is_self(name: &str) -> bool {
     name == "You" || id_key_ref(name) == "you"
 }
 
-/// One thing the log said, as this fold names it before the bucket pools it.
-struct Observation {
-    /// The mob's name as the line spelled it; the key is folded from it.
-    mob: String,
-    spell_key: String,
-    family: Family,
-    kind: CasterKind,
-    /// The caster's level, or `None` when nothing has stated it.
-    level: Option<i64>,
-    ts: i64,
-    /// The spell upgrade rank this observation was made at: -15 of resist adjust each.
-    rank: i64,
-    /// Whether the overchannel invocation was up. Three states — see `cast_state.rs`.
-    overchannel: Option<bool>,
-}
-
-/// A landing waiting to see whether a damage line cancels it: an `Observation` held for
-/// `LAND_DEFER_MS` before it is filed. The fields must stay identical to `Observation`'s, because a
-/// deferred filing carrying a different set of facts from an immediate one is a bug with nowhere to
-/// be caught. The family is always `cast`: a song pulse is never deferred, its sentence is the
-/// landing.
-struct Deferred {
-    mob: String,
-    spell_key: String,
-    ts: i64,
-    kind: CasterKind,
-    level: Option<i64>,
-    rank: i64,
-    overchannel: Option<bool>,
-}
-
 #[derive(Default)]
 pub struct ResistFold {
     levels: MobLevels,
@@ -166,14 +139,23 @@ pub struct ResistFold {
     cast: CastState,
     casts: ArmedCasts,
     dot_seen: HashSet<String>,
+    /// The `dot_seen` key under construction, reused so a tick that is a repeat allocates nothing.
+    dot_key: String,
     deferred: Option<Deferred>,
     /// The timestamp of the last immunity sentence, waiting for the `resisted your` line it
     /// explains. Taken by that line, or left to go stale past `IMMUNE_PAIR_MS`.
     immune_pending: Option<i64>,
     /// Mob names both ways, memoised. The measurement behind the memo is in `world.rs`.
     names: MobNames,
+    /// Spell canon keys, memoised: every spell and DoT line asks for one.
+    spell_keys: KeyMemo,
     /// Per-fold rather than module-scoped, so no verdict cache outlives a `Fold`.
     targets: TargetVerdicts,
+    /// The last row filed, and the revision of the world it was filed against: `row_cache.rs`.
+    rows: RowCache,
+    /// Moves on every line that can change what `spec` reads for a given observation (a level, a
+    /// `/con`, a debuff, a zone, the class loadout), which is what lets `rows` be trusted.
+    world_rev: u64,
 }
 
 impl ResistFold {
@@ -208,6 +190,10 @@ impl ResistFold {
         self.deferred = None;
         self.immune_pending = None;
         self.names.reset();
+        self.spell_keys.clear();
+        // The bucket this fold files into is replaced at the same boundary, so its slots are gone.
+        self.rows.clear();
+        self.world_rev += 1;
     }
 
     /// The live tail's heartbeat: settle, never finish. A landing that has waited out its cancel
@@ -237,6 +223,16 @@ impl ResistFold {
 
     /// State the outcomes are interpreted against. True when the event was one of these.
     fn on_world_event(&mut self, ev: &Event, bucket: &mut ResistBucket) -> bool {
+        if self.on_world_state(ev, bucket) {
+            // Any of these can change what `spec` reads, so the row cache is told the world moved.
+            self.world_rev += 1;
+            return true;
+        }
+        self.on_cast_lifecycle(ev, bucket)
+    }
+
+    /// The world lines themselves; the cast lifecycle is the other half of `on_world_event`.
+    fn on_world_state(&mut self, ev: &Event, bucket: &mut ResistBucket) -> bool {
         match ev.kind_of() {
             Kind::Zone => {
                 let zone = ev.str(Key::Zone).unwrap_or_default().to_string();
@@ -262,10 +258,10 @@ impl ResistFold {
                 true
             }
             Kind::Consider => {
-                let mob = ev.str(Key::Mob).unwrap_or_default().to_string();
-                self.names.remember(&mob);
+                let mob = ev.str(Key::Mob).unwrap_or_default();
+                self.names.remember(mob);
                 if let Some(level) = ev.int(Key::Level) {
-                    let key = self.names.key(&mob);
+                    let key = self.names.key(mob);
                     self.levels.note(&key, level);
                 }
                 true
@@ -472,16 +468,18 @@ impl ResistFold {
         let key = self.names.key(mob_display);
         if catalog::is_resist_debuff(&cast.display) {
             self.debuffs.open(&key, &cast.spell_key, ts);
+            self.world_rev += 1;
         }
         // One cast is one roll. If this cast already printed damage on this mob, the damage line is
         // the observation and the emote is the same roll saying so twice.
-        if cast.damaged.contains(&key) {
+        if cast.damaged.contains(&*key) {
             return;
         }
         // Deferred: a damage line for the same mob and spell cancels it.
         self.flush_deferred(i64::MAX, bucket);
         self.deferred = Some(Deferred {
             mob: mob_display.to_string(),
+            mob_key: key,
             spell_key: cast.spell_key,
             ts,
             kind: cast.kind,
@@ -491,80 +489,38 @@ impl ResistFold {
         });
     }
 
-    fn flush_deferred(&mut self, now: i64, bucket: &mut ResistBucket) {
-        match &self.deferred {
-            None => return,
-            Some(d) if now - d.ts <= LAND_DEFER_MS => return,
-            Some(_) => {}
-        }
-        let d = self.deferred.take().expect("checked above");
-        // Only your own emote-landings are attributable. A stranger's sentence names no caster, and
-        // an npc's cast is never armed in the first place.
-        if d.kind != CasterKind::SelfCast {
-            return;
-        }
-        self.row_for(
-            bucket,
-            &Observation {
-                mob: d.mob,
-                spell_key: d.spell_key,
-                family: Family::Cast,
-                kind: d.kind,
-                level: d.level,
-                ts: d.ts,
-                rank: d.rank,
-                overchannel: d.overchannel,
-            },
-        )
-        .land += 1;
-    }
-
-    fn cancel_deferred(&mut self, mob_display: &str, spell_key: &str) {
-        let Some(held) = self
-            .deferred
-            .as_ref()
-            .filter(|d| d.spell_key == spell_key)
-            .map(|d| d.mob.clone())
-        else {
-            return;
-        };
-        if self.names.key(&held) == self.names.key(mob_display) {
-            self.deferred = None;
-        }
-    }
-
     fn on_resist(&mut self, ev: &Event, bucket: &mut ResistBucket) {
         // `You resist <mob>'s <Spell>!` is your own resist and a different feature entirely.
         if ev.bool(Key::Incoming) {
             return;
         }
-        let target = ev.str(Key::Target).unwrap_or_default().to_string();
-        if !self.targets.is_mob_target(&target) {
+        let target = ev.str(Key::Target).unwrap_or_default();
+        if !self.targets.is_mob_target(target) {
             return;
         }
-        let caster = ev.str(Key::Caster).unwrap_or_default().to_string();
-        let kind = self.casters.kind_of(&caster);
-        let spell = ev.str(Key::Spell).unwrap_or_default().to_string();
-        let spell_key = spell_canon_key(&spell);
+        let caster = ev.str(Key::Caster).unwrap_or_default();
+        let kind = self.casters.kind_of(caster);
+        let spell = ev.str(Key::Spell).unwrap_or_default();
+        let spell_key = self.spell_keys.key(spell, spell_canon_key);
         // The resist line is the one outcome line that often prints the rank, so it beats the armed
         // cast rather than falling back to it.
-        let line_rank = spell_rank(&spell);
+        let line_rank = spell_rank(spell);
         if kind == CasterKind::SelfCast {
             self.cast.note_song_rank(&spell_key, line_rank);
         }
-        self.names.remember(&target);
-        let mob = self.names.key(&target);
+        self.names.remember(target);
+        let mob = self.names.key(target);
         let ts = ev.ts();
         // AN IMMUNITY IS NOT A RESIST. Filed on the row the resist would have gone on, so the row
         // and mob counts are what they were, and counted where the estimate never reads.
         if self.take_immunity(kind, ts) {
-            let obs = self.resist_observation(kind, &caster, target, spell_key, line_rank, ts);
+            let obs = self.resist_observation(kind, caster, target, &spell_key, line_rank, ts);
             self.row_for(bucket, &obs).immune += 1;
             return;
         }
         let mut out = Vec::new();
         let handled = self.songs.on_resist(
-            &target,
+            target,
             &mob,
             &spell_key,
             kind == CasterKind::SelfCast,
@@ -575,56 +531,8 @@ impl ResistFold {
         if handled {
             return;
         }
-        let obs = self.resist_observation(kind, &caster, target, spell_key, line_rank, ts);
+        let obs = self.resist_observation(kind, caster, target, &spell_key, line_rank, ts);
         self.row_for(bucket, &obs).resist += 1;
-    }
-
-    /// The cast a `resisted` line reports, as a row is keyed: the caster's level, and the rank and
-    /// invocation of the armed cast it joins (the line's own rank beats the armed one, because the
-    /// resist line is the one outcome line that often prints it).
-    fn resist_observation(
-        &mut self,
-        kind: CasterKind,
-        caster: &str,
-        target: String,
-        spell_key: String,
-        line_rank: i64,
-        ts: i64,
-    ) -> Observation {
-        let level = self.caster_level(kind, caster);
-        let armed = self
-            .casts
-            .owned_by(kind, &spell_key, ts)
-            .map(|a| (a.rank, a.overchannel));
-        let overchannel = self.cast.invocation_for(kind, armed.map(|(_, oc)| oc));
-        Observation {
-            mob: target,
-            spell_key,
-            family: Family::Cast,
-            kind,
-            level,
-            ts,
-            rank: if line_rank > 0 {
-                line_rank
-            } else {
-                armed.map_or(0, |(r, _)| r)
-            },
-            overchannel,
-        }
-    }
-
-    /// The caster's level, by kind. Self is the session level; another player's is never stated
-    /// anywhere this app reads; an NPC's is the same catalog-or-`/con` ladder the target's level
-    /// climbs. `None` is a first-class answer and simply drops the row from the fit.
-    fn caster_level(&mut self, kind: CasterKind, caster: &str) -> Option<i64> {
-        match kind {
-            CasterKind::SelfCast => self.self_level,
-            CasterKind::Pc => None,
-            CasterKind::Npc => {
-                let key = self.names.key(caster);
-                self.levels.level_of(&key, caster).map(|f| f.level)
-            }
-        }
     }
 
     fn on_damage(&mut self, ev: &Event, bucket: &mut ResistBucket) {
@@ -672,8 +580,8 @@ impl ResistFold {
         if !self.targets.is_mob_target(target) {
             return;
         }
-        let skill = ev.str(Key::Skill).unwrap_or_default().to_string();
-        let spell_key = spell_canon_key(&skill);
+        let skill = ev.str(Key::Skill).unwrap_or_default();
+        let spell_key = self.spell_keys.key(skill, spell_canon_key);
         self.names.remember(target);
         let ts = ev.ts();
         let mut out = Vec::new();
@@ -684,23 +592,23 @@ impl ResistFold {
         if handled {
             return;
         }
-        self.cancel_deferred(target, &spell_key);
         let target_key = self.names.key(target);
+        self.cancel_deferred(&target_key, &spell_key);
         if let Some(i) = self.casts.peek_at(&spell_key, ts) {
-            self.casts.note_damaged(i, target_key);
+            self.casts.note_damaged(i, &target_key);
         }
         let level = self.caster_level(kind, attacker);
         // A damage line almost never prints the rank, so the armed cast is the ordinary source and
         // the line is the rare exception that beats it.
-        let line_rank = spell_rank(&skill);
+        let line_rank = spell_rank(skill);
         let armed = self
             .casts
             .owned_by(kind, &spell_key, ts)
             .map(|a| (a.rank, a.overchannel));
         let overchannel = self.cast.invocation_for(kind, armed.map(|(_, oc)| oc));
         let obs = Observation {
-            mob: target.to_string(),
-            spell_key: spell_key.clone(),
+            mob: target,
+            spell_key: &spell_key,
             family: Family::Cast,
             kind,
             level,
@@ -714,8 +622,15 @@ impl ResistFold {
         };
         if dtype == "dot" {
             // The row is minted whether or not the tick counts — see `ledger.rs ResistBucket::row`.
-            let key = format!("{}{SEP}{}", self.names.key(target), spell_key);
-            let fresh = self.dot_seen.insert(key);
+            // The key is built in the fold's scratch string and copied only on a first tick.
+            self.dot_key.clear();
+            self.dot_key.push_str(&target_key);
+            self.dot_key.push(SEP);
+            self.dot_key.push_str(&spell_key);
+            let fresh = !self.dot_seen.contains(&self.dot_key);
+            if fresh {
+                self.dot_seen.insert(self.dot_key.clone());
+            }
             let row = self.row_for(bucket, &obs);
             if fresh {
                 row.land += 1;
@@ -785,8 +700,8 @@ impl ResistFold {
         }
         self.names.remember(mob_display);
         let obs = Observation {
-            mob: mob_display.to_string(),
-            spell_key: song_key.to_string(),
+            mob: mob_display,
+            spell_key: song_key,
             family: Family::Song,
             kind: CasterKind::SelfCast,
             level: self.self_level,
@@ -801,42 +716,6 @@ impl ResistFold {
         } else {
             row.land += 1;
         }
-    }
-
-    fn spec(&mut self, obs: &Observation) -> RowSpec {
-        let key = self.names.key(&obs.mob);
-        let level = self.levels.level_of(&key, &obs.mob);
-        let ranged = level.filter(|l| l.lo != l.hi);
-        RowSpec {
-            debuffs: self.debuffs.active(&key, obs.ts),
-            mob_key: key,
-            // Only where it changes `rc`, which is what keeps it out of the key on every ordinary
-            // row.
-            caster_classes: (obs.overchannel == Some(true)).then(|| self.cast.caster_classes()),
-            zone: self.zone.clone(),
-            spell_key: obs.spell_key.clone(),
-            family: obs.family,
-            caster_kind: obs.kind,
-            caster_level: obs.level,
-            mob_level: level.map(|l| l.level),
-            mob_level_lo: ranged.map(|l| l.lo),
-            mob_level_hi: ranged.map(|l| l.hi),
-            rank: obs.rank,
-            overchannel: obs.overchannel,
-            // The one key term that is not about `rc`: a row's age, so recent evidence can weigh
-            // more than old. Off the log's own clock, never a wall clock — a replay must produce
-            // the same ledger twice.
-            week: Some(iso_week_key(obs.ts)),
-        }
-    }
-
-    fn row_for<'b>(
-        &mut self,
-        bucket: &'b mut ResistBucket,
-        obs: &Observation,
-    ) -> &'b mut ledger::ResistRow {
-        let spec = self.spec(obs);
-        bucket.row(spec, obs.ts)
     }
 }
 

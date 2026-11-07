@@ -29,7 +29,7 @@
 //     is `shared/mobEra.mobOutOfEra`, the one mob era predicate, and the player's own log outranks
 //     the flag there (a mob they killed, conned or looted from is in era for them). It is read at
 //     plan time, never stored on a `SlayerMob`: the catalog index is built once, the log's
-//     evidence arrives later (`metVersion()` keys the memos over a plan, `PlanOptions.met`).
+//     evidence arrives later (`eraVersion()` keys the memos over a plan, `PlanOptions.met`).
 // A zone the era table makes no claim about stays in (`unknown` is not `out-of-era`), and so does
 // a mob with no flag. The "Zones not open yet" switch brings both kinds back.
 
@@ -41,7 +41,6 @@ import { eraVerdict } from '../planner/era'
 import { ZONES, zoneKey, zoneShortNameFromCatalog } from '../zones'
 import {
   labelMatcher,
-  matchMob,
   mobFacts,
   strictMatcher,
   type LabelMatcher,
@@ -79,6 +78,27 @@ export interface SlayerMob {
   high: number | null
   /** the wiki says a kill lowers a faction (`mobFactions.json`); false when it says none or nothing */
   factionHit: boolean
+  /** the zones the page files the mob under, each resolved once (`SlayerPlace`) */
+  places: readonly SlayerPlace[]
+}
+
+/** One zone a page files a mob under, resolved once per catalog (whole-app review 2026-11-06:
+ *  `zoneKey` and the map-stem lookup ran ~5 times per (mob, zone) link per plan). */
+export interface SlayerPlace {
+  /** the page's spelling, without the closing period a page sometimes leaves on it (`Lake of Ill Omen.`) */
+  catalogName: string
+  /** the plan's zone key: the map stem when the zone table knows the zone, else the `zoneKey` fold */
+  key: string
+  short: ZoneShort | null
+  /** a place to go, not one of the catalog's placeholders (`isPlaceholder`) */
+  isPlace: boolean
+}
+
+function placeOf(raw: string): SlayerPlace {
+  const catalogName = raw.replace(/\.\s*$/, '')
+  const short = zoneShortNameFromCatalog(catalogName)
+  const key = zoneKey(catalogName)
+  return { catalogName, key: short ?? key, short, isPlace: !isPlaceholder(key) }
 }
 
 /** The number the text opens with, and the one a dash or `to` joins to it. */
@@ -112,7 +132,8 @@ export function slayerMobs(
     entry,
     facts: mobFacts(entry.name, raceOf(entry.page)),
     ...levelSpan(entry.level),
-    factionHit: hitsFaction(entry.page)
+    factionHit: hitsFaction(entry.page),
+    places: (entry.zones ?? []).map(placeOf)
   }))
 }
 
@@ -123,9 +144,10 @@ export interface PlanOptions {
   outOfEra: boolean
   /** leave out mobs the wiki says lower a faction; a mob it is silent on stays */
   noFactionHits: boolean
-  /** the log evidence version (`metInLog.metVersion()`) the plan is read under. Nothing here reads
-   *  it: `mobOutOfEra` reads the evidence itself. A memo keyed by the options carries it so the
-   *  plan recomputes when the evidence moves. */
+  /** the log evidence version (`metInLog.eraVersion()`, which moves only when a name a verdict
+   *  has read arrives or leaves) the plan is read under. Nothing here reads it: `mobOutOfEra`
+   *  reads the evidence itself. A memo keyed by the options carries it so the plan recomputes
+   *  when the evidence moves. */
   met?: number
 }
 
@@ -196,17 +218,53 @@ export function keptMob(mob: SlayerMob, cap: MobCap): boolean {
   return withinLevel(mob, cap.maxLevel) && !(cap.noFactionHits && mob.factionHit)
 }
 
-/** The mob as one zone row's line, or null when it counts toward nothing picked. */
-function planMob(mob: SlayerMob, targets: readonly SlayerTarget[]): PlanMob | null {
-  const hits: string[] = []
-  let basis: MatchBasis = 'race'
-  for (const t of targets) {
-    const how = matchMob(t.matcher, mob.facts)
-    if (how === null) continue
-    hits.push(t.id)
-    if (how === 'name') basis = 'name'
+/** The picked counters inverted: each wiki race and each term to the counters (by position) that
+ *  claim it, so a mob reads its few counters instead of being matched against every one (whole-app
+ *  review 2026-11-06). Positions ascend in each list, so the hits keep the pick order. */
+interface TargetIndex {
+  targets: readonly SlayerTarget[]
+  byRace: ReadonlyMap<string, readonly number[]>
+  byTerm: ReadonlyMap<string, readonly number[]>
+}
+
+function targetIndex(targets: readonly SlayerTarget[]): TargetIndex {
+  const byRace = new Map<string, number[]>()
+  const byTerm = new Map<string, number[]>()
+  const add = (m: Map<string, number[]>, k: string, i: number): void => {
+    const had = m.get(k)
+    if (had === undefined) m.set(k, [i])
+    else had.push(i)
   }
-  if (hits.length === 0) return null
+  targets.forEach((t, i) => {
+    for (const race of t.matcher.races) add(byRace, race, i)
+    for (const term of t.matcher.terms) add(byTerm, term, i)
+  })
+  return { targets, byRace, byTerm }
+}
+
+/** The counters (by position, ascending) a mob counts toward, and the row's basis: the same answer
+ *  as `matchMob` per counter. A race claim is 'race'; a counter reached by a term alone is 'name',
+ *  and one such counter makes the row's basis 'name'. Null when it counts toward nothing picked. */
+function hitsOf(facts: MobFacts, index: TargetIndex): { at: readonly number[]; basis: MatchBasis } | null {
+  const raced = facts.race === '' ? undefined : index.byRace.get(facts.race)
+  let named: number[] | undefined
+  for (const term of facts.nameTerm === null ? facts.always : [...facts.always, facts.nameTerm]) {
+    const claimed = index.byTerm.get(term)
+    if (claimed !== undefined) (named ??= []).push(...claimed)
+  }
+  // Most of the catalog counts toward nothing picked: no allocation on that path.
+  if (raced === undefined && named === undefined) return null
+  if (named === undefined) return { at: raced ?? [], basis: 'race' }
+  const basis: MatchBasis = named.some((i) => !raced?.includes(i)) ? 'name' : 'race'
+  return { at: [...new Set([...(raced ?? []), ...named])].sort((a, b) => a - b), basis }
+}
+
+/** The mob as one zone row's line, or null when it counts toward nothing picked. */
+function planMob(mob: SlayerMob, index: TargetIndex): PlanMob | null {
+  const found = hitsOf(mob.facts, index)
+  if (found === null) return null
+  const { basis } = found
+  const hits = found.at.map((i) => index.targets[i].id)
   const { entry } = mob
   return {
     entry,
@@ -218,8 +276,7 @@ function planMob(mob: SlayerMob, targets: readonly SlayerTarget[]): PlanMob | nu
   }
 }
 
-function emptyZone(key: string, catalogName: string): PlanZone {
-  const short = zoneShortNameFromCatalog(catalogName)
+function emptyZone({ key, short, catalogName }: SlayerPlace): PlanZone {
   const name = (short === null ? undefined : zoneNameByShort().get(short)) ?? catalogName
   return { key, name, short, mobs: [], targets: [], spawns: 0, advances: 0, low: null, high: null, level: null }
 }
@@ -232,15 +289,10 @@ function addMob(zone: PlanZone, row: PlanMob, mob: SlayerMob): void {
   if (mob.high !== null) zone.high = zone.high === null ? mob.high : Math.max(zone.high, mob.high)
 }
 
-/** The zones a mob is filed under that are places and that the options keep, each without the
- *  closing period a page sometimes leaves on it (`Lake of Ill Omen.`). */
-function keptZones(entry: MobEntry, opts: PlanOptions): string[] {
-  return (entry.zones ?? [])
-    .map((z) => z.replace(/\.\s*$/, ''))
-    .filter((z) => {
-      if (isPlaceholder(zoneKey(z))) return false
-      return opts.outOfEra || eraVerdict([z]) !== 'out-of-era'
-    })
+/** The places a mob is filed under that the options keep: the era reading is taken at plan time,
+ *  because it reads the log's evidence (`PlanOptions.met`). */
+function keptPlaces(mob: SlayerMob, opts: PlanOptions): SlayerPlace[] {
+  return mob.places.filter((p) => p.isPlace && (opts.outOfEra || eraVerdict([p.catalogName]) !== 'out-of-era'))
 }
 
 function byRank(a: PlanZone, b: PlanZone): number {
@@ -257,13 +309,14 @@ export function planZones(
 ): PlanZone[] {
   const zones = new Map<string, PlanZone>()
   const levels = new Map<PlanZone, { sum: number; spawns: number }>()
+  const index = targetIndex(targets)
   for (const mob of mobs) {
     if (!keptMob(mob, opts)) continue
-    const row = planMob(mob, targets)
+    const row = planMob(mob, index)
     if (row === null) continue
-    for (const catalogName of keptZones(mob.entry, opts)) {
-      const key = zoneShortNameFromCatalog(catalogName) ?? zoneKey(catalogName)
-      const zone = zones.get(key) ?? emptyZone(key, catalogName)
+    for (const place of keptPlaces(mob, opts)) {
+      const { key } = place
+      const zone = zones.get(key) ?? emptyZone(place)
       zones.set(key, zone)
       addMob(zone, row, mob)
       if (mob.low === null) continue

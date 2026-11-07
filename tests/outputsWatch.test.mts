@@ -43,7 +43,12 @@ import { mkdtempSync, realpathSync, rmSync, unlinkSync, writeFileSync } from 'fs
 import { tmpdir } from 'os'
 import { join } from 'path'
 import type { FSWatcher } from 'chokidar'
-import { watchForOutputFile, watchOutputFile } from '../src/main/outputs/watch'
+import {
+  openOutputDirWatchers,
+  subscribeOutputDir,
+  watchForOutputFile,
+  watchOutputFile
+} from '../src/main/outputs/watch'
 import { outputKind } from '../src/shared/outputs/kinds'
 
 const INVENTORY = outputKind('inventory')
@@ -249,5 +254,39 @@ test('the directory watcher stays out of every other file in the install root', 
     writeFileSync(join(root, DUMP), dumpText(7))
     assert.equal(await within(ours), true, 'the kind’s own dump is still reported')
     assert.equal(rec.errors.length, 0)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// THE SHARED DIRECTORY WATCHER: one chokidar instance per root, however many kinds subscribe
+// ---------------------------------------------------------------------------
+
+test('kinds subscribed to one root share one watcher and each gets only its own dump', async () => {
+  await withRoot(async (root) => {
+    const inv = recorder()
+    const ach = recorder()
+    const before = openOutputDirWatchers()
+    const a = subscribeOutputDir(root, INVENTORY, inv.handlers)
+    const b = subscribeOutputDir(root, outputKind('achievements'), ach.handlers)
+    try {
+      assert.equal(openOutputDirWatchers(), before + 1, 'two subscribers, one watcher')
+      // chokidar needs a moment to arm before the first write is news.
+      await new Promise((r) => setTimeout(r, 500))
+
+      const ours = inv.next('change')
+      writeFileSync(join(root, DUMP), dumpText(5))
+      assert.equal(await within(ours), true, 'the inventory kind was told')
+      assert.equal(await within(ach.next('change'), 1_000), false, 'the achievements kind was not')
+
+      a.close()
+      assert.equal(openOutputDirWatchers(), before + 1, 'the watcher outlives one subscriber leaving')
+      b.close()
+      assert.equal(openOutputDirWatchers(), before, 'and closes with the last')
+      b.close()
+      assert.equal(openOutputDirWatchers(), before, 'a second close is a no-op')
+    } finally {
+      a.close()
+      b.close()
+    }
   })
 })

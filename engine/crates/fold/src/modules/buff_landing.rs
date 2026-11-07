@@ -22,9 +22,11 @@
 //! wrote it down — and the DB name is the string every other surface states.
 
 use crate::event::{Event, Key};
-use crate::modules::buff_anchors::CastAnchors;
+use crate::modules::buff_anchors::{anchor_key_of, CastAnchors};
 use crate::modules::buffs_shapes::{spell_key, SELF_CASTER};
 use crate::spell_facts::{Nature, SpellFacts};
+use eqlog::names::id_key_ref;
+use std::borrow::Cow;
 
 /// A candidate spell carried by an ambiguous landing message.
 #[derive(Debug, Clone)]
@@ -93,16 +95,39 @@ fn resolved(cand: &Candidate, caster: &str, cast: Option<&str>) -> AdmittedLandi
     }
 }
 
+/// A landing's candidates with the two keys the gate joins on, computed once each. The four cases
+/// below ask about every candidate in turn and the keys (a regex strip, a lower-case, an
+/// apostrophe fold) were being rebuilt per case; the anchor key borrows the spell key wherever the
+/// fold changes nothing, which is nearly every name.
+struct Keyed<'a> {
+    cands: &'a [Candidate],
+    spell_keys: Vec<String>,
+}
+
+impl<'a> Keyed<'a> {
+    fn new(cands: &'a [Candidate]) -> Self {
+        Keyed {
+            cands,
+            spell_keys: cands.iter().map(|c| spell_key(&c.name)).collect(),
+        }
+    }
+
+    fn anchor_key(&self, i: usize) -> Cow<'_, str> {
+        anchor_key_of(&self.spell_keys[i])
+    }
+}
+
 /// Cases 1 and 2: the candidate with a named anchor in window, most recently cast first. The
 /// recency tiebreak reads `last_cast_ts` — the self-only ever-cast map — not the anchor's own ts.
-fn named_landing(cands: &[Candidate], ts: i64, anchors: &CastAnchors) -> Option<AdmittedLanding> {
+fn named_landing(keyed: &Keyed, ts: i64, anchors: &CastAnchors) -> Option<AdmittedLanding> {
     let mut best: Option<AdmittedLanding> = None;
     let mut best_ts = -1i64;
-    for c in cands {
-        let Some(at) = anchors.named_anchor_for(&c.name, ts) else {
+    for (i, c) in keyed.cands.iter().enumerate() {
+        let key = keyed.anchor_key(i);
+        let Some(at) = anchors.named_anchor_for_key(&key, ts) else {
             continue;
         };
-        let t = anchors.last_cast_ts(&c.name).unwrap_or(-1);
+        let t = anchors.last_cast_ts_key(&key).unwrap_or(-1);
         if t <= best_ts {
             continue;
         }
@@ -115,15 +140,18 @@ fn named_landing(cands: &[Candidate], ts: i64, anchors: &CastAnchors) -> Option<
 /// Case 2b: the one candidate the proc gate vouches for. `target` is the landing's subject as the
 /// event spelled it; the anchors key it the way they keyed your swing.
 fn proc_landing(
-    cands: &[Candidate],
+    keyed: &Keyed,
     target: &str,
     ts: i64,
     anchors: &CastAnchors,
 ) -> Option<AdmittedLanding> {
-    let mut vouched = cands
+    let target_key = id_key_ref(target);
+    let mut vouched = keyed
+        .cands
         .iter()
-        .filter(|c| anchors.proc_evidence(&c.name, target, ts));
-    let one = vouched.next()?;
+        .zip(&keyed.spell_keys)
+        .filter(|(_, key)| anchors.proc_evidence_key(key, &target_key, ts));
+    let (one, _) = vouched.next()?;
     if vouched.next().is_some() {
         return None;
     }
@@ -132,14 +160,14 @@ fn proc_landing(
 
 /// Burst narrowing (a): the candidate you have EVER cast, most recent first.
 fn ever_cast_landing(
-    cands: &[Candidate],
+    keyed: &Keyed,
     caster: &str,
     anchors: &CastAnchors,
 ) -> Option<AdmittedLanding> {
     let mut best: Option<&Candidate> = None;
     let mut best_ts = -1i64;
-    for c in cands {
-        let Some(t) = anchors.last_cast_ts(&c.name) else {
+    for (i, c) in keyed.cands.iter().enumerate() {
+        let Some(t) = anchors.last_cast_ts_key(&keyed.anchor_key(i)) else {
             continue;
         };
         if t <= best_ts {
@@ -153,14 +181,16 @@ fn ever_cast_landing(
 
 /// Burst narrowing (b): the candidate you already have up (EQ stacking keeps one per family).
 fn active_landing(
-    cands: &[Candidate],
+    keyed: &Keyed,
     caster: &str,
     has_active_spell: &dyn Fn(&str) -> bool,
 ) -> Option<AdmittedLanding> {
-    cands
+    keyed
+        .cands
         .iter()
-        .find(|c| has_active_spell(&spell_key(&c.name)))
-        .map(|c| resolved(c, caster, None))
+        .zip(&keyed.spell_keys)
+        .find(|(_, key)| has_active_spell(key))
+        .map(|(c, _)| resolved(c, caster, None))
 }
 
 /// A landing the burst admits but nobody can narrow: draw the family rather than nothing, but only
@@ -168,18 +198,11 @@ fn active_landing(
 /// could not choose a window) and on one stated duration. Disagree on either and the answer is
 /// nothing, because picking one of them would be a coin flip — which is what happens to `is
 /// resistant to magic.`, three spells in the committed DB whose durations do not agree.
-fn family_landing(
-    cands: &[Candidate],
-    caster: &str,
-    facts: &SpellFacts,
-) -> Option<AdmittedLanding> {
-    let nature_of = |c: &Candidate| {
-        facts
-            .get(&spell_key(&c.name))
-            .map_or(Nature::Unknown, |s| s.nature)
-    };
-    let first = nature_of(&cands[0]);
-    if cands.iter().any(|c| nature_of(c) != first) {
+fn family_landing(keyed: &Keyed, caster: &str, facts: &SpellFacts) -> Option<AdmittedLanding> {
+    let cands = keyed.cands;
+    let nature_of = |key: &String| facts.get(key).map_or(Nature::Unknown, |s| s.nature);
+    let first = nature_of(&keyed.spell_keys[0]);
+    if keyed.spell_keys.iter().any(|key| nature_of(key) != first) {
         return None;
     }
     let duration_ms = stated_duration(cands)?;
@@ -238,22 +261,23 @@ pub fn admit_landing(
     if cands.is_empty() {
         return None;
     }
-    if let Some(named) = named_landing(cands, ts, anchors) {
+    let keyed = Keyed::new(cands);
+    if let Some(named) = named_landing(&keyed, ts, anchors) {
         return Some(named);
     }
-    if let Some(proc) = proc_landing(cands, target, ts, anchors) {
+    if let Some(proc) = proc_landing(&keyed, target, ts, anchors) {
         return Some(proc);
     }
     // `attribute` reports `unnamed` for every candidate under a burst, so asking with the first one
     // is asking about the burst.
-    let burst = anchors.attribute(&cands[0].name, ts)?;
+    let burst = anchors.attribute_key(&keyed.anchor_key(0), ts)?;
     if !burst.unnamed {
         return None;
     }
     if cands.len() == 1 {
         return Some(resolved(&cands[0], &burst.caster, None));
     }
-    ever_cast_landing(cands, &burst.caster, anchors)
-        .or_else(|| active_landing(cands, &burst.caster, has_active_spell))
-        .or_else(|| family_landing(cands, &burst.caster, facts))
+    ever_cast_landing(&keyed, &burst.caster, anchors)
+        .or_else(|| active_landing(&keyed, &burst.caster, has_active_spell))
+        .or_else(|| family_landing(&keyed, &burst.caster, facts))
 }

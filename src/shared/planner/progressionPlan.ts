@@ -122,6 +122,7 @@ import type { ClassAbbr } from '../classCombo'
 import type { ConBand } from '../conBands'
 import type { GearRow } from './gear'
 import type { EquipSlot } from './types'
+import { perObject } from '../gapMemo'
 import { layeredVerdict } from './era'
 import { LAST_BRACKET_ROOM, QUIET_BRACKETS, bracketsFrom, type Bracket } from './planHorizon'
 import {
@@ -131,6 +132,7 @@ import {
   policyAdmits,
   readsSurvivability,
   roleValue,
+  roleValuer,
   type ClassFacts,
   type GearRole,
   type RoleContext,
@@ -449,11 +451,6 @@ function byWorth(a: GearTarget, b: GearTarget): number {
   return Number(b.wished) - Number(a.wished) || b.score - a.score || a.name.localeCompare(b.name)
 }
 
-/** The base spelling of a possibly-tiered name. */
-function baseName(name: string): string {
-  return plusSuffix(name)?.base ?? name
-}
-
 /**
  * CAN THE TRIO WEAR IT? Two ways to answer yes, and both are law 1.
  *
@@ -478,14 +475,40 @@ export function wearable(row: GearRow, classes: readonly ClassAbbr[]): boolean {
  * era purposes, and the zone table has never heard of the tiered spelling, so an unstripped name
  * would resolve to nothing and turn every tiered witness into an `unknown` the filter then hides.
  */
-function eraLegal(row: GearRow, eraOnly: boolean): boolean {
+function eraLegal(sources: readonly ParsedSource[], eraTag: string | undefined, eraOnly: boolean): boolean {
   if (!eraOnly) return true
-  const zones: string[] = []
-  for (const source of row.wikiSources ?? []) {
-    const zone = baseName(source.zone ?? '').trim()
-    if (zone !== '') zones.push(zone)
+  const zones = sources.flatMap((source) => (source.zone === '' ? [] : [source.zone]))
+  return layeredVerdict(zones, eraTag) === 'in-era'
+}
+
+/** One `|dropsfrom` edge with the tier split off either side (`parseSource`), read by the era gate and the witnesses alike. */
+interface ParsedSource {
+  /** the zone without its tier, trimmed; '' when the page states none */
+  zone: string
+  plus: number | null
+  mob: string
+  /** the page spelling, untouched */
+  mobPage: string
+  /** the MOB carried the tier: a creature the catalog has no row for (`witnessesOf`) */
+  mobTiered: boolean
+}
+
+/** A row's edges parsed once per row object (whole-app review 2026-11-06: `plusSuffix` ran twice per
+ *  source per row per pool, once for the era gate and once for the witnesses). The corpus rows are
+ *  the same objects for the life of the window, so a later pool reads them back. */
+const sourcesOf = perObject((row: GearRow): readonly ParsedSource[] => (row.wikiSources ?? []).map(parseSource))
+
+function parseSource(source: { mob: string; zone?: string }): ParsedSource {
+  const zoneRaw = source.zone ?? ''
+  const zonePlus = zoneRaw === '' ? null : plusSuffix(zoneRaw)
+  const mobPlus = plusSuffix(source.mob)
+  return {
+    zone: (zonePlus === null ? zoneRaw : zonePlus.base).trim(),
+    plus: tierOf(zonePlus, mobPlus),
+    mob: mobPlus === null ? source.mob : mobPlus.base,
+    mobPage: source.mob,
+    mobTiered: mobPlus !== null
   }
-  return layeredVerdict(zones, row.eraTag) === 'in-era'
 }
 
 /**
@@ -500,31 +523,13 @@ function eraLegal(row: GearRow, eraOnly: boolean): boolean {
  *     (plan §0.2: zero `MobEntry` names carry `+N`), and handing back the base mob's level would be
  *     stating a number about a different creature. `null`.
  */
-function witnessesOf(row: GearRow, mobLevel: (name: string) => number | null): Witness[] {
-  return (row.wikiSources ?? []).map((source) => witnessOf(source, mobLevel))
+function witnessesOf(sources: readonly ParsedSource[], mobLevel: (name: string) => number | null): Witness[] {
+  return sources.map((s) => ({ zone: s.zone, plus: s.plus, mob: s.mob, mobPage: s.mobPage, mobLevel: s.mobTiered ? null : mobLevel(s.mob) }))
 }
 
 /** THE TIER, from whichever side of the edge spelled it. The zone wins when both do. */
 function tierOf(zonePlus: PlusName | null, mobPlus: PlusName | null): number | null {
   return zonePlus?.plus ?? mobPlus?.plus ?? null
-}
-
-/** One `|dropsfrom` edge, resolved. Split out of `witnessesOf` for the complexity ceiling. */
-function witnessOf(
-  source: { mob: string; zone?: string },
-  mobLevel: (name: string) => number | null
-): Witness {
-  const zoneRaw = source.zone ?? ''
-  const zonePlus = zoneRaw === '' ? null : plusSuffix(zoneRaw)
-  const mobPlus = plusSuffix(source.mob)
-  const mob = mobPlus === null ? source.mob : mobPlus.base
-  return {
-    zone: (zonePlus === null ? zoneRaw : zonePlus.base).trim(),
-    plus: tierOf(zonePlus, mobPlus),
-    mob,
-    mobPage: source.mob,
-    mobLevel: mobPlus === null ? mobLevel(mob) : null
-  }
 }
 
 /**
@@ -805,17 +810,17 @@ export type PlanScope = Pick<PlanInputs, 'classes' | 'role' | 'eraOnly' | 'survi
  * `best` is what a target is RANKED by: the slot where the item is worth most is the slot you
  * would wear it in.
  */
-function scoresOf(row: GearRow, scope: PlanScope, corpora: PlanCorpora): { best: number; bySlot: number[] } {
-  const ctx = { classes: scope.classes, survivability: scope.survivability }
+function scoresOf(row: GearRow, value: RoleValuer, ownedHaste: readonly OwnedHaste[] | undefined): { best: number; bySlot: number[] } {
   if ((row.stats.HASTE === undefined && row.stats.DMG === undefined) || row.slots.length === 0) {
-    const one = roleValue(row.stats, scope.role, ctx)
+    const one = value(row.stats)
     return { best: one, bySlot: row.slots.map(() => one) }
   }
-  const bySlot = row.slots.map((slot) =>
-    roleValue(row.stats, scope.role, { ...ctx, slot, ownedHaste: ownedHasteOutside(corpora.ownedHaste, slot) })
-  )
+  const bySlot = row.slots.map((slot) => value(row.stats, { slot, ownedHaste: ownedHasteOutside(ownedHaste, slot) }))
   return { best: Math.max(...bySlot), bySlot }
 }
+
+/** `roleValuer`'s scorer: the focus, the class gate and the stat keys resolved once per pool. */
+type RoleValuer = ReturnType<typeof roleValuer>
 
 /**
  * EVERY GEAR ROW THAT COULD EVER BE A TARGET, filtered once and scored once — not per bracket, and
@@ -830,11 +835,13 @@ function scoresOf(row: GearRow, scope: PlanScope, corpora: PlanCorpora): { best:
 export function candidatePool(scope: PlanScope, corpora: PlanCorpora): PlanCandidate[] {
   const out: PlanCandidate[] = []
   const policy = ROLE_WEAPON_POLICY[scope.role]
+  const value = roleValuer(scope.role, { classes: scope.classes, survivability: scope.survivability })
   for (const row of corpora.gear) {
     if (corpora.owned.has(row.key)) continue
     if (!wearable(row, scope.classes)) continue
-    if (!eraLegal(row, scope.eraOnly)) continue
-    const witnesses = witnessesOf(row, corpora.mobLevel)
+    const sources = sourcesOf(row)
+    if (!eraLegal(sources, row.eraTag, scope.eraOnly)) continue
+    const witnesses = witnessesOf(sources, corpora.mobLevel)
     // The quest lane fills in ONLY where no dropper is stated: a killable witness is the more
     // actionable pointer when the page states both.
     if (witnesses.length === 0) {
@@ -843,7 +850,7 @@ export function candidatePool(scope: PlanScope, corpora: PlanCorpora): PlanCandi
       }
     }
     if (witnesses.length === 0) continue
-    const { best, bySlot } = scoresOf(row, scope, corpora)
+    const { best, bySlot } = scoresOf(row, value, corpora.ownedHaste)
     const slot = upgradeSlot(row, { bySlot, bars: corpora.ownedBestBySlot, policy })
     out.push({ row, witnesses, score: best, upgrade: slot !== undefined, ...(slot === undefined ? {} : { slot }) })
   }

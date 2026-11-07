@@ -32,7 +32,7 @@
 // ELECTRON-FREE on purpose, the `mobLookupLocal.ts` precedent: `tests/mobDropEra.test.mts` drives
 // the real annotation over the real committed corpus under the node runner.
 
-import { itemKey, type ItemDbFile } from './itemsDb'
+import { itemKey, type ItemDbEntry, type ItemDbFile } from './itemsDb'
 import type { MobDrop, MobKnowledge } from '../shared/types'
 // ES-imported so electron-vite INLINES it into the main bundle — a path-relative readFile would
 // miss in out/main/ (AGENTS.md toolchain note). Same module instance as itemLookup.ts's import.
@@ -40,7 +40,8 @@ import itemsJson from './data/items.json'
 import { itemsByAnyName } from './itemOtherNames'
 
 // By any name the wiki gives the page: a mob page's link that is a redirect finds the item (itemOtherNames.ts).
-const items = itemsByAnyName((itemsJson as unknown as ItemDbFile).items)
+// Memoized per corpus there, so this and the gap modules share one build, made on the first ask.
+const items = (): Readonly<Record<string, ItemDbEntry>> => itemsByAnyName((itemsJson as unknown as ItemDbFile).items)
 
 /**
  * ONE drop, annotated with what the ITEM PAGE says about its era. Returns the drop UNCHANGED when
@@ -48,7 +49,7 @@ const items = itemsByAnyName((itemsJson as unknown as ItemDbFile).items)
  * renderer renders it as `era?` rather than as a verdict (law 1).
  */
 export function annotateDrop(drop: MobDrop): MobDrop {
-  const entry = items[itemKey(drop.item)]
+  const entry = items()[itemKey(drop.item)]
   if (entry === undefined) return drop
   // `dropsFrom` is the page's `|dropsfrom` list; only the zone half is era evidence, and a zone
   // named by three of its mobs is one zone. Order is the page's, which no fold depends on.

@@ -133,6 +133,50 @@ const groupTies = perObject((groups: DropGroups): readonly (readonly [string, re
   Object.entries(groups).map(([g, ms]) => [sourceItemKey(g), ms.map(sourceItemKey)] as const)
 )
 
+/** `groupTies` indexed for `ties` (whole-app review 2026-11-06: it scanned every group per subject):
+ *  each key's members (the first group of a repeated key, as `find` read it) and each member key's
+ *  groups by position, ascending. Once per table. */
+const groupLookup = perObject((groups: DropGroups) => {
+  const entries = groupTies(groups)
+  const members = new Map<string, readonly string[]>()
+  const groupsOf = new Map<string, number[]>()
+  entries.forEach(([g, ms], i) => {
+    if (!members.has(g)) members.set(g, ms)
+    for (const m of ms) {
+      const at = groupsOf.get(m)
+      if (at === undefined) groupsOf.set(m, [i])
+      else if (at[at.length - 1] !== i) at.push(i)
+    }
+  })
+  return { entries, members, groupsOf }
+})
+
+/**
+ * The subject, its own members, and every group the in-order scan reached: a group is added when a
+ * member of it is already among the names as the scan passes it, so a group added at position i can
+ * admit a later group only. Read off the index instead of scanning the table.
+ */
+function tiedNames(subject: string, lookup: ReturnType<typeof groupLookup>): Set<string> {
+  const { entries, members, groupsOf } = lookup
+  const names = new Set([subject, ...(members.get(subject) ?? [])])
+  const due = new Set<number>()
+  for (const n of names) for (const i of groupsOf.get(n) ?? []) due.add(i)
+  const order = [...due].sort((a, b) => a - b)
+  for (let p = 0; p < order.length; p++) {
+    const i = order[p]
+    const g = entries[i][0]
+    names.add(g)
+    for (const j of groupsOf.get(g) ?? []) {
+      if (j <= i || due.has(j)) continue
+      due.add(j)
+      let k = p + 1
+      while (k < order.length && order[k] < j) k++
+      order.splice(k, 0, j)
+    }
+  }
+  return names
+}
+
 /**
  * Drop key → the mobs (`mobKey` of each page's `|name`) whose page lists it under either loot field,
  * raw names only (no aliases, no unqualified spellings: what `ties` always counted). Once per catalog.
@@ -279,7 +323,7 @@ function withoutServerWide(pairs: Missing[], catalog: readonly CatalogMob[], gro
   const mobsOf = new Map<string, Set<string>>()
   for (const p of pairs) mobsOf.set(sourceItemKey(p.name), (mobsOf.get(sourceItemKey(p.name)) ?? new Set()).add(mobKey(p.mob)))
   const wide = new Set<string>()
-  const wiki = { byDrop: catalogTies(catalog), entries: groupTies(groups), itemMobs }
+  const wiki = { byDrop: catalogTies(catalog), lookup: groupLookup(groups), itemMobs }
   for (const [subject, mobs] of mobsOf) {
     if (mobs.size >= GLOBAL_MOBS && ties(subject, wiki).size <= GLOBAL_TIES) wide.add(subject)
   }
@@ -289,12 +333,10 @@ function withoutServerWide(pairs: Missing[], catalog: readonly CatalogMob[], gro
 /** Every mob the wiki ties a drop (an item or group key) to, on either side of the two pages. */
 function ties(
   subject: string,
-  wiki: { byDrop: ReadonlyMap<string, ReadonlySet<string>>; entries: ReturnType<typeof groupTies>; itemMobs: ItemMobs }
+  wiki: { byDrop: ReadonlyMap<string, ReadonlySet<string>>; lookup: ReturnType<typeof groupLookup>; itemMobs: ItemMobs }
 ): Set<string> {
-  const { byDrop, entries, itemMobs } = wiki
-  const names = new Set([subject, ...(entries.find(([g]) => g === subject)?.[1] ?? [])])
-  // In the table's order, as before: a group added here can be a later group's member.
-  for (const [g, ms] of entries) if (ms.some((m) => names.has(m))) names.add(g)
+  const { byDrop, lookup, itemMobs } = wiki
+  const names = tiedNames(subject, lookup)
   const out = new Set<string>()
   for (const n of names) for (const mob of byDrop.get(n) ?? []) out.add(mob)
   for (const n of names) for (const mob of itemMobs.get(n) ?? []) out.add(mobKey(mob))

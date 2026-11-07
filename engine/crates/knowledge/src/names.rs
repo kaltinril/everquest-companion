@@ -4,6 +4,29 @@
 //! item DB, the quest index, the posky index and the runtime overlay must key an item the same way
 //! four times, or a lookup answers for one spelling and not another.
 
+use eqlog::jsstr::js_trim;
+use fold::modules::consider::mob_key;
+use std::borrow::Cow;
+
+/// [`mob_key`], borrowed where the name is already its own key: trimmed, all ASCII with no
+/// uppercase letter, no backtick, no control character and no run of two spaces, and not ending
+/// in `)`. Those are the only things the fold touches (ASCII case, the three quote marks, runs of
+/// whitespace, a trailing copy number), so on such a name the key is the trimmed name itself; any
+/// other name takes the owned path. Every mob lookup keys through this.
+#[must_use]
+pub fn mob_key_ref(name: &str) -> Cow<'_, str> {
+    let n = js_trim(name);
+    let plain = n.bytes().all(|b| {
+        b == b' ' || (b.is_ascii() && !b.is_ascii_uppercase() && !b.is_ascii_control() && b != b'`')
+    }) && !n.contains("  ")
+        && !n.ends_with(')');
+    if plain {
+        Cow::Borrowed(n)
+    } else {
+        Cow::Owned(mob_key(name))
+    }
+}
+
 /// Strip a trailing ` +N` item-level suffix, then trim.
 ///
 /// `Cloak of Flames +4` and `Cloak of Flames` are one item to every counting boundary (law 2), and
@@ -54,7 +77,40 @@ pub fn quest_item_key(name: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::{item_base_name, item_key, quest_item_key};
+    use super::{item_base_name, item_key, mob_key, mob_key_ref, quest_item_key};
+    use std::borrow::Cow;
+
+    /// The borrowed key is the fold's key, over every fold the fold makes and the names it leaves
+    /// alone; and it is a borrow where the point was to skip the copy.
+    #[test]
+    fn the_borrowed_mob_key_is_the_folds_key() {
+        let names = [
+            "a sand giant",
+            "A Sand Giant",
+            "Innoruuk`s Chosen",
+            "innoruuk\u{2019}s chosen",
+            "innoruuk\u{b4}s chosen",
+            "a rat (2)",
+            "a rat(12)",
+            "a rat (Awakened)",
+            "a rat )",
+            "a  rat",
+            " a rat ",
+            "a\trat",
+            "x\u{A0}y",
+            "Cazic-Thule",
+            "\u{fc}n\u{ef}c\u{f6}d\u{e9}",
+            "key master",
+            "",
+            "   ",
+        ];
+        for name in names {
+            assert_eq!(mob_key_ref(name).as_ref(), mob_key(name), "{name:?}");
+        }
+        assert!(matches!(mob_key_ref("a sand giant"), Cow::Borrowed(_)));
+        assert!(matches!(mob_key_ref(" a sand giant "), Cow::Borrowed(_)));
+        assert!(matches!(mob_key_ref("A Sand Giant"), Cow::Owned(_)));
+    }
 
     #[test]
     fn the_item_level_suffix_is_stripped_and_nothing_else_is() {

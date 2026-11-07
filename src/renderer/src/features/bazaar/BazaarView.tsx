@@ -38,6 +38,7 @@ import BazaarTierTable from './BazaarTierTable'
 import BazaarWatchPanel from './BazaarWatchPanel'
 import { useHeardAlerts } from './BazaarWatcher'
 import { useBazaarSummary } from './useBazaarSummary'
+import { kept, type Kept } from '../../lib/kept'
 import { useBazaarWatch } from './useBazaarWatch'
 import { useItemFacts, type ItemFacts } from './useItemFacts'
 
@@ -267,6 +268,11 @@ function narrowed(ctl: BazaarControlState, facts: FactsFilter): boolean {
   return ctl.text !== '' || ctl.dir !== 'all' || ctl.show !== 'all' || ctl.minPrice > 0 || factsAsked(facts)
 }
 
+/** The distinct item names in the snapshot, kept across visits (one walk per snapshot). */
+const namesSlot: Kept<string[]> = { last: null }
+/** The Quest box's choices, kept per (names, facts reader) so opening the box twice folds once. */
+const questsSlot: Kept<string[]> = { last: null }
+
 async function exportCsv(items: readonly BazaarItem[], lastDay: string | null): Promise<void> {
   await window.eq.saveBazaarCsv(offersCsv(offersOf(items)), `bazaar-offers-${lastDay ?? 'all'}.csv`)
 }
@@ -280,9 +286,10 @@ export default function BazaarView({ onOpenLoot }: { onOpenLoot: (item: string) 
   const [pick, setPick] = useState<string | null>(null)
   const [detailHidden, setDetailHidden] = useDetailHidden()
   const wished = useMemo(() => new Set(wishes.ready ? wishes.list.entries.map((e) => e.itemKey) : []), [wishes])
-  const names = useMemo(() => [...new Set((snap?.rows ?? []).map((r) => r.item))], [snap])
+  const names = kept(namesSlot, [snap], () => [...new Set((snap?.rows ?? []).map((r) => r.item))])
   const factsOf = useItemFacts(names)
-  const quests = useMemo(() => questNamesOf(names, factsOf), [names, factsOf])
+  // A getter: the fold runs when the Quest box opens (BazaarControls), not on every render here.
+  const quests = useCallback(() => kept(questsSlot, [names, factsOf], () => questNamesOf(names, factsOf)), [names, factsOf])
   // The Quest box's text is deferred like the search's (useBazaarSummary), so typing never waits on the list.
   const quest = useDeferredValue(ctl.quest)
   const facts = useMemo(() => ({ hideNoTrade: ctl.hideNoTrade, tradeskill: ctl.tradeskill, quest }), [ctl.hideNoTrade, ctl.tradeskill, quest])

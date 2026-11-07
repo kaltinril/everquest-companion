@@ -33,7 +33,7 @@ import {
 } from '../../shared/outputs/kinds'
 import { effectiveEqRoot } from '../log/config'
 import { findOutputFile } from './discovery'
-import { watchForOutputFile, watchOutputFile } from './watch'
+import { subscribeOutputDir, watchOutputFile } from './watch'
 import type { FSWatcher } from 'chokidar'
 
 /** Whose dumps we are asking about. Both parts optional — an unknown character still resolves
@@ -126,6 +126,9 @@ export interface OutputKindWatch {
  * never-run machine, and the duplicate reload it can produce (the directory sees the same `add`
  * the file watcher does) is one re-read of a file we would have re-read anyway: `outputStatus`
  * caches nothing and `loadInventory` is a parse, not a mutation.
+ *
+ * AND THAT WATCHER IS SHARED (watch.ts `subscribeOutputDir`): the three kinds subscribe to one
+ * chokidar instance on the root rather than arming three of them.
  */
 export function watchOutputKind(
   id: OutputKindId,
@@ -182,7 +185,7 @@ export function watchOutputKind(
     }
   }
 
-  const dirWatcher = watchForOutputFile(effectiveEqRoot(), def, {
+  const dirWatcher = subscribeOutputDir(effectiveEqRoot(), def, {
     onChange: () => {
       if (!active()) return
       // Re-arm FIRST: whatever just appeared may be a better answer than what we were watching,
@@ -201,7 +204,7 @@ export function watchOutputKind(
       announceTimer = null
       void fileWatcher?.close()
       fileWatcher = null
-      void dirWatcher.close()
+      dirWatcher.close()
     }
   }
 }

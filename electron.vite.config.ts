@@ -76,13 +76,17 @@ export default defineConfig({
         //     unmeasurable, which is the strongest form of "this needs its own entry".
         //   * fontReaderWorker — the screenshot reader's exact font match (shot/fontReader.ts):
         //     0.05-2.5 s of pure CPU a window, which main cannot spend. Same rule as the others.
+        //   * jsonChunkWorker — a big JSON file (the resist cache, the resist ledger) read and
+        //     parsed off main and handed back in slices (jsonChunks.ts), so no single turn of
+        //     the main thread parses more than ~512 KB of it.
         input: {
           index: resolve(__dirname, 'src/main/index.ts'),
           speechWorker: resolve(__dirname, 'src/main/speech/worker.ts'),
           presenceWorker: resolve(__dirname, 'src/main/presenceWorker.ts'),
           perfProbeWorker: resolve(__dirname, 'src/main/perfProbeWorker.ts'),
           resistTableWorker: resolve(__dirname, 'src/main/resistTableWorker.ts'),
-          fontReaderWorker: resolve(__dirname, 'src/main/fontReaderWorker.ts')
+          fontReaderWorker: resolve(__dirname, 'src/main/fontReaderWorker.ts'),
+          jsonChunkWorker: resolve(__dirname, 'src/main/jsonChunkWorker.ts')
         }
       }
     }

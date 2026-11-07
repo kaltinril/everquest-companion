@@ -23,7 +23,7 @@ import { killIndex, type KillMap } from '@shared/kills'
 import type { KillsSnap } from '@shared/types'
 import type { SlayerCounter } from '@shared/outputs/slayer'
 import type { ZoneShort } from '@shared/maps'
-import { metVersion } from '@shared/metInLog'
+import { eraVersion } from '@shared/metInLog'
 import {
   planZones,
   sortZones,
@@ -125,7 +125,7 @@ function usePlanOptions(): {
   const maxLevel = levelCap(stored, own)
   // The log's evidence rides the options (`PlanOptions.met`), so every plan memo keyed by them
   // recomputes when it moves: a flagged mob the player met comes back in era.
-  const met = metVersion()
+  const met = eraVersion()
   const opts = useMemo(
     () => ({ maxLevel, outOfEra, noFactionHits, met }),
     [maxLevel, outOfEra, noFactionHits, met]

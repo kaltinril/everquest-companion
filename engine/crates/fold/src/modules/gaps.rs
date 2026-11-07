@@ -275,14 +275,18 @@ impl GapsModule {
         let Some(name) = name else {
             return false;
         };
-        if self.players.contains(&mob_key(name)) || no_mob(name) {
+        // One key fold per call: the same key serves the player test, the redirect and the row
+        // unless the knowledge files the name under another spelling.
+        let key = mob_key(name);
+        if self.players.contains(&key) || no_mob(name) {
             return false;
         }
         let (known, filed) = self.knowledge.as_deref().map_or((false, name), |k| self.filed_as(k, name));
         if let Some(page) = (self.knowledge.as_ref()).and_then(|k| self.mob_names.via_redirect(k.as_ref(), name)) {
-            return self.redirected(Domain::Mob, mob_key(name), name, page, kind, ev);
+            return self.redirected(Domain::Mob, key, name, page, kind, ev);
         }
-        self.note(Domain::Mob, mob_key(filed), filed, known, kind, ev)
+        let filed_key = if filed == name { key } else { mob_key(filed) };
+        self.note(Domain::Mob, filed_key, filed, known, kind, ev)
     }
 
     /// A purchase (an item and its merchant), a vendor sale or a corpse's coin (held for the kill
@@ -296,8 +300,9 @@ impl GapsModule {
             }
             Kind::Unknown => {
                 self.kill_factions.line(ev);
-                let zone = self.zone.clone();
-                self.mob_locs.line(ev, zone.as_deref()) | self.quest_line(ev) | self.unparsed(ev) | self.merchant(ev) | self.offered(ev) | self.stocked(ev)
+                // The zone is borrowed beside the one reader that takes it; `|` keeps the order.
+                let located = { let Self { zone, mob_locs, .. } = self; mob_locs.line(ev, zone.as_deref()) };
+                located | self.quest_line(ev) | self.unparsed(ev) | self.merchant(ev) | self.offered(ev) | self.stocked(ev)
             }
             _ => self.merchant(ev),
         }
@@ -366,8 +371,10 @@ impl GapsModule {
         } else if self.who.is_player(name) {
             return false;
         }
-        let zone = self.zone.clone();
-        self.who.candidate(name, zone.as_deref(), ev.ts(), hail);
+        {
+            let Self { zone, who, .. } = self;
+            who.candidate(name, zone.as_deref(), ev.ts(), hail);
+        }
         self.mob(Some(name), kind, ev)
     }
 
@@ -383,8 +390,8 @@ impl GapsModule {
     /// A death claims the faction lines and the corpse coin just before it (`gaps_trade.rs`,
     /// `gaps_coin.rs`).
     fn kill_factions_of(&mut self, ev: &Event) -> bool {
-        let zone = self.zone.clone();
-        ev.str("name").is_some_and(|mob| self.kill_factions.death(ev, mob, zone.as_deref()) | self.kill_coin.death(mob, ev.ts()))
+        let Self { zone, kill_factions, kill_coin, .. } = self;
+        ev.str("name").is_some_and(|mob| kill_factions.death(ev, mob, zone.as_deref()) | kill_coin.death(mob, ev.ts()))
     }
 
     /// The death rule from the module header: a player-shaped name that dies to a mob is a player
@@ -478,18 +485,26 @@ impl GapsModule {
         true
     }
 
+    /// Every row under the domain it is served under, in one pass over the rows: the snapshot
+    /// asks for eight domains and `served_under` is a lookup per row, so one pass beats eight.
+    fn bucketed(&self) -> HashMap<Domain, Vec<(&String, &GapRow)>> {
+        let mut by_domain: HashMap<Domain, Vec<(&String, &GapRow)>> = HashMap::new();
+        for ((d, k), r) in &self.rows {
+            if let Some(served) = self.served_under(*d, k) {
+                by_domain.entry(served).or_default().push((k, r));
+            }
+        }
+        by_domain
+    }
+
     /// The domain's rows with their keys, most mentioned first, then by name; the first
-    /// CAP_PER_DOMAIN of them.
-    fn served(&self, domain: Domain) -> Vec<(&String, &GapRow)> {
-        let mut rows: Vec<(&String, &GapRow)> = self
-            .rows
-            .iter()
-            .filter(|((d, k), _)| self.served_under(*d, k) == Some(domain))
-            .map(|((_, k), r)| (k, r))
-            .collect();
+    /// CAP_PER_DOMAIN of them. `count` is how many the domain holds before the cap.
+    fn served<'a>(&self, bucket: Option<&[(&'a String, &'a GapRow)]>) -> (Vec<(&'a String, &'a GapRow)>, usize) {
+        let mut rows: Vec<(&String, &GapRow)> = bucket.map(<[_]>::to_vec).unwrap_or_default();
         rows.sort_by(|a, b| b.1.count.cmp(&a.1.count).then_with(|| a.1.name.cmp(&b.1.name)));
+        let count = rows.len();
         rows.truncate(CAP_PER_DOMAIN);
-        rows
+        (rows, count)
     }
 
     /// The row as served: its fields, and `suggest` when one known name is within reach.
@@ -552,15 +567,17 @@ impl EqModule for GapsModule {
         let mut rows: Vec<Value> = Vec::new();
         let mut totals = serde_json::Map::new();
         let mut seen = serde_json::Map::new();
+        let buckets = self.bucketed();
         for d in Domain::ALL {
-            rows.extend(self.served(d).into_iter().map(|(k, r)| self.serve_row(d, k, r)));
-            let gaps = self.rows.keys().filter(|(k, key)| self.served_under(*k, key) == Some(d)).count();
+            let (served, gaps) = self.served(buckets.get(&d).map(Vec::as_slice));
+            rows.extend(served.into_iter().map(|(k, r)| self.serve_row(d, k, r)));
             totals.insert(d.as_str().to_string(), json!(gaps));
             let checked = self.seen.get(&d).map_or(0, HashSet::len);
             seen.insert(d.as_str().to_string(), json!(checked));
         }
         for proof in [Domain::Forage, Domain::Depot] {
-            rows.extend(self.served(proof).into_iter().map(|(k, r)| self.serve_row(proof, k, r)));
+            let (served, _) = self.served(buckets.get(&proof).map(Vec::as_slice));
+            rows.extend(served.into_iter().map(|(k, r)| self.serve_row(proof, k, r)));
         }
         let kill_factions = self.kill_factions.serve();
         let mob_locs = self.mob_locs.serve();

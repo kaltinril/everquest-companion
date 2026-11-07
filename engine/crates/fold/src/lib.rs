@@ -103,6 +103,13 @@ pub trait EqModule {
         Vec::new()
     }
 
+    /// Does this module ever hand back derived events? A producer says so once, at registration,
+    /// and the registry asks `take_derived` of it alone: every other module's answer is the empty
+    /// default, and a dispatch was paying a call per module per event to hear it.
+    fn wants_derived(&self) -> bool {
+        false
+    }
+
     /// The group-roster pull seam.
     ///
     /// The combat engine does not fold the roster, it asks the module for it, during the same
@@ -308,16 +315,25 @@ pub const WIRING_ORDER: &[&str] = &[
 #[derive(Default)]
 pub struct Registry {
     mods: Vec<Box<dyn EqModule>>,
+    /// Per module, whether it answered [`EqModule::wants_derived`] at registration.
+    derives: Vec<bool>,
+    /// The first module that answers the roster pull, found at registration rather than by a scan
+    /// per delivery.
+    roster_at: Option<usize>,
 }
 
 impl Registry {
     pub fn new() -> Self {
-        Registry { mods: Vec::new() }
+        Registry::default()
     }
 
     /// Register in delivery order. It is the caller's job to follow `WIRING_ORDER`; `registered`
     /// is the caller that matters, and it is asserted.
     pub fn register(&mut self, m: Box<dyn EqModule>) {
+        if self.roster_at.is_none() && m.as_roster().is_some() {
+            self.roster_at = Some(self.mods.len());
+        }
+        self.derives.push(m.wants_derived());
         self.mods.push(m);
     }
 
@@ -332,11 +348,13 @@ impl Registry {
     /// emits during a drain appends to the queue being drained, which is the shift-until-empty
     /// semantics `LogBus.drain` has.
     pub fn dispatch(&mut self, ev: &Event, live: bool, derived: &mut Vec<Event<'static>>) {
-        for m in &mut self.mods {
+        for (m, &derives) in self.mods.iter_mut().zip(&self.derives) {
             m.on_event(ev, live);
-            let mut out = m.take_derived();
-            if !out.is_empty() {
-                derived.append(&mut out);
+            if derives {
+                let mut out = m.take_derived();
+                if !out.is_empty() {
+                    derived.append(&mut out);
+                }
             }
         }
     }
@@ -355,9 +373,11 @@ impl Registry {
         for (i, m) in self.mods.iter_mut().enumerate() {
             let t = std::time::Instant::now();
             m.on_event(ev, live);
-            let mut out = m.take_derived();
-            if !out.is_empty() {
-                derived.append(&mut out);
+            if self.derives[i] {
+                let mut out = m.take_derived();
+                if !out.is_empty() {
+                    derived.append(&mut out);
+                }
             }
             sink(i, u64::try_from(t.elapsed().as_nanos()).unwrap_or(u64::MAX));
         }
@@ -377,11 +397,13 @@ impl Registry {
         // Built once, before the loop — see [`EqModule::on_tick`] for why this instant is the one
         // the TS's lazy pull would have read at.
         let rows = self.timer_rows();
-        for m in &mut self.mods {
+        for (m, &derives) in self.mods.iter_mut().zip(&self.derives) {
             m.on_tick(now_ms, &rows);
-            let mut out = m.take_derived();
-            if !out.is_empty() {
-                derived.append(&mut out);
+            if derives {
+                let mut out = m.take_derived();
+                if !out.is_empty() {
+                    derived.append(&mut out);
+                }
             }
         }
     }
@@ -414,9 +436,9 @@ impl Registry {
     }
 
     /// The registered module that answers the roster pull, or `None` when this build registered
-    /// none. A linear scan over at most twenty modules, made once per delivery.
+    /// none. Found at registration (`roster_at`), since this is asked once per delivery.
     pub fn roster(&self) -> Option<&dyn combat::RosterSource> {
-        self.mods.iter().find_map(|m| m.as_roster())
+        self.mods[self.roster_at?].as_roster()
     }
 
     /// The registered module that answers the loot-ledger pull — the same linear scan `roster` is,
@@ -2232,6 +2254,9 @@ mod tests {
                 vec![Event::from_value(
                     json!({ "kind": "buffExpired", "seq": 7, "ts": 42, "raw": "x" }),
                 )]
+            }
+            fn wants_derived(&self) -> bool {
+                true
             }
         }
         let mut r = Registry::new();

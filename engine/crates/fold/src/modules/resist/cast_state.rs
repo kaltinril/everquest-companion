@@ -85,8 +85,12 @@ impl ArmedCasts {
         None
     }
 
-    pub fn note_damaged(&mut self, i: usize, mob_key: String) {
-        self.casts[i].damaged.insert(mob_key);
+    /// Copies the key only on the first damage line this cast prints for the mob.
+    pub fn note_damaged(&mut self, i: usize, mob_key: &str) {
+        let damaged = &mut self.casts[i].damaged;
+        if !damaged.contains(mob_key) {
+            damaged.insert(mob_key.to_string());
+        }
     }
 
     /// The armed cast an outcome may read its rank and invocation off — this caster's, never

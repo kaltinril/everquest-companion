@@ -77,12 +77,16 @@ export class LineDecoder {
   push(chunk: string): string[] {
     this.buffer += chunk
     const lines: string[] = []
+    // One walk by offset and one slice of the remainder, not a re-slice of the whole buffer per
+    // line: a chunk carrying many frames was quadratic in the chunk (audit item 15).
+    let start = 0
     let at = this.buffer.indexOf(DELIMITER)
     while (at !== -1) {
-      lines.push(this.buffer.slice(0, at))
-      this.buffer = this.buffer.slice(at + 1)
-      at = this.buffer.indexOf(DELIMITER)
+      lines.push(this.buffer.slice(start, at))
+      start = at + 1
+      at = this.buffer.indexOf(DELIMITER, start)
     }
+    if (start > 0) this.buffer = this.buffer.slice(start)
     if (this.buffer.length > this.maxLineChars) {
       this.buffer = ''
       throw new TransportError('frameTooLarge', `a frame exceeded ${String(this.maxLineChars)} characters`)

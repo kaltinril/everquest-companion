@@ -71,7 +71,7 @@ export interface UserLedgerFile {
 
 /** A bucket we are willing to seed from: our shape, and not a stale copy of the shipped baseline
  *  (which is re-seeded from the bundle every launch and would otherwise be counted twice). */
-function isLedgerSource(v: unknown): v is LedgerSource {
+export function isLedgerSource(v: unknown): v is LedgerSource {
   if (typeof v !== 'object' || v === null) return false
   const src = v as Partial<LedgerSource>
   return typeof src.key === 'string' && src.key !== BASELINE_SOURCE_KEY && Array.isArray(src.rows)

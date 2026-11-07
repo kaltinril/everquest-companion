@@ -26,10 +26,12 @@
 import { app } from 'electron'
 import { join } from 'node:path'
 import { logError, logInfo } from '../errorLog'
-import { BASELINE_SOURCE_KEY, type ResistLedger } from '../../shared/resistTypes'
+import { readJsonChunked } from '../jsonChunkRead'
+import { BASELINE_SOURCE_KEY, type ResistLedger, type ResistRow } from '../../shared/resistTypes'
 import { ResistLedgerStore, type ResistBucket } from './ledger'
 import {
   createLedgerWriter,
+  isLedgerSource,
   loadUserLedgerFile,
   type LedgerSource,
   type LedgerWriteOutcome
@@ -141,6 +143,38 @@ export function resistLedger(): ResistLedgerStore {
   for (const src of loadUserSources()) created.bucket(src.key).seed(src.rows)
   store = created
   return created
+}
+
+/**
+ * THE SAME SEED, OFF THE MAIN THREAD (audit item 2). `resistLedger()` above is synchronous because
+ * everything that reads it is, and on the owner's 14 MB ledger that first call was a ~60 ms
+ * read-and-parse plus the seed, at the first con of a session. This reads the file on a worker and
+ * seeds each bucket from ~512 KB slices as they arrive (jsonChunkRead.ts), then installs the store
+ * if nothing beat it to it. Called from the post-replay warm-up; a sync caller arriving mid-way
+ * simply loads the store itself and this result is dropped. Every failure falls back to the
+ * synchronous load, which owns the salvage and the quarantine, so nothing is handled twice.
+ */
+export async function warmResistLedger(): Promise<void> {
+  if (store) return
+  const created = new ResistLedgerStore()
+  created.seed(baselineLedger())
+  const accepted = new Map<number, string>()
+  const res = await readJsonChunked(
+    userLedgerPath(),
+    { key: 'sources', each: 'rows', expectHead: { version: RESIST_LEDGER_VERSION } },
+    {
+      item: (index, item) => {
+        if (isLedgerSource({ ...item, rows: [] })) accepted.set(index, item.key as string)
+      },
+      chunk: (rows, index) => {
+        const key = index === undefined ? undefined : accepted.get(index)
+        if (key !== undefined) created.bucket(key).seed(rows as ResistRow[])
+      }
+    }
+  )
+  if (store) return
+  if (res.ok) store = created
+  else resistLedger()
 }
 
 /** Discard this character's bucket and hand it back for the fold to write into. */

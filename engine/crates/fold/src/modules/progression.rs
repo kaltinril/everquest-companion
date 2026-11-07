@@ -44,6 +44,7 @@ use crate::EqModule;
 use eqlog::names::id_key;
 use serde::Serialize;
 use serde_json::{json, Value};
+use std::cell::RefCell;
 use std::collections::HashSet;
 
 /// Drop-oldest caps — a retention FLOOR, not a hard length (see `TRIM_BATCH`). At these caps the
@@ -168,6 +169,12 @@ pub struct ProgressionModule {
     /// dozens of lines and exactly one `last_ts` advance. The three pet arms, which mutate binding
     /// sets nobody can read, say nothing on their own.
     announce: crate::announce::Announce,
+    /// Moves with every column push, trim and rebirth: everything in `Snap` but `last_ts`.
+    cols_rev: u64,
+    /// The `state` built at a column revision. A snapshot is asked on every serve beat the cursor
+    /// moved on, and the cursor moves once a second on `last_ts` alone while the ~150k integers
+    /// in the columns stand still; the memo is cloned and `lastTs` patched in for those beats.
+    state_at: RefCell<Option<(u64, Value)>>,
 }
 
 /// Drop-oldest across parallel columns that must stay index-aligned. Returns how many leading
@@ -248,7 +255,7 @@ impl ProgressionModule {
         // a stale line handed to a later kill is a fabricated attribution.
         self.pending_exp = Some(PendingExp { ts, pct, party });
         self.trim();
-        self.announce.changed(self.seq);
+        self.columns_moved();
     }
 
     /// The experience line this kill line claims, or `None`. Claiming CONSUMES it.
@@ -282,7 +289,7 @@ impl ProgressionModule {
         }
         self.s.witness_ts.push(ts);
         self.trim();
-        self.announce.changed(self.seq);
+        self.columns_moved();
     }
 
     fn push_kill(&mut self, ts: i64, credit: i64, name: &str, exp: Option<PendingExp>) {
@@ -293,7 +300,7 @@ impl ProgressionModule {
         self.s.kill_credit.push(credit);
         self.push_kill_row(ts, credit, name, exp);
         self.trim();
-        self.announce.changed(self.seq);
+        self.columns_moved();
     }
 
     fn push_kill_row(&mut self, ts: i64, credit: i64, name: &str, exp: Option<PendingExp>) {
@@ -333,7 +340,7 @@ impl ProgressionModule {
         self.s.offline_end.push(to_ts);
         self.s.offline_camped.push(i64::from(camped));
         self.trim();
-        self.announce.changed(self.seq);
+        self.columns_moved();
     }
 
     /// Close the open interval at the new zone's start, then open the next one.
@@ -348,11 +355,33 @@ impl ProgressionModule {
         // Charm cannot survive a zone transition; a summoned pet does (law 4).
         self.charmed.clear();
         self.trim();
-        self.announce.changed(self.seq);
+        self.columns_moved();
     }
 
     /// Enforce every cap, then re-derive the retention floor.
+    /// A column moved: the revision the state memo is keyed on, and the announce cursor.
+    fn columns_moved(&mut self) {
+        self.cols_rev = self.cols_rev.wrapping_add(1);
+        self.announce.changed(self.seq);
+    }
+
+    /// The published state, from the memo when the columns have not moved (see `state_at`).
+    fn state(&self) -> Value {
+        if let Some((rev, state)) = self.state_at.borrow().as_ref() {
+            if *rev == self.cols_rev {
+                let mut state = state.clone();
+                state["lastTs"] = json!(self.s.last_ts);
+                return state;
+            }
+        }
+        let state = serde_json::to_value(&self.s).unwrap_or(Value::Null);
+        *self.state_at.borrow_mut() = Some((self.cols_rev, state.clone()));
+        state
+    }
+
     fn trim(&mut self) {
+        // A trim moves `windowStart` and `dropped`; every caller announces, this keys the memo.
+        self.cols_rev = self.cols_rev.wrapping_add(1);
         let n = cap_drop(EXP_CAP, self.s.exp_ts.len());
         if n > 0 {
             self.s.exp_ts.drain(0..n);
@@ -445,7 +474,7 @@ impl ProgressionModule {
     fn fold(&mut self, ev: &Event) {
         if self.s.ledger.fold(ev) {
             self.trim();
-            self.announce.changed(self.seq);
+            self.columns_moved();
         }
         match ev.kind_of() {
             Kind::ExpGain => self.push_exp(ev.ts(), ev.f64("pct"), ev.bool("party")),
@@ -462,18 +491,18 @@ impl ProgressionModule {
                 // at the keyboard, so excluding it would manufacture idle time out of real play.
                 self.s.loot_ts.push(ev.ts());
                 self.trim();
-                self.announce.changed(self.seq);
+                self.columns_moved();
             }
             Kind::Level => {
                 // Uncapped (with aaGain): ~5k rows/year, and the chart needs every ding.
                 self.s.level_ts.push(ev.ts());
                 self.s.level_value.push(ev.int("level").unwrap_or(0));
-                self.announce.changed(self.seq);
+                self.columns_moved();
             }
             Kind::AaGain => {
                 self.s.aa_gain_ts.push(ev.ts());
                 self.s.aa_gain_amount.push(ev.int("amount").unwrap_or(0));
-                self.announce.changed(self.seq);
+                self.columns_moved();
             }
             // The three pet arms publish nothing: they move the claimed/charmed/ever-charmed sets,
             // which decide whether a LATER kill is credited or witnessed and appear in no snapshot.
@@ -500,6 +529,7 @@ impl EqModule for ProgressionModule {
     fn reset(&mut self) {
         self.clear();
         self.seq = 0;
+        self.cols_rev = self.cols_rev.wrapping_add(1);
         self.announce.reset();
     }
 
@@ -510,13 +540,14 @@ impl EqModule for ProgressionModule {
         // the boundary event itself.
         if ev.kind_of() == Kind::Epoch {
             self.clear();
-            self.announce.changed(self.seq);
+            self.columns_moved();
             return;
         }
         if ev.ts() > self.s.last_ts {
             self.s.last_ts = ev.ts();
             // A published field moved — see the `announce` field for why this bump is owed. Every
-            // column push below bumps for itself.
+            // column push below bumps for itself. The cursor alone: `lastTs` is patched into the
+            // built state, so this is the one move that does not rebuild the columns.
             self.announce.changed(self.seq);
         }
         self.fold(ev);
@@ -528,7 +559,7 @@ impl EqModule for ProgressionModule {
     }
 
     fn snapshot(&self) -> Value {
-        json!({ "seq": self.seq, "state": self.s })
+        json!({ "seq": self.seq, "state": self.state() })
     }
 
     /// The view pull seam. See `EqModule::as_progression`.

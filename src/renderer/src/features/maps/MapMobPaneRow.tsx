@@ -89,6 +89,12 @@ export function rowCaption(
   )
 }
 
+/**
+ * Every this-zone row is this tall, so the sections can window (useWindowedRows is fixed-height):
+ * a name line and a caption line (20 px each, both `noWrap`) with the dense button's padding.
+ */
+export const PANE_ROW_HEIGHT = 48
+
 /** What a row's action buttons act on: copy its /waypoint, put it on the track list. */
 export interface RowActions {
   tracked: boolean
@@ -142,7 +148,7 @@ export function WithRowActions({
   // The buttons sit IN the row's flex line, after the row button, never floated over it: floated,
   // they covered the level column (owner, 2026-10-13). Dimmed until the row is hovered or focused.
   return (
-    <ListItem disablePadding sx={{ '&:hover .row-acts, & .row-acts:focus-within': { opacity: 1 } }}>
+    <ListItem disablePadding sx={{ height: PANE_ROW_HEIGHT, '&:hover .row-acts, & .row-acts:focus-within': { opacity: 1 } }}>
       <Box sx={{ flexGrow: 1, minWidth: 0, display: 'flex' }}>{children}</Box>
       <Stack direction="row" alignItems="center" className="row-acts" sx={{ flexShrink: 0, opacity: 0.45, pr: 0.5 }}>
           {target != null && (

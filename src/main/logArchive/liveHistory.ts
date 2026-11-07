@@ -10,6 +10,7 @@ import { activeCharId, getActiveCharacter } from '../session'
 import { getComboCorrections } from '../store'
 import { logArchiveOn } from '../storeLogArchive'
 import { createHistoryMerge, readHeadBytes } from './history'
+import { prewarmSegments } from './segmentStore'
 import respawnsJson from '../data/respawns.json'
 
 /** The pages' respawn statements by mob key: the same committed file the engine embeds. */
@@ -37,6 +38,9 @@ export const liveHistory = createHistoryMerge({
   readHead: (path, n) => readHeadBytes(path, n),
   comboCorrections: () => getComboCorrections(activeCharId()),
   respawnWiki: (key) => RESPAWN_WIKI.get(key),
+  prewarm: () => {
+    if (logArchiveOn()) void prewarmSegments(logArchiveDir())
+  },
   note: (line) => {
     logInfo(`[everquest-companion] ${line}`)
   }

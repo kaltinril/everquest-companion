@@ -139,9 +139,11 @@ dependencies = [
 name = "eqlog"
 version = "0.1.0"
 dependencies = [
+ "aho-corasick",
  "chrono",
  "chrono-tz",
  "iana-time-zone",
+ "memchr",
  "regex",
  "serde",
  "serde_json",

@@ -449,11 +449,10 @@ impl RespawnModule {
     fn record_death(&mut self, key: &str, display: &str, ts: i64) {
         let id = format!("{}::{}", id_key(&self.zone), key);
         let mut learned_gap: Option<i64> = None;
-        let mut h = match self.history.get(&id) {
-            Some(prior) => {
-                let mut h = prior.clone();
-                // Re-insert so the map's iteration order is LRU order (oldest first).
-                self.history.remove(&id);
+        let mut h = match self.history.take(&id) {
+            Some(mut h) => {
+                // Taken out and put back at the end below, so the map's iteration order is LRU
+                // order (oldest first).
                 let gap = h.first_seen_ts.unwrap_or(ts) - h.last_ts;
                 if self.zone_since > 0 && h.last_ts >= self.zone_since && gap >= MIN_GAP_MS {
                     h.min_gap_ms = Some(match h.min_gap_ms {
@@ -504,10 +503,9 @@ impl RespawnModule {
             self.awaiting.insert(key.to_string());
         }
         while self.history.len() > MAX_HISTORY {
-            let Some(oldest) = self.history.keys().next().map(str::to_string) else {
+            if self.history.pop_front().is_none() {
                 break;
-            };
-            self.history.remove(&oldest);
+            }
         }
         self.rev += 1;
     }

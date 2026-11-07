@@ -29,7 +29,7 @@
 // means. What the hover used to say is not lost — clicking a row (or a pickup chip) opens the
 // drill-down, which is where the item window and its quest/recipe knowledge live anyway.
 
-import { type JSX, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { type JSX, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Box, Snackbar, Stack } from '@mui/material'
 import type { ItemKnowledge, LootEvent } from '@shared/types'
 import type { EngineClient } from '@shared/dataServer/client'
@@ -41,7 +41,7 @@ import { noteBack } from '../../lib/navReturn'
 import { useWindowedRows } from '../../lib/useWindowedRows'
 import { itemCountKey } from '../../lib/itemName'
 import type { InventoryRow } from '../inventory/reconcile'
-import { useProgress } from '../posky/useProgress'
+import { useInventoryRows } from '../posky/useProgress'
 import { ItemDetailPane } from './ItemDetailPane'
 import { itemStats, questItemNames } from './lootItemData'
 import { ROW_HEIGHT } from './lootRows'
@@ -69,7 +69,18 @@ import { useSliceLootRates } from './useSliceLootRates'
 // describe different stretches.
 import { SliceBar } from '../timeslice/SliceBar'
 import { useTimeslice, type TimesliceState } from '../timeslice/useTimeslice'
-import { inSlice, type Timeslice } from '@shared/timeslice'
+import type { Timeslice } from '@shared/timeslice'
+import { effectiveRange, ledgerSpan, sliceLedger, type LedgerSpan } from '@shared/lootSlice'
+import { kept, type Kept } from '../../lib/kept'
+import { characterEpoch } from '../../lib/characterEpoch'
+
+// THE SLICE CUT OUTLIVES THE VIEW (lib/kept.ts; shared/lootSlice.ts has the argument). The range
+// is resolved against `progression`, whose `lastTs` moves every second lines arrive, so under
+// `All` the ledger re-filtered 11k rows per second for an answer that could not change. The key
+// is the ledger's identity and the range CLAMPED TO ITS ROWS, so it moves only when a row's
+// membership can; under a covering range the cut is the ledger itself, same array.
+const spanSlot: Kept<LedgerSpan | null> = { last: null }
+const slicedSlot: Kept<LootEvent[]> = { last: null }
 
 /**
  * THE LEDGER'S SLICE BAR, INCLUDING THE SESSION SPLIT (JOS-436).
@@ -341,9 +352,10 @@ function engineLedger(p: {
 }
 
 export default function LootView(props: LootViewProps = {}): JSX.Element {
-  // ONE subscription to the loot module: useProgress already owns it (and needs it for the
-  // reconcile), so the merged view reads its history from there rather than holding a
-  // second copy of the full loot snapshot.
+  // ONE subscription to the loot module: the inventory reconcile already owns it, so the merged
+  // view reads its history from there rather than holding a second copy of the full loot
+  // snapshot. `useInventoryRows`, not `useProgress`: this tab shows no quest, and the quest fold
+  // over every Sky quest was ~a third of what the tab paid per mount and per loot push.
   const {
     lootHistory: history,
     inventoryRows,
@@ -351,7 +363,7 @@ export default function LootView(props: LootViewProps = {}): JSX.Element {
     setCountSource,
     reloadInventory,
     inventoryInfo
-  } = useProgress()
+  } = useInventoryRows()
   const [query, setQuery] = useState('')
   const [groupByItem, setGroupByItem] = useState(true)
   const [questOnly, setQuestOnly] = useState(false)
@@ -368,12 +380,17 @@ export default function LootView(props: LootViewProps = {}): JSX.Element {
   const timeslice = useTimeslice()
   const { prog, slice } = timeslice
   // THE SLICE IS APPLIED ONCE, HERE, and everything below reads the result — the ledger, the
-  // grouped counts, the notable strip and the drill-down's events. `inSlice` is the shared
-  // membership test (`shared/timeslice.ts`), half-open exactly like `rangeStats`, so a row is in
-  // this table if and only if the same instant is inside the range the xp numbers were measured
-  // over. Under `All` it keeps every row, so this costs one pass and changes nothing.
-  // eslint-disable-next-line eqc/no-domain-munging -- JOS-459 cutover ledger item 3: no served view source answers this yet, so the renderer still derives LootEvent. Becomes a view descriptor when the source lands.
-  const sliced = useMemo(() => history.filter((e) => inSlice(slice, e.ts, e.zone)), [history, slice])
+  // grouped counts, the notable strip and the drill-down's events. `sliceLedger` runs the shared
+  // membership test (`shared/timeslice.inSlice`), half-open exactly like `rangeStats`, so a row is
+  // in this table if and only if the same instant is inside the range the xp numbers were measured
+  // over. Under `All` it keeps every row, and hands back the ledger itself (the slots above).
+  const span = kept(spanSlot, [history], () => ledgerSpan(history))
+  const eff = effectiveRange(slice, span)
+  const sliced = kept(
+    slicedSlot,
+    [history, eff.t0, eff.t1, slice.zoneKey, slice.zoneExactKey, characterEpoch()],
+    () => sliceLedger(history, slice, span)
+  )
   // THE WHOLE history goes in, not `sliced`: the hook applies the slice through the same membership
   // test `inSlice` is, so the caption's count and the caption's rate cannot disagree about what
   // "inside this slice" means (useSliceLootRates' header states the argument).

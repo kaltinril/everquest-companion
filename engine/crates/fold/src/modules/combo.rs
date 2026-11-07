@@ -27,6 +27,7 @@ use evidence::{class_observation, tables_ready, who_classes, ClassObservation, S
 use intervals::{build_intervals, ComboCorrection, IntervalInput};
 use levels::{LevelPoint, WhoRow};
 use serde_json::{json, Value};
+use std::cell::RefCell;
 
 /// The 16 EQ Legends classes, by their `/who` three-letter code. Note SHD, not SHK: the wiki spells
 /// the class both "Shadow Knight" and "Shadowknight" and both canonicalize here.
@@ -60,6 +61,11 @@ pub struct ComboModule {
     spell_classes: SpellClassIndex,
     /// The revision — see the header. Never a LogEvent seq.
     rev: i64,
+    /// The snapshot built at a revision, handed back again while the revision stands. The
+    /// intervals are a pure function of the four inputs and the revision moves with every one of
+    /// them, so an equal revision is the same snapshot; what the memo saves is rebuilding the
+    /// interval model from every observation on every serve beat that asks.
+    snap: RefCell<Option<(i64, Value)>>,
 }
 
 impl ComboModule {
@@ -72,6 +78,7 @@ impl ComboModule {
             launch_ms,
             spell_classes,
             rev: 0,
+            snap: RefCell::new(None),
         }
     }
 
@@ -140,6 +147,11 @@ impl EqModule for ComboModule {
     }
 
     fn snapshot(&self) -> Value {
+        if let Some((rev, snap)) = self.snap.borrow().as_ref() {
+            if *rev == self.rev {
+                return snap.clone();
+            }
+        }
         let intervals = build_intervals(&IntervalInput {
             observations: &self.observations,
             who_rows: &self.who_rows,
@@ -148,7 +160,7 @@ impl EqModule for ComboModule {
         });
         // `current` is the last interval, or null — the same object, never a second reading.
         let current = intervals.last().cloned();
-        json!({
+        let snap = json!({
             "seq": self.rev,
             "state": {
                 "intervals": intervals,
@@ -157,7 +169,9 @@ impl EqModule for ComboModule {
                 // inference into an unknown slot, so the UI says "not ready" instead.
                 "ready": tables_ready(),
             }
-        })
+        });
+        *self.snap.borrow_mut() = Some((self.rev, snap.clone()));
+        snap
     }
 
     fn as_defines(&mut self) -> Option<&mut dyn crate::Defines> {

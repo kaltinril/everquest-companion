@@ -2390,3 +2390,4 @@ Alexa's_Robe
 Ring_of_the_Eldest
 Fractured_Malice
 Burning_Fighters_Blade
+Agnostic

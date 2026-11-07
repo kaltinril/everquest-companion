@@ -68,7 +68,7 @@ import { logError, logInfo } from './errorLog'
 // THE LIVE HALF of the same subject (JOS-367), in its own leaf module for `tailIoStats.ts`'s two
 // reasons: it is plain data that knows nothing about telemetry, and a leaf cannot join the import
 // cycle that would otherwise form between this file and the seam that drains it.
-import { startLiveProbe, stopLiveProbe } from './livePerfProbe'
+import { setLiveProbeDemand, stopLiveProbe } from './livePerfProbe'
 // …and the half that says WHO (JOS-458), started and stopped in lockstep with it and a leaf for
 // the identical two reasons. The two measurements are one window on purpose: a stall's magnitude
 // and its owner have to describe the same seconds or neither can explain the other.
@@ -76,6 +76,8 @@ import { startStallAttribution, stopStallAttribution } from './perfAttribution'
 // The fleet half of the same measurement (JOS-57). Through the telemetry FAÇADE, like every other
 // producer in this app — the wiring may not reach around it into the ring.
 import { noteStartupReplay, scheduleSetupSnapshot } from './telemetry'
+import { telemetryCollectEnabled } from './telemetry/net'
+import { getTelemetryPrefs } from './store'
 import { sendToMain } from './windows'
 
 const PROFILE_FILE = 'perf-startup.json'
@@ -272,7 +274,12 @@ export function markStartupPhase(phase: StartupPhase, opts: MarkOptions = {}): v
     // this mark is a running app rather than a boot. Two clocks from here to quit — main's, and
     // one on a thread of its own — because a single clock can prove it was late and can never say
     // who made it late, and the freezes this hunts are reported on a machine we do not own.
-    startLiveProbe()
+    //
+    // …WHEN SOMEBODY IS LISTENING (audit item 8): the probes run only while the HUD is open or
+    // telemetry collection is on, and `livePerfProbe.ts` holds that rule. Armed here, because a
+    // boot is not a running session; the HUD and the telemetry toggle report their halves.
+    setLiveProbeDemand('telemetry', telemetryCollectEnabled(getTelemetryPrefs()))
+    setLiveProbeDemand('armed', true)
     // …and with them the GC half of the instrument that answers WHO (JOS-458). Same instant, same
     // window, same argument as the probes beside it: `gc` is a POPULATION the fleet reads as a
     // rate, and a 1.4M-event fold's garbage is nothing like a running session's, so mixing a boot
@@ -387,6 +394,30 @@ export function startupProfile(): StartupProfile {
 
 /** One line per launch, in the same voice as the other boot logs: total, replay size, and the
  *  three costliest phases — enough to know from `errors.log` alone whether a launch was slow. */
+/**
+ * THE INSIDE OF `storeLoaded` (audit item 16). That phase is "process start to the store open",
+ * which is three different things: Electron's own boot, the evaluation of this bundle up to
+ * store.ts, and the store's migration and open. The phase names are a wire schema (STARTUP_PHASES,
+ * pinned by tests and read by the renderer and telemetry), so the split rides the summary line
+ * rather than a new phase. `channel.ts` stamps the first and `store.ts` the second.
+ */
+let evaluation: { bundleStartMs: number; storeOpenStartMs: number } | null = null
+
+export function noteEvaluationMarks(marks: { bundleStartMs: number; storeOpenStartMs: number }): void {
+  evaluation = marks
+}
+
+function evaluated(profile: StartupProfile): string {
+  const storeLoaded = profile.phases.find((p) => p.phase === 'storeLoaded')
+  if (evaluation === null || storeLoaded === undefined) return ''
+  const ms = (n: number): string => String(Math.round(n))
+  return (
+    `, storeLoaded = electron boot ${ms(evaluation.bundleStartMs)}ms` +
+    ` + bundle evaluation ${ms(evaluation.storeOpenStartMs - evaluation.bundleStartMs)}ms` +
+    ` + store open ${ms(storeLoaded.atMs - evaluation.storeOpenStartMs)}ms`
+  )
+}
+
 function logStartupSummary(profile: StartupProfile): void {
   const worst = [...profile.phases]
     .sort((a, b) => b.durationMs - a.durationMs)
@@ -414,7 +445,7 @@ function logStartupSummary(profile: StartupProfile): void {
         ` over ${String(profile.replay.slices)} slices)`
   logInfo(
     `[everquest-companion] Startup ${String(Math.round(profile.totalMs))}ms` +
-      `${replayed}${blocked}${duty}${coldRead(profile)} (${worst}) - profile at ${profilePath()}`
+      `${replayed}${blocked}${duty}${coldRead(profile)}${evaluated(profile)} (${worst}) - profile at ${profilePath()}`
   )
   // THE DATA LEDGER GETS ITS OWN LINE (JOS-458) rather than another clause on the one above. The
   // line above describes THIS launch; this one describes the BUILD, and it is the same every time
@@ -561,6 +592,7 @@ export function startPerfSampler(): void {
   emitSample()
   sampleTimer = setInterval(emitSample, PERF_SAMPLE_INTERVAL_MS)
   sampleTimer.unref()
+  setLiveProbeDemand('hud', true)
   logInfo('[everquest-companion] perf HUD: sampler started (2s metrics, 500ms lag probe)')
 }
 
@@ -576,6 +608,7 @@ export function stopPerfSampler(): void {
   sampleTimer = null
   lagTimer = null
   drifts = []
+  setLiveProbeDemand('hud', false)
   if (wasRunning) sendToMain(IPC.onPerfSample, null)
 }
 

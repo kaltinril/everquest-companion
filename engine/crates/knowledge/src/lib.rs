@@ -33,13 +33,12 @@ use std::sync::{Arc, Mutex, OnceLock, RwLock};
 use serde_json::{json, Map, Value};
 
 use fold::knowledge::{Answer, Knowledge, Miss, OwnLoot};
-use fold::modules::consider::mob_key;
 use items::{display_of, knowledge_from_db, load_item_db, load_quests, merge_local, LocalQuests};
 use mobs::{
     annotate_drop_eras, knowledge_from_catalog, merge_local_knowledge, quests_by_mob, MobIndex,
     MobQuestIndex,
 };
-use names::item_key;
+use names::{item_key, mob_key_ref};
 use overlay::{fetchable, key_for, overlay_found};
 
 /// The two corpora a `knowledge.define` may push into, and the two a miss may name.
@@ -59,8 +58,10 @@ pub const SEARCH_DEFAULT_LIMIT: usize = 20;
 /// See [`SEARCH_DEFAULT_LIMIT`].
 pub const SEARCH_MAX_LIMIT: usize = 100;
 
-/// `Corpus::spell` and the gaps index, apart so this file stays under its recorded size.
+/// `Corpus::spell`, `Corpus::search` and the gaps index, apart so this file stays under its
+/// recorded size.
 mod gap_index;
+mod search;
 mod spell_lookup;
 
 /// The process's one corpus: one instance shared by the ingest thread (the fold's own probes) and by
@@ -77,6 +78,10 @@ pub struct Corpus {
     mob_quests: OnceLock<MobQuestIndex>,
     /// See [`mobs::imageless_keys`].
     imageless_mobs: OnceLock<HashSet<String>>,
+    /// The gaps module's index, built once; see [`Knowledge::gap_index`] below.
+    gap_index: OnceLock<fold::knowledge::GapIndex>,
+    /// Every corpus's names case-folded once, for `search`.
+    search_index: OnceLock<search::SearchIndex>,
     /// domain → key → the record the app pushed. See [`Corpus::define`].
     overlay: RwLock<HashMap<&'static str, HashMap<String, Value>>>,
     /// Names this process could not answer, waiting to be announced.
@@ -198,109 +203,6 @@ impl Corpus {
             });
         }
     }
-
-    /// Name search across every corpus this engine holds — `knowledge.search`.
-    ///
-    /// A lookup needs the exact name; a person types three letters. Hits rank EXACT, then PREFIX,
-    /// then CONTAINS, and within a rank by name length then alphabetically, so the ranking is total
-    /// and the same query twice is the same answer twice.
-    ///
-    /// The ranking is the ENGINE'S, not the client's: the renderer never sorts or filters domain
-    /// data, so handing back an unordered bag would be handing back the work.
-    #[must_use]
-    pub fn search(&self, query: &str, domain: Option<&str>, limit: Option<usize>) -> Value {
-        let needle = query.trim().to_lowercase();
-        let limit = limit.unwrap_or(SEARCH_DEFAULT_LIMIT).min(SEARCH_MAX_LIMIT);
-        if needle.is_empty() {
-            return json!({ "query": query.trim(), "total": 0, "hits": [] });
-        }
-        let mut scored: Vec<(u8, usize, String, &'static str, Option<String>)> = Vec::new();
-        let wants = |d: &str| domain.is_none_or(|only| only == d);
-        if wants("item") {
-            for (_, entry) in self.items() {
-                let page = entry["page"].as_str();
-                let name = entry["name"].as_str().or(page).unwrap_or_default();
-                if let Some(rank) = rank_of(name, &needle) {
-                    scored.push((
-                        rank,
-                        name.len(),
-                        name.to_owned(),
-                        "item",
-                        page.map(str::to_owned),
-                    ));
-                }
-            }
-        }
-        if wants("mob") {
-            for name in self.mob_index().names() {
-                if let Some(rank) = rank_of(name, &needle) {
-                    let page = self
-                        .mob_index()
-                        .entry(name)
-                        .and_then(|e| e["page"].as_str())
-                        .map(str::to_owned);
-                    scored.push((rank, name.len(), name.clone(), "mob", page));
-                }
-            }
-        }
-        if wants("quest") {
-            for q in self.quests() {
-                let name = q["name"].as_str().unwrap_or_default();
-                if let Some(rank) = rank_of(name, &needle) {
-                    scored.push((
-                        rank,
-                        name.len(),
-                        name.to_owned(),
-                        "quest",
-                        q["page"].as_str().map(str::to_owned),
-                    ));
-                }
-            }
-        }
-        if wants("spell") {
-            for entry in &eqlog::spelldb::shared().spells {
-                if let Some(rank) = rank_of(&entry.name, &needle) {
-                    scored.push((rank, entry.name.len(), entry.name.clone(), "spell", None));
-                }
-            }
-        }
-        scored.sort_by(|a, b| {
-            a.0.cmp(&b.0)
-                .then(a.1.cmp(&b.1))
-                .then(a.2.cmp(&b.2))
-                .then(a.3.cmp(b.3))
-        });
-        let total = scored.len();
-        let hits: Vec<Value> = scored
-            .into_iter()
-            .take(limit)
-            .map(|(_, _, name, domain, page)| {
-                let mut hit = json!({ "domain": domain, "name": name });
-                if let Some(page) = page {
-                    hit["page"] = json!(page);
-                }
-                hit
-            })
-            .collect();
-        // `total` is the MATCH count, not the hit count: the one number a caller cannot compute from
-        // what it was handed.
-        json!({ "query": query.trim(), "total": total, "hits": hits })
-    }
-}
-
-/// EXACT (0), PREFIX (1), CONTAINS (2), or no match. Case-folded on both sides.
-fn rank_of(name: &str, needle: &str) -> Option<u8> {
-    let folded = name.to_lowercase();
-    if folded == needle {
-        return Some(0);
-    }
-    if folded.starts_with(needle) {
-        return Some(1);
-    }
-    if folded.contains(needle) {
-        return Some(2);
-    }
-    None
 }
 
 impl Knowledge for Corpus {
@@ -308,8 +210,9 @@ impl Knowledge for Corpus {
     /// answers, because they say something about the item's USES that no item page states.
     fn item(&self, name: &str) -> Answer {
         let display = display_of(name);
-        let local = self.local_quests().for_item(name);
-        let key = self.item_db_key(item_key(name));
+        let key = item_key(name);
+        let local = self.local_quests().for_key(&key);
+        let key = self.item_db_key(key);
         // Primary: the committed database. Answered here, an item costs no overlay read and no
         // announcement, so a miss describes only names the corpus lacks.
         if let Some(entry) = self.items().get(&key) {
@@ -340,8 +243,12 @@ impl Knowledge for Corpus {
         self.mob_index().identity(mob.trim()).keys
     }
 
+    /// Built once per corpus and handed out as a copy, since the trait returns it by value: two
+    /// modules ask at every attach, and each used to rebuild it off the corpora.
     fn gap_index(&self) -> fold::knowledge::GapIndex {
-        gap_index::build(self.items(), self.mob_index())
+        self.gap_index
+            .get_or_init(|| gap_index::build(self.items(), self.mob_index()))
+            .clone()
     }
 
     /// The catalog, then the overlay, then a miss; the local half merged on top of whichever
@@ -354,7 +261,7 @@ impl Knowledge for Corpus {
         let ask = id.canonical.clone();
         let (base, found) = if let Some(entry) = self.mob_index().entry(&ask) {
             (knowledge_from_catalog(display, entry), true)
-        } else if let Some(entry) = self.overlay_entry("mob", &mob_key(&ask)) {
+        } else if let Some(entry) = self.overlay_entry("mob", &mob_key_ref(&ask)) {
             let found = overlay_found(&entry);
             let mut record = entry;
             record["name"] = json!(display);
@@ -388,7 +295,7 @@ impl Knowledge for Corpus {
     /// The committed catalog's picture flags, keyed as `gapImages.ts` keys them (no loose fold).
     fn imageless_mob(&self, name: &str) -> bool {
         let keys = self.imageless_mobs.get_or_init(mobs::imageless_keys);
-        keys.contains(&mob_key(name))
+        keys.contains(mob_key_ref(name).as_ref())
     }
 
     fn take_misses(&self) -> Vec<Miss> {

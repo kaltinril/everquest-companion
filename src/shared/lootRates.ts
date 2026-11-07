@@ -373,7 +373,23 @@ export interface WindowRatesArgs {
  * about the window ("you looted nothing in this hour"), which is why only the rates are nullable.
  */
 export function windowLootRates(args: WindowRatesArgs): WindowLootRates {
-  const { events, t0, t1, spans } = args
+  return lootRatesOf(windowLootTotals(args), args.spans)
+}
+
+/** The numerator half of `windowLootRates`: what the window's rows add up to. */
+export interface WindowLootTotals {
+  drops: number
+  events: number
+}
+
+/**
+ * THE ONE PASS OVER THE LEDGER, on its own so a caller can memoize it on the rows and the window
+ * alone (the 2026-11-06 renderer pass): the denominators come from the progression snapshot,
+ * which moves every second lines arrive, and the Loot caption re-walked 11k rows per second to
+ * re-derive a numerator that had not changed.
+ */
+export function windowLootTotals(args: Omit<WindowRatesArgs, 'spans'>): WindowLootTotals {
+  const { events, t0, t1 } = args
   let drops = 0
   let lines = 0
   for (const e of events) {
@@ -381,13 +397,18 @@ export function windowLootRates(args: WindowRatesArgs): WindowLootRates {
     drops += dropsOf(e)
     lines += 1
   }
+  return { drops, events: lines }
+}
+
+/** The division half: the totals over the window's own denominators. */
+export function lootRatesOf(totals: WindowLootTotals, spans: WindowSpans): WindowLootRates {
   const wall = wallMs(spans)
   return {
-    drops,
-    events: lines,
+    drops: totals.drops,
+    events: totals.events,
     activeMs: spans.activeMs,
     wallMs: wall,
-    dropsPerHourActive: perHour(drops, spans.activeMs),
-    dropsPerHourWall: perHour(drops, wall)
+    dropsPerHourActive: perHour(totals.drops, spans.activeMs),
+    dropsPerHourWall: perHour(totals.drops, wall)
   }
 }

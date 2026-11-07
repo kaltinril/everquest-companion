@@ -59,8 +59,9 @@ import { useCallback, useMemo } from 'react'
 import { kept, type Kept } from '../../lib/kept'
 import type { ClassAbbr } from '@shared/classCombo'
 import { conBand } from '@shared/conBands'
-import { metVersion } from '@shared/metInLog'
+import { eraVersion } from '@shared/metInLog'
 import { mobKey } from '@shared/mobKey'
+import { gapMobKey } from '@shared/gapMemo'
 import type { MobEntry } from '@shared/mobTypes'
 import type { GearRow } from '@shared/planner/gear'
 import type { WishList } from '@shared/planner/wishlist'
@@ -173,7 +174,7 @@ function questSourcesOf(key: string): readonly QuestSource[] {
  * a mob out of era states no level here either, so a drop only it witnesses is no target.
  */
 export function mobLevelOf(name: string, eraOnly = true): number | null {
-  return MOB_LEVELS(eraOnly).get(mobKey(name)) ?? null
+  return MOB_LEVELS(eraOnly).get(gapMobKey(name)) ?? null
 }
 
 /**
@@ -265,7 +266,7 @@ export function usePlanCorpora(
   )
   // The log's evidence version: the two folds are taken again when it moves (`eraCached`), and
   // the corpora with them, so a flagged mob the player met is evidence again.
-  const met = metVersion()
+  const met = eraVersion()
   return useMemo(
     () => {
       const owned = ownedSignature(keys)

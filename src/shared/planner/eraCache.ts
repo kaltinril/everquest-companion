@@ -5,18 +5,20 @@
 // and that predicate reads the player's own log (`shared/metInLog.ts`, owner ruling 2026-10-17: a
 // mob the player killed, conned or looted from is in era for them). The evidence arrives after the
 // first fold, so a fold kept forever would keep hiding a mob the log has since met. This is the
-// cache that cannot: one answer per chip state, all of them dropped when `metVersion()` moves.
+// cache that cannot: one answer per chip state, all of them dropped when `eraVersion()` moves,
+// which it does only when a name some verdict has read arrives or leaves (`metInLog.ts` header),
+// not on the first kill of a mob no verdict asks about.
 //
 // Pure, relative imports: the node test runner loads it.
 
-import { metVersion } from '../metInLog'
+import { eraVersion } from '../metInLog'
 
 /** `build` per chip state, each taken once and taken again after the log's evidence moves. */
 export function eraCached<T>(build: (eraOnly: boolean) => T): (eraOnly: boolean) => T {
   const held = new Map<boolean, T>()
-  let met = metVersion()
+  let met = eraVersion()
   return (eraOnly) => {
-    const now = metVersion()
+    const now = eraVersion()
     if (now !== met) {
       held.clear()
       met = now

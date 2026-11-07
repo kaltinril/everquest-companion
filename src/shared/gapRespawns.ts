@@ -14,7 +14,7 @@
 import type { GapAction, GapRow } from './gaps'
 import { wikiEditUrl } from './gapUrls'
 import { mobPageFinder } from './mobPageTitle'
-import { AGREES_MS, constantRespawn, RULE_WORDS, verdictFor, wikiRespawnText, type LearnedEvidence, type RespawnVerdict } from './respawnLearn'
+import { AGREES_MS, RULE_WORDS, verdictFor, verdictsOf, wikiRespawnText, type LearnedEvidence, type RespawnVerdict } from './respawnLearn'
 
 /** A catalog record as the page finder reads it. */
 type TitledMob = Parameters<typeof mobPageFinder>[0][number]
@@ -87,8 +87,7 @@ export function respawnGaps(learned: readonly LearnedEvidence[], catalog: readon
   // One verdict per page, the zone (or tier) with the most agreeing gaps (as `verdictFor`), and only
   // that one is compared with the page: a few odd gaps elsewhere do not outvote it.
   const byPage = new Map<string, { e: LearnedEvidence; v: RespawnVerdict }>()
-  for (const e of learned) {
-    const v = constantRespawn(e.gapsMs)
+  for (const { evidence: e, verdict: v } of verdictsOf(learned).each) {
     if (v === null) continue
     const page = pageOf(e.display) ?? (e.wikiPage === undefined ? undefined : pageOf(e.wikiPage))
     if (page === undefined) continue

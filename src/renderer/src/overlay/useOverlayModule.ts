@@ -24,13 +24,25 @@
 //
 // MUI-FREE like everything in this bundle.
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { MODULE_WORLD_CHANGED, type ModuleChanged } from '@shared/types'
 
-export function useOverlayModule<Snap>(moduleId: string, empty: Snap): Snap {
+/**
+ * `enabled` (default on) lets a window stop reading a module it has no row for: off, the hook
+ * holds `empty`, subscribes to nothing and hydrates nothing; on again, it hydrates afresh. A hook
+ * cannot be called conditionally, so the switch is an argument (the XP overlay's `loot`).
+ */
+export function useOverlayModule<Snap>(moduleId: string, empty: Snap, enabled = true): Snap {
   const [state, setState] = useState<Snap>(empty)
+  // The empty value is a module constant at every call site; a ref keeps it out of the effect's
+  // dependency list all the same, so a caller's literal could never resubscribe per render.
+  const emptyRef = useRef(empty)
 
   useEffect(() => {
+    if (!enabled) {
+      setState(emptyRef.current)
+      return
+    }
     let cancelled = false
     /** The cursor the held state is at. -1 until the first snapshot lands. */
     let knownSeq = -1
@@ -86,7 +98,7 @@ export function useOverlayModule<Snap>(moduleId: string, empty: Snap): Snap {
       offChanged()
       offChar()
     }
-  }, [moduleId])
+  }, [moduleId, enabled])
 
   return state
 }

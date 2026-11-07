@@ -21,9 +21,12 @@
 // `registerSchemesAsPrivileged` running at module scope (before `ready`), and graphics safe mode
 // being applied at module scope for the same before-`ready` reason (graphics.ts).
 
-// FIRST import on purpose: channel.ts picks this process's `userData` dir (prod / dev /
-// e2e — Task #58) and runs the one-time state seed, before electron-store is constructed
-// (module-level) further down this import list.
+// ZEROTH: a clock stamp and nothing else (bundleStart.ts has no imports and no effect), so the
+// startup summary can say how much of `storeLoaded` was this bundle's own evaluation.
+import { BUNDLE_START_MS } from './bundleStart'
+// FIRST import that does anything, on purpose: channel.ts picks this process's `userData` dir
+// (prod / dev / e2e — Task #58) and runs the one-time state seed, before electron-store is
+// constructed (module-level) further down this import list.
 import { CHANNEL, USER_DATA } from './channel'
 // SECOND on purpose: installs the uncaughtException/unhandledRejection sinks before any
 // module body below can throw. See crashGuards.ts.
@@ -47,7 +50,7 @@ import { installSpeechCacheProtocol } from './speech/cache'
 import { registerIpc } from './ipc'
 import { prewarmGearIndex } from './ipc/planner'
 import { DATA_READY_MS, logSpellDbSummary } from './appSpellDb'
-import { markStartupPhase, startPerfSampler, stopPerf } from './perf'
+import { markStartupPhase, noteEvaluationMarks, startPerfSampler, stopPerf } from './perf'
 import { stopEnginePerfWatch } from './enginePerfWatch'
 import { noteHeapAfterData } from './dataWeight'
 import { initProcessPriority } from './processPriority'
@@ -60,9 +63,10 @@ import { initPresenceEffects, stopPresenceEffects } from './presenceEffects'
 import { provisionDefaultPacks } from './provisionPacks'
 import { removedPackIds } from './storeSoundPacks'
 // Item icons from the wiki's GitHub data pack, before the wiki (imageCache.ts asks it on a miss).
+import { scheduleResistWarm } from './resist/warm'
 import { startTailing, stopSession } from './session'
 import { runSmokeFeedback } from './smokeFeedback'
-import { STORE_READY_MS, getOverlayConfig, getPerfHudPrefs } from './store'
+import { STORE_OPEN_START_MS, STORE_READY_MS, getOverlayConfig, getPerfHudPrefs } from './store'
 // The z-order guard's tally, read once at quit (JOS-368; see `logTopmostSavings`).
 import { topmostStats } from './topmost'
 // The notification-area icon and the close interceptor (JOS-139). Its own module beside windows.ts
@@ -128,12 +132,13 @@ const GEAR_PREWARM_DELAY_MS = 5_000
 // disagrees with the boot it describes would put three zeroes in the breakdown and hide the real
 // cost of opening the store and parsing the spell DB inside `appReady`. Measured beats guessed
 // (see shared/perf.ts STARTUP_PHASES for the full table).
+// The inside of `storeLoaded` for the summary line: Electron's boot, this bundle's evaluation up to
+// the store, and the store's own open (perf.ts `evaluated`). The phase itself is unchanged.
+noteEvaluationMarks({ bundleStartMs: BUNDLE_START_MS, storeOpenStartMs: STORE_OPEN_START_MS })
 markStartupPhase('storeLoaded', { atMs: STORE_READY_MS })
 markStartupPhase('dataLoaded', { atMs: DATA_READY_MS })
-// The committed spell data's boot summary. It printed at `pipeline.ts` module scope until
-// JOS-499; the catalog is built lazily now, so the root asks for it rather than a side effect
-// happening during an import.
-logSpellDbSummary()
+// The committed spell data's boot summary is printed after the window exists (below): it forces
+// the catalog build plus a 2.9 MB overlay read, which used to sit here, before `ready`.
 // …and the one figure in the data-weight ledger that is measured on THIS machine (JOS-458). Here,
 // and only here: this statement is the first moment after every committed corpus has been parsed
 // and the last moment before the app allocates anything of its own, so the reading describes the
@@ -307,6 +312,10 @@ if (!gotSingleInstanceLock) {
     }
     createMainWindow()
     markStartupPhase('windowCreated')
+    // The spell data's boot summary, off the pre-`ready` path (audit item 6). It printed at
+    // `pipeline.ts` module scope until JOS-499; the catalog is built lazily, so the root asks for
+    // it rather than a side effect happening during an import, and asks once the window is up.
+    setTimeout(logSpellDbSummary, 0)
     // THE TRAY, AND WHAT THE X MEANS (JOS-139). Straight after the window exists, because the
     // icon's whole job is to bring that window back — and because the quitting latch it arms has
     // to be in place before anything can ask this process to quit. It creates no icon under
@@ -338,6 +347,8 @@ if (!gotSingleInstanceLock) {
         // this process finished handing the session its work and the app became usable. The
         // FOLD's cost is the engine's to report, over the perf channel (owner ruling 19).
         markStartupPhase('replayDone')
+        // The resist table and ledger, read while the app is idle rather than at the first con.
+        scheduleResistWarm()
       })
       .catch((err: unknown) => {
         markStartupPhase('replayDone')
