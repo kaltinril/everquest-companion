@@ -192,3 +192,11 @@ both logs).
 
 Quiet machine, back to back, the 68 MB log: before this pass (branch `c64e7f137`) 6,679 /
 7,638 ms; after 6,044 / 6,258 ms. Against the original trunk the fold is 14.5 s to ~6.1 s.
+
+## Fourth pass, 2026-11-06 to 07: the whole-app review's agents
+
+Six agent branches, see [2026-11-06-whole-app-review.md](2026-11-06-whole-app-review.md)
+"Landed". The engine side on the 68 MB log, idle machine, the morning's trunk binary against the
+merged tree: whole fold 12.1 s to 4.2 s (parse 2.7 to 0.9 s; combat 4.1 to 1.7 s; buffs 3.3 to
+0.44 s; resist 0.53 to 0.39 s; respawn 0.34 to 0.18 s). Byte-identical events and deep-equal
+snapshots throughout.

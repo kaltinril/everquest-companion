@@ -28,6 +28,36 @@ export interface CommunityRelease {
 
 export const COMMUNITY_RELEASE_NOTES: readonly CommunityRelease[] = [
   {
+    "version": "0.1.0-test.42",
+    "date": "2026-11-07",
+    "title": "the log folds three times faster, tabs reuse their work, the settings file is read once",
+    "groups": [
+      {
+        "heading": "Speed",
+        "items": [
+          {
+            "text": "The log is read about three times faster at launch and after a character switch (a 68 MB log went from 12 s to 4 s on the same machine), and every live line costs less: the parser, the buff, resist and respawn modules, the combat meters and the engine's serving were all tightened. What the app shows is unchanged: every event and every module's state were checked byte for byte against the previous build."
+          },
+          {
+            "text": "Tabs: Maps, Loot, Buffs, Bazaar, Gaps and Mobs draw only the rows on screen and reuse what they worked out on the last visit; the Buffs page no longer redraws everything once a second; the Maps mob list and each Buffs durations table scroll inside their own box."
+          },
+          {
+            "text": "The app's settings file is read once instead of on every window change and every alert; the first con card no longer freezes the app while it reads the resist tables; the install folder is no longer looked up again for every spell icon; the XP overlay and the Wiki Gaps overlay refetch less."
+          }
+        ]
+      },
+      {
+        "heading": "Data",
+        "items": [
+          {
+            "text": "Wiki pages refreshed to tonight: Archeologist Pack is now the Archaeologist Pack page, three kobolds gained pictures, Kobold Killing and Message Intercept factions updated."
+          }
+        ]
+      }
+    ],
+    "knownIssues": "Joining another player's private instance is not told apart from the open world of that zone; only an instance you create yourself is. A pet summoned shortly before its first \"My leader is\" line can carry a \"(2)\" after its name in the meters until the next restart. Another player's spells never count toward a mob's resists: the game prints only your own resists to you. The con card does not list a mob's immunities yet (the mob page does). Saved characters read \"needs refresh\" on Wiki Gaps until logged in once with this build. A +0 worked back from a window often leaves Weight as ?. A groupmate's charmed pet can still lose its credit when a damage-over-time it cast before the charm ticks on a groupmate. A mob or item added to the wiki after this build shows no wiki details until the next build (or a Copy click in Wiki Gaps). Copy on a wiki page that still holds the template's placeholders keeps them. A merchant page the wiki already has gets no \"items sold\" check. Capture finds the game window only when it is titled \"EverQuest Legends\" or \"EverQuest\". All characters needs each character logged in here once with this build. The screenshot reader reads English only. The installer is not code-signed, so Windows shows \"Windows protected your PC\" the first time (More info, then Run anyway). Builds before test.20 do not update themselves; install one by hand once."
+  },
+  {
     "version": "0.1.0-test.41",
     "date": "2026-11-05",
     "title": "merchant pages keep their items sold, respawn learning pools a zone's instances",
