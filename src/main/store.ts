@@ -1,4 +1,5 @@
 import Store from 'electron-store'
+import { cachedStore } from './storeCache'
 import { join } from 'path'
 import { STORE_NAME, USER_DATA } from './channel'
 import { logError, logInfo } from './errorLog'
@@ -90,13 +91,16 @@ const schemaMigration = migrateStoreFile(join(USER_DATA, `${STORE_NAME}.json`), 
   error: (message) => logError('main:storeSchema', message)
 })
 
-const store = new Store<StoreShape>({
+const backing = new Store<StoreShape>({
   // File name follows the product (Task #58): `<userData>/everquest-companion-progress.json`.
   // The pre-rename `eq-tools-progress.json` is copied+renamed into this channel's userData
   // on its first launch — see channel.ts `seedFromLegacy`.
   name: STORE_NAME,
   defaults: { byCharacter: {}, activeLogPath: undefined, windowBounds: undefined }
 })
+
+// Read once, written through: `electron-store` re-reads the file on every `get` (storeCache.ts).
+const store = cachedStore<StoreShape>(backing)
 
 // Stamp a store that the migrator could not stamp itself: a fresh install (no file existed,
 // so electron-store just created one from `defaults`) or a quarantined corrupt file. Gated on

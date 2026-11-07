@@ -147,6 +147,7 @@ function discoverOnce(): string | null {
  *  resolution probes the machine again. Called when the manual override changes. */
 export function invalidateEqDiscovery(): void {
   discoveredRoot = undefined
+  rootsMemo = undefined
   clearEqDiscoveredRoot()
 }
 
@@ -175,6 +176,7 @@ export function refreshEqDiscoveryCheaply(): void {
   // skipped-to directly on the next launch rather than re-swept.
   if (found) {
     discoveredRoot = found
+    rootsMemo = undefined
     setEqDiscoveredRoot(found)
   }
 }
@@ -229,26 +231,56 @@ function describeLogsDir(logsDir: string): Pick<
  * `<root>\Logs` holding a log), and so does the default.
  */
 export function resolveEqDir(): ResolvedEqDir {
-  const override = getEqInstallDir()?.trim()
+  const roots = resolveEqRoots()
+  return { ...roots, ...describeLogsDir(roots.logsDir) }
+}
+
+type EqRoots = Pick<ResolvedEqDir, 'root' | 'logsDir' | 'source'>
+
+/**
+ * The root and logs dir, held for `ROOTS_TTL_MS` per override value.
+ *
+ * `effectiveEqRoot()` is asked for every spell-gem image the overlays draw, every output-file
+ * lookup and every character listing, and each answer cost the override probes or discovery's
+ * re-validating `readdir` of the Logs folder (2026-11-06 whole-app review, main item 3). The
+ * self-heal that re-validation buys — an install moved or removed under a running app — is kept,
+ * at most five seconds late. A changed override is seen at once, since it is the memo's key, and
+ * `invalidateEqDiscovery` and the idle rescan drop the memo with the discovery it was built on.
+ * The logs-dir read (`describeLogsDir`) is not memoized: its character count is what the Settings
+ * pane and `character:list` read fresh.
+ */
+const ROOTS_TTL_MS = 5_000
+let rootsMemo: { at: number; override: string | undefined; roots: EqRoots } | undefined
+
+function resolveEqRoots(): EqRoots {
+  const trimmed = getEqInstallDir()?.trim()
+  const override = trimmed === undefined || trimmed === '' ? undefined : trimmed
+  const now = Date.now()
+  if (rootsMemo && rootsMemo.override === override && now - rootsMemo.at < ROOTS_TTL_MS) {
+    return rootsMemo.roots
+  }
+  let roots: EqRoots
   if (override) {
     const { root, logsDir } = normalizeEqDirOverride(override, realOverrideProbes())
-    return { root, logsDir, source: 'manual', ...describeLogsDir(logsDir) }
+    roots = { root, logsDir, source: 'manual' }
+  } else {
+    const discovered = discoverOnce()
+    const root = discovered ?? EQ_ROOT
+    const source: EqDirSource = discovered ? 'auto' : 'default'
+    roots = { root, logsDir: join(root, 'Logs'), source }
   }
-  const discovered = discoverOnce()
-  const root = discovered ?? EQ_ROOT
-  const source: EqDirSource = discovered ? 'auto' : 'default'
-  const logsDir = join(root, 'Logs')
-  return { root, logsDir, source, ...describeLogsDir(logsDir) }
+  rootsMemo = { at: now, override, roots }
+  return roots
 }
 
 /** The effective install root (override ?? discovery ?? default). */
 export function effectiveEqRoot(): string {
-  return resolveEqDir().root
+  return resolveEqRoots().root
 }
 
 /** The effective `<root>\Logs` directory every log consumer reads from. */
 export function eqLogsDir(): string {
-  return resolveEqDir().logsDir
+  return resolveEqRoots().logsDir
 }
 
 // ---------------------------------------------------------------------------
