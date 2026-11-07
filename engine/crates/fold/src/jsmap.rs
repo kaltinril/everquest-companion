@@ -93,6 +93,26 @@ impl<V> JsMap<V> {
         &mut self.entries[i].1
     }
 
+    /// The slot a key sits in, which is stable for as long as nothing is removed: the resist row
+    /// cache holds one of these so a tick stream on one mob skips its key build and hash.
+    pub fn index_of(&self, key: &str) -> Option<usize> {
+        self.at.get(key).copied()
+    }
+
+    /// The value at a slot `index_of` or `push` handed out.
+    pub fn value_at_mut(&mut self, i: usize) -> &mut V {
+        &mut self.entries[i].1
+    }
+
+    /// `insert` for a key known to be absent, handing back its slot. The caller has just asked
+    /// `index_of`, so the hash is not paid a second time.
+    pub fn push(&mut self, key: String, value: V) -> usize {
+        let i = self.entries.len();
+        self.at.insert(key.clone(), i);
+        self.entries.push((key, value));
+        i
+    }
+
     /// `remove`, handing the value back; None when the key is absent. Same cost.
     pub fn take(&mut self, key: &str) -> Option<V> {
         let i = self.at.remove(key)?;

@@ -27,7 +27,7 @@ use std::collections::HashMap;
 pub const MAX_DISTINCT_DAMAGE_VALUES: usize = 32;
 
 const DAY_MS: i64 = 86_400_000;
-const WEEK_MS: i64 = 7 * DAY_MS;
+pub const WEEK_MS: i64 = 7 * DAY_MS;
 /// 1970-01-01 was a Thursday, so the Monday opening epoch week zero is three days earlier. This
 /// offset is the whole of the ISO week arithmetic; everything else is division.
 const EPOCH_MONDAY: i64 = -3 * DAY_MS;
@@ -257,24 +257,37 @@ impl ResistBucket {
     /// tidy: damage mints the row before the tick handler decides the tick is a repeat, so the
     /// ledger carries all-zero rows and the golden's `rows` integer counts them.
     pub fn row(&mut self, spec: RowSpec, ts: i64) -> &mut ResistRow {
+        let slot = self.slot_of(spec, ts);
+        self.row_at(slot, ts)
+    }
+
+    /// The slot of the row this spec pools into, minting it when absent. A slot is stable for the
+    /// bucket's life because nothing is ever removed from it, which is what lets the fold hold one
+    /// across a tick stream and skip the key build (`mod.rs row_for`).
+    pub fn slot_of(&mut self, spec: RowSpec, ts: i64) -> usize {
         self.newest = later_week(self.newest.as_deref(), spec.week.as_deref());
         let key = row_key(&spec);
-        if !self.by_key.contains_key(&key) {
-            self.by_key.insert(
-                key.clone(),
-                ResistRow {
-                    spec,
-                    resist: 0,
-                    land: 0,
-                    immune: 0,
-                    dmg: HashMap::new(),
-                    variable: false,
-                    first_ts: ts,
-                    last_ts: ts,
-                },
-            );
+        if let Some(slot) = self.by_key.index_of(&key) {
+            return slot;
         }
-        let row = self.by_key.get_mut(&key).expect("just inserted");
+        self.by_key.push(
+            key,
+            ResistRow {
+                spec,
+                resist: 0,
+                land: 0,
+                immune: 0,
+                dmg: HashMap::new(),
+                variable: false,
+                first_ts: ts,
+                last_ts: ts,
+            },
+        )
+    }
+
+    /// The row at a slot `slot_of` handed out, its span widened to `ts`.
+    pub fn row_at(&mut self, slot: usize, ts: i64) -> &mut ResistRow {
+        let row = self.by_key.value_at_mut(slot);
         if ts < row.first_ts {
             row.first_ts = ts;
         }
@@ -345,11 +358,9 @@ impl ResistLedgerStore {
         self.buckets.get(key)
     }
 
+    /// One hash per call: this is asked once per event.
     pub fn bucket_mut(&mut self, key: &str) -> &mut ResistBucket {
-        if !self.buckets.contains_key(key) {
-            self.buckets.insert(key.to_string(), ResistBucket::new());
-        }
-        self.buckets.get_mut(key).expect("just inserted")
+        self.buckets.get_or_insert_with(key, ResistBucket::new)
     }
 
     /// The newest week any bucket holds: the instant every row's age is measured against.

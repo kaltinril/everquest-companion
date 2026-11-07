@@ -31,6 +31,7 @@ use eqlog::jsstr::{js_trim, JS_S};
 use eqlog::names::{id_key, id_key_ref, mob_article_re};
 use regex::Regex;
 use std::collections::HashMap;
+use std::rc::Rc;
 use std::sync::OnceLock;
 
 /// Bound on the display-name caches. Cleared wholesale rather than evicted one at a time, because a
@@ -279,10 +280,21 @@ fn judge_target(name: &str) -> bool {
 /// Closed early by the mob's death or a zone change, both of which the log states.
 pub const DEBUFF_WINDOW_MS: i64 = 11 * 60 * 1000;
 
+/// One mob's open windows, and the last answer `active` gave for them. The answer is a pure
+/// function of the windows and of whether `ts` has passed one of them, so it holds until the next
+/// `open` on this mob or until the earliest window closes.
+#[derive(Debug, Default)]
+struct MobDebuffs {
+    windows: JsMap<i64>,
+    /// The joined string, and the first instant at which it stops being right (`i64::MAX` when
+    /// nothing is up). Dropped by `open`.
+    joined: Option<(String, i64)>,
+}
+
 /// Which resist debuffs are up on which mob. The row stores the keys; nothing else.
 #[derive(Debug, Default)]
 pub struct DebuffWindows {
-    by_mob: HashMap<String, JsMap<i64>>,
+    by_mob: HashMap<String, MobDebuffs>,
 }
 
 impl DebuffWindows {
@@ -291,32 +303,42 @@ impl DebuffWindows {
     }
 
     pub fn open(&mut self, mob_key: &str, spell_key: &str, ts: i64) {
-        self.by_mob
-            .entry(mob_key.to_string())
-            .or_default()
+        let mob = self.by_mob.entry(mob_key.to_string()).or_default();
+        mob.windows
             .insert(spell_key.to_string(), ts + DEBUFF_WINDOW_MS);
+        mob.joined = None;
     }
 
-    /// The row's `debuffs` field: sorted, pipe-joined, empty when nothing is up. Expired entries are
-    /// dropped on the way past, which is the only sweep this map ever gets.
-    pub fn active(&mut self, mob_key: &str, ts: i64) -> String {
-        let Some(m) = self.by_mob.get_mut(mob_key) else {
-            return String::new();
+    /// The row's `debuffs` field: sorted, pipe-joined, empty when nothing is up, with the instant
+    /// the answer expires (`i64::MAX` for an empty one). Expired entries are dropped on the way
+    /// past, which is the only sweep this map ever gets. The joined string is kept between calls:
+    /// a DoT ticking on one mob asks this on every tick, and the answer moves only on an `open` or
+    /// when a window closes.
+    pub fn active(&mut self, mob_key: &str, ts: i64) -> (&str, i64) {
+        let Some(mob) = self.by_mob.get_mut(mob_key) else {
+            return ("", i64::MAX);
         };
-        let mut dead: Vec<String> = Vec::new();
-        let mut live: Vec<String> = Vec::new();
-        for (key, &until) in m.iter() {
-            if until <= ts {
-                dead.push(key.to_string());
-            } else {
-                live.push(key.to_string());
+        let stale = mob.joined.as_ref().is_none_or(|(_, until)| ts >= *until);
+        if stale {
+            let mut dead: Vec<String> = Vec::new();
+            let mut live: Vec<String> = Vec::new();
+            let mut until = i64::MAX;
+            for (key, &at) in mob.windows.iter() {
+                if at <= ts {
+                    dead.push(key.to_string());
+                } else {
+                    live.push(key.to_string());
+                    until = until.min(at);
+                }
             }
+            for key in dead {
+                mob.windows.remove(&key);
+            }
+            live.sort();
+            mob.joined = Some((live.join("|"), until));
         }
-        for key in dead {
-            m.remove(&key);
-        }
-        live.sort();
-        live.join("|")
+        let (joined, until) = mob.joined.as_ref().expect("filled above");
+        (joined.as_str(), *until)
     }
 
     pub fn clear_mob(&mut self, mob_key: &str) {
@@ -324,12 +346,37 @@ impl DebuffWindows {
     }
 }
 
+/// A memo of one pure key fold, bounded the way the display-name caches are. `Rc<str>` so a hit
+/// hands back a handle rather than a copy: `MobNames::key` runs on every filed row.
+#[derive(Debug, Default)]
+pub struct KeyMemo {
+    keys: HashMap<String, Rc<str>>,
+}
+
+impl KeyMemo {
+    pub fn clear(&mut self) {
+        self.keys.clear();
+    }
+
+    pub fn key(&mut self, name: &str, fold: impl FnOnce(&str) -> String) -> Rc<str> {
+        if let Some(hit) = self.keys.get(name) {
+            return Rc::clone(hit);
+        }
+        let key: Rc<str> = Rc::from(fold(name));
+        if self.keys.len() >= MAX_KEY_CACHE {
+            self.keys.clear();
+        }
+        self.keys.insert(name.to_string(), Rc::clone(&key));
+        key
+    }
+}
+
 /// Mob names both ways. Display to key is a memo; key to display is not a cache but a fact the
 /// ledger needs, since the fold keys rows canonically and the surfaces show the log's spelling.
 #[derive(Debug, Default)]
 pub struct MobNames {
-    keys: HashMap<String, String>,
-    display: HashMap<String, String>,
+    keys: KeyMemo,
+    display: HashMap<Rc<str>, String>,
 }
 
 impl MobNames {
@@ -339,21 +386,18 @@ impl MobNames {
         self.keys.clear();
     }
 
-    pub fn key(&mut self, display: &str) -> String {
-        if let Some(hit) = self.keys.get(display) {
-            return hit.clone();
-        }
-        let key = mob_key(display);
-        if self.keys.len() >= MAX_KEY_CACHE {
-            self.keys.clear();
-        }
-        self.keys.insert(display.to_string(), key.clone());
-        key
+    pub fn key(&mut self, display: &str) -> Rc<str> {
+        self.keys.key(display, mob_key)
     }
 
-    /// Note the spelling the game just used for this creature.
+    /// Note the spelling the game just used for this creature. The latest spelling wins, as it
+    /// always has; the write is skipped when it is the spelling already held, which is every call
+    /// but the first for a mob the log spells one way.
     pub fn remember(&mut self, display: &str) {
         let key = self.key(display);
+        if self.display.get(&key).is_some_and(|held| held == display) {
+            return;
+        }
         self.display.insert(key, display.to_string());
     }
 
@@ -417,11 +461,28 @@ mod tests {
         let mut d = DebuffWindows::default();
         d.open("a rat", "tashani", 0);
         d.open("a rat", "malosi", 1_000);
-        assert_eq!(d.active("a rat", 2_000), "malosi|tashani");
+        assert_eq!(
+            d.active("a rat", 2_000),
+            ("malosi|tashani", DEBUFF_WINDOW_MS)
+        );
+        // The same answer again, off the kept string, until the first window closes.
+        assert_eq!(
+            d.active("a rat", DEBUFF_WINDOW_MS - 1),
+            ("malosi|tashani", DEBUFF_WINDOW_MS)
+        );
         // The window is closed at `until <= ts`, so the tash is gone one ms past its end.
-        assert_eq!(d.active("a rat", DEBUFF_WINDOW_MS), "malosi");
-        assert_eq!(d.active("a rat", DEBUFF_WINDOW_MS + 1_000), "");
-        assert_eq!(d.active("a bat", 0), "");
+        assert_eq!(
+            d.active("a rat", DEBUFF_WINDOW_MS),
+            ("malosi", DEBUFF_WINDOW_MS + 1_000)
+        );
+        assert_eq!(d.active("a rat", DEBUFF_WINDOW_MS + 1_000), ("", i64::MAX));
+        assert_eq!(d.active("a bat", 0), ("", i64::MAX));
+        // A fresh window on the mob drops the kept answer.
+        d.open("a rat", "tashani", DEBUFF_WINDOW_MS + 1_000);
+        assert_eq!(
+            d.active("a rat", DEBUFF_WINDOW_MS + 1_000),
+            ("tashani", 2 * DEBUFF_WINDOW_MS + 1_000)
+        );
     }
 
     #[test]
