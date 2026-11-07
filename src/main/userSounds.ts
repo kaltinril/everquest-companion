@@ -26,7 +26,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } 
 import { join } from 'node:path'
 import { logError } from './errorLog'
 import { isInsideDir } from './security'
-import { userSoundsRoot } from './sounds'
+import { forgetManifest, userSoundsRoot } from './sounds'
 import {
   MAX_IMPORT_BYTES,
   MAX_IMPORT_MB,
@@ -69,6 +69,8 @@ export function readUserManifest(root: string): SoundPackManifest {
 function writeUserManifest(root: string, manifest: SoundPackManifest): void {
   mkdirSync(join(root, 'sounds'), { recursive: true })
   writeFileSync(join(root, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n', 'utf8')
+  // The reader memoizes by mtime and size; a rewrite can keep both inside one tick.
+  forgetManifest(root)
 }
 
 /** The pack's sounds as the management list shows them (manifest order = import order). */
