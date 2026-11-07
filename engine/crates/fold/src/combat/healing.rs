@@ -35,14 +35,15 @@ pub const SELF_ROW_ID: &str = "you";
 /// unstated lanes are appended after the cap, so a long tail of small heals cannot squeeze them out.
 const SPELL_CAP: usize = 14;
 
-/// One heal line, already attributed by the engine.
+/// One heal line, already attributed by the engine. The spell name is borrowed from the line: the
+/// ledger copies it once, when it opens the lane, and reads it on every later landing.
 #[derive(Debug, Clone, Default)]
-pub struct HealInput {
+pub struct HealInput<'a> {
     /// Effective (landed) heal.
     pub amount: i64,
     /// Raw/pre-overheal amount, present only on the `(M)` lines.
     pub raw_amount: Option<i64>,
-    pub spell: Option<String>,
+    pub spell: Option<&'a str>,
     pub crit: bool,
 }
 
@@ -152,11 +153,11 @@ impl HealAccum {
         HealAccum::default()
     }
 
-    pub fn add_friendly(&mut self, key: &str, name: &str, kind: HealSourceKind, h: &HealInput) {
+    pub fn add_friendly(&mut self, key: &str, name: &str, kind: HealSourceKind, h: &HealInput<'_>) {
         add(&mut self.friendly, key, name, kind, h);
     }
 
-    pub fn add_hostile(&mut self, key: &str, name: &str, h: &HealInput) {
+    pub fn add_hostile(&mut self, key: &str, name: &str, h: &HealInput<'_>) {
         add(&mut self.hostile, key, name, HealSourceKind::Enemy, h);
     }
 
@@ -195,7 +196,13 @@ fn accrue_min(cur: Option<i64>, amount: i64) -> Option<i64> {
     })
 }
 
-fn add(m: &mut JsMap<HealSourceStat>, key: &str, name: &str, kind: HealSourceKind, h: &HealInput) {
+fn add(
+    m: &mut JsMap<HealSourceStat>,
+    key: &str,
+    name: &str,
+    kind: HealSourceKind,
+    h: &HealInput<'_>,
+) {
     if !m.contains_key(key) {
         m.insert(key.to_string(), new_source(name, kind));
     }
@@ -222,7 +229,7 @@ fn add(m: &mut JsMap<HealSourceStat>, key: &str, name: &str, kind: HealSourceKin
     }
     // Absent, blank and whitespace-only spell names all fall to the one shared lane; a nullish check
     // would let `''` through as a lane of its own.
-    let trimmed = h.spell.as_deref().map(str::trim).unwrap_or("");
+    let trimmed = h.spell.map(str::trim).unwrap_or("");
     let spell_name = if trimmed.is_empty() {
         UNSPECIFIED_SPELL
     } else {
@@ -535,11 +542,11 @@ pub fn build_healing_view(acc: &HealAccum, duration_sec: f64) -> HealingView {
 mod tests {
     use super::*;
 
-    fn heal(amount: i64, raw: Option<i64>, spell: &str) -> HealInput {
+    fn heal(amount: i64, raw: Option<i64>, spell: &str) -> HealInput<'_> {
         HealInput {
             amount,
             raw_amount: raw,
-            spell: Some(spell.to_string()),
+            spell: Some(spell),
             crit: false,
         }
     }
@@ -620,7 +627,7 @@ mod tests {
             HealSourceKind::You,
             &HealInput {
                 amount: 5,
-                spell: Some("   ".into()),
+                spell: Some("   "),
                 ..HealInput::default()
             },
         );

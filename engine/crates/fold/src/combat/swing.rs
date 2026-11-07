@@ -46,19 +46,18 @@ fn weapon_swing(verb: Option<&str>, modifiers: &[&str]) -> bool {
         return false;
     };
     let weapon = matches!(melee_skill(verb), "Melee" | "Cleave");
-    let extra = modifiers
-        .iter()
-        .any(|m| extra_swing_mod(&m.to_lowercase()).is_some());
+    let extra = modifiers.iter().any(|m| extra_swing_mod(m).is_some());
     weapon && !verb.eq_ignore_ascii_case("reave") && !extra
 }
 
 /// A landed melee line or an avoided swing (`You try to slash …`): kept when it is your weapon.
-pub fn note(st: &mut EngineState, ev: &Event) {
+/// `modifiers` is the line's modifier list as the caller already built it for the routing record.
+pub fn note(st: &mut EngineState, ev: &Event, modifiers: &[&str]) {
     let attacker = ev.str(Key::Attacker).unwrap_or_default();
     if id_key_ref(attacker) != "you" || ev.str(Key::Dtype).is_some_and(|d| d != "melee") {
         return;
     }
-    if weapon_swing(ev.str(Key::Verb), &ev.arr_str(Key::Modifiers)) {
+    if weapon_swing(ev.str(Key::Verb), modifiers) {
         st.swings.note(ev.ts());
     }
 }

@@ -175,6 +175,13 @@ pub fn eval_closure(st: &mut EngineState, now: i64) {
         return;
     }
 
+    // The death-close below is a pure conjunction and the linger is one of its terms, so while the
+    // linger has not elapsed nothing it reads can finalize: the hold walk and the presence walk
+    // over `engaged` are skipped for every damage line inside a fight, which is nearly all of them.
+    if since_damage < LINGER_MS {
+        return;
+    }
+
     // CC-hold: any engaged instance still under an unexpired hold vetoes the death-close, except one
     // of your own live pets.
     for (id, &until) in enc.cc_active_until.iter() {
@@ -218,13 +225,13 @@ pub fn finalize_current(st: &mut EngineState) {
         .is_some_and(|c| is_slow_capable(&c.poison))
     {
         let first = enc.agg.procs.first_slow_ts;
-        st.slow_samples.push(if first > 0 {
+        st.slow_samples.push_back(if first > 0 {
             Some((first - enc.start_ts).max(0))
         } else {
             None
         });
         if st.slow_samples.len() > SLOW_SAMPLE_CAP {
-            st.slow_samples.remove(0);
+            st.slow_samples.pop_front();
         }
     }
     st.zone_finalized_ms += (enc.last_ts - enc.start_ts).max(0);

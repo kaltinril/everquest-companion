@@ -253,13 +253,7 @@ impl CombatEngine {
         roster: Option<&dyn RosterSource>,
     ) -> Value {
         let mut guard = self.st.borrow_mut();
-        if !guard.hydrating {
-            let st = &mut *guard;
-            st.sweep_charm(now);
-            st.sweep_ally(now);
-            st.pet_nudge.sweep(now);
-            lifecycle::eval_closure(st, now);
-        }
+        sweep_live(&mut guard, now);
         // Read-only from here down, and the borrow is released with this function.
         let st: &EngineState = &guard;
 
@@ -338,6 +332,20 @@ impl CombatEngine {
         out
     }
 
+    /// The live meter's rows: what `snapshot(now, ..)["selected"]["entities"]` carries at the top
+    /// level and nothing else, for the `combat.live` source that is cut on every serve beat. The
+    /// same sweeps, the same default selection and the same numbers in the same order
+    /// (`views::live_rows`), without the segment list, the drill, the healing and proc ledgers or
+    /// the JSON a full snapshot builds. Empty when the selection resolves to nothing, as the view
+    /// is `null` then.
+    pub fn live_rows(&self, now: i64) -> Vec<views::LiveRow> {
+        let mut guard = self.st.borrow_mut();
+        sweep_live(&mut guard, now);
+        let st: &EngineState = &guard;
+        let selected_id = resolve_selected_id(st, &SnapshotOpts::default());
+        views::live_rows(st, &selected_id).unwrap_or_default()
+    }
+
     /// The fight-search corpus — `engine.ts searchFights`. The open fight as `kind: "current"`, then
     /// every finalized encounter newest-first and uncapped.
     ///
@@ -375,6 +383,18 @@ impl CombatEngine {
         }
         out
     }
+}
+
+/// The four sweeps a live read runs before it reads — see `snapshot`, whose order this is: charm,
+/// ally, nudge, then closure. Nothing at all while hydrating, which is the whole gate.
+fn sweep_live(st: &mut EngineState, now: i64) {
+    if st.hydrating {
+        return;
+    }
+    st.sweep_charm(now);
+    st.sweep_ally(now);
+    st.pet_nudge.sweep(now);
+    lifecycle::eval_closure(st, now);
 }
 
 /// Default selection = the fight scope's head row: the open fight, else the most recent finalized

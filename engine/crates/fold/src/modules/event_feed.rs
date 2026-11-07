@@ -165,11 +165,13 @@ impl EventFeedModule {
         &self.ring
     }
 
-    /// The change signal — the module's published `seq`, bumped on every append as well as on every
-    /// event. Coarse, because there is no separate revision counter to read.
+    /// The change signal — the announce cursor, which `append` moves and nothing else does.
+    /// `append` is the only way into the ring (the `announce` field), so this moves exactly when a
+    /// row reached the feed. The module's `seq` was reported here before, and it moves on every
+    /// event whether or not one did.
     #[must_use]
     pub fn revision(&self) -> i64 {
-        self.seq
+        self.announce.cursor()
     }
 
     /// Append one row and bump the seq.

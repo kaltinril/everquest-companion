@@ -16,6 +16,7 @@ use crate::combat::encounter::{encounter_name, TimelineRaw, TIMELINE_BUDGET};
 use crate::combat::state::EngineState;
 use crate::jsmap::JsMap;
 use serde::Serialize;
+use std::collections::VecDeque;
 
 /// The stable UI ordering of the damage taxonomy.
 const CATEGORY_ORDER: [&str; 5] = ["melee", "slay", "spell", "dot", "ds"];
@@ -110,10 +111,10 @@ fn timeline_event(r: &TimelineRaw, start: i64) -> TimelineEvent {
     }
 }
 
-/// Walk the ring once, aggregating every event into its lane while emitting only the stride-sampled
-/// ones — so lane totals and ordering stay accurate under downsampling.
+/// Walk the ring once, oldest first, aggregating every event into its lane while emitting only the
+/// stride-sampled ones — so lane totals and ordering stay accurate under downsampling.
 fn collect_timeline(
-    raw: &[TimelineRaw],
+    raw: &VecDeque<TimelineRaw>,
     start: i64,
     stride: usize,
 ) -> (Vec<TimelineEvent>, Vec<TimelineLane>) {

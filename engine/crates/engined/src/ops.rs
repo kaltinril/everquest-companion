@@ -1900,7 +1900,7 @@ mod tests {
     fn misses(membership: &crate::world::Membership) -> Vec<(String, String)> {
         let mut out = Vec::new();
         while let Ok(message) = membership.inbox.try_recv() {
-            if let EngineMessage::KnowledgeMissMessage(miss) = message {
+            if let EngineMessage::KnowledgeMissMessage(miss) = message.into_message() {
                 out.push((miss.domain.to_string(), miss.name));
             }
         }

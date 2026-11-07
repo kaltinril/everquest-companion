@@ -55,15 +55,12 @@ impl EngineState {
             }
         }
         let ts = self.last_activity_ts;
-        self.log(
-            ts,
-            "charm",
-            "info",
+        self.log_lazy(ts, "charm", "info", || {
             format!(
                 "➜ {name_key}: {why} - its recorded damage moved to {}",
                 to.name
-            ),
-        );
+            )
+        });
     }
 }
 
@@ -84,12 +81,7 @@ fn merge_source(into: &mut SourceStat, from: SourceStat) {
     for c in from.by_category.into_values() {
         merge_category(&mut into.by_category, c);
     }
-    for (skill, seconds) in from.rounds.bucket {
-        let to = into.rounds.bucket.entry(skill).or_default();
-        for (second, hits) in seconds {
-            *to.entry(second).or_insert(0) += hits;
-        }
-    }
+    into.rounds.merge(from.rounds);
     for m in from.mods.into_values() {
         merge_modifier(&mut into.mods, m);
     }

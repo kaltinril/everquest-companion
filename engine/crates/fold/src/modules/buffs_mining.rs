@@ -3,10 +3,11 @@
 //! It mines the same way in replay and live, which is what makes the overlay a FOLD rather than a
 //! session artifact, and therefore reproducible.
 //!
-//! `build()` is memoised on the overlay's announce cursor: the served overlay is a pure function of
-//! the counts, the cursor moves exactly when a count does, and `updatedAt` (the one field that can
-//! move without a count) is patched in from the miner's clock. A serve beat that asks for the
-//! overlay between two mined lines, which is most of them, hands back the built value again.
+//! `build()` is memoised on the overlay's announce cursor. The cursor moves on every line that fed
+//! the miner, which is every line that can move a count or the miner's clock (`updatedAt`), so a
+//! kept answer at an unmoved cursor is never stale (`engined`'s kept-key test pins that). A serve
+//! beat that asks for the overlay between two fed lines, which is most of them, hands back the
+//! built value again.
 //!
 //! `buffs` feeds it and `messageOverlay` serves it (`buffs_overlay.rs`), so it is shared between the
 //! two and carries the overlay's own announce cursor.
@@ -72,25 +73,31 @@ impl OverlayMining {
     /// Offer one event to the miner. A cast is the association ANCHOR; the message-bearing events
     /// are candidate messages associated to the nearest anchor within the window.
     ///
-    /// A line that moves a count moves the overlay's cursor. The miner says exactly whether one
-    /// did (`observe_message`), and an exact answer is what the announce law asks for: a cast or a
-    /// line with no unambiguous anchor changes nothing a client can read.
+    /// A line that reaches the miner moves the overlay's cursor: the CALL, not the miner's own
+    /// verdict, because the miner's clock (`updatedAt`) moves on every line it is fed, count or no
+    /// count, and the announce law says to bump whenever the served state may have moved.
     pub fn observe(&mut self, ev: &Event) {
         if self.feed(ev) {
             self.announce.changed(ev.seq());
         }
     }
 
-    /// Whether `ev` moved a count in the miner.
+    /// Whether `ev` fed the miner.
     fn feed(&mut self, ev: &Event) -> bool {
         match ev.kind_of() {
             Kind::CastBegin => {
                 let spell = ev.str(Key::Spell).unwrap_or_default();
                 self.miner.observe_cast(spell, ev.ts());
-                false
+                true
             }
-            Kind::BuffApply | Kind::SpellEmote => self.note(ev, "landing"),
-            Kind::BuffWearOff | Kind::IllusionFade | Kind::BuffFade => self.note(ev, "wearsOff"),
+            Kind::BuffApply | Kind::SpellEmote => {
+                self.note(ev, "landing");
+                true
+            }
+            Kind::BuffWearOff | Kind::IllusionFade | Kind::BuffFade => {
+                self.note(ev, "wearsOff");
+                true
+            }
             // The AA potion quaff is a landing message the leveling analytics claim as their own
             // kind, but it is absent from spells.json so the overlay learned it here. It keeps the
             // same miner path so the learned overlay stays what it was.
@@ -102,15 +109,19 @@ impl OverlayMining {
                 // Borrowed: this arm runs on every unclaimed line and the miner copies the text
                 // only when it files it.
                 let t = message_text_of(ev.raw());
-                looks_landing_message(t) && self.miner.observe_message(t, ev.ts(), "landing")
+                if !looks_landing_message(t) {
+                    return false;
+                }
+                self.miner.observe_message(t, ev.ts(), "landing");
+                true
             }
             _ => false,
         }
     }
 
-    fn note(&mut self, ev: &Event, role: &'static str) -> bool {
+    fn note(&mut self, ev: &Event, role: &'static str) {
         self.miner
-            .observe_message(message_text_of(ev.raw()), ev.ts(), role)
+            .observe_message(message_text_of(ev.raw()), ev.ts(), role);
     }
 
     /// Seed one persisted bucket, through the same `merge` the committed baseline arrives by.

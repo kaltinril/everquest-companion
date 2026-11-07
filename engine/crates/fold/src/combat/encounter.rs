@@ -20,7 +20,7 @@
 use crate::combat::aggregate::Agg;
 use crate::jsmap::JsMap;
 use serde::Serialize;
-use std::collections::HashSet;
+use std::collections::{HashSet, VecDeque};
 
 /// One coated poison and when it went on.
 #[derive(Debug, Clone, Serialize)]
@@ -118,6 +118,11 @@ pub struct Encounter {
     pub agg: Agg,
     /// Instance ids engaged as hostiles. The one thing that can veto closure.
     pub engaged: HashSet<String>,
+    /// The name key of every id in `engaged` — the same set projected through `name_key_of`, kept
+    /// beside it because the proc, dispel, heal and defender paths ask "is this NAME engaged" on
+    /// every line, and walking the ids to answer was O(engaged) per ask. Insert-only, like
+    /// `engaged`, and written only through [`Encounter::engage`].
+    pub engaged_names: HashSet<String>,
     /// instanceId → ts of the last evidence this instance is still in the fight. The presence axis:
     /// misses, resists, CC and heals refresh it as well as damage, because a mob that whiffs for
     /// eight seconds is still here. It drives only the "gone" staleness in `eval_closure` and never
@@ -138,8 +143,9 @@ pub struct Encounter {
     /// immutable thereafter. Recomputing it per history entry per snapshot dominated snapshot cost.
     pub summary: Option<crate::combat::lifecycle::SegmentSummary>,
     /// Per-encounter timeline event ring (absolute ts), capped drop-oldest at `TIMELINE_CAP`.
-    /// Retained only for the most recent `TIMELINE_HISTORY_CAP` finalized encounters.
-    pub events: Vec<TimelineRaw>,
+    /// Retained only for the most recent `TIMELINE_HISTORY_CAP` finalized encounters. A deque, so
+    /// the drop past the cap is a pop and not a memmove of the ring per line of a long fight.
+    pub events: VecDeque<TimelineRaw>,
     /// True count of every instant ever pushed, including ones the cap evicted. The only way a
     /// consumer can tell "the ring is full" from "the fight was that long", since `events.len()`
     /// saturates. No aggregate, total or attribution reads it.
@@ -149,7 +155,7 @@ pub struct Encounter {
     pub stance_spans: Vec<StanceRaw>,
     /// Point annotations on this fight's clock: stance/invocation commits, blade coats, slow
     /// landings. Never downsampled and never counted from; the cap is purely a memory bound.
-    pub markers: Vec<MarkerRaw>,
+    pub markers: VecDeque<MarkerRaw>,
     /// The utility blade coat on at open and the combat venoms alongside it, snapshotted here
     /// because "could this pull have been slowed?" is a question about the moment of ENGAGE —
     /// re-reading today's coat at render would re-label every past fight after a poison swap.
@@ -166,19 +172,34 @@ impl Encounter {
             last_ts: ts,
             agg: Agg::new(),
             engaged: HashSet::new(),
+            engaged_names: HashSet::new(),
             engaged_seen: JsMap::new(),
             active_ms: 0,
             prev_damage_ts: None,
             cc_active_until: JsMap::new(),
             last_out_target: None,
             summary: None,
-            events: Vec::new(),
+            events: VecDeque::new(),
             events_total: 0,
             stance_spans: Vec::new(),
-            markers: Vec::new(),
+            markers: VecDeque::new(),
             coat_at_engage: None,
             combat_at_engage: Vec::new(),
         }
+    }
+
+    /// Engage an instance and stamp its presence at `ts` — the one writer of `engaged`,
+    /// `engaged_names` and (for this door) `engaged_seen`, so the id set and its name index cannot
+    /// drift. The id's name key is what `is_engaged_hostile` is asked about; an id with none (the
+    /// `you` sentinel) is never asked after, so it is kept out of the index as the old walk left it.
+    pub fn engage(&mut self, instance_id: &str, ts: i64) {
+        if let Some(name_key) = crate::combat::state::name_key_of(instance_id) {
+            if !self.engaged_names.contains(name_key) {
+                self.engaged_names.insert(name_key.to_string());
+            }
+        }
+        self.engaged.insert(instance_id.to_string());
+        self.engaged_seen.insert(instance_id.to_string(), ts);
     }
 }
 

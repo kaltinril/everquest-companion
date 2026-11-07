@@ -197,14 +197,14 @@ pub(crate) fn pet_source(instance_id: &str, label: String) -> SourceRef {
 /// schedule — would hold a pull open indefinitely. Members reach this function on the ordinary
 /// outgoing path via `You → <member>`: a member's TARGET engages, the member never does.
 fn engage_hostile(st: &mut EngineState, inst: &Resolved, ts: i64) {
-    if st.is_known_player(&inst.name_key) || st.is_member(&inst.name_key) {
+    let name_key = inst.name_key();
+    if st.is_known_player(name_key) || st.is_member(name_key) {
         return;
     }
     let Some(enc) = st.current.as_mut() else {
         return;
     };
-    enc.engaged.insert(inst.instance_id.clone());
-    enc.engaged_seen.insert(inst.instance_id.clone(), ts);
+    enc.engage(&inst.instance_id, ts);
 }
 
 /// Resolve the defender's label. The CALL is not optional even where nothing reads the result:
@@ -451,7 +451,7 @@ pub struct MissLine<'a> {
     pub verb: Option<&'a str>,
     /// The parser's own `meleeSkill(verb)` answer, carried on the event.
     pub verb_skill: Option<&'static str>,
-    pub modifiers: Vec<&'a str>,
+    pub modifiers: &'a [&'a str],
 }
 
 fn miss_fold<'a>(st: &EngineState, ev: &'a MissLine<'a>, is_you: bool) -> MissFold<'a> {
@@ -471,7 +471,7 @@ fn miss_fold<'a>(st: &EngineState, ev: &'a MissLine<'a>, is_you: bool) -> MissFo
         skill: "Melee",
         verb: ev.verb,
         lane_skill,
-        modifiers: &ev.modifiers,
+        modifiers: ev.modifiers,
         target: ev.target,
         ts: ev.ts,
     }
@@ -561,11 +561,13 @@ fn route_outgoing_miss(
     });
 }
 
-pub struct ResistLine {
+/// Borrowed from the event like `MissLine`: a resist line is routed once and nothing here
+/// outlives the call, so the three names are the parser's bytes and not three copies of them.
+pub struct ResistLine<'a> {
     pub ts: i64,
-    pub caster: String,
-    pub target: String,
-    pub spell: String,
+    pub caster: &'a str,
+    pub target: &'a str,
+    pub spell: &'a str,
     pub incoming: bool,
 }
 
@@ -586,32 +588,27 @@ fn resist_caster(st: &EngineState, caster_key: &str) -> Option<OutKind> {
 /// Resisted detrimental spells are direct spells in the taxonomy, so every resist categorizes as
 /// `spell` and sorts into the spell lanes. They carry no amount, so category totals are unaffected;
 /// the lane is the display spell name, so a resist tick lands beside landed casts of that spell.
-pub fn route_resist(st: &mut EngineState, ev: &ResistLine) {
+pub fn route_resist(st: &mut EngineState, ev: &ResistLine<'_>) {
     const CATEGORY: &str = "spell";
     // Presence: refresh whichever side is a hostile we are already engaged with — the caster on an
     // incoming resist, the target on our own resisted cast. `note_presence` ignores anything not
     // engaged, so the you/pet side is a no-op.
-    let who = if ev.incoming {
-        ev.caster.clone()
-    } else {
-        ev.target.clone()
-    };
-    st.note_presence(&who, ev.ts);
+    let who = if ev.incoming { ev.caster } else { ev.target };
+    st.note_presence(who, ev.ts);
 
     if ev.incoming {
         // You resisted a mob's spell — attribute to the mob (the incoming caster).
-        let att = st.resolve(&ev.caster, ev.ts, false);
+        let att = st.resolve(ev.caster, ev.ts, false);
         let (id, name) = (att.instance_id, att.label);
-        let spell = ev.spell.clone();
         both(st, ev.ts, true, |agg| {
-            agg.add_inc_resist(&id, &name, &spell, CATEGORY)
+            agg.add_inc_resist(&id, &name, ev.spell, CATEGORY)
         });
         push_fresh_timeline(
             st,
             ev.ts,
             TimelineRaw {
                 ts: ev.ts,
-                lane: ev.spell.clone(),
+                lane: ev.spell.to_string(),
                 category: CATEGORY.to_string(),
                 amount: 0,
                 crit: false,
@@ -622,16 +619,13 @@ pub fn route_resist(st: &mut EngineState, ev: &ResistLine) {
                 target: Some("You".to_string()),
             },
         );
-        st.log(
-            ev.ts,
-            "resist",
-            "info",
-            format!("You resisted {name}'s {}", ev.spell),
-        );
+        st.log_lazy(ev.ts, "resist", "info", || {
+            format!("You resisted {name}'s {}", ev.spell)
+        });
         return;
     }
 
-    let Some(kind) = resist_caster(st, &id_key_ref(&ev.caster)) else {
+    let Some(kind) = resist_caster(st, &id_key_ref(ev.caster)) else {
         // A resisted cast by a combatant the log named — the record-everything ladder, asked of the
         // CASTER because a resist has no attacker/defender pair to classify.
         if route_other_resist(st, ev, CATEGORY) {
@@ -639,33 +633,29 @@ pub fn route_resist(st: &mut EngineState, ev: &ResistLine) {
         }
         // A hostile mob's spell resisted by another mob is out of scope, and said so: a line the
         // engine deliberately refused is what the `dropped` role is for.
-        st.log(
-            ev.ts,
-            "resist",
-            "dropped",
-            format!("{}'s {} resisted by {}", ev.caster, ev.spell, ev.target),
-        );
+        st.log_lazy(ev.ts, "resist", "dropped", || {
+            format!("{}'s {} resisted by {}", ev.caster, ev.spell, ev.target)
+        });
         return;
     };
-    let src = out_source(st, &ev.caster, kind, ev.ts);
+    let src = out_source(st, ev.caster, kind, ev.ts);
     // A pet whose spell got resisted was casting for us. A member's resisted cast is not charm
     // evidence.
     if kind == OutKind::Pet {
-        st.charm.note_pet_evidence(&id_key_ref(&ev.caster));
+        st.charm.note_pet_evidence(&id_key_ref(ev.caster));
     }
-    let spell = ev.spell.clone();
     both(st, ev.ts, true, |agg| {
-        agg.add_out_resist(&src, &spell, CATEGORY)
+        agg.add_out_resist(&src, ev.spell, CATEGORY)
     });
     // Same instance resolution as the miss and damage paths: a resisted cast at a twin lands on that
     // twin's per-mob row, not on a bare-named ghost.
-    let tgt_name = note_defender(st, &ev.target, ev.ts);
+    let tgt_name = note_defender(st, ev.target, ev.ts);
     push_fresh_timeline(
         st,
         ev.ts,
         TimelineRaw {
             ts: ev.ts,
-            lane: ev.spell.clone(),
+            lane: ev.spell.to_string(),
             category: CATEGORY.to_string(),
             amount: 0,
             crit: false,
@@ -676,31 +666,31 @@ pub fn route_resist(st: &mut EngineState, ev: &ResistLine) {
             target: Some(tgt_name.clone()),
         },
     );
-    st.log(
-        ev.ts,
-        "resist",
-        src.kind.as_str(),
-        format!("{}'s {} resisted by {tgt_name}", src.name, ev.spell),
-    );
+    st.log_lazy(ev.ts, "resist", src.kind.as_str(), || {
+        format!("{}'s {} resisted by {tgt_name}", src.name, ev.spell)
+    });
 }
 
-pub struct HealLine {
+/// Borrowed from the event like `MissLine`: the three readers of a heal line (routing, the death
+/// recap, the heal-proc inference) all run inside the one ingest call, and copying the names first
+/// was three allocations per heal line of the fold.
+pub struct HealLine<'a> {
     pub ts: i64,
-    pub target: String,
-    pub healer: Option<String>,
+    pub target: &'a str,
+    pub healer: Option<&'a str>,
     pub amount: i64,
     /// Raw/pre-overheal amount, present only on the `for N (M) hit points` lines.
     pub raw_amount: Option<i64>,
-    pub spell: Option<String>,
+    pub spell: Option<&'a str>,
     pub crit: bool,
 }
 
-impl HealLine {
-    fn input(&self) -> HealInput {
+impl<'a> HealLine<'a> {
+    fn input(&self) -> HealInput<'a> {
         HealInput {
             amount: self.amount,
             raw_amount: self.raw_amount,
-            spell: self.spell.clone(),
+            spell: self.spell,
             crit: self.crit,
         }
     }
@@ -713,12 +703,12 @@ impl HealLine {
 ///
 /// Zero-effective heals (`… for 0 (2) hit points …`) are the overheal evidence and belong to the
 /// ledger; the `enemy_heal` / `inc_heal` maps keep their `amount <= 0` gate.
-pub fn route_heal(st: &mut EngineState, ev: &HealLine) {
+pub fn route_heal(st: &mut EngineState, ev: &HealLine<'_>) {
     if ev.amount < 0 {
         return;
     }
-    let t_key = id_key_ref(&ev.target);
-    let healer_key = ev.healer.as_deref().map(id_key_ref);
+    let t_key = id_key_ref(ev.target);
+    let healer_key = ev.healer.map(id_key_ref);
     let is_you_tgt = t_key == "you";
     let is_pet_tgt = !is_you_tgt && st.pet_names.contains(t_key.as_ref());
 
@@ -775,23 +765,23 @@ fn outgoing_heal_row(
 
 /// A heal on somebody else, as the healer's output: per spell, overheal from `(M)` as for a
 /// self-heal. Ledger only: `inc_heal` is healing YOU received, and this was not.
-fn add_outgoing_heal(st: &mut EngineState, ev: &HealLine, id: &str, kind: HealSourceKind) {
-    let name = ev.healer.clone().unwrap_or_else(|| "You".to_string());
+fn add_outgoing_heal(st: &mut EngineState, ev: &HealLine<'_>, id: &str, kind: HealSourceKind) {
+    let name = ev.healer.unwrap_or("You");
     let input = ev.input();
     both(st, ev.ts, true, |agg| {
-        agg.heal.add_friendly(id, &name, kind, &input)
+        agg.heal.add_friendly(id, name, kind, &input)
     });
 }
 
 /// Incoming heal to You (or the player by name) / your pet. The `inc_heal` map keeps its
 /// `amount <= 0` gate; the ledger takes the zero-effective lines too, because they are the overheal
 /// evidence.
-fn add_friendly_heal(st: &mut EngineState, ev: &HealLine, healer_key: Option<&str>) {
+fn add_friendly_heal(st: &mut EngineState, ev: &HealLine<'_>, healer_key: Option<&str>) {
     let hk = healer_key.unwrap_or("unknown").to_string();
-    let healer_name = ev.healer.clone().unwrap_or_else(|| "Unknown".to_string());
+    let healer_name = ev.healer.unwrap_or("Unknown");
     if ev.amount > 0 {
         both(st, ev.ts, true, |agg| {
-            agg.add_inc_heal(&hk, &healer_name, ev.amount)
+            agg.add_inc_heal(&hk, healer_name, ev.amount)
         });
     }
     // Healing ledger: ranked by HEALER. Row id `you` for self-heals keys the healing meter's primary
@@ -810,7 +800,7 @@ fn add_friendly_heal(st: &mut EngineState, ev: &HealLine, healer_key: Option<&st
     };
     let input = ev.input();
     both(st, ev.ts, true, |agg| {
-        agg.heal.add_friendly(&id, &healer_name, kind, &input)
+        agg.heal.add_friendly(&id, healer_name, kind, &input)
     });
 }
 
@@ -857,8 +847,8 @@ pub fn route_mitigation(st: &mut EngineState, ev: &MitigationLine) {
 }
 
 /// Heal on a hostile instance we are currently engaged with → enemy healing. `true` when it was.
-fn add_hostile_heal(st: &mut EngineState, ev: &HealLine, healer_key: Option<&str>) -> bool {
-    let t_key = id_key_ref(&ev.target);
+fn add_hostile_heal(st: &mut EngineState, ev: &HealLine<'_>, healer_key: Option<&str>) -> bool {
+    let t_key = id_key_ref(ev.target);
     // A known player is never a hostile, so their heals are never enemy healing. Stated here as well
     // as in `engage_hostile` so the two rules cannot disagree.
     if st.is_known_player(&t_key) {
@@ -870,7 +860,7 @@ fn add_hostile_heal(st: &mut EngineState, ev: &HealLine, healer_key: Option<&str
     if st.is_member(&t_key) {
         return false;
     }
-    let inst = st.resolve(&ev.target, ev.ts, false);
+    let inst = st.resolve(ev.target, ev.ts, false);
     let engaged = st
         .current
         .as_ref()
@@ -887,18 +877,18 @@ fn add_hostile_heal(st: &mut EngineState, ev: &HealLine, healer_key: Option<&str
     // Counter-healing ledger, ranked by the HEALER (a mob healing itself is its own row). It takes
     // the zero-effective lines the map above refuses, for the reason the friendly side does.
     let hk = healer_key.unwrap_or("unknown").to_string();
-    let healer_name = ev.healer.clone().unwrap_or_else(|| "Unknown".to_string());
+    let healer_name = ev.healer.unwrap_or("Unknown");
     let input = ev.input();
     both(st, ev.ts, false, |agg| {
         agg.heal
-            .add_hostile(&format!("heal:{hk}"), &healer_name, &input)
+            .add_hostile(&format!("heal:{hk}"), healer_name, &input)
     });
     // A heal on an engaged hostile proves BOTH ends are still in the fight — the mob receiving it,
     // and (when a second mob cast it) the healer, who may have landed nothing for seconds while
     // healing. Liveness only; enemy healing is an annotation, never damage.
     st.note_presence_id(&inst.instance_id, ev.ts);
-    if let Some(name) = ev.healer.clone() {
-        st.note_presence(&name, ev.ts);
+    if let Some(name) = ev.healer {
+        st.note_presence(name, ev.ts);
     }
     true
 }
@@ -1001,32 +991,28 @@ fn route_other_miss(st: &mut EngineState, ev: &MissLine<'_>, fold: &MissFold<'_>
     both(st, ev.ts, true, |agg| agg.add_out_miss(&src, fold));
     let tgt_name = note_defender(st, ev.target, ev.ts);
     push_fresh_timeline(st, ev.ts, miss_instant(ev, "other", tgt_name.clone()));
-    st.log(
-        ev.ts,
-        "miss",
-        "other",
-        format!("{} ✕ {tgt_name} ({})", src.name, ev.mtype.as_str()),
-    );
+    st.log_lazy(ev.ts, "miss", "other", || {
+        format!("{} ✕ {tgt_name} ({})", src.name, ev.mtype.as_str())
+    });
     true
 }
 
-fn route_other_resist(st: &mut EngineState, ev: &ResistLine, category: &str) -> bool {
-    let Some(key) = records_other(st, &ev.caster, &ev.target) else {
+fn route_other_resist(st: &mut EngineState, ev: &ResistLine<'_>, category: &str) -> bool {
+    let Some(key) = records_other(st, ev.caster, ev.target) else {
         return false;
     };
-    st.others.note(&key, &ev.caster);
-    let src = other_source(st, &ev.caster, &key, false);
-    let spell = ev.spell.clone();
+    st.others.note(&key, ev.caster);
+    let src = other_source(st, ev.caster, &key, false);
     both(st, ev.ts, true, |agg| {
-        agg.add_out_resist(&src, &spell, category)
+        agg.add_out_resist(&src, ev.spell, category)
     });
-    let tgt_name = note_defender(st, &ev.target, ev.ts);
+    let tgt_name = note_defender(st, ev.target, ev.ts);
     push_fresh_timeline(
         st,
         ev.ts,
         TimelineRaw {
             ts: ev.ts,
-            lane: ev.spell.clone(),
+            lane: ev.spell.to_string(),
             category: category.to_string(),
             amount: 0,
             crit: false,
@@ -1037,12 +1023,9 @@ fn route_other_resist(st: &mut EngineState, ev: &ResistLine, category: &str) -> 
             target: Some(tgt_name.clone()),
         },
     );
-    st.log(
-        ev.ts,
-        "resist",
-        "other",
-        format!("{}'s {} resisted by {tgt_name}", src.name, ev.spell),
-    );
+    st.log_lazy(ev.ts, "resist", "other", || {
+        format!("{}'s {} resisted by {tgt_name}", src.name, ev.spell)
+    });
     true
 }
 
@@ -1135,12 +1118,9 @@ fn note_ally_pet_evidence(st: &mut EngineState, attacker: &str, target: &str, ts
         if said {
             if let Some(b) = st.ally.bind_of(&a_key) {
                 let (display, charmer) = (b.display.clone(), b.charmer.clone());
-                st.log(
-                    ts,
-                    "charm",
-                    "dropped",
-                    format!("~ {display}: a second one is active - {charmer}'s pet is unreadable"),
-                );
+                st.log_lazy(ts, "charm", "dropped", || {
+                    format!("~ {display}: a second one is active - {charmer}'s pet is unreadable")
+                });
             }
         }
         return;
@@ -1151,15 +1131,12 @@ fn note_ally_pet_evidence(st: &mut EngineState, attacker: &str, target: &str, ts
     // `soft_hostile` hands back the bind it retired, which is what the line needs to name: after the
     // call there is nothing left to look up.
     if let Some(gone) = st.ally.soft_hostile(&a_key) {
-        st.log(
-            ts,
-            "charm",
-            "dropped",
+        st.log_lazy(ts, "charm", "dropped", || {
             format!(
                 "✕ {} turned on {target} - {}'s charm broke",
                 gone.display, gone.charmer
-            ),
-        );
+            )
+        });
     }
 }
 
@@ -1177,18 +1154,15 @@ fn route_ally_pet_damage(st: &mut EngineState, ev: &DamageEvent<'_>) {
     both(st, ev.ts, true, |agg| agg.add_out(&src, ev, false));
     let tgt_name = note_defender(st, ev.target, ev.ts);
     push_fresh_timeline(st, ev.ts, damage_instant(ev, "allyPet", tgt_name.clone()));
-    st.log(
-        ev.ts,
-        ev.dtype,
-        "allyPet",
+    st.log_lazy(ev.ts, ev.dtype, "allyPet", || {
         format!(
             "{} → {tgt_name}  {}{}  {}",
             src.name,
             ev.amount,
             if ev.crit { "*" } else { "" },
             ev.skill
-        ),
-    );
+        )
+    });
 }
 
 /// The avoided-swing twin, on the same aggregate-only terms. A miss carries no amount, so it can
@@ -1204,12 +1178,9 @@ fn route_ally_pet_miss(st: &mut EngineState, ev: &MissLine<'_>, fold: &MissFold<
     both(st, ev.ts, true, |agg| agg.add_out_miss(&src, fold));
     let tgt_name = note_defender(st, ev.target, ev.ts);
     push_fresh_timeline(st, ev.ts, miss_instant(ev, "allyPet", tgt_name.clone()));
-    st.log(
-        ev.ts,
-        "miss",
-        "allyPet",
-        format!("{} ✕ {tgt_name} ({})", src.name, ev.mtype.as_str()),
-    );
+    st.log_lazy(ev.ts, "miss", "allyPet", || {
+        format!("{} ✕ {tgt_name} ({})", src.name, ev.mtype.as_str())
+    });
 }
 
 /// The incoming row for damage the log gives no source (`You were hit by non-melee for N damage.`).
@@ -1232,12 +1203,9 @@ pub fn route_environment_damage(st: &mut EngineState, ev: &DamageEvent<'_>) {
         ..damage_instant(ev, "enemy", String::new())
     };
     push_fresh_timeline(st, ev.ts, instant);
-    st.log(
-        ev.ts,
-        ev.dtype,
-        "enemy",
-        format!("{ENVIRONMENT} → You  {}  {}", ev.amount, ev.skill),
-    );
+    st.log_lazy(ev.ts, ev.dtype, "enemy", || {
+        format!("{ENVIRONMENT} → You  {}  {}", ev.amount, ev.skill)
+    });
 }
 
 /// A DoT tick on you that `encounter_for` refused: still damage taken, booked like environment
@@ -1255,12 +1223,9 @@ fn route_lone_tick(st: &mut EngineState, ev: &DamageEvent<'_>) {
         ..damage_instant(ev, "enemy", String::new())
     };
     push_fresh_timeline(st, ev.ts, instant);
-    st.log(
-        ev.ts,
-        ev.dtype,
-        "enemy",
-        format!("{name} → You  {}  {}", ev.amount, ev.skill),
-    );
+    st.log_lazy(ev.ts, ev.dtype, "enemy", || {
+        format!("{name} → You  {}  {}", ev.amount, ev.skill)
+    });
 }
 
 #[cfg(test)]
@@ -1432,8 +1397,8 @@ mod tests {
             &mut st,
             &HealLine {
                 ts: 2_000,
-                target: "a spite golem".into(),
-                healer: Some("a spite golem".into()),
+                target: "a spite golem",
+                healer: Some("a spite golem"),
                 amount: 15,
                 raw_amount: None,
                 spell: None,
@@ -1451,8 +1416,8 @@ mod tests {
             &mut st,
             &HealLine {
                 ts: 3_000,
-                target: "a bat".into(),
-                healer: Some("a bat".into()),
+                target: "a bat",
+                healer: Some("a bat"),
                 amount: 15,
                 raw_amount: None,
                 spell: None,
@@ -1479,7 +1444,7 @@ mod tests {
                 mtype: MissType::Dodge,
                 verb: Some("slash"),
                 verb_skill: Some("Melee"),
-                modifiers: Vec::new(),
+                modifiers: &[],
             },
         );
         assert!(st.current.is_none());
@@ -1500,7 +1465,7 @@ mod tests {
             mtype: MissType::Miss,
             verb: Some("strike"),
             verb_skill: Some("Strike"),
-            modifiers: Vec::new(),
+            modifiers: &[],
         };
         let mine = miss_fold(&st, &line, true);
         assert_eq!(mine.skill, "Melee");

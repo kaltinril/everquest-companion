@@ -1937,7 +1937,7 @@ mod tests {
         let mut bumps = Vec::new();
         let mut resets = Vec::new();
         while let Ok(message) = listener.inbox.try_recv() {
-            match message {
+            match message.into_message() {
                 EngineMessage::EpochMessage(epoch)
                     if matches!(epoch.reason, EpochReason::Attach) =>
                 {
