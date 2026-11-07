@@ -23,6 +23,8 @@
 // such a name is then two spawns' gaps mixed, so a lowest cluster under two minutes offers nothing,
 // whatever the name.
 
+import { perObject } from './gapMemo'
+
 /** One mob's evidence as the engine publishes it (`RespawnLearned`, respawn-first-sight). */
 export interface LearnedEvidence {
   id: string
@@ -155,13 +157,36 @@ export function wikiRespawnText(ms: number): string {
 /** A page's respawn and the kills' agree when they are within 25 s: nothing to fix. */
 export const AGREES_MS = 25_000
 
-/** The best-evidenced verdict for a mob, by key, over every zone it was learned in. */
-export function verdictFor(learned: readonly LearnedEvidence[], key: string): { evidence: LearnedEvidence; verdict: RespawnVerdict } | null {
-  let best: { evidence: LearnedEvidence; verdict: RespawnVerdict } | null = null
-  for (const e of learned) {
-    if (e.key !== key) continue
-    const v = constantRespawn(e.gapsMs)
-    if (v !== null && (best === null || v.agree > best.verdict.agree)) best = { evidence: e, verdict: v }
+/** One mob's evidence with its verdict; `verdict` null while the gaps do not agree enough. */
+export interface LearnedVerdict {
+  evidence: LearnedEvidence
+  verdict: RespawnVerdict
+}
+
+/** Every evidence's verdict, and by key the best-evidenced one (`verdictFor`). */
+export interface LearnedVerdicts {
+  each: readonly { evidence: LearnedEvidence; verdict: RespawnVerdict | null }[]
+  byKey: ReadonlyMap<string, LearnedVerdict>
+}
+
+/**
+ * The verdicts of a `learned` list, taken once per list object (whole-app review 2026-11-06: the
+ * Gaps derive re-ran `constantRespawn` for every matching evidence of every Mobs row, per derive).
+ * The identity contract is gapMemo's: a list edited in place reads stale; build a new one instead.
+ */
+export const verdictsOf = perObject((learned: readonly LearnedEvidence[]): LearnedVerdicts => {
+  const each = learned.map((evidence) => ({ evidence, verdict: constantRespawn(evidence.gapsMs) }))
+  const byKey = new Map<string, LearnedVerdict>()
+  for (const { evidence, verdict } of each) {
+    if (verdict === null) continue
+    const best = byKey.get(evidence.key)
+    // The FIRST of the most agreeing wins, as the scan always chose: a later tie does not replace it.
+    if (best === undefined || verdict.agree > best.verdict.agree) byKey.set(evidence.key, { evidence, verdict })
   }
-  return best
+  return { each, byKey }
+})
+
+/** The best-evidenced verdict for a mob, by key, over every zone it was learned in. */
+export function verdictFor(learned: readonly LearnedEvidence[], key: string): LearnedVerdict | null {
+  return verdictsOf(learned).byKey.get(key) ?? null
 }

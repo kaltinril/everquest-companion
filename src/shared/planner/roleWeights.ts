@@ -591,18 +591,46 @@ function slotRatio(stats: GearStats, slot: EquipSlot | undefined): number | unde
  * than an accumulation of float dust — the ranking, not the value, is the answer this returns.
  */
 export function roleValue(stats: GearStats, role: GearRole, ctx: RoleContext = {}): number {
+  return valueOf(stats, scorerOf(role, ctx), ctx)
+}
+
+/** What a score reads per item beside the focus: the slot it would be worn in, the haste still owned outside it. */
+export type RoleAt = Pick<RoleContext, 'slot' | 'ownedHaste'>
+
+/**
+ * `roleValue` with the focus and the class gate resolved ONCE (whole-app review 2026-11-06: the
+ * plan fold priced ~7k rows per pool and rebuilt the weights, the gate and the stat key list for
+ * every one). The same number as `roleValue(stats, role, { ...ctx, ...at })`.
+ */
+export function roleValuer(role: GearRole, ctx: Pick<RoleContext, 'classes' | 'survivability'> = {}): (stats: GearStats, at?: RoleAt) => number {
+  const scorer = scorerOf(role, ctx)
+  return (stats, at = {}) => valueOf(stats, scorer, at)
+}
+
+/** A focus's weights, its class gate and the stat keys it prices (HASTE priced apart, `hasteTerm`). */
+interface Scorer {
+  weights: RoleWeights
+  gate: LiveGate
+  keys: readonly GearStatKey[]
+}
+
+function scorerOf(role: GearRole, ctx: Pick<RoleContext, 'classes' | 'survivability'>): Scorer {
   const weights = focusWeights(role, ctx.survivability)
-  const gate = liveGate(ctx.classes ?? [])
-  const ratio = slotRatio(stats, ctx.slot)
+  const keys = (Object.keys(weights.stats) as GearStatKey[]).filter((key) => key !== 'HASTE')
+  return { weights, gate: liveGate(ctx.classes ?? []), keys }
+}
+
+function valueOf(stats: GearStats, { weights, gate, keys }: Scorer, at: RoleAt): number {
+  const ratio = slotRatio(stats, at.slot)
   // HASTE PRICES AT NOTHING ON A WEAPON ROW (fork ruling, kaltinril 2026-09-05: *"i'd obviously
   // put a haste belt or cape on when i get the fangol"*). Worn haste does not stack, the same
   // percentage lives on belts, capes and gloves, so it is a property of the LOADOUT and not of the
   // blade — and priced flat it let a 36% incumbent set a 144-point bar no hasteless weapon could
   // ever clear, four weapons' worth of white damage for a stat you would re-source from your waist
   // the day you swapped. Weapons compete on damage; haste competes in the slots that carry it.
-  const damage = (ratio === undefined ? hasteTerm(stats, weights, gate, ctx.ownedHaste ?? 0) : ratio * weights.ratio)
+  const damage = ratio === undefined ? hasteTerm(stats, weights, gate, at.ownedHaste ?? 0) : ratio * weights.ratio
   const garnish =
-    statedTotal(stats, weights, gate) +
+    statedTotal(stats, keys, weights, gate) +
     manaTotal(stats, weights, gate) +
     derivedTotal(stats, weights)
   // The weapon-garnish damp (see `RoleWeights.weaponGarnish`): damage terms in full, always;
@@ -613,10 +641,9 @@ export function roleValue(stats: GearStats, role: GearRole, ctx: RoleContext = {
 
 /** The focus row, through the class gate — LAYER 1 × LAYER 2. HASTE lives in `hasteTerm`: it is
  *  a damage term and must ride outside the weapon-garnish damp. */
-function statedTotal(stats: GearStats, weights: RoleWeights, gate: LiveGate): number {
+function statedTotal(stats: GearStats, keys: readonly GearStatKey[], weights: RoleWeights, gate: LiveGate): number {
   let total = 0
-  for (const key of Object.keys(weights.stats) as GearStatKey[]) {
-    if (key === 'HASTE') continue
+  for (const key of keys) {
     const stated = stats[key]
     const coefficient = weights.stats[key]
     if (stated === undefined || coefficient === undefined || !statIsLive(key, gate)) continue

@@ -35,7 +35,7 @@
 // `MOB_CATALOG` and the tests hand in a synthetic one, which is what keeps the fold node-testable
 // (the shared/planner house rule — relative imports, no `@shared` for values).
 
-import { mobKey } from '../mobKey'
+import { gapMobKey as mobKey } from '../gapMemo'
 import type { MobEntry } from '../mobTypes'
 import { mobOutOfEra } from '../mobEra'
 

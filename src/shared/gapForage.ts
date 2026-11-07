@@ -82,7 +82,8 @@ export function isCommonForage(seenZones: readonly string[], page: ItemPageForag
 const noZoneOwed = (page: ItemPageForage, seenZones: readonly string[]): boolean => (page.note !== undefined && ANY_ZONE.test(page.note)) || isCommonForage(seenZones, page)
 
 const PROOFS: readonly string[] = [FORAGE_PROOF, DEPOT_PROOF]
-const isProof = (r: GapRow): boolean => PROOFS.includes(r.domain)
+/** A proof row: the engine's hidden forage or depot evidence, never a gap of its own (gapDerive.ts splices around them). */
+export const isProof = (r: GapRow): boolean => PROOFS.includes(r.domain)
 
 /** The names main should be asked about: every forage or depot proof row's item, each once. */
 export function forageProofNames(snap: GapsSnap): string[] {
@@ -136,7 +137,7 @@ function withIngredient(byItem: Map<string, GapRow>, r: GapRow, page: ItemPageFo
   byItem.set(forageKey(r.name), { ...(had ?? r), domain: 'item', forageUpdate })
 }
 
-function withoutProof<T extends Record<string, number>>(counts: T): T {
+export function withoutProof<T extends Record<string, number>>(counts: T): T {
   return Object.fromEntries(Object.entries(counts).filter(([k]) => !PROOFS.includes(k))) as T
 }
 

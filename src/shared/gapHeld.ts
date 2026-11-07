@@ -19,8 +19,41 @@
 
 import { itemTierKey } from './itemStats'
 import { atTiers, heldTiers, lowTier } from './gapHeldTier'
+import { perObject } from './gapMemo'
 import { visibleGaps, type GapRow } from './gaps'
+import { isDestroyed } from './lootDisposition'
 import type { OwnershipEntry, OwnershipPlace } from './planner/ownership'
+import type { LootEvent } from './types'
+
+/** The log's two folds after an export's instant: what dropped since (gross) and what was destroyed since. */
+export interface HeldSince {
+  loot: Record<string, number>
+  destroyed: Record<string, number>
+}
+
+const sinceOf = perObject((_loot: readonly LootEvent[]) => new Map<number, HeldSince>())
+
+/**
+ * `computeHeldCountsAfter` and `computeDestroyedAfter` (posky/heldCounts.ts) in ONE pass over the
+ * ledger, kept per (ledger object, instant): the held index took two full scans per loot push per
+ * character (whole-app review 2026-11-06). The rules are theirs: rows strictly after `after`; a
+ * sold or combined row is nothing; a destroy counts on the destroyed side, every other row on the
+ * loot side, by `count`; the key is `itemTierKey`, which `heldIndex` keys both maps by.
+ */
+export function heldSince(loot: readonly LootEvent[], after: number): HeldSince {
+  const byAt = sinceOf(loot)
+  const hit = byAt.get(after)
+  if (hit !== undefined) return hit
+  const out: HeldSince = { loot: {}, destroyed: {} }
+  for (const e of loot) {
+    if (e.ts <= after || e.disposition === 'sold' || e.disposition === 'combined') continue
+    const side = isDestroyed(e) ? out.destroyed : out.loot
+    const k = itemTierKey(e.item)
+    side[k] = (side[k] ?? 0) + (e.count ?? 1)
+  }
+  byAt.set(after, out)
+  return out
+}
 
 /** One place and how many copies it holds. */
 export interface HeldPart {

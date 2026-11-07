@@ -13,6 +13,7 @@ import type { GapEdit } from './gapEdits'
 import { replaceWhy } from './gapDrops'
 import { pageCheckAction } from './gapRedirects'
 import { fieldAction } from './gapFieldActions'
+import { perObject } from './gapMemo'
 import type { RespawnFact } from './gapRespawns'
 import { offerCheckText, offerText } from './gapOffers'
 import { decodeFactionAmount } from './mobFactionAmounts'
@@ -404,10 +405,12 @@ const zoneNames = (row: GapRow): readonly string[] => row.details.zones?.all ?? 
  */
 export function visibleGaps(rows: readonly GapRow[], domain: GapDomain, query: string, zone: string | null = null): GapRow[] {
   const q = query.trim().toLowerCase()
-  const hit = (r: GapRow): boolean =>
-    r.name.toLowerCase().includes(q) || r.kinds.some((k) => k.includes(q)) || zoneNames(r).some((z) => z.toLowerCase().includes(q))
-  return rows.filter((r) => r.domain === domain && (q === '' || hit(r)) && (zone === null || gapInZone(r, zone)))
+  return rows.filter((r) => r.domain === domain && (q === '' || searchText(r).includes(q)) && (zone === null || gapInZone(r, zone)))
 }
+
+/** What the search reads of a row, case-folded once per row object (a keystroke re-read every row):
+ *  its name, kinds and zones, each on its own line so a query never spans two of them. */
+const searchText = perObject((r: GapRow): string => [r.name, ...r.kinds, ...zoneNames(r)].join('\n').toLowerCase())
 
 /** `a treant (11), a kobold (2) +3 more` — one tally as a phrase. */
 export function tallyText(t: GapTally): string {

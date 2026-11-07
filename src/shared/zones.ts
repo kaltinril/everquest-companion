@@ -43,6 +43,7 @@
 //
 // This module is PURE: no Node, no Electron, no renderer. Both main and the renderer import it.
 
+import { memoFold } from './gapMemo'
 import type { ZoneShort } from './maps'
 
 /**
@@ -128,13 +129,8 @@ const SEPARATORS_RE = /[\s-]+/g
 /** The one leading article EQ zone names use. */
 const LEADING_ARTICLE_RE = /^the /
 
-/**
- * Canonical key for a zone name, from ANY of the three sources. Case-insensitive, instance noise
- * stripped, leading article folded, separators normalized. Never throws; a nullish/blank name
- * folds to `''`.
- */
-export function zoneKey(zone: string | undefined | null): string {
-  return (zone ?? '')
+function foldZoneKey(zone: string): string {
+  return zone
     .replace(INSTANCE_TAG_RE, '')
     .replace(SOLO_GROUP_RE, '')
     .replace(TIER_ORDINAL_RE, '')
@@ -144,6 +140,19 @@ export function zoneKey(zone: string | undefined | null): string {
     .trim()
     .replace(LEADING_ARTICLE_RE, '')
     .trim()
+}
+
+/** Seven regex passes a call, asked ~5 times per (mob, zone) link in Slayer and per row in the Gaps
+ *  zone filter (whole-app review 2026-11-06): each spelling's fold is remembered (gapMemo.ts). */
+const zoneKeyOf = memoFold(foldZoneKey)
+
+/**
+ * Canonical key for a zone name, from ANY of the three sources. Case-insensitive, instance noise
+ * stripped, leading article folded, separators normalized. Never throws; a nullish/blank name
+ * folds to `''`.
+ */
+export function zoneKey(zone: string | undefined | null): string {
+  return zone === undefined || zone === null || zone === '' ? '' : zoneKeyOf(zone)
 }
 
 // ---- the table -----------------------------------------------------------------------------
