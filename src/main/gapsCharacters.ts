@@ -124,6 +124,7 @@ export async function saveAttachedGaps(): Promise<void> {
     const saved: SavedGaps = { v: SAVED_GAPS_VERSION, character: id, name: c.name, server: c.server, savedAt: new Date().toISOString(), log, modules, rows: SAVED_ROWS }
     await writeFileDurableAsync(savedDir(), join(savedDir(), `${id}.json`), JSON.stringify(saved))
     lastSeqs.set(id, seqs)
+    folderMarks.delete(savedDir())
   } catch (err) {
     logInfo(`[everquest-companion] gaps characters: save failed: ${(err as Error).message}`)
   } finally {
@@ -164,8 +165,25 @@ const readSegments = (): Promise<Segment[]> =>
     return p.ok && `${p.segment.id}.segment.json` === file ? p.segment : null
   })
 
-/** What the listing depends on: each file's name, size and time in both folders. */
+/**
+ * What the listing depends on: each file's name, size and time in both folders. The sweep (one
+ * readdir plus a stat per file) ran on every ask (audit item 13); it is now taken at most once per
+ * `FOLDER_MARK_TTL_MS` per folder, and dropped outright when this process writes a save, so a
+ * change of our own is seen at once and an outside change within a few seconds.
+ */
+const FOLDER_MARK_TTL_MS = 5_000
+const folderMarks = new Map<string, { at: number; mark: string }>()
+
 function folderMark(dir: string): string {
+  const known = folderMarks.get(dir)
+  const now = Date.now()
+  if (known !== undefined && now - known.at < FOLDER_MARK_TTL_MS) return known.mark
+  const mark = sweepFolder(dir)
+  folderMarks.set(dir, { at: now, mark })
+  return mark
+}
+
+function sweepFolder(dir: string): string {
   if (!existsSync(dir)) return ''
   return readdirSync(dir)
     .map((f) => {
