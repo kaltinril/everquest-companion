@@ -4,10 +4,9 @@
 // folds (heldCounts.ts), so "held" means here what it means on every other tab.
 
 import { useMemo } from 'react'
-import { heldIndex, isOwnExport, type HeldIndex } from '@shared/gapHeld'
+import { heldIndex, heldSince, isOwnExport, type HeldIndex } from '@shared/gapHeld'
 import type { CharacterRef, LootEvent } from '@shared/types'
 import { useGearOwnership } from '../gear/gearData'
-import { computeDestroyedAfter, computeHeldCountsAfter } from '../posky/heldCounts'
 
 const NONE: HeldIndex = new Map()
 
@@ -17,6 +16,7 @@ export function useHeld(loot: readonly LootEvent[], me: CharacterRef | null, who
   return useMemo(() => {
     const at = payload.loadedAt === null ? Number.NaN : Date.parse(payload.loadedAt)
     if (Number.isNaN(at) || me === null || !isOwnExport(payload.path, me.name, me.server)) return NONE
-    return heldIndex(payload, computeHeldCountsAfter(loot, at), computeDestroyedAfter(loot, at), who)
+    const since = heldSince(loot, at)
+    return heldIndex(payload, since.loot, since.destroyed, who)
   }, [payload, loot, me, who])
 }
