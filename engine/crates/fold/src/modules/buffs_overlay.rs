@@ -62,7 +62,7 @@ mod tests {
     }
 
     #[test]
-    fn the_overlay_is_served_here_not_in_buffs_and_a_fed_line_moves_only_its_cursor() {
+    fn the_overlay_is_served_here_not_in_buffs_and_a_mined_line_moves_only_its_cursor() {
         let facts = SpellFacts::default();
         let core = super::super::buffs::shared_core(facts.clone());
         let mut buffs = super::super::buffs::BuffsModule::new(facts, core);
@@ -74,8 +74,20 @@ mod tests {
         let cast = r#"{"kind":"castBegin","spell":"Bramblecoat","ts":1000,"seq":7,"raw":"[Mon Oct 26 12:00:00 2026] You begin casting Bramblecoat."}"#;
         feed(&mut buffs, cast);
         feed(&mut overlay, cast);
+        // The anchor alone moves no count, so nothing a client can read has changed.
+        assert_eq!(overlay.published_seq(), before);
+        let landing = r#"{"kind":"buffApply","target":"self","ts":2000,"seq":8,"raw":"[Mon Oct 26 12:00:01 2026] Your skin sprouts brambles.","candidates":[{"name":"Bramblecoat"}]}"#;
+        feed(&mut buffs, landing);
+        feed(&mut overlay, landing);
         let after = overlay.published_seq();
-        assert!(after > before && after > Some(7), "{before:?} -> {after:?}");
-        assert_eq!(overlay.snapshot()["seq"], 7);
+        assert!(after > before && after > Some(8), "{before:?} -> {after:?}");
+        let snap = overlay.snapshot();
+        assert_eq!(snap["seq"], 8);
+        let messages = snap["state"]["messages"].as_array().expect("an array");
+        assert!(messages
+            .iter()
+            .any(|m| m["text"] == "Your skin sprouts brambles."));
+        // Served again at the same cursor: the same overlay, with the clock still the log's.
+        assert_eq!(overlay.snapshot()["state"], snap["state"]);
     }
 }

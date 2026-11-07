@@ -207,6 +207,8 @@ pub struct ResistRow {
 pub struct ResistBucket {
     by_key: JsMap<ResistRow>,
     newest: Option<String>,
+    /// Rows minted or seeded, ever; it never falls, so an equal reading is an unchanged row set.
+    minted: u64,
 }
 
 impl ResistBucket {
@@ -248,7 +250,14 @@ impl ResistBucket {
     /// newest week moves with it, or a seeded bucket would age its rows from the wrong instant.
     pub fn seed_row(&mut self, row: ResistRow) {
         self.newest = later_week(self.newest.as_deref(), row.spec.week.as_deref());
+        self.minted += 1;
         self.by_key.insert(row_key(&row.spec), row);
+    }
+
+    /// How many rows were ever put in this bucket; see the field.
+    #[must_use]
+    pub fn minted(&self) -> u64 {
+        self.minted
     }
 
     /// Get or mint the row this spec pools into, widening its span.
@@ -270,6 +279,7 @@ impl ResistBucket {
         if let Some(slot) = self.by_key.index_of(&key) {
             return slot;
         }
+        self.minted += 1;
         self.by_key.push(
             key,
             ResistRow {
@@ -330,7 +340,16 @@ pub fn add_damage(row: &mut ResistRow, amount: i64) {
 #[derive(Debug, Default)]
 pub struct ResistLedgerStore {
     buckets: JsMap<ResistBucket>,
+    /// Moves when a bucket is replaced, which is the one way a row count can fall.
+    generation: u64,
+    /// `counts` at a (generation, rows ever minted) reading. The published surface is asked on
+    /// every serve beat and was a walk over every row; the pair above moves exactly when the row
+    /// set does.
+    counts_at: std::cell::RefCell<Option<CountsAt>>,
 }
+
+/// A `counts` reading and the (generation, minted) pair it was taken at.
+type CountsAt = ((u64, u64), (usize, usize));
 
 impl ResistLedgerStore {
     pub fn new() -> Self {
@@ -339,6 +358,7 @@ impl ResistLedgerStore {
 
     /// Discard a source's bucket before its log is folded again. The idempotence seam.
     pub fn begin_source(&mut self, key: &str) {
+        self.generation += 1;
         self.buckets.insert(key.to_string(), ResistBucket::new());
     }
 
@@ -375,6 +395,13 @@ impl ResistLedgerStore {
     /// The module's whole published surface: how many pooled rows the ledger holds, and how many
     /// distinct creatures they are about.
     pub fn counts(&self) -> (usize, usize) {
+        let minted: u64 = self.buckets.values().map(ResistBucket::minted).sum();
+        let at = (self.generation, minted);
+        if let Some((seen, counts)) = *self.counts_at.borrow() {
+            if seen == at {
+                return counts;
+            }
+        }
         let mut rows = 0usize;
         let mut mobs: std::collections::HashSet<&str> = std::collections::HashSet::new();
         for bucket in self.buckets.values() {
@@ -383,6 +410,7 @@ impl ResistLedgerStore {
                 mobs.insert(row.spec.mob_key.as_str());
             }
         }
+        *self.counts_at.borrow_mut() = Some((at, (rows, mobs.len())));
         (rows, mobs.len())
     }
 }

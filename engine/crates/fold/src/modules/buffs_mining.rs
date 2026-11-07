@@ -3,9 +3,10 @@
 //! It mines the same way in replay and live, which is what makes the overlay a FOLD rather than a
 //! session artifact, and therefore reproducible.
 //!
-//! There is deliberately no dirty-cache around `build()`: a `Fold` takes exactly one snapshot, so
-//! memoizing would save nothing and would cost this file the interior mutability that
-//! `EqModule::snapshot(&self)` otherwise never needs.
+//! `build()` is memoised on the overlay's announce cursor: the served overlay is a pure function of
+//! the counts, the cursor moves exactly when a count does, and `updatedAt` (the one field that can
+//! move without a count) is patched in from the miner's clock. A serve beat that asks for the
+//! overlay between two mined lines, which is most of them, hands back the built value again.
 //!
 //! `buffs` feeds it and `messageOverlay` serves it (`buffs_overlay.rs`), so it is shared between the
 //! two and carries the overlay's own announce cursor.
@@ -25,6 +26,8 @@ pub struct OverlayMining {
     miner: MessageOverlayMiner,
     /// Moves whenever the served overlay may have; `messageOverlay`'s `published_seq`.
     announce: crate::announce::Announce,
+    /// The overlay built at a cursor, see the header.
+    built: RefCell<Option<(i64, Value)>>,
 }
 
 impl OverlayMining {
@@ -39,6 +42,7 @@ impl OverlayMining {
         OverlayMining {
             miner,
             announce: crate::announce::Announce::default(),
+            built: RefCell::new(None),
         }
     }
 
@@ -68,30 +72,25 @@ impl OverlayMining {
     /// Offer one event to the miner. A cast is the association ANCHOR; the message-bearing events
     /// are candidate messages associated to the nearest anchor within the window.
     ///
-    /// A line that reaches the miner moves the overlay's cursor: the CALL, not the miner's own
-    /// verdict, because "unsure whether this mutated" is the case the announce law says to bump on.
+    /// A line that moves a count moves the overlay's cursor. The miner says exactly whether one
+    /// did (`observe_message`), and an exact answer is what the announce law asks for: a cast or a
+    /// line with no unambiguous anchor changes nothing a client can read.
     pub fn observe(&mut self, ev: &Event) {
         if self.feed(ev) {
             self.announce.changed(ev.seq());
         }
     }
 
-    /// Whether `ev` fed the miner.
+    /// Whether `ev` moved a count in the miner.
     fn feed(&mut self, ev: &Event) -> bool {
         match ev.kind_of() {
             Kind::CastBegin => {
                 let spell = ev.str(Key::Spell).unwrap_or_default();
                 self.miner.observe_cast(spell, ev.ts());
-                true
+                false
             }
-            Kind::BuffApply | Kind::SpellEmote => {
-                self.note(ev, "landing");
-                true
-            }
-            Kind::BuffWearOff | Kind::IllusionFade | Kind::BuffFade => {
-                self.note(ev, "wearsOff");
-                true
-            }
+            Kind::BuffApply | Kind::SpellEmote => self.note(ev, "landing"),
+            Kind::BuffWearOff | Kind::IllusionFade | Kind::BuffFade => self.note(ev, "wearsOff"),
             // The AA potion quaff is a landing message the leveling analytics claim as their own
             // kind, but it is absent from spells.json so the overlay learned it here. It keeps the
             // same miner path so the learned overlay stays what it was.
@@ -103,19 +102,15 @@ impl OverlayMining {
                 // Borrowed: this arm runs on every unclaimed line and the miner copies the text
                 // only when it files it.
                 let t = message_text_of(ev.raw());
-                if looks_landing_message(t) {
-                    self.miner.observe_message(t, ev.ts(), "landing");
-                    return true;
-                }
-                false
+                looks_landing_message(t) && self.miner.observe_message(t, ev.ts(), "landing")
             }
             _ => false,
         }
     }
 
-    fn note(&mut self, ev: &Event, role: &'static str) {
+    fn note(&mut self, ev: &Event, role: &'static str) -> bool {
         self.miner
-            .observe_message(message_text_of(ev.raw()), ev.ts(), role);
+            .observe_message(message_text_of(ev.raw()), ev.ts(), role)
     }
 
     /// Seed one persisted bucket, through the same `merge` the committed baseline arrives by.
@@ -134,8 +129,18 @@ impl OverlayMining {
         self.miner.register()
     }
 
-    /// The served overlay.
+    /// The served overlay: built once per cursor, with the clock patched in (see the header).
     pub fn build(&self) -> Value {
-        self.miner.build()
+        let cursor = self.announce.cursor();
+        let mut built = self.built.borrow_mut();
+        if let Some((at, value)) = built.as_mut() {
+            if *at == cursor {
+                value["updatedAt"] = Value::String(self.miner.updated_at());
+                return value.clone();
+            }
+        }
+        let value = self.miner.build();
+        *built = Some((cursor, value.clone()));
+        value
     }
 }
