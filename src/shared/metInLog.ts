@@ -18,7 +18,7 @@
 // on purpose: an item verdict (plannerData's `donorEra`) keys on `metVersion()`, and the Gear tab
 // asks about thousands of items, so counting them would move it on nearly every loot line.
 
-import { mobKey } from './mobKey'
+import { gapMobKey as mobKey } from './gapMemo'
 import { zoneKey } from './zones'
 
 export type MetKind = 'mobs' | 'items' | 'zones'
