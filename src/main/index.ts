@@ -60,6 +60,7 @@ import { initPresenceEffects, stopPresenceEffects } from './presenceEffects'
 import { provisionDefaultPacks } from './provisionPacks'
 import { removedPackIds } from './storeSoundPacks'
 // Item icons from the wiki's GitHub data pack, before the wiki (imageCache.ts asks it on a miss).
+import { scheduleResistWarm } from './resist/warm'
 import { startTailing, stopSession } from './session'
 import { runSmokeFeedback } from './smokeFeedback'
 import { STORE_READY_MS, getOverlayConfig, getPerfHudPrefs } from './store'
@@ -338,6 +339,8 @@ if (!gotSingleInstanceLock) {
         // this process finished handing the session its work and the app became usable. The
         // FOLD's cost is the engine's to report, over the perf channel (owner ruling 19).
         markStartupPhase('replayDone')
+        // The resist table and ledger, read while the app is idle rather than at the first con.
+        scheduleResistWarm()
       })
       .catch((err: unknown) => {
         markStartupPhase('replayDone')
