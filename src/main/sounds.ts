@@ -190,10 +190,27 @@ export function cespToManifestSounds(
   return sounds
 }
 
-/** Read + validate a pack manifest from a directory; null if missing/invalid. */
+/** Parsed manifests by path, valid while the file's mtime stands (audit item 12). */
+const manifestMemo = new Map<string, { mtimeMs: number; manifest: SoundPackManifest | null }>()
+
+/** Read + validate a pack manifest from a directory; null if missing/invalid. One stat per call,
+ *  and the parse only when the file moved: every play and every pack listing asked for it. */
 function readManifest(dir: string): SoundPackManifest | null {
   const manifestPath = join(dir, 'manifest.json')
-  if (!existsSync(manifestPath)) return null
+  let mtimeMs: number
+  try {
+    mtimeMs = statSync(manifestPath).mtimeMs
+  } catch {
+    return null
+  }
+  const known = manifestMemo.get(manifestPath)
+  if (known?.mtimeMs === mtimeMs) return known.manifest
+  const manifest = parseManifest(manifestPath)
+  manifestMemo.set(manifestPath, { mtimeMs, manifest })
+  return manifest
+}
+
+function parseManifest(manifestPath: string): SoundPackManifest | null {
   try {
     const parsed = JSON.parse(readFileSync(manifestPath, 'utf8')) as SoundPackManifest
     if (!parsed || typeof parsed.id !== 'string' || typeof parsed.sounds !== 'object') return null
@@ -353,15 +370,52 @@ function readPackSound(roots: SoundRoots, packId: string, soundId: string): Soun
   // Guard against manifest paths escaping the pack dir. Segment-aware: a bare prefix test let
   // `../<pack>X/a.wav` through to a sibling folder whose name merely starts with this one's.
   if (!isInsideDir(file, loc.dir)) return null
-  if (!existsSync(file)) return null
+  let mtimeMs: number
+  try {
+    mtimeMs = statSync(file).mtimeMs
+  } catch {
+    return null
+  }
   const ext = sound.file.slice(sound.file.lastIndexOf('.')).toLowerCase()
   const mime = AUDIO_MIME[ext]
   if (!mime) return null
+  const hit = soundCache.get(file)
+  if (hit?.mtimeMs === mtimeMs) {
+    // Most recently used goes to the back; the front is what eviction takes.
+    soundCache.delete(file)
+    soundCache.set(file, hit)
+    return hit.data
+  }
   try {
     const buf = readFileSync(file)
-    return { mime, dataBase64: buf.toString('base64') }
+    const data = { mime, dataBase64: buf.toString('base64') }
+    rememberSound(file, { mtimeMs, data })
+    return data
   } catch (err) {
     logError('main:sounds', { message: `failed reading ${file}`, err })
     return null
+  }
+}
+
+/**
+ * THE PLAYED SOUNDS, BASE64'D ONCE (audit item 12): every alert fire read the file and encoded it
+ * again. An LRU by file path, valid while the file's mtime stands, bounded by count and by bytes
+ * so a pack of long clips cannot pin tens of megabytes.
+ */
+const SOUND_CACHE_MAX = 32
+const SOUND_CACHE_MAX_CHARS = 8 * 1024 * 1024
+const soundCache = new Map<string, { mtimeMs: number; data: SoundData }>()
+let soundCacheChars = 0
+
+function rememberSound(file: string, entry: { mtimeMs: number; data: SoundData }): void {
+  const old = soundCache.get(file)
+  if (old !== undefined) soundCacheChars -= old.data.dataBase64.length
+  soundCache.delete(file)
+  soundCache.set(file, entry)
+  soundCacheChars += entry.data.dataBase64.length
+  for (const [key, held] of soundCache) {
+    if (soundCache.size <= SOUND_CACHE_MAX && soundCacheChars <= SOUND_CACHE_MAX_CHARS) break
+    soundCache.delete(key)
+    soundCacheChars -= held.data.dataBase64.length
   }
 }

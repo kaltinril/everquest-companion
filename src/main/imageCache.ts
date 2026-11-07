@@ -86,7 +86,7 @@
 
 import { spellIconPng } from './spellIcons'
 import { createHash } from 'node:crypto'
-import { existsSync, mkdirSync } from 'node:fs'
+import { mkdirSync } from 'node:fs'
 import { readFile, rename, unlink, writeFile } from 'node:fs/promises'
 import { basename, join } from 'node:path'
 // Console passthroughs (no prefix, no reformatting) — the ONE module in src/main that owns
@@ -861,13 +861,15 @@ export function installImageCacheProtocol(protocol: ProtocolLike, opts: ImageCac
    */
   async function serveFromDisk(paths: readonly string[], repair: boolean): Promise<GlobalResponse | null> {
     for (const path of paths) {
-      if (!existsSync(path)) continue
+      // No `existsSync` first (audit item 18): the read's own ENOENT is the miss, one syscall per
+      // candidate instead of two on every icon request.
       try {
         const bytes = await readFile(path)
         const mime = sniffImageMime(bytes)
         if (mime) return imageResponse(bytes, mime)
         if (repair) await unlink(path).catch(ignoreCleanupFailure)
       } catch (err) {
+        if (describeReadFailure(err) === 'ENOENT') continue
         // A READ THAT FAILED IS A MISS, NOT AN ERROR (JOS-266) — evicted, counted, and warned
         // about once per code per session, never filed. See `healUnreadableEntry` above, and the
         // section over it for the whole argument. This request then falls through to the same

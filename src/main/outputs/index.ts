@@ -29,7 +29,7 @@ import {
 } from '../../shared/outputs/achievements'
 import type { FactionStanding, FactionsSource } from '../../shared/outputs/factions'
 import { isOwnOutputFile } from '../../shared/outputs/kinds'
-import type { OutputKindId } from '../../shared/outputs/kinds'
+import type { OutputFileStatus, OutputKindId } from '../../shared/outputs/kinds'
 import { logWarn } from '../errorLog'
 import { outputKind, ownsOutputFile, parseOutput, type OutputParseResult } from './kinds'
 import { outputStatus, type OutputCharacter } from './registry'
@@ -83,7 +83,11 @@ export function loadOutput(
   server?: string
 ): LoadedOutput | null {
   const character: OutputCharacter = { name: characterName, server }
-  const status = outputStatus(id, character)
+  return readOutput(id, outputStatus(id, character))
+}
+
+/** The read-and-parse half of `loadOutput`, for a caller that already has the status. */
+function readOutput(id: OutputKindId, status: OutputFileStatus): LoadedOutput | null {
   if (status.path === null || status.updatedAt === null) return null
   let text: string
   try {
@@ -121,18 +125,39 @@ export interface LoadedInventoryDump {
  * it lands as an ADDITIVE key with a defaulting reader plus its migration step, in the same
  * commit — until then, parse on demand.
  */
+/**
+ * PARSED ONCE PER (path, mtime) (audit item 11). The planner, the character sheet, the gaps save
+ * and the worn-focus index each re-read and re-parsed the dump on every IPC call; the status
+ * (one readdir + one stat) is still taken fresh every time, so a rewritten dump is re-read the
+ * moment its mtime moves. The cached object is SHARED between callers, which only derive from it.
+ */
+const inventoryCache = new Map<string, LoadedInventoryDump>()
+const INVENTORY_CACHE_MAX = 8
+
 export function loadInventoryDump(
   characterName?: string,
   server?: string
 ): LoadedInventoryDump | null {
-  const loaded = loadOutput('inventory', characterName, server)
+  const status = outputStatus('inventory', { name: characterName, server })
+  if (status.path === null || status.updatedAt === null) return null
   // Another character's dump is refused, as the achievements one is: its counts would be saved under
   // this character (2026-10-19: a new character on a new server was shown Drywrought's inventory).
-  if (!loaded || !ownsOutputFile(outputKind('inventory'), loaded.path, characterName, server)) return null
+  if (!ownsOutputFile(outputKind('inventory'), status.path, characterName, server)) return null
+  const hit = inventoryCache.get(status.path)
+  if (hit?.loadedAt === status.updatedAt) return hit
+  const loaded = readOutput('inventory', status)
+  if (!loaded) return null
   const { result } = loaded
   // The registry types this narrowing honestly: an unsupported kind never yields data.
   if (!result.ok || result.data.kind !== 'inventory') return null
-  return { path: loaded.path, loadedAt: loaded.loadedAt, dump: result.data.dump }
+  const out = { path: loaded.path, loadedAt: loaded.loadedAt, dump: result.data.dump }
+  inventoryCache.delete(status.path)
+  inventoryCache.set(status.path, out)
+  if (inventoryCache.size > INVENTORY_CACHE_MAX) {
+    const oldest = inventoryCache.keys().next().value
+    if (oldest !== undefined) inventoryCache.delete(oldest)
+  }
+  return out
 }
 
 /** The achievements dump's earned class-unlock rewards, plus the record of where they came from. */
