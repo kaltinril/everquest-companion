@@ -774,6 +774,11 @@ impl EqModule for BuffsModule {
         std::mem::take(&mut self.derived)
     }
 
+    /// The one producer of derived events (`buffExpired`).
+    fn wants_derived(&self) -> bool {
+        true
+    }
+
     fn as_defines(&mut self) -> Option<&mut dyn crate::Defines> {
         Some(self)
     }
