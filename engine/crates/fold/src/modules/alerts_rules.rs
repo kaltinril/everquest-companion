@@ -642,13 +642,9 @@ impl RuleSet {
     /// Stamp a fire on clock `key`, keeping the map bounded and its iteration order
     /// least-recently-fired first (remove-then-insert re-inserts at the tail).
     fn note_fire(&mut self, key: &str, ts: i64) {
-        self.last_fire.remove(key);
-        self.last_fire.insert(key.to_owned(), ts);
+        self.last_fire.move_to_back(key, ts);
         if self.last_fire.len() > COOLDOWN_KEY_CAP {
-            let oldest = self.last_fire.keys().next().map(str::to_owned);
-            if let Some(k) = oldest {
-                self.last_fire.remove(&k);
-            }
+            self.last_fire.pop_front();
         }
     }
 
