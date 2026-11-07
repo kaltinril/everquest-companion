@@ -457,20 +457,20 @@ impl BuffsModule {
         active
     }
 
-    /// The view layer's change signal, and NOT the announce cursor.
+    /// The view layer's change signal: the announce cursor.
     ///
-    /// Deliberately coarse: this module has no revision counter, so it reports the fold's own `seq`,
-    /// which moves on every event. It can never miss a change — the property the view layer's
-    /// correctness needs — and it over-reports, costing one re-cut of the buff and timer windows per
-    /// serve beat over a row set of tens.
+    /// It moves whenever `active` — what `active_instances` reads and what the snapshot publishes —
+    /// or the stats could have moved: a landing, a wear-off, a retirement by the log or by the wall
+    /// clock, a gap, a rebirth, a define. Under-announcing is the one direction the cursor is built
+    /// to forbid (`crate::announce`), which is the property the view layer's correctness needs.
     ///
-    /// The announce cursor beside it answers the same question for a reader with a very different
-    /// cost, and answers it by over-approximating per arm — sound for a dirty bit, but a bet for a
-    /// window whose remaining times are a function of `now`. Two readers, two signals: fusing them
-    /// would tie a view's correctness to an audit made for somebody else's sake.
+    /// The buff and timer windows carry no cell that is a function of `now` (`endsAt` is
+    /// `startedTs + durationMs`), so a signal that moves only with the model is complete for them,
+    /// and a beat on which nothing landed or wore off re-cuts neither. The fold's own `seq` was
+    /// reported here before, and re-cut both windows on every line of a melee round.
     #[must_use]
     pub fn revision(&self) -> i64 {
-        self.seq
+        self.announce.cursor()
     }
 
     /// A new log is about to be folded from its first byte.

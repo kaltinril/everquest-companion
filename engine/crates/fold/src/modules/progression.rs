@@ -215,14 +215,14 @@ impl ProgressionModule {
             .zip(self.s.aa_gain_amount.iter().copied())
     }
 
-    /// The view layer's change signal — `foldsink::source_revision`, and deliberately NOT the
-    /// announce cursor. The two answer different questions: this one decides whether a SUBSCRIPTION
-    /// re-cuts a window of tens of rows on the ingest thread, and over-reports cheaply; the announce
-    /// cursor decides whether a RENDERER re-fetches a snapshot and re-renders a tree. One number
-    /// would tie a view's correctness to an audit done for the other reader's sake.
+    /// The view layer's change signal — `foldsink::source_revision` — and it is the announce
+    /// cursor: every push to a column a view reads (`levels`, `aa_gains`, `recent_kills`) bumps it
+    /// (see `fold` and `push_kill`), as do a rebirth and the log's clock advancing, so it can never
+    /// miss a row and over-reports only on the clock. The fold's own `seq` was reported here
+    /// before, and re-cut the progression and kills windows on every event of the fold.
     #[must_use]
     pub fn revision(&self) -> i64 {
-        self.seq
+        self.announce.cursor()
     }
 
     /// A pet addressed you as master. For a name never seen charmed this is the only binding signal

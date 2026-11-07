@@ -533,14 +533,15 @@ impl EventSink for FoldSink {
 
     /// The change signal per source. Cheap by contract — a counter read, never a serialization.
     ///
-    /// Three of these are coarse. `loot`, `respawn` and `buffTimers` keep real revision counters
-    /// that move only when their state could have; `buffs`, `progression` and `eventFeed` do not,
-    /// so they report the fold's own `seq`, which moves on every event. That never misses a change
-    /// and over-reports, costing a re-cut per serve beat on a busy tail; the fix is the counters,
-    /// not a cache.
+    /// Every module here reports a counter that moves only when the state its rows are cut from
+    /// could have: `loot`, `respawn` and `buffTimers` keep revision counters of their own, and
+    /// `buffs`, `progression` and `eventFeed` report their announce cursors, which their mutating
+    /// arms move (each module's `revision` says which). A busy tail re-cuts a window when
+    /// something in it moved, not on every line.
     ///
-    /// `timers.rows` takes the max of its two inputs, the only honest answer for a source folded
-    /// from two modules: either moving could move the window.
+    /// `timers.rows` is folded from two modules, so its signal is the SUM of their two: each only
+    /// ever grows (a fresh world zeroes both and resets every window regardless), so the sum moves
+    /// whenever either does, where the larger of the two could stand still while the smaller moved.
     fn source_revision(&self, source: &'static views::SourceDef) -> Option<u64> {
         let registry = &self.fold.registry;
         let signal = |seq: i64| u64::try_from(seq).unwrap_or(0);
@@ -549,7 +550,7 @@ impl EventSink for FoldSink {
             id if id == views::buffs::ACTIVE.id => Some(signal(registry.buffs()?.revision())),
             id if id == views::timers::ROWS.id => Some(
                 signal(registry.buffs()?.revision())
-                    .max(signal(registry.buff_timers()?.revision())),
+                    .saturating_add(signal(registry.buff_timers()?.revision())),
             ),
             id if id == views::respawn::WATCHES.id => Some(signal(registry.respawn()?.revision())),
             id if id == views::kills::RECENT.id || id == views::progression::RECENT.id => {
