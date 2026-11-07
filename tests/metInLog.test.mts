@@ -7,8 +7,9 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { metVersion, setMet, wasMet } from '../src/shared/metInLog'
+import { eraVersion, metVersion, setMet, wasMet } from '../src/shared/metInLog'
 import { mobOutOfEra } from '../src/shared/mobEra'
+import { eraCached } from '../src/shared/planner/eraCache'
 import { CURRENT_ERA, eraVerdict, withoutOutOfEraMobs, zoneEra } from '../src/shared/planner/era'
 import { donorEra, eraHides, type EraSubject } from '../src/renderer/src/features/planner/plannerData'
 
@@ -114,6 +115,58 @@ test('donorEra: an item the log looted is in era, over every wiki layer, and the
     assert.equal(eraHides(tomb, true), false)
     setMet('items', [])
     assert.equal(donorEra(tomb).verdict, 'out-of-era', 'evidence gone, the wiki speaks again')
+  } finally {
+    clearAll()
+  }
+})
+
+test('eraVersion moves only when a mob or zone key some verdict has read arrives or leaves', () => {
+  try {
+    const fiend = { name: 'an era bench fiend', page: 'An era bench fiend (Plane of Fear)', outOfEra: true as const }
+    assert.equal(mobOutOfEra(fiend), true, 'the verdict reads the fiend: it joins the read set')
+    const e0 = eraVersion()
+    const v0 = metVersion()
+    setMet('mobs', ['a never asked bench rat'])
+    assert.notEqual(metVersion(), v0, 'the evidence moved')
+    assert.equal(eraVersion(), e0, 'but no verdict ever asked about the rat')
+    setMet('mobs', ['a never asked bench rat', 'An era bench fiend'])
+    assert.notEqual(eraVersion(), e0, 'the fiend was read: a verdict can change')
+    const e1 = eraVersion()
+    assert.equal(mobOutOfEra(fiend), false)
+    setMet('mobs', ['An era bench fiend', 'another unasked bench rat'])
+    assert.equal(eraVersion(), e1, 'a rat came and a rat went, neither read')
+    setMet('mobs', ['another unasked bench rat'])
+    assert.notEqual(eraVersion(), e1, 'the fiend left: a verdict can change back')
+    const e2 = eraVersion()
+    setMet('items', ['Bench Blade'])
+    assert.equal(eraVersion(), e2, 'items never move it (their verdicts key on metVersion)')
+    assert.equal(zoneEra('Bench Hollow Nowhere'), null, 'a zone read joins the read set too')
+    setMet('zones', ['Bench Hollow Nowhere'])
+    assert.notEqual(eraVersion(), e2)
+    assert.equal(zoneEra('Bench Hollow Nowhere'), CURRENT_ERA)
+  } finally {
+    clearAll()
+  }
+})
+
+test('eraCached holds its fold across evidence no verdict read, and folds again when a read key moves', () => {
+  let builds = 0
+  const drake = { name: 'a bench cached drake', outOfEra: true as const }
+  const kept = eraCached((eraOnly) => {
+    builds++
+    return { eraOnly, out: mobOutOfEra(drake) }
+  })
+  try {
+    const first = kept(true)
+    assert.equal(first.out, true)
+    setMet('mobs', ['a bench cached unread mob'])
+    assert.equal(kept(true), first, 'held: the new name was never read by the fold')
+    assert.equal(builds, 1)
+    setMet('mobs', ['a bench cached unread mob', 'A Bench Cached Drake'])
+    const after = kept(true)
+    assert.notEqual(after, first, 'the drake was read: folded again')
+    assert.equal(after.out, false)
+    assert.equal(builds, 2)
   } finally {
     clearAll()
   }

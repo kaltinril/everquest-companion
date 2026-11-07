@@ -29,7 +29,7 @@
 //     is `shared/mobEra.mobOutOfEra`, the one mob era predicate, and the player's own log outranks
 //     the flag there (a mob they killed, conned or looted from is in era for them). It is read at
 //     plan time, never stored on a `SlayerMob`: the catalog index is built once, the log's
-//     evidence arrives later (`metVersion()` keys the memos over a plan, `PlanOptions.met`).
+//     evidence arrives later (`eraVersion()` keys the memos over a plan, `PlanOptions.met`).
 // A zone the era table makes no claim about stays in (`unknown` is not `out-of-era`), and so does
 // a mob with no flag. The "Zones not open yet" switch brings both kinds back.
 
@@ -123,9 +123,10 @@ export interface PlanOptions {
   outOfEra: boolean
   /** leave out mobs the wiki says lower a faction; a mob it is silent on stays */
   noFactionHits: boolean
-  /** the log evidence version (`metInLog.metVersion()`) the plan is read under. Nothing here reads
-   *  it: `mobOutOfEra` reads the evidence itself. A memo keyed by the options carries it so the
-   *  plan recomputes when the evidence moves. */
+  /** the log evidence version (`metInLog.eraVersion()`, which moves only when a name a verdict
+   *  has read arrives or leaves) the plan is read under. Nothing here reads it: `mobOutOfEra`
+   *  reads the evidence itself. A memo keyed by the options carries it so the plan recomputes
+   *  when the evidence moves. */
   met?: number
 }
 
