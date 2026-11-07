@@ -3,7 +3,7 @@
 // how far back prices count, All tiers as one with its Price at slider, Ignore outliers, whether
 // items the wiki marks No Drop or No Trade show at all, and the offers list with its CSV export.
 
-import { type JSX } from 'react'
+import { type JSX, useState } from 'react'
 import { Autocomplete, Box, Button, FormControlLabel, MenuItem, Slider, Stack, Switch, TextField, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material'
 import type { BazaarDir } from '@shared/bazaar'
 import { TRADESKILLS } from '@shared/tradeskills'
@@ -67,8 +67,17 @@ interface Props {
   set: (patch: Partial<BazaarControlState>) => void
 }
 
+/** The Quest box's choices, asked for when it opens (`QuestOptions`). */
+export type QuestOptions = () => readonly string[]
+
+const NO_QUESTS: readonly string[] = []
+
 /** What the item is for: the Tradeskill picker and the Quest search, off the wiki's recipes and quests. */
-function PurposeControls({ state, set, quests }: Props & { quests: readonly string[] }): JSX.Element {
+function PurposeControls({ state, set, quests }: Props & { quests: QuestOptions }): JSX.Element {
+  // THE CHOICES ARE ASKED FOR WHEN THE BOX OPENS (the 2026-11-06 renderer pass): they are every
+  // quest the wiki names for ~2k items, re-derived whenever a marks batch landed, and the list was
+  // built on every render of the tab for a dropdown that is closed almost all of the time.
+  const [open, setOpen] = useState(false)
   return (
     <>
       <TextField
@@ -90,7 +99,10 @@ function PurposeControls({ state, set, quests }: Props & { quests: readonly stri
       <Autocomplete
         freeSolo
         size="small"
-        options={quests}
+        open={open}
+        onOpen={() => setOpen(true)}
+        onClose={() => setOpen(false)}
+        options={open ? quests() : NO_QUESTS}
         inputValue={state.quest}
         onInputChange={(_e, v) => set({ quest: v })}
         sx={{ minWidth: 220 }}
@@ -101,7 +113,7 @@ function PurposeControls({ state, set, quests }: Props & { quests: readonly stri
 }
 
 /** Which items: search, direction, the Show picker, Popular and its price floor, and what the item is for. */
-function FilterControls({ state, set, quests }: Props & { quests: readonly string[] }): JSX.Element {
+function FilterControls({ state, set, quests }: Props & { quests: QuestOptions }): JSX.Element {
   return (
     <>
       <TextField
@@ -233,7 +245,7 @@ function ListControls({ state, set, onExport }: Props & { onExport: () => void }
   )
 }
 
-export default function BazaarControls({ state, set, quests, onExport }: Props & { quests: readonly string[]; onExport: () => void }): JSX.Element {
+export default function BazaarControls({ state, set, quests, onExport }: Props & { quests: QuestOptions; onExport: () => void }): JSX.Element {
   return (
     <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" useFlexGap>
       <FilterControls state={state} set={set} quests={quests} />
