@@ -190,23 +190,38 @@ export function cespToManifestSounds(
   return sounds
 }
 
-/** Parsed manifests by path, valid while the file's mtime stands (audit item 12). */
-const manifestMemo = new Map<string, { mtimeMs: number; manifest: SoundPackManifest | null }>()
+/** Parsed manifests by path, valid while the file's mtime and size stand (audit item 12). */
+const manifestMemo = new Map<
+  string,
+  { mtimeMs: number; size: number; manifest: SoundPackManifest | null }
+>()
+
+/**
+ * Drop the memo for one pack directory. Our own writers call it after rewriting a manifest: a
+ * rewrite inside one filesystem timestamp tick keeps the mtime (the CI runner's disk did, and a
+ * removed sound was still served from the stale copy), so a writer never relies on the stat.
+ */
+export function forgetManifest(dir: string): void {
+  manifestMemo.delete(join(dir, 'manifest.json'))
+}
 
 /** Read + validate a pack manifest from a directory; null if missing/invalid. One stat per call,
  *  and the parse only when the file moved: every play and every pack listing asked for it. */
 function readManifest(dir: string): SoundPackManifest | null {
   const manifestPath = join(dir, 'manifest.json')
   let mtimeMs: number
+  let size: number
   try {
-    mtimeMs = statSync(manifestPath).mtimeMs
+    const st = statSync(manifestPath)
+    mtimeMs = st.mtimeMs
+    size = st.size
   } catch {
     return null
   }
   const known = manifestMemo.get(manifestPath)
-  if (known?.mtimeMs === mtimeMs) return known.manifest
+  if (known?.mtimeMs === mtimeMs && known.size === size) return known.manifest
   const manifest = parseManifest(manifestPath)
-  manifestMemo.set(manifestPath, { mtimeMs, manifest })
+  manifestMemo.set(manifestPath, { mtimeMs, size, manifest })
   return manifest
 }
 
