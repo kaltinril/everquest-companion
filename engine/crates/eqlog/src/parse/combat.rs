@@ -14,7 +14,8 @@ use std::borrow::Cow;
 use super::Ctx;
 
 /// The melee verbs, first- and third-person, are `melee.rs`'s tables: the melee line is split by
-/// hand there, and the two patterns it replaces are that file's test oracle.
+/// hand there, and the two patterns it replaces are that file's test oracle. The miss line is
+/// `miss.rs`'s the same way, its three patterns that file's oracle.
 pub struct CombatRes {
     spell: Regex,
     ds: Regex,
@@ -27,9 +28,6 @@ pub struct CombatRes {
     rune_gain: Regex,
     skin_absorb_blow: Regex,
     skin_absorb_ds: Regex,
-    miss: Regex,
-    miss_verb: Regex,
-    miss_mod: Regex,
     resist_yours: Regex,
     resist_caster: Regex,
     resist_incoming: Regex,
@@ -84,20 +82,6 @@ impl CombatRes {
                 r"^YOUR magical skin absorbs the damage of (.+?)'s .+\.$",
             )
             .unwrap(),
-            miss: Regex::new(
-                concat!(
-                    r"^(.+?) tr(?:y|ies) to [0-9A-Za-z_]+ (?:on )?(.+?), but ",
-                    r"(?:(miss|misses)",
-                    r"|(.+?) (parries|dodges|ripostes|blocks)",
-                    r"|(YOU) (parry|dodge|riposte|block)",
-                    r"|.+?'s magical skin (absorbs) the blow",
-                    r"|(YOUR) magical skin absorbs the blow)",
-                    r"!(?: \([A-Za-z ]+\))?$"
-                ),
-            )
-            .unwrap(),
-            miss_verb: Regex::new(r" tr(?:y|ies) to ([0-9A-Za-z_]+)").unwrap(),
-            miss_mod: Regex::new(r" \(([A-Za-z ]+)\)$").unwrap(),
             resist_yours: Regex::new(r"^(.+?) resisted your (.+?)!$").unwrap(),
             resist_caster: Regex::new(r"^(.+?) resisted (.+?)'s (.+?)!$").unwrap(),
             resist_incoming: Regex::new(r"^You resist(?:ed)? (.+?)'s (.+?)!$").unwrap(),
@@ -221,6 +205,20 @@ fn dmg(c: &Ctx, out: &mut Ev, spec: Dmg<'_>) {
     out.s(Key::Category, damage_category(spec.dtype, &[] as &[&str]));
 }
 
+/// The miss type of a defence verb in either person: `parries`/`parry` → `parry`, and so on;
+/// anything else is a block.
+fn avoid_type(verb: &str) -> &'static str {
+    if verb.starts_with("parr") {
+        "parry"
+    } else if verb.starts_with("dodge") {
+        "dodge"
+    } else if verb.starts_with("riposte") {
+        "riposte"
+    } else {
+        "block"
+    }
+}
+
 /// Misses / avoided swings (by far the most common combat line).
 pub fn classify_miss(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
     if !(c.text.contains(", but ")
@@ -228,48 +226,30 @@ pub fn classify_miss(r: &CombatRes, c: &Ctx, out: &mut Ev) -> bool {
     {
         return false;
     }
-    if let Some(m) = r.miss.captures(c.text) {
-        let attacker = norm(&m[1]);
-        // Group map: 3=miss|misses 4=defender 5=3rd-verb 6=YOU 7=base-verb 8=absorbs(possessive)
-        // 9=YOUR(self)
-        let (mtype, target): (&str, Cow<str>) = if m.get(3).is_some() {
-            ("miss", norm(&m[2]))
-        } else if let Some(v) = m.get(5) {
-            let t = match v.as_str() {
-                "parries" => "parry",
-                "dodges" => "dodge",
-                "ripostes" => "riposte",
-                _ => "block",
-            };
-            (t, norm(&m[4]))
-        } else if let Some(v) = m.get(7) {
+    if let Some(m) = super::miss::split(c.text) {
+        use super::miss::Outcome;
+        let attacker = norm(m.attacker);
+        let (mtype, target): (&str, Cow<str>) = match m.outcome {
+            Outcome::Miss => ("miss", norm(m.target)),
+            Outcome::Defended(defender, verb) => (avoid_type(verb), norm(defender)),
             // The base form is the miss type.
-            (
-                match v.as_str() {
-                    "parry" => "parry",
-                    "dodge" => "dodge",
-                    "riposte" => "riposte",
-                    _ => "block",
-                },
-                Cow::Borrowed("You"),
-            )
-        } else if m.get(9).is_some() {
+            Outcome::YouDefended(verb) => (avoid_type(verb), Cow::Borrowed("You")),
             // Self rune absorb: YOUR skin means the swing was aimed at you.
-            ("absorb", Cow::Borrowed("You"))
-        } else {
-            ("absorb", norm(&m[2]))
+            Outcome::YourSkinAbsorbs => ("absorb", Cow::Borrowed("You")),
+            Outcome::SkinAbsorbs => ("absorb", norm(m.target)),
         };
         out.begin(Kind::Miss);
         out.envelope(c.seq, c.ts, c.raw);
         out.s(Key::Attacker, &attacker);
         out.s(Key::Target, &target);
         out.s(Key::Mtype, mtype);
-        // Verb then modifiers, each written only when present.
-        if let Some(v) = r.miss_verb.captures(c.text) {
-            out.s(Key::Verb, &melee_verb_base(&v[1]));
+        // Verb then modifiers, each written only when present. The verb is the first on the
+        // line, as the separate rescan found it (`miss::first_verb`).
+        if let Some(v) = super::miss::first_verb(c.text) {
+            out.s(Key::Verb, &melee_verb_base(v));
         }
-        if let Some(md) = r.miss_mod.captures(c.text) {
-            out.strs(Key::Modifiers, &parse_modifiers(Some(&md[1])));
+        if let Some(md) = m.modifier {
+            out.strs(Key::Modifiers, &parse_modifiers(Some(md)));
         }
         return true;
     }
