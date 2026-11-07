@@ -1581,60 +1581,102 @@ fn serve(
             }
             let (rows, total) = views::cut(&sub.view, &source.rows);
             let owed = reset_all || sub.held.is_none();
-            // The reset carries the rows themselves and hands them back once encoded; a diff keeps
-            // them here. Either way the window is copied out of the source exactly once.
-            let (kind, row_count, ops, message, kept) = if owed {
-                let row_count = rows.len();
-                let message = EngineMessage::ResetMessage(ResetMessage {
-                    kind: ResetMessageKind::Reset,
-                    id: RequestId(*id),
-                    epoch: Epoch(landed),
-                    total,
-                    rows,
-                });
-                (FrameKind::Reset, row_count, 0, message, None)
-            } else {
-                let held = sub.held.as_deref().unwrap_or_default();
-                let ops = views::diff(held, &rows);
-                // A frame that says nothing is not sent. `total` moving on its own is still
-                // something to say — a filtered view can shrink outside the window — so the two
-                // conditions are separate rather than one.
-                if ops.is_empty() && total == sub.total {
-                    sub.revision = Some(source.revision);
-                    continue;
-                }
-                let ops_count = ops.len();
-                let message = EngineMessage::DiffMessage(DiffMessage {
-                    kind: DiffMessageKind::Diff,
-                    id: RequestId(*id),
-                    epoch: Epoch(landed),
-                    // Present only when it moved — the schema says so, and fixture 03 is a
-                    // meter tick with no `total` for exactly this reason.
-                    total: (total != sub.total).then_some(total),
-                    ops,
-                });
-                (FrameKind::Diff, 0, ops_count, message, Some(rows))
+            let Some(frame) = frame_for(sub, *id, landed, owed, rows, total) else {
+                sub.revision = Some(source.revision);
+                continue;
             };
-            // Encoded once, here: the bytes the meter records are the bytes the writer sends,
-            // measured from the frame about to go out rather than estimated from the rows, because
-            // an estimated payload budget is a payload budget nobody is keeping (see
-            // `views::meter`). A message that will not encode (none can) goes out typed, as before.
-            let (bytes, outbound) = match crate::wire::encode(&message) {
-                Ok(line) => (line.len(), Outbound::Line(line)),
-                Err(_) => (0, Outbound::Message(message.clone())),
-            };
+            let (kind, row_count, ops) = (frame.kind, frame.rows, frame.ops);
+            let (bytes, outbound, held) = encode_frame(frame);
             meter.frame(source.source, kind, row_count, ops, bytes, folded_at);
             alive = listener.outbox.send(outbound).is_ok();
-            sub.held = Some(match (kept, message) {
-                (Some(rows), _) => rows,
-                (None, EngineMessage::ResetMessage(reset)) => reset.rows,
-                (None, _) => Vec::new(),
-            });
+            sub.held = Some(held);
             sub.total = total;
             sub.revision = Some(source.revision);
         }
         alive
     });
+}
+
+/// One frame cut for a subscription, before it is encoded.
+struct Frame {
+    kind: FrameKind,
+    /// Rows a reset carries; 0 for a diff.
+    rows: usize,
+    /// Ops a diff carries; 0 for a reset.
+    ops: usize,
+    message: EngineMessage,
+    /// The window the client will hold once this is sent, when the message does not carry it (a
+    /// diff). A reset carries it and hands it back after encoding.
+    kept: Option<Vec<Row>>,
+}
+
+/// The frame a freshly cut window owes a subscription: a reset while one is owed, else the diff
+/// against what the client holds — or `None` when the diff would say nothing. Either way the window
+/// is copied out of the source exactly once, by the cut.
+fn frame_for(
+    sub: &Sub,
+    id: i64,
+    landed: i64,
+    owed: bool,
+    rows: Vec<Row>,
+    total: i64,
+) -> Option<Frame> {
+    if owed {
+        let count = rows.len();
+        return Some(Frame {
+            kind: FrameKind::Reset,
+            rows: count,
+            ops: 0,
+            message: EngineMessage::ResetMessage(ResetMessage {
+                kind: ResetMessageKind::Reset,
+                id: RequestId(id),
+                epoch: Epoch(landed),
+                total,
+                rows,
+            }),
+            kept: None,
+        });
+    }
+    let held = sub.held.as_deref().unwrap_or_default();
+    let ops = views::diff(held, &rows);
+    // A frame that says nothing is not sent. `total` moving on its own is still something to say
+    // — a filtered view can shrink outside the window — so the two conditions are separate rather
+    // than one.
+    if ops.is_empty() && total == sub.total {
+        return None;
+    }
+    Some(Frame {
+        kind: FrameKind::Diff,
+        rows: 0,
+        ops: ops.len(),
+        message: EngineMessage::DiffMessage(DiffMessage {
+            kind: DiffMessageKind::Diff,
+            id: RequestId(id),
+            epoch: Epoch(landed),
+            // Present only when it moved — the schema says so, and fixture 03 is a meter tick
+            // with no `total` for exactly this reason.
+            total: (total != sub.total).then_some(total),
+            ops,
+        }),
+        kept: Some(rows),
+    })
+}
+
+/// Encode a frame once — the bytes the meter records are the bytes the writer sends, measured from
+/// the frame about to go out rather than estimated from the rows, because an estimated payload
+/// budget is a payload budget nobody is keeping (see `views::meter`) — and hand back the rows the
+/// client holds from here on. A message that will not encode (none can) goes out typed, as before.
+fn encode_frame(frame: Frame) -> (usize, Outbound, Vec<Row>) {
+    let (bytes, outbound) = match crate::wire::encode(&frame.message) {
+        Ok(line) => (line.len(), Outbound::Line(line)),
+        Err(_) => (0, Outbound::Message(frame.message.clone())),
+    };
+    let held = match (frame.kept, frame.message) {
+        (Some(rows), _) => rows,
+        (None, EngineMessage::ResetMessage(reset)) => reset.rows,
+        (None, _) => Vec::new(),
+    };
+    (bytes, outbound, held)
 }
 
 #[cfg(test)]
