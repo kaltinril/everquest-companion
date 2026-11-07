@@ -202,6 +202,8 @@ pub struct SpellStats {
     /// The player's per-line duration choices (`buffs_overrides`). App knowledge rather than log
     /// knowledge, so `reset` leaves it alone; only a define replaces it.
     overrides: HashMap<String, DurationOverride>,
+    /// Moves on every write through this type's own methods — see [`SpellStats::version`].
+    version: u64,
 }
 
 impl SpellStats {
@@ -215,11 +217,27 @@ impl SpellStats {
             last_seen: JsMap::new(),
             cast_tiers: JsMap::new(),
             overrides: HashMap::new(),
+            version: 0,
         }
+    }
+
+    /// A count of the writes made through this type's methods. Two equal readings mean no answer
+    /// this type gives can have changed between them, which is what lets the buffs hygiene sweep
+    /// keep a memo across events. Every `&mut self` method bumps it, whether or not it changed
+    /// anything: a spare re-sweep is cheap and a missed one is a stale answer. `db` is `pub` and
+    /// is written by nothing after construction.
+    #[must_use]
+    pub fn version(&self) -> u64 {
+        self.version
+    }
+
+    fn touched(&mut self) {
+        self.version = self.version.wrapping_add(1);
     }
 
     /// Replace the player's duration choices whole. Returns whether anything changed.
     pub fn set_overrides(&mut self, next: HashMap<String, DurationOverride>) -> bool {
+        self.touched();
         if self.overrides == next {
             return false;
         }
@@ -244,6 +262,7 @@ impl SpellStats {
     }
 
     pub fn reset(&mut self) {
+        self.touched();
         self.samples.clear();
         self.ever_faded.clear();
         self.ever_faded_at.clear();
@@ -255,12 +274,14 @@ impl SpellStats {
     /// Insertion order is what `build_stats` walks. The object it builds is keyed, so that order is
     /// not published; keeping it stable anyway is what makes a diff between two runs readable.
     pub fn note_ever_faded(&mut self, key: &str) {
+        self.touched();
         if self.ever_faded_at.insert(key.to_string()) {
             self.ever_faded.push(key.to_string());
         }
     }
 
     pub fn witness_wear_off_channel(&mut self, key: &str) {
+        self.touched();
         self.wear_off_witnessed.insert(key.to_string());
     }
 
@@ -270,6 +291,7 @@ impl SpellStats {
 
     /// Record the newest ts a spell was seen (cast / apply / fade) — the recency signal.
     pub fn touch_last_seen(&mut self, key: &str, ts: i64) {
+        self.touched();
         if self.last_seen.get(key).is_none_or(|&prev| ts > prev) {
             self.last_seen.insert(key.to_string(), ts);
         }
@@ -288,6 +310,7 @@ impl SpellStats {
     /// Record the upgrade tier a cast line named for this (line, caster). An unsuffixed name states
     /// the base tier and is not evidence, so it never lowers what a numeral already proved.
     pub fn note_cast_tier(&mut self, key: &str, caster: &str, ranked_name: &str) {
+        self.touched();
         let tier = tier_of(ranked_name);
         if tier <= 0 {
             return;
@@ -337,6 +360,7 @@ impl SpellStats {
     /// Append a mined duration sample for one caster. The display name is re-read on every sample,
     /// not written once at mint.
     pub fn push_sample(&mut self, key: &str, caster: &str, spell: &str, sample: DurationSample) {
+        self.touched();
         self.row(key, caster, spell).samples.push(sample);
     }
 
@@ -349,6 +373,7 @@ impl SpellStats {
     /// The same line states the RANK when it carries a numeral: this seam is fed the ranked cast
     /// text, which on a crowd-control line is the only spelling that ever has one.
     pub fn note_display_name(&mut self, key: &str, caster: &str, spell: &str) {
+        self.touched();
         self.row(key, caster, spell);
         self.note_cast_tier(key, caster, spell);
     }
@@ -391,6 +416,7 @@ impl SpellStats {
     ///
     /// Returns whether it found one, so the caller knows whether to re-stat.
     pub fn censor_sample_at(&mut self, key: &str, caster: &str, closed_ts: i64) -> bool {
+        self.touched();
         let Some(s) = self.samples.get_mut(&learn_key(key, caster)) else {
             return false;
         };

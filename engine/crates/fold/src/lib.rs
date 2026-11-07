@@ -39,6 +39,7 @@ pub mod spell_facts;
 /// directory belong to `engined::spells`. Nothing in the fold reads it — a fold that never needs
 /// the client table can be replayed, shipped and re-estimated without one.
 pub mod spells_us;
+pub mod versioned;
 
 use event::Event;
 use serde_json::Value;

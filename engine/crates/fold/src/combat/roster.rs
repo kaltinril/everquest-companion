@@ -52,6 +52,14 @@ pub trait RosterSource {
     /// The roster as the snapshot serializes it — provenance, names and staleness.
     fn snap(&self) -> RosterSnap;
 
+    /// A count that moves whenever any answer below could have changed, or `None` for a source
+    /// that does not keep one. The engine re-pulls the roster once per change rather than once per
+    /// line when it is given one; given `None` it pulls every line, as it always did. (Measured
+    /// 2026-11-06: the per-line pull was 1.6 s of a 14.5 s fold of the owner's 68 MB log.)
+    fn revision(&self) -> Option<u64> {
+        None
+    }
+
     /// Canonical keys CURRENTLY in the roster: the Group allowlist, and the set nothing may treat
     /// as a hostile. `engageHostile` and the presence axis both consult it, because a group
     /// member's TARGET is what we are fighting and the member never is.

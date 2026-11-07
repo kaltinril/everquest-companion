@@ -200,6 +200,10 @@ pub struct RosterModule {
     /// What other players' `/who` rows stated — see [`super::roster_who`]. Knowledge about NAMES,
     /// so like `never_member` it outlives a reset: a rebirth of yours changes nobody else's classes.
     who: super::roster_who::WhoSeen,
+    /// Moves on every write to `log`, `admitted_keys`, `edits`, `epoch_ts` or `left_ts` — the
+    /// inputs of `effective()` and `admitted()`, which is what the combat engine pulls. See
+    /// [`crate::combat::RosterSource::revision`].
+    revision: u64,
 }
 
 /// One persisted user edit.
@@ -254,6 +258,7 @@ impl RosterModule {
         // The refusal is knowledge about a NAME and is not published. Only evicting a member the
         // weakest rung had already admitted changes the roster anybody can read.
         if self.log.get(&key).map(|m| m.source) == Some("buffed") {
+            self.revision += 1;
             self.log.remove(&key);
             self.admitted_keys.remove(&key);
             self.announce.changed(self.seq);
@@ -287,6 +292,8 @@ impl RosterModule {
         // Every group line is a published change, the usually-declined invite and the `selfJoin`
         // that names nobody included: both set `seen` and `lastSignalTs`, which are in the snapshot.
         self.announce.changed(self.seq);
+        // …and every arm below may move the membership, so the engine's pull is told once here.
+        self.revision += 1;
         // An INVITE is not a membership fact — it may be declined — but it proves a group is in
         // play, so it counts as a signal: "no roster yet" is more honest than a silent Everyone.
         self.seen = true;
@@ -324,6 +331,7 @@ impl RosterModule {
 
     /// Add or re-assert one member. Provenance only ever moves UP the ladder.
     fn add(&mut self, key: &str, name: &str, source: &'static str, ts: i64) {
+        self.revision += 1;
         self.admitted_keys.insert(key.to_string(), name.to_string());
         let Some(cur) = self.log.get_mut(key) else {
             self.log.insert(
@@ -429,6 +437,7 @@ impl EqModule for RosterModule {
     }
 
     fn reset(&mut self) {
+        self.revision += 1;
         self.log.clear();
         self.admitted_keys.clear();
         self.seen = false;
@@ -451,6 +460,7 @@ impl EqModule for RosterModule {
                 // because the list belongs to the app and the fold does not get to edit it.
                 self.reset();
                 self.epoch_ts = ev.ts();
+                self.revision += 1;
                 // Off `ev.seq()`, not `self.seq`, which the reset just zeroed: a cursor bumped off
                 // the zeroed field would land BELOW the seq a client still holds from the wiped
                 // character's snapshot, and the group would be cleared here and left on screen
@@ -540,6 +550,7 @@ impl crate::Defines for RosterModule {
             return;
         };
         self.edits = list.iter().filter_map(RosterEdit::read).collect();
+        self.revision += 1;
         // `effective()` folds these into the published `members`, so a pushed edit list is a
         // published change with no event behind it.
         self.announce.changed(self.seq);
@@ -555,6 +566,10 @@ impl crate::Defines for RosterModule {
 /// the combat snapshot and the meter does not draw `lastConfirmedTs` or `stale`. Both are built from
 /// the same map in the same order, so the two readings can disagree about nothing.
 impl crate::combat::RosterSource for RosterModule {
+    fn revision(&self) -> Option<u64> {
+        Some(self.revision)
+    }
+
     fn snap(&self) -> crate::combat::RosterSnap {
         crate::combat::RosterSnap {
             members: self

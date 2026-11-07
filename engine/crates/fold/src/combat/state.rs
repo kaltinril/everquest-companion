@@ -188,6 +188,8 @@ pub struct EngineState {
 
     /// See `RosterFacts`. Refreshed once per ingested event and once per snapshot.
     pub roster: RosterFacts,
+    /// The source's [`RosterSource::revision`] that `roster` was pulled at — see `refresh_roster`.
+    roster_revision: Option<u64>,
     /// The hits and heals on you before each of your deaths (`deathrecap.rs`).
     pub recaps: DeathRecaps,
     /// Your weapon swing seconds, for the swing timer (`swing.rs`).
@@ -241,6 +243,7 @@ impl EngineState {
             pet_nudge: PetNudgeState::new(),
             quick_buff_ts: 0,
             roster: RosterFacts::default(),
+            roster_revision: None,
             recaps: DeathRecaps::default(),
             swings: SwingTrack::default(),
         }
@@ -310,7 +313,14 @@ impl EngineState {
     /// Refresh the per-event roster snapshot. See `RosterFacts` for why once per event is exactly
     /// the live pull.
     pub fn refresh_roster(&mut self, roster: Option<&dyn RosterSource>) {
+        // A source that counts its changes is pulled once per change; one that does not, and no
+        // source at all, is pulled every line.
+        let revision = roster.and_then(RosterSource::revision);
+        if revision.is_some() && revision == self.roster_revision {
+            return;
+        }
         self.roster = RosterFacts::pull(roster);
+        self.roster_revision = revision;
     }
 
     /// The roster as the SNAPSHOT serializes it. A pull, never a stored copy.

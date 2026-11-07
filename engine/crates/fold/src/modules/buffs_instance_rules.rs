@@ -197,35 +197,49 @@ pub fn unwitnessed_cull_cap(a: &ActiveBuff) -> f64 {
 /// It reaps only ORPHANS — a record with no active row behind it — on the shared schedule
 /// ([`learning_record_cap_ms`]). It mints nothing and says nothing: a reap is not an observation,
 /// and nothing in either snapshot describes an open record.
+///
+/// Answers whether anything was dropped, and the last instant at which the orphans it left alone
+/// stay untouched: an orphan's oldest landing is reaped once `now` reaches it plus its cap, so
+/// nothing moves while `now` is short of the earliest such instant. The sweep's memo reads both.
 pub fn reap_orphaned_open(
     open: &mut JsMap<OpenCast>,
     active: &JsMap<ActiveBuff>,
     stats: &SpellStats,
     now: i64,
-) {
+) -> (bool, i64) {
     let mut dead: Vec<String> = Vec::new();
     for (ik, _) in open.iter() {
         if !active.contains_key(ik) {
             dead.push(ik.to_string());
         }
     }
+    let mut changed = false;
+    let mut quiet_until = i64::MAX;
     for ik in dead {
-        let cap = {
+        let cap_ms = {
             let o = open.get(&ik).expect("named above");
-            now - learning_record_cap_ms(
+            learning_record_cap_ms(
                 stats.floor_for(&o.spell_key, &o.caster),
                 HYGIENE_ABSOLUTE_MS,
             )
         };
-        let empty = {
+        let cap = now - cap_ms;
+        let (dropped, empty, oldest_ts) = {
             let o = open.get_mut(&ik).expect("named above");
-            o.group.drop_expired(cap);
-            o.group.is_empty()
+            let dropped = !o.group.drop_expired(cap).is_empty();
+            (dropped, o.group.is_empty(), o.group.oldest_ts())
         };
         if empty {
             open.remove(&ik);
+            changed = true;
+            continue;
         }
+        changed |= dropped;
+        // `drop_expired` takes a landing once `started_ts <= now - cap_ms`, so the oldest one
+        // survives through `now == oldest_ts + cap_ms - 1`.
+        quiet_until = quiet_until.min(oldest_ts.saturating_add(cap_ms).saturating_sub(1));
     }
+    (changed, quiet_until)
 }
 
 /// Does this landing never expire — no countdown, no duration sample, no hygiene retirement?
