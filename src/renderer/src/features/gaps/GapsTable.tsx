@@ -474,8 +474,14 @@ export default function GapsTable({
   const [open, setOpen] = useState<string | null>(null)
   const onToggle = useCallback((name: string) => setOpen((cur) => (cur === name ? null : name)), [])
   const shown = useMemo(() => unfoldedEntries(entries, folded), [entries, folded])
-  const work = useMemo<RowWork>(() => ({ pageText, onDone }), [pageText, onDone])
-  const headingWork = useMemo<HeadingWork>(() => ({ pageText, done, onDoneAll }), [pageText, done, onDoneAll])
+  // THE PAGE TEXT IS READ THROUGH A REF (the 2026-11-06 renderer pass): `pageText` is rebuilt on
+  // every loot and kill push (it closes over both ledgers), and as a prop it re-rendered every
+  // mounted row, its buttons and its chips per push. It is only ever CALLED on a click, so the rows
+  // get one function for the life of the table that reads the current one when pressed.
+  const pageTextRef = useRef(pageText)
+  pageTextRef.current = pageText
+  const work = useMemo<RowWork>(() => ({ pageText: (row) => pageTextRef.current(row), onDone }), [onDone])
+  const headingWork = useMemo<HeadingWork>(() => ({ pageText: work.pageText, done, onDoneAll }), [work, done, onDoneAll])
   const scrollRef = useRef<HTMLDivElement>(null)
   const win = useWindowedRows({ count: shown.length, rowHeight: ROW_HEIGHT, scrollRef })
   if (entries.length === 0) {
