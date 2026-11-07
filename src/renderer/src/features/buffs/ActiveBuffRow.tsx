@@ -5,6 +5,7 @@
 // drawing a fake bar.
 
 import type { JSX } from 'react'
+import { memo } from 'react'
 import { Box, Chip, LinearProgress, Paper, Stack, Typography } from '@mui/material'
 import type { ActiveBuff } from '@shared/types'
 import { rowRankLabel } from '@shared/buffTimers'
@@ -155,9 +156,17 @@ function EstimateBar({
   )
 }
 
-/** One active-buff row: name, elapsed, estimated remaining bar, ± spread, n. */
-export function ActiveRow({ buff, now }: { buff: ActiveBuff; now: number }): JSX.Element {
-  const elapsed = Math.max(0, now - buff.startedTs)
+/**
+ * One active-buff row: name, elapsed, estimated remaining bar, ± spread, n.
+ *
+ * MEMOIZED ON THE BUFF AND ITS ELAPSED SECOND (the 2026-11-06 renderer pass). The clock that
+ * drives the countdown ticks once a second in the active section; a card redraws when its own
+ * second moves or its own row in the snapshot changed, and not because a sibling's did or because
+ * the page re-rendered for a push that left this row alone. Whole seconds, because that is the
+ * resolution every number on the card prints at.
+ */
+export const ActiveRow = memo(function ActiveRow({ buff, elapsedSec }: { buff: ActiveBuff; elapsedSec: number }): JSX.Element {
+  const elapsed = Math.max(0, elapsedSec) * 1000
   const state = estimateState(buff, elapsed)
 
   // Debuff target is INFERRED (castBegin carries no target) — surface it honestly as a
@@ -245,5 +254,5 @@ export function ActiveRow({ buff, now }: { buff: ActiveBuff; now: number }): JSX
       )}
     </Paper>
   )
-}
+})
 

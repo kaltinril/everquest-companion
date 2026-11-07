@@ -16,9 +16,18 @@
 // PLAIN SUBSTRING, CASE-INSENSITIVE, ACROSS EVERY CLASS. Not `spellSearch`'s token machinery: this
 // is a filter over ~200 names the reader is already looking at, and the ticket says so explicitly.
 // The input echoes instantly and the FILTER rides `useDeferredValue` (AGENTS.md's search rule).
+//
+// WINDOWED, IN A FIXED-HEIGHT BOX PER CLASS (the 2026-11-06 renderer pass; whole-app review #5).
+// Every spell the log ever mined is a row of seven cells, a chip, a button and (in opt-in mode) a
+// checkbox, and all of them mounted at once — 300 to 1,200 MUI nodes per visit on the owner's log.
+// Each class's table now scrolls inside its own box (AGENTS.md: a growing list lives in a
+// fixed-height scroll box) and mounts only the rows under the viewport (useWindowedRows, the
+// Loot ledger's pattern: fixed row height, spacer rows). The two per-row tooltips became native
+// `title`s, the repo's rule for a dense table cell (JOS-143): a popper per cell was most of the
+// cost and the cell is not a card.
 
 import type { JSX } from 'react'
-import { memo, useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
+import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Box,
   Chip,
@@ -41,9 +50,16 @@ import type { BuffDurationOverride } from '@shared/buffTrust'
 import { buffStatRows, type KeyedBuffStat } from '@shared/buffStatRows'
 import { fmtDuration, classAccent, estimateChipLabel, estimatePrefix, estimatorSourceTitle } from './format'
 import { BuffDurationDialog } from './BuffDurationDialog'
-import { Tooltip } from '../../lib/Tooltip'
 import { BuffAllowCheck } from './BuffAllowCheck'
 import { useBuffAllow } from './useBuffAllow'
+import { useWindowedRows, type WindowedRows } from '../../lib/useWindowedRows'
+import { characterEpoch, heldNow, holdFor, type Held } from '../../lib/characterEpoch'
+
+/** Every durations row is this tall (the windowing hook is fixed-height): the small edit button
+ *  (18 px) is the tallest thing on it, with the cell's padding. */
+const STAT_ROW_HEIGHT = 34
+/** How tall one class's scroll box may grow before it scrolls: about fourteen rows. */
+const SECTION_MAX_HEIGHT = 480
 
 // Stats-table sections: buffs first, then debuffs (Task #35 — a spell property).
 const CLASS_ORDER: BuffClass[] = ['buff', 'debuff']
@@ -66,37 +82,41 @@ function rowEstimate(s: BuffStat): { ms?: number | null; src?: string } {
   return { ms, src }
 }
 
-/** The estimate cell: the figure plus a chip naming where it came from. */
+/** The estimate cell: the figure plus a chip naming where it came from. A native `title` (the
+ *  dense-cell rule, file header) says which source won, exactly as the popper used to. */
 function EstimateCell({ ms, src }: { ms?: number | null; src?: string }): JSX.Element {
   if (ms == null) return <>-</>
   return (
-    <Tooltip title={estimatorSourceTitle(src)}>
-      <span>
-        {/* A DEATH BOUND IS A FLOOR, AND THE CELL SAYS SO (JOS-379): `≥ 3m 08s`, never a bare
-            figure that reads as a measurement. See format.ts `estimatePrefix`. */}
-        {estimatePrefix(src)}
-        {fmtDuration(ms)}
-        {src ? (
-          <Chip
-            size="small"
-            label={estimateChipLabel(src)}
-            variant="outlined"
-            sx={{ ml: 0.5, height: 15, fontSize: 9, '& .MuiChip-label': { px: 0.4 } }}
-          />
-        ) : null}
-      </span>
-    </Tooltip>
+    <span title={estimatorSourceTitle(src)}>
+      {/* A DEATH BOUND IS A FLOOR, AND THE CELL SAYS SO (JOS-379): `≥ 3m 08s`, never a bare
+          figure that reads as a measurement. See format.ts `estimatePrefix`. */}
+      {estimatePrefix(src)}
+      {fmtDuration(ms)}
+      {src ? (
+        <Chip
+          size="small"
+          label={estimateChipLabel(src)}
+          variant="outlined"
+          sx={{ ml: 0.5, height: 15, fontSize: 9, '& .MuiChip-label': { px: 0.4 } }}
+        />
+      ) : null}
+    </span>
   )
 }
 
 /** Opens the duration dialog for one line (fork issue #4). */
 type OnEdit = (key: string) => void
 
-/** One stats row. Everything not stated by a source renders as '—', never as a zero. */
-function StatsRow({ k, s, withBoxes, onEdit }: { k: string; s: BuffStat; withBoxes: boolean; onEdit: OnEdit }): JSX.Element {
+/** The row's fixed geometry (file header): one line, no wrapping, the hook's row height. */
+const ROW_SX = { height: STAT_ROW_HEIGHT, '& td': { py: 0, whiteSpace: 'nowrap' } } as const
+
+/** One stats row. Everything not stated by a source renders as '—', never as a zero. Memoized on
+ *  its stat object: the snapshot rebuilds only the rows that moved, and a search or a scroll
+ *  must not redraw every row it keeps. */
+const StatsRow = memo(function StatsRow({ k, s, withBoxes, onEdit }: { k: string; s: BuffStat; withBoxes: boolean; onEdit: OnEdit }): JSX.Element {
   const est = rowEstimate(s)
   return (
-    <TableRow hover data-testid="buff-stats-row" data-spell={s.spell}>
+    <TableRow hover data-testid="buff-stats-row" data-spell={s.spell} sx={ROW_SX}>
       {/* THE SECOND PLACE TO CHECK A SPELL (JOS-168) — the same box the active card carries, on
           every mined line, which is what makes a buff that is not currently up reachable. The
           COLUMN exists only in opt-in mode (owner ruling 2026-08-17): off means no boxes anywhere,
@@ -123,9 +143,9 @@ function StatsRow({ k, s, withBoxes, onEdit }: { k: string; s: BuffStat; withBox
       </TableCell>
       <TableCell align="right">
         {s.n === 0 ? (
-          <Tooltip title="No cast→fade pair yet">
-            <span style={{ opacity: 0.5 }}>0</span>
-          </Tooltip>
+          <span style={{ opacity: 0.5 }} title="No cast→fade pair yet">
+            0
+          </span>
         ) : (
           s.n
         )}
@@ -139,12 +159,23 @@ function StatsRow({ k, s, withBoxes, onEdit }: { k: string; s: BuffStat; withBox
       </TableCell>
     </TableRow>
   )
+})
+
+/** The spacer rows that reserve the windowed rows' height (useWindowedRows; LootTables' PadRow). */
+function PadRow({ height, colSpan }: { height: number; colSpan: number }): JSX.Element | null {
+  if (height <= 0) return null
+  return (
+    <TableRow style={{ height }}>
+      <TableCell colSpan={colSpan} sx={{ p: 0, border: 0 }} />
+    </TableRow>
+  )
 }
 
-/** The dense per-spell stats table for ONE class, sorted by sample count. */
-function StatsTable({ rows, withBoxes, onEdit }: { rows: KeyedBuffStat[]; withBoxes: boolean; onEdit: OnEdit }): JSX.Element {
+/** The dense per-spell stats table for ONE class, sorted by sample count; `win` is its slice. */
+function StatsTable({ rows, withBoxes, onEdit, win }: { rows: KeyedBuffStat[]; withBoxes: boolean; onEdit: OnEdit; win: WindowedRows }): JSX.Element {
+  const colSpan = withBoxes ? 7 : 6
   return (
-    <Table size="small" sx={{ '& td, & th': { py: 0.5 } }}>
+    <Table size="small" stickyHeader sx={{ '& th': { py: 0.5 } }}>
       <TableHead>
         <TableRow>
           {withBoxes ? <TableCell padding="checkbox">on</TableCell> : null}
@@ -157,15 +188,18 @@ function StatsTable({ rows, withBoxes, onEdit }: { rows: KeyedBuffStat[]; withBo
         </TableRow>
       </TableHead>
       <TableBody>
-        {rows.map(({ key, s }) => (
+        <PadRow height={win.topPad} colSpan={colSpan} />
+        {rows.slice(win.start, win.end).map(({ key, s }) => (
           <StatsRow key={key} k={key} s={s} withBoxes={withBoxes} onEdit={onEdit} />
         ))}
+        <PadRow height={win.bottomPad} colSpan={colSpan} />
       </TableBody>
     </Table>
   )
 }
 
-/** One class's durations table, under its accent swatch. */
+/** One class's durations table, under its accent swatch, in its own scroll box (file header). The
+ *  windowing hook lives beside the box it measures (LootView's JOS-260 shape). */
 function StatsSection({
   cls,
   rows,
@@ -177,6 +211,8 @@ function StatsSection({
   withBoxes: boolean
   onEdit: OnEdit
 }): JSX.Element {
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const win = useWindowedRows({ count: rows.length, rowHeight: STAT_ROW_HEIGHT, scrollRef })
   return (
     <Box>
       <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
@@ -185,29 +221,44 @@ function StatsSection({
           {CLASS_LABEL[cls]}
         </Typography>
       </Stack>
-      <Paper variant="outlined" sx={{ p: 1, borderLeft: '3px solid', borderLeftColor: classAccent(cls) }}>
-        <StatsTable rows={rows} withBoxes={withBoxes} onEdit={onEdit} />
+      <Paper
+        ref={scrollRef}
+        variant="outlined"
+        data-testid="buff-stats-scroll"
+        sx={{ maxHeight: SECTION_MAX_HEIGHT, overflow: 'auto', borderLeft: '3px solid', borderLeftColor: classAccent(cls) }}
+      >
+        <StatsTable rows={rows} withBoxes={withBoxes} onEdit={onEdit} win={win} />
       </Paper>
     </Box>
   )
 }
 
+/** The duration choices this window read for its character (lib/characterEpoch.ts), so a
+ *  revisit paints with them instead of asking main again and rendering twice. */
+let heldDurations: Held<Record<string, BuffDurationOverride>> | null = null
+
 /**
- * The player's per-spell duration choices (fork issue #4): read once, and replaced by what main
- * stored after every save. Saves go through `setBuffDuration`, which merges on main.
+ * The player's per-spell duration choices (fork issue #4): read once per character, and replaced
+ * by what main stored after every save. Saves go through `setBuffDuration`, which merges on main.
  */
 function useBuffDurations(): {
   durations: Record<string, BuffDurationOverride>
   setDuration: (key: string, choice: BuffDurationOverride | undefined) => void
 } {
-  const [durations, setDurations] = useState<Record<string, BuffDurationOverride>>({})
+  const [durations, setDurations] = useState<Record<string, BuffDurationOverride>>(
+    () => heldNow(heldDurations) ?? {}
+  )
   useEffect(() => {
+    if (heldNow(heldDurations) !== undefined) return
+    const asked = characterEpoch()
     void window.eq.getBuffTrust().then((p) => {
+      heldDurations = holdFor(asked, p.durations)
       setDurations(p.durations)
     })
   }, [])
   const setDuration = useCallback((key: string, choice: BuffDurationOverride | undefined) => {
     void window.eq.setBuffDuration(key, choice).then((p) => {
+      heldDurations = holdFor(characterEpoch(), p.durations)
       setDurations(p.durations)
     })
   }, [])
