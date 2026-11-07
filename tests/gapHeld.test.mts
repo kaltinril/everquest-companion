@@ -2,7 +2,7 @@
 // where each copy was, the log's loot since it lands in the bags, its destroys come off. Fixtures only.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { gapHeld, heldCaption, heldChipLabel, heldIndex, heldLine, heldPickOf, heldPickText, heldTitle, heldWhere, isOwnExport, joinHeld, onlyHeld } from '../src/shared/gapHeld'
+import { gapHeld, heldCaption, heldChipLabel, heldIndex, heldLine, heldPickOf, heldPickText, heldSince, heldTitle, heldWhere, isOwnExport, joinHeld, onlyHeld } from '../src/shared/gapHeld'
 import type { GapRow } from '../src/shared/gaps'
 import type { OwnershipEntry, OwnershipRow } from '../src/shared/planner/ownership'
 import type { LootEvent } from '../src/shared/types'
@@ -135,4 +135,27 @@ test("A HOLDER CARRIES THE EXPORT'S OWN SPELLING AND SLOTS, SO AN ITEM THE LOG N
   assert.deepEqual(index.get('petamorph wand: gelatinous cube')?.[0]?.exported, { name: 'Petamorph Wand: Gelatinous Cube', slots: ['General 6-Slot3'] })
   // An item only the loot since the export shows has no export spelling.
   assert.equal(index.get('rat ear')?.[0]?.exported, undefined)
+})
+
+test('heldSince is the two posky folds after the instant in one pass, kept per (ledger, instant)', () => {
+  const row = (ts: number, item: string, extra: Partial<LootEvent> = {}): LootEvent => ({ ts, item, source: 'a rat', zone: 'Z', ...extra })
+  const loot: LootEvent[] = [
+    row(10, 'Bone Chips', { count: 3 }),
+    row(20, 'Bone Chips +2'),
+    row(30, 'Rusty Dagger', { disposition: 'sold' }),
+    row(40, 'Sphinx Claw', { disposition: 'combined' }),
+    row(50, 'bone chips', { disposition: 'destroyed', count: 2 }),
+    row(60, 'Wind Rune', { disposition: 'currency' }),
+    row(70, 'Dragon Scale', { disposition: 'hoard' }),
+    row(80, 'Sphinx Claw +1', { disposition: 'destroyed' }),
+    row(90, 'Petamorph Wand', { count: 2 })
+  ]
+  for (const at of [0, 15, 50, 85, 100]) {
+    const since = heldSince(loot, at)
+    assert.deepEqual(since.loot, computeHeldCountsAfter(loot, at), `loot since ${String(at)}`)
+    assert.deepEqual(since.destroyed, computeDestroyedAfter(loot, at), `destroyed since ${String(at)}`)
+    assert.equal(heldSince(loot, at), since, 'the same ledger and instant read the same answer back')
+  }
+  assert.notEqual(heldSince(loot, 15), heldSince(loot, 50))
+  assert.notEqual(heldSince([...loot], 15), heldSince(loot, 15), 'a new ledger object is folded again')
 })
