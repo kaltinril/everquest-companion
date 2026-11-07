@@ -2,6 +2,8 @@ import { useDeferredValue, useMemo } from 'react'
 import type { LootEvent } from '@shared/types'
 import { itemCountKey } from '../../lib/itemName'
 import { normalizeQuery } from '../../lib/search'
+import { kept, type Kept } from '../../lib/kept'
+import { characterEpoch } from '../../lib/characterEpoch'
 import type { InventoryRow } from '../inventory/reconcile'
 import { buildInvOnlyRows, filterLootEvents, groupLootRows, type GroupRow, type KeyedLoot } from './lootGrouping'
 import { selectInvOnly, showsInvOnly } from './ownedItems'
@@ -36,6 +38,20 @@ export interface LootRows {
   invByKey: Map<string, InventoryRow>
 }
 
+// THE LEDGER FOLDS OUTLIVE THE VIEW (lib/kept.ts, the 2026-11-06 renderer pass). The Loot tab
+// unmounts on every tab switch, and `useMemo` forgets with it, so each revisit re-keyed, re-filtered
+// and re-grouped the whole history (79-129 ms measured on an 11k-row ledger) for the rows it had
+// just been showing. The folds over the ledger are now module-scope slots keyed on the history's
+// identity (held across visits by useModule) and the character epoch, and on PRIMITIVES for the
+// per-mount inputs (the sort is read back from storage as a fresh object each mount). One Loot
+// view exists at a time, so one slot per question is the whole cache.
+const keyedSlot: Kept<KeyedLoot[]> = { last: null }
+const countKeysSlot: Kept<Set<string>> = { last: null }
+const invByKeySlot: Kept<Map<string, InventoryRow>> = { last: null }
+const invOnlySlot: Kept<InventoryRow[]> = { last: null }
+const eventsSlot: Kept<KeyedLoot[]> = { last: null }
+const groupedSlot: Kept<GroupRow[]> = { last: null }
+
 /**
  * Everything the Loot tables derive from the raw history + reconciled inventory. Split out
  * of the view because it is pure derivation: each step is memoized on exactly the inputs it
@@ -54,37 +70,36 @@ export function useLootRows({
   const deferredQuery = useDeferredValue(query)
   const q = normalizeQuery(deferredQuery)
 
+  const epoch = characterEpoch()
   // Precompute the lowercase + counting keys ONCE per history change (not per keystroke).
-  const keyed = useMemo<KeyedLoot[]>(
-    () => history.map((e) => ({ ...e, itemKey: e.item.toLowerCase(), countKey: itemCountKey(e.item) })),
-    [history]
+  const keyed = kept(keyedSlot, [history, epoch], () =>
+    history.map((e) => ({ ...e, itemKey: e.item.toLowerCase(), countKey: itemCountKey(e.item) }))
   )
 
   // countKey → reconciled inventory row, rebuilt ONCE per inventory change so the estimate
   // lookup stays O(1) per rendered row (the table is windowed; never scan per row).
-  const invByKey = useMemo(() => {
+  const invByKey = kept(invByKeySlot, [inventoryRows, epoch], () => {
     const m = new Map<string, InventoryRow>()
     for (const r of inventoryRows) m.set(r.key, r)
     return m
-  }, [inventoryRows])
+  })
 
   // Every counting key that appears in loot history, so "inventory-only" means exactly
   // "held per the export but never looted this epoch".
-  const lootCountKeys = useMemo(() => new Set(keyed.map((e) => e.countKey)), [keyed])
+  const lootCountKeys = kept(countKeysSlot, [keyed], () => new Set(keyed.map((e) => e.countKey)))
 
-  const invOnlySource = useMemo(
-    () => selectInvOnly(inventoryRows, lootCountKeys),
-    [inventoryRows, lootCountKeys]
+  const invOnlySource = kept(invOnlySlot, [inventoryRows, lootCountKeys], () =>
+    selectInvOnly(inventoryRows, lootCountKeys)
   )
 
-  const events = useMemo(() => filterLootEvents({ keyed, questOnly, q }), [keyed, q, questOnly])
+  const events = kept(eventsSlot, [keyed, q, questOnly], () => filterLootEvents({ keyed, questOnly, q }))
   // Re-sorting is the ONLY thing a sort change costs: the filter above it is memoized on the
   // query, so switching to "last looted" never re-runs the per-keystroke work.
   // The In-inventory column sorts on the same `net` its cell draws, joined by counting key.
-  const grouped = useMemo(() => {
+  const grouped = kept(groupedSlot, [events, sort.key, sort.dir, invByKey], () => {
     const invOf = (r: SortableLootRow): number => invByKey.get((r as GroupRow).countKey)?.net ?? 0
     return groupLootRows(events, sort, invOf)
-  }, [events, sort, invByKey])
+  })
 
   // The inventory-only tail is kept OUT of the default BROWSE so the Loot table stays a loot
   // table (the toolbar chip says how many are hiding) — but a SEARCH always reaches it, because a

@@ -587,30 +587,37 @@ export function useQuestTurnInWatch(opts: UseProgressOptions): void {
 /** The character name this window last heard (lib/characterEpoch.ts), so a remount starts from it instead of re-rendering on the ask. */
 let heldCharacter: Held<string | null> | null = null
 
-export function useProgress(opts?: UseProgressOptions): UseProgress {
+/** What the Loot ledger reads of the progress model: the reconciled inventory and its sources,
+ *  with no quest in it. `useProgress` is this plus the character and the quest fold. */
+export type InventoryRowsState = Pick<
+  UseProgress,
+  'lootHistory' | 'inventoryRows' | 'countSource' | 'setCountSource' | 'reloadInventory' | 'inventoryInfo'
+>
+
+/** The reconcile and everything it is built from — the half of `useProgress` both readers share. */
+interface ProgressCore extends InventoryRowsState {
+  progress: ProgressState | null
+  ledger: TurnInLedger
+  itemOverrides: ItemCountOverride[]
+  setItemOverride: UseProgress['setItemOverride']
+  net: Record<string, number>
+  lastLootedAt: Record<string, number>
+}
+
+/**
+ * THE RECONCILE, WITHOUT THE QUESTS (the 2026-11-06 renderer pass). The Loot tab shows no quest,
+ * but it read `useProgress`, which folds every Sky quest over the held counts on every mount and
+ * every loot push. `useInventoryRows` below is this core alone; `useProgress` adds the character
+ * and the quest fold for the Plane of Sky tab, which is the one surface that wants them.
+ */
+function useProgressCore(opts?: UseProgressOptions): ProgressCore {
   // One held copy per window (progressStore.ts): asked on mount, inventory reload and character
   // switch, kept current by main's pushes, dropped on a switch.
   const [progress, setProgress] = useHeldProgress()
-  const [character, setHeard] = useState<string | null>(() => heldNow(heldCharacter) ?? null)
-  const setCharacter = useCallback((name: string | null, asked = characterEpoch()) => {
-    heldCharacter = holdFor(asked, name)
-    setHeard(name)
-  }, [])
   // One pick per window (useCountSource.ts), so every instance of this hook follows the tab's.
   const countSource = useCountSource()
-
   const lootHistory = useModule<LootSnap>('loot') ?? EMPTY_LOOT
-
-  useEffect(() => {
-    const asked = characterEpoch()
-    void window.eq.getCharacter().then((c) => setCharacter(c?.name ?? null, asked))
-    return window.eq.onCharacter((c) => {
-      setCharacter(c?.name ?? null)
-    })
-  }, [setCharacter])
-
   const ledger = useTurnInLedger(progress, setProgress, opts?.onQuestComplete)
-  const { turnIns, detected, logCounts, recordTurnIn, undoTurnIn, resetTurnIns, turnInsReady } = ledger
 
   const reloadInventory = useCallback(async (): Promise<string> => {
     const res = await window.eq.reloadInventory()
@@ -645,11 +652,51 @@ export function useProgress(opts?: UseProgressOptions): UseProgress {
     lootHistory,
     progress,
     countSource,
-    turnIns,
-    detectedTurnIns: detected,
+    turnIns: ledger.turnIns,
+    detectedTurnIns: ledger.detected,
     trades: ledger.trades,
     overrides: itemOverrides
   })
+
+  return {
+    progress,
+    ledger,
+    lootHistory,
+    inventoryRows,
+    countSource,
+    setCountSource,
+    reloadInventory,
+    inventoryInfo: progress?.inventorySource,
+    itemOverrides,
+    setItemOverride,
+    net,
+    lastLootedAt
+  }
+}
+
+/** The reconciled inventory for a surface that shows no quest (the Loot ledger). */
+export function useInventoryRows(): InventoryRowsState {
+  const { lootHistory, inventoryRows, countSource, setCountSource, reloadInventory, inventoryInfo } = useProgressCore()
+  return { lootHistory, inventoryRows, countSource, setCountSource, reloadInventory, inventoryInfo }
+}
+
+export function useProgress(opts?: UseProgressOptions): UseProgress {
+  const core = useProgressCore(opts)
+  const { progress, ledger, itemOverrides, net, lastLootedAt } = core
+  const { turnIns, logCounts, recordTurnIn, undoTurnIn, resetTurnIns, turnInsReady } = ledger
+  const [character, setHeard] = useState<string | null>(() => heldNow(heldCharacter) ?? null)
+  const setCharacter = useCallback((name: string | null, asked = characterEpoch()) => {
+    heldCharacter = holdFor(asked, name)
+    setHeard(name)
+  }, [])
+
+  useEffect(() => {
+    const asked = characterEpoch()
+    void window.eq.getCharacter().then((c) => setCharacter(c?.name ?? null, asked))
+    return window.eq.onCharacter((c) => {
+      setCharacter(c?.name ?? null)
+    })
+  }, [setCharacter])
 
   const overridesByKey = useMemo(() => itemOverridesByKey(itemOverrides), [itemOverrides])
   // The DERIVED completion floor — the reward in your inventory export (issue #27) and the
@@ -670,18 +717,18 @@ export function useProgress(opts?: UseProgressOptions): UseProgress {
     quests,
     classes,
     progress,
-    lootHistory,
-    inventoryRows,
-    countSource,
-    setCountSource,
-    reloadInventory,
+    lootHistory: core.lootHistory,
+    inventoryRows: core.inventoryRows,
+    countSource: core.countSource,
+    setCountSource: core.setCountSource,
+    reloadInventory: core.reloadInventory,
     recordTurnIn,
     undoTurnIn,
     resetTurnIns,
     turnInsReady,
-    setItemOverride,
+    setItemOverride: core.setItemOverride,
     itemOverrides,
-    inventoryInfo: progress?.inventorySource,
+    inventoryInfo: core.inventoryInfo,
     achievementsInfo: progress?.achievementsSource,
     sharedItems: sharedItemsMap,
     ambiguousQuestNames: ambiguousNames

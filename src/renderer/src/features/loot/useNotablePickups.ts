@@ -17,6 +17,7 @@ import { isDestroyed } from '../../../../shared/lootDisposition'
 import { itemCountKey } from '../../lib/itemName'
 import { fetchItemMarks } from '../../lib/itemMarks'
 import { characterEpoch, heldNow, holdFor, type Held } from '../../lib/characterEpoch'
+import { kept, type Kept } from '../../lib/kept'
 
 const PROBE_LIMIT = 40
 
@@ -74,13 +75,16 @@ async function probe(toFetch: Recent[]): Promise<Map<string, ItemKnowledge>> {
 
 /** The notable records this window found for its character (lib/characterEpoch.ts), so a re-open paints with them. */
 let heldByKey: Held<Map<string, ItemKnowledge>> | null = null
+/** The recent-distinct walk, kept per ledger identity (lib/kept.ts): it ran on every render of
+ *  the Loot view, and a ledger whose tail is destroys or repeats walks far past forty rows. */
+const recentSlot: Kept<Recent[]> = { last: null }
 
 export function useNotablePickups(history: LootEvent[], dismissed: Set<string>): NotableState {
   const [byKey, setByKey] = useState<Map<string, ItemKnowledge>>(() => heldNow(heldByKey) ?? new Map())
   // A key already found is not asked again; the rest are re-asked once per mount, as before.
   const requested = useRef<Set<string>>(new Set(byKey.keys()))
   const recent = useRef<Recent[]>([])
-  recent.current = recentDistinct(history)
+  recent.current = kept(recentSlot, [history, characterEpoch()], () => recentDistinct(history))
   const recentKeys = recent.current.map((r) => r.key).join('|')
 
   useEffect(() => {
