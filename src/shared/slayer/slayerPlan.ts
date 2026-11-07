@@ -79,6 +79,27 @@ export interface SlayerMob {
   high: number | null
   /** the wiki says a kill lowers a faction (`mobFactions.json`); false when it says none or nothing */
   factionHit: boolean
+  /** the zones the page files the mob under, each resolved once (`SlayerPlace`) */
+  places: readonly SlayerPlace[]
+}
+
+/** One zone a page files a mob under, resolved once per catalog (whole-app review 2026-11-06:
+ *  `zoneKey` and the map-stem lookup ran ~5 times per (mob, zone) link per plan). */
+export interface SlayerPlace {
+  /** the page's spelling, without the closing period a page sometimes leaves on it (`Lake of Ill Omen.`) */
+  catalogName: string
+  /** the plan's zone key: the map stem when the zone table knows the zone, else the `zoneKey` fold */
+  key: string
+  short: ZoneShort | null
+  /** a place to go, not one of the catalog's placeholders (`isPlaceholder`) */
+  isPlace: boolean
+}
+
+function placeOf(raw: string): SlayerPlace {
+  const catalogName = raw.replace(/\.\s*$/, '')
+  const short = zoneShortNameFromCatalog(catalogName)
+  const key = zoneKey(catalogName)
+  return { catalogName, key: short ?? key, short, isPlace: !isPlaceholder(key) }
 }
 
 /** The number the text opens with, and the one a dash or `to` joins to it. */
@@ -112,7 +133,8 @@ export function slayerMobs(
     entry,
     facts: mobFacts(entry.name, raceOf(entry.page)),
     ...levelSpan(entry.level),
-    factionHit: hitsFaction(entry.page)
+    factionHit: hitsFaction(entry.page),
+    places: (entry.zones ?? []).map(placeOf)
   }))
 }
 
@@ -219,8 +241,7 @@ function planMob(mob: SlayerMob, targets: readonly SlayerTarget[]): PlanMob | nu
   }
 }
 
-function emptyZone(key: string, catalogName: string): PlanZone {
-  const short = zoneShortNameFromCatalog(catalogName)
+function emptyZone({ key, short, catalogName }: SlayerPlace): PlanZone {
   const name = (short === null ? undefined : zoneNameByShort().get(short)) ?? catalogName
   return { key, name, short, mobs: [], targets: [], spawns: 0, advances: 0, low: null, high: null, level: null }
 }
@@ -233,15 +254,10 @@ function addMob(zone: PlanZone, row: PlanMob, mob: SlayerMob): void {
   if (mob.high !== null) zone.high = zone.high === null ? mob.high : Math.max(zone.high, mob.high)
 }
 
-/** The zones a mob is filed under that are places and that the options keep, each without the
- *  closing period a page sometimes leaves on it (`Lake of Ill Omen.`). */
-function keptZones(entry: MobEntry, opts: PlanOptions): string[] {
-  return (entry.zones ?? [])
-    .map((z) => z.replace(/\.\s*$/, ''))
-    .filter((z) => {
-      if (isPlaceholder(zoneKey(z))) return false
-      return opts.outOfEra || eraVerdict([z]) !== 'out-of-era'
-    })
+/** The places a mob is filed under that the options keep: the era reading is taken at plan time,
+ *  because it reads the log's evidence (`PlanOptions.met`). */
+function keptPlaces(mob: SlayerMob, opts: PlanOptions): SlayerPlace[] {
+  return mob.places.filter((p) => p.isPlace && (opts.outOfEra || eraVerdict([p.catalogName]) !== 'out-of-era'))
 }
 
 function byRank(a: PlanZone, b: PlanZone): number {
@@ -262,9 +278,9 @@ export function planZones(
     if (!keptMob(mob, opts)) continue
     const row = planMob(mob, targets)
     if (row === null) continue
-    for (const catalogName of keptZones(mob.entry, opts)) {
-      const key = zoneShortNameFromCatalog(catalogName) ?? zoneKey(catalogName)
-      const zone = zones.get(key) ?? emptyZone(key, catalogName)
+    for (const place of keptPlaces(mob, opts)) {
+      const { key } = place
+      const zone = zones.get(key) ?? emptyZone(place)
       zones.set(key, zone)
       addMob(zone, row, mob)
       if (mob.low === null) continue
