@@ -33,6 +33,7 @@ use eqlog::jsstr::js_trim;
 use eqlog::names::{id_key, spell_canon_key};
 use regex::{Regex, RegexBuilder};
 use serde_json::Value;
+use std::collections::HashMap;
 
 /// What a def that names no cooldown gets.
 const DEFAULT_COOLDOWN_MS: i64 = 2000;
@@ -429,6 +430,36 @@ impl Rule {
         }
     }
 
+    /// The event kinds a match can come from, or `None` for a rule a line of any kind can match
+    /// (a `raw` regex). An `all` composite needs every condition on the one event, so its first
+    /// `event` condition pins the kind; an `any` is the union of its `event` conditions. The
+    /// string compare in `condition_matches` is untouched: this only decides which rules are
+    /// tried, and a kind the parser never spells reads as `Other`, which no event carries.
+    fn trigger_kinds(&self) -> Option<Vec<Kind>> {
+        let all = matches!(self.composite, Composite::All);
+        let mut kinds = Vec::new();
+        let mut raw = false;
+        for c in &self.conditions {
+            match c {
+                Condition::Event { kind, .. } => {
+                    kinds.push(Kind::parse(kind));
+                    if all {
+                        return Some(kinds);
+                    }
+                }
+                Condition::Raw(_) => raw = true,
+                Condition::Never => {}
+            }
+        }
+        // An `all` with no `event` condition, or an `any`: a raw condition reaches any line, and
+        // no condition at all (or only `app` ones) reaches none.
+        if raw {
+            None
+        } else {
+            Some(kinds)
+        }
+    }
+
     /// Everything this rule's match produced, resolved. `base` is the event's own best-effort spell,
     /// computed once per firing by the caller and refined here PER ALERT, because for the
     /// shared-message families which name is right depends on which alert matched.
@@ -510,6 +541,11 @@ pub struct RuleSet {
     /// list is the store's contract and carries the defs this evaluator compiled out too.
     defs: Vec<Value>,
     rules: Vec<Rule>,
+    /// Rule indices by the event kind that can reach them, ascending, and the indices a line of
+    /// any kind can reach (`Rule::trigger_kinds`). A live event tries its own kind's rules and
+    /// those, in index order, instead of every rule's matcher.
+    by_kind: HashMap<Kind, Vec<usize>>,
+    any_kind: Vec<usize>,
     /// Cooldown clock → last fire timestamp. `def.id` for an alert-scoped clock and
     /// `def.id\0<targetKey>` for a per-target one; one map holds both because a NUL can appear in
     /// no alert id and in no mob name. Bounded by [`COOLDOWN_KEY_CAP`], least-recently-fired first,
@@ -526,6 +562,41 @@ impl RuleSet {
     pub fn set_defs(&mut self, defs: Vec<Value>) {
         self.rules = defs.iter().filter_map(Rule::compile).collect();
         self.defs = defs;
+        self.by_kind.clear();
+        self.any_kind.clear();
+        for (i, rule) in self.rules.iter().enumerate() {
+            match rule.trigger_kinds() {
+                None => self.any_kind.push(i),
+                Some(kinds) => {
+                    for kind in kinds {
+                        let bucket = self.by_kind.entry(kind).or_default();
+                        if bucket.last() != Some(&i) {
+                            bucket.push(i);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// The rules a line of this kind can reach, in index order: its kind's bucket merged with the
+    /// any-kind list, both ascending and disjoint.
+    fn candidates(&self, kind: Kind) -> Vec<usize> {
+        let own: &[usize] = self.by_kind.get(&kind).map_or(&[], Vec::as_slice);
+        let any = &self.any_kind;
+        let mut out = Vec::with_capacity(own.len() + any.len());
+        let (mut i, mut j) = (0, 0);
+        while i < own.len() || j < any.len() {
+            let take_own = j >= any.len() || (i < own.len() && own[i] < any[j]);
+            if take_own {
+                out.push(own[i]);
+                i += 1;
+            } else {
+                out.push(any[j]);
+                j += 1;
+            }
+        }
+        out
     }
 
     /// The definitions the store pushed, for `snapshot()`.
@@ -561,7 +632,8 @@ impl RuleSet {
         let mut out = Vec::new();
         // Collected before the clocks are written because a rule borrow cannot outlive one.
         let mut hits: Vec<(usize, String, Hit)> = Vec::new();
-        for (i, rule) in self.rules.iter().enumerate() {
+        for i in self.candidates(ev.kind_of()) {
+            let rule = &self.rules[i];
             if let Some(hit) = rule.matches(ev) {
                 hits.push((i, rule.cooldown_key(ev), hit));
             }
@@ -642,13 +714,9 @@ impl RuleSet {
     /// Stamp a fire on clock `key`, keeping the map bounded and its iteration order
     /// least-recently-fired first (remove-then-insert re-inserts at the tail).
     fn note_fire(&mut self, key: &str, ts: i64) {
-        self.last_fire.remove(key);
-        self.last_fire.insert(key.to_owned(), ts);
+        self.last_fire.move_to_back(key, ts);
         if self.last_fire.len() > COOLDOWN_KEY_CAP {
-            let oldest = self.last_fire.keys().next().map(str::to_owned);
-            if let Some(k) = oldest {
-                self.last_fire.remove(&k);
-            }
+            self.last_fire.pop_front();
         }
     }
 

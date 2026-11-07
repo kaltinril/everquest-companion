@@ -316,11 +316,13 @@ impl MobFights {
         let weapon = !SKILL_VERBS.contains(&verb);
         let in_round = weapon && verb != BESIDE_ROUND;
         let tier = o.tier;
+        // The modifier list is built only for the lines that carry one.
         if in_round
-            && !ev
-                .arr_str("modifiers")
-                .iter()
-                .any(|m| OFF_ROUND.contains(m))
+            && (ev.arr_len("modifiers") == 0
+                || !ev
+                    .arr_str("modifiers")
+                    .iter()
+                    .any(|m| OFF_ROUND.contains(m)))
         {
             o.swing(ts, ev.str("target").unwrap_or(""));
         }

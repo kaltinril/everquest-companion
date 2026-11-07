@@ -90,18 +90,11 @@ impl AlertsModule {
         {
             return;
         }
-        // Re-insert so the iteration order stays least-recent-first for the eviction below.
-        self.spell_last_cast.remove(name);
-        self.spell_last_cast.insert(name.to_string(), ts);
+        // Re-inserted at the back so the iteration order stays least-recent-first for the
+        // eviction below.
+        self.spell_last_cast.move_to_back(name, ts);
         if self.spell_last_cast.len() > SPELL_CAST_CAP {
-            let oldest = self
-                .spell_last_cast
-                .iter()
-                .next()
-                .map(|(k, _)| k.to_string());
-            if let Some(k) = oldest {
-                self.spell_last_cast.remove(&k);
-            }
+            self.spell_last_cast.pop_front();
         }
         // Past both refusals, so the published recency map really moved.
         self.announce.changed(self.seq);

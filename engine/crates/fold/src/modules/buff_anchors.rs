@@ -28,7 +28,8 @@ use crate::modules::buffs_shapes::{
     caster_key, caster_trusted, spell_key, OWN_CAST_WINDOW_MS, QUICK_BUFF_WINDOW_MS, SELF_CASTER,
 };
 use eqlog::jsstr::js_trim;
-use eqlog::names::id_key;
+use eqlog::names::id_key_ref;
+use std::borrow::Cow;
 
 /// How long after YOUR OWN swing at a mob a cast-less landing on it may still be a proc of the
 /// weapon that swung. EQ stamps to the second and a proc lands in the swing's own second, so two
@@ -36,19 +37,42 @@ use eqlog::names::id_key;
 /// swinging, which is when a landing is somebody else's.
 pub const PROC_MELEE_WINDOW_MS: i64 = 2_000;
 
+/// How far behind the newest swing a target's last swing may fall before the sweep forgets it.
+/// `proc_evidence` reads a swing only inside `PROC_MELEE_WINDOW_MS` of the landing it vouches for,
+/// and a landing is asked at its own instant or a held one at most `HOLD_MS` earlier, so a swing
+/// this far behind the newest one can answer nothing unless the log's clock steps back ten minutes.
+const MELEE_KEEP_MS: i64 = 10 * 60 * 1_000;
+
+/// The map size that triggers a sweep; the next is set from what the sweep left, so a fight with
+/// more live targets than this is not swept on every swing.
+const MELEE_SWEEP_AT: usize = 256;
+
 /// The key the anchors join on: [`spell_key`] with every apostrophe folded to one glyph. The cast
 /// line and the DB spell the same name with different marks — `You begin singing Jaxan's Jig o`
 /// Vigor.` lands as `Jaxan's Jig o' Vigor` (measured on the owner's log: 0 of 248 sings anchored)
 /// — and the join is the ONLY place the two spellings meet. Every instance, stat and overlay key
 /// stays on `spell_key`, so nothing a client reads moves.
-fn anchor_key(spell: &str) -> String {
-    spell_key(spell)
+pub fn anchor_key(spell: &str) -> String {
+    anchor_key_of(&spell_key(spell)).into_owned()
+}
+
+/// The join key from a [`spell_key`] already in hand: borrowed when the fold changes nothing, which
+/// is nearly every spell name. The landing gate keys each candidate once this way.
+pub fn anchor_key_of(key: &str) -> Cow<'_, str> {
+    if !key
         .chars()
-        .map(|c| match c {
-            '`' | '\u{2018}' | '\u{2019}' | '\u{00B4}' => '\'',
-            c => c,
-        })
-        .collect()
+        .any(|c| matches!(c, '`' | '\u{2018}' | '\u{2019}' | '\u{00B4}'))
+    {
+        return Cow::Borrowed(key);
+    }
+    Cow::Owned(
+        key.chars()
+            .map(|c| match c {
+                '`' | '\u{2018}' | '\u{2019}' | '\u{00B4}' => '\'',
+                c => c,
+            })
+            .collect(),
+    )
 }
 
 /// One remembered cast line. `display` is the ranked name exactly as the log spelled it; the map is
@@ -110,8 +134,12 @@ pub struct CastAnchors {
     /// catalog is never consulted on its own (`itemClickies.ts` measured why — absence from an
     /// 11,375-page scrape is not evidence).
     proc_spells: std::collections::HashSet<String>,
-    /// Newest ts YOU landed a melee hit, per target key. Log state: cleared by `reset`.
+    /// Newest ts YOU landed a melee hit, per target key. Log state: cleared by `reset`. Bounded by
+    /// the sweep in `note_melee`: a session meets thousands of names and reads only the last few
+    /// seconds of them.
     melee: JsMap<i64>,
+    /// The `melee` size at which the next sweep runs.
+    melee_sweep_at: usize,
 }
 
 impl CastAnchors {
@@ -144,14 +172,29 @@ impl CastAnchors {
         self.proc_spells = spells.into_iter().map(|s| spell_key(&s)).collect();
     }
 
-    /// A swing YOU made at `target` — the swing a proc rides on.
+    /// A swing YOU made at `target` — the swing a proc rides on. The key is copied only for a
+    /// target not yet in the map, and the map is swept of targets whose last swing is
+    /// `MELEE_KEEP_MS` behind this one (see the constant for why that changes no answer).
     pub fn note_melee(&mut self, target: &str, ts: i64) {
-        self.melee.insert(id_key(target), ts);
+        let key = id_key_ref(target);
+        match self.melee.get_mut(&key) {
+            Some(last) => *last = ts,
+            None => self.melee.insert(key.into_owned(), ts),
+        }
+        if self.melee.len() >= self.melee_sweep_at.max(MELEE_SWEEP_AT) {
+            self.melee.retain(|_, &hit| ts - hit <= MELEE_KEEP_MS);
+            self.melee_sweep_at = (2 * self.melee.len()).max(MELEE_SWEEP_AT);
+        }
     }
 
     /// Switched on, and this spell is a combat effect of something you hold.
     pub fn is_held_proc(&self, spell: &str) -> bool {
-        self.proc_debuffs && self.proc_spells.contains(&spell_key(spell))
+        self.is_held_proc_key(&spell_key(spell))
+    }
+
+    /// [`CastAnchors::is_held_proc`] for a [`spell_key`] already in hand.
+    pub fn is_held_proc_key(&self, key: &str) -> bool {
+        self.proc_debuffs && self.proc_spells.contains(key)
     }
 
     /// Could the gate ever vouch for a landing with these candidates, given a swing? The test
@@ -169,11 +212,17 @@ impl CastAnchors {
     /// boundary later at most. A landing folded live never sees a later swing here — the swing has
     /// not been read yet — so the slack only reaches the replay (and a log clock stepping back).
     pub fn proc_evidence(&self, spell: &str, target: &str, ts: i64) -> bool {
-        if !self.is_held_proc(spell) {
+        self.proc_evidence_key(&spell_key(spell), &id_key_ref(target), ts)
+    }
+
+    /// [`CastAnchors::proc_evidence`] with the spell's [`spell_key`] and the target's identity
+    /// key already in hand.
+    pub fn proc_evidence_key(&self, spell_key: &str, target_key: &str, ts: i64) -> bool {
+        if !self.is_held_proc_key(spell_key) {
             return false;
         }
         self.melee
-            .get(&id_key(target))
+            .get(target_key)
             .is_some_and(|&hit| hit - ts <= SAME_SECOND_MS && ts - hit <= PROC_MELEE_WINDOW_MS)
     }
 
@@ -235,7 +284,12 @@ impl CastAnchors {
     /// `unnamed`, which the caller must not treat as narrowing. An unanchored landing produces
     /// nothing.
     pub fn attribute(&self, spell: &str, ts: i64) -> Option<Attribution> {
-        if let Some(a) = self.by_line.get(&anchor_key(spell)) {
+        self.attribute_key(&anchor_key(spell), ts)
+    }
+
+    /// [`CastAnchors::attribute`] for an [`anchor_key`] already in hand.
+    pub fn attribute_key(&self, key: &str, ts: i64) -> Option<Attribution> {
+        if let Some(a) = self.by_line.get(key) {
             // Re-checked against the CURRENT allowlist, so a name the user just removed stops
             // anchoring immediately rather than at the next cast.
             if ts >= a.ts && ts - a.ts <= OWN_CAST_WINDOW_MS && self.trusted(&a.caster) {
@@ -262,12 +316,22 @@ impl CastAnchors {
 
     /// True when this exact spell has a NAMED anchor in window — the candidate-narrowing test.
     pub fn named_anchor_for(&self, spell: &str, ts: i64) -> Option<Attribution> {
-        self.attribute(spell, ts).filter(|a| !a.unnamed)
+        self.named_anchor_for_key(&anchor_key(spell), ts)
+    }
+
+    /// [`CastAnchors::named_anchor_for`] for an [`anchor_key`] already in hand.
+    pub fn named_anchor_for_key(&self, key: &str, ts: i64) -> Option<Attribution> {
+        self.attribute_key(key, ts).filter(|a| !a.unnamed)
     }
 
     /// The newest ts YOU ever cast this line — the ambiguous-apply recency tiebreak.
     pub fn last_cast_ts(&self, spell: &str) -> Option<i64> {
-        self.ever_cast.get(&anchor_key(spell)).copied()
+        self.last_cast_ts_key(&anchor_key(spell))
+    }
+
+    /// [`CastAnchors::last_cast_ts`] for an [`anchor_key`] already in hand.
+    pub fn last_cast_ts_key(&self, key: &str) -> Option<i64> {
+        self.ever_cast.get(key).copied()
     }
 }
 
@@ -381,6 +445,24 @@ mod tests {
             1000 + PROC_MELEE_WINDOW_MS + 1
         ));
         assert!(!a.proc_evidence("Tashania", "a Kunark goblin", 1000 - SAME_SECOND_MS - 1));
+    }
+
+    /// The sweep forgets a target whose last swing is ten minutes behind the newest, and nothing
+    /// nearer: a swing inside the proc window still vouches after the sweep ran past it.
+    #[test]
+    fn the_melee_sweep_keeps_every_swing_a_landing_could_still_read() {
+        let mut a = CastAnchors::new();
+        a.set_proc_trust(true, ["Tashania".to_string()]);
+        a.note_melee("a stale rat", 0);
+        for i in 0..MELEE_SWEEP_AT as i64 {
+            a.note_melee(&format!("mob {i}"), MELEE_KEEP_MS + 1_000);
+        }
+        assert!(a.melee.len() <= MELEE_SWEEP_AT, "the stale swing was swept");
+        assert!(!a.proc_evidence("Tashania", "a stale rat", 1_000));
+        assert!(a.proc_evidence("Tashania", "mob 3", MELEE_KEEP_MS + 2_000));
+        // A map of live targets is left alone and the next sweep waits for it to double: the
+        // sweep ran at 256 with one stale entry, so the next is set at twice the 255 it left.
+        assert_eq!(a.melee_sweep_at, 2 * (MELEE_SWEEP_AT - 1));
     }
 
     /// `reset` clears the swings, which are log state, and keeps the gate, which is a preference.

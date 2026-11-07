@@ -255,18 +255,19 @@ impl MessageOverlayMiner {
 
     /// Record a candidate message line and associate it with the recent cast, but only when the
     /// anchor is unambiguous: exactly one distinct spell cast in the window (a recast counts as
-    /// one).
-    pub fn observe_message(&mut self, text: &str, ts: i64, role: &'static str) {
+    /// one). True when a count moved, which is the only thing that can change a served verdict;
+    /// `updatedAt` is read live by `build`, so it needs no announcement of its own.
+    pub fn observe_message(&mut self, text: &str, ts: i64, role: &'static str) -> bool {
         self.expire(ts);
         if ts > self.last_observed_ts {
             self.last_observed_ts = ts;
         }
         if self.recent_casts.is_empty() {
-            return;
+            return false;
         }
         let first = &self.recent_casts[0].spell_key;
         if self.recent_casts.iter().any(|c| &c.spell_key != first) {
-            return;
+            return false;
         }
         let cast = self.recent_casts.last().expect("non-empty");
         let (cast_key, cast_display) = (cast.spell_key.clone(), cast.spell_display.clone());
@@ -293,6 +294,13 @@ impl MessageOverlayMiner {
                 },
             ),
         }
+        true
+    }
+
+    /// The overlay's `updatedAt`, as `build` writes it: the log's clock, see `last_observed_ts`.
+    #[must_use]
+    pub fn updated_at(&self) -> String {
+        iso_utc(self.last_observed_ts)
     }
 
     /// Drop casts that have aged out of the association window.

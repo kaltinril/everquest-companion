@@ -89,6 +89,10 @@ pub struct BuffsModule {
     /// second copy rather than reaching through the shared borrow is what keeps `admit_landing` a
     /// plain function over immutable facts.
     facts: SpellFacts,
+    /// `stats.build_stats()` at a store version, handed back while the version stands: every write
+    /// to the store bumps it, so an equal reading is the same record, and what the memo saves is
+    /// sorting every key's samples again for a snapshot asked between two writes.
+    stats_at: RefCell<Option<(u64, serde_json::Map<String, Value>)>>,
     /// The `buffExpired` events synthesized while folding the current PRIMARY event, in emission
     /// order, waiting for the registry to take them.
     derived: Vec<Event<'static>>,
@@ -130,6 +134,7 @@ impl BuffsModule {
                 )],
             ))),
             facts,
+            stats_at: RefCell::new(None),
             derived: Vec::new(),
             cur_seq: 0,
             cur_ts: 0,
@@ -504,8 +509,20 @@ impl BuffsModule {
         let active = self.active_buffs();
         json!({
             "active": active,
-            "stats": stats.build_stats(),
+            "stats": self.stats_memo(stats),
         })
+    }
+
+    /// See the `stats_at` field.
+    fn stats_memo(&self, stats: &SpellStats) -> serde_json::Map<String, Value> {
+        if let Some((version, built)) = self.stats_at.borrow().as_ref() {
+            if *version == stats.version() {
+                return built.clone();
+            }
+        }
+        let built = stats.build_stats();
+        *self.stats_at.borrow_mut() = Some((stats.version(), built.clone()));
+        built
     }
 }
 
@@ -755,6 +772,11 @@ impl EqModule for BuffsModule {
 
     fn take_derived(&mut self) -> Vec<Event<'static>> {
         std::mem::take(&mut self.derived)
+    }
+
+    /// The one producer of derived events (`buffExpired`).
+    fn wants_derived(&self) -> bool {
+        true
     }
 
     fn as_defines(&mut self) -> Option<&mut dyn crate::Defines> {

@@ -51,6 +51,10 @@ impl MobSpecials {
         if attacker == "You" || attacker.ends_with(" pet") || is_player_shaped_name(attacker) {
             return false;
         }
+        // Most lines carry no modifier; the list is built only when there is one to read.
+        if ev.arr_len("modifiers") == 0 {
+            return false;
+        }
         let mods = ev.arr_str("modifiers");
         let mut changed = false;
         for (word, special) in SPECIALS {
