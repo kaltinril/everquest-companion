@@ -17,7 +17,7 @@
 use super::alerts_early::{BreakWatchers as _, EarlyWarnings};
 use super::alerts_rules::{Fire, RuleSet};
 use super::buff_timer_rows::BuffTimerRow;
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::jsmap::JsMap;
 use crate::{Defines, EqModule};
 use eqlog::jsstr::js_trim;
@@ -73,7 +73,7 @@ impl AlertsModule {
     /// Runs for replay events as well as live ones: the map describes the character, not the
     /// session.
     fn note_cast(&mut self, ev: &Event) {
-        if ev.kind() != "castBegin" {
+        if ev.kind_of() != Kind::CastBegin {
             return;
         }
         let name = js_trim(ev.str("spell").unwrap_or_default());
@@ -110,7 +110,7 @@ impl AlertsModule {
     /// `effect` is the unambiguous half of a poison proc: the two shared emotes are shared between
     /// strikes that AGREE on their effect, so 'slow' is Weakening Strike's landing and nothing else.
     fn note_poison_slow(&mut self, ev: &Event) {
-        if ev.kind() != "poisonProc" || ev.str("effect") != Some("slow") {
+        if ev.kind_of() != Kind::PoisonProc || ev.str("effect") != Some("slow") {
             return;
         }
         let ts = ev.ts();

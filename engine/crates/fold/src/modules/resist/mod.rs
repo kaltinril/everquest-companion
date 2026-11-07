@@ -56,7 +56,7 @@ use crate::event::{Event, Key, Kind};
 use crate::modules::consider::mob_key;
 use crate::EqModule;
 use cast_state::{Armed, ArmedCasts, CastState};
-use eqlog::names::{id_key, spell_canon_key, spell_rank};
+use eqlog::names::{id_key_ref, spell_canon_key, spell_rank};
 use ledger::{
     add_damage, iso_week_key, CasterKind, Family, ResistBucket, ResistLedgerStore, RowSpec,
 };
@@ -119,7 +119,7 @@ const SEP: char = '|';
 /// uses, so the identity compare answers almost every call and `id_key` is the fallback for shapes
 /// that reach here unnormalised. Ordered that way because this runs on every melee swing.
 fn is_self(name: &str) -> bool {
-    name == "You" || id_key(name) == "you"
+    name == "You" || id_key_ref(name) == "you"
 }
 
 /// One thing the log said, as this fold names it before the bucket pools it.
@@ -628,28 +628,30 @@ impl ResistFold {
     }
 
     fn on_damage(&mut self, ev: &Event, bucket: &mut ResistBucket) {
-        let attacker = ev.str(Key::Attacker).unwrap_or_default().to_string();
+        // Borrowed from the event: this runs on every damage line and most of them leave at the
+        // dtype test below.
+        let attacker = ev.str(Key::Attacker).unwrap_or_default();
         if attacker.is_empty() {
             return;
         }
-        let dtype = ev.str(Key::Dtype).unwrap_or_default().to_string();
-        let target = ev.str(Key::Target).unwrap_or_default().to_string();
+        let dtype = ev.str(Key::Dtype).unwrap_or_default();
+        let target = ev.str(Key::Target).unwrap_or_default();
         // A swing either way is melee contact, which is the only proxy for point-blank range a song
         // pulse gets (rule 3). A damage shield firing means the mob hit you, so it counts too.
         if dtype == "melee" || dtype == "ds" {
-            self.on_melee(&attacker, &target, ev.ts());
+            self.on_melee(attacker, target, ev.ts());
             // The behavioural guard runs whatever the songs are doing: a name you have landed damage
             // on is a mob, and that is what keeps a proper-named guard out of the player roster.
-            if is_self(&attacker) {
-                self.casters.note_struck(&target);
+            if is_self(attacker) {
+                self.casters.note_struck(target);
             }
             return;
         }
         if dtype != "spell" && dtype != "dot" {
             return;
         }
-        let kind = self.casters.kind_of(&attacker);
-        self.on_spell_damage(ev, &attacker, &target, &dtype, kind, bucket);
+        let kind = self.casters.kind_of(attacker);
+        self.on_spell_damage(ev, attacker, target, dtype, kind, bucket);
     }
 
     /// A spell or DoT line from somebody this fold is willing to learn from.

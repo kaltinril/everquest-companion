@@ -25,7 +25,7 @@
 
 use super::gaps_names::is_reward_chest;
 use super::gaps_offers::{Offer, Offers};
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::jsfn::item_base_name;
 use regex::Regex;
 use serde::ser::{Serialize, Serializer};
@@ -192,8 +192,8 @@ impl Details {
     }
 
     fn item(&mut self, ev: &Event) {
-        match ev.kind() {
-            "loot" => {
+        match ev.kind_of() {
+            Kind::Loot => {
                 // A chest payout is still looted, but the chest is no source (`is_reward_chest`).
                 let source = ev.str("source").filter(|s| !is_reward_chest(s));
                 self.sources.add(source.unwrap_or_default());
@@ -203,7 +203,7 @@ impl Details {
                     self.sales_copper += copper;
                 }
             }
-            "purchase" => {
+            Kind::Purchase => {
                 self.sources.add(ev.str("npc").unwrap_or_default());
                 if let Some((coin, copper)) = price_of(ev.raw(), " for ") {
                     self.paid.add(&coin);
@@ -215,15 +215,15 @@ impl Details {
     }
 
     fn mob(&mut self, ev: &Event) {
-        match ev.kind() {
+        match ev.kind_of() {
             // An item at any tier is one item (owner, 2026-10-19).
-            "loot" => self.drops.add(&item_base_name(ev.str("item").unwrap_or_default())),
-            "consider" => {
+            Kind::Loot => self.drops.add(&item_base_name(ev.str("item").unwrap_or_default())),
+            Kind::Consider => {
                 let level = ev.int("level").unwrap_or_default();
                 let faction = ev.str("faction").unwrap_or_default();
                 self.cons.add(&format!("L{level} {faction}"));
             }
-            "death" => {
+            Kind::Death => {
                 let killer = if ev.bool("bySelf") {
                     "you"
                 } else {
@@ -236,9 +236,9 @@ impl Details {
     }
 
     fn spell(&mut self, ev: &Event) {
-        match ev.kind() {
-            "castBegin" => self.casters.add("you"),
-            "otherCastBegin" => self.casters.add(ev.str("caster").unwrap_or_default()),
+        match ev.kind_of() {
+            Kind::CastBegin => self.casters.add("you"),
+            Kind::OtherCastBegin => self.casters.add(ev.str("caster").unwrap_or_default()),
             _ => {}
         }
     }

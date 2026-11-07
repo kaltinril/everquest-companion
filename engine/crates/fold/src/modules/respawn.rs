@@ -32,13 +32,13 @@
 //! fold it survives into `snapshot()`, so a recorder pins it to an instant derived from the log —
 //! the only way the pin means the same thing on both sides.
 
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::jsmap::JsMap;
 use crate::modules::respawn_learned::{LearnedStore, WikiSays};
 use crate::modules::respawn_seen::seen_names_of;
 use crate::modules::respawn_wiki::{resolve_respawn, wiki};
 use crate::EqModule;
-use eqlog::names::id_key;
+use eqlog::names::{id_key, id_key_ref};
 use serde::Serialize;
 use serde_json::{json, Value};
 
@@ -353,19 +353,21 @@ impl RespawnModule {
         if name.is_empty() {
             return;
         }
-        let key = id_key(name);
+        // Borrowed: the name is already its own key on nearly every line, and both refusals below
+        // are lookups.
+        let key = id_key_ref(name);
         if self.watch_of(&key).is_none() {
             // Not watched: only the learned evidence wants this line, and only for a mob that died in
             // this stay and has not shown life yet. Nothing is published for it (owner, 2026-10-25:
             // every mob's gap ends at its first sign of life, watched or not).
-            if self.awaiting.contains(&key) {
+            if self.awaiting.contains(key.as_ref()) {
                 self.first_sign(&key, ts);
             }
             return;
         }
         let id = format!("{}::{}", id_key(&self.zone), key);
         let Some(h) = self.history.get_mut(&id) else {
-            self.awaiting.remove(&key);
+            self.awaiting.remove(key.as_ref());
             return;
         };
         let base = base_of(h);
@@ -380,7 +382,7 @@ impl RespawnModule {
         }
         // Still awaiting inside the first minute: unwatched later, its gap ends at a sighting.
         if h.first_seen_ts.is_some() {
-            self.awaiting.remove(&key);
+            self.awaiting.remove(key.as_ref());
         }
         h.seen_ts = Some(ts);
         h.seen_via = Some(via);
@@ -719,8 +721,8 @@ impl EqModule for RespawnModule {
     }
 
     fn on_event(&mut self, ev: &Event, _live: bool) {
-        match ev.kind() {
-            "epoch" => {
+        match ev.kind_of() {
+            Kind::Epoch => {
                 // A character rebirth invalidates the live clocks and takes the learned gaps with
                 // them, because the gaps are recomputed by the same fold replaying past this line:
                 // nothing is lost that the log still states. Only knowledge the log CANNOT restate
@@ -730,9 +732,9 @@ impl EqModule for RespawnModule {
                 self.learned.clear();
                 self.rev += 1;
             }
-            "instanceCreate" => self.instance_created(ev),
-            "zone" => self.entered(ev),
-            "death" if is_counted_kill(ev) => {
+            Kind::InstanceCreate => self.instance_created(ev),
+            Kind::Zone => self.entered(ev),
+            Kind::Death if is_counted_kill(ev) => {
                 let name = ev.str("name").unwrap_or_default();
                 self.record_death(&id_key(name), name, ev.ts());
             }
@@ -742,10 +744,8 @@ impl EqModule for RespawnModule {
         // here (`respawn_seen.rs`), so a corpse can never mark its own row seen.
         if let Some((names, via)) = seen_names_of(ev) {
             let ts = ev.ts();
-            let owned: Vec<Option<String>> =
-                names.into_iter().map(|n| n.map(str::to_string)).collect();
-            for name in owned {
-                self.mark_seen(name.as_deref(), via, ts);
+            for name in names {
+                self.mark_seen(name, via, ts);
             }
         }
     }

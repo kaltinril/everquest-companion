@@ -528,21 +528,18 @@ fn ingest_combat(st: &mut EngineState, ev: &Event) -> bool {
             routing::route_heal(st, &line);
             deathrecap::note_heal(st, &line);
             fold_heal_analytics(st, &line, ev.bool(Key::OverTime));
-            let spell = match &line.spell {
-                Some(s) => format!(" ({s})"),
-                None => String::new(),
-            };
-            st.log(
-                line.ts,
-                "heal",
-                "info",
+            st.log_lazy(line.ts, "heal", "info", || {
+                let spell = match &line.spell {
+                    Some(s) => format!(" ({s})"),
+                    None => String::new(),
+                };
                 format!(
                     "+ {} → {} {}{spell}",
                     line.healer.as_deref().unwrap_or("?"),
                     line.target,
                     line.amount
-                ),
-            );
+                )
+            });
             true
         }
         // A heal with no amount cannot enter the proc model — a 0-amount "Mend proc" is a fabricated
@@ -710,10 +707,12 @@ fn damage_origin(st: &mut EngineState, ev: &DamageEvent) -> Option<SpellOrigin> 
     if ev.amount <= 0 {
         return None;
     }
-    if !proc_eligible_damage(ev.dtype, &ev.skill) {
+    // The attacker test before the rain-spell one: both are pure, and the second folds a spell
+    // name through a regex.
+    if id_key_ref(ev.attacker) != "you" {
         return None;
     }
-    if id_key_ref(ev.attacker) != "you" {
+    if !proc_eligible_damage(ev.dtype, &ev.skill) {
         return None;
     }
     if routing::classify(st, ev.attacker, ev.target) != Attribution::OutYou {

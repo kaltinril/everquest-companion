@@ -21,7 +21,7 @@ pub mod intervals;
 pub mod levels;
 pub mod score;
 
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::EqModule;
 use evidence::{class_observation, tables_ready, who_classes, ClassObservation, SpellClassIndex};
 use intervals::{build_intervals, ComboCorrection, IntervalInput};
@@ -99,7 +99,7 @@ impl EqModule for ComboModule {
     }
 
     fn on_event(&mut self, ev: &Event, _live: bool) {
-        if ev.kind() == "epoch" {
+        if ev.kind_of() == Kind::Epoch {
             // Character rebirth: observations before the boundary belong to a dead character. Note
             // what is deliberately absent — a level-regression epoch trigger. A level drop is a
             // loadout swap, which is the whole point of this module.
@@ -108,7 +108,7 @@ impl EqModule for ComboModule {
             self.corrections.retain(|c| c.start_ts >= launch_ms);
             return;
         }
-        if ev.kind() == "level" {
+        if ev.kind_of() == Kind::Level {
             self.levels.push(LevelPoint {
                 ts: ev.ts(),
                 level: ev.int("level").unwrap_or(0),
@@ -116,7 +116,7 @@ impl EqModule for ComboModule {
             self.mark_stale();
             return;
         }
-        if ev.kind() == "selfWho" {
+        if ev.kind_of() == Kind::SelfWho {
             let classes = who_classes(ev);
             if !classes.is_empty() {
                 self.who_rows.push(WhoRow {

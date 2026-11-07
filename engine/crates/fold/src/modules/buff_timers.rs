@@ -910,12 +910,12 @@ impl EqModule for BuffTimersModule {
     fn on_event(&mut self, ev: &Event, _live: bool) {
         // A 30-minute event-time hole is past any hold this module can carry (the same boundary the
         // buffs model uses), and a character epoch is a different character entirely.
-        if ev.kind() == "epoch" {
+        if ev.kind_of() == Kind::Epoch {
             self.clear_all();
             return;
         }
         // An offline gap changes nothing here — see the module header.
-        if ev.kind() == "offlineGap" {
+        if ev.kind_of() == Kind::OfflineGap {
             return;
         }
         let ts = ev.ts();

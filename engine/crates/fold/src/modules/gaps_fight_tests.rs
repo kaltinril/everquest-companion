@@ -1,7 +1,7 @@
 //! The fight numbers on log lines as the game prints them, read by the real parser.
 
 use super::MobFights;
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use serde_json::{json, Value};
 
 /// Folds the lines as gaps.rs hands them over: the zone, the combat lines, the deaths.
@@ -16,10 +16,10 @@ fn fold_into(f: &mut MobFights, text: &str) {
 }
 
 fn feed(f: &mut MobFights, ev: &Event) {
-    match ev.kind() {
-        "zone" => f.zone(ev.str("zone")),
-        "damage" | "miss" => f.event(ev),
-        "death" => f.death(ev),
+    match ev.kind_of() {
+        Kind::Zone => f.zone(ev.str("zone")),
+        Kind::Damage | Kind::Miss => f.event(ev),
+        Kind::Death => f.death(ev),
         _ => {}
     }
 }

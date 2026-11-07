@@ -25,7 +25,7 @@
 //! the ingest, the shape `take_fires` and `take_derived` already are. The card is a thing that
 //! happened and the ring is a state, which is why the two are folded side by side.
 
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::knowledge::{Knowledge, OwnLoot, SeenDrop};
 use crate::EqModule;
 use eqlog::jsstr::{js_trim, JS_S};
@@ -340,19 +340,19 @@ impl EqModule for ConsiderModule {
     /// draws one.
     fn on_event(&mut self, ev: &Event, live: bool) {
         self.seq = ev.seq();
-        match ev.kind() {
+        match ev.kind_of() {
             // Character rebirth: everything before the boundary belongs to a dead same-name
             // character, the loot history included, which would otherwise credit this character
             // with drops it never saw. The ZONE is not cleared: the character has not moved.
-            "epoch" => {
+            Kind::Epoch => {
                 self.ring.clear();
                 self.own_loot.reset();
                 self.announce.changed(self.seq);
             }
             // Neither of the next two publishes anything: `zone` is the label the next row carries,
             // and the own-loot index appears in no snapshot.
-            "zone" => self.zone = ev.str("zone").map(str::to_string),
-            "loot" => {
+            Kind::Zone => self.zone = ev.str("zone").map(str::to_string),
+            Kind::Loot => {
                 // `You successfully destroyed 38 Bone Chips.` rides the loot lane and names no mob,
                 // and this index answers "what has this MOB handed me". Refused at the decision.
                 if ev.str("disposition") == Some("destroyed") {
@@ -366,7 +366,7 @@ impl EqModule for ConsiderModule {
                     ev.int("count").unwrap_or(1),
                 );
             }
-            "consider" => {
+            Kind::Consider => {
                 self.fold_consider(ev, live);
                 // Beside the fold rather than inside it, because the two answer different questions:
                 // `fold_consider` maintains a state, and this is a thing that happened.

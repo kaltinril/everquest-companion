@@ -28,7 +28,7 @@
 //! relog reaches the hygiene sweep at the login line with no hold in place, and the gap that would
 //! have rewound the clocks is drained one event later — culling the row the pause exists for.
 
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::modules::buffs_shapes::SESSION_GAP_MS;
 use crate::session::{in_world_evidence, OFFLINE_GAP_MIN_MS};
 
@@ -91,7 +91,7 @@ impl SessionFrame {
         if self.from_ts == 0 {
             return None;
         }
-        if ev.kind() == "sessionStart" {
+        if ev.kind_of() == Kind::SessionStart {
             self.explained = true;
             return None;
         }

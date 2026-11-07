@@ -166,3 +166,29 @@ table above: the miss classifier's regex (485 ms), the other classifiers' prefil
 (588 ms), the resist and respawn modules, the NDJSON string per event, and the encounter
 timeline's `Vec::remove(0)` past 8,000 events (small here, a memmove per line in a very long
 fight).
+
+## Third pass, 2026-11-06: from the whole-app review
+
+Items 8-13 and 20 of [2026-11-06-whole-app-review.md](2026-11-06-whole-app-review.md). Same
+corpus, same functional check (event stream byte-identical, every module snapshot deep-equal,
+both logs).
+
+- **Fat LTO measured and dropped.** Three paired runs of the same code with and without
+  `lto = "fat", codegen-units = 1`: fold 6,517 / 6,549 / 6,243 ms without, 6,425 / 6,717 /
+  6,322 ms with. Noise. The build went from 31 s to 1 m 46 s, which every engine rebuild and the
+  dev launcher would pay, so it is not kept. `#[inline]` on `Key::parse` and `Kind::parse` is.
+- **String kinds to the discriminant.** 55 `ev.kind()` string compares and matches across the
+  modules, the session detector and the epoch detector now use `ev.kind_of()`; the session
+  detector's `FIRST_PERSON_KINDS` is a `&[Kind]`. Modules + combat 5.5 to 4.8 s; detectors 165 to
+  100 ms; progression 65 to 50 ms.
+- **respawn borrows its names** (`respawn_seen.rs`: a two-slot array instead of a `Vec`, no owned
+  copy, `id_key_ref`): 430 to 250 ms.
+- **resist borrows on the damage path** (`on_damage`, `is_self`, `note_struck`, `kind_of`): 660
+  to 570 ms.
+- **Proc windows and state bumps**: `WindowAccum::ensure` keeps the last minute's key and only
+  inserts a state key it does not hold; `bump_state` hashes once. The rain-spell test folds one
+  canon key instead of 24, and the attacker test runs before it. Combat 2.7 to 2.35 s.
+- The heal path's ring line goes through `log_lazy`.
+
+Quiet machine, back to back, the 68 MB log: before this pass (branch `c64e7f137`) 6,679 /
+7,638 ms; after 6,044 / 6,258 ms. Against the original trunk the fold is 14.5 s to ~6.1 s.

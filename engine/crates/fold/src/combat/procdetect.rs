@@ -23,6 +23,7 @@
 //! casts and procs occupies two rows, and `lane_canon_key` strips the marker at every join.
 
 use std::collections::{HashMap, HashSet};
+use std::sync::OnceLock;
 
 use crate::jsmap::JsMap;
 use eqlog::names::spell_canon_key;
@@ -233,8 +234,10 @@ const RAIN_SPELLS: [&str; 23] = [
 /// True when a spell delivers its damage in waves from one cast. Rank-blind, because a damage line
 /// prints the rank-less name while the cast line may carry the numeral.
 pub fn is_rain_spell(spell: &str) -> bool {
-    let key = spell_canon_key(spell);
-    RAIN_SPELLS.iter().any(|r| spell_canon_key(r) == key)
+    // The table's keys once, not 23 regex folds per outgoing spell line.
+    static KEYS: OnceLock<HashSet<String>> = OnceLock::new();
+    let keys = KEYS.get_or_init(|| RAIN_SPELLS.iter().map(|r| spell_canon_key(r)).collect());
+    keys.contains(&spell_canon_key(spell))
 }
 
 /// Damage lines eligible for cast-less detection: spell effects that are not rain waves.

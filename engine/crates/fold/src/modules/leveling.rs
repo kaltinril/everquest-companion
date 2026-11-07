@@ -4,7 +4,7 @@
 //! The potion is deliberately not persisted: the quaff is a log line, so a relaunch replays it and
 //! re-derives the charge state exactly.
 
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::EqModule;
 use serde::Serialize;
 use serde_json::{json, Value};
@@ -74,38 +74,35 @@ impl EqModule for LevelingModule {
         self.seq = ev.seq();
         // One bump for five arms, ahead of the match rather than inside each, because the arms are
         // exactly the mutations: four appends and a clear.
-        let published = matches!(
-            ev.kind(),
-            "epoch" | "level" | "aaGain" | "aaSpend" | "aaPotion"
-        );
+        let published = matches!(ev.kind_of(), Kind::Epoch | Kind::Level | Kind::AaGain | Kind::AaSpend | Kind::AaPotion);
         if published {
             self.announce.changed(self.seq);
         }
-        match ev.kind() {
+        match ev.kind_of() {
             // Character rebirth: the prior epoch's levels and AA belong to a dead same-name
             // character, and the AA identity (allocated/unspent/earned) holds only without them.
-            "epoch" => {
+            Kind::Epoch => {
                 self.levels.clear();
                 self.aa_gains.clear();
                 self.aa_spends.clear();
                 self.aa_potions.clear();
             }
-            "level" => self.levels.push(LevelRow {
+            Kind::Level => self.levels.push(LevelRow {
                 ts: ev.ts(),
                 level: ev.int("level").unwrap_or(0),
             }),
-            "aaGain" => self.aa_gains.push(AaGainRow {
+            Kind::AaGain => self.aa_gains.push(AaGainRow {
                 ts: ev.ts(),
                 amount: ev.int("amount").unwrap_or(0),
                 now_have: ev.int("nowHave").unwrap_or(0),
             }),
-            "aaSpend" => self.aa_spends.push(AaSpendRow {
+            Kind::AaSpend => self.aa_spends.push(AaSpendRow {
                 ts: ev.ts(),
                 ability: ev.str("ability").unwrap_or_default().to_string(),
                 cost: ev.int("cost").unwrap_or(0),
                 rank: ev.int("rank"),
             }),
-            "aaPotion" => self.aa_potions.push(AaPotionRow { ts: ev.ts() }),
+            Kind::AaPotion => self.aa_potions.push(AaPotionRow { ts: ev.ts() }),
             _ => {}
         }
     }

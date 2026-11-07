@@ -9,10 +9,12 @@
 //! log shows the first sign of life is a cast or a swing in every cycle, and the emotes follow.
 //! NPC targeting is never printed (`Targeted (NPC)` does not occur in that log).
 
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::message_overlay::message_text_of;
 
-type Names<'e> = Vec<Option<&'e str>>;
+/// At most two names per line, padded with `None`, which `mark_seen` ignores — so a line's names
+/// cost no allocation (the module reads every line of the log).
+type Names<'e> = [Option<&'e str>; 2];
 
 /// The names an event states as alive, and which family stated them. The groups ARE the
 /// `RespawnSeenVia` values, so the factoring and the vocabulary agree.
@@ -23,37 +25,39 @@ pub fn seen_names_of<'e>(ev: &'e Event<'_>) -> Option<(Names<'e>, &'static str)>
     if let Some(names) = spell_names(ev) {
         return Some((names, "spell"));
     }
-    match ev.kind() {
-        "consider" => Some((vec![ev.str("mob")], "consider")),
+    match ev.kind_of() {
+        Kind::Consider => Some(([ev.str("mob"), None], "consider")),
         // A mez / root / charm landed on it, broke on it, or wore off it.
-        "cc" | "ccWake" | "charm" | "uncharm" => Some((vec![ev.str("mob")], "hold")),
-        "petSay" => Some((vec![ev.str("name")], "say")),
-        "unknown" => speech_names(message_text_of(ev.raw())).map(|names| (names, "say")),
+        Kind::Cc | Kind::CcWake | Kind::Charm | Kind::Uncharm => {
+            Some(([ev.str("mob"), None], "hold"))
+        }
+        Kind::PetSay => Some(([ev.str("name"), None], "say")),
+        Kind::Unknown => speech_names(message_text_of(ev.raw())).map(|names| (names, "say")),
         _ => None,
     }
 }
 
 fn combat_names<'e>(ev: &'e Event<'_>) -> Option<Names<'e>> {
-    match ev.kind() {
+    match ev.kind_of() {
         // Somebody swung at it, or it swung at somebody. `attacker` is null on caster-less DoT lines.
-        "damage" | "miss" => Some(vec![ev.str("attacker"), ev.str("target")]),
-        "heal" => Some(vec![ev.str("healer"), ev.str("target")]),
+        Kind::Damage | Kind::Miss => Some([ev.str("attacker"), ev.str("target")]),
+        Kind::Heal => Some([ev.str("healer"), ev.str("target")]),
         // Its blow was absorbed.
-        "mitigation" => Some(vec![ev.str("source")]),
+        Kind::Mitigation => Some([ev.str("source"), None]),
         // What it killed is a corpse; the killer is not.
-        "death" | "playerDeath" => Some(vec![ev.str("killer")]),
+        Kind::Death | Kind::PlayerDeath => Some([ev.str("killer"), None]),
         _ => None,
     }
 }
 
 fn spell_names<'e>(ev: &'e Event<'_>) -> Option<Names<'e>> {
-    match ev.kind() {
+    match ev.kind_of() {
         // A spell named it — as a resister, as a caster, or as the thing something landed on.
-        "resist" => Some(vec![ev.str("caster"), ev.str("target")]),
-        "otherCastBegin" => Some(vec![ev.str("caster")]),
-        "buffApply" | "poisonProc" => Some(vec![ev.str("target")]),
+        Kind::Resist => Some([ev.str("caster"), ev.str("target")]),
+        Kind::OtherCastBegin => Some([ev.str("caster"), None]),
+        Kind::BuffApply | Kind::PoisonProc => Some([ev.str("target"), None]),
         // `<Name> feels/looks/seems …`; the subject is `self` for the player's own.
-        "spellEmote" => Some(vec![ev.str("subject").filter(|s| *s != "self")]),
+        Kind::SpellEmote => Some([ev.str("subject").filter(|s| *s != "self"), None]),
         _ => None,
     }
 }
@@ -69,7 +73,7 @@ fn speech_names(text: &str) -> Option<Names<'_>> {
         }
     };
     let said = said.strip_suffix('\'').unwrap_or(said);
-    Some(vec![speaker, said.strip_prefix("Hail, ")])
+    Some([speaker, said.strip_prefix("Hail, ")])
 }
 
 #[cfg(test)]
@@ -80,15 +84,15 @@ mod tests {
     fn speech_names_cut_the_speaker_and_the_hailed_name_exactly() {
         assert_eq!(
             speech_names("Hoptor Thaggelum says, 'You will die.'"),
-            Some(vec![Some("Hoptor Thaggelum"), None])
+            Some([Some("Hoptor Thaggelum"), None])
         );
         assert_eq!(
             speech_names("You say, 'Hail, Hoptor Thaggelum'"),
-            Some(vec![None, Some("Hoptor Thaggelum")])
+            Some([None, Some("Hoptor Thaggelum")])
         );
         assert_eq!(
             speech_names("Revilus says, 'Hail, a reanimated hand'"),
-            Some(vec![Some("Revilus"), Some("a reanimated hand")])
+            Some([Some("Revilus"), Some("a reanimated hand")])
         );
         assert_eq!(speech_names("Hoptor Thaggelum staggers."), None);
     }

@@ -15,7 +15,7 @@
 //! BOUNDED, AND NEVER PERSISTED. A `/who all` in a city is hundreds of strangers; the memory holds
 //! the newest `CAPACITY` names and lives only as long as the fold does.
 
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::message_overlay::message_text_of;
 use eqlog::names::id_key;
 use regex::Regex;
@@ -66,7 +66,7 @@ impl WhoSeen {
     /// Read one event. Answers the canonical key of the player a `/who` row named, so the caller
     /// can tell whether a member it publishes was restated.
     pub fn observe(&mut self, ev: &Event) -> Option<String> {
-        if ev.kind() != "unknown" || !ev.raw().contains("ZONE: ") {
+        if ev.kind_of() != Kind::Unknown || !ev.raw().contains("ZONE: ") {
             return None;
         }
         let m = self.row.captures(message_text_of(ev.raw()))?;

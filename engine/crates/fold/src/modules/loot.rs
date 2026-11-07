@@ -8,7 +8,7 @@
 //! through `JSON.stringify`, which drops a key whose value is `undefined`. `zone` is the module's
 //! own state (the last zone line seen) and is absent for rows folded before the scan reached one.
 
-use crate::event::Event;
+use crate::event::{Event, Kind};
 use crate::EqModule;
 use serde::Serialize;
 use serde_json::{json, Value};
@@ -125,18 +125,18 @@ impl EqModule for LootModule {
 
     fn on_event(&mut self, ev: &Event, _live: bool) {
         self.seq = ev.seq();
-        match ev.kind() {
+        match ev.kind_of() {
             // Character rebirth: loot before the boundary is a dead same-name character's. `zone`
             // is kept — it is world state, not character-scoped.
-            "epoch" => {
+            Kind::Epoch => {
                 self.loot.clear();
                 self.revision += 1;
                 self.announce.changed(self.seq);
             }
             // Not a change to published state: `zone` is the label the NEXT row will carry, and
             // `snapshot()` publishes `self.loot` alone.
-            "zone" => self.zone = ev.str("zone").map(str::to_string),
-            "loot" => {
+            Kind::Zone => self.zone = ev.str("zone").map(str::to_string),
+            Kind::Loot => {
                 self.loot.push(LootRow {
                     ts: ev.ts(),
                     item: ev.str("item").unwrap_or_default().to_string(),
