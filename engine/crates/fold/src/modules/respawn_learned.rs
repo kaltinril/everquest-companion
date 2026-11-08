@@ -63,6 +63,14 @@ pub struct RespawnLearned {
     wiki_page: Option<String>,
 }
 
+/// The smaller of two optional gaps; one side absent is the other.
+pub fn least(a: Option<i64>, b: Option<i64>) -> Option<i64> {
+    match (a, b) {
+        (Some(a), Some(b)) => Some(a.min(b)),
+        (a, b) => a.or(b),
+    }
+}
+
 /// The store, by row id (`<zone key>::<mob key>`), in order of last learning.
 #[derive(Debug, Clone, Default)]
 pub struct LearnedStore {
@@ -105,6 +113,22 @@ impl LearnedStore {
             };
             self.map.remove(&oldest);
         }
+    }
+
+    /// One mob's gaps across every place `same_zone` admits: the smallest, and how many. The
+    /// estimate reads from here (`respawn_places.rs pooled_gaps`) because the history forgets a
+    /// place (a closed private instance, the 800-mob LRU) while this keeps what it taught.
+    pub fn pooled(&self, key: &str, same_zone: impl Fn(&str) -> bool) -> (Option<i64>, i64) {
+        let mut min: Option<i64> = None;
+        let mut count: i64 = 0;
+        for e in self.map.values() {
+            if e.key != key || !same_zone(&e.zone) {
+                continue;
+            }
+            count += e.gaps.len() as i64;
+            min = least(min, e.gaps.iter().copied().min());
+        }
+        (min, count)
     }
 
     /// Every mob with a gap, most recently learned first, each with what its wiki page says.
