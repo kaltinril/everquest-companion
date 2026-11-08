@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-07T08:17:11.833Z",
+  "scrapedAt": "2026-11-08T11:54:05.929Z",
   "source": "eqlwiki.com — Category:NPCs/Named Mobs/Merchants/Raid Encounters ∪ embeddedin Template:Namedmobpage/MerchantPage, filtered to pages opening a mob template + recentchanges delta (scripts/scrape-delta.mts)",
   "mobs": [
     {
@@ -40627,7 +40627,10 @@
       ],
       "drops": [
         "Cat Skull Cap",
-        "Blackened Iron Gloves"
+        "Blackened Iron Gloves",
+        "Gossamer Collar",
+        "Gossamer Sash",
+        "Gossamer Veil"
       ],
       "factions": [
         "Pickclaw Goblins",
@@ -43348,7 +43351,10 @@
       "factionAmounts": [
         "-2"
       ],
-      "image": "npc_a_reanimated_servant.png"
+      "image": "npc_a_reanimated_servant.png",
+      "commonDrops": [
+        "Ruby"
+      ]
     },
     {
       "page": "A reconstructed justiciar",
@@ -55804,7 +55810,8 @@
         "Ringmail Gloves",
         "Fine Steel Long Sword",
         "Ringmail Mantle",
-        "Fine Steel Morning Star"
+        "Fine Steel Morning Star",
+        "Ringmail Bracelet"
       ]
     },
     {
