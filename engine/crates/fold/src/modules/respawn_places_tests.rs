@@ -133,6 +133,39 @@ fn another_zones_instance_notice_keeps_this_zones_private_clock() {
     assert_eq!(m.watch_rows(NOW).len(), 1);
 }
 
+/// A gap learned in a private instance still times the clock once the next instance of the zone is
+/// created (owner, 2026-11-07: the Nektropos Castle nameds respawned in 21-24 minutes in the Nov 5
+/// instance; two days on, in a fresh instance, every clock ran from the open world's hour-long gap
+/// alone, "your kills (1 gap)"). Closing an instance drops its clocks, never what it taught.
+#[test]
+fn a_gap_learned_in_a_closed_private_instance_still_times_the_next_one() {
+    let mut m = RespawnModule::new(NOW, watching_without_a_number());
+    // The open +4: a kill, and an hour on, another. A one-hour bound.
+    m.on_event(&ev(&zone_named(T_ZONE, "Nektropos Castle 4 (Refined)")), false);
+    m.on_event(&ev(&death(1, T_DEATH)), false);
+    m.on_event(&ev(&death(2, T_DEATH + 3_600_000)), false);
+    // A private +4 instance: a kill, and the respawn killed 22 minutes on.
+    let t_inst = T_DEATH + 3_700_000;
+    m.on_event(&ev(&instance_created(t_inst - 1_000, "Nektropos Castle", 709)), false);
+    m.on_event(&ev(&zone_named(t_inst, "Nektropos Castle 4 (Refined)")), false);
+    m.on_event(&ev(&death(3, t_inst + 60_000)), false);
+    m.on_event(&ev(&death(4, t_inst + 60_000 + 1_320_000)), false);
+    // Two days on, the zone's next private instance (a +0: a bare zone line), and a kill in it.
+    let t_next = t_inst + 2 * 86_400_000;
+    m.on_event(&ev(&instance_created(t_next - 1_000, "Nektropos Castle", 1156)), false);
+    m.on_event(&ev(&zone_named(t_next, "Nektropos Castle")), false);
+    m.on_event(&ev(&death(5, t_next + 60_000)), false);
+    let rows = m.watch_rows(t_next + 120_000);
+    let here = rows
+        .iter()
+        .find(|r| r.zone == "Nektropos Castle [instance 1156]")
+        .expect("the new instance's own row");
+    assert_eq!(here.samples, 2, "the open world's gap and the closed instance's: {rows:?}");
+    assert_eq!(here.observed_ms, Some(1_320_000), "the 22-minute gap, not the hour");
+    assert_eq!(here.estimate_ms, Some(1_320_000));
+    assert_eq!(here.base_ts, t_next + 60_000, "its own clock base");
+}
+
 /// Gaps learned in the open zone and in a private instance of it are one series for the wiki number
 /// (owner, 2026-11-05: Nektropos Castle 4's nameds showed one gap per place and never reached three).
 #[test]

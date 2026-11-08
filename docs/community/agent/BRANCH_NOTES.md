@@ -415,6 +415,16 @@ where one exists.
   709]::the game master` beside `nektropos castle 4 (refined)::the game master`), so the owner's
   three Nektropos 4 nameds showed one gap per place and never reached the three-gap wiki rule. The
   clocks stay per place; only the learned series is pooled, as the estimate already was.
+- The respawn estimate pools the LEARNED store, not only the history (`respawn_places.rs
+  pooled_gaps` → `respawn_learned.rs pooled`, 2026-11-07). Creating the next private instance
+  drops the last one's history entries (its clocks), and the 800-mob LRU drops the rest in time, so
+  an estimate read from the history alone forgot every gap a closed instance taught: the owner's
+  three Nektropos Castle nameds respawned in 21-24 min in the Nov 5 instance and, in a fresh
+  instance two days on, each clock ran from the open world's hour-long gap, "your kills (1 gap)".
+  Every history gap is recorded in the store as it is learned, so the pooled count is the larger of
+  the two, never the sum. Still open: a learned series keeps the tier (`nektropos castle 4
+  (refined)::x` beside `nektropos castle::x` for a +0 instance), so the wiki three-gap rule can
+  still split across tiers; the estimate pools by `zone_base` and does not care.
 - The archive merge takes a row's served fields from the NEWER side (`mergeGaps.ts mergeRow`,
   2026-11-05). A name on both sides joins its tallies; `itemsSold`, `greeting`, `role`,
   `questFacts`, `suggest` and the like are the live fold's current reading. Before, `...had` kept

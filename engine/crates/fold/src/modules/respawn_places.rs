@@ -5,6 +5,7 @@
 
 use super::*;
 use crate::event::Event;
+use crate::modules::respawn_learned::least;
 
 /// A zone line's base name, lowercase: the tier, any `- Solo`/`- Group` and a private instance's
 /// `[instance N]` tag stripped. `Lake Nerius 4 (Refined) [instance 17]` and `Lake Nerius` are one.
@@ -70,6 +71,13 @@ impl RespawnModule {
     /// spawn time is the same in each (owner, 2026-11-03: "the amount of time it takes to spawn
     /// isn't different between instances"), so a gap learned in the open +4 times the +3's clock
     /// too. Each place keeps its own clock base; only the smallest gap and the count are pooled.
+    ///
+    /// Pooled from the LEARNED store as well as the history, because the history forgets a place:
+    /// creating the next private instance drops the last one's entries, and the 800-mob LRU drops
+    /// the rest in time. Every history gap is recorded in the store the moment it is learned, so
+    /// the count is the larger of the two, never their sum (owner, 2026-11-07: the Nektropos
+    /// Castle nameds respawned in 21-24 minutes in the Nov 5 instance; two days on, in a fresh
+    /// instance, each clock ran from the open world's hour-long gap alone, "your kills (1 gap)").
     pub(super) fn pooled_gaps(&self, h: &MobHistory) -> (Option<i64>, i64) {
         let base = zone_base(&h.zone);
         let mut min = h.min_gap_ms;
@@ -79,11 +87,9 @@ impl RespawnModule {
                 continue;
             }
             samples += o.samples;
-            min = match (min, o.min_gap_ms) {
-                (Some(a), Some(b)) => Some(a.min(b)),
-                (a, b) => a.or(b),
-            };
+            min = least(min, o.min_gap_ms);
         }
-        (min, samples)
+        let (learned_min, learned_count) = self.learned.pooled(&h.key, |z| zone_base(z) == base);
+        (least(min, learned_min), samples.max(learned_count))
     }
 }
