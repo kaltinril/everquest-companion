@@ -19,7 +19,9 @@ reaches players within hours: only publish what the owner has asked for.
    owner's PC (owner, 2026-10-22: "be specific about releases going forward ... say github
    release"). Ask in one line: "Publish GitHub release test.N now (public, every install
    updates)?" and wait.
-2. **The GitHub pack compare and a delta scrape first, always, both** (owner, 2026-10-25):
+2. **The GitHub pack compare and a delta scrape first, always, both** (owner, 2026-10-25).
+   Since 2026-11-08: `bash scripts/community/wiki-delta.sh` from the main clone does all of this
+   step, merged (the `wiki-delta` skill). By hand it is
    `npx tsx scripts/eoz-compare.mts`, then the delta with `--titles-from-compare` (it also reads the
    pages the compare found our scrape never listed; the first run after 2026-10-29 adds `--all-pages`;
    `docs/community/agent/DATA_REFRESH.md`; the

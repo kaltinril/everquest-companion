@@ -115,6 +115,13 @@ repo is run.
 
 ## Delta procedure
 
+Since 2026-11-08 the whole procedure below is one script, `bash scripts/community/wiki-delta.sh`
+from the main clone (the `wiki-delta` skill is its checklist): compare, dry run, work tree with the
+caches junctioned in, the delta with `--titles-from-compare`, data-diff and validate-data, the data
+commit with the counts, `--release` compare, `known-reds.sh` on the branch, merge from the main
+tree, clean-up (`--dry-run`, `--no-merge`, `--push`, `--all-pages`, `--extra=`). The steps stay
+here for when it stops (new reds, a stale file) and for what each one is for.
+
 The script is `scripts/scrape-delta.mts`. It reads MediaWiki
 `list=recentchanges` (articles, then File:) once from the oldest stamp and fetches only changed
 pages at 1 request per second, through the creator's own parsers (output byte-compatible with the
