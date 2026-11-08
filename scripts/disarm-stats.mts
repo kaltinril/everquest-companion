@@ -218,6 +218,50 @@ function sweepIdle(at: number): void {
 
 let pendingBroadcast: { mob: string; at: number } | undefined
 
+function onSuccess(mob: string, at: number, stamp: string): void {
+  if (pendingBroadcast?.at === at) pendingBroadcast = undefined
+  totals.successes++
+  const t = tallyOf(mob)
+  t.attempts++
+  t.successes++
+  t.firstSuccessAt ??= stamp
+  const f = fightOf(mob, at)
+  f.anyAttempt = true
+  if (f.successes > 0) {
+    f.attemptsAfter++
+    f.successesAfter++
+  } else {
+    f.attemptsBefore++
+  }
+  f.successes++
+  lastTarget = { mob, at }
+}
+
+function onFailure(at: number): void {
+  totals.failures++
+  if (!lastTarget || at - lastTarget.at > TARGET_WINDOW_MS) {
+    totals.unattributedFailures++
+    return
+  }
+  tallyOf(lastTarget.mob).attempts++
+  const f = fightOf(lastTarget.mob, at)
+  f.anyAttempt = true
+  if (f.successes > 0) f.attemptsAfter++
+  else f.attemptsBefore++
+}
+
+/** `<Mob> was disarmed!`: yours is followed by `You disarmed X!` in the same second; anyone else's stands alone. */
+function onBroadcast(mob: string, at: number): void {
+  if (pendingBroadcast && pendingBroadcast.at !== at) totals.othersDisarms++
+  pendingBroadcast = { mob, at }
+}
+
+function onNoRoll(text: string): void {
+  if (text.startsWith('You are too far away to disarm')) totals.tooFar++
+  else if (text.startsWith('You must target someone to disarm')) totals.noTarget++
+  else if (text === 'You cannot disarm yourself!') totals.self++
+}
+
 function onLine(at: number, stamp: string, text: string): void {
   totals.lines++
   totals.firstLine ??= stamp
@@ -226,9 +270,8 @@ function onLine(at: number, stamp: string, text: string): void {
 
   const melee = OWN_MELEE_RE.exec(text)
   if (melee) {
-    const mob = melee[1]
-    lastTarget = { mob, at }
-    fightOf(mob, at)
+    lastTarget = { mob: melee[1], at }
+    fightOf(melee[1], at)
     return
   }
   const slain = SLAIN_BY_YOU_RE.exec(text) ?? SLAIN_RE.exec(text)
@@ -238,50 +281,11 @@ function onLine(at: number, stamp: string, text: string): void {
     return
   }
   const bc = BROADCAST_RE.exec(text)
-  if (bc) {
-    // Yours follows on the same second as `You disarmed X!`; anyone else's stands alone.
-    if (pendingBroadcast && pendingBroadcast.at !== at) totals.othersDisarms++
-    pendingBroadcast = { mob: bc[1], at }
-    return
-  }
+  if (bc) { onBroadcast(bc[1], at); return; }
   const ok = SUCCESS_RE.exec(text)
-  if (ok) {
-    if (pendingBroadcast && pendingBroadcast.at === at) pendingBroadcast = undefined
-    const mob = ok[1]
-    totals.successes++
-    const t = tallyOf(mob)
-    t.attempts++
-    t.successes++
-    t.firstSuccessAt ??= stamp
-    const f = fightOf(mob, at)
-    f.anyAttempt = true
-    if (f.successes > 0) {
-      f.attemptsAfter++
-      f.successesAfter++
-    } else {
-      f.attemptsBefore++
-    }
-    f.successes++
-    lastTarget = { mob, at }
-    return
-  }
-  if (text === 'Your attempt to disarm failed.') {
-    totals.failures++
-    if (lastTarget && at - lastTarget.at <= TARGET_WINDOW_MS) {
-      const t = tallyOf(lastTarget.mob)
-      t.attempts++
-      const f = fightOf(lastTarget.mob, at)
-      f.anyAttempt = true
-      if (f.successes > 0) f.attemptsAfter++
-      else f.attemptsBefore++
-    } else {
-      totals.unattributedFailures++
-    }
-    return
-  }
-  if (text.startsWith('You are too far away to disarm')) totals.tooFar++
-  else if (text.startsWith('You must target someone to disarm')) totals.noTarget++
-  else if (text === 'You cannot disarm yourself!') totals.self++
+  if (ok) { onSuccess(ok[1], at, stamp); return; }
+  if (text === 'Your attempt to disarm failed.') { onFailure(at); return; }
+  onNoRoll(text)
 }
 
 // --- run --------------------------------------------------------------------------------------
