@@ -28,6 +28,30 @@ export interface CommunityRelease {
 
 export const COMMUNITY_RELEASE_NOTES: readonly CommunityRelease[] = [
   {
+    "version": "0.1.0-test.44",
+    "date": "2026-11-08",
+    "title": "respawn timers keep what earlier instances taught them",
+    "groups": [
+      {
+        "heading": "Timers",
+        "items": [
+          {
+            "text": "A respawn timer remembers the gaps measured in earlier instances. Creating a new private instance dropped the previous instance's clocks and, with them, the respawn gaps measured there, so a fresh instance ran its clocks from the open world's older, longer gap alone (\"your kills (1 gap)\"). The estimate now keeps every gap learned anywhere in the zone, open world or any instance: the Nektropos Castle nameds read 21 to 24 minutes instead of an hour."
+          }
+        ]
+      },
+      {
+        "heading": "Data",
+        "items": [
+          {
+            "text": "Wiki pages refreshed to today: The Bayle List and Bayle List II quest items, and the drops of a Pickclaw mindripper, a reanimated servant and a Teir`Dal shadowknight."
+          }
+        ]
+      }
+    ],
+    "knownIssues": "Joining another player's private instance is not told apart from the open world of that zone; only an instance you create yourself is. A pet summoned shortly before its first \"My leader is\" line can carry a \"(2)\" after its name in the meters until the next restart. Another player's spells never count toward a mob's resists: the game prints only your own resists to you. The con card does not list a mob's immunities yet (the mob page does). Saved characters read \"needs refresh\" on Wiki Gaps until logged in once with this build. A +0 worked back from a window often leaves Weight as ?. A groupmate's charmed pet can still lose its credit when a damage-over-time it cast before the charm ticks on a groupmate. A mob or item added to the wiki after this build shows no wiki details until the next build (or a Copy click in Wiki Gaps). Copy on a wiki page that still holds the template's placeholders keeps them. A merchant page the wiki already has gets no \"items sold\" check. Capture finds the game window only when it is titled \"EverQuest Legends\" or \"EverQuest\". All characters needs each character logged in here once with this build. The screenshot reader reads English only. The installer is not code-signed, so Windows shows \"Windows protected your PC\" the first time (More info, then Run anyway). Builds before test.20 do not update themselves; install one by hand once."
+  },
+  {
     "version": "0.1.0-test.43",
     "date": "2026-11-07",
     "title": "the log folds three times faster, tabs reuse their work, the settings file is read once",
