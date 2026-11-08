@@ -141,6 +141,13 @@ SK, others).
   hand and the ghoul arch magus read the same way. The archive refold and merge changed none of
   it (the respawn code is byte-identical to test.20). Fix to make: measure death to first sighting.
 
+- **Disarm** (`npx tsx scripts/disarm-stats.mts`, 2026-11-08, every log Aug 12 to Nov 8): 32,458
+  attempts that rolled (`Your attempt to disarm failed.` / `You disarmed <mob>!`), 357 successes,
+  1.1% per attempt; 17,343 presses were "too far away" and 2,091 had no target (no roll). Once a
+  mob is disarmed in a fight it is never disarmed again that fight: 0 of 655 later attempts (the
+  weapon is gone). Named mobs land it more often than trash (Knight V`Tal 8.1%, Korven Nisere 5.7%,
+  Avatar of Fear 5.8%, Master Yael 2.8%; Teir`Dal trash 1.4-1.8%); 144 distinct mobs disarmed, 51
+  named. A success prints `<Mob> was disarmed!` (anyone's) and then `You disarmed <mob>!` (yours).
 - **Death:** no XP loss. `Slain by <groupmate/pet>` means you were charmed
   (`You lose control of yourself!`).
 - **Multiclass XP:** every active class gets the full amount; displayed level = lowest active
