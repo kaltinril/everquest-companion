@@ -33,6 +33,7 @@ fn watching_the_knight() -> RespawnPrefs {
             key: "a vis ghoul knight".to_owned(),
             display: "a vis ghoul knight".to_owned(),
             custom_sec: Some(CUSTOM_SEC),
+            shared_name: false,
         }],
     }
 }

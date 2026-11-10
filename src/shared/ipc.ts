@@ -977,6 +977,9 @@ export const IPC = {
   // seconds or null; clearing also drops any kept copy of an older typed number. Returns whether
   // the call was valid and applied.
   respawnSetCustom: 'respawn:setCustom',
+  // renderer -> main: "several mobs share this name" on or off for one watch (owner, 2026-11-09):
+  // the estimate then ignores gaps under ten minutes. Payload is KEY, display and the flag.
+  respawnSetSharedName: 'respawn:setSharedName',
 
   // ---- per-mob resist profiles (JOS-382 — docs/plans/resist-mining.md) -------------------
   //

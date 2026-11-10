@@ -39,10 +39,12 @@ import { type JSX, useEffect, useState } from 'react'
 import {
   Box,
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControlLabel,
   Link,
   Stack,
   TextField,
@@ -65,6 +67,38 @@ import { wikiPageUrl } from '@shared/wiki'
 import { MobCard, useMobKnowledge } from '../../lib/hoverCards'
 import { fmtDuration } from '../buffs/format'
 import { mainMobLookup } from './mobLookup'
+import { useSetSharedName } from './useRespawn'
+
+/**
+ * SEVERAL MOBS SHARE THIS NAME (owner, 2026-11-09: "the few mobs i've killed are screwing up the
+ * timers because there are identical named mobs"). Two spawns of one name make gaps of a minute or
+ * two; the switch tells the estimate to ignore gaps under ten minutes and take the lowest above. It
+ * writes on the click, not on Save: Save is the typed number's, and is disabled while the row has no
+ * number to prefill, which is exactly the state a shared name with only short gaps is in.
+ */
+function SharedNameSwitch({ row }: { row: RespawnRow }): JSX.Element {
+  const onSetSharedName = useSetSharedName()
+  return (
+    <Box>
+      <FormControlLabel
+        control={
+          <Checkbox
+            size="small"
+            checked={row.sharedName === true}
+            data-testid="respawn-edit-shared-name"
+            onChange={(e) => {
+              onSetSharedName(row.key, row.display, e.target.checked)
+            }}
+          />
+        }
+        label={<Typography variant="body2">Several mobs share this name</Typography>}
+      />
+      <Typography variant="caption" color="text.secondary" component="div" sx={{ ml: 4 }}>
+        Gaps under 10 minutes are ignored; the lowest above them counts.
+      </Typography>
+    </Box>
+  )
+}
 
 /** What the field opens with: the duration in force, in the shorthand the field itself accepts. */
 function prefillOf(row: RespawnRow): string {
@@ -190,6 +224,7 @@ export function RespawnEditDialog({
           </Box>
           <WikiLine row={row} page={row.wikiPage ?? data?.page} />
           <CalculatedLine row={row} />
+          <SharedNameSwitch row={row} />
           <Box>
             <TextField
               size="small"

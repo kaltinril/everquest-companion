@@ -58,5 +58,11 @@ export const respawnBridge = {
    * modal, round 9). Clearing also forgets any kept copy of an older typed number.
    */
   setRespawnCustom: (key: string, display: string, sec: number | null): Promise<boolean> =>
-    ipcRenderer.invoke(IPC.respawnSetCustom, key, display, sec)
+    ipcRenderer.invoke(IPC.respawnSetCustom, key, display, sec),
+  /**
+   * "Several mobs share this name" on or off for one watch (owner, 2026-11-09): the estimate then
+   * ignores gaps under ten minutes and takes the lowest above. Resolves to whether anything changed.
+   */
+  setRespawnSharedName: (key: string, display: string, shared: boolean): Promise<boolean> =>
+    ipcRenderer.invoke(IPC.respawnSetSharedName, key, display, shared)
 }

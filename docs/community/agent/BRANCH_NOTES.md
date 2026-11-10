@@ -285,6 +285,17 @@ where one exists.
 
 ## Gaps tab (was gaps-tab, gaps-item-facts, gaps-all-characters, gaps-overlay)
 
+- 2026-11-09: a KNOWN NPC's page lacking a quest the catalog says it gives is a Mobs row, an Update
+  page (owner: Lord Ollix Everling's page, a template stub, lists none of The Tragic Tale of House
+  Everling; the Mobs domain filed only unknown names and a quest enters only through a task line).
+  `knowledge gap_index.rs mob_quest_gaps_of` pairs quests.json `giver` (by mob key, under every name
+  a page answers to) with the record's `relatedQuests` (the page's `related_quests` links, a
+  `MobEntry` field since 2026-11-09, re-derived offline); `gaps_quest_givers.rs` files the row when
+  the log meets the NPC (hail, /con, kill, loot), `questGaps: { page, quests }` on it; the Event log's
+  con mark skips such a row (`gaps_marks.rs`). TS: `gapFieldActions.ts` gives the "Add quests to
+  mob page" chip, Copy gives the `* [[Quest]]` bullets, `stillNeeded` is empty. Giver only, not
+  `relatedNpcs` (a page need not list every quest that mentions the NPC). Measured 2026-11-09: 70 of
+  604 giver pages lack one of their quests (73 quests).
 - 2026-10-25: E4 turn-ins count only at `You complete the trade with X.`; an offer left open, handed
   back or cancelled is none (`gaps_quests.rs`). Map links: `lib/mapZoneLink.ts` (context from the
   gate), `shared/gapMapZones.ts`. Stored edits are read through `readEdit` (non-strings dropped, the
@@ -425,6 +436,14 @@ where one exists.
   the two, never the sum. Still open: a learned series keeps the tier (`nektropos castle 4
   (refined)::x` beside `nektropos castle::x` for a +0 instance), so the wiki three-gap rule can
   still split across tiers; the estimate pools by `zone_base` and does not care.
+- A watch marked "several mobs share this name" (`sharedName` on the pref, the edit dialog's switch,
+  owner 2026-11-09: same-named mobs made the clock read a minute or two) estimates from the gaps of
+  ten minutes or more only, the lowest of them, pooled as before (`respawn_places.rs
+  pooled_gaps_above`, `SHARED_NAME_FLOOR_MS`; the learned store's `pooled` takes the floor). With no
+  such gap the ladder falls to the wiki, then none. The row carries `sharedName`; the label reads
+  "your kills (N gaps over 10 min)". The switch writes on the click (`respawn:setSharedName`), not on
+  Save, since Save is disabled while the row has no number. An unwatch drops the switch with the
+  watch (the kept list holds typed numbers only); `respawnWithCustom` keeps it.
 - The archive merge takes a row's served fields from the NEWER side (`mergeGaps.ts mergeRow`,
   2026-11-05). A name on both sides joins its tallies; `itemsSold`, `greeting`, `role`,
   `questFacts`, `suggest` and the like are the live fold's current reading. Before, `...had` kept
