@@ -1,0 +1,35 @@
+{{Classic Era}}
+A mount is summoned by clicking a bridle (horses), a drum (Drogmors) or a set of reins. Every one is Slot: AMMO, all classes, all races, No Trade. The material or size sets the speed; the colour is only the look. The full list is [[:Category:Mounts]].
+
+== Horses ==
+Bridles cast [[Summon Horse]]. Sold by [[Stable Hand Brack]] ([[East Freeport]], right past the gate, -163, -725), [[Stable Hand Kaye]] ([[North Qeynos]], west of the gate, outside, 201, 572) and [[Stable Hand V`Shal]] ([[Lake Nerius]], -255, 301).
+
+{| class="wikitable"
+! Speed !! Black !! Brown !! Tan !! White
+|-
+| Very Slow (rope) || [[Black Rope Bridle]] || [[Brown Rope Bridle]] || [[Tan Rope Bridle]] || [[White Rope Bridle]]
+|-
+| Slow (leather) || [[Black Leather Bridle]] || [[Brown Leather Bridle]] || [[Tan Leather Bridle]] || [[White Leather Bridle]]
+|-
+| Moderate (silken) || [[Black Silken Bridle]] || [[Brown Silken Bridle]] || [[Tan Silken Bridle]] || [[White Silken Bridle]]
+|-
+| Fast (chain, Velocity 64) || [[Black Chain Bridle]] || [[Brown Chain Bridle]] || [[Tan Chain Bridle]] || [[White Chain Bridle]]
+|}
+
+== Drogmors ==
+Drums cast [[Summon Drogmor]]. Sold by [[Stablehand Fleeb]] ([[Rathe Mountains]], -2244, 589).
+
+{| class="wikitable"
+! Speed !! Black !! Green !! Red !! White
+|-
+| Very Slow (small) || [[Small Black Drum]] || [[Small Green Drum]] || [[Small Red Drum]] || [[Small White Drum]]
+|-
+| Slow || [[Black Drum]] || [[Green Drum]] || [[Red Drum]] || [[White Drum]]
+|-
+| Moderate (large) || [[Large Black Drum]] || [[Large Green Drum]] || [[Large Red Drum]] || [[Large White Drum]]
+|-
+| Fast (giant, Velocity 64) || [[Giant Black Drum]] || [[Giant Green Drum]] || [[Giant Red Drum]] || [[Giant White Drum]]
+|}
+
+== Boar ==
+[[Bristly Boar Reins]] cast Summon Bristly Boar (Moderate). Bought from the [[Marketplace]], bound to the character.
