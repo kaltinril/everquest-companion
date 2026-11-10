@@ -174,7 +174,17 @@ export function parseMobPage(title: string, wikitext: string): MobEntry | null {
   // absent rather than acquiring a guessed one.
   if (facts.locations?.length) entry.loc = facts.locations
   if (mobOutOfEra(eraTag)) entry.outOfEra = true
-  return { ...entry, ...gapsFacts(wikitext) }
+  return { ...entry, ...gapsFacts(wikitext), ...relatedQuestsOf(facts) }
+}
+
+/**
+ * The quest pages the page links under |related_quests, so the Gaps tab can see a page that lacks a
+ * quest the catalog says this NPC gives (owner, 2026-11-09: Lord Ollix Everling). Last in the record,
+ * as the 2026-11-09 offline re-derive appended it.
+ */
+function relatedQuestsOf(facts: ReturnType<typeof parseMobWikitext>): Pick<MobEntry, 'relatedQuests'> {
+  const relatedQuests = [...new Set((facts.quests ?? []).map((q) => q.page ?? q.quest))]
+  return relatedQuests.length ? { relatedQuests } : {}
 }
 
 /**

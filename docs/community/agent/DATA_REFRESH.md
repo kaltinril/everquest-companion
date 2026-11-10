@@ -181,7 +181,9 @@ full scrapers). A 3-week window was ~1,200 pages in ~25 batched requests.
 - A new field from an existing parser (2026-10-19, `commonDrops`): re-parse the cached pages with
   the fixed parser and take the field into a record only where the re-parse reproduces the record's
   other parser fields exactly; a full `scrape:mobs` would drop `otherNames` until the redirect
-  cache exists.
+  cache exists. Done again 2026-11-09 for `relatedQuests` (the page's `related_quests` links): all
+  8,098 records reproduced exactly, 2,372 gained the field, appended last in the record; the delta
+  folds it from the parser like every other field.
 
 ## Expect new reds, and clear them
 

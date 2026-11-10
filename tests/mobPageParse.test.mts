@@ -110,6 +110,13 @@ test('common_loot is read beside known_loot (owner, 2026-10-19: a drop listed th
   assert.deepEqual(entry?.commonDrops, ['Classic Raid Tier Treasures', 'Jade Ring'])
 })
 
+test('relatedQuests: the quest pages |related_quests links, once each; `* None` and an empty field give no field (owner, 2026-11-09)', () => {
+  const page = (block: string): string => ['{{Namedmobpage', '| name = Nikko Canti', '| zone = [[Lake Nerius]]', `| related_quests = ${block}`, '}}'].join('\n')
+  assert.deepEqual(parseMobPage('Nikko Canti', page('\n* [[Something Fishy]]\n* [[Alchemical Solution|the alchemist]]\n* [[Something Fishy]]'))?.relatedQuests, ['Something Fishy', 'Alchemical Solution'])
+  assert.equal(parseMobPage('Nikko Canti', page('\n* None'))?.relatedQuests, undefined)
+  assert.equal(parseMobPage('Nikko Canti', page(''))?.relatedQuests, undefined)
+})
+
 test('factionAmounts: each listed faction with the amount its bullet states (owner, 2026-10-20; A Troll Slayer)', () => {
   const wt = [
     '{{Namedmobpage',

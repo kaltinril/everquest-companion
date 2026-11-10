@@ -89,6 +89,8 @@ export interface MobEntry {
   image?: string
   /** the page names no image, or one the wiki has no file for (scrape-wiki-files.ts) */
   noImage?: true
+  /** the quest pages `|related_quests` links, as linked; absent when the field is empty or `* None` */
+  relatedQuests?: string[]
 }
 
 export interface MobData {
