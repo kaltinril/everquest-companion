@@ -247,7 +247,7 @@ impl Knowledge for Corpus {
     /// modules ask at every attach, and each used to rebuild it off the corpora.
     fn gap_index(&self) -> fold::knowledge::GapIndex {
         self.gap_index
-            .get_or_init(|| gap_index::build(self.items(), self.mob_index()))
+            .get_or_init(|| gap_index::build(self.items(), self.mob_index(), self.quests()))
             .clone()
     }
 

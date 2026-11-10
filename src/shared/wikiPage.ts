@@ -24,6 +24,7 @@ import { anyMobDrop } from './gapDrops'
 import { isRewardChest, mobSourceOf } from './rewardChest'
 import { wikiZoneLink } from './gapWikiZone'
 import { forageAddText } from './gapForage'
+import { questGiverAddText } from './gapQuestGivers'
 import type { VendorFinder } from './gapMobPage'
 import type { LootEvent } from './types'
 import { SPELL_HEAD, SPELL_TAIL, spellPageValues, type SpellPageShot } from './spellWindow'
@@ -645,9 +646,10 @@ interface PageContext extends Omit<PageExtras, 'zoneName'> {
 const PAGE_OF: Record<GapDomain, (row: GapRow, c: PageContext) => string> = {
   // A page that exists and lacks a forage zone or the category: only the lines to add (gapForage.ts).
   item: (row, c) => (row.forageUpdate ? forageAddText(row.forageUpdate) : itemPage({ ...withPageTitles(itemFacts(row, c.loot, c.zoneName, c.vendorAt), c.mobPage), ...withFishedNote(questPageParts(questFactsOf(row), { mobPage: c.mobPage, zoneName: c.zoneName, locOf: locFinder(c.seen.mobLocs) }), row, c.zoneName) }, c.itemShots?.[row.name])),
+  // A known NPC's page lacking a quest it gives: only the related_quests lines to add (gapQuestGivers.ts).
   // A mob its target line calls a merchant takes the merchant layout before any trade (owner, 2026-10-22);
   // a new mob page takes its fight estimates in its blank fields (shared/gapFight.ts).
-  mob: (row, c) => (roleOf(row) === 'Merchant' ? merchantPage(withDescription(mobFacts(row, [], c.kills, { ...c.seen, zoneName: c.zoneName }), row, c)) : withRespawnField(withFightFields(mobPage(mobFacts(row, c.loot, c.kills, { ...c.seen, zoneName: c.zoneName }), c.commonLoot), row), row)),
+  mob: (row, c) => (row.questGaps ? questGiverAddText(row.questGaps) : roleOf(row) === 'Merchant' ? merchantPage(withDescription(mobFacts(row, [], c.kills, { ...c.seen, zoneName: c.zoneName }), row, c)) : withRespawnField(withFightFields(mobPage(mobFacts(row, c.loot, c.kills, { ...c.seen, zoneName: c.zoneName }), c.commonLoot), row), row)),
   merchant: (row, c) => merchantPage(withDescription(mobFacts(row, [], c.kills, { ...c.seen, zoneName: c.zoneName }), row, c)),
   spell: (row, c) => spellPage({ name: row.name, npcOnly: npcOnlySpell(row, c.isMob), client: c.spellFacts?.[row.name], shot: c.spellShots?.[row.name], castBy: castBySentence(row, c.isMob) }),
   faction: (row) => `${factionLine({ faction: factionOf(row), adjust: row.adjust, raised: row.raised })}\n`,
@@ -703,8 +705,9 @@ const NEEDED_OF: Partial<Record<GapDomain, (row: GapRow, seen: PageExtras) => st
  * what to collect before the trip ends (review 2026-10-19). `kills` must be a `killIndex` result.
  */
 export function stillNeeded(row: GapRow, loot: readonly LootEvent[], kills: KillMap, seen: MobSightings & PageExtras & MerchantExtras = {}): string[] {
-  // A redirect row asks for a check in game, nothing to collect (gapRedirects.ts).
-  if (row.viaRedirect !== undefined) return []
+  // A redirect row asks for a check in game, nothing to collect (gapRedirects.ts); a known NPC's
+  // quest gaps are the lines to add, nothing more (gapQuestGivers.ts).
+  if (row.viaRedirect !== undefined || row.questGaps !== undefined) return []
   const fixed = NEEDED_OF[row.domain]
   if (fixed !== undefined) return fixed(row, seen)
   const f = mobFacts(row, row.domain === 'mob' ? loot : [], kills, seen)

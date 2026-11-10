@@ -26,7 +26,7 @@ impl Knowledge for Corpus {
         panic!("the gaps module must never ask a lookup that notes a miss")
     }
     fn known_mob(&self, name: &str) -> bool {
-        matches!(super::mob_key(name).as_str(), "a decaying skeleton" | "innoruuk" | "a rotting citizen")
+        matches!(super::mob_key(name).as_str(), "a decaying skeleton" | "innoruuk" | "a rotting citizen" | "lord ollix everling")
     }
     /// The corpus's one vendor, a `{{MerchantPage}}` on the wiki.
     fn known_merchant(&self, name: &str) -> bool {
@@ -61,7 +61,7 @@ impl Knowledge for Corpus {
         .collect();
         // The catalog's names as the wiki writes them: a god's disambiguated page, a name with
         // no article, a page split by zone.
-        let mob_names = ["a decaying skeleton", "Cazic-Thule (God)", "fire giant warrior", "a kobold (Warrens)", "an imp / imp"];
+        let mob_names = ["a decaying skeleton", "Cazic-Thule (God)", "fire giant warrior", "a kobold (Warrens)", "an imp / imp", "Lord Ollix Everling"];
         GapIndex {
             item_pages,
             item_effects: vec![("Summon Horse".to_string(), "Black Chain Bridle".to_string())],
@@ -69,6 +69,8 @@ impl Knowledge for Corpus {
             // A page that says it may not be in Legends (owner, 2026-10-22: A Rotting Citizen).
             item_notices: vec![("old wand".into(), "Old Wand".into(), vec!["delete: No longer in game".into()])],
             mob_notices: vec![("a rotting citizen".into(), "A Rotting Citizen".into(), vec!["delete".into(), "DNE".into()])],
+            // A known NPC's page lacking the quest he gives (owner, 2026-11-09: Lord Ollix Everling).
+            mob_quest_gaps: vec![("Lord Ollix Everling".into(), "Lord Ollix Everling".into(), vec!["The Tragic Tale of House Everling".into()])],
             // Wiki redirects (owner, 2026-10-22): a wrong one (Halfling Blood is no vial), one that only
             // drops an article, and one onto a name that has its own record.
             item_redirects: vec![
@@ -460,6 +462,24 @@ fn a_trader_the_wiki_lists_as_no_merchant_is_a_row_and_a_kill_keeps_its_faction_
     let pairs = m.snapshot()["state"]["killFactions"].clone();
     // No proof lines here: `killFactionSamples` serves them (gaps_samples.rs, perf review 2026-10-20).
     assert_eq!(pairs, json!([{ "mob": "a decaying skeleton", "faction": "Undead Frogloks of Guk", "n": 1, "zone": "", "adjust": -20, "raised": false }]));
+}
+
+#[test]
+fn a_known_quest_giver_met_whose_page_lacks_the_quest_is_a_mobs_row_to_update() {
+    // Owner, 2026-11-09: Lord Ollix Everling, conned, his page listing no quest; a known mob whose
+    // page lists what it should stays no row.
+    let mut m = module();
+    feed(&mut m, 1, json!({ "kind": "consider", "mob": "Lord Ollix Everling", "level": 65 }));
+    feed(&mut m, 2, json!({ "kind": "consider", "mob": "a decaying skeleton", "level": 5 }));
+    feed(&mut m, 3, json!({ "kind": "unknown", "raw": "[Sun Oct 25 18:09:58 2026] You say, 'Hail, Lord Ollix Everling'" }));
+    let rows = m.snapshot()["state"]["rows"].clone();
+    assert_eq!(rows.as_array().map_or(0, Vec::len), 1, "{rows}");
+    assert_eq!(rows[0]["domain"], json!("mob"));
+    assert_eq!(rows[0]["name"], json!("Lord Ollix Everling"));
+    assert_eq!(rows[0]["questGaps"], json!({ "page": "Lord Ollix Everling", "quests": ["The Tragic Tale of House Everling"] }));
+    assert_eq!(rows[0]["kinds"], json!(["considered", "hailed"]));
+    assert!(rows[0].get("suggest").is_none(), "a known name wants no other spelling: {rows}");
+    assert_eq!(m.snapshot()["state"]["seen"]["mob"], json!(2));
 }
 
 /// The review's engine rules (2026-10-19): a file of their own for the factoring bar.

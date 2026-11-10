@@ -101,6 +101,10 @@ pub struct GapIndex {
     pub item_notices: Vec<(String, String, Vec<String>)>,
     /// The same for mob pages, by every name the page answers to (its `|name`, title, redirects).
     pub mob_notices: Vec<(String, String, Vec<String>)>,
+    /// Every name a mob page answers to whose page lacks a quest the catalog says that NPC gives:
+    /// `(name, page, the quest pages missing)`. The log meeting the NPC makes it work to do
+    /// (owner, 2026-11-09: Lord Ollix Everling's page lists none of his quest).
+    pub mob_quest_gaps: Vec<(String, String, Vec<String>)>,
     /// Every wiki redirect that lands on an item page, `(item key of the redirect's name, page)`.
     /// Apart from `item_pages`: a name known ONLY so is a row to check, never silent (owner,
     /// 2026-10-22: a wrong redirect, Halfling Blood to Vial of Halfling Blood, hid a missing item).
