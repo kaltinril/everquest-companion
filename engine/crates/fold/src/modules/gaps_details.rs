@@ -168,6 +168,12 @@ impl Details {
         true
     }
 
+    /// A merchant's price quote for the item (`record` kept its line): the merchant is a source, as
+    /// a purchase from it would be. The quote line is `Unknown`, so `record`'s item branch saw none.
+    pub fn quoted_by(&mut self, merchant: &str) {
+        self.sources.add(merchant);
+    }
+
     /// A forage of the item in `zone` (`record` already counted the zone among `zones`).
     pub fn foraged(&mut self, zone: &str) {
         self.forage_zones.add(zone);

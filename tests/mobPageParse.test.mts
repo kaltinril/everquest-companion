@@ -76,6 +76,10 @@ test('the wiki era rule: the page banner decides, whatever zone the page names',
 test('a merchant page is marked, and a page names the factions a kill moves (Gaps tab, 2026-10-18)', () => {
   const merchant = parseMobPage('Murga', '{{MerchantPage\n| name = Murga\n| zone = [[The Feerrott]]\n| items_sold =\n}}')
   assert.equal(merchant?.merchant, true)
+  assert.equal(merchant?.sells, undefined, 'an empty stock is no field')
+  // Owner, 2026-11-10: the stock, so a new item page's soldby names every merchant the wiki says stocks it.
+  const asher = parseMobPage('Asher', "{{MerchantPage\n| name = Asher\n| items_sold = \n\n<ul>\n    <li> {{:Ashwood Bowstave}}  <span class='ddp'>(15pp 7gp 4sp 9cp)</span></li>\n    <li> {{:Darkwood Bowstave}} <span class='ddp'>(226pp 7gp 9sp 9cp)</span></li>\n    <li> {{:Darkwood Bowstave}} </li>\n</ul>\n\n| factions = \n}}")
+  assert.deepEqual(asher?.sells, ['Ashwood Bowstave', 'Darkwood Bowstave'])
   const mob = parseMobPage(
     'A zol ghoul knight',
     '{{Namedmobpage\n| name = a zol ghoul knight\n| factions =\n* [[Undead Frogloks of Guk]] (-20)\n| opposing_factions =\n* [[Frogloks of Guk]] (+5)\n}}'
@@ -108,6 +112,13 @@ test('common_loot is read beside known_loot (owner, 2026-10-19: a drop listed th
   const entry = parseMobPage('A froglok forager', wt)
   assert.deepEqual(entry?.drops, ['Froglok Meat'])
   assert.deepEqual(entry?.commonDrops, ['Classic Raid Tier Treasures', 'Jade Ring'])
+})
+
+test('relatedQuests: the quest pages |related_quests links, once each; `* None` and an empty field give no field (owner, 2026-11-09)', () => {
+  const page = (block: string): string => ['{{Namedmobpage', '| name = Nikko Canti', '| zone = [[Lake Nerius]]', `| related_quests = ${block}`, '}}'].join('\n')
+  assert.deepEqual(parseMobPage('Nikko Canti', page('\n* [[Something Fishy]]\n* [[Alchemical Solution|the alchemist]]\n* [[Something Fishy]]'))?.relatedQuests, ['Something Fishy', 'Alchemical Solution'])
+  assert.equal(parseMobPage('Nikko Canti', page('\n* None'))?.relatedQuests, undefined)
+  assert.equal(parseMobPage('Nikko Canti', page(''))?.relatedQuests, undefined)
 })
 
 test('factionAmounts: each listed faction with the amount its bullet states (owner, 2026-10-20; A Troll Slayer)', () => {

@@ -31,6 +31,7 @@ import {
   respawnClearKeys,
   respawnClearPlan,
   respawnWithCustom,
+  respawnWithSharedName,
   respawnWithWatch,
   respawnWithWatchList,
   respawnWithoutWatch,
@@ -355,4 +356,32 @@ test('an unwatch past the cap drops the OLDEST kept number, never the one just s
   assert.equal(next.keptCustom?.length, RESPAWN_MAX_KEPT)
   assert.equal(next.keptCustom?.[0]?.key, 'mob 1')
   assert.deepEqual(next.keptCustom?.at(-1), { key: 'newest', customSec: 5 })
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SEVERAL MOBS SHARE THIS NAME (owner, 2026-11-09)
+// ─────────────────────────────────────────────────────────────────────────────
+
+test('the shared-name switch is set on the watch in place, keeps a typed number, and round-trips the store', () => {
+  const prefs: RespawnPrefs = { watches: [{ key: 'the game master', display: 'The Game Master', customSec: 1200 }, { key: 'b', display: 'b' }] }
+  const on = stored(respawnWithSharedName(prefs, 'The Game Master', 'The Game Master', true))
+  assert.deepEqual(on.watches, [{ key: 'the game master', display: 'The Game Master', customSec: 1200, sharedName: true }, { key: 'b', display: 'b' }])
+  // Typing a number afterwards keeps the switch; clearing the number keeps it too.
+  assert.deepEqual(stored(respawnWithCustom(on, 'the game master', 'The Game Master', 900)).watches[0], { key: 'the game master', display: 'The Game Master', customSec: 900, sharedName: true })
+  assert.deepEqual(stored(respawnWithCustom(on, 'the game master', 'The Game Master')).watches[0], { key: 'the game master', display: 'The Game Master', sharedName: true })
+  const off = stored(respawnWithSharedName(on, 'the game master', 'The Game Master', false))
+  assert.deepEqual(off.watches[0], { key: 'the game master', display: 'The Game Master', customSec: 1200 })
+})
+
+test('switching it on for a mob no longer watched watches it again; off for one not watched is a no-op', () => {
+  const prefs: RespawnPrefs = { watches: [{ key: 'b', display: 'b' }] }
+  assert.deepEqual(stored(respawnWithSharedName(prefs, 'Elite Guard', 'Elite Guard', true)).watches, [{ key: 'b', display: 'b' }, { key: 'elite guard', display: 'Elite Guard', sharedName: true }])
+  assert.equal(respawnWithSharedName(prefs, 'Elite Guard', 'Elite Guard', false), prefs)
+})
+
+test('the store normalizer keeps only a true switch, and a whole-list replace carries it through', () => {
+  const read = normalizeRespawnPrefs({ watches: [{ key: 'a', display: 'a', sharedName: true }, { key: 'b', display: 'b', sharedName: 'yes' }, { key: 'c', display: 'c', sharedName: false }] })
+  assert.deepEqual(read.watches, [{ key: 'a', display: 'a', sharedName: true }, { key: 'b', display: 'b' }, { key: 'c', display: 'c' }])
+  const replaced = stored(respawnWithWatchList({ watches: [] }, read.watches))
+  assert.deepEqual(replaced.watches[0], { key: 'a', display: 'a', sharedName: true })
 })

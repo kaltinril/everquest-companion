@@ -85,8 +85,68 @@ fn watching_without_a_number() -> RespawnPrefs {
             key: "a vis ghoul knight".to_owned(),
             display: "a vis ghoul knight".to_owned(),
             custom_sec: None,
+            shared_name: false,
         }],
     }
+}
+
+fn watching_a_shared_name() -> RespawnPrefs {
+    RespawnPrefs {
+        watches: vec![RespawnWatchPref {
+            key: "a vis ghoul knight".to_owned(),
+            display: "a vis ghoul knight".to_owned(),
+            custom_sec: None,
+            shared_name: true,
+        }],
+    }
+}
+
+/// Two spawns sharing a name: a kill, the other one 90 s on, then the real cycle twice over.
+fn two_spawns_of_one_name(prefs: RespawnPrefs) -> RespawnModule {
+    let mut m = RespawnModule::new(NOW, prefs);
+    m.on_event(&ev(&zone(T_ZONE)), false);
+    m.on_event(&ev(&death(1, T_DEATH)), false);
+    m.on_event(&ev(&death(2, T_DEATH + 90_000)), false);
+    m.on_event(&ev(&death(3, T_DEATH + 90_000 + 720_000)), false);
+    m.on_event(&ev(&death(4, T_DEATH + 90_000 + 720_000 + 660_000)), false);
+    m
+}
+
+/// Same-named mobs ruin the clock (owner, 2026-11-09: "identical named mobs ... the spawn can't be
+/// lower than 10min for these mobs as an exception, and it uses the lowest time above 10 mins"): with
+/// the switch on, the 90 s gap is ignored and the lowest of the two real gaps numbers the row.
+#[test]
+fn a_shared_name_ignores_gaps_under_ten_minutes_and_takes_the_lowest_above() {
+    let plain = only_row(&two_spawns_of_one_name(watching_without_a_number()));
+    assert_eq!((plain.observed_ms, plain.samples, plain.shared_name), (Some(90_000), 3, false));
+    let shared = only_row(&two_spawns_of_one_name(watching_a_shared_name()));
+    assert_eq!((shared.observed_ms, shared.estimate_ms, shared.samples), (Some(660_000), Some(660_000), 2));
+    assert_eq!((shared.source, shared.shared_name), ("observed", true));
+    // The last six gaps still show as they were measured: the switch changes the estimate, not the evidence.
+    assert_eq!(shared.gaps_ms, Some(vec![660_000, 720_000, 90_000]));
+}
+
+/// With no gap above the floor the row has no observed number at all, never the short one.
+#[test]
+fn a_shared_name_with_only_short_gaps_has_no_observed_number() {
+    let mut m = RespawnModule::new(NOW, watching_a_shared_name());
+    m.on_event(&ev(&zone(T_ZONE)), false);
+    m.on_event(&ev(&death(1, T_DEATH)), false);
+    m.on_event(&ev(&death(2, T_DEATH + 90_000)), false);
+    let row = only_row(&m);
+    assert_eq!((row.observed_ms, row.samples, row.source), (None, 0, "none"));
+}
+
+/// The switch rides the pushed prefs as `sharedName`; absent is off.
+#[test]
+fn the_shared_name_switch_is_read_off_the_pushed_prefs() {
+    let prefs = RespawnPrefs::read(&serde_json::json!({ "watches": [
+        { "key": "a vis ghoul knight", "display": "a vis ghoul knight", "sharedName": true },
+        { "key": "the game master", "customSec": 1200 }
+    ] }))
+    .expect("an object");
+    let flags: Vec<(&str, bool, Option<i64>)> = prefs.watches.iter().map(|w| (w.key.as_str(), w.shared_name, w.custom_sec)).collect();
+    assert_eq!(flags, vec![("a vis ghoul knight", true, None), ("the game master", false, Some(1200))]);
 }
 
 /// A gap learned in one place of the zone times the mob's clock in another (owner, 2026-11-03:

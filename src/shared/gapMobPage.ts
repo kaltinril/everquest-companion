@@ -77,6 +77,49 @@ export interface VendorPlace {
 
 export type VendorFinder = (vendor: string, zones: readonly string[]) => VendorPlace | undefined
 
+/**
+ * How a vendor is placed: by the catalog (`vendorFinder`), else by the log's own `/loc` beside its
+ * hail (`locFinder`); and which merchants the catalog itself says stock an item (`sellersOf`).
+ */
+export interface VendorPlacing {
+  vendorAt?: VendorFinder
+  locOf?: (npc: string) => readonly number[] | undefined
+  sellersOf?: (item: string) => readonly string[]
+}
+
+/**
+ * The merchant pages whose `|items_sold` transcludes the item (`MobEntry.sells`), by the item's name
+ * lower-cased: a new item page's `soldby` names them beside the log's own vendor (owner, 2026-11-10:
+ * "the code should be smart enough to know that the Bowstave has other merchants that sell it, based
+ * on the wiki cache"; Asher in Nektropos Undercrofts beside Zok Rurpp). Page titles, catalog order.
+ * Built once per catalog (gapMemo.ts), so it is read-only.
+ */
+export const sellersOf = perObject((catalog: readonly { page: string; sells?: string[] }[]): ((item: string) => readonly string[]) => {
+  const by = new Map<string, string[]>()
+  for (const m of catalog) {
+    for (const item of m.sells ?? []) {
+      const key = item.toLowerCase()
+      const pages = by.get(key)
+      if (pages === undefined) by.set(key, [m.page])
+      else if (!pages.includes(m.page)) pages.push(m.page)
+    }
+  }
+  const none: readonly string[] = []
+  return (item) => by.get(item.toLowerCase()) ?? none
+})
+
+/** The merchants the catalog says stock the item (`sellersOf`), less any the log already named. */
+export function catalogSellers(item: string, named: readonly string[], place: VendorPlacing): string[] {
+  const have = new Set(named.map(mobKey))
+  return (place.sellersOf?.(item) ?? []).filter((page) => !have.has(mobKey(page)))
+}
+
+/** The log's first `/loc` point for a mob as a row's (ns, ew), or none. */
+export function logSpot(place: VendorPlacing, vendor: string): readonly [number, number] | undefined {
+  const seen = place.locOf?.(vendor)
+  return seen !== undefined && seen.length >= 2 ? [seen[0] ?? 0, seen[1] ?? 0] : undefined
+}
+
 type Placed = Paged & { loc?: readonly { ns: number; ew: number }[] }
 
 /**

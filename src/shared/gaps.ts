@@ -9,6 +9,7 @@
 
 import type { FactionFix, KillFaction } from './gapFactions'
 import { forageWhy, type ForageUpdate } from './gapForage'
+import type { QuestGaps } from './gapQuestGivers'
 import type { GapEdit } from './gapEdits'
 import { replaceWhy } from './gapDrops'
 import { pageCheckAction } from './gapRedirects'
@@ -329,6 +330,8 @@ export interface GapRow {
   noPage?: true
   /** A name the data knows only through a wiki redirect: the page it sends the name to (gapRedirects.ts). */
   viaRedirect?: string
+  /** A Mobs row for a KNOWN NPC: its page, and the quests it gives that the page lacks (gapQuestGivers.ts). */
+  questGaps?: QuestGaps
   /** A faction row for a faction the page LISTS: what to fix, and what the page says (`-30..-10?`). */
   fix?: FactionFix
   pageSays?: string
@@ -617,7 +620,7 @@ export function gapActions(row: GapRow, verdict: GapVerdict, ctx: GapActionConte
   // A notice row, a redirect row, or a page that exists under other capitals or as free text (gapExistingPage.ts).
   const check = pageCheckAction(row, verdict)
   if (check !== undefined) return [check]
-  // A picture or a respawn: one field of a mob page (gapFieldActions.ts).
+  // A picture, a respawn, or a known NPC's missing quests: one field of a mob page (gapFieldActions.ts).
   const field = fieldAction(row)
   if (field !== undefined) return [field]
   if (row.domain === 'drop') return dropActions(row)

@@ -53,6 +53,13 @@ export function useSetCustom(): (key: string, display: string, sec?: number) => 
   }, [])
 }
 
+/** "Several mobs share this name" on or off (the edit modal, owner 2026-11-09). Same shape as `useWatch`. */
+export function useSetSharedName(): (key: string, display: string, shared: boolean) => void {
+  return useCallback((key: string, display: string, shared: boolean) => {
+    void window.eq.setRespawnSharedName(key, display, shared)
+  }, [])
+}
+
 /** Clear all (2026-10-17): unwatch every key the tab's scope shows, in one write. */
 export function useUnwatchMany(): (keys: string[]) => void {
   return useCallback((keys: string[]) => {

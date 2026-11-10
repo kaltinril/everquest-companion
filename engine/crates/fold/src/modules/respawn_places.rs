@@ -89,7 +89,27 @@ impl RespawnModule {
             samples += o.samples;
             min = least(min, o.min_gap_ms);
         }
-        let (learned_min, learned_count) = self.learned.pooled(&h.key, |z| zone_base(z) == base);
+        let (learned_min, learned_count) = self.learned.pooled(&h.key, |z| zone_base(z) == base, 0);
+        (least(min, learned_min), samples.max(learned_count))
+    }
+
+    /// The same with every gap under `floor` left out (a watch marked "several mobs share this
+    /// name", owner 2026-11-09): the lowest gap of `floor` or more and how many there are, off the
+    /// learned store (every gap) and the history's recent ones. A same-named spawn's short gap never
+    /// numbers the clock; with no gap above the floor the ladder falls to the wiki, then to none.
+    pub(super) fn pooled_gaps_above(&self, h: &MobHistory, floor: i64) -> (Option<i64>, i64) {
+        let base = zone_base(&h.zone);
+        let mut min: Option<i64> = None;
+        let mut samples: i64 = 0;
+        for o in self.history.values() {
+            if o.key != h.key || zone_base(&o.zone) != base {
+                continue;
+            }
+            let above = o.gaps.iter().copied().filter(|g| *g >= floor);
+            samples += above.clone().count() as i64;
+            min = least(min, above.min());
+        }
+        let (learned_min, learned_count) = self.learned.pooled(&h.key, |z| zone_base(z) == base, floor);
         (least(min, learned_min), samples.max(learned_count))
     }
 }

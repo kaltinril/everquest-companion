@@ -116,6 +116,9 @@ pub struct GapRow {
     /// The page a wiki redirect sends this name to, when only that redirect knows it (`gaps_redirects.rs`).
     #[serde(skip_serializing_if = "Option::is_none")]
     via_redirect: Option<String>,
+    /// A known NPC's page and the quests it gives that the page lacks (`gaps_quest_givers.rs`).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    quest_gaps: Option<QuestGaps>,
 }
 
 #[derive(Default)]
@@ -138,6 +141,8 @@ pub struct GapsModule {
     players: HashSet<String>,
     /// Pages with a not-Legends or deletion notice, for the Notices domain (`gaps_notices.rs`).
     notices: Notices,
+    /// NPC pages lacking a quest their NPC gives (`gaps_quest_givers.rs`).
+    quest_givers: QuestGivers,
     /// Who gave each item, who took it, which quest it moved (`gaps_quests.rs`). Served as `questFacts`.
     quests: QuestFacts,
     /// Each task's steps, for the Quests rows (`gaps_quest_log.rs`).
@@ -452,7 +457,8 @@ impl GapsModule {
     ) -> bool {
         self.seen.entry(domain).or_default().insert(key.clone());
         if known {
-            return self.noticed(domain, &key, name, kind, ev);
+            // A known name's page can still be work: a notice on it, or a quest it gives and lacks.
+            return self.noticed(domain, &key, name, kind, ev) | self.quest_gap(domain, &key, name, kind, ev);
         }
         let at = stamp_of(ev.raw()).unwrap_or_default();
         let row = self.rows.entry((domain, key)).or_insert_with(|| GapRow {
@@ -466,6 +472,7 @@ impl GapsModule {
             maybe_player: false,
             notice: None,
             via_redirect: None,
+            quest_gaps: None,
         });
         // No zone for an offer (where the item went), a fusion or a combine, failed too (where made):
         // none says where it drops (owner, 2026-10-25: looted in the castle, fused at the lake).
@@ -593,6 +600,7 @@ impl EqModule for GapsModule {
         self.item_effects = index.item_effects.iter().map(|(n, _)| effect_key(n)).collect();
         self.mob_names = MobNames::new(&index.mob_names).with_redirects(&index.mob_redirects);
         self.notices = Notices::new(&index);
+        self.quest_givers = QuestGivers::new(&index);
         self.knowledge = Some(Arc::clone(k));
     }
 }
@@ -614,6 +622,9 @@ mod fished;
 use fished::Fished;
 #[path = "gaps_notices.rs"]
 mod notices;
+#[path = "gaps_quest_givers.rs"]
+mod quest_givers;
+use quest_givers::{QuestGaps, QuestGivers};
 #[path = "gaps_redirects.rs"]
 mod redirects;
 #[path = "gaps_stock.rs"]

@@ -94,8 +94,9 @@ impl GapsModule {
             return FeedMarks::default();
         };
         let (known, filed) = self.filed_as(k, name);
+        // A known NPC's row for the quests its page lacks (gaps_quest_givers.rs) is no missing page.
         match self.rows.get(&(Domain::Mob, mob_key(filed))) {
-            Some(row) if row.via_redirect.is_none() => FeedMarks {
+            Some(row) if row.via_redirect.is_none() && row.quest_gaps.is_none() => FeedMarks {
                 unknown: true,
                 maybe_player: self.maybe_player(row),
                 needs_image: false,

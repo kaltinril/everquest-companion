@@ -81,6 +81,8 @@ export interface MobEntry {
   loc?: MobLoc[]
   /** the page is a `{{MerchantPage}}`: a vendor NPC */
   merchant?: true
+  /** a merchant page's `|items_sold`: the item page titles it transcludes (`{{:Item}}`), page order, deduped */
+  sells?: string[]
   /** every faction the page says a kill moves, lowered or raised (`|factions`, `|opposing_factions`) */
   factions?: string[]
   /** what each `factions` bullet states about the hit, same order: "-30", "-30..-10?", "+" (mobFactionAmounts.ts) */
@@ -89,6 +91,8 @@ export interface MobEntry {
   image?: string
   /** the page names no image, or one the wiki has no file for (scrape-wiki-files.ts) */
   noImage?: true
+  /** the quest pages `|related_quests` links, as linked; absent when the field is empty or `* None` */
+  relatedQuests?: string[]
 }
 
 export interface MobData {

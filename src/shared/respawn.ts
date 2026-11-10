@@ -424,7 +424,16 @@ export interface RespawnWatchPref {
   display: string
   /** The user's own respawn, in SECONDS. Rung 1; absent means "use what you learn". */
   customSec?: number
+  /**
+   * Several mobs share this name (owner, 2026-11-09: two spawns of one name make short gaps that
+   * ruin the clock): the estimate ignores gaps under `RESPAWN_SHARED_NAME_FLOOR_MS` and takes the
+   * lowest above it. Absent means off; an unwatch drops it with the watch.
+   */
+  sharedName?: true
 }
+
+/** The floor a shared-name watch applies (`respawn.rs SHARED_NAME_FLOOR_MS`): ten minutes. */
+export const RESPAWN_SHARED_NAME_FLOOR_MS = 10 * 60_000
 
 export interface RespawnPrefs {
   /**
@@ -517,6 +526,7 @@ function normalizeWatch(raw: unknown): RespawnWatchPref | null {
   const out: RespawnWatchPref = { key, display: display.length > 0 ? display : key }
   const sec = normalizeCustomSec(w.customSec)
   if (sec !== undefined) out.customSec = sec
+  if (w.sharedName === true) out.sharedName = true
   return out
 }
 
@@ -656,6 +666,8 @@ export interface RespawnRow {
    * from.
    */
   customMs?: number
+  /** The watch says several mobs share this name: gaps under ten minutes were ignored (`sharedName`). */
+  sharedName?: true
   /** The wiki's verbatim text, when it has one — shown as-is, including "Triggered" and "?". */
   wikiText?: string
   wikiMs?: number
@@ -936,7 +948,8 @@ export function respawnFloored(row: RespawnRow): boolean {
 export function respawnSourceLabel(row: RespawnRow): string {
   if (row.source === 'custom') return 'your number'
   if (row.source === 'observed') {
-    const n = row.samples === 1 ? '1 gap' : `${String(row.samples)} gaps`
+    // A shared name counts only the gaps over ten minutes (owner, 2026-11-09), and says so.
+    const n = `${row.samples === 1 ? '1 gap' : `${String(row.samples)} gaps`}${row.sharedName === true ? ' over 10 min' : ''}`
     return respawnFloored(row) ? `your kills (${n}), floored by the wiki` : `your kills (${n})`
   }
   if (row.source === 'wiki') return 'wiki default'

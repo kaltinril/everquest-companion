@@ -24,7 +24,8 @@ import { anyMobDrop } from './gapDrops'
 import { isRewardChest, mobSourceOf } from './rewardChest'
 import { wikiZoneLink } from './gapWikiZone'
 import { forageAddText } from './gapForage'
-import type { VendorFinder } from './gapMobPage'
+import { questGiverAddText } from './gapQuestGivers'
+import { catalogSellers, logSpot, type VendorFinder, type VendorPlacing } from './gapMobPage'
 import type { LootEvent } from './types'
 import { SPELL_HEAD, SPELL_TAIL, spellPageValues, type SpellPageShot } from './spellWindow'
 import { castBySentence, withCastBy } from './spellCastBy'
@@ -237,21 +238,24 @@ export function dropsSeen(item: string, loot: readonly LootEvent[], zoneName: Zo
 }
 
 /**
- * A vendor's row: its catalog page, zone and single spawn point when the catalog can tell which page
- * (`vendorFinder`), else its name as printed and the item's one zone, if it was seen in only one.
+ * A vendor's row: its catalog page, zone and single spawn point when the catalog can tell which page,
+ * else its name as printed and the item's one zone, if seen in only one. A spot the catalog lacks (a
+ * page newer than the scrape, or without a location) is the log's `/loc` beside the hail: the point
+ * the vendor's own Mobs row already carries (owner, 2026-11-10: Zok Crikk, placed and marked done).
  */
-function vendorSeen(vendor: string, zones: readonly string[], zoneName: ZoneNamer, vendorAt?: VendorFinder): VendorSeen {
-  const at = vendorAt?.(vendor, zones)
+function vendorSeen(vendor: string, zones: readonly string[], zoneName: ZoneNamer, place: VendorPlacing): VendorSeen {
+  const at = place.vendorAt?.(vendor, zones)
   const zone = at?.zone !== undefined ? zoneName(at.zone) : zones.length === 1 ? (zones[0] ?? '') : ''
-  return { vendor: at?.page ?? vendor, zone, ...(at?.loc === undefined ? {} : { loc: at.loc }) }
+  const loc = at?.loc ?? logSpot(place, vendor)
+  return { vendor: at?.page ?? vendor, zone, ...(loc === undefined ? {} : { loc }) }
 }
 
-export function itemFacts(row: GapRow, loot: readonly LootEvent[], zoneName: ZoneNamer = asPrinted, vendorAt?: VendorFinder): ItemFacts {
+export function itemFacts(row: GapRow, loot: readonly LootEvent[], zoneName: ZoneNamer = asPrinted, place: VendorPlacing = {}): ItemFacts {
   const drops = dropsSeen(row.name, loot, zoneName)
   const mobs = new Set(drops.map((d) => d.mob.toLowerCase()))
-  const bought = row.kinds.includes('bought')
+  const bought = row.kinds.includes('bought') || row.kinds.includes('quoted')
   const vendors = bought ? (row.details.sources?.entries ?? []).map((e) => e.name).filter((n) => !mobs.has(n.toLowerCase()) && !isRewardChest(n)) : []
-  const soldBy = vendors.map((v) => vendorSeen(v, rowZones(row, zoneName), zoneName, vendorAt))
+  const soldBy = [...vendors, ...catalogSellers(row.name, vendors, place)].map((v) => vendorSeen(v, rowZones(row, zoneName), zoneName, place))
   // A merchant's offer heard at ally wins over the instant-sale estimate; any other never stands in
   // for it (shared/gapOffers.ts `merchantValueOf`, owner ask 2026-10-20).
   const merchantValue = merchantValueOf(row.details, derivedPrices(row.details)?.vendorValue)
@@ -613,6 +617,8 @@ export interface PageExtras extends QuestExtras, MerchantExtras {
   spellFacts?: Readonly<Record<string, ClientSpellFacts>>
   /** Where a vendor stands, by the catalog (`vendorFinder`): an item page's `|soldby` rows. */
   vendorAt?: VendorFinder
+  /** The merchants the catalog says stock an item (`sellersOf`): the rows the log did not name. */
+  sellersOf?: (item: string) => readonly string[]
   /** What pasted screenshots of item windows gave, by the row's name (ItemPageShot). */
   itemShots?: Readonly<Record<string, ItemPageShot>>
   /** What pasted spell display windows gave, by the row's name (SpellPageShot). */
@@ -638,16 +644,24 @@ interface PageContext extends Omit<PageExtras, 'zoneName'> {
   zoneName: ZoneNamer
 }
 
+/** An item page's facts: rows and quest parts, both placing an NPC by the log's `/loc` when the catalog cannot. */
+function itemPageParts(row: GapRow, c: PageContext): Parameters<typeof itemPage>[0] {
+  const locOf = locFinder(c.seen.mobLocs)
+  const facts = withPageTitles(itemFacts(row, c.loot, c.zoneName, { vendorAt: c.vendorAt, locOf, sellersOf: c.sellersOf }), c.mobPage)
+  return { ...facts, ...withFishedNote(questPageParts(questFactsOf(row), { mobPage: c.mobPage, zoneName: c.zoneName, locOf }), row, c.zoneName) }
+}
+
 /**
  * Each domain's page, or the one line a mob's page lacks (a faction, image or drop row). A table,
  * so a new domain is one entry, and a domain without one does not compile.
  */
 const PAGE_OF: Record<GapDomain, (row: GapRow, c: PageContext) => string> = {
   // A page that exists and lacks a forage zone or the category: only the lines to add (gapForage.ts).
-  item: (row, c) => (row.forageUpdate ? forageAddText(row.forageUpdate) : itemPage({ ...withPageTitles(itemFacts(row, c.loot, c.zoneName, c.vendorAt), c.mobPage), ...withFishedNote(questPageParts(questFactsOf(row), { mobPage: c.mobPage, zoneName: c.zoneName, locOf: locFinder(c.seen.mobLocs) }), row, c.zoneName) }, c.itemShots?.[row.name])),
+  item: (row, c) => (row.forageUpdate ? forageAddText(row.forageUpdate) : itemPage(itemPageParts(row, c), c.itemShots?.[row.name])),
+  // A known NPC's page lacking a quest it gives: only the related_quests lines to add (gapQuestGivers.ts).
   // A mob its target line calls a merchant takes the merchant layout before any trade (owner, 2026-10-22);
   // a new mob page takes its fight estimates in its blank fields (shared/gapFight.ts).
-  mob: (row, c) => (roleOf(row) === 'Merchant' ? merchantPage(withDescription(mobFacts(row, [], c.kills, { ...c.seen, zoneName: c.zoneName }), row, c)) : withRespawnField(withFightFields(mobPage(mobFacts(row, c.loot, c.kills, { ...c.seen, zoneName: c.zoneName }), c.commonLoot), row), row)),
+  mob: (row, c) => (row.questGaps ? questGiverAddText(row.questGaps) : roleOf(row) === 'Merchant' ? merchantPage(withDescription(mobFacts(row, [], c.kills, { ...c.seen, zoneName: c.zoneName }), row, c)) : withRespawnField(withFightFields(mobPage(mobFacts(row, c.loot, c.kills, { ...c.seen, zoneName: c.zoneName }), c.commonLoot), row), row)),
   merchant: (row, c) => merchantPage(withDescription(mobFacts(row, [], c.kills, { ...c.seen, zoneName: c.zoneName }), row, c)),
   spell: (row, c) => spellPage({ name: row.name, npcOnly: npcOnlySpell(row, c.isMob), client: c.spellFacts?.[row.name], shot: c.spellShots?.[row.name], castBy: castBySentence(row, c.isMob) }),
   faction: (row) => `${factionLine({ faction: factionOf(row), adjust: row.adjust, raised: row.raised })}\n`,
@@ -703,8 +717,9 @@ const NEEDED_OF: Partial<Record<GapDomain, (row: GapRow, seen: PageExtras) => st
  * what to collect before the trip ends (review 2026-10-19). `kills` must be a `killIndex` result.
  */
 export function stillNeeded(row: GapRow, loot: readonly LootEvent[], kills: KillMap, seen: MobSightings & PageExtras & MerchantExtras = {}): string[] {
-  // A redirect row asks for a check in game, nothing to collect (gapRedirects.ts).
-  if (row.viaRedirect !== undefined) return []
+  // A redirect row asks for a check in game, nothing to collect (gapRedirects.ts); a known NPC's
+  // quest gaps are the lines to add, nothing more (gapQuestGivers.ts).
+  if (row.viaRedirect !== undefined || row.questGaps !== undefined) return []
   const fixed = NEEDED_OF[row.domain]
   if (fixed !== undefined) return fixed(row, seen)
   const f = mobFacts(row, row.domain === 'mob' ? loot : [], kills, seen)

@@ -19,7 +19,7 @@ import { lootedItemNames, type DropAliases, type DropGroups } from '@shared/gapD
 import { lastGapsSnap, type GapsWiki } from '@shared/gapDerive'
 import { learnedOf, type LearnedEvidence } from '@shared/respawnLearn'
 import { memoLast } from '@shared/gapMemo'
-import { catalogNameTest, commonLootNames, vendorFinder } from '@shared/gapMobPage'
+import { catalogNameTest, commonLootNames, sellersOf, vendorFinder } from '@shared/gapMobPage'
 import { catalogZoneCounts, wikiZoneNamer } from '@shared/gapWikiZone'
 import type { PageExtras, ZoneNamer } from '@shared/wikiPage'
 import dropGroupsJson from '../../data/eqlegends/dropGroups.json'
@@ -96,6 +96,9 @@ export const PAGE_EXTRAS: PageExtras = {
   },
   get vendorAt() {
     return (vendorAt ??= vendorFinder(MOB_CATALOG))
+  },
+  get sellersOf() {
+    return sellersOf(MOB_CATALOG)
   },
   get mobPage() {
     return (mobPage ??= mobPageFinder(MOB_CATALOG))

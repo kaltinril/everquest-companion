@@ -51,6 +51,9 @@ mod places;
 const RESPAWN_SHAPE_VERSION: i64 = 4;
 /// The shortest gap this module will read as a spawn cycle, and the earliest sign of life (header).
 const MIN_GAP_MS: i64 = 60_000;
+/// A watch marked "several mobs share this name" (owner, 2026-11-09: two spawns of one name make
+/// short gaps that ruin the clock): gaps under this are ignored and the lowest above it wins.
+const SHARED_NAME_FLOOR_MS: i64 = 10 * 60_000;
 /// Distinct (zone, mob) pairs the history keeps before evicting the least recently killed.
 const MAX_HISTORY: usize = 800;
 /// How often a continuing sighting re-publishes. A fight prints several lines a second and every
@@ -103,6 +106,9 @@ pub struct RespawnRow {
     /// The number the user typed, when they typed one.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_ms: Option<i64>,
+    /// The watch says several mobs share this name: gaps under `SHARED_NAME_FLOOR_MS` were ignored.
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    pub shared_name: bool,
     /// What the committed wiki data says, verbatim.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub wiki_text: Option<String>,
@@ -141,6 +147,10 @@ pub struct RespawnWatchPref {
     /// The user's own respawn, in SECONDS. Rung 1; absent means "use what you learn".
     #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_sec: Option<i64>,
+    /// Several mobs share this name (owner, 2026-11-09): the estimate ignores gaps under
+    /// `SHARED_NAME_FLOOR_MS` and takes the lowest above it. Absent on the wire when false.
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    pub shared_name: bool,
 }
 
 /// `DEFAULT_RESPAWN_PREFS` is an empty list and that is the shipped default: tracking is opt-in per
@@ -206,6 +216,7 @@ impl RespawnPrefs {
                 .filter(|s| s.is_finite())
                 .map(|s| s as i64)
                 .filter(|s| (MIN_SEC..=MAX_SEC).contains(s));
+            let shared_name = w.get("sharedName").and_then(Value::as_bool).unwrap_or(false);
             watches.push(RespawnWatchPref {
                 display: if display.is_empty() {
                     key.clone()
@@ -214,6 +225,7 @@ impl RespawnPrefs {
                 },
                 key,
                 custom_sec,
+                shared_name,
             });
             if watches.len() >= MAX_WATCHES {
                 break;
@@ -514,10 +526,13 @@ impl RespawnModule {
     /// returns `None`. It never sweeps stale rows, and it takes no clock: nothing it computes
     /// depends on `now`.
     fn row_for(&self, h: &MobHistory) -> Option<RespawnRow> {
-        let custom_ms = self.watch_of(&h.key)?;
+        let watch = self.watch_index.get(&h.key)?;
+        let custom_ms = watch.custom_sec.map(|s| s * 1000);
         let wiki_row = wiki().get(&h.key);
         let wiki_ms = wiki_row.and_then(|w| w.seconds).map(|s| s * 1000);
-        let (min_gap_ms, samples) = self.pooled_gaps(h);
+        // A shared name's short gaps are two spawns mixed (owner, 2026-11-09): only the gaps of ten
+        // minutes or more count, and the lowest of those is the estimate.
+        let (min_gap_ms, samples) = if watch.shared_name { self.pooled_gaps_above(h, SHARED_NAME_FLOOR_MS) } else { self.pooled_gaps(h) };
         let (estimate_ms, source) = resolve_respawn(custom_ms, min_gap_ms, samples, wiki_ms);
         let base = base_of(h);
         let mut row = RespawnRow {
@@ -540,6 +555,7 @@ impl RespawnModule {
             observed_ms: min_gap_ms,
             gaps_ms: None,
             custom_ms,
+            shared_name: watch.shared_name,
             wiki_text: wiki_row.map(|w| w.text.clone()),
             wiki_ms,
             // The page those words came from, so the edit modal can link to it: quoting a source

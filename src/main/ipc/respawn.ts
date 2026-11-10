@@ -31,6 +31,7 @@ import {
   respawnWithWatchList,
   respawnClearKeys,
   respawnWithCustom,
+  respawnWithSharedName,
   respawnWithWatch,
   respawnWithoutWatch,
   respawnWithoutWatches
@@ -192,6 +193,15 @@ function registerWatchEdits(): void {
     const clean = sec === null ? undefined : normalizeCustomSec(sec)
     if (sec !== null && clean === undefined) return false
     commit(respawnWithCustom(getRespawnPrefs(), key, display, clean))
+    return true
+  })
+  /** SEVERAL MOBS SHARE THIS NAME, on or off (owner, 2026-11-09). A no-op (false) when nothing changes. */
+  ipcMain.handle(IPC.respawnSetSharedName, (_e, key: unknown, display: unknown, shared: unknown) => {
+    if (!isMobKey(key) || !isDisplay(display) || typeof shared !== 'boolean') return false
+    const current = getRespawnPrefs()
+    const next = respawnWithSharedName(current, key, display, shared)
+    if (next === current) return false
+    commit(next)
     return true
   })
 }

@@ -1,9 +1,10 @@
-// shared/gapFieldActions.ts — the chips of the domains whose row is one field of a mob page: a
-// picture (gapImages.ts) and a respawn (gapRespawns.ts). Out of gaps.ts, which sits at the factoring
-// ceiling (eslint max-lines).
+// shared/gapFieldActions.ts — the chips of the rows that are one field of a mob page: a picture
+// (gapImages.ts), a respawn (gapRespawns.ts) and a known NPC's missing quests, its related_quests
+// (gapQuestGivers.ts). Out of gaps.ts, which sits at the factoring ceiling (eslint max-lines).
 
 import type { GapAction, GapDomain, GapRow } from './gaps'
 import { respawnAction } from './gapRespawns'
+import { questGiverAction } from './gapQuestGivers'
 import { wikiUploadUrl } from './gapUrls'
 
 /** An image row's chip: upload the file; the page's imagefilename line added, or fixed when it names another file. */
@@ -17,7 +18,8 @@ const FIELD_ACTION: Partial<Record<GapDomain, (row: GapRow) => GapAction>> = {
   respawn: (row) => respawnAction(row)
 }
 
-/** The row's one chip when its domain is one field of a mob page; undefined otherwise. */
+/** The row's one chip when it is one field of a mob page; undefined otherwise. */
 export function fieldAction(row: GapRow): GapAction | undefined {
+  if (row.questGaps !== undefined) return questGiverAction(row)
   return FIELD_ACTION[row.domain]?.(row)
 }

@@ -115,18 +115,20 @@ impl LearnedStore {
         }
     }
 
-    /// One mob's gaps across every place `same_zone` admits: the smallest, and how many. The
-    /// estimate reads from here (`respawn_places.rs pooled_gaps`) because the history forgets a
-    /// place (a closed private instance, the 800-mob LRU) while this keeps what it taught.
-    pub fn pooled(&self, key: &str, same_zone: impl Fn(&str) -> bool) -> (Option<i64>, i64) {
+    /// One mob's gaps of `floor` or more across every place `same_zone` admits: the smallest, and
+    /// how many. The estimate reads from here (`respawn_places.rs pooled_gaps`) because the history
+    /// forgets a place (a closed private instance, the 800-mob LRU) while this keeps what it taught.
+    /// `floor` is 0 for every gap; a shared name's floor leaves two spawns' short gaps out.
+    pub fn pooled(&self, key: &str, same_zone: impl Fn(&str) -> bool, floor: i64) -> (Option<i64>, i64) {
         let mut min: Option<i64> = None;
         let mut count: i64 = 0;
         for e in self.map.values() {
             if e.key != key || !same_zone(&e.zone) {
                 continue;
             }
-            count += e.gaps.len() as i64;
-            min = least(min, e.gaps.iter().copied().min());
+            let above = e.gaps.iter().copied().filter(|g| *g >= floor);
+            count += above.clone().count() as i64;
+            min = least(min, above.min());
         }
         (min, count)
     }

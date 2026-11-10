@@ -164,10 +164,31 @@ export function respawnWithWatchList(stored: RespawnPrefs, incoming: readonly Re
 export function respawnWithCustom(prefs: RespawnPrefs, key: string, display: string, sec?: number): RespawnPrefs {
   const want = canonRespawnKey(key)
   if (want.length === 0) return prefs
-  const entry: RespawnWatchPref = sec === undefined ? { key: want, display } : { key: want, display, customSec: sec }
+  // The shared-name switch is the watch's other fact and rides along (owner, 2026-11-09).
+  const shared = prefs.watches.find((w) => w.key === want)?.sharedName === true ? { sharedName: true as const } : {}
+  const entry: RespawnWatchPref = sec === undefined ? { key: want, display, ...shared } : { key: want, display, customSec: sec, ...shared }
   let watches = prefs.watches.map((w) => (w.key === want ? entry : w))
   if (sec !== undefined && !prefs.watches.some((w) => w.key === want)) watches = [...watches, entry]
   return withKept({ ...prefs, watches }, keptWithout(prefs.keptCustom, want))
+}
+
+/**
+ * SEVERAL MOBS SHARE THIS NAME, OR NOT (owner, 2026-11-09: "identical named mobs" ruin the clock; the
+ * estimate then ignores gaps under ten minutes). The switch is set on the watch in place, a typed
+ * number kept; switching it on for a mob whose watch went away meanwhile watches it again, as a
+ * typed number does; switching it off for a mob not watched is a no-op. The kept list is untouched:
+ * the switch is a fact about the watch and goes with it.
+ */
+export function respawnWithSharedName(prefs: RespawnPrefs, key: string, display: string, shared: boolean): RespawnPrefs {
+  const want = canonRespawnKey(key)
+  if (want.length === 0) return prefs
+  const had = prefs.watches.find((w) => w.key === want)
+  if (had === undefined && !shared) return prefs
+  const entry: RespawnWatchPref = { key: want, display: had?.display ?? display }
+  if (had?.customSec !== undefined) entry.customSec = had.customSec
+  if (shared) entry.sharedName = true
+  const watches = had === undefined ? [...prefs.watches, entry] : prefs.watches.map((w) => (w.key === want ? entry : w))
+  return { ...prefs, watches }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

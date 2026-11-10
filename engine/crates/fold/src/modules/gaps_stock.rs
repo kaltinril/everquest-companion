@@ -35,7 +35,7 @@
 
 use crate::modules::gaps_details::coin_of;
 use crate::modules::gaps_players::{hail_of, ANSWER_MS};
-use crate::modules::gaps_keys::ItemIndex;
+use crate::modules::gaps_keys::{item_gap_key, ItemIndex};
 use super::{Domain, GapsModule};
 use crate::event::{Event, Kind};
 use crate::message_overlay::message_text_of;
@@ -210,10 +210,23 @@ impl GapsModule {
                     return self.stock.heard(text, ev.ts());
                 };
                 let ally = self.standings.of(merchant) == Some(ALLY);
-                self.stock.sold(merchant, item, ally.then_some(copper))
+                self.stock.sold(merchant, item, ally.then_some(copper)) | self.quoted(merchant, item, ev)
             }
             _ => false,
         }
+    }
+
+    /// A quote names an item the merchant sells: filed as the purchase would be, the merchant its
+    /// source, so an item the wiki lacks is a row before anything is bought or captured, and its
+    /// page's `soldby` has the merchant (owner, 2026-11-10: Darkwood Bowstave at Zok Rurpp was a row
+    /// only once its window was pasted, and that said nothing of where it is sold). A quote for a
+    /// player's resell names a merchant that never stocks it: the player prunes, as on merchant pages.
+    fn quoted(&mut self, merchant: &str, item: &str, ev: &Event) -> bool {
+        let filed = self.item_named(item, "quoted", ev);
+        if let Some(row) = self.rows.get_mut(&(Domain::Item, item_gap_key(item))) {
+            row.details.quoted_by(merchant);
+        }
+        filed
     }
 }
 

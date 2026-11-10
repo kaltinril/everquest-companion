@@ -4,7 +4,9 @@
 use crate::mobs::MobIndex;
 use crate::names::item_key;
 use fold::knowledge::GapIndex;
+use fold::modules::consider::mob_key;
 use serde_json::{Map, Value};
+use std::collections::{HashMap, HashSet};
 
 /// The item keys with their pages, every effect an item states, and the mob catalog's names.
 ///
@@ -12,7 +14,7 @@ use serde_json::{Map, Value};
 /// (owner, 2026-10-22: "no one told you to restrict it to mobs only"), handed over apart from its
 /// own keys: a name known only through a redirect is a row to check, since a redirect can be wrong
 /// (Halfling Blood was sent to Vial of Halfling Blood, a different item).
-pub(crate) fn build(items: &Map<String, Value>, mobs: &MobIndex) -> GapIndex {
+pub(crate) fn build(items: &Map<String, Value>, mobs: &MobIndex, quests: &[Value]) -> GapIndex {
     let page = |k: &String, e: &Value| e["page"].as_str().unwrap_or(k).to_string();
     let item_pages = items.iter().map(|(k, e)| (k.clone(), page(k, e))).collect();
     let item_redirects = items
@@ -40,6 +42,7 @@ pub(crate) fn build(items: &Map<String, Value>, mobs: &MobIndex) -> GapIndex {
     GapIndex {
         item_notices: item_notices(items),
         mob_notices: mob_notices_of(mobs.names().iter().filter_map(|n| mobs.entry(n))),
+        mob_quest_gaps: mob_quest_gaps_of(mobs.names().iter().filter_map(|n| mobs.entry(n)), quests),
         item_pages,
         item_effects,
         mob_names: mobs.names().to_vec(),
@@ -102,9 +105,62 @@ fn mob_notices_of<'a>(mobs: impl Iterator<Item = &'a Value>) -> Vec<(String, Str
     out
 }
 
+/// A quest page title as two lists compare it: case apart, the game's backtick as the wiki's apostrophe.
+fn quest_title_key(title: &str) -> String {
+    title.trim().to_lowercase().replace('`', "'")
+}
+
+/// The quest pages each giver's mob key gives, off the quest catalog's `giver`.
+fn quests_by_giver(quests: &[Value]) -> HashMap<String, Vec<String>> {
+    let mut out: HashMap<String, Vec<String>> = HashMap::new();
+    for q in quests {
+        let Some(giver) = q["giver"].as_str().map(mob_key).filter(|g| !g.is_empty()) else {
+            continue;
+        };
+        let Some(page) = q["page"].as_str().or_else(|| q["name"].as_str()).filter(|p| !p.trim().is_empty()) else {
+            continue;
+        };
+        let given = out.entry(giver).or_default();
+        if !given.iter().any(|p| quest_title_key(p) == quest_title_key(page)) {
+            given.push(page.to_string());
+        }
+    }
+    out
+}
+
+/// Every name a mob page answers to whose page lacks a quest the catalog says that NPC gives
+/// (owner, 2026-11-09): `(name, page, the quest pages missing)`, each page once. A giver matches by
+/// mob key under any of the page's names; a quest is listed when `relatedQuests` names its page.
+fn mob_quest_gaps_of<'a>(mobs: impl Iterator<Item = &'a Value>, quests: &[Value]) -> Vec<(String, String, Vec<String>)> {
+    let by_giver = quests_by_giver(quests);
+    let mut pages = HashSet::new();
+    let mut out = Vec::new();
+    for m in mobs {
+        let Some(page) = m["page"].as_str().filter(|p| pages.insert(p.to_string())) else {
+            continue;
+        };
+        let others = m["otherNames"].as_array().into_iter().flatten().filter_map(Value::as_str);
+        let names: Vec<&str> = [m["name"].as_str(), Some(page)].into_iter().flatten().chain(others).filter(|n| !n.trim().is_empty()).collect();
+        let listed: Vec<String> = m["relatedQuests"].as_array().into_iter().flatten().filter_map(Value::as_str).map(quest_title_key).collect();
+        let mut missing: Vec<String> = Vec::new();
+        for given in names.iter().filter_map(|n| by_giver.get(&mob_key(n))) {
+            for q in given {
+                if !listed.contains(&quest_title_key(q)) && !missing.iter().any(|x| quest_title_key(x) == quest_title_key(q)) {
+                    missing.push(q.clone());
+                }
+            }
+        }
+        if missing.is_empty() {
+            continue;
+        }
+        out.extend(names.iter().map(|n| (n.to_string(), page.to_string(), missing.clone())));
+    }
+    out
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{build, mob_notices_of};
+    use super::{build, mob_notices_of, mob_quest_gaps_of};
     use crate::mobs::MobIndex;
     use serde_json::{json, Map, Value};
 
@@ -116,7 +172,7 @@ mod tests {
             "rusty mace": {"page": "Rusty Mace"}
         }))
         .unwrap();
-        let index = build(&items, &MobIndex::build());
+        let index = build(&items, &MobIndex::build(), &[]);
         let pages: Vec<(&str, &str)> = index
             .item_pages
             .iter()
@@ -148,9 +204,40 @@ mod tests {
             "rusty mace": {"page": "Rusty Mace"}
         }))
         .unwrap();
-        let index = build(&items, &MobIndex::build());
+        let index = build(&items, &MobIndex::build(), &[]);
         let keys: Vec<(&str, &str)> = index.item_notices.iter().map(|(k, p, _)| (k.as_str(), p.as_str())).collect();
         assert_eq!(keys, [("old thing", "Old Thing"), ("older thing", "Old Thing")]);
         assert_eq!(index.item_notices[0].2, ["delete: No longer in game"]);
+    }
+
+    #[test]
+    fn a_quest_givers_page_that_does_not_list_the_quest_is_a_gap_under_every_name_it_answers_to() {
+        // Owner, 2026-11-09: Lord Ollix Everling's page (a template stub) lists no quest; the
+        // catalog says he gives The Tragic Tale of House Everling. Nikko Canti's page lists his two.
+        let mobs: Value = serde_json::from_str(
+            r#"{"mobs":[
+          {"page":"Lord Ollix Everling","name":"NPC Name","otherNames":["Ollix"]},
+          {"page":"Nikko Canti","name":"Nikko Canti","relatedQuests":["Something Fishy","Alchemical solution"]},
+          {"page":"A bat","name":"a bat"}
+        ]}"#,
+        )
+        .unwrap();
+        let records = mobs["mobs"].as_array().unwrap();
+        let quests = vec![
+            json!({"name":"The Tragic Tale of House Everling","page":"The Tragic Tale of House Everling","giver":"Lord Ollix Everling"}),
+            json!({"name":"Something Fishy","page":"Something Fishy","giver":"Nikko Canti"}),
+            json!({"name":"Alchemical Solution","page":"Alchemical Solution","giver":"nikko canti"}),
+            json!({"name":"No giver","page":"No giver"}),
+        ];
+        let tale = vec!["The Tragic Tale of House Everling".to_string()];
+        let gaps = mob_quest_gaps_of(records.iter().chain(records.iter()), &quests);
+        assert_eq!(
+            gaps,
+            [
+                ("NPC Name".to_string(), "Lord Ollix Everling".to_string(), tale.clone()),
+                ("Lord Ollix Everling".to_string(), "Lord Ollix Everling".to_string(), tale.clone()),
+                ("Ollix".to_string(), "Lord Ollix Everling".to_string(), tale),
+            ]
+        );
     }
 }

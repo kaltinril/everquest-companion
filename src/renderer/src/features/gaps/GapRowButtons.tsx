@@ -143,6 +143,8 @@ function editorOf(row: GapRow): { target: string; create: string; existing: bool
   }
   // A notice row's page exists: it is edited, the notice off (owner, 2026-10-22).
   if (row.domain === 'notice') return { target: row.page ?? row.name, create: 'Edit page', existing: true }
+  // A known NPC's page exists: its related_quests gain the quests it gives (gapQuestGivers.ts).
+  if (row.questGaps !== undefined) return { target: row.questGaps.page, create: 'Edit mob page', existing: true }
   // A respawn row's page exists: its respawn_time is set (gapRespawns.ts).
   if (row.domain === 'respawn') return { target: row.page ?? row.name, create: 'Edit mob page', existing: true }
   if (onMobPage(row)) return { target: mobPageOf(row), create: 'Edit mob page', existing: true }
