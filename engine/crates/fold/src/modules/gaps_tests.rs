@@ -192,6 +192,25 @@ fn nothing_is_checked_before_the_knowledge_is_installed_and_an_epoch_clears() {
     assert_eq!(m.snapshot()["state"]["seen"], json!({ "item": 0, "mob": 0, "spell": 0, "merchant": 0, "notice": 0, "quest": 0 }));
 }
 
+/// Owner, 2026-11-10: Darkwood Bowstave was a row only once its window was pasted, and the page
+/// said nothing of Zok Rurpp.
+#[test]
+fn a_merchants_price_quote_files_the_item_with_the_merchant_as_its_source() {
+    let mut m = module();
+    feed(&mut m, 1, json!({ "kind": "zone", "zone": "The Rathe Mountains" }));
+    feed(&mut m, 2, json!({ "kind": "unknown", "raw": "[Tue Nov 10 00:10:53 2026] Zok Rurpp told you, 'That'll be 226 platinum 7 gold 9 silver 9 copper per Darkwood Bowstave.'" }));
+    feed(&mut m, 3, json!({ "kind": "unknown", "raw": "[Tue Nov 10 00:11:06 2026] Zok Rurpp told you, 'That'll be 226 platinum 7 gold 9 silver 9 copper per Darkwood Bowstave.'" }));
+    let rows = m.snapshot()["state"]["rows"].clone();
+    let row = rows.as_array().unwrap().iter().find(|r| r["name"] == "Darkwood Bowstave").expect("the quoted item is a row");
+    assert_eq!(row["kinds"], json!(["quoted"]));
+    assert_eq!(row["count"], 2);
+    assert_eq!(row["details"]["sources"]["entries"], json!([{ "name": "Zok Rurpp", "n": 2 }]));
+    assert_eq!(row["details"]["zones"]["entries"], json!([{ "name": "The Rathe Mountains", "n": 2 }]));
+    // A known item quoted is no row, as a known item bought is none.
+    feed(&mut m, 4, json!({ "kind": "unknown", "raw": "[Tue Nov 10 00:12:00 2026] Zok Rurpp told you, 'That'll be 1 silver per Bone Chips.'" }));
+    assert!(m.snapshot()["state"]["rows"].as_array().unwrap().iter().all(|r| r["name"] != "Bone Chips"));
+}
+
 #[test]
 fn details_say_where_and_from_whom_and_keep_the_last_lines() {
     let mut m = module();
@@ -456,7 +475,8 @@ fn a_trader_the_wiki_lists_as_no_merchant_is_a_row_and_a_kill_keeps_its_faction_
     feed(&mut m, 1, line("Murga told you, 'That'll be 5 silver 3 copper per Tunic Pattern.'"));
     feed(&mut m, 2, line("Klok Koglin told you, 'That'll be 1 gold per Bread.'"));
     feed(&mut m, 3, json!({ "kind": "coin", "source": "vendor", "npc": "Murga", "item": "Bone Chips" }));
-    assert_eq!(rows(&m), ["merchant Murga x2 [quoted,sold]"]);
+    // Each quote files its item too, the merchant its source (2026-11-10).
+    assert_eq!(rows(&m), ["item Bread x1 [quoted]", "item Tunic Pattern x1 [quoted]", "merchant Murga x2 [quoted,sold]"]);
     feed(&mut m, 4, line("Your faction standing with Undead Frogloks of Guk has been adjusted by -20."));
     feed(&mut m, 5, json!({ "kind": "death", "name": "a decaying skeleton", "killer": "You", "raw": "[Tue Oct 06 18:12:26 2026] You have slain a decaying skeleton!" }));
     let pairs = m.snapshot()["state"]["killFactions"].clone();

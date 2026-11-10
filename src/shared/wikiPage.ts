@@ -253,7 +253,7 @@ function vendorSeen(vendor: string, zones: readonly string[], zoneName: ZoneName
 export function itemFacts(row: GapRow, loot: readonly LootEvent[], zoneName: ZoneNamer = asPrinted, place: VendorPlacing = {}): ItemFacts {
   const drops = dropsSeen(row.name, loot, zoneName)
   const mobs = new Set(drops.map((d) => d.mob.toLowerCase()))
-  const bought = row.kinds.includes('bought')
+  const bought = row.kinds.includes('bought') || row.kinds.includes('quoted')
   const vendors = bought ? (row.details.sources?.entries ?? []).map((e) => e.name).filter((n) => !mobs.has(n.toLowerCase()) && !isRewardChest(n)) : []
   const soldBy = vendors.map((v) => vendorSeen(v, rowZones(row, zoneName), zoneName, place))
   // A merchant's offer heard at ally wins over the instant-sale estimate; any other never stands in
