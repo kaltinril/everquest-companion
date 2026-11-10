@@ -285,6 +285,12 @@ where one exists.
 
 ## Gaps tab (was gaps-tab, gaps-item-facts, gaps-all-characters, gaps-overlay)
 
+- 2026-11-10: an item page's `soldby` row places its vendor by the catalog first (`vendorFinder`,
+  one page, one spot), else by the log's own `/loc` beside the hail or con (`locFinder` over the
+  engine's `mobLocs`, the point the vendor's Mobs row already puts on its page). `VendorPlacing` in
+  `gapMobPage.ts` carries both finders. Owner: Zok Crikk, hailed beside a `/loc`, page created and
+  marked done, yet Unusual Wine and Ale - Part 2's row had an empty loc cell (his page postdates the
+  2026-11-08 scrape, so the catalog had nothing). The catalog's spot still wins where it has one.
 - 2026-11-09: a KNOWN NPC's page lacking a quest the catalog says it gives is a Mobs row, an Update
   page (owner: Lord Ollix Everling's page, a template stub, lists none of The Tragic Tale of House
   Everling; the Mobs domain filed only unknown names and a quest enters only through a task line).

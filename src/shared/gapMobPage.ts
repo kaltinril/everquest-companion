@@ -77,6 +77,18 @@ export interface VendorPlace {
 
 export type VendorFinder = (vendor: string, zones: readonly string[]) => VendorPlace | undefined
 
+/** How a vendor is placed: by the catalog (`vendorFinder`), else by the log's own `/loc` beside its hail (`locFinder`). */
+export interface VendorPlacing {
+  vendorAt?: VendorFinder
+  locOf?: (npc: string) => readonly number[] | undefined
+}
+
+/** The log's first `/loc` point for a mob as a row's (ns, ew), or none. */
+export function logSpot(place: VendorPlacing, vendor: string): readonly [number, number] | undefined {
+  const seen = place.locOf?.(vendor)
+  return seen !== undefined && seen.length >= 2 ? [seen[0] ?? 0, seen[1] ?? 0] : undefined
+}
+
 type Placed = Paged & { loc?: readonly { ns: number; ew: number }[] }
 
 /**

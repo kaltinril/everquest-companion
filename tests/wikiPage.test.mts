@@ -117,6 +117,13 @@ test('a soldby row places its vendor by the catalog: the page picked by zone, on
   assert.match(page, /\{\{ItemWhereRow {3}\| \[\[South Felwithe\]\] +\| \[\[Merchant Tyslin \(South Felwithe\)\]\] \| {15}\| \(450, -775\) \}\}/)
   // A vendor the catalog lacks: its name as printed, the item's one zone, no loc.
   assert.match(wikiPageText(row(['Gnomish Peddler'], ['Ak`Anon']), [], {}, { vendorAt }), /\| \[\[Ak`Anon\]\] +\| \[\[Gnomish Peddler\]\] +\| {15}\| {2}\}\}/)
+  // A vendor the catalog lacks, hailed beside a /loc: the log's own point, as its Mobs row's page
+  // carries it (owner, 2026-11-10: Zok Crikk). A catalog page with several spots takes it too.
+  const mobLocs = [{ mob: 'Zok Crikk', zone: 'rathemtn', points: [[-1239, 38, 4]] }, { mob: 'Two Spot', zone: 'halas', points: [[7, 8, 9], [1, 2, 3]] }]
+  assert.match(wikiPageText(row(['Zok Crikk'], ['Rathe Mountains']), [], {}, { vendorAt, mobLocs }), /\| \[\[Rathe Mountains\]\] +\| \[\[Zok Crikk\]\] +\| {15}\| \(-1239, 38\) \}\}/)
+  assert.match(wikiPageText(row(['Two Spot'], ['Halas']), [], {}, { vendorAt, mobLocs }), /\| \[\[Halas\]\] +\| \[\[Two Spot\]\] +\| {15}\| \(7, 8\) \}\}/)
+  // The catalog's own spot still wins over the log's.
+  assert.match(wikiPageText(row(['Dansie McVicker'], []), [], {}, { vendorAt, mobLocs: [{ mob: 'Dansie McVicker', zone: 'everfrost', points: [[1, 1, 1]] }] }), /\(3638, 697\) \}\}/)
 })
 
 test('prices are written the wiki way', () => {
