@@ -28,6 +28,47 @@ export interface CommunityRelease {
 
 export const COMMUNITY_RELEASE_NOTES: readonly CommunityRelease[] = [
   {
+    "version": "0.1.0-test.45",
+    "date": "2026-11-10",
+    "title": "wiki gaps see merchants' quotes and stock, same-named mobs get a timer floor",
+    "groups": [
+      {
+        "heading": "Wiki Gaps",
+        "items": [
+          {
+            "text": "A merchant's price quote now files the item it names, with that merchant as its seller. Before, an item the wiki lacked became a row only once you bought it or pasted its window, and that row said nothing of where it is sold."
+          },
+          {
+            "text": "A new item page's \"sold by\" table lists every merchant the wiki already says stocks the item, beside the one you met, each with its zone and spot from its own page."
+          },
+          {
+            "text": "When the wiki has no page for the vendor yet, the seller's spot on the item page is your own /loc beside the hail or con, the same point the vendor's Mobs row carries."
+          },
+          {
+            "text": "A known NPC whose page lists none of the quests it gives is an Update page row once you meet it (hail, con, kill or loot), with the related_quests lines ready to paste."
+          }
+        ]
+      },
+      {
+        "heading": "Timers",
+        "items": [
+          {
+            "text": "A respawn watch can be marked \"Several mobs share this name\" (Edit timer). Gaps under 10 minutes are then ignored and the lowest gap above them counts, so kills of same-named mobs elsewhere in the zone stop shrinking the clock."
+          }
+        ]
+      },
+      {
+        "heading": "Data",
+        "items": [
+          {
+            "text": "Wiki pages refreshed to today: 69 pages, among them the Rathe Mountains merchants Zok Crikk and Zok Rurpp, the Unusual Wine and Ale books, and the Ashwood and Elm Bowstaves."
+          }
+        ]
+      }
+    ],
+    "knownIssues": "An item page the wiki already has gets no check that it lists a merchant you were quoted by. A merchant page the wiki already has gets no \"items sold\" check. Joining another player's private instance is not told apart from the open world of that zone; only an instance you create yourself is. A pet summoned shortly before its first \"My leader is\" line can carry a \"(2)\" after its name in the meters until the next restart. Another player's spells never count toward a mob's resists: the game prints only your own resists to you. The con card does not list a mob's immunities yet (the mob page does). Saved characters read \"needs refresh\" on Wiki Gaps until logged in once with this build. A +0 worked back from a window often leaves Weight as ?. A groupmate's charmed pet can still lose its credit when a damage-over-time it cast before the charm ticks on a groupmate. A mob or item added to the wiki after this build shows no wiki details until the next build (or a Copy click in Wiki Gaps). Copy on a wiki page that still holds the template's placeholders keeps them. Capture finds the game window only when it is titled \"EverQuest Legends\" or \"EverQuest\". All characters needs each character logged in here once with this build. The screenshot reader reads English only. The installer is not code-signed, so Windows shows \"Windows protected your PC\" the first time (More info, then Run anyway). Builds before test.20 do not update themselves; install one by hand once."
+  },
+  {
     "version": "0.1.0-test.44",
     "date": "2026-11-08",
     "title": "respawn timers keep what earlier instances taught them",
