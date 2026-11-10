@@ -16,6 +16,7 @@
 * [[Miranda's Chocolate]]
 * [[Rognarog's Head]]
 * [[Spirit Aid]]
+* [[Spirit Powder]]
 * [[Yuio's Illness]]
 
 | quests_lower = 

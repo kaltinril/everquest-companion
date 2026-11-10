@@ -1,4 +1,4 @@
-{"scrapedAt":"2026-11-06T06:26:43.186Z","source":"eqlwiki.com ns0 pages no other DB keys (scripts/sources/deltaAllPages.ts)","count":1202,"pages":[
+{"scrapedAt":"2026-11-10T09:52:26.176Z","source":"eqlwiki.com ns0 pages no other DB keys (scripts/sources/deltaAllPages.ts)","count":1200,"pages":[
 {"title":"A giant yellow recluse","categories":[]},
 {"title":"A nisch mas mender","categories":[]},
 {"title":"A rebel clockwork","categories":[]},
@@ -578,7 +578,6 @@
 {"title":"Linux Setup Guide","categories":["Guides","Technical"]},
 {"title":"Lion-Skin Leggings","categories":["Bard Equipment","Cleric Equipment","Druid Equipment","Monk Equipment","Paladin Equipment","Ranger Equipment","Rogue Equipment","Shaman Equipment","Shadow Knight Equipment","Warrior Equipment","Legs","Northern Karana","Fashion: Leather"]},
 {"title":"Lizard Man (Faction)","categories":[]},
-{"title":"Loaf of Bread","categories":["Vendor Sold","Player Crafted","Tradeskill Ingredient","Quest Items"]},
 {"title":"Loam Encrusted Armor Set","categories":["Armor Sets"]},
 {"title":"Logfiles","categories":["Technical"]},
 {"title":"Loom","categories":["Tradeskill Containers"]},
@@ -655,6 +654,7 @@
 {"title":"Monster Races","categories":["Technical","Lore"]},
 {"title":"Monster Summoning I Summon","categories":["Summoned Pet","Magician Pet"]},
 {"title":"Mote Guide","categories":["Guides"]},
+{"title":"Mounts","categories":[]},
 {"title":"MQ","categories":[]},
 {"title":"Mrylokar's Armor","categories":["Armor Sets"]},
 {"title":"Mucktail Gnolls","categories":["Monster factions"]},
@@ -805,7 +805,6 @@
 {"title":"Raw-Hide Armor","categories":[]},
 {"title":"Raw-Hide Armor Set","categories":["Armor Sets"]},
 {"title":"Recommended Levels and ZEM List","categories":["Technical"]},
-{"title":"Recovered Loot","categories":[]},
 {"title":"Red Sr Apprentice Robe*","categories":[]},
 {"title":"Reinforced Armor Set","categories":["Armor Sets"]},
 {"title":"Reinforced Bamboo Weapons","categories":["Armor Sets"]},
@@ -1058,7 +1057,6 @@
 {"title":"Tanik's Note","categories":["Quest Items"]},
 {"title":"Tarnished Weapons","categories":["Armor Sets"]},
 {"title":"Tattered Armor Set","categories":["Armor Sets"]},
-{"title":"Tattered Codex","categories":[]},
 {"title":"Tech Support: Graphics Problems","categories":["Technical","Tech Support"]},
 {"title":"Teir'dal","categories":["Lore"]},
 {"title":"Teir'Dal Adamantite Armor Set (Imbued)","categories":["Armor Sets"]},

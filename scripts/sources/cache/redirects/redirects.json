@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-08T11:54:05.937Z",
+ "updatedAt": "2026-11-10T09:52:20.505Z",
  "redirects": [
   {
    "from": "1 Hand Blunt",
@@ -10428,6 +10428,10 @@
   {
    "from": "Lizard meat",
    "to": "Lizard Meat"
+  },
+  {
+   "from": "Loaf of bread",
+   "to": "Loaf of Bread"
   },
   {
    "from": "Loam Encrusted Armor",

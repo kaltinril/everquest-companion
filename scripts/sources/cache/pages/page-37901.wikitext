@@ -23,6 +23,7 @@
 * [[Rognarog's Head]]
 * [[Skeleton Killing]]
 * [[Spirit Aid]]
+* [[Spirit Powder]]
 * [[Yuio's Illness]]
 
 | quests_lower = 

@@ -72,6 +72,10 @@
   "content": "{{Classic Era}}\n<onlyinclude>{{Itempage\n|notes       = {{Item Lore|Treant heart}}<br>\nMay be obtained as a reward (small chance) from turning in [[Small Lantern]] to [[Jyle Windshot]] in [[West Freeport]]\n|itemname    = Wooden Heart\n|lucy_img_ID = 1003\n|statsblock  = \nNo Trade, Quest<br>\nWT: 2.0  Size: SMALL<br>\nClass: ALL<br>\nRace: ALL<br>\n|dropsfrom = \n\n[[Southern Karana]]\n\n* [[a treant]]\n\n|relatedquests = \n\n* [[Rain Caller Quest]]\n\n}}</onlyinclude>\n\n\n[[Category:Southern Karana]]\n\n[[Category:Quest Items]]"
  },
  {
+  "title": "Airborne Spores",
+  "content": ""
+ },
+ {
   "title": "An Alligator Tooth",
   "content": "{{Classic Era}}\n<onlyinclude>{{Itempage\n|notes       = For the earring, see [[Alligator Tooth Earring]]. No use in Classic, but for quests in Planes of Power expansion.\n|itemname    = Alligator Tooth\n|lucy_img_ID = 803\n|merchant_value = 7s 1c\n|statsblock  = \nQuest<br>\nWT: 0.1  Size: TINY<br>\nClass: ALL<br>\nRace: ALL<br>\n|dropsfrom = \n\n[[Innothule Swamp]]\n\n* [[a bull alligator]]\n* [[a swamp alligator]]\n\n|relatedquests =\n\n* [[Dark One's Armor]]\n* [[Spiritcharmer Final Job]]\n}}</onlyinclude>\n\n\n[[Category:Innothule Swamp]]\n\n[[Category:Quest Items]]"
  },
@@ -168,6 +172,10 @@
   "content": ""
  },
  {
+  "title": "Chunk of Digested Earth",
+  "content": ""
+ },
+ {
   "title": "Classic Mid-Tier Treasures",
   "content": "These are treasure loot that drop from higher end monsters in Everquest. Typically they can be found on monsters in the level 25-35 range.  The gems can be used for [[Jewelcrafting]] but they are typically just sold to vendors.\n\n<ul><li> {{:Amber}}\n</li><li> {{:Topaz}}\n</li><li> {{:Gold Ring}}\n</li><li> {{:Jade}}\n</li><li> {{:Pearl}}\n</li><li> {{:Peridot}}\n</li><li> {{:Silver Amulet}}\n</li><li> {{:Mithril Earring}}\n</li><li> {{:Jade Earring}}\n</li><li> {{:Flame Agate}}\n</li><li> {{:Ivory}}\n</li></ul>"
  },
@@ -194,6 +202,18 @@
  {
   "title": "Composition of Ervaj",
   "content": "<noinclude>{{Velious Era}}</noinclude>\n{{Spellpagesmart|\n\n| spellname = Song: Composition of Ervaj\n| spellicon = A\n| description = An ancient song that increases the attack speed of your group.  This increase is cumulative with most other effects that increase attack speed. It does stack with other haste buffs, it does not bypass the [[Haste_Guide#Haste_Caps|Haste_Cap]].\n| Table = {{{Table|0}}}\n| TableLevel = {{{TableLevel|}}}\n\n| classes = \n\n* [[Bard]] - Level 60\n\n| slots = \n\n{{SpellSlotRowSmart | 1 | Increase Haste v2 by 10% | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}\n{{SpellSlotRowSmart | 4 | Increase AC by 9 (L60) to 9 (L65) | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}\n{{SpellSlotRowSmart | Enhanced by instrument? | '''Yes (except attack speed)''' | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}\n\n| skill = [[Skill Brass | Brass]] †\n\n| mana = 0\n| range = 0\n| casting_time = 3.00\n| fizzle_time = 0.00\n| recast_time = 0.00\n| duration = 3 ticks\n| target_type = Party\n| spell_type = Beneficial\n| resist = Unresistable\n\n| other = \n\n* '''Focus:''' [[Horn]]\n\n| msg_cast_on_you = A song of inspiration fills your weapon arm with strength.\n| msg_cast_on_other =  \n| msg_wears_off =  \n\n| where_to_obtain = \n\n* Drop from level 50+ Velious mobs\n\n[[Cobalt Scar]]\n* [[Kelorek'Dar]]\n\n| TableLocations = Unknown\n| TableEra = Velious\n}}"
+ },
+ {
+  "title": "Crab Spider's Carapace",
+  "content": ""
+ },
+ {
+  "title": "Crab Spiderling Eye",
+  "content": ""
+ },
+ {
+  "title": "Cracked Crab Spider Leg",
+  "content": ""
  },
  {
   "title": "Cracked Femur",
@@ -608,10 +628,6 @@
   "content": "{{Velious Era}}\n\n<onlyinclude>{{Itempage\n|notes       = Monk probably does not need this ring - Grim Aura doesn't stack with the monk epic effect, which is also instant cast.\n|itemname    = Reaper's Ring\n|lucy_img_ID = 872\n|statsblock  = \nMAGIC ITEM  LORE ITEM  NO DROP<br>\nSlot: FINGER<br>\nAC: 10<br>\nSTA: +15  HP: +50  MANA: +50<br>\nEffect: [[Grim Aura]] (Any Slot, Casting Time: Instant)<br>\nWT: 0.0  Size: TINY<br>\nClass: ALL<br>\nRace: ALL<br>\n|dropsfrom = \n\n[[Temple of Veeshan]]\n\n* [[Aaryonar]]\n\n}}</onlyinclude>\n\n[[Category:Bard Equipment]]\n[[Category:Cleric Equipment]]\n[[Category:Druid Equipment]]\n[[Category:Enchanter Equipment]]\n[[Category:Magician Equipment]]\n[[Category:Monk Equipment]]\n[[Category:Necromancer Equipment]]\n[[Category:Paladin Equipment]]\n[[Category:Ranger Equipment]]\n[[Category:Rogue Equipment]]\n[[Category:Shaman Equipment]]\n[[Category:Shadow Knight Equipment]]\n[[Category:Warrior Equipment]]\n[[Category:Wizard Equipment]]\n[[Category:Fingers]]\n[[Category:Temple of Veeshan]]\n[[Category:Instant_Click_Equipment]]"
  },
  {
-  "title": "Recovered Loot",
-  "content": ""
- },
- {
   "title": "Red Sr Apprentice Robe*",
   "content": ""
  },
@@ -900,6 +916,18 @@
   "content": ""
  },
  {
+  "title": "Spiderling Flesh",
+  "content": ""
+ },
+ {
+  "title": "Spiderling Meat",
+  "content": ""
+ },
+ {
+  "title": "Spore Fungus",
+  "content": ""
+ },
+ {
   "title": "Stronghorn`s Horn",
   "content": "{{Velious Era}}\n[[Image:EQ000001.jpeg|right]]\n\n\n<onlyinclude>{{Itempage\n|notes       = Procs at level 1\n|itemname    = Stronghorn's Horn\n|lucy_img_ID = 1219\n|statsblock  = MAGIC ITEM  LORE ITEM  NO DROP  <br> Slot: PRIMARY<br> Skill: 1H Blunt  Atk Delay: 30<br> DMG: 18 <br>STR: +7  STA: +15  HP: +25<br> SV DISEASE: +15<br> Effect: [[Knockback]] (Combat, Casting Time: Instant)<br> WT: 7.5  Size: MEDIUM<br>\nClass: ALL except NEC WIZ MAG ENC<br> Race: ALL<br>\n\n|dropsfrom = \n\n[[Western Wastes]]\n\n* [[Strong Horn]]\n\n}}</onlyinclude>\n\n[[Category:Bard Equipment]]\n[[Category:Cleric Equipment]]\n[[Category:Druid Equipment]]\n[[Category:Monk Equipment]]\n[[Category:Paladin Equipment]]\n[[Category:Ranger Equipment]]\n[[Category:Rogue Equipment]]\n[[Category:Shaman Equipment]]\n[[Category:Shadow Knight Equipment]]\n[[Category:Warrior Equipment]]\n[[Category:Primary]]\n[[Category:1H Blunt]]\n[[Category:Western Wastes]]"
  },
@@ -910,10 +938,6 @@
  {
   "title": "Tanned Splitpaw Skin",
   "content": "{{Disambig3|[[Tanned Split Paw Skin (lore)]]}}\n{{Classic Era}}\n\n<onlyinclude>{{Itempage\n|notes       = '''Note:''' This item is not the same as what's required for [[Gem Inlaid Gauntlets Quest]] or [[Tesch Val Scrolls]]. These are essentially worthless. The ones you need look like rolled-up scrolls. See [[Tanned Split Paw Skin (lore)]]\n|itemname    = Tanned Split Paw Skin\n|merchant_value = 9c\n|lucy_img_ID = 504\n|statsblock  = \nQuest<br>\nSize: TINY  WT: 0.1<br>\n|merchant_value = 1s\n|dropsfrom = \n\n[[Southern Karana]]\n\n* Various Gnolls\n\n[[Splitpaw Lair]]\n\n* Various Gnolls\n* [[a Tesch Mas Gnoll]]\n\n|bookcontents = \n\n'''1'''\n\nFear not, my brethren! We have taken this home and we shall make it our own! Use what resources we have to establish ourselves here. Care not about the Theth, for they are our inferiors. Use their goods, use their services, and use their skins if need be. In time, we shall feel our former glory! Ishk kal hobra!\n\n'''2'''\n\nTesch Val, you must recover, from the archives, the incantation to speed our transit to the new continent. Let not one of the council members see you, or you will surely be slain. You must complete this task I have laid before you, or they will eventually find and slay us. The accursed council knows of my location, so I must be off. Slay the messenger of this note when you have finished reading it. Good journey to you, my faithful. Ishva\n\n'''3'''\n\nRosch Val, our plans have failed. We must escape this continent or risk being slain by the other elders on the council. My place upon the council was forfeit once it became known that I practiced the dark magiks. We must quicken our search for the maps. If we are unable to find the spell which will open the gate to Antonica, then we must acquire another means of travel. Ishva \n\n}}</onlyinclude>\n\n\n[[Category:Splitpaw Lair]]\n[[Category:Southern Karana]]"
- },
- {
-  "title": "Tattered Codex",
-  "content": ""
  },
  {
   "title": "Tattered Note",

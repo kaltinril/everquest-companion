@@ -26,8 +26,8 @@ A brew barrel is a stationary object with which players can interact in order to
 ** ''brew barrel @ (-1116, -1163), in Seafarer's Roost ''
 
 * ''[[Erudin]] ''
-** ''brew barrel @ (-999, -86), second floor (through 2nd entrance) of Erudin Surplus ''
-** ''brew barrel @ (-1213, -311), in Blue Hawks, first building to right of Toxxulia Forest zoneline ''
+** brew barrel @ (-999, -86), second floor (through 2nd entrance) of Erudin Surplus
+** brew barrel @ (-1213, -311), in Blue Hawks, first building to right of Toxxulia Forest zoneline 
 
 * ''[[Firiona Vie]] ''
 ** ''brew barrel @ (-2940, 2980) ''
@@ -40,7 +40,7 @@ A brew barrel is a stationary object with which players can interact in order to
 ** ''brew barrel @ (50, -220), upstairs in kitchen (second floor) ''
 
 * ''[[Highpass Hold]] ''
-** ''brew barrel @ (61, 303(, in hidden smugglers' area ''
+** ''brew barrel @ (61, 303), in hidden smugglers' area ''
 ** ''brew barrel @ (-78, 425), in Tiger's Roar ''
 ** ''brew barrel @ (-214, 37), in The Lumberyard ''
 ** ''brew barrel @ (-187, 14), upstairs in The Lumberyard ''

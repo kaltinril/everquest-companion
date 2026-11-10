@@ -23,6 +23,13 @@ Note: If you're sufficiently high level and heading to Befallen to farm an item,
 
 *[[Guard's Keyring]] - Drops from [[Moosh]] or random [[a guard officer]]s. Opens the jail cells.
 
+=== Nektropos Keys ===
+
+#[[Nektropos Library Key]] - Click the ruined harpsichord in [[Nektropos Castle]] at (368, 65) (main lobby, directly to the left when facing the staircase) to open the '''Nektropos Harpsichord''' combine window. Put in the [[Harpsichord Black Key]], [[Harpsichord White Key]], [[Harpsichord String]] and [[Harpsichord Plectrum]] (ground spawns in the castle) and click Combine. The game says: ''You press the keys in order. The piano hammer strikes, a panel slides aside and a Library Key drops into your hand.'' The key goes on your key ring.
+#[[Nektropos Great Room Key]] - Given by Alexa`s Handmaiden in [[Nektropos Castle]] during [[The Betrayer]], after the six Everling sisters are killed. It opens the great room, where [[Alexa Everling]] is.
+#[[Nektropos Private Chamber Key]] - Drops from [[Alexa Everling]]. Opens the door to [[Guard Captain Ga`Vin]]'s room.
+#[[Nektropos Basement Key]] - Drops from [[The Juggernaught]]. Opens alternate entrance to the basement.
+
 === Plane of Sky Keys ===
 Once you use these keys they are added to your keyring, giving you the ability to easily move through the Plane of Sky.
 
