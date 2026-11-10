@@ -105,7 +105,10 @@ A page is a mob page only if its OWN text opens the template (indirect transclus
   kill); `<span class='oppfac'>(10)</span>` under `|opposing_factions` (raised). `* None` when known
   to be none (most pages), `(?)` when unknown.
 - **Item soldby**: `{{ItemWhereTable|` + `{{ItemWhereRow | [[Zone]] | [[Vendor]] | | (x, y) }}` on
-  1,243 of 1,278 pages that fill it.
+  1,243 of 1,278 pages that fill it. A page with one seller written as a bare `[[Zone]]` /
+  `* [[Vendor]]` list is left as it is: the vendor's loc belongs on the vendor's mob page, and
+  reformatting the item page to carry it is cleanup, not a fact (owner, 2026-11-09, the Drogmor
+  drums and Stablehand Fleeb).
 - **Merchant items_sold**: `<li> {{:Item}} <span class='ddp'>(5gp 2sp 4cp)</span>`.
 - **merchant_value** (item): `2s 7c` style.
 - **Item lore text** (the in-game Lore tab, e.g. "The Cloth Seems To Be Moving") goes in
