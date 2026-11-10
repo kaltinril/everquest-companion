@@ -183,7 +183,8 @@ full scrapers). A 3-week window was ~1,200 pages in ~25 batched requests.
   other parser fields exactly; a full `scrape:mobs` would drop `otherNames` until the redirect
   cache exists. Done again 2026-11-09 for `relatedQuests` (the page's `related_quests` links): all
   8,098 records reproduced exactly, 2,372 gained the field, appended last in the record; the delta
-  folds it from the parser like every other field.
+  folds it from the parser like every other field. And 2026-11-10 for `sells` (a merchant page's
+  `{{:Item}}` titles under `|items_sold`): all 8,098 reproduced, 1,009 merchant records gained it.
 
 ## Expect new reds, and clear them
 

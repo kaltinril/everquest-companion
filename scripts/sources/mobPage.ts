@@ -128,7 +128,7 @@ export function factionAmountList(wikitext: string): string[] {
 }
 
 /** For the Gaps tab (owner ask, 2026-10-18): whether the page is a vendor's, and the factions a kill moves. */
-function gapsFacts(wikitext: string): Pick<MobEntry, 'merchant' | 'factions' | 'factionAmounts' | 'image' | 'commonDrops'> & { notices?: PageNotice[] } {
+function gapsFacts(wikitext: string): Pick<MobEntry, 'merchant' | 'sells' | 'factions' | 'factionAmounts' | 'image' | 'commonDrops'> & { notices?: PageNotice[] } {
   // `{{DNE}}` / `{{delete}}`: the page says the mob may not be in Legends (owner, 2026-10-22).
   const notices = pageNotices(wikitext)
   const factions = factionNames(wikitext)
@@ -137,13 +137,24 @@ function gapsFacts(wikitext: string): Pick<MobEntry, 'merchant' | 'factions' | '
   const common = [...new Set(parseMobLoot(templateField(wikitext, 'common_loot') ?? '').map((d) => d.item))]
   // A bidi mark pasted after the name is not part of it: the wiki drops it from the title.
   const image = stripFormatChars(/\|\s*imagefilename\s*=\s*([^\n|}]*)/i.exec(wikitext)?.[1] ?? '')
+  const merchant = /\{\{\s*MerchantPage\b/i.test(wikitext)
   return {
-    ...(/\{\{\s*MerchantPage\b/i.test(wikitext) ? { merchant: true } : {}),
+    ...(merchant ? { merchant: true, ...sellsOf(wikitext) } : {}),
     ...(factions.length ? { factions, factionAmounts: factionAmountList(wikitext) } : {}),
     ...(image !== '' ? { image } : {}),
     ...(common.length ? { commonDrops: common } : {}),
     ...(notices === undefined ? {} : { notices })
   }
+}
+
+/**
+ * A merchant page's stock: the item pages `|items_sold` transcludes (`<li> {{:Oak Bowstave}} <span
+ * class='ddp'>(69pp 2gp 9sp 9cp)</span>`), so a new item page's `soldby` can name every merchant the
+ * wiki already says stocks it (owner, 2026-11-10: Darkwood Bowstave, sold by Asher too).
+ */
+function sellsOf(wikitext: string): Pick<MobEntry, 'sells'> {
+  const sells = [...new Set([...(templateField(wikitext, 'items_sold') ?? '').matchAll(/\{\{:([^}|]+)/g)].map((m) => m[1].trim()).filter((t) => t !== ''))]
+  return sells.length ? { sells } : {}
 }
 
 /**
