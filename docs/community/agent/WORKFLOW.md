@@ -111,6 +111,12 @@ disagree, RULES.md wins; fix this file.
   The gate script runs the tests ONLY: a change that fails `tsc` can pass it (2026-10-11, a
   class-rename fold typed as the rename's value). Typecheck and lint the work branch too,
   every time, before merging into `main_community`.
+- **`npm test` under Node 22 fails 56 tests with `instanceof` errors** (a class loaded twice, "identical
+  name but a different prototype", 6 cancelled) and prints TAP (`# pass`), while Node 24 passes them
+  and prints spec (`ℹ pass`); known-reds.sh then stops "without naming a failing test". The trap
+  (2026-11-10, an hour lost): a PATH entry in `C:/...` form, or the Program Files `npm` wrapper,
+  which runs its own node.exe whatever `node` resolves to. Prepend `/c/Users/<user>/AppData/Roaming/nvm/v24.19.0`
+  (the `/c/` form) and check `node -v` prints v24 before the gate; a `# pass` summary means Node 22 ran.
 - **The npm gate does not run the Rust suite.** For an engine change, and before a push, also run `cargo test --workspace` in
   `engine/` on the merged tree (`CARGO_TARGET_DIR` = the main clone's `engine/target` reuses its
   build). 2026-10-13 it found two reds the npm gate had passed for days: the module snapshot test
