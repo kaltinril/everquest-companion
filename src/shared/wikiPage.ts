@@ -25,7 +25,7 @@ import { isRewardChest, mobSourceOf } from './rewardChest'
 import { wikiZoneLink } from './gapWikiZone'
 import { forageAddText } from './gapForage'
 import { questGiverAddText } from './gapQuestGivers'
-import { logSpot, type VendorFinder, type VendorPlacing } from './gapMobPage'
+import { catalogSellers, logSpot, type VendorFinder, type VendorPlacing } from './gapMobPage'
 import type { LootEvent } from './types'
 import { SPELL_HEAD, SPELL_TAIL, spellPageValues, type SpellPageShot } from './spellWindow'
 import { castBySentence, withCastBy } from './spellCastBy'
@@ -255,7 +255,7 @@ export function itemFacts(row: GapRow, loot: readonly LootEvent[], zoneName: Zon
   const mobs = new Set(drops.map((d) => d.mob.toLowerCase()))
   const bought = row.kinds.includes('bought') || row.kinds.includes('quoted')
   const vendors = bought ? (row.details.sources?.entries ?? []).map((e) => e.name).filter((n) => !mobs.has(n.toLowerCase()) && !isRewardChest(n)) : []
-  const soldBy = vendors.map((v) => vendorSeen(v, rowZones(row, zoneName), zoneName, place))
+  const soldBy = [...vendors, ...catalogSellers(row.name, vendors, place)].map((v) => vendorSeen(v, rowZones(row, zoneName), zoneName, place))
   // A merchant's offer heard at ally wins over the instant-sale estimate; any other never stands in
   // for it (shared/gapOffers.ts `merchantValueOf`, owner ask 2026-10-20).
   const merchantValue = merchantValueOf(row.details, derivedPrices(row.details)?.vendorValue)
@@ -617,6 +617,8 @@ export interface PageExtras extends QuestExtras, MerchantExtras {
   spellFacts?: Readonly<Record<string, ClientSpellFacts>>
   /** Where a vendor stands, by the catalog (`vendorFinder`): an item page's `|soldby` rows. */
   vendorAt?: VendorFinder
+  /** The merchants the catalog says stock an item (`sellersOf`): the rows the log did not name. */
+  sellersOf?: (item: string) => readonly string[]
   /** What pasted screenshots of item windows gave, by the row's name (ItemPageShot). */
   itemShots?: Readonly<Record<string, ItemPageShot>>
   /** What pasted spell display windows gave, by the row's name (SpellPageShot). */
@@ -645,7 +647,7 @@ interface PageContext extends Omit<PageExtras, 'zoneName'> {
 /** An item page's facts: rows and quest parts, both placing an NPC by the log's `/loc` when the catalog cannot. */
 function itemPageParts(row: GapRow, c: PageContext): Parameters<typeof itemPage>[0] {
   const locOf = locFinder(c.seen.mobLocs)
-  const facts = withPageTitles(itemFacts(row, c.loot, c.zoneName, { vendorAt: c.vendorAt, locOf }), c.mobPage)
+  const facts = withPageTitles(itemFacts(row, c.loot, c.zoneName, { vendorAt: c.vendorAt, locOf, sellersOf: c.sellersOf }), c.mobPage)
   return { ...facts, ...withFishedNote(questPageParts(questFactsOf(row), { mobPage: c.mobPage, zoneName: c.zoneName, locOf }), row, c.zoneName) }
 }
 

@@ -285,6 +285,18 @@ where one exists.
 
 ## Gaps tab (was gaps-tab, gaps-item-facts, gaps-all-characters, gaps-overlay)
 
+- 2026-11-10: a merchant's price quote (`X told you, 'That'll be 2 gold per Y.'`) files Y as an
+  Items row of kind `quoted` with X as its source (`gaps_stock.rs quoted`, `Details::quoted_by`),
+  as a purchase does; before, only the merchant's `items_sold` took it, and an unknown item was a
+  row only once bought or captured. `wikiPage.ts` reads `quoted` as `bought` for the `soldby` rows.
+  A quote for a player's resell names a merchant that never stocks it: pruned by hand, as on merchant
+  pages (the 2026-10-23 ruling). Owner: Darkwood Bowstave at Zok Rurpp.
+- 2026-11-10: `MobEntry.sells`, a merchant page's stock (the `{{:Item}}` titles under
+  `|items_sold`, 1,009 records, re-derived offline). `gapMobPage.ts sellersOf` indexes it by item
+  name; `catalogSellers` adds the merchants the log did not name to an item page's `soldby` rows,
+  each placed by its own page (`vendorAt`). Owner: "the code should be smart enough to know that
+  the Bowstave has other merchants that sell it, based on the wiki cache" (Asher, Nektropos
+  Undercrofts). Not yet: a KNOWN item's page lacking a merchant the log quoted is no Update row.
 - 2026-11-10: an item page's `soldby` row places its vendor by the catalog first (`vendorFinder`,
   one page, one spot), else by the log's own `/loc` beside the hail or con (`locFinder` over the
   engine's `mobLocs`, the point the vendor's Mobs row already puts on its page). `VendorPlacing` in

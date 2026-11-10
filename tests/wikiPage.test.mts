@@ -3,7 +3,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { dropsSeen, itemPage, itemWhereTable, mobFacts, mobPage, spellPage, stillNeeded, wikiCoin, wikiPageText } from '../src/shared/wikiPage'
-import { vendorFinder } from '../src/shared/gapMobPage'
+import { sellersOf, vendorFinder } from '../src/shared/gapMobPage'
 import { wikiZoneNamer } from '../src/shared/gapWikiZone'
 import { killIndex, type KillMap } from '../src/shared/kills'
 import type { GapRow } from '../src/shared/gaps'
@@ -122,6 +122,13 @@ test('a soldby row places its vendor by the catalog: the page picked by zone, on
   const mobLocs = [{ mob: 'Zok Crikk', zone: 'rathemtn', points: [[-1239, 38, 4]] }, { mob: 'Two Spot', zone: 'halas', points: [[7, 8, 9], [1, 2, 3]] }]
   assert.match(wikiPageText(row(['Zok Crikk'], ['Rathe Mountains']), [], {}, { vendorAt, mobLocs }), /\| \[\[Rathe Mountains\]\] +\| \[\[Zok Crikk\]\] +\| {15}\| \(-1239, 38\) \}\}/)
   assert.match(wikiPageText(row(['Two Spot'], ['Halas']), [], {}, { vendorAt, mobLocs }), /\| \[\[Halas\]\] +\| \[\[Two Spot\]\] +\| {15}\| \(7, 8\) \}\}/)
+  // The catalog's merchants that stock the item join the log's vendor, placed by their pages; one the
+  // log named is not doubled (owner, 2026-11-10: Darkwood Bowstave, Asher beside Zok Rurpp).
+  const stocked = [...catalog, { page: 'Asher', name: 'Asher', zones: ['Nektropos Undercrofts'], loc: [{ ns: -149, ew: 111 }], sells: ['Darkwood Bowstave'] }, { page: 'Zok Rurpp', name: 'Zok Rurpp', zones: ['Rathe Mountains'], sells: ['Darkwood Bowstave'] }]
+  const both = wikiPageText({ ...row(['Zok Rurpp'], ['Rathe Mountains']), name: 'Darkwood Bowstave' }, [], {}, { vendorAt: vendorFinder(stocked), sellersOf: sellersOf(stocked), mobLocs: [...mobLocs, { mob: 'Zok Rurpp', zone: 'rathemtn', points: [[-1239, 38, 4]] }] })
+  assert.match(both, /\| \[\[Nektropos Undercrofts\]\] +\| \[\[Asher\]\] +\| {15}\| \(-149, 111\) \}\}/)
+  assert.match(both, /\| \[\[Rathe Mountains\]\] +\| \[\[Zok Rurpp\]\] +\| {15}\| \(-1239, 38\) \}\}/)
+  assert.equal(both.match(/Zok Rurpp/g)?.length, 1)
   // The catalog's own spot still wins over the log's.
   assert.match(wikiPageText(row(['Dansie McVicker'], []), [], {}, { vendorAt, mobLocs: [{ mob: 'Dansie McVicker', zone: 'everfrost', points: [[1, 1, 1]] }] }), /\(3638, 697\) \}\}/)
 })
