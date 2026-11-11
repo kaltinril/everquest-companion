@@ -303,6 +303,11 @@ where one exists.
   `gapMobPage.ts` carries both finders. Owner: Zok Crikk, hailed beside a `/loc`, page created and
   marked done, yet Unusual Wine and Ale - Part 2's row had an empty loc cell (his page postdates the
   2026-11-08 scrape, so the catalog had nothing). The catalog's spot still wins where it has one.
+- 2026-11-10: a mob's `/loc` points within 20 units of a kept spot's mean are that spot, averaged
+  (`gaps_locs.rs CLUSTER_UNITS`; owner: two `/loc`s beside Scribe Noglleg "are basically the same
+  loc", then "100 units is a bit much, should be 20 or so"). A point further off is a second spot, as
+  before. Measured (MEASURED.md, /loc section): his standing NPCs' pairs lie 36 to 50 apart, so at 20
+  those still read as two spots; roamers 273 and up.
 - 2026-11-09: a KNOWN NPC's page lacking a quest the catalog says it gives is a Mobs row, an Update
   page (owner: Lord Ollix Everling's page, a template stub, lists none of The Tragic Tale of House
   Everling; the Mobs domain filed only unknown names and a quest enters only through a task line).
