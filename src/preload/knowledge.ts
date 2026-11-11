@@ -114,6 +114,8 @@ export const knowledgeBridge = {
   gapQuestPage: (title: string): Promise<import('../shared/gapQuestMerge').LiveQuestPage | null> => ipcRenderer.invoke(IPC.gapQuestPage, title),
   /** An item or mob row's Copy click: its wiki lookup, cached, and the row's verdict after it (src/main/gapCopyLookup.ts). */
   gapCopyLookup: (domain: 'item' | 'mob', name: string): Promise<import('../shared/gaps').GapVerdict> => ipcRenderer.invoke(IPC.gapCopyLookup, domain, name),
+  /** A Mobs or Merchants row's Copy click: the mob's live page, read fresh, for the copy that fills only its empty fields (owner, 2026-11-10). */
+  gapMobPageRead: (name: string, title?: string): Promise<import('../shared/gapPageMerge').MobPageRead> => ipcRenderer.invoke(IPC.gapMobPageRead, name, title),
   /** A copied spell page's fill: what the install's spell files state (src/main/gapSpellFacts.ts). */
   // The type is named inline so the import line spell-upgrades also edits stays untouched.
   gapSpellFacts: (names: readonly string[]): Promise<Record<string, import('../shared/gaps').ClientSpellFacts>> =>

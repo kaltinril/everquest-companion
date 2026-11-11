@@ -1244,6 +1244,11 @@ export const IPC = {
   // An item or mob row's Copy click: its wiki lookup, cached, and the row's fresh verdict back
   // (src/main/gapCopyLookup.ts; owner, 2026-10-26). Payload: (domain: 'item' | 'mob', name: string).
   gapCopyLookup: 'gaps:copyLookup',
+  // A Mobs or Merchants row's Copy click: the mob's live wiki page, read fresh every click so the copy
+  // fills only what the page lacks (src/main/gapCopyLookup.ts; owner, 2026-11-10: "click copy ... give me
+  // the updated full wiki"). Payload: (name: string, title?: string). `{ found, title, wikitext }`,
+  // `{ found: false }`, or `{ offline: true }`.
+  gapMobPageRead: 'gaps:mobPageRead',
 
   // ---- error harness (renderer -> main, fire-and-forget) ----
   // window.onerror / onunhandledrejection / React ErrorBoundary report here so

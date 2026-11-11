@@ -308,6 +308,18 @@ where one exists.
   loc", then "100 units is a bit much, should be 20 or so"). A point further off is a second spot, as
   before. Measured (MEASURED.md, /loc section): his standing NPCs' pairs lie 36 to 50 apart, so at 20
   those still read as two spots; roamers 273 and up.
+- 2026-11-10: Copy on a Mobs or Merchants row reads the live page first (owner: "click copy ... it
+  should do the fresh fetch of the page, compare and validate, and give me the updated full wiki to
+  just copy/paste into place. I don't want to be doing surgery on the page if I don't have to").
+  `main/mobLookup.ts readMobPage` (after the Copy door, same client and ledger feature, never cached:
+  one search and one page fetch a click; a zone-titled row asks by its title first), IPC
+  `gapMobPageRead`, `shared/gapPageMerge.ts mergeMobPage`: a template field EMPTY on the page takes
+  the draft's value, a filled field and `description` are never touched, nothing outside the template
+  is touched; what the page did not take is handed back per field with the reason ("Exceptions:
+  individual currently EMPTY fields ... just give me that section and make sure I know that's the
+  reason"). `MobCopyDialog.tsx` shows the result and puts the page on the clipboard as the read lands;
+  no page: the new page as before; wiki out of reach: the draft, said so; a page of free text: the
+  draft, said so. A redirect row, a forage update and a quest-giver add text keep the plain copy.
 - 2026-11-10: a mob page split by zone (`A kobold (Warrens)`) answers to its plain name only in its
   record's zones, any tier (`gaps_names.rs known_in`, `GapIndex::mob_zone_splits`); elsewhere the name
   is a Mobs row served `zoneTitled`, and its Create page opens `A kobold (Rathe Mountains)`
