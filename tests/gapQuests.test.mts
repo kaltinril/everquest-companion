@@ -75,6 +75,24 @@ test('A QUEST TITLE FOLDS THE BACKTICK AND THE TRAILING ?, AND THE CATALOG FINDS
   assert.equal(withQuestPages({ rows: [{ domain: 'quest', name: 'Call for Aid' }] }, find).rows[0].page, undefined)
 })
 
+// Owner, 2026-11-10: the Skunk Scent Gland task was a New page while the wiki had `Skunk Scent Gland
+// (quest)`, the item owning the plain title. 9 catalog pages carry `(quest)` or `(Quest)`.
+test('A (QUEST) PAGE ANSWERS TO THE TASK NAME WITHOUT THE SUFFIX, AND A PLAIN TITLE OF ITS OWN STILL WINS', () => {
+  const find = questCatalogFinder([
+    { name: 'Skunk Scent Gland (quest)', page: 'Skunk Scent Gland (quest)' },
+    { name: 'Brother Trintle (Quest)', page: 'Brother Trintle (Quest)' },
+    { name: 'Fang Tooth', page: 'Fang Tooth' },
+    { name: 'Fang Tooth (quest)', page: 'Fang Tooth (quest)' }
+  ])
+  assert.equal(find('Skunk Scent Gland')?.page, 'Skunk Scent Gland (quest)')
+  assert.equal(find('Skunk Scent Gland (quest)')?.page, 'Skunk Scent Gland (quest)')
+  assert.equal(find('brother trintle')?.page, 'Brother Trintle (Quest)')
+  assert.equal(find('Fang Tooth')?.page, 'Fang Tooth', 'the plain page is its own quest')
+  assert.equal(find('Skunk Hunting'), undefined)
+  const snap = { rows: [{ domain: 'quest', name: 'Skunk Scent Gland' }] }
+  assert.equal(withQuestPages(snap, find).rows[0].page, 'Skunk Scent Gland (quest)')
+})
+
 test('THE QUESTS TAB SAYS WHAT IT LISTS, AND A ROW IS A NEW PAGE OR AN UPDATE', () => {
   assert.equal(GAP_DOMAIN_LABELS.quest, 'Quests')
   assert.equal(GAP_DOMAIN_HELP.quest, 'Quests your log took part in: make the page, or fill what its page is missing.')
