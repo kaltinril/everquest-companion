@@ -19,7 +19,7 @@ import type { RespawnFact } from './gapRespawns'
 import { offerCheckText, offerText } from './gapOffers'
 import { decodeFactionAmount } from './mobFactionAmounts'
 import { wikiPageUrl } from './wiki'
-import { zoneKey } from './zones'
+import { zoneBaseName, zoneKey } from './zones'
 import { wikiCreateUrl, wikiEditUrl, wikiSearchUrl, wikiUploadUrl } from './gapUrls'
 
 export { wikiCreateUrl, wikiEditUrl, wikiSearchUrl, wikiUploadUrl }
@@ -666,9 +666,23 @@ export function gapsCaption(snap: GapsSnap, domain: GapDomain, zone: string | nu
   return `${Math.max(0, (snap.totals[domain] ?? 0) - off).toLocaleString()} unknown`
 }
 
-/** Where the row was named most, and how many other zones: `Befallen 4 (Refined) +2`; '' for none. */
+/**
+ * A zones tally with the tiers folded: `Befallen 4 (Refined)` and `Befallen` are one zone (owner,
+ * 2026-11-10: the rows show the zone, never its tier). Entries merge by `zoneBaseName`, most named
+ * first; `all` folds the same way and sets `distinct` when it is there. Once per tally object.
+ */
+export const foldZoneTally = perObject((t: GapTally): GapTally => {
+  const byBase = new Map<string, number>()
+  for (const e of t.entries) byBase.set(zoneBaseName(e.name), (byBase.get(zoneBaseName(e.name)) ?? 0) + e.n)
+  const entries = [...byBase].map(([name, n]) => ({ name, n })).sort((a, b) => b.n - a.n)
+  const all = t.all === undefined ? undefined : [...new Set(t.all.map(zoneBaseName))]
+  const distinct = all?.length ?? Math.max(entries.length, t.distinct - (t.entries.length - entries.length))
+  return { entries, distinct, ...(all === undefined ? {} : { all }) }
+})
+
+/** Where the row was named most, and how many other zones, tiers folded: `Befallen +2`; '' for none. */
 export function gapZone(row: GapRow): string {
-  const zones = row.details.zones
+  const zones = row.details.zones === undefined ? undefined : foldZoneTally(row.details.zones)
   const top = zones?.entries[0]?.name
   if (zones === undefined || top === undefined) return ''
   return zones.distinct > 1 ? `${top} +${zones.distinct - 1}` : top
@@ -694,7 +708,7 @@ function gapSortValue(r: GapRow, key: GapSortKey, verdicts: GapVerdicts): string
   if (key === 'name') return r.name.toLowerCase()
   if (key === 'kinds') return r.kinds.join(', ')
   // By the zone it was named in most, A to Z; a row with no zone sorts first.
-  if (key === 'zone') return (r.details.zones?.entries[0]?.name ?? '').toLowerCase()
+  if (key === 'zone') return (r.details.zones === undefined ? '' : (foldZoneTally(r.details.zones).entries[0]?.name ?? '')).toLowerCase()
   if (key === 'todo') return gapActions(r, verdicts[r.name] ?? 'unchecked').map((a) => a.label).join(', ')
   // The timestamps are `YYYY-MM-DD HH:MM:SS`, which sort as text.
   return key === 'first' ? r.first : r.last

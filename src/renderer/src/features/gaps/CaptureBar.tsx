@@ -18,7 +18,7 @@ import CheckIcon from '@mui/icons-material/Check'
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
-import { captureRow, iconFree, keptAfter, otherItemNote, PART_WORDS, shotKind } from '@shared/itemShotKeep'
+import { captureRow, iconFree, keptAfter, otherItemNote, PART_WORDS, plausibleItemName, shotKind } from '@shared/itemShotKeep'
 import { partPicture } from '@shared/mobPicture'
 import { captureHowTo, readNames, type Captured } from '@shared/shotTrigger'
 import type { CharacterSnap } from '@shared/types'
@@ -88,7 +88,8 @@ function fileNew(c: Captured, unknown: ReadonlySet<string>): string | undefined 
   // The icon read in front of the name (owner, 2026-10-24: `1 Alexa's Robe` rows) is not the name.
   const name = read === undefined ? undefined : iconFree(read)
   const kind = c.reply === undefined ? null : shotKind(c.reply)
-  if (c.reply === undefined || name === undefined || kind === null || !unknown.has(name)) return undefined
+  // OCR junk is no page to suggest (owner, 2026-11-10: an `IL` row from an icon read as letters).
+  if (c.reply === undefined || name === undefined || kind === null || !plausibleItemName(name) || !unknown.has(name)) return undefined
   addCapturedItem(name)
   setItemShot(name, keptAfter(itemShotNow(name), c.reply, kind))
   void keepPartPicture(partPicture(kind), name, c.png)

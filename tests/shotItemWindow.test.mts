@@ -3,6 +3,7 @@
 // real: the prototype's reads of the owner's and Malkil's screenshots (2026-10-21), junk and all.
 // The target is the page the owner wrote for Ruined Robe the same night.
 
+import { plausibleItemName } from '../src/shared/itemShotKeep'
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { checkRatio, cleanLine, readItemWindow, slotOf, valueCopper, weightValue } from '../src/shared/itemWindow.ts'
@@ -283,6 +284,19 @@ test("AN EXALTATION SLOT WITH NO VALUE READ, OR EMPTY WITH AN OCR SLIP, IS EMPTY
     assert.ok(r.statsblock.includes('[[Gate|'), `${slot}: ${r.statsblock}`)
     assert.ok(!(r.checks ?? []).some((c) => /not written/.test(c)), `${slot}: ${JSON.stringify(r.checks)}`)
   }
+})
+
+// Owner, 2026-11-10: a Kobold Talisman's icon was read as its own line `IL` under the name, so `IL` became
+// the name, the window "RR's", and a captured `IL` row appeared. The title bar names the line that is the name.
+test('THE ICON READ AS ITS OWN LINE UNDER THE NAME IS NOT THE NAME WHEN THE TITLE BAR NAMES ANOTHER LINE', () => {
+  const r = readItemWindow(['Kobold Talisman ?X', 'Description', 'Kobold Talisman', 'IL', 'Class: None', 'Race: None', 'Size: SMALL Weight: 1.0'])
+  assert.equal(r.name, 'Kobold Talisman')
+  // No title names any line: the last line above Class stays the name, as before.
+  assert.equal(readItemWindow(['Description', 'Kobold Talisman', 'IL', 'Class: None', 'Race: None']).name, 'IL')
+  assert.equal(plausibleItemName('IL'), false)
+  assert.equal(plausibleItemName('RR'), false)
+  assert.equal(plausibleItemName('Ale'), true)
+  assert.equal(plausibleItemName('Kobold Talisman'), true)
 })
 
 test("THE ICON READ AS A CHARACTER BEFORE THE NAME GOES WHEN THE TITLE BAR NAMES THE ITEM WITHOUT IT (OWNER'S SCREENSHOTS, 2026-10-22)", () => {

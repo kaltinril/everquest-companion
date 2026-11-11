@@ -308,6 +308,14 @@ where one exists.
   loc", then "100 units is a bit much, should be 20 or so"). A point further off is a second spot, as
   before. Measured (MEASURED.md, /loc section): his standing NPCs' pairs lie 36 to 50 apart, so at 20
   those still read as two spots; roamers 273 and up.
+- 2026-11-10: the rows show a zone without its tier or instance mark (`Lake Nerius 4 (Refined)` ->
+  `Lake Nerius`; `shared/zones.ts zoneBaseName`, `gaps.ts foldZoneTally` for the Zone column, its sort and
+  the open row's zones chips; owner: "just show the zone, not +1 +4 whatnot"). The engine still serves
+  the tiered spellings: Copy wiki page and the zone filter read them as before.
+- 2026-11-10: a capture files a NEW Items row only under a plausible name (`itemShotKeep.ts
+  plausibleItemName`: three letters, one lower case; owner: an `IL` row from a Kobold Talisman's icon read as
+  letters). The window reader prefers, among the lines above Class, the one the title bar starts with
+  (`itemWindow.ts titleNamed`), so an icon read as its own line under the name is not the name.
 - 2026-11-10: a quest page titled `<name> (quest)` / `(Quest)` (the wiki's suffix when the plain title
   is a mob's, item's or zone's; 9 of 913 catalog pages) answers to the game's task name without the
   suffix (`gapQuests.ts questCatalogFinder`). Owner: the Skunk Scent Gland task was a New page while

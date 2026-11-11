@@ -13,6 +13,7 @@ import {
   gapDetailsText,
   gapsAsText,
   gapsCaption,
+  foldZoneTally,
   gapZone,
   gapInZone,
   tallyText,
@@ -248,8 +249,13 @@ test('Zone shows where a row was named most and sorts by it, A to Z (owner, 2026
     row(['mob', name, ['killed'], 1], { zones: { entries: zones.map((z) => ({ name: z, n: 1 })), distinct: zones.length } })
   const rows = [at('A', ['The Plane of Sky', 'Befallen']), at('B', ['Befallen 4 (Refined)']), row(['mob', 'C', ['killed'], 1])]
   assert.equal(gapZone(rows[0]), 'The Plane of Sky +1')
-  assert.equal(gapZone(rows[1]), 'Befallen 4 (Refined)')
+  // The tier is not shown (owner, 2026-11-10: "just show the zone, not +1 +4 whatnot").
+  assert.equal(gapZone(rows[1]), 'Befallen')
   assert.equal(gapZone(rows[2]), '')
+  // Tiers of one zone are one zone: three spellings of Lake Nerius and one of Befallen fold to `Lake Nerius +1`.
+  const tiered = at('D', ['Lake Nerius 4 (Refined)', 'Lake Nerius', 'Lake Nerius 2 (Adaptive)', 'Befallen - Group'])
+  assert.equal(gapZone(tiered), 'Lake Nerius +1')
+  assert.deepEqual(foldZoneTally(tiered.details.zones!).entries, [{ name: 'Lake Nerius', n: 3 }, { name: 'Befallen', n: 1 }])
   assert.deepEqual(sortGaps(rows, { key: 'zone', dir: 'asc' }).map((r) => r.name), ['C', 'B', 'A'])
   assert.equal(firstGapSortDir('zone'), 'asc')
 })
