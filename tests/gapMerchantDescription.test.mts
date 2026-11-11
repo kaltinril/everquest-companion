@@ -5,7 +5,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { itemTrades } from '../src/main/gapItemTrades'
-import { catalogStates, descriptionLines, itemsTrade, maskedGreeting, merchantDescription, subtitleSentence } from '../src/shared/gapMerchantDescription'
+import { catalogStates, descriptionLines, itemsTrade, maskedGreeting, merchantDescription, subtitleRole, subtitleSentence } from '../src/shared/gapMerchantDescription'
 import { applyEditText, withGapEdits } from '../src/shared/gapEdits'
 import { stillNeeded, wikiPageText } from '../src/shared/wikiPage'
 import type { GapRow } from '../src/shared/gaps'
@@ -53,6 +53,23 @@ test('a nameplate subtitle is the wiki\'s `<trade> merchant.`; a bare Merchant s
   assert.equal(subtitleSentence('Tailoring Supplies'), 'Tailoring supplies merchant.')
   assert.equal(subtitleSentence('Weapons Merchant'), 'Weapons merchant.')
   assert.equal(subtitleSentence('(Merchant)'), undefined)
+})
+
+// Owner, 2026-11-10: Bok Master Thragnog's nameplate reads `(Shadow Knight Guildmaster)`, and his page came
+// out with no class and no description. The wiki: `class = GM [[Shadow Knight]]`, `Shadow knight guildmaster in Oggok.`
+test("a guildmaster nameplate gives the class line and the wiki's guildmaster sentence, on a mob page", () => {
+  assert.equal(subtitleSentence('(Shadow Knight Guildmaster)', 'Rathe Mountains'), 'Shadow knight guildmaster in Rathe Mountains.')
+  assert.equal(subtitleSentence('Warrior Guildmaster'), 'Warrior guildmaster.')
+  assert.equal(subtitleRole('(Shadow Knight Guildmaster)'), 'Shadow Knight GM')
+  assert.equal(subtitleRole('Tailoring Supplies'), undefined)
+  const zones = { entries: [{ name: 'The Rathe Mountains', n: 5 }], distinct: 1 }
+  const r = { domain: 'mob', name: 'Bok Master Thragnog', kinds: ['considered', 'hailed'], count: 5, first: '', last: '', details: { samples: [], zones } } as unknown as GapRow
+  const text = wikiPageText(r, [], {}, { nameplate: () => 'Shadow Knight Guildmaster', zoneName: (z: string) => z.replace(/^The /, '') })
+  assert.ok(text.includes('| class             = GM [[Shadow Knight]]'), text)
+  assert.ok(text.includes('| description = \n\nShadow knight guildmaster in Rathe Mountains.\n'), text)
+  // A target line's role wins over the nameplate's reading.
+  const banker = wikiPageText({ ...r, role: 'Banker' } as unknown as GapRow, [], {}, { nameplate: () => 'Shadow Knight Guildmaster' })
+  assert.ok(banker.includes('| class             = [[Banker]]'), banker)
 })
 
 test('a hail answer writes the player as `____`, as the cached pages do', () => {

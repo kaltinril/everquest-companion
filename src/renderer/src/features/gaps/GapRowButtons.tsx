@@ -14,7 +14,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { removeCapturedItem } from './capturedItemsStore'
 import NoteAddIcon from '@mui/icons-material/NoteAdd'
 import SearchIcon from '@mui/icons-material/Search'
-import { GAP_CAPTURE, mobPageOf, onMobPage, wikiCreateUrl, wikiEditUrl, wikiSearchUrl, type GapRow } from '@shared/gaps'
+import { GAP_CAPTURE, mobPageOf, onMobPage, wikiCreateUrl, wikiEditUrl, wikiSearchUrl, zoneTitledPage, type GapRow } from '@shared/gaps'
 import { forageButtons } from '@shared/gapForage'
 import { copyText } from '../../lib/clipboard'
 import { Tooltip } from '../../lib/Tooltip'
@@ -135,6 +135,17 @@ function CopyPageButton({ text, row, compact }: { text: () => string; row: GapRo
   )
 }
 
+/**
+ * A row with a page title of its own: a quest, under the catalog's page when the wiki has one, else
+ * the wiki's spelling; a mob whose plain name is another zone's page, under a title with this zone
+ * (owner, 2026-11-10: `A kobold (Rathe Mountains)`). Undefined for every other row.
+ */
+function ownPageEditor(row: GapRow): { target: string; create: string; existing: boolean } | undefined {
+  if (row.domain === 'quest') return row.page === undefined ? { target: questPageTitle(row.name), create: 'Create page', existing: false } : { target: row.page, create: 'Edit page', existing: true }
+  if (row.domain === 'mob' && row.zoneTitled === true) return { target: zoneTitledPage(row), create: 'Create page', existing: false }
+  return undefined
+}
+
 /** The page the editor opens and its button's words: a page that exists, or a new one. */
 function editorOf(row: GapRow): { target: string; create: string; existing: boolean; view?: boolean } {
   if (row.forageUpdate !== undefined) {
@@ -148,8 +159,8 @@ function editorOf(row: GapRow): { target: string; create: string; existing: bool
   // A respawn row's page exists: its respawn_time is set (gapRespawns.ts).
   if (row.domain === 'respawn') return { target: row.page ?? row.name, create: 'Edit mob page', existing: true }
   if (onMobPage(row)) return { target: mobPageOf(row), create: 'Edit mob page', existing: true }
-  // A quest: its page from the catalog when the wiki has one, else a new page under the wiki's spelling.
-  if (row.domain === 'quest') return row.page === undefined ? { target: questPageTitle(row.name), create: 'Create page', existing: false } : { target: row.page, create: 'Edit page', existing: true }
+  const own = ownPageEditor(row)
+  if (own !== undefined) return own
   // A page the lookup found under other capitals or as free text is edited, never made twice
   // (owner, 2026-10-22: Drake lava powder; gapExistingPage.ts).
   const found = existingEditor(row, readGapVerdict(row.domain, row.name))

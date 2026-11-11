@@ -36,7 +36,10 @@ impl Knowledge for Corpus {
     }
     fn gap_index(&self) -> GapIndex {
         GapIndex {
-            mob_names: vec!["The Great Zultor".into(), "a froglok".into()],
+            mob_names: vec!["The Great Zultor".into(), "a froglok".into(), "a kobold (Warrens)".into()],
+            // The kobold's only page is the Warrens one (owner, 2026-11-10).
+            mob_pages: vec!["The Great Zultor".into(), "A froglok".into(), "A kobold (Warrens)".into()],
+            mob_zone_splits: vec![("A kobold (Warrens)".into(), vec!["The Warrens".into()])],
             ..GapIndex::default()
         }
     }
@@ -108,6 +111,22 @@ impl Pair {
             .map(|r| (mob_key(r["name"].as_str().unwrap_or("")), r["maybePlayer"] == true))
             .collect()
     }
+}
+
+/// Owner, 2026-11-10: the `a kobold` of Rathe Mountains drops nothing of `A kobold (Warrens)`; a page
+/// split by zone answers to the plain name in its zone alone, any tier of it.
+#[test]
+fn a_page_split_by_zone_knows_the_plain_name_only_in_its_zone() {
+    let mut p = Pair::new();
+    p.send(1, json!({ "kind": "zone", "zone": "The Warrens 2 (Adaptive)" }));
+    p.send(2, json!({ "kind": "death", "name": "a kobold", "bySelf": true }));
+    assert!(!p.mob_rows().contains_key("a kobold"), "in the Warrens the Warrens page is its page");
+    p.send(3, json!({ "kind": "zone", "zone": "The Rathe Mountains" }));
+    p.send(4, json!({ "kind": "death", "name": "a kobold", "bySelf": true }));
+    assert!(p.mob_rows().contains_key("a kobold"), "elsewhere it is a page to make");
+    let rows = p.gaps.snapshot()["state"]["rows"].clone();
+    let row = rows.as_array().expect("rows").iter().find(|r| r["name"] == "a kobold").expect("the kobold row").clone();
+    assert_eq!(row["zoneTitled"], json!(true), "its new page is titled with the zone");
 }
 
 #[test]

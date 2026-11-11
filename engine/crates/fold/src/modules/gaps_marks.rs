@@ -76,7 +76,7 @@ impl GapsModule {
     /// whole names (owner, 2026-10-23: "there is no 'a fragile'"). Elsewhere the shape is a mob's pet:
     /// the owner's log has 918 lines of `a dar ghoul knight pet`, 570 of `a worry wraith pet`.
     pub(super) fn filed_as<'a>(&self, k: &dyn Knowledge, name: &'a str) -> (bool, &'a str) {
-        let known = self.mob_names.known(k, name);
+        let known = self.mob_names.known_in(k, name, self.zone.as_deref());
         let whole = self.zone.as_deref().is_some_and(is_tutorial_zone);
         (known, if known || whole { name } else { owner_of_pet(name) })
     }

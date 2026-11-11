@@ -46,9 +46,28 @@ pub(crate) fn build(items: &Map<String, Value>, mobs: &MobIndex, quests: &[Value
         item_pages,
         item_effects,
         mob_names: mobs.names().to_vec(),
+        mob_pages: mobs.records().iter().filter_map(|m| m["page"].as_str()).map(str::to_string).collect(),
+        mob_zone_splits: mob_zone_splits_of(mobs.records()),
         item_redirects,
         mob_redirects: mob_redirects_of(mobs.names().iter().filter_map(|n| mobs.entry(n))),
     }
+}
+
+/// Every mob page titled with a disambiguation (`A kobold (Warrens)`, `Cazic-Thule (God)`), with the
+/// zones its record states: the plain name is that page's only where the record says it is.
+fn mob_zone_splits_of(records: &[Value]) -> Vec<(String, Vec<String>)> {
+    let titled = |t: &str| t.ends_with(')') && t.contains(" (");
+    records
+        .iter()
+        .filter_map(|m| {
+            let page = m["page"].as_str()?;
+            if !titled(page) && !m["name"].as_str().is_some_and(titled) {
+                return None;
+            }
+            let zones = m["zones"].as_array().into_iter().flatten().filter_map(Value::as_str).map(str::to_string).collect();
+            Some((page.to_string(), zones))
+        })
+        .collect()
 }
 
 /// Every `(redirect name, page)` of the mob records, each page once.

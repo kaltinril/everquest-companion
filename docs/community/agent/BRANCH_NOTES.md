@@ -308,6 +308,20 @@ where one exists.
   loc", then "100 units is a bit much, should be 20 or so"). A point further off is a second spot, as
   before. Measured (MEASURED.md, /loc section): his standing NPCs' pairs lie 36 to 50 apart, so at 20
   those still read as two spots; roamers 273 and up.
+- 2026-11-10: a mob page split by zone (`A kobold (Warrens)`) answers to its plain name only in its
+  record's zones, any tier (`gaps_names.rs known_in`, `GapIndex::mob_zone_splits`); elsewhere the name
+  is a Mobs row served `zoneTitled`, and its Create page opens `A kobold (Rathe Mountains)`
+  (`gaps.ts zoneTitledPage`). A name with a plain page too stays known everywhere. Owner: the Rathe
+  Mountains kobold drops Kobold Scalps and Woven armor, nothing of the Warrens page. The zone match
+  is lenient (`zone_matches`: equal, one within the other, or a telling word shared), since the
+  wiki's zone fields use short forms (`Eastern Karana`, `Lake Rathe`, `Unrest`); checked against all
+  42 zone-titled-only pages, 2026-11-10: only `A goblin alchemist (Beholder's Maze)` (zone field
+  `Beholder's Maze`, log `Gorge of King Xorbb`) misses, and a miss errs toward a row, never silence.
+- 2026-11-10: a guildmaster's nameplate (`(Shadow Knight Guildmaster)`, read off its picture) gives a
+  Mobs row's page `class = GM [[Shadow Knight]]` and `Shadow knight guildmaster in <zone>.`, as 50
+  cached guildmaster pages say it (`gapMerchantDescription.ts subtitleRole`, `subtitleSentence`); a
+  target line's role still wins. Mob pages now take the nameplate and hail-answer description that
+  merchant pages took (owner: Bok Master Thragnog's page had neither).
 - 2026-11-10: the rows show a zone without its tier or instance mark (`Lake Nerius 4 (Refined)` ->
   `Lake Nerius`; `shared/zones.ts zoneBaseName`, `gaps.ts foldZoneTally` for the Zone column, its sort and
   the open row's zones chips; owner: "just show the zone, not +1 +4 whatnot"). The engine still serves

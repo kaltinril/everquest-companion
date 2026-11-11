@@ -16,7 +16,9 @@
 // `greeting`). Race is left out: no fixed rule reads it from a picture. Only a NEW page gets one, as
 // items_sold: an existing page's description is never replaced.
 
-import type { GapRow } from './gaps'
+import { foldZoneTally, type GapRow } from './gaps'
+import { roleOf } from './gapRoles'
+import { zoneBaseName } from './zones'
 import { gapJob } from './gapJob'
 import { itemsSoldOf } from './gapItemsSold'
 import { mobKey } from './mobKey'
@@ -31,6 +33,8 @@ export interface MerchantExtras {
   ownNames?: readonly string[]
   /** The subtitle under the mob's name on a pasted picture's nameplate (`Tailoring Supplies`). */
   nameplate?: (name: string) => string | undefined
+  /** The wiki's name for a zone the log names (`PageExtras.zoneName`): a guildmaster's sentence says where. */
+  zoneName?: (zone: string) => string
   /** What the wiki's page for a name already states (`catalogStates`): an Update row asks for none of it. */
   pageStates?: PageStates
 }
@@ -142,12 +146,37 @@ export function itemsTrade(items: readonly string[], itemTrades: Readonly<Record
   return { trade: top[0], count: top[1], traded: traded.length }
 }
 
-/** `Tailoring Supplies` → `Tailoring supplies merchant.`; a bare `Merchant` says nothing. */
-export function subtitleSentence(subtitle: string): string | undefined {
-  const words = subtitle.replace(/[()]/g, ' ').replace(/\s+/g, ' ').trim()
+/** The nameplate's words, the brackets and runs of space gone. */
+const subtitleWords = (subtitle: string): string => subtitle.replace(/[()]/g, ' ').replace(/\s+/g, ' ').trim()
+
+/**
+ * `Shadow Knight Guildmaster` → `Shadow Knight GM`, the role the client's target line would state
+ * (gapRoles.ts writes it as `GM [[Shadow Knight]]`); undefined for any other subtitle. Owner,
+ * 2026-11-10: Bok Master Thragnog's nameplate, read off his picture, and his page had no class.
+ */
+export function subtitleRole(subtitle: string): string | undefined {
+  const gm = /^(.+?)\s+guild\s*master$/i.exec(subtitleWords(subtitle))
+  return gm === null ? undefined : `${gm[1]} GM`
+}
+
+/**
+ * `Tailoring Supplies` → `Tailoring supplies merchant.`; a bare `Merchant` says nothing; a guildmaster
+ * → `Shadow knight guildmaster in Rathe Mountains.`, as the wiki's guildmaster pages say it (50 of
+ * the cached pages, `<Class> guildmaster in <place>.`), or without the place when none is known.
+ */
+export function subtitleSentence(subtitle: string, zone?: string): string | undefined {
+  const words = subtitleWords(subtitle)
   if (words === '' || /^merchant$/i.test(words)) return undefined
   const said = `${words.charAt(0).toUpperCase()}${words.slice(1).toLowerCase()}`
+  if (/\bguild\s*master$/i.test(said)) return zone === undefined ? `${said}.` : `${said} in ${zone}.`
   return /\b(merchant|vendor|trader|shopkeeper)s?$/i.test(said) ? `${said}.` : `${said} merchant.`
+}
+
+/** The wiki's name for the zone the row was named in most; undefined when none was. */
+function placeOf(row: GapRow, extras: MerchantExtras): string | undefined {
+  const top = row.details.zones === undefined ? undefined : foldZoneTally(row.details.zones).entries[0]?.name
+  if (top === undefined) return undefined
+  return extras.zoneName?.(top) ?? zoneBaseName(top).replace(/^the\s+/i, '')
 }
 
 /** A hail answer with each own character's name as `____`, as the cached pages write the player. */
@@ -163,7 +192,7 @@ const greetingOf = (row: object): string | undefined => {
 /** The trade sentence and its source in words: the nameplate first, else what it sold. */
 function sentenceOf(row: GapRow, extras: MerchantExtras): MerchantDescription['sentence'] {
   const subtitle = extras.nameplate?.(row.name)
-  const named = subtitle === undefined ? undefined : subtitleSentence(subtitle)
+  const named = subtitle === undefined ? undefined : subtitleSentence(subtitle, placeOf(row, extras))
   if (named !== undefined) return { text: named, from: 'from its nameplate' }
   const sold = itemsSoldOf(row).map((s) => s.item)
   const trade = extras.itemTrades === undefined ? undefined : itemsTrade(sold, extras.itemTrades)
@@ -189,7 +218,10 @@ export function merchantDescription(row: GapRow, extras: MerchantExtras): Mercha
 export function withDescription<F extends object>(f: F, row: GapRow, extras: MerchantExtras): F & { description?: string; stated?: PageStated } {
   if (gapJob(row, { isMob: extras.isMob }) === 'update') return { ...f, stated: extras.pageStates?.(row.name) ?? { level: false, location: false, image: false } }
   const d = merchantDescription(row, extras)
-  return d === undefined ? f : { ...f, description: d.text }
+  // A guildmaster's nameplate names its class when no target line did (gapRoles.ts `roleClass`).
+  const subtitle = extras.nameplate?.(row.name)
+  const gm = subtitle === undefined || roleOf(row) !== undefined ? undefined : subtitleRole(subtitle)
+  return { ...f, ...(d === undefined ? {} : { description: d.text }), ...(gm === undefined ? {} : { role: gm }) }
 }
 
 /** The add text's opening words, by which an edit finds it (withEditedFields). */

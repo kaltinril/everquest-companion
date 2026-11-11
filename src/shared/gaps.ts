@@ -309,6 +309,8 @@ export interface GapRow {
   pageImage?: string
   /** A faction, drop or image row: the wiki page of its mob, when the catalog could pick one; a notice row's page. */
   page?: string
+  /** A Mobs row whose plain name belongs to zone-titled pages elsewhere (`A kobold (Warrens)`): its new page is titled with its zone (`zoneTitledPage`). */
+  zoneTitled?: true
   /** A notice row: the page's notices, `DNE`, `delete` or `delete: <reason>` (gaps_notices.rs). */
   notices?: string[]
   /** A notice row: whether the log met an item or a mob there. */
@@ -679,6 +681,18 @@ export const foldZoneTally = perObject((t: GapTally): GapTally => {
   const distinct = all?.length ?? Math.max(entries.length, t.distinct - (t.entries.length - entries.length))
   return { entries, distinct, ...(all === undefined ? {} : { all }) }
 })
+
+/**
+ * The page a zone-titled Mobs row is made under, as the wiki titles a page split by zone: the name
+ * capitalized, then the zone it was named in most without its article, `A kobold (Rathe Mountains)`
+ * (owner, 2026-11-10). The plain name when no zone was seen.
+ */
+export function zoneTitledPage(row: GapRow): string {
+  const name = row.name.charAt(0).toUpperCase() + row.name.slice(1)
+  const top = row.details.zones === undefined ? undefined : foldZoneTally(row.details.zones).entries[0]?.name
+  if (top === undefined) return name
+  return `${name} (${top.replace(/^the\s+/i, '')})`
+}
 
 /** Where the row was named most, and how many other zones, tiers folded: `Befallen +2`; '' for none. */
 export function gapZone(row: GapRow): string {
