@@ -109,7 +109,9 @@ A page is a mob page only if its OWN text opens the template (indirect transclus
   `* [[Vendor]]` list is left as it is: the vendor's loc belongs on the vendor's mob page, and
   reformatting the item page to carry it is cleanup, not a fact (owner, 2026-11-09, the Drogmor
   drums and Stablehand Fleeb).
-- **Merchant items_sold**: `<li> {{:Item}} <span class='ddp'>(5gp 2sp 4cp)</span>`.
+- **Merchant items_sold**: `<li> {{:Item}} <span class='ddp'>(5gp 2sp 4cp)</span>`. A scroll has no item
+  page: `<li> [[Animate Dead|Spell: Animate Dead]]` links the spell page under the scroll's name (10,297
+  `Spell:` and 115 `Song:` lines on 1,415 cached merchant pages, 2026-11-10; none transclude `{{:Spell: X}}`).
 - **merchant_value** (item): `2s 7c` style.
 - **Item lore text** (the in-game Lore tab, e.g. "The Cloth Seems To Be Moving") goes in
   `|notes = {{Item Lore|<text>}}`, not in `statsblock` and not in a `== Lore ==` section (that

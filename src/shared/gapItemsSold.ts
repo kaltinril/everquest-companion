@@ -9,6 +9,12 @@
 // `\n</li><li> `, closed by `\n</li></ul>`; a priced line pads `{{:Item}}` to 40 characters (9,495 of
 // the priced lines) before `<span class='ddp'>(5gp 2sp 4cp)</span>`, zero parts left out.
 //
+// A spell scroll has no item page: the wiki's merchant pages link the SPELL page under the scroll's
+// name, `[[Animate Dead|Spell: Animate Dead]]` (10,297 Spell: and 115 Song: lines on the 1,415 cached
+// merchant pages, 2026-11-10; none transclude `{{:Spell: X}}`). `{{:Spell: X}}` rendered as a red
+// link on the owner's Scribe Noglleg page (owner, 2026-11-10: "shows the spell sold by the merchant
+// as unknown").
+//
 // A price stands only at ally (owner, 2026-10-23: "don't show the price since we can't guarantee
 // it"): a quote moves with faction standing and with Charisma, which the log never shows, so no
 // formula converts one standing's price to another's. Prices are written only when every item has
@@ -44,12 +50,18 @@ export function ddpCoin(copper: number): string {
 /** The stated standing every written price was heard at: the only one a price is written at. */
 export const PRICES_AT = 'Prices at Ally.'
 
+/** `{{:Item}}` for an item; a scroll (`Spell: X`, `Song: X`) links its spell page under the scroll's name, as the wiki does. */
+export function soldLink(item: string): string {
+  const scroll = /^(Spell|Song): (.+)$/.exec(item)
+  return scroll === null ? `{{:${item}}}` : `[[${scroll[2]}|${item}]]`
+}
+
 /** The `items_sold` block, or '' for a merchant the log saw sell nothing. */
 export function itemsSoldBlock(sold: readonly SoldSeen[]): string {
   if (sold.length === 0) return ''
   const priced = sold.every((s) => s.copper !== undefined)
   const line = (s: SoldSeen): string => {
-    const link = `{{:${s.item}}}`
+    const link = soldLink(s.item)
     if (!priced) return link
     return `${link.length >= 40 ? `${link} ` : link.padEnd(40)}<span class='ddp'>(${ddpCoin(s.copper ?? 0)})</span>`
   }
