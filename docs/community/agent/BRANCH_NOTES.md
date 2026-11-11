@@ -333,6 +333,13 @@ where one exists.
   The overlay's Mobs-only copy derives the field domains too (gapDerive `wants`). Not folded: Drops stays
   a tab for its 1,694 per-item lines (the mob row says `drops N`); no `location` or `items sold` need yet
   (nothing derives either for a known page today).
+- 2026-11-11: an Update Mobs row (its page exists) never reads the live page on Copy; its Copy is its
+  needed lines (`gapNeeds.ts needsCopyText`), and a row that needs only a picture copies nothing and
+  says so (`isUpdateMob`; owner: a giant beetle's Copy read the page and reported "0 fields filled in",
+  "this is sort of saying nothing to do which is a waste of my time"). The page read is for New page rows.
+  A `viaRedirect` mob row copies the whole page for its own name and reads nothing (owner: the wiki sends
+  a giant fire beetle, level 9 in Toxxulia, to A giant beetle, level 6-8 in Western Karana; "the copy
+  command is dumb"): Edit page opens the redirect to replace it.
 - 2026-11-10: a new mob page lists a drop group as its group line (`[[Rusty Weapons]]`, rated by the
   corpses that dropped any member), as the Drops tab files them (owner: his A kobold (Rathe Mountains)
   page listed every rusty weapon); a `zoneTitled` row takes loot only from its own zone (owner: "we

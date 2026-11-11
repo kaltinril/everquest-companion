@@ -12,7 +12,7 @@ import { type JSX, useCallback, useMemo, useState } from 'react'
 import { Box, Button, Checkbox, CircularProgress, FormControlLabel, MenuItem, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import { GAP_DOMAIN_HELP, GAP_DOMAIN_LABELS, GAP_SHOWN_NOUN, gapsAsText, hiddenBy, visibleGaps, type GapDomain, type GapRow, type GapsSnap } from '@shared/gaps'
-import { GAP_TABS, needsCopyText } from '@shared/gapNeeds'
+import { GAP_TABS, isUpdateMob, needsCopyText } from '@shared/gapNeeds'
 import NeedsChips from './NeedsChips'
 import { heldCaption, type HeldFilter, type HeldPick } from '@shared/gapHeld'
 import { GAP_SHOW_WORDS, jobCaption, type GapShow } from '@shared/gapJob'
@@ -243,7 +243,20 @@ export default function GapsView(): JSX.Element {
   // files, the kept screenshots) and what each row still lacks come from the list (useGapReady).
   const { sightings, needed } = readiness
   // An Update row on the Mobs list copies its field rows' lines, never a page over one that exists (gapNeeds.ts).
-  const pageText = useCallback((row: GapRow) => needsCopyText(row, needs.index, (r) => wikiPageText(r, loot, kills, sightings), CHIP_CONTEXT) ?? wikiPageText(row, loot, kills, sightings), [loot, kills, sightings, needs.index])
+  // An Update row (its page exists) copies the lines its needs ask for, and nothing when only a
+  // picture is missing (owner, 2026-11-11: a giant beetle's Copy read the page and said nothing to do);
+  // a New page row copies the whole page.
+  const pageText = useCallback(
+    (row: GapRow) => {
+      // A name the wiki redirects elsewhere may be another mob (owner, 2026-11-11: a giant fire beetle
+      // sent to A giant beetle): the whole page for this name, to create over the redirect.
+      if (row.viaRedirect !== undefined) return wikiPageText(row, loot, kills, sightings)
+      const lines = needsCopyText(row, needs.index, (r) => wikiPageText(r, loot, kills, sightings), CHIP_CONTEXT)
+      if (lines !== undefined) return lines
+      return isUpdateMob(row) ? '' : wikiPageText(row, loot, kills, sightings)
+    },
+    [loot, kills, sightings, needs.index]
+  )
   // "Group by zone, then mob" (owner ask, 2026-10-18), its heading order and its folds (useGrouping).
   const group = useGrouping(sorted, loot, zone)
 
