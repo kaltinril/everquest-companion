@@ -77,8 +77,7 @@ interface Inputs {
 }
 
 function domainsOf({ engine, met, wiki, only }: Inputs, m: DomainMemos): Domains {
-  // The Mobs list reads the field domains by mob (gapNeeds.ts), so a Mobs-only copy derives them too.
-  const wants = (d: GapDomain): boolean => only === undefined || only === d || (only === 'mob' && (d === 'faction' || d === 'drop' || d === 'image' || d === 'respawn'))
+  const wants = (d: GapDomain): boolean => only === undefined || only === d
   const learned = m.learned([met.respawn], () => learnedOf(met.respawn))
   return {
     ...(wants('faction') ? { factions: m.factions([engine.killFactions, wiki.catalog, met.kills], () => factionGaps(engine.killFactions ?? [], wiki.catalog, met.kills)) } : {}),

@@ -18,17 +18,9 @@ const UPDATE_DOMAINS: ReadonlySet<GapDomain> = new Set<GapDomain>(['faction', 'd
  * has as a mob (`ctx.isMob`) has a page that only lacks the merchant layout. An Items row standing
  * for a known item's page that lacks a forage zone or the category (shared/gapForage.ts) is an update.
  */
-/**
- * A row whose page exists: a field domain's, a forage update, a known NPC's quest gaps, a name known
- * only through a redirect, or a known mob's row on the Mobs list (gapNeeds.ts: `page` set).
- */
-function pageExists(row: GapRow): boolean {
-  if (UPDATE_DOMAINS.has(row.domain) || row.forageUpdate !== undefined || row.questGaps !== undefined || row.viaRedirect !== undefined) return true
-  return (row.domain === 'mob' || row.domain === 'merchant') && row.page !== undefined
-}
-
 export function gapJob(row: GapRow, ctx: GapActionContext = {}): GapJob {
-  if (pageExists(row)) return 'update'
+  // A forage update, a known NPC's quest gaps, or a name known only through a redirect: the page exists.
+  if (UPDATE_DOMAINS.has(row.domain) || row.forageUpdate !== undefined || row.questGaps !== undefined || row.viaRedirect !== undefined) return 'update'
   if (row.domain === 'merchant' && ctx.isMob?.(row.name) === true) return 'update'
   // A quest the wiki has a page for: the job is to fill what the page lacks (`page`, the catalog's).
   if (row.domain === 'quest') return row.page === undefined ? 'new' : 'update'
