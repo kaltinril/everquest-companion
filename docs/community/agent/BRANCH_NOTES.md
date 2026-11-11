@@ -692,6 +692,9 @@ where one exists.
 - A capture's `Captured.png` is that window's crop (`windowPng`) and rides `CapturedRead.png`, so "Use it
   anyway" keeps it too. Pictures are written after the reading is kept and never block it.
 - Overlay code imported by tests uses relative `shared/` imports, not `@shared` (`feedGapTags.ts`).
+- A renderer `<img>` from a Blob URL needs `blob:` in `index.html`'s `img-src` (2026-11-10: the picture
+  beside "is it X's?" (`PasteZone.tsx WrongItem`) was a broken image for two weeks; nothing in the gate
+  checks the CSP). `media-src` had `blob:` already, for alert sounds; `img-src` has it now.
 - `shotIpc.ts catalogNames` includes each item's `otherNames` (wiki redirects).
 - Details picture: `rowPicture` (shared/mobPicture.ts) picks it (mob/Images: the held picture; item: `item/item_<n>.png`,
   never the Lore one; spell: `spell/spell_<n>.png`); `RowPicture.tsx WithRowPicture` lays the pane out (text `1 1 380px`,
