@@ -4,7 +4,7 @@
 // filter (any ticked need; counts are mobs) and the Seen as collapse.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { FOLDED_INTO, GAP_TABS, needCounts, needIndex, needLabel, needsCopyText, needsFilter, needsOf, needsPickOf, needsPickText, seenAs, withMobNeeds } from '../src/shared/gapNeeds'
+import { isUpdateMob, FOLDED_INTO, GAP_TABS, needCounts, needIndex, needLabel, needsCopyText, needsFilter, needsOf, needsPickOf, needsPickText, seenAs, withMobNeeds } from '../src/shared/gapNeeds'
 import { gapDomainOf } from '../src/shared/gapsViewPrefs'
 import { gapJob, jobCaption } from '../src/shared/gapJob'
 import type { GapRow, GapsSnap } from '../src/shared/gaps'
@@ -30,6 +30,16 @@ const SNAP: GapsSnap = {
   totals: { mob: 1, faction: 2, drop: 2, image: 1, respawn: 1, merchant: 1 },
   seen: {}
 } as unknown as GapsSnap
+
+// Owner, 2026-11-11: a giant beetle (page exists, needs only a picture) opened the page read and said
+// "0 fields filled in": an Update row reads no page; its Copy is its needed lines, or nothing.
+test('an Update mob row is told apart from a New page row for the Copy', () => {
+  const update = { domain: 'mob', name: 'a giant beetle', kinds: ['killed'], count: 1, first: '', last: '', details: { samples: [] }, page: 'A giant beetle' } as unknown as GapRow
+  const fresh = { ...update, page: undefined } as unknown as GapRow
+  assert.equal(isUpdateMob(update), true)
+  assert.equal(isUpdateMob(fresh), false)
+  assert.equal(isUpdateMob({ ...update, domain: 'item' } as unknown as GapRow), false)
+})
 
 test('a known mob with field rows gets one Update row; a no-page faction folds into its mob\'s New page row', () => {
   const snap = withMobNeeds(SNAP)

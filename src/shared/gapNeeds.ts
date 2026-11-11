@@ -187,6 +187,11 @@ export function needsCopyText(row: GapRow, index: ReadonlyMap<string, FieldRows>
   return rows.map(pageText).filter((t) => t.trim() !== '').join('\n\n')
 }
 
+/** A Mobs or Merchants row whose page exists (an Update row): its Copy is its needed lines, never a page, and it reads no page. */
+export function isUpdateMob(row: GapRow, ctx: GapActionContext = {}): boolean {
+  return isMobRow(row) && gapJob(row, ctx) === 'update'
+}
+
 /** Seen as, collapsed: the first two kinds and how many more (owner, 2026-11-10: "fixed width and gets chips cut off"). */
 export function seenAs(kinds: readonly string[]): { shown: string[]; more: number } {
   return { shown: kinds.slice(0, 2), more: Math.max(0, kinds.length - 2) }

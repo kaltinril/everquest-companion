@@ -15,6 +15,7 @@ import { removeCapturedItem } from './capturedItemsStore'
 import NoteAddIcon from '@mui/icons-material/NoteAdd'
 import SearchIcon from '@mui/icons-material/Search'
 import { GAP_CAPTURE, mobPageOf, onMobPage, wikiCreateUrl, wikiEditUrl, wikiSearchUrl, zoneTitledPage, type GapRow } from '@shared/gaps'
+import { isUpdateMob } from '@shared/gapNeeds'
 import { forageButtons } from '@shared/gapForage'
 import { copyText } from '../../lib/clipboard'
 import { Tooltip } from '../../lib/Tooltip'
@@ -87,6 +88,19 @@ function pageExists(row: GapRow): boolean {
   return existingEditor(row, readGapVerdict(row.domain, row.name)) !== undefined
 }
 
+/**
+ * A Mobs or Merchants row's Copy words: a page read first for a new page (owner, 2026-11-10); the whole
+ * page for a redirected name, to create over the redirect when it is another mob; the needed lines for
+ * an Update row (owner, 2026-11-11: "nothing to do is a waste of my time"). Undefined for other rows.
+ */
+function mobCopyWords(row: GapRow): { label: string; tip: string } | undefined {
+  if (readsMobPage(row)) return { label: 'Copy wiki page', tip: 'Reads the wiki page first: fills only its empty fields, or copies a whole new page.' }
+  if (row.domain !== 'mob' && row.domain !== 'merchant') return undefined
+  if (row.viaRedirect !== undefined) return { label: 'Copy wiki page', tip: `The wiki sends this name to ${row.viaRedirect}. If that is another mob, Edit page opens the redirect: replace it with this whole page.` }
+  if (isUpdateMob(row)) return { label: 'Copy lines to add', tip: 'Only the lines this page lacks, for its Needs: paste them into the page. A page that needs only a picture has nothing to copy: paste the picture in the open row.' }
+  return undefined
+}
+
 /** The Copy button's words and tip for a row. */
 function copyWords(row: GapRow): { label: string; tip: string } {
   if (row.forageUpdate !== undefined) return { label: 'Copy wiki page', tip: forageButtons(row.forageUpdate).copyTip }
@@ -96,15 +110,18 @@ function copyWords(row: GapRow): { label: string; tip: string } {
   if (row.domain === 'notice') return { label: 'Copy proof', tip: 'What your log proves (how often, when, where, the lines), for the talk page or the edit summary.' }
   // A quest reads its wiki page first and adds to it (owner, 2026-10-23: "implement the diff idea").
   if (row.domain === 'quest') return { label: 'Copy wiki page', tip: 'Reads the wiki page and adds what your log saw, removing nothing.' }
-  // A mob reads its page first too (owner, 2026-11-10): empty fields filled, or a whole new page.
-  if (readsMobPage(row)) return { label: 'Copy wiki page', tip: 'Reads the wiki page first: fills only its empty fields, or copies a whole new page.' }
+  const mob = mobCopyWords(row)
+  if (mob !== undefined) return mob
   const tip = `Wiki markup from what your log saw. ${GAP_CAPTURE[row.domain]}`
   if (!pageExists(row)) return { label: 'Copy wiki page', tip }
   return { label: 'Copy draft (page exists)', tip: `The wiki already has this page: copy only the fields it lacks from this draft. Pasting all of it replaces what people wrote there. ${tip}` }
 }
 
-/** A Mobs or Merchants row whose Copy reads the live page first (MobCopyDialog.tsx); a redirect or a quest-giver add text does not. */
-const readsMobPage = (row: GapRow): boolean => (row.domain === 'mob' || row.domain === 'merchant') && row.suggest === undefined && row.forageUpdate === undefined && row.questGaps === undefined
+/**
+ * A Mobs or Merchants row whose Copy reads the live page first (MobCopyDialog.tsx): a New page row. A
+ * redirect, a quest-giver add text or an Update row (its page exists; its Copy is its needed lines) does not.
+ */
+const readsMobPage = (row: GapRow): boolean => (row.domain === 'mob' || row.domain === 'merchant') && row.suggest === undefined && row.forageUpdate === undefined && row.questGaps === undefined && !isUpdateMob(row)
 
 /** A new wiki page for the row, built from what the log saw (shared/wikiPage.ts), onto the clipboard. */
 function CopyPageButton({ text, row, compact }: { text: () => string; row: GapRow; compact: boolean }): JSX.Element {
@@ -138,7 +155,10 @@ function CopyPageButton({ text, row, compact }: { text: () => string; row: GapRo
   // whether the page already exists before one is made (owner, 2026-10-26: "user clicks COPY on an
   // item and it does the lookup"). A redirect or forage row copies only.
   const copy = (): void => {
-    void copyText(text()).then(setCopied)
+    const t = text()
+    // Nothing to copy (an Update row that only needs a picture): the tip says what to do instead.
+    if (t === '') return
+    void copyText(t).then(setCopied)
     if (row.suggest === undefined && row.forageUpdate === undefined) void lookupOnCopy(row.domain, row.name)
   }
   const onClick = row.domain === 'quest' ? openRead : readsMobPage(row) ? openMobRead : copy
