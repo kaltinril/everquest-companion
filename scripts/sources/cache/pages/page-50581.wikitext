@@ -1,0 +1,1247 @@
+= General Pet Info =
+
+All summoned pets are Warriors, and most have an additional class as well. The Warrior class grants all pets combat abilities from the Warrior class such as Block, Cleave, Parry, Dual Wield, Kick, etc. Any summoned pets not on this list (such as Druid pets and Magician Monster Summons) are exclusively Warriors.
+{| class="wikitable"
+|+Multiclass Pets
+!Pet
+!Second Class
+!Additional Abilities
+|-
+|[[Beastlord|Beastlord's]] Warders
+|[[Beastlord]]
+|Beastlord Spells, including Slows
+|-
+|[[Enchanter|Enchanter's]] Animations
+|[[Paladin]]
+|Lay on Hands, Paladin Spells
+|-
+|[[Magician|Magician's]] Air Elementals
+|[[Monk]]
+|Monk special attacks
+|-
+|[[Magician|Magician's]] Earth Elementals
+|[[Ranger]]
+|Ranger Spells, including AoEs
+|-
+|[[Magician|Magician's]] Fire Elementals
+|[[Wizard]]
+|Wizard Spells, including AoEs, Stuns, Roots
+|-
+|[[Magician|Magician's]] Water Elementals
+|[[Rogue]]
+|Backstab
+|-
+|[[Necromancer|Necromancer's]] Undead
+|[[Shadow Knight]]
+|Harm Touch, Shadow Knight Spells
+|-
+|[[Shaman|Shaman's]] Spirit Guardians
+|[[Beastlord]]
+|Beastlord Spells, including Slows
+|}
+
+=== Pet Spell Upgrades ===
+
+Spell upgrades to pet spells improve the spell itself: lower mana cost, lower cast time, and each level provides 10% chance to not use a reagent.
+
+Along with adjusting the spell itself, it also provides a boost to the pet summoned by the spell. Each increase in the spell's rank, increases the summoned pet's level by one. This increase maxes out once the summoned pet has the same level as the caster.
+
+Each upgraded pet level will provide the following benefits:
+*+6% Hit Points
+*+10% base damage
+*+5 to skill points
+
+When a pet is summoned using a focus item, the pet summoned has higher base stats (more hit points, more damage per hit, etc). The bonuses from upgrading the spell levels are then applied on top of the focused pet's higher base stats.
+
+At least some of these bonuses apply even if the summoned pet has reached max level.  If your +9 mage pet summons a level 50 pet when you are level 50, and you upgrade it to +10 - you will still have a level 50 pet, but the pet's health will still increase even though the summoned pet is the same level; pet damage is dependent on level, so that will not increase the same way. Other benefits (lower mana cost, cast time, and reagent usage) still apply.
+
+How exactly the damage upgrade works alongside the new changes to pet weapon calculations needs to be tested (Oct 13th, 2026).
+
+=== Pet Related AAs ===
+* Companion's Discipline: Unlocks the /pet hold and /pet ghold commands.
+* Companion's Fury (Magician Only): Grants access to the [[Frenzied Burnout I]] ability. This is a powerful pet buff that includes a large ATK bonus, overhaste, and causes the pet to flurry.
+* Hobble of Spirits (Beastlord Only): Grants access to the [[Hobble of Spirit]] ability. This ability casts a permanent buff on your pet that lets it proc a 40% snare on its target.
+* Pet Affinity: Allows Group Buffs, including Bard Songs, to affect your pet.
+* Unbound Companion (Magician Only): Gives your pets an increased chance to land critical hits. Works on any pet you summon, not just Magician's elemental summons.
+* Unbound Ferocity (Beastlord Only): Gives your pets up to 9% chance to flurry. Works on any pet you summon, not just Beastlord warders.
+
+=== Pets and Experience ===
+
+In order to receive full experience for a kill solo, you need to do at least 1 damage to the mob.  If your pet does all of the damage, experience will be greatly reduced. [Unknown group impact, if a group member does 1 damage if full xp is given to summoner as well as group]
+
+=== Pet tracking ===
+
+In older versions of Everquest, the '''/pet attack <npc name>''' command could be used to check if NPCs up in the zone. If the NPC is up, the pet would emote 'Attacking <npc name> Master.'
+
+In Everquest Legends, pet tracking does <strong><em>not</strong></em> function. The pet attack command has a very short range.
+
+=== Pet Appearance ===
+
+There are a few available options for your pet's appearance. 
+
+==== Pet Size ====
+
+[[File:pet_size_ant.png|200px|thumb|'''Don't step on him!''']]
+
+In Options >> System >> Accessibility, you can use the "Pet Size" slider to change the size of all pets from your point of view. The [[Shrink]] and [[Tiny Companion]] spells may be used to reduce the size of your pet from everybody's perspective. You can even combine the spell plus the accessibility option to make your pet positively ant-sized.
+
+==== Pet Illusions ==== 
+
+Some items in the game can be used to place an illusion on your pet. These come in two varieties: items which require "conversion" to a pet illusion item (ex: [[Guise of the Deceiver]]) and items that are natively pet illusion items (ex: [[Petamorph Wand: Murderbee]]). You can find the full list of items under [[:Category:Pet Illusion Items]].
+
+To use a native pet illusion item:
+# Place the item in your Inventory >> Storage >> Activated items
+# Switch to the Inventory >> Pet tab
+# Set the illusion at Inventory >> Pet >> Pet Illusion
+# Resummon your pet 
+
+To use a convertible item:
+# Right-click on the item to open its details window
+# Click the button next to 'Convert to <illusion item name>' (note: you will be prompted to remove any equipped exaltations)
+# Follow the regular pet illusion item steps above
+
+'''Note:''' You can convert the illusion item back to the original item via the same mechanism.
+
+= Pet Equipment =
+Finding new equipment for your pet is something that can continue throughout the lifetime of your character, as you only need to acquire an item once, and you can use it indefinitely on your pet, until an upgrade is found. Pet inventory items are not lost on logout, pet death, or class changes. They remain in the pet inventory until you remove them. If you change your classes and lose pet inventory slots they will be displayed as red and will not be equipped by your pet, so must be moved to an active slot to be used.
+<br>
+Charmed pets also use items in the pet inventory slots until charm breaks. 
+
+== Equipment Restrictions ==
+Pets can use any items that can be worn by their own classes, and any equipment you may wear.  For example, if you're a DRU/MAG/SHM and you summon a Water elemental (WAR/ROG), the pet can use any items that can be used by: Druids, Magicians, Shamans, Warriors, or Rogues.
+
+[Can pets use items with Deity restrictions?? Needs testing in EQ Legends]
+
+== Pet Inventory Slots ==
+Pet inventory slots are given as follows.
+Everyone starts with a base of 4, then you add the following slots for the following classes:
+
+Magician and Beastlord: +3<br>
+Necromancer: +2<br>
+Enchanter, Druid, Shaman: +1<br>
+<br>
+Shadow Knight does not get an extra pet inventory slot.
+
+So as an example, max would be the base 4 pet inventory slots + Mag 3, + Bst 3, + Nec 2 = 12 pet inventory slots.
+
+== Pet Weapons ==
+
+Changes have been made to how pets function with weapons throughout Everquest Legends. As of October 13th, 2026, how pets use weapons has changed once again. Giving pets weapons will increase their damage output, but the effectiveness of the weapon is based entirely on the weapon's <em>ratio</em>. Higher ratio weapons will always increase the pet's melee damage (though other factors, like stats, effects, procs, and accuracy should all be considered as well when equipping your pet).
+ 
+With low level pets, who typically have poor dual wielding - you'll generally get better damage output with a high ratio two hander.  For higher level pets, dual wielding high ratio one handers will usually provide much better damage per second against individual targets. However, when fighting large numbers of enemies simultaneously, it is possible that a two handed weapon will provide more damage due to much higher damage cleave strikes on multiple targets.
+
+=== Pet Damage Calculation ===
+Pet attacks use a weapon damage and delay, much like players, when performing melee attacks. 
+
+==== Delay ====
+Pet attack delays are <em>fixed</em>. So a level 50 water pet will always attack with a delay of 28 (2.8 seconds) no matter what kind of weapon it has. In the early months of EQ Legends, different pets had different delays and so far it appears that the pets' base delay and damage values are unchanged. But testing needs to be done to reconfirm, and fill out the damage and delay values in the class specific pet lists below.
+
+==== Damage ====
+
+Pet Weapon damage is calculated by (Base Pet Damage * Mote Modifier) + (Equipped Weapon Ratio * Weapon Type Modifier).  Additionally, pets have bonus damage that is applied after the random roll to determine how much they hit the target for, just like players. Bonus damage cannot be modified, though it varies between different pets.
+
+*''Base Pet Damage:'' This is the damage of the pet's fist, if it is using no weapon at all. This is determined by the pet you summon.
+*''Mote Modifier:'' This is a damage increase from upgrading a pet spell with motes. The modifier is equal to 1 + (Spell Rank / 10).  So with a Rank 0 spell, the modifier is 1, and the pet does base damage.  At Rank X, the mote modifier increases to 2, doubling the pet's base damage.
+*''Equipped Weapon Ratio:'' Fairly self explanatory - this is the ratio of the weapon your pet has equipped. Upgrading the weapon with motes increases the ratio which increases the extra damage the pet deals from having a weapon.
+*''Weapon Type Modifier:'' This value is multiplied by the equipped weapon's ratio. The value is fixed regardless of pet level, though there do seem to be damage caps on low level pets' max hit.
+** One-Handed Weapon Modifier: 28
+** Two-Handed Weapon Modifier: 42.5
+
+=== Dual Wielding ===
+
+An update on July 7th, 2026 made changes to some, maybe all, pets' ability to dual wield. They now start dual wielding much earlier, and their dual wield skill improves more quickly than it used to.
+
+As players determine which level pets actually start dual wielding, they can be updated here. This is the ''pet level'' when they begin to use both weapons, not character level.
+
+*Beastlord Warders: 5
+*Enchanter Pet: ?
+*Magician Air Pet: 8
+*Magician Earth Pet: 9
+*Magician Fire Pet: ?
+*Magician Water Pet:6
+*Necromancer Pet:8
+*Shadow Knight Pet: ?
+*Shaman Pet: ?
+
+'''Note:''' Pets attempt to equip weapons in the order you place them in the inventory. If you have two one-handed weapons, and one of them is Primary only and the other is Primary/Secondary only you need to equip them in the correct order to get your pet to dual wield. If you equip the Primary/Secondary weapon first, the pet will put it in their primary slot. When you then give them the Primary only weapon, they will refuse to use it. You must give them the Primary only weapon first, and then the Secondary weapon.
+
+==== Dual Wield Measurements ====
+Dual Wield measurements on the class pet charts below represent how many additional off hand attacks are made relative to main hand attacks using identical delay. A dual wield of 100% would mean the pet makes an equal number of attacks with both hands - including double and triple attacks for each hand.
+
+=== Weapon Procs ===
+Pets will use the procs on most weapons, so long as they meet the minimum required level to do so. However, they are blocked from proccing AoE effect procs, such as the [[Earthquake]] proc on [[Earthshaker]] or [[Hierophant`s Crook]].
+
+=== Backstab Damage ===
+For [[Magician]] Water Pets, who are Rogues, their maximum backstab damage is 8 * pet's backstab damage. A pet's base backstab damage is equal to their base weapon damage. If you give a pet a weapon with backstab damage, it will use the weapon's backstab damage, but only if that weapon's backstab damage is greater than their own base backstab damage.  However, since the highest backstab weapon in the current game is [[Serpent's Tooth]], with 13, and pets surpass an unarmed weapon damage of 13 at level 22 - there really isn't much reason to worry about the backstab damage of weapons you give your pets.
+
+NOTE: It's possible that the recent pet overhaul, combined with new weapon drops in Nektropos may have changed this information somewhat. More testing needs to be done to understand how weapons work with backstab under the new system.
+
+=== Recommended Pet Weapons ===
+When starting out, just give your pets the best ratio weapons you can find that you don't need for yourself. You will usually want to use two handers, since their dual wield chance is low. By the time your pets are in their 20-30s, they are dual wielding quite frequently, so two one handers with good ratios becomes more viable.
+
+==== Noteable Weapons ====
+
+<strong>One handed weapons</strong>
+
+<ul><li>{{:Short Sword of the Ykesha}} - Taunt proc, useful if you want your pet to tank for you</li>
+<li>{{:Wakizashi of the Frozen Skies}} - 80pt DD at level 35. Requires a quest, [[Yuio's Illness]], that needs [[Skill Forage|Foraging]] and [[Skill Tracking|Tracking]]</li>
+<li>{{:Gnoll Hide Lariat}} - Stun</li>
+<li>{{:Dagger of Dropping}} - Weaken</li>
+<li>{{:Serrated Bone Dirk}} - Snare Dot</li>
+<li>{{:Dagas}} - Warrior Plane of Sky sword that gives very big AC and Hit Point boost and can be used in the pet's off-hand.</li>
+</ul>
+
+<strong>Two handed weapons</strong>
+
+<ul><li>{{:Axe of the Slayers}} - Rampage Proc</li>
+<li>{{:A Mithril Two-Handed Sword}} - Haste worn</li>
+<li>{{:Staff of Undead Legions}} - 2hb Banish Undead (Necro only)</li>
+<li>{{:Earthshaker}} - 2hs with extremely high damage and delay with an AoE proc (pets will now use AoE procs - they did not at launch, but as of September 2026 they now do)</li>
+</ul>
+
+== Pet Armor ==
+
+Pets can equip items by using the pet inventory system, accessed from a tab in your own inventory. However, they have the same limitations as a player character - they will only wear one chest, two earrings, two wrist items, etc.  Pets will gain stats from items, but if you give them too many of the same item, they will wear whichever item has higher AC, regardless of any other bonuses the item may have (i.e. 16 AC belt item will overwrite a 14 AC 22% haste belt). It is best to make sure to only give them exactly which items you want them to use.
+
+'''/pet inventory check''' is a way to confirm if your pet is equipping a specific item. It will output in chat what your pet is currently equipping. If you wish for an item to be replaced or taken off, remove it from the pet inventory window and your pet will automatically update in real time.
+
+=Pet Details By Class=
+The following information is still being collected and updated for Everquest Legends.
+
+== [[Beastlord]] Pets ==
+
+There was a patch on 8/18/2026 that was a pretty big change to Beastlord pets. Currently the only data in the chart below that is confirmed is for Spirit of Kashek.  Other pets still need retested.
+
+{| class="wikitable"
+!Character Level
+!Pet Spell
+!Pet Level
+!Base Melee Ratio
+!Bonus Damage
+!Dual Wield
+|-
+|style="text-align:center;"|'''1'''
+|[[Wild Spirit Summon|Wild Spirit]]
+|1
+|4/30 (0.133)
+| +0
+| - 
+|-
+|style="text-align:center;"|'''4'''
+|[[Tame Spirit Summon|Tame Spirit]]
+|5
+|4/38 (0.105)
+| +0
+|5%
+|-
+|style="text-align:center;"|'''8'''
+|[[Spirit of Sharik Summon|Spirit of Sharik]]
+|9
+|5/38 (0.132)
+| +0
+|14%
+|-
+|style="text-align:center;"|'''15'''
+|[[Spirit of Khaliz Summon|Spirit of Khaliz]]
+|16
+|10/38 (0.263)?
+| +0
+|X?
+|-
+| style="text-align:center;" |'''23'''
+|[[Spirit of Keshuval Summon|Spirit of Keshuval]]
+|22
+|13/38 (0.342)?
+| +1?
+|X?
+|-
+| style="text-align:center;" |'''30'''
+|[[Spirit of Herikol Summon|Spirit of Herikol]]
+|26
+|16/38 (0.421)?
+| +?
+|X?
+|-
+| style="text-align:center;" |'''39'''
+|[[Spirit of Yekan Summon|Spirit of Yekan]]
+|31
+|20/38 (0.526)?
+| +?
+|X?
+|-
+| style="text-align:center;" |'''46'''
+|[[Spirit of Kashek Summon|Spirit of Kashek]]
+|39
+|21/26 (0.808)
+| +14
+|X?
+|}
+==== Reagents ====
+Beastlord pets do not have a reagent required to summon.
+
+== [[Enchanter]] Pets ==
+
+{| class="eoTable2"
+! Character Level
+! Pet Spell
+! Pet Level
+! Base Melee Ratio
+!Bonus Damage
+!Dual Wield
+|-
+| style="text-align:center;"|'''1'''
+| [[Pendril's Animation Summon|Pendril's Animation]]|| 1 || 4/30? (0.XXX) 
+| +?
+|X?
+|-
+| style="text-align:center;"|'''2'''
+| [[Juli's Animation Summon|Juli's Animation]]|| 5 || 7/30? (0.XXX) 
+| +?
+|X?
+|-
+| style="text-align:center;"|'''7'''
+| [[Mircyl's Animation Summon|Mircyl's Animation]]|| 9 || 8/30? (0.XXX) 
+| +?
+|X?
+|-
+| style="text-align:center;"|'''9'''
+| [[Kilan's Animation Summon|Kilan's Animation]]|| 11 || 9/30? (0.XXX) 
+| +?
+|X?
+|-
+| style="text-align:center;"|'''14'''
+| [[Shalee's Animation Summon|Shalee's Animation]]|| 16 || X/30? (0.XXX) 
+| +?
+|X?
+|-
+| style="text-align:center;"|'''17'''
+| [[Sisna's Animation Summon|Sisna's Animation]]|| 19 || 11/20 (0.55) 
+| +?
+| 10-20%
+|-
+| style="text-align:center;"|'''22'''
+| [[Sagar's Animation Summon|Sagar's Animation]]|| 22 || X/30? (0.XXX) 
+| +?
+|X?
+|-
+| style="text-align:center;"|'''29'''
+| [[Uleen's Animation Summon|Uleen's Animation]]|| 25 || X/30? (0.XXX) 
+| +?
+|X?
+|-
+| style="text-align:center;"|'''31'''
+| [[Boltran's Animation Summon|Boltran's Animation]]|| 28 || X/30? (0.XXX) 
+| +?
+|X?
+|-
+| style="text-align:center;"|'''37'''
+| [[Aanya's Animation Summon|Aanya's Animation]]|| 31 || X/30? (0.XXX) 
+| +?
+|X?
+|-
+| style="text-align:center;"|'''41'''
+| [[Yegoreff's Animation Summon|Yegoreff's Animation]]|| 34 || X/30? (0.XXX) 
+| +?
+|X?
+|-
+| style="text-align:center;"|'''48'''
+| [[Kintaz's Animation Summon|Kintaz's Animation]]|| 39 || 21/28 (0.750) 
+| +10
+|X?
+|}
+==== Reagents ====
+Enchanter pets all require [[Tiny Dagger|Tiny Daggers]] to summon.
+
+== [[Magician]] Pets ==
+
+{| class="wikitable"
+|+Elementalkin<br>(Level 5 Elementals)
+!Character Level
+!Elemental
+!Hit Points
+!Damage
+!Delay
+!Ratio
+!Bonus Damage
+!Dual Wield
+|-
+|style="text-align: center;"|2
+|style="text-align: center;"|[[Elementalkin: Water Summon|Water]]
+|style="text-align: center;"|144
+|style="text-align: center;" rowspan="4"| 6
+|style="text-align: center;"|30
+|style="text-align: center;"|0.200
+|style="text-align: center;" rowspan="4"| +0
+|style="text-align: center;" rowspan="4"| 8%
+|-
+|style="text-align: center;"|3
+|style="text-align: center;"|[[Elementalkin: Fire Summon|Fire]]
+|style="text-align: center;"|94
+|style="text-align: center;"|30
+|style="text-align: center;"|0.200
+|-
+|style="text-align: center;"|4
+|style="text-align: center;"|[[Elementalkin: Air Summon|Air]]
+|style="text-align: center;"|118
+|style="text-align: center;"|30
+|style="text-align: center;"|0.200
+|-
+|style="text-align: center;"|5
+|style="text-align: center;"|[[Elementalkin: Earth Summon|Earth]]
+|style="text-align: center;"|178
+|style="text-align: center;"|30
+|style="text-align: center;"|0.200
+|}
+
+{| class="wikitable"
+|+Elementaling<br>(Level 9 Elementals)
+!Character Level
+!Elemental
+!Hit Points
+!Damage
+!Delay
+!Ratio
+!Bonus Damage
+!Dual Wield
+|-
+|style="text-align: center;"|6
+|style="text-align: center;"|[[Elementaling: Water Summon|Water]]
+|style="text-align: center;"|390
+|style="text-align: center;" rowspan="4"| 8
+|style="text-align: center;"|30
+|style="text-align: center;"|0.267
+|style="text-align: center;" rowspan="4"| +0
+|style="text-align: center;" rowspan="4"| 13%
+|-
+|style="text-align: center;"|7
+|style="text-align: center;"|[[Elementaling: Fire Summon|Fire]]
+|style="text-align: center;"|256
+|style="text-align: center;"|30?
+|style="text-align: center;"|0.267?
+|-
+|style="text-align: center;"|8
+|style="text-align: center;"|[[Elementaling: Air Summon|Air]]
+|style="text-align: center;"|320
+|style="text-align: center;"|30?
+|style="text-align: center;"|0.267?
+|-
+|style="text-align: center;"|9
+|style="text-align: center;"|[[Elementaling: Earth Summon|Earth]]
+|style="text-align: center;"|480
+|style="text-align: center;"|30?
+|style="text-align: center;"|0.267?
+|}
+
+{| class="wikitable"
+|+Elemental<br>(Level 12 Elementals)
+!Character Level
+!Elemental
+!Hit Points
+!Damage
+!Delay
+!Ratio
+!Bonus Damage
+!Dual Wield
+|-
+|style="text-align: center;"|10
+|style="text-align: center;"|[[Elemental: Water Summon|Water]]
+|style="text-align: center;"|552
+|style="text-align: center;" rowspan="4"| 9
+|style="text-align: center;"|30
+|style="text-align: center;"|0.300
+|style="text-align: center;" rowspan="4"| +0
+|style="text-align: center;" rowspan="4"| 17%
+|-
+|style="text-align: center;"|11
+|style="text-align: center;"|[[Elemental: Fire Summon|Fire]]
+|style="text-align: center;"|364
+|style="text-align: center;"|30?
+|style="text-align: center;"|0.300?
+|-
+|style="text-align: center;"|12
+|style="text-align: center;"|[[Elemental: Air Summon|Air]]
+|style="text-align: center;"|454
+|style="text-align: center;"|30?
+|style="text-align: center;"|0.300?
+|-
+|style="text-align: center;"|13
+|style="text-align: center;"|[[Elemental: Earth Summon|Earth]]
+|style="text-align: center;"|682
+|style="text-align: center;"|30?
+|style="text-align: center;"|0.300?
+|}
+
+{| class="wikitable"
+|+Minor Summoning<br>(Level 17 Elementals)
+!Character Level
+!Elemental
+!Hit Points
+!Damage
+!Delay
+!Ratio
+!Bonus Damage
+!Dual Wield
+|-
+|style="text-align: center;"|14
+|style="text-align: center;"|[[Minor Summoning: Water Summon|Water]]
+|style="text-align: center;"|836
+|style="text-align: center;" rowspan="4"| 10
+|style="text-align: center;"|30
+|style="text-align: center;"|0.333
+|style="text-align: center;" rowspan="4"| +0
+|style="text-align: center;" rowspan="4"| 20%
+|-
+|style="text-align: center;"|15
+|style="text-align: center;"|[[Minor Summoning: Fire Summon|Fire]]
+|style="text-align: center;"|552
+|style="text-align: center;"|30?
+|style="text-align: center;"|0.333?
+|-
+|style="text-align: center;"|16
+|style="text-align: center;"|[[Minor Summoning: Air Summon|Air]]
+|style="text-align: center;"|690
+|style="text-align: center;"|30?
+|style="text-align: center;"|0.333?
+|-
+|style="text-align: center;"|17
+|style="text-align: center;"|[[Minor Summoning: Earth Summon|Earth]]
+|style="text-align: center;"|1032
+|style="text-align: center;"|30?
+|style="text-align: center;"|0.333?
+|}
+
+{| class="wikitable"
+|+Lesser Summoning<br>(Level 20 Elementals)
+!Character Level
+!Elemental
+!Hit Points
+!Damage
+!Delay
+!Ratio
+!Bonus Damage
+!Dual Wield
+|-
+|style="text-align: center;"|18
+|style="text-align: center;"|[[Lesser Summoning: Water Summon|Water]]
+|style="text-align: center;"|1080
+|style="text-align: center;" rowspan="4"| 11
+|style="text-align: center;"|30
+|style="text-align: center;"|0.367
+|style="text-align: center;" rowspan="4"| +0
+|style="text-align: center;" rowspan="4"| 24%
+|-
+|style="text-align: center;"|19
+|style="text-align: center;"|[[Lesser Summoning: Fire Summon|Fire]]
+|style="text-align: center;"|702
+|style="text-align: center;"|30?
+|style="text-align: center;"|0.367?
+|-
+|style="text-align: center;"|20
+|style="text-align: center;"|[[Lesser Summoning: Air Summon|Air]]
+|style="text-align: center;"|892
+|style="text-align: center;"|30?
+|style="text-align: center;"|0.367?
+|-
+|style="text-align: center;"|21
+|style="text-align: center;"|[[Lesser Summoning: Earth Summon|Earth]]
+|style="text-align: center;"|1336
+|style="text-align: center;"|30?
+|style="text-align: center;"|0.367?
+|}
+
+{| class="wikitable"
+|+Summoning<br>(Level 23 Elementals)
+!Character Level
+!Elemental
+!Hit Points
+!Damage
+!Delay
+!Ratio
+!Bonus Damage
+!Dual Wield
+|-
+|style="text-align: center;"|22
+|style="text-align: center;"|[[Summoning: Water Summon|Water]]
+|style="text-align: center;"|1326
+|style="text-align: center;" rowspan="4"| 13
+|style="text-align: center;"|30
+|style="text-align: center;"|0.433
+|style="text-align: center;" rowspan="4"| +0
+|style="text-align: center;" rowspan="4"| 28%
+|-
+|style="text-align: center;"|23
+|style="text-align: center;"|[[Summoning: Fire Summon|Fire]]
+|style="text-align: center;"|860
+|style="text-align: center;"|31
+|style="text-align: center;"|0.424
+|-
+|style="text-align: center;"|24
+|style="text-align: center;"|[[Summoning: Air Summon|Air]]
+|style="text-align: center;"|1092
+|style="text-align: center;"|30
+|style="text-align: center;"|0.433
+|-
+|style="text-align: center;"|25
+|style="text-align: center;"|[[Summoning: Earth Summon|Earth]]
+|style="text-align: center;"|1638
+|style="text-align: center;"|31
+|style="text-align: center;"|0.424
+|}
+
+{| class="wikitable"
+|+Greater Summoning<br>(Level 26 Elementals)
+!Character Level
+!Elemental
+!Hit Points
+!Damage
+!Delay
+!Ratio
+!Bonus Damage
+!Dual Wield
+|-
+|style="text-align: center;"|26
+|style="text-align: center;"|[[Greater Summoning: Water Summon|Water]]
+|style="text-align: center;"|1570
+|style="text-align: center;" rowspan="4"| 14
+|style="text-align: center;"|30
+|style="text-align: center;"|0.467?
+|style="text-align: center;" rowspan="4"| +0
+|style="text-align: center;" rowspan="4"| 31%
+|-
+|style="text-align: center;"|27
+|style="text-align: center;"|[[Greater Summoning: Fire Summon|Fire]]
+|style="text-align: center;"|1018
+|style="text-align: center;"|30?
+|style="text-align: center;"|0.467?
+|-
+|style="text-align: center;"|28
+|style="text-align: center;"|[[Greater Summoning: Air Summon|Air]]
+|style="text-align: center;"|1294
+|style="text-align: center;"|30?
+|style="text-align: center;"|0.467?
+|-
+|style="text-align: center;"|29
+|style="text-align: center;"|[[Greater Summoning: Earth Summon|Earth]]
+|style="text-align: center;"|1940
+|style="text-align: center;"|30?
+|style="text-align: center;"|0.467?
+|}
+
+{| class="wikitable"
+|+Minor Conjuration<br>(Level 29 Elementals)
+!Character Level
+!Elemental
+!Hit Points
+!Damage
+!Delay
+!Ratio
+!Bonus Damage
+!Dual Wield
+|-
+|style="text-align: center;"|31
+|style="text-align: center;"|[[Minor Conjuration: Water Summon|Water]]
+|style="text-align: center;"|1858
+|style="text-align: center;" rowspan="4"| 16
+|style="text-align: center;"|29
+|style="text-align: center;"|0.552?
+|style="text-align: center;" rowspan="4"| +2
+|style="text-align: center;" rowspan="4"| 34%
+|-
+|style="text-align: center;"|32
+|style="text-align: center;"|[[Minor Conjuration: Fire Summon|Fire]]
+|style="text-align: center;"|1204
+|style="text-align: center;"|29?
+|style="text-align: center;"|0.552?
+|-
+|style="text-align: center;"|33
+|style="text-align: center;"|[[Minor Conjuration: Air Summon|Air]]
+|style="text-align: center;"|1530
+|style="text-align: center;"|29?
+|style="text-align: center;"|0.552?
+|-
+|style="text-align: center;"|34
+|style="text-align: center;"|[[Minor Conjuration: Earth Summon|Earth]]
+|style="text-align: center;"|2296
+|style="text-align: center;"|29?
+|style="text-align: center;"|0.552?
+|}
+
+{| class="wikitable"
+|+Lesser Conjuration<br>(Level 33 Elementals)
+!Character Level
+!Elemental
+!Hit Points
+!Damage
+!Delay
+!Ratio
+!Bonus Damage
+!Dual Wield
+|-
+|style="text-align: center;"|36
+|style="text-align: center;"|[[Lesser Conjuration: Water Summon|Water]]
+|style="text-align: center;"|2348
+|style="text-align: center;" rowspan="4"| 17
+|style="text-align: center;"|28
+|style="text-align: center;"|0.607?
+|style="text-align: center;" rowspan="4"| +6
+|style="text-align: center;" rowspan="4"| 50%
+|-
+|style="text-align: center;"|37
+|style="text-align: center;"|[[Lesser Conjuration: Fire Summon|Fire]]
+|style="text-align: center;"|1518
+|style="text-align: center;"|28?
+|style="text-align: center;"|0.607?
+|-
+|style="text-align: center;"|38
+|style="text-align: center;"|[[Lesser Conjuration: Air Summon|Air]]
+|style="text-align: center;"|1932
+|style="text-align: center;"|28?
+|style="text-align: center;"|0.607?
+|-
+|style="text-align: center;"|39
+|style="text-align: center;"|[[Lesser Conjuration: Earth Summon|Earth]]
+|style="text-align: center;"|2900
+|style="text-align: center;"|28?
+|style="text-align: center;"|0.607?
+|}
+
+
+{| class="wikitable"
+|+Conjuration<br>(Level 37 Elementals)
+!Character Level
+!Elemental
+!Hit Points
+!Damage
+!Delay
+!Ratio
+!Bonus Damage
+!Dual Wield
+|-
+|style="text-align: center;"|41
+|style="text-align: center;"|[[Conjuration: Water Summon|Water]]
+|style="text-align: center;"|2732
+|style="text-align: center;" rowspan="4"| 19
+|style="text-align: center;"|28
+|style="text-align: center;"|0.679?
+|style="text-align: center;" rowspan="4"| +10
+|style="text-align: center;" rowspan="4"| 58%
+|-
+|style="text-align: center;"|42
+|style="text-align: center;"|[[Conjuration: Fire Summon|Fire]]
+|style="text-align: center;"|1768
+|style="text-align: center;"|28?
+|style="text-align: center;"|0.679?
+|-
+|style="text-align: center;"|43
+|style="text-align: center;"|[[Conjuration: Air Summon|Air]]
+|style="text-align: center;"|2250
+|style="text-align: center;"|28?
+|style="text-align: center;"|0.679?
+|-
+|style="text-align: center;"|44
+|style="text-align: center;"|[[Conjuration: Earth Summon|Earth]]
+|style="text-align: center;"|3376
+|style="text-align: center;"|28?
+|style="text-align: center;"|0.679?
+|}
+
+
+{| class="wikitable"
+|+Greater Conjuration<br>(Level 41 Elementals)
+!Character Level
+!Elemental
+!Hit Points
+!Damage
+!Delay
+!Ratio
+!Bonus Damage
+!Dual Wield
+|-
+|style="text-align: center;"|46
+|style="text-align: center;"|[[Greater Conjuration: Earth Summon|Earth]]
+|style="text-align: center;"|6286
+|style="text-align: center;" rowspan="4"| 21
+|style="text-align: center;"|28
+|style="text-align: center;"|0.750?
+|style="text-align: center;" rowspan="4"| +14
+|style="text-align: center;" rowspan="4"| 69%
+|-
+|style="text-align: center;"|47
+|style="text-align: center;"|[[Greater Conjuration: Fire Summon|Fire]]
+|style="text-align: center;"|3294
+|style="text-align: center;"|28
+|style="text-align: center;"|0.750
+|-
+|style="text-align: center;"|48
+|style="text-align: center;"|[[Greater Conjuration: Air Summon|Air]]
+|style="text-align: center;"|4192
+|style="text-align: center;"|28
+|style="text-align: center;"|0.750
+|-
+|style="text-align: center;"|49
+|style="text-align: center;"|[[Greater Conjuration: Water Summon|Water]]
+|style="text-align: center;"|5088
+|style="text-align: center;"|28
+|style="text-align: center;"|0.750
+|}
+
+==== Reagents ====
+Magician pets all require a [[Malachite]] to summon.
+
+=== The Elements ===
+As long as EQ has been around, the pros and cons of the mage pets has been a constant source of discussion. People have their individual play styles and the pets allow for a bit of customization depending on what you're looking for.
+
+==== Air Elementals ====
+Air Elementals suffer from being the middle of the road pets in most situations. They can be decent tanks, but not as good as Earth Elementals; and they can do decent damage, but not as good as Water Elementals. Like Water Elementals, they have an additional attack to increase their melee damage output. Unlike a Water Elemental's backstab, these monk-based strike attacks can be used from any position, keeping their damage output consistent regardless of what direction they attack from (though anyone attacking a monster from the front will have to deal with defensive skills like Riposte reducing their overall damage). Their greatest strength, however, is fighting casters. They use an instant cast, 3 second stun every 12 seconds. Combined with their normal attacks and monk strikes, this makes them quite adept at interrupting spell casting. The stun can also function like a weak root spell, helping to keep their target in place and focused on the elemental instead of yourself.
+
+===== Pros =====
+*Highest Armor Class (both Mitigation and Evasion) of all Elementals
+*Extra damage from monk attacks that aren't dependent on positioning
+*Casts a 3 second stun every 12 seconds, but mobs at level 56 and up are immune to stun (at least currently)
+*Has a relatively high cold resistance (needs confirmation in EQ Legends)
+
+===== Cons =====
+*Second lowest hit points in the Classic Era
+**In Traditional Everquest, Air Elementals start to have the second most hit points after level 50 - but there's no way to be sure if this will hold true in Legends
+*Not as good at damage as Water Elementals, or as good at tanking as Earth Elementals
+
+==== Earth Elementals ====
+Earth Elementals are kings of tanking. They have the highest hit points, and cast an instant cast root spell every 16 seconds. This can keep enemies glued to your pet while you keep at range. However, they have the lowest damage output of all of the elementals in most cases - so if you already do most of the tanking, they usually aren't the best choice. However, their increased hit points may be beneficial when dealing with enemies such as [[Lord Nagafen]] who have strong AoE damage effects. 
+
+===== Pros =====
+*Has the most hit points of any of the elementals for its level
+*Casts a root spell
+*Has a relatively high disease resistance (needs confirmation in EQ Legends)
+*Casts Ranger spells, including buffing and healing itself, and low damage AoE nukes
+
+===== Cons =====
+*Lowest damage output of all pets
+*Lowest Armor Class - both mitigation and evasion - of all pets. However, the difference is minor and becomes even less significant when fully equipped and buffed.
+*Spends a lot of time casting low damage Ranger nukes, as well as Ranger root and snare spells - despite already having an instant cast root ability. On the upside the snare, root, and DoTs can help it maintain agro if you need it tanking.
+
+==== Fire Elementals ====
+The "glass cannons" of the Elementals. Fire Elementals have low hit points, but they cast Wizard nukes and spells. This includes a 5 second stun (though they don't use it consistently like an Air Elemental) and roots. They can also use Wizard AoE spells - both damage spells and snares. When upgraded to level 49, and Rank VIII [[Greater Conjuration: Fire Summon]] will even cast [[Ice Comet]]. These are probably the least used of the magician pets, but are far better in Everquest Legends than they were in traditional Everquest (at least during the Classic through Planes of Power eras). When clearing large numbers of blue and light blue mobs, the Fire Elemental's nukes can allow it to help you burn through low hit point enemies very quickly.
+
+===== Pros =====
+*High burst damage
+*Casts an instant cast, zero mana fire DD every 6 seconds
+*Casts a self-only damage shield that is far stronger than what you can cast for a given level 
+*Has a relatively high fire resistance (needs confirmed in EQ Legends)
+
+===== Cons =====
+*Lower damage in long fights once it runs out of mana
+*Its spells cannot be [[Spell Upgrade System|upgraded]], which means it cannot benefit from the resist reduction that Wizards can get - so its nukes can get resisted easily against powerful targets
+*Its spell list cannot be customized for a given fight
+**It will use Cold Resist spells against ice creatures, Fire Resist spells against fire creatures, and cast stuns and roots on enemies that are immune to such effects
+*Dies easily due to significantly lower hit points
+
+==== Manifestation of the Elements ====
+This is the pet summoned by the [[Orb of Mastery]], the reward for the [[Magician Epic Quest]]. It is not currently available in Everquest Legends, so this section mostly exists to retain information from traditional Everquest until Epic Quests have been added to Everquest Legends.
+
+This elemental looks like a huge Air Elemental, but it is essentially a combination of all of the elementals upgraded and wrapped into one.
+*Has by far the highest hit points of any summoned pet in the game
+*Hits very hard and quite fast
+*Casts a 50 point damage shield
+*Casts a 143 DD spell (cold-based)
+*Casts an 84 DD stun
+*[once EQL is in Kunark, needs to be verified] Magician Epic Pets will no longer enrage at low health. Minor changes to runspeed [idem, needs to be verified, on EQ live, they run faster than regular pets but Velocity, the Kunark pet only runspeed buff, is still better] and magic resistance.
+
+==== Water Elementals ====
+Water elementals provide high sustained damage. If positioned behind their target they can backstab, and they have an instant cast direct damage spell that they cast every 6 seconds. They can also tank for you if need be, but it will lower their damage output. For most builds, water elementals are the most frequently used of all the elementals.
+
+===== Pros =====
+*2nd highest amount of hit points among elementals of the same level, at least up until level 50
+**In Traditional Everquest, Air Elementals start to have the second most hit points after level 50 - but there's no way to be sure if this will hold true in Legends
+*Can tank if need be, but not as well as an Earth Elemental
+*Has a high poison resistance (needs confirmation in EQ Legends)
+*Instant cast, cold resist, nuke every six seconds to boost damage output
+*Backstabs when behind its target, making it the highest damage pet over long fights
+
+===== Cons =====
+*Needs to be positioned properly to use Backstab - will still use Backstab from the front, but it only counts as an extra normal attack dealing 25% as much damage as a backstab
+*No additional utility - this pet is only good for dealing melee damage
+
+=== Monster Summons ===
+Monster Summons are pretty much just Fire Elementals, but without the Damage Shield or Wizard spells. They lack any benefit over using Elementals at all. The spell is a fun little party trick that allows mages to run around with a pet that looks like a monster from the zone they are in.
+
+Generally monster summoning has a chance to give you a pet model from any non-playable race mob in the zone.  In Sol A, for example, you can summon a clockwork pet, but you can't summon a gnome.  Some models are extremely rare and may take many attempts to successfully "capture" them.
+There are also some easter egg type models that are quite unexpected.  Dagnor's Cauldron has a [[Faydedar]] model buried in the zone file.   Other expected models, such as [[Quillmane]] in South Karana or [[Terrorantula]] in South Ro, don't seem to be summonable or are insanely rare (over 1,200 attempts).
+
+The summoned monster pets are largely a novelty and help take the boredom away when farming in lower level zones.  Who doesn't love to watch a snow bunny slaughter the Eastern Wastes giant fort? For serious adventuring, you will want to stick with your situational elemental pets.
+
+=== Pet Focus Items ===
+
+''Are you looking for [[Focus Effects]]?''
+
+(This information was provided by the Devs during a livestream)
+
+Pet focus items a bit strange. They do not improve the stats of the pets you summon. Instead the game has tons of predefined pets - including versions of every pet summoned with a focus item that works on their respective summoning spell. So rather than the focus item just giving pets a stat buff, using the focus causes your spell to summon a <em>different</em> pet with different stats. Because the benefits are not a flat buff, the exact benefits can vary slightly from pet to pet. Information below is intended to give a rough idea of what the foci do, but are not exact.
+
+However, the exact interaction between the pet focuses and the [[Spell Upgrade System]] are still being tested and will be updated here later.
+
+==== Lesser Elemental Foci ====
+
+The lesser focus items ({{:Torch of Alna}}, {{:Shovel of Ponz}}, {{:Broom of Trilon}}, and {{:Stein of Ulissa}}) are quested from the Temple of Solusek Ro, and provide the spell-level 4-49 pets with increased size and stats.
+
+===== Benefits =====
+
+* Bigger Pet Size
+* +1 level (limited like the bonus levels from [[Spell Upgrade System|spell upgrades]])
+** Does not give the same benefits as a level from the spell upgrades, it only allows them to cast new spells, if that extra level happens to unlock any.
+* +15 STR
+** Results in +10 Attack (Offense)
+* +10 AGI
+** Results in +5 Armor (Evasion)
+* Extra Hit Points
+** This is a bit annoying with how it works but seems consistent with how these focus effects worked in original Classic EQ. Essentially, the pet summoned when using the lesser focus has hit points equal to the next highest elemental's hit points. What that means is - a Fire Elemental will have hit points that match the hit points of an Air Elemental of the same level. A focused Air Elemental will have Water Elemental hit points. And Water Elementals will have hit points equivalent to Earth Elementals. Unfortunately, the Earth Elementals are already at the top and gain no additional hit points.
+
+==== Greater Elemental Foci ====
+
+The greater focus items ({{:Staff of Elemental Mastery: Water}}, {{:Staff of Elemental Mastery: Fire}}, {{:Staff of Elemental Mastery: Earth}}, {{:Staff of Elemental Mastery: Air}}) are obtained from high-end mobs and quests. These staves provide improved stats and hit points for all pets that can be summoned with them. Currently this is limited to the Greater Conjuration line of pets, but is expected to include Kunark level pets as well.
+
+===== Benefits =====
+
+This area needs testing, but initial results show it being much better than the Lesser Elemental Foci. However, using the focus items may be pointless once your summoning spell is upgraded to +8. Further testing needs to be done.
+
+== [[Necromancer]] Pets ==
+EQ Legends Pet details are being updated for Necromancer pets in the spell descriptions, not all pets have been tested yet.
+
+{| class="eoTable2"
+! Player Level
+! Pet
+! Pet Level
+! Melee Ratio
+!Bonus Damage
+! Dual Wield
+|-
+| style="text-align:center;"|'''1'''
+| [[Cavorting Bones Summon|Cavorting Bones]]
+| 1
+| 4/30 (0.133)
+| +?
+| -
+|-
+| style="text-align:center;"|'''4'''
+| [[Leering Corpse Summon|Leering Corpse]]
+| 5
+| 7/30 (0.233)
+| +?
+| 8%
+|-
+| style="text-align:center;"|'''8'''
+| [[Bone Walk Summon|Bone Walk]]
+| 9
+| 8/30 (0.267)
+| +?
+| 13%
+|-
+| style="text-align:center;"|'''12'''
+| [[Convoke Shadow Summon|Convoke Shadow]]
+| 11
+| X/30 (0.xxx?)
+| +?
+| X%
+|-
+| style="text-align:center;"|'''16'''
+| [[Restless Bones Summon|Restless Bones]]
+| 16
+| X/30 (0.xxx?)
+| +?
+| X%
+|-
+| style="text-align:center;"|'''20'''
+| [[Animate Dead Summon|Animate Dead]]
+| 19
+| X/30 (0.xxx?)
+| +?
+| X%
+|-
+| style="text-align:center;"|'''24'''
+| [[Haunting Corpse Summon|Haunting Corpse]]
+| 22
+| X/30 (0.xxx?)
+| +?
+| X%
+|-
+| style="text-align:center;"|'''29'''
+| [[Summon Dead Summon|Summon Dead]]
+| 25
+| X/30 (0.xxx?)
+| +?
+| X%
+|-
+| style="text-align:center;"|'''34'''
+| [[Invoke Shadow Summon|Invoke Shadow]]
+| 29
+| X/30 (0.xxx?)
+| +?
+| X%
+|-
+| style="text-align:center;"|'''39'''
+| [[Malignant Dead Summon|Malignant Dead]]
+| 33
+| X/30 (0.xxx?)
+| +?
+| X%
+|-
+| style="text-align:center;"|'''44'''
+| [[Cackling Bones Summon|Cackling Bones]]
+| 37?
+| X/30 (0.xxx?)
+| +?
+| X%
+|-
+| style="text-align:center;"|'''49'''
+| [[Invoke Death Summon|Invoke Death]]
+| 41
+| 21/28 (0.750)
+| +13
+| X%
+|}
+==== Reagents ====
+Necromancer pets all require [[Bone Chips]] to summon.
+
+=== Focus Items ===
+
+The only pet focus item that Necromancers can obtain is the {{:Encyclopedia Necrotheurgia}}. Similar to the Magician pet focus items, this focus item makes the pet larger in size. It is believed to only work on [[Invoke Death]] but this needs confirmed for EQ Legends.
+
+When used with [[Invoke Death]], the focus provides +10 STR/STA/AGI, which grants some bonus ATK and Evasion. It also boosts the base pet hit points from 5230 to 5470.  The [[Spell Upgrade System]] then applies any spell upgrades (such as increased Hit Points) to the focused pet.
+
+== [[Shaman]] Pets ==
+
+{| class="eoTable2"
+! Player Level
+! Pet
+! Pet Level
+! Base Melee Ratio
+!Bonus Damage
+! Dual Wield
+|-
+| style="text-align:center;"|'''32'''
+| [[Companion Spirit Summon|Companion Spirit]]
+| 26
+| 15/30 (0.500)
+| +0
+| 10%
+|-
+| style="text-align:center;"|'''37'''
+| [[Vigilant Spirit Summon|Vigilant Spirit]]
+| 29
+| 16/29 (0.551)
+| +3
+| 15%
+|-
+| style="text-align:center;"|'''41'''
+| [[Guardian Spirit Summon|Guardian Spirit]]
+| 32
+| 18/28 (0.642)
+| +7
+| 20%
+|-
+| style="text-align:center;"|'''45'''
+| [[Frenzied Spirit Summon|Frenzied Spirit]]
+| 36
+| 20/28 (0.714)
+| +11
+| 55%
+|}
+==== Reagents ====
+Shaman pets do not require a reagent to summon.
+
+== [[Shadow Knight]] Pets ==
+
+These pets are identical to the [[Necromancer]] pets. Once that section is filled out, the chart below will be updated to match.
+
+{| class="eoTable2"
+! Player Level
+! Spell
+! Pet Level
+|-
+| '''9'''
+| [[Leering Corpse Summon|Leering Corpse]]
+| 5
+|-
+| '''15'''
+| [[Bone Walk Summon|Bone Walk]]
+| 9
+|-
+| '''22'''
+| [[Convoke Shadow Summon|Convoke Shadow]]
+| 11
+|-
+| '''30'''
+| [[Restless Bones Summon|Restless Bones]]
+| 16
+|-
+| '''39'''
+| [[Animate Dead Summon|Animate Dead]]
+| 19
+|-
+| '''49'''
+| [[Summon Dead Summon|Summon Dead]]
+| 25
+|-
+|}
+==== Reagents ====
+Just like Necromancer pets, Shadow Knight pets all require [[Bone Chips]] to summon.
+
+== [[Druid]] Pets ==
+
+In current Everquest Legends, Druids can only Charm animals as pets, the details below are not relevant to the current state of the game.
+
+{| class="eoTable2"
+! Spell
+! Level
+! Pet Level
+! Pet Class
+! ~HP
+! Max Hit
+! Kick/Bash Dmg
+|-
+| Nature Walkers Behest
+| 55
+| 23-28
+| Warrior
+| 200-300
+| 20-30
+| 30
+|-
+|}
+This pet is not very useful as a standard pet. Some Druids use it together with clicky [[Reclaim Energy]] items as a way to store mana. (It is a good guard pet in low level zones while afk) The above stats were collected from a live server and may be inaccurate if there were ever any updates pertaining to this pet.
+
+== Pet Commands ==
+
+=== Command: /pet follow me, or /pet guard me ===
+
+UI Button: Follow
+
+Effect: puts the pet in Follow mode. This is the initial mode of a newly summoned pet. This command will overwrite /pet sit and /pet guard here and force the pet to follow its master.
+
+=== Command: /pet guard here ===
+
+UI Button: Guard
+
+Effect: puts the pet in Guard mode.
+
+Detail: pet will become "parked" at its current locaton, contrary to the command wording it will not automatically attack any MOB, unless said MOB attacks its master.
+
+Special Note: A pet under /pet guard here will face the nearest NPC, including invisible mobs, traps, horses, and Eye of Zomms.
+
+=== Command: /pet sit down ===
+
+UI Button: Sit
+
+Effect: puts the pet in Sit mode.
+
+Detail: works exactly like the /pet guard here command with a few minor exceptions, low level pets will regen slightly faster. Once pets get their innate regen boost in the low 30's this additional regen becomes inconsequential. 
+
+The command /pet sit down will overwrite the command /guard, meaning that after it kills a mob it will follow its master rather than returning to the point where /pet sit was issued.
+
+Special Note: /pet sit will toggle the pet's sit state, whereas /pet sit down will force the pet to sit.
+
+=== Command: /pet attack ===
+
+UI Button: Attack
+
+Effect: places the owners current target onto the pet's Hate List, and ends /pet hold.
+
+Detail: pet will temporarily forget all prior commands and attempt to attack the target at the top of his hate list. /pet attack does not place the target at the top of the pets hate list, it just makes the pet attack the mob at the top of his hate list. The pet will not forget targets it already hates. It will not "forget" movement states, such as follow or guard, it will just temporarily ignore them as he attempts to attack his target. After the mob dies, the pet will return to his previous guard point, follow, or sit down, as previously commanded. The pet may be sidetracked however if another MOB begins to attack him before he has engagued the target OR if another MOB is doing signifigantly more damage to the pet thus generating enough aggro to make the pet switch targets.
+
+Special Note: you may also use the alternative version of this command /pet kill
+PvP Note: unless Player versus Player is enabled, you cannot add a player or a player charmed NPC to a pet's Hate List.
+
+=== Command: /pet kill name ===
+
+Effect: takes whatever would be selected by the command /target name and puts it at the top of the pet's Hate List.
+
+Detail: for example assume King Tormax was within range for you to /target King Tormax the command /pet kill King Tormax will order the pet to attack King Tormax regardless of what you currently have targeted. Originally a zone wide command, it was reduced to only work within the same range of the /target command.
+
+=== Command: /pet back off ===
+
+UI Button: Back
+
+Effect: empties the pet's Hate List, causing it to stop attacking.
+
+Detail: while this will clear the pets hate list, if a mob atacks the pet again after this command is given it will begin attacking the mob again. This is a particular problem in areas with mobs casting large AE's. Temple of Veeshan is the most common example.
+
+=== Command: /pet taunt off ===
+
+UI Button: Taunt
+
+Effect: disables pet taunting, that is the pet will not taunt during fights.
+
+Detail: this command very helpful on raids or other such group encounters where summoning MOBs are involved. However, in solo situations you should generally leave taunt enabled.
+
+Special Note: if you omit the "off" portion of the command it will toggle the pets taunt mode (i.e. if it is on it will switch it off, and vice-versa)
+
+=== Command: /pet taunt on ===
+
+UI Button: Taunt
+
+Effect: enables pet taunting.
+
+Detail: generally recommended for solo situations only.
+
+Special Note: if you omit the "on" portion of the command it will toggle the pets taunt mode (i.e. if it is on it will switch it off, and vice-versa)
+
+=== Command: /pet leader ===
+
+Effect: the pet will /say My leader is Doofus Da'Magi.
+
+Detail: This command can be used by any player to target a pet and identify its owner.
+
+=== Command: /pet get lost ===
+
+UI Button: Leave
+
+Effect: Instantly kills your pet.
+
+Detail: This will instantly kill your pet, and is one of the essential commands for a technique known as chain-petting.
+
+Special Note: This command is zone-wide and will kill your pet anywhere in the zone, regardless of distance from its master.
+
+=== Command: /pet health ===
+
+UI Button: The Pet window itself
+
+Effect: Displays your pet's current health percentage and buff list in the chat window.
+
+Detail: This command instantly displays the current status of your pet, showing its HP percentage and current buffs/debuffs it currently has.
+
+Special Note: This command displays the pet's health faster than the UI can update, and is very useful when timing is critical.
+
+=== Command: /pet target ===
+
+Effect: Targets your pet.
+
+Detail: This command clears your current target and replaces it with your pet. This is very useful for macros. However, it's often faster to simply hit the F1 key twice to target your pet.
+
+Special Note: This command will target special pets that borrow the name of their master (i.e. Xalmat's pet) instead of your summoned pet (Flurfy's warder, Jonartik, etc). Use with caution when using such pets.
+
+=== Command: /pet as you were ===
+
+Effect: Clears your pet's command list
+
+Detail: This tells your pet to revert to a free state. If the pet is currently under /pet follow, or /pet guard me, it will revert to a /pet sit state. If it is chasing an NPC, and /pet as you were, followed by /pet back off is issued, the pet will continue off in its direction of travel. This command does not break /pet hold.
+
+=== Command: /pet hold ===
+
+Unlock: Companion's Discipline AA
+
+Effect: Causes the pet to hold its attacks. It ignores its Hate List and goes into Free mode, resuming its regular movement (either follow, guard, or sit).
+
+Detail: This command does not clear the pet's hate list, the pet will remain "held" until you give it an attack command at which time it will attempt to attack the target at the top of its hate list. After this, it will continue to attack other enemies on its hate list or new enemies added to its hate list. A pet's hate list is frozen while it is "held", which means it does not add anyone to its hate list even if attacked, but anyone on its list before being told to "hold" remains on the list.
+
+After telling your pet to hold, you can use /pet back off to ensure your pet's hate list is clear.
+
+=== Command: /pet ghold ===
+
+Unlock: Companion's Discipline AA
+
+Effect: This command is a toggle. Using "/pet ghold" will toggle between on/off, but "/pet ghold on" and "/pet ghold off" also work. When this state is toggled on, the pet will not attack anyone unless you explicitly tell them to.
+
+Detail: This command prevents any enemies from being added onto your pet's hate list, except if you explicitly tell them to attack. This gives complete control over who your pet will and will not attack. However, in chaotic fights against many enemies it can result in your pet standing around watching unless you tell your pet to attack each and every enemy.
+
+Telling your pet "/pet back off" clears the list of any targets you have given it and it goes back to not fighting anything.
+
+[[Category:Guides]]

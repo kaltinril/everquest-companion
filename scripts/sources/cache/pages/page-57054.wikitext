@@ -3,7 +3,46 @@
 The latest patch notes can always be found on the EverQuest Legends official discord in the [https://discord.com/channels/1435786469968183456/1507492046296977548 #patch-notes channel] and on the [https://www.everquestlegends.com/patch-notes Official EverQuest Legends Website]
 
 = Classic Era Patch Notes =
-EverQuest Legends launched on July 28, 2026.  With a Level cap of 50, this is what the wiki will call the "Classic Era"
+EverQuest Legends launched on July 28, 2026.  With a Level cap of 50, this is what the wiki will call the "Classic Era". 
+
+== 2026-11-10 - Patch Notes - [[Rules of Kunark]] Pre-order patch ==
+These patch notes are from the Official EverQuest Legends discord, posted on November 10, 2026
+
+=== [[Reincarnation]] Early Access Period === 
+The [[reincarnation]] system is available today with purchase of the Premium or Deluxe Editions of [[Rulers of Kunark]]!
+
+* The Standard Edition will gain access to the reincarnation with the launch of [[Rulers of Kunark]] on December 8
+* To reincarnate, you must be in a three-class loadout at max level and have a [[Token of Reincarnation]]
+* A [[Token of Reincarnation]] can be acquired from any [[Voidling]] (but not while in an instance)
+* When you reincarnate, the level for each of the three classes and the race in your loadout are reset to level 1
+* Upon [[reincarnation]], you immediately gain a rank in the associated [[reincarnation]] AA for each class and race in your loadout
+* The [[reincarnation]] AAs each have 3 ranks, each rank grants an escalating passive, and the third class rank for class AAs additionally adds an activated ability
+* All [[reincarnation]] activated abilities share a cooldown
+* For completionists, there’s an additional AA that can be leveled up by completing the first, second and third rank of all class reincarnation AAs
+
+=== Rendering === 
+* Improved graphical performance of the game.
+
+=== Disciplines === 
+* [[Disciplines]] can now be upgraded similar to Spells using motes.
+
+=== Items === 
+* Added [[Fragment Motes]], which are rare mote drops with increased upgrade power.
+* The [[Idol of Forsaken Ideals]] now has 6 AC.
+* [[Sergeant's Leather Belt]], [[Handmaiden's Wristwraps]], and [[Handmaiden's Earring]] now have 3 AC each.
+* [[Signet Ring of Lord Everling]] has 10 AC.
+* Throwing a spear now throws the pointed end forward instead of up.
+
+=== Zones === 
+* Adjusted difficulty rating (e.g. "This creature would require a small army to defeat") of NPCs in [[Plane of Hate]] and [[Plane of Fear]] so that the end bosses are differentiated from all other mobs in the zone.
+* Improved pathing in narrow hallways of [[Nektropos Castle]]'s first floor.
+
+=== Spells === 
+* Effects that are triggered on expire are now upgraded one-to-one with the primary spell, excluding [[Promised Renewal]].
+* [[Denon's Desperate Dirge]] can now only land on the same target once every 2 ticks (12-17 seconds).
+* When upgrading [[Cancel Magic]] the effective spell casting level will be increased by half of the upgrade level. For example, a +4 [[Cancel Magic]] will cast two levels above the spell’s base casting level.
+* Summoned items with + upgrades on them now show the upgraded item when you click the item link.
+* Stuns/Mesmerize/Charm/Lull now show their upgraded max levels.
 
 == 2026-11-4 - Hotfix ==
 These patch notes are from the Official EverQuest Legends discord, posted on November 4, 2026
