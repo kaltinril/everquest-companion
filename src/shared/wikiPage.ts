@@ -17,17 +17,17 @@
 import { CURRENT_ERA } from './planner/era'
 import type { KillMap } from './kills'
 import { killsFor } from './kills'
-import { foldZoneTally, derivedPrices, factionMob, factionOf, npcOnlySpell, type ClientSpellFacts, type GapDomain, type GapRow, type GapTally, type MobCoin } from './gaps'
+import { derivedPrices, factionMob, factionOf, npcOnlySpell, type ClientSpellFacts, type GapDomain, type GapRow, type GapTally, type MobCoin } from './gaps'
 import { merchantValueOf } from './gapOffers'
 import { itemBaseName } from './itemStats'
-import { anyMobDrop, groupOfItem, type DropGroups } from './gapDrops'
-import { zoneBaseName } from './zones'
+import { anyMobDrop, type DropGroups } from './gapDrops'
 import { isRewardChest, mobSourceOf } from './rewardChest'
 import { wikiZoneLink } from './gapWikiZone'
 import { forageAddText } from './gapForage'
 import { questGiverAddText } from './gapQuestGivers'
 import { catalogSellers, logSpot, type VendorFinder, type VendorPlacing } from './gapMobPage'
 import type { LootEvent } from './types'
+import { mobLoot, type MobLootLine } from './mobLoot'
 import { SPELL_HEAD, SPELL_TAIL, spellPageValues, type SpellPageShot } from './spellWindow'
 import { castBySentence, withCastBy } from './spellCastBy'
 import { npcImageName, withPageTitles } from './mobPageTitle'
@@ -161,7 +161,7 @@ export interface MobFacts {
   levels: number[]
   /** Items looted from it, and on how many corpses. */
   /** `group`: the line is a drop group's (`[[Rusty Weapons]]`), its members folded (owner, 2026-11-10: the kobold page listed every rusty weapon). */
-  loot: { item: string; drops: number; group?: true }[]
+  loot: MobLootLine[]
   /** How many of it the player killed: the drop rates' denominator. */
   kills: number
   /** The player's own killing blows, whose faction lines the log always prints: with none seen, the page can say none. */
@@ -291,53 +291,6 @@ function conLevels(row: GapRow): number[] {
   return [...new Set(levels)].sort((a, b) => a - b)
 }
 
-/** What the ledger looted from the mob, by base item, on how many corpses, A to Z. */
-/**
- * Whether a loot line is this row's mob: the name, and for a row whose page is titled with its zone
- * (`zoneTitled`: `A kobold (Rathe Mountains)`), the zone too (owner, 2026-11-10: "we shouldn't be
- * pulling in loot from other 'a kobold (zone)' to ours"). A line with no zone is left out of such a row.
- */
-function ownLoot(row: GapRow, zones: ReadonlySet<string>): (e: LootEvent) => boolean {
-  return (e) => {
-    const mob = mobSourceOf(e)
-    if (mob === undefined || !same(mob, row.name)) return false
-    return row.zoneTitled !== true || (e.zone !== undefined && zones.has(zoneBaseName(e.zone).toLowerCase()))
-  }
-}
-
-/** A looted name as the page lists it: its drop group when the wiki has one (`[[Rusty Weapons]]`), else the item (`{{:Item}}`). */
-function lootedAs(groups: DropGroups | undefined): (item: string) => { item: string; group?: true } {
-  const groupOf = groups === undefined ? () => undefined : groupOfItem(groups)
-  return (item) => {
-    const group = groupOf(item)
-    return group === undefined ? { item: itemBaseName(item) } : { item: group, group: true }
-  }
-}
-
-function mobLoot(row: GapRow, loot: readonly LootEvent[], groups?: DropGroups): MobFacts['loot'] {
-  // The zone in the page's title: the one the row was named in most (zoneTitledPage).
-  const top = row.details.zones === undefined ? undefined : foldZoneTally(row.details.zones).entries[0]?.name
-  const zones = new Set(top === undefined ? [] : [top.toLowerCase()])
-  const mine = ownLoot(row, zones)
-  const filedAs = lootedAs(groups)
-  const byItem = new Map<string, { item: string; group?: true; corpses: Set<string> }>()
-  for (const e of loot) {
-    if (!mine(e)) continue
-    const as = filedAs(e.item)
-    // A group's rate is the corpses that dropped ANY member (gapDrops.ts, review D2).
-    const seen = byItem.get(itemKey(as.item)) ?? { ...as, corpses: new Set<string>() }
-    seen.corpses.add(corpseOf(e))
-    byItem.set(itemKey(as.item), seen)
-  }
-  const out = new Map([...byItem].map(([k, v]) => [k, { item: v.item, drops: v.corpses.size, ...(v.group === true ? { group: true as const } : {}) }]))
-  // The row's own drop list names what the ledger may not hold (lines, not corpses: no better count).
-  for (const d of row.details.drops?.entries ?? []) {
-    const as = filedAs(d.name)
-    const had = out.get(itemKey(as.item))
-    if (!byItem.has(itemKey(as.item))) out.set(itemKey(as.item), { item: as.item, drops: (had?.drops ?? 0) + d.n, ...(as.group === true ? { group: true as const } : {}) })
-  }
-  return [...out.values()].sort((a, b) => a.item.localeCompare(b.item))
-}
 
 /**
  * The player's own killing blows on the row's mob (its `killed by` tally). A kill of your own prints
