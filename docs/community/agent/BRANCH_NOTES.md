@@ -308,6 +308,19 @@ where one exists.
   loc", then "100 units is a bit much, should be 20 or so"). A point further off is a second spot, as
   before. Measured (MEASURED.md, /loc section): his standing NPCs' pairs lie 36 to 50 apart, so at 20
   those still read as two spots; roamers 273 and up.
+- 2026-11-10: THE ONE MOBS LIST (`shared/gapNeeds.ts`; owner: "Merchants, factions, mobs, respawns are all
+  basically the same page, just different REASONS the mob shows up"). The field domains (faction, drop,
+  image, respawn) keep their rows and Copy texts; `needIndex` reads them BY MOB, `needsOf` gives a Mobs
+  row its needs (`page` for a mob the wiki lacks, else `merchant`, `factions`, `drops N`, `picture`,
+  `respawn`, `quests`, `redirect`), `withMobNeeds` (useGapsData `joinedSnap`) adds an Update row (`page`
+  set; gapJob.ts reads it as update) for every known mob with field rows, and folds a no-page faction
+  row into its mob's New page row. Tabs: `GAP_TABS` (Merchants, Factions, Images, Respawns gone;
+  `gapDomainOf` reads a stored one as Mobs); Needs filter chips (`eq.gaps.needs`, any ticked need,
+  counts are mobs) in `NeedsChips.tsx`; the Needs cell and the collapsed Seen as in `NeedChips.tsx`. An
+  Update row's Copy is its field rows' texts one after another (`needsCopyText`), never a whole page.
+  The overlay's Mobs-only copy derives the field domains too (gapDerive `wants`). Not folded: Drops stays
+  a tab for its 1,694 per-item lines (the mob row says `drops N`); no `location` or `items sold` need yet
+  (nothing derives either for a known page today).
 - 2026-11-10: a mob page split by zone (`A kobold (Warrens)`) answers to its plain name only in its
   record's zones, any tier (`gaps_names.rs known_in`, `GapIndex::mob_zone_splits`); elsewhere the name
   is a Mobs row served `zoneTitled`, and its Create page opens `A kobold (Rathe Mountains)`
