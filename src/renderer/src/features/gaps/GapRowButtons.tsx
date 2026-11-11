@@ -88,6 +88,19 @@ function pageExists(row: GapRow): boolean {
   return existingEditor(row, readGapVerdict(row.domain, row.name)) !== undefined
 }
 
+/**
+ * A Mobs or Merchants row's Copy words: a page read first for a new page (owner, 2026-11-10); the whole
+ * page for a redirected name, to create over the redirect when it is another mob; the needed lines for
+ * an Update row (owner, 2026-11-11: "nothing to do is a waste of my time"). Undefined for other rows.
+ */
+function mobCopyWords(row: GapRow): { label: string; tip: string } | undefined {
+  if (readsMobPage(row)) return { label: 'Copy wiki page', tip: 'Reads the wiki page first: fills only its empty fields, or copies a whole new page.' }
+  if (row.domain !== 'mob' && row.domain !== 'merchant') return undefined
+  if (row.viaRedirect !== undefined) return { label: 'Copy wiki page', tip: `The wiki sends this name to ${row.viaRedirect}. If that is another mob, Edit page opens the redirect: replace it with this whole page.` }
+  if (isUpdateMob(row)) return { label: 'Copy lines to add', tip: 'Only the lines this page lacks, for its Needs: paste them into the page. A page that needs only a picture has nothing to copy: paste the picture in the open row.' }
+  return undefined
+}
+
 /** The Copy button's words and tip for a row. */
 function copyWords(row: GapRow): { label: string; tip: string } {
   if (row.forageUpdate !== undefined) return { label: 'Copy wiki page', tip: forageButtons(row.forageUpdate).copyTip }
@@ -97,12 +110,8 @@ function copyWords(row: GapRow): { label: string; tip: string } {
   if (row.domain === 'notice') return { label: 'Copy proof', tip: 'What your log proves (how often, when, where, the lines), for the talk page or the edit summary.' }
   // A quest reads its wiki page first and adds to it (owner, 2026-10-23: "implement the diff idea").
   if (row.domain === 'quest') return { label: 'Copy wiki page', tip: 'Reads the wiki page and adds what your log saw, removing nothing.' }
-  // A mob reads its page first too (owner, 2026-11-10): empty fields filled, or a whole new page.
-  if (readsMobPage(row)) return { label: 'Copy wiki page', tip: 'Reads the wiki page first: fills only its empty fields, or copies a whole new page.' }
-  // A redirected name: the whole page for this name, to create over the redirect when it is another mob.
-  if ((row.domain === 'mob' || row.domain === 'merchant') && row.viaRedirect !== undefined) return { label: 'Copy wiki page', tip: `The wiki sends this name to ${row.viaRedirect}. If that is another mob, Edit page opens the redirect: replace it with this whole page.` }
-  // An Update row: the lines its page lacks, never the page (owner, 2026-11-11: "nothing to do is a waste of my time").
-  if (isUpdateMob(row)) return { label: 'Copy lines to add', tip: 'Only the lines this page lacks, for its Needs: paste them into the page. A page that needs only a picture has nothing to copy: paste the picture in the open row.' }
+  const mob = mobCopyWords(row)
+  if (mob !== undefined) return mob
   const tip = `Wiki markup from what your log saw. ${GAP_CAPTURE[row.domain]}`
   if (!pageExists(row)) return { label: 'Copy wiki page', tip }
   return { label: 'Copy draft (page exists)', tip: `The wiki already has this page: copy only the fields it lacks from this draft. Pasting all of it replaces what people wrote there. ${tip}` }
