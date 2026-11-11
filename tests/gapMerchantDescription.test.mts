@@ -72,6 +72,14 @@ test("a guildmaster nameplate gives the class line and the wiki's guildmaster se
   assert.ok(banker.includes('| class             = [[Banker]]'), banker)
 })
 
+// Owner, 2026-11-10: a kobold's "Grrrrr. Bark. Bark. Grrrrr." landed in his page's description.
+test("a generic mob's bark is not quoted; a named NPC's or a merchant's hail answer is", () => {
+  const bark = { domain: 'mob', name: 'a kobold', kinds: ['killed'], count: 1, first: '', last: '', details: { samples: [] }, greeting: 'Grrrrr. Bark.' } as unknown as GapRow
+  assert.equal(merchantDescription(bark, {}), undefined)
+  const named = { ...bark, name: 'Scribe Noglleg', greeting: 'Welcome to my shop, Drywrought.' } as unknown as GapRow
+  assert.ok(merchantDescription(named, { ownNames: ['Drywrought'] })?.text.includes("Scribe Noglleg says, 'Welcome to my shop, ____.'"))
+})
+
 test('a hail answer writes the player as `____`, as the cached pages do', () => {
   assert.equal(maskedGreeting('Good day, Drywrought! Have you visited Taria?', ['Drywrought', 'Primitive']), 'Good day, ____! Have you visited Taria?')
 })

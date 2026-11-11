@@ -95,6 +95,9 @@ export const PAGE_EXTRAS: PageExtras = {
   get commonLoot() {
     return (commonLoot ??= commonLootNames(MOB_CATALOG))
   },
+  get dropGroups() {
+    return DROPS.groups
+  },
   get vendorAt() {
     return (vendorAt ??= vendorFinder(MOB_CATALOG))
   },

@@ -333,6 +333,12 @@ where one exists.
   The overlay's Mobs-only copy derives the field domains too (gapDerive `wants`). Not folded: Drops stays
   a tab for its 1,694 per-item lines (the mob row says `drops N`); no `location` or `items sold` need yet
   (nothing derives either for a known page today).
+- 2026-11-10: a new mob page lists a drop group as its group line (`[[Rusty Weapons]]`, rated by the
+  corpses that dropped any member), as the Drops tab files them (owner: his A kobold (Rathe Mountains)
+  page listed every rusty weapon); a `zoneTitled` row takes loot only from its own zone (owner: "we
+  shouldn't be pulling in loot from other 'a kobold (zone)' to ours"); kills and cons are still by name.
+  A generic mob's hail answer is not quoted on its page (a kobold's "Grrrrr. Bark."): merchants, mobs
+  with a role or nameplate, and named NPCs keep the quote (`gapMerchantDescription.ts hailWorthQuoting`).
 - 2026-11-10: a mob page split by zone (`A kobold (Warrens)`) answers to its plain name only in its
   record's zones, any tier (`gaps_names.rs known_in`, `GapIndex::mob_zone_splits`); elsewhere the name
   is a Mobs row served `zoneTitled`, and its Create page opens `A kobold (Rathe Mountains)`
