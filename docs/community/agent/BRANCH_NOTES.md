@@ -308,6 +308,12 @@ where one exists.
   loc", then "100 units is a bit much, should be 20 or so"). A point further off is a second spot, as
   before. Measured (MEASURED.md, /loc section): his standing NPCs' pairs lie 36 to 50 apart, so at 20
   those still read as two spots; roamers 273 and up.
+- 2026-11-10: a new mob page lists a drop group as its group line (`[[Rusty Weapons]]`, rated by the
+  corpses that dropped any member), as the Drops tab files them (owner: his A kobold (Rathe Mountains)
+  page listed every rusty weapon); a `zoneTitled` row takes loot only from its own zone (owner: "we
+  shouldn't be pulling in loot from other 'a kobold (zone)' to ours"); kills and cons are still by name.
+  A generic mob's hail answer is not quoted on its page (a kobold's "Grrrrr. Bark."): merchants, mobs
+  with a role or nameplate, and named NPCs keep the quote (`gapMerchantDescription.ts hailWorthQuoting`).
 - 2026-11-10: a mob page split by zone (`A kobold (Warrens)`) answers to its plain name only in its
   record's zones, any tier (`gaps_names.rs known_in`, `GapIndex::mob_zone_splits`); elsewhere the name
   is a Mobs row served `zoneTitled`, and its Create page opens `A kobold (Rathe Mountains)`

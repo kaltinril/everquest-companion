@@ -125,6 +125,12 @@ const groupsByItem = perObject((groups: DropGroups): ReadonlyMap<string, readonl
   return out
 })
 
+/** The group a looted item is filed as on a mob page (`Rusty Long Sword` → `Rusty Weapons`); undefined for an item in none. */
+export function groupOfItem(groups: DropGroups): (item: string) => string | undefined {
+  const by = groupsByItem(groups)
+  return (item) => by.get(sourceItemKey(item))?.[0]
+}
+
 /** Group name → its members' keys; built once per groups table. */
 const memberKeys = perObject((groups: DropGroups): ReadonlyMap<string, readonly string[]> => new Map(Object.entries(groups).map(([g, ms]) => [g, ms.map(sourceItemKey)])))
 

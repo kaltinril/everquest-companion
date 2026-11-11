@@ -17,10 +17,11 @@
 import { CURRENT_ERA } from './planner/era'
 import type { KillMap } from './kills'
 import { killsFor } from './kills'
-import { derivedPrices, factionMob, factionOf, npcOnlySpell, type ClientSpellFacts, type GapDomain, type GapRow, type GapTally, type MobCoin } from './gaps'
+import { foldZoneTally, derivedPrices, factionMob, factionOf, npcOnlySpell, type ClientSpellFacts, type GapDomain, type GapRow, type GapTally, type MobCoin } from './gaps'
 import { merchantValueOf } from './gapOffers'
 import { itemBaseName } from './itemStats'
-import { anyMobDrop } from './gapDrops'
+import { anyMobDrop, groupOfItem, type DropGroups } from './gapDrops'
+import { zoneBaseName } from './zones'
 import { isRewardChest, mobSourceOf } from './rewardChest'
 import { wikiZoneLink } from './gapWikiZone'
 import { forageAddText } from './gapForage'
@@ -159,7 +160,8 @@ export interface MobFacts {
   /** The levels its /con lines stated. */
   levels: number[]
   /** Items looted from it, and on how many corpses. */
-  loot: { item: string; drops: number }[]
+  /** `group`: the line is a drop group's (`[[Rusty Weapons]]`), its members folded (owner, 2026-11-10: the kobold page listed every rusty weapon). */
+  loot: { item: string; drops: number; group?: true }[]
   /** How many of it the player killed: the drop rates' denominator. */
   kills: number
   /** The player's own killing blows, whose faction lines the log always prints: with none seen, the page can say none. */
@@ -290,20 +292,49 @@ function conLevels(row: GapRow): number[] {
 }
 
 /** What the ledger looted from the mob, by base item, on how many corpses, A to Z. */
-function mobLoot(row: GapRow, loot: readonly LootEvent[]): MobFacts['loot'] {
-  const byItem = new Map<string, { item: string; corpses: Set<string> }>()
-  for (const e of loot) {
+/**
+ * Whether a loot line is this row's mob: the name, and for a row whose page is titled with its zone
+ * (`zoneTitled`: `A kobold (Rathe Mountains)`), the zone too (owner, 2026-11-10: "we shouldn't be
+ * pulling in loot from other 'a kobold (zone)' to ours"). A line with no zone is left out of such a row.
+ */
+function ownLoot(row: GapRow, zones: ReadonlySet<string>): (e: LootEvent) => boolean {
+  return (e) => {
     const mob = mobSourceOf(e)
-    if (mob === undefined || !same(mob, row.name)) continue
-    const seen = byItem.get(itemKey(e.item)) ?? { item: itemBaseName(e.item), corpses: new Set<string>() }
-    seen.corpses.add(corpseOf(e))
-    byItem.set(itemKey(e.item), seen)
+    if (mob === undefined || !same(mob, row.name)) return false
+    return row.zoneTitled !== true || (e.zone !== undefined && zones.has(zoneBaseName(e.zone).toLowerCase()))
   }
-  const out = new Map([...byItem].map(([k, v]) => [k, { item: v.item, drops: v.corpses.size }]))
+}
+
+/** A looted name as the page lists it: its drop group when the wiki has one (`[[Rusty Weapons]]`), else the item (`{{:Item}}`). */
+function lootedAs(groups: DropGroups | undefined): (item: string) => { item: string; group?: true } {
+  const groupOf = groups === undefined ? () => undefined : groupOfItem(groups)
+  return (item) => {
+    const group = groupOf(item)
+    return group === undefined ? { item: itemBaseName(item) } : { item: group, group: true }
+  }
+}
+
+function mobLoot(row: GapRow, loot: readonly LootEvent[], groups?: DropGroups): MobFacts['loot'] {
+  // The zone in the page's title: the one the row was named in most (zoneTitledPage).
+  const top = row.details.zones === undefined ? undefined : foldZoneTally(row.details.zones).entries[0]?.name
+  const zones = new Set(top === undefined ? [] : [top.toLowerCase()])
+  const mine = ownLoot(row, zones)
+  const filedAs = lootedAs(groups)
+  const byItem = new Map<string, { item: string; group?: true; corpses: Set<string> }>()
+  for (const e of loot) {
+    if (!mine(e)) continue
+    const as = filedAs(e.item)
+    // A group's rate is the corpses that dropped ANY member (gapDrops.ts, review D2).
+    const seen = byItem.get(itemKey(as.item)) ?? { ...as, corpses: new Set<string>() }
+    seen.corpses.add(corpseOf(e))
+    byItem.set(itemKey(as.item), seen)
+  }
+  const out = new Map([...byItem].map(([k, v]) => [k, { item: v.item, drops: v.corpses.size, ...(v.group === true ? { group: true as const } : {}) }]))
   // The row's own drop list names what the ledger may not hold (lines, not corpses: no better count).
   for (const d of row.details.drops?.entries ?? []) {
-    const had = out.get(itemKey(d.name))
-    if (!byItem.has(itemKey(d.name))) out.set(itemKey(d.name), { item: itemBaseName(d.name), drops: (had?.drops ?? 0) + d.n })
+    const as = filedAs(d.name)
+    const had = out.get(itemKey(as.item))
+    if (!byItem.has(itemKey(as.item))) out.set(itemKey(as.item), { item: as.item, drops: (had?.drops ?? 0) + d.n, ...(as.group === true ? { group: true as const } : {}) })
   }
   return [...out.values()].sort((a, b) => a.item.localeCompare(b.item))
 }
@@ -324,7 +355,7 @@ function ownKills(row: GapRow, pets: readonly string[] = []): number {
 }
 
 /** `kills` must be a `killIndex` result, as `killsFor` asks. */
-export function mobFacts(row: GapRow, loot: readonly LootEvent[], kills: KillMap, seen: MobSightings & { zoneName?: ZoneNamer } = {}): MobFacts {
+export function mobFacts(row: GapRow, loot: readonly LootEvent[], kills: KillMap, seen: MobSightings & { zoneName?: ZoneNamer; dropGroups?: DropGroups } = {}): MobFacts {
   const zoneName = seen.zoneName ?? asPrinted
   const mine = (m: { mob: string }): boolean => same(m.mob, row.name)
   const killed = killsFor(kills, row.name)
@@ -332,7 +363,7 @@ export function mobFacts(row: GapRow, loot: readonly LootEvent[], kills: KillMap
     name: row.name,
     zones: rowZones(row, zoneName),
     levels: conLevels(row),
-    loot: mobLoot(row, loot),
+    loot: mobLoot(row, loot, seen.dropGroups),
     kills: killed?.count ?? 0,
     // Only the player's own killing blows prove "no factions". An experience-credited kill does not:
     // a pet's kill while the player is feigned pays experience and moves no faction (owner's log,
@@ -520,9 +551,9 @@ function npcValues(f: NpcFacts): Record<string, string> {
   }
 }
 
-/** Loot lines in the wiki's list; '' for none. */
+/** Loot lines in the wiki's list, a group's as `[[Group]]`; '' for none. */
 const lootList = (loot: MobFacts['loot'], kills: number): string =>
-  loot.length === 0 ? '' : `<ul>\n${loot.map((l) => lootLine(l.item, l.drops, kills)).join('\n')}\n</ul>`
+  loot.length === 0 ? '' : `<ul>\n${loot.map((l) => (l.group === true ? groupLine(l.item, l.drops, kills) : lootLine(l.item, l.drops, kills))).join('\n')}\n</ul>`
 
 /** The mob's coin, when its kills paid any. */
 function coinOf(all: readonly MobCoin[] | undefined, mob: string): { coin?: MobCoin } {
@@ -615,6 +646,8 @@ export interface PageExtras extends QuestExtras, MerchantExtras {
   isMob?: (name: string) => boolean
   /** Drop names the wiki files under `|common_loot`, lower-cased (`commonLootNames`). */
   commonLoot?: ReadonlySet<string>
+  /** The wiki's drop groups (dropGroups.json): a member looted is listed as its group (owner's 2026-10-21 ruling, on the page too since 2026-11-10). */
+  dropGroups?: DropGroups
   /** What the install's spell files state, by spell name. */
   spellFacts?: Readonly<Record<string, ClientSpellFacts>>
   /** Where a vendor stands, by the catalog (`vendorFinder`): an item page's `|soldby` rows. */
@@ -663,7 +696,7 @@ const PAGE_OF: Record<GapDomain, (row: GapRow, c: PageContext) => string> = {
   // A known NPC's page lacking a quest it gives: only the related_quests lines to add (gapQuestGivers.ts).
   // A mob its target line calls a merchant takes the merchant layout before any trade (owner, 2026-10-22);
   // a new mob page takes its fight estimates in its blank fields (shared/gapFight.ts).
-  mob: (row, c) => (row.questGaps ? questGiverAddText(row.questGaps) : roleOf(row) === 'Merchant' ? merchantPage(withDescription(mobFacts(row, [], c.kills, { ...c.seen, zoneName: c.zoneName }), row, c)) : withRespawnField(withFightFields(mobPage(withDescription(mobFacts(row, c.loot, c.kills, { ...c.seen, zoneName: c.zoneName }), row, c), c.commonLoot), row), row)),
+  mob: (row, c) => (row.questGaps ? questGiverAddText(row.questGaps) : roleOf(row) === 'Merchant' ? merchantPage(withDescription(mobFacts(row, [], c.kills, { ...c.seen, zoneName: c.zoneName }), row, c)) : withRespawnField(withFightFields(mobPage(withDescription(mobFacts(row, c.loot, c.kills, { ...c.seen, zoneName: c.zoneName, dropGroups: c.dropGroups }), row, c), c.commonLoot), row), row)),
   merchant: (row, c) => merchantPage(withDescription(mobFacts(row, [], c.kills, { ...c.seen, zoneName: c.zoneName }), row, c)),
   spell: (row, c) => spellPage({ name: row.name, npcOnly: npcOnlySpell(row, c.isMob), client: c.spellFacts?.[row.name], shot: c.spellShots?.[row.name], castBy: castBySentence(row, c.isMob) }),
   faction: (row) => `${factionLine({ faction: factionOf(row), adjust: row.adjust, raised: row.raised })}\n`,
