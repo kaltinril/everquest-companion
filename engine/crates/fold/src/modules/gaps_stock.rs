@@ -35,7 +35,7 @@
 
 use crate::modules::gaps_details::coin_of;
 use crate::modules::gaps_players::{hail_of, ANSWER_MS};
-use crate::modules::gaps_keys::{item_gap_key, ItemIndex};
+use crate::modules::gaps_keys::{item_gap_key, scroll_spell, ItemIndex};
 use super::{Domain, GapsModule};
 use crate::event::{Event, Kind};
 use crate::message_overlay::message_text_of;
@@ -58,6 +58,19 @@ pub fn quote_of(text: &str) -> Option<(&str, &str, i64)> {
     let (coin, item) = rest.split_once(" for the ").or_else(|| rest.split_once(" per "))?;
     let (_, copper) = coin_of(coin).filter(|(w, _)| w == coin)?;
     (!merchant.is_empty() && !item.is_empty()).then_some((merchant, item, copper))
+}
+
+/// The name an item sold is served under: its catalog page title when the data has one, a scroll's
+/// with its `Spell: ` / `Song: ` word kept in front of the spell page's title; else as printed.
+fn sold_title(item: &str, items: &ItemIndex) -> String {
+    let Some(page) = items.page(item) else {
+        return item.to_string();
+    };
+    match scroll_spell(item) {
+        // The scroll word as printed, `Spell: ` or `Song: `, in front of the spell page.
+        Some(_) if scroll_spell(page).is_none() => format!("{}{page}", &item[..item.find(": ").map_or(0, |i| i + 2)]),
+        _ => page.to_string(),
+    }
 }
 
 /// One item a merchant sold or quoted: as printed, and its latest price heard at ally.
@@ -173,10 +186,13 @@ impl Stock {
     }
 
     /// `[{item, copper?}]` A to Z, each under its page title where the data has one; None for a name
-    /// that sold nothing.
+    /// that sold nothing. A scroll's catalog page is its SPELL's (`Spell: Improved Invis vs. Undead` →
+    /// `Improved Invis vs Undead`), so a scroll keeps its `Spell: ` / `Song: ` word in front of that
+    /// title: the page writer links the spell page under the scroll's name, as the wiki's merchant
+    /// pages do (owner, 2026-11-10: Scribe Noglleg's page transcluded a spell page as an item).
     fn sold_of(&self, key: &str, items: &ItemIndex) -> Option<Value> {
         let sold = self.sold.get(key)?;
-        let mut rows: Vec<(String, Option<i64>)> = sold.iter().map(|s| (items.page(&s.item).unwrap_or(&s.item).to_string(), s.ally_copper)).collect();
+        let mut rows: Vec<(String, Option<i64>)> = sold.iter().map(|s| (sold_title(&s.item, items), s.ally_copper)).collect();
         rows.sort_by_key(|(item, _)| item.to_lowercase());
         rows.dedup_by(|a, b| a.0.eq_ignore_ascii_case(&b.0));
         let rows: Vec<Value> = rows.iter().map(|(item, copper)| copper.map_or_else(|| json!({ "item": item }), |c| json!({ "item": item, "copper": c }))).collect();
@@ -265,6 +281,25 @@ mod tests {
             "A to Z, under the catalog's title"
         );
         assert_eq!(s.sold_of("kaelin k'toz", &items), None);
+    }
+
+    /// Owner, 2026-11-10: Scribe Noglleg's page wrote `{{:Improved Invis vs Undead}}`, the spell page as
+    /// an item. The catalog files the scroll under its spell's page; the served name keeps the scroll word.
+    #[test]
+    fn a_scroll_the_catalog_files_under_its_spell_page_keeps_its_spell_word() {
+        let mut s = Stock::default();
+        let items = ItemIndex::new(&[("spell: improved invis vs undead".to_string(), "Improved Invis vs Undead".to_string())]);
+        assert!(s.sold("Scribe Noglleg", "Spell: Improved Invis vs. Undead", Some(51_918)));
+        assert!(s.sold("Scribe Noglleg", "Spell: Animate Dead", Some(3_149)));
+        assert!(s.sold("Scribe Noglleg", "Song: Chords of Dissonance", None));
+        assert_eq!(
+            s.sold_of("scribe noglleg", &items),
+            Some(json!([
+                { "item": "Song: Chords of Dissonance" },
+                { "item": "Spell: Animate Dead", "copper": 3_149 },
+                { "item": "Spell: Improved Invis vs Undead", "copper": 51_918 }
+            ]))
+        );
     }
 
     /// The owner's log, 2026-10-23: a hail's answer is kept; a shop window's greeting, another
