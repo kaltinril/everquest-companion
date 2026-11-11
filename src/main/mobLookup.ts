@@ -60,6 +60,7 @@ import { knowledgeFromCatalog, localMobEntry, mergeLocalKnowledge } from './mobL
 import { type MobIdentity, poisonedAliasKeys, resolveMobIdentity } from './mobAliases'
 import type { MobKnowledge } from '../shared/types'
 import { hasMobTemplate } from '../shared/wikiTemplates'
+import type { MobPageRead } from '../shared/gapPageMerge'
 
 export { MobLootIndex, mobKey, parseMobWikitext }
 
@@ -260,5 +261,40 @@ export async function lookupMobOnCopy(name: string): Promise<MobKnowledge> {
     // A thrown error is transient — degrade to offline WITHOUT persisting a negative, so the
     // next call retries the network (same rule itemLookup follows).
     return mergeLocal({ name: display, cached: false, offline: true }, id)
+  }
+}
+
+/**
+ * THE SAME DOOR, READ FRESH (owner, 2026-11-10: Copy on a Mobs row "should do the fresh fetch of the
+ * page, compare and validate, and give me the updated full wiki to just copy/paste"). Nothing cached
+ * and nothing served from the catalog: the page as it stands this minute, raw, for the renderer's
+ * merge (shared/gapPageMerge.ts). `title` first when the row knows its page's title (a zone-titled
+ * page); else the search, an exact spelling of the mob's identity, else the top hit only when its own
+ * `|name` is this mob (the lookup's gate: a cousin's page is never filled in). One search and one
+ * page fetch a click, through the service's own polite queue; the ledger counts them as `mob copy`.
+ */
+export async function readMobPage(name: string, title?: string): Promise<MobPageRead> {
+  const { id, ask } = identityOf(name)
+  const run = wiki.enqueue(async (): Promise<MobPageRead> => {
+    if (title !== undefined) {
+      const named = await wiki.fetchPage(title)
+      if (named === null) return { offline: true }
+      if (named.text.trim() !== '') return { found: true, title: named.title, wikitext: named.text }
+    }
+    const hits = await wiki.searchTitles(ask)
+    if (hits === null) return { offline: true }
+    if (hits.length === 0) return { found: false }
+    const exact = hits.find((h) => identityMatches(id, h.title))
+    const page = await wiki.fetchPage((exact ?? hits[0]).title)
+    if (page === null) return { offline: true }
+    if (page.text.trim() === '') return { found: false }
+    if (exact === undefined && !identityMatches(id, parseMobWikitext(page.text).pageName ?? page.title)) return { found: false }
+    return { found: true, title: page.title, wikitext: page.text }
+  })
+  try {
+    return await run
+  } catch (err) {
+    logError('main:mobLookup', { message: `page read failed for ${name}`, err })
+    return { offline: true }
   }
 }

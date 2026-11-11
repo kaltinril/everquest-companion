@@ -23,6 +23,7 @@ import { wikiPageUrl } from '@shared/gapUrls'
 import { questPageTitle } from '@shared/gapQuests'
 import { lookupOnCopy, readGapVerdict } from '../../lib/gapVerdicts'
 import { QuestCopyDialog, readQuestPage, type QuestRead } from './QuestCopyDialog'
+import { MobCopyDialog, readMobPage, type MobRead } from './MobCopyDialog'
 import { ForcedRowButtons } from './ForcedQuests'
 import { EditRowButton } from './GapRowEdit'
 import { applyEditText, shownRow } from '@shared/gapEdits'
@@ -95,16 +96,23 @@ function copyWords(row: GapRow): { label: string; tip: string } {
   if (row.domain === 'notice') return { label: 'Copy proof', tip: 'What your log proves (how often, when, where, the lines), for the talk page or the edit summary.' }
   // A quest reads its wiki page first and adds to it (owner, 2026-10-23: "implement the diff idea").
   if (row.domain === 'quest') return { label: 'Copy wiki page', tip: 'Reads the wiki page and adds what your log saw, removing nothing.' }
+  // A mob reads its page first too (owner, 2026-11-10): empty fields filled, or a whole new page.
+  if (readsMobPage(row)) return { label: 'Copy wiki page', tip: 'Reads the wiki page first: fills only its empty fields, or copies a whole new page.' }
   const tip = `Wiki markup from what your log saw. ${GAP_CAPTURE[row.domain]}`
   if (!pageExists(row)) return { label: 'Copy wiki page', tip }
   return { label: 'Copy draft (page exists)', tip: `The wiki already has this page: copy only the fields it lacks from this draft. Pasting all of it replaces what people wrote there. ${tip}` }
 }
+
+/** A Mobs or Merchants row whose Copy reads the live page first (MobCopyDialog.tsx); a redirect or a quest-giver add text does not. */
+const readsMobPage = (row: GapRow): boolean => (row.domain === 'mob' || row.domain === 'merchant') && row.suggest === undefined && row.forageUpdate === undefined && row.questGaps === undefined
 
 /** A new wiki page for the row, built from what the log saw (shared/wikiPage.ts), onto the clipboard. */
 function CopyPageButton({ text, row, compact }: { text: () => string; row: GapRow; compact: boolean }): JSX.Element {
   const [copied, setCopied] = useState(false)
   // A quest's Copy opens the comparison with its live page; the read starts on this click, once.
   const [read, setRead] = useState<QuestRead | null>(null)
+  // A mob's Copy reads its page fresh and fills only what is empty (owner, 2026-11-10).
+  const [mobRead, setMobRead] = useState<MobRead | null>(null)
   const words = copyWords(row)
   const icon = copied && compact ? <DoneIcon fontSize="small" color="success" /> : <ContentCopyIcon fontSize="small" />
   // A read that answers after Close is dropped: the ticket moved on, so the dialog stays shut.
@@ -118,6 +126,13 @@ function CopyPageButton({ text, row, compact }: { text: () => string; row: GapRo
   const close = (): void => {
     ticket.current++
     setRead(null)
+    setMobRead(null)
+  }
+  const openMobRead = (): void => {
+    const mine = ++ticket.current
+    readMobPage(row, editorOf(row).target, (r) => {
+      if (ticket.current === mine) setMobRead(r)
+    })
   }
   // An item or mob page: the copy at once, and the wiki lookup on the same click, so the row learns
   // whether the page already exists before one is made (owner, 2026-10-26: "user clicks COPY on an
@@ -126,11 +141,12 @@ function CopyPageButton({ text, row, compact }: { text: () => string; row: GapRo
     void copyText(text()).then(setCopied)
     if (row.suggest === undefined && row.forageUpdate === undefined) void lookupOnCopy(row.domain, row.name)
   }
-  const onClick = row.domain === 'quest' ? openRead : copy
+  const onClick = row.domain === 'quest' ? openRead : readsMobPage(row) ? openMobRead : copy
   return (
     <>
       <ActionButton compact={compact} label={copied ? 'Copied' : words.label} tip={words.tip} icon={icon} onClick={onClick} testId="gaps-copy-page" />
       {read !== null && <QuestCopyDialog row={row} read={read} offline={text} onClose={close} />}
+      {mobRead !== null && <MobCopyDialog row={row} read={mobRead} title={editorOf(row).target} draft={text} onClose={close} />}
     </>
   )
 }

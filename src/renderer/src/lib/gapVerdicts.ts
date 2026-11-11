@@ -62,6 +62,13 @@ export function requestGapVerdicts(domain: GapDomain, names: readonly string[]):
  * the wiki for one, owner 2026-10-26), and the verdict it gives replaces the row's. Only a row the
  * caches have no answer for asks; a failed call leaves the verdict as it was.
  */
+/** A verdict another read settled (a mob row's Copy reads its page fresh, MobCopyDialog.tsx): kept, and every reader told. */
+export function noteGapVerdict(domain: GapDomain, name: string, verdict: GapVerdict): void {
+  if (domain !== 'item' && domain !== 'mob' && domain !== 'merchant') return
+  verdicts.set(keyOf(domain === 'merchant' ? 'mob' : domain, name), verdict)
+  notify()
+}
+
 export async function lookupOnCopy(domain: GapDomain, name: string): Promise<void> {
   if ((domain !== 'item' && domain !== 'mob') || readGapVerdict(domain, name) !== 'unchecked') return
   try {

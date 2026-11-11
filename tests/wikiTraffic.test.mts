@@ -39,7 +39,7 @@ globalThis.fetch = ((input: string | URL | Request) => {
 
 const { lookupItem, knownItem, lookupItemOnCopy } = await import('../src/main/itemLookup')
 const { lookupMob, knownMob } = await import('../src/main/mobLookup')
-const { copyLookup } = await import('../src/main/gapCopyLookup')
+const { copyLookup, copyPageRead } = await import('../src/main/gapCopyLookup')
 const { installImageCacheProtocol } = await import('../src/main/imageCache')
 
 after(async () => {
@@ -79,6 +79,18 @@ test('A COPY CLICK IS THE ONE DOOR: it asks the wiki once, and every automatic l
   assert.equal(knownItem(name)?.notFound, true)
   assert.equal((await lookupItemOnCopy(name)).notFound, true)
   assert.equal(asked.length, 1, 'a cached answer is never asked again')
+})
+
+// Owner, 2026-11-10: Copy on a Mobs row "should do the fresh fetch of the page" every click, so the
+// copy fills only what the page lacks; a zero-hit search is "no page", and nothing of it is cached.
+test('A MOB COPY READS ITS PAGE FRESH ON EVERY CLICK: one search per click when the wiki has no page, never a cached answer', async () => {
+  asked.length = 0
+  assert.deepEqual(await copyPageRead('a zzyzx nowhere hound'), { found: false })
+  assert.equal(asked.length, 1)
+  assert.match(asked[0], /^https:\/\/eqlwiki\.com\/api\.php\?.*list=search/)
+  assert.deepEqual(await copyPageRead('a zzyzx nowhere hound'), { found: false })
+  assert.equal(asked.length, 2, 'the second click asks again: the page may have been made since')
+  assert.equal(knownMob('a zzyzx nowhere hound'), null, 'a page read caches nothing')
 })
 
 test('THE IMAGE HANDLER AS THE APP INSTALLS IT FETCHES NOTHING: a missing icon or portrait is a 404', async () => {
