@@ -7,7 +7,8 @@
 // the categories, free text) is touched. Pure, so the rule is tested apart from the wiki.
 
 /** A mob's live page on a Copy click (main/mobLookup.ts `readMobPage`): its text to fill, no page, or the wiki out of reach. */
-export type MobPageRead = { found: true; title: string; wikitext: string } | { found: false } | { offline: true }
+/** The wiki's answer to a Copy click's page read, with the time it was read (a read is kept a while; mobLookup.ts). */
+export type MobPageRead = { found: true; title: string; wikitext: string; at: number } | { found: false; at: number } | { offline: true }
 
 /** The merge's answer: the page to paste, what was filled, and what was set aside. */
 export interface PageMerge {

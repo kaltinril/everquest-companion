@@ -311,8 +311,9 @@ where one exists.
 - 2026-11-10: Copy on a Mobs or Merchants row reads the live page first (owner: "click copy ... it
   should do the fresh fetch of the page, compare and validate, and give me the updated full wiki to
   just copy/paste into place. I don't want to be doing surgery on the page if I don't have to").
-  `main/mobLookup.ts readMobPage` (after the Copy door, same client and ledger feature, never cached:
-  one search and one page fetch a click; a zone-titled row asks by its title first), IPC
+  `main/mobLookup.ts readMobPage` (after the Copy door, same client and ledger feature, a read kept
+  half an hour for the row's next clicks, else one search and one page fetch; a zone-titled row asks by
+  its title and never searches), IPC
   `gapMobPageRead`, `shared/gapPageMerge.ts mergeMobPage`: a template field EMPTY on the page takes
   the draft's value, a filled field and `description` are never touched, nothing outside the template
   is touched; what the page did not take is handed back per field with the reason ("Exceptions:
@@ -320,26 +321,22 @@ where one exists.
   reason"). `MobCopyDialog.tsx` shows the result and puts the page on the clipboard as the read lands;
   no page: the new page as before; wiki out of reach: the draft, said so; a page of free text: the
   draft, said so. A redirect row, a forage update and a quest-giver add text keep the plain copy.
-- 2026-11-10: THE ONE MOBS LIST (`shared/gapNeeds.ts`; owner: "Merchants, factions, mobs, respawns are all
-  basically the same page, just different REASONS the mob shows up"). The field domains (faction, drop,
-  image, respawn) keep their rows and Copy texts; `needIndex` reads them BY MOB, `needsOf` gives a Mobs
-  row its needs (`page` for a mob the wiki lacks, else `merchant`, `factions`, `drops N`, `picture`,
-  `respawn`, `quests`, `redirect`), `withMobNeeds` (useGapsData `joinedSnap`) adds an Update row (`page`
-  set; gapJob.ts reads it as update) for every known mob with field rows, and folds a no-page faction
-  row into its mob's New page row. Tabs: `GAP_TABS` (Merchants, Factions, Images, Respawns gone;
-  `gapDomainOf` reads a stored one as Mobs); Needs filter chips (`eq.gaps.needs`, any ticked need,
-  counts are mobs) in `NeedsChips.tsx`; the Needs cell and the collapsed Seen as in `NeedChips.tsx`. An
-  Update row's Copy is its field rows' texts one after another (`needsCopyText`), never a whole page.
-  The overlay's Mobs-only copy derives the field domains too (gapDerive `wants`). Not folded: Drops stays
-  a tab for its 1,694 per-item lines (the mob row says `drops N`); no `location` or `items sold` need yet
-  (nothing derives either for a known page today).
-- 2026-11-11: an Update Mobs row (its page exists) never reads the live page on Copy; its Copy is its
-  needed lines (`gapNeeds.ts needsCopyText`), and a row that needs only a picture copies nothing and
-  says so (`isUpdateMob`; owner: a giant beetle's Copy read the page and reported "0 fields filled in",
-  "this is sort of saying nothing to do which is a waste of my time"). The page read is for New page rows.
-  A `viaRedirect` mob row copies the whole page for its own name and reads nothing (owner: the wiki sends
-  a giant fire beetle, level 9 in Toxxulia, to A giant beetle, level 6-8 in Western Karana; "the copy
-  command is dumb"): Edit page opens the redirect to replace it.
+- 2026-11-11: THE TABS STAY SPLIT BY PURPOSE. The one Mobs list of 2026-11-10 (`gapNeeds.ts`: Merchants,
+  Factions, Images and Respawns folded into Mobs behind Needs chips, an Update row per known mob) is
+  reverted whole (commits 89960b1e3, 1b474d936 and the 2026-11-11 Copy fix on top of them). Owner:
+  "before i would go to image tab, paste, upload, and mark done. Now i go to mob and I'm like 'oh the
+  mob is missing'"; "i'm leaning personally towards reverting the combined MOBS tab". His wiki work is
+  batched by kind of edit, which is what a tab is; a row's tab is its purpose. Kept from that night,
+  since none of it depends on the fold: the Copy page read and fill (below), drop groups on mob pages,
+  a zone-titled row's loot kept to its zone, the Seen as cell collapsed to two chips and a count
+  (`SeenAsChips.tsx`; the pane lists them all), and a redirected name's Copy as its whole page, read
+  nothing (a giant fire beetle sent to A giant beetle: the read had filled the beetle's page).
+- 2026-11-11: THE COPY READ IS KEPT HALF AN HOUR (owner: "we do not want to hit the wiki so much, we
+  really need to avoid this as much as possible"): `mobLookup.ts readMobPage` answers the same row's
+  later clicks from memory (`READ_KEEP_MS`; an offline answer is not kept), the dialog says the read's
+  clock time, and a row that knows its page's title (zone-titled, or found by the verdict) fetches that
+  page and never searches: the plain search once handed a Rathe Mountains kobold the Warrens page. Every
+  request is still a `mob copy` line in the wiki ledger (`wikiClient.ts recordAppWikiCall`).
 - 2026-11-10: a new mob page lists a drop group as its group line (`[[Rusty Weapons]]`, rated by the
   corpses that dropped any member), as the Drops tab files them (owner: his A kobold (Rathe Mountains)
   page listed every rusty weapon); a `zoneTitled` row takes loot only from its own zone (owner: "we

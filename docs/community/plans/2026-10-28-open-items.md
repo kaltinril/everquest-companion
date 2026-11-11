@@ -93,3 +93,11 @@ agreed work has a row in its `requirements/` file.
   engine connection served in order.
 - Major dependency bumps (`requirements/deps-refresh.md`), one branch each.
 - Next wiki delta before ~2027-01-16 (the wiki keeps ~90 days of changes).
+- Gaps tab, after the 2026-11-10/11 night (requirements/gaps-tab.md has the rows): the tabs stay split
+  by purpose (the one Mobs list was reverted). Open: a `location` or `items sold` gap for a merchant
+  whose page exists is derived by nothing, so such a page shows no row; Drops rows are per item and never
+  folded into a mob's page work; the Gray Jr Apprentice Robe near-miss ("Fix wiki title: Gray Sr
+  Apprentice Robe") needs the owner's screen; which store fed the 2026-11-10 build the owner's Oct 6
+  Warrens kobold loot onto a Rathe Mountains kobold page (not the live log, the archive, the segments
+  or the knowledge cache) is unresolved. The owner threw away wiki edits that night because the pages
+  the app handed over could not be trusted: every Copy text must stand on its own before it is handed over.

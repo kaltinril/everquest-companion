@@ -264,35 +264,55 @@ export async function lookupMobOnCopy(name: string): Promise<MobKnowledge> {
   }
 }
 
+// ---- the Copy click's page read ----------------------------------------------
+
+/** How long one read answers the same row's later Copy clicks (owner, 2026-11-11: "we do not want to hit
+ *  the wiki so much, we really need to avoid this as much as possible"). */
+export const READ_KEEP_MS = 30 * 60 * 1000
+const reads = new Map<string, MobPageRead>()
+
 /**
- * THE SAME DOOR, READ FRESH (owner, 2026-11-10: Copy on a Mobs row "should do the fresh fetch of the
- * page, compare and validate, and give me the updated full wiki to just copy/paste"). Nothing cached
- * and nothing served from the catalog: the page as it stands this minute, raw, for the renderer's
- * merge (shared/gapPageMerge.ts). `title` first when the row knows its page's title (a zone-titled
- * page); else the search, an exact spelling of the mob's identity, else the top hit only when its own
- * `|name` is this mob (the lookup's gate: a cousin's page is never filled in). One search and one
- * page fetch a click, through the service's own polite queue; the ledger counts them as `mob copy`.
+ * The read itself. A row that knows its page's title (a zone-titled page, a page the verdict found under
+ * other capitals) asks for that page and never searches: a zone-titled row's plain name is another zone's
+ * page, which is why it is titled (the plain search once filled a Rathe Mountains kobold from the Warrens
+ * page). Else the search, an exact spelling of the mob's identity, else the top hit only when its own
+ * `|name` is this mob (the lookup's gate: a cousin's page is never filled in).
+ */
+async function readFresh(id: MobIdentity, ask: string, title: string | undefined): Promise<MobPageRead> {
+  const at = Date.now()
+  if (title !== undefined) {
+    const named = await wiki.fetchPage(title)
+    if (named === null) return { offline: true }
+    return named.text.trim() === '' ? { found: false, at } : { found: true, title: named.title, wikitext: named.text, at }
+  }
+  const hits = await wiki.searchTitles(ask)
+  if (hits === null) return { offline: true }
+  if (hits.length === 0) return { found: false, at }
+  const exact = hits.find((h) => identityMatches(id, h.title))
+  const page = await wiki.fetchPage((exact ?? hits[0]).title)
+  if (page === null) return { offline: true }
+  if (page.text.trim() === '') return { found: false, at }
+  if (exact === undefined && !identityMatches(id, parseMobWikitext(page.text).pageName ?? page.title)) return { found: false, at }
+  return { found: true, title: page.title, wikitext: page.text, at }
+}
+
+/**
+ * THE SAME DOOR, READ ONCE (owner, 2026-11-10: Copy on a Mobs row "should do the fresh fetch of the page,
+ * compare and validate, and give me the updated full wiki to just copy/paste"; 2026-11-11: "we do not
+ * want to hit the wiki so much"). Nothing served from the catalog: the page as it stood when this name
+ * was last read, raw, for the renderer's merge (shared/gapPageMerge.ts), with the time of the read. A
+ * name read within READ_KEEP_MS asks nothing; an offline answer is never kept. At most one search and
+ * one page fetch a read, through the service's own polite queue; the ledger counts them as `mob copy`.
  */
 export async function readMobPage(name: string, title?: string): Promise<MobPageRead> {
-  const { id, ask } = identityOf(name)
-  const run = wiki.enqueue(async (): Promise<MobPageRead> => {
-    if (title !== undefined) {
-      const named = await wiki.fetchPage(title)
-      if (named === null) return { offline: true }
-      if (named.text.trim() !== '') return { found: true, title: named.title, wikitext: named.text }
-    }
-    const hits = await wiki.searchTitles(ask)
-    if (hits === null) return { offline: true }
-    if (hits.length === 0) return { found: false }
-    const exact = hits.find((h) => identityMatches(id, h.title))
-    const page = await wiki.fetchPage((exact ?? hits[0]).title)
-    if (page === null) return { offline: true }
-    if (page.text.trim() === '') return { found: false }
-    if (exact === undefined && !identityMatches(id, parseMobWikitext(page.text).pageName ?? page.title)) return { found: false }
-    return { found: true, title: page.title, wikitext: page.text }
-  })
+  const { id, ask, key } = identityOf(name)
+  const memo = `${key}\u0000${title ?? ''}`
+  const held = reads.get(memo)
+  if (held !== undefined && 'found' in held && Date.now() - held.at < READ_KEEP_MS) return held
   try {
-    return await run
+    const read = await wiki.enqueue(() => readFresh(id, ask, title))
+    if ('found' in read) reads.set(memo, read)
+    return read
   } catch (err) {
     logError('main:mobLookup', { message: `page read failed for ${name}`, err })
     return { offline: true }

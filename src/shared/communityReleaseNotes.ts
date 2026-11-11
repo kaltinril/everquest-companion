@@ -28,6 +28,57 @@ export interface CommunityRelease {
 
 export const COMMUNITY_RELEASE_NOTES: readonly CommunityRelease[] = [
   {
+    "version": "0.1.0-test.46",
+    "date": "2026-11-11",
+    "title": "wiki gaps Copy reads the page first, drop groups and zone-split mobs on mob pages, merchant scroll links",
+    "groups": [
+      {
+        "heading": "Wiki Gaps",
+        "items": [
+          {
+            "text": "Copy on a Mobs or Merchants row reads the live wiki page first. A page that exists comes back whole with only its empty fields filled from your log, and anything the page did not take is listed under it with the reason. No page means the whole new page, as before. One read is kept for half an hour, so clicking Copy again does not ask the wiki again; the dialog says when the page was read."
+          },
+          {
+            "text": "A new mob page lists a drop group as its group line ([[Rusty Weapons]], [[Cloth Armor]]) instead of every member, and a mob whose page is titled with its zone (A kobold (Rathe Mountains)) takes loot only from that zone."
+          },
+          {
+            "text": "A mob whose wiki page is split by zone (A kobold (Warrens)) no longer counts as known in other zones: elsewhere it is a row whose page is titled with your zone."
+          },
+          {
+            "text": "A guildmaster's nameplate gives its page the class line (GM [[Shadow Knight]]) and the \"<Class> guildmaster in <zone>.\" sentence."
+          },
+          {
+            "text": "Merchant pages link scrolls as the wiki does ([[Minor Healing|Spell: Minor Healing]]), and a merchant's /loc points within 20 units of each other are one averaged spot."
+          },
+          {
+            "text": "A quest the wiki titles \"<name> (quest)\" is matched by its plain task name."
+          },
+          {
+            "text": "Rows show the zone without its tier (+1, +4). A capture whose name is not a plausible item (an icon read as letters) no longer creates an item row."
+          },
+          {
+            "text": "The Seen as cell shows two chips and a count; the open row lists them all."
+          },
+          {
+            "text": "A name the wiki redirects to another mob's page copies its whole page, to create over the redirect."
+          },
+          {
+            "text": "The picture read off a pasted screenshot shows again in the open row."
+          }
+        ]
+      },
+      {
+        "heading": "Data",
+        "items": [
+          {
+            "text": "Wiki pages refreshed to today."
+          }
+        ]
+      }
+    ],
+    "knownIssues": "A Copy page read is kept for half an hour, so a page made on the wiki within that time is not seen until it passes. A merchant page the wiki already has gets no \"items sold\" or \"location\" check. An item page the wiki already has gets no check that it lists a merchant you were quoted by. Joining another player's private instance is not told apart from the open world of that zone; only an instance you create yourself is. A pet summoned shortly before its first \"My leader is\" line can carry a \"(2)\" after its name in the meters until the next restart. Another player's spells never count toward a mob's resists: the game prints only your own resists to you. The con card does not list a mob's immunities yet (the mob page does). Saved characters read \"needs refresh\" on Wiki Gaps until logged in once with this build. A +0 worked back from a window often leaves Weight as ?. A groupmate's charmed pet can still lose its credit when a damage-over-time it cast before the charm ticks on a groupmate. A mob or item added to the wiki after this build shows no wiki details until the next build (or a Copy click in Wiki Gaps). Copy on a wiki page that still holds the template's placeholders keeps them. Capture finds the game window only when it is titled \"EverQuest Legends\" or \"EverQuest\". All characters needs each character logged in here once with this build. The screenshot reader reads English only. The installer is not code-signed, so Windows shows \"Windows protected your PC\" the first time (More info, then Run anyway). Builds before test.20 do not update themselves; install one by hand once."
+  },
+  {
     "version": "0.1.0-test.45",
     "date": "2026-11-10",
     "title": "wiki gaps see merchants' quotes and stock, same-named mobs get a timer floor",
