@@ -3,7 +3,7 @@
 
 import { type JSX, useMemo } from 'react'
 import { Box, Chip, Stack, Typography } from '@mui/material'
-import { GAP_LISTS, derivedPrices, formatCoin, type GapDetails, type GapRow, type GapTally } from '@shared/gaps'
+import { GAP_LISTS, derivedPrices, foldZoneTally, formatCoin, type GapDetails, type GapRow, type GapTally } from '@shared/gaps'
 import { offerCheckText, offerText } from '@shared/gapOffers'
 import { questFactLines, questFactsOf } from '@shared/itemQuestFacts'
 import { rowFactLines } from '@shared/gapQuestPage'
@@ -96,8 +96,10 @@ export default function GapDetailsPanel({ row }: { row: GapRow }): JSX.Element {
         </Typography>
       ))}
       {GAP_LISTS.map(({ key, label }) => {
-        const tally = details[key]
-        if (tally === undefined) return null
+        const raw = details[key]
+        if (raw === undefined) return null
+        // The zones as the player names them, tiers folded (owner, 2026-11-10).
+        const tally = key === 'zones' || key === 'forageZones' ? foldZoneTally(raw) : raw
         return (
           <Stack key={key} spacing={0.25}>
             <TallyChips label={label} tally={tally} />

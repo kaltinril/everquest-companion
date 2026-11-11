@@ -155,6 +155,15 @@ export function zoneKey(zone: string | undefined | null): string {
   return zone === undefined || zone === null || zone === '' ? '' : zoneKeyOf(zone)
 }
 
+/**
+ * The zone as the player names it, the log's tier and instance marks dropped: `Lake Nerius 4
+ * (Refined)` -> `Lake Nerius`, `The Permafrost Caverns - Group` -> `The Permafrost Caverns`. Case
+ * and article kept (owner, 2026-11-10: "just show the zone, not +1 +4 whatnot").
+ */
+export function zoneBaseName(zone: string): string {
+  return zone.replace(INSTANCE_TAG_RE, '').replace(SOLO_GROUP_RE, '').replace(TIER_ORDINAL_RE, '').replace(TIER_PAREN_RE, '').trim()
+}
+
 // ---- the table -----------------------------------------------------------------------------
 
 /**

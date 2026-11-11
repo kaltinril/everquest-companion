@@ -517,10 +517,32 @@ function iconJunkDropped(name: string, above: readonly string[]): string {
   return titles.some((t) => t.startsWith(bare)) && !titles.some((t) => t.startsWith(whole)) ? rest : name
 }
 
+/**
+ * Among the candidate name lines, the last one a title bar above it starts with (owner, 2026-11-10:
+ * a Kobold Talisman's icon was read as its own line `IL` under the name, and `IL` became the name);
+ * undefined when no title names a line, as with a title OCR mangled.
+ */
+function titleNamed(raw: readonly string[], ok: readonly boolean[]): number | undefined {
+  const norm = (s: string): string => withoutTier(s).toLowerCase().replace(/[^a-z0-9]/g, '')
+  for (let j = ok.length - 1; j > 0; j--) {
+    if (!ok[j]) continue
+    const bare = norm(bareTitle(cleanLine(raw[j], true)) ?? '')
+    if (bare.length < 3) continue
+    const named = raw.slice(0, j).some((l) => {
+      const t = bareTitle(cleanLine(l, true)) ?? ''
+      return [norm(t), norm(t.replace(/^\S{1,2}\s+/, ''))].some((n) => n.startsWith(bare))
+    })
+    if (named) return j
+  }
+  return undefined
+}
+
 /** The name: the line above the flags line, else above Class; junk dropped, a `+N` tier apart. `raw`: the lines before cleaning. */
 function nameAbove(lines: readonly string[], raw: readonly string[], at: number): { name?: string; tier?: number } {
-  const i = lines.slice(0, at).map((l) => /[A-Za-z]{2}/.test(l) && !NOT_ITEM.test(l)).lastIndexOf(true)
-  if (i < 0) return {}
+  const ok = lines.slice(0, at).map((l) => /[A-Za-z]{2}/.test(l) && !NOT_ITEM.test(l))
+  const last = ok.lastIndexOf(true)
+  if (last < 0) return {}
+  const i = titleNamed(raw, ok) ?? last
   const bare = iconJunkDropped(bareTitle(cleanLine(raw[i], true)) ?? '', raw.slice(0, i))
   const tier = TIER.exec(bare)
   return { name: withoutTier(bare), ...(tier === null || Number(tier[1]) === 0 ? {} : { tier: Number(tier[1]) }) }

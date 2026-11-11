@@ -185,6 +185,13 @@ export function iconTokenless(name: string): string | undefined {
 /** The icon's usual misreads in front of a name that matched no row: the name after it (`1 Alexa's Robe` -> `Alexa's Robe`). */
 export const iconFree = (name: string): string => name.replace(ICON_TOKEN, '')
 
+/**
+ * A name a capture may file a NEW row under: three letters at least, one of them lower case. An icon
+ * read as letters (`IL`, `RR`: the owner's Kobold Talisman, 2026-11-10) is not an item and gets no
+ * row; a window that names an existing row still lands on it by its other lines.
+ */
+export const plausibleItemName = (name: string): boolean => (name.match(/[A-Za-z]/g) ?? []).length >= 3 && /[a-z]/.test(name)
+
 const ICON_TOKEN = /^[1lI|]\s+(?=[A-Z])/
 
 function nameRow(name: string, rowNames: readonly string[], known: readonly string[]): CaptureMatch | undefined {
