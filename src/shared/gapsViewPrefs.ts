@@ -5,6 +5,7 @@
 // beside the tab's other prefs; anything unreadable is the default, never an error.
 
 import { DEFAULT_GAP_SORT, GAP_DOMAINS, type GapDomain, type GapSort, type GapSortKey } from './gaps'
+import { FOLDED_INTO, GAP_TABS } from './gapNeeds'
 
 /** Where the domain tab is remembered. */
 export const GAP_DOMAIN_KEY = 'eq.gaps.domain'
@@ -13,10 +14,15 @@ export const GAP_SORT_KEY = 'eq.gaps.sort'
 
 const SORT_KEYS: readonly GapSortKey[] = ['name', 'kinds', 'zone', 'count', 'first', 'last', 'todo']
 
-/** The stored domain tab; Items when absent or not a domain this build has. */
+/** The stored domain tab; Items when absent or not a domain this build has; a tab folded into Mobs (2026-11-10) reads as Mobs. */
 export function gapDomainOf(raw: string | null): GapDomain {
-  return GAP_DOMAINS.find((d) => d === raw) ?? 'item'
+  const stored = GAP_DOMAINS.find((d) => d === raw)
+  if (stored === undefined) return 'item'
+  return GAP_TABS.includes(stored) ? stored : (FOLDED_INTO[stored] ?? 'item')
 }
+
+/** Where the Needs chips' choice is remembered, `factions,drops`. */
+export const GAP_NEEDS_KEY = 'eq.gaps.needs'
 
 /** The stored sort order (`count desc`); the engine's own order when absent or unreadable. */
 export function gapSortOf(raw: string | null): GapSort {

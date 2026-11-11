@@ -128,8 +128,10 @@ test('a change inside the gap waits out the rest of it, measured from the last w
 
 // ---- the tab's remembered choices ----
 
-test('the domain tab reads back, and anything else is Items', () => {
-  assert.equal(gapDomainOf('image'), 'image')
+test('the domain tab reads back, a tab folded into Mobs reads as Mobs, and anything else is Items', () => {
+  // Images, Merchants, Factions and Respawns folded into the Mobs list (owner, 2026-11-10).
+  assert.equal(gapDomainOf('image'), 'mob')
+  assert.equal(gapDomainOf('merchant'), 'mob')
   assert.equal(gapDomainOf('drop'), 'drop')
   assert.equal(gapDomainOf(null), 'item')
   assert.equal(gapDomainOf('pictures'), 'item')

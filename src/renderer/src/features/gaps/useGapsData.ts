@@ -34,6 +34,7 @@ import { useThrottled } from '../../lib/useThrottled'
 import { questJournalNow, useQuestJournals } from './itemShotsStore'
 import { useItemForage } from '../../lib/gapItemForage'
 import { forageProofNames } from '@shared/gapForage'
+import { withMobNeeds } from '@shared/gapNeeds'
 import { mobPageFinder } from '@shared/mobPageTitle'
 import { catalogStates } from '@shared/gapMerchantDescription'
 import { useQuestLivePages } from '../../lib/questLivePages'
@@ -241,7 +242,9 @@ interface JoinInputs {
 function joinedSnap(derived: GapsSnap, x: JoinInputs): GapsSnap {
   return (x.only === undefined ? lastJoined : lastJoinedOnly)([derived, x.live?.talks, x.live?.questThreads, x.forced, x.livePages, x.journals], () => {
     // The live snapshot's talks and chains: a joined or day-cut snapshot is rebuilt without them.
-    const named = withForcedQuests({ ...derived, talks: x.live?.talks ?? [], questThreads: x.live?.questThreads ?? [] }, x.forced)
+    // The one Mobs list (gapNeeds.ts, owner 2026-11-10): a known mob's field rows give it an Update row.
+    const listed = withMobNeeds(derived)
+    const named = withForcedQuests({ ...listed, talks: x.live?.talks ?? [], questThreads: x.live?.questThreads ?? [] }, x.forced)
     const linked = { ...named, rows: withQuestLinks(named.rows, popupLinksOfRows(named.rows, (q) => x.journals[questTitleKey(q)]?.popups)) }
     return withZoneRedirects(withQuestPages(linked, questPageOf(x.livePages)), catalogZonesOf())
   })
