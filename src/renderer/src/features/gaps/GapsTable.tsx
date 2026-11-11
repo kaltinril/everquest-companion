@@ -53,8 +53,7 @@ import { needsWords } from '@shared/gapReady'
 import { wikiPageUrl } from '@shared/wiki'
 import { Tooltip } from '../../lib/Tooltip'
 import { useWindowedRows } from '../../lib/useWindowedRows'
-import { SeenAsChips, ToDoCell } from './NeedChips'
-import type { GapNeed } from '@shared/gapNeeds'
+import GapActionChips from './GapActionChips'
 import PageFixNote from './PageFixNote'
 import GapDetailsPanel from './GapDetailsPanel'
 import ShotPanel from './ShotPanel'
@@ -174,8 +173,7 @@ const GapTableRow = memo(function GapTableRow({
   chipContext,
   work,
   held,
-  need,
-  needs
+  need
 }: {
   row: GapRow
   open: boolean
@@ -183,8 +181,6 @@ const GapTableRow = memo(function GapTableRow({
   onToggle: (name: string) => void
   /** what is left to capture, a word each; '' when the row is Ready */
   need: string
-  /** a Mobs row's needs (gapNeeds.ts): its Needs cell; other rows keep their action chips */
-  needs?: readonly GapNeed[]
   /** marked done: shown only under "Show done", dimmed */
   done?: boolean
   chipContext?: GapActionContext
@@ -220,19 +216,22 @@ const GapTableRow = memo(function GapTableRow({
         <GapRowButtons row={row} pageText={work.pageText} isDone={done} onDone={work.onDone} compact />
       </TableCell>
       <TableCell sx={CLIP}>
-        <SeenAsChips kinds={row.kinds} />
+        <Stack direction="row" spacing={0.5} sx={{ flexWrap: 'nowrap' }}>
+          {row.kinds.map((k) => (
+            <Chip key={k} label={k} size="small" variant="outlined" />
+          ))}
+        </Stack>
       </TableCell>
       <TableCell sx={{ ...CLIP, color: 'text.secondary' }}>{gapZone(row)}</TableCell>
       <TableCell align="right" sx={CLIP}>{row.count.toLocaleString()}</TableCell>
       <TableCell sx={{ ...CLIP, color: 'text.secondary' }}>{row.first}</TableCell>
       <TableCell sx={{ ...CLIP, color: 'text.secondary' }}>{row.last}</TableCell>
       <TableCell sx={CLIP}>
-        <ToDoCell row={row} verdict={verdict} ctx={chipContext} needs={needs} />
+        <GapActionChips row={row} verdict={verdict} ctx={chipContext} />
       </TableCell>
     </TableRow>
   )
 })
-
 
 /** What a row's icon buttons need; one stable object, so the memoized rows stay memoized. */
 interface RowWork {
@@ -291,9 +290,6 @@ function DetailsPane({ row, actions }: { row: GapRow; actions: PaneActions }): J
             Seen by: {seen.join(', ')}.
           </Typography>
         )}
-        <Typography variant="caption" color="text.secondary" component="div" data-testid="gaps-seen-as">
-          Seen as: {row.kinds.join(', ')}.
-        </Typography>
         {held.map((h) => (
           <Typography key={h.who ?? ''} variant="body2" color="success.main" component="div" data-testid="gaps-held-line">
             {gapJob(row) === 'update' ? heldWhere(h) : heldLine(h)}
@@ -444,8 +440,7 @@ export default function GapsTable({
   hiddenByFilter = false,
   folded,
   onFold,
-  nameLead,
-  needsOf
+  nameLead
 }: {
   /** the rows, or the grouped list with its zone and mob headings */
   entries: readonly GapEntry[]
@@ -475,8 +470,6 @@ export default function GapsTable({
   onFold: (key: string) => void
   /** before the Name header's label: the grouped list's fold-all and order controls */
   nameLead?: ReactNode
-  /** a Mobs row's needs, for its Needs cell (gapNeeds.ts); memoized per row by the list */
-  needsOf?: (row: GapRow) => readonly GapNeed[]
 }): JSX.Element {
   const [open, setOpen] = useState<string | null>(null)
   const onToggle = useCallback((name: string) => setOpen((cur) => (cur === name ? null : name)), [])
@@ -512,7 +505,7 @@ export default function GapsTable({
             <PadRow height={win.topPad} />
             {shown.slice(win.start, win.end).map((e) =>
               e.kind === 'row' ? (
-                <GapTableRow key={e.key} row={e.row} open={open === e.row.name} verdict={verdicts[e.row.name] ?? 'unchecked'} onToggle={onToggle} depth={e.depth} done={done.has(doneKey(e.row))} chipContext={chipContext} work={work} held={gapHeld(e.row, holding)} need={needsWords(needed(e.row))} needs={needsOf?.(e.row)} />
+                <GapTableRow key={e.key} row={e.row} open={open === e.row.name} verdict={verdicts[e.row.name] ?? 'unchecked'} onToggle={onToggle} depth={e.depth} done={done.has(doneKey(e.row))} chipContext={chipContext} work={work} held={gapHeld(e.row, holding)} need={needsWords(needed(e.row))} />
               ) : (
                 <GroupRow key={e.key} entry={e} folded={folded.has(e.key)} onFold={onFold} work={headingWork} />
               )

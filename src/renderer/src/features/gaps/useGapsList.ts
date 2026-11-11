@@ -13,8 +13,7 @@
 
 import { useCallback, useDeferredValue, useMemo, useSyncExternalStore } from 'react'
 import { firstGapSortDir, sortGaps, visibleGaps, withoutDone, withoutPlayers, type GapDomain, type GapRow, type GapSort, type GapSortKey, type GapVerdicts } from '@shared/gaps'
-import { GAP_DOMAIN_KEY, GAP_NEEDS_KEY, GAP_SORT_KEY, gapDomainOf, gapSortOf, gapSortText } from '@shared/gapsViewPrefs'
-import { needCounts, needIndex, needsFilter, needsOf, needsPickOf, needsPickText, type GapNeed, type NeedKind } from '@shared/gapNeeds'
+import { GAP_DOMAIN_KEY, GAP_SORT_KEY, gapDomainOf, gapSortOf, gapSortText } from '@shared/gapsViewPrefs'
 import type { CharacterRef, CharacterSnap } from '@shared/types'
 import { useModule } from '../../lib/useModule'
 import { useBoolPref, useRawPref } from '../combat/useCombatPrefs'
@@ -42,45 +41,6 @@ const SHOW_DONE_KEY = 'eq.gaps.showDone'
 /** What a row's job reads beyond the row: which names are catalog mobs (a merchant with a page). */
 const JOB_CONTEXT = { isMob: PAGE_EXTRAS.isMob }
 const NO_NAMES: readonly string[] = []
-const NO_ROWS: readonly GapRow[] = []
-const NO_COUNTS: ReadonlyMap<NeedKind, number> = new Map()
-
-/** The Needs chips under the Mobs tab (gapNeeds.ts): what is ticked, each kind's count, and a row's needs. */
-export interface NeedsState {
-  picked: ReadonlySet<NeedKind>
-  toggle: (kind: NeedKind) => void
-  counts: ReadonlyMap<NeedKind, number>
-  of: (row: GapRow) => readonly GapNeed[]
-  index: ReturnType<typeof needIndex>
-}
-
-/** Each row's needs, once per row object while the index is the same: the memoized table rows stay memoized. */
-function useNeeds(rows: readonly GapRow[] | undefined, domain: GapDomain, inDomain: readonly GapRow[]): NeedsState {
-  const index = useMemo(() => needIndex(rows ?? NO_ROWS), [rows])
-  const of = useMemo(() => {
-    const cache = new WeakMap<GapRow, readonly GapNeed[]>()
-    return (r: GapRow): readonly GapNeed[] => {
-      const had = cache.get(r)
-      if (had !== undefined) return had
-      const made = needsOf(r, index, JOB_CONTEXT)
-      cache.set(r, made)
-      return made
-    }
-  }, [index])
-  const [raw, setRaw] = useRawPref(GAP_NEEDS_KEY)
-  const picked = useMemo(() => needsPickOf(raw), [raw])
-  const toggle = useCallback(
-    (kind: NeedKind) => {
-      const next = new Set(picked)
-      if (next.has(kind)) next.delete(kind)
-      else next.add(kind)
-      setRaw(next.size === 0 ? null : needsPickText(next))
-    },
-    [picked, setRaw]
-  )
-  const counts = useMemo(() => (domain === 'mob' ? needCounts(inDomain, of) : NO_COUNTS), [domain, inDomain, of])
-  return useMemo(() => ({ picked, toggle, counts, of, index }), [picked, toggle, counts, of, index])
-}
 
 // ---- the search, kept for the session ----
 
@@ -157,8 +117,6 @@ export interface GapsList {
   onSort: (key: GapSortKey) => void
   /** the rows on the tab, in the tab's order */
   sorted: GapRow[]
-  /** the Needs chips under the Mobs tab, and each row's needs (gapNeeds.ts) */
-  needs: NeedsState
 }
 
 /** With the tab closed, the overlay's copy takes the game's new data at most this often. */
@@ -203,14 +161,11 @@ export function useGapsList(opts: { background?: boolean } = {}): GapsList {
   // The list follows the query a beat behind the keystroke, so typing never waits on a filter.
   const deferredQuery = useDeferredValue(shownQuery)
   const inDomain = useMemo(() => visibleGaps(rows ?? [], domain, deferredQuery, zone), [rows, domain, deferredQuery, zone])
-  // The Needs chips (owner, 2026-11-10): the Mobs list narrowed to rows with any ticked need; counts are mobs.
-  const needs = useNeeds(rows, domain, inDomain)
-  const byNeed = useMemo(() => (domain === 'mob' && needs.picked.size > 0 ? needsFilter(inDomain, needs.picked, needs.of) : inDomain), [domain, inDomain, needs.picked, needs.of])
   // "Show" (owner, 2026-10-21): new pages, updates or both; then "I have it", what the player holds.
   // Ready (owner, 2026-10-21): nothing left to capture; the install's spell files asked for the domain's spells.
-  const spellNames = useMemo(() => (domain === 'spell' ? byNeed.map((r) => r.name) : NO_NAMES), [domain, byNeed])
-  const readiness = useGapReady(data, spellNames, byNeed)
-  const job = useGapShow(byNeed, JOB_CONTEXT, readiness.isReady)
+  const spellNames = useMemo(() => (domain === 'spell' ? inDomain.map((r) => r.name) : NO_NAMES), [domain, inDomain])
+  const readiness = useGapReady(data, spellNames, inDomain)
+  const job = useGapShow(inDomain, JOB_CONTEXT, readiness.isReady)
   const mine = useHeldOnly(job.rows, holding, domain)
   // "Hide uncertain" (owner, 2026-10-19): rows the tab is not sure are gaps, hidden on request.
   const sure = useHideUncertain(mine.rows)
@@ -221,5 +176,5 @@ export function useGapsList(opts: { background?: boolean } = {}): GapsList {
   // The table and Copy list read the same order, so a copied list matches what is on screen.
   const sorted = useMemo(() => sortGaps(visible, sort, verdicts), [visible, sort, verdicts])
   // prettier-ignore
-  return { me, allChars, data, domain, setDomain, query: shownQuery, setQuery, hereOnly, setHereOnly, current, zone, playerList, rows, marks, showDone, setShowDone, holding, job, readiness, mine, sure, visible, verdicts, sort, onSort, sorted, needs }
+  return { me, allChars, data, domain, setDomain, query: shownQuery, setQuery, hereOnly, setHereOnly, current, zone, playerList, rows, marks, showDone, setShowDone, holding, job, readiness, mine, sure, visible, verdicts, sort, onSort, sorted }
 }
