@@ -520,6 +520,10 @@ impl GapsModule {
         if domain == Domain::Mob && self.maybe_player(row) {
             v["maybePlayer"] = json!(true);
         }
+        // Its plain name is taken by zone-titled pages: the new page is titled with its zone too.
+        if domain == Domain::Mob && self.mob_names.zone_titled(&row.name) {
+            v["zoneTitled"] = json!(true);
+        }
         self.serve_extras(domain, key, &mut v);
         if let Some(s) = self.suggestion(domain, key) {
             v["suggest"] = json!(s);
@@ -598,7 +602,7 @@ impl EqModule for GapsModule {
         self.item_candidates = item_candidates(&index.item_pages);
         let effect_key = |n: &String| loose_key(&spell_gap_key(n));
         self.item_effects = index.item_effects.iter().map(|(n, _)| effect_key(n)).collect();
-        self.mob_names = MobNames::new(&index.mob_names).with_redirects(&index.mob_redirects);
+        self.mob_names = MobNames::new(&index.mob_names).with_redirects(&index.mob_redirects).with_zone_splits(&index.mob_pages, &index.mob_zone_splits);
         self.notices = Notices::new(&index);
         self.quest_givers = QuestGivers::new(&index);
         self.knowledge = Some(Arc::clone(k));

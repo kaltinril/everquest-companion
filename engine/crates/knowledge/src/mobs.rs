@@ -117,6 +117,13 @@ impl MobIndex {
         self.entry_keyed(&mob_key_ref(name))
     }
 
+    /// Every record, in catalog order: two records can share a `|name` (a page split by zone), so a
+    /// reader of every page walks these rather than `names()` through `entry`.
+    #[must_use]
+    pub fn records(&self) -> &[Value] {
+        &self.records
+    }
+
     /// [`Self::entry`] for a caller that already holds the `mob_key`.
     #[must_use]
     pub fn entry_keyed(&self, key: &str) -> Option<&Value> {

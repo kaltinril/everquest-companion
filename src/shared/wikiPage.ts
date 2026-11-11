@@ -175,8 +175,10 @@ export interface MobFacts {
   coin?: MobCoin
   /** The quests whose task lines came just after it spoke or took an item (gaps_quests.rs): `related_quests`. */
   quests?: string[]
-  /** Its role from the client's target line (`Banker`, `Merchant`, `Warrior GM`; gaps_roles.rs). */
+  /** Its role from the client's target line (`Banker`, `Merchant`, `Warrior GM`; gaps_roles.rs), else a guildmaster's nameplate. */
   role?: string
+  /** A new page's description from its nameplate and hail answer (gapMerchantDescription.ts `withDescription`). */
+  description?: string
   /** What it quoted or sold the player, a merchant page's `items_sold` (gaps_stock.rs, shared/gapItemsSold.ts). */
   itemsSold?: SoldSeen[]
 }
@@ -565,7 +567,7 @@ export function mobPage(facts: MobFacts, commonLoot: ReadonlySet<string> = new S
   const loot = f.loot.length === 0 && f.ownKills >= LOOT_NONE_KILLS ? '* None' : lootList(f.loot.filter((l) => !isCommon(l)), f.kills)
   const own = [loot, f.coin === undefined ? '' : moneyBlock(f.coin)].filter((s) => s !== '').join('\n')
   const shared = lootList(f.loot.filter(isCommon), f.kills)
-  return page(layoutBlock('Namedmobpage', NPC_LAYOUT, { ...npcValues(f), known_loot: own, common_loot: shared }), f.zones)
+  return page(layoutBlock('Namedmobpage', NPC_LAYOUT, { ...npcValues(f), description: f.description ?? '', known_loot: own, common_loot: shared }), f.zones)
 }
 
 /** The files' facts and the spell window's as Spell Page Blueprint fields (shared/spellWindow.ts), in its order. */
@@ -661,7 +663,7 @@ const PAGE_OF: Record<GapDomain, (row: GapRow, c: PageContext) => string> = {
   // A known NPC's page lacking a quest it gives: only the related_quests lines to add (gapQuestGivers.ts).
   // A mob its target line calls a merchant takes the merchant layout before any trade (owner, 2026-10-22);
   // a new mob page takes its fight estimates in its blank fields (shared/gapFight.ts).
-  mob: (row, c) => (row.questGaps ? questGiverAddText(row.questGaps) : roleOf(row) === 'Merchant' ? merchantPage(withDescription(mobFacts(row, [], c.kills, { ...c.seen, zoneName: c.zoneName }), row, c)) : withRespawnField(withFightFields(mobPage(mobFacts(row, c.loot, c.kills, { ...c.seen, zoneName: c.zoneName }), c.commonLoot), row), row)),
+  mob: (row, c) => (row.questGaps ? questGiverAddText(row.questGaps) : roleOf(row) === 'Merchant' ? merchantPage(withDescription(mobFacts(row, [], c.kills, { ...c.seen, zoneName: c.zoneName }), row, c)) : withRespawnField(withFightFields(mobPage(withDescription(mobFacts(row, c.loot, c.kills, { ...c.seen, zoneName: c.zoneName }), row, c), c.commonLoot), row), row)),
   merchant: (row, c) => merchantPage(withDescription(mobFacts(row, [], c.kills, { ...c.seen, zoneName: c.zoneName }), row, c)),
   spell: (row, c) => spellPage({ name: row.name, npcOnly: npcOnlySpell(row, c.isMob), client: c.spellFacts?.[row.name], shot: c.spellShots?.[row.name], castBy: castBySentence(row, c.isMob) }),
   faction: (row) => `${factionLine({ faction: factionOf(row), adjust: row.adjust, raised: row.raised })}\n`,

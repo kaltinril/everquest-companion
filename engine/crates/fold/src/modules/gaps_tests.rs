@@ -66,6 +66,8 @@ impl Knowledge for Corpus {
             item_pages,
             item_effects: vec![("Summon Horse".to_string(), "Black Chain Bridle".to_string())],
             mob_names: mob_names.iter().map(|n| n.to_string()).collect(),
+            mob_pages: Vec::new(),
+            mob_zone_splits: Vec::new(),
             // A page that says it may not be in Legends (owner, 2026-10-22: A Rotting Citizen).
             item_notices: vec![("old wand".into(), "Old Wand".into(), vec!["delete: No longer in game".into()])],
             mob_notices: vec![("a rotting citizen".into(), "A Rotting Citizen".into(), vec!["delete".into(), "DNE".into()])],

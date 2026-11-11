@@ -11,6 +11,11 @@
 //!   * A MOB'S PET, `<mob> pet` (`a shadowknight pet`, `Lady Vox pet`): the wiki pages the mob,
 //!     never its pet, so the name is known when the mob is, and an unknown mob's pet is filed
 //!     under the mob ([`owner_of_pet`]); not in the EQ Legends Tutorial, whose `a fragile pet` is a mob.
+//!   * A PAGE SPLIT BY ZONE answers to its plain name only in its zones (owner, 2026-11-10: the
+//!     `a kobold` of Rathe Mountains drops Kobold Scalps and Woven armor, nothing of `A kobold
+//!     (Warrens)`, and wants `A kobold (Rathe Mountains)`). A name with a plain page too (`a kobold
+//!     runt`: `A Kobold Runt` and `A kobold runt (Steamfont)`) stays known everywhere: the plain
+//!     page's zone list may just be short, which is an update, not a new page.
 //!   * NO MOB: the `Reward Chest` a raid's loot is taken from.
 //!   * A PLAYER'S: a pet that spoke as a pet or named its leader (`Zonarer says, 'As you wish, oh
 //!     great one.'`) is filed as a player by the module; a mount or familiar a single-word name
@@ -30,6 +35,10 @@ pub struct MobNames {
     redirects: HashMap<String, String>,
     /// Those pages under [`mob_loose`]: a page's own title is its own name.
     pages: HashSet<String>,
+    /// Plain page titles (no disambiguation) under [`mob_loose`]: known in every zone.
+    plain: HashSet<String>,
+    /// Zone-titled pages under [`mob_loose`] of their plain name → their zones under [`zone_loose`].
+    split_zones: HashMap<String, Vec<String>>,
 }
 
 impl MobNames {
@@ -50,6 +59,38 @@ impl MobNames {
         self.redirects = redirects.iter().map(|(n, page)| (mob_loose(n), page.clone())).collect();
         self.pages = redirects.iter().map(|(_, page)| mob_loose(page)).collect();
         self
+    }
+
+    /// The page titles (`GapIndex::mob_pages`) and the zone-titled pages' zones (`mob_zone_splits`).
+    #[must_use]
+    pub fn with_zone_splits(mut self, pages: &[String], splits: &[(String, Vec<String>)]) -> Self {
+        let titled = |t: &str| t.ends_with(')') && t.contains(" (");
+        self.plain = pages.iter().filter(|p| !titled(p)).map(|p| mob_loose(p)).collect();
+        for (page, zones) in splits {
+            let at = self.split_zones.entry(mob_loose(page)).or_default();
+            at.extend(zones.iter().map(|z| zone_loose(z)));
+        }
+        self
+    }
+
+    /// A name whose only pages are zone-titled: known in their zones alone (`known_in`), and a row
+    /// elsewhere wants a zone-titled page of its own.
+    pub fn zone_titled(&self, name: &str) -> bool {
+        let key = mob_loose(name);
+        !self.plain.contains(&key) && !self.redirects.contains_key(&key) && self.split_zones.contains_key(&key)
+    }
+
+    /// [`Self::known`], except that a name known only through zone-titled pages is known in their
+    /// zones alone; with no zone known yet, as `known`.
+    pub fn known_in(&self, k: &dyn Knowledge, name: &str, zone: Option<&str>) -> bool {
+        if !self.known(k, name) {
+            return false;
+        }
+        let Some(zone) = zone.filter(|_| self.zone_titled(name)) else {
+            return true;
+        };
+        let here = zone_loose(zone);
+        self.split_zones.get(&mob_loose(name)).is_some_and(|zones| zones.iter().any(|z| zone_matches(&here, z)))
     }
 
     /// The page a mob name reaches only through a wiki redirect that is more than a respelling
@@ -99,6 +140,32 @@ fn mob_loose(name: &str) -> String {
         .find_map(|a| loose.strip_prefix(a))
         .unwrap_or(&loose)
         .to_string()
+}
+
+/// A zone as the log or a page names it, folded for comparing: `The Warrens 2 (Adaptive) [instance 3]`,
+/// `The Warrens - Group` and `the warrens` are one.
+fn zone_loose(zone: &str) -> String {
+    let bare = zone.split(" [instance ").next().unwrap_or(zone);
+    let bare = bare.split(" - ").next().unwrap_or(bare);
+    let (base, _) = crate::jsfn::zone_tier(bare);
+    let loose = loose_key(&base.to_lowercase());
+    loose.strip_prefix("the ").unwrap_or(&loose).to_string()
+}
+
+/// Whether the zone the log names is one a page states, allowing the wiki's short forms (`Eastern
+/// Karana` for `The Eastern Plains of Karana`, `Lake Rathe` for `Lake Rathetear`, `Unrest` for `The
+/// Estate of Unrest`, both under [`zone_loose`]): equal, one within the other, or a telling word
+/// shared. Lenient on purpose: a miss here makes a known mob a row, a false match keeps today's answer.
+fn zone_matches(here: &str, stated: &str) -> bool {
+    if here == stated || here.contains(stated) || stated.contains(here) {
+        return true;
+    }
+    const COMMON: [&str; 14] = ["north", "south", "east", "west", "northern", "southern", "eastern", "western", "greater", "lesser", "upper", "lower", "plane", "plains"];
+    fn telling(z: &str) -> Vec<&str> {
+        z.split(' ').filter(|w| w.len() >= 5 && !COMMON.contains(w)).collect()
+    }
+    let a = telling(here);
+    telling(stated).iter().any(|w| a.contains(w))
 }
 
 /// `a necro initiate pet` → `a necro initiate`: the name an unknown mob's pet is filed under.
@@ -161,6 +228,27 @@ pub fn is_pet_name(name: &str) -> bool {
             })
         })
     })
+}
+
+#[cfg(test)]
+mod zone_tests {
+    use super::{zone_loose, zone_matches};
+
+    /// The wiki's zone fields against the log's zone lines (the 42 zone-titled-only pages, 2026-11-10).
+    #[test]
+    fn a_pages_zone_is_matched_by_the_logs_spelling_of_it_at_any_tier() {
+        let m = |here: &str, stated: &str| zone_matches(&zone_loose(here), &zone_loose(stated));
+        assert!(m("The Warrens 2 (Adaptive)", "The Warrens"));
+        assert!(m("Befallen 4 (Refined) [instance 3]", "Befallen"));
+        assert!(m("The Eastern Plains of Karana", "Eastern Karana"));
+        assert!(m("Lake Rathetear", "Lake Rathe"));
+        assert!(m("The Estate of Unrest", "Unrest"));
+        assert!(m("Runnyeye Citadel", "Clan Runnyeye"));
+        assert!(m("The Permafrost Caverns - Group", "Permafrost"));
+        assert!(!m("The Rathe Mountains", "The Warrens"), "the owner's kobold");
+        assert!(!m("The Rathe Mountains", "Lake Rathetear"));
+        assert!(!m("Toxxulia Forest", "Greater Faydark"));
+    }
 }
 
 #[cfg(test)]

@@ -15,6 +15,7 @@ import {
   gapsCaption,
   foldZoneTally,
   gapZone,
+  zoneTitledPage,
   gapInZone,
   tallyText,
   visibleGaps,
@@ -242,6 +243,14 @@ test('a first click puts counts and dates biggest first, text A to Z', () => {
   assert.equal(firstGapSortDir('count'), 'desc')
   assert.equal(firstGapSortDir('last'), 'desc')
   assert.equal(firstGapSortDir('name'), 'asc')
+})
+
+// Owner, 2026-11-10: a kobold killed in Rathe Mountains is not `A kobold (Warrens)`; its page is titled with its zone.
+test('A MOB WHOSE PLAIN NAME IS A ZONE-TITLED PAGE ELSEWHERE GETS A PAGE TITLED WITH ITS OWN ZONE', () => {
+  const zones = { entries: [{ name: 'The Rathe Mountains 2 (Adaptive)', n: 27 }, { name: 'Toxxulia Forest', n: 1 }], distinct: 2 }
+  const kobold = row(['mob', 'a kobold', ['killed'], 28], { zones })
+  assert.equal(zoneTitledPage(kobold), 'A kobold (Rathe Mountains)')
+  assert.equal(zoneTitledPage(row(['mob', 'Zok Drup', ['spoke'], 1])), 'Zok Drup')
 })
 
 test('Zone shows where a row was named most and sorts by it, A to Z (owner, 2026-10-17)', () => {

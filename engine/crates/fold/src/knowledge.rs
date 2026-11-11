@@ -95,6 +95,13 @@ pub struct GapIndex {
     pub item_effects: Vec<(String, String)>,
     /// Every name the mob catalog states, as its pages spell them.
     pub mob_names: Vec<String>,
+    /// Every mob page title. A plain title (`A kobold runt`) makes its name known in every zone.
+    pub mob_pages: Vec<String>,
+    /// Every mob page titled with a disambiguation, with the zones its record states: `(page,
+    /// zones)`. A name known ONLY through such pages is known only in those zones (owner,
+    /// 2026-11-10: `a kobold` killed in Rathe Mountains is not `A kobold (Warrens)`; it drops
+    /// other things and wants its own page).
+    pub mob_zone_splits: Vec<(String, Vec<String>)>,
     /// Every item key (and redirect name) whose page says the item may not be in Legends
     /// (`{{DNE}}`, `{{delete}}`): `(key, page, notices)`. A thing the log met is proof it exists, so
     /// its page is work to do (owner, 2026-10-22).
