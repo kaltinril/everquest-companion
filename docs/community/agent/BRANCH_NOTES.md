@@ -303,6 +303,11 @@ where one exists.
   `gapMobPage.ts` carries both finders. Owner: Zok Crikk, hailed beside a `/loc`, page created and
   marked done, yet Unusual Wine and Ale - Part 2's row had an empty loc cell (his page postdates the
   2026-11-08 scrape, so the catalog had nothing). The catalog's spot still wins where it has one.
+- 2026-11-10: a mob's `/loc` points within 20 units of a kept spot's mean are that spot, averaged
+  (`gaps_locs.rs CLUSTER_UNITS`; owner: two `/loc`s beside Scribe Noglleg "are basically the same
+  loc", then "100 units is a bit much, should be 20 or so"). A point further off is a second spot, as
+  before. Measured (MEASURED.md, /loc section): his standing NPCs' pairs lie 36 to 50 apart, so at 20
+  those still read as two spots; roamers 273 and up.
 - 2026-11-10: a quest page titled `<name> (quest)` / `(Quest)` (the wiki's suffix when the plain title
   is a mob's, item's or zone's; 9 of 913 catalog pages) answers to the game's task name without the
   suffix (`gapQuests.ts questCatalogFinder`). Owner: the Skunk Scent Gland task was a New page while

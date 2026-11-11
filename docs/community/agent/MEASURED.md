@@ -246,6 +246,11 @@ SK, others).
 - `Your Location is -790.65, 173.39, -12.01` IS written to the log file on EQ Legends (6 lines in the
   owner's live log on 2026-10-18), against `features/maps/locMarker.ts`'s header, which measured zero on
   the creator's log. Order is /loc's (y, x, z), the same order the wiki's `|location` uses.
+- How far apart a mob's `/loc` points fall (owner's 68 placed mobs, 2026-11-10; 10 had two or more):
+  standing NPCs 36 to 50 (A scouting kobold, Trooper Axyl, Scribe Noglleg), roamers 273 to 878 (a feral
+  bleeder, a bleeder pupa, a dune spiderling, a kobold, Dar Guard Lraktol), one wanderer's three at 51 and
+  118 (an undead servant). `gaps_locs.rs CLUSTER_UNITS` = 20 (owner's ruling, "20 or so"): points
+  within it of a spot's mean are that spot, averaged; his standing NPCs' pairs above still read as two.
 - The faction line on Legends is `Your faction standing with X has been adjusted by -20.` (or `could not
   possibly get any better/worse.`), printed just before the kill's death line, same second.
 
