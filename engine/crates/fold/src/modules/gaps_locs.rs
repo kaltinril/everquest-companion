@@ -7,8 +7,12 @@
 //! ```
 //!
 //! EQ Legends writes the `/loc` line to the log (the owner's, 2026-10-18). A con or a hail takes
-//! the `/loc` read within LOC_PAIR_MS before it, else the next one within LOC_PAIR_MS after; each
-//! distinct point is kept per mob, rounded, in `/loc`'s own order, which is the wiki's.
+//! the `/loc` read within LOC_PAIR_MS before it, else the next one within LOC_PAIR_MS after. Each
+//! point is kept per mob in `/loc`'s own order, which is the wiki's; points within CLUSTER_UNITS
+//! of a kept spot are that spot, averaged (owner, 2026-11-10: two `/loc`s beside one merchant "are
+//! basically the same loc"; his ruling: 20 units). Measured on the owner's 68 placed mobs: a
+//! standing NPC's points lie 36 to 50 apart, a roamer's 273 and up, one wanderer's three at 51 and
+//! 118, so at 20 units two `/loc`s from different sides of one NPC still read as two spots.
 
 use crate::event::Event;
 use crate::message_overlay::message_text_of;
@@ -17,8 +21,26 @@ use std::collections::HashMap;
 
 /// LOC, hail, LOC is a few seconds' work; a con from across the zone a minute later is not.
 const LOC_PAIR_MS: i64 = 10_000;
-/// Points nearer than this are one spawn point.
-const SAME_POINT: f64 = 10.0;
+/// Points within this of a spot's mean are that spot (owner's ruling, 2026-11-10: "should be 20 or
+/// so"; his standing NPCs measured 36 to 50 apart, roamers 273 and up).
+const CLUSTER_UNITS: f64 = 20.0;
+
+/// One spot: the running mean of the `/loc` points read beside the mob there.
+struct Cluster {
+    sum: [f64; 3],
+    n: f64,
+}
+
+impl Cluster {
+    fn mean(&self) -> [f64; 3] {
+        self.sum.map(|v| v / self.n)
+    }
+
+    /// The mean rounded, as the page writes it.
+    fn point(&self) -> [f64; 3] {
+        self.mean().map(f64::round)
+    }
+}
 
 /// `Your Location is -790.65, 173.39, -12.01` → the three numbers.
 pub(crate) fn loc_of(text: &str) -> Option<[f64; 3]> {
@@ -40,7 +62,8 @@ fn hail_of(text: &str) -> Option<&str> {
 struct Spot {
     mob: String,
     zone: String,
-    points: Vec<[f64; 3]>,
+    /// In the order first seen.
+    clusters: Vec<Cluster>,
 }
 
 #[derive(Default)]
@@ -87,15 +110,26 @@ impl MobLocs {
             .or_insert_with(|| Spot {
                 mob: mob.to_string(),
                 zone: String::new(),
-                points: Vec::new(),
+                clusters: Vec::new(),
             });
         spot.zone = zone.unwrap_or_default().to_string();
-        let near = |q: &[f64; 3]| (q[0] - p[0]).hypot(q[1] - p[1]) < SAME_POINT;
-        if spot.points.iter().any(near) {
-            return false;
+        let near = |c: &&mut Cluster| {
+            let m = c.mean();
+            (m[0] - p[0]).hypot(m[1] - p[1]) < CLUSTER_UNITS
+        };
+        // True when the served point moved: a /loc on the spot's mean changes nothing.
+        match spot.clusters.iter_mut().find(near) {
+            Some(c) => {
+                let was = c.point();
+                c.sum = [c.sum[0] + p[0], c.sum[1] + p[1], c.sum[2] + p[2]];
+                c.n += 1.0;
+                c.point() != was
+            }
+            None => {
+                spot.clusters.push(Cluster { sum: p, n: 1.0 });
+                true
+            }
         }
-        spot.points.push(p.map(f64::round));
-        true
     }
 
     /// `[{mob, zone, points: [[y, x, z], …]}]`, by mob.
@@ -105,7 +139,7 @@ impl MobLocs {
         Value::Array(
             spots
                 .iter()
-                .map(|s| json!({ "mob": s.mob, "zone": s.zone, "points": s.points }))
+                .map(|s| json!({ "mob": s.mob, "zone": s.zone, "points": s.clusters.iter().map(Cluster::point).collect::<Vec<_>>() }))
                 .collect(),
         )
     }
@@ -154,5 +188,22 @@ mod tests {
             serde_json::json!([[-791.0, 173.0, -12.0]])
         );
         assert_eq!(served[0]["points"], serde_json::json!([[10.0, -21.0, 1.0]]));
+    }
+
+    /// Owner, 2026-11-10: two `/loc`s a few steps apart beside Scribe Noglleg are one spot, averaged;
+    /// at his 20 units, a point 50 away (his second Noglleg `/loc`) is another spot.
+    #[test]
+    fn points_beside_one_mob_average_into_one_spot_and_a_far_point_is_another() {
+        let mut m = MobLocs::default();
+        m.line(&line("Your Location is -2058.60, 1935.27, 1.54", 0), Some("The Rathe Mountains"));
+        assert!(m.target("Scribe Noglleg", 1_000, Some("The Rathe Mountains")));
+        m.line(&line("Your Location is -2050.10, 1947.40, 2.04", 60_000), Some("The Rathe Mountains"));
+        assert!(m.target("Scribe Noglleg", 61_000, Some("The Rathe Mountains")), "the mean moved");
+        assert_eq!(m.serve()[0]["points"], serde_json::json!([[-2054.0, 1941.0, 2.0]]));
+        m.line(&line("Your Location is -2054.35, 1941.33, 1.79", 120_000), Some("The Rathe Mountains"));
+        assert!(!m.target("Scribe Noglleg", 121_000, Some("The Rathe Mountains")), "a /loc on the mean changes nothing");
+        m.line(&line("Your Location is -2056.10, 1985.40, 2.04", 180_000), Some("The Rathe Mountains"));
+        assert!(m.target("Scribe Noglleg", 181_000, Some("The Rathe Mountains")));
+        assert_eq!(m.serve()[0]["points"], serde_json::json!([[-2054.0, 1941.0, 2.0], [-2056.0, 1985.0, 2.0]]), "44 units away is a second spot at 20");
     }
 }
