@@ -12,7 +12,10 @@
                                 runtime. This is the single deliberate relaxation.
         img-src eqimg:          the permanent image cache's scheme. `https:` is deliberately
                                 ABSENT so a raw remote <img> fails loudly instead of silently
-                                bypassing the cache (imageCache.ts); `data:` is for inline SVG.
+                                bypassing the cache (imageCache.ts); `data:` is for inline SVG;
+                                `blob:` shows a pasted or captured item window back to the player
+                                beside the "is it this item's?" question (gaps/PasteZone.tsx) —
+                                bytes already in the renderer, never fetched.
         media-src blob:         alert sounds arrive over IPC as bytes and are played from a
                                 Blob URL (features/alerts/soundCache.ts) — never fetched.
         media-src eqspeech:     the permanent SPEECH cache's scheme (speech/cache.ts): a
@@ -29,7 +32,7 @@
     -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: eqimg:; media-src 'self' blob: eqspeech:; font-src 'self' data:; connect-src 'self'; object-src 'none'; frame-src 'none'; child-src 'none'; base-uri 'none'; form-action 'none'"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: eqimg:; media-src 'self' blob: eqspeech:; font-src 'self' data:; connect-src 'self'; object-src 'none'; frame-src 'none'; child-src 'none'; base-uri 'none'; form-action 'none'"
     />
     <title>EQ Legends Companion TEST</title>
   </head>
