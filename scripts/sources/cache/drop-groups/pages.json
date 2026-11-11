@@ -72,10 +72,6 @@
   "content": "{{Classic Era}}\n<onlyinclude>{{Itempage\n|notes       = {{Item Lore|Treant heart}}<br>\nMay be obtained as a reward (small chance) from turning in [[Small Lantern]] to [[Jyle Windshot]] in [[West Freeport]]\n|itemname    = Wooden Heart\n|lucy_img_ID = 1003\n|statsblock  = \nNo Trade, Quest<br>\nWT: 2.0  Size: SMALL<br>\nClass: ALL<br>\nRace: ALL<br>\n|dropsfrom = \n\n[[Southern Karana]]\n\n* [[a treant]]\n\n|relatedquests = \n\n* [[Rain Caller Quest]]\n\n}}</onlyinclude>\n\n\n[[Category:Southern Karana]]\n\n[[Category:Quest Items]]"
  },
  {
-  "title": "Airborne Spores",
-  "content": ""
- },
- {
   "title": "An Alligator Tooth",
   "content": "{{Classic Era}}\n<onlyinclude>{{Itempage\n|notes       = For the earring, see [[Alligator Tooth Earring]]. No use in Classic, but for quests in Planes of Power expansion.\n|itemname    = Alligator Tooth\n|lucy_img_ID = 803\n|merchant_value = 7s 1c\n|statsblock  = \nQuest<br>\nWT: 0.1  Size: TINY<br>\nClass: ALL<br>\nRace: ALL<br>\n|dropsfrom = \n\n[[Innothule Swamp]]\n\n* [[a bull alligator]]\n* [[a swamp alligator]]\n\n|relatedquests =\n\n* [[Dark One's Armor]]\n* [[Spiritcharmer Final Job]]\n}}</onlyinclude>\n\n\n[[Category:Innothule Swamp]]\n\n[[Category:Quest Items]]"
  },
@@ -172,10 +168,6 @@
   "content": ""
  },
  {
-  "title": "Chunk of Digested Earth",
-  "content": ""
- },
- {
   "title": "Classic Mid-Tier Treasures",
   "content": "These are treasure loot that drop from higher end monsters in Everquest. Typically they can be found on monsters in the level 25-35 range.  The gems can be used for [[Jewelcrafting]] but they are typically just sold to vendors.\n\n<ul><li> {{:Amber}}\n</li><li> {{:Topaz}}\n</li><li> {{:Gold Ring}}\n</li><li> {{:Jade}}\n</li><li> {{:Pearl}}\n</li><li> {{:Peridot}}\n</li><li> {{:Silver Amulet}}\n</li><li> {{:Mithril Earring}}\n</li><li> {{:Jade Earring}}\n</li><li> {{:Flame Agate}}\n</li><li> {{:Ivory}}\n</li></ul>"
  },
@@ -202,18 +194,6 @@
  {
   "title": "Composition of Ervaj",
   "content": "<noinclude>{{Velious Era}}</noinclude>\n{{Spellpagesmart|\n\n| spellname = Song: Composition of Ervaj\n| spellicon = A\n| description = An ancient song that increases the attack speed of your group.  This increase is cumulative with most other effects that increase attack speed. It does stack with other haste buffs, it does not bypass the [[Haste_Guide#Haste_Caps|Haste_Cap]].\n| Table = {{{Table|0}}}\n| TableLevel = {{{TableLevel|}}}\n\n| classes = \n\n* [[Bard]] - Level 60\n\n| slots = \n\n{{SpellSlotRowSmart | 1 | Increase Haste v2 by 10% | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}\n{{SpellSlotRowSmart | 4 | Increase AC by 9 (L60) to 9 (L65) | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}\n{{SpellSlotRowSmart | Enhanced by instrument? | '''Yes (except attack speed)''' | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}\n\n| skill = [[Skill Brass | Brass]] †\n\n| mana = 0\n| range = 0\n| casting_time = 3.00\n| fizzle_time = 0.00\n| recast_time = 0.00\n| duration = 3 ticks\n| target_type = Party\n| spell_type = Beneficial\n| resist = Unresistable\n\n| other = \n\n* '''Focus:''' [[Horn]]\n\n| msg_cast_on_you = A song of inspiration fills your weapon arm with strength.\n| msg_cast_on_other =  \n| msg_wears_off =  \n\n| where_to_obtain = \n\n* Drop from level 50+ Velious mobs\n\n[[Cobalt Scar]]\n* [[Kelorek'Dar]]\n\n| TableLocations = Unknown\n| TableEra = Velious\n}}"
- },
- {
-  "title": "Crab Spider's Carapace",
-  "content": ""
- },
- {
-  "title": "Crab Spiderling Eye",
-  "content": ""
- },
- {
-  "title": "Cracked Crab Spider Leg",
-  "content": ""
  },
  {
   "title": "Cracked Femur",
@@ -382,6 +362,10 @@
  {
   "title": "King Cod Card",
   "content": "{{Velious Era}}\n\n<onlyinclude>{{Itempage\n|notes       = Obtained from [[Ferjeneror]] from the 4 Colored Cod Cards.\n|itemname    = A King Cod Card\n|lucy_img_ID = 651\n|statsblock  = \nMAGIC ITEM  QUEST ITEM<br>\nWT: 0.0  Size: TINY<br>\nClass: NONE<br>\nRace: NONE<br>\n|relatedquests = \n\n* [[Deck of Spontaneous Generation Quest]]\n}}</onlyinclude>\n\n\n\n[[Category:Quest Items]]"
+ },
+ {
+  "title": "Kobold Talon",
+  "content": ""
  },
  {
   "title": "Large Cloth Armor",
@@ -913,18 +897,6 @@
  },
  {
   "title": "Spell:Wandering Mind",
-  "content": ""
- },
- {
-  "title": "Spiderling Flesh",
-  "content": ""
- },
- {
-  "title": "Spiderling Meat",
-  "content": ""
- },
- {
-  "title": "Spore Fungus",
   "content": ""
  },
  {

@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-11T08:24:20.326Z",
+  "scrapedAt": "2026-11-11T09:55:48.457Z",
   "source": "eqlwiki.com — Category:NPCs/Named Mobs/Merchants/Raid Encounters ∪ embeddedin Template:Namedmobpage/MerchantPage, filtered to pages opening a mob template + recentchanges delta (scripts/scrape-delta.mts)",
   "mobs": [
     {
@@ -34036,6 +34036,51 @@
       "noImage": true
     },
     {
+      "page": "A kobold (Rathe Mountains)",
+      "eraTag": "Classic",
+      "name": "a kobold",
+      "level": "2-4",
+      "zones": [
+        "Rathe Mountains"
+      ],
+      "drops": [
+        "Bead Necklace",
+        "Cloth Armor",
+        "Copper Band",
+        "Kobold Scalp",
+        "Kobold Talisman",
+        "Kobold Talon",
+        "Lapis Lazuli",
+        "Malachite",
+        "Rusty Knuckles",
+        "Rusty Weapons",
+        "Small Cloth Armor",
+        "Woven Cap",
+        "Woven Cape",
+        "Woven Collar",
+        "Woven Girth",
+        "Woven Gloves",
+        "Woven Leggings",
+        "Woven Mask",
+        "Woven Sleeves"
+      ],
+      "loc": [
+        {
+          "ns": -1236,
+          "ew": 1035
+        },
+        {
+          "ns": -1131,
+          "ew": 1717
+        },
+        {
+          "ns": -1264,
+          "ew": 1563
+        }
+      ],
+      "image": "npc_a_kobold.png"
+    },
+    {
       "page": "A kobold (Warrens)",
       "eraTag": "Classic",
       "name": "a kobold (Warrens)",
@@ -34555,8 +34600,7 @@
         "1",
         "1"
       ],
-      "image": "npc_a_kobold_runt.png",
-      "noImage": true
+      "image": "npc_a_kobold_runt.png"
     },
     {
       "page": "A kobold runt (Steamfont)",
@@ -34582,8 +34626,7 @@
         "-30",
         "10"
       ],
-      "image": "npc_a_kobold_runt.png",
-      "noImage": true
+      "image": "npc_a_kobold_runt.png"
     },
     {
       "page": "A Kobold Scout",
@@ -34737,8 +34780,7 @@
         "10",
         "10"
       ],
-      "image": "npc_a_kobold_sentry.png",
-      "noImage": true
+      "image": "npc_a_kobold_sentry.png"
     },
     {
       "page": "A Kobold Shaman",
@@ -35411,8 +35453,7 @@
           "pct": 100
         }
       ],
-      "image": "npc_a_large_briar_snake.jpg",
-      "noImage": true
+      "image": "npc_a_large_briar_snake.png"
     },
     {
       "page": "A large commoner",
@@ -35978,8 +36019,7 @@
           "pct": 100
         }
       ],
-      "image": "npc_a_large_thistle_snake.jpg",
-      "noImage": true
+      "image": "npc_a_large_thistle_snake.png"
     },
     {
       "page": "A large undead gnoll",
@@ -36050,8 +36090,7 @@
         "Spiderling Eye",
         "Spider Silk"
       ],
-      "image": "npc_a_large_widow.png",
-      "noImage": true
+      "image": "npc_a_large_widow.png"
     },
     {
       "page": "A large wisp",
@@ -75648,8 +75687,7 @@
       "relatedQuests": [
         "Air Tight Box Quest",
         "Cazic Thule Symbol Quests"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "An Initiate Familiar",
