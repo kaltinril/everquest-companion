@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-10T09:52:20.495Z",
+  "scrapedAt": "2026-11-11T08:24:20.326Z",
   "source": "eqlwiki.com — Category:NPCs/Named Mobs/Merchants/Raid Encounters ∪ embeddedin Template:Namedmobpage/MerchantPage, filtered to pages opening a mob template + recentchanges delta (scripts/scrape-delta.mts)",
   "mobs": [
     {
@@ -7920,8 +7920,7 @@
           "ew": 1003
         }
       ],
-      "image": "npc_a_crab_spiderling.png",
-      "noImage": true
+      "image": "npc_a_crab_spiderling.png"
     },
     {
       "page": "A Cracked Skeleton",
@@ -11995,6 +11994,25 @@
       "noImage": true
     },
     {
+      "page": "A domesticated bleeder",
+      "eraTag": "Classic",
+      "name": "a domesticated bleeder",
+      "level": "1",
+      "zones": [
+        "Rathe Mountains"
+      ],
+      "drops": [
+        "Small Mosquito Wing"
+      ],
+      "loc": [
+        {
+          "ns": -2250,
+          "ew": 952
+        }
+      ],
+      "image": "npc_a_domesticated_bleeder.png"
+    },
+    {
       "page": "A domesticated direwolf",
       "eraTag": "Velious",
       "name": "a domesticated direwolf",
@@ -12037,6 +12055,27 @@
       ],
       "image": "npc_a_domesticated_direwolf.png",
       "noImage": true
+    },
+    {
+      "page": "A domesticated hatchling",
+      "eraTag": "Classic",
+      "name": "a domesticated hatchling",
+      "level": "1",
+      "zones": [
+        "Rathe Mountains"
+      ],
+      "drops": [
+        "Spiderling Eye",
+        "Spiderling Legs",
+        "Spiderling Silk"
+      ],
+      "loc": [
+        {
+          "ns": -1604,
+          "ew": 211
+        }
+      ],
+      "image": "npc_a_domesticated_hatchling.png"
     },
     {
       "page": "A Drachnid Recluse",
@@ -78889,6 +78928,30 @@
       "noImage": true
     },
     {
+      "page": "An undead servant",
+      "eraTag": "Classic",
+      "name": "an undead servant",
+      "level": "10",
+      "zones": [
+        "Rathe Mountains"
+      ],
+      "loc": [
+        {
+          "ns": -1922,
+          "ew": 1988
+        },
+        {
+          "ns": -1955,
+          "ew": 1927
+        },
+        {
+          "ns": -1959,
+          "ew": 1876
+        }
+      ],
+      "image": "npc_an_undead_servant.png"
+    },
+    {
       "page": "An Undead Steward",
       "eraTag": "Classic",
       "name": "An Undead Steward",
@@ -81576,8 +81639,7 @@
         "-30",
         "-30"
       ],
-      "image": "npc_atheki_norkhitter.png",
-      "noImage": true
+      "image": "npc_atheki_norkhitter.png"
     },
     {
       "page": "Atheling Plague",
@@ -82812,13 +82874,6 @@
         }
       ],
       "merchant": true,
-      "factions": [
-        "Merchants of Kaladim"
-      ],
-      "factionAmounts": [
-        "-30"
-      ],
-      "image": "npc_banaf_norkhitter.jpg",
       "sells": [
         "Amber",
         "Bloodstone",
@@ -82841,7 +82896,13 @@
         "Topaz",
         "Turquoise"
       ],
-      "noImage": true
+      "factions": [
+        "Merchants of Kaladim"
+      ],
+      "factionAmounts": [
+        "-30"
+      ],
+      "image": "npc_banaf_norkhitter.png"
     },
     {
       "page": "Bandl McMarrin",
@@ -89014,6 +89075,22 @@
       ],
       "image": "npc_bogen_chazel.png",
       "noImage": true
+    },
+    {
+      "page": "Bok Master Thragnog",
+      "eraTag": "Classic",
+      "name": "Bok Master Thragnog",
+      "level": "70",
+      "zones": [
+        "Rathe Mountains"
+      ],
+      "loc": [
+        {
+          "ns": -1750,
+          "ew": 2146
+        }
+      ],
+      "image": "npc_bok_master_thragnog.png"
     },
     {
       "page": "Bolace",
@@ -108109,6 +108186,22 @@
       "noImage": true
     },
     {
+      "page": "Dar Guard Broktl",
+      "eraTag": "Classic",
+      "name": "Dar Guard Broktl",
+      "level": "9-11",
+      "zones": [
+        "Rathe Mountains"
+      ],
+      "loc": [
+        {
+          "ns": -1399,
+          "ew": 786
+        }
+      ],
+      "image": "npc_dar_guard_broktl.png"
+    },
+    {
       "page": "Dar Guard Fnabble",
       "eraTag": "Classic",
       "name": "Dar Guard Fnabble",
@@ -111976,8 +112069,7 @@
         "Miners Pick",
         "Parrying Pick Quest",
         "Runnyeye Warbeads (Kaladim Rogue)"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Diggory",
@@ -125577,6 +125669,38 @@
       ]
     },
     {
+      "page": "Frip Frooply",
+      "eraTag": "Classic",
+      "name": "Frip Frooply",
+      "level": "30",
+      "zones": [
+        "Rathe Mountains"
+      ],
+      "loc": [
+        {
+          "ns": -2235,
+          "ew": 627
+        }
+      ],
+      "merchant": true,
+      "sells": [
+        "Backpack",
+        "Bandages",
+        "Boots of the Long Road",
+        "Bottle of Milk",
+        "Decorative Mask",
+        "Fishing Bait",
+        "Fishing Pole",
+        "Iron Ration",
+        "Large Harness",
+        "Malachite",
+        "Ration",
+        "Trinket Pouch",
+        "Water Flask"
+      ],
+      "image": "npc_frip_frooply.png"
+    },
+    {
       "page": "Frist Furtun",
       "eraTag": "Kunark",
       "name": "Frist Furtun",
@@ -130190,6 +130314,22 @@
       "relatedQuests": [
         "Soldier's Brooch Quest"
       ]
+    },
+    {
+      "page": "Gaz Master Shargnol",
+      "eraTag": "Classic",
+      "name": "Gaz Master Shargnol",
+      "level": "70",
+      "zones": [
+        "Rathe Mountains"
+      ],
+      "loc": [
+        {
+          "ns": -1748,
+          "ew": 2103
+        }
+      ],
+      "image": "npc_gaz_master_shargnol.png"
     },
     {
       "page": "Gearheart",
@@ -169302,8 +169442,7 @@
         "-30",
         "-30"
       ],
-      "image": "npc_kalamin_norkhitter.png",
-      "noImage": true
+      "image": "npc_kalamin_norkhitter.png"
     },
     {
       "page": "Kalatrina Plossen",
@@ -176177,6 +176316,22 @@
         "Smithy Hammer",
         "The Firepride Secret of Heroes"
       ]
+    },
+    {
+      "page": "Kor Master Ralg",
+      "eraTag": "Classic",
+      "name": "Kor Master Ralg",
+      "level": "70",
+      "zones": [
+        "Rathe Mountains"
+      ],
+      "loc": [
+        {
+          "ns": -1883,
+          "ew": 2140
+        }
+      ],
+      "image": "npc_kor_master_ralg.png"
     },
     {
       "page": "Korakaz",
@@ -221607,6 +221762,23 @@
       ],
       "image": "npc_scraps.png",
       "noImage": true
+    },
+    {
+      "page": "Scribe Noglleg",
+      "eraTag": "Classic",
+      "name": "Scribe Noglleg",
+      "level": "50",
+      "zones": [
+        "Rathe Mountains"
+      ],
+      "loc": [
+        {
+          "ns": -2059,
+          "ew": 1935
+        }
+      ],
+      "merchant": true,
+      "image": "npc_scribe_noglleg.png"
     },
     {
       "page": "Scrounge",
@@ -273929,6 +274101,22 @@
       "relatedQuests": [
         "Phosphorous Powder for Zok Zribb"
       ]
+    },
+    {
+      "page": "Zol Master Malgorn",
+      "eraTag": "Classic",
+      "name": "Zol Master Malgorn",
+      "level": "70",
+      "zones": [
+        "Rathe Mountains"
+      ],
+      "loc": [
+        {
+          "ns": -2060,
+          "ew": 1957
+        }
+      ],
+      "image": "npc_zol_master_malgorn.png"
     },
     {
       "page": "Zombie Advisor",

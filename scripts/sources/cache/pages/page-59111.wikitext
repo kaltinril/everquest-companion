@@ -101,6 +101,11 @@ Applies to Charm, Fear, Lull/Pacify, Mez, Root, and Stun spells
 * +1? Level Cap
 * -15 Resist
 
+=== Dispel Magic ===
+* -2% Cast Time?
+* -2% Mana Cost?
+* +1/2 Spell Casting Level
+
 === Pets ===
 * -? Cast Time
 * -? Mana Cost

@@ -42,8 +42,8 @@ Kaladim is the underground city of the Dwarves of Norrath. A huge carved statue 
 |style="padding:10px;"|
 [[Image:nkaladim.jpg|right|border]]
 '''North Kaladim
-* 1. Merchant selling Gems
-* 2. Merchant selling Brellium, Ore, Smithy Hammers, Sharpening Stones
+* 1. Merchant selling Gems and Jewelcrafting Supplies ([[Banaf Norkhitter]])
+* 2. Merchant selling Brellium, Ore, Smithy Hammers, Sharpening Stones ([[Bloarn Norkhitter]])
 * 3. [[Cleric]] Guild - Merchants selling Blunt Weapons, Food and Goods Merchant outside
 * 4. Ratsbone Treasure and Assay Office - Bank, Merchants who sell Throwing Weapons ([[Kafia Ratsbone]]), Mining Supplies & Boxes ([[Kadek Norkhitter]]), and [[Rogue]] Guild Members outside
 * 5. Pottery Wheel and Kiln
