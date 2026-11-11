@@ -125,12 +125,23 @@ export const questTitleKey = (title: string): string =>
     .trim()
     .toLowerCase()
 
-/** The catalog's entry for a task name, by `questTitleKey`. */
+/**
+ * The wiki's suffix on a quest page whose plain title is a mob's, an item's or a zone's: `Skunk Scent
+ * Gland (quest)`, `Brother Trintle (Quest)` (9 of the 913 catalog pages, 2026-11-10). The game's task
+ * name has no suffix, so the plain title is a key too (owner, 2026-11-10: the Skunk Scent Gland task
+ * was a New page while the wiki had its page).
+ */
+const QUEST_SUFFIX = /\s*\((?:quest|task)\)\s*$/i
+
+/** The catalog's entry for a task name, by `questTitleKey`; a `(quest)` page answers to its plain title too. */
 export function questCatalogFinder(entries: readonly QuestCatalogEntry[]): (name: string) => QuestCatalogEntry | undefined {
   const by = new Map<string, QuestCatalogEntry>()
-  for (const e of entries) {
-    for (const t of [e.page, e.name]) if (!by.has(questTitleKey(t))) by.set(questTitleKey(t), e)
+  const put = (t: string, e: QuestCatalogEntry): void => {
+    if (!by.has(questTitleKey(t))) by.set(questTitleKey(t), e)
   }
+  for (const e of entries) for (const t of [e.page, e.name]) put(t, e)
+  // After every exact title, so a plain title that is its own quest page keeps its own entry.
+  for (const e of entries) for (const t of [e.page, e.name]) if (QUEST_SUFFIX.test(t)) put(t.replace(QUEST_SUFFIX, ''), e)
   return (name) => by.get(questTitleKey(name))
 }
 

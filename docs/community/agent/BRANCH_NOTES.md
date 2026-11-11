@@ -303,6 +303,10 @@ where one exists.
   `gapMobPage.ts` carries both finders. Owner: Zok Crikk, hailed beside a `/loc`, page created and
   marked done, yet Unusual Wine and Ale - Part 2's row had an empty loc cell (his page postdates the
   2026-11-08 scrape, so the catalog had nothing). The catalog's spot still wins where it has one.
+- 2026-11-10: a quest page titled `<name> (quest)` / `(Quest)` (the wiki's suffix when the plain title
+  is a mob's, item's or zone's; 9 of 913 catalog pages) answers to the game's task name without the
+  suffix (`gapQuests.ts questCatalogFinder`). Owner: the Skunk Scent Gland task was a New page while
+  the wiki had `Skunk Scent Gland (quest)`. A plain title that is its own quest page keeps its entry.
 - 2026-11-09: a KNOWN NPC's page lacking a quest the catalog says it gives is a Mobs row, an Update
   page (owner: Lord Ollix Everling's page, a template stub, lists none of The Tragic Tale of House
   Everling; the Mobs domain filed only unknown names and a quest enters only through a task line).
