@@ -200,13 +200,20 @@ function sentenceOf(row: GapRow, extras: MerchantExtras): MerchantDescription['s
   return { text: `${trade.trade} supplies merchant.`, from: `from what it sold: ${String(trade.count)} of ${String(sold.length)} items are ${trade.trade.toLowerCase()} supplies` }
 }
 
+/** Whose hail answer the page quotes: a merchant, a mob with a role or a nameplate, or a named NPC (no `a`/`an`/`the`). */
+function hailWorthQuoting(row: GapRow, extras: MerchantExtras): boolean {
+  return row.domain === 'merchant' || roleOf(row) !== undefined || extras.nameplate?.(row.name) !== undefined || !/^(a|an|the)\s/i.test(row.name)
+}
+
 /** A new merchant page's description; undefined for a page that exists or when nothing says one. */
 export function merchantDescription(row: GapRow, extras: MerchantExtras): MerchantDescription | undefined {
   if (gapJob(row, { isMob: extras.isMob }) !== 'new') return undefined
   const sentence = sentenceOf(row, extras)
   const said = greetingOf(row)
   const greeting = said === undefined ? undefined : maskedGreeting(said, extras.ownNames ?? [])
-  const quote = greeting === undefined ? undefined : `:You say, 'Hail ${row.name}'\n\n${row.name} says, '${greeting}'`
+  // A generic mob's bark is no description (owner, 2026-11-10: a kobold's "Grrrrr. Bark."): the hail
+  // answer is quoted for a merchant, a mob with a role or a nameplate, or a named NPC.
+  const quote = greeting === undefined || !hailWorthQuoting(row, extras) ? undefined : `:You say, 'Hail ${row.name}'\n\n${row.name} says, '${greeting}'`
   const text = [sentence?.text, quote].filter((t) => t !== undefined).join('\n\n')
   return text === '' ? undefined : { text, ...(sentence === undefined ? {} : { sentence }), ...(greeting === undefined ? {} : { greeting }) }
 }

@@ -11,7 +11,8 @@ import { ipcMain } from 'electron'
 import { IPC } from '../shared/ipc'
 import type { GapVerdict } from '../shared/gaps'
 import { lookupItemOnCopy } from './itemLookup'
-import { lookupMobOnCopy } from './mobLookup'
+import { lookupMobOnCopy, readMobPage } from './mobLookup'
+import type { MobPageRead } from '../shared/gapPageMerge'
 import { lookupVerdict } from '../shared/gapExistingPage'
 
 /** One row's lookup and its verdict; a read that could not reach the wiki is no answer (gapVerdictsRead.ts). */
@@ -20,10 +21,18 @@ export async function copyLookup(domain: 'item' | 'mob', name: string): Promise<
   return answer.offline === true ? 'unchecked' : lookupVerdict(name, answer)
 }
 
+/** A Mobs or Merchants row's Copy click: the live page, read fresh (owner, 2026-11-10), for the renderer's merge. */
+export function copyPageRead(name: string, title?: string): Promise<MobPageRead> {
+  return readMobPage(name, title)
+}
+
+const aName = (v: unknown): v is string => typeof v === 'string' && v.trim() !== '' && v.length <= 200
+
 export function registerGapCopyLookupIpc(): void {
   ipcMain.handle(IPC.gapCopyLookup, (_e, domain: unknown, name: unknown) =>
-    (domain === 'item' || domain === 'mob') && typeof name === 'string' && name.trim() !== '' && name.length <= 200
-      ? copyLookup(domain, name.trim())
-      : 'unchecked'
+    (domain === 'item' || domain === 'mob') && aName(name) ? copyLookup(domain, name.trim()) : 'unchecked'
+  )
+  ipcMain.handle(IPC.gapMobPageRead, (_e, name: unknown, title: unknown): Promise<MobPageRead> =>
+    aName(name) ? copyPageRead(name.trim(), aName(title) ? title.trim() : undefined) : Promise.resolve({ offline: true })
   )
 }

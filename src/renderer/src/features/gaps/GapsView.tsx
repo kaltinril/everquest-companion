@@ -11,7 +11,9 @@
 import { type JSX, useCallback, useMemo, useState } from 'react'
 import { Box, Button, Checkbox, CircularProgress, FormControlLabel, MenuItem, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import { GAP_DOMAINS, GAP_DOMAIN_HELP, GAP_DOMAIN_LABELS, GAP_SHOWN_NOUN, gapsAsText, hiddenBy, visibleGaps, type GapDomain, type GapRow, type GapsSnap } from '@shared/gaps'
+import { GAP_DOMAIN_HELP, GAP_DOMAIN_LABELS, GAP_SHOWN_NOUN, gapsAsText, hiddenBy, visibleGaps, type GapDomain, type GapRow, type GapsSnap } from '@shared/gaps'
+import { GAP_TABS, needsCopyText } from '@shared/gapNeeds'
+import NeedsChips from './NeedsChips'
 import { heldCaption, type HeldFilter, type HeldPick } from '@shared/gapHeld'
 import { GAP_SHOW_WORDS, jobCaption, type GapShow } from '@shared/gapJob'
 import { wikiPageText } from '@shared/wikiPage'
@@ -161,7 +163,7 @@ function DomainToggle({
       }}
       data-testid="gaps-domain"
     >
-      {GAP_DOMAINS.map((d) => (
+      {GAP_TABS.map((d) => (
         <ToggleButton key={d} value={d} sx={{ textTransform: 'none', px: 1.5 }}>
           <Stack alignItems="flex-start">
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
@@ -228,7 +230,7 @@ export default function GapsView(): JSX.Element {
   // The list itself, from the engine's rows to the order on screen, is the hook the Wiki Gaps
   // overlay's publisher runs too (useGapsList), so the overlay lists what this tab lists.
   const list = useGapsList()
-  const { allChars, domain, setDomain, query, setQuery, hereOnly, setHereOnly, current, zone, playerList, rows, marks, showDone, setShowDone, holding, job, readiness, mine, sure, visible, verdicts, sort, onSort, sorted } = list
+  const { allChars, domain, setDomain, query, setQuery, hereOnly, setHereOnly, current, zone, playerList, rows, marks, showDone, setShowDone, holding, job, readiness, mine, sure, visible, verdicts, sort, onSort, sorted, needs } = list
   const { snap, loot, kills, seenBy, joining, forced } = list.data
   // While this tab is mounted it feeds the overlay itself, and the headless publisher stands down.
   useMarkGapsTabMounted()
@@ -240,7 +242,8 @@ export default function GapsView(): JSX.Element {
   // What the pages read beside the ledgers (each kill's factions, each mob's points, the install's spell
   // files, the kept screenshots) and what each row still lacks come from the list (useGapReady).
   const { sightings, needed } = readiness
-  const pageText = useCallback((row: GapRow) => wikiPageText(row, loot, kills, sightings), [loot, kills, sightings])
+  // An Update row on the Mobs list copies its field rows' lines, never a page over one that exists (gapNeeds.ts).
+  const pageText = useCallback((row: GapRow) => needsCopyText(row, needs.index, (r) => wikiPageText(r, loot, kills, sightings), CHIP_CONTEXT) ?? wikiPageText(row, loot, kills, sightings), [loot, kills, sightings, needs.index])
   // "Group by zone, then mob" (owner ask, 2026-10-18), its heading order and its folds (useGrouping).
   const group = useGrouping(sorted, loot, zone)
 
@@ -268,6 +271,7 @@ export default function GapsView(): JSX.Element {
       {/* Two rows (owner, 2026-10-20: "put search and all the values after that on the next row
           instead of next to the tabs"): the domains alone, then what narrows them, Copy list last. */}
       <DomainToggle snap={snap} domain={domain} zone={zone} onPick={setDomain} hidden={hiddenRow} heldOnly={mine.pick === 'off' ? null : { index: holding, where: mine.pick }} />
+      {domain === 'mob' && <NeedsChips needs={needs} />}
       <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" useFlexGap>
         <TextField
           size="small"
@@ -316,6 +320,7 @@ export default function GapsView(): JSX.Element {
         chipContext={CHIP_CONTEXT}
         seenBy={seenBy}
         hiddenByFilter={held > 0}
+        needsOf={needs.of}
         {...group.folds}
         nameLead={<GroupHeaderControls group={group} />}
       />

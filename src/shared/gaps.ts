@@ -39,7 +39,7 @@ export const GAP_DOMAIN_LABELS: Record<GapDomain, string> = { item: 'Items', mob
 /** What the shown-count line calls a domain's rows: "Showing 11 of 395 mobs missing a wiki picture" (owner, 2026-10-19: "unknown images" read oddly). */
 export const GAP_SHOWN_NOUN: Record<GapDomain, string> = {
   item: 'items with no wiki page',
-  mob: 'mobs with no wiki page',
+  mob: 'mobs with no page, or a page that lacks something',
   spell: 'spells with no wiki page',
   merchant: 'merchants the wiki does not list',
   faction: 'factions to add or fix on mob pages',
@@ -54,7 +54,7 @@ export const GAP_SHOWN_NOUN: Record<GapDomain, string> = {
 /** One line under the toggle saying what the chosen domain's rows are (owner ask, 2026-10-18). */
 export const GAP_DOMAIN_HELP: Record<GapDomain, string> = {
   item: 'Items your log, inventory export or a capture names that have no wiki page yet: make the page.',
-  mob: 'Mobs you looted, killed, conned or hailed that have no wiki page yet: make the page.',
+  mob: 'Mobs you looted, killed, conned or hailed: make the page, or add what its page lacks (factions, drops, picture, respawn, quests).',
   spell: 'Spells cast near you that have no wiki page yet: make the page.',
   merchant: "NPCs you saw trading that the wiki doesn't mark as merchants: give them a merchant page.",
   faction: "Factions a kill changed that the mob's page is missing or states wrongly: fix the mob page.",

@@ -212,6 +212,31 @@ test('a Gaps row picks its page by domain and takes the vendor value from a sale
   assert.match(wikiPageText(row, [], {}), /\|merchant_value = 4s\n/)
 })
 
+// Owner, 2026-11-10: his A kobold (Rathe Mountains) page listed every rusty weapon and cloth piece one by one;
+// the Drops tab files those as their group (2026-10-21), so the page does too. And a zone-titled row takes
+// no loot from another zone's kobold.
+test('a mob page lists a drop group as its group line, rated by any member, and a zone-titled row keeps to its zone', () => {
+  const groups = { 'Rusty Weapons': ['Rusty Long Sword', 'Rusty Mace'], 'Cloth Armor': ['Cloth Cape', 'Cloth Gloves'] }
+  const zones = { entries: [{ name: 'The Rathe Mountains', n: 4 }], distinct: 1 }
+  const kobold = { domain: 'mob', name: 'a kobold', kinds: ['killed'], count: 4, first: '', last: '', details: { samples: [], zones }, zoneTitled: true } as unknown as GapRow
+  const loot: LootEvent[] = [
+    { ts: 1, item: 'Rusty Long Sword', source: 'a kobold', zone: 'The Rathe Mountains' },
+    { ts: 2, item: 'Rusty Mace', source: 'a kobold', zone: 'The Rathe Mountains 2 (Adaptive)' },
+    { ts: 3, item: 'Cloth Cape', source: 'a kobold', zone: 'The Rathe Mountains' },
+    { ts: 4, item: 'Kobold Scalp', source: 'a kobold', zone: 'The Rathe Mountains' },
+    { ts: 5, item: 'Dusty Burlap Cape', source: 'a kobold', zone: 'The Warrens' }
+  ]
+  const kills = { 'a kobold': { count: 20, mob: 'a kobold' } } as unknown as Parameters<typeof wikiPageText>[2]
+  const text = wikiPageText(kobold, loot, kills, { dropGroups: groups })
+  assert.ok(text.includes("<li> [[Rusty Weapons]] <span class='drare'>(Rare)</span> <span class='ddb'>[Overall: ~10%]</span> </li>"), text)
+  assert.ok(text.includes("<li> [[Cloth Armor]] <span class='drare'>(Rare)</span> <span class='ddb'>[Overall: ~5%]</span> </li>"), text)
+  assert.ok(text.includes('<li> {{:Kobold Scalp}} '), text)
+  assert.ok(!text.includes('Rusty Long Sword') && !text.includes('Dusty Burlap'), text)
+  // The same loot on a plain row (no zone title) takes every zone, as before.
+  const plain = wikiPageText({ ...kobold, zoneTitled: undefined } as unknown as GapRow, loot, kills, { dropGroups: groups })
+  assert.ok(plain.includes('{{:Dusty Burlap Cape}}'), plain)
+})
+
 // Review E3: a mob page's MONEY DROPS, in the layout of the wiki's 406 blocks, at the end of known_loot.
 test('a mob page ends known_loot with MONEY DROPS, each coin least to most over the kills that paid; none seen writes none', () => {
   const coin = { mob: 'A rabid kobold', n: 2, min: [0, 0, 0, 1], max: [0, 2, 4, 9] }
