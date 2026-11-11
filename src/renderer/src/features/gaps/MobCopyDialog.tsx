@@ -31,15 +31,18 @@ export function readMobPage(row: GapRow, title: string, onRead: (r: MobRead) => 
 }
 
 /** The copy made of the read: the merged page, the draft as a new page, or the draft with the wiki out of reach. */
-type MobCopy = { kind: 'merged'; title: string; merge: PageMerge } | { kind: 'draft'; title: string; text: string } | { kind: 'offline'; title: string; text: string } | { kind: 'freeText'; title: string; text: string }
+type MobCopy = { kind: 'merged'; title: string; merge: PageMerge; at: number } | { kind: 'draft'; title: string; text: string; at: number } | { kind: 'offline'; title: string; text: string } | { kind: 'freeText'; title: string; text: string }
+
+/** When the page was read, as a clock time: a read answers the row's clicks for a while (mobLookup.ts READ_KEEP_MS). */
+const clock = (at: number): string => new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 
 function copyOf(read: MobRead, title: string, draft: string): MobCopy | undefined {
   if (read.state === 'reading') return undefined
   const page = read.page
   if ('offline' in page) return { kind: 'offline', title, text: draft }
-  if (!page.found) return { kind: 'draft', title, text: draft }
+  if (!page.found) return { kind: 'draft', title, text: draft, at: page.at }
   if (!hasMobTemplate(page.wikitext)) return { kind: 'freeText', title: page.title, text: draft }
-  return { kind: 'merged', title: page.title, merge: mergeMobPage(page.wikitext, draft) }
+  return { kind: 'merged', title: page.title, merge: mergeMobPage(page.wikitext, draft), at: page.at }
 }
 
 const clipboardText = (c: MobCopy): string => (c.kind === 'merged' ? c.merge.text : c.text)
@@ -57,7 +60,7 @@ function Lead({ copy }: { copy: MobCopy }): JSX.Element {
     return (
       <Stack spacing={0.5} sx={{ p: 1, borderRadius: 1, bgcolor: 'rgba(76, 175, 80, 0.14)' }} data-testid="mob-copy-lead">
         <Typography variant="body2" sx={{ fontWeight: 600 }}>
-          Page found on the wiki just now. The whole page is on your clipboard with {n} {n === 1 ? 'field' : 'fields'} filled in
+          Page found on the wiki as of {clock(copy.at)}. The whole page is on your clipboard with {n} {n === 1 ? 'field' : 'fields'} filled in
           {m > 0 ? `; ${String(m)} ${m === 1 ? 'field is' : 'fields are'} left for you below.` : '.'}
         </Typography>
         <Typography variant="caption" color="text.secondary">
@@ -68,7 +71,7 @@ function Lead({ copy }: { copy: MobCopy }): JSX.Element {
     )
   }
   const words: Record<Exclude<MobCopy['kind'], 'merged'>, string> = {
-    draft: 'No page on the wiki as of just now. The whole new page is on your clipboard.',
+    draft: `No page on the wiki as of ${copy.kind === 'draft' ? clock(copy.at) : ''}. The whole new page is on your clipboard. (A read is kept for half an hour, so the wiki is not asked on every click.)`,
     offline: "Couldn't reach the wiki: the page from your log alone is on your clipboard. Check the wiki before you make a page.",
     freeText: `The wiki's page ${copy.title} is free text with no mob box, so nothing could be filled: the page from your log is on your clipboard to take fields from by hand.`
   }

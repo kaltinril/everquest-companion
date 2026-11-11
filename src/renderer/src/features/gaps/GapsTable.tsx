@@ -54,6 +54,7 @@ import { wikiPageUrl } from '@shared/wiki'
 import { Tooltip } from '../../lib/Tooltip'
 import { useWindowedRows } from '../../lib/useWindowedRows'
 import GapActionChips from './GapActionChips'
+import SeenAsChips from './SeenAsChips'
 import PageFixNote from './PageFixNote'
 import GapDetailsPanel from './GapDetailsPanel'
 import ShotPanel from './ShotPanel'
@@ -216,11 +217,7 @@ const GapTableRow = memo(function GapTableRow({
         <GapRowButtons row={row} pageText={work.pageText} isDone={done} onDone={work.onDone} compact />
       </TableCell>
       <TableCell sx={CLIP}>
-        <Stack direction="row" spacing={0.5} sx={{ flexWrap: 'nowrap' }}>
-          {row.kinds.map((k) => (
-            <Chip key={k} label={k} size="small" variant="outlined" />
-          ))}
-        </Stack>
+        <SeenAsChips kinds={row.kinds} />
       </TableCell>
       <TableCell sx={{ ...CLIP, color: 'text.secondary' }}>{gapZone(row)}</TableCell>
       <TableCell align="right" sx={CLIP}>{row.count.toLocaleString()}</TableCell>
@@ -290,6 +287,9 @@ function DetailsPane({ row, actions }: { row: GapRow; actions: PaneActions }): J
             Seen by: {seen.join(', ')}.
           </Typography>
         )}
+        <Typography variant="caption" color="text.secondary" component="div" data-testid="gaps-seen-as">
+          Seen as: {row.kinds.join(', ')}.
+        </Typography>
         {held.map((h) => (
           <Typography key={h.who ?? ''} variant="body2" color="success.main" component="div" data-testid="gaps-held-line">
             {gapJob(row) === 'update' ? heldWhere(h) : heldLine(h)}

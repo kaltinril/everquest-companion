@@ -81,16 +81,25 @@ test('A COPY CLICK IS THE ONE DOOR: it asks the wiki once, and every automatic l
   assert.equal(asked.length, 1, 'a cached answer is never asked again')
 })
 
-// Owner, 2026-11-10: Copy on a Mobs row "should do the fresh fetch of the page" every click, so the
-// copy fills only what the page lacks; a zero-hit search is "no page", and nothing of it is cached.
-test('A MOB COPY READS ITS PAGE FRESH ON EVERY CLICK: one search per click when the wiki has no page, never a cached answer', async () => {
+// Owner, 2026-11-10: Copy on a Mobs row "should do the fresh fetch of the page", so the copy fills only
+// what the page lacks; 2026-11-11: "we do not want to hit the wiki so much, we really need to avoid this
+// as much as possible": one read answers the row's clicks for half an hour, a zero-hit search is "no
+// page", and the lookups' cache takes none of it. A row that knows its page's title asks for that page
+// and never searches (a zone-titled row's plain name is another zone's page).
+test('A MOB COPY READS ITS PAGE ONCE: one search on the first click when the wiki has no page, none on the next, and a titled row never searches', async () => {
   asked.length = 0
-  assert.deepEqual(await copyPageRead('a zzyzx nowhere hound'), { found: false })
+  const first = await copyPageRead('a zzyzx nowhere hound')
+  assert.ok('found' in first && !first.found, 'the zero-hit search is no page')
   assert.equal(asked.length, 1)
   assert.match(asked[0], /^https:\/\/eqlwiki\.com\/api\.php\?.*list=search/)
-  assert.deepEqual(await copyPageRead('a zzyzx nowhere hound'), { found: false })
-  assert.equal(asked.length, 2, 'the second click asks again: the page may have been made since')
-  assert.equal(knownMob('a zzyzx nowhere hound'), null, 'a page read caches nothing')
+  assert.deepEqual(await copyPageRead('a zzyzx nowhere hound'), first)
+  assert.equal(asked.length, 1, 'the second click within the half hour asks nothing')
+  assert.equal(knownMob('a zzyzx nowhere hound'), null, 'a page read caches nothing for the lookups')
+  const titled = await copyPageRead('a zzyzx nowhere hound', 'A zzyzx nowhere hound (Nowhere)')
+  assert.ok('found' in titled && !titled.found)
+  assert.equal(asked.length, 2, 'the titled read is one page fetch')
+  assert.match(asked[1], /action=parse/)
+  assert.doesNotMatch(asked[1], /list=search/, 'the plain name is never searched for a titled row')
 })
 
 test('THE IMAGE HANDLER AS THE APP INSTALLS IT FETCHES NOTHING: a missing icon or portrait is a 404', async () => {

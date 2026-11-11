@@ -96,15 +96,29 @@ function copyWords(row: GapRow): { label: string; tip: string } {
   if (row.domain === 'notice') return { label: 'Copy proof', tip: 'What your log proves (how often, when, where, the lines), for the talk page or the edit summary.' }
   // A quest reads its wiki page first and adds to it (owner, 2026-10-23: "implement the diff idea").
   if (row.domain === 'quest') return { label: 'Copy wiki page', tip: 'Reads the wiki page and adds what your log saw, removing nothing.' }
-  // A mob reads its page first too (owner, 2026-11-10): empty fields filled, or a whole new page.
-  if (readsMobPage(row)) return { label: 'Copy wiki page', tip: 'Reads the wiki page first: fills only its empty fields, or copies a whole new page.' }
+  const mob = mobCopyWords(row)
+  if (mob !== undefined) return mob
   const tip = `Wiki markup from what your log saw. ${GAP_CAPTURE[row.domain]}`
   if (!pageExists(row)) return { label: 'Copy wiki page', tip }
   return { label: 'Copy draft (page exists)', tip: `The wiki already has this page: copy only the fields it lacks from this draft. Pasting all of it replaces what people wrote there. ${tip}` }
 }
 
-/** A Mobs or Merchants row whose Copy reads the live page first (MobCopyDialog.tsx); a redirect or a quest-giver add text does not. */
-const readsMobPage = (row: GapRow): boolean => (row.domain === 'mob' || row.domain === 'merchant') && row.suggest === undefined && row.forageUpdate === undefined && row.questGaps === undefined
+/**
+ * A Mobs or Merchants row's Copy words: a page read first for a new page (owner, 2026-11-10); the whole
+ * page for a redirected name, to create over the redirect when it is another mob (owner, 2026-11-11: a
+ * giant fire beetle sent to A giant beetle, and the read filled the beetle's page). Undefined for other rows.
+ */
+function mobCopyWords(row: GapRow): { label: string; tip: string } | undefined {
+  if (readsMobPage(row)) return { label: 'Copy wiki page', tip: 'Reads the wiki page first (a read is kept for half an hour): fills only its empty fields, or copies a whole new page.' }
+  if ((row.domain === 'mob' || row.domain === 'merchant') && row.viaRedirect !== undefined) return { label: 'Copy wiki page', tip: `The wiki sends this name to ${row.viaRedirect}. If that is another mob, Edit page opens the redirect: replace it with this whole page.` }
+  return undefined
+}
+
+/**
+ * A Mobs or Merchants row whose Copy reads the live page first (MobCopyDialog.tsx); a redirected name (its
+ * page is another mob's, reached through the redirect), a redirect suggestion or a quest-giver add text does not.
+ */
+const readsMobPage = (row: GapRow): boolean => (row.domain === 'mob' || row.domain === 'merchant') && row.suggest === undefined && row.viaRedirect === undefined && row.forageUpdate === undefined && row.questGaps === undefined
 
 /** A new wiki page for the row, built from what the log saw (shared/wikiPage.ts), onto the clipboard. */
 function CopyPageButton({ text, row, compact }: { text: () => string; row: GapRow; compact: boolean }): JSX.Element {
@@ -136,10 +150,10 @@ function CopyPageButton({ text, row, compact }: { text: () => string; row: GapRo
   }
   // An item or mob page: the copy at once, and the wiki lookup on the same click, so the row learns
   // whether the page already exists before one is made (owner, 2026-10-26: "user clicks COPY on an
-  // item and it does the lookup"). A redirect or forage row copies only.
+  // item and it does the lookup"). A redirect (either kind: the page is known) or forage row copies only.
   const copy = (): void => {
     void copyText(text()).then(setCopied)
-    if (row.suggest === undefined && row.forageUpdate === undefined) void lookupOnCopy(row.domain, row.name)
+    if (row.suggest === undefined && row.viaRedirect === undefined && row.forageUpdate === undefined) void lookupOnCopy(row.domain, row.name)
   }
   const onClick = row.domain === 'quest' ? openRead : readsMobPage(row) ? openMobRead : copy
   return (
