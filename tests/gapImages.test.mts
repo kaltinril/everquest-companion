@@ -139,3 +139,19 @@ test("an image row keeps every zone it was met in, the newest first, so Zone I'm
   const [old] = imageGaps({}, loot as never, cat, [{ ...cons[0], ts: looted - 1000 }])
   assert.equal(old?.details.zones?.entries[0]?.name, 'The Feerrott')
 })
+
+test('a name with a page per zone is a row for the page of the zone it was met in (owner, 2026-11-11)', () => {
+  const cat = [
+    { page: 'A Kobold Scout', name: 'a kobold scout', zones: ['Steamfont Mountains'], image: 'npc_a_kobold_scout.png', noImage: true as const },
+    { page: 'A kobold scout (Toxxulia)', name: 'a kobold scout', zones: ['Toxxulia Forest'], image: 'npc_a_kobold_scout.png', noImage: true as const }
+  ]
+  const kills: KillMap = { 'a kobold scout': kill('a kobold scout', 4) }
+  const tox = imageGaps(kills, [], cat, [{ mob: 'a kobold scout', zone: 'Toxxulia Forest', cons: 1, ts: 5 }])
+  assert.deepEqual(tox.map((r) => [r.name, r.page, r.details.zones?.all]), [['A kobold scout (Toxxulia)', 'A kobold scout (Toxxulia)', ['Toxxulia Forest']]])
+  // Met in both zones: a row per page, each with its own zone.
+  const both = imageGaps(kills, [], cat, [{ mob: 'a kobold scout', zone: 'Toxxulia Forest', cons: 1, ts: 5 }, { mob: 'a kobold scout', zone: 'Steamfont Mountains 2 (Refined)', cons: 2, ts: 9 }])
+  assert.deepEqual(both.map((r) => [r.page, r.details.zones?.all]).sort(), [['A Kobold Scout', ['Steamfont Mountains 2 (Refined)']], ['A kobold scout (Toxxulia)', ['Toxxulia Forest']]])
+  // Placed nowhere, or in neither page's zone: the first page, as before.
+  assert.deepEqual(imageGaps(kills, [], cat).map((r) => r.page), ['A Kobold Scout'])
+  assert.deepEqual(imageGaps(kills, [], cat, [{ mob: 'a kobold scout', zone: 'Oggok', cons: 1 }]).map((r) => r.page), ['A Kobold Scout'])
+})

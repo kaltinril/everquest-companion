@@ -337,6 +337,12 @@ where one exists.
   clock time, and a row that knows its page's title (zone-titled, or found by the verdict) fetches that
   page and never searches: the plain search once handed a Rathe Mountains kobold the Warrens page. Every
   request is still a `mob copy` line in the wiki ledger (`wikiClient.ts recordAppWikiCall`).
+- 2026-11-11: an Images row for a name several imageless pages share (`A Kobold Scout`, Steamfont;
+  `A kobold scout (Toxxulia)`) is the page whose `|zone` the mob was met in (`gapImages.ts pagesMet`,
+  `zoneKey` equality; a loot or a con places a mob, a kill does not), one row per page met, each with
+  its own zones; met in no page's zone, the first page as before. Both pages can name ONE file
+  (`npc_a_kobold_scout.png`): one upload then pictures both. Unchanged: a name with an image on any
+  page is no row.
 - 2026-11-10: a new mob page lists a drop group as its group line (`[[Rusty Weapons]]`, rated by the
   corpses that dropped any member), as the Drops tab files them (owner: his A kobold (Rathe Mountains)
   page listed every rusty weapon); a `zoneTitled` row takes loot only from its own zone (owner: "we
