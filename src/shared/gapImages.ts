@@ -14,21 +14,22 @@ import type { MobEntry } from './mobTypes'
 import { mobSourceOf } from './rewardChest'
 import type { LootEvent } from './types'
 import { npcImageName } from './wikiPage'
+import { zoneKey } from './zones'
 
 /** A catalog record as this reads it; `otherNames` and the image fields are absent on a branch without them. */
-type CatalogMob = Pick<MobEntry, 'name' | 'page'> & { otherNames?: string[]; image?: string; noImage?: true }
+type CatalogMob = Pick<MobEntry, 'name' | 'page'> & { otherNames?: string[]; image?: string; noImage?: true; zones?: string[] }
 
 /**
  * Every catalog name → its pages, all of them with no image; a name with one image anywhere is left
  * out. Built once per catalog (perf audit, 2026-10-20: gapMemo.ts), so read-only.
  */
-const imagelessByMob = perObject((catalog: readonly CatalogMob[]): ReadonlyMap<string, CatalogMob> => {
-  const out = new Map<string, CatalogMob>()
+const imagelessByMob = perObject((catalog: readonly CatalogMob[]): ReadonlyMap<string, readonly CatalogMob[]> => {
+  const out = new Map<string, CatalogMob[]>()
   const pictured = new Set<string>()
   for (const m of catalog) {
-    for (const key of [m.name, m.page, ...(m.otherNames ?? [])].map(mobKey)) {
+    for (const key of new Set([m.name, m.page, ...(m.otherNames ?? [])].map(mobKey))) {
       if (m.noImage !== true) pictured.add(key)
-      else if (!out.has(key)) out.set(key, m)
+      else out.set(key, [...(out.get(key) ?? []), m])
     }
   }
   for (const key of pictured) out.delete(key)
@@ -107,6 +108,35 @@ function zoneTally(met: Met): NonNullable<GapRow['details']['zones']> {
   return { entries, distinct: entries.length, all: entries.map((e) => e.name) }
 }
 
+/** A title naming its page's place, `A goblin (Feerrott)`: several pages share the mob's name. */
+const QUALIFIED = /\s\([^()]+\)$/
+
+/** Whether a page's zone and a log's are one zone: equal keys, or one within the other. */
+const zoneMatch = (a: string, b: string): boolean => a !== '' && b !== '' && (a.includes(b) || b.includes(a))
+
+/**
+ * The pages a met name's row belongs to. Several pages can share a name, one per zone (`A Kobold
+ * Scout` in Steamfont, `A kobold scout (Toxxulia)`): the page whose `|zone` the mob was met in is
+ * the row, with only those zones on it (owner, 2026-11-11: a Toxxulia kobold scout's row opened the
+ * Steamfont page). Met in no page's zone, or nowhere: the plain page when there is one, else no row,
+ * never another zone's page (owner, 2026-11-11); that mob's missing page is a Mobs row. The match is
+ * lenient as the engine's is (the wiki's `Unrest` for the log's `The Estate of Unrest`).
+ */
+function pagesMet(met: Met, pages: readonly CatalogMob[]): { met: Met; page: CatalogMob }[] {
+  if (pages.length <= 1) return pages.map((page) => ({ met, page }))
+  const out: { met: Met; page: CatalogMob }[] = []
+  for (const page of pages) {
+    const keys = (page.zones ?? []).map(zoneKey)
+    const zones = new Map([...met.zones].filter(([z]) => keys.some((k) => zoneMatch(k, zoneKey(z)))))
+    if (zones.size === 0) continue
+    const zone = zones.has(met.zone) ? met.zone : [...zones].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0][0]
+    out.push({ met: { ...met, zones, zone }, page })
+  }
+  if (out.length > 0) return out
+  const plain = pages.find((p) => !QUALIFIED.test(p.page))
+  return plain === undefined ? [] : [{ met, page: plain }]
+}
+
 /** One met spelling's row for a page, before it is named: its tallies, its times, its zones. */
 function metRow(met: Met, page: string, n: number): GapRow {
   return {
@@ -132,13 +162,13 @@ export function imageGaps(kills: KillMap, loot: readonly LootEvent[], catalog: r
   // The row is named by the spelling that is the page's title or in-game name, when the log met it.
   const byPage = new Map<string, { row: GapRow; page: CatalogMob }>()
   const named = new Map<string, string>()
-  for (const [key, met] of metMobs(kills, loot, cons)) {
-    const page = imageless.get(key)
-    if (page === undefined) continue
-    if ([page.page, page.name].map(mobKey).includes(key)) named.set(page.page, met.name)
-    const n = Math.max(met.kills, met.loots, met.cons)
-    if ((byPage.get(page.page)?.row.count ?? -1) >= n) continue
-    byPage.set(page.page, { row: metRow(met, page.page, n), page })
+  for (const [key, seen] of metMobs(kills, loot, cons)) {
+    for (const { met, page } of pagesMet(seen, imageless.get(key) ?? [])) {
+      if ([page.page, page.name].map(mobKey).includes(key)) named.set(page.page, met.name)
+      const n = Math.max(met.kills, met.loots, met.cons)
+      if ((byPage.get(page.page)?.row.count ?? -1) >= n) continue
+      byPage.set(page.page, { row: metRow(met, page.page, n), page })
+    }
   }
   const rows = [...byPage].map(([title, { row, page }]) => ({ ...row, ...imageNames(named.get(title) ?? row.name, page) }))
   return rows.sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
@@ -148,9 +178,6 @@ export function imageGaps(kills: KillMap, loot: readonly LootEvent[], catalog: r
 export function otherPageTitle(row: GapRow): string | undefined {
   return row.domain === 'image' && row.page !== undefined && mobKey(row.page) !== mobKey(row.name) ? row.page : undefined
 }
-
-/** A title naming its page's place, `A goblin (Feerrott)`: several pages share the mob's name. */
-const QUALIFIED = /\s\([^()]+\)$/
 
 /**
  * An image row's name and file. The name is the game's spelling as the log met it (owner, 2026-10-19:
