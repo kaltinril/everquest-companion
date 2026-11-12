@@ -100,6 +100,8 @@ test("A ROW'S DETAILS SHOW ITS PICTURE: A MOB'S HELD ONE, AN ITEM'S OR SPELL'S K
     { dir: SPELL, files: [{ name: 'spell_burst_of_flame.png', path: `${SPELL}\\spell_burst_of_flame.png` }] }
   ])
   assert.equal(rowPicture(row('mob', 'Missionary of Rodcet'), {}, folder), `${NPC}\\npc_missionary_of_rodcet.png`)
+  // A Merchants row shows its picture as a Mobs row does (owner, 2026-11-11: Scribe Biddlegorb's did not).
+  assert.equal(rowPicture(row('merchant', 'Missionary of Rodcet'), {}, folder), `${NPC}\\npc_missionary_of_rodcet.png`)
   // The window, not its Lore tab.
   assert.equal(rowPicture(row('item', 'Halfling Blood'), {}, folder), `${ITEM}\\item_halfling_blood.png`)
   assert.equal(rowPicture(row('spell', 'Burst of Flame'), {}, folder), `${SPELL}\\spell_burst_of_flame.png`)

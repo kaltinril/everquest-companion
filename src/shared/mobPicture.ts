@@ -95,7 +95,8 @@ export function heldPicture(file: string, saved: Readonly<Record<string, unknown
  * spell's kept window (`spell_<name>.png`), each as the folders list it. Undefined: nothing to show.
  */
 export function rowPicture(row: Pick<GapRow, 'domain' | 'name' | 'image'>, saved: Readonly<Record<string, unknown>>, folder: FolderPictures): string | undefined {
-  if (row.domain === 'mob' || row.domain === 'image') return heldPicture(pictureFile(row), saved, folder)
+  // A Merchants row pastes its picture as a mob row does (ShotPanel), so it shows one too.
+  if (row.domain === 'mob' || row.domain === 'image' || row.domain === 'merchant') return heldPicture(pictureFile(row), saved, folder)
   if (row.domain === 'item') return folder.files[keptPictureFile('item', row.name)]
   if (row.domain === 'spell') return folder.files[keptPictureFile('spell', row.name)]
   return undefined
