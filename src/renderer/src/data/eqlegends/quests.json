@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-11T09:55:48.457Z",
+  "scrapedAt": "2026-11-12T09:06:01.946Z",
   "source": "eqlwiki.com — Category:Quests + quest subcategories + recentchanges delta (scripts/scrape-delta.mts)",
   "quests": [
     {
@@ -18748,9 +18748,6 @@
           "name": "Supple Black Cloak"
         },
         {
-          "name": "Bloodstone Eyepatch"
-        },
-        {
           "name": "Bronze Gauntlets"
         },
         {
@@ -18832,9 +18829,6 @@
           "name": "Large Splinted Bronze Cloak"
         },
         {
-          "name": "Patch of Shadow"
-        },
-        {
           "name": "Ringmail Coat"
         },
         {
@@ -18892,7 +18886,16 @@
           "name": "Small Ringmail Pants"
         },
         {
+          "name": "Bloodstone Eyepatch"
+        },
+        {
+          "name": "Patch of Shadow"
+        },
+        {
           "name": "Serpentskin Eyepatch"
+        },
+        {
+          "name": "Short Sword"
         }
       ],
       "requiredItems": [
@@ -36952,7 +36955,6 @@
       "giver": "Loveal S`Nez",
       "minLevel": 20,
       "classes": [
-        "Necromancer",
         "Shadow Knight"
       ],
       "relatedZones": [

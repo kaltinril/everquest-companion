@@ -70,7 +70,7 @@ A brew barrel is a stationary object with which players can interact in order to
 ** ''brew barrel @ (65, -375), downstairs, Tovaniks Venom ''
 
 * ''[[Oggok]] ''
-** ''brew barrel @ (264, -259), inside Meet and Drink tew Bie ''
+** brew barrel @ (264, -259), inside Meet and Drink tew Bie 
 
 * ''[[Overthere]] ''
 ** ''brew barrel @ (2683, 2383) ''
