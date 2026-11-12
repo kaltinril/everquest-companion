@@ -2400,3 +2400,5 @@ Brass_Resonance_15
 Unusual_Wine_and_Ale_-_Part_2
 Unusual_Wine_and_Ale_-_Part_1
 Small_Mosquito_Wing
+Gauntlets_of_Fiery_Might
+Crystalline_Spear

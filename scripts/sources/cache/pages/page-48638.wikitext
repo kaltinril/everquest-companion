@@ -132,7 +132,7 @@ The first door in Befallen is your best and easiest place to work this skill. Ma
 |-
 | [[Veeshan's Peak]] || All doors || || || || || 210
 |-
-| [[Estate of Unrest]] || Basement || || || || || > 095
+| [[Estate of Unrest]] || Basement || || || || || 101
 |-
 | [[Estate of Unrest]] || Bar|| || || || || <= 085
 |-

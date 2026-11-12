@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-11T09:55:48.457Z",
+  "scrapedAt": "2026-11-12T09:06:01.946Z",
   "source": "eqlwiki.com — Category:NPCs/Named Mobs/Merchants/Raid Encounters ∪ embeddedin Template:Namedmobpage/MerchantPage, filtered to pages opening a mob template + recentchanges delta (scripts/scrape-delta.mts)",
   "mobs": [
     {
@@ -22202,8 +22202,7 @@
           "pct": 100
         }
       ],
-      "image": "npc_a_giant_briar_snake.jpg",
-      "noImage": true
+      "image": "npc_a_giant_briar_snake.png"
     },
     {
       "page": "A giant cave bat",
@@ -34681,8 +34680,7 @@
         "-30",
         "10"
       ],
-      "image": "npc_a_kobold_scout.png",
-      "noImage": true
+      "image": "npc_a_kobold_scout.png"
     },
     {
       "page": "A kobold scout (Toxxulia)",
@@ -34720,8 +34718,7 @@
       "image": "npc_a_kobold_scout.png",
       "relatedQuests": [
         "Mining Caps"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "A Kobold Sentinel",
@@ -66640,8 +66637,7 @@
       "image": "npc_aglthin_dasmore.png",
       "relatedQuests": [
         "The Fisherman"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Agryn Moonfield",
@@ -99508,7 +99504,8 @@
         "North Kaladim"
       ],
       "drops": [
-        "Scrap Metal"
+        "Scrap Metal",
+        "Bozinite Pestle"
       ],
       "loc": [
         {
@@ -99522,8 +99519,7 @@
         "Cleaner Clockwork",
         "Knight Card Quest",
         "Miner's Cap"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Cleaner X",
@@ -107342,8 +107338,7 @@
         "Star Rose Quartz",
         "Turquoise",
         "Wolf's Eye Agate"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Cyrla Shadowstepper",
@@ -128697,8 +128692,7 @@
       "relatedQuests": [
         "Guild Summons - Stormguard",
         "The Mudtoes"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Fyrefly",
@@ -161089,6 +161083,22 @@
       ]
     },
     {
+      "page": "Ilisiv Gantrau",
+      "eraTag": "Classic",
+      "name": "Ilisiv Gantrau",
+      "level": "65",
+      "zones": [
+        "Toxxulia Forest"
+      ],
+      "loc": [
+        {
+          "ns": 1150,
+          "ew": -296
+        }
+      ],
+      "image": "npc_ilisiv_gantrau.png"
+    },
+    {
       "page": "Illie Roln",
       "eraTag": "Classic",
       "name": "Illie Roln",
@@ -165648,8 +165658,7 @@
       "image": "npc_jalen_goldsinger.png",
       "relatedQuests": [
         "Azraxs' Legacy"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Jali Kaliio",
@@ -190956,8 +190965,7 @@
         }
       ],
       "merchant": true,
-      "image": "npc_martyn_firechaser.png",
-      "noImage": true
+      "image": "npc_martyn_firechaser.png"
     },
     {
       "page": "Marus Kemson",
@@ -221802,6 +221810,23 @@
       "noImage": true
     },
     {
+      "page": "Scribe Biddlegorb",
+      "eraTag": "Classic",
+      "name": "Scribe Biddlegorb",
+      "level": "50",
+      "zones": [
+        "Rathe Mountains"
+      ],
+      "loc": [
+        {
+          "ns": -1870,
+          "ew": 2091
+        }
+      ],
+      "merchant": true,
+      "image": "npc_scribe_biddlegorb.png"
+    },
+    {
       "page": "Scribe Noglleg",
       "eraTag": "Classic",
       "name": "Scribe Noglleg",
@@ -231062,8 +231087,7 @@
       "image": "npc_shintar_vinlail.png",
       "relatedQuests": [
         "Heretic Battle"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Shintl Lowbrew",
@@ -251401,8 +251425,7 @@
         "Throwing Knife",
         "Wolf's Eye Agate",
         "Wrist Pouch"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Tranala",
@@ -251571,6 +251594,37 @@
         "Throwing Knife"
       ],
       "noImage": true
+    },
+    {
+      "page": "Translocator Fithop",
+      "name": "Translocator Fithop",
+      "level": "1",
+      "zones": [
+        "Butcherblock Mountains"
+      ],
+      "loc": [
+        {
+          "ns": 1350,
+          "ew": 3264,
+          "z": 10
+        }
+      ],
+      "image": "npc_translocator_fithop.png"
+    },
+    {
+      "page": "Translocator Narrik",
+      "name": "Translocator Narrik",
+      "zones": [
+        "Ocean of Tears"
+      ],
+      "loc": [
+        {
+          "ns": 264,
+          "ew": -9202,
+          "z": 3
+        }
+      ],
+      "image": "npc_translocator_narrik.png"
     },
     {
       "page": "Trantor Everhot",
@@ -259724,16 +259778,6 @@
         }
       ],
       "merchant": true,
-      "factions": [
-        "Merchants of Kaladim"
-      ],
-      "factionAmounts": [
-        "-30"
-      ],
-      "image": "npc_vacto_molunel.png",
-      "relatedQuests": [
-        "Scarab Armor Quests"
-      ],
       "sells": [
         "Backpack",
         "Bandages",
@@ -259746,6 +259790,16 @@
         "Spear",
         "Two Handed Sword",
         "Warhammer"
+      ],
+      "factions": [
+        "Merchants of Kaladim"
+      ],
+      "factionAmounts": [
+        "-30"
+      ],
+      "image": "npc_vacto_molunel.png",
+      "relatedQuests": [
+        "Scarab Armor Quests"
       ]
     },
     {
@@ -260652,8 +260706,7 @@
       "image": "npc_veisha_fathomwalker.png",
       "relatedQuests": [
         "Experienced Courier"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Vekis",
