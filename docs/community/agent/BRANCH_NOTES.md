@@ -339,8 +339,9 @@ where one exists.
   request is still a `mob copy` line in the wiki ledger (`wikiClient.ts recordAppWikiCall`).
 - 2026-11-11: an Images row for a name several imageless pages share (`A Kobold Scout`, Steamfont;
   `A kobold scout (Toxxulia)`) is the page whose `|zone` the mob was met in (`gapImages.ts pagesMet`,
-  `zoneKey` equality; a loot or a con places a mob, a kill does not), one row per page met, each with
-  its own zones; met in no page's zone, the first page as before. Both pages can name ONE file
+  `zoneKey` equal or one within the other; a loot or a con places a mob, a kill does not), one row per
+  page met, each with its own zones; met in no page's zone, the plain page, and with no plain page no
+  row: never another zone's page (owner), the missing page is the Mobs tab's `zoneTitled` row. Both pages can name ONE file
   (`npc_a_kobold_scout.png`): one upload then pictures both. Unchanged: a name with an image on any
   page is no row.
 - 2026-11-10: a new mob page lists a drop group as its group line (`[[Rusty Weapons]]`, rated by the

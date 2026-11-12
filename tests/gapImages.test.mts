@@ -151,7 +151,16 @@ test('a name with a page per zone is a row for the page of the zone it was met i
   // Met in both zones: a row per page, each with its own zone.
   const both = imageGaps(kills, [], cat, [{ mob: 'a kobold scout', zone: 'Toxxulia Forest', cons: 1, ts: 5 }, { mob: 'a kobold scout', zone: 'Steamfont Mountains 2 (Refined)', cons: 2, ts: 9 }])
   assert.deepEqual(both.map((r) => [r.page, r.details.zones?.all]).sort(), [['A Kobold Scout', ['Steamfont Mountains 2 (Refined)']], ['A kobold scout (Toxxulia)', ['Toxxulia Forest']]])
-  // Placed nowhere, or in neither page's zone: the first page, as before.
+  // Placed nowhere, or in neither page's zone: the plain page, wherever it sits in the catalog.
   assert.deepEqual(imageGaps(kills, [], cat).map((r) => r.page), ['A Kobold Scout'])
-  assert.deepEqual(imageGaps(kills, [], cat, [{ mob: 'a kobold scout', zone: 'Oggok', cons: 1 }]).map((r) => r.page), ['A Kobold Scout'])
+  assert.deepEqual(imageGaps(kills, [], [cat[1], cat[0]], [{ mob: 'a kobold scout', zone: 'Oggok', cons: 1 }]).map((r) => r.page), ['A Kobold Scout'])
+  // Every page is another zone's: no row, never another zone's page. A short zone field still matches.
+  const split = [
+    { page: 'A skeleton (Najena)', name: 'a skeleton', zones: ['Najena'], noImage: true as const },
+    { page: 'A skeleton (Unrest)', name: 'a skeleton', zones: ['Unrest'], noImage: true as const }
+  ]
+  const bones: KillMap = { 'a skeleton': kill('a skeleton', 2) }
+  assert.deepEqual(imageGaps(bones, [], split, [{ mob: 'a skeleton', zone: 'Toxxulia Forest', cons: 1 }]), [])
+  assert.deepEqual(imageGaps(bones, [], split), [])
+  assert.deepEqual(imageGaps(bones, [], split, [{ mob: 'a skeleton', zone: 'The Estate of Unrest', cons: 1 }]).map((r) => r.page), ['A skeleton (Unrest)'])
 })

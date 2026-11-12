@@ -108,23 +108,33 @@ function zoneTally(met: Met): NonNullable<GapRow['details']['zones']> {
   return { entries, distinct: entries.length, all: entries.map((e) => e.name) }
 }
 
+/** A title naming its page's place, `A goblin (Feerrott)`: several pages share the mob's name. */
+const QUALIFIED = /\s\([^()]+\)$/
+
+/** Whether a page's zone and a log's are one zone: equal keys, or one within the other. */
+const zoneMatch = (a: string, b: string): boolean => a !== '' && b !== '' && (a.includes(b) || b.includes(a))
+
 /**
  * The pages a met name's row belongs to. Several pages can share a name, one per zone (`A Kobold
  * Scout` in Steamfont, `A kobold scout (Toxxulia)`): the page whose `|zone` the mob was met in is
  * the row, with only those zones on it (owner, 2026-11-11: a Toxxulia kobold scout's row opened the
- * Steamfont page). Met in no page's zone, or nowhere: the first page, as before.
+ * Steamfont page). Met in no page's zone, or nowhere: the plain page when there is one, else no row,
+ * never another zone's page (owner, 2026-11-11); that mob's missing page is a Mobs row. The match is
+ * lenient as the engine's is (the wiki's `Unrest` for the log's `The Estate of Unrest`).
  */
 function pagesMet(met: Met, pages: readonly CatalogMob[]): { met: Met; page: CatalogMob }[] {
   if (pages.length <= 1) return pages.map((page) => ({ met, page }))
   const out: { met: Met; page: CatalogMob }[] = []
   for (const page of pages) {
-    const keys = new Set((page.zones ?? []).map(zoneKey))
-    const zones = new Map([...met.zones].filter(([z]) => keys.has(zoneKey(z))))
+    const keys = (page.zones ?? []).map(zoneKey)
+    const zones = new Map([...met.zones].filter(([z]) => keys.some((k) => zoneMatch(k, zoneKey(z)))))
     if (zones.size === 0) continue
     const zone = zones.has(met.zone) ? met.zone : [...zones].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0][0]
     out.push({ met: { ...met, zones, zone }, page })
   }
-  return out.length > 0 ? out : [{ met, page: pages[0] }]
+  if (out.length > 0) return out
+  const plain = pages.find((p) => !QUALIFIED.test(p.page))
+  return plain === undefined ? [] : [{ met, page: plain }]
 }
 
 /** One met spelling's row for a page, before it is named: its tallies, its times, its zones. */
@@ -168,9 +178,6 @@ export function imageGaps(kills: KillMap, loot: readonly LootEvent[], catalog: r
 export function otherPageTitle(row: GapRow): string | undefined {
   return row.domain === 'image' && row.page !== undefined && mobKey(row.page) !== mobKey(row.name) ? row.page : undefined
 }
-
-/** A title naming its page's place, `A goblin (Feerrott)`: several pages share the mob's name. */
-const QUALIFIED = /\s\([^()]+\)$/
 
 /**
  * An image row's name and file. The name is the game's spelling as the log met it (owner, 2026-10-19:
