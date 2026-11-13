@@ -44,6 +44,10 @@ disagree, RULES.md wins; fix this file.
 - Never stop, kill or close the user's processes (game, the installed app, the dev app they are
   using) without asking. If a build target is locked, build to a fresh output dir
   (`npx electron-builder --win --dir -c.directories.output=release/dev`) and say where it is.
+- **Before the owner tests in the dev app, copy their settings down from the installed build**
+  (owner, 2026-11-12: "always copy my settings down from prod to the dev"):
+  `%APPDATA%\everquest-companion-test` to `%APPDATA%\everquest-companion-dev`, one way, dev backed
+  up first. The file list and what to leave alone are step 2 of the `start-companion` skill.
 - Stopping a dev app the agent itself launched: stopping the shell task can leave the
   `electron-vite dev --watch` node process alive (README.md, "Merge while the dev app is up").
   Stop that node PID; its Electron exits with it. The single-instance lock means an old instance

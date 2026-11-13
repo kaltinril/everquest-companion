@@ -17,19 +17,31 @@ it with `powershell -ExecutionPolicy Bypass -File .\start_companion.ps1`.
    relaunches Electron, so a merge or checkout here while it runs crashes the app on the owner.
    Finish merges first, or pass `-NoWatch`.
 
-2. **Launch it in the background** (PowerShell tool, `run_in_background: true`), sending the
+2. **Copy the owner's settings down from the installed build, every time** (owner, 2026-11-12:
+   "always copy my settings down from prod to the dev"). Prod is `%APPDATA%\everquest-companion-test`
+   (the installed TEST build the owner plays on), dev is `%APPDATA%\everquest-companion-dev`. With
+   the dev app closed (the installed one may stay open; never close it), first copy the dev files
+   about to be replaced into `%APPDATA%\everquest-companion-dev.bak-<date>`, then copy prod over dev:
+   the files `everquest-companion-progress.json`, `message-overlay.json`, `resist-ledger.json`,
+   `shot-settings.json`, `item-knowledge-cache.json`, `mob-knowledge-cache.json`,
+   `spell-resist-cache.json`, and the folders `gaps-characters`, `picture-inbox`, `image-cache`,
+   `soundpacks` (`robocopy <prod>\<dir> <dev>\<dir> /E`). Leave `Local Storage` and every other
+   Chromium folder alone: prod holds a live lock on its own, and the dev server's remembered view
+   choices live under a different page origin (the trap below). One-way only, never dev to prod.
+
+3. **Launch it in the background** (PowerShell tool, `run_in_background: true`), sending the
    output to a log in the session scratchpad:
 
    ```powershell
    powershell -NoProfile -ExecutionPolicy Bypass -File C:\git\everquest-companion\start_companion.ps1 *> "<scratchpad>\dev.log"
    ```
 
-3. **Wait for the engine**, not just the window: poll the log until a line matches
+4. **Wait for the engine**, not just the window: poll the log until a line matches
    `connected to the engine` or `engine attached` (a cold engine rebuild takes minutes, a warm
    launch about 20 s). Also stop on `already running`, `not found`, `npm ERR!` or the background
    task exiting, and report what the log says.
 
-4. **Tell the owner it is up**, with the branch (`git branch --show-current`) and the short HEAD.
+5. **Tell the owner it is up**, with the branch (`git branch --show-current`) and the short HEAD.
 
 ## When the owner is playing on it: `-Prod`
 
