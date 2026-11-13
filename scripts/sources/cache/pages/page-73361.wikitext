@@ -1,0 +1,40 @@
+{{Era}}
+
+= Overview =
+
+Granted by killing mobs in [[Nektropos Castle]], this faction was introduced with the release of the Nektropos Castle. 
+
+= Raise Faction =
+
+== Zones ==
+
+* [[Nektropos Castle]]
+
+== Quests ==
+
+* None
+
+== Mobs ==
+
+* None
+
+= Lower Faction =
+
+== Zones ==
+
+* None
+
+== Quests ==
+
+* None
+
+== Mobs ==
+
+* None
+
+= See Also =
+
+* [[Faction]]
+* [[Faction Quests]]
+
+[[Category:Factions]]

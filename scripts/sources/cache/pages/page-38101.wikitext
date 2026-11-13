@@ -2402,3 +2402,9 @@ Unusual_Wine_and_Ale_-_Part_1
 Small_Mosquito_Wing
 Gauntlets_of_Fiery_Might
 Crystalline_Spear
+Category:Items
+Icebelt
+Burning_Affliction_III
+Rune_of_Yirno
+Flower
+Shaman

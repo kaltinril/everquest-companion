@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-12T09:06:01.946Z",
+  "scrapedAt": "2026-11-13T08:07:05.929Z",
   "source": "eqlwiki.com — Category:NPCs/Named Mobs/Merchants/Raid Encounters ∪ embeddedin Template:Namedmobpage/MerchantPage, filtered to pages opening a mob template + recentchanges delta (scripts/scrape-delta.mts)",
   "mobs": [
     {
@@ -40466,10 +40466,12 @@
         }
       ],
       "factions": [
-        "Host of Nektropos"
+        "Host of Nektropos",
+        "The Everling Dynasty"
       ],
       "factionAmounts": [
-        "-2"
+        "-2",
+        "+"
       ],
       "image": "npc_a_mutilated_attendant.png"
     },
@@ -107994,6 +107996,40 @@
       "noImage": true
     },
     {
+      "page": "Dandalek Swillslammer",
+      "name": "Dandalek Swillslammer",
+      "level": "40",
+      "zones": [
+        "Butcherblock Mountains"
+      ],
+      "loc": [
+        {
+          "ns": 2957,
+          "ew": -203,
+          "z": 0
+        }
+      ],
+      "merchant": true,
+      "sells": [
+        "Backpack",
+        "Bandages",
+        "Bottle",
+        "Bottle of Milk",
+        "Dagger",
+        "Fishing Bait",
+        "Fishing Pole",
+        "Iron Ration",
+        "Large Lantern",
+        "Mead",
+        "Ration",
+        "Raw Bamboo",
+        "Small Lantern",
+        "Torch",
+        "Water Flask"
+      ],
+      "image": "npc_dandalek_swillslammer.png"
+    },
+    {
       "page": "Danilla Delucic",
       "name": "Danilla Delucic",
       "level": "35",
@@ -113789,8 +113825,7 @@
       "factionAmounts": [
         "-30"
       ],
-      "image": "npc_doran_glosglen.png",
-      "noImage": true
+      "image": "npc_doran_glosglen.png"
     },
     {
       "page": "Doran Vargnus",
@@ -129546,8 +129581,7 @@
       "factionAmounts": [
         "-30"
       ],
-      "image": "npc_gann_dunbull.png",
-      "noImage": true
+      "image": "npc_gann_dunbull.png"
     },
     {
       "page": "Gans Paust",
@@ -138886,8 +138920,7 @@
         "-30",
         "10"
       ],
-      "image": "npc_guard_armandin.png",
-      "noImage": true
+      "image": "npc_guard_armandin.png"
     },
     {
       "page": "Guard Ashmod",
@@ -139882,8 +139915,7 @@
         "-30",
         "10"
       ],
-      "image": "npc_guard_burr.png",
-      "noImage": true
+      "image": "npc_guard_burr.png"
     },
     {
       "page": "Guard Butal",
@@ -140284,8 +140316,7 @@
         "-30",
         "10"
       ],
-      "image": "npc_guard_clendin.png",
-      "noImage": true
+      "image": "npc_guard_clendin.png"
     },
     {
       "page": "Guard Cloten",
@@ -141655,8 +141686,7 @@
         "-30",
         "10"
       ],
-      "image": "npc_guard_dunil.png",
-      "noImage": true
+      "image": "npc_guard_dunil.png"
     },
     {
       "page": "Guard Dunix",
@@ -143606,8 +143636,7 @@
         "-30",
         "10"
       ],
-      "image": "npc_guard_grae.png",
-      "noImage": true
+      "image": "npc_guard_grae.png"
     },
     {
       "page": "Guard Greedin",
@@ -143870,8 +143899,7 @@
         "-30",
         "10"
       ],
-      "image": "npc_guard_haendar.png",
-      "noImage": true
+      "image": "npc_guard_haendar.png"
     },
     {
       "page": "Guard Haldin",
@@ -144044,8 +144072,7 @@
         "-30",
         "10"
       ],
-      "image": "npc_guard_hartt.png",
-      "noImage": true
+      "image": "npc_guard_hartt.png"
     },
     {
       "page": "Guard Helminth",
@@ -149860,9 +149887,6 @@
           "pct": 100
         }
       ],
-      "otherNames": [
-        "Guard Rundel"
-      ],
       "factions": [
         "Kazon Stormhammer",
         "Merchants of Kaladim",
@@ -149877,8 +149901,10 @@
         "-30",
         "10"
       ],
-      "image": "npc_guard_rundel.png",
-      "noImage": true
+      "image": "npc_guard_rundul.png",
+      "otherNames": [
+        "Guard Rundel"
+      ]
     },
     {
       "page": "Guard Rylin",
@@ -149911,8 +149937,7 @@
         "-30",
         "10"
       ],
-      "image": "npc_guard_rylin.png",
-      "noImage": true
+      "image": "npc_guard_rylin.png"
     },
     {
       "page": "Guard Rysis",
@@ -156340,8 +156365,7 @@
           "pct": 50
         }
       ],
-      "image": "npc_happ_findlefinn.png",
-      "noImage": true
+      "image": "npc_happ_findlefinn.png"
     },
     {
       "page": "Harban Ranflash",
@@ -165340,8 +165364,7 @@
       "relatedQuests": [
         "Eye of Stormhammer Quest",
         "Scout Blade"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Jailer Mkrarrg",
@@ -190637,7 +190660,8 @@
       "image": "npc_marrowbane.png",
       "commonDrops": [
         "Bronze Two Handed Sword",
-        "Raw-Hide Skullcap"
+        "Raw-Hide Skullcap",
+        "Raw-hide Boots"
       ]
     },
     {
@@ -215648,16 +215672,14 @@
         "Raw-Hide Cloak",
         "Runed Shawl",
         "Snakeskin Gloves",
-        "Raw-hide Gorget"
+        "Raw-hide Gorget",
+        "Sharp Claws"
       ],
       "loc": [
         {
           "ns": 89,
           "ew": -147
         }
-      ],
-      "otherNames": [
-        "Refugee spiltpaw"
       ],
       "factions": [
         "Sabertooths of Blackburrow",
@@ -215671,7 +215693,10 @@
         "5",
         "5"
       ],
-      "image": "npc_refugee_splitpaw.png"
+      "image": "npc_refugee_splitpaw.png",
+      "otherNames": [
+        "Refugee spiltpaw"
+      ]
     },
     {
       "page": "Refugee Splitpaw (Monk)",
@@ -234746,21 +234771,21 @@
         "Misty Thicket"
       ],
       "drops": [
-        "Froglok Leg",
         "Bloodstone",
+        "Cat's Eye Agate",
+        "Froglok Leg",
         "Lapis Lazuli"
       ],
       "factions": [
         "Frogloks of Kunark"
       ],
       "factionAmounts": [
-        "-30"
+        "-50"
       ],
       "image": "npc_slaythe.png",
       "relatedQuests": [
         "Eye of Stormhammer Quest"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Slaythe the Slayer",
@@ -245682,7 +245707,7 @@
       ],
       "factions": [
         "Host of Nektropos",
-        "Everling Dynasty"
+        "The Everling Dynasty"
       ],
       "factionAmounts": [
         "-2",
