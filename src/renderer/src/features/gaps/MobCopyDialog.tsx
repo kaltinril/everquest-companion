@@ -6,7 +6,7 @@
 // individual currently EMPTY fields ... just give me that section and make sure I know that's the
 // reason"); with none, the new page as before; with the wiki out of reach, the draft, said so.
 
-import { useEffect, useMemo, useState, type JSX } from 'react'
+import { useEffect, useMemo, useRef, useState, type JSX } from 'react'
 import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material'
 import type { GapRow } from '@shared/gaps'
 import { fieldSection, mergeMobPage, type MobPageRead, type PageMerge } from '@shared/gapPageMerge'
@@ -107,8 +107,14 @@ function Leftover({ merge }: { merge: PageMerge }): JSX.Element | null {
 
 export function MobCopyDialog({ row, read, title, draft, onClose }: { row: GapRow; read: MobRead; title: string; draft: () => string; onClose: () => void }): JSX.Element {
   const [copied, setCopied] = useState(false)
-  // Merged once per answer, not on every render.
-  const copy = useMemo(() => copyOf(read, title, draft()), [read, title, draft])
+  // Merged once per answer, not on every render. `draft` is a new closure on every parent render, so
+  // it is read through a ref: as a dependency it re-merged each render and the effect below put the
+  // whole page back on the clipboard, over a field the player had just copied by hand.
+  const draftRef = useRef(draft)
+  useEffect(() => {
+    draftRef.current = draft
+  })
+  const copy = useMemo(() => copyOf(read, title, draftRef.current()), [read, title])
   // The click's promise: the text is on the clipboard as soon as the read answers.
   useEffect(() => {
     if (copy !== undefined) void copyText(clipboardText(copy)).then(setCopied)
