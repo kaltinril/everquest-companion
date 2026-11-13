@@ -32,7 +32,8 @@ import { windowItemRows } from './lootRates'
  *             the AA row survives (JOS-36/11; shared/aaPace.ts states why those are two different
  *             measurements).
  *   'eta'   — what is next: time to the level, or (at cap) the inferred wait for the next AA.
- *   'motes' — motes per hour, one line per mote type seen in the slice.
+ *   'motes' — motes per hour, one line per mote type seen in the slice, then the same for
+ *             Fragments of Potential (owner ask, 2026-11-12: same ranks, separate items).
  *   'coin'  — platinum per hour received in the slice, and the total (owner ask, 2026-10-13).
  *
  * SO A CHECKLIST ENTRY IS NOT A ROW COUNT. `XpRowId` is what a user switches off; how many lines
@@ -107,11 +108,27 @@ export function isMote(item: string): boolean {
  * so the tierless member of the family cannot be shortened to nothing.
  */
 export function moteTier(item: string): string {
-  if (!isMote(item)) return item
-  const rest = item.slice(MOTE_PREFIX.length)
+  return isMote(item) ? tierWord(item, MOTE_PREFIX) : item
+}
+
+function tierWord(item: string, prefix: string): string {
+  const rest = item.slice(prefix.length)
   return rest.endsWith(MOTE_SUFFIX) && rest.length > MOTE_SUFFIX.length
     ? rest.slice(0, rest.length - MOTE_SUFFIX.length)
     : rest
+}
+
+/** `Fragment of <tier> Potential`: the motes' ranks, a separate item (owner, 2026-11-12). */
+const FRAGMENT_PREFIX = 'Fragment of '
+
+/** Is this loot item a Fragment of Potential? */
+export function isFragment(item: string): boolean {
+  return item.startsWith(FRAGMENT_PREFIX) && item.endsWith(MOTE_SUFFIX)
+}
+
+/** The tier word of a fragment: `Fragment of Major Potential` → `Major`. */
+export function fragmentTier(item: string): string {
+  return isFragment(item) ? tierWord(item, FRAGMENT_PREFIX) : item
 }
 
 /** One mote type observed in the slice. */
@@ -166,14 +183,29 @@ export interface MoteRatesArgs {
  * Counting them apart states what the log stated; ordering them by worth would not.
  */
 export function moteRates(args: MoteRatesArgs): MoteRateRow[] {
-  return windowItemRows(args)
-    .filter((r) => isMote(r.item))
-    .map((r) => ({
+  return potentialRates(args).motes
+}
+
+/**
+ * Motes and fragments per hour for one slice, from ONE `windowItemRows` pass. Each list keeps that
+ * pass's order (most looted first); the two are never added together, because they are two items.
+ */
+export function potentialRates(args: MoteRatesArgs): { motes: MoteRateRow[]; fragments: MoteRateRow[] } {
+  const motes: MoteRateRow[] = []
+  const fragments: MoteRateRow[] = []
+  for (const r of windowItemRows(args)) {
+    const mote = isMote(r.item)
+    if (!mote && !isFragment(r.item)) continue
+    const row: MoteRateRow = {
       key: r.key,
       item: r.item,
-      tier: moteTier(r.item),
+      tier: mote ? moteTier(r.item) : fragmentTier(r.item),
       drops: r.drops,
       perHourActive: r.dropsPerHourActive,
       perHourWall: r.dropsPerHourWall
-    }))
+    }
+    if (mote) motes.push(row)
+    else fragments.push(row)
+  }
+  return { motes, fragments }
 }

@@ -13,7 +13,7 @@
 //   the slice     `resolveSlice` (shared/timeslice.ts) — the Leveling tab's own control, JOS-130
 //   the level ETA `levelEta` (shared/levelEta.ts) — the Overview card's own four gates
 //   the AA read   `aaEta` (shared/aaPace.ts) — JOS-36/11, the read that survives the cap
-//   the motes     `moteRates` → `windowItemRows` (shared/lootRates.ts) — JOS-78's own rate
+//   the motes     `potentialRates` → `windowItemRows` (shared/lootRates.ts) — JOS-78's own rate
 //
 // So a number in this window and the same number on the Leveling tab cannot disagree: there is
 // one arithmetic and this file only chooses the words. That is the whole point of the ticket's
@@ -68,7 +68,7 @@ import { ETA_ABSURD_MS, atCap, levelEta } from '../../../shared/levelEta'
 // the number on a floating window is most likely to be wrong.
 import { currentLevelRead, type LevelStatement } from '../../../shared/currentLevel'
 import { aaEta } from '../../../shared/aaPace'
-import { moteRates, xpRowVisible, type XpRowId } from '../../../shared/xpOverlay'
+import { potentialRates, xpRowVisible, type MoteRateRow, type XpRowId } from '../../../shared/xpOverlay'
 // WHICH HOUR (JOS-288). The union, the default and the just-arrived gate live in
 // shared/rateBasis.ts; this file picks halves of pairs and chooses words. The REFUSAL SENTENCE that
 // lives there too is no longer read here — it was a row hover, and JOS-358 took those.
@@ -318,6 +318,9 @@ function etaRow(
  * A slice with no mote gets ONE row saying so rather than nothing at all: a silently missing
  * section reads as a broken window, and "none here" is a measurement over a span the caption
  * beside it already states.
+ *
+ * FRAGMENTS OF POTENTIAL follow the motes (owner ask, 2026-11-12): the same ranks, a separate item,
+ * so each rank seen gets its own row, labelled `<rank> frag`, under the same checklist entry.
  */
 function moteRows(
   loot: readonly LootEvent[],
@@ -325,7 +328,7 @@ function moteRows(
   stats: RangeStats,
   read: BasisRead
 ): XpOverlayRow[] {
-  const rows = moteRates({
+  const { motes, fragments } = potentialRates({
     events: loot,
     t0: slice.range.t0,
     t1: slice.range.t1,
@@ -336,7 +339,7 @@ function moteRows(
     zoneKey: slice.zoneKey,
     zoneExactKey: slice.zoneExactKey
   })
-  if (rows.length === 0) {
+  if (motes.length === 0 && fragments.length === 0) {
     return [
       {
         id: 'motes-none',
@@ -349,21 +352,22 @@ function moteRows(
       }
     ]
   }
-  return rows.map((m) => {
+  const line = (m: MoteRateRow, fragment: boolean): XpOverlayRow => {
     const r = split(rate(pickRate(read, m.perHourActive, m.perHourWall), formatDropRate))
     // THE COUNT IS NEVER GATED, only the rate. "3 looted in Befallen this session" is a fact about
     // the log that a short stretch does not make less true; "3.00 drops/hr" over ninety seconds is
     // the extrapolation. So the detail and the hover keep stating what was observed.
     return {
-      id: `mote-${m.key}`,
-      row: 'motes' as const,
-      label: m.tier,
+      id: `${fragment ? 'fragment' : 'mote'}-${m.key}`,
+      row: 'motes',
+      label: fragment ? `${m.tier} frag` : m.tier,
       value: r.value,
       unit: r.unit || 'drops/hr',
       detail: `${m.drops.toLocaleString()}×`,
       inferred: false
     }
-  })
+  }
+  return [...motes.map((m) => line(m, false)), ...fragments.map((m) => line(m, true))]
 }
 
 /** Platinum per hour received in the slice, with the total; a measured zero when none came in. */

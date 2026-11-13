@@ -22,6 +22,8 @@ import type { ProgressionSnap } from '../src/shared/progressionTypes'
 import { availableSlices, resolveSlice, resolveSliceId, type SliceId } from '../src/shared/timeslice'
 import {
   XP_ROW_IDS,
+  fragmentTier,
+  isFragment,
   isMote,
   moteRates,
   moteTier,
@@ -199,6 +201,27 @@ test('motes are ordered by what was OBSERVED, and a stack counts as its size', (
   })
   assert.equal(halfIdle[0].perHourActive, 6)
   assert.equal(halfIdle[0].perHourWall, 3, 'the medding stays in the elapsed denominator, deliberately')
+})
+
+test('fragments of potential get their own rows after the motes, never added to them', () => {
+  assert.equal(isFragment('Fragment of Major Potential'), true)
+  assert.equal(isFragment('Fragment of Bone'), false, 'only the Potential family')
+  assert.equal(isMote('Fragment of Major Potential'), false, 'a separate item, not a mote')
+  assert.equal(fragmentTier('Fragment of Infinitesimal Potential'), 'Infinitesimal')
+  const zone = 'Nagafen’s Lair - Solo 4 (Refined)'
+  const snap = farming({ pct: 1, zone })
+  const events = [
+    loot('Fragment of Major Potential', 50 * MIN, zone),
+    loot('Fragment of Major Potential', 40 * MIN, zone),
+    loot('Mote of Major Potential', 30 * MIN, zone)
+  ]
+  const rows = view(snap, events).rows.filter((r) => r.row === 'motes')
+  assert.deepEqual(rows.map((r) => r.label), ['Major', 'Major frag'], 'motes first, though fewer')
+  assert.deepEqual(rows.map((r) => r.detail), ['1×', '2×'])
+  assert.deepEqual(rows.map((r) => r.id), ['mote-mote of major potential', 'fragment-fragment of major potential'])
+  // Fragments alone are something to show, so the 'none here' line stays away.
+  const only = view(snap, events.slice(0, 2)).rows.filter((r) => r.row === 'motes')
+  assert.deepEqual(only.map((r) => r.label), ['Major frag'])
 })
 
 test('a slice with no mote says so, once, instead of leaving a blank section', () => {
