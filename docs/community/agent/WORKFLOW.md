@@ -131,7 +131,9 @@ disagree, RULES.md wins; fix this file.
 - Count node:test output with `grep -E "ℹ (tests|pass|fail)"`; failures are `^✖` lines. The pass
   count can wobble by one between runs with the same fail set (a skipping test).
 - Do not run `npm test` while `npm run dist` rebuilds `out/`: symbolicate's round-trip test scans
-  `out/renderer/assets` and goes red for that alone.
+  `out/renderer/assets` and goes red for that alone. The same test (`ROUND TRIP: every emitted
+  bundle has a map beside it`) also fails with `ENOENT ... out\renderer\assets` when a dev launch
+  has left `out/renderer` empty in the main clone (2026-11-12); a worktree has no `out/` and skips it.
 - **Size ceilings, with headroom** (owner, 2026-10-17: "400 is NOT that huge for a class with
   comments"; a hard count was driving splits and comment cuts that bought nothing): 440 code lines
   per file, 110 per function, complexity 13, max-params 4, max-depth 3 (`eslint.config.mjs`
