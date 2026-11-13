@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-12T09:06:01.946Z",
+  "scrapedAt": "2026-11-13T08:07:05.929Z",
   "source": "eqlwiki.com — Category:Quests + quest subcategories + recentchanges delta (scripts/scrape-delta.mts)",
   "quests": [
     {
@@ -10036,9 +10036,11 @@
         "Rivervale"
       ],
       "relatedNpcs": [
+        "Assistant Kiolna",
         "Bronin Higginsbot",
         "Elmion Hendrys",
         "Faldor Hendrys",
+        "Jail Clerk Maryl",
         "Slaythe"
       ],
       "rewards": [
@@ -10048,16 +10050,42 @@
       ],
       "requiredItems": [
         "Cracked Emerald",
+        "Emerald Shard",
         "Froglok Leg",
         "H.K. 106",
-        "Emerald Shard",
         "Eye of Stormhammer (Item)"
       ],
       "expReward": true,
       "factions": [
         {
           "name": "Frogloks of Kunark",
-          "up": false
+          "up": false,
+          "amount": -50
+        },
+        {
+          "name": "DeepPockets",
+          "up": true,
+          "amount": 10
+        },
+        {
+          "name": "Circle of Unseen Hands",
+          "up": true,
+          "amount": 5
+        },
+        {
+          "name": "Merchants of Rivervale",
+          "up": false,
+          "amount": -1
+        },
+        {
+          "name": "Coalition of Tradefolk Underground",
+          "up": true,
+          "amount": 5
+        },
+        {
+          "name": "Carson McCabe",
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Kazon Stormhammer",
