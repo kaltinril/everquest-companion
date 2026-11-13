@@ -3,7 +3,7 @@
 // real: the prototype's reads of the owner's and Malkil's screenshots (2026-10-21), junk and all.
 // The target is the page the owner wrote for Ruined Robe the same night.
 
-import { plausibleItemName } from '../src/shared/itemShotKeep'
+import { catalogNameList, plausibleItemName } from '../src/shared/itemShotKeep'
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { checkRatio, cleanLine, readItemWindow, slotOf, valueCopper, weightValue } from '../src/shared/itemWindow.ts'
@@ -408,4 +408,13 @@ test('A WEIGHT THE WINDOW DID NOT PRINT AS N.N IS FLAGGED, EVEN WITH NO LETTERS 
   const r = readItemWindow(['Layered Guards', 'Lore Equipped, No Trade', 'Class: WAR', 'Race: ALL', 'Arms', 'Size: SMALL AC: 19', 'Weight 228". En: 30'])
   assert.ok((r.checks ?? []).some((c) => c.startsWith('Weight read')), JSON.stringify(r.checks))
   assert.ok(!(readItemWindow(['A Thing', 'No Trade', 'Class: ALL', 'Race: ALL', 'Weight: 2.5']).checks ?? []).some((c) => c.startsWith('Weight read')))
+})
+
+test('the catalog name list is each record name or page, then its other names, once each', () => {
+  const names = catalogNameList([
+    { page: 'Vial of Halfling Blood', name: 'Vial of Halfling Blood', otherNames: ['Halfling Blood'] },
+    { page: 'Bone Chips' },
+    { page: 'Bone Chips (Quest)', name: 'Bone Chips', otherNames: ['Halfling Blood'] }
+  ])
+  assert.deepEqual(names, ['Vial of Halfling Blood', 'Halfling Blood', 'Bone Chips'])
 })

@@ -243,7 +243,7 @@ function intersectSpans(spans: readonly Span[], segs: readonly ZoneSeg[]): Span[
 function idleSpans(snap: ProgressionSnap, t0: number, t1: number): Span[] {
   const cols = [snap.expTs, snap.killTs, snap.lootTs]
   const stream: number[] = []
-  for (const col of cols) for (let i = lowerBound(col, t0); i < lowerBound(col, t1); i++) stream.push(col[i])
+  for (const col of cols) for (let i = lowerBound(col, t0), hi = lowerBound(col, t1); i < hi; i++) stream.push(col[i])
   stream.sort((a, b) => a - b)
   const prev = cols.map((c) => prevBefore(c, t0)).filter((v): v is number => v !== null)
   const next = cols.map((c) => nextFrom(c, t1)).filter((v): v is number => v !== null)
@@ -444,7 +444,7 @@ function foldKills(snap: ProgressionSnap, ctx: FoldCtx): Pick<RangeStats, 'kills
   let kills = 0
   let killsSelf = 0
   let killsPet = 0
-  for (let i = lowerBound(snap.killTs, ctx.t0); i < lowerBound(snap.killTs, ctx.t1); i++) {
+  for (let i = lowerBound(snap.killTs, ctx.t0), hi = lowerBound(snap.killTs, ctx.t1); i < hi; i++) {
     // The ROW decides membership, not the range: unfiltered every in-range sample has one (the
     // segments are contiguous), and under a zone filter a sample with no row happened somewhere
     // this slice is not about, so it enters neither the row nor the total.
@@ -470,7 +470,7 @@ function foldExp(
   let expParty = 0
   let expUnstated = 0
   let levelEquiv = 0
-  for (let i = lowerBound(snap.expTs, ctx.t0); i < lowerBound(snap.expTs, ctx.t1); i++) {
+  for (let i = lowerBound(snap.expTs, ctx.t0), hi = lowerBound(snap.expTs, ctx.t1); i < hi; i++) {
     // Membership is the row's, exactly as in `foldKills` — see the note there.
     const row = rowAt(ctx, snap.expTs[i])
     if (!row) continue
@@ -493,7 +493,7 @@ function levelSeriesIn(snap: ProgressionSnap, ctx: FoldCtx): Pick<RangeStats, 'l
   const { t0, t1, segs } = ctx
   const levelUps: RangeStats['levelUps'] = []
   const levelRuns: RangeStats['levelRuns'] = []
-  for (let i = lowerBound(snap.levelTs, t0); i < lowerBound(snap.levelTs, t1); i++) {
+  for (let i = lowerBound(snap.levelTs, t0), hi = lowerBound(snap.levelTs, t1); i < hi; i++) {
     const ts = snap.levelTs[i]
     if (segAt(segs, ts) < 0) continue
     const level = snap.levelValue[i]
@@ -557,7 +557,7 @@ export function rangeStats(args: RangeStatsArgs): RangeStats {
   const unknown = levelsUnknown(exp.expSamples, exp.expUnstated)
   let aaGained = 0
   let aaEvents = 0
-  for (let i = lowerBound(snap.aaGainTs, t0); i < lowerBound(snap.aaGainTs, t1); i++) {
+  for (let i = lowerBound(snap.aaGainTs, t0), hi = lowerBound(snap.aaGainTs, t1); i < hi; i++) {
     if (segAt(segs, snap.aaGainTs[i]) < 0) continue
     aaGained += snap.aaGainAmount[i]
     aaEvents++

@@ -29,6 +29,7 @@ measured fact, an owner ruling), add it to the right file below on a work branch
 | [../audits/2026-10-20-performance-review.md](../audits/2026-10-20-performance-review.md) | Before any performance work: what was measured, what is fixed, the ranked structural findings and quick wins. |
 | [../audits/2026-11-06-fold-hot-paths.md](../audits/2026-11-06-fold-hot-paths.md) | Before any engine fold or parser performance work: the per-line costs ranked (top 10), the six fixed over two passes (buffs sweep memo, roster revision, hand-rolled line and melee splits, one-hash aggregate lookups, borrowed miss line), how to re-measure with `parity --stages`. |
 | [../audits/2026-11-06-whole-app-review.md](../audits/2026-11-06-whole-app-review.md) | Before any performance work anywhere: the whole-app review (six areas, merged top 20 with status), the per-area lists, how to re-measure. |
+| [../audits/2026-11-12-quick-review.md](../audits/2026-11-12-quick-review.md) | Before picking small fixes: a one-hour review's five fixes with timings, and ten open findings ranked. |
 
 Notes, plans, audits, requirements and ledgers written before 2026-10-26 name the branches of the
 time (`catch_all`, `local-data-refresh`, `gaps-tab` ...). Those branches are retired and their work

@@ -200,7 +200,13 @@ test('ROUND TRIP: every emitted bundle has a map beside it', (t) => {
     assert.ok(existsSync(join(OUT, dir, `${name}.map`)), `out/${dir}/${name}.map is missing`)
   }
   const assets = join(OUT, 'renderer', 'assets')
-  const js = readdirSync(assets).filter((f) => f.endsWith('.js'))
+  // A dev launch leaves `out/renderer` with no `assets` at all (the dev server serves the renderer
+  // from memory): there is no renderer build to judge, which is a skip and not a missing map.
+  if (!existsSync(assets)) {
+    t.skip('out/renderer/assets is absent — a dev launch, not a build; run `npm run build`')
+    return
+  }
+  const js =readdirSync(assets).filter((f) => f.endsWith('.js'))
   assert.ok(js.length > 0)
   // `out/` on a dev machine is a MIX: fresh bundles beside stale chunks from older builds (the
   // dev server rewrites main/preload but not every renderer asset), so bare existence cannot

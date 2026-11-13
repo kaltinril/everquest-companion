@@ -331,3 +331,16 @@ test('a sound is served only from inside its own pack, and only by a key the man
   assert.equal(getSoundDataIn(roots, 'chimes', '__proto__', 'none'), null)
   assert.equal(getSoundDataIn(roots, 'chimes', 'constructor', 'none'), null)
 })
+
+test('the manifest is written beside itself and renamed over, so a killed write cannot tear it', () => {
+  const tree = tempTree()
+  const root = join(tree, 'my-sounds')
+  importUserSoundFiles(root, [fakeAudio(join(tree, 'downloads'), 'First.mp3')])
+  // What a write killed half way leaves behind: a torn file BESIDE the manifest, never in it.
+  writeFileSync(join(root, 'manifest.json.tmp'), '{"sounds": {"fir')
+  assert.deepEqual(listUserSounds(root).map((s) => s.soundId), ['first'], 'the manifest itself still reads whole')
+  importUserSoundFiles(root, [fakeAudio(join(tree, 'downloads'), 'Second.mp3')])
+  assert.deepEqual(listUserSounds(root).map((s) => s.soundId), ['first', 'second'], 'the earlier sound survives the next import')
+  assert.equal(existsSync(join(root, 'manifest.json.tmp')), false, 'the next write takes the leftover with it')
+  assert.doesNotThrow(() => JSON.parse(readFileSync(join(root, 'manifest.json'), 'utf8')) as unknown)
+})

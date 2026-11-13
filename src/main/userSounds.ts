@@ -22,7 +22,7 @@
 // tests/userSounds.test.mts drives the real copy/remove against a temp dir.
 
 import { dialog, type BrowserWindow } from 'electron'
-import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { logError } from './errorLog'
 import { isInsideDir } from './security'
@@ -68,7 +68,11 @@ export function readUserManifest(root: string): SoundPackManifest {
 
 function writeUserManifest(root: string, manifest: SoundPackManifest): void {
   mkdirSync(join(root, 'sounds'), { recursive: true })
-  writeFileSync(join(root, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n', 'utf8')
+  // Beside the file, then renamed over it: a kill mid-write must not leave a torn manifest, which
+  // reads as empty and lets the next import drop every earlier sound from the list.
+  const file = join(root, 'manifest.json')
+  writeFileSync(`${file}.tmp`, JSON.stringify(manifest, null, 2) + '\n', 'utf8')
+  renameSync(`${file}.tmp`, file)
   // The reader memoizes by mtime and size; a rewrite can keep both inside one tick.
   forgetManifest(root)
 }

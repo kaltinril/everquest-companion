@@ -75,6 +75,11 @@ export function sameItem(read: string | undefined, row: string, others: readonly
   return !others.some((o) => squash(o) !== b && editDistance(a, squash(o)) <= d)
 }
 
+/** Every name the catalog's records answer to: each record's name (or page), then its otherNames, once each. */
+export function catalogNameList(entries: readonly { name?: string; page: string; otherNames?: string[] }[]): string[] {
+  return [...new Set(entries.flatMap((e) => [e.name ?? e.page, ...(e.otherNames ?? [])]))]
+}
+
 /** The names within OCR's two slips of `name`: what `sameItem` checks a slip against (main, over the item catalog). */
 export function nearNames(name: string, names: readonly string[]): string[] {
   const a = squash(name)

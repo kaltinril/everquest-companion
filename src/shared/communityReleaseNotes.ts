@@ -28,6 +28,52 @@ export interface CommunityRelease {
 
 export const COMMUNITY_RELEASE_NOTES: readonly CommunityRelease[] = [
   {
+    "version": "0.1.0-test.48",
+    "date": "2026-11-12",
+    "title": "XP overlay shows Fragments of Potential, Mob Copy keeps a field you copied by hand",
+    "groups": [
+      {
+        "heading": "XP overlay",
+        "items": [
+          {
+            "text": "Fragments of Potential get their own rows after the Motes, one per rank you loot (\"Major frag\"), with drops per hour and the count. They are under the motes button and are never added to the mote counts."
+          }
+        ]
+      },
+      {
+        "heading": "Wiki Gaps",
+        "items": [
+          {
+            "text": "Copy on a mob row no longer puts the whole page back on the clipboard after you press \"Copy these lines\" on a single field."
+          }
+        ]
+      },
+      {
+        "heading": "Smaller fixes",
+        "items": [
+          {
+            "text": "The Leveling tab and the XP overlay work out their rates faster on a long log."
+          },
+          {
+            "text": "The screenshot reader checks an item name against the catalog without listing the catalog again each time."
+          },
+          {
+            "text": "Your imported alert sounds list is saved in one step, so a crash while saving cannot empty it."
+          }
+        ]
+      },
+      {
+        "heading": "Data",
+        "items": [
+          {
+            "text": "Wiki pages refreshed to today (18 pages changed)."
+          }
+        ]
+      }
+    ],
+    "knownIssues": "A Copy page read is kept for half an hour, so a page made on the wiki within that time is not seen until it passes. A merchant page the wiki already has gets no \"items sold\" or \"location\" check. An item page the wiki already has gets no check that it lists a merchant you were quoted by. Joining another player's private instance is not told apart from the open world of that zone; only an instance you create yourself is. A pet summoned shortly before its first \"My leader is\" line can carry a \"(2)\" after its name in the meters until the next restart. Another player's spells never count toward a mob's resists: the game prints only your own resists to you. The con card does not list a mob's immunities yet (the mob page does). Saved characters read \"needs refresh\" on Wiki Gaps until logged in once with this build. A +0 worked back from a window often leaves Weight as ?. A groupmate's charmed pet can still lose its credit when a damage-over-time it cast before the charm ticks on a groupmate. A mob or item added to the wiki after this build shows no wiki details until the next build (or a Copy click in Wiki Gaps). Copy on a wiki page that still holds the template's placeholders keeps them. Capture finds the game window only when it is titled \"EverQuest Legends\" or \"EverQuest\". All characters needs each character logged in here once with this build. The screenshot reader reads English only. The installer is not code-signed, so Windows shows \"Windows protected your PC\" the first time (More info, then Run anyway). Builds before test.20 do not update themselves; install one by hand once."
+  },
+  {
     "version": "0.1.0-test.47",
     "date": "2026-11-12",
     "title": "wiki gaps image rows pick the zone's own page, merchant rows show their saved picture",

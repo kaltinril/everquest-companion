@@ -8,7 +8,7 @@ import { app, clipboard, ipcMain, nativeImage } from 'electron'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { IPC } from '../../shared/ipc'
-import { nearNames } from '../../shared/itemShotKeep'
+import { catalogNameList, nearNames } from '../../shared/itemShotKeep'
 import type { ItemShotReply } from '../../shared/itemWindow'
 import type { ShotTextReply } from '../../shared/spellWindow'
 import itemsJson from '../data/items.json'
@@ -77,8 +77,8 @@ let catalog: string[] | null = null
  * 2026-10-22: Halfling Blood is Vial of Halfling Blood).
  */
 function catalogNames(): string[] {
-  const entries = Object.values((itemsJson as unknown as ItemDbFile).items) as (ItemDbFile['items'][string] & { otherNames?: string[] })[]
-  catalog ??= [...new Set(entries.flatMap((e) => [e.name ?? e.page, ...(e.otherNames ?? [])]))]
+  // Listed inside the `??=`: every `known()` call used to walk the whole catalog first and discard it.
+  catalog ??= catalogNameList(Object.values((itemsJson as unknown as ItemDbFile).items))
   return catalog
 }
 
