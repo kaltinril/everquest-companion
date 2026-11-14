@@ -77,6 +77,8 @@ export interface SpeechWorkerJob {
   readonly hash: string
   readonly text: string
   readonly voiceId: string
+  /** Shorter pauses: cap the silent stretches before the wav is written (speech/silence.ts). */
+  readonly tight?: boolean
 }
 
 /** The worker's answer. `ok` means the wav is on disk under `hash`. */
@@ -151,7 +153,7 @@ export interface SpeechEngineOptions {
 
 export interface SpeechEngine {
   /** Synthesize (or serve from cache) one utterance. Never rejects. */
-  say(text: string, voiceId: string | null | undefined): Promise<SpeechSayResult>
+  say(text: string, voiceId: string | null | undefined, tightPauses?: boolean): Promise<SpeechSayResult>
   /**
    * Forget a latched fault so the NEXT `say()` tries the worker again (JOS-274).
    *
@@ -295,7 +297,7 @@ export function createSpeechEngine(opts: SpeechEngineOptions): SpeechEngine {
   }
 
   /** Post one job and wait for its reply. Resolves false on any failure. */
-  function runJob(hash: string, text: string, voiceId: string): Promise<boolean> {
+  function runJob(hash: string, text: string, voiceId: string, tight: boolean): Promise<boolean> {
     const w = ensureWorker()
     if (!w) return Promise.resolve(false)
     const id = nextJobId++
@@ -304,12 +306,12 @@ export function createSpeechEngine(opts: SpeechEngineOptions): SpeechEngine {
         if (!reply.ok) onError(`speech: synthesis failed - ${reply.error}`, null)
         resolve(reply.ok)
       })
-      w.postMessage({ id, hash, text, voiceId } satisfies SpeechWorkerJob)
+      w.postMessage({ id, hash, text, voiceId, ...(tight ? { tight } : {}) } satisfies SpeechWorkerJob)
     })
   }
 
-  async function synthesize(hash: string, text: string, voiceId: string): Promise<SpeechSayResult> {
-    const ok = await runJob(hash, text, voiceId)
+  async function synthesize(hash: string, text: string, voiceId: string, tight: boolean): Promise<SpeechSayResult> {
+    const ok = await runJob(hash, text, voiceId, tight)
     // Trust the FILE, not the reply: the url we hand back is a promise that the protocol
     // handler will find bytes there, and only the filesystem can keep that promise.
     if (!ok || !existsSync(speechCachePath(opts.userData, hash))) {
@@ -321,9 +323,10 @@ export function createSpeechEngine(opts: SpeechEngineOptions): SpeechEngine {
   }
 
   return {
-    async say(text, voiceId) {
+    async say(text, voiceId, tightPauses = false) {
       const voice = resolveKokoroVoice(voiceId)
-      const hash = speechCacheKey(voice, text)
+      // The tight rendering is its own cache entry: same words, different audio.
+      const hash = speechCacheKey(voice, text, tightPauses ? 'tight' : '')
       // 1. The steady state: already synthesized, some session long ago. No worker, no model.
       if (existsSync(speechCachePath(opts.userData, hash))) {
         return { ok: true, url: eqSpeechUrl(hash) }
@@ -334,7 +337,7 @@ export function createSpeechEngine(opts: SpeechEngineOptions): SpeechEngine {
       // 3. Someone is already synthesizing exactly this. Join them.
       const existing = inFlight.get(hash)
       if (existing) return existing
-      const run = synthesize(hash, text, voice).finally(() => inFlight.delete(hash))
+      const run = synthesize(hash, text, voice, tightPauses).finally(() => inFlight.delete(hash))
       inFlight.set(hash, run)
       return run
     },

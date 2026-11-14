@@ -56,8 +56,11 @@ export function speechCacheDir(userData: string): string {
  * engine's default voice" is a stable identity too, and it must not collide with a voice
  * literally named "undefined".
  */
-export function speechCacheKey(voiceId: string | null | undefined, text: string): string {
-  return createHash('sha256').update(`${voiceId ?? ''}\0${text}`, 'utf8').digest('hex')
+export function speechCacheKey(voiceId: string | null | undefined, text: string, variant = ''): string {
+  // `variant` names a different RENDERING of the same words ('tight' = shorter pauses). Empty
+  // adds nothing, so every wav cached before variants existed keeps its key.
+  const suffix = variant ? `\0${variant}` : ''
+  return createHash('sha256').update(`${voiceId ?? ''}\0${text}${suffix}`, 'utf8').digest('hex')
 }
 
 /** Whether a string is one of our hashes — the ONLY thing allowed to name a cache file. */

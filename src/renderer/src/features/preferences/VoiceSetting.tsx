@@ -32,11 +32,14 @@ import { type JSX, useCallback, useEffect, useRef, useState } from 'react'
 import {
   Box,
   Button,
+  FormControlLabel,
   LinearProgress,
   MenuItem,
   Select,
   Slider,
   Stack,
+  Switch,
+  Tooltip,
   Typography
 } from '@mui/material'
 import DownloadIcon from '@mui/icons-material/Download'
@@ -451,6 +454,19 @@ function RateVolumeRow({ prefs, onChange }: { prefs: VoicePrefs; onChange: (p: V
           sx={{ width: 160 }}
         />
       </Stack>
+      <Tooltip title="Skips pauses at punctuation; a downloaded voice also shortens gaps between words.">
+        <FormControlLabel
+          label={<Typography variant="body2">Shorter pauses</Typography>}
+          control={
+            <Switch
+              size="small"
+              data-testid="pref-voice-tight-pauses"
+              checked={prefs.tightPauses === true}
+              onChange={(_e, on) => onChange({ ...prefs, tightPauses: on })}
+            />
+          }
+        />
+      </Tooltip>
     </Stack>
   )
 }

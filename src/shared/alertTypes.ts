@@ -216,6 +216,11 @@ export interface VoicePrefs {
   rate: number
   /** 0..1, applied on top of the alerts module's own master volume. */
   volume: number
+  /**
+   * Shorter pauses (owner ask, 2026-11-13): punctuation pauses are skipped, and the downloaded
+   * voice's silent gaps are capped. Stored only when on; absent means off.
+   */
+  tightPauses?: boolean
 }
 
 /** One voice a tier can speak with, as surfaced to the renderer by `speech:voices`. */
@@ -266,6 +271,8 @@ export interface SpeechSayRequest {
   text: string
   /** voice override; absent ⇒ VoicePrefs.voiceId. */
   voiceId?: string
+  /** `VoicePrefs.tightPauses`: ask for the rendering with its silent gaps capped. */
+  tightPauses?: boolean
 }
 
 /**

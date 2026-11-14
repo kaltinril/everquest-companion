@@ -161,7 +161,9 @@ export function normalizeVoicePrefs(value: unknown): VoicePrefs {
     // null (never undefined) is the stated "use whatever voice the engine defaults to".
     voiceId: typeof voiceId === 'string' && voiceId.trim() ? voiceId : null,
     rate: clampNumber(raw.rate, MIN_SPEECH_RATE, MAX_SPEECH_RATE, DEFAULT_VOICE_PREFS.rate),
-    volume: clampNumber(raw.volume, 0, 1, DEFAULT_VOICE_PREFS.volume)
+    volume: clampNumber(raw.volume, 0, 1, DEFAULT_VOICE_PREFS.volume),
+    // Written only when on, so a store that never touched it keeps its four keys.
+    ...(raw.tightPauses === true ? { tightPauses: true } : {})
   }
 }
 
@@ -184,6 +186,16 @@ export type SpeechDef = Pick<AlertDef, 'name' | 'speech'>
 /** Trim + collapse runs of whitespace: a newline in a phrase is a pause, not a word break. */
 function tidy(text: string): string {
   return text.replace(/\s+/g, ' ').trim()
+}
+
+/**
+ * "Shorter pauses" (`VoicePrefs.tightPauses`), the text half: drop the punctuation a voice stops
+ * on. Only marks followed by a space go, so `1.5`, `T'vala` and the closing mark (the sentence's
+ * tone) stay. Text that would be left empty is returned as it came.
+ */
+export function tightenPauseText(text: string): string {
+  const tight = tidy(text.replace(/[,;:.!?…]+(?=\s)/g, '').replace(/\s[-–—]+(?=\s)/g, ''))
+  return tight || text
 }
 
 /** Cap an utterance at MAX_SPEECH_CHARS, cutting mid-word rather than refusing to speak. */

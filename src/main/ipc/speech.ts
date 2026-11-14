@@ -77,18 +77,21 @@ const MAX_VOICE_ID_CHARS = 256
 interface ValidSayRequest {
   text: string
   voiceId?: string
+  /** Shorter pauses. Only a literal `true` turns it on. */
+  tight: boolean
 }
 
 /** Narrow an arbitrary renderer value to a say request, or null when it is not one. */
 function validateSayRequest(raw: unknown): ValidSayRequest | null {
   if (typeof raw !== 'object' || raw === null) return null
-  const { text, voiceId } = raw as { text?: unknown; voiceId?: unknown }
+  const { text, voiceId, tightPauses } = raw as { text?: unknown; voiceId?: unknown; tightPauses?: unknown }
   if (typeof text !== 'string') return null
   const trimmed = text.trim()
   if (!trimmed || trimmed.length > MAX_SPEECH_CHARS) return null
-  if (voiceId === undefined) return { text: trimmed }
+  const tight = tightPauses === true
+  if (voiceId === undefined) return { text: trimmed, tight }
   if (typeof voiceId !== 'string' || voiceId.length > MAX_VOICE_ID_CHARS) return null
-  return { text: trimmed, voiceId }
+  return { text: trimmed, voiceId, tight }
 }
 
 /**
@@ -238,7 +241,7 @@ export function registerSpeechIpc(): void {
     // here (rather than in the engine) keeps the store as main's single source for prefs and
     // leaves the engine electron-free.
     const voiceId = request.voiceId ?? getVoicePrefs().voiceId
-    const result = await speechEngine().say(request.text, voiceId)
+    const result = await speechEngine().say(request.text, voiceId, request.tight)
     // THE FUNNEL'S LAST STEP: the downloaded tier actually spoke. Only a success counts, and only
     // THIS tier — the system voice is the renderer's own `speechSynthesis` and never reaches
     // main, which is right: this funnel measures the install flow, and an install that ends in a

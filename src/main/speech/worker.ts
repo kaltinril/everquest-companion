@@ -45,7 +45,8 @@ import { phonemize } from 'phonemizer'
 import { encodeWav } from './cache'
 import { kokoroSessionOptions } from './engine'
 import { normalizeEspeakPhonemes, phonemeCount, tokenizePhonemes } from './phonemes'
-import { KOKORO_MAX_TOKENS, kokoroVoiceLang } from './pinned'
+import { KOKORO_MAX_TOKENS, KOKORO_SAMPLE_RATE, kokoroVoiceLang } from './pinned'
+import { capSilence } from './silence'
 import { decodeNpyFloat32, parseVoicePack, styleVectorFor } from './voicePack'
 import type { SpeechWorkerInit, SpeechWorkerJob, SpeechWorkerReply } from './engine'
 
@@ -150,7 +151,7 @@ async function synthesize(job: SpeechWorkerJob): Promise<void> {
   const output = (await session.run(feeds))[names.audio]
   const samples = output.data
   if (!(samples instanceof Float32Array)) throw new Error('model returned non-float audio')
-  await writeAtomic(job.hash, encodeWav(samples))
+  await writeAtomic(job.hash, encodeWav(job.tight ? capSilence(samples, KOKORO_SAMPLE_RATE) : samples))
 }
 
 /**
