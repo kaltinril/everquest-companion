@@ -58,6 +58,26 @@ export const COLUMN_CORRECTIONS: readonly SpellCorrection[] = [
     evidence:
       'Reported 01M0V24TW8FP3WFS38AFGN1HDH (v1.9.0): `Vengeance of the Wild is not showing as a DoT and the damage listed does not match the actual DoT damage (likely because its is not being seen as a DoT?)` The page is its own witness (pageid fetched 2026-08-28): its description reads `causing between 122 and 131 damage every six seconds for 30s` and its duration row `5 ticks`, while its slot line alone omits the rate marker. The DB is the family witness: 138 detrimental rows with a duration carry `per tick` on their Decrease-Hitpoints line verbatim, and every other no-marker row with a duration (censused 2026-08-28: the root families, Fire, Ice, Flame Song of Ro, Stone Spider Stun) is genuinely front-loaded damage riding a root/resist/stun duration — Vengeance of the Wild is the sole row whose own description contradicts its slot. The numbers 121/132 are the slot`s and stay: the description`s 122/131 is the page disagreeing with itself by one, and a correction fixes the marker, not the wiki`s arithmetic. Blast radius: spellMetrics reads perTick true, so bestSpells moves the spell from the DD tab to the DoT tab and its total becomes per-tick x 5 ticks (126.5 midpoint -> 632.5) with dps over the 30 s cycle; the parser is untouched (DoT damage attribution is log-shape driven); spellEffectClass`s heal families are untouched (this is a Decrease line).'
   },
+  // Two levels the game's patch notes moved and the wiki pages still state the old way (read
+  // 2026-11-15). The owner's client file agrees with the patch notes on both.
+  {
+    spells: ['Lifespike'],
+    field: 'classes',
+    from: '* Necromancer - Level 3 (Autogranted) * Shadow Knight - Level 8',
+    to: '* Necromancer - Level 3 (Autogranted) * Shadow Knight - Level 5',
+    attribution: 'db',
+    evidence:
+      'Patch notes 2026-08-18: `The Lifespike spell has been moved from level 8 to level 5 for Shadowknights`, in the same note that adds Lifebite at Shadow Knight 10 and Necromancer 8, which the catalog already carries. The owner`s client file (spell 502) states Shadow Knight 5 and Necromancer 3. Blast radius: the unlock card moves from Shadow Knight 8 to 5; no message or figure moves.'
+  },
+  {
+    spells: ['Enchant Steel'],
+    field: 'classes',
+    from: '* Enchanter - Level 46',
+    to: '* Enchanter - Level 21',
+    attribution: 'db',
+    evidence:
+      'Patch notes 2026-06-29: `Reduced the usable level of the following Enchanter spells: Enchant Clay to level 7. Enchant Steel to level 21.` The catalog already carries Enchant Clay at 7; the Enchant Steel page still states 46. The owner`s client file (spell 1892) states Enchanter 21. Blast radius: the unlock card moves from Enchanter 46 to 21, and its place on the enchant line with it.'
+  },
   // Two slot lines the stat reader cannot read, so the buff set scored both spells at nothing
   // (owner report 2026-11-15, Loadout buff set for a Shadow Knight).
   {

@@ -385,14 +385,34 @@ test('two PET buffs of the same stat still contest each other', () => {
 
 test('a PROC buff is a candidate, the newer of two wins the tie, and a proc is not totalled', () => {
   const proc = (name: string, level: number): UnlockSpell =>
-    ({ name, at: [{ cls: 'SHD', level }], upgradeCategory: 'buff', proc: true }) as UnlockSpell
+    ({ name, at: [{ cls: 'SHD', level }], upgradeCategory: 'buff', proc: true, line: 'SK procs' }) as UnlockSpell
   const spells = [proc('Vampiric Embrace', 15), proc('Scream of Death', 37)]
   const cands = loadoutCandidates(spells, ['SHD'], DEFAULT_STAT_WEIGHTS)
   assert.deepEqual(cands.map((c) => c.name), ['Scream of Death', 'Vampiric Embrace'])
   assert.deepEqual(cands[0].grants.map((g) => g.key), ['MELEE_PROC'])
   const set = buildLoadout(cands, L)
   assert.deepEqual(set.keep.map((c) => c.name), ['Scream of Death'])
+  assert.deepEqual(set.rejected.map((r) => [r.name, r.beatenBy]), [['Vampiric Embrace', 'Scream of Death']])
   assert.deepEqual(buffTotals(set.keep).rows, [])
+})
+
+test('PROC buffs of DIFFERENT lines stack, even where the client rows share the proc effect', () => {
+  // Patch notes 2026-06-09 / 06-11: the Paladin, Shadow Knight and Ranger combat innates all stack.
+  const procView = (id: number): StackSpellView =>
+    stackView({ id, name: String(id), goodEffect: true, slots: [{ slot: 1, effect: 85, base: id, limit: 0, calc: 100, max: 0 }] })
+  const proc = (name: string, line: string, id?: number): LoadoutCandidate => ({
+    name,
+    at: [{ cls: 'SHD', level: 30 }],
+    grants: [{ key: 'MELEE_PROC', amount: 1, percent: false, line: 'Add Melee Proc' }],
+    score: 30,
+    line,
+    ...(id === undefined ? {} : { view: procView(id) })
+  })
+  const exact = buildLoadout([proc('Scream of Death', 'SK procs', 2574), proc('Call of Sky', 'RNG procs', 1461)], L)
+  assert.deepEqual(exact.keep.map((c) => c.name).sort(), ['Call of Sky', 'Scream of Death'])
+  assert.deepEqual(exact.rejected, [])
+  const flagged = buildLoadout([proc('Scream of Death', 'SK procs'), proc('Call of Sky', 'RNG procs')], L)
+  assert.deepEqual(flagged.keep.map((c) => c.name).sort(), ['Call of Sky', 'Scream of Death'])
 })
 
 test('a debuff with a RECOURSE is a buff on its caster: the recourse grants, at the level asked', () => {

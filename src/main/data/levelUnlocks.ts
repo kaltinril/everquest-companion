@@ -278,7 +278,7 @@ function writeFigures(
 ): void {
   const clientHp = clientHpFor(client, s.name)
   const waves = rainWaves(s.name)
-  const cap = aeMaxTargets(clientHp?.aeMaxTargets)
+  const cap = aeMaxTargets(clientHp?.aeMaxTargets, s.targetType)
   const input = { ...s, hits: aeHits(waves, 1, cap) }
   const level = Math.min(...at.map((p) => p.level))
   const metrics = spellMetricsAt(input, level, clientHp)

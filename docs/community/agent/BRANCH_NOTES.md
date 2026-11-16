@@ -185,6 +185,9 @@ where one exists.
 - Buff set rank: `CandidateQuery.tierOf` lifts every point stat to the spell's tier (`statAtRank`,
   MEASURED.md); percents, regens and the proc grant are not scaled. Open: `spellUpgrade.ts` carries
   no stat magnitude, so the Upgrades tab still ranks a buff as buying no bigger numbers.
+- Buff set procs: `procLadder` keeps one proc buff per spell line (the newest) before the conflict
+  search and blanks SPA 85 in the kept views, because the game stacks proc buffs of different
+  lines (MEASURED.md, patch notes) and the same-effect rule would call every pair a contest.
 - Recourses: `<name> Recourse` in the catalog is folded onto `<name>` as `UnlockSpell.recourse`
   (main `levelUnlocks.ts`) and is no longer an unlock row. Such a spell is a buff candidate under
   its own name with the recourse's grants, `enemy: true`, and `stackAs` = the recourse row, whose
