@@ -81,6 +81,16 @@ export function KeepRow({
           sx={TINY_CHIP}
         />
       )}
+      {c.pet === true && (
+        <Chip
+          size="small"
+          variant="outlined"
+          data-testid="loadout-pet"
+          label="pet"
+          title="Lands on your pet, so its stats are not in your totals."
+          sx={TINY_CHIP}
+        />
+      )}
       {(also ?? []).map((m) => (
         <Chip
           key={m.name}

@@ -12,6 +12,7 @@ import { spellStatGrants } from '../src/shared/spellStats'
 import { stackView, type StackSpellView } from '../src/shared/spellStack'
 import {
   DEFAULT_STAT_WEIGHTS,
+  buffTotals,
   buildLoadout,
   combatSet,
   loadoutCandidates,
@@ -346,4 +347,36 @@ test('a loser that contests several kept spells is said to lose to the one it sh
   assert.equal(set.rejected[0].beatenBy, 'Alacrity')
   // …and a stat ANY of the spells that beat it grants is not a stat the set gave up.
   assert.deepEqual(set.rejected[0].loses, [])
+})
+
+// =================================================================================================
+// PET BUFFS - owner, 2026-11-15: Strengthen Death "doesn't give me haste, attack or ac"
+// =================================================================================================
+
+/** A catalog buff whose target is the caster's pet. */
+function petBuff(name: string, effects: string[]): UnlockSpell {
+  return { ...buff(name, effects, ['SHD']), targetType: 'Pet' } as UnlockSpell
+}
+
+test('a PET buff is kept beside a player buff of the same stat, and stays out of the totals', () => {
+  const spells = [
+    petBuff('Strengthen Death', ['Increase Attack Speed by 20%', 'Increase STR by 5']),
+    buff('Quickness', ['Increase Attack Speed by 30%'], ['SHD'])
+  ]
+  const set = buildLoadout(loadoutCandidates(spells, ['SHD'], DEFAULT_STAT_WEIGHTS), L)
+  assert.deepEqual(set.keep.map((c) => c.name).sort(), ['Quickness', 'Strengthen Death'])
+  assert.equal(set.keep.find((c) => c.name === 'Strengthen Death')?.pet, true)
+  assert.equal(set.keep.find((c) => c.name === 'Quickness')?.pet, undefined)
+  assert.deepEqual(set.rejected, [])
+  assert.deepEqual(buffTotals(set.keep).rows.map((r) => [r.key, r.amount]), [['HASTE', 30]])
+})
+
+test('two PET buffs of the same stat still contest each other', () => {
+  const spells = [
+    petBuff('Strengthen Death', ['Increase Attack Speed by 20%']),
+    petBuff('Augment Death', ['Increase Attack Speed by 45%'])
+  ]
+  const set = buildLoadout(loadoutCandidates(spells, ['SHD'], DEFAULT_STAT_WEIGHTS), L)
+  assert.deepEqual(set.keep.map((c) => c.name), ['Augment Death'])
+  assert.deepEqual(set.rejected.map((r) => [r.name, r.beatenBy]), [['Strengthen Death', 'Augment Death']])
 })

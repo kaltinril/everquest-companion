@@ -151,6 +151,8 @@ export interface LoadoutCandidate {
   score: number
   /** The client's stacking view, when the player's own spell file could answer for it. */
   view?: StackSpellView
+  /** It lands on the caster's pet: the pet's own slots, and none of the player's totals. */
+  pet?: true
 }
 
 /** One buff that lost its slot, and what losing it costs beyond the obvious. */
@@ -382,8 +384,15 @@ function candidate(s: UnlockSpell, parts: CandidateParts): LoadoutCandidate {
     at,
     grants,
     score,
-    ...(view === undefined ? {} : { view })
+    ...(view === undefined ? {} : { view }),
+    ...(landsOnPet(s) ? { pet: true as const } : {})
   }
+}
+
+/** The catalog's `Pet` and `Summoned Pet` targets (owner, 2026-11-15, on Strengthen Death). */
+function landsOnPet(s: UnlockSpell): boolean {
+  const target = s.targetType?.trim().toLowerCase()
+  return target === 'pet' || target === 'summoned pet'
 }
 
 export function loadoutCandidates(
@@ -421,6 +430,8 @@ export function loadoutCandidates(
 
 /** Do these two candidates conflict? Exact through the engine, flagged through shared stats. */
 function conflicts(a: LoadoutCandidate, b: LoadoutCandidate, levels: StackLevels): boolean {
+  // A pet buff sits in the pet's slots, so it never contests a buff that lands on a player.
+  if ((a.pet === true) !== (b.pet === true)) return false
   if (a.view !== undefined && b.view !== undefined) return spellsConflict(a.view, b.view, levels)
   return grantsShareASlot(a.grants, b.grants).length > 0
 }
@@ -501,7 +512,7 @@ export function buildLoadout(
   const keep: LoadoutCandidate[] = []
   let provenOptimal = true
 
-  for (const component of componentsOf(candidates, levels)) {
+  for (const component of componentsBySide(candidates, levels)) {
     const members = component.map((i) => candidates[i])
     if (members.length === 1) {
       keep.push(members[0])
@@ -560,6 +571,17 @@ function closestWinner(
   const shared = (w: LoadoutCandidate): number => grantsShareASlot(w.grants, loser.grants).length
   // A stable sort, so a tie keeps the set's own order.
   return [...winners].sort((x, y) => shared(y) - shared(x))[0]
+}
+
+/** Components of the player's buffs, then of the pet's: the two sides share no slot. */
+function componentsBySide(candidates: readonly LoadoutCandidate[], levels: StackLevels): number[][] {
+  const out: number[][] = []
+  for (const pet of [false, true]) {
+    const index = candidates.flatMap((c, i) => ((c.pet === true) === pet ? [i] : []))
+    const side = index.map((i) => candidates[i])
+    for (const component of componentsOf(side, levels)) out.push(component.map((j) => index[j]))
+  }
+  return out
 }
 
 /**
@@ -864,6 +886,8 @@ function addGrant(into: Map<string, BuffStatTotal>, g: SpellStatGrant, from: str
 export function buffTotals(keep: readonly LoadoutCandidate[]): BuffTotals {
   const byKey = new Map<string, BuffStatTotal>()
   for (const c of keep) {
+    // A pet buff's stats are the pet's, not the player's.
+    if (c.pet === true) continue
     for (const g of c.grants) addGrant(byKey, g, c.name)
   }
   // A FIXED ORDER, NOT A MAGNITUDE ONE (owner, 2026-09-10). Sorting by size put a different stat at

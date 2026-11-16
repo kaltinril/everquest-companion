@@ -176,6 +176,14 @@ where one exists.
   mates are read at YOUR level. Party colours are stored as slots (8), paint in `partyPaint.ts`.
 - Open: pass `roleWeights` (the Gear plan's, now on the same trunk) into `buildLoadout` and delete
   `DEFAULT_STAT_WEIGHTS`.
+- Buff set: a `Pet` / `Summoned Pet` target buff is a candidate with `pet: true`. It is solved as
+  its own side (`componentsBySide`), never contests a player buff, and `buffTotals` skips it.
+- Buff set scores stat grants only. A proc buff (`Add Melee Proc:`, `Add Proc:`; 39 catalog rows)
+  scores zero and is drawn on Utility, Other buffs. Open (requirements, 2026-11-15).
+- Recourse buffs: the catalog lists one as its own spell only where the wiki gives it a class row
+  (Shroud of Hate Recourse, SHD 39). Owner's `spells_us.txt`, read 2026-11-15: Siphon Strength (343)
+  links recourse 2463 (caster STR +5 to +10, wiki: "cast by NPCs only"); Wave of Enfeeblement (363)
+  links none; Scream of Death (2574) procs 2718, a 30-point lifetap.
 - Rust `spells_us.rs` twin is not parity-gated; deferred.
 - Open: SPA 148 slot reading (MEASURED.md); SPA 475 rows in the same slot contest each other.
 - `LevelUnlockData.general` holds the General AAs with no class key; the fold appends them classless
