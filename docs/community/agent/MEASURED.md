@@ -10,6 +10,14 @@ SK, others).
 - **Proc damage scales exactly 3% per rank:** `floor(base * (1 + 0.03 * rank))`. Puma Maw over
   the whole log: rank I 154 (n=3453), IV 172 (n=196), VI 181 (n=1735). Crits corroborate (400/154 =
   472/181 = 2.6).
+- **Buff and debuff stats: 3% per tier, rounded** (`statAtRank`, 2026-11-15). The game's spell
+  windows print the upgraded figure in green since a patch; before it they printed base figures.
+  Tier 4: 10 -> 11 (Grim Aura, Siphon Strength, Shadow Vortex), 20 -> 22 (Shroud of Hate, Heart
+  Flutter), 25 -> 28 (Dark Temptation), 7 -> 8 (Heart Flutter AC: 7.84, so rounded, not floored).
+  A roman rank is the tier (`IV` shows `Tier 4`). Same windows: debuff duration +10% and cast -4%
+  a tier match the table; Heart Flutter's tick reads 24 -> 27, where the floored 3% gives 26.
+  No reading yet for a percent stat (haste), a resist or a regen; the Chloroplast and Form of the
+  Bear sheet readings (regen did not move) predate the patch.
 - **DoT ticks: 3% per rank** (overturned the shipped 6%, which was fitted on nukes only).
   `scaleSpellDamage(amount, rank, perTick)`; a DD+DoT hybrid's direct hit stays 6%. Odium 387 ->
   445 at V, 468 at VII (exact); Envenomed Bolt 422 -> 473 at IV; Plague 180 -> 199 at IV. A

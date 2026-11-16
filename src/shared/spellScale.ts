@@ -207,6 +207,28 @@ export function damageAtRank(amount: number, n: number, perTick = false): number
   return amount + Math.floor((amount * pct * n) / 100)
 }
 
+/**
+ * Percent ONE rank adds to a STAT a buff or debuff states (STR, AC, ATK), from the game's own spell
+ * windows (owner, 2026-11-15, after the patch that made them print the upgraded figure in green).
+ * Eight readings, seven at Tier 4 and every one `round(base x 1.12)`:
+ *
+ *     Grim Aura IV          ATK  10 -> 11      Shroud of Hate IV   ATK  20 -> 22
+ *     Dark Temptation IV    ATK  25 -> 28      Shadow Vortex IV    AC   10 -> 11
+ *     Siphon Strength IV    STR  10 -> 11      Heart Flutter IV    STR  20 -> 22, AC 7 -> 8
+ *
+ * ROUNDED, NOT FLOORED: 7 x 1.12 is 7.84 and the window prints 8. This overturns the claim that a
+ * buff's magnitudes never scale (`spellUpgrade.ts`), which predates the patch and was never a
+ * measurement. A percent stat (haste, run speed) has no reading yet and is left unscaled.
+ */
+export const SPELL_STAT_RANK_PERCENT = 3
+
+/** ONE STAT MAGNITUDE AT A RANK, sign kept: a debuff's -10 reads -11 at Tier 4. */
+export function statAtRank(amount: number, n: number): number {
+  if (n <= 0 || amount === 0) return amount
+  const size = Math.abs(amount)
+  return Math.sign(amount) * Math.round(size + (size * SPELL_STAT_RANK_PERCENT * n) / 100)
+}
+
 export function healAtRank(amount: number, n: number): number {
   if (n <= 0 || amount <= 0) return amount
   return amount + Math.floor((amount * SPELL_HEAL_RANK_PERCENT * n) / 100)

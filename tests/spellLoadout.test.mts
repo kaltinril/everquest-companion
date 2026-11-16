@@ -427,3 +427,11 @@ test('THE REAL CATALOG: a Shadow Knight`s buff set names the spells he casts, no
   assert.deepEqual(grantsOf('Shieldskin'), [['ABSORB_DAMAGE', 55]])
   assert.equal(cands.find((c) => c.name === 'Strengthen Death')?.pet, true)
 })
+
+test('a buff`s POINT stats are read at its rank; a percent is not', () => {
+  const spells = [buff('Dark Temptation', ['Increase ATK by 25', 'Increase Attack Speed by 20%'], ['SHD'])]
+  const at = (tier: number): unknown =>
+    loadoutCandidates(spells, ['SHD'], DEFAULT_STAT_WEIGHTS, { tierOf: () => tier })[0].grants.map((g) => g.amount)
+  assert.deepEqual(at(0), [25, 20])
+  assert.deepEqual(at(4), [28, 20])
+})

@@ -52,6 +52,7 @@ import type { SpellMetrics } from './spellMetrics'
 import { compareStatKeys, grantsShareASlot, rampAt, type SpellStatGrant, type SpellStatKey } from './spellStats'
 import { parseHpLine, parseManaLine, type HpLine } from './spellMetrics'
 import { foldSpellsByName } from './spellFold'
+import { statAtRank } from './spellScale'
 import {
   conflictComponents,
   spellsConflict,
@@ -277,6 +278,11 @@ export interface CandidateQuery {
    * delete good buffs.
    */
   minDurationMs?: number
+  /**
+   * THE RANK EACH SPELL IS READ AT, already resolved to a tier 0..10 (`effectiveSpellRank`).
+   * A point stat grows 3% a tier (`statAtRank`). Absent means every spell at its base.
+   */
+  tierOf?: (name: string) => number
 }
 
 /**
@@ -404,10 +410,14 @@ function candidate(s: UnlockSpell, parts: CandidateParts): LoadoutCandidate {
  * A recourse spell grants its caster the recourse's lines and nothing of its own, which land on the
  * enemy. Every ramp is read again at this level: the catalog's `grants` are a reading at the level
  * the spell is first gained, and Grim Aura's `5 (L1) to 10 (L10)` is 10 on a level-44 caster.
+ * Then every point stat is lifted to the spell's rank; a percent has no measured rate and stays.
  */
-function grantsOf(s: UnlockSpell, level: number): SpellStatGrant[] {
+function grantsOf(s: UnlockSpell, level: number, tier: number): SpellStatGrant[] {
   const stated = s.recourse?.grants ?? s.grants ?? []
-  const read = stated.map((g) => (g.ramp === undefined ? g : { ...g, amount: rampAt(g.ramp, level) }))
+  const read = stated.map((g) => {
+    const amount = g.ramp === undefined ? g.amount : rampAt(g.ramp, level)
+    return { ...g, amount: g.percent ? amount : statAtRank(amount, tier) }
+  })
   if (s.recourse !== undefined) return read
   const proc: SpellStatGrant[] =
     s.proc === true ? [{ key: 'MELEE_PROC', amount: 1, percent: false, line: 'Add Melee Proc' }] : []
@@ -443,7 +453,7 @@ export function loadoutCandidates(
     const at = s.at.filter((p) => classes.includes(p.cls) && (level === undefined || p.level <= level))
     if (at.length === 0) continue
     // The catalog's own grants, plus the per-tick regens and the proc it states in other words.
-    const grants = grantsOf(s, level ?? ASSUMED_CASTER_LEVEL)
+    const grants = grantsOf(s, level ?? ASSUMED_CASTER_LEVEL, query.tierOf?.(s.name) ?? 0)
     const score = scoreGrants(grants, weights)
     // A buff worth nothing under the weights in force is not a recommendation. It is still a real
     // spell and the Spellbook still lists it; this tab is about a SET worth keeping up.
@@ -852,14 +862,10 @@ export interface CombatSource {
 // asked for. They are separated here rather than in the view, so every surface that draws these
 // totals separates them the same way.
 //
-// ── AND THE TOTALS DO NOT MOVE WITH THE UPGRADE SLIDER, WHICH IS THE ANSWER RATHER THAN A GAP ──
+// ── THE TOTALS MOVE WITH RANK (2026-11-15) ────────────────────────────────────────────────────
 //
-// The reason to build this panel beside a 0-to-10 slider is to see what upgrading buys. For a BUFF
-// SET the answer is nothing: no category scales a stat grant (`spellUpgrade.ts` states that claim
-// and what it rests on), so every number below reads the same at rank 0 and at rank X. That is the
-// owner's question 2 - *"which spells are important to upgrade"* - answered for a whole set at
-// once, and a panel that sat still while the slider moved WITHOUT saying so would read as broken.
-// The surface drawing it has to say it out loud; `buffTotals` just makes the stillness true.
+// A candidate's point stats arrive already lifted to its rank (`grantsOf`, `statAtRank`), so the
+// sum below is the set as the player holds it and the slider moves it.
 
 /** One line of the summary. */
 export interface BuffStatTotal {
