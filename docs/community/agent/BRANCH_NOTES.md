@@ -182,6 +182,9 @@ where one exists.
 - Buff set grants (`grantsOf`): stat lines re-read at the character's level (the catalog's
   `grants` are a reading at the gain level), per-tick regens, and one `MELEE_PROC` grant for
   `UnlockSpell.proc`. `MELEE_PROC` is never parsed by `parseStatLine` and never totalled.
+- Buff set rank: `CandidateQuery.tierOf` lifts every point stat to the spell's tier (`statAtRank`,
+  MEASURED.md); percents, regens and the proc grant are not scaled. Open: `spellUpgrade.ts` carries
+  no stat magnitude, so the Upgrades tab still ranks a buff as buying no bigger numbers.
 - Recourses: `<name> Recourse` in the catalog is folded onto `<name>` as `UnlockSpell.recourse`
   (main `levelUnlocks.ts`) and is no longer an unlock row. Such a spell is a buff candidate under
   its own name with the recourse's grants, `enemy: true`, and `stackAs` = the recourse row, whose

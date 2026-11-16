@@ -53,6 +53,7 @@ import {
 import { bestSpellsAt, defaultSorts } from '@shared/bestSpells'
 import { utilitySet, type UtilitySet } from '@shared/spellUtilitySet'
 import { observedRankRow } from '@shared/spellRanks'
+import { effectiveSpellRank } from '@shared/spellScale'
 import type { CharacterSnap } from '@shared/characterTypes'
 import { useLevelUnlocks } from '../leveling/useLevelUnlocks'
 import { useModule } from '../../lib/useModule'
@@ -271,12 +272,17 @@ export default function SpellLoadoutView(): JSX.Element {
   // number. Absent until the log has seen a level-up or your own `/who` row, which is the ordinary
   // state of a fresh log - see `ASSUMED_LEVEL`.
   const level = who?.level?.level ?? ASSUMED_LEVEL
-  // YOUR BUFFS, PLUS WHAT A GROUP-MATE CAN PUT ON YOU (Garrett, 2026-09-26) - `useLoadoutPool`.
-  const pool = useLoadoutPool(data.spells, combo.resolved, level)
-  const { candidates } = pool
   // THE RANK YOU ACTUALLY HAVE, off the log (JOS-446), lifted to whatever the slider asks for -
   // `max(observed, simulated)`, which is the Leveling tab's own rule so the two cannot disagree.
   const ranks = useObservedSpellRanks()
+  // The same rank as a tier, for the stats: a buff's STR and ATK grow with it (`statAtRank`).
+  const tierOf = useCallback(
+    (name: string) => effectiveSpellRank(observedRankRow(ranks, name)?.rank, tier),
+    [ranks, tier]
+  )
+  // YOUR BUFFS, PLUS WHAT A GROUP-MATE CAN PUT ON YOU (Garrett, 2026-09-26) - `useLoadoutPool`.
+  const pool = useLoadoutPool(data.spells, combo.resolved, level, tierOf)
+  const { candidates } = pool
   const rankOf = useCallback(
     (name: string) => Math.max(observedRankRow(ranks, name)?.rank ?? 0, tier, 1),
     [ranks, tier]
@@ -368,7 +374,7 @@ export default function SpellLoadoutView(): JSX.Element {
         testId="loadout-tier-slider"
         note={
           shown === 'buffs' || shown === 'pet'
-            ? 'a buff set gains mana, duration and cast time - never bigger stats'
+            ? 'buff stats grow 3% a rank; mana, duration and cast time improve too'
             : shown === 'utility'
               ? 'utility spells gain mana, duration and cast time; a charm or mez caps one level higher a rank'
               : 'damage and healing move; mana, duration and cast time move with them'

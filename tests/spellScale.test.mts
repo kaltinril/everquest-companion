@@ -276,3 +276,13 @@ test('the rate is stated once and the two constants are the ones the header argu
   assert.equal(SPELL_DAMAGE_RANK_PERCENT, 6)
   assert.equal(SPELL_MAX_RANK, 10)
 })
+
+test('a STAT at a rank is 3% a tier, ROUNDED, sign kept: the owner`s eight spell-window readings', async () => {
+  const { statAtRank } = await import('../src/shared/spellScale')
+  // Tier 4, 2026-11-15: Grim Aura, Siphon Strength, Shadow Vortex 10 -> 11; Shroud of Hate and
+  // Heart Flutter 20 -> 22; Dark Temptation 25 -> 28; Heart Flutter AC 7 -> 8 (7.84, so not a floor).
+  assert.deepEqual([10, 20, 25, 7].map((n) => statAtRank(n, 4)), [11, 22, 28, 8])
+  assert.equal(statAtRank(-20, 4), -22)
+  assert.equal(statAtRank(25, 0), 25)
+  assert.equal(statAtRank(0, 10), 0)
+})

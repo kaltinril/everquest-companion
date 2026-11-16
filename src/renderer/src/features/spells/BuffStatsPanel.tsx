@@ -23,19 +23,8 @@ const TINY_CHIP = { height: 18, fontSize: 10, '& .MuiChip-label': { px: 0.6 } } 
  * your ITEMS say and its header states in three words that that is all it knows, explicitly
  * declining to lecture about buffs. This is the sentence it refused to write.
  *
- * ============================================================================
- * IT DOES NOT MOVE WHEN YOU DRAG THE SLIDER, AND IT SAYS SO
- * ============================================================================
- * The rest of the owner's ask was *"lets me imagine what it would look like for each individual
- * spell updated"* - so this panel sits beside a 0-to-10 slider and the honest answer is that these
- * numbers are the same at rank 0 and at rank X. No category scales a stat grant (`spellUpgrade.ts`
- * carries that claim and the Form of the Bear measurement behind it), so upgrading a buff buys
- * mana, duration and cast time and never a bigger number here.
- *
- * That is his question 2 - *"which spells are important to upgrade"* - answered for a whole set at
- * once, and it is the most useful thing this panel can tell him. A summary that simply sat still
- * while the control beside it moved would read as broken, so the stillness is LABELLED rather than
- * left to be discovered.
+ * IT MOVES WITH THE SLIDER SINCE 2026-11-15: a buff's point stats grow 3% a rank
+ * (`spellScale.statAtRank`), so the totals are read at each spell's rank and the note says so.
  */
 export default function BuffStatsPanel({
   totals,
@@ -94,16 +83,16 @@ export default function BuffStatsPanel({
           ))}
         </Box>
       )}
-      {/* THE LABEL THAT MAKES THE STILLNESS INFORMATIVE. See this component's header. */}
+      {/* Since 2026-11-15 the totals move with rank: the game's spell windows show it. */}
       <Typography
         variant="caption"
         color="text.secondary"
         display="block"
         sx={{ mt: 1, pt: 1, borderTop: 1, borderColor: 'divider' }}
-        data-testid="buff-stats-static-note"
+        data-testid="buff-stats-rank-note"
       >
-        These do not change with the slider. Upgrading a buff buys mana, duration and cast time; the
-        stats it grants stay where they are.
+        Each buff is read at your rank of it. The slider lifts them all; haste and run speed do not
+        move.
       </Typography>
     </Paper>
   )
