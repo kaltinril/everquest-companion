@@ -140,8 +140,9 @@ Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`)
   rank suffix is in interrupt, fizzle, wore-off and damage lines. 08-25: several item rewards
   print a count.
 - **Spell levels the notes moved** (client file agrees, 2026-11-15): Lifespike to Shadow Knight 5
-  (08-18), Enchant Steel to Enchanter 21 (06-29). The wiki pages still said 8 and 46: corrected in
-  `spellCorrectionsColumns.ts`. The June Shaman heal levels (Slugs 28, Sloths 42) were reshuffled
+  (08-18), Enchant Steel to Enchanter 21 (06-29). The wiki pages still said 8 and 46, so the
+  catalog does too: the page edits went to the owner. Not corrected in the app, because a `classes`
+  correction is projected into the engine's spell overlay and needs the engine gate. The June Shaman heal levels (Slugs 28, Sloths 42) were reshuffled
   later; the catalog and the client agree on Snails 14, Tortoises 28, Slugs 42.
 
 ## Items and upgrades
