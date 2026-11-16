@@ -136,6 +136,8 @@ export type SpellStatKey =
   | 'CHANCE_TO_HIT'
   /** `Increase Chance to Reflect Spell by 5%`. */
   | 'REFLECT_SPELL'
+  /** `Add Melee Proc:` / `Add Proc:` - a weapon proc. No magnitude: the buff set's own grant. */
+  | 'MELEE_PROC'
 
 /**
  * The alias table: every spelling the catalog uses, folded to one key.
@@ -406,7 +408,8 @@ export const SPELL_STAT_LABEL: Partial<Record<SpellStatKey, string>> = {
   CURSE_COUNTER: 'Curse cure',
   AGGRO_MULT: 'Aggro',
   CHANCE_TO_HIT: 'Accuracy',
-  REFLECT_SPELL: 'Spell reflect'
+  REFLECT_SPELL: 'Spell reflect',
+  MELEE_PROC: 'Weapon proc'
 }
 
 /**
@@ -447,6 +450,8 @@ function counterWord(key: SpellStatKey, amount: number): string | null {
 export function spellStatText(g: SpellStatGrant): string {
   const counter = counterWord(g.key, g.amount)
   if (counter !== null) return counter
+  // A proc is there or it is not; `+1` would read as a magnitude.
+  if (g.key === 'MELEE_PROC') return spellStatLabel(g.key)
   const sign = g.amount >= 0 ? '+' : '-'
   return `${spellStatLabel(g.key)} ${sign}${String(Math.abs(g.amount))}${g.percent ? '%' : ''}`
 }

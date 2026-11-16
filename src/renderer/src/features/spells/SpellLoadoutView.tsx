@@ -43,10 +43,10 @@
 import { type JSX, useCallback, useMemo, useState } from 'react'
 import { Alert, Box, Chip, Divider, Stack, Tab, Tabs, Typography } from '@mui/material'
 import {
-  buildLoadout,
   COMBAT_TABLES,
   buffTotals,
   combatSet,
+  loadoutSides,
   type CombatSet,
   type LoadoutSet
 } from '@shared/spellLoadout'
@@ -57,7 +57,7 @@ import type { CharacterSnap } from '@shared/characterTypes'
 import { useLevelUnlocks } from '../leveling/useLevelUnlocks'
 import { useModule } from '../../lib/useModule'
 import SpellTierSlider from './SpellTierSlider'
-import { CastSection, RejectRow, TINY_CHIP, UtilitySection } from './LoadoutRows'
+import { CastSection, PetSection, RejectRow, TINY_CHIP, UtilitySection } from './LoadoutRows'
 import LoadoutKeep, { othersWhoCast } from './LoadoutKeep'
 import LoadoutClasses, { useLoadoutClasses } from './LoadoutClasses'
 import BuffStatsPanel from './BuffStatsPanel'
@@ -197,11 +197,13 @@ function BuffSection({
 }
 
 /** Which set is on screen. Local to this view - see the tab bar for why it is not an app View. */
-type LoadoutPane = 'buffs' | 'combat' | 'heals' | 'utility'
+type LoadoutPane = 'buffs' | 'pet' | 'combat' | 'heals' | 'utility'
 
 /** The four sets, as one value - they travel together into `Pane` and never apart. */
 interface LoadoutSets {
   buffs: LoadoutSet
+  /** The buffs that land on your pet (owner, 2026-11-15), solved apart: `loadoutSides`. */
+  pet: LoadoutSet
   combat: CombatSet
   heals: CombatSet
   /** THE FOURTH (owner, 2026-09-12): the top rung of every line the other three did not place. */
@@ -229,6 +231,7 @@ function Pane({
   pool: LoadoutPool
 }): JSX.Element {
   if (pane === 'buffs') return <BuffSection set={sets.buffs} classes={classes} rankOf={rankOf} pool={pool} />
+  if (pane === 'pet') return <PetSection set={sets.pet} rankOf={rankOf} />
   if (pane === 'utility') return <UtilitySection set={sets.utility} level={level} />
   if (pane === 'combat') {
     return (
@@ -278,17 +281,21 @@ export default function SpellLoadoutView(): JSX.Element {
     (name: string) => Math.max(observedRankRow(ranks, name)?.rank ?? 0, tier, 1),
     [ranks, tier]
   )
-  const names = useMemo(() => candidates.map((c) => c.name), [candidates])
+  // A recourse buff stacks as its recourse row, not as the debuff it rides on (`stackAs`).
+  const names = useMemo(() => candidates.map((c) => c.stackAs ?? c.name), [candidates])
   const views = useLoadoutViews(names)
-  const set = useMemo(() => {
+  const sides = useMemo(() => {
     // The views arrive after the candidates do, so the candidate list is rebuilt with them attached
     // rather than the optimizer being asked to reach for a second source.
     const withViews = candidates.map((c) => {
-      const view = views.get(c.name)
+      const view = views.get(c.stackAs ?? c.name)
       return view === undefined ? c : { ...c, view }
     })
-    return buildLoadout(withViews, { worn: level, cast: level })
+    return loadoutSides(withViews, { worn: level, cast: level })
   }, [candidates, views, level])
+  const { self: set, pet } = sides
+  const hasPet = pet.keep.length + pet.rejected.length > 0
+  const shown: LoadoutPane = pane === 'pet' && !hasPet ? 'buffs' : pane
   // THE TWO CAST SETS, over the Leveling tab's own ranking so the surfaces can never disagree about
   // which nuke is better. `defaultSorts()` is that tab's "best first" on every table, and
   // `bestSpellsAt` already applies the level and splits the era off - so these two have always had
@@ -304,10 +311,14 @@ export default function SpellLoadoutView(): JSX.Element {
   const totals = useMemo(() => buffTotals(set.keep), [set.keep])
   // THE FOURTH PANE reads what the first three placed, so a spell appears on exactly one.
   const utility = useMemo(() => {
-    const placed = new Set([...set.keep, ...set.rejected, ...combat.picks, ...heals.picks].map((x) => x.name))
+    const buffs = [...set.keep, ...set.rejected, ...pet.keep, ...pet.rejected]
+    const placed = new Set([...buffs, ...combat.picks, ...heals.picks].map((x) => x.name))
     return utilitySet(data.spells, combo.resolved, level, { placed })
-  }, [data.spells, combo.resolved, level, set, combat, heals])
-  const sets = useMemo<LoadoutSets>(() => ({ buffs: set, combat, heals, utility }), [set, combat, heals, utility])
+  }, [data.spells, combo.resolved, level, set, pet, combat, heals])
+  const sets = useMemo<LoadoutSets>(
+    () => ({ buffs: set, pet, combat, heals, utility }),
+    [set, pet, combat, heals, utility]
+  )
 
   if (combo.resolved.length === 0) {
     return (
@@ -330,7 +341,7 @@ export default function SpellLoadoutView(): JSX.Element {
           `components/AreaTabs`: that component routes the APP's views through `selectView`, and
           these three are one view's internal state. Same styling, so the two bars read alike. */}
       <Tabs
-        value={pane}
+        value={shown}
         onChange={(_e, v: LoadoutPane) => setPane(v)}
         variant="standard"
         data-testid="loadout-panes"
@@ -343,6 +354,7 @@ export default function SpellLoadoutView(): JSX.Element {
         }}
       >
         <Tab value="buffs" label={`Buffs (${String(set.gems)})`} data-testid="loadout-pane-buffs" />
+        {hasPet && <Tab value="pet" label={`Pet (${String(pet.gems)})`} data-testid="loadout-pane-pet" />}
         <Tab value="combat" label={`Combat (${String(combat.picks.length)})`} data-testid="loadout-pane-combat" />
         <Tab value="heals" label={`Heals (${String(heals.picks.length)})`} data-testid="loadout-pane-heals" />
         <Tab value="utility" label={`Utility (${String(utility.count)})`} data-testid="loadout-pane-utility" />
@@ -355,9 +367,9 @@ export default function SpellLoadoutView(): JSX.Element {
         onTier={setTier}
         testId="loadout-tier-slider"
         note={
-          pane === 'buffs'
+          shown === 'buffs' || shown === 'pet'
             ? 'a buff set gains mana, duration and cast time - never bigger stats'
-            : pane === 'utility'
+            : shown === 'utility'
               ? 'utility spells gain mana, duration and cast time; a charm or mez caps one level higher a rank'
               : 'damage and healing move; mana, duration and cast time move with them'
         }
@@ -365,7 +377,7 @@ export default function SpellLoadoutView(): JSX.Element {
 
       <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ pb: 4, mt: 1 }}>
         <Stack spacing={2} sx={{ flexGrow: 1, minWidth: 0 }}>
-          <Pane pane={pane} sets={sets} level={level} classes={combo.resolved.join(' / ')} rankOf={rankOf} pool={pool} />
+          <Pane pane={shown} sets={sets} level={level} classes={combo.resolved.join(' / ')} rankOf={rankOf} pool={pool} />
         </Stack>
         {/* THE SUMMARY RIDES BESIDE ALL THREE PANES. "What am I getting from my buffs" is the
             standing question whichever set you are reading, and it is the panel the slider is

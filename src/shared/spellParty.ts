@@ -247,7 +247,9 @@ const REACHES_OTHERS: ReadonlySet<string> = new Set([
  * Read off the catalog's `target_type`. A row that states none is kept: silence is not a verdict
  * (law 1), and every beneficial row in the committed catalog states one.
  */
-export function landsOnOthers(spell: Pick<UnlockSpell, 'targetType'>): boolean {
+export function landsOnOthers(spell: Pick<UnlockSpell, 'targetType' | 'recourse'>): boolean {
+  // A recourse lands on whoever cast the debuff, never on a group-mate.
+  if (spell.recourse !== undefined) return false
   if (spell.targetType === undefined) return true
   return REACHES_OTHERS.has(spell.targetType.trim().toLowerCase())
 }
