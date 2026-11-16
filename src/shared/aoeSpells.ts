@@ -73,11 +73,20 @@ export function isAeTargetType(targetType: string | undefined): boolean {
  */
 export const DEFAULT_AE_MAX_TARGETS = 4
 
-/** A spell's own cap where a source stated a positive one, the default otherwise. */
-export function aeMaxTargets(stated: number | null | undefined): number {
-  return typeof stated === 'number' && Number.isFinite(stated) && stated > 0
-    ? Math.trunc(stated)
-    : DEFAULT_AE_MAX_TARGETS
+/**
+ * A POINT-BLANK area spell's cap where no source states one. The game's patch notes, 2026-05-26:
+ * "Point blank AOE spells will now hit a maximum of 8 targets", and the owner's client file states
+ * 8 on a PB AE (header). Until 2026-11-15 a reader with no install got 4 for these too.
+ */
+export const DEFAULT_PBAE_MAX_TARGETS = 8
+
+const PBAE_TARGET_TYPES: ReadonlySet<string> = new Set(['pb ae', 'pbaoe'])
+
+/** A spell's own cap where a source stated a positive one, the default for its shape otherwise. */
+export function aeMaxTargets(stated: number | null | undefined, targetType?: string): number {
+  if (typeof stated === 'number' && Number.isFinite(stated) && stated > 0) return Math.trunc(stated)
+  const pointBlank = PBAE_TARGET_TYPES.has(targetType?.trim().toLowerCase() ?? '')
+  return pointBlank ? DEFAULT_PBAE_MAX_TARGETS : DEFAULT_AE_MAX_TARGETS
 }
 
 /**
@@ -118,4 +127,4 @@ export function aoeAssumptionLabel(targetCounts: readonly number[]): string {
 
 /** The longer sentence behind the marker, for its tooltip. Stated once, beside the words. */
 export const AOE_ASSUMPTION_TITLE =
-  'Figures assume every target the spell can hit. Four unless your client states the spell its own cap. A rain is capped at four hits in total across its three waves, so a pack takes four and one mob takes three.'
+  'Figures assume every target the spell can hit. Four, or eight for a point-blank spell, unless your game file states a cap for the spell. A rain is capped at four hits in total across its three waves, so a pack takes four and one mob takes three.'

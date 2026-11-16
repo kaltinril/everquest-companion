@@ -225,6 +225,11 @@ export function stackView(row: StackSource): StackSpellView {
   }
 }
 
+/** The same view with every slot of one effect blanked, so that effect contests nothing. */
+export function withoutEffect(view: StackSpellView, effect: number): StackSpellView {
+  return { ...view, effects: view.effects.map((e) => (e[0] === effect ? BLANK_SLOT : e)) }
+}
+
 /** A spreadable fragment, because `stackView` sits at the complexity ceiling. */
 function triggeredViews(triggers: StackSource['triggers']): Pick<StackSpellView, 'triggered'> {
   return triggers === undefined ? {} : { triggered: triggers.map(stackView) }

@@ -7,11 +7,14 @@ SK, others).
 
 ## Spells
 
-- **Proc damage scales exactly 3% per rank:** `floor(base * (1 + 0.03 * rank))`. Puma Maw over
-  the whole log: rank I 154 (n=3453), IV 172 (n=196), VI 181 (n=1735). Crits corroborate (400/154 =
-  472/181 = 2.6).
+- **Proc damage: 3% per rank of the BUFF, because the proc is cast at half the buff's tier**
+  (patch notes 2026-07-07) and scales as a nuke, 6% a rank. Puma Maw over the whole log: buff
+  rank I 154 (n=3453), IV 172 (n=196), VI 181 (n=1735), which is 154 x 1.12 and x 1.18 floored;
+  rank I reads the base. Crits corroborate (400/154 = 472/181 = 2.6). An odd buff rank is not
+  measured: half of V is 2.5, and whether that proc is rank II (172) or scaled to 177 is open.
 - **Buff and debuff stats: 3% per tier, rounded** (`statAtRank`, 2026-11-15). The game's spell
-  windows print the upgraded figure in green since a patch; before it they printed base figures.
+  windows print the upgraded figure in green (probably since the 2026-10-22 note below); before
+  that they printed base figures.
   Tier 4: 10 -> 11 (Grim Aura, Siphon Strength, Shadow Vortex), 20 -> 22 (Shroud of Hate, Heart
   Flutter), 25 -> 28 (Dark Temptation), 7 -> 8 (Heart Flutter AC: 7.84, so rounded, not floored).
   A roman rank is the tier (`IV` shows `Tier 4`). Same windows: debuff duration +10% and cast -4%
@@ -42,8 +45,10 @@ SK, others).
   in `src/shared/spellUpgrade.ts` plus the `magnitudeCanMove` guard. Open: whether Chloroplast and
   Harnessing of Spirit behave the same. Known defect: the Upgrades tab scales a HoT's total healed
   by the magnitude rate, crediting duration growth twice.
-- **The in-game tooltip never updates damage** with rank (mana/cast/reuse do update). Use the
-  Stats window or a log line, never the tooltip, for magnitude.
+- **The in-game spell window was not an instrument before 2026-10-22** (it printed base damage
+  at every rank while mana, cast and re-use updated). Since then it prints upgraded stats and DoT
+  ticks in green. A figure with no green value may be an effect the window does not show yet:
+  still confirm a magnitude that matters from the Stats window or a log line.
 - **The log states stacking verdicts:** `Your Dexterity spell did not take hold. (Blocked by
   Harnessing of Spirit.)`. 40 pairs are committed as `tests/stackGroundTruth.test.mts`; matching
   by EFFECT anywhere caught 40/40, the EQEmu slot-i-to-slot-i walk almost none. Ask the owner for
@@ -72,6 +77,73 @@ SK, others).
   owner's whole history (5.37 M lines) never names Largo's Assonant/Absonant Binding, Cantata/Cantana
   of Replenishment or GelatRoot/Gelatinous Root; spells_us.txt is the game's spelling for those
   (`audits/2026-10-11-data-gaps.md` section 4).
+
+## From the game's patch notes
+
+The wiki's `Patch Notes` page (pageid 57054, revid 200638), read whole on 2026-11-15: 2026-05-22
+to 2026-11-10, the newest note there. A dated line is what the note says, not a measurement.
+Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`) after a delta.
+
+- **Spell ranks.** 06-29: a rank lowers mana, cast, recovery and re-use, raises duration, lowers
+  resist. 07-07: damage and healing bonuses; small durations are rounded; mez and charm cap one
+  level higher a tier (07-14: pacify, fear and stun too); 10% a tier not to use a reagent, none at
+  tier 10 (09-22: Alter Plane spells too); a summon-item spell summons the item at the spell's
+  tier; a proc buff casts its proc at HALF the buff's tier (`Vampiric Embrace X` casts proc `V`).
+  06-29: an item's proc that is also an upgraded spell fires at base rank. 08-25: pets gain from
+  pet proc spell upgrades. 11-10: disciplines upgrade with motes like spells; Fragment Motes are
+  rare drops with more upgrade power; on-expire effects upgrade one-to-one with the spell (not
+  Promised Renewal); Cancel Magic casts half a tier of levels higher; stun, mez, charm and lull
+  windows show the upgraded max level. 07-28: Void-Touched Potential is +1 rank to an item or
+  spell, three a week from raids.
+- **Spell windows.** 10-22: descriptions "adjusted to provide more specific and accurate
+  information ... More effects will be implemented over time". The upgraded stat figures the owner
+  showed on 2026-11-15 are not named in any note.
+- **Stacking.** 06-09 and 06-11: the Paladin, Shadow Knight and Ranger combat innates (the self
+  proc buffs) all stack, with each other, with Boon of the Garou and with a Rogue's poisons. 09-01
+  and 09-09: a detrimental spell never overwrites or strips a beneficial one of the same effect
+  (haste and slow, run speed and snare, HoT and DoT). 06-11: a permanent buff is not dispelled by
+  a duration reducer.
+- **Pets.** 06-02: Necromancer and Shadow Knight pets are Shadow Knights, Magician earth pets
+  Rangers, Enchanter animations Paladins; every summoned pet is also a Warrior; a multi-class pet
+  has double health. 06-11: Shaman wolves are Beastlords. 06-29: warders are Beastlords. 10-22:
+  Monster Summoning pets are Warrior/Berserker. 07-07: a pet's level is its base plus the spell's
+  rank, capped at player level - 1 (10-13: at player level); each added level is +6% hp, +1 base
+  damage, +5 skill; pets gain ATK, HP regen and mana regen from items. 10-13: pet weapon damage
+  follows the weapon's ratio far more than its base damage. 10-22: fixes to that; pets gain mana
+  from WIS and INT and HP from STA. 09-09: pets proc AoE spells again. 08-18: no secondary-only
+  item beside a two-hander. 09-15: pets respect Lore Equipped.
+- **Pet procs, the owner's log (2026-11-14, measured):** an Animate Dead IV pet procced Winter's
+  Roar (required level 30) 33 times in 21 minutes at 234, from a Shaman-only Garduk +10, while
+  the owner was WAR/SHD/MNK. Spirit Strike (required level 35) fired once in two days. `Your
+  pet's will is not sufficient to command its weapon.` printed 24 times in those two days:
+  probably the proc's level requirement, not confirmed. The wiki's pet page lists that pet at
+  level 19 and says a pet wears only what its classes or yours can: both are behind the log.
+- **Combat.** 05-26: a point-blank area spell hits at most 8 targets (`aeMaxTargets`). 05-22:
+  attack range is reciprocal. 06-09: the out-of-combat timer is 9 s (was 12). 06-11: a lifetap
+  heals what it taps. 07-07: the low-level item haste cap is gone. 07-28: a stun leaves a short
+  immunity; NPC charm on a player lasts 30 s at most. 09-22: upgraded weapons gain accuracy and
+  backstab damage scales with weapon upgrades.
+- **Motes and loot.** 05-28: motes drop within 10 levels (was 5). 06-21: a Constructed Potential
+  condenses motes two to one (ranks 1 to 8). 07-14: motes are not tradable. 07-28: no motes at the
+  class lock cap or on a kill that gave no experience. 07-29: loot rolls the difficulty tier or
+  higher (+1 or more in D1). 09-09: in a Dungeon Crawl nothing respawns, and completion pays
+  motes, experience and a bonus chest.
+- **Quests and faction.** 05-22: the smallest faction hit is 5; race unlocks check the faction
+  achievements, not current standing. 05-28: a Paineel NPC gives at most 100 faction a hit. 08-25:
+  a bulk turn-in is calculated at once and shown in at most 4 chat blocks; NPCs take coin in any
+  denomination. NOT CHECKED: whether the faction receipts the app counts survive that 4-block cap.
+- **Levels.** 08-18: grouping gives a small experience bonus. 06-23: zone experience modifiers
+  changed. 11-10: Reincarnation resets each class and the race of a level-50 three-class loadout
+  to level 1 for reincarnation AAs (early access now, everyone on 2026-12-08). NOT CHECKED: what
+  the app's level history does with that reset.
+- **Log lines.** 07-07: the rank is in `begin casting` lines; heal crits are logged. 09-15: the
+  rank suffix is in interrupt, fizzle, wore-off and damage lines. 08-25: several item rewards
+  print a count.
+- **Spell levels the notes moved** (client file agrees, 2026-11-15): Lifespike to Shadow Knight 5
+  (08-18), Enchant Steel to Enchanter 21 (06-29). The wiki pages still said 8 and 46, so the
+  catalog does too: the page edits went to the owner. Not corrected in the app, because a `classes`
+  correction is projected into the engine's spell overlay and needs the engine gate. The June Shaman heal levels (Slugs 28, Sloths 42) were reshuffled
+  later; the catalog and the client agree on Snails 14, Tortoises 28, Slugs 42.
 
 ## Items and upgrades
 

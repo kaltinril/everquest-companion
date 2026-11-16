@@ -420,7 +420,7 @@ export function columnValue(row: BestSpellRow, column: BestSpellColumn): number 
  * two expressions would let the printed count drift from the one the figures used.
  */
 export function spellHitsFor(spell: UnlockSpell, targets: number): number {
-  return aeHits(spell.waves ?? 1, targets, aeMaxTargets(spell.aeMaxTargets))
+  return aeHits(spell.waves ?? 1, targets, aeMaxTargets(spell.aeMaxTargets, spell.targetType))
 }
 
 /**
@@ -512,7 +512,7 @@ export function pctOfSide(focus: readonly BestSpellFocus[], side: FocusKind): nu
  * assumption when the AOE tab is the one asking.
  */
 export function targetsFor(spell: UnlockSpell): number {
-  return aeMaxTargets(spell.aeMaxTargets)
+  return aeMaxTargets(spell.aeMaxTargets, spell.targetType)
 }
 
 /**

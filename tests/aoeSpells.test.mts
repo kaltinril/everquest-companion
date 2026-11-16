@@ -48,6 +48,10 @@ test('the default cap is four, and a stated cap wins over it', () => {
   assert.equal(aeMaxTargets(undefined), 4, 'no client install: the stated default answers')
   assert.equal(aeMaxTargets(null), 4)
   assert.equal(aeMaxTargets(8), 8, "the client's PB AE cap")
+  // Patch notes 2026-05-26: a point-blank area spell hits up to 8, client file or not.
+  assert.equal(aeMaxTargets(undefined, 'PB AE'), 8)
+  assert.equal(aeMaxTargets(undefined, 'Targeted AE'), 4)
+  assert.equal(aeMaxTargets(5, 'PB AE'), 5, 'a stated cap still wins')
   assert.equal(aeMaxTargets(5), 5, "Denon's Desperate Dirge, where the client and the page disagree")
   // A zero in the client's column is what a single-target row says; it is not a cap of nothing.
   assert.equal(aeMaxTargets(0), 4)

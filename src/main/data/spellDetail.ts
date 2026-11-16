@@ -224,7 +224,7 @@ function worthFields(
 ): Partial<SpellDetail> {
   const level = classLevels.length > 0 ? Math.min(...classLevels.map((c) => c.level)) : 1
   const client = clientHpFor(sources.client ?? null, e.name)
-  const spell = { ...e, hits: aeHits(rainWaves(e.name), 1, aeMaxTargets(client?.aeMaxTargets)) }
+  const spell = { ...e, hits: aeHits(rainWaves(e.name), 1, aeMaxTargets(client?.aeMaxTargets, e.targetType)) }
   const metrics = spellMetricsAt(spell, level, client)
   if (!metrics) return {}
   // AND THE SAME READING AT THE RANK THE PLAYER HOLDS (JOS-447). Second call rather than a second
