@@ -176,6 +176,23 @@ where one exists.
   mates are read at YOUR level. Party colours are stored as slots (8), paint in `partyPaint.ts`.
 - Open: pass `roleWeights` (the Gear plan's, now on the same trunk) into `buildLoadout` and delete
   `DEFAULT_STAT_WEIGHTS`.
+- Buff set sides: a `Pet` / `Summoned Pet` target buff is a candidate with `pet: true`;
+  `loadoutSides` solves the player's set and the pet's apart, and the view draws the pet's on its
+  own tab. `buildLoadout` itself knows no sides: hand it one side.
+- Buff set grants (`grantsOf`): stat lines re-read at the character's level (the catalog's
+  `grants` are a reading at the gain level), per-tick regens, and one `MELEE_PROC` grant for
+  `UnlockSpell.proc`. `MELEE_PROC` is never parsed by `parseStatLine` and never totalled.
+- Recourses: `<name> Recourse` in the catalog is folded onto `<name>` as `UnlockSpell.recourse`
+  (main `levelUnlocks.ts`) and is no longer an unlock row. Such a spell is a buff candidate under
+  its own name with the recourse's grants, `enemy: true`, and `stackAs` = the recourse row, whose
+  client row answers stacking. A group-mate's recourse never reaches you (`landsOnOthers`).
+  Owner's log, 2026-11-14: `You feel your strength grow.` follows a Siphon Strength cast and
+  `Hatred fuels your arms.` a Shroud of Hate cast. Client rows: Siphon Strength (343) links
+  recourse 2463, Shroud of Hate (1457) links 2470, Wave of Enfeeblement (363) links none.
+- Wiki errors met here (2026-11-15): the Shroud of Hate Recourse page (pageid 51199) sets
+  `spellname = siphon strength recourse` and a Shadow Knight 39 class row; the Siphon Strength
+  and Shroud of Hate pages carry their recourse's cast-on-you message. Grim Aura and Shieldskin
+  slot lines are corrected in `spellCorrectionsColumns.ts` until the pages are edited.
 - Rust `spells_us.rs` twin is not parity-gated; deferred.
 - Open: SPA 148 slot reading (MEASURED.md); SPA 475 rows in the same slot contest each other.
 - `LevelUnlockData.general` holds the General AAs with no class key; the fold appends them classless

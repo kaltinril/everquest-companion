@@ -49,7 +49,7 @@ import type { UnlockSpell } from './levelUnlocks'
 import type { ClassAbbr } from './classCombo'
 import type { BestSpellTab } from './bestSpells'
 import type { SpellMetrics } from './spellMetrics'
-import { compareStatKeys, grantsShareASlot, type SpellStatGrant, type SpellStatKey } from './spellStats'
+import { compareStatKeys, grantsShareASlot, rampAt, type SpellStatGrant, type SpellStatKey } from './spellStats'
 import { parseHpLine, parseManaLine, type HpLine } from './spellMetrics'
 import { foldSpellsByName } from './spellFold'
 import {
@@ -119,7 +119,10 @@ export const DEFAULT_STAT_WEIGHTS: StatWeights = {
   HASTE: 3,
   HASTE_V2: 3,
   MOVEMENT_SPEED: 0.5,
-  SPELL_HASTE: 2
+  SPELL_HASTE: 2,
+  // A weapon proc states no magnitude, so this is the whole score of a proc buff: enough to be a
+  // recommendation, and the same for every proc, so two that contest fall to the newer one.
+  MELEE_PROC: 30
 }
 
 /**
@@ -151,6 +154,12 @@ export interface LoadoutCandidate {
   score: number
   /** The client's stacking view, when the player's own spell file could answer for it. */
   view?: StackSpellView
+  /** It lands on the caster's pet: the pet's own slots, and none of the player's totals. */
+  pet?: true
+  /** Cast on an enemy: the grants are what its recourse puts on the caster (`UnlockSpell.recourse`). */
+  enemy?: true
+  /** The spell whose client row answers stacking for this one, when it is not `name`: the recourse. */
+  stackAs?: string
 }
 
 /** One buff that lost its slot, and what losing it costs beyond the obvious. */
@@ -359,7 +368,8 @@ function admitsBuff(s: UnlockSpell, query: CandidateQuery, minMs: number): boole
   // cast Treeform). It is refused outright rather than scored down: no quantity of AC makes being
   // rooted to the floor worth a gem, so there is no weight that would express it honestly.
   if (s.roots === true) return false
-  if (!isKeepUp(s, minMs)) return false
+  // A debuff with a recourse is a buff on its caster for as long as the debuff lasts.
+  if (s.recourse === undefined && !isKeepUp(s, minMs)) return false
   // A STATED duration below the floor is a sprint, not a buff - see `minDurationMs`.
   if (s.durationMs !== undefined && s.durationMs < minMs) return false
   return !(s.outOfEra === true && query.includeOutOfEra !== true)
@@ -382,8 +392,37 @@ function candidate(s: UnlockSpell, parts: CandidateParts): LoadoutCandidate {
     at,
     grants,
     score,
-    ...(view === undefined ? {} : { view })
+    ...(view === undefined ? {} : { view }),
+    ...(landsOnPet(s) ? { pet: true as const } : {}),
+    ...(s.recourse === undefined ? {} : { enemy: true as const, stackAs: s.recourse.name })
   }
+}
+
+/**
+ * WHAT A CANDIDATE GRANTS ITS HOLDER, AT THE LEVEL ASKED.
+ *
+ * A recourse spell grants its caster the recourse's lines and nothing of its own, which land on the
+ * enemy. Every ramp is read again at this level: the catalog's `grants` are a reading at the level
+ * the spell is first gained, and Grim Aura's `5 (L1) to 10 (L10)` is 10 on a level-44 caster.
+ */
+function grantsOf(s: UnlockSpell, level: number): SpellStatGrant[] {
+  const stated = s.recourse?.grants ?? s.grants ?? []
+  const read = stated.map((g) => (g.ramp === undefined ? g : { ...g, amount: rampAt(g.ramp, level) }))
+  if (s.recourse !== undefined) return read
+  const proc: SpellStatGrant[] =
+    s.proc === true ? [{ key: 'MELEE_PROC', amount: 1, percent: false, line: 'Add Melee Proc' }] : []
+  return [...read, ...regenGrants(s, level), ...proc]
+}
+
+/** The newest level a class in the trio gains it at: the tie-break between two equal scores. */
+function newest(c: LoadoutCandidate): number {
+  return Math.max(0, ...c.at.map((p) => p.level))
+}
+
+/** The catalog's `Pet` and `Summoned Pet` targets (owner, 2026-11-15, on Strengthen Death). */
+function landsOnPet(s: UnlockSpell): boolean {
+  const target = s.targetType?.trim().toLowerCase()
+  return target === 'pet' || target === 'summoned pet'
 }
 
 export function loadoutCandidates(
@@ -403,15 +442,15 @@ export function loadoutCandidates(
     // trio through the Warrior alone, and the surviving pairs are what the row then reports.
     const at = s.at.filter((p) => classes.includes(p.cls) && (level === undefined || p.level <= level))
     if (at.length === 0) continue
-    // The catalog's own grants, plus the per-tick regens it states in another vocabulary.
-    const grants = [...(s.grants ?? []), ...regenGrants(s, level ?? ASSUMED_CASTER_LEVEL)]
+    // The catalog's own grants, plus the per-tick regens and the proc it states in other words.
+    const grants = grantsOf(s, level ?? ASSUMED_CASTER_LEVEL)
     const score = scoreGrants(grants, weights)
     // A buff worth nothing under the weights in force is not a recommendation. It is still a real
     // spell and the Spellbook still lists it; this tab is about a SET worth keeping up.
     if (score <= 0) continue
-    out.push(candidate(s, { at, grants, score, view: views?.get(s.name) }))
+    out.push(candidate(s, { at, grants, score, view: views?.get(s.recourse?.name ?? s.name) }))
   }
-  out.sort((a, b) => b.score - a.score || a.name.localeCompare(b.name))
+  out.sort((a, b) => b.score - a.score || newest(b) - newest(a) || a.name.localeCompare(b.name))
   return out
 }
 
@@ -541,6 +580,20 @@ export function buildLoadout(
     read,
     provenOptimal,
     gems: keep.length
+  }
+}
+
+/**
+ * THE PLAYER'S SET AND THE PET'S, SOLVED APART (owner, 2026-11-15: "move all pet buffs to a pet
+ * tab"). A pet buff sits in the pet's slots: it contests other pet buffs and never a player's.
+ */
+export function loadoutSides(
+  candidates: readonly LoadoutCandidate[],
+  levels: StackLevels
+): { self: LoadoutSet; pet: LoadoutSet } {
+  return {
+    self: buildLoadout(candidates.filter((c) => c.pet !== true), levels),
+    pet: buildLoadout(candidates.filter((c) => c.pet === true), levels)
   }
 }
 
@@ -864,7 +917,8 @@ function addGrant(into: Map<string, BuffStatTotal>, g: SpellStatGrant, from: str
 export function buffTotals(keep: readonly LoadoutCandidate[]): BuffTotals {
   const byKey = new Map<string, BuffStatTotal>()
   for (const c of keep) {
-    for (const g of c.grants) addGrant(byKey, g, c.name)
+    // A proc is not a number to total; the row's own chip says it is there.
+    for (const g of c.grants) if (g.key !== 'MELEE_PROC') addGrant(byKey, g, c.name)
   }
   // A FIXED ORDER, NOT A MAGNITUDE ONE (owner, 2026-09-10). Sorting by size put a different stat at
   // the top of every set, so there was nothing to scan down - the panel read as a different shape

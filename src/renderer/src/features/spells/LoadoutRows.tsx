@@ -10,10 +10,10 @@
 // figure or a chip and stays a step down, which is what makes the name findable rather than merely
 // bigger - a row where every word is the same size has no shape to scan.
 import type { JSX } from 'react'
-import { Alert, Box, Chip, Stack, Typography } from '@mui/material'
+import { Alert, Box, Chip, Divider, Stack, Typography } from '@mui/material'
 import { spellStatText } from '@shared/spellStats'
 import { TAB_LABEL } from '@shared/bestSpells'
-import type { CombatPick, CombatSet, LoadoutCandidate, LoadoutRejection } from '@shared/spellLoadout'
+import type { CombatPick, CombatSet, LoadoutCandidate, LoadoutRejection, LoadoutSet } from '@shared/spellLoadout'
 import type { UtilityPick, UtilitySet } from '@shared/spellUtilitySet'
 import { SpellTooltip } from '../../lib/SpellCard'
 import SpellIcon from './SpellIcon'
@@ -78,6 +78,16 @@ export function KeepRow({
           data-rank={rank}
           label={romanRank(rank)}
           title="The rank this reads at: the highest your log has seen, lifted to the slider."
+          sx={TINY_CHIP}
+        />
+      )}
+      {c.enemy === true && (
+        <Chip
+          size="small"
+          variant="outlined"
+          data-testid="loadout-enemy"
+          label="cast on enemy"
+          title="You cast it on an enemy; this is what it gives you."
           sx={TINY_CHIP}
         />
       )}
@@ -156,6 +166,39 @@ export function RejectRow({ r, casters }: { r: LoadoutRejection; casters?: reado
         </>
       )}
     </Stack>
+  )
+}
+
+/** THE PET PANE (owner, 2026-11-15): the buffs that land on your pet, solved apart from yours. */
+export function PetSection({ set, rankOf }: { set: LoadoutSet; rankOf: (name: string) => number }): JSX.Element {
+  return (
+    <Box data-testid="pet-set">
+      <Typography variant="h6">Pet buffs</Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+        These land on your pet, so they are not in your totals.
+      </Typography>
+      <Typography variant="overline" color="text.secondary">
+        Keep up ({String(set.gems)})
+      </Typography>
+      <Stack>
+        {set.keep.map((c) => (
+          <KeepRow key={c.name} c={c} rank={rankOf(c.name)} />
+        ))}
+      </Stack>
+      {set.rejected.length > 0 && (
+        <Box data-testid="pet-rejections" sx={{ mt: 1 }}>
+          <Divider />
+          <Typography variant="overline" color="text.secondary">
+            Left out, and why
+          </Typography>
+          <Stack>
+            {set.rejected.map((r) => (
+              <RejectRow key={r.name} r={r} />
+            ))}
+          </Stack>
+        </Box>
+      )}
+    </Box>
   )
 }
 

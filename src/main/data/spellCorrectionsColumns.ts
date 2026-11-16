@@ -57,5 +57,25 @@ export const COLUMN_CORRECTIONS: readonly SpellCorrection[] = [
     attribution: 'db',
     evidence:
       'Reported 01M0V24TW8FP3WFS38AFGN1HDH (v1.9.0): `Vengeance of the Wild is not showing as a DoT and the damage listed does not match the actual DoT damage (likely because its is not being seen as a DoT?)` The page is its own witness (pageid fetched 2026-08-28): its description reads `causing between 122 and 131 damage every six seconds for 30s` and its duration row `5 ticks`, while its slot line alone omits the rate marker. The DB is the family witness: 138 detrimental rows with a duration carry `per tick` on their Decrease-Hitpoints line verbatim, and every other no-marker row with a duration (censused 2026-08-28: the root families, Fire, Ice, Flame Song of Ro, Stone Spider Stun) is genuinely front-loaded damage riding a root/resist/stun duration — Vengeance of the Wild is the sole row whose own description contradicts its slot. The numbers 121/132 are the slot`s and stay: the description`s 122/131 is the page disagreeing with itself by one, and a correction fixes the marker, not the wiki`s arithmetic. Blast radius: spellMetrics reads perTick true, so bestSpells moves the spell from the DD tab to the DoT tab and its total becomes per-tick x 5 ticks (126.5 midpoint -> 632.5) with dps over the 30 s cycle; the parser is untouched (DoT damage attribution is log-shape driven); spellEffectClass`s heal families are untouched (this is a Decrease line).'
+  },
+  // Two slot lines the stat reader cannot read, so the buff set scored both spells at nothing
+  // (owner report 2026-11-15, Loadout buff set for a Shadow Knight).
+  {
+    spells: ['Grim Aura'],
+    field: 'effects',
+    from: 'Increase ATK by 5 to 10 (L10)',
+    to: 'Increase ATK by 5 (L1) to 10 (L10)',
+    attribution: 'db',
+    evidence:
+      'The page (pageid 50145) states the ramp without its low level. Siphon Strength (pageid 50143) writes the same magnitude in the full form, `Decrease STR by 5 (L1) to 10 (L10)`, and the owner`s client file gives both spells the same slot shape: base 5, formula 101 (base + level / 2), max 10, which is 5 at level 1 and 10 at level 10. Blast radius: the stat reader yields ATK, read as 10 from level 10 up; no message moves.'
+  },
+  {
+    spells: ['Shieldskin'],
+    field: 'effects',
+    from: 'UNKNOWN CALC 111 base 27 max 55 attrib Absorb Damage',
+    to: 'Increase Absorb Damage by 27 (L16) to 55 (L21)',
+    attribution: 'db',
+    evidence:
+      'The wiki`s slot line (pageid 50172) is its template`s failed formula output. The owner`s client file gives the slot as absorb damage, base 27, formula 111, max 55, and the page`s own description says the spell `absorbs 55 damage`. Formula 111 is base + 6 x (level - 16) in the emulator source, which reaches the 55 cap at level 21; the cap is the client`s and the page`s, the ramp under it is the emulator`s and unmeasured here. Blast radius: the stat reader yields a rune of 55 for every caster at 21 or above; no message moves.'
   }
 ]
