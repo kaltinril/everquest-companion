@@ -48,6 +48,16 @@ disagree, RULES.md wins; fix this file.
   (owner, 2026-11-12: "always copy my settings down from prod to the dev"):
   `%APPDATA%\everquest-companion-test` to `%APPDATA%\everquest-companion-dev`, one way, dev backed
   up first. The file list and what to leave alone are step 2 of the `start-companion` skill.
+- **That copy does not carry the remembered view choices** (measured 2026-11-16: 56 of prod's 69
+  differed or were missing in dev). Pet layout, Fight/Overall, drills, Gaps marks, Gear and Planner
+  filters live in each app's `Local Storage\leveldb`, keyed by page origin: prod under `file://`,
+  the dev server under `http://localhost:5173`. The owner expects them to match too ("the combat
+  section is not on the same setting as production"). Done by hand once, both apps closed, dev's
+  leveldb backed up first: open a COPY of prod's leveldb with `classic-level` (buffer encodings),
+  take every key starting `_file://\0`, and put it into dev's leveldb under
+  `_http://localhost:5173\0`. Key and value are one byte (1 = Latin-1, 0 = UTF-16LE) then the text.
+  Dev-only keys are left alone. Open: landing this as a script with `classic-level` as a dev
+  dependency waits on the owner's word.
 - Stopping a dev app the agent itself launched: stopping the shell task can leave the
   `electron-vite dev --watch` node process alive (README.md, "Merge while the dev app is up").
   Stop that node PID; its Electron exits with it. The single-instance lock means an old instance
