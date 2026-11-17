@@ -101,9 +101,108 @@ Motes of Potential are new items added to Everquest Legends.  These are used to 
 
 </div>
 
-'''* BUG: For items only:''' Motes do not show progress beyond their item-tier limit. Any excess points will not show. For example, using a [[Mote of Major Potential|Major mote]] (5 points, maximum tier +5) on a +4 item at 15/16 only shows that it advances to +5, but the remaining 4 points are not shown (but will be added in once the mote is consumed).
+== Fragments of Potential Tiers ==
 
-=== Void-Touched Potential ===
+* Fragments grant significantly more exp than their Mote equivalent.
+* Fragments have the same item upgrade restrictions as Motes.
+* Fragments can randomly drop in place of Motes from mobs over level 35.
+** They are most commonly awarded from killing raid bosses (who always drop Fragments instead of Motes) and completing Dungeon Crawls.
+
+<div style="display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap;">
+
+<div>
+
+'''Items'''
+
+{| class="wikitable sortable"
+!Fragment Name
+!Points Added*
+!Item Tier Limit
+|-
+| [[Fragment of Infinitesimal Potential]]
+| ?
+| +0
+|-
+| [[Fragment of Minor Potential]]
+| ?
+| +1
+|-
+| [[Fragment of Lesser Potential]]
+| ?
+| +2
+|-
+| [[Fragment of Potential]]
+| ?
+| +3
+|-
+| [[Fragment of Major Potential]]
+| 8
+| +4
+|-
+| [[Fragment of Greater Potential]]
+| 11
+| +5
+|-
+| [[Fragment of Superior Potential]]
+| ?
+| +6
+|-
+| [[Fragment of Grand Potential]]
+| ?
+| +7
+|-
+| [[Fragment of Ascendant Potential]]
+| ?
+| +8
+|-
+| [[Fragment of Infinite Potential]]
+| ?
+| +9
+|}
+</div>
+
+<div>
+'''Spells'''
+
+{| class="wikitable sortable"
+!Fragment Name
+!Points Added
+|-
+| [[Fragment of Infinitesimal Potential]]
+| 2
+|-
+| [[Fragment of Minor Potential]]
+| 4
+|-
+| [[Fragment of Lesser Potential]]
+| 8
+|-
+| [[Fragment of Potential]]
+| 16
+|-
+| [[Fragment of Major Potential]]
+| 32
+|-
+| [[Fragment of Greater Potential]]
+| 64
+|-
+| [[Fragment of Superior Potential]]
+| 128
+|-
+| [[Fragment of Grand Potential]]
+| 256
+|-
+| [[Fragment of Ascendant Potential]]
+| 512
+|-
+| [[Fragment of Infinite Potential]]
+| 1024
+|}
+</div>
+
+</div>
+
+== Void-Touched Potential ==
 
 * [[Void-Touched Potential]] are special motes earned from raids that instantly advance an item or spell to its next tier, regardless of its current upgrade progress.
 ** For example, using one on a +1 item will raise it directly to +2, while using one on a +9 item will raise it directly to +10.

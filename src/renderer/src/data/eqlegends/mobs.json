@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-13T08:07:05.929Z",
+  "scrapedAt": "2026-11-17T07:55:23.765Z",
   "source": "eqlwiki.com — Category:NPCs/Named Mobs/Merchants/Raid Encounters ∪ embeddedin Template:Namedmobpage/MerchantPage, filtered to pages opening a mob template + recentchanges delta (scripts/scrape-delta.mts)",
   "mobs": [
     {
@@ -26392,6 +26392,24 @@
       "noImage": true
     },
     {
+      "page": "A goblin janitor",
+      "eraTag": "Classic",
+      "name": "A goblin janitor",
+      "level": "7",
+      "zones": [
+        "Runnyeye"
+      ],
+      "loc": [
+        {
+          "ns": -169,
+          "ew": 14,
+          "z": -128
+        }
+      ],
+      "image": "?",
+      "noImage": true
+    },
+    {
       "page": "A Goblin Knight",
       "eraTag": "Classic",
       "name": "a goblin knight",
@@ -45012,7 +45030,10 @@
         "-2",
         "+"
       ],
-      "image": "npc_a_reanimated_chaplain.png"
+      "image": "npc_a_reanimated_chaplain.png",
+      "commonDrops": [
+        "Ruby"
+      ]
     },
     {
       "page": "A Reanimated Conscript",
@@ -103198,8 +103219,7 @@
       "factionAmounts": [
         "-30"
       ],
-      "image": "npc_cognoggin.png",
-      "noImage": true
+      "image": "npc_cognoggin.jpg"
     },
     {
       "page": "Coldain Outcast",
@@ -119093,8 +119113,7 @@
       "relatedQuests": [
         "Eye of Stormhammer Quest",
         "Scouts Leggings"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Elna Kelpweaver",
@@ -121987,8 +122006,7 @@
       "relatedQuests": [
         "Eye of Stormhammer Quest",
         "Scouts Leggings"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Falia Frikniller",
@@ -186103,9 +186121,6 @@
           "ew": -871
         }
       ],
-      "otherNames": [
-        "Naggy"
-      ],
       "factions": [
         "Nagafen",
         "Vox",
@@ -186122,6 +186137,9 @@
         "Red Dragonscale Armor Quest",
         "The Fiery Avenger",
         "Warrior Epic Quest"
+      ],
+      "otherNames": [
+        "Naggy"
       ]
     },
     {
@@ -190661,7 +190679,11 @@
       "commonDrops": [
         "Bronze Two Handed Sword",
         "Raw-Hide Skullcap",
-        "Raw-hide Boots"
+        "Raw-hide Boots",
+        "Bronze Mace",
+        "Bronze Long Sword",
+        "Raw-hide Wristbands",
+        "Bronze Battle Axe"
       ]
     },
     {
@@ -193530,14 +193552,7 @@
       "zones": [
         "Greater Faydark"
       ],
-      "loc": [
-        {
-          "ns": 420,
-          "ew": 373
-        }
-      ],
       "merchant": true,
-      "image": "npc_merchant_legweien.png",
       "sells": [
         "Basic Pottery",
         "Block of Clay",
@@ -193555,7 +193570,8 @@
         "Small Block of Clay",
         "Small Deity Sketch",
         "Vial Sketch"
-      ]
+      ],
+      "image": "npc_merchant_legweien.png"
     },
     {
       "page": "Merchant Linolyen",
@@ -196847,6 +196863,24 @@
         "Message Intercept",
         "Paladin Message"
       ]
+    },
+    {
+      "page": "Mojo the Tainted",
+      "eraTag": "Classic",
+      "name": "Mojo the Tainted",
+      "level": "30",
+      "zones": [
+        "Ocean of Tears"
+      ],
+      "loc": [
+        {
+          "ns": -1188,
+          "ew": -8716,
+          "z": 52
+        }
+      ],
+      "image": "npc_name.png",
+      "noImage": true
     },
     {
       "page": "Moldering Ape",
@@ -251652,6 +251686,25 @@
       "image": "npc_translocator_narrik.png"
     },
     {
+      "page": "Translocator Setikan",
+      "name": "Translocator Setikan",
+      "level": "1",
+      "zones": [
+        "East Freeport"
+      ],
+      "drops": [
+        "None"
+      ],
+      "loc": [
+        {
+          "ns": -25,
+          "ew": -1032,
+          "z": -53
+        }
+      ],
+      "image": "npc_translocator_setikan.png"
+    },
+    {
       "page": "Trantor Everhot",
       "eraTag": "Classic",
       "name": "Trantor Everhot",
@@ -252578,6 +252631,12 @@
           "ns": 2284,
           "ew": -745
         }
+      ],
+      "factions": [
+        "New Sebilisian Expedition"
+      ],
+      "factionAmounts": [
+        "-100"
       ],
       "image": "npc_trooper_axlia.png"
     },
@@ -256182,7 +256241,16 @@
           "ew": -725
         }
       ],
-      "image": "npc_trooper_tygin.png"
+      "factions": [
+        "New Sebilisian Expedition"
+      ],
+      "factionAmounts": [
+        "-100"
+      ],
+      "image": "npc_trooper_tygin.png",
+      "commonDrops": [
+        "Finely Crafted Shan`Tok"
+      ]
     },
     {
       "page": "Trooper Uthmytel",
@@ -263422,7 +263490,8 @@
       "loc": [
         {
           "ns": 411,
-          "ew": 91
+          "ew": 90,
+          "z": 18
         }
       ],
       "image": "npc_vira.png",
