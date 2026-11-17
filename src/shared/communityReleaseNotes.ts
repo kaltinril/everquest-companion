@@ -28,6 +28,58 @@ export interface CommunityRelease {
 
 export const COMMUNITY_RELEASE_NOTES: readonly CommunityRelease[] = [
   {
+    "version": "0.1.0-test.49",
+    "date": "2026-11-16",
+    "title": "Loadout gets a Pet tab and rank-scaled buff stats, the Combat tab's scope word is clickable",
+    "groups": [
+      {
+        "heading": "Loadout",
+        "items": [
+          {
+            "text": "Pet buffs have their own Pet tab. They no longer compete with your own buffs and are left out of your stat totals (Strengthen Death was counted as your haste, STR and AC)."
+          },
+          {
+            "text": "A buff that adds a weapon proc is now in the buff set, with a \"Weapon proc\" chip (Scream of Death). Proc buffs from different spell lines stack, as the game's patch notes say; of two on the same line the newer one is kept."
+          },
+          {
+            "text": "A spell that buffs you when you cast it on an enemy is listed under its own name with a \"cast on enemy\" chip (Siphon Strength, Shroud of Hate). \"Shroud of Hate Recourse\" is gone from the lists."
+          },
+          {
+            "text": "Buff and debuff stats follow each spell's rank: 3% a tier, rounded, as the game's spell window shows since its last patch (a 10 reads 11 at Tier 4). The totals move with the rank slider."
+          },
+          {
+            "text": "A point-blank area spell is counted against up to 8 targets, the game's cap; it was 4."
+          }
+        ]
+      },
+      {
+        "heading": "Combat",
+        "items": [
+          {
+            "text": "The scope word on the Combat tab (Everyone) is clickable: a click steps to You (you and your pets only), Group, and back to Everyone. It is the same setting as Preferences > Combat, so the Overview card and the overlays follow."
+          }
+        ]
+      },
+      {
+        "heading": "Voice",
+        "items": [
+          {
+            "text": "A \"Shorter pauses\" switch in Preferences, off by default. Spoken alerts skip the pauses at punctuation, and a downloaded voice also has the silent gaps between words shortened."
+          }
+        ]
+      },
+      {
+        "heading": "Data",
+        "items": [
+          {
+            "text": "Wiki pages refreshed to today (37 pages changed)."
+          }
+        ]
+      }
+    ],
+    "knownIssues": "A buff's percent stats (haste, run speed) and regen are not raised with rank yet, and the Upgrades tab does not count bigger stats as a reason to upgrade a buff. Shorter pauses cannot change the spacing a Windows voice puts between words. A Copy page read is kept for half an hour, so a page made on the wiki within that time is not seen until it passes. A merchant page the wiki already has gets no \"items sold\" or \"location\" check. An item page the wiki already has gets no check that it lists a merchant you were quoted by. Joining another player's private instance is not told apart from the open world of that zone; only an instance you create yourself is. A pet summoned shortly before its first \"My leader is\" line can carry a \"(2)\" after its name in the meters until the next restart. Another player's spells never count toward a mob's resists: the game prints only your own resists to you. The con card does not list a mob's immunities yet (the mob page does). Saved characters read \"needs refresh\" on Wiki Gaps until logged in once with this build. A +0 worked back from a window often leaves Weight as ?. A groupmate's charmed pet can still lose its credit when a damage-over-time it cast before the charm ticks on a groupmate. A mob or item added to the wiki after this build shows no wiki details until the next build (or a Copy click in Wiki Gaps). Copy on a wiki page that still holds the template's placeholders keeps them. Capture finds the game window only when it is titled \"EverQuest Legends\" or \"EverQuest\". All characters needs each character logged in here once with this build. The screenshot reader reads English only. The installer is not code-signed, so Windows shows \"Windows protected your PC\" the first time (More info, then Run anyway). Builds before test.20 do not update themselves; install one by hand once."
+  },
+  {
     "version": "0.1.0-test.48",
     "date": "2026-11-12",
     "title": "XP overlay shows Fragments of Potential, Mob Copy keeps a field you copied by hand",

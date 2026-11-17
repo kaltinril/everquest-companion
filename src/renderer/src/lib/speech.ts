@@ -50,7 +50,8 @@ import {
   MAX_SPEECH_RATE,
   MIN_SPEECH_RATE,
   resolveAlertAudio,
-  speechTextFor
+  speechTextFor,
+  tightenPauseText
 } from '../../../shared/speechText'
 import { noteAudioPlayed, reportAudioFailure } from '../features/alerts/audioHealth'
 
@@ -479,7 +480,8 @@ function warnKokoroFallback(reason: string): void {
  * must not make the firing path wait on speech synthesis.
  */
 export async function speak(text: string, voicePrefs: VoicePrefs, opts: SpeakOptions = {}): Promise<void> {
-  const said = text.trim()
+  // Shorter pauses, the text half: both engines stop on punctuation, so it goes before either.
+  const said = (voicePrefs.tightPauses ? tightenPauseText(text) : text).trim()
   if (!said) return
   const voiceId = voicePrefs.voiceId
   const uttered = !isE2E()
@@ -506,7 +508,12 @@ async function sayThroughEngine(
   let result: SpeechSayResult
   try {
     const voiceId = voicePrefs.voiceId
-    result = await window.eq.speechSay({ text, ...(voiceId ? { voiceId } : {}) })
+    result = await window.eq.speechSay({
+      text,
+      ...(voiceId ? { voiceId } : {}),
+      // …and the audio half, which only this engine has: main caps the wav's silent gaps.
+      ...(voicePrefs.tightPauses ? { tightPauses: true } : {})
+    })
   } catch {
     warnKokoroFallback('the speech channel is unavailable')
     return false
