@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-11T08:24:38.581Z",
+  "scrapedAt": "2026-11-17T07:56:13.076Z",
   "names": {
     "BER": "Berserker",
     "BRD": "Bard",
@@ -1038,10 +1038,7 @@
     },
     "Banestrike": {
       "group": "special",
-      "activated": false,
-      "levels": [
-        1
-      ]
+      "activated": false
     },
     "Bestow Divine Aura": {
       "group": "class",
@@ -3186,6 +3183,11 @@
         "kind": "skill"
       },
       {
+        "name": "CLASS REINCARNATION I",
+        "level": 1,
+        "kind": "skill"
+      },
+      {
         "name": "Conjuration",
         "level": 1,
         "kind": "skill"
@@ -3243,6 +3245,16 @@
       {
         "name": "Throwing",
         "level": 1,
+        "kind": "skill"
+      },
+      {
+        "name": "CLASS REINCARNATION II",
+        "level": 2,
+        "kind": "skill"
+      },
+      {
+        "name": "CLASS REINCARNATION III",
+        "level": 3,
         "kind": "skill"
       },
       {

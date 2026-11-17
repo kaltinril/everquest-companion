@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-13T08:07:05.929Z",
+  "scrapedAt": "2026-11-17T07:55:23.765Z",
   "source": "eqlwiki.com — Category:Quests + quest subcategories + recentchanges delta (scripts/scrape-delta.mts)",
   "quests": [
     {
@@ -10032,8 +10032,7 @@
         "Greater Faydark",
         "High Keep",
         "Misty Thicket",
-        "North Qeynos",
-        "Rivervale"
+        "North Qeynos"
       ],
       "relatedNpcs": [
         "Assistant Kiolna",
@@ -10041,7 +10040,8 @@
         "Elmion Hendrys",
         "Faldor Hendrys",
         "Jail Clerk Maryl",
-        "Slaythe"
+        "Slaythe",
+        "Tylfon"
       ],
       "rewards": [
         {
@@ -10053,7 +10053,7 @@
         "Emerald Shard",
         "Froglok Leg",
         "H.K. 106",
-        "Eye of Stormhammer (Item)"
+        "Sealed Note"
       ],
       "expReward": true,
       "factions": [
@@ -10088,8 +10088,29 @@
           "amount": 5
         },
         {
+          "name": "Storm Guard",
+          "up": true,
+          "amount": 100
+        },
+        {
           "name": "Kazon Stormhammer",
-          "up": true
+          "up": true,
+          "amount": 15
+        },
+        {
+          "name": "Miners Guild 249",
+          "up": true,
+          "amount": 15
+        },
+        {
+          "name": "Merchants of Kaladim",
+          "up": true,
+          "amount": 25
+        },
+        {
+          "name": "Craknek Warriors",
+          "up": false,
+          "amount": -25
         }
       ]
     },
@@ -17963,7 +17984,7 @@
         {
           "name": "Primordial Malice",
           "up": false,
-          "amount": -800
+          "amount": -100
         }
       ]
     },

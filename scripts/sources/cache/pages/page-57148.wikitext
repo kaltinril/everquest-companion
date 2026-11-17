@@ -1,0 +1,17 @@
+{{Classic Era}}
+[[File:Umbral_Platemail.jpg|thumb|[[Dark Elf]] in a set of Umbral Platemail.|left]]
+Umbral Platemail is the planar armor set for [[Shadow Knight|Shadow Knights]]. It drops as part of [[Classic Planar Armor: Group 2|Group 2 Armor Sets]] in the [[Plane of Hate]] and [[Plane of Fear]]. The named target that always drops two pieces of this armor is ??? in the ???.
+
+{{Gear Set
+|Umbral Platemail Boots
+|Umbral Platemail Bracer
+|Umbral Platemail Breastplate
+|Umbral Platemail Gauntlets
+|Umbral Platemail Greaves
+|Umbral Platemail Helm
+|Umbral Platemail Vambraces
+}}
+
+
+
+[[Category: Armor Sets]]
