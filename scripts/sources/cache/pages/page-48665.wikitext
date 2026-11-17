@@ -1,0 +1,2296 @@
+<div style="float:right; margin-left: 20px;">__TOC__</div>
+==Getting Started==
+
+If you wish to make non-metal armor for yourself and others, tailoring is the skill you need to learn. The first thing you will need is access to either; [[Small Sewing Kit]], [[Large Sewing Kit]], [[Deluxe Sewing Kit]], or [[Loom]]; additionally there is a [[Coldain Tanners Kit]] for higher level [[Velious]] tailoring.  Your first finished products will be [[Patchwork Armor]] for the non-casters, and [[Silk Swatch]]es and [[Raw Silk Armor]] for the pure spellcasters and [[Monk]]s. Although, if you are interested in the best way to raise your skill check out the [[Skill Tailoring#Leveling Guide|Leveling Guide]].  
+
+''' Pelts and Skins '''
+
+[[Verant]] was somewhat inconsistent in the way hides are named.  For the most part they are interchangeable terms - if you have a "skin", but a recipe calls for a "pelt" it should work.  Wolf, cat and bear pelts drop from various animals scattered all over Norrath. They come in a variety of different standard qualities; High, Medium, Low, and Ruined Quality. Additionally there are 'superb' and 'excellent' quality skins used in cultural tailoring.  The major difference between wolf, cat and bear pelts is the size of the armor they create; Wolf-Small, Cat-Medium, Bear-Large.
+
+''' Velious '''
+
+Items for all of the [[Velious]] recipes may be obtained with varying levels of difficulty from across Velious zones. If you are having a tailor make something for you, please have mercy on them and help them gather the difficult stuff first; which may be the pelts, oils, or Velium ore depending on the combine as to which pieces are the most difficult.
+
+'''WARNING -''' The Coldain Shawl requires you to level tailoring to 162 and preferably to 208 so all needed combines will be trivial. Most people level to 162 versus 208 and hope their 208 combine doesn't fail. If it does fail, those ingredients are not that hard to re-acquire, which is why people are willing to take the risk.
+
+While it was true that most people stopped at 162 - in Everquest Legends, all players can use the [[Forest Green Silk Swatch]] to get Tailoring to 190. It's a bit of a pain because it requires ground spawns from Greater Faydark, but about 6-9 of them spawn every ~5 minutes, and with jumping to other instances the items can be acquired fairly quickly. Assuming the Coldain Shawl is added to EQ Legends, its probably preferable for anyone doing the quest to get to 190 Tailoring at a minimum. (Approximately 234 combines to progress from 158-190 at 451 wisdom.)
+
+== Leveling Guide ==
+'''Intelligence or Wisdom, whichever is higher governs your chance to gain skill increases.'''
+{| class="eoTable2 sortable"
+! Range || Trivial || Item || Ingredients || Combine in ||  Era
+|-
+| '''1-15''' || 15 || [[Silk Swatch]] ||  2x [[Spider Silk]] || [[Sewing Kit]] ||  {{Classic Era Inline}}
+|-
+| '''15-26''' || 26 || [[Patchwork Boots]] ||  [[Boot Pattern]], Ruined [[Ruined Bear Pelt|Bear]] or [[Ruined Wolf Pelt|Wolf]] or [[Ruined Cat Pelt|Cat]] Pelts || [[Sewing Kit]] ||  {{Classic Era Inline}}
+|-
+| '''26-36''' || 36 || [[Raw Silk Headband]] || [[Cap Pattern]], [[Silk Swatch]] || [[Loom]], [[Large Sewing Kit]] ||  {{Classic Era Inline}}
+|-
+| '''51-82''' || 82 || [[Cured Silk Mask]]|| [[Mask Pattern]], [[Heady Kiola]], [[Silk Swatch]]  || [[Loom]], [[Large Sewing Kit]] ||  {{Classic Era Inline}}
+|-
+| '''82-88''' || 88 || [[Hand Made Backpack]]|| [[Backpack Pattern]], [[High Quality Bear Skin]]  || [[Loom]], [[Large Sewing Kit]] ||  {{Classic Era Inline}}
+|-
+| '''88-108''' || 108 || [[Reinforced Armor]] || (Small) [[High Quality Wolf Skin]], (Medium) [[High Quality Cat Pelt]],<br> (Large) [[High Quality Bear Skin]], 1-4x [[Steel Boning]], 1x * Pattern ||  [[Loom]], [[Sewing Kit]], [[Large Sewing Kit]] ||  {{Classic Era Inline}}
+<!---
+|-
+| '''88-108''' || 108 || [[Crystalline Silk Mask]] || [[Mask Pattern ]], [[Silver Thread]], [[Crystalline Silk Swatch]] || [[Loom]], [[Large Sewing Kit]] || {{Velious Era Inline}}
+-->
+|-
+| '''108-115''' || 115 || [[Tailored Quiver]] || [[High Quality Cat Pelt]], [[Quiver Pattern]] ||  [[Loom]] || {{Classic Era Inline}}
+<!---
+|-
+| '''108-115''' || 115 || [[Crystalline Silk Cap]] || [[Cap Pattern]], [[Silver Thread]], [[Crystalline Silk Swatch]] || [[Loom]], [[Large Sewing Kit]] || {{Velious Era Inline}}
+|-
+| '''115-124''' || 124 || [[Crystalline Silk Gloves]] || [[Glove Pattern]], [[Silver Thread]], 2x [[Crystalline Silk Swatch]] || [[Loom]], [[Large Sewing Kit]] || {{Velious Era Inline}}
+|-
+| '''124-131''' || 131 || [[Crystalline Silk Shirt]] || [[Tunic Pattern]], [[Silver Thread]], 3x [[Crystalline Silk Swatch]] || [[Loom]], [[Large Sewing Kit]] || {{Velious Era Inline}}
+-->
+|-
+| '''131-135''' || 135 || [[Wu's Fighting Wristbands]] || [[Wristband Pattern]], 4x [[Heady Kiola]], [[Silk Swatch]], [[Vial of Viscous Mana]] || [[Sewing Kit]] || {{Classic Era Inline}}
+|-
+| '''135-142''' || 142 || [[Wu's Fighting Cap]] || [[Cap Pattern]], 4x [[Heady Kiola]], [[Silk Swatch]], [[Vial of Viscous Mana]] || [[Sewing Kit]] || {{Classic Era Inline}}
+|-
+| '''142-151''' || 151 || [[Wu's Fighting Sleeves]] || [[Sleeve Pattern]], 4x [[Heady Kiola]], 2x [[Silk Swatch]], [[Vial of Viscous Mana]] || [[Sewing Kit]] || {{Classic Era Inline}}
+|-
+| '''151-155''' || 155 || [[Wu's Fighting Pantaloons]] || [[Pant Pattern]], 4x [[Heady Kiola]], 3x [[Silk Swatch]], [[Vial of Viscous Mana]] || [[Loom]] || {{Classic Era Inline}}
+|-
+| '''155-158''' || 158 || [[Wu's Fighting Shirt]] || [[Tunic Pattern]], 4x [[Heady Kiola]], 3x [[Silk Swatch]], [[Vial of Viscous Mana]] || [[Loom]] || {{Classic Era Inline}}
+|-
+| '''158-190''' || 190 || [[Forest Green Silk Swatch]] || 2x [[Silk Thread]], 2x [[Silk Swatch]], [[Dark Green Dye]] || [[Sewing Kit]] || {{Classic Era Inline}}
+|-
+| '''190''' || - ||colspan=4| Recommended level for [[Coldain Prayer Shawl]] (and stopping point for many tailors)
+|-
+| '''190-222''' || 222 || [[Fleeting Quiver]] || [[Fleeting Quiver Pattern]], [[Aviak Egg Oil]], [[Griffon Feathers]], [[High Quality Lion Skin]], [[Vial of Distilled Mana]] || [[Loom]], [[Large Sewing Kit]] || {{Classic Era Inline}}
+|-
+| '''190-215''' || 215 || Wood Elf Cultural<br> [[Mithril Reinforced Mask]] || [[Mask Pattern]], [[Excellent Sabertooth Tiger Hide]], [[Mithril Boning]], [[Oak Bark Tannin]] || [[Feir'Dal Sewing Kit]] || {{Kunark Era Inline}}
+|-
+| '''190-215''' || 215 || Halfling Cultural<br> [[Vale Reinforced Mask]] || [[Mask Pattern]], [[Acorn Oil]], [[High Quality Brute Hide]], [[Steel Boning]] || [[Vale Sewing Kit]] || {{Kunark Era Inline}}
+|-
+| '''215-228''' || 228 || Wood Elf Cultural<br> [[Imbued Mithril Reinforced Mask]] || [[Mask Pattern]], [[Excellent Sabertooth Tiger Hide]], [[Mithril Boning]], [[Oak Bark Tannin]], [[Imbued Emerald]] || [[Feir'Dal Sewing Kit]] || {{Kunark Era Inline}}
+|-
+| '''215-228''' || 228 || Halfling Cultural<br> [[Imbued Vale Reinforced Mask]] || [[Mask Pattern]], [[Acorn Oil]], [[High Quality Brute Hide]], [[Steel Boning]], [[Imbued Plains Pebble]] || [[Vale Sewing Kit]] || {{Kunark Era Inline}}
+|-
+| '''228+''' || 300+ || Velious Tailoring || [[Skill_Tailoring#Velious_Tailoring|See Options Below]] || [[Coldain Tanners Kit]] || {{Velious Era Inline}}
+|}
+
+== Bags and Miscellaneous ==
+
+<table class="eoTable sortable">
+  <tr>
+    <th colspan="8">Bags</th>
+  </tr>
+  <tr>
+    <th>Container</th>
+    <th>Skin</th>
+    <th>Other</th>
+    <th>Trivial</th>
+    <th>Slots</th>
+    <th>Size</th>
+    <th>Weight Reduction</th>
+    <th>Weight</th>
+  </tr>
+  <tr>
+    <td>[[Tailored Wrist Pouch]]</td>
+    <td>[[Ruined Wolf Pelt]]</td>
+    <td>[[Silk Cord]]</td>
+    <td>26</td>
+    <td>4</td>
+    <td>Tiny</td>
+    <td>10%</td>
+    <td>0.3</td>
+  </tr>
+  <tr>
+    <td>[[Tailored Small Bag]]</td>
+    <td>[[Low Quality Wolf Pelt|LQ Wolf]]</td>
+    <td>[[Silk Cord]]</td>
+    <td>31</td>
+    <td>4</td>
+    <td>Medium</td>
+    <td>10%</td>
+    <td>0.4</td>
+  </tr>
+  <tr>
+    <td>[[Tailored Large Belt Pouch]]</td>
+    <td>[[Low Quality Cat Skin|LQ Cat]]</td>
+    <td>[[Silk Cord]]</td>
+    <td>36</td>
+    <td>6</td>
+    <td>Medium</td>
+    <td>10%</td>
+    <td>0.6</td>
+  </tr>
+  <tr>
+    <td>[[Tailored Large Bag]]</td>
+    <td>[[Low Quality Bear Skin|LQ Bear]]</td>
+    <td>[[Silk Cord]]</td>
+    <td>41</td>
+    <td>6</td>
+    <td>Large</td>
+    <td>10%</td>
+    <td>0.8</td>
+  </tr>
+  <tr>
+    <td>[[Reinforced Medicine Bag]]</td>
+    <td>[[Thick Grizzly Bear Skin]]</td>
+    <td>[[Silk Cord]]</td>
+    <td>68</td>
+    <td>10</td>
+    <td>Giant</td>
+    <td>10%</td>
+    <td>2.5</td>
+  </tr>
+  <tr>
+    <td>[[Handmade Backpack]]</td>
+    <td>[[High Quality Bear Skin|HQ Bear]]</td>
+    <td>[[Backpack Pattern]]</td>
+    <td>88</td>
+    <td>10</td>
+    <td>Large</td>
+    <td>10%</td>
+    <td>3.0</td>
+  </tr>
+  <tr>
+    <td>[[Tailored Quiver]]</td>
+    <td>[[High Quality Cat Pelt|HQ Cat]]</td>
+    <td>[[Quiver Pattern]]</td>
+    <td>115</td>
+    <td>6</td>
+    <td>Arrows</td>
+    <td>22%</td>
+    <td>0.4</td>
+  </tr>
+  <tr>
+    <td rowspan="2">[[Fleeting Quiver]]</td>
+    <td rowspan="2">[[High Quality Lion Skin|HQ Lion]]</td>
+    <td>[[Aviak Egg Oil]], [[Vial of Distilled Mana]]</td>
+    <td rowspan="2">222</td>
+    <td rowspan="2">6</td>
+    <td rowspan="2">Arrows</td>
+    <td rowspan="2">60%</td>
+    <td rowspan="2">0.4</td>
+  </tr>
+  <tr>
+    <td>[[Griffon Feather]], [[Fleeting Quiver Pattern]]</td>
+  </tr>
+</table>
+
+<table class="eoTable">
+  <tr>
+    <th colspan="8">Miscellaneous</th>
+  </tr>
+  <tr>
+    <th>Item</th>
+    <th colspan="3">Components</th>
+    <th>Trivial</th>
+    <th>Stackable</th>
+    <th>Era</th>
+  </tr>
+  <tr>
+    <td>[[Crystalline Silk Swatch]]</td>
+    <td colspan="3">[[Crystalline Silk]] x2</td>
+    <td>15</td>
+    <td>Yes</td>
+    <td>{{Velious Era Short}}</td>
+  </tr>
+  <tr>
+    <td>LQ ([[Low Quality Wolf Skin|Wolf]]/[[Low Quality Cat Skin|Cat]]/[[Low Quality Bear Skin|Bear]]) Skin</td>
+    <td>MQ ([[Medium Quality Wolf Skin|Wolf]]/[[Medium Quality Cat Skin|Cat]]/[[Medium Quality Bear Skin|Bear]]) Skin</td>
+    <td colspan="2">[[Skinning Knife]]</td>
+    <td>15</td>
+    <td>No</td>
+    <td>{{Classic Era Short}}</td>
+  </tr>
+  <tr>
+    <td>MQ ([[Medium Quality Wolf Skin|Wolf]]/[[Medium Quality Cat Skin|Cat]]/[[Medium Quality Bear Skin|Bear]]) Skin</td>
+    <td>HQ ([[High Quality Wolf Skin|Wolf]]/[[High Quality Cat Skin|Cat]]/[[High Quality Bear Skin|Bear]]) Skin</td>
+    <td colspan="2">[[Skinning Knife]]</td>
+    <td>15</td>
+    <td>No</td>
+    <td>{{Classic Era Short}}</td>
+  </tr>
+  <tr>
+    <td>Ruined ([[Ruined Wolf Pelt|Wolf]]/[[Ruined Cat Pelt|Cat]]/[[Ruined Bear Pelt|Bear]]) Pelt</td>
+    <td>LQ ([[Low Quality Wolf Skin|Wolf]]/[[Low Quality Cat Skin|Cat]]/[[Low Quality Bear Skin|Bear]]) Skin</td>
+    <td colspan="2">[[Skinning Knife]]</td>
+    <td>15</td>
+    <td>No</td>
+    <td>{{Classic Era Short}}</td>
+  </tr>
+  <tr>
+    <td>[[Silk Swatch]]</td>
+    <td colspan="3">[[Spider Silk]] x2</td>
+    <td>15</td>
+    <td>Yes</td>
+    <td>{{Classic Era Short}}</td>
+  </tr>
+  <tr>
+    <td>[[Silk Thread]]</td>
+    <td colspan="3">[[Spiderling Silk]] x2</td>
+    <td>15</td>
+    <td>Yes</td>
+    <td>{{Classic Era Short}}</td>
+  </tr>
+  <tr>
+    <td>[[Silk Bandage]]</td>
+    <td colspan="3">[[Silk Thread]] x2</td>
+    <td>21</td>
+    <td>Yes</td>
+    <td>{{Classic Era Short}}</td>
+  </tr>
+  <tr>
+    <td>[[Silk Cord]]</td>
+    <td colspan="3">[[Silk Thread]] x3</td>
+    <td>26</td>
+    <td>Yes</td>
+    <td>{{Classic Era Short}}</td>
+  </tr>
+  <tr>
+    <td>[[Leather Padding]]</td>
+    <td>LQ ([[Low Quality Wolf Skin|Wolf]]/[[Low Quality Cat Skin|Cat]]/[[Low Quality Bear Skin|Bear]]) Skin</td>
+    <td colspan="2">[[Silk Thread]]</td>
+    <td>31</td>
+    <td>Yes</td>
+    <td>{{Classic Era Short}}</td>
+  </tr>
+  <tr>
+    <td>{{:Tailor-made Whip}}</td>
+    <td>MQ ([[Medium Quality Wolf Skin|Wolf]]/[[Medium Quality Cat Skin|Cat]]) Skin</td>
+    <td>[[Heady Kiola]] x4</td>
+    <td>[[Whip Pattern]]</td>
+    <td>36</td>
+    <td>No</td>
+    <td>{{Classic Era Short}}</td>
+  </tr>
+  <tr>
+    <td>[[Crystalline Silk Fiber]]</td>
+    <td colspan="3">[[Crystalline Silk Thread]] x5</td>
+    <td>51</td>
+    <td>No</td>
+    <td>{{Velious Era Short}}</td>
+  </tr>
+</table>
+
+*Note: A [[Skinning Knife]] allows you to reduce some pelts/skins in quality by one degree ('''High -> Medium -> Low -> Ruined''').  It is returned to you on success or failure.
+
+== Quest Items ==
+
+<table class="eoTable sortable">
+  <tr>
+    <th>Item</th>
+    <th colspan="4">Components</th>
+    <th>Trivial</th>
+    <th>Quest</th>
+    <th class="unsortable">Era</th>
+  </tr>
+  <tr>
+    <td>[[Gnoll Fur Patch]]</td>
+    <td colspan="4">4 [[Patch of Gnoll Fur]]s</td>
+    <td>21</td>
+    <td>[[Fang of the Wolf]] quest</td>
+    <td>{{Classic Era Short}}</td>
+  </tr>
+  <tr>
+    <td>[[Mended Tapestry]]</td>
+    <td colspan="2">[[Torn Tapestry]]</td>
+    <td colspan="2">[[Ripped Tapestry]]</td>
+    <td>23</td>
+    <td>[[Necromancer Skullcap Quests#Necromancer 2nd Rank|Necromancer Skullcap - 2nd Rank]]</td>
+    <td>{{Kunark Era Short}}</td>
+  </tr>
+  <tr>
+    <td>[[Gnoll Fur Patch Quarter]]</td>
+    <td colspan="4">4 [[Gnoll Fur Patch]]es</td>
+    <td>26</td>
+    <td>[[Fang of the Wolf]] quest</td>
+    <td>{{Classic Era Short}}</td>
+  </tr>
+  <tr>
+    <td>[[Patched Gnoll Fur Bundle]]</td>
+    <td colspan="4">4 [[Gnoll Fur Patch Quarter]]s</td>
+    <td>31</td>
+    <td>[[Fang of the Wolf]] quest</td>
+    <td>{{Classic Era Short}}</td>
+  </tr>
+  <tr>
+    <td>[[Large Shadow Silk]]</td>
+    <td>2 [[Shadow Wolf Pelt]]</td>
+    <td>1 [[Silk Swatch]]</td>
+    <td colspan="2">1 [[Gather Shadows|Spell Scroll of Gather Shadows]]</td>
+    <td>34</td>
+    <td>[[Robe of Enshroudment]]</td>
+    <td>{{Era Short | Temple}}</td>
+  </tr>
+  <tr>
+    <td>[[Inky Shadow Silk]]</td>
+    <td>1 [[Shadow Wolf Pelt]]</td>
+    <td>1 [[Silk Swatch]]</td>
+    <td colspan="2">2 [[Gather Shadows|Spell Scroll of Gather Shadows]]</td>
+    <td>34</td>
+    <td>[[ShadowBound Gloves]]</td>
+    <td>{{Era Short | Temple}}</td>
+  </tr>
+  <tr>
+    <td>[[Shadow Silk]]</td>
+    <td>1 [[Shadow Wolf Pelt]]</td>
+    <td>1 [[Silk Swatch]]</td>
+    <td colspan="2">1 [[Gather Shadows|Spell Scroll of Gather Shadows]]</td>
+    <td>36</td>
+    <td>[[ShadowBound Boots]]</td>
+    <td>{{Era Short | Temple}}</td>
+  </tr>
+  <tr>
+    <td>[[Coldain Hunting Blanket]]</td>
+    <td colspan="2">2 [[High Quality Cougarskin]]s</td>
+    <td colspan="2">2 [[High Quality Tundra Kodiak Pelt]]s</td>
+    <td>41</td>
+    <td>[[Copper Coldain Insignia Ring]]</td>
+    <td>{{Velious Era Short}}</td>
+  </tr>
+  <tr>
+    <td>[[Crystalline Silk Fiber]]</td>
+    <td colspan="4">5 [[Crystalline Silk Thread]]s</td>
+    <td>51</td>
+    <td>[[Coldain Prayer Shawl Quests]] #5</td>
+    <td>{{Velious Era Short}}</td>
+  </tr>
+  <tr>
+    <td>[[Silk Coldain Prayer Shawl]]</td>
+    <td colspan="2">5 [[Glowing Crystalline Silk Piece]]s</td>
+    <td colspan="2">1 [[Fur-Lined Coldain Prayer Shawl]]</td>
+    <td>115</td>
+    <td>[[Coldain Prayer Shawl Quests]] #5</td>
+    <td>{{Velious Era Short}}</td>
+  </tr>
+  <tr>
+    <td>[[Spool of Sacred Coldain Thread]]</td>
+    <td>1 [[Woven Frost Giant Beard]]</td>
+    <td>2 [[Manticore Mane|Manticore Manes]]</td>
+    <td>2 [[Drakkel Wolf Whisker|Drakkel Wolf Whiskers]]</td>
+    <td>2 [[Siren Hair|Siren Hairs]]</td>
+    <td>162</td>
+    <td>[[Coldain Prayer Shawl Quests]] #6</td>
+    <td>{{Era Short | Warrens}}</td>
+  </tr>
+  <tr>
+    <td>[[Runed Coldain Prayer Shawl]]</td>
+    <td>1 [[Encased Velium Etched Rune]]</td>
+    <td>1 [[Runed Prayer Shawl Pattern]]</td>
+    <td colspan="2">1 [[Embroidered Coldain Prayer Shawl]]</td>
+    <td>162</td>
+    <td>[[Coldain Prayer Shawl Quests]] #7</td>
+    <td>{{Era Short | Warrens}}</td>
+  </tr>
+  <tr>
+    <td>[[Embroidered Coldain Prayer Shawl]]</td>
+    <td>1 [[Spool of Sacred Coldain Thread]]</td>
+    <td>1 [[Embroidered Shawl Pattern]]</td>
+    <td colspan="2">1 [[Silk Coldain Prayer Shawl]]</td>
+    <td>208</td>
+    <td>[[Coldain Prayer Shawl Quests]] #6</td>
+    <td>{{Era Short | Warrens}}</td>
+  </tr>
+  <tr>
+    <td>[[Robe of the Lost Circle]]</td>
+    <td>[[Needle of the Void]]</td>
+    <td>[[Rare Robe Pattern]]</td>
+    <td>[[Jonthan's Whistling Warsong|Scroll of Song Jonthan's Whistling Warsong]]</td>
+    <td>[[Shadow Silk]]</td>
+    <td>No Fail</td>
+    <td>[[Monks of The Whistling Fist]]</td>
+    <td>{{Epics Era Short}}</td>
+  </tr>
+  <tr>
+    <td>[[Monk Training Bag]]</td>
+    <td colspan="2">3 [[Pile of Granite Pebbles]]</td>
+    <td colspan="2">1 [[Training Bag Husk]]</td>
+    <td>No Fail</td>
+    <td>[[Sparring Armor]]</td>
+    <td>{{Kunark Era Short}}</td>
+  </tr>
+</table>
+
+== Classic Armor ==
+
+Tailors can create silk and leather armor.  The sizing and weight of a leather armor piece depends on the animal pelt used.
+
+<table class="eoTable">
+  <tr>
+    <th colspan="15">Sizing Guide by Race</th>
+  </tr>
+  <tr>
+    <th>Size</th>
+    <th>Pelt</th>
+    <th>[[Ogre]]</th>
+    <th>[[Troll]]</th>
+    <th>[[Barbarian]]</th>
+    <th>[[Iksar]]</th>
+    <th>[[Erudite]]</th>
+    <th>[[Human]]</th>
+    <th>[[Half-Elf]]</th>
+    <th>[[Wood Elf]]</th>
+    <th>[[High Elf]]</th>
+    <th>[[Dark Elf]]</th>
+    <th>[[Dwarf]]</th>
+    <th>[[Gnome]]</th>
+    <th>[[Halfling]]</th>
+  </tr>
+  <tr>
+    <td>Large</td>
+    <td>Bear</td>
+    <td colspan=3 style="border: 1px solid black; text-align: center">x</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Medium</td>
+    <td>Cat</td>
+    <td></td>
+    <td></td>
+    <td colspan=8 style="border: 1px solid black; text-align: center">x</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Small</td>
+    <td>Wolf</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td colspan=6 style="border: 1px solid black; text-align: center">x</td>
+  </tr>
+</table>
+
+=== [[Patchwork Armor|Patchwork]] / [[Tattered Armor|Tattered Leather Armor]] ===
+
+* '''Ingredients:''' Tailoring Pattern, 1 Ruined Pelt
+* '''Combine:''' [[Small Sewing Kit]], [[Large Sewing Kit]], [[Deluxe Sewing Kit]], [[Loom]]
+* '''Drop Info:''' Cats, Bears and Wolves
+* '''Classes:''' BRD CLR DRU MNK PAL RNG ROG SHD SHM WAR
+* '''Trivial:''' 26
+
+<table class="eoTable sortable">
+  <tr>
+    <th>Item</th>
+    <th>Pattern</th>
+    <th>Pelt</th>
+    <th>AC</th>
+  </tr>
+  <tr>
+    <td>{{:Tattered Belt}}</td>
+    <td>[[Belt Pattern|Belt]]</td>
+    <td>1</td>
+    <td>2</td>
+  </tr>
+  <tr>
+    <td>{{:Patchwork Boots}}</td>
+    <td>[[Boot Pattern|Boot]]</td>
+    <td>1</td>
+    <td>3</td>
+  </tr>
+  <tr>
+    <td>{{:Tattered Skullcap}}</td>
+    <td>[[Cap Pattern|Cap]]</td>
+    <td>1</td>
+    <td>3</td>
+  </tr>
+  <tr>
+    <td>{{:Patchwork Cloak}}</td>
+    <td>[[Cloak Pattern|Cloak]]</td>
+    <td>1</td>
+    <td>3</td>
+  </tr>
+  <tr>
+    <td>{{:Tattered Gloves}}</td>
+    <td>[[Glove Pattern|Glove]]</td>
+    <td>1</td>
+    <td>3</td>
+  </tr>
+  <tr>
+    <td>{{:Tattered Gorget}}</td>
+    <td>[[Gorget Pattern|Gorget]]</td>
+    <td>1</td>
+    <td>2</td>
+  </tr>
+  <tr>
+    <td>{{:Tattered Mask}}</td>
+    <td>[[Mask Pattern|Mask]]</td>
+    <td>1</td>
+    <td>2</td>
+  </tr>
+  <tr>
+    <td>{{:Patchwork Pants}}</td>
+    <td>[[Pant Pattern|Pant]]</td>
+    <td>1</td>
+    <td>4</td>
+  </tr>
+  <tr>
+    <td>{{:Tattered Shoulderpads}}</td>
+    <td>[[Shoulderpad Pattern|Shoulderpad]]</td>
+    <td>1</td>
+    <td>2</td>
+  </tr>
+  <tr>
+    <td>{{:Patchwork Sleeves}}</td>
+    <td>[[Sleeve Pattern|Sleeve]]</td>
+    <td>1</td>
+    <td>3</td>
+  </tr>
+  <tr>
+    <td>{{:Patchwork Tunic}}</td>
+    <td>[[Tunic Pattern|Tunic]]</td>
+    <td>1</td>
+    <td>6</td>
+  </tr>
+  <tr>
+    <td>{{:Tattered Wristbands}}</td>
+    <td>[[Wristband Pattern|Wristband]]</td>
+    <td>1</td>
+    <td>2</td>
+  </tr>
+  <tr>
+    <th>[[Patchwork Armor|Patchwork]] / [[Tattered Armor|Tattered Set]]</th>
+    <th>Total</th>
+    <th>13</th>
+    <th>37</th>
+  </tr>
+</table>
+
+=== [[Raw Silk Armor|Raw Silk Armor]] ===
+
+* '''Ingredients:''' Tailoring Pattern, 1 to 2 [[Silk Swatch]]es
+* '''Combine:''' [[Small Sewing Kit]], [[Large Sewing Kit]], [[Deluxe Sewing Kit]], [[Loom]]
+* '''Drop Info:''' Adult Spiders, Drachnids
+* '''Classes:''' MNK MAG NEC WIZ ENC
+* '''Trivial:''' 36 (note: may be incorrect; these went trivial at 32 for me)
+
+<table class="eoTable sortable">
+  <tr>
+    <th>Item</th>
+    <th>Pattern</th>
+    <th>Swatches</th>
+    <th>AC</th>
+    <th>Weight</th>
+  </tr>
+  <tr>
+    <td>{{:Raw Silk Sash}}</td>
+    <td>[[Belt Pattern|Belt]]</td>
+    <td>1</td>
+    <td>2</td>
+    <td>0.4</td>
+  </tr>
+  <tr>
+    <td>{{:Raw Silk Sandals}}</td>
+    <td>[[Boot Pattern|Boot]]</td>
+    <td>1</td>
+    <td>3</td>
+    <td>0.4</td>
+  </tr>
+  <tr>
+    <td>{{:Raw Silk Headband}}</td>
+    <td>[[Cap Pattern|Cap]]</td>
+    <td>1</td>
+    <td>3</td>
+    <td>0.4</td>
+  </tr>
+  <tr>
+    <td>{{:Raw Silk Cloak}}</td>
+    <td>[[Cloak Pattern|Cloak]]</td>
+    <td>1</td>
+    <td>3</td>
+    <td>0.4</td>
+  </tr>
+  <tr>
+    <td>{{:Raw Silk Gloves}}</td>
+    <td>[[Glove Pattern|Glove]]</td>
+    <td>1</td>
+    <td>3</td>
+    <td>0.4</td>
+  </tr>
+  <tr>
+    <td>{{:Raw Silk Collar}}</td>
+    <td>[[Gorget Pattern|Gorget]]</td>
+    <td>1</td>
+    <td>2</td>
+    <td>0.4</td>
+  </tr>
+  <tr>
+    <td>{{:Raw Silk Mask}}</td>
+    <td>[[Mask Pattern|Mask]]</td>
+    <td>1</td>
+    <td>2</td>
+    <td>0.4</td>
+  </tr>
+  <tr>
+    <td>{{:Raw Silk Leggings}}</td>
+    <td>[[Pant Pattern|Pant]]</td>
+    <td>2</td>
+    <td>4</td>
+    <td>0.4</td>
+  </tr>
+  <tr>
+    <td>{{:Raw Silk Mantle}}</td>
+    <td>[[Shoulderpad Pattern|Shoulderpad]]</td>
+    <td>1</td>
+    <td>2</td>
+    <td>0.4</td>
+  </tr>
+  <tr>
+    <td>{{:Raw Silk Sleeves}}</td>
+    <td>[[Sleeve Pattern|Sleeve]]</td>
+    <td>1</td>
+    <td>3</td>
+    <td>0.4</td>
+  </tr>
+  <tr>
+    <td>{{:Raw Silk Robe}}</td>
+    <td>[[Tunic Pattern|Tunic]]</td>
+    <td>2</td>
+    <td>6</td>
+    <td>0.4</td>
+  </tr>
+  <tr>
+    <td>{{:Raw Silk Wristbands}}</td>
+    <td>[[Wristband Pattern|Wristband]]</td>
+    <td>1</td>
+    <td>2</td>
+    <td>0.4</td>
+  </tr>
+  <tr>
+    <th>[[Raw Silk Armor Set]]</th>
+    <th>Total</th>
+    <th>15</th>
+    <th>37</th>
+    <th>5.2</th>
+  </tr>
+</table>
+
+=== [[Studded Armor|Studded Leather Armor]] ===
+
+* '''Ingredients:''' Tailoring Pattern, 1 Medium Quality Pelt, 1 to 5 [[Studs]]
+* '''Combine:''' [[Large Sewing Kit]], [[Deluxe Sewing Kit]], [[Loom]]
+* '''Drop Info:''' Cats, Bears and Wolves
+* '''Classes:''' WAR CLR PAL RNG SHD DRU MNK BRD ROG SHM
+* '''Trivial:''' 56
+
+<table class="eoTable sortable">
+  <tr>
+    <th>Item</th>
+    <th>Pattern</th>
+    <th>Pelt</th>
+    <th>Studs</th>
+    <th>AC</th>
+  </tr>
+  <tr>
+    <td>{{:Studded Belt}}</td>
+    <td>[[Belt Pattern|Belt]]</td>
+    <td>1</td>
+    <td>2</td>
+    <td>4</td>
+  </tr>
+  <tr>
+    <td>{{:Studded Boots}}</td>
+    <td>[[Boot Pattern|Boot]]</td>
+    <td>1</td>
+    <td>4</td>
+    <td>5</td>
+  </tr>
+  <tr>
+    <td>{{:Studded Skullcap}}</td>
+    <td>[[Cap Pattern|Cap]]</td>
+    <td>1</td>
+    <td>3</td>
+    <td>5</td>
+  </tr>
+  <tr>
+    <td>{{:Studded Cloak}}</td>
+    <td>[[Cloak Pattern|Cloak]]</td>
+    <td>1</td>
+    <td>4</td>
+    <td>5</td>
+  </tr>
+  <tr>
+    <td>{{:Studded Gloves}}</td>
+    <td>[[Glove Pattern|Glove]]</td>
+    <td>1</td>
+    <td>4</td>
+    <td>5</td>
+  </tr>
+  <tr>
+    <td>{{:Studded Gorget}}</td>
+    <td>[[Gorget Pattern|Gorget]]</td>
+    <td>1</td>
+    <td>2</td>
+    <td>4</td>
+  </tr>
+  <tr>
+    <td>{{:Studded Mask}}</td>
+    <td>[[Mask Pattern|Mask]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>3</td>
+  </tr>
+  <tr>
+    <td>{{:Studded Leggings}}</td>
+    <td>[[Pant Pattern|Pant]]</td>
+    <td>1</td>
+    <td>4</td>
+    <td>6</td>
+  </tr>
+  <tr>
+    <td>{{:Studded Shoulderpads}}</td>
+    <td>[[Shoulderpad Pattern|Shoulderpad]]</td>
+    <td>1</td>
+    <td>3</td>
+    <td>4</td>
+  </tr>
+  <tr>
+    <td>{{:Studded Sleeves}}</td>
+    <td>[[Sleeve Pattern|Sleeve]]</td>
+    <td>1</td>
+    <td>3</td>
+    <td>5</td>
+  </tr>
+  <tr>
+    <td>{{:Studded Tunic}}</td>
+    <td>[[Tunic Pattern|Tunic]]</td>
+    <td>1</td>
+    <td>5</td>
+    <td>9</td>
+  </tr>
+  <tr>
+    <td>{{:Studded Wristbands}}</td>
+    <td>[[Wristband Pattern|Wristband]]</td>
+    <td>1</td>
+    <td>2</td>
+    <td>4</td>
+  </tr>
+  <tr>
+    <th>[[Studded Armor Set]]</th>
+    <th>Total</th>
+    <th>13</th>
+    <th>39</th>
+    <th>63</th>
+  </tr>
+</table>
+
+=== [[Cured Silk Armor|Cured Silk Armor]] - Monk Only ===
+
+* '''Ingredients:''' Tailoring Pattern, 1 to 3 [[Silk Swatch]]es, 1 to 3 [[Heady Kiola]]s
+* '''Combine:''' [[Small Sewing Kit]], [[Large Sewing Kit]], [[Deluxe Sewing Kit]], [[Loom]]
+* '''Drop Info:''' Adult Spiders, Drachnids
+* '''Classes:''' MNK
+* '''Trivial:''' 82
+
+<table class="eoTable sortable">
+  <tr>
+    <th>Item</th>
+    <th>Pattern</th>
+    <th>Swatches</th>
+    <th>Heady<br>Kiolas</th>
+    <th>AC</th>
+    <th>Weight</th>
+  </tr>
+  <tr>
+    <td>{{:Cured Silk Sash}}</td>
+    <td>[[Belt Pattern|Belt]]</td>
+    <td>1</td>
+    <td>2</td>
+    <td>3</td>
+    <td>0.1</td>
+  </tr>
+  <tr>
+    <td>{{:Cured Silk Sandals}}</td>
+    <td>[[Boot Pattern|Boot]]</td>
+    <td>1</td>
+    <td>2</td>
+    <td>4</td>
+    <td>0.1</td>
+  </tr>
+  <tr>
+    <td>{{:Cured Silk Headband}}</td>
+    <td>[[Cap Pattern|Cap]]</td>
+    <td>1</td>
+    <td>3</td>
+    <td>4</td>
+    <td>0.1</td>
+  </tr>
+  <tr>
+    <td>{{:Cured Silk Cloak}}</td>
+    <td>[[Cloak Pattern|Cloak]]</td>
+    <td>2</td>
+    <td>2</td>
+    <td>4</td>
+    <td>0.1</td>
+  </tr>
+  <tr>
+    <td>{{:Cured Silk Handwraps}}</td>
+    <td>[[Glove Pattern|Glove]]</td>
+    <td>2</td>
+    <td>2</td>
+    <td>4</td>
+    <td>0.1</td>
+  </tr>
+  <tr>
+    <td>{{:Cured Silk Collar}}</td>
+    <td>[[Gorget Pattern|Gorget]]</td>
+    <td>1</td>
+    <td>2</td>
+    <td>3</td>
+    <td>0.1</td>
+  </tr>
+  <tr>
+    <td>{{:Cured Silk Mask}}</td>
+    <td>[[Mask Pattern|Mask]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>2</td>
+    <td>0.1</td>
+  </tr>
+  <tr>
+    <td>{{:Cured Silk Leggings}}</td>
+    <td>[[Pant Pattern|Pant]]</td>
+    <td>2</td>
+    <td>3</td>
+    <td>5</td>
+    <td>0.1</td>
+  </tr>
+  <tr>
+    <td>{{:Cured Silk Mantle}}</td>
+    <td>[[Shoulderpad Pattern|Shoulderpad]]</td>
+    <td>2</td>
+    <td>2</td>
+    <td>3</td>
+    <td>0.1</td>
+  </tr>
+  <tr>
+    <td>{{:Cured Silk Sleeves}}</td>
+    <td>[[Sleeve Pattern|Sleeve]]</td>
+    <td>2</td>
+    <td>2</td>
+    <td>4</td>
+    <td>0.1</td>
+  </tr>
+  <tr>
+    <td>{{:Cured Silk Gi}}</td>
+    <td>[[Tunic Pattern|Tunic]]</td>
+    <td>3</td>
+    <td>2</td>
+    <td>8</td>
+    <td>0.1</td>
+  </tr>
+  <tr>
+    <td>{{:Cured Silk Wristbands}}</td>
+    <td>[[Wristband Pattern|Wristband]]</td>
+    <td>1</td>
+    <td>2</td>
+    <td>3</td>
+    <td>0.1</td>
+  </tr>
+  <tr>
+    <th>[[Cured Silk Armor Set]]</th>
+    <th>Total</th>
+    <th>20</th>
+    <th>27</th>
+    <th>50</th>
+    <th>1.3</th>
+  </tr>
+</table>
+
+=== [[Reinforced Armor Set | Reinforced Armor]] ===
+* '''Ingredients:''' Tailoring Pattern, 1 High Quality Pelt, 1 - 4 [[Steel Boning]]
+* '''Combine:''' [[Small Sewing Kit]], [[Large Sewing Kit]], [[Deluxe Sewing Kit]], [[Loom]]
+* '''Drop Info:''' Cats, Bears and Wolves
+* '''Classes:''' BRD CLR DRU MNK PAL RNG ROG SHD SHM WAR
+* '''Trivial:''' 108
+
+{| class="eoTable3 sortable" style="text-align: center; width: 85%;"
+! scope="col" style="width: 30%;" | Item
+! scope="col" style="width: 20%;" | Pattern
+! scope="col" style="width: 10%;" | Pelts
+! scope="col" style="width: 10%;" | Boning
+! scope="col" style="width: 12%;" | AC
+! scope="col" style="width: 5%;"  | WT Small
+! scope="col" style="width: 5%;"  | WT Medium
+! scope="col" style="width: 5%;"  | WT Large
+|-
+| style="text-align:left;" | {{:Reinforced Belt}}&nbsp;(&nbsp;[[Small Reinforced Belt|S]]&nbsp;|&nbsp;[[Reinforced Belt|M]]&nbsp;|&nbsp;[[Large Reinforced Belt|L]]&nbsp;)
+| style="text-align:left;" | [[Belt Pattern]]
+| 1
+| 2
+| 5
+| 0.8
+| 1.0
+| 1.3
+|-
+| style="text-align:left;" | {{:Reinforced&nbsp;Boots}}&nbsp;(&nbsp;[[Small&nbsp;Reinforced&nbsp;Boots|S]]&nbsp;|&nbsp;[[Reinforced&nbsp;Boots|M]]&nbsp;|&nbsp;[[Large&nbsp;Reinforced&nbsp;Boots|L]]&nbsp;)
+| style="text-align:left;" | [[Boot Pattern]]
+| 1
+| 3
+| 6
+| 1.9
+| 2.5
+| 3.1
+|-
+| style="text-align:left;" | {{:Reinforced&nbsp;Skullcap}}&nbsp;(&nbsp;[[Small&nbsp;Reinforced&nbsp;Skullcap|S]]&nbsp;|&nbsp;[[Reinforced&nbsp;Skullcap|M]]&nbsp;|&nbsp;[[Large&nbsp;Reinforced&nbsp;Skullcap|L]]&nbsp;)
+| style="text-align:left;" | [[Cap Pattern]]
+| 1
+| 2
+| 6
+| 0.5
+| 0.6
+| 0.8
+|-
+| style="text-align:left;" | {{:Reinforced&nbsp;Cloak}}&nbsp;(&nbsp;[[Small&nbsp;Reinforced&nbsp;Cloak|S]]&nbsp;|&nbsp;[[Reinforced&nbsp;Cloak|M]]&nbsp;|&nbsp;[[Large&nbsp;Reinforced&nbsp;Cloak|L]]&nbsp;)
+| style="text-align:left;" | [[Cloak Pattern]]
+| 1
+| 2
+| 6
+| 1.5
+| 2.0
+| 2.5
+|-
+| style="text-align:left;" | {{:Reinforced Gloves}}&nbsp;(&nbsp;[[Small&nbsp;Reinforced&nbsp;Gloves|S]]&nbsp;|&nbsp;[[Reinforced&nbsp;Gloves|M]]&nbsp;|&nbsp;[[Large&nbsp;Reinforced&nbsp;Gloves|L]]&nbsp;)
+| style="text-align:left;" | [[Glove Pattern]]
+| 1
+| 2
+| 6
+| 1.1
+| 1.5
+| 1.9
+|-
+| style="text-align:left;" | {{:Reinforced Gorget}}&nbsp;(&nbsp;[[Small&nbsp;Reinforced&nbsp;Gorget|S]]&nbsp;|&nbsp;[[Reinforced&nbsp;Gorget|M]]&nbsp;|&nbsp;[[Large&nbsp;Reinforced&nbsp;Gorget|L]]&nbsp;)
+| style="text-align:left;" | [[Gorget Pattern]]
+| 1
+| 1
+| 5
+| 0.4
+| 0.5
+| 0.6
+|-
+| style="text-align:left;" | {{:Reinforced Mask}}&nbsp;(&nbsp;[[Small&nbsp;Reinforced&nbsp;Mask|S]]&nbsp;|&nbsp;[[Reinforced&nbsp;Mask|M]]&nbsp;|&nbsp;[[Large&nbsp;Reinforced&nbsp;Mask|L]]&nbsp;)
+| style="text-align:left;" | [[Mask Pattern]]
+| 1
+| 1
+| 4
+| 0.4
+| 0.4
+| 0.5
+|-
+| style="text-align:left;" | {{:Reinforced Leggings}}&nbsp;(&nbsp;[[Small&nbsp;Reinforced&nbsp;Leggings|S]]&nbsp;|&nbsp;[[Reinforced&nbsp;Leggings|M]]&nbsp;|&nbsp;[[Large&nbsp;Reinforced&nbsp;Leggings|L]]&nbsp;)
+| style="text-align:left;" | [[Pant Pattern]]
+| 1
+| 3
+| 7
+| 3.0
+| 4.0
+| 5.0
+|-
+| style="text-align:left;" | {{:Reinforced Shoulderpads}}&nbsp;(&nbsp;[[Small&nbsp;Reinforced&nbsp;Shoulderpads|S]]&nbsp;|&nbsp;[[Reinforced&nbsp;Shoulderpads|M]]&nbsp;|&nbsp;[[Large&nbsp;Reinforced&nbsp;Shoulderpads|L]]&nbsp;)
+| style="text-align:left;" | [[Shoulderpad Pattern]]
+| 1
+| 2
+| 5
+| 1.1
+| 1.5
+| 1.9
+|-
+| style="text-align:left;" | {{:Reinforced Sleeves}}&nbsp;(&nbsp;[[Small&nbsp;Reinforced&nbsp;Sleeves|S]]&nbsp;|&nbsp;[[Reinforced&nbsp;Sleeves|M]]&nbsp;|&nbsp;[[Large&nbsp;Reinforced&nbsp;Sleeves|L]]&nbsp;)
+| style="text-align:left;" | [[Sleeve Pattern]]
+| 1
+| 2
+| 6
+| 1.1
+| 1.5
+| 1.9
+|-
+| style="text-align:left;" | {{:Reinforced Tunic}}&nbsp;(&nbsp;[[Small&nbsp;Reinforced&nbsp;Tunic|S]]&nbsp;|&nbsp;[[Reinforced&nbsp;Tunic|M]]&nbsp;|&nbsp;[[Large&nbsp;Reinforced&nbsp;Tunic|L]]&nbsp;)
+| style="text-align:left;" | [[Tunic Pattern]]
+| 1
+| 4
+| 11
+| 2.6
+| 3.5
+| 4.4
+|-
+| style="text-align:left;" | {{:Reinforced Wristbands}}&nbsp;(&nbsp;[[Reinforced&nbsp;Wristbands|S]]&nbsp;|&nbsp;[[Reinforced&nbsp;Wristbands|M]]&nbsp;|&nbsp;[[Reinforced&nbsp;Wristbands|L]]&nbsp;)
+| style="text-align:left;" | [[Wristband Pattern]]
+| 1
+| 1
+| 5
+| 0.8
+| 1.0
+| 1.3
+|-
+! style="text-align: right;" | [[Reinforced Armor Set|Full Set]] (two wristbands)
+! style="text-align: right;" | Total
+! style="text-align: center;" |13
+! style="text-align: center;" |26
+! style="text-align: center;" |77
+! style="text-align: center;" |16
+! style="text-align: center;" |21
+! style="text-align: center;" |26.5
+|-
+! style="text-align: right;" | Visible Set
+! style="text-align: right;" | Total
+! style="text-align: center;" | 7
+! style="text-align: center;" |19
+! style="text-align: center;" |47
+! style="text-align: center;" |11
+! style="text-align: center;" |14.6
+! style="text-align: center;" |19.7
+|}
+
+=== [[Wu's Fighting Armor|Master Wu's Fighting Armor]] - Monk Only ===
+
+* '''Ingredients:''' Tailoring Pattern, 1 to 3 [[Silk Swatch]]es, 4 [[Heady Kiola]]s, 1 [[Vial of Viscous Mana]], 1 [[Greater Lightstone]]*
+* '''Combine:''' [[Large Sewing Kit]], [[Deluxe Sewing Kit]], [[Loom]] (cloak, pants, tunic require loom)
+* '''Drop Info:''' Adult Spiders, Drachnids
+* '''Classes:''' MNK 
+* '''Trivial:''' Varies from 88 to 158
+
+{| class="eoTable3 sortable" style="text-align: center;"
+|-
+! Item
+! Pattern
+! Viscous<br>Mana
+! Heady<br>Kiolas
+! Swatches
+! Trivial
+! AC
+! AGI
+! Weight
+|-
+| style="text-align: left;" | {{:Wu's Fighting Gauntlets}}*
+| style="text-align: left;" | [[Glove Pattern|Glove]]
+| 1
+| 4
+| 1
+| 88
+| 4
+| 0
+| 0.1
+|-
+| style="text-align: left;" | {{:Wu's Fighting Collar}}
+| style="text-align: left;" | [[Gorget Pattern|Gorget]]
+| 1
+| 4
+| 1
+| 124
+| 4
+| 2
+| 0.1
+|-
+| style="text-align: left;" | {{:Wu's Fighting Sash}}
+| style="text-align: left;" | [[Belt Pattern|Belt]]
+| 1
+| 4
+| 2
+| 128
+| 4
+| 2
+| 0.1
+|-
+| style="text-align: left;" | {{:Wu's Fighting Cloak}}
+| style="text-align: left;" | [[Cloak Pattern|Cloak]]
+| 1
+| 4
+| 3
+| 135
+| 5
+| 4
+| 0.1
+|-
+| style="text-align: left;" | {{:Wu's Fighting Mask}}
+| style="text-align: left;" | [[Mask Pattern|Mask]]
+| 1
+| 4
+| 1
+| 135
+| 3
+| 1
+| 0.1
+|-
+| style="text-align: left;" | {{:Wu's Fighting Wristbands}}
+| style="text-align: left;" | [[Wristband Pattern|Wristband]]
+| 1
+| 4
+| 1
+| 135
+| 4
+| 1
+| 0.1
+|-
+| style="text-align: left;" | {{:Wu's Fighting Cap}}
+| style="text-align: left;" | [[Cap Pattern|Cap]]
+| 1
+| 4
+| 1
+| 142
+| 5
+| 3
+| 0.1
+|-
+| style="text-align: left;" | {{:Wu's Fighting Mantle}}
+| style="text-align: left;" | [[Shoulderpad Pattern|Shoulderpad]]
+| 1
+| 4
+| 1
+| 142
+| 4
+| 3
+| 0.1
+|-
+| style="text-align: left;" | {{:Wu's Fighting Slippers}}
+| style="text-align: left;" | [[Boot Pattern|Boot]]
+| 1
+| 4
+| 2
+| 142
+| 5
+| 2
+| 0.1
+|-
+| style="text-align: left;" | {{:Wu's Fighting Sleeves}}
+| style="text-align: left;" | [[Sleeve Pattern|Sleeve]]
+| 1
+| 4
+| 2
+| 151
+| 5
+| 3
+| 0.1
+|-
+| style="text-align: left;" | {{:Wu's Fighting Pantaloons}}
+| style="text-align: left;" | [[Pant Pattern|Pant]]
+| 1
+| 4
+| 3
+| 155
+| 6
+| 4
+| 0.1
+|-
+| style="text-align: left;" | {{:Wu's Fighting Shirt}}
+| style="text-align: left;" | [[Tunic Pattern|Tunic]]
+| 1
+| 4
+| 3
+| 158
+| 9
+| 4
+| 0.1
+|-
+! style="text-align: left;" | [[Wu's Fighting Armor Set]]
+! style="text-align: left;" |Total
+! style="text-align: center;" |12
+! style="text-align: center;" |48
+! style="text-align: center;" |21
+! style="text-align: center;" |158
+! style="text-align: center;" |62
+! style="text-align: center;" |28
+! style="text-align: center;" |1.3
+|}
+
+<nowiki>*</nowiki> [[Wu's Fighting Gauntlets]] require a [[Greater Lightstone]] and act as an equivalent light source when worn.<br>[[Wu's Fighting Gauntlets]] (and [[Wu's Fighting Slippers]]) turn a [[Monk]]'s hands (and feet) into magical weapons, allowing [[Skill_Hand_to_Hand|Hand to Hand]] combat and special attacks against magical creatures.
+
+== Kunark Tailoring ==
+{{Kunark Era Inline}}
+
+'''NOTE:''' We don't know what if anything will be changed in the Rulers of Kunark release for Everquest Legends. The information below should be treated as unreliable until someone has updated it all (and removed this message once done).
+
+Cultural tailoring involves a few sets of armor unique to the following races. This includes the use of imbued gems, and special sewing containers. 
+
+{| class="eoTable"
+! Imbued Gem                || Deity Restriction   || Race           || Creation Spell           || Spell Caster Class
+|-
+| [[Imbued Emerald]]        || [[Tunare]]          || [[Wood Elf]]   || [[Imbue Emerald]]        || [[Cleric]], [[Druid]]
+|-
+| [[Imbued Plains Pebble]]  || [[Karana]]          || [[Halfling]]   || [[Imbue Plains Pebble]]  || [[Cleric]], [[Druid]]
+|-
+| [[Imbued Topaz]]          || [[Quellious]]       || [[Erudite]]    || [[Imbue Topaz]]          || [[Cleric]]
+|-
+| [[Imbued Amber]]          || [[Cazic-Thule]]       || [[Erudite]]    || [[Imbue Amber]]          || [[Cleric]], [[Shaman]]
+|}
+
+=== Erudites ===
+
+''Can make Steelsilk Armor (tailored with smithing components). Use a [[Erud Forge]] for the smithing, and a [[Erudite Sewing Kit]] for the tailoring.''
+
+See [[Cultural Tradeskills: Erudite]] for complete recipe list.
+
+=== Halflings ===
+
+''Can make Vale Leather Armor (tailored with smithing components). Use a [[Vale Forge]] for the smithing, and a [[Vale Sewing Kit]] for the tailoring.''
+
+See [[Cultural Tradeskills: Halfling]] for complete recipe list.
+
+=== Wood Elves ===
+
+''Can make Mithril Armor (tailored with smithing components). Use a [[Forge|Feir`dal Forge]] for the smithing, and a [[Feir'Dal Sewing Kit]] for the tailoring.''
+
+See [[Cultural Tradeskills: Wood Elf]] for complete recipe list.
+
+====Sources====
+Mostly from [http://www.lokari.net/everquest/tailoring.html Lokari's Tailoring Guide].
+
+
+== Velious Tailoring ==
+
+'''NOTE:''' We don't know what if anything will be changed in the upcoming Velious Expansion for Everquest Legends. The information below should be treated as unreliable until someone has updated it all (and removed this message once done).
+
+=== Silk Armors ===
+
+==== [[Crystalline Silk Armor|Crystalline Silk]] ====
+{{Velious Era Inline}}
+
+* '''Ingredients:''' Tailoring Pattern, 1 [[Silver Thread]], 1 to 3 [[Crystalline Silk Swatch]]es
+* '''Combine:''' Coldain Tanners Kit, Large or Deluxe Sewing Kit, or Loom
+* '''Drop Info:''' Spiders in [[Crystal Caverns]], [[Thurgadin]], [[Velketor's Labyrinth]]
+* '''Classes:''' ALL
+* '''Trivial:''' Varies from 102 to 131
+
+<table class="eoTable">
+  <tr>
+    <th>Item</th>
+    <th>Pattern</th>
+    <th>Silver Thread</th>
+    <th>Swatches</th>
+    <th>Trivial</th>
+    <th>Item stats</th>
+  </tr>
+  <tr>
+    <td>{{:Crystalline Silk Collar}}</td>
+    <td>[[Gorget Pattern|Gorget]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>102</td>
+    <td>AC 2, SvMagic 1, Wt 0.1</td>
+  </tr>
+  <tr>
+    <td>{{:Crystalline Silk Sash}}</td>
+    <td>[[Belt Pattern|Belt]]</td>
+    <td>1</td>
+    <td>2</td>
+    <td>102</td>
+    <td>AC 2, SvMagic 2, Wt 0.1</td>
+  </tr>
+  <tr>
+    <td>{{:Crystalline Silk Cloak}}</td>
+    <td>[[Cloak Pattern|Cloak]]</td>
+    <td>1</td>
+    <td>3</td>
+    <td>108</td>
+    <td>AC 4, SvMagic 2, Wt 0.1</td>
+  </tr>
+  <tr>
+    <td>{{:Crystalline Silk Mask}}</td>
+    <td>[[Mask Pattern|Mask]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>108</td>
+    <td>AC 2, SvMagic 1, Wt 0.1</td>
+  </tr>
+  <tr>
+    <td>{{:Crystalline Silk Wristbands}}</td>
+    <td>[[Wristband Pattern|Wristband]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>108</td>
+    <td>AC 2, SvMagic 2, Wt 0.1</td>
+  </tr>
+  <tr>
+    <td>{{:Crystalline Silk Cap}}</td>
+    <td>[[Cap Pattern|Cap]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>115</td>
+    <td>AC 4, SvMagic 2, Wt 0.1</td>
+  </tr>
+  <tr>
+    <td>{{:Crystalline Silk Slippers}}</td>
+    <td>[[Boot Pattern|Boot]]</td>
+    <td>1</td>
+    <td>2</td>
+    <td>115</td>
+    <td>AC 3, SvMagic 2, Wt 0.1</td>
+  </tr>
+  <tr>
+    <td>{{:Crystalline Silk Mantle}}</td>
+    <td>[[Shoulderpad Pattern|Shoulderpad]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>118</td>
+    <td>AC 2, SvMagic 2, Wt 0.1</td>
+  </tr>
+  <tr>
+    <td>{{:Crystalline Silk Gloves}}</td>
+    <td>[[Glove Pattern|Glove]]</td>
+    <td>1</td>
+    <td>2</td>
+    <td>124</td>
+    <td>AC 3, SvMagic 2, Wt 0.1</td>
+  </tr>
+  <tr>
+    <td>{{:Crystalline Silk Sleeves}}</td>
+    <td>[[Sleeve Pattern|Sleeve]]</td>
+    <td>1</td>
+    <td>2</td>
+    <td>124</td>
+    <td>AC 4, SvMagic 2, Wt 0.1</td>
+  </tr>
+  <tr>
+    <td>{{:Crystalline Silk Pantaloons}}</td>
+    <td>[[Pant Pattern|Pant]]</td>
+    <td>1</td>
+    <td>3</td>
+    <td>128</td>
+    <td>AC 4, SvMagic 3, Wt 0.1</td>
+  </tr>
+  <tr>
+    <td>{{:Crystalline Silk Shirt}}</td>
+    <td>[[Tunic Pattern|Tunic]]</td>
+    <td>1</td>
+    <td>3</td>
+    <td>131</td>
+    <td>AC 7, SvMagic 4, Wt 0.1</td>
+  </tr>
+  <tr>
+    <th>[[Crystalline Silk Armor|Crystalline Silk Armor Set]]</th>
+    <th>TOTAL</th>
+    <th>13</th>
+    <th>23</th>
+    <th>131</th>
+    <th>AC 41, SvMagic 27, Wt 1.3</th>
+  </tr>
+</table>
+
+==== [[Ice Silk Armor|Ice Silk]] ====
+{{Velious Era Inline}}
+
+* '''Ingredients:''' Tailoring Pattern, 1 [[Platinum Thread]], 1 [[Vial of Purified Mana]], 1 to 3 [[Ice Silk Swatch]]es
+* '''Combine:''' Coldain Tanners Kit, Large or Deluxe Sewing Kit, or Loom
+* '''Drop Info:''' [[Western Wastes]] -- [[an ice burrower]]
+* '''Classes:''' ENC MAG NEC WIZ
+* '''Trivial:''' 275-335
+
+<table class="eoTable">
+  <tr>
+    <th>Item</th>
+    <th>Pattern</th>
+    <th>Mana</th>
+    <th>Thread</th>
+    <th>Swatches</th>
+    <th>Trivial</th>
+    <th>Item stats</th>
+  </tr>
+  <tr>
+    <td>{{:Ice Silk Choker}}</td>
+    <td>[[Gorget Pattern|Gorget]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>1</td>
+    <td>275</td>
+    <td>AC 4, INT 4, CHA 5, SvMagic 5, SvCold 5, HP 5, Mana 10, Wt 0.2</td>
+  </tr>
+  <tr>
+    <td>{{:Ice Silk Veil}}</td>
+    <td>[[Mask Pattern|Mask]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>1</td>
+    <td>282</td>
+    <td>AC 3, INT 4, CHA 4, HP 5, Mana 10, SvCold 5, SvMagic 5, Wt 0.2</td>
+  </tr>
+  <tr>
+    <td>{{:Ice Silk Sash}}</td>
+    <td>[[Belt Pattern|Belt]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>2</td>
+    <td>288</td>
+    <td>AC 4, CHA 1, WIS 1, INT 3, HP 5, Mana 10, SvCold 5, SvMagic 5, Wt 0.2</td>
+  </tr>
+  <tr>
+    <td>{{:Ice Silk Bracelet}}</td>
+    <td>[[Wristband Pattern|Wristband]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>1</td>
+    <td>295</td>
+    <td>AC 3, STA 5, CHA 3, HP 5, Mana 15, SvCold 5, Wt 0.3</td>
+  </tr>
+  <tr>
+    <td>{{:Ice Silk Amice}}</td>
+    <td>[[Shoulderpad Pattern|Shoulderpad]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>1</td>
+    <td>302</td>
+    <td>AC 4, INT 3, CHA 5, HP 5, Mana 10, Wt 0.3</td>
+  </tr>
+  <tr>
+    <td>{{:Ice Silk Cap}}</td>
+    <td>[[Cap Pattern|Cap]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>1</td>
+    <td>308</td>
+    <td>AC 5, INT 10, WIS 8, CHA 11, SvMagic 5, SvCold 5, Mana: 20, Wt 0.3</td>
+  </tr>
+  <tr>
+    <td>{{:Ice Silk Lined Shoes}}</td>
+    <td>[[Boot Pattern|Boot]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>2</td>
+    <td>315</td>
+    <td>AC 4, DEX 5, CHA 4, AGI 4, HP 20, Mana 8, SvCold 10, Wt 0.7</td>
+  </tr>
+  <tr>
+    <td>{{:Ice Silk Cloak}}</td>
+    <td>[[Cloak Pattern|Cloak]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>3</td>
+    <td>322</td>
+    <td>AC 6, INT 8, CHA 6, HP 5, Mana 10, SvCold 10, SvMagic 10, Wt 0.6</td>
+  </tr>
+  <tr>
+    <td>{{:Ice Silk Gloves}}</td>
+    <td>[[Glove Pattern|Glove]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>2</td>
+    <td>328</td>
+    <td>AC 4, Int 7, CHA 3, AGI 10, HP 10, MANA 10, Wt 0.4</td>
+  </tr>
+  <tr>
+    <td>{{:Ice Silk Sleeves}}</td>
+    <td>[[Sleeve Pattern|Sleeve]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>2</td>
+    <td>328</td>
+    <td>AC 4, CHA 1, INT 8, HP 10, Mana 10, SvCold 9, Wt 0.4</td>
+  </tr>
+  <tr>
+    <td>{{:Ice Silk Pantaloons}}</td>
+    <td>[[Pant Pattern|Pant]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>3</td>
+    <td>335</td>
+    <td>AC 5, INT 5, CHA 6, HP 20, Mana 5, SvCold 9, Wt 0.7</td>
+  </tr>
+  <tr>
+    <td>{{:Ice Silk Robe}}</td>
+    <td>[[Tunic Pattern|Tunic]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>3</td>
+    <td>335</td>
+    <td>AC 12, INT 14, DEX 11, CHA 10, HP 15, Mana 25, SvCold 10, Wt 1.0</td>
+  </tr>
+  <tr>
+    <th>[[Ice Silk Armor|Ice Silk Armor Set]]</th>
+    <th>Total</th>
+    <th>1</th>
+    <th>1</th>
+    <th>1</th>
+    <th>342</th>
+    <th>61 AC, 10 STA, 14 AGI, 16 DEX, 9 WIS, 56 INT, 62 CHA, 120 HP, 153 MANA, 30 MR, 92 CR, Wt 5.6</th>
+  </tr>
+</table>
+
+=== Velious Hide Armors ===
+==== Velious Fur Armor ====
+{{Velious Era Inline}}
+
+* '''Ingredients:''' Tailoring Pattern, 2 to 4 Velious Furs ([[Othmir Fur|Othmir]]/[[Holgresh Fur|Holgresh]]/[[Velium Hound Fur|Velium Hound]]), 1 Thread ([[Silver Thread|Silver]]/[[Gold Thread|Gold]]/[[Platinum Thread|Platinum]]), 1 Summoned Vial of Mana ([[Vial of Clear Mana|Clear]]/[[Vial Of Distilled Mana|Distilled]]/[[Vial of Purified Mana|Purified]])
+* '''Combine:''' [[Coldain Tanners Kit]]
+* '''Classes:''' ALL
+* '''Trivial:''' 262-322
+
+<table class="eoTable">
+  <tr>
+    <th>Item</th>
+    <th>Pattern</th>
+    <th>Thread</th>
+    <th>Mana Vial</th>
+    <th>Furs</th>
+    <th>Trivial</th>
+    <th>Item stats</th>
+  </tr>
+  <tr>
+    <td>{{:Othmir Fur Moccasins}}</td>
+    <td>[[Boot Pattern|Boot]]</td>
+    <td>1 [[Silver Thread|Silver]]</td>
+    <td>1 [[Vial of Clear Mana|Clear Mana]]</td>
+    <td>3 [[Othmir Fur|Othmir]]</td>
+    <td>268</td>
+    <td>AC 4, DEX 3, CHA 3, AGI 3, HP 20, Mana 5, SvCold 10, Wt 0.8</td>
+  </tr>
+  <tr>
+    <td>{{:Othmir Fur Cap}}</td>
+    <td>[[Cap Pattern|Cap]]</td>
+    <td>1 [[Silver Thread|Silver]]</td>
+    <td>1 [[Vial of Clear Mana|Clear Mana]]</td>
+    <td>2 [[Othmir Fur|Othmir]]</td>
+    <td>262</td>
+    <td>AC 3, AGI 2, DEX 3, WIS 6, HP 7, SvCold 4, Wt 0.4</td>
+  </tr>
+  <tr>
+    <td>{{:Othmir Fur Cloak}}</td>
+    <td>[[Cloak Pattern|Cloak]]</td>
+    <td>1 [[Silver Thread|Silver]]</td>
+    <td>1 [[Vial of Clear Mana|Clear Mana]]</td>
+    <td>4 [[Othmir Fur|Othmir]]</td>
+    <td>295</td>
+    <td>AC 6, STA 6, WIS 4, CHA 2, HP 5, SvMagic 2, SvDisease 4, Wt 1.6</td>
+  </tr>
+  <tr>
+    <th>[[Othmir Fur Armor]]</th>
+    <th>Set Total</th>
+    <th>3 Threads</th>
+    <th>3 Manas</th>
+    <th>9 Furs</th>
+    <th></th>
+    <th>AC 13, STA 6, DEX 6, WIS 10, AGI 5, CHA 5, HP 32, Mana 5, CR 14, MR 2, DR 4, Wt 2.8</th>
+  </tr>
+  <tr>
+    <td>{{:Holgresh Fur Moccasins}}</td>
+    <td>[[Boot Pattern|Boot]]</td>
+    <td>1 [[Gold Thread|Gold]]</td>
+    <td>1 [[Vial Of Distilled Mana|Distilled Mana]]</td>
+    <td>3 [[Holgresh Fur|Holgresh]]</td>
+    <td>282</td>
+    <td>AC 4, DEX 3, CHA 3, Mana 15, SvFire 5, SvCold 5, SvMagic 5, Wt 0.9</td>
+  </tr>
+  <tr>
+    <td>{{:Holgresh Fur Cap}}</td>
+    <td>[[Cap Pattern|Cap]]</td>
+    <td>1 [[Gold Thread|Gold]]</td>
+    <td>1 [[Vial Of Distilled Mana|Distilled Mana]]</td>
+    <td>2 [[Holgresh Fur|Holgresh]]</td>
+    <td>268</td>
+    <td>AC 3, DEX 3, INT 3, AGI 3, Mana 5, SvFire 2, SvCold 2, SvMagic 2, Wt 0.5</td>
+  </tr>
+  <tr>
+    <td>{{:Holgresh Fur Cloak}}</td>
+    <td>[[Cloak Pattern|Cloak]]</td>
+    <td>1 [[Gold Thread|Gold]]</td>
+    <td>1 [[Vial Of Distilled Mana|Distilled Mana]]</td>
+    <td>4 [[Holgresh Fur|Holgresh]]</td>
+    <td>322</td>
+    <td>AC 6, DEX 5, INT 4, SvMagic 6, Wt 1.8</td>
+  </tr>
+  <tr>
+    <th>[[Holgresh Fur Armor]]</th>
+    <th>Set Total</th>
+    <th>3 Threads</th>
+    <th>3 Manas</th>
+    <th>9 Furs</th>
+    <th></th>
+    <th>AC 13, AGI 3, DEX 11, INT 7, CHA 3, Mana 20, CR 7, FR 7, MR 13, Wt 3.2</th>
+  </tr>
+  <tr>
+    <td>{{:Velium Hound Fur Moccasins}}</td>
+    <td>[[Boot Pattern|Boot]]</td>
+    <td>1 [[Platinum Thread|Platinum]]</td>
+    <td>1 [[Vial of Purified Mana|Purified Mana]]</td>
+    <td>3 [[Velium Hound Fur|Velium Hound]]</td>
+    <td>275</td>
+    <td>AC 4, STR 4, STA 8, AGI 4, Mana 10, SvFire 10, Wt 1.0</td>
+  </tr>
+  <tr>
+    <td>{{:Velium Hound Fur Cap}}</td>
+    <td>[[Cap Pattern|Cap]]</td>
+    <td>1 [[Platinum Thread|Platinum]]</td>
+    <td>1 [[Vial of Purified Mana|Purified Mana]]</td>
+    <td>2 [[Velium Hound Fur|Velium Hound]]</td>
+    <td>268</td>
+    <td>AC 5, STR 6, STA 6, SvFire 10, Wt 0.5</td>
+  </tr>
+  <tr>
+    <td>{{:Velium Hound Fur Cloak}}</td>
+    <td>[[Cloak Pattern|Cloak]]</td>
+    <td>1 [[Platinum Thread|Platinum]]</td>
+    <td>1 [[Vial of Purified Mana|Purified Mana]]</td>
+    <td>4 [[Velium Hound Fur|Velium Hound]]</td>
+    <td>322</td>
+    <td>AC 8, STR 8, STA 10, SvFire 5, SvCold 5, Wt 1.9</td>
+  </tr>
+  <tr>
+    <th>[[Velium Hound Fur Armor]]</th>
+    <th>Set Total</th>
+    <th>3 Threads</th>
+    <th>3 Manas</th>
+    <th>9 Furs</th>
+    <th></th>
+    <th>AC 17, STR 18, STA 24, AGI 4, Mana 10, FR 25, CR 5, Wt 3.4</th>
+  </tr>
+  <tr>
+    <td>{{:Velium Mastodon Fur Cloak}}</td>
+    <td>[[Cloak Pattern|Cloak]]</td>
+    <td>1 [[Platinum Thread|Platinum]]</td>
+    <td>1 [[Vial of Purified Mana|Purified Mana]]</td>
+    <td>4 [[Velium Mastodon Fur| Velium Mastodon]]</td>
+    <td>322</td>
+    <td>AC 10, STR 10, STA 10, SvCold 10, Wt 4.0</td>
+  </tr>
+</table>
+
+==== [[Cobalt Drake Armor|Cobalt Drake]] ====
+{{Velious Era Inline}}
+
+* '''Ingredients''' - Tailoring Pattern, 1 [[Cobalt Drake Hide]]s, 1 [[Drake Egg Oil]], 1 to 4 [[Velium Boning]]s
+* '''Combine''' - [[Coldain Tanners Kit]]
+* '''Classes''' - BRD CLR DRU PAL RNG ROG SHD SHM WAR
+* '''Trivial''' - 335
+
+<table class="eoTable">
+  <tr>
+    <th>Item</th>
+    <th>Pattern</th>
+    <th>Boning</th>
+    <th>Item stats</th>
+  </tr>
+  <tr>
+    <td>{{:Cobalt Drake Belt}}</td>
+    <td>[[Belt Pattern|Belt]]</td>
+    <td>2</td>
+    <td>AC 8, STA 5, WIS 8, Mana 5, SvCold 4, Wt 1.0</td>
+  </tr>
+  <tr>
+    <td>{{:Cobalt Drake Boots}}</td>
+    <td>[[Boot Pattern|Boot]]</td>
+    <td>3</td>
+    <td>AC 8, STA 4, CHA 5, Mana 10, SvCold 5, Wt 2.5</td>
+  </tr>
+  <tr>
+    <td>{{:Cobalt Drake Skullcap}}</td>
+    <td>[[Cap Pattern|Cap]]</td>
+    <td>2</td>
+    <td>AC 9, Mana 8, SvCold 5, Wt 0.6</td>
+  </tr>
+  <tr>
+    <td>{{:Cobalt Drake Cloak}}</td>
+    <td>[[Cloak Pattern|Cloak]]</td>
+    <td>2</td>
+    <td>AC 9, STR 8, WIS 4, Mana 23, SvCold 8, Wt 2.0</td>
+  </tr>
+  <tr>
+    <td>{{:Cobalt Drake Gloves}}</td>
+    <td>[[Glove Pattern|Glove]]</td>
+    <td>2</td>
+    <td>AC 8, Mana 10, SvCold 5, Wt 1.5</td>
+  </tr>
+  <tr>
+    <td>{{:Cobalt Drake Gorget}}</td>
+    <td>[[Gorget Pattern|Gorget]]</td>
+    <td>1</td>
+    <td>AC 7, STA 5, Mana 5, SvCold 4, Wt 0.5</td>
+  </tr>
+  <tr>
+    <td>{{:Cobalt Drake Mask}}</td>
+    <td>[[Mask Pattern|Mask]]</td>
+    <td>1</td>
+    <td>AC 6, CHA 5, Mana 5, SvCold 3, Wt 0.4</td>
+  </tr>
+  <tr>
+    <td>{{:Cobalt Drake Leggings}}</td>
+    <td>[[Pant Pattern|Pant]]</td>
+    <td>3</td>
+    <td>AC 9, CHA 3, Mana 25, SvCold 8, Wt 4.0</td>
+  </tr>
+  <tr>
+    <td>{{:Cobalt Drake Shoulderpads}}</td>
+    <td>[[Shoulderpad Pattern|Shoulderpad]]</td>
+    <td>2</td>
+    <td>AC 7, STR 8, Mana 10, SvCold 5, Wt 1.5</td>
+  </tr>
+  <tr>
+    <td>{{:Cobalt Drake Sleeves}}</td>
+    <td>[[Sleeve Pattern|Sleeve]]</td>
+    <td>2</td>
+    <td>AC 8, CHA 8, Mana 22, SvCold 6, Wt 1.5</td>
+  </tr>
+  <tr>
+    <td>{{:Cobalt Drake Tunic}}</td>
+    <td>[[Tunic Pattern|Tunic]]</td>
+    <td>4</td>
+    <td>AC 14, STA 8, CHA 12, Mana 27, SvCold 10, Wt 3.5</td>
+  </tr>
+  <tr>
+    <td>{{:Cobalt Drake Wristbands}}</td>
+    <td>[[Wristband Pattern|Wristband]]</td>
+    <td>1</td>
+    <td>AC 7, STR 3, WIS 3, Mana 5, SvCold 3, Wt 1.0</td>
+  </tr>
+  <tr>
+    <th>[[Cobalt Drake Armor|Cobalt Drake Armor Set]]</th>
+    <th>Total</th>
+    <th>26</th>
+    <th>107 AC, 22 STR, 22 STA, 18 WIS, 33 CHA, 160 MANA, SvCold 69, Wt 22.4</th>
+  </tr>
+</table>
+
+=== Class Specific Armor ===
+
+==== [[Black Pantherskin Armor|Black Pantherskin]] - Monk ====
+{{Velious Era Inline}}
+
+* '''Ingredients:''' Tailoring Pattern, 1 [[Black Panther Skin]]s, 1 [[Yew Leaf Tannin]], 1 to 4 [[Velium Boning]]
+* '''Combine:''' [[Coldain Tanners Kit]]
+* '''Drop Info:''' Waking Land Panthers
+* '''Classes:''' MNK
+* '''Trivial:''' 335
+
+{| class="eoTable sortable"
+|-
+! Item
+! Pattern
+! Velium<br/>Boning
+! AC
+! Wt
+! STR
+! STA
+! AGI
+! DEX
+! CHA
+! HP
+|-
+| {{:Black Pantherskin Belt}}
+| [[Belt Pattern|Belt]]
+| 2
+| 6
+| 0.3
+| 
+| +4
+| 
+| +4
+| 
+| +5
+|-
+| {{:Black Pantherskin Boots}}
+| [[Boot Pattern|Boot]]
+| 3
+| 7
+| 0.5
+| +9
+| 
+| +5
+| +5
+| 
+| 
+|-
+| {{:Black Pantherskin Skullcap}}
+| [[Cap Pattern|Cap]]
+| 2
+| 7
+| 0.4
+| 
+| 
+| 
+| +8
+| 
+| +20
+|-
+| {{:Black Pantherskin Cloak}}
+| [[Cloak Pattern|Cloak]]
+| 2
+| 7
+| 0.6
+| 
+| +5
+| +5
+| +5
+| 
+| +25
+|-
+| {{:Black Pantherskin Gloves}}
+| [[Glove Pattern|Glove]]
+| 2
+| 7
+| 0.3
+| +7
+| 
+| +7
+| 
+| 
+| 
+|-
+| {{:Black Pantherskin Gorget}}
+| [[Gorget Pattern|Gorget]]
+| 1
+| 6
+| 0.3
+| 
+| +5
+| 
+| 
+| 
+| +10
+|-
+| {{:Black Pantherskin Mask}}
+| [[Mask Pattern|Mask]]
+| 1
+| 5
+| 0.2
+| 
+| 
+| 
+| 
+| +5
+| +15
+|-
+| {{:Black Pantherskin Leggings}}
+| [[Pant Pattern|Pant]]
+| 3
+| 8
+| 0.4
+| +4
+| +5
+| 
+| +5
+| 
+| 
+|-
+| {{:Black Pantherskin Shoulderpads}}
+| [[Shoulderpad Pattern|Shoulderpad]]
+| 2
+| 6
+| 0.4
+| +4
+| 
+| 
+| +4
+| 
+| 
+|-
+| {{:Black Pantherskin Sleeves}}
+| [[Sleeve Pattern|Sleeve]]
+| 2
+| 7
+| 0.4
+| +4
+| +5
+| +5
+| +5
+| 
+| 
+|-
+| {{:Black Pantherskin Tunic}}
+| [[Tunic Pattern|Tunic]]
+| 4
+| 11
+| 0.5
+| +10
+| +10
+| 
+| +10
+| 
+| 
+|-
+| {{:Black Pantherskin Wristbands}}
+| [[Wristband Pattern|Wristband]]
+| 1
+| 6
+| 0.1
+| +3
+| 
+| 
+| 
+| +3
+| +10
+|-
+! [[Black Pantherskin Armor|Black Pantherskin Armor Set]]
+! Total
+! 26
+! 89
+! 4.5
+! +44
+! +34
+! +22
+! +46
+! +11
+! +95
+|}
+
+==== [[Tigeraptor Armor|Tigeraptor]] - Ranger ====
+{{Velious Era Inline}}
+
+* '''Ingredients:''' Tailoring Pattern, 1 [[Tigeraptor Hide]], 1 [[Drake Egg Oil]], 1-5 [[Velium Studs]]
+* '''Combine:''' [[Coldain Tanners Kit]]
+* '''Drop Info:''' [[Wakening Lands]] -- [[A tigeraptor]], [[A tigesaurous]]
+* '''Classes:''' RNG
+* '''Trivial:''' 335
+
+{| class="eoTable sortable"
+|-
+! Item
+! Pattern
+! Hides
+! Drake<br>Egg Oil
+! Velium<br>Studs
+! Item stats
+|-
+| {{:Tigeraptor Belt}}
+| [[Belt Pattern|Belt]]
+| 1
+| 1
+| 2
+| AC 8, STR 4, AGI 8, HP 10, Wt 1.0
+|-
+| {{:Tigeraptor Boots}}
+| [[Boot Pattern|Boot]]
+| 1
+| 1
+| 4
+| AC 8, STR 5, DEX 8, WIS 6, AGI 8
+|-
+| {{:Tigeraptor Skullcap}}
+| [[Cap Pattern|Cap]]
+| 1
+| 1
+| 3
+| AC 9, STR 4, DEX 4, WIS 8, Wt 0.6
+|-
+| {{:Tigeraptor Cloak}}
+| [[Cloak Pattern|Cloak]]
+| 1
+| 1
+| 4
+| AC 9, STR 8, DEX 10, STA 6, WIS 6, Wt 2.0
+|-
+| {{:Tigeraptor Gloves}}
+| [[Glove Pattern|Glove]]
+| 1
+| 1
+| 4
+| AC 8, STR 4, DEX 4, WIS 4, SvDisease 3, Wt 1.5
+|-
+| {{:Tigeraptor Gorget}}
+| [[Gorget Pattern|Gorget]]
+| 1
+| 1
+| 2
+| AC 7, STR 4, WIS 4, AGI 6, Wt 0.5
+|-
+| {{:Tigeraptor Mask}}
+| [[Mask Pattern|Mask]]
+| 1
+| 1
+| 1
+| AC 6, STA 6, CHA 6, Wt 0.4
+|-
+| {{:Tigeraptor Leggings}}
+| [[Pant Pattern|Pant]]
+| 1
+| 1
+| 4
+| AC 9, STR 5, DEX 5, AGI 5, HP 10, Wt 4.0
+|-
+| {{:Tigeraptor Shoulderpads}}
+| [[Shoulderpad Pattern|Shoulderpad]]
+| 1
+| 1
+| 3
+| AC 7, CHA 5, HP 15, Mana 15, Wt 1.5
+|-
+| {{:Tigeraptor Sleeves}}
+| [[Sleeve Pattern|Sleeve]]
+| 1
+| 1
+| 3
+| AC 8, DEX 4, AGI 4, HP 5, Wt 1.5
+|-
+| {{:Tigeraptor Tunic}}
+| [[Tunic Pattern|Tunic]]
+| 1
+| 1
+| 5
+| AC 14, STR 6, DEX 6, STA 10, WIS 8, Wt 3.5
+|-
+| {{:Tigeraptor Wristbands}}
+| [[Wristband Pattern|Wristband]]
+| 1
+| 1
+| 2
+| AC 7, STR 4, STA 2, CHA 2, AGI 4, Wt 1.0
+|-
+! [[Tigeraptor Armor|Tigeraptor Armor Set]]
+! Total
+! 13
+! 13
+! 39
+! 107 AC, 48 STR, 41 DEX, 39 AGI, 26 STA, 15 CHA, 40 HP, 3 DR, Wt 20.6
+|}
+
+==== [[Haze Panther Armor|Haze Panther]] - Rogue ====
+{{Velious Era Inline}}
+
+* '''Ingredients:''' Tailoring Pattern, 1 [[Haze Panther Skin]], 1 [[Yew Leaf Tannin]], 1 to 4 [[Velium Boning]]s
+* '''Combine:''' [[Coldain Tanners Kit]]
+* '''Drop Info:''' [[Wakening Lands]] -- [[a haze panther]]
+* '''Classes:''' ROG
+* '''Trivial:''' 335
+
+<table class="eoTable">
+  <tr>
+    <th>Item</th>
+    <th>Pattern</th>
+    <th>Skins</th>
+    <th>Yew Leaf<br>Tannin</th>
+    <th>Velium<br>Bonings</th>
+    <th>Item stats</th>
+  </tr>
+  <tr>
+    <td>{{:Haze Panther Belt}}</td>
+    <td>[[Belt Pattern|Belt]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>2</td>
+    <td>AC 8, DEX 8, AGI 10, Wt 1.0</td>
+  </tr>
+  <tr>
+    <td>{{:Haze Panther Boots}}</td>
+    <td>[[Boot Pattern|Boot]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>3</td>
+    <td>AC 8, STR 8, DEX 10, AGI 10, HP 10, Wt 2.5</td>
+  </tr>
+  <tr>
+    <td>{{:Haze Panther Skullcap}}</td>
+    <td>[[Cap Pattern|Cap]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>2</td>
+    <td>AC 9, STR 10, STA 10, AGI 10, Wt 0.6</td>
+  </tr>
+  <tr>
+    <td>{{:Haze Panther Cloak}}</td>
+    <td>[[Cloak Pattern|Cloak]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>2</td>
+    <td>AC 9, DEX 14, AGI 14, HP 25, Wt 2.0</td>
+  </tr>
+  <tr>
+    <td>{{:Haze Panther Gloves}}</td>
+    <td>[[Glove Pattern|Glove]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>2</td>
+    <td>AC 8, STR 8, DEX 10, STA 10, Wt 1.5</td>
+  </tr>
+  <tr>
+    <td>{{:Haze Panther Gorget}}</td>
+    <td>[[Gorget Pattern|Gorget]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>1</td>
+    <td>AC 7, STR 6, AGI 8, Wt 0.5</td>
+  </tr>
+  <tr>
+    <td>{{:Haze Panther Mask}}</td>
+    <td>[[Mask Pattern|Mask]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>1</td>
+    <td>AC 6, AGI 5, CHA 3, HP 15, Wt 0.4</td>
+  </tr>
+  <tr>
+    <td>{{:Haze Panther Leggings}}</td>
+    <td>[[Pant Pattern|Pant]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>3</td>
+    <td>AC 9, STR 5, DEX 8, STA 8, AGI 8, Wt 4.0</td>
+  </tr>
+  <tr>
+    <td>{{:Haze Panther Shoulderpads}}</td>
+    <td>[[Shoulderpad Pattern|Shoulderpad]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>2</td>
+    <td>AC 7, STR 7, DEX 10, Wt 1.5</td>
+  </tr>
+  <tr>
+    <td>{{:Haze Panther Sleeves}}</td>
+    <td>[[Sleeve Pattern|Sleeve]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>2</td>
+    <td>AC 8, STR 5, STA 10, AGI 10, SvMagic 5 Wt 1.5</td>
+  </tr>
+  <tr>
+    <td>{{:Haze Panther Tunic}}</td>
+    <td>[[Tunic Pattern|Tunic]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>4</td>
+    <td>AC 14, STR 14, DEX 10, STA 10, AGI 20, All Resists 5, Wt 3.5</td>
+  </tr>
+  <tr>
+    <td>{{:Haze Panther Wristbands}}</td>
+    <td>[[Wristband Pattern|Wristband]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>1</td>
+    <td>AC 7, STR 5, STA 4, AGI 8, Wt 1.0</td>
+  </tr>
+  <tr>
+    <th>[[Haze Panther Armor|Haze Panther Armor Set]]</th>
+    <th>Total</th>
+    <th>13</th>
+    <th>13</th>
+    <th>26</th>
+    <th>100 AC, 67 STR, 56 STA, 103 AGI, 70 DEX, 3 CHA, 50 HP, 10 MR, 5 CR, 5 FR, 5 PR, 5 DR, Wt 21.0</th>
+  </tr>
+</table>
+
+==== [[Arctic Wyvern Armor|Arctic Wyvern]] - Shaman ====
+{{Velious Era Inline}}
+
+* '''Ingredients:''' Tailoring Pattern, 1 [[Arctic Wyvern Hide]], 1 [[Cod Oil]], 1-5 [[Velium Studs]]
+* '''Combine:''' [[Coldain Tanners Kit]]
+* '''Drop Info:''' [[Cobalt Scar]] -- [[A wyvern (Cobalt Scar)|Wyverns]]
+* '''Classes:''' SHM
+* '''Trivial:''' 335
+
+<table class="eoTable"> 
+  <tr>
+    <th>Item</th>
+    <th>Pattern</th>
+    <th>Hides</th>
+    <th>Cod<br>Oil</th>
+    <th>Velium<br>Studs</th>
+    <th>Item stats</th>
+  </tr>
+  <tr>
+    <td>{{:Arctic Wyvern Belt}}</td>
+    <td>[[Belt Pattern|Belt]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>2</td>
+    <td>AC 8, DEX 12, WIS 4, SvCold 4, Wt 1.0</td>
+  </tr>
+  <tr>
+    <td>{{:Arctic Wyvern Boots}}</td>
+    <td>[[Boot Pattern|Boot]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>4</td>
+    <td>AC 8, STR 8, DEX 7, SvCold 5, SvMagic 5, Wt 2.5</td>
+  </tr>
+  <tr>
+    <td>{{:Arctic Wyvern Skullcap}}</td>
+    <td>[[Cap Pattern|Cap]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>3</td>
+    <td>AC 9, WIS 10, SvCold 5, Wt 0.6</td>
+  </tr>
+  <tr>
+    <td>{{:Arctic Wyvern Cloak}}</td>
+    <td>[[Cloak Pattern|Cloak]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>4</td>
+    <td>AC 9, STR 5, STA 8, CHA 6, WIS 8, SvCold 8, Wt 2.0</td>
+  </tr>
+  <tr>
+    <td>{{:Arctic Wyvern Gloves}}</td>
+    <td>[[Glove Pattern|Glove]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>4</td>
+    <td>AC 8, DEX 5, WIS 5, SvCold 5, SvMagic 5, Wt 1.5</td>
+  </tr>
+  <tr>
+    <td>{{:Arctic Wyvern Gorget}}</td>
+    <td>[[Gorget Pattern|Gorget]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>2</td>
+    <td>AC 7, STA 8, WIS 5, SvCold 4, Wt 0.5</td>
+  </tr>
+  <tr>
+    <td>{{:Arctic Wyvern Mask}}</td>
+    <td>[[Mask Pattern|Mask]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>1</td>
+    <td>AC 6, CHA 6, WIS 5, SvCold 3, Wt 0.4</td>
+  </tr>
+  <tr>
+    <td>{{:Arctic Wyvern Leggings}}</td>
+    <td>[[Pant Pattern|Pant]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>4</td>
+    <td>AC 9, STR 6, DEX 8, WIS 5, SvCold 8, Wt 4.0</td>
+  </tr>
+  <tr>
+    <td>{{:Arctic Wyvern Shoulderpads}}</td>
+    <td>[[Shoulderpad Pattern|Shoulderpad]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>3</td>
+    <td>AC 7, STR 2, STA 6, CHA 8, SvCold 5, Wt 1.5</td>
+  </tr>
+  <tr>
+    <td>{{:Arctic Wyvern Sleeves}}</td>
+    <td>[[Sleeve Pattern|Sleeve]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>3</td>
+    <td>AC 8, STR 8, STA 6, SvCold 6, SvMagic 3 Wt 1.5</td>
+  </tr>
+  <tr>
+    <td>{{:Arctic Wyvern Tunic}}</td>
+    <td>[[Tunic Pattern|Tunic]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>5</td>
+    <td>AC 14, STR 10, DEX 8, WIS 10, SvCold 10, Wt 3.5</td>
+  </tr>
+  <tr>
+    <td>{{:Arctic Wyvern Wristbands}}</td>
+    <td>[[Wristband Pattern|Wristband]]</td>
+    <td>1</td>
+    <td>1</td>
+    <td>2</td>
+    <td>AC 7, STR 6, STA 5, WIS 5, SvCold 3, Wt 1.0</td>
+  </tr>
+  <tr>
+    <th>[[Arctic Wyvern Armor|Arctic Wyvern Armor Set]]</th>
+    <th>Total</th>
+    <th>12</th>
+    <th>12</th>
+    <th>37</th>
+    <th>AC 107, STR 51, STA 38, DEX 40, WIS 62, CHA 20, SvCold 69, SvMagic 13, Wt 20.0</th>
+  </tr>
+</table>
+
+*Note: The 252 trivials listed on EQTraders date from a patch in 2005.
+
+{{Navbox Tradeskill}}
+
+[[Category:Skills]]
+[[Category:Tradeskills]]

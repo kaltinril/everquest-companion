@@ -278,7 +278,7 @@ function writeFigures(
 ): void {
   const clientHp = clientHpFor(client, s.name)
   const waves = rainWaves(s.name)
-  const cap = aeMaxTargets(clientHp?.aeMaxTargets)
+  const cap = aeMaxTargets(clientHp?.aeMaxTargets, s.targetType)
   const input = { ...s, hits: aeHits(waves, 1, cap) }
   const level = Math.min(...at.map((p) => p.level))
   const metrics = spellMetricsAt(input, level, clientHp)
@@ -411,6 +411,32 @@ function rootsTarget(effects: readonly string[] | undefined): boolean {
   return (effects ?? []).some((line) => line.trim().toLowerCase() === 'root')
 }
 
+type SpellRow = SpellDbFile['spells'][number]
+
+/** The catalog's recourse rows, keyed by the spell that fires them: `<name> Recourse` -> `<name>`. */
+function recourseRows(spells: readonly SpellRow[]): Map<string, SpellRow> {
+  const names = new Set(spells.map((s) => s.name))
+  const out = new Map<string, SpellRow>()
+  for (const s of spells) {
+    const parent = s.name.endsWith(RECOURSE) ? s.name.slice(0, -RECOURSE.length) : ''
+    if (parent !== '' && names.has(parent)) out.set(parent, s)
+  }
+  return out
+}
+
+const RECOURSE = ' Recourse'
+
+/**
+ * What the buff set reads beyond the stat lines (owner, 2026-11-15): a weapon proc, and the buff a
+ * debuff's recourse puts on its caster. The owner's log shows both recourses landing: `You feel
+ * your strength grow.` after Siphon Strength, `Hatred fuels your arms.` after Shroud of Hate.
+ */
+function writeBuffExtras(spell: UnlockSpell, s: SpellRow, recourse: SpellRow | undefined): void {
+  if ((s.effects ?? []).some((line) => /^Add (?:Melee )?Proc:/.test(line.trim()))) spell.proc = true
+  const grants = spellStatGrants(recourse?.effects, LEVEL_ANY)
+  if (recourse !== undefined && grants.length > 0) spell.recourse = { name: recourse.name, grants }
+}
+
 function writeLineage(spell: UnlockSpell, at: readonly { cls: ClassAbbr; level: number }[]): void {
   const replaces = replacesFor(spell.name, at)
   if (replaces) spell.replaces = replaces
@@ -427,7 +453,11 @@ function unlockSpells(client: SpellResistTable | null): UnlockSpell[] {
   const effective = applyLegendsPagePreference(
     applySpellCorrections(applySpellEra(applySpellRemovals(file.spells).spells).spells).spells
   ).spells
-  for (const s of effective) {
+  // A recourse is what its parent spell does to the caster, never a spell of its own: the wiki
+  // gives Shroud of Hate Recourse a Shadow Knight row, and it drew as a spell nobody can scribe.
+  const recourses = recourseRows(effective)
+  const fired = new Set([...recourses.values()].map((r) => r.name))
+  for (const s of effective.filter((row) => !fired.has(row.name))) {
     const at = parseSpellClasses(s.classes)
     if (at.length === 0) continue
     const spell: UnlockSpell = { name: s.name, at }
@@ -449,6 +479,7 @@ function unlockSpells(client: SpellResistTable | null): UnlockSpell[] {
     if (s.illusion) spell.illusion = true
     writeFigures(spell, s, at, client)
     writeLineage(spell, at)
+    writeBuffExtras(spell, s, recourses.get(s.name))
     if (rootsTarget(s.effects)) spell.roots = true
     out.push({
       spell,

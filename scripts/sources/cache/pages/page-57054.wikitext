@@ -5,6 +5,86 @@ The latest patch notes can always be found on the EverQuest Legends official dis
 = Classic Era Patch Notes =
 EverQuest Legends launched on July 28, 2026.  With a Level cap of 50, this is what the wiki will call the "Classic Era". 
 
+== 2026-11-17 - Patch Notes ==
+These patch notes are from the Official EverQuest Legends discord, posted on November 17, 2026
+
+=== Void-Touched Reincarnation Token === 
+* Players will now receive a notification of extra rewards upon completion of their third task in a week that awards a [[Void-Touched Potential]]. Talking to a [[voidling]] after that notification will reward the player with a [[Void-Touched Reincarnation Token]].
+ 
+=== Dungeon Crawler's Reincarnation Token === 
+* Players can now receive a [[Dungeon Crawler's Reincarnation Token]] by completing a set of Dungeon Crawls.
+
+* Until the release of [[Rulers of Kunark]] on December 8th, 2026, the Dungeon Crawl requirement is as follows: 
+* Complete 5 Dungeon Crawls in any of the following zones: 
+** [[Permafrost Keep]]
+** [[The Ruins of Old Guk]]
+** [[Nagafen's Lair]]
+** [[Kedge Keep]]
+** [[The Ruins of Old Paineel]]
+** [[The Plane of Hate]]
+** [[Plane of Fear]]
+** [[Nektropos Castle]]
+ 
+* Upon the release of [[Rulers of Kunark]], the dungeons eligible for this reward will be shifted to be completed in [[Kunark]] dungeons.
+ 
+* If you do not currently have a [[Dungeon Crawlers Reincarnation Token]] and you complete a [[Dungeon Crawl]] in an eligible zone, you will automatically receive progress towards your next token. A task will automatically be assigned to you so that you can track your progress in the [[Quest Journal]].
+ 
+=== Fragments of Potential === 
+* Added a [[fragment]] upgrade quest to the [[Construct of Potential]].
+
+=== Spell Particle Effects === 
+* Restored the classic spell particle effects. Orbiting sprites, bolt trails and explosions that had stopped appearing are back, and many spells look as they did in the early days of EverQuest.
+
+=== Zones and World === 
+* Improved how far away objects are drawn in all zones:
+** Huts, camp props and other small objects no longer fade in and out partway through their draw distance.
+** Buildings and other structures are always drawn, so they no longer pop into view.
+** Smaller objects are now drawn out to where the zone's fog hides them.
+* Fixed a legacy issue with night-sky stars that were drawn misaligned or cut off.
+* Fixed a legacy issue with the sun or moon disappearing for the rest of a play session after a graphics error. They now reappear on their own.
+* Improved NPC pathing in [[Nektropos]].
+* Most doors in [[The Hol]]e are now unlocked to better support the [[Dungeon Crawl]] mode.
+
+=== Items === 
+* [[Mote]] items now show their upgrade values and maximum upgrade tiers.
+
+=== Spells and Abilities === 
+* Rain clouds and ring effects now stay where they were cast instead of following the caster.
+* [[Bard]] song pulse orbs, such as the one from [[Selo's Accelerando]], now stay where they appear instead of following a running bard.
+* Bolt spells now carry their light inside the bolt instead of slightly ahead of it and above it.
+* Bolt spells that had no visible effect while in flight now show a bolt.
+* Added colored light types for spell effects.
+* [[Frost Bolt]], [[Fire Bolt]] and [[Lightning Bolt]] now travel to their target as visible bolts, with lights and colors matching their element.
+* Many fire-based bolt spells now light up their surroundings, with brighter lights at higher spell levels.
+* Fixed an issue where the [[Reincarnation]] Ability for [[Bards]] would not stack with all other forms of movement speed.
+
+=== Combat === 
+* Fixed an issue where players could not be stunned after zoning in until they had died and respawned.
+* Persistent auto attack now stays on for characters below level 11 who target a red-con creature. Previously it was turned off automatically.
+
+=== User Interface === 
+* Spell descriptions:
+** Added required items: items that are needed to cast a spell, like reagents, but are not used up.
+** Added a note to spells such as Spirit of Scale explaining that they are removed when you cast, attack or use a skill.
+** Movement speed now scales by 1% per level with the spell. This does not apply to songs.
+** Added indoor-only and outdoor-only requirements.
+** Added focused endurance values, similar to focused mana values.
+** Added details for hate, reflect, defensive procs, blinds, roots, Reclaim Energy, fear, infravision, telescope, increased maximum endurance and additional haste.
+** Fixed links to triggered spells, which opened the parent spell instead.
+* The Actions window's spell description area now shows spell details.
+* Improved how the map fades by height in [[Nektropos]].
+* The race list in the [[Find Item]], [[Bazaar Search]] and [[Item Search]] windows no longer includes Drakkin, and now includes [[Half Dark Elf]].
+
+=== Bug Fixes === 
+* Fixed an occasional crash when moving between the login screen and the game, or when switching to or from fullscreen.
+* Fixed a crash that could happen after your computer woke from sleep with the game open.
+* Fixed a crash at startup on some computers when the default audio device changed during loading, for example with audio routing software.
+* Music tracks that use drum kits the game did not have now play them with the standard drum kit.
+* Fixed a hitch of several seconds shortly after zoning in.
+* Fixed an issue where players could get stuck in the Respawn window after dying when choosing to resurrect without a resurrection offer.
+* Fixed a crash that could happen when certain NPCs died.
+* Fixed an issue where pets left without an owner could summon pets of their own.
+
 == 2026-11-10 - Patch Notes - [[Rules of Kunark]] Pre-order patch ==
 These patch notes are from the Official EverQuest Legends discord, posted on November 10, 2026
 

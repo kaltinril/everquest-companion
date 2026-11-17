@@ -284,7 +284,8 @@ test('JOS-449 acceptance, the other half: Frost Storm on a pack, with the assump
   // FOUR HITS, not twelve — the four-page quote, over the real catalog.
   assert.equal(row.metrics.damage, 2048, '512 x the four-hit cap')
   assert.equal(row.targets, 4)
-  assert.equal(best.aoeTargets, 'x4 targets', 'and the tab says so, over a table with no client file')
+  // No client file: rains and targeted AEs at four, point-blank spells at eight (patch 2026-05-26).
+  assert.equal(best.aoeTargets, 'x4 to x8 targets', 'and the tab says so, over a table with no client file')
   assert.ok(best.tabs.aoe.shown.length >= 15, `wizard AOE rows at 50: ${String(best.tabs.aoe.shown.length)}`)
 })
 

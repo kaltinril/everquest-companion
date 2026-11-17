@@ -8,13 +8,16 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import type { UnlockSpell } from '../src/shared/levelUnlocks'
+import { buildLevelUnlocks } from '../src/main/data/levelUnlocks'
 import { spellStatGrants } from '../src/shared/spellStats'
 import { stackView, type StackSpellView } from '../src/shared/spellStack'
 import {
   DEFAULT_STAT_WEIGHTS,
+  buffTotals,
   buildLoadout,
   combatSet,
   loadoutCandidates,
+  loadoutSides,
   scoreGrants,
   type CombatSource,
   type LoadoutCandidate
@@ -346,4 +349,109 @@ test('a loser that contests several kept spells is said to lose to the one it sh
   assert.equal(set.rejected[0].beatenBy, 'Alacrity')
   // …and a stat ANY of the spells that beat it grants is not a stat the set gave up.
   assert.deepEqual(set.rejected[0].loses, [])
+})
+
+// =================================================================================================
+// PET BUFFS, PROCS AND RECOURSES - owner, 2026-11-15, the Shadow Knight buff set
+// =================================================================================================
+
+/** A catalog buff whose target is the caster's pet. */
+function petBuff(name: string, effects: string[]): UnlockSpell {
+  return { ...buff(name, effects, ['SHD']), targetType: 'Pet' } as UnlockSpell
+}
+
+test('a PET buff is solved on its own side: beside a player buff of the same stat, out of the totals', () => {
+  const spells = [
+    petBuff('Strengthen Death', ['Increase Attack Speed by 20%', 'Increase STR by 5']),
+    buff('Quickness', ['Increase Attack Speed by 30%'], ['SHD'])
+  ]
+  const { self, pet } = loadoutSides(loadoutCandidates(spells, ['SHD'], DEFAULT_STAT_WEIGHTS), L)
+  assert.deepEqual(self.keep.map((c) => c.name), ['Quickness'])
+  assert.deepEqual(pet.keep.map((c) => c.name), ['Strengthen Death'])
+  assert.deepEqual([...self.rejected, ...pet.rejected], [])
+  assert.deepEqual(buffTotals(self.keep).rows.map((r) => [r.key, r.amount]), [['HASTE', 30]])
+})
+
+test('two PET buffs of the same stat still contest each other', () => {
+  const spells = [
+    petBuff('Strengthen Death', ['Increase Attack Speed by 20%']),
+    petBuff('Augment Death', ['Increase Attack Speed by 45%'])
+  ]
+  const { self, pet } = loadoutSides(loadoutCandidates(spells, ['SHD'], DEFAULT_STAT_WEIGHTS), L)
+  assert.deepEqual(self.keep, [])
+  assert.deepEqual(pet.keep.map((c) => c.name), ['Augment Death'])
+  assert.deepEqual(pet.rejected.map((r) => [r.name, r.beatenBy]), [['Strengthen Death', 'Augment Death']])
+})
+
+test('a PROC buff is a candidate, the newer of two wins the tie, and a proc is not totalled', () => {
+  const proc = (name: string, level: number): UnlockSpell =>
+    ({ name, at: [{ cls: 'SHD', level }], upgradeCategory: 'buff', proc: true, line: 'SK procs' }) as UnlockSpell
+  const spells = [proc('Vampiric Embrace', 15), proc('Scream of Death', 37)]
+  const cands = loadoutCandidates(spells, ['SHD'], DEFAULT_STAT_WEIGHTS)
+  assert.deepEqual(cands.map((c) => c.name), ['Scream of Death', 'Vampiric Embrace'])
+  assert.deepEqual(cands[0].grants.map((g) => g.key), ['MELEE_PROC'])
+  const set = buildLoadout(cands, L)
+  assert.deepEqual(set.keep.map((c) => c.name), ['Scream of Death'])
+  assert.deepEqual(set.rejected.map((r) => [r.name, r.beatenBy]), [['Vampiric Embrace', 'Scream of Death']])
+  assert.deepEqual(buffTotals(set.keep).rows, [])
+})
+
+test('PROC buffs of DIFFERENT lines stack, even where the client rows share the proc effect', () => {
+  // Patch notes 2026-06-09 / 06-11: the Paladin, Shadow Knight and Ranger combat innates all stack.
+  const procView = (id: number): StackSpellView =>
+    stackView({ id, name: String(id), goodEffect: true, slots: [{ slot: 1, effect: 85, base: id, limit: 0, calc: 100, max: 0 }] })
+  const proc = (name: string, line: string, id?: number): LoadoutCandidate => ({
+    name,
+    at: [{ cls: 'SHD', level: 30 }],
+    grants: [{ key: 'MELEE_PROC', amount: 1, percent: false, line: 'Add Melee Proc' }],
+    score: 30,
+    line,
+    ...(id === undefined ? {} : { view: procView(id) })
+  })
+  const exact = buildLoadout([proc('Scream of Death', 'SK procs', 2574), proc('Call of Sky', 'RNG procs', 1461)], L)
+  assert.deepEqual(exact.keep.map((c) => c.name).sort(), ['Call of Sky', 'Scream of Death'])
+  assert.deepEqual(exact.rejected, [])
+  const flagged = buildLoadout([proc('Scream of Death', 'SK procs'), proc('Call of Sky', 'RNG procs')], L)
+  assert.deepEqual(flagged.keep.map((c) => c.name).sort(), ['Call of Sky', 'Scream of Death'])
+})
+
+test('a debuff with a RECOURSE is a buff on its caster: the recourse grants, at the level asked', () => {
+  const siphon = {
+    name: 'Siphon Strength',
+    at: [{ cls: 'SHD', level: 6 }],
+    upgradeCategory: 'debuff',
+    durationMs: 360_000,
+    grants: spellStatGrants(['Decrease STR by 5 (L1) to 10 (L10)'], 1),
+    recourse: {
+      name: 'Siphon Strength Recourse',
+      grants: spellStatGrants(['Increase STR by 5 (L1) to 10 (L10)'], 1)
+    }
+  } as UnlockSpell
+  const [c] = loadoutCandidates([siphon], ['SHD'], DEFAULT_STAT_WEIGHTS, { level: 44 })
+  assert.equal(c.name, 'Siphon Strength')
+  assert.deepEqual(c.grants.map((g) => [g.key, g.amount]), [['STR', 10]])
+  assert.equal(c.enemy, true)
+  assert.equal(c.stackAs, 'Siphon Strength Recourse')
+})
+
+test('THE REAL CATALOG: a Shadow Knight`s buff set names the spells he casts, not their recourses', () => {
+  const data = buildLevelUnlocks(null)
+  assert.equal(data.spells.some((s) => s.name === 'Shroud of Hate Recourse'), false)
+  const cands = loadoutCandidates(data.spells, ['SHD'], DEFAULT_STAT_WEIGHTS, { level: 44 })
+  const grantsOf = (name: string): unknown =>
+    cands.find((c) => c.name === name)?.grants.map((g) => [g.key, g.amount])
+  assert.deepEqual(grantsOf('Siphon Strength'), [['STR', 10]])
+  assert.deepEqual(grantsOf('Shroud of Hate'), [['ATTACK', 20]])
+  assert.deepEqual(grantsOf('Scream of Death'), [['MELEE_PROC', 1]])
+  assert.deepEqual(grantsOf('Grim Aura'), [['ATTACK', 10]])
+  assert.deepEqual(grantsOf('Shieldskin'), [['ABSORB_DAMAGE', 55]])
+  assert.equal(cands.find((c) => c.name === 'Strengthen Death')?.pet, true)
+})
+
+test('a buff`s POINT stats are read at its rank; a percent is not', () => {
+  const spells = [buff('Dark Temptation', ['Increase ATK by 25', 'Increase Attack Speed by 20%'], ['SHD'])]
+  const at = (tier: number): unknown =>
+    loadoutCandidates(spells, ['SHD'], DEFAULT_STAT_WEIGHTS, { tierOf: () => tier })[0].grants.map((g) => g.amount)
+  assert.deepEqual(at(0), [25, 20])
+  assert.deepEqual(at(4), [28, 20])
 })

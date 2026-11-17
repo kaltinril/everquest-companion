@@ -338,6 +338,11 @@ test('Form of the Bear: the payoff names what upgrading does NOT buy', () => {
   assert.equal(p.nothing, false)
   assert.equal(
     upgradePayoffSentence(p),
+    'upgrading buys longer duration, less mana and faster casting'
+  )
+  // A category whose numbers are still held static keeps the clause.
+  assert.equal(
+    upgradePayoffSentence(upgradePayoff({ category: 'cc', mana: 100, castSeconds: 4, durationTicks: 10 })),
     'upgrading buys longer duration, less mana and faster casting - the numbers it grants do not change'
   )
 })

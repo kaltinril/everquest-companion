@@ -181,6 +181,13 @@ export interface UnlockSpell {
   grants?: SpellStatGrant[]
   /** The level `grants` was read at. Present exactly when `grants` is. */
   grantsLevel?: number
+  /** An effect line reads `Add Melee Proc:` or `Add Proc:`: the buff adds a weapon proc. */
+  proc?: true
+  /**
+   * WHAT CASTING THIS ON AN ENEMY GIVES THE CASTER: the grants of the catalog's `<name> Recourse`
+   * row (Siphon Strength, Shroud of Hate). `name` is that row's, whose client row answers stacking.
+   */
+  recourse?: { name: string; grants: SpellStatGrant[] }
   /**
    * WHICH UPGRADE CATEGORY THIS SPELL IS IN, and therefore what a mote tier buys for it
    * (docs/plans/spell-upgrades-and-loadout.md §3.1).

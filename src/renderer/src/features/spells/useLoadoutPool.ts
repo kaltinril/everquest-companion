@@ -72,7 +72,9 @@ function useStoredGroup(): Omit<LoadoutGroup, 'suggestions'> {
 export function useLoadoutPool(
   spells: readonly UnlockSpell[],
   classes: readonly ClassAbbr[],
-  level: number
+  level: number,
+  /** The tier each spell's stats are read at - `CandidateQuery.tierOf`. */
+  tierOf: (name: string) => number
 ): LoadoutPool {
   const group = useStoredGroup()
   const { party } = group
@@ -83,8 +85,8 @@ export function useLoadoutPool(
   // LEVEL AND ERA ARE PART OF THE QUESTION (owner, 2026-09-10). Without them the tab recommended
   // spells he could not cast - see `CandidateQuery.level` for the count.
   const pool = useMemo(
-    () => partyCandidates(spells, classes, party, { weights: DEFAULT_STAT_WEIGHTS, query: { level } }),
-    [spells, classes, party, level]
+    () => partyCandidates(spells, classes, party, { weights: DEFAULT_STAT_WEIGHTS, query: { level, tierOf } }),
+    [spells, classes, party, level, tierOf]
   )
   const castersOf = useCallback((name: string) => pool.casters.get(name) ?? [], [pool])
   const groupKeep = useCallback(

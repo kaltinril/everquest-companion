@@ -1,3 +1,13 @@
+== 11/14/2026 ==
+
+Hi everyone! We're trying optional ads as a way to support the wiki and buy more time for development '''without throwing money at it''', if you choose.
+
+* '''Ads X / 1 / 2''' is next to Donate. X turns them off, 1 puts them below the page, and 2 puts them on the right (below the page on smaller screens).
+* Logged out? Ads start on, but your choice sticks for 24 hours.
+* '''[[Special:CreateAccount|Sign up]] or [[Special:UserLogin|sign in]]''' to keep your preference. Signed-in users start with ads off unless they've chosen otherwise.
+
+Signing in also helps us get a better sense of the community as we plan future features. This is a trial run. Please report weird layouts and tell us what you'd like to see next in [https://discord.com/channels/1435786469968183456/1521564179587268649 the wiki Discord]!
+
 == 10/25/2026 ==
 
 === [https://eqlwiki.com/Nektropos_Castle Nektropos Castle is Live!]===

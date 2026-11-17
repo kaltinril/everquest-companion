@@ -1,6 +1,6 @@
 {
  "source": "eqlwiki.com — |respawn_time on every page in the committed mob catalog",
- "scrapedAt": "2026-11-13",
+ "scrapedAt": "2026-11-17",
  "rows": [
   {
    "key": "a alchemist`s acolyte",
@@ -238,6 +238,11 @@
    "page": "A goblin jailmaster",
    "text": "22 minutes",
    "seconds": 1320
+  },
+  {
+   "key": "a goblin janitor",
+   "page": "A goblin janitor",
+   "text": "?"
   },
   {
    "key": "a goblin scryer",

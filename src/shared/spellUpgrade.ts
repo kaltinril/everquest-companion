@@ -167,6 +167,11 @@
 // ============================================================================
 // AND THE ONE CLAIM THE WHOLE FEATURE HANGS ON
 // ============================================================================
+// OVERTURNED 2026-11-15 FOR STATS: the game's spell windows now print the upgraded figure, and a
+// buff's or debuff's STR, AC and ATK read 3% a tier higher (`spellScale.SPELL_STAT_RANK_PERCENT`).
+// The Loadout applies it. This model still carries no stat magnitude: its payoff and ladder for a
+// buff are open work. The two regen readings below (Bear, Chloroplast) are from before that patch.
+//
 // A BUFF'S MAGNITUDES DO NOT SCALE. Form of the Bear grants `Increase Hit points by 1 per tick` and
 // `Increase Wisdom by 5`, and upgrading it to X leaves both of those exactly where they are - all
 // you buy is duration, mana and cast time. That is the owner's own report (2026-09-10) and the
@@ -848,7 +853,10 @@ export function upgradePayoffSentence(p: UpgradePayoff): string {
       ? gains[0]
       : `${gains.slice(0, -1).join(', ')} and ${gains[gains.length - 1]}`
   // The part the owner actually asked for: say what it does NOT buy, where that is the surprise.
-  if (!p.magnitude) return `upgrading buys ${list} - the numbers it grants do not change`
+  // A buff's or debuff's stats DO grow with rank (`spellScale.statAtRank`, 2026-11-15); this model
+  // does not carry them yet, so for those two it no longer claims the numbers stand still.
+  const statsMove = p.category === 'buff' || p.category === 'debuff'
+  if (!p.magnitude && !statsMove) return `upgrading buys ${list} - the numbers it grants do not change`
   return `upgrading buys ${list}`
 }
 
