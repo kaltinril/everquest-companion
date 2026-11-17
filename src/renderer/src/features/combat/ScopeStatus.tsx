@@ -10,7 +10,11 @@
 // filtering rows out must be able to say so on the surface where the rows are missing. `chipLabel`
 // is the whole reason: `Group (no roster yet)` is the sentence that explains why a Group-scoped
 // meter is showing everybody (law 1's fallback), and moving the control away must not take that
-// explanation with it. One word, no click, and the tooltip says where the choice lives.
+// explanation with it.
+//
+// THE WORD IS CLICKABLE AGAIN, ON THIS TAB ONLY (fork owner, 2026-11-16: a "mine only" on the
+// Combat tab). A click steps You, Group, Everyone and writes the same one preference, so the
+// Overview card and the overlays follow; the overlays still carry no control.
 //
 // THE PROVENANCE IS THE POINT, not decoration. The roster is inferred from lines the game prints
 // once, so a member can be there because they joined (the game said so), because they hold the
@@ -45,10 +49,12 @@ import CloseIcon from '@mui/icons-material/Close'
 import GroupIcon from '@mui/icons-material/Group'
 import { Tooltip } from '../../lib/Tooltip'
 import { formatDate } from '../../lib/formatDate'
+import { useMeterScope } from './useCombatPrefs'
 import {
   SCOPE_HINT,
   SOURCE_LABEL,
   chipLabel,
+  nextScope,
   type MeterScope,
   type RosterMember,
   type RosterSnap
@@ -162,10 +168,10 @@ function RosterPanel({
 }
 
 /**
- * The readout itself: the scope this meter is filtering by, stated and not offered, with the group
- * icon beside it opening the roster. The roster button STAYS a control — it is the only place a
- * mis-inferred group can be corrected, and correcting it is a different act from choosing a scope
- * (JOS-115 moved the choice, not the correction).
+ * The readout itself: the scope this meter is filtering by, with the group icon beside it opening
+ * the roster. A click on the word steps to the next scope. The roster button is its own control —
+ * it is the only place a mis-inferred group can be corrected, and correcting it is a different act
+ * from choosing a scope.
  */
 export function ScopeStatus({
   scope,
@@ -175,6 +181,7 @@ export function ScopeStatus({
   roster: RosterSnap
 }): React.JSX.Element {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null)
+  const [, setScope] = useMeterScope()
   const add = (name: string): void => {
     void window.eq.setRosterEdit({ name, action: 'add' })
   }
@@ -184,11 +191,12 @@ export function ScopeStatus({
 
   return (
     <>
-      <Tooltip title={`${SCOPE_HINT[scope]}. Change it in Preferences > Combat.`}>
+      <Tooltip title={`${SCOPE_HINT[scope]}. Click to change.`}>
         <Chip
           size="small"
           data-testid="meter-scope-label"
           label={chipLabel(scope, roster)}
+          onClick={() => setScope(nextScope(scope))}
           // `minWidth: 0` is what lets this chip ELLIPSIZE instead of pushing the lens line past
           // its box. The label is world-state text of unbounded length — "Group" is 50px, but the
           // law-1 fallback spells itself out ("Group (no roster yet)") and measures 121px — and a

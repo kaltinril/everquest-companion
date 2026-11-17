@@ -398,7 +398,8 @@ export async function stepScriptedPull(page: Page, log: FixtureLog): Promise<Sna
  * the Combat tab keeps only the READOUT — because a meter that is filtering rows out has to be
  * able to say so where the rows are missing. So this step walks the new shape: the chip is gone,
  * the word is there, changing the preference two tabs away changes what this meter shows, and the
- * roster popover (which was never a scope control) still opens.
+ * roster popover (which was never a scope control) still opens. Since 2026-11-16 the word itself
+ * is clickable on this tab and steps the same preference; the retired chip testid stays absent.
  *
  * THE ROSTER STATE IS NOT ASSERTED, because it belongs to whatever the log happens to contain: a
  * log with group lines in it leaves `seen: true`, one without leaves `seen: false`, and both are
@@ -473,6 +474,16 @@ export async function stepMeterScope(page: Page): Promise<void> {
   await page.click('[data-testid="nav-combat"]')
   await settleCount(page, SCOPE_LABEL_SEL)
   check('the scope is remembered across a tab round trip', (await settle(label, (t) => t === 'You')) === 'You', await label())
+
+  // THE WORD IS CLICKABLE ON THIS TAB (fork owner, 2026-11-16): a click steps You, Group, Everyone.
+  const click = async (want: (t: string) => boolean): Promise<string> => {
+    await page.click(SCOPE_LABEL_SEL)
+    return settle(label, want, { timeoutMs: 8_000 })
+  }
+  const stepped = await click((t) => t.startsWith('Group'))
+  check('a click on the scope word steps You to Group', stepped.startsWith('Group'), stepped)
+  check('…then to Everyone', (await click((t) => t === 'Everyone')) === 'Everyone', await label())
+  check('…and back round to You', (await click((t) => t === 'You')) === 'You', await label())
 
   // The roster popover (G3) — the answer to "who does the app think is with me, and why". Still a
   // control, and deliberately so: correcting a mis-inferred group is a different act from choosing
