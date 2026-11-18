@@ -39,12 +39,14 @@ import {
   DEFAULT_METER_SCOPE,
   DPS_LINE_KEYS,
   HIDDEN_LINES_KEY,
+  COMBAT_TAB_SCOPE_KEY,
   METER_SCOPE_KEY,
   NO_DRILL,
   abilityKey,
   drillKey,
   parseDrillMemory,
   parseHiddenLines,
+  readCombatTabScope,
   readMeterScope,
   readPetLayout,
   serializeDrillMemory,
@@ -94,6 +96,17 @@ test('the scope is ONE key for every surface — no per-surface suffix survives'
   // Overview card and every floating overlay are reading and writing the same string.
   assert.equal(METER_SCOPE_KEY, 'eq.combat.meterScope')
   assert.ok(!METER_SCOPE_KEY.endsWith('.'), 'the key is complete, not a prefix a surface appends to')
+})
+
+test("the Combat tab's own scope is its own key, and an absent one follows the preference", () => {
+  // Owner, 2026-11-17: a pick on the Combat tab "thats only for the combat tab, not the overlay".
+  assert.notEqual(COMBAT_TAB_SCOPE_KEY, METER_SCOPE_KEY)
+  assert.ok(!COMBAT_TAB_SCOPE_KEY.startsWith(`${METER_SCOPE_KEY}.`), 'not one of the retired per-surface keys')
+  for (const shared of METER_SCOPES) {
+    assert.equal(readCombatTabScope(null, shared), shared)
+    assert.equal(readCombatTabScope('party', shared), shared, 'an unreadable pick is no pick')
+    for (const own of METER_SCOPES) assert.equal(readCombatTabScope(own, shared), own)
+  }
 })
 
 // ── where a pet's damage shows (Malkil, 2026-10-21) ─────────────────────────────────────

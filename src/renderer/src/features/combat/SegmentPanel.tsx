@@ -20,8 +20,8 @@ import { meterDrill, skillsForTarget, type Drill, type MeterMode, type TargetDet
 import { HealBody } from './HealPanel'
 import { DrillCrumb, MeterRows, crumbOf } from './MeterRows'
 import { SegmentHeader } from './SegmentHeader'
-import { groupedPanel, meterPanel, panelTotals, type MeterPanel } from './petRows'
-import { scopeSources, scopeTotals } from './meterScope'
+import { groupedPanel, meterPanel, panelRate, panelTotals, type MeterPanel } from './petRows'
+import { scopeRate, scopeSources, scopeTotals } from './meterScope'
 import { usePetLayout } from './useCombatPrefs'
 import { useModule } from '../../lib/useModule'
 import { selfMeterLabel, withSelfLabel } from './selfMeterLabel'
@@ -285,9 +285,12 @@ function scopedDimension(seg: SegmentView, mode: MeterMode, scope: MeterScope, r
   const base = dimension(seg, mode)
   if (mode !== 'out') return base
   const rows = scopeSources(base.rows, scope, roster)
+  const share = scopeTotals(base.rows, rows, base.total, base.dps)
   return {
     rows,
-    ...scopeTotals(base.rows, rows, base.total, base.dps),
+    total: share.total,
+    // Under You the rate is over your own clock, as your row's is (meterScope.scopeRate).
+    dps: scopeRate(seg, scope, roster, share),
     activeDps: scopeTotals(base.rows, rows, base.total, base.activeDps).dps
   }
 }
@@ -301,8 +304,8 @@ function scopedDimension(seg: SegmentView, mode: MeterMode, scope: MeterScope, r
  * preference under an open You drill moved the rows and left the number where it was.
  */
 function headline(panel: MeterPanel, dim: Dimension): { total: number; dps: number; activeDps: number } {
-  const { total, dps } = panelTotals(panel, dim.total, dim.dps)
-  return { total, dps, activeDps: panelTotals(panel, dim.total, dim.activeDps).dps }
+  const { total } = panelTotals(panel, dim.total, dim.dps)
+  return { total, dps: panelRate(panel, dim.dps), activeDps: panelTotals(panel, dim.total, dim.activeDps).dps }
 }
 
 export function SegmentBody({

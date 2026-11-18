@@ -24,11 +24,14 @@ pub mod encounter;
 pub mod healing;
 pub mod ingest;
 pub mod lifecycle;
+pub mod liverows;
 pub mod others;
+pub mod ownclock;
 pub mod petnudge;
 pub mod poisons;
 pub mod procbuffs;
 pub mod procdetect;
+pub mod procledger;
 pub mod procrouting;
 pub mod procviews;
 pub mod procwindows;
@@ -335,15 +338,15 @@ impl CombatEngine {
     /// The live meter's rows: what `snapshot(now, ..)["selected"]["entities"]` carries at the top
     /// level and nothing else, for the `combat.live` source that is cut on every serve beat. The
     /// same sweeps, the same default selection and the same numbers in the same order
-    /// (`views::live_rows`), without the segment list, the drill, the healing and proc ledgers or
+    /// (`liverows::live_rows`), without the segment list, the drill, the healing and proc ledgers or
     /// the JSON a full snapshot builds. Empty when the selection resolves to nothing, as the view
     /// is `null` then.
-    pub fn live_rows(&self, now: i64) -> Vec<views::LiveRow> {
+    pub fn live_rows(&self, now: i64) -> Vec<liverows::LiveRow> {
         let mut guard = self.st.borrow_mut();
         sweep_live(&mut guard, now);
         let st: &EngineState = &guard;
         let selected_id = resolve_selected_id(st, &SnapshotOpts::default());
-        views::live_rows(st, &selected_id).unwrap_or_default()
+        liverows::live_rows(st, &selected_id).unwrap_or_default()
     }
 
     /// The fight-search corpus — `engine.ts searchFights`. The open fight as `kind: "current"`, then
@@ -531,6 +534,48 @@ mod tests {
         format!(
             r#"{{"kind":"damage","seq":{seq},"ts":{ts},"raw":"d","attacker":"You","target":"a kodiak","amount":{amount},"dtype":"spell","skill":"Smiting Strike","crit":false}}"#
         )
+    }
+
+    /// One hit on you by the mob, as the parser emits it.
+    fn mob_hit(seq: i64, ts: i64, amount: i64) -> String {
+        format!(
+            r#"{{"kind":"damage","seq":{seq},"ts":{ts},"raw":"d","attacker":"a kodiak","target":"You","amount":{amount},"dtype":"melee","skill":"Bite","crit":false}}"#
+        )
+    }
+
+    /// Owner, 2026-11-17: a row's DPS is over the time that attacker spent attacking. The mob opens
+    /// the fight three seconds before your first hit; your 7,000 damage over your own 14 seconds is
+    /// 500 DPS, while the fight's own rate still divides by its 17.
+    #[test]
+    fn a_rows_dps_divides_by_its_own_first_to_last_swing() {
+        let e = fold(&[
+            &mob_hit(1, 1_000, 10),
+            &hit(2, 4_000, 3_000),
+            &hit(3, 18_000, 4_000),
+        ]);
+        let snap = e.snapshot(18_000, &SnapshotOpts::full(), None);
+        let seg = &snap["selected"];
+        assert_eq!(seg["durationSec"], json!(17.0), "{seg}");
+        assert_eq!(seg["outDps"], json!(7_000.0 / 17.0));
+        let you = &seg["entities"][0];
+        assert_eq!(you["ownSec"], json!(14.0));
+        assert_eq!(you["dps"], json!(500.0));
+        assert_eq!(seg["selfSec"], json!(14.0));
+        // The mob's one bite is its own one-second floor, not the fight's 17.
+        assert_eq!(seg["incoming"][0]["dps"], json!(10.0));
+    }
+
+    /// The owner's own example: one hit in a long fight is that hit's damage per second.
+    #[test]
+    fn one_hit_in_a_long_fight_is_its_own_damage_per_second() {
+        let e = fold(&[
+            &mob_hit(1, 1_000, 10),
+            &hit(2, 10_000, 40_000),
+            &mob_hit(3, 20_000, 10),
+        ]);
+        let snap = e.snapshot(20_000, &SnapshotOpts::full(), None);
+        assert_eq!(snap["selected"]["durationSec"], json!(19.0));
+        assert_eq!(snap["selected"]["entities"][0]["dps"], json!(40_000.0));
     }
 
     /// A historical fold never leaves hydration, and the whole snapshot-time sweep block hangs off

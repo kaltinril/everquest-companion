@@ -34,22 +34,28 @@ function ActiveDpsNote({
   seg,
   mode,
   dps,
-  activeDps
+  activeDps,
+  clockSec
 }: {
   seg: SegmentView
   mode: MeterMode
   /** the wall-clock rate this header is printing — what the tooltip contrasts against. */
   dps: number
   activeDps: number
+  /** the time `dps` was taken over (SegmentHeader's `clockSec`). */
+  clockSec: number
 }): React.JSX.Element | null {
   if (mode !== 'out' || seg.activeSec <= 0 || seg.activeSec >= seg.durationSec) return null
+  // A headline over a row's own clock (the You scope, a drill) can already beat the fight's
+  // active-time rate; an "active" figure below the headline would say nothing true.
+  if (activeDps <= dps) return null
   return (
     <Tooltip
       title={`Active-time DPS: damage ÷ ${fmtDur(
         seg.activeSec
       )} of actual combat time (gaps between hits capped at 3s each). Wall-clock DPS (${formatRate(
         dps
-      )}) divides by the full ${fmtDur(seg.durationSec)} fight length.`}
+      )}) divides by the full ${fmtDur(clockSec)}.`}
     >
       <Typography component="span" variant="caption" sx={{ color: 'text.secondary', mr: 0.25 }}>
         (act {formatRate(activeDps)})
@@ -140,6 +146,10 @@ export function SegmentHeader({
   copyView: (() => string) | null
 }): React.JSX.Element {
   const heal = mode === 'heal'
+  // THE CLOCK THE HEADLINE RATE WAS TAKEN OVER: the fight's length at level 1, a shorter one under
+  // the You scope or a drill, where the rate is over the row's own attacking time. Read back off
+  // the two figures printed beside it, so rate x time is always the total shown.
+  const clockSec = mode === 'out' && dps > 0 ? total / dps : seg.durationSec
   return (
     <Stack direction="row" justifyContent="space-between" alignItems="baseline" sx={{ mb: 1, flexShrink: 0 }}>
       <Typography variant="subtitle1" noWrap>
@@ -156,11 +166,11 @@ export function SegmentHeader({
           title={heal ? healTotalTitle(seg.healing) : undefined}
         >
           {heal ? formatHealRate(dps) : formatRate(dps)}{' '}
-          <ActiveDpsNote seg={seg} mode={mode} dps={dps} activeDps={activeDps} />
+          <ActiveDpsNote seg={seg} mode={mode} dps={dps} activeDps={activeDps} clockSec={clockSec} />
           <Typography component="span" variant="caption" color="text.secondary">
             {/* The bare total, testid'd because it is the number JOS-170 is about: it must follow
                 the drill and the pet preference, and only the real app can say that it does. */}
-            · <span data-testid="meter-total">{fmt(total)}</span> · {fmtDur(seg.durationSec)}
+            · <span data-testid="meter-total">{fmt(total)}</span> · {fmtDur(clockSec)}
             <EnemyHealNote seg={seg} mode={mode} />
             <SlowChip seg={seg} mode={mode} />
           </Typography>

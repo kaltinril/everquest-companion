@@ -470,8 +470,8 @@ export function CombatHeader(p: CombatHeaderProps): React.JSX.Element {
 
         {/* WHOSE damage (docs/plans/group-model.md §2). Only the two SOURCE dimensions are
             scoped: the Incoming list is always "what is hitting You", and no roster changes
-            that. It states the scope, and a click steps it (the same preference Preferences >
-            Combat holds); the roster popover beside it is its own control, because a
+            that. Three buttons, the chosen one lit, for this tab alone (Preferences > Combat
+            still sets every meter); the roster popover beside it is its own control, because a
             mis-inferred group is corrected where its rows are missing. The readout stays
             compact because this line never wraps — its two-rank height is a contract the
             headless harness measures. */}

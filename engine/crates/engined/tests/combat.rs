@@ -806,8 +806,9 @@ fn a_live_meter_window_updates_the_cells_that_moved_and_no_others() {
     // One hit, two rows, two different cell sets:
     //   * `you` — total moved (500 → 1000) and so did the rate; `pct` did not, because you were
     //     already the top bar at 100%.
-    //   * `member:rowel` — total did not move; the rate did because the fight is longer, and `pct`
-    //     did because their 60 is now a smaller share of a bigger top bar (12% → 6%).
+    //   * `member:rowel` — total did not move, and neither did the rate: a row's rate is over its
+    //     own first-to-last swing, so your hit making the fight longer does not touch theirs.
+    //     `pct` did, because their 60 is now a smaller share of a bigger top bar (12% → 6%).
     let you = updates
         .iter()
         .find(|u| u.key.0 == "you")
@@ -829,8 +830,8 @@ fn a_live_meter_window_updates_the_cells_that_moved_and_no_others() {
         .expect("their row moved too");
     assert_eq!(
         them.cells.keys().collect::<Vec<_>>(),
-        ["dps", "pct"],
-        "their damage did not move, so `total` is not on the wire"
+        ["pct"],
+        "their damage did not move and they did not swing, so neither `total` nor `dps` is on the wire"
     );
     assert!(
         !them.cells.contains_key("total"),

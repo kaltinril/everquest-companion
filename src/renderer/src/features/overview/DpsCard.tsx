@@ -59,8 +59,8 @@ import type { CombatSnapshot, SegmentView, SourceView } from '@shared/combat'
 import { DashCard, QuietNote, fmtDur } from '../combat/combatShared'
 import { LIVE_SELECTION, fightScopeOptions, meterDrill, type Drill } from '../combat/dashboardData'
 import { DrillCrumb, MeterRows, crumbOf } from '../combat/MeterRows'
-import { meterPanel, panelTotals, type MeterPanel } from '../combat/petRows'
-import { scopeSources, scopeTotals } from '../combat/meterScope'
+import { meterPanel, panelRate, panelTotals, type MeterPanel } from '../combat/petRows'
+import { scopeRate, scopeSources, scopeTotals } from '../combat/meterScope'
 import { useMeterScope, usePetLayout } from '../combat/useCombatPrefs'
 import { useModule } from '../../lib/useModule'
 import { selfMeterLabel, withSelfLabel } from '../combat/selfMeterLabel'
@@ -100,9 +100,10 @@ interface ScopedView {
 
 function scopedView(seg: SegmentView, scope: MeterScope, roster: RosterSnap): ScopedView {
   const rows = scopeSources(seg.entities, scope, roster)
-  const { total, dps } = scopeTotals(seg.entities, rows, seg.outTotal, seg.outDps)
+  const share = scopeTotals(seg.entities, rows, seg.outTotal, seg.outDps)
   const { dps: activeDps } = scopeTotals(seg.entities, rows, seg.outTotal, seg.activeDps)
-  return { rows, total, dps, activeDps }
+  // Under You the rate is over your own clock, as your row's is (meterScope.scopeRate).
+  return { rows, total: share.total, dps: scopeRate(seg, scope, roster, share), activeDps }
 }
 
 /**
@@ -123,7 +124,8 @@ interface CardBody {
 function cardBody(v: ScopedView, combine: boolean, drill: Drill | null, selfLabel: string | null): CardBody {
   const rows = withSelfLabel(v.rows, selfLabel)
   const panel = meterPanel(rows, combine, meterDrill(drill))
-  const { total, dps } = panelTotals(panel, v.total, v.dps)
+  const { total } = panelTotals(panel, v.total, v.dps)
+  const dps = panelRate(panel, v.dps)
   return { panel, view: { rows, total, dps, activeDps: panelTotals(panel, v.total, v.activeDps).dps } }
 }
 

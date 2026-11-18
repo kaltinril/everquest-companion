@@ -18,12 +18,13 @@
 //! a slay lane's `direct_damage` is not damage the proc added. Both keep an empty list rather than a
 //! zero-filled one.
 
-use crate::combat::aggregate::{strike_keys, Agg, SourceStat};
+use crate::combat::aggregate::{Agg, SourceStat};
 use crate::combat::collate::compare_names;
 use crate::combat::encounter::{CoatSlot, Encounter};
 use crate::combat::poisons::{is_slow_capable, POISONS};
 use crate::combat::procbuffs::PROC_BUFF_CATALOG;
 use crate::combat::procdetect::{is_castless_lane_name, lane_count};
+use crate::combat::procledger::strike_keys;
 use crate::combat::procwindows::{
     build_attribution_report, links_for, proc_rate, AttributionReport, LaneForDirect, ProcLink,
     ProcRateView, ProcSourceWindow, RateInput,
@@ -279,7 +280,7 @@ fn lane_rate(count: i64, b: &RateBase, origin: &str, label: &str) -> ProcRateVie
     })
 }
 
-/// The Strike keys an emote label names — see `aggregate::strike_keys`, which the ledger stores on
+/// The Strike keys an emote label names — see `procledger::strike_keys`, which the ledger stores on
 /// every Strike lane; this is for a lane the ledger does not hold (a slay or AA lane's name).
 fn candidate_keys(label: &str) -> Vec<String> {
     strike_keys(label)

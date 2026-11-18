@@ -232,13 +232,18 @@ fn push_fresh_timeline(st: &mut EngineState, ts: i64, rec: TimelineRaw) {
 /// Fold into the open encounter's aggregate and the zone aggregate alike — the pair every routing
 /// path writes, and never one without the other.
 fn both(st: &mut EngineState, ts: i64, fresh_only: bool, f: impl Fn(&mut Agg)) {
-    if fresh_only {
-        if let Some(enc) = st.fresh_encounter(ts) {
-            f(&mut enc.agg);
-        }
-    } else if let Some(enc) = st.current.as_mut() {
+    // The open fight's counter names the span a row's own clock is in (`OwnClock`); 0 is no fight.
+    let fight = if st.current.is_some() { st.seq } else { 0 };
+    let enc = if fresh_only {
+        st.fresh_encounter(ts)
+    } else {
+        st.current.as_mut()
+    };
+    if let Some(enc) = enc {
+        enc.agg.at(ts, fight);
         f(&mut enc.agg);
     }
+    st.zone_agg.at(ts, fight);
     f(&mut st.zone_agg);
 }
 

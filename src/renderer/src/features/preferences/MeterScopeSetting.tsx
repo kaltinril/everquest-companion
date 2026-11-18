@@ -6,6 +6,7 @@
 // ("the You / Group / Everyone meter SOURCE-scope control is shown INLINE on every combat surface
 // and is too crowded"), so it is ONE preference now, written here and read by the Combat tab, the
 // Overview damage card and every floating meter (features/combat/useCombatPrefs.useMeterScope).
+// The Combat tab's scope word can hold a pick for that tab alone (2026-11-17); a pick here clears it.
 //
 // A SEGMENTED CONTROL, NOT A CYCLE. The overlay's chip was a cycle because a two-inch pinned
 // window has room for one word; a preferences card has room for three, and three visible options

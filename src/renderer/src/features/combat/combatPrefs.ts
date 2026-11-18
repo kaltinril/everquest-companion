@@ -55,6 +55,19 @@ export function readMeterScope(raw: string | null): MeterScope {
   return isMeterScope(raw) ? raw : DEFAULT_METER_SCOPE
 }
 
+/**
+ * THE COMBAT TAB'S OWN SCOPE (fork owner, 2026-11-17: a pick on the Combat tab "thats only for the
+ * combat tab, not the overlay"). A click on the tab's scope word writes this key and only the tab
+ * reads it; absent, the tab follows the preference above, so nobody's tab moves. A new name, not
+ * the retired `eq.combat.meterScope.combat`, whose stale answers stay inert.
+ */
+export const COMBAT_TAB_SCOPE_KEY = 'eq.combat.tabScope'
+
+/** The tab's own stored scope, else the app-wide one. */
+export function readCombatTabScope(raw: string | null, shared: MeterScope): MeterScope {
+  return isMeterScope(raw) ? raw : shared
+}
+
 // ── where a pet's damage shows ───────────────────────────────────────────────────────────
 
 /**

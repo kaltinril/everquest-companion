@@ -51,7 +51,7 @@
 //     reads `outTotal`, so the two can't drift.
 
 import { flattenSkills, type SkillRow } from './dashboardData'
-import { petGroupRows, type PetGroupRow } from '../../../../shared/combatPetGroups'
+import { combinedRate, petGroupRows, type PetGroupRow } from '../../../../shared/combatPetGroups'
 import type { SourceView } from '@shared/combat'
 
 /** The synthetic line item that stands for ONE pet inside your breakdown. */
@@ -383,10 +383,9 @@ function resolveSubject(entities: SourceView[], drill: MeterDrill): SourceView |
  *             `MeterPanel.rows` sums to. Flip the preference and `pets` empties, so the number
  *             follows in the same render — in both directions and without re-selecting anything.
  *
- * `dps` is SCALED rather than re-derived, for `scopeTotals`' reason: every source's rate divides
- * by the same segment elapsed time (`main/combat/sourceViews.ts` — `s.total / durationSec`), so
- * the ratio is exact arithmetic rather than a second opinion. That also makes it the right call
- * for the ACTIVE-time rate, which no source carries at all: one function, either rate.
+ * `dps` is SCALED rather than re-derived, which is exact for a rate that shares the segment's
+ * divisor: the ACTIVE-time rate, which no source carries at all. A drill's headline rate is
+ * `panelRate` below instead, since a source's own `dps` is over its own attacking time.
  *
  * WHAT IT DELIBERATELY DOES NOT TOUCH: the overlay meters' crumb figure, which is LABELLED `all`
  * and states the whole segment on purpose (JOS-158, owner direction with a screenshot —
@@ -399,6 +398,15 @@ export function panelTotals(panel: MeterPanel, total: number, dps: number): { to
   // eslint-disable-next-line eqc/no-domain-munging -- JOS-459 cutover ledger item 3: no served view source answers this yet, so the renderer still derives SourceView. Becomes a view descriptor when the source lands.
   const shown = [panel.subject, ...panel.pets].reduce((n, s) => n + s.total, 0)
   return { total: shown, dps: total > 0 ? (dps * shown) / total : 0 }
+}
+
+/**
+ * THE HEADLINE RATE. Level 1 keeps the scoped rate. A drill states its subject's own rate plus the
+ * pets nested into it: each row's DPS is over its own attacking time (`SourceView.dps`), so the
+ * number over a drilled row is the one its bar showed, not its share of the fight's rate.
+ */
+export function panelRate(panel: MeterPanel, dps: number): number {
+  return panel.level === 1 ? dps : combinedRate([panel.subject, ...panel.pets])
 }
 
 /**

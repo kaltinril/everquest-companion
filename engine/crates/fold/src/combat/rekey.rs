@@ -67,6 +67,7 @@ impl EngineState {
 /// `from` summed into `into`. The attack-round grouper (`round_acc`) is kept as `into` had it: it holds
 /// open sequences, not totals, and a pet's rounds before the bind read the same either way.
 fn merge_source(into: &mut SourceStat, from: SourceStat) {
+    into.clock.merge(from.clock);
     into.total += from.total;
     into.hits += from.hits;
     into.crits += from.crits;

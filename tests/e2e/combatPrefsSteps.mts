@@ -19,8 +19,10 @@ import { check, settle } from './appHarness.mjs'
 /** The three scopes, exactly as `shared/roster.METER_SCOPES` spells them. */
 export type Scope = 'you' | 'group' | 'everyone'
 
-/** The Combat tab's scope readout: a WORD since JOS-115, and a click steps it since 2026-11-16. */
+/** The Combat tab's scope readout: the lit button of its three-button switch (2026-11-17). */
 export const SCOPE_LABEL_SEL = '[data-testid="meter-scope-label"]'
+/** The fallback note beside the switch, there only while Group has no roster to filter by. */
+export const SCOPE_NOTE_SEL = '[data-testid="meter-scope-note"]'
 /** The control JOS-115 deleted from every combat surface. Asserted ABSENT, never used. */
 export const RETIRED_SCOPE_CHIP = '[data-testid="meter-scope-chip"]'
 /** …and its overlay twin. */

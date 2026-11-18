@@ -99,7 +99,7 @@ pub fn route_coat(st: &mut EngineState, ev: &CoatLine) {
     }
     // A coat is not combat: it never opens or extends an encounter. It attaches to an in-progress
     // fight (the same freshness rule a miss uses) and always to the zone aggregate.
-    let mark = crate::combat::aggregate::CoatMark {
+    let mark = crate::combat::procledger::CoatMark {
         poison: ev.poison.to_string(),
         ts: ev.ts,
     };
