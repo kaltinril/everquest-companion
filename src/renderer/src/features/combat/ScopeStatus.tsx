@@ -13,8 +13,9 @@
 // explanation with it.
 //
 // THE WORD IS CLICKABLE AGAIN, ON THIS TAB ONLY (fork owner, 2026-11-16: a "mine only" on the
-// Combat tab). A click steps You, Group, Everyone and writes the same one preference, so the
-// Overview card and the overlays follow; the overlays still carry no control.
+// Combat tab). A click steps You, Group, Everyone and writes the TAB'S OWN pick (owner,
+// 2026-11-17: "thats only for the combat tab, not the overlay"), so the Overview card and the
+// overlays stay on what Preferences > Combat holds; the overlays still carry no control.
 //
 // THE PROVENANCE IS THE POINT, not decoration. The roster is inferred from lines the game prints
 // once, so a member can be there because they joined (the game said so), because they hold the
@@ -49,7 +50,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import GroupIcon from '@mui/icons-material/Group'
 import { Tooltip } from '../../lib/Tooltip'
 import { formatDate } from '../../lib/formatDate'
-import { useMeterScope } from './useCombatPrefs'
+import { useCombatTabScope } from './useCombatPrefs'
 import {
   SCOPE_HINT,
   SOURCE_LABEL,
@@ -181,7 +182,7 @@ export function ScopeStatus({
   roster: RosterSnap
 }): React.JSX.Element {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null)
-  const [, setScope] = useMeterScope()
+  const [, setScope] = useCombatTabScope()
   const add = (name: string): void => {
     void window.eq.setRosterEdit({ name, action: 'add' })
   }
@@ -191,7 +192,7 @@ export function ScopeStatus({
 
   return (
     <>
-      <Tooltip title={`${SCOPE_HINT[scope]}. Click to change.`}>
+      <Tooltip title={`${SCOPE_HINT[scope]}. Click to change it for this tab.`}>
         <Chip
           size="small"
           data-testid="meter-scope-label"

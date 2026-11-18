@@ -17,7 +17,7 @@ import {
   type MeterMode,
   type ScopeOptions
 } from './dashboardData'
-import { useMeterScope } from './useCombatPrefs'
+import { useCombatTabScope } from './useCombatPrefs'
 import { useDrillMemory, type DrillMemoryApi } from './useDrillMemory'
 import { AbilityExpandProvider } from './abilityExpand'
 import { EMPTY_ROSTER, type MeterScope, type RosterSnap } from '@shared/roster'
@@ -333,11 +333,11 @@ export default function CombatView({
     { setSelection: combat.setSelection, setScope: combat.setScope, setMode: setModeState, focusFight: combat.focusFight },
     setDrill
   )
-  // WHOSE damage (docs/plans/group-model.md §2) — ONE persisted preference for every combat
-  // surface since JOS-115, read here and written only in Preferences > Combat. `EMPTY_ROSTER`
+  // WHOSE damage (docs/plans/group-model.md §2): the tab's own pick when its scope word was
+  // clicked, else the one preference Preferences > Combat holds (JOS-115). `EMPTY_ROSTER`
   // while the first snapshot is in flight means Group renders as Everyone for that instant, never
   // as an empty meter.
-  const [meterScope] = useMeterScope()
+  const [meterScope] = useCombatTabScope()
   const roster = snap?.roster ?? EMPTY_ROSTER
 
   // An inbound focus (deep link) picks the scope + selection, then is consumed. Keyed on the

@@ -24,12 +24,14 @@ import { useCallback, useMemo, useSyncExternalStore } from 'react'
 // The vocabulary — defaults, guards and degrades — lives in a DOM-free module beside this one so
 // it can be node-tested (combatPrefs.ts says why). This file is the storage half and nothing else.
 import {
+  COMBAT_TAB_SCOPE_KEY,
   DEFAULT_METER_SCOPE,
   HIDDEN_LINES_KEY,
   LEGACY_PET_ROW_KEY,
   METER_SCOPE_KEY,
   PET_LAYOUT_KEY,
   parseHiddenLines,
+  readCombatTabScope,
   readMeterScope,
   readPetLayout,
   serializeHiddenLines,
@@ -197,7 +199,8 @@ export function useHiddenChartLines(): [readonly ChartLineKey[], (k: ChartLineKe
  * questions. In practice that was three controls to find and three answers to keep straight for one
  * question ("whose damage am I looking at"), and the surfaces disagreeing was the common case
  * rather than the useful one. Now every damage and healing meter in the app reads THIS key, and
- * only Preferences > Combat writes it.
+ * only Preferences > Combat writes it. (The Combat tab may hold a pick of its own over it since
+ * 2026-11-17: `useCombatTabScope` below.)
  *
  * The old per-surface keys are INERT, not migrated: they are view state a user can restate in one
  * click, and reading three of them to guess which one the "real" answer was would be a coin flip
@@ -220,6 +223,26 @@ export function useMeterScope(): [MeterScope, (v: MeterScope) => void] {
   )
   const set = useCallback((v: MeterScope) => {
     localStorage.setItem(METER_SCOPE_KEY, v)
+    // A pick in Preferences sets every meter, so it also drops the Combat tab's own pick.
+    localStorage.removeItem(COMBAT_TAB_SCOPE_KEY)
+    notifyAll()
+  }, [])
+  return [value, set]
+}
+
+/**
+ * THE COMBAT TAB'S SCOPE (fork owner, 2026-11-17): the tab's own pick when it has one, else the
+ * preference above. Its setter writes the tab's key alone, so a click on the tab's scope word
+ * never moves the overlays or the Overview card.
+ */
+export function useCombatTabScope(): [MeterScope, (v: MeterScope) => void] {
+  const value = useSyncExternalStore<MeterScope>(
+    subscribe,
+    () => readCombatTabScope(localStorage.getItem(COMBAT_TAB_SCOPE_KEY), readMeterScope(localStorage.getItem(METER_SCOPE_KEY))),
+    () => DEFAULT_METER_SCOPE
+  )
+  const set = useCallback((v: MeterScope) => {
+    localStorage.setItem(COMBAT_TAB_SCOPE_KEY, v)
     notifyAll()
   }, [])
   return [value, set]

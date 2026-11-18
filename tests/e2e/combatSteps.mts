@@ -399,7 +399,8 @@ export async function stepScriptedPull(page: Page, log: FixtureLog): Promise<Sna
  * able to say so where the rows are missing. So this step walks the new shape: the chip is gone,
  * the word is there, changing the preference two tabs away changes what this meter shows, and the
  * roster popover (which was never a scope control) still opens. Since 2026-11-16 the word itself
- * is clickable on this tab and steps the same preference; the retired chip testid stays absent.
+ * is clickable on this tab; since 2026-11-17 the click is the tab's own pick and a choice in
+ * Preferences clears it. The retired chip testid stays absent.
  *
  * THE ROSTER STATE IS NOT ASSERTED, because it belongs to whatever the log happens to contain: a
  * log with group lines in it leaves `seen: true`, one without leaves `seen: false`, and both are
@@ -482,6 +483,9 @@ export async function stepMeterScope(page: Page): Promise<void> {
   }
   const stepped = await click((t) => t.startsWith('Group'))
   check('a click on the scope word steps You to Group', stepped.startsWith('Group'), stepped)
+  // …FOR THIS TAB ALONE (fork owner, 2026-11-17): the preference the overlays read does not move.
+  const shared = await page.evaluate(() => localStorage.getItem('eq.combat.meterScope'))
+  check('…and leaves the preference the overlays read where it was', shared === 'you', String(shared))
   check('…then to Everyone', (await click((t) => t === 'Everyone')) === 'Everyone', await label())
   check('…and back round to You', (await click((t) => t === 'You')) === 'You', await label())
 
