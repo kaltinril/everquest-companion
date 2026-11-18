@@ -51,7 +51,7 @@
 //     reads `outTotal`, so the two can't drift.
 
 import { flattenSkills, type SkillRow } from './dashboardData'
-import { petGroupRows, type PetGroupRow } from '../../../../shared/combatPetGroups'
+import { combinedRate, petGroupRows, type PetGroupRow } from '../../../../shared/combatPetGroups'
 import type { SourceView } from '@shared/combat'
 
 /** The synthetic line item that stands for ONE pet inside your breakdown. */
@@ -406,9 +406,7 @@ export function panelTotals(panel: MeterPanel, total: number, dps: number): { to
  * number over a drilled row is the one its bar showed, not its share of the fight's rate.
  */
 export function panelRate(panel: MeterPanel, dps: number): number {
-  if (panel.level === 1) return dps
-  // eslint-disable-next-line eqc/no-domain-munging -- JOS-459 cutover ledger item 3: no served view source answers this yet, so the renderer still derives SourceView. Becomes a view descriptor when the source lands.
-  return [panel.subject, ...panel.pets].reduce((n, s) => n + s.dps, 0)
+  return panel.level === 1 ? dps : combinedRate([panel.subject, ...panel.pets])
 }
 
 /**

@@ -81,6 +81,14 @@ export function pairedPetLabel(pet: SourceView, master: SourceView): string {
 }
 
 /**
+ * Several rows' rates taken together: a drilled subject and the pets nested into it. Each row's
+ * `dps` is over its own attacking time, so this is a sum of rates, as a combined bar's is.
+ */
+export function combinedRate(sources: readonly SourceView[]): number {
+  return sources.reduce((n, s) => n + s.dps, 0)
+}
+
+/**
  * The grouped level-1 list. A pet joins its master only when the master has a row in this list: an
  * unbound pet, or one whose master dealt nothing (or was scoped out), stays a row of its own with
  * its full name. Rows rank by their combined total; every bar width is against the top row.
