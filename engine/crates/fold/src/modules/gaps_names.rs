@@ -112,11 +112,12 @@ impl MobNames {
     }
 
     /// The event feed's "no picture" mark for a conned name the catalog knows: its pages have none
-    /// (the Gaps tab's Images domain, owner 2026-10-20). Never for a one-word name, nor a player's
-    /// mount, familiar, warder or summoned pet (owner, 2026-10-22). The "missing" mark is the Gaps
-    /// tab's own Mobs row (`gaps_marks.rs`).
+    /// (the Gaps tab's Images domain, owner 2026-10-20). Never for a player's mount, familiar,
+    /// warder or summoned pet (owner, 2026-10-22). A one-word name is marked like any other, as the
+    /// tab lists it (owner, 2026-11-17: Crisyn, Charlotte); a name the log showed to be a player
+    /// is the caller's to refuse. The "missing" mark is the Gaps tab's own Mobs row (`gaps_marks.rs`).
     pub fn needs_image(&self, k: &dyn Knowledge, name: &str) -> bool {
-        !is_player_shaped_name(name) && !no_mob(name) && self.known(k, name) && k.imageless_mob(name)
+        !no_mob(name) && self.known(k, name) && k.imageless_mob(name)
     }
 
     fn spelled(&self, k: &dyn Knowledge, name: &str) -> bool {
