@@ -795,7 +795,8 @@ where one exists.
   identical, 31 the same page with the font now fitting, 16 better, 1 two-window fixture changed.
 - The existing screenshot tests keep the OCR-only path (it is the fallback and the non-Windows path);
   `tests/shotFontReader.test.mts` pins the font path: 0 wrong of 1,903 transcribed characters for the
-  reader, font+OCR 4, OCR alone 42; every item fixture's page OCR's or better.
+  reader, font+OCR 0 (4 before the 2026-11-17 title-bar check), OCR alone 42; every item fixture's
+  page OCR's or better.
 - Picture root = live autoDir, else live lastDir, through `pictureRoot` (a kind's folder stands for
   its parent; `lastDir` is saved as the root). Mob -> `<root>/npc`; item/lore ->
   `<root>/item/item_<n>[_lore].png`; spell -> `<root>/spell/spell_<n>.png` (`keptPictureFile`). Item
