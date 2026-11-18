@@ -72,8 +72,11 @@ import type { ResistTableCacheTarget, ResistTableWorkerHead } from '../resistTab
  *      icon after the fix that was meant to give them one. Not upgradeable in place for the
  *      opposite reason to the bumps above - the data is complete, the index is stale - and a
  *      re-key on read would be a second copy of the key rule to keep byte-identical.
+ *  10  2026-11-17 - the 2026-11-16 game patch moved the effect slots 173 -> 189 (spellsUsLayout.ts)
+ *      and every build before this fix cached that file with no slots on any row, under the file's
+ *      own size and mtime. The stamp matches, so only a bump makes the fixed reader parse it again.
  */
-export const SPELL_RESIST_CACHE_VERSION = 9
+export const SPELL_RESIST_CACHE_VERSION = 10
 
 /** The client file, as it sits in the install this app resolved. */
 export function spellsUsPath(): string {
