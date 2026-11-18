@@ -28,6 +28,66 @@ export interface CommunityRelease {
 
 export const COMMUNITY_RELEASE_NOTES: readonly CommunityRelease[] = [
   {
+    "version": "0.1.0-test.50",
+    "date": "2026-11-17",
+    "title": "a meter row's DPS is over its own attacking time, the Combat tab's scope is its own three-button switch",
+    "groups": [
+      {
+        "heading": "Combat",
+        "items": [
+          {
+            "text": "A meter row's DPS is its damage over the time that attacker spent attacking: first swing to last swing in each fight (a miss is a swing), at least one second. It was the whole fight's length, so joining a fight late read low. One 40,000 hit is 40,000 DPS. The fight's own total DPS is unchanged, so the rows no longer add up to it."
+          },
+          {
+            "text": "The Combat tab's scope is a three-button switch (You, Group, Everyone) and it belongs to the tab: the overlays and the Overview card no longer follow it. They follow Preferences > Combat, and a pick there also resets the tab. If your overlays went to \"You\" on test.49, set Preferences > Combat back to Everyone or Group once."
+          },
+          {
+            "text": "Under You, and on a row you have opened, the header's DPS and time are that row's own."
+          }
+        ]
+      },
+      {
+        "heading": "Spells",
+        "items": [
+          {
+            "text": "The game's 2026-11-16 patch changed its spell file and the app read no effects from it, so spell stacking, buff conflicts and resist estimates were wrong. They are read again."
+          }
+        ]
+      },
+      {
+        "heading": "Wiki Gaps and screenshots",
+        "items": [
+          {
+            "text": "An item window with a wide title bar is read correctly (Token of Reincarnation came out as \"wee, Token of Reincamation\"), and the title bar is checked against the name."
+          },
+          {
+            "text": "An item row that already holds its picture reads its stats from it, and a copied item page always carries its icon number."
+          },
+          {
+            "text": "The Event log marks a one-word mob the wiki has no picture of (Crisyn, Charlotte), as the Images list does."
+          }
+        ]
+      },
+      {
+        "heading": "Maps",
+        "items": [
+          {
+            "text": "Closest port: where a port lands is shown before the item names, so a long list of items cannot push it off the card."
+          }
+        ]
+      },
+      {
+        "heading": "Data",
+        "items": [
+          {
+            "text": "Wiki pages refreshed to today (52 pages changed)."
+          }
+        ]
+      }
+    ],
+    "knownIssues": "The healing meters still divide by the whole fight's length. A buff's percent stats (haste, run speed) and regen are not raised with rank yet, and the Upgrades tab does not count bigger stats as a reason to upgrade a buff. Shorter pauses cannot change the spacing a Windows voice puts between words. A Copy page read is kept for half an hour, so a page made on the wiki within that time is not seen until it passes. A merchant page the wiki already has gets no \"items sold\" or \"location\" check. An item page the wiki already has gets no check that it lists a merchant you were quoted by. Joining another player's private instance is not told apart from the open world of that zone; only an instance you create yourself is. A pet summoned shortly before its first \"My leader is\" line can carry a \"(2)\" after its name in the meters until the next restart. Another player's spells never count toward a mob's resists: the game prints only your own resists to you. The con card does not list a mob's immunities yet (the mob page does). Saved characters read \"needs refresh\" on Wiki Gaps until logged in once with this build. A +0 worked back from a window often leaves Weight as ?. A groupmate's charmed pet can still lose its credit when a damage-over-time it cast before the charm ticks on a groupmate. A mob or item added to the wiki after this build shows no wiki details until the next build (or a Copy click in Wiki Gaps). Copy on a wiki page that still holds the template's placeholders keeps them. Capture finds the game window only when it is titled \"EverQuest Legends\" or \"EverQuest\". All characters needs each character logged in here once with this build. The screenshot reader reads English only. The installer is not code-signed, so Windows shows \"Windows protected your PC\" the first time (More info, then Run anyway). Builds before test.20 do not update themselves; install one by hand once."
+  },
+  {
     "version": "0.1.0-test.49",
     "date": "2026-11-16",
     "title": "Loadout gets a Pet tab and rank-scaled buff stats, the Combat tab's scope word is clickable",
