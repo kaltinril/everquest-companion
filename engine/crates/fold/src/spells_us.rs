@@ -595,13 +595,13 @@ pub fn parse_spells_us(text: &str) -> SpellTable {
     // `playable` per key, beside the table — the TypeScript's `seen` map, whose only extra content
     // is that flag.
     let mut playable_by_key: HashMap<String, bool> = HashMap::new();
-    // The 2026-10-13 patch's extra column, read off the file and dropped from each row (layout.rs).
-    let shifted = layout::shifted(text);
+    // The game patches' extra columns, read off the file and dropped from each row (layout.rs).
+    let shift = layout::shift(text);
     for line in text.split('\n') {
         if line.is_empty() {
             continue;
         }
-        let f = layout::unshift(line.split('^').collect(), shifted);
+        let f = layout::unshift(line.split('^').collect(), shift);
         if f.len() < F_SLOTS {
             continue;
         }

@@ -12,7 +12,9 @@
 //!   * no row: no mark. A known player, a name a chat, `/who`, group or `Targeted (Player)` line
 //!     withdrew, a pet, a mount, familiar or warder, the player's own name: the tab files none of
 //!     them, so the feed marks none of them;
-//!   * a name the catalog knows whose pages have no picture: `needsImage`, as before.
+//!   * a name the catalog knows whose pages have no picture: `needsImage`, one-word names too
+//!     (owner, 2026-11-17: "if the wiki gaps page says missing image, it needs to show in the
+//!     overlay"), unless the log showed the name to be a player.
 //!
 //! A redirect's row (`viaRedirect`) is a row to check, not a missing page: it marks nothing more than
 //! a known name does. A mark that appears later for a feed row already shown is not drawn back onto
@@ -102,7 +104,7 @@ impl GapsModule {
                 needs_image: false,
             },
             _ => FeedMarks {
-                needs_image: known && self.mob_names.needs_image(k, name),
+                needs_image: known && !self.who.is_player(name) && self.mob_names.needs_image(k, name),
                 ..FeedMarks::default()
             },
         }

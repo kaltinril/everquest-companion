@@ -3,7 +3,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { INSERTED_COLUMN, spellsUsShifted, unshiftRow } from '../src/main/resist/spellsUsLayout'
+import { INSERTED_COLUMN, spellsUsShift, spellsUsShifted, unshiftRow } from '../src/main/resist/spellsUsLayout'
 import { parseSpellsUs } from '../src/main/resist/spellsUsParse'
 
 const SLOTS = '1|0|-30|0|103|125'
@@ -45,4 +45,39 @@ test('unshift drops exactly one column, at the inserted index, and only from a p
   assert.equal(g.length, 173)
   assert.equal(g[INSERTED_COLUMN], String(INSERTED_COLUMN + 1))
   assert.equal(g[INSERTED_COLUMN - 1], String(INSERTED_COLUMN - 1))
+})
+
+// The 2026-11-16 game patch: sixteen more columns after aemaxtargets, the effect slots at 189 of 190.
+test('the sixteen-column patch is detected and every read field is back in place', () => {
+  const patched = (): string => {
+    const f = Array.from({ length: 190 }, () => '0')
+    for (let i = 36; i < 52; i++) f[i] = '255'
+    f[0] = '6'
+    f[1] = 'Test Bolt'
+    f[29] = '2'
+    f[47] = '1'
+    f[76] = '165'
+    f[79] = '-100'
+    f[144] = '4'
+    f[189] = SLOTS
+    return f.join('^')
+  }
+  const text = [patched(), patched()].join('\n')
+  assert.equal(spellsUsShift(text), 17)
+  assert.equal(spellsUsShifted(text), true)
+  const t = parseSpellsUs(text)['test bolt']
+  assert.equal(t?.icon, 165)
+  assert.equal(t?.resistAdj, -100)
+  assert.equal(t?.aeMaxTargets, 4)
+  assert.ok(t?.hpSlot, 'the damage slot is back at 172')
+  const g = unshiftRow(Array.from({ length: 190 }, (_, i) => String(i)), 17)
+  assert.equal(g.length, 173)
+  assert.equal(g[172], '189')
+  assert.equal(g[143], '144')
+})
+
+test('the shift is a count: none, one column, seventeen', () => {
+  assert.equal(spellsUsShift([row(173, 172), row(173, 172)].join('\n')), 0)
+  assert.equal(spellsUsShift([row(174, 173, 52), row(174, 173, 52)].join('\n')), 1)
+  assert.equal(spellsUsShift('1^Short^row'), 0)
 })

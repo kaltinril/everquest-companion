@@ -424,6 +424,10 @@ where one exists.
   log showed a player (chat, tells, group joins, `/who`); it is "may be a player" until an answered
   hail or a revisit in the same zone 10+ min later; "Mark as player" is a per-viewer list
   (`eq.gaps.players`). Measured: no catalog NPC sends tells on Legends (77 tellers, 0 in the catalog).
+- Event log picture mark (`needsImage`): any conned name the catalog knows with no picture, one-word
+  names included (owner, 2026-11-17: the overlay must show what the Images tab lists); never a name
+  the log showed to be a player (`who.is_player`), a mount, familiar, warder or pet. The feed drops a
+  repeat con of one mob inside 10 s (`CONSIDER_FEED_DEDUPE_MS`): space cons in a test.
 - Loot fields: `mobs.json commonDrops` is the page's `|common_loot`; Drops counts both fields and
   dropGroups.json `aliases` (redirect titles); Copy wiki page files a name under common_loot when the
   wiki does on 3+ pages and more often than under known_loot (`commonLootNames`).

@@ -7,6 +7,16 @@ SK, others).
 
 ## Spells
 
+- **`spells_us.txt` column layout moves with game patches** (`src/main/resist/spellsUsLayout.ts`,
+  `engine/crates/fold/src/spells_us/layout.rs`, one rule). 173 fields, slots at 172 (original);
+  2026-10-13: one column added in 52..75 (174 fields, slots 173); 2026-11-16: sixteen more after
+  aemaxtargets (190 fields, slots 189; icon 76, resist adjust 79, good effect 127, aemaxtargets 144
+  unmoved, 100% of 48,296 rows against the app's saved parse of the file before). The symptom of a
+  new shift: `resistBaseline` and `stackGroundTruth` go red on an untouched trunk (they read the
+  install's file) and every spell parses with no slots. To place the columns, join today's file by
+  id to an older `spell-resist-cache.json` (a `.bak` of the dev userData) and score each column.
+  A layout fix also bumps `SPELL_RESIST_CACHE_VERSION`: the bad parse is cached under the file's
+  own size and mtime.
 - **Proc damage: 3% per rank of the BUFF, because the proc is cast at half the buff's tier**
   (patch notes 2026-07-07) and scales as a nuke, 6% a rank. Puma Maw over the whole log: buff
   rank I 154 (n=3453), IV 172 (n=196), VI 181 (n=1735), which is 154 x 1.12 and x 1.18 floored;

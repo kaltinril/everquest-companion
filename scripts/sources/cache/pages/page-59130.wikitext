@@ -120,19 +120,19 @@ Motes of Potential are new items added to Everquest Legends.  These are used to 
 !Item Tier Limit
 |-
 | [[Fragment of Infinitesimal Potential]]
-| ?
+| 2
 | +0
 |-
 | [[Fragment of Minor Potential]]
-| ?
+| 3
 | +1
 |-
 | [[Fragment of Lesser Potential]]
-| ?
+| 4
 | +2
 |-
 | [[Fragment of Potential]]
-| ?
+| 6
 | +3
 |-
 | [[Fragment of Major Potential]]
@@ -144,19 +144,19 @@ Motes of Potential are new items added to Everquest Legends.  These are used to 
 | +5
 |-
 | [[Fragment of Superior Potential]]
-| ?
+| 16
 | +6
 |-
 | [[Fragment of Grand Potential]]
-| ?
+| 22
 | +7
 |-
 | [[Fragment of Ascendant Potential]]
-| ?
+| 32
 | +8
 |-
 | [[Fragment of Infinite Potential]]
-| ?
+| 45
 | +9
 |}
 </div>

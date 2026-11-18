@@ -110,10 +110,13 @@ Applies to Charm, Fear, Lull/Pacify, Mez, Root, and Stun spells
 * -? Cast Time
 * -? Mana Cost
 * Pet level increased +1 (max pet level = Character Level)
-* Benefits per pet level:
+** Benefits per pet level:
+*** Increase base hit points
+*** Spells available for spell casting pets is adjusted by the pet's level
+* Additional Benefits per Spell Rank (the pet gains all these benefits even if its level is capped):
 ** +6% Hit Points
-** +5 points to skills
-** +1 unarmed damage (a pet that normally hits for a max of 18 will instead hit for a max of 20)
-** Spells available for spell casting pets is adjusted by the pet's level
+** +5 points to skills (improving Attack and AC)
+** +10% base damage (at Rank X your pet's damage before weapons is doubled - weapons then add extra damage on top of that)
+
 
 [[Category:Guides]]

@@ -26,10 +26,10 @@ impl Knowledge for Corpus {
         panic!("a con must never ask a lookup that notes a miss")
     }
     fn known_mob(&self, name: &str) -> bool {
-        matches!(mob_key(name).as_str(), "the great zultor" | "a froglok")
+        matches!(mob_key(name).as_str(), "the great zultor" | "a froglok" | "crisyn")
     }
     fn imageless_mob(&self, name: &str) -> bool {
-        mob_key(name) == "a froglok"
+        matches!(mob_key(name).as_str(), "a froglok" | "crisyn")
     }
     fn take_misses(&self) -> Vec<Miss> {
         Vec::new()
@@ -183,6 +183,20 @@ fn a_pet_or_a_mount_is_never_marked_and_a_known_mob_keeps_its_picture_mark() {
     assert_eq!(p.mark(), "no picture");
     p.con(6, "a lizardman forager", 12);
     assert_eq!(p.mark(), "missing");
+}
+
+/// Owner, 2026-11-17: Crisyn and Charlotte were Images rows on the Gaps tab and unmarked on the Event
+/// log, which skipped every one-word name. A one-word mob the catalog knows is marked like any other.
+#[test]
+fn a_one_word_mob_with_no_picture_is_marked_unless_the_log_showed_a_player() {
+    let mut p = Pair::new();
+    p.con(1, "Crisyn", 45);
+    assert_eq!(p.mark(), "no picture");
+    assert!(!p.mob_rows().contains_key("crisyn"), "a known mob is no Mobs row");
+    // A player who shares the mob's name is not asked for a picture.
+    p.line(2, "Targeted (Player): Crisyn");
+    p.con(30, "Crisyn", 45);
+    assert_eq!(p.mark(), "none");
 }
 
 /// The owner's question: every name the Gaps tab files as a Mobs row is marked on the Event log,
