@@ -1021,3 +1021,37 @@ where one exists.
   never fills it. Each taken fire logs one `data-server fire ... taken by the app` line, so a
   `/who all` in a city writes hundreds of dev.log lines. Last listing and the list live in
   `eq.who.last` / `eq.friends` (main window localStorage).
+
+## Damage meters: whose scope, and what a row's DPS divides by (2026-11-17)
+
+Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
+
+- **Two scope keys.** `eq.combat.meterScope` is the preference (Preferences > Combat): the
+  overlays and the Overview card read it alone. `eq.combat.tabScope` is the Combat tab's own pick,
+  written by the tab's three-button switch (`ScopeStatus.tsx`); absent, the tab follows the
+  preference. A pick in Preferences removes the tab's key, so Preferences still sets every meter.
+  Never make a Combat tab control write the preference: the overlays follow it (owner: a tab pick
+  is "only for the combat tab, not the overlay").
+- **A row's `dps` is over its own clock** (`OwnClock`, `engine/crates/fold/src/combat/ownclock.rs`):
+  first swing to last swing (hits, misses, resists) inside each fight, at least 1 s per fight,
+  summed over the fights a segment holds. Every row door stamps it through `Agg::at(ts, fight)`,
+  which `routing.rs both()` sets; a new door that writes a row without `both()` leaves the clock
+  unstamped and that row falls back to the segment's length. `SourceView.ownSec` carries the
+  seconds.
+- Two seams were split out of the engine's combat files to make room, not squeezed (owner,
+  2026-11-17: "don't shrink files arbitrarily, can we break the code out into other files"):
+  the proc ledger (`procledger.rs`, was in `aggregate.rs`) and the live meter's typed row door
+  (`liverows.rs`, was in `views.rs`). A file at its size ceiling gets a split along a real seam.
+- **Rows do not sum to the fight's rate, on purpose.** `SegmentSummary.dps`, `SegmentView.outDps`
+  and the overlay's `all` crumb are still whole damage over the fight's length. Group and Everyone
+  headlines are still their share of that. The You headline is over `SegmentView.selfSec` (you and
+  your pets taken together, `meterScope.scopeRate`); a drilled row's headline is that row's own
+  rate (`petRows.panelRate`). The Combat tab header prints the time as total / rate
+  (`SegmentHeader` `clockSec`), so the three figures always agree.
+- A combined bar (pet inside your bar, the grouped total box) still ADDS the rows' rates; with own
+  clocks that is a sum of two rates over two spans, not one total over one span.
+- The healing meters (`hps`) still divide by the segment's length: not asked for.
+- Measured on the owner's log (2026-11-17 21:46:45, Cleric of Innoruuk): a group-mate's bow shot
+  opened the fight 3 s before the owner's first hit; 7,247 damage was 426 DPS over the 17 s fight
+  and is 518 over his own 14 s. A group-mate who shot and missed to the end keeps the full 17 s:
+  a miss is a swing.
