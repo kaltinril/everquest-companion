@@ -2424,3 +2424,4 @@ Skill_Tailoring
 Wu's_Fighting_Armor_Set
 Wu's_Fighting_Armor
 Elemental_Binder
+Reddish_Crystal

@@ -6,7 +6,7 @@
     <li>Pet Type: [[Beastlord#Your Race & Warder|Beastlord Warder]]</li>
     <li>Pet Classes: [[Beastlord]] / [[Warrior]]</li>
     <li>Pet Level: 1</li>
-    <li>Hit Points: 200 (+1/tick)</li>
+    <li>Hit Points: 141 (+1/tick)</li>
     <li>Mana: 100 (+4/tick)</li>
     </ul>
   </div>
@@ -28,8 +28,6 @@
        <ul>
        <li>Offense: 17</li>
        <li>Accuracy: 26</li>
-       <li>Max Damage: 8</li>
-       <li>Dual Wield: Never</li>
        </ul>
      </ul>
   </div>
@@ -43,6 +41,20 @@
     <li>Charisma: 8</li></ul>
   </div>
 </div>
+
+==== Melee Attacks ====
+{| class="wikitable"
+!Damage
+!Delay
+!Bonus Damage
+!Dual Wield
+|-
+|4
+|30
+| +0
+| - 
+|-
+|}
 
 == Abilities ==
 * [[Skill_Dodge|Dodge]]

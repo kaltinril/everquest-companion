@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-17T07:55:23.765Z",
+  "scrapedAt": "2026-11-18T04:25:21.357Z",
   "source": "eqlwiki.com — Category:NPCs/Named Mobs/Merchants/Raid Encounters ∪ embeddedin Template:Namedmobpage/MerchantPage, filtered to pages opening a mob template + recentchanges delta (scripts/scrape-delta.mts)",
   "mobs": [
     {
@@ -2184,8 +2184,7 @@
       ],
       "relatedQuests": [
         "Bertoxxulous Symbol Quests"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "A broken golem",
@@ -5913,8 +5912,7 @@
         "Silk String",
         "Standard Bow Cam",
         "Whittling Blade"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "A Clockwork Brewmaster",
@@ -6040,8 +6038,7 @@
         "Silver Tipped Arrowheads",
         "Small Groove Nocks",
         "Tailoring Quivers"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "A Clockwork Grocer",
@@ -10448,8 +10445,7 @@
       ],
       "relatedQuests": [
         "Bone Chips Quests"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "A Decaying Skeleton",
@@ -22303,8 +22299,7 @@
         "10",
         "10"
       ],
-      "image": "npc_a_giant_diseased_rat.png",
-      "noImage": true
+      "image": "npc_a_giant_diseased_rat.png"
     },
     {
       "page": "A giant frenzied leech",
@@ -24928,8 +24923,7 @@
         "Rusty Warhammer",
         "Rusty Rapier"
       ],
-      "image": "npc_a_gnome_skeleton.png",
-      "noImage": true
+      "image": "npc_a_gnome_skeleton.png"
     },
     {
       "page": "A Gnome Slave",
@@ -26986,8 +26980,7 @@
         "5",
         "5"
       ],
-      "image": "npc_a_goblin_peon.png",
-      "noImage": true
+      "image": "npc_a_goblin_peon.png"
     },
     {
       "page": "A goblin pit fighter",
@@ -36677,8 +36670,7 @@
           "ew": -1458
         }
       ],
-      "image": "npc_a_lesser_ebon_drake.png",
-      "noImage": true
+      "image": "npc_a_lesser_ebon_drake.png"
     },
     {
       "page": "A Lesser Guardian",
@@ -39936,8 +39928,7 @@
       "factionAmounts": [
         "-30"
       ],
-      "image": "npc_a_mountain_brownie.png",
-      "noImage": true
+      "image": "npc_a_mountain_brownie.png"
     },
     {
       "page": "A mountain giant brae",
@@ -46052,8 +46043,7 @@
       "factionAmounts": [
         "-30"
       ],
-      "image": "npc_a_runaway_clockwork.png",
-      "noImage": true
+      "image": "npc_a_runaway_clockwork.png"
     },
     {
       "page": "A Runnyeye Conscript",
@@ -54498,12 +54488,7 @@
           "pct": 100
         }
       ],
-      "image": "npc_a_small_coyote.png",
-      "notices": [
-        "delete",
-        "DNE"
-      ],
-      "noImage": true
+      "image": "npc_a_small_coyote.png"
     },
     {
       "page": "A small mountain lion",
@@ -54522,8 +54507,7 @@
       "notices": [
         "delete",
         "DNE"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "A smelly slave",
@@ -56639,11 +56623,10 @@
         "Russet Oxide",
         "Swirling Mist"
       ],
+      "image": "npc_a_steam_elemental.png",
       "otherNames": [
         "Steam Elemental"
-      ],
-      "image": "BST 2793 222223.jpg",
-      "noImage": true
+      ]
     },
     {
       "page": "A steel golem",
@@ -63203,8 +63186,7 @@
           "pct": 100
         }
       ],
-      "image": "npc_a_young_ebon_drake.png",
-      "noImage": true
+      "image": "npc_a_young_ebon_drake.png"
     },
     {
       "page": "A young gila monster",
@@ -70409,12 +70391,7 @@
           "ew": -1488
         }
       ],
-      "image": "npc_an_ebon_drakeling.png",
-      "notices": [
-        "delete",
-        "DNE"
-      ],
-      "noImage": true
+      "image": "npc_an_ebon_drakeling.png"
     },
     {
       "page": "An ebon wing hatchling",
@@ -105363,8 +105340,7 @@
       "factionAmounts": [
         "-30"
       ],
-      "image": "npc_crisyn.png",
-      "noImage": true
+      "image": "npc_crisyn.png"
     },
     {
       "page": "Cronte Deloru",
@@ -115793,8 +115769,7 @@
         "5",
         "5"
       ],
-      "image": "npc_driver_bryggin.png",
-      "noImage": true
+      "image": "npc_driver_bryggin.png"
     },
     {
       "page": "Drixiv Arcut",
@@ -123589,8 +123564,7 @@
         "Water Flask",
         "Xectia's Favored Flavors",
         "Xectia's Hot Pie"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Finlay Kitoran",
@@ -124694,23 +124668,6 @@
         }
       ],
       "merchant": true,
-      "factions": [
-        "Deep Muses",
-        "Gem Choppers",
-        "King Ak'Anon Faction",
-        "Merchants of AkAnon"
-      ],
-      "factionAmounts": [
-        "-30",
-        "-30",
-        "-30",
-        "-30"
-      ],
-      "image": "npc_fodin_frugrin.jpg",
-      "relatedQuests": [
-        "Air Tight Box Quest",
-        "Telescope Lenses"
-      ],
       "sells": [
         "Small Belt Sectional Mold",
         "Small Boot Mold",
@@ -124725,7 +124682,23 @@
         "Small Mask Mold",
         "Small Sleeves Sectional Mold"
       ],
-      "noImage": true
+      "factions": [
+        "Deep Muses",
+        "Gem Choppers",
+        "King Ak'Anon Faction",
+        "Merchants of AkAnon"
+      ],
+      "factionAmounts": [
+        "-30",
+        "-30",
+        "-30",
+        "-30"
+      ],
+      "image": "npc_fodin_frugrin.png",
+      "relatedQuests": [
+        "Air Tight Box Quest",
+        "Telescope Lenses"
+      ]
     },
     {
       "page": "Fogerty Bottlenip",
@@ -125229,8 +125202,7 @@
       "image": "npc_forpar_fizfla.png",
       "relatedQuests": [
         "Bard Epic Quest"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Founy Jestands",
@@ -125478,8 +125450,7 @@
           "ew": -442
         }
       ],
-      "image": "npc_frebin_tinderhue.png",
-      "noImage": true
+      "image": "npc_frebin_tinderhue.png"
     },
     {
       "page": "Freed Fimplefur",
@@ -125525,8 +125496,7 @@
         "Thimble Mold",
         "Whip Pattern",
         "Wristband Pattern"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Frekka Alebringer",
@@ -130763,8 +130733,7 @@
         "-30",
         "-30"
       ],
-      "image": "npc_genda_minyte.png",
-      "noImage": true
+      "image": "npc_genda_minyte.png"
     },
     {
       "page": "Gende Reldari",
@@ -132793,8 +132762,7 @@
         "Small Lantern",
         "Torch",
         "Water Flask"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Glendl Vargnus",
@@ -206160,8 +206128,7 @@
         "Spit",
         "Standing Legs Mold",
         "Troll Cookie Mold"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Orex Nolus",
@@ -219663,8 +219630,7 @@
       "factionAmounts": [
         "-30"
       ],
-      "image": "npc_runaway_clockwork.png",
-      "noImage": true
+      "image": "npc_runaway_clockwork.png"
     },
     {
       "page": "Runethar Hamest",
@@ -250586,8 +250552,7 @@
         "Star Rose Quartz",
         "Topaz",
         "Turquoise"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Torth Largefoot",
@@ -267830,8 +267795,7 @@
         "5",
         "5"
       ],
-      "image": "npc_watchman_mylz.png",
-      "noImage": true
+      "image": "npc_watchman_mylz.png"
     },
     {
       "page": "Watchman Myriin",

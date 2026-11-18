@@ -205,6 +205,15 @@ Pets can equip items by using the pet inventory system, accessed from a tab in y
 
 '''/pet inventory check''' is a way to confirm if your pet is equipping a specific item. It will output in chat what your pet is currently equipping. If you wish for an item to be replaced or taken off, remove it from the pet inventory window and your pet will automatically update in real time.
 
+=== Pet Equipment Stats ===
+
+Pets benefit from all stats now the same as [[Statistics|players]] - though they have no use for Charisma. If you intend for your pet to do most of the tanking, you might want to favor STA/AGI. If your pet is just for extra damage, you will likely want to favor STR/DEX. INT/WIS can increase their mana, if they cast spells - but it is generally not super useful to increase their mana.
+
+==== Pet Hit Points ====
+It should be noted that the calculation for pet hit points is quite complicated. Depending on which spell is used to summon your pet, their base hit points will vary. Additionally, granting your pets extra levels via Focus Items or [[Spell Upgrade System|Spell Ranks]] will also increase their '''base''' hit points.  This means if you are level 47 with a Greater Conjuration Earth Rank X pet also at level 47, it will gain more hit points when you level up and can summon the same pet at level 48 - despite the fact your spell is already max rank.  Additionally, Spell Rank Upgrades grant +6% Hit Points (believed to be base hit points, not including STA). This bonus is applied regardless of whether or not your pet is at its level cap. So at level 46, Rank X pet will have more hit points than a Rank V pet, even though they're both level 46.
+
+Essentially, every method of increasing your pets' hit points work together to make your pet stronger. There's no need to worry about whether Focus Items and Spell Upgrades stack (they do). There's no need to worry about whether or not to upgrade your Spell Rank - every increase will improve your pet, even if they're level capped.
+
 =Pet Details By Class=
 The following information is still being collected and updated for Everquest Legends.
 
@@ -216,63 +225,81 @@ There was a patch on 8/18/2026 that was a pretty big change to Beastlord pets. C
 !Character Level
 !Pet Spell
 !Pet Level
-!Base Melee Ratio
+!Pet HP
+!Damage
+!Delay
 !Bonus Damage
 !Dual Wield
 |-
 |style="text-align:center;"|'''1'''
 |[[Wild Spirit Summon|Wild Spirit]]
 |1
-|4/30 (0.133)
+|141
+|4
+|30
 | +0
 | - 
 |-
 |style="text-align:center;"|'''4'''
 |[[Tame Spirit Summon|Tame Spirit]]
 |5
-|4/38 (0.105)
+|287
+|4
+|38
 | +0
-|5%
+|5%?
 |-
 |style="text-align:center;"|'''8'''
 |[[Spirit of Sharik Summon|Spirit of Sharik]]
 |9
-|5/38 (0.132)
-| +0
-|14%
+|397
+|5
+|38
+| +1
+|14%?
 |-
 |style="text-align:center;"|'''15'''
 |[[Spirit of Khaliz Summon|Spirit of Khaliz]]
 |16
-|10/38 (0.263)?
-| +0
+|778
+|9
+|30
+| +2
 |X?
 |-
 | style="text-align:center;" |'''23'''
 |[[Spirit of Keshuval Summon|Spirit of Keshuval]]
 |22
-|13/38 (0.342)?
-| +1?
+|1301
+|12
+|30
+| +3
 |X?
 |-
 | style="text-align:center;" |'''30'''
 |[[Spirit of Herikol Summon|Spirit of Herikol]]
 |26
-|16/38 (0.421)?
-| +?
+|1563
+|14
+|30
+| +4
 |X?
 |-
 | style="text-align:center;" |'''39'''
 |[[Spirit of Yekan Summon|Spirit of Yekan]]
 |31
-|20/38 (0.526)?
-| +?
+|2305
+|17
+|28
+| +6
 |X?
 |-
 | style="text-align:center;" |'''46'''
 |[[Spirit of Kashek Summon|Spirit of Kashek]]
 |39
-|21/26 (0.808)
+|3651
+|21
+|28
 | +14
 |X?
 |}
@@ -887,13 +914,13 @@ The lesser focus items ({{:Torch of Alna}}, {{:Shovel of Ponz}}, {{:Broom of Tri
 
 * Bigger Pet Size
 * +1 level (limited like the bonus levels from [[Spell Upgrade System|spell upgrades]])
-** Does not give the same benefits as a level from the spell upgrades, it only allows them to cast new spells, if that extra level happens to unlock any.
+** Grants a slight bonus to hit points, and might unlock new spells that the pet can cast.
 * +15 STR
 ** Results in +10 Attack (Offense)
 * +10 AGI
 ** Results in +5 Armor (Evasion)
 * Extra Hit Points
-** This is a bit annoying with how it works but seems consistent with how these focus effects worked in original Classic EQ. Essentially, the pet summoned when using the lesser focus has hit points equal to the next highest elemental's hit points. What that means is - a Fire Elemental will have hit points that match the hit points of an Air Elemental of the same level. A focused Air Elemental will have Water Elemental hit points. And Water Elementals will have hit points equivalent to Earth Elementals. Unfortunately, the Earth Elementals are already at the top and gain no additional hit points.
+** This is a bit annoying with how it works but seems consistent with how these focus effects worked in original Classic EQ. Essentially, the pet summoned when using a lesser focus has '''base''' hit points equal to the next highest elemental's hit points. This means a Fire Elemental summoned with a the [[Torch of Alna]] will have hit points that match the hit points of an unfocused Air Elemental of the same pet level. A focused Air Elemental will have unfocused Water Elemental hit points. And focused Water Elementals will have hit points equivalent to unfocused Earth Elementals. Unfortunately, the Earth Elementals are already at the top and do not gain significant hit points. They only gain the small increase granted by the level increase.
 
 ==== Greater Elemental Foci ====
 
@@ -901,7 +928,16 @@ The greater focus items ({{:Staff of Elemental Mastery: Water}}, {{:Staff of Ele
 
 ===== Benefits =====
 
-This area needs testing, but initial results show it being much better than the Lesser Elemental Foci. However, using the focus items may be pointless once your summoning spell is upgraded to +8. Further testing needs to be done.
+* Bigger Pet Size
+* +1 level (limited like the bonus levels from [[Spell Upgrade System|spell upgrades]])
+** Grants a slight bonus to hit points, and might unlock new spells that the pet can cast.
+* +10 - 20 STR, STA, DEX, AGI
+** Exact stat bonuses vary by Elemental type
+** Results in extra Attack (Offense)
+** Results in extra Armor (Evasion)
+* +1 Damage to pet's base melee damage
+* Extra Hit Points
+** Like the stat bonuses the exact bonus varies by Elemental, with Air and Fire pets getting significantly more bonus hit points. However, all of the pets gain 300-850 hitpoints which is substantially more than what the Lesser Foci grant.
 
 == [[Necromancer]] Pets ==
 EQ Legends Pet details are being updated for Necromancer pets in the spell descriptions, not all pets have been tested yet.
@@ -1006,6 +1042,18 @@ Necromancer pets all require [[Bone Chips]] to summon.
 The only pet focus item that Necromancers can obtain is the {{:Encyclopedia Necrotheurgia}}. Similar to the Magician pet focus items, this focus item makes the pet larger in size. It is believed to only work on [[Invoke Death]] but this needs confirmed for EQ Legends.
 
 When used with [[Invoke Death]], the focus provides +10 STR/STA/AGI, which grants some bonus ATK and Evasion. It also boosts the base pet hit points from 5230 to 5470.  The [[Spell Upgrade System]] then applies any spell upgrades (such as increased Hit Points) to the focused pet.
+
+===== Benefits =====
+
+* Bigger Pet Size?
+* +1 level (limited like the bonus levels from [[Spell Upgrade System|spell upgrades]])
+** This level may unlock new spells that the pet can cast.
+* +10 STR, STA, and AGI
+** Results in extra Attack (Offense)
+** Results in extra Armor (Evasion)
+* +1 Damage to pet's base melee damage
+* +290 Hit Points
+** This is the increase granted to an [[Invoke Death]] pet at spell Rank 0. It includes an increase from the pet's level (41 -> 42) and the +10 Stamina bonus. Different levels of pets summoned with different ranks of [[Invoke Death]] will always get a nice hit point boost, though the exact amount will vary based on Spell Rank and pet level.
 
 == [[Shaman]] Pets ==
 
