@@ -104,6 +104,12 @@ A page is a mob page only if its OWN text opens the template (indirect transclus
 - **Factions**: `* [[Faction]] <span class='profac'>(-30)</span>` under `|factions` (lowered by a
   kill); `<span class='oppfac'>(10)</span>` under `|opposing_factions` (raised). `* None` when known
   to be none (most pages), `(?)` when unknown.
+- **Item handed out by an NPC** (a quest container, a note): the giver goes in `|dropsfrom`, as a
+  drop does: a `[[Zone]]` line, a blank line, then `* [[NPC]] - Gives it to you when you ...`
+  (Klunga's Bracelet, Incomplete Blackbox, Stem of Candlestick). Not in `|notes` prose (155 of
+  4,066 Quest Items pages do that; 1,822 fill `dropsfrom`). The quest goes in `|relatedquests` as
+  `* [[Quest]]` (4,013 pages) only when its name is known, and the page carries
+  `[[Category:Quest Items]]`.
 - **Item soldby**: `{{ItemWhereTable|` + `{{ItemWhereRow | [[Zone]] | [[Vendor]] | | (x, y) }}` on
   1,243 of 1,278 pages that fill it. A page with one seller written as a bare `[[Zone]]` /
   `* [[Vendor]]` list is left as it is: the vendor's loc belongs on the vendor's mob page, and
