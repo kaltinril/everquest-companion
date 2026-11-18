@@ -18,7 +18,7 @@
 //! would put a hard-hitting mob among your group; a drill into a source's ability lanes is a
 //! different row shape with its own key space. Each gets its own source when its surface arrives.
 
-use fold::combat::views::LiveRow;
+use fold::combat::liverows::LiveRow;
 use protocol::cell::Cell;
 use protocol::generated::Cells;
 #[cfg(test)]

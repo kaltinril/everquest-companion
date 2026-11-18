@@ -24,7 +24,7 @@
 // `@shared/*` alias, and this module has its own test file (tests/meterScope.test.mts).
 import { effectiveScope, isScopedKind } from '../../../../shared/roster'
 import type { MeterScope, RosterSnap } from '@shared/roster'
-import type { HealSourceView, SourceView } from '@shared/combat'
+import type { HealSourceView, SegmentView, SourceView } from '@shared/combat'
 
 // The two row-id readers live beside the pet grouping, which pairs an ally pet with its charmer by
 // the same keys (shared/combatPetGroups.ts); re-exported here for this file's callers and tests.
@@ -79,6 +79,22 @@ export function scopeTotals(
   // eslint-disable-next-line eqc/no-domain-munging -- JOS-459 cutover ledger item 3: no served view source answers this yet, so the renderer still derives SourceView. Becomes a view descriptor when the source lands.
   const kept = scoped.reduce((n, r) => n + r.total, 0)
   return { total: kept, dps: total > 0 ? (dps * kept) / total : 0 }
+}
+
+/**
+ * THE HEADLINE RATE FOR A SCOPE (fork owner, 2026-11-17). A row's DPS is over its own attacking
+ * time (`SourceView.dps`), so under You the headline is your and your pets' damage over your own
+ * clock (`SegmentView.selfSec`), not your share of a fight you joined late. Group and Everyone
+ * keep `share`: their part of the fight's rate.
+ */
+export function scopeRate(
+  seg: Pick<SegmentView, 'selfSec'>,
+  scope: MeterScope,
+  roster: RosterSnap,
+  share: { total: number; dps: number }
+): number {
+  const own = seg.selfSec ?? 0
+  return effectiveScope(scope, roster) === 'you' && own > 0 ? share.total / Math.max(1, own) : share.dps
 }
 
 /**

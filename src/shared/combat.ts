@@ -335,7 +335,12 @@ export interface SourceView {
   name: string
   kind: SourceKind
   total: number
+  /** `total / ownSec`: this source's rate over its OWN attacking time, not over the fight it may
+   *  have joined late (fork owner, 2026-11-17). Rows therefore do not sum to the fight's rate. */
   dps: number
+  /** First swing to last swing (hits, misses, resists) in each fight, at least a second per fight,
+   *  summed over the fights the segment holds. Absent from a snapshot older than the field. */
+  ownSec?: number
   pct: number
   hits: number
   crits: number
@@ -379,6 +384,9 @@ export interface SegmentView {
   /** Sum of active combat time (gaps between consecutive attributed damage hits
    *  capped at 3s each — standard meter convention), in seconds. ≤ durationSec. */
   activeSec: number
+  /** Your and your pets' own attacking time taken together (the You scope's clock, see
+   *  `SourceView.ownSec`); 0 when none of you swung. Absent from an older snapshot. */
+  selfSec?: number
   outTotal: number
   outDps: number
   /** Outgoing damage ÷ activeSec — DPS while actually swinging (excludes idle gaps). */

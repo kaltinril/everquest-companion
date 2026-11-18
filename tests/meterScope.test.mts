@@ -19,9 +19,11 @@ import {
   memberKeyOf,
   scopeHealers,
   scopeHealing,
+  scopeRate,
   scopeSources,
   scopeTotals
 } from '../src/renderer/src/features/combat/meterScope'
+import { meterPanel, panelRate } from '../src/renderer/src/features/combat/petRows'
 import { EMPTY_ROSTER, type RosterSnap } from '../src/shared/roster'
 import type { HealSourceView, SourceView } from '../src/shared/combat'
 
@@ -142,6 +144,28 @@ test('the headline is re-summed from the rows that SURVIVED, never carried over'
   assert.equal(total, 1400, 'you + pet only')
   // dps rides the same denominator (the segment's own elapsed time), so the ratio is exact.
   assert.equal(dps, 140)
+})
+
+test('under You the headline rate is over your own clock, not your share of the fight', () => {
+  // Owner, 2026-11-17, measured on his log: a group-mate opened the fight 3 s before his first
+  // hit, so 7,247 damage read 426 DPS over the 17 s fight and is 518 over his own 14 s.
+  const share = { total: 7247, dps: 7247 / 17 }
+  const seg = { selfSec: 14 }
+  assert.equal(Math.round(scopeRate(seg, 'you', roster('malkil'), share)), 518)
+  // Group and Everyone keep their share of the fight's rate.
+  assert.equal(scopeRate(seg, 'group', roster('malkil'), share), share.dps)
+  assert.equal(scopeRate(seg, 'everyone', roster('malkil'), share), share.dps)
+  // A snapshot older than the field, or a fight you never swung in, keeps the share too.
+  assert.equal(scopeRate({}, 'you', roster('malkil'), share), share.dps)
+  assert.equal(scopeRate({ selfSec: 0 }, 'you', roster('malkil'), share), share.dps)
+})
+
+test('a drilled row headlines its own rate; level 1 keeps the scoped one', () => {
+  const malkil = { ...src('member:malkil', 'member', 7759), dps: 1940 }
+  const pet = { ...src('pet:fluffy#1', 'pet', 400), dps: 40 }
+  assert.equal(panelRate(meterPanel([malkil, pet], false, null), 1167), 1167)
+  // His bar said 1,940 (a four-second burst); the header over his drill says the same, not 456.
+  assert.equal(panelRate(meterPanel([malkil, pet], false, { entityId: malkil.id }), 1167), 1940)
 })
 
 test('an unfiltered list keeps the engine\'s own totals, to the bit', () => {
