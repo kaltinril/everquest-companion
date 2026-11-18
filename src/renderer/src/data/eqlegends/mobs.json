@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-18T04:53:22.533Z",
+  "scrapedAt": "2026-11-18T07:57:57.360Z",
   "source": "eqlwiki.com — Category:NPCs/Named Mobs/Merchants/Raid Encounters ∪ embeddedin Template:Namedmobpage/MerchantPage, filtered to pages opening a mob template + recentchanges delta (scripts/scrape-delta.mts)",
   "mobs": [
     {
@@ -35174,8 +35174,7 @@
       "image": "npc_a_krag_elder.png",
       "relatedQuests": [
         "Aviak Talons"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "A krag warrior",
@@ -92427,8 +92426,7 @@
       "image": "npc_brona_frugrin.png",
       "relatedQuests": [
         "The Telescope"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Bronin Higginsbot",
@@ -195314,6 +195312,22 @@
       "noImage": true
     },
     {
+      "page": "Metallurgist Mirakzin",
+      "eraTag": "Classic",
+      "name": "Metallurgist Mirakzin",
+      "level": "61",
+      "zones": [
+        "Steamfont Mountains"
+      ],
+      "loc": [
+        {
+          "ns": -1933,
+          "ew": 1394
+        }
+      ],
+      "image": "npc_metallurgist_mirakzin.png"
+    },
+    {
       "page": "Metha Wintersong",
       "name": "Metha Wintersong",
       "level": "30",
@@ -269859,8 +269873,7 @@
         "10",
         "10"
       ],
-      "image": "npc_winex_kloktik.png",
-      "noImage": true
+      "image": "npc_winex_kloktik.png"
     },
     {
       "page": "Winlar Tanner",
