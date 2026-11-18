@@ -778,6 +778,21 @@ where one exists.
   letters or digits and never makes a line of its own (`Place`, a button, became an unread line).
   Attach a cell by the OCR WORDS it covers, not the line box (`8 Quest` took the Class cell).
   Under tsx an arrow made inside a hot function costs an esbuild `__name` call each time (3x slower).
+- Font reader calibration (2026-11-17): the scale was judged on the ONE widest text cell, and when
+  that was the title bar (drawn with a shadow, fits no scale) the reader returned scale 0 and OCR read
+  the whole window: 45 of the owner's 154 kept item pictures, and Wu's Fist (long listed as "0.91").
+  Now the next widest cells lead in turn (`LEADS`), and a later lead's reading is used only when 3+
+  cells read exactly (`proven`). The widest cell's own answer is unchanged.
+- The title bar is a second reading at 1x only (`fontMerge.ts confirmedCells`): a cell fitting
+  0.02-0.35 whose box spans the OCR words under it, with no fewer letters and at most 3 slips, replaces
+  them (`Reincamalion` -> `Reincarnation`). Never at a fractional scale (Rickety Fishing Pole at 0.90
+  came back `Rickety' Fishing F'ole`). Title cells drop letters at `g`, `p`, `y`, so a title with one
+  is not corrected. The name line's leading icon junk of any length is dropped when the title names
+  the rest within 2 slips (`itemWindow.ts iconJunkDropped`: `wee, Token of Reincamation`).
+- Checking a reader change: read every kept picture with both trees and diff name, statsblock and
+  lore (the owner's picture folder `item/` plus `tests/fixtures/shots`; a script per tree that imports
+  `readItemShot` by file URL, ~3 min for 200 pictures). The 2026-11-17 run: 207 pictures, 159
+  identical, 31 the same page with the font now fitting, 16 better, 1 two-window fixture changed.
 - The existing screenshot tests keep the OCR-only path (it is the fallback and the non-Windows path);
   `tests/shotFontReader.test.mts` pins the font path: 0 wrong of 1,903 transcribed characters for the
   reader, font+OCR 4, OCR alone 42; every item fixture's page OCR's or better.

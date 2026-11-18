@@ -420,3 +420,16 @@ test('the catalog name list is each record name or page, then its other names, o
   ])
   assert.deepEqual(names, ['Vial of Halfling Blood', 'Halfling Blood', 'Bone Chips'])
 })
+
+// Owner, 2026-11-17: the token's icon was read as `wee,` in front of its name, four characters, so the
+// one-or-two-character rule kept it and the app asked whose window it was.
+test("THE ICON READ AS A LONGER TOKEN IS DROPPED WHEN THE TITLE BAR NAMES THE REST (wee, Token of Reincamation)", () => {
+  const window = (title: string, name: string): string[] => [title, '- Description Lore', name, 'No Trade', 'Class: ALL', 'Race: ALL', 'Size: TINY', 'Weight: 0.1']
+  assert.equal(readItemWindow(window('Token of Reincamation [ll [=', 'wee, Token of Reincamation')).name, 'Token of Reincamation')
+  // The title and the name line each read by OCR: a slip or two between them still names the rest.
+  assert.equal(readItemWindow(window('Token of Reincamation [ll [=', 'wee, Token of Reincarnation')).name, 'Token of Reincarnation')
+  // A name that starts with a word of its own keeps it: the title has it too.
+  assert.equal(readItemWindow(window('Small Bronze Girdle [ll [=', 'Small Bronze Girdle')).name, 'Small Bronze Girdle')
+  // No title read: nothing confirms the rest, so nothing is dropped.
+  assert.equal(readItemWindow(window('- [ll [=', 'wee, Token of Reincamation')).name, 'wee, Token of Reincamation')
+})
