@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-18T04:25:21.357Z",
+  "scrapedAt": "2026-11-18T04:53:22.533Z",
   "source": "eqlwiki.com — Category:NPCs/Named Mobs/Merchants/Raid Encounters ∪ embeddedin Template:Namedmobpage/MerchantPage, filtered to pages opening a mob template + recentchanges delta (scripts/scrape-delta.mts)",
   "mobs": [
     {
@@ -14882,8 +14882,7 @@
         "Air Tight Box Quest",
         "Bertoxxulous Symbol Quests",
         "Cazic Thule Initiate"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "A Feral Amalgam",
@@ -23041,6 +23040,25 @@
       "noImage": true
     },
     {
+      "page": "A giant yellow recluse",
+      "eraTag": "Classic",
+      "name": "a giant yellow recluse",
+      "level": "8-9",
+      "zones": [
+        "Steamfont Mountains"
+      ],
+      "drops": [
+        "Spider Legs"
+      ],
+      "loc": [
+        {
+          "ns": 301,
+          "ew": -1463
+        }
+      ],
+      "image": "npc_a_giant_yellow_recluse.png"
+    },
+    {
       "page": "A giant yellowjacket",
       "name": "a giant yellowjacket",
       "level": "7-8",
@@ -29583,6 +29601,59 @@
       "noImage": true
     },
     {
+      "page": "A Grikbar Kobold",
+      "eraTag": "Classic",
+      "name": "a grikbar kobold",
+      "level": "3-5",
+      "zones": [
+        "Steamfont Mountains"
+      ],
+      "drops": [
+        "Ale",
+        "Bead Necklace",
+        "Belt Pouch",
+        "Cloth Armor",
+        "Hematite",
+        "Iron Ration",
+        "Malachite",
+        "Mead",
+        "Ration",
+        "Silver Stud",
+        "Small Box",
+        "Small Cloth Armor",
+        "Steamfont Spring Water"
+      ],
+      "loc": [
+        {
+          "ns": -364,
+          "ew": 1682
+        }
+      ],
+      "image": "npc_a_grikbar_kobold.png"
+    },
+    {
+      "page": "A Grikbar Shaman",
+      "eraTag": "Classic",
+      "name": "a grikbar shaman",
+      "level": "4-5",
+      "zones": [
+        "Steamfont Mountains"
+      ],
+      "drops": [
+        "Cloth Armor",
+        "Rusty Weapons",
+        "Small Box",
+        "Steamfont Spring Water"
+      ],
+      "loc": [
+        {
+          "ns": -350,
+          "ew": 1685
+        }
+      ],
+      "image": "npc_a_grikbar_shaman.png"
+    },
+    {
       "page": "A Grinning Gargoyle",
       "name": "a grinning gargoyle",
       "level": "24",
@@ -35107,6 +35178,35 @@
       "noImage": true
     },
     {
+      "page": "A krag warrior",
+      "eraTag": "Classic",
+      "name": "a krag warrior",
+      "level": "9-10",
+      "zones": [
+        "Steamfont Mountains"
+      ],
+      "drops": [
+        "Aviak Talon",
+        "Bronze Weapons",
+        "Rusty Weapons"
+      ],
+      "loc": [
+        {
+          "ns": 386,
+          "ew": 1835
+        }
+      ],
+      "factions": [
+        "Krag",
+        "Storm Guard"
+      ],
+      "factionAmounts": [
+        "-10",
+        "+"
+      ],
+      "image": "npc_a_krag_warrior.png"
+    },
+    {
       "page": "A krom zek spy",
       "eraTag": "Velious",
       "name": "a krom zek spy",
@@ -36161,6 +36261,22 @@
       ],
       "image": "npc_a_large_wooly_spider.png",
       "noImage": true
+    },
+    {
+      "page": "A large yellow recluse",
+      "eraTag": "Classic",
+      "name": "a large yellow recluse",
+      "level": "7",
+      "zones": [
+        "Steamfont Mountains"
+      ],
+      "loc": [
+        {
+          "ns": 969,
+          "ew": -251
+        }
+      ],
+      "image": "npc_a_large_yellow_recluse.png"
     },
     {
       "page": "A large yellowjacket",
@@ -45203,6 +45319,32 @@
       "commonDrops": [
         "Ruby"
       ]
+    },
+    {
+      "page": "A rebel clockwork",
+      "eraTag": "Classic",
+      "name": "a rebel clockwork",
+      "level": "8",
+      "zones": [
+        "Steamfont Mountains"
+      ],
+      "drops": [
+        "Mechanical Light Emitter",
+        "Saltpeter"
+      ],
+      "loc": [
+        {
+          "ns": 1476,
+          "ew": -1650
+        }
+      ],
+      "factions": [
+        "Defective Clockwork"
+      ],
+      "factionAmounts": [
+        "-2"
+      ],
+      "image": "npc_a_rebel_clockwork.png"
     },
     {
       "page": "A reconstructed justiciar",
@@ -134739,6 +134881,32 @@
       "noImage": true
     },
     {
+      "page": "Gorehorn",
+      "eraTag": "Classic",
+      "name": "Gorehorn",
+      "level": "14",
+      "zones": [
+        "Steamfont Mountains"
+      ],
+      "loc": [
+        {
+          "ns": 1575,
+          "ew": 1708
+        }
+      ],
+      "factions": [
+        "Meldrath",
+        "Gem Choppers",
+        "King Ak`Anon"
+      ],
+      "factionAmounts": [
+        "-5",
+        "+",
+        "7"
+      ],
+      "image": "npc_gorehorn.png"
+    },
+    {
       "page": "Gorenaire",
       "eraTag": "Kunark",
       "name": "Gorenaire",
@@ -156992,6 +157160,26 @@
       "noImage": true
     },
     {
+      "page": "Hector the highway bandit",
+      "eraTag": "Classic",
+      "name": "Hector the highway bandit",
+      "level": "13",
+      "zones": [
+        "Steamfont Mountains"
+      ],
+      "drops": [
+        "Fine Steel Weapons",
+        "Hector's Severed Head"
+      ],
+      "loc": [
+        {
+          "ns": -726,
+          "ew": 102
+        }
+      ],
+      "image": "npc_hector_the_highway_bandit.png"
+    },
+    {
       "page": "Hefax Tinmar",
       "name": "Hefax Tinmar",
       "level": "20",
@@ -166881,6 +167069,26 @@
         "Magician Epic Quest"
       ],
       "noImage": true
+    },
+    {
+      "page": "Jerald the highway bandit",
+      "eraTag": "Classic",
+      "name": "Jerald the highway bandit",
+      "level": "13",
+      "zones": [
+        "Steamfont Mountains"
+      ],
+      "drops": [
+        "Fine Steel Weapons",
+        "Jerald's Severed Head"
+      ],
+      "loc": [
+        {
+          "ns": -693,
+          "ew": 124
+        }
+      ],
+      "image": "npc_jerald_the_highway_bandit.png"
     },
     {
       "page": "Jerigozia",
@@ -201303,8 +201511,7 @@
       "image": "npc_nilit_druzlit.png",
       "relatedQuests": [
         "Gnomish Toy"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Nilit's contraption",
@@ -216226,6 +216433,26 @@
       "noImage": true
     },
     {
+      "page": "Renaldo the highway bandit",
+      "eraTag": "Classic",
+      "name": "Renaldo the highway bandit",
+      "level": "13",
+      "zones": [
+        "Steamfont Mountains"
+      ],
+      "drops": [
+        "Fine Steel Weapons",
+        "Renaldo's Severed Head"
+      ],
+      "loc": [
+        {
+          "ns": -677,
+          "ew": 103
+        }
+      ],
+      "image": "npc_renaldo_the_highway_bandit.png"
+    },
+    {
       "page": "Rendallen Ironforge",
       "eraTag": "Classic",
       "name": "Rendallen Ironforge",
@@ -217875,8 +218102,7 @@
       "factionAmounts": [
         "-"
       ],
-      "image": "npc_rogue_cleaner.png",
-      "noImage": true
+      "image": "npc_rogue_cleaner.png"
     },
     {
       "page": "Rogue Clockwork",
