@@ -26,6 +26,7 @@ test('an item page holds the banner, only the filled fields, the zone blocks and
       '{{Classic Era}}',
       '<onlyinclude>{{Itempage',
       '|itemname = Fire Beetle Eye',
+      '|lucy_img_ID = ',
       '|merchant_value = 2s 7c',
       '|statsblock = ',
       'Size:   WT: <br>',
@@ -56,7 +57,7 @@ test('a bought or crafted item says so; nothing seen leaves only the name and th
   // The blueprint's kinds, alphabetical (Help:Contents, Item Page Blueprint).
   assert.match(text, /\[\[Category:Player Crafted\]\]\n\[\[Category:Vendor Sold\]\]/)
   const bare = itemPage({ name: 'X', drops: [], soldBy: [], crafted: false })
-  assert.equal(bare, '{{Classic Era}}\n<onlyinclude>{{Itempage\n|itemname = X\n|statsblock = \nSize:   WT: <br>\nClass: <br>\nRace: <br>\n}}</onlyinclude>\n')
+  assert.equal(bare, '{{Classic Era}}\n<onlyinclude>{{Itempage\n|itemname = X\n|lucy_img_ID = \n|statsblock = \nSize:   WT: <br>\nClass: <br>\nRace: <br>\n}}</onlyinclude>\n')
 })
 
 // Review D1: the wiki's own `|soldby` on 1,243 of 1,278 pages. The rows below are copied byte for
@@ -301,6 +302,7 @@ test('a foraged, depot-stored, tradeskill item page lists the forage zones, the 
       '{{Classic Era}}',
       '<onlyinclude>{{Itempage',
       '|itemname = Gray Wolf Skull',
+      '|lucy_img_ID = ',
       '|statsblock = ',
       'Size:   WT: <br>',
       'Class: <br>',

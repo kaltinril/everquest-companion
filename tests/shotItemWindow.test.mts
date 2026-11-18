@@ -169,7 +169,9 @@ test('COPY WIKI PAGE: A SCREENSHOT FILLS lucy_img_ID, notes, statsblock IN THE O
   const at = order.map((l) => page.indexOf(l))
   assert.ok(at.every((i, k) => i >= 0 && (k === 0 || i > at[k - 1])), page)
   assert.ok(page.includes(ROBE_PAGE_STATS.join('\n')), page)
-  assert.ok(!itemPage(facts).includes('lucy_img_ID'))
+  // The line is always there, empty until the icon is known: without it the wiki draws the template's
+  // raw `{{{lucy_img_ID}}}` (owner, 2026-11-17: Hector's Severed Head).
+  assert.ok(itemPage(facts).includes('|itemname = Ruined Robe\n|lucy_img_ID = \n'))
   assert.ok(itemPage(facts).includes('Size:   WT: <br>'))
 })
 

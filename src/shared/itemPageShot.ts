@@ -54,7 +54,9 @@ export const baseStatsblock = (shot: ItemPageShot): string | undefined =>
 export function shotFields(shot: ItemPageShot, merchantValue: number | undefined): [string, string][] {
   const value = shot.valueCopper ?? merchantValue
   const fields: [string, string][] = []
-  if (shot.iconId !== undefined) fields.push(['lucy_img_ID', String(shot.iconId)])
+  // Always written, empty when the icon is not known: a page without the line draws the template's raw
+  // `[[File:item_{{{lucy_img_ID}}}.png]]` (owner, 2026-11-17; 11,754 of 11,756 item pages carry it, 23 empty).
+  fields.push(['lucy_img_ID', shot.iconId === undefined ? '' : String(shot.iconId)])
   if (value !== undefined) fields.push(['merchant_value', wikiCoin(value)])
   // The wiki's own marker for lore not yet transcribed (466 pages), so the page is listed with them.
   if (shot.lore) fields.push(['notes', `{{Item Lore|${shot.lore}}}`])

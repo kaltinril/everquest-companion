@@ -140,6 +140,24 @@ export function keptAfter(kept: ItemPageShot | undefined, r: ItemShotReply, kind
   return defined({ lore: kept?.lore, ...(checks.length === 0 ? {} : { checks }), ...(iconChoices.length === 0 ? {} : { iconChoices }), statsblock: r.read.statsblock, iconId: r.icons[0]?.id, valueCopper: r.read.valueCopper, focusEffect: r.read.focusEffect, loreTab: r.read.loreTab, tier: r.read.tier, baseStatsblock: r.read.baseStatsblock })
 }
 
+/** A kept picture to read again: the part it is filed as, and its file. */
+export interface KeptPart {
+  kind: 'window' | 'lore'
+  path: string
+}
+
+/**
+ * The row's kept pictures whose part has no reading (owner, 2026-11-17: "shouldn't it be loading the
+ * data from the screenshot it already has??"). The reading is kept in one app's own storage and the
+ * picture in a folder, so another install, or a cleared store, holds the file alone. The window first.
+ */
+export function partsToRead(kept: ItemPageShot | undefined, pictures: { window?: string | undefined; lore?: string | undefined }): KeptPart[] {
+  const parts: KeptPart[] = []
+  if (pictures.window !== undefined && !hasWindowPart(kept)) parts.push({ kind: 'window', path: pictures.window })
+  if (pictures.lore !== undefined && kept?.lore === undefined) parts.push({ kind: 'lore', path: pictures.lore })
+  return parts
+}
+
 /** One part cleared; null when nothing is left to keep. */
 export function cleared(kept: ItemPageShot, part: 'window' | 'lore'): ItemPageShot | null {
   const next: ItemPageShot = part === 'lore' ? defined({ ...kept, lore: undefined }) : defined({ lore: kept.lore })
