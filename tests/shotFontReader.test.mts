@@ -192,8 +192,17 @@ test('THE PROOF OF CONCEPT HOLDS: THE FONT READER READS 0 WRONG OF 1,903 CHARACT
   assert.ok(sum.merged <= 5 && sum.ocr >= 30, JSON.stringify(sum))
 })
 
-test('A UI SCALE THE FONT DOES NOT FIT (WU’S FIST AT 0.91, THE MUMMY WINDOWS AT 1.24-1.30): NO CELL, OCR READS IT ALONE', { skip: NO_GDI }, () => {
-  for (const file of ['wus-fist-of-mastery-10-augmented.png', 'petamorph-wand-mummy.png', 'petamorph-wand-mummy-lore.png']) {
+// Wu's Fist was listed here as a window at UI scale 0.91 that the font fits nowhere. It is at 1x: its
+// widest cell misled the calibration, and with the next widest leading it reads exactly (2026-11-17).
+test('WU’S FIST READS AT 1x ONCE ITS WIDEST CELL NO LONGER DECIDES ALONE', { skip: NO_GDI }, () => {
+  const r = readFont(readPng(join(SHOTS, 'wus-fist-of-mastery-10-augmented.png')), atlas!)
+  assert.equal(r.scale, 1)
+  const exact = exactCells(r).map((c) => c.text)
+  for (const text of ["Wu's Fist of Mastery +10", 'Class: MNK', 'Base Dmg:', 'Delay:', 'Hand to Hand', 'Combat Effect: Lifebite']) assert.ok(exact.includes(text), `${text}: ${JSON.stringify(exact)}`)
+})
+
+test('A UI SCALE THE FONT DOES NOT FIT (THE MUMMY WINDOWS AT 1.24-1.30): NO CELL, OCR READS IT ALONE', { skip: NO_GDI }, () => {
+  for (const file of ['petamorph-wand-mummy.png', 'petamorph-wand-mummy-lore.png']) {
     const r = readFont(readPng(join(SHOTS, file)), atlas!)
     assert.deepEqual([r.scale, r.cells.length], [0, 0], file)
   }
@@ -238,3 +247,49 @@ for (const file of ITEM_FIXTURES) {
     }
   })
 }
+
+// Owner, 2026-11-17: Token of Reincarnation's window asked "This is wee, Token of Reincamation's item
+// window, not Token of Reincarnation's." Its title bar is its widest text, so the font reader found no
+// scale and OCR read the window alone: the icon as `wee,`, `rn` as `m`. Its Lore tab's title read
+// `Reincamalion`. The pictures are the owner's own, as the app kept them.
+test('A WINDOW WHOSE TITLE BAR IS ITS WIDEST TEXT IS STILL READ IN THE GAME’S FONT (TOKEN OF REINCARNATION)', { skip: NO_GDI }, async () => {
+  const r = readFont(readPng(join(SHOTS, 'token-of-reincarnation.png')), atlas!)
+  assert.equal(r.scale, 1)
+  const exact = exactCells(r).map((c) => c.text)
+  for (const text of ['Token of Reincarnation', 'No Trade', 'Class: ALL', 'Race: ALL']) assert.ok(exact.includes(text), `${text}: ${JSON.stringify(exact)}`)
+  const shot = await read('token-of-reincarnation.png', true)
+  assert.equal(shot.read.name, 'Token of Reincarnation', JSON.stringify(shot.lines))
+  assert.match(shot.read.statsblock, /No Trade<br>\nSize: TINY WT: 0\.1<br>\nClass: ALL<br>\nRace: ALL<br>/)
+})
+
+test('THE TITLE BAR IS A SECOND READING: WHERE OCR’S WORDS CONFIRM IT, ITS LETTERS STAND (A LORE TAB’S NAME)', { skip: NO_GDI }, async () => {
+  const shot = await read('token-of-reincarnation-lore.png', true)
+  assert.equal(shot.read.name, 'Token of Reincarnation', JSON.stringify(shot.lines))
+  assert.equal(shot.read.lore, 'Permits reincarnation on the Loadout Window')
+  // OCR alone, as it was: the slips the font corrects.
+  assert.equal((await read('token-of-reincarnation-lore.png', false)).read.name, 'Token of Reincamalion')
+})
+
+test('A NEAR CELL THAT COVERS PART OF A WORD IS NOT TAKEN: THE TITLE BAR’S CELLS BREAK AT g, p AND y', () => {
+  // `Earrin` over OCR's `Earring`: the cell ends a letter short, so OCR's word stays.
+  const lines = [ocrLine([['Earring', 40, 46], ['of', 90, 12], ['Experimentation', 106, 96]])]
+  const part = mergeFont(lines, fontRead([cell('Earrin', 40, 40, { fit: 0.28 })]), counts)
+  assert.equal(part[0].text, 'Earring of Experimentation')
+  // The whole stretch, a few letters apart: the font's letters stand.
+  const whole = [ocrLine([['Token', 50, 34], ['of', 88, 12], ['Reincamalion', 104, 72], ['=', 190, 8]])]
+  assert.equal(mergeFont(whole, fontRead([cell('Token of Reincarnation', 50, 126, { fit: 0.26 })]), counts)[0].text, 'Token of Reincarnation =')
+  // Art that fits nothing, and a near cell OCR does not confirm, change nothing.
+  assert.equal(mergeFont(whole, fontRead([cell('Token of Reincarnation', 50, 126, { fit: 0.6 })]), counts)[0].text, 'Token of Reincamalion =')
+  assert.equal(mergeFont(whole, fontRead([cell('Staff of the Wheel xx', 50, 126, { fit: 0.26 })]), counts)[0].text, 'Token of Reincamalion =')
+})
+
+// The 205-picture comparison (2026-11-17) caught this one: at a fractional UI scale a near cell's
+// letters are not the game's, and the title-bar check must not run.
+test('AT A FRACTIONAL SCALE THE TITLE BAR IS NOT A SECOND READING (RICKETY FISHING POLE AT 0.90)', { skip: NO_GDI }, async () => {
+  const r = readFont(readPng(join(SHOTS, 'rickety-fishing-pole.png')), atlas!)
+  assert.ok(r.scale > 0 && r.scale < 1, String(r.scale))
+  const [withIt, ocr] = [await read('rickety-fishing-pole.png', true), await read('rickety-fishing-pole.png', false)]
+  assert.equal(withIt.read.name, 'Rickety Fishing Pole')
+  assert.equal(withIt.read.name, ocr.read.name)
+  assert.match(withIt.read.statsblock, /Slot: PRIMARY<br>/)
+})

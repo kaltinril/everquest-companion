@@ -82,9 +82,66 @@ function replaced(line: OcrLine, cells: readonly OcrWord[]): OcrLine {
   return { ...line, text: words.map((w) => w.text).join(' '), words }
 }
 
+/**
+ * A cell this near is a second reading of its text, not an exact one. Measured on the fixtures
+ * (2026-11-17): the title bar, drawn with a shadow, fits 0.24-0.30 and its letters were right on every
+ * one; art and other fonts fit 0.6 and up.
+ */
+export const NEAR_FIT = 0.35
+/** Letters or digits a near cell needs, and the slips allowed between it and OCR's words under it. */
+const NEAR_MIN = 8
+const NEAR_SLIPS = 3
+
+const lettersOf = (s: string): string => s.toLowerCase().replace(/[^a-z0-9]/g, '')
+
+function slips(a: string, b: string): number {
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j)
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i]
+    for (let j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1))
+    prev = cur
+  }
+  return prev[b.length]
+}
+
+/**
+ * The near cells that OCR's own words confirm (owner, 2026-11-17: "use them both as validation"):
+ * the cell spans the same stretch as the OCR words under it, and the two readings differ by a few
+ * letters at most (`Reincamalion` under the font's `Reincarnation`). Two readers that agree this far
+ * read one text, and the font's letters are the game's own. A cell that covers part of a word (the
+ * title bar's cells break at `g`, `p` and `y`: `Earrin`, `erimentation`) spans less and is left out.
+ */
+export function confirmedCells(lines: readonly OcrLine[], read: FontRead): { line: number; cell: FontCell }[] {
+  const out: { line: number; cell: FontCell }[] = []
+  // At 1x only. At a fractional scale a near cell's letters are not the game's: the owner's Rickety
+  // Fishing Pole (0.8955) came back `Rickety' Fishing F'ole` over OCR's correct name (2026-11-17, the
+  // 205-picture comparison).
+  if (read.scale !== 1) return out
+  for (const c of read.cells) {
+    const letters = lettersOf(c.text)
+    if (c.fit <= EXACT_FIT || c.fit > NEAR_FIT || letters.length < NEAR_MIN) continue
+    const i = lineUnder(lines, c.box)
+    const under = i < 0 ? [] : (lines[i].words ?? []).filter((w) => overlap(w.box.x, w.box.x + w.box.w, c.box.x, c.box.x + c.box.w) > COVERED * w.box.w)
+    if (under.length === 0) continue
+    const x0 = Math.min(...under.map((w) => w.box.x))
+    const x1 = Math.max(...under.map((w) => w.box.x + w.box.w))
+    // Half a line's height either side: under a letter's width.
+    const reach = Math.max(3, c.box.h * 0.5)
+    if (Math.abs(x0 - c.box.x) > reach || Math.abs(x1 - (c.box.x + c.box.w)) > reach) continue
+    // A cell's box is its whole word even where a letter under it was not decoded (`erimentation`
+    // over `Experimentation`): the font's text never has fewer letters than OCR's when it is whole.
+    const ocr = lettersOf(under.map((w) => w.text).join(''))
+    if (letters.length >= ocr.length && slips(letters, ocr) <= NEAR_SLIPS) out.push({ line: i, cell: c })
+  }
+  return out
+}
+
 /** OCR's lines, in OCR's order, with the font reader's exact cells in place of what OCR read there. */
 export function mergeFont(lines: readonly OcrLine[], read: FontRead, counts: ReadonlyMap<string, number>): OcrLine[] {
   const byLine = new Map<number, OcrWord[]>()
+  for (const { line, cell } of confirmedCells(lines, read)) {
+    byLine.set(line, [...(byLine.get(line) ?? []), { text: resolveIl(cell.text.replace(/\s+/g, ' '), counts), box: cell.box }])
+  }
   for (const c of exactCells(read)) {
     const word = { text: resolveIl(c.text.replace(/\s+/g, ' '), counts), box: c.box }
     const under = lineUnder(lines, c.box)

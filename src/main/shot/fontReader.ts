@@ -41,8 +41,16 @@ function calibration(L: Layout): CellAt[] {
     const med = hs[hs.length >> 1]
     return cell.pieces.length >= 2 && med >= 6 * s0 && med <= 14 * s0 && line.y1 - line.y0 + 1 <= 18 * s0
   })
-  return [...(texty.length > 0 ? texty : all)].sort((a, b) => b.cell.x1 - b.cell.x0 - (a.cell.x1 - a.cell.x0)).slice(0, 2)
+  return [...(texty.length > 0 ? texty : all)].sort((a, b) => b.cell.x1 - b.cell.x0 - (a.cell.x1 - a.cell.x0)).slice(0, LEADS + 1)
 }
+
+/**
+ * How many of the widest cells may lead the calibration, each with the next widest beside it. The
+ * widest can be the title bar, which is drawn with a shadow and fits no scale: the reader then gave
+ * up on the whole window and OCR read it alone (owner's Token of Reincarnation, 2026-11-17: a short
+ * item window whose title is its widest text). A window whose widest cell fits is read as before.
+ */
+const LEADS = 4
 
 type Judged = ScaleFit & { n: number }
 
@@ -124,18 +132,38 @@ function readCells(L: Layout, tpl: Templates, grid: { ox: number; oy: number } |
   return out
 }
 
+/** A cell read exactly (fontMerge.ts `EXACT_FIT`), with a few letters or digits in it. */
+const READS = 0.02
+
+/** A later lead's reading is the font's when this many cells read exactly. */
+const PROOF = 3
+
+function proven(cells: readonly FontCell[]): boolean {
+  let n = 0
+  for (const c of cells) if (c.fit <= READS && (c.text.match(/[A-Za-z0-9]/g) ?? []).length >= 3) n++
+  return n >= PROOF
+}
+
 /** Every text cell of the picture, read against the atlas, with its fit. */
 export function readFont(img: Rgba, atlas: FontAtlas): FontRead {
   const t0 = performance.now()
   const L = layout(img)
   // `I` and `l` are one bitmap: `l` stands for both.
   const chars = Object.keys(atlas.glyphs).filter((c) => c !== ' ' && c !== 'I')
-  const calib = calibration(L)
-  const fit = calib.length === 0 ? null : chooseScale(L, atlas, chars, calib)
+  // The widest cell leads, as it always has. When nothing fits it, the next widest lead in turn, and
+  // such a reading has to prove itself: a scale found on a narrower cell can be a false one (Wu's
+  // Fist at 0.91 read "at 1x" with no cell exact).
+  const leads = calibration(L)
+  for (let lead = 0; lead < Math.min(LEADS, leads.length); lead++) {
+    const calib = leads.slice(lead, lead + 2)
+    const fit = chooseScale(L, atlas, chars, calib)
+    if (fit === null) continue
+    const s = Math.abs(fit.s - 1) < 0.004 ? 1 : fit.s
+    const tpl = buildTemplates(atlas, s, chars, fit.filt)
+    const grid = Math.abs(s - 1) > 0.001 ? gridOrigin(L, tpl, calib) : null
+    const cells = readCells(L, tpl, grid)
+    if (lead === 0 || proven(cells)) return { scale: s, filter: fit.filt, cells, ms: Math.round(performance.now() - t0) }
+  }
   // Nothing in the font: no cells, and OCR reads the window alone.
-  if (fit === null) return { scale: 0, filter: 'bilinear', cells: [], ms: Math.round(performance.now() - t0) }
-  const s = Math.abs(fit.s - 1) < 0.004 ? 1 : fit.s
-  const tpl = buildTemplates(atlas, s, chars, fit.filt)
-  const grid = Math.abs(s - 1) > 0.001 ? gridOrigin(L, tpl, calib) : null
-  return { scale: s, filter: fit.filt, cells: readCells(L, tpl, grid), ms: Math.round(performance.now() - t0) }
+  return { scale: 0, filter: 'bilinear', cells: [], ms: Math.round(performance.now() - t0) }
 }

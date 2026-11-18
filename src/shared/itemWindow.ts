@@ -16,7 +16,7 @@ import { delevel, tierBarFraction } from './itemDelevel'
 import { effectText, petIllusionLine, petIllusionOf } from './itemEffects'
 import { bestLoreLine, withSplitCapital } from './itemLore'
 import { isTabRow, tabRowAt } from './itemTabRow'
-import { CLASS_CODES, codeWords, deityText, FLAG_WORDS, isDeityLine, RACE_CODES, SIZES, slotOf, snap, snapLabelWords, type Snapped } from './itemVocab'
+import { CLASS_CODES, codeWords, deityText, editDistance, FLAG_WORDS, isDeityLine, RACE_CODES, SIZES, slotOf, snap, snapLabelWords, type Snapped } from './itemVocab'
 export { slotOf } from './itemVocab'
 import { statValue, weaponValue, weightValue } from './itemWindowNumbers'
 export { weightValue } from './itemWindowNumbers'
@@ -502,19 +502,24 @@ export const withoutTier = (name: string): string => name.replace(TIER, '').trim
  * Betrayed`). A name that starts so itself (`5 Dose Potion of Cold`) keeps it: its title has it too.
  */
 function iconJunkDropped(name: string, above: readonly string[]): string {
-  const rest = name.replace(/^\S{1,2}\s+/, '')
-  if (rest === name) return name
   const norm = (s: string): string => withoutTier(s).toLowerCase().replace(/[^a-z0-9]/g, '')
   // The title bar's buttons are read onto its end (owner, 2026-10-24: `Jenni's Robe ZI]E<]` over the
   // robe's icon read `1`), so the title only has to start with the name; one that starts with the
   // token too names the item with it.
-  const [whole, bare] = [norm(name), norm(rest)]
+  const whole = norm(name)
   // Its minimize button can be read onto its front too (`B Crysta's Robe +4 ZI]`).
   const titles = above.flatMap((l) => {
     const t = bareTitle(cleanLine(l, true)) ?? ''
     return [norm(t), norm(t.replace(/^\S{1,2}\s+/, ''))]
   })
-  return titles.some((t) => t.startsWith(bare)) && !titles.some((t) => t.startsWith(whole)) ? rest : name
+  const short = name.replace(/^\S{1,2}\s+/, '')
+  if (short !== name) return titles.some((t) => t.startsWith(norm(short))) && !titles.some((t) => t.startsWith(whole)) ? short : name
+  // A longer token (owner, 2026-11-17: a token's icon read `wee,` before `Token of Reincamation`): the
+  // title has to name the rest, a slip or two allowed since OCR read both, and not the whole.
+  const rest = name.replace(/^\S+\s+/, '')
+  if (rest === name) return name
+  const names = (title: string, s: string): boolean => s.length >= 6 && editDistance(title.slice(0, s.length), s) <= 2
+  return titles.some((t) => names(t, norm(rest))) && !titles.some((t) => names(t, whole)) ? rest : name
 }
 
 /**
