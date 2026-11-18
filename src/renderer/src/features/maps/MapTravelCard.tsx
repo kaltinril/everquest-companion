@@ -268,10 +268,12 @@ function LandingRow({
     <Stack direction="row" spacing={0.75} alignItems="center" data-testid="map-travel-landing" data-hops={landing.path.length}>
       <CasterChip label="WIZ" ports={landing.wizard} />
       <CasterChip label="DRU" ports={landing.druid} />
-      <ItemChip ports={landing.items} onOpenItem={onOpenItem} />
-      <Typography variant="caption" component="span" color="text.secondary" noWrap sx={{ minWidth: 0 }} title={walkText(landing)}>
+      {/* Where it lands comes before the items and never shrinks: twelve item names once pushed
+          "lands in Misty Thicket" off the card's right edge (owner, 2026-11-17). */}
+      <Typography variant="caption" component="span" color="text.secondary" noWrap sx={{ flexShrink: 0 }} title={walkText(landing)}>
         <Walk landing={landing} onPick={onPick} />
       </Typography>
+      <ItemChip ports={landing.items} onOpenItem={onOpenItem} />
     </Stack>
   )
 }
