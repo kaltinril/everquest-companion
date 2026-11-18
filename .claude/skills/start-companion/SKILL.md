@@ -13,6 +13,12 @@ it with `powershell -ExecutionPolicy Bypass -File .\start_companion.ps1`.
 
 ## The procedure
 
+0. **The installed build is not running.** The dev app is not run beside it (owner, 2026-11-17:
+   "my installed version was running silly you can't run dev when its up"; a dev launch that day
+   came up, attached its engine, and was closed within a minute). Check for `EQ Legends Companion
+   TEST.exe` first; if it is up, do not launch and never close it: say so and ask the owner to quit
+   it (tray Quit) or to say when. The settings copy in step 2 can still be done while it runs.
+
 1. **Nothing is mid-merge in this clone.** `npm run dev` is `--watch`: a change under `src/main`
    relaunches Electron, so a merge or checkout here while it runs crashes the app on the owner.
    Finish merges first, or pass `-NoWatch`.

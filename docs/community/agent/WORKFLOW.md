@@ -41,6 +41,9 @@ disagree, RULES.md wins; fix this file.
 
 ## The user's machine
 
+- **The dev app is not launched while the installed build is running** (owner, 2026-11-17: "you
+  can't run dev when its up"). Check for `EQ Legends Companion TEST.exe` before a launch; if it is
+  up, ask the owner to quit it, never close it yourself (`start-companion` skill, step 0).
 - Never stop, kill or close the user's processes (game, the installed app, the dev app they are
   using) without asking. If a build target is locked, build to a fresh output dir
   (`npx electron-builder --win --dir -c.directories.output=release/dev`) and say where it is.
