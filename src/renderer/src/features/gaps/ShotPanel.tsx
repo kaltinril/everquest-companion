@@ -18,6 +18,7 @@ import type { ItemPageShot } from '@shared/wikiPage'
 import { partPicture } from '@shared/mobPicture'
 import { itemRowNamesNow, itemShotNow, keepPartPicture, setCapturedRead, setItemShot, useCapturedRead, useItemShots, type StoredShot } from './itemShotsStore'
 import { CheckChips, KeptPicture, Line, PasteZone, WrongItem } from './PasteZone'
+import { useKeptPictureRead } from './keptPictureRead'
 import SpellShot from './SpellShot'
 import MobPicture from './MobPicture'
 import QuestShot from './QuestShot'
@@ -185,6 +186,8 @@ function useCaptured(name: string, clear: () => void): { ask: Pending | null; re
 
 function ItemShot({ row }: { row: GapRow }): JSX.Element {
   const kept = useItemShots()[row.name]
+  // A kept picture with no reading (another install's paste) is read here, as a paste would be.
+  useKeptPictureRead(row.name)
   const [busy, setBusy] = useState(false)
   const [reply, setReply] = useState<ItemShotReply | null>(null)
   /** Why the last paste kept nothing, in words; null when it kept something. */

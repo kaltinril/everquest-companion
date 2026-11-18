@@ -4,7 +4,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { cleared, hasWindowPart, isItemShotRow, itemRowNames, keptAfter, nearNames, otherItemNote, sameItem, shotKind, shotProblem } from '../src/shared/itemShotKeep.ts'
+import { cleared, hasWindowPart, isItemShotRow, itemRowNames, keptAfter, nearNames, otherItemNote, partsToRead, sameItem, shotKind, shotProblem } from '../src/shared/itemShotKeep.ts'
 import type { GapRow } from '../src/shared/gaps.ts'
 import { gapJob } from '../src/shared/gapJob.ts'
 import { readItemWindow, type ItemShotReply } from '../src/shared/itemWindow.ts'
@@ -186,4 +186,19 @@ test('A FORAGE UPDATE ROW TAKES NO ITEM SCREENSHOT AND NO CAPTURE IS FILED ON IT
   assert.equal(isItemShotRow(row('Rat Ear')), true)
   assert.equal(isItemShotRow(update), false)
   assert.deepEqual(itemRowNames([row('Rat Ear'), update]), ['Rat Ear'])
+})
+
+// Owner, 2026-11-17: a row showed its kept item window beside "stats needed" (the reading was in
+// another install's storage). A kept picture whose part has no reading is read again.
+test('A KEPT PICTURE WITH NO READING FOR ITS PART IS READ AGAIN: THE WINDOW FIRST, THEN THE LORE', () => {
+  const both = { window: 'C:/p/item_x.png', lore: 'C:/p/item_x_lore.png' }
+  assert.deepEqual(partsToRead(undefined, both), [
+    { kind: 'window', path: 'C:/p/item_x.png' },
+    { kind: 'lore', path: 'C:/p/item_x_lore.png' }
+  ])
+  assert.deepEqual(partsToRead({ statsblock: 's', iconId: 1 }, both), [{ kind: 'lore', path: 'C:/p/item_x_lore.png' }])
+  assert.deepEqual(partsToRead({ lore: 'L' }, both), [{ kind: 'window', path: 'C:/p/item_x.png' }])
+  assert.deepEqual(partsToRead({ statsblock: 's', lore: 'L' }, both), [])
+  assert.deepEqual(partsToRead(undefined, {}), [], 'no picture, nothing to read')
+  assert.deepEqual(partsToRead(undefined, { lore: 'C:/p/item_x_lore.png' }), [{ kind: 'lore', path: 'C:/p/item_x_lore.png' }])
 })
