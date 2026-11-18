@@ -12,8 +12,9 @@
 // meter is showing everybody (law 1's fallback), and moving the control away must not take that
 // explanation with it.
 //
-// THE WORD IS CLICKABLE AGAIN, ON THIS TAB ONLY (fork owner, 2026-11-16: a "mine only" on the
-// Combat tab). A click steps You, Group, Everyone and writes the TAB'S OWN pick (owner,
+// IT IS A CONTROL AGAIN, ON THIS TAB ONLY (fork owner, 2026-11-16: a "mine only" on the Combat
+// tab). Three buttons, You / Group / Everyone, the chosen one lit (owner, 2026-11-17: a single
+// word that cycled on click was "not obvious"). A press writes the TAB'S OWN pick (owner,
 // 2026-11-17: "thats only for the combat tab, not the overlay"), so the Overview card and the
 // overlays stay on what Preferences > Combat holds; the overlays still carry no control.
 //
@@ -37,13 +38,14 @@ import { useState } from 'react'
 import {
   Box,
   Button,
-  Chip,
   ClickAwayListener,
   IconButton,
   Paper,
   Popper,
   Stack,
   TextField,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
@@ -51,11 +53,13 @@ import GroupIcon from '@mui/icons-material/Group'
 import { Tooltip } from '../../lib/Tooltip'
 import { formatDate } from '../../lib/formatDate'
 import { useCombatTabScope } from './useCombatPrefs'
+import { segmented } from './segmented'
 import {
+  METER_SCOPES,
   SCOPE_HINT,
+  SCOPE_LABEL,
   SOURCE_LABEL,
   chipLabel,
-  nextScope,
   type MeterScope,
   type RosterMember,
   type RosterSnap
@@ -169,8 +173,8 @@ function RosterPanel({
 }
 
 /**
- * The readout itself: the scope this meter is filtering by, with the group icon beside it opening
- * the roster. A click on the word steps to the next scope. The roster button is its own control —
+ * The scope switch: the three scopes with this tab's one lit, and the group icon beside it opening
+ * the roster. The roster button is its own control —
  * it is the only place a mis-inferred group can be corrected, and correcting it is a different act
  * from choosing a scope.
  */
@@ -183,7 +187,9 @@ export function ScopeStatus({
 }): React.JSX.Element {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null)
   const [, setScope] = useCombatTabScope()
-  const add = (name: string): void => {
+  // `chipLabel` is the one place the fallback wording is decided (shared/roster.ts).
+  const fallback = chipLabel(scope, roster) !== SCOPE_LABEL[scope]
+  const add =(name: string): void => {
     void window.eq.setRosterEdit({ name, action: 'add' })
   }
   const remove = (name: string): void => {
@@ -192,24 +198,39 @@ export function ScopeStatus({
 
   return (
     <>
-      <Tooltip title={`${SCOPE_HINT[scope]}. Click to change it for this tab.`}>
-        <Chip
-          size="small"
-          data-testid="meter-scope-label"
-          label={chipLabel(scope, roster)}
-          onClick={() => setScope(nextScope(scope))}
-          // `minWidth: 0` is what lets this chip ELLIPSIZE instead of pushing the lens line past
-          // its box. The label is world-state text of unbounded length — "Group" is 50px, but the
-          // law-1 fallback spells itself out ("Group (no roster yet)") and measures 121px — and a
-          // flex item's default `min-width: auto` refuses to shrink below its content, so the
-          // extra 70px came straight off the end of a bar whose whole contract is that nothing in
-          // it is cut off. MEASURED 2026-08-06 against the committed e2e fixture (which carries no
-          // group lines, so the fallback label is what it always renders): the header overflowed
-          // by 30px at a 720px window. The Chip's own label already ellipsizes; it only ever
-          // needed permission to be narrower than its text.
-          sx={{ height: 20, fontSize: 11, fontWeight: 600, borderRadius: 1, minWidth: 0 }}
-        />
-      </Tooltip>
+      {/* THREE BUTTONS, the chosen one lit (fork owner, 2026-11-17: one word you had to know to
+          click was "not obvious that it's a 3 way toggle"). The tab's other switches wear the
+          same chrome (segmented.ts), so it reads as a switch at a glance. */}
+      <ToggleButtonGroup
+        size="small"
+        exclusive
+        value={scope}
+        data-testid="meter-scope"
+        title={`${SCOPE_HINT[scope]}. This tab only.`}
+        // `exclusive` hands back null when the lit button is pressed; scope has no "off".
+        onChange={(_e: unknown, v: MeterScope | null) => v && setScope(v)}
+        sx={segmented('quiet')}
+      >
+        {METER_SCOPES.map((s) => (
+          <ToggleButton key={s} value={s} data-testid={`meter-scope-${s}`}>
+            {s === scope ? <span data-testid="meter-scope-label">{SCOPE_LABEL[s]}</span> : SCOPE_LABEL[s]}
+          </ToggleButton>
+        ))}
+      </ToggleButtonGroup>
+      {/* Law 1's fallback, said where the rows are: Group with no roster shows everybody. Its own
+          shrinking caption, not button text: the lens line never wraps, and a 121px label inside a
+          button that cannot shrink once pushed this bar 30px past a 720px window (2026-08-06). */}
+      {fallback && (
+        <Typography
+          variant="caption"
+          noWrap
+          data-testid="meter-scope-note"
+          title="No group signal yet, so Group shows everyone"
+          sx={{ minWidth: 0, color: 'text.secondary' }}
+        >
+          (no roster yet)
+        </Typography>
+      )}
       <Tooltip title="Who the app thinks is in your group, and why">
         <IconButton
           size="small"
