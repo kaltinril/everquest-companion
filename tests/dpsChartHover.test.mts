@@ -163,6 +163,22 @@ test('the hover dot rides the DRAWN polyline, vertex for vertex', () => {
   })
 })
 
+test('with the pet drawn apart the dot rides the you line, not the old sum', () => {
+  const series: DpsSeries = {
+    ...mkSeries(RATES),
+    pet: Float64Array.from(RATES.map((v) => v * 2)),
+    hasPet: true,
+    petApart: true
+  }
+  const chart = buildDpsChart(series, false)
+  assert.ok(chart, 'the fixture must produce a drawable chart')
+  parsePts(chart.outLine).forEach((p, k) => {
+    const y = curveYAtUserX(chart, series, p.x)
+    assert.ok(Math.abs(y - p.y) < 0.5, `vertex ${k} must sit on the line (got ${y}, drawn ${p.y})`)
+    assert.ok(Math.abs(y - yAt(chart.yMax, RATES[k])) < 0.5, `vertex ${k} is your own rate`)
+  })
+})
+
 test('between two vertices the dot follows the segment the SVG paints', () => {
   const chart = mkChart(RATES)
   const pts = parsePts(chart.outLine)
