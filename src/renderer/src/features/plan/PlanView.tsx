@@ -83,24 +83,7 @@ import { CURRENT_ERA_LABEL, useEraOnly } from '../planner/plannerData'
 import type { MobTarget } from '../mobs/mobTarget'
 import PlanBracketCard from './PlanBracketCard'
 import { useOwnedUpgrades, usePlanCorpora, usePlanRoute, usePlanWishes } from './planData'
-import { planBlurb } from './planBlurb'
-
-/** What each role is CALLED. A `Record` so an eleventh role is a type error here (the `VIEW_LABELS` trick). */
-const ROLE_LABEL: Record<GearRole, string> = {
-  balanced: 'Balanced',
-  tank: 'Tank',
-  healer: 'Healer',
-  // "(any)" rather than a bare "DPS", because four of the entries below are also DPS. This is the
-  // one that constrains no weapon slot, and the label has to say which of the five it is.
-  dps: 'DPS (any)',
-  dps1h: '1H DPS',
-  dps2h: '2H DPS',
-  dualwield: 'Dual wield',
-  // The fifth build (owner, 2026-08-22): bows and throwing, from the RANGE slot.
-  range: 'Ranged',
-  dd: 'Caster DD',
-  dot: 'Caster DoT'
-}
+import { ROLE_LABEL, planBlurb } from './planBlurb'
 
 /** …and the two reaches, whose words are the gate they open (`progressionPlan` SOLO/GROUP_GATE). */
 const REACH_LABEL: Record<PlanReach, string> = {
