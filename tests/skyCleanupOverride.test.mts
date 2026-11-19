@@ -85,14 +85,16 @@ test('loot after a statement of 0 brings the row back with that count', () => {
   assert.equal(rows[0].quantity, 2)
 })
 
-test('a statement of 2 is the count the row reads, under both and under handins', () => {
+test('a statement of 1 is the count the row reads, under both and under handins', () => {
   const [row] = rowsFor()
-  const overrides = itemOverridesByKey(statedFrom(row, 2))
+  const overrides = itemOverridesByKey(statedFrom(row, 1))
+  const logOnly = { held: { [skin]: 5 }, givenTo: {} }
   for (const countSource of ['both', 'handins'] as const) {
-    // A handins fold that disagrees, so the statement is what answers.
-    const rows = rowsFor({ countSource, overrides, logOnly: { held: { [skin]: 5 }, givenTo: {} } })
+    // Neither source answers 1 unstated, so the statement is what answers.
+    assert.notEqual(rowsFor({ countSource, logOnly })[0].quantity, 1, countSource)
+    const rows = rowsFor({ countSource, overrides, logOnly })
     assert.equal(rows.length, 1, countSource)
-    assert.equal(rows[0].quantity, 2, countSource)
+    assert.equal(rows[0].quantity, 1, countSource)
   }
 })
 
