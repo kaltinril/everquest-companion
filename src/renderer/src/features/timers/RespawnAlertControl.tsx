@@ -13,7 +13,7 @@ export function RespawnAlertControl(): JSX.Element {
   const [draft, setDraft] = useState<string | null>(null)
   return (
     <Stack direction="row" spacing={1} alignItems="center">
-      <Tooltip title="Fires the Alerts tab's Respawn timer ending alert for every watched mob.">
+      <Tooltip title="Fires the Alerts tab's Respawn timer ending alert for watched mobs in your zone.">
         <FormControlLabel
           sx={{ mr: 0 }}
           control={

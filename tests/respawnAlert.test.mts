@@ -77,6 +77,8 @@ test('nothing for a row seen up, with no estimate, in another zone, in a dungeon
   assert.deepEqual(win('Lake Nerius', [row('Lake Nerius', BASE, { seenTs: BASE + 60_000, seenVia: 'consider' })]), [])
   assert.deepEqual(win('Lake Nerius', [row('Lake Nerius', BASE, { estimateMs: undefined, source: 'none' })]), [])
   assert.deepEqual(win('Befallen', [row('Lake Nerius', BASE)]), [])
+  // Standing elsewhere silences only the other zone's clock, not the one in the zone you are in.
+  assert.deepEqual(win('Befallen', [row('Lake Nerius', BASE), row('Befallen', BASE)]), [`befallen::enynti@${String(BASE)}`])
   const crawl = "Nagafen's Lair - Group 4 (Refined)"
   assert.deepEqual(win(crawl, [row(crawl, BASE)]), [])
   assert.deepEqual(win("Nagafen's Lair", [row(crawl, BASE)]), [])
