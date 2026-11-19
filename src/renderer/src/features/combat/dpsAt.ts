@@ -7,8 +7,8 @@
 
 import type { DpsSeries } from './dashboardData'
 
-/** The rates a hover readout prints. `out` is the outgoing total (you + pet + group) — the value
- *  the curve's gold line draws. */
+/** The rates a hover readout prints. `out` is the outgoing total (`outRate`) — the value the
+ *  curve's gold line draws. */
 export interface DpsPoint {
   you: number
   pet: number
@@ -16,6 +16,22 @@ export interface DpsPoint {
   group: number
   inc: number
   out: number
+}
+
+/** The gold line's rate at bucket `i`: you + pet + group, or without the pet when it is drawn apart. */
+export function outRate(series: DpsSeries, i: number): number {
+  return series.you[i] + (series.petApart ? 0 : series.pet[i]) + series.group[i]
+}
+
+/** The gold line's name: exactly what `outRate` sums, for the legend and the hover alike. */
+export function outLabel(series: DpsSeries): string {
+  return `you${series.petApart ? '' : ' + pet'}${series.hasGroup ? ' + group' : ''}`
+}
+
+/** The series the card draws under a pet layout. Not apart hands back the SAME object, so the
+ *  memo chain behind it never re-derives; apart is a shallow copy sharing the typed arrays. */
+export function withPetApart(series: DpsSeries, apart: boolean): DpsSeries {
+  return apart ? { ...series, petApart: true } : series
 }
 
 /**
@@ -28,7 +44,7 @@ export function dpsAt(series: DpsSeries, tMs: number): DpsPoint {
   const you = series.you[i]
   const pet = series.pet[i]
   const group = series.group[i]
-  return { you, pet, group, inc: series.inc[i], out: you + pet + group }
+  return { you, pet, group, inc: series.inc[i], out: outRate(series, i) }
 }
 
 /**

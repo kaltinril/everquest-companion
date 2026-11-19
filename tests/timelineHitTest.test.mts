@@ -150,6 +150,12 @@ test('the OUTGOING readout counts your group, so the curve and the tooltip agree
   assert.deepEqual(dpsAt(s, 99_000), { you: 40, pet: 4, group: 8, inc: 5, out: 52 })
 })
 
+test('with the pet drawn apart the OUTGOING readout leaves the pet out and still reports it', () => {
+  const s = series({ group: Float64Array.from([5, 6, 7, 8]), hasGroup: true, petApart: true })
+  assert.deepEqual(dpsAt(s, 0), { you: 10, pet: 1, group: 5, inc: 0, out: 15 })
+  assert.deepEqual(dpsAt(s, 99_000), { you: 40, pet: 4, group: 8, inc: 5, out: 48 })
+})
+
 test('rollingNote states the series own window, and marks an inexact ring', () => {
   assert.equal(rollingNote(series()), '5s rolling')
   assert.equal(rollingNote(series({ smoothMs: 3000 })), '3s rolling')

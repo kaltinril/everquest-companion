@@ -19,7 +19,7 @@ import { rafThrottle } from '../../lib/rafThrottle'
 import type { ChartLineKey } from './combatPrefs'
 import { KIND_COLOR } from './combatShared'
 import type { DpsSeries } from './dashboardData'
-import { dpsAt, rollingNote } from './dpsAt'
+import { dpsAt, outLabel, rollingNote } from './dpsAt'
 import {
   CHART_H,
   CHART_W,
@@ -88,10 +88,9 @@ function sameHit(a: Hit, b: Hit): boolean {
 function dpsRows(series: DpsSeries, t: number, hidden: readonly ChartLineKey[]): TooltipRow[] {
   const p = dpsAt(series, t)
   const a = series.estimated ? '~' : ''
-  const outLabel = series.hasGroup ? 'you + pet + group' : 'you + pet'
   const shown = (k: ChartLineKey, has: boolean): boolean => has && !hidden.includes(k)
   const rows: TooltipRow[] = []
-  if (shown('out', true)) rows.push({ label: outLabel, value: `${a}${formatRate(p.out)}`, color: KIND_COLOR.you })
+  if (shown('out', true)) rows.push({ label: outLabel(series), value: `${a}${formatRate(p.out)}`, color: KIND_COLOR.you })
   if (shown('pet', series.hasPet)) rows.push({ label: 'pet', value: `${a}${formatRate(p.pet)}`, color: KIND_COLOR.pet })
   if (shown('group', series.hasGroup))
     rows.push({ label: 'group', value: `${a}${formatRate(p.group)}`, color: KIND_COLOR.member })

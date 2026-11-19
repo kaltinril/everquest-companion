@@ -22,6 +22,7 @@ import { formatRate } from '../../lib/formatRate'
 import type { ChartLineKey, DpsLineKey } from './combatPrefs'
 import { ApproxChip, DashCard, QuietNote, fmtDur } from './combatShared'
 import { approxNote, buildDpsSeries, type DpsSeries } from './dashboardData'
+import { outLabel, withPetApart } from './dpsAt'
 import {
   CHART_H,
   CHART_W,
@@ -37,7 +38,7 @@ import {
 import { DpsCurveHoverLayer, type CurveHoverHandle } from './DpsCurveHoverLayer'
 import { MARKER_COLOR, MARKER_WORD } from './markerStyle'
 import { Tooltip } from '../../lib/Tooltip'
-import { useHiddenChartLines } from './useCombatPrefs'
+import { useHiddenChartLines, usePetLayout } from './useCombatPrefs'
 
 const OUT_COLOR = '#d9b25f'
 const PET_COLOR = '#6fb3d2'
@@ -84,11 +85,15 @@ function ChartHeaderStats({
 }): React.JSX.Element | null {
   if (!tl || !series || !chart) return null
   const note = approxNote(tl)
+  const secs = Math.round(series.smoothMs / 1000)
+  const peakTip = series.petApart
+    ? `Peak ${secs}s rolling rate without your pet, in the visible window.`
+    : `Peak ${secs}s rolling outgoing rate in the visible window.`
   return (
     <Stack direction="row" spacing={0.75} alignItems="baseline" sx={{ minWidth: 0 }}>
       {note && <ApproxChip shown={note.shown} raw={note.of} truncated={note.truncated} />}
       {chart.outLine !== null && (
-        <Tooltip title={`Peak ${Math.round(series.smoothMs / 1000)}s rolling outgoing rate in the visible window.`}>
+        <Tooltip title={peakTip}>
           <Typography variant="caption" sx={{ color: OUT_COLOR, whiteSpace: 'nowrap' }}>
             {series.estimated ? '~' : ''}
             {formatRate(chart.peakVis)} peak
@@ -301,7 +306,7 @@ function ChartLegend({
     >
       {/* The headline curve's label names exactly what it sums, so a grouped fight's line is
           never read as "yours". */}
-      {entry('out', OUT_COLOR, series.hasGroup ? 'you + pet + group' : 'you + pet')}
+      {entry('out', OUT_COLOR, outLabel(series))}
       {series.hasPet && entry('pet', PET_COLOR, 'pet')}
       {series.hasGroup && entry('group', GROUP_COLOR, 'group')}
       {series.hasInc && entry('inc', INC_COLOR, 'incoming')}
@@ -424,7 +429,9 @@ export function DpsOverTime({
   // The glance card has no legend, so it obeys no hidden set — see `compact`. NOTHING is a stable
   // identity, so the memo chain below is unaffected on that surface.
   const hidden = compact ? NOTHING_HIDDEN : stored
-  const series = useMemo(() => (tl ? keptSeries(tl, live) : null), [tl, live])
+  // "Its own bar" takes the pet out of the gold line too, so you and your pet are two lines.
+  const petApart = usePetLayout()[0] === 'separate'
+  const series = useMemo(() => (tl ? withPetApart(keptSeries(tl, live), petApart) : null), [tl, live, petApart])
   const chart = useMemo(() => buildDpsChart(series, live, hidden), [series, live, hidden])
   const placed = useMemo(() => placeMarkers(tl, chart), [tl, chart])
   const drawn = useMemo(() => drawnMarkers(placed, hidden), [placed, hidden])

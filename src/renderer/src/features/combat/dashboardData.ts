@@ -275,6 +275,8 @@ export interface DpsSeries {
   /** true when the source events were downsampled and/or truncated → every rate here is
    *  inexact (a scaled estimate, a lower bound, or both — see `approxNote`). */
   estimated: boolean
+  /** the gold line leaves the pet out. Set by the card from the pet layout, never by buildDpsSeries. */
+  petApart?: boolean
 }
 
 /**
