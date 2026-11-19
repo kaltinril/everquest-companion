@@ -32,6 +32,7 @@
 {"pageid":32027,"title":"Shadowed Weapons"},
 {"pageid":32053,"title":"Tarnished Weapons"},
 {"pageid":32159,"title":"Blue Bamboo Armor"},
+{"pageid":32179,"title":"Cryosilk Armor"},
 {"pageid":32227,"title":"Ratmen Velium Weapons"},
 {"pageid":32414,"title":"Small Chainmail Belt"},
 {"pageid":34051,"title":"Cabilis"},
@@ -422,6 +423,7 @@
 {"pageid":51169,"title":"Fear (effect)"},
 {"pageid":51170,"title":"Damage Shield"},
 {"pageid":52561,"title":"Coif of Wrath"},
+{"pageid":53020,"title":"Shadow Knight"},
 {"pageid":53046,"title":"Commands"},
 {"pageid":53050,"title":"Zone Spawn Timers"},
 {"pageid":53051,"title":"Experience table"},
@@ -721,5 +723,6 @@
 {"pageid":73102,"title":"Player List"},
 {"pageid":73148,"title":"Pyrosilk Armor"},
 {"pageid":73220,"title":"Mounts"},
-{"pageid":73361,"title":"The Everling Dynasty"}
+{"pageid":73361,"title":"The Everling Dynasty"},
+{"pageid":73453,"title":"Monster Summoning II Summon"}
 ]

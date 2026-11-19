@@ -1,0 +1,21 @@
+{{Classic Era}}
+Cryosilk Armor is special planar armor usable only by INT casters. In Everquest Legends, it is confirmed to drop from [[a haunted chest]] in [[Plane of Hate]] - but only from the two chests that spawn during the Innoruuk raid instance. Also confirmed that at least the Belt drops from [[a spinechiller spider]] in [[Plane of Fear]]. Potentially all of them drop from the spiders.
+
+
+{{Gear Set
+|Cryosilk Amice
+|Cryosilk Bracelet
+|Cryosilk Cap
+|Cryosilk Choker
+|Cryosilk Cloak
+|Cryosilk Gloves
+|Cryosilk Lined Shoes
+|Cryosilk Pantaloons
+|Cryosilk Robe
+|Cryosilk Sash
+|Cryosilk Sleeves
+|Cryosilk Veil
+|Cryosilk Webshield
+}}
+
+[[Category:Armor Sets]]

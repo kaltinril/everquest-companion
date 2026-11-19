@@ -43,7 +43,19 @@
     <li>Charisma: 15</li></ul>
   </div>
 </div>
-
+==== Melee Attacks ====
+{| class="wikitable"
+!Damage
+!Delay
+!Bonus Damage
+!Dual Wield
+|-
+|17
+|29
+| +6
+| 50% 
+|-
+|}
 == Abilities ==
 * [[Skill_Bash|Bash]]
 * [[Skill_Block|Block]]

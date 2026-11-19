@@ -483,35 +483,35 @@ Special AAs require either an achievement to unlock or using the [[Reincarnation
 |-
 | Class Reincarnation: Dark Elf || 3 || 6 || 9 || This passive ability reduces incoming fire damage by 3%. 
 |-
-| Class Reincarnation: Dwarf || 10 || ? || ? || This passive ability increases your chance to resist fear spells by 10%. 
+| Class Reincarnation: Dwarf || 10 || 20 || 30 || This passive ability increases your chance to resist fear spells by 10%. 
 |-
-| Class Reincarnation: Erudite || +2 || ? || ? || This passive ability increases your mana regeneration by 2. -- Mana Regen +4 -- Mana Regen +6 
+| Class Reincarnation: Erudite || +2 Mana gen || +4 Mana gen || +6 Mana gen  || This passive ability increases your mana regeneration by 2.
 |-
-| Class Reincarnation: Froglok || +1 || ? || ? || This passive ability will increase your jump power by 10% and your hitpoint regeneration by 1. 
+| Class Reincarnation: Froglok || +1 HP gen + 10 Jump Power || ? || ? || This passive ability will increase your jump power by 10% and your hitpoint regeneration by 1. 
 |-
-| Class Reincarnation: Gnome || 10% || ? || ? || This passive ability grants you an additional 10% chance to resist charm and mesmerization spells. 
+| Class Reincarnation: Gnome || 10% || 20 || 30 || This passive ability grants you an additional 10% chance to resist charm and mesmerization spells. 
 |-
-| Class Reincarnation: Half Dark Elf || 10% || ? || ? || This passive ability will increase the range of your tracking and map awareness by 10%. 
+| Class Reincarnation: Half Dark Elf || 10% || 20 || 30 || This passive ability will increase the range of your tracking and map awareness by 10%. 
 |-
-| Class Reincarnation: Half Elf || 3 || ? || ? || This passive ability increases your base stat caps and all resists by 3. 
+| Class Reincarnation: Half Elf || 3 || 6 || 9 || This passive ability increases your base stat caps and all resists by 3. 
 |-
-| Class Reincarnation: Halfling || 15% || ? || ? ||| This passive ability will mitigate the effects of any negative movement speed effect by 15%.
+| Class Reincarnation: Halfling || 15% || 30 || 45 ||| This passive ability will mitigate the effects of any negative movement speed effect by 15%.
 |-
-| Class Reincarnation: High Elf || 3 || ? || ? || This passive ability reduces incoming magic damage by 3%. 
+| Class Reincarnation: High Elf || 3 || 6 || 9 || This passive ability reduces incoming magic damage by 3%. 
 |-
-| Class Reincarnation: Human || 5 || ? || ? || This passive ability increases your base stat caps by 5. --Cap by +10 --Cap by +
+| Class Reincarnation: Human || 5 || 10 || 15 || This passive ability increases your base stat caps by 5.
 |-
-| Class Reincarnation: Iksar || +2 HP Gen +5 AC || ? || ? || This passive ability increases your hitpoint regeneration by 2 and your base armor class by 5. 
+| Class Reincarnation: Iksar || +2 HP Gen +5 AC || +4 HP Gen +10 AC || +6 HP Gen +15 AC || This passive ability increases your hitpoint regeneration by 2 and your base armor class by 5. 
 |-
-| Class Reincarnation: Kerran || +2 END gen || ? || ? || This passive ability will increase your endurance regeneration by 2 and grants an additional 10 points to your Safe Fall skill. 
+| Class Reincarnation: Kerran || +2 END gen +10 Safe Fall ||  +2 END gen  +20 Safe Fall ||  +2 END gen  +30 Safe Fall || This passive ability will increase your endurance regeneration by 2 and grants an additional 10 points to your Safe Fall skill. 
 |-
 | Class Reincarnation: Ogre || 10% || ? || ? || This passive ability increases your chance to resist any stun by 10%. 
 |-
-| Class Reincarnation: Troll || +3 HP gen || ? || ? || This passive ability increases your hitpoint regeneration by 3.
+| Class Reincarnation: Troll || +3 HP gen || +6 HP gen || +9 HP gen || This passive ability increases your hitpoint regeneration by 3.
 |-
-| Class Reincarnation: Wood Elf || 10 || ? || ? || This passive ability will increase the range of your spells and ranged attacks by 10 units. 
+| Class Reincarnation: Wood Elf || 10 || 20 || 30 || This passive ability will increase the range of your spells and ranged attacks by 10 units. 
 |-
-| Reincarnation: Completionist || 1 || ? || ? || This passive ability increases the damage of your melee by 1%. You can raise your rank in this ability by completing all Class Reincarnations. 
+| Reincarnation: Completionist || 1 || 2 || 3 || This passive ability increases the damage of your melee by 1%. You can raise your rank in this ability by completing all Class Reincarnations. 
 |}
 
 [[Category:Character]]

@@ -28,8 +28,6 @@
        <ul>
        <li>Offense: 202</li>
        <li>Accuracy: 245</li>
-       <li>Max Damage: 43</li>
-       <li>Dual Wield: 20%</li>
        </ul>
      </ul>
   </div>
@@ -43,7 +41,19 @@
     <li>Charisma: 100</li></ul>
   </div>
 </div>
-
+==== Melee Attacks ====
+{| class="wikitable"
+!Damage
+!Delay
+!Bonus Damage
+!Dual Wield
+|-
+|18
+|28
+| +7
+| 20%
+|-
+|}
 == Abilities ==
 * [[Skill_Bash|Bash]]
 * [[Skill_Block|Block]]

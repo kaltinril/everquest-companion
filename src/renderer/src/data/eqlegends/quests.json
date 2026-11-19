@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-18T07:57:57.360Z",
+  "scrapedAt": "2026-11-19T10:42:22.428Z",
   "source": "eqlwiki.com — Category:Quests + quest subcategories + recentchanges delta (scripts/scrape-delta.mts)",
   "quests": [
     {
@@ -16078,7 +16078,7 @@
       "eraTag": "Classic",
       "startZone": "Lake Nerius",
       "giver": "Retainer Ozval",
-      "minLevel": 55,
+      "minLevel": 46,
       "classes": [
         "ALL"
       ],
