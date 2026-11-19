@@ -37,6 +37,7 @@ import { recordPref, usePrefsSeed } from './prefsHydration'
 // item in THIS section: someone who came here to fix their meters has to find it without leaving
 // the card they landed on.
 import { OverlaysAppearanceSetting } from './OverlaysAppearanceSetting'
+import { navMenuItem } from './NavMenuSetting'
 import type { PrefSection } from './PreferencesView'
 
 /**
@@ -95,8 +96,8 @@ const ALPHA_WORDS =
  * unchanged: it is what the rail's testid, the deep link and every existing e2e step address it by,
  * and renaming an id to match a label is how a working route breaks for a cosmetic reason.
  *
- * TWO ITEMS, in this order, which is the hierarchy the owner asked for: what the APP draws at, then
- * what the floating windows draw at.
+ * THREE ITEMS, in this order, which is the hierarchy the owner asked for: what the APP draws at, its
+ * left menu (fork #10), then what the floating windows draw at.
  */
 export function appearanceSection(): PrefSection {
   return {
@@ -110,6 +111,7 @@ export function appearanceSection(): PrefSection {
         keywords: `${SIZE_WORDS} window app main`,
         content: <TextSizeSetting />
       },
+      navMenuItem(SIZE_WORDS),
       // ONE CARD for the overlays' size, their transparency, and the switch that decides whether
       // either is shared — because they pertain to the same twelve windows (owner, 2026-08-17).
       {
