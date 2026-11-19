@@ -141,6 +141,10 @@ const ICONS: readonly [string, number, number][] = [
   // Ten classes wrap `BST` onto a row of its own between Class and Race: read as one line pitch, the
   // box was twice the size and took in the title bar (owner, 2026-11-18: no dagger offered). 305 against 1,112.
   ['jibbles-stiletto.png', 591, 1],
+  // The same wrap, twelve classes (the owner's kept picture; 938 and 939 led, the belt 4th): 116 against 837.
+  ['sergeants-leather-belt.png', 563, 1],
+  // `CLASS` in the name: the box was placed from the title bar (602 led at 1,479). 123 against 663.
+  ['class-1-steel-hooked-arrow.png', 598, 1],
   // 597 and 1104 are one bow in two colours: a tie the picker shows, top two.
   ['windstriker-ground.png', 1104, 2],
   ['windstriker-sky.png', 1104, 2]

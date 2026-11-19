@@ -193,6 +193,14 @@ test('THE ICON SITS LEFT OF THE CLASS WORD, ITS TOP AT THE NAME LINE, SIZED BY T
   const wrapped = iconRegion([line("Jibble's Stiletto", 72, 63), line('Lore Equipped', 72, 79), line('"Class: WAR', 55, 93), line('BST', 72, 111), line('Race: ALL', 72, 127)], 416, 323)
   assert.ok(wrapped !== null)
   assert.ok(Math.abs(wrapped.w - 54) <= 1 && Math.abs(wrapped.x - 15) <= 1 && Math.abs(wrapped.y - 53) <= 1, JSON.stringify(wrapped))
+  // A name that holds the word (the title bar and the name line both): the Class row is the last above Race.
+  const named = iconRegion(
+    [line('CLASS 1 Steel Hooked Arrow', 150, 23), line('CLASS 1 Steel Hooked Arrow', 62, 75), line('No Trade', 62, 91), line('Class: WAR', 62, 107), line('Race: ALL', 62, 123)],
+    400,
+    300
+  )
+  assert.ok(named !== null)
+  assert.ok(Math.abs(named.w - 54) <= 1 && Math.abs(named.x - 5) <= 1 && Math.abs(named.y - 67) <= 1, JSON.stringify(named))
 })
 
 test('OCR READS ITS ENGLISH DATA FROM DISK, NEVER A URL (rule 15: no CDN fallback)', () => {

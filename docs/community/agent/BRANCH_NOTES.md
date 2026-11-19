@@ -712,6 +712,9 @@ where one exists.
   the icon can be a real-looking word (`By`).
 - The icon box's size is the line pitch at `Race:` (`readItemShot.ts pitchAt`: Race minus the row
   above it), never Class to Race: a class list that wraps (ten classes) puts a row between them.
+  The Class row is the LAST line with the word above Race: a name can hold it (`CLASS 1 Steel Hooked
+  Arrow`). Checking a box change: both trees' `iconRegion` on every kept picture's lines, then
+  `readItemShot` only where the box moved (2026-11-18: 217 pictures, 4 moved, ~3 min).
   TRAP: the box has ~2 px to spare on the left. The pane's border line 1 px inside it stretches the
   query's content box to the full height and every score ties near 600 (a clear win is under ~350
   against 1,000+). A near-tie at 600 means the box, not the matcher.

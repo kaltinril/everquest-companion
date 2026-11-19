@@ -93,9 +93,13 @@ function pitchAt(lines: readonly OcrLine[], cls: number, race: number): number {
  * name line, two lines above `Class:`; its side about 2.5 line pitches (40 px at the owner's 16 px).
  */
 export function iconRegion(lines: readonly OcrLine[], w: number, h: number): Box | null {
-  const cls = lines.findIndex((l) => /\bClass\b/i.test(l.text))
-  if (cls < 0) return null
-  const race = lines.findIndex((l, i) => i > cls && /\bRace\b/i.test(l.text))
+  const first = lines.findIndex((l) => /\bClass\b/i.test(l.text))
+  if (first < 0) return null
+  const race = lines.findIndex((l, i) => i > first && /\bRace\b/i.test(l.text))
+  // The Class row is the last one above Race: a name can hold the word too (`CLASS 1 Steel Hooked
+  // Arrow`, in the title bar and the name line), and the box was placed from the title bar.
+  let cls = first
+  for (let i = first + 1; i < race; i++) if (/\bClass\b/i.test(lines[i].text)) cls = i
   const at = lines[cls].lead
   const pitch = race > cls ? pitchAt(lines, cls, race) : at.h * 1.4
   // The text column's left edge: the `Class:` and `Race:` words themselves (a junk prefix such as
