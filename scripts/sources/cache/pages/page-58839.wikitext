@@ -6,8 +6,8 @@
     <li>Pet Type: Dry Bones Skeleton</li>
     <li>Pet Classes: [[Shadow Knight]] / [[Warrior]]</li>
     <li>Pet Level: 29</li>
-    <li>Hit Points: 2064 (+1/tick)</li>
-    <li>Mana: 580 (+58/tick)</li>
+    <li>Hit Points: 1946 (+1/tick)</li>
+    <li>Mana: 601 (+7/tick)</li>
     </ul>
   </div>
   <div style="flex: 1;">
@@ -28,8 +28,6 @@
        <ul>
        <li>Offense: 172</li>
        <li>Accuracy: 196</li>
-       <li>Max Damage: 32?</li>
-       <li>Dual Wield Skill: Medium?</li>
        </ul>
      </ul>
   </div>
@@ -43,7 +41,19 @@
     <li>Charisma: 8</li></ul>
   </div>
 </div>
-
+==== Melee Attacks ====
+{| class="wikitable"
+!Damage
+!Delay
+!Bonus Damage
+!Dual Wield
+|-
+|16
+|29
+| +1
+| X%
+|-
+|}
 == Abilities ==
 '''Needs to be Verified'''
 * [[Skill_Bash|Bash]]

@@ -31,6 +31,10 @@ All summoned pets are Warriors, and most have an additional class as well. The W
 |[[Rogue]]
 |Backstab
 |-
+|[[Magician|Magician's]] Monster Summoning
+|[[Berserker]]
+|Frenzy and Flurry
+|-
 |[[Necromancer|Necromancer's]] Undead
 |[[Shadow Knight]]
 |Harm Touch, Shadow Knight Spells
@@ -388,36 +392,28 @@ Enchanter pets all require [[Tiny Dagger|Tiny Daggers]] to summon.
 !Hit Points
 !Damage
 !Delay
-!Ratio
 !Bonus Damage
 !Dual Wield
 |-
 |style="text-align: center;"|2
 |style="text-align: center;"|[[Elementalkin: Water Summon|Water]]
-|style="text-align: center;"|144
+|style="text-align: center;"|193
 |style="text-align: center;" rowspan="4"| 6
-|style="text-align: center;"|30
-|style="text-align: center;"|0.200
+|style="text-align: center;" rowspan="4"| 30
 |style="text-align: center;" rowspan="4"| +0
 |style="text-align: center;" rowspan="4"| 8%
 |-
 |style="text-align: center;"|3
 |style="text-align: center;"|[[Elementalkin: Fire Summon|Fire]]
-|style="text-align: center;"|94
-|style="text-align: center;"|30
-|style="text-align: center;"|0.200
+|style="text-align: center;"|146
 |-
 |style="text-align: center;"|4
 |style="text-align: center;"|[[Elementalkin: Air Summon|Air]]
-|style="text-align: center;"|118
-|style="text-align: center;"|30
-|style="text-align: center;"|0.200
+|style="text-align: center;"|163
 |-
 |style="text-align: center;"|5
 |style="text-align: center;"|[[Elementalkin: Earth Summon|Earth]]
-|style="text-align: center;"|178
-|style="text-align: center;"|30
-|style="text-align: center;"|0.200
+|style="text-align: center;"|228
 |}
 
 {| class="wikitable"
@@ -427,36 +423,28 @@ Enchanter pets all require [[Tiny Dagger|Tiny Daggers]] to summon.
 !Hit Points
 !Damage
 !Delay
-!Ratio
 !Bonus Damage
 !Dual Wield
 |-
 |style="text-align: center;"|6
 |style="text-align: center;"|[[Elementaling: Water Summon|Water]]
-|style="text-align: center;"|390
+|style="text-align: center;"|438
 |style="text-align: center;" rowspan="4"| 8
-|style="text-align: center;"|30
-|style="text-align: center;"|0.267
+|style="text-align: center;" rowspan="4"| 30
 |style="text-align: center;" rowspan="4"| +0
 |style="text-align: center;" rowspan="4"| 13%
 |-
 |style="text-align: center;"|7
 |style="text-align: center;"|[[Elementaling: Fire Summon|Fire]]
-|style="text-align: center;"|256
-|style="text-align: center;"|30?
-|style="text-align: center;"|0.267?
+|style="text-align: center;"|323
 |-
 |style="text-align: center;"|8
 |style="text-align: center;"|[[Elementaling: Air Summon|Air]]
-|style="text-align: center;"|320
-|style="text-align: center;"|30?
-|style="text-align: center;"|0.267?
+|style="text-align: center;"|368
 |-
 |style="text-align: center;"|9
 |style="text-align: center;"|[[Elementaling: Earth Summon|Earth]]
-|style="text-align: center;"|480
-|style="text-align: center;"|30?
-|style="text-align: center;"|0.267?
+|style="text-align: center;"|520
 |}
 
 {| class="wikitable"
@@ -466,36 +454,28 @@ Enchanter pets all require [[Tiny Dagger|Tiny Daggers]] to summon.
 !Hit Points
 !Damage
 !Delay
-!Ratio
 !Bonus Damage
 !Dual Wield
 |-
 |style="text-align: center;"|10
 |style="text-align: center;"|[[Elemental: Water Summon|Water]]
-|style="text-align: center;"|552
+|style="text-align: center;"|633
 |style="text-align: center;" rowspan="4"| 9
-|style="text-align: center;"|30
-|style="text-align: center;"|0.300
+|style="text-align: center;" rowspan="4"| 30
 |style="text-align: center;" rowspan="4"| +0
 |style="text-align: center;" rowspan="4"| 17%
 |-
 |style="text-align: center;"|11
 |style="text-align: center;"|[[Elemental: Fire Summon|Fire]]
-|style="text-align: center;"|364
-|style="text-align: center;"|30?
-|style="text-align: center;"|0.300?
+|style="text-align: center;"|452
 |-
 |style="text-align: center;"|12
 |style="text-align: center;"|[[Elemental: Air Summon|Air]]
-|style="text-align: center;"|454
-|style="text-align: center;"|30?
-|style="text-align: center;"|0.300?
+|style="text-align: center;"|515
 |-
 |style="text-align: center;"|13
 |style="text-align: center;"|[[Elemental: Earth Summon|Earth]]
-|style="text-align: center;"|682
-|style="text-align: center;"|30?
-|style="text-align: center;"|0.300?
+|style="text-align: center;"|726
 |}
 
 {| class="wikitable"
@@ -505,36 +485,28 @@ Enchanter pets all require [[Tiny Dagger|Tiny Daggers]] to summon.
 !Hit Points
 !Damage
 !Delay
-!Ratio
 !Bonus Damage
 !Dual Wield
 |-
 |style="text-align: center;"|14
 |style="text-align: center;"|[[Minor Summoning: Water Summon|Water]]
-|style="text-align: center;"|836
+|style="text-align: center;"|943
 |style="text-align: center;" rowspan="4"| 10
-|style="text-align: center;"|30
-|style="text-align: center;"|0.333
+|style="text-align: center;" rowspan="4"| 30
 |style="text-align: center;" rowspan="4"| +0
 |style="text-align: center;" rowspan="4"| 20%
 |-
 |style="text-align: center;"|15
 |style="text-align: center;"|[[Minor Summoning: Fire Summon|Fire]]
-|style="text-align: center;"|552
-|style="text-align: center;"|30?
-|style="text-align: center;"|0.333?
+|style="text-align: center;"|675
 |-
 |style="text-align: center;"|16
 |style="text-align: center;"|[[Minor Summoning: Air Summon|Air]]
-|style="text-align: center;"|690
-|style="text-align: center;"|30?
-|style="text-align: center;"|0.333?
+|style="text-align: center;"|771
 |-
 |style="text-align: center;"|17
 |style="text-align: center;"|[[Minor Summoning: Earth Summon|Earth]]
-|style="text-align: center;"|1032
-|style="text-align: center;"|30?
-|style="text-align: center;"|0.333?
+|style="text-align: center;"|1082
 |}
 
 {| class="wikitable"
@@ -544,36 +516,28 @@ Enchanter pets all require [[Tiny Dagger|Tiny Daggers]] to summon.
 !Hit Points
 !Damage
 !Delay
-!Ratio
 !Bonus Damage
 !Dual Wield
 |-
 |style="text-align: center;"|18
 |style="text-align: center;"|[[Lesser Summoning: Water Summon|Water]]
-|style="text-align: center;"|1080
+|style="text-align: center;"|1183
 |style="text-align: center;" rowspan="4"| 11
-|style="text-align: center;"|30
-|style="text-align: center;"|0.367
+|style="text-align: center;" rowspan="4"| 30
 |style="text-align: center;" rowspan="4"| +0
 |style="text-align: center;" rowspan="4"| 24%
 |-
 |style="text-align: center;"|19
 |style="text-align: center;"|[[Lesser Summoning: Fire Summon|Fire]]
-|style="text-align: center;"|702
-|style="text-align: center;"|30?
-|style="text-align: center;"|0.367?
+|style="text-align: center;"|838
 |-
 |style="text-align: center;"|20
 |style="text-align: center;"|[[Lesser Summoning: Air Summon|Air]]
-|style="text-align: center;"|892
-|style="text-align: center;"|30?
-|style="text-align: center;"|0.367?
+|style="text-align: center;"|968
 |-
 |style="text-align: center;"|21
 |style="text-align: center;"|[[Lesser Summoning: Earth Summon|Earth]]
-|style="text-align: center;"|1336
-|style="text-align: center;"|30?
-|style="text-align: center;"|0.367?
+|style="text-align: center;"|1362
 |}
 
 {| class="wikitable"
@@ -583,36 +547,28 @@ Enchanter pets all require [[Tiny Dagger|Tiny Daggers]] to summon.
 !Hit Points
 !Damage
 !Delay
-!Ratio
 !Bonus Damage
 !Dual Wield
 |-
 |style="text-align: center;"|22
 |style="text-align: center;"|[[Summoning: Water Summon|Water]]
-|style="text-align: center;"|1326
-|style="text-align: center;" rowspan="4"| 13
-|style="text-align: center;"|30
-|style="text-align: center;"|0.433
+|style="text-align: center;"|1425
+|style="text-align: center;" rowspan="4"| 12
+|style="text-align: center;" rowspan="4"| 30
 |style="text-align: center;" rowspan="4"| +0
 |style="text-align: center;" rowspan="4"| 28%
 |-
 |style="text-align: center;"|23
 |style="text-align: center;"|[[Summoning: Fire Summon|Fire]]
-|style="text-align: center;"|860
-|style="text-align: center;"|31
-|style="text-align: center;"|0.424
+|style="text-align: center;"|1010
 |-
 |style="text-align: center;"|24
 |style="text-align: center;"|[[Summoning: Air Summon|Air]]
-|style="text-align: center;"|1092
-|style="text-align: center;"|30
-|style="text-align: center;"|0.433
+|style="text-align: center;"|1168
 |-
 |style="text-align: center;"|25
 |style="text-align: center;"|[[Summoning: Earth Summon|Earth]]
-|style="text-align: center;"|1638
-|style="text-align: center;"|31
-|style="text-align: center;"|0.424
+|style="text-align: center;"|1643
 |}
 
 {| class="wikitable"
@@ -622,36 +578,28 @@ Enchanter pets all require [[Tiny Dagger|Tiny Daggers]] to summon.
 !Hit Points
 !Damage
 !Delay
-!Ratio
 !Bonus Damage
 !Dual Wield
 |-
 |style="text-align: center;"|26
 |style="text-align: center;"|[[Greater Summoning: Water Summon|Water]]
-|style="text-align: center;"|1570
+|style="text-align: center;"|1672
 |style="text-align: center;" rowspan="4"| 14
-|style="text-align: center;"|30
-|style="text-align: center;"|0.467?
+|style="text-align: center;" rowspan="4"| 30
 |style="text-align: center;" rowspan="4"| +0
 |style="text-align: center;" rowspan="4"| 31%
 |-
 |style="text-align: center;"|27
 |style="text-align: center;"|[[Greater Summoning: Fire Summon|Fire]]
-|style="text-align: center;"|1018
-|style="text-align: center;"|30?
-|style="text-align: center;"|0.467?
+|style="text-align: center;"|1185
 |-
 |style="text-align: center;"|28
 |style="text-align: center;"|[[Greater Summoning: Air Summon|Air]]
-|style="text-align: center;"|1294
-|style="text-align: center;"|30?
-|style="text-align: center;"|0.467?
+|style="text-align: center;"|1373
 |-
 |style="text-align: center;"|29
 |style="text-align: center;"|[[Greater Summoning: Earth Summon|Earth]]
-|style="text-align: center;"|1940
-|style="text-align: center;"|30?
-|style="text-align: center;"|0.467?
+|style="text-align: center;"|1930
 |}
 
 {| class="wikitable"
@@ -661,36 +609,28 @@ Enchanter pets all require [[Tiny Dagger|Tiny Daggers]] to summon.
 !Hit Points
 !Damage
 !Delay
-!Ratio
 !Bonus Damage
 !Dual Wield
 |-
 |style="text-align: center;"|31
 |style="text-align: center;"|[[Minor Conjuration: Water Summon|Water]]
-|style="text-align: center;"|1858
-|style="text-align: center;" rowspan="4"| 16
-|style="text-align: center;"|29
-|style="text-align: center;"|0.552?
+|style="text-align: center;"|1947
+|style="text-align: center;" rowspan="4"| 15
+|style="text-align: center;" rowspan="4"| 29
 |style="text-align: center;" rowspan="4"| +2
 |style="text-align: center;" rowspan="4"| 34%
 |-
 |style="text-align: center;"|32
 |style="text-align: center;"|[[Minor Conjuration: Fire Summon|Fire]]
-|style="text-align: center;"|1204
-|style="text-align: center;"|29?
-|style="text-align: center;"|0.552?
+|style="text-align: center;"|1382
 |-
 |style="text-align: center;"|33
 |style="text-align: center;"|[[Minor Conjuration: Air Summon|Air]]
-|style="text-align: center;"|1530
-|style="text-align: center;"|29?
-|style="text-align: center;"|0.552?
+|style="text-align: center;"|1603
 |-
 |style="text-align: center;"|34
 |style="text-align: center;"|[[Minor Conjuration: Earth Summon|Earth]]
-|style="text-align: center;"|2296
-|style="text-align: center;"|29?
-|style="text-align: center;"|0.552?
+|style="text-align: center;"|2251
 |}
 
 {| class="wikitable"
@@ -700,36 +640,28 @@ Enchanter pets all require [[Tiny Dagger|Tiny Daggers]] to summon.
 !Hit Points
 !Damage
 !Delay
-!Ratio
 !Bonus Damage
 !Dual Wield
 |-
 |style="text-align: center;"|36
 |style="text-align: center;"|[[Lesser Conjuration: Water Summon|Water]]
-|style="text-align: center;"|2348
+|style="text-align: center;"|2382
 |style="text-align: center;" rowspan="4"| 17
-|style="text-align: center;"|28
-|style="text-align: center;"|0.607?
+|style="text-align: center;" rowspan="4"| 29
 |style="text-align: center;" rowspan="4"| +6
 |style="text-align: center;" rowspan="4"| 50%
 |-
 |style="text-align: center;"|37
 |style="text-align: center;"|[[Lesser Conjuration: Fire Summon|Fire]]
-|style="text-align: center;"|1518
-|style="text-align: center;"|28?
-|style="text-align: center;"|0.607?
+|style="text-align: center;"|1683
 |-
 |style="text-align: center;"|38
 |style="text-align: center;"|[[Lesser Conjuration: Air Summon|Air]]
-|style="text-align: center;"|1932
-|style="text-align: center;"|28?
-|style="text-align: center;"|0.607?
+|style="text-align: center;"|1963
 |-
 |style="text-align: center;"|39
 |style="text-align: center;"|[[Lesser Conjuration: Earth Summon|Earth]]
-|style="text-align: center;"|2900
-|style="text-align: center;"|28?
-|style="text-align: center;"|0.607?
+|style="text-align: center;"|2762
 |}
 
 
@@ -740,36 +672,28 @@ Enchanter pets all require [[Tiny Dagger|Tiny Daggers]] to summon.
 !Hit Points
 !Damage
 !Delay
-!Ratio
 !Bonus Damage
 !Dual Wield
 |-
 |style="text-align: center;"|41
 |style="text-align: center;"|[[Conjuration: Water Summon|Water]]
-|style="text-align: center;"|2732
+|style="text-align: center;"|2755
 |style="text-align: center;" rowspan="4"| 19
-|style="text-align: center;"|28
-|style="text-align: center;"|0.679?
+|style="text-align: center;" rowspan="4"| 28
 |style="text-align: center;" rowspan="4"| +10
 |style="text-align: center;" rowspan="4"| 58%
 |-
 |style="text-align: center;"|42
 |style="text-align: center;"|[[Conjuration: Fire Summon|Fire]]
-|style="text-align: center;"|1768
-|style="text-align: center;"|28?
-|style="text-align: center;"|0.679?
+|style="text-align: center;"|1950
 |-
 |style="text-align: center;"|43
 |style="text-align: center;"|[[Conjuration: Air Summon|Air]]
-|style="text-align: center;"|2250
-|style="text-align: center;"|28?
-|style="text-align: center;"|0.679?
+|style="text-align: center;"|2275
 |-
 |style="text-align: center;"|44
 |style="text-align: center;"|[[Conjuration: Earth Summon|Earth]]
-|style="text-align: center;"|3376
-|style="text-align: center;"|28?
-|style="text-align: center;"|0.679?
+|style="text-align: center;"|3197
 |}
 
 
@@ -780,36 +704,28 @@ Enchanter pets all require [[Tiny Dagger|Tiny Daggers]] to summon.
 !Hit Points
 !Damage
 !Delay
-!Ratio
 !Bonus Damage
 !Dual Wield
 |-
 |style="text-align: center;"|46
 |style="text-align: center;"|[[Greater Conjuration: Earth Summon|Earth]]
-|style="text-align: center;"|6286
+|style="text-align: center;"|5205
 |style="text-align: center;" rowspan="4"| 21
-|style="text-align: center;"|28
-|style="text-align: center;"|0.750?
+|style="text-align: center;" rowspan="4"| 28
 |style="text-align: center;" rowspan="4"| +14
 |style="text-align: center;" rowspan="4"| 69%
 |-
 |style="text-align: center;"|47
 |style="text-align: center;"|[[Greater Conjuration: Fire Summon|Fire]]
-|style="text-align: center;"|3294
-|style="text-align: center;"|28
-|style="text-align: center;"|0.750
+|style="text-align: center;"|3057
 |-
 |style="text-align: center;"|48
 |style="text-align: center;"|[[Greater Conjuration: Air Summon|Air]]
-|style="text-align: center;"|4192
-|style="text-align: center;"|28
-|style="text-align: center;"|0.750
+|style="text-align: center;"|3646
 |-
 |style="text-align: center;"|49
 |style="text-align: center;"|[[Greater Conjuration: Water Summon|Water]]
-|style="text-align: center;"|5088
-|style="text-align: center;"|28
-|style="text-align: center;"|0.750
+|style="text-align: center;"|4410
 |}
 
 ==== Reagents ====
@@ -889,12 +805,50 @@ Water elementals provide high sustained damage. If positioned behind their targe
 *No additional utility - this pet is only good for dealing melee damage
 
 === Monster Summons ===
-Monster Summons are pretty much just Fire Elementals, but without the Damage Shield or Wizard spells. They lack any benefit over using Elementals at all. The spell is a fun little party trick that allows mages to run around with a pet that looks like a monster from the zone they are in.
+Monster Summons have been upgraded to be Berserkers. Unlike other Magician pets they do not have a focus for summoning them. The upgrade to make them Berserkers has made them more useful than in the past - though most mages still mainly use the Elementals.
+
+{| class="eoTable2"
+!Character Level
+!Pet Spell
+!Pet Level
+!Pet HP
+!Damage
+!Delay
+!Bonus Damage
+!Dual Wield
+|-
+| style="text-align:center;"|'''30'''
+| [[Monster Summoning I Summon|Monster Summoning I]]
+| 29
+| 2248
+| 15
+| 30
+| +2
+| 33%?
+|-
+| style="text-align:center;"|'''50'''
+| [[Monster Summoning II Summon|Monster Summoning II]]
+| 41
+| 5205
+| 21
+| 28
+| +14
+| X%
+|-
+| style="text-align:center;"|'''55?'''
+| [[Monster Summoning III Summon|Monster Summoning III]]
+| X
+| X
+| X
+| X
+| +X
+| X%
+|}
 
 Generally monster summoning has a chance to give you a pet model from any non-playable race mob in the zone.  In Sol A, for example, you can summon a clockwork pet, but you can't summon a gnome.  Some models are extremely rare and may take many attempts to successfully "capture" them.
 There are also some easter egg type models that are quite unexpected.  Dagnor's Cauldron has a [[Faydedar]] model buried in the zone file.   Other expected models, such as [[Quillmane]] in South Karana or [[Terrorantula]] in South Ro, don't seem to be summonable or are insanely rare (over 1,200 attempts).
 
-The summoned monster pets are largely a novelty and help take the boredom away when farming in lower level zones.  Who doesn't love to watch a snow bunny slaughter the Eastern Wastes giant fort? For serious adventuring, you will want to stick with your situational elemental pets.
+The summoned monster pets are largely a novelty and help take the boredom away when farming in lower level zones.  Who doesn't love to watch a snow bunny slaughter the Eastern Wastes giant fort?
 
 === Pet Focus Items ===
 
@@ -940,97 +894,121 @@ The greater focus items ({{:Staff of Elemental Mastery: Water}}, {{:Staff of Ele
 ** Like the stat bonuses the exact bonus varies by Elemental, with Air and Fire pets getting significantly more bonus hit points. However, all of the pets gain 300-850 hitpoints which is substantially more than what the Lesser Foci grant.
 
 == [[Necromancer]] Pets ==
-EQ Legends Pet details are being updated for Necromancer pets in the spell descriptions, not all pets have been tested yet.
-
 {| class="eoTable2"
-! Player Level
-! Pet
-! Pet Level
-! Melee Ratio
+!Character Level
+!Pet Spell
+!Pet Level
+!Pet HP
+!Damage
+!Delay
 !Bonus Damage
-! Dual Wield
+!Dual Wield
 |-
 | style="text-align:center;"|'''1'''
 | [[Cavorting Bones Summon|Cavorting Bones]]
 | 1
-| 4/30 (0.133)
-| +?
+| 53
+| 4
+| 30
+| +0
 | -
 |-
 | style="text-align:center;"|'''4'''
 | [[Leering Corpse Summon|Leering Corpse]]
 | 5
-| 7/30 (0.233)
-| +?
-| 8%
+| 195
+| 7
+| 30
+| +0
+| 8%?
 |-
 | style="text-align:center;"|'''8'''
 | [[Bone Walk Summon|Bone Walk]]
 | 9
-| 8/30 (0.267)
-| +?
-| 13%
+| 453
+| 8
+| 30
+| +0
+| 13%?
 |-
 | style="text-align:center;"|'''12'''
 | [[Convoke Shadow Summon|Convoke Shadow]]
 | 11
-| X/30 (0.xxx?)
-| +?
+| 572
+| 9
+| 30
+| +0
 | X%
 |-
 | style="text-align:center;"|'''16'''
 | [[Restless Bones Summon|Restless Bones]]
 | 16
-| X/30 (0.xxx?)
-| +?
+| 891
+| 10
+| 30
+| +0
 | X%
 |-
 | style="text-align:center;"|'''20'''
 | [[Animate Dead Summon|Animate Dead]]
 | 19
-| X/30 (0.xxx?)
-| +?
+| 1130
+| 11
+| 30
+| +0
 | X%
 |-
 | style="text-align:center;"|'''24'''
 | [[Haunting Corpse Summon|Haunting Corpse]]
 | 22
-| X/30 (0.xxx?)
-| +?
+| 1385
+| 13
+| 30
+| +0
 | X%
 |-
 | style="text-align:center;"|'''29'''
 | [[Summon Dead Summon|Summon Dead]]
 | 25
-| X/30 (0.xxx?)
-| +?
+| 1645
+| 14
+| 30
+| +0
 | X%
 |-
 | style="text-align:center;"|'''34'''
 | [[Invoke Shadow Summon|Invoke Shadow]]
 | 29
-| X/30 (0.xxx?)
-| +?
+| 1946
+| 16
+| 29
+| +1
 | X%
 |-
 | style="text-align:center;"|'''39'''
 | [[Malignant Dead Summon|Malignant Dead]]
 | 33
-| X/30 (0.xxx?)
-| +?
+| 2281
+| 17
+| 29
+| +5
 | X%
 |-
 | style="text-align:center;"|'''44'''
 | [[Cackling Bones Summon|Cackling Bones]]
-| 37?
-| X/30 (0.xxx?)
-| +?
+| 37
+| 2733
+| 19
+| 28
+| +9
 | X%
 |-
 | style="text-align:center;"|'''49'''
 | [[Invoke Death Summon|Invoke Death]]
 | 41
-| 21/28 (0.750)
+| 4313
+| 21
+| 28
 | +13
 | X%
 |}
@@ -1058,38 +1036,48 @@ When used with [[Invoke Death]], the focus provides +10 STR/STA/AGI, which grant
 == [[Shaman]] Pets ==
 
 {| class="eoTable2"
-! Player Level
-! Pet
-! Pet Level
-! Base Melee Ratio
+!Character Level
+!Pet Spell
+!Pet Level
+!Pet HP
+!Damage
+!Delay
 !Bonus Damage
-! Dual Wield
+!Dual Wield
 |-
 | style="text-align:center;"|'''32'''
 | [[Companion Spirit Summon|Companion Spirit]]
 | 26
-| 15/30 (0.500)
+| 1684
+| 15
+| 30
 | +0
 | 10%
 |-
 | style="text-align:center;"|'''37'''
 | [[Vigilant Spirit Summon|Vigilant Spirit]]
 | 29
-| 16/29 (0.551)
+| 1988
+| 16
+| 29
 | +3
 | 15%
 |-
 | style="text-align:center;"|'''41'''
 | [[Guardian Spirit Summon|Guardian Spirit]]
 | 32
-| 18/28 (0.642)
+| 2512
+| 18
+| 28
 | +7
 | 20%
 |-
 | style="text-align:center;"|'''45'''
 | [[Frenzied Spirit Summon|Frenzied Spirit]]
 | 36
-| 20/28 (0.714)
+| 3246
+| 20
+| 28
 | +11
 | 55%
 |}
@@ -1097,38 +1085,70 @@ When used with [[Invoke Death]], the focus provides +10 STR/STA/AGI, which grant
 Shaman pets do not require a reagent to summon.
 
 == [[Shadow Knight]] Pets ==
-
-These pets are identical to the [[Necromancer]] pets. Once that section is filled out, the chart below will be updated to match.
-
+These pets are identical to the [[Necromancer]] pets, Shadowknights just get them at a later level.
 {| class="eoTable2"
-! Player Level
-! Spell
-! Pet Level
+!Character Level
+!Pet Spell
+!Pet Level
+!Pet HP
+!Damage
+!Delay
+!Bonus Damage
+!Dual Wield
 |-
-| '''9'''
+| style="text-align:center;"|'''9'''
 | [[Leering Corpse Summon|Leering Corpse]]
 | 5
+| 195
+| 7
+| 30
+| +0
+| 8%?
 |-
-| '''15'''
+| style="text-align:center;"|'''15'''
 | [[Bone Walk Summon|Bone Walk]]
 | 9
+| 453
+| 8
+| 30
+| +0
+| 13%?
 |-
-| '''22'''
+| style="text-align:center;"|'''22'''
 | [[Convoke Shadow Summon|Convoke Shadow]]
 | 11
+| 572
+| 9
+| 30
+| +0
+| X%
 |-
-| '''30'''
+| style="text-align:center;"|'''30'''
 | [[Restless Bones Summon|Restless Bones]]
 | 16
+| 891
+| 10
+| 30
+| +0
+| X%
 |-
-| '''39'''
+| style="text-align:center;"|'''39'''
 | [[Animate Dead Summon|Animate Dead]]
 | 19
+| 1130
+| 11
+| 30
+| +0
+| X%
 |-
-| '''49'''
+| style="text-align:center;"|'''49'''
 | [[Summon Dead Summon|Summon Dead]]
 | 25
-|-
+| 1645
+| 14
+| 30
+| +0
+| X%
 |}
 ==== Reagents ====
 Just like Necromancer pets, Shadow Knight pets all require [[Bone Chips]] to summon.

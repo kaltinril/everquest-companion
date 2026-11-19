@@ -1,6 +1,6 @@
 {
  "source": "eqlwiki.com — |respawn_time on every page in the committed mob catalog",
- "scrapedAt": "2026-11-18",
+ "scrapedAt": "2026-11-19",
  "rows": [
   {
    "key": "a alchemist`s acolyte",
@@ -2675,14 +2675,14 @@
    "seconds": 420
   },
   {
-   "key": "sir lucan d`lere",
-   "page": "Sir Lucan D`Lere",
+   "key": "sir lucan d'lere",
+   "page": "Sir Lucan Dlere",
    "text": "7 hours",
    "seconds": 25200
   },
   {
-   "key": "sir lucan dlere",
-   "page": "Sir Lucan Dlere",
+   "key": "sir lucan d`lere",
+   "page": "Sir Lucan D`Lere",
    "text": "7 hours",
    "seconds": 25200
   },

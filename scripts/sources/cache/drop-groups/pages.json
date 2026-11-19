@@ -213,7 +213,7 @@
  },
  {
   "title": "Cryosilk Armor",
-  "content": "{{Classic Era}}\nCryosilk Armor is special planar armor usable only by INT casters. In Everquest Legends, it is confirmed to drop from [[a haunted chest]] in [[Plane of Hate]] - but only from the two chests that spawn during the Innoruuk raid instance.\n\n\n{{Gear Set\n|Cryosilk Amice\n|Cryosilk Bracelet\n|Cryosilk Cap\n|Cryosilk Choker\n|Cryosilk Cloak\n|Cryosilk Gloves\n|Cryosilk Lined Shoes\n|Cryosilk Pantaloons\n|Cryosilk Robe\n|Cryosilk Sash\n|Cryosilk Sleeves\n|Cryosilk Veil\n|Cryosilk Webshield\n}}\n\n[[Category:Armor Sets]]"
+  "content": "{{Classic Era}}\nCryosilk Armor is special planar armor usable only by INT casters. In Everquest Legends, it is confirmed to drop from [[a haunted chest]] in [[Plane of Hate]] - but only from the two chests that spawn during the Innoruuk raid instance. Also confirmed that at least the Belt drops from [[a spinechiller spider]] in [[Plane of Fear]]. Potentially all of them drop from the spiders.\n\n\n{{Gear Set\n|Cryosilk Amice\n|Cryosilk Bracelet\n|Cryosilk Cap\n|Cryosilk Choker\n|Cryosilk Cloak\n|Cryosilk Gloves\n|Cryosilk Lined Shoes\n|Cryosilk Pantaloons\n|Cryosilk Robe\n|Cryosilk Sash\n|Cryosilk Sleeves\n|Cryosilk Veil\n|Cryosilk Webshield\n}}\n\n[[Category:Armor Sets]]"
  },
  {
   "title": "Crystallized Shadow Weapons",
@@ -328,10 +328,6 @@
   "content": "{{Classic Era}}\n<onlyinclude>{{Itempage\n|notes       = \n|itemname    = A Gypsy Medallion\n|lucy_img_ID = 566\n|statsblock  = \nMAGIC ITEM<br>\nSlot: NECK<br>\nAC: 2<br>\nCHA: +9<br>\nSV DISEASE: +10<br>\nWT: 0.1  Size: SMALL<br>\nClass: ALL<br>\nRace: ALL<br>\n|dropsfrom = \n\n[[Northern Karana]]\n\n* [[Korvik the Cursed]]\n\n}}</onlyinclude>\n\n[[Category:Bard Equipment]]\n[[Category:Cleric Equipment]]\n[[Category:Druid Equipment]]\n[[Category:Enchanter Equipment]]\n[[Category:Magician Equipment]]\n[[Category:Monk Equipment]]\n[[Category:Necromancer Equipment]]\n[[Category:Paladin Equipment]]\n[[Category:Ranger Equipment]]\n[[Category:Rogue Equipment]]\n[[Category:Shaman Equipment]]\n[[Category:Shadow Knight Equipment]]\n[[Category:Warrior Equipment]]\n[[Category:Wizard Equipment]]\n[[Category:Neck]]\n[[Category:Northern Karana]]"
  },
  {
-  "title": "Hector's Severed Head",
-  "content": ""
- },
- {
   "title": "High Quality Bear Pelt",
   "content": "{{Classic Era}}\n\n<onlyinclude>{{Itempage\n|notes       = Coveted for [[tailoring]].\n|itemname    = High Quality Bear Skin\n|lucy_img_ID = 554\n|statsblock  = \nWT: 4.0  Size: LARGE<br>\nClass: ALL<br>\nRace: ALL<br>\n|dropsfrom = \n\n[[Blackburrow]]\n\n* [[a grizzly bear]]\n\n[[East Commonlands]]\n* [[a black bear]]\n* [[a young kodiak]]\n\n[[Eastern Plains of Karana]]\n\n* [[a brown bear]]\n\n[[Everfrost Peaks]]\n\n* [[a glacier bear]]\n* [[a polar bear]]\n* [[a polar bear cub]]\n\n[[Misty Thicket]]\n\n* [[a young kodiak]]\n\n[[Nektulos Forest]]\n\n* [[a black bear]]\n* [[a young kodiak]]\n\n[[Northern Plains of Karana]]\n\n* [[a brown bear]]\n* [[a grizzly bear]]\n* [[A Rabid Grizzly]]\n\n[[Rathe Mountains]]\n\n* [[a black bear]]\n* [[a brown bear]]\n* [[a grizzly bear]]\n\n[[Qeynos Hills]]\n\n* [[a brown bear]]\n\n[[Southern Plains of Karana]]\n\n* [[a brown bear]]\n\n[[Surefall Glade]]\n\n* [[a bear cub]]\n\n[[The Feerrott]]\n\n* [[A Marsh Bear]]\n* [[a marsh bear cub]]\n\n[[West Commonlands]]\n\n* [[a black bear]]\n* [[a kodiak]]\n* [[a young kodiak]]\n\n[[Western Plains of Karana]]\n\n* [[a brown bear]]\n* [[a grizzly bear]]\n* [[A Rabid Grizzly]]\n\n|relatedquests = \n\n* [[Bearskin Gloves Quest]]\n* [[Bear Hide Armor]]\n\n\n|recipes = \n\n* [[Tailoring]]\n** [[Reinforced Armor]] (large sizes)(Trivial: 108)\n** [[Medium Quality Bear Skin]] (Trivial: 15)\n** [[Hand Made Backpack]] (Trivial: 88)\n\n}}</onlyinclude>\n\n[[Category:Tradeskill Ingredient]]\n\n[[Category:Quest Items]]"
  },
@@ -362,10 +358,6 @@
  {
   "title": "Jaelen`s Katana",
   "content": "{{Velious Era}}\n\n<onlyinclude>{{Itempage\n|notes       = {{Item Lore|Katana of the Chosen}} <br>\nConfirmed to proc at level 50, possibly even lower levels.\n|itemname    = Jaelen's Katana\n|lucy_img_ID = 890\n|statsblock  = \nMAGIC ITEM  LORE ITEM  NO DROP  <br>\nSlot: PRIMARY SECONDARY<br>\nSkill: 1H Slashing  Atk Delay: 19<br>\nDMG: 14 <br>\nSTR: +15  STA: +25  HP: +100<br>\nSV FIRE: +10  SV DISEASE: +10  SV COLD: +10  SV MAGIC: +10  SV POISON: +10<br>\nEffect: [[Strike of the Chosen]] (Combat, Casting Time: Instant)<br>\nWT: 1.0  Size: TINY<br>\nClass: WAR<br>\nRace: ALL<br>\n|dropsfrom = \n\n[[Temple of Veeshan]]\n\n* [[Vulak`Aerr]]\n\n}}</onlyinclude>\n\n[[Category:Warrior Equipment]]\n[[Category:Primary]]\n[[Category:Secondary]]\n[[Category:1H Slashing]]\n[[Category:Temple of Veeshan]]"
- },
- {
-  "title": "Jerald's Severed Head",
-  "content": ""
  },
  {
   "title": "King Cod Card",
@@ -517,7 +509,7 @@
  },
  {
   "title": "Monster Summoning II",
-  "content": "{{Classic Era}}\n{{Spellpagesmart|\n\n| spellname = Monster Summoning II\n| spellicon = 38\n| description = Conjures a pet in the form of a local monster to aid you in battle.\n\n| classes = \n\n* [[Magician]] - Level 50\n\n| slots = \n\n{{SpellSlotRow | 1 | Summon Pet: Level 42 [[Monster Summoning II Summon|Monster]] }}\n\n| skill = [[Skill Conjuration | Conjuration]]\n\n| mana = 200\n| range =  \n| casting_time = 10.00\n| fizzle_time = 1.50\n| recast_time = 1.50\n| duration = Instant\n| target_type = Self\n| spell_type = Pet\n| resist = Unresistable\n\n| other = \n\n* '''Reagent:''' [[Malachite]]\n\n| msg_cast_on_you =  \n| msg_cast_on_other =  \n| msg_wears_off =  \n\n| where_to_obtain = \n\n<ul>\n<li>[[Magician#Spell Vendors|Magician Spell Vendors]]</li>\n</ul>\n}}"
+  "content": "{{Classic Era}}\n{{Spellpagesmart|\n\n| spellname = Monster Summoning II\n| spellicon = 38\n| description = Conjures a pet in the form of a local monster to aid you in battle.\n\n| classes = \n\n* [[Magician]] - Level 50\n\n| slots = \n\n{{SpellSlotRow | 1 | Summon Pet: Level 41 [[Monster Summoning II Summon|Monster]] }}\n\n| skill = [[Skill Conjuration | Conjuration]]\n\n| mana = 200\n| range =  \n| casting_time = 10.00\n| fizzle_time = 1.50\n| recast_time = 1.50\n| duration = Instant\n| target_type = Self\n| spell_type = Pet\n| resist = Unresistable\n\n| other = \n\n* '''Reagent:''' [[Malachite]]\n\n| msg_cast_on_you =  \n| msg_cast_on_other =  \n| msg_wears_off =  \n\n| where_to_obtain = \n\n<ul>\n<li>[[Magician#Spell Vendors|Magician Spell Vendors]]</li>\n</ul>\n}}"
  },
  {
   "title": "Monster Summoning III",
@@ -626,10 +618,6 @@
  {
   "title": "Reinforced Rhino Armor",
   "content": "Reinforced Rhino is a pure AC armor set found in [[Kurn's Tower]].\n\nFull set with 2 bracers: +38 AC, 19.6 WT\n\n{{Gear Set\n|Reinforced Rhino Arm Guards\n|Reinforced Rhino Boots\n|Reinforced Rhino Chest Guard\n|Reinforced Rhino Gloves\n|Reinforced Rhino Leggings\n|Reinforced Rhino Skullcap\n|Reinforced Rhino Wrist Guard\n}}\n\n[[Category:Armor Sets]]"
- },
- {
-  "title": "Renaldo's Severed Head",
-  "content": ""
  },
  {
   "title": "Research",
@@ -1054,5 +1042,9 @@
  {
   "title": "Yellow Whip",
   "content": "{{Kunark Era}}\n\n<onlyinclude>{{Itempage\n|notes       = {{Item Lore | A Whip of Flaxen Cord}}\n\nVendors will not buy this.\n|itemname    = A Yellow Whip\n|lucy_img_ID = 596\n|statsblock  = \nLORE ITEM  <br>\nSlot: PRIMARY SECONDARY<br>\nSkill: 1H Slashing  Atk Delay: 33<br>\nDMG: 7 <br>\nWT: 6.0  Size: MEDIUM<br>\nClass: WAR PAL RNG SHD BRD ROG<br>\nRace: ALL<br>\n|dropsfrom = \n\n[[Dreadlands]]\n\n* [[a wulfware lonewolf]]\n\n[[Nektulos Forest]]\n\n* [[a decaying skeleton]]\n|relatedquests = \n\n* [[Necromancer Skullcap Quests]] (#8)\n\n}}</onlyinclude>\n\n[[Category:Bard Equipment]]\n[[Category:Paladin Equipment]]\n[[Category:Ranger Equipment]]\n[[Category:Rogue Equipment]]\n[[Category:Shadow Knight Equipment]]\n[[Category:Warrior Equipment]]\n[[Category:Primary]]\n[[Category:Secondary]]\n[[Category:1H Slashing]]\n[[Category:Dreadlands]]\n\n[[Category:Quest Items]]"
+ },
+ {
+  "title": "Yulcabis' Axe",
+  "content": ""
  }
 ]

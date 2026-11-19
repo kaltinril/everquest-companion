@@ -4,9 +4,9 @@
     <ul>
     <li>Summoning Spell: [[Monster Summoning I]]</li>
     <li>Pet Type: Monster</li>
-    <li>Pet Classes: [[Warrior]]</li>
+    <li>Pet Classes: [[Warrior]]/[[Berserker]]</li>
     <li>Pet Level: 29</li>
-    <li>Hit Points: 1170 (+1/tick)</li>
+    <li>Hit Points: 2248 (+1/tick)</li>
     <li>Mana: 0 (+4/tick)</li>
     </ul>
   </div>
@@ -28,8 +28,6 @@
        <ul>
        <li>Offense: 193</li>
        <li>Accuracy: 196</li>
-       <li>Max Damage: 32</li>
-       <li>Dual Wield Skill: 33%</li>
        </ul>
      </ul>
   </div>
@@ -43,13 +41,26 @@
     <li>Charisma: 15</li></ul>
   </div>
 </div>
-
+==== Melee Attacks ====
+{| class="wikitable"
+!Damage
+!Delay
+!Bonus Damage
+!Dual Wield
+|-
+|15
+|30
+| +2
+| 33%?
+|-
+|}
 == Abilities ==
 * [[Skill_Bash|Bash]]
 * [[Skill_Block|Block]]
 * [[Skill_Cleave|Cleave]]
 * [[Skill_Dodge|Dodge]]
 * [[Skill_Double_Attack|Double Attack]]
+* [[Skill_Frenzy|Frenzy]]
 * [[Skill_Kick|Kick]]
 * [[Skill_Parry|Parry]]
 * [[Skill_Riposte|Riposte]]

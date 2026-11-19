@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-18T07:57:57.360Z",
+  "scrapedAt": "2026-11-19T10:42:22.428Z",
   "source": "eqlwiki.com — Category:NPCs/Named Mobs/Merchants/Raid Encounters ∪ embeddedin Template:Namedmobpage/MerchantPage, filtered to pages opening a mob template + recentchanges delta (scripts/scrape-delta.mts)",
   "mobs": [
     {
@@ -3078,8 +3078,7 @@
       "otherNames": [
         "A caimen"
       ],
-      "image": "npc_a_caiman.png",
-      "noImage": true
+      "image": "npc_a_caiman.png"
     },
     {
       "page": "A Carrion Bat",
@@ -8226,8 +8225,7 @@
         "Chunk of Meat",
         "Gator Meat"
       ],
-      "image": "npc_a_crocodile.png",
-      "noImage": true
+      "image": "npc_a_crocodile.png"
     },
     {
       "page": "A crocodile (Lake Rathe)",
@@ -37555,7 +37553,8 @@
         "Cazic Thule"
       ],
       "drops": [
-        "Bronze Weapons"
+        "Bronze Weapons",
+        "Lizardman Fang"
       ],
       "factions": [
         "Allize Taeew",
@@ -53745,6 +53744,9 @@
       "zones": [
         "Befallen"
       ],
+      "drops": [
+        "Rusty Mining Pick"
+      ],
       "factions": [
         "Befallen Inhabitants"
       ],
@@ -58159,7 +58161,8 @@
       "commonDrops": [
         "Fine Steel Warhammer",
         "Steel Knuckles",
-        "Fine Steel Long Sword"
+        "Fine Steel Long Sword",
+        "Fine Steel Morning Star"
       ],
       "noImage": true
     },
@@ -58248,7 +58251,10 @@
         "Ringmail Mantle",
         "Fine Steel Morning Star",
         "Ringmail Bracelet",
-        "Fine Steel Spear"
+        "Fine Steel Spear",
+        "Weighted Gloves",
+        "Ringmail Cape",
+        "Ringmail Pants"
       ]
     },
     {
@@ -58414,6 +58420,26 @@
       "outOfEra": true,
       "image": "npc_a_terror_carver.png",
       "noImage": true
+    },
+    {
+      "page": "A terrorantuling",
+      "eraTag": "Classic",
+      "name": "a terrorantuling",
+      "level": "21",
+      "zones": [
+        "Southern Desert of Ro"
+      ],
+      "drops": [
+        "Terrorantula Silk",
+        "Urticating Hairs"
+      ],
+      "loc": [
+        {
+          "ns": 309,
+          "ew": 453
+        }
+      ],
+      "image": "npc_a_terrorantuling.png"
     },
     {
       "page": "A Tesch Mal Gnoll",
@@ -81254,6 +81280,27 @@
       "noImage": true
     },
     {
+      "page": "Arthikus",
+      "eraTag": "Classic",
+      "name": "Arthikus",
+      "level": "33",
+      "zones": [
+        "Oasis of Marr"
+      ],
+      "drops": [
+        "Blackrock Lichen",
+        "Embalming Dust",
+        "Rusty Weapons"
+      ],
+      "loc": [
+        {
+          "ns": -1337,
+          "ew": 704
+        }
+      ],
+      "image": "npc_arthikus.png"
+    },
+    {
       "page": "Arthon Spiritsight",
       "name": "Arthon Spiritsight",
       "level": "30",
@@ -94660,6 +94707,22 @@
       ]
     },
     {
+      "page": "Byrola Bendil",
+      "eraTag": "Classic",
+      "name": "Byrola Bendil",
+      "level": "1-3",
+      "zones": [
+        "Steamfont Mountains"
+      ],
+      "loc": [
+        {
+          "ns": -137,
+          "ew": -469
+        }
+      ],
+      "image": "npc_byrola_bendil.png"
+    },
+    {
       "page": "Byzar Bloodforge",
       "eraTag": "Classic",
       "name": "Byzar Bloodforge",
@@ -98134,8 +98197,7 @@
       "factionAmounts": [
         "-30"
       ],
-      "image": "npc_charlotte.png",
-      "noImage": true
+      "image": "npc_charlotte.png"
     },
     {
       "page": "Charlotte Diggs",
@@ -116330,8 +116392,7 @@
           "pct": 5
         }
       ],
-      "image": "npc_dry_bones_skeleton.png",
-      "noImage": true
+      "image": "npc_dry_bones_skeleton.png"
     },
     {
       "page": "Duga",
@@ -122828,8 +122889,7 @@
       "factionAmounts": [
         "-30"
       ],
-      "image": "npc_feddi_dooger.png",
-      "noImage": true
+      "image": "npc_feddi_dooger.png"
     },
     {
       "page": "Feld",
@@ -159767,8 +159827,7 @@
           "pct": 50
         }
       ],
-      "image": "npc_hurgo_felcind.png",
-      "noImage": true
+      "image": "npc_hurgo_felcind.png"
     },
     {
       "page": "Hurrieta Ironforge",
@@ -190143,8 +190202,7 @@
       "factionAmounts": [
         "-"
       ],
-      "image": "npc_mantrek_needlebender.png",
-      "noImage": true
+      "image": "npc_mantrek_needlebender.png"
     },
     {
       "page": "Mar Sedder",
@@ -190857,7 +190915,8 @@
         "Bronze Mace",
         "Bronze Long Sword",
         "Raw-hide Wristbands",
-        "Bronze Battle Axe"
+        "Bronze Battle Axe",
+        "Raw-hide Leggings"
       ]
     },
     {
@@ -196097,8 +196156,7 @@
         "7",
         "10"
       ],
-      "image": "npc_minotaur_guard.png",
-      "noImage": true
+      "image": "npc_minotaur_guard.png"
     },
     {
       "page": "Minotaur Hero",
@@ -196240,6 +196298,16 @@
         "Small Sewing Kit"
       ],
       "noImage": true
+    },
+    {
+      "page": "Mip Sprocket",
+      "eraTag": "Classic",
+      "name": "Mip Sprocket",
+      "level": "60",
+      "zones": [
+        "Steamfont Mountains"
+      ],
+      "image": "npc_mip_sprocket.png"
     },
     {
       "page": "Mira Sayer",
@@ -209021,8 +209089,7 @@
       "image": "npc_phiz_frugrin.png",
       "relatedQuests": [
         "Telescope Lenses"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Phloatin Highbrow",
@@ -214779,8 +214846,7 @@
           "pct": 50
         }
       ],
-      "image": "npc_ranzall_netcaster.png",
-      "noImage": true
+      "image": "npc_ranzall_netcaster.png"
     },
     {
       "page": "Raotin Teawel",
@@ -232853,7 +232919,7 @@
     {
       "page": "Sir Lucan Dlere",
       "eraTag": "Classic",
-      "name": "Sir Lucan Dlere",
+      "name": "Sir Lucan D'Lere",
       "level": "48",
       "zones": [
         "West Freeport"
@@ -232889,8 +232955,7 @@
         "Message Intercept",
         "The Traitor",
         "Zimel's Blades (SoulFire)"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Sir Mollin",
@@ -235354,6 +235419,16 @@
         "Water Flask"
       ],
       "noImage": true
+    },
+    {
+      "page": "Smith Numden",
+      "eraTag": "Classic",
+      "name": "Smith Numden",
+      "level": "60",
+      "zones": [
+        "Steamfont Mountains"
+      ],
+      "image": "npc_smith_numden.png"
     },
     {
       "page": "Smith Tv`ysa",
@@ -260612,7 +260687,7 @@
           "z": 4
         }
       ],
-      "noImage": true
+      "image": "Varish Balinsky.png"
     },
     {
       "page": "Varithyx",
@@ -272613,6 +272688,25 @@
       "relatedQuests": [
         "Yuio's Illness"
       ]
+    },
+    {
+      "page": "Yulcabis",
+      "eraTag": "Classic",
+      "name": "Yulcabis",
+      "level": "13",
+      "zones": [
+        "Steamfont Mountains"
+      ],
+      "drops": [
+        "Yulcabis' Axe"
+      ],
+      "loc": [
+        {
+          "ns": -851,
+          "ew": -1448
+        }
+      ],
+      "image": "npc_yulcabis.png"
     },
     {
       "page": "Yun Assistant Maldock",
