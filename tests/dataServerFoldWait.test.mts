@@ -215,6 +215,54 @@ test('a turn superseded WHILE a poll was in flight says nothing about the answer
   assert.deepEqual(r.saw, [])
 })
 
+// ---- 2b. a read that ended (fork #9) -------------------------------------------------------------
+
+/** A rig that also records every `failed` call. */
+function failing(answers: (FoldHealth | Error)[]): { r: Rig; failed: [string, string][] } {
+  const failed: [string, string][] = []
+  const r = rig(answers, { failed: (why, detail) => failed.push([why, detail]) })
+  return { r, failed }
+}
+
+test('AN ENGINE THAT ANSWERS IDLE ENDS THE WAIT, says why once, and is asked no more', async () => {
+  // The engine accepts an attach before it opens the file; when the read then dies it reports
+  // `idle` and never goes live. The loop used to poll that answer for the rest of the session.
+  const idle: FoldHealth = { status: 'idle', epoch: 2 }
+  const { r, failed } = failing([folding(4096, 40), folding(8192, 80), idle])
+
+  assert.equal(await waitForFold(r.deps), null)
+  assert.equal(r.asks, 3, 'the idle answer was the last poll')
+  assert.equal(r.saw.length, 3, 'the idle answer was still passed on')
+  assert.deepEqual(failed, [['ended', 'the engine reports idle after an accepted attach']])
+  assert.ok(r.notes.some((line) => line.includes('stopped reading the log')))
+})
+
+test('ONLY idle ENDS IT: starting, attaching and folding are waited out', async () => {
+  const script: FoldHealth[] = []
+  for (const status of ['starting', 'attaching', 'folding']) {
+    for (let i = 0; i < 400; i += 1) script.push({ status, epoch: 2 })
+  }
+  script.push(live(4096, 40))
+  const { r, failed } = failing(script)
+
+  assert.equal((await waitForFold(r.deps))?.status, 'live')
+  assert.equal(r.asks, script.length)
+  assert.deepEqual(failed, [], 'a read that landed did not fail')
+})
+
+test('three refusals running say `unanswered`, with the last refusal as the detail', async () => {
+  const { r, failed } = failing([new EngineError('timeout', 'nobody answered')])
+  assert.equal(await waitForFold(r.deps), null)
+  assert.deepEqual(failed, [['unanswered', 'timeout: nobody answered']])
+})
+
+test('a superseded turn fails nothing, even on an idle answer', async () => {
+  const failed: string[] = []
+  const r = rig([{ status: 'idle', epoch: 2 }], { mine: () => false, failed: (why) => failed.push(why) })
+  assert.equal(await waitForFold(r.deps), null)
+  assert.deepEqual(failed, [])
+})
+
 // ---- 3. the sentence a long fold explains itself with --------------------------------------------
 
 test('THE NARRATION SAYS WHERE THE FOLD IS, in the units a person waits in', () => {

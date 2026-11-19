@@ -211,6 +211,8 @@ export interface EngineSupervisorDeps extends HealthWatchDeps {
    * in — and the count lives in the entry the deps' `report` gets.
    */
   onServedExit?(): void
+  /** Each engine stderr line, token-redacted and bounded, for the log-read report (fork #9). */
+  onEngineSaid?(line: string): void
   /**
    * THE MACHINE'S OWN SLEEP, seamed like the clock (`EnginePowerHandlers`): the composition root
    * subscribes to Electron's `powerMonitor` and calls these; this file never learns the word.
@@ -461,6 +463,7 @@ export class EngineSupervisor {
       // `boundedDetail` states: it is text from outside our types heading for a log a person reads.
       const safe = redactToken(line, token)
       l.lastStderr = boundedDetail(safe)
+      if (l.lastStderr !== null) this.deps.onEngineSaid?.(l.lastStderr)
       this.deps.debug(`data-server engine: ${trim(safe)}`)
     })
     child.on('error', (err) => {

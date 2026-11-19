@@ -58,7 +58,12 @@ import { logInfo } from '../errorLog'
 import { setWorldRebuiltObserver } from '../worldRebuilt'
 import { getActiveCharacter } from '../session'
 import { liveHistory } from '../logArchive/liveHistory'
-import { createEngineClient, EngineError, type EngineClient } from '../../shared/dataServer/client'
+import {
+  createEngineClient,
+  EngineError,
+  type ConnectionState,
+  type EngineClient
+} from '../../shared/dataServer/client'
 import { createNdjsonTransport, type ByteChannel } from '../../shared/dataServer/ndjson'
 import type {
   ClientMessage,
@@ -115,6 +120,13 @@ import { noteEngineFolding, noteEngineLive, noteFoldProgress } from './engineLau
 // a connection that dies mid-wait — are drivable in a unit test. Its header carries the owner ruling
 // that a folding engine is never given up on.
 import { waitForFold, type FoldHealth } from './foldWait'
+// What went wrong on the way to live, kept for the "Reading log..." report (fork #9).
+import {
+  noteLogReadConnection,
+  noteLogReadError,
+  noteLogReadHealth,
+  noteLogReadTurn
+} from './logReadState'
 import { SERVABLE, type Readiness } from './readShim'
 import type { ReadyEngine } from './supervisor'
 import type { ParamsFor, RequestOp, ResultFor } from '../../shared/dataServer/ops'
@@ -211,6 +223,7 @@ function bumpGen(): number {
   // measured on the world somebody has since replaced is a fact about a different log, and a
   // synchronous reader holding it would answer with authority about a character the app has left.
   resetMirrors()
+  noteLogReadTurn(Date.now())
   return gen
 }
 
@@ -295,6 +308,7 @@ export function onEngineReady(info: ReadyEngine | null): void {
     debug('data-server client: the engine is gone; the connection is closed')
     return
   }
+  noteLogReadConnection(Date.now())
   const client = createEngineClient({
     token: info.token,
     debug: (note) => {
@@ -311,6 +325,8 @@ async function openConnection(mine: number, info: ReadyEngine, client: EngineCli
     channel = await connectToEngine(info.port, CONNECT_TIMEOUT_MS)
   } catch (err) {
     debug(`data-server client: could not reach the engine on port ${String(info.port)} (${describeErr(err)})`)
+    // The connection guard, not the turn one: a connect is per launch and outlives a world rebuild.
+    if (live?.client === client) noteLogReadError('connect', describeErr(err), Date.now())
     return
   }
   if (gen !== mine) {
@@ -625,6 +641,7 @@ async function sendAttach(mine: number, l: LiveEngine, logPath: string): Promise
     return result.epoch
   } catch (err) {
     debug(`data-server client: session.attach was refused (${describeErr(err)})`)
+    if (gen === mine) noteLogReadError('attach', describeErr(err), Date.now())
     return null
   }
 }
@@ -703,6 +720,7 @@ function servingLine(logPath: string | null, health: FoldHealth): string {
  * live would be the shim serving a mid-scan prefix to a hydrating window.
  */
 function sawHealth(l: LiveEngine, health: FoldHealth): void {
+  noteLogReadHealth(health.status, health.mark?.offset, Date.now())
   if (health.status !== 'live') return
   // THE GO-LIVE EDGE (JOS-493), taken exactly once per turn: the shim starts serving on this
   // assignment, so the windows that hydrated during the fold are holding this process's own
@@ -767,8 +785,27 @@ async function waitForFoldHere(mine: number, l: LiveEngine): Promise<FoldHealth 
       sawHealth(l, health)
     },
     note: debug,
-    logSize: () => lastFoldLogSize
+    logSize: () => lastFoldLogSize,
+    failed: (why, detail) => {
+      // A dead read is forgotten, so a later rebuild of the same log attaches again (fork #9).
+      if (why === 'ended') l.attachedTo = null
+      noteLogReadError(why === 'ended' ? 'fold' : 'health', detail, Date.now())
+    }
   })
+}
+
+/** What this file knows about the read, for the "Reading log..." report (fork #9). */
+export function engineClientFacts(): {
+  connection: ConnectionState | null
+  readiness: string
+  logSize: number | null
+} {
+  const ready = engineServeReadiness()
+  return {
+    connection: live?.client.state ?? null,
+    readiness: ready.ok ? 'ok' : ready.why,
+    logSize: lastFoldLogSize
+  }
 }
 
 // ── what the performance panel can ask this file (JOS-483) ─────────────────────────────────────

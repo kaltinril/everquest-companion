@@ -440,6 +440,28 @@ test('THE LAUNCH TOKEN NEVER COMES BACK OUT — a child that echoes its stdin pu
   assert.match(everything, /<token>/, 'and it was redacted rather than the line being dropped')
 })
 
+test('EVERY STDERR LINE REACHES onEngineSaid, token-redacted and bounded (fork #9)', () => {
+  const h = harness()
+  h.supervisor.start()
+  const token = h.tokens[0]
+  h.children[0].stderr.emit(`warming up\n\nbad token ${token}\n${'x'.repeat(5_000)}\n`)
+  assert.equal(h.said.length, 3, 'a blank line is not something the engine said')
+  assert.equal(h.said[0], 'warming up')
+  assert.equal(h.said[1], 'bad token <token>')
+  assert.ok(h.said[2].length < 300, `a 5,000 character line arrived whole (${String(h.said[2].length)})`)
+  assert.equal(h.said.join('\n').includes(token), false, 'the token reached the report')
+})
+
+test('a supervisor built without onEngineSaid behaves as before', () => {
+  const h = harness({ deaf: true })
+  h.supervisor.start()
+  h.children[0].stderr.emit('warming up\nERROR: could not open the knowledge corpus\n')
+  h.children[0].exit(1)
+  assert.deepEqual(h.said, [])
+  assert.equal(h.reports[0].detail, 'ERROR: could not open the knowledge corpus')
+  assert.ok(h.logs.some((l) => l.includes('warming up')))
+})
+
 test('an 8 MB stdout line with no newline does not throw into the app', () => {
   // `LineDecoder` raises past its ceiling, and a throw inside a `data` handler is an uncaught
   // exception in the main process — i.e. a child could take the app down by printing.

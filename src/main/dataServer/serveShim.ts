@@ -57,6 +57,7 @@ import { logInfo } from '../errorLog'
 import { engineLogMtimeMs, engineRequest, engineServeReadiness } from './engineClientHost'
 import { createReadShim, type ReadShim } from './readShim'
 import { startSlowReadLog } from './slowReads'
+import { noteCombatRead } from './logReadState'
 import { liveHistory } from '../logArchive/liveHistory'
 import { withArchivedDrops } from '../../shared/logArchive/mergeDropsSeen'
 import { withoutKillFactionSamples } from '../../shared/gapKillFactionSamples'
@@ -138,7 +139,10 @@ function delay(ms: number): Promise<void> {
 let shim: ReadShim | null = null
 
 function readShim(): ReadShim {
-  shim ??= createReadShim({
+  if (shim !== null) return shim
+  // Slow and unserved reads, to a file a tester can send (slowReads.ts).
+  const record = startSlowReadLog(app.getPath('userData'))
+  shim = createReadShim({
     readiness: engineServeReadiness,
     request: engineRequest,
     note: (line) => {
@@ -148,8 +152,11 @@ function readShim(): ReadShim {
     timeoutMs: SERVE_TIMEOUT_MS,
     noteEveryMs: NOTE_EVERY_MS,
     delay,
-    // Slow and unserved reads, to a file a tester can send (slowReads.ts).
-    observe: startSlowReadLog(app.getPath('userData'))
+    observe: (op, ms, unserved) => {
+      record(op, ms, unserved)
+      // The last combat read's fate, for the "Reading log..." report (fork #9).
+      if (op === 'combat.snapshot') noteCombatRead(unserved ?? null, Date.now())
+    }
   })
   return shim
 }

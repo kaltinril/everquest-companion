@@ -15,7 +15,9 @@ import type { EngineExitLog, EnginePowerHandlers } from '../src/main/dataServer/
 import { FakeChild, connectError, fakeClock, scriptedChannel, type ChannelBehaviour } from './dataServerSupervisorFakes.mts'
 
 /** Everything one supervisor-under-test is wired to, and everything it said. */
-export function harness(opts: { binary?: string | null; behaviour?: ChannelBehaviour; spawnThrows?: Error } = {}) {
+export function harness(
+  opts: { binary?: string | null; behaviour?: ChannelBehaviour; spawnThrows?: Error; deaf?: boolean } = {}
+) {
   const clock = fakeClock()
   const children: FakeChild[] = []
   let power: EnginePowerHandlers | null = null
@@ -28,6 +30,8 @@ export function harness(opts: { binary?: string | null; behaviour?: ChannelBehav
   /** THE CYCLING EDGE (JOS-519) — one entry per launch that had SERVED and then died, stamped with
    *  the fake clock so a suite can assert both how many there were and when. */
   const servedExits: number[] = []
+  /** Every stderr line handed to `onEngineSaid` (fork #9). `deaf` wires a supervisor without it. */
+  const said: string[] = []
   const tokens: string[] = []
   let mintCount = 0
   // MUTABLE, because a health WATCHDOG is only a watchdog if the answer can change under it: the
@@ -68,6 +72,7 @@ export function harness(opts: { binary?: string | null; behaviour?: ChannelBehav
     onReady: (engine) => readies.push(engine),
     onFault: (fault) => faults.push(fault),
     onServedExit: () => servedExits.push(clock.now()),
+    ...(opts.deaf === true ? {} : { onEngineSaid: (line: string) => said.push(line) }),
     powerEvents: (handlers) => (power = handlers)
   }
   return {
@@ -79,6 +84,7 @@ export function harness(opts: { binary?: string | null; behaviour?: ChannelBehav
     readies,
     faults,
     servedExits,
+    said,
     tokens,
     /** One entry per probe connection, in order, saying which engine answered it. */
     connects,
