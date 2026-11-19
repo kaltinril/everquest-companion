@@ -3,6 +3,9 @@
 //! private instance closes the last. A child of `respawn_tests.rs` for its helpers and constants.
 
 use super::*;
+use crate::modules::respawn_learned::LearnedStore;
+use crate::modules::respawn_wiki::{floor_of, resolve_respawn, wiki};
+use eqlog::names::id_key;
 
 fn zone_named(ts: i64, name: &str) -> String {
     format!(r#"{{"kind":"zone","seq":0,"ts":{ts},"raw":"z","zone":"{name}"}}"#)
@@ -244,5 +247,95 @@ fn gaps_learned_in_a_private_instance_and_in_the_open_zone_file_under_one_zone()
     assert_eq!(learned[0]["zone"], "Nektropos Castle 4 (Refined)");
     assert_eq!(learned[0]["id"], "nektropos castle 4 (refined)::a vis ghoul knight");
     assert_eq!(learned[0]["gapsMs"].as_array().map(Vec::len), Some(2));
+}
+
+/// The owner's 31 measured Enynti gaps, in seconds (`tests/respawnLearn.test.mts`).
+const ENYNTI_S: [i64; 31] = [
+    558, 956, 1010, 656, 676, 550, 554, 669, 532, 533, 530, 618, 531, 544, 599, 543, 559, 608, 929, 881, 530, 2035, 529, 2272, 1921,
+    542, 530, 1350, 1037, 1353, 2764,
+];
+
+/// What one mob's gaps (in seconds) agree on, with gaps under `floor` ms left out.
+fn agreed_of(gaps_s: &[i64], floor: i64) -> Option<i64> {
+    let mut store = LearnedStore::default();
+    for g in gaps_s {
+        store.record("z::m", ("m", "M", "z"), 0, g * 1000);
+    }
+    store.agreed("m", |_| true, floor)
+}
+
+/// Three gaps inside 50 s agree, and the lowest such cluster is the number (the Gaps tab's own rule).
+#[test]
+fn three_gaps_inside_fifty_seconds_agree_on_the_lowest_of_them() {
+    assert_eq!(agreed_of(&ENYNTI_S, 0), Some(529_000));
+    assert_eq!(agreed_of(&[527, 567, 529], 0), Some(527_000));
+    assert_eq!(agreed_of(&[527, 529], 0), None, "two gaps are not enough");
+    assert_eq!(agreed_of(&[527, 529, 600], 0), None, "nor three that sit apart");
+    assert_eq!(agreed_of(&[60, 75, 90, 720, 730, 740], 0), None, "under two minutes is two spawns sharing the name");
+    assert_eq!(agreed_of(&[60, 75, 90, 720, 730, 740], 600_000), Some(720_000), "a ten-minute floor leaves the short gaps out");
+}
+
+/// The agreed gap lowers a longer wiki floor and does nothing else to the ladder (fork #8).
+#[test]
+fn an_agreed_gap_lowers_a_longer_wiki_floor_and_nothing_else() {
+    let ladder = |observed: i64, wiki: Option<i64>, agreed: Option<i64>| resolve_respawn(None, Some(observed), 3, floor_of(wiki, agreed));
+    assert_eq!(ladder(529_000, Some(1_320_000), Some(529_000)), (Some(529_000), "observed"));
+    assert_eq!(ladder(529_000, Some(1_320_000), None), (Some(1_320_000), "observed"), "no agreement keeps the wiki floor");
+    assert_eq!(ladder(200_000, Some(1_320_000), Some(529_000)), (Some(529_000), "observed"), "an outlier under the agreed gap");
+    assert_eq!(ladder(529_000, Some(300_000), Some(529_000)), (Some(529_000), "observed"), "a wiki time under the kills");
+    assert_eq!(floor_of(Some(300_000), Some(529_000)), Some(300_000), "never raised");
+    assert_eq!(ladder(200_000, None, Some(529_000)), (Some(200_000), "observed"), "no wiki time, no floor");
+}
+
+fn death_of(name: &str, ts: i64) -> String {
+    serde_json::json!({ "kind": "death", "seq": 0, "ts": ts, "raw": "d", "name": name, "bySelf": true }).to_string()
+}
+
+/// fork #8: the page said 22 minutes, the kills 8:50 apart, and the clock kept the page's number.
+/// Four kills 530 s apart in one stay are three agreeing gaps, and the clock is theirs.
+#[test]
+fn agreeing_kills_number_the_clock_under_a_longer_wiki_time() {
+    // Any page stating more than ten minutes, picked at run time: never a named page.
+    let page = wiki()
+        .values()
+        .filter(|w| w.seconds.is_some_and(|s| s > 600) && id_key(&w.key) == w.key)
+        .min_by(|a, b| a.key.cmp(&b.key))
+        .expect("a page with a stated respawn");
+    let wiki_ms = page.seconds.unwrap_or_default() * 1000;
+    let watch = RespawnWatchPref { key: page.key.clone(), display: page.key.clone(), custom_sec: None, shared_name: false };
+    let mut m = RespawnModule::new(NOW, RespawnPrefs { watches: vec![watch] });
+    m.on_event(&ev(&zone(T_ZONE)), false);
+    for n in 0..3 {
+        m.on_event(&ev(&death_of(&page.key, T_DEATH + n * 530_000)), false);
+    }
+    let two = only_row(&m);
+    assert_eq!((two.agreed_ms, two.estimate_ms), (None, Some(wiki_ms)), "two gaps keep the wiki floor");
+    assert!(m.snapshot()["state"]["rows"][0].get("agreedMs").is_none(), "absent, never null");
+    m.on_event(&ev(&death_of(&page.key, T_DEATH + 3 * 530_000)), false);
+    let three = only_row(&m);
+    assert_eq!((three.estimate_ms, three.source, three.samples), (Some(530_000), "observed", 3));
+    assert_eq!(three.wiki_ms, Some(wiki_ms), "the row still states the page's own number");
+    assert_eq!(m.snapshot()["state"]["rows"][0]["agreedMs"], 530_000);
+}
+
+/// Gaps a closed private instance taught count toward the agreed gap, pooled as the estimate is.
+#[test]
+fn gaps_learned_in_a_closed_private_instance_count_toward_the_agreed_gap() {
+    let mut m = RespawnModule::new(NOW, watching_without_a_number());
+    m.on_event(&ev(&instance_created(T_ZONE - 1_000, "Lake Nerius", 17)), false);
+    m.on_event(&ev(&zone_named(T_ZONE, "Lake Nerius 4 (Refined)")), false);
+    for n in 0..3 {
+        m.on_event(&ev(&death(n, T_DEATH + n * 530_000)), false);
+    }
+    assert_eq!(only_row(&m).agreed_ms, None, "two gaps do not agree yet");
+    // The zone's next instance closes the first; one more gap there is the third.
+    let t_next = T_DEATH + 3 * 530_000;
+    m.on_event(&ev(&instance_created(t_next, "Lake Nerius", 18)), false);
+    m.on_event(&ev(&zone_named(t_next + 1_000, "Lake Nerius")), false);
+    m.on_event(&ev(&death(4, t_next + 60_000)), false);
+    m.on_event(&ev(&death(5, t_next + 60_000 + 540_000)), false);
+    let row = only_row(&m);
+    assert_eq!((row.agreed_ms, row.samples), (Some(530_000), 3));
+    assert_eq!(row.estimate_ms, Some(530_000), "no wiki time: the smallest gap, as before");
 }
 

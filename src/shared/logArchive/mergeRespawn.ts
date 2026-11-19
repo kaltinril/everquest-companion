@@ -69,6 +69,8 @@ function joinRow(older: RespawnRow, newer: RespawnRow): RespawnRow {
   const out: RespawnRow = { ...newer, kills: older.kills + newer.kills, samples: older.samples + newer.samples }
   const bounds = [older.observedMs, newer.observedMs].filter((n): n is number => typeof n === 'number')
   if (bounds.length > 0) out.observedMs = Math.min(...bounds)
+  // The agreed gap of either side lowers the wiki floor: the smaller one, as for the bound.
+  if (older.agreedMs !== undefined) out.agreedMs = Math.min(older.agreedMs, newer.agreedMs ?? older.agreedMs)
   const gaps = [...(newer.gapsMs ?? []), ...(older.gapsMs ?? [])].slice(0, RESPAWN_MAX_GAPS)
   if (gaps.length > 0) out.gapsMs = gaps
   return withEstimate(out)

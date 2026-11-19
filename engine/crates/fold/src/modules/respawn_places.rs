@@ -112,4 +112,11 @@ impl RespawnModule {
         let (learned_min, learned_count) = self.learned.pooled(&h.key, |z| zone_base(z) == base, floor);
         (least(min, learned_min), samples.max(learned_count))
     }
+
+    /// The gap the mob's kills agree on across the zone's places (`respawn_learned.rs agreed`), off
+    /// the learned store alone: every gap the history learns is recorded there.
+    pub(super) fn agreed_gap(&self, h: &MobHistory, floor: i64) -> Option<i64> {
+        let base = zone_base(&h.zone);
+        self.learned.agreed(&h.key, |z| zone_base(z) == base, floor)
+    }
 }

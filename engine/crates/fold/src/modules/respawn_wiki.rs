@@ -37,10 +37,16 @@ pub fn wiki() -> &'static std::collections::HashMap<String, WikiRespawn> {
     })
 }
 
+/// The floor under rung 2: the wiki time, lowered to the gap the player's kills agree on when that
+/// is shorter (fork #8). Never raised by it, and no floor where the wiki states none.
+pub fn floor_of(wiki_ms: Option<i64>, agreed_ms: Option<i64>) -> Option<i64> {
+    wiki_ms.map(|w| agreed_ms.map_or(w, |a| a.min(w)))
+}
+
 /// `resolveRespawn` — the estimate ladder. Rung 2 is FLOORED by rung 3 rather than averaged with it
 /// (the smallest gap you measured is an upper bound, so the wiki lifting it is a correction); rung
 /// 1 is never floored, because the user is looking at the spawn and the wiki describes another
-/// server.
+/// server. The fourth argument is the floor in force (`floor_of`), the wiki time unless kills agree.
 pub fn resolve_respawn(
     custom_ms: Option<i64>,
     observed_ms: Option<i64>,
