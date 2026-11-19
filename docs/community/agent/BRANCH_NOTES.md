@@ -55,6 +55,11 @@ where one exists.
     experience a week, added. Drop = kills a week x (class drops per kill / loot list) x 16 /
     hardness; quest reward = its slowest part x 1. Raid target = roster mob or a stated respawn of
     a day or more, 1 kill a week. Absent when no page states a road: then only motes are counted.
+  - TRAP (review, 2026-11-19): `moteShare` decides whether the supply counts at all. At 0.5 the
+    ordinary motes swamped the copies of anything scarce and the tier alone ordered the list
+    (Hate's trash armour at +9 led every raid boss's drop). It is 0.05, and a raid zone's trash is
+    counted at the runs it CAN be run (16 a week), a raid target at its lockout. After changing
+    either, replay the owner's dump and the week of Nov 11 (the plan doc's "Review").
   - AN ESTIMATE: the catalog has no drop rates. What a page does not state is assumed at a `SUPPLY`
     default and listed in `supply.assumed`; never present a number from it as measured.
   - Gate: `pick` at +7 or higher; `rare` at +5 or +6 when supply <= 0.5 a week (the Plane of Sky

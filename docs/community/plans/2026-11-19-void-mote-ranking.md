@@ -96,7 +96,7 @@ weighted by how much the piece gives you.
 | --- | --- | --- | --- | --- |
 | 1 | how often the mob can be killed | `respawns.json` seconds (555 pages); spawn points from `mobs.json` `loc` | 600 s, named 1 spawn, common 4: listed as assumed | data where stated, else a stated default |
 | 2 | placeholders | the spawn points' stated shares, summed (`loc[].pct`; 3,125 mobs state one) | counted as always up | data where stated |
-| 3 | how often the raid or instance starts | raid roster (`bosses.json`) or a stated respawn of a day or more: 1 kill a week; other mobs of a raid zone: 2 runs a week; a respawn over an hour: 1 personal instance an hour | the camp rule | the lockout rule is the wiki's and measured (1.3 a week); 2 runs a week is a guess from 1 to 3 measured |
+| 3 | how often the raid or instance starts | raid roster (`bosses.json`) or a stated respawn of a day or more: 1 kill a week; other mobs of a raid zone: the 16 runs a week it can be run; a respawn over an hour: 1 personal instance an hour | the camp rule | the lockout rule is the wiki's and measured (1.3 a week); 16 runs is the ceiling (re-made about hourly, measured), the habit was 2 |
 | 4 | the chance it drops | gear a kill of the mob's class drops / its loot list size (drop groups counted) | list size 14, 2 or 7 by class: listed as assumed | a proxy: no rate is in the data. Anchored on measured gear per kill |
 | 5 | copies at +4 | a drop counts 16, a quest reward or a crafted item 1 | none needed | the game's rule; assumes the player farms at D4 |
 | 6 | how hard the mob is | raid target, raid zone, level over 50, a hand-kept mechanics list (`MECHANIC_MOBS`: Lord Rikantus Everling) | not harder | judgment, except the level |
@@ -117,14 +117,14 @@ only).
 | `instancesPerHour` | 1 | 2 charges, 1 an hour |
 | `raidKillsPerWeek` | 1 | the weekly lockout; measured 1.3 |
 | `raidRespawn` | 1 day | a stated respawn this long is a raid-style target |
-| `raidRunsPerWeek` / `raidZonePoints` | 2 / 6 | guesses; measured 1 to 3 runs, 7 to 17 kills a week of one trash name |
+| `raidRunsPerWeek` / `raidZonePoints` | 16 / 6 | the CEILING, as a camp's kills are (factor 3 asks how often it CAN be started): 20 hours over a 75 minute clear; a plane's instance is re-made about hourly (a second Refined Hate 67 to 92 minutes after the first, four days). The owner's habit was 2 runs a week (30 Refined Hate entries in 14.3 weeks). Was 2 in the first cut. 6 points is a guess |
 | `partsPerHour` / `craftedPerHour` | 2 / 4 | guesses, always listed as assumed |
 | `hard.raid` / `hard.group` | 2 / 1.5 | judgment: a +4 raid target needs a group; so does a raid zone |
 | `hard.levelStep` | 0.2 a level over 50 | judgment: level 65 is 4 times slower |
 | `hard.mechanics` | 2 | judgment, hand-kept list |
 | `hoursPerWeek` | 20 | turns a weekly kill into an hourly rate; the order does not change from 5 to 35 |
 | `moteExpPerHour` | 18.6, 12.5, 7.8, 4.55, 2.6, 1.45 (+4 to +9) | measured, one player, level 50, D4 |
-| `moteShare` | 0.5 | judgment: a mote spent here is one not spent on a spell or another item. At 1 a raid boss's drop and a raid zone's trash drop tie; at 0 the tier stops mattering for farmable items |
+| `moteShare` | 0.05 | judgment: one item's share of the ordinary motes, among about twenty worn pieces and the spells. Was 0.5 in the first cut: the motes then swamped the copies, so the six factors moved nothing at +7 and up and the tier alone ordered every scarce item (see "Review") |
 | `minTier` / `rareMinTier` / `rarePerWeek` | 7 / 5 / 0.5 | the owner's rule and exception; 0.5 sits between the Sky test rewards (0.07 to 0.34) and a raid boss's drop (1.0) |
 
 ### Unknown is not easy and not hard
@@ -158,6 +158,44 @@ only).
   then tied at a tier, and Indicolite led an Innoruuk drop on gain alone); it became the blend with
   `moteShare`. The level step went 0.1 to 0.2 and stopped applying inside raid zones. The week's
   plan stopped filling up with "not yet" rows.
+
+## Review (2026-11-19, before the merge; the owner asked for one against the rules above)
+
+- Finding: in the first cut the supply was computed and then did not count. At `moteShare` 0.5 the
+  ordinary motes brought 0.7 to 2.3 experience an hour against 0.05 to 0.25 from copies of anything
+  scarce, so hours were the tier's alone (55, 190, 526 at +7, +8, +9 for a raid boss's drop and for
+  Hate's trash armour alike) and Indicolite Breastplate +9 led every raid boss's drop. The owner's
+  rule says the opposite, and the owner spent 12 motes over four weeks with none on it.
+- The supply itself checks against the owner's loot lines (14.3 weeks): Indicolite Breastplate 8
+  copies looted, 5 at +4, so 0.35 a week at 2 runs a week; modelled 0.31. Earring of Bashing 12
+  looted, 5 at +4: a raid boss's drop came in no slower than the trash piece at the owner's habit.
+  What separates them is the lockout: more runs bring more Indicolite, never more of Innoruuk's.
+- Two constants changed, nothing else: `moteShare` 0.5 to 0.05, `raidRunsPerWeek` 2 to 16 (the
+  ceiling). The plan stays one mote at a time; a best-total split over the three was tried and put
+  all three on a +7 raid piece ahead of finishing a +8 one, against the list's own first row.
+- After, the owner's dump of 2026-11-18, Balanced:
+
+  | # | Row | Hours | Why |
+  | --- | --- | --- | --- |
+  | 1 | Earring of Bashing +8 | 1,422 | Innoruuk, weekly |
+  | 2 | Indicolite Breastplate +9 | 296 | Hate and Fear trash, re-runnable |
+  | 3 | Darkbrood Mask +7 | 461 | Innoruuk |
+  | 4 | Bloodstar Pendant +7 | 461 | Innoruuk |
+  | 5 | Hotof's Bracer +7 | 461 | Innoruuk |
+  | 6 | Back Straps of Mastery +6 (allowed early) | 163 | Sky test |
+  | 7 | Indicolite Vambraces +8 | 145 | Hate trash |
+
+  The week: Earring of Bashing +8 to +10, then Indicolite Breastplate +9 to +10.
+- Against the motes spent: the week of Nov 11 replayed (Slime Blood and Shield of Rainbow Hues back
+  at +8) plans Slime Blood +8 to +10 and Earring of Bashing +8 to +9. The owner's merges that night:
+  Slime Blood +9 and +10, and Earring of Bashing +8 one minute after the third mote arrived.
+- Still not reproduced: all three on Blood's Unity from +7 (the data lists it as a camp drop, which
+  it is not) and on the Talisman.
+- Side effect: 6 of the 95 Plane of Sky test rewards leave the +5/+6 exception, because their parts
+  come from island mobs that are no raid target (Ton Po's Shoulder Wraps, 2.3 a week). The ranger
+  bow (Windstriker, 0.063) and 88 others stay.
+- The hours are an index now, not a forecast: at a twentieth share a raid boss's +9 reads 4,180
+  hours. The tab's order is what they are for.
 
 ## Known gaps
 

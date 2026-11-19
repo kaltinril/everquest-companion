@@ -43,11 +43,12 @@ export const MOTE_RULES = {
    */
   moteExpPerHour: [18.6, 18.6, 18.6, 18.6, 18.6, 12.5, 7.8, 4.55, 2.6, 1.45],
   /**
-   * The share of those motes counted toward one item: a mote spent here is one not spent on a
-   * spell or another item. A judgment. At 1 a raid boss's drop and a raid zone's trash drop tie;
-   * at 0 the tier stops mattering for anything farmable.
+   * The share of those motes counted toward ONE item: a character wears about twenty pieces and has
+   * spells to raise, and every one draws on the same motes. A judgment. At 0.5 the motes swamp the
+   * copies and the tier alone orders every scarce item, whatever it drops from (the first cut:
+   * Hate's trash armour at +9 led every raid boss's drop, where the owner spent none on it).
    */
-  moteShare: 0.5
+  moteShare: 0.05
 } as const
 
 /** How many the game hands out a week (and lets you hold): the size of the week's plan. */

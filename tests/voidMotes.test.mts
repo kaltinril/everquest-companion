@@ -200,9 +200,9 @@ test("THE OWNER'S ORDER OF SCARCITY: a weekly raid boss's drop, then a raid zone
 // ---- hours, and the tier gate -------------------------------------------------------------------
 
 test('moteHours: the tier over copies plus the share of ordinary motes; no stated road counts motes alone', () => {
-  // +7 is 128 experience; motes bring 4.55 an hour and half are counted.
-  assert.deepEqual(moteHours(7, undefined), { hours: 56.3, road: 'motes' })
-  assert.deepEqual(moteHours(7, { kind: 'unknown', roads: 0 }), { hours: 56.3, road: 'motes' })
+  // +7 is 128 experience; motes bring 4.55 an hour and one item's share of them is a twentieth.
+  assert.deepEqual(moteHours(7, undefined), { hours: 562.6, road: 'motes' })
+  assert.deepEqual(moteHours(7, { kind: 'unknown', roads: 0 }), { hours: 562.6, road: 'motes' })
   const farm = moteHours(7, supplyOf('Earring of Experimentation'))
   assert.equal(farm.road, 'copies')
   assert.ok(farm.hours < 2, String(farm.hours))
@@ -274,6 +274,9 @@ const names = (rows: readonly GearRow[], tiers: readonly number[]): string[] => 
 test("THE OWNER'S EXAMPLE: a weekly raid boss's drop outranks a rare drop from an instance's trash at the same tier", () => {
   assert.deepEqual(names([gear('Rare Trash Blade'), gear('Bloodstar Pendant')], [8, 8]), ['Bloodstar Pendant', 'Rare Trash Blade'])
   assert.deepEqual(names([gear('Indicolite Vambraces'), gear('Bloodstar Pendant')], [8, 8]), ['Bloodstar Pendant', 'Indicolite Vambraces'], "and a raid zone's trash drop")
+  // The source outweighs one tier (review, 2026-11-19): the first cut let ordinary motes swamp the
+  // copies, so Hate's trash armour at +9 led every raid boss's drop at +8, where the owner spent none on it.
+  assert.deepEqual(names([gear('Indicolite Vambraces'), gear('Bloodstar Pendant')], [9, 8]), ['Bloodstar Pendant', 'Indicolite Vambraces'], 'even a tier lower')
 })
 
 test("THE OWNER'S EXAMPLE: a common drop from many mobs in many zones ranks lowest", () => {

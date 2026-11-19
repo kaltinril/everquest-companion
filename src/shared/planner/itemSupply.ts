@@ -79,8 +79,13 @@ export const SUPPLY = {
   raidKillsPerWeek: 1,
   /** a stated respawn this long (seconds) is a raid-style target: weekly, like the roster's */
   raidRespawn: 86_400,
-  /** raid runs a week whose other mobs can be killed (the owner ran each plane 1 to 3 times) */
-  raidRunsPerWeek: 2,
+  /**
+   * Runs a week a raid zone's other mobs CAN be killed in (owner's factor 3: how often it can be
+   * started), the ceiling a camp's kills are counted at too: the week's 20 hours over a 75 minute
+   * clear. A plane's instance is re-made about hourly (a second Refined Hate 67 to 92 minutes after
+   * the first, four days); the owner's habit was 2 runs a week. A raid target stays at its lockout.
+   */
+  raidRunsPerWeek: 16,
   /** spawn points of a raid zone's mob whose page lists none */
   raidZonePoints: 6,
   /** a quest part or a quest with no listed source: how many an hour is assumed */
