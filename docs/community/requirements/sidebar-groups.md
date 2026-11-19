@@ -8,3 +8,4 @@ before 2026-10-10 were gathered that day from agent notes and the branch history
 | --- | --- | --- | --- |
 | 2026-09-12 | owner | Group the sidebar: Overview on top; Research (Mobs, Gear, Plane of Sky, Spells, Raid targets, Factions); Stats/Data (Combat, Loot, Buffs, Leveling); Config (Alerts, Timers). | built (Maps placed under Research by the agent; unconfirmed) |
 | 2026-10-18 | owner | The overview spec's stale checks (Loot after Mobs; the Preferences row probed while scrolled out of view) follow the grouped nav. | built |
+| 2026-11-10 | ziplock9000 (fork #10); owner 2026-11-19 | The left menu is spaced out too much: "It should be a lot more compact." Owner: "some font sizing for the menu, and some spacing sizing for the menu so users can control that separately from other font/spacing. Perhaps with some defaults that just shrink the height". | planned (plans/2026-11-19-issue-sweep.md, phase 5) |
