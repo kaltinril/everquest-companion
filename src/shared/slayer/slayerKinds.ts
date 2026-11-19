@@ -13,6 +13,7 @@
 //   names  words a mob's NAME states the kind with, used only for a mob the index has no usable
 //          race for. A match read off a name is an estimate and every consumer labels it so;
 //   of     other terms this one is the sum of (`Mystical Horses` is the four horses).
+// A term may also name `yieldsTo`: terms whose NAME word outranks its race claim (the drakes).
 // A term with none of them is a creature this table makes no claim about, which is most of what
 // came with later expansions (Shissar, Hynids, Riftseekers). It is listed anyway: a term that is
 // MISSING from the table is a word the game printed that nobody has looked at, and
@@ -28,6 +29,8 @@
 //     So that one term reads the name first (`always`).
 //   - `Pesticide` less `Rats!` is 99, and `Bats and Werebats.` stands at 99/100.
 //   - Gargoyles, golems and scarecrows: 1,138 kills in the log against `It's Alive!` at 1,147.
+//   - A DRAKE IS NOT A TRUE DRAGON (fork #5): An Emerald Drake's page states `Dragon`, a player's
+//     kills of it did not move `True Dragons`, and the game counts Drakes on a line of their own.
 // WHAT IS ASSUMED, on the plain reading and nothing more: that a city's citizens and guards
 // (`Qeynos Citizen`, `Freeport Guards`, `Felguard`, `Fayguard`) count as the race they are drawn
 // as, and that the ghosts above also count as `Ghosts`.
@@ -39,6 +42,8 @@ export interface SlayerTerm {
   of?: readonly string[]
   /** the name is read even when the page states a race (the clockworks, measured above) */
   always?: true
+  /** the terms whose NAME word outranks this term's race claim (a drake filed as Dragon) */
+  yieldsTo?: readonly string[]
 }
 
 /** A wiki race value or a term, folded for comparison: case, hyphens and runs of space. */
@@ -361,7 +366,8 @@ const CLAIMS: Record<string, SlayerTerm> = {
 
   // ---- dragonkind
   'true dragons': {
-    races: ['dragon', 'velious dragons', 'ice dragon', 'lava dragon', 'black and white dragons']
+    races: ['dragon', 'velious dragons', 'ice dragon', 'lava dragon', 'black and white dragons'],
+    yieldsTo: ['drakes', 'wurms', 'wyverns']
   },
   dragons: { of: ['true dragons', 'lesser dragons'] },
   dracoliches: { races: ['dragon skeleton'], names: ['dracoliche'] },
