@@ -42,7 +42,7 @@ export const COMMUNITY_RELEASE_NOTES: readonly CommunityRelease[] = [
             "text": "The order weighs how hard copies are to come by. A weekly raid boss's drop leads a rare drop from a plane's trash, and both lead anything from an ordinary camp. Respawn time, placeholders, the size of the loot list, the mob's level and the weekly lockout all count."
           },
           {
-            "text": "Nothing below +7 is recommended, as lower tiers are quick to earn with ordinary motes. The exception is +5 and +6 on a piece whose copies barely exist (most Plane of Sky test rewards). Other rows read \"not yet\"."
+            "text": "Nothing below +7 is recommended, as lower tiers are quick to earn with ordinary motes. The exception is +5 and +6 on a piece whose copies barely exist (most Plane of Sky test rewards). A row below that says so (\"Below +7: ordinary motes get it there\") and takes no mote."
           },
           {
             "text": "The line above the list is the week's plan for your three motes. Two or three can land on the same item when its last tiers are the most costly."
