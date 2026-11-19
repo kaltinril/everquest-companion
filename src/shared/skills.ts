@@ -18,6 +18,9 @@ export interface SkillRow {
   sessionUps: number
   /** This session's first raise; absent when it has none. */
   sessionFirstTs?: number
+  /** Its log's first line for the skill, level and time; a row carried from an older log has none. */
+  firstValue?: number
+  firstTs?: number
 }
 
 export interface SkillsSnap {

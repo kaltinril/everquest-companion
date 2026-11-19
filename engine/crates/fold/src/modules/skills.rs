@@ -21,6 +21,9 @@ pub struct SkillRow {
     /// This session's first raise; absent when the session has none.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub session_first_ts: Option<i64>,
+    /// This log's first line for the skill: only a join with an older log can tell it repeated.
+    pub first_value: i64,
+    pub first_ts: i64,
 }
 
 #[derive(Default)]
@@ -45,6 +48,8 @@ impl SkillsModule {
                 last_ts: ts,
                 session_ups: 1,
                 session_first_ts: Some(ts),
+                first_value: value,
+                first_ts: ts,
             });
             return true;
         };
@@ -147,7 +152,7 @@ mod tests {
         assert_eq!(
             rows(&m),
             json!([{ "skill": "Fishing", "value": 127, "lastTs": 10,
-                     "sessionUps": 1, "sessionFirstTs": 10 }])
+                     "sessionUps": 1, "sessionFirstTs": 10, "firstValue": 127, "firstTs": 10 }])
         );
         assert_eq!(m.snapshot()["seq"], json!(10));
     }
@@ -163,9 +168,9 @@ mod tests {
             rows(&m),
             json!([
                 { "skill": "Fishing", "value": 128, "lastTs": 30,
-                  "sessionUps": 2, "sessionFirstTs": 10 },
+                  "sessionUps": 2, "sessionFirstTs": 10, "firstValue": 127, "firstTs": 10 },
                 { "skill": "Baking", "value": 4, "lastTs": 20,
-                  "sessionUps": 1, "sessionFirstTs": 20 }
+                  "sessionUps": 1, "sessionFirstTs": 20, "firstValue": 4, "firstTs": 20 }
             ])
         );
     }
@@ -185,7 +190,7 @@ mod tests {
         assert_eq!(
             rows(&m),
             json!([{ "skill": "Forage", "value": 50, "lastTs": 20,
-                     "sessionUps": 2, "sessionFirstTs": 10 }])
+                     "sessionUps": 2, "sessionFirstTs": 10, "firstValue": 52, "firstTs": 10 }])
         );
     }
 
@@ -194,7 +199,8 @@ mod tests {
         let mut m = fold(&[up(10, "Fishing", 127), bare("offlineGap", 500)]);
         assert_eq!(
             rows(&m),
-            json!([{ "skill": "Fishing", "value": 127, "lastTs": 10, "sessionUps": 0 }])
+            json!([{ "skill": "Fishing", "value": 127, "lastTs": 10, "sessionUps": 0,
+                     "firstValue": 127, "firstTs": 10 }])
         );
         assert_eq!(m.published_seq(), Some(501));
         // A second gap has nothing left to zero.
@@ -204,7 +210,7 @@ mod tests {
         assert_eq!(
             rows(&m),
             json!([{ "skill": "Fishing", "value": 128, "lastTs": 700,
-                     "sessionUps": 1, "sessionFirstTs": 700 }])
+                     "sessionUps": 1, "sessionFirstTs": 700, "firstValue": 127, "firstTs": 10 }])
         );
     }
 
