@@ -4,13 +4,16 @@
 // by `useVoidMotePrefs` (useGearPrefs.ts), validated on every read.
 
 import type { GearStatKey } from '../../../../shared/planner/gear'
+import type { ItemSupply, SupplyGap, SupplyKind } from '../../../../shared/planner/itemSupply'
 import type { GearRole } from '../../../../shared/planner/roleWeights'
 import {
   MOTE_ORDERS,
-  MOTE_SOURCE_LABEL,
+  MOTE_RULES,
   MOTE_TARGET_STATS,
+  planByItem,
   type MoteAdvice,
   type MoteOrder,
+  type MotePlanStep,
   type MoteTarget
 } from '../../../../shared/planner/voidMotes'
 import { ROLE_LABEL } from '../plan/planBlurb'
@@ -46,14 +49,14 @@ export function sanitizeMotePrefs(raw: unknown): VoidMotePrefs {
 export const MOTE_ORDER_LABEL: Record<MoteOrder, string> = {
   recommended: 'Recommended',
   gain: 'Biggest gain',
-  effort: 'Hardest to farm'
+  effort: 'Most hours saved'
 }
 
 /** One clause each (the tooltip diet): what the order ranks by. */
 export const MOTE_ORDER_HINT: Record<MoteOrder, string> = {
-  recommended: 'Gain weighed by how hard the next tier is to farm',
+  recommended: 'Gain times the hours of play the mote saves',
   gain: 'The largest gain for your target, whatever the tier costs',
-  effort: 'The dearest next tier first: high tiers and raid drops'
+  effort: 'The tier that would take longest to earn, first'
 }
 
 const isRole = (target: MoteTarget): target is GearRole => (PLAN_ROLES as readonly string[]).includes(target)
@@ -81,10 +84,80 @@ export function moteCopiesText(advice: Pick<MoteAdvice, 'copies'>): string {
   return `${advice.copies.toLocaleString('en-US')} ${advice.copies === 1 ? 'copy' : 'copies'}`
 }
 
-/** The source cell's hover: the camp the verdict rests on, or why there is none. */
-export function moteSourceTitle(advice: Pick<MoteAdvice, 'source' | 'from'>): string {
-  if (advice.from !== undefined) return `${MOTE_SOURCE_LABEL[advice.source]}: ${advice.from}`
-  if (advice.source === 'quest') return 'A quest item, and no mob is listed dropping it'
-  if (advice.source === 'crafted') return 'Player crafted, and no mob is listed dropping it'
-  return 'The item data lists no source for it'
+/** `190 h`, `5.1 h`: the hours of play the mote saves. */
+export function moteHoursText(advice: Pick<MoteAdvice, 'hours'>): string {
+  return `${advice.hours >= 20 ? Math.round(advice.hours).toLocaleString('en-US') : String(advice.hours)} h`
+}
+
+/** The hours cell's hover: what the tier costs, and which road would mostly pay for it. */
+export function moteHoursTitle(advice: Pick<MoteAdvice, 'copies' | 'road'>): string {
+  const road = advice.road === 'copies' ? 'mostly by farming copies' : 'mostly by ordinary motes'
+  return `Without a mote: ${moteCopiesText(advice)} of experience, ${road}`
+}
+
+export const SUPPLY_LABEL: Record<SupplyKind, string> = {
+  raid: 'Raid boss',
+  raidZone: 'Raid zone',
+  camp: 'Camp',
+  quest: 'Quest',
+  crafted: 'Crafted',
+  unknown: 'Not listed'
+}
+
+/** `1 in 8`: a chance as a player says it. */
+function oneIn(chance: number): string {
+  return chance >= 0.95 ? 'every kill' : `1 in ${String(Math.max(2, Math.round(1 / chance)))}`
+}
+
+/** `9.5 min`, `2 h`: a stated respawn. */
+function respawnText(seconds: number): string {
+  return seconds >= 3600 ? `${String(Math.round(seconds / 360) / 10)} h` : `${String(Math.round(seconds / 6) / 10)} min`
+}
+
+/** The source cell: where copies come from and the one fact that prices them. */
+export function moteSourceText(supply: ItemSupply | undefined): string {
+  if (supply === undefined) return SUPPLY_LABEL.unknown
+  const label = SUPPLY_LABEL[supply.kind]
+  if (supply.kind === 'quest' || supply.kind === 'crafted') return `${label}: copies come at +0`
+  if (supply.kind === 'raid') return `${label}: weekly kill${supply.chance === undefined ? '' : `, ${oneIn(supply.chance)}`}`
+  if (supply.chance === undefined) return label
+  const hard = (supply.hard ?? []).some((h) => h === 'level' || h === 'mechanics') ? ', hard fight' : ''
+  return `${label}: ${oneIn(supply.chance)}${supply.respawn === undefined ? '' : `, ${respawnText(supply.respawn)} respawn`}${hard}`
+}
+
+const GAP_TEXT: Record<SupplyGap, string> = {
+  respawn: 'respawn',
+  loot: 'loot list',
+  spawn: 'spawn points',
+  source: 'source'
+}
+
+/** The source cell's hover: who, how much a week, and what the estimate had to assume. */
+export function moteSourceTitle(supply: ItemSupply | undefined): string {
+  if (supply?.perWeek === undefined) return 'No page lists where it comes from, so only ordinary motes are counted'
+  const from = supply.from === undefined ? '' : `${supply.from}: `
+  const roads = supply.roads > 1 ? ` over ${String(supply.roads)} sources` : ''
+  const assumed = supply.assumed === undefined ? '' : `; ${supply.assumed.map((g) => GAP_TEXT[g]).join(', ')} assumed`
+  return `${from}about ${String(supply.perWeek)} experience a week${roads}${assumed}`
+}
+
+/** Why a row is not a pick yet, or `''` when it may be one. */
+export function moteGateText(advice: Pick<MoteAdvice, 'gate' | 'gain'>): string {
+  if (advice.gain <= 0) return 'No gain for your target'
+  if (advice.gate === 'early') return `Below +${String(MOTE_RULES.minTier)}: ordinary motes get it there`
+  return advice.gate === 'rare' ? `Below +${String(MOTE_RULES.minTier)}, but copies barely exist` : ''
+}
+
+/** `Indicolite Breastplate +9→+10 · Earring of Bashing +8→+10`: the week's motes, one item each. */
+export function motePlanText(plan: readonly MotePlanStep[]): string {
+  return planByItem(plan)
+    .map((p) => `${p.name} +${String(p.from)}→+${String(p.from + p.motes)}`)
+    .join(' · ')
+}
+
+/** The line above the list: where the week's motes go, and how many are left to hold. */
+export function motePlanLine(plan: readonly MotePlanStep[], motes: number = MOTE_RULES.perWeek): string {
+  if (plan.length === 0) return `Nothing you wear is ready for a mote yet: hold them`
+  const held = motes - plan.length
+  return `This week: ${motePlanText(plan)}${held > 0 ? ` · hold ${String(held)}` : ''}`
 }
