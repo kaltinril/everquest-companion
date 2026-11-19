@@ -1,13 +1,16 @@
 # Third-party pull requests: the adoption ledger
 
-Every upstream PR that was looked at gets a row, adopted or not (RULES.md, rule 12). The upstream
-head commit is the one vetted; if the PR moves, it is vetted again before any later commit of it
-is taken. A deferred PR is re-evaluated from its row. Until 2026-10-26 an adopted PR was kept on a
-`community/pr-N-slug` branch; those are retired and merged, and a new adoption is a work branch off
-`main_community` (RULES.md, rule 4).
+Every outside pull request that was looked at gets a row, adopted or not, whether it was opened
+on this repo or on the original's (RULES.md, rule 12). So far every row is a pull request on the
+original repo. The head commit in the row is the one vetted; if the PR moves, it is vetted again
+before any later commit of it is taken. A deferred PR is re-evaluated from its row. Until
+2026-10-26 an adopted PR was kept on a `community/pr-N-slug` branch; those are retired and merged,
+and a new adoption is a work branch off `main_community` (RULES.md, rule 4).
 
-Upstream is `jmoyers/everquest-companion`. `gh pr list --repo jmoyers/everquest-companion` lists
-what is open; `git fetch upstream` refreshes the `upstream/pr/N` refs.
+On this repo, `gh pr list` lists what is open. The original repo is
+`jmoyers/everquest-companion` (remote `upstream`); its pull requests are looked at only when the
+owner asks. `gh pr list --repo jmoyers/everquest-companion` lists what is open there;
+`git fetch upstream` refreshes the `upstream/pr/N` refs.
 
 ## Adopted
 
@@ -24,6 +27,9 @@ what is open; `git fetch upstream` refreshes the `upstream/pr/N` refs.
 | [#67](https://github.com/jmoyers/everquest-companion/pull/67) | feat(combat): show my character name instead of "You" in the DPS meter | brianmontanaweb | `f80cd531` | 2026-09-19 | `community/pr-67-self-meter-name` | A feature, not a fix; adopted because it is off by default and display-only. A renderer preference (`eq.combat.selfMeterName`, localStorage, same `useBoolPref` as the pet-row pref) re-projects only the `name` of the `kind === 'you'` row to `<Character> (You)`; the row's `id` and `kind` are untouched, and `withSelfLabel` hands the input back by reference when the pref is off, so the default path is what it was. Read whole, 14 files, 518 lines, based on current `main`. One main-process change: `sendWorldRebuilt` fans the character-switch signal to the `fight` and `overall` overlays as well (a new superset list beside `MODULE_READING_OVERLAYS`); the 10x/s module delta firehose still goes to the old list only, and the PR's `serveDeltaArm` test pins that. The pref joins `UI_PREF_SPECS` as `replace`; an imported `1` shows the importer's own name, since the label is derived from the local character on read. `copyText.ts` also lifts the melee-rounds footer into its own function, text unchanged, to stay under the complexity bar. No dependency, script, workflow, network, URL or env change; non-ASCII is typographic only (dashes, quotes, box-drawing rules), no invisible or bidirectional characters; no text addressed to agents in the diff (the author's commits carry Claude co-author trailers, which is metadata about him, not instruction to us). Merges clean into `main` and into `main_community`. Gate on the branch alone: typecheck, lint green, suite 4207/0. Not run: its new e2e spec (`tests/e2e/self-meter-name.e2e.mts`), which launches the app twice. 2026-10-01, one commit on top (`0a297ef6`): with the pref on, the floating fight and overall meters could keep the previous character's name, because the character rebuild reached them before the engine attached (an empty `character` snapshot, so the old label stayed) and the go-live `MODULE_WORLD_CHANGED` frame went to `MODULE_READING_OVERLAYS` only. `pushWorldChanged` now sends that one frame through `sendToCharacterAwareOverlays` as well; the cursor firehose is unchanged. The PR's whole-file assertion that `serveDeltas.ts` never names the character-aware list is narrowed to the `push` and `pushModuleChanged` bodies, which is what it guarded, and a new test pins the frame's fan-out. Suite on the branch alone 4208/0. |
 
 ## Deferred
+
+The last column is as written at the time. Where it waits on the creator, read it as waiting on
+the owner's decision: the creator is no longer active on the project.
 
 | PR | Title | Author | Upstream head | Looked at | Why deferred | Re-evaluate when |
 |---|---|---|---|---|---|---|
@@ -44,13 +50,15 @@ Open on GitHub, but the creator took the commits by rebase and never closed the 
 |---|---|---|---|---|---|
 | [#33](https://github.com/jmoyers/everquest-companion/pull/33) | Sky: a held quest reward marks its quest turned in (fixes #27) | johnsideserf | `178ecc71` | 2026-09-15 | Both PR commits are patch-identical (`git patch-id --stable`) to `f068e8b3` and `9ad1c15f` on `main`, same author, 2026-08-16. The creator then extended the mechanism in `d28d5b3f` (JOS-429: `achievementInference.ts`, `withDerivedCompletion`, a `completionEvidence` ladder replacing `rewardInferred`). A `community/pr-33` branch would conflict in all seven files and regress that extension. Read whole anyway: no rule 7 items. Two soft spots the creator's version inherits: the export fallback to another character's inventory can mark a fresh character's quests turned in with undo disabled, and the untradeable regex is not word-bounded (matches all 93 flagged rewards today, fragile on rescrape). |
 
-## Not yet looked at
+## Not looked at: optional reading, on the owner's word
+
+This is not a to-do list. A pull request here is read only when the owner asks for it.
 
 Open upstream PRs from other contributors still unread as of 2026-09-19 (upstream re-listed that
 day: no PR opened since 2026-09-15, `upstream/main` unmoved at `af7a938a`, every adopted PR's
-head still the commit vetted), in the order
-they should probably be looked at: independent features first, then the ones that overlap our own
-branches and need a purpose-level comparison before anything else.
+head still the commit vetted), in the order they were ranked that day: independent features
+first, then the ones that overlap our own work and need a purpose-level comparison before
+anything else.
 
 | PR | Title | Author | Overlaps |
 |---|---|---|---|

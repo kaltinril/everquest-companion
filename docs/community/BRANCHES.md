@@ -106,7 +106,7 @@ root `README.md`, the project's own, and `.github/README.md` is removed.
 | `community_release_rules` | `.claude/worktrees/community_release_rules` | Publishing a TEST build to the fork's own Releases page (owner ask, 2026-10-07: someone asked for an exe to install). `docs/community/RELEASING.md` is the procedure; `scripts/community/publish-release.sh` checks the build and posts it under a `community-<version>` tag, never `v*`, which would start the creator's release job. Unsigned on purpose: signing is shelved because it costs money. Docs and a script only, like `main_community_rules`: it merges into `main_community`, and every release is built from `main_community`, never from this branch. Its place in the order is free; it sits with the other never-closing branches. |
 | `test-neutering` | *(none)* | The TEST build identity (own appId, own userData, telemetry and feedback dark, updater guarded, no signing), the UNRELEASED gate forced open, and the `0.1.0-test.N` version bumps with tester notes. Always last. 2026-10-18: Thanks names the EverQuest Legends Wiki licence (CC BY-SA 4.0, its About page) in the app and the README; fork-only text. |
 
-### Ours, in front of the creator (open PRs)
+### Ours, offered to the creator as pull requests (as they stood on 2026-10-26)
 
 | Branch | PR | Worktree | What it does |
 |---|---|---|---|
@@ -125,7 +125,7 @@ root `README.md`, the project's own, and `.github/README.md` is removed.
 | `respawn-first-sight` | `.claude/worktrees/respawn-first-sight` | The respawn estimate measures from a mob's death to its first sighting afterwards, falling back to the next death only when no sighting came between (owner ruling, 2026-10-11: "death to first appearance should win"; `requirements/respawn-first-sight.md`). The creator's rule took the minimum death-to-death gap, which carries the fight: in Lower Guk 4 (Refined) Hoptor Thaggelum respawns in exactly 570 s (death to first sighting, seven cycles) while the tab read 634 s, and a reanimated hand and the ghoul arch magus read 60-90 s long the same way (MEASURED.md). The archive merge already takes the smaller observed bound, so the shorter sample wins across an archive. Off `main`, among the fixes. Built 2026-10-11: `MobHistory.first_seen_ts` is set by the first line naming the mob alive at least 60 s after its death (a mention inside the minute is the same pull) and `record_death` measures to it; the sighting pass (`respawn_seen.rs`) reads damage and misses either way, heals, mitigation, a kill by it, cons, crowd control, resists, casts, buffs and procs, spell emotes, pet says, and off raw lines `<mob> says` and `Hail, <mob>` (a new `seenVia` of `say`); a corpse never lights its own row. Parity on the owner's log: Hoptor 634 to 569 s, the ghoul arch magus 602 to 568, a reanimated hand 616 to 590. Limits: an unwatched mob stays death-to-death (the watch index exists to skip the per-line lookup), so an archived row for a mob nobody watched at capture keeps the old measure until a Refresh after it is watched; free-text emotes are not read. The Timers tab's UP label already keys off the same `seen_ts`. `respawn.rs` 663 to 547 lines, tests in `respawn_tests.rs`. |
 | `timers-clear-all` | `.claude/worktrees/timers-clear-all` | The Timers tab's Clear all, for the zone you are in and for all zones (owner ask, 2026-10-17; `requirements/timers-clear-all.md`): one confirmation that states how many clocks it clears, then every clock in scope is unwatched; kills and sightings stay, as Unwatch has always kept them. A respawn time the player typed for a mob is kept when its clock is cleared or unwatched (owner ruling, 2026-10-17), so watching it again brings the typed time back. A mob's name on either list opens its Mobs page and its zone opens the Maps tab (owner ask, 2026-10-23; a zone with no map stays text); carries `appRouting.ts` and `CellLink.tsx` byte-identical for `openMapZone` and the link idiom. Off `main`; after `respawn-first-sight`, which touches the same respawn files.
 
-### Ours, finished, no PR opened yet
+### Ours, finished, no PR opened
 
 | Branch | Worktree | What it does |
 |---|---|---|
@@ -186,6 +186,9 @@ commits. The vetting record is the PR's row in [ADOPTIONS.md](ADOPTIONS.md).
 
 ### Not in the recipe
 
+The rows are as written at retirement. `main` is now a frozen copy of the original repo's `main`
+(remote `upstream`), kept as a reference and never committed to (RULES.md, rule 2).
+
 | Branch | Why |
 |---|---|
 | `main` | The base, not a merge. Mirror of `origin/main`. Still live (RULES.md, rule 2). |
@@ -200,6 +203,6 @@ Failures that are not regressions, so the gate can tell a new red from an old on
 - 2 `enginePackaging` signing assertions (the TEST build turns signing off on purpose;
   `scripts/community/known-reds.txt`).
 
-A data top-up is not finished until the creator's data-pinned tests are re-measured against it:
+A data top-up is not finished until the data-pinned tests are re-measured against it:
 wiki typos are corrected on the wiki and read back by a second delta run, and the fact pins,
 floors and census tests move in the same work branch as the data (`agent/DATA_REFRESH.md`).

@@ -1,6 +1,6 @@
 # fix-sky-turnin-undo: what was asked for
 
-Every request this branch has taken, newest at the bottom. Read it before changing the branch;
+Every request this feature has taken, newest at the bottom. Read it before changing the feature;
 nothing listed here is removed or narrowed without the owner's word (RULES.md, rule 19). The
 first rows were gathered on 2026-10-11 from the branch's commits, which record what was built but
 not always who asked; those say "owner" or the upstream issue where the commit does.

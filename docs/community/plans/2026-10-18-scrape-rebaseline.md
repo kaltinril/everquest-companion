@@ -153,8 +153,8 @@ The list as it stood before that session:
   dropped its footnoted Harm Touch skill row; Harm Touch is a 10-rank AA. The app still knows it
   (abilities, AA table); read each AA's "Requirements: Level 1/6/11..." so AAs appear at their levels.
 - A table-driven item test (catch_all requirement row) and the delta covering every file (above).
-- `wiki-scraper-fixes` is open upstream as PR #84: keep fork-only lines off it (the fork User-Agent
-  moved to `scrape-delta-tool` for that reason).
+- (Retired 2026-10-26.) `wiki-scraper-fixes` was offered upstream as PR #84 and is left there.
+  Nothing is kept separate for it any more.
 - Creator-code bugs RULES.md rule 20 says to file upstream, not filed (owner's call): the spell
   scraper wrote an empty catalog on an error body; scrape-bosses paced 80/120 ms; release triage
   sorts `main.10` before `main.9` (`releaseNotes.ts` is the creator's).
