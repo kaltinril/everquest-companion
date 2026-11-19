@@ -47,16 +47,26 @@ where one exists.
     `NOT_YET_REPORTED` (`tests/telemetryContract.test.mts`) until the schema widening.
   - Gain = the role model's score at tier+1 minus tier (`roleValuer`, the Gear tab's class picks,
     default dial), or one stat's own points. Read at no banked progress: the dump states `+N` only.
-  - Source = the easiest stated road: `raid` (every dropper is on the raid roster, or every drop
-    zone is one the roster names a category after: the planes), `high` (easiest camp states level
-    45+), `farm`, else `crafted` / `quest` / `unknown` when no mob is listed. A camp with no stated
-    level is never `high`.
-  - Recommended = gain x (1 + tier + source steps); steps raid 3, quest and high 2, crafted 1,
-    farm and unknown 0 (`MOTE_SOURCE_STEPS`). Heuristic: a tier is one doubling of copies, a step
-    is one more. A row whose target gains nothing sinks in every order. Top 3 gaining rows are the
-    picks.
-  - Not modelled: spells (a mote lifts a spell rank too), the worn copy being replaced soon,
-    D1-D4 drops arriving pre-plussed, ordinary motes as the other road to a tier.
+  - Ranking (owner, 2026-11-19; `plans/2026-11-19-void-mote-ranking.md` has the rules, the
+    measurements and every constant): score = gain x hours of play the mote saves. Hours =
+    2^tier / (copies an hour + `moteShare` x ordinary-mote experience an hour at that tier).
+  - Copies = `GearRow.supply` (`shared/planner/itemSupply.ts`, built in main by
+    `planner/gearSupply.ts`): every mob that drops it and every quest that rewards it, as item
+    experience a week, added. Drop = kills a week x (class drops per kill / loot list) x 16 /
+    hardness; quest reward = its slowest part x 1. Raid target = roster mob or a stated respawn of
+    a day or more, 1 kill a week. Absent when no page states a road: then only motes are counted.
+  - AN ESTIMATE: the catalog has no drop rates. What a page does not state is assumed at a `SUPPLY`
+    default and listed in `supply.assumed`; never present a number from it as measured.
+  - Gate: `pick` at +7 or higher; `rare` at +5 or +6 when supply <= 0.5 a week (the Plane of Sky
+    test rewards); else `early` ("not yet"). The week's plan (`motePlan`) takes the best ready row,
+    re-weighs the item a tier higher, to three; a "not yet" row never takes a mote, the rest are held.
+  - TRAPS: `GearRow.quest` means the item is USED in a quest, not that a quest rewards it (rewards
+    come from `quests.json` `rewards` and `posky.json`). An item page writes `Cazic Thule (God)`
+    where the roster says `Cazic Thule`: `mobKey` folds the suffix. A quest's parts are priced
+    from the mob catalog by item name, gear or not.
+  - Not modelled: spells (a mote lifts a spell rank too), banked progress, a piece about to be
+    replaced, the player's own loot history, D0-D3 raid kills. Open questions for the owner are at
+    the end of the plan.
 
 ## Maps (was map-improvements)
 
