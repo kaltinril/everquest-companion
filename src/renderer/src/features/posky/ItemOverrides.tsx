@@ -14,13 +14,14 @@
 // WHERE IT LIVES: the expanded quest panel's item table, in the Have cell — beside the number it
 // corrects, on the row that names the item, on BOTH tabs that draw a quest row (Quests and Ready
 // draw the same accordion, which is JOS-147's rule and the reason this needed no second mount).
+// The Cleanup row's Held cell draws the same control (`HandCountCell`, upstream #73).
 //
 // NO POPPER, like everything else on this tab (JOS-143). The editor opens INLINE, inside the
 // accordion panel that is already expanded — it displaces its own row's cell and nothing else, so
 // there is no floating layer to land on the toolbar's dropdowns. Every sentence rides a native
 // `title`, which is an OS tooltip with no hit area at all.
 
-import { type JSX, useState } from 'react'
+import { type JSX, type ReactNode, useState } from 'react'
 import { Box, Chip, IconButton, Stack, TextField, Typography } from '@mui/material'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
@@ -145,20 +146,29 @@ function DumpBlindNote(): JSX.Element {
  * A blank box commits NOTHING. The way to say "I have none" is to type 0, which is a statement;
  * an empty field is a user who changed their mind, and inventing a zero out of it would be the
  * one mistake this control cannot let a mis-click make.
+ *
+ * `children` is the number as the caller's row writes it: have/need on a quest row, xN on Cleanup.
  */
-export function ItemHaveCell({
-  it,
-  onSetItemCount
+export function HandCountCell({
+  name,
+  held,
+  override,
+  onSetItemCount,
+  children
 }: {
-  it: ItemProgress
+  name: string
+  /** the uncapped held count the editor opens on */
+  held: number
+  override?: ItemCountOverride
   /** absent in a tree mounted without the store — the cell then simply states the number */
   onSetItemCount?: SetItemCount
+  children: ReactNode
 }): JSX.Element {
   const [editing, setEditing] = useState(false)
   const [text, setText] = useState('')
   const commit = (): void => {
     const n = Number(text.trim())
-    if (text.trim() !== '' && Number.isFinite(n) && n >= 0) onSetItemCount?.(it.name, Math.floor(n))
+    if (text.trim() !== '' && Number.isFinite(n) && n >= 0) onSetItemCount?.(name, Math.floor(n))
     setEditing(false)
   }
   if (editing && onSetItemCount) {
@@ -168,20 +178,17 @@ export function ItemHaveCell({
   }
   return (
     <Stack direction="row" spacing={0.5} alignItems="center">
-      <Typography variant="body2" component="span">
-        {it.have}/{it.need}
-      </Typography>
-      {it.have < it.need && !it.override && isDumpBlindItem(it.name) && <DumpBlindNote />}
-      {it.override && onSetItemCount && (
-        <OverrideChip o={it.override} onClear={() => onSetItemCount(it.name, null)} />
+      {children}
+      {override && onSetItemCount && (
+        <OverrideChip o={override} onClear={() => onSetItemCount(name, null)} />
       )}
       {onSetItemCount && (
         <IconButton
           size="small"
           data-testid="posky-item-count-edit"
-          title="Correct this count by hand - for an item you destroyed, gave away or never had. The log and the export cannot see any of those, so this is how you tell the app."
+          title="Set how many you hold when the log and export are wrong."
           onClick={() => {
-            setText(String(it.held))
+            setText(String(held))
             setEditing(true)
           }}
         >
@@ -189,6 +196,24 @@ export function ItemHaveCell({
         </IconButton>
       )}
     </Stack>
+  )
+}
+
+/** The quest row's Have cell: have/need, the dump-blind note, then the hand-count control. */
+export function ItemHaveCell({
+  it,
+  onSetItemCount
+}: {
+  it: ItemProgress
+  onSetItemCount?: SetItemCount
+}): JSX.Element {
+  return (
+    <HandCountCell name={it.name} held={it.held} override={it.override} onSetItemCount={onSetItemCount}>
+      <Typography variant="body2" component="span">
+        {it.have}/{it.need}
+      </Typography>
+      {it.have < it.need && !it.override && isDumpBlindItem(it.name) && <DumpBlindNote />}
+    </HandCountCell>
   )
 }
 

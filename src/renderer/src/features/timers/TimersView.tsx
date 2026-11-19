@@ -114,6 +114,7 @@ import { mainMobLookup } from './mobLookup'
 import { RespawnRowBar } from './RespawnRowBar'
 import { RESPAWN_TOGGLE_SX, UnwatchButton } from './UnwatchButton'
 import { ClearAllClocks } from './ClearAllClocks'
+import { RespawnAlertControl } from './RespawnAlertControl'
 import { MobNameLink, ZoneLink, type TimerLinks } from './timerLinks'
 import {
   useConfirmSighting,
@@ -471,7 +472,7 @@ export default function TimersView({
         <Typography variant="h6">Timers</Typography>
         {snap.zone.length > 0 && <Chip size="small" label={zoneName} variant="outlined" />}
       </Stack>
-      <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2, mt: 1.5 }}>
+      <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" useFlexGap sx={{ mb: 2, mt: 1.5 }}>
         <ScopeSwitch
           scope={scope}
           onScope={setScope}
@@ -486,6 +487,7 @@ export default function TimersView({
           zone={scope === 'zone' ? zoneName : null}
           onClear={unwatchMany}
         />
+        <RespawnAlertControl />
       </Stack>
 
       <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems="flex-start">

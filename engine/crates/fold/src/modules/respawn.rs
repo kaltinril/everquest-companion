@@ -36,7 +36,7 @@ use crate::event::{Event, Kind};
 use crate::jsmap::JsMap;
 use crate::modules::respawn_learned::{LearnedStore, WikiSays};
 use crate::modules::respawn_seen::seen_names_of;
-use crate::modules::respawn_wiki::{resolve_respawn, wiki};
+use crate::modules::respawn_wiki::{floor_of, resolve_respawn, wiki};
 use crate::EqModule;
 use eqlog::names::{id_key, id_key_ref};
 use serde::Serialize;
@@ -118,6 +118,9 @@ pub struct RespawnRow {
     /// The wiki page the text came from.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub wiki_page: Option<String>,
+    /// The gap the kills agree on, when they do: under `wiki_ms` it is the floor in force.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub agreed_ms: Option<i64>,
 }
 
 /// A mob you recently killed, offered in the view as a one-click watch.
@@ -533,7 +536,9 @@ impl RespawnModule {
         // A shared name's short gaps are two spawns mixed (owner, 2026-11-09): only the gaps of ten
         // minutes or more count, and the lowest of those is the estimate.
         let (min_gap_ms, samples) = if watch.shared_name { self.pooled_gaps_above(h, SHARED_NAME_FLOOR_MS) } else { self.pooled_gaps(h) };
-        let (estimate_ms, source) = resolve_respawn(custom_ms, min_gap_ms, samples, wiki_ms);
+        // Three agreeing gaps beat a longer wiki time (fork #8); a shared name's short gaps stay out.
+        let agreed_ms = self.agreed_gap(h, if watch.shared_name { SHARED_NAME_FLOOR_MS } else { 0 });
+        let (estimate_ms, source) = resolve_respawn(custom_ms, min_gap_ms, samples, floor_of(wiki_ms, agreed_ms));
         let base = base_of(h);
         let mut row = RespawnRow {
             id: format!("{}::{}", id_key(&h.zone), h.key),
@@ -561,6 +566,7 @@ impl RespawnModule {
             // The page those words came from, so the edit modal can link to it: quoting a source
             // the reader cannot open is half a provenance.
             wiki_page: wiki_row.map(|w| w.page.clone()),
+            agreed_ms,
         };
         // A mention from the fight that KILLED the mob is not a sighting of the spawn that follows,
         // so a row must never open in the seen state.

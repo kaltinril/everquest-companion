@@ -8,6 +8,8 @@
 // THE NAME IS NOT CONSULTED WHEN THE PAGE HAS ANSWERED. `A dwarf skeleton` is a Skeleton because
 // its page says so, and reading `dwarf` off its name as well would put it under Dwarves. The one
 // exception is a term marked `always`, where the log showed the name to be the better witness.
+// The other is a term's `yieldsTo`: a page race that gives way to a name stating a kind the game
+// counts on a separate line (a drake filed as Dragon is read by its name).
 //
 // AND A NAME SAYS ONE KIND: THE LAST ONE IN IT. Measured over the catalogued mobs whose page
 // states a claimed race, by asking what the name alone would have said: the misses were
@@ -27,7 +29,8 @@ export interface LabelMatcher {
 
 /** What one mob offers the join. Computed once per mob, whatever the number of lines. */
 export interface MobFacts {
-  /** the page's race in `raceKey` form, '' when the index has no page or the page states none */
+  /** the page's race in `raceKey` form, '' when the index has no page, the page states none, or
+   *  the race yields to the name (`yieldsTo`) */
   race: string
   /** the kind the name states, read when the page has not answered with a claimed race */
   nameTerm: string | null
@@ -38,6 +41,14 @@ export interface MobFacts {
 /** Every wiki race value some term claims: a page stating one of these has answered. */
 export const CLAIMED_RACES: ReadonlySet<string> = new Set(
   [...SLAYER_TERMS.values()].flatMap((t) => t.races ?? [])
+)
+
+/** Each race value of a term with `yieldsTo`, to the terms whose name word outranks it. */
+const YIELDS: ReadonlyMap<string, ReadonlySet<string>> = new Map(
+  [...SLAYER_TERMS.values()].flatMap((t) => {
+    const to = new Set(t.yieldsTo ?? [])
+    return to.size === 0 ? [] : (t.races ?? []).map((race): [string, Set<string>] => [race, to])
+  })
 )
 
 /** A mob's name as the patterns read it: lower case, one apostrophe glyph, no leading article. */
@@ -91,8 +102,16 @@ export function nameTerm(name: string): string | null {
   return best
 }
 
+/** The page's race, or '' when the name states a kind that race yields to. */
+function standingRace(name: string, key: string): string {
+  const yielded = YIELDS.get(key)
+  if (yielded === undefined) return key
+  const said = nameTerm(name)
+  return said !== null && yielded.has(said) ? '' : key
+}
+
 export function mobFacts(name: string, race: string | undefined): MobFacts {
-  const key = race === undefined ? '' : raceKey(race)
+  const key = standingRace(name, race === undefined ? '' : raceKey(race))
   const nameKey = mobNameKey(name)
   const always = namePatterns()
     .filter((p) => p.always && lastMatchEnd(p.re, nameKey) >= 0)

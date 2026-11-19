@@ -31,6 +31,7 @@
 // timer:
 //
 //   * the engine says `live` — the fold landed, which is the answer the loop was waiting for;
+//   * the engine says `idle` — its read of the log ended (fork #9), so there is no fold to wait on;
 //   * the turn was superseded (`mine()` answers false) — a respawn, a character switch or a world
 //     rebuild replaced the world, and the fresh turn is already waiting on its own fold;
 //   * the connection refused the poll a bounded few times running — the engine is not answering AT
@@ -116,6 +117,8 @@ export interface FoldWaitDeps {
    *  narration's denominator, and the reason it is a callback: it moves while the fold runs
    *  (EverQuest is still appending), so a value captured at the start would go stale. */
   readonly logSize: () => number | null
+  /** The wait ended without going live: the engine's read `ended`, or the polls went `unanswered`. */
+  readonly failed?: (why: 'ended' | 'unanswered', detail: string) => void
 }
 
 /**
@@ -139,6 +142,7 @@ export async function waitForFold(deps: FoldWaitDeps): Promise<FoldHealth | null
           `data-server client: session.health was refused ${String(refusals)} times running — ` +
             `this turn stops asking (${describeErr(err)})`
         )
+        deps.failed?.('unanswered', describeErr(err))
         return null
       }
       deps.note(
@@ -155,6 +159,13 @@ export async function waitForFold(deps: FoldWaitDeps): Promise<FoldHealth | null
     refusals = 0
     deps.saw(health)
     if (health.status === 'live') return health
+    // `idle` after an accepted attach is the engine saying the read ended (unopenable file, read
+    // error, panic): it will never go live, so polling on is waiting for nothing (fork #9).
+    if (health.status === 'idle') {
+      deps.note('data-server client: the engine stopped reading the log before the end; this turn stops asking')
+      deps.failed?.('ended', 'the engine reports idle after an accepted attach')
+      return null
+    }
     sincePoll += 1
     if (sincePoll >= FOLD_NARRATE_EVERY) {
       sincePoll = 0

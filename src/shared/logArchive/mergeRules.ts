@@ -21,6 +21,7 @@ import { mergeLoot } from './mergeLoot'
 import { mergeMet } from './mergeMet'
 import { mergeProgression } from './mergeProgression'
 import { mergeRespawn } from './mergeRespawn'
+import { mergeSkills } from './mergeSkills'
 import { mergeSpellRanks } from './mergeSpellRanks'
 import { mergeSpellSets } from './mergeSpellSets'
 import { mergeClassUnlocks, mergeTurnIns } from './mergeUnlocksTurnIns'
@@ -32,6 +33,7 @@ export const MERGE_RULES: Readonly<Record<string, MergeRule>> = {
   kills: mergeKills,
   loot: mergeLoot,
   leveling: mergeLeveling,
+  skills: mergeSkills,
   consider: mergeConsider,
   itemTiers: mergeItemTiers,
   classUnlocks: mergeClassUnlocks,

@@ -15,6 +15,7 @@ export const CAPTURED_MODULES: readonly string[] = [
   'respawn',
   'progression',
   'leveling',
+  'skills',
   'character',
   'outputFiles',
   'spellSets',

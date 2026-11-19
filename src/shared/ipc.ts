@@ -980,6 +980,11 @@ export const IPC = {
   // renderer -> main: "several mobs share this name" on or off for one watch (owner, 2026-11-09):
   // the estimate then ignores gaps under ten minutes. Payload is KEY, display and the flag.
   respawnSetSharedName: 'respawn:setSharedName',
+  // THE ALERT BEFORE A RESPAWN (shared/respawnAlert.ts): its one setting, normalized at the
+  // handler, and main -> renderer a 1 s tick carrying Date.now() while the setting is on.
+  respawnAlertGet: 'respawnAlert:get',
+  respawnAlertSet: 'respawnAlert:set',
+  respawnAlertTick: 'respawnAlert:tick',
 
   // ---- per-mob resist profiles (JOS-382 — docs/plans/resist-mining.md) -------------------
   //
@@ -1125,6 +1130,10 @@ export const IPC = {
   // pending backoff and launches now (src/main/dataServer/supervisor.ts `restart`). A respawn is a
   // launch (spawn contract rule 5), so this is a fresh token, port and epoch world. Returns void.
   engineRetry: 'engine:retry',
+  // renderer -> main: what the app is waiting on while a panel says "Reading log..." (fork #9).
+  // Polled only by a hydrating panel that has waited 5 s. Returns: LogReadReport
+  // (shared/logReadReport.ts); the log's base name only, never its full path.
+  logReadReport: 'engine:logReadReport',
 
   // ---- Summarize and archive log (docs/plans/log-archive; main/ipc/logArchive.ts) ----
   // renderer -> main. Every action returns LogArchiveReply (shared/logArchive/panel.ts): the

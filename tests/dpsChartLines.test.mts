@@ -23,6 +23,8 @@
 //   6. THE HIDDEN MARKER KINDS COME OFF THE DRAWING, NOT OFF THE LEGEND. `placeMarkers` still
 //      returns them (the legend is built from it, and an entry that deleted itself would be a
 //      one-way door); `drawnMarkers` is the filtered view the ticks and the hover share.
+//   7. THE PET DRAWN APART (`petApart`, upstream #91) takes the pet out of the gold line, its peak
+//      and the scale, and moves nothing else. Absent or false is the chart as it always was.
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
@@ -41,6 +43,7 @@ import {
   yAt,
   type DpsChart
 } from '../src/renderer/src/features/combat/dpsChart'
+import { outLabel, withPetApart } from '../src/renderer/src/features/combat/dpsAt'
 
 const BUCKET = 1000
 
@@ -248,4 +251,76 @@ test('nothing hidden hands the placed markers straight back, same array', () => 
   assert.equal(drawnMarkers(placed, []), placed)
   // A curve key in the hidden set is not a marker kind, so it takes no tick with it.
   assert.equal(drawnMarkers(placed, ['out', 'pet']).length, 1)
+})
+
+// ── 7. the pet drawn apart ("Its own bar", upstream #91) ─────────────────────────────────
+
+/** you + group, bucket by bucket: the gold line once the pet is left out of it. */
+const APART = [120, 280]
+
+test('a petApart series draws the gold line without the pet, and moves nothing else', () => {
+  // The incoming band sets the ceiling here, so the scale is the same with and without the flag.
+  const tall: DpsSeries = { ...mkSeries(), inc: Float64Array.from([10, 500]) }
+  const sum = mkChart([], tall)
+  const apart = mkChart([], { ...tall, petApart: true })
+  assert.equal(apart.yMax, sum.yMax)
+  parsePts(apart.outLine).forEach((p, i) => {
+    assert.ok(Math.abs(p.y - yAt(apart.yMax, APART[i])) <= 0.05, `bucket ${i} is you + group`)
+  })
+  assert.equal(apart.petLine, sum.petLine)
+  assert.equal(apart.groupLine, sum.groupLine)
+  assert.equal(apart.incLine, sum.incLine)
+  assert.equal(apart.peakVis, Math.max(...APART), 'the peak is the gold line own peak')
+  assert.equal(apart.t0, sum.t0)
+  assert.equal(apart.t1, sum.t1)
+  assert.equal(apart.i0, sum.i0)
+  assert.equal(apart.count, sum.count)
+})
+
+test('a pet that out-damages you sets the scale when it is drawn apart', () => {
+  const series: DpsSeries = {
+    ...mkSeries(),
+    you: Float64Array.from([100, 100]),
+    pet: Float64Array.from([400, 300]),
+    group: new Float64Array(2),
+    hasGroup: false,
+    petApart: true
+  }
+  const chart = mkChart([], series)
+  assert.equal(chart.yMax, 400)
+  const pet = parsePts(chart.petLine)
+  const out = parsePts(chart.outLine)
+  assert.ok(Math.abs(pet[0].y - PAD_T) < 1e-9, 'the pet line reaches the top of the plot')
+  out.forEach((p, i) => assert.ok(p.y > pet[i].y, `the gold line sits below the pet at bucket ${i}`))
+  assert.equal(mkChart(['pet'], series).yMax, 100, 'with the pet hidden the scale is your own peak')
+})
+
+test('the flag off or absent draws the same chart, and hiding the gold line still works apart', () => {
+  const plain = mkChart()
+  assert.deepEqual(mkChart([], { ...mkSeries(), petApart: false }), plain)
+  parsePts(plain.outLine).forEach((p, i) => assert.ok(Math.abs(p.y - yAt(plain.yMax, OUT[i])) <= 0.05))
+  const noOut = mkChart(['out'], { ...mkSeries(), petApart: true })
+  assert.equal(noOut.outLine, null)
+  assert.equal(noOut.outArea, null)
+})
+
+test('the gold line is named for exactly what it sums', () => {
+  const solo: DpsSeries = { ...mkSeries(), hasGroup: false }
+  assert.equal(outLabel(solo), 'you + pet')
+  assert.equal(outLabel(mkSeries()), 'you + pet + group')
+  assert.equal(outLabel({ ...solo, petApart: true }), 'you')
+  assert.equal(outLabel({ ...mkSeries(), petApart: true }), 'you + group')
+})
+
+test('withPetApart hands back the same series unless the pet is apart, and never copies the bands', () => {
+  const series = mkSeries()
+  assert.equal(withPetApart(series, false), series)
+  const apart = withPetApart(series, true)
+  assert.notEqual(apart, series)
+  assert.equal(apart.petApart, true)
+  assert.equal(series.petApart, undefined, 'the kept series is never flagged in place')
+  assert.equal(apart.you, series.you)
+  assert.equal(apart.pet, series.pet)
+  assert.equal(apart.group, series.group)
+  assert.equal(apart.inc, series.inc)
 })

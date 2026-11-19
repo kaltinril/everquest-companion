@@ -24,7 +24,8 @@
  * governs both the overlays' text size and their transparency. The overlay steps live in
  * ./overlaysAppearanceSteps.mts — one module for one card, folded together the way the two cards
  * were — and they belong to an e2e for a reason on top of the three above: they are claims about
- * SEPARATE RENDERER PROCESSES agreeing, which no assertion in one process can make.
+ * SEPARATE RENDERER PROCESSES agreeing, which no assertion in one process can make. Between the two
+ * sits the Left menu card (fork #10): the drawer's own text size and row height, `stepNavMenu`.
  *
  * The main window's measurement is `window.devicePixelRatio`, which Chromium reports as the
  * display's own scale multiplied by this webContents' zoom factor. Absolute values are a fact about
@@ -64,6 +65,13 @@ import {
 } from './overlaysAppearanceSteps.mjs'
 import { launchOnFixture, stageFixture } from './logFixture.mjs'
 import { UI_SCALE_DEFAULT, UI_SCALE_MAX, UI_SCALE_MIN, uiScalePercent } from '../../src/shared/uiScale'
+import {
+  NAV_ROW_DEFAULT,
+  NAV_ROW_STEPS,
+  NAV_TEXT_DEFAULT,
+  NAV_TEXT_STEPS,
+  navPx
+} from '../../src/shared/navMenu'
 
 const RAIL = '[data-testid="prefs-rail-textsize"]'
 const PANE = '[data-testid="pref-text-size"]'
@@ -199,6 +207,102 @@ async function stepCard(page: Page): Promise<void> {
     /app window/i.test(text) && /overlays/i.test(text),
     text.slice(0, 160)
   )
+}
+
+// ---- the left menu's own sizes (fork #10) ----
+
+const navSel = (id: string): string => `[data-testid="${id}"]`
+
+function textOf(page: Page, selector: string): Promise<string> {
+  return page.evaluate(
+    (sel) => (document.querySelector(sel) as HTMLElement | null)?.innerText.trim() ?? '',
+    selector
+  )
+}
+
+/** The drawn height of one destination row, in CSS px. */
+function navRowHeight(page: Page): Promise<number> {
+  return page.evaluate(
+    () => document.querySelector('[data-testid="nav-combat"]')?.getBoundingClientRect().height ?? 0
+  )
+}
+
+/** Press one end of a left-menu stepper until it prints `stop` or disables; hands back what it prints. */
+async function pressNav(page: Page, stepper: string, end: 'minus' | 'plus', stop: number): Promise<string> {
+  const button = navSel(`${stepper}-${end}`)
+  const value = navSel(`${stepper}-value`)
+  let shown = await textOf(page, value)
+  for (let i = 0; i < 8 && shown !== navPx(stop) && !(await isDisabled(page, button)); i++) {
+    const before = shown
+    await page.click(button, { timeout: 15_000 })
+    shown = await settle(() => textOf(page, value), (v) => v !== before, { timeoutMs: 15_000 })
+  }
+  return shown
+}
+
+/**
+ * The drawer rows that do not fit: wider than their box, a label outside its row, or a one-line
+ * row taller than `rowPx` (a wrapped label grows the row, it does not clip). Headings are skipped;
+ * the two-line feedback row is checked for fit, not for height.
+ */
+function navMisfits(page: Page, rowPx: number): Promise<string[]> {
+  return page.evaluate((want) => {
+    const bad: string[] = []
+    for (const row of document.querySelectorAll<HTMLElement>('.MuiDrawer-paper [data-testid^="nav-"]')) {
+      const id = row.getAttribute('data-testid') ?? ''
+      const label = row.querySelector('.MuiListItemText-root')
+      if (id.startsWith('nav-group-') || !label) continue
+      const r = row.getBoundingClientRect()
+      const l = label.getBoundingClientRect()
+      const inside =
+        l.top >= r.top - 0.5 && l.bottom <= r.bottom + 0.5 && l.left >= r.left - 0.5 && l.right <= r.right + 0.5
+      const tall = id !== 'nav-feedback' && Math.abs(r.height - want) >= 0.5
+      if (row.scrollWidth > row.clientWidth || !inside || tall) bad.push(`${id} ${String(r.height)}px`)
+    }
+    return bad
+  }, rowPx)
+}
+
+/**
+ * THE LEFT MENU'S OWN TEXT SIZE AND ROW HEIGHT (fork #10). The claim is a DRAWN height: the pixel
+ * figures behind the ladders were computed from MUI's sources, and only a rendered row proves the
+ * sx rules outrank MUI's own. It leaves both values at their defaults for the steps after it.
+ */
+async function stepNavMenu(page: Page): Promise<void> {
+  const rowMin = Math.min(...NAV_ROW_STEPS)
+  const rowMax = Math.max(...NAV_ROW_STEPS)
+  const near = (px: number) => (h: number): boolean => Math.abs(h - px) < 0.5
+  const drawn = (px: number): Promise<number> => settle(() => navRowHeight(page), near(px), { timeoutMs: 15_000 })
+
+  const fresh = await drawn(NAV_ROW_DEFAULT)
+  check(`a fresh install draws a menu row ${navPx(NAV_ROW_DEFAULT)} tall`, near(NAV_ROW_DEFAULT)(fresh), `${String(fresh)}px`)
+  const shown = await textOf(page, navSel('pref-nav-row-value'))
+  check('…and the Left menu card prints it', shown === navPx(NAV_ROW_DEFAULT), shown || 'nothing printed')
+
+  await pressNav(page, 'pref-nav-row', 'minus', rowMin)
+  const short = await drawn(rowMin)
+  check(`minus draws the rows ${navPx(rowMin)} tall at once, with no relaunch`, near(rowMin)(short), `${String(short)}px`)
+  check('…and it is disabled there, because the rows cannot get shorter', await isDisabled(page, navSel('pref-nav-row-minus')))
+
+  await pressNav(page, 'pref-nav-row', 'plus', rowMax)
+  const tall = await drawn(rowMax)
+  check(`plus walks the ladder up to ${navPx(rowMax)} rows`, near(rowMax)(tall), `${String(tall)}px`)
+  check('…and it is disabled there', await isDisabled(page, navSel('pref-nav-row-plus')))
+
+  // The largest text, in the tallest rows and then the shortest: the two fits that could fail.
+  await pressNav(page, 'pref-nav-text', 'plus', Math.max(...NAV_TEXT_STEPS))
+  check('the text size walks up to its top stop and is disabled there', await isDisabled(page, navSel('pref-nav-text-plus')))
+  const wide = await navMisfits(page, rowMax)
+  check('at the largest text no menu row overflows or wraps', wide.length === 0, wide.join(', '))
+  await pressNav(page, 'pref-nav-row', 'minus', rowMin)
+  await drawn(rowMin)
+  const tight = await navMisfits(page, rowMin)
+  check('…nor in the shortest rows, where the label has the least room', tight.length === 0, tight.join(', '))
+
+  // Home again, so the launches after this one start from the shipped menu.
+  const text = await pressNav(page, 'pref-nav-text', 'minus', NAV_TEXT_DEFAULT)
+  const row = await pressNav(page, 'pref-nav-row', 'plus', NAV_ROW_DEFAULT)
+  check('both step back to their defaults', text === navPx(NAV_TEXT_DEFAULT) && row === navPx(NAV_ROW_DEFAULT), `${text} / ${row}`)
 }
 
 /** THE ASSERTION THE TICKET IS ABOUT: pressing A+ makes this window bigger, now. */
@@ -354,6 +458,8 @@ async function main(): Promise<void> {
     await dismissFirstRunNotice(page)
     await openAppearance(page)
     await stepCard(page)
+    // Before any zoom: the menu's row heights are read at 100%.
+    await stepNavMenu(page)
     base = await zoomOf(page)
     check('the window reports a usable baseline to measure against', base.dpr > 0 && base.innerWidth > 0, JSON.stringify(base))
     await stepBiggerNow(page, base)

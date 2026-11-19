@@ -35,6 +35,7 @@
 import type { TimelineMarker, TimelineView } from '@shared/combat'
 import type { ChartLineKey } from './combatPrefs'
 import type { DpsSeries } from './dashboardData'
+import { outRate } from './dpsAt'
 
 export const CHART_W = 720
 export const CHART_H = 118
@@ -51,7 +52,8 @@ export interface DpsChart {
   /** The OUTGOING curve — you + your pets + your group. The headline line, and the one the
    *  hover dot follows. `null` when the legend has it hidden (JOS-264), which is the same shape
    *  the other three lines already used for "this fight had none" — so every line the SVG draws
-   *  is asked the same question, and there is no second way to be absent. */
+   *  is asked the same question, and there is no second way to be absent. A `petApart` series
+   *  leaves the pets out of it. */
   outLine: string | null
   outArea: string | null
   petLine: string | null
@@ -225,9 +227,10 @@ export function userToPx(ux: number, rectW: number): number {
  * THE OUTGOING RATE at one bucket — you + your pets + your group. ONE definition, because three
  * places used to spell out `you[i] + pet[i]` independently (the y-scale, the drawn line and the
  * hover's vertex lookup) and a fourth source kind would have had to be remembered in all three.
+ * The sum itself is `dpsAt.outRate`, so the hover's printed rate is the same number.
  */
 function outAt(series: DpsSeries, i: number): number {
-  return series.you[i] + series.pet[i] + series.group[i]
+  return outRate(series, i)
 }
 
 /** The outgoing rate at drawn vertex `k`, clamped to the series. */

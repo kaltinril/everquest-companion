@@ -27,6 +27,7 @@ import { useBackFallback } from './appBack'
 import PoskyView from './features/posky/PoskyView'
 import LootView from './features/loot/LootView'
 import LevelingView from './features/leveling/LevelingView'
+import { SkillsTab } from './features/skills/SkillsView'
 import PlannerView from './features/planner/PlannerView'
 import GearView from './features/gear/GearView'
 import VoidMoteView from './features/gear/VoidMoteView'
@@ -176,6 +177,8 @@ function PlainView({
       {/* VOID MOTES (owner, 2026-11-19): a gear-area tab. Keyed like the rest: what is worn is one character's. */}
       {view === 'voidMotes' && <VoidMoteView key={viewKey} onOpenLoot={routing.openLoot} />}
       {view === 'buffs' && <BuffsView key={viewKey} />}
+      {/* SKILLS (fork #6). Its view check lives in its own file for the SpellDrill's reason. */}
+      <SkillsTab view={view} viewKey={viewKey} />
       {/* The Plan tab (its place in the gear area's tab bar comes from appViews, not this list).
           Its routes out (user rulings, 2026-08-18): item names to the Loot drill-down, zone chips
           and run headings to the Maps tab, and a named witness mob's name to the mob's own page.

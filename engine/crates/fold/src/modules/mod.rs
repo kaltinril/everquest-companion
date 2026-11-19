@@ -82,5 +82,7 @@ mod respawn_tests;
 pub mod respawn_wiki;
 pub mod roster;
 pub mod roster_who;
+/// `skills`: the newest level the log stated per skill, and this session's raises.
+pub mod skills;
 pub mod spell_sets;
 pub mod turnins;

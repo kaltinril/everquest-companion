@@ -12,6 +12,7 @@
 import { ipcRenderer } from 'electron'
 import { IPC } from '../shared/ipc'
 import type { RespawnPrefs } from '../shared/respawn'
+import type { RespawnAlertSetting } from '../shared/respawnAlert'
 
 export const respawnBridge = {
   /** The persisted watch list. Auto-watch on, no explicit watches, by default. */
@@ -64,5 +65,15 @@ export const respawnBridge = {
    * ignores gaps under ten minutes and takes the lowest above. Resolves to whether anything changed.
    */
   setRespawnSharedName: (key: string, display: string, shared: boolean): Promise<boolean> =>
-    ipcRenderer.invoke(IPC.respawnSetSharedName, key, display, shared)
+    ipcRenderer.invoke(IPC.respawnSetSharedName, key, display, shared),
+  /** The alert before a respawn (shared/respawnAlert.ts); the set returns what was stored. */
+  getRespawnAlert: (): Promise<RespawnAlertSetting> => ipcRenderer.invoke(IPC.respawnAlertGet),
+  setRespawnAlert: (next: RespawnAlertSetting): Promise<RespawnAlertSetting> =>
+    ipcRenderer.invoke(IPC.respawnAlertSet, next),
+  /** Main's 1 s tick (its Date.now()), sent only while the alert is on. */
+  onRespawnAlertTick: (cb: (nowMs: number) => void): (() => void) => {
+    const listener = (_e: unknown, nowMs: number): void => cb(nowMs)
+    ipcRenderer.on(IPC.respawnAlertTick, listener)
+    return () => ipcRenderer.removeListener(IPC.respawnAlertTick, listener)
+  }
 }

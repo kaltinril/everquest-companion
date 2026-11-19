@@ -378,3 +378,13 @@ disagree, RULES.md wins; fix this file.
   several claims), then one implementer per worktree, never two in one worktree.
 - Measure on the real log before believing a tester's cause; replay with parity
   (MEASURED.md, Analysis methods).
+- An issue sweep that worked (2026-11-19, `plans/2026-11-19-issue-sweep.md`): read every comment
+  the owner left on the issues first; a quick first pass by three different models over all the
+  issues; then one evaluator per feature area that checks those claims against the code, measures
+  on the owner's log, and writes the plan (the evaluators corrected first-pass claims on every
+  issue). Request rows and the phase doc before any code. One worktree per fix with a
+  `node_modules` junction; TypeScript fixes in parallel, engine fixes one after the other on this
+  clone's `engine/target`; helpers run focused tests only and leave the ledgers alone (ISSUES.md,
+  BRANCH_NOTES.md and MEASURED.md are written once, by the coordinator, from what they return, so
+  eight branches merge with no conflict). An independent reviewer on another model per diff found
+  one real defect in three of eight. One gate over the merged work.

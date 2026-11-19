@@ -7,6 +7,19 @@ the code and wrote the plan below. The owner's comments on the issues that day a
 each. Rules first: `docs/community/RULES.md`, then `agent/INDEX.md`. What was asked, per feature:
 the `requirements/` file named in each phase (rule 19).
 
+## Status
+
+- 2026-11-19: all eight fixes are built and on `main_community`. Each was built in its own
+  worktree, read by an independent reviewer on a different model, merged with the others onto one
+  branch (no conflicts) and gated once: typecheck, lint, 6,562 unit tests with only the two known
+  reds failing, `cargo test --workspace` 1,219 passed.
+- Three of the eight reviews found one real defect each, all corrected before the merge: the
+  pre-alert's tooltip and request row now say it covers the zone you are in; a Sky Cleanup test
+  that would have passed without the fix was made to fail without it; a live log's first line
+  that repeats an archived skill level is no longer counted as a raise.
+- Not done: the owner's try in the app, the push, any reply on an issue, a release. The two wiki
+  pages are the owner's to edit ("Wiki pages to fix").
+
 ## At a glance
 
 | Phase | Issue | What | Verdict | Size | Lane | Work branch |

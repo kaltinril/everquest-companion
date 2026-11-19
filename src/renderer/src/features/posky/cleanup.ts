@@ -12,7 +12,7 @@
 //
 // PURE, and no React and no data bundle, exactly like `questCompletion.ts` and `sharedItems.ts`:
 // the rule below is the entire feature and it is pinned by a plain node test
-// (tests/skyCleanup.test.mts) rather than by a browser. Everything the tab draws on a row is a
+// (tests/skyCleanupOverride.test.mts) rather than by a browser. Everything the tab draws on a row is a
 // field or a sentence produced here, so the words a player reads are testable without a DOM.
 //
 // ---------------------------------------------------------------------------
