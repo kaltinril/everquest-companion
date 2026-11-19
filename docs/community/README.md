@@ -1,18 +1,19 @@
 # How the fork is run
 
-This fork (`kaltinril/everquest-companion`, git remote `origin`) started from the creator's repo
-(`jmoyers/everquest-companion`, git remote `upstream`). The creator is on hiatus and may not come
-back, and other tools now compete for the same players, so since 2026-10-26 the fork runs as its
-own project on one trunk, `main_community`, to move fast and change course easily. This directory
-holds the rules and records that make that safe.
+This repo (`kaltinril/everquest-companion`, git remote `origin`) runs EQ Legends Companion as its
+own project on one trunk, `main_community`, to move fast and change course easily (since
+2026-10-26). It began as a fork of `jmoyers/everquest-companion`; the creator is no longer active
+on the project and other tools now compete for the same players, so nothing here tracks the
+original repo or waits on it ([The original repo](#the-original-repo), last section). This
+directory holds the rules and records that make that safe.
 
 Read [RULES.md](RULES.md) before touching any branch. [ADOPTIONS.md](ADOPTIONS.md) records every
-third-party pull request that was vetted, adopted or deferred. [ISSUES.md](ISSUES.md) records
-every upstream issue that was looked at and what became of it. [requirements/](requirements/)
-holds each feature area's list of what was asked for (rule 19). [RELEASING.md](RELEASING.md) is
-how a test build reaches the fork's Releases page. [BRANCHES.md](BRANCHES.md) is the record of
-the retired branches and the list of known test reds. [agent/](agent/INDEX.md) is the working
-manual for AI agents.
+outside pull request that was vetted, adopted or deferred. [ISSUES.md](ISSUES.md) records every
+issue that was looked at, on this repo and on the original one, and what became of it.
+[requirements/](requirements/) holds each feature area's list of what was asked for (rule 19).
+[RELEASING.md](RELEASING.md) is how a build reaches the fork's Releases page.
+[BRANCHES.md](BRANCHES.md) is the record of the retired branches and the list of known test reds.
+[agent/](agent/INDEX.md) is the working manual for AI agents.
 
 ## How to work in this fork
 
@@ -38,49 +39,46 @@ The same steps for people and agents:
 
 ## At a glance
 
-![How the community fork is run: upstream/main fast-forwards into main and is merged into main_community after a scan; every change is a short-lived work branch off main_community, gated and merged back; a community tag on main_community builds a release](fork-workflow.svg)
+![How the project is run: main_community is the trunk; every change is a short-lived work branch off it, gated, merged back and removed; a community tag on main_community builds a release; the original repo is a frozen reference from which nothing is synced](fork-workflow.svg)
 
-The creator's `main` comes down unchanged and, once read, merges into `main_community`. Every
-change of ours, and every vetted outside pull request, is a short-lived work branch off
+Every change of ours, and every vetted outside pull request, is a short-lived work branch off
 `main_community` that merges back behind the gate and is then removed. A `community-<version>` tag
-on `main_community` builds a release. The picture is [fork-workflow.svg](fork-workflow.svg), plain
-SVG, so a change to the process is a change to that file in the same commit.
+on `main_community` builds a release. The original repo is a frozen reference: nothing is synced
+from it. The picture is [fork-workflow.svg](fork-workflow.svg), plain SVG, so a change to the
+process is a change to that file in the same commit.
 
 ## Why
 
 1. **One trunk is fast.** Until 2026-10-26 every change was its own branch off `main`, kept so it
    could go back to the creator as a pull request, and `main_community` was rebuilt from an
    ordered recipe of about seventy of them. That cost a branch, a recipe line and a merge per fix,
-   and conflicts between branches that touched the same files. With the creator gone and handing
-   changes back no longer a goal, all of it is retired.
-2. **`main` stays the creator's.** It mirrors `upstream/main` and is never committed to, so his
-   later changes can still be pulled in with a fast-forward and one merge into `main_community`.
-3. **Outside code stays untrusted.** Whatever comes from upstream, his `main` included, is read in
-   full before it merges (RULES.md, rules 5 to 8).
+   and conflicts between branches that touched the same files. With the creator no longer active
+   on the project and handing changes back no longer a goal, all of it is retired.
+2. **The original is a frozen reference, not something to track.** Its `main` has not moved since
+   2026-09-03 and the trunk is 3,706 commits past it, so no sync is routine work. `main` and the
+   `upstream` remote stay, untouched, so the original can still be read.
+3. **Outside code stays untrusted.** Whatever comes from outside, a pull request on this repo or
+   anything the owner asks for from the original, is read in full before it merges (RULES.md,
+   rules 5 to 8).
 
 ## The branches
 
 | Branch | Lifetime | Purpose |
 |---|---|---|
 | `main_community` | forever | The trunk. Every change lands here; the dev app runs it and every test build and release is cut from it. The fork's default branch on GitHub, so its root `README.md` is the front page. |
-| `main` | forever | Mirror of `upstream/main`. Never committed to. Pushed to `origin` only, never to `upstream`. |
+| `main` | forever | A frozen copy of the original repo's `main` (last commit 2026-09-03), kept as a reference. Never committed to, never synced as routine work (rule 2). Pushed to `origin` only, never to `upstream`. |
 | work branches | one job | A short-lived branch off `main_community` in its own worktree; merged back, then deleted with its worktree. |
 | retired branches | kept | Every other branch, retired on 2026-10-26 with a `RETIRED.md` note: the old feature branches, `catch_all`, `main_community_rules`, `local-data-refresh`, `community_release_rules`, `test-neutering`, the `community/pr-*` copies. Never deleted, never merged again (rule 9). Listed in BRANCHES.md. |
 
 ## Procedures
 
-**Sync main.** `git fetch upstream main:main && git push origin main` (the fetch only ever
-fast-forwards `main`, and needs no checkout of it). Read the new commits in full (RULES.md, rules 5
-to 7), then merge `main` into `main_community` on a work branch, gate, and merge. On a conflict in
-`releaseNotes.ts`, take `main`'s wholesale (rule 13).
-
-**See every upstream PR locally.** The `upstream` remote carries a second fetch refspec,
-`+refs/pull/*/head:refs/remotes/upstream/pr/*`, so `git fetch upstream` refreshes a read-only
-`upstream/pr/N` ref per open PR. `gh pr list --repo jmoyers/everquest-companion` lists them.
-
-**Adopt a third-party PR.** Vet it (RULES.md, rules 5 to 8). Make a work branch off
-`main_community` and merge or cherry-pick `upstream/pr/N` onto it. Run the gate there. Add the
-ADOPTIONS.md row. Merge into `main_community`, gate again, remove the work branch.
+**Adopt a third-party PR.** A pull request opened on this repo: `gh pr list` lists them, and
+`git fetch origin pull/<N>/head` puts its head at `FETCH_HEAD`, read-only. Vet it (RULES.md, rules
+5 to 8). Make a work branch off `main_community` and merge or cherry-pick the PR's commits onto it,
+never the contributor's ref straight into the trunk. Run the gate there. Add the ADOPTIONS.md row.
+Merge into `main_community`, gate again, remove the work branch. A pull request opened on the
+original repo is adopted the same way, from its `upstream/pr/N` ref, and only when the owner asks
+(last section).
 
 **Merge while the dev app is up.** `npm run dev` runs `electron-vite dev --watch` in this clone,
 so every file a merge writes restarts Electron, and a merge burst relaunches the app on a
@@ -107,3 +105,22 @@ earlier builds (RULES.md, rule 17). `npm run dist` runs in this clone, never in 
 `npx @electron/asar list release/<version>/win-unpacked/resources/app.asar` must list
 `\node_modules\conf`; a build without it fails at launch. A GitHub release is RELEASING.md, on the
 owner's word only (rule 10).
+
+## The original repo
+
+`jmoyers/everquest-companion` (git remote `upstream`) is a frozen reference, not something the
+fork tracks. The creator is no longer active on it: its last release is v1.16.0 (2026-09-04), the
+last commit on its `main` is 2026-09-03, and `main_community` is 3,706 commits past that and 0
+behind. Nothing is synced from it as routine work, nothing is offered to it, and nothing is ever
+pushed to it (RULES.md, rules 2, 4 and 9). The pull requests and issues the fork opened there
+earlier are left as they are.
+
+**Look at it, when the owner asks.** `git fetch upstream` (read-only). It updates `upstream/main`
+and, through the remote's second refspec `+refs/pull/*/head:refs/remotes/upstream/pr/*`, one
+`upstream/pr/N` ref per pull request there. What the owner asks to take is read in full and
+brought in on a work branch (rules 4 to 7), with its row in ADOPTIONS.md.
+
+**`main` stays where it is.** It moves only if the owner asks for it to be brought up to the
+original's, and then by fast-forward (`git fetch upstream main:main`), never by a commit;
+`releaseNotes.ts` then follows rule 13. A push of `main` to `origin` starts `build.yml` (and
+`infra.yml` or `pages.yml` when their paths changed): those workflows trigger on that branch.

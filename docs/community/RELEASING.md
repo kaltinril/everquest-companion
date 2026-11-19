@@ -14,17 +14,18 @@ The `0.1.0-test.N` installer that `main_community` produces (the TEST identity, 
 fork. Nothing about the build changes for the release; the TEST identity is what makes it safe to
 hand to strangers:
 
-- **It installs beside the official app, not over it.** Its own appId, product name, install
+- **It installs beside the original app, not over it.** Its own appId, product name, install
   folder and settings.
 - **It updates itself from this fork's Releases page, and only from it** (since test.20). The TEST
-  `electron-builder.yml` points the creator's own updater at a generic feed,
+  `electron-builder.yml` points the app's updater at a generic feed,
   `https://github.com/kaltinril/everquest-companion/releases/latest/download/`, so an install reads
   `test.yml` (electron-builder names the update file after the version's prerelease word) from the
   newest release here, downloads the newer installer quietly and applies it
-  when the app closes. Nothing points at the creator's repo, so the official app never replaces a
-  TEST install and a TEST release never reaches an official one. The updates are unsigned, which
+  when the app closes. Nothing points at the original repo, so the original app never replaces a
+  TEST install and a TEST release never reaches an original one. The updates are unsigned, which
   is the same trust a manual download from this page has: the fork's GitHub account and HTTPS.
-- **Telemetry and feedback are dark**, so nothing it does reaches the creator's servers.
+- **Telemetry and feedback are off.** Both addresses are compiled in empty, so nothing is sent to
+  the original author's servers or anywhere else.
 - **It is not code-signed.** Windows SmartScreen says "Windows protected your PC" on first run;
   the player clicks **More info**, then **Run anyway**. The release notes say so.
 
@@ -34,10 +35,10 @@ competing commercial product.
 ## Why the tag is `community-<version>`
 
 A GitHub Release always creates a tag. `.github/workflows/build.yml` runs its `release` job on
-any `v*` tag: it builds the OFFICIAL app identity, signs it if signing secrets exist, and publishes
-with the creator's `publish` block. A `v0.1.0-test.N` tag on the fork would at best fail and at
-worst start an official-looking build. `community-0.1.0-test.N` matches no workflow trigger, so
-creating the release runs nothing.
+any `v*` tag: it builds the ORIGINAL app's identity, signs it if signing secrets exist, and
+publishes with the creator's `publish` block. A `v0.1.0-test.N` tag on the fork would at best fail
+and at worst start a build that looks like the original app's. `community-0.1.0-test.N` matches
+only `community-release.yml`, the workflow that builds this project's releases (Procedure, below).
 
 ## Procedure
 
@@ -73,9 +74,9 @@ step 4.
 1. **Prepare** as for any tester build: read the previous `Test build` commit's notes, check no
    finished work branch is left unmerged, bump `package.json` and write the notes as a commit on
    a work branch off `main_community` (they become the release notes, so they are written for players,
-   and hold only what changed since the previous version plus the known issues: the full list of
-   what the community build adds lives once, on the test.20 release, and every later release links
-   to it). Then regenerate the in-app What's new list on the same branch,
+   and hold only what changed since the previous version plus the known issues: the cumulative
+   list, the release body's `WHAT THIS BUILD ADDS` section, lives once, on the test.20 release, and
+   every later release links to it). Then regenerate the in-app What's new list on the same branch,
    `node scripts/community/community-release-notes.mjs`, and commit
    `src/shared/communityReleaseNotes.ts` (the unit suite fails without it). Merge the branch into
    `main_community`, and run the gate (`bash scripts/community/known-reds.sh` is the unit suite with only
@@ -124,15 +125,15 @@ someone may already have downloaded. Deleting a release is the owner's call.
   installer.
 - **Moving over from older installs (since test.20)**, all checked on the owner's machine:
   - *An older TEST build* (test.19 and before) lived in `%LOCALAPPDATA%\Programs\everquest-companion`,
-    the official app's folder. test.20's installer (`build/installer.nsh`, `eqLeaveSharedFolder`) moves it to
+    the original app's folder. test.20's installer (`build/installer.nsh`, `eqLeaveSharedFolder`) moves it to
     `everquest-companion-test`; settings are untouched.
-  - *Both apps installed*: the official app's files in the shared folder are left alone; only the
+  - *Both apps installed*: the original app's files in the shared folder are left alone; only the
     TEST exes are removed. The TEST settings are kept and win, since they already exist. An
-    official app an earlier TEST install had overwritten needs one reinstall from the creator's
-    page.
-  - *Only the official app*: on first launch the TEST build copies the official app's settings,
+    original app that an earlier TEST install had overwritten needs one reinstall from the
+    original repo's Releases page.
+  - *Only the original app*: on first launch the TEST build copies the original app's settings,
     learned messages, resist history, item cache, sound packs and UI choices (`channel.ts`
-    `SEED_ENTRIES`); the official app is never changed.
+    `SEED_ENTRIES`); the original app is never changed.
 - **The front page** is the root `README.md` on `main_community`, the default branch since
   2026-10-09. Until 2026-11-19 it was `.github/README.md`, shown by GitHub in place of the original
   app's README at the root; that copy is removed and the root page is the project's own, so there
