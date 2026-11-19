@@ -62,7 +62,7 @@ SVG, so a change to the process is a change to that file in the same commit.
 
 | Branch | Lifetime | Purpose |
 |---|---|---|
-| `main_community` | forever | The trunk. Every change lands here; the dev app runs it and every test build and release is cut from it. The fork's default branch on GitHub, so its `.github/README.md` is the front page. |
+| `main_community` | forever | The trunk. Every change lands here; the dev app runs it and every test build and release is cut from it. The fork's default branch on GitHub, so its root `README.md` is the front page. |
 | `main` | forever | Mirror of `upstream/main`. Never committed to. Pushed to `origin` only, never to `upstream`. |
 | work branches | one job | A short-lived branch off `main_community` in its own worktree; merged back, then deleted with its worktree. |
 | retired branches | kept | Every other branch, retired on 2026-10-26 with a `RETIRED.md` note: the old feature branches, `catch_all`, `main_community_rules`, `local-data-refresh`, `community_release_rules`, `test-neutering`, the `community/pr-*` copies. Never deleted, never merged again (rule 9). Listed in BRANCHES.md. |

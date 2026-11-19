@@ -93,7 +93,9 @@ The fork is `origin` (`kaltinril/everquest-companion`). Nothing is ever pushed t
 (`jmoyers/everquest-companion`). The tables are as they stood at retirement; the Worktree column
 is where a branch used to be checked out and no longer applies, and an open PR listed here is
 left as it is upstream. To find where a feature's code came from, `git log --merges
---grep="Merge branch '<branch>'" main_community`, or read the retired branch itself.
+--grep="Merge branch '<branch>'" main_community`, or read the retired branch itself. The
+`main_community_rules` row names the front page of its day: since 2026-11-19 the front page is the
+root `README.md`, the project's own, and `.github/README.md` is removed.
 
 ### Ours, never closing, never a PR
 

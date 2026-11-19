@@ -1,164 +1,177 @@
-# EQ Legends Companion
+# EQ Legends Companion: Community Edition
 
-A Windows desktop companion for **EverQuest Legends**. It reads the log file the game
-already writes and turns it into live, useful views — a DPS meter, floating overlays,
-quest and loot tracking, alerts.
+A Windows desktop companion for **EverQuest Legends**. It reads the log file the game already
+writes and turns it into live, useful views: a DPS meter, floating overlays, quest, loot and gear
+tracking, maps, alerts.
 
-**It only reads your log.** Nothing is injected into EverQuest, no game files are
-touched, no memory is read, and nothing is automated or played for you. If you turned
-off logging, the app simply has nothing to show.
+**It only reads your log.** Nothing is injected into EverQuest, no game files are touched, no
+memory is read, and nothing is automated or played for you. If you turned off logging, the app
+simply has nothing to show.
+
+This project began as a fork of [**EQ Legends Companion**](https://github.com/jmoyers/everquest-companion)
+by **Josh Moyers**. He built the app and its engine, and the credit for that is his. He is no
+longer active on it, so this repo runs the app as its own project, with its own releases, its own
+issue tracker and its own direction.
 
 ## What it does
 
-- **Live DPS meter** — per-fight and per-zone numbers with fight history, drill-down
-  into each attack and spell, and a timeline of the pull.
-- **Floating overlays** — small always-on-top meters you can leave on top of the game:
-  damage or healing, scoped to the current fight or the whole zone. Lock one and it
-  becomes click-through.
-- **Plane of Sky tracker** — every class's Test quests with "have / need" chips per
-  item, item stats on hover, and sorting by closest-to-done.
-- **Loot + item knowledge** — a running history of what you looted, and what each item
-  is actually *for*: which quests use it, what it turns in for, which recipes consume it.
-- **Leveling & AA** — XP and AA progress per character, with history.
-- **Raid targets** — which named/raid mobs you've killed and when.
-- **Buff timers** — remaining time on buffs, learned from the log *(early — still rough)*.
-- **Sound alerts** — play a sound when something happens: a charm break, a buff fading,
-  a raid target dying, or any log line you write a rule for. Voice packs included.
+Everything is per-character: switch characters and the app re-reads that log.
 
-Everything is per-character; switch characters and the app re-reads that log.
+**What your log says**
 
-## Getting started
+- **Overview:** the at-a-glance page the app opens on.
+- **Combat:** a live DPS meter with per-fight and per-zone numbers, fight history, a drill-down
+  into each attack and spell, and a timeline of the pull. Healing has its own meters.
+- **Loot:** a running history of what you looted, and what each item is for: which quests use
+  it, what it turns in for, which recipes consume it.
+- **Bazaar:** what trade chat asks and offers, with a watchlist that alerts.
+- **Wiki Gaps:** the names your log mentions that the wiki data has no record of, with a Copy
+  button that drafts the wiki page.
+- **Buffs:** remaining time on your buffs and debuffs, learned from the log, and which of your
+  spells did not take hold and what blocked them.
+- **Leveling:** XP and AA progress per character, with history.
 
-**Requires 64-bit Windows 10 or 11.** Windows 8.1 and older can't run it — the installer
-checks and stops with a message rather than leaving you an app that won't start.
+**Looking things up**
 
-1. Download `everquest-companion-Setup-<version>.exe` from the
-   [**Releases**](https://github.com/jmoyers/everquest-companion/releases) page.
-2. Run it. It's a one-click, per-user install (like Discord) — no admin prompt, no
-   wizard. It adds a Start-menu and desktop shortcut.
+- **Mobs:** look up a mob and what it drops.
+- **Gear** (beta): drop sources, worth scores and the +0 to +10 upgrade slider. Its other tabs:
+  **Recommended** (a level route with the gear to aim for), **Exaltations** (the socket board
+  optimizer), **Void motes** (where the week's three are best spent), **Character** and
+  **Wish list**.
+- **Maps:** clickable zone links, mob pins, travel routes, ports, and where to level.
+- **Raid Targets:** which named and raid mobs you have killed and when.
+- **Achievements:** your open achievements, with a Slayer planner that ranks the zones to work in.
+- **Unlocks:** the races, classes and deities you have not unlocked yet, and what each still needs.
+- **Plane of Sky:** every class's Test quests with "have / need" chips per item, item stats on
+  hover, and sorting by closest-to-done.
+- **Spells** (beta): a spellbook, the upgrades each spell line has, and loadouts with buff
+  stacking.
+- **Factions:** your standings, read from the game's `/outputfile faction`.
+
+**Alerts and timers**
+
+- **Alerts:** play a sound, speak a line or show a banner when something happens: a charm break,
+  a buff fading, a raid target dying, or any log line you write a rule for.
+- **Timers:** respawn clocks started by your own kills.
+
+**Overlays**
+
+Small always-on-top windows you can leave over the game, turned on from the **Overlay** menu in
+the title bar: damage and healing meters (the current fight or the whole zone), buff and debuff
+timers, XP per hour, respawn countdowns, your next weapon swing, a mob card when you `/con`, the
+Plane of Sky quests you starred, map pins over the game's map, and the top of the Wiki Gaps list.
+Lock one and it becomes click-through. The same menu resets every overlay's position.
+
+**Your log file**
+
+- **Summarize and archive log** (in **Preferences**, off until you turn it on): keeps your history
+  while the game starts a fresh, small log file.
+
+## Download and first run
+
+**Requires 64-bit Windows 10 or 11.** Windows 8.1 and older cannot run it: the installer checks
+and stops with a message.
+
+1. Download the newest `everquest-companion-test-Setup-<version>.exe` from this repo's
+   [**Releases**](https://github.com/kaltinril/everquest-companion/releases/latest) page.
+2. Run it. Windows SmartScreen will say "Windows protected your PC", because the installer is not
+   code-signed: click **More info**, then **Run anyway**. It is a one-click, per-user install with
+   no admin prompt. It adds a Start-menu and a desktop shortcut named **EQ Legends Companion TEST**.
 3. In EverQuest, type `/log on`.
 
-The app finds your log automatically — usually
-`C:\Users\Public\Daybreak Game Company\Installed Games\EverQuest Legends\Logs\`. If your
-install lives somewhere else, point it at the right folder in **Settings**.
+The app finds your log by itself, usually in
+`C:\Users\Public\Daybreak Game Company\Installed Games\EverQuest Legends\Logs\`. If your install
+lives somewhere else, set the **EverQuest install folder** in **Preferences**.
 
-Overlays sit on top of the game in **windowed** or **borderless** mode. Exclusive
-fullscreen can't be overlaid by anything, so use borderless if you want them.
+Overlays sit on top of the game in **windowed** or **borderless** mode. Exclusive fullscreen
+cannot be overlaid by anything, so use borderless if you want them.
 
-### Code signing
+## If you have the original app installed
 
-The installer is code-signed as **Joshua Moyers** through Microsoft's Artifact
-Signing service, and auto-updates are verified against that signature before they
-install. If SmartScreen still shows a "Windows protected your PC" warning while
-the certificate is new, click **More info**, then **Run anyway** — you only ever
-see it once.
+The app installs **beside** the original app, never over it. It has its own name, its own install
+folder and its own settings folder (`%AppData%\everquest-companion-test\`), so the two never
+overwrite each other and can run at the same time.
 
-### Already have an old `eq-tools` install?
-
-The app was renamed from `eq-tools` to `everquest-companion`, which Windows treats as a
-different app — the new installer will *not* replace the old one, and the old install
-will never auto-update again. Uninstall **eq-tools** once from Settings → Apps, then run
-the new installer. Your settings, alerts and sound packs carry over automatically on
-first launch (the old folder is left in place, untouched, as a backup).
+On its first launch, if the original app's settings folder is there, the app copies these from it
+once: your settings, the learned spell messages, the item cache, the sound-pack list and your
+installed sound packs, the learned resists, and the choices you made in each view. It is a copy:
+the original app and its folder are never changed.
 
 ## Updates
 
-The app updates itself in the background from GitHub Releases. When a new version has
-downloaded, an **"Update ready"** notice appears with a **Restart** button — click it to
-apply now, or it installs the next time you quit.
+The app updates itself in the background from this repo's Releases page, and from nowhere else.
+When a new version has downloaded, a **Restart to update** button appears at the bottom of the left
+menu. Click it to update now, or the update installs the next time you quit the app (if the app
+closes to the tray, use **Quit** on the tray icon). To stay on the version you have, turn off
+**Update automatically** in **Preferences**.
+
+Updates are not code-signed either. They rest on this repo's GitHub account and the HTTPS download,
+the same as a download by hand.
 
 ## Make it yours
 
-- **Sound & voice packs.** Alert sounds come from packs. One voice pack ships with the
-  app and installs itself on first launch, and you can browse and install ~350 more from
-  inside the app (**Alerts → Sound packs…**). To add your own: drop a folder into
-  `%AppData%\everquest-companion\soundpacks\<your-pack>\` containing your `.wav`/`.mp3`/`.ogg`
-  files and a small `manifest.json` naming them — it shows up in every sound picker. Want
-  your own Final Fantasy fanfare on a raid kill? That's the whole job.
-- **Share alerts.** Any alert (or all of them at once) copies to a short paste-safe
-  string. Drop it in guild chat or Discord; whoever pastes it back in gets a preview
-  before anything is added. Imports only ever *add* — they never overwrite your alerts.
-- **Share your setup.** Export your whole settings bundle — alerts, volume, overlay
-  look, view preferences, favorites — as one string or a file. It carries no file paths,
-  no window positions, and no character progress.
+- **Sound and voice packs.** Alert sounds come from packs. One voice pack installs itself on first
+  launch, and you can browse and install more from inside the app (**Alerts**, then
+  **Sound packs…**). To add your own: drop a folder into
+  `%AppData%\everquest-companion-test\soundpacks\<your-pack>\` containing your `.wav`, `.mp3` or
+  `.ogg` files and a small `manifest.json` naming them. It then shows up in every sound picker.
+- **Share alerts.** An alert, or all of them at once, copies to a short paste-safe string. Whoever
+  pastes it back in gets a preview before anything is added. Imports only add: they never
+  overwrite your alerts.
+- **Share your setup.** Export your settings as one string or a file (**Preferences**, under
+  **Profiles**). It carries no file paths, no window positions and no character progress.
 
-## Feedback
+## Privacy
 
-**Send feedback** in the nav drawer (also in **Settings → Feedback**) opens a dialog with
-two choices — **Feature request** or **Bug report** — and one box to type in. That box is
-the only thing you fill out; there's no title field and no contact field to fill in.
+The app sends no usage counts and no feedback reports: both addresses are empty in this build, so
+there is nowhere for them to go. What it does ask the network for:
 
-A report carries exactly this:
+- **Updates:** a check against this repo's Releases page, and the installer when there is a newer
+  one.
+- **The EverQuest Legends wiki:** only when you click **Copy** on a row of the Wiki Gaps tab, to
+  read the page that row is about. Everything else the app shows comes from data and pictures
+  shipped inside it.
+- **Sound and voice files:** the first voice pack on first launch, and any sound pack or
+  spoken-alert voice you choose to install.
 
-- the type (feature or bug) and the description you typed;
-- what the app knows about *itself* — app version, release channel, `win32`, your OS
-  build number, CPU architecture, and the Electron/Chrome/Node versions it's running on;
-- an anonymous per-install id, which exists only to rate-limit and to link your follow-up
-  report to your earlier one. It's a random UUID in a file you own, tied to nothing.
+`SECURITY.md` and `TELEMETRY.md` in this repo were written for the original app. They do not
+describe this build.
 
-**It does not contain your character name, your server, your EverQuest install path, your
-Windows user name, or your machine name.** None of those are collected, and none of your
-gameplay, progress, or settings ride along.
+## Reporting a problem
 
-**Bug reports can attach a slice of your EverQuest log**, and this is the one place log
-contents leave your machine. It's opt-in (ticked by default for bugs, and never offered
-for feature requests), covers the last 15, 30, or 60 minutes, and it is **scrubbed before
-you ever see it**: chat, tells, group and guild messages, and `/who` output are dropped
-by the same filter that governs the log fixtures committed to this repo. Your own
-character name, zones, spells, combat lines, and structural events like group joins
-stay — that's what makes a bug reproducible.
-
-The dialog shows you the slice, expanded, before you send anything: how many lines it is,
-the exact time span, how many lines the scrub removed, and its compressed size. **Save a
-copy…** writes every byte to a file of your choosing, so you can read the whole thing
-first rather than trusting a preview. Nothing is uploaded until you press Send.
-
-**Want a reply?** Put your email or Discord handle in the message itself. That's the only
-way we'll have to reach you, and leaving it out is a perfectly normal way to file.
-
-After a successful send you get a **report id**. It's worth keeping: quote it in a
-[GitHub issue](https://github.com/jmoyers/everquest-companion/issues) and we can delete
-that report's log slice and any contact details you included. See
-[`SECURITY.md`](SECURITY.md) for how long each piece is kept.
-
-If you're offline, the report is saved and sent the next time the app runs with a working
-connection.
-
-**Anonymous usage counts.** Separately from feedback, the app sends anonymous counts —
-session lengths, which views and features get used, whether an update or a voice install
-worked. It's on by default and a one-line bar tells you so the first time you run it;
-nothing is sent before that bar has appeared. **Opt out** there, or the switch in
-**Preferences → Usage analytics**, turns it off and deletes both the buffered events and
-your anonymous id on the spot. There is no free-text field in what it sends, so your
-character names, zones, chat, alert names, paths and log lines cannot travel in it —
-[`TELEMETRY.md`](TELEMETRY.md) lists every event and field, generated from the schema, and
-the same Preferences pane shows you the exact JSON waiting to go and the last batch that
-left. The id it uses is deliberately **not** your feedback install id: the two data sets
-can't be joined, by us or by anyone else. [`SECURITY.md`](SECURITY.md#usage-analytics) has
-the retention details.
+Open an issue on [**this repo's Issues page**](https://github.com/kaltinril/everquest-companion/issues).
+The **Send feedback** form inside the app is switched off.
 
 ## Development
 
-Contributions welcome. Everything about building, testing, and the architecture lives in
-[`AGENTS.md`](AGENTS.md) — start there.
+Contributions are welcome as pull requests to this repo. Each one is read in full before it is
+taken in. Read these in order:
+
+1. [docs/community/README.md](docs/community/README.md): how the project is run (branches, the
+   checks every change must pass).
+2. [docs/community/RULES.md](docs/community/RULES.md): the rules that bind every change.
+3. [`AGENTS.md`](AGENTS.md): the code manual, written by the original author. Where it and the
+   rules disagree, the rules win.
 
 ## License
 
-FSL-1.1-MIT (Functional Source License, converting to MIT after two years) — see
+FSL-1.1-MIT (Functional Source License, converting to MIT after two years): see
 [`LICENSE`](LICENSE). Copyright (c) 2026 Josh Moyers.
 
 ## Thanks
 
-The item icons and raid-boss portraits this app draws come from two volunteer-run
-EverQuest wikis — [**wiki.project1999.com**](https://wiki.project1999.com/) (boss
-portraits) and [**eqlwiki.com**](https://eqlwiki.com/) (item icons, and the item, spell
-and quest knowledge behind them). Those images are **copied into the app at build time**
-(`resources/wiki-images/`, ~3.75 MB, regenerated with `npm run fetch:images`), so the
-running app never asks either site for a picture, and
-[`resources/wiki-images/manifest.json`](resources/wiki-images/manifest.json) records the
-exact source URL, byte length and SHA-256 of every file it ships. Neither wiki is
-affiliated with this app. The same credit is in the app itself, under
-**Preferences → Thanks**.
+**Josh Moyers** wrote the original app, EQ Legends Companion, and its engine:
+[jmoyers/everquest-companion](https://github.com/jmoyers/everquest-companion). That repo is no
+longer updated (its last release is v1.16.0).
+
+The item icons and raid-boss portraits this app draws come from two volunteer-run EverQuest wikis:
+[**wiki.project1999.com**](https://wiki.project1999.com/) (boss portraits) and
+[**eqlwiki.com**](https://eqlwiki.com/) (item icons, and the item, spell and quest knowledge behind
+them). Those images are **copied into the app at build time** (`resources/wiki-images/`,
+regenerated with `npm run fetch:images`), so the running app never asks either site for a picture,
+and [`resources/wiki-images/manifest.json`](resources/wiki-images/manifest.json) records the exact
+source URL, byte length and SHA-256 of every file it ships. Neither wiki is affiliated with this
+app. The same credit is in the app itself, under **Preferences**, then **Thanks**.
 
 The text of the **EverQuest Legends Wiki** (eqlwiki.com) is licensed
 [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), as its

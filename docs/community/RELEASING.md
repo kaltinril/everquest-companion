@@ -133,5 +133,7 @@ someone may already have downloaded. Deleting a release is the owner's call.
   - *Only the official app*: on first launch the TEST build copies the official app's settings,
     learned messages, resist history, item cache, sound packs and UI choices (`channel.ts`
     `SEED_ENTRIES`); the official app is never changed.
-- **The fork's front page** is `.github/README.md` on `main_community`, the default branch since
-  2026-10-09; the creator's root `README.md` stays untouched.
+- **The front page** is the root `README.md` on `main_community`, the default branch since
+  2026-10-09. Until 2026-11-19 it was `.github/README.md`, shown by GitHub in place of the original
+  app's README at the root; that copy is removed and the root page is the project's own, so there
+  is one front page.
