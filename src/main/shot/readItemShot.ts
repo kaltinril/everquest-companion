@@ -74,6 +74,21 @@ const TEXTURE_RMS_MAX = 6
 const median = (v: number[]): number => [...v].sort((a, b) => a - b)[v.length >> 1]
 
 /**
+ * The line pitch at `Race:`: its distance from the row above it. That row is `Class:`, or the last row
+ * of a class list that wraps (ten classes, `BST` on its own row), which also sits below the icon, so
+ * no icon junk lifts its box (owner, 2026-11-18: Jibble's Stiletto; Class to Race read as one pitch
+ * doubled the box, and half a pixel too much still took in the pane's border).
+ */
+function pitchAt(lines: readonly OcrLine[], cls: number, race: number): number {
+  const to = lines[race].lead
+  for (let i = race - 1; i > cls; i--) {
+    const gap = to.y - lines[i].lead.y
+    if (gap >= to.h) return gap
+  }
+  return to.y - lines[cls].lead.y
+}
+
+/**
  * Where the icon is: the window draws it left of the text column (`IDW_IconButton`), its top at the
  * name line, two lines above `Class:`; its side about 2.5 line pitches (40 px at the owner's 16 px).
  */
@@ -82,7 +97,7 @@ export function iconRegion(lines: readonly OcrLine[], w: number, h: number): Box
   if (cls < 0) return null
   const race = lines.findIndex((l, i) => i > cls && /\bRace\b/i.test(l.text))
   const at = lines[cls].lead
-  const pitch = race > cls ? lines[race].lead.y - at.y : at.h * 1.4
+  const pitch = race > cls ? pitchAt(lines, cls, race) : at.h * 1.4
   // The text column's left edge: the `Class:` and `Race:` words themselves (a junk prefix such as
   // `| Class` stretches the line's box over the icon, never the word's).
   const left = median([at.x, ...(race > cls ? [lines[race].lead.x] : [])])

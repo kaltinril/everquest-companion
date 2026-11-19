@@ -187,6 +187,12 @@ test('THE ICON SITS LEFT OF THE CLASS WORD, ITS TOP AT THE NAME LINE, SIZED BY T
   // pitch 14: side 47.6, right edge just left of x = 73, top 2.5 pitches above Class
   assert.ok(Math.abs(r.x + r.w - 71) <= 2 && Math.abs(r.y - 58) <= 1 && Math.abs(r.w - 48) <= 1, JSON.stringify(r))
   assert.equal(iconRegion([line('nothing here', 10, 10)], 100, 100), null)
+  // A class list that wraps (Jibble's Stiletto: ten classes, `BST` alone on the next row) puts a row
+  // between Class and Race, and the icon's junk lifts the Class word (93, where its row is 95): the
+  // pitch is Race's distance from the row above it (16), never Class to Race (34).
+  const wrapped = iconRegion([line("Jibble's Stiletto", 72, 63), line('Lore Equipped', 72, 79), line('"Class: WAR', 55, 93), line('BST', 72, 111), line('Race: ALL', 72, 127)], 416, 323)
+  assert.ok(wrapped !== null)
+  assert.ok(Math.abs(wrapped.w - 54) <= 1 && Math.abs(wrapped.x - 15) <= 1 && Math.abs(wrapped.y - 53) <= 1, JSON.stringify(wrapped))
 })
 
 test('OCR READS ITS ENGLISH DATA FROM DISK, NEVER A URL (rule 15: no CDN fallback)', () => {

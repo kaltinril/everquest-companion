@@ -138,6 +138,9 @@ const ICONS: readonly [string, number, number][] = [
   ['vial-of-swamp-water.png', 705, 1],
   // a translucent window over the scene at a larger UI scale (Malkil's): 212 against 1,020
   ['surefall-fletching-kit.png', 883, 1],
+  // Ten classes wrap `BST` onto a row of its own between Class and Race: read as one line pitch, the
+  // box was twice the size and took in the title bar (owner, 2026-11-18: no dagger offered). 305 against 1,112.
+  ['jibbles-stiletto.png', 591, 1],
   // 597 and 1104 are one bow in two colours: a tie the picker shows, top two.
   ['windstriker-ground.png', 1104, 2],
   ['windstriker-sky.png', 1104, 2]
