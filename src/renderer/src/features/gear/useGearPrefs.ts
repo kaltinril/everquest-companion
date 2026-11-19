@@ -28,11 +28,13 @@ import {
   type GearColumnWidths,
   type GearControl
 } from './gearPrefs'
+import { sanitizeMotePrefs, type VoidMotePrefs } from './voidMotePrefs'
 
 const COLUMNS_KEY = 'eq.gear.columns'
 const CONTROLS_KEY = 'eq.gear.controls'
 const WIDTHS_KEY = 'eq.gear.widths'
 const DROPS_KEY = 'eq.gear.dropcols'
+const MOTES_KEY = 'eq.gear.motes'
 
 /**
  * One stored preference as parsed JSON, or `null` for anything unusable — absent, empty, truncated,
@@ -71,6 +73,9 @@ export interface GearPrefs {
   /** the Zone / Level / Mob columns (fork decision, kaltinril 2026-08-15) — on unless switched off */
   dropCols: boolean
   setDropCols: (next: boolean) => void
+  /** the void mote panel: open or not, its target and its order (voidMotePrefs.ts) */
+  motes: VoidMotePrefs
+  setMotes: (next: VoidMotePrefs) => void
 }
 
 export function useGearPrefs(): GearPrefs {
@@ -78,6 +83,7 @@ export function useGearPrefs(): GearPrefs {
   const [controls, setControlsState] = useState<GearControl[] | null>(() => sanitizeControls(readJson(CONTROLS_KEY)))
   const [widths, setWidthsState] = useState<GearColumnWidths | null>(() => sanitizeWidths(readJson(WIDTHS_KEY)))
   const [dropCols, setDropColsState] = useState<boolean>(() => sanitizeDropCols(readJson(DROPS_KEY)))
+  const [motes, setMotesState] = useState<VoidMotePrefs>(() => sanitizeMotePrefs(readJson(MOTES_KEY)))
 
   const setColumns = useCallback((next: GearSortKey[] | null) => {
     setColumnsState(next)
@@ -116,5 +122,10 @@ export function useGearPrefs(): GearPrefs {
     writeJson(DROPS_KEY, next ? null : false)
   }, [])
 
-  return { columns, setColumns, controls, setControls, widths, setWidths, dropCols, setDropCols }
+  const setMotes = useCallback((next: VoidMotePrefs) => {
+    setMotesState(next)
+    writeJson(MOTES_KEY, next)
+  }, [])
+
+  return { columns, setColumns, controls, setControls, widths, setWidths, dropCols, setDropCols, motes, setMotes }
 }

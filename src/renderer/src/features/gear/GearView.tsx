@@ -133,6 +133,7 @@ import { useWindowedRows } from '../../lib/useWindowedRows'
 import GearFilterBar from './GearFilterBar'
 import GearPicker from './GearPickers'
 import GearTable, { ROW_HEIGHT } from './GearTable'
+import VoidMotePanel from './VoidMotePanel'
 import { useWishlist } from '../wishlist/useWishlist'
 import { wishFromGear } from '../wishlist/wishSearch'
 import { useGearPrefs, type GearPrefs } from './useGearPrefs'
@@ -389,6 +390,17 @@ function ShapePickers({ prefs, columns }: { prefs: GearPrefs; columns: readonly 
         color={prefs.dropCols ? 'primary' : 'default'}
         variant={prefs.dropCols ? 'filled' : 'outlined'}
         onClick={() => prefs.setDropCols(!prefs.dropCols)}
+        sx={{ flexShrink: 0 }}
+      />
+      {/* The void mote panel's switch (owner ask, 2026-11-18): a shape chip too, it narrows nothing. */}
+      <Chip
+        size="small"
+        label="Void motes"
+        data-testid="gear-motes-toggle"
+        title="Where a Void-Touched Potential is best spent on what you wear"
+        color={prefs.motes.open ? 'primary' : 'default'}
+        variant={prefs.motes.open ? 'filled' : 'outlined'}
+        onClick={() => prefs.setMotes({ ...prefs.motes, open: !prefs.motes.open })}
         sx={{ flexShrink: 0 }}
       />
     </>
@@ -658,6 +670,11 @@ export default function GearView({ onOpenLoot, onOpenMob, onOpenMapZone }: GearV
         prefs={prefs}
         columns={table.columns}
       />
+
+      {/* Where to spend a void mote, over what the dump says is worn: outside the three memos, like the hover card. */}
+      {prefs.motes.open && (
+        <VoidMotePanel compare={compare} classes={classes.classes} motes={prefs.motes} setMotes={prefs.setMotes} onOpenLoot={onOpenLoot} />
+      )}
 
       {/* THE TABLE IS THE WHOLE BODY NOW. Until JOS-325 this was a `nowrap` ROW — the list on the
           left, the sets pane as a fixed column on the right — and with the pane retired the row has

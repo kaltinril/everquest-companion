@@ -67,6 +67,24 @@ function classSentence(classes: readonly ClassAbbr[]): string {
   return `${manaPart}${backstab ? '; backstab counts' : ''}.`
 }
 
+/** What each role is CALLED. A `Record` so an eleventh role is a type error here (the `VIEW_LABELS`
+ *  trick). Here, not in PlanView, since the Gear tab's void mote panel names the same focuses. */
+export const ROLE_LABEL: Record<GearRole, string> = {
+  balanced: 'Balanced',
+  tank: 'Tank',
+  healer: 'Healer',
+  // "(any)" rather than a bare "DPS", because four of the entries below are also DPS. This is the
+  // one that constrains no weapon slot, and the label has to say which of the five it is.
+  dps: 'DPS (any)',
+  dps1h: '1H DPS',
+  dps2h: '2H DPS',
+  dualwield: 'Dual wield',
+  // The fifth build (owner, 2026-08-22): bows and throwing, from the RANGE slot.
+  range: 'Ranged',
+  dd: 'Caster DD',
+  dot: 'Caster DoT'
+}
+
 /** The paragraph: the focus, then the class gate. */
 export function planBlurb(role: GearRole, classes: readonly ClassAbbr[]): string {
   return `${FOCUS_BLURB[role]} ${classSentence(classes)}`

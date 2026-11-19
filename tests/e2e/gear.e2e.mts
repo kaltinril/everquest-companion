@@ -128,6 +128,7 @@ import { stepGearWish } from './gearWishSteps.mjs'
 // JOS-338's comparison card, likewise — and it is the step that hit-tests the JOS-143 regression
 // with a popper open over this tab for the first time since the table shipped.
 import { stepGearCompare } from './gearCompareSteps.mjs'
+import { stepGearVoidMotes } from './gearVoidMoteSteps.mjs'
 // JOS-329's away-and-back steps, shared with the planner and character specs — one module because
 // the claim is identical on every tab of the area and only the fingerprint differs.
 import { stepGearMemory, stepGearMemoryRelaunched } from './areaMemorySteps.mjs'
@@ -613,6 +614,8 @@ async function steps(app: ElectronApplication, page: Page, log: FixtureLog): Pro
   // simulation, and the step asserts it has nothing to admit to yet), which is true anywhere above
   // `stepUpgrade`. It hands the tab back with the box empty and both pickers clear.
   await stepGearCompare(app, page, THELVORN_BASE)
+  // The void mote panel reads the same worn items off the same dump; it opens and closes its own panel.
+  await stepGearVoidMotes(page)
   // Phase 5's set steps used to run HERE, between the ownership steps and the phase-3 ones, and
   // JOS-325 removed them with the surface they drove. The clear-the-box line they were followed by
   // STAYS, even though `stepOwnedFilter` now leaves the box empty on its own: `stepSearch` measures
