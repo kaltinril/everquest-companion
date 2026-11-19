@@ -73,6 +73,8 @@ import mobsJson from '../../renderer/src/data/eqlegends/mobs.json'
 import type { MobData } from '../../shared/types'
 import { buildSourceIndex, dropDetails, mergeItemSources, type SourceIndex } from '../../shared/itemSources'
 import { isShieldLike } from '../../shared/planner/shield'
+import { itemSupply, type SupplyContext } from '../../shared/planner/itemSupply'
+import { committedSupplyContext } from './gearSupply'
 
 /** Tier 1 — any upgraded state answers the SV VOID question identically (phase 0: it reads `full > 0`). */
 const ANY_UPGRADED: ItemUpgradeState = { full: 1, fraction: 0 }
@@ -349,11 +351,15 @@ function countRow(acc: Acc, row: GearRow): void {
  * gear.ts states why). ABSENT when nobody names the item: an empty array would be this index
  * inventing "drops from nothing" where the catalog merely stated nothing (law 1).
  */
-function withDrops(row: GearRow, sources: SourceIndex): GearRow {
-  const drops = dropDetails(mergeItemSources(sources.get(row.key) ?? [], row.wikiSources))
+function withDrops(row: GearRow, sources: SourceIndex, supplyOf: SupplyContext): GearRow {
+  const merged = mergeItemSources(sources.get(row.key) ?? [], row.wikiSources)
+  const drops = dropDetails(merged)
+  // How fast copies come in, for the void mote ranking: absent when no page states a road.
+  const supply = itemSupply(row, merged, supplyOf)
   return {
     ...row,
     ...(drops.dropMobs.length === 0 ? {} : drops),
+    ...(supply.roads === 0 ? {} : { supply }),
     ...(isShieldLike(row) ? { shield: true as const } : {})
   }
 }
@@ -367,6 +373,7 @@ interface BuildDeps {
   research: ItemResearchFile
   spells: SpellFactsIndex
   sources: SourceIndex
+  supply: SupplyContext
 }
 
 /** One page → its row, or null when the corpus places the item in no slot at all. */
@@ -407,7 +414,7 @@ function pageRow(entry: ItemDbEntry, deps: BuildDeps, acc: Acc): GearRow | null 
     effects: block.effects.map((e) => gearEffect(e, spells, acc)),
     ...optionalFields(k, read, synthesizesVoidSave(block, ANY_UPGRADED), acc.derived.get(itemKey(entry.page)))
   }
-  return withDrops(row, deps.sources)
+  return withDrops(row, deps.sources, deps.supply)
 }
 
 /**
@@ -480,7 +487,7 @@ export function* gearIndexSteps(
   sources: SourceIndex = committedSources()
 ): Steps<GearIndexPayload> {
   const acc = newAcc(yield* eraDerivationSteps(file))
-  const deps: BuildDeps = { research, spells, sources }
+  const deps: BuildDeps = { research, spells, sources, supply: committedSupplyContext(sources) }
   // Through the rename overlay (JOS-415) — same reasoning as `buildPlannerIndex`: a gear row is a
   // DISPLAYED name, and `addPage`'s page dedupe already absorbs the alias key.
   let walked = 0
