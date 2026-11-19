@@ -20,6 +20,7 @@ import ReceiptLongIcon from '@mui/icons-material/ReceiptLong'
 import StorefrontIcon from '@mui/icons-material/Storefront'
 import FindInPageIcon from '@mui/icons-material/FindInPage'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
+import HandymanIcon from '@mui/icons-material/Handyman'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech'
 import LockOpenIcon from '@mui/icons-material/LockOpen'
@@ -145,7 +146,9 @@ const GROUPS: NavGroup[] = [
       // GAPS sits under Loot: what the log named that the app's data does not know.
       { view: 'gaps', icon: <FindInPageIcon /> },
       { view: 'buffs', icon: <AutoFixHighIcon /> },
-      { view: 'leveling', icon: <TrendingUpIcon /> }
+      { view: 'leveling', icon: <TrendingUpIcon /> },
+      // SKILLS sits under Leveling: the other thing your log watches go up.
+      { view: 'skills', icon: <HandymanIcon /> }
     ]
   },
 {
