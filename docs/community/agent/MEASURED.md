@@ -375,3 +375,51 @@ Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`)
 - Castle of Mistmoore 4 (Refined), same-stay gaps ending at the first sign of life (2026-08-12..10-06 archive): Lasna Cheroon 8:50 (49 of 50 gaps at 526-532 s; the wiki says 8:50), Princess Cherista 8:48, a dark librarian 8:49, a cloaked dhampyre 8:50, Enynti 8:50 (the wiki says 22 minutes), Xicotl 4:55, a fallen noble 5:54. A named casts a buff the moment it spawns (`begins casting Greater Shielding`), so its gaps are second-accurate.
 - Common names cluster at the 60 s floor (a deathly usher, the gargoyles): two spawn points sharing a name, not a respawn.
 - Cost of learning every mob's gaps (respawn-first-sight): no slower (Oct log 105 MB: 28 s vs 30 s; Aug-Oct 334 MB: 85 s vs 91 s); respawn snapshot 5.5 KB to 72 KB and 125 KB.
+
+## From the 2026-11-19 issue sweep
+
+**Slayer kinds (fork #5)**
+
+- 2026-11-19, committed mobs.json + mobRaces.json (8,154 catalog mobs), branch matcher: the
+  `yieldsTo` rule changes the facts of exactly one mob, An emerald drake (page race Dragon, level 8
+  ~ 14, Butcherblock Mountains): { race: 'dragon', nameTerm: null } becomes { race: '', nameTerm:
+  'drakes' }. Mobs matching `True Dragons`: 84 before, 83 after. Mobs matching the You Call That a
+  Dragon? line: 309 before, 310 after.
+- mobRaces.json `races.Dragon` holds seven pages: An emerald drake, Hoshkar, Nexona, Silverwing,
+  Trakanon, Trakanon (triggered), Xygoz. Lord Nagafen and Lady Vox are `Lava Dragon`.
+- Dump lines (tests/fixtures/slayer-open-Achievements.txt): Dragonbane `True Dragons 19/250`
+  (:234-235); You Call That a Dragon? `Dinosaurs, Dracoliches, Lesser Dragons, Drakes, Drixies,
+  Raptors, Witherans, Wurms, and Wyverns. 90/1000` (:236-237); You Keep Dragon Me Into This `Drakes,
+  Drixies, and Fay Drakes. 63/100` (:295-296); Here Be Dragons! 109/5000 (:178-179), which is 19 +
+  90.
+- Not measured: whether killing An Emerald Drake moves any drake counter in game (the reporter was
+  asked in the reply draft).
+
+**Respawn (fork #8)**
+
+- Enynti, owner's log: four kills on 2026-11-12 in one stay in The Castle of Mistmoore 4 (Refined)
+  gave gaps of 527, 567 and 529 s to the first sign of life; the page states 22 minutes. Under the
+  agreement rule those three gaps agree on 527 s (8m 47s) and the 31 archived Aug to Oct gaps on 529
+  s (8m 49s). Both cases are engine tests.
+
+**Skills, combines, feign, fishing and forage lines (fork #6)**
+
+- Skill-up line `You have become better at <Skill>! (<n>)`: archive 2026-08-12 to 2026-10-06 has
+  5,071 lines over 61 distinct skills, every line with the value; live log 2026-10-25 to 2026-11-19
+  has 195 lines over 11 skills.
+- The line can repeat the level it already stated: `Specialize Evocation! (50)` 37 times in 7
+  minutes (live log lines 286520-286873). A level can go down between lines: Specialize Evocation
+  200 in the archive then 50; Forage 52 then 50.
+- Combines (archive): 606 `You have fashioned the items together to create something new: X.`, 130
+  `You lacked the skills to fashion X.`; a tradeskill tick lands in the same second for only 160
+  successes and 55 failures. `You can no longer advance your skill from making this item.` (60
+  lines) prints just before a trivial success; nothing reads it.
+- Feign Death: no attempt line and no success line. Only `<You> has fallen to the ground.` (28
+  archive, 5 live; mobs keep swinging, the failure) and `You are no longer feigning death, because a
+  spell hit you.` A success rate cannot be computed.
+- Fishing (live): `You cast your line.` 131, `You caught X!` 64, `You didn't catch anything.` 62,
+  `You lost your bait!` 4, `You spill your beer while bringing in your line.` 16, `Your fishing pole
+  broke!` 2. Forage: `You have scrounged up X.` 526 live / 159 archive, `You fail to locate any food
+  nearby.` 568 / 357.
+- Checked in code by this change: the real parser types `You have become better at Fishing! (127)`
+  as Kind::SkillUp with skill `Fishing` and value 127 (test in skills.rs).

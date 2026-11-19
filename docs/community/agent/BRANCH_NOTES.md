@@ -261,6 +261,21 @@ where one exists.
 - Unlocks: needs the Factions and Achievements code. The App-root provider wraps
   `<ViewContentMemo>` at App's ROOT. Deity constants are spelled locally (shared ones exist in the
   Exaltations code; folding them together is open).
+- Achievements, kinds table (fork #5, 2026-11-19): `SlayerTerm.yieldsTo` is the second exception to
+  "the page race decides" (the first is `always`). A race claimed by a term with `yieldsTo` gives
+  way when `nameTerm(name)` is one of the listed terms; `mobFacts` then returns `race: ''` and the
+  mob is read by name (basis 'name', est. chip). Only `true dragons` uses it, yielding to drakes,
+  wurms, wyverns.
+- It is a rule, never a boss list (owner: "I would hate to hard code it to the 2 raid bosses"). Do
+  not replace it with bosses.json, a level floor, or a general "name beats race": most name/race
+  disagreements are the game reusing a model, which is what the game counts (clockworks on spider
+  pages, crocodiles as Alligator).
+- Traps: a yielded-to term must have `names`, and a race of a yielding term must be claimed by that
+  term alone (tests/slayerYield.test.mts checks both). `drakeling` and `wyrm` are not whole-word
+  matches and are left out on purpose (adding them would newly list A thorn drakeling under Drakes).
+  `nameTerm` is run only for mobs whose race is in YIELDS (about 84), not the whole catalog.
+- `MobFacts.race` is now '' for a yielded mob, so nothing downstream can show "Dragon" for it;
+  matchMob, hitsOf, strictMatcher and the map shading read the facts and needed no change.
 
 ## Roster classes from /who (was roster-who-classes)
 
@@ -297,6 +312,23 @@ where one exists.
 - One `GROUPS` table in `NavDrawer.tsx`. A change that adds a tab places it in a group in the
   same change. Maps under Research was an agent's choice; the owner never placed
   it.
+- Row metrics (fork #10) come from `shared/navMenu.ts` (two px ladders, defaults 14px text / 32px
+  rows) through four CSS variables on the drawer paper (`--nav-row`, `--nav-text`, `--nav-icon`,
+  `--nav-icon-col`). `NavRowButton` and the feedback row read them via `NAV_ROW_SX` / `NAV_ICON_SX`
+  / `NAV_TEXT_SX`; no prop drilling. Group headings stay fixed (`GROUP_HEADING_SX`, 28px).
+- Rows use `minHeight`, never `height`: a label that wraps grows its row. `tests/navMenu.test.mts`
+  holds the fit rule: the shortest row must hold the largest text's line (x1.3) and icon (x1.5). A
+  new stop on either ladder must keep it.
+- The two values are renderer localStorage (`eq.nav.textPx`, `eq.nav.rowPx`) read with `useRawPref`,
+  like the folds: no IPC, no store field, no hydration-gate entry, not in the settings export. An
+  absent key is the default, so the defaults are what every install without a pick draws.
+- The Preferences card is `navMenuItem(SIZE_WORDS)` in `appearanceSection`, a factory call on
+  purpose: `tests/uiScale.test.mts` counts the section's inline object literals (2) and pins the
+  call beside them. An inline third item fails that count.
+- `PrefStepper` has a third kind, `spacing` ("Shorter rows for" / "Taller rows for");
+  `tests/overlayIndependent.test.mts` pins the other four names.
+- The window zoom (In-app text size) multiplies these px values; at 90% with 28px rows a row is
+  about 25 device px.
 
 ## The TEST build identity (was test-neutering)
 
@@ -1120,3 +1152,182 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
   opened the fight 3 s before the owner's first hit; 7,247 damage was 426 DPS over the 17 s fight
   and is 518 over his own 14 s. A group-mate who shot and missed to the end keeps the full 17 s:
   a miss is a swing.
+
+## Respawn timers: agreeing kills lower the wiki floor (fork #8, requirements/respawn-first-sight.md)
+
+- Agreeing kills lower the wiki floor (fork #8, 2026-11-19; beside the 2026-11-07 and 2026-11-09
+  respawn bullets). `respawn_learned.rs agreed`: the mob's learned gaps of `floor` or more, pooled
+  across the zone's places as `pooled` pools, sorted; the lowest gap with `AGREE_LEAST` (3) gaps
+  inside `AGREE_WITHIN_MS` (50 s) above it, or None when there is no such window or it is under
+  `AGREE_SUSPECT_UNDER_MS` (2 min, two spawns sharing a name). `respawn_wiki.rs floor_of(wiki,
+  agreed)` is the floor handed to `resolve_respawn`: the wiki time, lowered to the agreed gap when
+  that is shorter. It never raises a floor and makes none where the wiki states no time. A typed
+  number is still never floored.
+- The rule is the Gaps tab's within25 rule (`respawnLearn.ts constantRespawn`, `lowest(sorted,
+  50_000, 3)`), so the timer and the "Fix respawn" suggestion agree. Trap: the Rust side tests the
+  window's LOWEST gap against two minutes where constantRespawn tests the cluster's peak; the Rust
+  side is stricter at that boundary on purpose. Do not align them.
+- Trap: only the lowest agreeing window is looked at. If it is under two minutes the answer is None,
+  not the next cluster up (as constantRespawn does). A shared-name watch passes
+  `SHARED_NAME_FLOOR_MS` as `floor`, so its short gaps are left out before the window is looked for.
+- The row carries `agreedMs` (absent when the gaps do not agree, present even with no wiki time);
+  `wikiMs` stays the page's own number. No protocol schema change and RESPAWN_SHAPE_VERSION stays 4:
+  `mergeRespawn` refuses archives of another version and the field is optional.
+- Two ladders, one rule: `shared/respawn.ts resolveRespawn` mirrors the engine (floor = min(wikiMs,
+  agreedMs ?? wikiMs)) because `mergeRespawn.ts withEstimate` re-numbers archive-joined rows in
+  TypeScript. `joinRow` keeps the smaller of the two sides' `agreedMs`; it does not re-test
+  agreement over the joined gaps. `tests/respawnAgreed.test.mts` and `respawn_places_tests.rs` hold
+  the same ladder cases.
+- `respawnFloored` is true only when the wiki time is the floor in force (no `agreedMs` under
+  `wikiMs`); the label and the hover both key off it and off `agreedUnderWiki`.
+- An archive segment captured before this build has no `agreedMs`: an archived-only row keeps the
+  wiki floor until the mob is killed again or the segment is re-captured.
+
+## Respawn pre-alert (fork #7, requirements/respawn-alert.md)
+
+- Law: the Timers tab decides only WHEN (one setting, store key `respawnAlert`, off / 20 s /
+  5..300); how it sounds is the seeded Alerts-tab alert `respawn-soon` on app signal `respawnSoon`
+  (`main/alertRespawnSeed.ts`, stamp `alertRespawnSeed`: a deleted alert stays deleted). Never speak
+  or show a banner from the feature.
+- Which clocks: `shared/respawnAlert.ts respawnAlertsDue` reads `respawnTierView(snap, now,
+  'here')`, so it alerts for exactly what the Respawn overlay lists in the zone you stand in (other
+  tiers and your instance included, crawls and other zones never). Skipped: seen up, no estimate,
+  already due, respawn <= lead. First look (`prevMs` null) is a baseline.
+- Trap, cooldown: `fireAppSignal` defaults to a 2 s per-alert cooldown. The seed sets `cooldownMs:
+  0` so two mobs due together are both heard; dedupe is the watcher's fired set keyed
+  `row.id@baseTs` (a re-based clock is a new key, a moved estimate is not).
+- Trap, tokens: a capture is cut at 48 characters (`MAX_CAPTURE_CHARS`) and an empty or missing
+  token is spoken literally. So the sentence is `{mob} {when}`, never one whole-sentence token, and
+  every `respawnSoon` token always carries text. Tokens: mob, seconds, place, zone, when.
+- Trap, clock: the watcher (`features/timers/RespawnAlertWatcher.tsx`, mounted in AppCelebrations)
+  counts on `respawnAlert:tick` from `main/respawnAlertTick.ts`, a 1 s main-process interval that
+  runs only while the setting is on. Do not move it to a renderer interval: the main window sets no
+  `backgroundThrottling` and is usually minimized during play (reasoned, not measured).
+- The reader subscribes to the `respawn` module only while the setting is on (the BazaarWatcher
+  rule).
+- A per-mob flag on the watch needs a Rust change: the engine keeps only key, display, customSec and
+  sharedName on a watch and publishes its own copy.
+- Open: the Alerts tab's Test button on this alert has no captures, as with the Bazaar seed.
+
+## Reading log: the log-read report (fork #9, requirements/fix-combat-reading-log.md)
+
+- The engine answers `session.attach` accepted before it opens the file. When the read dies
+  (unopenable file, read error, panic) it prints one stderr line and reports `idle`. `idle` after an
+  accepted attach always means the read ended; `foldWait.ts` ends the wait on it and calls
+  `failed('ended')`. `starting`, `attaching` and `folding` never end the wait (owner ruling: a
+  folding engine is never given up on). tests/dataServerFoldWait.test.mts pins both.
+- On `ended`, `engineClientHost.ts` sets `attachedTo = null`, so the next world rebuild of the same
+  log attaches again. Nothing retries by itself (owner default 2026-11-19). A rebuild therefore
+  re-reads the whole log, and a panic repeats.
+- All data-server narration is `logInfo`, console only. The only copy a packaged build keeps is
+  `main/dataServer/logReadState.ts` (module state, no Electron import): the last error with its
+  step, the last health answer, when the offset last grew, the last combat read, and the engine's
+  newest stderr lines.
+- State lifetimes: a new launch (`noteLogReadConnection`) clears everything except the stderr lines.
+  A new turn (`noteLogReadTurn`, called from `bumpGen`) clears health, movedAt and every error
+  except a connect error, because the connection is per launch, not per turn. A `live` health answer
+  clears the error.
+- Guards on the notes: the connect error uses the connection guard (`live?.client === client`), the
+  attach error the turn guard (`gen === mine`). Using `gen` for the connect error would drop it on
+  every world rebuild.
+- The report crosses IPC as `LogReadReport` (channel `engine:logReadReport`). It carries the log's
+  base name only. Every string from outside (error detail, stderr lines, fault detail) goes through
+  `scrubPaths` in `shared/logReadReport.ts`: log path to base name, home directory and any
+  `<drive>:\Users\<name>` or `/Users/<name>` to `~`, em and en dashes to ` - `. A new field that
+  carries outside text must go through it too.
+- The decision order in `composeLogReadReport` is the design: no character, engine missing, engine
+  failing, engine starting, not connected, attach refused, read ended (missing / unreadable /
+  stopped), health unanswered, stalled (folding and no offset growth for 60 s), still reading,
+  combat read unserved, ok. Seven waits show the box at once; the rest wait 15 s
+  (`LOG_READ_SLOW_MS`).
+- Main opens the log itself (`probeLog` in `main/logReadReport.ts`) only when the read has ended or
+  nothing has stated the size. It is a diagnostic on the failure path; the engine still owns
+  log-file facts everywhere else (ruling 21).
+- The renderer hook asks 5 s after a hydrating panel mounts and every 3 s after, so a healthy launch
+  asks nothing. The box is in `HydratingPanel` (CombatView) and `OverviewHydrating` only; overlays
+  are unchanged.
+- "Engine said" lines come only from the error's snapshot (the 4 newest stderr lines when the error
+  was recorded). A slow or stalled read with no recorded error shows none.
+- Not fixed here, each a follow-up once a screenshot says which one players hit: main's one
+  connection to the engine is never retried; the `gen` guard in `openConnection` can discard a good
+  connection during a world rebuild; a refused attach is never retried; an engine that dies after
+  serving is relaunched forever with no card; the old failure card's "It last said" is not scrubbed.
+- e2e: a run with no engine binary, or one that holds a fold or a hydrating panel past 5 s with a
+  failure (15 s without), now finds `data-testid="log-read-report"` inside `combat-hydrating` /
+  `overview-hydrating`.
+
+## DPS chart: the pet drawn apart (upstream #91, requirements/meter-pet-split.md)
+
+- The DPS-over-time chart (DpsOverTime.tsx, both the Combat tab card and the Overview glance card)
+  follows the pet layout: 'separate' ("Its own bar") sets `petApart` on the card's DpsSeries;
+  'nested' and 'grouped' do not. Same predicate as the Overview DpsCard (layout !== 'separate' means
+  combined).
+- ONE sum: `dpsAt.outRate(series, i)`. The gold line, its area, peakVis, yMax, the hover dot
+  (dpsChart.outAt) and the hover's printed rate (dpsAt().out) all read it. Never spell you + pet +
+  group again beside it. `dpsAt.outLabel(series)` is the one name for that line (legend and hover).
+- `petApart` is set only by `withPetApart` in the card, never by buildDpsSeries: the SERIES WeakMap
+  cache stays layout-free, and with the flag off the card gets the SAME cached object (no
+  re-derive). The flagged copy shares the typed arrays.
+- `series.peakOut` (whole-fight peak, built in buildDpsSeries) still includes the pet; the card
+  quotes `chart.peakVis`, which follows the flag. Do not quote peakOut next to a petApart line.
+- Under petApart the pet line can stand ABOVE the gold line and set yMax (it is no longer a
+  component of `out`); the comment in buildDpsChart's scale loop predates this.
+- The Combat timeline (CombatTimeline.tsx, TimelineHoverLayer.tsx) builds its own unflagged series
+  and still prints 'you + pet' as the sum, on purpose. In a group the gold line under "Its own bar"
+  is 'you + group', not you alone.
+- No new storage key and no new line key: eq.combat.chartHidden still holds out/pet/group/inc,
+  absent = nothing hidden.
+
+## Sky Cleanup hand-set count (upstream #73, requirements/sky-cleanup-count.md)
+
+- The Cleanup row's Held cell is `HandCountCell` (ItemOverrides.tsx), the same control the quest
+  row's `ItemHaveCell` wraps: one editor, one chip, one store call (`useProgress.setItemOverride`).
+  Change testids, the commit rule (blank commits nothing) or the hover there once; both rows follow.
+- No count logic lives in the door. A stated 0 leaves Cleanup through `cleanup.ts`'s `quantity <= 0`
+  rule; the statement is per item, so it also moves the Have count on every quest row naming the
+  item.
+- The pencil writes with `row.name`; `itemCountKey(row.name) === row.key` is what makes it land on
+  the row. `CleanupRow` carries no override: `CleanupList` indexes
+  `itemOverridesByKey(itemOverrides)` by `row.key`.
+- A row zeroed by hand is gone, so its chip is gone. The trace is `OverrideSummaryChip` on the
+  Cleanup control row; the take-back is the "By hand" chip on the quest row. Zeroed rows are not
+  kept listed (default taken 2026-11-19).
+- Tests: `tests/skyCleanupOverride.test.mts` is the only unit test over `cleanupRows` (the old
+  `tests/skyCleanup.test.mts` was deleted in b6ff987bb). e2e: `sky-cleanup.e2e.mts` step 4b,
+  reversible, so steps 5 and 6 keep their numbers.
+- TRAP: `tests/skyTurnInAfterDump.test.mts:31` still names the deleted `tests/skyCleanup.test.mts`
+  for Cleanup's half of the JOS-403 report; no unit test pins that case.
+
+## Skills tab (fork #6, requirements/skills-tab.md)
+
+- Engine module `skills` (`engine/crates/fold/src/modules/skills.rs`), wired after `leveling` in
+  `WIRING_ORDER` and `registered`. State `{ rows: [{ skill, value, lastTs, sessionUps,
+  sessionFirstTs? }] }`, one row per skill in the client's spelling, in first-raise order. No parser
+  kind and no protocol change.
+- Trap 1, repeat at cap: the game reprints the level it already stated (`Specialize Evocation! (50)`
+  37 times in 7 minutes). A line is a raise only when its level differs from the stored one; a
+  repeat changes nothing and does not announce. Lines are not points gained.
+- Trap 2, a level can drop (Specialize Evocation 200 then 50; Forage 52 then 50). The level kept is
+  the newest stated, never the maximum; a lower line replaces it and counts as one raise in the
+  session column.
+- A skill-up line with no `(n)` is ignored. A skill that never went up in the log has no row; the
+  caption says so. Do not present the table as complete.
+- Session = since the newest `offlineGap` (the app's Session, `timeslice.ts`): the gap zeroes
+  `sessionUps` and drops `sessionFirstTs`, the level stays. An epoch clears the table.
+- Per hour is `(sessionUps - 1)` over the span from the session's first to latest raise of that
+  skill, stated only when `rateMeasurable(span)` (5 minutes, `rateBasis.ts`). It is not the Leveling
+  slice bar: that would need one stored row per raise.
+- Archives: `skills` is in `CAPTURED_MODULES` and `MERGE_RULES`
+  (`shared/logArchive/mergeSkills.ts`). The newer row wins whole; an older-only skill is carried
+  with `sessionUps` 0 and no `sessionFirstTs`, built from its four known fields, so a new `SkillRow`
+  field must be added there. A session that spans an archive cut counts only the live log's raises.
+  Adding the module made every sealed archive refold once.
+- Sort and the tradeskill filter live in `src/shared/skills.ts` (`skillRows`, `isTradeskillRow` via
+  `tradeskillOf`), not the renderer (eqc/no-domain-munging).
+- `App.tsx` `PlainView` is at the complexity ceiling (13): the tab is mounted as `<SkillsTab view
+  viewKey />`, whose view check is in `features/skills/SkillsView.tsx`. A new plain tab must do the
+  same.
+- View id `skills` is in `NOT_YET_REPORTED` (tests/telemetryContract.test.mts) until the telemetry
+  schema widens. Nav row: Stats/Data, after Leveling.
+- Per hour and This session cells are blank when there is nothing to state (no dash glyph:
+  copyNoEmDash).
