@@ -22,6 +22,9 @@ export type View =
   | 'posky'
   | 'alerts'
   | 'leveling'
+  // SKILLS (fork #6, 2026-11-19): every skill the log has seen go up, at its newest level. Not yet
+  // in `TELEMETRY_VIEWS`.
+  | 'skills'
   | 'loot'
   // BAZAAR (2026-10-06): what trade chat asked and offered per item, per day. Not yet in
   // `TELEMETRY_VIEWS`.
@@ -132,6 +135,7 @@ export const VIEW_LABELS: Record<View, string> = {
   posky: 'Plane of Sky',
   alerts: 'Alerts',
   leveling: 'Leveling',
+  skills: 'Skills',
   loot: 'Loot',
   bazaar: 'Bazaar',
   // "Wiki Gaps" (owner, 2026-10-19): what the tab lists is what the WIKI lacks. Label only; the view id stays `gaps`.
@@ -188,6 +192,7 @@ const KNOWN_VIEWS: View[] = [
   'posky',
   'alerts',
   'leveling',
+  'skills',
   'loot',
   'bazaar',
   'gaps',

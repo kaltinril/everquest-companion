@@ -103,6 +103,11 @@ export function formatPointRate(n: number): string {
   return `${formatSmall(n)} pts/hr`
 }
 
+/** SKILL RAISES per hour: '3.00/hr'. No unit word: the Skills tab's column heading names it. */
+export function formatSkillRate(n: number): string {
+  return `${formatSmall(n)}/hr`
+}
+
 /** PLATINUM per hour: '1.25 pp/hr'. */
 export function formatPlatRate(n: number): string {
   return `${formatSmall(n)} pp/hr`
