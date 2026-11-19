@@ -37,6 +37,8 @@ import RuleFolderIcon from '@mui/icons-material/RuleFolder'
 import HandshakeIcon from '@mui/icons-material/Handshake'
 import AutoStoriesIcon from '@mui/icons-material/AutoStories'
 import UpdateChip from './UpdateChip'
+import { useNavMenu } from './useNavMenu'
+import { navPx } from '@shared/navMenu'
 import { useBoolPref } from '../features/combat/useCombatPrefs'
 import { FORK_FEEDBACK_OFF } from '../features/feedback/forkFeedback'
 import { OWNER_TOOLS } from '../devFlags'
@@ -202,6 +204,23 @@ const GROUPS: NavGroup[] = [
 const GROUP_HEADING_SX = { minHeight: 28, mt: 0.5, py: 0, pr: 1 } as const
 const GROUP_HEADING_TEXT_SX = { fontSize: 11, letterSpacing: 1, textTransform: 'uppercase' } as const
 
+/** A destination row's metrics (fork #10): the `--nav-*` variables NavDrawer sets on the paper. */
+const NAV_ROW_SX = { minHeight: 'var(--nav-row)', py: 0 } as const
+const NAV_ICON_SX = {
+  minWidth: 'var(--nav-icon-col)',
+  '& .MuiSvgIcon-root': { fontSize: 'var(--nav-icon)' }
+} as const
+const NAV_TEXT_SX = {
+  my: 0,
+  '& .MuiListItemText-primary': { fontSize: 'var(--nav-text)', lineHeight: 1.3 }
+} as const
+/** The two-line feedback row: the same metrics, a little air, a smaller second line. */
+const NAV_FEEDBACK_ROW_SX = { ...NAV_ROW_SX, py: 0.5 } as const
+const NAV_FEEDBACK_TEXT_SX = {
+  ...NAV_TEXT_SX,
+  '& .MuiListItemText-secondary': { fontSize: 12, lineHeight: 1.3 }
+} as const
+
 /** The fold's key. '1'/'0' via `useBoolPref`; absent means OPEN, the state a new user starts in. */
 const groupOpenKey = (id: string): string => `eq.nav.open.${id}`
 
@@ -223,9 +242,10 @@ function NavRowButton({
       data-testid={`nav-${row.view}`}
       selected={row.area ? row.area.includes(view) : view === row.view}
       onClick={() => onSelect(row.opens ? row.opens() : row.view)}
+      sx={NAV_ROW_SX}
     >
-      <ListItemIcon>{row.icon}</ListItemIcon>
-      <ListItemText primary={row.label ?? VIEW_LABELS[row.view]} />
+      <ListItemIcon sx={NAV_ICON_SX}>{row.icon}</ListItemIcon>
+      <ListItemText primary={row.label ?? VIEW_LABELS[row.view]} sx={NAV_TEXT_SX} />
       {row.badge}
     </ListItemButton>
   )
@@ -307,6 +327,7 @@ export default function NavDrawer({
    *  than taking one opaque callback per section a future row might want. */
   prefs: PrefsRouting
 }): JSX.Element {
+  const menu = useNavMenu()
   return (
     <Drawer
       variant="permanent"
@@ -318,7 +339,11 @@ export default function NavDrawer({
           boxSizing: 'border-box',
           position: 'relative',
           height: '100%',
-          borderTop: 'none'
+          borderTop: 'none',
+          '--nav-row': navPx(menu.rowPx),
+          '--nav-text': navPx(menu.textPx),
+          '--nav-icon': navPx(menu.iconPx),
+          '--nav-icon-col': navPx(menu.iconCol)
         }
       }}
     >
@@ -368,11 +393,21 @@ export default function NavDrawer({
               state to own, because nothing in the nav stays "on" while it is open. */}
           {/* TEST-BUILD NEUTERING (this branch only): disabled, and named for why, since a
               disabled row draws no tooltip (features/feedback/forkFeedback.ts). */}
-          <ListItemButton data-testid="nav-feedback" onClick={onSendFeedback} disabled aria-label={FORK_FEEDBACK_OFF}>
-            <ListItemIcon>
+          <ListItemButton
+            data-testid="nav-feedback"
+            onClick={onSendFeedback}
+            disabled
+            aria-label={FORK_FEEDBACK_OFF}
+            sx={NAV_FEEDBACK_ROW_SX}
+          >
+            <ListItemIcon sx={NAV_ICON_SX}>
               <FeedbackIcon />
             </ListItemIcon>
-            <ListItemText primary="Send feedback" secondary="Off in the community build" />
+            <ListItemText
+              primary="Send feedback"
+              secondary="Off in the community build"
+              sx={NAV_FEEDBACK_TEXT_SX}
+            />
           </ListItemButton>
           <NavRowButton row={PREFERENCES} view={view} onSelect={onSelect} />
         </List>

@@ -248,7 +248,8 @@ test('the section is called Appearance, and its id is NOT renamed with it', () =
   assert.match(card, /label: 'In-app text size'/, 'the first item is about the app window only')
   // …and the overlays are ONE item, not three.
   const items = card.match(/^ {6}\{$/gm) ?? []
-  assert.equal(items.length, 2, 'the section carries exactly two items')
+  assert.equal(items.length, 2, 'the section carries exactly two inline items, plus the left menu’s')
+  assert.match(card, /navMenuItem\(SIZE_WORDS\)/, 'the left menu is the third item (fork #10)')
   assert.match(card, /<OverlaysAppearanceSetting \/>/)
   const view = src('../src/renderer/src/features/preferences/PreferencesView.tsx')
   assert.match(view, /appearanceSection\(\)/, 'and the pane builds it under that name')

@@ -30,7 +30,7 @@ import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 
 /** What this stepper is stepping — which decides the button faces and how they are spoken. */
-export type StepperKind = 'size' | 'transparency'
+export type StepperKind = 'size' | 'transparency' | 'spacing'
 
 /**
  * The two words each kind uses, in one table so a button face and its accessible name can never
@@ -49,7 +49,8 @@ const WORDS: Record<StepperKind, { less: string; more: string; lessName: string;
     more: '+',
     lessName: 'More see-through for',
     moreName: 'More solid for'
-  }
+  },
+  spacing: { less: '−', more: '+', lessName: 'Shorter rows for', moreName: 'Taller rows for' }
 }
 
 /**
