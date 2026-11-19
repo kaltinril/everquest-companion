@@ -20,6 +20,7 @@ import {
 import { useCombatTabScope } from './useCombatPrefs'
 import { useDrillMemory, type DrillMemoryApi } from './useDrillMemory'
 import { AbilityExpandProvider } from './abilityExpand'
+import { LogReadReport } from '../../components/LogReadReport'
 import { EMPTY_ROSTER, type MeterScope, type RosterSnap } from '@shared/roster'
 import type { CombatFocus } from './combatFocus'
 import type { CombatSnapshot, SegmentSummary, SegmentView, TimelineView } from '@shared/combat'
@@ -67,6 +68,7 @@ function HydratingPanel(): React.JSX.Element {
           Reading log…
         </Typography>
       </Stack>
+      <LogReadReport />
       {[0, 1, 2, 3, 4].map((i) => (
         <Skeleton key={i} variant="rounded" height={22} sx={{ mb: '3px', opacity: 1 - i * 0.15 }} />
       ))}

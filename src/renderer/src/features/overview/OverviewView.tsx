@@ -40,6 +40,7 @@ import type { JSX } from 'react'
 import { Box, CircularProgress, Paper, Skeleton, Stack, Typography } from '@mui/material'
 import type { CombatFocus } from '../combat/combatFocus'
 import type { MobTarget } from '../mobs/mobTarget'
+import { LogReadReport } from '../../components/LogReadReport'
 import { DpsCard } from './DpsCard'
 import { DpsCurveCard } from './DpsCurveCard'
 import { CurrentMobCard } from './CurrentMobCard'
@@ -105,6 +106,7 @@ function OverviewHydrating(): JSX.Element {
           Reading log…
         </Typography>
       </Stack>
+      <LogReadReport />
       {[0, 1, 2, 3].map((i) => (
         <Skeleton key={i} variant="rounded" height={22} sx={{ mb: '3px', opacity: 1 - i * 0.18 }} />
       ))}

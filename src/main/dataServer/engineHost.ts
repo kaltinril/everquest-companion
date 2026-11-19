@@ -112,6 +112,7 @@ import {
   noteEngineRetrying,
   noteEngineStarting
 } from './engineLaunchState'
+import { noteEngineSaid } from './logReadState'
 
 /** How long a loopback connect may take before the probe gives up on it. Loopback either answers
  *  immediately or is not listening; this is a bound on the pathological case, not a budget. */
@@ -535,7 +536,9 @@ export function startEngineSupervisor(): void {
     // supervisor's own (`report`); this is the sequence a crash report carries.
     onServedExit: () => {
       noteEngineEdge('engine:cycled')
-    }
+    },
+    // The engine's own words, kept for the log-read report (fork #9).
+    onEngineSaid: noteEngineSaid
   })
   supervisor.start()
 }

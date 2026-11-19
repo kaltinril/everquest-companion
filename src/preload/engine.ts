@@ -43,6 +43,7 @@ import { IPC } from '../shared/ipc'
 import { messagePortChannel } from '../shared/dataServer/messagePortChannel'
 import type { ByteChannel } from '../shared/dataServer/ndjson'
 import type { EngineLaunchSay } from '../shared/engineLaunch'
+import type { LogReadReport } from '../shared/logReadReport'
 
 /** One brokered connection, as the renderer sees it: bytes, and the secret to open with. */
 export interface EngineConnection extends ByteChannel {
@@ -149,5 +150,9 @@ export const engineBridge = {
     ipcRenderer.invoke(IPC.engineLaunchState) as Promise<EngineLaunchSay>,
 
   /** The failure card's retry button. Resolves when main has taken the ask, not when it worked. */
-  engineRetry: (): Promise<void> => ipcRenderer.invoke(IPC.engineRetry) as Promise<void>
+  engineRetry: (): Promise<void> => ipcRenderer.invoke(IPC.engineRetry) as Promise<void>,
+
+  /** What the app is waiting on while a panel says "Reading log..." (fork #9). */
+  logReadReport: (): Promise<LogReadReport> =>
+    ipcRenderer.invoke(IPC.logReadReport) as Promise<LogReadReport>
 }

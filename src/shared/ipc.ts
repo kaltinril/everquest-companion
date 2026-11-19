@@ -1130,6 +1130,10 @@ export const IPC = {
   // pending backoff and launches now (src/main/dataServer/supervisor.ts `restart`). A respawn is a
   // launch (spawn contract rule 5), so this is a fresh token, port and epoch world. Returns void.
   engineRetry: 'engine:retry',
+  // renderer -> main: what the app is waiting on while a panel says "Reading log..." (fork #9).
+  // Polled only by a hydrating panel that has waited 5 s. Returns: LogReadReport
+  // (shared/logReadReport.ts); the log's base name only, never its full path.
+  logReadReport: 'engine:logReadReport',
 
   // ---- Summarize and archive log (docs/plans/log-archive; main/ipc/logArchive.ts) ----
   // renderer -> main. Every action returns LogArchiveReply (shared/logArchive/panel.ts): the
