@@ -23,6 +23,7 @@
 //   it. A button asking a player to hand-state a fact the log states is a button that can only be
 //   wrong or redundant. The pencil on the quest row (`ItemOverrides.tsx`) stays as the escape hatch
 //   for what the log genuinely cannot see — a trade, a bank deposit into a window no dump opened.
+//   This row's Held cell carries the same pencil (`HandCountCell`, upstream #73).
 //
 //   "REFRESH FROM INVENTORY" IS GONE. The Sky tab has followed the export file by itself since
 //   JOS-268 (`inventory:autoReloaded`, which `useCharacterSheet` re-asks on); JOS-389 added a
@@ -47,7 +48,9 @@ import {
   TableRow,
   Typography
 } from '@mui/material'
-import type { CountSource } from '@shared/types'
+import type { CountSource, ItemCountOverride } from '@shared/types'
+import { itemOverridesByKey } from '@shared/itemOverrides'
+import { HandCountCell, OverrideSummaryChip, type SetItemCount } from './ItemOverrides'
 import { InventorySource } from './QuestFilterBar'
 import { ItemNameLink } from './QuestItemsTable'
 import { useCharacterSheet } from '../character/useCharacterSheet'
@@ -78,6 +81,9 @@ export interface CleanupListProps {
   inventoryLoadedAt: number | null
   /** an item name → the Loot tab's drill-down; absent leaves the names hoverable but unlinked */
   onOpenLoot?: (item: string) => void
+  /** the hand-stated counts in force, and the store call that states or clears one */
+  itemOverrides: readonly ItemCountOverride[]
+  setItemCount: (name: string, count: number | null) => Promise<void>
 }
 
 /** One quest this item feeds, and the case for keeping the item instead of destroying it. */
@@ -129,11 +135,15 @@ function TurnInLine({
 function CleanupItemRow({
   row,
   tierOf,
-  onOpenLoot
+  onOpenLoot,
+  override,
+  onSetItemCount
 }: {
   row: CleanupRow
   tierOf: (reward: string | undefined) => number | undefined
   onOpenLoot?: (item: string) => void
+  override?: ItemCountOverride
+  onSetItemCount: SetItemCount
 }): JSX.Element {
   return (
     <TableRow data-testid="posky-cleanup-row" data-item={row.name} data-count={row.quantity}>
@@ -144,7 +154,14 @@ function CleanupItemRow({
         <ItemNameLink name={row.name} onOpenLoot={onOpenLoot} />
       </TableCell>
       <TableCell data-testid="posky-cleanup-qty" sx={{ verticalAlign: 'top' }}>
-        x{row.quantity}
+        <HandCountCell
+          name={row.name}
+          held={row.quantity}
+          override={override}
+          onSetItemCount={onSetItemCount}
+        >
+          <span>x{row.quantity}</span>
+        </HandCountCell>
       </TableCell>
       <TableCell
         data-testid="posky-cleanup-where"
@@ -175,10 +192,19 @@ export default function CleanupList({
   countSource,
   onCountSource,
   inventoryLoadedAt,
-  onOpenLoot
+  onOpenLoot,
+  itemOverrides,
+  setItemCount
 }: CleanupListProps): JSX.Element {
   const { sheet } = useCharacterSheet()
   const tiers = useItemTiers()
+  const overrides = useMemo(() => itemOverridesByKey(itemOverrides), [itemOverrides])
+  const onSetItemCount = useCallback<SetItemCount>(
+    (name, count) => {
+      void setItemCount(name, count)
+    },
+    [setItemCount]
+  )
 
   const locations = useMemo(() => dumpLocationsFrom(sheet?.carry.rows), [sheet])
   const rows = useMemo(() => cleanupRowsFor(quests, locations), [quests, locations])
@@ -196,6 +222,8 @@ export default function CleanupList({
         {CLEANUP_CAVEAT}
       </Alert>
       <Stack direction="row" spacing={2} alignItems="center" useFlexGap sx={{ mb: 2 }}>
+        {/* A row zeroed by hand is gone from the table; this is the trace it leaves on the tab. */}
+        <OverrideSummaryChip overrides={itemOverrides} />
         <Box sx={{ flexGrow: 1 }} />
         <InventorySource
           countSource={countSource}
@@ -235,6 +263,8 @@ export default function CleanupList({
                     row={row}
                     tierOf={tierOf}
                     onOpenLoot={onOpenLoot}
+                    override={overrides[row.key]}
+                    onSetItemCount={onSetItemCount}
                   />
                 ))}
               </TableBody>
