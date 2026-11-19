@@ -4,9 +4,12 @@ A Windows desktop companion for **EverQuest Legends**. It reads the log file the
 writes and turns it into live, useful views: a DPS meter, floating overlays, quest, loot and gear
 tracking, maps, alerts.
 
-**It only reads your log.** Nothing is injected into EverQuest, no game files are touched, no
-memory is read, and nothing is automated or played for you. If you turned off logging, the app
-simply has nothing to show.
+**It only reads files the game writes.** Your log, and a few files in your EverQuest folder, such
+as the `/outputfile` lists, your UI settings and the spell data. Nothing is injected into
+EverQuest, no memory is read, and nothing is automated or played for you. It changes no game file,
+with one exception that is off until you turn it on: **Summarize and archive log** moves a full log
+file into a `companion-archive` folder inside the game's Logs folder, so a fresh one starts. If you
+turned off logging, the app simply has nothing to show.
 
 This project began as a fork of [**EQ Legends Companion**](https://github.com/jmoyers/everquest-companion)
 by **Josh Moyers**. He built the app and its engine, and the credit for that is his. He is no
@@ -64,8 +67,9 @@ Lock one and it becomes click-through. The same menu resets every overlay's posi
 
 **Your log file**
 
-- **Summarize and archive log** (in **Preferences**, off until you turn it on): keeps your history
-  while the game starts a fresh, small log file.
+- **Summarize and archive log** (in **Preferences**, off until you turn it on): once your log
+  passes 100 MB the app moves it into a `companion-archive` folder inside the game's Logs folder
+  and keeps your history showing, and the game carries on in a fresh, small log file.
 
 ## Download and first run
 
@@ -131,8 +135,10 @@ there is nowhere for them to go. What it does ask the network for:
 - **The EverQuest Legends wiki:** only when you click **Copy** on a row of the Wiki Gaps tab, to
   read the page that row is about. Everything else the app shows comes from data and pictures
   shipped inside it.
-- **Sound and voice files:** the first voice pack on first launch, and any sound pack or
-  spoken-alert voice you choose to install.
+- **Sound and voice files:** the first voice pack on first launch; the list of packs, and any
+  sound you preview, when you open **Sound packs…**; and any sound pack or spoken-alert voice you
+  choose to install. These come from GitHub (and, for the spoken-alert voice, a Microsoft runtime
+  download when your PC does not already have it).
 
 `SECURITY.md` and `TELEMETRY.md` in this repo were written for the original app. They do not
 describe this build.
@@ -178,7 +184,7 @@ The text of the **EverQuest Legends Wiki** (eqlwiki.com) is licensed
 [About page](https://eqlwiki.com/index.php?title=Project:About) states; the item, mob, spell
 and quest data this app builds from it is credited to that wiki.
 
-The bundled **Alan Rickman** voice pack comes from
+The default **Alan Rickman** voice pack, which the app downloads on first launch, comes from
 [utensils/openpeon-alan-rickman-soundpack](https://github.com/utensils/openpeon-alan-rickman-soundpack)
 and is licensed CC-BY-4.0. Packs you install from the in-app browser carry their own
 licenses and attribution (see each pack's manifest); none of them are part of this

@@ -35,10 +35,12 @@ competing commercial product.
 ## Why the tag is `community-<version>`
 
 A GitHub Release always creates a tag. `.github/workflows/build.yml` runs its `release` job on
-any `v*` tag: it builds the ORIGINAL app's identity, signs it if signing secrets exist, and
-publishes with the creator's `publish` block. A `v0.1.0-test.N` tag on the fork would at best fail
-and at worst start a build that looks like the original app's. `community-0.1.0-test.N` matches
-only `community-release.yml`, the workflow that builds this project's releases (Procedure, below).
+any `v*` tag. That job is the original repo's release path: it expects the original app's file
+names (`latest.yml`, `everquest-companion-Setup-<version>.exe`), which this repo's
+`electron-builder.yml` never produces, so a `v0.1.0-test.N` tag here would publish nothing: the
+job fails, at the latest when it looks for those files after the build. `community-0.1.0-test.N`
+matches only `community-release.yml`, the workflow that builds this project's releases (Procedure,
+below).
 
 ## Procedure
 
