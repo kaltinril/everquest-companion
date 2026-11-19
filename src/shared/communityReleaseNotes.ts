@@ -28,6 +28,47 @@ export interface CommunityRelease {
 
 export const COMMUNITY_RELEASE_NOTES: readonly CommunityRelease[] = [
   {
+    "version": "0.1.0-test.51",
+    "date": "2026-11-19",
+    "title": "a Void motes tab says where the week's three are best spent, item icons are found on windows with a wrapped class list",
+    "groups": [
+      {
+        "heading": "Gear",
+        "items": [
+          {
+            "text": "New tab, Void motes (in the Gear area, after Exaltations): where a Void-Touched Potential is best spent on what you wear, read from your /outputfile inventory dump. One row per worn item below +10: what the next tier adds for the focus or the single stat you pick, what that tier would cost you without a mote, and where copies of the item come from."
+          },
+          {
+            "text": "The order weighs how hard copies are to come by. A weekly raid boss's drop leads a rare drop from a plane's trash, and both lead anything from an ordinary camp. Respawn time, placeholders, the size of the loot list, the mob's level and the weekly lockout all count."
+          },
+          {
+            "text": "Nothing below +7 is recommended, as lower tiers are quick to earn with ordinary motes. The exception is +5 and +6 on a piece whose copies barely exist (most Plane of Sky test rewards). A row below that says so (\"Below +7: ordinary motes get it there\") and takes no mote."
+          },
+          {
+            "text": "The line above the list is the week's plan for your three motes. Two or three can land on the same item when its last tiers are the most costly."
+          }
+        ]
+      },
+      {
+        "heading": "Wiki Gaps and screenshots",
+        "items": [
+          {
+            "text": "The icon of a pasted item window is found when the class list wraps onto a second line (ten or more classes: Jibble's Stiletto, Sergeant's Leather Belt) and when the item's name holds the word Class (CLASS 1 Steel Hooked Arrow). The picker offered unrelated icons for those."
+          }
+        ]
+      },
+      {
+        "heading": "Data",
+        "items": [
+          {
+            "text": "Wiki pages refreshed to today (89 pages changed)."
+          }
+        ]
+      }
+    ],
+    "knownIssues": "The Void motes tab estimates a drop's chance from the size of the mob's loot list, because the wiki lists no drop rates; a row's hover says what it assumed. It does not count spells (a mote raises a spell rank too) or progress already banked toward a tier, and it assumes copies are farmed at Refined. The healing meters still divide by the whole fight's length. A buff's percent stats (haste, run speed) and regen are not raised with rank yet, and the Upgrades tab does not count bigger stats as a reason to upgrade a buff. Shorter pauses cannot change the spacing a Windows voice puts between words. A Copy page read is kept for half an hour, so a page made on the wiki within that time is not seen until it passes. A merchant page the wiki already has gets no \"items sold\" or \"location\" check. An item page the wiki already has gets no check that it lists a merchant you were quoted by. Joining another player's private instance is not told apart from the open world of that zone; only an instance you create yourself is. A pet summoned shortly before its first \"My leader is\" line can carry a \"(2)\" after its name in the meters until the next restart. Another player's spells never count toward a mob's resists: the game prints only your own resists to you. The con card does not list a mob's immunities yet (the mob page does). Saved characters read \"needs refresh\" on Wiki Gaps until logged in once with this build. A +0 worked back from a window often leaves Weight as ?. A groupmate's charmed pet can still lose its credit when a damage-over-time it cast before the charm ticks on a groupmate. A mob or item added to the wiki after this build shows no wiki details until the next build (or a Copy click in Wiki Gaps). Copy on a wiki page that still holds the template's placeholders keeps them. Capture finds the game window only when it is titled \"EverQuest Legends\" or \"EverQuest\". All characters needs each character logged in here once with this build. The screenshot reader reads English only. The installer is not code-signed, so Windows shows \"Windows protected your PC\" the first time (More info, then Run anyway). Builds before test.20 do not update themselves; install one by hand once."
+  },
+  {
     "version": "0.1.0-test.50",
     "date": "2026-11-17",
     "title": "a meter row's DPS is over its own attacking time, the Combat tab's scope is its own three-button switch",
