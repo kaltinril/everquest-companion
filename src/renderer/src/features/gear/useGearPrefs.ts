@@ -73,9 +73,6 @@ export interface GearPrefs {
   /** the Zone / Level / Mob columns (fork decision, kaltinril 2026-08-15) — on unless switched off */
   dropCols: boolean
   setDropCols: (next: boolean) => void
-  /** the void mote panel: open or not, its target and its order (voidMotePrefs.ts) */
-  motes: VoidMotePrefs
-  setMotes: (next: VoidMotePrefs) => void
 }
 
 export function useGearPrefs(): GearPrefs {
@@ -83,7 +80,6 @@ export function useGearPrefs(): GearPrefs {
   const [controls, setControlsState] = useState<GearControl[] | null>(() => sanitizeControls(readJson(CONTROLS_KEY)))
   const [widths, setWidthsState] = useState<GearColumnWidths | null>(() => sanitizeWidths(readJson(WIDTHS_KEY)))
   const [dropCols, setDropColsState] = useState<boolean>(() => sanitizeDropCols(readJson(DROPS_KEY)))
-  const [motes, setMotesState] = useState<VoidMotePrefs>(() => sanitizeMotePrefs(readJson(MOTES_KEY)))
 
   const setColumns = useCallback((next: GearSortKey[] | null) => {
     setColumnsState(next)
@@ -122,10 +118,18 @@ export function useGearPrefs(): GearPrefs {
     writeJson(DROPS_KEY, next ? null : false)
   }, [])
 
+  return { columns, setColumns, controls, setControls, widths, setWidths, dropCols, setDropCols }
+}
+
+/**
+ * The Void motes tab's two choices (voidMotePrefs.ts): a hook of its own, since the list left the
+ * Gear tab (owner, 2026-11-19). The key keeps its `eq.gear.*` name so a stored choice survives.
+ */
+export function useVoidMotePrefs(): [VoidMotePrefs, (next: VoidMotePrefs) => void] {
+  const [motes, setMotesState] = useState<VoidMotePrefs>(() => sanitizeMotePrefs(readJson(MOTES_KEY)))
   const setMotes = useCallback((next: VoidMotePrefs) => {
     setMotesState(next)
     writeJson(MOTES_KEY, next)
   }, [])
-
-  return { columns, setColumns, controls, setControls, widths, setWidths, dropCols, setDropCols, motes, setMotes }
+  return [motes, setMotes]
 }

@@ -270,6 +270,28 @@ Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`)
 - **Motes:** grade order Infinitesimal < Minor < Lesser < Major < Greater (< Superior). Yellow/red
   cons drop ~7-10 per 100 kills vs blue 4.2, green 3.1. Player level caps grade (~1 tier per 5
   levels). Party XP lines carry the percent: `You gain party experience! (0.718%)`.
+- **Loot at a difficulty is that difficulty's tier** (owner's logs 08-12..11-19): D4 7,988 of 7,989
+  gear loots are +4 (one +5); D3 629 of 635 are +3; D2 416 of 427 are +2; D1 325 of 402 are +1 (76
+  are +2). A +N copy merges for 2^N item experience (wiki Item Upgrade System), so a D4 drop is 16.
+- **Gear looted per kill at D4** (the owner's own loots over the group's kills, mobs with 10+ kills):
+  raid roster 1.83 (263 / 144), named 0.99 (1,618 / 1,640), common 0.39 (4,924 / 12,716). One item
+  from one mob: Innoruuk's jewellery 21-43% a kill (14 kills), Grandmaster R`Tal's Indicolite 33-42%
+  (12), the same Indicolite from Hate trash 1-4% (a forsaken revenant 5 in 185).
+- **Void-Touched Potential:** `You have been given: Void-Touched Potential`, one per weekly task
+  `Potential of the Void - <boss> - Weekly`; 3 in every week from 2026-08-18 (14 weeks). A USE has
+  no line of its own: it prints the ordinary `You have successfully merged two items together to
+  create a new item: <Item> +N`, so a use is inferred (single-step tier-ups seconds apart at a high
+  tier, soon after motes arrived), never read. Inferred uses, all at +7 or higher: Blood's Unity
+  +8/+9/+10 (Oct 30), Talisman of Kejaar Kerrath +8/+9/+10 (Nov 3), Slime Blood of Cazic-Thule
+  +9/+10 and Shield of Rainbow Hues +9 (Nov 11), Shield of Rainbow Hues +10 (Nov 17).
+- **Ordinary motes at level 50 in Refined zones** (70.8 active hours, gaps under 5 min; 5,093 kills):
+  Major 215, Greater 27, Superior 9, Grand 1, Ascendant 1, Infinite 0, plus fragments Major 4,
+  Greater 2. Condensed two to one upward, the item experience an hour usable at a tier: +4 18.6, +5
+  12.5, +6 7.8, +7 4.55, +8 2.6, +9 1.45. Hours for one tier by motes alone: 0.9, 2.6, 8.2, 28, 98,
+  353. Active play over the same logs: 494 h in 14.3 weeks.
+- **Raid cadence:** a raid boss at D4 1.3 kills a week (Innoruuk, 14 in 11 weeks); each plane entered
+  at D4 1 to 3 times a week; `<Zone> - Group[ N (Adj)]` is also the group RAID instance (the first
+  void mote arrived with the Innoruuk kill in `The Plane of Hate - Group`).
 - **Con colours** (`src/shared/conColor.ts`) were measured by pairing each con with the HIGHEST
   "Welcome to level" so far (multiclass; the last ding is noise).
 - **Faction:** the log prints numeric receipts (`has been adjusted by N`) and cap lines

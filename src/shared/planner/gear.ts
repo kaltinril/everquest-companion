@@ -38,6 +38,7 @@ import type { ClassAbbr } from '../classCombo'
 import type { ItemEffectKind } from '../itemStats'
 import type { EffectFacts } from './effectText'
 import type { EraDerivation } from './era'
+import type { ItemSupply } from './itemSupply'
 import type { EquipSlot, ExtractTier, SocketType } from './types'
 
 // ---- the numeric vector ------------------------------------------------------------------
@@ -249,6 +250,13 @@ export interface GearRow {
   dropZones?: string[]
   dropLevels?: string[]
   dropPages?: string[]
+  /**
+   * HOW FAST COPIES COME IN (owner, 2026-11-19), for the void mote ranking: every stated road (the
+   * mobs above, the quests that reward it) priced as item experience a week by
+   * `planner/itemSupply.ts`. An ESTIMATE, with what it assumed listed inside. ABSENT when no page
+   * states a road: the data says nothing, so the row claims nothing.
+   */
+  supply?: ItemSupply
   /**
    * Reads as a shield (`renderer/features/gear/gearFilter.isShieldLike`'s rule — SECONDARY slot
    * and a shield word in the name or a `Skill: Shield` line), answered ONCE at build so the search

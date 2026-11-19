@@ -1,131 +1,58 @@
 // planner/voidMotes.ts — where a void mote (Void-Touched Potential) is best spent on worn gear.
 //
 // The game's rule (wiki Mote Guide; Patch Notes 07-28): one lifts an item a full tier whatever
-// progress it has banked, and at most three are earned a week, from raids. Without one, tier T+1
-// costs 2^T base copies of the item (`expToNextTier`), so a mote is worth most where the next tier
-// is dearest: a high tier, on an item whose copies are hard to come by.
+// progress it has banked, at most three are earned a week, and only three can be held. Without one,
+// tier T+1 costs 2^T item experience, by copies of the item or by ordinary motes.
 //
-// HEURISTIC, and the three numbers that make it one are named constants below. What it ranks is
-// stated per row (gain, copies skipped, source), so a player can overrule it by eye.
+// WHAT IS RANKED (owner, 2026-11-19; plans/2026-11-19-void-mote-ranking.md): the stat gain times the
+// HOURS OF PLAY the mote saves. The hours are the tier's experience over what two roads bring in
+// together: copies (`itemSupply.ts`: respawn, spawn share, lockout, drop chance, +4 or +0 copies,
+// how hard the mob is) and a share of the ordinary motes (measured on the owner's logs,
+// `MOTE_RULES.moteExpPerHour`). Below +7 ordinary motes are quick, so a row there is "not yet"
+// unless copies barely exist.
+//
+// AN ESTIMATE: every number that makes it one is in `MOTE_RULES` and `itemSupply.SUPPLY`, and each
+// row states its hours, its road and its source, so a player can overrule it by eye.
 //
 // PURE, relative value imports (the shared/planner house rule) so the node test runner loads it.
 
 import type { ClassAbbr } from '../classCombo'
 import { EXALTATION_SLOT_TYPES, ITEM_MAX_TIER, expToNextTier } from '../itemStats'
 import { upgradeStateForTier } from '../itemUpgrade'
-import type { RaidTarget } from '../types'
 import { GEAR_STAT_KEYS, isGearStatKey, type GearRow, type GearStatKey, type GearStats } from './gear'
 import { scaleGearStats } from './gearScale'
 import type { PlannerInventoryHost } from './inventorySlots'
+import { SUPPLY, type ItemSupply } from './itemSupply'
 import { roleValuer, type GearRole } from './roleWeights'
 import { equipSlotOf, type EquipSlot, type PlanSlotId } from './types'
-import { statedLevel } from './zoneLevels'
 
-/** How many the game hands out a week (and lets you hold): the size of the pick list. */
-export const VOID_MOTES_PER_WEEK = 3
+/** The rules of the ranking, in one table (the plan doc gives each one's reason). */
+export const MOTE_RULES = {
+  /** how many the game hands out a week, and lets you hold */
+  perWeek: 3,
+  /** below this tier a mote is not recommended (owner: "almost never below +7") */
+  minTier: 7,
+  /** the exception's floor: +5 or +6 when copies barely exist (the Plane of Sky test rewards) */
+  rareMinTier: 5,
+  /** "barely exist": copies bring at most this much item experience a week of play */
+  rarePerWeek: 0.5,
+  /**
+   * Item experience an hour of level-50 Refined play earns in ordinary motes usable at each tier
+   * (index = the tier worn), lower grades condensed two to one (owner's logs: 70.8 h, 5,093 kills).
+   * Below +4 was not measured and takes +4's figure; nothing below +5 is ever recommended.
+   */
+  moteExpPerHour: [18.6, 18.6, 18.6, 18.6, 18.6, 12.5, 7.8, 4.55, 2.6, 1.45],
+  /**
+   * The share of those motes counted toward ONE item: a character wears about twenty pieces and has
+   * spells to raise, and every one draws on the same motes. A judgment. At 0.5 the motes swamp the
+   * copies and the tier alone orders every scarce item, whatever it drops from (the first cut:
+   * Hate's trash armour at +9 led every raid boss's drop, where the owner spent none on it).
+   */
+  moteShare: 0.05
+} as const
 
-// ---- where copies come from ---------------------------------------------------------------------
-
-/** How a second copy of an item is come by, easiest road first when a page states several. */
-export type MoteSource = 'raid' | 'quest' | 'high' | 'crafted' | 'farm' | 'unknown'
-
-/** A drop counts as high level when its easiest camp states at least this (the cap is 50). */
-export const MOTE_HIGH_LEVEL = 45
-
-/**
- * How much dearer one copy is by source, in DOUBLINGS (a tier is one doubling of copies, so the two
- * add). The order is the owner's: raid over quests and high-level camps, those over farmable drops.
- * `unknown` claims nothing: a page that states no source is not evidence the item is hard to get.
- */
-export const MOTE_SOURCE_STEPS: Readonly<Record<MoteSource, number>> = {
-  raid: 3,
-  quest: 2,
-  high: 2,
-  crafted: 1,
-  farm: 0,
-  unknown: 0
-}
-
-export const MOTE_SOURCE_LABEL: Readonly<Record<MoteSource, string>> = {
-  raid: 'Raid',
-  quest: 'Quest',
-  high: 'High level',
-  crafted: 'Crafted',
-  farm: 'Farmable',
-  unknown: 'Not listed'
-}
-
-/** The raid roster as two lookups: the targets' names, and the zones the roster files whole. */
-export interface RaidFacts {
-  mobs: ReadonlySet<string>
-  zones: ReadonlySet<string>
-}
-
-/** A mob name with case and a leading article folded (the roster's `match` names carry none). */
-function mobKey(name: string): string {
-  return name.trim().toLowerCase().replace(/^(?:an?|the) /, '')
-}
-
-/** A zone name down to its place: the roster's `Plane of Sky <dash> Island 1` and a page's `The Plane of Sky` are one zone. */
-function zoneKey(zone: string): string {
-  return (zone.split(/\s+[—-]\s+/)[0] ?? '').trim().toLowerCase().replace(/^the /, '')
-}
-
-/**
- * The roster's lookups. A zone is a raid zone only when the roster names a CATEGORY after it (the
- * planes): an open-world dragon's lair is an ordinary dungeon with one raid target in it.
- */
-export function raidFactsOf(targets: readonly Pick<RaidTarget, 'name' | 'category' | 'match' | 'zone'>[]): RaidFacts {
-  const mobs = new Set<string>()
-  const zones = new Set<string>()
-  for (const target of targets) {
-    for (const name of [target.name, ...target.match]) mobs.add(mobKey(name))
-    if (target.zone !== undefined && zoneKey(target.zone) === zoneKey(target.category)) zones.add(zoneKey(target.zone))
-  }
-  return { mobs, zones }
-}
-
-export interface MoteSourceInfo {
-  source: MoteSource
-  /** the camp the verdict rests on, as the page names it (with its stated level), when there is one */
-  from?: string
-}
-
-type Sourced = Pick<GearRow, 'dropMobs' | 'dropLevels' | 'dropZones' | 'quest' | 'playerCrafted'>
-
-/** The easiest non-raid camp a row names: the lowest stated level, and an unstated level is lowest. */
-function easiestCamp(row: Sourced, raid: RaidFacts): { mob: string; level: number | null; text: string } | null {
-  let best: { mob: string; level: number | null; text: string } | null = null
-  const mobs = row.dropMobs ?? []
-  for (let i = 0; i < mobs.length; i++) {
-    const mob = mobs[i] ?? ''
-    if (raid.mobs.has(mobKey(mob))) continue
-    const text = row.dropLevels?.[i] ?? ''
-    const level = statedLevel(text)
-    if (best === null || (level ?? -1) < (best.level ?? -1)) best = { mob, level, text }
-  }
-  return best
-}
-
-/**
- * Where copies of this item come from. THE EASIEST STATED ROAD WINS: an item a raid target and a
- * dungeon mob both drop is as farmable as the dungeon mob. A camp that states no level is never
- * called high level (absent is not a value).
- */
-export function moteSource(row: Sourced, raid: RaidFacts): MoteSourceInfo {
-  const mobs = row.dropMobs ?? []
-  if (mobs.length === 0) {
-    if (row.playerCrafted) return { source: 'crafted' }
-    return { source: row.quest ? 'quest' : 'unknown' }
-  }
-  const zones = row.dropZones ?? []
-  const camp = easiestCamp(row, raid)
-  if (camp === null || (zones.length > 0 && zones.every((z) => raid.zones.has(zoneKey(z))))) {
-    return { source: 'raid', from: mobs[0] }
-  }
-  const from = camp.text === '' ? camp.mob : `${camp.mob} (${camp.text})`
-  return { source: camp.level !== null && camp.level >= MOTE_HIGH_LEVEL ? 'high' : 'farm', from }
-}
+/** How many the game hands out a week (and lets you hold): the size of the week's plan. */
+export const VOID_MOTES_PER_WEEK = MOTE_RULES.perWeek
 
 // ---- the advice ---------------------------------------------------------------------------------
 
@@ -160,6 +87,15 @@ export interface MoteChange {
   to: number
 }
 
+/** The road that would otherwise bring in most of the next tier. */
+export type MoteRoad = 'copies' | 'motes'
+
+/**
+ * Whether a mote belongs on the row yet: `pick` at +7 or higher, `rare` at +5 or +6 when copies
+ * barely exist, `early` otherwise (ordinary motes are the cheaper road there).
+ */
+export type MoteGate = 'pick' | 'rare' | 'early'
+
 /** One worn item, and what one mote spent on it buys. */
 export interface MoteAdvice {
   cell: PlanSlotId
@@ -173,11 +109,15 @@ export interface MoteAdvice {
   changes: MoteChange[]
   /** base copies the next tier costs without the mote (2^tier), at no banked progress */
   copies: number
-  source: MoteSource
-  from?: string
+  /** how copies are come by; absent when no page states a road */
+  supply?: ItemSupply
+  /** hours of play the next tier costs without the mote, by copies and ordinary motes together */
+  hours: number
+  road: MoteRoad
+  gate: MoteGate
   /** the exaltation socket the next tier opens (`Proc`), when it opens one */
   opens?: string
-  /** `gain x (1 + tier + source steps)`; 0 when the target gains nothing */
+  /** `gain x hours`; 0 when the target gains nothing */
   score: number
 }
 
@@ -185,7 +125,6 @@ export interface MoteOptions {
   target: MoteTarget
   /** the class picks, for the role model's class gate; empty gates nothing */
   classes: readonly ClassAbbr[]
-  raid: RaidFacts
 }
 
 interface Worn {
@@ -236,17 +175,31 @@ function wornSlot(w: Worn): EquipSlot | undefined {
 
 const round3 = (n: number): number => Math.round(n * 1000) / 1000
 
-/** How dear the next tier is, in doublings: the tier itself plus the source's steps. */
-export function moteEffort(a: Pick<MoteAdvice, 'tier' | 'source'>): number {
-  return a.tier + MOTE_SOURCE_STEPS[a.source]
+/**
+ * The hours of play a tier costs without a void mote, and the road they are spent on. Copies count
+ * only when a page states a road (`perWeek` present): no stated road is not evidence of an easy one.
+ */
+export function moteHours(tier: number, supply: ItemSupply | undefined): { hours: number; road: MoteRoad } {
+  const exp = expToNextTier(tier) ?? 0
+  const byMotes = (MOTE_RULES.moteExpPerHour[tier] ?? 0) * MOTE_RULES.moteShare
+  const byCopies = (supply?.perWeek ?? 0) / SUPPLY.hoursPerWeek
+  const rate = byCopies + byMotes
+  return { hours: rate > 0 ? Math.round((exp / rate) * 10) / 10 : 0, road: byCopies > byMotes ? 'copies' : 'motes' }
+}
+
+/** Does a mote belong on an item at this tier yet? (`MoteGate`.) */
+export function moteGate(tier: number, supply: ItemSupply | undefined): MoteGate {
+  if (tier >= MOTE_RULES.minTier) return 'pick'
+  const rare = supply?.perWeek !== undefined && supply.perWeek <= MOTE_RULES.rarePerWeek
+  return tier >= MOTE_RULES.rareMinTier && rare ? 'rare' : 'early'
 }
 
 /**
- * One row per worn item below +10: what the next tier gains the target, what it would cost in
- * copies, and where those copies come from. Unsorted (`sortMoteAdvice`).
+ * One row per worn item below +10: what the next tier gains the target, the hours of play it would
+ * otherwise cost, and whether a mote belongs there yet. Unsorted (`sortMoteAdvice`).
  *
- * Every tier is read at NO banked progress, because the dump states `+N` and stops: `copies` is
- * the most a mote can skip, never a promise.
+ * Every tier is read at NO banked progress, because the dump states `+N` and stops: `hours` is the
+ * most a mote can save, never a promise.
  */
 export function moteAdvice(
   hosts: readonly PlannerInventoryHost[],
@@ -261,7 +214,7 @@ export function moteAdvice(
     const next = scaleGearStats(w.row.stats, upgradeStateForTier(w.tier + 1), w.row.voidSynth === true)
     const at = { slot: wornSlot(w), ownedHaste: outside[i] }
     const gain = value === null ? (next[target as GearStatKey] ?? 0) - (w.now[target as GearStatKey] ?? 0) : value(next, at) - value(w.now, at)
-    const { source, from } = moteSource(w.row, opts.raid)
+    const { hours, road } = moteHours(w.tier, w.row.supply)
     const advice: MoteAdvice = {
       cell: w.host.slot,
       key: w.row.key,
@@ -270,10 +223,12 @@ export function moteAdvice(
       gain: round3(gain),
       changes: changesOf(w.now, next),
       copies: expToNextTier(w.tier) ?? 0,
-      source,
-      score: gain > 0 ? round3(gain * (1 + moteEffort({ tier: w.tier, source }))) : 0
+      hours,
+      road,
+      gate: moteGate(w.tier, w.row.supply),
+      score: gain > 0 ? round3(gain * hours) : 0
     }
-    if (from !== undefined) advice.from = from
+    if (w.row.supply !== undefined) advice.supply = w.row.supply
     const opens = EXALTATION_SLOT_TYPES.find((s) => s.unlocksAt === w.tier + 1)
     if (opens !== undefined) advice.opens = opens.type
     return advice
@@ -282,7 +237,7 @@ export function moteAdvice(
 
 // ---- the order ----------------------------------------------------------------------------------
 
-/** What the list is ranked by: the blend, the gain alone, or how dear the tier is alone. */
+/** What the list is ranked by: gain times hours, the gain alone, or the hours alone. */
 export type MoteOrder = 'recommended' | 'gain' | 'effort'
 
 export const MOTE_ORDERS: readonly MoteOrder[] = ['recommended', 'gain', 'effort']
@@ -290,19 +245,26 @@ export const MOTE_ORDERS: readonly MoteOrder[] = ['recommended', 'gain', 'effort
 const ORDER_KEY: Record<MoteOrder, (a: MoteAdvice) => number> = {
   recommended: (a) => a.score,
   gain: (a) => a.gain,
-  effort: moteEffort
+  effort: (a) => a.hours
+}
+
+/** A row a mote may go on now: it gains the target something and its tier is not too early. */
+export function isMoteReady(a: Pick<MoteAdvice, 'gain' | 'gate'>): boolean {
+  return a.gain > 0 && a.gate !== 'early'
 }
 
 /**
- * Best first. A row whose target gains nothing sinks in EVERY order: a mote that buys nothing you
- * asked for is not a pick, however dear its tier. Ties fall to the blend, then the gain, then the
- * name, so the order is total.
+ * Best first. A row whose target gains nothing sinks in EVERY order, and in the recommended order
+ * a "not yet" row sits below every row a mote may go on. Ties fall to the blend, then the gain,
+ * then the name, so the order is total.
  */
 export function sortMoteAdvice(list: readonly MoteAdvice[], order: MoteOrder): MoteAdvice[] {
   const key = ORDER_KEY[order]
+  const ready = (a: MoteAdvice): number => (order === 'recommended' ? Number(isMoteReady(a)) : 0)
   return [...list].sort(
     (a, b) =>
       Number(b.gain > 0) - Number(a.gain > 0) ||
+      ready(b) - ready(a) ||
       key(b) - key(a) ||
       b.score - a.score ||
       b.gain - a.gain ||
@@ -310,7 +272,52 @@ export function sortMoteAdvice(list: readonly MoteAdvice[], order: MoteOrder): M
   )
 }
 
-/** Is the row at `index` of a sorted list one of the week's picks? */
-export function isMotePick(list: readonly MoteAdvice[], index: number): boolean {
-  return index < VOID_MOTES_PER_WEEK && (list[index]?.gain ?? 0) > 0
+// ---- the week's plan ----------------------------------------------------------------------------
+
+/** One of the week's motes: the item it goes on and the tier it lifts it from. */
+export interface MotePlanStep {
+  cell: PlanSlotId
+  key: string
+  name: string
+  tier: number
+}
+
+/**
+ * Where the week's motes go, one at a time: the best row a mote may go on, then the list again
+ * with that item one tier higher. So two or three can land on one item (the last tiers cost the
+ * most), which is how the owner has spent them. A "not yet" row never takes one: when the ready
+ * rows run out the plan is short, and the rest are held (owner: almost never below +7).
+ */
+export function motePlan(
+  hosts: readonly PlannerInventoryHost[],
+  byKey: ReadonlyMap<string, GearRow>,
+  opts: MoteOptions,
+  motes: number = MOTE_RULES.perWeek
+): MotePlanStep[] {
+  const steps: MotePlanStep[] = []
+  let worn = [...hosts]
+  for (let n = 0; n < motes; n++) {
+    const list = sortMoteAdvice(moteAdvice(worn, byKey, opts), 'recommended')
+    const best = list[0]
+    if (best === undefined || !isMoteReady(best)) break
+    steps.push({ cell: best.cell, key: best.key, name: best.name, tier: best.tier })
+    worn = worn.map((h) => (h.slot === best.cell ? { ...h, tier: best.tier + 1 } : h))
+  }
+  return steps
+}
+
+/** The plan as one line per item: the tier it starts at and how many motes it takes. */
+export function planByItem(plan: readonly MotePlanStep[]): { name: string; from: number; motes: number }[] {
+  const out = new Map<PlanSlotId, { name: string; from: number; motes: number }>()
+  for (const s of plan) {
+    const at = out.get(s.cell)
+    if (at === undefined) out.set(s.cell, { name: s.name, from: s.tier, motes: 1 })
+    else at.motes++
+  }
+  return [...out.values()]
+}
+
+/** How many of the plan's motes land on this cell. */
+export function planMotesOn(plan: readonly MotePlanStep[], cell: PlanSlotId): number {
+  return plan.filter((s) => s.cell === cell).length
 }

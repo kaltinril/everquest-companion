@@ -269,7 +269,7 @@ const VIEW_ID = /'([a-zA-Z]+)'/g
  * the owner sequences the server deploy that widens `TELEMETRY_VIEWS`. Hand-kept, and the test
  * below fails if one of them is ALSO in the schema, so the widening has to shorten this list.
  */
-const NOT_YET_REPORTED = ['slayer', 'unlocks', 'bazaar', 'gaps', 'factions', 'spells', 'spellUpgrades', 'spellLoadout']
+const NOT_YET_REPORTED = ['slayer', 'unlocks', 'bazaar', 'gaps', 'factions', 'spells', 'spellUpgrades', 'spellLoadout', 'voidMotes']
 
 /**
  * The view ids `KNOWN_VIEWS` lists — the ones this build can RESTORE, which is the same thing as
