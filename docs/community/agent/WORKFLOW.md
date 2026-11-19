@@ -204,25 +204,35 @@ disagree, RULES.md wins; fix this file.
 - Push to `origin` only. Finished, gated work is pushed once it is merged into `main_community`
   and the owner has tested it in the app; then push `main_community` without asking. Before the
   owner has tested, do not push. Work branches are deleted after the merge, not pushed.
-- Retired branches are never pushed again; the ones with an open upstream PR stay as they are.
+- Retired branches are never pushed again; the pull requests opened from them on the original
+  repo are left as they are (RULES.md rule 9).
 
 ## Owner rulings that shape work
 
 - **No unreleased tabs** (owner, 2026-10-28: "no reason to hide them ever just always show the
   tabs"; 2026-10-29: "everyone should always see all tabs"). The `UNRELEASED` gate is removed
   outright (no flag, no `EQ_UNRELEASED`); a new surface ships visible. A view not yet in
-  `TELEMETRY_VIEWS` goes in `NOT_YET_REPORTED` (`tests/telemetryContract.test.mts`) until the
-  owner sequences the schema widening.
+  `TELEMETRY_VIEWS` goes in `NOT_YET_REPORTED` (`tests/telemetryContract.test.mts`) so the
+  contract test passes. The build sends no telemetry; whether those lists are kept is the owner's
+  decision, still open.
 
 - **The fork has taken over the project** (owner, 2026-09-28). A decision that used to wait on the
   creator (a new tab, a new data file, a departure from AGENTS.md design) is the owner's alone; do
-  not park work on the creator's sign-off. The fork's own rules still bind, his code conventions
-  are still followed (lint ceilings, tests, house style) so his later `main` still merges, and
-  `AGENTS.md` / `releaseNotes.ts` stay hands-off unless the owner says otherwise.
+  not park work on the creator's sign-off. The fork's own rules still bind. The code conventions
+  (lint ceilings, tests, house style) are still followed because they are the house style, and
+  the lint ceilings and tests enforce them. `AGENTS.md` and `releaseNotes.ts` are left as
+  written (RULES.md rules 13 and 14); taking `AGENTS.md` over is the owner's decision, still open.
 - **One trunk, to move faster** (owner, 2026-10-26: the creator "may never come back, there are
   already multiple competing tools ... we need to be able to move faster and pivot easier").
   Upstream pull requests are no longer a goal, so a change is shaped for the fork, not for
   separability; RULES.md rules 1 to 4 and 9.
+- **The fork does not track the original** (owner, 2026-11-19: "we broke away from the original
+  fork but our readme still acts like we are trying to stay in-sync with it"). Docs, rules and
+  app text speak as the project itself. Nothing is synced from or offered to the original repo
+  unless the owner asks; `main` and the `upstream` remote stay as a frozen reference (RULES.md
+  rules 2, 4, 9, 20).
+- **The owner's comments on this repo's issues are directions** (owner, 2026-11-19). Read every
+  comment by the owner on an issue before triaging it: what is said there is what to build.
 - **Wiki and network:** no new runtime fetches. Data comes from committed files and bundled
   assets. Any new scrape is an owner decision, in bulk, at 1 request per second.
   The app reads the wiki only on a Copy click (owner, 2026-10-26: "the app should not be hitting
@@ -253,6 +263,11 @@ disagree, RULES.md wins; fix this file.
   for formatting sake alone"). The app suggests an edit only for what the player's log shows a page
   lacks; a formatting change (group lines, layout) rides along with a real change, never alone; no
   wiki-wide cleanup lists or bot requests.
+- **A wiki-data complaint is reported, not fixed** (owner, 2026-11-19: "If users are complaining
+  about issues that are just data issues from missing or incorrect WIKI, there is nothing I can do
+  about it, report those to me instead of attempting to fix them"). When a report's cause is a
+  wrong or missing wiki page, give the owner the page, the field, what it says and what it should
+  say. No code change and no data override for it, unless the owner asks for one on that issue.
 - **Scraping is wiki-only; the log is the truth** (owner, 2026-10-10). The game's own files may
   be parsed once, at dev time, to find wiki errors; nothing shipped or scraped depends on them.
   DATA_REFRESH.md, "The ETL".
@@ -265,7 +280,8 @@ disagree, RULES.md wins; fix this file.
   the feature. New code gets lean comments: a one-line note for a real constraint, not an essay,
   even where legacy files carry long headers.
 - **Never write to the creator's spaces** (his Linear board, his data pipelines, his
-  telemetry/Lambda deploys). Hand the owner a text brief instead.
+  telemetry/Lambda deploys). The fork's work is tracked in this repo and its GitHub issues;
+  nothing is passed on to his systems unless the owner asks.
 - **Feature alerts use the alert framework:** add an `AppSignal`, declare its tokens in
   `APP_SIGNAL_CAPTURES` (`src/shared/alertCaptures.ts`), seed an AlertDef (own module with a
   one-time stamp, e.g. `src/main/alertBazaarSeed.ts`, because `store.ts` is at its ceiling), fire

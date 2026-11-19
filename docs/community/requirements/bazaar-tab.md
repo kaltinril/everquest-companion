@@ -1,6 +1,6 @@
 # bazaar-tab: what was asked for
 
-Every request this feature has taken, newest at the bottom. Read it before changing the branch;
+Every request this feature has taken, newest at the bottom. Read it before changing the feature;
 nothing listed here is removed or narrowed without the owner's word (RULES.md, rule 19). The
 first rows were gathered on 2026-10-08 from the branch's commits and its BRANCHES.md row, which
 record what was built but not always who asked; those say "owner" where the row does.

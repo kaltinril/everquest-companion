@@ -153,11 +153,13 @@ The list as it stood before that session:
   dropped its footnoted Harm Touch skill row; Harm Touch is a 10-rank AA. The app still knows it
   (abilities, AA table); read each AA's "Requirements: Level 1/6/11..." so AAs appear at their levels.
 - A table-driven item test (catch_all requirement row) and the delta covering every file (above).
-- `wiki-scraper-fixes` is open upstream as PR #84: keep fork-only lines off it (the fork User-Agent
-  moved to `scrape-delta-tool` for that reason).
-- Creator-code bugs RULES.md rule 20 says to file upstream, not filed (owner's call): the spell
-  scraper wrote an empty catalog on an error body; scrape-bosses paced 80/120 ms; release triage
-  sorts `main.10` before `main.9` (`releaseNotes.ts` is the creator's).
+- (Retired 2026-10-26.) `wiki-scraper-fixes` was offered upstream as PR #84 and is left there.
+  Nothing is kept separate for it any more.
+- (Not a to-do since 2026-11-19.) Bugs in the original code that RULES.md rule 20, as it read
+  until 2026-11-19, said to file on the original repo too. They were not filed (owner's call) and
+  nothing is filed there now unless the owner asks: the spell scraper wrote an empty catalog on an
+  error body; scrape-bosses paced 80/120 ms; release triage sorts `main.10` before `main.9`
+  (`releaseNotes.ts` holds the original app's notes and is left as it is, rule 13).
 - Wiki fixes for the owner to make: restore Sulgar (blanked 2026-09-26,
   https://eqlwiki.com/index.php?title=Sulgar&action=history); `Clockwork Merchant (LG-16)` has
   `|name = Clockwork Merchant (1105, -1030)`, should be `|name = Clockwork Merchant` like its 37 siblings.

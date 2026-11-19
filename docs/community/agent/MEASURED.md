@@ -344,7 +344,7 @@ Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`)
 
 - The spell DB is wiki-only: `spells_us_str.txt` (landing/wear-off text per id) is read by
   nothing; ~36k unknown lines are landings it names (all Legends-only 74xxx spells). Touches the
-  creator's parse-purity law; a design conversation. Related to upstream #56.
+  original design's parse-purity law; the owner decides. Related to issue #56 on the original repo.
 - Unclaimed families: `Your <item> (Exaltation) flickers with a pale light.`, `<mob> tries to
   cast a spell on you, but you are protected.`, outgoing damage-shield absorbs (uncounted by the
   owner's 2026-10-25 rule: no damage passed). Claimed 2026-10-25: `You were hit by non-melee`

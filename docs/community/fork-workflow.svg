@@ -1,10 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 860" width="1600" height="860" font-family="Segoe UI, Helvetica, Arial, sans-serif" role="img" aria-labelledby="t d">
-  <title id="t">How the kaltinril/everquest-companion community fork is run (one trunk, since 2026-10-26)</title>
-  <desc id="d">upstream/main fast-forwards into the fork's main, which is read in full and merged into main_community. main_community is the trunk: every change is a short-lived work branch off it, in a temporary worktree, gated, merged back, then removed. Vetted third-party pull requests come in the same way. A community-version tag on main_community builds a GitHub Release. The old feature branches are retired and kept for history.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 800" width="1600" height="800" font-family="Segoe UI, Helvetica, Arial, sans-serif" role="img" aria-labelledby="t d">
+  <title id="t">How the kaltinril/everquest-companion project is run (one trunk, since 2026-10-26)</title>
+  <desc id="d">main_community is the trunk: every change is a short-lived work branch off it, in a temporary worktree, gated, merged back, then removed. A community-version tag on main_community builds a GitHub Release. The original repo, jmoyers/everquest-companion, is a frozen reference: it is no longer active, main is a frozen copy of its main, nothing is synced, and its code is taken only on the owner's word, after a full read. The old feature branches are retired and kept for history.</desc>
   <defs>
     <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#334155"/></marker>
     <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker>
-    <marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ea580c"/></marker>
     <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#16a34a"/></marker>
     <style>
       .h { font-size: 19px; font-weight: 700; }
@@ -15,84 +14,68 @@
     </style>
   </defs>
 
-  <rect width="1600" height="860" fill="#ffffff"/>
-  <text x="800" y="44" text-anchor="middle" font-size="30" font-weight="800" fill="#0f172a">kaltinril/everquest-companion: how the community fork is run</text>
+  <rect width="1600" height="800" fill="#ffffff"/>
+  <text x="800" y="44" text-anchor="middle" font-size="30" font-weight="800" fill="#0f172a">kaltinril/everquest-companion: how the project is run</text>
   <text x="800" y="72" text-anchor="middle" class="s" font-size="16">One trunk, main_community, since 2026-10-26: short-lived work branches merge into it behind the gate</text>
 
-  <!-- upstream -->
-  <rect x="30" y="100" width="420" height="132" rx="12" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
-  <text x="50" y="130" class="h" fill="#0f172a">upstream = jmoyers/everquest-companion</text>
-  <rect x="50" y="144" width="380" height="36" rx="8" class="pill" stroke="#94a3b8"/>
-  <text x="66" y="168" class="m">upstream/main</text><text x="200" y="168" class="s">the creator's code</text>
-  <rect x="50" y="188" width="380" height="36" rx="8" class="pill" stroke="#ea580c"/>
-  <text x="66" y="212" class="m">upstream PR #N</text><text x="200" y="212" class="s" fill="#9a3412">untrusted until vetted</text>
-
-  <!-- origin main -->
-  <line x1="450" y1="162" x2="606" y2="162" stroke="#334155" stroke-width="2.5" marker-end="url(#a)"/>
-  <text x="528" y="150" text-anchor="middle" class="b" font-weight="700">fast-forward only</text>
-  <rect x="610" y="100" width="420" height="132" rx="12" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
-  <text x="630" y="130" class="h" fill="#0f172a">origin = kaltinril/everquest-companion</text>
-  <rect x="630" y="144" width="380" height="36" rx="8" class="pill" stroke="#7c3aed"/>
-  <text x="646" y="168" class="m">main</text><text x="700" y="168" class="s">mirrors upstream/main, never committed to</text>
-  <text x="630" y="210" class="s">Read in full, then merged into the trunk on a work branch.</text>
-
   <!-- house rules -->
-  <rect x="1070" y="100" width="500" height="132" rx="12" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
-  <text x="1090" y="130" class="h" fill="#991b1b">House rules (docs/community/RULES.md)</text>
-  <text x="1090" y="156" class="b">• Push to origin only, never to upstream.</text>
-  <text x="1090" y="179" class="b">• Every change: a work branch off main_community.</text>
-  <text x="1090" y="202" class="b">• Outside code is read whole before it merges.</text>
-  <text x="1090" y="225" class="b">• Releases only on the owner's word.</text>
+  <rect x="30" y="100" width="1140" height="132" rx="12" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="50" y="130" class="h" fill="#991b1b">House rules (docs/community/RULES.md)</text>
+  <text x="50" y="156" class="b">• Every change: a work branch off main_community.</text>
+  <text x="50" y="179" class="b">• Outside code is read whole before it merges.</text>
+  <text x="50" y="202" class="b">• Releases only on the owner's word.</text>
+  <text x="620" y="156" class="b">• main is a frozen copy, never committed to.</text>
+  <text x="620" y="179" class="b">• Push to origin only, never to upstream.</text>
 
-  <!-- main -> trunk -->
-  <line x1="820" y1="232" x2="820" y2="300" stroke="#7c3aed" stroke-width="2.5" marker-end="url(#a)"/>
-  <text x="832" y="272" class="s">scan (rules 5 to 7), then merge</text>
-
-  <!-- PR -> work branch -->
-  <path d="M240,232 L240,560" fill="none" stroke="#ea580c" stroke-width="2.5" marker-end="url(#ao)"/>
-  <text x="252" y="420" class="s" fill="#9a3412">vetted: ADOPTIONS.md row</text>
+  <!-- the original repo: a reference, connected to nothing -->
+  <rect x="1220" y="100" width="350" height="132" rx="12" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="1240" y="130" class="h" fill="#475569">The original repo</text>
+  <text x="1240" y="154" class="s">jmoyers/everquest-companion (upstream):</text>
+  <text x="1240" y="174" class="s">no longer active; main is a frozen copy;</text>
+  <text x="1240" y="194" class="s">nothing synced; its code is taken only on the</text>
+  <text x="1240" y="214" class="s">owner's word, after a full read</text>
 
   <!-- trunk -->
-  <rect x="460" y="304" width="720" height="150" rx="14" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
-  <text x="480" y="336" class="h" fill="#1d4ed8">The trunk</text>
-  <rect x="480" y="350" width="680" height="40" rx="9" class="pill" stroke="#2563eb" stroke-width="2"/>
-  <text x="498" y="376" class="m" font-size="16" font-weight="700">main_community</text>
-  <text x="660" y="376" class="s">the default branch: the dev app runs it, every build comes from it</text>
-  <text x="480" y="424" class="b">Gate on the work branch and again after the merge:</text>
-  <text x="480" y="444" class="s">typecheck, lint, npm test on Node 24; cargo test for engine changes; only the known reds may fail</text>
+  <rect x="30" y="268" width="1140" height="150" rx="14" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+  <text x="50" y="300" class="h" fill="#1d4ed8">The trunk</text>
+  <rect x="50" y="314" width="1100" height="40" rx="9" class="pill" stroke="#2563eb" stroke-width="2"/>
+  <text x="68" y="340" class="m" font-size="16" font-weight="700">main_community</text>
+  <text x="230" y="340" class="s">the default branch: the dev app runs it, every build comes from it</text>
+  <text x="50" y="388" class="b">Gate on the work branch and again after the merge:</text>
+  <text x="50" y="408" class="s">typecheck, lint, npm test on Node 24; cargo test for engine changes; only the known reds may fail</text>
 
   <!-- work branches -->
-  <rect x="30" y="564" width="1140" height="150" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
-  <text x="50" y="594" class="h" fill="#15803d">Work branches: one job each, then gone</text>
-  <rect x="50" y="608" width="340" height="32" rx="7" class="pill" stroke="#16a34a"/><text x="64" y="630" class="m">a feature or a fix</text>
-  <rect x="410" y="608" width="340" height="32" rx="7" class="pill" stroke="#16a34a"/><text x="424" y="630" class="m">a data refresh</text>
-  <rect x="770" y="608" width="380" height="32" rx="7" class="pill" stroke="#16a34a"/><text x="784" y="630" class="m">a version bump with tester notes</text>
-  <text x="50" y="674" class="b">git worktree add -b &lt;name&gt; .claude/worktrees/&lt;name&gt; main_community</text>
-  <text x="50" y="698" class="s">gate, merge into main_community, then remove the worktree (junction first) and the branch</text>
+  <rect x="30" y="528" width="1140" height="150" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="50" y="558" class="h" fill="#15803d">Work branches: one job each, then gone</text>
+  <rect x="50" y="572" width="340" height="32" rx="7" class="pill" stroke="#16a34a"/><text x="64" y="594" class="m">a feature or a fix</text>
+  <rect x="410" y="572" width="340" height="32" rx="7" class="pill" stroke="#16a34a"/><text x="424" y="594" class="m">a data refresh</text>
+  <rect x="770" y="572" width="380" height="32" rx="7" class="pill" stroke="#16a34a"/><text x="784" y="594" class="m">a version bump with tester notes</text>
+  <text x="50" y="638" class="b">git worktree add -b &lt;name&gt; .claude/worktrees/&lt;name&gt; main_community</text>
+  <text x="50" y="662" class="s">gate, merge into main_community, then remove the worktree (junction first) and the branch</text>
 
-  <line x1="760" y1="454" x2="760" y2="560" stroke="#16a34a" stroke-width="2.5" marker-end="url(#ag)"/>
-  <text x="772" y="500" class="s">branch off</text>
-  <line x1="880" y1="560" x2="880" y2="458" stroke="#2563eb" stroke-width="2.5" marker-end="url(#ab)"/>
-  <text x="892" y="520" class="s">merge back</text>
+  <line x1="540" y1="418" x2="540" y2="524" stroke="#16a34a" stroke-width="2.5" marker-end="url(#ag)"/>
+  <text x="552" y="464" class="s">branch off</text>
+  <line x1="660" y1="524" x2="660" y2="422" stroke="#2563eb" stroke-width="2.5" marker-end="url(#ab)"/>
+  <text x="672" y="484" class="s">gate, then merge back</text>
 
   <!-- release -->
-  <rect x="1220" y="304" width="350" height="150" rx="12" fill="#fff7ed" stroke="#ea580c" stroke-width="1.5"/>
-  <text x="1240" y="334" class="h" fill="#9a3412">A release</text>
-  <text x="1240" y="360" class="m">community-&lt;version&gt;</text>
-  <text x="1240" y="384" class="s">tag on main_community, owner's word only,</text>
-  <text x="1240" y="404" class="s">after the pack compare and a delta scrape;</text>
-  <text x="1240" y="424" class="s">GitHub Actions builds and publishes it</text>
-  <line x1="1180" y1="379" x2="1216" y2="379" stroke="#334155" stroke-width="2.5" marker-end="url(#a)"/>
+  <rect x="1220" y="268" width="350" height="150" rx="12" fill="#fff7ed" stroke="#ea580c" stroke-width="1.5"/>
+  <text x="1240" y="298" class="h" fill="#9a3412">A release</text>
+  <text x="1240" y="324" class="m">community-&lt;version&gt;</text>
+  <text x="1240" y="348" class="s">tag on main_community, owner's word only,</text>
+  <text x="1240" y="368" class="s">after the pack compare and a delta scrape;</text>
+  <text x="1240" y="388" class="s">GitHub Actions builds and publishes it</text>
+  <line x1="1170" y1="343" x2="1216" y2="343" stroke="#334155" stroke-width="2.5" marker-end="url(#a)"/>
 
   <!-- retired -->
-  <rect x="1220" y="564" width="350" height="150" rx="12" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 4"/>
-  <text x="1240" y="594" class="h" fill="#475569">Retired branches</text>
-  <text x="1240" y="620" class="s">the old feature branches, catch_all,</text>
-  <text x="1240" y="640" class="s">the never-closing branches, community/pr-*:</text>
-  <text x="1240" y="660" class="s">merged in, marked RETIRED.md (2026-10-26),</text>
-  <text x="1240" y="680" class="s">kept for history, never merged again</text>
+  <rect x="1220" y="528" width="350" height="150" rx="12" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="1240" y="558" class="h" fill="#475569">Retired branches</text>
+  <text x="1240" y="584" class="s">the old feature branches, catch_all,</text>
+  <text x="1240" y="604" class="s">the never-closing branches, community/pr-*:</text>
+  <text x="1240" y="624" class="s">merged in, marked RETIRED.md (2026-10-26),</text>
+  <text x="1240" y="644" class="s">kept for history, never merged again</text>
 
   <!-- footer -->
-  <text x="800" y="780" text-anchor="middle" class="b">One fix, start to finish: worktree and branch off main_community → change → gate → merge → gate again → owner tests → push main_community to origin → remove worktree and branch</text>
-  <text x="800" y="810" text-anchor="middle" class="s">docs/community/README.md explains each step; RULES.md binds them</text>
+  <text x="800" y="730" text-anchor="middle" class="b">One fix, start to finish: worktree and branch off main_community → change → gate → merge → gate again → owner tests → push main_community to origin → remove worktree and branch</text>
+  <text x="800" y="760" text-anchor="middle" class="s">docs/community/README.md explains each step; RULES.md binds them</text>
 </svg>

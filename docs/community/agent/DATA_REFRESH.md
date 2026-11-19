@@ -188,7 +188,7 @@ full scrapers). A 3-week window was ~1,200 pages in ~25 batched requests.
 
 ## Expect new reds, and clear them
 
-New wiki content turns the creator's census tests red. Each failing test names its tokens.
+New wiki content turns the census tests red. Each failing test names its tokens.
 
 - `itemsResearch.json`'s instrument table is pinned both ways against the corpus: a page that stops
   stating an instrument loses its entry in the data's work branch (2026-10-21: Unfinished Lute

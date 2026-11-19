@@ -44,7 +44,7 @@ where one exists.
     panel over the Gear tab's table it was a second list on the catalog page; it asks about what is
     WORN, not about the catalog). Never put it back on the Gear tab. `VoidMotePanel` fills whatever
     box hosts it, so another host (the Character tab) is a mount, not a rewrite. In
-    `NOT_YET_REPORTED` (`tests/telemetryContract.test.mts`) until the schema widening.
+    `NOT_YET_REPORTED` (`tests/telemetryContract.test.mts`); the build sends no telemetry.
   - Gain = the role model's score at tier+1 minus tier (`roleValuer`, the Gear tab's class picks,
     default dial), or one stat's own points. Read at no banked progress: the dump states `+N` only.
   - Ranking (owner, 2026-11-19; `plans/2026-11-19-void-mote-ranking.md` has the rules, the
@@ -123,8 +123,8 @@ where one exists.
   `DEFAULT_OVERLAY_CONFIG`, `OVERLAY_MENU_ROWS` (description only, never the label),
   `OVERLAY_TITLE`, `overlay/main.tsx`, `MODULE_READING_OVERLAYS` when it reads a module, tests
   `overlayHotZone` + `overlaysAppearanceSteps` ALL_KINDS. Telemetry: list it in
-  `UNREPORTED_OVERLAY_KINDS` (`shared/telemetryOverlays.ts`) rather than widen the closed enum the
-  creator's Lambda validates.
+  `UNREPORTED_OVERLAY_KINDS` (`shared/telemetryOverlays.ts`) rather than widen the closed enum.
+  The service that validates it is the creator's, and this build sends it nothing.
 - Overlays may not carry native `title` tooltips (`overlayTooltipPolicy.test.mts`).
 - Owner rule (2026-10-13): zoom and pan NEVER redraw the Maps sidebar. `MapMobPane` is `memo`;
   every prop it takes must keep its identity across view changes. A callback that needs the view
@@ -198,10 +198,12 @@ where one exists.
 ## Spells, upgrades and Loadout (was spell-upgrades)
 
 - The Spells views are drawn in every build but not yet in `TELEMETRY_VIEWS` (listed in
-  `NOT_YET_REPORTED`, `tests/telemetryContract.test.mts`). Widening order: `TELEMETRY_VIEWS` and the
-  ingest Lambda deploy FIRST (a client reporting an unknown view 400s the whole batch), then drop
-  the view from that list. Deploy is the owner's call. `tests/e2e/spells-area.e2e.mts` checks the
-  area opens.
+  `NOT_YET_REPORTED`, `tests/telemetryContract.test.mts`, so the contract test passes). The build
+  sends no telemetry (`TELEMETRY_API_URL` is empty) and the ingest service is the creator's, which
+  the fork never deploys to (WORKFLOW.md), so no widening is pending. Whether the lists are kept is
+  the owner's decision, still open. If reporting is ever turned on, the order is `TELEMETRY_VIEWS`
+  and the ingest deploy FIRST (a client reporting an unknown view 400s the whole batch), then drop
+  the view from that list. `tests/e2e/spells-area.e2e.mts` checks the area opens.
 - Two copies of the spell load pipeline: `buildLevelUnlocks` (levelUnlocks.ts) runs its own pass
   over spells.json, separate from `loadSpellDb`. A new load pass goes in both.
 - `spells_us.txt` is parsed into a versioned disk cache (`SPELL_RESIST_CACHE_VERSION`,
@@ -250,8 +252,8 @@ where one exists.
   requests). Wiki quest pages quote receipts inconsistently, so home-zone quests with no stated
   receipt are shown separately with a neutral marker.
 - Class filter is inclusive on ambiguity (wiki class tokens are prose).
-- Factions telemetry: add `factions` to `TELEMETRY_VIEWS` (Lambda first), drop it from
-  `NOT_YET_REPORTED`, give `loadFactionsNow` its perf seam.
+- Factions: `factions` stays in `NOT_YET_REPORTED` (the build sends no telemetry; see Spells,
+  above). Open: give `loadFactionsNow` its perf seam.
 - Achievements: the view id stays `slayer`. `achievements:book` is read on demand and never stored. Mob race
   from the wiki `|race` field (`scripts/gen-mob-races.mts`), mob factions likewise
   (`gen-mob-factions.mts`). Open: `Obtain <Item>` lines link nowhere; picks are per machine, not
@@ -298,12 +300,13 @@ where one exists.
 
 ## The TEST build identity (was test-neutering)
 
-- The community build is a continuation, not a test of the official app. Nothing points a user at
-  the official app by default; the original is credited, clearly labelled "no longer updated".
-- What's new: the community releases (test.20 on, the public ones) render above the creator's
-  history from `src/shared/communityReleaseNotes.ts`, generated from the `Test build` commits by
-  `node scripts/community/community-release-notes.mjs` (never hand-edited; the creator's
-  `releaseNotes.ts` stays untouched, rule 13). Its known issues show for the newest release only.
+- The build is the project's own app, not a test of the original app. Nothing points a player at
+  the original app by default; the original is credited, clearly labelled "no longer updated".
+- What's new: the community releases (test.20 on, the public ones) render above the original
+  app's history from `src/shared/communityReleaseNotes.ts`, generated from the `Test build`
+  commits by `node scripts/community/community-release-notes.mjs` (never hand-edited;
+  `releaseNotes.ts` holds the original app's notes and is left as it is, rule 13). Its known
+  issues show for the newest release only.
   `tests/communityReleaseNotes.test.mts` fails when the newest entry is not the `package.json`
   version. The parser reads the notes' shape: ALL-CAPS sections (`NEW IN TEST.N`, `KNOWN ISSUES`),
   plain-text group headings, `- ` bullets, `  - ` sub-bullets; keep new notes in that shape.
@@ -941,7 +944,8 @@ where one exists.
   "move faster"; tell the owner), the kill-faction samples out of the gaps snapshot, the map timer
   pins' clock gate. Left: a `gearOwnership` cache (would change the visible per-window "read at"
   time; owner asked).
-- Rust ProcBuff duration floor 0 vs measured growth (the creator's deliberate floor).
+- Rust ProcBuff duration floor 0 vs measured growth (a deliberate floor in the original code;
+  owner to decide).
 - `tests/e2e/sky-inventory-autoload.e2e.mts` was red on `main_community` independent of any
   branch (2026-09-25, geometry "counts top was 280, now 336"); unknown on plain main.
 - Buff tracker, by design (tell testers): two same-named mobs debuffed in different seconds merge
