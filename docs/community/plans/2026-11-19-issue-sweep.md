@@ -1634,9 +1634,9 @@ longer exists: it was deleted in b6ff987bb (JOS-499 test prune, 2026-08-25) beca
 deleted TS parser and LootModule; its case 5 was "an override zeroing the count - the row leaves the
 list". So nothing on trunk pins cleanupRows without a browser.
 8. The ruling. Owner 2026-09-28: "not ours to build", on the grounds that the count logic is the
-creator's design to change (ISSUES.md:26). This change touches no count logic: it adds a second door
+creator's design to change (the original repo's #73 row in ISSUES.md). This change touches no count logic: it adds a second door
 to a statement the app already honours. The ledger already notes the ruling predates the fork taking
-the project over (ISSUES.md:53), the owner asked today whether recent upstream issues can be fixed
+the project over (this repo's #2 row in ISSUES.md), the owner asked today whether recent upstream issues can be fixed
 in the fork, and the request that started this run says the fork has broken away from the original.
 CleanupList.tsx:17-25 (JOS-401) removed a destroy button because the log states destroys; it keeps
 the pencil as "the escape hatch for what the log genuinely cannot see - a trade", which is this
@@ -1682,7 +1682,7 @@ case. No instruction addressed to an AI in the issue text.
    one step between the reward-hover step and the destroy step.
 9. Records on the work branch: new docs/community/requirements/sky-cleanup-count.md with the row
    (2026-09-26, upstream #73 SwedishLesbian, hand-set quantity on Cleanup);
-   docs/community/ISSUES.md:26 disposition to fixed with the branch name and the owner's 2026-11-19
+   the original repo's #73 row in docs/community/ISSUES.md: disposition to fixed with the branch name and the owner's 2026-11-19
    word; one line under the Sky notes in docs/community/agent/BRANCH_NOTES.md (Cleanup's Held cell
    is HandCountCell; cleanup.ts has no unit test but the new file). Fix the stale pointer comments
    naming tests/skyCleanup.test.mts (cleanup.ts:15, sky-cleanup.e2e.mts:19) to the new file. The
@@ -1800,13 +1800,13 @@ looted before that window reads 0 until the pencil states it
 8. Nothing is left to build under the owner's ruling. The owner's 2026-11-02 comment on the issue
 already points at the dropdown; the only unbuilt idea is reading the Currencies tab off the screen,
 which the owner named as a some-day idea. No instruction addressed to an AI in the issue text.
-9. Records are stale, not the code: docs/community/ISSUES.md:53 and
+9. Records are stale, not the code: this repo's #2 row in docs/community/ISSUES.md and
 docs/community/requirements/sky-rune-count.md:8 still say "not yet tested in the app" and "Not
 answered on the issue", and neither records the 2026-11-02 comment or the test.39 release.
 
 ### Risks and limits
 
-- Records only: docs/community/ISSUES.md:53 and docs/community/requirements/sky-rune-count.md:8
+- Records only: this repo's #2 row in docs/community/ISSUES.md and docs/community/requirements/sky-rune-count.md:8
   still read 'not yet tested in the app' and 'Not answered on the issue'; worth correcting the next
   time the ledger is touched (shipped in test.39, owner commented 2026-11-02).
 - "Log only (loot minus hand-ins)" ignores the export for every item, so a player who switches to it
