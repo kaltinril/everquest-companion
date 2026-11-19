@@ -56,6 +56,7 @@ import { ALERT_TRIGGER_MIGRATION_VERSION, migrateAlertTriggers } from './data/al
 // direction would make the settings store an import cycle.
 import { seedAlertsWith } from './alertSeeds'
 import { seedBazaarAlertOnce, withBazaarAlert } from './alertBazaarSeed'
+import { seedRespawnAlertOnce, withRespawnAlert } from './alertRespawnSeed'
 // The persisted SHAPE lives in ./storeShape.ts (this file is at its factoring ceiling). Nothing
 // moved but the declaration; every accessor below is still written against it.
 import type { StoreShape } from './storeShape'
@@ -698,9 +699,9 @@ export function getAlerts(): AlertDef[] {
     // migration ever re-runs against a store that was born current.
     store.set('alertSoundMigration', ALERT_SOUND_MIGRATION_VERSION)
     store.set('alertTriggerMigration', ALERT_TRIGGER_MIGRATION_VERSION)
-    return seedBazaarAlertOnce(seeded, store)
+    return seedRespawnAlertOnce(seedBazaarAlertOnce(seeded, store), store)
   }
-  return seedBazaarAlertOnce(migrateStoredAlertTriggers(migrateStoredAlertSounds(existing)), store)
+  return seedRespawnAlertOnce(seedBazaarAlertOnce(migrateStoredAlertTriggers(migrateStoredAlertSounds(existing)), store), store)
 }
 
 /**
@@ -731,7 +732,7 @@ export function deleteAlert(id: string): AlertDef[] {
 
 /** Restore the seeded built-in alert set, discarding any user edits (Task #22). */
 export function resetAlerts(): AlertDef[] {
-  return saveAlerts(withBazaarAlert(seedAlertsWith(SEED_ALERTS, store.get('soundPacks')), store.get('soundPacks')))
+  return saveAlerts(withRespawnAlert(withBazaarAlert(seedAlertsWith(SEED_ALERTS, store.get('soundPacks')), store.get('soundPacks')), store.get('soundPacks')))
 }
 
 export function getAlertPrefs(): AlertPrefs {

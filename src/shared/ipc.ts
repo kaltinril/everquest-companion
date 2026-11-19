@@ -980,6 +980,11 @@ export const IPC = {
   // renderer -> main: "several mobs share this name" on or off for one watch (owner, 2026-11-09):
   // the estimate then ignores gaps under ten minutes. Payload is KEY, display and the flag.
   respawnSetSharedName: 'respawn:setSharedName',
+  // THE ALERT BEFORE A RESPAWN (shared/respawnAlert.ts): its one setting, normalized at the
+  // handler, and main -> renderer a 1 s tick carrying Date.now() while the setting is on.
+  respawnAlertGet: 'respawnAlert:get',
+  respawnAlertSet: 'respawnAlert:set',
+  respawnAlertTick: 'respawnAlert:tick',
 
   // ---- per-mob resist profiles (JOS-382 — docs/plans/resist-mining.md) -------------------
   //

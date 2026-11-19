@@ -20,6 +20,7 @@ import type { BuffTrustPrefs } from '../shared/buffTrust'
 import type { BuffAllowPrefs } from '../shared/buffAllow'
 import type { LogArchivePrefs } from '../shared/logArchive/prefs'
 import type { RespawnPrefs } from '../shared/respawn'
+import type { RespawnAlertSetting } from '../shared/respawnAlert'
 import type { BazaarWatchlist } from '../shared/bazaarWatch'
 import type { SoundPackPrefs } from '../shared/soundPacks'
 import type { WindowBounds } from './store'
@@ -105,6 +106,8 @@ export interface StoreShape {
   alertTriggerMigration?: number
   /** True once the Bazaar watchlist's alert was seeded (src/main/alertBazaarSeed.ts). */
   alertBazaarSeed?: boolean
+  /** True once the respawn pre-alert was seeded (src/main/alertRespawnSeed.ts). */
+  alertRespawnSeed?: boolean
   /**
    * WHICH SOUND PACK IS YOURS, AND WHICH SHIPPED ONES YOU THREW AWAY (JOS-273;
    * shared/soundPacks.ts). Two keys, both absent for almost everybody: the default-pack
@@ -276,6 +279,8 @@ export interface StoreShape {
    * every field, so an older build reading a store written here is unaffected and vice versa.
    */
   respawn?: RespawnPrefs
+  /** The alert before a tracked mob respawns (shared/respawnAlert.ts). Additive: absent reads as off, 20 s. */
+  respawnAlert?: RespawnAlertSetting
   /**
    * The Bazaar watchlist (shared/bazaarWatch.ts): items to buy, sell or watch, and their alert
    * prices. Another additive key: absent reads as no watches, no schema bump, no migration.

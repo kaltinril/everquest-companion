@@ -36,7 +36,8 @@ import {
   respawnWithoutWatch,
   respawnWithoutWatches
 } from '../../shared/respawnWatchList'
-import { getRespawnPrefs, setRespawnPrefs } from '../storeRespawn'
+import { getRespawnAlert, getRespawnPrefs, setRespawnAlert, setRespawnPrefs } from '../storeRespawn'
+import { syncRespawnAlertTick } from '../respawnAlertTick'
 // A FOURTH DUTY, ADDITIVE (JOS-482): the engine's own respawn module holds the same watch list and
 // bumps its own revision on the push, which is the engine-side spelling of duties 2 and 3 above.
 // Duty 1 — persistence — stays here and only here; the engine never reads a settings file.
@@ -93,6 +94,7 @@ export function registerRespawnIpc(): void {
     return next
   })
   registerWatchEdits()
+  registerAlertSetting()
   /**
    * STOP WATCHING ONE MOB (round 4). All three of the setter's duties apply — persist, apply live,
    * push now — and it is a separate channel from the setter for one reason: the surfaces that call
@@ -150,6 +152,17 @@ export function registerRespawnIpc(): void {
       serveConfirmSighting(id)
     }
     return true
+  })
+}
+
+/** The alert before a respawn (fork #7): its setting, and the 1 s tick that runs only while it is on. */
+function registerAlertSetting(): void {
+  syncRespawnAlertTick(getRespawnAlert().on)
+  ipcMain.handle(IPC.respawnAlertGet, () => getRespawnAlert())
+  ipcMain.handle(IPC.respawnAlertSet, (_e, value: unknown) => {
+    const next = setRespawnAlert(value)
+    syncRespawnAlertTick(next.on)
+    return next
   })
 }
 
