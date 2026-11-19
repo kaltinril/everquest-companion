@@ -195,8 +195,9 @@ test('isMotePick: the first three rows that gain something are the week picks', 
 test('sanitizeMotePrefs: each field falls back alone, and garbage is the default', () => {
   assert.deepEqual(sanitizeMotePrefs(null), DEFAULT_MOTE_PREFS)
   assert.deepEqual(sanitizeMotePrefs('open'), DEFAULT_MOTE_PREFS)
-  assert.deepEqual(sanitizeMotePrefs({ open: true, target: 'tank', order: 'effort' }), { open: true, target: 'tank', order: 'effort' })
-  assert.deepEqual(sanitizeMotePrefs({ open: true, target: 'WEIGHT', order: 'best' }), { open: true, target: 'balanced', order: 'recommended' })
+  // `open` is a field of the old Gear-tab panel's stored value: read past, never kept.
+  assert.deepEqual(sanitizeMotePrefs({ open: true, target: 'tank', order: 'effort' }), { target: 'tank', order: 'effort' })
+  assert.deepEqual(sanitizeMotePrefs({ open: true, target: 'WEIGHT', order: 'best' }), { target: 'balanced', order: 'recommended' })
   assert.equal(sanitizeMotePrefs({ target: 'SV_FIRE' }).target, 'SV_FIRE')
 })
 

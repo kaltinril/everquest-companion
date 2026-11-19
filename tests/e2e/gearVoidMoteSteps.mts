@@ -1,17 +1,22 @@
 /**
- * The Gear tab's void mote panel (owner ask, 2026-11-18), driven in a real window. A module rather
- * than more of `gear.e2e.mts` (the gearReviewSteps.mts precedent). The ranking itself is unit-tested
- * (tests/voidMotes.test.mts); what only a window can prove is the CHAIN: the chip opens the panel,
- * the panel reads what the staged `/outputfile inventory` dump says is worn, and a pick re-ranks it.
+ * The gear area's Void motes tab (owner ask, 2026-11-18; a tab of its own since 2026-11-19, when the
+ * list left the Gear tab), driven in a real window. A module rather than more of `gear.e2e.mts` (the
+ * gearReviewSteps.mts precedent). The ranking itself is unit-tested (tests/voidMotes.test.mts); what
+ * only a window can prove is the CHAIN: the tab opens the list, the list reads what the staged
+ * `/outputfile inventory` dump says is worn, and a pick re-ranks it.
  *
  * Runs on the committed `Primitive_freeport-Inventory.txt`, which wears `Thelvorn, Blade of Light +5`,
- * and hands the tab back with the panel closed.
+ * and hands the window back on the Gear tab (its filters are remembered across the visit).
  */
 import type { Page } from 'playwright-core'
-import { check, countOf, settle } from './appHarness.mjs'
+import { check, countOf, rectOf, settle } from './appHarness.mjs'
 
-const TOGGLE = '[data-testid="gear-motes-toggle"]'
+const MOTES_TAB = '[data-testid="tab-voidMotes"]'
+const GEAR_TAB = '[data-testid="tab-gear"]'
+const GEAR_VIEW = '[data-testid="gear-view"]'
+const OLD_TOGGLE = '[data-testid="gear-motes-toggle"]'
 const PANEL = '[data-testid="gear-motes"]'
+const LIST = '[data-testid="gear-motes-list"]'
 const ROW = '[data-testid="gear-motes-row"]'
 const GAIN_ORDER = '[data-testid="gear-motes-order-gain"]'
 const RECOMMENDED_ORDER = '[data-testid="gear-motes-order-recommended"]'
@@ -49,11 +54,17 @@ async function rows(page: Page): Promise<MoteRowText[]> {
 }
 
 export async function stepGearVoidMotes(page: Page): Promise<void> {
-  check('the void mote panel is closed until asked for', (await countOf(page, PANEL)) === 0)
-  await page.click(TOGGLE, { timeout: 15_000 })
+  check(
+    'the Gear tab carries no void mote list and no chip for one',
+    (await countOf(page, PANEL)) === 0 && (await countOf(page, OLD_TOGGLE)) === 0
+  )
+  await page.click(MOTES_TAB, { timeout: 15_000 })
   const listed = await until(async () => (await countOf(page, ROW)) > 0, 15_000)
   const list = await rows(page)
-  check('the Void motes chip opens a panel listing worn items', listed, `${String(list.length)} rows`)
+  check('the Void motes tab lists worn items', listed, `${String(list.length)} rows`)
+  // The list is the tab's body: it fills the height the tab has, where the old panel stopped at 216 px.
+  const box = await rectOf(page, LIST)
+  check('the list has the tab to itself', box !== null && box.h > 216, box === null ? 'no list' : `${String(Math.round(box.h))} px tall`)
 
   const sword = list.find((r) => r.name === 'Thelvorn, Blade of Light')
   check(
@@ -77,6 +88,6 @@ export async function stepGearVoidMotes(page: Page): Promise<void> {
   check('Biggest gain re-ranks the list by the gain column', sorted, (await rows(page)).map((r) => String(r.gain)).join(' '))
   await page.click(RECOMMENDED_ORDER, { timeout: 15_000 })
 
-  await page.click(TOGGLE, { timeout: 15_000 })
-  check('…and the chip closes it again', await until(async () => (await countOf(page, PANEL)) === 0, 15_000))
+  await page.click(GEAR_TAB, { timeout: 15_000 })
+  check('…and the Gear tab comes back without it', await until(async () => (await countOf(page, GEAR_VIEW)) === 1 && (await countOf(page, PANEL)) === 0, 15_000))
 }

@@ -29,6 +29,7 @@ import LootView from './features/loot/LootView'
 import LevelingView from './features/leveling/LevelingView'
 import PlannerView from './features/planner/PlannerView'
 import GearView from './features/gear/GearView'
+import VoidMoteView from './features/gear/VoidMoteView'
 // The gear area's third tab (JOS-324). A placeholder panel until JOS-326 fills it, and imported
 // plainly rather than lazily: it is a heading and two sentences, which is cheaper than the code
 // that would defer it.
@@ -172,6 +173,8 @@ function PlainView({
           tab's donor names use, so the drill's Back arrow comes home here), and the route's zone
           headings and camp mobs open the Maps tab and the mob's page, the drop trio's doors. */}
       {view === 'wishlist' && <WishlistView key={viewKey} onOpenLoot={routing.openLoot} onOpenMob={routing.openMob} onOpenMapZone={routing.openMapZone} />}
+      {/* VOID MOTES (owner, 2026-11-19): a gear-area tab. Keyed like the rest: what is worn is one character's. */}
+      {view === 'voidMotes' && <VoidMoteView key={viewKey} onOpenLoot={routing.openLoot} />}
       {view === 'buffs' && <BuffsView key={viewKey} />}
       {/* The Plan tab (its place in the gear area's tab bar comes from appViews, not this list).
           Its routes out (user rulings, 2026-08-18): item names to the Loot drill-down, zone chips

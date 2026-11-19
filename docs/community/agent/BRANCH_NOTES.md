@@ -35,10 +35,16 @@ where one exists.
   `zoneShortNameFromCatalog`.
 - Open: arrows are unvalued (DMG with no delay); two suspect rows (Oakwynd, Coldain Crossbow) top
   the RANGE slot; zone options do not respect Current era; clicking a Zone cell does not filter.
-- **Void motes panel** (2026-11-18; `shared/planner/voidMotes.ts`, `VoidMotePanel.tsx`, chip on the
-  count line, stored at `eq.gear.motes`). A void mote is Void-Touched Potential: +1 full tier on
+- **Void motes tab** (2026-11-18, a tab since 2026-11-19; `shared/planner/voidMotes.ts`,
+  `gear/VoidMoteView.tsx` hosting `VoidMotePanel.tsx`, view id `voidMotes`, stored at
+  `eq.gear.motes`). A void mote is Void-Touched Potential: +1 full tier on
   any item, 3 a week from raids (MEASURED.md, patch notes 07-28). One row per WORN item below +10
   (the hover card's `plannerInventory` join; bags and bank are not read).
+  - Where it lives: its own gear-area tab, right of Exaltations (owner, 2026-11-19: as a chip-opened
+    panel over the Gear tab's table it was a second list on the catalog page; it asks about what is
+    WORN, not about the catalog). Never put it back on the Gear tab. `VoidMotePanel` fills whatever
+    box hosts it, so another host (the Character tab) is a mount, not a rewrite. In
+    `NOT_YET_REPORTED` (`tests/telemetryContract.test.mts`) until the schema widening.
   - Gain = the role model's score at tier+1 minus tier (`roleValuer`, the Gear tab's class picks,
     default dial), or one stat's own points. Read at no banked progress: the dump states `+N` only.
   - Source = the easiest stated road: `raid` (every dropper is on the raid roster, or every drop

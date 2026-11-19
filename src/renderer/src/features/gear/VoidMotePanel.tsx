@@ -1,14 +1,16 @@
-// gear/VoidMotePanel.tsx — where to spend a void mote (Void-Touched Potential), on the Gear tab.
+// gear/VoidMotePanel.tsx — where to spend a void mote (Void-Touched Potential): the list the Void
+// motes tab draws (VoidMoteView.tsx).
 //
 // One row per WORN item below +10: what the next tier gains the chosen target, how many copies it
 // would cost without the mote, and where those copies come from. The ranking and every number are
 // `shared/planner/voidMotes.ts`; the words are `voidMotePrefs.ts`; this file only lays them out.
 //
-// OUTSIDE THE TABLE'S THREE MEMOS, like the hover card: what you wear is not a filter. It reads
-// the same `plannerInventory` join the card does (`GearCompareData`), so both say one thing about
-// the dump, and the count line above already states the dump's age.
+// It reads the same `plannerInventory` join the Gear tab's hover card does (`GearCompareData`), so
+// both say one thing about the dump.
 //
-// BOUNDED, like the table under it: the list scrolls inside its own box and never grows the page.
+// IT FILLS ITS HOST (owner, 2026-11-19: as a 216 px box over the Gear tab's table it was a second
+// list on a catalog page). The host gives it a height; the list scrolls inside and never grows the
+// page. A host that wants it short bounds the box it sits in.
 
 import { type JSX, useMemo } from 'react'
 import {
@@ -168,10 +170,8 @@ function MoteRow({ advice, rank, pick, target, onOpenLoot }: RowProps): JSX.Elem
       <TableCell align="right" data-testid="gear-motes-gain" sx={{ ...CELL, color: 'success.light' }}>
         {moteGainText(advice, target)}
       </TableCell>
-      <TableCell
-        title={opens === '' ? changes : `${changes} · ${opens}`}
-        sx={{ ...CELL, maxWidth: 360, overflow: 'hidden', textOverflow: 'ellipsis', color: 'text.secondary' }}
-      >
+      {/* Wraps: a jewel moves a dozen stats, and a cut-off list hid the half that decides. */}
+      <TableCell data-testid="gear-motes-changes" sx={{ ...CELL, whiteSpace: 'normal', color: 'text.secondary' }}>
         {opens !== '' && (
           <Box component="span" data-testid="gear-motes-opens" sx={{ color: 'primary.main', mr: 0.75 }}>
             {opens}
@@ -199,7 +199,7 @@ function emptyText(compare: GearCompareData): string {
 export interface VoidMotePanelProps {
   /** what is worn, and the corpus by key — the hover card's own join */
   compare: GearCompareData
-  /** the Gear tab's class picks, for the focus scores' class gate */
+  /** the gear area's class picks, for the focus scores' class gate */
   classes: readonly ClassAbbr[]
   motes: VoidMotePrefs
   setMotes: (next: VoidMotePrefs) => void
@@ -216,8 +216,11 @@ export default function VoidMotePanel({ compare, classes, motes, setMotes, onOpe
   const list = useMemo(() => sortMoteAdvice(advice, motes.order), [advice, motes.order])
 
   return (
-    <Box data-testid="gear-motes" sx={{ flexShrink: 0, mb: 0.5, border: 1, borderColor: 'divider', borderRadius: 1 }}>
-      <Stack direction="row" spacing={1.5} alignItems="center" sx={{ px: 1, py: 0.75 }}>
+    <Box
+      data-testid="gear-motes"
+      sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, minHeight: 0, border: 1, borderColor: 'divider', borderRadius: 1 }}
+    >
+      <Stack direction="row" spacing={1.5} alignItems="center" sx={{ px: 1, py: 0.75, flexShrink: 0 }}>
         <Typography variant="subtitle2" sx={{ flexShrink: 0 }}>
           Void motes
         </Typography>
@@ -231,7 +234,7 @@ export default function VoidMotePanel({ compare, classes, motes, setMotes, onOpe
           {emptyText(compare)}
         </Typography>
       ) : (
-        <Box data-testid="gear-motes-list" sx={{ maxHeight: 216, overflow: 'auto' }}>
+        <Box data-testid="gear-motes-list" sx={{ flexGrow: 1, minHeight: 0, overflow: 'auto' }}>
           <Table size="small" stickyHeader>
             <TableHead>
               <TableRow>

@@ -46,6 +46,9 @@ export type View =
   // you have decided you want, kept as a list rather than derived from a plan. It ships this
   // ticket as an honest placeholder panel and gains its content in JOS-326.
   | 'wishlist'
+  // VOID MOTES (owner, 2026-11-19): where a Void-Touched Potential is best spent on what you wear.
+  // A gear-area tab of its own, not a panel over the Gear tab's catalog. Not yet in `TELEMETRY_VIEWS`.
+  | 'voidMotes'
   | 'buffs'
   | 'timers'
   // FACTION STANDINGS (the third graduated `/outputfile` kind, 2026-09-05) — the tab that draws
@@ -148,6 +151,7 @@ export const VIEW_LABELS: Record<View, string> = {
   // JOS-324. Two words, as a player writes it — the tab bar says it and, the day a wish-list row
   // deep-links into Loot, so will that drill's Back button.
   wishlist: 'Wish list',
+  voidMotes: 'Void motes',
   buffs: 'Buffs',
   timers: 'Timers',
   factions: 'Factions',
@@ -191,6 +195,7 @@ const KNOWN_VIEWS: View[] = [
   'gear',
   'plan',
   'wishlist',
+  'voidMotes',
   'buffs',
   'timers',
   'factions',
@@ -262,7 +267,9 @@ export const DEFAULT_GEAR_TAB: View = 'gear'
 export const GEAR_AREA_VIEWS: readonly View[] = (
   // Character sits LEFT of Wish list, in the run with everything else (owner ruling 2026-08-13:
   // the right-pushed placement hid the tab well enough that the owner reported it missing).
-  ['gear', 'plan', 'planner', 'character', 'wishlist'] as const
+  // Void motes sits right of Exaltations (owner, 2026-11-19): both are boards about raising what
+  // you already wear, and Character stays the sheet itself.
+  ['gear', 'plan', 'planner', 'voidMotes', 'character', 'wishlist'] as const
 ).filter((v) => (KNOWN_VIEWS as readonly View[]).includes(v))
 
 /** Is this view drawn inside the gear area? (⇒ the nav row reads selected, the tab bar is up.) */

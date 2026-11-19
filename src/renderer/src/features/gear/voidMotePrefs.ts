@@ -1,7 +1,7 @@
-// gear/voidMotePrefs.ts — what the Gear tab's void mote panel remembers, and the words it uses.
+// gear/voidMotePrefs.ts — what the Void motes tab remembers, and the words it uses.
 //
 // PURE AND NODE-TESTED (the `gearPrefs.ts` precedent): relative value imports, no React. Stored
-// beside the tab's other shape choices (`useGearPrefs`), validated on every read.
+// by `useVoidMotePrefs` (useGearPrefs.ts), validated on every read.
 
 import type { GearStatKey } from '../../../../shared/planner/gear'
 import type { GearRole } from '../../../../shared/planner/roleWeights'
@@ -14,30 +14,30 @@ import {
   type MoteTarget
 } from '../../../../shared/planner/voidMotes'
 import { ROLE_LABEL } from '../plan/planBlurb'
-import { PLAN_ROLES, sanitizeFlag } from './areaMemory'
+import { PLAN_ROLES } from './areaMemory'
 import { columnLabel, statText } from './gearColumns'
 
 export interface VoidMotePrefs {
-  /** the panel is drawn */
-  open: boolean
   /** what a gain is measured in: a focus, or one stat */
   target: MoteTarget
   order: MoteOrder
 }
 
-/** Closed until asked for; the Gear tab's own BEST column is the balanced focus, so it leads. */
-export const DEFAULT_MOTE_PREFS: VoidMotePrefs = { open: false, target: 'balanced', order: 'recommended' }
+/** The Gear tab's own BEST column is the balanced focus, so it leads. */
+export const DEFAULT_MOTE_PREFS: VoidMotePrefs = { target: 'balanced', order: 'recommended' }
 
 /** The picker's two groups, in the order it draws them. */
 export const MOTE_TARGET_ROLES: readonly GearRole[] = PLAN_ROLES
 export const MOTE_TARGETS: readonly MoteTarget[] = [...PLAN_ROLES, ...MOTE_TARGET_STATS]
 
-/** A stored panel choice; each field falls back alone, so one bad value does not reset the rest. */
+/**
+ * A stored choice; each field falls back alone, so one bad value does not reset the rest. A value
+ * from the days the list was a panel on the Gear tab carries `open` too: it is ignored.
+ */
 export function sanitizeMotePrefs(raw: unknown): VoidMotePrefs {
   if (typeof raw !== 'object' || raw === null) return DEFAULT_MOTE_PREFS
   const o = raw as Record<string, unknown>
   return {
-    open: sanitizeFlag(o.open, DEFAULT_MOTE_PREFS.open),
     target: MOTE_TARGETS.find((t) => t === o.target) ?? DEFAULT_MOTE_PREFS.target,
     order: MOTE_ORDERS.find((v) => v === o.order) ?? DEFAULT_MOTE_PREFS.order
   }
