@@ -23,6 +23,12 @@ const RESPAWN_MAX_LEARNED_GAPS: usize = 50;
 /// few hundred KB at the very worst. It also bounds what is published: every mob with a gap is, so
 /// an archived log's one or two gaps can join the live log's (the reader asks for three).
 const MAX_LEARNED_STORE: usize = 1_000;
+/// Gaps agree when this many sit this close (`respawnLearn.ts constantRespawn`, three inside 50 s).
+const AGREE_LEAST: usize = 3;
+const AGREE_WITHIN_MS: i64 = 50_000;
+/// Under this they are two spawns sharing the name (`respawnLearn.ts`). Tested on the window's
+/// lowest gap where that file tests its peak: stricter at the boundary, on purpose.
+const AGREE_SUSPECT_UNDER_MS: i64 = 120_000;
 
 /// One mob's gaps.
 #[derive(Debug, Clone)]
@@ -131,6 +137,22 @@ impl LearnedStore {
             min = least(min, above.min());
         }
         (min, count)
+    }
+
+    /// The gap the mob's kills agree on: the lowest gap of `floor` or more with `AGREE_LEAST` of
+    /// them inside `AGREE_WITHIN_MS` above it, pooled as `pooled` pools. `None` while they do not
+    /// agree. It lowers a longer wiki time under the clock (`respawn_wiki.rs floor_of`, fork #8).
+    pub fn agreed(&self, key: &str, same_zone: impl Fn(&str) -> bool, floor: i64) -> Option<i64> {
+        let mut gaps: Vec<i64> = self
+            .map
+            .values()
+            .filter(|e| e.key == key && same_zone(&e.zone))
+            .flat_map(|e| e.gaps.iter().copied())
+            .filter(|g| *g >= floor)
+            .collect();
+        gaps.sort_unstable();
+        let lowest = gaps.windows(AGREE_LEAST).find(|w| w[AGREE_LEAST - 1] - w[0] <= AGREE_WITHIN_MS)?[0];
+        (lowest >= AGREE_SUSPECT_UNDER_MS).then_some(lowest)
     }
 
     /// Every mob with a gap, most recently learned first, each with what its wiki page says.

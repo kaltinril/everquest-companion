@@ -36,6 +36,7 @@
 // against it: the estimate is never allowed below what the wiki states. It is not consulted for
 // anything else, and where the wiki says nothing (85% of the mobs in the dungeons this ticket
 // targets — see respawnWiki.ts for the measurement) rung 2 stands alone.
+// Since fork #8 three agreeing gaps (`agreedMs`) lower that floor to themselves, never raise it.
 //
 // WHAT THE APP NEVER DOES. It never claims the mob IS up: it says the clock ran out. A spawn
 // this app did not see cannot be reported, a placeholder cycle can put the trash mob there
@@ -587,6 +588,8 @@ export interface RespawnEvidence {
   samples: number
   /** Rung 3 — the wiki's stated duration, in ms. Absent when it states none. */
   wikiMs?: number
+  /** The gap three or more kills agree on (`respawn_learned.rs agreed`): under `wikiMs`, it is rung 2's floor. */
+  agreedMs?: number
 }
 
 export interface RespawnEstimate {
@@ -603,7 +606,9 @@ export interface RespawnEstimate {
 export function resolveRespawn(ev: RespawnEvidence): RespawnEstimate {
   if (ev.customMs !== undefined && ev.customMs > 0) return { estimateMs: ev.customMs, source: 'custom' }
   if (ev.observedMs !== undefined && ev.observedMs > 0 && ev.samples > 0) {
-    const floored = ev.wikiMs !== undefined ? Math.max(ev.observedMs, ev.wikiMs) : ev.observedMs
+    // Agreeing kills lower a longer wiki floor (fork #8); they never raise one and never make one.
+    const floor = ev.wikiMs === undefined ? undefined : Math.min(ev.wikiMs, ev.agreedMs ?? ev.wikiMs)
+    const floored = floor !== undefined ? Math.max(ev.observedMs, floor) : ev.observedMs
     return { estimateMs: floored, source: 'observed' }
   }
   if (ev.wikiMs !== undefined && ev.wikiMs > 0) return { estimateMs: ev.wikiMs, source: 'wiki' }
@@ -671,6 +676,8 @@ export interface RespawnRow {
   /** The wiki's verbatim text, when it has one — shown as-is, including "Triggered" and "?". */
   wikiText?: string
   wikiMs?: number
+  /** The gap the kills agree on, when they do (`RespawnEvidence.agreedMs`). */
+  agreedMs?: number
   /**
    * THE PAGE THOSE WORDS CAME FROM (round 9) — the committed floor's own `WikiRespawn.page`, which
    * the scrape has carried since it was written and which nothing had ever read. Present exactly
@@ -935,12 +942,17 @@ export function orderRespawnRows(rows: readonly RespawnRow[], nowMs: number): Re
   })
 }
 
+/** The kills agree on a gap under the wiki time: that gap, not the wiki, is the floor in force. */
+function agreedUnderWiki(row: RespawnRow): boolean {
+  return row.agreedMs !== undefined && row.wikiMs !== undefined && row.agreedMs < row.wikiMs
+}
+
 /**
  * Did the wiki floor LIFT this row's estimate above what your own kills said? True only when both
  * numbers exist and the wiki's is the larger — i.e. when the guard in the header actually fired.
  */
 export function respawnFloored(row: RespawnRow): boolean {
-  if (row.source !== 'observed') return false
+  if (row.source !== 'observed' || agreedUnderWiki(row)) return false
   return row.observedMs !== undefined && row.wikiMs !== undefined && row.wikiMs > row.observedMs
 }
 
@@ -1000,6 +1012,7 @@ export function respawnCalculated(row: RespawnRow): RespawnRow {
   const ev: RespawnEvidence = { samples: row.samples }
   if (row.observedMs !== undefined) ev.observedMs = row.observedMs
   if (row.wikiMs !== undefined) ev.wikiMs = row.wikiMs
+  if (row.agreedMs !== undefined) ev.agreedMs = row.agreedMs
   const est = resolveRespawn(ev)
   const out: RespawnRow = { ...row, source: est.source }
   delete out.customMs
@@ -1035,6 +1048,7 @@ export function respawnProvenance(row: RespawnRow, fmt: (ms: number | null | und
   }
   if (row.wikiText !== undefined) parts.push(`Wiki: "${row.wikiText}".`)
   if (respawnFloored(row)) parts.push('The wiki floor lifted it.')
+  if (row.source === 'observed' && agreedUnderWiki(row)) parts.push('Your kills agree, so the wiki time is not used.')
   if (row.basis === 'sighting') parts.push('Re-based on a sighting you confirmed.')
   parts.push(`Killed ${String(row.kills)} time${row.kills === 1 ? '' : 's'} here.`)
   return parts.join(' ')
