@@ -16,7 +16,7 @@
  * subject of steps 3 to 5 below: a destroy line arriving in the tailed log while the tab is open.
  *
  * WHY THIS NEEDS A REAL APP. The arithmetic is pure and pinned without a browser
- * (tests/skyCleanup.test.mts drives the cases, tests/lootDispositionWindows.test.mts the fold on
+ * (tests/skyCleanupOverride.test.mts drives the cases, tests/lootDispositionWindows.test.mts the fold on
  * real bytes, tests/skyItemOverrides.test.mts the witness discount per count source). What no unit
  * test can see is the WIRING: the log line → the parser → the LootModule's LIVE delta → the held
  * counts → `reconcile` → the cleanup model → a tab whose COUNT is computed above the pane it
@@ -112,6 +112,12 @@ const NAME_LINK = `${ROW} [data-testid="posky-item-link"]`
 /** …so the REWARD carries a handle of its own, because it is the one this spec is about. */
 const REWARD_LINK = `${ROW} [data-testid="posky-cleanup-reward"] [data-testid="posky-item-link"]`
 const POPPER = '.MuiTooltip-popper'
+/** The quest row's hand-count pencil, drawn on the Cleanup row too (upstream #73). */
+const ROW_EDIT = `${ROW} [data-testid="posky-item-count-edit"]`
+const ROW_INPUT = `${ROW} [data-testid="posky-item-count-input"] input`
+const ROW_SAVE = `${ROW} [data-testid="posky-item-count-save"]`
+const OVERRIDE_CLEAR = '[data-testid="posky-item-override"] .MuiChip-deleteIcon'
+const OVERRIDES_ACTIVE = '[data-testid="posky-overrides-active"]'
 /** The count-source control, which STAYS - it is the strategy, not a refresh. */
 const SOURCE = '[data-testid="posky-count-source"]'
 /** Everything JOS-401 removed. Asserted as an ABSENCE, once, so a revert cannot pass quietly. */
@@ -499,6 +505,49 @@ async function stepRewardHovers(page: Page): Promise<void> {
 }
 
 /**
+ * STEP 4b — THE PENCIL ON THE ROW (upstream #73): state 0 here and the row leaves; take it back on
+ * the quest row and it returns.
+ *
+ * The row reads x3 going in and x3 coming out, so steps 5 and 6 see the numbers they always did.
+ * The statement is made after the loot and the turn-in, so nothing counts on top of it or off it.
+ */
+async function stepHandCountOnTheRow(page: Page): Promise<boolean> {
+  await page.click(ROW_EDIT, { timeout: 15_000 })
+  const filled = await settle(
+    () => page.inputValue(ROW_INPUT).catch(() => null),
+    (v) => v === '3',
+    { timeoutMs: 15_000 }
+  )
+  check('the Cleanup row`s pencil opens on the held count', filled === '3', String(filled))
+  await page.fill(ROW_INPUT, '0')
+  await page.click(ROW_SAVE, { timeout: 15_000 })
+  const gone = await settleCountOf(page, null)
+  if (
+    !check(
+      'STATING 0 ON THE CLEANUP ROW TAKES IT OFF THE TAB',
+      gone.length === 0,
+      gone.map((r) => `${r.item} x${String(r.count)}`).join(', ')
+    )
+  ) {
+    return false
+  }
+  check('…the tab drops its count', (await tabLabel(page)) === 'Cleanup', await tabLabel(page))
+  check('…and the tab says one count is set by hand', (await countOf(page, OVERRIDES_ACTIVE)) === 1)
+
+  // The take-back is the chip on the quest row: the Cleanup row that carried the pencil is gone.
+  if (!(await reopenTheQuestPanel(page))) return false
+  await page.click(OVERRIDE_CLEAR, { timeout: 15_000 })
+  if (!(await openCleanup(page))) return false
+  const back = await settleCountOf(page, 3)
+  check('…and no chip is left on the Cleanup tab', (await countOf(page, OVERRIDES_ACTIVE)) === 0)
+  return check(
+    'CLEARING THE STATEMENT ON THE QUEST ROW PUTS THE ROW BACK AT x3',
+    back.length === 1 && back[0].count === 3,
+    back.map((r) => `${r.item} x${String(r.count)}`).join(', ')
+  )
+}
+
+/**
  * STEP 5 — THE LOG SAYS YOU DESTROYED ONE, AND THE COUNT GOES DOWN. Live, with no button.
  *
  * The refarm left the row at x3, so there is something for both witnesses to lose: one destroy line
@@ -562,7 +611,7 @@ async function stepFloorEndsTheRow(page: Page, log: FixtureLog): Promise<void> {
 }
 
 /**
- * The six steps, each gating the next — written as early returns rather than as nested ifs, which
+ * The steps, each gating the next — written as early returns rather than as nested ifs, which
  * is also what keeps this file inside the measured `max-depth`. A step that could not establish its
  * own precondition has already said so through `check`; there is nothing to add here.
  */
@@ -575,6 +624,7 @@ async function arc(page: Page, app: ElectronApplication, log: FixtureLog): Promi
   // screen a player decides from. Opt-in (see `captureTab`) - an ordinary run writes no PNG.
   await captureTab(app, 'sky-cleanup-tab')
   await stepRewardHovers(page)
+  if (!(await stepHandCountOnTheRow(page))) return
   if (!(await stepDestroyLowersIt(page, log))) return
   await stepFloorEndsTheRow(page, log)
 }

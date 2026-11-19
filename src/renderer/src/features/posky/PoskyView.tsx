@@ -396,6 +396,8 @@ function PoskyBody(x: PoskyBodyProps): JSX.Element {
         onCountSource={onCountSource}
         inventoryLoadedAt={inventoryLoadedAt}
         onOpenLoot={x.onOpenLoot}
+        itemOverrides={x.itemOverrides}
+        setItemCount={rows.setItemCount}
       />
     )
   }
