@@ -35,6 +35,22 @@ where one exists.
   `zoneShortNameFromCatalog`.
 - Open: arrows are unvalued (DMG with no delay); two suspect rows (Oakwynd, Coldain Crossbow) top
   the RANGE slot; zone options do not respect Current era; clicking a Zone cell does not filter.
+- **Void motes panel** (2026-11-18; `shared/planner/voidMotes.ts`, `VoidMotePanel.tsx`, chip on the
+  count line, stored at `eq.gear.motes`). A void mote is Void-Touched Potential: +1 full tier on
+  any item, 3 a week from raids (MEASURED.md, patch notes 07-28). One row per WORN item below +10
+  (the hover card's `plannerInventory` join; bags and bank are not read).
+  - Gain = the role model's score at tier+1 minus tier (`roleValuer`, the Gear tab's class picks,
+    default dial), or one stat's own points. Read at no banked progress: the dump states `+N` only.
+  - Source = the easiest stated road: `raid` (every dropper is on the raid roster, or every drop
+    zone is one the roster names a category after: the planes), `high` (easiest camp states level
+    45+), `farm`, else `crafted` / `quest` / `unknown` when no mob is listed. A camp with no stated
+    level is never `high`.
+  - Recommended = gain x (1 + tier + source steps); steps raid 3, quest and high 2, crafted 1,
+    farm and unknown 0 (`MOTE_SOURCE_STEPS`). Heuristic: a tier is one doubling of copies, a step
+    is one more. A row whose target gains nothing sinks in every order. Top 3 gaining rows are the
+    picks.
+  - Not modelled: spells (a mote lifts a spell rank too), the worn copy being replaced soon,
+    D1-D4 drops arriving pre-plussed, ordinary motes as the other road to a tier.
 
 ## Maps (was map-improvements)
 
