@@ -726,6 +726,14 @@ where one exists.
   creator's file: left as it is, recorded here.
 - The icon box is placed from the `Class`/`Race` word itself (`ocr.ts` `LABEL_WORD`): OCR junk off
   the icon can be a real-looking word (`By`).
+- The icon box's size is the line pitch at `Race:` (`readItemShot.ts pitchAt`: Race minus the row
+  above it), never Class to Race: a class list that wraps (ten classes) puts a row between them.
+  The Class row is the LAST line with the word above Race: a name can hold it (`CLASS 1 Steel Hooked
+  Arrow`). Checking a box change: both trees' `iconRegion` on every kept picture's lines, then
+  `readItemShot` only where the box moved (2026-11-18: 217 pictures, 4 moved, ~3 min).
+  TRAP: the box has ~2 px to spare on the left. The pane's border line 1 px inside it stretches the
+  query's content box to the full height and every score ties near 600 (a clear win is under ~350
+  against 1,000+). A near-tie at 600 means the box, not the matcher.
 - Auto-find anchor: the selected tab's yellow label, `max(r,g)>=100 && b*3<r && g>=0.6r`; its height
   sets the scale. Each yellow word's own text is OCR'd first (a crop, ~10 ms) and only `Description`
   / `Lore` (`isTabWord`) gets the full read: by shape alone, chat titles, map buttons and gauges
