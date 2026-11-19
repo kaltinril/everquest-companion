@@ -28,6 +28,7 @@
 
 import { settingsStore } from './store'
 import { normalizeRespawnPrefs, type RespawnPrefs } from '../shared/respawn'
+import { normalizeRespawnAlert, type RespawnAlertSetting } from '../shared/respawnAlert'
 
 /** The respawn watch list, defaulted. Never throws, never returns a partial. */
 export function getRespawnPrefs(): RespawnPrefs {
@@ -43,5 +44,17 @@ export function getRespawnPrefs(): RespawnPrefs {
 export function setRespawnPrefs(next: unknown): RespawnPrefs {
   const clean = normalizeRespawnPrefs(next)
   settingsStore.set('respawn', clean)
+  return clean
+}
+
+/** The alert before a respawn, defaulted (off, 20 s). */
+export function getRespawnAlert(): RespawnAlertSetting {
+  return normalizeRespawnAlert(settingsStore.get('respawnAlert'))
+}
+
+/** Store the setting the renderer sent; returns what was actually stored. */
+export function setRespawnAlert(next: unknown): RespawnAlertSetting {
+  const clean = normalizeRespawnAlert(next)
+  settingsStore.set('respawnAlert', clean)
   return clean
 }
