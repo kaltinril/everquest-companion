@@ -262,8 +262,12 @@ Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`)
   (Adaptive)` ... `4 (Refined)`, `/pickzone` between them, 5 min apart) against a private instance
   (`Player <You> creating instance <Zone> <Id>.`, one at a time, the next closes the last, every mob
   up at creation), the difficulty +0 to +4 on either. A dungeon crawl is the `<Zone> - Group[ N
-  (Adj)]` zone line (the log's only crawl shape; `You have completed the Dungeon Crawl` follows);
-  nothing respawns inside. The respawn time is the same in every place of a zone (owner).
+  (Adj)]` zone line (`You have completed the Dungeon Crawl` follows); nothing respawns inside.
+  Not the only crawl shape (2026-11-18): a crawl run from a private instance keeps the plain zone
+  line. `Player Drywrought creating instance The Ruins of Old Guk 257.` at 23:28:21, `You have
+  entered The Ruins of Old Guk.` at 23:28:40, then `You have completed the Dungeon Crawl and earned
+  reward loot!` at 00:01:47 with no `- Group` line anywhere. A crawl flag read from the zone line
+  alone misses it; the completion line is the sure sign. The respawn time is the same in every place of a zone (owner).
 - **Respawn across a visit elsewhere runs longer** (Corrupted Kedgespawn, open-world Lake Nerius 4,
   2026-11-03): death to first sighting 12:11-13:15 in one stay; 14:55-15:03 when you left the zone
   and came back (the owner waiting at the spawn).
