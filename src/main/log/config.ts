@@ -10,6 +10,7 @@ import {
   dirHasCharacterLogs,
   discoverEqRoot,
   fixedDrives,
+  keptRootIsGood,
   logIsUnderLogsDir,
   normalizeEqDirOverride,
   readLogsDir,
@@ -119,7 +120,7 @@ function realProbes(): DiscoveryProbes {
  *     RE-VALIDATED with `rootHasLogs` — one readdir — so an install that moves or is uninstalled
  *     under us re-probes immediately rather than serving a dead path forever. A root that fails
  *     that re-check is KEPT unless the sweep finds another (fork #9: a drive that drops out for a
- *     moment comes back), and the sweep is not repeated inside a minute.
+ *     moment comes back), and neither its re-check nor the sweep is repeated inside a minute.
  *   * ACROSS LAUNCHES: a POSITIVE result is persisted (`eqDiscoveredRoot` in the store) so the very
  *     next launch skips the whole sweep — `resolveDiscoveredRoot` (discovery.ts) revalidates it
  *     with the same one readdir, drops it if it no longer holds, and NEVER persists a null.
@@ -170,7 +171,8 @@ export function invalidateEqDiscovery(): void {
  */
 export function refreshEqDiscoveryCheaply(): void {
   if (getEqInstallDir()?.trim()) return
-  if (discovery.root && rootHasLogs(discovery.root)) return
+  // Not `rootHasLogs(root)` alone: a root marked bad is not read on every tick (keptRootIsGood).
+  if (keptRootIsGood(discovery, rootHasLogs)) return
   const found = discoverEqRoot({
     hasLogs: rootHasLogs,
     extraCandidates: envCandidates,

@@ -15,10 +15,12 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import {
   NO_DISCOVERY,
   SWEEP_AGAIN_MS,
   discoverEqRoot,
+  keptRootIsGood,
   recheckDiscoveredRoot,
   resolveDiscoveredRoot,
   type CachedRootDeps,
@@ -185,19 +187,25 @@ test('discoverEqRoot: a filtered (non-fixed) drive is never probed at all', () =
 /** A run of re-checks over one mutable world: which roots have logs now, and what a sweep finds. */
 function run(start: { good: string[]; sweepFinds?: string | null; persisted?: string | null }): {
   world: { good: string[]; sweepFinds: string | null; clock: number }
-  log: { swept: number; persisted: string[]; dropped: number }
+  /** `looked`: how many times a root's Logs folder was read (one synchronous readdir each). */
+  log: { swept: number; persisted: string[]; dropped: number; looked: number }
+  memo(): DiscoveryMemo
   check(): string | null
 } {
   const world = { good: start.good, sweepFinds: start.sweepFinds ?? null, clock: 1_000_000 }
-  const log = { swept: 0, persisted: [] as string[], dropped: 0 }
+  const log = { swept: 0, persisted: [] as string[], dropped: 0, looked: 0 }
   let memo: DiscoveryMemo = NO_DISCOVERY
   return {
     world,
     log,
+    memo: () => memo,
     check: () => {
       memo = recheckDiscoveredRoot(memo, {
         persisted: start.persisted ?? null,
-        hasLogs: (root) => world.good.includes(root),
+        hasLogs: (root) => {
+          log.looked++
+          return world.good.includes(root)
+        },
         sweep: () => {
           log.swept++
           return world.sweepFinds
@@ -235,11 +243,64 @@ test('recheckDiscoveredRoot: A ROOT THAT FAILS ONE RE-CHECK IS KEPT, and is foun
   assert.equal(r.check(), D_ROOT, 'a drive that dropped out for a moment sent the app to the default path')
   assert.equal(r.log.swept, 1, 'the machine is still swept once, in case the install moved')
   assert.equal(r.log.dropped, 0, 'the remembered root was thrown away over one failed look')
-  // It comes back: the next cycle's one readdir finds it, with no sweep.
+  // It comes back: the kept root is the answer on the next cycle, with no sweep.
   r.world.good = [D_ROOT]
   r.world.clock += 5_000
   assert.equal(r.check(), D_ROOT)
   assert.equal(r.log.swept, 1)
+})
+
+test('recheckDiscoveredRoot: A ROOT KNOWN BAD IS READ ONCE A MINUTE, not on every 5 s cycle', () => {
+  // The install is on a share that went offline: each read of it can block main for the SMB
+  // timeout. Before the root was kept it became null and was never read again; kept, it was read
+  // on every cycle for the rest of the run.
+  const r = run({ good: [D_ROOT], persisted: D_ROOT })
+  r.check()
+  r.world.good = []
+  r.check()
+  const after = r.log.looked
+  for (let i = 0; i < 11; i += 1) {
+    r.world.clock += 5_000
+    assert.equal(r.check(), D_ROOT)
+  }
+  assert.equal(r.log.looked, after, 'a dead root was read again inside the minute')
+  assert.equal(r.log.swept, 1)
+  // The minute is up: one read, and (still bad) one sweep.
+  r.world.clock += 5_000
+  assert.equal(r.check(), D_ROOT)
+  assert.equal(r.log.looked, after + 1)
+  assert.equal(r.log.swept, 2)
+  // Back: the next look after the minute clears the mark with one read and no sweep, and a good
+  // root is then read every cycle again.
+  r.world.good = [D_ROOT]
+  r.world.clock += SWEEP_AGAIN_MS
+  assert.equal(r.check(), D_ROOT)
+  assert.equal(r.memo().sweptAt, null)
+  assert.equal(r.log.swept, 2)
+  r.world.clock += 5_000
+  r.check()
+  assert.equal(r.log.looked, after + 3)
+})
+
+test('keptRootIsGood: the idle rescan does not read a root this run knows is bad', () => {
+  const looked: string[] = []
+  const hasLogs = (root: string): boolean => {
+    looked.push(root)
+    return true
+  }
+  assert.equal(keptRootIsGood({ root: D_ROOT, sweptAt: null }, hasLogs), true)
+  assert.deepEqual(looked, [D_ROOT])
+  // Marked bad by a failed re-check: no read, and the rescan goes on to look elsewhere.
+  assert.equal(keptRootIsGood({ root: D_ROOT, sweptAt: 1_000_000 }, hasLogs), false)
+  assert.deepEqual(looked, [D_ROOT], 'the dead root was read on a rescan tick')
+  // Nothing remembered: nothing to read.
+  assert.equal(keptRootIsGood(NO_DISCOVERY, hasLogs), false)
+  assert.equal(keptRootIsGood({ root: null, sweptAt: null }, hasLogs), false)
+  assert.equal(keptRootIsGood({ root: D_ROOT, sweptAt: null }, () => false), false)
+  // config.ts cannot be loaded here (electron-store): its rescan is read from source.
+  const config = readFileSync(new URL('../src/main/log/config.ts', import.meta.url), 'utf8')
+  assert.match(config, /if \(keptRootIsGood\(discovery, rootHasLogs\)\) return/)
+  assert.doesNotMatch(config, /rootHasLogs\(discovery\.root\)/)
 })
 
 test('recheckDiscoveredRoot: THE SWEEP IS NOT RUN TWICE INSIDE 60 s while the root stays bad', () => {
@@ -256,10 +317,12 @@ test('recheckDiscoveredRoot: THE SWEEP IS NOT RUN TWICE INSIDE 60 s while the ro
   // A minute after the last sweep it may look again.
   assert.equal(r.check(), D_ROOT)
   assert.equal(r.log.swept, 2)
-  // A root that came good and went bad again is a new failure: the clock starts over.
+  // A root seen good again and then bad is a new failure: the clock starts over.
   r.world.good = [D_ROOT]
+  r.world.clock += SWEEP_AGAIN_MS
   r.check()
   r.world.good = []
+  r.world.clock += 5_000
   r.check()
   assert.equal(r.log.swept, 3)
 })

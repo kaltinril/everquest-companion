@@ -437,18 +437,31 @@ export type RecheckDeps = CachedRootDeps & { readonly now: () => number }
  *      restart: a drive that dropped out for a moment left the app on the default path. The sweep
  *      still runs, at most once per `SWEEP_AGAIN_MS`, and only a root it FINDS replaces the kept
  *      one. The persisted root is left alone: the next launch re-validates it by itself.
+ *   5. A ROOT KNOWN BAD IS NOT READ AGAIN INSIDE THAT FLOOR EITHER. Its readdir is synchronous on
+ *      main and can block for the SMB timeout on a share that went offline; kept, it would be
+ *      read on every cycle for the rest of the run. Nothing is lost: the kept root is the answer
+ *      either way, so a drive that came back is in use at once.
  */
 export function recheckDiscoveredRoot(memo: DiscoveryMemo, deps: RecheckDeps): DiscoveryMemo {
   const kept = memo.root
   if (kept === undefined) return { root: resolveDiscoveredRoot(deps), sweptAt: null }
   if (kept === null) return memo
-  if (deps.hasLogs(kept)) return memo.sweptAt === null ? memo : { root: kept, sweptAt: null }
   if (memo.sweptAt !== null && deps.now() - memo.sweptAt < SWEEP_AGAIN_MS) return memo
+  if (deps.hasLogs(kept)) return memo.sweptAt === null ? memo : { root: kept, sweptAt: null }
   const found = deps.sweep()
   // Stamped after the sweep: a sweep that ran out its ceiling is not due again 54 s later.
   if (found === null) return { root: kept, sweptAt: deps.now() }
   deps.persist(found)
   return { root: found, sweptAt: null }
+}
+
+/**
+ * Does the root this run remembers still have logs? One readdir, and none for a root marked bad
+ * (`sweptAt`): `recheckDiscoveredRoot` is what reads that one again, on its floor.
+ */
+export function keptRootIsGood(memo: DiscoveryMemo, hasLogs: (root: string) => boolean): boolean {
+  if (memo.root === undefined || memo.root === null || memo.root === '') return false
+  return memo.sweptAt === null && hasLogs(memo.root)
 }
 
 // ---------------------------------------------------------------------------
