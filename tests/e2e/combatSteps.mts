@@ -714,10 +714,17 @@ export async function stepPetAnswersWhoLeads(page: Page, log: FixtureLog): Promi
   })
   const heir = petRowFor(after, PET_LEADER_NAME)
   if (!check('a pet that NAMES YOU ITS LEADER lands on the meter', !!heir, heir ? heir.name : 'no row')) return
+  // The answer moves the earlier hit onto the row at once, so the row can exist before the later
+  // hit folds. Read the total only after it has held still for longer than one tail poll (400 ms):
+  // by then the retired pet's swing has folded too, so a leak onto this row would show.
+  const total = await settleStable(
+    () => snapshot(page).then((s) => petRowFor(s, PET_LEADER_NAME)?.total ?? -1),
+    { timeoutMs: 10_000, stable: 5, pollMs: 200 }
+  )
   check(
     '…and the hit before the answer moves onto its row — nothing it swung is dropped (owner, 2026-10-28)',
-    heir?.total === PET_LEADER_UNBOUND_DAMAGE + PET_LEADER_BOUND_DAMAGE,
-    `${String(heir?.total ?? 0)} of ${String(PET_LEADER_UNBOUND_DAMAGE + PET_LEADER_BOUND_DAMAGE)} (${String(PET_LEADER_UNBOUND_DAMAGE)} before the answer + ${String(PET_LEADER_BOUND_DAMAGE)} after)`
+    total === PET_LEADER_UNBOUND_DAMAGE + PET_LEADER_BOUND_DAMAGE,
+    `${String(total)} of ${String(PET_LEADER_UNBOUND_DAMAGE + PET_LEADER_BOUND_DAMAGE)} (${String(PET_LEADER_UNBOUND_DAMAGE)} before the answer + ${String(PET_LEADER_BOUND_DAMAGE)} after)`
   )
   // ONE PET AT A TIME (JOS-54), through the whole product: binding the successor retired the
   // predecessor, so its LATER swing is nobody's — while everything it earned while it was yours
