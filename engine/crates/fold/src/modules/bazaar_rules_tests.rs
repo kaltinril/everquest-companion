@@ -238,3 +238,61 @@ fn a_guess_is_listed_but_not_counted() {
         [true, false]
     );
 }
+
+fn sure(msg: &str) -> Vec<bool> {
+    let ix = ItemIndex::new(NAMES.iter().map(|s| s.to_string()));
+    parse_trade(msg, &ix).iter().map(|o| o.sure).collect()
+}
+
+/// Bug hunt, 2026-11-19: `1,500pp` was split at its comma and counted as 500pp, and `1,000pp` as 0.
+#[test]
+fn a_comma_in_a_price_is_its_thousands() {
+    assert_eq!(
+        read("WTS Fleeting Quiver 1,000pp"),
+        ["sell Fleeting Quiver 1000pp"]
+    );
+    assert_eq!(
+        read("WTS Fleeting Quiver 1,500pp"),
+        ["sell Fleeting Quiver 1500pp"]
+    );
+    assert_eq!(
+        read("wtb Fleeting Quiver 12,500 pp"),
+        ["buy Fleeting Quiver 12500pp"]
+    );
+    assert_eq!(
+        read("WTS Fleeting Quiver 1,250,000 plat"),
+        ["sell Fleeting Quiver 1250000pp"]
+    );
+    assert_eq!(sure("WTS Fleeting Quiver 1,500pp"), [true]);
+    // With no unit it is still a price with no unit: listed, not counted.
+    assert_eq!(
+        read("WTS Fleeting Quiver 1,500"),
+        ["sell Fleeting Quiver 1500pp"]
+    );
+    assert_eq!(sure("WTS Fleeting Quiver 1,500"), [false]);
+    // A comma between two numbers that are not one number still parts them.
+    assert_eq!(
+        read("WTS Bone Chips 580, 10p each"),
+        ["sell Bone Chips 10pp"]
+    );
+    assert_eq!(
+        read("WTS Fleeting Quiver +4,500pp"),
+        ["sell Fleeting Quiver +4 500pp"]
+    );
+    assert_eq!(
+        read("WTS Fleeting Quiver 5k,Bone Chips 10pp"),
+        ["sell Fleeting Quiver 5000pp", "sell Bone Chips 10pp"]
+    );
+}
+
+/// A price of nothing is no price: the offer is listed with none, never counted at 0.
+#[test]
+fn a_zero_price_is_no_price() {
+    assert_eq!(read("WTS Fleeting Quiver 0pp"), ["sell Fleeting Quiver"]);
+    assert_eq!(read("WTS Fleeting Quiver 0k"), ["sell Fleeting Quiver"]);
+    assert_eq!(read("WTS Fleeting Quiver 000pp"), ["sell Fleeting Quiver"]);
+    assert_eq!(
+        read("WTS Bone Chips 20 copper each"),
+        ["sell Bone Chips 0.02pp"]
+    );
+}
