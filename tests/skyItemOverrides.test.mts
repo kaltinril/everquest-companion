@@ -40,6 +40,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import {
   MAX_ITEM_OVERRIDES,
   MAX_OVERRIDE_COUNT,
@@ -66,6 +67,7 @@ import { readyQuests } from '../src/renderer/src/features/posky/questCompletion'
 import type { QuestProgress } from '../src/renderer/src/features/posky/useProgress'
 import { questKey } from '../src/renderer/src/features/posky/keys'
 import { itemCountKey } from '../src/renderer/src/lib/itemName'
+import { COUNT_SOURCE_LABEL, handCountChipTitle } from '../src/renderer/src/features/posky/handCountWords'
 import type { CountSource, ItemCountOverride, LootEvent, PoskyQuest } from '../src/shared/types'
 
 // A hand-built two-item quest, for the reason tests/questTurnIns.test.mts states: the claim is
@@ -556,4 +558,17 @@ test('passing the new inputs EMPTY is byte-identical to omitting them', () => {
       `${countSource}: the three shipped sources are untouched by the machinery around them`
     )
   }
+})
+
+test('the By hand chip`s hover is true under every count source: it names the setting, not the witnesses', () => {
+  const title = handCountChipTitle(5, 'a date')
+  assert.ok(title.startsWith('You stated 5 of these on a date. '), title)
+  assert.ok(title.endsWith(`Remove this to go back to the count your "${COUNT_SOURCE_LABEL}" setting gives.`), title)
+  // Before 2026-11-19 it ended "counting from the log and the export", untrue under Export only and Log only.
+  assert.doesNotMatch(title, /the log and the export|from the log|from the export/)
+  assert.ok(!title.includes(String.fromCharCode(0x2013)) && !title.includes(String.fromCharCode(0x2014)), 'a dash character')
+  // The setting is named by the label its own control shows.
+  const bar = readFileSync(new URL('../src/renderer/src/features/posky/QuestFilterBar.tsx', import.meta.url), 'utf8')
+  assert.ok(bar.includes('label={COUNT_SOURCE_LABEL}'), 'the control no longer takes its label from the shared constant')
+  assert.equal(COUNT_SOURCE_LABEL, 'Count items from')
 })
