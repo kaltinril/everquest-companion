@@ -11,7 +11,13 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { applyItemOverride, clearItemOverride, itemOverridesByKey } from '../src/shared/itemOverrides'
 import { reconcile, type ReconcileInput } from '../src/renderer/src/features/inventory/reconcile'
-import { cleanupRows, type CleanupQuest, type CleanupRow } from '../src/renderer/src/features/posky/cleanup'
+import {
+  cleanupRows,
+  decisionLine,
+  setsLine,
+  type CleanupQuest,
+  type CleanupRow
+} from '../src/renderer/src/features/posky/cleanup'
 import { questKey } from '../src/renderer/src/features/posky/keys'
 import { itemCountKey } from '../src/renderer/src/lib/itemName'
 import type { ItemCountOverride, PoskyQuest } from '../src/shared/types'
@@ -96,6 +102,35 @@ test('a statement of 1 is the count the row reads, under both and under handins'
     assert.equal(rows.length, 1, countSource)
     assert.equal(rows[0].quantity, 1, countSource)
   }
+})
+
+test('a stated count does not list an item while another quest that names it is not turned in', () => {
+  const other: PoskyQuest = { ...SKIN, className: 'Monk', name: 'Test of Hide' }
+  const quests = [SKIN, other]
+  const shaped: CleanupQuest[] = [...SHAPED, { ...SHAPED[0], key: questKey(other), className: 'Monk', name: 'Test of Hide' }]
+  const overrides = itemOverridesByKey(statedFrom(rowsFor()[0], 4))
+  const net = reconcile({ ...BASE, quests, overrides }).net
+  assert.equal(net[skin], 4, 'the statement is the count')
+  assert.deepEqual(cleanupRows(shaped, BASE.turnIns, net), [], 'the Monk has not turned his in')
+  const both = cleanupRows(shaped, { ...BASE.turnIns, [questKey(other)]: 1 }, net)
+  assert.deepEqual(both.map((r) => [r.name, r.quantity, r.turnIns.length]), [['Azarack Skin', 4, 2]])
+})
+
+test('a stated count is what the row`s advice is worked from', () => {
+  const five: PoskyQuest = { ...SKIN, items: [{ ...SKIN.items[0], count: 5 }] }
+  const shaped: CleanupQuest[] = [{ ...SHAPED[0], items: [{ name: 'Azarack Skin', count: 5 }] }]
+  const turnInFor = (count: number): CleanupRow['turnIns'][number] => {
+    const overrides = itemOverridesByKey(statedFrom(rowsFor()[0], count))
+    const net = reconcile({ ...BASE, quests: [five], overrides }).net
+    return cleanupRows(shaped, BASE.turnIns, net)[0].turnIns[0]
+  }
+  const ten = turnInFor(10)
+  assert.equal(ten.sets, 2)
+  assert.equal(setsLine(ten), 'you hold enough for 2 more turn-ins')
+  assert.ok(decisionLine(ten).startsWith('keep them: turning in again gives another Skin Wristwraps'))
+  const three = turnInFor(3)
+  assert.equal(three.sets, 0)
+  assert.equal(decisionLine(three), 'you hold 3 of the 5 needed for another turn-in')
 })
 
 test('clearing the statement restores exactly the rows there were before it', () => {
