@@ -72,8 +72,11 @@ test('THE RECOVERY IS BOUND: the real probe, the real re-attach, the status told
   const report = code(MAIN_REPORT)
   const bound = /createLogReadRecovery\(\{([\s\S]*?)\n\}\)/.exec(report)
   assert.ok(bound, 'nothing builds the recovery')
-  assert.match(bound[1], /logProbe\.look\(path\)/)
+  // `since` must reach the probe, and the answer's time must come back: an answer the probe kept
+  // from before a read ended would otherwise decide what is done about that end.
+  assert.match(bound[1], /look: \(path, since\) => \{\s*logProbe\.look\(path, since\)/)
   assert.match(bound[1], /last: \(path\) => logProbe\.last\(path\)/)
+  assert.match(bound[1], /answeredAt: \(path\) => logProbe\.answeredAt\(path\)/)
   assert.match(bound[1], /reattach: reattachEngineLog/)
   assert.match(bound[1], /stopped: \(line\) => \{\s*noteLogReadError\('fold', line, Date\.now\(\)\)/)
   assert.match(bound[1], /timer: unrefTimer/, 'a watch must never keep the app alive')

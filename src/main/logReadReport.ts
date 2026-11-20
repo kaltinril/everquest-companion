@@ -67,10 +67,11 @@ const status = createLogReadStatus({
 
 /** THE RECOVERY, bound (phase R4): what the app tries by itself when a read ends. */
 const recovery = createLogReadRecovery({
-  look: (path) => {
-    logProbe.look(path)
+  look: (path, since) => {
+    logProbe.look(path, since)
   },
   last: (path) => logProbe.last(path),
+  answeredAt: (path) => logProbe.answeredAt(path),
   reattach: reattachEngineLog,
   stopped: (line) => {
     noteLogReadError('fold', line, Date.now())

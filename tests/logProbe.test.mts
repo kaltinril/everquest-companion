@@ -142,6 +142,56 @@ test('NO MORE THAN TWO OPENS ARE EVER OUT: hung opens on several logs cannot tak
   assert.equal(flights[2].path, paths[2])
 })
 
+test('A LOOK WITH `since` DOES NOT KEEP AN ANSWER TAKEN BEFORE THEN, and still never stacks opens', async () => {
+  const { probe, flights, clock } = rig()
+  assert.equal(probe.answeredAt(A), null, 'nothing was ever asked')
+  probe.look(A)
+  assert.equal(probe.answeredAt(A), null, 'out, not answered')
+  flights[0].resolve(4096)
+  await turn()
+  const first = clock.now
+  assert.equal(probe.answeredAt(A), first)
+
+  // A read ended 300 ms after main last saw the file: that answer says nothing about the end.
+  clock.now += 300
+  probe.look(A)
+  assert.equal(flights.length, 1, 'a plain look keeps the answer')
+  probe.look(A, clock.now)
+  assert.equal(flights.length, 2, 'a look for an end after the answer opens the file again')
+  for (let i = 0; i < 100; i += 1) probe.look(A, clock.now + i)
+  assert.equal(flights.length, 2, 'one open in flight per path, whatever `since` says')
+  assert.equal(probe.answeredAt(A), first, 'the old answer stands until the new one is in')
+
+  clock.now += 40
+  flights[1].reject(errno('EBUSY'))
+  await turn()
+  assert.equal(probe.answeredAt(A), clock.now)
+  // An answer taken at or after `since` is kept like any other.
+  probe.look(A, clock.now)
+  probe.look(A, clock.now - 40)
+  clock.now += PROBE_KEEP_MS - 1
+  probe.look(A, clock.now - PROBE_KEEP_MS)
+  assert.equal(flights.length, 2)
+  clock.now += 1
+  probe.look(A, 0)
+  assert.equal(flights.length, 3)
+})
+
+test('`since` does not get past the two-opens limit either', async () => {
+  const { probe, flights, clock } = rig()
+  probe.look(A)
+  flights[0].resolve(9)
+  await turn()
+  clock.now += 1_000
+  probe.look(B)
+  probe.look('D:\\Logs\\eqlog_C_test.txt')
+  assert.equal(flights.length, 1 + PROBE_MAX_FLIGHTS)
+  probe.look(A, clock.now)
+  assert.equal(flights.length, 1 + PROBE_MAX_FLIGHTS, 'two hung opens: a third would take another pool thread')
+  assert.equal(probe.pending(A), false)
+  assert.equal(probe.answeredAt(A), clock.now - 1_000, 'and the caller can tell the answer is the old one')
+})
+
 test('an open that throws instead of rejecting is an answer, not a crash', async () => {
   const probe = createLogProbe({
     open: () => {

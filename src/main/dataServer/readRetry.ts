@@ -39,6 +39,15 @@ export function probeSeen(probe: LogReadProbe | null): ProbeSeen {
   return probe.problem ?? 'clean'
 }
 
+/**
+ * `probeSeen` for a read that ended at `endedAt`. An answer main took before the end is `pending`:
+ * the file may have been locked or removed since, and that is what ended the read.
+ */
+export function probeSeenSince(probe: LogReadProbe | null, answeredAt: number | null, endedAt: number): ProbeSeen {
+  if (answeredAt === null || answeredAt < endedAt) return 'pending'
+  return probeSeen(probe)
+}
+
 /** What has been tried for one log. */
 export interface RetryCounts {
   /** Plain retries of a read that ended with the file openable. */

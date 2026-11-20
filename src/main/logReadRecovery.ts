@@ -5,7 +5,7 @@
 // re-attach (`engineClientHost.ts reattachEngineLog`). It hears the read's edges
 // (`dataServer/readEdges.ts`) and does one of three things when a read ends:
 //
-//   * WATCH THE FILE. Main cannot open the log (or has not answered yet): look every
+//   * WATCH THE FILE. Main cannot open the log (or has not answered SINCE THE END): look every
 //     `FILE_WATCH_MS`, and when a file that could not be opened can be, re-attach.
 //   * RETRY ONCE. Main can open the log: re-attach `ENDED_RETRY_MS` later, one time.
 //   * STOP, and record why on the status's Last error row.
@@ -30,7 +30,7 @@ import {
   manualTry,
   onProbeChange,
   plainRetrySent,
-  probeSeen,
+  probeSeenSince,
   recentAfterLiveEnds,
   stoppedLine,
   wentLive,
@@ -39,10 +39,15 @@ import {
 } from './dataServer/readRetry'
 
 export interface LogReadRecoveryDeps {
-  /** Start an open of the log (`logProbe.ts look`: one in flight per path, answer kept 5 s). */
-  readonly look: (path: string) => void
+  /**
+   * Start an open of the log (`logProbe.ts look`: one in flight per path, answer kept 5 s, but
+   * never an answer taken before `since`).
+   */
+  readonly look: (path: string, since: number) => void
   /** What main last learned about the log, without waiting. */
   readonly last: (path: string) => LogReadProbe | null
+  /** When it learned that, or null when no open has answered. */
+  readonly answeredAt: (path: string) => number | null
   /** Point the engine at the log again; it reads the log from the start. */
   readonly reattach: () => void
   /** Nothing more is tried: the line for the status's Last error row. */
@@ -74,8 +79,13 @@ export function createLogReadRecovery(deps: LogReadRecoveryDeps): LogReadRecover
   const counts = new Map<string, RetryCounts>()
   let job: Job | null = null
   let cancel: (() => void) | null = null
+  // When the read last ended. The probe keeps an answer for 5 s, and one taken before the end
+  // (the watch's own "it can be opened", just before the engine found it locked) decides nothing.
+  let endedAt = 0
 
   const of = (log: string): RetryCounts => counts.get(log) ?? NO_RETRIES
+
+  const seen = (log: string): ProbeSeen => probeSeenSince(deps.last(log), deps.answeredAt(log), endedAt)
 
   // A watch that could not end in a re-attach is not one the screen may promise.
   const watching = (): boolean => job?.kind === 'watch' && of(job.log).fileBackTries < FILE_BACK_CAP
@@ -115,7 +125,7 @@ export function createLogReadRecovery(deps: LogReadRecoveryDeps): LogReadRecover
     cancel = deps.timer(() => {
       cancel = null
       if (job?.kind !== 'watch' || job.log !== log) return
-      deps.look(log)
+      deps.look(log, endedAt)
       lookLater(log)
     }, FILE_WATCH_MS)
   }
@@ -133,7 +143,7 @@ export function createLogReadRecovery(deps: LogReadRecoveryDeps): LogReadRecover
   /** The read of `log` ended; main's look at the file has answered, or is still out. */
   const decide = (log: string): void => {
     const c = of(log)
-    const probe = probeSeen(deps.last(log))
+    const probe = seen(log)
     const next = afterEnded({ probe, autoTries: c.autoTries, fileBackTries: c.fileBackTries })
     if (next.do === 'watchFile') {
       watch(log, probe)
@@ -148,7 +158,8 @@ export function createLogReadRecovery(deps: LogReadRecoveryDeps): LogReadRecover
     disarm()
     const c = of(log)
     counts.set(log, { ...c, ends: c.ends + 1 })
-    deps.look(log)
+    endedAt = deps.now()
+    deps.look(log, endedAt)
     decide(log)
   }
 
@@ -167,7 +178,7 @@ export function createLogReadRecovery(deps: LogReadRecoveryDeps): LogReadRecover
   const probed = (): void => {
     if (job?.kind !== 'watch') return
     const { log, was } = job
-    const now = probeSeen(deps.last(log))
+    const now = seen(log)
     // Another open is out, or nothing moved: the last answer stands.
     if (now === was || now === 'pending') return
     if (was === 'pending') {

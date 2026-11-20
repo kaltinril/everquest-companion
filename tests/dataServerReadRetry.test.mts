@@ -17,6 +17,7 @@ import {
   onProbeChange,
   plainRetrySent,
   probeSeen,
+  probeSeenSince,
   recentAfterLiveEnds,
   stoppedLine,
   wentLive,
@@ -160,6 +161,25 @@ test('a look that never answered, or whose open is out, is `pending`; otherwise 
   assert.equal(probeSeen({ bytes: null, problem: 'missing', pendingMs: null }), 'missing')
   assert.equal(probeSeen({ bytes: null, problem: 'unreadable', pendingMs: null }), 'unreadable')
   assert.equal(probeSeen({ bytes: 4_096, problem: null, pendingMs: null }), 'clean')
+})
+
+test('AN ANSWER TAKEN BEFORE THE READ ENDED IS `pending`: it says nothing about why the read ended', () => {
+  const clean = { bytes: 4_096, problem: null, pendingMs: null }
+  const END = 1_800_000_000_000
+  // Main saw the file openable 200 ms before the engine failed to open it.
+  assert.equal(probeSeenSince(clean, END - 200, END), 'pending')
+  assert.equal(probeSeenSince(clean, END - 1, END), 'pending')
+  assert.equal(probeSeenSince(clean, END, END), 'clean')
+  assert.equal(probeSeenSince(clean, END + 40, END), 'clean')
+  assert.equal(probeSeenSince({ bytes: null, problem: 'missing', pendingMs: null }, END - 200, END), 'pending')
+  assert.equal(probeSeenSince({ bytes: null, problem: 'unreadable', pendingMs: null }, END + 1, END), 'unreadable')
+  // Nothing ever answered, and an open that is out, as before.
+  assert.equal(probeSeenSince(null, null, END), 'pending')
+  assert.equal(probeSeenSince({ bytes: 4_096, problem: null, pendingMs: 10 }, END + 1, END), 'pending')
+  // So the end is waited for, never retried or stopped, on an old answer.
+  const old = probeSeenSince(clean, END - 200, END)
+  assert.deepEqual(afterEnded({ probe: old, autoTries: 0, fileBackTries: 0 }), { do: 'watchFile' })
+  assert.deepEqual(afterEnded({ probe: old, autoTries: 1, fileBackTries: FILE_BACK_CAP }), { do: 'watchFile' })
 })
 
 // ---- 5. what is recorded once nothing more is tried ----------------------------------------------

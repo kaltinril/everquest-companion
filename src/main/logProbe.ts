@@ -32,8 +32,13 @@ export interface LogProbeDeps {
 }
 
 export interface LogProbe {
-  /** Start an open, unless one is out for this path or its last answer is still fresh. */
-  look(path: string): void
+  /**
+   * Start an open, unless one is out for this path or its last answer is still fresh. An answer
+   * taken before `since` is never fresh: it says nothing about a read that ended after it.
+   */
+  look(path: string, since?: number): void
+  /** When the last answer about `path` came in, or null when none has. */
+  answeredAt(path: string): number | null
   /** What is known about `path` right now, or null when nothing was ever asked. Never waits. */
   last(path: string): LogReadProbe | null
   /** Is an open out for `path`? */
@@ -103,14 +108,15 @@ export function createLogProbe(deps: LogProbeDeps): LogProbe {
   }
 
   return {
-    look(path): void {
+    look(path, since = 0): void {
       let entry = entries.get(path)
       if (entry === undefined) {
         entry = { answer: null, answeredAt: 0, flightSince: null }
         entries.set(path, entry)
       }
       if (entry.flightSince !== null) return
-      if (entry.answer !== null && deps.now() - entry.answeredAt < PROBE_KEEP_MS) return
+      const kept = entry.answeredAt >= since && deps.now() - entry.answeredAt < PROBE_KEEP_MS
+      if (entry.answer !== null && kept) return
       // Other paths' opens are hanging: one more would only take another pool thread.
       if (flights >= PROBE_MAX_FLIGHTS) return
       start(path, entry)
@@ -120,6 +126,10 @@ export function createLogProbe(deps: LogProbeDeps): LogProbe {
       if (entry === undefined || (entry.answer === null && entry.flightSince === null)) return null
       const pendingMs = entry.flightSince === null ? null : Math.max(0, deps.now() - entry.flightSince)
       return { bytes: entry.answer?.bytes ?? null, problem: entry.answer?.problem ?? null, pendingMs }
+    },
+    answeredAt(path): number | null {
+      const entry = entries.get(path)
+      return entry === undefined || entry.answer === null ? null : entry.answeredAt
     },
     pending: (path) => (entries.get(path)?.flightSince ?? null) !== null,
     onSettled(cb): void {

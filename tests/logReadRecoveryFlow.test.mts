@@ -32,6 +32,7 @@ function flow(): Flow {
   let now = 1_800_000_000_000
   let timers: { at: number; run: () => void }[] = []
   let last: LogReadProbe | null = null
+  let answeredAt: number | null = null
   const f: Flow = {
     r,
     stopped: [],
@@ -50,6 +51,7 @@ function flow(): Flow {
     },
     async looked() {
       last = probeOf(f.file, false)
+      answeredAt = now
       f.recovery.probed()
       await settle()
     },
@@ -59,6 +61,7 @@ function flow(): Flow {
         if (last?.pendingMs === null || last === null) last = probeOf(f.file, true)
       },
       last: () => last,
+      answeredAt: () => answeredAt,
       // `reattachEngineLog`: a new turn that forgets the attach.
       reattach: () => {
         r.attached = null

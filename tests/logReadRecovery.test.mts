@@ -37,6 +37,8 @@ interface Rig {
   /** Timers armed and not yet run or cancelled. */
   pending(): number
   advance(ms: number): void
+  /** Is an open of `path` out? */
+  out(path: string): boolean
   /** The open of `path` that is out settles with `seen`. */
   answer(path: string, seen: Seen): void
   /** What main already knows about `path`, as a fresh answer with no open out. */
@@ -70,6 +72,7 @@ function rig(): Rig {
       }
       now = until
     },
+    out: (path) => (last.get(path)?.probe.pendingMs ?? null) !== null,
     answer(path, seen) {
       last.set(path, { probe: probeOf(seen), at: now })
       r.recovery.probed()
@@ -81,16 +84,19 @@ function rig(): Rig {
       r.recovery.edge(edge, logPath)
     },
     recovery: createLogReadRecovery({
-      look: (path) => {
+      look: (path, since = 0) => {
         r.looks.push(path)
-        // `logProbe.ts look`: nothing while an open is out or the last answer is under 5 s old.
+        // `logProbe.ts look`: nothing while an open is out, or while the last answer is under 5 s
+        // old and was not taken before `since`.
         const was = last.get(path)
-        if (was !== undefined && (was.probe.pendingMs !== null || now - was.at < PROBE_KEEP_MS)) return
+        const kept = was !== undefined && was.at >= since && now - was.at < PROBE_KEEP_MS
+        if (was !== undefined && (was.probe.pendingMs !== null || kept)) return
         // An open is out: whatever was known is old until it settles.
         const probe = { bytes: was?.probe.bytes ?? null, problem: was?.probe.problem ?? null, pendingMs: 0 }
         last.set(path, { probe, at: was?.at ?? 0 })
       },
       last: (path) => last.get(path)?.probe ?? null,
+      answeredAt: (path) => last.get(path)?.at ?? null,
       reattach: () => {
         r.reattaches += 1
         // What the host does: a re-attach is a new turn.
@@ -181,6 +187,45 @@ test('THE FILE COMING BACK RE-ATTACHES 5 TIMES AND THEN STOPS, and the screen st
   assert.equal(r.stopped.length, 20 - FILE_BACK_CAP, 'every end past the cap says so again')
   assert.equal(r.recovery.watching(), false, 'a Try line may promise a retry only while one will come')
   assert.equal(r.pending(), 0)
+})
+
+test('AN ANSWER TAKEN BEFORE THE READ ENDED DECIDES NOTHING: a lock that is back at once is watched again', () => {
+  const r = rig()
+  r.edge('ended')
+  r.answer(LOG, 'unreadable')
+  r.advance(FILE_WATCH_MS)
+  r.answer(LOG, 'clean')
+  assert.equal(r.reattaches, 1)
+  // The engine's own open, 200 ms later, meets the lock again. Main's "clean" is 200 ms old.
+  r.advance(200)
+  r.edge('ended')
+  assert.equal(r.out(LOG), true, 'the kept answer is from before the end: the file is opened again')
+  assert.equal(r.pending(), 1, 'and nothing is decided until that open answers')
+  r.answer(LOG, 'unreadable')
+  assert.equal(r.recovery.watching(), true, 'the file is watched again')
+  r.advance(ENDED_RETRY_MS)
+  assert.equal(r.reattaches, 1, 'no plain retry: the file was not openable when the read ended')
+  assert.deepEqual(r.stopped, [])
+  // And the watch still ends in a re-attach.
+  r.advance(FILE_WATCH_MS)
+  r.answer(LOG, 'clean')
+  assert.equal(r.reattaches, 2)
+})
+
+test('the same when the kept answer says the file is gone and it is back: one plain retry, not a file-back', () => {
+  const r = rig()
+  r.known(LOG, 'missing')
+  r.advance(1_000)
+  r.edge('ended')
+  assert.equal(r.out(LOG), true)
+  r.answer(LOG, 'clean')
+  assert.equal(r.recovery.watching(), false)
+  r.advance(ENDED_RETRY_MS)
+  assert.equal(r.reattaches, 1)
+  r.advance(500)
+  r.edge('ended')
+  r.answer(LOG, 'clean')
+  assert.deepEqual(r.stopped, ['stopped twice; not trying again by itself'])
 })
 
 test('with the cap used up, a look still out does not promise a retry either', () => {
