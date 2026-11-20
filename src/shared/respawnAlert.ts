@@ -67,11 +67,41 @@ export function respawnAlertHeard(alerts: readonly Pick<AlertDef, 'enabled' | 't
   return found ? 'off' : 'missing'
 }
 
-/** The line under the Timers tab's box when it is ticked and nothing will play; null otherwise. */
-export function respawnAlertSilentNote(on: boolean, heard: RespawnAlertHeard): string | null {
+/** The name the seeded alert carries, and the name of the app signal in the Alerts tab's picker. */
+const RESPAWN_ALERT_NAME = 'Respawn timer ending'
+
+/**
+ * The names of the switched-off alerts on the `respawnSoon` signal, as the Alerts tab lists them,
+ * each once. The note names THESE: the player can rename the seeded alert or make their own, and
+ * a note naming "Respawn timer ending" then sent them looking for an alert that is not there.
+ */
+export function respawnAlertOffNames(alerts: readonly Pick<AlertDef, 'enabled' | 'trigger' | 'name'>[]): string[] {
+  const names: string[] = []
+  for (const a of alerts) {
+    if (a.trigger.type !== 'app' || a.trigger.signal !== 'respawnSoon' || a.enabled) continue
+    const name = a.name.trim()
+    if (name !== '' && !names.includes(name)) names.push(name)
+  }
+  return names
+}
+
+/** `"A"`, `"A" and "B"`, `"A", "B" and "C"`. */
+function quotedList(names: readonly string[]): string {
+  const quoted = names.map((n) => `"${n}"`)
+  return quoted.length <= 1 ? (quoted[0] ?? '') : `${quoted.slice(0, -1).join(', ')} and ${quoted[quoted.length - 1] ?? ''}`
+}
+
+/**
+ * The line under the Timers tab's box when it is ticked and nothing will play; null otherwise.
+ * `offNames` is `respawnAlertOffNames`: with none given the seeded alert's name stands in.
+ */
+export function respawnAlertSilentNote(on: boolean, heard: RespawnAlertHeard, offNames: readonly string[] = []): string | null {
   if (!on || heard === 'ok') return null
-  if (heard === 'off') return 'No alert will play: "Respawn timer ending" is switched off on the Alerts tab.'
-  return 'No alert will play: the Alerts tab has no "Respawn timer ending" alert. Add one there (App signal: Respawn timer ending).'
+  if (heard === 'off') {
+    const names = offNames.length === 0 ? [RESPAWN_ALERT_NAME] : offNames
+    return `No alert will play: ${quotedList(names)} ${names.length === 1 ? 'is' : 'are'} switched off on the Alerts tab.`
+  }
+  return `No alert will play: the Alerts tab has no "${RESPAWN_ALERT_NAME}" alert. Add one there (App signal: ${RESPAWN_ALERT_NAME}).`
 }
 
 export interface RespawnAlertDue {
