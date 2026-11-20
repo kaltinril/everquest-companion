@@ -24,6 +24,7 @@ import { levelBar, type LevelBar } from '@shared/tradeskillLevelBar'
 import type { Tradeskill } from '@shared/tradeskills'
 import { LogReadInline } from '../../components/LogReadInline'
 import { Tooltip } from '../../lib/Tooltip'
+import { ForagingTile } from './ForagingTile'
 import { HomePickUp, type HomeFacts } from './HomePickUp'
 import { HomeWished, type OpenPlan } from './HomeWished'
 import { BarOf, CapNote, SkillBar } from './SkillBar'
@@ -151,6 +152,8 @@ export function TradeskillsHome({ index, onOpen, onPlan, planner }: TradeskillsH
           <Tile key={tile.tradeskill} tile={tile} rows={levels.rows} onOpen={onOpen} />
         ))}
       </Box>
+      {/* Forage has no recipes and so no workbench: its tile is the whole of it (ForagingTile.tsx). */}
+      <ForagingTile />
       <SourcesLine guides={guides} />
     </Box>
   )

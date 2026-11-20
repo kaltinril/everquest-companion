@@ -46,6 +46,7 @@ import { HistoryPanel } from './HistoryPanel'
 import { RecipeFilterSwitches, useRecipeFilters, type RecipeFilterState } from './RecipeFilters'
 import { RecipePanel } from './RecipePanel'
 import { RecipeTable, type RowLog } from './RecipeTable'
+import { AaPanel } from './AaPanel'
 import { RoutePanel } from './RoutePanel'
 import { BarOf, CapNote, SkillBar } from './SkillBar'
 import { SkillGearPanel } from './SkillGearPanel'
@@ -301,6 +302,8 @@ export function Workbench({ tradeskill, index, eraOnly, onHome, restoreTop }: Wo
     <Stack spacing={1} sx={{ flexGrow: 1, minHeight: 0 }} data-testid="tradeskill-workbench">
       <BenchHead tradeskill={tradeskill} levels={levels} onHome={onHome} totals={totalsLine(history.totals)} />
       <SkillGearPanel tradeskill={tradeskill} held={held} eraOnly={eraOnly} />
+      {/* The AAs that bear on this tradeskill, from the wiki's AA table (AaPanel.tsx). */}
+      <AaPanel tradeskill={tradeskill} />
       <BenchTabs
         tab={memory.tab}
         onTab={(tab) => {
