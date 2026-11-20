@@ -24,9 +24,10 @@
 // heuristics score on — discovery is what a friend's Defender/Norton sees this app do
 // FIRST. See the block comments on `registryInstallCandidates` and `fixedDrives`.
 
-import { existsSync, readdirSync, statSync } from 'fs'
+import { existsSync, statSync } from 'fs'
 import type * as NativeReg from 'native-reg'
 import { join } from 'path'
+import { characterLogNames } from './characterLogs'
 
 /** The canonical Daybreak install root on a default EQ Legends install. */
 export const EQ_ROOT =
@@ -69,9 +70,6 @@ export interface DiscoveryProbes {
   now?: () => number
 }
 
-/** The character-log filename the game writes: `eqlog_<Char>_<server>.txt`. */
-const EQLOG_RE = /^eqlog_.+\.txt$/i
-
 /**
  * THE OUTCOME OF READING A LOGS DIR — three answers, never two (JOS-82).
  *
@@ -103,7 +101,8 @@ export type LogsDirRead =
  */
 export function readLogsDir(logsDir: string): LogsDirRead {
   try {
-    return { ok: true, count: readdirSync(logsDir).filter((f) => EQLOG_RE.test(f)).length }
+    // Files only (characterLogs.ts): a folder named like a log is not a log to count.
+    return { ok: true, count: characterLogNames(logsDir).length }
   } catch (err) {
     const code = (err as NodeJS.ErrnoException | undefined)?.code
     // ENOENT (nothing there) and ENOTDIR (a FILE where a directory was expected) are both

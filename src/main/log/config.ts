@@ -1,6 +1,7 @@
-import { existsSync, readdirSync, statSync } from 'fs'
-import { basename, join } from 'path'
+import { existsSync } from 'fs'
+import { join } from 'path'
 import type { CharacterRef } from '../../shared/types'
+import { charactersIn, newestCharacterIn, parseLogName } from './characterLogs'
 import { clearEqDiscoveredRoot, getEqDiscoveredRoot, getEqInstallDir, setEqDiscoveredRoot } from '../store'
 import {
   EQ_ROOT,
@@ -287,34 +288,9 @@ export function eqLogsDir(): string {
 // Character-log listing / active-character resolution (now dir-resolver-driven).
 // ---------------------------------------------------------------------------
 
-/** Parse "eqlog_<Character>_<server>.txt" into a CharacterRef. */
-export function parseLogName(logPath: string): CharacterRef | null {
-  const m = /^eqlog_(.+?)_(.+?)\.txt$/i.exec(basename(logPath))
-  if (!m) return null
-  return { name: m[1], server: m[2], logPath, lastPlayed: mtimeOf(logPath) }
-}
-
-/** A file's mtime, or undefined when it is gone (or cannot be stat'd) by the time we look. */
-function mtimeOf(path: string): number | undefined {
-  try {
-    return statSync(path).mtimeMs
-  } catch {
-    return undefined
-  }
-}
-
-/**
- * The `eqlog_*.txt` names in a Logs dir. A dir that cannot be read (a file where the folder
- * should be, no permission) has none, which is how `readLogsDir` already reads it; throwing here
- * instead rejected every caller, the idle rescan and the quiet-switch poll among them.
- */
-function characterLogFiles(logsDir: string): string[] {
-  try {
-    return readdirSync(logsDir).filter((f) => /^eqlog_.+\.txt$/i.test(f))
-  } catch {
-    return []
-  }
-}
+// WHICH ENTRIES ARE LOGS, and which is the newest, is `characterLogs.ts` (files only, links
+// followed): store-free, so a test can list a temp folder. This file hands it the folder.
+export { parseLogName }
 
 /** Stable id for a character (used to key per-character progress). */
 export function characterId(c: CharacterRef): string {
@@ -323,11 +299,7 @@ export function characterId(c: CharacterRef): string {
 
 /** All detected character logs, most-recently-played first. */
 export function listCharacters(): CharacterRef[] {
-  const logsDir = eqLogsDir()
-  return characterLogFiles(logsDir)
-    .map((f) => parseLogName(join(logsDir, f)))
-    .filter((c): c is CharacterRef => c !== null)
-    .sort((a, b) => (b.lastPlayed ?? 0) - (a.lastPlayed ?? 0))
+  return charactersIn(eqLogsDir())
 }
 
 /**
@@ -342,14 +314,5 @@ export function resolveActiveCharacter(): CharacterRef | null {
   if (override && existsSync(override)) {
     return parseLogName(override) ?? { name: 'Unknown', server: 'unknown', logPath: override }
   }
-  const logsDir = eqLogsDir()
-  const candidates = characterLogFiles(logsDir)
-    .map((f) => join(logsDir, f))
-    .map((p) => ({ p, mtime: mtimeOf(p) }))
-    // A log deleted between the listing and the stat is not a candidate.
-    .filter((c): c is { p: string; mtime: number } => c.mtime !== undefined)
-    .sort((a, b) => b.mtime - a.mtime)
-
-  if (candidates.length === 0) return null
-  return parseLogName(candidates[0].p)
+  return newestCharacterIn(eqLogsDir())
 }
