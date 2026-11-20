@@ -65,7 +65,8 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   text; 'Row height' label box 0px wide holding 70px (white-space nowrap, overflow hidden,
   text-overflow ellipsis, so nothing of either is drawn). Steppers at x 448.7..560.7, 0.7px past the
   card's right edge at 560. The note wraps to 4 lines. At 125% minimum the boxes are ...
-- CONFIRMED [low, confusing] Stepping to the end of a ladder with the keyboard drops focus out of
+- FIXED 2026-11-20 (the press that reaches an end hands focus to the stepper's other button,
+  `prefStepperFocus.ts`; `text-size.e2e.mts` presses Enter to the end) [low, confusing] Stepping to the end of a ladder with the keyboard drops focus out of
   the card Seen: Enter x7 from 28px: 32px, 36px, 40px with focus on BUTTON[pref-nav-row-plus], then
   at 48px the button disables and document.activeElement becomes BODY; further Enter presses do
   nothing and Tab starts again from the top of the window. This is the shared PrefStepper, so the
@@ -757,7 +758,8 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   649.7-759.7, 112.7 px past the panel's inner edge; app-content scrolls sideways by 64 px
   (scrollWidth 540, clientWidth 476). At 900 px with 100% and at 1280 with 125% the panel's
   scrollWidth equals ...
-- CONFIRMED [low, cosmetic] Buffs card: a long spell name breaks "8s elapsed" onto two lines at the
+- FIXED 2026-11-20 (the caption is one unshrinking line; pinned in the source by
+  `tests/buffsFormat.test.mts`, not measured in the running app) [low, cosmetic] Buffs card: a long spell name breaks "8s elapsed" onto two lines at the
   default window Seen: Card "Jonthan's Whistling Warsong": name box 171 px wide and 40 px high (two
   lines), "8s elapsed" box 51.8 px wide and 39.8 px high (two lines), card 98.7 px high against 78.8
   for its neighbours. With boxes on, "Quivering Veil of Xarn" does the same (name 129 px x 40, "29s

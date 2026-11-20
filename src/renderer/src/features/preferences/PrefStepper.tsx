@@ -24,10 +24,11 @@
 //
 // ONE BORDER: PreferencesView already wraps each item in an outlined Paper, so this renders bare.
 
-import { type JSX } from 'react'
+import { type JSX, useEffect, useRef } from 'react'
 import { IconButton, Stack, Typography } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
+import { focusAfterStep, type StepDir } from './prefStepperFocus'
 
 /** What this stepper is stepping — which decides the button faces and how they are spoken. */
 export type StepperKind = 'size' | 'transparency' | 'spacing'
@@ -95,6 +96,22 @@ export function PrefStepper({
 }): JSX.Element {
   const words = WORDS[kind]
   const lettered = kind === 'size' && !plain
+  // THE KEYBOARD STAYS IN THE STEPPER. The press that reaches an end disables its own button, and a
+  // disabled button drops focus to the page body; the other button takes it (prefStepperFocus.ts).
+  // Noted only when the press was made with focus on the button, so a mouse click moves nothing.
+  const minusRef = useRef<HTMLButtonElement>(null)
+  const plusRef = useRef<HTMLButtonElement>(null)
+  const pressed = useRef<StepDir | null>(null)
+  const step = (dir: StepDir, button: HTMLButtonElement): void => {
+    pressed.current = document.activeElement === button ? dir : null
+    onStep(dir)
+  }
+  useEffect(() => {
+    const to = focusAfterStep(pressed.current, atMin, atMax)
+    pressed.current = null
+    if (to === 'minus') minusRef.current?.focus()
+    if (to === 'plus') plusRef.current?.focus()
+  }, [value, atMin, atMax])
   return (
     <Stack
       direction="row"
@@ -109,8 +126,9 @@ export function PrefStepper({
         aria-label={`${words.lessName} ${name}`}
         data-testid={`${testid}-minus`}
         disabled={atMin}
-        onClick={() => {
-          onStep(-1)
+        ref={minusRef}
+        onClick={(e) => {
+          step(-1, e.currentTarget)
         }}
       >
         {lettered ? (
@@ -134,8 +152,9 @@ export function PrefStepper({
         aria-label={`${words.moreName} ${name}`}
         data-testid={`${testid}-plus`}
         disabled={atMax}
-        onClick={() => {
-          onStep(1)
+        ref={plusRef}
+        onClick={(e) => {
+          step(1, e.currentTarget)
         }}
       >
         {lettered ? (
