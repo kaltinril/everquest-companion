@@ -124,11 +124,15 @@ export function sanitizeItemOverrides(value: unknown): ItemCountOverride[] {
  * State a count for one key, REPLACING whatever that key said before. Replace rather than append
  * for the reason `setComboCorrection` gives: two statements about one item are one statement, the
  * later one.
+ *
+ * A statement that would not survive the sanitizer changes nothing: it must not erase the one it
+ * was meant to replace.
  */
 export function applyItemOverride(
   list: readonly ItemCountOverride[],
   next: ItemCountOverride
 ): ItemCountOverride[] {
+  if (!sanitizeItemOverride(next)) return sanitizeItemOverrides(list)
   return sanitizeItemOverrides([...list.filter((o) => o.key !== next.key), next])
 }
 

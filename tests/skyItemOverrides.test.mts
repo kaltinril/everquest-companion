@@ -124,6 +124,18 @@ test('two statements about one item are ONE statement, the later one', () => {
   assert.deepEqual(clearItemOverride(list, diamond), list, 'clearing another key touches nothing')
 })
 
+test('a statement the store cannot keep leaves the one already made in place', () => {
+  const zero: ItemCountOverride = { key: claw, name: 'Sphinx Claw', count: 0, setAt: T0 }
+  const other: ItemCountOverride = { key: diamond, name: 'Ivory Sky Diamond', count: 2, setAt: T0 + 1 }
+  const list = applyItemOverride(applyItemOverride([], zero), other)
+  const later = { key: claw, name: 'Sphinx Claw', setAt: T0 + HOUR }
+  assert.deepEqual(applyItemOverride(list, { ...later, count: MAX_OVERRIDE_COUNT + 1 }), list)
+  assert.deepEqual(applyItemOverride(list, { ...later, count: -1 }), list)
+  assert.deepEqual(applyItemOverride(list, { ...later, count: Number.NaN }), list)
+  // And a usable one still replaces it.
+  assert.equal(itemOverridesByKey(applyItemOverride(list, { ...later, count: 5 }))[claw].count, 5)
+})
+
 test('what is typed in the pencil`s box: a whole count in range, or nothing at all', () => {
   // A blank box is a changed mind, never a 0.
   assert.equal(parseHandCount(''), null)
