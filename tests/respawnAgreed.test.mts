@@ -115,6 +115,36 @@ test('the archive join keeps the smaller agreed gap and numbers the joined row f
   assert.equal(neither?.estimateMs, WIKI)
 })
 
+// The field case: every log archived before fork #8 has no agreedMs, and the live log's three gaps agree.
+test('the archive join keeps an agreed gap only the live log has', () => {
+  const older = row({ samples: 1, observedMs: 200_000, estimateMs: WIKI })
+  const newer = row({ estimateMs: AGREED, agreedMs: AGREED, baseTs: 900 })
+  const joined = mergeRespawn(snap([older]), snap([newer]))?.rows[0]
+  assert.equal(joined?.agreedMs, AGREED)
+  assert.equal(joined?.estimateMs, AGREED, 'the archive gap under it is lifted to the agreed gap, not to the wiki time')
+  assert.equal(joined?.source, 'observed')
+  assert.equal(joined?.samples, 4)
+})
+
+test('a row filed before the first zone line joins its zone row without losing the agreed gap', () => {
+  const pre = row({ id: '::enynti', zone: '', samples: 0, kills: 1, baseTs: 50, source: 'wiki', estimateMs: WIKI })
+  delete pre.observedMs
+  const post = row({ estimateMs: AGREED, agreedMs: AGREED, baseTs: 900 })
+  for (const rows of [
+    [pre, post],
+    [post, pre]
+  ]) {
+    const merged = mergeRespawn(snap([]), snap(rows, { zone: '' }))
+    assert.equal(merged?.rows.length, 1)
+    const joined = merged?.rows[0]
+    assert.equal(joined?.id, 'mistmoore::enynti')
+    assert.equal(joined?.agreedMs, AGREED)
+    assert.equal(joined?.estimateMs, AGREED)
+    assert.equal(joined?.kills, 5)
+    assert.equal(joined?.baseTs, 900)
+  }
+})
+
 // The same sets as `respawn_places_tests.rs` (three_gaps_inside_fifty_seconds_agree_on_the_lowest_of_them
 // and the boundary test under it), so the engine's rule and this copy of it cannot drift.
 test('agreedGap: three gaps inside 50 s agree on the lowest of them, as the engine reads it', () => {
