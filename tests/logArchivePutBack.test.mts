@@ -82,7 +82,9 @@ test('put back: lines an earlier try had already joined are kept, and the second
 
 test('put back: a refused link keeps the newest lines, says where, and the second try finishes it', async () => {
   const f = archivedThenPlayed()
-  const first = await restoreLog(f.logPath, f.dir, f.seg, { link: refused('EPERM') })
+  // The drive links files (the check before the join passes); only the link to the log's name is refused.
+  const link = (from: string, to: string): void => (to === f.logPath ? refused('EPERM')() : linkSync(from, to))
+  const first = await restoreLog(f.logPath, f.dir, f.seg, { link })
   assert.equal(first.ok, false)
   assert.ok(first.reason.includes(f.joined), first.reason)
   assert.match(first.reason, /Put back again/)
@@ -94,6 +96,37 @@ test('put back: a refused link keeps the newest lines, says where, and the secon
   assert.ok(second.ok, second.reason)
   assert.equal(readFileSync(f.logPath, 'utf8'), ARCHIVED + FRESH + NEWER)
   assert.deepEqual(scratch(f.dir), [])
+})
+
+// A drive without hard links (exFAT, FAT32) refuses every link, so the join can never get the log's
+// name. That is found out before a live line moves: a put back that cannot finish must not start.
+
+test('put back: a drive that cannot link files is refused before any line moves, and nothing is left', async () => {
+  const f = archivedThenPlayed()
+  for (const press of [1, 2]) {
+    const back = await restoreLog(f.logPath, f.dir, f.seg, { link: refused('EISDIR') })
+    assert.equal(back.ok, false)
+    assert.match(back.reason, /would not link .+ Nothing has changed/, `press ${press}: ${back.reason}`)
+    assert.doesNotMatch(back.reason, /Put back again/)
+    assert.equal(readFileSync(f.logPath, 'utf8'), FRESH, `press ${press}: the live log is untouched`)
+    assert.deepEqual(scratch(f.dir), [], `press ${press}: no scratch file`)
+    assert.deepEqual(putBackLeftovers(f.dir), [], `press ${press}: nothing to stop the next archive`)
+  }
+})
+
+test('put back: lines an earlier try left on such a drive stay put, and no second try is promised', async () => {
+  const f = archivedThenPlayed()
+  // What a version before the check left there: the lines since the archive, only in the joined file.
+  writeFileSync(f.joined, ARCHIVED + FRESH)
+  writeFileSync(f.logPath, NEWER)
+  const back = await restoreLog(f.logPath, f.dir, f.seg, { link: refused('EISDIR') })
+  assert.equal(back.ok, false)
+  assert.ok(back.reason.includes(f.joined), back.reason)
+  assert.doesNotMatch(back.reason, /Put back again|Nothing has changed/)
+  assert.match(back.reason, /somewhere safe/)
+  assert.equal(readFileSync(f.logPath, 'utf8'), NEWER, 'the live log is not moved into a join that cannot finish')
+  assert.equal(readFileSync(f.joined, 'utf8'), ARCHIVED + FRESH)
+  assert.deepEqual(scratch(f.dir), [`${f.seg.id}.restoring`])
 })
 
 test('put back: a join that fails leaves the live log where it was, and the next try works', async () => {

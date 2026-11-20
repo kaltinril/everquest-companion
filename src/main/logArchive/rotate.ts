@@ -324,6 +324,29 @@ async function archiveBase(archive: string | null, joined: string, source: { byt
   }
 }
 
+/** The drive would not give a file a second name, so a put-back cannot finish on it as it is. */
+class NoLink extends Error {}
+
+/**
+ * Ask the drive for a second name of `joined` BEFORE any live line moves. exFAT and FAT32 have no
+ * hard links: there the join could never be given the log's name, and every try would only move
+ * more of the live log into it. The probe's `.partial` name is swept at launch (backup.ts).
+ */
+function probeLink(joined: string, io: RestoreIo): void {
+  const probe = `${joined}.link.partial`
+  try {
+    rmSync(probe, { force: true })
+    ;(io.link ?? linkSync)(joined, probe)
+  } catch (err) {
+    throw new NoLink(`this drive would not link a file (${(err as Error).message}), so the log cannot be put back in one piece`)
+  }
+  try {
+    rmSync(probe)
+  } catch {
+    // A spare name for the joined file; the launch sweep takes it.
+  }
+}
+
 /** The pieces of `id` an earlier try set aside. Throws, naming the file, when this version cannot
  *  say where one belongs: a second piece, or a name without a length past the archive's. */
 function waitingPieces(dir: string, id: string, archiveBytes: number): Piece[] {
@@ -356,8 +379,10 @@ function joinAndLink(logPath: string, joined: string, waiting: Piece[], io: Rest
 }
 
 /** What a put-back that stopped has left, in the player's words. An unpacked copy holding nothing
- *  but the archive is removed, so the folder is as it was. */
-function stopped(why: string, dir: string, seg: Segment, joined: string): string {
+ *  but the archive is removed, so the folder is as it was. Pressing again is advised only when it
+ *  can finish, so never after `NoLink`. */
+function stopped(err: Error, dir: string, seg: Segment, joined: string): string {
+  const why = err.message
   const held = [joined, ...piecesOf(dir, seg.id).map((p) => p.path)].filter((p) => existsSync(p))
   const onlyArchive = held.length === 1 && held[0] === joined && statSync(joined).size === seg.archiveSource?.bytes
   if (held.length === 0 || onlyArchive) {
@@ -365,7 +390,9 @@ function stopped(why: string, dir: string, seg: Segment, joined: string): string
     return `${why}. Nothing has changed.`
   }
   const them = held.length > 1 ? 'them' : 'it'
-  return `${why}. The lines since the archive are safe in ${held.join(' and ')}. Leave ${them} there and press Put back again to finish.`
+  const safe = `${why}. The lines since the archive are safe in ${held.join(' and ')}.`
+  if (err instanceof NoLink) return `${safe} Put back cannot finish until this drive links files. To use Archive now again, move ${them} somewhere safe first.`
+  return `${safe} Leave ${them} there and press Put back again to finish.`
 }
 
 /**
@@ -393,6 +420,7 @@ export async function restoreLog(logPath: string, dir: string, seg: Segment, io:
     const waiting = waitingPieces(dir, seg.id, source.bytes)
     await archiveBase(resolveArchivePath(dir, seg), joined, source, logPath)
     based = true
+    probeLink(joined, io)
     joinAndLink(logPath, joined, waiting, io)
     return { ok: true, reason: 'restored' }
   } catch (err) {
@@ -404,6 +432,6 @@ export async function restoreLog(logPath: string, dir: string, seg: Segment, io:
     } catch {
       // The game makes it on its next line.
     }
-    return { ok: false, reason: stopped(why, dir, seg, joined) }
+    return { ok: false, reason: stopped(err as Error, dir, seg, joined) }
   }
 }
