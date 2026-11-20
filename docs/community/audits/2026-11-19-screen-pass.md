@@ -169,7 +169,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   describes is a design decided and tested today, and no sentence on screen is untrue. In
   src/shared/respawnEdit.ts:14-26, respawnDraftToSave returns null when the trimmed typed text
   equals the prefill. The doc comment explains why: saving the ...
-- CONFIRMED [low, untrue-words] The note names "Respawn timer ending" when the switched-off alert
+- FIXED 2026-11-20 (`respawnAlertOffNames`: the note names the switched-off alerts themselves) [low, untrue-words] The note names "Respawn timer ending" when the switched-off alert
   has another name Seen: [data-testid="respawn-alert-silent"] reads: No alert will play: "Respawn
   timer ending" is switched off on the Alerts tab. The Alerts tab has no alert of that name in this
   state (store: [{id:probe-own-respawn, name:"Camp is about to pop", enabled:false}]). With that
