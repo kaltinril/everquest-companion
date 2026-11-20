@@ -17,7 +17,7 @@ mod harness;
 
 use harness::{
     attach, health, module_snapshot, resist_levels, resist_spell, respawn_confirm, respawn_define,
-    session_mark, subscribe, Client, Engine, PATIENCE,
+    respawn_define_shared, session_mark, subscribe, Client, Engine, PATIENCE,
 };
 use protocol::generated::{
     ClientSpellDebuffAxis, ConCardMessage, EngineMessage, HealthResultStatus, ModuleChangedMessage,
@@ -542,6 +542,53 @@ fn a_confirmed_sighting_re_bases_the_clock_and_an_unknown_row_moves_nothing() {
     };
     assert!(!nothing.confirmed);
     assert_eq!(conn.state(24, "respawn")["rows"][0]["basis"], "sighting");
+}
+
+#[test]
+fn a_watchs_shared_name_switch_survives_the_wire() {
+    // The fold reads `sharedName` off the pushed prefs and its own tests hand it raw JSON. Over a
+    // socket the prefs pass through the typed `RespawnWatch` first, and a property that struct does
+    // not name is dropped there (found 2026-11-19: the switch did nothing in the running app). This
+    // owns that crossing: the switch a define sends is the switch the next snapshot shows.
+    let staged = Staged::new("shared-name", A_WATCHED_DEATH);
+    let engine = Engine::start();
+    let mut conn = Conn::new(engine.connected());
+
+    conn.client.send(&respawn_define_shared(
+        1,
+        &[
+            ("a fire giant warlord", "a fire giant warlord", true),
+            ("a lava guardian", "a lava guardian", false),
+        ],
+    ));
+    let _acked = conn.reply(1);
+
+    conn.client.send(&attach(2, &staged.path()));
+    let _accepted = conn.reply(2);
+    conn.wait_for_live(3);
+
+    let state = conn.state(20, "respawn");
+    let watches = &state["prefs"]["watches"];
+    assert_eq!(watches[0]["sharedName"], true, "{state}");
+    // Off is absent, never false: the app's store writes the property only when it is on.
+    assert!(watches[1].get("sharedName").is_none(), "{state}");
+    assert_eq!(
+        state["rows"][0]["sharedName"], true,
+        "the row says the estimate ignored short gaps: {state}"
+    );
+
+    // Switching it off is a define without the property, and the row follows.
+    conn.client.send(&respawn_define_shared(
+        21,
+        &[("a fire giant warlord", "a fire giant warlord", false)],
+    ));
+    let _off = conn.reply(21);
+    let after = conn.state(22, "respawn");
+    assert!(
+        after["prefs"]["watches"][0].get("sharedName").is_none(),
+        "{after}"
+    );
+    assert!(after["rows"][0].get("sharedName").is_none(), "{after}");
 }
 
 #[test]

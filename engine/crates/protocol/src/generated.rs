@@ -8,7 +8,7 @@
 //! and a schema edit that lands without regenerating turns the protocol-codegen staleness
 //! test red on this side and tests/protocolSchema.test.mts red on the other.
 //!
-//! schema-digest: sha256:eadca3087163acadf8eb08225cebbc677e554ef870d57f216bda1889568f0378
+//! schema-digest: sha256:2114bb0cb3d5e4b96341e7cb7babdb56c9eb282aee8027656b64570566593572
 #![allow(missing_docs, clippy::all, clippy::pedantic)]
 
 /// Error types.
@@ -8816,6 +8816,10 @@ pub struct RespawnPrefs {
 ///    "key": {
 ///      "description": "Canonical (lowercased) mob name — what a death line's name canonicalizes to.",
 ///      "type": "string"
+///    },
+///    "sharedName": {
+///      "description": "Several mobs share this name: estimate from gaps of ten minutes or more only. Absent means off.",
+///      "type": "boolean"
 ///    }
 ///  },
 ///  "additionalProperties": true
@@ -8834,6 +8838,13 @@ pub struct RespawnWatch {
     pub display: ::std::string::String,
     ///Canonical (lowercased) mob name — what a death line's name canonicalizes to.
     pub key: ::std::string::String,
+    ///Several mobs share this name: estimate from gaps of ten minutes or more only. Absent means off.
+    #[serde(
+        rename = "sharedName",
+        default,
+        skip_serializing_if = "::std::option::Option::is_none"
+    )]
+    pub shared_name: ::std::option::Option<bool>,
 }
 ///`RosterDefineParams`
 ///
