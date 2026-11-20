@@ -146,6 +146,7 @@ import type { UpdateChannel, UpdateStatus } from '../shared/types'
 import {
   MAX_DOWNLOAD_ATTEMPTS,
   SIGNATURE_BLOCKED_PAUSED_MESSAGE,
+  checkFollowUpPhase,
   describeUpdateFailure,
   isInterruptedFailure,
   isNewerVersion,
@@ -272,6 +273,11 @@ function rememberStaged(version: string | undefined): void {
   }
 }
 
+/**
+ * Checks and downloads cut short since the last check that completed. It bounds the short retry
+ * (shared/update.ts `checkFollowUpPhase`), so a network that keeps changing is not polled forever.
+ */
+let interruptedInARow = 0
 /**
  * True once a download has landed in this session with install-on-close ON, which is the only
  * moment electron-updater registers its quit handler (BaseUpdater.js `addQuitHandler`).
@@ -406,7 +412,9 @@ function noteInterrupted(step: UpdateStep, err: unknown, sinks: StatusSinks): vo
   logUpdateFailure(step, 'final', err, LOG_SINKS)
   noteUpdate(step, err)
   checkInFlight = false
-  sinks.push({ state: 'idle' })
+  interruptedInARow++
+  // `interrupted` is what stops the chip reading "up to date" about a check that never finished.
+  sinks.push({ state: 'idle', interrupted: step })
   sinks.retryOnResume()
 }
 
@@ -705,6 +713,7 @@ export function initUpdater(
   const checkDone = (status: UpdateStatus): void => {
     lastCheckedAt = Date.now()
     checkInFlight = false
+    interruptedInARow = 0
     try {
       setUpdateLastCheckedAt(lastCheckedAt)
     } catch {
@@ -782,6 +791,7 @@ export function initUpdater(
   const runCheck = async (manual: boolean): Promise<UpdateStatus> => {
     if (manual) {
       consecutiveFailures = 0
+      interruptedInARow = 0
       downloadAttempts.clear()
       // The user may have just allowed PowerShell and come back to press the button — an explicit
       // retry re-asks the environment rather than repeating this session's verdict about it.
@@ -825,7 +835,8 @@ export function initUpdater(
     // Automatic updates off: no background check. The manual "Check for updates" still runs.
     if (autoUpdateOff) return
     timer = setTimeout(() => {
-      void runCheck(false).finally(() => schedule('periodic'))
+      // From the verdict, not a fixed 'periodic': that overwrote an interrupted check's short retry.
+      void runCheck(false).finally(() => schedule(checkFollowUpPhase(lastStatus, interruptedInARow)))
     }, nextCheckDelayMs({ phase, consecutiveFailures }))
   }
 
@@ -833,8 +844,8 @@ export function initUpdater(
   ipcMain.handle(IPC.checkForUpdates, async (): Promise<UpdateStatus> => {
     const res = await runCheck(true)
     // Re-anchor the background cadence off the manual check so we don't poll
-    // again three seconds later.
-    schedule('periodic')
+    // again three seconds later. An interrupted check keeps its short retry instead.
+    schedule(checkFollowUpPhase(res, interruptedInARow))
     return res
   })
 

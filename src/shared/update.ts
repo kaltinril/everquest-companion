@@ -128,6 +128,33 @@ export function shouldRearmStagedBuild(now: {
   return !now.quitArmed && !now.autoUpdateOff && now.state === 'ready'
 }
 
+/** Short retries allowed in a row for a check that keeps being interrupted. */
+export const MAX_INTERRUPTED_RETRIES = 3
+
+/**
+ * Which delay follows a check that has just returned.
+ *
+ * An interrupted check asked for the short post-wake retry, and its caller re-arms the poll right
+ * after it returns: re-arming at the ordinary spacing there overwrote that retry with a 4 hour
+ * wait. `interruptedInARow` bounds it, so a network that keeps changing falls back to the ordinary
+ * spacing.
+ */
+export function checkFollowUpPhase(
+  status: UpdateStatus,
+  interruptedInARow: number
+): 'resume' | 'periodic' {
+  const retry = status.interrupted !== undefined && interruptedInARow <= MAX_INTERRUPTED_RETRIES
+  return retry ? 'resume' : 'periodic'
+}
+
+/**
+ * Does this answer to a manual check start the "one answer is valid for a while" window? An
+ * interrupted check is not an answer, so the button stays live for another try.
+ */
+export function checkEarnsCooldown(status: UpdateStatus): boolean {
+  return status.interrupted === undefined
+}
+
 // ----------------------------------------------------- feed failure messages
 //
 // JOS-211. A 0.18.0 user pressed "Check for updates" and the app answered
@@ -720,6 +747,8 @@ export type UpdateChipState =
       message?: string
       disabled?: boolean
       staged?: string
+      /** The last check or download was cut short (`UpdateStatus.interrupted`). */
+      interrupted?: 'check' | 'download'
     }
 
 /**
@@ -761,7 +790,8 @@ export function updateChipState(status: UpdateStatus, currentVersion?: string): 
         failed: false,
         disabled: status.disabled,
         // Only a positive "newer" verdict: an unknown running version makes no claim.
-        ...(isNewerVersion(status.stagedVersion, currentVersion) && { staged: status.stagedVersion })
+        ...(isNewerVersion(status.stagedVersion, currentVersion) && { staged: status.stagedVersion }),
+        ...(status.interrupted && { interrupted: status.interrupted })
       }
   }
 }
@@ -807,6 +837,31 @@ export interface UpdateChipLine {
 }
 
 /**
+ * The two resting facts that outrank "up to date" and the age line, because both of those claim
+ * a check completed and found nothing. Lifted out of `updateChipLine` for its branch count.
+ */
+function standingFactLine(ui: UpdateChipState, vPrefix: string): UpdateChipLine | null {
+  if (ui.kind !== 'quiet') return null
+  // CUT SHORT, NOT FAILED AND NOT DONE. Quiet, because an interruption is not a failed check.
+  if (ui.interrupted) {
+    return {
+      label: `${vPrefix}${ui.interrupted} interrupted`,
+      tip: 'The connection changed or the PC slept; click to try again.',
+      failed: false
+    }
+  }
+  // A newer build is on disk and not installed.
+  if (ui.staged) {
+    return {
+      label: `${vPrefix}update not installed`,
+      tip: `Click to check again, then restart to install v${ui.staged}.`,
+      failed: false
+    }
+  }
+  return null
+}
+
+/**
  * The ONE producer of the quiet/working line. Pure, so `tests/updateCadence.test.mts` can pin the
  * sentence the user actually reads — which is the only artefact issue 29 ever produced.
  */
@@ -825,14 +880,8 @@ export function updateChipLine(ui: UpdateChipState, ctx: UpdateChipLineCtx): Upd
   // THE FAILURE BRANCH COMES BEFORE THE COOLDOWN, and that ordering IS the fix: the cooldown's
   // "up to date" and the age line are both claims that a check completed.
   if (failed) return { label: `${vPrefix}update check failed`, tip, failed: true }
-  // A newer build is on disk and not installed: that outranks "up to date" and the age line.
-  if (ui.kind === 'quiet' && ui.staged) {
-    return {
-      label: `${vPrefix}update not installed`,
-      tip: `Click to check again, then restart to install v${ui.staged}.`,
-      failed: false
-    }
-  }
+  const standing = standingFactLine(ui, vPrefix)
+  if (standing) return standing
   if (ctx.cooldown) return { label: `${vPrefix}up to date`, tip, failed: false }
   return {
     label: ctx.age === null ? `${vPrefix}not checked yet` : `${vPrefix}checked ${ctx.age}`,
@@ -876,6 +925,8 @@ export function updatePrefsChip(
   if (status.disabled) return { label: 'dev build - updates off', color: 'default' }
   const resting = status.state === 'idle' || (ui.kind === 'quiet' && status.state === 'ready')
   if (!resting) return PREFS_CHIP[status.state]
+  // A check cut short reached no verdict, so none of the resting labels below is its to claim.
+  if (status.interrupted) return { label: `${status.interrupted} interrupted`, color: 'default' }
   if (ui.kind === 'quiet' && ui.staged) return { label: 'update not installed', color: 'info' }
   // Switch off: nothing checks again, so "up to date" is only true just after a check the player
   // ran. The rest of the time the chip says why it is not checking.

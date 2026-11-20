@@ -25,6 +25,7 @@ import {
   type UpdateChipState,
   type UpdatePrefsChip,
   autoUpdateCaption,
+  checkEarnsCooldown,
   updateChipState,
   updatePrefsChip
 } from '@shared/update'
@@ -250,12 +251,16 @@ export function UpdateSetting({
 
   const checkNow = useCallback(async () => {
     setChecking(true)
+    // An interrupted check is not an answer: no cooldown, so the button works again at once.
+    let answered = true
     try {
-      await window.eq.checkForUpdates()
+      answered = checkEarnsCooldown(await window.eq.checkForUpdates())
     } finally {
       setChecking(false)
-      setCooldown(true)
-      setTimeout(() => setCooldown(false), 10_000)
+      if (answered) {
+        setCooldown(true)
+        setTimeout(() => setCooldown(false), 10_000)
+      }
     }
   }, [])
 

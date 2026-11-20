@@ -3,7 +3,7 @@ import { Box, LinearProgress, Typography } from '@mui/material'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import NewReleasesIcon from '@mui/icons-material/NewReleases'
 import type { UpdateStatus } from '@shared/types'
-import { readyChipTip, updateChipLine, updateChipState } from '@shared/update'
+import { checkEarnsCooldown, readyChipTip, updateChipLine, updateChipState } from '@shared/update'
 import { formatAge } from '../lib/formatDate'
 
 /**
@@ -388,10 +388,17 @@ export function UpdateChip({ onWhatsNew }: { onWhatsNew: () => void }): JSX.Elem
       disabled={busy || cooldown || ui.kind === 'working'}
       onCheck={() => {
         setBusy(true)
-        void window.eq.checkForUpdates().finally(() => {
-          setBusy(false)
-          startCooldown()
-        })
+        // An interrupted check is not an answer: no cooldown, so the next click works at once.
+        let answered = true
+        void window.eq
+          .checkForUpdates()
+          .then((res) => {
+            answered = checkEarnsCooldown(res)
+          })
+          .finally(() => {
+            setBusy(false)
+            if (answered) startCooldown()
+          })
       }}
     />
   )
