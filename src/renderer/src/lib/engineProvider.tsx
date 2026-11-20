@@ -25,23 +25,24 @@
 // is nothing to carry across — resume is always re-query (diff-protocol rule 3), which the client
 // library already enforces on its own window state.
 //
-// ── THE RETRY IS A DEV LOOP, AND IT IS BOUNDED BY BEING BORING ────────────────────────────────
+// ── THE RETRY HAS A CAP, AND A CHANGED FACT STARTS IT AGAIN (fork #9) ─────────────────────────
 //
 // The engine becomes ready asynchronously (spawn → announce → health probe), so the first ask can
 // legitimately arrive before there is anything to connect to; and a respawn invalidates every port
-// main handed out. Both are answered by asking again on a fixed interval. It is a plain timer, not
-// a backoff, because the whole thing is behind a developer's environment variable and the cost of
-// being wrong is one refused IPC call every few seconds. When the flag is unset this file does
-// exactly nothing: no timer, no IPC, no client — one `if`, read once.
+// main handed out. Both are answered by asking again. It used to be a flat 4 s timer for ever,
+// written when this was behind a developer's environment variable; every launch connects now, and
+// an engine that never comes up cost one refused IPC call every 4 s for the life of the window.
+// `shared/dataServer/retryPlan.ts` is the rule: 4, 8, 16, 30 s, five tries in a row, then no
+// timer. What starts it again is the engine words of the log-read status main pushes: the engine
+// starting, connecting or coming back all change them, so no new channel is needed.
 
-import { useEffect, useState, type JSX, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type JSX, type ReactNode } from 'react'
 import { createEngineClient, type EngineClient } from '../../../shared/dataServer/client'
 import { createNdjsonTransport } from '../../../shared/dataServer/ndjson'
 import type { ClientMessage, EngineMessage } from '../../../shared/dataServer/protocol.generated'
+import { onStatusWords, retryPlan, type RetryPhase } from '../../../shared/dataServer/retryPlan'
+import { useLogReadReport } from './logReadReportHud'
 import { EngineClientProvider } from './useView'
-
-/** How long before a window that could not connect asks again. See the header for why it is flat. */
-const RETRY_MS = 4_000
 
 /**
  * Give every view below this a client — when there is one.
@@ -56,6 +57,21 @@ const RETRY_MS = 4_000
 export function EngineProvider({ children }: { children: ReactNode }): JSX.Element {
   const [client, setClient] = useState<EngineClient | null>(null)
   const [attempt, setAttempt] = useState(0)
+  /** Failed tries in a row, and what this window is doing about its connection (retryPlan.ts). */
+  const retry = useRef<{ tries: number; phase: RetryPhase }>({ tries: 0, phase: 'trying' })
+  const engineWords = useLogReadReport()?.engine ?? null
+  const seenWords = useRef(engineWords)
+
+  // THE CHANGED FACT. A try that is out is left to finish; a window that is waiting, or has
+  // stopped asking, tries now. Above the connect effect, so the phase it reads is the last try's.
+  useEffect(() => {
+    if (seenWords.current === engineWords) return
+    seenWords.current = engineWords
+    const what = onStatusWords(retry.current.phase)
+    if (what === 'nothing') return
+    retry.current.tries = retryPlan(retry.current.tries, true).tries
+    if (what === 'tryNow') setAttempt((n) => n + 1)
+  }, [engineWords])
 
   useEffect(() => {
     // NO PRE-CHECK (JOS-499 item 9). There used to be a static preload readout saying whether
@@ -65,11 +81,17 @@ export function EngineProvider({ children }: { children: ReactNode }): JSX.Eleme
     let live = true
     let created: EngineClient | null = null
     let timer: ReturnType<typeof setTimeout> | undefined
+    retry.current.phase = 'trying'
     const askAgain = (): void => {
       if (!live || timer !== undefined) return
+      retry.current.tries += 1
+      const { delayMs } = retryPlan(retry.current.tries, false)
+      retry.current.phase = delayMs === null ? 'stopped' : 'waiting'
+      // Out of tries: no timer. The status changing is what starts the next one.
+      if (delayMs === null) return
       timer = setTimeout(() => {
         if (live) setAttempt((n) => n + 1)
-      }, RETRY_MS)
+      }, delayMs)
     }
     void window.eq.engineConnect().then(
       (connection) => {
@@ -93,6 +115,8 @@ export function EngineProvider({ children }: { children: ReactNode }): JSX.Eleme
           }
         })
         next.attach(createNdjsonTransport<ClientMessage, EngineMessage>(connection))
+        // A connection taken: the next failure is the first of a new run.
+        retry.current = { tries: 0, phase: 'connected' }
         setClient(next)
       },
       () => {
