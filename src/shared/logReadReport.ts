@@ -38,6 +38,21 @@ export interface LogReadError {
   readonly said: readonly string[]
 }
 
+/** Main's connection to the engine, as the keeper that reopens it sees it (main/dataServer/linkKeeper.ts). */
+export interface LogReadLink {
+  /** Retries made in a row; 0 on the first connect of a launch and after a connection held. */
+  readonly tries: number
+  /** The most retries in a row before it gives up. */
+  readonly of: number
+  /** When the next retry is due, or null when none is waiting. */
+  readonly nextAt: number | null
+  /** No more retries will be made until a person asks. */
+  readonly gaveUp: boolean
+  /** Why the last connect failed or the last connection was lost. */
+  readonly lastReason: string | null
+  readonly everConnected: boolean
+}
+
 /** Everything main knows about the read. Every unknown is null, never 0. */
 export interface LogReadFacts {
   readonly now: number
