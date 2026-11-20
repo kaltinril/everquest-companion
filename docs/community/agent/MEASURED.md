@@ -424,6 +424,29 @@ Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`)
 - Checked in code by this change: the real parser types `You have become better at Fishing! (127)`
   as Kind::SkillUp with skill `Fishing` and value 127 (test in skills.rs).
 
+**Combines in detail (fork #6, measured 2026-11-20 on the 2026-08-12 to 2026-10-06 archive)**
+
+- 736 combines (606 made, 130 failed), 31 items; Jewelry Making 2 to 205 in 204 raises, 129 of
+  them on 2026-09-12 (563 combines, 91 minutes of crafting inside 4 h 43 min of clock).
+- Raise and combine share a second. The raise is one or two lines before the combine line (133) or
+  the line after (49); a failed combine can raise too. Taking both orders, all 204 raises pair.
+  Only 215 of 736 combines carry a raise.
+- `Consumed N x <item> (leaving M) from your personal depot.` precedes a combine made from depot
+  stock (328 of 736): ingredient, quantity, stock left.
+- `You can no longer advance your skill from making this item.` precedes a trivial combine, made
+  or failed, in the same second or the one before.
+- `Requesting favorite recipes...` prints when the tradeskill window opens. `Sorry, but you don't
+  have everything you need for this recipe in your general inventory.` is a refused attempt, not
+  a combine.
+- Merchant lines: `You purchased N <item> from <merchant> for  N platinum N gold ...` (two spaces
+  after `for`) and `You receive N platinum ... from <merchant> for the <item>(s).` 491 sales on
+  2026-09-12, about 12,262 pp.
+- Wiki trivials match the game: of 25 items that gave a raise, the last raise equals the
+  `items.json` trivial on 22, is under it on 3, over it on none. All 31 items made have a
+  `craftedBy` with a trivial and ingredients.
+- The Inventory dump lists depot stock as `Personal-Depot<n>` rows (143 in the owner's dump of
+  2026-11-20). `items.json` has no merchant data: no record says who sells an item.
+
 **Left menu (fork #10)**
 
 - Measured in the hidden e2e app, fresh install, default window (inner 1280 x 860, 100%), every
