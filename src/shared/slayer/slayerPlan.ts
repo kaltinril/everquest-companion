@@ -42,6 +42,7 @@ import { ZONES, zoneKey, zoneShortNameFromCatalog } from '../zones'
 import {
   labelMatcher,
   mobFacts,
+  raceYields,
   strictMatcher,
   type LabelMatcher,
   type MatchBasis,
@@ -73,6 +74,8 @@ export function slayerTarget(counter: SlayerCounter): SlayerTarget {
 export interface SlayerMob {
   entry: MobEntry
   facts: MobFacts
+  /** the page's race as the wiki writes it, when it gave way to the name (slayerMatch.ts `yieldsTo`) */
+  yieldedRace?: string
   /** the lowest and highest level the page states; null when it states none */
   low: number | null
   high: number | null
@@ -129,13 +132,17 @@ export function slayerMobs(
   raceOf: (page: string) => string | undefined,
   hitsFaction: (page: string) => boolean = () => false
 ): SlayerMob[] {
-  return catalog.map((entry) => ({
-    entry,
-    facts: mobFacts(entry.name, raceOf(entry.page)),
-    ...levelSpan(entry.level),
-    factionHit: hitsFaction(entry.page),
-    places: (entry.zones ?? []).map(placeOf)
-  }))
+  return catalog.map((entry) => {
+    const race = raceOf(entry.page)
+    return {
+      entry,
+      facts: mobFacts(entry.name, race),
+      ...(race !== undefined && raceYields(entry.name, race) ? { yieldedRace: race } : {}),
+      ...levelSpan(entry.level),
+      factionHit: hitsFaction(entry.page),
+      places: (entry.zones ?? []).map(placeOf)
+    }
+  })
 }
 
 export interface PlanOptions {
@@ -162,7 +169,22 @@ export interface PlanMob {
   spawns: number
   /** `name` when any counter it is listed for was read off its name */
   basis: MatchBasis
+  /** on a row read off its name because the page's race gave way: that race as the wiki writes
+   *  it, and the kind the name states */
+  yielded?: { race: string; kind: string }
   targets: string[]
+}
+
+/**
+ * What the `est.` chip's tooltip says, or null for a row that carries no chip (basis 'race'). A
+ * row whose wiki race was set aside names that race: the mob's own page says it, so a bare `est.`
+ * there reads as the app being wrong.
+ */
+export function estimateNote(mob: Pick<PlanMob, 'basis' | 'yielded'>): string | null {
+  if (mob.basis !== 'name') return null
+  if (mob.yielded === undefined) return 'Its kind is read from its name, not from a race on its wiki page.'
+  const { race, kind } = mob.yielded
+  return `Read from its name: the wiki says ${race}, but the game counts ${kind} separately.`
 }
 
 export interface PlanZone {
@@ -267,12 +289,16 @@ function planMob(mob: SlayerMob, index: TargetIndex): PlanMob | null {
   const { basis } = found
   const hits = found.at.map((i) => index.targets[i].id)
   const { entry } = mob
+  const race = mob.yieldedRace
+  const kind = mob.facts.nameTerm
+  const yielded = basis === 'name' && race !== undefined && kind !== null ? { yielded: { race, kind } } : {}
   return {
     entry,
     name: entry.name,
     level: levelText(mob.low, mob.high),
     spawns: spawnPoints(entry),
     basis,
+    ...yielded,
     targets: hits
   }
 }

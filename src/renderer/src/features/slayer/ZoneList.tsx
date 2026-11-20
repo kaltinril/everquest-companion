@@ -2,7 +2,8 @@
 // (shared/slayer/slayerPlan.ts states the order). A row opens into the mobs that count there.
 //
 // A MOB WHOSE KIND WAS READ OFF ITS NAME SAYS SO, with the one word the app already uses for an
-// estimate (`est.`). A mob whose wiki page states its race carries no mark.
+// estimate (`est.`), and the chip's tooltip says why (`estimateNote`): a drake's page says Dragon,
+// and the race was set aside. A mob counted by its wiki race carries no mark.
 
 import { type JSX, useState } from 'react'
 import {
@@ -24,7 +25,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import MapIcon from '@mui/icons-material/Map'
 import { killsFor, type KillMap } from '@shared/kills'
-import type { PlanMob, PlanZone, ZoneOrder } from '@shared/slayer/slayerPlan'
+import { estimateNote, type PlanMob, type PlanZone, type ZoneOrder } from '@shared/slayer/slayerPlan'
 import type { ZoneListBundle } from './useSlayerController'
 
 const CHIP_SX = { height: 18, fontSize: 10, '& .MuiChip-label': { px: 0.75 } }
@@ -93,6 +94,7 @@ function killedIn(zone: PlanZone, kills: KillMap): number {
 
 function MobLine({ mob, bundle }: { mob: PlanMob; bundle: ZoneListBundle }): JSX.Element {
   const { onOpenMob, names } = bundle
+  const note = estimateNote(mob)
   return (
     <Stack
       direction="row"
@@ -126,7 +128,11 @@ function MobLine({ mob, bundle }: { mob: PlanMob; bundle: ZoneListBundle }): JSX
         {String(mob.spawns)} {mob.spawns === 1 ? 'spawn' : 'spawns'}
       </Typography>
       <Killed name={mob.name} kills={bundle.kills} />
-      {mob.basis === 'name' && <Chip size="small" label="est." sx={CHIP_SX} />}
+      {note !== null && (
+        <Tooltip title={note}>
+          <Chip size="small" label="est." sx={CHIP_SX} />
+        </Tooltip>
+      )}
       <CounterChips ids={mob.targets} names={names} />
     </Stack>
   )
