@@ -163,6 +163,43 @@ test('a log just archived (empty, or not yet recreated) still answers the recent
   assert.equal((await readFactionEvidence(logPath, at('12:00:00')))?.recent, undefined)
 })
 
+// The dump's mtime carries milliseconds; a log line carries whole seconds. So a line stamped in the
+// dump's own second may be older or newer than the dump, and only the game's receipt line says which.
+const DUMP_DONE = 'Outputfile Complete: Primitive_freeport-WAR-Factions.txt'
+
+test('in the dump second, a faction line after the game says the dump is done counts', async () => {
+  const logPath = install(
+    [line('10:00:00', adj('Test Faction', 5)), line('10:00:00', DUMP_DONE), line('10:00:00', adj('Test Faction', 7))],
+    []
+  )
+  const r = await readFactionEvidence(logPath, at('10:00:00') + 700)
+  assert.deepEqual(r?.rows, [{ name: 'Test Faction', cap: null, sum: 7, hits: 1 }])
+})
+
+test('in the dump second, with no receipt line the order is unknown and the second is left out', async () => {
+  const logPath = install([line('10:00:00', adj('Test Faction', 5)), line('10:00:01', adj('Other Faction', 1))], [])
+  const r = await readFactionEvidence(logPath, at('10:00:00') + 700)
+  assert.deepEqual(r?.rows, [{ name: 'Other Faction', cap: null, sum: 1, hits: 1 }])
+})
+
+test('in the dump second, a faction line before the receipt is in the dump already and is not added again', async () => {
+  const logPath = install([line('10:00:00', adj('Test Faction', 5)), line('10:00:00', DUMP_DONE)], [])
+  const r = await readFactionEvidence(logPath, at('10:00:00') + 700)
+  assert.deepEqual(r?.rows, [])
+})
+
+test('only the faction dump receipt of that second opens it: another dump, an older one, or chat does not', async () => {
+  const after = line('10:00:00', adj('Test Faction', 7))
+  for (const notIt of [
+    line('10:00:00', 'Outputfile Complete: Primitive_freeport-Inventory.txt'),
+    line('09:59:59', DUMP_DONE),
+    line('10:00:00', `You say, '${DUMP_DONE}'`)
+  ]) {
+    const r = await readFactionEvidence(install([notIt, after], []), at('10:00:00') + 700)
+    assert.deepEqual(r?.rows, [], notIt)
+  }
+})
+
 test('a backup of the live log counts nothing twice in the recent tally', async () => {
   const live = [line('10:00:00', 'You are hungry.'), line('10:05:00', adj('Heretics', -5))]
   const logPath = install(live, [ledgerOf(live, 'backup')])
