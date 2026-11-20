@@ -5,7 +5,7 @@
 // Here, not in the renderer: order, filter and the "next" mark are domain logic
 // (eqc/no-domain-munging), and tests/tradeskillBook.test.mts runs them on the committed data.
 
-import type { ItemSource } from './itemSources'
+import { sourceItemKey, type ItemSource } from './itemSources'
 import { mobOutOfEra } from './mobEra'
 import { eraVerdict, type EraDerivation } from './planner/era'
 import { ownedCount, ownershipRowsFor, type OwnershipIndex } from './planner/ownership'
@@ -71,6 +71,8 @@ export interface BookIndex {
   bySkill: ReadonlyMap<Tradeskill, readonly BookRecipe[]>
   /** Every recipe that makes an item, by the item's key: a material's own recipe. Nothing hidden. */
   byItem: ReadonlyMap<string, readonly BookRecipe[]>
+  /** Every recipe by its own `id`, era-hidden ones included: what a link in from another tab resolves. */
+  byId: ReadonlyMap<string, BookRecipe>
   materials: ReadonlyMap<string, BookMaterial>
   /** How many recipes of each tradeskill the era setting left out. */
   eraHidden: ReadonlyMap<Tradeskill, number>
@@ -89,15 +91,17 @@ function pushTo<K, V>(map: Map<K, V[]>, key: K, value: V): void {
 export function indexBook(payload: TradeskillBookPayload, hidden?: (recipe: BookRecipe) => boolean): BookIndex {
   const bySkill = new Map<Tradeskill, BookRecipe[]>(TRADESKILLS.map((t) => [t, []]))
   const byItem = new Map<string, BookRecipe[]>()
+  const byId = new Map<string, BookRecipe>()
   const eraHidden = new Map<Tradeskill, number>()
   for (const recipe of payload.recipes) {
     pushTo(byItem, recipe.key, recipe)
+    byId.set(recipe.id, recipe)
     if (recipe.tradeskill === undefined) continue
     if (hidden?.(recipe) === true) eraHidden.set(recipe.tradeskill, (eraHidden.get(recipe.tradeskill) ?? 0) + 1)
     else pushTo(bySkill, recipe.tradeskill, recipe)
   }
   for (const list of bySkill.values()) list.sort(recipeOrder)
-  return { bySkill, byItem, materials: new Map(Object.entries(payload.materials)), eraHidden }
+  return { bySkill, byItem, byId, materials: new Map(Object.entries(payload.materials)), eraHidden }
 }
 
 export const NO_RECIPES: readonly BookRecipe[] = []
@@ -241,6 +245,54 @@ export function pickedRecipe(ladder: Ladder, id: string | null): BookRecipe | nu
   // The open line can be the heading only when every listed recipe is unrated: take the first.
   const first = ladder.lines.find((l) => l.kind === 'recipe')
   return first?.kind === 'recipe' ? first.recipe : null
+}
+
+// ---- a link in from another tab --------------------------------------------------------------
+
+function usesItem(recipe: BookRecipe, key: string): boolean {
+  // The material's own key is its record's; the recipe may spell it the way a redirect does.
+  return recipe.ingredients.some((i) => i.key === key || sourceItemKey(i.name) === key)
+}
+
+/**
+ * The recipe a link from another tab opens on a tradeskill's workbench: the first (in ladder
+ * order) that makes the item, or failing that the first that uses it as a material; null when
+ * the tradeskill has neither. A recipe the era setting hides is found too, after the listed
+ * ones of its kind, so a link to an out-of-era item still lands on its own recipe.
+ */
+export function recipeForItem(index: BookIndex, tradeskill: Tradeskill, item: string): BookRecipe | null {
+  const key = sourceItemKey(item)
+  const listed = skillRecipes(index, tradeskill)
+  const every = [...index.byId.values()].filter((r) => r.tradeskill === tradeskill).sort(recipeOrder)
+  return (
+    listed.find((r) => r.key === key) ??
+    every.find((r) => r.key === key) ??
+    listed.find((r) => usesItem(r, key)) ??
+    every.find((r) => usesItem(r, key)) ??
+    null
+  )
+}
+
+/** What the workbench remembers of its pick. `linked`: a link from another tab chose it. */
+export interface BenchPick {
+  id: string | null
+  linked: boolean
+}
+
+/**
+ * The recipe the detail panel shows. A recipe a link opened stays up even when the table does
+ * not list it (Hide trivial, the era setting), until the player picks another or searches; any
+ * other pick shows only while it is listed (`pickedRecipe`).
+ */
+export function benchRecipe(index: BookIndex, ladder: Ladder, pick: BenchPick): BookRecipe | null {
+  const linked = pick.linked && pick.id !== null ? index.byId.get(pick.id) : undefined
+  return linked ?? pickedRecipe(ladder, pick.id)
+}
+
+/** Why the panel's recipe is not in the table under it, or null when it is listed. */
+export function unlistedText(ladder: Ladder, recipe: BookRecipe | null): string | null {
+  if (recipe === null || lineOfRecipe(ladder.lines, recipe.id) >= 0) return null
+  return 'This recipe is not in the list below: a filter above is hiding it.'
 }
 
 // ---- a material's own recipe ----------------------------------------------------------------

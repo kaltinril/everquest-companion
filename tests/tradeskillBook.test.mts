@@ -16,6 +16,7 @@ import {
   NO_TRIVIAL_TEXT,
   TRADESKILL_BOOK_VERSION,
   asTradeskill,
+  benchRecipe,
   capped,
   heldCount,
   indexBook,
@@ -27,12 +28,14 @@ import {
   pickedRecipe,
   qtyPrefix,
   recipeFacts,
+  recipeForItem,
   recipeLadder,
   skillRecipes,
   sourceWords,
   subRecipes,
   tradeskillLevel,
   tradeskillTiles,
+  unlistedText,
   yieldText,
   type BookRecipe,
   type LadderLine,
@@ -187,6 +190,53 @@ test('the detail panel shows the picked recipe while it is listed, else the one 
   assert.equal(pickedRecipe(hidden, 'golden fire wedding ring#0')?.item, 'Golden Ruby Ring', 'a pick the switch hid falls back')
   const onlyUnrated = recipeLadder(recipes, { level: 205, query: 'odd', hideTrivial: false })
   assert.equal(pickedRecipe(onlyUnrated, null)?.item, 'Odd Trinket')
+})
+
+test('a link in opens the recipe that makes the item, or failing that the first that uses it', () => {
+  const index = indexBook(fixtureBook())
+  assert.equal(recipeForItem(index, 'Jewelcrafting', 'Golden Ruby Ring')?.id, 'golden ruby ring#0', 'the recipe that makes it')
+  assert.equal(recipeForItem(index, 'Jewelcrafting', 'golden ruby ring +3')?.id, 'golden ruby ring#0', 'any case, any plus level')
+  // Ruby is made by nothing; three recipes use it. The first in ladder order is the one opened.
+  assert.equal(recipeForItem(index, 'Jewelcrafting', 'Ruby')?.item, 'Golden Ruby Ring', 'the first recipe that uses it')
+  assert.equal(recipeForItem(index, 'Jewelcrafting', 'Fire Opal')?.item, 'Golden Fire Wedding Ring', 'a material by its redirect spelling')
+  assert.equal(recipeForItem(index, 'Jewelcrafting', 'Opal of Fire')?.item, 'Golden Fire Wedding Ring', 'and by its own page name')
+  // Making wins over using: Loop A is made by one Baking recipe and used by the other.
+  assert.equal(recipeForItem(index, 'Baking', 'Loop A')?.item, 'Loop A')
+  assert.equal(recipeForItem(index, 'Baking', 'Golden Ruby Ring'), null, 'another tradeskill has no recipe for it')
+  assert.equal(recipeForItem(index, 'Jewelcrafting', 'Velium Bar'), null, 'an item no recipe names')
+  assert.equal(recipeForItem(index, 'Jewelcrafting', 'Quest Idol'), null, 'a recipe whose word names no tradeskill is on no workbench')
+})
+
+test('a link in still finds a recipe the era setting hides, after the listed ones of its kind', () => {
+  const book = fixtureBook()
+  const index = indexBook(book, (r) => r.item === 'Golden Ruby Ring')
+  assert.equal(index.byId.size, book.recipes.length, 'every recipe is reachable by id, hidden or not')
+  assert.equal(recipeForItem(index, 'Jewelcrafting', 'Golden Ruby Ring')?.id, 'golden ruby ring#0', 'the hidden recipe that makes it')
+  // Ruby: the hidden Ruby Ring uses it and so does the listed Odd Trinket. The listed one is opened.
+  assert.equal(recipeForItem(index, 'Jewelcrafting', 'Ruby')?.item, 'Odd Trinket')
+  const all = indexBook(book, (r) => r.tradeskill === 'Jewelcrafting')
+  assert.equal(recipeForItem(all, 'Jewelcrafting', 'Ruby')?.item, 'Golden Ruby Ring', 'with none listed, the first hidden one in ladder order')
+})
+
+test('a recipe a link opened stays in the panel when the table hides it; any other pick falls back', () => {
+  const index = indexBook(fixtureBook())
+  const recipes = skillRecipes(index, 'Jewelcrafting')
+  const hidden = recipeLadder(recipes, { level: 205, query: '', hideTrivial: true })
+  const fire = 'golden fire wedding ring#0'
+  assert.equal(benchRecipe(index, hidden, { id: fire, linked: true })?.item, 'Golden Fire Wedding Ring', 'linked: kept though Hide trivial took its line')
+  assert.equal(benchRecipe(index, hidden, { id: fire, linked: false })?.item, 'Golden Ruby Ring', 'not linked: the line the table opens on')
+  assert.equal(benchRecipe(index, hidden, { id: null, linked: true })?.item, 'Golden Ruby Ring', 'nothing picked')
+  assert.equal(benchRecipe(index, hidden, { id: 'no such recipe#0', linked: true })?.item, 'Golden Ruby Ring', 'an id the book does not hold')
+  const shown = recipeLadder(recipes, { level: 205, query: '', hideTrivial: false })
+  assert.equal(benchRecipe(index, shown, { id: fire, linked: true })?.item, 'Golden Fire Wedding Ring')
+  // The panel says so only when its recipe is not on a line under it.
+  assert.equal(unlistedText(shown, benchRecipe(index, shown, { id: fire, linked: true })), null)
+  assert.match(unlistedText(hidden, benchRecipe(index, hidden, { id: fire, linked: true })) ?? '', /not in the list/)
+  assert.equal(unlistedText(hidden, null), null)
+  // Under the era setting the hidden recipe is on no ladder at all, and a link still shows it.
+  const era = indexBook(fixtureBook(), (r) => r.item === 'Golden Ruby Ring')
+  const eraLadder = recipeLadder(skillRecipes(era, 'Jewelcrafting'), { level: 205, query: '', hideTrivial: false })
+  assert.equal(benchRecipe(era, eraLadder, { id: 'golden ruby ring#0', linked: true })?.item, 'Golden Ruby Ring')
 })
 
 test('a recipe whose word names no tradeskill is on no ladder but still opens as a material', () => {
