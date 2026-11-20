@@ -1787,8 +1787,8 @@ only: no engine, parser, protocol, network or dependency change.
 - Memory (`tradeskillMemory.ts`, the gear area's rule): the open workbench
   (`eq.tradeskills.skill`, absent is Home) and Hide trivial (`eq.tradeskills.hideTrivial`) in
   localStorage; the search and the picked recipe in sessionStorage (`eq.tradeskills.bench`),
-  for the open workbench only. The table's scroll position rides `lib/navReturn` (parked on
-  unmount, taken on mount after a Back).
+  for the open workbench only, with `linked` when a link from another tab chose the pick. The
+  table's scroll position rides `lib/navReturn` (parked on unmount, taken on mount after a Back).
 - Back: `openLoot(item)` and `openMob(...)` are anchored links, so their Back returns to the
   Tradeskills view, which reopens the workbench and the picked recipe from storage. Only the
   Loot page's Back calls `noteBack`, so the exact scroll position is restored after Loot and the
@@ -1801,27 +1801,75 @@ only: no engine, parser, protocol, network or dependency change.
   commit, `scripts/community/community-release-notes.mjs`; nothing is hand-edited): "New
   Tradeskills section: a tile per tradeskill with your level, and a workbench with the wiki's
   recipes in trivial order, what to make next, each material's sources and how many you hold."
+  For slice 2: "Tradeskills is linked from the Loot page, the Bazaar, the Skills tab, the wish
+  list and the Gear table, and a workbench lists the gear that raises its skill."
 - Not built, and no placeholder is drawn: the goal switch and routes, merchants and locations,
-  prices, combine history, the guide panel, the make-an-item planner, a "ready" mark, the
-  skill-mod recommendations.
-- Open, links IN from other tabs (owner, 2026-11-20: "fully integrated with maps and other
-  tabs"). All need one opener first: `openTradeskills({ tradeskill, item? })` in `appRouting.ts`
-  (a `FocusSlot` like `openLoot`) that `TradeskillsTab` applies by opening the workbench and
-  picking the recipe that makes, or first uses, the item. Then, one small change each:
-  - Loot page: `features/loot/KnowledgeSection.tsx` `CraftedNote` (how it is made) and
-    `RecipesBlock` (recipes that use it). `ItemKnowledge.craftedBy` and `.recipes` are already there.
-  - Item hover card: `lib/KnownItemTooltip.tsx` `WhatItsFor`. Most cards are click-through (no
-    pointer events), so a link works only where the card is the interactive kind.
-  - Bazaar: `features/bazaar/BazaarControls.tsx`, beside the Tradeskill picker.
-  - Skills tab: `features/skills/SkillsView.tsx` `SkillRowLine`, a tradeskill's name.
-  - Character sheet: `features/character/CarryAll.tsx` depot lane rows (`ItemMarks.tradeskills`
-    says which tradeskills a material is for).
-  - Loot ledger and Mobs drop lists: `features/loot/KnowledgeBadge.tsx`, the tradeskill-only badge.
-  - Wish list and Exaltations farm list: the `crafted` group (`features/planner/plannerFarm.ts`,
-    `features/wishlist/WishGroups.tsx`); Recommended (`features/plan/PlanView.tsx`); Gear rows
-    with `playerCrafted` (`features/gear/GearTable.tsx`).
-  - Factions turn-ins: blocked on quest reward data. Maps merchant waypoints: blocked on
-    merchant data (the guides, or the log's purchases).
+  prices, combine history, the guide panel, the make-an-item planner, a "ready" mark.
+- Links IN from other tabs (owner, 2026-11-20: "fully integrated with maps and other tabs"),
+  slice 2, 2026-11-20 on `tradeskills-links`:
+  - The opener: `openTradeskills({ tradeskill, item? })` in `appRouting.ts`, a `FocusSlot` like
+    `openLoot` (`tradeskillFocus`, `tradeskillNonce`, `clearTradeskillFocus`). A focus is
+    anchored, so the origin stack parks the tab the link was on.
+  - How a link reaches it: a context, `lib/tradeskillLink.tsx` (`useTradeskillLink()`, null where
+    no app published it), the spell link's arrangement. `lib/appLinks.tsx` `AppLinkProvider`
+    mounts the spell and tradeskill providers as one element, because `App.tsx` is at its line
+    ceiling: add a later context door there, not in `App.tsx`.
+  - How the tab applies it (`TradeskillsView.tsx` `useArrival`): once the book is loaded,
+    `shared/tradeskillBook.recipeForItem` picks the recipe (makes the item, else first uses it;
+    listed recipes before era-hidden ones of the same kind), `rememberLinkedPick` writes it as
+    the workbench's pick with `linked: true` and an empty search, the workbench is opened and the
+    focus retired. No screen is drawn while a focus waits, so the workbench mounts after the
+    pick is written. A link with no item, or an item with no recipe there, leaves the workbench's
+    memory alone.
+  - A linked pick stays in the panel when the table does not list it (Hide trivial, the era
+    toggle): `benchRecipe`, with `unlistedText` under the recipe's name. Picking a line or typing
+    a search clears `linked`. `BookIndex.byId` holds every recipe, era-hidden included.
+  - Back: the header's `BackToOrigin` ("Back to <tab>", `tradeskills-back`) shows while an origin
+    is parked; it is also the mouse Back's target (`useBackTarget`) and calls `noteBack`, so a
+    mob page that sent the reader here comes back as that page. LootView now parks its open item
+    page too (`parkReturn('loot', ...)`), so Back to Loot lands on that item; only this Back
+    notes `loot`, so every other arrival at Loot is unchanged.
+    TRAP: `lib/navReturn` is ONE slot. The recipe table parks on unmount, so going Home or to
+    another workbench after a link in overwrites what Mobs or Loot parked, and Back then lands
+    on their list.
+  - Which tradeskill an item is made by, for a row that has no recipe in hand:
+    `ItemMarks.madeBy` (`shared/itemKnowledge.marksOf`: the tradeskills of the item's own
+    `craftedBy`, absent when none). `marks.tradeskills` also holds what the item is an ingredient
+    of, so it is not the answer to "made by". `lib/tradeskillLink.MadeByLink` draws
+    "made: <Tradeskill>" from it.
+
+  | Surface | File and component | State | What the player sees |
+  | --- | --- | --- | --- |
+  | Loot item page and item dialog | `features/loot/KnowledgeSection.tsx` `CraftedNote`, `RecipeUseChip` | built | Each way in "Crafted:" that names a tradeskill is a `CellLink` (parts from `shared/itemKnowledge.craftedByParts`); each "Used in recipe" chip that names one is clickable and opens the recipe that makes the chip's item |
+  | Item hover card | `lib/KnownItemTooltip.tsx` `RecipeHow` | built where the card takes the pointer | Depth 0 only (not click-through, not nested): the "Baking 56" beside a "Used in recipe" name is a `CellLink`. Most cards in the app are click-through and are unchanged |
+  | Bazaar | `features/bazaar/BazaarControls.tsx` `WorkbenchButton` | built | "<Tradeskill> recipes" beside the Tradeskill picker once one is picked |
+  | Skills tab | `features/skills/SkillsView.tsx` `SkillName` | built | A tradeskill's name is a `CellLink` to its workbench (any log spelling, folded by `tradeskillOf`) |
+  | Loot ledger | `features/loot/KnowledgeBadge.tsx` `TradeskillChip` | built | The `tradeskill` badge is clickable: the first of `marks.tradeskills`, with the row's item; the click stops before the row |
+  | Mobs drop lists | none | not built | The mob page's drop rows carry no tradeskill badge (`KnowledgeBadge` is drawn only by `loot/lootRows.tsx`); the item dialog opened from a drop row has the Loot page's links |
+  | Wish list | `features/wishlist/WishGroups.tsx` `CampLine` | built | A Crafted-group row with no camp reads "made: <Tradeskill>" (`MadeByLink`) where it read "-". The Exaltations farm list no longer exists: the wish list is its drawing half |
+  | Gear rows | `features/gear/GearTable.tsx`, the Mob cell | built | A `playerCrafted` row with no drop mob reads "made: <Tradeskill>"; its marks are asked only for such rows |
+  | Recommended (Plan) | none | not built | The plan's targets are mob drops and quest rewards (`progressionPlan.ts` reads no `playerCrafted`): a made item is never on it, so there is nothing to link. A crafted lane is a feature, not a link |
+  | Character sheet depot rows | none | not built | `CarryAll.tsx` is read-only by its own header ("no row click ... a row is text") and the Character tab has no door to any other tab. A link there is a new pattern for that screen: the owner's call |
+  | Factions turn-ins | none | blocked | No quest reward data |
+  | Maps merchant waypoints | none | blocked | No merchant data (the guides, or the log's purchases) |
+
+- "Gear that raises this skill" (`SkillGearPanel.tsx`, under the workbench's head): the Gear
+  index rows whose `skillMods` name the tradeskill, by `shared/tradeskillGear.skillGear` (fold by
+  `tradeskillOf`; largest percent, then cap, then name; a mod that lowers the skill left out).
+  - The rows are `gear/gearData.useGearIndex()`: the Gear tab's one fetch per window. The first
+    workbench opened in a window pays that fetch if the Gear tab has not; the panel appears when
+    it lands. Do not build a second index.
+  - Era: `gearData.useEraHidden()` injected when the Current era toggle is on; hidden items are
+    counted in the panel. Held: `heldCount` over the section's own `useHeld()`; with no dump the
+    words are left out.
+  - No line for the tradeskill: the panel returns null. 2026-11-20 data: Fishing four, Baking one.
+  - The link out: `appRouting.openGearSearch(text)` writes `eq.gear.search`
+    (`gear/useAreaMemory.presetSearch`) and switches to Gear unanchored, `openMapZone`'s
+    arrangement. The text is `skill mod <the item's own spelling of the skill>`, lower case: the
+    Gear haystack holds what the item wrote (`skillModSearchText`). The Gear tab's other filters
+    are not touched, so a class or slot filter the player left on can still hide the items.
+- e2e (written, NOT run on `tradeskills-links`): `tradeskills.e2e.mts` gained `stepFromSkills`,
+  `stepFromLoot` and `stepSkillGear`.
 
 ## Bug hunt 2026-11-19: the rules its fixes left in force
 
