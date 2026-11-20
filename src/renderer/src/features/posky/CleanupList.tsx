@@ -277,8 +277,10 @@ export default function CleanupList({
           inventoryLoadedAt={inventoryLoadedAt}
         />
       </Stack>
-      <HandHiddenLine hidden={hidden} onSetItemCount={onSetItemCount} />
-      <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
+      {/* The take-back chips scroll WITH the list. Above it they had no height limit: 30 zeroed
+          items made seven lines of chips and left the list less than one row at the minimum window. */}
+      <Box data-testid="posky-cleanup-scroll" sx={{ flexGrow: 1, overflow: 'auto' }}>
+        <HandHiddenLine hidden={hidden} onSetItemCount={onSetItemCount} />
         {rows.length === 0 ? (
           <Typography color="text.secondary" data-testid="posky-cleanup-empty">
             Nothing here to destroy - every Sky item you are holding is still wanted by a quest you
