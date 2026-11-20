@@ -2245,6 +2245,83 @@ only: no engine, parser, protocol, network or dependency change.
   - What's new line: "Tradeskills: the route has Only use materials I have, recipes you can make
     right now are marked and can be listed alone, and a recipe the wiki is missing materials or a
     trivial for says so with a link to its wiki page."
+- Slice 6, the Faction goal (2026-11-20, branch `tradeskill-faction` off `tradeskills-batch3`; not
+  merged, not tried by the owner). TypeScript only; no engine, protocol, network, data or
+  dependency change; `security.ts` untouched.
+  - Where: the fifth goal of the switch on "Your route". `ROUTE_GOALS` has five; `BOOK_GOALS` is
+    the four `buildRoute` builds (`RouteAsk.goal` and `Route.goal` are `BookGoal`). Faction is not
+    a climb from the level, so it is not a `Route`: `shared/tradeskillRouteFaction.ts`
+    `buildFactionRoute(facts, ask)` returns the list of factions, the picked one and its rows.
+    `RoutePanel.tsx` draws `BookRoute` or `FactionRoute.tsx` by the goal.
+  - The join is `shared/questFactions.ts` (`questsTaking`). The renderer has no items.json, so
+    its item records come from the recipe book: `bookFactionItems(index)`, one record per made
+    item's page, every recipe counted (era-hidden too). `BookRecipe.questPages` (new, filled in
+    `main/tradeskillBook.ts` `madeItemFacts`) is quest name to page title for a use whose page has
+    another title (97 entries on 83 recipes); without it Tarnished Dagger lost its rows.
+    `TRADESKILL_BOOK_VERSION` unchanged (optional field). A test holds the book's rows equal to
+    the item database's (none invented, at most 2% lost; measured: none lost).
+  - Era: the caller builds the join over `inEraQuests(quests)` when the Current era setting is on
+    (`FactionRoute.useTurnIns`), and the rows walk `skillRecipes(index, tradeskill)`, which the
+    setting has already narrowed. With the setting off an out-of-era quest's row carries
+    `TurnIn.eraNote`.
+  - A row is one recipe and one quest page (`FactionStep`, a `RouteStep` plus `turnIn`, so
+    `ShoppingPanel` reads it unchanged). Its id is `<recipe id>|<quest page>`. One recipe is a row
+    under every faction its page raises.
+  - Order (`rowOrder`): trivial at or under the level, then the stated raise (unstated after every
+    stated one), then the known cost per combine, then ladder order, then the page title. A level
+    the log never showed makes no recipe trivial (`LEVEL_UNSEEN_NOTE`), unlike the climbing routes,
+    which start from 0.
+  - Default pick: the faction most recipes feed, first by name among equals; a remembered pick
+    (`eq.tradeskills.faction.<Tradeskill>`, the join key) stands while the list holds it.
+  - THE LAW: one list per quest page (questFactions.ts header). Nothing is filtered for it. A row
+    is marked (`TurnIn.shared`, chip "shared page" and the sentence) on three signs: the item's
+    page files the use under a quest name that is not the page's title (`filedAs`), the title
+    matches `quests|tests`, or the page lists more than `LONG_LIST` (5) changes. Do not turn a
+    sign into a filter without the owner's word.
+  - A second honesty line, `TurnIn.tie`: a row tied by the quest page alone (`requiredItems` is
+    every item the page names outside its Reward section, so a material of the turn-in is there
+    too: Clump of Dough on Muffin Quests) or by the item's page alone says which. Both: nothing.
+  - Never drawn: a number of turn-ins, a standing to reach, how many of the item a turn-in takes
+    (`requiredItems` holds no counts), a combine chance. `tests/tradeskillRouteFaction.test.mts`
+    "NOTHING FORECAST" scans every row.
+  - Standings: `factions/useFactionRows.useFactionData()`, the Factions tab's own rows (the dump
+    corrected by the log), keyed by `questFactionKey(row.name)`. It asks main for the log evidence
+    while the Faction goal is open, as the Factions tab does. Null rows = no dump: no standing is
+    drawn and `OutputKindLine kind="faction" quiet` names the command.
+  - "Only use materials I have" reads here too (`tradeskillRoute.heldOnlyApplies`): rows whose
+    recipe `combinesHeld` covers at least one combine, each judged alone (rows are alternatives,
+    not a sequence, so no stock is shared out). The list of factions is not narrowed.
+    `HELD_ONLY_GOALS_TEXT` now reads "Applies to Cheapest and Fastest, and to Faction." (the e2e
+    held steps match `cheapest and fastest`).
+  - Shopping list: for the first row, or the row whose "Shop for this" was pressed (component
+    state, not remembered; a pick the list no longer holds falls back to the first row).
+  - Links: item = `ItemLabel`; quest = `<a target="_blank">` to `wikiPageUrl(page)` (no tab holds a
+    quest page; the Factions tab and the Loot page link a quest the same way); giver =
+    `MerchantLink` (a link only when the mob catalog holds the name on one page); zones =
+    `ZoneList` (`startZone` split on commas; a spelling the table refuses stays text); faction =
+    `lib/factionLink.FactionLink`.
+  - The door into the Factions tab is new: `appRouting.openFactions(name?)` (`factionFocus`,
+    `factionNonce`, `clearFactionFocus`; a `FocusSlot`, anchored when a name rides along),
+    published by `lib/factionLink.tsx` through `lib/appLinks.tsx`. `useFactionsController`
+    `useFocusArrival` calls `reveal(name)` and retires the ask; `FactionBack.tsx` is the Back
+    (`MapBack.tsx`'s arrangement). The link asks for the dump's spelling when the dump lists the
+    faction (`FactionChange.openAs`): the tab's search is a substring match on the dump's names,
+    and a wiki spelling of a faction can differ from the dump's. Not checked against a real dump.
+  - Back from Factions lands on the route again: the open workbench, the route tab, the goal and
+    the picked faction are all in storage. The "Shop for this" row is not.
+  - Measured 2026-11-20, in era: factions per tradeskill Baking 42, Brewing 42, Blacksmithing 38,
+    Tailoring 30, Pottery 25, Fletching 13, Fishing 3 (the other five none; with the setting off
+    Poison Making 5, Alchemy 3 and Jewelcrafting 2 appear). 90 recipe and page pairs; 26 marked
+    shared (14 pages); 26 tied by the quest page alone, 13 by the item's page alone. TRAP for the
+    reader: Pottery's 25 and Fletching's 13 are one item on one long page each.
+  - Tests: `tests/tradeskillRouteFaction.test.mts` (a fixture, then Muffin, Silk Swatch and
+    Tarnished Dagger from the committed data); changed `tradeskillRoute.test.mts` (five goals,
+    `BOOK_GOALS`) and `tradeskillHeld.test.mts` (`heldOnlyApplies`). e2e:
+    `tests/e2e/tradeskillFactionSteps.mts` (`stepFaction`), written, NOT run, and not yet called
+    from `tradeskills.e2e.mts`; `tradeskillRouteSteps.mts` now expects five goals.
+  - What's new line: "Tradeskills: the route has a Faction goal. Pick a faction and see which
+    items of the tradeskill a quest takes to raise it, with the quest, its giver and zone, every
+    faction change the wiki states, and the shopping list. Faction names open the Factions tab."
 
 ## Tradeskill guides as data (fork #6, requirements/skills-tab.md)
 
