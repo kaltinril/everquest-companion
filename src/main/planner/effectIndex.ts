@@ -90,6 +90,9 @@ import {
 } from '../../shared/planner/normalize'
 import { extractionTier } from '../../shared/planner/rules'
 import { COMMITTED_FOCUS_BENEFIT } from './focusBenefit'
+import { buildEraDerivations } from './eraDerive'
+import { eraEvidenceOf, type EraEvidence } from './eraEvidence'
+import type { EraDerivation } from '../../shared/planner/era'
 import { deitiesOf } from '../../shared/planner/deity'
 import type { EffectFacts } from '../../shared/planner/effectText'
 import type { ClassAbbr } from '../../shared/classCombo'
@@ -151,8 +154,8 @@ interface PageCtx {
   playerCrafted: boolean
   /** what the item page's `|dropsfrom` stated; absent when it carried none */
   wikiSources?: ItemDropSource[]
-  /** the page-top `{{X Era}}` banner's token; absent when the page opened with none */
-  eraTag?: string
+  /** the page's era evidence: its banner and layer 3, from the one builder (`eraEvidence.ts`) */
+  era: EraEvidence
   /** the `Charges:` stat row, verbatim; absent when the block stated none */
   charges?: string
   /** the deities the raw stats block restricts the item to, folded; absent when it states none */
@@ -300,7 +303,8 @@ function deityList(statsBlock: string | undefined): string[] | undefined {
 
 function pageContext(
   entry: ItemDbEntry,
-  research: ItemResearchFile
+  research: ItemResearchFile,
+  derivations: ReadonlyMap<string, EraDerivation>
 ): {
   ctx: PageCtx
   effects: ItemEffect[]
@@ -321,7 +325,7 @@ function pageContext(
       // Carried through verbatim, not merged with the renderer's catalog index: the two are
       // independent witnesses and the join belongs where both are in hand (design §4.2).
       wikiSources: k.dropsFrom,
-      eraTag: k.eraTag,
+      era: eraEvidenceOf(entry.page, k.eraTag, derivations),
       charges: k.stats?.stats.find((r) => r.key.trim().toUpperCase() === 'CHARGES')?.value,
       // Read off the RAW block, as the gear index does (`deity.deitiesOf` says why the parsed flags
       // cannot be trusted with this line). The browser marks what the character cannot use by it.
@@ -370,7 +374,8 @@ function donorRow(
     // Copied per row (donors are denormalized by effect) so a consumer never has to hold a
     // second index to answer "where does this one drop".
     wikiSources: ctx.wikiSources ? ctx.wikiSources.map((s) => ({ ...s })) : undefined,
-    eraTag: ctx.eraTag,
+    // The same era evidence the Gear row for this page carries, so the two lists cannot disagree.
+    ...ctx.era,
     charges: ctx.charges,
     ...(ctx.deities === undefined ? {} : { deities: [...ctx.deities] }),
     ...(benefit === null ? {} : { benefit })
@@ -407,12 +412,16 @@ function rememberItem(acc: Acc, ctx: PageCtx): void {
   if (ctx.canonical) acc.itemFromCanonical.add(ctx.key)
 }
 
-function addPage(
-  acc: Acc,
-  entry: ItemDbEntry,
-  research: ItemResearchFile,
+/** What every page of one build is read against. */
+interface BuildDeps {
+  research: ItemResearchFile
   spells: SpellFactsIndex
-): void {
+  /** layer 3 of the era join for the file being walked (`eraDerive.ts`) */
+  derivations: ReadonlyMap<string, EraDerivation>
+}
+
+function addPage(acc: Acc, entry: ItemDbEntry, deps: BuildDeps): void {
+  const { research, spells, derivations } = deps
   if (acc.seenPages.has(entry.page)) {
     acc.stats.aliasKeys++
     return
@@ -420,7 +429,7 @@ function addPage(
   acc.seenPages.add(entry.page)
   acc.stats.pages++
 
-  const { ctx, effects, unknown } = pageContext(entry, research)
+  const { ctx, effects, unknown } = pageContext(entry, research, derivations)
   for (const token of unknown) acc.unknownSlots.add(token)
   // The ITEM index takes every page, excluded or not: the host picker and the lookup are asking a
   // different question than the donor list is.
@@ -449,13 +458,16 @@ function addPage(
 export function buildPlannerIndex(
   file: ItemDbFile,
   research: ItemResearchFile = ITEMS_RESEARCH,
-  spells: SpellFactsIndex = committedSpellFacts()
+  spells: SpellFactsIndex = committedSpellFacts(),
+  /** layer 3 for `file`, when the caller already holds it (`indexCurrent.ts`); built here otherwise */
+  derivations: ReadonlyMap<string, EraDerivation> = buildEraDerivations(file)
 ): PlannerIndex {
   const acc = newAcc()
   // Through the rename overlay (JOS-415), so a donor's row carries the name the wiki uses now.
   // The alias key it adds costs nothing here: `addPage` already dedupes by `entry.page`, which is
   // exactly the mechanism items.json's own two-keys-per-page shape relies on.
-  for (const entry of Object.values(renamedItems(file.items ?? {}))) addPage(acc, entry, research, spells)
+  const deps: BuildDeps = { research, spells, derivations }
+  for (const entry of Object.values(renamedItems(file.items ?? {}))) addPage(acc, entry, deps)
   const donors = [...acc.donors.values()]
   return {
     donors,

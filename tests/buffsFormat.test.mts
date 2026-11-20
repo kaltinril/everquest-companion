@@ -5,6 +5,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import type { ActiveBuff } from '../src/shared/buffTypes'
 import { estimateState, estimateText, fmtPrecise, leftCaption, statCells } from '../src/renderer/src/features/buffs/format'
 
@@ -91,4 +92,13 @@ test('the Durations row prints its median the way it prints its estimate', () =>
   // A minute and over keeps the long form, and a missing number is a dash.
   assert.deepEqual(statCells({ medianMs: 90_000, p25: 60_000, p75: 120_000, minMs: 30_000, maxMs: 150_000 }), { median: '1m 30s', middle: '1m 00s - 2m 00s', range: '30s - 2m 30s' })
   assert.deepEqual(statCells({ medianMs: null }), { median: fmtPrecise(null), middle: '-', range: '-' })
+})
+
+test('a card`s elapsed caption is one line that a long spell name cannot squeeze', () => {
+  // Layout, so the proof is the rule in the source: "8s elapsed" broke in two beside a two-line name.
+  const src = readFileSync(new URL('../src/renderer/src/features/buffs/ActiveBuffRow.tsx', import.meta.url), 'utf8')
+  const at = src.indexOf('data-testid="buff-elapsed"')
+  assert.ok(at > 0, 'the elapsed caption lost its handle')
+  const tag = src.slice(src.lastIndexOf('<Typography', at), src.indexOf('>', at))
+  assert.ok(tag.includes("whiteSpace: 'nowrap'") && tag.includes('flexShrink: 0'), tag)
 })

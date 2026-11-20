@@ -18,6 +18,7 @@ import {
   RESPAWN_ALERT_SPEECH,
   normalizeRespawnAlert,
   respawnAlertHeard,
+  respawnAlertOffNames,
   respawnAlertLeadFromDraft,
   respawnAlertLeadOk,
   respawnAlertSilentNote,
@@ -280,4 +281,23 @@ test('only an app signal that fills tokens has sample values; a log alert is tes
   // An app condition inside a composite never fires (alertTypes.ts), so it has nothing to sample.
   const composite = { type: 'any', conditions: [{ type: 'app', signal: 'respawnSoon' }] } as const
   assert.equal(sampleCapturesFor({ ...composite, conditions: [...composite.conditions] }), undefined)
+})
+
+test('the note names the alert that is switched off, by the name the Alerts tab shows', () => {
+  const respawn = { type: 'app', signal: 'respawnSoon' } as const
+  const own = { name: 'Camp is about to pop', enabled: false, trigger: respawn }
+  // Before 2026-11-20 the note always said "Respawn timer ending", an alert this list does not hold.
+  assert.deepEqual(respawnAlertOffNames([own]), ['Camp is about to pop'])
+  assert.equal(respawnAlertSilentNote(true, 'off', respawnAlertOffNames([own])), 'No alert will play: "Camp is about to pop" is switched off on the Alerts tab.')
+  // Several, each once, in the tab's order; an enabled one and another signal's are not named.
+  const many = [own, { name: 'Respawn timer ending', enabled: false, trigger: respawn }, { ...own }, { name: 'Loud one', enabled: true, trigger: respawn }, { name: 'Bazaar', enabled: false, trigger: { type: 'app', signal: 'bazaarWatch' } as const }]
+  assert.deepEqual(respawnAlertOffNames(many), ['Camp is about to pop', 'Respawn timer ending'])
+  assert.equal(respawnAlertSilentNote(true, 'off', ['A', 'B']), 'No alert will play: "A" and "B" are switched off on the Alerts tab.')
+  assert.equal(respawnAlertSilentNote(true, 'off', ['A', 'B', 'C']), 'No alert will play: "A", "B" and "C" are switched off on the Alerts tab.')
+  // No names in hand (an unnamed alert): the seeded name stands in, as before.
+  assert.deepEqual(respawnAlertOffNames([{ name: '  ', enabled: false, trigger: respawn }]), [])
+  assert.equal(respawnAlertSilentNote(true, 'off', []), 'No alert will play: "Respawn timer ending" is switched off on the Alerts tab.')
+  // Still silent while the box is unticked or an alert is on.
+  assert.equal(respawnAlertSilentNote(false, 'off', ['A']), null)
+  assert.equal(respawnAlertSilentNote(true, 'ok', ['A']), null)
 })

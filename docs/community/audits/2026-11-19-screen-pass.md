@@ -170,7 +170,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   describes is a design decided and tested today, and no sentence on screen is untrue. In
   src/shared/respawnEdit.ts:14-26, respawnDraftToSave returns null when the trimmed typed text
   equals the prefill. The doc comment explains why: saving the ...
-- CONFIRMED [low, untrue-words] The note names "Respawn timer ending" when the switched-off alert
+- FIXED 2026-11-20 (`respawnAlertOffNames`: the note names the switched-off alerts themselves) [low, untrue-words] The note names "Respawn timer ending" when the switched-off alert
   has another name Seen: [data-testid="respawn-alert-silent"] reads: No alert will play: "Respawn
   timer ending" is switched off on the Alerts tab. The Alerts tab has no alert of that name in this
   state (store: [{id:probe-own-respawn, name:"Camp is about to pop", enabled:false}]). With that
@@ -663,7 +663,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   Test: Unit tests in tests/bazaarWatch.test.mts on setEveryTier. (1) The list [{tier 4, wts false,
   wtb false}, {tier null, wts true, wtsMax 31000}] with every=true gives exactly [{tier null, wts
   true, wtsMax 31000}], so the ...
-- CONFIRMED [low, untrue-words] Bazaar: with "All tiers as one", the row chip and the panel show one
+- FIXED 2026-11-20 (`watchOnItem` returns the every-tier watch first) [low, untrue-words] Bazaar: with "All tiers as one", the row chip and the panel show one
   tier's watch, not the every-tier watch Seen: Combined row text: "Fleeting Quiver 3 tiers at +4
   Watch: WTB". Panel: Watch on, "Alert on WTS" off, "Alert on WTB" on, "at or over" blank, and no
   "Every tier" box, so nothing says this is the +4 watch. Alerts in the same session fired on +0, +2
@@ -679,7 +679,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   ... Test: Add a case to tests/bazaarWatch.test.mts: (a) setWatch a +4 watch {wtb:true}, then an
   every-tier watch {wts:true, wtsMax:31000, wtb:true, wtbMin:9500}. watchOnItem(list, 'fleeting
   quiver') returns the tier:null entry. ...
-- CONFIRMED [low, untrue-words] Bazaar: the row chip names only the price when a price and a percent
+- FIXED 2026-11-20 (`watchChipLabel`, now in shared/bazaarWatch.ts, names both joined by "or") [low, untrue-words] Bazaar: the row chip names only the price when a price and a percent
   are both set Seen: Chip: "Watch: WTS ≤ 100p + WTB ≥ 9.5k". Heard: "Sela WTS Fleeting Quiver 9k
   (68% of the 7-day median 13k)". With 12500 and 80 the chip reads "Watch: WTS ≤ 12.5k"; with 80
   alone it reads "Watch: WTS ≤ 80% median". Verdict: The code confirms the report, so I did not
@@ -758,7 +758,8 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   649.7-759.7, 112.7 px past the panel's inner edge; app-content scrolls sideways by 64 px
   (scrollWidth 540, clientWidth 476). At 900 px with 100% and at 1280 with 125% the panel's
   scrollWidth equals ...
-- CONFIRMED [low, cosmetic] Buffs card: a long spell name breaks "8s elapsed" onto two lines at the
+- FIXED 2026-11-20 (the caption is one unshrinking line; pinned in the source by
+  `tests/buffsFormat.test.mts`, not measured in the running app) [low, cosmetic] Buffs card: a long spell name breaks "8s elapsed" onto two lines at the
   default window Seen: Card "Jonthan's Whistling Warsong": name box 171 px wide and 40 px high (two
   lines), "8s elapsed" box 51.8 px wide and 39.8 px high (two lines), card 98.7 px high against 78.8
   for its neighbours. With boxes on, "Quivering Veil of Xarn" does the same (name 129 px x 40, "29s

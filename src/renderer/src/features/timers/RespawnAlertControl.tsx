@@ -7,6 +7,7 @@ import {
   RESPAWN_ALERT_MAX_SEC,
   RESPAWN_ALERT_MIN_SEC,
   respawnAlertHeard,
+  respawnAlertOffNames,
   respawnAlertLeadFromDraft,
   respawnAlertSilentNote
 } from '@shared/respawnAlert'
@@ -43,7 +44,7 @@ export function RespawnAlertControl(): JSX.Element {
     setDraft(null)
   }
   // A ticked box with no enabled alert behind it plays nothing: say so here, where the box is.
-  const note = alerts === null ? null : respawnAlertSilentNote(on, respawnAlertHeard(alerts))
+  const note = alerts === null ? null : respawnAlertSilentNote(on, respawnAlertHeard(alerts), respawnAlertOffNames(alerts))
   // The note sits UNDER the box and the field, on its own line: beside them it took the row's room
   // and squeezed the field until its label was cut off (132 px down to 56 at the minimum window).
   return (
