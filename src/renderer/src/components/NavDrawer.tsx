@@ -21,6 +21,7 @@ import StorefrontIcon from '@mui/icons-material/Storefront'
 import FindInPageIcon from '@mui/icons-material/FindInPage'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import HandymanIcon from '@mui/icons-material/Handyman'
+import ConstructionIcon from '@mui/icons-material/Construction'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech'
 import LockOpenIcon from '@mui/icons-material/LockOpen'
@@ -170,6 +171,8 @@ const GROUPS: NavGroup[] = [
         opens: loadGearTab
       },
       { view: 'maps', icon: <MapIcon /> },
+      // TRADESKILLS sits under Maps: the wiki's recipes, and where their materials come from.
+      { view: 'tradeskills', icon: <ConstructionIcon /> },
       { view: 'bosses', icon: <EmojiEventsIcon /> },
       // SLAYER sits under Raid Targets: both are lists of things to go and kill.
       { view: 'slayer', icon: <MilitaryTechIcon /> },
