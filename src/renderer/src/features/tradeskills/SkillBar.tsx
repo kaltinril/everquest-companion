@@ -9,7 +9,7 @@
 
 import type { JSX } from 'react'
 import { Box, Typography } from '@mui/material'
-import { CAP_NOTE, barLabel, barOfText, barTip, capTip, type LevelBar } from '@shared/tradeskillLevelBar'
+import { CAP_NOTE, LIFTED_TIP, barLabel, barOfText, barTip, capTip, liftedNote, type LevelBar } from '@shared/tradeskillLevelBar'
 import { Tooltip } from '../../lib/Tooltip'
 
 const TRACK_HEIGHT = 6
@@ -50,6 +50,16 @@ export function BarOf({ bar }: { bar: LevelBar }): JSX.Element | null {
 
 /** The quiet "caps at 200 without Crafting Mastery" note; nothing when the wiki's rule does not apply. */
 export function CapNote({ bar }: { bar: LevelBar }): JSX.Element | null {
+  // The log's Crafting Mastery rank leaves room for this one: say that instead of the cap.
+  if (bar.liftedBy !== null) {
+    return (
+      <Tooltip title={LIFTED_TIP}>
+        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-cap-lifted">
+          {liftedNote(bar.liftedBy)}
+        </Typography>
+      </Tooltip>
+    )
+  }
   if (bar.cappedBy === null) return null
   return (
     <Tooltip title={capTip(bar.cappedBy)}>

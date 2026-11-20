@@ -460,6 +460,7 @@ async function main(): Promise<void> {
     await (await import('./tradeskillHeldSteps.mjs')).stepHeldAndWiki(page) // held-only route, Can make now, Missing on the wiki (written, not yet run)
     await (await import('./tradeskillGatherSteps.mjs')).stepAaAndGather(page, log) // crafting AAs, fishing outcomes, the Foraging tile (written, not yet run)
     await (await import('./tradeskillHomeSteps.mjs')).stepHomeAndWish(page) // level bars, Pick up where you left off, wishing a crafted item, sources, the Skills tab's door (written, not yet run)
+    await (await import('./tradeskillFactionSteps.mjs')).stepFaction(page) // the Faction goal: a faction's turn-ins, the shopping list, the Factions tab and back (written, not yet run)
 
     check('no renderer console errors', consoleErrors.length === 0, consoleErrors.slice(0, 3).join(' | '))
     if (failures.length) await dumpArtifacts(page, 'tradeskills-FAIL')

@@ -47,6 +47,7 @@ import { RecipeFilterSwitches, useRecipeFilters, type RecipeFilterState } from '
 import { RecipePanel } from './RecipePanel'
 import { RecipeTable, type RowLog } from './RecipeTable'
 import { AaPanel } from './AaPanel'
+import { useMasteryRank } from './useMasteryRank'
 import { RoutePanel } from './RoutePanel'
 import { BarOf, CapNote, SkillBar } from './SkillBar'
 import { SkillGearPanel } from './SkillGearPanel'
@@ -98,6 +99,7 @@ interface HeadProps {
 }
 
 function BenchHead({ tradeskill, levels, onHome, totals }: HeadProps): JSX.Element {
+  const rank = useMasteryRank()
   return (
     <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
       <Button size="small" startIcon={<ArrowBackIcon />} onClick={onHome} data-testid="tradeskill-home">
@@ -107,7 +109,7 @@ function BenchHead({ tradeskill, levels, onHome, totals }: HeadProps): JSX.Eleme
         {tradeskill}
       </Typography>
       {/* Until the engine serves the skills module the level is unknown, not unseen: say what the app waits on. */}
-      {levels.served ? <LevelLine bar={levelBar(levels.rows, tradeskill)} /> : <LogReadInline module={SKILLS_MODULE} served={false} />}
+      {levels.served ? <LevelLine bar={levelBar(levels.rows, tradeskill, rank)} /> : <LogReadInline module={SKILLS_MODULE} served={false} />}
       <Box sx={{ flexGrow: 1 }} />
       {totals !== '' && (
         <Typography variant="body2" color="text.secondary" data-testid="tradeskill-totals">

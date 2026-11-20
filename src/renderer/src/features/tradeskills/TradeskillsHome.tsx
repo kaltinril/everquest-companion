@@ -25,6 +25,7 @@ import type { Tradeskill } from '@shared/tradeskills'
 import { LogReadInline } from '../../components/LogReadInline'
 import { Tooltip } from '../../lib/Tooltip'
 import { ForagingTile } from './ForagingTile'
+import { useMasteryRank } from './useMasteryRank'
 import { HomePickUp, type HomeFacts } from './HomePickUp'
 import { HomeWished, type OpenPlan } from './HomeWished'
 import { BarOf, CapNote, SkillBar } from './SkillBar'
@@ -79,8 +80,16 @@ function TileNext({ tile }: { tile: TradeskillTile }): JSX.Element | null {
   )
 }
 
-function Tile({ tile, rows, onOpen }: { tile: TradeskillTile; rows: readonly SkillRow[]; onOpen: (t: Tradeskill) => void }): JSX.Element {
-  const bar = levelBar(rows, tile.tradeskill)
+interface TileProps {
+  tile: TradeskillTile
+  rows: readonly SkillRow[]
+  /** The Crafting Mastery rank the log shows bought (useMasteryRank). */
+  rank: number
+  onOpen: (t: Tradeskill) => void
+}
+
+function Tile({ tile, rows, rank, onOpen }: TileProps): JSX.Element {
+  const bar = levelBar(rows, tile.tradeskill, rank)
   return (
     <Card variant="outlined" data-testid={`tradeskill-tile-${tile.tradeskill}`}>
       <CardActionArea
@@ -137,6 +146,7 @@ export function TradeskillsHome({ index, onOpen, onPlan, planner }: TradeskillsH
   const { craft } = useCrafting(index)
   const facts = useMemo((): HomeFacts => ({ index, guides, levels, craft, held }), [index, guides, levels, craft, held])
   const tiles = useMemo(() => tradeskillTiles(index, levels.rows), [index, levels.rows])
+  const rank = useMasteryRank()
   return (
     <Box sx={{ flexGrow: 1, minHeight: 0, overflow: 'auto' }} data-testid="tradeskills-home">
       <HomePickUp facts={facts} onOpen={onOpen} />
@@ -149,7 +159,7 @@ export function TradeskillsHome({ index, onOpen, onPlan, planner }: TradeskillsH
       {!levels.served && <LogReadInline module={SKILLS_MODULE} served={false} sx={{ mb: 1 }} />}
       <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 1.5 }}>
         {tiles.map((tile) => (
-          <Tile key={tile.tradeskill} tile={tile} rows={levels.rows} onOpen={onOpen} />
+          <Tile key={tile.tradeskill} tile={tile} rows={levels.rows} rank={rank} onOpen={onOpen} />
         ))}
       </Box>
       {/* Forage has no recipes and so no workbench: its tile is the whole of it (ForagingTile.tsx). */}

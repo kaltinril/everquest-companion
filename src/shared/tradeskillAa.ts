@@ -165,6 +165,11 @@ export function boughtOf(purchases: AaPurchases, name: string): AaBought | null 
   return purchases.get(nameKey(name)) ?? null
 }
 
+/** The Crafting Mastery rank the log shows bought; 0 when it shows none (or is not read yet). */
+export function craftingMasteryRank(spends: readonly AASpendLike[] | null | undefined): number {
+  return spends ? (boughtOf(aaPurchases(spends), 'Crafting Mastery')?.top ?? 0) : 0
+}
+
 const plural = (n: number, one: string, many: string): string => `${String(n)} ${n === 1 ? one : many}`
 
 /** `2, 4 and 6`. */

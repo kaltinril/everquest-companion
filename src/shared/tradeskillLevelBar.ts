@@ -58,25 +58,46 @@ export interface LevelBar {
   capTick: number | null
   /** The player's tradeskill that is past 200, which is why the cap note is drawn; null when it is not. */
   cappedBy: Tradeskill | null
+  /**
+   * The Crafting Mastery rank the log shows bought, when the wiki's rule would cap this tradeskill
+   * and that rank leaves room for one more past 200; null otherwise. With it the cap note and the
+   * tick are not drawn.
+   */
+  liftedBy: number | null
 }
 
-/** The player's first tradeskill (of the seven the rule names) above 200, other than `tradeskill`; or null. */
-function pastCap(rows: readonly SkillRow[], tradeskill: Tradeskill): Tradeskill | null {
-  return CAPPED.find((other) => other !== tradeskill && (tradeskillLevel(rows, other) ?? 0) > SPECIALIZATION_CAP) ?? null
+/** The player's tradeskills (of the seven the rule names) above 200, other than `tradeskill`. */
+function pastCap(rows: readonly SkillRow[], tradeskill: Tradeskill): Tradeskill[] {
+  return CAPPED.filter((other) => other !== tradeskill && (tradeskillLevel(rows, other) ?? 0) > SPECIALIZATION_CAP)
 }
 
 /**
  * One tradeskill's bar from the log's skill rows. The cap note applies to a tradeskill of the
  * seven whose level is known and at or under 200 while another of the seven is above 200. A
  * skill the log never showed has an empty bar and no note: its level is not known.
+ *
+ * `masteryRank` is the Crafting Mastery rank the log shows bought (0 when none). The wiki's row
+ * says each rank lets one more tradeskill pass 200, and the first past 200 needs none, so a rank
+ * above the number of OTHER tradeskills already past 200, less that first one, leaves room for
+ * this one: the cap note gives way to `liftedBy`.
  */
-export function levelBar(rows: readonly SkillRow[], tradeskill: Tradeskill): LevelBar {
+export function levelBar(rows: readonly SkillRow[], tradeskill: Tradeskill, masteryRank = 0): LevelBar {
   const level = tradeskillLevel(rows, tradeskill)
   const top = skillTop(tradeskill)
   const fill = level === null || top === null ? 0 : Math.min(1, Math.max(0, level / top))
   const capped = top !== null && level !== null && level <= SPECIALIZATION_CAP && CAPPED.includes(tradeskill)
-  const cappedBy = capped ? pastCap(rows, tradeskill) : null
-  return { tradeskill, level, top, fill, capTick: cappedBy === null || top === null ? null : SPECIALIZATION_CAP / top, cappedBy }
+  const past = capped ? pastCap(rows, tradeskill) : []
+  const lifted = past.length > 0 && masteryRank > past.length - 1
+  const cappedBy = past.length === 0 || lifted ? null : past[0]
+  return {
+    tradeskill,
+    level,
+    top,
+    fill,
+    capTick: cappedBy === null || top === null ? null : SPECIALIZATION_CAP / top,
+    cappedBy,
+    liftedBy: lifted ? masteryRank : null
+  }
 }
 
 // ---- the words on screen ----------------------------------------------------------------------
@@ -101,6 +122,15 @@ export function barTip(bar: LevelBar): string {
 
 /** The quiet note under a capped tradeskill's bar. */
 export const CAP_NOTE = 'caps at 200 without Crafting Mastery'
+
+/** The quiet note where the log's Crafting Mastery rank lifts the cap: "can pass 200: Crafting Mastery rank 6 in your log". */
+export function liftedNote(rank: number): string {
+  return `can pass 200: Crafting Mastery rank ${String(rank)} in your log`
+}
+
+/** That note's hover: the wiki's two sentences, as its pages state them. */
+export const LIFTED_TIP =
+  "The wiki's Tradeskills page says the other tradeskills cap at 200 once one passes it, until you buy the Crafting Mastery AA. Its AA page says each rank lets one more standard tradeskill go from 200 to 300."
 
 /** The note's hover: the wiki's rule, and which of the player's tradeskills brought it on. */
 export function capTip(over: Tradeskill): string {
