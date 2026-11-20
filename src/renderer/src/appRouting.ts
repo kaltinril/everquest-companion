@@ -15,6 +15,8 @@ import type { ZoneShort } from '@shared/maps'
 // The Maps tab's zone selection is persisted machine-local state with pin semantics (JOS-97);
 // `openMapZone` writes a pick through the same pure rules the toolbar uses. See the opener's doc.
 import { onPick, saveZoneSelection } from './features/maps/zoneFollow'
+// A one-shot "open the map at this mob" ask rides beside the zone pick (features/maps/mapFocus.ts).
+import { parkMapFocus, type MapFocus } from './features/maps/mapFocus'
 // The Gear tab's search box is remembered session state (gear/areaMemory.ts); `openGearSearch`
 // writes it the way `openMapZone` writes a zone pick, and the tab reads it back on mount.
 import { presetSearch } from './features/gear/useAreaMemory'
@@ -171,6 +173,16 @@ export interface AppRouting {
    * so parking an origin would promise a return nothing on that surface can deliver.
    */
   openMapZone: (zone: ZoneShort) => void
+  /**
+   * The Maps tab opened AT A MOB'S PIN (the Tradeskills section's "Show on map" beside a merchant;
+   * owner, 2026-11-20: "fully integrated with maps"). `openMapZone`'s arrangement plus a one-shot
+   * ask: the zone is written as a pick, the mob's catalog page is parked in
+   * `features/maps/mapFocus.ts`, and the Maps view takes it once on arrival, then rings that mob's
+   * existing pin and centres on it. Offered only where the Maps tab would draw the pin
+   * (`mapFocus.pinTarget`). ANCHORED, unlike `openMapZone`: the reader left a screen they will
+   * want back, so the origin is parked and the Maps tab shows a Back for this arrival alone.
+   */
+  openMapAt: (focus: MapFocus) => void
   /** The spell the drilldown should draw, or null. Never bare — a spell page IS its spell. */
   spellName: string | null
   spellNonce: number
@@ -294,6 +306,15 @@ export function useAppRouting(view: View, setView: (v: View) => void): AppRoutin
     },
     [linkTo]
   )
+  // The zone pick first, as above; then the mob to ring, taken once by the Maps view as it mounts.
+  const openMapAt = useCallback(
+    (focus: MapFocus) => {
+      saveZoneSelection(onPick(focus.zone))
+      parkMapFocus(focus)
+      linkTo('maps', true)
+    },
+    [linkTo]
+  )
   // THE WHOLE ROUTER IS ONE MEMOIZED OBJECT (JOS-510 item 3). It is handed down as `routing` to
   // `ViewContent`, which is a `React.memo` boundary now — a fresh object here would make that
   // boundary compare unequal on every App render and buy nothing.
@@ -330,9 +351,10 @@ export function useAppRouting(view: View, setView: (v: View) => void): AppRoutin
       openTradeskills: tradeskill.open,
       clearTradeskillFocus: tradeskill.clear,
       openGearSearch,
-      openMapZone
+      openMapZone,
+      openMapAt
     }),
-    [selectView, nav, spell, mob, quest, level, combat, loot, tradeskill, openGearSearch, openMapZone]
+    [selectView, nav, spell, mob, quest, level, combat, loot, tradeskill, openGearSearch, openMapZone, openMapAt]
   )
 }
 

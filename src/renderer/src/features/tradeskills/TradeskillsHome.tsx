@@ -1,10 +1,11 @@
-// tradeskills/TradeskillsHome.tsx — Home: one tile per tradeskill with the level the log last
-// stated (or that it has not shown the skill go up), how many wiki recipes it has, and the recipe
-// to make next. A tile opens that tradeskill's workbench.
+// tradeskills/TradeskillsHome.tsx — Home: the door to Make an item (Planner.tsx's panel, handed
+// in), then one tile per tradeskill with the level the log last stated (or that it has not shown
+// the skill go up), how many wiki recipes it has, and the recipe to make next. A tile opens that
+// tradeskill's workbench.
 //
 // The tiles and their order are shared/tradeskillBook.ts `tradeskillTiles`.
 
-import { type JSX, useMemo } from 'react'
+import { type JSX, type ReactNode, useMemo } from 'react'
 import { Box, Card, CardActionArea, Stack, Typography } from '@mui/material'
 import { SKILLS_MODULE } from '@shared/skills'
 import { tradeskillTiles, type BookIndex, type TradeskillTile } from '@shared/tradeskillBook'
@@ -84,11 +85,19 @@ function Tile({ tile, onOpen }: { tile: TradeskillTile; onOpen: (t: Tradeskill) 
   )
 }
 
-export function TradeskillsHome({ index, onOpen }: { index: BookIndex; onOpen: (t: Tradeskill) => void }): JSX.Element {
+export interface TradeskillsHomeProps {
+  index: BookIndex
+  onOpen: (t: Tradeskill) => void
+  /** The "Make an item" panel, drawn above the tiles. */
+  planner?: ReactNode
+}
+
+export function TradeskillsHome({ index, onOpen, planner }: TradeskillsHomeProps): JSX.Element {
   const levels = useSkillLevels()
   const tiles = useMemo(() => tradeskillTiles(index, levels.rows), [index, levels.rows])
   return (
     <Box sx={{ flexGrow: 1, minHeight: 0, overflow: 'auto' }} data-testid="tradeskills-home">
+      {planner}
       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
         Pick a tradeskill to open its workbench.
       </Typography>

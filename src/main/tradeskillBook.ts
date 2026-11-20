@@ -9,11 +9,13 @@ import { itemKey, wornKey, type ItemDbEntry } from './itemsDb'
 import { eraEvidenceOf } from './planner/eraEvidence'
 import type { EraDerivation } from '../shared/planner/era'
 import { tradeskillOf } from '../shared/tradeskills'
+import type { WikiItemName } from '../shared/tradeskillGuide'
 import {
   TRADESKILL_BOOK_VERSION,
   type BookIngredient,
   type BookMaterial,
   type BookRecipe,
+  type BookWorn,
   type TradeskillBookPayload
 } from '../shared/tradeskillBook'
 import type { ItemCraftRecipe } from '../shared/types'
@@ -27,6 +29,29 @@ function statedFields(recipe: ItemCraftRecipe): Partial<BookRecipe> {
     ...(recipe.container === undefined ? {} : { container: recipe.container }),
     ...(recipe.yieldItem === undefined ? {} : { yieldItem: recipe.yieldItem }),
     ...(recipe.yieldQty === undefined ? {} : { yieldQty: recipe.yieldQty })
+  }
+}
+
+/** The made item's own stats, saves and effects as its window words them, or null when it states none. */
+function wornOf(entry: ItemDbEntry): BookWorn | null {
+  const block = entry.stats
+  if (block === undefined) return null
+  const stats = [...block.stats, ...block.saves].map((stat) => `${stat.key} ${stat.value}`)
+  if (block.ac !== undefined) stats.unshift(`AC ${String(block.ac)}`)
+  const effects = block.effects.map((effect) => effect.name)
+  return stats.length === 0 && effects.length === 0 ? null : { stats, effects }
+}
+
+/**
+ * What the Explore route groups a recipe by, off the made item's own page: the quests that take
+ * it (a quest that only hands it out is no use of it) and its own stats and effects.
+ */
+function madeItemFacts(entry: ItemDbEntry): Partial<BookRecipe> {
+  const quests = [...new Set((entry.questUses ?? []).filter((use) => use.role !== 'reward').map((use) => use.quest))]
+  const worn = wornOf(entry)
+  return {
+    ...(quests.length === 0 ? {} : { quests }),
+    ...(worn === null ? {} : { worn })
   }
 }
 
@@ -52,7 +77,8 @@ function bookRecipe(entry: ItemDbEntry, recipe: ItemCraftRecipe, nth: number, de
     ingredients,
     // The Gear row's evidence, from the same builder, so one item has one era verdict on both tabs.
     ...eraEvidenceOf(entry.page, entry.eraTag, derivations),
-    ...(entry.dropsFrom === undefined ? {} : { wikiSources: entry.dropsFrom })
+    ...(entry.dropsFrom === undefined ? {} : { wikiSources: entry.dropsFrom }),
+    ...madeItemFacts(entry)
   }
 }
 
@@ -74,6 +100,18 @@ function noteMaterials(recipe: BookRecipe, index: ItemIndex, materials: Map<stri
     const record = index.get(itemKey(ingredient.name))
     const material = record === undefined ? null : materialOf(record)
     if (material !== null) materials.set(ingredient.key, material)
+  }
+}
+
+/**
+ * The guides' name lookup: the item a spelling names exactly (its name, its page title or one of
+ * its other names, as the index keys them), in the item's own spelling. A loose guide spelling
+ * finds nothing and stays the text its author wrote.
+ */
+export function wikiItemName(index: ItemIndex): WikiItemName {
+  return (name) => {
+    const record = index.get(itemKey(name))
+    return record === undefined ? undefined : (record.name ?? record.page)
   }
 }
 

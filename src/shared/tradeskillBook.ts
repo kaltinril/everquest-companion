@@ -10,6 +10,7 @@ import { mobOutOfEra } from './mobEra'
 import { eraVerdict, type EraDerivation } from './planner/era'
 import { ownedCount, ownershipRowsFor, type OwnershipIndex } from './planner/ownership'
 import type { SkillRow } from './skills'
+import type { GuidePayload } from './tradeskillGuide'
 import { TRADESKILLS, tradeskillOf, type Tradeskill } from './tradeskills'
 import type { ItemCraftIngredient, ItemDropSource } from './types'
 
@@ -18,6 +19,12 @@ export const TRADESKILL_BOOK_VERSION = 1
 /** A recipe's material, with the item database's key for it (aliases resolved in main). */
 export interface BookIngredient extends ItemCraftIngredient {
   key: string
+}
+
+/** What a made item's own window states: `STR +3`, `SV MAGIC +5`, and the names of its effects. */
+export interface BookWorn {
+  stats: string[]
+  effects: string[]
 }
 
 /** One wiki recipe. `key`, `eraTag`, `eraDerived` and `wikiSources` are the era join's subject. */
@@ -39,6 +46,10 @@ export interface BookRecipe {
   eraTag?: string
   eraDerived?: EraDerivation
   wikiSources?: ItemDropSource[]
+  /** The quests that take the made item (its page's quest uses; a quest that only hands it out is left out). */
+  quests?: string[]
+  /** The made item's own stats, saves and effects, as its window words them; absent when it has none. */
+  worn?: BookWorn
 }
 
 /** Where a material comes from, off its own item page. */
@@ -53,6 +64,8 @@ export interface TradeskillBookPayload {
   recipes: BookRecipe[]
   /** By material key; a material the item database does not hold has no entry. */
   materials: Record<string, BookMaterial>
+  /** The two community guides as data (shared/tradeskillGuide.ts); absent reads as no guide. */
+  guides?: GuidePayload
 }
 
 export const EMPTY_BOOK: TradeskillBookPayload = { version: TRADESKILL_BOOK_VERSION, recipes: [], materials: {} }
