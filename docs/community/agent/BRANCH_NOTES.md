@@ -1396,6 +1396,205 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
   down while it shows. `engine-absent.e2e.mts` pins the card on a tab other than Overview and the
   Try row and button in Overview's box.
 
+## Reading log: tabs, overlays and the no-logs screen follow the status (phase R3, plans/2026-11-19-reading-log-robustness.md)
+
+- The meter's reads are PER QUESTION. LogReadFacts.combatReads (was lastCombatRead): newest outcome
+  per key `<op> <stableKey(params)>`, 8 keys, 30 s each (COMBAT_READ_FRESH_MS), own `since` per key;
+  cleared on a turn, a launch and the live edge. A key asked again after it lapsed starts a new run.
+- Combat branch order (shared/logReadReport.ts combatCause, the ONE place): tooLarge ->
+  replyTooLarge; timedOut, or refused with code timeout -> panelSlow; other refusal -> notAnswering;
+  guess / readiness reason / nothing -> ok. Timed from the earliest `since` of the deciding keys.
+  panelSlow has NO button and shows after 15 s. panelSlow and replyTooLarge are in CLOCKED.
+- readShim `observe` takes ONE object (ObservedRead: op, key, ms, unserved?, why?, code?). Never put
+  a duration into a status string: it changes per poll and statusChanged would push every second.
+- Notes are composed in shared/logReadNotes.ts from facts of ONE read (large, tooLargeModules,
+  nothingRecognised, archiveOn); logReadState forgetReadNotes() clears them on a turn and a launch.
+  A note's text must not move while the read stands. LogReadNote.modules is compared by
+  statusChanged. With the archive on: no getting-large note, no Try line on the too-large note.
+- noteLogReadLanded(health.events, health.mark?.offset) is ONE line inside `if (first)` at the
+  go-live edge; tests/logReadPokes.test.mts finds it in engineClientHost.ts or attachTurn.ts and
+  fails if it is missing or doubled. Events 0 over 64 KiB = recognised nothing; unknown is not zero.
+- A tab prints its own empty text only when its RAW snapshot is non-null. Use LogReadInline /
+  useTabLine(module, served); never coalesce a null into "nothing yet". The line is held 1.5 s
+  (inlineDue) unless report.show: remove the hold and every rebuild and tab mount flashes a
+  sentence.
+- Overlay labels: LOG_READ_SHORT, 22 characters at most (test-enforced). overlayTitle decides title
+  and tail; 'Loading...' when hydrating with wait ok or no status. The JOS-158 pin allows a meter
+  exactly one tail: `tail={head.tail}`.
+- useOverlayModule: other log -> rows down at once; world-changed + null -> rows down; SAME log +
+  null -> rows kept (an ordinary rebuild is 'not live' for an instant); an answer to an older ask is
+  dropped. Source pin: the world-changed branch calls rehydrate().
+- The dot (lib/useLiveDot.ts): a module cursor lights it, the world-changed frame does not, any
+  non-ok wait turns it off and it then needs a new cursor. It no longer lights at go-live on a quiet
+  log.
+- showsNoLogs = no character AND empty list. The list and the folder config are re-read on window
+  focus. EqFolderCheck is shared with Preferences (test id no-logs-check on the no-logs screen);
+  folderVerdict is the one decision.
+- Logs are listed by log/characterLogs.ts: FILES only, links followed with stat (kept unless they
+  lead to a folder; kept when they cannot be followed). readLogsDir counts through it.
+  Dirent.isFile() is false for a link: never filter on it alone.
+- discovery.ts recheckDiscoveredRoot: a root good in this run is kept across a failed re-check; the
+  sweep runs at most once per 60 s; the persisted root is not dropped on a failed re-check.
+- The window's own engine connection: shared/dataServer/retryPlan.ts, 4/8/16/30 s, 5 tries, then
+  nothing until the status's engine words change.
+- Still open: Mobs, Maps, Gear and the rest rely on the band alone; the tray tooltip; the renderer
+  client's per-subscription too-large error is drawn nowhere; gapsCharacters.ts still lists logs by
+  name.
+- After review: Overlay labels: add "The percentage is printed only when report.show is true
+  (overlayLabel). Main sends numbers to a window only while the status shows, so before 15 s an
+  overlay says a plain 'Reading log'. Never print a number from a report with show false: nothing
+  keeps it current."
+- After review: Replace the discovery line with: "discovery.ts recheckDiscoveredRoot: a root good in
+  this run is kept across a failed re-check; while it is marked bad (sweptAt set) NEITHER its
+  re-check NOR the sweep runs more than once per 60 s; the persisted root is not dropped. The kept
+  root is the answer either way, so a drive that returns is in use at once and only the mark clears
+  late. config.ts refreshEqDiscoveryCheaply asks keptRootIsGood(discovery, rootHasLogs), never
+  rootHasLogs(discovery.root). Still true: every resolveEqDir()/listCharacters() reads the kept
+  root's Logs folder on demand (describeLogsDir is not memoized), so a dead share is still read when
+  something asks for the list; only the 5 s re-check and the 2 s rescan tick were floored."
+- After review: Replace the engine-connection line with: "The window's own engine connection:
+  shared/dataServer/retryPlan.ts, 4/8/16/30 s, 5 tries, then nothing until the status's engine words
+  change. The count is cleared by the client's 'ready' (hello accepted), never by a connection
+  merely handed over: retryAfter(held, 'taken' | 'ready' | 'failed') is the one place. 'taken' is
+  said BEFORE next.attach(). A connection that reaches ready and then drops every time still retries
+  at 4 s each time (the supervisor's own cap covers an engine that keeps dying)."
+- After review: Add: "moduleStore: a null reply leaves the entry stale, so the next READER of that
+  module asks again (a tab reopened). No timer, and nothing is asked without a new reader. On a
+  launch with no engine this costs one more IPC per module each time a tab is opened."
+- After review: Add to the tab-line note: "The hook's rule is lib/useTabLine.ts useTabLineOf(report,
+  module, served); components/LogReadInline.tsx useTabLine only hands it the store's report.
+  tests/tabLine.test.mts runs it on hookHost and pins the six views from source: a view must pass
+  the RAW snapshot as served, and its empty text must appear once, inside the line."
+- After review: Add to 'Still open': "A module that answered null after go-live (a 10 s timeout
+  during the go-live burst) keeps its tab on 'The data engine is answering; this panel has no reply
+  yet.' for a player who STAYS on the tab, until that module's next cursor. Reopening the tab now
+  asks again. Making the tab ask by itself needs a force-refresh on the module store, which the
+  owner ruling in useModule.ts (2026-08-26) says to raise first: this is that raise."
+- After review: Add: "R6 should call useTabLineOf (lib/useTabLine.ts) when it needs the rule in a
+  test; useTabLine in LogReadInline.tsx is the store-bound wrapper."
+- After review: Add: "tests/moduleStore.test.mts is AT 440 code lines. A new module-store case goes
+  in a sibling file."
+- After review: Add: "Owner decision wanted: may the module store get a bounded re-ask of a null
+  reply (one more try a few seconds later, or a refresh the tab line calls once)? Without it the 'no
+  reply yet' sentence can outlive its 'yet' for a player who never leaves the tab."
+- After review: Change the retry item for R5: "engineProvider's count now survives a taken
+  connection; if R5 changes when the engine words move (engineCycling), check that onStatusWords
+  still restarts a 'stopped' window."
+- After review: where_the_other_branch_meets_mine: unchanged for R4's files. None of these fixes
+  touches engineClientHost.ts, logReadState.ts, shared/logReadReport.ts, main/logReadReport.ts,
+  logReadStatus.ts, foldWait.ts, supervisor.ts or session.ts. In src/shared/logReadWords.ts the only
+  change is inside overlayLabel (the new section below line 95): one condition and its comment; no
+  existing table was touched.
+- After review: E2E STEP FOR THE COORDINATOR (not added; tests/e2e was not edited, and this text has
+  not been run). File tests/e2e/engine-absent.e2e.mts, function stepStatusEverywhere, directly after
+  the existing check 'the failure card is still up on a tab other than Overview' (the page is on the
+  Loot tab there); add LOG_READ_WORDS to the file's import from shared/logReadWords beside
+  LOG_READ_TRY:
+- After review: const line = await settle(() => textOf(page, '[data-testid="log-read-inline"]'), (t)
+  => t !== '')
+- After review: check('the Loot tab says what the app is waiting on',
+  line.includes(LOG_READ_WORDS.engineMissing), line || '(no line)')
+- After review: const lootText = await page.locator('body').innerText()
+- After review: check('...and does not say "No loot parsed yet" over a log nobody read',
+  !lootText.includes('No loot parsed yet'), lootText.includes('No loot parsed yet') ? 'printed' :
+  'absent')
+- After review: Expected line text on that launch: 'The data engine program is missing. Check your
+  antivirus quarantine, then reinstall.' (wait engineMissing shows at once, so the 1.5 s hold does
+  not apply). The plan names 'the run that holds a fold' instead; no run under tests/e2e holds a
+  fold today, and the engine-absent run already opens the Loot tab with no loot snapshot served, so
+  it is the thin place for it.
+- After review: No existing e2e check is made stale by these six commits: no test id, no sentence on
+  a tab and no healthy-launch text changed. An overlay title during the first 15 s of a read is now
+  'Reading log' with no number; no e2e spec was found asserting the number.
+
+## Reading log: the read starts again by itself, with caps (phase R4, plans/2026-11-19-reading-log-robustness.md)
+
+- The 2026-11-19 default (nothing retries a read by itself) is replaced, on the default taken for
+  owner question 2. Three automatic re-attaches, each a whole re-read, each capped in
+  dataServer/readRetry.ts: file came back (5 per log per engine launch), one plain retry 2 s after a
+  read ended with the file openable, one re-read after the reader stops after live (none while an
+  earlier such end lies inside 30 minutes).
+- Going live and a new launch clear autoTries, fileBackTries and ends. Nothing clears the after-live
+  window but time and a Try again press. Never reset it on go-live: a reader that dies after every
+  go-live would be re-read for ever.
+- Nothing fires into a running read. Every read starts with bumpGen, bumpGen says the 'turn' edge,
+  and the recovery drops whatever was armed. A new way to start a read must go through bumpGen.
+- The host says the read's edges through dataServer/readEdges.ts (one listener): launch, turn, live,
+  ended, endedAfterLive, manual. 'ended' is said AFTER the fold error is recorded, because the
+  recovery may replace it with its stop line. main/logReadReport.ts startLogReadStatus binds the
+  recovery; it must run before the engine starts.
+- logProbe.onSettled still has ONE listener; it now tells the publisher, then the recovery.
+- A Try line may promise a retry only while one will come. LogReadFacts.watchingFile
+  (recovery.watching()) picks the line; TRY_NOT_WATCHING in shared/logReadReport.ts holds the two
+  lines without the promise. Move them into logReadWords.ts once R3 is merged.
+- attachTurn.ts is the turn. What the engine was told is recorded even on a stale turn. A health
+  answer is this turn's only when its mark names the turn's TARGET (markAgrees: case and slash
+  insensitive; a mark with no log cannot disagree). An answer about another log is never passed to
+  sawHealth, so it can never be recorded as live. Caps per turn: 2 re-sends of an unanswered attach
+  (2 s, 5 s), 1 re-attach on a difference.
+- The mark's log is the string main sent in session.attach, echoed back. If main ever attaches with
+  one spelling and compares with another, every launch would re-attach once and then stop on
+  'mismatch'.
+- Attach error codes decide the wait (ATTACH_WAITS): timeout is notAnswering, mismatch (main's own)
+  is mismatch, anything else attachRefused.
+- The archive half (liveHistory.engineAttaching()'s callback) is called for EVERY accepted attach,
+  stale or not. The bar half (noteEngineFolding) only by the current turn, or a replaced turn when
+  the app still wants that log.
+- foldWait: unanswered is said once and the loop asks every 5 s for as long as the turn lasts; the
+  slow asks write no line. An answered poll clears a 'health' error. The wait returns at once if
+  saw() ended the turn.
+- After live: supervisor onHealth hands on every probe answer; afterLive.ts confirms a not-live
+  answer once on main's own connection, in the same turn, before readStoppedAfterLive runs. There is
+  no poller on main's connection, on purpose.
+- tailCharacter goes through sessionTail.ts storeThenSignal: a failed settings write is logged
+  (main:attachCharacter) and the world-rebuilt signal is still sent.
+- Traps: noteEngineFolding() resets the fold measurement, so never call it per poll. A reconnect's
+  turn re-attaches an ended read; that is bounded by the link keeper, not by readRetry. servingLine
+  lives in foldWait.ts now.
+- Line budgets: engineClientHost.ts 411 of 440, supervisor.ts 399.
+- After review: First bullet, replace the end with: "... one plain retry 2 s after a read ended with
+  the file openable, one re-read after the reader stops after live (none while an earlier such end
+  lies inside 30 minutes). THE RE-READ AFTER LIVE IS THE PLAIN RETRY (readRetry.ts plainRetrySent):
+  if it ends before it goes live the log is not read a third time. Only going live, a new launch or
+  a Try again press gives the retry back."
+- After review: Second bullet, add: "`ends` counts the end after live too, so the stopped line says
+  how often the read really stopped since it was last live."
+- After review: New bullet: "A read's end is decided only on a look at the file taken AT OR AFTER
+  THE END. logReadRecovery records endedAt; an answer the probe kept from before it reads as
+  'pending' (readRetry.ts probeSeenSince) and the first answer after the end decides.
+  logProbe.look(path, since) does not keep an answer taken before `since`, and
+  logProbe.answeredAt(path) says when the last answer came in. One open in flight per path and two
+  in all still hold; when the two-opens limit blocks the open, the old answer stays 'pending' and
+  the 5 s watch asks again. Trap: never decide on logProbe.last() alone after an end; the watch's
+  own 'it can be opened' is under 5 s old when the re-read it caused fails."
+- After review: The logProbe.onSettled bullet is unchanged. LogReadRecoveryDeps now has look(path,
+  since), last(path) and answeredAt(path); the pin in tests/logReadRecoveryPins.test.mts reads all
+  three in src/main/logReadReport.ts.
+- After review: Add to the test list: tests/logReadRecoveryProbe.test.mts drives the recovery on the
+  real createLogProbe (hand-made open, clock and timer); use it for anything that depends on the
+  probe's keep.
+- After review: R6 item ("logReadRecovery's file watch runs only after a read ended ..."): add "A
+  quiet-log check that looks at the file should pass `since` to logProbe.look when it needs an
+  answer newer than some moment; a plain look may return an answer up to 5 s old."
+- After review: R5 item about the 'launch' edge: still true; note also that 'launch' gives the plain
+  retry back after an after-live re-read (wentLive), the after-live window is still kept.
+- After review: "Anyone adding a LogReadFacts literal": unchanged. LogReadProbe (the shared type)
+  was NOT changed; answeredAt is a separate method on the probe, so no R3 file is touched.
+- After review: where_the_other_branch_meets_mine, correction: src/main/logReadReport.ts recovery
+  binding now has `look: (path, since) => { logProbe.look(path, since) }` and one more line
+  `answeredAt: (path) => logProbe.answeredAt(path),`; buildLogReadReport's own
+  `logProbe.look(logPath)` is unchanged. Nothing changed in engineClientHost.ts, attachTurn.ts,
+  logReadWords.ts, shared/logReadReport.ts or logReadState.ts, so the go-live edge and every line
+  number reported for those files stand.
+- After review: deviations, additions: (a) the stop line after an after-live end plus one more end
+  reads 'stopped twice; not trying again by itself' (true count), and STOPPED_AFTER_LIVE_LINE is
+  shown only when a second after-live end falls inside the window; (b) every end now costs one open
+  of the log by main unless an open is already out or an answer came in the same millisecond, where
+  before a look under 5 s old was reused; (c) logProbe.ts (an R2 file) gained an optional parameter
+  and one method.
+- After review: Line counts: src/main/logReadRecovery.ts and readRetry.ts stay far under the
+  ceiling; engineClientHost.ts and supervisor.ts untouched (411 and 399).
+
 ## DPS chart: the pet drawn apart (upstream #91, requirements/meter-pet-split.md)
 
 - The DPS-over-time chart (DpsOverTime.tsx, both the Combat tab card and the Overview glance card)

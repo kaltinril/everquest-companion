@@ -62,8 +62,8 @@ structured-clone size per window, and merged archive history over IPC (experimen
 | --- | --- | --- | --- | --- | --- |
 | R1 | The cliff: no reply size, slow reply or socket fault ends the connection for good | typescript | L | - | built 2026-11-19 |
 | R2 | One status, pushed to every window, with a Try line and a Try again action | typescript | L | R1 | built 2026-11-19 |
-| R3 | Tabs, overlays, the title-bar dot and the no-logs screen follow the status | typescript | L | R2 | planned |
-| R4 | The read recovers by itself when a fact changes | typescript | L | R1, R2 | planned |
+| R3 | Tabs, overlays, the title-bar dot and the no-logs screen follow the status | typescript | L | R2 | built 2026-11-19 |
+| R4 | The read recovers by itself when a fact changes | typescript | L | R1, R2 | built 2026-11-19 |
 | R5 | The engine process: no blind kill, no blind relaunch loop, right words for why it will not start | typescript | M | R2, R4 | planned |
 | R6 | The log is there but nothing is being written, or the game runs from another folder | typescript | M | R2, R3, R4 | planned |
 | R7 | The engine phase (Rust), built in its own worktree and target directory | both | M | R1, R4 | planned |
@@ -164,6 +164,771 @@ know. The rules each phase left in force are in `agent/BRANCH_NOTES.md` ("Readin
   The fault detail is still cut to 200 characters by the supervisor before it is scrubbed. When a
   read ends, the first push says "stopped before the end" and the probe's answer (missing or locked)
   follows as a second push, which a screen reader may announce twice.
+
+### R3 (2026-11-19)
+
+- Built as designed, reviewed by two readers with different lenses (5 findings; 5 corrected with
+  tests that failed first, 2 left with the reason). Gated together with the trunk merged in: 7,311
+  unit tests, the two known reds only. End to end: the attach-path specs passed on R4 alone
+  (character-switch, character-switch-storm, overview, combat-dashboard, respawn-timers,
+  engine-loot-view, engine-alert-fires); the full suite on the two phases together is in the merge
+  commit. No Rust change.
+- What changes for the player: Loot, Leveling, Timers, Buffs, Gaps and Bazaar no longer say "nothing
+  yet" while the log is unread or a reply was not served: after 1.5 s (at once when the band is up)
+  they print the status sentence and what to try, and "This tab's history is too large for the app
+  to show." when their own reply was the one refused. The two meter overlays say "Starting engine",
+  "Connecting", "Reading log 43%", "Log read stopped" and so on instead of a bare "Reading log...",
+  and show the same label beside the fight name when the numbers have stopped updating. Module
+  overlays (XP, respawn, map pins) drop the previous character's rows the moment the character
+  changes. A meter read that only ran out its wait is called "Your log is read. This panel is taking
+  too long to build." with no button, instead of "The data engine is not answering." The band can
+  carry three notes while all is well: part of the history too large to show, the log getting large
+  (archive off only), and a read that recognised no lines. The title-bar dot no longer goes green
+  when the engine goes live or goes away, and goes dark while the status is not ok. The no-logs
+  screen says which folder it looked in and whether that folder is missing, unreadable or empty,
+  never covers a character that is being read, and corrects itself when the window is focused again.
+  A folder named like a log is not offered as a character. A drive that drops out for a moment no
+  longer sends the app to the default folder until restart. Seen on a healthy launch: tabs are blank
+  for 1.5 s then say "Still reading your log." where they used to show their empty text during the
+  read; the dot lights on the first new log line, not at go-live.
+- Differs from the phase text: LogReadFacts.lastCombatRead is REPLACED by combatReads (an array),
+  not kept beside it: one source for the decision. Every literal facts object changed.
+- Differs from the phase text: The per-key window is 30 s (COMBAT_READ_FRESH_MS), not the plan's 10
+  s: R2's rule that it must stay above the idle meter's 10 s poll.
+- Differs from the phase text: A too-large key is replyTooLarge with no second condition. R1's
+  `tooLarge !== null` guard is gone: reads are cleared on a turn, so no left-over verdict can exist.
+  The test that asserted the guard was removed.
+- Differs from the phase text: readShim `observe` changed from four positional arguments to one
+  object (ObservedRead). It needed the key and the engine code; a fifth positional argument would
+  pass the 4-parameter ceiling.
+- Differs from the phase text: New fact `archiveOn` (main/logReadReport.ts reads logArchiveOn()).
+  With the archive on, the getting-large note is not shown and the too-large note and tab sentence
+  carry no Try line: both planned sentences say 'Turn on Summarize and archive log', which is untrue
+  when it is on.
+- Differs from the phase text: Short label for logUnreadable is 'Log file unreadable', not the
+  plan's 'Log file locked': the app knows only that Windows would not open it.
+- Differs from the phase text: New string not in the plan's list: 'Loading...', the meter title when
+  there is no reply and the status is ok or not yet known. The plan left that case with an empty
+  label; 'Reading log' would be untrue there.
+- Differs from the phase text: The tab line is held 1.5 s unless main says show (inlineDue,
+  useHeldFor). Without it a rebuild of the same log, and every tab mount before its fetch lands,
+  would flash a sentence.
+- Differs from the phase text: useOverlayModule: a null snapshot after a CHARACTER frame for the
+  SAME log keeps the rows (the plan resets on any null after a character frame). The engine is 'not
+  live' for the instant of an ordinary rebuild, so the plan's rule flashes an empty overlay. Another
+  character's log drops the rows at once, before the answer, which is stricter than the plan. Also
+  added: a stale-answer guard and one logReadReport() ask per hook mount to learn the active log.
+- Differs from the phase text: useOverlayModule.ts now imports shared/types by relative path so the
+  unit suite can run the hook.
+- Differs from the phase text: tests/overlayLockedSelector.test.mts (the JOS-158 pin that no meter
+  passes a tail) was changed to allow exactly `tail={head.tail}`, the status label. The ruling was
+  about the aggregate number; this is a decision for the owner to confirm.
+- Differs from the phase text: No-logs screen: the old paragraph ('We looked for your EverQuest
+  Legends install automatically ... Make sure logging is on') is REMOVED, not kept beside the
+  verdict. It gave the logging advice for a missing and an unreadable folder too, and said
+  'automatically' for a folder the player chose. Before the folder config arrives the screen shows
+  the heading and the button only.
+- Differs from the phase text: lookedIn takes the user's folder off the head of the path itself
+  before scrubPaths: scrubPaths ends a user name at a space, so 'Jeremy Smith' left 'Smith' on
+  screen.
+- Differs from the phase text: Step 9 is a new leaf (log/characterLogs.ts), not an edit inside
+  config.ts: config.ts imports electron-store and cannot be loaded by a test. discovery.ts
+  readLogsDir counts through the same lister (wider than the two functions the plan names), so the
+  count and the list cannot disagree.
+- Differs from the phase text: Step 11 has a second pure function, onStatusWords(phase): a status
+  change does not throw away a try that is already out.
+- Differs from the phase text: CLOCKED also gained replyTooLarge (the plan names panelSlow only):
+  its verdict lapses with the same 30 s clock.
+- Differs from the phase text: Tests went into sibling files (logReadCombat, logReadNotes,
+  logReadShort) instead of tests/logReadReport.test.mts, which is at 325 of 440 code lines; the dot,
+  the hold and the overlay hook got tests the plan did not list.
+- Differs from the phase text: Process: tests/dataServerShimWire.test.mts was edited once with a
+  node script (it kept the file's CRLF; no mixed endings in any changed file). Everything else used
+  Edit and Write. tsc was run directly several times beyond the one npm run typecheck.
+- For the next phases: LogReadWait has 'panelSlow'. LOG_READ_WORDS, LOG_READ_TRY, LOG_READ_ACTION
+  and LOG_READ_SHORT are Records over it: a new wait does not compile until all four have a row, and
+  tests/logReadShort.test.mts fails a short label over 22 characters or one that repeats another.
+- For the next phases: LogReadFacts required fields are now combatReads (replaces lastCombatRead),
+  large, tooLargeModules, nothingRecognised, archiveOn. tests/logReadFactsHarness.mts builds a full
+  literal; logReadPrivacy and logReadReport tests carry their own.
+- For the next phases: A new note: add it in shared/logReadNotes.ts, keep its text fixed for the
+  life of the read, clear its fact in logReadState forgetReadNotes(). LogReadNote.button is still
+  declared and NOT drawn.
+- For the next phases: R5's planned short label for engineCycling must fit 22 characters; its Try
+  line must still say 'this window'.
+- For the next phases: R6 can reuse useTabLine / LogReadInline for any tab, and useHeldFor for any
+  'only after it has held' rule. useLogReadReport() cannot run on tests/hookHost (no
+  useSyncExternalStore there): keep store reads out of the hook core, as useDotLit and useHeldFor
+  do.
+- For the next phases: Line budget: shared/logReadReport.ts is at 394 of 440 code lines and
+  engineClientHost.ts at 412. New decision code should go in a leaf like logReadNotes.ts.
+- For the next phases: The combat branch's since is the earliest `since` among the deciding keys, so
+  a key that failed once and is still inside its 30 s can make a newer key's failure show before it
+  has itself failed for 15 s.
+- For the next phases: tests/logConfig.test.mts skips its real file-symlink case where Windows
+  refuses to create one (this machine did): run it once on a machine with Developer Mode or
+  elevation before relying on it.
+- For the next phases: The owner should confirm two things: the JOS-158 pin now allows the status
+  label as a meter's tail, and the old no-logs paragraph is gone.
+- Left after review: Finding 2, second option: when the tab's line becomes due with wait ok,
+  re-hydrate that module once (or on a timer) Why: Not built, on purpose. It needs a force-refresh
+  member on the module store. src/renderer/src/lib/useModule.ts states an owner ruling (2026-08-26):
+  wanting to force a refresh is a design signal to be raised, not added. The store-only fix gives
+  the way out the finding asks for (reopen the tab). What remains is listed in notes_changed as an
+  open item for the owner.
+- Left after review: Finding 3, first option: add the e2e step under tests/e2e Why: tests/e2e is
+  outside what this builder may edit. The unit-level replacement was built instead, and the exact
+  e2e step is in notes_changed for the coordinator.
+- Open: Nothing here was run in the app or end to end. The tab lines, the overlay titles, the
+  no-logs screen and the dot are covered by unit tests of their logic and by the typecheck, not by a
+  look at the screen.
+- Open: The real file-symlink test was skipped on this machine (EPERM creating the link). The link
+  rule is covered by the isLogFileEntry unit and by a real junction-to-folder case only.
+- Open: LOG_READ_TRY for replyTooLarge (R2) and for panelSlow (planned text, built as written) say
+  to turn on Summarize and archive log even when it is already on. I did not reword existing rows;
+  the notes and the tab sentence do check archiveOn.
+- Open: The getting-large note has no dismiss: with the archive off and one reply of 16 MiB or more
+  it stands on every tab until the next turn.
+- Open: After a rebuild of the same log a meter can show 'Loading...' for up to a second (it showed
+  'Reading log...' there before), until its next poll.
+- Open: The dot is dark after go-live on a quiet log until the first new line. Before, the go-live
+  frame lit it.
+- Open: A module overlay now goes empty when main's connection drops and comes back (world-changed
+  with no snapshot); before it kept stale rows for that time.
+- Open: Timers still prints 'No clocks running. Watch a mob from Recently killed.' with no snapshot;
+  the plan named only the Recently killed text. Mobs, Maps, Gear and other tabs rely on the band
+  alone, as the plan says.
+- Open: src/main/gapsCharacters.ts still lists logs by name alone (readdirSync, line 164); only
+  config.ts and discovery.ts use the files-only lister.
+- Open: src/main/session.ts line 233 has a comment that quotes the removed no-logs paragraph. Not
+  edited: R4 is changing that file.
+- Open: The renderer's own engine client still draws its per-subscription too-large error nowhere
+  (noted for R3 in the R1 notes, not a step of this phase).
+- Open: The window's connection retry now stops after 5 failed tries (58 s) until the status's
+  engine words change. If the window's broker fails while main's status never changes, the window
+  stays without its own client until a character switch or restart.
+- Open: nothingRecognised rests on session.health `events` being the count of events folded (the
+  protocol comment says so); it was not checked against a real UTF-16 log.
+- Open: Not done, as the plan says: the tray tooltip.
+
+### R4 (2026-11-19)
+
+- Built as designed, reviewed by two readers with different lenses (2 findings; 2 corrected with
+  tests that failed first). Gated together with the trunk merged in: 7,311 unit tests, the two known
+  reds only. End to end: the attach-path specs passed on R4 alone (character-switch,
+  character-switch-storm, overview, combat-dashboard, respawn-timers, engine-loot-view,
+  engine-alert-fires); the full suite on the two phases together is in the merge commit. No Rust
+  change. Built on the default taken for owner question 2 (the app may read again by itself in three
+  capped cases).
+- What changes for the player: A log that was missing, or held open by another program, is now read
+  by itself within about 5 seconds of becoming openable, and the band says so while it is waiting
+  ('The app will pick the file up by itself.'). A read that stopped for no lasting reason is tried
+  once more after 2 seconds; if it stops again the box says 'read: stopped twice; not trying again
+  by itself' and Try again is there. A slow start (the engine took more than 15 s to answer) is no
+  longer called a refusal and no longer loses the read. A wait that went unanswered keeps asking, so
+  an engine that was only slow is picked up when it answers. If the engine stops reading after it
+  had caught up, the app notices within about 30 seconds, clears the stale numbers, says the read
+  stopped and reads again once, and not a second time inside 30 minutes. Switching character away
+  and back quickly can no longer show one character's data under another's name. A settings file
+  that cannot be written no longer leaves the app on 'Still reading your log.' for ever.
+- Differs from the phase text: Truth after a cap needed more than the plan had. afterEnded also
+  takes fileBackTries and answers stop for a file that cannot be opened once the 5 are used, and
+  LogReadFacts gained watchingFile. Two sentences that are not in screen_text now exist for that
+  state: 'In game, type /log on. Then press Try again.' and 'Close any program that has the log
+  open. Then press Try again.' They sit in src/shared/logReadReport.ts (TRY_NOT_WATCHING), not in
+  logReadWords.ts, because this job may change only two lines there.
+- Differs from the phase text: The stop line says the true count when it is more than two: 'read:
+  stopped 6 times; not trying again by itself'. The plan's sentence 'stopped twice; ...' is used for
+  exactly two.
+- Differs from the phase text: Rule 4 is wider than the plan: every health answer whose mark names
+  another log counts, not only a live one. With the plan's rule the engine would read the whole of
+  the wrong log before main re-attached. The plan's two named tests still hold.
+- Differs from the phase text: Rule 3 adopts on any status whose mark names this log, starting and
+  idle included (idle with this log's mark is a read that was taken and ended). By reading
+  engine/crates/engined/src/world.rs the mark carries the log from the instant an attach is
+  accepted, so 'idle with no mark' means the engine never attached; a mark naming another log is
+  treated the same way (re-send).
+- Differs from the phase text: The 'mismatch' wait is decided from the attach error's code
+  ('mismatch', ATTACH_WAITS in shared/logReadReport.ts). As the plan had it the recorded attach
+  error would have read 'The data engine refused the log file.', and the old mismatch test
+  (readiness notAttached with health live) can no longer fire here because a mismatched live answer
+  is never passed on.
+- Differs from the phase text: A stale reply with accepted false records nothing (the winner's reply
+  records its own log).
+- Differs from the phase text: Not in the plan: with the stale-turn record a later turn can rely on
+  an attach it did not send, so nobody told the bar or the archive. A replaced turn's accepted
+  attach now always tells the archive and tells the bar when the app still wants that log (new dep
+  wanted; attaching and folding are two deps).
+- Differs from the phase text: attachTurn's deps are attach and health (two functions) instead of
+  one request, plus defines, wanted, attaching, folding, saw, failed, logSize, rest.
+- Differs from the phase text: foldWait gained one check: it returns at once when saw() ended the
+  turn. One existing test counted calls to mine() as a clock and now counts polls.
+- Differs from the phase text: afterLive.ts holds the confirm flow as well as the verdict
+  (createAfterLiveWatch), so it has tests; the host's part is three small functions. The after-live
+  re-read is sent 2 s after the end, not at once, so the status is pushed in between.
+- Differs from the phase text: New leaf src/main/dataServer/readEdges.ts (one listener slot) so the
+  host and the recovery do not import each other; logReadRecovery.ts is a factory with its
+  dependencies handed in and is bound in src/main/logReadReport.ts.
+- Differs from the phase text: A new engine launch clears autoTries and fileBackTries (plan: per
+  launch) and not the after-live window. Any Try again press that ran an action (relaunch and
+  reconnect too) clears every count.
+- Differs from the phase text: The session fix is a leaf (sessionTail.ts storeThenSignal) plus a
+  source pin, not an inline try/catch.
+- Differs from the phase text: servingLine moved unchanged from engineClientHost.ts to foldWait.ts
+  to bring the host from 420 back to 411 lines; the plan expected the host to shrink and it ends one
+  line above where it began.
+- Differs from the phase text: The fold wait's line at the limit now reads '... refused 3 times
+  running; asking every 5000 ms from here (...)' (was '... this turn stops asking').
+- Differs from the phase text: Tests are in more files than the plan names (attach turn split in two
+  plus a rig; four new logRead* files) to stay under the line ceiling and out of the other builder's
+  test files.
+- Differs from the phase text: The Write tool turned -- escapes into literal dash characters in a
+  new test; the two new tests that need them build the pattern with String.fromCharCode. New files
+  are LF in the worktree, as R2 reported for its own.
+- For the next phases: R5: a relaunched engine attaches by itself through the new connection's turn;
+  that is not counted by readRetry. The 'launch' edge clears autoTries and fileBackTries, so R5's
+  'stop after 3 on the same log' must be its own count. noteReadEdge('launch') is said in
+  onEngineReady for every non-null launch.
+- For the next phases: R5: supervisor.ts is at 399 of 440 and has the new optional dep
+  onHealth(health); engineClientHost.ts is at 411. EngineHealth (the probe's answer) carries status
+  and epoch, no mark.
+- For the next phases: R5: the fold wait no longer returns on unanswered polls; a wedged engine is
+  ended only by the supervisor's watchdog. If R5 softens the kill rule, an engine that never answers
+  leaves a turn asking every 5 s (15 s deadline each) with the 'notAnswering' wait on screen.
+- For the next phases: R6: logReadRecovery's file watch runs only after a read ended. A quiet-log
+  check must not call reattachEngineLog outside the recovery, or it bypasses the caps; say a new
+  edge instead.
+- For the next phases: R6 / R3: recovery.watching() is exposed to the report as watchingFile. A note
+  or short label that says the app will try by itself must read the same fact.
+- For the next phases: R7: after-live detection rests on the engine answering session.health 'idle'
+  (or anything but live) once its reader has stopped. A reader that stops while status stays 'live'
+  is not seen.
+- For the next phases: R7: the mark check rests on the engine echoing the attach's logPath unchanged
+  in mark.log (world.rs: fold.log.to_string_lossy()). Canonicalising the path engine-side would stop
+  every launch at the mismatch wait.
+- For the next phases: Anyone adding a LogReadFacts literal: watchingFile is required
+  (tests/logReadFactsHarness.mts sets false).
+- For the next phases: tests/dataServerAttachTurnRig.mts is a fake engine plus a model of the host's
+  turn (edges included); a new rule in attachTurn.ts or a new edge can be driven there.
+- Open: Nothing was run against a real engine. The claims that rest on reading only: the engine
+  answers idle once its reader stops after live; replies come back in request order on one
+  connection; the mark's log equals the attach's logPath.
+- Open: Owner question 2 (may the app re-attach by itself in three capped cases) is still built on
+  the default taken, not on his word.
+- Open: During the 2 s before the one automatic retry, and before the after-live re-read, the band
+  shows 'The data engine stopped before the end of your log. Press Try again...' and then moves to
+  reading by itself. Two pushes; a screen reader may say both. Pressing Try again in that window is
+  safe (it cancels the timed retry).
+- Open: After the after-live re-read starts, nothing on screen says why the app is reading again:
+  the fold error is cleared by the new turn, as every error is.
+- Open: If an attach is never taken and never answered three times while health does answer, the
+  wait shown is 'The data engine is not answering.' (the plan's choice: the timeout error). Its
+  button reconnects.
+- Open: A stale attach reply that arrived AFTER a newer attach's reply would leave main believing
+  the older log. It cannot happen on one in-order connection; if it did, no data is served and the
+  mismatch wait with Try again shows. Comparing the reply's epoch would close it.
+- Open: Bar only: in a three-pick storm Z, Y, Z where Y is replaced before it sends its attach and
+  Z's reply lands during Y's turn, the last turn reuses Z's fold and the catch-up bar is not told.
+  The band covers it after 15 s. The archive is told.
+- Open: A reconnect's turn re-attaches a read that had ended; bounded by the link keeper (5 in a
+  row, 20 per launch), not counted by readRetry.
+- Open: The two sentences shown once the file-back cap is used are new copy the owner has not seen.
+- Open: The no-character interlude: a stale accepted attach now records the log the engine is on, so
+  coming back to that same log sends no attach (the engine was following it throughout). Before,
+  coming back always re-attached.
+
+## Measured on a real machine (2026-11-19)
+
+Three investigators ran the experiments below that need no special hardware (1, 9, 12, 13, 17, 18)
+on the owner's PC (16 cores, 64 GB), on synthetic logs up to 2 GB and on a private copy of the
+owner's 99 MB log; a skeptic on another model re-ran the measurement each main conclusion rests on.
+The machine was busy with other test apps, so a curve or an order of magnitude stands and a 20
+percent difference does not. Each conclusion is given as the skeptic left it. The phases built after
+this (R5, R7) had these numbers.
+
+### How long the engine takes to answer, against log size
+
+Log size does not make the answers slow. On a real-shaped log of 100 MB, 500 MB, 1 GB and 2 GB, and
+on a copy of the owner's 99 MB log, every answer a window asks for came back in 1 to 13 ms once warm
+(the slowest first-time build was 720 ms), and no window reply was larger than 1.7 MB. The probe's
+stuck "Reading log..." is real but comes from that log's shape, not its size. A fight that never
+ends and kills 70,000 same-named mobs makes the meter's reply 81 MB and 2.6 to 3.4 s to build. Main
+gives up at 2 s, then refuses to read the reply because it is over 64 MiB, and never asks again. The
+owner's log is far from this: its largest fight has 38 such rows and its largest zone stay 178,
+against about 29,000 needed to pass the 32 MiB show limit. What a big real log does cost is the wait
+before go-live and engine memory: the 2 GB log took 208 to 242 s to read and the engine held 8.6 GB.
+Two things in the plan do not match what was measured. The engine itself refuses any answer its
+reader thread has not built in 5 s, so a slow build never reaches main's 10 s module wait or the
+client's 15 s deadline; only queueing behind slow builds does. And once main has refused an oversize
+meter reply it keeps refusing that request even after the answer has become small again.
+
+- (stands, fix in its phase) On a log whose current fight (or a selected zone stay) holds tens of
+  thousands of mob instances, combat.snapshot grows by about 1,160 bytes per instance and takes 2.6
+  to 3.8 s engine-side at 70,111 instances (81 MB). Main's 2 s wait expires first, then it refuses
+  the 81 MB reply and blocks that question, so Overview and Combat stay on 'Reading log...'. On the
+  owner's real log the largest selection is 38 rows in a fight and 178 in a zone stay, so this is
+  not reachable from ordinary play. Where the 2 s crossing falls through the app, between 13.7 MB
+  and 81 MB, was not measured. Reachable in real play: No. It needs about 29,000 distinct mob
+  instances in ONE fight or ONE zone stay to pass the 32 MiB show limit, about 45,000 to 55,000 to
+  pass 2 s on this PC, about 58,000 for the 64 MiB read limit. A fight closes 5 s after everything
+  engaged is dead or after 60 s idle, and a zone stay ends at every 'You have entered' line. The
+  owner's 99 MB log tops out at 38 rows in a fight (193 KB, 4 ms) and 178 in a zone stay (460 KB, 11
+  ms); a 40-player raid shape reached 1.1 MB and 34 ms. Fix (S): Capping rows in build_view and
+  folding the rest into one remainder row does remove the only path found to a huge or slow window
+  answer. But it is not purely an engine change. The renderer's incoming table, pet nesting by id
+  and any drill-down would have to accept a synthetic remainder row, so it is S to M, not S. A
+  smaller and safer first step is to cap or merge per-instance rows by name only past a high
+  threshold (for example, over 2,000 sources), so ordinary fights are untouched. Test: a fold unit
+  test with 50,000 same-named kills in one fight asserts that the incoming length is at most N+1,
+  that in_total is unchanged, and that the reply is under 1 MB. Then re-run zz-exp-slow-panel-2 on
+  probe900k and expect milliseconds.
+- (corrected by the skeptic, record only) Answer time stayed in milliseconds at every size measured:
+  each window's meter took 1 to 7 ms, warm modules 0 to 25 ms, the slowest first build 760 ms
+  (gaps), and all 27 modules at once 36 ms. Module reply sizes do grow with post-launch log content.
+  On 1 GB of real-shaped play entirely after the 2026-07-28 epoch: loot 3.7 MB, progression 2.2 MB,
+  killFactionSamples 1.4 MB, all modules together 10.3 MB. The module sizes reported at 500 MB to 2
+  GB reflect only the ~114 post-launch days of those logs. Loot is uncapped and linear (about 150
+  bytes a fight on the synthetic shape; about 10.4 KB per MB on the owner's real log). It would pass
+  the 32 MiB show limit near 3 GB of owner-shaped post-launch log, an extrapolation that is not
+  measured and not reachable in 114 days of play at the owner's 4 MB a day. Reachable in real play:
+  Yes, this is the normal case, measured to 2 GB / 24.3 million lines / 692 days of the synthetic
+  real shape and on the owner's 99 MB.
+- (corrected by the skeptic, record only) The whole fight list (about 250 bytes and 3 to 4 µs a
+  fight) and the fight search (about 6 µs a fight) grow linearly with fights. So do the uncapped
+  loot ledger and several other character-scoped modules, with post-launch content (loot 3.7 MB at
+  24,194 post-launch synthetic fights). None is near a limit at sizes a player can have today. The
+  crossing points are extrapolations. Reachable in real play: Unknown, and only for logs of several
+  GB with the feature in use. Time to live (about 15 minutes at 8 GB) and engine memory (4.3 MB per
+  MB of log) would be felt first.
+- (stands, record only) An ask that the single ingest thread has not answered within 5 s of being
+  posted (queue plus build) gets 'the fold did not answer within 5000 ms'. The ingest thread still
+  finishes the build and then drops the result, and while it builds, the log tail and every other
+  ask on any connection wait behind it. So a slow build alone never reaches main's 10 s module wait
+  or the client's 15 s deadline. Those are reached by requests queued behind slow builds on main's
+  single connection. Reachable in real play: Not from log size (2 GB answers in milliseconds). Only
+  when a build is seconds long: the capped-rows case above, or a real-size answer on a CPU starved
+  several hundred times over, which was not produced. A starved x20 engine would still answer the
+  owner's largest real selection (11 ms) in about a quarter of a second.
+- (stands, record only) Once a combat.snapshot reply for an options key is refused (over 64 MiB) or
+  is over the 32 MiB show limit, main answers that key 'tooLarge' without asking the engine again.
+  This lasts until the connection is reopened, the log is re-read or the app restarts, even if the
+  selected fight has since become small. The report's sentence names the fight list although the
+  bytes are the selected fight's rows. Reachable in real play: No for the meter, because the
+  oversize reply itself is not reachable (first conclusion). For a module the reply only grows, so
+  the permanent block is the right behaviour there. Fix (S): The proposed timed re-ask every 5 s is
+  not safe as stated for the refused case. On the probe shape it would make the single ingest thread
+  spend about 3.5 of every 5 s building an 81 MB answer, starving the tail and every other ask.
+  Smaller and safer: clear the block for combat.snapshot keys only when the combat world moves (a
+  new segment or the combat-activity signal main already forwards), with a backoff, and clear it on
+  any reply under the limit. Also reword replyTooLarge for combat to 'The selected fight is too
+  large for the app to show.' Test: in tests/dataServerReplySizes.test.mts, a blocked combat key
+  unblocks after a world-moved signal and stays blocked without one. Then an app run on probe900k
+  plus an appended small fight should be served within one poll.
+- (stands, record only) Each options key has at most one request on the wire. A caller whose 2 s
+  wait expires leaves the request there, and the next poll joins it. When a build takes between 2 s
+  and about 4 s, the meter is served on alternate calls (seen once, with a starved engine, not on
+  any real shape). Reachable in real play: Only on a starved or much slower PC combined with a
+  multi-MB selection; not seen on any real shape here.
+- (corrected by the skeptic, record only) The same 13.7 MB reply took 0.49 to 0.57 s engine-alone
+  (load 47 to 69%) and 1.05 to 1.21 s from the renderer's call to its return (load 100%). How much
+  of the difference is main's parse, the IPC copy or the machine load was not measured. Reachable in
+  real play: Not at real reply sizes (at most 1.7 MB).
+- (stands, record only) The gap between the end of the read and live is under 0.2 s, and the meter
+  is served from the first read after go-live, so a normal multi-GB read does not dwell in a
+  finishing state. Reachable in real play: Yes, measured at 99 MB and 2 GB.
+- (stands, record only) What a large real log costs is the wait before go-live and engine memory,
+  not answer time. Reachable in real play: Yes: it scales with log size from the first MB. On an 8
+  or 16 GB PC a 2 GB log's 8.6 GB engine would not fit in memory comfortably; that was not tested.
+
+What it means for this plan:
+
+- The 2 s meter wait (serveShim SERVE_TIMEOUT_MS) is confirmed as ample on real shapes: the slowest
+  meter answer at 2 GB was 7 ms engine-side, 9 ms median and 642 ms worst (first call) through the
+  app. No reason to raise it.
+- The 10 s module wait and the 15 s client deadline are contradicted as build-time limits: the
+  engine refuses at 5 s (world.rs SNAPSHOT_PATIENCE). They are reached only by requests queued on
+  main's single connection behind slow builds (measured: modules null at 10.0 s, kills at 20.0 s,
+  one reply dropped after 15 s under x20 starvation).
+- Experiment 18, 3 to 10 s case: done with a starved engine. One request per options key is
+  confirmed; Overview is served on every second call at about 3 s per answer and never at 5 s or
+  more; the R1 report says wait=notAnswering, 'the engine did not answer in time' / 'the engine
+  refused'. The Overview keeps its last meter with no notice while this happens.
+- Experiment 18, over-15 s case: as written it cannot be produced by a slow build, because the
+  engine answers 'unavailable' at 5 s. R3's sentence 'Your log is read. This panel is taking too
+  long to build.' should be driven by the shim's timedOut and refused reasons after go-live. R3 is
+  not in this tree, so its words were not seen.
+- Experiment 12: the last-progress-to-live gap is 13 to 98 ms engine-side and under 0.2 s in the app
+  at 2 GB, and hydrating is false from the first read after go-live. 'Finishing the read.', its 64
+  KiB and 5 minute rules and the 60 s stalled rule are not exercised by a normal read of a
+  real-shaped log; they only matter for a fault.
+- The 32 MiB show limit and 64 MiB read limit (R1) are confirmed as far above any real window reply:
+  the largest at 2 GB was 1.7 MB (gaps), and 1.25 MB on the owner's log. The only real-shape reply
+  in the tens of MB is the archive's whole fight list (12.2 MB at 48,378 fights), which does not go
+  to a window.
+- R1's size gate has a hole worth a line in the plan: a combat.snapshot key blocked as too large is
+  never asked again (replySizes.note keeps blocked), so the meter cannot recover when the answer
+  shrinks. A timed re-ask fixes it.
+- R1's sentence 'The fight list is too large for the app to show.' is printed for any oversize
+  combat.snapshot; in the one shape that triggers it the list held a single fight and the bytes were
+  the selected fight's rows.
+- R7 (engine phase): the one engine change these numbers argue for is a cap on the rows of the
+  selected view (views.rs build_view). It removes the only way found to make a window's answer large
+  or slow.
+- Fork issue #9 (stuck for days): slow answers on a large log are not the explanation on this
+  evidence. A real-shaped log serves the meter in milliseconds at 2 GB, and the shape that does
+  stick needs tens of thousands of mob instances in one fight. Before R1 a frame over 8 MiB ended
+  the connection; at the measured 252 bytes a fight, the archive's fight-list read passes 8 MiB near
+  33,000 fights (about 950 MB of the owner's shape), and that is the first real-shape reply that
+  would have crossed it.
+- For experiment 13 (not mine, side numbers): engine private memory at live was 4.3 to 5.9 MB per MB
+  of real-shaped log and about 19.5 KB per finished fight on a short-fight log.
+
+Not measured (the skeptic's list):
+
+- Large synthetic logs should have been built entirely after the 2026-07-28 epoch
+  (engine/crates/fold/src/epoch.rs). real500, real1g and real2g were mostly pre-launch, so every
+  character-scoped module (loot, progression, kills, killFactionSamples and others) reset partway
+  through and was measured on only ~114 days of content. On an all-post-launch 1 GB log, loot was
+  3.7 MB instead of 1.27 MB and all modules together 10.3 MB instead of about 5 MB.
+- Growth of the uncapped, append-only loot ledger (and of met, bazaar and eventFeed with real alert
+  definitions) against post-launch log size. On the owner's shape (about 10.4 KB per MB) loot would
+  cross 32 MiB near 3 GB; that is extrapolated, not measured.
+- The Combat tab's real request carries archived: true. Engine-alone asks omitted it, and the
+  archive-on case, where archived fights are appended to the list, was not measured.
+- Where a meter reply crosses main's 2 s wait through the app, between 13.7 MB (served) and 81 MB
+  (never): roughly 20,000 to 30,000 incoming rows, at the same machine load as the engine-alone
+  runs.
+- How long the log tail and the live meter lag while the single ingest thread builds a slow or
+  refused answer, and how windows' own direct connections (subscriptions) are affected during that
+  time.
+- A split of through-app time (main's JSON.parse, the shim, the IPC structured clone, the renderer)
+  at matched load, with three repeats.
+- Main-side cost of the archive capture's whole fight-list read (12 MB at 2 GB) through main, not
+  just the engine.
+- Three repeats at 2 GB, both engine-alone and in the app (one each was taken), and any run on a
+  smaller-memory PC.
+- Overlay requests with an explicit selectedId (the overlay passes one), and the Combat tab's
+  Overall (zone) selection through the app on a long single-zone stay.
+
+### What very large replies cost
+
+The 8 MiB cliff is gone on this build: loot replies of 12.8, 23.2 and 34.9 MiB were read and a 69.7
+MiB one was dropped, and the connection stayed up every time. The reply that grows and reaches a
+window is the loot history (about 122 to 129 characters per looted item), not the fight list and not
+the event feed. The meter's own reply stays 14 to 72 KB at any log size, so the size limits never
+cause "Reading log...". - Cost of a big loot reply: the engine and main's parse are the cheap part
+(about 45 ms and 35 to 48 ms at 12.8 MiB). Handing it to a window costs the most: about 255 to 280
+ms at 12.8 MiB and 570 to 730 ms at 23 MiB. - It repeats on every looted item: each new loot line
+makes every window that holds loot fetch the whole history again. At 110,000 rows that stalled main
+for 155 to 410 ms per loot line, and the Loot tab took 1.3 to 1.6 s to update. - Over 32 MiB or 64
+MiB: the player gets no warning. The Loot tab says "0 loot events ... No loot parsed yet. Loot
+something in-game (or check your log path)" and the Overview looks normal. The real reason sits in a
+report box that is not shown. - The archive: it cures the engine and the launch (4.4 s instead of 24
+s, engine at 0.2 GB instead of 1.9 GB) and brings the Loot tab back. It does not cure the window
+cost: main then keeps the history for good and sends the same weight to each window with no size
+limit. After archiving, a window was handed 36.55 million characters, the same size the app had just
+refused to show. - Over 64 MiB the archive refuses: "Not archived: this log is too large to
+summarize in one piece", after 50 to 65 s of work. That player has no cure inside the app. How soon
+real play reaches this depends on loot density. At the owner's density (10.5 KB of loot reply per MB
+of log) the limits fall at about 1.6, 3.2 and 6.4 GB of log. On my loot-dense synthetic shape, which
+is 11 times denser and an assumption, they fall at 156, 311 and 622 MB.
+
+- (stands, record only) A reply over 8 MiB no longer ends the connection on this build. Reachable in
+  real play: yes: 8 MiB of loot is about 65,000 looted items, about 0.8 GB of log at the owner's
+  density
+- (corrected by the skeptic, record only) The window-facing reply that grows in a straight line is
+  loot, at about 122 to 129 characters per row. The plan's 1.19 MB 'event feed' is messageOverlay.
+  It grows sublinearly, main reads it, and one window reads it too: the Buffs tab, while its
+  Diagnostics panel is open. The every-fight combat.snapshot is asked only by the archive capture.
+  Window meter options stay at 14 to 72 KB. Reachable in real play: yes, at any size Fix (S): A doc
+  fix in the plan is right and S in size. Name loot as the growing window reply, and call the 1.19
+  MB figure messageOverlay (read by Buffs diagnostics), not 'main only'.
+- (stands, record only) No size limit blocks the meter's own read, and the replyTooLarge wait was
+  not reached at any measured log shape. A large reply in flight at go-live still delayed the
+  meter's read by 0.5 to 1.3 s against its 2 s wait on a 16-core PC. Reachable in real play: no for
+  the meter's too-large wait at any measured shape; yes for the silent Loot case, see the next
+  conclusion
+- (stands, fix in its phase) Once loot passes the 32 MiB show limit (about 260,000 to 275,000 looted
+  items, whatever the log's size), the Loot tab shows the 'No loot parsed yet ... check your log
+  path' text, and live loot never appears. By code the Overview's drops card says 'Nothing looted
+  yet'. The real reason is only in the hidden report. Reachable in real play: yes for a loot-heavy
+  log: about 260,000 to 275,000 looted items. That is 311 MB on my synthetic shape and about 3.2 GB
+  at the owner's density. Fix (M): The direction is right: R3's module line, loot first. To be
+  correct it needs two things the proposal skips. First, the renderer must tell 'unserved' (null)
+  apart from 'empty' and 'still loading' in useLootHistory, the Overview's drops card and the XP
+  overlay. Second, logReadReport.tooLarge holds one reply only, so a second over-limit module would
+  overwrite loot's. Size M is fair. Test: a 140 MB log with 12 loot per kill gives a 34.9 MB loot
+  reply. Assert that the Loot tab and Overview show the too-large line, not the empty text.
+- (stands, record only) At about 110,000 loot rows (13.4M characters), the part of one window's loot
+  read that comes after main's handler is 245 to 280 ms, more than the engine (about 45 ms) or
+  main's parse (33 to 48 ms). Each new loot line refetches the whole ledger in every window
+  subscribed to loot. Main stalled 155 to 410 ms, and the Loot tab took 1.1 to 1.6 s to update. That
+  holds at 51 MB and at 124 MB of log alike. Reachable in real play: yes: noticeable from roughly
+  100,000 looted items (about 1.3 GB of log at the owner's density, 124 MB on the loot-dense shape).
+  An archive user reaches it by total play, not log size. Fix (S): The proposed smallest fix does
+  not work as written. replySizes only learns a reply's size through the transport's onOversize,
+  which fires at noticeChars = LARGE_MESSAGE_CHARS (16 MiB). A 2 MiB floor in delayFor would never
+  see a 2 to 16 MiB reply. It would also need the size recorded somewhere else: in serveShim, or
+  with a lower notice threshold, which would also spam the 'large' dev-log line. Even when wired, a
+  floor only merges pickups that come within 5 s. Each send still costs every window the full copy,
+  and the Loot tab lags up to 5 s. The lasting fix is the plan's deferred 'paging the loot ledger'
+  item, or serving Loot from the engine's windowed loot view. Test: the x110 shape with live loot
+  lines, measuring the main stall and the count update.
+- (stands, record only) On a 16-core, 64 GB PC, main peaked under 1 GB and fell back to about 250 MB
+  at every size tested. A 32 to 64 MiB reply main will not show is still read and parsed in main, by
+  more than one request at go-live, at a cost of a few hundred MB of heap and about 200 ms stalls.
+  Reachable in real play: yes on a 16-core, 64 GB PC; unknown on a small one
+- (stands, fix in its phase) "Summarize and archive log" cures the engine and the launch, and brings
+  the Loot tab back, but it moves the whole weight into main and past the show limit. Reachable in
+  real play: yes: any player with the switch on, by total loot ever archived; the stall was measured
+  at 110,003 and 300,003 rows Fix (M): Neither proposed fix is free. Noting the merged size needs it
+  serialized, which is the plan's stated reason for deferring. Applying the show limit to it would
+  turn Loot empty again for archive users, trading slow for empty. Capping merged loot to the newest
+  N rows changes the Loot tab's totals and drop rates, which are computed from all rows. So it is M
+  or more, and it needs a decision on what the tab may show. The home is the plan's deferred 'bound
+  on what one module merged with archived history may carry', now unblocked because experiment 17
+  has been measured. Test: archive a log with 300,000 loot rows, restart, record the characters
+  handed per window and the Loot tab totals.
+- (stands, fix in its phase) Above 64 MiB the archive is not a cure at all: it refuses, after a long
+  wait, and nothing in the app can shrink that log. Reachable in real play: only on a very
+  loot-heavy log: about 520,000 to 550,000 looted items (622 MB on the synthetic shape, about 6.4 GB
+  at the owner's density) Fix (S): The two small parts are right and S. R2's Try line for a refused
+  (over 64 MiB) reply must not offer the archive. The automatic check should remember a refusal for
+  that log's identity and size, so the roughly 50 s capture is not repeated at every launch. The
+  real cure stays the deferred 'move an oversized log aside' or paged loot. Test: the
+  12-loot-per-kill shape at 50,000 fights (69.7 MiB). Launch twice with the switch on, and count
+  captures and dropped 73 MB messages on the second launch.
+- (corrected by the skeptic, fix in its phase) Main-only readers (the Gaps save every 10 min, the
+  archive capture) ask for loot again after it has been found too large for windows. From 32 to 64
+  MiB that works as R1 intends: the Gaps save is written. Above 64 MiB the reply is refused each
+  time, so that character's Gaps save is never written ('save skipped, to be tried again'). The
+  engine rebuilds the 73 MB reply for nothing. Reachable in real play: yes, whenever loot is over 32
+  MiB Fix (S): Smallest correct fix: have replySizes keep 'refused' (over the read limit) apart from
+  'blocked' (over the show limit), for example an unreadable(key). Then rawModule skips only when
+  the last reply was refused, and logs why. Test: a unit test in tests/dataServerReplySizes.test.mts
+  for the two states, plus a run on the 69.7 MiB shape past 60 s, counting refused loot replies over
+  time.
+- (corrected by the skeptic, record only) Engine memory and read time grow with the log: 0.5 GB and
+  15 s on the real 99 MB log, 0.9 to 4.7 GB and 13 to 65 s on synthetic logs of 51 to 338 MB, about
+  3 MB of engine per MB of the owner's log as a slope. On a loot-light log like the owner's they
+  become a problem long before the reply limits. On a loot-dense log (12 per kill) the 32 MiB loot
+  limit arrives at about 140 MB of log, with a 2 GB engine. Reachable in real play: yes in
+  proportion to the log: measured 0.5 GB at 99 MB real, 1.8 to 5 GB at 124 to 338 MB synthetic
+
+What it means for this plan:
+
+- R1 "A reply larger than the old 8 MiB limit loads": confirmed on real replies of 12.79 and 23.25
+  MiB; "fails only its own request": confirmed at 34.86 MiB (not shown) and 69.71 MiB (not read),
+  with the connection up and one serving line.
+- "How this plan was made" says the largest replies are the event feed (1.19 MB), loot, the fight
+  list and progression. Corrected: the 1.19 MB one is messageOverlay (1,252,522 chars), which only
+  main reads and which flattens. eventFeed is capped at 100 rows. Loot (1,033,581 chars) is the
+  window-facing one.
+- "Measured growth 12.6 KB of largest reply per MB of log" and "a window works to about 2.6 GB of
+  log and the archive to about 5 GB": for the reply that actually reaches a window (loot, 10.5 KB
+  per MB on the owner's log) the figures are about 3.2 GB (32 MiB) and 6.4 GB (64 MiB). "At an alt's
+  loot density about 0.5 to 0.9 GB and 1.2 to 2 GB" is not contradicted: my 11-times-denser shape
+  gives 311 and 622 MB, and no real alt log was measured.
+- The default "Read 64 MiB, show 32 MiB, revisited after experiment 1": keep it. Parse in main is 33
+  to 48 ms at 12.8 MiB and 233 to 311 ms at 69.7 MiB; main's peak working set stayed under 1 GB;
+  nothing timed out. Do not take the "read and show up to 64 MiB" option: one send to one window is
+  already 0.8 to 0.9 s at 36.6M chars.
+- The 10 s module wait and the 15 s client deadline have room: the worst module handler was 1.29 s
+  (launch, 69.7 MiB reply in flight). The 2 s meter wait has less: the meter's read queued behind
+  the big loot reply for 725 to 1,271 ms at go-live on a 16-core PC, so a slower PC can show one
+  "Reading log..." frame there.
+- The 5 s floor for large replies works as designed: the second and third reads at 23.25 MiB were
+  held 2.5 to 2.7 s. It starts at 16 MiB, so it does nothing in the 2 to 16 MiB band, where each
+  loot line already costs 155 to 410 ms of main-thread stall.
+- The wait word "replyTooLarge" and "The fight list is too large for the app to show." (R1 step 15)
+  cannot fire for the meter at any measured log shape. "A too-large MODULE reply ... changes no wait
+  and no tab text (R3)" is the case that actually happens, and what the player reads today is a
+  wrong reason. R3's module line for loot should move up, or a minimal loot-only line should ship
+  with R2.
+- R1 risk "A module merged with archived history ... still crosses IPC unbounded (deferred,
+  experiment 17)": measured, and it defeats the show limit: 36,554,333 chars handed to a window
+  right after the same size was refused. This should be scheduled, not deferred.
+- R1 risk text "main-only readers (the archive capture) then still work in the 32 to 64 MiB range
+  ... which is what lets the archive be the cure": true for the range (l300 archived in 62.5 s).
+  Above 64 MiB the archive refuses after 50 to 65 s, so R2's Try line for a refused reply needs
+  different advice than for a not-shown one.
+- R1 "it is not asked again until the log is re-read": holds for shim callers only; gapsCharacters
+  and the archive capture ask again.
+- R1 as-built note "After an archive in the same run the engine still holds the old lines, so the
+  reply stays too large until a restart": consistent with what I saw (engine still 4.8 GB after
+  archiving l300 in the same run; the restart brought 238 MB and a full Loot tab).
+
+Not measured (the skeptic's list):
+
+- The window's own cost in a visible window: deserializing and re-rendering 110,000+ loot rows. The
+  harness window is hidden and throttled, so the 'hand-over' figure mixes the IPC copy with renderer
+  work and was never split.
+- The band between 8,000 and 110,000 loot rows (for example 25k, 50k, 75k), where the per-pickup
+  stall becomes noticeable. The '~100,000 items' onset is one point, not a measured curve.
+- A burst of loot lines like real corpse looting (several lines within 1 to 3 s). Only one loot line
+  per kill was appended, so how markDirty and the joined reads merge, or pile up, during a burst was
+  not measured.
+- Which caller sent each over-limit loot read at launch. In my x300 run two 34.9 MB replies were
+  parsed by main at go-live, before the size was noted, and a third later. That leaves shim versus
+  Gaps save versus serveLiveState, and whether the race lets the same key go on the wire twice,
+  open.
+- Whether the Gaps save actually wrote its file in the 32 to 64 MiB band (it should, by code), and
+  what it does every 10 min above 64 MiB. The userData was thrown away before anyone looked.
+- Whether the engine's single fold thread pauses live tailing while it serializes a 35 to 73 MB
+  reply, so that the meter lags real play during each pickup's rebuild.
+- The Overview's drops card and XP overlay text past 32 MiB. The screen capture cut content at 420
+  characters, so the Overview's 'Nothing looted yet' was taken from code, not seen.
+- An unserved meter read at go-live on a slower or CPU-limited machine. Main's combat handler took
+  1.0 to 1.3 s against a 2 s wait while the big loot reply was in flight.
+- Repeats of whole launches. The archive runs, the over-64 MiB refusal timings (49.9 s and 65.4 s)
+  and the automatic retry at every launch are single observations or come from code reading.
+- A real loot-heavy log (an alt or a farmer). Every density beyond the owner's one log is synthetic.
+- messageOverlay through its one window reader, the Buffs tab Diagnostics panel, on a spell-heavy
+  log.
+
+### A busy engine and the watchdog
+
+With CPU to run on, the app leaves the engine alone at every size tried: 14 app launches on logs
+from 99 MB to 2 GB showed no "health probe failed" and no restart, and session.health never took
+more than 15 ms during a read. When the engine is starved of CPU, the watchdog does end a healthy
+engine mid-read and the app reads again from byte 0: 4 times in 10 minutes in the run you specified
+(one core, Idle priority, a burner on that core), three of them back to back every 41.3 s, and the
+log never went live. The cause is one number: a probe on a new connection to a starved engine takes
+about 4.8 to 4.9 s, against a 5.0 s limit, while the app's own connection is answered in
+milliseconds the whole time. Plan R5's rule (do not end an engine heard on the app's own connection
+in the last 20 s) would have forgiven all 7 kill verdicts I recorded; its 20 s is supported (longest
+silence measured: 8.4 s). Whether this is issue #9 I cannot say: it needs every core the engine may
+use to be busy with normal-priority work, which I only emulated. Separately, engine memory grows in
+a straight line with the log and reached 11.1 to 11.3 GiB at 2 GB.
+
+- (stands, record only) 14 app launches (99 MB to 2 GB) ended no engine and logged no failed probe.
+  In each one the engine had free cores and ran at Normal priority, because the e2e harness switches
+  off the app's BelowNormal. During 500 MB to 2 GB reads, 1,140 probes on new connections took at
+  most 15 ms. Log size by itself does not trip the watchdog. Reachable in real play: yes, this is
+  the ordinary path; log size alone does not trip the watchdog
+- (corrected by the skeptic, fix in its phase) When only the engine is starved (pinned to one core
+  with a Normal-priority spinner, main left at Normal), the watchdog can end it mid-read, and the
+  next engine reads again from byte 0 with no cap. At Idle priority the investigator saw 4 deaths in
+  10 minutes and 1 more in an earlier run, at a 41.3 s cycle. My 6-minute Idle re-run saw 0 deaths
+  and 3 forgiven timeouts. At BelowNormal, the app's real class, two 10-minute app runs saw 0
+  deaths. A kill needs two timeouts in a row, so the rate is highly variable, and an endless loop
+  was shown only at Idle. Whether a real install, where main is lowered too, ever reaches this loop
+  rather than the announce-timeout card was not measured. A starved read crawls at about 0.05 MB/s
+  even when nothing is killed. Reachable in real play: Unknown how often. It needs every core the
+  engine may run on to be busy with normal-priority work. A real install makes that easier than my
+  harness does: 'yield CPU to the game' is on by default, so the engine runs at BelowNormal.
+  Plausible on a 2-core PC or when several game clients each hold a core; not measured on such a PC.
+  It does not depend on the log's shape; a longer read only gives it more 30 s beats (a 99 MB log at
+  the starved rate of 0.045 MB/s is a 37 minute read, about 74 beats). Fix (M): R5 step 1 (forgive
+  when the engine was heard on the app's own connection in the last 20 s) is the right, minimal
+  direction. Its evidence is a replay on a direct engine where 'heard' was the investigator's own
+  unstarved client. With main starved too, main's own stamp is late as well, and that was not
+  measured. Test it with a unit test in tests/dataServerSupervisorHealth.test.mts (two timeouts with
+  the engine heard 5 s earlier: no onUnhealthy), plus an app run in idle1 and tree2 modes that
+  counts 'a serving engine died' before and after. It does not make a starved read finish in a
+  reasonable time; only priority does that.
+- (stands, fix in its phase) A new-connection probe to an engine starved at BelowNormal or Idle
+  takes at least about 4.8 s, with a median of 4.9 s and a tail up to 12 to 14 s for single probes
+  (18 s when probes overlap), against a 5.0 s limit. So each 30 s beat is close to a coin flip. The
+  app's own kept connection is answered in milliseconds at the median and was never silent longer
+  than 8.4 s. Reachable in real play: same condition as the row above Fix (S): Raising
+  ENGINE_HEALTH_TIMEOUT_MS to 20 s is a one-line, safe stopgap. Only HealthWatch reads it, and the
+  cost is slower detection of a truly wedged engine (10 s becomes 40 s). The margin is thin: the
+  investigator's overlapping probes reached 18.1 s. 30 s would clear every probe measured. R5's rule
+  is the better cure. A test: the same direct replay with the new limit, counting first timeouts
+  over 30 minutes.
+- (corrected by the skeptic, fix in its phase) After go-live, main stops polling session.health.
+  Whether anything else reaches the app's own connection on a quiet log (the engine ticks its
+  modules every second) was not measured. A new-connection probe to an engine starved after go-live
+  still takes about 4.9 s (1 timeout in 400 s, forgiven). Reachable in real play: same starvation
+  condition, while standing idle in game or alt-tabbed Fix (S): 'Ask once on the app's own
+  connection with a 10 s limit before ending' is cheap and safe, since the worst kept-connection
+  answer measured was 8.0 s. Before adding it, measure frame arrivals on the app's connection after
+  live on a quiet log; R5's module-changed stamp may already cover this. Test: an app run that goes
+  live, then starves the engine, and counts deaths with and without the extra ask.
+- (stands, fix in its phase) In one 10-minute run with the whole app (every process, BelowNormal)
+  pinned to two cores that each had a Normal spinner, the watchdog ended the engine once at +46.9 s
+  after 3 MB. All 13 later launches then missed the 10 s announce wait, because main itself ran 2 to
+  15 s late. The app showed 'The data engine started but never answered' and never read the log.
+  This is the closest measured analog of a starved real install. Reachable in real play: Only on a
+  PC whose every core is saturated at normal priority while the app is at its default BelowNormal;
+  harsher than the row above. Unknown how common. Fix (S): R5 step 4 (10, then 30, then 60 s, never
+  less than twice the last announce that worked) points the right way but is untested. Test it by
+  repeating the tree2 run with a 30 s and a 60 s announce wait (constant override in a throwaway
+  build) and counting announce timeouts.
+- (stands, record only) Engine private memory grows about linearly with the log: 515 MiB at 99 MB of
+  real log; about 2.9 GiB, 5.6 GiB and 11.1 to 11.3 GiB at 500 MB, 1 GB and 2 GB of synthetic log
+  (about 37% heavier per MB than the real shape). It did not fall in the 9 s after go-live. Where a
+  smaller PC runs out of memory is an extrapolation. Reachable in real play: The owner's shape is 99
+  MB per 23 days, so a year without archiving is about 1.6 GB of log and about 6 GiB of engine; an 8
+  GB PC would be in trouble somewhere between 1 and 2 GB of log. With 'Summarize and archive log' on
+  the log stays small. Fix (L): No small fix. A real bound is engine work, which the plan defers. A
+  test: measure engine memory on a real log above 500 MB, and once more 5 minutes after go-live.
+- (corrected by the skeptic, record only) On one core shared with a Normal-priority spinner, an
+  engine at Normal read about 2 times slower and no probe failed. At BelowNormal it read about 100
+  to 160 times slower (0.045 to 0.062 MB/s) and probes took about 4.9 s. A real install runs the
+  engine, main and the renderers at BelowNormal by default, and the e2e harness never does. Whether
+  a real game load starves them was not measured. Reachable in real play: same condition as the
+  second row Fix (S): Player workaround (turn off 'yield CPU to the game') is cheap and reversible.
+  The code option needs an owner ruling and a measurement with a real game-like load first. A test:
+  the tree2 run with yieldToGame off against on (all processes Normal against BelowNormal),
+  comparing read rate and deaths.
+
+What it means for this plan:
+
+- Experiment 9 (starved read) is answered, with one change of method: one core plus a burner instead
+  of all 16 cores, to spare the other agents. Before R5: 4 engine restarts in 10 minutes at Idle
+  priority, 0 at BelowNormal in the app (4 timeouts forgiven) and 1 verdict in 39 beats in the
+  replay. After R5 is a replay only (0 kills), since the code is not written.
+- R5 step 1's 20 s is supported: the app's own connection was never silent for more than 8.4 s under
+  starvation and was heard 18 to 384 ms before every verdict. 10 s would be too tight.
+- R5's text 'two failed probes about 14 s apart' measures as 10.0 s from the first ask to the
+  verdict (5.0 + 5.0) when main is not starved, and the kill cycle is 41.3 s.
+- R5 step 1 needs one addition: after go-live on a quiet log there is no passive evidence, so ask
+  once on the app's own connection (10 s limit) before ending the launch. Its 'at most 6
+  forgivenesses in a row once live' is not contradicted: I saw at most 2 timeouts in a row.
+- R5 step 2 (stop after 3 deaths before live) would have fired at +124 s in the Idle run. Land the
+  forgiveness first or the cap turns a slow PC into a 'press Try again' loop.
+- R5 step 3 (say the restart count under the bar) is confirmed as needed: today the box resets
+  'Waiting' and 'Read so far' and says 'Last error none' at every restart.
+- R5 step 4 (announce wait 10, 30, 60 s): a starved engine alone announces at 4.8 to 5.06 s; with
+  the whole app starved 10 s failed 13 of 13 times. 30 and 60 s are untested.
+- Experiment 13 is answered for memory against size and fight count (see the memory row). R5's own
+  risk line 'the engine still runs out of memory on such a log' stands, with numbers: 11 GiB at 2
+  GB. R7's ring release remains unmeasured.
+- Experiment 12, in part: at 2 GB the panel left 'Reading log...' and hydrating went false within 2
+  s of the go-live line, 3 of 3. The gap from the last progress frame to 'live' was not logged.
+- R1's limits (32 MiB shown, 64 MiB read) are far from the largest reply I saw at 2 GB: the loot
+  snapshot stops growing near 5 MB (5.02, 5.04, 5.28 MB at 500 MB, 1 GB, 2 GB) and combat.snapshot
+  stays under 70 KB. I did not measure the event feed or the fight list.
+- Audit row 2's sentence 'the code does NOT kill a healthy read by itself at any log size' holds up
+  to 2 GB. Its estimate of 5 MB/s is low for this PC: 7 to 8 MB/s on the synthetic logs, 9.6 to 10.8
+  on the real one.
+- The earlier probe's 'hydrating still true 200 s after launch' did not reproduce on logs with
+  ordinary fights: hydrating was false within 2 s of go-live at every size.
+
+Not measured (the skeptic's list):
+
+- The real install's configuration was never run: the whole app (main, renderers, engine) at
+  BelowNormal on unpinned cores with every core saturated, or on a 2-core PC. The idle1/below1 runs
+  starve only the engine and leave main at Normal, which no install produces.
+- All 14 'healthy' launches had the engine at Normal, because e2e switches priority off. No run
+  tested a BelowNormal engine on a heavily loaded but not saturated machine (for example the
+  100%-load conditions of s2000-a1).
+- The load was a pure spinning Node loop, never a game-like frame-paced load. Whether a real
+  EverQuest client starves a BelowNormal process was not measured.
+- Repeats of the starved app runs: the Idle result rests on one complete run (the second escaped the
+  pin) and one cycle from another. My 6-minute Idle re-run gave 0 deaths. The kill rate per beat at
+  each priority needs many more beats (a 30-60 minute run per class).
+- Whether the app's own connection receives frames after go-live on a quiet log (the engine ticks
+  modules every 1 s). This decides whether R5 needs the extra ask.
+- The R5 replay used the investigator's own unstarved client as the 'heard' witness. Main's own
+  stamp under whole-app starvation was not measured.
+- How long a starved read takes end to end (a 100 MB log at 0.045-0.062 MB/s takes about 30-40 min),
+  and whether the screen tells the player anything during that crawl.
+- Whether the first probe and its immediate confirmation are correlated (the confirmation was
+  forgiven far more often than independent 40% odds would predict in my direct run).
+- The issue #9 reporter's machine: CPU count, load, priority setting, log size.
 
 ## Defaults taken on the questions that are the owner's
 
