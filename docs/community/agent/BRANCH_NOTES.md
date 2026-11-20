@@ -176,10 +176,18 @@ where one exists.
 - The "Current era" filter hides a POSITIVE out-of-era only (owner, 2026-11-20: "lets show items
   that we can't figure out the era"). A row nothing states an era for is shown, chipped
   `Unknown Era` (`plannerData.eraHides`, `eraChip`, `UNKNOWN_ERA_LABEL`). One rule for the
-  Exaltations list, the Gear tab and the Wish list; 105 of 1,641 donors and 281 of 6,972 gear rows
+  Exaltations list, the Gear tab and the Wish list; 77 of 1,641 donors and 281 of 6,972 gear rows
   are in that state (`tests/unknownEraShown.test.mts` prints the counts). This reverses the
   2026-08-13 ruling that "era?" hides. The Recommended tab still requires in-era
   (`shared/planner/progressionPlan.ts eraLegal`): not changed, ask before changing.
+- ONE BUILDER FOR A ROW'S ERA EVIDENCE: `main/planner/eraEvidence.ts eraEvidenceOf` (the banner
+  and layer 3, `eraDerived`). The Gear index and the Exaltation donor index both spread it, over
+  one copy of the derivations (`indexCurrent.ts eraDerivations`, filled by whichever index builds
+  first). Before 2026-11-20 only the Gear index attached layer 3, so Mane Attraction was in era on
+  the Gear tab and "era unknown" on the Exaltations list. `tests/eraEvidenceShared.test.mts` holds
+  the property: every item on both lists carries the same evidence and gets the same verdict
+  (1,256 items). A new index that shows an era takes its fields from that builder. Not yet on it:
+  the item card and a mob's drop list, which read `ItemKnowledge` and so have layers 1 and 2 only.
 - An item page states its era with a banner template at its top, `{{Classic Era}}`
   (`main/itemLookupParse.ts parseEraTag`); a quest reward with no dropper and no banner is
   `Unknown Era` until its page carries one and the data is refreshed.

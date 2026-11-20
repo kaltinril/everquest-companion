@@ -21,13 +21,41 @@ import itemsJson from '../data/items.json'
 import type { ItemDbFile } from '../itemsDb'
 import { buildPlannerIndex, type PlannerIndex } from './effectIndex'
 import { buildSpellItemIndex, type SpellItemIndex } from './spellItemIndex'
+import { buildEraDerivations, eraDerivationSteps } from './eraDerive'
+import type { EraDerivation } from '../../shared/planner/era'
+import type { Steps } from '../yieldingSteps'
 
 let index: PlannerIndex | null = null
 let bySpell: SpellItemIndex | null = null
+let derivations: ReadonlyMap<string, EraDerivation> | null = null
+
+/**
+ * LAYER 3 OF THE ERA JOIN FOR THE COMMITTED CORPUS, built once and handed to BOTH indexes.
+ *
+ * The donor index and the gear index each state an item's era evidence, through one builder
+ * (`eraEvidence.ts`), and this is the one copy of the derivations that builder reads: a second
+ * walk would be 50 to 80 ms of the main process for an answer already in hand, and two copies are
+ * two things that can drift.
+ */
+export function eraDerivations(): ReadonlyMap<string, EraDerivation> {
+  derivations ??= buildEraDerivations(itemsJson as unknown as ItemDbFile)
+  return derivations
+}
+
+/**
+ * The same map as STEPS, for the gear index's sliced build (`ipc/planner.ts`): the walk yields
+ * between pages, and whichever of the two asks first fills the memo for the other.
+ */
+export function* eraDerivationsSteps(): Steps<ReadonlyMap<string, EraDerivation>> {
+  if (derivations !== null) return derivations
+  const built = yield* eraDerivationSteps(itemsJson as unknown as ItemDbFile)
+  derivations ??= built
+  return derivations
+}
 
 /** The donor + item indices, built on first use. */
 export function plannerIndex(): PlannerIndex {
-  index ??= buildPlannerIndex(itemsJson as unknown as ItemDbFile)
+  index ??= buildPlannerIndex(itemsJson as unknown as ItemDbFile, undefined, undefined, eraDerivations())
   return index
 }
 
