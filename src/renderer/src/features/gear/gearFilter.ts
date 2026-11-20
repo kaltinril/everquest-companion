@@ -56,6 +56,7 @@ import {
 import { WEAPON_PICKS, weaponPicksMatch, type WeaponPick } from '../../../../shared/planner/weaponType'
 import { isShieldLike } from '../../../../shared/planner/shield'
 import { benefitsClasses } from '../../../../shared/planner/usability'
+import { skillModPercent } from '../../../../shared/planner/skillMod'
 import type { EquipSlot, SocketType } from '../../../../shared/planner/types'
 import type { ZoneShort } from '../../../../shared/maps'
 import { gearZoneOf } from './gearZones'
@@ -252,7 +253,7 @@ export interface GearQuery {
  * for a ratio, an effective HP, the damage score or the BIS score exactly as it asks for a stat.
  */
 const THRESHOLD_KEYS: ReadonlyMap<string, GearSortKey> = new Map([
-  ...(['RATIO', 'EFF_HP', 'EFF_DMG', 'BIS', ...GEAR_STAT_KEYS] as const).flatMap(
+  ...(['RATIO', 'EFF_HP', 'EFF_DMG', 'BIS', 'SKILL_MOD', ...GEAR_STAT_KEYS] as const).flatMap(
     (key): [string, GearSortKey][] => [
       [key.toLowerCase(), key],
       [key.toLowerCase().replace(/_/g, ''), key]
@@ -478,8 +479,11 @@ export function filterGearRows<T extends GearRow>(
  * A DERIVED KEY IS NOT A VECTOR KEY, and the union says so: `GearStats` has no `EFF_HP` field and
  * never will. Nothing indexes it, nothing scales it, and nothing stores it — it is computed from the
  * vector at the moment somebody asks, which is exactly why the plus-state moves it for free.
+ *
+ * `SKILL_MOD` (owner, 2026-11-20) reads the row's `skillMods`, not the vector: its number is the
+ * largest percent the item states, and its cell is words (`gearColumns.gearCellText`).
  */
-export type GearSortKey = 'name' | GearDropSortKey | 'RATIO' | 'EFF_HP' | 'EFF_DMG' | 'BIS' | GearStatKey
+export type GearSortKey = 'name' | GearDropSortKey | 'RATIO' | 'EFF_HP' | 'EFF_DMG' | 'BIS' | 'SKILL_MOD' | GearStatKey
 
 /**
  * The drop trio's own axes (fork decision, kaltinril 2026-08-18: *I'd be in a zone like Unrest and want to see
@@ -527,6 +531,7 @@ export function sortValue(row: GearRow, key: GearSortKey, opts: GearDerivedOpts 
   if (key === 'EFF_HP') return gearEffectiveHp(row.stats)
   if (key === 'EFF_DMG') return gearEffectiveDamage(row.stats, opts)
   if (key === 'BIS') return gearBisValue(row.stats, opts)
+  if (key === 'SKILL_MOD') return skillModPercent(row.skillMods)
   return row.stats[key]
 }
 

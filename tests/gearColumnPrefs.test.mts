@@ -32,6 +32,7 @@ import {
   gearColumnIds,
   gearTableLayout,
   maxPercentColumns,
+  numericUnits,
   sortWithin,
   visibleColumns
 } from '../src/renderer/src/features/gear/gearColumns'
@@ -89,9 +90,10 @@ function everyStat(n: number, delay: number): GearStats {
   return out
 }
 
-/** High (ratio 2.0), low (ratio 0.25), and a row that states nothing at all. */
-const HIGH = row('High', everyStat(20, 10))
-const LOW = row('Low', everyStat(5, 20))
+/** High (ratio 2.0), low (ratio 0.25), and a row that states nothing at all. The two that state
+ *  every stat state a skill mod too: `SKILL_MOD` reads the row's `skillMods`, not the vector. */
+const HIGH = { ...row('High', everyStat(20, 10)), skillMods: [{ skill: 'Fishing', percent: 20 }] }
+const LOW = { ...row('Low', everyStat(5, 20)), skillMods: [{ skill: 'Fishing', percent: 5 }] }
 const NONE = row('None', {})
 const ROWS: readonly GearRow[] = [NONE, HIGH, LOW]
 
@@ -146,8 +148,10 @@ test('a stored choice DEGRADES rather than erroring, whatever another build wrot
 test('the picker offers the WHOLE vocabulary - every indexed stat, all four derived keys, never the name', () => {
   // FOUR DERIVED KEYS: `RATIO`, `EFF_HP` (JOS-336), and since 2026-08-15 `EFF_DMG` and `BIS`. None
   // is a field of `GearStats`, all are computed off the SCALED vector at read time, and all are
-  // offered exactly like a stat.
-  assert.equal(PICKABLE_COLUMNS.length, GEAR_STAT_KEYS.length + 4)
+  // offered exactly like a stat. A fifth key that is not a vector field joined on 2026-11-20:
+  // `SKILL_MOD`, read off the row's skill mods (tests/gearSkillMod.test.mts).
+  assert.equal(PICKABLE_COLUMNS.length, GEAR_STAT_KEYS.length + 5)
+  assert.ok(PICKABLE_COLUMNS.includes('SKILL_MOD'))
   for (const key of GEAR_STAT_KEYS) assert.ok(PICKABLE_COLUMNS.includes(key), `${key} is offered`)
   assert.ok(PICKABLE_COLUMNS.includes('RATIO'))
   assert.ok(PICKABLE_COLUMNS.includes('EFF_HP'))
@@ -244,8 +248,10 @@ test('NOTHING THE DERIVATION CAN PRODUCE crosses into pixel mode - over the whol
   // hand-built worst case that no longer exists.
   for (const key of PICKABLE_COLUMNS) {
     const derived = columnsFor(null, { key, dir: 'desc' })
-    assert.ok(derived.length <= MAX_PERCENT_COLUMNS, `sorting by ${key} draws ${String(derived.length)} columns`)
-    assert.equal(gearTableLayout(derived.length, true).mode, 'percent', `sorting by ${key} left percentage mode`)
+    // Counted in UNITS, as the table counts (a two-unit column costs two): the claim is about room.
+    const units = numericUnits(derived)
+    assert.ok(units <= MAX_PERCENT_COLUMNS, `sorting by ${key} draws ${String(units)} columns' worth`)
+    assert.equal(gearTableLayout(units, true).mode, 'percent', `sorting by ${key} left percentage mode`)
   }
 })
 

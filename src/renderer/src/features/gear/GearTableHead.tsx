@@ -8,7 +8,7 @@
 
 import { memo, useEffect, useRef, type JSX } from 'react'
 import { Box, TableCell, TableHead, TableRow, TableSortLabel } from '@mui/material'
-import { NUMERIC_PAD, defaultColumnPx, type GearColumn, type GearTableLayout } from './gearColumns'
+import { NUMERIC_PAD, defaultColumnPx, numericColumnWidth, type GearColumn, type GearTableLayout } from './gearColumns'
 import { clampGearWidth, fitColumnWidth, type CellMeasure, type GearColumnWidths } from './gearPrefs'
 import type { GearSort, GearSortKey } from './gearFilter'
 
@@ -361,7 +361,7 @@ export const GearHead = memo(function GearHead({
           </>
         )}
         {columns.map((c) => (
-          <SortHeader key={c.key} column={c} sort={sort} width={w(c.key, layout.numeric)} align="right" onSort={onSort} onWidths={onWidths} />
+          <SortHeader key={c.key} column={c} sort={sort} width={w(c.key, numericColumnWidth(layout, c.key))} align="right" onSort={onSort} onWidths={onWidths} />
         ))}
         {/* The one column that is not a number and not sortable: it reports a live file, and the
             header carries the two things a reader has to know about it — that a `+N` is its own

@@ -23,6 +23,7 @@ import type { ClassAbbr } from '@shared/classCombo'
 import { resolvedClasses } from '@shared/classCombo'
 import type { ItemUpgradeState } from '@shared/itemUpgrade'
 import { GEAR_INDEX_VERSION, type GearBuildStats, type GearRow } from '@shared/planner/gear'
+import { skillModSearchText } from '@shared/planner/skillMod'
 import { NO_OWNERSHIP, type OwnershipPayload } from '@shared/planner/ownership'
 import { isKept } from '@shared/lootDisposition'
 import { useLootHistory } from '../loot/useLootHistory'
@@ -80,7 +81,8 @@ function effectHaystack(row: GearRow): string {
  * The index row with the table's own, wider search key. Same type — only the haystack grew.
  *
  * WHAT THE HAYSTACK HOLDS: the name, the effects, the slots, the classes, the weapon skill, the
- * drop mobs and zones, and `shield` for a row the index flagged. WHAT IT DOES NOT HOLD, since
+ * drop mobs and zones, `shield` for a row the index flagged, and `skill mod <skill>` for each skill
+ * mod (2026-11-20; its percent is a threshold's, `skillmod>0`). WHAT IT DOES NOT HOLD, since
  * 2026-08-25 (fork review): the STAT VECTOR and the drop LEVELS. `ac 13 cha 15 …` folded into
  * every key made typing `10` or `ac` match most of the corpus - a number is a threshold's question
  * (`ac>=20`, gearFilter.ts), never a substring's, and a level text like `36-40` is the same kind
@@ -97,7 +99,8 @@ function toRow(row: GearRow): GearViewRow {
     row.skill ?? '',
     dropMobs.join(' '),
     dropZones.join(' '),
-    row.shield === true ? 'shield' : ''
+    row.shield === true ? 'shield' : '',
+    skillModSearchText(row.skillMods)
   ]
   return {
     ...row,

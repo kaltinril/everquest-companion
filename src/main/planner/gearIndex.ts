@@ -74,6 +74,7 @@ import mobsJson from '../../renderer/src/data/eqlegends/mobs.json'
 import type { MobData } from '../../shared/types'
 import { buildSourceIndex, dropDetails, mergeItemSources, type SourceIndex } from '../../shared/itemSources'
 import { isShieldLike } from '../../shared/planner/shield'
+import { parseSkillMods } from '../../shared/planner/skillMod'
 import { itemSupply, type SupplyContext } from '../../shared/planner/itemSupply'
 import { committedSupplyContext } from './gearSupply'
 
@@ -394,6 +395,7 @@ function pageRow(entry: ItemDbEntry, deps: BuildDeps, acc: Acc): GearRow | null 
   foldReading(acc, read)
   const deities = deitiesOf(entry.statsBlock)
   for (const d of deities) if (!isDeity(d)) acc.unknownDeities.add(d)
+  const skillMods = parseSkillMods(block.flags)
   // LAYER 3 is keyed by the PAGE's canonical key (`eraDerive.ts` walks pages, not alias keys), while
   // the row's key comes from the item NAME. They differ on the 196 `|itemname` alias pages, and the
   // page is the thing the derivation walked, so the page is what it is looked up by.
@@ -409,6 +411,7 @@ function pageRow(entry: ItemDbEntry, deps: BuildDeps, acc: Acc): GearRow | null 
     // whole here. `planner/deity.deitiesOf` states the measurement.
     ...(deities.length === 0 ? {} : { deities }),
     flags: [...block.flags],
+    ...(skillMods.length === 0 ? {} : { skillMods }),
     quest: k.quest,
     playerCrafted: k.playerCrafted === true,
     stats: read.stats,
