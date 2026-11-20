@@ -44,7 +44,7 @@ test('EVERY SENTENCE AND TRY LINE IS SHORT, SAYS SOMETHING AND CARRIES NO LONG D
     for (const line of lines) {
       assert.ok(line.trim().length > 0, `${wait} has an empty line`)
       assert.ok(line.length < 90, `${wait} is ${String(line.length)} characters: ${line}`)
-      assert.doesNotMatch(line, /[–—]/, `${wait} carries an em or en dash`)
+      assert.doesNotMatch(line, /[\u2013\u2014]/, `${wait} carries an em or en dash`)
       assert.match(line, /\.$/, `${wait} does not end as a sentence: ${line}`)
     }
   }

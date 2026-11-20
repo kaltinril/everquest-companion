@@ -255,7 +255,7 @@ export function scrubPaths(text: string, logPath: string | null, home: string): 
     '~'
   )
   // The copy rule (no em or en dash on screen) holds for quoted text too.
-  return out.replace(/\s*[–—]\s*/g, ' - ')
+  return out.replace(/\s*[\u2013\u2014]\s*/g, ' - ')
 }
 
 /** A launch fault with its detail scrubbed: a spawn failure's detail starts with the program path. */
@@ -264,8 +264,9 @@ export function scrubFault<T extends { readonly detail: string | null }>(
   logPath: string | null,
   home: string
 ): T | null {
-  if (fault === null || fault.detail === null) return fault
-  return { ...fault, detail: scrubPaths(fault.detail, logPath, home) }
+  const detail = fault?.detail ?? null
+  if (fault === null || detail === null) return fault
+  return { ...fault, detail: scrubPaths(detail, logPath, home) }
 }
 
 /** How much of one engine stderr line the box prints. */
@@ -367,7 +368,8 @@ function logWait(f: LogReadFacts): LogReadWait | null {
  */
 function combatVerdict(f: LogReadFacts): Verdict {
   const read = f.lastCombatRead
-  if (read === null || typeof read.unserved !== 'string' || f.now - read.at > COMBAT_READ_FRESH_MS) {
+  const served = typeof read?.unserved !== 'string'
+  if (read === null || served || f.now - read.at > COMBAT_READ_FRESH_MS) {
     return { wait: 'ok', since: f.waitingSince }
   }
   // The meter's OWN read went unserved because its reply was too large, in this read of the log:
@@ -466,6 +468,15 @@ export function composeLogReadReport(f: LogReadFacts): LogReadReport {
     engineSaid: (f.error?.said ?? []).map((line) => saidLine(line, f)),
     waitingSince: verdict.since
   }
+}
+
+/**
+ * Does a "Reading log..." panel that has itself been up for `mountedMs` draw the box? When main
+ * says to show the status, and in any case once the panel has waited out the slow clock: a panel
+ * with no reply while main says `ok` or `noCharacter` still owes the player the rows.
+ */
+export function boxShows(report: LogReadReport, mountedMs: number): boolean {
+  return report.show || mountedMs >= LOG_READ_SLOW_MS
 }
 
 // ── the rows ───────────────────────────────────────────────────────────────────────────────────
