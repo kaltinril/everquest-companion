@@ -17,6 +17,7 @@ import {
   RESPAWN_ALERT_BANNER,
   RESPAWN_ALERT_SPEECH,
   normalizeRespawnAlert,
+  respawnAlertLeadFromDraft,
   respawnAlertLeadOk,
   respawnAlertsDue
 } from '../src/shared/respawnAlert.ts'
@@ -63,6 +64,15 @@ test('the setting: off and 20 s for nothing or garbage, the lead held to 5..300,
   assert.deepEqual(normalizeRespawnAlert({ on: true, leadSec: 44.6 }), { on: true, leadSec: 45 })
   assert.deepEqual(normalizeRespawnAlert({ on: true, leadSec: 60, extra: 1 }), { on: true, leadSec: 60 })
   assert.deepEqual([4, 5, 300, 301, 20.5, Number.NaN].map(respawnAlertLeadOk), [false, true, true, false, false, false])
+})
+
+test('what is typed in the seconds field is stored whole: held to 5..300, rounded, never a prefix', () => {
+  const typed = ['600', '1000', '301', '3', '0', '-20', '44.6', '20', '300', '5', ' 45 ', '1e3']
+  assert.deepEqual(typed.map(respawnAlertLeadFromDraft), [300, 300, 300, 5, 5, 5, 45, 20, 300, 5, 45, 300])
+  // Nothing usable typed: the field goes back to the stored lead.
+  assert.deepEqual(['', '   ', 'abc', '2 0', 'NaN', 'Infinity', '-Infinity'].map(respawnAlertLeadFromDraft), Array(7).fill(null))
+  // Whatever comes back is a lead the setting may hold.
+  for (const text of typed) assert.ok(respawnAlertLeadOk(respawnAlertLeadFromDraft(text) ?? Number.NaN), text)
 })
 
 test('a clock is returned exactly when its lead moment falls in (prevMs, nowMs]', () => {

@@ -20,11 +20,27 @@ export function respawnAlertLeadOk(sec: number): boolean {
   return Number.isInteger(sec) && sec >= RESPAWN_ALERT_MIN_SEC && sec <= RESPAWN_ALERT_MAX_SEC
 }
 
+/** Any number as a lead the setting may hold: rounded, then held to the bounds. */
+function heldLead(sec: number): number {
+  return Math.min(RESPAWN_ALERT_MAX_SEC, Math.max(RESPAWN_ALERT_MIN_SEC, Math.round(sec)))
+}
+
 export function normalizeRespawnAlert(raw: unknown): RespawnAlertSetting {
   if (typeof raw !== 'object' || raw === null) return DEFAULT_RESPAWN_ALERT
   const { on, leadSec } = raw as { on?: unknown; leadSec?: unknown }
-  const lead = typeof leadSec === 'number' && Number.isFinite(leadSec) ? Math.round(leadSec) : DEFAULT_RESPAWN_ALERT.leadSec
-  return { on: on === true, leadSec: Math.min(RESPAWN_ALERT_MAX_SEC, Math.max(RESPAWN_ALERT_MIN_SEC, lead)) }
+  const lead = typeof leadSec === 'number' && Number.isFinite(leadSec) ? leadSec : DEFAULT_RESPAWN_ALERT.leadSec
+  return { on: on === true, leadSec: heldLead(lead) }
+}
+
+/**
+ * The lead to store for what was typed in the seconds field, read once the typing is finished:
+ * 600 is 300 and 3 is 5. Null when nothing usable was typed, so the stored lead stays.
+ */
+export function respawnAlertLeadFromDraft(text: string): number | null {
+  const typed = text.trim()
+  if (typed === '') return null
+  const sec = Number(typed)
+  return Number.isFinite(sec) ? heldLead(sec) : null
 }
 
 // The seeded alert's phrases. A capture is cut at 48 characters, so the sentence is two tokens,

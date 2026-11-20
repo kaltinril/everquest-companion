@@ -3,14 +3,20 @@
 
 import { useState, type JSX } from 'react'
 import { Checkbox, FormControlLabel, Stack, TextField, Typography } from '@mui/material'
-import { RESPAWN_ALERT_MAX_SEC, RESPAWN_ALERT_MIN_SEC, respawnAlertLeadOk } from '@shared/respawnAlert'
+import { RESPAWN_ALERT_MAX_SEC, RESPAWN_ALERT_MIN_SEC, respawnAlertLeadFromDraft } from '@shared/respawnAlert'
 import Tooltip from '../../lib/Tooltip'
 import { editRespawnAlert, useRespawnAlert } from './useRespawnAlert'
 
 export function RespawnAlertControl(): JSX.Element {
   const { on, leadSec } = useRespawnAlert()
-  // What is being typed. Only a lead inside the bounds is stored; anything else goes on blur.
+  // What is being typed. It is stored once, when the typing is finished (blur or Enter), held to
+  // the bounds: storing each keystroke kept "60" out of a typed "600".
   const [draft, setDraft] = useState<string | null>(null)
+  const commit = (): void => {
+    const sec = draft === null ? null : respawnAlertLeadFromDraft(draft)
+    if (sec !== null && sec !== leadSec) editRespawnAlert({ leadSec: sec })
+    setDraft(null)
+  }
   return (
     <Stack direction="row" spacing={1} alignItems="center">
       <Tooltip title="Fires the Alerts tab's Respawn timer ending alert for watched mobs in your zone.">
@@ -31,15 +37,14 @@ export function RespawnAlertControl(): JSX.Element {
       <TextField
         size="small"
         type="number"
-        label="Seconds"
+        label={`Seconds (${String(RESPAWN_ALERT_MIN_SEC)}-${String(RESPAWN_ALERT_MAX_SEC)})`}
         value={draft ?? String(leadSec)}
-        onChange={(e) => {
-          setDraft(e.target.value)
-          const sec = Number(e.target.value)
-          if (respawnAlertLeadOk(sec)) editRespawnAlert({ leadSec: sec })
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') commit()
         }}
-        onBlur={() => setDraft(null)}
-        sx={{ width: 96 }}
+        sx={{ width: 132 }}
         slotProps={{
           htmlInput: { min: RESPAWN_ALERT_MIN_SEC, max: RESPAWN_ALERT_MAX_SEC, 'data-testid': 'respawn-alert-lead' }
         }}
