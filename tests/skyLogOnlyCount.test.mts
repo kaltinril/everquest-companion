@@ -76,6 +76,15 @@ test('a cancelled or refused offer removes nothing', () => {
   assert.equal(net([loot(1, 4)], trades, 'handins'), 4)
 })
 
+test('every `given` entry is taken off, so a bounced offer must not ride in on a later trade', () => {
+  // The giver bounced a lone rune, then took the pair. The engine sends the pair only (turnins.rs
+  // drops an offer older than the trade window); the bounced one left in would read one too low.
+  const pair = [{ item: RUNE, count: 1 }, { item: RUNE, count: 1 }]
+  assert.equal(net([loot(1, 3)], [trade(9, 'Kizdean Gix', pair, [RUNE, RUNE, RUNE])], 'handins'), 1)
+  const withBounced = [{ item: RUNE, count: 1 }, ...pair]
+  assert.equal(net([loot(1, 3)], [trade(9, 'Kizdean Gix', withBounced, [RUNE, RUNE, RUNE])], 'handins'), 0)
+})
+
 test('a destroy removes', () => {
   assert.equal(net([loot(1, 6), loot(2, 2, 'destroyed')], [], 'handins'), 4)
 })
