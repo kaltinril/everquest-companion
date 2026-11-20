@@ -459,11 +459,14 @@ export function CombatHeader(p: CombatHeaderProps): React.JSX.Element {
         now={p.now}
       />
 
-      {/* ── LINE 2: LENS + REFINEMENTS ── controls left, passive state right. It NEVER wraps:
-          wrapping turns content growth into HEIGHT, and this bar's whole contract is that it
+      {/* ── LINE 2: LENS + REFINEMENTS ── controls left, passive state right. From md up it NEVER
+          wraps: wrapping turns content growth into HEIGHT, and this bar's whole contract is that it
           stays two ranks (the headless harness measures it). Overflow is absorbed by the passive
-          readout instead, which shrinks and ellipsizes with its hover text intact. */}
-      <Stack direction="row" spacing={0.5} alignItems="center" flexWrap="nowrap" useFlexGap sx={{ mt: 0.5, minWidth: 0 }}>
+          readout instead, which shrinks and ellipsizes with its hover text intact.
+          BELOW md it wraps. Only a zoomed window is that narrow (125% text size on the 900px
+          minimum window lays out at 720px), and the scope buttons cannot shrink, so one row cut
+          them and the roster button off at the header's edge. A taller bar beats a lost control. */}
+      <Stack direction="row" spacing={0.5} alignItems="center" flexWrap={{ xs: 'wrap', md: 'nowrap' }} useFlexGap sx={{ mt: 0.5, minWidth: 0 }}>
         <ViewSwitch view={p.view} setView={p.setView} noTimeline={p.noTimeline} />
 
         {p.view === 'dash' && <DirectionFilter mode={p.mode} setMode={p.setMode} />}
@@ -473,8 +476,8 @@ export function CombatHeader(p: CombatHeaderProps): React.JSX.Element {
             that. Three buttons, the chosen one lit, for this tab alone (Preferences > Combat
             still sets every meter); the roster popover beside it is its own control, because a
             mis-inferred group is corrected where its rows are missing. The readout stays
-            compact because this line never wraps — its two-rank height is a contract the
-            headless harness measures. */}
+            compact because from md up this line never wraps — its two-rank height is a contract
+            the headless harness measures. */}
         {p.view === 'dash' && p.mode !== 'in' && <ScopeStatus scope={p.meterScope} roster={p.roster} />}
 
         <Box sx={{ flexGrow: 1, minWidth: 8 }} />
