@@ -328,17 +328,14 @@ test('A NULL REPLY IS ASKED AGAIN BY THE NEXT READER: reopening the tab is a way
 
 test('a second reader of a module still unanswered joins the fetch that is out', async () => {
   const { spy, store } = harness()
-  const a = store.subscribe('gaps', () => undefined)
+  const offs = [store.subscribe('gaps', () => undefined)]
   await spy.replyNone('gaps')
-  const b = store.subscribe('gaps', () => undefined)
-  const c = store.subscribe('gaps', () => undefined)
+  offs.push(store.subscribe('gaps', () => undefined), store.subscribe('gaps', () => undefined))
   assert.equal(spy.fetchesOf('gaps'), 2, 'each new reader of a null module opened its own fetch')
   await spy.replyNone('gaps')
   assert.equal(spy.frames(), 0)
   assert.equal(spy.fetchesOf('gaps'), 2, 'a null reply was asked again with no new reader')
-  a()
-  b()
-  c()
+  for (const off of offs) off()
 })
 
 // ---- the character switch ----------------------------------------------------------------------
