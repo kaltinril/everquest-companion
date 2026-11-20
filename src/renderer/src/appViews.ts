@@ -29,6 +29,10 @@ export type View =
   // book. One view: Home or a workbench is the tab's own remembered state. Not yet in
   // `TELEMETRY_VIEWS`.
   | 'tradeskills'
+  // MACROS (fork #11, 2026-11-20): the app's own macro library, sets, and what each character's
+  // game file holds. Proof of concept: the game's files are read, never written. Not yet in
+  // `TELEMETRY_VIEWS`.
+  | 'macros'
   | 'loot'
   // BAZAAR (2026-10-06): what trade chat asked and offered per item, per day. Not yet in
   // `TELEMETRY_VIEWS`.
@@ -141,6 +145,7 @@ export const VIEW_LABELS: Record<View, string> = {
   leveling: 'Leveling',
   skills: 'Skills',
   tradeskills: 'Tradeskills',
+  macros: 'Macros',
   loot: 'Loot',
   bazaar: 'Bazaar',
   // "Wiki Gaps" (owner, 2026-10-19): what the tab lists is what the WIKI lacks. Label only; the view id stays `gaps`.
@@ -199,6 +204,7 @@ const KNOWN_VIEWS: View[] = [
   'leveling',
   'skills',
   'tradeskills',
+  'macros',
   'loot',
   'bazaar',
   'gaps',
