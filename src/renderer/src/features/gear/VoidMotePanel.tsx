@@ -53,6 +53,7 @@ import {
   MOTE_ORDER_LABEL,
   MOTE_TARGET_ROLES,
   moteChangesText,
+  moteEmptyText,
   moteGainText,
   moteGateText,
   moteHoursText,
@@ -196,16 +197,12 @@ function MoteRow({ advice, picks, target, onOpenLoot }: RowProps): JSX.Element {
   )
 }
 
-/** Why there is no list: no dump is the command, never "you wear nothing" (the hover card's rule). */
-function emptyText(compare: GearCompareData): string {
-  if (!compare.ready) return 'Reading your inventory…'
-  if (!compare.hasDump) return `No inventory dump for this character yet. Type ${INVENTORY_COMMAND} in game.`
-  return 'Nothing you wear can go higher: every piece the item data knows is already +10.'
-}
-
 export interface VoidMotePanelProps {
   /** what is worn, and the corpus by key — the hover card's own join */
   compare: GearCompareData
+  /** the item data's own read (`useGearIndex`): until it settles no worn item finds its row */
+  indexReady: boolean
+  indexRefused: boolean
   /** the gear area's class picks, for the focus scores' class gate */
   classes: readonly ClassAbbr[]
   motes: VoidMotePrefs
@@ -213,7 +210,7 @@ export interface VoidMotePanelProps {
   onOpenLoot?: (item: string) => void
 }
 
-export default function VoidMotePanel({ compare, classes, motes, setMotes, onOpenLoot }: VoidMotePanelProps): JSX.Element {
+export default function VoidMotePanel({ compare, indexReady, indexRefused, classes, motes, setMotes, onOpenLoot }: VoidMotePanelProps): JSX.Element {
   const { equipped, byKey } = compare
   const hosts = useMemo(() => [...equipped.values()], [equipped])
   const opts = useMemo(() => ({ target: motes.target, classes }), [motes.target, classes])
@@ -237,7 +234,14 @@ export default function VoidMotePanel({ compare, classes, motes, setMotes, onOpe
       </Stack>
       {list.length === 0 ? (
         <Typography variant="body2" color="text.secondary" data-testid="gear-motes-empty" sx={{ px: 1, pb: 1 }}>
-          {emptyText(compare)}
+          {moteEmptyText({
+            indexReady,
+            indexRefused,
+            hasRows: byKey.size > 0,
+            inventoryReady: compare.ready,
+            hasDump: compare.hasDump,
+            command: INVENTORY_COMMAND
+          })}
         </Typography>
       ) : (
         <Box data-testid="gear-motes-list" sx={{ flexGrow: 1, minHeight: 0, overflow: 'auto' }}>

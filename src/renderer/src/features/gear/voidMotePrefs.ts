@@ -148,6 +148,33 @@ export function moteGateText(advice: Pick<MoteAdvice, 'gate' | 'gain'>): string 
   return advice.gate === 'rare' ? `Below +${String(MOTE_RULES.minTier)}, but copies barely exist` : ''
 }
 
+/** What the tab knows when it has no row to draw. */
+export interface MoteEmptyState {
+  /** the item data's first read has settled */
+  indexReady: boolean
+  /** the item data states a version this build does not know */
+  indexRefused: boolean
+  /** the item data holds any item at all */
+  hasRows: boolean
+  inventoryReady: boolean
+  hasDump: boolean
+  /** the in-game command that writes the dump */
+  command: string
+}
+
+/**
+ * Why there is no list: no dump is the command, never "you wear nothing" (the hover card's rule).
+ * The item data comes first: without it no worn item finds its row, and that is not "all +10".
+ */
+export function moteEmptyText(s: MoteEmptyState): string {
+  if (s.indexRefused) return 'This build cannot read the gear index it was served - it states a newer version.'
+  if (!s.indexReady) return 'Reading the item database…'
+  if (!s.hasRows) return 'The item data could not be read, so nothing can be ranked.'
+  if (!s.inventoryReady) return 'Reading your inventory…'
+  if (!s.hasDump) return `No inventory dump for this character yet. Type ${s.command} in game.`
+  return 'Nothing you wear can go higher: every piece the item data knows is already +10.'
+}
+
 /** `Indicolite Breastplate +9→+10 · Earring of Bashing +8→+10`: the week's motes, one item each. */
 export function motePlanText(plan: readonly MotePlanStep[]): string {
   return planByItem(plan)
