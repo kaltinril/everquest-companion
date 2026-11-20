@@ -43,7 +43,7 @@ import {
   yAt,
   type DpsChart
 } from '../src/renderer/src/features/combat/dpsChart'
-import { outLabel, withPetApart } from '../src/renderer/src/features/combat/dpsAt'
+import { outLabel, peakTitle, withPetApart } from '../src/renderer/src/features/combat/dpsAt'
 
 const BUCKET = 1000
 
@@ -310,6 +310,20 @@ test('the gold line is named for exactly what it sums', () => {
   assert.equal(outLabel(mkSeries()), 'you + pet + group')
   assert.equal(outLabel({ ...solo, petApart: true }), 'you')
   assert.equal(outLabel({ ...mkSeries(), petApart: true }), 'you + group')
+})
+
+test('the peak tooltip says when the peak leaves the pet out', () => {
+  // The tooltip is the only place that says what the gold peak number measures.
+  const plain = peakTitle(mkSeries())
+  assert.equal(plain, 'Peak 5s rolling outgoing rate in the visible window.')
+  assert.ok(!plain.includes('without your pet'))
+  const apart = 'Peak 5s rolling rate without your pet, in the visible window.'
+  assert.equal(peakTitle({ ...mkSeries(), petApart: true }), apart)
+  assert.equal(peakTitle(withPetApart(mkSeries(), true)), apart, 'the path the card uses')
+  assert.equal(peakTitle({ ...mkSeries(), petApart: false }), plain)
+  // The window is the series own, rounded to whole seconds.
+  assert.ok(peakTitle({ ...mkSeries(), smoothMs: 2600 }).startsWith('Peak 3s '))
+  assert.ok(peakTitle({ ...mkSeries(), smoothMs: 2600, petApart: true }).startsWith('Peak 3s '))
 })
 
 test('withPetApart hands back the same series unless the pet is apart, and never copies the bands', () => {

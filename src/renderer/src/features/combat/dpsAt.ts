@@ -56,3 +56,11 @@ export function dpsAt(series: DpsSeries, tMs: number): DpsPoint {
 export function rollingNote(series: DpsSeries): string {
   return `${Math.round(series.smoothMs / 1000)}s rolling${series.estimated ? ' · ~ estimated' : ''}`
 }
+
+/** The header peak's tooltip: what the gold peak number measures, pet or no pet. */
+export function peakTitle(series: DpsSeries): string {
+  const secs = Math.round(series.smoothMs / 1000)
+  return series.petApart
+    ? `Peak ${secs}s rolling rate without your pet, in the visible window.`
+    : `Peak ${secs}s rolling outgoing rate in the visible window.`
+}

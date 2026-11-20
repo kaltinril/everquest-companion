@@ -22,7 +22,7 @@ import { formatRate } from '../../lib/formatRate'
 import { petDrawnApart, type ChartLineKey, type DpsLineKey } from './combatPrefs'
 import { ApproxChip, DashCard, QuietNote, fmtDur } from './combatShared'
 import { approxNote, buildDpsSeries, type DpsSeries } from './dashboardData'
-import { outLabel, withPetApart } from './dpsAt'
+import { outLabel, peakTitle, withPetApart } from './dpsAt'
 import {
   CHART_H,
   CHART_W,
@@ -85,15 +85,11 @@ function ChartHeaderStats({
 }): React.JSX.Element | null {
   if (!tl || !series || !chart) return null
   const note = approxNote(tl)
-  const secs = Math.round(series.smoothMs / 1000)
-  const peakTip = series.petApart
-    ? `Peak ${secs}s rolling rate without your pet, in the visible window.`
-    : `Peak ${secs}s rolling outgoing rate in the visible window.`
   return (
     <Stack direction="row" spacing={0.75} alignItems="baseline" sx={{ minWidth: 0 }}>
       {note && <ApproxChip shown={note.shown} raw={note.of} truncated={note.truncated} />}
       {chart.outLine !== null && (
-        <Tooltip title={peakTip}>
+        <Tooltip title={peakTitle(series)}>
           <Typography variant="caption" sx={{ color: OUT_COLOR, whiteSpace: 'nowrap' }}>
             {series.estimated ? '~' : ''}
             {formatRate(chart.peakVis)} peak
