@@ -434,6 +434,15 @@ export function stripLayoutBounds(kind: OverlayKind, chrome: Bounds, scale: numb
 }
 
 /**
+ * The rectangle an OPEN window is re-placed on (a monitor change, the Recover key, a text-size
+ * change). A fit kind keeps the height it is wearing: `next` carries the stored placeholder, and
+ * the renderer sends no new measurement while its card is unchanged.
+ */
+export function placedOverlayBounds(kind: OverlayKind, next: Bounds, liveHeight: number): Bounds {
+  return fitsHeightToContent(kind) ? { ...next, height: liveHeight } : next
+}
+
+/**
  * How many uniform slots of this height stack between the bottom and top margins of a work area.
  * Always at least one — a display shorter than a single overlay still has to place it somewhere,
  * and the final clamp in `defaultOverlayBounds` keeps it on-screen.
