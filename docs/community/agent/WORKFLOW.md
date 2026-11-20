@@ -205,6 +205,13 @@ disagree, RULES.md wins; fix this file.
   `copy` on a locked machine proves less; rerun it unlocked. A baseline needs a worktree of its own
   at the older commit with its own `engine/target` (release profile only: 0.6 GB, a few minutes
   cold), so this clone's engine is not overwritten.
+  Measured 2026-11-19, evening (the trunk with the whole-app hunt's fixes and Reading log R1, run in
+  the candidate branch's own worktree before the merge, 4 in parallel; the reds again one at a
+  time): 62/66 green and no new red. `alert-dialog-focus`, `engine-boots` and `engine-absent` failed
+  in parallel and passed alone (the two engine specs counted other specs' engines;
+  alert-dialog-focus measured 1 suggestion row at 1280 px in parallel and 200 alone, so its
+  "heaviest row" check read the wrong row). `voice-alerts` red as before. `copy` skipped its
+  clipboard round trip again (locked workstation).
 - **Headless look at a tab:** every tab is in every build (the `UNRELEASED` gate was removed
   2026-10-29), so `electron-vite build --outDir=<worktree>/out-e2e` and a throwaway spec with
   `launchOnFixture(...)` reach any of them; no flag or env var is needed.
@@ -374,6 +381,16 @@ disagree, RULES.md wins; fix this file.
   (`tests/corpusFloor.mts`), a property, or a fixture under `tests/fixtures/` (BRANCH_NOTES.md,
   Test hygiene).
 
+- Before deleting a merged branch, check that no running job names it later: a review stage that
+  diffs `base...work` resolves the base when it starts, not when the job was launched (2026-11-19:
+  `log-read-r1` was deleted after its merge while phase R2's reviewers were still to run against it;
+  the ref was put back at the same commit).
+- A helper must never `git stash`: the stash list belongs to the clone, not the worktree, so a
+  helper's entry sits on the owner's stack (2026-11-19: one sat there two minutes while a test run
+  hung). Say so in every brief; to see a test fail against the old code, copy the changed file to a
+  scratch folder and restore it. `git merge-tree --write-tree a b` is the safe trial merge: it
+  writes only unreferenced objects.
+
 - **A scratch Playwright probe of the e2e app** (`tests/e2e/appWindow.mts` `mainWindow`,
   `logFixture.mts` `stageFixture` + `appendAt` + `launchOnFixture`) is the way to watch a tab
   without a window on the owner's screen. The window is hidden: `requestAnimationFrame` never
@@ -405,3 +422,26 @@ disagree, RULES.md wins; fix this file.
   BRANCH_NOTES.md and MEASURED.md are written once, by the coordinator, from what they return, so
   eight branches merge with no conflict). An independent reviewer on another model per diff found
   one real defect in three of eight. One gate over the merged work.
+- A whole-app hunt that worked (2026-11-19, `audits/2026-11-19-bug-hunt.md`): 18 feature areas, one
+  or two read-only finders per area spread over four models, each handed the area's `requirements/`
+  file and its BRANCH_NOTES section and told to skip decided limits; one skeptic on another model
+  per finding (12 of 93 refuted, 5 already known). Fixes: one worktree per area, a unit test that
+  failed before each fix, a reviewer on another model per branch (4 of 17 branches needed a
+  correction). TypeScript areas ran side by side; engine areas ran in two lanes, each lane with its
+  own `CARGO_TARGET_DIR` and its areas one after another. Every fixer returned a `requirements_row`
+  and `notes_for_branch_notes`; the coordinator wrote them into the ledgers once, so 17 branches
+  merged with no conflict in a document.
+- The correction pass after a review is the one stage nobody else reads: read those commits yourself
+  before the merge (2026-11-19: both were sound; one added a new JSON import edge in main, which is
+  a bundle-order risk only an e2e run settles).
+- Lint the merged tree, not only each branch. Two branches each under a ceiling can be over it
+  together: `captureSegment` passed on both branches and was complexity 14 of 13 once merged
+  (2026-11-19). `git diff --name-only trunk...branch` per branch, then the files named twice, is the
+  list to read by hand.
+- Several finished branches waiting on the same expensive checks (cargo, the e2e suite): merge them
+  into one candidate branch, gate and e2e that once, merge it into the trunk, and confirm the
+  trunk's tree is the gated tree (`git rev-parse <ref>^{tree}`).
+- A branch that changes the connection to the engine, main's import order, or a dialog an e2e spec
+  drives gets the e2e suite BEFORE the merge, in its own worktree: the run builds that tree's
+  `engined.exe` (release; measured 2026-11-19: 37 s and 0.36 GB under its `engine/target`, with
+  the cargo registry warm) and its `out-e2e`.
