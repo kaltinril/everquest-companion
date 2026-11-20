@@ -30,6 +30,7 @@ import LootView from './features/loot/LootView'
 import LevelingView from './features/leveling/LevelingView'
 import { SkillsTab } from './features/skills/SkillsView'
 import { TradeskillsTab } from './features/tradeskills/TradeskillsView'
+import { MacrosTab } from './features/macros/MacrosView'
 import PlannerView from './features/planner/PlannerView'
 import GearView from './features/gear/GearView'
 import VoidMoteView from './features/gear/VoidMoteView'
@@ -185,6 +186,8 @@ function PlainView({
       <SkillsTab view={view} viewKey={viewKey} />
       {/* TRADESKILLS (fork #6). Its view check lives in its own file, as the Skills tab's does. */}
       <TradeskillsTab view={view} viewKey={viewKey} routing={routing} />
+      {/* MACROS (fork #11). Its view check lives in its own file; not keyed by character. */}
+      <MacrosTab view={view} />
       {/* The Plan tab (its place in the gear area's tab bar comes from appViews, not this list).
           Its routes out (user rulings, 2026-08-18): item names to the Loot drill-down, zone chips
           and run headings to the Maps tab, and a named witness mob's name to the mob's own page.
