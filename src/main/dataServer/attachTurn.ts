@@ -43,6 +43,8 @@ export interface AttachTurnDeps {
   readonly target: string
   /** Is this still the turn that started? Asked after every suspension point. */
   readonly mine: () => boolean
+  /** The log the app wants the engine on NOW, whichever turn is asking. */
+  readonly wanted: () => string | null
   /** `session.attach` on main's connection. */
   readonly attach: (params: ParamsFor<'session.attach'>) => Promise<{ readonly epoch: number; readonly accepted: boolean }>
   /** `session.health` on main's connection. */
@@ -107,12 +109,14 @@ function attached(turn: Turn, result: { readonly epoch: number; readonly accepte
   const mine = deps.mine()
   // RULE 1. `accepted: false` lost to a later attach, whose own reply records its own log.
   if (result.accepted || mine) deps.setAttached(deps.target)
+  // The bar and the archive are told by the turn that owns the fold. A turn replaced by a rebuild
+  // of the SAME log still tells them: the new turn finds the engine on its log and sends nothing.
+  if (result.accepted && (mine || deps.wanted() === deps.target)) taken()
   if (!mine) return false
   deps.note(
     `data-server engine attached: ${deps.target} (epoch ${String(result.epoch)}, ` +
       `accepted ${String(result.accepted)})`
   )
-  if (result.accepted) taken()
   return true
 }
 

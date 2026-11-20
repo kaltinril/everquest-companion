@@ -97,7 +97,8 @@ test('THE TURN IS RUN BY attachTurn.ts, with the host-s own turn, connection and
   assert.match(turn, /const stateDir = deps\.stateDir\(\)\s*const clock = deps\.clock\(\)\s*const taken = deps\.attaching\(\)[\s\S]*?await deps\.attach\(/)
   assert.match(turn, /await deps\.defines\(\)\s*if \(!deps\.mine\(\)\) return[\s\S]*?sendAttach\(turn\)/)
   assert.match(turn, /if \(deps\.getAttached\(\) !== deps\.target && !\(await sendAttach\(turn\)\)\) return/)
-  assert.match(turn, /if \(result\.accepted\) taken\(\)/)
+  assert.match(turn, /if \(result\.accepted && \(mine \|\| deps\.wanted\(\) === deps\.target\)\) taken\(\)/)
+  assert.match(probe, /wanted: attachTarget/)
 })
 
 test('the supervisor-s edges poke, and its fault is scrubbed before the card is told', () => {

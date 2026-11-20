@@ -97,6 +97,30 @@ test('B-S REPLY NEVER ARRIVING AT ALL is closed by the mark alone', async () => 
   assert.equal(r.attached, LOG_A)
 })
 
+test('A REBUILD OF THE SAME LOG WHILE ITS ATTACH IS OUT: no second attach, and the bar is still told, once', async () => {
+  // The ordinary launch can do this: the engine becomes ready and is attached, and the app's own
+  // world lands on the same log before the reply is back. The old code dropped the reply, sent a
+  // second attach and read the log twice. Now the first attach stands, so somebody has to tell
+  // the catch-up bar and the archive that a fold began: the new turn sends nothing.
+  const r = rig()
+  const reply = held<AttachAnswer>()
+  r.attachScripts.push({ reply })
+  const first = r.turn(LOG_A)
+  await settle()
+  const defines = held<undefined>()
+  r.definesGate = defines
+  const second = r.turn(LOG_A)
+  await settle()
+  reply.resolve({ epoch: 1, accepted: true })
+  await settle()
+  assert.equal(r.order.filter((step) => step === 'taken').length, 1, 'the bar was never told the fold began')
+  defines.resolve(undefined)
+  await Promise.all([first, second])
+  assert.equal(r.attaches.length, 1, 'the log is read once')
+  assert.equal(r.order.filter((step) => step === 'taken').length, 1)
+  assert.deepEqual(r.liveOn, [LOG_A])
+})
+
 test('a stale reply that lost to a later attach records nothing: the winner-s own reply does', async () => {
   const r = rig()
   const replyA = held<AttachAnswer>()

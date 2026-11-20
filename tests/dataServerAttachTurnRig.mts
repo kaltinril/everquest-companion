@@ -126,6 +126,8 @@ function healthOf(r: Rig): Promise<FoldHealth> {
 
 export function rig(): Rig {
   let gen = 0
+  /** The host's `attachTarget()`: the log of the newest turn. */
+  let wanted: string | null = null
   const r: Rig = {
     engineLog: null,
     engineStatus: 'idle',
@@ -145,12 +147,14 @@ export function rig(): Rig {
     stateDir: 'C:\\Users\\tester\\AppData\\Roaming\\app',
     turn(target) {
       gen += 1
+      wanted = target
       const mine = gen
       const gate = r.definesGate
       r.definesGate = null
       return runAttachTurn({
         target,
         mine: () => gen === mine,
+        wanted: () => wanted,
         attach: (params) => attachOf(r, params),
         health: () => healthOf(r),
         defines: async () => {

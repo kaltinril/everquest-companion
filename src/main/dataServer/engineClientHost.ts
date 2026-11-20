@@ -477,6 +477,7 @@ async function attachAndProbe(mine: number): Promise<void> {
     target,
     // ASKED, NOT CAPTURED: the generation is this file's state and a leaf never holds a copy.
     mine: () => gen === mine,
+    wanted: attachTarget,
     attach: (params) => l.client.request('session.attach', params),
     health: () => l.client.request('session.health', {}),
     defines: () => pushAllDefines(mine),
