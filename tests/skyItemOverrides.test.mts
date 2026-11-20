@@ -47,6 +47,7 @@ import {
   clearItemOverride,
   itemOverrideInstants,
   itemOverridesByKey,
+  parseHandCount,
   sanitizeItemOverride,
   sanitizeItemOverrides
 } from '../src/shared/itemOverrides'
@@ -121,6 +122,35 @@ test('two statements about one item are ONE statement, the later one', () => {
   assert.equal(list[0].setAt, T0 + HOUR, 'and it carries the LATER instant, so the window moves too')
   assert.deepEqual(clearItemOverride(list, claw), [], 'and the take-back leaves nothing behind')
   assert.deepEqual(clearItemOverride(list, diamond), list, 'clearing another key touches nothing')
+})
+
+test('what is typed in the pencil`s box: a whole count in range, or nothing at all', () => {
+  // A blank box is a changed mind, never a 0.
+  assert.equal(parseHandCount(''), null)
+  assert.equal(parseHandCount('   '), null)
+  assert.equal(parseHandCount('0'), 0, 'a typed 0 is a statement')
+  assert.equal(parseHandCount(' 3 '), 3)
+  assert.equal(parseHandCount('-1'), null)
+  assert.equal(parseHandCount('abc'), null)
+  // The box steps by whole numbers; a fraction is cut down, so under 1 is a statement of 0.
+  assert.equal(parseHandCount('2.9'), 2)
+  assert.equal(parseHandCount('0.5'), 0)
+  // A number box accepts an exponent.
+  assert.equal(parseHandCount('1e3'), 1000)
+  assert.equal(parseHandCount(String(MAX_OVERRIDE_COUNT)), MAX_OVERRIDE_COUNT)
+  // Past the guard the store would drop the statement, so the box commits nothing instead.
+  assert.equal(parseHandCount(String(MAX_OVERRIDE_COUNT + 1)), null)
+  assert.equal(parseHandCount('1e5'), null)
+  assert.equal(parseHandCount('Infinity'), null)
+})
+
+test('whatever the box commits is a statement the store keeps', () => {
+  for (const text of ['0', '7', '2.9', '1e3', String(MAX_OVERRIDE_COUNT)]) {
+    const count = parseHandCount(text)
+    assert.notEqual(count, null, text)
+    const kept = sanitizeItemOverride({ key: claw, name: 'Sphinx Claw', count, setAt: T0 })
+    assert.equal(kept?.count, count, text)
+  }
 })
 
 test('the list is deduped by key, ordered oldest first, and capped', () => {

@@ -28,6 +28,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import EditIcon from '@mui/icons-material/Edit'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import type { ItemCountOverride } from '@shared/types'
+import { parseHandCount } from '@shared/itemOverrides'
 import type { ItemProgress } from './useProgress'
 // The one caveat that belongs in this cell without being about a statement (JOS-409) — see below.
 import { DUMP_BLIND_ITEM_NOTE, isDumpBlindItem } from './dumpBlindItems'
@@ -167,8 +168,8 @@ export function HandCountCell({
   const [editing, setEditing] = useState(false)
   const [text, setText] = useState('')
   const commit = (): void => {
-    const n = Number(text.trim())
-    if (text.trim() !== '' && Number.isFinite(n) && n >= 0) onSetItemCount?.(name, Math.floor(n))
+    const n = parseHandCount(text)
+    if (n !== null) onSetItemCount?.(name, n)
     setEditing(false)
   }
   if (editing && onSetItemCount) {
