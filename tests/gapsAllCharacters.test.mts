@@ -215,6 +215,21 @@ test("another character's mob row the catalog now knows is dropped", () => {
   assert.deepEqual((inp.gaps as GapsSnap).rows.map((r) => r.name), ['a zork'])
 })
 
+test("another character's quest-giver, redirect and zone-titled Mobs rows survive the catalog re-check: their names are known by design", () => {
+  // Each is a row about a name the wiki HAS a page for (add its quests; check its redirect; a page
+  // for this zone beside another zone's), so the catalog always knows the name. Only a plain
+  // unknown-name row closes when a page appears.
+  const giver = { ...row('mob', 'Lord Ollix Everling', 1), questGaps: { page: 'Lord Ollix Everling', quests: ['The Tragic Tale of House Everling'] } }
+  const redirect = { ...row('mob', 'Hoptor Thaggelum', 1), viaRedirect: 'The Ghoul Lord' }
+  const zoned = { ...row('mob', 'a kobold', 1), zoneTitled: true as const }
+  const o: CharacterGaps = { character: 'd_o', name: 'D', server: 'o', savedAt: null, archives: 0, gaps: gaps([giver, redirect, zoned, row('mob', 'a rat', 1)]), loot: [], kills: null }
+  const others = otherInputs([o], () => true)
+  assert.deepEqual((others[0].gaps as GapsSnap).rows.map((r) => r.name), ['Lord Ollix Everling', 'Hoptor Thaggelum', 'a kobold'])
+  const j = joinCharacters([{ label: 'Live', gaps: gaps([]), loot: [], kills: null }, ...others], null)
+  assert.deepEqual(j.gaps?.rows.find((r) => r.name === 'Lord Ollix Everling')?.questGaps?.quests, ['The Tragic Tale of House Everling'])
+  assert.deepEqual(j.seenBy.get(seenByKey({ domain: 'mob', name: 'Lord Ollix Everling' })), ['D'])
+})
+
 test('two characters of one name are told apart by server', () => {
   const one = (server: string): CharacterGaps => ({ character: `d_${server}`, name: 'D', server, savedAt: null, archives: 0, gaps: null, loot: [], kills: null })
   assert.deepEqual(otherInputs([one('oggok'), one('freeport')], () => false).map((i) => i.label), ['D (oggok)', 'D (freeport)'])
