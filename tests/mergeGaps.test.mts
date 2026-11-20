@@ -280,6 +280,31 @@ test('gaps: kill-faction amounts stated equally often go to the larger hit, as i
   assert.equal(capped.adjusts, undefined)
 })
 
+const raul = (kinds: string[], extra: Record<string, unknown> = {}): Row => ({ ...row('mob', 'Raul', 1, { kinds }), ...extra })
+const mergedRow = (older: Row, newer: Row): Record<string, unknown> => (mergeGaps(snap([older]), snap([newer])) as Snap).rows[0] as unknown as Record<string, unknown>
+
+test("gaps: 'may be a player' stands only while NEITHER side has shown the NPC: a side's row without the flag is its proof", () => {
+  // Conned once in the archived log; the live log hailed him and he answered.
+  assert.equal('maybePlayer' in mergedRow(raul(['considered'], { maybePlayer: true }), raul(['hailed'])), false)
+  // The proof in the archive, one con in the live log.
+  assert.equal('maybePlayer' in mergedRow(raul(['hailed']), raul(['considered'], { maybePlayer: true })), false)
+  // Neither log has shown him to be an NPC.
+  assert.equal(mergedRow(raul(['considered'], { maybePlayer: true }), raul(['hailed'], { maybePlayer: true })).maybePlayer, true)
+  // A row only one side holds keeps what that side said.
+  const lone = mergeGaps(snap([raul(['considered'], { maybePlayer: true })]), snap([])) as Snap
+  assert.equal((lone.rows[0] as unknown as Record<string, unknown>).maybePlayer, true)
+})
+
+test("gaps: a row's wiki-data flags are the newer side's reading, also when the newer side no longer has one", () => {
+  const item = (extra: Record<string, unknown> = {}): Row => ({ ...row('item', 'Bone Chaps', 1), ...extra })
+  const suggest = { name: 'Bone Chips', page: 'Bone Chips', distance: 1 }
+  assert.equal('suggest' in mergedRow(item({ suggest }), item()), false, 'a near miss the newer data no longer sees')
+  assert.deepEqual(mergedRow(item(), item({ suggest })).suggest, suggest)
+  assert.equal('zoneTitled' in mergedRow(raul(['killed'], { zoneTitled: true }), raul(['killed'])), false)
+  assert.equal('viaRedirect' in mergedRow(raul(['killed'], { viaRedirect: 'The Ghoul Lord' }), raul(['killed'])), false)
+  assert.equal(mergedRow(raul(['killed']), raul(['killed'], { viaRedirect: 'The Ghoul Lord' })).viaRedirect, 'The Ghoul Lord')
+})
+
 test('gaps: merchant offers survive the join, the same offer counted once (owner, 2026-10-20)', () => {
   const offer = (merchant: string, copper: number, n: number, last: string): Record<string, unknown> => ({ merchant, coin: `${String(copper)} copper`, copper, n, last })
   const older = snap([

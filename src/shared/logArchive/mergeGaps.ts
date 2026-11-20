@@ -51,6 +51,12 @@ interface Row {
   details: Details
   /** a Mobs row's fight numbers per zone tier (gaps_fight.rs) */
   fight?: FightTier[]
+  /** served only when true (gaps.rs `serve_row`): a one-word name this log has not shown to be an NPC */
+  maybePlayer?: boolean
+  /** served only when the wiki data says so (`mergeRow`) */
+  suggest?: unknown
+  zoneTitled?: true
+  viaRedirect?: string
 }
 
 /** A kill and a faction its lines moved (gaps_trade.rs), how often, and the zone last seen in. */
@@ -247,10 +253,16 @@ function mergeFight(a: FightTier[] | undefined, b: FightTier[] | undefined): Fig
  * (owner, 2026-11-05: a merchant met once in an archived log copied as a page with no items sold,
  * though the live row carried every quote: `...had` kept the archive row's fields and never saw the
  * live row's).
+ *
+ * Two kinds of flag are served only when set, so the spread alone let the older side's stand after
+ * the newer side had dropped it. What the fold reads off the wiki data alone (`suggest`, `zoneTitled`,
+ * `viaRedirect`) follows the newer side, absent or not. `maybePlayer` stands only when BOTH sides say
+ * it: a side's row without it is that log's proof of an NPC (an answered hail, a kill), whichever
+ * side holds the proof.
  */
 function mergeRow(had: Row, r: Row): Row {
   const fight = mergeFight(had.fight, r.fight)
-  return {
+  const out: Row = {
     ...had,
     ...r,
     ...(fight === undefined ? {} : { fight }),
@@ -261,6 +273,11 @@ function mergeRow(had: Row, r: Row): Row {
     last: had.last > r.last ? had.last : r.last,
     details: mergeDetails(had.details, r.details)
   }
+  if (r.suggest === undefined) delete out.suggest
+  if (r.zoneTitled === undefined) delete out.zoneTitled
+  if (r.viaRedirect === undefined) delete out.viaRedirect
+  if (had.maybePlayer !== true || r.maybePlayer !== true) delete out.maybePlayer
+  return out
 }
 
 /** Each domain's rows re-ranked and re-capped as the fold serves them, the domains in its order. */
