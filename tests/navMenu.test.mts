@@ -99,6 +99,21 @@ test('a press moves one stop each way, and the ends are fixed points', () => {
   }
 })
 
+// The card's rule (value <= lowest stop, value >= highest stop) against what a press really does.
+test('a button is greyed exactly where its press would change nothing', () => {
+  for (const { name, steps, dflt } of LADDERS) {
+    const min = Math.min(...steps)
+    const max = Math.max(...steps)
+    for (const stop of steps) {
+      assert.equal(stop <= min, stepNavStep(steps, stop, -1) === stop, `${name} ${String(stop)} minus`)
+      assert.equal(stop >= max, stepNavStep(steps, stop, 1) === stop, `${name} ${String(stop)} plus`)
+    }
+    assert.equal(steps.filter((stop) => stop <= min).length, 1, `${name} has one bottom`)
+    assert.equal(steps.filter((stop) => stop >= max).length, 1, `${name} has one top`)
+    assert.ok(dflt > min && dflt < max, `${name} ships with both buttons live`)
+  }
+})
+
 test('an off-ladder value is snapped before it is stepped', () => {
   assert.equal(stepNavStep(NAV_ROW_STEPS, 33, 1), 36)
   assert.equal(stepNavStep(NAV_ROW_STEPS, 33, -1), 28)
@@ -141,6 +156,12 @@ test('the card is two of the page’s steppers, walking the shared ladders', () 
   assert.match(card, /useNavStep\(NAV_TEXT_KEY, NAV_TEXT_STEPS, NAV_TEXT_DEFAULT\)/)
   assert.match(card, /useNavStep\(NAV_ROW_KEY, NAV_ROW_STEPS, NAV_ROW_DEFAULT\)/)
   assert.doesNotMatch(card, /\b(text|row) [-+] /, 'and never by an increment of its own')
+  // Each stepper greys a button only at the end of its OWN ladder, never the other one's.
+  assert.match(card, /atMin=\{text <= Math\.min\(\.\.\.NAV_TEXT_STEPS\)\}/)
+  assert.match(card, /atMax=\{text >= Math\.max\(\.\.\.NAV_TEXT_STEPS\)\}/)
+  assert.match(card, /atMin=\{row <= Math\.min\(\.\.\.NAV_ROW_STEPS\)\}/)
+  assert.match(card, /atMax=\{row >= Math\.max\(\.\.\.NAV_ROW_STEPS\)\}/)
+  assert.equal((card.match(/at(Min|Max)=/g) ?? []).length, 4, 'two ends per stepper, no more')
   assert.match(card, /testid="pref-nav-text"/)
   assert.match(card, /testid="pref-nav-row"/)
   const hook = src('../src/renderer/src/components/useNavMenu.ts')
