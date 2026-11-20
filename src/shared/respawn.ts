@@ -1352,11 +1352,12 @@ export function formatRespawnDuration(sec: number): string {
  * retired seconds box's limits and nothing else).
  *
  * The range is spelled from the constants rather than written out, so a change to either bound
- * cannot leave the sentence lying.
+ * cannot leave the sentence lying. It says nothing of an empty field: Save refuses one, and the way
+ * back to the calculated value is the modal's own button.
  */
 export const RESPAWN_INPUT_HELP = `Plain seconds, or 44m / 44m 30s / 1h 10m. ${String(
   RESPAWN_CUSTOM_MIN_SEC
-)}s to ${String(RESPAWN_CUSTOM_MAX_SEC / 86400)}d. Empty uses the calculated value.`
+)}s to ${String(RESPAWN_CUSTOM_MAX_SEC / 86400)}d.`
 
 /** What the modal says when the grammar refused what was typed. One spelling, pinned by test. */
 export const RESPAWN_INPUT_UNREADABLE = 'Not a duration. Try 2640, 44m, or 44m 30s.'

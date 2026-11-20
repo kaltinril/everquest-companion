@@ -4,7 +4,7 @@
 // writes only what the player typed.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { RESPAWN_CUSTOM_MAX_SEC, formatRespawnDuration, parseRespawnDuration, type RespawnRow } from '../src/shared/respawn'
+import { RESPAWN_CUSTOM_MAX_SEC, RESPAWN_INPUT_HELP, formatRespawnDuration, parseRespawnDuration, type RespawnRow } from '../src/shared/respawn'
 import { RESPAWN_SAVE_NOTE, respawnDraftToSave, respawnPrefill } from '../src/shared/respawnEdit'
 
 const row = (over: Partial<RespawnRow>): RespawnRow => ({
@@ -71,6 +71,12 @@ test('the prefill reads back as the same number, so the field never moves a cloc
   for (const sec of [1, 59, 60, 61, 525, 570, 3600, 3661, 86_400, 90_061, RESPAWN_CUSTOM_MAX_SEC]) {
     assert.deepEqual(parseRespawnDuration(formatRespawnDuration(sec)), { ok: true, sec }, String(sec))
   }
+})
+
+test('the field promises nothing for an empty box, which Save refuses', () => {
+  assert.equal(respawnDraftToSave('', '8m 45s'), null)
+  assert.ok(!/empty/i.test(RESPAWN_INPUT_HELP), RESPAWN_INPUT_HELP)
+  assert.ok(RESPAWN_INPUT_HELP.includes('1s to 7d'), 'it still states the range')
 })
 
 test('the note under the field says a saved number stops the learning, in one short sentence', () => {
