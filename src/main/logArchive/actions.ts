@@ -21,7 +21,7 @@ import { CAPTURED_MODULES } from '../../shared/logArchive/modules'
 import { capturedState } from '../../shared/logArchive/capturedShape'
 import { archiveName, backupLog, sweepTemp } from './backup'
 import { captureSegment, type CaptureDeps } from './capture'
-import { archiveBuckets, placeArchivedBuckets } from './engineBuckets'
+import { archiveBuckets, placeArchivedBuckets, wasMovedThisRun } from './engineBuckets'
 import { logWasPutBack } from './history'
 import { liveHistory, logArchiveDir } from './liveHistory'
 import { readLogPrefix } from './logPrefix'
@@ -40,8 +40,6 @@ import { putBackLeftovers, readJournal, recoverRotation, restoreLog, rotateLog, 
 import { listSegments, resolveArchivePath, writeSegment } from './segmentStore'
 
 let busy: string | null = null
-/** One archive per app run: see `archivedThisRun` in preflight.ts. */
-let archivedThisRun = false
 /** Why this run could not finish an interrupted archive, for the card (`interruptedReason`). */
 let notFinished: string | null = null
 /** The captured modules the running engine serves, learned once it has caught up; null before. */
@@ -284,7 +282,8 @@ function fillOn(base: LogArchiveStatus, dir: string, a: { character: string; log
     interrupted: journal !== null,
     interruptedReason: journal === null ? null : notFinished,
     busy: busy !== null,
-    archivedThisRun,
+    // One archive per run, per character (engineBuckets.ts): another character's log is a fresh fold.
+    archivedThisRun: a !== null && wasMovedThisRun(a.character),
     putBackUnfinished: base.newestSealedId !== null && putBackLeftovers(dir).some((f) => f.startsWith(`${base.newestSealedId}.`))
   })
   return base
@@ -383,7 +382,6 @@ export function rotateNow(): Promise<LogArchiveReply> {
     if (!r.ok && r.logTouched) notFinished = r.reason
     if (!r.ok) return reply(false, r.logTouched ? `Interrupted: ${r.reason}` : `Not archived: ${r.reason}`)
     liveHistory.noteSealedThisAttach(r.segment.id)
-    archivedThisRun = true
     const gap = r.segment.gapLines ?? 0
     const extra = gap > 0 ? ` ${gap} line(s) written during the move are in the archive but not in the totals.` : ''
     return reply(true, `Archived to ${r.segment.archivePath ?? dir}. Your history is kept.${extra}`)

@@ -139,6 +139,12 @@ export async function waitForEngineWrite(userData: string, deps: WaitDeps = WAIT
 /** Characters whose log was moved during this run: their attach holds the archived lines too. */
 const movedThisRun = new Set<string>()
 
+/** This character's log was moved during this run, so the engine still holds its archived lines:
+ *  the card's "one archive per run" (preflight.ts `archivedThisRun`), which is per character. */
+export function wasMovedThisRun(character: string): boolean {
+  return movedThisRun.has(character)
+}
+
 /** Test seam: a fresh run. */
 export function resetArchiveBucketsForTests(): void {
   movedThisRun.clear()

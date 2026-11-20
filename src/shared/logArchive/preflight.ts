@@ -36,8 +36,8 @@ export interface PreflightInput {
   interruptedReason?: string | null
   /** Another log-archive action is running. */
   busy: boolean
-  /** The log was already archived since the app started. The engine still holds the archived
-   *  lines until the next launch, so a second capture would count them twice. */
+  /** This character's log was already archived since the app started. The engine still holds the
+   *  archived lines until the next launch, so a second capture would count them twice. */
   archivedThisRun?: boolean
   /** A put back of the newest archive stopped part-way. Its scratch files hold the lines since,
    *  and only that archive's Put back joins them (rotate.ts restoreLog), so it must stay newest. */
