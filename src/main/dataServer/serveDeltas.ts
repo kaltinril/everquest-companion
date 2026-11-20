@@ -119,8 +119,9 @@ export function pushModuleChanged(moduleId: string, seq: number): void {
   // …and the quiet-switch clock. It asks whether OUR file is being written to at all, so it
   // deliberately counted every RAW line rather than only the ones that parsed. A cursor is a
   // coarser instrument — the engine coalesces to ~10 Hz and says nothing for a module that did
-  // not move — but it is strictly conservative in the direction that matters: it can only make
-  // the app slower to believe the log went quiet, never quicker.
+  // not move — and it can MISS writes: no cursor arrives while the engine is down or restarting,
+  // which makes the log look quiet sooner. So the clock also reads the file's own size
+  // (`switchNudge.ts hearFromFile`), and this is the cheap feeder, not the only one.
   noteTailLine()
   // …and the ERROR-REPORT BREADCRUMB RING (JOS-499), which lost its only producer with the parser.
   //

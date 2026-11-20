@@ -15,7 +15,17 @@ import type { CharacterRef, LogSwitchNudge } from '../shared/types'
 import { E2E } from './e2e'
 import { logInfo } from './errorLog'
 import { listCharacters, parseLogName } from './log/config'
-import { ENTERED_QUIET_MS, POLL_MS, QUIET_MS, QuietSwitchWatcher, logIsQuiet, worldEntryAt, type SiblingSample } from './log/quietSwitch'
+import {
+  ENTERED_QUIET_MS,
+  POLL_MS,
+  QUIET_MS,
+  QuietSwitchWatcher,
+  attachedWroteSince,
+  logIsQuiet,
+  worldEntryAt,
+  type AttachedSample,
+  type SiblingSample
+} from './log/quietSwitch'
 import { sendToMain } from './windows'
 
 /**
@@ -106,12 +116,24 @@ function offerSwitch(logPath: string, quietFor: number): void {
   sendToMain(IPC.onLogSwitchNudge, payload)
 }
 
+/** The attached log's size at the previous sample (quietSwitch.ts `attachedWroteSince`). */
+let attachedSeen: AttachedSample | null = null
+
+/** The attached log growing counts as a line heard: a cursor can miss a write, the file cannot. */
+function hearFromFile(ref: CharacterRef, logs: readonly SiblingSample[], now: number): void {
+  const mine = logs.find((log) => log.path.toLowerCase() === ref.logPath.toLowerCase())
+  if (!mine) return
+  if (attachedWroteSince(lastLineAt, attachedSeen, mine.size)) lastLineAt = now
+  attachedSeen = { size: mine.size, at: now }
+}
+
 function poll(): void {
   const ref = attached
   if (!ref) return
   const now = Date.now()
   // The directory read is bought only by silence — see the header.
   const logs = logIsQuiet(lastLineAt, now, watcher.samplingQuietMs) ? sampleLogs() : []
+  hearFromFile(ref, logs, now)
   const outcome = watcher.observe({ now, activeLogPath: ref.logPath, lastLineAt, logs })
   if (outcome.kind === 'nudge') offerSwitch(outcome.logPath, outcome.quietMs)
 }
@@ -126,6 +148,7 @@ export function watchForQuietSwitch(ref: CharacterRef): void {
   stopWatchingForQuietSwitch()
   attached = ref
   lastLineAt = Date.now()
+  attachedSeen = null
   timer = setInterval(poll, pollMs)
   timer.unref?.()
 }

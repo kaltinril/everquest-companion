@@ -450,9 +450,9 @@ function attachCharacter(ref: CharacterRef): void {
   markFunnelStep('first-run', 'logDetected')
 
   // …and start the quiet clock. It watches whether OUR file is being written to at all, which is a
-  // question about the log rather than about a fold, so it is unaffected by the boundary — except
-  // that its feeder is now the engine's cursors rather than this process's tail lines
-  // (`dataServer/serveDeltas.ts noteTailLine`).
+  // question about the log rather than about a fold. Its feeder is the engine's cursors
+  // (`dataServer/serveDeltas.ts noteTailLine`), which can miss writes while the engine is down, so
+  // the file's own size backs them up (`switchNudge.ts hearFromFile`).
   watchForQuietSwitch(ref)
 
   // READ THE DUMP, THEN FOLLOW IT (JOS-253) — the same two-step the log itself gets. The watcher is
