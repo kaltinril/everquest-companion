@@ -83,7 +83,7 @@ test('a new connection clears everything it can', () => {
   noteLogReadConnection(1_000)
   noteLogReadHealth('folding', 4096, 1_500)
   noteLogReadError('health', 'timeout', 1_600)
-  noteCombatRead('the engine did not answer in time', 1_700)
+  noteCombatRead('the engine did not answer in time', 'timedOut', 1_700)
   noteReplySize({ op: 'combat.snapshot', module: null, chars: 70 * MIB, refused: true, limit: 64 * MIB }, 1_800)
   noteReplySize({ op: 'module.snapshot', module: 'loot', chars: 20 * MIB, refused: false, limit: null }, 1_900)
   noteLogReadConnection(5_000)
@@ -159,8 +159,8 @@ test('movedAt advances only when the offset grows', () => {
 
 test('the last combat read is remembered, served or not', () => {
   noteLogReadConnection(1_000)
-  noteCombatRead('the engine refused', 1_500)
-  assert.deepEqual(logReadFacts().lastCombatRead, { unserved: 'the engine refused', at: 1_500 })
-  noteCombatRead(null, 1_900)
-  assert.deepEqual(logReadFacts().lastCombatRead, { unserved: null, at: 1_900 })
+  noteCombatRead('the engine refused', 'refused', 1_500)
+  assert.deepEqual(logReadFacts().lastCombatRead, { unserved: 'the engine refused', why: 'refused', at: 1_500 })
+  noteCombatRead(null, null, 1_900)
+  assert.deepEqual(logReadFacts().lastCombatRead, { unserved: null, why: null, at: 1_900 })
 })

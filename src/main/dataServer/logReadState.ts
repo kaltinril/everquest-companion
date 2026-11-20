@@ -75,9 +75,10 @@ export function noteLogReadHealth(status: string, offset: number | undefined, at
   if (status === 'live') error = null
 }
 
-/** One finished combat read: `unserved` is the fallback phrase, or null when it was served. */
-export function noteCombatRead(unserved: string | null, at: number): void {
-  lastCombatRead = { unserved, at }
+/** One finished combat read: `unserved` is the fallback phrase and `why` its reason word
+ *  (readShim.ts `FallbackReason`), both null when it was served. */
+export function noteCombatRead(unserved: string | null, why: string | null, at: number): void {
+  lastCombatRead = { unserved, why, at }
 }
 
 /**

@@ -160,10 +160,10 @@ function readShim(): ReadShim {
     sizeGate: replySizes,
     noteEveryMs: NOTE_EVERY_MS,
     delay,
-    observe: (op, ms, unserved) => {
+    observe: (op, ms, unserved, why) => {
       record(op, ms, unserved)
       // The last combat read's fate, for the "Reading log..." report (fork #9).
-      if (op === 'combat.snapshot') noteCombatRead(unserved ?? null, Date.now())
+      if (op === 'combat.snapshot') noteCombatRead(unserved ?? null, why ?? null, Date.now())
     }
   })
   return shim

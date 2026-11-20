@@ -97,7 +97,13 @@ export interface LogReadFacts {
   readonly error: LogReadError | null
   /** Main's own look at the file, taken only on the failure path. */
   readonly probe: { readonly bytes: number | null; readonly problem: 'missing' | 'unreadable' | null } | null
-  readonly lastCombatRead: { readonly unserved: string | null; readonly at: number } | null
+  /** The meter's last read: `unserved` is the phrase and `why` the read path's reason word
+   *  (main/dataServer/readShim.ts `FallbackReason`), both null when it was served. */
+  readonly lastCombatRead: {
+    readonly unserved: string | null
+    readonly why: string | null
+    readonly at: number
+  } | null
   /** The keeper of main's connection, or null when there is no client. */
   readonly link: LogReadLink | null
   /** The newest reply of this read that could not be shown, or null. */
@@ -245,9 +251,10 @@ function readWait(f: LogReadFacts): LogReadWait {
   if (stalled(f)) return 'stalled'
   if (f.readiness !== 'ok') return 'reading'
   if (typeof f.lastCombatRead?.unserved !== 'string') return 'ok'
-  // The meter's read went unserved BECAUSE its reply was too large: that is the cause to name.
-  // (A fight list too large only for main's own readers, with the meter served, is no wait.)
-  return f.tooLarge?.op === 'combat.snapshot' ? 'replyTooLarge' : 'notAnswering'
+  // The meter's OWN read went unserved because its reply was too large, in this read of the log:
+  // that is the cause to name. Never decided from `tooLarge.op`: the archive asks combat.snapshot
+  // for every fight, and that reply being too large to show says nothing about the meter's.
+  return f.lastCombatRead.why === 'tooLarge' && f.tooLarge !== null ? 'replyTooLarge' : 'notAnswering'
 }
 
 /** `connected`, or how the reconnect is going: `connecting (try 2 of 5)`. */
