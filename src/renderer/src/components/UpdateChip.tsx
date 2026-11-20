@@ -3,7 +3,7 @@ import { Box, LinearProgress, Typography } from '@mui/material'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import NewReleasesIcon from '@mui/icons-material/NewReleases'
 import type { UpdateStatus } from '@shared/types'
-import { updateChipLine, updateChipState } from '@shared/update'
+import { readyChipTip, updateChipLine, updateChipState } from '@shared/update'
 import { formatAge } from '../lib/formatDate'
 
 /**
@@ -70,10 +70,12 @@ const CHECK_COOLDOWN_MS = 10_000
 /** The one inviting, clickable state: downloaded + staged, waiting on a restart. */
 function ReadyChip({
   version,
+  tip,
   glow,
   onInstall
 }: {
   version?: string
+  tip: string
   glow: boolean
   onInstall: () => void
 }): JSX.Element {
@@ -84,7 +86,7 @@ function ReadyChip({
         type="button"
         data-testid="update-chip-ready"
         onClick={onInstall}
-        title={version ? `Restart to update to v${version}` : 'Restart to update'}
+        title={tip}
         sx={{
           width: '100%',
           display: 'flex',
@@ -346,7 +348,14 @@ export function UpdateChip({ onWhatsNew }: { onWhatsNew: () => void }): JSX.Elem
   }, [ready])
 
   if (ui.kind === 'ready') {
-    return <ReadyChip version={ui.version} glow={glow} onInstall={() => void window.eq.installUpdate()} />
+    return (
+      <ReadyChip
+        version={ui.version}
+        tip={readyChipTip(ui.version, status.autoUpdateOff === true)}
+        glow={glow}
+        onInstall={() => void window.eq.installUpdate()}
+      />
+    )
   }
 
   if (ui.kind === 'downloading') return <DownloadingChip percent={ui.percent} />

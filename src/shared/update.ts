@@ -678,8 +678,16 @@ export type UpdateChipState =
   | { kind: 'working'; label: string; checkedAt?: number }
   /** The resting state: "checked 2h ago" (or "never"), click to check. `disabled` means the
    *  updater is off for this process (dev build) — render a truthful static note, not a
-   *  forever-stale check affordance. */
-  | { kind: 'quiet'; checkedAt?: number; failed: boolean; message?: string; disabled?: boolean }
+   *  forever-stale check affordance. `staged` is a newer version that is downloaded but not
+   *  installed (`UpdateStatus.stagedVersion`), present only when it is newer than the running one. */
+  | {
+      kind: 'quiet'
+      checkedAt?: number
+      failed: boolean
+      message?: string
+      disabled?: boolean
+      staged?: string
+    }
 
 /**
  * Map a raw UpdateStatus onto what the chip should render.
@@ -714,7 +722,14 @@ export function updateChipState(status: UpdateStatus, currentVersion?: string): 
       return { kind: 'quiet', checkedAt, failed: true, message: status.message }
     case 'idle':
     default:
-      return { kind: 'quiet', checkedAt, failed: false, disabled: status.disabled }
+      return {
+        kind: 'quiet',
+        checkedAt,
+        failed: false,
+        disabled: status.disabled,
+        // Only a positive "newer" verdict: an unknown running version makes no claim.
+        ...(isNewerVersion(status.stagedVersion, currentVersion) && { staged: status.stagedVersion })
+      }
   }
 }
 
@@ -777,10 +792,85 @@ export function updateChipLine(ui: UpdateChipState, ctx: UpdateChipLineCtx): Upd
   // THE FAILURE BRANCH COMES BEFORE THE COOLDOWN, and that ordering IS the fix: the cooldown's
   // "up to date" and the age line are both claims that a check completed.
   if (failed) return { label: `${vPrefix}update check failed`, tip, failed: true }
+  // A newer build is on disk and not installed: that outranks "up to date" and the age line.
+  if (ui.kind === 'quiet' && ui.staged) {
+    return {
+      label: `${vPrefix}update not installed`,
+      tip: `Click to check again, then restart to install v${ui.staged}.`,
+      failed: false
+    }
+  }
   if (ctx.cooldown) return { label: `${vPrefix}up to date`, tip, failed: false }
   return {
     label: ctx.age === null ? `${vPrefix}not checked yet` : `${vPrefix}checked ${ctx.age}`,
     tip,
     failed: false
   }
+}
+
+// ------------------------------------------------- WHAT PREFERENCES > UPDATES SAYS
+//
+// The Preferences chip, the sentence under the "Update automatically" switch and the gold chip's
+// tooltip. Pure and here, not inline in the components, so a node test pins the words.
+
+/** The Preferences headline chip: its words and its colour. */
+export interface UpdatePrefsChip {
+  label: string
+  color: 'default' | 'success' | 'info' | 'warning'
+}
+
+const PREFS_CHIP: Record<UpdateStatus['state'], UpdatePrefsChip> = {
+  idle: { label: 'up to date', color: 'default' },
+  checking: { label: 'checking', color: 'info' },
+  available: { label: 'update available', color: 'info' },
+  downloading: { label: 'downloading', color: 'info' },
+  ready: { label: 'update ready', color: 'success' },
+  error: { label: 'check failed', color: 'warning' }
+}
+
+/**
+ * Which chip the Preferences headline shows. `ui` is the same pure mapping the left-nav chip
+ * uses, so the two surfaces can never disagree — in particular about the updated-away case (a
+ * 'ready' naming the build we are ALREADY running is stale, so updateChipState demotes it to
+ * 'quiet' and we must not claim "update ready"). `cooldown` is the window after a manual check.
+ */
+export function updatePrefsChip(
+  status: UpdateStatus,
+  ui: UpdateChipState,
+  cooldown: boolean
+): UpdatePrefsChip {
+  // Dev build: the updater is off, so "up to date" would be a claim no check ever made.
+  if (status.disabled) return { label: 'dev build - updates off', color: 'default' }
+  const resting = status.state === 'idle' || (ui.kind === 'quiet' && status.state === 'ready')
+  if (!resting) return PREFS_CHIP[status.state]
+  if (ui.kind === 'quiet' && ui.staged) return { label: 'update not installed', color: 'info' }
+  // Switch off: nothing checks again, so "up to date" is only true just after a check the player
+  // ran. The rest of the time the chip says why it is not checking.
+  if (status.autoUpdateOff && !cooldown) return { label: 'automatic updates off', color: 'default' }
+  if (status.checkedAt === undefined) return { label: 'not checked yet', color: 'default' }
+  return PREFS_CHIP.idle
+}
+
+/**
+ * The sentence under the "Update automatically" switch. `off` is the switch as shown.
+ *
+ * With the switch off, closing the app installs nothing (`autoInstallOnAppQuit` is false), so a
+ * downloaded build needs the sentence to say what does install it.
+ */
+export function autoUpdateCaption(off: boolean, version: string, ui: UpdateChipState): string {
+  if (!off) return 'New versions download in the background and install when you close the app.'
+  if (ui.kind === 'ready') {
+    const what = ui.version ? `v${ui.version}` : 'The new version'
+    return `${what} is downloaded. Press Restart to update to install it; closing the app will not.`
+  }
+  if (ui.kind === 'quiet' && ui.staged) {
+    return `v${ui.staged} is downloaded but not installed. Press Check for updates, then Restart to update.`
+  }
+  return `Staying on ${version ? `v${version}` : 'this version'}. It updates only when you press Check for updates.`
+}
+
+/** The gold "Restart to update" chip's tooltip. */
+export function readyChipTip(version: string | undefined, autoUpdateOff: boolean): string {
+  const tip = version ? `Restart to update to v${version}` : 'Restart to update'
+  return autoUpdateOff ? `${tip}; closing the app will not install it.` : tip
 }

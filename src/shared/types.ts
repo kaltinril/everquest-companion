@@ -1059,6 +1059,9 @@ export interface UpdateStatus {
   disabled?: boolean
   /** The user switched "Update automatically" off: only the manual check runs. */
   autoUpdateOff?: boolean
+  /** A newer version an earlier download left on disk and nothing has installed yet. Remembered
+   *  across launches; only a check in this session can turn it back into 'ready'. */
+  stagedVersion?: string
 }
 
 // ----- Split-out sections -----

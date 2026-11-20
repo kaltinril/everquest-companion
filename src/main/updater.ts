@@ -148,6 +148,7 @@ import {
   SIGNATURE_BLOCKED_PAUSED_MESSAGE,
   describeUpdateFailure,
   isInterruptedFailure,
+  isNewerVersion,
   isStaleVersion,
   nextCheckDelayMs,
   shouldRetryCheck
@@ -162,7 +163,12 @@ import {
   type UpdateStep
 } from './updateLog'
 import { getUpdateChannel, getUpdateLastCheckedAt, setUpdateLastCheckedAt } from './store'
-import { getAutoUpdateOff, setAutoUpdateOff } from './storeAutoUpdate'
+import {
+  getAutoUpdateOff,
+  getUpdateStagedVersion,
+  setAutoUpdateOff,
+  setUpdateStagedVersion
+} from './storeAutoUpdate'
 import { classifyFailure, recordEvent } from './telemetry'
 
 const { autoUpdater } = electronUpdater
@@ -245,6 +251,31 @@ let checkAttempts = 0
  * which both fire for the same failure — exactly like `checkInFlight`.
  */
 let retryPending = false
+/**
+ * The newer version a finished download left on disk, REMEMBERED ACROSS LAUNCHES. 'ready' itself
+ * is never persisted (a check in this session has to re-arm it, see `initUpdater`), so without
+ * this a launch with the switch off, where no check runs, forgot the build and the app read as up
+ * to date. It rides on every status as `stagedVersion`; the words are shared/update.ts's.
+ */
+let stagedVersion: string | undefined
+
+/** Set or clear the remembered build. Written only on a change; a failed write holds for the session. */
+function rememberStaged(version: string | undefined): void {
+  if (version === stagedVersion) return
+  stagedVersion = version
+  try {
+    setUpdateStagedVersion(version)
+  } catch {
+    // A store write must never break the update flow.
+  }
+}
+
+/** Launch: read the remembered build back, and drop it once this build is that version or newer. */
+function restoreStaged(currentVersion: string): void {
+  stagedVersion = getUpdateStagedVersion()
+  if (!isNewerVersion(stagedVersion, currentVersion)) rememberStaged(undefined)
+  if (stagedVersion) lastStatus = { ...lastStatus, stagedVersion }
+}
 
 /**
  * Map our channel choice onto electron-updater's settings — which since the tags-only
@@ -433,6 +464,8 @@ function registerUpdaterEvents(
     const version: string | undefined = info?.version
     consecutiveFailures = 0 // the CHECK succeeded, whatever happens to the download
     noteUpdate('check')
+    // The feed moved on from the remembered build: its file is about to be replaced.
+    if (version !== stagedVersion) rememberStaged(undefined)
     // UPDATED-AWAY: the feed names a build we already are. Nothing to offer.
     if (isStaleVersion(version, currentVersion)) {
       checkDone({ state: 'idle' })
@@ -469,6 +502,7 @@ function registerUpdaterEvents(
     consecutiveFailures = 0
     downloading = null
     noteUpdate('check')
+    rememberStaged(undefined)
     checkDone({ state: 'idle' })
   })
 
@@ -505,6 +539,7 @@ function registerUpdaterEvents(
     // (research §6b) — which is how "restart to update" prompts turn into a nag
     // in other apps. Pushing an idempotent state instead of firing an event is
     // what makes re-emission harmless here.
+    rememberStaged(version)
     push({ state: 'ready', version })
   })
 
@@ -520,6 +555,8 @@ function registerUpdaterEvents(
     // we had a download in flight. Getting it wrong would put CDN failures in the check row.
     const step = downloading !== null ? 'download' : 'check'
     downloading = null
+    // A download only runs when no valid file is cached, so its failure leaves nothing staged.
+    if (step === 'download') rememberStaged(undefined)
     if (isInterruptedFailure(err)) {
       noteInterrupted(step, err, { push, checkDone, retryOnResume })
       return
@@ -622,12 +659,14 @@ export function initUpdater(
   }
 
   const currentVersion = app.getVersion()
+  restoreStaged(currentVersion)
 
   /** Record + broadcast a status. `checkedAt` rides along on every push once known. */
   const push = (status: UpdateStatus): void => {
     lastStatus = lastCheckedAt
       ? { ...status, checkedAt: lastCheckedAt, autoUpdateOff }
       : { ...status, autoUpdateOff }
+    if (stagedVersion) lastStatus.stagedVersion = stagedVersion
     const win = getMainWindow()
     if (win && !win.isDestroyed()) win.webContents.send(IPC.onUpdateStatus, lastStatus)
   }
