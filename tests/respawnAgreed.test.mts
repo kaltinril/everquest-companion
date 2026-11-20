@@ -6,6 +6,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { resolveRespawn, respawnCalculated, respawnProvenance, respawnSourceLabel, type RespawnRow, type RespawnSnap } from '../src/shared/respawn'
 import { mergeRespawn } from '../src/shared/logArchive/mergeRespawn'
+import { agreedGap } from '../src/shared/respawnLearn'
 
 const WIKI = 1_320_000
 const AGREED = 529_000
@@ -28,7 +29,27 @@ const row = (over: Partial<RespawnRow>): RespawnRow => ({
   ...over
 })
 
-const snap = (rows: RespawnRow[]): RespawnSnap => ({ v: 4, zone: 'Mistmoore', rows, recent: [], prefs: { watches: [{ key: 'enynti', display: 'Enynti' }] } })
+const snap = (rows: RespawnRow[], over: Partial<RespawnSnap> = {}): RespawnSnap => ({
+  v: 4,
+  zone: 'Mistmoore',
+  rows,
+  recent: [],
+  prefs: { watches: [{ key: 'enynti', display: 'Enynti' }] },
+  ...over
+})
+
+const s = (secs: number[]): number[] => secs.map((x) => x * 1000)
+
+/** One log's learned gaps for Enynti (seconds, newest first), as the engine publishes them. */
+const learned = (gapsS: number[], zone = 'Mistmoore'): NonNullable<RespawnSnap['learned']> => [
+  { id: `${zone.toLowerCase()}::enynti`, key: 'enynti', display: 'Enynti', zone, gapsMs: s(gapsS) }
+]
+
+/** A row whose kills have not agreed in its own log: the wiki floor is in force. */
+const wikiFloored = (over: Partial<RespawnRow>): RespawnRow => row({ estimateMs: WIKI, ...over })
+
+/** The owner's 31 measured Enynti gaps, in seconds (`respawn_places_tests.rs ENYNTI_S`). */
+const ENYNTI_S = [558, 956, 1010, 656, 676, 550, 554, 669, 532, 533, 530, 618, 531, 544, 599, 543, 559, 608, 929, 881, 530, 2035, 529, 2272, 1921, 542, 530, 1350, 1037, 1353, 2764]
 
 test('the ladder: an agreed gap lowers a longer wiki floor and changes nothing else', () => {
   const ladder = (observedMs: number, wikiMs?: number, agreedMs?: number) =>
@@ -92,4 +113,112 @@ test('the archive join keeps the smaller agreed gap and numbers the joined row f
   const neither = mergeRespawn(snap([row({ samples: 1, estimateMs: WIKI })]), snap([live]))?.rows[0]
   assert.equal(neither?.agreedMs, undefined)
   assert.equal(neither?.estimateMs, WIKI)
+})
+
+// The same sets as `respawn_places_tests.rs` (three_gaps_inside_fifty_seconds_agree_on_the_lowest_of_them
+// and the boundary test under it), so the engine's rule and this copy of it cannot drift.
+test('agreedGap: three gaps inside 50 s agree on the lowest of them, as the engine reads it', () => {
+  assert.equal(agreedGap(s(ENYNTI_S)), 529_000)
+  assert.equal(agreedGap(s([527, 567, 529])), 527_000)
+  assert.equal(agreedGap(s([527, 529])), undefined, 'two gaps are not enough')
+  assert.equal(agreedGap(s([527, 529, 600])), undefined, 'nor three that sit apart')
+  assert.equal(agreedGap(s([60, 75, 90, 720, 730, 740])), undefined, 'under two minutes is two spawns sharing the name')
+  assert.equal(agreedGap(s([60, 75, 90, 720, 730, 740]), 600_000), 720_000, 'a ten-minute floor leaves the short gaps out')
+  assert.equal(agreedGap([]), undefined)
+})
+
+test('agreedGap: the 50 second window and the two minute rule sit on their boundaries', () => {
+  assert.equal(agreedGap(s([600, 625, 650])), 600_000, 'exactly 50 s apart agree')
+  assert.equal(agreedGap(s([600, 625, 651])), undefined, '51 s do not')
+  assert.equal(agreedGap(s([120, 121, 122])), 120_000, 'two minutes is not under two minutes')
+  assert.equal(agreedGap(s([119, 120, 121])), undefined, 'tested on the lowest gap, not the peak')
+  assert.equal(agreedGap(s([100, 121, 122, 123])), undefined, 'a lowest window that starts under two minutes offers nothing')
+  assert.equal(agreedGap(s([650, 600, 625])), 600_000, 'whatever order they come in')
+})
+
+test('the archive join finds agreement across the cut: two gaps archived and one live are three', () => {
+  const older = snap([wikiFloored({ samples: 2 })], { learned: learned([531, 529]) })
+  const newer = snap([wikiFloored({ samples: 1, observedMs: 530_000, baseTs: 900 })], { learned: learned([530]) })
+  const joined = mergeRespawn(older, newer)?.rows[0]
+  assert.equal(joined?.agreedMs, 529_000)
+  assert.equal(joined?.estimateMs, 529_000)
+  assert.equal(joined?.source, 'observed')
+  assert.equal(joined?.samples, 3)
+  assert.equal(joined === undefined ? '' : respawnSourceLabel(joined), 'your kills (3 gaps)')
+})
+
+test('a log archived before agreedMs existed still lowers the wiki floor from its learned gaps', () => {
+  const older = snap([wikiFloored({})], { learned: learned([531, 530, 529]) })
+  const live = wikiFloored({ samples: 0, kills: 1, source: 'wiki', baseTs: 900 })
+  delete live.observedMs
+  const joined = mergeRespawn(older, snap([live]))?.rows[0]
+  assert.equal(joined?.agreedMs, 529_000)
+  assert.equal(joined?.estimateMs, 529_000)
+  assert.equal(joined?.source, 'observed')
+  // A mob the live log has not killed yet: the archived row alone, for a mob still watched.
+  const alone = mergeRespawn(older, snap([]))?.rows[0]
+  assert.equal(alone?.agreedMs, 529_000)
+  assert.equal(alone?.estimateMs, 529_000)
+})
+
+test('the joined gaps are read as one log: the lowest agreeing trio, not the smaller of two verdicts', () => {
+  const older = snap([row({ observedMs: 540_000, estimateMs: 540_000, agreedMs: 540_000 })], { learned: learned([550, 545, 540]) })
+  const newer = snap([wikiFloored({ samples: 2, observedMs: 527_000, baseTs: 900 })], { learned: learned([529, 527]) })
+  const joined = mergeRespawn(older, newer)?.rows[0]
+  assert.equal(joined?.agreedMs, 527_000)
+  assert.equal(joined?.estimateMs, 527_000)
+})
+
+test('the join keeps the wiki floor while the joined gaps do not agree', () => {
+  const live = wikiFloored({ samples: 1, observedMs: 600_000, baseTs: 900 })
+  const two = mergeRespawn(snap([wikiFloored({ samples: 2 })], { learned: learned([531, 529]) }), snap([wikiFloored({ samples: 0, baseTs: 900 })]))?.rows[0]
+  assert.equal(two?.agreedMs, undefined, 'two gaps and none')
+  assert.equal(two?.estimateMs, WIKI)
+  const apart = mergeRespawn(snap([wikiFloored({ samples: 2 })], { learned: learned([530, 527]) }), snap([live], { learned: learned([600]) }))?.rows[0]
+  assert.equal(apart?.agreedMs, undefined, 'three that sit apart')
+  assert.equal(apart?.estimateMs, WIKI)
+  const one = mergeRespawn(snap([wikiFloored({ samples: 1 })], { learned: learned([529]) }), snap([live], { learned: learned([530]) }))?.rows[0]
+  assert.equal(one?.estimateMs, WIKI, 'one gap each side')
+})
+
+test('a typed number stays the estimate when the joined gaps agree', () => {
+  const older = snap([wikiFloored({ samples: 2 })], { learned: learned([531, 529]) })
+  const typed = row({ samples: 1, observedMs: 530_000, source: 'custom', customMs: 60_000, estimateMs: 60_000, baseTs: 900 })
+  const newer = snap([typed], { learned: learned([530]), prefs: { watches: [{ key: 'enynti', display: 'Enynti', customSec: 60 }] } })
+  const joined = mergeRespawn(older, newer)?.rows[0]
+  assert.equal(joined?.estimateMs, 60_000)
+  assert.equal(joined?.source, 'custom')
+})
+
+test('the joined gaps pool across the places of one zone, and never across zones', () => {
+  const MM = 'The Castle of Mistmoore'
+  const here = wikiFloored({ id: 'the castle of mistmoore 4 (refined) [instance 17]::enynti', zone: `${MM} 4 (Refined) [instance 17]`, baseTs: 900 })
+  // The archive learned two gaps in the open +3, the live log one in the +4 (a private instance's gaps file without the tag).
+  const pooled = mergeRespawn(snap([], { zone: MM, learned: learned([531, 529], `${MM} 3 (Fused)`) }), snap([here], { zone: here.zone, learned: learned([530], `${MM} 4 (Refined)`) }))
+  assert.equal(pooled?.rows[0]?.agreedMs, 529_000)
+  assert.equal(pooled?.rows[0]?.estimateMs, 529_000)
+  // Another zone's mob of the same name is another spawn.
+  const other = mergeRespawn(snap([], { zone: MM, learned: learned([531, 530, 529], 'Najena') }), snap([here], { zone: here.zone }))
+  assert.equal(other?.rows[0]?.agreedMs, undefined)
+  assert.equal(other?.rows[0]?.estimateMs, WIKI)
+})
+
+test('a shared name keeps its ten minute floor when the joined gaps are read', () => {
+  const shared = { prefs: { watches: [{ key: 'enynti', display: 'Enynti', sharedName: true as const }] } }
+  // Two spawns of the name make short gaps that agree: they never lower the wiki floor.
+  const short = wikiFloored({ samples: 0, sharedName: true, source: 'wiki', baseTs: 900 })
+  delete short.observedMs
+  const kept = mergeRespawn(snap([], { learned: learned([131, 130]) }), snap([short], { ...shared, learned: learned([132]) }))?.rows[0]
+  assert.equal(kept?.agreedMs, undefined)
+  assert.equal(kept?.estimateMs, WIKI)
+  // Agreeing gaps over ten minutes still do.
+  const long = wikiFloored({ observedMs: 720_000, sharedName: true, baseTs: 900 })
+  const lowered = mergeRespawn(snap([], { learned: learned([90, 75, 60, 740, 730]) }), snap([long], { ...shared, learned: learned([720]) }))?.rows[0]
+  assert.equal(lowered?.agreedMs, 720_000)
+  assert.equal(lowered?.estimateMs, 720_000)
+  // An archived row captured before the switch was set is read with today's watch list.
+  const archived = wikiFloored({ observedMs: 130_000 })
+  const today = mergeRespawn(snap([archived], { learned: learned([132, 131, 130]) }), snap([], shared))?.rows[0]
+  assert.equal(today?.agreedMs, undefined)
+  assert.equal(today?.estimateMs, WIKI)
 })
