@@ -118,6 +118,7 @@ import {
   noteLogReadConnection,
   noteLogReadError,
   noteLogReadHealth,
+  noteLogReadTouched,
   noteLogReadTurn
 } from './logReadState'
 import { SERVABLE, type Readiness } from './readShim'
@@ -339,7 +340,8 @@ export function onEngineReady(info: ReadyEngine | null): void {
     },
     timer: unrefTimer,
     now: () => Date.now(),
-    note: debug
+    note: debug,
+    changed: noteLogReadTouched
   })
   live = { engine: info, client, link, attachedTo: null }
   // ONCE PER CLIENT, not once per connect: the connection is reopened under this same client.

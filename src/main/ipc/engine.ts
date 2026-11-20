@@ -20,7 +20,9 @@
 //     answers by doing nothing rather than by throwing. A retry with nothing to retry is not an
 //     error; it is a button pressed a moment early.
 //   * `engine:logReadReport` (fork #9) came later and is a third: a read of what main already
-//     holds about the log read, asked only by a panel stuck on "Reading log...".
+//     holds about the log read, made once by each window on mount. The changes after that are
+//     pushed (`engine:logReadStatus`, started here), and `engine:logReadTryAgain` is the status's
+//     own button: a verb with no payload, like the retry.
 //
 // THE RETRY VALIDATES NOTHING BECAUSE IT TAKES NOTHING. It is a verb with no payload — the
 // `perf:rendererHydrated` shape — so there is no argument to distrust. It is an `invoke` rather
@@ -31,7 +33,7 @@ import { ipcMain } from 'electron'
 import { IPC } from '../../shared/ipc'
 import { engineLaunchSay } from '../dataServer/engineLaunchState'
 import { retryEngineSupervisor } from '../dataServer/engineHost'
-import { buildLogReadReport } from '../logReadReport'
+import { buildLogReadReport, startLogReadStatus } from '../logReadReport'
 
 /** Register them. Called from `registerIpc()` beside every other domain. */
 export function registerEngineLaunchIpc(): void {
@@ -40,4 +42,5 @@ export function registerEngineLaunchIpc(): void {
     retryEngineSupervisor()
   })
   ipcMain.handle(IPC.logReadReport, () => buildLogReadReport())
+  startLogReadStatus()
 }

@@ -40,6 +40,8 @@ interface Rig {
   readonly opened: Channel[]
   readonly timers: Timer[]
   readonly notes: string[]
+  /** What `facts()` answered each time the keeper said its facts changed. */
+  readonly changes: { tries: number; gaveUp: boolean; nextAt: number | null }[]
   /** Settle the connect in flight. */
   open(): Promise<Channel>
   refuse(reason: string): Promise<void>
@@ -57,6 +59,7 @@ function rig(): Rig {
     opened: [],
     timers: [],
     notes: [],
+    changes: [],
     now: 1_000_000,
     keeper: undefined as unknown as LinkKeeper,
     open: async () => {
@@ -103,7 +106,11 @@ function rig(): Rig {
       }
     },
     now: () => r.now,
-    note: (line) => r.notes.push(line)
+    note: (line) => r.notes.push(line),
+    changed: () => {
+      const { tries, gaveUp, nextAt } = r.keeper.facts()
+      r.changes.push({ tries, gaveUp, nextAt })
+    }
   })
   return r
 }
@@ -339,3 +346,26 @@ test('a connection nobody could adopt is closed and counted as a failed try', as
   assert.equal(keeper.facts().lastReason, 'the host was not ready')
   assert.deepEqual(timers, [LINK_STABLE_MS, 500])
 })
+
+test('THE KEEPER SAYS WHEN ITS FACTS CHANGE WITH NO CONNECTION OPENING: a retry scheduled, and giving up', async () => {
+  // The log-read status is pushed from this. Without it the box said "connecting (try 1 of 5)"
+  // until something else happened to move.
+  const r = rig()
+  r.keeper.start()
+  assert.deepEqual(r.changes, [], 'the first connect is not a change of what is said')
+  await r.refuse('ECONNREFUSED')
+  assert.deepEqual(r.changes, [{ tries: 1, gaveUp: false, nextAt: r.now + 500 }])
+  for (const ms of LINK_RETRY_DELAYS_MS) {
+    r.fire(ms)
+    await r.refuse('ECONNREFUSED')
+  }
+  assert.equal(r.changes.length, 6, 'five retries scheduled, then the give-up')
+  assert.deepEqual(r.changes[5], { tries: 5, gaveUp: true, nextAt: null })
+  // A loss a retry cannot change gives up at once, and says so.
+  const fatal = rig()
+  fatal.keeper.start()
+  await fatal.open()
+  fatal.keeper.lost(Object.assign(new Error('the engine speaks protocol 9'), { code: 'protocolMismatch' }))
+  assert.deepEqual(fatal.changes, [{ tries: 0, gaveUp: true, nextAt: null }])
+})
+

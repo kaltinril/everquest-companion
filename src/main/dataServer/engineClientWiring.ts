@@ -3,8 +3,9 @@
 // engineClientHost.ts, fork #9).
 // ============================================================================
 //
-// The six things main hears from its engine besides replies: alert fires, fold progress, con
-// cards, module cursors, wiki misses, and a reply that was too large. The first five lived inside
+// The seven things main hears from its engine besides replies: alert fires, fold progress, con
+// cards, module cursors, wiki misses, a reply that was too large, and the connection's own state
+// (which the log-read status is told about). The first five lived inside
 // `engineClientHost.ts openConnection` and were registered on every connect; they are registered
 // ONCE PER CLIENT here, because the connection is now reopened under the same client
 // (`linkKeeper.ts`) and a listener added per connect would be called once per reconnect, per frame.
@@ -26,7 +27,7 @@ import { takeOwnFire } from './ownFires'
 import { conCardServeLine, noteConCardServe, openEngineConCard } from './conCardServe'
 import { noteFoldProgress } from './engineLaunchState'
 import { onKnowledgeMiss } from './knowledgeMissFetch'
-import { noteReplySize } from './logReadState'
+import { noteLogReadTouched, noteReplySize } from './logReadState'
 import { replySizes, sizedReply } from './replySizes'
 import { pushModuleChanged } from './serveDeltas'
 import { noteMirrorChanged } from './serveMirrors'
@@ -203,5 +204,10 @@ export function wireEngineClient(client: EngineClient, host: WiringHost): void {
   client.onOversize((sized) => {
     if (!host.current()) return
     noteOversize(sized, host.note)
+  })
+  // THE CONNECTION'S OWN STATE (fork #9): the log-read status says `connecting` / `connected`
+  // from it, and nothing else tells the status that it moved.
+  client.onState(() => {
+    if (host.current()) noteLogReadTouched()
   })
 }

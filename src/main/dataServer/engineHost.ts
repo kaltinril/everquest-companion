@@ -113,7 +113,7 @@ import {
   noteEngineRetrying,
   noteEngineStarting
 } from './engineLaunchState'
-import { noteEngineSaid } from './logReadState'
+import { noteEngineSaid, noteLogReadTouched } from './logReadState'
 import { scrubFault } from '../../shared/logReadReport'
 import { getActiveCharacter } from '../session'
 
@@ -479,6 +479,8 @@ export function startEngineSupervisor(): void {
       // before that produced a report with an empty ring. The pid itself is NOT recorded: the
       // edge is the fact, and `noteEngineEdge` has no parameter one could travel in.
       noteEngineEdge(pid === null ? 'engine:gone' : 'engine:spawned')
+      // The supervisor's status moved with this edge, and the log-read status quotes it.
+      noteLogReadTouched()
     },
     // …and the CLIENT arm (JOS-479): the port and the launch's token, at the one moment a round
     // trip has proven there is something to talk to. `onPid` is about a process and this is about a
@@ -533,6 +535,8 @@ export function startEngineSupervisor(): void {
       // Scrubbed here: the card prints the detail as given, and a spawn failure's starts with the
       // full program path.
       noteEngineFault(scrubFault(fault, getActiveCharacter()?.logPath ?? null, homedir()))
+      // Said even when the fault did not change: `absent` is a status, not only a fault.
+      noteLogReadTouched()
     },
     // THE CYCLING EDGE (JOS-519). `onPid(null)` above already wrote `engine:gone` for this same
     // ending — this is the one bit that ending did not carry: the engine had REACHED READY, so what

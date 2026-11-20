@@ -44,6 +44,8 @@ export interface EngineLinkDeps {
   readonly now: () => number
   /** The dev log. */
   readonly note: (line: string) => void
+  /** The keeper's facts changed (`linkKeeper.ts changed`): a retry was scheduled, or it gave up. */
+  readonly changed?: () => void
 }
 
 export interface EngineLink {
@@ -107,7 +109,8 @@ export function openEngineLink(deps: EngineLinkDeps): EngineLink {
     adopt,
     timer: deps.timer,
     now: deps.now,
-    note: deps.note
+    note: deps.note,
+    changed: deps.changed
   })
 
   // ONCE, for the life of the client: every connection it is given is one of this link's.
