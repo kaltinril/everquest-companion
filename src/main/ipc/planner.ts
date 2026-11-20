@@ -29,7 +29,10 @@ import { activeCharId, getActiveCharacter } from '../session'
 // The two planner documents' store accessors live in their own module since JOS-286 — store.ts
 // was at its 400-code-line ceiling, and this repo splits rather than ratchets.
 import { getExaltPlans, getGearSets, getWishlist, setExaltPlans, setGearSets, setWishlist } from '../storePlans'
-import { itemKey, type ItemDbFile } from '../itemsDb'
+import { wornKey, type ItemDbFile } from '../itemsDb'
+// The lookup index (aliases and renames included), built once for the process: characterSheet.ts
+// reads the same one.
+import { itemDb } from '../itemLookup'
 // The COMMITTED wiki item database — the same module itemLookup.ts imports, so the JSON is
 // inlined into the main bundle exactly once.
 import itemsJson from '../data/items.json'
@@ -152,9 +155,11 @@ export function registerPlannerIpc(): void {
     return {
       path: loaded.path,
       loadedAt: loaded.loadedAt,
-      // `itemKey` is applied HERE and not in the shared join: the key is main's definition
-      // (itemsDb.ts, law 2) and shared/planner/inventorySlots.ts must stay dependency-free.
-      hosts: equippedHosts(loaded.dump).map((h) => ({ ...h, key: itemKey(h.name) })),
+      // The key is made HERE and not in the shared join: it is main's definition (itemsDb.ts, law 2)
+      // and shared/planner/inventorySlots.ts must stay dependency-free. `wornKey` and not a bare
+      // `itemKey`: the export can spell an item by a redirect, and the Gear rows are keyed by the
+      // record's own name.
+      hosts: equippedHosts(loaded.dump).map((h) => ({ ...h, key: wornKey(h.name, itemDb()) })),
       ...(focus.length > 0 ? { focus } : {})
     }
   })

@@ -112,3 +112,17 @@ export function buildItemDbIndex(file: ItemDbFile): Map<string, ItemDbEntry> {
   }
   return index
 }
+
+/**
+ * The key a WORN item is looked up by wherever rows are keyed by the record's own name (the Gear
+ * index, `gearIndex.ts`): the record `name` resolves to in `index`, by its own key. The export
+ * can spell an item the way a redirect or an old name does (`Djarn's Amethyst Ring` for the page
+ * `Djarns Amethyst Ring`): `itemKey(name)` alone then finds the record in the index and no row in
+ * the Gear data, and the Void motes tab called a known ring "not in the item data". A name the
+ * index does not hold keeps its own key.
+ */
+export function wornKey(name: string, index: ReadonlyMap<string, ItemDbEntry>): string {
+  const own = itemKey(name)
+  const record = index.get(own)
+  return record === undefined ? own : itemKey(record.name ?? record.page)
+}
