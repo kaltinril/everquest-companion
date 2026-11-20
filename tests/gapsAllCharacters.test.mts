@@ -20,6 +20,7 @@ import {
   nameFromId,
   otherCharacters,
   otherInputs,
+  othersGaps,
   ownSince,
   parseSavedGaps,
   seenByKey,
@@ -91,6 +92,28 @@ test('a saved file round-trips through the parser; a foreign or older one is ref
   assert.equal(parseSavedGaps({ ...s, v: 99 }), null)
   assert.equal(parseSavedGaps({ ...s, modules: { gaps: s.modules.gaps } }), null)
   assert.equal(parseSavedGaps(null), null)
+})
+
+test('a saved file whose module is missing its state is refused, not handed to the join', () => {
+  const s = saved('drywrought_oggok', 'head-D', { gaps: gaps([]), loot: [], kills: kills('rat', 1) })
+  assert.equal(parseSavedGaps({ ...s, modules: { ...s.modules, gaps: null } }), null)
+  assert.equal(parseSavedGaps({ ...s, modules: { ...s.modules, loot: 'x' } }), null)
+})
+
+test('one character whose saved state will not join is named unreadable and never hides the others', () => {
+  // A row from before details existed, on both the archive and the saved side: the merge throws on it.
+  const bare = { domain: 'item', name: 'Old Widget', kinds: ['looted'], count: 1, first: '', last: '' } as unknown as GapRow
+  const bad = saved('bad_oggok', 'head-B', { gaps: gaps([bare]), loot: [], kills: null })
+  const badArchive = segment({ id: 'b-old', character: 'bad_oggok', head: 'head-old', last: '2026-09-15 10:00:00' }, { gaps: { seq: 1, state: gaps([bare]) } })
+  const good = saved('drywrought_oggok', 'head-D', { gaps: gaps([row('item', 'Bat Wing', 2)]), loot: [], kills: null })
+  const failures: string[] = []
+  const others = othersGaps({ saved: [bad, good], segments: [badArchive] }, 'kaltinril_oggok', null, (id) => failures.push(id))
+  assert.deepEqual(others.map((c) => [c.character, c.name, c.unreadable === true]), [['bad_oggok', 'Bad', true], ['drywrought_oggok', 'Drywrought', false]])
+  assert.deepEqual(failures, ['bad_oggok'])
+  assert.deepEqual((others[1].gaps as GapsSnap).rows.map((r) => r.name), ['Bat Wing'])
+  // The unreadable one joins as nothing.
+  const j = joinCharacters([{ label: 'Live', gaps: gaps([]), loot: [], kills: null }, ...otherInputs(others, () => false)], null)
+  assert.deepEqual(j.gaps?.rows.map((r) => r.name), ['Bat Wing'])
 })
 
 test('a character id names its character', () => {

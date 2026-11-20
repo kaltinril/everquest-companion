@@ -29,8 +29,7 @@ import { readFile, readdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import { IPC } from '../shared/ipc'
 import {
-  characterGaps,
-  otherCharacters,
+  othersGaps,
   parseSavedGaps,
   type CharacterGaps,
   type GapSourceModule,
@@ -192,12 +191,9 @@ export async function allCharacterGaps(sinceStamp: string | null): Promise<Chara
   const key = [sinceStamp, except, archiveOn, folderMark(savedDir()), archiveOn ? folderMark(logArchiveDir()) : ''].join('\n')
   if (cache?.key === key) return cache.value.map((c) => ({ ...c, inventory: ownInventory(c) }))
   const [saved, segments] = await Promise.all([readSaved(), archiveOn ? readSegments() : Promise.resolve([])])
-  const value: CharacterGaps[] = []
-  for (const id of otherCharacters(saved, segments, except)) {
-    const one = characterGaps(id, saved.find((s) => s.character === id) ?? null, segments, sinceStamp)
-    // A saved list is re-checked against today's data: a page the wiki gained since stops showing.
-    if (one !== null) value.push({ ...one, gaps: withoutNowKnown(one.gaps, knownNow) })
-  }
+  const unreadable = (id: string, err: unknown): void => logInfo(`[everquest-companion] gaps characters: ${id} could not be joined: ${(err as Error).message}`)
+  // A saved list is re-checked against today's data: a page the wiki gained since stops showing.
+  const value = othersGaps({ saved, segments }, except, sinceStamp, unreadable).map((one) => ({ ...one, gaps: withoutNowKnown(one.gaps, knownNow) }))
   cache = { key, value }
   return value.map((c) => ({ ...c, inventory: ownInventory(c) }))
 }
@@ -209,7 +205,11 @@ export function startGapsCharacterSaves(): void {
 }
 
 export function registerGapsCharactersIpc(): void {
+  // A failed read is logged here and still rejects: the tab says the read failed (gapsOthersLine.ts).
   ipcMain.handle(IPC.gapsAllCharacters, (_e, sinceStamp: unknown) =>
-    allCharacterGaps(typeof sinceStamp === 'string' && sinceStamp.length <= 19 ? sinceStamp : null)
+    allCharacterGaps(typeof sinceStamp === 'string' && sinceStamp.length <= 19 ? sinceStamp : null).catch((err: unknown) => {
+      logInfo(`[everquest-companion] gaps characters: read failed: ${(err as Error).message}`)
+      throw err
+    })
   )
 }

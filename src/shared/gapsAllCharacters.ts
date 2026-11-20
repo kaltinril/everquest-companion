@@ -92,6 +92,8 @@ export interface CharacterGaps {
   inventory?: OwnershipPayload | null
   /** Saved by an older build whose rows lack a kind this one serves (SAVED_ROWS). */
   olderRows?: true
+  /** Its saved state would not join (`othersGaps`): named on the line, nothing of it in the list. */
+  unreadable?: true
 }
 
 /** A saved file as read back, or null when it is not one this build understands. */
@@ -100,7 +102,9 @@ export function parseSavedGaps(raw: unknown): SavedGaps | null {
   const s = raw as Partial<SavedGaps>
   if (s.v !== SAVED_GAPS_VERSION || typeof s.character !== 'string' || typeof s.savedAt !== 'string') return null
   if (s.log === undefined || typeof s.log.headSha256 !== 'string' || typeof s.log.headBytes !== 'number') return null
-  if (s.modules === undefined || GAP_SOURCE_MODULES.some((m) => s.modules?.[m] === undefined)) return null
+  // Each module is `{ seq, state }`: a null or a bare value in its place made the join throw.
+  const modules: Partial<Record<GapSourceModule, unknown>> | undefined = s.modules
+  if (modules === undefined || GAP_SOURCE_MODULES.some((m) => modules[m] === null || typeof modules[m] !== 'object')) return null
   return s as SavedGaps
 }
 
@@ -150,6 +154,33 @@ export function otherCharacters(saved: readonly SavedGaps[], segments: readonly 
   const ids = new Set<string>([...saved.map((s) => s.character), ...segments.map((s) => s.character)])
   if (except !== null) ids.delete(except)
   return [...ids].sort()
+}
+
+/**
+ * Every other character's inputs. One whose saved state will not join (a row shape from another
+ * build, a damaged segment) is handed to `onError` and named `unreadable`, with nothing of it in
+ * the list: thrown out of the loop it failed the whole read, and the tab then showed no other
+ * character at all.
+ */
+export function othersGaps(
+  from: { saved: readonly SavedGaps[]; segments: readonly Segment[] },
+  except: string | null,
+  sinceStamp: string | null,
+  onError: (character: string, err: unknown) => void
+): CharacterGaps[] {
+  const out: CharacterGaps[] = []
+  for (const id of otherCharacters(from.saved, from.segments, except)) {
+    const own = from.saved.find((s) => s.character === id) ?? null
+    try {
+      const one = characterGaps(id, own, from.segments, sinceStamp)
+      if (one !== null) out.push(one)
+    } catch (err) {
+      onError(id, err)
+      const who = own === null ? nameFromId(id) : { name: own.name, server: own.server }
+      out.push({ character: id, ...who, savedAt: own?.savedAt ?? null, archives: 0, gaps: null, loot: null, kills: null, unreadable: true })
+    }
+  }
+  return out
 }
 
 // ---- the cut-off -------------------------------------------------------------------------------
