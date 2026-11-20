@@ -173,6 +173,16 @@ where one exists.
 
 ## Exaltations and sockets (was exaltation-clarity, character-slot-sockets)
 
+- The "Current era" filter hides a POSITIVE out-of-era only (owner, 2026-11-20: "lets show items
+  that we can't figure out the era"). A row nothing states an era for is shown, chipped
+  `Unknown Era` (`plannerData.eraHides`, `eraChip`, `UNKNOWN_ERA_LABEL`). One rule for the
+  Exaltations list, the Gear tab and the Wish list; 105 of 1,641 donors and 281 of 6,972 gear rows
+  are in that state (`tests/unknownEraShown.test.mts` prints the counts). This reverses the
+  2026-08-13 ruling that "era?" hides. The Recommended tab still requires in-era
+  (`shared/planner/progressionPlan.ts eraLegal`): not changed, ask before changing.
+- An item page states its era with a banner template at its top, `{{Classic Era}}`
+  (`main/itemLookupParse.ts parseEraTag`); a quest reward with no dropper and no banner is
+  `Unknown Era` until its page carries one and the data is refreshed.
 - Socket rules and the per-weapon proc exception: MEASURED.md, Exaltations.
 - Board optimizer (`socketOptimize.ts`): maximum bipartite matching over one claim per family ->
   worn sockets; objective = most distinct families at highest owned tiers. Stable matching:

@@ -150,7 +150,7 @@ interface Facet {
 }
 
 const NO_SLOT: Facet = { key: 'none', label: 'No slot', rank: EQUIP_SLOTS.length }
-const NO_ERA: Facet = { key: 'unknown', label: 'era?', rank: ERA_ORDER.length }
+const NO_ERA: Facet = { key: 'unknown', label: 'Unknown Era', rank: ERA_ORDER.length }
 
 function slotFacets(donor: DonorRow): Facet[] {
   // Slotless rows are the R2 escape hatch (the non-equippable toggle); they group together rather
