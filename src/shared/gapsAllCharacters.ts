@@ -25,6 +25,7 @@ import { mergeLoot } from './logArchive/mergeLoot'
 import { mergeModule } from './logArchive/mergeRules'
 import type { Segment } from './logArchive/segment'
 import type { GapDomain, GapRow, GapsSnap } from './gaps'
+import { aboutKnownPage } from './gapsRecheckPages'
 import type { KillsSnap } from './kills'
 import type { OwnershipPayload } from './planner/ownership'
 import type { LootSnap } from './types'
@@ -92,6 +93,8 @@ export interface CharacterGaps {
   inventory?: OwnershipPayload | null
   /** Saved by an older build whose rows lack a kind this one serves (SAVED_ROWS). */
   olderRows?: true
+  /** Its saved state would not join (`othersGaps`): named on the line, nothing of it in the list. */
+  unreadable?: true
 }
 
 /** A saved file as read back, or null when it is not one this build understands. */
@@ -100,7 +103,9 @@ export function parseSavedGaps(raw: unknown): SavedGaps | null {
   const s = raw as Partial<SavedGaps>
   if (s.v !== SAVED_GAPS_VERSION || typeof s.character !== 'string' || typeof s.savedAt !== 'string') return null
   if (s.log === undefined || typeof s.log.headSha256 !== 'string' || typeof s.log.headBytes !== 'number') return null
-  if (s.modules === undefined || GAP_SOURCE_MODULES.some((m) => s.modules?.[m] === undefined)) return null
+  // Each module is `{ seq, state }`: a null or a bare value in its place made the join throw.
+  const modules: Partial<Record<GapSourceModule, unknown>> | undefined = s.modules
+  if (modules === undefined || GAP_SOURCE_MODULES.some((m) => modules[m] === null || typeof modules[m] !== 'object')) return null
   return s as SavedGaps
 }
 
@@ -150,6 +155,33 @@ export function otherCharacters(saved: readonly SavedGaps[], segments: readonly 
   const ids = new Set<string>([...saved.map((s) => s.character), ...segments.map((s) => s.character)])
   if (except !== null) ids.delete(except)
   return [...ids].sort()
+}
+
+/**
+ * Every other character's inputs. One whose saved state will not join (a row shape from another
+ * build, a damaged segment) is handed to `onError` and named `unreadable`, with nothing of it in
+ * the list: thrown out of the loop it failed the whole read, and the tab then showed no other
+ * character at all.
+ */
+export function othersGaps(
+  from: { saved: readonly SavedGaps[]; segments: readonly Segment[] },
+  except: string | null,
+  sinceStamp: string | null,
+  onError: (character: string, err: unknown) => void
+): CharacterGaps[] {
+  const out: CharacterGaps[] = []
+  for (const id of otherCharacters(from.saved, from.segments, except)) {
+    const own = from.saved.find((s) => s.character === id) ?? null
+    try {
+      const one = characterGaps(id, own, from.segments, sinceStamp)
+      if (one !== null) out.push(one)
+    } catch (err) {
+      onError(id, err)
+      const who = own === null ? nameFromId(id) : { name: own.name, server: own.server }
+      out.push({ character: id, ...who, savedAt: own?.savedAt ?? null, archives: 0, gaps: null, loot: null, kills: null, unreadable: true })
+    }
+  }
+  return out
 }
 
 // ---- the cut-off -------------------------------------------------------------------------------
@@ -253,11 +285,38 @@ function joinStep<T>(acc: T | null, next: T | null, rule: (a: unknown, b: unknow
   return (rule(acc, next) as T | null) ?? acc
 }
 
+/** One character's rows cut to the window, or null when its state is no gaps snapshot. */
+function cutGaps(c: CharacterInputs, cut: { stamp: string; ms: number } | null): GapsSnap | null {
+  const g = asGaps(c.gaps)
+  return g === null || cut === null ? g : gapsSince(g, cut.stamp)
+}
+
+/**
+ * A snapshot's rows with their tallies emptied: joined once more as the newest side it adds nothing
+ * and re-states each row's served fields, which `mergeGaps.ts mergeRow` takes from the newer side
+ * (`itemsSold`, `greeting`, `role`, `questFacts`). Only the rows the join still serves: one past a
+ * domain's cap must not come back as an empty row.
+ */
+function servedOnly(g: GapsSnap, joined: GapsSnap): GapsSnap {
+  const kept = new Set(joined.rows.map(seenByKey))
+  const rows = g.rows.filter((row) => kept.has(seenByKey(row))).map((row) => {
+    const { fight: _fight, ...r } = row as GapRow & { fight?: unknown }
+    return { ...r, kinds: [], count: 0, first: '', last: '', details: { samples: [] } }
+  })
+  return { rows, totals: g.totals, seen: g.seen }
+}
+
 /**
  * The characters joined one after another with the archive's merge rules, each one's rows cut to
  * the window first; loot and kills join whole, as in `ownSince`. A character whose state the rule
  * will not join (a kills shape from another build) adds nothing to that module and is not counted
  * twice. Loot is put back in time order.
+ *
+ * `inputs[0]` IS THE ATTACHED CHARACTER, and its reading of a row stands over every other
+ * character's, as the live fold's stands over its own archive: it is joined first (its spelling,
+ * kinds and first `/loc` lead) and its served fields are joined once more at the end. Without that
+ * the last character joined won them, and a merchant whose whole stock the live log quoted copied
+ * with the one item an alt once saw.
  */
 export function joinCharacters(inputs: readonly CharacterInputs[], cut: { stamp: string; ms: number } | null): JoinedGaps {
   let gaps: GapsSnap | null = null
@@ -265,28 +324,38 @@ export function joinCharacters(inputs: readonly CharacterInputs[], cut: { stamp:
   let kills: KillsSnap | null = null
   const seenBy = new Map<string, string[]>()
   for (const c of inputs) {
-    const g = asGaps(c.gaps)
-    const cutG = g === null || cut === null ? g : gapsSince(g, cut.stamp)
+    const cutG = cutGaps(c, cut)
     if (cutG !== null) noteSeen(seenBy, cutG.rows, c.label)
     gaps = joinStep(gaps, cutG, mergeGaps)
     const l = Array.isArray(c.loot) ? (c.loot as LootSnap) : null
     loot = joinStep(loot, l, mergeLoot) ?? loot
     kills = joinStep(kills, asKills(c.kills), mergeKills)
   }
+  const own = inputs.length > 1 ? cutGaps(inputs[0], cut) : null
+  if (own !== null && gaps !== null) gaps = joinStep(gaps, servedOnly(own, gaps), mergeGaps)
   return { gaps, loot: inputs.length > 1 ? [...loot].sort((x, y) => x.ts - y.ts) : loot, kills, seenBy }
 }
 
 /**
+ * A saved Mobs row the catalog now answers: a plain unknown name whose page has been added. A row
+ * about a name the wiki already has a page for (its quests to add, its redirect to check, a page
+ * for this zone beside another zone's) is known by design, so the name test says nothing about it:
+ * the one predicate main's re-check uses (`aboutKnownPage`), so the two cannot drift apart.
+ */
+const closedByCatalog = (r: GapRow, isMob: (name: string) => boolean): boolean => r.domain === 'mob' && !aboutKnownPage(r) && isMob(r.name)
+
+/**
  * Another character's inputs for the join. Its saved mob rows are checked again against today's
- * catalog (a page added since it was saved closes the gap); item and spell known-ness is the engine's
- * call and waits for that character's next attach. Its label names it, with its server when two
- * characters share a name.
+ * catalog (a page added since it was saved closes the gap, `closedByCatalog`), as main already did
+ * before serving them (gapsRecheck.ts, which also re-checks a quest-giver, redirect or zone-titled
+ * row against today's data); spell known-ness is the engine's call and waits for that character's
+ * next attach. Its label names it, with its server when two characters share a name.
  */
 export function otherInputs(others: readonly CharacterGaps[], isMob: (name: string) => boolean): CharacterInputs[] {
   const names = others.map((o) => o.name)
   return others.map((o) => {
     const g = asGaps(o.gaps)
-    const gaps = g === null ? null : { ...g, rows: g.rows.filter((r) => !(r.domain === 'mob' && isMob(r.name))) }
+    const gaps = g === null ? null : { ...g, rows: g.rows.filter((r) => !closedByCatalog(r, isMob)) }
     const label = names.filter((n) => n === o.name).length > 1 ? `${o.name} (${o.server})` : o.name
     return { label, gaps, loot: o.loot, kills: o.kills }
   })

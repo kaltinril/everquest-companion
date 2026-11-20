@@ -5,6 +5,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { DEFAULT_GAP_DAYS, MAX_GAP_DAYS, cutoffOf, type CharacterGaps } from '@shared/gapsAllCharacters'
+import { allCharactersCaption, otherAnswer, type OthersAnswer } from '@shared/gapsOthersLine'
 import type { CharacterRef } from '@shared/types'
 import { useBoolPref, useRawPref } from '../combat/useCombatPrefs'
 import type { AllCharacters } from './useGapsData'
@@ -29,9 +30,12 @@ export function useGapCutoff(days: number): { stamp: string; ms: number } {
   return useMemo(() => cutoffOf(days, new Date(today)), [days, today])
 }
 
-/** The other characters' inputs while `on`; undefined until the first answer lands, or while off. */
-export function useOtherCharacters(on: boolean, sinceStamp: string, attached: string | null): CharacterGaps[] | undefined {
-  const [got, setGot] = useState<{ key: string; value: CharacterGaps[] } | null>(null)
+/**
+ * The other characters' inputs while `on`; undefined until the first answer lands, or while off. A
+ * read that failed is kept as one (`otherAnswer`), never turned into "no other characters".
+ */
+export function useOtherCharacters(on: boolean, sinceStamp: string, attached: string | null): OthersAnswer | undefined {
+  const [got, setGot] = useState<OthersAnswer | null>(null)
   const key = `${sinceStamp}|${attached ?? ''}`
   useEffect(() => {
     if (!on) return
@@ -40,10 +44,10 @@ export function useOtherCharacters(on: boolean, sinceStamp: string, attached: st
       window.eq
         .gapsAllCharacters(sinceStamp)
         .then((value) => {
-          if (live) setGot({ key, value })
+          if (live) setGot((prev) => otherAnswer(prev, key, { value }))
         })
         .catch(() => {
-          if (live) setGot({ key, value: [] })
+          if (live) setGot((prev) => otherAnswer(prev, key, { failed: true }))
         })
     }
     ask()
@@ -53,7 +57,7 @@ export function useOtherCharacters(on: boolean, sinceStamp: string, attached: st
       clearInterval(timer)
     }
   }, [on, key, sinceStamp])
-  return on && got?.key === key ? got.value : undefined
+  return on && got?.key === key ? got : undefined
 }
 
 export interface AllCharactersState {
@@ -63,6 +67,8 @@ export interface AllCharactersState {
   setDays: (days: number) => void
   /** The other characters' inputs; undefined while off or until main answers. */
   others: readonly CharacterGaps[] | undefined
+  /** The last read of them failed: `others` is an earlier read's list, or empty. */
+  failed: boolean
   liveLabel: string
   /** What useGapsData joins; null while off or loading, so the tab shows the one character meanwhile. */
   all: AllCharacters | null
@@ -77,8 +83,9 @@ export function useAllCharacters(me: CharacterRef | null): AllCharactersState {
   const [on, setOn] = useBoolPref(ALL_CHARACTERS_KEY, false)
   const [days, setDays] = useGapDays()
   const cut = useGapCutoff(days)
-  const others = useOtherCharacters(on, cut.stamp, me === null ? null : `${me.name}_${me.server}`.toLowerCase())
+  const answer = useOtherCharacters(on, cut.stamp, me === null ? null : `${me.name}_${me.server}`.toLowerCase())
+  const others = answer?.value
   const liveLabel = me?.name ?? 'This character'
   const all = useMemo(() => (others === undefined ? null : { others, liveLabel, cut }), [others, liveLabel, cut])
-  return { on, setOn, days, setDays, others, liveLabel, all, cut, caption: on ? `, every character, last ${days} days` : `, last ${days} days` }
+  return { on, setOn, days, setDays, others, failed: answer?.failed === true, liveLabel, all, cut, caption: allCharactersCaption(on, days, answer) }
 }

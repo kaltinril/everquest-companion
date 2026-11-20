@@ -239,7 +239,7 @@ export interface GapOffer {
 export interface GapTally {
   entries: { name: string; n: number }[]
   distinct: number
-  /** The zones and forageZones lists only: every zone by name, beyond the eight (the "this zone" filter, a page's `|foraged`). */
+  /** The zones, forageZones and cons lists only: every name, beyond the eight (the "this zone" filter, a page's `|foraged` and `|level`). */
   all?: string[]
 }
 

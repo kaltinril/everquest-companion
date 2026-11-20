@@ -483,7 +483,7 @@ fn a_trader_the_wiki_lists_as_no_merchant_is_a_row_and_a_kill_keeps_its_faction_
     feed(&mut m, 5, json!({ "kind": "death", "name": "a decaying skeleton", "killer": "You", "raw": "[Tue Oct 06 18:12:26 2026] You have slain a decaying skeleton!" }));
     let pairs = m.snapshot()["state"]["killFactions"].clone();
     // No proof lines here: `killFactionSamples` serves them (gaps_samples.rs, perf review 2026-10-20).
-    assert_eq!(pairs, json!([{ "mob": "a decaying skeleton", "faction": "Undead Frogloks of Guk", "n": 1, "zone": "", "adjust": -20, "raised": false }]));
+    assert_eq!(pairs, json!([{ "mob": "a decaying skeleton", "faction": "Undead Frogloks of Guk", "n": 1, "zone": "", "adjust": -20, "raised": false, "adjusts": [[-20, 1]] }]));
 }
 
 #[test]
@@ -520,3 +520,8 @@ mod item_facts;
 /// for the factoring bar.
 #[path = "gaps_batch_tests.rs"]
 mod batch;
+
+/// What the details serve past their cap, and one item of a sold stack (bug hunt, 2026-11-19): a
+/// file of their own for the factoring bar.
+#[path = "gaps_details_tests.rs"]
+mod details;

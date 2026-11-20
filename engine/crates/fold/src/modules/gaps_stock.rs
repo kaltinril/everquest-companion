@@ -130,12 +130,15 @@ impl Stock {
         *self.cons.entry(mob_key(mob)).or_default().entry(label).or_default() += 1;
     }
 
-    /// The cons as a row's `details.cons` serves them: most seen first.
+    /// The cons as a row's `details.cons` serves them: most seen first, and `all`, every reading by
+    /// name, which a join of two logs keeps whole past its cap (gaps_details.rs).
     fn cons_of(&self, key: &str) -> Option<Value> {
-        let mut all: Vec<(&String, &u32)> = self.cons.get(key)?.iter().collect();
+        let seen = self.cons.get(key)?;
+        let mut all: Vec<(&String, &u32)> = seen.iter().collect();
         all.sort_by(|a, b| b.1.cmp(a.1).then_with(|| a.0.cmp(b.0)));
         let entries: Vec<Value> = all.iter().map(|(name, n)| json!({ "name": name, "n": n })).collect();
-        Some(json!({ "entries": entries, "distinct": all.len() }))
+        let names: Vec<&String> = seen.keys().collect();
+        Some(json!({ "entries": entries, "distinct": all.len(), "all": names }))
     }
 
     /// A hail notes its name; that NPC's first `says` within ANSWER_MS is its answer. True when an

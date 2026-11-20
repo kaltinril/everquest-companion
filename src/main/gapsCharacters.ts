@@ -13,9 +13,16 @@
 // after the fetch, then write with a blocking fsync on main; during play that was a 2 MB read
 // queued in front of every Combat poll, and the gaps snapshot's own suggestion pass ran on the
 // engine's fold thread. Now: the first save comes a minute after launch, then one every ten
-// minutes, each skipped without asking the engine unless a cursor moved (gapSourceMoves.ts), and
-// the write is the async durable one. Nothing is lost by the longer interval: the file is a cache
-// of what the character's own log says, rebuilt the next time that character is attached.
+// minutes, each skipped without asking the engine unless a cursor moved (gapSourceMoves.ts) or the
+// last attempt did not land (gapsCharacterSave.ts), and the write is the async durable one. The file
+// is a cache of what the character's own log says, rebuilt the next time that character is attached.
+//
+// WHAT THE INTERVAL COSTS (bug hunt, 2026-11-19; not built yet). No save is made when the player
+// switches character or quits, and both timers count from launch, not from the attach. So under All
+// characters another character's rows are up to ten minutes behind its play, and a character left
+// before its first save is absent until it is attached again. The tab's tooltip gives each save's
+// time (shared/gapsOthersLine.ts). The fix is a bounded save before a switch and on an ordinary
+// quit, through `gapsSaver`; it needs a hook in session.ts `tailCharacter` and in the quit path.
 //
 // SERVE. `gaps:allCharacters` answers every OTHER character's inputs (the attached one's the tab
 // already has, served live): its saved snapshot with its eligible archive segments folded in when
@@ -28,13 +35,8 @@ import { existsSync, readdirSync, statSync } from 'node:fs'
 import { readFile, readdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import { IPC } from '../shared/ipc'
-import type { CharacterRef } from '../shared/types'
 import {
-  GAP_SOURCE_MODULES,
-  SAVED_GAPS_VERSION,
-  SAVED_ROWS,
-  characterGaps,
-  otherCharacters,
+  othersGaps,
   parseSavedGaps,
   type CharacterGaps,
   type GapSourceModule,
@@ -53,15 +55,16 @@ import { loadInventoryDump } from './outputs'
 import { ownershipPayload, type OwnershipPayload } from '../shared/planner/ownership'
 import { isOwnExport } from '../shared/gapHeld'
 import { writeFileDurableAsync } from './telemetry/durableWrite'
-import { takeMoved } from './gapSourceMoves'
+import { gapsSaver } from './gapsCharacterSave'
 import { logInfo } from './errorLog'
 import { withoutNowKnown, type KnownNow } from '../shared/gapsRecheck'
-import { inItemDb } from './itemLookup'
+import { inItemDb, itemDb } from './itemLookup'
+import { itemKey } from './itemsDb'
 import { localMobEntry } from './mobLookupLocal'
+import { pagesToday } from './gapsToday'
 
 const FIRST_SAVE_MS = 60 * 1000
 const SAVE_EVERY_MS = 10 * 60 * 1000
-const SAFE_ID = /^[a-z0-9_.-]+$/
 
 function savedDir(): string {
   return join(app.getPath('userData'), 'gaps-characters')
@@ -91,46 +94,19 @@ async function rawModule(module: GapSourceModule): Promise<{ seq: number; state:
   }
 }
 
-/** The seqs last written per character, so an unmoved snapshot is not written again. */
-const lastSeqs = new Map<string, string>()
-let saving = false
-
-/** The character a save is owed for now, or null: none attached, engine not live, or nothing moved. */
-function owedSave(): { c: CharacterRef; id: string } | null {
-  if (saving || !engineServeReadiness().ok) return null
-  const c = getActiveCharacter()
-  if (c === null) return null
-  const id = characterId(c)
-  if (!SAFE_ID.test(id)) return null
-  // Nothing moved since the last look and this character is already saved: no engine read at all.
-  if (!takeMoved(GAP_SOURCE_MODULES) && lastSeqs.has(id)) return null
-  return { c, id }
-}
-
-/** Save the attached character's Gaps inputs when the engine is live on its log and something moved. */
-export async function saveAttachedGaps(): Promise<void> {
-  const owed = owedSave()
-  if (owed === null) return
-  const { c, id } = owed
-  saving = true
-  try {
-    const got = await Promise.all(GAP_SOURCE_MODULES.map(rawModule))
-    if (got.some((m) => m === null) || getActiveCharacter()?.logPath !== c.logPath) return
-    const seqs = got.map((m) => m?.seq).join(',')
-    if (lastSeqs.get(id) === seqs) return
-    const log = logIdentity(c.logPath)
-    if (log === null) return
-    const modules = Object.fromEntries(GAP_SOURCE_MODULES.map((m, i) => [m, got[i]])) as SavedGaps['modules']
-    const saved: SavedGaps = { v: SAVED_GAPS_VERSION, character: id, name: c.name, server: c.server, savedAt: new Date().toISOString(), log, modules, rows: SAVED_ROWS }
-    await writeFileDurableAsync(savedDir(), join(savedDir(), `${id}.json`), JSON.stringify(saved))
-    lastSeqs.set(id, seqs)
+/** Save the attached character's Gaps inputs when the engine is live on its log and something moved (gapsCharacterSave.ts). */
+export const saveAttachedGaps = gapsSaver({
+  ready: () => engineServeReadiness().ok,
+  active: getActiveCharacter,
+  idOf: characterId,
+  readModule: rawModule,
+  logIdentity,
+  write: async (saved) => {
+    await writeFileDurableAsync(savedDir(), join(savedDir(), `${saved.character}.json`), JSON.stringify(saved))
     folderMarks.delete(savedDir())
-  } catch (err) {
-    logInfo(`[everquest-companion] gaps characters: save failed: ${(err as Error).message}`)
-  } finally {
-    saving = false
-  }
-}
+  },
+  log: logInfo
+})
 
 /**
  * Every JSON file in `dir` that `parse` accepts, read without blocking: an archive can hold many
@@ -201,6 +177,8 @@ let cache: { key: string; value: CharacterGaps[] } | null = null
 
 /** Today's committed data, asked of a saved row (shared/gapsRecheck.ts has why). */
 const knownNow: KnownNow = (domain, name) => (domain === 'item' ? inItemDb(name) : localMobEntry(name) !== null)
+/** Today's catalogs, asked of a saved row about a page the wiki has (shared/gapsRecheckPages.ts). */
+const pagesNow = pagesToday((name) => itemDb().get(itemKey(name)) ?? null)
 
 /**
  * The character's OWN inventory export folded as the Gear tab folds it, for "held by" (owner,
@@ -224,12 +202,9 @@ export async function allCharacterGaps(sinceStamp: string | null): Promise<Chara
   const key = [sinceStamp, except, archiveOn, folderMark(savedDir()), archiveOn ? folderMark(logArchiveDir()) : ''].join('\n')
   if (cache?.key === key) return cache.value.map((c) => ({ ...c, inventory: ownInventory(c) }))
   const [saved, segments] = await Promise.all([readSaved(), archiveOn ? readSegments() : Promise.resolve([])])
-  const value: CharacterGaps[] = []
-  for (const id of otherCharacters(saved, segments, except)) {
-    const one = characterGaps(id, saved.find((s) => s.character === id) ?? null, segments, sinceStamp)
-    // A saved list is re-checked against today's data: a page the wiki gained since stops showing.
-    if (one !== null) value.push({ ...one, gaps: withoutNowKnown(one.gaps, knownNow) })
-  }
+  const unreadable = (id: string, err: unknown): void => logInfo(`[everquest-companion] gaps characters: ${id} could not be joined: ${(err as Error).message}`)
+  // A saved list is re-checked against today's data: a page the wiki gained since stops showing.
+  const value = othersGaps({ saved, segments }, except, sinceStamp, unreadable).map((one) => ({ ...one, gaps: withoutNowKnown(one.gaps, knownNow, pagesNow) }))
   cache = { key, value }
   return value.map((c) => ({ ...c, inventory: ownInventory(c) }))
 }
@@ -241,7 +216,11 @@ export function startGapsCharacterSaves(): void {
 }
 
 export function registerGapsCharactersIpc(): void {
+  // A failed read is logged here and still rejects: the tab says the read failed (gapsOthersLine.ts).
   ipcMain.handle(IPC.gapsAllCharacters, (_e, sinceStamp: unknown) =>
-    allCharacterGaps(typeof sinceStamp === 'string' && sinceStamp.length <= 19 ? sinceStamp : null)
+    allCharacterGaps(typeof sinceStamp === 'string' && sinceStamp.length <= 19 ? sinceStamp : null).catch((err: unknown) => {
+      logInfo(`[everquest-companion] gaps characters: read failed: ${(err as Error).message}`)
+      throw err
+    })
   )
 }
