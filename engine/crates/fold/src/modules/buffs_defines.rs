@@ -49,8 +49,11 @@ impl crate::Defines for BuffsModule {
         core.anchors
             .set_proc_trust(enabled, strings_of(payload, "procSpells"));
         // The player's duration choices (fork issue #4). A change moves the Durations table and
-        // every live buff bar with no log line behind it, so it is announced here.
+        // every live buff bar with no log line behind it, so it is announced here. The table reads
+        // the estimator on each snapshot; a live row holds the numbers it was projected with, so
+        // the rows are restated here or they keep the old length until the next cast.
         if core.stats.set_overrides(parse_overrides(payload)) {
+            self.inst.restat_all(&core.stats, &self.pets);
             drop(core);
             self.announce.changed(self.seq);
         }

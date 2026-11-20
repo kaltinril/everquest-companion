@@ -565,23 +565,7 @@ impl BuffInstances {
             .map(|(ik, _)| ik.to_string())
             .collect();
         for ik in targets {
-            let count = self
-                .open
-                .get(&ik)
-                .map(|o| o.group.count() as i64)
-                .or_else(|| self.active.get(&ik).and_then(|a| a.count))
-                .unwrap_or(1);
-            let a = self.active.get(&ik).expect("named above");
-            let spec = reproject_spec(
-                a,
-                key,
-                instance_entity_key(&ik),
-                a.started_ts,
-                a.caster.as_deref().unwrap_or(SELF_CASTER),
-                count,
-            );
-            let built = build_active(&spec, stats, pets);
-            self.active.insert(ik, built);
+            self.reproject_row(ik, stats, pets);
         }
     }
 
@@ -1017,10 +1001,10 @@ impl BuffInstances {
 /// by the caller.
 ///
 /// It exists because the store re-projects from two places that must not drift — `restat` (the hold
-/// group moved) and `add_sample` (a fresh duration changed what every live instance of that line
-/// counts down from). Hand-copying the fields in both is how a row ends up saying different things
-/// depending on which internal event last touched it.
-fn reproject_spec(
+/// group moved) and `reproject_row` in `buffs_restat.rs` (a fresh sample or a saved choice changed
+/// what a live instance counts down from). Hand-copying the fields in both is how a row ends up
+/// saying different things depending on which internal event last touched it.
+pub(super) fn reproject_spec(
     a: &ActiveBuff,
     key: &str,
     entity_key: &str,

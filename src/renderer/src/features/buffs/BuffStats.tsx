@@ -48,7 +48,7 @@ import EditIcon from '@mui/icons-material/EditOutlined'
 import type { BuffClass, BuffStat } from '@shared/types'
 import type { BuffDurationOverride } from '@shared/buffTrust'
 import { buffStatRows, type KeyedBuffStat } from '@shared/buffStatRows'
-import { fmtDuration, classAccent, estimateChipLabel, estimatePrefix, estimatorSourceTitle } from './format'
+import { fmtDuration, classAccent, estimateChipLabel, estimateText, estimatorSourceTitle } from './format'
 import { BuffDurationDialog } from './BuffDurationDialog'
 import { BuffAllowCheck } from './BuffAllowCheck'
 import { useBuffAllow } from './useBuffAllow'
@@ -90,8 +90,7 @@ function EstimateCell({ ms, src }: { ms?: number | null; src?: string }): JSX.El
     <span title={estimatorSourceTitle(src)}>
       {/* A DEATH BOUND IS A FLOOR, AND THE CELL SAYS SO (JOS-379): `≥ 3m 08s`, never a bare
           figure that reads as a measurement. See format.ts `estimatePrefix`. */}
-      {estimatePrefix(src)}
-      {fmtDuration(ms)}
+      {estimateText(ms, src)}
       {src ? (
         <Chip
           size="small"
