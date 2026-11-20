@@ -181,6 +181,26 @@ test('put back: an archive that does not unpack to its recorded bytes leaves no 
   assert.deepEqual(scratch(f.dir), [], 'nothing is left to stop the next try')
 })
 
+// The record stores the archive's full path; the folder moves with the game's Logs folder.
+
+test('put back: after the game folder moved, the archive is found by its name in the archive folder', async () => {
+  const f = archivedThenPlayed()
+  const stale = { ...f.seg, archivePath: join(f.dir, 'old-install', 'eqlog_Primitive_freeport_2026-08-02_to_2026-08-02.log.gz') }
+  const back = await restoreLog(f.logPath, f.dir, stale)
+  assert.ok(back.ok, back.reason)
+  assert.equal(readFileSync(f.logPath, 'utf8'), ARCHIVED + FRESH)
+})
+
+test('put back: an archive that is gone is refused at once and nothing is touched', { timeout: 5000 }, async () => {
+  const f = archivedThenPlayed()
+  rmSync(f.seg.archivePath ?? '')
+  const back = await restoreLog(f.logPath, f.dir, f.seg)
+  assert.equal(back.ok, false)
+  assert.match(back.reason, /its archive is missing from .+ Nothing has changed/)
+  assert.equal(readFileSync(f.logPath, 'utf8'), FRESH)
+  assert.deepEqual(scratch(f.dir), [])
+})
+
 test('preflight: an unfinished put back stops a new archive, which would end that archive being the newest', () => {
   const ok = { on: true, hasLog: true, engineLive: true, sameDrive: true, freeBytes: 10, logBytes: 5, interrupted: false, busy: false }
   const why = rotateBlockers({ ...ok, putBackUnfinished: true })

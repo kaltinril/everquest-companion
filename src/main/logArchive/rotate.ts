@@ -30,6 +30,7 @@ import type { BackupRequest, BackupResult } from './backup'
 import { archiveName } from './backup'
 import { logNameOf, type LedgerSource } from './factionLedgerFile'
 import { readLogPrefix } from './logPrefix'
+import { resolveArchivePath } from './segmentStore'
 
 export const JOURNAL = 'rotation-journal.json'
 
@@ -304,12 +305,13 @@ function roomFor(dir: string, bytes: number): boolean {
  * `.partial` name (swept at launch, backup.ts) and named only once its bytes are checked. A file
  * already there is never opened for writing: it may hold the only copy of the lines since.
  */
-async function archiveBase(archive: string, joined: string, source: { bytes: number; sha256: string }, logPath: string): Promise<void> {
+async function archiveBase(archive: string | null, joined: string, source: { bytes: number; sha256: string }, logPath: string): Promise<void> {
   if (existsSync(joined)) {
     const kept = statSync(joined).size >= source.bytes ? (await readLogPrefix(joined, source.bytes)).sha256 : null
     if (kept === source.sha256) return
     throw new Error(`an earlier try left ${joined}, which does not begin with this archive. Move it somewhere safe, then try again`)
   }
+  if (archive === null) throw new Error(`its archive is missing from ${dirname(joined)}`)
   const live = statSync(logPath, { throwIfNoEntry: false })?.size ?? 0
   if (!roomFor(dirname(joined), source.bytes + live)) throw new Error('there is not enough free space to put the log back')
   const tmp = `${joined}.partial`
@@ -389,7 +391,7 @@ export async function restoreLog(logPath: string, dir: string, seg: Segment, io:
       return { ok: true, reason: 'restored' }
     }
     const waiting = waitingPieces(dir, seg.id, source.bytes)
-    await archiveBase(seg.archivePath, joined, source, logPath)
+    await archiveBase(resolveArchivePath(dir, seg), joined, source, logPath)
     based = true
     joinAndLink(logPath, joined, waiting, io)
     return { ok: true, reason: 'restored' }

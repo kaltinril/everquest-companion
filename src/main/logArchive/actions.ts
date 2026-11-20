@@ -37,7 +37,7 @@ import { pushWorldChanged } from '../dataServer/serveDeltas'
 import type { RespawnRow } from '../../shared/respawn'
 import { lacksLearned, refreshSegment, sweepRefreshLeftovers } from './refresh'
 import { putBackLeftovers, readJournal, recoverRotation, restoreLog, rotateLog, unfinishedReason, type RotateDeps } from './rotate'
-import { listSegments, writeSegment } from './segmentStore'
+import { listSegments, resolveArchivePath, writeSegment } from './segmentStore'
 
 let busy: string | null = null
 /** One archive per app run: see `archivedThisRun` in preflight.ts. */
@@ -401,7 +401,7 @@ export function restoreNow(id: string): Promise<LogArchiveReply> {
     if (newest?.id !== id) return reply(false, 'Only the newest archived log can be put back.')
     const r = await restoreLog(a.logPath, dir, newest)
     if (!r.ok) return reply(false, `Not put back: ${r.reason}`)
-    writeSegment(dir, { ...newest, state: 'backed-up' })
+    writeSegment(dir, { ...newest, archivePath: resolveArchivePath(dir, newest) ?? newest.archivePath, state: 'backed-up' })
     // The engine is following a short log that just became a long one; only a fresh launch folds
     // it from the start. The card told the player the app restarts.
     setTimeout(() => {
