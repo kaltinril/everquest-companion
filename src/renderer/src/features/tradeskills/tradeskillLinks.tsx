@@ -6,6 +6,7 @@
 //   mob    `CellLink` to the mob's page, resolved by `gear/dropLinks.dropMobTarget`.
 //   zone   `CellLink` to the Maps tab when `dropZoneTarget` resolves the spelling; plain text when
 //          it refuses (`Various`), never a nearest guess.
+//   merchant  the mob link too, when the mob catalog holds the name on one page; else plain text.
 //
 // The doors are the app router's own openers, handed down once through a context.
 
@@ -13,9 +14,11 @@ import { createContext, useContext, type JSX } from 'react'
 import { Box } from '@mui/material'
 import type { ZoneShort } from '@shared/maps'
 import type { ItemSource } from '@shared/itemSources'
+import { merchantEntry, merchantIndex, type MerchantIndex } from '@shared/tradeskillMerchant'
 import { CellLink } from '../../lib/CellLink'
 import { ItemIcon } from '../../lib/ItemIcon'
 import { dropMobTarget, dropZoneTarget } from '../gear/dropLinks'
+import { MOB_CATALOG } from '../mobs/mobSearch'
 import type { MobTarget } from '../mobs/mobTarget'
 import { DonorName } from '../planner/PlannerChips'
 
@@ -80,6 +83,31 @@ export function MobLink({ source }: { source: ItemSource }): JSX.Element {
         text={source.mob}
         onOpen={() => {
           doors.onOpenMob(dropMobTarget(source.mob, source.mobPage ?? ''))
+        }}
+      />
+    </span>
+  )
+}
+
+// Built once per window, off the catalog the Mobs tab already loaded (gear/dropLinks' arrangement).
+let MERCHANTS: MerchantIndex | null = null
+
+/**
+ * A merchant's name, from the log's purchase lines or from the recipe guide: the standard mob
+ * link when the catalog holds that name on one page (`shared/tradeskillMerchant`), plain text
+ * when it does not. `zone` chooses between pages that share the name.
+ */
+export function MerchantLink({ name, zone }: { name: string; zone?: string }): JSX.Element {
+  const doors = useContext(DoorsContext)
+  MERCHANTS ??= merchantIndex(MOB_CATALOG)
+  const entry = doors === null ? null : merchantEntry(MERCHANTS, name, zone)
+  if (doors === null || entry === null) return <>{name}</>
+  return (
+    <span data-testid="tradeskill-merchant-link">
+      <CellLink
+        text={name}
+        onOpen={() => {
+          doors.onOpenMob({ mob: entry.name, entry })
         }}
       />
     </span>

@@ -2,6 +2,9 @@
 // ascending by trivial, windowed the Bazaar's way (only the lines in view are mounted). Picking a
 // line shows the recipe in the panel above; the table opens on the recipe to make next.
 //
+// Cost, Sells and You are the player's own log (shared/tradeskillMoney.ts, tradeskillHistory.ts):
+// a cell is blank where the log states nothing.
+//
 // The lines, their order and their marks are shared/tradeskillBook.ts `recipeLadder`.
 
 import { type JSX, memo, useEffect, useLayoutEffect, useRef } from 'react'
@@ -15,14 +18,17 @@ import {
   type LadderLine,
   type LadderState
 } from '@shared/tradeskillBook'
+import { historyWords, recipeHistory, type CraftBook } from '@shared/tradeskillHistory'
+import { COST_TIP, SELLS_TIP, YOU_TIP, costCell, sellsCell, type MoneyBook } from '@shared/tradeskillMoney'
 import { Tooltip } from '../../lib/Tooltip'
 import { parkReturn } from '../../lib/navReturn'
 import { useWindowedRows } from '../../lib/useWindowedRows'
 import { EraChip } from '../planner/PlannerChips'
+import { NoticeChip } from './RecipeYou'
 import { ItemLabel, ItemLink } from './tradeskillLinks'
 
 export const ROW_HEIGHT = 36
-const COLUMNS = 4
+const COLUMNS = 7
 /** Lines of what is already trivial left in view above the line the table opens on. */
 const CONTEXT_LINES = 2
 
@@ -77,14 +83,39 @@ function MaterialsCell({ recipe }: { recipe: BookRecipe }): JSX.Element {
   )
 }
 
+/** The player's own combines and prices, read per line (the engine's `crafting` module). */
+export interface RowLog {
+  craft: CraftBook
+  money: MoneyBook
+}
+
+/** The player's combines of the recipe, cut off with the whole of it on hover; blank when the log shows none. */
+function YouCell({ recipe, craft }: { recipe: BookRecipe; craft: CraftBook }): JSX.Element {
+  const row = recipeHistory(craft, recipe)
+  if (row === null) return <TableCell data-testid="tradeskill-row-you" />
+  const words = historyWords(row)
+  return (
+    <TableCell sx={CUT_SX} title={words} data-testid="tradeskill-row-you">
+      <Stack direction="row" spacing={0.75} alignItems="center" sx={{ flexWrap: 'nowrap', minWidth: 0 }}>
+        <NoticeChip row={row} />
+        <Box component="span" sx={CUT_SX}>
+          {words}
+        </Box>
+      </Stack>
+    </TableCell>
+  )
+}
+
 interface RowProps {
   recipe: BookRecipe
   state: LadderState
   picked: boolean
   onPick: (id: string) => void
+  log: RowLog
 }
 
-const RecipeRow = memo(function RecipeRow({ recipe, state, picked, onPick }: RowProps): JSX.Element {
+const RecipeRow = memo(function RecipeRow({ recipe, state, picked, onPick, log }: RowProps): JSX.Element {
+  const money = log.money.of(recipe)
   return (
     <TableRow
       hover
@@ -106,6 +137,13 @@ const RecipeRow = memo(function RecipeRow({ recipe, state, picked, onPick }: Row
       </TableCell>
       <TableCell sx={CUT_SX}>{recipe.container ?? ''}</TableCell>
       <MaterialsCell recipe={recipe} />
+      <TableCell align="right" sx={CUT_SX} data-testid="tradeskill-row-cost">
+        {costCell(money)}
+      </TableCell>
+      <TableCell align="right" sx={CUT_SX} data-testid="tradeskill-row-sells">
+        {sellsCell(money)}
+      </TableCell>
+      <YouCell recipe={recipe} craft={log.craft} />
     </TableRow>
   )
 })
@@ -139,9 +177,24 @@ function Head(): JSX.Element {
         <TableCell align="right" sx={{ width: 72 }}>
           Trivial
         </TableCell>
-        <TableCell sx={{ width: '34%' }}>Item</TableCell>
-        <TableCell sx={{ width: '16%' }}>Container</TableCell>
+        <TableCell sx={{ width: '26%' }}>Item</TableCell>
+        <TableCell sx={{ width: '11%' }}>Container</TableCell>
         <TableCell>Materials</TableCell>
+        <TableCell align="right" sx={{ width: 92 }}>
+          <Tooltip title={COST_TIP}>
+            <span>Cost</span>
+          </Tooltip>
+        </TableCell>
+        <TableCell align="right" sx={{ width: 92 }}>
+          <Tooltip title={SELLS_TIP}>
+            <span>Sells</span>
+          </Tooltip>
+        </TableCell>
+        <TableCell sx={{ width: '19%' }}>
+          <Tooltip title={YOU_TIP}>
+            <span>You</span>
+          </Tooltip>
+        </TableCell>
       </TableRow>
     </TableHead>
   )
@@ -162,6 +215,13 @@ export interface RecipeTableProps {
   restoreTop: number | null
   /** What to park for Back when the tab is left (lib/navReturn). */
   parkAs: (scrollTop: number) => unknown
+  /**
+   * Asked when the table unmounts: false when it is only the workbench changing tab, so the one
+   * Back slot keeps what another tab parked there. Absent reads as true.
+   */
+  parkOnLeave?: () => boolean
+  /** The player's combines and prices for the Cost, Sells and You cells. */
+  log: RowLog
 }
 
 /**
@@ -186,19 +246,21 @@ function usePlacement(scrollRef: React.RefObject<HTMLDivElement | null>, p: Reci
 }
 
 export function RecipeTable(p: RecipeTableProps): JSX.Element {
-  const { lines, pickedId, onPick, parkAs } = p
+  const { lines, pickedId, onPick, parkAs, parkOnLeave, log } = p
   const scrollRef = useRef<HTMLDivElement>(null)
   const win = useWindowedRows({ count: lines.length, rowHeight: ROW_HEIGHT, scrollRef })
   usePlacement(scrollRef, p)
   // The unmount parks where the table was. It reads a value kept from the last render: the
   // scroller's node is already gone when an effect's cleanup runs.
   const park = useRef<unknown>(null)
+  const leaving = useRef(parkOnLeave)
   useEffect(() => {
     park.current = parkAs(win.scrollTop)
-  }, [parkAs, win.scrollTop])
+    leaving.current = parkOnLeave
+  }, [parkAs, parkOnLeave, win.scrollTop])
   useEffect(
     () => () => {
-      parkReturn('tradeskills', park.current)
+      if (leaving.current?.() !== false) parkReturn('tradeskills', park.current)
     },
     []
   )
@@ -216,6 +278,7 @@ export function RecipeTable(p: RecipeTableProps): JSX.Element {
                 state={line.state}
                 picked={line.recipe.id === pickedId}
                 onPick={onPick}
+                log={log}
               />
             ) : (
               <UnratedHeading key="unrated-heading" count={line.count} />

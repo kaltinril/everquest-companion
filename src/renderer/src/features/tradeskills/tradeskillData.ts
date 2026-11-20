@@ -1,10 +1,13 @@
 // tradeskills/tradeskillData.ts — what the Tradeskills section reads: the recipe book (one fetch
-// per window: it is committed data), its index under the era setting, the player's levels, and
-// what the inventory dump holds.
+// per window: it is committed data), its index under the era setting, the two community guides
+// that ride on the same payload, the player's levels, the player's own combines and merchant
+// prices (the engine's `crafting` module), and what the inventory dump holds.
 //
-// No fold lives here: order, filter and the marks are shared/tradeskillBook.ts.
+// No fold lives here: order, filter and the marks are shared/tradeskillBook.ts; the joins are
+// shared/tradeskillHistory.ts, tradeskillMoney.ts and tradeskillGuide.ts.
 
 import { useEffect, useMemo, useState } from 'react'
+import { CRAFTING_MODULE, type CraftingSnap } from '@shared/crafting'
 import { ownershipIndexFrom, type OwnershipIndex } from '@shared/planner/ownership'
 import { SKILLS_MODULE, type SkillRow, type SkillsSnap } from '@shared/skills'
 import {
@@ -14,6 +17,9 @@ import {
   type BookIndex,
   type TradeskillBookPayload
 } from '@shared/tradeskillBook'
+import { NO_GUIDES, indexGuides, type GuideIndex } from '@shared/tradeskillGuide'
+import { indexCrafting, type CraftBook } from '@shared/tradeskillHistory'
+import { moneyBook, type MoneyBook } from '@shared/tradeskillMoney'
 import { useMetVersion } from '../../lib/useMetInLog'
 import { useModule } from '../../lib/useModule'
 import { eraHides } from '../planner/plannerData'
@@ -65,6 +71,30 @@ export function useBookIndex(eraOnly: boolean): BookIndex | null {
     if (book === null) return null
     return indexBook(book, eraOnly ? (recipe) => eraHides(recipe, true) : undefined)
   }, [book, eraOnly, met])
+}
+
+/** The two community guides as the screens read them; empty until the book has loaded. */
+export function useGuides(): GuideIndex {
+  const book = useTradeskillBook()
+  return useMemo(() => (book?.guides === undefined ? NO_GUIDES : indexGuides(book.guides)), [book])
+}
+
+export interface CraftState {
+  craft: CraftBook
+  money: MoneyBook
+}
+
+/**
+ * The player's combines, purchases, sales and depot counts (the engine's `crafting` module, joined
+ * across archived logs), keyed for the workbench, and the cost of each recipe at those prices.
+ * `craft.served` is false until the engine has answered.
+ */
+export function useCrafting(index: BookIndex): CraftState {
+  const snap = useModule<CraftingSnap>(CRAFTING_MODULE)
+  return useMemo(() => {
+    const craft = indexCrafting(snap, index)
+    return { craft, money: moneyBook(craft, index) }
+  }, [snap, index])
 }
 
 const NO_ROWS: readonly SkillRow[] = []
