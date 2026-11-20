@@ -1,10 +1,12 @@
-// logReadReport.ts - what the "Reading log..." panels say when the wait runs long (fork #9).
+// logReadReport.ts - the one status of the log read: what the app is waiting on (fork #9).
 //
 // Main gathers `LogReadFacts` (main/logReadReport.ts), `composeLogReadReport` turns them into the
-// one object that crosses IPC, and `logReadLines` turns that into the rows the box draws. Pure: no
-// clock, no DOM. The full log path and the home directory stop here; only the base name goes on.
+// one object that is pushed to every window, and `logReadLines` turns that into the rows the box
+// draws. The words are `logReadWords.ts`. Pure: no clock, no DOM. The full log path and the home
+// directory stop here; only the base name goes on.
 
 import { humanBytes, humanDuration } from './engineLaunch'
+import { LOG_READ_ACTION, LOG_READ_TRY, LOG_READ_WORDS, type LogReadAction } from './logReadWords'
 
 /** Where on the log-loading path an error was recorded. */
 export type LogReadStep = 'connect' | 'attach' | 'health' | 'fold'
@@ -20,17 +22,31 @@ export type LogReadWait =
   | 'attachRefused'
   | 'logMissing'
   | 'logUnreadable'
+  | 'logHung'
   | 'readerStopped'
   | 'stalled'
+  | 'finishing'
+  | 'opening'
+  | 'mismatch'
   | 'notAnswering'
   | 'reading'
   | 'replyTooLarge'
   | 'ok'
 
-/** A wait this long shows the box even when nothing has failed. */
+/** A wait this long shows the status even when nothing has failed. */
 export const LOG_READ_SLOW_MS = 15_000
-/** A read whose offset has not grown for this long is called stalled. */
+/** A read whose offset has not grown for this long is called stalled, or finishing. */
 export const LOG_READ_STALL_MS = 60_000
+/** A still read this close to the end of the log is finishing, not stalled... */
+export const LOG_READ_NEAR_END_BYTES = 64 * 1024
+/** ...for this long. After that it is stalled like any other. */
+export const LOG_READ_FINISH_MS = 5 * 60_000
+/** The engine saying it is opening the log for this long is named. */
+export const LOG_READ_OPENING_MS = 60_000
+/** Main's own open of the log out for this long means the drive is not answering. */
+export const LOG_READ_HUNG_MS = 15_000
+/** The meter's last read speaks for this long. After that nobody is asking. */
+export const COMBAT_READ_FRESH_MS = 10_000
 
 export interface LogReadError {
   readonly step: LogReadStep
@@ -71,6 +87,14 @@ export interface LogReadReplySize {
   readonly at: number
 }
 
+/** Main's own look at the log file (main/logProbe.ts). */
+export interface LogReadProbe {
+  readonly bytes: number | null
+  readonly problem: 'missing' | 'unreadable' | null
+  /** How long the one open in flight has been out, or null when none is. */
+  readonly pendingMs: number | null
+}
+
 /** Everything main knows about the read. Every unknown is null, never 0. */
 export interface LogReadFacts {
   readonly now: number
@@ -103,8 +127,8 @@ export interface LogReadFacts {
    *  it; another log, or the read going live, does. */
   readonly waitingSince: number | null
   readonly error: LogReadError | null
-  /** Main's own look at the file, taken only on the failure path. */
-  readonly probe: { readonly bytes: number | null; readonly problem: 'missing' | 'unreadable' | null } | null
+  /** Main's own look at the file, or null when it has not looked. */
+  readonly probe: LogReadProbe | null
   /** The meter's last read since the log went live: `unserved` is the phrase and `why` the read
    *  path's reason word (main/dataServer/readShim.ts `FallbackReason`), both null when it was
    *  served. `since` is when its reads began going unserved in a row, null when it was served. */
@@ -120,11 +144,25 @@ export interface LogReadFacts {
   readonly tooLarge: LogReadReplySize | null
 }
 
+/** One more thing to tell the player while the read itself is fine. Nothing composes one yet. */
+export interface LogReadNote {
+  readonly id: string
+  readonly text: string
+  readonly tryLine?: string
+  /** A button's label, when the note has one. */
+  readonly button?: string
+}
+
 /** What crosses IPC. No full path, no home directory. */
 export interface LogReadReport {
   readonly wait: LogReadWait
-  /** Draw the box now, without waiting out `LOG_READ_SLOW_MS`. */
+  /** Draw the status now, without waiting out `LOG_READ_SLOW_MS`. */
   readonly show: boolean
+  /** What the player can try (`LOG_READ_TRY`), or null. */
+  readonly tryLine: string | null
+  /** What the Try again button does, or null when there is no button for this wait. */
+  readonly action: LogReadAction | null
+  readonly notes: readonly LogReadNote[]
   readonly appVersion: string
   /** The log's base name. */
   readonly logFile: string | null
@@ -136,29 +174,12 @@ export interface LogReadReport {
   readonly engine: string
   readonly lastError: string | null
   readonly engineSaid: readonly string[]
-  readonly waitedMs: number | null
+  /** When this wait began (epoch ms), or null when nothing says. The window counts from it with
+   *  its own clock, so the number moves without a push. */
+  readonly waitingSince: number | null
 }
 
-/** The sentence beside "Waiting on". */
-export const LOG_READ_WORDS: Readonly<Record<LogReadWait, string>> = {
-  noCharacter: 'No character log is selected.',
-  engineMissing: 'The data engine program is missing.',
-  engineFailing: 'The data engine keeps failing to start.',
-  engineStarting: 'Starting the data engine.',
-  connecting: 'Connecting to the data engine.',
-  notConnected: 'The app cannot connect to its data engine.',
-  attachRefused: 'The data engine refused the log file.',
-  logMissing: 'The log file is missing.',
-  logUnreadable: 'Windows will not let the app read the log file.',
-  readerStopped: 'The data engine stopped before the end of your log.',
-  stalled: 'The data engine has stopped making progress.',
-  notAnswering: 'The data engine is not answering.',
-  reading: 'Still reading your log.',
-  replyTooLarge: 'The fight list is too large for the app to show.',
-  ok: 'The data engine is answering; this panel has no reply yet.'
-}
-
-/** The waits that show the box at the first check: something has failed, not merely run long. */
+/** The waits that show at the first check: something has failed, not merely run long. */
 const SHOW_AT_ONCE: ReadonlySet<LogReadWait> = new Set<LogReadWait>([
   'engineMissing',
   'engineFailing',
@@ -167,9 +188,14 @@ const SHOW_AT_ONCE: ReadonlySet<LogReadWait> = new Set<LogReadWait>([
   'attachRefused',
   'logMissing',
   'logUnreadable',
+  'logHung',
   'readerStopped',
-  'stalled'
+  'stalled',
+  'mismatch'
 ])
+
+/** The waits of a read that ended: their row says where it stopped. */
+const ENDED: ReadonlySet<LogReadWait> = new Set<LogReadWait>(['logMissing', 'logUnreadable', 'readerStopped'])
 
 const SUPERVISOR_WORDS = new Map<string, string>([
   ['ready', 'running'],
@@ -229,7 +255,7 @@ export function scrubPaths(text: string, logPath: string | null, home: string): 
     '~'
   )
   // The copy rule (no em or en dash on screen) holds for quoted text too.
-  return out.replace(/\s*[\u2013\u2014]\s*/g, ' - ')
+  return out.replace(/\s*[–—]\s*/g, ' - ')
 }
 
 /** A launch fault with its detail scrubbed: a spawn failure's detail starts with the program path. */
@@ -248,46 +274,105 @@ const SAID_SHOWN_CHARS = 200
 /** One engine stderr line for the screen: scrubbed FIRST, because a path cut short no longer matches. */
 function saidLine(line: string, f: LogReadFacts): string {
   const safe = scrubPaths(line, f.logPath, f.home)
-  return safe.length <= SAID_SHOWN_CHARS ? safe : `${safe.slice(0, SAID_SHOWN_CHARS)}\u2026`
+  return safe.length <= SAID_SHOWN_CHARS ? safe : `${safe.slice(0, SAID_SHOWN_CHARS)}…`
 }
 
 // ── the decision ───────────────────────────────────────────────────────────────────────────────
 
-/** The waits that are about the engine process and its connection, or null when both are up. */
+/** A wait, and the instant it is timed from (the slow clock, and the Waiting row). */
+interface Verdict {
+  readonly wait: LogReadWait
+  readonly since: number | null
+}
+
+/**
+ * The waits that are about the engine process and its connection, or null when both are up.
+ * A missing or failing engine comes before "no character": with no engine, picking a character
+ * changes nothing, and the box used to say only that none was picked.
+ */
 function engineWait(f: LogReadFacts): LogReadWait | null {
-  if (f.logPath === null) return 'noCharacter'
   if (f.supervisor === 'absent' || f.fault?.kind === 'no-binary') return 'engineMissing'
   if (f.fault !== null) return 'engineFailing'
+  if (f.logPath === null) return 'noCharacter'
   if (f.supervisor !== 'ready') return 'engineStarting'
   // The connection is reopened by itself (linkKeeper.ts) until its keeper gives up.
   if (f.connection !== 'ready') return f.link?.gaveUp === true ? 'notConnected' : 'connecting'
   return null
 }
 
+/** Main's own open of the log has been out long enough to say the drive is not answering. */
+function hung(f: LogReadFacts): boolean {
+  return (f.probe?.pendingMs ?? 0) >= LOG_READ_HUNG_MS
+}
+
 function endedWait(f: LogReadFacts): LogReadWait {
+  // The likeliest reason the read ended, and the more useful thing to say.
+  if (hung(f)) return 'logHung'
   if (f.probe?.problem === 'missing') return 'logMissing'
   if (f.probe?.problem === 'unreadable') return 'logUnreadable'
   return 'readerStopped'
 }
 
-function stalled(f: LogReadFacts): boolean {
-  if (f.health?.status !== 'folding' || f.movedAt === null) return false
-  return f.now - f.movedAt >= LOG_READ_STALL_MS
+/** The wait of a read that failed outright, or null when nothing has. */
+function failedWait(f: LogReadFacts): LogReadWait | null {
+  const error = f.error
+  // An attach nobody answered was not refused: the engine said nothing at all.
+  if (error?.step === 'attach') return error.code === 'timeout' ? 'notAnswering' : 'attachRefused'
+  if (error?.step === 'fold' || f.health?.status === 'idle') return endedWait(f)
+  if (error?.step === 'health') return 'notAnswering'
+  return hung(f) ? 'logHung' : null
 }
 
-/** The waits that are about the read itself, with the engine up and connected. */
-function readWait(f: LogReadFacts): LogReadWait {
-  const step = f.error?.step
-  if (step === 'attach') return 'attachRefused'
-  if (step === 'fold' || f.health?.status === 'idle') return endedWait(f)
-  if (step === 'health') return 'notAnswering'
-  if (stalled(f)) return 'stalled'
-  if (f.readiness !== 'ok') return 'reading'
-  if (typeof f.lastCombatRead?.unserved !== 'string') return 'ok'
+/** Is the read within a few lines of the end of the log, as far as anything has stated? */
+function nearEnd(f: LogReadFacts): boolean {
+  const size = f.fold?.logSize ?? f.logSize
+  if (size === null) return false
+  const offset = Math.max(f.fold?.offset ?? 0, f.lastOffset ?? 0)
+  return size - offset <= LOG_READ_NEAR_END_BYTES
+}
+
+/** A read that is running and has stopped moving, or is slow to begin; null when it is neither. */
+function slowWait(f: LogReadFacts): LogReadWait | null {
+  const health = f.health
+  if (health === null) return null
+  if (health.status === 'folding' && f.movedAt !== null) {
+    const still = f.now - f.movedAt
+    if (still < LOG_READ_STALL_MS) return null
+    // The engine builds its last panels after the last byte; that is not a stall for a while.
+    return still < LOG_READ_FINISH_MS && nearEnd(f) ? 'finishing' : 'stalled'
+  }
+  const opening = health.status === 'starting' || health.status === 'attaching'
+  return opening && f.now - health.since >= LOG_READ_OPENING_MS ? 'opening' : null
+}
+
+/** The waits that are about the read itself, or null once the log is read and being served. */
+function logWait(f: LogReadFacts): LogReadWait | null {
+  const named = failedWait(f) ?? slowWait(f)
+  if (named !== null) return named
+  // The engine says it is caught up on a log the app is not reading its answers for.
+  if (f.readiness === 'notAttached' && f.health?.status === 'live') return 'mismatch'
+  return f.readiness === 'ok' ? null : 'reading'
+}
+
+/**
+ * The log is read; what is left is the meter's own read. Timed from when its reads began going
+ * unserved, not from the log's wait: one slow read hours after going live is not a long wait.
+ */
+function combatVerdict(f: LogReadFacts): Verdict {
+  const read = f.lastCombatRead
+  if (read === null || typeof read.unserved !== 'string' || f.now - read.at > COMBAT_READ_FRESH_MS) {
+    return { wait: 'ok', since: f.waitingSince }
+  }
   // The meter's OWN read went unserved because its reply was too large, in this read of the log:
   // that is the cause to name. Never decided from `tooLarge.op`: the archive asks combat.snapshot
   // for every fight, and that reply being too large to show says nothing about the meter's.
-  return f.lastCombatRead.why === 'tooLarge' && f.tooLarge !== null ? 'replyTooLarge' : 'notAnswering'
+  const tooLarge = read.why === 'tooLarge' && f.tooLarge !== null
+  return { wait: tooLarge ? 'replyTooLarge' : 'notAnswering', since: read.since }
+}
+
+function decide(f: LogReadFacts): Verdict {
+  const wait = engineWait(f) ?? logWait(f)
+  return wait === null ? combatVerdict(f) : { wait, since: f.waitingSince }
 }
 
 /** `connected`, or how the reconnect is going: `connecting (try 2 of 5)`. */
@@ -337,34 +422,42 @@ function lastErrorText(f: LogReadFacts, wait: LogReadWait): string | null {
   return null
 }
 
-function shows(wait: LogReadWait, waitedMs: number | null): boolean {
+function shows(verdict: Verdict, now: number): boolean {
+  const { wait, since } = verdict
   if (SHOW_AT_ONCE.has(wait)) return true
-  if (wait === 'ok' || wait === 'noCharacter' || waitedMs === null) return false
-  return waitedMs >= LOG_READ_SLOW_MS
+  if (wait === 'ok' || wait === 'noCharacter' || since === null) return false
+  return now - since >= LOG_READ_SLOW_MS
 }
 
 /** How big the log is and how far the read got, as far as anything has measured. */
 function measured(f: LogReadFacts): Pick<LogReadReport, 'logBytes' | 'offset' | 'pct' | 'events'> {
-  if (f.fold === null) {
-    return { logBytes: f.logSize ?? f.probe?.bytes ?? null, offset: null, pct: null, events: null }
+  if (f.fold !== null) {
+    return { logBytes: f.fold.logSize, offset: f.fold.offset, pct: f.fold.pct, events: f.fold.events }
   }
-  return { logBytes: f.fold.logSize, offset: f.fold.offset, pct: f.fold.pct, events: f.fold.events }
+  const logBytes = f.logSize ?? f.probe?.bytes ?? null
+  // A read that has landed has nothing left to report: the log grows on, the mark is not asked again.
+  const offset = f.health?.status === 'live' ? null : f.lastOffset
+  const known = offset !== null && logBytes !== null && logBytes > 0
+  return { logBytes, offset, pct: known ? Math.min(100, (offset / logBytes) * 100) : null, events: null }
 }
 
-/** The facts, decided and scrubbed: the one object the renderer is handed. */
+/** The facts, decided and scrubbed: the one object every window is handed. */
 export function composeLogReadReport(f: LogReadFacts): LogReadReport {
-  const wait = engineWait(f) ?? readWait(f)
-  const waitedMs = f.waitingSince === null ? null : Math.max(0, f.now - f.waitingSince)
+  const verdict = decide(f)
+  const { wait } = verdict
   return {
     wait,
-    show: shows(wait, waitedMs),
+    show: shows(verdict, f.now),
+    tryLine: LOG_READ_TRY[wait],
+    action: LOG_READ_ACTION[wait],
+    notes: [],
     appVersion: f.appVersion,
     logFile: f.logPath === null ? null : baseName(f.logPath),
     ...measured(f),
     engine: engineWords(f),
     lastError: lastErrorText(f, wait),
     engineSaid: (f.error?.said ?? []).map((line) => saidLine(line, f)),
-    waitedMs
+    waitingSince: verdict.since
   }
 }
 
@@ -387,15 +480,20 @@ function readSoFar(r: LogReadReport): string | null {
   return `${humanBytes(r.offset)}${pct}${events}`
 }
 
-/** The box's rows, in order. A row whose value is unknown is left out, never printed as 0. */
-export function logReadLines(r: LogReadReport): LogReadLine[] {
+/**
+ * The box's rows, in order, at `now` (the window's own clock, for the Waiting row). A row whose
+ * value is unknown is left out, never printed as 0.
+ */
+export function logReadLines(r: LogReadReport, now: number): LogReadLine[] {
+  const waited = r.waitingSince === null ? null : humanDuration(Math.max(0, now - r.waitingSince))
   const rows: [string, string | null][] = [
     ['Waiting on', LOG_READ_WORDS[r.wait]],
+    ['Try', r.tryLine],
     ['Log', logLine(r)],
-    ['Read so far', readSoFar(r)],
+    [ENDED.has(r.wait) ? 'Stopped at' : 'Read so far', readSoFar(r)],
     ['Engine', r.engine === '' ? null : r.engine],
     ['Last error', r.lastError ?? 'none'],
-    ['Waiting', r.waitedMs === null ? null : humanDuration(r.waitedMs)],
+    ['Waiting', waited],
     ['Version', r.appVersion]
   ]
   const lines: LogReadLine[] = []

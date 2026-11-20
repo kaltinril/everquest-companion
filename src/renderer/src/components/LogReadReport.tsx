@@ -19,7 +19,7 @@ export function LogReadReport(): JSX.Element | null {
       data-testid="log-read-report"
       sx={{ mb: 1, px: 1, py: 0.75, border: 1, borderColor: 'divider', borderRadius: 1 }}
     >
-      {logReadLines(report).map((line) => (
+      {logReadLines(report, Date.now()).map((line) => (
         <Stack key={line.label} direction="row" spacing={1}>
           <Typography variant="caption" color="text.secondary" sx={{ width: 76, flexShrink: 0 }}>
             {line.label}

@@ -22,13 +22,13 @@ async function probeLog(path: string): Promise<NonNullable<LogReadFacts['probe']
   try {
     const file = await open(path, 'r')
     try {
-      return { bytes: (await file.stat()).size, problem: null }
+      return { bytes: (await file.stat()).size, problem: null, pendingMs: null }
     } finally {
       await file.close()
     }
   } catch (err) {
     const missing = (err as NodeJS.ErrnoException).code === 'ENOENT'
-    return { bytes: null, problem: missing ? 'missing' : 'unreadable' }
+    return { bytes: null, problem: missing ? 'missing' : 'unreadable', pendingMs: null }
   }
 }
 

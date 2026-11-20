@@ -7,13 +7,13 @@ import assert from 'node:assert/strict'
 import {
   LOG_READ_SLOW_MS,
   LOG_READ_STALL_MS,
-  LOG_READ_WORDS,
   composeLogReadReport,
   logReadLines,
   scrubPaths,
   type LogReadFacts,
   type LogReadWait
 } from '../src/shared/logReadReport'
+import { LOG_READ_WORDS } from '../src/shared/logReadWords'
 
 const NOW = 1_800_000_000_000
 const LOG = 'C:\\Users\\Jeremy\\EverQuest\\Logs\\eqlog_Primitive_freeport.txt'
@@ -31,9 +31,10 @@ function facts(over: Partial<LogReadFacts> = {}): LogReadFacts {
     fault: null,
     connection: 'ready',
     readiness: 'notLive',
-    health: { status: 'folding', at: NOW - 400 },
+    health: { status: 'folding', at: NOW - 400, since: NOW - 2_000 },
     fold: { offset: 148.8 * MB, logSize: 412.3 * MB, events: 1_571_003, pct: 36.09 },
     logSize: null,
+    lastOffset: 148.8 * MB,
     movedAt: NOW - 400,
     waitingSince: NOW - 2_000,
     error: null,
@@ -55,7 +56,7 @@ function waitOf(over: Partial<LogReadFacts>): LogReadWait {
 }
 
 const NO_BINARY = { kind: 'no-binary', attempts: 0, detail: null }
-const FOLD_ENDED = { step: 'fold', detail: 'the engine reports idle after an accepted attach', at: NOW, said: [] } as const
+const FOLD_ENDED = { step: 'fold', code: null, detail: 'the engine reports idle after an accepted attach', at: NOW, said: [] } as const
 
 // ---- 1. the decision order ---------------------------------------------------------------------
 
@@ -67,15 +68,15 @@ test('each wait is reached by the facts that mean it', () => {
   assert.equal(waitOf({ connection: 'failed', link: link() }), 'connecting')
   assert.equal(waitOf({ connection: 'failed', link: link({ gaveUp: true }) }), 'notConnected')
   assert.equal(
-    waitOf({ health: null, error: { step: 'attach', detail: 'timeout', at: NOW, said: [] } }),
+    waitOf({ health: null, error: { step: 'attach', code: 'badParams', detail: 'badParams: no such log', at: NOW, said: [] } }),
     'attachRefused'
   )
   assert.equal(
-    waitOf({ error: { step: 'health', detail: 'timeout', at: NOW, said: [] } }),
+    waitOf({ error: { step: 'health', code: null, detail: 'timeout', at: NOW, said: [] } }),
     'notAnswering'
   )
   assert.equal(waitOf({}), 'reading')
-  assert.equal(waitOf({ readiness: 'ok', health: { status: 'live', at: NOW } }), 'ok')
+  assert.equal(waitOf({ readiness: 'ok', health: { status: 'live', at: NOW, since: NOW } }), 'ok')
 })
 
 test('A MISSING ENGINE WINS OVER EVERYTHING BELOW IT', () => {
@@ -84,18 +85,18 @@ test('A MISSING ENGINE WINS OVER EVERYTHING BELOW IT', () => {
     supervisor: 'absent',
     connection: null,
     error: FOLD_ENDED,
-    health: { status: 'idle', at: NOW },
-    probe: { bytes: null, problem: 'missing' }
+    health: { status: 'idle', at: NOW, since: NOW },
+    probe: { bytes: null, problem: 'missing', pendingMs: null }
   })
   assert.equal(wait, 'engineMissing')
   assert.equal(waitOf({ fault: NO_BINARY }), 'engineMissing', 'the fault alone says it')
 })
 
 test('a read that ended is named by what main found when it looked at the file', () => {
-  const idle = { status: 'idle', at: NOW }
-  assert.equal(waitOf({ health: idle, probe: { bytes: null, problem: 'missing' } }), 'logMissing')
-  assert.equal(waitOf({ error: FOLD_ENDED, probe: { bytes: null, problem: 'unreadable' } }), 'logUnreadable')
-  assert.equal(waitOf({ health: idle, probe: { bytes: 5 * MB, problem: null } }), 'readerStopped')
+  const idle = { status: 'idle', at: NOW, since: NOW }
+  assert.equal(waitOf({ health: idle, probe: { bytes: null, problem: 'missing', pendingMs: null } }), 'logMissing')
+  assert.equal(waitOf({ error: FOLD_ENDED, probe: { bytes: null, problem: 'unreadable', pendingMs: null } }), 'logUnreadable')
+  assert.equal(waitOf({ health: idle, probe: { bytes: 5 * MB, problem: null, pendingMs: null } }), 'readerStopped')
   assert.equal(waitOf({ error: FOLD_ENDED, probe: null }), 'readerStopped')
 })
 
@@ -105,19 +106,19 @@ test('a fold whose offset has not grown for a minute is stalled, and not a secon
   assert.equal(waitOf({ movedAt: null }), 'reading', 'no mark yet is not a stall')
   // Only a FOLDING engine can stall: a live one has nothing left to read.
   assert.equal(
-    waitOf({ readiness: 'ok', health: { status: 'live', at: NOW }, movedAt: NOW - LOG_READ_STALL_MS }),
+    waitOf({ readiness: 'ok', health: { status: 'live', at: NOW, since: NOW }, movedAt: NOW - LOG_READ_STALL_MS }),
     'ok'
   )
 })
 
 test('a live engine whose last combat read went unserved is not answering', () => {
-  const live = { readiness: 'ok', health: { status: 'live', at: NOW } }
+  const live = { readiness: 'ok', health: { status: 'live', at: NOW, since: NOW } }
   const r = composeLogReadReport(
-    facts({ ...live, lastCombatRead: { unserved: 'the engine did not answer in time', why: 'timedOut', at: NOW } })
+    facts({ ...live, lastCombatRead: { unserved: 'the engine did not answer in time', why: 'timedOut', at: NOW, since: NOW } })
   )
   assert.equal(r.wait, 'notAnswering')
   assert.equal(r.lastError, 'the engine did not answer in time')
-  assert.equal(waitOf({ ...live, lastCombatRead: { unserved: null, why: null, at: NOW } }), 'ok')
+  assert.equal(waitOf({ ...live, lastCombatRead: { unserved: null, why: null, at: NOW, since: null } }), 'ok')
 })
 
 // ---- 1b. the connection is reopened, and a reply can be too large (fork #9) --------------------
@@ -182,7 +183,7 @@ test('the link-s reason is scrubbed like every other text from outside', () => {
 })
 
 test('with the connection up, an old connect error is not the last error any more', () => {
-  const old = { step: 'connect', detail: 'ECONNREFUSED', at: NOW - 9_000, said: [] } as const
+  const old = { step: 'connect', code: null, detail: 'ECONNREFUSED', at: NOW - 9_000, said: [] } as const
   const up = composeLogReadReport(facts({ error: old, link: link({ tries: 1, everConnected: true }) }))
   assert.equal(up.wait, 'reading')
   assert.equal(up.lastError, null)
@@ -190,9 +191,9 @@ test('with the connection up, an old connect error is not the last error any mor
   assert.equal(composeLogReadReport(facts({ connection: 'failed', error: old })).lastError, 'connect: ECONNREFUSED')
 })
 
-const LIVE = { readiness: 'ok', health: { status: 'live', at: NOW } }
-const TOO_LARGE_PHRASE = { unserved: 'the reply was too large to show', why: 'tooLarge', at: NOW }
-const TIMED_OUT = { unserved: 'the engine did not answer in time', why: 'timedOut', at: NOW }
+const LIVE = { readiness: 'ok', health: { status: 'live', at: NOW, since: NOW } }
+const TOO_LARGE_PHRASE = { unserved: 'the reply was too large to show', why: 'tooLarge', at: NOW, since: NOW }
+const TIMED_OUT = { unserved: 'the engine did not answer in time', why: 'timedOut', at: NOW, since: NOW }
 
 test('A FIGHT LIST TOO LARGE TO SHOW IS NAMED, even though the last combat read also went unserved', () => {
   const refused = { op: 'combat.snapshot', module: null, chars: 71.2 * MB, refused: true, limit: 64 * MB, at: NOW }
@@ -213,7 +214,7 @@ test('a reply too large is not the wait when it is not what the meter is missing
   const fights = { op: 'combat.snapshot', module: null, chars: 71.2 * MB, refused: true, limit: 64 * MB, at: NOW }
   const loot = { ...fights, op: 'module.snapshot', module: 'loot' }
   // The meter was served: the too-large fight list was main-s own (the archive asks for every fight).
-  assert.equal(waitOf({ ...LIVE, tooLarge: fights, lastCombatRead: { unserved: null, why: null, at: NOW } }), 'ok')
+  assert.equal(waitOf({ ...LIVE, tooLarge: fights, lastCombatRead: { unserved: null, why: null, at: NOW, since: null } }), 'ok')
   assert.equal(waitOf({ ...LIVE, tooLarge: fights }), 'ok')
   // A module-s reply is too large and the meter went unserved for another reason.
   const r = composeLogReadReport(facts({ ...LIVE, tooLarge: loot, lastCombatRead: TIMED_OUT }))
@@ -233,7 +234,7 @@ test('ANOTHER FIGHT LIST BEING TOO LARGE DOES NOT MAKE A SLOW METER READ `replyT
   assert.equal(r.show, false, 'a slow read is not shown at once')
   // Every other reason the meter can go unserved for is the same: only its own reply decides.
   for (const why of ['refused', 'guess', 'notLive', null]) {
-    const read = { unserved: 'some other reason', why, at: NOW }
+    const read = { unserved: 'some other reason', why, at: NOW, since: NOW }
     assert.equal(waitOf({ ...LIVE, tooLarge: archive, lastCombatRead: read }), 'notAnswering')
   }
   // The meter-s own reply too large, with a module-s reply the newest one recorded since.
@@ -255,9 +256,9 @@ test('A DEAD READ SHOWS AT ONCE', () => {
   const dead: Partial<LogReadFacts>[] = [
     { supervisor: 'absent' },
     { fault: { kind: 'unhealthy', attempts: 3, detail: null } },
-    { error: { step: 'attach', detail: 'refused', at: NOW, said: [] } },
-    { error: FOLD_ENDED, probe: { bytes: null, problem: 'missing' } },
-    { error: FOLD_ENDED, probe: { bytes: null, problem: 'unreadable' } },
+    { error: { step: 'attach', code: null, detail: 'refused', at: NOW, said: [] } },
+    { error: FOLD_ENDED, probe: { bytes: null, problem: 'missing', pendingMs: null } },
+    { error: FOLD_ENDED, probe: { bytes: null, problem: 'unreadable', pendingMs: null } },
     { error: FOLD_ENDED },
     { movedAt: NOW - LOG_READ_STALL_MS }
   ]
@@ -269,7 +270,7 @@ test('A DEAD READ SHOWS AT ONCE', () => {
 
 test('an engine that is answering never asks for the box itself', () => {
   const r = composeLogReadReport(
-    facts({ readiness: 'ok', health: { status: 'live', at: NOW }, waitingSince: NOW - 3_600_000 })
+    facts({ readiness: 'ok', health: { status: 'live', at: NOW, since: NOW }, waitingSince: NOW - 3_600_000 })
   )
   assert.equal(r.wait, 'ok')
   assert.equal(r.show, false)
@@ -306,14 +307,15 @@ test('SCRUB: the home directory and any other user folder become ~', () => {
 test('the report carries the base name only, and scrubs what the engine and the error said', () => {
   const r = composeLogReadReport(
     facts({
-      health: { status: 'idle', at: NOW },
+      health: { status: 'idle', at: NOW, since: NOW },
       error: {
         step: 'fold',
+        code: null,
         detail: `could not read ${LOG}`,
         at: NOW,
         said: [`[engined] the ingest of ${LOG} ended: Access is denied.`, 'a line with \u2014 a long dash']
       },
-      probe: { bytes: null, problem: 'unreadable' }
+      probe: { bytes: null, problem: 'unreadable', pendingMs: null }
     })
   )
   assert.equal(r.logFile, 'eqlog_Primitive_freeport.txt')
@@ -343,9 +345,10 @@ function row(lines: readonly { label: string; value: string }[], label: string):
 }
 
 test('THE ROWS OF A SLOW, HEALTHY READ', () => {
-  const lines = logReadLines(composeLogReadReport(facts({ waitingSince: NOW - 42_000 })))
+  const lines = logReadLines(composeLogReadReport(facts({ waitingSince: NOW - 42_000 })), NOW)
   assert.deepEqual(lines, [
     { label: 'Waiting on', value: 'Still reading your log.' },
+    { label: 'Try', value: 'Nothing to do. Large logs take a while.' },
     { label: 'Log', value: 'eqlog_Primitive_freeport.txt, 412.3 MB' },
     { label: 'Read so far', value: '148.8 MB (36%), 1,571,003 events' },
     { label: 'Engine', value: 'running, connected, reading' },
@@ -356,10 +359,10 @@ test('THE ROWS OF A SLOW, HEALTHY READ', () => {
 })
 
 test('what was never measured is left out, never printed as 0', () => {
+  const unmeasured = { health: null, fold: null, lastOffset: null, movedAt: null, waitingSince: null }
   const lines = logReadLines(
-    composeLogReadReport(
-      facts({ supervisor: 'starting', connection: null, health: null, fold: null, movedAt: null, waitingSince: null })
-    )
+    composeLogReadReport(facts({ supervisor: 'starting', connection: null, ...unmeasured })),
+    NOW
   )
   assert.equal(row(lines, 'Read so far'), undefined)
   assert.equal(row(lines, 'Waiting'), undefined)
@@ -369,17 +372,19 @@ test('what was never measured is left out, never printed as 0', () => {
 })
 
 test('the size falls back to what the engine last stated, then to what main measured', () => {
-  const base = { fold: null, health: { status: 'idle', at: NOW } }
+  const base = { fold: null, health: { status: 'idle', at: NOW, since: NOW } }
   assert.equal(composeLogReadReport(facts({ ...base, logSize: 7 * MB })).logBytes, 7 * MB)
   assert.equal(
-    composeLogReadReport(facts({ ...base, probe: { bytes: 9 * MB, problem: null } })).logBytes,
+    composeLogReadReport(facts({ ...base, probe: { bytes: 9 * MB, problem: null, pendingMs: null } })).logBytes,
     9 * MB
   )
 })
 
-test('every wait has a sentence, and none carries an em or en dash', () => {
-  for (const [wait, words] of Object.entries(LOG_READ_WORDS)) {
-    assert.ok(words.length > 0, `${wait} has no words`)
-    assert.doesNotMatch(words, /[\u2013\u2014]/)
-  }
+test('the Waiting row is counted by the reader-s own clock from when the wait began', () => {
+  const r = composeLogReadReport(facts({ waitingSince: NOW - 42_000 }))
+  assert.equal(r.waitingSince, NOW - 42_000)
+  // No push is needed for it to move: the same report read a minute later.
+  assert.equal(row(logReadLines(r, NOW + 60_000), 'Waiting'), '2m')
+  // A clock a little behind main's never prints a negative wait.
+  assert.equal(row(logReadLines(r, NOW - 50_000), 'Waiting'), '1s')
 })
