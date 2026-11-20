@@ -30,7 +30,8 @@ import {
   foldRecentFactions,
   parseFactionLogLine,
   type FactionEvidenceReport,
-  type FactionLogEvent
+  type FactionLogEvent,
+  type FactionRecent
 } from '../shared/factionLog'
 import {
   FACTION_LEDGER_DIR,
@@ -117,6 +118,23 @@ export function withLedgers(
 }
 
 /**
+ * The recent tally over the live read and the ledgers together. An archive can happen at launch
+ * right after play, on the daily check, or from the card's button, so the window's lines may be in
+ * a ledger. The ledgers give only what the live read does not hold (the window rule), so a backup
+ * counts nothing twice. A ledger keeps a run of one cap line as one entry: it is one hit here.
+ */
+export function recentWithLedgers(
+  ledgers: readonly FactionLedger[],
+  live: { recent: { ts: number; ev: FactionLogEvent }[]; windowStartTs: number },
+  recentFromMs: number
+): FactionRecent[] {
+  if (ledgers.length === 0) return foldRecentFactions(live.recent, recentFromMs)
+  // ledgerWindow keeps `ts > sinceMs`; the tally wants `ts >= recentFromMs`.
+  const w = ledgerWindow(ledgers, live.windowStartTs === 0 ? Infinity : live.windowStartTs, recentFromMs - 1)
+  return foldRecentFactions([...w.events.map((e) => ({ ts: e.ts, ev: asLogEvent(e) })), ...live.recent], recentFromMs)
+}
+
+/**
  * Fold the log's faction lines newer than `sinceMs`, and an archive's ledgers before them. Null
  * when neither the log nor a ledger can be read — the tab then simply shows the dump as-is, which
  * is what it showed before this existed.
@@ -137,7 +155,9 @@ export async function readFactionEvidence(
     // ledgers beside it — read them over an empty live window rather than fall back to the dump.
     const ledgers = readLedgers(logPath)
     if (ledgers.length === 0) return null
-    return withLedgers(ledgers, { events: [], windowStartTs: 0, liveComplete: true }, sinceMs)
+    const report = withLedgers(ledgers, { events: [], windowStartTs: 0, liveComplete: true }, sinceMs)
+    if (recentFromMs === undefined) return report
+    return { ...report, recent: recentWithLedgers(ledgers, { recent: [], windowStartTs: 0 }, recentFromMs), recentFromMs }
   }
 
   const raw = tail.text.split(/\r?\n/)
@@ -147,9 +167,8 @@ export async function readFactionEvidence(
   // Complete when the window reaches back to the dump: an untruncated read always does; a
   // truncated one does only if its first readable line is no newer than the dump.
   const liveComplete = !tail.truncated || (windowStartTs !== 0 && windowStartTs <= sinceMs)
-  const report = withLedgers(readLedgers(logPath), { events, windowStartTs, liveComplete }, sinceMs)
-  // The recent tally reads the live tail only: an archive happens at launch, so the last hours of
-  // play are in the live log.
+  const ledgers = readLedgers(logPath)
+  const report = withLedgers(ledgers, { events, windowStartTs, liveComplete }, sinceMs)
   if (recentFromMs === undefined) return report
-  return { ...report, recent: foldRecentFactions(recent, recentFromMs), recentFromMs }
+  return { ...report, recent: recentWithLedgers(ledgers, { recent, windowStartTs }, recentFromMs), recentFromMs }
 }

@@ -129,3 +129,43 @@ test('the recent tally reads the live log from its own start, whatever the dump 
   ])
   assert.equal((await readFactionEvidence(logPath, at('12:00:00')))?.recent, undefined)
 })
+
+const KERRA_ARCHIVED = [
+  line('10:00:00', 'You are hungry.'),
+  line('10:50:00', adj('Kerra Isle', 5)),
+  line('10:55:00', adj('Kerra Isle', 5))
+]
+
+test('the recent tally reaches into an archive ledger, so a restart after play still shows what moved', async () => {
+  const logPath = install(
+    [line('11:00:00', 'You are hungry.'), line('11:01:00', adj('Kerra Isle', 5))],
+    [ledgerOf(KERRA_ARCHIVED, 'seg-1')]
+  )
+  const r = await readFactionEvidence(logPath, at('12:00:00'), at('10:45:00'))
+  assert.deepEqual(r?.recent, [{ name: 'Kerra Isle', hits: 3, net: 15, lastTs: at('11:01:00') }])
+  // A ledger line before the window is left out; one in the window's first second is in.
+  const later = await readFactionEvidence(logPath, at('12:00:00'), at('10:52:00'))
+  assert.deepEqual(later?.recent, [{ name: 'Kerra Isle', hits: 2, net: 10, lastTs: at('11:01:00') }])
+  const onTheSecond = await readFactionEvidence(logPath, at('12:00:00'), at('10:50:00'))
+  assert.equal(onTheSecond?.recent?.[0]?.hits, 3)
+})
+
+test('a log just archived (empty, or not yet recreated) still answers the recent window', async () => {
+  const logPath = install([], [ledgerOf(KERRA_ARCHIVED, 'seg-1')])
+  const want = [{ name: 'Kerra Isle', hits: 2, net: 10, lastTs: at('10:55:00') }]
+  const empty = await readFactionEvidence(logPath, at('12:00:00'), at('10:45:00'))
+  assert.equal(empty?.recentFromMs, at('10:45:00'))
+  assert.deepEqual(empty?.recent, want)
+  rmSync(logPath)
+  const missing = await readFactionEvidence(logPath, at('12:00:00'), at('10:45:00'))
+  assert.deepEqual(missing?.recent, want)
+  // Not asked for, not tallied: the report is what it was.
+  assert.equal((await readFactionEvidence(logPath, at('12:00:00')))?.recent, undefined)
+})
+
+test('a backup of the live log counts nothing twice in the recent tally', async () => {
+  const live = [line('10:00:00', 'You are hungry.'), line('10:05:00', adj('Heretics', -5))]
+  const logPath = install(live, [ledgerOf(live, 'backup')])
+  const r = await readFactionEvidence(logPath, at('12:00:00'), at('09:00:00'))
+  assert.deepEqual(r?.recent, [{ name: 'Heretics', hits: 1, net: -5, lastTs: at('10:05:00') }])
+})
