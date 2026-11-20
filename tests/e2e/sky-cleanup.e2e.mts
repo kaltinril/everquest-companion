@@ -119,6 +119,8 @@ const ROW_INPUT = `${ROW} [data-testid="posky-item-count-input"] input`
 const ROW_SAVE = `${ROW} [data-testid="posky-item-count-save"]`
 const OVERRIDE_CLEAR = '[data-testid="posky-item-override"] .MuiChip-deleteIcon'
 const OVERRIDES_ACTIVE = '[data-testid="posky-overrides-active"]'
+/** The take-back chips for rows a hand count took off the table, INSIDE the list's own scroller. */
+const HAND_HIDDEN_IN_LIST = '[data-testid="posky-cleanup-scroll"] [data-testid="posky-cleanup-hand-hidden"]'
 /** The count-source control, which STAYS - it is the strategy, not a refresh. */
 const SOURCE = '[data-testid="posky-count-source"]'
 /** Everything JOS-401 removed. Asserted as an ABSENCE, once, so a revert cannot pass quietly. */
@@ -534,6 +536,7 @@ async function stepHandCountOnTheRow(page: Page): Promise<boolean> {
   }
   check('…the tab drops its count', (await tabLabel(page)) === 'Cleanup', await tabLabel(page))
   check('…and the tab says one count is set by hand', (await countOf(page, OVERRIDES_ACTIVE)) === 1)
+  check('…and the chip that takes it back scrolls with the list, so many of them cannot take its room', (await countOf(page, HAND_HIDDEN_IN_LIST)) === 1)
 
   // The take-back is the chip on the quest row: the Cleanup row that carried the pencil is gone.
   if (!(await reopenTheQuestPanel(page))) return false

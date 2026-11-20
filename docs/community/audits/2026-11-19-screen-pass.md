@@ -315,7 +315,8 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   validationMessage '', aria-invalid 'false', no max attribute (min=0, step=1). After Enter: editor
   gone, row still 'x3' (or 'x99999 By hand: 99999'), tab text byte-identical before and after, no
   .MuiFormHelperText-root, no role=alert or status besides the caveat. '1e5' and ...
-- CONFIRMED [medium, cut-off] The hidden-chip line has no height limit and takes the list's room: 30
+- FIXED 2026-11-19 (the line is now the first thing inside the list's scroller; `sky-cleanup.e2e.mts`
+  step 4b checks it) [medium, cut-off] The hidden-chip line has no height limit and takes the list's room: 30
   zeroed items leave less than one row at the minimum window Seen:
   [data-testid=posky-cleanup-hand-hidden] sits above the scrolling list, outside it. 900x600, 30
   chips: line 7 lines / 188 px (y268-456); list box top 472, bottom 584 = 112 px for 23600 px of
