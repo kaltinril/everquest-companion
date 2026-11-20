@@ -326,6 +326,15 @@ export function isStripKind(kind: OverlayKind): boolean {
 }
 
 /**
+ * Is this a strip window built opaque (JOS-40) with nothing to draw? Shown, it is a solid rectangle
+ * over the game, so nothing but its own queue may show it. `idle` absent reads as resting: an empty
+ * window is a strip's resting state until its overlay says otherwise.
+ */
+export function opaqueStripRests(kind: OverlayKind, builtOpaque: boolean | undefined, idle: boolean | undefined): boolean {
+  return isStripKind(kind) && builtOpaque === true && idle !== false
+}
+
+/**
  * The kinds that dock into the bottom-right stack — every kind except the three STRIPS (the
  * celebration toast at the top, the con card below it, the alert banner a third of the way down).
  * None holds a slot in the meter grid, so none may consume an index either: adding one that did

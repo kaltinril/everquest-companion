@@ -27,7 +27,7 @@ import { IPC } from '../shared/ipc'
 import { installBackButton } from './appBack'
 import { E2E } from './e2e'
 import { logError, logInfo } from './errorLog'
-import { OVERLAY_MIN_SIZE, OVERLAY_TITLE, isStripKind, overlayDefaultSize } from './overlayLayout'
+import { OVERLAY_MIN_SIZE, OVERLAY_TITLE, isStripKind, opaqueStripRests, overlayDefaultSize } from './overlayLayout'
 // WHERE AN OVERLAY IS, HOW TALL IT IS, AND WHICH OF THAT IS WRITTEN DOWN (JOS-187 + JOS-386). Its
 // own module for the reason overlaySnapDrag.ts and OVERLAY_TITLE are: this file is at the
 // 400-code-line ceiling, and a persistence policy over pure geometry was never its subject.
@@ -114,9 +114,15 @@ const opaqueStripWindow: Partial<Record<OverlayKind, boolean>> = {}
 
 /** Is that opaque strip window currently drawing nothing? Only ever consulted while its
  *  `opaqueStripWindow` entry is true — see `applyOpaqueStripVisibility`, which owns this value.
- *  ABSENT READS AS IDLE (hence every check spells `!== false`), because an empty window is a
+ *  ABSENT READS AS IDLE (overlayLayout.ts `opaqueStripRests`), because an empty window is a
  *  strip's resting state and nothing has told us otherwise until its renderer's first signal. */
 const opaqueStripIdle: Partial<Record<OverlayKind, boolean>> = {}
+
+/** Is this kind's live window an opaque strip with nothing to draw? Only its own queue may show
+ *  it then; every other show (the un-hide pass, "Bring overlays to front") asks here first. */
+export function opaqueStripResting(kind: OverlayKind): boolean {
+  return opaqueStripRests(kind, opaqueStripWindow[kind], opaqueStripIdle[kind])
+}
 
 /** The main window while it exists (null before creation / after close). */
 export function getMainWindow(): BrowserWindow | null {
@@ -1087,7 +1093,7 @@ export function setOverlaysHidden(hidden: boolean): void {
     if (E2E || w.isVisible()) continue
     // An OPAQUE strip with nothing queued must not come back as a solid rectangle: its
     // visibility belongs to its queue, and the next card brings it up (JOS-40).
-    if (isStripKind(kind) && opaqueStripWindow[kind] === true && opaqueStripIdle[kind] !== false) continue
+    if (opaqueStripResting(kind)) continue
     w.showInactive()
     // A gate restore can land while presence has the overlays PARKED (JOS-427) — the user may be
     // alt-tabbed away while a character-switch fold ends. The show must come up at the park's
