@@ -190,6 +190,9 @@ export interface EngineClient {
    * put a network call in the renderer's copy of it.
    */
   onKnowledgeMiss(listener: (miss: KnowledgeMissMessage) => void): () => void
+  /** The connection ended in a way the transport does not report (a clean hang-up, fork #9):
+   *  `failed` is announced and everything in flight is rejected. A no-op once failed or closed. */
+  fail(error: EngineError): void
   close(): void
 }
 
@@ -598,6 +601,9 @@ export function createEngineClient(options: EngineClientOptions): EngineClient {
     onConCard: (listener): (() => void) => listen(s.broadcasts.conCard, listener),
     onModuleChanged: (listener): (() => void) => listen(s.broadcasts.moduleChanged, listener),
     onKnowledgeMiss: (listener): (() => void) => listen(s.broadcasts.knowledgeMiss, listener),
+    fail: (error): void => {
+      failConnection(s, error)
+    },
     close: (): void => {
       if (s.state === 'closed') return
       setConnectionState(s, 'closed')

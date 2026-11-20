@@ -84,7 +84,9 @@ export function openEngineLink(deps: EngineLinkDeps): EngineLink {
       // one and it has been reported by then. A connection since replaced is no news.
       queueMicrotask(() => {
         if (channel !== opened || client.state === 'failed') return
-        lost(new EngineError('unavailable', 'the engine closed the connection'))
+        // Through the client, so it stops saying `ready` over a closed socket and rejects what is
+        // in flight; the `failed` listener below reports the loss.
+        client.fail(new EngineError('unavailable', 'the engine closed the connection'))
       })
     })
     // The hello rides this call — the client sends it the moment it has a transport, and queues

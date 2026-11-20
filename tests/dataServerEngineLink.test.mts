@@ -10,6 +10,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { EngineError, createEngineClient, type EngineClient } from '../src/shared/dataServer/client'
 import { encodeLine, type ByteChannel } from '../src/shared/dataServer/ndjson'
+import { isLinkLost } from '../src/shared/dataServer/ops'
 import type { ClientMessage, EngineMessage } from '../src/shared/dataServer/protocol.generated'
 import { openEngineLink, type EngineLink } from '../src/main/dataServer/engineLink'
 import { LINK_STABLE_MS } from '../src/main/dataServer/linkKeeper'
@@ -191,6 +192,10 @@ test('A CLEAN HANG-UP IS A LOSS, and the connection is reopened under the same c
   assert.equal(view.state.loading, true)
 
   // The engine closes the socket between two messages: the transport reports nothing.
+  const asked = r.client.request('session.health', {}).then(
+    () => null,
+    (error: unknown) => error
+  )
   first.end()
   assert.deepEqual(r.losses, [], 'reported one tick later, so the client-s own reason can win')
   await tick()
@@ -199,6 +204,11 @@ test('A CLEAN HANG-UP IS A LOSS, and the connection is reopened under the same c
   assert.ok(loss instanceof EngineError)
   assert.equal(loss.message, 'the engine closed the connection')
   assert.deepEqual(retriesWaiting(r), [500])
+  // The client is told: `ready` over a closed socket is what the "Reading log..." box reads.
+  assert.equal(r.client.state, 'failed', 'the client still says ready on a connection that ended')
+  assert.equal(r.client.failure, loss)
+  assert.equal(isLinkLost(loss), true)
+  assert.equal(await asked, loss, 'a request in flight was left to wait out its deadline')
 
   r.retry()
   const second = await r.open()
@@ -212,6 +222,19 @@ test('A CLEAN HANG-UP IS A LOSS, and the connection is reopened under the same c
   first.end()
   await tick()
   assert.equal(r.losses.length, 1)
+})
+
+test('a hang-up before the hello is answered fails the client too, and is retried', async () => {
+  const r = rig()
+  r.link.start()
+  const w = await r.open()
+  assert.equal(r.client.state, 'connecting')
+  w.end()
+  await tick()
+  assert.equal(r.client.state, 'failed', 'the client waits for a hello on a connection that ended')
+  assert.equal(r.losses.length, 1)
+  assert.equal(r.link.facts().lastReason, 'unavailable: the engine closed the connection')
+  assert.deepEqual(retriesWaiting(r), [500])
 })
 
 test('a stream that ends inside a message is lost ONCE, with the reason the client gives', async () => {
