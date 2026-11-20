@@ -24,6 +24,7 @@ import {
   type BazaarSortKey
 } from '@shared/bazaar'
 import { useModule } from '../../lib/useModule'
+import { LogReadInline } from '../../components/LogReadInline'
 import { useWindowedRows } from '../../lib/useWindowedRows'
 import { useWishlist } from '../wishlist/useWishlist'
 import { ASK_COLOR, BazaarChart, OFFER_COLOR } from './BazaarChart'
@@ -332,7 +333,7 @@ export default function BazaarView({ onOpenLoot }: { onOpenLoot: (item: string) 
       <HeardAlerts />
       {ctl.offers && <BazaarQuotes quotes={offersOf(sum.items)} title="Every offer of the items below" withItem maxHeight={420} />}
       {snap === null ? (
-        <Typography variant="body2">Reading your log…</Typography>
+        <LogReadInline module={BAZAAR_MODULE_ID} served={false} />
       ) : picked === null || sum.lastDay === null ? (
         <Typography variant="body2">No trade offers {filtered ? 'match' : 'in your log yet'}.</Typography>
       ) : (

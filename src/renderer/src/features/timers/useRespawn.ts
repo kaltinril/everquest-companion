@@ -17,6 +17,11 @@ export function useRespawnSnap(): RespawnSnap {
   return snap ?? EMPTY_RESPAWN_SNAP
 }
 
+/** Has the respawn snapshot landed? "Nothing has died yet" is true only of a served one. */
+export function useRespawnServed(): boolean {
+  return useModule<RespawnSnap>('respawn') !== null
+}
+
 /** One shared 1 Hz clock; it lives in lib/ so the overlays can share it too. */
 export { useSecondsClock } from '../../lib/useSecondsClock'
 

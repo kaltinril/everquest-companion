@@ -193,6 +193,27 @@ test('THE WATCHDOG KEEPS ASKING — an engine that goes wedged mid-session is ca
   assert.equal(h.supervisor.state, 'backoff')
 })
 
+test('EVERY HEALTHY ANSWER REACHES `onHealth`, the first one included, and READY still fires once', async () => {
+  // The watchdog already asked `session.health` every 30 s and threw the status away. It is the
+  // only look at the engine's status after the read is live (fork #9, `afterLive.ts`).
+  const h = harness()
+  await launched(h)
+  assert.equal(h.healths.length, 1, 'the launch probe is an answer like any other')
+  for (let beat = 0; beat < 5; beat += 1) {
+    h.clock.advance(ENGINE_HEALTH_INTERVAL_MS)
+    await settle()
+  }
+  assert.equal(h.healths.length, 6)
+  assert.ok(h.healths.every((status) => typeof status === 'string' && status.length > 0))
+  assert.equal(h.readies.filter((engine) => engine !== null).length, 1, 'READY is an edge, not a beat')
+  assert.equal(h.supervisor.state, 'ready')
+  // A probe that fails hands on nothing.
+  h.setBehaviour('closed')
+  h.clock.advance(ENGINE_HEALTH_INTERVAL_MS)
+  await settle()
+  assert.equal(h.healths.length, 6)
+})
+
 // ---- 4b. the READY handover (JOS-479) --------------------------------------------------------
 //
 // The one thing phase 3 added to this file's surface: the launch hands out its port and its TOKEN,

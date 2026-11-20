@@ -35,7 +35,8 @@ function sameNotes(a: readonly LogReadNote[], b: readonly LogReadNote[]): boolea
   return a.every((note, i) => {
     const other = b[i]
     const same = note.id === other.id && note.text === other.text
-    return same && note.tryLine === other.tryLine && note.button === other.button
+    const about = (note.modules ?? []).join() === (other.modules ?? []).join()
+    return same && about && note.tryLine === other.tryLine && note.button === other.button
   })
 }
 
@@ -74,8 +75,10 @@ const CLOCKED: ReadonlySet<LogReadWait> = new Set<LogReadWait>([
   'finishing',
   'stalled',
   'logHung',
-  // The meter's last read stops speaking after `COMBAT_READ_FRESH_MS`.
-  'notAnswering'
+  // The meter's reads stop speaking after `COMBAT_READ_FRESH_MS`, whichever of the three they said.
+  'notAnswering',
+  'panelSlow',
+  'replyTooLarge'
 ])
 
 /** Can this report's verdict change by the clock alone? Then it is composed again every second. */

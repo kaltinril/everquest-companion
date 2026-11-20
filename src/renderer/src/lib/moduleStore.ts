@@ -118,7 +118,8 @@ interface Entry {
   pendingSeq: number
   hydrated: boolean
   fetching: boolean
-  /** The cursor moved while nobody was watching — serve the cache, then refresh. */
+  /** The cursor moved while nobody was watching, or the reply was no snapshot: the next reader
+   *  is served what is held, and asks again. */
   stale: boolean
   subs: Set<() => void>
 }
@@ -191,11 +192,15 @@ function notify(entry: Entry): void {
 
 /** Take a reply. NO SNAPSHOT IS AN ANSWER, and it is the engine-absent one (contract 1): nothing
  *  is held and nothing is invented, and the cursor is left where it was — a null reply reports
- *  none. The view draws its loading/unavailable state until a cursor or a rebuild says to re-ask. */
+ *  none. The view draws its loading/unavailable state until a cursor or a rebuild says to re-ask.
+ *  AND IT IS LEFT STALE (fork #9), so the next READER asks again: a read that timed out after
+ *  go-live answers null and moves no cursor, and a tab reopened over it would otherwise ask
+ *  nothing until that module's next line in the log. No timer and no re-ask without a new reader. */
 function absorb(entry: Entry, snap: ModuleSnapshot | null): void {
   entry.fetching = false
   entry.hydrated = true
   entry.snapshot = snap ? snap.state : null
+  entry.stale = snap === null
   if (snap) entry.seq = snap.seq
 }
 

@@ -438,3 +438,49 @@ Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`)
 - At 28 px rows (the default since): the menu is no taller than the 820 px drawer and every
   destination row reads back 28.0 px. The row heights always read back exactly as set, so the
   styling holds; only the total was wrong.
+
+## The engine against a large log (2026-11-19, owner's PC: 16 cores, 64 GB, busy with other test apps)
+
+- From `plans/2026-11-19-reading-log-robustness.md` ("Measured on a real machine"), where each
+  number has its method and its caveats. Synthetic logs of a real shape (fights of 20 to 180 s, a
+  pet, two group members) and a private copy of the owner's 99 MB log.
+- Read rate: 7 to 11 MB of log a second with CPU to spare. Attach to live: 9 to 12 s at 99 MB
+  (real), 55 to 73 s at 500 MB, 100 to 150 s at 1 GB, 208 to 270 s at 2 GB. The gap between the last
+  progress frame and live is under 0.2 s.
+- Engine memory at go-live, not released afterwards: about 0.5 GB at 99 MB (real), 2.2 to 3.1 GB at
+  500 MB, 4.3 to 5.8 GB at 1 GB, 8.6 to 11.3 GB at 2 GB: 3.8 to 5.9 MB per MB of log, by shape. The
+  combat fight history dominates it.
+- Answers once live do not slow with size: a window's meter 1 to 7 ms and a warm module 0 to 25 ms
+  up to 2 GB; the slowest first build of a module 720 to 760 ms (gaps). No window reply over 1.7 MB
+  on those logs (they were mostly before the 2026-07-28 character epoch, which clears
+  character-scoped modules such as loot: a log wholly after it grows loot at about 3.7 MB per GB of
+  that shape).
+- The reply that grows without bound is the loot history: 122 to 129 characters per looted item
+  (10.5 KB of reply per MB of the owner's log). 8 MiB (the old limit that ended the connection) is
+  about 65,000 looted items; 32 MiB (not shown) about 260,000 to 275,000; 64 MiB (not read) about
+  520,000 to 550,000. The 1.19 MB "event feed" of the first measurement is the `messageOverlay`
+  module; `eventFeed` is capped at 100 rows.
+- A long loot history is paid for on every pickup: each new loot line makes every window that holds
+  loot fetch the whole history. At 110,000 rows: engine about 45 ms, main's parse 33 to 48 ms, the
+  hand-over to a window 245 to 280 ms, main stalled 155 to 410 ms per loot line.
+- The engine refuses an ask its one reader thread has not answered within 5 s of being posted
+  (`world.rs SNAPSHOT_PATIENCE`); it still finishes the build and drops it, and the log tail and
+  every other ask wait behind it.
+- The only shape found that makes the meter's own reply large or slow is one fight (or zone stay)
+  with tens of thousands of mob instances: about 1,160 bytes and 40 to 50 microseconds per row of
+  `selected.incoming` (81 MB and 2.6 to 3.4 s at 70,111 rows). The owner's largest fight has 38 such
+  rows.
+- The watchdog: with CPU to spare a health probe on a new connection takes at most 15 ms during a
+  read (1,140 probes), and 14 launches from 99 MB to 2 GB ended no engine. With the engine starved
+  (pinned to one core shared with a normal-priority spinner) the same probe takes 4.8 to 4.9 s at
+  the median against the 5.0 s limit (7 of 83 single probes over 5 s, the worst 13.8 s; up to 18 s
+  when probes overlap), while the app's own kept connection is answered in milliseconds and was
+  never silent longer than 8.4 s. In the app: at Idle priority 4 engine restarts in 10 minutes and
+  the log never live (one run; a 6 minute re-run saw none); at BelowNormal, the app's default, 4
+  timeouts, all forgiven by the second ask, and no restart in 10 minutes, the read crawling at 0.045
+  MB/s (about 160 times slower); with every process of the app starved, one kill and then 13
+  launches that missed the 10 s announce wait (a starved engine alone announces in 4.8 to 5.1 s). A
+  kill needs two timeouts in a row, so the rate varies widely; an endless loop was shown only at
+  Idle.
+- The e2e harness switches the app's lowered priority off, so no e2e run exercises the BelowNormal
+  engine a real install runs.

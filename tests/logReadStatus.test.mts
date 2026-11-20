@@ -88,7 +88,10 @@ test('`shouldTick` is true while the verdict can move with the clock, shown or n
     { movedAt: NOW - 60_000 },
     { fold: null, logSize: 400 * MB, lastOffset: 400 * MB, movedAt: NOW - 120_000 },
     { probe: { bytes: null, problem: null, pendingMs: 15_000 }, movedAt: NOW - 60_000 },
-    { ...LIVE, lastCombatRead: { unserved: 'timed out', why: 'timedOut', at: NOW, since: NOW - 60_000 } }
+    { ...LIVE, combatReads: [{ key: 'a', unserved: 'refused', why: 'refused', code: null, at: NOW, since: NOW - 60_000 }] },
+    // The meter's verdicts lapse with the clock, whichever of the three they are.
+    { ...LIVE, combatReads: [{ key: 'a', unserved: 'timed out', why: 'timedOut', code: null, at: NOW, since: NOW - 60_000 }] },
+    { ...LIVE, combatReads: [{ key: 'a', unserved: 'too large', why: 'tooLarge', code: null, at: NOW, since: NOW - 60_000 }] }
   ]
   const seen: string[] = []
   for (const over of clocked) {
@@ -98,7 +101,7 @@ test('`shouldTick` is true while the verdict can move with the clock, shown or n
       assert.equal(shouldTick(r), true, `${r.wait} (show ${String(r.show)}) is left to go stale`)
     }
   }
-  for (const wait of ['reading', 'engineStarting', 'connecting', 'opening', 'stalled', 'finishing', 'logHung', 'notAnswering']) {
+  for (const wait of ['reading', 'engineStarting', 'connecting', 'opening', 'stalled', 'finishing', 'logHung', 'notAnswering', 'panelSlow', 'replyTooLarge']) {
     assert.ok(seen.includes(wait), `${wait} was not exercised`)
   }
   // Any wait that is not shown yet will be once it has run long: it ticks until then.

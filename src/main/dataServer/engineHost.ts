@@ -98,7 +98,7 @@ import {
 } from './supervisor'
 // THE APP'S OWN CLIENT (JOS-479, phase 3). It lives behind THIS file's flag and nothing else, which
 // is why it reads no environment variable of its own: one gate, in one place.
-import { installEngineClient, onEngineReady, stopEngineClient } from './engineClientHost'
+import { installEngineClient, noteSupervisorHealth, onEngineReady, stopEngineClient } from './engineClientHost'
 // THE RENDERERS' OWN CLIENTS (JOS-484, phase 3), behind THIS file's flag as well. The broker holds
 // no flag of its own either — it simply never learns about a launch, so its IPC handler refuses.
 import { noteEngineLaunch, stopRendererBroker } from './rendererBroker'
@@ -528,6 +528,9 @@ export function startEngineSupervisor(): void {
       noteEngineStarting()
       onEngineReady(info)
     },
+    // Every answer to the 30 s probe: the only look at the engine's status once the read is live
+    // (fork #9, `afterLive.ts`).
+    onHealth: noteSupervisorHealth,
     // THE DIAGNOSIS, WHEN IT HAS STOPPED CHANGING (JOS-503). Fires twice at most in a session and
     // is what puts the failure card on screen; `null` is a launch that reached READY and takes it
     // back off. The candidate paths are grafted on inside `noteEngineFault` from the list above.

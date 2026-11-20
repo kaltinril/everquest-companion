@@ -85,6 +85,21 @@ function appendTo(path: string, ...messages: readonly string[]): void {
   appendFileSync(path, `${messages.map((m) => `${prefix} ${m}`).join('\n')}\n`)
 }
 
+/**
+ * Play a character until the live dot answers: a line a second, for up to 20 s.
+ *
+ * The dot is lit by a line read LIVE (fork #9, phase R3: the world-changed frame no longer lights
+ * it). A line written while the switch's own re-read is still running is history by the time that
+ * read lands, so one batch written straight after the click proves nothing either way.
+ */
+async function litByPlay(page: Page, path: string): Promise<boolean> {
+  for (let i = 0; i < 20; i++) {
+    appendTo(path, ZONES[i % ZONES.length])
+    if ((await settleCount(page, LIVE_DOT, 1, { timeoutMs: 1_000, pollMs: 150 })) === 1) return true
+  }
+  return false
+}
+
 /** Keep a log growing the way a character being actively played does, until stopped. */
 function keepGrowing(path: string): () => void {
   appendTo(path, GROW_LINE)
@@ -275,11 +290,7 @@ async function run(): Promise<void> {
     // `live` false on every `log:character`), which is exactly the state the reporter was staring
     // at — so this is the assertion that taking the offer fixes what they were looking at.
     check('the dot goes dark across the rebuild', await settleGone(page, LIVE_DOT, { timeoutMs: 10_000 }))
-    appendTo(thirdPath, ...ZONES)
-    check(
-      `…and lights again on ${THIRD}'s next line`,
-      (await settleCount(page, LIVE_DOT, 1, { timeoutMs: 20_000, pollMs: 150 })) === 1
-    )
+    check(`…and lights again on ${THIRD}'s next line`, await litByPlay(page, thirdPath))
 
     // ── THE ALTERNATION BOUND: at most one ask per LOG, whichever way the pair alternates ─────
     // We are on Bantam now and nothing writes to its log, while Alterna is still being played hard.

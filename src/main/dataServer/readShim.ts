@@ -146,6 +146,26 @@ export type ServeOutcome<T> =
   | { readonly served: true; readonly value: T }
   | { readonly served: false; readonly why: FallbackReason; readonly detail: string }
 
+/** One finished read, as `observe` is told of it. */
+export interface ObservedRead {
+  readonly op: string
+  /** The question: `<op> <stableKey(params)>`, the key requests are joined on. */
+  readonly key: string
+  readonly ms: number
+  /** The fallback phrase and the reason, when it went unserved. */
+  readonly unserved?: string
+  readonly why?: FallbackReason
+  /** The engine error's code, when a request was refused with one. */
+  readonly code?: string
+}
+
+/** Why a read has no reply: the reason, and for a refusal what the engine said. */
+interface NoReply {
+  readonly why: FallbackReason
+  readonly detail?: string
+  readonly code?: string
+}
+
 export interface ShimDeps {
   /** Connection-state awareness, asked fresh per call — see `engineClientHost.engineServeReadiness`. */
   readiness: () => Readiness
@@ -164,10 +184,10 @@ export interface ShimDeps {
    * the main process must be `unref`'d (`serveShim.ts` knows).
    */
   delay: (ms: number) => Promise<void>
-  /** Every finished read: its op, how long it took, and the fallback phrase and reason when it went
-   *  unserved (slowReads.ts writes the slow and unserved ones to a file a tester can send).
-   *  Optional so the unit tests need not supply it. */
-  observe?: (op: string, ms: number, unserved?: string, why?: FallbackReason) => void
+  /** Every finished read (slowReads.ts writes the slow and unserved ones to a file a tester can
+   *  send; logReadState.ts keeps the meter's by question). Optional so the unit tests need not
+   *  supply it. */
+  observe?: (read: ObservedRead) => void
   /** How long a caller waits for `op`, when that is not `timeoutMs`. */
   timeoutFor?: (op: RequestOp) => number | undefined
   /** What is known about reply sizes; absent means no reply is ever too large (the header). */
@@ -234,6 +254,12 @@ class NotSent extends Error {
   }
 }
 
+/** A rejection's own `code`, when it carries one (`EngineError` does: the schema's). */
+function codeOf(err: unknown): string | undefined {
+  const code = err instanceof Error ? (err as { code?: unknown }).code : undefined
+  return typeof code === 'string' ? code : undefined
+}
+
 /**
  * One rejection, as a phrase. `EngineError` carries the schema's own `code`, which is the half a
  * developer branches on, so it is quoted in front of the message when there is one.
@@ -245,8 +271,8 @@ class NotSent extends Error {
 function describe(err: unknown): string {
   if (err === null || err === undefined) return 'no reason given'
   if (err instanceof Error) {
-    const code = (err as { code?: unknown }).code
-    return typeof code === 'string' ? `${code}: ${err.message}` : err.message
+    const code = codeOf(err)
+    return code === undefined ? err.message : `${code}: ${err.message}`
   }
   if (typeof err === 'string') return err
   if (typeof err === 'number' || typeof err === 'boolean' || typeof err === 'bigint') {
@@ -307,14 +333,10 @@ export function createReadShim(deps: ShimDeps): ReadShim {
   const wires = createInFlight()
 
   /** One unserved read: observed, and returned as the outcome. */
-  const unserved = <T>(
-    op: RequestOp,
-    ms: number,
-    why: FallbackReason,
-    detail = REASON_PHRASE[why]
-  ): ServeOutcome<T> => {
-    deps.observe?.(op, ms, REASON_PHRASE[why], why)
-    return { served: false, why, detail }
+  const unserved = <T>(asked: Pick<ObservedRead, 'op' | 'key'>, ms: number, no: NoReply): ServeOutcome<T> => {
+    const { why } = no
+    deps.observe?.({ ...asked, ms, unserved: REASON_PHRASE[why], why, code: no.code })
+    return { served: false, why, detail: no.detail ?? REASON_PHRASE[why] }
   }
 
   /** THE request for this question: the one already on the wire, or a new one, sent after any
@@ -339,7 +361,7 @@ export function createReadShim(deps: ShimDeps): ReadShim {
     op: O,
     params: ParamsFor<O>,
     key: string
-  ): Promise<{ reply: ResultFor<O> } | { why: FallbackReason; detail?: string }> => {
+  ): Promise<{ reply: ResultFor<O> } | NoReply> => {
     // The caller's own wait, plus any hold main itself puts on the request.
     const hold = deps.sizeGate?.delayFor(key, deps.now()) ?? 0
     const wait = (deps.timeoutFor?.(op) ?? deps.timeoutMs) + hold
@@ -350,7 +372,7 @@ export function createReadShim(deps: ShimDeps): ReadShim {
     } catch (err) {
       if (err instanceof NotSent) return { why: err.why }
       if (isTooLarge(err)) return { why: 'tooLarge' }
-      return { why: 'refused', detail: `${op} — ${describe(err)}` }
+      return { why: 'refused', detail: `${op} — ${describe(err)}`, code: codeOf(err) }
     }
   }
 
@@ -363,22 +385,23 @@ export function createReadShim(deps: ShimDeps): ReadShim {
     // put on a wire that is not there would come back as `refused` anyway, but it would come back
     // saying the wrong thing about WHY — and `why` is the whole value of the note.
     const ready = deps.readiness()
-    if (!ready.ok) return unserved(op, 0, ready.why)
     const key = `${op} ${stableKey(params)}`
-    if (blocked(key)) return unserved(op, 0, 'tooLarge')
+    const asked = { op, key }
+    if (!ready.ok) return unserved(asked, 0, ready)
+    if (blocked(key)) return unserved(asked, 0, { why: 'tooLarge' })
     const t0 = deps.now()
     const got = await awaitReply(op, params, key)
     const ms = deps.now() - t0
-    if (!('reply' in got)) return unserved(op, ms, got.why, got.detail)
+    if (!('reply' in got)) return unserved(asked, ms, got)
     // ASKED AGAIN: the wait above can be seconds, and a reply that landed after the world changed
     // hands is about the last one (or a prefix of the next).
     const still = deps.readiness()
-    if (!still.ok) return unserved(op, ms, still.why)
+    if (!still.ok) return unserved(asked, ms, still)
     // Main read it, but it is over what a window may be handed: the gate heard before the reply did.
-    if (blocked(key)) return unserved(op, ms, 'tooLarge')
+    if (blocked(key)) return unserved(asked, ms, { why: 'tooLarge' })
     const value = project(got.reply)
-    if (value === null) return unserved(op, ms, 'guess', `${op} answered, unusably`)
-    deps.observe?.(op, ms)
+    if (value === null) return unserved(asked, ms, { why: 'guess', detail: `${op} answered, unusably` })
+    deps.observe?.({ ...asked, ms })
     return { served: true, value }
   }
 

@@ -33,12 +33,15 @@ import RefreshIcon from '@mui/icons-material/Refresh'
 import type { CountSource } from '@shared/types'
 import type { WindowLootRates } from '@shared/lootRates'
 import type { Timeslice } from '@shared/timeslice'
+import { tabLineText } from '@shared/logReadWords'
+import { useTabLine } from '../../components/LogReadInline'
 import { formatDateTime, formatTime } from '../../lib/formatDate'
 import { KnownItemTooltip } from '../../lib/KnownItemTooltip'
 import { COUNT_SOURCE_OPTIONS } from '../inventory/countSource'
 import type { GroupRow } from './lootGrouping'
 import { LOOT_RATE_TITLE, lootRateText } from './lootRateText'
 import { DEFAULT_LOOT_SORT, isLootSortKey, naturalDir, nextLootSort, type LootSort, type LootSortKey } from './lootSort'
+import { useLootServed } from './useLootHistory'
 
 // The grouped table's order survives restarts, the way the Quests tab's does (useQuestList's
 // `eq.questSort`). An unknown stored key falls back to the default rather than sorting by nothing;
@@ -296,8 +299,18 @@ export function LootSummary({
   )
 }
 
-// Nothing parsed yet is a STATE, not an error: say where the rows will come from.
-function NoLootYet(): JSX.Element {
+// Nothing parsed yet is a STATE, not an error: say where the rows will come from. With no loot
+// snapshot at all it is the app that has nothing yet: the same box says what it is waiting on.
+function NoLootYet(): JSX.Element | null {
+  const line = useTabLine('loot', useLootServed())
+  if (line === null) return null
+  if (line.kind === 'waiting') {
+    return (
+      <Alert severity="info" data-testid="log-read-inline">
+        {tabLineText(line)}
+      </Alert>
+    )
+  }
   return (
     <Alert severity="info">
       No loot parsed yet. Loot something in-game (or check your log path) - every{' '}

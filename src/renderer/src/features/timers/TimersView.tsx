@@ -116,8 +116,10 @@ import { RESPAWN_TOGGLE_SX, UnwatchButton } from './UnwatchButton'
 import { ClearAllClocks } from './ClearAllClocks'
 import { RespawnAlertControl } from './RespawnAlertControl'
 import { MobNameLink, ZoneLink, type TimerLinks } from './timerLinks'
+import { LogReadInline } from '../../components/LogReadInline'
 import {
   useConfirmSighting,
+  useRespawnServed,
   useRespawnSnap,
   useSecondsClock,
   useSetCustom,
@@ -342,6 +344,8 @@ function RecentEmpty({
   anyRecent: number
   zoneName: string
 }): JSX.Element {
+  // With no respawn snapshot the list is empty because nothing was served, not because nothing died.
+  const served = useRespawnServed()
   // A search that matched nothing is a different state from an empty log, and saying so is what
   // keeps a typo from reading as "this dungeon killed nothing".
   const text =
@@ -351,9 +355,11 @@ function RecentEmpty({
         ? `Nothing has died in ${zoneName} yet. ${anyRecent} elsewhere.`
         : 'Nothing has died yet in this log.'
   return (
-    <Typography variant="body2" color="text.secondary" data-testid="respawn-recent-empty">
-      {text}
-    </Typography>
+    <LogReadInline module="respawn" served={served}>
+      <Typography variant="body2" color="text.secondary" data-testid="respawn-recent-empty">
+        {text}
+      </Typography>
+    </LogReadInline>
   )
 }
 

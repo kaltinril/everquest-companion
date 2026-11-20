@@ -265,7 +265,12 @@ test('JOS-158: the meters state their aggregate in the panel, not in the title b
   for (const [who, rel] of Object.entries(METERS)) {
     const headerEl = /<OverlayHeader[\s\S]*?\/>/.exec(src(rel))?.[0] ?? ''
     assert.ok(headerEl.length > 0, `${who} renders no OverlayHeader`)
-    assert.doesNotMatch(headerEl, /tail=/, `${who} still puts its aggregate in the title bar`)
+    // THE ONE TAIL A METER MAY PASS (fork #9): the log-read status's short label, which is absent
+    // on a healthy meter and never a number. Anything else beside the name is the aggregate back.
+    const status = 'tail={head.tail}'
+    assert.ok(headerEl.includes(status), `${who} no longer says why its numbers have stopped`)
+    assert.doesNotMatch(headerEl.replace(status, ''), /tail=/, `${who} still puts its aggregate in the title bar`)
+    assert.match(src(rel), /const head = overlayTitle\(useLogReadReport\(\), hydrating, headerName\)/)
   }
 
   // BOTH BAR BODIES, THROUGH THE ONE CRUMB. Neither may state the aggregate its own way.
