@@ -205,6 +205,59 @@ test("a newer log's first line that restated the older level is not a raise", ()
   assert.equal(merged(older, later).items[0].sessionRaises, 1)
 })
 
+const NO_FISH = { casts: 0, caught: 0, nothing: 0, lostBait: 0, spilled: 0, poleBroke: 0 }
+
+test('fishing and forage: counts add, the session is the newer log, an item keeps its later time', () => {
+  const older: CraftingSnap = {
+    ...EMPTY,
+    fishing: {
+      casts: 72, caught: 33, nothing: 35, lostBait: 2, spilled: 8, poleBroke: 0,
+      session: { casts: 9, caught: 4, nothing: 5, lostBait: 0, spilled: 1, poleBroke: 0 },
+      items: [{ item: 'Fresh Fish', count: 20, lastTs: 500 }, { item: 'Fish Scales', count: 6, lastTs: 400 }]
+    },
+    forage: { found: 659, failed: 659, session: { found: 12, failed: 10 }, items: [{ item: 'Roots', count: 300, lastTs: 600 }, { item: 'Berries', count: 359, lastTs: 550 }] }
+  }
+  const newer: CraftingSnap = {
+    ...EMPTY,
+    fishing: {
+      casts: 131, caught: 64, nothing: 62, lostBait: 4, spilled: 16, poleBroke: 2,
+      session: { casts: 3, caught: 1, nothing: 2, lostBait: 0, spilled: 0, poleBroke: 1 },
+      items: [{ item: 'Rusty Dagger', count: 9, lastTs: DAY + 5 }, { item: 'Fresh Fish', count: 28, lastTs: DAY + 9 }]
+    },
+    forage: { found: 550, failed: 588, session: { found: 0, failed: 0 }, items: [{ item: 'Roots', count: 78, lastTs: DAY }] }
+  }
+  const out = merged(older, newer)
+  assert.deepEqual(out.fishing, {
+    casts: 203, caught: 97, nothing: 97, lostBait: 6, spilled: 24, poleBroke: 2,
+    session: newer.fishing?.session,
+    // The older log's rows in their order, then the newer log's new names.
+    items: [{ item: 'Fresh Fish', count: 48, lastTs: DAY + 9 }, { item: 'Fish Scales', count: 6, lastTs: 400 }, { item: 'Rusty Dagger', count: 9, lastTs: DAY + 5 }]
+  })
+  assert.deepEqual(out.forage, {
+    found: 1209, failed: 1247,
+    session: { found: 0, failed: 0 },
+    items: [{ item: 'Roots', count: 378, lastTs: DAY }, { item: 'Berries', count: 359, lastTs: 550 }]
+  })
+})
+
+test('a log with no fishing or forage of its own leaves the other log its counts and no session', () => {
+  const fished: CraftingSnap = {
+    ...EMPTY,
+    fishing: { casts: 3, caught: 1, nothing: 1, lostBait: 0, spilled: 0, poleBroke: 0, session: { ...NO_FISH, casts: 3, caught: 1, nothing: 1 }, items: [{ item: 'Fresh Fish', count: 1, lastTs: 9 }] }
+  }
+  // Archived fishing under a live log that has none: the session there is over.
+  const carried = merged(fished, EMPTY)
+  assert.deepEqual(carried.fishing, { casts: 3, caught: 1, nothing: 1, lostBait: 0, spilled: 0, poleBroke: 0, session: NO_FISH, items: fished.fishing?.items })
+  assert.equal('forage' in carried, false)
+  // An archive folded before the engine counted fishing: the live log's stands as it is.
+  assert.deepEqual(merged(EMPTY, fished).fishing, fished.fishing)
+  // Neither log: no key at all.
+  assert.equal('fishing' in merged(EMPTY, EMPTY), false)
+  // The empty template mergeModule tests a shape with ({} for an object) reads as zeros.
+  assert.equal(mergeModule('crafting', [fished], { ...EMPTY, fishing: fished.fishing }).used, 1)
+  assert.equal((mergeModule('crafting', [fished], fished).state as CraftingSnap).fishing?.casts, 6)
+})
+
 test('a state of another shape is not joined', () => {
   assert.equal(mergeCrafting({ rows: [] }, LIVE), null)
   assert.equal(mergeCrafting(ARCHIVED, null), null)

@@ -1,6 +1,7 @@
 //! Crafting: what the log says of the player's tradeskill combines (fork #6). Compact aggregates
 //! only, no per-combine list: one row per item combined, the runs of combines (spans, for pace),
-//! what merchants were paid and paid back, and the depot stock the game last stated.
+//! what merchants were paid and paid back, and the depot stock the game last stated. Fishing and
+//! forage outcomes ride in the same snapshot (`crafting_gather.rs`).
 //!
 //! Measured on the owner's archive (MEASURED.md, "Combines in detail"):
 //! - A combine's line never names its tradeskill. A raise printed in the combine's second does,
@@ -14,6 +15,7 @@
 //!   counted. Neither is a combine. The by-product line prints in its combine's second (4 of 4,
 //!   each after a failed Brewing combine) and is counted on that combine's item.
 
+use super::crafting_gather::Gather;
 use super::crafting_money::{consumed_of, Money};
 use super::crafting_spans::Spans;
 use super::gaps::craft::{alternate_product_of, failed_combine_of, is_tradeskill, Combines};
@@ -145,6 +147,7 @@ pub struct CraftingModule {
     levels: Rows<LevelRow>,
     spans: Spans,
     money: Money,
+    gather: Gather,
     /// The last tradeskill line and the last combine, each waiting for the other in its second.
     pairing: Combines,
     tick: Option<Tick>,
@@ -165,7 +168,8 @@ impl CraftingModule {
     /// A same-name rebirth: everything counted belongs to the character before it. True when
     /// there was anything.
     fn clear(&mut self) -> bool {
-        let had = !(self.items.is_empty() && self.levels.is_empty() && self.money.is_empty());
+        let had = !(self.items.is_empty() && self.levels.is_empty() && self.money.is_empty() && self.gather.is_empty());
+        self.gather.clear();
         self.items.clear();
         self.levels.clear();
         self.spans.clear();
@@ -189,7 +193,7 @@ impl CraftingModule {
         for level in &mut self.levels.list {
             changed |= std::mem::take(&mut level.first_in_session);
         }
-        changed
+        changed | self.gather.end_session()
     }
 
     /// A combine of `item`, made or failed. Always a change.
@@ -287,7 +291,7 @@ impl CraftingModule {
     }
 
     /// The lines the parser leaves unknown: a failed combine, the trivial notice, a depot draw,
-    /// a combine's by-product.
+    /// a combine's by-product, a fishing or a forage line.
     fn line(&mut self, text: &str, ts: i64) -> bool {
         if let Some(item) = failed_combine_of(text) {
             return self.combine(item, false, ts);
@@ -299,7 +303,10 @@ impl CraftingModule {
         if let Some(c) = consumed_of(text) {
             return self.money.consumed(&c, ts);
         }
-        alternate_product_of(text).is_some() && self.by_product(ts)
+        if alternate_product_of(text).is_some() {
+            return self.by_product(ts);
+        }
+        self.gather.line(text, ts)
     }
 }
 
@@ -340,8 +347,8 @@ impl EqModule for CraftingModule {
     }
 
     /// Moves on a combine, a by-product counted on one, a credited or first-stated raise, a
-    /// merchant line, a depot draw, a session end that zeroed something, or an epoch that emptied
-    /// the tables.
+    /// merchant line, a depot draw, a fishing or forage line, a session end that zeroed something,
+    /// or an epoch that emptied the tables.
     fn published_seq(&self) -> Option<i64> {
         Some(self.announce.cursor())
     }
@@ -357,6 +364,13 @@ impl EqModule for CraftingModule {
         });
         if let Some(older) = self.spans.older() {
             state["olderSpans"] = json!(older);
+        }
+        // Absent until the log has a line of the kind: most characters never fish.
+        if let Some(fishing) = self.gather.fishing() {
+            state["fishing"] = fishing;
+        }
+        if let Some(forage) = self.gather.forage() {
+            state["forage"] = forage;
         }
         json!({ "seq": self.seq, "state": state })
     }

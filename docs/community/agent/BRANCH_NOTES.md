@@ -1779,6 +1779,36 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
 - `depot` is the newest `(leaving N)` of a `Consumed` line. A deposit or a withdrawal states no
   count, so the number is as old as the item's last draw.
 - Session = since the newest `offlineGap`; an epoch clears every table (the zone is kept).
+- Fishing and forage (2026-11-20, `crafting_gather.rs`, tests `crafting_gather_tests.rs`): the
+  snapshot gains `fishing` (`casts`, `caught`, `nothing`, `lostBait`, `spilled`, `poleBroke`,
+  `session` with the same six, `items`) and `forage` (`found`, `failed`, `session`, `items`);
+  an item row is `item`, `count`, `lastTs`. Each key is absent until the log has a line of its
+  kind, and from an engine or an archive older than this, so both are optional in `CraftingSnap`.
+  - No parser kind and no protocol change: all eight shapes are `unknown` lines (a test holds the
+    real parser to that). The two that name an item are read with Wiki Gaps' `caught_of` and
+    `forage_of` (`gaps_players.rs`), one copy: a change there changes both features. A forage's
+    leading `a `/`an ` is dropped, as on the Gaps row.
+  - Line counts, no state machine. A cast and its outcome are counted apart, so a cast with no
+    outcome (zoned, interrupted) is in `casts` and in nothing else. `fishingRate` is `caught`
+    over `caught + nothing`.
+  - `lostBait`, `spilled` and `poleBroke` are not outcomes: each prints beside a `You didn't
+    catch anything.` of its second (32 of 32), so `nothing` holds those casts already. Adding
+    them to a denominator counts a cast twice.
+  - `You caught something...` is a catch the game does not name: in `caught`, in no item row.
+    `unnamedCatches` is `caught` less the rows' sum.
+  - The item rows are not capped: one row per distinct name, 5 fished and 15 to 26 foraged per
+    log on the owner's three (MEASURED.md). The session has totals only, no per-item column.
+  - A catch or a forage is never a combine or a purchase: the module counts a combine only on an
+    `itemReceived` with `via` fashioned or a failed-combine line, a purchase only on `purchase`.
+  - Archives (`mergeCrafting.ts joinGathered`): counts and item counts add, the session is the
+    newer log's, an item's `lastTs` the later. A side without the key reads as zeros, which is
+    also how `mergeModule`'s empty template (`fishing: {}`) passes.
+  - Trap: a sealed archive keeps the state it was folded with. It gains `fishing` and `forage`
+    when it is refolded: by itself once the app's version moves (`refreshLackingHistories`), or by
+    Refresh on its card. Until then a joined total holds the live log's counts only (the owner's
+    October archive has 72 casts and 659 forages the dev build will not show before a refresh).
+  - Not built: a screen; the zone a fish or a forage came from (Wiki Gaps keeps those for its own
+    rows); pace per hour (the Skills tab states raises per hour for Fishing and Forage).
 - Archives: `crafting` is in `CAPTURED_MODULES` and `MERGE_RULES` (`mergeCrafting.ts`). Counts
   add; session columns, last price, merchant, depot count and level are the newer log's; the
   first raise is the older log's. Spans are concatenated, bridged when an archive cut a run

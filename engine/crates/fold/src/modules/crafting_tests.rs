@@ -18,11 +18,11 @@ const TRIVIAL: &str = "You can no longer advance your skill from making this ite
 const REFUSED: &str = "Sorry, but you don't have everything you need for this recipe in your general inventory.";
 
 /// One log line of 2026-08-15 at `clock` (`00:15:14`).
-fn at(clock: &str, text: &str) -> String {
+pub(super) fn at(clock: &str, text: &str) -> String {
     format!("[Sat Aug 15 {clock} 2026] {text}")
 }
 
-fn read(m: &mut CraftingModule, lines: &[String]) {
+pub(super) fn read(m: &mut CraftingModule, lines: &[String]) {
     let parser = eqlog::parser_for("Tester", eqlog::Tz::UTC);
     let mut ev = Ev::new();
     for line in lines {
@@ -32,20 +32,20 @@ fn read(m: &mut CraftingModule, lines: &[String]) {
     }
 }
 
-fn fold(lines: &[String]) -> CraftingModule {
+pub(super) fn fold(lines: &[String]) -> CraftingModule {
     let mut m = CraftingModule::new();
     read(&mut m, lines);
     m
 }
 
 /// A derived event, which the parser never writes.
-fn derived(m: &mut CraftingModule, kind: &str) {
+pub(super) fn derived(m: &mut CraftingModule, kind: &str) {
     let seq = m.snapshot()["seq"].as_i64().unwrap_or(0) + 1;
     let ev = Event::from_json(&json!({ "kind": kind, "seq": seq, "ts": 0 }).to_string()).expect("a JSON event");
     m.on_event(&ev, false);
 }
 
-fn state(m: &CraftingModule) -> Value {
+pub(super) fn state(m: &CraftingModule) -> Value {
     m.snapshot()["state"].clone()
 }
 
