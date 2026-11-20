@@ -132,3 +132,25 @@ test('quests: a read page on no list that files itself as a quest joins the list
   assert.deepEqual(fold.members.map((m) => m.title), ['Armor Quest', 'Faction Quest List', 'Gone Quest', 'Unfortunate news'])
   assert.deepEqual(fold.fresh.map((p) => p.pageid), [72900, 72903])
 })
+
+test('quests: an edited page folds with its faction lines read as scrape:quests reads them', () => {
+  // The delta parses a changed page with scrape-quests.ts's own buildCatalog, so the plain name,
+  // the label and the figure beside the verb reach quests.json from a delta too.
+  const cache = questCache()
+  const edited = [
+    QUEST,
+    '* Your faction standing with Kerra Isle has been adjusted by 20.',
+    '* Your faction standing with [[King Tormax (Faction)|King Tormax]] got worse. (-5)'
+  ].join('\n')
+  const fold = foldQuests(cache, catalog('Armor Quest', QUEST), {
+    pages: new Map([['Armor Quest', edited]]),
+    ids: ids([['Armor Quest', 1, 11]]),
+    aux: new Map()
+  })
+  assert.deepEqual(fold.folded, ['Armor Quest'])
+  assert.deepEqual(fold.quests[0].factions, [
+    { name: 'Kerra Isle', plain: true, up: true, amount: 20 },
+    { name: 'King Tormax (Faction)', label: 'King Tormax', up: false, amount: -5 }
+  ])
+  assert.deepEqual(fold.quests, catalog('Armor Quest', edited))
+})

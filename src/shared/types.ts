@@ -491,11 +491,19 @@ export interface PoskyData {
  * (a signed number, sometimes parenthesised). `amount` is carried only when the page said one.
  */
 export interface QuestFactionHit {
-  /** the faction's wiki page title — matches the `/outputfile faction` dump's Name column */
+  /** the faction's wiki page title — matches the `/outputfile faction` dump's Name column. When
+   *  `plain`, the page's own spelling instead. */
   name: string
+  /** the link's label when the line pipes one that differs from the title
+   *  (`[[King Tormax (Faction)|King Tormax]]`): mostly the game's name for a disambiguated page */
+  label?: string
+  /** the line named the faction in plain text, no link: `name` is the page's own spelling
+   *  (spaced as the game spaces it; a run-together `LegionofCabilis` is not read), no wiki title */
+  plain?: boolean
   /** the direction: raised (true) or lowered */
   up: boolean
-  /** the signed per-turn-in delta, only when the page stated a number */
+  /** the signed per-turn-in delta, only when the page stated a number: `adjusted by N`, or a
+   *  figure beside `got better` / `got worse` (`(+5)`), signed by the verb */
   amount?: number
 }
 
