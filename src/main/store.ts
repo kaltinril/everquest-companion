@@ -91,7 +91,7 @@ const emptyProgress: ProgressState = {
  *  separates the store's own cost from the bundle evaluation before it in the startup summary. */
 export const STORE_OPEN_START_MS = performance.now()
 
-const schemaMigration = migrateStoreFile(join(USER_DATA, `${STORE_NAME}.json`), {
+export const schemaMigration = migrateStoreFile(join(USER_DATA, `${STORE_NAME}.json`), {
   info: (message) => logInfo(`[everquest-companion] ${message}`),
   error: (message) => logError('main:storeSchema', message)
 })

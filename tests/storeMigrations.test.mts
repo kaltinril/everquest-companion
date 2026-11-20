@@ -28,7 +28,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -444,6 +444,27 @@ test('a CORRUPT store file is quarantined instead of bricking every launch', () 
       assert.equal(errors.length, 1)
     })
   }
+})
+
+test('a store restored from a backup says which copy it was and when that copy was saved', () => {
+  // The backup is as old as the last schema upgrade, so the player has to be told its date.
+  const body = readFileSync(join(FIXTURES, 'store-v3-alerts.json'), 'utf8')
+  const backupName = 'everquest-companion-progress.v3.backup.json'
+  inTempDir({ [STORE]: '{"byCharacter": {"a": 1', [backupName]: body }, (dir) => {
+    const path = join(dir, STORE)
+    const savedAtMs = statSync(join(dir, backupName)).mtimeMs
+    const out = migrateStoreFile(path, { error: () => undefined })
+
+    assert.equal(out.salvagedFrom, 'backup')
+    assert.deepEqual(out.salvagedBackup, { version: 3, savedAtMs })
+    assert.equal(out.wrote, true, 'and the restored store is back on the live path')
+  })
+  // The player's own torn bytes carry no such date: they are the latest settings.
+  inTempDir({ [STORE]: `${body}\u0000\u0000` }, (dir) => {
+    const out = migrateStoreFile(join(dir, STORE), { error: () => undefined })
+    assert.equal(out.salvagedFrom, 'torn-bytes')
+    assert.equal(out.salvagedBackup, undefined)
+  })
 })
 
 // ------------------------------------------------------------- long chains + failure

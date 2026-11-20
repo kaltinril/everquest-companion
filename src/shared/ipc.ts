@@ -1259,6 +1259,12 @@ export const IPC = {
   // `{ found: false }`, or `{ offline: true }`.
   gapMobPageRead: 'gaps:mobPageRead',
 
+  // renderer(main app) -> main: what happened to a damaged settings file at this launch
+  // (shared/settingsRecovery.ts). Returns SettingsRecoveryNotice, or null when it opened normally.
+  settingsRecoveryGet: 'settingsRecovery:get',
+  // renderer(main app) -> main, FIRE-AND-FORGET: the player closed that notice. No payload.
+  settingsRecoverySeen: 'settingsRecovery:seen',
+
   // ---- error harness (renderer -> main, fire-and-forget) ----
   // window.onerror / onunhandledrejection / React ErrorBoundary report here so
   // renderer crashes land in errors.log + dev stdout and never leave a blank window.
