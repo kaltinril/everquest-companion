@@ -119,6 +119,24 @@ test('…and a frame with nothing to say still carries nothing, which is nearly 
   assert.deepEqual(Object.keys(firing ?? {}).sort(), ['alertId', 'matchedText', 'ts'])
 })
 
+test('TWO ALERTS SHARE A NAME AND ONE IS OFF: the fire belongs to the one that is on', () => {
+  // The engine never compiles a switched-off def, so a fire can only have come from an enabled one.
+  // The old alert was switched off and a new one made under the same name, both on the default sound.
+  const old = def({ id: 'old', name: 'Tell', enabled: false, speech: { mode: 'custom', phrase: 'guild' } })
+  const live = def({ id: 'new', name: 'Tell', speech: { mode: 'custom', phrase: 'tell' } })
+  assert.equal(fireToFiring(fire({ rule: 'Tell' }), [old, live])?.alertId, 'new')
+  // The sound key still separates two enabled twins, as it always has.
+  const other = def({ id: 'other', name: 'Tell', sound: { packId: 'classic', soundId: 'bell' } })
+  assert.equal(fireToFiring(fire({ rule: 'Tell' }), [other, live])?.alertId, 'new')
+})
+
+test('…and a fire whose only namesake is switched off plays nothing', () => {
+  // Switched off between the push and the fire: an alert the player turned off must not speak.
+  assert.equal(fireToFiring(fire(), [def({ id: 'a', name: 'Charm break', enabled: false })]), null)
+  // A name no def answers to is still nothing.
+  assert.equal(fireToFiring(fire({ rule: 'Gone' }), [def({ id: 'a', name: 'Charm break' })]), null)
+})
+
 // ---- the words (JOS-500, ruling 27) -------------------------------------------------------------
 //
 // The frame grew three fields and this function COPIES them. What is proven here is the copy and
