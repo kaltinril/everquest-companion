@@ -296,6 +296,51 @@ test('NO SNAPSHOT IS AN ANSWER: a null reply is held as null, never smoothed int
   off()
 })
 
+test('A NULL REPLY IS ASKED AGAIN BY THE NEXT READER: reopening the tab is a way out', async () => {
+  // A read that timed out after go-live answers null and moves no cursor. The entry counted as
+  // settled, so leaving the tab and coming back asked nothing, and the tab stayed on "no reply
+  // yet" until that module's next line in the log (fork #9).
+  const { spy, store } = harness()
+  const keep = store.subscribe('character', () => undefined)
+  const off = store.subscribe('leveling', () => undefined)
+  await spy.replyNone('leveling')
+  assert.equal(spy.fetchesOf('leveling'), 1, 'a null reply was asked again with nobody new reading')
+  assert.equal(spy.frames(), 0, 'a null reply armed a fetch by itself')
+  off()
+
+  let told = 0
+  const again = store.subscribe('leveling', () => {
+    told += 1
+  })
+  assert.equal(spy.fetchesOf('leveling'), 2, 'the tab was reopened and nothing asked again')
+  const state = { levels: [{ level: 60, ts: 1 }] }
+  await spy.reply('leveling', state, 4)
+  assert.equal(store.getSnapshot('leveling'), state)
+  assert.equal(told, 1)
+
+  // An ANSWER is not asked again: a second reader of a served module costs nothing.
+  const second = store.subscribe('leveling', () => undefined)
+  assert.equal(spy.fetchesOf('leveling'), 2, 'a served module was fetched again for a new reader')
+  second()
+  again()
+  keep()
+})
+
+test('a second reader of a module still unanswered joins the fetch that is out', async () => {
+  const { spy, store } = harness()
+  const a = store.subscribe('gaps', () => undefined)
+  await spy.replyNone('gaps')
+  const b = store.subscribe('gaps', () => undefined)
+  const c = store.subscribe('gaps', () => undefined)
+  assert.equal(spy.fetchesOf('gaps'), 2, 'each new reader of a null module opened its own fetch')
+  await spy.replyNone('gaps')
+  assert.equal(spy.frames(), 0)
+  assert.equal(spy.fetchesOf('gaps'), 2, 'a null reply was asked again with no new reader')
+  a()
+  b()
+  c()
+})
+
 // ---- the character switch ----------------------------------------------------------------------
 
 test('A CHARACTER SWITCH CLEARS THE STORE, TELLS EVERY READER, AND ASKS AGAIN AT ONCE', async () => {
