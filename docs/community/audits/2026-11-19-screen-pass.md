@@ -332,7 +332,9 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   ... Test: Only the running app shows this, so it needs an e2e check. Add it to
   tests/e2e/sky-cleanup.e2e.mts near step 4b, which already zeroes a row with the pencil and takes
   it back. With at least one row zeroed, check that ...
-- CONFIRMED [medium, broken] At the minimum window the Quests tab leaves the quest list 54 px, and
+- FIXED 2026-11-19 (the list keeps a 240 px floor and the page scrolls; measured by
+  `tests/e2e/sky-quests-min-window.e2e.mts`. Seen while measuring and NOT fixed: at 900x600 the quest
+  list also scrolls sideways, at 100% and at 125% text) [medium, broken] At the minimum window the Quests tab leaves the quest list 54 px, and
   at 125% text 0 px: the '+', '-' and the row's pencil cannot be clicked Seen: 900x600: column 528
   px = tabs 36 + filter bar 270 + counts row 76 + achievements line 15 + list 66 (scroll box
   clientHeight 54 for 512 px of content). Real clicks on '+', '-' and the pencil work only after

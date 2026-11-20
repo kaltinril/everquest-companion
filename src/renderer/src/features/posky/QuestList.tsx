@@ -93,6 +93,9 @@ function ListFooter({ total, list }: { total: number; list: QuestListState }): J
  */
 const NO_SHARED_ITEMS: SharedItem[] = []
 
+/** The least height the list keeps: about one open quest's header, its turn-in row and the start of its items. */
+const QUEST_LIST_MIN_PX = 240
+
 /**
  * How many rows the render that MOUNTS this list draws. About one screen of collapsed accordions
  * at the default window height, so the first paint is the list the user sees and nothing below the
@@ -179,7 +182,10 @@ export function QuestList({
   )
   const cap = useFirstScreen(quests.length, list.visibleCount)
   return (
-    <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
+    // THE FLOOR: the list takes what the filters leave, and at the minimum window that was 54 px (0
+    // at 125% text), so a quest's "+", "-" and pencil could not be reached. With a floor the tab's
+    // column grows past the window instead and the page's own scroller brings the list up.
+    <Box data-testid="posky-quest-list" sx={{ flexGrow: 1, overflow: 'auto', minHeight: QUEST_LIST_MIN_PX }}>
       {quests.slice(0, cap).map((q) => (
         <QuestAccordion
           // The NONCE rides the key for the anchored quest alone: the accordion is uncontrolled
