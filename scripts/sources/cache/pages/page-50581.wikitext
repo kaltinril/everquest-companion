@@ -33,7 +33,7 @@ All summoned pets are Warriors, and most have an additional class as well. The W
 |-
 |[[Magician|Magician's]] Monster Summoning
 |[[Berserker]]
-|Frenzy and Flurry
+|Frenzy
 |-
 |[[Necromancer|Necromancer's]] Undead
 |[[Shadow Knight]]
@@ -316,67 +316,117 @@ Beastlord pets do not have a reagent required to summon.
 ! Character Level
 ! Pet Spell
 ! Pet Level
-! Base Melee Ratio
+! Hit Points
+! Damage
+! Delay
 !Bonus Damage
 !Dual Wield
 |-
 | style="text-align:center;"|'''1'''
-| [[Pendril's Animation Summon|Pendril's Animation]]|| 1 || 4/30? (0.XXX) 
+| [[Pendril's Animation Summon|Pendril's Animation]]
+| 1 
+| ???
+|
+| 4 
 | +?
 |X?
 |-
 | style="text-align:center;"|'''2'''
-| [[Juli's Animation Summon|Juli's Animation]]|| 5 || 7/30? (0.XXX) 
+| [[Juli's Animation Summon|Juli's Animation]]
+| 5 
+| ???
+|
+| 7 
 | +?
 |X?
 |-
 | style="text-align:center;"|'''7'''
-| [[Mircyl's Animation Summon|Mircyl's Animation]]|| 9 || 8/30? (0.XXX) 
+| [[Mircyl's Animation Summon|Mircyl's Animation]]
+| 9 
+| ???
+|
+| 8 
 | +?
 |X?
 |-
 | style="text-align:center;"|'''9'''
-| [[Kilan's Animation Summon|Kilan's Animation]]|| 11 || 9/30? (0.XXX) 
+| [[Kilan's Animation Summon|Kilan's Animation]]
+| 11 
+| ???
+|
+| 9 
 | +?
 |X?
 |-
 | style="text-align:center;"|'''14'''
-| [[Shalee's Animation Summon|Shalee's Animation]]|| 16 || X/30? (0.XXX) 
+| [[Shalee's Animation Summon|Shalee's Animation]]
+| 16
+| ??? 
+|
+| X 
 | +?
 |X?
 |-
 | style="text-align:center;"|'''17'''
-| [[Sisna's Animation Summon|Sisna's Animation]]|| 19 || 11/20 (0.55) 
+| [[Sisna's Animation Summon|Sisna's Animation]]
+| 19 
+| ???
+|
+| X 
 | +?
 | 10-20%
 |-
 | style="text-align:center;"|'''22'''
-| [[Sagar's Animation Summon|Sagar's Animation]]|| 22 || X/30? (0.XXX) 
+| [[Sagar's Animation Summon|Sagar's Animation]]
+| 22 
+| ???
+|
+| X 
 | +?
 |X?
 |-
 | style="text-align:center;"|'''29'''
-| [[Uleen's Animation Summon|Uleen's Animation]]|| 25 || X/30? (0.XXX) 
+| [[Uleen's Animation Summon|Uleen's Animation]]
+| 25 
+| ???
+|
+| X 
 | +?
 |X?
 |-
 | style="text-align:center;"|'''31'''
-| [[Boltran's Animation Summon|Boltran's Animation]]|| 28 || X/30? (0.XXX) 
+| [[Boltran's Animation Summon|Boltran's Animation]]
+| 28 
+| ???
+| X
+| X 
 | +?
 |X?
 |-
 | style="text-align:center;"|'''37'''
-| [[Aanya's Animation Summon|Aanya's Animation]]|| 31 || X/30? (0.XXX) 
+| [[Aanya's Animation Summon|Aanya's Animation]]
+| 31 
+| ???
+|
+|
 | +?
 |X?
 |-
 | style="text-align:center;"|'''41'''
-| [[Yegoreff's Animation Summon|Yegoreff's Animation]]|| 34 || X/30? (0.XXX) 
+| [[Yegoreff's Animation Summon|Yegoreff's Animation]]
+| 34 
+| ???
+|
+| X 
 | +?
 |X?
 |-
 | style="text-align:center;"|'''48'''
-| [[Kintaz's Animation Summon|Kintaz's Animation]]|| 39 || 21/28 (0.750) 
+| [[Kintaz's Animation Summon|Kintaz's Animation]]
+| 39 
+| 2393
+| 21?
+| 28? 
 | +10
 |X?
 |}
@@ -384,7 +434,6 @@ Beastlord pets do not have a reagent required to summon.
 Enchanter pets all require [[Tiny Dagger|Tiny Daggers]] to summon.
 
 == [[Magician]] Pets ==
-
 {| class="wikitable"
 |+Elementalkin<br>(Level 5 Elementals)
 !Character Level
@@ -415,7 +464,6 @@ Enchanter pets all require [[Tiny Dagger|Tiny Daggers]] to summon.
 |style="text-align: center;"|[[Elementalkin: Earth Summon|Earth]]
 |style="text-align: center;"|228
 |}
-
 {| class="wikitable"
 |+Elementaling<br>(Level 9 Elementals)
 !Character Level
@@ -446,7 +494,6 @@ Enchanter pets all require [[Tiny Dagger|Tiny Daggers]] to summon.
 |style="text-align: center;"|[[Elementaling: Earth Summon|Earth]]
 |style="text-align: center;"|520
 |}
-
 {| class="wikitable"
 |+Elemental<br>(Level 12 Elementals)
 !Character Level
@@ -477,7 +524,6 @@ Enchanter pets all require [[Tiny Dagger|Tiny Daggers]] to summon.
 |style="text-align: center;"|[[Elemental: Earth Summon|Earth]]
 |style="text-align: center;"|726
 |}
-
 {| class="wikitable"
 |+Minor Summoning<br>(Level 17 Elementals)
 !Character Level
@@ -508,7 +554,6 @@ Enchanter pets all require [[Tiny Dagger|Tiny Daggers]] to summon.
 |style="text-align: center;"|[[Minor Summoning: Earth Summon|Earth]]
 |style="text-align: center;"|1082
 |}
-
 {| class="wikitable"
 |+Lesser Summoning<br>(Level 20 Elementals)
 !Character Level
@@ -539,7 +584,6 @@ Enchanter pets all require [[Tiny Dagger|Tiny Daggers]] to summon.
 |style="text-align: center;"|[[Lesser Summoning: Earth Summon|Earth]]
 |style="text-align: center;"|1362
 |}
-
 {| class="wikitable"
 |+Summoning<br>(Level 23 Elementals)
 !Character Level
@@ -570,7 +614,6 @@ Enchanter pets all require [[Tiny Dagger|Tiny Daggers]] to summon.
 |style="text-align: center;"|[[Summoning: Earth Summon|Earth]]
 |style="text-align: center;"|1643
 |}
-
 {| class="wikitable"
 |+Greater Summoning<br>(Level 26 Elementals)
 !Character Level
@@ -601,7 +644,6 @@ Enchanter pets all require [[Tiny Dagger|Tiny Daggers]] to summon.
 |style="text-align: center;"|[[Greater Summoning: Earth Summon|Earth]]
 |style="text-align: center;"|1930
 |}
-
 {| class="wikitable"
 |+Minor Conjuration<br>(Level 29 Elementals)
 !Character Level
@@ -632,7 +674,6 @@ Enchanter pets all require [[Tiny Dagger|Tiny Daggers]] to summon.
 |style="text-align: center;"|[[Minor Conjuration: Earth Summon|Earth]]
 |style="text-align: center;"|2251
 |}
-
 {| class="wikitable"
 |+Lesser Conjuration<br>(Level 33 Elementals)
 !Character Level
@@ -663,8 +704,6 @@ Enchanter pets all require [[Tiny Dagger|Tiny Daggers]] to summon.
 |style="text-align: center;"|[[Lesser Conjuration: Earth Summon|Earth]]
 |style="text-align: center;"|2762
 |}
-
-
 {| class="wikitable"
 |+Conjuration<br>(Level 37 Elementals)
 !Character Level
@@ -695,8 +734,6 @@ Enchanter pets all require [[Tiny Dagger|Tiny Daggers]] to summon.
 |style="text-align: center;"|[[Conjuration: Earth Summon|Earth]]
 |style="text-align: center;"|3197
 |}
-
-
 {| class="wikitable"
 |+Greater Conjuration<br>(Level 41 Elementals)
 !Character Level

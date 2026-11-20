@@ -2428,3 +2428,15 @@ Reddish_Crystal
 Monster_Summoning_II_Summon
 Knight_V`Tal
 Pyrosilk_Armor
+User:Sarion
+Chipped_Bone_Bracelet
+Bloodstar_Pendant
+White_Gold_Necklace
+Dread
+Character_Races
+Kintaz's_Animation_Summon
+File:Animated_longsword_summon.png
+File:Animated_scimitar_summon.png
+Metal_Bits
+Dorian_G`Wyn
+Sir_Mollin

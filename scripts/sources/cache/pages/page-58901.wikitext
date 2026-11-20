@@ -6,8 +6,8 @@
     <li>Pet Type: Earth Elemental</li>
     <li>Pet Classes: [[Ranger]] / [[Warrior]]</li>
     <li>Pet Level: 12</li>
-    <li>Hit Points: 682 (+1/tick)</li>
-    <li>Mana: 240 (+24/tick)</li>
+    <li>Hit Points: 726 (+1/tick)</li>
+    <li>Mana: 285 (+24/tick)</li>
     </ul>
   </div>
   <div style="flex: 1;">
@@ -28,8 +28,6 @@
        <ul>
        <li>Offense: 95</li>
        <li>Accuracy: 93</li>
-       <li>Max Damage: 18</li>
-       <li>Dual Wield: 17%</li>
        </ul>
      </ul>
   </div>

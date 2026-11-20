@@ -2,8 +2,8 @@
   "rows": [
     {
       "file": "src/main/data/items.json",
-      "bytes": 9021737,
-      "parseMs": 49.2,
+      "bytes": 9021769,
+      "parseMs": 48.4,
       "heapMb": 21
     },
     {
@@ -15,7 +15,7 @@
     {
       "file": "src/main/data/pageEra.json",
       "bytes": 236477,
-      "parseMs": 2.1,
+      "parseMs": 1.7,
       "heapMb": 0.7
     },
     {
@@ -38,8 +38,8 @@
     },
     {
       "file": "src/renderer/src/data/eqlegends/mobs.json",
-      "bytes": 5696420,
-      "parseMs": 16.9,
+      "bytes": 5696411,
+      "parseMs": 15.9,
       "heapMb": 8.6
     }
   ],
