@@ -16,6 +16,12 @@ export function fmtDuration(ms: number | null | undefined): string {
   return `${hr}h ${min.toString().padStart(2, '0')}m`
 }
 
+/** A duration with tenths under a minute (`7.5s`) — these spells are short and 7.5 is not 8. */
+export function fmtPrecise(ms: number | null | undefined): string {
+  if (ms == null || ms <= 0 || ms >= 60_000) return fmtDuration(ms)
+  return `${Math.round(ms / 100) / 10}s`
+}
+
 /**
  * Fraction of the estimated window still remaining (1 = just landed, 0 = expired),
  * clamped to [0,1]. Used to drive the progress bar. `estimatedMs` must be > 0.
@@ -68,6 +74,14 @@ export function estimatorSourceTitle(src: string | undefined): string {
  */
 export function estimatePrefix(src: string | undefined): string {
   return src === 'deathBound' ? '≥ ' : ''
+}
+
+/**
+ * The Durations table's estimate figure, with the bound sign when it is one. Tenths under a
+ * minute, as the edit dialog prints it: a typed 7.5 s read `8s` here and `7.5s` there.
+ */
+export function estimateText(ms: number, src: string | undefined): string {
+  return `${estimatePrefix(src)}${fmtPrecise(ms)}`
 }
 
 /** The provenance chip's word: the database, a number you set, or the log. */

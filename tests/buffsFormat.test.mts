@@ -1,11 +1,12 @@
 // The Buffs tab's small formatters (features/buffs/format.ts): what a running card says once its
-// buff has outlived the estimate. The engine's own fixture is three clean casts of 50 s, 52 s and
-// 100 s, so "From my log" estimates the median, 52 s, while p75 over every sample is 76 s.
+// buff has outlived the estimate, and how the Durations table prints a short duration. The engine's
+// own fixture is three clean casts of 50 s, 52 s and 100 s, so "From my log" estimates the median,
+// 52 s, while p75 over every sample is 76 s.
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import type { ActiveBuff } from '../src/shared/buffTypes'
-import { estimateState, leftCaption } from '../src/renderer/src/features/buffs/format'
+import { estimateState, estimateText, fmtPrecise, leftCaption } from '../src/renderer/src/features/buffs/format'
 
 function buff(over: Partial<ActiveBuff>): ActiveBuff {
   return { spell: 'Swift Like the Wind', cls: 'buff', self: true, startedTs: 0, estimatedMs: null, p25: null, p75: null, n: 0, ...over }
@@ -55,4 +56,26 @@ test('the time-left caption never prints a dash where a time belongs', () => {
   for (const ms of [0, 1, 499, 500, 59_999, 60_000]) {
     assert.ok(!leftCaption('observed', ms).includes('- left'), String(ms))
   }
+})
+
+test('a short duration keeps its tenths: 7.5 is not 8', () => {
+  assert.equal(fmtPrecise(7500), '7.5s')
+  assert.equal(fmtPrecise(7400), '7.4s')
+  assert.equal(fmtPrecise(8000), '8s')
+  // A minute and over reads as every other duration in the app does.
+  assert.equal(fmtPrecise(90_000), '1m 30s')
+  assert.equal(fmtPrecise(null), '-')
+  assert.equal(fmtPrecise(undefined), '-')
+  assert.equal(fmtPrecise(0), '-')
+})
+
+test('the Durations table states the number the player typed', () => {
+  // Fork issue #4's own spell: Whirl Till You Hurl set to 7.5 s read "8s" beside the "set" chip.
+  assert.equal(estimateText(7500, 'manual'), '7.5s')
+  assert.equal(estimateText(7400, 'manual'), '7.4s')
+  assert.equal(estimateText(52_500, 'logMedian'), '52.5s')
+  assert.equal(estimateText(24_000, 'db'), '24s')
+  assert.equal(estimateText(2_160_000, 'db'), '36m 00s')
+  // A bound still wears its sign.
+  assert.equal(estimateText(34_000, 'deathBound'), '≥ 34s')
 })
