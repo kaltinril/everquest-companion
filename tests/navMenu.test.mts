@@ -7,8 +7,10 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import {
   NAV_ROW_DEFAULT,
+  NAV_ROW_KEY,
   NAV_ROW_STEPS,
   NAV_TEXT_DEFAULT,
+  NAV_TEXT_KEY,
   NAV_TEXT_STEPS,
   navMenuMetrics,
   navPx,
@@ -34,6 +36,16 @@ test('each ladder ascends without a repeat and holds its own default', () => {
   assert.ok(NAV_ROW_STEPS.includes(48))
   // The shipped row is not the shortest one: a player who wants it tighter still has a stop to go to.
   assert.ok(NAV_ROW_DEFAULT > Math.min(...NAV_ROW_STEPS))
+})
+
+// A renamed key reads every saved pick as absent; two equal keys make each stepper move the other.
+test('the two picks live under their own keys, apart from the folds', () => {
+  assert.equal(NAV_TEXT_KEY, 'eq.nav.textPx')
+  assert.equal(NAV_ROW_KEY, 'eq.nav.rowPx')
+  assert.notEqual(NAV_TEXT_KEY, NAV_ROW_KEY)
+  for (const key of [NAV_TEXT_KEY, NAV_ROW_KEY]) {
+    assert.ok(!key.startsWith('eq.nav.open.'), `${key} is not a fold key`)
+  }
 })
 
 test('an absent or malformed stored value reads as the default', () => {
