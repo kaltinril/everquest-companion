@@ -715,9 +715,9 @@ export async function stepPetAnswersWhoLeads(page: Page, log: FixtureLog): Promi
   const heir = petRowFor(after, PET_LEADER_NAME)
   if (!check('a pet that NAMES YOU ITS LEADER lands on the meter', !!heir, heir ? heir.name : 'no row')) return
   check(
-    '…forward only, exactly like the tell — the hit before the answer stays invisible',
-    heir?.total === PET_LEADER_BOUND_DAMAGE,
-    `${String(heir?.total ?? 0)} of ${String(PET_LEADER_BOUND_DAMAGE)} (unbound ${String(PET_LEADER_UNBOUND_DAMAGE)} dropped)`
+    '…and the hit before the answer moves onto its row — nothing it swung is dropped (owner, 2026-10-28)',
+    heir?.total === PET_LEADER_UNBOUND_DAMAGE + PET_LEADER_BOUND_DAMAGE,
+    `${String(heir?.total ?? 0)} of ${String(PET_LEADER_UNBOUND_DAMAGE + PET_LEADER_BOUND_DAMAGE)} (${String(PET_LEADER_UNBOUND_DAMAGE)} before the answer + ${String(PET_LEADER_BOUND_DAMAGE)} after)`
   )
   // ONE PET AT A TIME (JOS-54), through the whole product: binding the successor retired the
   // predecessor, so its LATER swing is nobody's — while everything it earned while it was yours

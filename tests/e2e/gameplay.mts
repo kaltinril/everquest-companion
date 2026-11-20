@@ -173,9 +173,9 @@ export function playPetOrder(log: FixtureLog): number {
  * work at all.
  *
  * It plays THREE facts at once, in the order the game would print them:
- *   1. a NEW pet swings while nothing has bound it            — must stay invisible
- *   2. it answers `/pet who leader`                            — binds, forward only
- *   3. it swings again                                         — the whole of its row
+ *   1. a NEW pet swings while nothing has bound it            — not yours yet
+ *   2. it answers `/pet who leader`                            — binds, and swing 1 moves to its row
+ *   3. it swings again                                         — its row is both swings
  *   4. the PREVIOUS pet swings once more                       — must not move, ever: the
  *      single-pet succession (JOS-54) retired it when this one bound, and retirement ends a
  *      future without touching a past.
@@ -189,10 +189,11 @@ export const PET_LEADER_NAME = 'Gonekn'
 /** Every line `playPetLeaderAnswer` writes. */
 export const PET_LEADER_LINES = 4
 
-/** The successor's hit BEFORE it answers. A say binds forward, so nothing may ever show this. */
+/** The successor's hit BEFORE it answers. The answer moves it onto the pet's row instead of
+ *  dropping it (owner, 2026-10-28; engine `bind_pet_claim`, tests/pet_claim_players.rs). */
 export const PET_LEADER_UNBOUND_DAMAGE = 55
 
-/** The successor's hit AFTER it answers — and therefore the whole of its meter row. */
+/** The successor's hit AFTER it answers. Its meter row is this plus the hit before. */
 export const PET_LEADER_BOUND_DAMAGE = 88
 
 /** What the RETIRED pet swings for afterwards. Its row must stay on PET_BOUND_DAMAGE. */

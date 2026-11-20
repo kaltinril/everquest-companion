@@ -102,33 +102,42 @@ async function stepCopy(app: ElectronApplication, page: Page): Promise<void> {
   const userText = await mainClipboard(app)
   // A sentinel, so "the clipboard already happened to hold the right thing" cannot pass.
   const sentinel = `e2e-nothing-was-copied-${String(Date.now())}`
-  await mainClipboard(app, sentinel)
+  // The spec's OWN write has to read back before anything can be said about the app's. On a
+  // locked workstation it does not (the OS clipboard reads back empty and raises nothing): the
+  // clipboard is then not available to this process, which is a note about the machine.
+  const usable = (await mainClipboard(app, sentinel)) === sentinel
+  if (!usable) {
+    note('the OS clipboard does not hold this spec’s own write (a locked workstation?) — the clipboard round-trip is not asserted this run')
+  }
 
   await page.click(BTN)
-  // Read the icon FIRST: the copied state is deliberately transient (~1.5s), and the clipboard
+  // Read the copied state FIRST: it is deliberately transient (~1.5s), and the clipboard
   // round-trip below can outlive it. Its APPEARANCE is main's reply arriving — a condition, and
   // the very thing the assertion is about, so it is waited for rather than slept past.
-  const checks = await settleCount(page, `${BTN} [data-testid="CheckIcon"]`, 1, { timeoutMs: 5_000 })
+  const checks = await settleCount(page, `${BTN}[aria-label="Copied"]`, 1, { timeoutMs: 5_000 })
   const after = await mainClipboard(app)
   if (userText) await mainClipboard(app, userText)
 
   const first = after.split('\n')[0] ?? ''
-  check(
-    'clicking Copy actually puts the view on the OS clipboard',
-    after !== sentinel && after.length > 0,
-    after === sentinel
-      ? 'the clipboard still holds the sentinel — the click wrote nothing'
-      : `${String(after.length)} chars from ${String(buttons)} copy affordance(s) on screen`
-  )
-  check(
-    '…and what landed there is the panel’s own serialization (subject line · duration, then rows)',
-    / · \d+:\d{2}$/.test(first) && after.includes('\n'),
-    first.slice(0, 80) || 'empty'
-  )
-  // The user-visible half of the same fact: the icon flashes to a checkmark for ~1.5s (MUI's
-  // icons carry their own `data-testid`, so the swap is observable). It is driven by main's
-  // reply, so a refused write leaves the copy icon in place — a failed copy must never look
-  // like a successful one.
+  if (usable) {
+    check(
+      'clicking Copy actually puts the view on the OS clipboard',
+      after !== sentinel && after.length > 0,
+      after === sentinel
+        ? 'the clipboard still holds the sentinel — the click wrote nothing'
+        : `${String(after.length)} chars from ${String(buttons)} copy affordance(s) on screen`
+    )
+    check(
+      '…and what landed there is the panel’s own serialization (subject line · duration, then rows)',
+      / · \d+:\d{2}$/.test(first) && after.includes('\n'),
+      first.slice(0, 80) || 'empty'
+    )
+  }
+  // The user-visible half of the same fact: the icon flashes to a checkmark for ~1.5s and the
+  // button's tooltip title becomes 'Copied', which MUI puts on the button as its `aria-label`
+  // (CopyButton.tsx; MUI 7's icons carry no `data-testid` in a production build, so the icon
+  // itself is not observable). It is driven by main's reply, so a refused write leaves the copy
+  // state unset — a failed copy must never look like a successful one.
   check(
     '…and the button flips to its copied state (the checkmark tracks what main actually wrote)',
     checks === 1,

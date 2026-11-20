@@ -12,8 +12,9 @@
  *   2. "UNRESOLVABLE STATES ARE VISIBLE" is a claim about a rendered row. This machine is the
  *      perfect witness for it: `EQ_E2E=1` skips pack provisioning entirely (src/main/index.ts —
  *      a fresh temp userData would otherwise re-download every pack on every launch), so an e2e
- *      app has NO sound packs at all and every seeded alert genuinely cannot play. Before this
- *      ticket that was invisible; the row now says it.
+ *      app has NO sound packs at all and every seeded alert that plays a pack sound genuinely
+ *      cannot play. Before this ticket that was invisible; the row now says it. A seeded alert
+ *      that SPEAKS (the Bazaar watchlist's, the respawn warning) needs no pack and says nothing.
  *
  * WHY THE PREFERENCE IS SET OVER IPC RATHER THAN BY CLICKING THE STAR. The star lives on a
  * registry pack's ROW, and the registry is fetched over the network — the CI machine and this one
@@ -43,9 +44,9 @@ const CHOSEN = 'portal-turret'
 
 const ROW = '[data-testid="alert-row"]'
 const NOTICE = '[data-testid="alert-sound-notice"]'
-/** A SPOKEN alert (the Bazaar watchlist's) cannot play on a machine with no speech voices either, and
- *  its row says so with the voice-setup notice instead: either notice is the row saying it. */
-const VOICE_NOTICE = '[data-testid="alert-row-voice-setup"]'
+/** The speak-what select, which only a SPOKEN alert's row carries (AudioPicker.tsx `SayPicker`): a
+ *  row without it plays a pack sound. Whether a voice exists is voice-alerts.e2e.mts's business. */
+const SPEAKS = '[data-testid="alert-say"]'
 const DEFAULT_ROW = '[data-testid="pack-default-row"]'
 
 interface PackPrefs {
@@ -76,22 +77,38 @@ async function openAlerts(page: Page): Promise<void> {
 
 /**
  * THE STATE THIS MACHINE IS ACTUALLY IN, said out loud. No packs are installed (see the header),
- * so every seeded alert resolves to nothing — and the row is where a user has to be able to find
- * that out. It is also the "missing" branch of the resolution, observed in the real app rather
- * than asserted over a fixture.
+ * so every seeded alert that plays a pack sound resolves to nothing — and the row is where a user
+ * has to be able to find that out. It is also the "missing" branch of the resolution, observed in
+ * the real app rather than asserted over a fixture. BY CHANNEL, not "every row": a spoken alert
+ * plays no pack sound (`soundNotice` answers null for it), so its row must NOT carry the notice.
  */
 async function stepSilentIsVisible(page: Page): Promise<void> {
   await openAlerts(page)
   const rows = await countOf(page, ROW)
   check('the seeded alerts are on screen', rows >= 1, String(rows))
-  const notices = await page.evaluate(
-    ([row, pack, voice]) => [...document.querySelectorAll(row)].filter((r) => r.querySelector(pack) ?? r.querySelector(voice)).length,
-    [ROW, NOTICE, VOICE_NOTICE] as const
+  const seen = await page.evaluate(
+    ([row, notice, say]) => {
+      const all = [...document.querySelectorAll(row)]
+      const spoken = all.filter((r) => r.querySelector(say))
+      const pack = all.filter((r) => !r.querySelector(say))
+      return {
+        pack: pack.length,
+        packSaid: pack.filter((r) => r.querySelector(notice)).length,
+        spoken: spoken.length,
+        spokenSaid: spoken.filter((r) => r.querySelector(notice)).length
+      }
+    },
+    [ROW, NOTICE, SPEAKS] as const
   )
   check(
-    'with no pack installed, every alert row SAYS it cannot play - it does not just sit there',
-    notices === rows,
-    `${notices} notice(s) on ${rows} row(s)`
+    'with no pack installed, every alert row that plays a pack sound SAYS it cannot play - it does not just sit there',
+    seen.pack >= 1 && seen.packSaid === seen.pack,
+    `${seen.packSaid} notice(s) on ${seen.pack} pack-sound row(s)`
+  )
+  check(
+    '…and no spoken alert row carries that notice - a spoken alert needs no sound pack',
+    seen.spokenSaid === 0,
+    `${seen.spokenSaid} notice(s) on ${seen.spoken} spoken row(s)`
   )
   const said = (await textOf(page, NOTICE)).replace(/\s+/g, ' ')
   check('…and it says what is wrong in words a user can act on', /silent/i.test(said), said)
