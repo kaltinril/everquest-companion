@@ -662,7 +662,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   Test: Unit tests in tests/bazaarWatch.test.mts on setEveryTier. (1) The list [{tier 4, wts false,
   wtb false}, {tier null, wts true, wtsMax 31000}] with every=true gives exactly [{tier null, wts
   true, wtsMax 31000}], so the ...
-- CONFIRMED [low, untrue-words] Bazaar: with "All tiers as one", the row chip and the panel show one
+- FIXED 2026-11-20 (`watchOnItem` returns the every-tier watch first) [low, untrue-words] Bazaar: with "All tiers as one", the row chip and the panel show one
   tier's watch, not the every-tier watch Seen: Combined row text: "Fleeting Quiver 3 tiers at +4
   Watch: WTB". Panel: Watch on, "Alert on WTS" off, "Alert on WTB" on, "at or over" blank, and no
   "Every tier" box, so nothing says this is the +4 watch. Alerts in the same session fired on +0, +2
@@ -678,7 +678,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   ... Test: Add a case to tests/bazaarWatch.test.mts: (a) setWatch a +4 watch {wtb:true}, then an
   every-tier watch {wts:true, wtsMax:31000, wtb:true, wtbMin:9500}. watchOnItem(list, 'fleeting
   quiver') returns the tier:null entry. ...
-- CONFIRMED [low, untrue-words] Bazaar: the row chip names only the price when a price and a percent
+- FIXED 2026-11-20 (`watchChipLabel`, now in shared/bazaarWatch.ts, names both joined by "or") [low, untrue-words] Bazaar: the row chip names only the price when a price and a percent
   are both set Seen: Chip: "Watch: WTS ≤ 100p + WTB ≥ 9.5k". Heard: "Sela WTS Fleeting Quiver 9k
   (68% of the 7-day median 13k)". With 12500 and 80 the chip reads "Watch: WTS ≤ 12.5k"; with 80
   alone it reads "Watch: WTS ≤ 80% median". Verdict: The code confirms the report, so I did not
