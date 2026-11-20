@@ -108,11 +108,15 @@ import { hostClockHint, resolvedTimeZone } from './hostClock'
 // historical fold BEGINS (an accepted attach), how far it has got (the engine's progress frames)
 // and when it LANDS (the go-live edge below) — so it feeds all three to the one state main pushes.
 import { noteEngineFolding, noteEngineLive, noteEngineReadEnded } from './engineLaunchState'
-// THE WAIT ITSELF (JOS-518). A leaf with its request, its turn, its sleep and its log sink handed
-// in, so the shapes that matter — a fold past the old budget, a poll refused once and then answered,
-// a connection that dies mid-wait — are drivable in a unit test. Its header carries the owner ruling
-// that a folding engine is never given up on.
-import { waitForFold, type FoldHealth } from './foldWait'
+// THE TURN AND ITS WAIT (JOS-518, fork #9). Two leaves with their requests, their turn, their sleep
+// and their log sink handed in, so the shapes that matter — a fold past the old budget, an attach
+// nobody answered, an answer about another log — are drivable in a unit test. `foldWait.ts` carries
+// the owner ruling that a folding engine is never given up on.
+import { runAttachTurn } from './attachTurn'
+import { servingLine, type FoldHealth } from './foldWait'
+// THE LOOK AFTER LIVE, and the read's edges as the recovery hears them (fork #9, phase R4).
+import { createAfterLiveWatch } from './afterLive'
+import { noteReadEdge } from './readEdges'
 // What went wrong on the way to live, kept for the "Reading log..." report (fork #9).
 import {
   noteLogReadConnection,
@@ -123,7 +127,7 @@ import {
 } from './logReadState'
 import { SERVABLE, type Readiness } from './readShim'
 import type { ReadyEngine } from './supervisor'
-import { isLinkLost, type ParamsFor, type RequestOp, type ResultFor } from '../../shared/dataServer/ops'
+import type { ParamsFor, RequestOp, ResultFor } from '../../shared/dataServer/ops'
 import type { CharacterRef } from '../../shared/types'
 
 /** How long the client's own loopback connect may take. The supervisor's probe just completed a
@@ -223,6 +227,8 @@ function bumpGen(): number {
   // What was known about reply sizes was known about the last read (replySizes.ts).
   replySizes.reset()
   noteLogReadTurn(Date.now(), attachTarget())
+  // Whatever was armed to read the last world again must not fire into this one.
+  noteReadEdge('turn', null)
   return gen
 }
 
@@ -301,7 +307,7 @@ export function onEngineReady(info: ReadyEngine | null): void {
   //
   // NOT IN `bumpGen`, deliberately, even though that is where everything else that must die with
   // the turn lives: a WORLD REBUILD bumps the turn and does NOT re-attach when the log is unchanged
-  // (`attachAndProbe`), so a hand-back there would fire one second into every launch and never be
+  // (`attachTurn.ts`), so a hand-back there would fire one second into every launch and never be
   // undone. This is the connection edge, which is the edge that actually replaces an owner.
   takeArtifactsBack(debug)
   if (info === null) {
@@ -309,6 +315,7 @@ export function onEngineReady(info: ReadyEngine | null): void {
     return
   }
   noteLogReadConnection(Date.now())
+  noteReadEdge('launch', null)
   const client = createEngineClient({
     token: info.token,
     debug: (note) => {
@@ -457,11 +464,12 @@ async function pushLogDirNow(mine: number): Promise<void> {
 // ── the attach ─────────────────────────────────────────────────────────────────────────────────
 
 /**
- * Point the engine at the app's log, then — if the app's own fold has landed on it — compare.
+ * Point the engine at the app's log and wait for its read. The turn itself (defines, attach, wait,
+ * and what happens when an attach or an answer is not this turn's) is `attachTurn.ts`; this is its
+ * wiring, and everything it is handed is the turn's to abandon.
  *
- * THE ATTACH HAPPENS EVEN WHEN THE PROBE CANNOT. An engine that becomes ready mid-fold should start
- * reading the log immediately; the comparison waits for the other world, and the two are separate
- * questions.
+ * THE WAIT ARMS THE READ PATH: `sawHealth` records `engineLiveOn`, which `engineServeReadiness()`
+ * reads on every served IPC. It has no deadline (JOS-518).
  */
 async function attachAndProbe(mine: number): Promise<void> {
   const target = attachTarget()
@@ -471,84 +479,86 @@ async function attachAndProbe(mine: number): Promise<void> {
     debug('data-server client: no character is attached here, so the engine is left idle')
     return
   }
-  // WHAT THE APP KNOWS GOES FIRST, before any attach can be sent — see `pushAllDefines`.
-  await pushAllDefines(mine)
-  if (gen !== mine) return
-  // AN ATTACH IS A WHOLE RE-FOLD, so it is sent only when the FILE changes. This runs twice on an
-  // ordinary launch — once when the engine becomes ready (pointed at the log this process is
-  // already tailing) and once when this process's own fold lands on that same log — and issuing a
-  // second attach there would make the engine read the whole log twice for nothing. It is not a
-  // freshness risk: the engine folded the same file from byte zero and has been tailing it since,
-  // which is the same lossless seam the app's own scan→tail handoff is. A character switch changes
-  // the path and does attach, which is the case the re-attach exists for.
-  if (l.attachedTo !== target && (await sendAttach(mine, l, target)) === null) return
-  if (gen !== mine) return
-  // THE FOLD IS WAITED FOR, AND NOTHING IS COMPARED (JOS-499). The wait is what records
-  // `engineLiveOn`, which is what `engineServeReadiness()` reads on every served IPC — so this
-  // call is the arming of the read path, not the preamble to a probe. It has no deadline (JOS-518):
-  // a folding engine is never given up on, so this `await` runs for as long as the log is big.
-  await waitForFoldHere(mine, l)
+  await runAttachTurn({
+    target,
+    // ASKED, NOT CAPTURED: the generation is this file's state and a leaf never holds a copy.
+    mine: () => gen === mine,
+    wanted: attachTarget,
+    attach: (params) => l.client.request('session.attach', params),
+    health: () => l.client.request('session.health', {}),
+    defines: () => pushAllDefines(mine),
+    getAttached: () => l.attachedTo,
+    setAttached: (logPath) => {
+      l.attachedTo = logPath
+    },
+    // THE ARTIFACT HANDOVER (JOS-497 item 2): `attachStateDir` stops this process persisting the
+    // resist ledger and the message-overlay register and only THEN answers the directory.
+    // `serving` is always true (JOS-499 item 9): an attach is sent only by a connected client.
+    stateDir: () => attachStateDir({ serving: true, userData: () => app.getPath('userData'), note: debug }),
+    // READ FRESH AT THE ATTACH (JOS-536): the offset is a function of the date.
+    clock: () => hostClockHint(new Date(), resolvedTimeZone),
+    // An archive sealed before this attach is not in the fold it starts (eligible.ts rule 4).
+    attaching: () => liveHistory.engineAttaching(),
+    // A HISTORICAL FOLD HAS JUST STARTED (JOS-503): only for an attach the engine accepted.
+    folding: noteEngineFolding,
+    rest: delay,
+    note: debug,
+    // The code goes with it: an attach nobody answered is not an attach that was refused.
+    noteError: (detail, code) => {
+      noteLogReadError('attach', detail, Date.now(), code)
+    },
+    saw: (health) => {
+      sawHealth(l, health)
+      if (health.status === 'live') noteReadEdge('live', target)
+    },
+    logSize: () => lastFoldLogSize,
+    failed: (why, detail) => {
+      // A dead read is forgotten, so a later rebuild of the same log attaches again (fork #9),
+      // and the catch-up bar is told there is no fold to draw.
+      if (why === 'ended') {
+        l.attachedTo = null
+        noteEngineReadEnded()
+      }
+      noteLogReadError(why === 'ended' ? 'fold' : 'health', detail, Date.now())
+      // AFTER the error is on record: the recovery may replace it with why it will not retry.
+      if (why === 'ended') noteReadEdge('ended', target)
+    }
+  })
+}
+
+// ── after live (fork #9, phase R4) ─────────────────────────────────────────────────────────────
+
+/** `afterLive.ts`: a probe answer that says not live is asked again here before it is believed. */
+const afterLive = createAfterLiveWatch({
+  liveOn: () => engineLiveOn,
+  turn: () => gen,
+  ask: () => engineRequest('session.health', {}),
+  ended: readStoppedAfterLive,
+  note: debug
+})
+
+/** Every healthy answer to the supervisor's 30 s probe (`engineHost.ts onHealth`). */
+export function noteSupervisorHealth(health: { readonly status: string }): void {
+  afterLive.probed(health.status)
 }
 
 /**
- * `session.attach`, and what it answered. Null when it was refused or superseded.
- *
- * THE ARTIFACT HANDOVER RIDES THIS CALL (JOS-497 item 2, boundary verdict 4), and it does so
- * BEFORE the request object exists rather than beside it. `attachStateDir` stops this process
- * persisting the resist ledger and the message-overlay register and only THEN produces the
- * directory to send — so there is no arrangement of these lines in which the engine learns where
- * the files are while this process is still writing them. `artifactOwner.ts` carries the argument
- * for why the ordering is enforced by that function's body instead of by this call site's care.
- *
- * `undefined` IS THE ORDINARY ANSWER when the engine is not in this app's read path
- * (`EQC_ENGINE_SERVE=0`), and the schema defines an absent `stateDir` as no engine-side persistence
- * at all — so a flag-off launch sends the byte-identical attach it always has and keeps writing its
- * own files.
+ * THE ENGINE STOPPED READING A LOG IT HAD CAUGHT UP ON. A fourth edge that lets go of a served
+ * world, with the three `wasServing` ones: a new turn, the windows told (the engine WAS serving,
+ * or `afterLive` would not have asked), the attach forgotten so the next one is sent, and the
+ * reason on record. Whether it is read again is the recovery's call (`logReadRecovery.ts`).
  */
-async function sendAttach(mine: number, l: LiveEngine, logPath: string): Promise<number | null> {
-  const stateDir = attachStateDir({
-    // ALWAYS (JOS-499 item 9). The `serving` argument used to carry `shimServing()`, so a
-    // flag-off launch kept persisting its own artifacts. There is no such launch: an attach is
-    // sent only by a connected client, and this process folds nothing to persist.
-    serving: true,
-    userData: () => app.getPath('userData'),
-    note: debug
-  })
-  // READ FRESH, HERE (JOS-536). A respawn is a launch and the offset is a function of the date, so
-  // a hint computed anywhere but at the attach is wrong across a DST transition.
-  const clock = hostClockHint(new Date(), resolvedTimeZone)
-  // An archive sealed before this attach is not in the fold it starts (log archive, eligible.ts rule 4).
-  const refolded = liveHistory.engineAttaching()
-  try {
-    const result = await l.client.request(
-      'session.attach',
-      stateDir === undefined ? { logPath, clock } : { logPath, stateDir, clock }
-    )
-    if (gen !== mine) return null
-    l.attachedTo = logPath
-    debug(
-      `data-server engine attached: ${logPath} (epoch ${String(result.epoch)}, ` +
-        `accepted ${String(result.accepted)})`
-    )
-    // A HISTORICAL FOLD HAS JUST STARTED (JOS-503) — the earliest instant that is true, and the
-    // only place in the product that knows it. Gated on `accepted`, because `false` means this
-    // attach LOST to a later one: the engine is folding somebody else's log and the caller has no
-    // business claiming the banner for a fold it does not own (the winner's own attach already did).
-    if (result.accepted) {
-      noteEngineFolding()
-      refolded()
-    }
-    return result.epoch
-  } catch (err) {
-    debug(`data-server client: session.attach was refused (${describeErr(err)})`)
-    // The connection went away under the attach: the engine refused nothing, and the reconnect
-    // sends it again (`attachedTo` is still unset).
-    if (isLinkLost(err)) return null
-    // The code goes with it: an attach nobody answered is not an attach that was refused.
-    const code = err instanceof EngineError ? err.code : null
-    if (gen === mine) noteLogReadError('attach', describeErr(err), Date.now(), code)
-    return null
-  }
+function readStoppedAfterLive(): void {
+  const l = live
+  const was = engineLiveOn
+  if (l === null || was === null) return
+  debug('data-server client: the engine stopped reading the log after it was live')
+  bumpGen()
+  pushWorldChanged()
+  l.attachedTo = null
+  noteEngineReadEnded()
+  noteLogReadError('fold', 'the engine stopped reading after it was live', Date.now())
+  noteReadEdge('endedAfterLive', was)
 }
 
 /**
@@ -560,7 +570,7 @@ async function sendAttach(mine: number, l: LiveEngine, logPath: string): Promise
  * boundary reaches it, so hooking it is how this feature inherits every one of those without a
  * second call site to keep in step.
  *
- * A REBUILD OF THE SAME LOG IS NOT A RE-ATTACH — see `attachAndProbe`. It is still a fresh TURN and
+ * A REBUILD OF THE SAME LOG IS NOT A RE-ATTACH — see `attachTurn.ts`. It is still a fresh TURN and
  * a fresh probe, because this process's snapshots have just been rebuilt and are worth re-checking.
  */
 function onWorldRebuilt(character: CharacterRef | null): void {
@@ -601,22 +611,8 @@ function onWorldRebuilt(character: CharacterRef | null): void {
 // `EngineHealthSay` LIVED HERE AND IS `FoldHealth` IN `foldWait.ts` NOW (JOS-518) — the loop that
 // reads it moved, and the shape belongs beside its reader.
 
-/**
- * THE GO-LIVE SENTENCE, built out of line so `sawHealth` keeps its own shape.
- *
- * The optional clauses are appended rather than interpolated because both are genuinely absent on a
- * fresh attach — an engine that has folded nothing has no event count and no byte mark — and an
- * empty interpolation would print a dangling comma rather than saying nothing.
- */
-function servingLine(logPath: string | null, health: FoldHealth): string {
-  const parts = [`epoch ${String(health.epoch)}`]
-  if (health.events !== undefined) parts.push(`${String(health.events)} events`)
-  if (health.mark?.offset !== undefined) parts.push(`at byte ${String(health.mark.offset)}`)
-  return (
-    `data-server serving: ${logPath ?? '(none)'} — the engine's fold is live and is now ` +
-    `answering this app's reads (${parts.join(', ')})`
-  )
-}
+// THE GO-LIVE SENTENCE (`servingLine`) is built in `foldWait.ts`, beside the other line a fold
+// explains itself with, so `sawHealth` keeps its own shape and a test can read the sentence.
 
 /**
  * ONE HEALTH ANSWER, ON THE WAY PAST — and everything this app does about the engine going live.
@@ -673,36 +669,6 @@ function sawHealth(l: LiveEngine, health: FoldHealth): void {
   // one up because the interesting edge belonged to an earlier turn. `set` is a no-op when
   // nothing changed, so saying it every poll costs a comparison.
   noteEngineLive()
-}
-
-/**
- * WAIT OUT THE CATCH-UP — the loop's argument is in `foldWait.ts`; this is its wiring.
- *
- * THE TURN IS ASKED FOR RATHER THAN CAPTURED. `mine` closes over the number this turn was given and
- * compares it against the module's live `gen` on every ask, which is the same rule every `await` in
- * this file is followed by — and moving the loop out is precisely why it has to be a callback: the
- * generation is this file's state and a leaf must never hold a copy of it.
- */
-async function waitForFoldHere(mine: number, l: LiveEngine): Promise<FoldHealth | null> {
-  return waitForFold({
-    ask: () => l.client.request('session.health', {}),
-    mine: () => gen === mine,
-    rest: delay,
-    saw: (health) => {
-      sawHealth(l, health)
-    },
-    note: debug,
-    logSize: () => lastFoldLogSize,
-    failed: (why, detail) => {
-      // A dead read is forgotten, so a later rebuild of the same log attaches again (fork #9),
-      // and the catch-up bar is told there is no fold to draw.
-      if (why === 'ended') {
-        l.attachedTo = null
-        noteEngineReadEnded()
-      }
-      noteLogReadError(why === 'ended' ? 'fold' : 'health', detail, Date.now())
-    }
-  })
 }
 
 /** What this file knows about the read, for the "Reading log..." report (fork #9). */

@@ -28,6 +28,8 @@ import {
   FOLD_POLL_MS,
   FOLD_REFUSAL_LIMIT,
   FOLD_REFUSAL_PAUSE_MS,
+  FOLD_UNANSWERED_PAUSE_MS,
+  servingLine,
   stillFolding,
   waitForFold,
   type FoldHealth,
@@ -44,7 +46,7 @@ const OLD_BUDGET_POLLS = OLD_BUDGET_MS / FOLD_POLL_MS
 const GB = 1024 * 1024 * 1024
 
 function folding(offset: number, events: number): FoldHealth {
-  return { status: 'folding', epoch: 2, events, mark: { logPath: 'eqlog_Primitive_freeport.txt', offset } }
+  return { status: 'folding', epoch: 2, events, mark: { log: 'eqlog_Primitive_freeport.txt', offset } }
 }
 
 function live(offset: number, events: number): FoldHealth {
@@ -127,18 +129,14 @@ test('a fold that never lands never stops being waited on, and never stops SAYIN
   // and counts the lines. `mine` going false is what ends it — a stand-in for the respawn or the
   // character switch that would end it in the field.
   const halfHourPolls = (30 * 60 * 1000) / FOLD_POLL_MS
-  let asked = 0
-  const r = rig([folding(4096, 40)], {
-    mine: () => {
-      asked += 1
-      return asked < halfHourPolls
-    }
-  })
+  const r = rig([folding(4096, 40)])
+  // Counted in polls, not in how often the loop asks whose turn it is.
+  const deps: FoldWaitDeps = { ...r.deps, mine: () => r.asks < halfHourPolls }
 
-  assert.equal(await waitForFold(r.deps), null, 'a superseded turn says nothing')
+  assert.equal(await waitForFold(deps), null, 'a superseded turn says nothing')
   const narrations = r.notes.filter((line) => line.includes('still folding'))
   // One line per thirty seconds, give or take the turn it was cut off on.
-  const expected = Math.floor(halfHourPolls / 2 / FOLD_NARRATE_EVERY)
+  const expected = Math.floor(halfHourPolls / FOLD_NARRATE_EVERY)
   assert.ok(
     narrations.length >= expected - 1 && narrations.length <= expected + 1,
     `${String(narrations.length)} lines over half an hour, expected about ${String(expected)}`
@@ -154,20 +152,52 @@ test('a turn that has been superseded touches nothing', async () => {
 
 // ---- 2. the exits that are real events ----------------------------------------------------------
 
-test('A CONNECTION THAT DIES ENDS THE TURN, and does not hang', async () => {
-  const dead = new EngineError('unavailable', 'there is no open connection')
-  const r = rig([dead])
+test('THREE REFUSALS RUNNING ARE SAID ONCE AND THE WAIT KEEPS ASKING, slowly, while the turn is its own', async () => {
+  // It used to return here, and nothing ever asked again: an engine that was only slow (main's
+  // connection behind a large reply, a stall after wake) then went live with nobody looking, and
+  // the app sat on "Reading log..." for the rest of the session (fork #9, phase R4).
+  const dead = new EngineError('timeout', 'the engine did not answer session.health in time')
+  const failed: [string, string][] = []
+  const asksWanted = FOLD_REFUSAL_LIMIT + 40
+  const r = rig([dead], { failed: (why, detail) => failed.push([why, detail]) })
+  // A stand-in for the respawn or the switch that ends an unanswered wait in the field.
+  const deps: FoldWaitDeps = { ...r.deps, mine: () => r.asks < asksWanted }
 
-  assert.equal(await waitForFold(r.deps), null)
-  assert.equal(r.asks, FOLD_REFUSAL_LIMIT, 'it asked its bounded few times and then stopped')
+  assert.equal(await waitForFold(deps), null)
+  assert.equal(r.asks, asksWanted, 'driven far past the limit: it never stops asking by itself')
+  assert.deepEqual(failed, [['unanswered', 'timeout: the engine did not answer session.health in time']], 'said once')
   assert.equal(r.saw.length, 0)
-  assert.ok(
-    r.notes.some((line) => line.includes('times running')),
-    `the giving-up is unexplained: ${r.notes.join(' | ')}`
-  )
-  // The retries are SPACED, and by the refusal pause rather than the ordinary beat: a refusal is
-  // not a measurement that came back uninteresting.
-  assert.deepEqual(r.rests, [FOLD_REFUSAL_PAUSE_MS, FOLD_REFUSAL_PAUSE_MS])
+  // The first refusals are spaced by the refusal pause; from the limit on it is the slow cadence.
+  assert.deepEqual(r.rests.slice(0, FOLD_REFUSAL_LIMIT), [FOLD_REFUSAL_PAUSE_MS, FOLD_REFUSAL_PAUSE_MS, FOLD_UNANSWERED_PAUSE_MS])
+  assert.ok(r.rests.slice(FOLD_REFUSAL_LIMIT).every((ms) => ms === FOLD_UNANSWERED_PAUSE_MS))
+  assert.equal(FOLD_UNANSWERED_PAUSE_MS, 5_000)
+  // One line at the limit and none per slow ask: a dead connection must not write a line every 5 s.
+  assert.equal(r.notes.filter((line) => line.includes('times running')).length, 1, r.notes.join(' | '))
+  assert.equal(r.notes.length, FOLD_REFUSAL_LIMIT)
+})
+
+test('AN ENGINE THAT ANSWERS AGAIN AFTER GOING UNANSWERED IS SEEN, and its `live` is returned', async () => {
+  const slow = new EngineError('timeout', 'nobody answered')
+  const failed: string[] = []
+  const script: (FoldHealth | Error)[] = []
+  for (let i = 0; i < FOLD_REFUSAL_LIMIT + 5; i += 1) script.push(slow)
+  script.push(folding(2048, 20), live(4096, 40))
+  const r = rig(script, { failed: (why) => failed.push(why) })
+
+  const landed = await waitForFold(r.deps)
+  assert.equal(landed?.status, 'live')
+  assert.equal(r.saw.length, 2, 'both answered polls were passed on')
+  assert.deepEqual(failed, ['unanswered'])
+  assert.equal(r.rests[r.rests.length - 1], FOLD_POLL_MS, 'an answered poll goes back to the ordinary beat')
+})
+
+test('a second run of refusals after an answer is said again, once', async () => {
+  const slow = new EngineError('timeout', 'nobody answered')
+  const failed: string[] = []
+  const run = [slow, slow, slow, slow]
+  const r = rig([...run, folding(2048, 20), ...run, live(4096, 40)], { failed: (why) => failed.push(why) })
+  assert.equal((await waitForFold(r.deps))?.status, 'live')
+  assert.deepEqual(failed, ['unanswered', 'unanswered'])
 })
 
 test('A TRANSIENTLY REFUSED POLL RETRIES AND THEN ARMS', async () => {
@@ -215,6 +245,26 @@ test('a turn superseded WHILE a poll was in flight says nothing about the answer
   assert.deepEqual(r.saw, [])
 })
 
+test('A TURN ENDED BY WHAT `saw` LEARNED RETURNS AT ONCE: no rest, no verdict on the answer', async () => {
+  // `attachTurn.ts` ends its wait this way when an answer is about another log. The answer must
+  // not then be read as this log's read ending, or as its landing.
+  for (const status of ['idle', 'live', 'folding']) {
+    let mine = true
+    const failed: string[] = []
+    const r = rig([{ status, epoch: 2 }], {
+      mine: () => mine,
+      saw: () => {
+        mine = false
+      },
+      failed: (why) => failed.push(why)
+    })
+    assert.equal(await waitForFold(r.deps), null, status)
+    assert.equal(r.asks, 1, status)
+    assert.deepEqual(r.rests, [], status)
+    assert.deepEqual(failed, [], status)
+  }
+})
+
 // ---- 2b. a read that ended (fork #9) -------------------------------------------------------------
 
 /** A rig that also records every `failed` call. */
@@ -250,10 +300,32 @@ test('ONLY idle ENDS IT: starting, attaching and folding are waited out', async 
   assert.deepEqual(failed, [], 'a read that landed did not fail')
 })
 
-test('three refusals running say `unanswered`, with the last refusal as the detail', async () => {
-  const { r, failed } = failing([new EngineError('timeout', 'nobody answered')])
+test('an engine that goes idle after going unanswered still ends the wait', async () => {
+  const slow = new EngineError('timeout', 'nobody answered')
+  const { r, failed } = failing([slow, slow, slow, slow, { status: 'idle', epoch: 2 }])
   assert.equal(await waitForFold(r.deps), null)
-  assert.deepEqual(failed, [['unanswered', 'timeout: nobody answered']])
+  assert.equal(r.asks, 5, 'the idle answer was the last poll')
+  assert.deepEqual(failed, [
+    ['unanswered', 'timeout: nobody answered'],
+    ['ended', 'the engine reports idle after an accepted attach']
+  ])
+})
+
+test('a turn superseded while it is unanswered ends silently', async () => {
+  let mine = true
+  const failed: string[] = []
+  const r = rig([new EngineError('timeout', 'nobody answered')], {
+    mine: () => mine,
+    rest: () => {
+      // The world is replaced during the first slow rest.
+      if (failed.length > 0) mine = false
+      return Promise.resolve()
+    },
+    failed: (why) => failed.push(why)
+  })
+  assert.equal(await waitForFold(r.deps), null)
+  assert.equal(r.asks, FOLD_REFUSAL_LIMIT)
+  assert.deepEqual(failed, ['unanswered'])
 })
 
 test('a superseded turn fails nothing, even on an idle answer', async () => {
@@ -281,6 +353,17 @@ test('it DEGRADES rather than guessing', () => {
   const noSize = stillFolding(folding(512 * 1024, 500), null)
   assert.match(noSize, /512\.0 KB/)
   assert.doesNotMatch(noSize, / of /)
+})
+
+test('THE GO-LIVE SENTENCE names the log, the epoch and what the engine can vouch for', () => {
+  // tests/e2e/engineSteps.mts waits on this line as the app's readiness: the words up to the
+  // epoch are what its pattern reads.
+  const line = servingLine('C:\\Logs\\eqlog_Primitive_freeport.txt', live(4_096, 40))
+  const read = /data-server serving: (.*?) . the engine's fold is live and is now answering this app's reads \(epoch (\d+)/.exec(line)
+  assert.deepEqual(read?.slice(1), ['C:\\Logs\\eqlog_Primitive_freeport.txt', '2'])
+  assert.match(line, /\(epoch 2, 40 events, at byte 4096\)$/)
+  // Nothing folded yet: no dangling comma, and no log is said as none.
+  assert.match(servingLine(null, { status: 'live', epoch: 7 }), /serving: \(none\) .* reads \(epoch 7\)$/)
 })
 
 test('a denominator the fold has already passed never reads backwards', () => {

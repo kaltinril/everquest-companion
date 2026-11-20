@@ -11,7 +11,8 @@
 
 import { existsSync, statSync } from 'fs'
 import { IPC } from '../shared/ipc'
-import { logConsoleError, logInfo, logWarn } from './errorLog'
+import { logConsoleError, logError, logInfo, logWarn } from './errorLog'
+import { storeThenSignal } from './sessionTail'
 import {
   characterId,
   eqLogsDir,
@@ -420,9 +421,11 @@ export async function tailCharacter(ref: CharacterRef): Promise<boolean> {
   // ONE STORE WRITE FOR THE WHOLE ATTACH. The log path and the three dump loads below each wrote
   // `byCharacter` (141 KB, fsync) on their own: six rewrites back to back. The batch lands them
   // together once the last load has run (audit item 1); the reads inside see the pending values.
-  batchStore(() => {
-    attachCharacter(ref)
-  })
+  const store = (): void => {
+    batchStore(() => {
+      attachCharacter(ref)
+    })
+  }
   // THE ATTACH RIDES THIS CALL, and that is the whole of what "tailing a character" means now.
   //
   // `sendWorldRebuilt` tells every window that folds a module to re-hydrate, and — through the one
@@ -435,7 +438,18 @@ export async function tailCharacter(ref: CharacterRef): Promise<boolean> {
   // than a race. They re-ask immediately, the engine is still attaching or folding, and
   // `module:getSnapshot` answers null until it goes live — which `useModule` draws as loading. The
   // alternative would be showing the previous character's rows under this character's name.
-  sendWorldRebuilt(ref)
+  const signal = (): void => {
+    sendWorldRebuilt(ref)
+  }
+  // A SAVE THAT THROWS DOES NOT STOP THE SIGNAL (fork #9, `sessionTail.ts`): reading the log must
+  // not depend on writing the settings file.
+  storeThenSignal({
+    store,
+    signal,
+    failed: (err) => {
+      logError('main:attachCharacter', err)
+    }
+  })
   return true
 }
 

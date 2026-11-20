@@ -146,6 +146,9 @@ export interface LogReadFacts {
   readonly link: LogReadLink | null
   /** The newest reply of this read that could not be shown, or null. */
   readonly tooLarge: LogReadReplySize | null
+  /** Main is watching a log it could not open and will read it again by itself once it can
+   *  (main/logReadRecovery.ts). False once that cap is used up. */
+  readonly watchingFile: boolean
 }
 
 /** One more thing to tell the player while the read itself is fine. Nothing composes one yet. */
@@ -325,11 +328,20 @@ function endedWait(f: LogReadFacts): LogReadWait {
   return 'readerStopped'
 }
 
+/**
+ * An attach error that is not a refusal, by its code. An attach nobody answered: the engine said
+ * nothing at all. `mismatch` is main's own (main/dataServer/attachTurn.ts): the engine answered,
+ * about another log, twice.
+ */
+const ATTACH_WAITS = new Map<string, LogReadWait>([
+  ['timeout', 'notAnswering'],
+  ['mismatch', 'mismatch']
+])
+
 /** The wait of a read that failed outright, or null when nothing has. */
 function failedWait(f: LogReadFacts): LogReadWait | null {
   const error = f.error
-  // An attach nobody answered was not refused: the engine said nothing at all.
-  if (error?.step === 'attach') return error.code === 'timeout' ? 'notAnswering' : 'attachRefused'
+  if (error?.step === 'attach') return ATTACH_WAITS.get(error.code ?? '') ?? 'attachRefused'
   if (error?.step === 'fold' || f.health?.status === 'idle') return endedWait(f)
   if (error?.step === 'health') return 'notAnswering'
   return hung(f) ? 'logHung' : null
@@ -457,6 +469,19 @@ function measured(f: LogReadFacts): Pick<LogReadReport, 'logBytes' | 'offset' | 
   return { logBytes, offset, pct: known ? Math.min(100, (offset / logBytes) * 100) : null, events: null }
 }
 
+/**
+ * The two file waits once main has stopped watching the file: their Try line in
+ * `logReadWords.ts` says the app will try by itself, which is true only while it will.
+ */
+const TRY_NOT_WATCHING: Partial<Record<LogReadWait, string>> = {
+  logMissing: 'In game, type /log on. Then press Try again.',
+  logUnreadable: 'Close any program that has the log open. Then press Try again.'
+}
+
+function tryLineFor(wait: LogReadWait, f: LogReadFacts): string | null {
+  return (f.watchingFile ? undefined : TRY_NOT_WATCHING[wait]) ?? LOG_READ_TRY[wait]
+}
+
 /** The facts, decided and scrubbed: the one object every window is handed. */
 export function composeLogReadReport(f: LogReadFacts): LogReadReport {
   const verdict = decide(f)
@@ -464,7 +489,7 @@ export function composeLogReadReport(f: LogReadFacts): LogReadReport {
   return {
     wait,
     show: shows(verdict, f.now),
-    tryLine: LOG_READ_TRY[wait],
+    tryLine: tryLineFor(wait, f),
     action: LOG_READ_ACTION[wait],
     notes: [],
     appVersion: f.appVersion,
