@@ -34,7 +34,7 @@ export type ProbeSeen = 'missing' | 'unreadable' | 'pending' | 'clean'
 
 /** `pending` when nothing has answered yet, or an open is out and the kept answer is old. */
 export function probeSeen(probe: LogReadProbe | null): ProbeSeen {
-  if (probe === null || probe.pendingMs !== null) return 'pending'
+  if (probe?.pendingMs !== null) return 'pending'
   return probe.problem ?? 'clean'
 }
 
