@@ -757,7 +757,8 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   649.7-759.7, 112.7 px past the panel's inner edge; app-content scrolls sideways by 64 px
   (scrollWidth 540, clientWidth 476). At 900 px with 100% and at 1280 with 125% the panel's
   scrollWidth equals ...
-- CONFIRMED [low, cosmetic] Buffs card: a long spell name breaks "8s elapsed" onto two lines at the
+- FIXED 2026-11-20 (the caption is one unshrinking line; pinned in the source by
+  `tests/buffsFormat.test.mts`, not measured in the running app) [low, cosmetic] Buffs card: a long spell name breaks "8s elapsed" onto two lines at the
   default window Seen: Card "Jonthan's Whistling Warsong": name box 171 px wide and 40 px high (two
   lines), "8s elapsed" box 51.8 px wide and 39.8 px high (two lines), card 98.7 px high against 78.8
   for its neighbours. With boxes on, "Quivering Veil of Xarn" does the same (name 129 px x 40, "29s
