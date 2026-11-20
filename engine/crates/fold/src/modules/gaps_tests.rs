@@ -296,6 +296,32 @@ fn the_coin_a_sale_on_loot_or_a_purchase_printed_is_read_off_the_line() {
 }
 
 #[test]
+fn every_con_reading_is_served_past_the_cap_so_a_page_states_the_whole_level_range() {
+    // Four levels under two standings fill the eight served entries; the lowest and highest level,
+    // each conned once, fall off them. The copied page's `level` reads `all`.
+    let mut m = module();
+    let mut seq = 0;
+    let mut con = |m: &mut GapsModule, level: i64, faction: &str| {
+        seq += 1;
+        feed(m, seq, json!({ "kind": "consider", "mob": "a nameless thing", "level": level, "faction": faction }));
+    };
+    con(&mut m, 28, "apprehensive");
+    for level in 29..=32 {
+        for faction in ["apprehensive", "indifferent"] {
+            con(&mut m, level, faction);
+            con(&mut m, level, faction);
+        }
+    }
+    con(&mut m, 33, "indifferent");
+    let cons = m.snapshot()["state"]["rows"][0]["details"]["cons"].clone();
+    assert_eq!(cons["entries"].as_array().map(Vec::len), Some(8));
+    assert_eq!(cons["distinct"], json!(10));
+    let all: Vec<&str> = cons["all"].as_array().expect("all").iter().filter_map(Value::as_str).collect();
+    assert_eq!(all.len(), 10);
+    assert!(all.contains(&"L28 apprehensive") && all.contains(&"L33 indifferent"), "{all:?}");
+}
+
+#[test]
 fn a_stack_sold_on_loot_is_tallied_at_one_items_price() {
     // The line's coin covers the stack (tests/fixtures/w21-stacked.log: Spider Silk 1 for 143c, 2
     // for 286c, 4 for 572c); the list is one item's price, the sum what the row brought in.

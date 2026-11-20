@@ -294,8 +294,9 @@ impl Serialize for Details {
             }
         }
         // Every name past the cap: the tab's zone filter reads `zones`, a page's `|foraged` lists
-        // every forage zone.
-        for (name, tally) in [("zones", &self.zones), ("forageZones", &self.forage_zones)] {
+        // every forage zone, and a page's `level` is the lowest to the highest /con (the capped
+        // entries drop the readings seen least, which are the ends of the range).
+        for (name, tally) in [("zones", &self.zones), ("forageZones", &self.forage_zones), ("cons", &self.cons)] {
             if let Some(list) = out.get_mut(name) {
                 let mut all: Vec<&String> = tally.0.keys().collect();
                 all.sort();

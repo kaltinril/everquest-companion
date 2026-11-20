@@ -159,6 +159,16 @@ test('gaps: the zones list keeps every name across both sides, for the "this zon
   assert.equal(bare.all, undefined, 'neither side had one, so none is made up')
 })
 
+test("gaps: a mob's con readings keep every name across both sides, so a level only the archive saw stays in the page's range", () => {
+  const eight: [string, number][] = [29, 30, 31, 32].flatMap((l): [string, number][] => [[`L${String(l)} apprehensive`, 4], [`L${String(l)} indifferent`, 4]])
+  const older = snap([row('mob', 'a gorgon', 1, { details: { cons: { ...tally(['L28 apprehensive', 1]), all: ['L28 apprehensive'] }, samples: [] } })])
+  const newer = snap([row('mob', 'a gorgon', 9, { details: { cons: { ...tally(...eight), all: eight.map(([name]) => name) }, samples: [] } })])
+  const cons = (mergeGaps(older, newer) as Snap).rows[0].details.cons as Tally
+  assert.equal(cons.entries.some((e) => e.name === 'L28 apprehensive'), false, 'the served entries are capped as before')
+  assert.ok(cons.all?.includes('L28 apprehensive'))
+  assert.equal(cons.distinct, 9)
+})
+
 test('mob points from both sides join per mob, each point once', () => {
   const older = { ...snap([]), mobLocs: [{ mob: 'a scout', zone: 'The Feerrott', points: [[-791, 173, -12]] }] }
   const newer = { ...snap([]), mobLocs: [{ mob: 'A scout', zone: 'The Feerrott', points: [[-791, 173, -12], [10, -21, 1]] }] }

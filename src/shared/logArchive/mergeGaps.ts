@@ -13,7 +13,7 @@ import { isRewardChest } from '../rewardChest'
 interface Tally {
   entries: { name: string; n: number }[]
   distinct: number
-  /** The zones and forageZones lists: every name, past the cap (the "this zone" filter, a page's `|foraged`). */
+  /** The zones, forageZones and cons lists: every name, past the cap (the "this zone" filter, a page's `|foraged` and `|level`). */
   all?: string[]
 }
 
