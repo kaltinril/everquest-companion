@@ -247,6 +247,14 @@ test('a detail line is bounded by SHAPE, not trusted by provenance', () => {
   assert.ok(long?.endsWith('…'))
 })
 
+test('a detail can be given a longer bound, and the default is still 200', () => {
+  const line = `a\u0000${'x'.repeat(5_000)}`
+  assert.equal(boundedDetail(line, 2048)?.length, 2049, 'cut at the bound asked for, plus the ellipsis')
+  assert.ok(boundedDetail(line, 2048)?.startsWith('a x'), 'still control-free')
+  assert.equal(boundedDetail('y'.repeat(2048), 2048)?.length, 2048, 'a line at the bound is not cut')
+  assert.equal(boundedDetail(line)?.length, ENGINE_DETAIL_MAX + 1)
+})
+
 // ---- 5. where the binary is looked for -------------------------------------------------
 //
 // THE INCIDENT THIS SECTION IS NOW THE MEMORY OF (JOS-520). The order used to be DEBUG BEFORE

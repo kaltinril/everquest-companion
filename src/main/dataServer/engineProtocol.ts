@@ -409,6 +409,8 @@ export function engineLocalSocketLog(
  * file by accident, and a comparison cannot be mistyped invisibly.
  */
 export const ENGINE_DETAIL_MAX = 200
+/** How much of one stderr line is kept for the log-read report, which scrubs paths and cuts again. */
+export const ENGINE_SAID_MAX = 2048
 
 /**
  * THE LAUNCH TOKEN NEVER SURVIVES A ROUND TRIP THROUGH THE CHILD'S OUTPUT — and this is not
@@ -430,7 +432,7 @@ export function redactToken(line: string, token: string): string {
   return line.split(token).join('<token>')
 }
 
-export function boundedDetail(value: unknown): string | null {
+export function boundedDetail(value: unknown, max = ENGINE_DETAIL_MAX): string | null {
   if (typeof value !== 'string') return null
   let out = ''
   for (const ch of value) {
@@ -439,7 +441,7 @@ export function boundedDetail(value: unknown): string | null {
   }
   const flat = out.replace(/\s+/g, ' ').trim()
   if (flat === '') return null
-  return flat.length <= ENGINE_DETAIL_MAX ? flat : `${flat.slice(0, ENGINE_DETAIL_MAX)}…`
+  return flat.length <= max ? flat : `${flat.slice(0, max)}…`
 }
 
 /** The cause as one sentence. A function rather than a template at each call site so every failure

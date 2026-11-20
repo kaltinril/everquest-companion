@@ -213,9 +213,32 @@ export function scrubPaths(text: string, logPath: string | null, home: string): 
   let out = text
   if (logPath !== null && logPath.length > 3) out = out.replace(pathPattern(logPath), baseName(logPath))
   if (home.length > 3) out = out.replace(pathPattern(home), '~')
-  out = out.replace(/(?:[A-Za-z]:)?[\\/]+Users[\\/]+[^\\/\s"']+/gi, '~')
+  // Not the machine's shared folders: `~\Daybreak Game Company` would read as the player's home.
+  out = out.replace(
+    /(?:[A-Za-z]:)?[\\/]+Users[\\/]+(?!(?:Public|Default|All Users)(?:[\\/\s"']|$))[^\\/\s"']+/gi,
+    '~'
+  )
   // The copy rule (no em or en dash on screen) holds for quoted text too.
   return out.replace(/\s*[\u2013\u2014]\s*/g, ' - ')
+}
+
+/** A launch fault with its detail scrubbed: a spawn failure's detail starts with the program path. */
+export function scrubFault<T extends { readonly detail: string | null }>(
+  fault: T | null,
+  logPath: string | null,
+  home: string
+): T | null {
+  if (fault === null || fault.detail === null) return fault
+  return { ...fault, detail: scrubPaths(fault.detail, logPath, home) }
+}
+
+/** How much of one engine stderr line the box prints. */
+const SAID_SHOWN_CHARS = 200
+
+/** One engine stderr line for the screen: scrubbed FIRST, because a path cut short no longer matches. */
+function saidLine(line: string, f: LogReadFacts): string {
+  const safe = scrubPaths(line, f.logPath, f.home)
+  return safe.length <= SAID_SHOWN_CHARS ? safe : `${safe.slice(0, SAID_SHOWN_CHARS)}\u2026`
 }
 
 // ── the decision ───────────────────────────────────────────────────────────────────────────────
@@ -330,7 +353,7 @@ export function composeLogReadReport(f: LogReadFacts): LogReadReport {
     ...measured(f),
     engine: engineWords(f),
     lastError: lastErrorText(f, wait),
-    engineSaid: (f.error?.said ?? []).map((line) => scrubPaths(line, f.logPath, f.home)),
+    engineSaid: (f.error?.said ?? []).map((line) => saidLine(line, f)),
     waitedMs
   }
 }

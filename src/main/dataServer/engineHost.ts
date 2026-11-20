@@ -71,6 +71,7 @@
 
 import { spawn, type ChildProcess } from 'node:child_process'
 import { copyFileSync, existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs'
+import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { app, powerMonitor } from 'electron'
 import { logError, logInfo, logWarn } from '../errorLog'
@@ -113,6 +114,8 @@ import {
   noteEngineStarting
 } from './engineLaunchState'
 import { noteEngineSaid } from './logReadState'
+import { scrubFault } from '../../shared/logReadReport'
+import { getActiveCharacter } from '../session'
 
 /** How long a loopback connect may take before the probe gives up on it. Loopback either answers
  *  immediately or is not listening; this is a bound on the pathological case, not a budget. */
@@ -527,7 +530,9 @@ export function startEngineSupervisor(): void {
     // is what puts the failure card on screen; `null` is a launch that reached READY and takes it
     // back off. The candidate paths are grafted on inside `noteEngineFault` from the list above.
     onFault: (fault) => {
-      noteEngineFault(fault)
+      // Scrubbed here: the card prints the detail as given, and a spawn failure's starts with the
+      // full program path.
+      noteEngineFault(scrubFault(fault, getActiveCharacter()?.logPath ?? null, homedir()))
     },
     // THE CYCLING EDGE (JOS-519). `onPid(null)` above already wrote `engine:gone` for this same
     // ending — this is the one bit that ending did not carry: the engine had REACHED READY, so what
