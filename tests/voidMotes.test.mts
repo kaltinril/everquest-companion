@@ -11,7 +11,9 @@ import type { MobEntry } from '../src/shared/mobTypes'
 import type { GearRow } from '../src/shared/planner/gear'
 import type { PlannerInventoryHost } from '../src/shared/planner/inventorySlots'
 import { SUPPLY, itemSupply, mobKey, raidFactsOf, type ItemSupply } from '../src/shared/planner/itemSupply'
+import { procSeatSwings } from '../src/shared/planner/rules'
 import { supplyContextOf } from '../src/shared/planner/supplyContext'
+import type { EquipSlot, PlanSlotId } from '../src/shared/planner/types'
 import {
   MOTE_RULES,
   isMoteReady,
@@ -37,6 +39,7 @@ import {
   moteUnrankedText,
   sanitizeMotePrefs
 } from '../src/renderer/src/features/gear/voidMotePrefs'
+import { seatIsLive } from '../src/renderer/src/features/character/socketRecommend'
 
 // ---- the pages ----------------------------------------------------------------------------------
 
@@ -239,7 +242,8 @@ test('moteAdvice: one row per worn item below +10, read at the tier its name sta
   assert.equal(list.length, 1, 'a +10 item and an item the corpus does not know are left out')
   const [a] = list
   assert.ok(a)
-  assert.deepEqual([a.tier, a.copies, a.gate, a.opens], [3, 8, 'early', 'Proc'])
+  // Worn on the chest: the +4 Proc socket is not named there (the Proc test below).
+  assert.deepEqual([a.tier, a.copies, a.gate, a.opens], [3, 8, 'early', undefined])
   // floor(30 + 30 * 3 / 10) = 39 at +3, floor(30 + 30 * 4 / 10) = 42 at +4 (itemUpgrade's primary rule)
   assert.equal(a.gain, 3)
   assert.deepEqual(a.changes, [
@@ -255,6 +259,29 @@ test('moteAdvice: the score is the gain times the hours, and a stat the item lac
   assert.ok(a && none)
   assert.equal(a.score, Math.round(a.gain * a.hours * 1000) / 1000)
   assert.deepEqual([none.gain, none.score], [0, 0])
+})
+
+test('moteAdvice: a Proc socket is named only where a proc can fire (the Exaltations tab offers none elsewhere)', () => {
+  /** What the row of one item worn in `cell` at `tier` says the next tier opens. */
+  const opens = (cell: PlanSlotId, tier: number, slots: EquipSlot[]): string | undefined => {
+    const row = gear(`Worn in ${cell}`, { slots })
+    const host: PlannerInventoryHost = { slot: cell, name: row.name, key: row.key, tier }
+    const [advice] = moteAdvice([host], new Map([[row.key, row]]), OPTS)
+    assert.ok(advice)
+    return advice.opens
+  }
+  assert.equal(opens('CHEST', 3, ['CHEST']), undefined, 'nothing swings a breastplate')
+  assert.equal(opens('FINGER2', 3, ['FINGER']), undefined)
+  assert.equal(opens('PRIMARY', 3, ['PRIMARY', 'SECONDARY']), 'Proc')
+  assert.equal(opens('SECONDARY', 3, ['SECONDARY']), 'Proc')
+  assert.equal(opens('ANY1', 3, ['SECONDARY']), undefined, 'an off-hand item in an Any Slot cell is in no hand')
+  assert.equal(opens('CHEST', 2, ['CHEST']), 'Worn', 'the other sockets are named on every cell')
+  assert.equal(opens('CHEST', 4, ['CHEST']), undefined, 'no socket opens above +4')
+  // One rule, read by both tabs: the seat the Exaltations tab offers a proc for.
+  for (const slot of ['PRIMARY', 'SECONDARY', 'CHEST', 'EAR', null] as const) {
+    assert.equal(seatIsLive({ type: 'Proc', slot }), procSeatSwings(slot), String(slot))
+  }
+  assert.deepEqual([procSeatSwings('PRIMARY'), procSeatSwings('SECONDARY'), procSeatSwings('RANGE'), procSeatSwings(null)], [true, true, false, false])
 })
 
 test('moteUnranked: a worn item the item data does not know is named, not dropped in silence', () => {

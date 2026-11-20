@@ -24,6 +24,7 @@ import { scaleGearStats } from './gearScale'
 import type { PlannerInventoryHost } from './inventorySlots'
 import { SUPPLY, type ItemSupply } from './itemSupply'
 import { roleValuer, type GearRole } from './roleWeights'
+import { procSeatSwings } from './rules'
 import { equipSlotOf, type EquipSlot, type PlanSlotId } from './types'
 
 /** The rules of the ranking, in one table (the plan doc gives each one's reason). */
@@ -115,7 +116,10 @@ export interface MoteAdvice {
   hours: number
   road: MoteRoad
   gate: MoteGate
-  /** the exaltation socket the next tier opens (`Proc`), when it opens one */
+  /**
+   * the exaltation socket the next tier opens (`Worn`), when it opens one. A Proc socket is named
+   * only on a weapon-hand cell (`procSeatSwings`): the Exaltations tab offers no proc elsewhere
+   */
   opens?: string
   /** `gain x hours`; 0 when the target gains nothing */
   score: number
@@ -240,7 +244,9 @@ export function moteAdvice(
     }
     if (w.row.supply !== undefined) advice.supply = w.row.supply
     const opens = EXALTATION_SLOT_TYPES.find((s) => s.unlocksAt === w.tier + 1)
-    if (opens !== undefined) advice.opens = opens.type
+    // The CELL decides, not `wornSlot`: an off-hand item in an any-cell is in no hand.
+    const live = opens !== undefined && (opens.type !== 'Proc' || procSeatSwings(equipSlotOf(w.host.slot)))
+    if (live) advice.opens = opens.type
     return advice
   })
 }
