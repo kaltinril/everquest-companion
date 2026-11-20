@@ -28,6 +28,12 @@ reaches players within hours: only publish what the owner has asked for.
    data committed on a work branch off `main_community`, gated and merged), then `npx tsx scripts/eoz-compare.mts
    --release` (exits 1 while anything is behind). No pack age stands in for the delta. A release ships the wiki as it stands today,
    owner's and testers' edits included.
+3. **The two tradeskill guides, after the delta has merged** (owner, 2026-11-20: "as part of the
+   delta refresh we do from the wiki every time we release can we do a fresh pull from the google
+   sheets"). `npx tsx scripts/community/guides-pull.mts` in a work tree off `main_community`
+   (`docs/community/agent/DATA_REFRESH.md`, "The two tradeskill guides"; the `wiki-delta` skill's
+   "After" has the three outcomes). A refused pull does not stop the release: it ships the last
+   good copy, and the owner is told what was refused.
 
 ## 1. Before the tag
 
