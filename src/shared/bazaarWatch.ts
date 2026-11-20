@@ -104,11 +104,26 @@ export function watchKey(item: string, tier: number | null): string {
   return `${item.toLowerCase()}|${tier ?? '*'}`
 }
 
-/** The watch that covers this item and tier: its own tier's first, else the every-tier one. */
+/**
+ * The watch that covers this item and tier: its own tier's first, else the every-tier one. It is the
+ * watch the panel shows and edits; which watch an offer alerts under is `alertingWatch`.
+ */
 export function findWatch(list: BazaarWatchlist, item: string, tier: number): BazaarWatch | null {
   const lower = item.toLowerCase()
   const on = list.entries.filter((w) => w.item.toLowerCase() === lower)
   return on.find((w) => w.tier === tier) ?? on.find((w) => w.tier === null) ?? null
+}
+
+/**
+ * The watch that decides whether this live offer alerts. The tier's own watch decides the side it
+ * has on (its price wins over the every-tier one); a side it leaves off falls to the every-tier
+ * watch, so a WTB tick on +4 never silences "Every tier" WTS on +4.
+ */
+export function alertingWatch(list: BazaarWatchlist, o: LiveOffer): BazaarWatch | null {
+  const own = findWatch(list, o.item, o.tier)
+  if (own === null || own.tier === null || (o.dir === 'sell' ? own.wts : own.wtb)) return own
+  const lower = o.item.toLowerCase()
+  return list.entries.find((w) => w.tier === null && w.item.toLowerCase() === lower) ?? own
 }
 
 /** Any watch on this item, its tier's or not: the row's chip, when a row stands for every tier. */
@@ -204,7 +219,7 @@ export function freshWatchAlerts(snap: BazaarSnap, list: BazaarWatchlist, after:
   const alerts: WatchAlert[] = []
   for (const o of live) {
     if (o.seq <= after) continue
-    const w = findWatch(list, o.item, o.tier)
+    const w = alertingWatch(list, o)
     const reason = w === null ? null : watchAlertReason(w, o, weekMedianAsking(snap.rows, o.item, o.tier, o.at.slice(0, 10)))
     if (reason !== null) alerts.push({ offer: o, reason, text: `${watchAlertText(o)} (${reason})` })
   }

@@ -168,6 +168,36 @@ test('the first snapshot is a baseline; later live offers alert once', () => {
   assert.deepEqual(freshWatchAlerts(later, list, 7).alerts, [])
 })
 
+// Bug hunt, 2026-11-19: a +4 watch with only WTB ticked silenced the every-tier watch's WTS on +4.
+test("an every-tier watch still alerts on the side a tier's own watch leaves off", () => {
+  const list = {
+    entries: [watch({ item: 'Fleeting Quiver', tier: 4, wtb: true }), watch({ item: 'Fleeting Quiver', wts: true, wtsMax: 5000 })]
+  }
+  const snap: BazaarSnap = { rows: [], live: [offer([2, 'sell', 'Fleeting Quiver', 4], 3000), offer([3, 'buy', 'Fleeting Quiver', 4], null), offer([4, 'buy', 'Fleeting Quiver', 2], null)] }
+  assert.deepEqual(
+    freshWatchAlerts(snap, list, 1).alerts.map((a) => a.text),
+    // The +2 buyer is on no watch's WTB: the every-tier watch has it off and the +4 one is another tier.
+    ['Leric WTS Fleeting Quiver +4 3k (at or under your 5k)', 'Leric WTB Fleeting Quiver +4 (on your watchlist)']
+  )
+})
+
+test("a tier's own price still decides on the side it has on", () => {
+  const list = {
+    entries: [watch({ item: 'Fleeting Quiver', wts: true, wtsMax: 20000 }), watch({ item: 'Fleeting Quiver', tier: 0, wts: true, wtsMax: 5000 })]
+  }
+  const snap: BazaarSnap = { rows: [], live: [offer([2, 'sell', 'Fleeting Quiver', 0], 10000), offer([3, 'sell', 'Fleeting Quiver', 2], 10000)] }
+  assert.deepEqual(
+    freshWatchAlerts(snap, list, 1).alerts.map((a) => a.text),
+    ['Leric WTS Fleeting Quiver +2 10k (at or under your 20k)']
+  )
+  // A tier watched with neither box ticked mutes nothing: the every-tier watch still alerts there.
+  const quiet = { entries: [watch({ item: 'Fleeting Quiver', tier: 4 }), watch({ item: 'Fleeting Quiver', wts: true })] }
+  const sale: BazaarSnap = { rows: [], live: [offer([2, 'sell', 'Fleeting Quiver', 4], 3000)] }
+  assert.equal(freshWatchAlerts(sale, quiet, 1).alerts.length, 1)
+  // With no every-tier watch, a tier's own watch with the side off stays silent.
+  assert.deepEqual(freshWatchAlerts(sale, { entries: [watch({ item: 'Fleeting Quiver', tier: 4, wtb: true })] }, 1).alerts, [])
+})
+
 test('Popular ranks by platinum traded and the floor drops what sells under it', () => {
   const rows = [
     row(['2026-09-25', 'sell', 'Bone Chips'], [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]),
