@@ -12,7 +12,8 @@ use serde_json::{json, Value};
 
 /// Each line as the parser's event, in its JSON spelling.
 fn parsed(lines: &[&str]) -> Vec<String> {
-    let parser = Parser::new(Clock::new(Tz::America__Los_Angeles), None, None);
+    let me = Some("Primitive".to_string());
+    let parser = Parser::new(Clock::new(Tz::America__Los_Angeles), None, me);
     let mut out = Vec::new();
     for (seq, raw) in lines.iter().enumerate() {
         let mut ev = Ev::new();
@@ -122,6 +123,29 @@ const HEAL_BETWEEN: [&str; 5] = [
     "[Tue Nov 17 12:00:41 2026] You slash a skeleton for 50 points of damage.",
 ];
 
+/// Another player fights nearby between two pulls of yours, and misses once.
+const STRANGER_BETWEEN: [&str; 7] = [
+    "[Tue Nov 17 12:00:00 2026] You slash a bat for 50 points of damage.",
+    "[Tue Nov 17 12:00:10 2026] You slash a bat for 50 points of damage.",
+    "[Tue Nov 17 12:00:10 2026] You have slain a bat!",
+    "[Tue Nov 17 12:00:20 2026] Scooba slashes a gnoll for 900 points of damage.",
+    "[Tue Nov 17 12:00:40 2026] Scooba tries to slash a gnoll, but misses!",
+    "[Tue Nov 17 12:01:30 2026] You slash a skeleton for 50 points of damage.",
+    "[Tue Nov 17 12:01:31 2026] You have slain a skeleton!",
+];
+
+/// A pet that fought two pulls beside you as another combatant, claimed during the second.
+const PET_CLAIMED_LATE: [&str; 8] = [
+    "[Tue Nov 17 12:00:00 2026] You slash a bat for 50 points of damage.",
+    "[Tue Nov 17 12:00:02 2026] Gobekn bites a bat for 50 points of damage.",
+    "[Tue Nov 17 12:00:10 2026] You slash a bat for 50 points of damage.",
+    "[Tue Nov 17 12:00:12 2026] Gobekn bites a bat for 50 points of damage.",
+    "[Tue Nov 17 12:00:12 2026] You have slain a bat!",
+    "[Tue Nov 17 12:00:40 2026] You slash a skeleton for 50 points of damage.",
+    "[Tue Nov 17 12:00:48 2026] Gobekn bites a skeleton for 50 points of damage.",
+    "[Tue Nov 17 12:00:49 2026] Gobekn says, 'My leader is Primitive.'",
+];
+
 /// The replayed fight is its own ten seconds: the miss that opened the next pull is not in it.
 #[test]
 fn a_miss_that_opens_the_next_pull_is_not_booked_in_the_fight_that_ended() {
@@ -157,11 +181,13 @@ fn a_heal_after_the_kill_is_not_booked_in_the_fight_that_ended() {
 /// The promise itself: every list and every scope, the same from a replay as from the live tail.
 #[test]
 fn the_same_lines_read_the_same_live_and_replayed() {
-    let cases: [(&str, &[&str]); 4] = [
+    let cases: [(&str, &[&str]); 6] = [
         ("a miss opens the next pull", &MISS_OPENS),
         ("a miss opens a pull minutes later", &MISS_OPENS_LATE),
         ("a resist opens the next pull", &RESIST_OPENS),
         ("a heal between two pulls", &HEAL_BETWEEN),
+        ("another player fights between two pulls", &STRANGER_BETWEEN),
+        ("a pet claimed during its second pull", &PET_CLAIMED_LATE),
     ];
     for (name, lines) in cases {
         let (was_live, restarted) = (live(lines), replayed(lines));
