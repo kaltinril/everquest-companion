@@ -426,7 +426,7 @@ async function pushAllDefines(mine: number): Promise<void> {
  * ON CONNECT, AND NOT WITH THE DEFINES. `pushAllDefines` is called from `attachAndProbe`, which
  * RETURNS EARLY when this app has no character attached — "the engine is left idle" — and that early
  * return is exactly the launch this push matters most on: a fresh install has no character to attach
- * to and a picker that has to draw one anyway. So it is sent from `openConnection`, before anything
+ * to and a picker that has to draw one anyway. So it is sent from `afterConnect`, before anything
  * can decide there is nothing to do.
  *
  * `eqLogsDir()` RATHER THAN A VALUE PASSED IN, for `appKnowledge.ts`'s reason exactly: what the
