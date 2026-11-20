@@ -34,9 +34,11 @@ export const LOG_READ_STALL_MS = 60_000
 
 export interface LogReadError {
   readonly step: LogReadStep
+  /** The engine error's code (`timeout`, `badParams`, ...), or null when there was none. */
+  readonly code: string | null
   readonly detail: string
   readonly at: number
-  /** The engine's last stderr lines at the moment the error was recorded. */
+  /** The engine's newest stderr lines: as of now for a `fold` error, as recorded for the others. */
   readonly said: readonly string[]
 }
 
@@ -82,7 +84,9 @@ export interface LogReadFacts {
   readonly connection: string | null
   /** `ok`, or the read path's reason for not serving. */
   readonly readiness: string
-  readonly health: { readonly status: string; readonly at: number } | null
+  /** The last `session.health` answer of this turn. `since` is when its status was first heard in
+   *  a row (`starting` and `attaching` count as one). */
+  readonly health: { readonly status: string; readonly at: number; readonly since: number } | null
   readonly fold: {
     readonly offset: number
     readonly logSize: number
@@ -91,18 +95,24 @@ export interface LogReadFacts {
   } | null
   /** The log's size as the engine last stated it, when no fold measurement is held. */
   readonly logSize: number | null
+  /** How far the engine last said the read had got in this turn. It outlives a read that ended. */
+  readonly lastOffset: number | null
   /** When the read's offset last grew. */
   readonly movedAt: number | null
+  /** When the wait for this log began. A new launch or a rebuild of the same log does not restart
+   *  it; another log, or the read going live, does. */
   readonly waitingSince: number | null
   readonly error: LogReadError | null
   /** Main's own look at the file, taken only on the failure path. */
   readonly probe: { readonly bytes: number | null; readonly problem: 'missing' | 'unreadable' | null } | null
-  /** The meter's last read: `unserved` is the phrase and `why` the read path's reason word
-   *  (main/dataServer/readShim.ts `FallbackReason`), both null when it was served. */
+  /** The meter's last read since the log went live: `unserved` is the phrase and `why` the read
+   *  path's reason word (main/dataServer/readShim.ts `FallbackReason`), both null when it was
+   *  served. `since` is when its reads began going unserved in a row, null when it was served. */
   readonly lastCombatRead: {
     readonly unserved: string | null
     readonly why: string | null
     readonly at: number
+    readonly since: number | null
   } | null
   /** The keeper of main's connection, or null when there is no client. */
   readonly link: LogReadLink | null

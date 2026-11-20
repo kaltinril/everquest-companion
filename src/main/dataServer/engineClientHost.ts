@@ -221,7 +221,7 @@ function bumpGen(): number {
   resetMirrors()
   // What was known about reply sizes was known about the last read (replySizes.ts).
   replySizes.reset()
-  noteLogReadTurn(Date.now())
+  noteLogReadTurn(Date.now(), attachTarget())
   return gen
 }
 
@@ -542,7 +542,9 @@ async function sendAttach(mine: number, l: LiveEngine, logPath: string): Promise
     // The connection went away under the attach: the engine refused nothing, and the reconnect
     // sends it again (`attachedTo` is still unset).
     if (isLinkLost(err)) return null
-    if (gen === mine) noteLogReadError('attach', describeErr(err), Date.now())
+    // The code goes with it: an attach nobody answered is not an attach that was refused.
+    const code = err instanceof EngineError ? err.code : null
+    if (gen === mine) noteLogReadError('attach', describeErr(err), Date.now(), code)
     return null
   }
 }
