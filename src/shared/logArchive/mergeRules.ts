@@ -13,6 +13,7 @@ import { mergeBazaar } from './mergeBazaar'
 import { mergeBuffStats } from './mergeBuffStats'
 import { mergeCombo } from './mergeCombo'
 import { mergeConsider } from './mergeConsider'
+import { mergeCrafting } from './mergeCrafting'
 import { mergeGaps } from './mergeGaps'
 import { mergeItemTiers } from './mergeItemTiers'
 import { mergeKills } from './mergeKills'
@@ -34,6 +35,7 @@ export const MERGE_RULES: Readonly<Record<string, MergeRule>> = {
   loot: mergeLoot,
   leveling: mergeLeveling,
   skills: mergeSkills,
+  crafting: mergeCrafting,
   consider: mergeConsider,
   itemTiers: mergeItemTiers,
   classUnlocks: mergeClassUnlocks,
