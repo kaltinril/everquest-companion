@@ -223,9 +223,11 @@ export interface RecipePanelProps {
   /** Null for a recipe the table no longer lists. */
   state: LadderState | null
   facts: BenchFacts
+  /** Why the recipe is not in the table under the panel (a link from another tab opened it); null when it is. */
+  unlisted?: string | null
 }
 
-export function RecipePanel({ recipe, state, facts }: RecipePanelProps): JSX.Element {
+export function RecipePanel({ recipe, state, facts, unlisted }: RecipePanelProps): JSX.Element {
   const { dumpedAt } = facts.held
   return (
     <FactsContext.Provider value={facts}>
@@ -237,6 +239,11 @@ export function RecipePanel({ recipe, state, facts }: RecipePanelProps): JSX.Ele
           <Typography variant="body2" color="text.secondary" data-testid="tradeskill-picked-facts">
             {recipeFacts(recipe, false)}
           </Typography>
+          {unlisted != null && (
+            <Typography variant="caption" color="text.secondary" data-testid="tradeskill-picked-unlisted">
+              {unlisted}
+            </Typography>
+          )}
         </Stack>
         <ColumnHeads dumpedAt={dumpedAt} />
         {/* Keyed by recipe so a material opened under one recipe is not open under the next. */}

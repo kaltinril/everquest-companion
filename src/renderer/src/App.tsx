@@ -76,7 +76,7 @@ import { SpellDrill } from './features/spells/SpellPage'
 // views - `unreleasedSpells.tsx` holds the `lazy(…)` trio and the view test, so this file gains a
 // line rather than nine.
 import UnreleasedSpellsView from './unreleasedSpells'
-import { SpellLinkProvider } from './lib/spellLink'
+import { AppLinkProvider } from './lib/appLinks'
 // Every "on the way to" chip is a link the same way (lib/unlockLink.tsx).
 import { UnlockLinkProvider, useOpenUnlock } from './lib/unlockLink'
 // The ACHIEVEMENTS and UNLOCKS tabs; each view check lives in its own file.
@@ -267,9 +267,10 @@ function ViewContent({
   // links is a property of the APP, not a per-caller decision. It sits HERE rather than at App's
   // root because this is the exact subtree that draws spell names: Preferences and the owner-only
   // triage tab return above it and draw none, and the overlay bundle — a different window, mounting
-  // no provider at all — keeps the plain text it has always had.
+  // no provider at all — keeps the plain text it has always had. `AppLinkProvider` (lib/appLinks.tsx)
+  // is that spell provider plus the Tradeskills door (lib/tradeskillLink.tsx), mounted as one element.
   return (
-    <SpellLinkProvider open={routing.openSpell}>
+    <AppLinkProvider routing={routing}>
       <PlainView
         view={view}
         viewKey={viewKey}
@@ -331,7 +332,7 @@ function ViewContent({
           onFocusConsumed={routing.clearCombatFocus}
         />
       )}
-    </SpellLinkProvider>
+    </AppLinkProvider>
   )
 }
 

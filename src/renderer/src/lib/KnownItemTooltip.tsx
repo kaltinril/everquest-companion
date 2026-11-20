@@ -53,13 +53,16 @@
 
 import { type JSX, type ReactNode, useCallback, useEffect, useState, type ReactElement } from 'react'
 import { Box, CircularProgress, Stack, Typography } from '@mui/material'
-import type { ItemKnowledge } from '@shared/types'
+import type { ItemKnowledge, ItemRecipeUse } from '@shared/types'
+import { tradeskillOf } from '@shared/tradeskills'
 import { questWikiUrl } from '@shared/wiki'
+import { CellLink } from './CellLink'
 import { EQ_ITEM_COLORS } from './ItemWindow'
 import { ObservedItemWindow } from './ObservedItemWindow'
 import { questUseOutcomes, questUseWhere } from './itemKnowledgeView'
 import { nameUpgrade } from '../features/loot/itemUpgradeSim'
 import { Tooltip, type TooltipProps } from './Tooltip'
+import { useTradeskillLink } from './tradeskillLink'
 
 /** How many quest uses / recipes the card lists before collapsing to "+N more". */
 const MAX_LISTED = 4
@@ -211,6 +214,33 @@ function Outcomes({ names, depth }: { names: string[]; depth: number }): JSX.Ele
 }
 
 /**
+ * A recipe use's tradeskill and trivial ("Baking 56"). On the card the pointer can enter (depth 0:
+ * a nested or click-through card takes no clicks) it is a link to that tradeskill's workbench in
+ * the Tradeskills section, on the recipe that makes the named item, drawn the way the quest name
+ * above it is. Anywhere else, or where the wiki's word names no tradeskill, it is the text it was.
+ */
+function RecipeHow({ use, depth }: { use: ItemRecipeUse; depth: number }): JSX.Element | null {
+  const open = useTradeskillLink()
+  const how = [use.tradeskill, use.trivial != null ? String(use.trivial) : null].filter(Boolean).join(' ')
+  if (how === '') return null
+  const tradeskill = tradeskillOf(use.tradeskill)
+  if (open === null || tradeskill === undefined || depth > 0) return <> · {how}</>
+  return (
+    <>
+      {' · '}
+      <span title={`Open this recipe in ${tradeskill}`} data-testid="item-card-recipe-link">
+        <CellLink
+          text={how}
+          onOpen={() => {
+            open({ tradeskill, item: use.recipe })
+          }}
+        />
+      </span>
+    </>
+  )
+}
+
+/**
  * "What it's for" — the block BELOW the hairline. Quest uses first (they're the reason an item
  * is notable at all), then the recipes that consume it, which is the honest answer for the big
  * family of QUEST-ITEM-flagged tradeskill components. Renders nothing when we know nothing:
@@ -264,23 +294,20 @@ function WhatItsFor({ data, depth }: { data: ItemKnowledge; depth: number }): JS
       {shownRecipes.length > 0 && (
         <Box>
           <Muted>Used in {recipes.length === 1 ? 'recipe' : 'recipes'}:</Muted>
-          {shownRecipes.map((r) => {
+          {shownRecipes.map((r) => (
             // `recipeUseLabel` is the ONE spelling of a recipe use ("Gnome Kabobs (Baking 56)").
             // Here the name is drawn separately (it's the hoverable crafted item), so the
-            // tradeskill/trivial half is taken from the same fields the label uses.
-            const how = [r.tradeskill, r.trivial != null ? String(r.trivial) : null].filter(Boolean).join(' ')
-            return (
-              <Typography
-                key={`${r.tradeskill ?? ''}:${r.recipe}`}
-                component="div"
-                sx={{ color: EQ_ITEM_COLORS.label, fontSize: 11, lineHeight: 1.4, mt: 0.25 }}
-              >
-                {/* The recipe NAME is the crafted item — so it is the outcome, and hoverable. */}
-                <OutcomeName name={r.recipe} depth={depth} />
-                {how && <> · {how}</>}
-              </Typography>
-            )
-          })}
+            // tradeskill/trivial half (`RecipeHow`) is taken from the same fields the label uses.
+            <Typography
+              key={`${r.tradeskill ?? ''}:${r.recipe}`}
+              component="div"
+              sx={{ color: EQ_ITEM_COLORS.label, fontSize: 11, lineHeight: 1.4, mt: 0.25 }}
+            >
+              {/* The recipe NAME is the crafted item — so it is the outcome, and hoverable. */}
+              <OutcomeName name={r.recipe} depth={depth} />
+              <RecipeHow use={r} depth={depth} />
+            </Typography>
+          ))}
           {recipes.length > shownRecipes.length && <Muted>+{recipes.length - shownRecipes.length} more</Muted>}
         </Box>
       )}

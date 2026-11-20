@@ -71,6 +71,7 @@ import { Box, Stack, Table, TableBody, TableCell, TableRow } from '@mui/material
 import type { WindowedRows } from '../../lib/useWindowedRows'
 import { itemIconUrl } from '../../lib/ItemWindow'
 import { CellLink } from '../../lib/CellLink'
+import { MadeByLink } from '../../lib/tradeskillLink'
 import { EraChip, DonorName } from '../planner/PlannerChips'
 import {
   NUMERIC_PAD,
@@ -405,6 +406,8 @@ const GearLine = memo(function GearLine({
           </TableCell>
           <TableCell title={row.dropMobs.join(' · ')}>
             <OverflowCell values={row.dropMobs} open={dropMobOpen(row, on.openMob)} />
+            {/* A made item no mob drops: the tradeskill that makes it, a door to its workbench. */}
+            {row.playerCrafted && row.dropMobs.length === 0 && <MadeByLink item={row.name} />}
           </TableCell>
         </>
       )}

@@ -12,7 +12,11 @@
  *   - Hide trivial and the search take lines away; recipes with no trivial sit under their heading;
  *   - an item name opens its Loot page and Back returns to the same workbench;
  *   - leaving by the menu and coming back reopens the workbench;
- *   - Have reads the dump's tradeskill depot.
+ *   - Have reads the dump's tradeskill depot;
+ *   - links IN: a tradeskill's name on the Skills tab opens its workbench with a Back to Skills,
+ *     and the Loot page's crafted note opens the workbench on that item's own recipe;
+ *   - "Gear that raises this skill" lists items with their mod, each the standard item link, and
+ *     its last link opens the Gear tab with the search box filled.
  *
  * Every claim about a recipe is a property of what is on screen, never a name or a count from the
  * wiki data, so a data refresh cannot turn it red.
@@ -305,6 +309,115 @@ async function stepOpenInPlace(page: Page): Promise<void> {
   note('none of the first Brewing recipes has a material that is itself made: opening one in place did not run')
 }
 
+const BACK = sel('tradeskills-back')
+
+/** A tradeskill's name on the Skills tab is a door to its workbench, and the section's Back goes home to Skills. */
+async function stepFromSkills(page: Page): Promise<void> {
+  await page.click(sel('nav-skills'))
+  const link = `${sel('skill-row')} ${sel('skill-tradeskill-link')} [role="button"]`
+  const linked = await settle(() => countOf(page, link), (n) => n > 0, { timeoutMs: 20_000 })
+  check("a tradeskill's name on the Skills tab is a link", linked > 0)
+  if (linked === 0) return
+  const name = await textOf(page, `${link} >> nth=0`)
+  check("…the skill the log raised, in the log's own spelling", name === 'Jewelry Making', name)
+  await page.click(`${link} >> nth=0`)
+  const up = await settle(() => textOf(page, sel('tradeskill-name')), (t) => t === 'Jewelcrafting', { timeoutMs: 20_000 })
+  check('…that opens its workbench in the Tradeskills section', up === 'Jewelcrafting', up)
+  const label = await settle(() => textOf(page, BACK), (t) => t !== '', { timeoutMs: 10_000 })
+  check('…whose header says where Back goes', /^back to skills$/i.test(label), label)
+  await page.click(BACK)
+  const home = await settle(() => countOf(page, sel('skills-view')), (n) => n === 1, { timeoutMs: 20_000 })
+  check('…and Back returns to the Skills tab', home === 1)
+  await page.click(NAV)
+  await settle(() => countOf(page, BENCH), (n) => n === 1, { timeoutMs: 20_000 })
+  check('a visit by the menu shows no Back: nothing is parked', (await countOf(page, BACK)) === 0)
+}
+
+/**
+ * The Loot page's crafted note: each way of making the item that names a tradeskill is a door to
+ * that workbench, on the item's own recipe. The recipe is one above the table's opening line, so
+ * normally a trivial one: Hide trivial then proves the panel keeps what a link opened even when
+ * the table hides its line.
+ */
+async function stepFromLoot(page: Page): Promise<void> {
+  await page.fill(sel('tradeskill-search'), '')
+  await settle(() => countOf(page, ROW), (n) => n > 0, { timeoutMs: 15_000 })
+  // The trivial cell: a click there picks the line and opens no link.
+  await page.click(`${ROW} >> nth=0 >> td >> nth=0`)
+  const first = (await rows(page))[0]
+  const item = await settle(() => textOf(page, `${PICKED} ${sel('planner-donor-name')}`), (t) => t === first?.item, { timeoutMs: 10_000 })
+  await page.click(`${PICKED} ${sel('planner-donor-name')}`)
+  await settle(() => countOf(page, sel('loot-detail')), (n) => n === 1, { timeoutMs: 20_000 })
+  const made = `${sel('loot-crafted')} [role="button"]`
+  const linked = await settle(() => countOf(page, made), (n) => n > 0, { timeoutMs: 20_000 })
+  if (linked === 0) {
+    note(`the Loot page of ${item} drew no crafted note with a tradeskill link: the link in from Loot was not clicked`)
+    await page.click(sel('loot-back'))
+    await settle(() => countOf(page, BENCH), (n) => n === 1, { timeoutMs: 20_000 })
+    return
+  }
+  check("the Loot page's crafted note names the tradeskill as a link", linked > 0)
+  await page.click(`${made} >> nth=0`)
+  const up = await settle(() => countOf(page, BENCH), (n) => n === 1, { timeoutMs: 20_000 })
+  check('…that opens the workbench', up === 1)
+  const shown = await settle(() => textOf(page, `${PICKED} ${sel('planner-donor-name')}`), (t) => t === item, { timeoutMs: 15_000 })
+  check("…on the item's own recipe", shown === item, `${shown} / ${item}`)
+  const label = await textOf(page, BACK)
+  check('…with a Back to the Loot tab', /^back to loot$/i.test(label), label)
+  if (first?.state === 'trivial') {
+    await page.click(sel('tradeskill-hide-trivial'))
+    const kept = await settle(() => countOf(page, sel('tradeskill-picked-unlisted')), (n) => n === 1, { timeoutMs: 10_000 })
+    check('Hide trivial takes its line away and the panel keeps the recipe, saying so', kept === 1 && (await textOf(page, `${PICKED} ${sel('planner-donor-name')}`)) === item)
+    await page.click(sel('tradeskill-hide-trivial'))
+    await settleGone(page, sel('tradeskill-picked-unlisted'), { timeoutMs: 10_000 })
+  } else {
+    note(`the recipe opened from Loot is not a trivial one (${first?.state ?? 'none'}): keeping it under Hide trivial was not checked`)
+  }
+  await page.click(BACK)
+  check('…and Back returns to the Loot tab', (await settle(() => navSelected(page, 'loot'), (on) => on, { timeoutMs: 20_000 })) === true)
+  await page.click(NAV)
+  await settle(() => countOf(page, BENCH), (n) => n === 1, { timeoutMs: 20_000 })
+}
+
+/** Fishing's workbench: the gear whose skill mod names it, and the door to the Gear tab searched for it. */
+async function stepSkillGear(page: Page): Promise<void> {
+  await page.click(sel('tradeskill-home'))
+  await settle(() => countOf(page, HOME), (n) => n === 1, { timeoutMs: 15_000 })
+  await page.click(`${tile('Fishing')} button`)
+  await settle(() => textOf(page, sel('tradeskill-name')), (t) => t === 'Fishing', { timeoutMs: 15_000 })
+  const panel = sel('tradeskill-gear')
+  // The Gear index is one fetch per window: the panel arrives after the workbench does.
+  const drawn = await settle(() => countOf(page, panel), (n) => n === 1, { timeoutMs: 30_000 })
+  if (drawn === 0) {
+    note('the Fishing workbench drew no gear panel (no item in this data and era raises Fishing): it was not checked')
+    return
+  }
+  const facts = await page.evaluate(
+    (s) =>
+      [...document.querySelectorAll<HTMLElement>(s)].map((e) => ({
+        name: e.querySelector('[data-testid="planner-donor-name"]')?.textContent ?? '',
+        mod: e.querySelector<HTMLElement>('[data-testid="tradeskill-gear-mod"]')?.innerText ?? '',
+        held: e.querySelector<HTMLElement>('[data-testid="tradeskill-gear-held"]')?.innerText ?? ''
+      })),
+    `${panel} ${sel('tradeskill-gear-item')}`
+  )
+  check('"Gear that raises this skill" lists items', facts.length > 0, (await textOf(page, panel)).slice(0, 120))
+  check("…each by the app's item link", facts.every((g) => g.name !== ''))
+  check('…with what it adds', facts.every((g) => /^\+\d/.test(g.mod)), facts.map((g) => g.mod).join(' | '))
+  check('…largest first', facts.every((g, i) => i === 0 || parseFloat(facts[i - 1]?.mod.slice(1) ?? '0') >= parseFloat(g.mod.slice(1))))
+  check('…and whether the inventory dump holds it', facts.every((g) => g.held === 'not held' || /^you have \d+$/.test(g.held)), facts.map((g) => g.held).join(' | '))
+  await page.click(`${sel('tradeskill-gear-open')} [role="button"]`)
+  const onGear = await settle(() => navSelected(page, 'gear'), (on) => on, { timeoutMs: 20_000 })
+  check('its last link opens the Gear tab', onGear)
+  const typed = await settle(() => page.evaluate((s) => document.querySelector<HTMLInputElement>(s)?.value ?? '', `${sel('gear-search')} input`), (t) => t !== '', { timeoutMs: 20_000 })
+  check('…with the search box filled for that skill', typed === 'skill mod fishing', typed)
+  // The Gear search is session state: clear it so a later Gear visit in this run starts clean.
+  await page.fill(`${sel('gear-search')} input`, '')
+  await page.click(NAV)
+  const back = await settle(() => textOf(page, sel('tradeskill-name')), (t) => t === 'Fishing', { timeoutMs: 20_000 })
+  check('…and the menu comes back to the same workbench', back === 'Fishing', back)
+}
+
 async function main(): Promise<void> {
   buildIfStale()
   const { app, close, log } = await launchOnFixture('e2e-overview.log', { inventory: 'Primitive_freeport-Inventory.txt' })
@@ -325,7 +438,10 @@ async function main(): Promise<void> {
     await stepWorkbench(page, tileNext)
     await stepFilters(page)
     await stepLinks(page)
+    await stepFromSkills(page)
+    await stepFromLoot(page)
     await stepHave(page)
+    await stepSkillGear(page)
 
     check('no renderer console errors', consoleErrors.length === 0, consoleErrors.slice(0, 3).join(' | '))
     if (failures.length) await dumpArtifacts(page, 'tradeskills-FAIL')

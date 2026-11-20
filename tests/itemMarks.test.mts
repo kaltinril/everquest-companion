@@ -32,8 +32,28 @@ test('marksOf keeps the icon, reduces the lists to counts, and names the quests 
       stats: { flags: ['Magic Item', 'No Drop'], stats: [], saves: [], effects: [], exaltationSlots: [], extras: [] }
     })
   )
-  assert.deepEqual(m, { iconId: 804, lore: true, quest: false, questUses: 2, quests: ['A'], recipes: 3, tradeskills: ['Baking', 'Jewelcrafting'], noTrade: true })
+  // `madeBy` (the Tradeskills links, 2026-11-20): the tradeskills of the item's OWN recipes only.
+  assert.deepEqual(m, { iconId: 804, lore: true, quest: false, questUses: 2, quests: ['A'], recipes: 3, tradeskills: ['Baking', 'Jewelcrafting'], madeBy: ['Jewelcrafting'], noTrade: true })
   assert.deepEqual(marksOf(record({})), { lore: false, quest: false, questUses: 0, quests: [], recipes: 0, tradeskills: [], noTrade: false })
+})
+
+test('madeBy names what makes the item, once each in first-named order, and is absent when nothing does', () => {
+  const made = marksOf(
+    record({
+      recipes: [{ recipe: 'R', tradeskill: 'Baking' }],
+      craftedBy: [
+        { tradeskill: 'Jewelry Making', ingredients: [] },
+        { tradeskill: 'Jewelcrafting', ingredients: [] },
+        { tradeskill: 'Non-Tradeskill', ingredients: [] },
+        { tradeskill: 'Tailoring', ingredients: [] }
+      ]
+    })
+  )
+  assert.deepEqual(made.madeBy, ['Jewelcrafting', 'Tailoring'], 'two spellings fold to one; a word that names no tradeskill is left out')
+  assert.deepEqual(made.tradeskills, ['Baking', 'Jewelcrafting', 'Tailoring'], 'the wider list still holds what it is used in')
+  // An ingredient that nothing makes: used in a tradeskill, made by none.
+  assert.equal('madeBy' in marksOf(record({ recipes: [{ recipe: 'R', tradeskill: 'Baking' }] })), false)
+  assert.equal('madeBy' in marksOf(record({ craftedBy: [{ tradeskill: 'Non-Tradeskill', ingredients: [] }] })), false)
 })
 
 test('notability on marks is the same rule as on records', () => {

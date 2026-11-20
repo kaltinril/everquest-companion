@@ -4,6 +4,7 @@
 //
 //   restart (localStorage)    the open workbench (absent: Home), the Hide trivial switch
 //   session (sessionStorage)  the search text and the picked recipe, for the open workbench only
+//                             (and whether a link from another tab chose that recipe)
 //
 // The era toggle is not here: it is the shared `eq.planner.era` (plannerData.useEraOnly).
 // A stored value degrades, never errors: anything unreadable is the default.
@@ -32,20 +33,23 @@ export function useHideTrivial(): [boolean, (next: boolean) => void] {
 export interface BenchMemory {
   query: string
   pick: string | null
+  /** A link from another tab chose the pick: the panel keeps it up even when the table hides it. */
+  linked: boolean
 }
 
-const FRESH: BenchMemory = { query: '', pick: null }
+const FRESH: BenchMemory = { query: '', pick: null, linked: false }
 
 function readBench(tradeskill: Tradeskill): BenchMemory {
   try {
     const stored: unknown = JSON.parse(window.sessionStorage.getItem(BENCH_KEY) ?? 'null')
     if (typeof stored !== 'object' || stored === null) return FRESH
-    const { skill, query, pick } = stored as Record<string, unknown>
+    const { skill, query, pick, linked } = stored as Record<string, unknown>
     // Another tradeskill's search and pick mean nothing here.
     if (skill !== tradeskill) return FRESH
     return {
       query: typeof query === 'string' ? query.slice(0, MAX_SEARCH) : '',
-      pick: typeof pick === 'string' ? pick : null
+      pick: typeof pick === 'string' ? pick : null,
+      linked: linked === true
     }
   } catch {
     return FRESH
@@ -58,6 +62,15 @@ function writeBench(tradeskill: Tradeskill, next: BenchMemory): void {
   } catch {
     // A window without storage forgets; the workbench still works.
   }
+}
+
+/**
+ * A link in from another tab names its recipe (appRouting `openTradeskills`): written before the
+ * workbench mounts, which reads it back like any pick. The search is cleared so the table can
+ * show the recipe.
+ */
+export function rememberLinkedPick(tradeskill: Tradeskill, recipeId: string): void {
+  writeBench(tradeskill, { query: '', pick: recipeId, linked: true })
 }
 
 /** The open workbench's search and pick, read on mount and written through on every change. */

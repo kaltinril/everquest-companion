@@ -11,7 +11,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { parseItemWikitext, parseRecipeUses, parseCraftRecipes } from '../src/main/itemLookupParse'
-import { craftedByLabel, isNotableKnowledge, recipeUseLabel } from '../src/shared/itemKnowledge'
+import { craftedByLabel, craftedByParts, isNotableKnowledge, recipeUseLabel } from '../src/shared/itemKnowledge'
 // The renderer-side VIEW rule (which items the push surfaces hide). Pure + MUI-free, so it
 // runs here; its only import is a type, which tsx erases.
 import { isTradeskillOnly } from '../src/renderer/src/lib/itemKnowledgeView'
@@ -231,6 +231,32 @@ test('Skewers: the one page with BOTH fields — crafted two ways, used in four 
     ['Quality Firing Sheet', 'Unfired Skewers']
   )
   assert.equal(craftedByLabel({ ...BASE, ...k }), 'Blacksmithing 38 (Forge) · Pottery 17 (Kiln)')
+  // The same words in parts, each with the tradeskill its link opens (the Loot page's crafted note).
+  assert.deepEqual(craftedByParts({ ...BASE, ...k }), [
+    { label: 'Blacksmithing 38 (Forge)', tradeskill: 'Blacksmithing' },
+    { label: 'Pottery 17 (Kiln)', tradeskill: 'Pottery' }
+  ])
+})
+
+test('the crafted note in parts: a wiki spelling folds to its tradeskill, a word that names none carries no link', () => {
+  const made = craftedByParts({
+    ...BASE,
+    craftedBy: [
+      { tradeskill: 'Jewelry Making', trivial: 207, container: "Jeweler's Kit", ingredients: [] },
+      { tradeskill: 'Non-Tradeskill', ingredients: [] },
+      { ingredients: [] },
+      { container: 'Oven', ingredients: [] }
+    ]
+  })
+  assert.deepEqual(made, [
+    { label: "Jewelry Making 207 (Jeweler's Kit)", tradeskill: 'Jewelcrafting' },
+    { label: 'Non-Tradeskill' },
+    { label: ' (Oven)' }
+  ])
+  // The label is the join of the parts, exactly as before the parts existed.
+  assert.equal(craftedByLabel({ ...BASE, craftedBy: [{ tradeskill: 'Baking', trivial: 56, container: 'Oven', ingredients: [] }] }), 'Baking 56 (Oven)')
+  assert.deepEqual(craftedByParts({ ...BASE }), [])
+  assert.equal(craftedByLabel({ ...BASE, craftedNote: 'made by gnomes' }), 'made by gnomes', 'the prose fallback when no recipe says anything')
 })
 
 test('Gnome Kabobs: a craft RESULT — yield x2, oven, four ingredients, {{SmIcon}} dropped', () => {

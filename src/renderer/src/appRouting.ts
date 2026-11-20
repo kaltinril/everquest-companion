@@ -15,6 +15,10 @@ import type { ZoneShort } from '@shared/maps'
 // The Maps tab's zone selection is persisted machine-local state with pin semantics (JOS-97);
 // `openMapZone` writes a pick through the same pure rules the toolbar uses. See the opener's doc.
 import { onPick, saveZoneSelection } from './features/maps/zoneFollow'
+// The Gear tab's search box is remembered session state (gear/areaMemory.ts); `openGearSearch`
+// writes it the way `openMapZone` writes a zone pick, and the tab reads it back on mount.
+import { presetSearch } from './features/gear/useAreaMemory'
+import type { TradeskillFocus } from './lib/tradeskillLink'
 
 /**
  * THE ONE BACK CONTRACT (JOS-43). Every cross-view drill receiver takes this same object — never
@@ -181,6 +185,25 @@ export interface AppRouting {
    */
   openSpell: (name: string) => void
   clearSpellFocus: () => void
+  /** The workbench the Tradeskills tab should open, and the item whose recipe to pick; or null. */
+  tradeskillFocus: TradeskillFocus | null
+  tradeskillNonce: number
+  /**
+   * Bare ⇒ the Tradeskills tab as the player left it. With a focus ⇒ the link in from another tab
+   * (owner, 2026-11-20: "fully integrated with maps and other tabs"): that tradeskill's workbench,
+   * on the recipe that makes the item, or failing that the first that uses it as a material
+   * (`shared/tradeskillBook.recipeForItem`). ONE opener, like `openLoot`. A focus is anchored, so
+   * the section shows a Back to the tab the link was on.
+   */
+  openTradeskills: (focus?: TradeskillFocus) => void
+  clearTradeskillFocus: () => void
+  /**
+   * The Gear tab with its search box already filled (the workbench's "Gear that raises this skill"
+   * sends `skill mod fishing`). `openMapZone`'s arrangement and for its reason: the search is the
+   * tab's own remembered state (`eq.gear.search`), so the text is written first and the mount reads
+   * it back. Unanchored: the Gear tab has no drill and no Back button.
+   */
+  openGearSearch: (text: string) => void
 }
 
 /**
@@ -253,6 +276,15 @@ export function useAppRouting(view: View, setView: (v: View) => void): AppRoutin
   // to every spell name in the window, so a fresh identity per render would re-render every list
   // that draws one.
   const spell = useFocusSlot<string>('spell', linkTo)
+  // Also published to every tradeskill link in the window (`TradeskillLinkProvider`).
+  const tradeskill = useFocusSlot<TradeskillFocus>('tradeskills', linkTo)
+  const openGearSearch = useCallback(
+    (text: string) => {
+      presetSearch('eq.gear.search', text)
+      linkTo('gear', false)
+    },
+    [linkTo]
+  )
   // Not a FocusSlot: the Maps tab's zone is persisted pin state, so the pick is written first and
   // the remount reads it back. Unanchored — Maps has no drill and no Back button.
   const openMapZone = useCallback(
@@ -293,9 +325,14 @@ export function useAppRouting(view: View, setView: (v: View) => void): AppRoutin
       lootNonce: loot.nonce,
       openLoot: loot.open,
       clearLootFocus: loot.clear,
+      tradeskillFocus: tradeskill.value,
+      tradeskillNonce: tradeskill.nonce,
+      openTradeskills: tradeskill.open,
+      clearTradeskillFocus: tradeskill.clear,
+      openGearSearch,
       openMapZone
     }),
-    [selectView, nav, spell, mob, quest, level, combat, loot, openMapZone]
+    [selectView, nav, spell, mob, quest, level, combat, loot, tradeskill, openGearSearch, openMapZone]
   )
 }
 
