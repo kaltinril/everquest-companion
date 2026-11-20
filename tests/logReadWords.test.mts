@@ -5,7 +5,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { LOG_READ_ACTION, LOG_READ_TRY, LOG_READ_WORDS } from '../src/shared/logReadWords'
-import { bandPosition, logReadLines, LOG_READ_STALL_MS } from '../src/shared/logReadReport'
+import { bandPosition, boxShows, logReadLines, LOG_READ_STALL_MS } from '../src/shared/logReadReport'
 import type { LogReadReport, LogReadWait } from '../src/shared/logReadReport'
 import { error, health, report, MB, NOW } from './logReadFactsHarness.mts'
 
@@ -149,6 +149,24 @@ test('the band draws where the read is only for a read that stands still, and ne
   for (const wait of ALL) {
     if (wait !== 'readerStopped' && wait !== 'stalled') assert.equal(bandPosition(shownAs(wait)), null, wait)
   }
+})
+
+test('WITH NO ENGINE PROGRAM AND A CHARACTER PICKED, the box is up at the first check with its Try row and a button', () => {
+  // What the no-engine-binary e2e run (tests/e2e/engine-absent.e2e.mts) would read off the screen.
+  const missing = report({
+    supervisor: 'absent',
+    fault: { kind: 'no-binary', attempts: 0, detail: null },
+    connection: null,
+    health: null,
+    fold: null,
+    lastOffset: null,
+    movedAt: null
+  })
+  assert.equal(missing.wait, 'engineMissing')
+  assert.equal(boxShows(missing, 0), true)
+  const lines = logReadLines(missing, NOW)
+  assert.equal(lines.find((line) => line.label === 'Try')?.value, LOG_READ_TRY.engineMissing)
+  assert.equal(missing.action, 'relaunch', 'the box draws its Try again button from the action')
 })
 
 test('the report carries the Try line and the action of its wait', () => {
