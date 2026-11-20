@@ -356,7 +356,8 @@ pub struct Agg {
     /// The minute-window ledger the Tier-B counterfactual is computed from. On the `Agg` for the
     /// same reason again: a finalized zone session inherits it frozen.
     pub windows: WindowAccum,
-    /// Your and your pets' attacking time taken together: the You scope's clock.
+    /// Your and your pets' attacking time taken together: the You scope's clock. Two writers: a row
+    /// door (`stamp_self`) and a claim that moves a recorded row to your pet (`rekey.rs move_out`).
     pub self_clock: OwnClock,
     /// The instant and the fight (encounter counter, 0 for none) of the line being folded, set by
     /// `at` (ownclock.rs) before a row is written so every row door stamps its clock the same way.

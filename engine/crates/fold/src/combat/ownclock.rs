@@ -13,11 +13,19 @@ pub struct OwnClock {
     first: i64,
     last: i64,
     closed_ms: i64,
+    /// The finished spans that were inside a fight of ours (fight, first, last), each counted in
+    /// `closed_ms`. Kept for `merge`: two clocks that ran in one finished fight count its hull once.
+    done: Vec<(u64, i64, i64)>,
 }
 
 /// A span outside any fight of ours (a bystander's row) ends after this much quiet.
 const LOOSE_SPAN_GAP_MS: i64 = 60_000;
 const SPAN_FLOOR_MS: i64 = 1_000;
+
+/// One span's length: first swing to last, a second at least.
+fn span(first: i64, last: i64) -> i64 {
+    (last - first).max(SPAN_FLOOR_MS)
+}
 
 impl OwnClock {
     /// One swing at `ts` in fight `fight`. Another fight, or a long quiet with no fight around it,
@@ -26,6 +34,9 @@ impl OwnClock {
         let loose_gap = fight == 0 && ts - self.last > LOOSE_SPAN_GAP_MS;
         if self.open && (self.fight != fight || loose_gap) {
             self.closed_ms += self.span_ms();
+            if self.fight != 0 {
+                self.done.push((self.fight, self.first, self.last));
+            }
             self.open = false;
         }
         if !self.open {
@@ -40,7 +51,7 @@ impl OwnClock {
 
     fn span_ms(&self) -> i64 {
         if self.open {
-            (self.last - self.first).max(SPAN_FLOOR_MS)
+            span(self.first, self.last)
         } else {
             0
         }
@@ -51,9 +62,14 @@ impl OwnClock {
         self.closed_ms + self.span_ms()
     }
 
-    /// Fold another row's clock in (a re-keyed row): one fight's two spans become their hull.
+    /// Fold another row's clock in (a re-keyed row): one fight's two spans become their hull,
+    /// whether that fight is still open or long finished. Time outside any fight is added.
     pub fn merge(&mut self, from: OwnClock) {
-        self.closed_ms += from.closed_ms;
+        let in_fights: i64 = from.done.iter().map(|s| span(s.1, s.2)).sum();
+        self.closed_ms += from.closed_ms - in_fights;
+        for (fight, first, last) in from.done {
+            self.join(fight, first, last);
+        }
         if !from.open {
             return;
         }
@@ -62,12 +78,37 @@ impl OwnClock {
             self.fight = from.fight;
             self.first = from.first;
             self.last = from.last;
-        } else if self.fight == from.fight {
-            self.first = self.first.min(from.first);
-            self.last = self.last.max(from.last);
         } else {
-            self.closed_ms += from.span_ms();
+            self.join(from.fight, from.first, from.last);
         }
+    }
+
+    /// Count one span of `fight` from another clock: widened into this clock's own span of that
+    /// fight when it has one, new time when it has none.
+    fn join(&mut self, fight: u64, first: i64, last: i64) {
+        if self.open && self.fight == fight && self.near(fight, first, last) {
+            self.first = self.first.min(first);
+            self.last = self.last.max(last);
+            return;
+        }
+        let mine = (self.done.iter_mut()).find(|s| fight != 0 && s.0 == fight);
+        if let Some(s) = mine {
+            let was = span(s.1, s.2);
+            (s.1, s.2) = (s.1.min(first), s.2.max(last));
+            self.closed_ms += span(s.1, s.2) - was;
+            return;
+        }
+        if fight != 0 {
+            self.done.push((fight, first, last));
+        }
+        self.closed_ms += span(first, last);
+    }
+
+    /// Two spans of one fight are one span. Outside any fight (0) only when no long quiet parts
+    /// them, the rule `stamp` ends a loose span by.
+    fn near(&self, fight: u64, first: i64, last: i64) -> bool {
+        fight != 0
+            || (first - self.last <= LOOSE_SPAN_GAP_MS && self.first - last <= LOOSE_SPAN_GAP_MS)
     }
 
     /// The clock in seconds, the divisor of a row's DPS. A row no door ever stamped (none in a
@@ -172,5 +213,40 @@ mod tests {
         b.stamp(9_000, 3);
         a.merge(b);
         assert_eq!(a.ms(), 8_000);
+    }
+
+    /// A pet claimed late: a finished fight both clocks ran in is its hull once, a fight only the
+    /// pet ran in and its time outside any fight are added, and the open fight goes on as one span.
+    #[test]
+    fn merging_counts_a_finished_fight_both_clocks_ran_in_once() {
+        let mut you = OwnClock::default();
+        you.stamp(0, 1);
+        you.stamp(10_000, 1);
+        you.stamp(300_000, 3);
+        let mut pet = OwnClock::default();
+        pet.stamp(2_000, 1);
+        pet.stamp(12_000, 1);
+        pet.stamp(100_000, 2);
+        pet.stamp(104_000, 2);
+        pet.stamp(200_000, 0);
+        pet.stamp(308_000, 3);
+        you.merge(pet);
+        // Fight 1's hull (12 s), fight 2 (4 s), the loose second, fight 3's hull so far (8 s).
+        assert_eq!(you.ms(), 25_000);
+        you.stamp(310_000, 3);
+        assert_eq!(you.ms(), 27_000);
+    }
+
+    /// Two spans outside any fight, a long quiet apart, stay two spans when merged.
+    #[test]
+    fn merging_two_loose_spans_keeps_the_quiet_between_them_out() {
+        let mut a = OwnClock::default();
+        a.stamp(0, 0);
+        a.stamp(10_000, 0);
+        let mut b = OwnClock::default();
+        b.stamp(500_000, 0);
+        b.stamp(505_000, 0);
+        a.merge(b);
+        assert_eq!(a.ms(), 15_000);
     }
 }
