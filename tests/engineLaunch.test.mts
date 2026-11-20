@@ -25,6 +25,7 @@ import {
   FOLD_RATE_SAMPLES,
   NEW_FOLD_RING,
   NO_ENGINE_CONSEQUENCE,
+  bannerFor,
   failureWords,
   foldFrameCounts,
   foldRate,
@@ -36,9 +37,11 @@ import {
   type EngineFaultKind,
   type EngineFaultSay,
   type EngineLaunchPhase,
+  type EngineLaunchSay,
   type FoldRing,
   type FoldSay
 } from '../src/shared/engineLaunch'
+import { error, health, report } from './logReadFactsHarness.mts'
 
 const MB = 1024 * 1024
 
@@ -264,3 +267,69 @@ test('`noteFoldProgress` ASKS THAT QUESTION rather than spelling its own', () =>
     'the phase-only test came back — it is the defence that failed'
   )
 })
+
+// ── which band the shell draws (fork #9) ───────────────────────────────────────────────────────
+
+const STARTING: EngineLaunchSay = { phase: 'starting', fold: null, fault: null }
+const FOLDING: EngineLaunchSay = { phase: 'folding', fold: sample(60 * MB, 100 * MB, 1_000_000), fault: null }
+function faulted(kind: EngineFaultKind): EngineLaunchSay {
+  const phase = kind === 'no-binary' ? 'absent' : 'failed'
+  return { phase, fold: null, fault: { kind, attempts: 3, lookedIn: [], detail: null } }
+}
+
+test('ANY FAULT IS THE CARD, whatever the log read says, also with no character picked', () => {
+  const noCharacter = report({ logPath: null, supervisor: 'absent', fault: { kind: 'no-binary', attempts: 0, detail: null } })
+  assert.equal(noCharacter.wait, 'engineMissing')
+  assert.equal(bannerFor(noCharacter, faulted('no-binary'), false), 'card')
+  for (const kind of ['no-binary', 'spawn-failed', 'announce-timeout', 'bad-announce', 'unhealthy', 'exited'] as const) {
+    // A healthy-looking report, a held measurement, no report at all: the card still wins.
+    assert.equal(bannerFor(report(), faulted(kind), true), 'card', kind)
+    assert.equal(bannerFor(null, faulted(kind), false), 'card', kind)
+  }
+})
+
+test('THE BAR IS DRAWN ONLY FOR A READ THAT IS RUNNING AND HAS A MEASUREMENT', () => {
+  const reading = report()
+  assert.equal(reading.wait, 'reading')
+  assert.equal(bannerFor(reading, FOLDING, true), 'bar')
+  // Slow enough to be shown, it is still the bar: it says more than the band would.
+  assert.equal(bannerFor(report({ waitingSince: 0 }), FOLDING, true), 'bar')
+  const logSize = 100 * MB
+  const finishing = report({
+    fold: { offset: logSize, logSize, events: 1, pct: 100 },
+    lastOffset: logSize,
+    movedAt: reading.waitingSince === null ? 0 : reading.waitingSince - 120_000
+  })
+  assert.equal(finishing.wait, 'finishing')
+  assert.equal(bannerFor(finishing, FOLDING, true), 'bar')
+  // No measurement yet: nothing for the first seconds, the band once the wait has run long.
+  assert.equal(bannerFor(reading, STARTING, false), 'none')
+  assert.equal(bannerFor(report({ waitingSince: 0 }), STARTING, false), 'band')
+})
+
+test('A READ THAT STOPPED WITH A MEASUREMENT STILL HELD IS THE BAND, NEVER THE BAR', () => {
+  // The contradiction this function exists to end: a bar frozen at 60% over "the read stopped".
+  const stopped = report({ health: health('idle'), error: error('fold') })
+  assert.equal(stopped.wait, 'readerStopped')
+  assert.equal(bannerFor(stopped, FOLDING, true), 'band')
+  const stalled = report({ movedAt: 0 })
+  assert.equal(stalled.wait, 'stalled')
+  assert.equal(bannerFor(stalled, FOLDING, true), 'band')
+})
+
+test('a read that landed draws nothing, or its notes when it has any', () => {
+  const ok = report({ readiness: 'ok', health: health('live'), fold: null })
+  assert.equal(ok.wait, 'ok')
+  assert.equal(bannerFor(ok, { phase: 'live', fold: null, fault: null }, false), 'none')
+  const noted = { ...ok, notes: [{ id: 'large', text: 'Your log is getting large.' }] }
+  assert.equal(bannerFor(noted, { phase: 'live', fold: null, fault: null }, false), 'notes')
+  // Notes belong to a read that is fine: under any other wait the wait is what is said.
+  const waitingWithNotes = { ...report({ logPath: null }), notes: noted.notes }
+  assert.equal(bannerFor(waitingWithNotes, STARTING, false), 'none')
+})
+
+test('before a window has its first report it draws nothing but the card', () => {
+  assert.equal(bannerFor(null, FOLDING, true), 'none')
+  assert.equal(bannerFor(null, STARTING, false), 'none')
+})
+

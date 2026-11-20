@@ -107,7 +107,7 @@ import { hostClockHint, resolvedTimeZone } from './hostClock'
 // THE LAUNCH BANNER'S THREE EDGES (JOS-503). This file is the only place that knows when a
 // historical fold BEGINS (an accepted attach), how far it has got (the engine's progress frames)
 // and when it LANDS (the go-live edge below) — so it feeds all three to the one state main pushes.
-import { noteEngineFolding, noteEngineLive } from './engineLaunchState'
+import { noteEngineFolding, noteEngineLive, noteEngineReadEnded } from './engineLaunchState'
 // THE WAIT ITSELF (JOS-518). A leaf with its request, its turn, its sleep and its log sink handed
 // in, so the shapes that matter — a fold past the old budget, a poll refused once and then answered,
 // a connection that dies mid-wait — are drivable in a unit test. Its header carries the owner ruling
@@ -574,6 +574,8 @@ function onWorldRebuilt(character: CharacterRef | null): void {
     // app comes back to is the one the engine still has open, which after an interlude of not
     // watching is the safe direction.
     l.attachedTo = null
+    // …and a fold nobody is waiting on is not drawn over the no-logs screen.
+    noteEngineReadEnded()
     debug('data-server client: the app has no character; the engine keeps its last attach')
     return
   }
@@ -690,8 +692,12 @@ async function waitForFoldHere(mine: number, l: LiveEngine): Promise<FoldHealth 
     note: debug,
     logSize: () => lastFoldLogSize,
     failed: (why, detail) => {
-      // A dead read is forgotten, so a later rebuild of the same log attaches again (fork #9).
-      if (why === 'ended') l.attachedTo = null
+      // A dead read is forgotten, so a later rebuild of the same log attaches again (fork #9),
+      // and the catch-up bar is told there is no fold to draw.
+      if (why === 'ended') {
+        l.attachedTo = null
+        noteEngineReadEnded()
+      }
       noteLogReadError(why === 'ended' ? 'fold' : 'health', detail, Date.now())
     }
   })

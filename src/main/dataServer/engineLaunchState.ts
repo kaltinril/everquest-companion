@@ -49,6 +49,7 @@ import { ENGINE_LAUNCH_STARTING, foldFrameCounts } from '../../shared/engineLaun
 import type { FoldProgress } from '../../shared/dataServer/protocol.generated'
 import { IPC } from '../../shared/ipc'
 import { sendToMain } from '../windows'
+import { noteLogReadTouched } from './logReadState'
 import type { EngineFaultCause } from './supervisor'
 
 /** The current answer. Module-level like every other singleton in `src/main`: one app, one engine. */
@@ -86,6 +87,8 @@ function set(next: EngineLaunchSay): void {
   if (same(say, next)) return
   say = next
   sendToMain(IPC.onEngineLaunch, next)
+  // The log-read status is composed from this state too (main/logReadStatus.ts).
+  noteLogReadTouched()
 }
 
 function same(a: EngineLaunchSay, b: EngineLaunchSay): boolean {
@@ -132,6 +135,17 @@ export function noteEngineRetrying(): void {
  */
 export function noteEngineFolding(): void {
   set({ phase: 'folding', fold: null, fault: null })
+}
+
+/**
+ * The read ended before the end of the log, or the app stopped reading one (fork #9). No fold is
+ * running, so none is held: nothing used to move the phase off `folding`, and the bar stayed
+ * frozen over a box that said the read had stopped. Where it stopped is `lastOffset` in
+ * logReadState.ts. A standing fault is left alone, as `noteEngineStarting` leaves it.
+ */
+export function noteEngineReadEnded(): void {
+  if (say.fault !== null) return
+  set({ phase: 'starting', fold: null, fault: null })
 }
 
 /** The go-live edge — the fold landed and the engine is answering. The bar resolves and goes. */
