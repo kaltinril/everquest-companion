@@ -5,9 +5,11 @@
 
 use fold::modules::buffs_entities::PetEntities;
 use fold::modules::buffs_instances::{BuffInstances, LandingSpec};
+use fold::modules::buffs_overrides::DurationOverride;
 use fold::modules::buffs_shapes::{instance_key, spell_key, EstimatorSource, SELF_CASTER};
 use fold::modules::buffs_stats::SpellStats;
 use fold::spell_facts::SpellFacts;
+use std::collections::HashMap;
 
 /// A slow with a 2 m 30 s base and a wear-off sentence: the owner's field case.
 const SLOW: &str = "Shiftless Deeds";
@@ -236,4 +238,60 @@ fn the_field_case_numbers_stay_inside_what_the_log_measured() {
         w.estimate(SLOW),
         (Some(239_000), Some(EstimatorSource::Observed))
     );
+}
+
+/// The player's "Set it myself" for the slow (fork issue #4), or none again.
+fn choose(w: &mut World, typed_ms: Option<i64>) {
+    let choices: HashMap<String, DurationOverride> = typed_ms
+        .map(|ms| (spell_key(SLOW), DurationOverride::Fixed(ms)))
+        .into_iter()
+        .collect();
+    w.stats.set_overrides(choices);
+}
+
+/// (f) A typed duration is a display choice, so it lets in no corpse the automatic rule refuses.
+///
+/// 430 s on an article-named mob is past twice the 210 s floor: more likely another mob of that
+/// name. Judged against a typed 300 s it passed every rail, and the bound it left behind was what
+/// Automatic read once the player switched back.
+#[test]
+fn a_typed_duration_lets_in_no_corpse_the_automatic_rule_refuses() {
+    let mut plain = World::new(SLOW);
+    plain.land(SLOW, SLOW_IV, MOB, 0);
+    plain.death(MOB, 430_000);
+    let refused = (Some(210_000), Some(EstimatorSource::Db));
+    assert_eq!(plain.estimate(SLOW), refused);
+
+    let mut w = World::new(SLOW);
+    w.land(SLOW, SLOW_IV, MOB, 0);
+    choose(&mut w, Some(300_000));
+    w.death(MOB, 430_000);
+    choose(&mut w, None);
+    assert_eq!(w.estimate(SLOW), refused);
+}
+
+/// (g) And it keeps out none the automatic rule learns from. A named mob dying 250 s in proves
+/// the slow outlasts its 210 s floor, whatever number the player has typed over it.
+#[test]
+fn a_typed_duration_keeps_out_no_corpse_the_automatic_rule_learns_from() {
+    const NAMED: &str = "lord nagafen";
+    let learned = (Some(250_000), Some(EstimatorSource::DeathBound));
+
+    let mut plain = World::new(SLOW);
+    plain.land(SLOW, SLOW_IV, NAMED, 0);
+    plain.death(NAMED, 250_000);
+    assert_eq!(plain.estimate(SLOW), learned);
+
+    let mut w = World::new(SLOW);
+    w.land(SLOW, SLOW_IV, NAMED, 0);
+    choose(&mut w, Some(300_000));
+    w.death(NAMED, 250_000);
+    // The bars keep the number the player set...
+    assert_eq!(
+        w.estimate(SLOW),
+        (Some(300_000), Some(EstimatorSource::Manual))
+    );
+    // ...and Automatic, when they go back to it, knows what the corpse proved.
+    choose(&mut w, None);
+    assert_eq!(w.estimate(SLOW), learned);
 }
