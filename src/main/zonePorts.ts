@@ -54,8 +54,11 @@ import type { ZoneShort } from '../shared/maps'
  * THE TRAILING PERIOD IS OPTIONAL because the corpus is inconsistent about it: `Alter Plane:
  * Hate` states `in Plane of Hate.` and its twin `Alter Plane: Sky` states `in Plane of Air`
  * (owner report 2026-09-23: the Plane of Hate showed no port, while a level-46 wizard has one).
+ *
+ * THE COORDINATES MAY SIT IN PARENTHESES: `Combine Gate` states `to (3047,9658,1052) in Dreadlands`,
+ * the one row that does, and the wizard's level-24 port to the Dreadlands was dropped (2026-11-19).
  */
-const DESTINATION = /^(?:Teleport|Translocate|Evacuate)(?: group)? to (?:[-0-9., ]+ )?in (.+?)\.?$/i
+const DESTINATION = /^(?:Teleport|Translocate|Evacuate)(?: group)? to (?:\(?[-0-9., ]+\)? )?in (.+?)\.?$/i
 
 /** `* Druid - Level 29` — the only two classes that carry travel, and the level it opens at. */
 const CASTER = /\b(Druid|Wizard)\b[^0-9]*?Level\s*(\d+)/i
