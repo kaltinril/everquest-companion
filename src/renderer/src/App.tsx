@@ -95,6 +95,7 @@ import { WhatsNewTeaser } from './features/whatsnew/WhatsNewTeaser'
 import { setCurrentView } from './lib/currentView'
 import { dwellView, useViewDwell } from './lib/telemetry'
 import { useLiveDot } from './lib/useLiveDot'
+import { relistOnFocus, showsNoLogs } from './lib/noLogs'
 import { MetInLogFeed } from './lib/useMetInLog'
 
 /**
@@ -544,7 +545,10 @@ export default function App(): JSX.Element {
       applyDeepLink(focus, { openMob, openQuest, openLeveling, selectView })
     )
     const offPrefs = keepPrefsSnapshotCurrent()
+    // A list read while the folder was away, or before the log existed, used to stand until restart.
+    const offList = relistOnFocus(window, () => window.eq.listCharacters(), setCharacters)
     return () => {
+      offList()
       offChar()
       offEqConfig()
       offFocus()
@@ -566,7 +570,8 @@ export default function App(): JSX.Element {
   // the tab exists: the provider below publishes nothing in a build without it.
   const openUnlock = useOpenUnlock(selectView)
   const onOpenLeveling = useCallback(() => openLeveling(), [openLeveling])
-  const hasCharacters = characters.length > 0
+  // The no-logs screen never covers an attached character, whatever the list says (lib/noLogs.ts).
+  const hasCharacters = !showsNoLogs(characters, character)
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>

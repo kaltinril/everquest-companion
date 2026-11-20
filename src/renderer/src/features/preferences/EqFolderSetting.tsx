@@ -16,6 +16,7 @@ import FolderOpenIcon from '@mui/icons-material/FolderOpen'
 import DescriptionIcon from '@mui/icons-material/Description'
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh'
 import type { EqConfig } from '@shared/types'
+import { folderVerdict } from '../../lib/noLogs'
 import { recordPref, usePrefsSeed } from './prefsHydration'
 
 const SOURCE_CHIP: Record<EqConfig['source'], { label: string; color: 'success' | 'info' | 'warning' }> = {
@@ -100,10 +101,12 @@ function EqFolderPath({ config }: { config: EqConfig | null }): JSX.Element {
  * logging is a silent wrong answer of exactly the kind JOS-53 was about; `config.readable`
  * carries the difference so each case gets advice that can actually work.
  */
-function EqFolderCheck({ config }: { config: EqConfig | null }): JSX.Element | null {
+export function EqFolderCheck({ config }: { config: EqConfig | null }): JSX.Element | null {
   if (!config) return null
+  // ONE decision for which verdict (lib/noLogs.ts): the no-logs screen prints these same sentences.
+  const verdict = folderVerdict(config)
   // variant="standard": a tonal fill, no border ring — same no-boxes-in-boxes rule.
-  if (config.readable === 'unreadable') {
+  if (verdict === 'unreadable') {
     return (
       <Alert severity="error" variant="standard" data-testid="eq-folder-check">
         This folder could not be read ({config.readError ?? 'unknown error'}). Its files may be
@@ -112,7 +115,7 @@ function EqFolderCheck({ config }: { config: EqConfig | null }): JSX.Element | n
       </Alert>
     )
   }
-  if (config.readable === 'missing') {
+  if (verdict === 'missing') {
     return (
       <Alert severity="warning" variant="standard" data-testid="eq-folder-check">
         This folder doesn&apos;t exist. Pick the folder your <code>eqlog_*.txt</code> files are
@@ -121,7 +124,7 @@ function EqFolderCheck({ config }: { config: EqConfig | null }): JSX.Element | n
     )
   }
   const found = config.characterCount
-  return found > 0 ? (
+  return verdict === 'found' ? (
     <Alert severity="success" variant="standard" data-testid="eq-folder-check">
       Found {found} character log{found === 1 ? '' : 's'} in this folder.
     </Alert>
