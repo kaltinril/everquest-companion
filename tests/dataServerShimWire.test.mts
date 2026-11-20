@@ -17,6 +17,7 @@ import {
   createReadShim,
   SERVABLE,
   type FallbackReason,
+  type Readiness,
   type ReadShim,
   type SizeGate
 } from '../src/main/dataServer/readShim'
@@ -52,7 +53,13 @@ interface Rig {
   advance(ms: number): Promise<void>
 }
 
-function rig(opts: { sizeGate?: SizeGate; timeoutFor?: (op: RequestOp) => number | undefined } = {}): Rig {
+interface RigOptions {
+  sizeGate?: SizeGate
+  timeoutFor?: (op: RequestOp) => number | undefined
+  readiness?: () => Readiness
+}
+
+function rig(opts: RigOptions = {}): Rig {
   let at = 1_000_000
   const sleepers: { due: number; wake: () => void }[] = []
   const wires: Wire[] = []
@@ -283,4 +290,53 @@ test('A LARGE QUESTION IS SENT AT MOST ONCE PER FLOOR, and whoever asks meanwhil
   void pollLoot(r)
   await settle()
   assert.equal(r.wires.length, 3)
+})
+
+// ---- 5. readiness is asked again after every wait --------------------------------------------------
+
+test('A REQUEST HELD WHILE THE ENGINE STOPS BEING SERVABLE IS NEVER SENT, and its joiners fall back', async () => {
+  const sizes = createReplySizes()
+  let ready: Readiness = SERVABLE
+  const r = rig({ sizeGate: sizes, readiness: () => ready })
+  const first = pollLoot(r)
+  await settle()
+  sizes.note(LOOT_KEY, LARGE_MESSAGE_CHARS, false)
+  await r.wires[0].answer(loot(1))
+  await first
+
+  // Asked again inside the floor, so the request is held; a joiner shares the hold.
+  await r.advance(2_000)
+  const held = r.shim.ask(MODULE, { module: 'loot' }, (reply) => reply.seq)
+  await r.advance(1_000)
+  const joiner = pollLoot(r)
+  // The player switches character during the hold: the engine is reading another log.
+  ready = { ok: false, why: 'notLive' }
+  await r.advance(LARGE_REPLY_FLOOR_MS)
+
+  assert.equal(r.wires.length, 1, 'a request held across a character switch was sent into the new read')
+  assert.deepEqual(await held, { served: false, why: 'notLive', detail: 'the engine is still folding' })
+  assert.equal(await joiner, EMPTY)
+  assert.deepEqual(r.seen, ['served', 'notLive', 'notLive'])
+
+  // The question is not stuck: once the engine is servable it is asked again.
+  ready = SERVABLE
+  void pollLoot(r)
+  await r.advance(LARGE_REPLY_FLOOR_MS)
+  assert.equal(r.wires.length, 2)
+})
+
+test('A REPLY THAT LANDS AFTER THE ENGINE STOPPED BEING SERVABLE IS NOT SERVED', async () => {
+  let ready: Readiness = SERVABLE
+  const r = rig({ timeoutFor: () => 10_000, readiness: () => ready })
+  const asked = r.shim.ask(MODULE, { module: 'loot' }, (reply) => reply.seq)
+  const joiner = pollLoot(r)
+  await r.advance(6_000)
+  // The world changed hands while the request was out: its reply is about the last one.
+  ready = { ok: false, why: 'notAttached' }
+  await r.wires[0].answer(loot(7))
+
+  assert.deepEqual(await asked, { served: false, why: 'notAttached', detail: 'the engine is on another log' })
+  assert.equal(await joiner, EMPTY, 'a reply from before a character switch was served as current')
+  assert.equal(r.wires.length, 1)
+  assert.deepEqual(r.seen, ['notAttached', 'notAttached'])
 })

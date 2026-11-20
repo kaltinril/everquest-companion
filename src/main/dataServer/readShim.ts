@@ -227,6 +227,13 @@ export interface ReadShim {
 /** The sentinel a raced deadline resolves with — a private object, so no result can impersonate it. */
 const DEADLINE = Symbol('deadline')
 
+/** A held request that was not sent: the engine stopped being servable during the hold. */
+class NotSent extends Error {
+  constructor(readonly why: FallbackReason) {
+    super(REASON_PHRASE[why])
+  }
+}
+
 /**
  * One rejection, as a phrase. `EngineError` carries the schema's own `code`, which is the half a
  * developer branches on, so it is quoted in front of the message when there is one.
@@ -315,7 +322,12 @@ export function createReadShim(deps: ShimDeps): ReadShim {
   const wire = <O extends RequestOp>(op: O, params: ParamsFor<O>, key: string): Promise<ResultFor<O>> =>
     wires.share(key, async () => {
       const hold = deps.sizeGate?.delayFor(key, deps.now()) ?? 0
-      if (hold > 0) await deps.delay(hold)
+      if (hold > 0) {
+        await deps.delay(hold)
+        // A character switch during the hold: sent now, it would be answered from the new read.
+        const still = deps.readiness()
+        if (!still.ok) throw new NotSent(still.why)
+      }
       deps.sizeGate?.sent(key, deps.now())
       return deps.request(op, params)
     })
@@ -336,6 +348,7 @@ export function createReadShim(deps: ShimDeps): ReadShim {
       if (reply === DEADLINE) return { why: 'timedOut', detail: `${op} after ${String(wait)} ms` }
       return { reply }
     } catch (err) {
+      if (err instanceof NotSent) return { why: err.why }
       if (isTooLarge(err)) return { why: 'tooLarge' }
       return { why: 'refused', detail: `${op} — ${describe(err)}` }
     }
@@ -357,6 +370,10 @@ export function createReadShim(deps: ShimDeps): ReadShim {
     const got = await awaitReply(op, params, key)
     const ms = deps.now() - t0
     if (!('reply' in got)) return unserved(op, ms, got.why, got.detail)
+    // ASKED AGAIN: the wait above can be seconds, and a reply that landed after the world changed
+    // hands is about the last one (or a prefix of the next).
+    const still = deps.readiness()
+    if (!still.ok) return unserved(op, ms, still.why)
     // Main read it, but it is over what a window may be handed: the gate heard before the reply did.
     if (blocked(key)) return unserved(op, ms, 'tooLarge')
     const value = project(got.reply)
