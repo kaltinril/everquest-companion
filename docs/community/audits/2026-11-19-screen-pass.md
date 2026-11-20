@@ -143,7 +143,8 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   shared_name: Option<bool>`. Set shared_name: None ... Test: 1) Unit/integration test at the
   engined level (engine/crates/engined/tests, using the harness): send respawn.define with watches
   [{key:"a vis ghoul knight", display:..., sharedName:true}], then read the respawn module ...
-- CONFIRMED [medium, cut-off] When the "No alert will play" note shows, the seconds field is
+- FIXED 2026-11-19 (the note is on its own line under the box; measured by
+  `tests/e2e/respawnAlertNoteSteps.mts`) [medium, cut-off] When the "No alert will play" note shows, the seconds field is
   squeezed and its label "Seconds (5-300)" is cut off Seen:
   .MuiTextField-root:has([data-testid="respawn-alert-lead"]) is 132 px wide with no note; with the
   note it is 85.5 px (900x600 100%, deleted), 103.6 px (1280x860 125%, deleted), 78.6 px (900x600

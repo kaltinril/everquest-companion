@@ -97,6 +97,9 @@ import { stepEditTheNumber, stepOverriddenOverTheGame } from './respawnRound9Ste
 // Clear all (2026-10-17): the scope's clocks in one confirmed press, and a typed respawn that
 // survives it. It runs last because it empties the watch list.
 import { stepClearAll } from './respawnClearAllSteps.mjs'
+// The pre-alert's "no alert will play" note sits under the box (2026-11-19). It runs after Clear all
+// because it deletes the seeded alert.
+import { stepAlertNoteUnderTheBox } from './respawnAlertNoteSteps.mjs'
 
 /** A mob the committed wiki floor states a duration for: `9.5 min` → 570 s. */
 const WIKI_MOB = 'a frenzied ghoul'
@@ -758,6 +761,7 @@ async function main(): Promise<void> {
     await stepZoneScope(page, overlay, fixture)
   }
   await stepClearAll(page)
+  await stepAlertNoteUnderTheBox(page, launched.app)
 
   if (failures.length) await dumpArtifacts(page, 'respawn-timers-FAIL')
   await launched.close()
