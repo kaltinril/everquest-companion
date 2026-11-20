@@ -273,6 +273,18 @@ export interface AlertBannerPayload {
   dueAt?: number
 }
 
+/**
+ * The queue identity of each firing's line, from one maker per player.
+ *
+ * The queue REFRESHES a line whose id repeats, and two firings of one alert can share a
+ * millisecond (two respawn clocks due on one tick, one mez landing on three mobs). So the id
+ * carries a per-firing count beside the clock: every firing is its own line.
+ */
+export function makeAlertBannerIds(): (alertId: string, ts: number) => string {
+  let seq = 0
+  return (alertId, ts) => `${alertId}:${String(ts)}:${String(seq++)}`
+}
+
 /** Rendering guarantees, not taste: a 40 kB "alert name" cannot push a line off the screen. */
 const MAX_ID_CHARS = 120
 

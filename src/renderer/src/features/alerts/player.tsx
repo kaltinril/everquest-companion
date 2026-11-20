@@ -43,8 +43,10 @@ import type {
 import {
   alertBannerText,
   alertShowsOnScreen,
+  makeAlertBannerIds,
   type AlertBannerPayload
 } from '@shared/alertBanner'
+import { cooldownOver } from '@shared/alertCooldown'
 import { playSound } from './soundCache'
 import { currentVoicePrefs, loadVoicePrefs, speak, speechPlan } from '../../lib/speech'
 import { audioIdentity, coalesceAudio, type AudioWindow } from './audioThrottle'
@@ -55,7 +57,6 @@ import { previewDef, previewFiring } from './preview'
 let defs: AlertDef[] = []
 let prefs: AlertPrefs = { globalVolume: 0.7, muted: false }
 const appCooldown = new Map<string, number>()
-const DEFAULT_COOLDOWN_MS = 2000
 /**
  * The audio channel's current occupancy — when it was last opened, and everything already heard
  * inside that window (audioThrottle.ts). One cell for the whole app on purpose: coalescing is
@@ -114,16 +115,19 @@ function effectiveVolume(def: AlertDef): number {
  * way a spoken phrase's do (upstream issue #53). Null means there was nothing truthful to print,
  * and nothing is sent.
  *
- * EVERY FIRING IS ITS OWN LINE. The queue's dedupe key carries the timestamp, so a second landing
- * of the same alert stacks a second line rather than re-clocking the first — which is what the
- * reporter asked for: a banner is a short-lived record of what just happened, not a status field.
+ * EVERY FIRING IS ITS OWN LINE. The queue's dedupe key carries the timestamp and a per-firing
+ * count (`makeAlertBannerIds`), so a second landing of the same alert stacks a second line rather
+ * than re-clocking the first, even in the same millisecond — which is what the reporter asked
+ * for: a banner is a short-lived record of what just happened, not a status field.
  */
+const bannerId = makeAlertBannerIds()
+
 function showAlertBanner(def: AlertDef, firing?: Pick<FiredAlert, 'spell' | 'captures' | 'dueAt'>): void {
   if (!alertShowsOnScreen(def)) return
   const text = alertBannerText(def, firing?.captures)
   if (!text) return
   const ts = Date.now()
-  const payload: AlertBannerPayload = { id: `${def.id}:${String(ts)}`, alertId: def.id, ts, text }
+  const payload: AlertBannerPayload = { id: bannerId(def.id, ts), alertId: def.id, ts, text }
   if (def.bannerColor) payload.color = def.bannerColor
   // The COUNTDOWN, where the firing has one (JOS-216 early warnings): the card prints "… in 12s"
   // and leaves when it reaches zero instead of on the configured hold. Passed straight through —
@@ -210,9 +214,7 @@ export function fireAppSignal(signal: AppSignal, context = '', captures?: Record
   for (const def of defs) {
     if (!def.enabled) continue
     if (def.trigger.type !== 'app' || def.trigger.signal !== signal) continue
-    const cd = def.cooldownMs ?? DEFAULT_COOLDOWN_MS
-    const last = appCooldown.get(def.id)
-    if (last !== undefined && now - last < cd) continue
+    if (!cooldownOver(def, appCooldown.get(def.id), now)) continue
     appCooldown.set(def.id, now)
     playAlertNow(def, captures ? { captures } : undefined)
     // Route the fire through main so history stays the single source of truth.
