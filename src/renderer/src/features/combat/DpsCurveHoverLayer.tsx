@@ -14,12 +14,11 @@
 import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState, type Ref } from 'react'
 import type { TimelineMarker } from '@shared/combat'
 import { ChartTooltip, type TooltipRow } from '../../lib/ChartTooltip'
-import { formatRate } from '../../lib/formatRate'
 import { rafThrottle } from '../../lib/rafThrottle'
-import type { ChartLineKey } from './combatPrefs'
+import type { ChartLineKey, DpsLineKey } from './combatPrefs'
 import { KIND_COLOR } from './combatShared'
 import type { DpsSeries } from './dashboardData'
-import { dpsAt, outLabel, rollingNote } from './dpsAt'
+import { curveRows, rollingNote } from './dpsAt'
 import {
   CHART_H,
   CHART_W,
@@ -83,20 +82,18 @@ function sameHit(a: Hit, b: Hit): boolean {
   return a.mk === b.mk && a.w === b.w && Math.abs(a.x - b.x) < 2 && Math.abs(a.y - b.y) < 2
 }
 
-/** The rolling-DPS block — sampled from THIS chart's own series (dpsAt), never recomputed, and
- *  `~`-prefixed when that series is inexact. Rates go through formatRate: '12.4k dps', no '/s'. */
+/** Each rate row wears its line's colour. */
+const ROW_COLOR: Record<DpsLineKey, string> = {
+  out: KIND_COLOR.you,
+  pet: KIND_COLOR.pet,
+  group: KIND_COLOR.member,
+  inc: KIND_COLOR.enemy
+}
+
+/** The rolling-DPS block — `curveRows` (dpsAt.ts) decides the rows, their names and their numbers;
+ *  this only adds the colour, which lives in an MUI-bound file the node suite cannot load. */
 function dpsRows(series: DpsSeries, t: number, hidden: readonly ChartLineKey[]): TooltipRow[] {
-  const p = dpsAt(series, t)
-  const a = series.estimated ? '~' : ''
-  const shown = (k: ChartLineKey, has: boolean): boolean => has && !hidden.includes(k)
-  const rows: TooltipRow[] = []
-  if (shown('out', true)) rows.push({ label: outLabel(series), value: `${a}${formatRate(p.out)}`, color: KIND_COLOR.you })
-  if (shown('pet', series.hasPet)) rows.push({ label: 'pet', value: `${a}${formatRate(p.pet)}`, color: KIND_COLOR.pet })
-  if (shown('group', series.hasGroup))
-    rows.push({ label: 'group', value: `${a}${formatRate(p.group)}`, color: KIND_COLOR.member })
-  if (shown('inc', series.hasInc))
-    rows.push({ label: 'incoming', value: `${a}${formatRate(p.inc)}`, color: KIND_COLOR.enemy })
-  return rows
+  return curveRows(series, t, hidden).map((r) => ({ label: r.label, value: r.value, color: ROW_COLOR[r.key] }))
 }
 
 /** A marker under the cursor becomes the tooltip's SUBJECT and the rates drop to secondary rows;

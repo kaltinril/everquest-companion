@@ -43,7 +43,8 @@ import {
   yAt,
   type DpsChart
 } from '../src/renderer/src/features/combat/dpsChart'
-import { outLabel, peakTitle, withPetApart } from '../src/renderer/src/features/combat/dpsAt'
+import { curveRows, outLabel, peakTitle, withPetApart } from '../src/renderer/src/features/combat/dpsAt'
+import { formatRate } from '../src/renderer/src/lib/formatRate'
 
 const BUCKET = 1000
 
@@ -324,6 +325,56 @@ test('the peak tooltip says when the peak leaves the pet out', () => {
   // The window is the series own, rounded to whole seconds.
   assert.ok(peakTitle({ ...mkSeries(), smoothMs: 2600 }).startsWith('Peak 3s '))
   assert.ok(peakTitle({ ...mkSeries(), smoothMs: 2600, petApart: true }).startsWith('Peak 3s '))
+})
+
+// ── 8. the hover readout's rate rows ─────────────────────────────────────────────────────
+
+test('the hover rows name the gold line for what it sums, and its number matches the name', () => {
+  const grouped = mkSeries()
+  const solo: DpsSeries = { ...mkSeries(), hasGroup: false, group: new Float64Array(2) }
+  const labels = (s: DpsSeries): (string | undefined)[] => curveRows(s, 0, []).map((r) => r.label)
+  assert.deepEqual(labels(solo), ['you + pet', 'pet', 'incoming'])
+  assert.deepEqual(labels({ ...solo, petApart: true }), ['you', 'pet', 'incoming'])
+  assert.deepEqual(labels(grouped), ['you + pet + group', 'pet', 'group', 'incoming'])
+  assert.deepEqual(labels({ ...grouped, petApart: true }), ['you + group', 'pet', 'group', 'incoming'])
+  assert.deepEqual(
+    curveRows(grouped, 0, []).map((r) => r.key),
+    ['out', 'pet', 'group', 'inc']
+  )
+
+  // Bucket 1 (t = 1000ms): the summed line carries the pet, the apart one does not.
+  assert.equal(curveRows(grouped, 1000, [])[0].value, formatRate(OUT[1]))
+  const apart = curveRows({ ...grouped, petApart: true }, 1000, [])
+  assert.equal(apart[0].value, formatRate(APART[1]))
+  assert.notEqual(apart[0].value, formatRate(OUT[1]))
+  // The pet keeps its own row and its own number, so nothing is lost by drawing it apart.
+  assert.equal(apart[1].value, formatRate(PET[1]))
+  assert.equal(apart[2].value, formatRate(GROUP[1]))
+  assert.equal(apart[3].value, formatRate(INC[1]))
+})
+
+test('a hidden line and a line the fight never had get no hover row', () => {
+  const series = mkSeries()
+  const keys = (s: DpsSeries, hidden: ChartLineKey[]): string[] => curveRows(s, 0, hidden).map((r) => r.key)
+  assert.deepEqual(keys(series, ['out']), ['pet', 'group', 'inc'])
+  assert.deepEqual(keys(series, ['pet']), ['out', 'group', 'inc'])
+  assert.deepEqual(keys(series, ['group', 'inc']), ['out', 'pet'])
+  assert.deepEqual(keys(series, ['out', 'pet', 'group', 'inc']), [])
+  // A hidden marker kind is not a curve, so it takes no rate row with it.
+  assert.deepEqual(keys(series, ['slow', 'coat']), ['out', 'pet', 'group', 'inc'])
+  assert.deepEqual(keys({ ...series, hasPet: false }, []), ['out', 'group', 'inc'])
+  assert.deepEqual(keys({ ...series, hasGroup: false }, []), ['out', 'pet', 'inc'])
+  assert.deepEqual(keys({ ...series, hasInc: false }, []), ['out', 'pet', 'group'])
+  // Hiding the gold line under Its own bar leaves the pet row standing.
+  assert.deepEqual(keys({ ...series, petApart: true }, ['out']), ['pet', 'group', 'inc'])
+})
+
+test('an estimated series marks every hover rate with a tilde', () => {
+  const exact = curveRows(mkSeries(), 0, [])
+  const rough = curveRows({ ...mkSeries(), estimated: true }, 0, [])
+  assert.equal(rough.length, exact.length)
+  rough.forEach((r, i) => assert.equal(r.value, `~${exact[i].value}`))
+  for (const r of exact) assert.ok(!r.value.startsWith('~'))
 })
 
 test('withPetApart hands back the same series unless the pet is apart, and never copies the bands', () => {

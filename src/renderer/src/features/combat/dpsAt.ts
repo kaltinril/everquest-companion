@@ -3,8 +3,11 @@
 // the reading a live meter gives), so the timeline's hover number and the DPS curve's line can
 // never disagree. The same law that made CAT_COLOR one map.
 //
-// Pure + type-only imports, so the node suite can import it (see timelineHitTest.ts's header).
+// Pure: type-only imports plus the pure formatRate, so the node suite can import it (see
+// timelineHitTest.ts's header).
 
+import { formatRate } from '../../lib/formatRate'
+import type { ChartLineKey, DpsLineKey } from './combatPrefs'
 import type { DpsSeries } from './dashboardData'
 
 /** The rates a hover readout prints. `out` is the outgoing total (`outRate`) — the value the
@@ -45,6 +48,32 @@ export function dpsAt(series: DpsSeries, tMs: number): DpsPoint {
   const pet = series.pet[i]
   const group = series.group[i]
   return { you, pet, group, inc: series.inc[i], out: outRate(series, i) }
+}
+
+/** One rate row of the curve's hover readout, keyed by the line it reads. */
+export interface CurveRow {
+  key: DpsLineKey
+  label: string
+  value: string
+}
+
+/**
+ * The hover readout's rate rows, in legend order: sampled from the chart's own series (`dpsAt`),
+ * `~`-prefixed when that series is inexact, and with no row for a line that is hidden or that the
+ * fight never had. Rates go through formatRate: '12.4k dps', no '/s'.
+ */
+export function curveRows(series: DpsSeries, t: number, hidden: readonly ChartLineKey[]): CurveRow[] {
+  const p = dpsAt(series, t)
+  const a = series.estimated ? '~' : ''
+  const rows: CurveRow[] = []
+  const add = (key: DpsLineKey, has: boolean, label: string, rate: number): void => {
+    if (has && !hidden.includes(key)) rows.push({ key, label, value: `${a}${formatRate(rate)}` })
+  }
+  add('out', true, outLabel(series), p.out)
+  add('pet', series.hasPet, 'pet', p.pet)
+  add('group', series.hasGroup, 'group', p.group)
+  add('inc', series.hasInc, 'incoming', p.inc)
+  return rows
 }
 
 /**
