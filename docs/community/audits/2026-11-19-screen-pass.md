@@ -65,7 +65,8 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   text; 'Row height' label box 0px wide holding 70px (white-space nowrap, overflow hidden,
   text-overflow ellipsis, so nothing of either is drawn). Steppers at x 448.7..560.7, 0.7px past the
   card's right edge at 560. The note wraps to 4 lines. At 125% minimum the boxes are ...
-- CONFIRMED [low, confusing] Stepping to the end of a ladder with the keyboard drops focus out of
+- FIXED 2026-11-20 (the press that reaches an end hands focus to the stepper's other button,
+  `prefStepperFocus.ts`; `text-size.e2e.mts` presses Enter to the end) [low, confusing] Stepping to the end of a ladder with the keyboard drops focus out of
   the card Seen: Enter x7 from 28px: 32px, 36px, 40px with focus on BUTTON[pref-nav-row-plus], then
   at 48px the button disables and document.activeElement becomes BODY; further Enter presses do
   nothing and Tab starts again from the top of the window. This is the shared PrefStepper, so the
