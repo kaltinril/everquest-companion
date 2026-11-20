@@ -30,7 +30,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import type { TimelineMarker, TimelineView } from '../src/shared/combat'
 import type { DpsSeries } from '../src/renderer/src/features/combat/dashboardData'
-import type { ChartLineKey } from '../src/renderer/src/features/combat/combatPrefs'
+import { PET_LAYOUTS, petDrawnApart, type ChartLineKey } from '../src/renderer/src/features/combat/combatPrefs'
 import {
   CHART_H,
   PAD_B,
@@ -323,4 +323,22 @@ test('withPetApart hands back the same series unless the pet is apart, and never
   assert.equal(apart.pet, series.pet)
   assert.equal(apart.group, series.group)
   assert.equal(apart.inc, series.inc)
+})
+
+test('the pet layout decides the gold line: only Its own bar leaves the pet out', () => {
+  // The card's own path: layout -> petDrawnApart -> withPetApart -> the drawn chart and its name.
+  const series = mkSeries()
+  const plain = mkChart([], series)
+  for (const layout of PET_LAYOUTS) {
+    const drawn = withPetApart(series, petDrawnApart(layout))
+    if (layout === 'separate') {
+      assert.equal(drawn.petApart, true)
+      assert.equal(outLabel(drawn), 'you + group')
+      assert.equal(mkChart([], drawn).peakVis, Math.max(...APART))
+    } else {
+      assert.equal(drawn, series, `${layout} draws the kept series itself`)
+      assert.equal(outLabel(drawn), 'you + pet + group')
+      assert.deepEqual(mkChart([], drawn), plain, `${layout} draws what it drew before`)
+    }
+  }
 })

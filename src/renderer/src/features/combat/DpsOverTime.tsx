@@ -19,7 +19,7 @@ import { useCallback, useMemo, useRef, type ReactNode } from 'react'
 import { Box, ButtonBase, Stack, Typography } from '@mui/material'
 import type { TimelineView } from '@shared/combat'
 import { formatRate } from '../../lib/formatRate'
-import type { ChartLineKey, DpsLineKey } from './combatPrefs'
+import { petDrawnApart, type ChartLineKey, type DpsLineKey } from './combatPrefs'
 import { ApproxChip, DashCard, QuietNote, fmtDur } from './combatShared'
 import { approxNote, buildDpsSeries, type DpsSeries } from './dashboardData'
 import { outLabel, withPetApart } from './dpsAt'
@@ -430,7 +430,7 @@ export function DpsOverTime({
   // identity, so the memo chain below is unaffected on that surface.
   const hidden = compact ? NOTHING_HIDDEN : stored
   // "Its own bar" takes the pet out of the gold line too, so you and your pet are two lines.
-  const petApart = usePetLayout()[0] === 'separate'
+  const petApart = petDrawnApart(usePetLayout()[0])
   const series = useMemo(() => (tl ? withPetApart(keptSeries(tl, live), petApart) : null), [tl, live, petApart])
   const chart = useMemo(() => buildDpsChart(series, live, hidden), [series, live, hidden])
   const placed = useMemo(() => placeMarkers(tl, chart), [tl, chart])

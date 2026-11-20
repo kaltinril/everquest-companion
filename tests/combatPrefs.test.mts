@@ -42,10 +42,12 @@ import {
   COMBAT_TAB_SCOPE_KEY,
   METER_SCOPE_KEY,
   NO_DRILL,
+  PET_LAYOUTS,
   abilityKey,
   drillKey,
   parseDrillMemory,
   parseHiddenLines,
+  petDrawnApart,
   readCombatTabScope,
   readMeterScope,
   readPetLayout,
@@ -120,6 +122,20 @@ test('the pet layout is opt-in: an untouched install stays nested, an old switch
   // a value this build does not know falls back to the old switch, never to a blank meter
   assert.equal(readPetLayout('sideways', '0'), 'separate')
   assert.equal(readPetLayout('', null), 'nested')
+})
+
+test('only Its own bar draws the pet apart on the chart', () => {
+  // Upstream #91: 'separate' is the one layout that takes the pet out of the chart's gold line.
+  // The other two draw exactly what they drew before.
+  assert.equal(petDrawnApart('separate'), true)
+  assert.equal(petDrawnApart('nested'), false)
+  assert.equal(petDrawnApart('grouped'), false)
+  // Exactly one layout, so a fourth one added later has to be decided here.
+  const apart = PET_LAYOUTS.filter((l) => petDrawnApart(l))
+  assert.deepEqual(apart, ['separate'])
+  // An install that never chose a layout keeps the summed line.
+  assert.equal(petDrawnApart(readPetLayout(null, null)), false)
+  assert.equal(petDrawnApart(readPetLayout(null, '0')), true, 'the old switch turned off is Its own bar')
 })
 
 // ── JOS-116: where you had drilled to ────────────────────────────────────────────────────
