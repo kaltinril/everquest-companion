@@ -181,11 +181,18 @@ test('capture: a character changed since the archive started is refused', async 
 test('capture: a character changed while the capture was being read is refused too', async () => {
   const f = fixture()
   const a = { character: 'primitive_freeport', logPath: f.logPath }
+  // The first two asks are the capture's own read and its check at the start; the switch comes after.
   let asks = 0
-  const deps = captureDeps(f.logPath, { attached: () => (asks++ === 0 ? a : otherCharacter(f)) })
-  const r = await captureSegment(deps, a)
+  let reads = 0
+  const base = captureDeps(f.logPath, { attached: () => (asks++ < 2 ? a : otherCharacter(f)) })
+  const health = async (): Promise<EngineHealth> => {
+    reads++
+    return base.health()
+  }
+  const r = await captureSegment({ ...base, health }, a)
   assert.equal(r.ok, false)
   if (!r.ok) assert.match(r.reason, /character changed/)
+  assert.ok(reads >= 2, 'the start check passed and the engine was read before the refusal')
 })
 
 test('archive: a character switch during the wait moves no log and leaves no journal', async () => {
