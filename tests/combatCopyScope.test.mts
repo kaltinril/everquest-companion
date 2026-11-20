@@ -12,7 +12,8 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { MAX_WIDTH, formatSegmentText, type ShownSources } from '../src/renderer/src/features/combat/copyText'
+import { MAX_WIDTH, fmtDur, formatSegmentText, type ShownSources } from '../src/renderer/src/features/combat/copyText'
+import { headlineClockSec } from '../src/renderer/src/features/combat/headlineClock'
 import { scopeRate, scopeSources, scopeTotals } from '../src/renderer/src/features/combat/meterScope'
 import { meterSources } from '../src/renderer/src/features/combat/petRows'
 import type { MeterScope, RosterSnap } from '../src/shared/roster'
@@ -68,14 +69,14 @@ const WITH_BOB: RosterSnap = {
 }
 
 /** The rows and figures the panel shows at level 1, built the way `SegmentPanel` builds them. */
-function shownAs(scope: MeterScope, nested: boolean): ShownSources {
-  const scoped = scopeSources(SEG.entities, scope, WITH_BOB)
-  const share = scopeTotals(SEG.entities, scoped, SEG.outTotal, SEG.outDps)
+function shownAs(scope: MeterScope, nested: boolean, seg: SegmentView = SEG): ShownSources {
+  const scoped = scopeSources(seg.entities, scope, WITH_BOB)
+  const share = scopeTotals(seg.entities, scoped, seg.outTotal, seg.outDps)
   return {
     rows: meterSources(scoped, nested),
     total: share.total,
-    dps: scopeRate(SEG, scope, WITH_BOB, share),
-    activeDps: scopeTotals(SEG.entities, scoped, SEG.outTotal, SEG.activeDps).dps
+    dps: scopeRate(seg, scope, WITH_BOB, share),
+    activeDps: scopeTotals(seg.entities, scoped, seg.outTotal, seg.activeDps).dps
   }
 }
 
@@ -85,9 +86,10 @@ test('the paste is the scoped, pet-folded rows and the headline over them', () =
     text,
     [
       'a deadly black widow +2 · 1:23',
-      // 40,230 over your own 50 s. The fight's active rate, scaled to these rows, is below that
-      // headline, so it is left off as the panel leaves it off.
-      'Outgoing damage · 40.2k · 805 dps',
+      // 40,230 over your own 50 s, and the paste says so: the 1:23 above is the fight's length,
+      // not the time this rate was taken over. The fight's active rate, scaled to these rows, is
+      // below that headline, so it is left off as the panel leaves it off.
+      'Outgoing damage · 40.2k · 805 dps over 0:50',
       '',
       '   Source  Total      DPS  Crit  Hit',
       '1  You     40.2k  483 dps    8%  80%'
@@ -99,11 +101,39 @@ test('the paste is the scoped, pet-folded rows and the headline over them', () =
 
 test('the pet stays a row of its own when the layout keeps it apart', () => {
   const lines = formatSegmentText(SEG, 'out', null, shownAs('you', false)).split('\n')
-  assert.equal(lines[1], 'Outgoing damage · 40.2k · 805 dps')
+  assert.equal(lines[1], 'Outgoing damage · 40.2k · 805 dps over 0:50')
   assert.deepEqual(
     lines.slice(4).map((l) => l.slice(0, 15).trimEnd()),
     ['1  You', '2  Vebarn (pet)']
   )
+})
+
+test('the time in the paste is the one the Combat tab header prints beside the same figures', () => {
+  const shown = shownAs('you', true)
+  const clock = fmtDur(headlineClockSec(shown.total, shown.dps, SEG.durationSec))
+  assert.equal(clock, '0:50')
+  assert.notEqual(clock, fmtDur(SEG.durationSec))
+  // Total, rate and time agree inside the paste: 40,230 / 805 is 50 s, not the fight's 83.
+  assert.ok(formatSegmentText(SEG, 'out', null, shown).split('\n')[1].endsWith(`dps over ${clock}`))
+})
+
+test('an active rate above a headline over your own clock rides after that clock', () => {
+  // Your clock is 76 s here, longer than the fight's 70 active seconds.
+  const seg = { ...SEG, selfSec: 76 } as SegmentView
+  const lines = formatSegmentText(seg, 'out', null, shownAs('you', true, seg)).split('\n')
+  assert.equal(lines[1], 'Outgoing damage · 40.2k · 529 dps over 1:16 (act 575 dps)')
+})
+
+test('a scope that keeps the fight’s clock adds no second time', () => {
+  // Group hides a stranger: the total and the rate shrink together, so the rate is still over the
+  // fight's length, which the first line already states.
+  const zed = source({ id: 'member:zed', name: 'Zed', kind: 'member', total: 2000, dps: 24, pct: 6, hits: 20 })
+  const seg = { ...SEG, outTotal: 47230, outDps: 569, activeDps: 675, entities: [YOU, PET, BOB, zed] } as SegmentView
+  const text = formatSegmentText(seg, 'out', null, shownAs('group', false, seg))
+  const lines = text.split('\n')
+  assert.equal(lines[0], 'a deadly black widow +2 · 1:23')
+  assert.equal(lines[1], 'Outgoing damage · 45.2k · 545 dps (act 646 dps)')
+  assert.doesNotMatch(text, /Zed| over /)
 })
 
 test('Group keeps the roster’s rows and their share of the fight’s rate', () => {

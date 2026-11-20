@@ -30,7 +30,8 @@ import { flattenSkills, type MobBreakdown, type SkillRow, type TargetDetail } fr
 import { defenseHeadlineParts, defenseRowText, defenseRows, riposteLine, ripostesTakenLine } from './defenseRows'
 import { landEvidence } from './landEvidence'
 import { nestedRows, type OwnRow } from './petRows'
-import { RANK, count, pctText, statLines, subjectLine, table, wrapText, type Col } from './copyTable'
+import { RANK, count, fmtDur, pctText, statLines, subjectLine, table, wrapText, type Col } from './copyTable'
+import { headlineClockSec } from './headlineClock'
 import { formatNum, formatRate } from '../../lib/formatRate'
 
 // The width constant and the `m:ss` spelling keep their old import path: combatShared.tsx
@@ -89,6 +90,18 @@ function wholeSegment(seg: SegmentView, mode: 'out' | 'in'): ShownSources {
 }
 
 /**
+ * ` over 0:50`: the time the headline rate was taken over, when it is not the fight's length the
+ * subject line states. Under the You scope the rate is over your own clock, and the panel's header
+ * prints that clock beside it (`headlineClockSec`, the same helper), so total, rate and time agree
+ * in the paste as they do on screen.
+ */
+function ownClockNote(seg: SegmentView, mode: 'out' | 'in', shown: ShownSources): string {
+  if (mode !== 'out') return ''
+  const clock = fmtDur(headlineClockSec(shown.total, shown.dps, seg.durationSec))
+  return clock === fmtDur(seg.durationSec) ? '' : ` over ${clock}`
+}
+
+/**
  * The header stat run: direction, total, dps. Active-time DPS rides along under exactly the
  * panel's condition (outgoing only, and only when the fight actually had idle gaps — otherwise
  * it is the same number twice), and so does the enemy-heal caveat.
@@ -99,7 +112,8 @@ function segmentStats(seg: SegmentView, mode: 'out' | 'in', shown: ShownSources)
   // above the headline. A headline over your own clock can already beat it.
   const gaps = mode === 'out' && seg.activeSec > 0 && seg.activeSec < seg.durationSec
   const act = gaps && activeDps > dps ? ` (act ${formatRate(activeDps)})` : ''
-  const stats = [`${mode === 'out' ? 'Outgoing' : 'Incoming'} damage`, formatNum(total), `${formatRate(dps)}${act}`]
+  const rate = `${formatRate(dps)}${ownClockNote(seg, mode, shown)}${act}`
+  const stats = [`${mode === 'out' ? 'Outgoing' : 'Incoming'} damage`, formatNum(total), rate]
   if (mode === 'out' && seg.enemyHealTotal > 0) stats.push(`+${formatNum(seg.enemyHealTotal)} enemy heal`)
   return stats
 }
