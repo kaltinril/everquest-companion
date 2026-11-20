@@ -211,7 +211,9 @@ disagree, RULES.md wins; fix this file.
   in parallel and passed alone (the two engine specs counted other specs' engines;
   alert-dialog-focus measured 1 suggestion row at 1280 px in parallel and 200 alone, so its
   "heaviest row" check read the wrong row). `voice-alerts` red as before. `copy` skipped its
-  clipboard round trip again (locked workstation).
+  clipboard round trip again (locked workstation). `voice-alerts` was then fixed the same evening,
+  in the spec: `customPhraseSteps.mts` answers the first-run notice before it opens the say picker
+  (green alone, 118 s). A red `voice-alerts` is a regression from here on.
 - **Headless look at a tab:** every tab is in every build (the `UNRELEASED` gate was removed
   2026-10-29), so `electron-vite build --outDir=<worktree>/out-e2e` and a throwaway spec with
   `launchOnFixture(...)` reach any of them; no flag or env var is needed.
