@@ -56,7 +56,8 @@ import { useEffect, useMemo, useRef, type JSX } from 'react'
 import { Button, Stack, Typography } from '@mui/material'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import type { CombatSnapshot, SegmentView, SourceView } from '@shared/combat'
-import { DashCard, QuietNote, fmtDur } from '../combat/combatShared'
+import { DashCard, QuietNote } from '../combat/combatShared'
+import { supportLine } from '../combat/headlineClock'
 import { LIVE_SELECTION, fightScopeOptions, meterDrill, type Drill } from '../combat/dashboardData'
 import { DrillCrumb, MeterRows, crumbOf } from '../combat/MeterRows'
 import { meterPanel, panelRate, panelTotals, type MeterPanel } from '../combat/petRows'
@@ -70,7 +71,7 @@ import { useDrillMemory } from '../combat/useDrillMemory'
 import { AbilityExpandProvider } from '../combat/abilityExpand'
 import type { CombatFocus } from '../combat/combatFocus'
 import { EMPTY_ROSTER, type MeterScope, type RosterSnap } from '@shared/roster'
-import { formatNum, formatRate } from '../../lib/formatRate'
+import { formatRate } from '../../lib/formatRate'
 
 /** How many rows a GLANCE shows, at any level. The full list is one click away. */
 const TOP_ROWS = 5
@@ -127,11 +128,6 @@ function cardBody(v: ScopedView, combine: boolean, drill: Drill | null, selfLabe
   const { total } = panelTotals(panel, v.total, v.dps)
   const dps = panelRate(panel, v.dps)
   return { panel, view: { rows, total, dps, activeDps: panelTotals(panel, v.total, v.activeDps).dps } }
-}
-
-/** total · duration · active-time DPS — the secondary stat, never the headline (law 7). */
-function supportingLine(seg: SegmentView, v: ScopedView): string {
-  return `${formatNum(v.total)} total · ${fmtDur(seg.durationSec)} · ${formatRate(v.activeDps)} active`
 }
 
 function OpenInCombat({ onOpenCombat }: { onOpenCombat: (f: CombatFocus) => void }): JSX.Element {
@@ -261,7 +257,9 @@ export function DpsCard({ snap, onOpenCombat }: DpsCardProps): JSX.Element {
             {formatRate(body.view.dps)}
           </Typography>
           <Typography variant="caption" color="text.secondary" sx={{ mb: 0.75 }} data-testid="overview-dps-support">
-            {supportingLine(seg, body.view)}
+            {/* total · the headline's own clock · active-time DPS: the secondary stat, never the
+                headline (law 7). */}
+            {supportLine(body.view, seg.durationSec)}
           </Typography>
           {/* The inline per-ability stats a reader expanded are remembered beside the drill they
               sit inside (JOS-116); the provider is how that answer reaches the shared SkillBar

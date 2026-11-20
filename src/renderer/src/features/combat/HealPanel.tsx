@@ -23,6 +23,7 @@ import { Bar, QuietNote } from './combatShared'
 import {
   UNSTATED_AMOUNT,
   hasAbsorbCounts,
+  healEmptyNote,
   healPanel,
   healerAmount,
   healerStat,
@@ -37,7 +38,7 @@ import { formatNum as fmt } from '../../lib/formatRate'
 import { scopeHealing } from './meterScope'
 import type { Drill } from './dashboardData'
 import type { HealSourceView, HealSpellView, HealingView, MitigationView } from '@shared/combat'
-import type { MeterScope, RosterSnap } from '@shared/roster'
+import { effectiveScope, type MeterScope, type RosterSnap } from '@shared/roster'
 import { Tooltip } from '../../lib/Tooltip'
 
 /**
@@ -261,7 +262,7 @@ export function HealBody({
       {panel.empty ? (
         // A quiet state, not a zeroed meter: the amount-less absorption families can still have
         // fired with nothing to rank (swings eaten by a rune granted before this fight).
-        <QuietNote>No healing in this segment.</QuietNote>
+        <QuietNote>{healEmptyNote(healing, effectiveScope(scope, roster))}</QuietNote>
       ) : (
         panel.healers.map((h, i) => (
           <HealerBar

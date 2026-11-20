@@ -321,6 +321,15 @@ test('formatSegmentText (incoming) uses the incoming totals and appends the heal
   assert.ok(fits(text))
 })
 
+test('a panel showing the whole direction pastes exactly these goldens', () => {
+  // The panel hands over its own rows and headline (tests/combatCopyScope.test.mts). With nothing
+  // scoped or folded those are the segment's, so both pastes above hold through that door too.
+  const out = { rows: SEG.entities, total: SEG.outTotal, dps: SEG.outDps, activeDps: SEG.activeDps }
+  assert.equal(formatSegmentText(SEG, 'out', null, out), formatSegmentText(SEG, 'out'))
+  const incoming = { rows: SEG.incoming, total: SEG.inTotal, dps: SEG.inDps, activeDps: SEG.inDps }
+  assert.equal(formatSegmentText(SEG, 'in', null, incoming), formatSegmentText(SEG, 'in'))
+})
+
 // ── the self-name preference (eq.combat.selfMeterName) ──────────────────────────────
 
 test('a selfLabel relabels the self row at every copy level, and the default is byte-identical', () => {
