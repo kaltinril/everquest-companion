@@ -5,12 +5,16 @@
 //
 // A row with a Plane of Sky chip hides the quest chip (the PoSky chip says it). An item whose
 // only use is as a TRADESKILL component (Gnome Meat → Gnome Kabobs) gets a `tradeskill` chip
-// instead of `quest`, so the two kinds of "it is for something" stay apart.
+// instead of `quest`, so the two kinds of "it is for something" stay apart. That chip is a link
+// into the Tradeskills section where the app published the door (lib/tradeskillLink): the first
+// tradeskill the item's recipes name, on the recipe that makes or first uses the item.
 
 import type { JSX } from 'react'
 import { Chip, Stack } from '@mui/material'
 import type { ItemMarks } from '@shared/itemKnowledge'
+import type { Tradeskill } from '@shared/tradeskills'
 import { useItemMarks } from '../../lib/itemMarks'
+import { useTradeskillLink } from '../../lib/tradeskillLink'
 
 interface BadgeFlags {
   showQuest: boolean
@@ -26,6 +30,35 @@ function badgeFlags(m: ItemMarks, isPosky: boolean): BadgeFlags {
   }
 }
 
+const BADGE_SX = { height: 18, fontSize: 10 } as const
+
+/**
+ * The `tradeskill` chip. With a tradeskill to open and the door in hand it is clickable, and the
+ * click stays off the row under it (the row's own click opens the item's page).
+ */
+function TradeskillChip({ name, tradeskill }: { name: string; tradeskill: Tradeskill | undefined }): JSX.Element {
+  const open = useTradeskillLink()
+  if (open === null || tradeskill === undefined) {
+    return <Chip size="small" color="info" variant="outlined" label="tradeskill" sx={BADGE_SX} />
+  }
+  return (
+    <Chip
+      size="small"
+      color="info"
+      variant="outlined"
+      label="tradeskill"
+      clickable
+      title={`Open in ${tradeskill}`}
+      data-testid="loot-tradeskill-badge"
+      onClick={(e) => {
+        e.stopPropagation()
+        open({ tradeskill, item: name })
+      }}
+      sx={BADGE_SX}
+    />
+  )
+}
+
 export function KnowledgeBadge({ name, isPosky }: { name: string; isPosky: boolean }): JSX.Element | null {
   const m = useItemMarks(name)
   if (!m) return null
@@ -37,9 +70,7 @@ export function KnowledgeBadge({ name, isPosky }: { name: string; isPosky: boole
       {flags.showQuest && (
         <Chip size="small" color="secondary" variant="outlined" label="quest" sx={{ height: 18, fontSize: 10 }} />
       )}
-      {flags.showTradeskill && (
-        <Chip size="small" color="info" variant="outlined" label="tradeskill" sx={{ height: 18, fontSize: 10 }} />
-      )}
+      {flags.showTradeskill && <TradeskillChip name={name} tradeskill={m.tradeskills[0]} />}
     </Stack>
   )
 }

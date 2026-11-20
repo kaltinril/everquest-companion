@@ -2,10 +2,12 @@ import { Fragment, type JSX } from 'react'
 import { Box, Chip, CircularProgress, Stack, Typography } from '@mui/material'
 import AutoStoriesIcon from '@mui/icons-material/AutoStories'
 import type { ItemKnowledge, ItemQuestUse, ItemRecipeUse } from '@shared/types'
-import { craftedByLabel, recipeUseLabel } from '@shared/itemKnowledge'
+import { craftedByLabel, craftedByParts, recipeUseLabel } from '@shared/itemKnowledge'
+import { tradeskillOf } from '@shared/tradeskills'
 import { wikiPageUrl } from '@shared/wiki'
 import { CellLink } from '../../lib/CellLink'
 import { KnownItemTooltip } from '../../lib/KnownItemTooltip'
+import { useTradeskillLink } from '../../lib/tradeskillLink'
 import { questUseOutcomes, questUseWhere } from '../../lib/itemKnowledgeView'
 import { QuestEraChip } from '../planner/PlannerChips'
 // What the item is on the way to (a race, a class, a deity), drawn under the quest uses.
@@ -167,6 +169,30 @@ function QuestUsesBlock({
   )
 }
 
+/**
+ * ONE RECIPE THAT USES THE ITEM. A link when the wiki's word names a tradeskill and the app
+ * published the Tradeskills door (lib/tradeskillLink): that tradeskill's workbench, on the recipe
+ * that makes what the chip names. The quest chip's own gesture (`QuestUseChip`): a chip that goes
+ * somewhere is clickable, one that cannot is the plain chip it was.
+ */
+function RecipeUseChip({ use }: { use: ItemRecipeUse }): JSX.Element {
+  const open = useTradeskillLink()
+  const tradeskill = tradeskillOf(use.tradeskill)
+  const linked = open !== null && tradeskill !== undefined
+  return (
+    <Chip
+      size="small"
+      variant="outlined"
+      data-testid="loot-recipe-use"
+      label={recipeUseLabel(use)}
+      clickable={linked}
+      onClick={linked ? () => open({ tradeskill, item: use.recipe }) : undefined}
+      {...(linked && { title: `Open this recipe in ${tradeskill}` })}
+      sx={{ height: 22 }}
+    />
+  )
+}
+
 // The tradeskill recipes that CONSUME this item (`|recipes`).
 function RecipesBlock({ recipes, questUseCount }: { recipes: ItemRecipeUse[]; questUseCount: number }): JSX.Element | null {
   if (recipes.length === 0) return null
@@ -177,13 +203,7 @@ function RecipesBlock({ recipes, questUseCount }: { recipes: ItemRecipeUse[]; qu
       </Typography>
       <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap sx={{ mt: 0.5 }}>
         {recipes.map((r) => (
-          <Chip
-            key={`${r.tradeskill ?? ''}:${r.recipe}`}
-            size="small"
-            variant="outlined"
-            label={recipeUseLabel(r)}
-            sx={{ height: 22 }}
-          />
+          <RecipeUseChip key={`${r.tradeskill ?? ''}:${r.recipe}`} use={r} />
         ))}
       </Stack>
     </Box>
@@ -201,11 +221,32 @@ function RecipesNote({ note, recipeCount }: { note?: string; recipeCount: number
   )
 }
 
-function CraftedNote({ crafted }: { crafted?: string }): JSX.Element | null {
+/**
+ * How the item is made. Each way that names a tradeskill is a link to that tradeskill's workbench
+ * with this item's recipe picked (`CellLink`, the reward names' gesture above); a way that names
+ * none, the prose fallback, and a window with no Tradeskills door stay the plain text they were.
+ */
+function CraftedNote({ data, crafted }: { data: ItemKnowledge; crafted?: string }): JSX.Element | null {
+  const open = useTradeskillLink()
   if (!crafted) return null
+  const parts = open === null ? [] : craftedByParts(data)
   return (
-    <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }}>
-      Crafted: {crafted}
+    <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }} data-testid="loot-crafted">
+      Crafted:{' '}
+      {parts.length === 0 && crafted}
+      {parts.map((part, i) => {
+        const tradeskill = part.tradeskill
+        return (
+          <Fragment key={`${String(i)}:${part.label}`}>
+            {i > 0 && ' · '}
+            {open === null || tradeskill === undefined ? (
+              part.label
+            ) : (
+              <CellLink text={part.label} onOpen={() => open({ tradeskill, item: data.name })} />
+            )}
+          </Fragment>
+        )
+      })}
     </Typography>
   )
 }
@@ -274,7 +315,7 @@ export function KnowledgeSection({
       )}
       <RecipesBlock recipes={recipes} questUseCount={data.questUses.length} />
       <RecipesNote note={data.recipesNote} recipeCount={recipes.length} />
-      <CraftedNote crafted={crafted} />
+      <CraftedNote data={data} crafted={crafted} />
       <SourceNote wikiUrl={wikiPageUrl(data.page)} questUses={data.questUses} />
     </Box>
   )

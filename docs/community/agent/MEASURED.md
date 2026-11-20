@@ -426,7 +426,8 @@ Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`)
 
 **Combines in detail (fork #6, measured 2026-11-20 on the 2026-08-12 to 2026-10-06 archive)**
 
-- 736 combines (606 made, 130 failed), 31 items; Jewelry Making 2 to 205 in 204 raises, 129 of
+- 736 combines (606 made, 130 failed), 43 items (31 of them on 2026-09-12; one only ever
+  failed); Jewelry Making 2 to 205 in 204 raises, 129 of
   them on 2026-09-12 (563 combines, 91 minutes of crafting inside 4 h 43 min of clock).
 - Raise and combine share a second. The raise is one or two lines before the combine line (133) or
   the line after (49); a failed combine can raise too. Taking both orders, all 204 raises pair.
@@ -456,6 +457,30 @@ Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`)
 - Skill-mod items in `items.json`: five, as `Skill Mod: Fishing +5% (10 Max)` style strings in
   `stats.flags` (four Fishing, one Baking).
 
+**The engine's `crafting` module on the same archive (2026-11-20, `parity --snapshots` on a copy)**
+
+- The module gives 736 combines (606 made, 130 failed) over 43 items; 215 paired raises (Jewelry
+  Making 204, Brewing 7, Baking 4); Gold Malachite Bracelet 92 made, 29 failed, 33 raises, 114
+  to 146. A line-by-line count of the same file agrees on every number.
+- Raise order, all 215: before the line of a made combine 160, after the line of a failed one 55,
+  never the other two ways. No two combines share a second, so the pairing is never ambiguous.
+- One tradeskill line pairs with nothing: a point bought from a trainer (`You have become better
+  at Alchemy! (2)`, then the trainer's `You have increased your skill in Alchemy.`).
+- The trivial notice: 60 lines, each claimed by a combine within one second.
+- By-product: `You have fashioned the items together to create an alternate product: Bottle.`
+  (4 lines, with `an`), each in the second of a failed Brewing combine and after its raise. It
+  is not a combine of its own.
+- `Consumed` lines: 466 for 328 combines, one per ingredient drawn. `You have deposited N <item>
+  to your personal depot.` (254) and `You have taken N <item> from your personal depot.` (20)
+  state a quantity and no count left. Refused attempts (`Sorry, but you don't have everything
+  ...`): 54.
+- Crafting spans (gaps over five minutes end one): 11. The four of 2026-09-12 hold 563 combines
+  and 129 raises in 91.4 minutes: 369 combines and 85 raises per crafting hour.
+- Merchants, whole archive: 680 purchase lines, 3,951 items of 555 distinct names, 57,811 pp;
+  1,258 sale lines over 375 names, 45,815 pp. Most rows are not tradeskill goods (spell scrolls,
+  drink, loot sold).
+- Snapshot: 149 KB as JSON (bought 92, sold 44, items 10, spans 1.2, depot 1.1, levels 0.4).
+
 **Left menu (fork #10)**
 
 - Measured in the hidden e2e app, fresh install, default window (inner 1280 x 860, 100%), every
@@ -470,6 +495,9 @@ Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`)
 - At 28 px rows (the default since): the menu is no taller than the 820 px drawer and every
   destination row reads back 28.0 px. The row heights always read back exactly as set, so the
   styling holds; only the total was wrong.
+- 2026-11-20, with the Tradeskills row (21 destination rows, ten under Research): the menu's
+  blocks take 774 px of the 820 px drawer and nothing scrolls (`tradeskills.e2e.mts`, the sum of
+  the drawer's children). 46 px spare: one more 28 px row fits, a second does not.
 
 ## The engine against a large log (2026-11-19, owner's PC: 16 cores, 64 GB, busy with other test apps)
 

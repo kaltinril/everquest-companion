@@ -289,6 +289,7 @@ pub const WIRING_ORDER: &[&str] = &[
     "progression",
     "leveling",
     "skills",
+    "crafting",
     "character",
     "outputFiles",
     "spellSets",
@@ -883,6 +884,7 @@ pub fn registered(deps: ClusterDeps) -> Registry {
     r.register(Box::new(modules::progression::ProgressionModule::new()));
     r.register(Box::new(modules::leveling::LevelingModule::new()));
     r.register(Box::new(modules::skills::SkillsModule::new()));
+    r.register(Box::new(modules::crafting::CraftingModule::new()));
     r.register(Box::new(modules::character::CharacterModule::new(character.clone())));
     r.register(Box::new(modules::output_files::OutputFilesModule::new()));
     r.register(Box::new(modules::spell_sets::SpellSetsModule::new()));

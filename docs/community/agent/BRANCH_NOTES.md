@@ -1730,6 +1730,220 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
 - Per hour and This session cells are blank when there is nothing to state (no dash glyph:
   copyNoEmDash).
 
+### Crafting module (fork #6, data only: no screen reads it yet)
+
+- Engine module `crafting`, wired after `skills`: `fold/src/modules/crafting.rs` (the module, item
+  rows, pairing), `crafting_spans.rs`, `crafting_money.rs`, `crafting_tests.rs`. No parser kind and
+  no protocol change: the failed combine, the trivial notice and the depot draw are read from
+  `unknown` lines, as Wiki Gaps reads the first.
+- State: `items` (per item: `made`, `failed`, `trivial`, `trivialTs?`, `raises`, `firstRaise?`,
+  `lastRaise?`, `tradeskill?`, `firstTs`, `lastTs`, `sessionMade`, `sessionFailed`,
+  `sessionRaises`), `levels` (per tradeskill: `value` and its log's first line), `spans`,
+  `olderSpans?`, `bought`, `sold`, `depot`. Types and helpers: `src/shared/crafting.ts`.
+- Shared with Wiki Gaps, one copy: `gaps_craft.rs` `failed_combine_of`, `is_tradeskill` and the
+  `Combines` pairing (the module is `gaps::craft`, `pub(crate)`); `gaps_details.rs` `coin_of` and
+  `price_of`. A change to any of them changes both features.
+- Pairing: a tradeskill line and a combine pair when they share a log second, either order. The
+  raise is counted on the item, the session and the span. A line restating the stored level is
+  not a raise but still names the item's tradeskill. A skill that is no tradeskill never pairs.
+- `tradeskill` is absent on an item no raise ever named (8 of the owner's 43). The TypeScript
+  side fills it from recipe data: `itemTradeskill(row, recipe)`, folded through `tradeskillOf`.
+- Not combines: the refused attempt (`Sorry, but you don't have everything ...`) and the
+  by-product line (`... create an alternate product: Bottle.`), which rides on a failed combine
+  already counted.
+- The trivial notice is held and claimed by the next combine within 1 s, made or failed; a
+  later combine does not get it.
+- Spans: a combine within 5 minutes of the last one extends the span, else opens one. The newest
+  120 are kept; an older one is summed into `olderSpans` (count, length, counts, and per
+  tradeskill the spans that held a raise of it). `SPAN_CAP` and `SPAN_GAP_MS` exist twice
+  (`crafting_spans.rs`, `shared/crafting.ts`): change both.
+- Pace (`craftingPace`) is per crafting hour: counts over the spans' summed length. With a
+  tradeskill, only spans holding a raise of it count. A span of one combine has no length.
+- Money is in copper, read off the raw line. `bought` keeps the newest line as `lastQty` and
+  `lastCopper` (unit price = the second over the first, `unitCopper`), the merchant and the zone
+  the player was in. `sold` counts lines: the sale line states no quantity. Both hold EVERY item
+  bought or sold, not only tradeskill ones (the engine knows no recipe): 555 and 375 rows on the
+  owner's archive, 136 KB of the 149 KB snapshot.
+- `depot` is the newest `(leaving N)` of a `Consumed` line. A deposit or a withdrawal states no
+  count, so the number is as old as the item's last draw.
+- Session = since the newest `offlineGap`; an epoch clears every table (the zone is kept).
+- Archives: `crafting` is in `CAPTURED_MODULES` and `MERGE_RULES` (`mergeCrafting.ts`). Counts
+  add; session columns, last price, merchant, depot count and level are the newer log's; the
+  first raise is the older log's. Spans are concatenated, bridged when an archive cut a run
+  within the 5 minute gap, and capped by the engine's rule. A newer log's first tradeskill line
+  that restates the older log's level is taken back off its item and span (`levels[].firstItem`).
+- `combineCost` states a cost only when every ingredient was bought at least once; a crafted
+  ingredient (Enchanted Gold Bar) is never bought, so its recipe must be costed first by the
+  caller. It assumes a failed combine loses its materials.
+- Open: Wiki Gaps' `alternate_product_of` matches `create alternate product: `, but the game
+  prints `create an alternate product: ` (4 of 4 lines in the owner's archive), so Gaps never
+  reads a by-product. Left alone here; one word fixes it.
+
+## Tradeskills section (fork #6, requirements/skills-tab.md, plans/2026-11-20-tradeskills-real-work.md)
+
+Slice 1 (2026-11-20): the menu entry, Home and a workbench with the wiki recipe book. TypeScript
+only: no engine, parser, protocol, network or dependency change.
+
+- View id `tradeskills`, one view with two screens. Nav row: Research, after Maps. In
+  `NOT_YET_REPORTED` (tests/telemetryContract.test.mts). Mounted as `<TradeskillsTab view viewKey
+  routing />` (`features/tradeskills/TradeskillsView.tsx`), the Skills tab's way, because
+  `App.tsx` `PlainView` is at the complexity ceiling. The Skills tab is unchanged.
+- Data path: main builds the book once per process (`src/main/tradeskillBook.ts`
+  `buildTradeskillBook`, handler `src/main/ipc/tradeskills.ts`, channel `tradeskills:book`,
+  bridge `window.eq.tradeskillBook()` in `preload/knowledge.ts`). It reads `itemDb()` and
+  `eraDerivations()`, the memos the item lookups and the Gear index hold: no second import of
+  items.json (a new JSON import edge in main is a bundle-order risk, WORKFLOW.md). The import in
+  `ipc/index.ts` sits after `./planner` on purpose. The renderer fetches once per window
+  (`tradeskillData.ts`); the payload is about 1.6 MB.
+- Every fold is `src/shared/tradeskillBook.ts`, tested in `tests/tradeskillBook.test.mts`:
+  `indexBook` (per-tradeskill ladders, era-hidden counted), `recipeLadder` (marks, search, Hide
+  trivial, the unrated heading as a line), `tradeskillTiles`, `subRecipes`, `materialDrops`,
+  `heldCount`, and the words on screen. Components only map over what these return.
+- TRAP: `items.json` files one page under two keys (its title and its `|itemname`) as two copies
+  of the record. Counting keys gives 2,497 crafted items and 2,531 recipes; walked once per PAGE
+  there are 2,483 recipes (2,359 name a tradeskill). `buildTradeskillBook` dedupes by
+  `entry.page`, not by object identity.
+- TRAP: several pages share one in-game name (a bow's Linen, Hemp and Silk pages; `Blade
+  core-Nth fold`). A recipe's `id` is `<page key>#<n>`; `key` (the item name's key) is not unique
+  and is only for the era join, the item link and "which recipes make this item".
+- Marks: trivial at or under the level is `trivial`; the first rated recipe above it is `next`;
+  no trivial is `unrated`, kept after everything else under a heading line. A skill the log never
+  showed reads as level 0 and the screen says so. The marks are set against the whole ladder
+  before the search and the switch take lines away, so a search never moves `next`.
+- Era: the shared Current era toggle (`plannerData.useEraOnly`, `eq.planner.era`), with
+  `plannerData.eraHides` injected into `indexBook`, the Gear filter's arrangement. A recipe row
+  carries the Gear row's evidence (`eraEvidenceOf`), so an item has one verdict on both tabs. An
+  unknown era is shown with the `Unknown Era` chip (owner, 2026-11-20). A material's own recipe
+  opens whatever its era. Drop mobs are a list that recommends: under the toggle, out-of-era
+  mobs are left out and counted.
+- Layout: the Bazaar's master and detail. The picked recipe's panel (the next recipe until the
+  player picks) holds the materials in full; the table under it is `useWindowedRows` with 36 px
+  lines, so a line's Materials cell is one cut-off line with the whole list on hover.
+  TRAP: after the table sets its own `scrollTop` it dispatches a `scroll` event itself. The
+  browser's event comes a frame later (far later in the hidden e2e window) and until then the
+  windowed slice is the old position's: a blank table.
+- Names: every item name is `ItemLink` / `ItemLabel` (`tradeskillLinks.tsx`), which is
+  `DonorName` with `card` plus `lib/ItemIcon`: the item window on hover, the Loot page on click.
+  Mob names are `CellLink` to `openMob(dropMobTarget(...))`, zones `CellLink` to
+  `openMapZone(dropZoneTarget(...))`; a zone the table refuses stays plain text. Do not build
+  another hover or link here.
+- A material's mobs: `mergeItemSources(sourcesFor(key), material.dropsFrom)`, the Loot page's
+  own join, folded to one row per mob name and cut to 4 with a count.
+- Have: `window.eq.gearOwnership()` (the Gear tab's read; re-asked on `onInventoryReload`),
+  counted by `heldCount`: bags, bank, shared bank and `Personal-Depot<n>` rows, every plus level,
+  a socketed copy left out. No dump: the cell is blank and `OutputKindLine kind="inventory"`
+  names the command. The panel states the dump's date.
+- Memory (`tradeskillMemory.ts`, the gear area's rule): the open workbench
+  (`eq.tradeskills.skill`, absent is Home) and Hide trivial (`eq.tradeskills.hideTrivial`) in
+  localStorage; the search and the picked recipe in sessionStorage (`eq.tradeskills.bench`),
+  for the open workbench only, with `linked` when a link from another tab chose the pick. The
+  table's scroll position rides `lib/navReturn` (parked on unmount, taken on mount after a Back).
+- Back: `openLoot(item)` and `openMob(...)` are anchored links, so their Back returns to the
+  Tradeskills view, which reopens the workbench and the picked recipe from storage. Only the
+  Loot page's Back calls `noteBack`, so the exact scroll position is restored after Loot and the
+  table opens on the picked recipe after Mobs. Maps has no Back: the nav row reopens the workbench.
+- e2e: `tests/e2e/tradeskills.e2e.mts`. Its claims are properties of what is on screen (the line
+  marked next is the first above the level), never a name or count from the wiki data.
+- Left menu: with this row the menu's blocks take 774 px of the 820 px drawer (MEASURED.md). One
+  more 28 px row fits; a second does not.
+- What's new line, for the next `Test build` commit (the in-app list is generated from that
+  commit, `scripts/community/community-release-notes.mjs`; nothing is hand-edited): "New
+  Tradeskills section: a tile per tradeskill with your level, and a workbench with the wiki's
+  recipes in trivial order, what to make next, each material's sources and how many you hold."
+  For slice 2: "Tradeskills is linked from the Loot page, the Bazaar, the Skills tab, the wish
+  list and the Gear table, and a workbench lists the gear that raises its skill."
+- Not built, and no placeholder is drawn: the goal switch and routes, merchants and locations,
+  prices, combine history, the guide panel, the make-an-item planner, a "ready" mark.
+- Links IN from other tabs (owner, 2026-11-20: "fully integrated with maps and other tabs"),
+  slice 2, 2026-11-20 on `tradeskills-links`:
+  - The opener: `openTradeskills({ tradeskill, item? })` in `appRouting.ts`, a `FocusSlot` like
+    `openLoot` (`tradeskillFocus`, `tradeskillNonce`, `clearTradeskillFocus`). A focus is
+    anchored, so the origin stack parks the tab the link was on.
+  - How a link reaches it: a context, `lib/tradeskillLink.tsx` (`useTradeskillLink()`, null where
+    no app published it), the spell link's arrangement. `lib/appLinks.tsx` `AppLinkProvider`
+    mounts the spell and tradeskill providers as one element, because `App.tsx` is at its line
+    ceiling: add a later context door there, not in `App.tsx`.
+  - How the tab applies it (`TradeskillsView.tsx` `useArrival`): once the book is loaded,
+    `shared/tradeskillBook.recipeForItem` picks the recipe (makes the item, else first uses it;
+    listed recipes before era-hidden ones of the same kind), `rememberLinkedPick` writes it as
+    the workbench's pick with `linked: true` and an empty search, the workbench is opened and the
+    focus retired. No screen is drawn while a focus waits, so the workbench mounts after the
+    pick is written. A link with no item, or an item with no recipe there, leaves the workbench's
+    memory alone.
+  - A linked pick stays in the panel when the table does not list it (Hide trivial, the era
+    toggle): `benchRecipe`, with `unlistedText` under the recipe's name. Picking a line or typing
+    a search clears `linked`. `BookIndex.byId` holds every recipe, era-hidden included.
+  - Back: the header's `BackToOrigin` ("Back to <tab>", `tradeskills-back`) shows while an origin
+    is parked; it is also the mouse Back's target (`useBackTarget`) and calls `noteBack`, so a
+    mob page that sent the reader here comes back as that page. LootView now parks its open item
+    page too (`parkReturn('loot', ...)`), so Back to Loot lands on that item; only this Back
+    notes `loot`, so every other arrival at Loot is unchanged.
+    TRAP: `lib/navReturn` is ONE slot. The recipe table parks on unmount, so going Home or to
+    another workbench after a link in overwrites what Mobs or Loot parked, and Back then lands
+    on their list.
+  - Which tradeskill an item is made by, for a row that has no recipe in hand:
+    `ItemMarks.madeBy` (`shared/itemKnowledge.marksOf`: the tradeskills of the item's own
+    `craftedBy`, absent when none). `marks.tradeskills` also holds what the item is an ingredient
+    of, so it is not the answer to "made by". `lib/tradeskillLink.MadeByLink` draws
+    "made: <Tradeskill>" from it.
+
+  | Surface | File and component | State | What the player sees |
+  | --- | --- | --- | --- |
+  | Loot item page and item dialog | `features/loot/KnowledgeSection.tsx` `CraftedNote`, `RecipeUseChip` | built | Each way in "Crafted:" that names a tradeskill is a `CellLink` (parts from `shared/itemKnowledge.craftedByParts`); each "Used in recipe" chip that names one is clickable and opens the recipe that makes the chip's item |
+  | Item hover card | `lib/KnownItemTooltip.tsx` `RecipeHow` | built where the card takes the pointer | Depth 0 only (not click-through, not nested): the "Baking 56" beside a "Used in recipe" name is a `CellLink`. Most cards in the app are click-through and are unchanged |
+  | Bazaar | `features/bazaar/BazaarControls.tsx` `WorkbenchButton` | built | "<Tradeskill> recipes" beside the Tradeskill picker once one is picked |
+  | Skills tab | `features/skills/SkillsView.tsx` `SkillName` | built | A tradeskill's name is a `CellLink` to its workbench (any log spelling, folded by `tradeskillOf`) |
+  | Loot ledger | `features/loot/KnowledgeBadge.tsx` `TradeskillChip` | built | The `tradeskill` badge is clickable: the first of `marks.tradeskills`, with the row's item; the click stops before the row |
+  | Mobs drop lists | none | not built | The mob page's drop rows carry no tradeskill badge (`KnowledgeBadge` is drawn only by `loot/lootRows.tsx`); the item dialog opened from a drop row has the Loot page's links |
+  | Wish list | `features/wishlist/WishGroups.tsx` `CampLine` | built | A Crafted-group row with no camp reads "made: <Tradeskill>" (`MadeByLink`) where it read "-". The Exaltations farm list no longer exists: the wish list is its drawing half |
+  | Gear rows | `features/gear/GearTable.tsx`, the Mob cell | built | A `playerCrafted` row with no drop mob reads "made: <Tradeskill>"; its marks are asked only for such rows |
+  | Recommended (Plan) | none | not built | The plan's targets are mob drops and quest rewards (`progressionPlan.ts` reads no `playerCrafted`): a made item is never on it, so there is nothing to link. A crafted lane is a feature, not a link |
+  | Character sheet depot rows | none | not built | `CarryAll.tsx` is read-only by its own header ("no row click ... a row is text") and the Character tab has no door to any other tab. A link there is a new pattern for that screen: the owner's call |
+  | Factions turn-ins | none | blocked | No quest reward data |
+  | Maps merchant waypoints | none | blocked | No merchant data (the guides, or the log's purchases) |
+
+- "Gear that raises this skill" (`SkillGearPanel.tsx`, under the workbench's head): the Gear
+  index rows whose `skillMods` name the tradeskill, by `shared/tradeskillGear.skillGear` (fold by
+  `tradeskillOf`; largest percent, then cap, then name; a mod that lowers the skill left out).
+  - The rows are `gear/gearData.useGearIndex()`: the Gear tab's one fetch per window. The first
+    workbench opened in a window pays that fetch if the Gear tab has not; the panel appears when
+    it lands. Do not build a second index.
+  - Era: `gearData.useEraHidden()` injected when the Current era toggle is on; hidden items are
+    counted in the panel. Held: `heldCount` over the section's own `useHeld()`; with no dump the
+    words are left out.
+  - No line for the tradeskill: the panel returns null. 2026-11-20 data: Fishing four, Baking one.
+  - The link out: `appRouting.openGearSearch(text)` writes `eq.gear.search`
+    (`gear/useAreaMemory.presetSearch`) and switches to Gear unanchored, `openMapZone`'s
+    arrangement. The text is `skill mod <the item's own spelling of the skill>`, lower case: the
+    Gear haystack holds what the item wrote (`skillModSearchText`). The Gear tab's other filters
+    are not touched, so a class or slot filter the player left on can still hide the items.
+- e2e (written, NOT run on `tradeskills-links`): `tradeskills.e2e.mts` gained `stepFromSkills`,
+  `stepFromLoot` and `stepSkillGear`.
+
+## Tradeskill guides as data (fork #6, requirements/skills-tab.md)
+
+- Two community guides are pulled at release time by `scripts/community/guides-pull.mts` and
+  committed as `src/main/data/tradeskillGuides.json` (types `src/shared/guideData.ts`). Procedure,
+  rules and thresholds: DATA_REFRESH.md, "The two tradeskill guides". The app never fetches them.
+- Not wired into any screen. A screen that shows this data shows the guide's `title`, `author` and
+  `sourceUrl` with it (owner, 2026-11-20: the app credits and links both).
+- `leveling.tradeskills.<Tradeskill>`: `steps` and `alternates` (`from`, `to`, `item`, `materials`
+  nested per sub-combine), `notes`, and `asides` (side tables as written). `recipes.tradeskills.
+  <Tradeskill>.recipes`: `trivial`, `item`, `materials` with `merchant` + `zone` + `loc` only when
+  the guide gives coordinates, else `sourceText`. Keys are `tradeskillOf` spellings.
+- Names are the guides' own, loose spellings (`Gold jade`, `HQ cat pelt`, `Fresh Fresh`): join to
+  `items.json` by a fold and expect misses; the pull lists them.
+- `returned: true` is a tool the combine gives back (the sheet writes `(returned)`, the recipe book
+  `(Reusable)`).
+- Trap: the leveling guide's ranges overlap and skip (`179 - 196` then `192 - 202`); a recipe-book
+  recipe may have no `trivial` (an item made inside another recipe's block) or a `tradeskill` other
+  than its tab's. A step's upper bound may be text (`range: "189 - see side"`, no `to`).
+- Trap: a remark sits at most 3 columns right of its name, a side table at least 4 (measured on the
+  2026-11-20 sheet; `NOTE_REACH` in `guides/sheetGuide.ts`). A sheet that narrows that gap turns a
+  side-table cell into a `note`: read the data diff after a pull.
+- The data file is never edited by hand: `guides-pull.mts --offline` rewrites it from the last good
+  copy, and `tests/guidesPull.test.mts` compares the two.
+
 ## Bug hunt 2026-11-19: the rules its fixes left in force
 
 From the multi-model hunt of that day (`audits/2026-11-19-bug-hunt.md`). One block per feature area:

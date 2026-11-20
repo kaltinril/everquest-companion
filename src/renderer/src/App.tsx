@@ -29,6 +29,7 @@ import PoskyView from './features/posky/PoskyView'
 import LootView from './features/loot/LootView'
 import LevelingView from './features/leveling/LevelingView'
 import { SkillsTab } from './features/skills/SkillsView'
+import { TradeskillsTab } from './features/tradeskills/TradeskillsView'
 import PlannerView from './features/planner/PlannerView'
 import GearView from './features/gear/GearView'
 import VoidMoteView from './features/gear/VoidMoteView'
@@ -75,7 +76,7 @@ import { SpellDrill } from './features/spells/SpellPage'
 // views - `unreleasedSpells.tsx` holds the `lazy(…)` trio and the view test, so this file gains a
 // line rather than nine.
 import UnreleasedSpellsView from './unreleasedSpells'
-import { SpellLinkProvider } from './lib/spellLink'
+import { AppLinkProvider } from './lib/appLinks'
 // Every "on the way to" chip is a link the same way (lib/unlockLink.tsx).
 import { UnlockLinkProvider, useOpenUnlock } from './lib/unlockLink'
 // The ACHIEVEMENTS and UNLOCKS tabs; each view check lives in its own file.
@@ -182,6 +183,8 @@ function PlainView({
       {view === 'buffs' && <BuffsView key={viewKey} />}
       {/* SKILLS (fork #6). Its view check lives in its own file for the SpellDrill's reason. */}
       <SkillsTab view={view} viewKey={viewKey} />
+      {/* TRADESKILLS (fork #6). Its view check lives in its own file, as the Skills tab's does. */}
+      <TradeskillsTab view={view} viewKey={viewKey} routing={routing} />
       {/* The Plan tab (its place in the gear area's tab bar comes from appViews, not this list).
           Its routes out (user rulings, 2026-08-18): item names to the Loot drill-down, zone chips
           and run headings to the Maps tab, and a named witness mob's name to the mob's own page.
@@ -264,9 +267,10 @@ function ViewContent({
   // links is a property of the APP, not a per-caller decision. It sits HERE rather than at App's
   // root because this is the exact subtree that draws spell names: Preferences and the owner-only
   // triage tab return above it and draw none, and the overlay bundle — a different window, mounting
-  // no provider at all — keeps the plain text it has always had.
+  // no provider at all — keeps the plain text it has always had. `AppLinkProvider` (lib/appLinks.tsx)
+  // is that spell provider plus the Tradeskills door (lib/tradeskillLink.tsx), mounted as one element.
   return (
-    <SpellLinkProvider open={routing.openSpell}>
+    <AppLinkProvider routing={routing}>
       <PlainView
         view={view}
         viewKey={viewKey}
@@ -328,7 +332,7 @@ function ViewContent({
           onFocusConsumed={routing.clearCombatFocus}
         />
       )}
-    </SpellLinkProvider>
+    </AppLinkProvider>
   )
 }
 

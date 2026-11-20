@@ -34,14 +34,22 @@ export interface ItemMarks {
   recipes: number
   /** The tradeskills it is an ingredient of or made by, one spelling each (the Bazaar's Tradeskill filter). */
   tradeskills: Tradeskill[]
+  /** The tradeskills that MAKE it, one spelling each; absent when no recipe of its own names one. */
+  madeBy?: Tradeskill[]
   /** The stats block says NO DROP / NO TRADE (the Bazaar's keep rule). */
   noTrade: boolean
 }
 
 const NO_TRADE = new Set(['no drop', 'no trade', 'nodrop'])
 
+/** The tradeskills named, once each, in first-named order. */
+function folded(skills: readonly (Tradeskill | undefined)[]): Tradeskill[] {
+  return [...new Set(skills.filter((t): t is Tradeskill => t !== undefined))]
+}
+
 export function marksOf(k: Omit<ItemKnowledge, 'cached'>): ItemMarks {
   const skills = [...(k.recipes ?? []), ...(k.craftedBy ?? [])].map((r) => tradeskillOf(r.tradeskill))
+  const madeBy = folded((k.craftedBy ?? []).map((r) => tradeskillOf(r.tradeskill)))
   return {
     ...(k.iconId === undefined ? {} : { iconId: k.iconId }),
     lore: k.lore,
@@ -49,7 +57,8 @@ export function marksOf(k: Omit<ItemKnowledge, 'cached'>): ItemMarks {
     questUses: k.questUses.length,
     quests: [...new Set(k.questUses.map((u) => u.quest))],
     recipes: k.recipes?.length ?? 0,
-    tradeskills: [...new Set(skills.filter((t): t is Tradeskill => t !== undefined))],
+    tradeskills: folded(skills),
+    ...(madeBy.length === 0 ? {} : { madeBy }),
     noTrade: (k.stats?.flags ?? []).some((f) => NO_TRADE.has(f.toLowerCase()))
   }
 }
@@ -66,15 +75,31 @@ export function recipeUseLabel(r: ItemRecipeUse): string {
   return inner ? `${r.recipe} (${inner})` : r.recipe
 }
 
+/** One way the item is made, in the Loot page's words, and the tradeskill those words name. */
+export interface CraftedPart {
+  /** `Baking 56 (Oven)` */
+  label: string
+  /** Absent when the wiki's word names no tradeskill ("Non-Tradeskill", a quest's name). */
+  tradeskill?: Tradeskill
+}
+
+/** How the item is made, one part per recipe that says anything; `[]` when the page stated none. */
+export function craftedByParts(k: ItemKnowledge): CraftedPart[] {
+  const parts: CraftedPart[] = []
+  for (const c of k.craftedBy ?? []) {
+    const head = [c.tradeskill, c.trivial != null ? String(c.trivial) : null].filter(Boolean).join(' ')
+    const label = c.container ? `${head} (${c.container})` : head
+    if (label === '') continue
+    const tradeskill = tradeskillOf(c.tradeskill)
+    parts.push({ label, ...(tradeskill === undefined ? {} : { tradeskill }) })
+  }
+  return parts
+}
+
 /** ONE spelling of "how this item is made": `Baking 56 (Oven)`, joined with ` · ` across
  *  recipes, or the prose fallback. Undefined when the page said nothing. */
 export function craftedByLabel(k: ItemKnowledge): string | undefined {
-  const made = (k.craftedBy ?? [])
-    .map((c) => {
-      const head = [c.tradeskill, c.trivial != null ? String(c.trivial) : null].filter(Boolean).join(' ')
-      return c.container ? `${head} (${c.container})` : head
-    })
-    .filter(Boolean)
+  const made = craftedByParts(k).map((p) => p.label)
   if (made.length > 0) return made.join(' · ')
   return k.craftedNote
 }

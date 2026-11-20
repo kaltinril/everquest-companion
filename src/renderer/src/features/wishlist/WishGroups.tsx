@@ -28,6 +28,7 @@ import { Box, Chip, IconButton, Paper, Stack, Typography } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import { Tooltip } from '../../lib/Tooltip'
 import { CellLink } from '../../lib/CellLink'
+import { MadeByLink } from '../../lib/tradeskillLink'
 import { DonorName, EraChip, MismatchChip, NoSlotChip, StateChip } from '../planner/PlannerChips'
 import { classesMismatch } from '../planner/plannerClasses'
 import { CURRENT_ERA_LABEL } from '../planner/plannerData'
@@ -124,6 +125,8 @@ export interface WishRowProps {
  *  honest link), the level and `+N more` tail stay plain text. */
 function CampLine({ row, onOpenMob }: { row: FarmRow; onOpenMob?: ((t: MobTarget) => void) | undefined }): JSX.Element {
   const first = row.sources[0]
+  // A made item with no camp: the tradeskill that makes it, a door to its workbench (lib/tradeskillLink).
+  if (first === undefined && row.playerCrafted) return <MadeByLink item={row.name} otherwise="-" />
   if (first === undefined || onOpenMob === undefined) {
     const camp = campText(row)
     return <>{camp === '' ? '-' : camp}</>

@@ -61,6 +61,19 @@ behind. No age of the pack
 stands in for the delta (the 2026-10-23 five-hour rule is withdrawn). The same pair runs whenever
 the owner asks for a delta or a data refresh, with no condition attached.
 
+**The two tradeskill guides, every release, after the delta** (owner, 2026-11-20: "as part of the
+delta refresh we do from the wiki every time we release can we do a fresh pull from the google
+sheets"): `npx tsx scripts/community/guides-pull.mts` in a work tree off `main_community`, once the
+delta has merged (DATA_REFRESH.md, "The two tradeskill guides").
+
+- "Byte for byte the last good copy": nothing to commit.
+- "Written": read the diff, commit `scripts/sources/cache/guides` and
+  `src/main/data/tradeskillGuides.json`, merge before the version bump.
+- "REFUSED" (exit 1): nothing was written; the release ships the last good copy. A `[change]`
+  refusal (a tab gone or new, over 10% of a tab's rows lost, over 30% changed) is taken with
+  `--accept` once the owner has read the diff. A `[response]`, `[content]` or `[layout]` refusal is
+  never taken by a flag: report it to the owner.
+
 Since 2026-10-08 a release is built and published by GitHub Actions
 (`.github/workflows/community-release.yml`) when a `community-<version>` tag is pushed, as the
 creator's releases are by `build.yml` on a `v*` tag. Nothing is built on the owner's machine. The

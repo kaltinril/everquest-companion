@@ -1,0 +1,1609 @@
+{
+  "about": "Two community tradeskill guides as data. Written by scripts/community/guides-pull.mts at release time; never edited by hand. Each guide is its author's work: show the title, the author and the link wherever its data is shown.",
+  "leveling": {
+    "id": "eql-tradeskill-guide",
+    "title": "EQ Legends Tradeskill Guide",
+    "author": "Zakarsis Moonstalker - Iksar Monk / Druid / Enchanter",
+    "server": "Neriak",
+    "version": "1.8 (wip)",
+    "lastUpdate": "11/19/26",
+    "sourceUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTNj3GiLZ4nXBfLkGEB2iGkJy_WV4Mfkth5nwyg3pSfjJEiEreIsspJhIcSZAIS5hbSDwZbawzk4jEz/pubhtml",
+    "pulledAt": "2026-11-20T18:45:13.000Z",
+    "overview": [
+      {
+        "heading": "Notes",
+        "lines": [
+          "Alchemy is no longer shaman only.  Everyone can learn it.",
+          "Tinkering is still gnome only.  You must unlock the gnome race to learn it.",
+          "Spell Research was removed from EQ Legends.",
+          "Plan ahead for the tradeskill(s) you wish to max.  Once you pass 200 in any one skill, all other tradeskills will cap out at 200",
+          "With each rank of the AA Crafting Mastery you can raise an additional tradeskill to 300"
+        ]
+      },
+      {
+        "heading": "Stats",
+        "lines": [
+          "Charisma affects your buying/selling prices with merchants.",
+          "Chance of skill increase is based on the highest of your int/wis with 2 exceptions",
+          "Smithing uses highest of int/wis/str",
+          "Fletching uses highest of int/wis/dex",
+          "Illusions and sneak can also help with merchant prices, and getting into KOS areas.",
+          "For the above reasons I recommend having an enchanter in your trio to do tradeskills."
+        ]
+      }
+    ],
+    "tradeskills": {
+      "Alchemy": {
+        "notes": ["Recommend getting a Reinforced Medicine Bag before starting."],
+        "steps": [
+          {
+            "from": 1,
+            "to": 83,
+            "item": "Potion of Accuracy",
+            "materials": [{ "name": "Birthwort" }, { "name": "Fenugreek" }, { "name": "Blue Vervain Bulb" }]
+          },
+          {
+            "from": 84,
+            "to": 150,
+            "item": "Greater Potion of Accuracy",
+            "materials": [{ "name": "Birthwort" }, { "name": "Fenugreek" }, { "name": "Valerian Root" }]
+          },
+          { "from": 151, "to": 212, "item": "Elixir of Concentration", "materials": [{ "name": "Violet Tri-Tube Sap" }, { "name": "Yerbhimba" }] },
+          {
+            "from": 213,
+            "to": 244,
+            "item": "Elixir of Greater Concentration",
+            "materials": [{ "name": "Violet Tri-Tube Sap" }, { "name": "Duskglow Vine" }]
+          },
+          { "from": 245, "to": 255, "item": "Potion of Mystical Aptitude", "materials": [{ "name": "Yerbhimba" }, { "name": "Duskglow Vine" }] },
+          {
+            "from": 256,
+            "to": 300,
+            "item": "Distillate of Replenishment IX",
+            "materials": [
+              { "name": "Comfrey" },
+              { "name": "Deepwater Ink", "note": "Only drops from seahorses in kedge keep" },
+              { "name": "Clivers" },
+              { "name": "Small Vial", "qty": 5 }
+            ]
+          }
+        ],
+        "alternates": [],
+        "asides": [
+          { "col": "I", "cells": ["Useful items:"] },
+          { "col": "I", "cells": ["Item", "Trivial", "Effect"] },
+          { "col": "I", "cells": ["Potion of the Swamp", "170", "Innothule Port"] },
+          { "col": "I", "cells": ["Potion of the Frost", "170", "Everfrost Port"] },
+          { "col": "I", "cells": ["Potion of Unlife Awareness", "42", "IVU"] },
+          { "col": "I", "cells": ["Adrenaline Tap", "170", "40% haste for 20min"] },
+          { "col": "I", "cells": ["Kilva's Skin of Flame", "136", "Damage shield equal to half of your level"] },
+          {
+            "col": "G",
+            "cells": ["There are vendors located at the position below (#7 highlighted in yellow) that sell all mats needed except the deepwater ink"]
+          },
+          { "col": "O", "cells": ["Everfrost peaks"] }
+        ]
+      },
+      "Baking": {
+        "notes": ["Currently unknown if able to get past 226"],
+        "steps": [
+          { "from": 1, "to": 135, "item": "Fish Rolls", "materials": [{ "name": "Bat wing" }, { "name": "Fresh fish" }] },
+          {
+            "from": 136,
+            "to": 143,
+            "item": "Filleted bear/lion/mammoth/wolf",
+            "note": "Save these, as they will be used later",
+            "materials": [{ "name": "Filleting knife", "returned": true }, { "name": "bear/lion/mammoth/wolf meat" }]
+          },
+          {
+            "from": 144,
+            "to": 152,
+            "item": "Bear/lion/mammoth/wolf fillet in cream",
+            "note": "Save these, as they will be used later",
+            "materials": [
+              { "name": "Filleted bear/lion/mammoth/wolf" },
+              { "name": "Cream Fennel Sauce", "materials": [{ "name": "cup of flour" }, { "name": "cream" }, { "name": "fennel" }] }
+            ]
+          },
+          {
+            "from": 153,
+            "to": 190,
+            "item": "Pinemyer pasta",
+            "materials": [
+              { "name": "spices" },
+              { "name": "jug of sauces" },
+              {
+                "name": "noodles",
+                "note": "different eggs yield different amounts. see below",
+                "materials": [{ "name": "water flask" }, { "name": "cup of flour" }, { "name": "egg" }]
+              }
+            ]
+          },
+          {
+            "from": 191,
+            "to": 226,
+            "item": "Halas 10lb meat pie",
+            "note": "stat food.  useful item",
+            "materials": [
+              { "name": "clump of dough", "qty": 2, "note": "see below" },
+              { "name": "bear fillet in cream" },
+              { "name": "lion fillet in cream" },
+              { "name": "mammoth fillet in cream" },
+              { "name": "wolf fillet in cream" },
+              { "name": "pie tin" },
+              { "name": "sage leaf" }
+            ]
+          }
+        ],
+        "alternates": [
+          {
+            "from": 136,
+            "to": 142,
+            "item": "Jumjum salad",
+            "materials": [{ "name": "Fennel" }, { "name": "Lettuce" }, { "name": "Jumjum stalk" }, { "name": "Vegetables", "note": "foraged, or made:" }]
+          }
+        ],
+        "asides": [
+          { "col": "I", "cells": ["Egg", "# of noodles", "# of clumps of dough"] },
+          { "col": "I", "cells": ["alligator egg", "2", "5"] },
+          { "col": "I", "cells": ["aviak egg (foraged)", "2", "5"] },
+          { "col": "I", "cells": ["basilisk egg", "2", "15"] },
+          { "col": "I", "cells": ["griffon egg", "4", "7"] },
+          { "col": "I", "cells": ["snake egg", "1", "1"] },
+          { "col": "H", "cells": ["Where to obtain mats:"] },
+          {
+            "col": "H",
+            "cells": [
+              "bat wing",
+              "EC - Katha Firespinner @ 167.64, -368.50, Next to 3rd Inn  OR  Zasrin Blueflame @ -212, -954, 141, upstairs in Academy of Arcane Science in freeport"
+            ]
+          },
+          { "col": "H", "cells": ["fresh fish"] },
+          { "col": "H", "cells": ["bear meat"] },
+          { "col": "H", "cells": ["lion meat"] },
+          { "col": "H", "cells": ["mammoth meat"] },
+          { "col": "H", "cells": ["wolf meat"] },
+          { "col": "H", "cells": ["flour"] },
+          { "col": "H", "cells": ["fennel"] },
+          { "col": "H", "cells": ["spices"] },
+          { "col": "H", "cells": ["jug of sauces"] },
+          { "col": "H", "cells": ["sage leaf"] },
+          { "col": "H", "cells": ["lettuce"] },
+          { "col": "H", "cells": ["jumjum stalk"] },
+          { "col": "H", "cells": ["tradeskill recipes:"] },
+          { "col": "H", "cells": ["cream"] },
+          { "col": "H", "cells": ["filleting knife"] },
+          { "col": "H", "cells": ["pie tin"] }
+        ]
+      },
+      "Blacksmithing": {
+        "notes": [],
+        "steps": [
+          {
+            "from": 1,
+            "to": 18,
+            "item": "Metal bits",
+            "note": "save for later",
+            "materials": [{ "name": "small piece of ore", "qty": 2 }, { "name": "water flask" }]
+          },
+          {
+            "from": 19,
+            "to": 31,
+            "item": "Sheet metal",
+            "note": "save for later",
+            "materials": [{ "name": "small brick of ore", "qty": 2 }, { "name": "water flask" }]
+          },
+          {
+            "from": 32,
+            "to": 76,
+            "item": "Filleting knife",
+            "materials": [{ "name": "metal bits", "qty": 3 }, { "name": "water flask" }, { "name": "scaler mold" }]
+          },
+          {
+            "from": 77,
+            "to": 115,
+            "item": "Banded mail",
+            "materials": [{ "name": "mail sectional mold" }, { "name": "sheet metal", "qty": 3 }, { "name": "water flask" }]
+          },
+          {
+            "from": 116,
+            "to": 163,
+            "item": "Feir'dal fletching kit",
+            "note": "must be made in the wood elf forge in kelethin",
+            "materials": [
+              { "name": "small brick of mithril" },
+              { "name": "hinge mold" },
+              { "name": "container base mold" },
+              { "name": "container lid mold" },
+              { "name": "water flask" }
+            ]
+          },
+          {
+            "from": 164,
+            "to": 168,
+            "item": "Fine plate bracer",
+            "materials": [
+              { "name": "leather padding", "note": "see below" },
+              { "name": "medium quality folded sheet metal" },
+              { "name": "plate bracer mold" },
+              { "name": "smithy hammer", "returned": true },
+              { "name": "water flask" }
+            ]
+          },
+          {
+            "from": 169,
+            "to": 179,
+            "item": "Fine plate helm",
+            "materials": [
+              { "name": "leather padding", "note": "see below" },
+              { "name": "medium quality folded sheet metal", "qty": 2 },
+              { "name": "plate helm mold" },
+              { "name": "smithy hammer", "returned": true },
+              { "name": "water flask" }
+            ]
+          },
+          {
+            "from": 180,
+            "to": 188,
+            "item": "Fine plate breastplate",
+            "materials": [
+              { "name": "leather padding", "note": "see below" },
+              { "name": "medium quality folded sheet metal", "qty": 3 },
+              { "name": "breastplate mold" },
+              { "name": "smithy hammer", "returned": true },
+              { "name": "water flask" }
+            ]
+          },
+          {
+            "from": 189,
+            "to": 242,
+            "item": "Imbued field breastplate",
+            "materials": [
+              { "name": "breastplate mold" },
+              { "name": "leather padding", "note": "see below" },
+              { "name": "smithy hammer", "returned": true },
+              {
+                "name": "chain jointing",
+                "materials": [
+                  { "name": "water flask" },
+                  { "name": "file", "returned": true },
+                  { "name": "smithy hammer", "returned": true },
+                  { "name": "metal rings" }
+                ]
+              },
+              {
+                "name": "high quality folded sheet metal",
+                "qty": 3,
+                "materials": [{ "name": "water flask" }, { "name": "block of high quality ore" }, { "name": "smithy hammer", "returned": true }]
+              },
+              {
+                "name": "sea temper",
+                "materials": [
+                  { "name": "fish wine" },
+                  { "name": "saltwater seaweed", "note": "fished in ocean of tears" },
+                  { "name": "mug of seafoam", "qty": 2, "note": "dropped from seafury cyclops in ocean of tears" }
+                ]
+              },
+              { "name": "imbued gem", "note": "see below" }
+            ]
+          }
+        ],
+        "alternates": [
+          {
+            "from": 116,
+            "to": 188,
+            "item": "Steel Arrowheads",
+            "note": "requires following Karana",
+            "materials": [
+              { "name": "water flask" },
+              {
+                "name": "Mark of Karana",
+                "returned": true,
+                "note": "Quested (Qaelin Hailstorm, Surefall Glade, PoK | Hail Him, Returns on Combine). Requires Karana to be your diety",
+                "text": "Mark of Karana – Quested (Qaelin Hailstorm, Surefall Glade, PoK | Hail Him, Returns on Combine). Requires Karana to be your diety"
+              },
+              { "name": "Small Brick of Steel" },
+              { "name": "File" }
+            ]
+          }
+        ],
+        "asides": [
+          { "col": "J", "cells": ["Leather Padding"] },
+          { "col": "J", "cells": ["silk thread"] },
+          { "col": "J", "cells": ["LQ wolf/cat/bear pelt"] },
+          { "col": "K", "cells": ["HQ and MQ pelts can be lowered down to LQ using a skinning knife"] },
+          { "col": "J", "cells": ["Imbued Gems"] },
+          { "col": "J", "cells": ["Rose quartz", "Erolissi Marr"] },
+          { "col": "J", "cells": ["Diamond", "Mithaniel Marr"] },
+          { "col": "J", "cells": ["Sapphire", "Innoruuk"] },
+          { "col": "J", "cells": ["Plains pebble", "Karana"] },
+          { "col": "J", "cells": ["Jade", "Rallos Zek"] },
+          { "col": "J", "cells": ["Opal", "Rodcet Nife"] },
+          { "col": "J", "cells": ["Black Sapphire", "Bertoxxulous"] }
+        ]
+      },
+      "Brewing": {
+        "notes": [],
+        "steps": [
+          { "from": 1, "to": 135, "item": "Tumpy tonic", "materials": [{ "name": "kiola nut" }, { "name": "water flask" }] },
+          {
+            "from": 136,
+            "to": 162,
+            "item": "Jumjum spiced beer",
+            "materials": [
+              { "name": "spices" },
+              { "name": "water flask" },
+              { "name": "barley" },
+              { "name": "hops" },
+              { "name": "bottle" },
+              { "name": "jumjum stalk" }
+            ]
+          },
+          {
+            "from": 163,
+            "to": 188,
+            "item": "Faydwer shaker",
+            "materials": [{ "name": "cask" }, { "name": "dwarven ale" }, { "name": "elven wine" }, { "name": "gnomish spirits" }, { "name": "mead" }]
+          },
+          {
+            "from": 189,
+            "to": 248,
+            "item": "Minotaur hero's brew",
+            "materials": [
+              { "name": "cask" },
+              { "name": "malt", "qty": 3 },
+              { "name": "short beer", "qty": 2 },
+              { "name": "water flask", "qty": 2 },
+              { "name": "yeast" }
+            ]
+          },
+          {
+            "from": 249,
+            "to": 255,
+            "item": "Gruppas grizzly-popping ale",
+            "materials": [
+              { "name": "cask" },
+              { "name": "gnomish spirits" },
+              { "name": "pixie dust", "note": "drop from pixies in gfay and lfay" },
+              { "name": "infected rat liver", "note": "rats in steamfont mtns" },
+              {
+                "name": "Fizzle Pop",
+                "qty": 2,
+                "materials": [
+                  { "name": "bottle", "qty": 2 },
+                  { "name": "berries" },
+                  { "name": "aerated mineral water" },
+                  { "name": "sylvan berries", "note": "foraged in lfay.  also rare drop from pixies, brownies, and orcs in lfay" }
+                ]
+              }
+            ]
+          }
+        ],
+        "alternates": [
+          {
+            "from": 1,
+            "to": 151,
+            "item": "Skull ale",
+            "materials": [
+              {
+                "name": "Cyclops skull",
+                "returned": true,
+                "note": "from undead cyclops in south karana",
+                "text": "Cyclops skull (returned. from undead cyclops in south karana)"
+              },
+              { "name": "Short beer" },
+              { "name": "Spices" },
+              { "name": "Vinegar" }
+            ]
+          }
+        ]
+      },
+      "Fletching": {
+        "notes": [],
+        "steps": [
+          {
+            "from": 1,
+            "to": 68,
+            "item": "CLASS 1 Bone Point Arrow",
+            "note": "Large Groove",
+            "materials": [
+              { "name": "Large Groove Nocks" },
+              { "name": "Bundled Bone Arrow Shafts" },
+              { "name": "Field Point Arrowheads" },
+              { "name": "Several Round Cut Fletchings" }
+            ]
+          },
+          {
+            "from": 69,
+            "to": 102,
+            "item": "CLASS 1 Bone Hooked Arrow",
+            "note": "Large Groove",
+            "materials": [
+              { "name": "Large Groove Nocks" },
+              { "name": "Bundled Bone Arrow Shafts" },
+              { "name": "Hooked Arrowheads" },
+              { "name": "Several Round Cut Fletchings" }
+            ]
+          },
+          {
+            "from": 103,
+            "to": 182,
+            "item": "CLASS 1 Wood Silver Tip Arrow",
+            "note": "Large Groove",
+            "materials": [
+              { "name": "Bundled Wooden Arrow Shafts" },
+              { "name": "Large Groove Nocks" },
+              { "name": "Several Round Cut Fletchings" },
+              { "name": "Silver Tipped Arrowheads" }
+            ]
+          },
+          {
+            "from": 183,
+            "to": 202,
+            "item": "CLASS 6 Wood Point Arrow",
+            "note": "Large Groove",
+            "materials": [
+              { "name": "Bundled Wooden Arrow Shafts" },
+              { "name": "Large Groove Nocks" },
+              { "name": "Field Point Arrowheads" },
+              { "name": "Set of Ceramic Arrow Vanes" }
+            ]
+          },
+          {
+            "from": 203,
+            "to": 300,
+            "item": "Mithril Champion Arrows",
+            "note": "Must be made in Feir'Dal fletching kit",
+            "materials": [
+              { "name": "Small Groove Nocks" },
+              {
+                "name": "Mithril Fletchings",
+                "note": "fletching",
+                "materials": [
+                  { "name": "Small Brick of Mithril" },
+                  {
+                    "name": "Mithril Working Knife",
+                    "returned": true,
+                    "note": "Crafted (Blacksmiting, Trivial 42)",
+                    "text": "Mithril Working Knife – Crafted (Blacksmiting, Trivial 42) (returned)",
+                    "materials": [{ "name": "Water Flask" }, { "name": "Hilt Mold" }, { "name": "Dagger Blade Mold" }, { "name": "Small Brick of Mithril" }]
+                  }
+                ]
+              },
+              {
+                "name": "Mithril Bundled Arrow Shafts",
+                "note": "blacksmithing - 42 trivial",
+                "materials": [{ "name": "Water Flask" }, { "name": "Arrow Shaft Mold" }, { "name": "Large Brick of Mithril" }, { "name": "File" }]
+              },
+              {
+                "name": "Mithril Arrow Heads",
+                "note": "blacksmithing - 42 trivial",
+                "materials": [{ "name": "Small Brick of Mithril" }, { "name": "Water Flask" }, { "name": "File" }]
+              }
+            ]
+          }
+        ],
+        "alternates": [
+          {
+            "from": 203,
+            "to": 300,
+            "item": "Steel Guardian Arrows",
+            "note": "requires following Karana",
+            "materials": [
+              { "name": "Small Groove Nocks" },
+              {
+                "name": "Steel Arrowheads",
+                "note": "Crafted (Blacksmithing, Trivial 188, Forge, Yields 2)",
+                "text": "Steel Arrowheads – Crafted (Blacksmithing, Trivial 188, Forge, Yields 2)",
+                "materials": [
+                  { "name": "Water Flask" },
+                  {
+                    "name": "Mark of Karana",
+                    "returned": true,
+                    "note": "Quested (Qaelin Hailstorm, Surefall Glade, PoK | Hail Him, Returns on Combine). Requires Karana to be your diety",
+                    "text": "Mark of Karana – Quested (Qaelin Hailstorm, Surefall Glade, PoK | Hail Him, Returns on Combine). Requires Karana to be your diety"
+                  },
+                  { "name": "Small Brick of Steel" },
+                  { "name": "File" }
+                ]
+              },
+              {
+                "name": "Steel Arrowshafts",
+                "note": "Crafted (Blacksmithing, Trivial 42, Forge, Yields 2)",
+                "text": "Steel Arrowshafts – Crafted (Blacksmithing, Trivial 42, Forge, Yields 2)",
+                "materials": [
+                  { "name": "Water Flask" },
+                  {
+                    "name": "Mark of Karana",
+                    "returned": true,
+                    "note": "Quested (Qaelin Hailstorm, Surefall Glade, PoK | Hail Him, Returns on Combine). Requires Karana to be your diety",
+                    "text": "Mark of Karana – Quested (Qaelin Hailstorm, Surefall Glade, PoK | Hail Him, Returns on Combine). Requires Karana to be your diety"
+                  },
+                  { "name": "Large Brick of Steel" },
+                  { "name": "Arrow Shaft Mold" },
+                  { "name": "File" }
+                ]
+              },
+              {
+                "name": "Steel Fletch",
+                "note": "Crafted (Blacksmithing, Trivial 42, Forge, Yields 2)",
+                "text": "Steel Fletch – Crafted (Blacksmithing, Trivial 42, Forge, Yields 2)",
+                "materials": [
+                  {
+                    "name": "Mark of Karana",
+                    "returned": true,
+                    "note": "Quested (Qaelin Hailstorm, Surefall Glade, PoK | Hail Him, Returns on Combine). Requires Karana to be your diety",
+                    "text": "Mark of Karana – Quested (Qaelin Hailstorm, Surefall Glade, PoK | Hail Him, Returns on Combine). Requires Karana to be your diety"
+                  },
+                  { "name": "Small Brick of Steel" },
+                  {
+                    "name": "Steel Working Knife",
+                    "returned": true,
+                    "note": "Crafted (Blacksmiting, Trivial 42, Karana Diety only, Forge, Returns on Combine)",
+                    "text": "Steel Working Knife – Crafted (Blacksmiting, Trivial 42, Karana Diety only, Forge, Returns on Combine)",
+                    "materials": [
+                      { "name": "Water Flask" },
+                      { "name": "Hilt Mold" },
+                      { "name": "Dagger Blade Mold" },
+                      {
+                        "name": "Mark of Karana",
+                        "returned": true,
+                        "note": "Quested (Qaelin Hailstorm, Surefall Glade, PoK | Hail Him, Returns on Combine). Requires Karana to be your diety",
+                        "text": "Mark of Karana – Quested (Qaelin Hailstorm, Surefall Glade, PoK | Hail Him, Returns on Combine). Requires Karana to be your diety"
+                      },
+                      { "name": "Small Brick of Steel" }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "Jewelcrafting": {
+        "notes": [
+          "For jewelcrafting I chose to make things closer to the trivial.  That gives a better chance to make the item, thus selling it back to recoup the costs.",
+          "Ruby is the highest gem available on merchants.  It is recommended to save all black sapphires, jacinth, diamonds, and blue diamonds for 280+",
+          "All trivials and combines assume enchanted bars.  Non-enchanted bar trivials are lower.  Champagne Magnum requires an enchanted bar."
+        ],
+        "steps": [
+          { "from": 1, "to": 34, "item": "Silver star rose quartz", "materials": [] },
+          { "from": 35, "to": 74, "item": "Electrum malachite", "materials": [] },
+          { "from": 75, "to": 98, "item": "Electrum star rose quartz", "materials": [] },
+          { "from": 99, "to": 111, "item": "Electrum topaz", "materials": [] },
+          { "from": 112, "to": 146, "item": "Gold malachite", "note": "Some guides recommend starting here", "materials": [] },
+          { "from": 147, "to": 164, "item": "Gold jasper", "materials": [] },
+          { "from": 165, "to": 178, "item": "Gold jade", "materials": [] },
+          {
+            "from": 179,
+            "to": 196,
+            "item": "Champagne Magnum",
+            "note": "Can start earlier if desired",
+            "materials": [{ "name": "Enchanted gold bar" }, { "name": "Opal" }, { "name": "Bottle" }]
+          },
+          { "from": 192, "to": 202, "item": "Gold fire emerald", "materials": [] },
+          { "from": 203, "to": 228, "item": "Platinum cat's eye agate", "materials": [] },
+          { "from": 229, "to": 255, "item": "Platinum topaz", "materials": [] },
+          { "from": 256, "to": 279, "item": "Platinum ruby", "note": "Last store bought gem", "materials": [] },
+          { "from": 280, "to": 282, "item": "Platinum jacinth", "materials": [] },
+          { "from": 283, "to": 284, "item": "Platinum black sapphire", "materials": [] },
+          { "from": 285, "to": 287, "item": "Platinum diamond", "materials": [] },
+          { "from": 288, "to": 295, "item": "Platinum blue diamond", "materials": [] }
+        ],
+        "alternates": []
+      },
+      "Pottery": {
+        "notes": [],
+        "steps": [
+          {
+            "from": 1,
+            "to": 36,
+            "item": "Unfired medium container",
+            "materials": [{ "name": "Medium jar sketch" }, { "name": "Block of clay" }, { "name": "Water flask" }]
+          },
+          {
+            "from": 37,
+            "to": 102,
+            "item": "Unfired small bowl",
+            "materials": [{ "name": "Bowl sketch" }, { "name": "Small block of clay" }, { "name": "Water flask" }]
+          },
+          {
+            "from": 103,
+            "to": 122,
+            "item": "Unfired medium bowl",
+            "materials": [{ "name": "Medium bowl sketch" }, { "name": "Block of clay" }, { "name": "Water flask" }]
+          },
+          {
+            "from": 123,
+            "to": 148,
+            "item": "Unfired large bowl",
+            "materials": [{ "name": "Large bowl sketch" }, { "name": "Large block of clay" }, { "name": "Water flask" }, { "name": "Glass shard" }]
+          },
+          {
+            "from": 149,
+            "to": 168,
+            "item": "Unfired lined poison vial",
+            "materials": [
+              { "name": "Lined vial sketch" },
+              { "name": "Small block of clay" },
+              { "name": "Water flask" },
+              { "name": "Pelt/skin", "note": "see below" }
+            ]
+          },
+          {
+            "from": 169,
+            "to": 188,
+            "item": "Unfired sealed poison vial",
+            "materials": [
+              { "name": "Sealed vial sketch" },
+              { "name": "Small block of clay" },
+              { "name": "Water flask" },
+              { "name": "Pelt/skin", "note": "see below" }
+            ]
+          },
+          {
+            "from": 189,
+            "range": "189 - see side",
+            "item": "Unfired idol",
+            "note": "XXX",
+            "materials": [
+              { "name": "Idol sketch" },
+              { "name": "Imbued gem", "note": "diety specific, see below" },
+              { "name": "Large block of magic clay", "note": "enchanter created" },
+              { "name": "Sculpting tools", "returned": true },
+              { "name": "Vial of clear mana", "note": "enchanter created" }
+            ]
+          }
+        ],
+        "alternates": [],
+        "asides": [
+          { "col": "H", "cells": ["Pelt/skin"] },
+          { "col": "J", "cells": ["Imbued Gems"] },
+          { "col": "H", "cells": ["MQ/HQ wolf skin"] },
+          { "col": "J", "cells": ["gem", "god", "trivial"] },
+          { "col": "H", "cells": ["MQ/HQ cat pelt"] },
+          { "col": "J", "cells": ["Plains pebble", "Karana", "242"] },
+          { "col": "H", "cells": ["MQ/HQ bear skin"] },
+          { "col": "J", "cells": ["Peridot", "Bristlebane", "248"] },
+          { "col": "H", "cells": ["Mist wolf pelt"] },
+          { "col": "J", "cells": ["Amber", "Cazic Thule", "248"] },
+          { "col": "H", "cells": ["White wolf skin"] },
+          { "col": "J", "cells": ["Jade", "Rallos Zek", "248"] },
+          { "col": "H", "cells": ["Black wolf skin"] },
+          { "col": "J", "cells": ["Topaz", "Quellious", "252"] },
+          { "col": "H", "cells": ["Thick grizzly bear skin"] },
+          { "col": "J", "cells": ["Ivory", "The Tribunal", "252"] },
+          { "col": "H", "cells": ["Polar bear skin"] },
+          { "col": "J", "cells": ["Rose quartz", "Erolissi Marr", "255"] },
+          { "col": "H", "cells": ["Zombie skin"] },
+          { "col": "J", "cells": ["Black pearl", "Prexus", "255"] },
+          { "col": "G", "cells": ["Best option", "Crows Special Brew"] },
+          { "col": "J", "cells": ["Opal", "Rodcet Nife", "255"] },
+          { "col": "J", "cells": ["Fire opal", "Solusek Ro", "262"] },
+          { "col": "J", "cells": ["Black Sapphire", "Bertoxxulous", "282"] },
+          { "col": "J", "cells": ["Ruby", "Brell Serilis", "282"] },
+          { "col": "J", "cells": ["Sapphire", "Innoruuk", "282"] },
+          { "col": "J", "cells": ["Emerald", "Tunare", "282"] },
+          { "col": "J", "cells": ["Diamond", "Mithaniel Marr", "288"] }
+        ]
+      },
+      "Tailoring": {
+        "notes": [
+          "Best place for spider silk:  Sol B lava duct crawler area.  Lguk just past the bedroom.  EK near the ramp to highhold",
+          "Best place for spiderling silk:  Feerott near the druid ring.  Gukta (rathe mtns)."
+        ],
+        "steps": [
+          { "from": 1, "to": 66, "item": "Woven mandrake", "materials": [{ "name": "Mandrake root", "qty": 2 }] },
+          { "from": 67, "to": 76, "item": "Picnic basket", "materials": [{ "name": "Woven mandrake" }, { "name": "Steel boning" }] },
+          {
+            "from": 77,
+            "to": 82,
+            "item": "Cured silk mask",
+            "materials": [{ "name": "Mask pattern" }, { "name": "Heady kiola" }, { "name": "Silk swatch" }]
+          },
+          { "from": 83, "to": 88, "item": "Handmade backpack", "materials": [{ "name": "Backpack pattern" }, { "name": "HQ bear skin" }] },
+          {
+            "from": 89,
+            "to": 108,
+            "item": "Reinforced gorget",
+            "materials": [{ "name": "Gorget pattern" }, { "name": "HQ wolf/cat/bear pelt" }, { "name": "Steel boning" }]
+          },
+          { "from": 109, "to": 115, "item": "Tailored quiver", "materials": [{ "name": "Quiver pattern" }, { "name": "HQ cat pelt" }] },
+          {
+            "from": 116,
+            "to": 142,
+            "item": "Wu's fighting cap",
+            "materials": [
+              { "name": "Cap pattern" },
+              { "name": "Heady kiola", "qty": 4 },
+              { "name": "Silk swatch" },
+              { "name": "Vial of viscious mana", "note": "enchanter made" }
+            ]
+          },
+          {
+            "from": 143,
+            "to": 151,
+            "item": "Wu's fighting sleeves",
+            "materials": [
+              { "name": "Sleeve pattern" },
+              { "name": "Heady kiola", "qty": 4 },
+              { "name": "Silk swatch", "qty": 2 },
+              { "name": "Vial of viscious mana", "note": "enchanter made" }
+            ]
+          },
+          {
+            "from": 152,
+            "to": 158,
+            "item": "Wu's fighting shirt",
+            "materials": [
+              { "name": "Tunic pattern" },
+              { "name": "Heady kiola", "qty": 4 },
+              { "name": "Silk swatch", "qty": 3 },
+              { "name": "Vial of viscious mana", "note": "enchanter made" }
+            ]
+          },
+          {
+            "from": 159,
+            "to": 190,
+            "item": "Forest green silk swatch",
+            "materials": [
+              { "name": "Silk swatch", "qty": 2 },
+              { "name": "Silk thread", "qty": 2 },
+              {
+                "name": "Dark green dye",
+                "note": "Crafted in a medium clay jar, no fail",
+                "materials": [
+                  { "name": "Resin" },
+                  {
+                    "name": "Evergreen extract",
+                    "note": "Alchemy - 36",
+                    "materials": [
+                      { "name": "Evergreen leaf", "note": "Ground spawn in gfay   (Brewall's map pack shows the location of all ground spawns)" },
+                      { "name": "Empty vial" },
+                      { "name": "Water flask" }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "from": 191,
+            "to": 222,
+            "item": "Fleeting quiver",
+            "materials": [
+              { "name": "Fleeting quiver pattern" },
+              { "name": "Aviak egg oil" },
+              { "name": "Griffon feathers" },
+              { "name": "HQ lion skin" },
+              { "name": "Vial of distilled mana" }
+            ]
+          }
+        ],
+        "alternates": []
+      },
+      "Tinkering": {
+        "notes": [
+          "Creating a gnome or unlocking gnome race (and using it in your loadout) will automatically give you a skill of 50 in tinkering",
+          "Recommend not doing this skill until level 50.  There is a level-based skill cap on tinkering.  At level 14 I was unable to get a skillup in 200 combines (at 50 skill).  Upon swapping to a level 50 loadout, skillups were normal",
+          "Leveling tinkering is INCREDIBLY expensive per combine.  Unlike jewelcrafting, selling what you make doesn't yield close to what you spend.",
+          "Aqualung clocks in at about 210pp per combine.  Nantik's anti-gravity unit at 360pp, and rebreather(if you choose to make it) at a whopping 892pp per combine",
+          "While footwarming boots ARE cheaper to make, the leather padding (and smithing skill) are a huge bottleneck.  Feel free to choose your own upgrade path based on the below suggestions"
+        ],
+        "steps": [
+          {
+            "from": 51,
+            "to": 102,
+            "item": "Stalking probe",
+            "materials": [{ "name": "Bottle" }, { "name": "Metal rod" }, { "name": "Gears", "qty": 2 }, { "name": "Firewater" }]
+          },
+          {
+            "from": 103,
+            "to": 122,
+            "item": "Powered gloves",
+            "materials": [{ "name": "Sprockets" }, { "name": "Metal twine" }, { "name": "Gears" }, { "name": "Firewater" }, { "name": "Steel lined gloves" }]
+          },
+          {
+            "from": 123,
+            "to": 148,
+            "item": "Aqualung",
+            "note": "about 210pp per combine",
+            "materials": [
+              { "name": "Fresh fish" },
+              { "name": "Metal twine" },
+              { "name": "Metal rod" },
+              { "name": "Gnomish bolts" },
+              { "name": "Silk lined steel helm" },
+              { "name": "Fine coral mesh" }
+            ]
+          },
+          {
+            "from": 149,
+            "to": 202,
+            "item": "Nantik's anti-gravity unit",
+            "note": "about 360pp per combine",
+            "materials": [
+              { "name": "Large Black Lodestone", "qty": 2 },
+              { "name": "Metal Fastening" },
+              { "name": "Metal Rod" },
+              { "name": "Static orb" },
+              {
+                "name": "Sheet metal",
+                "note": "smithing, 31 trivial",
+                "materials": [{ "name": "small brick of ore", "qty": 2 }, { "name": "water flask" }]
+              }
+            ]
+          },
+          {
+            "from": 203,
+            "to": 235,
+            "item": "Footwarming boots",
+            "note": "about 201pp per combine",
+            "materials": [
+              { "name": "Firewater" },
+              { "name": "Gnomish bolts" },
+              { "name": "Metal Rod", "qty": 2 },
+              { "name": "Metal twine" },
+              { "name": "Sharkskin tubing" },
+              {
+                "name": "Small fine plate boots",
+                "note": "smithing, 168 trivial",
+                "materials": [
+                  { "name": "medium quality folded sheet metal", "qty": 2 },
+                  { "name": "small plate boot mold" },
+                  { "name": "water flask" },
+                  { "name": "smithy hammer", "returned": true },
+                  { "name": "leather padding", "note": "see blacksmithing tab", "text": "leather padding* (see blacksmithing tab)" }
+                ]
+              }
+            ]
+          }
+        ],
+        "alternates": [],
+        "asides": [
+          { "col": "F", "cells": ["Firewater"] },
+          { "col": "G", "cells": ["Water Flask"] },
+          { "col": "G", "cells": ["Gnomish Spirits"] },
+          { "col": "F", "cells": ["save these for the rebreathers if you want"] }
+        ]
+      }
+    }
+  },
+  "recipes": {
+    "id": "kerran-kornerstore",
+    "title": "EQL Myztikal's Kerran Kornerstore",
+    "author": "Myztikal",
+    "server": "Halas",
+    "credit": "Created by Myztikal on Halas!",
+    "sourceUrl": "https://drive.google.com/file/d/1VcUmqXTclXafiMxQvCr2G5HvtgRc7ew5/view",
+    "pulledAt": "2026-11-20T18:45:13.000Z",
+    "tradeskills": {
+      "Alchemy": {
+        "recipes": [
+          {
+            "trivial": 244,
+            "item": "Elixir of Greater Concentration",
+            "notes": ["3 Mana regen per tick"],
+            "materials": [
+              { "name": "Duskglow Vine", "merchant": "Sven Felligan", "zone": "Everfrost Peaks", "loc": "2841, -3457" },
+              { "name": "Tri-Tube Sap", "merchant": "Guri", "zone": "Everfrost Peaks", "loc": "2888. -3400" }
+            ]
+          },
+          {
+            "trivial": 302,
+            "item": "Distillate of replenishment",
+            "notes": ["Only used to level skill", "Unusable in current game"],
+            "materials": [
+              { "name": "Comfrey", "merchant": "Sven Felligan", "zone": "Everfrost Peaks", "loc": "2841, -3457" },
+              { "name": "Clivers", "merchant": "Sven Felligan", "zone": "Everfrost Peaks", "loc": "2841, -3457" },
+              { "name": "Deepwater Ink", "zone": "Kedge keep" },
+              { "name": "Small Vial", "qty": 5, "merchant": "Murtog MacYee", "zone": "Halas", "loc": "116, -352" }
+            ]
+          },
+          {
+            "trivial": 136,
+            "section": "Useful Alchemy",
+            "item": "Kilva's Skin of Flame",
+            "notes": ["Damage Shield(Twink leveling)"],
+            "materials": [{ "name": "Heliotrope", "qty": 3, "merchant": "Sven Felligan", "zone": "Everfrost Peaks", "loc": "2841, -3457" }]
+          },
+          {
+            "trivial": 36,
+            "section": "Useful Alchemy",
+            "item": "Evergreen Extract",
+            "notes": ["Used to level Tailoring"],
+            "materials": [
+              { "name": "Duskglow Vine", "merchant": "Sven Felligan", "zone": "Everfrost Peaks", "loc": "2841, -3457" },
+              {
+                "name": "Empty Vial",
+                "merchant": "Ulka",
+                "zone": "Rathe Mountains",
+                "loc": "1734, 1288",
+                "notes": ["Go to buy when you farm bears for reinforced medicine bag"]
+              },
+              { "name": "Water Flask", "sourceText": "Any adventure supply merchant" }
+            ]
+          },
+          {
+            "trivial": 162,
+            "section": "Useful Alchemy",
+            "item": "Distillate of Clarity VI",
+            "notes": ["6 Mana regen per tick", "It stacks with Elixir of Greater Concentration"],
+            "materials": [
+              { "name": "Mugwart", "merchant": "Guri", "zone": "Everfrost Peaks", "loc": "2888. -3400" },
+              { "name": "Black Henbane", "zone": "Sol B ( Nagafen's Lair)", "sourceText": "Kobolds" },
+              { "name": "Katukara Bark", "merchant": "Sven Felligan", "zone": "Everfrost Peaks", "loc": "2841, -3457" },
+              { "name": "Small Vial", "qty": 5, "merchant": "Murtog MacYee", "zone": "Halas", "loc": "116, -352" }
+            ]
+          },
+          {
+            "trivial": 170,
+            "section": "Useful Alchemy",
+            "item": "Potion of the Frost",
+            "notes": ["Everfrost Gate for when you need to do Vox"],
+            "materials": [
+              { "name": "Heliotrope", "merchant": "Sven Felligan", "zone": "Everfrost Peaks", "loc": "2841, -3457" },
+              { "name": "Oakmoss", "merchant": "Sven Felligan", "zone": "Everfrost Peaks", "loc": "2841, -3457" }
+            ]
+          }
+        ]
+      },
+      "Baking": {
+        "recipes": [
+          {
+            "trivial": 82,
+            "item": "Fish Fillets",
+            "notes": [],
+            "materials": [
+              { "name": "Fresh Fresh", "merchant": "Tarker Gargurd", "zone": "East Freeport", "loc": "72, -885" },
+              { "name": "Jug of Sauces", "merchant": "Pincia Brownloe", "zone": "West Freeport", "loc": "-276, -698" }
+            ]
+          },
+          {
+            "trivial": 135,
+            "item": "Fish Rolls",
+            "notes": [],
+            "materials": [
+              { "name": "Fresh Fish", "merchant": "Tarker Gargurd", "zone": "East Freeport", "loc": "72, -885" },
+              { "name": "Bat Wing", "merchant": "Kathra Firespinner", "zone": "East Commonlands", "loc": "234 , 4731" }
+            ]
+          },
+          {
+            "trivial": 143,
+            "item": "Filleted Bear",
+            "notes": [],
+            "materials": [
+              { "name": "Filleting Knife", "sourceText": "Blacksmithing" },
+              { "name": "Bear Meat", "zone": "Northwest Bear Hill Rathe Mountains", "sourceText": "Farmed" }
+            ]
+          },
+          {
+            "trivial": 143,
+            "item": "Filleted Lion",
+            "notes": [],
+            "materials": [
+              { "name": "Filleting Knife", "sourceText": "Blacksmithing" },
+              { "name": "Lion Meat", "zone": "North Karana while farming HQ Lion Skins", "sourceText": "Farmed" }
+            ]
+          },
+          {
+            "trivial": 143,
+            "item": "Filleted Mammoth",
+            "notes": [],
+            "materials": [
+              { "name": "Filleting Knife", "sourceText": "Blacksmithing" },
+              { "name": "Mammoth Meat", "zone": "Eastern Everfrost Peaks", "sourceText": "Farmed" }
+            ]
+          },
+          {
+            "trivial": 143,
+            "item": "Filleted Wolf",
+            "notes": [],
+            "materials": [
+              { "name": "Filleting Knife", "sourceText": "Blacksmithing" },
+              { "name": "Wolf Meat", "zone": "Most zones you find the other animals", "sourceText": "Farmed" }
+            ]
+          },
+          {
+            "trivial": 152,
+            "item": "Bear Fillet in Cream",
+            "notes": [],
+            "materials": [{ "name": "Creamy Fennel Sauce", "sourceText": "Mixing Bowl" }, { "name": "Filleted Bear", "sourceText": "Crafted" }]
+          },
+          {
+            "trivial": 152,
+            "item": "Lion Fillet in Cream",
+            "notes": [],
+            "materials": [{ "name": "Creamy Fennel Sauce", "sourceText": "Mixing Bowl" }, { "name": "Filleted Lion", "sourceText": "Crafted" }]
+          },
+          {
+            "trivial": 152,
+            "item": "Mammoth Fillet in Cream",
+            "notes": [],
+            "materials": [{ "name": "Creamy Fennel Sauce", "sourceText": "Mixing Bowl" }, { "name": "Filleted Mammoth", "sourceText": "Crafted" }]
+          },
+          {
+            "trivial": 152,
+            "item": "Wolf Fillet in Cream",
+            "notes": [],
+            "materials": [{ "name": "Creamy Fennel Sauce", "sourceText": "Mixing Bowl" }, { "name": "Filleted Wolf", "sourceText": "Crafted" }]
+          },
+          {
+            "trivial": 191,
+            "item": "Pinemyer Pasta",
+            "notes": [],
+            "materials": [
+              { "name": "Spices", "merchant": "Pincia Brownloe", "zone": "West Freeport", "loc": "-276, -698" },
+              { "name": "Jug of Sauces", "merchant": "Pincia Brownloe", "zone": "West Freeport", "loc": "-276, -698" },
+              { "name": "Noodles", "sourceText": "Crafted" }
+            ]
+          },
+          {
+            "trivial": 31,
+            "item": "Noodles",
+            "notes": [],
+            "materials": [
+              { "name": "Egg", "sourceText": "Eggs of Several creatures are usable" },
+              { "name": "Cup of Flour", "merchant": "Pincia Brownloe", "zone": "West Freeport", "loc": "-276, -698" },
+              { "name": "Water", "sourceText": "Any adventure supply merchant" }
+            ]
+          },
+          {
+            "trivial": 226,
+            "item": "Halas 10 lb Meat Pie",
+            "notes": [],
+            "materials": [
+              { "name": "Clump of Dough", "qty": 2, "sourceText": "Crafted" },
+              { "name": "Sage Leaf", "merchant": "Spirita", "zone": "Halas", "loc": "348, 343" },
+              { "name": "Pie Tin", "sourceText": "Blacksmithing" },
+              { "name": "Bear Fillet in Cream", "sourceText": "Crafted" },
+              { "name": "Lion Fillet in Cream", "sourceText": "Crafted" },
+              { "name": "Mammoth Fillet in Cream", "sourceText": "Crafted" },
+              { "name": "Wolf Fillet in Cream", "sourceText": "Crafted" }
+            ]
+          },
+          {
+            "trivial": 17,
+            "item": "Clump of Dough",
+            "notes": ["Use Mixing Bowl"],
+            "materials": [
+              { "name": "Bottle oF Milk", "merchant": "Pincia Brownloe", "zone": "West Freeport", "loc": "-276, -698" },
+              { "name": "Cup of Flour", "merchant": "Pincia Brownloe", "zone": "West Freeport", "loc": "-276, -698" },
+              { "name": "Egg", "sourceText": "Eggs of Several creatures are usable" }
+            ]
+          },
+          {
+            "trivial": 83,
+            "item": "Cream",
+            "notes": ["Use Mixing Bowl"],
+            "materials": [
+              { "name": "Bottle of Milk", "qty": 2, "merchant": "Pincia Brownloe", "zone": "West Freeport", "loc": "-276, -698" },
+              { "name": "Benzoin", "merchant": "Melixis", "zone": "Kerra Isle", "loc": "519, 179" },
+              { "name": "Dairy Spoon", "sourceText": "Blacksmithing" }
+            ]
+          },
+          {
+            "trivial": 75,
+            "item": "Creamy Fennel Sauce",
+            "notes": ["Use Mixing Bowl"],
+            "materials": [
+              { "name": "Cream", "sourceText": "Crafted" },
+              { "name": "Cup of Flour", "merchant": "Pincia Brownloe", "zone": "West Freeport", "loc": "-276, -698" },
+              { "name": "Fennel", "merchant": "Spirita", "zone": "Halas", "loc": "348, 343" }
+            ]
+          },
+          {
+            "trivial": 76,
+            "section": "Blacksmithing reusables required / Recipes for those provided below",
+            "item": "Filleting Knife",
+            "notes": ["Reusable"],
+            "materials": [
+              { "name": "Water Flask", "sourceText": "Any adventure supply merchant" },
+              { "name": "Scaler Mold", "merchant": "Nalda Gristone", "zone": "Butcherblock Mountains", "loc": "2717, -964" },
+              { "name": "Metal Bits", "qty": 3, "sourceText": "Crafted (See Blacksmithing)" }
+            ]
+          },
+          {
+            "trivial": 74,
+            "section": "Blacksmithing reusables required / Recipes for those provided below",
+            "item": "Dairy Spoon",
+            "notes": ["Reusable"],
+            "materials": [
+              { "name": "Water Flask", "sourceText": "Any adventure supply merchant" },
+              { "name": "Metal Bits", "qty": 2, "sourceText": "Crafted (See Blacksmithing)" },
+              { "name": "Scaler Mold", "merchant": "Nalda Gristone", "zone": "Butcherblock Mountains", "loc": "2717, -964" }
+            ]
+          },
+          {
+            "trivial": 36,
+            "section": "Blacksmithing reusables required / Recipes for those provided below",
+            "item": "Pie Tin",
+            "notes": ["Reusable"],
+            "materials": [
+              { "name": "Water Flask", "sourceText": "Any adventure supply merchant" },
+              { "name": "Metal Bits", "qty": 3, "sourceText": "Crafted (See Blacksmithing)" },
+              { "name": "Ceramic Lining", "sourceText": "Crafted (See Pottery)" },
+              { "name": "Pie Tin Mold", "merchant": "Issilyn Ristan", "zone": "East Freeport", "loc": "69, -205" }
+            ]
+          },
+          {
+            "trivial": 128,
+            "section": "Pottery reusables required / Recipes for those provided below",
+            "item": "Unfired Mixing Bowl",
+            "notes": ["use Pottery Wheel"],
+            "materials": [
+              { "name": "Large Block of Clay", "qty": 2, "merchant": "Gurb Smithson", "zone": "West Freeport", "loc": "-198, -335" },
+              { "name": "Large Bowl Sketch", "merchant": "Jynsa Smithson", "zone": "West Freeport", "loc": "-185, -343" },
+              { "name": "Water Flask", "sourceText": "Any adventure supply merchant" }
+            ]
+          },
+          {
+            "section": "Pottery reusables required / Recipes for those provided below",
+            "item": "Mixing Bowl",
+            "notes": ["Use Kiln"],
+            "materials": [
+              { "name": "Unfired Mixing Bowl", "sourceText": "Crafted (See above)" },
+              { "name": "Firing Sheet", "merchant": "Gurb Smithson", "zone": "West Freeport", "loc": "-198, -335" }
+            ]
+          }
+        ],
+        "unparsed": ["Pottery | Mixing Bowl (2 Steps)"]
+      },
+      "Blacksmithing": {
+        "recipes": [
+          {
+            "trivial": 18,
+            "item": "Metal Bits",
+            "notes": [],
+            "materials": [
+              { "name": "Water Flask", "sourceText": "Any Adventure Supply merchant" },
+              { "name": "Small Piece of Ore", "merchant": "Klok Lagnoz", "zone": "New Sebi", "loc": "280, -110" }
+            ]
+          },
+          {
+            "trivial": 31,
+            "item": "Sheet Metal",
+            "notes": [],
+            "materials": [
+              { "name": "Small Brick of Ore", "qty": 2, "merchant": "Klok Rento", "zone": "New Sebi", "loc": "288, -106" },
+              { "name": "Water Flask", "sourceText": "Any Adventure Supply merchant" }
+            ]
+          },
+          {
+            "trivial": 60,
+            "item": "Forged Javelin",
+            "notes": [],
+            "materials": [
+              { "name": "Sheet Metal", "merchant": "Klok Rento", "zone": "New Sebi", "loc": "288, -106" },
+              { "name": "Javelin Mold", "merchant": "Bndainy Everhot", "zone": "North Kaladim", "loc": "392, -160" }
+            ]
+          },
+          {
+            "trivial": 108,
+            "item": "Banded Leggings",
+            "notes": [],
+            "materials": [
+              { "name": "Sheet Metal", "qty": 3, "merchant": "Klok Rento", "zone": "New Sebi", "loc": "288, -106" },
+              { "name": "Water Flask", "sourceText": "Any Adventure Supply merchant" },
+              { "name": "Leggings Sectional Mold", "merchant": "Klok Rento", "zone": "New Sebi", "loc": "288, -106" }
+            ]
+          },
+          {
+            "trivial": 163,
+            "item": "Fine Plate Visor",
+            "notes": [],
+            "materials": [
+              { "name": "Water Flask", "sourceText": "Any Adventure Supply merchant" },
+              { "name": "Leather Padding", "sourceText": "Crafted (Tailoring)" },
+              { "name": "Smithy Hammer", "returned": true, "merchant": "Trudie Steelbone", "zone": "North Freeport", "loc": "-42, 472" },
+              { "name": "Medium Quality Folded Sheet", "sourceText": "Crafted (Blacksmithing)" },
+              { "name": "Plate Visor Mold", "merchant": "Valentin Fireheart", "zone": "East Freeport", "loc": "61,-175,-39" }
+            ]
+          },
+          {
+            "trivial": 179,
+            "item": "Fine Plate Helm",
+            "notes": [],
+            "materials": [
+              { "name": "Water Flask", "sourceText": "Any Adventure Supply merchant" },
+              { "name": "Leather Padding", "sourceText": "Crafted (Tailoring)" },
+              { "name": "Smithy Hammer", "returned": true, "merchant": "Trudie Steelbone", "zone": "North Freeport", "loc": "-42, 472" },
+              { "name": "Medium Quality Folded Sheet", "qty": 2, "sourceText": "Crafted (Blacksmithing)" },
+              { "name": "Plate Visor Mold", "merchant": "Valentin Fireheart", "zone": "East Freeport", "loc": "61,-175,-39" }
+            ]
+          },
+          {
+            "trivial": 188,
+            "item": "Fine Plate Breastplate",
+            "notes": [],
+            "materials": [
+              { "name": "Water Flask", "sourceText": "Any Adventure Supply merchant" },
+              { "name": "Leather Padding", "sourceText": "Crafted (Tailoring)" },
+              { "name": "Smithy Hammer", "returned": true, "merchant": "Trudie Steelbone", "zone": "North Freeport", "loc": "-42, 472" },
+              { "name": "Medium Quality Folded Sheet", "qty": 3, "sourceText": "Crafted (Blacksmithing)" },
+              { "name": "Plate Visor Mold", "merchant": "Valentin Fireheart", "zone": "East Freeport", "loc": "61,-175,-39" }
+            ]
+          },
+          {
+            "trivial": 36,
+            "item": "Medium Quality Folded Sheet",
+            "notes": [],
+            "materials": [
+              { "name": "Smithy Hammer", "returned": true, "merchant": "Trudie Steelbone", "zone": "North Freeport", "loc": "-42, 472" },
+              { "name": "Water Flask", "sourceText": "Any Adventure Supply merchant" },
+              { "name": "Block of Medium Quality Ore", "merchant": "Valentin Fireheart", "zone": "East Freeport", "loc": "61,-175,-39" }
+            ]
+          },
+          {
+            "trivial": 31,
+            "tradeskill": "Tailoring",
+            "item": "Leather Padding",
+            "notes": [],
+            "materials": [
+              { "name": "Low Quality Skin/Pelt", "zone": "NK/ Rathe Mountains for High density", "sourceText": "Bear/Lion skins most common" },
+              { "name": "Silk Thread", "sourceText": "Crafted (See Tailoring)" }
+            ]
+          }
+        ]
+      },
+      "Brewing": {
+        "recipes": [
+          {
+            "trivial": 46,
+            "item": "Heady Kiola",
+            "notes": ["Make excessive amounts", "You and friends use for tailoring"],
+            "materials": [
+              { "name": "Water Flask", "sourceText": "Any Adventure Supply merchant" },
+              { "name": "Bottle", "merchant": "Sun Alemaker", "zone": "East Freeport", "loc": "139, -259" },
+              { "name": "Packet of Kiola Sap", "merchant": "Sun Alemaker", "zone": "East Freeport", "loc": "139, -259" }
+            ]
+          },
+          {
+            "trivial": 102,
+            "item": "Aviak Egg Oil",
+            "notes": [],
+            "materials": [
+              { "name": "Water Flask", "sourceText": "Any Adventure Supply merchant" },
+              { "name": "Aviak Eggs", "zone": "Butcherblock Mountains", "sourceText": "Unique Forage" }
+            ]
+          },
+          {
+            "trivial": 135,
+            "item": "Tumpy Tonic",
+            "notes": ["I'd do this before Aviak Egg Oil"],
+            "materials": [
+              { "name": "Water Flask", "sourceText": "Any Adventure Supply merchant" },
+              { "name": "Kiola Nut", "merchant": "Cleonae Kalen", "zone": "Ocean of Tears", "loc": "503, -9253" }
+            ]
+          },
+          {
+            "trivial": 248,
+            "item": "Minotaur Hero's Brew",
+            "notes": [],
+            "materials": [
+              { "name": "Water Flask", "qty": 2, "sourceText": "Any Adventure Supply merchant" },
+              { "name": "Short Beer", "qty": 2, "merchant": "Sun Alemaker", "zone": "East Freeport", "loc": "139, -259" },
+              { "name": "Cask", "merchant": "Sun Alemaker", "zone": "East Freeport", "loc": "139, -259" },
+              { "name": "Malt", "qty": 3, "merchant": "Krystin Charcoal", "zone": "West Freeport", "loc": "105,8" },
+              { "name": "Yeast", "merchant": "Krystin Charcoal", "zone": "West Freeport", "loc": "105,8" }
+            ]
+          }
+        ]
+      },
+      "Fletching": {
+        "recipes": [
+          {
+            "trivial": 135,
+            "item": "CLASS 1 Ceramic Point Arrow",
+            "notes": [],
+            "materials": [
+              { "name": "Large Groove Nocks", "merchant": "Merchant Lanin", "zone": "Greater Faydark", "loc": "413,319" },
+              { "name": "Field Point Arrowhead", "merchant": "Merchant Lanin", "zone": "Greater Faydark", "loc": "413,319" },
+              { "name": "Bundled Ceramic Arrowshafts", "merchant": "Merchant Lanin", "zone": "Greater Faydark", "loc": "413,319" },
+              { "name": "Several Round Cut Fletchings", "merchant": "Merchant Lanin", "zone": "Greater Faydark", "loc": "413,319" }
+            ]
+          },
+          {
+            "trivial": 202,
+            "item": "Class 1 Steel Point Arrow",
+            "notes": [],
+            "materials": [
+              { "name": "Large Groove Nocks", "merchant": "Merchant Lanin", "zone": "Greater Faydark", "loc": "413,319" },
+              { "name": "Field Point Arrowhead", "merchant": "Merchant Lanin", "zone": "Greater Faydark", "loc": "413,319" },
+              { "name": "Bundled Steel Arrowshafts", "merchant": "Merchant Lanin", "zone": "Greater Faydark", "loc": "413,319" },
+              { "name": "Several Round Cut Fletchings", "merchant": "Merchant Lanin", "zone": "Greater Faydark", "loc": "413,319" }
+            ]
+          },
+          {
+            "trivial": 335,
+            "item": "Mithril Champion Arrows",
+            "notes": [],
+            "materials": [
+              { "name": "Small Groove Nocks", "merchant": "Merchant Lanin", "zone": "Greater Faydark", "loc": "413,319" },
+              { "name": "Mithril Arrow Heads", "sourceText": "Crafted (Blacksmithing)" },
+              { "name": "Mithril Bundled Arrow Shafts", "sourceText": "Crafted (Blacksmithing)" },
+              { "name": "Mithril Fletchings", "sourceText": "Crafted (Blacksmithing)" }
+            ]
+          },
+          {
+            "trivial": 42,
+            "tradeskill": "Blacksmithing",
+            "item": "Mithril Arrow Heads",
+            "notes": [],
+            "materials": [
+              { "name": "File", "returned": true, "sourceText": "Crafted (Blacksmithing)" },
+              { "name": "Water Flask", "sourceText": "Any Adventure Supply merchant" },
+              { "name": "Small Brick of Mithril", "merchant": "Merchant Niwiny", "zone": "Greater Faydark", "loc": "-197,135" }
+            ]
+          },
+          {
+            "trivial": 42,
+            "tradeskill": "Blacksmithing",
+            "item": "Mithril Bundled Arrow Shafts",
+            "notes": [],
+            "materials": [
+              { "name": "File", "returned": true, "sourceText": "Crafted (Blacksmithing)" },
+              { "name": "Water Flask", "sourceText": "Any Adventure Supply merchant" },
+              { "name": "Arrow Shaft Mold", "merchant": "Merchant Lanin", "zone": "Greater Faydark", "loc": "413,319" },
+              { "name": "Large Brick of Mithril", "merchant": "Merchant Niwiny", "zone": "Greater Faydark", "loc": "-197,135" }
+            ]
+          },
+          {
+            "trivial": 34,
+            "item": "Mithril Fletchings",
+            "notes": ["Feir'Dal Fletching Kit", "Buy kit at Merchant Niwiny"],
+            "materials": [
+              { "name": "Mithril Working Knife", "sourceText": "Crafted (Blacksmithing)" },
+              { "name": "Small Brick of Mithril", "merchant": "Merchant Niwiny", "zone": "Greater Faydark", "loc": "-197,135" }
+            ]
+          },
+          {
+            "trivial": 42,
+            "tradeskill": "Blacksmithing",
+            "item": "Mithril Working Knife",
+            "notes": ["Reusable"],
+            "materials": [
+              { "name": "Water Flask", "sourceText": "Any Adventure Supply merchant" },
+              { "name": "Small Brick of Mithril", "merchant": "Merchant Niwiny", "zone": "Greater Faydark", "loc": "-197,135" },
+              { "name": "Dagger Blade Mold", "merchant": "Bndainy Everhot", "zone": "North Kaladim", "loc": "392, -160" },
+              { "name": "Hilt Mold", "merchant": "Bndainy Everhot", "zone": "North Kaladim", "loc": "392, -160" }
+            ]
+          },
+          {
+            "trivial": 21,
+            "tradeskill": "Blacksmithing",
+            "item": "File",
+            "notes": [],
+            "materials": [
+              { "name": "Metal Bits", "sourceText": "See Blacksmithing" },
+              { "name": "Water Flask", "sourceText": "Any Adventure Supply merchant" },
+              { "name": "File Mold", "merchant": "Merchant Nluolian", "zone": "Greater Faydark", "loc": "-107, -565" }
+            ]
+          }
+        ]
+      },
+      "Jewelcrafting": {
+        "notes": ["Enchanting bars requires several levels in enchanter class"],
+        "recipes": [
+          {
+            "trivial": 74,
+            "item": "Enchanted Malachite Bracelet",
+            "notes": ["Can use regular electrum bars but sells for less"],
+            "materials": [
+              { "name": "Enchanted Electrum Bar", "merchant": "Amber", "zone": "North Freeport", "loc": "-176, 207, 17" },
+              { "name": "Malachite", "merchant": "Jade", "zone": "North Freeport", "loc": "-179,197, 3" }
+            ]
+          },
+          {
+            "trivial": 146,
+            "item": "Gold Malachite Bracelet",
+            "notes": ["Can use regular gold bars but sells for less"],
+            "materials": [
+              { "name": "Enchanted Gold Bar", "merchant": "Amber", "zone": "North Freeport", "loc": "-176, 207, 17" },
+              { "name": "Malachite", "merchant": "Jade", "zone": "North Freeport", "loc": "-179,197, 3" }
+            ]
+          },
+          {
+            "trivial": 218,
+            "item": "Platinum Malachite Ring",
+            "notes": ["Can use regular platinum bars but sells for less"],
+            "materials": [
+              { "name": "Enchanted Platinum Bar", "merchant": "Amber", "zone": "North Freeport", "loc": "-176, 207, 17" },
+              { "name": "Malachite", "merchant": "Jade", "zone": "North Freeport", "loc": "-179,197, 3" }
+            ]
+          },
+          {
+            "trivial": 279,
+            "item": "Platinum Ruby Veil",
+            "notes": ["Magical", "Can use regular platinum bars but sells for less"],
+            "materials": [
+              { "name": "Enchanted Platinum Bar", "merchant": "Amber", "zone": "North Freeport", "loc": "-176, 207, 17" },
+              { "name": "Ruby", "merchant": "Jade", "zone": "North Freeport", "loc": "-179,197, 3" }
+            ]
+          },
+          {
+            "trivial": 284,
+            "item": "Black Sapphire Platinum necklace",
+            "notes": ["Magical", "Vox Quest Jewelery 1 of 2", "Must use enchanted bars"],
+            "materials": [
+              { "name": "Enchanted Platinum Bar", "merchant": "Amber", "zone": "North Freeport", "loc": "-176, 207, 17" },
+              { "name": "Black Sapphire", "sourceText": "Dropped(Plane of Hate)" }
+            ]
+          },
+          {
+            "trivial": 287,
+            "item": "Platinum Diamond Wedding Ring",
+            "notes": ["Magical", "Vox Quest Jewelery 1 of 2", "Must use enchanted bars"],
+            "materials": [
+              { "name": "Enchanted Platinum Bar", "merchant": "Amber", "zone": "North Freeport", "loc": "-176, 207, 17" },
+              { "name": "Diamond", "sourceText": "Dropped(Plane of Hate)" }
+            ]
+          },
+          {
+            "trivial": 295,
+            "item": "Platinum Blue Diamond Tiara",
+            "notes": ["Magical"],
+            "materials": [
+              { "name": "Enchanted Platinum Bar", "merchant": "Amber", "zone": "North Freeport", "loc": "-176, 207, 17" },
+              { "name": "Blue Diamond", "sourceText": "Dropped(Plane of Hate)" }
+            ]
+          }
+        ],
+        "unparsed": ["K7: i"]
+      },
+      "Pottery": {
+        "recipes": [
+          {
+            "trivial": 36,
+            "item": "Unfired Ceramic Lining",
+            "notes": ["Use Pottery Wheel"],
+            "materials": [
+              { "name": "Small Block of Clay", "merchant": "Gurb Smithson", "zone": "West Freeport", "loc": "-198, -335" },
+              { "name": "Water Flask", "sourceText": "Any Adventure Supply merchant" },
+              { "name": "Ceramic Lining Sketch", "merchant": "Jynsa Smithson", "zone": "West Freeport", "loc": "-185, -343" }
+            ]
+          },
+          {
+            "trivial": 122,
+            "item": "Unfired Medium Bowl",
+            "notes": ["Use Pottery Wheel"],
+            "materials": [
+              { "name": "Water Flask", "sourceText": "Any Adventure Supply merchant" },
+              { "name": "Block of Clay", "merchant": "Gurb Smithson", "zone": "West Freeport", "loc": "-198, -335" },
+              { "name": "Medium Bowl Sketch", "merchant": "Jynsa Smithson", "zone": "West Freeport", "loc": "-185, -343" }
+            ]
+          }
+        ],
+        "unparsed": ["TBA | Still haven't finished pottery sorry!", "Let me know the combinations you used if you did =)"]
+      },
+      "Tailoring": {
+        "recipes": [
+          {
+            "trivial": 15,
+            "item": "Silk Swatch",
+            "notes": [],
+            "materials": [
+              {
+                "name": "Spider Silk",
+                "qty": 2,
+                "zone": "Popular spot is LGuk spiders undead side",
+                "sourceText": "Most Spiders",
+                "notes": ["Popular Spots in EK with a spawn on a hill to West"]
+              }
+            ]
+          },
+          {
+            "trivial": 15,
+            "item": "Silk Thread",
+            "notes": [],
+            "materials": [{ "name": "Spiderling Silk", "qty": 2, "zone": "Popular spot is NE corner of Feerot", "sourceText": "Most Spiderlings" }]
+          },
+          { "trivial": 26, "item": "Silk Cord", "notes": [], "materials": [{ "name": "Silk Thread", "qty": 3, "sourceText": "Crafted" }] },
+          {
+            "trivial": 108,
+            "item": "Reinforced Mask",
+            "notes": ["Only if you bought or farmed pelts for Quivers"],
+            "materials": [
+              { "name": "High Quality Cat Pelt", "zone": "You'll get plenty if you farm Highland Lions for skins", "sourceText": "Farmed" },
+              { "name": "Steel Boning", "sourceText": "Crafted (Blacksmithing)" },
+              { "name": "Mask Pattern", "merchant": "Klok Walrot", "zone": "New Sebi", "loc": "286, -54" }
+            ]
+          },
+          {
+            "trivial": 135,
+            "item": "Wu's Fighting Mask",
+            "notes": ["Brute force method if you have spider silks"],
+            "materials": [
+              { "name": "Heady Kiola", "qty": 4, "sourceText": "Crafted (See Brewing)" },
+              { "name": "Mask Pattern", "merchant": "Klok Walrot", "zone": "New Sebi", "loc": "286, -54" },
+              { "name": "Silk Swatch", "sourceText": "Crafted" },
+              { "name": "Vial Of Viscous Mana", "zone": "Lvl 12 Req, 1 Pearl, 1 Poison Vial", "sourceText": "Crafted (Enchanted Spell)" }
+            ]
+          },
+          {
+            "trivial": 190,
+            "item": "Forest Green Silk Swatch",
+            "notes": ["In my eperience farming up spider silks is harder then the dye"],
+            "materials": [
+              { "name": "Silk Swatch", "qty": 2, "sourceText": "Crafted" },
+              { "name": "Silk Thread", "qty": 2, "sourceText": "Crafted" },
+              { "name": "Dark Green Dye", "sourceText": "Crafted (Alchemy and Pottery)" }
+            ]
+          },
+          {
+            "trivial": 222,
+            "item": "Fleeting Quiver",
+            "notes": [],
+            "materials": [
+              { "name": "High Quality Lion Skin", "zone": "North Karana", "sourceText": "Highland Lions", "notes": ["Bring Track...."] },
+              { "name": "Fleeting Quiver Pattern", "merchant": "Klok Walrot", "zone": "New Sebi", "loc": "286, -54" },
+              { "name": "Griffon Feathers", "zone": "North Karana has the most", "sourceText": "Any griffon" },
+              { "name": "Aviak Egg Oil", "sourceText": "Crafted (See Brewing)" }
+            ]
+          },
+          {
+            "trivial": 36,
+            "tradeskill": "Alchemy",
+            "section": "Dark Green Dye crafting",
+            "item": "Evergreen Extract",
+            "notes": [],
+            "materials": [
+              { "name": "Water Flask", "sourceText": "Any Adventure Supply merchant" },
+              {
+                "name": "Empty Vial",
+                "merchant": "Ulka",
+                "zone": "Rathe Mountains",
+                "loc": "1734, 1288",
+                "notes": ["Go to buy when you farm bears for reinforced medicine bag"]
+              },
+              {
+                "name": "Evergreen Leaf",
+                "zone": "Greater Faydark",
+                "sourceText": "Unique Ground Spawn",
+                "notes": ["Brewels Maps", "Northeast of druid rings has a potential 6 spawns nearby"]
+              }
+            ]
+          },
+          {
+            "section": "Dark Green Dye crafting",
+            "item": "Dark Green Dye",
+            "notes": ["Must craft inside Medium Clay Jar provided below"],
+            "materials": [
+              {
+                "name": "Resin",
+                "merchant": "Ulka",
+                "zone": "Rathe Mountains",
+                "loc": "1734, 1288",
+                "notes": ["Go to buy when you farm bears for reinforced medicine bag"]
+              },
+              { "name": "Evergreen Extract", "sourceText": "Crafted" }
+            ]
+          },
+          {
+            "trivial": 36,
+            "tradeskill": "Pottery",
+            "section": "Dark Green Dye crafting",
+            "item": "Unfired Medium Container",
+            "notes": ["Use Pottery Wheel"],
+            "materials": [
+              { "name": "Block of Clay", "merchant": "Gurb Smithson", "zone": "West Freeport", "loc": "-198, -335" },
+              { "name": "Medium Jar sketch", "merchant": "Jynsa Smithson", "zone": "West Freeport", "loc": "-185, -343" },
+              { "name": "Water Flask", "sourceText": "Any Adventure Supply merchant" }
+            ]
+          },
+          {
+            "trivial": 17,
+            "tradeskill": "Pottery",
+            "section": "Dark Green Dye crafting",
+            "item": "Medium Clay Jar",
+            "notes": ["Use Kiln"],
+            "materials": [
+              { "name": "Quality Firing Sheet", "merchant": "Gurb Smithson", "zone": "West Freeport", "loc": "-198, -335" },
+              { "name": "Unfired Medium Container", "sourceText": "Crafted" }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
