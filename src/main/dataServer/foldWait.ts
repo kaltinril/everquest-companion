@@ -152,6 +152,8 @@ export async function waitForFold(deps: FoldWaitDeps): Promise<FoldHealth | null
     // that refused once at minute three and has answered every poll since is not the pathology.
     refusals = 0
     deps.saw(health)
+    // What `saw` learned can end the turn (`attachTurn.ts`: the answer was about another log).
+    if (!deps.mine()) return null
     if (health.status === 'live') return health
     // `idle` after an accepted attach is the engine saying the read ended (unopenable file, read
     // error, panic): it will never go live, so polling on is waiting for nothing (fork #9).

@@ -17,6 +17,7 @@ const code = (rel: string): string =>
 
 const LAUNCH_STATE = '../src/main/dataServer/engineLaunchState.ts'
 const HOST = '../src/main/dataServer/engineClientHost.ts'
+const TURN = '../src/main/dataServer/attachTurn.ts'
 const WIRING = '../src/main/dataServer/engineClientWiring.ts'
 const ENGINE_HOST = '../src/main/dataServer/engineHost.ts'
 const MAIN_REPORT = '../src/main/logReadReport.ts'
@@ -73,7 +74,30 @@ test('A READ THAT ENDED, AND AN APP WITH NO CHARACTER, DROP THE BAR', () => {
 })
 
 test('an attach error carries the engine-s code, so a timeout is not called a refusal', () => {
-  assert.match(code(HOST), /noteLogReadError\('attach', describeErr\(err\), Date\.now\(\), code\)/)
+  // The attach moved to `attachTurn.ts` (phase R4): the turn hands over the code, the host records it.
+  assert.match(code(TURN), /deps\.noteError\(describeErr\(err\), err instanceof EngineError \? err\.code : null\)/)
+  assert.match(code(HOST), /noteError: \(detail, code\) => \{\s*noteLogReadError\('attach', detail, Date\.now\(\), code\)/)
+})
+
+test('THE TURN IS RUN BY attachTurn.ts, with the host-s own turn, connection and go-live edge handed in', () => {
+  const host = code(HOST)
+  const probe = body(host, /async function attachAndProbe\(mine: number\): Promise<void> \{/)
+  assert.match(probe, /await runAttachTurn\(\{/)
+  assert.match(probe, /mine: \(\) => gen === mine/, 'the turn is asked, never captured')
+  assert.match(probe, /defines: \(\) => pushAllDefines\(mine\)/)
+  assert.match(probe, /getAttached: \(\) => l\.attachedTo/)
+  assert.match(probe, /stateDir: \(\) => attachStateDir\(\{ serving: true,/, 'the artifact handover left the attach')
+  assert.match(probe, /saw: \(health\) => \{\s*sawHealth\(l, health\)/, 'the go-live edge is no longer fed')
+  // The bar and the archive are told by the callback the turn calls for an ACCEPTED attach only.
+  assert.match(probe, /const refolded = liveHistory\.engineAttaching\(\)\s*return \(\) => \{\s*noteEngineFolding\(\)\s*refolded\(\)/)
+  // One sender of the attach, and it is not this file.
+  assert.doesNotMatch(host.replace(/attach: \(params\) => l\.client\.request\('session\.attach', params\)/, ''), /'session\.attach'/)
+  const turn = code(TURN)
+  // The handover comes before the request object exists; the defines before any attach.
+  assert.match(turn, /const stateDir = deps\.stateDir\(\)\s*const clock = deps\.clock\(\)\s*const taken = deps\.attaching\(\)[\s\S]*?await deps\.attach\(/)
+  assert.match(turn, /await deps\.defines\(\)\s*if \(!deps\.mine\(\)\) return[\s\S]*?sendAttach\(turn\)/)
+  assert.match(turn, /if \(deps\.getAttached\(\) !== deps\.target && !\(await sendAttach\(turn\)\)\) return/)
+  assert.match(turn, /if \(result\.accepted\) taken\(\)/)
 })
 
 test('the supervisor-s edges poke, and its fault is scrubbed before the card is told', () => {

@@ -128,18 +128,14 @@ test('a fold that never lands never stops being waited on, and never stops SAYIN
   // and counts the lines. `mine` going false is what ends it — a stand-in for the respawn or the
   // character switch that would end it in the field.
   const halfHourPolls = (30 * 60 * 1000) / FOLD_POLL_MS
-  let asked = 0
-  const r = rig([folding(4096, 40)], {
-    mine: () => {
-      asked += 1
-      return asked < halfHourPolls
-    }
-  })
+  const r = rig([folding(4096, 40)])
+  // Counted in polls, not in how often the loop asks whose turn it is.
+  const deps: FoldWaitDeps = { ...r.deps, mine: () => r.asks < halfHourPolls }
 
-  assert.equal(await waitForFold(r.deps), null, 'a superseded turn says nothing')
+  assert.equal(await waitForFold(deps), null, 'a superseded turn says nothing')
   const narrations = r.notes.filter((line) => line.includes('still folding'))
   // One line per thirty seconds, give or take the turn it was cut off on.
-  const expected = Math.floor(halfHourPolls / 2 / FOLD_NARRATE_EVERY)
+  const expected = Math.floor(halfHourPolls / FOLD_NARRATE_EVERY)
   assert.ok(
     narrations.length >= expected - 1 && narrations.length <= expected + 1,
     `${String(narrations.length)} lines over half an hour, expected about ${String(expected)}`
@@ -246,6 +242,26 @@ test('a turn superseded WHILE a poll was in flight says nothing about the answer
   })
   assert.equal(await waitForFold(r.deps), null)
   assert.deepEqual(r.saw, [])
+})
+
+test('A TURN ENDED BY WHAT `saw` LEARNED RETURNS AT ONCE: no rest, no verdict on the answer', async () => {
+  // `attachTurn.ts` ends its wait this way when an answer is about another log. The answer must
+  // not then be read as this log's read ending, or as its landing.
+  for (const status of ['idle', 'live', 'folding']) {
+    let mine = true
+    const failed: string[] = []
+    const r = rig([{ status, epoch: 2 }], {
+      mine: () => mine,
+      saw: () => {
+        mine = false
+      },
+      failed: (why) => failed.push(why)
+    })
+    assert.equal(await waitForFold(r.deps), null, status)
+    assert.equal(r.asks, 1, status)
+    assert.deepEqual(r.rests, [], status)
+    assert.deepEqual(failed, [], status)
+  }
 })
 
 // ---- 2b. a read that ended (fork #9) -------------------------------------------------------------
