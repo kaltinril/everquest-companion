@@ -9,12 +9,13 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { SKILLS_MODULE } from '@shared/skills'
 import {
   LEVEL_UNSEEN_TEXT,
+  benchRecipe,
   ladderEmptyText,
   lineOfRecipe,
-  pickedRecipe,
   recipeLadder,
   skillRecipes,
   tradeskillLevel,
+  unlistedText,
   type BookIndex,
   type Ladder,
   type LadderAsk,
@@ -26,6 +27,7 @@ import OutputKindLine from '../../components/OutputKindLine'
 import { SearchField } from '../../lib/SearchField'
 import { RecipePanel, type BenchFacts } from './RecipePanel'
 import { RecipeTable } from './RecipeTable'
+import { SkillGearPanel } from './SkillGearPanel'
 import { useHeld, useSkillLevels, type SkillLevels } from './tradeskillData'
 import { useBenchMemory, useHideTrivial } from './tradeskillMemory'
 
@@ -133,12 +135,13 @@ export function Workbench({ tradeskill, index, eraOnly, onHome, restoreTop }: Wo
   const level = tradeskillLevel(levels.rows, tradeskill)
   const ask = useMemo((): LadderAsk => ({ level, query, hideTrivial }), [level, query, hideTrivial])
   const ladder = useMemo(() => recipeLadder(skillRecipes(index, tradeskill), ask), [index, tradeskill, ask])
-  const picked = pickedRecipe(ladder, memory.pick)
+  // A recipe a link from another tab opened stays in the panel even when the table hides it.
+  const picked = benchRecipe(index, ladder, { id: memory.pick, linked: memory.linked })
   const pickedLine = lineOfRecipe(ladder.lines, picked?.id ?? null)
   const facts = useMemo((): BenchFacts => ({ index, held, eraOnly }), [index, held, eraOnly])
   const onPick = useCallback(
     (id: string) => {
-      setMemory({ query: memory.query, pick: id })
+      setMemory({ query: memory.query, pick: id, linked: false })
     },
     [memory.query, setMemory]
   )
@@ -147,16 +150,19 @@ export function Workbench({ tradeskill, index, eraOnly, onHome, restoreTop }: Wo
   return (
     <Stack spacing={1} sx={{ flexGrow: 1, minHeight: 0 }} data-testid="tradeskill-workbench">
       <BenchHead tradeskill={tradeskill} level={level} levels={levels} onHome={onHome} />
+      <SkillGearPanel tradeskill={tradeskill} held={held} eraOnly={eraOnly} />
       <BenchBar
         query={memory.query}
         onQuery={(q) => {
-          setMemory({ query: q, pick: memory.pick })
+          setMemory({ query: q, pick: memory.pick, linked: false })
         }}
         hideTrivial={hideTrivial}
         onHideTrivial={setHideTrivial}
         ladder={ladder}
       />
-      {picked !== null && <RecipePanel recipe={picked} state={stateOfPicked(ladder, picked.id)} facts={facts} />}
+      {picked !== null && (
+        <RecipePanel recipe={picked} state={stateOfPicked(ladder, picked.id)} facts={facts} unlisted={unlistedText(ladder, picked)} />
+      )}
       <OutputKindLine kind="inventory" quiet loadedAt={held.readAt} testId="tradeskills-dump-line" />
       {empty !== null ? (
         <Typography variant="body2" color="text.secondary" data-testid="tradeskill-empty" sx={{ py: 4, textAlign: 'center' }}>

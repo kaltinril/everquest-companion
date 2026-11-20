@@ -7,7 +7,7 @@
 //   zone   `CellLink` to the Maps tab when `dropZoneTarget` resolves the spelling; plain text when
 //          it refuses (`Various`), never a nearest guess.
 //
-// The three doors are the app router's own openers, handed down once through a context.
+// The doors are the app router's own openers, handed down once through a context.
 
 import { createContext, useContext, type JSX } from 'react'
 import { Box } from '@mui/material'
@@ -26,11 +26,18 @@ export interface TradeskillDoors {
   onOpenMob: (target: MobTarget) => void
   /** A zone on the Maps tab (App's `openMapZone`). */
   onOpenMapZone: (zone: ZoneShort) => void
+  /** The Gear tab with its search box filled (App's `openGearSearch`). */
+  onOpenGearSearch: (text: string) => void
 }
 
 const DoorsContext = createContext<TradeskillDoors | null>(null)
 
 export const DoorsProvider = DoorsContext.Provider
+
+/** The section's doors, or null outside a provider: the caller then draws plain text. */
+export function useDoors(): TradeskillDoors | null {
+  return useContext(DoorsContext)
+}
 
 /** An item name. Outside a provider it is the same name with its card and no click. */
 export function ItemLink({ name, bold }: { name: string; bold?: boolean }): JSX.Element {

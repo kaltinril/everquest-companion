@@ -107,3 +107,13 @@ export function useRemembered<T>(key: AreaFormKey, sanitize: (raw: unknown) => T
 export function useRememberedSearch(key: AreaFormKey): [string, (v: string) => void] {
   return useRemembered<string>(key, sanitizeSearch)
 }
+
+/**
+ * Fill a tab's search box FROM OUTSIDE IT, before the tab mounts: a link that opens the tab already
+ * searched (appRouting `openGearSearch`). It writes the same key, through the same sanitizer, that
+ * `useRememberedSearch` reads on mount, so the box, its clear button and the filter all see an
+ * ordinary typed search. Not for the tab's own controls: those hold the setter the hook returns.
+ */
+export function presetSearch(key: AreaFormKey, text: string): void {
+  writeJson(key, sanitizeSearch(text))
+}
