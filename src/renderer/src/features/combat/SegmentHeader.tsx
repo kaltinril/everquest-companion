@@ -10,6 +10,7 @@
 import { Stack, Typography } from '@mui/material'
 import CircleIcon from '@mui/icons-material/Circle'
 import { CopyButton, KIND_COLOR, fmtDur } from './combatShared'
+import { headlineClockSec } from './headlineClock'
 import { healTotalTitle } from './healRows'
 import { fmtElapsed } from './copyText'
 import { formatNum as fmt, formatHealRate, formatRate } from '../../lib/formatRate'
@@ -154,7 +155,7 @@ export function SegmentHeader({
   // THE CLOCK THE HEADLINE RATE WAS TAKEN OVER: the fight's length at level 1, a shorter one under
   // the You scope or a drill, where the rate is over the row's own attacking time. Read back off
   // the two figures printed beside it, so rate x time is always the total shown.
-  const clockSec = mode === 'out' && dps > 0 ? total / dps : seg.durationSec
+  const clockSec = mode === 'out' ? headlineClockSec(total, dps, seg.durationSec) : seg.durationSec
   return (
     <Stack direction="row" justifyContent="space-between" alignItems="baseline" sx={{ mb: 1, flexShrink: 0 }}>
       <Typography variant="subtitle1" noWrap>
