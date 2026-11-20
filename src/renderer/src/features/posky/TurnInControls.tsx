@@ -18,6 +18,8 @@ import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import { turnInBadgeLabel, type DerivedEvidence } from '@shared/questTurnIns'
 import type { QuestProgress } from './useProgress'
+import { useCountSource } from './useCountSource'
+import { recordTurnInTitle, turnedInHover } from '../inventory/countSource'
 
 /**
  * WHAT EACH DERIVED SOURCE SAYS FOR ITSELF (JOS-429). One sentence per rung of the ladder, in the
@@ -96,6 +98,8 @@ export function TurnInBadge({
   count: number
   evidence?: DerivedEvidence
 }): JSX.Element | null {
+  // The hover follows the count source: under "loot minus hand-ins" the badge moves no count.
+  const countSource = useCountSource()
   const derived = evidence === undefined ? null : EVIDENCE_BADGE[evidence]
   if (count <= 0 && derived === null) return null
   return (
@@ -107,13 +111,7 @@ export function TurnInBadge({
       data-count={count}
       data-inferred={evidence ? 'true' : undefined}
       data-evidence={evidence}
-      title={
-        evidence
-          ? EVIDENCE_HOVER[evidence]
-          : count > 1
-            ? `Turned in ${String(count)} times. Each turn-in spends the items it required, so the progress beside this is what you hold toward doing it again.`
-            : 'Turned in once. The items it required were spent, so the progress beside this is what you hold toward doing it again.'
-      }
+      title={evidence ? EVIDENCE_HOVER[evidence] : turnedInHover(countSource, count)}
       label={derived === null ? turnInBadgeLabel(count) : derived.label}
     />
   )
@@ -185,6 +183,7 @@ export function TurnInCounter({
   /** absent until the log's turn-ins have loaded */
   onUndoTurnIn?: () => void
 }): JSX.Element {
+  const countSource = useCountSource()
   return (
     <Stack direction="row" spacing={0.5} alignItems="center">
       <Typography variant="caption" color="text.secondary" data-testid="posky-turnin-count">
@@ -194,7 +193,7 @@ export function TurnInCounter({
       <IconButton
         size="small"
         data-testid="posky-record-turnin"
-        title="Record another turn-in. The items it required are subtracted, so the quest goes back to what you hold toward running it again."
+        title={recordTurnInTitle(countSource)}
         onClick={onRecordTurnIn}
       >
         <AddIcon fontSize="inherit" />
