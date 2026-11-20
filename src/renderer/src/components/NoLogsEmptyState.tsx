@@ -83,7 +83,7 @@ export default function NoLogsEmptyState({
           nothing here, and the list catches up on the next look. */}
       {config !== null && folderVerdict(config) !== 'found' && (
         <Box sx={{ maxWidth: 440, textAlign: 'left' }}>
-          <EqFolderCheck config={config} />
+          <EqFolderCheck config={config} testId="no-logs-check" />
         </Box>
       )}
       <Button variant="contained" startIcon={<SettingsIcon />} onClick={onOpenPreferences} sx={{ mt: 1 }}>

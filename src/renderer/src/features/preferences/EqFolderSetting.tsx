@@ -101,14 +101,21 @@ function EqFolderPath({ config }: { config: EqConfig | null }): JSX.Element {
  * logging is a silent wrong answer of exactly the kind JOS-53 was about; `config.readable`
  * carries the difference so each case gets advice that can actually work.
  */
-export function EqFolderCheck({ config }: { config: EqConfig | null }): JSX.Element | null {
+export function EqFolderCheck({
+  config,
+  testId = 'eq-folder-check'
+}: {
+  config: EqConfig | null
+  /** The no-logs screen draws these verdicts under its own id, so a check never reads the wrong one. */
+  testId?: string
+}): JSX.Element | null {
   if (!config) return null
   // ONE decision for which verdict (lib/noLogs.ts): the no-logs screen prints these same sentences.
   const verdict = folderVerdict(config)
   // variant="standard": a tonal fill, no border ring — same no-boxes-in-boxes rule.
   if (verdict === 'unreadable') {
     return (
-      <Alert severity="error" variant="standard" data-testid="eq-folder-check">
+      <Alert severity="error" variant="standard" data-testid={testId}>
         This folder could not be read ({config.readError ?? 'unknown error'}). Its files may be
         blocked by permissions or security software, or it may be a broken shortcut. Try
         choosing one of the log files directly.
@@ -117,7 +124,7 @@ export function EqFolderCheck({ config }: { config: EqConfig | null }): JSX.Elem
   }
   if (verdict === 'missing') {
     return (
-      <Alert severity="warning" variant="standard" data-testid="eq-folder-check">
+      <Alert severity="warning" variant="standard" data-testid={testId}>
         This folder doesn&apos;t exist. Pick the folder your <code>eqlog_*.txt</code> files are
         in - or pick one of the files itself.
       </Alert>
@@ -125,11 +132,11 @@ export function EqFolderCheck({ config }: { config: EqConfig | null }): JSX.Elem
   }
   const found = config.characterCount
   return verdict === 'found' ? (
-    <Alert severity="success" variant="standard" data-testid="eq-folder-check">
+    <Alert severity="success" variant="standard" data-testid={testId}>
       Found {found} character log{found === 1 ? '' : 's'} in this folder.
     </Alert>
   ) : (
-    <Alert severity="warning" variant="standard" data-testid="eq-folder-check">
+    <Alert severity="warning" variant="standard" data-testid={testId}>
       No character logs (eqlog_*.txt) found here. Make sure EverQuest logging is enabled
       (/log on), then pick the folder those files are in - or pick one of the files itself.
     </Alert>
