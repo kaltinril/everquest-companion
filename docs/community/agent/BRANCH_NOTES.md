@@ -732,6 +732,14 @@ where one exists.
   (`ingredient`); a page lacking `[[Category:Tradeskill Ingredient]]` sets `forageUpdate.ingredient`,
   on the item's forage row when it has one, else a row of its own. 35 rows on the owner's logs.
   SAVED_ROWS 3.
+- By-products (2026-11-20, `gaps_craft.rs by_product`): a combine's by-product line
+  (`... create an alternate product: Bottle.`) files the item under kind `by-product`, through
+  `item_named` like any item mention (unknown: an Items row; known: no row; a redirect-only name:
+  a redirect row). Not `crafted`: `wikiPage.ts madeAndForaged` writes Player Crafted for
+  `crafted` and `failed-combine` only, and a returned Bottle is no recipe's product. No zone
+  (`gaps.rs note`, the list that also holds `crafted` and `fused`). Never passed to `Combines`:
+  a by-product that entered the pairing would overwrite the failed combine waiting for its raise.
+  Before the fix the reader matched a spelling the game never prints, so none of this ran.
 - `itemLookupParse.ts` is 421 code lines, near the 440 bar.
 - Job rule: `shared/gapJob.ts gapJob` is the one classification. Faction, drop and image rows are
   updates; a merchant is an update when `isMob`; a `forageUpdate` row is an update; a faction row
@@ -1736,12 +1744,12 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
   rows, pairing), `crafting_spans.rs`, `crafting_money.rs`, `crafting_tests.rs`. No parser kind and
   no protocol change: the failed combine, the trivial notice and the depot draw are read from
   `unknown` lines, as Wiki Gaps reads the first.
-- State: `items` (per item: `made`, `failed`, `trivial`, `trivialTs?`, `raises`, `firstRaise?`,
+- State: `items` (per item: `made`, `failed`, `byProducts?`, `trivial`, `trivialTs?`, `raises`, `firstRaise?`,
   `lastRaise?`, `tradeskill?`, `firstTs`, `lastTs`, `sessionMade`, `sessionFailed`,
   `sessionRaises`), `levels` (per tradeskill: `value` and its log's first line), `spans`,
   `olderSpans?`, `bought`, `sold`, `depot`. Types and helpers: `src/shared/crafting.ts`.
-- Shared with Wiki Gaps, one copy: `gaps_craft.rs` `failed_combine_of`, `is_tradeskill` and the
-  `Combines` pairing (the module is `gaps::craft`, `pub(crate)`); `gaps_details.rs` `coin_of` and
+- Shared with Wiki Gaps, one copy: `gaps_craft.rs` `failed_combine_of`, `alternate_product_of`,
+  `is_tradeskill` and the `Combines` pairing (the module is `gaps::craft`, `pub(crate)`); `gaps_details.rs` `coin_of` and
   `price_of`. A change to any of them changes both features.
 - Pairing: a tradeskill line and a combine pair when they share a log second, either order. The
   raise is counted on the item, the session and the span. A line restating the stored level is
@@ -1751,6 +1759,10 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
 - Not combines: the refused attempt (`Sorry, but you don't have everything ...`) and the
   by-product line (`... create an alternate product: Bottle.`), which rides on a failed combine
   already counted.
+- By-products (2026-11-20): the line is counted as `byProducts` on the item of the newest combine
+  when that combine is in its second or the one before; with no combine that near it is counted
+  nowhere. The key is absent at 0, in the engine and after a join (`mergeCrafting.ts` adds the
+  two sides). The by-product's own name is not kept. No session column.
 - The trivial notice is held and claimed by the next combine within 1 s, made or failed; a
   later combine does not get it.
 - Spans: a combine within 5 minutes of the last one extends the span, else opens one. The newest
@@ -1767,6 +1779,36 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
 - `depot` is the newest `(leaving N)` of a `Consumed` line. A deposit or a withdrawal states no
   count, so the number is as old as the item's last draw.
 - Session = since the newest `offlineGap`; an epoch clears every table (the zone is kept).
+- Fishing and forage (2026-11-20, `crafting_gather.rs`, tests `crafting_gather_tests.rs`): the
+  snapshot gains `fishing` (`casts`, `caught`, `nothing`, `lostBait`, `spilled`, `poleBroke`,
+  `session` with the same six, `items`) and `forage` (`found`, `failed`, `session`, `items`);
+  an item row is `item`, `count`, `lastTs`. Each key is absent until the log has a line of its
+  kind, and from an engine or an archive older than this, so both are optional in `CraftingSnap`.
+  - No parser kind and no protocol change: all eight shapes are `unknown` lines (a test holds the
+    real parser to that). The two that name an item are read with Wiki Gaps' `caught_of` and
+    `forage_of` (`gaps_players.rs`), one copy: a change there changes both features. A forage's
+    leading `a `/`an ` is dropped, as on the Gaps row.
+  - Line counts, no state machine. A cast and its outcome are counted apart, so a cast with no
+    outcome (zoned, interrupted) is in `casts` and in nothing else. `fishingRate` is `caught`
+    over `caught + nothing`.
+  - `lostBait`, `spilled` and `poleBroke` are not outcomes: each prints beside a `You didn't
+    catch anything.` of its second (32 of 32), so `nothing` holds those casts already. Adding
+    them to a denominator counts a cast twice.
+  - `You caught something...` is a catch the game does not name: in `caught`, in no item row.
+    `unnamedCatches` is `caught` less the rows' sum.
+  - The item rows are not capped: one row per distinct name, 5 fished and 15 to 26 foraged per
+    log on the owner's three (MEASURED.md). The session has totals only, no per-item column.
+  - A catch or a forage is never a combine or a purchase: the module counts a combine only on an
+    `itemReceived` with `via` fashioned or a failed-combine line, a purchase only on `purchase`.
+  - Archives (`mergeCrafting.ts joinGathered`): counts and item counts add, the session is the
+    newer log's, an item's `lastTs` the later. A side without the key reads as zeros, which is
+    also how `mergeModule`'s empty template (`fishing: {}`) passes.
+  - Trap: a sealed archive keeps the state it was folded with. It gains `fishing` and `forage`
+    when it is refolded: by itself once the app's version moves (`refreshLackingHistories`), or by
+    Refresh on its card. Until then a joined total holds the live log's counts only (the owner's
+    October archive has 72 casts and 659 forages the dev build will not show before a refresh).
+  - Not built: a screen; the zone a fish or a forage came from (Wiki Gaps keeps those for its own
+    rows); pace per hour (the Skills tab states raises per hour for Fishing and Forage).
 - Archives: `crafting` is in `CAPTURED_MODULES` and `MERGE_RULES` (`mergeCrafting.ts`). Counts
   add; session columns, last price, merchant, depot count and level are the newer log's; the
   first raise is the older log's. Spans are concatenated, bridged when an archive cut a run
@@ -1775,9 +1817,9 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
 - `combineCost` states a cost only when every ingredient was bought at least once; a crafted
   ingredient (Enchanted Gold Bar) is never bought, so its recipe must be costed first by the
   caller. It assumes a failed combine loses its materials.
-- Open: Wiki Gaps' `alternate_product_of` matches `create alternate product: `, but the game
-  prints `create an alternate product: ` (4 of 4 lines in the owner's archive), so Gaps never
-  reads a by-product. Left alone here; one word fixes it.
+- Fixed 2026-11-20: `alternate_product_of` reads `create an alternate product: `, the game's
+  spelling (4 of 4 lines in the owner's archive). The spelling without `an` is not read: nothing
+  ever printed it.
 
 ## Tradeskills section (fork #6, requirements/skills-tab.md, plans/2026-11-20-tradeskills-real-work.md)
 
