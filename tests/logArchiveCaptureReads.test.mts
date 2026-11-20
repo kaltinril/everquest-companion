@@ -10,11 +10,20 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import { EngineError } from '../src/shared/dataServer/ops'
 import { TransportError } from '../src/shared/dataServer/transport'
 import type { SegmentLog } from '../src/shared/logArchive/segment'
 import { captureSegment, type CaptureDeps } from '../src/main/logArchive/capture'
-import { CaptureReadError, captureRead, readFailure, servedOrUnread } from '../src/main/logArchive/captureReads'
+import { ALL_FIGHTS } from '../src/shared/logArchive/mergeFights'
+import {
+  CaptureReadError,
+  captureRead,
+  engineCaptureReads,
+  readFailure,
+  servedOrUnread,
+  type CaptureRequest
+} from '../src/main/logArchive/captureReads'
 
 const TOO_LARGE = new EngineError(
   'internal',
@@ -160,6 +169,111 @@ test('a failed read stops the capture there: the modules after it are not asked 
   r.deps.snapshot = (m) => (m === 'loot' ? Promise.reject(TIMED_OUT) : ask(m))
   await captureSegment(r.deps)
   assert.deepEqual(r.asked, ['combo', 'roster'], 'the capture kept reading after a read had failed')
+})
+
+// ---- the reads the product hands the capture (actions.ts `captureDeps`) ---------------------------
+
+interface Asked {
+  op: string
+  params: unknown
+}
+
+/** `engineRequest`, faked: `answer` returns the op's result, or throws what the client would. */
+function fakeEngine(answer: (asked: Asked) => unknown): { request: CaptureRequest; asked: Asked[] } {
+  const asked: Asked[] = []
+  const request = ((op: string, params: unknown) => {
+    asked.push({ op, params })
+    return new Promise((resolve) => {
+      resolve(answer({ op, params }))
+    })
+  }) as CaptureRequest
+  return { request, asked }
+}
+
+/** An engine that answers every module and the fight list, except where `fail` throws first. */
+function answering(fail: (asked: Asked) => void = () => undefined): ReturnType<typeof fakeEngine> {
+  return fakeEngine((asked) => {
+    fail(asked)
+    if (asked.op === 'combat.snapshot') return { snapshot: { segments: [] } }
+    const module = (asked.params as { module: string }).module
+    return { module, seq: 5, state: { of: module } }
+  })
+}
+
+function failModule(module: string, error: unknown): (asked: Asked) => void {
+  return (asked) => {
+    if (asked.op === 'module.snapshot' && (asked.params as { module: string }).module === module) throw error
+  }
+}
+
+test('THE PRODUCT-S OWN READS REJECT WHEN THE READ FAILED: a failure is never turned into null', async () => {
+  for (const error of [TOO_LARGE, TIMED_OUT, LINK_LOST, NOT_FOUND]) {
+    const engine = fakeEngine(() => {
+      throw error
+    })
+    const reads = engineCaptureReads(engine.request)
+    // The very rejection, untouched: `captureRead` is the one place that decides what it means.
+    await assert.rejects(reads.snapshot('loot'), (err: unknown) => err === error)
+    await assert.rejects(reads.fights(), (err: unknown) => err === error)
+  }
+})
+
+test('an answer about another module is a failed read, not an empty one', async () => {
+  const engine = fakeEngine(() => ({ module: 'kills', seq: 2, state: {} }))
+  await assert.rejects(engineCaptureReads(engine.request).snapshot('loot'), /answered about kills, not loot/)
+})
+
+test('a good read is the snapshot as a segment keeps it, and the fight list asked for whole', async () => {
+  const engine = answering()
+  const reads = engineCaptureReads(engine.request)
+  assert.deepEqual(await reads.snapshot('loot'), { seq: 5, state: { of: 'loot' } })
+  assert.deepEqual(await reads.fights(), [])
+  assert.deepEqual(engine.asked, [
+    { op: 'module.snapshot', params: { module: 'loot' } },
+    { op: 'combat.snapshot', params: { opts: { maxSegments: ALL_FIGHTS } } }
+  ])
+  // What the engine serves apart is put back through the same request (capturedShape.ts).
+  await reads.snapshot('gaps')
+  assert.deepEqual(engine.asked.slice(2).map((a) => (a.params as { module: string }).module), ['gaps', 'killFactionSamples'])
+})
+
+test('A CAPTURE OVER THE PRODUCT-S READS IS REFUSED when a reply was too large, and nothing is read for the move', async () => {
+  const loot = rig(engineCaptureReads(answering(failModule('loot', TOO_LARGE)).request))
+  assert.deepEqual(await captureSegment(loot.deps), { ok: false, reason: 'this log is too large to summarize in one piece' })
+  assert.equal(loot.prefixReads, 0, 'the log was on its way aside without loot')
+
+  const silent = rig(engineCaptureReads(answering(failModule('kills', TIMED_OUT)).request))
+  assert.deepEqual(await captureSegment(silent.deps), {
+    ok: false,
+    reason: 'the data engine did not answer for kills; try again in a minute'
+  })
+
+  const fights = rig(
+    engineCaptureReads(
+      answering((asked) => {
+        if (asked.op === 'combat.snapshot') throw TOO_LARGE
+      }).request
+    )
+  )
+  assert.deepEqual(await captureSegment(fights.deps), { ok: false, reason: 'this log is too large to summarize in one piece' })
+  assert.equal(fights.prefixReads, 0)
+
+  // A module the engine does not carry is the one rejection that still leaves the capture good.
+  const none = rig(engineCaptureReads(answering(failModule('bazaar', NOT_FOUND)).request))
+  const result = await captureSegment(none.deps)
+  assert.ok(result.ok)
+  if (!result.ok) return
+  assert.equal('bazaar' in result.segment.modules, false)
+  assert.deepEqual(result.segment.modules.loot, { seq: 5, state: { of: 'loot' } })
+  assert.deepEqual(result.segment.fights, [])
+})
+
+test('actions.ts hands the capture those reads, and writes no `snapshot` or `fights` of its own', () => {
+  // actions.ts imports Electron, so no test can load it: its capture block is pinned as text.
+  const source = readFileSync(new URL('../src/main/logArchive/actions.ts', import.meta.url), 'utf8')
+  const block = /const captureDeps: CaptureDeps = \{[\s\S]*?\n\}/.exec(source)?.[0] ?? ''
+  assert.ok(block.includes('...engineCaptureReads(engineRequest)'), 'the capture is not handed the tested reads')
+  assert.doesNotMatch(block, /\b(snapshot|fights):/)
 })
 
 // ---- which modules the engine serves -----------------------------------------------------------

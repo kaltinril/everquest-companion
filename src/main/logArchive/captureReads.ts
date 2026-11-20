@@ -11,9 +11,13 @@
 //     out, the capture came back good, and the log was moved aside without it. Now it refuses the
 //     capture, in words the card prints, and nothing is moved.
 //
-// Pure, so tests/logArchiveCaptureReads.test.mts drives every case.
+// No Electron and no connection of its own (the request is handed in), so
+// tests/logArchiveCaptureReads.test.mts drives every case, the product's two reads included.
 
-import { EngineError, isTooLarge } from '../../shared/dataServer/ops'
+import { EngineError, isTooLarge, type ParamsFor, type RequestOp, type ResultFor } from '../../shared/dataServer/ops'
+import type { SegmentSummary } from '../../shared/combat'
+import { capturedState } from '../../shared/logArchive/capturedShape'
+import { ALL_FIGHTS, capturedFights } from '../../shared/logArchive/mergeFights'
 import type { SegmentModule } from '../../shared/logArchive/segment'
 
 /** One read of a capture failed: `what` names it for the player, `cause` is the rejection. */
@@ -24,6 +28,41 @@ export class CaptureReadError extends Error {
   ) {
     super(`the read of ${what} failed`)
     this.name = 'CaptureReadError'
+  }
+}
+
+/** `engineClientHost.ts engineRequest`, as a capture's reads use it. */
+export type CaptureRequest = <O extends RequestOp>(op: O, params: ParamsFor<O>) => Promise<ResultFor<O>>
+
+/** `CaptureDeps.snapshot` and `fights` (capture.ts). */
+export interface CaptureReads {
+  snapshot: (module: string) => Promise<SegmentModule | null>
+  fights: () => Promise<SegmentSummary[] | null>
+}
+
+/**
+ * A capture's two reads of the app's engine. A READ THAT FAILS REJECTS, and so does an answer
+ * about another module: `captureRead` below decides what a rejection means. Both used to swallow
+ * every failure into null, which reads as "the engine has none" and let a log be moved aside with
+ * a module missing. Never catch here.
+ */
+export function engineCaptureReads(request: CaptureRequest): CaptureReads {
+  /** Another module's state, for a capture's put-back (capturedShape.ts). */
+  const stateOf = async (module: string): Promise<unknown> => {
+    const r = await request('module.snapshot', { module })
+    return r.module === module ? r.state : null
+  }
+  return {
+    snapshot: async (module) => {
+      const r = await request('module.snapshot', { module })
+      if (r.module !== module) throw new Error(`the engine answered about ${r.module}, not ${module}`)
+      // A segment keeps what the engine serves apart (gaps' proof lines, buffs' overlay) in place.
+      return { seq: r.seq, state: await capturedState(module, r.state, stateOf) }
+    },
+    fights: async () => {
+      const r = await request('combat.snapshot', { opts: { maxSegments: ALL_FIGHTS } })
+      return capturedFights((r.snapshot as { segments?: unknown }).segments)
+    }
   }
 }
 

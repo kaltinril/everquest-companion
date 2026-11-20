@@ -15,16 +15,14 @@ import { getActiveCharacter } from '../session'
 import { getLogArchivePrefs, logArchiveOn, setLogArchivePrefs } from '../storeLogArchive'
 import { HELD_TEXT, type DumpAdvice, type LogArchiveReply, type LogArchiveStatus, type SegmentRow } from '../../shared/logArchive/panel'
 import { driveOf, rotateBlockers } from '../../shared/logArchive/preflight'
-import { ALL_FIGHTS, capturedFights } from '../../shared/logArchive/mergeFights'
 import type { Segment } from '../../shared/logArchive/segment'
 import { CAPTURED_MODULES } from '../../shared/logArchive/modules'
-import { capturedState } from '../../shared/logArchive/capturedShape'
 import { archiveName, backupLog, sweepTemp } from './backup'
 import { captureSegment, type CaptureDeps } from './capture'
 import { archiveBuckets, placeArchivedBuckets } from './engineBuckets'
 import { liveHistory, logArchiveDir } from './liveHistory'
 import { readLogPrefix } from './logPrefix'
-import { servedOrUnread } from './captureReads'
+import { engineCaptureReads, servedOrUnread } from './captureReads'
 import { refoldWithApp } from './refoldActions'
 import { historyKeys, readRespawnHistory } from './respawnHistory'
 import { writeFactionLedger, type LedgerSource } from './factionLedgerFile'
@@ -74,29 +72,12 @@ async function liveRespawnHistory(modules: Parameters<NonNullable<CaptureDeps['r
   })
 }
 
-/** Another module's state off the app's engine, for a capture's put-back (capturedShape.ts). */
-async function engineState(module: string): Promise<unknown> {
-  const r = await engineRequest('module.snapshot', { module })
-  return r.module === module ? r.state : null
-}
-
 const captureDeps: CaptureDeps = {
   on: () => logArchiveOn(),
   attached,
   health: async () => engineRequest('session.health', {}),
-  // A READ THAT FAILS REJECTS (fork #9), here and in `fights`: captureReads.ts decides what a
-  // rejection means. Both used to swallow every failure into null, which reads as "the engine has
-  // none" and let a log be moved aside with a module missing.
-  snapshot: async (module) => {
-    const r = await engineRequest('module.snapshot', { module })
-    if (r.module !== module) throw new Error(`the engine answered about ${r.module}, not ${module}`)
-    // A segment keeps what the engine serves apart (gaps' proof lines, buffs' overlay) in place.
-    return { seq: r.seq, state: await capturedState(module, r.state, engineState) }
-  },
-  fights: async () => {
-    const r = await engineRequest('combat.snapshot', { opts: { maxSegments: ALL_FIGHTS } })
-    return capturedFights((r.snapshot as { segments?: unknown }).segments)
-  },
+  // `snapshot` and `fights`: a read that fails REJECTS (fork #9, captureReads.ts, where it is tested).
+  ...engineCaptureReads(engineRequest),
   respawnHistory: liveRespawnHistory,
   readPrefix: readLogPrefix,
   producedBy: () => ({ app: app.getVersion(), engine: app.getVersion() })
