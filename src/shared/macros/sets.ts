@@ -103,6 +103,16 @@ export function filledCount(library: MacroLibrary, set: MacroSet): number {
   return setToGameMacros(library, set).length
 }
 
+/** How many of one page's buttons hold a macro the library still has. */
+export function filledOnPage(library: MacroLibrary, set: MacroSet, page: number): number {
+  return setToGameMacros(library, set).filter((m) => m.page === page).length
+}
+
+/** The names of the sets that have a macro on a slot, in the sets' order. */
+export function setsUsing(library: MacroLibrary, macroId: string): string[] {
+  return library.sets.filter((set) => Object.values(set.slots).includes(macroId)).map((set) => set.name)
+}
+
 /** One page of a set as the grid draws it: every button, with its macro or null. */
 export function pageSlots(library: MacroLibrary, set: MacroSet, page: number): { button: number; slot: string; macro: Macro | null }[] {
   return Array.from({ length: BUTTONS_PER_PAGE }, (_, i) => {

@@ -42,8 +42,14 @@ export function findMacro(library: MacroLibrary, id: string | null): Macro | nul
   return library.macros.find((m) => m.id === id) ?? null
 }
 
+/** A new macro goes on top of the list, where the player is looking. */
 export function addMacro(library: MacroLibrary, macro: Macro): MacroLibrary {
-  return { ...library, macros: [...library.macros, macro] }
+  return { ...library, macros: [macro, ...library.macros] }
+}
+
+/** The first line that has text: what a list row shows under the name. '' when there is none. */
+export function firstLine(macro: MacroBody): string {
+  return macro.lines.find((line) => line !== '') ?? ''
 }
 
 /** Change a macro's fields. An unknown id changes nothing. */

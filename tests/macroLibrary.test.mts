@@ -7,6 +7,7 @@ import {
   addMacro,
   duplicateMacro,
   emptyLibrary,
+  firstLine,
   importGameMacros,
   newMacro,
   removeMacro,
@@ -22,18 +23,20 @@ import {
   diffSetAgainstFile,
   duplicateSet,
   filledCount,
+  filledOnPage,
   newSet,
   pageSlots,
   removeSet,
   restoreSet,
   setFromGameMacros,
-  setToGameMacros
+  setToGameMacros,
+  setsUsing
 } from '../src/shared/macros/sets'
 import { parseSocials, renderSocials } from '../src/shared/macros/socials'
 import { addOwnTag, filterMacros, tagList, toggleTag } from '../src/shared/macros/tags'
 import { macrosToText, parseMacroText } from '../src/shared/macros/text'
 import type { GameMacro, MacroLibrary, Mint } from '../src/shared/macros/types'
-import { validateMacro } from '../src/shared/macros/validate'
+import { lineHint, validateMacro } from '../src/shared/macros/validate'
 
 /** Ids m1, m2 .. and a clock that ticks once per reading. */
 function testMint(): Mint {
@@ -76,6 +79,19 @@ test('validate: the pause form and its ceiling', () => {
   assert.deepEqual(codes({ name: 'x', color: 0, lines: ['/PAUSE 701, /sit'] }), ['pause-long'])
 })
 
+test("line hint: what a pause does, or the line's first warning", () => {
+  assert.deepEqual(lineHint('/pause 72,/cast 1'), { warning: false, text: 'Runs the command, then waits about 7.2 s.' })
+  assert.deepEqual(lineHint('  /pause 5, /attack on'), { warning: false, text: 'Runs the command, then waits about 0.5 s.' })
+  assert.deepEqual(lineHint('/pause 700'), { warning: false, text: 'Waits about 70.0 s.' })
+  assert.deepEqual(lineHint('/sit'), { warning: false, text: '' })
+  assert.deepEqual(lineHint(''), { warning: false, text: '' })
+  assert.deepEqual(lineHint('/pause 5 /sit'), { warning: true, text: 'Write it as /pause 20, /command.' })
+  assert.deepEqual(lineHint('/pause 900,/sit'), { warning: true, text: 'The game stops a pause near 70 seconds.' })
+  assert.deepEqual(lineHint('/say ' + 'y'.repeat(251)), { warning: true, text: 'Longer than 255 characters.' })
+  // The length comes first when a line has both.
+  assert.equal(lineHint('/pause 900,/say ' + 'y'.repeat(250)).text, 'Longer than 255 characters.')
+})
+
 test('import: an identical macro is not added twice, and the counts say so', () => {
   const { library, mint } = seeded()
   assert.deepEqual(library.macros.map((m) => [m.id, m.name, m.tags]), [
@@ -103,13 +119,17 @@ test('add, update and duplicate leave the old library alone', () => {
   assert.equal(library.macros.length, 3)
   assert.equal(added.macros.length, 4)
   const updated = updateMacro(added, fresh.id, { name: 'Hail', lines: ['/hail', '', ''], tags: ['Quest', 'quest', ' '] }, 5000)
-  assert.deepEqual(updated.macros[3], { id: 'm4', name: 'Hail', color: 0, lines: ['/hail'], tags: ['quest'], note: '', updatedAt: 5000 })
-  assert.equal(added.macros[3].name, '')
+  // A new macro goes on top.
+  assert.deepEqual(updated.macros[0], { id: 'm4', name: 'Hail', color: 0, lines: ['/hail'], tags: ['quest'], note: '', updatedAt: 5000 })
+  assert.equal(added.macros[0].name, '')
+  assert.equal(firstLine(updated.macros[0]), '/hail')
+  assert.equal(firstLine({ name: 'x', color: 0, lines: ['', '/second'] }), '/second')
+  assert.equal(firstLine(added.macros[0]), '')
   assert.equal(updateMacro(updated, 'nope', { name: 'x' }, 1), updated)
 
   const dup = duplicateMacro(updated, 'm1', mint)
   assert.equal(dup.macro?.name, 'Assist copy')
-  assert.deepEqual(dup.library.macros.map((m) => m.name), ['Assist', 'Assist copy', 'Forage', 'PetAttack', 'Hail'])
+  assert.deepEqual(dup.library.macros.map((m) => m.name), ['Hail', 'Assist', 'Assist copy', 'Forage', 'PetAttack'])
   assert.notEqual(dup.macro?.id, 'm1')
   assert.deepEqual(dup.macro?.lines, GAME[0].lines)
   assert.equal(duplicateMacro(updated, 'nope', mint).macro, null)
@@ -141,6 +161,9 @@ test('a set from a file reuses library macros, and goes back out as the file had
   assert.equal(made.library.macros.length, 4)
   assert.deepEqual(setToGameMacros(made.library, made.set), [...GAME, extra])
   assert.equal(filledCount(made.library, made.set), 4)
+  assert.deepEqual([2, 3, 4, 5].map((p) => filledOnPage(made.library, made.set, p)), [2, 1, 1, 0])
+  assert.deepEqual(setsUsing(made.library, 'm1'), ['From file'])
+  assert.deepEqual(setsUsing(made.library, 'nope'), [])
   assert.deepEqual(parseSocials(renderSocials(setToGameMacros(made.library, made.set))), [...GAME, extra])
 
   const page = pageSlots(made.library, made.set, 2)
@@ -199,12 +222,14 @@ test('diff: per slot, what the set would add, change, remove or leave', () => {
   assert.deepEqual(diffSetAgainstFile([], []), [])
 })
 
-test('filter: words match the name, a line, the note or a tag; tags narrow; sorted by name', () => {
+test('filter: words match the name, a line, the note or a tag; tags narrow; library order kept', () => {
   const { library } = seeded()
   let lib = updateMacro(library, 'm2', { note: 'Use in Karana', tags: ['tradeskill'] }, 1)
   lib = updateMacro(lib, 'm3', { tags: ['pet', 'offense'] }, 1)
   const names = (q: string, tags: string[] = []): string[] => filterMacros(lib.macros, q, tags).map((m) => m.name)
   assert.deepEqual(names(''), ['Assist', 'Forage', 'PetAttack'])
+  assert.deepEqual(filterMacros(addMacro(lib, newMacro(testMint(), { name: 'Aaa' })).macros, '', []).map((m) => m.name)[0], 'Aaa')
+  assert.deepEqual(filterMacros([...lib.macros].reverse(), '', []).map((m) => m.name), ['PetAttack', 'Forage', 'Assist'])
   assert.deepEqual(names('ASSIST'), ['Assist'])
   assert.deepEqual(names('autoinventory'), ['Forage'])
   assert.deepEqual(names('karana'), ['Forage'])

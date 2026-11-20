@@ -17,23 +17,50 @@ export interface Warning {
 }
 
 /** `/pause <whole number>`, then nothing or `, /command`. */
-const PAUSE = /^\/pause\s+(\d+)\s*(?:,\s*\/.*)?$/i
+const PAUSE = /^\/pause\s+(\d+)\s*(,\s*\/.*)?$/i
 const STARTS_WITH_PAUSE = /^\/pause(?![a-z])/i
+
+/** What a line's `/pause` is: not one (null), badly written, or its length and whether a command follows. */
+function pauseOf(text: string): { bad: true } | { bad: false; tenths: number; command: boolean } | null {
+  const trimmed = text.trim()
+  if (!STARTS_WITH_PAUSE.test(trimmed)) return null
+  const m = PAUSE.exec(trimmed)
+  if (!m) return { bad: true }
+  return { bad: false, tenths: Number(m[1]), command: trimmed.includes(',') }
+}
 
 function lineWarnings(text: string, line: number): Warning[] {
   const out: Warning[] = []
   if (text.length > LINE_MAX) {
-    out.push({ code: 'line-too-long', field: 'line', line, text: `Over ${String(LINE_MAX)} characters.` })
+    out.push({ code: 'line-too-long', field: 'line', line, text: `Longer than ${String(LINE_MAX)} characters.` })
   }
-  const trimmed = text.trim()
-  if (!STARTS_WITH_PAUSE.test(trimmed)) return out
-  const m = PAUSE.exec(trimmed)
-  if (!m) {
-    out.push({ code: 'pause-form', field: 'line', line, text: 'Write a pause as /pause 30 or /pause 30, /command.' })
-  } else if (Number(m[1]) > PAUSE_MAX) {
-    out.push({ code: 'pause-long', field: 'line', line, text: `A pause stops at about 70 seconds (${String(PAUSE_MAX)}).` })
+  const pause = pauseOf(text)
+  if (pause === null) return out
+  if (pause.bad) {
+    out.push({ code: 'pause-form', field: 'line', line, text: 'Write it as /pause 20, /command.' })
+  } else if (pause.tenths > PAUSE_MAX) {
+    out.push({ code: 'pause-long', field: 'line', line, text: 'The game stops a pause near 70 seconds.' })
   }
   return out
+}
+
+/** The one thing said under a command field: its first warning, else what its pause does, else ''. */
+export interface LineHint {
+  warning: boolean
+  text: string
+}
+
+/**
+ * A line's hint. A pause is in tenths of a second and runs AFTER the line's command although it is
+ * typed first (public guides for the older game; not checked in EQL).
+ */
+export function lineHint(text: string): LineHint {
+  const warnings = lineWarnings(text, 0)
+  if (warnings.length > 0) return { warning: true, text: warnings[0].text }
+  const pause = pauseOf(text)
+  if (pause === null || pause.bad) return { warning: false, text: '' }
+  const seconds = `${(pause.tenths / 10).toFixed(1)} s`
+  return { warning: false, text: pause.command ? `Runs the command, then waits about ${seconds}.` : `Waits about ${seconds}.` }
 }
 
 /** Every warning for a macro, in field order: name, colour, the line count, then each line. */

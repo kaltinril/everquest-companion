@@ -79,16 +79,14 @@ function haystack(m: Macro): string {
 
 /**
  * The library list: macros that carry every tag of `tags` and match every word of `query` in the
- * name, a line, the note or a tag (case folded), sorted by name.
+ * name, a line, the note or a tag (case folded), in the library's own order.
  */
 export function filterMacros(macros: readonly Macro[], query: string, tags: readonly string[]): Macro[] {
   const words = query.toLowerCase().split(/\s+/).filter((w) => w !== '')
   const wanted = cleanTags(tags)
-  return macros
-    .filter((m) => {
-      if (!wanted.every((tag) => m.tags.includes(tag))) return false
-      const text = haystack(m)
-      return words.every((w) => text.includes(w))
-    })
-    .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }) || a.id.localeCompare(b.id))
+  return macros.filter((m) => {
+    if (!wanted.every((tag) => m.tags.includes(tag))) return false
+    const text = haystack(m)
+    return words.every((w) => text.includes(w))
+  })
 }
