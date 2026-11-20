@@ -70,7 +70,7 @@ test('the feed is lazily loaded and fed only while the Map pins overlay is open'
   assert.match(src('overlay/MapPinsOverlay.tsx'), /const slayerChip = \(slayer\?\.picks \?\? 0\) > 0/)
   assert.match(src('overlay/MapPinsField.tsx'), /\{layers\.achievements && <AreaMarks/)
   // The overlay never imports the catalog-reading slayer code (the conCard bundle trap).
-  for (const f of ['overlay/MapPinsOverlay.tsx', 'overlay/MapPinsField.tsx', 'overlay/useMapPinsData.ts', 'overlay/mapPinsLayers.tsx']) {
+  for (const f of ['overlay/MapPinsOverlay.tsx', 'overlay/MapPinsField.tsx', 'overlay/useMapPinsData.ts', 'overlay/mapPinsNote.ts', 'overlay/mapPinsLayers.tsx']) {
     assert.doesNotMatch(src(f), /features\/slayer\//, f)
   }
 })

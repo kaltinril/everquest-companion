@@ -8,6 +8,7 @@ import type { MobEntry } from '@shared/types'
 import { SLAYER_OVERLAY_KEY, parseSlayerOverlay, type SlayerOverlayPayload } from '@shared/slayerOverlay'
 import { CRAWL_KEY } from '@shared/crawlMode'
 import { PACK_PREFS_KEY, loadPackPrefs } from '../features/maps/useMapData'
+import { heldMapFor, mapLoading, type HeldMap } from './mapPinsNote'
 
 /** The slim placed-mob catalog from main, once; an empty list until it lands. */
 export function useMobPlaces(): MobEntry[] {
@@ -35,9 +36,12 @@ function prefsKey(): string {
   }
 }
 
-/** The zone's map, refetched when the zone or the Maps tab's pack choice changes. */
-export function useOverlayMapData(zone: string | null): MapData | null {
-  const [data, setData] = useState<MapData | null>(null)
+/**
+ * The zone's map, refetched when the zone or the Maps tab's pack choice changes. The answer is held
+ * with the zone it was asked for (mapPinsNote.ts): the last zone's map is never this zone's.
+ */
+export function useOverlayMapData(zone: string | null): { data: MapData | null; loading: boolean } {
+  const [held, setHeld] = useState<HeldMap | null>(null)
   const [prefsRaw, setPrefsRaw] = useState(prefsKey)
   useEffect(() => {
     const onStorage = (e: StorageEvent): void => {
@@ -49,25 +53,22 @@ export function useOverlayMapData(zone: string | null): MapData | null {
     }
   }, [])
   useEffect(() => {
-    if (zone == null) {
-      setData(null)
-      return
-    }
+    if (zone == null) return
     let live = true
     const { geometry, labels } = loadPackPrefs()
     void window.eqOverlay
       .getMapData(zone, { ...(geometry == null ? {} : { geometry }), ...(labels == null ? {} : { labels }) })
       .then((res) => {
-        if (live) setData(res.ok ? res.data : null)
+        if (live) setHeld({ zone, data: res.ok ? res.data : null })
       })
       .catch(() => {
-        if (live) setData(null)
+        if (live) setHeld({ zone, data: null })
       })
     return () => {
       live = false
     }
   }, [zone, prefsRaw])
-  return data
+  return { data: heldMapFor(held, zone), loading: mapLoading(held, zone) }
 }
 
 function readSlayer(): SlayerOverlayPayload | null {
