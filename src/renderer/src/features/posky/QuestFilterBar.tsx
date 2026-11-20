@@ -62,6 +62,7 @@ import OutputKindLine from '../../components/OutputKindLine'
 import { COUNT_SOURCE_OPTIONS, countsFromInventory } from '../inventory/countSource'
 import { SORT_OPTIONS, type SortKey } from './questSort'
 import { withPicked } from './questFacets'
+import { COUNT_SOURCE_LABEL } from './handCountWords'
 import type { QuestListState } from './useQuestList'
 
 export interface QuestFilterBarProps {
@@ -468,7 +469,7 @@ export const InventorySource = memo(function InventorySource({
       <TextField
         select
         size="small"
-        label="Count items from"
+        label={COUNT_SOURCE_LABEL}
         data-testid="posky-count-source"
         value={countSource}
         onChange={(e) => onCountSource(e.target.value as CountSource)}
