@@ -60,13 +60,55 @@ structured-clone size per window, and merged archive history over IPC (experimen
 
 | Phase | What | Where | Size | Depends on | Status |
 | --- | --- | --- | --- | --- | --- |
-| R1 | The cliff: no reply size, slow reply or socket fault ends the connection for good | typescript | L | - | planned |
+| R1 | The cliff: no reply size, slow reply or socket fault ends the connection for good | typescript | L | - | built 2026-11-19 |
 | R2 | One status, pushed to every window, with a Try line and a Try again action | typescript | L | R1 | planned |
 | R3 | Tabs, overlays, the title-bar dot and the no-logs screen follow the status | typescript | L | R2 | planned |
 | R4 | The read recovers by itself when a fact changes | typescript | L | R1, R2 | planned |
 | R5 | The engine process: no blind kill, no blind relaunch loop, right words for why it will not start | typescript | M | R2, R4 | planned |
 | R6 | The log is there but nothing is being written, or the game runs from another folder | typescript | M | R2, R3, R4 | planned |
 | R7 | The engine phase (Rust), built in its own worktree and target directory | both | M | R1, R4 | planned |
+
+## As built
+
+One block per finished phase: what differs from the phase text below in a way a later phase must
+know. The rules each phase left in force are in `agent/BRANCH_NOTES.md` ("Reading log" sections).
+
+### R1 (2026-11-19)
+
+- Built as designed, reviewed by two readers with different lenses (five findings, all confirmed and
+  corrected, each with a test that failed first), gated with the trunk merged in: 6,876 unit tests,
+  the two known reds only. No Rust change. No run against a real reply over 8 MiB: the sizes in the
+  tests are synthetic messages through the real decoder and transport.
+- New leaves the plan did not name: `src/main/dataServer/engineLink.ts` (connect, adopt and lost, so
+  the connection guard and the clean hang-up have tests; `engineClientHost.ts` imports Electron),
+  `engineClientWiring.ts` (the listeners, once per client), `replySizes.ts`,
+  `src/shared/dataServer/clientStreams.ts` and `listeners.ts`,
+  `src/main/logArchive/captureReads.ts`.
+- A "try" is a retry: the first connect of a launch is not one, so the worst case is 6 connects
+  before the keeper gives up and the box says "gave up after 5 tries".
+- `EngineClient.fail(error)` exists (added in the corrections): a clean hang-up fails the client, so
+  `connection` reads `failed` and the box can say it is connecting.
+- `LogReadFacts` has the required fields `link` (`LogReadLink`: tries, of, nextAt, gaveUp,
+  lastReason, everConnected) and `tooLarge`, and `lastCombatRead.why` (the read shim's reason word).
+  `LogReadWait` has `connecting` and `replyTooLarge`; `LOG_READ_WORDS` is a Record over it, so a
+  table keyed the same way does not compile until both are covered.
+- `reconnectEngineClient()` is exported from `engineClientHost.ts` (the keeper's `tryNow`) and is
+  wired to nothing yet (R2). The keeper pushes nothing: R2's status push reads
+  `engineClientFacts().link` on its own edges.
+- `replyTooLarge` is decided from the meter's own read (`lastCombatRead.why === 'tooLarge'`), not
+  from the op of the newest too-large reply: the archive asks `combat.snapshot` too.
+- A blocked (too large) key stays blocked until the next turn. After an archive in the same run the
+  engine still holds the old lines, so the reply stays too large until a restart; R2's Try line for
+  `replyTooLarge` says to restart.
+- A too-large MODULE reply is recorded and printed on the Last error row but changes no wait and no
+  tab text (R3).
+- Left for a later phase: `lastCombatRead` is not cleared by a new turn; a connection whose hello is
+  never answered is not reported lost; the read shim's second readiness check compares servable or
+  not, not the turn; `secondEngine.ts` still skips a failed module read during a refold (no history
+  is lost: `refreshSegment` refuses, but not with the too-large sentence).
+- Line budgets: `engineClientHost.ts` 390 of 440 code lines, `client.ts` 385,
+  `tests/dataServerTransport.test.mts` 368. Source pins that break if the wiring moves:
+  `tests/serveDeltaArm.test.mts` reads `engineClientWiring.ts` and `engineClientHost.ts`.
 
 ## Defaults taken on the questions that are the owner's
 

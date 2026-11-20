@@ -1231,9 +1231,12 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
   step, the last health answer, when the offset last grew, the last combat read, and the engine's
   newest stderr lines.
 - State lifetimes: a new launch (`noteLogReadConnection`) clears everything except the stderr lines.
-  A new turn (`noteLogReadTurn`, called from `bumpGen`) clears health, movedAt and every error
-  except a connect error, because the connection is per launch, not per turn. A `live` health answer
-  clears the error.
+  A new turn (`noteLogReadTurn`, called from `bumpGen`) clears health, movedAt, the reply sizes
+  (`tooLarge`, `large`) and every error except a connect error, because the connection is per
+  launch, not per turn. A `live` health answer clears the error. A connect error is NOT cleared by a
+  successful reconnect; the report hides it while the connection is ready. `lastCombatRead` is not
+  cleared by a new turn (open: a panel that shows the box without polling the meter can read the
+  last turn's verdict).
 - Guards on the notes: the connect error uses the connection guard (`live?.client === client`), the
   attach error the turn guard (`gen === mine`). Using `gen` for the connect error would drop it on
   every world rebuild.
@@ -1242,11 +1245,12 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
   `scrubPaths` in `shared/logReadReport.ts`: log path to base name, home directory and any
   `<drive>:\Users\<name>` or `/Users/<name>` to `~`, em and en dashes to ` - `. A new field that
   carries outside text must go through it too.
-- The decision order in `composeLogReadReport` is the design: no character, engine missing, engine
-  failing, engine starting, not connected, attach refused, read ended (missing / unreadable /
-  stopped), health unanswered, stalled (folding and no offset growth for 60 s), still reading,
-  combat read unserved, ok. Seven waits show the box at once; the rest wait 15 s
-  (`LOG_READ_SLOW_MS`).
+- The decision order in `composeLogReadReport` is the design (as of phase R1): no character, engine
+  missing, engine failing, engine starting, connecting / not connected, attach refused, read ended
+  (missing / unreadable / stopped), health unanswered, stalled (folding and no offset growth for
+  60 s), still reading, reply too large, combat read unserved, ok. Nine waits show the box at once;
+  the rest wait 15 s (`LOG_READ_SLOW_MS`). Phase R2 reorders it (engine missing and failing before
+  no character).
 - Main opens the log itself (`probeLog` in `main/logReadReport.ts`) only when the read has ended or
   nothing has stated the size. It is a diagnostic on the failure path; the engine still owns
   log-file facts everywhere else (ruling 21).
@@ -1255,13 +1259,76 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
   are unchanged.
 - "Engine said" lines come only from the error's snapshot (the 4 newest stderr lines when the error
   was recorded). A slow or stalled read with no recorded error shows none.
-- Not fixed here, each a follow-up once a screenshot says which one players hit: main's one
-  connection to the engine is never retried; the `gen` guard in `openConnection` can discard a good
-  connection during a world rebuild; a refused attach is never retried; an engine that dies after
-  serving is relaunched forever with no card; the old failure card's "It last said" is not scrubbed.
+- Fixed by phase R1 (next section): main's one connection to the engine was never retried; the `gen`
+  guard in `openConnection` could discard a good connection during a world rebuild. Still open, each
+  with its phase in `plans/2026-11-19-reading-log-robustness.md`: a refused attach is never retried
+  (R4); an engine that dies after serving is relaunched forever with no card (R5); the old failure
+  card's "It last said" is not scrubbed (R2).
 - e2e: a run with no engine binary, or one that holds a fold or a hydrating panel past 5 s with a
   failure (15 s without), now finds `data-testid="log-read-report"` inside `combat-hydrating` /
   `overview-hydrating`.
+
+## Reading log: the connection and reply sizes (phase R1, plans/2026-11-19-reading-log-robustness.md)
+
+- Size never ends a connection. `ndjson.ts`: `MAX_LINE_CHARS` 8 MiB is only the decoder default
+  (the child's stdout and stderr, still throws). Engine transports use `MAX_MESSAGE_CHARS` 64 MiB
+  with a watch: an over-limit message is dropped to its delimiter and reported through
+  `Transport.onOversize({ id, size, refused })`. `LARGE_MESSAGE_CHARS` 16 MiB is reported with
+  `refused` false BEFORE the message is delivered. A line is kept as its chunks and joined once.
+- `messageIdOf` reads the id off the first 256 characters and depends on the engine writing `id`
+  before any nested value (reply `{"id":N,...`, reset `{"epoch":E,"id":N,...`). If that order
+  changed, a refused reply would end on its 15 s deadline instead (R7 pins the order in Rust).
+- `client.ts`: a refused reply rejects ONE request with `EngineError('internal', ..., cause
+  TransportError frameTooLarge)`; test with `ops.ts isTooLarge`. `isLinkLost` = code `unavailable`
+  and no `requestId` (the client speaking, never the engine). A refused frame for a subscription
+  sets its error AND drops its window (rows null), so later diffs are dropped until the next reset;
+  keeping the old rows let the next diff clear the error over a window that missed a frame.
+- Every listener the client calls goes through `listeners.ts callEach`. Protocol code is NOT
+  wrapped: a throw in `receive()` still fails the connection.
+- The windows and the epoch law's functions live in `clientStreams.ts` (a file-size split). Nothing
+  in it may sort, filter or derive (pinned in tests/dataServerClientFaults.test.mts).
+- One client per engine launch; its CONNECTION is reopened under it. `linkKeeper.ts` is the policy
+  (0.5/1/2/5/15 s, 5 retries in a row, 60 s held clears the count, 20 per launch,
+  `protocolMismatch` and `unauthorized` never retried, `tryNow` always gets one attempt).
+  `engineLink.ts` joins it to the client. A "try" is a retry: the first connect of a launch is 0.
+- Guards: everything about the connection uses `live?.client === client`. Never `gen`: it advances
+  on every world rebuild.
+- Listeners are registered ONCE per client in `engineClientWiring.ts`. Registering one per connect
+  would now mean once per reconnect per frame.
+- A reconnect takes a new turn (`bumpGen`) and keeps `attachedTo`: no second attach, no re-read. It
+  rests on the engine keeping its world when a connection drops (`conn.rs`: a connection's end only
+  calls `world.leave` for its own subscriptions).
+- A clean hang-up is not reported by the transport. `engineLink.ts` hears it through `watchClose`
+  and, one microtask later, fails the client with `EngineClient.fail()` (so the client stops saying
+  `ready` over a closed socket and rejects what is in flight); the client's own reason wins when it
+  has one. The `failed` state listener is the one place a loss is reported.
+- `replySizes.ts`: `MAX_FORWARD_CHARS` 32 MiB is what main hands a window; 64 MiB is what main
+  itself may read (the archive). A refused or unshowable key is `blocked` until `bumpGen`
+  (`replySizes.reset`). A key of 16 MiB or more is sent at most once per 5 s. Keys are
+  `<op> <stableKey(params)>`, the key `readShim` joins on.
+- `readShim.ts` has TWO in-flight maps: `inFlight` shares one caller-wait's outcome, `wires` holds
+  the real request until the client settles it. Do not merge them: that is what re-sent a timed-out
+  read. A caller's wait = `timeoutFor(op) ?? timeoutMs`, plus any size hold. Readiness is asked
+  again after a hold and after a reply (servable or not; it does not compare turns). `observe()`
+  gets the `FallbackReason` as its 4th argument; `lastCombatRead.why` carries it.
+- Report: `connecting` while the keeper has not given up (also with no keeper yet), `notConnected`
+  only once it has (shows at once). `replyTooLarge` needs the METER's own read to have failed as
+  `tooLarge` (`lastCombatRead.why`) and a too-large reply recorded in this turn; the archive asks
+  `combat.snapshot` under the same op, so the op name alone is not evidence.
+- Archive: the capture's reads REJECT on a failed read; only the engine's `notFound` means "none"
+  (`captureReads.ts`, `engineCaptureReads(request)`, tested without Electron). Never catch-to-null
+  there: that is what moved a log aside with a module missing. `secondEngine.ts` still skips a
+  failed module in a refold; `refreshSegment` already refuses a refold that gave a module back
+  missing.
+- Not covered by R1: a connection whose hello is never answered (the client stays `connecting`, no
+  loss is reported, requests end on their own 15 s deadline). A refused reset that is also the
+  first frame of a newer epoch is dropped before `noteEpoch` sees it. 64 MiB and 32 MiB are
+  reasoned, not measured (plan experiment 1); both are one-line constants.
+- The renderer's own engine client (`lib/engineProvider.tsx`) gets the same 64 MiB limit and the
+  same per-subscription error for a too-large reset; nothing in the renderer draws that error yet
+  (R3).
+- A module read is joined across `serve` and `serveShared` callers, so two projections can be
+  handed the same reply object. A projection must never mutate the reply.
 
 ## DPS chart: the pet drawn apart (upstream #91, requirements/meter-pet-split.md)
 
