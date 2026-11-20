@@ -49,8 +49,16 @@
 // the table, so `tests/gearFilter.test.mts` can assert that a sort key brings its column with it
 // and `tests/gearColumnPrefs.test.mts` that a chosen set of thirty overflows on purpose.
 
-import { GEAR_PERCENT_STAT_KEYS, GEAR_STAT_KEYS, isGearStatKey, type GearStatKey } from '../../../../shared/planner/gear'
-import { isDropSortKey, type GearSort, type GearSortKey } from './gearFilter'
+import {
+  GEAR_PERCENT_STAT_KEYS,
+  GEAR_STAT_KEYS,
+  isGearStatKey,
+  type GearRow,
+  type GearStatKey
+} from '../../../../shared/planner/gear'
+import type { GearDerivedOpts } from '../../../../shared/planner/gearScale'
+import { skillModsText, skillModsTitle } from '../../../../shared/planner/skillMod'
+import { isDropSortKey, sortValue, type GearSort, type GearSortKey } from './gearFilter'
 
 /**
  * The columns that are always there: armour, the two pools every class reads, and the weapon
@@ -146,6 +154,23 @@ const PX = { name: 280, wish: 90, slot: 110, classes: 100, zone: 130, zoneLevel:
  * or the columns shear — neither component may own the number the other must match.
  */
 export const NUMERIC_PAD = { px: 1 } as const
+
+/**
+ * How many numeric columns' room a column takes. The skill mod cell holds words (`Pick Lock +2%`,
+ * about 90px with its padding), which no numeric share reaches, so it takes two: twice the share in
+ * percentage mode, twice the pixels in pixel mode. The layout is asked for UNITS, so the budget and
+ * the table's pixel floor stay sums of what is drawn.
+ */
+export function columnUnits(key: string): number {
+  return key === 'SKILL_MOD' ? 2 : 1
+}
+
+/** The units a drawn set takes - what `gearTableLayout` is handed as its count. */
+export function numericUnits(columns: readonly GearColumn[]): number {
+  let units = 0
+  for (const c of columns) units += columnUnits(c.key)
+  return units
+}
 
 /**
  * EVERY COLUMN THE TABLE DRAWS, IN DRAW ORDER — the one statement of the roster, so the header's
@@ -256,6 +281,8 @@ export const PICKABLE_COLUMNS: readonly GearSortKey[] = [
   }),
   // BIS closes the list rather than standing anywhere inside it: it is the one key made of ALL of
   // the others, so there is no neighbour that documents it — last is the honest placement.
+  // SKILL MOD (owner, 2026-11-20) stands after the vector it is not part of, and before BIS.
+  'SKILL_MOD',
   'BIS'
 ]
 
@@ -278,7 +305,10 @@ export function visibleColumns(sort: GearSort): GearColumn[] {
   const keys: GearSortKey[] = [...CORE_COLUMNS]
   // A drop-trio sort names no NUMERIC column — its three columns are the `showDrops` trio, drawn
   // by the table itself — so it seeds nothing here.
-  if (sort.key !== 'name' && !isDropSortKey(sort.key) && !keys.includes(sort.key)) keys.push(sort.key)
+  // Nor does a two-unit column: core plus it is past the percentage line, and the seed never is.
+  // It is drawn when picked; a sort on it with nothing picked falls to a drawn column (`sortWithin`).
+  const seeds = sort.key !== 'name' && !isDropSortKey(sort.key) && columnUnits(sort.key) === 1
+  if (seeds && !keys.includes(sort.key)) keys.push(sort.key)
   return keys.map(column)
 }
 
@@ -326,15 +356,20 @@ export function defaultColumnPx(id: string): number {
   // The `PX` table answers by key — an identity column states its own width, every numeric column
   // (whose id is its `GearSortKey`, never a `PX` key) shares one. Indexing the table instead of
   // enumerating its keys again is what keeps this and `PX` one statement.
-  return id in PX ? PX[id as keyof typeof PX] : PX.numeric
+  return id in PX ? PX[id as keyof typeof PX] : PX.numeric * columnUnits(id)
 }
 
 /** One numeric column's width, as the percentage string the header cell states. */
 export function numericWidth(count: number, hasDrops = true): string {
+  return `${String(numericPercent(count, hasDrops))}%`
+}
+
+/** The same share as a number, so a two-unit column can state twice it. */
+function numericPercent(count: number, hasDrops: boolean): number {
   const budget = numericBudget(hasDrops)
   const each = count > 0 ? budget / count : budget
   const clamped = Math.min(MAX_NUMERIC_WIDTH, Math.max(MIN_NUMERIC_WIDTH, each))
-  return `${String(Math.round(clamped * 10) / 10)}%`
+  return Math.round(clamped * 10) / 10
 }
 
 /**
@@ -359,9 +394,17 @@ export interface GearTableLayout {
   zoneLevel: string
   mob: string
   numeric: string
+  /** a two-unit column's width (`columnUnits`): twice `numeric` */
+  wide: string
   owned: string
 }
 
+/** The width a numeric column states under the automatic layout: one unit's, or two units'. */
+export function numericColumnWidth(layout: GearTableLayout, key: string): string {
+  return columnUnits(key) === 1 ? layout.numeric : layout.wide
+}
+
+/** `count` is in UNITS (`numericUnits`): a two-unit column counts twice. */
 export function gearTableLayout(count: number, hasOwned: boolean, hasDrops = true): GearTableLayout {
   // BOTH HALVES READ `hasDrops` (2026-08-25): the line past which percentages stop serving, and
   // the share each numeric column takes under it. The pixel branch read it from the day the trio
@@ -379,6 +422,7 @@ export function gearTableLayout(count: number, hasOwned: boolean, hasDrops = tru
       zoneLevel: ZONE_LEVEL_COLUMN_WIDTH,
       mob: MOB_COLUMN_WIDTH,
       numeric: numericWidth(count, hasDrops),
+      wide: `${String(Math.round(numericPercent(count, hasDrops) * 20) / 10)}%`,
       owned: OWNED_COLUMN_WIDTH
     }
   }
@@ -400,6 +444,7 @@ export function gearTableLayout(count: number, hasOwned: boolean, hasDrops = tru
     zoneLevel: `${String(PX.zoneLevel)}px`,
     mob: `${String(PX.mob)}px`,
     numeric: `${String(PX.numeric)}px`,
+    wide: `${String(PX.numeric * 2)}px`,
     owned: `${String(PX.owned)}px`
   }
 }
@@ -422,6 +467,20 @@ export function statText(value: number | undefined, key: GearSortKey): string {
   if (key === 'WEIGHT') return value.toFixed(1)
   if (PERCENT_KEYS.has(key)) return `${String(value)}%`
   return String(value)
+}
+
+/**
+ * A body cell's text off the ROW. Every key but one is `statText` over the number the sort reads;
+ * the skill mod cell is the item's own words (`Fishing +5%`), ranked by its percent.
+ */
+export function gearCellText(row: GearRow, key: GearSortKey, opts: GearDerivedOpts = {}): string {
+  if (key === 'SKILL_MOD') return skillModsText(row.skillMods)
+  return statText(sortValue(row, key, opts), key)
+}
+
+/** The cell's hover: the skill mod with its cap (`Fishing +5% (10 Max)`); nothing for a number. */
+export function gearCellTitle(row: GearRow, key: GearSortKey): string | undefined {
+  return key === 'SKILL_MOD' && row.skillMods !== undefined ? skillModsTitle(row.skillMods) : undefined
 }
 
 /**

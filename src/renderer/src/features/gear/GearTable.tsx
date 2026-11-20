@@ -72,14 +72,23 @@ import type { WindowedRows } from '../../lib/useWindowedRows'
 import { itemIconUrl } from '../../lib/ItemWindow'
 import { CellLink } from '../../lib/CellLink'
 import { EraChip, DonorName } from '../planner/PlannerChips'
-import { NUMERIC_PAD, defaultColumnPx, gearColumnIds, gearTableLayout, statText, type GearColumn } from './gearColumns'
+import {
+  NUMERIC_PAD,
+  defaultColumnPx,
+  gearCellText,
+  gearCellTitle,
+  gearColumnIds,
+  gearTableLayout,
+  numericUnits,
+  type GearColumn
+} from './gearColumns'
 import type { GearColumnWidths } from './gearPrefs'
 // JOS-338 — the ONE door a card may reach these rows through (its header states the three
 // guarantees that make it safe over this tab's dropdown toolbar).
 import { GearRowCompare } from './GearCompareCard'
 import { GearHead } from './GearTableHead'
 import type { GearCompareData, GearViewRow } from './gearData'
-import { sortValue, type GearSort, type GearSortKey } from './gearFilter'
+import type { GearSort, GearSortKey } from './gearFilter'
 import type { GearDerivedOpts } from '@shared/planner/gearScale'
 import { ownedCellText, ownedCellTitle, ownershipFor, type GearOwnershipMap } from './gearOwnership'
 // JOS-343 — the ONE wish control in the app, shared with the Exaltations donor row by owner ruling.
@@ -400,8 +409,8 @@ const GearLine = memo(function GearLine({
         </>
       )}
       {columns.map((c) => (
-        <TableCell key={c.key} align="right" data-testid={`gear-cell-${c.key}`} sx={NUMERIC_PAD}>
-          {statText(sortValue(row, c.key, derived), c.key)}
+        <TableCell key={c.key} align="right" data-testid={`gear-cell-${c.key}`} title={gearCellTitle(row, c.key)} sx={NUMERIC_PAD}>
+          {gearCellText(row, c.key, derived)}
         </TableCell>
       ))}
       {owned !== null && (
@@ -449,7 +458,9 @@ export default function GearTable({
 }: GearTableProps): JSX.Element {
   // ONE layout per (count, owned, drops) — memoized for identity, because `GearHead` is `memo`'d
   // and reads the same object this function takes `minWidth`/`mode` from.
-  const layout = useMemo(() => gearTableLayout(columns.length, ownership !== null, showDrops), [columns.length, ownership, showDrops])
+  // Counted in UNITS: the skill mod column takes two numeric columns' room (gearColumns.columnUnits).
+  const units = numericUnits(columns)
+  const layout = useMemo(() => gearTableLayout(units, ownership !== null, showDrops), [units, ownership, showDrops])
   // The roster in draw order (gearColumnIds — the one statement of it): the colspan the pad rows
   // state, and the ids the pixel-mode width sum walks.
   const allIds = gearColumnIds(columns, showDrops, ownership !== null)

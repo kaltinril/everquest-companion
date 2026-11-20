@@ -39,6 +39,7 @@ import type { ItemEffectKind } from '../itemStats'
 import type { EffectFacts } from './effectText'
 import type { EraDerivation } from './era'
 import type { ItemSupply } from './itemSupply'
+import type { SkillMod } from './skillMod'
 import type { EquipSlot, ExtractTier, SocketType } from './types'
 
 // ---- the numeric vector ------------------------------------------------------------------
@@ -264,6 +265,13 @@ export interface GearRow {
    * 130 rows (the census the `shieldRows` stat pins).
    */
   shield?: true
+  /**
+   * The skill mods the flags state (`Skill Mod: Fishing +5% (10 Max)`), read ONCE at build by
+   * `planner/skillMod.parseSkillMods`. ABSENT when the item states none, or states one with no
+   * readable percent (`Skill Mod: ?`). Not scaled by the plus-state: no page states how a tier
+   * moves one.
+   */
+  skillMods?: SkillMod[]
 }
 
 // ---- the served payload ---------------------------------------------------------------------
