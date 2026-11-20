@@ -35,6 +35,9 @@ const EMPTY: LoadoutViews = new Map()
 export function useLoadoutViews(names: readonly string[]): LoadoutViews {
   const key = useMemo(() => [...names].sort((a, b) => a.localeCompare(b)).join('\u0000'), [names])
   const [views, setViews] = useState<LoadoutViews>(EMPTY)
+  // The rows come from the game's own file, so a changed EverQuest folder asks again.
+  const [folder, setFolder] = useState(0)
+  useEffect(() => window.eq.onEqConfigChanged(() => setFolder((n) => n + 1)), [])
   useEffect(() => {
     if (key === '') {
       setViews(EMPTY)
@@ -58,6 +61,6 @@ export function useLoadoutViews(names: readonly string[]): LoadoutViews {
     return () => {
       live = false
     }
-  }, [key])
+  }, [key, folder])
   return views
 }
