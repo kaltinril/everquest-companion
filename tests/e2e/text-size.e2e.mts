@@ -306,6 +306,20 @@ async function stepNavMenu(page: Page): Promise<void> {
   const tight = await navMisfits(page, rowMin)
   check('…nor in the shortest rows, where the label has the least room', tight.length === 0, tight.join(', '))
 
+  // THE KEYBOARD STAYS IN THE STEPPER (screen pass, 2026-11-19). The rows are at their shortest
+  // here. Enter on plus all the way up used to drop focus to the page body on the press that
+  // reached the top, where plus disables itself: Enter then did nothing and Tab began again.
+  const focusOn = (): Promise<string> => page.evaluate(() => document.activeElement?.getAttribute('data-testid') ?? document.activeElement?.tagName ?? '')
+  await page.focus(navSel('pref-nav-row-plus'))
+  for (let i = 0; i < NAV_ROW_STEPS.length - 1; i++) await page.keyboard.press('Enter')
+  const top = await settle(() => textOf(page, navSel('pref-nav-row-value')), (v) => v === navPx(rowMax), { timeoutMs: 10_000 })
+  const held = await settle(focusOn, (t) => t === 'pref-nav-row-minus', { timeoutMs: 5_000 })
+  check('Enter on plus up to the top stop hands the keyboard to minus, not to the page', top === navPx(rowMax) && held === 'pref-nav-row-minus', `${top}, focus on ${held}`)
+  await page.keyboard.press('Enter')
+  const stepped = await settle(() => textOf(page, navSel('pref-nav-row-value')), (v) => v !== navPx(rowMax), { timeoutMs: 5_000 })
+  check('…and Enter there steps the rows back down', stepped !== navPx(rowMax), stepped)
+  await pressNav(page, 'pref-nav-row', 'minus', rowMin)
+
   // Home again, so the launches after this one start from the shipped menu.
   const text = await pressNav(page, 'pref-nav-text', 'minus', NAV_TEXT_DEFAULT)
   const row = await pressNav(page, 'pref-nav-row', 'plus', NAV_ROW_DEFAULT)
