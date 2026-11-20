@@ -17,6 +17,11 @@ the `requirements/` file named in each phase (rule 19).
   pre-alert's tooltip and request row now say it covers the zone you are in; a Sky Cleanup test
   that would have passed without the fix was made to fail without it; a live log's first line
   that repeats an archived skill level is no longer counted as a raise.
+- Found after the merge, by measuring instead of trusting the plan's arithmetic: phase 5 sized the
+  menu's default (32 px rows) so the open menu fit the default window, phase 6 then added the Skills
+  row, and in the running app the menu was 841 px in an 820 px drawer. Corrected the same day: the
+  default is 28 px, a 24 px stop was added below it, and the text-size e2e spec now checks the fit.
+  Where phase 5 below says 32 px, read 28.
 - Not done: the owner's try in the app, the push, any reply on an issue, a release. The two wiki
   pages are the owner's to edit ("Wiki pages to fix").
 

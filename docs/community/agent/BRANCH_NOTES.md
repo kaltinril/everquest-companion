@@ -312,10 +312,16 @@ where one exists.
 - One `GROUPS` table in `NavDrawer.tsx`. A change that adds a tab places it in a group in the
   same change. Maps under Research was an agent's choice; the owner never placed
   it.
-- Row metrics (fork #10) come from `shared/navMenu.ts` (two px ladders, defaults 14px text / 32px
+- Row metrics (fork #10) come from `shared/navMenu.ts` (two px ladders, defaults 14px text / 28px
   rows) through four CSS variables on the drawer paper (`--nav-row`, `--nav-text`, `--nav-icon`,
   `--nav-icon-col`). `NavRowButton` and the feedback row read them via `NAV_ROW_SX` / `NAV_ICON_SX`
   / `NAV_TEXT_SX`; no prop drilling. Group headings stay fixed (`GROUP_HEADING_SX`, 28px).
+- TRAP: the default row height is a measurement, not arithmetic. It was first 32px, sized on paper
+  so the open menu fit the default window; the Skills row landed the same day and the menu ran 21px
+  over (MEASURED.md). A new nav row costs one row height, and the two-line Send feedback row is
+  57px, not the 42px a read of the styles gives, because its second line wraps. `stepNavMenu` in
+  `tests/e2e/text-size.e2e.mts` checks the open menu against the drawer on a fresh install: when a
+  new tab makes it fail, lower the default or shorten a row, do not delete the check.
 - Rows use `minHeight`, never `height`: a label that wraps grows its row. `tests/navMenu.test.mts`
   holds the fit rule: the shortest row must hold the largest text's line (x1.3) and icon (x1.5). A
   new stop on either ladder must keep it.

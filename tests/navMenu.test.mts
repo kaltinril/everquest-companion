@@ -32,6 +32,8 @@ test('each ladder ascends without a repeat and holds its own default', () => {
   // The look before the setting stays reachable: 16px text in 48px rows.
   assert.ok(NAV_TEXT_STEPS.includes(16))
   assert.ok(NAV_ROW_STEPS.includes(48))
+  // The shipped row is not the shortest one: a player who wants it tighter still has a stop to go to.
+  assert.ok(NAV_ROW_DEFAULT > Math.min(...NAV_ROW_STEPS))
 })
 
 test('an absent or malformed stored value reads as the default', () => {
