@@ -92,6 +92,11 @@ export function readPetLayout(raw: string | null, legacy: string | null): PetLay
   return legacy === null || legacy === '1' ? 'nested' : 'separate'
 }
 
+/** Only "Its own bar" takes the pet out of the DPS chart's gold line (upstream #91). */
+export function petDrawnApart(layout: PetLayout): boolean {
+  return layout === 'separate'
+}
+
 // ── where you had drilled to (JOS-116) ───────────────────────────────────────────────────
 
 /**

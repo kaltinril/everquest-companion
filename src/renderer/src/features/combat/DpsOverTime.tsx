@@ -19,10 +19,10 @@ import { useCallback, useMemo, useRef, type ReactNode } from 'react'
 import { Box, ButtonBase, Stack, Typography } from '@mui/material'
 import type { TimelineView } from '@shared/combat'
 import { formatRate } from '../../lib/formatRate'
-import type { ChartLineKey, DpsLineKey } from './combatPrefs'
+import { petDrawnApart, type ChartLineKey, type DpsLineKey } from './combatPrefs'
 import { ApproxChip, DashCard, QuietNote, fmtDur } from './combatShared'
 import { approxNote, buildDpsSeries, type DpsSeries } from './dashboardData'
-import { outLabel, withPetApart } from './dpsAt'
+import { outLabel, peakTitle, withPetApart } from './dpsAt'
 import {
   CHART_H,
   CHART_W,
@@ -85,15 +85,11 @@ function ChartHeaderStats({
 }): React.JSX.Element | null {
   if (!tl || !series || !chart) return null
   const note = approxNote(tl)
-  const secs = Math.round(series.smoothMs / 1000)
-  const peakTip = series.petApart
-    ? `Peak ${secs}s rolling rate without your pet, in the visible window.`
-    : `Peak ${secs}s rolling outgoing rate in the visible window.`
   return (
     <Stack direction="row" spacing={0.75} alignItems="baseline" sx={{ minWidth: 0 }}>
       {note && <ApproxChip shown={note.shown} raw={note.of} truncated={note.truncated} />}
       {chart.outLine !== null && (
-        <Tooltip title={peakTip}>
+        <Tooltip title={peakTitle(series)}>
           <Typography variant="caption" sx={{ color: OUT_COLOR, whiteSpace: 'nowrap' }}>
             {series.estimated ? '~' : ''}
             {formatRate(chart.peakVis)} peak
@@ -430,7 +426,7 @@ export function DpsOverTime({
   // identity, so the memo chain below is unaffected on that surface.
   const hidden = compact ? NOTHING_HIDDEN : stored
   // "Its own bar" takes the pet out of the gold line too, so you and your pet are two lines.
-  const petApart = usePetLayout()[0] === 'separate'
+  const petApart = petDrawnApart(usePetLayout()[0])
   const series = useMemo(() => (tl ? withPetApart(keptSeries(tl, live), petApart) : null), [tl, live, petApart])
   const chart = useMemo(() => buildDpsChart(series, live, hidden), [series, live, hidden])
   const placed = useMemo(() => placeMarkers(tl, chart), [tl, chart])
