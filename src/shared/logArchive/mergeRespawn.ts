@@ -2,7 +2,7 @@
 // (step 4.4).
 //
 // WHAT THE SNAPSHOT HOLDS. The fold (`respawn.rs`) keeps a history of up to 800 mobs, but publishes
-// only two views of it: a clock row for each WATCHED mob (at most `RESPAWN_MAX_ROWS`), carrying its
+// only two views of it: a clock row for each WATCHED mob (capped as `capRows` says), carrying its
 // learned gaps, and the `RESPAWN_MAX_RECENT` most recently killed mobs as watch candidates. A
 // segment holds those views, so the learned gaps an archive can give back are the gaps of mobs that
 // were watched when it was captured. The 800 cap cannot bind on what is published.
@@ -100,7 +100,28 @@ function mergeRows(older: RespawnSnap, newer: RespawnSnap): RespawnRow[] {
     .filter((r) => !newerIds.has(r.id) && watches.has(r.key))
     .sort((a, b) => b.baseTs - a.baseTs)
     .map((r) => archivedRow(r, watches.get(r.key)))
-  return [...rows, ...archivedOnly].slice(0, RESPAWN_MAX_ROWS)
+  return capRows([...rows, ...archivedOnly], standingOf(newer))
+}
+
+/**
+ * The engine's cap, as `respawn.rs collect` applies it: every row of the zone the player stands in
+ * (each tier and instance of it), and `RESPAWN_MAX_ROWS` of the other zones'. A row cut from the
+ * zone you stand in read as "none killed here yet" on the Respawn overlay.
+ */
+function capRows(rows: readonly RespawnRow[], standing: string): RespawnRow[] {
+  const here = zoneBase(standing)
+  let elsewhere = 0
+  return rows.filter((r) => zoneBase(r.zone) === here || elsewhere++ < RESPAWN_MAX_ROWS)
+}
+
+/**
+ * Where the player stands today. The live state says so itself; an archived state joined to
+ * another archive carries it from `withHistoryRows` (`liveZone`), since its own zone is where that
+ * log ended. A blank one (a fresh log before its first zone line) falls to the state's own zone.
+ */
+function standingOf(snap: RespawnSnap): string {
+  const live = (snap as unknown as { liveZone?: unknown }).liveZone
+  return typeof live === 'string' && live !== '' ? live : snap.zone
 }
 
 const candidateId = (c: RespawnCandidate): string => `${respawnZoneKey(c.zone)}::${c.key}`
@@ -276,13 +297,14 @@ export function withCurrentWiki(archived: unknown, wikiNow: RespawnWikiNow): unk
 }
 
 /**
- * An archived state with its history rows for every mob `live` watches, and `live`'s watch list.
- * A row the archived state already has is left as captured. Anything else comes back as is.
+ * An archived state with its history rows for every mob `live` watches, `live`'s watch list, and
+ * the zone `live` stands in (`liveZone`, for the row cap: `standingOf`; the join with the live state
+ * drops it). A row the archived state already has is left as captured. Anything else comes back as is.
  */
 export function withHistoryRows(archived: unknown, history: readonly RespawnRow[], live: unknown): unknown {
   if (!isRespawnSnap(archived) || !isRespawnSnap(live)) return archived
   const watches = watchesOf(live)
   const have = new Set(archived.rows.map((r) => r.id))
   const extra = history.filter((r) => watches.has(r.key) && !have.has(r.id))
-  return { ...archived, prefs: live.prefs, rows: [...archived.rows, ...extra] }
+  return { ...archived, prefs: live.prefs, rows: [...archived.rows, ...extra], liveZone: live.zone }
 }

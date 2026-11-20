@@ -397,7 +397,12 @@ export const RESPAWN_SHAPE_VERSION = 4
  */
 export const RESPAWN_LINGER_MS = 30 * 60 * 1000
 
-/** Most rows the module will publish. Bounded because a dungeon prints a lot of death lines. */
+/**
+ * Most rows the module will publish for zones other than the one you stand in. Bounded because a
+ * dungeon prints a lot of death lines. The zone you stand in publishes every clock, each tier and
+ * instance of it (`respawn.rs collect`, `mergeRespawn.ts capRows`): the overlay reads a missing row
+ * there as "none killed here yet".
+ */
 export const RESPAWN_MAX_ROWS = 60
 
 /** Most recently-killed mobs offered as watch candidates in the view. */
@@ -735,7 +740,7 @@ export interface RespawnLearned {
 }
 
 /**
- * The delta is a WHOLE snapshot. Rows are bounded at RESPAWN_MAX_ROWS and change on nearly every
+ * The delta is a WHOLE snapshot. Rows are bounded (RESPAWN_MAX_ROWS) and change on nearly every
  * death anyway, so a per-row merge would buy nothing and cost a second definition of the state.
  */
 export type RespawnDelta = RespawnSnap
