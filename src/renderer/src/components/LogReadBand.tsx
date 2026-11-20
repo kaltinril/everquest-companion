@@ -13,7 +13,7 @@
 
 import { type JSX, useState } from 'react'
 import { Box, Button, Stack, Typography, useTheme } from '@mui/material'
-import type { LogReadReport } from '../../../shared/logReadReport'
+import { bandPosition, type LogReadReport } from '../../../shared/logReadReport'
 import { LOG_READ_WORDS } from '../../../shared/logReadWords'
 
 /**
@@ -48,13 +48,15 @@ export function LogReadTryAgain({ testId }: { testId: string }): JSX.Element {
 
 export interface LogReadBandProps {
   readonly report: LogReadReport
-  /** `band`: the wait, its Try line and its button. `notes`: the report's notes alone. */
+  /** `band`: the wait, its Try line, where the read is when the Try line speaks of it, and its
+   *  button. `notes`: the report's notes alone. */
   readonly kind: 'band' | 'notes'
 }
 
 export function LogReadBand({ report, kind }: LogReadBandProps): JSX.Element {
   const theme = useTheme()
   const waiting = kind === 'band'
+  const position = waiting ? bandPosition(report) : null
   return (
     <Box
       role="status"
@@ -79,6 +81,11 @@ export function LogReadBand({ report, kind }: LogReadBandProps): JSX.Element {
           {waiting && report.tryLine !== null && (
             <Typography variant="body2" color="text.secondary" data-testid="log-read-band-try">
               {report.tryLine}
+            </Typography>
+          )}
+          {position !== null && (
+            <Typography variant="body2" color="text.secondary" data-testid="log-read-band-position">
+              {position.label}: {position.value}
             </Typography>
           )}
           {!waiting &&

@@ -505,6 +505,23 @@ function readSoFar(r: LogReadReport): string | null {
   return `${humanBytes(r.offset)}${pct}${events}`
 }
 
+function positionLabel(r: LogReadReport): string {
+  return ENDED.has(r.wait) ? 'Stopped at' : 'Read so far'
+}
+
+/** The waits whose Try line speaks of where the read is. Both stand still: `role="status"` reads
+ *  the whole band out again whenever a word in it changes. */
+const POSITION_IN_BAND: ReadonlySet<LogReadWait> = new Set<LogReadWait>(['readerStopped', 'stalled'])
+
+/**
+ * The one row of the box that the band draws too, or null. The band is on every tab and the box
+ * is not, so a Try line may point at nothing but this (tests/logReadWords.test.mts).
+ */
+export function bandPosition(r: LogReadReport): LogReadLine | null {
+  const value = POSITION_IN_BAND.has(r.wait) ? readSoFar(r) : null
+  return value === null ? null : { label: positionLabel(r), value }
+}
+
 /**
  * The box's rows, in order, at `now` (the window's own clock, for the Waiting row). A row whose
  * value is unknown is left out, never printed as 0.
@@ -515,7 +532,7 @@ export function logReadLines(r: LogReadReport, now: number): LogReadLine[] {
     ['Waiting on', LOG_READ_WORDS[r.wait]],
     ['Try', r.tryLine],
     ['Log', logLine(r)],
-    [ENDED.has(r.wait) ? 'Stopped at' : 'Read so far', readSoFar(r)],
+    [positionLabel(r), readSoFar(r)],
     ['Engine', r.engine === '' ? null : r.engine],
     ['Last error', r.lastError ?? 'none'],
     ['Waiting', waited],

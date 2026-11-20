@@ -38,7 +38,10 @@ export const LOG_READ_WORDS: Readonly<Record<LogReadWait, string>> = {
   ok: 'The data engine is answering; this panel has no reply yet.'
 }
 
-/** What the player can try, or null when there is nothing to say. */
+/**
+ * What the player can try, or null when there is nothing to say. The band prints these on every
+ * tab, where there is no box: a line points only at the band's own rows (`bandPosition`).
+ */
 export const LOG_READ_TRY: Readonly<Record<LogReadWait, string | null>> = {
   noCharacter: 'Pick your character in the title bar.',
   engineMissing: 'Check your antivirus quarantine, then reinstall.',
@@ -50,7 +53,7 @@ export const LOG_READ_TRY: Readonly<Record<LogReadWait, string | null>> = {
   logMissing: 'In game, type /log on.',
   logUnreadable: 'Close any program that has the log open.',
   logHung: 'Check that the drive or folder holding the log can be reached.',
-  readerStopped: 'Press Try again. If it stops at the same place, send a screenshot of this box.',
+  readerStopped: 'Press Try again. If it stops at the same place, send a screenshot of this window.',
   stalled: 'Wait a minute. If Read so far does not move, press Try again.',
   finishing: 'Nothing to do. This can take a minute on a large log.',
   opening: 'Wait a minute. If it stays, press Try again.',

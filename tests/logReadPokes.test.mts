@@ -114,6 +114,14 @@ test('TRY AGAIN IS BOUND TO THE THREE REAL VERBS, reads the wait that was last p
   assert.doesNotMatch(code('../src/preload/overlay.ts'), /logReadTryAgain/)
 })
 
+test('THE BAND DRAWS WHERE THE READ IS: the row two Try lines send the player to look at', () => {
+  // React cannot be loaded here. Which waits get the row, and its words, are `bandPosition`
+  // (tests/logReadWords.test.mts); this pins that the band asks it and prints the answer.
+  const band = code('../src/renderer/src/components/LogReadBand.tsx')
+  assert.match(band, /const position = waiting \? bandPosition\(report\) : null/)
+  assert.match(band, /position !== null && \([\s\S]*?data-testid="log-read-band-position"[\s\S]*?\{position\.label\}: \{position\.value\}/)
+})
+
 test('a re-read is a new turn that forgets the attach, and with no connection it reconnects instead', () => {
   const reattach = body(code(HOST), /export function reattachEngineLog\(\): void \{/)
   assert.match(reattach, /if \(l\.client\.state !== 'ready'\) \{\s*l\.link\.reopen\(\)\s*return\s*\}/)
