@@ -101,11 +101,12 @@ function placeOf(raw: string): SlayerPlace {
   return { catalogName, key: short ?? key, short, isPlace: !isPlaceholder(key) }
 }
 
-/** The number the text opens with, and the one a dash or `to` joins to it. */
-const LEVEL_RE = /^\D{0,12}?(\d+)(?:\s*(?:-|to)\s*(\d+))?/
+/** The number the text opens with, and the one a dash (hyphen, en or em), a tilde, a slash or `to`
+ *  joins to it: the wiki's pages write a range every one of those ways. A comma is not a join. */
+const LEVEL_RE = /^\D{0,12}?(\d+)(?:\s*(?:-|–|—|~|\/|to)\s*(\d+))?/
 
 /**
- * `36-40`, `2 - 4`, `18`, `50+`. ONLY THE OPENING OF THE TEXT IS READ: the field is prose on some
+ * `36-40`, `2 - 4`, `8 ~ 14`, `18`, `50+`. ONLY THE OPENING OF THE TEXT IS READ: the field is prose on some
  * pages (`6 (strangely cons dark blue to me at lvl 42, at night)`), and a number further in is
  * somebody's character, not the mob.
  */
