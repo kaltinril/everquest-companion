@@ -20,13 +20,15 @@
 // NO FIRING CONTEXT, ON PURPOSE. A preview has no matched event, so the spell modes resolve
 // through `speechTextFor`'s documented fallback to the alert's NAME — which is the honest answer:
 // it is precisely what the user will hear whenever the trigger turns out to name no spell.
+// ONE EXCEPTION (`previewFiring`): an app-signal alert's tokens are filled with sample values.
 //
 // MUTE IS NOT AN EXCEPTION. The alerts master mute is a promise that the app makes no noise, and
 // a preview is noise. It stays a parameter here rather than a lookup so this module has no state.
 //
 // Value imports stay RELATIVE (AGENTS.md toolchain gotchas) — node:test loads this file.
 
-import type { AlertDef } from '@shared/types'
+import type { AlertDef, FiredAlert } from '@shared/types'
+import { sampleCapturesFor } from '../../../../shared/alertCaptures'
 import { speechPlan, type SpeechPlan } from '../../lib/speech'
 
 /** The def a preview fires, given the def the row is showing. See the header for the two forces. */
@@ -39,5 +41,15 @@ export function previewDef(def: AlertDef): AlertDef {
  * because it is produced by the same function from the same fields.
  */
 export function previewPlan(def: AlertDef, muted: boolean): SpeechPlan {
-  return speechPlan(previewDef(def), null, muted)
+  return speechPlan(previewDef(def), previewFiring(def) ?? null, muted)
+}
+
+/**
+ * The firing a preview stands in for, where the alert is an app signal that fills tokens
+ * (`{mob} {when}`): the signal's sample values, so the Test says a sentence, not the braces.
+ * Undefined for every other alert, which previews with no firing as before.
+ */
+export function previewFiring(def: AlertDef): Pick<FiredAlert, 'spell' | 'captures'> | undefined {
+  const captures = sampleCapturesFor(def.trigger)
+  return captures ? { captures } : undefined
 }

@@ -17,8 +17,9 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import type { AlertAudio, AlertDef } from '../src/shared/types'
 import { speechPlan } from '../src/renderer/src/lib/speech'
-import { previewDef, previewPlan } from '../src/renderer/src/features/alerts/preview'
+import { previewDef, previewFiring, previewPlan } from '../src/renderer/src/features/alerts/preview'
 import { alertBannerText, alertShowsOnScreen } from '../src/shared/alertBanner'
+import { RESPAWN_ALERT_BANNER, RESPAWN_ALERT_SPEECH } from '../src/shared/respawnAlert'
 
 function def(over: Partial<AlertDef> = {}): AlertDef {
   return {
@@ -159,6 +160,35 @@ test('…and an alert TAMED off the screen previews silently there too — previ
 test('an On-screen override is auditioned, not bypassed', () => {
   const original = def({ speech: { mode: 'custom', phrase: 'a long spoken sentence' }, bannerText: 'CHARM' })
   assert.equal(alertBannerText(previewDef(original)), 'CHARM')
+})
+
+// ------------------------------------------------------------ app-signal alerts (fork #7)
+//
+// A seeded app-signal alert's phrase is tokens only ('{mob} {when}'). A firing fills them; a Test
+// has no firing, so it fills them with the signal's sample values instead of reading the braces out.
+
+const RESPAWN_SEED: Partial<AlertDef> = {
+  id: 'respawn-soon',
+  name: 'Respawn timer ending',
+  trigger: { type: 'app', signal: 'respawnSoon' },
+  audio: 'speech',
+  speech: { mode: 'custom', phrase: RESPAWN_ALERT_SPEECH },
+  bannerText: RESPAWN_ALERT_BANNER
+}
+
+test('▶ on the respawn alert says a sample sentence, never the raw tokens', () => {
+  const seeded = def(RESPAWN_SEED)
+  assert.deepEqual(previewPlan(seeded, false), { sound: false, speak: 'Enynti in 20 seconds' })
+  assert.equal(alertBannerText(previewDef(seeded), previewFiring(seeded)?.captures), 'Enynti in 20s - open +0')
+})
+
+test('…and so does the Bazaar alert; a log alert has no sample firing and tests as it always did', () => {
+  const bazaar = def({ trigger: { type: 'app', signal: 'bazaarWatch' }, audio: 'speech', speech: { mode: 'custom', phrase: '{item} {what}' } })
+  assert.doesNotMatch(previewPlan(bazaar, false).speak ?? '{', /[{}]/)
+  assert.equal(previewFiring(def()), undefined)
+  assert.equal(previewFiring(def({ trigger: { type: 'app', signal: 'bossDefeat' } })), undefined)
+  const typed = def({ audio: 'speech', speech: { mode: 'custom', phrase: 'Charm broke on {target}' } })
+  assert.equal(previewPlan(typed, false).speak, 'Charm broke on {target}')
 })
 
 test('preview never mutates the def the row is rendering', () => {

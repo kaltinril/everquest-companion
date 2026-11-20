@@ -2,7 +2,15 @@
 // setting, which clocks cross their lead moment between two looks, and the tokens they fill.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { APP_SIGNAL_CAPTURES, applyCaptures, captureNamesIn, tokensIn } from '../src/shared/alertCaptures.ts'
+import {
+  APP_SIGNAL_CAPTURES,
+  APP_SIGNAL_SAMPLE_CAPTURES,
+  applyCaptures,
+  captureNamesIn,
+  sampleCapturesFor,
+  tokensIn
+} from '../src/shared/alertCaptures.ts'
+import type { AppSignal } from '../src/shared/alertTypes.ts'
 import { DEFAULT_RESPAWN_PREFS, type RespawnRow } from '../src/shared/respawn.ts'
 import {
   DEFAULT_RESPAWN_ALERT,
@@ -135,4 +143,31 @@ test('the respawnSoon signal declares the tokens it fills, and the default phras
     applyCaptures(RESPAWN_ALERT_SPEECH, due.captures),
     'a Tesch Mas Gnoll Deathcaller of the Depths in 300 seconds, instance plus 4'
   )
+})
+
+test("the Alerts tab's Test button has a sample value for every token an app signal fills", () => {
+  for (const signal of Object.keys(APP_SIGNAL_CAPTURES) as AppSignal[]) {
+    const sample = APP_SIGNAL_SAMPLE_CAPTURES[signal]
+    assert.deepEqual(Object.keys(sample).sort(), [...APP_SIGNAL_CAPTURES[signal]].sort(), signal)
+    for (const [name, value] of Object.entries(sample)) {
+      // What a real firing would carry: nothing empty, nothing the 48-character cut would change.
+      assert.equal(applyCaptures(`{${name}}`, sample), value, `${signal} ${name}`)
+      assert.notEqual(value.trim(), '', `${signal} ${name}`)
+    }
+  }
+  const respawn = sampleCapturesFor({ type: 'app', signal: 'respawnSoon' })
+  assert.equal(applyCaptures(RESPAWN_ALERT_SPEECH, respawn), 'Enynti in 20 seconds')
+  assert.equal(applyCaptures(RESPAWN_ALERT_BANNER, respawn), 'Enynti in 20s - open +0')
+  // The Bazaar alert's seeded phrases (main/alertBazaarSeed.ts) are tokens only too.
+  const bazaar = sampleCapturesFor({ type: 'app', signal: 'bazaarWatch' })
+  for (const phrase of ['{item} {what}', '{offer} - {why}']) assert.doesNotMatch(applyCaptures(phrase, bazaar), /[{}]/)
+})
+
+test('only an app signal that fills tokens has sample values; a log alert is tested as before', () => {
+  assert.equal(sampleCapturesFor({ type: 'app', signal: 'bossDefeat' }), undefined)
+  assert.equal(sampleCapturesFor({ type: 'raw', regex: '(?<mob>\\w+) hits' }), undefined)
+  assert.equal(sampleCapturesFor({ type: 'event', kind: 'uncharm' }), undefined)
+  // An app condition inside a composite never fires (alertTypes.ts), so it has nothing to sample.
+  const composite = { type: 'any', conditions: [{ type: 'app', signal: 'respawnSoon' }] } as const
+  assert.equal(sampleCapturesFor({ ...composite, conditions: [...composite.conditions] }), undefined)
 })
