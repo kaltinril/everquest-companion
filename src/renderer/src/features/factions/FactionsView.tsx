@@ -28,6 +28,7 @@ import { Box, Stack, Table, TableBody, Typography } from '@mui/material'
 import HandshakeIcon from '@mui/icons-material/Handshake'
 import OutputKindLine from '../../components/OutputKindLine'
 import { useWindowedRows, type WindowedRows } from '../../lib/useWindowedRows'
+import { FactionBack } from './FactionBack'
 import { FactionTableHead, FilterBar, WorkFilterControls } from './FactionControls'
 import { LadderLegend } from './FactionLadder'
 import FactionRow, { FactionPadRow, ROW_HEIGHT } from './FactionRow'
@@ -65,6 +66,8 @@ export default function FactionsView(props: FactionsViewProps): JSX.Element {
       data-testid="factions-view"
       sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 2, minHeight: 0 }}
     >
+      {/* Only a link in from another tab parks an origin (appRouting `openFactions`); else nothing is drawn. */}
+      {props.nav !== undefined && <FactionBack nav={props.nav} />}
       <OutputKindLine kind="faction" loadedAt={c.readAt} testId="factions-freshness" />
       {/* THE SECOND EXPORT THIS TAB EATS, taught in place: race unlocks come from the
           achievements dump, and until one exists the tab SAYS SO where the player is looking —

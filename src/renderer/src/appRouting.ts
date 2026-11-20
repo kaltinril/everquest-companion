@@ -216,6 +216,18 @@ export interface AppRouting {
    * it back. Unanchored: the Gear tab has no drill and no Back button.
    */
   openGearSearch: (text: string) => void
+  /** The faction the Factions tab should find, as a name its search matches; or null. */
+  factionFocus: string | null
+  factionNonce: number
+  /**
+   * Bare is the Factions tab as it stands. With a name it is the link in from another tab (the
+   * Tradeskills route's Faction goal; owner, 2026-11-20: "fully integrated with maps and other
+   * tabs"): the tab finds that faction the way its own race chips do (the search filled, the two
+   * hide switches off). ONE opener, like `openLoot`. A name is anchored, so the tab shows a Back
+   * to the tab the link was on.
+   */
+  openFactions: (faction?: string) => void
+  clearFactionFocus: () => void
 }
 
 /**
@@ -290,6 +302,8 @@ export function useAppRouting(view: View, setView: (v: View) => void): AppRoutin
   const spell = useFocusSlot<string>('spell', linkTo)
   // Also published to every tradeskill link in the window (`TradeskillLinkProvider`).
   const tradeskill = useFocusSlot<TradeskillFocus>('tradeskills', linkTo)
+  // Also published to every faction name that links here (`lib/factionLink.tsx`).
+  const faction = useFocusSlot<string>('factions', linkTo)
   const openGearSearch = useCallback(
     (text: string) => {
       presetSearch('eq.gear.search', text)
@@ -350,11 +364,15 @@ export function useAppRouting(view: View, setView: (v: View) => void): AppRoutin
       tradeskillNonce: tradeskill.nonce,
       openTradeskills: tradeskill.open,
       clearTradeskillFocus: tradeskill.clear,
+      factionFocus: faction.value,
+      factionNonce: faction.nonce,
+      openFactions: faction.open,
+      clearFactionFocus: faction.clear,
       openGearSearch,
       openMapZone,
       openMapAt
     }),
-    [selectView, nav, spell, mob, quest, level, combat, loot, tradeskill, openGearSearch, openMapZone, openMapAt]
+    [selectView, nav, spell, mob, quest, level, combat, loot, tradeskill, faction, openGearSearch, openMapZone, openMapAt]
   )
 }
 
