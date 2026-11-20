@@ -146,6 +146,16 @@ function wornRows(hosts: readonly PlannerInventoryHost[], byKey: ReadonlyMap<str
   return out
 }
 
+/**
+ * The worn items below +10 that `wornRows` leaves out because the item data has no row for them:
+ * the tab names them, so a skipped piece is not read as one a mote is wasted on. Item data with
+ * nothing in it is unread, not a verdict on every item, and lists none.
+ */
+export function moteUnranked(hosts: readonly PlannerInventoryHost[], byKey: ReadonlyMap<string, GearRow>): PlannerInventoryHost[] {
+  if (byKey.size === 0) return []
+  return hosts.filter((host) => !byKey.has(host.key) && (host.tier ?? 0) < ITEM_MAX_TIER)
+}
+
 /** The best haste worn OUTSIDE each item (worn haste does not stack: `roleValue`'s credit rule). */
 function hasteOutside(worn: readonly Worn[]): number[] {
   let top = 0

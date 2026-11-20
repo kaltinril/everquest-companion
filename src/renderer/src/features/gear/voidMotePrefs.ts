@@ -4,6 +4,7 @@
 // by `useVoidMotePrefs` (useGearPrefs.ts), validated on every read.
 
 import type { GearStatKey } from '../../../../shared/planner/gear'
+import type { PlannerInventoryHost } from '../../../../shared/planner/inventorySlots'
 import type { ItemSupply, SupplyGap, SupplyKind } from '../../../../shared/planner/itemSupply'
 import type { GearRole } from '../../../../shared/planner/roleWeights'
 import {
@@ -19,6 +20,7 @@ import {
 import { ROLE_LABEL } from '../plan/planBlurb'
 import { PLAN_ROLES } from './areaMemory'
 import { columnLabel, statText } from './gearColumns'
+import { hostText } from './gearCompare'
 
 export interface VoidMotePrefs {
   /** what a gain is measured in: a focus, or one stat */
@@ -158,6 +160,8 @@ export interface MoteEmptyState {
   hasRows: boolean
   inventoryReady: boolean
   hasDump: boolean
+  /** worn items below +10 the item data does not know (`moteUnranked`) */
+  unranked: number
   /** the in-game command that writes the dump */
   command: string
 }
@@ -172,7 +176,14 @@ export function moteEmptyText(s: MoteEmptyState): string {
   if (!s.hasRows) return 'The item data could not be read, so nothing can be ranked.'
   if (!s.inventoryReady) return 'Reading your inventory…'
   if (!s.hasDump) return `No inventory dump for this character yet. Type ${s.command} in game.`
+  if (s.unranked > 0) return 'Every worn piece the item data knows is already +10.'
   return 'Nothing you wear can go higher: every piece the item data knows is already +10.'
+}
+
+/** `Not ranked: Bracer of Hate +8 (not in the item data)`: the worn items the list leaves out; `''` for none. */
+export function moteUnrankedText(hosts: readonly PlannerInventoryHost[]): string {
+  if (hosts.length === 0) return ''
+  return `Not ranked: ${hosts.map(hostText).join(', ')} (not in the item data)`
 }
 
 /** `Indicolite Breastplate +9→+10 · Earring of Bashing +8→+10`: the week's motes, one item each. */

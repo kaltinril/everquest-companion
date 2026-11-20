@@ -39,6 +39,7 @@ import {
   isMoteReady,
   moteAdvice,
   motePlan,
+  moteUnranked,
   planMotesOn,
   sortMoteAdvice,
   type MoteAdvice,
@@ -62,6 +63,7 @@ import {
   moteSourceText,
   moteSourceTitle,
   moteTargetLabel,
+  moteUnrankedText,
   type VoidMotePrefs
 } from './voidMotePrefs'
 
@@ -216,6 +218,7 @@ export default function VoidMotePanel({ compare, indexReady, indexRefused, class
   const opts = useMemo(() => ({ target: motes.target, classes }), [motes.target, classes])
   const list = useMemo(() => sortMoteAdvice(moteAdvice(hosts, byKey, opts), motes.order), [hosts, byKey, opts, motes.order])
   const plan = useMemo(() => motePlan(hosts, byKey, opts), [hosts, byKey, opts])
+  const unranked = useMemo(() => moteUnranked(hosts, byKey), [hosts, byKey])
 
   return (
     <Box
@@ -240,6 +243,7 @@ export default function VoidMotePanel({ compare, indexReady, indexRefused, class
             hasRows: byKey.size > 0,
             inventoryReady: compare.ready,
             hasDump: compare.hasDump,
+            unranked: unranked.length,
             command: INVENTORY_COMMAND
           })}
         </Typography>
@@ -262,6 +266,12 @@ export default function VoidMotePanel({ compare, indexReady, indexRefused, class
             </TableBody>
           </Table>
         </Box>
+      )}
+      {/* A worn piece with no row in the item data is named, never dropped in silence. */}
+      {unranked.length > 0 && (
+        <Typography variant="caption" color="text.secondary" data-testid="gear-motes-unranked" sx={{ px: 1, py: 0.5, flexShrink: 0 }}>
+          {moteUnrankedText(unranked)}
+        </Typography>
       )}
     </Box>
   )

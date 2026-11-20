@@ -16,6 +16,7 @@ const SETTLED: MoteEmptyState = {
   hasRows: true,
   inventoryReady: true,
   hasDump: true,
+  unranked: 0,
   command: '/outputfile inventory'
 }
 
@@ -42,4 +43,9 @@ test('moteEmptyText: "already +10" is said only when both reads settled and a du
   const flags = ['indexReady', 'hasRows', 'inventoryReady', 'hasDump'] as const
   for (const flag of flags) assert.notEqual(moteEmptyText({ ...SETTLED, [flag]: false }), MAXED, `${flag} false`)
   assert.notEqual(moteEmptyText({ ...SETTLED, indexRefused: true }), MAXED, 'indexRefused true')
+})
+
+test('moteEmptyText: with a worn item the item data does not know, "nothing can go higher" is not claimed', () => {
+  // The unknown piece may be +8: the line under this one names it (`moteUnrankedText`).
+  assert.equal(moteEmptyText({ ...SETTLED, unranked: 1 }), 'Every worn piece the item data knows is already +10.')
 })

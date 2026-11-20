@@ -19,6 +19,7 @@ import {
   moteGate,
   moteHours,
   motePlan,
+  moteUnranked,
   planMotesOn,
   sortMoteAdvice
 } from '../src/shared/planner/voidMotes'
@@ -33,6 +34,7 @@ import {
   moteSourceText,
   moteSourceTitle,
   moteTargetLabel,
+  moteUnrankedText,
   sanitizeMotePrefs
 } from '../src/renderer/src/features/gear/voidMotePrefs'
 
@@ -255,6 +257,20 @@ test('moteAdvice: the score is the gain times the hours, and a stat the item lac
   assert.deepEqual([none.gain, none.score], [0, 0])
 })
 
+test('moteUnranked: a worn item the item data does not know is named, not dropped in silence', () => {
+  const { hosts, byKey } = worn([gear('Plate'), gear('Capped'), gear('Unknown To Corpus')], [3, 10, 8])
+  assert.deepEqual(moteUnranked(hosts, byKey), [], 'every worn item has its row')
+  byKey.delete('unknown to corpus')
+  assert.deepEqual(
+    moteUnranked(hosts, byKey).map((h) => [h.key, h.tier]),
+    [['unknown to corpus', 8]]
+  )
+  assert.equal(moteAdvice(hosts, byKey, OPTS).length, 1, 'the ranked list still leaves it out')
+  byKey.delete('capped')
+  assert.equal(moteUnranked(hosts, byKey).length, 1, 'an unknown item at +10 can take no mote, so it is not listed')
+  assert.deepEqual(moteUnranked(hosts, new Map()), [], 'item data with nothing in it is unread, not a list of unknown items')
+})
+
 test('moteAdvice: a focus target scores through the role model, and the class gate decides what counts', () => {
   const { hosts, byKey } = worn([gear('Robe', { stats: { INT: 30 } })], [7])
   const [caster] = moteAdvice(hosts, byKey, { target: 'dd', classes: ['WIZ'] })
@@ -386,4 +402,11 @@ test('the tab words: the source, what it assumed, and why a row is not yet a pic
   assert.equal(moteGateText({ gate: 'rare', gain: 3 }), 'Below +7, but copies barely exist')
   assert.equal(moteGateText({ gate: 'pick', gain: 3 }), '')
   assert.equal(moteGateText({ gate: 'pick', gain: 0 }), 'No gain for your target')
+})
+
+test('the tab words: the worn items left off the list are named with the reason', () => {
+  assert.equal(moteUnrankedText([]), '', 'nothing skipped is no line')
+  const { hosts } = worn([gear('Unknown To Corpus'), gear('No Tier Stated')], [8, undefined])
+  assert.equal(moteUnrankedText(hosts.slice(0, 1)), 'Not ranked: Unknown To Corpus +8 (not in the item data)')
+  assert.equal(moteUnrankedText(hosts), 'Not ranked: Unknown To Corpus +8, No Tier Stated (not in the item data)')
 })
