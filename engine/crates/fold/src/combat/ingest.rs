@@ -144,7 +144,7 @@ fn ingest_world(st: &mut EngineState, ev: &Event) -> bool {
             st.charm.zone(&keys);
             // Somebody else's charm cannot survive a zone either, and neither can a cast in flight.
             // The friendly set survives — it is about people, not about the room.
-            st.ally.zone();
+            zone_ally_binds(st, ev.ts());
             st.log_lazy(ev.ts(), "zone", "info", || {
                 format!("▸ entered {}", ev.str(Key::Zone).unwrap_or_default())
             });
@@ -211,6 +211,19 @@ fn ingest_world(st: &mut EngineState, ev: &Event) -> bool {
             true
         }
         _ => false,
+    }
+}
+
+/// The ally binds a zone line ends, each said out loud: a pet's row that stops with no line to say
+/// why is a bug report nobody can write.
+fn zone_ally_binds(st: &mut EngineState, ts: i64) {
+    for gone in st.ally.zone() {
+        st.log_lazy(ts, "charm", "dropped", || {
+            format!(
+                "✕ {} - {}'s charm ended at the zone line",
+                gone.display, gone.charmer
+            )
+        });
     }
 }
 
