@@ -33,6 +33,12 @@ gated once on a candidate branch (WORKFLOW.md, "Gate") and merged with the tree 
   a "can make now" mark; links from the Character sheet's depot rows, Mobs drop rows and the
   Recommended tab (reasons in BRANCH_NOTES.md).
 
+Owner's answers, 2026-11-20 (rows in `requirements/skills-tab.md`): Cheapest stays ranked on cost
+and gains an "Only use materials I have" option; guide links stay in the README only; the Skills
+tab stays; the wiki is the primary source and guides fill only where it is silent; the Wiki Gaps
+by-product bug is to be fixed; quest pages are already cached, so the Faction goal needs a read of
+them and no request. Items 2 to 7 below are answered by that.
+
 Waiting on the owner:
 
 1. Try it in the dev app (the installed build must be closed first).
