@@ -94,6 +94,7 @@ import { TelemetryNotice } from './features/preferences/TelemetryNotice'
 import { WhatsNewTeaser } from './features/whatsnew/WhatsNewTeaser'
 import { setCurrentView } from './lib/currentView'
 import { dwellView, useViewDwell } from './lib/telemetry'
+import { useLiveDot } from './lib/useLiveDot'
 import { MetInLogFeed } from './lib/useMetInLog'
 
 /**
@@ -472,7 +473,9 @@ export default function App(): JSX.Element {
   const [view, setView] = useState<View>(loadView)
   const [character, setCharacter] = useState<CharacterRef | null>(null)
   const [characters, setCharacters] = useState<CharacterRef[]>([])
-  const [live, setLive] = useState(false)
+  // The live dot: lit by a module's cursor, never by the world-changed frame, and off whenever the
+  // log-read status is not ok (lib/useLiveDot.ts). It clears itself on a rebuild.
+  const { live, clear: clearLive } = useLiveDot()
   const [rebuild, setRebuild] = useState(0)
   // The feedback dialog's open-state + seed (Task #65). Also picks up a crash parked by the
   // ErrorBoundary's "Report this", which reloads the window to get here.
@@ -521,16 +524,11 @@ export default function App(): JSX.Element {
   useEffect(() => {
     void window.eq.getCharacter().then(setCharacter)
     void window.eq.listCharacters().then(setCharacters)
-    // Any served cursor means the engine is folding live events — light the dot. It was a module
-    // DELTA until JOS-499; main folds nothing now, and a cursor is the same evidence: something
-    // moved in a module because the log did.
-    const offDelta = window.eq.onModuleChanged(() => setLive(true))
     // FIX 3: main pushes onCharacter once state is fully rebuilt (startup + switch).
     // Sync the character and bump a rebuild counter so views reliably remount and
     // re-fetch their snapshots against the freshly-rebuilt state.
     const offChar = window.eq.onCharacter((c) => {
       setCharacter(c)
-      setLive(false)
       setRebuild((n) => n + 1)
       // A switch can land on a log created after the list was read (the switch card's new
       // character, 2026-10-19), which would leave the picker showing "Select character".
@@ -547,7 +545,6 @@ export default function App(): JSX.Element {
     )
     const offPrefs = keepPrefsSnapshotCurrent()
     return () => {
-      offDelta()
       offChar()
       offEqConfig()
       offFocus()
@@ -557,7 +554,7 @@ export default function App(): JSX.Element {
 
   const onCharacterSwitched = (c: CharacterRef): void => {
     setCharacter(c)
-    setLive(false)
+    clearLive()
   }
 
   const viewKey = `${character?.logPath ?? 'none'}#${rebuild}`
