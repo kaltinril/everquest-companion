@@ -5,8 +5,10 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
   EMPTY_SKY_OVERLAY,
+  buildSkyOverlayPayload,
   orderSkyOverlayRows,
   parseSkyOverlay,
+  skyOverlayNotice,
   type SkyOverlayRow
 } from '../src/shared/skyQuestOverlay'
 import { applySkyQuestsKnob } from '../src/main/storeSkyQuestsKnob'
@@ -48,6 +50,46 @@ test('a written payload reads back as it was written', () => {
     ]
   }
   assert.deepEqual(parseSkyOverlay(JSON.stringify(payload)), payload)
+})
+
+// COUNTS DRAWN BEFORE THE LOG IS IN. Progress arrives from main at once; the loot and turn-ins come
+// from the engine's fold of the log, which takes minutes on a large log and never arrives when the
+// engine did not start. Until then every starred quest was written as it counted without them
+// (0 held, not ready) and the overlay drew that with no sign. The payload now says so.
+
+const IN = { progress: true, loot: true, turnIns: true }
+
+test('rows written before the loot or the turn-ins are in are marked as pending', () => {
+  const rows = [row('Bard', 'Bard Test of Tone', false)]
+  assert.equal(buildSkyOverlayPayload({ ...IN, loot: false }, rows).countsPending, true)
+  assert.equal(buildSkyOverlayPayload({ ...IN, turnIns: false }, rows).countsPending, true)
+  // Progress present is still `loaded`: the starred list is known, only its counts are not.
+  assert.equal(buildSkyOverlayPayload({ ...IN, loot: false }, rows).loaded, true)
+})
+
+test('with everything in, the payload is the one written before: no extra key, rows in drawing order', () => {
+  const rows = [row('Wizard', 'Wizard Test of Mind', false), row('Bard', 'Bard Test of Song', true)]
+  assert.deepEqual(buildSkyOverlayPayload(IN, rows), { loaded: true, rows: orderSkyOverlayRows(rows) })
+  // Before progress there is nothing to qualify: the overlay says it is waiting.
+  assert.deepEqual(buildSkyOverlayPayload({ progress: false, loot: false, turnIns: false }, []), EMPTY_SKY_OVERLAY)
+})
+
+test('the pending mark survives the storage round trip, and only as a real true', () => {
+  const rows = [row('Bard', 'Bard Test of Tone', false)]
+  const read = parseSkyOverlay(JSON.stringify(buildSkyOverlayPayload({ ...IN, loot: false }, rows)))
+  assert.deepEqual([read.loaded, read.countsPending, read.rows.length], [true, true, 1])
+  assert.equal('countsPending' in parseSkyOverlay(JSON.stringify({ loaded: true, rows, countsPending: 'yes' })), false)
+})
+
+test('the overlay says the counts may be wrong only above rows it is drawing', () => {
+  const rows = [row('Bard', 'Bard Test of Tone', false)]
+  const notice = skyOverlayNotice(buildSkyOverlayPayload({ ...IN, loot: false }, rows))
+  assert.ok(notice)
+  const words = notice.split(/\s+/).length
+  assert.ok(words >= 7 && words <= 15, `one sentence of 7 to 15 words, got ${String(words)}`)
+  assert.equal(skyOverlayNotice(buildSkyOverlayPayload(IN, rows)), null, 'counts in: nothing to say')
+  // No starred quests: the empty text already speaks, and it does not wait on the log.
+  assert.equal(skyOverlayNotice(buildSkyOverlayPayload({ ...IN, loot: false }, [])), null)
 })
 
 test('nothing stored, or nothing readable, is the empty payload', () => {

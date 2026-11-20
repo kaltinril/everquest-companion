@@ -5,13 +5,14 @@
 //! is the TS's exact shape (its `pendingOffer = null` sits outside the `if`).
 //!
 //! `given` is what the trade really took, for the log-only item count (fork #2): each offer with
-//! its stack count, less a cancel (every open offer) and an NPC's refusal (its last offer, as
-//! `gaps_quest_log.rs` reads them). `items` keeps every offer as before; Sky quest crediting reads
+//! its stack count, less a cancel (every open offer), an NPC's refusal (its last offer, as
+//! `gaps_quest_log.rs` reads them) and an offer older than `TRADE_MS` when the next one comes (its
+//! trade never completed). `items` keeps every offer as before; Sky quest crediting reads
 //! `given` (`turnInCelebration.ts`), so a cancelled or refused offer is no turn-in there either.
 
 use crate::event::{Event, Kind};
 use crate::message_overlay::message_text_of;
-use crate::modules::gaps::quests::{refused_here, trade_cancelled, REFUSAL, REFUSE_MS};
+use crate::modules::gaps::quests::{refused_here, trade_cancelled, REFUSAL, REFUSE_MS, TRADE_MS};
 use crate::modules::gaps_players::speaker_of;
 use crate::EqModule;
 use serde::Serialize;
@@ -90,8 +91,12 @@ impl TurnInsModule {
         };
         match self.pending_offer.as_mut() {
             Some(open) if open.npc == npc => {
+                // An offer whose trade never completed went back to the bags (`gaps_quests.rs`
+                // `offered` has the same rule): it is not part of the trade that closes later.
+                let ts = ev.ts();
+                open.given.retain(|(at, _)| ts - at <= TRADE_MS);
                 open.items.push(item);
-                open.given.push((ev.ts(), given));
+                open.given.push((ts, given));
             }
             _ => {
                 self.pending_offer = Some(PendingOffer {
@@ -198,5 +203,33 @@ mod tests {
         fold(&mut m, r#"{"kind":"unknown","seq":3,"ts":3000,"raw":"[x] Lord Ollix Everling says, 'I have no need for this, Drywrought. You can have it back.'"}"#);
         fold(&mut m, r#"{"kind":"trade","seq":4,"ts":3000,"raw":"t","npc":"Lord Ollix Everling"}"#);
         assert_eq!(given_of(&m), json!([{ "item": "Wind Rune", "count": 1 }]));
+    }
+
+    #[test]
+    fn an_offer_whose_trade_never_completed_is_not_given_later() {
+        let mut m = TurnInsModule::new(Some("Drywrought"));
+        // The giver bounced the lone rune (`You must turn in all quest items at once ...`): no trade line.
+        fold(&mut m, r#"{"kind":"offer","seq":0,"ts":1000,"raw":"o","item":"Wind Rune","npc":"Kizdean Gix"}"#);
+        fold(&mut m, r#"{"kind":"offer","seq":1,"ts":401000,"raw":"o","item":"Wind Rune","npc":"Kizdean Gix"}"#);
+        fold(&mut m, r#"{"kind":"offer","seq":2,"ts":402000,"raw":"o","item":"Sphinx Claw","npc":"Kizdean Gix"}"#);
+        fold(&mut m, r#"{"kind":"trade","seq":3,"ts":403000,"raw":"t","npc":"Kizdean Gix"}"#);
+        let row = &m.snapshot()["state"][0];
+        assert_eq!(
+            row["given"],
+            json!([{ "item": "Wind Rune", "count": 1 }, { "item": "Sphinx Claw", "count": 1 }])
+        );
+        assert_eq!(row["items"], json!(["Wind Rune", "Wind Rune", "Sphinx Claw"]));
+    }
+
+    #[test]
+    fn offers_inside_the_trade_window_all_go_over() {
+        let mut m = TurnInsModule::new(Some("Drywrought"));
+        fold(&mut m, r#"{"kind":"offer","seq":0,"ts":1000,"raw":"o","item":"Wind Rune","npc":"Kizdean Gix"}"#);
+        fold(&mut m, r#"{"kind":"offer","seq":1,"ts":301000,"raw":"o","item":"Sphinx Claw","npc":"Kizdean Gix"}"#);
+        fold(&mut m, r#"{"kind":"trade","seq":2,"ts":302000,"raw":"t","npc":"Kizdean Gix"}"#);
+        assert_eq!(
+            given_of(&m),
+            json!([{ "item": "Wind Rune", "count": 1 }, { "item": "Sphinx Claw", "count": 1 }])
+        );
     }
 }

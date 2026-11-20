@@ -9,6 +9,7 @@
 import { useCallback, useRef } from 'react'
 import type { ProgressState } from '@shared/types'
 import {
+  mergeTurnInInstants,
   rejectAllTurnIns,
   takeBackTurnIn,
   type QuestTurnIns,
@@ -37,6 +38,21 @@ export interface TurnInActions {
 }
 
 /**
+ * One quest's turn-ins as the next click must read them: the render's list, plus the '+' stamps it
+ * does not show yet (`unseen`), less the take-backs it still shows (`gone`). Ascending, so the last
+ * one is the newest.
+ */
+function newestKnown(
+  base: readonly number[],
+  sent: readonly number[],
+  cut: readonly number[]
+): { list: number[]; unseen: number[]; gone: number[] } {
+  const unseen = sent.filter((ts) => !base.includes(ts))
+  const gone = cut.filter((ts) => base.includes(ts))
+  return { list: mergeTurnInInstants(base, unseen).filter((ts) => !gone.includes(ts)), unseen, gone }
+}
+
+/**
  * The statements, over the ledger `useTurnInLedger` derived. `detected` is the log's list with the
  * rejections already out, `rejected` the current rejected list, so each statement restates a
  * quest from what the user sees.
@@ -56,6 +72,10 @@ export function useTurnInActions(
   // Instants a '+' already sent that `turnIns` may not show yet: main REPLACES the list, so a
   // second click before the re-render would otherwise restate the old list and drop the first.
   const sent = useRef<Record<string, number[]>>({})
+  // The other half: instants a '-' took back whose reply has not landed, so `turnIns` may still
+  // show them. Held only while the statement is in flight: the reply re-renders at once, and a
+  // trade the log shows again later must stay open to a second take-back.
+  const cut = useRef<Record<string, number[]>>({})
   /** One more turn-in, dated NOW. `Date.now()` is the honest instant for a statement the user is
    *  making right now, and dating it is what keeps the ledger a list of events rather than a tally
    *  (an instant is what dedupes a detected turn-in against the stored one).
@@ -67,11 +87,10 @@ export function useTurnInActions(
    *  earlier instant; a guessed event time is exactly the kind of invention law 1 forbids. */
   const recordTurnIn = useCallback(
     async (key: string): Promise<void> => {
-      const base = turnIns.instants[key] ?? []
-      const unseen = (sent.current[key] ?? []).filter((ts) => !base.includes(ts))
+      const now = newestKnown(turnIns.instants[key] ?? [], sent.current[key] ?? [], cut.current[key] ?? [])
       const stamp = Date.now()
-      sent.current[key] = [...unseen, stamp]
-      setProgress(await window.eq.setQuestTurnIns(key, [...base, ...unseen, stamp]))
+      sent.current[key] = [...now.unseen, stamp]
+      setProgress(await window.eq.setQuestTurnIns(key, [...now.list, stamp]))
     },
     [turnIns, setProgress]
   )
@@ -82,13 +101,26 @@ export function useTurnInActions(
    * existed the control was disabled for a log-detected count, and a wrong detection was
    * permanent. With no instants at all, this clears a pre-JOS-131 completion, which is the only
    * other thing a count can come from.
+   *
+   * It builds on the newest known list, as '+' does: a second '-' before the first reply takes
+   * back a second turn-in, and a '-' right after a '+' takes back that '+'. The rejected list is
+   * restated whole, so a detection an in-flight '-' rejected is rejected in this statement too.
    */
   const undoTurnIn = useCallback(
     async (key: string): Promise<void> => {
       if (detected === null) return
-      sent.current[key] = []
-      const s = takeBackTurnIn(turnIns.instants[key] ?? [], detected[key] ?? [], rejected[key] ?? [])
-      setProgress(await window.eq.setQuestTurnIns(key, s.instants, s.rejected))
+      const now = newestKnown(turnIns.instants[key] ?? [], sent.current[key] ?? [], cut.current[key] ?? [])
+      const det = detected[key] ?? []
+      const refused = [...(rejected[key] ?? []), ...now.gone.filter((ts) => det.includes(ts))]
+      const s = takeBackTurnIn(now.list, det, refused)
+      const newest = now.list[now.list.length - 1]
+      sent.current[key] = now.unseen.filter((ts) => ts !== newest)
+      if (newest !== undefined) cut.current[key] = [...(cut.current[key] ?? []), newest]
+      try {
+        setProgress(await window.eq.setQuestTurnIns(key, s.instants, s.rejected))
+      } finally {
+        cut.current[key] = (cut.current[key] ?? []).filter((ts) => ts !== newest)
+      }
     },
     [turnIns, detected, rejected, setProgress]
   )
@@ -101,6 +133,7 @@ export function useTurnInActions(
   const resetTurnIns = useCallback(async (): Promise<void> => {
     if (detected === null) return
     sent.current = {}
+    cut.current = {}
     let last: ProgressState | null = null
     for (const key of new Set([...Object.keys(turnIns.all), ...Object.keys(detected)])) {
       const s = rejectAllTurnIns(detected[key] ?? [], rejected[key] ?? [])

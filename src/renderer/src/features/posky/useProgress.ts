@@ -40,6 +40,7 @@ import {
   rejectedTurnIns,
   resolveTurnIns,
   turnInsToPersist,
+  undoRejections,
   withoutRejected,
   type DerivedEvidence,
   type QuestTurnIns,
@@ -147,11 +148,12 @@ export interface QuestProgress {
   turnIns: number
   /**
    * How many of those the LOG itself accounts for. The difference (`turnIns - logTurnIns`) is
-   * what the user stated by hand, and it is the only part an "undo" can take back: the log is
-   * evidence, and a control that appeared to delete evidence would silently re-assert it on the
-   * next snapshot.
+   * what the user stated by hand or an older log showed. It does not say which one an undo takes
+   * back: `undoTakesLogTurnIn` does.
    */
   logTurnIns: number
+  /** The newest turn-in is one the log shows, so an undo rejects it for good (`undoRejectsDetection`). */
+  undoTakesLogTurnIn?: boolean
   /** turned in at least once. Kept as the one-bit reading of `turnIns` for the surfaces that
    *  only need the badge (the Ignored list) and for sorts that predate the count. */
   completed: boolean
@@ -186,6 +188,8 @@ export interface QuestProgress {
 export interface QuestTurnInCounts {
   all: Record<string, number>
   log: Record<string, number>
+  /** quest key → an undo would take back a log turn-in (`undoRejections`); absent reads as no */
+  undoesLog?: Record<string, boolean>
 }
 
 /**
@@ -249,6 +253,7 @@ export function computeQuestProgress(
     missing: items.filter((i) => i.have < i.need).map((i) => i.name),
     turnIns: count,
     logTurnIns: turnIns.log[key] ?? 0,
+    undoTakesLogTurnIn: turnIns.undoesLog?.[key] === true,
     completed: count > 0,
     lastDropAt: questDropRecency(items)
   }
@@ -287,6 +292,8 @@ export interface UseProgress {
    * turn-in from a hand-recorded one, so the tab holds both disabled (see `turnInActions.ts`).
    */
   turnInsReady: boolean
+  /** Has the log's loot loaded? Until it has, `lootHistory` is empty and the held counts lack it. */
+  lootReady: boolean
   /**
    * STATE ONE ITEM'S HELD COUNT BY HAND, or take the statement back with `count: null` (JOS-186).
    * Takes the item's DISPLAY name — the counting key is this module's business, not a control's —
@@ -598,6 +605,7 @@ export type InventoryRowsState = Pick<
 interface ProgressCore extends InventoryRowsState {
   progress: ProgressState | null
   ledger: TurnInLedger
+  lootReady: boolean
   itemOverrides: ItemCountOverride[]
   setItemOverride: UseProgress['setItemOverride']
   net: Record<string, number>
@@ -616,7 +624,8 @@ function useProgressCore(opts?: UseProgressOptions): ProgressCore {
   const [progress, setProgress] = useHeldProgress()
   // One pick per window (useCountSource.ts), so every instance of this hook follows the tab's.
   const countSource = useCountSource()
-  const lootHistory = useModule<LootSnap>('loot') ?? EMPTY_LOOT
+  const loot = useModule<LootSnap>('loot')
+  const lootHistory = loot ?? EMPTY_LOOT
   const ledger = useTurnInLedger(progress, setProgress, opts?.onQuestComplete)
 
   const reloadInventory = useCallback(async (): Promise<string> => {
@@ -661,6 +670,7 @@ function useProgressCore(opts?: UseProgressOptions): ProgressCore {
   return {
     progress,
     ledger,
+    lootReady: loot != null,
     lootHistory,
     inventoryRows,
     countSource,
@@ -683,7 +693,7 @@ export function useInventoryRows(): InventoryRowsState {
 export function useProgress(opts?: UseProgressOptions): UseProgress {
   const core = useProgressCore(opts)
   const { progress, ledger, itemOverrides, net, lastLootedAt } = core
-  const { turnIns, logCounts, recordTurnIn, undoTurnIn, resetTurnIns, turnInsReady } = ledger
+  const { turnIns, detected, logCounts, recordTurnIn, undoTurnIn, resetTurnIns, turnInsReady } = ledger
   const [character, setHeard] = useState<string | null>(() => heldNow(heldCharacter) ?? null)
   const setCharacter = useCallback((name: string | null, asked = characterEpoch()) => {
     heldCharacter = holdFor(asked, name)
@@ -705,10 +715,10 @@ export function useProgress(opts?: UseProgressOptions): UseProgress {
   const derived = useDerivedCompletions(posky.quests, progress)
   const quests = useMemo<QuestProgress[]>(() => {
     if (!progress) return []
-    const counts = { all: turnIns.all, log: logCounts }
+    const counts = { all: turnIns.all, log: logCounts, undoesLog: undoRejections(turnIns.instants, detected) }
     const facts = { lastLootedAt, overrides: overridesByKey }
     return posky.quests.map((q) => derived(computeQuestProgress(q, net, counts, facts)))
-  }, [progress, net, lastLootedAt, turnIns, logCounts, overridesByKey, derived])
+  }, [progress, net, lastLootedAt, turnIns, detected, logCounts, overridesByKey, derived])
 
   const classes = useMemo(() => [...new Set(posky.quests.map((q) => q.className))].sort(), [])
 
@@ -726,6 +736,7 @@ export function useProgress(opts?: UseProgressOptions): UseProgress {
     undoTurnIn,
     resetTurnIns,
     turnInsReady,
+    lootReady: core.lootReady,
     setItemOverride: core.setItemOverride,
     itemOverrides,
     inventoryInfo: core.inventoryInfo,

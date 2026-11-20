@@ -14,6 +14,7 @@ import {
   EMPTY_SKY_OVERLAY,
   SKY_OVERLAY_KEY,
   parseSkyOverlay,
+  skyOverlayNotice,
   type SkyOverlayItem,
   type SkyOverlayPayload,
   type SkyOverlayRow
@@ -243,6 +244,8 @@ export default function SkyQuestsOverlay(): JSX.Element {
   const rows = payload.rows
   let ready = 0
   for (const r of rows) if (r.ready) ready++
+  // Rows counted before the log's loot and turn-ins are in: say so, and hold the ready tally.
+  const notice = skyOverlayNotice(payload)
 
   return (
     <div
@@ -265,13 +268,18 @@ export default function SkyQuestsOverlay(): JSX.Element {
         tag="SKY"
         title="Sky quests"
         titleColor={ACCENT}
-        tail={rows.length > 0 ? `${String(ready)}/${String(rows.length)}` : undefined}
+        tail={rows.length > 0 && notice === null ? `${String(ready)}/${String(rows.length)}` : undefined}
         tailTitle="Ready to turn in, of your starred quests"
         iconAccentBg={ACCENT_BG}
         chrome={{ locked, hovering, dragRegion, noDrag, toggleLock, capture }}
       />
 
       <OverlayContent textScale={textScale} testId="sky-overlay-rows" locked={locked} capture={capture}>
+        {notice !== null && (
+          <div data-testid="sky-overlay-notice" style={{ fontSize: 10.5, color: DIM, padding: '2px 2px 4px' }}>
+            {notice}
+          </div>
+        )}
         {rows.length === 0 ? (
           <div data-testid="sky-overlay-empty" style={{ fontSize: 10.5, color: DIM, padding: '8px 2px' }}>
             {emptyText(payload)}

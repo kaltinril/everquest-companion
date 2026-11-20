@@ -33,10 +33,36 @@ export interface SkyOverlayRow {
 export interface SkyOverlayPayload {
   /** false until the main window holds the character's progress */
   loaded: boolean
+  /**
+   * true while the rows were counted without the log's loot or turn-ins: the engine is still
+   * reading the log, or did not start. Written only when true, so a settled payload is unchanged.
+   */
+  countsPending?: boolean
   rows: SkyOverlayRow[]
 }
 
 export const EMPTY_SKY_OVERLAY: SkyOverlayPayload = { loaded: false, rows: [] }
+
+/** What the main window holds when it writes: the character's progress, and the log's two modules. */
+export interface SkyOverlayState {
+  progress: boolean
+  loot: boolean
+  turnIns: boolean
+}
+
+/** The payload the feed writes: the rows in drawing order, and whether their counts can be trusted yet. */
+export function buildSkyOverlayPayload(state: SkyOverlayState, rows: readonly SkyOverlayRow[]): SkyOverlayPayload {
+  const payload: SkyOverlayPayload = { loaded: state.progress, rows: orderSkyOverlayRows(rows) }
+  if (state.progress && !(state.loot && state.turnIns)) payload.countsPending = true
+  return payload
+}
+
+/** The line the overlay draws above rows whose counts are not settled; null when it has nothing to say. */
+export function skyOverlayNotice(payload: SkyOverlayPayload): string | null {
+  return payload.countsPending === true && payload.rows.length > 0
+    ? 'Counts from your log are not in yet, so these may be wrong.'
+    : null
+}
 
 /** Ready rows first, then by class and quest name, so a row moves only when it becomes ready. */
 export function orderSkyOverlayRows(rows: readonly SkyOverlayRow[]): SkyOverlayRow[] {
@@ -85,7 +111,9 @@ export function parseSkyOverlay(raw: string | null): SkyOverlayPayload {
     if (typeof o !== 'object' || o === null) return EMPTY_SKY_OVERLAY
     const p = o as Record<string, unknown>
     const rows = Array.isArray(p.rows) ? p.rows.map(readRow).filter((r) => r !== null) : []
-    return { loaded: p.loaded === true, rows }
+    const payload: SkyOverlayPayload = { loaded: p.loaded === true, rows }
+    if (p.countsPending === true) payload.countsPending = true
+    return payload
   } catch {
     return EMPTY_SKY_OVERLAY
   }
