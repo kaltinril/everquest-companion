@@ -470,6 +470,9 @@ Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`)
 - At 28 px rows (the default since): the menu is no taller than the 820 px drawer and every
   destination row reads back 28.0 px. The row heights always read back exactly as set, so the
   styling holds; only the total was wrong.
+- 2026-11-20, with the Tradeskills row (21 destination rows, ten under Research): the menu's
+  blocks take 774 px of the 820 px drawer and nothing scrolls (`tradeskills.e2e.mts`, the sum of
+  the drawer's children). 46 px spare: one more 28 px row fits, a second does not.
 
 ## The engine against a large log (2026-11-19, owner's PC: 16 cores, 64 GB, busy with other test apps)
 
