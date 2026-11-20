@@ -108,7 +108,8 @@ const VIEWS = [
   'features/timers/TimersView.tsx',
   'features/loot/LootChrome.tsx',
   'features/gaps/GapsView.tsx',
-  'features/bazaar/BazaarView.tsx'
+  'features/bazaar/BazaarView.tsx',
+  'features/skills/SkillsView.tsx'
 ]
 
 test('NO VIEW TELLS THE LINE ITS MODULE IS SERVED WITHOUT ASKING: `served` is never a bare true', () => {
@@ -133,6 +134,14 @@ test('Leveling: the "No level-ups" text is inside the line, and served is the RA
   assert.match(src, /const snap = useModule<LevelingSnap>\('leveling'\)\n/)
   assert.match(src, /<LogReadInline module="leveling" served=\{snap !== null\}[^>]*>[\s\S]{0,260}data-testid="leveling-empty"[\s\S]{0,260}<\/LogReadInline>/)
   assert.equal(count(src, 'data-testid="leveling-empty"'), 1)
+})
+
+test('Skills: the empty text is inside the line, and served is the RAW snapshot', () => {
+  // Before 2026-11-19 the tab drew neither rows nor any line while the log was being read.
+  const src = source('features/skills/SkillsView.tsx')
+  assert.match(src, /const snap = useModule<SkillsSnap>\(SKILLS_MODULE\)\n/)
+  assert.match(src, /<LogReadInline module=\{SKILLS_MODULE\} served=\{snap !== null\}[^>]*>[\s\S]{0,260}data-testid="skills-empty"[\s\S]{0,160}<\/LogReadInline>/)
+  assert.equal(count(src, 'data-testid="skills-empty"'), 1)
 })
 
 test('Timers: "Nothing has died yet" is inside the line, and served is the RAW respawn snapshot', () => {

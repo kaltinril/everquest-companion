@@ -27,6 +27,7 @@ import {
   type SkillsSnap
 } from '@shared/skills'
 import type { View } from '../../appViews'
+import { LogReadInline } from '../../components/LogReadInline'
 import { useModule } from '../../lib/useModule'
 import { formatDateTime } from '../../lib/formatDate'
 import { formatSkillRate } from '../../lib/formatRate'
@@ -123,10 +124,13 @@ function SkillsView(): JSX.Element {
         Skills appear here once the log shows them going up.
       </Typography>
       {rows.length > 0 && <SkillsTable rows={rows} />}
-      {empty !== null && (
-        <Typography variant="body2" color="text.secondary" data-testid="skills-empty" sx={{ py: 4, textAlign: 'center' }}>
-          {empty}
-        </Typography>
+      {/* With no snapshot the list is empty because nothing was served: the line says what the app waits on. */}
+      {rows.length === 0 && (
+        <LogReadInline module={SKILLS_MODULE} served={snap !== null} sx={{ py: 4, textAlign: 'center' }}>
+          <Typography variant="body2" color="text.secondary" data-testid="skills-empty" sx={{ py: 4, textAlign: 'center' }}>
+            {empty}
+          </Typography>
+        </LogReadInline>
       )}
     </Box>
   )
