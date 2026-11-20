@@ -339,6 +339,11 @@ export function setActiveLogPath(logPath: string): void {
   store.set('activeLogPath', logPath)
 }
 
+/** Forget the saved pick: the player pointed the app at a folder with no log to track. */
+export function clearActiveLogPath(): void {
+  store.delete('activeLogPath')
+}
+
 // ----- EQ install-dir override (auto-discovery override) -----
 
 /**

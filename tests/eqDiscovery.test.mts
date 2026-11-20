@@ -29,6 +29,7 @@ import {
   realOverrideProbes,
   tailSurvivesRootChange,
   launchCharacter,
+  savedLogHonoured,
   type DiscoveryProbes
 } from '../src/main/log/discovery'
 
@@ -473,4 +474,30 @@ test('launch: a log written after the saved pick wins; otherwise the pick holds'
   // No list, or a row with no mtime: the pick.
   assert.equal(launchCharacter(drywrought, 1000, null), drywrought)
   assert.equal(launchCharacter(drywrought, 1000, { logPath: 'L/eqlog_X_y.txt' }), drywrought)
+})
+
+// --- savedLogHonoured: the saved pick at launch (2026-11-19) -----------------
+
+test('launch: a saved log under a folder the player moved away from is not honoured', () => {
+  const oldLog =
+    'C:\\Users\\Public\\Daybreak Game Company\\Installed Games\\EverQuest Legends\\Logs\\eqlog_Drywrought_oggok.txt'
+  // The player pointed the app at NEW_LOGS, which has no log yet. The old file still exists, and
+  // that alone used to bring the app back up on it after a restart.
+  assert.equal(savedLogHonoured(oldLog, NEW_LOGS, true, yes), false)
+  // The same pick inside the chosen folder is kept.
+  assert.equal(savedLogHonoured(`${NEW_LOGS}\\eqlog_Drywrought_oggok.txt`, NEW_LOGS, true, yes), true)
+})
+
+test('launch: with no chosen folder the saved log is kept on existence alone', () => {
+  const oldLog = 'E:\\Elsewhere\\Logs\\eqlog_Drywrought_oggok.txt'
+  // This is what rescues a launch where auto-discovery found nothing.
+  assert.equal(savedLogHonoured(oldLog, NEW_LOGS, false, yes), true)
+})
+
+test('launch: a saved log that is gone, or no saved log, is never honoured', () => {
+  for (const chosen of [true, false]) {
+    assert.equal(savedLogHonoured(`${NEW_LOGS}\\eqlog_A_b.txt`, NEW_LOGS, chosen, no), false)
+    assert.equal(savedLogHonoured(undefined, NEW_LOGS, chosen, yes), false)
+    assert.equal(savedLogHonoured('', NEW_LOGS, chosen, yes), false)
+  }
 })

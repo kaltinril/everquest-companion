@@ -14,6 +14,7 @@ import { IPC } from '../shared/ipc'
 import { logConsoleError, logInfo, logWarn } from './errorLog'
 import {
   characterId,
+  eqLogsDir,
   invalidateEqDiscovery,
   listCharacters,
   parseLogName,
@@ -22,7 +23,7 @@ import {
   resolveEqDir,
   tailSurvivesRootChange
 } from './log/config'
-import { launchCharacter } from './log/discovery'
+import { launchCharacter, savedLogHonoured } from './log/discovery'
 // THE SERVED ARM (JOS-496): `mirroredModuleState` answers the `/outputfile` baseline seam from the
 // engine when it is the world answering this app's reads, and `null` — no engine, not yet live, a
 // world just replaced — is every caller's cue to ask this process's own fold instead.
@@ -39,6 +40,7 @@ import { loadInventory } from './inventory/parseInventory'
 import { loadAchievements, loadFactions, watchOutputKind, type OutputKindWatch } from './outputs'
 import { sendWorldRebuilt } from './worldRebuilt'
 import {
+  clearActiveLogPath,
   getActiveLogPath,
   getEqInstallDir,
   batchStore,
@@ -135,7 +137,11 @@ async function resolveMostRecentCharacter(): Promise<CharacterRef | null> {
 async function resolveInitialCharacter(): Promise<CharacterRef | null> {
   const savedPath = getActiveLogPath()
   // A saved log that has since been deleted falls through to the served arm, as the header says.
-  const saved = savedPath && existsSync(savedPath) ? parseLogName(savedPath) : null
+  // So does one left under a folder the player moved away from (`savedLogHonoured`). `EQ_LOG_PATH`
+  // names its own file, so the chosen folder is not asked about under it.
+  const chosen = Boolean(getEqInstallDir()?.trim()) && !process.env.EQ_LOG_PATH
+  const honoured = savedLogHonoured(savedPath, chosen ? eqLogsDir() : '', chosen, existsSync)
+  const saved = savedPath && honoured ? parseLogName(savedPath) : null
   if (!savedPath || !saved) return resolveMostRecentCharacter()
   // Since 2026-10-19 the served list is asked on every launch too: a log written after the saved
   // one is a character played since, and it wins (log/discovery.ts `launchCharacter`).
@@ -208,6 +214,8 @@ export async function applyEqDirChange(): Promise<EqConfig> {
     factionsWatch?.close()
     factionsWatch = null
     character = null
+    // The saved pick goes with it, or the next launch would start from the log just left behind.
+    clearActiveLogPath()
     // Every window that folds a module, not just the main one (JOS-172): an overlay left open
     // over an install whose log went away must empty with everything else.
     sendWorldRebuilt(null)
