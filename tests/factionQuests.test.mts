@@ -75,17 +75,24 @@ test('the real catalog answers the questions the tab was built for', () => {
   //
   // THE WIKI CAUGHT UP ON THAT ONE (read by the 2026-10-10 delta run): the This Means Warrr page now
   // states `Kerra Isle +20`, so it rides the RAISE list with its amount and leaves the nearby list -
-  // the rule asserted just below. The home-zone inference still carries the island's other silent
-  // quests; Fang Tooth (the Fishbone Necklace) is the one pinned now.
+  // the rule asserted just below.
+  //
+  // ELEVEN MORE PAGES STATED IT ALL ALONG, UNLINKED (`Your faction standing with Kerra Isle has been
+  // adjusted by 20.`): the parser reads a plain-text game line since 2026-11-20, so Fang Tooth (the
+  // Fishbone Necklace) and the others ride the RAISE list too. The home-zone inference still
+  // carries the island's silent quests; Shiny Rings is the one pinned now.
   assert.equal(kerra.homeZone, 'Kerra Island')
   const warrr = kerra.raise.find((q) => q.name === 'This Means Warrr')
   assert.ok(warrr, 'the regen necklace quest now states its Kerra Isle raise')
   assert.equal(warrr.amount, 20)
   assert.deepEqual(warrr.rewards, ['Talisman of Kejaar Kerrath'])
   assert.ok(!kerra.nearby.some((q) => q.name === 'This Means Warrr'), 'and so is no longer a nearby candidate')
-  const fang = kerra.nearby.find((q) => q.name === 'Fang Tooth (quest)')
-  assert.ok(fang, 'the silent Kerra Island quests ride the nearby list')
+  const fang = kerra.raise.find((q) => q.name === 'Fang Tooth (quest)')
+  assert.ok(fang, 'a plain-text receipt line is a stated raise')
+  assert.equal(fang.amount, 20)
   assert.deepEqual(fang.rewards, ['Fishbone Necklace'])
+  assert.ok(!kerra.nearby.some((q) => q.name === 'Fang Tooth (quest)'))
+  assert.ok(kerra.nearby.some((q) => q.name === 'Shiny Rings'), 'the silent Kerra Island quests ride the nearby list')
   // A quest with a stated faction effect is never ALSO a nearby candidate.
   assert.ok(!kerra.nearby.some((q) => q.name === 'Rat Teeth'))
 })

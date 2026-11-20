@@ -217,23 +217,28 @@
       "factions": [
         {
           "name": "Priests of Life",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Knights of Thunder",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Guards of Qeynos",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Bloodsabers",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "Antonius Bayle",
-          "up": true
+          "up": true,
+          "amount": 5
         }
       ]
     },
@@ -277,6 +282,7 @@
         },
         {
           "name": "Mayong Mistmoore (Faction)",
+          "label": "Mayong Mistmoore",
           "up": false
         }
       ]
@@ -628,6 +634,11 @@
         },
         {
           "name": "Heretics",
+          "up": false
+        },
+        {
+          "name": "Bloodsabers",
+          "plain": true,
           "up": false
         }
       ],
@@ -1198,7 +1209,33 @@
       "requiredItems": [
         "Spectacle"
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "Knights of Thunder",
+          "plain": true,
+          "up": true,
+          "amount": 20
+        },
+        {
+          "name": "Bloodsabers",
+          "plain": true,
+          "up": false,
+          "amount": -20
+        },
+        {
+          "name": "Priests of Life",
+          "plain": true,
+          "up": true,
+          "amount": 15
+        },
+        {
+          "name": "Guards of Qeynos",
+          "plain": true,
+          "up": true,
+          "amount": 15
+        }
+      ]
     },
     {
       "name": "Bard Epic Quest",
@@ -1321,6 +1358,7 @@
         },
         {
           "name": "King Tormax (Faction)",
+          "label": "King Tormax",
           "up": true
         },
         {
@@ -1371,6 +1409,18 @@
         "Ruby"
       ],
       "expReward": true,
+      "factions": [
+        {
+          "name": "Temple Of Sol Ro",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "Shadowed Men",
+          "plain": true,
+          "up": false
+        }
+      ],
       "coin": "550 gold"
     },
     {
@@ -1427,6 +1477,7 @@
         },
         {
           "name": "Mayong Mistmoore (Faction)",
+          "label": "Mayong Mistmoore",
           "up": false
         }
       ]
@@ -1614,15 +1665,24 @@
       "factions": [
         {
           "name": "Deepwater Knights",
-          "up": true
+          "up": true,
+          "amount": 20
         },
         {
           "name": "High Council of Erudin",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Heretics",
-          "up": false
+          "up": false,
+          "amount": -3
+        },
+        {
+          "name": "Kerra Isle",
+          "plain": true,
+          "up": false,
+          "amount": -2
         }
       ]
     },
@@ -2461,18 +2521,22 @@
         },
         {
           "name": "Circle Of Unseen Hands",
+          "label": "CircleofUnseenHands",
           "up": true
         },
         {
           "name": "Merchants of Rivervale",
+          "label": "MerchantsofRivervale",
           "up": false
         },
         {
           "name": "Coalition of Tradefolk Underground",
+          "label": "CoalitionofTradeFolkIll",
           "up": true
         },
         {
           "name": "Carson McCabe",
+          "label": "CarsonMcCabe",
           "up": true
         }
       ]
@@ -2508,7 +2572,8 @@
         },
         {
           "name": "Merchants of Qeynos",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "Corrupt Qeynos Guards",
@@ -2516,7 +2581,8 @@
         },
         {
           "name": "Guards of Qeynos",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "Kane Bayle",
@@ -2524,11 +2590,13 @@
         },
         {
           "name": "Karana Residents",
-          "up": true
+          "up": true,
+          "amount": 30
         },
         {
           "name": "Priests of Life",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Knights of Thunder",
@@ -3091,23 +3159,28 @@
       "factions": [
         {
           "name": "Legion of Cabilis",
-          "up": true
+          "up": true,
+          "amount": 1
         },
         {
           "name": "Cabilis Residents",
-          "up": true
+          "up": true,
+          "amount": 1
         },
         {
           "name": "Scaled Mystics",
-          "up": true
+          "up": true,
+          "amount": 1
         },
         {
           "name": "Crusaders Of Greenmist",
-          "up": true
+          "up": true,
+          "amount": 1
         },
         {
           "name": "Swift Tails",
-          "up": true
+          "up": true,
+          "amount": 1
         }
       ]
     },
@@ -3268,6 +3341,18 @@
         "Thunder Staff",
         "Bayle List II",
         "Mammoth's Hide"
+      ],
+      "factions": [
+        {
+          "name": "Knightsofthunder",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "Bloodsabers",
+          "plain": true,
+          "up": false
+        }
       ]
     },
     {
@@ -3346,15 +3431,18 @@
       "factions": [
         {
           "name": "Dreadguard Outer",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Dreadguard Inner",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Dark Bargainers",
-          "up": true
+          "up": true,
+          "amount": 10
         }
       ]
     },
@@ -3495,6 +3583,7 @@
       "factions": [
         {
           "name": "Venril Sathir (Faction)",
+          "label": "Venril Sathir",
           "up": true
         }
       ]
@@ -3630,7 +3719,39 @@
       "relatedNpcs": [
         "Vhalen Nostrolo"
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "League of Antonican Bards",
+          "plain": true,
+          "up": true,
+          "amount": 20
+        },
+        {
+          "name": "Knights of Truth",
+          "plain": true,
+          "up": true,
+          "amount": 3
+        },
+        {
+          "name": "Guards of Qeynos",
+          "plain": true,
+          "up": true,
+          "amount": 3
+        },
+        {
+          "name": "Ring of Scale",
+          "plain": true,
+          "up": false,
+          "amount": -1
+        },
+        {
+          "name": "Mayong Mistmoore",
+          "plain": true,
+          "up": false,
+          "amount": -1
+        }
+      ]
     },
     {
       "name": "Broom Of Trilon Quest",
@@ -3844,6 +3965,7 @@
         },
         {
           "name": "King Ak'Anon (Faction)",
+          "label": "King Ak'Anon",
           "up": true
         }
       ]
@@ -3993,19 +4115,23 @@
       "factions": [
         {
           "name": "Kromzek",
-          "up": true
+          "up": true,
+          "amount": 40
         },
         {
           "name": "Kromrif",
-          "up": true
+          "up": true,
+          "amount": 10
         },
         {
           "name": "King Tormax",
-          "up": true
+          "up": true,
+          "amount": 10
         },
         {
           "name": "Claws of Veeshan",
-          "up": false
+          "up": false,
+          "amount": -20
         }
       ]
     },
@@ -5050,6 +5176,7 @@
       "factions": [
         {
           "name": "Circle Of Unseen Hands",
+          "label": "Circle of Unseen Hands",
           "up": false
         },
         {
@@ -5202,6 +5329,7 @@
         },
         {
           "name": "King Tormax (Faction)",
+          "label": "King Tormax",
           "up": true
         },
         {
@@ -5898,19 +6026,24 @@
       "factions": [
         {
           "name": "Coldain",
-          "up": true
+          "up": true,
+          "amount": 10
         },
         {
           "name": "Dain Frostreaver IV (Faction)",
-          "up": true
+          "label": "Dain Frostreaver IV",
+          "up": true,
+          "amount": 2
         },
         {
           "name": "Kromzek",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "Kromrif",
-          "up": false
+          "up": false,
+          "amount": -5
         }
       ]
     },
@@ -6014,10 +6147,12 @@
       "factions": [
         {
           "name": "Coldain",
-          "up": true
+          "up": true,
+          "amount": 10
         },
         {
           "name": "Dain Frostreaver IV (Faction)",
+          "label": "Dain Frostreaver IV",
           "up": true
         },
         {
@@ -6030,7 +6165,8 @@
         },
         {
           "name": "Dain Frostreaver IV",
-          "up": true
+          "up": true,
+          "amount": 10
         },
         {
           "name": "Rygorr Clan Snow Orcs",
@@ -6294,23 +6430,28 @@
       "factions": [
         {
           "name": "Knights of Truth",
-          "up": true
+          "up": true,
+          "amount": 10
         },
         {
           "name": "Priests of Marr",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Steel Warriors",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Dismal Rage",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "Freeport Militia",
-          "up": false
+          "up": false,
+          "amount": -1
         }
       ]
     },
@@ -6336,23 +6477,28 @@
       "factions": [
         {
           "name": "Knights of Truth",
-          "up": true
+          "up": true,
+          "amount": 25
         },
         {
           "name": "Dismal Rage",
-          "up": false
+          "up": false,
+          "amount": -3
         },
         {
           "name": "The Freeport Militia",
-          "up": false
+          "up": false,
+          "amount": -3
         },
         {
           "name": "Priests of Marr",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Steel Warriors",
-          "up": true
+          "up": true,
+          "amount": 5
         }
       ]
     },
@@ -6690,6 +6836,13 @@
       "requiredItems": [
         "Bone Chips",
         "Dwarf Bones"
+      ],
+      "factions": [
+        {
+          "name": "Clerics of Underfoot",
+          "plain": true,
+          "up": true
+        }
       ]
     },
     {
@@ -6733,51 +6886,63 @@
       "factions": [
         {
           "name": "Craknek Warriors",
-          "up": true
+          "up": true,
+          "amount": 10
         },
         {
           "name": "Clurg",
-          "up": true
+          "up": true,
+          "amount": 1
         },
         {
           "name": "Green Blood Knights",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "The Dead",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Queen Cristanos Thex",
-          "up": true
+          "up": true,
+          "amount": 1
         },
         {
           "name": "King Naythox Thex",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "Keepers of the Art",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "Eldritch Collective",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "Primordial Malice",
-          "up": false
+          "up": false,
+          "amount": -10
         },
         {
           "name": "Indigo Brotherhood",
-          "up": false
+          "up": false,
+          "amount": -200
         },
         {
           "name": "Emerald Warriors",
-          "up": true
+          "up": true,
+          "amount": 30
         },
         {
           "name": "Steel Warriors",
-          "up": true
+          "up": true,
+          "amount": 10
         }
       ]
     },
@@ -6982,23 +7147,28 @@
       "factions": [
         {
           "name": "Storm Guard",
-          "up": true
+          "up": true,
+          "amount": 10
         },
         {
           "name": "Kazon Stormhammer",
-          "up": true
+          "up": true,
+          "amount": 1
         },
         {
           "name": "Miners Guild 249",
-          "up": true
+          "up": true,
+          "amount": 1
         },
         {
           "name": "Merchants of Kaladim",
-          "up": true
+          "up": true,
+          "amount": 2
         },
         {
           "name": "Craknek Warriors",
-          "up": false
+          "up": false,
+          "amount": -2
         }
       ]
     },
@@ -7780,6 +7950,7 @@
       "factions": [
         {
           "name": "Temple Of Sol Ro",
+          "label": "Temple of Sol Ro",
           "up": true
         },
         {
@@ -7852,8 +8023,32 @@
       "expReward": true,
       "factions": [
         {
+          "name": "Steel Warriors",
+          "plain": true,
+          "up": true,
+          "amount": 5
+        },
+        {
+          "name": "Guards of Qeynos",
+          "plain": true,
+          "up": true,
+          "amount": 5
+        },
+        {
+          "name": "Corrupt Qeynos Guards",
+          "plain": true,
+          "up": false,
+          "amount": -1
+        },
+        {
+          "name": "The Freeport Militia",
+          "up": false,
+          "amount": -1
+        },
+        {
           "name": "Knights of Truth",
-          "up": false
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Priests of Marr",
@@ -8012,18 +8207,22 @@
       "factions": [
         {
           "name": "Storm Reapers",
+          "label": "StormReapers",
           "up": true
         },
         {
           "name": "Mayor Gubbin",
+          "label": "MayorGubbin",
           "up": true
         },
         {
           "name": "Merchants of Rivervale",
+          "label": "MerchantsofRivervale",
           "up": true
         },
         {
           "name": "Unkempt Druids",
+          "label": "UnkemptDruids",
           "up": false
         }
       ]
@@ -8094,7 +8293,24 @@
       "requiredItems": [
         "Sealed Letter"
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "King Tormax",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "Kromzek",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "Yelinak",
+          "plain": true,
+          "up": false
+        }
+      ]
     },
     {
       "name": "Direwolf Fur Cloak Quest",
@@ -8661,6 +8877,7 @@
         },
         {
           "name": "King Tormax (Faction)",
+          "label": "King Tormax",
           "up": true
         },
         {
@@ -9140,7 +9357,8 @@
         },
         {
           "name": "Claws of Veeshan",
-          "up": true
+          "up": true,
+          "amount": 10
         },
         {
           "name": "Yelinak",
@@ -9306,6 +9524,7 @@
         },
         {
           "name": "King Tormax (Faction)",
+          "label": "King Tormax",
           "up": true
         },
         {
@@ -10162,6 +10381,7 @@
         },
         {
           "name": "Mayong Mistmoore (Faction)",
+          "label": "Mayong Mistmoore",
           "up": false,
           "amount": -1
         }
@@ -10184,6 +10404,18 @@
       "rewards": [
         {
           "name": "Holgresh Mojo Stick (Air)"
+        }
+      ],
+      "factions": [
+        {
+          "name": "Kromzek",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "Kromrif",
+          "plain": true,
+          "up": true
         }
       ]
     },
@@ -10209,7 +10441,15 @@
           "name": "Fishbone Necklace"
         }
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "Kerra Isle",
+          "plain": true,
+          "up": true,
+          "amount": 20
+        }
+      ]
     },
     {
       "name": "Faren's Tacklebox",
@@ -10367,7 +10607,15 @@
         "Fire Beetle Leg",
         "Backpack"
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "Kerra Isle",
+          "plain": true,
+          "up": true,
+          "amount": 20
+        }
+      ]
     },
     {
       "name": "Field Supplies Quest",
@@ -10597,7 +10845,15 @@
       "requiredItems": [
         "Emissary Head"
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "Kerra Isle",
+          "plain": true,
+          "up": true,
+          "amount": 20
+        }
+      ]
     },
     {
       "name": "Fish Dinner",
@@ -10630,7 +10886,15 @@
       "requiredItems": [
         "Raw Darkwater Piranha"
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "Kerra Isle",
+          "plain": true,
+          "up": true,
+          "amount": 20
+        }
+      ]
     },
     {
       "name": "Fisherman Convert",
@@ -11534,15 +11798,18 @@
       "factions": [
         {
           "name": "Dain Frostreaver IV",
-          "up": true
+          "up": true,
+          "amount": 50
         },
         {
           "name": "Coldain",
-          "up": true
+          "up": true,
+          "amount": 50
         },
         {
           "name": "King Tormax",
-          "up": false
+          "up": false,
+          "amount": -25
         }
       ]
     },
@@ -11597,7 +11864,24 @@
       "requiredItems": [
         "Vluudeen's Tail"
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "Kromrif",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "Kromzek",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "Coldain",
+          "plain": true,
+          "up": false
+        }
+      ]
     },
     {
       "name": "Gloves of Earthcrafting Quest",
@@ -11815,7 +12099,34 @@
       "relatedZones": [
         "Qeynos Hills"
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "Jaggedpine Treefolk",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "Protectors of Pine",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "QRG Protected Animals",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "Unkempt Druids",
+          "plain": true,
+          "up": false
+        },
+        {
+          "name": "Guards of Qeynos",
+          "plain": true,
+          "up": true
+        }
+      ]
     },
     {
       "name": "Gnoll Scalp Collecting",
@@ -11837,23 +12148,28 @@
       "factions": [
         {
           "name": "Corrupt Qeynos Guards",
-          "up": true
+          "up": true,
+          "amount": 2
         },
         {
           "name": "Freeport Militia",
-          "up": true
+          "up": true,
+          "amount": 1
         },
         {
           "name": "Highpass Guards",
-          "up": true
+          "up": true,
+          "amount": 1
         },
         {
           "name": "Merchants of Highpass",
-          "up": true
+          "up": true,
+          "amount": 1
         },
         {
           "name": "Carson McCabe",
-          "up": true
+          "up": true,
+          "amount": 1
         }
       ]
     },
@@ -12096,23 +12412,29 @@
       "factions": [
         {
           "name": "League of Antonican Bards",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Knights of Truth",
-          "up": true
+          "up": true,
+          "amount": 1
         },
         {
           "name": "Guards of Qeynos",
-          "up": true
+          "up": true,
+          "amount": 1
         },
         {
           "name": "Ring of Scale",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "Mayong Mistmoore (Faction)",
-          "up": false
+          "label": "Mayong Mistmoore",
+          "up": false,
+          "amount": -1
         }
       ]
     },
@@ -12155,6 +12477,7 @@
         },
         {
           "name": "Mayong Mistmoore (Faction)",
+          "label": "Mayong Mistmoore",
           "up": false
         }
       ]
@@ -12198,6 +12521,7 @@
         },
         {
           "name": "Mayong Mistmoore (Faction)",
+          "label": "Mayong Mistmoore",
           "up": false
         }
       ]
@@ -12487,23 +12811,28 @@
       "factions": [
         {
           "name": "Corrupt Qeynos Guards",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Guards of Qeynos",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "Kane Bayle",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Circle Of Unseen Hands",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Bloodsabers",
-          "up": true
+          "up": true,
+          "amount": 5
         }
       ]
     },
@@ -14562,19 +14891,23 @@
       "factions": [
         {
           "name": "Protectors of Pine",
-          "up": true
+          "up": true,
+          "amount": 100
         },
         {
           "name": "Jaggedpine Treefolk",
-          "up": true
+          "up": true,
+          "amount": 25
         },
         {
           "name": "Sabertooths of Blackburrow",
-          "up": false
+          "up": false,
+          "amount": -15
         },
         {
           "name": "Guards of Qeynos",
-          "up": true
+          "up": true,
+          "amount": 25
         }
       ]
     },
@@ -15947,19 +16280,27 @@
       "factions": [
         {
           "name": "Indigo Brotherhood",
-          "up": true
+          "label": "IndigoBrotherhood",
+          "up": true,
+          "amount": 50
         },
         {
           "name": "Emerald Warriors",
-          "up": false
+          "label": "EmeraldWarriors",
+          "up": false,
+          "amount": -7
         },
         {
           "name": "Steel Warriors",
-          "up": false
+          "label": "SteelWarriors",
+          "up": false,
+          "amount": -2
         },
         {
           "name": "Primordial Malice",
-          "up": false
+          "label": "PrimordialMalice",
+          "up": false,
+          "amount": -100
         }
       ]
     },
@@ -16225,7 +16566,15 @@
         "Odd Kobold Paw",
         "Snake Fang"
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "Kerra Isle",
+          "plain": true,
+          "up": true,
+          "amount": 20
+        }
+      ]
     },
     {
       "name": "HEHE Meat Quest",
@@ -16349,15 +16698,18 @@
       "factions": [
         {
           "name": "Claws of Veeshan",
-          "up": true
+          "up": true,
+          "amount": 15
         },
         {
           "name": "Yelinak",
-          "up": true
+          "up": true,
+          "amount": 3
         },
         {
           "name": "Kromzek",
-          "up": false
+          "up": false,
+          "amount": -7
         }
       ]
     },
@@ -16426,35 +16778,43 @@
       "factions": [
         {
           "name": "Heretics",
-          "up": false
+          "up": false,
+          "amount": -20
         },
         {
           "name": "Deepwater Knights",
-          "up": true
+          "up": true,
+          "amount": 20
         },
         {
           "name": "Gate Callers",
-          "up": true
+          "up": true,
+          "amount": 20
         },
         {
           "name": "Craftkeepers",
-          "up": true
+          "up": true,
+          "amount": 20
         },
         {
           "name": "Crimson Hands",
-          "up": true
+          "up": true,
+          "amount": 20
         },
         {
           "name": "Kerra Isle",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "High Guard of Erudin",
-          "up": true
+          "up": true,
+          "amount": 7
         },
         {
           "name": "High Council of Erudin",
-          "up": true
+          "up": true,
+          "amount": 5
         }
       ]
     },
@@ -16523,7 +16883,15 @@
       "requiredItems": [
         "Heretics' Toy"
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "Kerra Isle",
+          "plain": true,
+          "up": true,
+          "amount": 20
+        }
+      ]
     },
     {
       "name": "Heretic's Toy",
@@ -16550,7 +16918,15 @@
       "requiredItems": [
         "Heretics' Toy"
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "Kerra Isle",
+          "plain": true,
+          "up": true,
+          "amount": 20
+        }
+      ]
     },
     {
       "name": "Hero Bracers Quest",
@@ -17151,8 +17527,13 @@
       "expReward": true,
       "factions": [
         {
+          "name": "Neriak Trolls",
+          "up": false
+        },
+        {
           "name": "Shadowknights of Night Keep",
-          "up": true
+          "up": true,
+          "amount": 50
         },
         {
           "name": "Green Blood Knights",
@@ -17514,19 +17895,23 @@
       "factions": [
         {
           "name": "Arcane Scientists",
-          "up": true
+          "up": true,
+          "amount": 10
         },
         {
           "name": "Knights of Truth",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Opal Dark Briar",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "The Freeport Militia",
-          "up": false
+          "up": false,
+          "amount": -1
         }
       ]
     },
@@ -17897,39 +18282,48 @@
       "factions": [
         {
           "name": "Heretics",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Craftkeepers",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "High Council of Erudin",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "High Guard of Erudin",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "Coalition of Tradefolk Underground",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Coalition of Tradefolk",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Carson McCabe",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Corrupt Qeynos Guards",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Freeport Militia",
-          "up": true
+          "up": true,
+          "amount": 5
         }
       ]
     },
@@ -18039,35 +18433,43 @@
       "factions": [
         {
           "name": "King Naythox Thex",
-          "up": true
+          "up": true,
+          "amount": 7
         },
         {
           "name": "Priests of Innoruuk",
-          "up": true
+          "up": true,
+          "amount": 50
         },
         {
           "name": "Clerics of Tunare",
-          "up": false
+          "up": false,
+          "amount": -12
         },
         {
           "name": "Priests of Life",
-          "up": false
+          "up": false,
+          "amount": -7
         },
         {
           "name": "Priests of Marr",
-          "up": false
+          "up": false,
+          "amount": -17
         },
         {
           "name": "Primordial Malice",
-          "up": false
+          "up": false,
+          "amount": -200
         },
         {
           "name": "The Dead",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "The Spurned",
-          "up": true
+          "up": true,
+          "amount": 10
         }
       ]
     },
@@ -18626,6 +19028,7 @@
         },
         {
           "name": "Zlandicar (Faction)",
+          "label": "Zlandicar",
           "up": false
         },
         {
@@ -18659,6 +19062,7 @@
       "factions": [
         {
           "name": "Zlandicar (Faction)",
+          "label": "Zlandicar",
           "up": true
         },
         {
@@ -19040,7 +19444,8 @@
       "factions": [
         {
           "name": "Heretics",
-          "up": true
+          "up": true,
+          "amount": 10
         },
         {
           "name": "Deepwater Knights",
@@ -19166,15 +19571,18 @@
       "factions": [
         {
           "name": "Peace Keepers",
-          "up": true
+          "up": true,
+          "amount": 20
         },
         {
           "name": "High Council of Erudin",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Heretics",
-          "up": false
+          "up": false,
+          "amount": -5
         }
       ]
     },
@@ -19926,6 +20334,7 @@
         },
         {
           "name": "King Tormax (Faction)",
+          "label": "King Tormax",
           "up": true
         },
         {
@@ -19954,7 +20363,14 @@
       "requiredItems": [
         "Mystic Doll"
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "Clurg",
+          "plain": true,
+          "up": true
+        }
+      ]
     },
     {
       "name": "Lizard Meat No 2",
@@ -20268,15 +20684,18 @@
       "factions": [
         {
           "name": "Dismal Rage",
-          "up": false
+          "up": false,
+          "amount": -5
         },
         {
           "name": "Knights of Truth",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Opal Darkbriar",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "Arcane Scientists",
@@ -20933,7 +21352,8 @@
       "factions": [
         {
           "name": "Shamen of War",
-          "up": true
+          "up": true,
+          "amount": 25
         }
       ]
     },
@@ -21203,11 +21623,13 @@
       "factions": [
         {
           "name": "Claws of Veeshan",
-          "up": true
+          "up": true,
+          "amount": 6
         },
         {
           "name": "Yelinak",
-          "up": true
+          "up": true,
+          "amount": 6
         },
         {
           "name": "Kromzek",
@@ -21313,27 +21735,33 @@
       "factions": [
         {
           "name": "The Freeport Militia",
-          "up": true
+          "up": true,
+          "amount": 25
         },
         {
           "name": "Coalition of Tradefolk Underground",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Knights of Truth",
-          "up": false
+          "up": false,
+          "amount": -2
         },
         {
           "name": "Priests of Marr",
-          "up": false
+          "up": false,
+          "amount": -2
         },
         {
           "name": "Dismal Rage",
-          "up": true
+          "up": true,
+          "amount": 20
         },
         {
           "name": "Opal Dark Briar",
-          "up": true
+          "up": true,
+          "amount": 5
         }
       ]
     },
@@ -21661,23 +22089,28 @@
       "factions": [
         {
           "name": "Eldritch Collective",
-          "up": true
+          "up": true,
+          "amount": 20
         },
         {
           "name": "Dark Reflection",
-          "up": false
+          "up": false,
+          "amount": -3
         },
         {
           "name": "The Dead",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "Gem Choppers",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "King Ak'Anon",
-          "up": true
+          "up": true,
+          "amount": 5
         }
       ]
     },
@@ -21959,6 +22392,7 @@
         },
         {
           "name": "King Tormax (Faction)",
+          "label": "King Tormax",
           "up": true
         },
         {
@@ -22540,36 +22974,133 @@
       "expReward": true,
       "factions": [
         {
-          "name": "Merchants of Qeynos",
-          "up": true
+          "name": "Merchants of Kaladim",
+          "plain": true,
+          "up": true,
+          "amount": 2
         },
         {
-          "name": "Coalition of Tradefolk",
-          "up": true
+          "name": "Storm Guard",
+          "plain": true,
+          "up": true,
+          "amount": 1
+        },
+        {
+          "name": "Miners Guild 628",
+          "plain": true,
+          "up": false,
+          "amount": -1
+        },
+        {
+          "name": "Miners Guild 249",
+          "plain": true,
+          "up": true,
+          "amount": 1
+        },
+        {
+          "name": "Kazon Stormhammer",
+          "plain": true,
+          "up": true,
+          "amount": 1
+        },
+        {
+          "name": "Merchants of Qeynos",
+          "up": true,
+          "amount": 2
+        },
+        {
+          "name": "Circle of Unseen Hands",
+          "up": false,
+          "amount": -1
         },
         {
           "name": "Antonius Bayle",
-          "up": true
+          "up": true,
+          "amount": 1
+        },
+        {
+          "name": "Coalition of Tradefolk",
+          "up": true,
+          "amount": 1
         },
         {
           "name": "Guards of Qeynos",
-          "up": true
+          "up": true,
+          "amount": 1
         },
         {
           "name": "Freeport Militia",
-          "up": true
+          "up": true,
+          "amount": 2
         },
         {
           "name": "Coalition of Tradefolk Underground",
-          "up": true
+          "up": true,
+          "amount": 1
         },
         {
           "name": "Knights of Truth",
-          "up": true
+          "up": false,
+          "amount": -1
         },
         {
           "name": "Priests of Marr",
-          "up": true
+          "up": false,
+          "amount": -1
+        },
+        {
+          "name": "Merchants of Halas",
+          "plain": true,
+          "up": true,
+          "amount": 2
+        },
+        {
+          "name": "Wolves of the North",
+          "plain": true,
+          "up": true,
+          "amount": 1
+        },
+        {
+          "name": "Shamen of Justice",
+          "plain": true,
+          "up": true,
+          "amount": 1
+        },
+        {
+          "name": "Merchants of Oggok",
+          "plain": true,
+          "up": true,
+          "amount": 5
+        },
+        {
+          "name": "Clurg",
+          "plain": true,
+          "up": true,
+          "amount": 5
+        },
+        {
+          "name": "Oggok Guards",
+          "plain": true,
+          "up": true,
+          "amount": 5
+        },
+        {
+          "name": "Dark Bargainers",
+          "plain": true,
+          "up": true,
+          "amount": 2
+        },
+        {
+          "name": "Dreadguard Outer",
+          "plain": true,
+          "up": true,
+          "amount": 1
+        },
+        {
+          "name": "Dreadguard Inner",
+          "plain": true,
+          "up": true,
+          "amount": 1
         },
         {
           "name": "Kelethin Merchants",
@@ -22582,6 +23113,24 @@
         {
           "name": "Emerald Warriors",
           "up": true
+        },
+        {
+          "name": "Merchants of Erudin",
+          "plain": true,
+          "up": true,
+          "amount": 2
+        },
+        {
+          "name": "High Council of Erudin",
+          "plain": true,
+          "up": true,
+          "amount": 1
+        },
+        {
+          "name": "High Guard of Erudin",
+          "plain": true,
+          "up": true,
+          "amount": 1
         }
       ]
     },
@@ -23543,15 +24092,18 @@
       "factions": [
         {
           "name": "Silent Fist Clan",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Guards of Qeynos",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Ashen Order",
-          "up": true
+          "up": true,
+          "amount": 5
         }
       ]
     },
@@ -23579,23 +24131,28 @@
       "factions": [
         {
           "name": "Coalition of Tradefolk Underground",
-          "up": true
+          "up": true,
+          "amount": 10
         },
         {
           "name": "Coalition of Tradefolk",
-          "up": true
+          "up": true,
+          "amount": 10
         },
         {
           "name": "Carson McCabe",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Corrupt Qeynos Guards",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "The Freeport Militia",
-          "up": true
+          "up": true,
+          "amount": 5
         }
       ]
     },
@@ -23676,15 +24233,24 @@
       "factions": [
         {
           "name": "Deepwater Knights",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "High Council of Erudin",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Heretics",
-          "up": false
+          "up": false,
+          "amount": -1
+        },
+        {
+          "name": "Kerra Isle",
+          "plain": true,
+          "up": false,
+          "amount": -1
         }
       ]
     },
@@ -24063,11 +24629,13 @@
         },
         {
           "name": "Clerics of Tunare",
-          "up": true
+          "up": true,
+          "amount": 10
         },
         {
           "name": "King Tearis Thex",
-          "up": true
+          "up": true,
+          "amount": 10
         }
       ]
     },
@@ -24495,23 +25063,28 @@
       "factions": [
         {
           "name": "Bloodsabers",
-          "up": true
+          "up": true,
+          "amount": 10
         },
         {
           "name": "Guards of Qeynos",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "Opal Dark Briar",
-          "up": true
+          "up": true,
+          "amount": 1
         },
         {
           "name": "Priests of Life",
-          "up": false
+          "up": false,
+          "amount": -2
         },
         {
           "name": "Corrupt Qeynos Guards",
-          "up": true
+          "up": true,
+          "amount": 1
         }
       ]
     },
@@ -24581,6 +25154,7 @@
         },
         {
           "name": "King Tormax (Faction)",
+          "label": "King Tormax",
           "up": true
         },
         {
@@ -24628,23 +25202,28 @@
       "factions": [
         {
           "name": "Knights of Truth",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Dismal Rage",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "The Freeport Militia",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "Priests of Marr",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Steel Warriors",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Coalition of Tradefolk Underground",
@@ -25064,11 +25643,13 @@
       "factions": [
         {
           "name": "Knights of Truth",
-          "up": true
+          "up": true,
+          "amount": 20
         },
         {
           "name": "Dismal Rage",
-          "up": false
+          "up": false,
+          "amount": -3
         },
         {
           "name": "Opal Dark Briar",
@@ -25076,15 +25657,18 @@
         },
         {
           "name": "Priests of Marr",
-          "up": true
+          "up": true,
+          "amount": 4
         },
         {
           "name": "Steel Warriors",
-          "up": true
+          "up": true,
+          "amount": 2
         },
         {
           "name": "The Freeport Militia",
-          "up": false
+          "up": false,
+          "amount": -3
         }
       ]
     },
@@ -25851,6 +26435,7 @@
       "factions": [
         {
           "name": "Venril Sathir (Faction)",
+          "label": "Venril Sathir",
           "up": true
         }
       ]
@@ -25893,7 +26478,39 @@
         "Putrid Rib Bone",
         "Pouch of Evidence"
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "Priests of Life",
+          "plain": true,
+          "up": true,
+          "amount": 50
+        },
+        {
+          "name": "Knights of Thunder",
+          "plain": true,
+          "up": true,
+          "amount": 15
+        },
+        {
+          "name": "Guards of Qeynos",
+          "plain": true,
+          "up": true,
+          "amount": 25
+        },
+        {
+          "name": "Bloodsabers",
+          "plain": true,
+          "up": false,
+          "amount": -12
+        },
+        {
+          "name": "Antonius Bayle",
+          "plain": true,
+          "up": true,
+          "amount": 7
+        }
+      ]
     },
     {
       "name": "Qeynos Badge Quests",
@@ -26011,47 +26628,58 @@
       "factions": [
         {
           "name": "Peace Keepers",
-          "up": true
+          "up": true,
+          "amount": 30
         },
         {
           "name": "High Council of Erudin",
-          "up": true
+          "up": true,
+          "amount": 7
         },
         {
           "name": "Heretics",
-          "up": false
+          "up": false,
+          "amount": -7
         },
         {
           "name": "Arcane Scientists",
-          "up": true
+          "up": true,
+          "amount": 10
         },
         {
           "name": "Knights of Truth",
-          "up": true
+          "up": true,
+          "amount": 2
         },
         {
           "name": "Opal Dark Briar",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "The Freeport Militia",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "Deep Muses",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Merchants of AkAnon",
-          "up": true
+          "up": true,
+          "amount": 1
         },
         {
           "name": "Gem Choppers",
-          "up": true
+          "up": true,
+          "amount": 1
         },
         {
           "name": "Dark Reflection",
-          "up": false
+          "up": false,
+          "amount": -1
         }
       ]
     },
@@ -27206,7 +27834,15 @@
           "name": "Kerran Fishingpole"
         }
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "Kerra Isle",
+          "plain": true,
+          "up": true,
+          "amount": 20
+        }
+      ]
     },
     {
       "name": "Recharge Prayer Beads",
@@ -27282,23 +27918,28 @@
       "factions": [
         {
           "name": "King AkAnon",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Merchants of AkAnon",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Gem Choppers",
-          "up": true
+          "up": true,
+          "amount": 10
         },
         {
           "name": "Dark Reflection",
-          "up": false
+          "up": false,
+          "amount": -2
         },
         {
           "name": "Clan Grikbar",
-          "up": false
+          "up": false,
+          "amount": -1
         }
       ]
     },
@@ -27758,35 +28399,43 @@
       "factions": [
         {
           "name": "Kejek Village",
-          "up": false
+          "up": false,
+          "amount": -25
         },
         {
           "name": "Peace Keepers",
-          "up": false
+          "up": false,
+          "amount": -2
         },
         {
           "name": "Heretics",
-          "up": true
+          "up": true,
+          "amount": 10
         },
         {
           "name": "Deepwater Knights",
-          "up": false
+          "up": false,
+          "amount": -10
         },
         {
           "name": "Gate Callers",
-          "up": false
+          "up": false,
+          "amount": -10
         },
         {
           "name": "Craftkeepers",
-          "up": false
+          "up": false,
+          "amount": -10
         },
         {
           "name": "Crimson Hands",
-          "up": false
+          "up": false,
+          "amount": -10
         },
         {
           "name": "Kerra Isle",
-          "up": false
+          "up": false,
+          "amount": -1
         }
       ]
     },
@@ -28239,6 +28888,7 @@
         },
         {
           "name": "Mayong Mistmoore (Faction)",
+          "label": "Mayong Mistmoore",
           "up": false
         },
         {
@@ -28442,7 +29092,8 @@
         },
         {
           "name": "Circle Of Unseen Hands",
-          "up": false
+          "up": false,
+          "amount": -30
         },
         {
           "name": "Antonius Bayle",
@@ -29245,23 +29896,28 @@
       "factions": [
         {
           "name": "King AkAnon",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Merchants of AkAnon",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Gem Choppers",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Dark Reflection",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "Clan Grikbar",
-          "up": false
+          "up": false,
+          "amount": -1
         }
       ]
     },
@@ -29420,6 +30076,12 @@
       "expReward": true,
       "factions": [
         {
+          "name": "Kerra Isle",
+          "plain": true,
+          "up": true,
+          "amount": 20
+        },
+        {
           "name": "High Guard of Erudin",
           "up": false,
           "amount": -300
@@ -29475,7 +30137,27 @@
           "name": "Deepwater Harpoon"
         }
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "Priests of Marr",
+          "plain": true,
+          "up": true,
+          "amount": 5
+        },
+        {
+          "name": "The Freeport Militia",
+          "plain": true,
+          "up": false,
+          "amount": -1
+        },
+        {
+          "name": "Knights of Truth",
+          "plain": true,
+          "up": true,
+          "amount": 5
+        }
+      ]
     },
     {
       "name": "Series C Black Boxes",
@@ -29547,11 +30229,6 @@
           "name": "The Dead",
           "up": false,
           "amount": -1
-        },
-        {
-          "name": "King AkAnon",
-          "up": true,
-          "amount": 5
         }
       ]
     },
@@ -29611,6 +30288,13 @@
         "Heart of the Innocent"
       ],
       "expReward": true,
+      "factions": [
+        {
+          "name": "Truespirit",
+          "plain": true,
+          "up": true
+        }
+      ],
       "coin": "1000 platinum"
     },
     {
@@ -29723,6 +30407,7 @@
         },
         {
           "name": "King Tormax (Faction)",
+          "label": "King Tormax",
           "up": true
         },
         {
@@ -29916,7 +30601,34 @@
         "Sack of Cursed Hay",
         "Sack of Writhing Hay"
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "Beta Neutral",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "Storm Reapers",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "Mayor Gubbin",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "Merchants of Rivervale",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "Unkempt Druids",
+          "plain": true,
+          "up": false
+        }
+      ]
     },
     {
       "name": "Shaman Epic Quest",
@@ -30302,6 +31014,7 @@
         },
         {
           "name": "Dain Frostreaver IV (Faction)",
+          "label": "Dain Frostreaver IV",
           "up": true
         },
         {
@@ -30638,43 +31351,53 @@
       "factions": [
         {
           "name": "Bloodsabers",
-          "up": true
+          "up": true,
+          "amount": 50
         },
         {
           "name": "Guards of Qeynos",
-          "up": false
+          "up": false,
+          "amount": -37
         },
         {
           "name": "Knights of Thunder",
-          "up": false
+          "up": false,
+          "amount": -50
         },
         {
           "name": "Priests of Life",
-          "up": false
+          "up": false,
+          "amount": -37
         },
         {
           "name": "The Dead",
-          "up": true
+          "up": true,
+          "amount": 25
         },
         {
           "name": "Queen Cristanos Thex",
-          "up": true
+          "up": true,
+          "amount": 3
         },
         {
           "name": "King Naythox Thex",
-          "up": false
+          "up": false,
+          "amount": -3
         },
         {
           "name": "Keepers of the Art",
-          "up": false
+          "up": false,
+          "amount": -3
         },
         {
           "name": "Eldritch Collective",
-          "up": false
+          "up": false,
+          "amount": -3
         },
         {
           "name": "Primordial Malice",
-          "up": false
+          "up": false,
+          "amount": -50
         }
       ]
     },
@@ -30857,7 +31580,15 @@
       "requiredItems": [
         "Skunk Scent Gland"
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "Kerra Isle",
+          "plain": true,
+          "up": true,
+          "amount": 20
+        }
+      ]
     },
     {
       "name": "Slaggak's Bounty",
@@ -31041,7 +31772,8 @@
       "factions": [
         {
           "name": "QeynosCitizen",
-          "up": true
+          "up": true,
+          "amount": 5
         }
       ]
     },
@@ -31249,6 +31981,7 @@
       "factions": [
         {
           "name": "Temple Of Sol Ro",
+          "label": "Temple of Solusek Ro",
           "up": true,
           "amount": 5
         },
@@ -31913,6 +32646,7 @@
       "factions": [
         {
           "name": "Claws of Veeshan",
+          "label": "ClawsofVeeshan",
           "up": true
         },
         {
@@ -31958,6 +32692,18 @@
       "requiredItems": [
         "Golden Tablet of Draconic Strategy",
         "Scroll of Scaled Tactics"
+      ],
+      "factions": [
+        {
+          "name": "Kromrif",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "Kromzek",
+          "plain": true,
+          "up": true
+        }
       ]
     },
     {
@@ -32024,7 +32770,7 @@
         {
           "name": "New Sebilisian Expedition",
           "up": true,
-          "amount": 10
+          "amount": 5
         }
       ]
     },
@@ -32268,7 +33014,34 @@
         "Klok's Seal",
         "Key"
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "Merchants of Qeynos",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "Circle Of Unseen Hands",
+          "plain": true,
+          "up": false
+        },
+        {
+          "name": "Antonius Bayle",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "Coalition of Tradefolk",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "Guards of Qeynos",
+          "plain": true,
+          "up": true
+        }
+      ]
     },
     {
       "name": "Teir`Dal Courier",
@@ -32440,23 +33213,52 @@
       "factions": [
         {
           "name": "Eldritch Collective",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Dark Reflection",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "The Dead",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "Gem Choppers",
-          "up": true
+          "up": true,
+          "amount": 1
         },
         {
           "name": "King AkAnon",
-          "up": true
+          "up": true,
+          "amount": 1
+        },
+        {
+          "name": "Crushbone Orcs",
+          "plain": true,
+          "up": false,
+          "amount": -100
+        },
+        {
+          "name": "Storm Guard",
+          "plain": true,
+          "up": true,
+          "amount": 5
+        },
+        {
+          "name": "Faydarks Champions",
+          "plain": true,
+          "up": true,
+          "amount": 15
+        },
+        {
+          "name": "Emerald Warriors",
+          "plain": true,
+          "up": true,
+          "amount": 15
         }
       ]
     },
@@ -33110,7 +33912,27 @@
         "Gem Encrusted Casket",
         "Revenant Ash"
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "Priests of Marr",
+          "plain": true,
+          "up": true,
+          "amount": 300
+        },
+        {
+          "name": "The Freeport Militia",
+          "plain": true,
+          "up": false,
+          "amount": -30
+        },
+        {
+          "name": "Knights of Truth",
+          "plain": true,
+          "up": true,
+          "amount": 45
+        }
+      ]
     },
     {
       "name": "The Bread Shipment",
@@ -33220,11 +34042,13 @@
       "factions": [
         {
           "name": "Merchants of Ogguk",
-          "up": true
+          "up": true,
+          "amount": 4
         },
         {
           "name": "Clurg",
-          "up": true
+          "up": true,
+          "amount": 3
         },
         {
           "name": "Oggok Guards",
@@ -33382,6 +34206,7 @@
         },
         {
           "name": "Coalition of Tradefolk",
+          "label": "Coalition of Trade Folk",
           "up": true
         },
         {
@@ -33504,6 +34329,7 @@
         },
         {
           "name": "Coalition of Tradefolk",
+          "label": "Coalition of Trade Folk",
           "up": true
         },
         {
@@ -33547,6 +34373,7 @@
         },
         {
           "name": "Coalition of Tradefolk",
+          "label": "Coalition of Trade Folk",
           "up": true
         },
         {
@@ -33805,6 +34632,7 @@
         },
         {
           "name": "Circle Of Unseen Hands",
+          "label": "Circle of Unseen Hands",
           "up": false
         },
         {
@@ -34033,7 +34861,8 @@
       "factions": [
         {
           "name": "Oggok Citizens",
-          "up": true
+          "up": true,
+          "amount": 1
         }
       ]
     },
@@ -34189,6 +35018,12 @@
           "name": "Oracle of K`Arnon",
           "up": true,
           "amount": 10
+        },
+        {
+          "name": "Oracle of Marud",
+          "plain": true,
+          "up": false,
+          "amount": -10
         }
       ]
     },
@@ -34307,6 +35142,10 @@
       "expReward": true,
       "factions": [
         {
+          "name": "Merchants of Rivervale",
+          "up": true
+        },
+        {
           "name": "Guardians of the Vale",
           "up": true
         },
@@ -34315,11 +35154,12 @@
           "up": true
         },
         {
-          "name": "Storm Reapers",
-          "up": true
+          "name": "Coalition of Trade Folk Ill",
+          "plain": true,
+          "up": false
         },
         {
-          "name": "Merchants of Rivervale",
+          "name": "Storm Reapers",
           "up": true
         },
         {
@@ -34862,15 +35702,18 @@
       "factions": [
         {
           "name": "Merchants of Erudin",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "High Council of Erudin",
-          "up": true
+          "up": true,
+          "amount": 3
         },
         {
           "name": "High Guard of Erudin",
-          "up": true
+          "up": true,
+          "amount": 3
         }
       ]
     },
@@ -35071,6 +35914,7 @@
       "factions": [
         {
           "name": "Coalition of Tradefolk Ill",
+          "label": "Coalition of Tradefolk Underground/Illegal",
           "up": true
         },
         {
@@ -35113,7 +35957,15 @@
       "requiredItems": [
         "Ajrah Leaf"
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "Kerra Isle",
+          "plain": true,
+          "up": true,
+          "amount": 20
+        }
+      ]
     },
     {
       "name": "The Mighty Garou",
@@ -35161,6 +36013,11 @@
         {
           "name": "Pirates of Iceclad",
           "up": true
+        },
+        {
+          "name": "Ulthork",
+          "plain": true,
+          "up": false
         }
       ]
     },
@@ -36220,6 +37077,28 @@
       "requiredItems": [
         "Velium Torque"
       ],
+      "factions": [
+        {
+          "name": "Kromzek",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "Kromrif",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "Claws of Veeshan",
+          "plain": true,
+          "up": false
+        },
+        {
+          "name": "Coldain",
+          "plain": true,
+          "up": false
+        }
+      ],
       "coin": "500 gold"
     },
     {
@@ -36269,6 +37148,23 @@
         "Kromrif Battle Totem"
       ],
       "expReward": true,
+      "factions": [
+        {
+          "name": "Coldain",
+          "plain": true,
+          "up": false
+        },
+        {
+          "name": "Kromrif",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "Kromzek",
+          "plain": true,
+          "up": true
+        }
+      ],
       "coin": "500 gold"
     },
     {
@@ -36392,7 +37288,39 @@
       "requiredItems": [
         "Evil Eye Lens"
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "Eldritch Collective",
+          "plain": true,
+          "up": true,
+          "amount": 15
+        },
+        {
+          "name": "Dark Reflection",
+          "plain": true,
+          "up": false,
+          "amount": -2
+        },
+        {
+          "name": "The Dead",
+          "plain": true,
+          "up": false,
+          "amount": -1
+        },
+        {
+          "name": "Gem Choppers",
+          "plain": true,
+          "up": true,
+          "amount": 5
+        },
+        {
+          "name": "King Ak`Anon",
+          "plain": true,
+          "up": true,
+          "amount": 5
+        }
+      ]
     },
     {
       "name": "The Test of the Green and Blue",
@@ -36644,7 +37572,29 @@
       "requiredItems": [
         "Slashed Militia Tunic"
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "Freeport Militia",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "Coalition of Tradefolk Underground",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "Knights of Truth",
+          "plain": true,
+          "up": false
+        },
+        {
+          "name": "Priests of Marr",
+          "plain": true,
+          "up": false
+        }
+      ]
     },
     {
       "name": "The Treant Fists",
@@ -36841,27 +37791,33 @@
       "factions": [
         {
           "name": "Priests of Innoruuk",
-          "up": true
+          "up": true,
+          "amount": 100
         },
         {
           "name": "King Naythox Thex",
-          "up": true
+          "up": true,
+          "amount": 15
         },
         {
           "name": "Priests of Marr",
-          "up": false
+          "up": false,
+          "amount": -35
         },
         {
           "name": "Clerics of Tunare",
-          "up": false
+          "up": false,
+          "amount": -25
         },
         {
           "name": "Priests of Life",
-          "up": false
+          "up": false,
+          "amount": -15
         },
         {
           "name": "Primordial Malice",
-          "up": false
+          "up": false,
+          "amount": -400
         },
         {
           "name": "Dark Bargainers",
@@ -36980,6 +37936,7 @@
         },
         {
           "name": "Mayong Mistmoore (Faction)",
+          "label": "Mayong Mistmoore",
           "up": false
         },
         {
@@ -37477,19 +38434,23 @@
       "factions": [
         {
           "name": "Coalition of Tradefolk",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Knights of Truth",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Merchants of Qeynos",
-          "up": true
+          "up": true,
+          "amount": 7
         },
         {
           "name": "Coalition of Tradefolk Underground",
-          "up": true
+          "up": true,
+          "amount": 5
         }
       ]
     },
@@ -37597,6 +38558,7 @@
         },
         {
           "name": "King Tormax (Faction)",
+          "label": "King Tormax",
           "up": false
         }
       ]
@@ -37625,6 +38587,7 @@
       "factions": [
         {
           "name": "Dain Frostreaver IV (Faction)",
+          "label": "Dain Frostreaver IV",
           "up": true
         },
         {
@@ -37833,6 +38796,7 @@
         },
         {
           "name": "Circle Of Unseen Hands",
+          "label": "Circle of Unseen Hands",
           "up": false
         },
         {
@@ -38005,6 +38969,7 @@
         },
         {
           "name": "Faydarks Champions",
+          "label": "Faydark's Champions",
           "up": true,
           "amount": 5
         },
@@ -38618,7 +39583,8 @@
       "factions": [
         {
           "name": "Order of Three",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Bloodsabers",
@@ -38675,15 +39641,18 @@
       "factions": [
         {
           "name": "Dark Ones",
-          "up": true
+          "up": true,
+          "amount": 10
         },
         {
           "name": "Shadowknights of Night Keep",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Frogloks of Guk",
-          "up": false
+          "up": false,
+          "amount": -1
         }
       ]
     },
@@ -39082,7 +40051,25 @@
         "Large Note",
         "Signet Ring"
       ],
-      "expReward": true
+      "expReward": true,
+      "factions": [
+        {
+          "name": "Kromrif",
+          "up": true
+        },
+        {
+          "name": "Kromzek",
+          "up": true
+        },
+        {
+          "name": "Coldain",
+          "up": false
+        },
+        {
+          "name": "Claws of Veeshan",
+          "up": false
+        }
+      ]
     },
     {
       "name": "Wage War Upon The Coldain",
@@ -39119,15 +40106,18 @@
       "factions": [
         {
           "name": "Kromrif",
-          "up": true
+          "up": true,
+          "amount": 10
         },
         {
           "name": "Kromzek",
-          "up": true
+          "up": true,
+          "amount": 8
         },
         {
           "name": "Coldain",
-          "up": false
+          "up": false,
+          "amount": -17
         },
         {
           "name": "Claws of Veeshan",
@@ -39155,7 +40145,8 @@
       "factions": [
         {
           "name": "Guardians of the Vale",
-          "up": false
+          "up": false,
+          "amount": -500
         }
       ]
     },
@@ -39282,6 +40273,7 @@
         },
         {
           "name": "King Tormax (Faction)",
+          "label": "King Tormax",
           "up": true
         },
         {
@@ -39600,7 +40592,8 @@
         },
         {
           "name": "Knights of Truth",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Guardians of the Vale",
@@ -39616,19 +40609,23 @@
         },
         {
           "name": "Steel Warriors",
-          "up": true
+          "up": true,
+          "amount": 20
         },
         {
           "name": "Guards of Qeynos",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Corrupt Qeynos Guards",
-          "up": false
+          "up": false,
+          "amount": -3
         },
         {
           "name": "The Freeport Militia",
-          "up": false
+          "up": false,
+          "amount": -3
         },
         {
           "name": "Coalition of Tradefolk",
@@ -39739,6 +40736,18 @@
       ],
       "requiredItems": [
         "Sealed Letter"
+      ],
+      "factions": [
+        {
+          "name": "Kromzek",
+          "plain": true,
+          "up": true
+        },
+        {
+          "name": "Yelinak",
+          "plain": true,
+          "up": false
+        }
       ]
     },
     {
@@ -39765,19 +40774,23 @@
       "factions": [
         {
           "name": "Karana Residents",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Guards of Qeynos",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Priests of Life",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Knights of Thunder",
-          "up": true
+          "up": true,
+          "amount": 5
         }
       ]
     },
@@ -39936,8 +40949,8 @@
       "factions": [
         {
           "name": "Guards of Qeynos",
-          "up": false,
-          "amount": -7
+          "up": true,
+          "amount": 1
         },
         {
           "name": "Knights of Truth",
@@ -39951,6 +40964,7 @@
         },
         {
           "name": "Mayong Mistmoore (Faction)",
+          "label": "Mayong Mistmoore",
           "up": false,
           "amount": -1
         },
@@ -40613,15 +41627,18 @@
       "factions": [
         {
           "name": "Indigo Brotherhood",
-          "up": true
+          "up": true,
+          "amount": 5
         },
         {
           "name": "Emerald Warriors",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "Steel Warriors",
-          "up": false
+          "up": false,
+          "amount": -1
         },
         {
           "name": "Primordial Malice",

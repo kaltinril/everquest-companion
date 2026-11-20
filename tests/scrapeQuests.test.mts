@@ -2,8 +2,12 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { buildCatalog, nonQuestReason, queryBlock, stalePages } from '../scripts/scrape-quests'
-import { parseQuestPage } from '../scripts/sources/questPage'
+import { parseQuestPage, titleKey } from '../scripts/sources/questPage'
+import questsJson from '../src/renderer/src/data/eqlegends/quests.json'
+import type { QuestData } from '../src/shared/types'
 
 const isItem = (t: string): boolean => ['rusty scythe', 'harvester'].includes(t.toLowerCase())
 
@@ -49,4 +53,19 @@ test('only pages whose revision moved, or that were never indexed, are re-fetche
   // 1 unchanged; 2 moved; 3 cached before the index (age unknown); 4 never cached;
   // 5 unchanged; 6 got no revid from the wiki but has a cached copy, so it is kept.
   assert.deepEqual(stale.map((p) => p.pageid), [2, 3, 4])
+})
+
+test('quests.json is what the committed quest cache parses to', () => {
+  // A parser change reaches the file through `npm run scrape:quests -- --offline` (zero requests),
+  // and the delta folds a changed page through this same buildCatalog.
+  const dir = join(import.meta.dirname, '../scripts/sources/cache/quests')
+  const json = (name: string): unknown => JSON.parse(readFileSync(join(dir, name), 'utf8'))
+  const pages = json('quest-pages.json') as { pageid: number; ns: number; title: string }[]
+  const titles = new Set(json('item-titles.json') as string[])
+  const text = (p: { pageid: number }): string => readFileSync(join(dir, `page-${p.pageid}.wikitext`), 'utf8')
+  const run = buildCatalog(pages, text, (t) => titles.has(titleKey(t)))
+  assert.deepEqual(run.failed, [])
+  const committed = (questsJson as unknown as QuestData).quests
+  assert.equal(run.quests.length, committed.length)
+  for (const [i, q] of run.quests.entries()) assert.deepEqual(q, committed[i], `re-parse of ${q.page}`)
 })
