@@ -8,9 +8,9 @@
 // were watched when it was captured. The 800 cap cannot bind on what is published.
 //
 // WHAT IS LEARNED, AND JOINED: per mob and zone, kills and samples add, the observed bound takes the
-// smaller, and the gaps join newest first under the engine's own cap of six. The estimate is then
-// re-read through the same ladder (`resolveRespawn`). A candidate's kills add and its last kill
-// takes the later.
+// smaller, and the gaps join newest first under the engine's own cap of six. The agreed gap is
+// re-read over both logs' learned gaps (`withAgreed`, fork #8). The estimate is then re-read through
+// the same ladder (`resolveRespawn`). A candidate's kills add and its last kill takes the later.
 //
 // WHAT BELONGS TO THE PRESENT, AND IS NOT: the zone, the watch list and every custom number come
 // from the live state only. An archived clock row is shown only for a mob the live watch list still
@@ -34,13 +34,15 @@ import {
   RESPAWN_MAX_GAPS,
   RESPAWN_MAX_RECENT,
   RESPAWN_MAX_ROWS,
+  RESPAWN_SHARED_NAME_FLOOR_MS,
   resolveRespawn,
   respawnZoneKey,
   type RespawnCandidate,
   type RespawnRow,
   type RespawnSnap
 } from '../respawn'
-import { learnedOf as learnedEvidence, type LearnedEvidence } from '../respawnLearn'
+import { agreedGap, learnedOf as learnedEvidence, type LearnedEvidence } from '../respawnLearn'
+import { zoneBaseName } from '../zones'
 import { carriedValue } from './carryOver'
 
 function isRespawnSnap(x: unknown): x is RespawnSnap {
@@ -143,7 +145,35 @@ export function mergeRespawn(older: unknown, newer: unknown): RespawnSnap | null
   if (!isRespawnSnap(older) || !isRespawnSnap(newer) || older.v !== newer.v) return null
   const live = carryZone(newer, older.zone)
   const learned = mergeLearned(learnedOf(older), learnedOf(newer), older.zone)
-  return { ...live, rows: mergeRows(older, live), recent: mergeRecent(older, live), ...(learned === null ? {} : { learned }) }
+  const joined = mergeRows(older, live)
+  const shared = sharedNames(live)
+  const rows = learned === null ? joined : joined.map((r) => withAgreed(r, learned, shared))
+  return { ...live, rows, recent: mergeRecent(older, live), ...(learned === null ? {} : { learned }) }
+}
+
+/** The mobs today's watch list marks "several mobs share this name". */
+function sharedNames(snap: RespawnSnap): ReadonlySet<string> {
+  const watches = Array.isArray(snap.prefs?.watches) ? snap.prefs.watches : []
+  return new Set(watches.filter((w) => w.sharedName === true).map((w) => w.key))
+}
+
+/** A zone's places as the engine pools them (`respawn_places.rs zone_base`): no tier, no instance tag. */
+const zoneBase = (zone: string): string => zoneBaseName(zone).toLowerCase()
+
+/**
+ * AGREEMENT ACROSS THE CUT (fork #8). The engine reads a row's agreed gap off one log's gaps, so two
+ * gaps in the archive and one in the live log agree on neither side, and a log archived before the
+ * field has none. Re-read here over the joined learned gaps, pooled as the engine pools them (the
+ * mob, in every place of the row's zone; a shared name's gaps under ten minutes left out, by the
+ * row or by today's watch list). It only ever lowers `agreedMs`, so it can lower a wiki floor and
+ * never raise an estimate; the row's own gaps, samples and typed number are not touched.
+ */
+function withAgreed(row: RespawnRow, learned: readonly Learned[], shared: ReadonlySet<string>): RespawnRow {
+  const base = zoneBase(row.zone)
+  const pool = learned.filter((l) => l.key === row.key && zoneBase(l.zone) === base).flatMap((l) => l.gapsMs)
+  const agreed = agreedGap(pool, row.sharedName === true || shared.has(row.key) ? RESPAWN_SHARED_NAME_FLOOR_MS : 0)
+  if (agreed === undefined || (row.agreedMs !== undefined && row.agreedMs <= agreed)) return row
+  return withEstimate({ ...row, agreedMs: agreed })
 }
 
 /**
