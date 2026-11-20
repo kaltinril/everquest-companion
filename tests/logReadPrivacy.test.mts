@@ -33,9 +33,13 @@ function facts(over: Partial<LogReadFacts> = {}): LogReadFacts {
     waitingSince: NOW - 2_000,
     error: null,
     probe: null,
-    lastCombatRead: null,
+    combatReads: [],
     link: null,
     tooLarge: null,
+    large: null,
+    tooLargeModules: [],
+    nothingRecognised: null,
+    archiveOn: false,
     ...over
   }
 }

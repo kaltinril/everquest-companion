@@ -13,6 +13,12 @@
 //      main saying "throw it away and ask again", and `worldRebuilt.ts sendWorldRebuilt` is what
 //      delivers it to this window at all.
 //
+// WHAT IS HELD ACROSS THAT RE-ASK (fork #9). An overlay outlives a character switch, and a re-ask
+// that came back with no snapshot used to leave the previous character's rows up. Now: another
+// character's log takes the rows down at once; a world that changed hands takes them down if no
+// snapshot comes back; a rebuild of the SAME log keeps them, so an ordinary rebuild never flashes
+// an empty overlay. An answer to an older ask is dropped. `tests/overlayModuleRows.test.mts`.
+//
 // THE DELTA ARM IS GONE (JOS-499 item 7), with main's own fold. `lib/useModule.ts` carries the full
 // account of what went with it and why none of it is missed; the short version is that a cursor is
 // a dirty bit carrying no state, so there is nothing left to fold, dedupe, buffer or call stale.
@@ -25,7 +31,10 @@
 // MUI-FREE like everything in this bundle.
 
 import { useEffect, useRef, useState } from 'react'
-import { MODULE_WORLD_CHANGED, type ModuleChanged } from '@shared/types'
+// RELATIVE, so the unit suite (no `@shared/*` alias) can run this hook: tests/overlayModuleRows.
+import { MODULE_WORLD_CHANGED, type ModuleChanged } from '../../../shared/types'
+
+const baseName = (path: string): string => path.split(/[\\/]/).pop() ?? path
 
 /**
  * `enabled` (default on) lets a window stop reading a module it has no row for: off, the hook
@@ -49,35 +58,58 @@ export function useOverlayModule<Snap>(moduleId: string, empty: Snap, enabled = 
     let hydrated = false
     /** The newest cursor heard while a hydrate was in flight; -1 when there is none. */
     let pendingSeq = -1
+    /** How many snapshots have been asked for. Only the answer to the newest one counts. */
+    let asked = 0
+    /** The world that held these rows changed hands: with no snapshot back, they go. */
+    let dropOnNull = false
+    /** The log the rows held are of, by base name. Undefined until this window has been told. */
+    let heldLog: string | null | undefined
+
+    /** Take the rows down: they are of a world that is gone. */
+    const drop = (): void => {
+      knownSeq = -1
+      setState(emptyRef.current)
+    }
 
     const hydrate = (): void => {
       hydrated = false
       pendingSeq = -1
+      asked += 1
+      const mine = asked
       void window.eqOverlay.getModuleSnapshot<Snap>(moduleId).then((snap) => {
-        if (cancelled) return
-        // NO SNAPSHOT: the engine has nothing to say for this module yet. The window keeps drawing
-        // the empty shape rather than inventing rows — see the header.
+        // An answer to an older ask may be of the character this window has left (fork #9).
+        if (cancelled || mine !== asked) return
+        hydrated = true
+        const gone = dropOnNull
+        dropOnNull = false
+        // NO SNAPSHOT: the engine has nothing to say for this module yet. The window keeps what it
+        // draws rather than inventing rows — unless the world those rows came from is gone.
         if (!snap) {
-          hydrated = true
+          if (gone) drop()
           return
         }
         knownSeq = snap.seq
         setState(snap.state)
-        hydrated = true
         // …and the cursor that landed during the fetch — `lib/useModule.ts` states why it cannot be
         // dropped and why the re-fetch terminates.
         if (pendingSeq > knownSeq) hydrate()
       }, () => {
         // A fetch that threw still settles, or every later cursor would only be buffered.
-        if (cancelled) return
+        if (cancelled || mine !== asked) return
         hydrated = true
         if (pendingSeq > knownSeq) hydrate()
       })
     }
 
+    /** Ask again because the world that answers changed hands, not because a cursor moved. */
+    const rehydrate = (): void => {
+      dropOnNull = true
+      hydrate()
+    }
+
     const offChanged = window.eqOverlay.onModuleChanged((c: ModuleChanged) => {
       if (c.moduleId === MODULE_WORLD_CHANGED) {
-        hydrate()
+        rehydrate()
         return
       }
       if (c.moduleId !== moduleId) return
@@ -88,9 +120,28 @@ export function useOverlayModule<Snap>(moduleId: string, empty: Snap, enabled = 
       if (c.seq <= knownSeq) return
       hydrate()
     })
-    const offChar = window.eqOverlay.onCharacter(() => {
-      hydrate()
+    const offChar = window.eqOverlay.onCharacter((c) => {
+      const log = c === null ? null : baseName(c.logPath)
+      const was = heldLog
+      heldLog = log
+      // A REBUILD OF THE SAME LOG: the rows are still this character's, and they stay while it is
+      // asked again. The engine is "not live" for that instant, and an empty overlay would flash.
+      if (was === log) {
+        hydrate()
+        return
+      }
+      // ANOTHER CHARACTER'S LOG: its rows come down now, before the answer. A window never told
+      // which log was active cannot know, so its rows go only if no snapshot comes back.
+      if (was !== undefined) drop()
+      rehydrate()
     })
+    // Which log is active now, so the first character frame can be told from a switch.
+    void window.eqOverlay.logReadReport().then(
+      (report) => {
+        if (!cancelled && heldLog === undefined) heldLog = report.logFile
+      },
+      () => undefined
+    )
     hydrate()
 
     return () => {

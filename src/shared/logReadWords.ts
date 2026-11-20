@@ -2,9 +2,10 @@
 //
 // Three tables keyed by `LogReadWait`, each exhaustive by its type, so a new wait cannot ship
 // without a sentence, a Try line and a decision about its button. The decision that picks the wait
-// is `logReadReport.ts`; `tests/logReadWords.test.mts` reads every row.
+// is `logReadReport.ts`; `tests/logReadWords.test.mts` reads every row. Below them: the short
+// labels an overlay prints, the notes' sentences, and the line a tab draws for a missing snapshot.
 
-import type { LogReadWait } from './logReadReport'
+import type { LogReadReport, LogReadWait } from './logReadReport'
 
 /** What "Try again" does (`main/logReadActions.ts`). */
 export type LogReadAction =
@@ -35,6 +36,7 @@ export const LOG_READ_WORDS: Readonly<Record<LogReadWait, string>> = {
   notAnswering: 'The data engine is not answering.',
   reading: 'Still reading your log.',
   replyTooLarge: 'The fight list is too large for the app to show.',
+  panelSlow: 'Your log is read. This panel is taking too long to build.',
   ok: 'The data engine is answering; this panel has no reply yet.'
 }
 
@@ -61,6 +63,7 @@ export const LOG_READ_TRY: Readonly<Record<LogReadWait, string | null>> = {
   notAnswering: 'Press Try again.',
   reading: 'Nothing to do. Large logs take a while.',
   replyTooLarge: 'Turn on Summarize and archive log in Preferences, then restart the app.',
+  panelSlow: 'Wait a moment. If it stays, turn on Summarize and archive log in Preferences.',
   ok: null
 }
 
@@ -85,5 +88,118 @@ export const LOG_READ_ACTION: Readonly<Record<LogReadWait, LogReadAction | null>
   reading: null,
   // On purpose: no button can make the reply smaller.
   replyTooLarge: null,
+  // The engine is answering; a new connection would only make the panel start over.
+  panelSlow: null,
   ok: null
+}
+
+// ── the short labels, for an overlay's title bar (phase R3) ─────────────────────────────────────
+
+/** The most characters a short label may have: it shares a 380 px title bar with a mob's name. */
+export const LOG_READ_SHORT_MAX = 22
+
+/** The wait in a few words. Empty for `ok`: there is nothing to say. */
+export const LOG_READ_SHORT: Readonly<Record<LogReadWait, string>> = {
+  noCharacter: 'No character',
+  engineMissing: 'Engine missing',
+  engineFailing: 'Engine not starting',
+  engineStarting: 'Starting engine',
+  connecting: 'Connecting',
+  notConnected: 'Not connected',
+  attachRefused: 'Log refused',
+  logMissing: 'Log file missing',
+  // Not "locked": the app knows only that Windows would not open it.
+  logUnreadable: 'Log file unreadable',
+  logHung: 'Drive not answering',
+  readerStopped: 'Log read stopped',
+  stalled: 'Log read stalled',
+  finishing: 'Finishing read',
+  opening: 'Opening log',
+  mismatch: 'Wrong log open',
+  notAnswering: 'Engine not answering',
+  reading: 'Reading log',
+  replyTooLarge: 'Log too large',
+  panelSlow: 'Slow to load',
+  ok: ''
+}
+
+/** What a meter with no reply says when no wait explains it: the status is unknown, or is `ok`. */
+export const OVERLAY_LOADING = 'Loading…'
+
+/**
+ * The short label for the status, `Reading log 43%` while the log is read; empty for none.
+ * The number is printed only once the status shows: main sends numbers to a window only then
+ * (`main/logReadStatus.ts`), and before that the one a window holds would stand still.
+ */
+export function overlayLabel(report: LogReadReport | null): string {
+  if (report === null) return ''
+  const label = LOG_READ_SHORT[report.wait]
+  if (report.wait !== 'reading' || report.pct === null || !report.show) return label
+  return `${label} ${String(Math.floor(report.pct))}%`
+}
+
+/**
+ * A meter overlay's title and the word beside it. With no reply to draw (`hydrating`) the title IS
+ * the reason; over numbers that are held, the reason goes beside the segment's own name.
+ */
+export function overlayTitle(
+  report: LogReadReport | null,
+  hydrating: boolean,
+  name: string
+): { readonly title: string; readonly tail: string | undefined } {
+  const label = overlayLabel(report)
+  if (hydrating) return { title: label === '' ? OVERLAY_LOADING : label, tail: undefined }
+  return { title: name, tail: label === '' ? undefined : label }
+}
+
+// ── the notes, and the one line a tab draws where its own empty text would go (phase R3) ────────
+
+/** The sentences of the notes (`logReadNotes.ts` decides which are told). */
+export const LOG_READ_NOTE = {
+  tooLarge: "Part of your log's history is too large for the app to show.",
+  tooLargeTry: 'Turn on Summarize and archive log in Preferences, then restart the app.',
+  large: 'Your log is getting large. Turn on Summarize and archive log in Preferences.',
+  /** A tab whose own reply was the one too large. */
+  tabTooLarge: "This tab's history is too large for the app to show."
+} as const
+
+/** `The app read 238.4 MB of eqlog_Name_server.txt and recognised no lines.` */
+export function nothingRecognisedText(size: string, logFile: string | null): string {
+  return `The app read ${size} of ${logFile ?? 'your log'} and recognised no lines.`
+}
+
+/** What a tab draws where its empty text goes. */
+export type TabLine =
+  /** Its module is served and holds nothing: the tab's own words. */
+  | { readonly kind: 'empty' }
+  /** Its module has no snapshot: why, and what to try. */
+  | { readonly kind: 'waiting'; readonly text: string; readonly tryLine: string | null }
+
+/**
+ * A tab with nothing to list says "nothing yet" only when its module was SERVED and is empty.
+ * With no snapshot it says what the app is waiting on; when the status is `ok` and this module's
+ * own reply was too large, it says that.
+ */
+export function emptyOrWaiting(snapshotIsNull: boolean, report: LogReadReport, module?: string): TabLine {
+  if (!snapshotIsNull) return { kind: 'empty' }
+  if (report.wait !== 'ok') return { kind: 'waiting', text: LOG_READ_WORDS[report.wait], tryLine: report.tryLine }
+  const note = module === undefined ? undefined : report.notes.find((n) => n.modules?.includes(module) === true)
+  if (note !== undefined) return { kind: 'waiting', text: LOG_READ_NOTE.tabTooLarge, tryLine: note.tryLine ?? null }
+  return { kind: 'waiting', text: LOG_READ_WORDS.ok, tryLine: null }
+}
+
+/** The status sentence and what to try, as the one line a tab prints. */
+export function tabLineText(line: Extract<TabLine, { kind: 'waiting' }>): string {
+  return line.tryLine === null ? line.text : `${line.text} ${line.tryLine}`
+}
+
+/**
+ * A tab's status line is held back this long unless main says to show the status: a rebuild of
+ * the same log empties a tab for a moment, and that moment must not flash a sentence.
+ */
+export const LOG_READ_INLINE_AFTER_MS = 1_500
+
+/** Is the line drawn yet, for a tab whose module has had no snapshot for `nullForMs`? */
+export function inlineDue(report: LogReadReport, nullForMs: number): boolean {
+  return report.show || nullForMs >= LOG_READ_INLINE_AFTER_MS
 }

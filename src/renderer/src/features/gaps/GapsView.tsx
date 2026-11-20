@@ -11,7 +11,9 @@
 import { type JSX, useCallback, useMemo, useState } from 'react'
 import { Box, Button, Checkbox, CircularProgress, FormControlLabel, MenuItem, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import { GAP_DOMAINS, GAP_DOMAIN_HELP, GAP_DOMAIN_LABELS, GAP_SHOWN_NOUN, gapsAsText, hiddenBy, visibleGaps, type GapDomain, type GapRow, type GapsSnap } from '@shared/gaps'
+import { GAPS_MODULE_ID, GAP_DOMAINS, GAP_DOMAIN_HELP, GAP_DOMAIN_LABELS, GAP_SHOWN_NOUN, gapsAsText, hiddenBy, visibleGaps, type GapDomain, type GapRow, type GapsSnap } from '@shared/gaps'
+import { tabLineText } from '@shared/logReadWords'
+import { useTabLine } from '../../components/LogReadInline'
 import { heldCaption, type HeldFilter, type HeldPick } from '@shared/gapHeld'
 import { GAP_SHOW_WORDS, jobCaption, type GapShow } from '@shared/gapJob'
 import { wikiPageText } from '@shared/wikiPage'
@@ -224,6 +226,17 @@ function ListActions({ domain, onCopy, disabled, copied }: { domain: GapDomain; 
   )
 }
 
+/** No rows yet: the spinner for the first moment, then what the app is waiting on. */
+function GapsWaiting(): JSX.Element {
+  const line = useTabLine(GAPS_MODULE_ID, false)
+  if (line?.kind !== 'waiting') return <CircularProgress size={20} />
+  return (
+    <Typography variant="body2" color="text.secondary" data-testid="log-read-inline">
+      {tabLineText(line)}
+    </Typography>
+  )
+}
+
 export default function GapsView(): JSX.Element {
   // The list itself, from the engine's rows to the order on screen, is the hook the Wiki Gaps
   // overlay's publisher runs too (useGapsList), so the overlay lists what this tab lists.
@@ -244,7 +257,7 @@ export default function GapsView(): JSX.Element {
   // "Group by zone, then mob" (owner ask, 2026-10-18), its heading order and its folds (useGrouping).
   const group = useGrouping(sorted, loot, zone)
 
-  if (!snap) return <CircularProgress size={20} />
+  if (!snap) return <GapsWaiting />
 
   const copy = async (): Promise<void> => {
     // The faction rows' proof lines are not in the list's snapshot: asked for first (useRowSamples).

@@ -21,6 +21,7 @@ import { onReadEdge } from './dataServer/readEdges'
 import { createLogProbe, worthALook } from './logProbe'
 import { createLogReadRecovery } from './logReadRecovery'
 import { createLogReadStatus } from './logReadStatus'
+import { logArchiveOn } from './storeLogArchive'
 import { sendToEveryWindow } from './windows'
 import { IPC } from '../shared/ipc'
 import { composeLogReadReport, type LogReadReport } from '../shared/logReadReport'
@@ -132,6 +133,7 @@ export function buildLogReadReport(): LogReadReport {
     fold: say.fold,
     logSize: client.logSize,
     probe: logPath === null ? null : logProbe.last(logPath),
-    watchingFile: recovery.watching()
+    watchingFile: recovery.watching(),
+    archiveOn: logArchiveOn()
   })
 }

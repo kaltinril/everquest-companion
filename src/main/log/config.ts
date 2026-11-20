@@ -1,21 +1,25 @@
-import { existsSync, readdirSync, statSync } from 'fs'
-import { basename, join } from 'path'
+import { existsSync } from 'fs'
+import { join } from 'path'
 import type { CharacterRef } from '../../shared/types'
+import { charactersIn, newestCharacterIn, parseLogName } from './characterLogs'
 import { clearEqDiscoveredRoot, getEqDiscoveredRoot, getEqInstallDir, setEqDiscoveredRoot } from '../store'
 import {
   EQ_ROOT,
+  NO_DISCOVERY,
   countCharacterLogs,
   dirHasCharacterLogs,
   discoverEqRoot,
   fixedDrives,
+  keptRootIsGood,
   logIsUnderLogsDir,
   normalizeEqDirOverride,
   readLogsDir,
   realOverrideProbes,
+  recheckDiscoveredRoot,
   registryInstallCandidates,
-  resolveDiscoveredRoot,
   rootHasLogs,
   tailSurvivesRootChange,
+  type DiscoveryMemo,
   type DiscoveryProbes,
   type LogsDirRead,
   type NormalizedEqDir,
@@ -112,9 +116,11 @@ function realProbes(): DiscoveryProbes {
  * `presence.ts` runs it on every watcher tick.
  *
  * TWO CACHE LAYERS (JOS-112), each with a self-heal:
- *   * IN-PROCESS: `discoveredRoot` memoizes the answer for this process. A cached hit is
+ *   * IN-PROCESS: `discovery` memoizes the answer for this process. A cached hit is
  *     RE-VALIDATED with `rootHasLogs` — one readdir — so an install that moves or is uninstalled
- *     under us re-probes immediately rather than serving a dead path forever.
+ *     under us re-probes immediately rather than serving a dead path forever. A root that fails
+ *     that re-check is KEPT unless the sweep finds another (fork #9: a drive that drops out for a
+ *     moment comes back), and neither its re-check nor the sweep is repeated inside a minute.
  *   * ACROSS LAUNCHES: a POSITIVE result is persisted (`eqDiscoveredRoot` in the store) so the very
  *     next launch skips the whole sweep — `resolveDiscoveredRoot` (discovery.ts) revalidates it
  *     with the same one readdir, drops it if it no longer holds, and NEVER persists a null.
@@ -124,29 +130,29 @@ function realProbes(): DiscoveryProbes {
  * lives has changed. Nothing else is cached: `countCharacterLogs` still reads the directory on
  * every call, because "how many characters are there" changes while the app runs.
  */
-let discoveredRoot: string | null | undefined
+let discovery: DiscoveryMemo = NO_DISCOVERY
 
+/**
+ * The discovered root, by `recheckDiscoveredRoot`'s rule (discovery.ts, fork #9): the first look
+ * of a run is the cross-launch cache and then the sweep; after that a root that was good in this
+ * run is KEPT across a failed re-check, and the sweep is tried again at most once a minute.
+ */
 function discoverOnce(): string | null {
-  if (discoveredRoot !== undefined) {
-    if (discoveredRoot === null) return null
-    if (rootHasLogs(discoveredRoot)) return discoveredRoot
-  }
-  // Cross-launch layer: prefer a persisted positive hit that still validates (skips the sweep);
-  // else run the ceiling-bounded sweep and persist only a positive result.
-  discoveredRoot = resolveDiscoveredRoot({
+  discovery = recheckDiscoveredRoot(discovery, {
     persisted: getEqDiscoveredRoot() ?? null,
     hasLogs: rootHasLogs,
     sweep: () => discoverEqRoot(realProbes()),
     persist: setEqDiscoveredRoot,
-    dropPersisted: clearEqDiscoveredRoot
+    dropPersisted: clearEqDiscoveredRoot,
+    now: () => Date.now()
   })
-  return discoveredRoot
+  return discovery.root ?? null
 }
 
 /** Forget the discovered root — BOTH the in-process memo and the persisted value — so the next
  *  resolution probes the machine again. Called when the manual override changes. */
 export function invalidateEqDiscovery(): void {
-  discoveredRoot = undefined
+  discovery = NO_DISCOVERY
   rootsMemo = undefined
   clearEqDiscoveredRoot()
 }
@@ -165,7 +171,8 @@ export function invalidateEqDiscovery(): void {
  */
 export function refreshEqDiscoveryCheaply(): void {
   if (getEqInstallDir()?.trim()) return
-  if (discoveredRoot && rootHasLogs(discoveredRoot)) return
+  // Not `rootHasLogs(root)` alone: a root marked bad is not read on every tick (keptRootIsGood).
+  if (keptRootIsGood(discovery, rootHasLogs)) return
   const found = discoverEqRoot({
     hasLogs: rootHasLogs,
     extraCandidates: envCandidates,
@@ -175,7 +182,7 @@ export function refreshEqDiscoveryCheaply(): void {
   // A positive find is persisted too (JOS-112), so the install this rescan finally caught is
   // skipped-to directly on the next launch rather than re-swept.
   if (found) {
-    discoveredRoot = found
+    discovery = { root: found, sweptAt: null }
     rootsMemo = undefined
     setEqDiscoveredRoot(found)
   }
@@ -287,34 +294,9 @@ export function eqLogsDir(): string {
 // Character-log listing / active-character resolution (now dir-resolver-driven).
 // ---------------------------------------------------------------------------
 
-/** Parse "eqlog_<Character>_<server>.txt" into a CharacterRef. */
-export function parseLogName(logPath: string): CharacterRef | null {
-  const m = /^eqlog_(.+?)_(.+?)\.txt$/i.exec(basename(logPath))
-  if (!m) return null
-  return { name: m[1], server: m[2], logPath, lastPlayed: mtimeOf(logPath) }
-}
-
-/** A file's mtime, or undefined when it is gone (or cannot be stat'd) by the time we look. */
-function mtimeOf(path: string): number | undefined {
-  try {
-    return statSync(path).mtimeMs
-  } catch {
-    return undefined
-  }
-}
-
-/**
- * The `eqlog_*.txt` names in a Logs dir. A dir that cannot be read (a file where the folder
- * should be, no permission) has none, which is how `readLogsDir` already reads it; throwing here
- * instead rejected every caller, the idle rescan and the quiet-switch poll among them.
- */
-function characterLogFiles(logsDir: string): string[] {
-  try {
-    return readdirSync(logsDir).filter((f) => /^eqlog_.+\.txt$/i.test(f))
-  } catch {
-    return []
-  }
-}
+// WHICH ENTRIES ARE LOGS, and which is the newest, is `characterLogs.ts` (files only, links
+// followed): store-free, so a test can list a temp folder. This file hands it the folder.
+export { parseLogName }
 
 /** Stable id for a character (used to key per-character progress). */
 export function characterId(c: CharacterRef): string {
@@ -323,11 +305,7 @@ export function characterId(c: CharacterRef): string {
 
 /** All detected character logs, most-recently-played first. */
 export function listCharacters(): CharacterRef[] {
-  const logsDir = eqLogsDir()
-  return characterLogFiles(logsDir)
-    .map((f) => parseLogName(join(logsDir, f)))
-    .filter((c): c is CharacterRef => c !== null)
-    .sort((a, b) => (b.lastPlayed ?? 0) - (a.lastPlayed ?? 0))
+  return charactersIn(eqLogsDir())
 }
 
 /**
@@ -342,14 +320,5 @@ export function resolveActiveCharacter(): CharacterRef | null {
   if (override && existsSync(override)) {
     return parseLogName(override) ?? { name: 'Unknown', server: 'unknown', logPath: override }
   }
-  const logsDir = eqLogsDir()
-  const candidates = characterLogFiles(logsDir)
-    .map((f) => join(logsDir, f))
-    .map((p) => ({ p, mtime: mtimeOf(p) }))
-    // A log deleted between the listing and the stat is not a candidate.
-    .filter((c): c is { p: string; mtime: number } => c.mtime !== undefined)
-    .sort((a, b) => b.mtime - a.mtime)
-
-  if (candidates.length === 0) return null
-  return parseLogName(candidates[0].p)
+  return newestCharacterIn(eqLogsDir())
 }

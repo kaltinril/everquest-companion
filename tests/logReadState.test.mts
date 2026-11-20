@@ -11,6 +11,7 @@ import {
   noteLogReadConnection,
   noteLogReadError,
   noteLogReadHealth,
+  noteLogReadLanded,
   noteLogReadTouched,
   noteLogReadTurn,
   noteReplySize,
@@ -146,10 +147,10 @@ test('AFTER A READ LANDED, THE NEXT TURN OR LAUNCH STARTS A NEW WAIT', () => {
 
 // ---- 3. what a turn and a launch forget --------------------------------------------------------
 
-test('a new turn forgets the last health answer, the offset and the meter-s last read', () => {
+test('a new turn forgets the last health answer, the offset and the meter-s reads', () => {
   const path = fresh(1_000)
   noteLogReadHealth('folding', 4096, 1_500)
-  noteCombatRead('the engine is still folding', 'notLive', 1_600)
+  noteCombatRead({ key: 'fight', unserved: 'the engine is still folding', why: 'notLive' }, 1_600)
   noteLogReadTurn(9_000, path)
   assert.deepEqual(logReadFacts(), {
     health: null,
@@ -157,9 +158,11 @@ test('a new turn forgets the last health answer, the offset and the meter-s last
     movedAt: null,
     waitingSince: 1_000,
     error: null,
-    lastCombatRead: null,
+    combatReads: [],
     tooLarge: null,
-    large: null
+    large: null,
+    tooLargeModules: [],
+    nothingRecognised: null
   })
 })
 
@@ -167,7 +170,7 @@ test('a new launch clears everything except how long the app has waited', () => 
   fresh(1_000)
   noteLogReadHealth('folding', 4096, 1_500)
   noteLogReadError('health', 'timeout', 1_600)
-  noteCombatRead('the engine did not answer in time', 'timedOut', 1_700)
+  noteCombatRead({ key: 'fight', unserved: 'the engine did not answer in time', why: 'timedOut' }, 1_700)
   noteReplySize({ op: 'combat.snapshot', module: null, chars: 70 * MIB, refused: true, limit: 64 * MIB }, 1_800)
   noteReplySize({ op: 'module.snapshot', module: 'loot', chars: 20 * MIB, refused: false, limit: null }, 1_900)
   noteLogReadConnection(5_000)
@@ -177,9 +180,11 @@ test('a new launch clears everything except how long the app has waited', () => 
     movedAt: null,
     waitingSince: 1_000,
     error: null,
-    lastCombatRead: null,
+    combatReads: [],
     tooLarge: null,
-    large: null
+    large: null,
+    tooLargeModules: [],
+    nothingRecognised: null
   })
 })
 
@@ -280,36 +285,118 @@ test('`since` is when a status was first heard in a row, and opening the log is 
   assert.deepEqual(logReadFacts().health, { status: 'folding', at: 2_700, since: 2_300 })
 })
 
-// ---- 5. the meter's last read ------------------------------------------------------------------
+// ---- 5. the meter's reads, one per question ----------------------------------------------------
 
-test('the last combat read is remembered, served or not, with when it began going unserved', () => {
+const REFUSED = { unserved: 'the engine refused', why: 'refused', code: 'internal' }
+const SLOW = { unserved: 'the engine did not answer in time', why: 'timedOut' }
+
+test('each question keeps its newest read, served or not, with when it began going unserved', () => {
   fresh(1_000)
-  noteCombatRead('the engine refused', 'refused', 1_500)
-  noteCombatRead('the engine did not answer in time', 'timedOut', 2_500)
-  assert.deepEqual(logReadFacts().lastCombatRead, {
-    unserved: 'the engine did not answer in time',
-    why: 'timedOut',
-    at: 2_500,
-    since: 1_500
-  })
-  noteCombatRead(null, null, 2_900)
-  assert.deepEqual(logReadFacts().lastCombatRead, { unserved: null, why: null, at: 2_900, since: null })
+  noteCombatRead({ key: 'fight', ...REFUSED }, 1_500)
+  noteCombatRead({ key: 'fight', ...SLOW }, 2_500)
+  assert.deepEqual(logReadFacts().combatReads, [
+    { key: 'fight', unserved: 'the engine did not answer in time', why: 'timedOut', code: null, at: 2_500, since: 1_500 }
+  ])
+  noteCombatRead({ key: 'fight' }, 2_900)
+  assert.deepEqual(logReadFacts().combatReads, [
+    { key: 'fight', unserved: null, why: null, code: null, at: 2_900, since: null }
+  ])
   // One served read ends the run: the next unserved one starts its own.
-  noteCombatRead('the engine refused', 'refused', 3_300)
-  assert.equal(logReadFacts().lastCombatRead?.since, 3_300)
+  noteCombatRead({ key: 'fight', ...REFUSED }, 3_300)
+  assert.equal(logReadFacts().combatReads[0].since, 3_300)
+  assert.equal(logReadFacts().combatReads[0].code, 'internal')
+})
+
+test('AN OVERLAY-S SERVED READ DOES NOT OVERWRITE THE COMBAT TAB-S FAILED ONE', () => {
+  fresh(1_000)
+  noteCombatRead({ key: 'tab', ...SLOW }, 1_500)
+  noteCombatRead({ key: 'overlay' }, 1_600)
+  noteCombatRead({ key: 'tab', ...SLOW }, 2_500)
+  noteCombatRead({ key: 'overlay' }, 2_600)
+  const reads = logReadFacts().combatReads
+  assert.deepEqual(reads.map((read) => [read.key, read.why, read.since]), [
+    ['overlay', null, null],
+    ['tab', 'timedOut', 1_500]
+  ])
+})
+
+test('the newest 8 questions are kept, and one nobody has asked for 30 s is dropped', () => {
+  fresh(1_000)
+  for (let i = 0; i < 12; i += 1) noteCombatRead({ key: `q${String(i)}`, ...SLOW }, 2_000 + i)
+  const kept = logReadFacts().combatReads.map((read) => read.key)
+  assert.deepEqual(kept, ['q11', 'q10', 'q9', 'q8', 'q7', 'q6', 'q5', 'q4'])
+
+  // 30 s on, only what is still being asked remains; q4 was last asked at 2,004.
+  noteCombatRead({ key: 'q11', ...SLOW }, 32_004)
+  assert.deepEqual(logReadFacts().combatReads.map((read) => read.key), ['q11', 'q10', 'q9', 'q8', 'q7', 'q6', 'q5', 'q4'])
+  noteCombatRead({ key: 'q11', ...SLOW }, 32_011)
+  assert.deepEqual(logReadFacts().combatReads.map((read) => [read.key, read.since]), [['q11', 2_011]])
+  // A question asked again after it lapsed starts a new run, not the old one.
+  noteCombatRead({ key: 'q5', ...SLOW }, 40_000)
+  assert.equal(logReadFacts().combatReads[0].since, 40_000)
 })
 
 test('GOING LIVE FORGETS WHAT THE METER WAS TOLD WHILE THE LOG WAS BEING READ', () => {
   fresh(1_000)
-  noteCombatRead('the engine is still folding', 'notLive', 1_500)
+  noteCombatRead({ key: 'fight', unserved: 'the engine is still folding', why: 'notLive' }, 1_500)
   noteLogReadHealth('folding', 10, 1_600)
-  assert.equal(logReadFacts().lastCombatRead?.why, 'notLive')
+  assert.equal(logReadFacts().combatReads[0].why, 'notLive')
   noteLogReadHealth('live', 20, 2_000)
-  assert.equal(logReadFacts().lastCombatRead, null)
+  assert.deepEqual(logReadFacts().combatReads, [])
   // After live it is kept: a second live answer is not the edge.
-  noteCombatRead('the engine refused', 'refused', 2_500)
+  noteCombatRead({ key: 'fight', ...REFUSED }, 2_500)
   noteLogReadHealth('live', 20, 2_600)
-  assert.equal(logReadFacts().lastCombatRead?.why, 'refused')
+  assert.equal(logReadFacts().combatReads[0].why, 'refused')
+})
+
+// ---- 5b. the notes: facts of ONE read of the log -----------------------------------------------
+
+const KIB = 1024
+
+test('every module whose reply could not be shown is kept, once each, apart from a large one that was', () => {
+  fresh(1_000)
+  const refused = { op: 'module.snapshot', module: 'loot', chars: 70 * MIB, refused: true, limit: 64 * MIB }
+  noteReplySize(refused, 1_100)
+  noteReplySize({ ...refused, module: 'gaps', chars: 40 * MIB, refused: false, limit: 32 * MIB }, 1_200)
+  noteReplySize(refused, 1_300)
+  // A fight list is not a module, and a large reply that was shown is not one that was not.
+  noteReplySize({ op: 'combat.snapshot', module: null, chars: 70 * MIB, refused: true, limit: 64 * MIB }, 1_400)
+  noteReplySize({ op: 'module.snapshot', module: 'events', chars: 20 * MIB, refused: false, limit: null }, 1_500)
+  const facts = logReadFacts()
+  assert.deepEqual(facts.tooLargeModules, ['loot', 'gaps'])
+  assert.equal(facts.large?.module, 'events')
+})
+
+test('NOTHING RECOGNISED is noted at go-live only for a read of more than 64 KiB with no event', () => {
+  fresh(1_000)
+  noteLogReadLanded(0, 64 * KIB)
+  assert.equal(logReadFacts().nothingRecognised, null, 'a log of a few lines was called unrecognised')
+  noteLogReadLanded(12, 300 * MIB)
+  assert.equal(logReadFacts().nothingRecognised, null)
+  // The engine did not say how many: unknown is not zero.
+  noteLogReadLanded(undefined, 300 * MIB)
+  noteLogReadLanded(0, undefined)
+  assert.equal(logReadFacts().nothingRecognised, null)
+  noteLogReadLanded(0, 64 * KIB + 1)
+  assert.equal(logReadFacts().nothingRecognised, 64 * KIB + 1)
+})
+
+test('THE NOTES ARE PER TURN: a new turn and a new launch forget all three', () => {
+  for (const forget of ['turn', 'launch']) {
+    const path = fresh(1_000)
+    noteReplySize({ op: 'module.snapshot', module: 'loot', chars: 70 * MIB, refused: true, limit: 64 * MIB }, 1_100)
+    noteReplySize({ op: 'module.snapshot', module: 'events', chars: 20 * MIB, refused: false, limit: null }, 1_200)
+    noteLogReadLanded(0, 300 * MIB)
+    if (forget === 'turn') noteLogReadTurn(2_000, path)
+    else noteLogReadConnection(2_000)
+    const { tooLarge, large, tooLargeModules, nothingRecognised } = logReadFacts()
+    assert.deepEqual({ tooLarge, large, tooLargeModules, nothingRecognised }, {
+      tooLarge: null,
+      large: null,
+      tooLargeModules: [],
+      nothingRecognised: null
+    }, forget)
+  }
 })
 
 // ---- 6. the change listener --------------------------------------------------------------------
@@ -327,8 +414,9 @@ test('EVERY NOTE CALLS THE CHANGE LISTENER ONCE', () => {
     ['noteLogReadError', () => noteLogReadError('attach', 'refused', 2_200)],
     ['noteLogReadHealth', () => noteLogReadHealth('folding', 10, 2_300)],
     ['noteLogReadHealth live', () => noteLogReadHealth('live', 20, 2_400)],
-    ['noteCombatRead', () => noteCombatRead(null, null, 2_500)],
+    ['noteCombatRead', () => noteCombatRead({ key: 'fight' }, 2_500)],
     ['noteReplySize', () => noteReplySize({ op: 'combat.snapshot', module: null, chars: 1, refused: false, limit: null }, 2_600)],
+    ['noteLogReadLanded', () => noteLogReadLanded(0, 300 * MIB)],
     ['noteLogReadTouched', () => noteLogReadTouched()]
   ]
   for (const [name, note] of notes) {

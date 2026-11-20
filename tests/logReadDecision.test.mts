@@ -224,18 +224,18 @@ test('a read that has landed prints no offset: the log grows on and nobody asks 
 
 // ---- 7. the meter's own read, after the log is read --------------------------------------------
 
-function unserved(sinceMs: number, atMs = 0): LogReadFacts['lastCombatRead'] {
-  return { unserved: 'the engine did not answer in time', why: 'timedOut', at: NOW - atMs, since: NOW - sinceMs }
+function unserved(sinceMs: number, atMs = 0): LogReadFacts['combatReads'] {
+  return [{ key: 'fight', unserved: 'the engine refused', why: 'refused', code: 'internal', at: NOW - atMs, since: NOW - sinceMs }]
 }
 
-test('ONE SLOW METER READ HOURS AFTER GOING LIVE IS NOT SHOWN: its wait is timed from itself', () => {
-  // The log went live two hours ago; the meter's read has just timed out once.
-  const once = report({ ...LIVE, waitingSince: NOW - 7_200_000, lastCombatRead: unserved(0) })
+test('ONE REFUSED METER READ HOURS AFTER GOING LIVE IS NOT SHOWN: its wait is timed from itself', () => {
+  // The log went live two hours ago; the meter's read has just been refused once.
+  const once = report({ ...LIVE, waitingSince: NOW - 7_200_000, combatReads: unserved(0) })
   assert.equal(once.wait, 'notAnswering')
-  assert.equal(once.show, false, 'every tab was told the engine is not answering over one slow read')
+  assert.equal(once.show, false, 'every tab was told the engine is not answering over one read')
   assert.equal(once.waitingSince, NOW, 'the Waiting row counts from the first unserved read')
   // Unserved in a row for 15 s it is shown.
-  const held = report({ ...LIVE, waitingSince: NOW - 7_200_000, lastCombatRead: unserved(LOG_READ_SLOW_MS) })
+  const held = report({ ...LIVE, waitingSince: NOW - 7_200_000, combatReads: unserved(LOG_READ_SLOW_MS) })
   assert.equal(held.show, true)
   assert.equal(held.action, 'reconnect')
 })
@@ -244,18 +244,12 @@ test('a meter read nobody has repeated for 30 s says nothing any more', () => {
   // Longer than an idle meter's 10 s between polls, or a standing failure would blink.
   assert.ok(COMBAT_READ_FRESH_MS >= 3 * IDLE_POLL_MS)
   const live = { ...LIVE, waitingSince: NOW - 7_200_000 }
-  assert.equal(waitOf({ ...live, lastCombatRead: unserved(60_000, COMBAT_READ_FRESH_MS) }), 'notAnswering')
+  assert.equal(waitOf({ ...live, combatReads: unserved(60_000, COMBAT_READ_FRESH_MS) }), 'notAnswering')
   // The Combat tab was left: the verdict of a read nobody is asking is not put on every tab.
-  const stale = report({ ...live, lastCombatRead: unserved(60_000, COMBAT_READ_FRESH_MS + 1) })
+  const stale = report({ ...live, combatReads: unserved(60_000, COMBAT_READ_FRESH_MS + 1) })
   assert.equal(stale.wait, 'ok')
   assert.equal(stale.show, false)
   assert.equal(stale.waitingSince, NOW - 7_200_000)
-  // The same for a reply that was too large.
-  const large = { op: 'combat.snapshot', module: null, chars: 71 * MB, refused: true, limit: 64 * MB, at: NOW }
-  const tooLarge = { unserved: 'the reply was too large to show', why: 'tooLarge', at: NOW, since: NOW }
-  assert.equal(waitOf({ ...live, tooLarge: large, lastCombatRead: tooLarge }), 'replyTooLarge')
-  const left = { ...tooLarge, at: NOW - COMBAT_READ_FRESH_MS - 1 }
-  assert.equal(waitOf({ ...live, tooLarge: large, lastCombatRead: left }), 'ok')
 })
 
 test('the facts object is not changed by composing a report from it', () => {

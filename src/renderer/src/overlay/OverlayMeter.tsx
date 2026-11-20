@@ -17,6 +17,8 @@ import { useOverlayChrome } from './useOverlayChrome'
 import { useOverlayCombat } from './useOverlayCombat'
 import { useMeterScope } from '../features/combat/useCombatPrefs'
 import { EMPTY_ROSTER, chipLabel } from '@shared/roster'
+import { overlayTitle } from '@shared/logReadWords'
+import { useLogReadReport } from '../lib/logReadReportHud'
 import { OVERLAY_FONT } from '../../../shared/overlayFont'
 
 // Palette (matches the app's combat colors; the overlay has no MUI theme).
@@ -53,6 +55,8 @@ function selectorRows(head: ScopeOption | null, rest: ScopeOption[], now: number
 /** Everything the chrome renders, resolved from one snapshot in one place. */
 interface MeterView {
   seg: SegmentView | undefined
+  /** No reply to draw yet: the title says why instead of naming a segment. */
+  hydrating: boolean
   live: boolean
   headerName: string
   rows: OverlaySelectRow[]
@@ -71,7 +75,8 @@ function headerFor(
 ): Pick<MeterView, 'live' | 'headerName'> {
   return {
     live: !hydrating && !!snap?.inCombat,
-    headerName: hydrating ? 'Reading log…' : seg?.name ?? (isFight ? 'No fight' : 'No zone')
+    // While hydrating the title is the log-read status's short label (`overlayTitle`), not this.
+    headerName: seg?.name ?? (isFight ? 'No fight' : 'No zone')
   }
 }
 
@@ -107,6 +112,7 @@ function meterView(
   const { rows, head } = scopeRows(snap, isFight, hydrating, now)
   return {
     seg,
+    hydrating,
     ...headerFor(snap, seg, isFight, hydrating),
     rows,
     headIsLast: selection === LIVE && !!head && !head.live
@@ -192,12 +198,15 @@ export default function OverlayMeter(): JSX.Element {
     setDrill(null)
   })
 
-  const { seg, live, headerName, rows, headIsLast } = meterView(
+  const { seg, hydrating, live, headerName, rows, headIsLast } = meterView(
     snap,
     isFight,
     selection,
     Date.now()
   )
+  // WHY THERE IS NOTHING TO DRAW, or why the numbers held have stopped moving (fork #9): the
+  // log-read status in a few words, in place of a bare "Reading log…".
+  const head = overlayTitle(useLogReadReport(), hydrating, headerName)
 
   /** A drill is per-segment: picking a different fight / zone session undrills. This lives on the
    *  selector's change handler, NOT in an effect keyed on `selection` — an effect fires on mount
@@ -244,7 +253,9 @@ export default function OverlayMeter(): JSX.Element {
         live={live}
         tag={isFight ? 'FIGHT' : 'ZONE'}
         last={headIsLast}
-        title={headerName}
+        title={head.title}
+        // Only while the status has a wait to name: a healthy meter's title bar is as it was.
+        tail={head.tail}
         titleColor={GOLD}
         // THE FIGHT'S NAME, AND NOTHING ELSE (owner direction 2026-08-09 — JOS-158). JOS-35 had
         // already sent the fight CLOCK down to the crumb row above the bars; the RATE has now
