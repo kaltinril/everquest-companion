@@ -27,7 +27,7 @@ import { FOOTER_ROW } from './overlayScale'
 import { markZones, type MarkZoneInput, timerLabelLengths } from './markZones'
 import { labelRows } from '../features/maps/mobPins'
 import { useOverlayModule } from './useOverlayModule'
-import { TRACK_COLOR, trackedIn, viewFit, type ExtentFit, type TrackedPin, type TrackedPoint, type ZoneExtent } from '../features/maps/mapTrack'
+import { TRACK_COLOR, overlayExtent, trackedIn, viewFit, type ExtentFit, type TrackedPin, type TrackedPoint, type ZoneExtent } from '../features/maps/mapTrack'
 import { useMapTrack } from '../features/maps/useMapTrack'
 import { withWatched } from '../features/maps/watchTrack'
 import { waypointCommand } from '../features/maps/waypoint'
@@ -145,7 +145,7 @@ function useZoneMarks(zone: string | null, layers: PinLayers) {
     () => zoneTimerPins(zone, respawn.rows, catalog, respawn.zone),
     [zone, respawn.rows, catalog, respawn.zone]
   )
-  const ext: ZoneExtent | undefined = data?.bounds ?? (zone == null ? undefined : state.extents[zone])
+  const ext = overlayExtent(state, zone, data?.bounds)
   // The Achievements areas the main window wrote for this zone (as the Maps tab's).
   const slayer = useSlayerOverlay()
   const areas = useMemo(() => slayerOverlayAreasFor(slayer, zone), [slayer, zone])
