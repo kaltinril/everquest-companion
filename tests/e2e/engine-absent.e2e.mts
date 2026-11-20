@@ -56,6 +56,8 @@ import { check, dumpArtifacts, failures, note, reportRun, settle, sleep } from '
 import { closeWindows, mainWindow } from './appWindow.mjs'
 import { launchOnFixture } from './logFixture.mjs'
 import { engineDescendantsOf, engineTable, tapOutput } from './engineSteps.mjs'
+// The Try line is read from the table the app prints it from, never retyped (fork #9).
+import { LOG_READ_TRY } from '../../src/shared/logReadWords'
 
 /** The smallest committed log the suite has: nothing here is about what the log SAYS. */
 const FIXTURE = 'e2e-telemetry.log'
@@ -134,6 +136,39 @@ async function stepFailureCard(page: Page): Promise<void> {
   check('…and can show WHERE it looked, which is how somebody finds the quarantined file', paths !== '', paths || 'absent')
 }
 
+/** The status box inside Overview's "Reading log..." panel, and its button (fork #9). */
+const BOX = '[data-testid="overview-hydrating"] [data-testid="log-read-report"]'
+const BOX_TRY_AGAIN = `${BOX} [data-testid="log-read-report-try-again"]`
+
+/**
+ * CLAIM 6 (fork #9) — THE SAME STATUS ON EVERY TAB, WITH SOMETHING TO PRESS.
+ *
+ * One function now picks the card, the catch-up bar or the status band (`bannerFor`) from a status
+ * main pushes to every window, and the box inside the "Reading log..." panels reads that same
+ * status. The unit suites drive the function with hand-built inputs; what only a real window can
+ * show is that the card is still up on a tab that is not Overview, and that Overview's box really
+ * carries the Try row and its button on a launch whose status stopped changing before any window
+ * existed to hear a push.
+ */
+async function stepStatusEverywhere(page: Page): Promise<void> {
+  await page.click('[data-testid="nav-loot"]')
+  const elsewhere = await settle(() => textOf(page, CARD), (t) => t !== '')
+  check(
+    'the failure card is still up on a tab other than Overview',
+    elsewhere !== '',
+    elsewhere === '' ? 'no card on the Loot tab' : 'on the Loot tab'
+  )
+  await page.click('[data-testid="nav-overview"]')
+  const box = await settle(() => textOf(page, BOX), (t) => t !== '')
+  if (!check('Overview’s "Reading log..." panel shows the status box for a missing engine', box !== '', box === '' ? '(no box)' : 'shown')) {
+    return
+  }
+  const said = box.replace(/\s+/g, ' ')
+  check('…with a Try row that says what to do about it', said.includes(`Try ${LOG_READ_TRY.engineMissing ?? '(no line)'}`), said.slice(0, 220))
+  const button = await textOf(page, BOX_TRY_AGAIN)
+  check('…and a Try again button, because a restored file deserves a press', button !== '', button || 'absent')
+}
+
 async function main(): Promise<void> {
   const before = engineTable().pids
   const launch = await launchOnFixture(FIXTURE, { cwd: NO_ENGINE_CWD, waitForEngine: false })
@@ -190,6 +225,9 @@ async function main(): Promise<void> {
 
     // CLAIM 5 — and it says so, on screen, with something to do about it.
     await stepFailureCard(page)
+
+    // CLAIM 6 — the same status on every tab, with something to press.
+    await stepStatusEverywhere(page)
 
     // CLAIM 4 — it does not fall over.
     for (const bad of ['main:uncaughtException', 'renderer:ErrorBoundary', 'main:unhandledRejection']) {
