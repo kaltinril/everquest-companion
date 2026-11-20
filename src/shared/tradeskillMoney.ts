@@ -20,10 +20,15 @@ import { sourceItemKey } from './itemSources'
 import { subRecipes, type BookIndex, type BookIngredient, type BookRecipe } from './tradeskillBook'
 import type { CraftBook } from './tradeskillHistory'
 
-/** Copper as platinum, to the copper: "131.25 pp", "14.175 pp", "0.05 pp". */
+/**
+ * Copper as platinum to two decimals, the one price format of the Tradeskills section (owner,
+ * 2026-11-20, on a cell reading "141.748 pp"): "131.25 pp", "14.18 pp", "0.05 pp". A price
+ * that is not nothing but would round to 0.00 reads "under 0.01 pp": it was paid.
+ */
 export function ppText(copper: number): string {
-  const fixed = (Math.round(copper) / 1000).toFixed(3)
-  return `${fixed.endsWith('0') ? fixed.slice(0, -1) : fixed} pp`
+  const whole = Math.round(copper)
+  if (whole > 0 && whole < 5) return 'under 0.01 pp'
+  return `${(Math.round(whole / 10) / 100).toFixed(2)} pp`
 }
 
 /** Where and for how much the player last bought a material. */
@@ -242,10 +247,17 @@ export function noCostText(money: RecipeMoney): string {
   return `No cost stated: your log shows no purchase of ${names.join(', ')}.`
 }
 
-/** "made 10.50 pp", "lost 4.75 pp", "the same" against the cost; '' when not stated. */
+/** A sale this close to the materials' cost reads as the same: one part in a hundred. */
+export const SAME_PRICE_SHARE = 0.01
+
+/**
+ * A sale against the cost of the materials: "2.25 pp over the materials", "4.75 pp under the
+ * materials", or "the same as the materials" when the two are within one percent of the cost (a
+ * ring that cost 141.748 pp and sold for 141.75 pp made nothing worth a line); '' when not stated.
+ */
 export function differenceText(money: RecipeMoney): string {
-  if (money.difference === null) return ''
-  if (money.difference === 0) return 'the same as the materials'
+  if (money.difference === null || money.perCombine === null) return ''
+  if (Math.abs(money.difference) <= money.perCombine * SAME_PRICE_SHARE) return 'the same as the materials'
   return money.difference > 0 ? `${ppText(money.difference)} over the materials` : `${ppText(-money.difference)} under the materials`
 }
 
