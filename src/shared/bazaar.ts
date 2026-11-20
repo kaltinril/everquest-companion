@@ -476,6 +476,27 @@ export function parsePlat(s: string): number | null {
   return n > 0 ? n : null
 }
 
+/** From, scale, unit and decimals of each way to write a price in full, shortest first. */
+const EXACT_UNITS: readonly (readonly [number, number, string, number])[] = [
+  [1_000_000, 1_000_000, 'M', 2],
+  [1000, 1000, 'k', 2],
+  [0, 1, 'p', 3]
+]
+
+/**
+ * A price written so `parsePlat` reads the same number back: `12500` → `12.5k`, `1250` → `1.25k`,
+ * `12345` → `12345p`, `2.5` → `2.5p`. For a price the player typed (a watch threshold) and what is
+ * set against it: `formatPlat` rounds (`12500` → `13k`), which suits a table and misstates a
+ * threshold. A number nothing short says in full is rounded as `formatPlat` does.
+ */
+export function formatPlatExact(pp: number): string {
+  for (const [from, scale, unit, decimals] of EXACT_UNITS) {
+    const s = `${Number((pp / scale).toFixed(decimals))}${unit}`
+    if (pp >= from && parsePlat(s) === pp) return s
+  }
+  return formatPlat(pp)
+}
+
 /** `0.12` → `+12%`, `-0.05` → `-5%`. */
 export function formatMove(f: number | null): string {
   if (f === null) return ''

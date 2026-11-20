@@ -238,3 +238,163 @@ fn a_guess_is_listed_but_not_counted() {
         [true, false]
     );
 }
+
+fn sure(msg: &str) -> Vec<bool> {
+    let ix = ItemIndex::new(NAMES.iter().map(|s| s.to_string()));
+    parse_trade(msg, &ix).iter().map(|o| o.sure).collect()
+}
+
+/// Bug hunt, 2026-11-19: `1,500pp` was split at its comma and counted as 500pp, and `1,000pp` as 0.
+#[test]
+fn a_comma_in_a_price_is_its_thousands() {
+    assert_eq!(
+        read("WTS Fleeting Quiver 1,000pp"),
+        ["sell Fleeting Quiver 1000pp"]
+    );
+    assert_eq!(
+        read("WTS Fleeting Quiver 1,500pp"),
+        ["sell Fleeting Quiver 1500pp"]
+    );
+    assert_eq!(
+        read("wtb Fleeting Quiver 12,500 pp"),
+        ["buy Fleeting Quiver 12500pp"]
+    );
+    assert_eq!(
+        read("WTS Fleeting Quiver 1,250,000 plat"),
+        ["sell Fleeting Quiver 1250000pp"]
+    );
+    assert_eq!(sure("WTS Fleeting Quiver 1,500pp"), [true]);
+    // With no unit it is still a price with no unit: listed, not counted.
+    assert_eq!(
+        read("WTS Fleeting Quiver 1,500"),
+        ["sell Fleeting Quiver 1500pp"]
+    );
+    assert_eq!(sure("WTS Fleeting Quiver 1,500"), [false]);
+    // A comma between two numbers that are not one number still parts them.
+    assert_eq!(
+        read("WTS Bone Chips 580, 10p each"),
+        ["sell Bone Chips 10pp"]
+    );
+    assert_eq!(
+        read("WTS Fleeting Quiver +4,500pp"),
+        ["sell Fleeting Quiver +4 500pp"]
+    );
+    assert_eq!(
+        read("WTS Fleeting Quiver 5k,Bone Chips 10pp"),
+        ["sell Fleeting Quiver 5000pp", "sell Bone Chips 10pp"]
+    );
+}
+
+/// Bug hunt, 2026-11-19: a price before "for" was given to every later item on the line, and a
+/// later item's own price was dropped.
+#[test]
+fn a_price_before_for_prices_only_the_item_after_it() {
+    assert_eq!(
+        read("WTS 5k for Fleeting Quiver, Bone Chips 3k"),
+        ["sell Fleeting Quiver 5000pp", "sell Bone Chips 3000pp"]
+    );
+    assert_eq!(
+        read("WTS 5k for Fleeting Quiver, Bone Chips"),
+        ["sell Fleeting Quiver 5000pp", "sell Bone Chips"]
+    );
+    assert_eq!(
+        read("WTS 50pp for Bone Chips, Fleeting Quiver 15k"),
+        ["sell Bone Chips 50pp", "sell Fleeting Quiver 15000pp"]
+    );
+    assert_eq!(
+        read("paying 15k for fleeting quiver and 20pp for bone chips, Diamond"),
+        [
+            "buy Fleeting Quiver 15000pp",
+            "buy Bone Chips 20pp",
+            "buy Diamond"
+        ]
+    );
+    // A leading `each` price is still every item's.
+    assert_eq!(
+        read("WTS 3k each: Fleeting Quiver | Rain Caller"),
+        ["sell Fleeting Quiver 3000pp", "sell Rain Caller 3000pp"]
+    );
+}
+
+/// Bug hunt, 2026-11-19: a second, different price right after the first was dropped and the offer
+/// counted at the first. Which one holds is a guess, so the offer is listed, not counted.
+#[test]
+fn a_second_price_right_after_the_first_is_a_guess() {
+    assert_eq!(sure("WTS Fleeting Quiver 5k 6k pst"), [false]);
+    assert_eq!(sure("WTB Fleeting Quiver 4k - 5k"), [false]);
+    assert_eq!(sure("WTS Fleeting Quiver 6k now 5k"), [false]);
+    assert_eq!(sure("WTB Fleeting Quiver 4k to 5k"), [false]);
+    // Prices listed in order after the items: the second item is not the first price's.
+    assert_eq!(
+        sure("WTS Fleeting Quiver / Rain Caller 5k / 6k"),
+        [true, false]
+    );
+    assert_eq!(
+        read("WTS Fleeting Quiver / Rain Caller 5k / 6k"),
+        ["sell Fleeting Quiver", "sell Rain Caller 5000pp"]
+    );
+    // Words between the two prices: the second belongs to something else, often an item no page
+    // names, so the first still counts.
+    assert_eq!(
+        sure("WTS Fleeting Quiver 5k, Some Unlisted Thing 6k"),
+        [true]
+    );
+    assert_eq!(sure("WTS Fleeting Quiver 5k (was 6k)"), [true]);
+    assert_eq!(sure("WTS Fleeting Quiver 5k each, 9k for two"), [true]);
+    // A second price that says what it is for leaves the first the price of one (owner's log).
+    assert_eq!(
+        sure("selling Slime Blood of Cazic-Thule 2500pp, 2000pp for multiples"),
+        [true]
+    );
+    assert_eq!(
+        sure("Selling Fleeting Quiver 15k... 10k for primary RNG.  ;)"),
+        [true]
+    );
+    assert_eq!(sure("WTS Fleeting Quiver 3k, 2k if you buy two"), [true]);
+    // The same price twice is one price.
+    assert_eq!(sure("WTS Fleeting Quiver 5k 5k"), [true]);
+    // The next tier's price and the next item's price are their own.
+    assert_eq!(
+        sure("WTS Mithril Champion Arrows +7 20k, +6 11k"),
+        [true, true]
+    );
+    assert_eq!(sure("WTS Fleeting Quiver 5k, Rain Caller 6k"), [true, true]);
+}
+
+/// Found on the owner's log, 2026-11-19: "WTB Bone Chips 1k per 100 300 for white dragon hide"
+/// counted the hide at 100,300pp. A price before the item is held to the same rule as one after
+/// it: with no unit it is a guess.
+#[test]
+fn a_price_before_the_item_with_no_unit_is_a_guess() {
+    assert_eq!(sure("paying 400 for fleeting quiver"), [false]);
+    assert_eq!(
+        sure("WTB Bone Chips 1k per 100 300 for Fleeting Quiver"),
+        [true, false]
+    );
+    assert_eq!(
+        sure("WTS 300 each: Fleeting Quiver | Rain Caller"),
+        [false, false]
+    );
+    // With its unit it counts, and so does the next item's own price.
+    assert_eq!(sure("paying 15k for fleeting quiver"), [true]);
+    assert_eq!(
+        sure("WTS 400 for Fleeting Quiver, Rain Caller 6k"),
+        [false, true]
+    );
+    assert_eq!(
+        sure("WTS 3k each: Fleeting Quiver | Rain Caller"),
+        [true, true]
+    );
+}
+
+/// A price of nothing is no price: the offer is listed with none, never counted at 0.
+#[test]
+fn a_zero_price_is_no_price() {
+    assert_eq!(read("WTS Fleeting Quiver 0pp"), ["sell Fleeting Quiver"]);
+    assert_eq!(read("WTS Fleeting Quiver 0k"), ["sell Fleeting Quiver"]);
+    assert_eq!(read("WTS Fleeting Quiver 000pp"), ["sell Fleeting Quiver"]);
+    assert_eq!(
+        read("WTS Bone Chips 20 copper each"),
+        ["sell Bone Chips 0.02pp"]
+    );
+}

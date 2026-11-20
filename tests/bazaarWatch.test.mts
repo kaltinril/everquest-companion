@@ -3,7 +3,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { formatPlat, parsePlat, summarizeBazaar, type BazaarRow, type BazaarSnap, type LiveOffer } from '../src/shared/bazaar'
+import { formatPlat, formatPlatExact, parsePlat, summarizeBazaar, type BazaarRow, type BazaarSnap, type LiveOffer } from '../src/shared/bazaar'
 import {
   findWatch,
   freshWatchAlerts,
@@ -168,6 +168,36 @@ test('the first snapshot is a baseline; later live offers alert once', () => {
   assert.deepEqual(freshWatchAlerts(later, list, 7).alerts, [])
 })
 
+// Bug hunt, 2026-11-19: a +4 watch with only WTB ticked silenced the every-tier watch's WTS on +4.
+test("an every-tier watch still alerts on the side a tier's own watch leaves off", () => {
+  const list = {
+    entries: [watch({ item: 'Fleeting Quiver', tier: 4, wtb: true }), watch({ item: 'Fleeting Quiver', wts: true, wtsMax: 5000 })]
+  }
+  const snap: BazaarSnap = { rows: [], live: [offer([2, 'sell', 'Fleeting Quiver', 4], 3000), offer([3, 'buy', 'Fleeting Quiver', 4], null), offer([4, 'buy', 'Fleeting Quiver', 2], null)] }
+  assert.deepEqual(
+    freshWatchAlerts(snap, list, 1).alerts.map((a) => a.text),
+    // The +2 buyer is on no watch's WTB: the every-tier watch has it off and the +4 one is another tier.
+    ['Leric WTS Fleeting Quiver +4 3k (at or under your 5k)', 'Leric WTB Fleeting Quiver +4 (on your watchlist)']
+  )
+})
+
+test("a tier's own price still decides on the side it has on", () => {
+  const list = {
+    entries: [watch({ item: 'Fleeting Quiver', wts: true, wtsMax: 20000 }), watch({ item: 'Fleeting Quiver', tier: 0, wts: true, wtsMax: 5000 })]
+  }
+  const snap: BazaarSnap = { rows: [], live: [offer([2, 'sell', 'Fleeting Quiver', 0], 10000), offer([3, 'sell', 'Fleeting Quiver', 2], 10000)] }
+  assert.deepEqual(
+    freshWatchAlerts(snap, list, 1).alerts.map((a) => a.text),
+    ['Leric WTS Fleeting Quiver +2 10k (at or under your 20k)']
+  )
+  // A tier watched with neither box ticked mutes nothing: the every-tier watch still alerts there.
+  const quiet = { entries: [watch({ item: 'Fleeting Quiver', tier: 4 }), watch({ item: 'Fleeting Quiver', wts: true })] }
+  const sale: BazaarSnap = { rows: [], live: [offer([2, 'sell', 'Fleeting Quiver', 4], 3000)] }
+  assert.equal(freshWatchAlerts(sale, quiet, 1).alerts.length, 1)
+  // With no every-tier watch, a tier's own watch with the side off stays silent.
+  assert.deepEqual(freshWatchAlerts(sale, { entries: [watch({ item: 'Fleeting Quiver', tier: 4, wtb: true })] }, 1).alerts, [])
+})
+
 test('Popular ranks by platinum traded and the floor drops what sells under it', () => {
   const rows = [
     row(['2026-09-25', 'sell', 'Bone Chips'], [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]),
@@ -194,6 +224,43 @@ test('a watch price reads what the field shows it as, millions included, so a th
   assert.equal(parsePlat('500pp'), 500)
   assert.equal(parsePlat(''), null)
   for (const pp of [500, 2500, 15_000, 1_500_000, 12_000_000]) assert.equal(parsePlat(formatPlat(pp)), pp)
+})
+
+test('a threshold is written in full, so typing what the field shows stores the same price', () => {
+  const written: [number, string][] = [
+    [0.5, '0.5p'],
+    [2.5, '2.5p'],
+    [999, '999p'],
+    [1250, '1.25k'],
+    [12_345, '12345p'],
+    [12_500, '12.5k'],
+    [20_000, '20k'],
+    [1_250_000, '1.25M'],
+    [1_234_567, '1234567p'],
+    [12_000_000, '12M']
+  ]
+  for (const [pp, text] of written) {
+    assert.equal(formatPlatExact(pp), text)
+    assert.equal(parsePlat(text), pp)
+  }
+  // The table's short form is unchanged, and it is what a number no short text says in full falls to.
+  assert.equal(formatPlat(12_500), '13k')
+  assert.equal(formatPlatExact(10 / 3), '3p')
+})
+
+// Bug hunt, 2026-11-19: a 12,500 threshold was written "13k", so the alert named a price the player
+// never set and a 13k offer looked as if it should have alerted.
+test('an alert names the threshold the player typed, and an offer at it never reads above it', () => {
+  const under = watch({ item: 'Fleeting Quiver', wts: true, wtsMax: 12_500 })
+  assert.equal(watchAlertReason(under, offer([1, 'sell', 'Fleeting Quiver'], 12_400), null), 'at or under your 12.5k')
+  const over = watch({ item: 'Fleeting Quiver', wtb: true, wtbMin: 1250 })
+  assert.equal(watchAlertReason(over, offer([1, 'buy', 'Fleeting Quiver'], 1300), null), 'at or over your 1.25k')
+  const snap: BazaarSnap = { rows: [], live: [offer([2, 'sell', 'Fleeting Quiver'], 12_500)] }
+  assert.deepEqual(
+    freshWatchAlerts(snap, { entries: [under] }, 1).alerts.map((a) => a.text),
+    ['Leric WTS Fleeting Quiver 12.5k (at or under your 12.5k)']
+  )
+  assert.equal(watchAlertCaptures(offer([1, 'sell', 'Fleeting Quiver'], 12_345), 'on your watchlist').price, '12345p')
 })
 
 test('a store reply lands only while its write is the newest, and the first load only before any write', () => {
