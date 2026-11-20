@@ -17,8 +17,8 @@ import { join } from 'node:path'
 import { parseAchievementsDump } from '../src/shared/outputs/achievements'
 import { slayerRecord, type SlayerCounter } from '../src/shared/outputs/slayer'
 import { SLAYER_TERMS } from '../src/shared/slayer/slayerKinds'
-import { labelMatcher, matchMob, mobFacts } from '../src/shared/slayer/slayerMatch'
-import { NO_CAP, planZones, slayerMobs, slayerTarget } from '../src/shared/slayer/slayerPlan'
+import { labelMatcher, matchMob, mobFacts, raceYields } from '../src/shared/slayer/slayerMatch'
+import { NO_CAP, estimateNote, planZones, slayerMobs, slayerTarget } from '../src/shared/slayer/slayerPlan'
 import type { MobEntry } from '../src/shared/mobTypes'
 
 const DUMP = readFileSync(join(import.meta.dirname, 'fixtures', 'slayer-open-Achievements.txt'), 'utf8')
@@ -108,6 +108,55 @@ test('the drake is listed under the drake achievement, marked as read off its na
     [[['An Emerald Drake', 'name']]]
   )
   assert.ok(zones[0].name.includes('Butcherblock'), zones[0].name)
+})
+
+// THE EST. CHIP SAYS WHY. The drake's own wiki page says Dragon, so a bare `est.` beside it reads
+// as the app being wrong. The row carries the race that gave way, and the chip's tooltip names it.
+
+test('a race gives way only to a name that states a kind it yields to', () => {
+  assert.equal(raceYields('An Emerald Drake', 'Dragon'), true)
+  assert.equal(raceYields('a lava wurm', 'Lava Dragon'), true)
+  assert.equal(raceYields('Lord Nagafen', 'Lava Dragon'), false)
+  assert.equal(raceYields('Trakanon', 'Dragon'), false)
+  assert.equal(raceYields('a glimmering emerald drake', 'Drake'), false)
+  assert.equal(raceYields('a gnoll pup', undefined), false)
+})
+
+test('the est. chip on a drake names the wiki race that was set aside and the kind its name states', () => {
+  const [zone] = planZones(MOBS, [slayerTarget(counterOf('You Keep Dragon Me Into This'))], NO_CAP)
+  const [drake] = zone.mobs
+  assert.deepEqual(drake.yielded, { race: 'Dragon', kind: 'drakes' })
+  assert.equal(estimateNote(drake), 'Read from its name: the wiki says Dragon, but the game counts drakes separately.')
+})
+
+test('the est. chip on a mob whose page states no race says only that its name was read', () => {
+  const pup = slayerMobs([mob('a gnoll pup', 'Blackburrow', '1-3')], () => undefined)
+  const [zone] = planZones(pup, [slayerTarget(counterOf('Gnolling is Half the Battle'))], NO_CAP)
+  assert.equal(zone.mobs[0].basis, 'name')
+  assert.equal(zone.mobs[0].yielded, undefined)
+  assert.equal(estimateNote(zone.mobs[0]), 'Its kind is read from its name, not from a race on its wiki page.')
+})
+
+test('a mob counted by its wiki race has no est. chip and so no note', () => {
+  const zones = planZones(MOBS, [slayerTarget(counterOf('Dragonbane'))], NO_CAP)
+  for (const m of zones.flatMap((z) => z.mobs)) {
+    assert.equal(m.yielded, undefined, m.name)
+    assert.equal(estimateNote(m), null, m.name)
+  }
+})
+
+test('every est. note is one sentence of 7 to 15 words with no long dash', () => {
+  const notes = [
+    estimateNote({ basis: 'name' }),
+    estimateNote({ basis: 'name', yielded: { race: 'Dragon', kind: 'drakes' } }),
+    estimateNote({ basis: 'name', yielded: { race: 'Lava Dragon', kind: 'wyverns' } })
+  ]
+  for (const note of notes) {
+    assert.ok(note !== null)
+    const words = note.split(/\s+/).length
+    assert.ok(words >= 7 && words <= 15, `${String(words)} words: ${note}`)
+    assert.match(note, /^[^.!?–—]+\.$/)
+  }
 })
 
 test('the table yields only to terms with a name word, and only races it alone claims', () => {

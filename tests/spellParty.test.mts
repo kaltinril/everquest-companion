@@ -15,15 +15,18 @@ import {
   keepByCaster,
   landsOnOthers,
   normalizeParty,
+  ownClassPin,
   partyCandidates,
   partyColors,
   partySuggestions,
+  readOwnClassPins,
   readOwnClasses,
   readParty,
   readSelfColor,
   sameClassSet,
   withColor,
   withMember,
+  withOwnClassPin,
   withoutMember,
   type PartyMember
 } from '../src/shared/spellParty'
@@ -261,6 +264,46 @@ test('your own pinned classes are a loadout or nothing', () => {
   assert.equal(sameClassSet(['MNK', 'WAR'], ['WAR', 'MNK']), true)
   assert.equal(sameClassSet(['MNK', 'WAR'], ['MNK', 'ENC']), false)
   assert.equal(sameClassSet(['MNK'], ['MNK', 'WAR']), false)
+})
+
+// The Loadout's pin was one value for every character: pin SHD/WAR/MNK on the main, log in to a
+// twink druid, and the buff set was still planned for SHD/WAR/MNK at the druid's level.
+const TRIO = ['SHD', 'WAR', 'MNK'] as const
+
+test('a pinned loadout belongs to the character it was pinned on', () => {
+  const stored = JSON.stringify(withOwnClassPin({}, 'Main', [...TRIO]))
+  const pins = readOwnClassPins(stored)
+  assert.deepEqual(ownClassPin(pins, 'Main', null), TRIO)
+  assert.equal(ownClassPin(pins, 'Twink', null), null, 'the twink follows detection')
+  // ...and the twink's own pick leaves the main's alone.
+  const both = readOwnClassPins(JSON.stringify(withOwnClassPin(pins, 'Twink', ['DRU'])))
+  assert.deepEqual(ownClassPin(both, 'Twink', null), ['DRU'])
+  assert.deepEqual(ownClassPin(both, 'Main', null), TRIO)
+})
+
+test('a pin from before pins were per character still stands, until a character clears it', () => {
+  // `legacy` is the older single pin (`readOwnClasses` of its own key).
+  const legacy = readOwnClasses(JSON.stringify(TRIO))
+  assert.deepEqual(ownClassPin({}, 'Twink', legacy), TRIO)
+  // Clearing the picker is stored, so that character follows detection instead of the old pin.
+  const cleared = readOwnClassPins(JSON.stringify(withOwnClassPin({}, 'Twink', [])))
+  assert.equal(ownClassPin(cleared, 'Twink', legacy), null)
+  assert.deepEqual(ownClassPin(cleared, 'Main', legacy), TRIO)
+  // A pin made with no character attached ('*') answers for every character with none of its own.
+  const any = withOwnClassPin(cleared, '*', ['ENC'])
+  assert.deepEqual(ownClassPin(any, 'Main', legacy), ['ENC'])
+  assert.equal(ownClassPin(any, 'Twink', legacy), null)
+})
+
+test('stored pins are validated like any other stored loadout', () => {
+  for (const text of [null, '', '{nope', '"MNK"', '["SHD","WAR"]']) assert.deepEqual(readOwnClassPins(text), {})
+  assert.deepEqual(readOwnClassPins('{"Main":["MNK","MNK","XYZ","WAR","SHM","ENC"],"Odd":"MNK","Twink":[]}'), {
+    Main: ['MNK', 'WAR', 'SHM'],
+    Twink: []
+  })
+  assert.deepEqual(withOwnClassPin({}, 'Main', ['MNK', 'MNK', 'WAR', 'SHM', 'ENC']), { Main: ['MNK', 'WAR', 'SHM'] })
+  // A character named like something every object has is still only a name.
+  assert.equal(ownClassPin({}, 'constructor', null), null)
 })
 
 // =================================================================================================

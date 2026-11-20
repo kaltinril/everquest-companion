@@ -238,6 +238,15 @@ export interface ExtractionCost {
 }
 
 /**
+ * Can a proc seated in this cell ever fire? Only in a weapon hand: a proc needs something to swing
+ * (owner ruling, 2026-09-11; `socketRecommend.seatIsLive` holds the reasoning and what would
+ * overturn it). An any-cell is `null` and is in no hand, whatever item sits in it.
+ */
+export function procSeatSwings(slot: EquipSlot | null): boolean {
+  return slot === 'PRIMARY' || slot === 'SECONDARY'
+}
+
+/**
  * The honest farm estimate for extracting an effect: "≈15 D0 copies, or 1 D4 copy" (R4).
  *
  * Both counts answer the SAME question — how many more drops must you farm, assuming you already

@@ -5,8 +5,9 @@
 // preference - so both live here, and `SpellLoadoutView`, which sits at this tree's
 // 100-line-per-function ceiling, trades a four-line memo for one call.
 //
-// The group is a per-machine preference like the class filters: two localStorage keys (the list,
-// and your own colour), read once, validated by the shared readers on the way back in.
+// The group is a per-machine preference, one for every character (the class pins are per
+// character; the group is not): two localStorage keys (the list, and your own colour), read once,
+// validated by the shared readers on the way back in.
 //
 // EVERYTHING THAT GROUPS, ORDERS OR OFFERS IS THE SHARED MODULE'S (ruling 4). This file holds
 // state and hands the shared answers on.

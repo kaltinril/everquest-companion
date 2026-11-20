@@ -156,3 +156,53 @@ test('a Timer click before main echoes the last one keeps both watches', () => {
   assert.deepEqual(withPendingWatches(snap, pending), [{ key: 'a', display: 'A' }, { key: 'b', display: 'B' }])
   assert.deepEqual(withPendingWatches(snap, new Map()), snap)
 })
+
+// ---- a map with nothing to fit (bug hunt, 2026-11-19) ----
+import { overlayExtent, parseOverlayViews, usableExtent } from '../src/renderer/src/features/maps/mapTrack'
+
+const NO_SPAN = { minX: 0, maxX: 0, minY: 0, maxY: 0 }
+
+test('a map with no span on either axis is not an extent the overlay can fit', () => {
+  // An empty map file states all-zero bounds, and a one-label zone states a single point.
+  assert.equal(usableExtent(NO_SPAN), null)
+  assert.equal(usableExtent({ minX: 5, maxX: 5, minY: 7, maxY: 7 }), null)
+  assert.equal(usableExtent({ minX: 0, maxX: Number.NaN, minY: 0, maxY: 10 }), null)
+  assert.equal(usableExtent(undefined), null)
+  const ext = { minX: -100, maxX: 100, minY: -50, maxY: 50 }
+  assert.deepEqual(usableExtent(ext), ext)
+  // One straight line has a span one way: it draws today and keeps drawing.
+  const line = { minX: 0, maxX: 0, minY: 0, maxY: 10 }
+  assert.deepEqual(usableExtent(line), line)
+})
+
+test('the overlay fits the loaded map, and falls to the stored extent when the map has no span', () => {
+  const stored = { minX: 0, maxX: 100, minY: 0, maxY: 100 }
+  const state = { points: [], extents: { oasis: stored } }
+  const loaded = { minX: -5, maxX: 5, minY: -5, maxY: 5 }
+  assert.deepEqual(overlayExtent(state, 'oasis', loaded), loaded)
+  assert.deepEqual(overlayExtent(state, 'oasis', NO_SPAN), stored)
+  assert.deepEqual(overlayExtent(state, 'oasis', undefined), stored)
+  // Nothing to fit and nothing stored: no extent, which is what lets the overlay's note speak.
+  assert.equal(overlayExtent(state, 'nektulos', NO_SPAN), undefined)
+  assert.equal(overlayExtent(state, null, undefined), undefined)
+})
+
+test('the fit, a zoom and a pan stay finite on a map with no span', () => {
+  const finite = (o: object): boolean => Object.values(o).every((v) => Number.isFinite(v))
+  const fit = fitExtent(NO_SPAN, 400, 300)
+  assert.ok(finite(fit), JSON.stringify(fit))
+  const frame = { ext: NO_SPAN, w: 400, h: 300 }
+  assert.ok(finite(zoomView(frame, null, { x: 200, y: 150 }, 1.06)))
+  assert.ok(finite(panView(frame, null, 10, 10)))
+  // A one-line map fits as it did: the height fills the window and the line sits mid-width.
+  assert.deepEqual(fitExtent({ minX: 0, maxX: 0, minY: 0, maxY: 10 }, 400, 300), { left: 200, top: 0, width: 0, height: 300, scale: 30 })
+})
+
+test('a saved overlay view that is not three usable numbers is dropped, the others kept', () => {
+  // NaN is written as null, which is how a broken view reached the store.
+  const raw = '{"a":{"k":1.06,"cx":null,"cy":null},"b":{"k":2,"cx":10,"cy":20},"c":{"k":0,"cx":1,"cy":1},"d":7}'
+  assert.deepEqual(parseOverlayViews(raw), { b: { k: 2, cx: 10, cy: 20 } })
+  assert.deepEqual(parseOverlayViews('not json'), {})
+  assert.deepEqual(parseOverlayViews('[1,2]'), {})
+  assert.deepEqual(parseOverlayViews(null), {})
+})

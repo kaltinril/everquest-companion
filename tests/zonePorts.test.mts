@@ -105,3 +105,14 @@ test('the wizard plane ports land in the planes: Alter Plane: Hate and Sky (2026
   assert.equal(hate?.level, 46)
   assert.equal(hate?.group, true, 'Alter Plane takes the group')
 })
+
+test('the wizard`s own port to the Dreadlands is offered: Combine Gate at 24 (2026-11-19)', () => {
+  // The corpus states its coordinates in parentheses, `Teleport to (3047,9658,1052) in Dreadlands`,
+  // the one row that does. It was dropped, so the wizard chip began at Combine Portal, level 34.
+  const gate = new Map(zonePorts().map((p) => [p.spell, p])).get('Combine Gate')
+  assert.equal(gate?.zone, 'dreadlands')
+  assert.equal(gate?.via, 'wizard')
+  assert.equal(gate?.level, 24)
+  assert.equal(gate?.group, false, 'a self port')
+  assert.equal(portsTo('dreadlands').find((p) => p.via === 'wizard')?.level, 24, 'the cheapest wizard cast leads')
+})

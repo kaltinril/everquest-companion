@@ -18,6 +18,7 @@ import AppCelebrations from './components/AppCelebrations'
 // push and switches through the same `character:set` IPC the title bar uses, so the shell gains an
 // element and no state. Main guarantees it can ask at most once per candidate log per app session.
 import LogSwitchNudge from './components/LogSwitchNudge'
+import SettingsRecoveryNotice from './components/SettingsRecoveryNotice'
 import NoLogsEmptyState from './components/NoLogsEmptyState'
 import { VIEW_KEY, loadView, rememberGearTab, rememberSpellTab, type View } from './appViews'
 // The app's navigation MODEL — the deep-link routers and their nonce contract. See appRouting.ts.
@@ -620,6 +621,7 @@ export default function App(): JSX.Element {
       <MetInLogFeed />
 
       <LogSwitchNudge />
+      <SettingsRecoveryNotice />
 
       {/* Feedback is a DIALOG, not a view (appViews.ts is untouched), so it is hosted here and
           opened from the nav footer, from Preferences, and by the ErrorBoundary's "Report this"

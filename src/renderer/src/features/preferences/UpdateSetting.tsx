@@ -21,23 +21,16 @@ import {
 import RefreshIcon from '@mui/icons-material/Refresh'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import type { UpdateStatus } from '@shared/types'
-import { type UpdateChipState, updateChipState } from '@shared/update'
+import {
+  type UpdateChipState,
+  type UpdatePrefsChip,
+  autoUpdateCaption,
+  checkEarnsCooldown,
+  updateChipState,
+  updatePrefsChip
+} from '@shared/update'
 import { formatDateTime } from '../../lib/formatDate'
 import { recordPref, usePrefsSeed } from './prefsHydration'
-
-interface ChipLook {
-  label: string
-  color: 'default' | 'success' | 'info' | 'warning'
-}
-
-const STATE_CHIP: Record<UpdateStatus['state'], ChipLook> = {
-  idle: { label: 'up to date', color: 'default' },
-  checking: { label: 'checking', color: 'info' },
-  available: { label: 'update available', color: 'info' },
-  downloading: { label: 'downloading', color: 'info' },
-  ready: { label: 'update ready', color: 'success' },
-  error: { label: 'check failed', color: 'warning' }
-}
 
 /**
  * Shared status state: SEEDED with the last one (pushes predate this mount), then following
@@ -87,27 +80,14 @@ export function VersionSetting({
   )
 }
 
-/**
- * Which chip the headline shows. `ui` is the same pure mapping the left-nav chip
- * uses, so the two surfaces can never disagree — in particular about the
- * updated-away case (a 'ready' naming the build we are ALREADY running is stale,
- * so updateChipState demotes it to 'quiet' and we must not claim "update ready").
- */
-function chipLook(status: UpdateStatus, ui: UpdateChipState): ChipLook {
-  // Dev build: the updater is off, so "up to date" would be a claim no check ever made.
-  if (status.disabled) return { label: 'dev build - updates off', color: 'default' }
-  if (ui.kind === 'quiet' && status.state === 'ready') return STATE_CHIP.idle
-  return STATE_CHIP[status.state]
-}
-
-/** The headline: state chip + when we last asked. */
+/** The headline: state chip (its words are `updatePrefsChip`'s) + when we last asked. */
 function UpdateHeadline({
   status,
   chip,
   busy
 }: {
   status: UpdateStatus
-  chip: ChipLook
+  chip: UpdatePrefsChip
   busy: boolean
 }): JSX.Element {
   return (
@@ -216,7 +196,15 @@ function UpdateActions({
  * download, nothing applied on quit. The manual check still works, so moving up stays a choice.
  * Follows the answer from main rather than a push, because dev never pushes.
  */
-function AutoUpdateSwitch({ status, version }: { status: UpdateStatus; version: string }): JSX.Element {
+function AutoUpdateSwitch({
+  status,
+  version,
+  ui
+}: {
+  status: UpdateStatus
+  version: string
+  ui: UpdateChipState
+}): JSX.Element {
   const [off, setOff] = useState(status.autoUpdateOff === true)
   useEffect(() => setOff(status.autoUpdateOff === true), [status.autoUpdateOff])
   const toggle = async (enabled: boolean): Promise<void> => {
@@ -238,9 +226,7 @@ function AutoUpdateSwitch({ status, version }: { status: UpdateStatus; version: 
         label={<Typography variant="body2">Update automatically</Typography>}
       />
       <Typography variant="caption" color="text.secondary">
-        {off
-          ? `Staying on ${version ? `v${version}` : 'this version'}. It updates only when you press Check for updates.`
-          : 'New versions download in the background and install when you close the app.'}
+        {autoUpdateCaption(off, version, ui)}
       </Typography>
     </Stack>
   )
@@ -258,19 +244,23 @@ export function UpdateSetting({
   // that long, and it keeps a rapid clicker from hammering the release feed.
   const [cooldown, setCooldown] = useState(false)
   const ui = updateChipState(status, version || undefined)
-  const chip = chipLook(status, ui)
+  const chip = updatePrefsChip(status, ui, cooldown)
   const busy = checking || status.state === 'checking'
   const ready = ui.kind === 'ready'
   const downloading = ui.kind === 'downloading'
 
   const checkNow = useCallback(async () => {
     setChecking(true)
+    // An interrupted check is not an answer: no cooldown, so the button works again at once.
+    let answered = true
     try {
-      await window.eq.checkForUpdates()
+      answered = checkEarnsCooldown(await window.eq.checkForUpdates())
     } finally {
       setChecking(false)
-      setCooldown(true)
-      setTimeout(() => setCooldown(false), 10_000)
+      if (answered) {
+        setCooldown(true)
+        setTimeout(() => setCooldown(false), 10_000)
+      }
     }
   }, [])
 
@@ -287,7 +277,7 @@ export function UpdateSetting({
         cooldown={cooldown}
         onCheck={() => void checkNow()}
       />
-      <AutoUpdateSwitch status={status} version={version} />
+      <AutoUpdateSwitch status={status} version={version} ui={ui} />
     </Stack>
   )
 }

@@ -105,6 +105,9 @@ export function scopeRate(
  *
  * A healer who is NOT on the roster is still real and still healed you; Everyone is where they
  * live, exactly like an ex-member's damage row.
+ *
+ * `pct` is re-based against the surviving maximum, as `scopeSources` does and for its reason: with
+ * the segment's top healer scoped away, the top row left must still fill the rail.
  */
 export function scopeHealers(rows: HealSourceView[], scope: MeterScope, roster: RosterSnap): HealSourceView[] {
   const eff = effectiveScope(scope, roster)
@@ -116,7 +119,9 @@ export function scopeHealers(rows: HealSourceView[], scope: MeterScope, roster: 
     const key = healerKeyOf(h.id)
     return key !== null && onRoster(roster, key)
   })
-  return kept.length === rows.length ? rows : kept
+  if (kept.length === rows.length) return rows
+  const max = Math.max(1, ...kept.map((h) => h.total))
+  return kept.map((h) => ({ ...h, pct: (h.total / max) * 100 }))
 }
 
 /**

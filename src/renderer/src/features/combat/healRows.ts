@@ -32,6 +32,9 @@ import type {
   HealingView,
   MitigationView
 } from '@shared/combat'
+import type { MeterScope } from '@shared/roster'
+// A VALUE import, so it is relative: the node tests run without the `@shared/*` alias.
+import { healerHeadline, healersHeadline, type HealHeadline } from '../../../../shared/healHeadline'
 import { formatNum as fmt, formatHealRate } from '../../lib/formatRate'
 
 /** The one honest line about the assumption, surfaced on hover (never as a caption). */
@@ -190,8 +193,9 @@ export function healerTitle(h: HealSourceView): string {
   return `${h.name} - ${bits.join(' · ')}`
 }
 
-/** The headline rate's hover title: the restored/absorbed split when there is one. */
-export function healTotalTitle(healing: HealingView | undefined): string {
+/** The headline rate's hover title: the restored/absorbed split when there is one. Takes the
+ *  figures the headline printed (`healHeadline` below), so the two cannot disagree. */
+export function healTotalTitle(healing: HealHeadline | undefined): string {
   if (!healing) return ''
   return healing.absorbedTotal > 0
     ? `${fmt(healing.total)} total · ${fmt(healing.restoredTotal)} restored + ${fmt(healing.absorbedTotal)} absorbed. ${ABSORB_NOTE}`
@@ -252,4 +256,24 @@ export function healPanel(healing: HealingView | undefined, entityId: string | n
     mitigation: healing?.mitigation ?? null,
     enemy: { total: healing?.enemyTotal ?? 0, healers: healing?.enemyHealers ?? [] }
   }
+}
+
+/**
+ * THE FIGURES OVER ONE PANEL. An unlabelled headline above a healing list describes the rows under
+ * it: the healers the scope kept at level 1, the one drilled healer at level 2. `healing` is the
+ * segment's whole model, which the level-1 rate is a share of (shared/healHeadline.ts).
+ */
+export function healHeadline(panel: HealPanel, healing: HealingView | undefined): HealHeadline {
+  return panel.level === 2 ? healerHeadline(panel.subject) : healersHeadline(panel.healers, healing)
+}
+
+/**
+ * The quiet line under a level-1 list with nothing to rank. `scope` is the EFFECTIVE scope
+ * (`effectiveScope`). When it hid every healer the segment recorded, the line says whose healing
+ * is missing and where the rest is, so a non-zero fight never reads as one with no healing.
+ */
+export function healEmptyNote(healing: HealingView | undefined, scope: MeterScope): string {
+  if (scope === 'everyone' || !healing || healing.healers.length === 0) return 'No healing in this segment.'
+  const who = scope === 'you' ? 'you or your pets' : 'your group'
+  return `No healing from ${who} in this segment. Pick Everyone to see other healers.`
 }

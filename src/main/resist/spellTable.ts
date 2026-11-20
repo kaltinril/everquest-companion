@@ -1,4 +1,4 @@
-// The client resist table: load it once per app run, cache it by the source file's identity.
+// The client resist table: load it once per EverQuest folder, cache it by the source file's identity.
 //
 // TWO LAWS ARE BEING OBEYED HERE AT ONCE.
 //
@@ -27,6 +27,7 @@ import { logError } from '../errorLog'
 import { readJsonChunked, receiveJsonChunks, type JsonChunkSink } from '../jsonChunkRead'
 import type { SpellResistTable } from '../../shared/resistTypes'
 import type { ResistTableCacheTarget, ResistTableWorkerHead } from '../resistTableWorker'
+import { spellTableMemo, type SpellTableLoad } from './spellTableMemo'
 
 /**
  * Bump to invalidate every cached table in the field (a parser change, not a game patch).
@@ -164,61 +165,42 @@ async function parseOnWorker(path: string, cache: ResistTableCacheTarget): Promi
  */
 export type SpellTableState = 'loading' | 'ok' | 'missing' | 'unloadable'
 
-let pending: Promise<SpellResistTable | null> | null = null
-let loaded: SpellResistTable | null = null
-let sourceMtime: number | null = null
-let state: SpellTableState = 'loading'
+async function load(path: string): Promise<SpellTableLoad<SpellResistTable>> {
+  const stamp = sourceStamp(path)
+  if (!stamp) return { table: null, state: 'missing', mtimeMs: null }
+  const cached = await readCache(stamp)
+  if (cached) return { table: cached, state: 'ok', mtimeMs: stamp.mtimeMs }
+  const parsed = await parseOnWorker(path, { path: cachePath(), version: SPELL_RESIST_CACHE_VERSION, ...stamp })
+  return { table: parsed, state: parsed ? 'ok' : 'unloadable', mtimeMs: stamp.mtimeMs }
+}
+
+// Loaded once per EverQuest folder, and again when that folder moves (spellTableMemo.ts).
+const memo = spellTableMemo(spellsUsPath, load)
 
 /**
- * The table, loaded at most once per app run. Null means the client file is unreadable — a
+ * The table, loaded at most once per client file path. Null means the client file is unreadable — a
  * SUPPORTED state (see the header), never an error the caller has to handle.
  */
 export function spellTable(): Promise<SpellResistTable | null> {
-  const existing = pending
-  if (existing) return existing
-  const created = load()
-  pending = created
-  return created
-}
-
-async function load(): Promise<SpellResistTable | null> {
-  const path = spellsUsPath()
-  const stamp = sourceStamp(path)
-  if (!stamp) {
-    state = 'missing'
-    return null
-  }
-  sourceMtime = stamp.mtimeMs
-  const cached = await readCache(stamp)
-  if (cached) {
-    loaded = cached
-    state = 'ok'
-    return cached
-  }
-  const parsed = await parseOnWorker(path, { path: cachePath(), version: SPELL_RESIST_CACHE_VERSION, ...stamp })
-  if (parsed) loaded = parsed
-  state = parsed ? 'ok' : 'unloadable'
-  return parsed
+  return memo.table()
 }
 
 /** Where the table stands right now, and the path it was looked for at. See `SpellTableState`. */
 export function spellTableStatus(): { state: SpellTableState; path: string } {
-  return { state, path: spellsUsPath() }
+  return memo.status()
 }
 
 /** The table if it is already resolved, else null. For synchronous readers (the fold). */
 export function spellTableNow(): SpellResistTable | null {
-  return loaded
+  return memo.now()
 }
 
 /** The `spells_us.txt` mtime this run's table was read from — stamped into a generated baseline. */
 export function spellsUsMtime(): number | null {
-  return sourceMtime
+  return memo.mtime()
 }
 
 /** Test seam: install a table without touching the filesystem. */
 export function installSpellTable(table: SpellResistTable | null, why: SpellTableState = 'unloadable'): void {
-  loaded = table
-  pending = Promise.resolve(table)
-  state = table ? 'ok' : why
+  memo.install(table, why)
 }

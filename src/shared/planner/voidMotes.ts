@@ -24,6 +24,7 @@ import { scaleGearStats } from './gearScale'
 import type { PlannerInventoryHost } from './inventorySlots'
 import { SUPPLY, type ItemSupply } from './itemSupply'
 import { roleValuer, type GearRole } from './roleWeights'
+import { procSeatSwings } from './rules'
 import { equipSlotOf, type EquipSlot, type PlanSlotId } from './types'
 
 /** The rules of the ranking, in one table (the plan doc gives each one's reason). */
@@ -115,7 +116,10 @@ export interface MoteAdvice {
   hours: number
   road: MoteRoad
   gate: MoteGate
-  /** the exaltation socket the next tier opens (`Proc`), when it opens one */
+  /**
+   * the exaltation socket the next tier opens (`Worn`), when it opens one. A Proc socket is named
+   * only on a weapon-hand cell (`procSeatSwings`): the Exaltations tab offers no proc elsewhere
+   */
   opens?: string
   /** `gain x hours`; 0 when the target gains nothing */
   score: number
@@ -144,6 +148,16 @@ function wornRows(hosts: readonly PlannerInventoryHost[], byKey: ReadonlyMap<str
     out.push({ host, row, tier, now: scaleGearStats(row.stats, upgradeStateForTier(tier), row.voidSynth === true) })
   }
   return out
+}
+
+/**
+ * The worn items below +10 that `wornRows` leaves out because the item data has no row for them:
+ * the tab names them, so a skipped piece is not read as one a mote is wasted on. Item data with
+ * nothing in it is unread, not a verdict on every item, and lists none.
+ */
+export function moteUnranked(hosts: readonly PlannerInventoryHost[], byKey: ReadonlyMap<string, GearRow>): PlannerInventoryHost[] {
+  if (byKey.size === 0) return []
+  return hosts.filter((host) => !byKey.has(host.key) && (host.tier ?? 0) < ITEM_MAX_TIER)
 }
 
 /** The best haste worn OUTSIDE each item (worn haste does not stack: `roleValue`'s credit rule). */
@@ -230,7 +244,9 @@ export function moteAdvice(
     }
     if (w.row.supply !== undefined) advice.supply = w.row.supply
     const opens = EXALTATION_SLOT_TYPES.find((s) => s.unlocksAt === w.tier + 1)
-    if (opens !== undefined) advice.opens = opens.type
+    // The CELL decides, not `wornSlot`: an off-hand item in an any-cell is in no hand.
+    const live = opens !== undefined && (opens.type !== 'Proc' || procSeatSwings(equipSlotOf(w.host.slot)))
+    if (live) advice.opens = opens.type
     return advice
   })
 }

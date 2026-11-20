@@ -472,7 +472,7 @@ test('THE WIRING: an interruption counts no failure, stamps no check, and re-anc
   // The four things that DO happen…
   assert.match(body, /logUpdateFailure\(step, 'final', err, LOG_SINKS\)/)
   assert.match(body, /noteUpdate\(step, err\)/)
-  assert.match(body, /sinks\.push\(\{ state: 'idle' \}\)/)
+  assert.match(body, /sinks\.push\(\{ state: 'idle', interrupted: step \}\)/)
   assert.match(body, /sinks\.retryOnResume\(\)/)
   // …and the ones that must not. A `checkDone` here would stamp `lastCheckedAt` for a check that
   // never completed — the same dishonesty the chip half of this ticket is about.

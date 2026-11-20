@@ -129,3 +129,80 @@ test('the recent tally reads the live log from its own start, whatever the dump 
   ])
   assert.equal((await readFactionEvidence(logPath, at('12:00:00')))?.recent, undefined)
 })
+
+const KERRA_ARCHIVED = [
+  line('10:00:00', 'You are hungry.'),
+  line('10:50:00', adj('Kerra Isle', 5)),
+  line('10:55:00', adj('Kerra Isle', 5))
+]
+
+test('the recent tally reaches into an archive ledger, so a restart after play still shows what moved', async () => {
+  const logPath = install(
+    [line('11:00:00', 'You are hungry.'), line('11:01:00', adj('Kerra Isle', 5))],
+    [ledgerOf(KERRA_ARCHIVED, 'seg-1')]
+  )
+  const r = await readFactionEvidence(logPath, at('12:00:00'), at('10:45:00'))
+  assert.deepEqual(r?.recent, [{ name: 'Kerra Isle', hits: 3, net: 15, lastTs: at('11:01:00') }])
+  // A ledger line before the window is left out; one in the window's first second is in.
+  const later = await readFactionEvidence(logPath, at('12:00:00'), at('10:52:00'))
+  assert.deepEqual(later?.recent, [{ name: 'Kerra Isle', hits: 2, net: 10, lastTs: at('11:01:00') }])
+  const onTheSecond = await readFactionEvidence(logPath, at('12:00:00'), at('10:50:00'))
+  assert.equal(onTheSecond?.recent?.[0]?.hits, 3)
+})
+
+test('a log just archived (empty, or not yet recreated) still answers the recent window', async () => {
+  const logPath = install([], [ledgerOf(KERRA_ARCHIVED, 'seg-1')])
+  const want = [{ name: 'Kerra Isle', hits: 2, net: 10, lastTs: at('10:55:00') }]
+  const empty = await readFactionEvidence(logPath, at('12:00:00'), at('10:45:00'))
+  assert.equal(empty?.recentFromMs, at('10:45:00'))
+  assert.deepEqual(empty?.recent, want)
+  rmSync(logPath)
+  const missing = await readFactionEvidence(logPath, at('12:00:00'), at('10:45:00'))
+  assert.deepEqual(missing?.recent, want)
+  // Not asked for, not tallied: the report is what it was.
+  assert.equal((await readFactionEvidence(logPath, at('12:00:00')))?.recent, undefined)
+})
+
+// The dump's mtime carries milliseconds; a log line carries whole seconds. So a line stamped in the
+// dump's own second may be older or newer than the dump, and only the game's receipt line says which.
+const DUMP_DONE = 'Outputfile Complete: Primitive_freeport-WAR-Factions.txt'
+
+test('in the dump second, a faction line after the game says the dump is done counts', async () => {
+  const logPath = install(
+    [line('10:00:00', adj('Test Faction', 5)), line('10:00:00', DUMP_DONE), line('10:00:00', adj('Test Faction', 7))],
+    []
+  )
+  const r = await readFactionEvidence(logPath, at('10:00:00') + 700)
+  assert.deepEqual(r?.rows, [{ name: 'Test Faction', cap: null, sum: 7, hits: 1 }])
+})
+
+test('in the dump second, with no receipt line the order is unknown and the second is left out', async () => {
+  const logPath = install([line('10:00:00', adj('Test Faction', 5)), line('10:00:01', adj('Other Faction', 1))], [])
+  const r = await readFactionEvidence(logPath, at('10:00:00') + 700)
+  assert.deepEqual(r?.rows, [{ name: 'Other Faction', cap: null, sum: 1, hits: 1 }])
+})
+
+test('in the dump second, a faction line before the receipt is in the dump already and is not added again', async () => {
+  const logPath = install([line('10:00:00', adj('Test Faction', 5)), line('10:00:00', DUMP_DONE)], [])
+  const r = await readFactionEvidence(logPath, at('10:00:00') + 700)
+  assert.deepEqual(r?.rows, [])
+})
+
+test('only the faction dump receipt of that second opens it: another dump, an older one, or chat does not', async () => {
+  const after = line('10:00:00', adj('Test Faction', 7))
+  for (const notIt of [
+    line('10:00:00', 'Outputfile Complete: Primitive_freeport-Inventory.txt'),
+    line('09:59:59', DUMP_DONE),
+    line('10:00:00', `You say, '${DUMP_DONE}'`)
+  ]) {
+    const r = await readFactionEvidence(install([notIt, after], []), at('10:00:00') + 700)
+    assert.deepEqual(r?.rows, [], notIt)
+  }
+})
+
+test('a backup of the live log counts nothing twice in the recent tally', async () => {
+  const live = [line('10:00:00', 'You are hungry.'), line('10:05:00', adj('Heretics', -5))]
+  const logPath = install(live, [ledgerOf(live, 'backup')])
+  const r = await readFactionEvidence(logPath, at('12:00:00'), at('09:00:00'))
+  assert.deepEqual(r?.recent, [{ name: 'Heretics', hits: 1, net: -5, lastTs: at('10:05:00') }])
+})

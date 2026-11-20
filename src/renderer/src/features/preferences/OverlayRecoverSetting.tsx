@@ -14,7 +14,14 @@ function OverlayRecoverSetting(): JSX.Element {
   const [listening, setListening] = useState(false)
   const [note, setNote] = useState<string | undefined>(undefined)
   useEffect(() => {
-    void window.eq.overlayRecoverHotkey('get').then((r) => setHotkey(r.hotkey)).catch(() => undefined)
+    void window.eq
+      .overlayRecoverHotkey('get')
+      .then((r) => {
+        setHotkey(r.hotkey)
+        // Why a saved key is off since the app started (shared/overlayHotkey.ts).
+        setNote(r.message)
+      })
+      .catch(() => undefined)
   }, [])
   const set = (accel: string | null): void => {
     void window.eq

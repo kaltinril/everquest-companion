@@ -45,3 +45,67 @@ export function hotkeyProblem(accel: string): string | undefined {
   if (!parts.some((p) => REQUIRED.has(p))) return "Hold Ctrl, Alt or Win with the key: a key alone (or with Shift) is the game's."
   return undefined
 }
+
+/** What the key's owner needs from the system and the settings store (main/overlayRecover.ts). */
+export interface HotkeyPorts {
+  /** Take the key system-wide; false, or a throw, when it is refused. */
+  register: (accel: string) => boolean
+  unregister: (accel: string) => void
+  /** The key saved last time; anything but a string is none. */
+  load: () => unknown
+  save: (accel: string) => void
+  clear: () => void
+}
+
+export interface RecoverHotkey {
+  /** Take the saved key again at app start. */
+  start: () => void
+  set: (accel: string | null) => HotkeyAnswer
+  get: () => HotkeyAnswer
+}
+
+/**
+ * The key's state: which key is in force, and what Preferences is told. A new key is taken before
+ * the old one is let go, so a refused key leaves the old one working. A saved key refused at start
+ * stays saved and off; `get` says so until a key is set or the key is turned off.
+ */
+export function makeRecoverHotkey(ports: HotkeyPorts): RecoverHotkey {
+  let current: string | null = null
+  // Why the saved key is off since start; dropped once a key is set or the key is turned off.
+  let startNote: string | undefined
+  const set = (accel: string | null): HotkeyAnswer => {
+    if (accel === null) {
+      if (current !== null) ports.unregister(current)
+      current = null
+      startNote = undefined
+      ports.clear()
+      return { hotkey: null }
+    }
+    const problem = hotkeyProblem(accel)
+    if (problem !== undefined) return { hotkey: current, message: problem }
+    if (accel === current) return { hotkey: current }
+    let ok = false
+    try {
+      ok = ports.register(accel)
+    } catch {
+      ok = false
+    }
+    if (!ok) return { hotkey: current, message: `${accel} is taken by Windows or another program.` }
+    if (current !== null) ports.unregister(current)
+    current = accel
+    startNote = undefined
+    ports.save(accel)
+    return { hotkey: current }
+  }
+  const start = (): void => {
+    const saved = ports.load()
+    if (typeof saved !== 'string') return
+    const refused = set(saved).message
+    if (refused === undefined) return
+    // A key the rules refuse never comes back by itself; a key held elsewhere does.
+    const later = hotkeyProblem(saved) === undefined ? ' It comes back when the app starts with the key free.' : ''
+    startNote = `Your saved key is off. ${refused}${later}`
+  }
+  const get = (): HotkeyAnswer => (current === null && startNote !== undefined ? { hotkey: null, message: startNote } : { hotkey: current })
+  return { start, set, get }
+}

@@ -31,7 +31,7 @@ import type { EquipLocationToken } from '../../../../shared/outputs/inventory'
 import type { EquipSlot } from '../../../../shared/planner/types'
 // R2's slot half, corrected 2026-09-10: `donor ∩ hostItem` first, the cell second. Its header
 // carries the report and the measurement behind it.
-import { narrowedClasses, slotFits } from '../../../../shared/planner/rules'
+import { narrowedClasses, procSeatSwings, slotFits } from '../../../../shared/planner/rules'
 import { bestEffectFor, helps, usable, type KindEffect, type Loadout } from './exaltationAudit'
 
 // ---- the recommender (the "best with what we have" ask) ----------------------------------------
@@ -213,7 +213,7 @@ function loosePool(owned: readonly OwnedExaltation[]): LoosePool {
  */
 export function seatIsLive(seat: Pick<SocketHostCell, 'type' | 'slot'>): boolean {
   if (seat.type !== 'Proc') return true
-  return seat.slot === 'PRIMARY' || seat.slot === 'SECONDARY'
+  return procSeatSwings(seat.slot)
 }
 
 /**

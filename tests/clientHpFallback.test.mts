@@ -131,6 +131,26 @@ test('C4 a dataset folded before the client table lands is rebuilt when it does'
   }
 })
 
+test('C4b a dataset folded with one client table is rebuilt for another', () => {
+  // The EverQuest folder can be changed while the app runs (spellTableMemo.ts), so a second table
+  // is a second install: its figures replace the first's.
+  const other: SpellResistTable = {
+    odium: { ...CLIENT.odium, hp: [{ base: -100, max: 325, calc: 103, perTick: true }] }
+  }
+  resetLevelUnlocksCache()
+  try {
+    const first = buildLevelUnlocks(CLIENT)
+    const second = buildLevelUnlocks(other)
+    const damage = second.spells.find((s) => s.name === 'Odium')?.metrics?.damage
+    assert.equal(typeof damage, 'number')
+    assert.notEqual(damage, 1515, "the second table's own figure")
+    assert.equal(buildLevelUnlocks(other), second, 'and it is folded once')
+    assert.equal(first.spells.find((s) => s.name === 'Odium')?.metrics?.damage, 1515)
+  } finally {
+    resetLevelUnlocksCache()
+  }
+})
+
 test('C5 no spell that already had wiki figures moves — the wiki stays primary', () => {
   resetLevelUnlocksCache()
   try {

@@ -212,6 +212,24 @@ test('healers scope by the same roster the damage rows do', () => {
   assert.equal(scopeHealers(HEALERS, 'everyone', roster('rykkerr')), HEALERS)
 })
 
+test('healer bar widths are re-based on the surviving maximum', () => {
+  // The engine's `pct` is against the top healer of the whole segment. With the cleric scoped
+  // away, your row is the top one and its bar must fill the rail, as the damage rows' do.
+  const rows: HealSourceView[] = [
+    { ...healer('heal:cleric', 'other', 5000), pct: 100 },
+    { ...healer('you', 'you', 1500), pct: 30 },
+    { ...healer('heal:fluffy', 'pet', 750), pct: 15 }
+  ]
+  const widths = (kept: HealSourceView[]): [string, number][] => kept.map((h) => [h.id, h.pct])
+  assert.deepEqual(widths(scopeHealers(rows, 'you', roster('cleric'))), [['you', 100], ['heal:fluffy', 50]])
+  assert.deepEqual(widths(scopeHealers(rows, 'group', roster('rykkerr'))), [['you', 100], ['heal:fluffy', 50]])
+  // Nothing removed: the same array, the engine's own widths.
+  assert.equal(scopeHealers(rows, 'group', roster('cleric')), rows)
+  // A row that only carries amount-less heals has total 0: an empty bar, never NaN.
+  const unvalued = scopeHealers([rows[0], { ...healer('you', 'you', 0), pct: 0 }], 'you', roster('cleric'))
+  assert.deepEqual(widths(unvalued), [['you', 0]])
+})
+
 test('scopeHealing filters the model in ONE place, and by reference when it changed nothing', () => {
   // The one-builder rule (tests/healRows.test.mts) applies to the filter too: both heal
   // surfaces call THIS, so neither reaches into `healing.healers` on its own.
