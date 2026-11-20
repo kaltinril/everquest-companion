@@ -152,6 +152,7 @@ import {
   isStaleVersion,
   nextCheckDelayMs,
   rescheduleAfterUpdateError,
+  shouldRearmStagedBuild,
   shouldRetryCheck
 } from '../shared/update'
 import { logError, logInfo, logWarn } from './errorLog'
@@ -269,6 +270,25 @@ function rememberStaged(version: string | undefined): void {
   } catch {
     // A store write must never break the update flow.
   }
+}
+
+/**
+ * True once a download has landed in this session with install-on-close ON, which is the only
+ * moment electron-updater registers its quit handler (BaseUpdater.js `addQuitHandler`).
+ */
+let quitArmed = false
+
+/**
+ * THE SWITCH WAS TURNED ON WITH A BUILD ALREADY DOWNLOADED. That build landed while
+ * `autoInstallOnAppQuit` was false, so no quit handler exists, and the check the switch starts
+ * returns at once on 'ready'. `downloadUpdate()` re-resolves the cached file (no network: it
+ * validates the file on disk) and runs the callback that registers the handler. `downloading`
+ * stays unset, so the re-emitted 'update-downloaded' counts nothing and re-pushes 'ready'.
+ * The caller sets the flag first.
+ */
+function rearmApplyOnQuit(): void {
+  if (!shouldRearmStagedBuild({ quitArmed, autoUpdateOff, state: lastStatus.state })) return
+  void autoUpdater.downloadUpdate().catch(() => undefined)
 }
 
 /** Launch: read the remembered build back, and drop it once this build is that version or newer. */
@@ -520,6 +540,8 @@ function registerUpdaterEvents(
 
   autoUpdater.on('update-downloaded', (info) => {
     const version: string | undefined = info?.version
+    // The library adds its quit handler right after this event, and only when this flag is on.
+    if (autoUpdater.autoInstallOnAppQuit) quitArmed = true
     // COUNTED ONLY WHEN THIS PROCESS ACTUALLY DOWNLOADED IT. Research §6b: this event is
     // RE-EMITTED on every check that re-resolves an already-staged file, so counting the event
     // itself would report one download per poll for the rest of the session — the same trap that
@@ -721,7 +743,8 @@ export function initUpdater(
   // startup check must be allowed to run and re-arm it. Also why a non-zero exit
   // code skips the install — a crash never installs anything.
   // Off when the user switched automatic updates off; electron-updater reads it again at quit,
-  // so a build staged before the switch is not applied either.
+  // so a build staged before the switch is not applied either. Switching back ON needs more than
+  // the flag: see `rearmApplyOnQuit`.
   autoUpdater.autoInstallOnAppQuit = !autoUpdateOff
   // We ship an NSIS target, never the web installer. Left at its default (false)
   // electron-updater logs a deprecation nag on EVERY download
@@ -820,6 +843,7 @@ export function initUpdater(
   // The switch flipped: re-arm or stop apply-on-quit, and the poll (switching on checks soon).
   applyAutoUpdate = () => {
     autoUpdater.autoInstallOnAppQuit = !autoUpdateOff
+    rearmApplyOnQuit()
     schedule('resume')
     push(lastStatus)
   }

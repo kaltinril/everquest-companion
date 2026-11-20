@@ -112,6 +112,22 @@ export function rescheduleAfterUpdateError(failure: {
   return failure.step === 'download' && failure.kind !== 'blocked' && failure.kind !== 'interrupted'
 }
 
+/**
+ * The switch was turned ON: does install-on-close still need arming for a downloaded build?
+ *
+ * electron-updater registers its quit handler only when a download resolves while
+ * `autoInstallOnAppQuit` is true (BaseUpdater.js `addQuitHandler`). A build that landed with the
+ * switch off has none, and a check cannot add one: a 'ready' state short-circuits every check.
+ * `quitArmed` is whether a download has landed in this session with install-on-close on.
+ */
+export function shouldRearmStagedBuild(now: {
+  quitArmed: boolean
+  autoUpdateOff: boolean
+  state: UpdateStatus['state']
+}): boolean {
+  return !now.quitArmed && !now.autoUpdateOff && now.state === 'ready'
+}
+
 // ----------------------------------------------------- feed failure messages
 //
 // JOS-211. A 0.18.0 user pressed "Check for updates" and the app answered
