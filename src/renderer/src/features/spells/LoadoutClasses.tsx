@@ -12,17 +12,26 @@
 //
 // Its own key rather than the Spellbook's: browsing five classes' spells to compare them must not
 // re-plan the buff set, and the reverse.
+//
+// THE PIN IS PER CHARACTER, as the Spellbook's is (`useFollowingClasses`). It was one value for
+// every character, so a twink druid's buff set was planned for the main's trio at the druid's
+// level, and correcting it by hand broke the main's on the way back.
 
 import { type JSX, useCallback, useMemo, useState } from 'react'
 import { Chip, Stack } from '@mui/material'
+import type { CharacterSnap } from '@shared/characterTypes'
 import { CLASS_ABBRS, MAX_COMBO_SLOTS, type ClassAbbr } from '@shared/classCombo'
 import type { ComboClasses } from '@shared/levelUnlocks'
 import { classDisplayName } from '@shared/spellLevels'
-import { readOwnClasses, sameClassSet } from '@shared/spellParty'
+import { ownClassPin, readOwnClasses, readOwnClassPins, sameClassSet, withOwnClassPin } from '@shared/spellParty'
 import ChipMultiSelect from '../../components/ChipMultiSelect'
+import { useModule } from '../../lib/useModule'
 import { useCurrentComboClasses } from '../leveling/useLevelUnlocks'
 
+/** The single pin from before pins were per character. Read as the fallback, never written. */
 const KEY = 'eq.spells.loadout.classes'
+/** The pins by character name. A new key, so the older value keeps the shape it was stored in. */
+const PINS_KEY = 'eq.spells.loadout.classes.byCharacter'
 
 export interface LoadoutClassesState {
   /** The loadout every pane is computed for, in the shape the folds take. */
@@ -38,13 +47,19 @@ export interface LoadoutClassesState {
 export function useLoadoutClasses(): LoadoutClassesState {
   const detectedCombo = useCurrentComboClasses()
   const detected = detectedCombo.resolved
-  const [pinned, setPinned] = useState(() => readOwnClasses(localStorage.getItem(KEY)))
-  const set = useCallback((next: ClassAbbr[]) => {
-    const text = JSON.stringify(next)
-    if (next.length === 0) localStorage.removeItem(KEY)
-    else localStorage.setItem(KEY, text)
-    setPinned(readOwnClasses(text))
-  }, [])
+  // The same name the Spellbook's pins are filed under, `'*'` while no character is attached.
+  const me = useModule<CharacterSnap>('character')?.character?.name ?? '*'
+  const [pins, setPins] = useState(() => readOwnClassPins(localStorage.getItem(PINS_KEY)))
+  const [legacy] = useState(() => readOwnClasses(localStorage.getItem(KEY)))
+  const pinned = useMemo(() => ownClassPin(pins, me, legacy), [pins, me, legacy])
+  const set = useCallback(
+    (next: ClassAbbr[]) => {
+      const after = withOwnClassPin(pins, me, next)
+      localStorage.setItem(PINS_KEY, JSON.stringify(after))
+      setPins(after)
+    },
+    [pins, me]
+  )
   const adopt = useCallback(() => set(detected), [set, detected])
   // A PINNED loadout is a statement, so nothing about it is ambiguous; a followed one carries
   // whatever the detection carries, the half-known slots included.

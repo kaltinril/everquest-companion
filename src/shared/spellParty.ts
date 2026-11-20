@@ -100,6 +100,51 @@ export function readOwnClasses(text: string | null): ClassAbbr[] | null {
   }
 }
 
+/**
+ * YOUR PINNED CLASSES, BY CHARACTER NAME. One pin for every character planned a twink druid's buff
+ * set for the main's trio, and correcting it by hand broke the main's on the way back.
+ *
+ * An EMPTY list is a statement: that character cleared the picker and follows detection.
+ */
+export type OwnClassPins = Record<string, ClassAbbr[]>
+
+/** The name a pin is filed under while no character is attached; every character falls back to it. */
+const ANY_CHARACTER = '*'
+
+/** The per-character pins out of their stored text. Unreadable text is no pins, never a throw. */
+export function readOwnClassPins(text: string | null): OwnClassPins {
+  if (text === null || text === '') return {}
+  try {
+    const raw = JSON.parse(text) as unknown
+    if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return {}
+    const out: [string, ClassAbbr[]][] = []
+    for (const [who, list] of Object.entries(raw)) {
+      if (Array.isArray(list)) out.push([who, memberClasses(list)])
+    }
+    return Object.fromEntries(out)
+  } catch {
+    return {}
+  }
+}
+
+/**
+ * The classes this character is pinned to, or null while it follows detection.
+ *
+ * Its own pin first, then the any-character pin, then `legacy`: the single pin stored before pins
+ * were per character (`readOwnClasses` of its own key), so nobody's standing pin is lost.
+ */
+export function ownClassPin(pins: OwnClassPins, me: string, legacy: ClassAbbr[] | null): ClassAbbr[] | null {
+  for (const who of [me, ANY_CHARACTER]) {
+    if (Object.prototype.hasOwnProperty.call(pins, who)) return pins[who].length === 0 ? null : pins[who]
+  }
+  return legacy
+}
+
+/** The pins with this character's set. Clearing is stored too, so it does not fall back to an older pin. */
+export function withOwnClassPin(pins: OwnClassPins, me: string, next: readonly ClassAbbr[]): OwnClassPins {
+  return { ...pins, [me]: memberClasses(next) }
+}
+
 /** Are these the same classes, in any order? */
 export function sameClassSet(a: readonly ClassAbbr[], b: readonly ClassAbbr[]): boolean {
   return a.length === b.length && a.every((c) => b.includes(c))
