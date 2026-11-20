@@ -419,7 +419,8 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   tests/dpsChartLines.test.mts on the pure functions. Build a DpsSeries with hasGroup=true, then:
   (a) withPetApart(series, true) gives a peakTitle that mentions the group and says 'without your
   pet'; (b) ...
-- CONFIRMED [medium, untrue-words] Timeline hover row 'you + pet' holds the group's damage too Seen:
+- FIXED 2026-11-19 (both hover layers now take their rows from `rateRows` in dpsAt.ts) [medium,
+  untrue-words] Timeline hover row 'you + pet' holds the group's damage too Seen:
   Timeline hover at 1:42: 'you + pet 59 dps', 'pet 0 dps'. The DPS card at the same 1:42: 'you + pet
   + group 59 dps', 'pet 0 dps', 'group 50 dps', so you + pet is about 9 dps and the Timeline prints
   59. At 1:35 the Timeline says 'you + pet 141 dps', 'pet 0 dps' while the card at 1:36 says 'group
