@@ -13,7 +13,7 @@ measured fact, an owner ruling), add it to the right file below on a work branch
 | [BRANCH_NOTES.md](BRANCH_NOTES.md) | Before changing a feature. Design laws, traps, open items per feature area. |
 | [../requirements/](../requirements/) | Before changing a feature. What was asked (rule 19). One file per feature area; most are named after the retired branch that built the feature. A new request goes in its area's file; a new area gets a new file. |
 | [MEASURED.md](MEASURED.md) | Before reasoning about game mechanics or mining a log. |
-| [DATA_REFRESH.md](DATA_REFRESH.md) | Before any wiki scrape or data top-up. |
+| [DATA_REFRESH.md](DATA_REFRESH.md) | Before any wiki scrape or data top-up, and before pulling the two tradeskill guides. |
 | [../wiki-usage/README.md](../wiki-usage/README.md) | Before any wiki read, by hand or by script: every request goes in the ledger. |
 | [WIKI.md](WIKI.md) | Before parsing wiki pages or writing pages for the wiki: links (site, API and its docs, the wiki's GitHub data pack), page templates, conventions, caches, what the log can give a page. |
 | [../RELEASING.md](../RELEASING.md) | Before a release. |
