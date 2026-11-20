@@ -18,8 +18,8 @@ import { ipcMain } from 'electron'
 import { IPC } from '../../shared/ipc'
 import { equippedHosts, type PlannerInventory } from '../../shared/planner/inventorySlots'
 import { searchPlannerItems } from '../planner/effectIndex'
-import { gearIndexSteps } from '../planner/gearIndex'
-import { runStepsSliced } from '../yieldingSteps'
+import { gearIndexStepsOn } from '../planner/gearIndex'
+import { runStepsSliced, type Steps } from '../yieldingSteps'
 import { logError } from '../errorLog'
 import type { GearIndexPayload } from '../../shared/planner/gear'
 import { NO_OWNERSHIP, ownershipPayload, type OwnershipPayload } from '../../shared/planner/ownership'
@@ -42,7 +42,7 @@ import { currentWornFocus } from '../planner/wornFocusCurrent'
 // The donor/item index memo used to live in this file. It moved to its own module the day the spell
 // page became a SECOND handler that needs the donor rows - which is the duplicate 8.6 MB walk the
 // gear memo's own comment below warns about. See planner/indexCurrent.ts.
-import { plannerIndex } from '../planner/indexCurrent'
+import { eraDerivationsSteps, plannerIndex } from '../planner/indexCurrent'
 
 let gear: Promise<GearIndexPayload> | null = null
 
@@ -58,9 +58,15 @@ let gear: Promise<GearIndexPayload> | null = null
  * lets a request that arrives mid-build wait for the build already running instead of starting a
  * second one. A failed build is forgotten, so the next ask retries — as a throw did before.
  */
+/** The gear build over the committed corpus, on the one copy of layer 3 the donor index also reads. */
+function* committedGearSteps(): Steps<GearIndexPayload> {
+  const derivations = yield* eraDerivationsSteps()
+  return yield* gearIndexStepsOn(itemsJson as unknown as ItemDbFile, derivations)
+}
+
 function gearIndex(): Promise<GearIndexPayload> {
   if (gear === null) {
-    const building = runStepsSliced(gearIndexSteps(itemsJson as unknown as ItemDbFile))
+    const building = runStepsSliced(committedGearSteps())
     gear = building
     building.catch(() => {
       if (gear === building) gear = null

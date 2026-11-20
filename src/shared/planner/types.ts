@@ -25,6 +25,7 @@
 import type { ClassAbbr } from '../classCombo'
 import type { EffectFacts } from './effectText'
 import type { FocusBenefit } from './gear'
+import type { EraDerivation } from './era'
 
 /**
  * Canonical equipment slots, normalized from the dirty wiki tokens (normalize.ts owns the
@@ -369,6 +370,13 @@ export interface PlannerDonor extends EffectFacts {
    * anywhere (`shared/planner/era.ts layeredVerdict`). Absent when the page opened with no banner.
    */
   eraTag?: string
+  /**
+   * LAYER 3: the era read off the way the corpus says you GET the item (the quest that awards it,
+   * the mob that drops it, its recipe), with the edge that says so. The same field a Gear row
+   * carries, written by the same builder (`main/planner/eraEvidence.ts`), so the Exaltation list
+   * and the Gear tab give one item one verdict. Absent when no edge speaks.
+   */
+  eraDerived?: EraDerivation
 }
 
 /**

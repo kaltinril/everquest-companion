@@ -41,6 +41,7 @@ import {
 import { committedSpellFacts, slotsOf, type SpellFactsIndex } from './effectIndex'
 import { COMMITTED_FOCUS_BENEFIT } from './focusBenefit'
 import { eraDerivationSteps } from './eraDerive'
+import { eraEvidenceOf, type EraEvidence } from './eraEvidence'
 import { runSteps, type Steps } from '../yieldingSteps'
 import {
   isHasteEffect,
@@ -309,12 +310,12 @@ function optionalFields(
   k: ResearchedKnowledge,
   read: GearStatReading | null,
   voidSynth: boolean,
-  derived: EraDerivation | undefined
+  era: EraEvidence
 ): Partial<GearRow> {
   return {
     ...(k.iconId === undefined ? {} : { iconId: k.iconId }),
-    ...(k.eraTag === undefined ? {} : { eraTag: k.eraTag }),
-    ...(derived === undefined ? {} : { eraDerived: derived }),
+    // The banner and layer 3, from the one builder the donor index also calls (`eraEvidence.ts`).
+    ...era,
     ...(k.stats?.skill === undefined ? {} : { skill: k.stats.skill }),
     ...(read?.rangeText === undefined ? {} : { rangeText: read.rangeText }),
     ...(voidSynth ? { voidSynth: true as const } : {}),
@@ -412,7 +413,7 @@ function pageRow(entry: ItemDbEntry, deps: BuildDeps, acc: Acc): GearRow | null 
     playerCrafted: k.playerCrafted === true,
     stats: read.stats,
     effects: block.effects.map((e) => gearEffect(e, spells, acc)),
-    ...optionalFields(k, read, synthesizesVoidSave(block, ANY_UPGRADED), acc.derived.get(itemKey(entry.page)))
+    ...optionalFields(k, read, synthesizesVoidSave(block, ANY_UPGRADED), eraEvidenceOf(entry.page, k.eraTag, acc.derived))
   }
   return withDrops(row, deps.sources, deps.supply)
 }
@@ -486,8 +487,30 @@ export function* gearIndexSteps(
   spells: SpellFactsIndex = committedSpellFacts(),
   sources: SourceIndex = committedSources()
 ): Steps<GearIndexPayload> {
-  const acc = newAcc(yield* eraDerivationSteps(file))
-  const deps: BuildDeps = { research, spells, sources, supply: committedSupplyContext(sources) }
+  const derivations = yield* eraDerivationSteps(file)
+  return yield* gearRowSteps(file, derivations, { research, spells, sources, supply: committedSupplyContext(sources) })
+}
+
+/**
+ * The same build over layer 3 the caller ALREADY HOLDS for `file` (`indexCurrent.ts` keeps one copy
+ * for the gear index and the donor index alike), with the committed research, spells and sources.
+ */
+export function* gearIndexStepsOn(
+  file: ItemDbFile,
+  derivations: ReadonlyMap<string, EraDerivation>
+): Steps<GearIndexPayload> {
+  const sources = committedSources()
+  const deps: BuildDeps = { research: ITEMS_RESEARCH, spells: committedSpellFacts(), sources, supply: committedSupplyContext(sources) }
+  return yield* gearRowSteps(file, derivations, deps)
+}
+
+/** The row walk and the census, over layer 3 as given. */
+function* gearRowSteps(
+  file: ItemDbFile,
+  derivations: ReadonlyMap<string, EraDerivation>,
+  deps: BuildDeps
+): Steps<GearIndexPayload> {
+  const acc = newAcc(derivations)
   // Through the rename overlay (JOS-415) — same reasoning as `buildPlannerIndex`: a gear row is a
   // DISPLAYED name, and `addPage`'s page dedupe already absorbs the alias key.
   let walked = 0
