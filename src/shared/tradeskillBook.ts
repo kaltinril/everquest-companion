@@ -10,6 +10,7 @@ import { mobOutOfEra } from './mobEra'
 import { eraVerdict, type EraDerivation } from './planner/era'
 import { ownedCount, ownershipRowsFor, type OwnershipIndex } from './planner/ownership'
 import type { SkillRow } from './skills'
+import type { GuidePayload } from './tradeskillGuide'
 import { TRADESKILLS, tradeskillOf, type Tradeskill } from './tradeskills'
 import type { ItemCraftIngredient, ItemDropSource } from './types'
 
@@ -53,6 +54,8 @@ export interface TradeskillBookPayload {
   recipes: BookRecipe[]
   /** By material key; a material the item database does not hold has no entry. */
   materials: Record<string, BookMaterial>
+  /** The two community guides as data (shared/tradeskillGuide.ts); absent reads as no guide. */
+  guides?: GuidePayload
 }
 
 export const EMPTY_BOOK: TradeskillBookPayload = { version: TRADESKILL_BOOK_VERSION, recipes: [], materials: {} }

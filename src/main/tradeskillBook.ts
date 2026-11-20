@@ -9,6 +9,7 @@ import { itemKey, wornKey, type ItemDbEntry } from './itemsDb'
 import { eraEvidenceOf } from './planner/eraEvidence'
 import type { EraDerivation } from '../shared/planner/era'
 import { tradeskillOf } from '../shared/tradeskills'
+import type { WikiItemName } from '../shared/tradeskillGuide'
 import {
   TRADESKILL_BOOK_VERSION,
   type BookIngredient,
@@ -74,6 +75,18 @@ function noteMaterials(recipe: BookRecipe, index: ItemIndex, materials: Map<stri
     const record = index.get(itemKey(ingredient.name))
     const material = record === undefined ? null : materialOf(record)
     if (material !== null) materials.set(ingredient.key, material)
+  }
+}
+
+/**
+ * The guides' name lookup: the item a spelling names exactly (its name, its page title or one of
+ * its other names, as the index keys them), in the item's own spelling. A loose guide spelling
+ * finds nothing and stays the text its author wrote.
+ */
+export function wikiItemName(index: ItemIndex): WikiItemName {
+  return (name) => {
+    const record = index.get(itemKey(name))
+    return record === undefined ? undefined : (record.name ?? record.page)
   }
 }
 
