@@ -12,7 +12,7 @@
 // One app-wide list, not per character: what an item sells for does not change with who asks.
 // Stored through the settings store (main/storeBazaarWatch.ts) and normalized on both sides.
 
-import { formatPlat, median, type BazaarRow, type BazaarSnap, type LiveOffer } from './bazaar'
+import { formatPlat, formatPlatExact, median, type BazaarRow, type BazaarSnap, type LiveOffer } from './bazaar'
 
 export interface BazaarWatch {
   /** The item page's spelling, as the bazaar rows carry it. */
@@ -167,7 +167,8 @@ export function watchAlertReason(w: BazaarWatch, o: LiveOffer, weekMedian: numbe
 function wtsReason(w: BazaarWatch, price: number | null, weekMedian: number | null): string | null {
   if (w.wtsMax === null && w.wtsShare === null) return 'on your watchlist'
   if (price === null) return null
-  if (w.wtsMax !== null && price <= w.wtsMax) return `at or under your ${formatPlat(w.wtsMax)}`
+  // The threshold as typed, never rounded: "your 13k" for a typed 12500 names a price never set.
+  if (w.wtsMax !== null && price <= w.wtsMax) return `at or under your ${formatPlatExact(w.wtsMax)}`
   const cap = w.wtsShare !== null && weekMedian !== null ? w.wtsShare * weekMedian : null
   if (cap !== null && price <= cap) return `${Math.round((price / (weekMedian ?? price)) * 100)}% of the 7-day median ${formatPlat(weekMedian)}`
   return null
@@ -176,14 +177,17 @@ function wtsReason(w: BazaarWatch, price: number | null, weekMedian: number | nu
 function wtbReason(w: BazaarWatch, price: number | null): string | null {
   if (w.wtbMin === null) return 'on your watchlist'
   if (price === null) return 'no price stated'
-  return price >= w.wtbMin ? `at or over your ${formatPlat(w.wtbMin)}` : null
+  return price >= w.wtbMin ? `at or over your ${formatPlatExact(w.wtbMin)}` : null
 }
 
-/** The offer as one line: `Leric WTS Fleeting Quiver +4 18k`. */
+/**
+ * The offer as one line: `Leric WTS Fleeting Quiver +4 18k`. Its price is in full, as the threshold
+ * beside it is, so an offer at the threshold never reads above it.
+ */
 export function watchAlertText(o: LiveOffer): string {
   const what = `${o.item}${o.tier > 0 ? ` +${o.tier}` : ''}`
   const verb = o.dir === 'sell' ? 'WTS' : 'WTB'
-  const price = o.price === null ? '' : ` ${formatPlat(o.price)}`
+  const price = o.price === null ? '' : ` ${formatPlatExact(o.price)}`
   return `${o.speaker} ${verb} ${what}${price}`.slice(0, 120)
 }
 
@@ -195,7 +199,7 @@ export function watchAlertCaptures(o: LiveOffer, reason: string): Record<string,
   return {
     item: `${o.item}${o.tier > 0 ? ` +${o.tier}` : ''}`,
     seller: o.speaker,
-    price: o.price === null ? 'no price' : formatPlat(o.price),
+    price: o.price === null ? 'no price' : formatPlatExact(o.price),
     what: o.dir === 'sell' ? 'for sale' : 'wanted',
     offer: watchAlertText(o),
     why: reason

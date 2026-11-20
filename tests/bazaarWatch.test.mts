@@ -3,7 +3,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { formatPlat, parsePlat, summarizeBazaar, type BazaarRow, type BazaarSnap, type LiveOffer } from '../src/shared/bazaar'
+import { formatPlat, formatPlatExact, parsePlat, summarizeBazaar, type BazaarRow, type BazaarSnap, type LiveOffer } from '../src/shared/bazaar'
 import {
   findWatch,
   freshWatchAlerts,
@@ -224,6 +224,43 @@ test('a watch price reads what the field shows it as, millions included, so a th
   assert.equal(parsePlat('500pp'), 500)
   assert.equal(parsePlat(''), null)
   for (const pp of [500, 2500, 15_000, 1_500_000, 12_000_000]) assert.equal(parsePlat(formatPlat(pp)), pp)
+})
+
+test('a threshold is written in full, so typing what the field shows stores the same price', () => {
+  const written: [number, string][] = [
+    [0.5, '0.5p'],
+    [2.5, '2.5p'],
+    [999, '999p'],
+    [1250, '1.25k'],
+    [12_345, '12345p'],
+    [12_500, '12.5k'],
+    [20_000, '20k'],
+    [1_250_000, '1.25M'],
+    [1_234_567, '1234567p'],
+    [12_000_000, '12M']
+  ]
+  for (const [pp, text] of written) {
+    assert.equal(formatPlatExact(pp), text)
+    assert.equal(parsePlat(text), pp)
+  }
+  // The table's short form is unchanged, and it is what a number no short text says in full falls to.
+  assert.equal(formatPlat(12_500), '13k')
+  assert.equal(formatPlatExact(10 / 3), '3p')
+})
+
+// Bug hunt, 2026-11-19: a 12,500 threshold was written "13k", so the alert named a price the player
+// never set and a 13k offer looked as if it should have alerted.
+test('an alert names the threshold the player typed, and an offer at it never reads above it', () => {
+  const under = watch({ item: 'Fleeting Quiver', wts: true, wtsMax: 12_500 })
+  assert.equal(watchAlertReason(under, offer([1, 'sell', 'Fleeting Quiver'], 12_400), null), 'at or under your 12.5k')
+  const over = watch({ item: 'Fleeting Quiver', wtb: true, wtbMin: 1250 })
+  assert.equal(watchAlertReason(over, offer([1, 'buy', 'Fleeting Quiver'], 1300), null), 'at or over your 1.25k')
+  const snap: BazaarSnap = { rows: [], live: [offer([2, 'sell', 'Fleeting Quiver'], 12_500)] }
+  assert.deepEqual(
+    freshWatchAlerts(snap, { entries: [under] }, 1).alerts.map((a) => a.text),
+    ['Leric WTS Fleeting Quiver 12.5k (at or under your 12.5k)']
+  )
+  assert.equal(watchAlertCaptures(offer([1, 'sell', 'Fleeting Quiver'], 12_345), 'on your watchlist').price, '12345p')
 })
 
 test('a store reply lands only while its write is the newest, and the first load only before any write', () => {
