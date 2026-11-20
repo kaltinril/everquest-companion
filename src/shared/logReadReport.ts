@@ -385,7 +385,10 @@ function combatVerdict(f: LogReadFacts): Verdict {
 
 function decide(f: LogReadFacts): Verdict {
   const wait = engineWait(f) ?? logWait(f)
-  return wait === null ? combatVerdict(f) : { wait, since: f.waitingSince }
+  if (wait === null) return combatVerdict(f)
+  // An engine the app itself stopped is the app closing: not a wait to put on a closing window.
+  const closing = f.supervisor === 'stopping' || f.supervisor === 'stopped'
+  return { wait, since: closing && wait === 'engineStarting' ? null : f.waitingSince }
 }
 
 /** `connected`, or how the reconnect is going: `connecting (try 2 of 5)`. */

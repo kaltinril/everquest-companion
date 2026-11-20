@@ -45,6 +45,20 @@ test('no character with the engine merely starting, or up, is `noCharacter`', ()
   assert.equal(waitOf({ logPath: null }), 'noCharacter')
 })
 
+test('AN ENGINE THE APP ITSELF STOPPED IS NEVER SHOWN: the app is closing, mid-read or not', () => {
+  // Quitting during a long read: the wait is a minute old, and without this the closing window
+  // was told "Starting the data engine."
+  for (const supervisor of ['stopping', 'stopped']) {
+    const r = report({ supervisor, connection: null, waitingSince: NOW - 60_000 })
+    assert.equal(r.wait, 'engineStarting', supervisor)
+    assert.equal(r.show, false, supervisor)
+  }
+  // An engine that is slow to start, or restarting, is still shown once the wait has run long.
+  for (const supervisor of ['starting', 'backoff']) {
+    assert.equal(report({ supervisor, connection: null, waitingSince: NOW - 60_000 }).show, true, supervisor)
+  }
+})
+
 // ---- 2. an attach nobody answered --------------------------------------------------------------
 
 test('AN ATTACH THAT TIMED OUT IS `notAnswering`; one the engine refused stays `attachRefused`', () => {
