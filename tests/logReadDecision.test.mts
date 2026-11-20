@@ -15,6 +15,7 @@ import {
 } from '../src/shared/logReadReport'
 import { KB, MB, NOW, error, facts, health, report } from './logReadFactsHarness.mts'
 import { composeLogReadReport } from '../src/shared/logReadReport'
+import { IDLE_POLL_MS } from '../src/renderer/src/features/combat/combatPoll'
 
 function waitOf(over: Partial<LogReadFacts>): string {
   return report(over).wait
@@ -225,7 +226,9 @@ test('ONE SLOW METER READ HOURS AFTER GOING LIVE IS NOT SHOWN: its wait is timed
   assert.equal(held.action, 'reconnect')
 })
 
-test('a meter read nobody has repeated for 10 s says nothing any more', () => {
+test('a meter read nobody has repeated for 30 s says nothing any more', () => {
+  // Longer than an idle meter's 10 s between polls, or a standing failure would blink.
+  assert.ok(COMBAT_READ_FRESH_MS >= 3 * IDLE_POLL_MS)
   const live = { ...LIVE, waitingSince: NOW - 7_200_000 }
   assert.equal(waitOf({ ...live, lastCombatRead: unserved(60_000, COMBAT_READ_FRESH_MS) }), 'notAnswering')
   // The Combat tab was left: the verdict of a read nobody is asking is not put on every tab.

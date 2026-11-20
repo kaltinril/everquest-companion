@@ -45,8 +45,12 @@ export const LOG_READ_FINISH_MS = 5 * 60_000
 export const LOG_READ_OPENING_MS = 60_000
 /** Main's own open of the log out for this long means the drive is not answering. */
 export const LOG_READ_HUNG_MS = 15_000
-/** The meter's last read speaks for this long. After that nobody is asking. */
-export const COMBAT_READ_FRESH_MS = 10_000
+/**
+ * The meter's last read speaks for this long. After that nobody is asking. Three of an idle
+ * meter's polls (renderer combatPoll.ts IDLE_POLL_MS, 10 s): at one poll's length the verdict
+ * would lapse between two reads and the band would blink.
+ */
+export const COMBAT_READ_FRESH_MS = 30_000
 
 export interface LogReadError {
   readonly step: LogReadStep

@@ -74,7 +74,7 @@ const CLOCKED: ReadonlySet<LogReadWait> = new Set<LogReadWait>([
   'finishing',
   'stalled',
   'logHung',
-  // The meter's last read stops speaking after 10 s (`COMBAT_READ_FRESH_MS`).
+  // The meter's last read stops speaking after `COMBAT_READ_FRESH_MS`.
   'notAnswering'
 ])
 
