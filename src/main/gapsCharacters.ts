@@ -58,8 +58,10 @@ import { writeFileDurableAsync } from './telemetry/durableWrite'
 import { gapsSaver } from './gapsCharacterSave'
 import { logInfo } from './errorLog'
 import { withoutNowKnown, type KnownNow } from '../shared/gapsRecheck'
-import { inItemDb } from './itemLookup'
+import { inItemDb, itemDb } from './itemLookup'
+import { itemKey } from './itemsDb'
 import { localMobEntry } from './mobLookupLocal'
+import { pagesToday } from './gapsToday'
 
 const FIRST_SAVE_MS = 60 * 1000
 const SAVE_EVERY_MS = 10 * 60 * 1000
@@ -175,6 +177,8 @@ let cache: { key: string; value: CharacterGaps[] } | null = null
 
 /** Today's committed data, asked of a saved row (shared/gapsRecheck.ts has why). */
 const knownNow: KnownNow = (domain, name) => (domain === 'item' ? inItemDb(name) : localMobEntry(name) !== null)
+/** Today's catalogs, asked of a saved row about a page the wiki has (shared/gapsRecheckPages.ts). */
+const pagesNow = pagesToday((name) => itemDb().get(itemKey(name)) ?? null)
 
 /**
  * The character's OWN inventory export folded as the Gear tab folds it, for "held by" (owner,
@@ -200,7 +204,7 @@ export async function allCharacterGaps(sinceStamp: string | null): Promise<Chara
   const [saved, segments] = await Promise.all([readSaved(), archiveOn ? readSegments() : Promise.resolve([])])
   const unreadable = (id: string, err: unknown): void => logInfo(`[everquest-companion] gaps characters: ${id} could not be joined: ${(err as Error).message}`)
   // A saved list is re-checked against today's data: a page the wiki gained since stops showing.
-  const value = othersGaps({ saved, segments }, except, sinceStamp, unreadable).map((one) => ({ ...one, gaps: withoutNowKnown(one.gaps, knownNow) }))
+  const value = othersGaps({ saved, segments }, except, sinceStamp, unreadable).map((one) => ({ ...one, gaps: withoutNowKnown(one.gaps, knownNow, pagesNow) }))
   cache = { key, value }
   return value.map((c) => ({ ...c, inventory: ownInventory(c) }))
 }

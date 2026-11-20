@@ -25,6 +25,7 @@ import { mergeLoot } from './logArchive/mergeLoot'
 import { mergeModule } from './logArchive/mergeRules'
 import type { Segment } from './logArchive/segment'
 import type { GapDomain, GapRow, GapsSnap } from './gaps'
+import { aboutKnownPage } from './gapsRecheckPages'
 import type { KillsSnap } from './kills'
 import type { OwnershipPayload } from './planner/ownership'
 import type { LootSnap } from './types'
@@ -338,17 +339,17 @@ export function joinCharacters(inputs: readonly CharacterInputs[], cut: { stamp:
 /**
  * A saved Mobs row the catalog now answers: a plain unknown name whose page has been added. A row
  * about a name the wiki already has a page for (its quests to add, its redirect to check, a page
- * for this zone beside another zone's) is known by design, so the name test says nothing about it.
+ * for this zone beside another zone's) is known by design, so the name test says nothing about it:
+ * the one predicate main's re-check uses (`aboutKnownPage`), so the two cannot drift apart.
  */
-const closedByCatalog = (r: GapRow, isMob: (name: string) => boolean): boolean =>
-  r.domain === 'mob' && r.questGaps === undefined && r.viaRedirect === undefined && r.zoneTitled !== true && isMob(r.name)
+const closedByCatalog = (r: GapRow, isMob: (name: string) => boolean): boolean => r.domain === 'mob' && !aboutKnownPage(r) && isMob(r.name)
 
 /**
  * Another character's inputs for the join. Its saved mob rows are checked again against today's
- * catalog (a page added since it was saved closes the gap, `closedByCatalog`); item and spell
- * known-ness, and a quest-giver, redirect or zone-titled Mobs row, are the engine's call and wait
- * for that character's next attach. Its label names it, with its server when two characters share
- * a name.
+ * catalog (a page added since it was saved closes the gap, `closedByCatalog`), as main already did
+ * before serving them (gapsRecheck.ts, which also re-checks a quest-giver, redirect or zone-titled
+ * row against today's data); spell known-ness is the engine's call and waits for that character's
+ * next attach. Its label names it, with its server when two characters share a name.
  */
 export function otherInputs(others: readonly CharacterGaps[], isMob: (name: string) => boolean): CharacterInputs[] {
   const names = others.map((o) => o.name)
