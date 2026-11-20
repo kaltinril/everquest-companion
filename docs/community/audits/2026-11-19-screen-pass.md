@@ -701,7 +701,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   n=1"; "Bounce | message | - elapsed | ~8s left | set | n=1"; "Flash of Light | message | - elapsed
   | ≥ 15s left | log | n=0". The next second it reads "1s elapsed". The left-hand caption was given
   "0s" today; the ...
-- CONFIRMED [low, untrue-words] Buffs Durations: the estimate reads 4.5s and the median beside it
+- FIXED 2026-11-19 (`statCells` in buffs/format.ts prints the three cells with tenths) [low, untrue-words] Buffs Durations: the estimate reads 4.5s and the median beside it
   reads 5s for the same two casts Seen: Row: "Jonthan's Whistling Warsong ; 4.5s log ; 2 ; 5s ; 4s -
   5s ; 4s - 5s". Dialog: "From my log · 4.5s | The middle of your last five clean casts". The median
   column prints the same middle rounded to 5s. Verdict: I re-ran the reporter's probe and got the

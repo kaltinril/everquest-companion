@@ -6,7 +6,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import type { ActiveBuff } from '../src/shared/buffTypes'
-import { estimateState, estimateText, fmtPrecise, leftCaption } from '../src/renderer/src/features/buffs/format'
+import { estimateState, estimateText, fmtPrecise, leftCaption, statCells } from '../src/renderer/src/features/buffs/format'
 
 function buff(over: Partial<ActiveBuff>): ActiveBuff {
   return { spell: 'Swift Like the Wind', cls: 'buff', self: true, startedTs: 0, estimatedMs: null, p25: null, p75: null, n: 0, ...over }
@@ -78,4 +78,17 @@ test('the Durations table states the number the player typed', () => {
   assert.equal(estimateText(2_160_000, 'db'), '36m 00s')
   // A bound still wears its sign.
   assert.equal(estimateText(34_000, 'deathBound'), '≥ 34s')
+})
+
+test('the Durations row prints its median the way it prints its estimate', () => {
+  // Two casts of 4 s and 5 s: the estimate read "4.5s" and the median beside it read "5s".
+  const two = statCells({ medianMs: 4500, p25: 4250, p75: 4750, minMs: 4000, maxMs: 5000 })
+  assert.equal(two.median, fmtPrecise(4500))
+  assert.equal(two.median, '4.5s')
+  assert.equal(two.middle, '4.3s - 4.8s')
+  // Min and max come from whole-second stamps, so they read as they did.
+  assert.equal(two.range, '4s - 5s')
+  // A minute and over keeps the long form, and a missing number is a dash.
+  assert.deepEqual(statCells({ medianMs: 90_000, p25: 60_000, p75: 120_000, minMs: 30_000, maxMs: 150_000 }), { median: '1m 30s', middle: '1m 00s - 2m 00s', range: '30s - 2m 30s' })
+  assert.deepEqual(statCells({ medianMs: null }), { median: fmtPrecise(null), middle: '-', range: '-' })
 })
