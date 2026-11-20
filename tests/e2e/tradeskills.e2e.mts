@@ -16,7 +16,9 @@
  *   - links IN: a tradeskill's name on the Skills tab opens its workbench with a Back to Skills,
  *     and the Loot page's crafted note opens the workbench on that item's own recipe;
  *   - "Gear that raises this skill" lists items with their mod, each the standard item link, and
- *     its last link opens the Gear tab with the search box filled.
+ *     its last link opens the Gear tab with the search box filled;
+ *   - the player's own log, the history tab and the guides tab: tradeskillLogSteps.mts (written
+ *     on `workbench-data`, not yet run).
  *
  * Every claim about a recipe is a property of what is on screen, never a name or a count from the
  * wiki data, so a data refresh cannot turn it red.
@@ -27,6 +29,7 @@ import type { Page } from 'playwright-core'
 import { buildIfStale, check, countOf, dumpArtifacts, failures, note, reportRun, settle, settleGone } from './appHarness.mjs'
 import { mainWindow } from './appWindow.mjs'
 import { launchOnFixture } from './logFixture.mjs'
+import { stepGuides, stepHistory, stepOwnLog } from './tradeskillLogSteps.mjs'
 import { TRADESKILLS } from '../../src/shared/tradeskills'
 
 const LEVEL = 205
@@ -442,6 +445,12 @@ async function main(): Promise<void> {
     await stepFromLoot(page)
     await stepHave(page)
     await stepSkillGear(page)
+    // Last: it raises the level, which every step above reads as LEVEL.
+    const crafted = await stepOwnLog(page, log, LEVEL)
+    if (crafted !== null) {
+      await stepHistory(page, crafted)
+      await stepGuides(page, LEVEL)
+    }
 
     check('no renderer console errors', consoleErrors.length === 0, consoleErrors.slice(0, 3).join(' | '))
     if (failures.length) await dumpArtifacts(page, 'tradeskills-FAIL')

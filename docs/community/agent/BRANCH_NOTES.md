@@ -1730,7 +1730,7 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
 - Per hour and This session cells are blank when there is nothing to state (no dash glyph:
   copyNoEmDash).
 
-### Crafting module (fork #6, data only: no screen reads it yet)
+### Crafting module (fork #6; the Tradeskills workbench reads it, slice 3 below)
 
 - Engine module `crafting`, wired after `skills`: `fold/src/modules/crafting.rs` (the module, item
   rows, pairing), `crafting_spans.rs`, `crafting_money.rs`, `crafting_tests.rs`. No parser kind and
@@ -1852,8 +1852,9 @@ only: no engine, parser, protocol, network or dependency change.
   recipes in trivial order, what to make next, each material's sources and how many you hold."
   For slice 2: "Tradeskills is linked from the Loot page, the Bazaar, the Skills tab, the wish
   list and the Gear table, and a workbench lists the gear that raises its skill."
-- Not built, and no placeholder is drawn: the goal switch and routes, merchants and locations,
-  prices, combine history, the guide panel, the make-an-item planner, a "ready" mark.
+- Not built, and no placeholder is drawn: the goal switch and routes, the shopping list across
+  several steps, the make-an-item planner, a "ready" mark. Merchants and locations, prices,
+  combine history and the guide panel are slice 3, below.
 - Links IN from other tabs (owner, 2026-11-20: "fully integrated with maps and other tabs"),
   slice 2, 2026-11-20 on `tradeskills-links`:
   - The opener: `openTradeskills({ tradeskill, item? })` in `appRouting.ts`, a `FocusSlot` like
@@ -1919,14 +1920,88 @@ only: no engine, parser, protocol, network or dependency change.
     are not touched, so a class or slot filter the player left on can still hide the items.
 - e2e (written, NOT run on `tradeskills-links`): `tradeskills.e2e.mts` gained `stepFromSkills`,
   `stepFromLoot` and `stepSkillGear`.
+- Slice 3, the workbench's data (2026-11-20, branch `workbench-data` off `tradeskills-batch`; not
+  merged, not tried by the owner). TypeScript only; no engine, protocol, network or dependency
+  change; `security.ts` untouched.
+  - Layout: three tabs under the head, one shown at a time (`Workbench.tsx` `BenchTabs`, the
+    `MapsTabs` arrangement): Recipes (the slice 1 master and detail), Your history, From the
+    guides. The tab is in the workbench's session memory (`BenchMemory.tab`); a link in and a
+    history row both open Recipes. The mockup's one page of panels is not built as drawn (owner:
+    the workbench must not be one long scroll).
+  - TRAP: `RecipeTable` parks the one `lib/navReturn` slot on unmount. A tab change unmounts it,
+    so `parkOnLeave` (Workbench's `awayFromRecipes` ref) tells it not to park then, and
+    `restoreTop` is dropped on the first tab change.
+  - Facts for every line: `benchFacts.ts` (`BenchFacts`: index, held, eraOnly, `craft`, `money`,
+    `guides`), one context for the recipe panel and the guide panel.
+  - Guides on the wire: `ipc/tradeskills.ts` imports `data/tradeskillGuides.json` (the one new
+    JSON import edge in main; e2e not run on it) and adds `guides` to the book payload:
+    `shared/tradeskillGuide.guidePayload` keeps each tradeskill's `notes`, `steps`, `alternates`
+    and the recipe lists, and resolves every item name once (`main/tradeskillBook.wikiItemName`:
+    the item index's own key, so a name, a page title, an other name or a renamed item's old
+    name). The leveling guide's `asides`, `overview` and `unparsed` are not served.
+  - Name matching: exact only (case folded, `+N` dropped). Measured 2026-11-20: 46 of 73 route
+    steps and alternates, 244 of 278 route materials, 61 of 68 guide recipes, 174 of 189 guide
+    recipe materials name a wiki item. The rest stay the text the author wrote ("Gold jade").
+  - History (`shared/tradeskillHistory.ts`): `indexCrafting` keys the snapshot by
+    `sourceItemKey`; `skillHistory` is one tradeskill's totals, pace and item rows (newest
+    combine first); `recipeHistory` is the row of a recipe's item or of what its combine yields.
+    Two recipes that make one item share one row: the log names the item, never the recipe.
+    Items neither a raise nor the book places are counted in a line under the history table.
+  - "trivial for you" (`RecipeYou.NoticeChip`, info colour) is the game's own notice
+    (`CraftedItemRow.trivial > 0`); "trivial" (`RecipeTable.StateChip`) is the wiki's trivial
+    against the level. Two chips, never merged.
+  - Money (`shared/tradeskillMoney.ts`, header lists the rules): a material's price is its
+    newest purchase line per unit; a material never bought is costed from the cheapest of its own
+    recipes whose every input has a price, per item yielded; a material the wiki marks
+    `Returned on Success` is left out; the sum is `crafting.combineCost`'s. Anything else leaves
+    the cost unknown: the cell is blank and the panel says which material has no purchase.
+    Enchanted Gold Bar (never bought, no wiki recipe, made by a spell from a bought Gold Bar) is
+    that case and gets no special rule, so the Golden Ruby Ring has no cost. Open, the owner's
+    call: a rule such as "Enchanted X costs what X costs".
+  - Limits of the money: a tool the wiki does not mark as returned counts as consumed if the
+    player ever bought one (the panel lists the parts it added up); the sale line states no
+    quantity, so Sells is what one sale LINE paid and the difference is stated only for a recipe
+    that yields one item; a recipe whose materials are the guide's has no cost.
+  - Have (`tradeskillHistory.haveNow`): the dump's count, or the log's `leaving N` when that line
+    is newer than the dump or there is no dump; the cell then carries `log` under the number and
+    the foot line says so. The log's count is the DEPOT only, the dump's is bags, bank and depot.
+  - Guide lines in the panel (`MaterialWhere.tsx`): the recipe guide's first merchant with a loc
+    for a material (66 materials; none has two different places), with a `guide` chip. A recipe
+    the wiki lists no materials for draws the guide's recipe of the same tradeskill and item (19
+    recipes): a matched name is an ordinary material row, an unmatched one plain text.
+  - Merchants: `shared/tradeskillMerchant` over the mob catalog: a link only when one page has
+    the name, or one page in the stated zone (24 of the recipe guide's 27 merchants).
+  - Loc: plain text. `openMapZone(zone)` is the only Maps opener and takes a zone. Measured
+    2026-11-20: the guide's locs are in `/loc` order (north/south, west/east) and each of the 24
+    catalog merchants has a wiki spawn point within about 15 units of the guide's loc (one
+    outlier, Merchant Lanin). What an opener would take: a one-shot focus beside
+    `openMapZone` that `MapsView` reads on mount, selects the merchant's mob pin
+    (`mobPins`, the existing selection ring) and centres on it (`centerOn`, as the loc marker's
+    `goTo` does). The typed `/loc` marker (`eq.maps.loc`) is "where you are" and must not be
+    written for this.
+  - Route (`tradeskillGuide.placedLadder`): a step is done at its top, open from the level just
+    under its bottom; ranges overlap, so two steps can both be open. The level line sits before
+    the first step not done.
+  - Credit: `guideCreditOf` (from `guideCredits.ts`) under the route, and under a picked recipe
+    when `recipeDrawsGuide` says the panel can draw a guide line (opened materials included).
+  - Not shown, by scope: the recipe guide's recipe notes, its 14 recipes with no wiki recipe of
+    the same tradeskill (7 name no wiki item), the leveling guide's side tables and overview.
+  - Tests: `tests/tradeskillHistory.test.mts`, `tradeskillMoney.test.mts`,
+    `tradeskillGuide.test.mts` (fixtures in `tests/tradeskillFixtures.mts`, the owner's shapes).
+    e2e: `tests/e2e/tradeskillLogSteps.mts` (`stepOwnLog`, `stepHistory`, `stepGuides`), called
+    last from `tradeskills.e2e.mts`; written, NOT run.
+  - What's new line: "A Tradeskills workbench now shows your own combines, what a recipe costs at
+    the prices you last paid, where you bought each material, and the two community guides: the
+    leveling route with your level on it, and merchants with their locations."
 
 ## Tradeskill guides as data (fork #6, requirements/skills-tab.md)
 
 - Two community guides are pulled at release time by `scripts/community/guides-pull.mts` and
   committed as `src/main/data/tradeskillGuides.json` (types `src/shared/guideData.ts`). Procedure,
   rules and thresholds: DATA_REFRESH.md, "The two tradeskill guides". The app never fetches them.
-- Not wired into any screen. A screen that shows this data shows the guide's `title`, `author` and
-  `sourceUrl` with it (owner, 2026-11-20: the app credits and links both).
+- Read by the Tradeskills workbench ("Tradeskills section", slice 3). A screen that shows this
+  data shows the guide's credit with it (owner, 2026-11-20: the app credits and links both); the
+  workbench draws the credit line as text, with no link (the hosts are not on the allowlist).
 - `leveling.tradeskills.<Tradeskill>`: `steps` and `alternates` (`from`, `to`, `item`, `materials`
   nested per sub-combine), `notes`, and `asides` (side tables as written). `recipes.tradeskills.
   <Tradeskill>.recipes`: `trivial`, `item`, `materials` with `merchant` + `zone` + `loc` only when
