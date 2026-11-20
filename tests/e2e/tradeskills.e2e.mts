@@ -318,7 +318,8 @@ async function stepFromSkills(page: Page): Promise<void> {
   const linked = await settle(() => countOf(page, link), (n) => n > 0, { timeoutMs: 20_000 })
   check("a tradeskill's name on the Skills tab is a link", linked > 0)
   if (linked === 0) return
-  const name = await textOf(page, `${link} >> nth=0`)
+  // `textOf` is a plain querySelector, which takes the first match itself.
+  const name = await textOf(page, link)
   check("…the skill the log raised, in the log's own spelling", name === 'Jewelry Making', name)
   await page.click(`${link} >> nth=0`)
   const up = await settle(() => textOf(page, sel('tradeskill-name')), (t) => t === 'Jewelcrafting', { timeoutMs: 20_000 })
@@ -392,6 +393,9 @@ async function stepSkillGear(page: Page): Promise<void> {
     note('the Fishing workbench drew no gear panel (no item in this data and era raises Fishing): it was not checked')
     return
   }
+  // The held words wait on the workbench's own read of the inventory dump, which settles after
+  // the panel is drawn: read the facts once they are there.
+  await settle(() => countOf(page, `${panel} ${sel('tradeskill-gear-held')}`), (n) => n > 0, { timeoutMs: 15_000 })
   const facts = await page.evaluate(
     (s) =>
       [...document.querySelectorAll<HTMLElement>(s)].map((e) => ({
