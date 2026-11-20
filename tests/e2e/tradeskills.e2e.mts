@@ -458,6 +458,7 @@ async function main(): Promise<void> {
     await (await import('./tradeskillRouteSteps.mjs')).stepRoute(page)
     await (await import('./tradeskillPlanSteps.mjs')).stepPlanner(page) // Make an item and Maps at a merchant (written, not yet run)
     await (await import('./tradeskillHeldSteps.mjs')).stepHeldAndWiki(page) // held-only route, Can make now, Missing on the wiki (written, not yet run)
+    await (await import('./tradeskillHomeSteps.mjs')).stepHomeAndWish(page) // level bars, Pick up where you left off, wishing a crafted item, sources, the Skills tab's door (written, not yet run)
 
     check('no renderer console errors', consoleErrors.length === 0, consoleErrors.slice(0, 3).join(' | '))
     if (failures.length) await dumpArtifacts(page, 'tradeskills-FAIL')

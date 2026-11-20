@@ -68,6 +68,8 @@ export interface TradeskillBookPayload {
   materials: Record<string, BookMaterial>
   /** The two community guides as data (shared/tradeskillGuide.ts); absent reads as no guide. */
   guides?: GuidePayload
+  /** When the wiki data the recipes come from was scraped (items.json's own `scrapedAt`, ISO 8601); absent when not stated. */
+  scrapedAt?: string
 }
 
 export const EMPTY_BOOK: TradeskillBookPayload = { version: TRADESKILL_BOOK_VERSION, recipes: [], materials: {} }

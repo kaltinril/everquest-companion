@@ -43,6 +43,22 @@ const CONTEXT_LINES = 2
 const CHIP_SX = { height: 18, fontSize: 10 } as const
 const CUT_SX = { overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' } as const
 
+/**
+ * The Cost and Sells columns. A price is never cut off: the table is `tableLayout: fixed`, so a
+ * column is exactly as wide as its head says, and the cell's side padding comes out of that. At
+ * 92 px with the small table's 16 px each side a price had 60 px, and "141.748 pp" ended in dots
+ * (owner's screenshot, 2026-11-20). 112 px with 8 px each side leaves 96 px: room for
+ * "12345.67 pp" in the table's font. The numbers line up on their decimals (tabular figures).
+ */
+const PRICE_WIDTH = 112
+const PRICE_SX = { whiteSpace: 'nowrap', px: 1, fontVariantNumeric: 'tabular-nums' } as const
+
+/**
+ * Under this width the table scrolls sideways instead of narrowing: the fixed columns keep
+ * their width, so a narrower table would take all of it out of Materials.
+ */
+const TABLE_MIN_WIDTH = 920
+
 const NEXT_TIP = 'The first recipe above your level: the one to make next.'
 const TRIVIAL_TIP = 'At or under your level, so it no longer raises the skill.'
 
@@ -177,10 +193,10 @@ const RecipeRow = memo(function RecipeRow({ recipe, state, picked, onPick, log, 
       </TableCell>
       <TableCell sx={CUT_SX}>{recipe.container ?? ''}</TableCell>
       <MaterialsCell recipe={recipe} />
-      <TableCell align="right" sx={CUT_SX} data-testid="tradeskill-row-cost">
+      <TableCell align="right" sx={PRICE_SX} data-testid="tradeskill-row-cost">
         {costCell(money)}
       </TableCell>
-      <TableCell align="right" sx={CUT_SX} data-testid="tradeskill-row-sells">
+      <TableCell align="right" sx={PRICE_SX} data-testid="tradeskill-row-sells">
         {sellsCell(money)}
       </TableCell>
       <YouCell recipe={recipe} craft={log.craft} />
@@ -220,17 +236,17 @@ function Head(): JSX.Element {
         <TableCell sx={{ width: '26%' }}>Item</TableCell>
         <TableCell sx={{ width: '11%' }}>Container</TableCell>
         <TableCell>Materials</TableCell>
-        <TableCell align="right" sx={{ width: 92 }}>
+        <TableCell align="right" sx={{ ...PRICE_SX, width: PRICE_WIDTH }}>
           <Tooltip title={COST_TIP}>
             <span>Cost</span>
           </Tooltip>
         </TableCell>
-        <TableCell align="right" sx={{ width: 92 }}>
+        <TableCell align="right" sx={{ ...PRICE_SX, width: PRICE_WIDTH }}>
           <Tooltip title={SELLS_TIP}>
             <span>Sells</span>
           </Tooltip>
         </TableCell>
-        <TableCell sx={{ width: '19%' }}>
+        <TableCell sx={{ width: '17%' }}>
           <Tooltip title={YOU_TIP}>
             <span>You</span>
           </Tooltip>
@@ -308,7 +324,7 @@ export function RecipeTable(p: RecipeTableProps): JSX.Element {
   )
   return (
     <Box ref={scrollRef} sx={{ flexGrow: 1, minHeight: 120, overflow: 'auto', overscrollBehavior: 'contain' }} data-testid="tradeskill-recipes-scroll">
-      <Table size="small" stickyHeader sx={{ tableLayout: 'fixed' }} data-testid="tradeskill-recipes">
+      <Table size="small" stickyHeader sx={{ tableLayout: 'fixed', minWidth: TABLE_MIN_WIDTH }} data-testid="tradeskill-recipes">
         <Head />
         <TableBody>
           <PadRow height={win.topPad} />

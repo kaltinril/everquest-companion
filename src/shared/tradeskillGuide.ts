@@ -30,11 +30,27 @@ export function guideCreditOf(id: string): string {
 /** The leveling guide's route for one tradeskill: its side tables are left out. */
 export type GuideRoute = Pick<GuideLadder, 'notes' | 'steps' | 'alternates'>
 
+/**
+ * Which copy of a guide the app holds, for the Home screen's sources line: the version the guide
+ * states for itself, and when the copy was taken. The guide's address is never served (owner,
+ * 2026-11-20: the app credits both guides in words and links neither).
+ */
+export interface GuideStamp {
+  /** The guide's id in `tradeskillGuides.json` and `GUIDE_CREDITS`. */
+  id: string
+  /** As the guide writes it ("1.8 (wip)"); absent when it states none. */
+  version?: string
+  /** When the pull that produced the committed copy ran (ISO 8601). */
+  pulledAt: string
+}
+
 export interface GuidePayload {
   leveling: Partial<Record<Tradeskill, GuideRoute>>
   recipes: Partial<Record<Tradeskill, RecipeList>>
   /** A guide's spelling of an item (as `sourceItemKey` folds it) to the wiki item's own name. Exact matches only. */
   names: Record<string, string>
+  /** The copy of each guide in hand; absent reads as none stated. */
+  stamps?: GuideStamp[]
 }
 
 export const EMPTY_GUIDES: GuidePayload = { leveling: {}, recipes: {}, names: {} }
@@ -56,6 +72,11 @@ function noteMaterials(names: Record<string, string>, materials: readonly GuideM
   }
 }
 
+/** Which copy of a guide the committed file holds; its address is left behind. */
+function stampOf(guide: { id: string; version?: string; pulledAt: string }): GuideStamp {
+  return { id: guide.id, ...(guide.version === undefined ? {} : { version: guide.version }), pulledAt: guide.pulledAt }
+}
+
 /** The committed guide file as the workbench's payload, every item name looked up once. */
 export function guidePayload(file: TradeskillGuidesFile, wikiName: WikiItemName): GuidePayload {
   const names: Record<string, string> = {}
@@ -73,7 +94,7 @@ export function guidePayload(file: TradeskillGuidesFile, wikiName: WikiItemName)
       for (const material of recipe.materials) noteName(names, material.name, wikiName)
     }
   }
-  return { leveling, recipes: file.recipes.tradeskills, names }
+  return { leveling, recipes: file.recipes.tradeskills, names, stamps: [stampOf(file.leveling), stampOf(file.recipes)] }
 }
 
 // ---- the payload as the screens read it -------------------------------------------------------

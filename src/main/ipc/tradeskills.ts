@@ -14,7 +14,7 @@ import { IPC } from '../../shared/ipc'
 import type { TradeskillGuidesFile } from '../../shared/guideData'
 import { guidePayload } from '../../shared/tradeskillGuide'
 import type { TradeskillBookPayload } from '../../shared/tradeskillBook'
-import { itemDb } from '../itemLookup'
+import { itemDb, itemDbScrapedAt } from '../itemLookup'
 import { eraDerivations } from '../planner/indexCurrent'
 import { buildTradeskillBook, wikiItemName } from '../tradeskillBook'
 import guidesJson from '../data/tradeskillGuides.json'
@@ -25,7 +25,8 @@ function build(): TradeskillBookPayload {
   const index = itemDb()
   // Read through `unknown`: the JSON's inferred type follows the data, the declared one is the pull script's.
   const guides = guidePayload(guidesJson as unknown as TradeskillGuidesFile, wikiItemName(index))
-  return { ...buildTradeskillBook(index, eraDerivations()), guides }
+  // The data's own date rides along for the Home screen's sources line.
+  return { ...buildTradeskillBook(index, eraDerivations()), guides, scrapedAt: itemDbScrapedAt() }
 }
 
 export function registerTradeskillsIpc(): void {

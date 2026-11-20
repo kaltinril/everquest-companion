@@ -15,6 +15,7 @@ import { type JSX, type ReactNode, useCallback, useEffect, useMemo, useState } f
 import { Box, Button, Chip, CircularProgress, Stack, Typography } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { recipeForItem, type BookIndex } from '@shared/tradeskillBook'
+import { HOME_SUBTITLE } from '@shared/tradeskillHome'
 import { withItem, type PlanMemory } from '@shared/tradeskillPlanMemory'
 import type { Tradeskill } from '@shared/tradeskills'
 import { useBackTarget } from '../../appBack'
@@ -172,7 +173,7 @@ function Screen({ screens, index, eraOnly }: { screens: Screens; index: BookInde
   }
   if (open === null) {
     const planner: ReactNode = <PlannerHomePanel index={index} eraOnly={eraOnly} plan={plan} onPlan={openPlan} />
-    return <TradeskillsHome index={index} onOpen={show} planner={planner} />
+    return <TradeskillsHome index={index} onOpen={show} onPlan={openPlan} planner={planner} />
   }
   return (
     <Workbench
@@ -212,6 +213,12 @@ function TradeskillsView({ doors, nav, arrival }: { doors: RouterDoors; nav: Nav
         <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
           <BackToOrigin nav={nav} />
           <Typography variant="h6">Tradeskills</Typography>
+          {/* On Home only: what the section draws on, in one line that gives way before the title does. */}
+          {ready && open === null && !planOpen && (
+            <Typography variant="body2" color="text.secondary" noWrap sx={{ minWidth: 0 }} data-testid="tradeskills-subtitle">
+              {HOME_SUBTITLE}
+            </Typography>
+          )}
           <Box sx={{ flexGrow: 1 }} />
           {/* The planner searches every tradeskill, so it counts what the setting hides across all of them, as Home does. */}
           <EraBar eraOnly={eraOnly} setEraOnly={setEraOnly} hidden={hiddenCount(index, planOpen ? null : open)} />
