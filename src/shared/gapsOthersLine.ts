@@ -7,7 +7,7 @@
 // refresh also replaced a good list with the empty one. Here a failure keeps the list an earlier
 // read gave, and the words say which of the two the player is looking at.
 
-import { isStale, type CharacterGaps } from './gapsAllCharacters'
+import { isStale, stampKeyOf, type CharacterGaps } from './gapsAllCharacters'
 
 /** The other characters as last read for one ask (`key`: the day window and the attached character). */
 export interface OthersAnswer {
@@ -38,14 +38,25 @@ export function charactersLineEnd(others: number, failed: boolean): { text: stri
   return { text: others === 0 ? '. No other character saved yet: log each one in here once.' : '.', warn: false }
 }
 
-/** A character's few words on the line, and the one sentence behind them (its date, what to do). */
+/** When a save was made, on the player's own clock: `2026-11-18 20:05`; the stamp as written when it is no date. */
+function savedStamp(savedAt: string): string {
+  const d = new Date(savedAt)
+  return Number.isNaN(d.getTime()) ? savedAt.slice(0, 10) : stampKeyOf(d).slice(0, 16)
+}
+
+/**
+ * A character's few words on the line, and the one sentence behind them (its date, what to do). A
+ * current save says its time too: a save trails the play by up to ten minutes and none is made on
+ * a switch or on quit (main/gapsCharacters.ts), so the time is how the player sees what is missing.
+ */
 export function savedWords(c: CharacterGaps, now: Date): { text: string; tip: string; stale: boolean } {
   const archives = `${String(c.archives)} archived log${c.archives === 1 ? '' : 's'}`
   if (c.unreadable === true) return { text: `${c.name} (could not be read)`, tip: `${c.name}'s saved Gaps could not be read, so its rows are left out.`, stale: true }
   if (c.savedAt === null) return { text: `${c.name} (archives only)`, tip: `Not logged in here since this was added: only its ${archives}.`, stale: false }
-  const date = c.savedAt.slice(0, 10)
+  const at = savedStamp(c.savedAt)
+  const date = at.slice(0, 10)
   // Over two months old, or an older build's save that lacks rows this one serves (a known item's forages).
   if (isStale(c.savedAt, now)) return { text: `${c.name} (over 2 months old)`, tip: `Saved ${date}, over two months ago; log in on ${c.name} to refresh it.`, stale: true }
   if (c.olderRows === true) return { text: `${c.name} (needs refresh)`, tip: `Saved ${date} by an older version; log in on ${c.name} to refresh it.`, stale: true }
-  return { text: c.name, tip: `${c.name}'s Gaps saved ${date}, plus ${archives}.`, stale: false }
+  return { text: c.name, tip: `${c.name}'s Gaps saved ${at}, plus ${archives}.`, stale: false }
 }

@@ -14,8 +14,15 @@
 // queued in front of every Combat poll, and the gaps snapshot's own suggestion pass ran on the
 // engine's fold thread. Now: the first save comes a minute after launch, then one every ten
 // minutes, each skipped without asking the engine unless a cursor moved (gapSourceMoves.ts) or the
-// last attempt did not land (gapsCharacterSave.ts), and the write is the async durable one. Nothing is lost by the longer interval: the file is a cache
-// of what the character's own log says, rebuilt the next time that character is attached.
+// last attempt did not land (gapsCharacterSave.ts), and the write is the async durable one. The file
+// is a cache of what the character's own log says, rebuilt the next time that character is attached.
+//
+// WHAT THE INTERVAL COSTS (bug hunt, 2026-11-19; not built yet). No save is made when the player
+// switches character or quits, and both timers count from launch, not from the attach. So under All
+// characters another character's rows are up to ten minutes behind its play, and a character left
+// before its first save is absent until it is attached again. The tab's tooltip gives each save's
+// time (shared/gapsOthersLine.ts). The fix is a bounded save before a switch and on an ordinary
+// quit, through `gapsSaver`; it needs a hook in session.ts `tailCharacter` and in the quit path.
 //
 // SERVE. `gaps:allCharacters` answers every OTHER character's inputs (the attached one's the tab
 // already has, served live): its saved snapshot with its eligible archive segments folded in when

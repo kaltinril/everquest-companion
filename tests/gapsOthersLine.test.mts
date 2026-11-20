@@ -56,6 +56,18 @@ test("a character's few words: its name, and a mark when its save is old, older-
   assert.deepEqual({ text: bad.text, stale: bad.stale }, { text: 'Dry (could not be read)', stale: true })
 })
 
+test("a character's tooltip gives the day and the time its Gaps were saved, on the player's own clock", () => {
+  // A save is up to ten minutes behind the play, and none is made on a switch or on quit: the time
+  // lets the player see how far behind this character's rows are.
+  const at = new Date(2026, 10, 18, 20, 5, 0)
+  const now = new Date(2026, 10, 19, 9, 0, 0)
+  assert.equal(savedWords(char('Dry', { savedAt: at.toISOString(), archives: 3 }), now).tip, "Dry's Gaps saved 2026-11-18 20:05, plus 3 archived logs.")
+  // The day is the local one too, never the UTC day of the stamp.
+  assert.match(savedWords(char('Dry', { savedAt: at.toISOString(), olderRows: true }), now).tip, /^Saved 2026-11-18 by an older version/)
+  // A stamp that is no date is shown as it was written.
+  assert.match(savedWords(char('Dry', { savedAt: 'not a date' }), now).tip, /saved not a date,/)
+})
+
 test('every sentence the line shows is short and plain: no dash, a tooltip of 7 to 15 words', () => {
   const now = new Date('2026-11-19T18:00:00.000Z')
   const tips = [char('Dry'), char('Dry', { savedAt: null, archives: 2 }), char('Dry', { savedAt: '2026-08-01T12:00:00.000Z' }), char('Dry', { olderRows: true }), char('Dry', { unreadable: true })].map((c) => savedWords(c, now).tip)
