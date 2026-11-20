@@ -38,6 +38,19 @@ use std::collections::HashMap;
 /// What a def that names no cooldown gets.
 const DEFAULT_COOLDOWN_MS: i64 = 2000;
 
+/// A stored cooldown in whole milliseconds, or the default when the def names none.
+///
+/// Read as a float and rounded half up, the app's `Math.round` (`shared/alertCooldown.ts`).
+/// `as_i64` is `None` for `1500.5`, which turned a cooldown the editor showed into the default.
+fn cooldown_ms_of(raw: Option<&Value>) -> i64 {
+    let Some(n) = raw.and_then(Value::as_f64).filter(|n| n.is_finite()) else {
+        return DEFAULT_COOLDOWN_MS;
+    };
+    #[allow(clippy::cast_possible_truncation)]
+    let ms = (n + 0.5).floor() as i64;
+    ms.max(0)
+}
+
 /// Max distinct cooldown clocks at once, across every alert. An alert-level clock is one entry per
 /// alert, so the bound exists for `cooldownScope:'target'` alerts, which mint an entry per mob.
 /// Eviction is least-recently-FIRED, so the entry discarded is the one closest to having expired.
@@ -381,10 +394,7 @@ impl Rule {
                     .and_then(Value::as_str)
                     .unwrap_or_default()
             ),
-            cooldown_ms: def
-                .get("cooldownMs")
-                .and_then(Value::as_i64)
-                .unwrap_or(DEFAULT_COOLDOWN_MS),
+            cooldown_ms: cooldown_ms_of(def.get("cooldownMs")),
             per_target: def.get("cooldownScope").and_then(Value::as_str) == Some("target"),
             composite,
             conditions,
@@ -991,6 +1001,39 @@ mod tests {
         // …and the store's list still carries it: `defs` is the store's contract, not the
         // evaluator's.
         assert_eq!(rules.defs().len(), 1);
+    }
+
+    /// A cooldown typed with a fraction is rounded, as the app rounds it. `as_i64` read `0.5` and
+    /// `1500.5` as "none given", so the rule got the 2 s default while the editor showed the number.
+    #[test]
+    fn a_fractional_cooldown_is_rounded_rather_than_read_as_the_default() {
+        let line = |ts: i64| {
+            Event::from_value(json!({ "kind": "uncharm", "seq": 1, "ts": ts, "raw": "x" }))
+        };
+        let with = |cooldown: Value| {
+            let mut d = def(json!({"type":"event","kind":"uncharm"}));
+            d["cooldownMs"] = cooldown;
+            set(vec![d])
+        };
+        // 0.5 ms is no cooldown to speak of: a repeat one second later sounds.
+        let mut rules = with(json!(0.5));
+        assert_eq!(rules.fire_no_offset(&line(1_000)).len(), 1);
+        assert_eq!(rules.fire_no_offset(&line(2_000)).len(), 1);
+
+        // 1500.5 rounds half up to 1501, like `Math.round`.
+        let mut rules = with(json!(1500.5));
+        assert_eq!(rules.fire_no_offset(&line(1_000)).len(), 1);
+        assert!(rules.fire_no_offset(&line(2_500)).is_empty());
+        assert_eq!(rules.fire_no_offset(&line(2_501)).len(), 1);
+
+        // A whole number, a negative and an absent key read as they always did.
+        let mut rules = with(json!(-5));
+        assert_eq!(rules.fire_no_offset(&line(1_000)).len(), 1);
+        assert_eq!(rules.fire_no_offset(&line(1_000)).len(), 1);
+        let mut rules = set(vec![def(json!({"type":"event","kind":"uncharm"}))]);
+        assert_eq!(rules.fire_no_offset(&line(1_000)).len(), 1);
+        assert!(rules.fire_no_offset(&line(2_999)).is_empty());
+        assert_eq!(rules.fire_no_offset(&line(3_000)).len(), 1);
     }
 
     /// The offset MOVES the one fire; it does not add a second — so a matching line makes no sound

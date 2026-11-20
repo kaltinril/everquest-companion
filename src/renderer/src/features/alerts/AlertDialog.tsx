@@ -33,6 +33,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import type { AlertDef, SoundPack } from '@shared/types'
 import { captureNamesIn } from '@shared/alertCaptures'
+import { cooldownFromInput } from '@shared/alertCooldown'
 import { autoTokenNamesFor } from '@shared/alertTargets'
 import { MAX_EARLY_WARN_SEC, breakTriggerKinds } from '@shared/earlyWarning'
 import { blankCondition, type CombineMode, type ConditionDraft } from './conditionDraft'
@@ -186,7 +187,7 @@ function VolumeCooldownSection({ f }: { f: AlertForm }): JSX.Element {
         label="Cooldown (ms)"
         data-testid="alert-cooldown"
         value={f.cooldownMs}
-        onChange={(e) => f.setCooldownMs(Math.max(0, Number(e.target.value) || 0))}
+        onChange={(e) => f.setCooldownMs(cooldownFromInput(e.target.value))}
         sx={{ width: 140 }}
       />
       {/* Sits against the cooldown field because it only qualifies THAT number. "Per mob" is
