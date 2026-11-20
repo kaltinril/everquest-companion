@@ -1338,3 +1338,285 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
   schema widens. Nav row: Stats/Data, after Leveling.
 - Per hour and This session cells are blank when there is nothing to state (no dash glyph:
   copyNoEmDash).
+
+## Bug hunt 2026-11-19: the rules its fixes left in force
+
+From the multi-model hunt of that day (`audits/2026-11-19-bug-hunt.md`). One block per feature area:
+what a later change must know. Each fix has a unit test that failed before it.
+
+### Damage and healing meters
+
+- Healing header (Combat tab) is unlabelled, so it follows the scope and the healer drill:
+  `healRows.healHeadline(panel, seg.healing)`, summed in `src/shared/healHeadline.ts` (in shared
+  because summing domain rows in the renderer trips eqc/no-domain-munging). Level 1 hps is
+  `healing.hps * shown / healing.total` (one clock, the segment's length); level 2 is the healer's
+  own. Trap: the solo path is an identity check, `shown === healing.healers`, so anything that
+  copies the healer array before `healPanel` loses the "engine's own figures" return.
+- `SegmentHeader` takes the heal figures as its `healing` prop and never reads `seg.healing`; pinned
+  in tests/healRows.test.mts and tests/overlayLockedSelector.test.mts. The overlay's heal crumb
+  stays the whole segment, labelled `all` (JOS-158): do not route it through `healHeadline`.
+- `SegmentPanel.SegmentBody` sits at the complexity ceiling (13). The heal headline rides on
+  `Dimension.healing` and `headline(panel, dim, healing)` so it adds no branch there; a new ternary
+  in that function fails lint.
+- `meterScope.scopeHealers` now re-bases `pct` when it removes a row (new objects), and still
+  returns the input array by reference when it removes none. `scopeHealing` still leaves `total` and
+  `hps` on the model untouched: the headline is derived, not rewritten.
+- The time beside a damage headline is `headlineClock.headlineClockSec(total, dps, durationSec)` on
+  both the Combat tab header and the Overview card (`supportLine`). The card hides "active" only
+  when it is BELOW the headline; the Combat tab's note also hides it when equal or when the fight
+  had no idle gaps. That difference is deliberate: the Overview plan lists the active rate on the
+  card's line.
+- Level 1 copy: `formatSegmentText(seg, mode, selfLabel, shown)` where `shown` is `{ rows:
+  panel.sources, ...head }` from the panel. A new caller that omits `shown` pastes the whole
+  unscoped direction. The level 2 copy (`formatEntityText`) still prints the subject's own total
+  above a table with the nested pet: pinned golden, owner's call to change.
+- tests/combatCopyText.test.mts is near the 440-line ceiling; scope and layout copy tests live in
+  tests/combatCopyScope.test.mts.
+- The level-1 copy (`copyText.formatSegmentText`) takes the panel's own rows and headline
+  (`ShownSources`, built in `SegmentPanel.copyView` from `panel.sources` and `head`). Never hand it
+  the bare segment from the panel again: the paste must list what the list shows.
+- One clock helper, three readers: `headlineClock.headlineClockSec(total, dps, durationSec)` is read
+  by the Combat tab header (`SegmentHeader` `clockSec`), the Overview card (`supportLine`) and now
+  the copy (`copyText.ownClockNote`). A surface that prints a headline rate beside a time must read
+  the time there, never `seg.durationSec` directly.
+- Copy rule: the first line always carries the fight's length (`subjectLine`). The rate gains ` over
+  m:ss` only for the outgoing direction and only when the headline's clock, as formatted, is not
+  that length (the You scope). The active rate follows it: `529 dps over 1:16 (act 575 dps)`. Trap:
+  do not key this on "the view differs from the whole segment"; Group hiding a stranger scales total
+  and rate together, the clock is still the fight's, and a second identical time would be printed.
+- Trap: the Incoming header uses `seg.durationSec` as its clock, not total / rate, so the note is
+  off for `mode === 'in'`. The Incoming golden's fixture (3.2k at 39 dps over 1:23) would print a
+  wrong `over 1:22` if that guard were dropped; that golden is what catches it.
+- Still open: the drilled copy (`formatEntityText`) prints the row's own total and own-clock rate
+  under the fight's length, and with the pet nested its headline is the subject alone while the
+  table includes the pet. The header at that level prints subject plus nested pets
+  (`petRows.panelTotals` / `panelRate`). Fix by passing the header's figures in, as level 1 does.
+
+### Gear: the Void motes tab
+
+- Void motes empty state: the rule is `moteEmptyText` (`gear/voidMotePrefs.ts`), not the panel. It
+  needs BOTH reads: the gear index (`indexReady` / `indexRefused` props from `useGearIndex`, plus
+  `hasRows` = `byKey.size > 0`) and the inventory. TRAP: `compare.ready` is the INVENTORY's
+  readiness only; with the index still loading `byKey` is empty, every worn item is skipped, and the
+  list is empty for a reason that is not "all +10". The "+10" sentence may be returned only from the
+  last branch.
+- The two index flags are panel props on purpose, not fields of `GearCompareData`: that object is a
+  memoised prop of the Gear table's rows and must not change shape for this tab.
+- Worn items with no gear-index row: `moteUnranked` (`shared/planner/voidMotes.ts`) lists them
+  (below +10 only) and the panel prints `moteUnrankedText` under the list (`gear-motes-unranked`).
+  `moteAdvice` / `motePlan` still leave them out. TRAP: `moteUnranked` returns none when `byKey` is
+  empty, otherwise a loading or unread index would name every worn item as "not in the item data".
+- Proc socket rule has ONE copy: `procSeatSwings` in `shared/planner/rules.ts` (PRIMARY or
+  SECONDARY; an Any Slot cell is null and not live). `socketRecommend.seatIsLive` and `moteAdvice`
+  both read it; the reasoning and what would overturn the ruling stay in `seatIsLive`'s header.
+  TRAP: `moteAdvice` must ask the CELL (`equipSlotOf(host.slot)`), never `wornSlot(w)`, which falls
+  back to the item's own first slot and would call an off-hand item in an Any Slot cell a weapon
+  hand.
+- `MoteAdvice.opens` is omitted for a Proc socket off a weapon hand (the game does open one there;
+  the app just does not point at it). If the owner would rather keep the fact visible, word it in
+  the panel instead of restoring `opens`.
+
+### Maps and the pins overlay
+
+- zonePorts.ts DESTINATION: the coordinates may be bare, absent, or in parentheses. Combine Gate is
+  the only parenthesised row in the corpus (2026-11-19). A new wiki spelling of a port line drops
+  the spell silently; the trap shows as a missing cheapest level on a chip, not an error.
+- Map pins overlay extent: always go through `overlayExtent` (mapTrack.ts), never `data.bounds`
+  directly. `usableExtent` rejects only when BOTH axes have no span; a one-line map (one axis zero)
+  must keep fitting. `readExtent` (stored extents) is stricter and rejects either axis, so a
+  one-line zone has no stored fallback.
+- `fitExtent` floors the DIVISION at one map unit but keeps the real span for width/height, so a
+  one-line map still centres as before. Do not floor width/height.
+- Saved overlay views (`eq.maps.overlayView`) are read through `parseOverlayViews`: k > 0 and finite
+  k/cx/cy, dropped entry by entry.
+- The overlay's map answer is held with the zone it was ASKED for (mapPinsNote.ts `heldMapFor`). Do
+  not compare against `MapData.zone`: main folds the name before loading and a spelling apart would
+  blank the map for good. Keyed by zone only, so a pack change in the same zone keeps the old lines
+  until the new ones land (intended).
+- `emptyNote` says nothing while `loading`; "No map for this zone" is only true once this zone's
+  answer is in. While loading, pins draw through the zone's stored extent with no lines.
+- Checked and not a defect: `useZoneTrack` stores `data.bounds` under `data.zone` (both from the
+  same MapData), so the Maps tab cannot store one zone's bounds under another while it loads.
+
+### Achievements and Factions
+
+- Achievements, level text: `slayerPlan.ts LEVEL_RE` joins two levels on a hyphen, en dash, em dash,
+  tilde, slash or `to`. A comma or a bracket is NOT a join on purpose (`4-6, ~12`, `35 (1-10
+  according to Magelo)`): only the opening of the text is read. Trap: `~53` and `28~` are one level,
+  not a range.
+- Achievements, est. chip: the tooltip text is `estimateNote(PlanMob)` in
+  `shared/slayer/slayerPlan.ts`, never inline in ZoneList. The chip shows exactly when
+  `estimateNote` is not null (basis 'name'). `SlayerMob.yieldedRace` (wiki race as written) is set
+  in `slayerMobs` via `slayerMatch.raceYields`; `PlanMob.yielded { race, kind }` only on a name-read
+  row whose race yielded. Trap: do not put the flag on `MobFacts`, tests/slayerYield.test.mts
+  deepEquals the drake's facts.
+- Factions, Moved recently: the recent tally is `factionsEvidence.ts recentWithLedgers` (live tail
+  plus the archive ledgers, under `ledgerWindow` with `recentFromMs - 1` because the window keeps
+  `ts > sinceMs` and the tally wants `ts >= recentFromMs`). The tail-null branch (log just archived)
+  returns `recent` too. Trap: a ledger keeps a run of one cap line as one entry, so a cap run is one
+  hit in the tally (net is exact).
+- Factions, the dump's own second: a faction line stamped in the dump mtime's second counts only
+  when it comes after the game's `Outputfile Complete: ...-Factions.txt` line of that same second;
+  with no such line the second is left out (undercount side, never a double count). Do not change
+  `ts > sinceMs` to `>=`. `ledgerWindow` keeps the plain exclusion: a ledger has no line order
+  against the dump. Not measured: that `/outputfile faction` prints the receipt line (inventory and
+  achievements dumps do); if it does not, behaviour is as before.
+- Suggested edit for docs/community/requirements/faction-tab.md (not made here, docs are off
+  limits): the 2026-10-13 Moved recently row's built note should say the window reads the live log
+  tail and an archive's ledgers. Suggested new row: | 2026-11-19 | owner (the bug hunt of that day)
+  | Moved recently went empty after the log was archived, and a faction hit logged in the dump's own
+  second was dropped. | built (the recent tally reads the archive ledgers too, also when the live
+  log is empty or not yet recreated; a hit after the game's Outputfile Complete line in the dump's
+  second is counted, otherwise that second stays left out) |
+
+### Spells and Loadout
+
+- The client spell table is loaded once per `spells_us.txt` PATH, not once per run:
+  `resist/spellTableMemo.ts` (Electron-free, tested) reloads when `spellsUsPath()` differs from the
+  path it loaded from. `spellTable.ts` only binds it. Trap: `spellTable()` can now resolve a table,
+  then null (folder moved to one with no file), then a table again; do not capture the table or
+  assume it never becomes null.
+- No reload on a patch to the same file (by design: restart). A reload never starts while one is in
+  flight.
+- `spellTableStatus()` reports `loading` while the memo is stale, so state and path always describe
+  the same folder. Every status reader also calls `spellTable()`, which is what starts the reload; a
+  new reader must do the same.
+- `buildLevelUnlocks` caches per table reference (`cachedClient`): a different table rebuilds, a
+  null read keeps the last fold (tests C4, C4b).
+- Renderer: the unlock dataset is held by `shared/heldPull.ts` and dropped on `eqconfig:changed`;
+  `useLoadoutViews` refetches on the same event. A new once-per-window pull of anything built from
+  the client table needs the same signal. Open: `useZoneTravel.allPorts` (maps) still holds its
+  first answer.
+- Renderer modules that import `@shared/...` at runtime cannot be loaded by node tests: put the rule
+  in `src/shared` (relative imports) and test that.
+- Loadout class pins are per character under `eq.spells.loadout.classes.byCharacter`
+  (`OwnClassPins`: name to classes, `'*'` with no character, an empty list means follow detection).
+  `eq.spells.loadout.classes` is the older single pin: read-only fallback, never written, shape
+  unchanged. The group (`eq.spells.party`) is one per machine by decision.
+- spellTableMemo.table(): an ask made while a load is in flight gets a CHAINED promise that
+  re-checks the path when the load settles (`pending !== mine || stale()`), then recurses into
+  table(). Do not return the bare in-flight promise again: the renderer's heldPull re-pulls once per
+  eqconfig:changed and is never signalled a second time, so a stale answer there lasts all session.
+- Trap: `stale()` alone is not enough in that re-check. `spellTableIsStale` is false while state is
+  'loading', so once the first waiter has started the new load every later waiter reads "not stale"
+  and would keep the old folder's table. The `pending !== mine` comparison is what catches them.
+  tests/spellTableMemo.test.mts holds two waiters for this reason; keep both.
+- Promise identity: only a SETTLED, unmoved table is returned as the same promise object. Callers
+  must not compare promises from table() while a load is running.
+- The caller that STARTS a load still gets that load's own table even if the folder moves meanwhile.
+  That is safe only because heldPull drops an overtaken pull and main-side readers reload on their
+  next ask. A new once-per-window consumer that is not behind heldPull would need the same re-check.
+- Still one load at a time (two would race for spell-resist-cache.json): the re-check starts the new
+  load only after the old one settles.
+
+### Settings stores and the session
+
+- Settings recovery notice: `store.ts` exports `schemaMigration`; `shared/settingsRecovery.ts
+  settingsRecoveryNotice()` is the only place the words live. "Recovered" means `salvagedFrom` set
+  AND `wrote` true; a salvage that could not be written back is a reset (the app is on defaults).
+  Trap: do not key on `fileMissing`, a failed migrated write leaves it false.
+- The notice is in memory for one launch (`main/ipc/settingsRecovery.ts`), cleared by
+  `settingsRecovery:seen`. It is not stored; a launch that never opens the main window never shows
+  it.
+- The card sits top centre under the title bar on purpose: a reset brings back the first-run
+  telemetry strip along the bottom, and bottom right belongs to the switch nudge and toasts.
+- `salvagedBackup.savedAtMs` is the backup file's mtime and is optional: a stat failure must never
+  cost the restore (`storeFile.ts backupFacts`).
+- Quarantine: `tornJson.ts quarantineSlots()` gives five names; `quarantineStore` takes the first
+  free one and reuses the LAST when full, never the first. `quarantinePathFor` is still the first
+  slot. Trap: `renameSync` replaces an existing file on Windows. The resist ledger
+  (`resist/ledgerFile.ts`) still uses the single name, which is fine because it is re-derived.
+- Launch pick: `log/discovery.ts savedLogHonoured` is the rule. The under-the-folder check applies
+  only when the player chose the EQ folder (a non-blank `eqInstallDir`) and not under `EQ_LOG_PATH`.
+  With no chosen folder the saved log is kept on existence alone: it rescues a launch where
+  auto-discovery misses, so do not make the check unconditional.
+- `clearActiveLogPath()` runs only in `applyEqDirChange`'s no-character arm (a player's own folder
+  change). The idle rescan saves the pick again on attach.
+- Quiet switch: `lastLineAt` has two feeders now, the engine's cursors (`noteTailLine`) and the
+  attached log's own size (`switchNudge.ts hearFromFile`). A cursor can miss writes (engine down),
+  so it makes a log look quiet sooner, never later. Trap: only a sample taken at or after
+  `lastLineAt` is evidence (`attachedWroteSince`); comparing against any remembered size delays
+  every normal offer by about a minute. Size is used, not mtime.
+- `switchNudge.ts` cannot be loaded in node:test (it imports Electron); `tests/quietSwitch.test.mts
+  bindingPoll` mirrors `poll()` and must be kept in step with it.
+- A new preload module must be listed in `tsconfig.web.json` or typecheck fails with TS6307;
+  `preload/index.ts` has room under the 440 ceiling for small additions.
+
+### Updates
+
+- Switch off means no request the player did not ask for. schedule() returns early for every phase;
+  do not add a forced check (the remembered build and the interrupted retry both stop short of this
+  on purpose).
+- A downloaded build is remembered in the store key updateStagedVersion and rides on the status as
+  stagedVersion. 'ready' itself is still never persisted: only a check in this session can bring it
+  back. Clear points: this build is that version or newer (launch), update-not-available,
+  update-available naming another version, any failed download.
+- Trap: a 'download' step error always means nothing valid is staged (electron-updater only
+  downloads when the cached file fails validation, and clears the pending folder on failure).
+- Trap: electron-updater adds its quit handler only when a download resolves while
+  autoInstallOnAppQuit is true. Setting the flag later is not enough; rearmApplyOnQuit() re-resolves
+  the cached file through downloadUpdate(). Keep 'downloading' unset there or telemetry counts a
+  download that did not happen.
+- Trap: the download runs after its check has returned, so runCheck's caller has already re-armed
+  the poll. Anything that should change the next delay after a download ends must re-arm from the
+  event handler (retrySoon), not rely on consecutiveFailures being read later: update-available
+  resets it first.
+- Trap: never re-arm with a fixed schedule('periodic') after runCheck; use
+  checkFollowUpPhase(status, interruptedInARow), or an interrupted check's short retry is
+  overwritten by a 4 hour wait.
+- An interruption is still not a failure: no checkDone, no consecutiveFailures, failed:false on the
+  line. It is marked with status.interrupted ('check' | 'download'), which the next push drops.
+- The words live in src/shared/update.ts (updateChipLine, updatePrefsChip, autoUpdateCaption,
+  readyChipTip). The Preferences chip may say 'up to date' only when a check completed with nothing
+  newer: switch on, or inside the cooldown after a manual check.
+- The first-launch copy lives in src/main/userDataSeed.ts and must keep importing only fs and path
+  (channel.ts is the first import). A new entry added to SEED_ENTRIES later needs its own late copy
+  in topUpSeed and its own toppedUp mark, or installs already seeded never get it.
+- The seed stamp migrated-from.json gained a toppedUp list; the store gained the optional key
+  updateStagedVersion and UpdateStatus gained stagedVersion and interrupted. All additive, no schema
+  bump.
+- The imported-sounds fix belongs to the 2026-10-08 'keeping settings' row in test-neutering.md;
+  that file may want its own row. RELEASING.md's sentence about what the copy carries should name
+  the imported sounds (text under not_fixed).
+
+### Overlay windows
+
+- Re-placing an OPEN overlay has one door: `overlayBounds.ts` `replaceOverlay(kind)` (monitor change
+  and Recover key via `reconcileOverlayDisplays`, text-size change via `refitStripsForTextScale`).
+  Trap: `overlayAppliedBounds` returns the stored PLACEHOLDER height for a fit kind (con card, 220);
+  never hand it straight to `applyOverlayBounds` on a live window. The app's own move is marked as
+  applied, so the move handler does not re-fit, and the overlay sends no new height while its card
+  measures the same. `placedOverlayBounds` (overlayLayout.ts) keeps the worn height; `refitOverlay`
+  then clamps the last request to the new work area.
+- Showing a hidden overlay from anywhere but its own queue must ask `windows.ts`
+  `opaqueStripResting(kind)` first (rule: `overlayLayout.ts` `opaqueStripRests`; absent idle reads
+  as resting). `raiseOverlays` and `setOverlaysHidden` do. E2E is NOT part of the rule: each call
+  site keeps its own E2E check. `createOverlayWindow`'s existing-window `show()` is unguarded but
+  unreachable today (toggle only opens a closed kind); guard it if a caller ever opens an open kind.
+  `raiseOverlays` still returns and logs every open kind, including a skipped resting strip.
+- Recover hotkey state lives in `shared/overlayHotkey.ts` `makeRecoverHotkey(ports)`;
+  `main/overlayRecover.ts` only supplies `globalShortcut` and the store (still the one
+  `globalShortcut` file, one `register(` call; `tests/overlayHotkey.test.mts` pins both, and the
+  factory file must not name `globalShortcut` in code). A saved key refused at start stays saved and
+  off; `get` carries the reason (existing optional `message` field, no protocol change) until a key
+  is set or turned off. The reason text is in src/shared, so the em-dash guard covers it. Not built:
+  a way to forget a refused saved key from Preferences without setting another key first ('Turn off'
+  is hidden while the key is null).
+
+### Loot
+
+- lib/itemMarks.ts: a null in `marks` means two things, "asked, answer on its way" and "answered,
+  unknown". The `unsettled` set tells them apart. Write the placeholder only through `hold(name)`,
+  and let only `settle()` clear it: a null written any other way reads as "unknown" to a probe.
+- `fetchItemMarks(names)` resolves when EVERY name has its answer, whoever asked (a row's 30 ms
+  batch or another probe), not when its own IPC lands. It sends only names nobody has asked for.
+  Trap: do not bring back the early return on "nothing missing"; that was the bug (a Loot row's
+  effect runs before LootView's probe in one commit, the probe read the row's placeholder as not
+  notable, and useNotablePickups never asks a key twice per mount).
+- `settle()` runs on both the success and the failure path of every ask. Keep it that way: a name
+  left in `unsettled` makes every later `fetchItemMarks` for it wait forever.
+- `requestItemMarks(name)` is the row's ask as a plain function (`useItemMarks` calls it in its
+  effect). It exists so a test can run a row's ask before a probe: tests/hookHost.mts has no
+  `useSyncExternalStore`, so `useItemMarks` itself cannot be mounted there.
+- The marks store is module-global and remembers every name for the run: each test uses item names
+  no other test in the file touches.
