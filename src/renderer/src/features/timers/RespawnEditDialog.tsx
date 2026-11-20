@@ -17,9 +17,10 @@
 //      opens in the SYSTEM BROWSER: `target="_blank"` is turned into `shell.openExternal` by main's
 //      `setWindowOpenHandler`, against the allowlist in security.ts. Never an app window.
 //   3. THE NUMBER, prefilled with the duration currently in force and written the way the field
-//      accepts it (`formatRespawnDuration`), so opening the modal, changing nothing and saving
-//      cannot move the clock. The grammar is `parseRespawnDuration`'s, stated in its header and
-//      summarised in one caption here; what it refuses it refuses out loud rather than half-reading.
+//      accepts it (`formatRespawnDuration`). Save writes only what was typed (`respawnDraftToSave`):
+//      an untouched field moves neither the clock nor whose number it is. The grammar is
+//      `parseRespawnDuration`'s, stated in its header and summarised in one caption here; what it
+//      refuses it refuses out loud rather than half-reading.
 //   4. THE WAY BACK. Clear/revert states the calculated number BEFORE you press it (`respawnCalculated`
 //      re-runs the ladder with rung 1 removed), because a revert whose result you cannot see is a
 //      dare rather than a control.
@@ -54,7 +55,6 @@ import {
   RESPAWN_INPUT_HELP,
   RESPAWN_INPUT_RANGE,
   RESPAWN_INPUT_UNREADABLE,
-  formatRespawnDuration,
   parseRespawnDuration,
   respawnCalculated,
   respawnCardNote,
@@ -63,6 +63,7 @@ import {
   respawnSourceLabel,
   type RespawnRow
 } from '@shared/respawn'
+import { RESPAWN_SAVE_NOTE, respawnDraftToSave, respawnPrefill } from '@shared/respawnEdit'
 import { wikiPageUrl } from '@shared/wiki'
 import { MobCard, useMobKnowledge } from '../../lib/hoverCards'
 import { fmtDuration } from '../buffs/format'
@@ -73,8 +74,8 @@ import { useSetSharedName } from './useRespawn'
  * SEVERAL MOBS SHARE THIS NAME (owner, 2026-11-09: "the few mobs i've killed are screwing up the
  * timers because there are identical named mobs"). Two spawns of one name make gaps of a minute or
  * two; the switch tells the estimate to ignore gaps under ten minutes and take the lowest above. It
- * writes on the click, not on Save: Save is the typed number's, and is disabled while the row has no
- * number to prefill, which is exactly the state a shared name with only short gaps is in.
+ * writes on the click, not on Save: Save is the typed number's, and is disabled until one is typed.
+ * So the button beside Save reads Close, not Cancel: it takes nothing back.
  */
 function SharedNameSwitch({ row }: { row: RespawnRow }): JSX.Element {
   const onSetSharedName = useSetSharedName()
@@ -98,11 +99,6 @@ function SharedNameSwitch({ row }: { row: RespawnRow }): JSX.Element {
       </Typography>
     </Box>
   )
-}
-
-/** What the field opens with: the duration in force, in the shorthand the field itself accepts. */
-function prefillOf(row: RespawnRow): string {
-  return row.estimateMs === undefined ? '' : formatRespawnDuration(Math.round(row.estimateMs / 1000))
 }
 
 /**
@@ -179,24 +175,26 @@ export function RespawnEditDialog({
   onClose: () => void
   onSetCustom: (key: string, display: string, sec?: number) => void
 }): JSX.Element {
-  const [draft, setDraft] = useState(() => prefillOf(row))
-  // RE-PREFILL ON EACH OPENING, and never while it is open. The row underneath re-renders once a
-  // second forever (it is a countdown) and its estimate can move under a delta, so a field that
-  // followed the row would fight anybody halfway through typing — the same reason the retired
-  // seconds box owned its draft. `open` is the only dependency for exactly that reason.
+  // NULL UNTIL THE FIELD IS TYPED IN, and null again on each opening. Untouched, the field shows the
+  // duration in force and follows it (the switch above can move it while the modal is open). Typed
+  // in, it is the player's and the row no longer reaches it: the row re-renders once a second (it is
+  // a countdown) and its estimate can move under a delta, so a field that followed the row then
+  // would fight anybody halfway through typing.
+  const [typed, setTyped] = useState<string | null>(null)
   useEffect(() => {
-    if (open) setDraft(prefillOf(row))
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- see above: the row is read at OPEN.
+    if (open) setTyped(null)
   }, [open])
-
-  const parsed = parseRespawnDuration(draft)
+  const inForce = respawnPrefill(row)
+  const draft = typed ?? inForce
+  // Only what was typed is saved: the untouched prefill would make a learned number "your number".
+  const toSave = respawnDraftToSave(typed, inForce)
   // The knowledge the card is fetching anyway, read here for one field: the page to link to when the
   // committed floor has no row for this mob.
   const { data } = useMobKnowledge(row.display, mainMobLookup)
 
   const save = (): void => {
-    if (!parsed.ok) return
-    onSetCustom(row.key, row.display, parsed.sec)
+    if (toSave === null) return
+    onSetCustom(row.key, row.display, toSave)
     onClose()
   }
   const clear = (): void => {
@@ -234,7 +232,7 @@ export function RespawnEditDialog({
               value={draft}
               data-testid="respawn-edit-input"
               onChange={(e) => {
-                setDraft(e.target.value)
+                setTyped(e.target.value)
               }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') save()
@@ -243,6 +241,11 @@ export function RespawnEditDialog({
             <Box sx={{ mt: 0.5 }}>
               <ParseLine text={draft} />
             </Box>
+            {!respawnOverridden(row) && (
+              <Typography variant="caption" color="text.secondary" component="div" data-testid="respawn-edit-save-note">
+                {RESPAWN_SAVE_NOTE}
+              </Typography>
+            )}
           </Box>
         </Stack>
       </DialogContent>
@@ -256,9 +259,9 @@ export function RespawnEditDialog({
         )}
         <Box sx={{ flex: 1 }} />
         <Button size="small" color="inherit" data-testid="respawn-edit-cancel" onClick={onClose}>
-          Cancel
+          Close
         </Button>
-        <Button size="small" variant="contained" disabled={!parsed.ok} data-testid="respawn-edit-save" onClick={save}>
+        <Button size="small" variant="contained" disabled={toSave === null} data-testid="respawn-edit-save" onClick={save}>
           Save
         </Button>
       </DialogActions>
