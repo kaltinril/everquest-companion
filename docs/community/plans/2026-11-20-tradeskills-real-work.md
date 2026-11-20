@@ -61,6 +61,11 @@ Proposed order, one testable piece at a time:
 5. Goal routes: cheapest, fastest, explore; then the one-item planner across tradeskills.
 6. Faction goal (after the scrape field). Fishing and forage outcomes.
 
+Status, 2026-11-20: item 3 is started. Slice 1 of it is built on the branch `tradeskills-section`
+(wiki rows only: the menu entry, Home, a workbench with the recipe book, material sources, Have
+from the inventory dump); `agent/BRANCH_NOTES.md`, "Tradeskills section", has where it lives and
+the links in from other tabs still to do. Guide rows and merchants wait on item 2.
+
 Validation of a guide pull (a pull that fails is refused and the last good copy stays):
 
 - Every expected tab is present; no tab lost more than a tenth of its rows.

@@ -15,6 +15,7 @@ import { ipcRenderer } from 'electron'
 import { IPC } from '../shared/ipc'
 import type { ItemKnowledge, MobKnowledge, SpellCatalog } from '../shared/types'
 import type { ItemMarks } from '../shared/itemKnowledge'
+import type { TradeskillBookPayload } from '../shared/tradeskillBook'
 import type { MobResistCell, MobResistProfile, ResistAxis } from '../shared/resistTypes'
 import type { ResistPrefs } from '../shared/resistPrefs'
 import type { LevelUnlockData } from '../shared/levelUnlocks'
@@ -62,6 +63,9 @@ export const knowledgeBridge = {
   lookupItem: (name: string): Promise<ItemKnowledge> => ipcRenderer.invoke(IPC.itemsLookup, name),
   /** The list-row marks for many item names in one call: `{ [name]: ItemMarks }` for the names the DB knows. */
   itemMarks: (names: string[]): Promise<Record<string, ItemMarks>> => ipcRenderer.invoke(IPC.itemsMarks, names),
+  /** The Tradeskills section's recipe book: every wiki recipe and where its materials come from.
+   *  Committed data, built once in main: fetch once and keep. */
+  tradeskillBook: (): Promise<TradeskillBookPayload> => ipcRenderer.invoke(IPC.tradeskillBook),
   /**
    * Mob knowledge (Task #63): "what does this thing drop" — your own loot history + the local
    * quest catalog first, then a cached, politely-throttled wiki lookup. Never rejects.

@@ -581,6 +581,11 @@ export const IPC = {
   // item names at once, from the committed DB plus the local quest sources (the Loot rows, one
   // call per paint). Returns Record<name, ItemMarks> for the names the DB knows.
   itemsMarks: 'items:marks',
+  // renderer -> main: the Tradeskills section's recipe book: every wiki recipe (tradeskill,
+  // trivial, container, yield, materials) and where each material drops or is foraged, off the
+  // committed item database. Returns TradeskillBookPayload (shared/tradeskillBook.ts). Built on
+  // the first ask and kept; the renderer fetches it once per window.
+  tradeskillBook: 'tradeskills:book',
 
   // ---- mob knowledge ("what does this thing drop", Task #63) ----
   // renderer -> main: look up a mob's drop knowledge (own loot history + local quest catalog

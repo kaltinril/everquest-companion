@@ -1730,6 +1730,99 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
 - Per hour and This session cells are blank when there is nothing to state (no dash glyph:
   copyNoEmDash).
 
+## Tradeskills section (fork #6, requirements/skills-tab.md, plans/2026-11-20-tradeskills-real-work.md)
+
+Slice 1 (2026-11-20): the menu entry, Home and a workbench with the wiki recipe book. TypeScript
+only: no engine, parser, protocol, network or dependency change.
+
+- View id `tradeskills`, one view with two screens. Nav row: Research, after Maps. In
+  `NOT_YET_REPORTED` (tests/telemetryContract.test.mts). Mounted as `<TradeskillsTab view viewKey
+  routing />` (`features/tradeskills/TradeskillsView.tsx`), the Skills tab's way, because
+  `App.tsx` `PlainView` is at the complexity ceiling. The Skills tab is unchanged.
+- Data path: main builds the book once per process (`src/main/tradeskillBook.ts`
+  `buildTradeskillBook`, handler `src/main/ipc/tradeskills.ts`, channel `tradeskills:book`,
+  bridge `window.eq.tradeskillBook()` in `preload/knowledge.ts`). It reads `itemDb()` and
+  `eraDerivations()`, the memos the item lookups and the Gear index hold: no second import of
+  items.json (a new JSON import edge in main is a bundle-order risk, WORKFLOW.md). The import in
+  `ipc/index.ts` sits after `./planner` on purpose. The renderer fetches once per window
+  (`tradeskillData.ts`); the payload is about 1.6 MB.
+- Every fold is `src/shared/tradeskillBook.ts`, tested in `tests/tradeskillBook.test.mts`:
+  `indexBook` (per-tradeskill ladders, era-hidden counted), `recipeLadder` (marks, search, Hide
+  trivial, the unrated heading as a line), `tradeskillTiles`, `subRecipes`, `materialDrops`,
+  `heldCount`, and the words on screen. Components only map over what these return.
+- TRAP: `items.json` files one page under two keys (its title and its `|itemname`) as two copies
+  of the record. Counting keys gives 2,497 crafted items and 2,531 recipes; walked once per PAGE
+  there are 2,483 recipes (2,359 name a tradeskill). `buildTradeskillBook` dedupes by
+  `entry.page`, not by object identity.
+- TRAP: several pages share one in-game name (a bow's Linen, Hemp and Silk pages; `Blade
+  core-Nth fold`). A recipe's `id` is `<page key>#<n>`; `key` (the item name's key) is not unique
+  and is only for the era join, the item link and "which recipes make this item".
+- Marks: trivial at or under the level is `trivial`; the first rated recipe above it is `next`;
+  no trivial is `unrated`, kept after everything else under a heading line. A skill the log never
+  showed reads as level 0 and the screen says so. The marks are set against the whole ladder
+  before the search and the switch take lines away, so a search never moves `next`.
+- Era: the shared Current era toggle (`plannerData.useEraOnly`, `eq.planner.era`), with
+  `plannerData.eraHides` injected into `indexBook`, the Gear filter's arrangement. A recipe row
+  carries the Gear row's evidence (`eraEvidenceOf`), so an item has one verdict on both tabs. An
+  unknown era is shown with the `Unknown Era` chip (owner, 2026-11-20). A material's own recipe
+  opens whatever its era. Drop mobs are a list that recommends: under the toggle, out-of-era
+  mobs are left out and counted.
+- Layout: the Bazaar's master and detail. The picked recipe's panel (the next recipe until the
+  player picks) holds the materials in full; the table under it is `useWindowedRows` with 36 px
+  lines, so a line's Materials cell is one cut-off line with the whole list on hover.
+  TRAP: after the table sets its own `scrollTop` it dispatches a `scroll` event itself. The
+  browser's event comes a frame later (far later in the hidden e2e window) and until then the
+  windowed slice is the old position's: a blank table.
+- Names: every item name is `ItemLink` / `ItemLabel` (`tradeskillLinks.tsx`), which is
+  `DonorName` with `card` plus `lib/ItemIcon`: the item window on hover, the Loot page on click.
+  Mob names are `CellLink` to `openMob(dropMobTarget(...))`, zones `CellLink` to
+  `openMapZone(dropZoneTarget(...))`; a zone the table refuses stays plain text. Do not build
+  another hover or link here.
+- A material's mobs: `mergeItemSources(sourcesFor(key), material.dropsFrom)`, the Loot page's
+  own join, folded to one row per mob name and cut to 4 with a count.
+- Have: `window.eq.gearOwnership()` (the Gear tab's read; re-asked on `onInventoryReload`),
+  counted by `heldCount`: bags, bank, shared bank and `Personal-Depot<n>` rows, every plus level,
+  a socketed copy left out. No dump: the cell is blank and `OutputKindLine kind="inventory"`
+  names the command. The panel states the dump's date.
+- Memory (`tradeskillMemory.ts`, the gear area's rule): the open workbench
+  (`eq.tradeskills.skill`, absent is Home) and Hide trivial (`eq.tradeskills.hideTrivial`) in
+  localStorage; the search and the picked recipe in sessionStorage (`eq.tradeskills.bench`),
+  for the open workbench only. The table's scroll position rides `lib/navReturn` (parked on
+  unmount, taken on mount after a Back).
+- Back: `openLoot(item)` and `openMob(...)` are anchored links, so their Back returns to the
+  Tradeskills view, which reopens the workbench and the picked recipe from storage. Only the
+  Loot page's Back calls `noteBack`, so the exact scroll position is restored after Loot and the
+  table opens on the picked recipe after Mobs. Maps has no Back: the nav row reopens the workbench.
+- e2e: `tests/e2e/tradeskills.e2e.mts`. Its claims are properties of what is on screen (the line
+  marked next is the first above the level), never a name or count from the wiki data.
+- Left menu: with this row the menu's blocks take 774 px of the 820 px drawer (MEASURED.md). One
+  more 28 px row fits; a second does not.
+- What's new line, for the next `Test build` commit (the in-app list is generated from that
+  commit, `scripts/community/community-release-notes.mjs`; nothing is hand-edited): "New
+  Tradeskills section: a tile per tradeskill with your level, and a workbench with the wiki's
+  recipes in trivial order, what to make next, each material's sources and how many you hold."
+- Not built, and no placeholder is drawn: the goal switch and routes, merchants and locations,
+  prices, combine history, the guide panel, the make-an-item planner, a "ready" mark, the
+  skill-mod recommendations.
+- Open, links IN from other tabs (owner, 2026-11-20: "fully integrated with maps and other
+  tabs"). All need one opener first: `openTradeskills({ tradeskill, item? })` in `appRouting.ts`
+  (a `FocusSlot` like `openLoot`) that `TradeskillsTab` applies by opening the workbench and
+  picking the recipe that makes, or first uses, the item. Then, one small change each:
+  - Loot page: `features/loot/KnowledgeSection.tsx` `CraftedNote` (how it is made) and
+    `RecipesBlock` (recipes that use it). `ItemKnowledge.craftedBy` and `.recipes` are already there.
+  - Item hover card: `lib/KnownItemTooltip.tsx` `WhatItsFor`. Most cards are click-through (no
+    pointer events), so a link works only where the card is the interactive kind.
+  - Bazaar: `features/bazaar/BazaarControls.tsx`, beside the Tradeskill picker.
+  - Skills tab: `features/skills/SkillsView.tsx` `SkillRowLine`, a tradeskill's name.
+  - Character sheet: `features/character/CarryAll.tsx` depot lane rows (`ItemMarks.tradeskills`
+    says which tradeskills a material is for).
+  - Loot ledger and Mobs drop lists: `features/loot/KnowledgeBadge.tsx`, the tradeskill-only badge.
+  - Wish list and Exaltations farm list: the `crafted` group (`features/planner/plannerFarm.ts`,
+    `features/wishlist/WishGroups.tsx`); Recommended (`features/plan/PlanView.tsx`); Gear rows
+    with `playerCrafted` (`features/gear/GearTable.tsx`).
+  - Factions turn-ins: blocked on quest reward data. Maps merchant waypoints: blocked on
+    merchant data (the guides, or the log's purchases).
+
 ## Bug hunt 2026-11-19: the rules its fixes left in force
 
 From the multi-model hunt of that day (`audits/2026-11-19-bug-hunt.md`). One block per feature area:

@@ -25,6 +25,10 @@ export type View =
   // SKILLS (fork #6, 2026-11-19): every skill the log has seen go up, at its newest level. Not yet
   // in `TELEMETRY_VIEWS`.
   | 'skills'
+  // TRADESKILLS (fork #6, 2026-11-20): one tile per tradeskill and a workbench with its wiki recipe
+  // book. One view: Home or a workbench is the tab's own remembered state. Not yet in
+  // `TELEMETRY_VIEWS`.
+  | 'tradeskills'
   | 'loot'
   // BAZAAR (2026-10-06): what trade chat asked and offered per item, per day. Not yet in
   // `TELEMETRY_VIEWS`.
@@ -136,6 +140,7 @@ export const VIEW_LABELS: Record<View, string> = {
   alerts: 'Alerts',
   leveling: 'Leveling',
   skills: 'Skills',
+  tradeskills: 'Tradeskills',
   loot: 'Loot',
   bazaar: 'Bazaar',
   // "Wiki Gaps" (owner, 2026-10-19): what the tab lists is what the WIKI lacks. Label only; the view id stays `gaps`.
@@ -193,6 +198,7 @@ const KNOWN_VIEWS: View[] = [
   'alerts',
   'leveling',
   'skills',
+  'tradeskills',
   'loot',
   'bazaar',
   'gaps',
