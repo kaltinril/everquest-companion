@@ -515,7 +515,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   title "Void-Touched Potential: three a week from raids, each skips a whole tier." Default 1280
   window, three +9 pieces: "This week: Lustrous Russet Vambraces +9→+10 · Gauntlets of Fiery Might
   +9→+10 · Earring of Disease Reflection ...
-- CONFIRMED [medium, untrue-words] A worn ring the app knows is called "not in the item data" and
+- FIXED 2026-11-19 (`wornKey` in itemsDb.ts: the worn item's key is the resolved record's own) [medium, untrue-words] A worn ring the app knows is called "not in the item data" and
   left out of the ranking Seen: The tab: "Not ranked: Djarn's Amethyst Ring +1 (not in the item
   data)". In the same launch: window.eq.lookupItem("Djarn's Amethyst Ring") returns page "Djarns
   Amethyst Ring" with its stats (AGI +9, HP +80); window.eq.gearIndex() holds a row with key "djarns
