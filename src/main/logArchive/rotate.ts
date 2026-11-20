@@ -162,7 +162,7 @@ export async function rotateLog(logPath: string, dir: string, captured: Segment,
     deps.crashAfter?.('moved')
     return { ok: true, segment: await finishFromMoved(dir, { ...j, step: 'moved' }, deps) }
   } catch (err) {
-    return { ok: false, reason: (err as Error).message, logTouched: true }
+    return { ok: false, reason: afterMove(err, j), logTouched: true }
   }
 }
 
@@ -181,8 +181,22 @@ export async function recoverRotation(dir: string, deps: RotateDeps): Promise<st
     const seg = await finishFromMoved(dir, { ...j, step: 'moved' }, deps)
     return `finished an interrupted archive: ${seg.id}`
   } catch (err) {
-    return `an interrupted archive could not be finished: ${(err as Error).message}`
+    return `${NOT_FINISHED}${afterMove(err, j)}`
   }
+}
+
+const NOT_FINISHED = 'an interrupted archive could not be finished: '
+
+/** Why the steps after the move stopped, always with where the old log is while it is there. */
+function afterMove(err: unknown, j: Journal): string {
+  const why = (err as Error).message
+  return why.includes(j.movedPath) || !existsSync(j.movedPath) ? why : `${why}; the old log is kept at ${j.movedPath}`
+}
+
+/** Why the recovery could not finish, from what `recoverRotation` answered; null when it did, or
+ *  had nothing to do. The card shows it (preflight.ts `interruptedReason`). */
+export function unfinishedReason(done: string | null): string | null {
+  return done?.startsWith(NOT_FINISHED) === true ? done.slice(NOT_FINISHED.length) : null
 }
 
 const RESTORING = '.restoring'

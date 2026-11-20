@@ -36,12 +36,14 @@ import { pushAppKnowledge } from '../dataServer/definePush'
 import { pushWorldChanged } from '../dataServer/serveDeltas'
 import type { RespawnRow } from '../../shared/respawn'
 import { lacksLearned, refreshSegment, sweepRefreshLeftovers } from './refresh'
-import { putBackLeftovers, readJournal, recoverRotation, restoreLog, rotateLog, type RotateDeps } from './rotate'
+import { putBackLeftovers, readJournal, recoverRotation, restoreLog, rotateLog, unfinishedReason, type RotateDeps } from './rotate'
 import { listSegments, writeSegment } from './segmentStore'
 
 let busy: string | null = null
 /** One archive per app run: see `archivedThisRun` in preflight.ts. */
 let archivedThisRun = false
+/** Why this run could not finish an interrupted archive, for the card (`interruptedReason`). */
+let notFinished: string | null = null
 /** The captured modules the running engine serves, learned once it has caught up; null before. */
 let engineModules: ReadonlySet<string> | null = null
 /** The engine's respawn snapshot carries `learned` (see `lacksLearned`). */
@@ -264,6 +266,7 @@ export function logArchiveStatus(): LogArchiveStatus {
 function fillOn(base: LogArchiveStatus, dir: string, a: { character: string; logPath: string } | null): LogArchiveStatus {
   const listing = listSegments(dir, a?.character)
   const ctx = liveHistory.status()
+  const journal = readJournal(dir)
   base.segments = listing.segments.map(row).sort((x, y) => x.firstStamp.localeCompare(y.firstStamp))
   base.archived = base.segments.filter((s) => s.state === 'sealed')
   base.newestSealedId = newestSealed(base.segments)
@@ -278,7 +281,8 @@ function fillOn(base: LogArchiveStatus, dir: string, a: { character: string; log
     sameDrive: a === null || driveOf(a.logPath) === driveOf(dir),
     freeBytes: freeBytes(dir),
     logBytes: base.live?.bytes ?? 0,
-    interrupted: readJournal(dir) !== null,
+    interrupted: journal !== null,
+    interruptedReason: journal === null ? null : notFinished,
     busy: busy !== null,
     archivedThisRun,
     putBackUnfinished: base.newestSealedId !== null && putBackLeftovers(dir).some((f) => f.startsWith(`${base.newestSealedId}.`))
@@ -376,6 +380,7 @@ export function rotateNow(): Promise<LogArchiveReply> {
     buckets.take()
     const r = await rotateLog(a.logPath, dir, cap.segment, rotateDeps)
     buckets.keep(dir, cap.segment.id, r.ok || r.logTouched)
+    if (!r.ok && r.logTouched) notFinished = r.reason
     if (!r.ok) return reply(false, r.logTouched ? `Interrupted: ${r.reason}` : `Not archived: ${r.reason}`)
     liveHistory.noteSealedThisAttach(r.segment.id)
     archivedThisRun = true
@@ -435,6 +440,7 @@ export async function recoverLogArchiveAtLaunch(note: (line: string) => void): P
     sweepTemp(dir)
     sweepRefreshLeftovers(dir)
     const done = await recoverRotation(dir, rotateDeps)
+    notFinished = unfinishedReason(done)
     if (done !== null) note(`log archive: ${done}`)
     // Never swept: they hold log lines until the same archive's Put back joins them.
     for (const f of putBackLeftovers(dir)) note(`log archive: a put back did not finish; ${join(dir, f)} holds log lines and is kept`)
