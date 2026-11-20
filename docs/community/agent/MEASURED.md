@@ -446,6 +446,15 @@ Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`)
   `craftedBy` with a trivial and ingredients.
 - The Inventory dump lists depot stock as `Personal-Depot<n>` rows (143 in the owner's dump of
   2026-11-20). `items.json` has no merchant data: no record says who sells an item.
+- Merchants pay for a made jewel what its materials cost at the same merchants: Golden Ruby Ring
+  141.75 pp of Gold Bar (10.50) and Ruby (131.25), sold for 141.75; Fire Emerald Golden Bracelet
+  99.75 and 99.75; Golden Jaded Bracelet 14.88 and 14.17. Over the four crafting days: about
+  28,823 pp paid, 13,452 pp received. The money lost is the failed combines.
+- `/outputfile recipes Jewelcrafting` (owner, in game, 2026-11-20): the game prints `You haven't
+  learned any notable Jewelry Making recipes, yet...` and writes no file, at skill 205 with 31
+  recipes made. The dump is for "notable" learned recipes, not ordinary ones.
+- Skill-mod items in `items.json`: five, as `Skill Mod: Fishing +5% (10 Max)` style strings in
+  `stats.flags` (four Fishing, one Baking).
 
 **Left menu (fork #10)**
 
