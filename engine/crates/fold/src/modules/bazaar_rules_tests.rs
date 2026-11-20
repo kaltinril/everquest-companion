@@ -285,6 +285,37 @@ fn a_comma_in_a_price_is_its_thousands() {
     );
 }
 
+/// Bug hunt, 2026-11-19: a price before "for" was given to every later item on the line, and a
+/// later item's own price was dropped.
+#[test]
+fn a_price_before_for_prices_only_the_item_after_it() {
+    assert_eq!(
+        read("WTS 5k for Fleeting Quiver, Bone Chips 3k"),
+        ["sell Fleeting Quiver 5000pp", "sell Bone Chips 3000pp"]
+    );
+    assert_eq!(
+        read("WTS 5k for Fleeting Quiver, Bone Chips"),
+        ["sell Fleeting Quiver 5000pp", "sell Bone Chips"]
+    );
+    assert_eq!(
+        read("WTS 50pp for Bone Chips, Fleeting Quiver 15k"),
+        ["sell Bone Chips 50pp", "sell Fleeting Quiver 15000pp"]
+    );
+    assert_eq!(
+        read("paying 15k for fleeting quiver and 20pp for bone chips, Diamond"),
+        [
+            "buy Fleeting Quiver 15000pp",
+            "buy Bone Chips 20pp",
+            "buy Diamond"
+        ]
+    );
+    // A leading `each` price is still every item's.
+    assert_eq!(
+        read("WTS 3k each: Fleeting Quiver | Rain Caller"),
+        ["sell Fleeting Quiver 3000pp", "sell Rain Caller 3000pp"]
+    );
+}
+
 /// A price of nothing is no price: the offer is listed with none, never counted at 0.
 #[test]
 fn a_zero_price_is_no_price() {

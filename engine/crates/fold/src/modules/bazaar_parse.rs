@@ -20,8 +20,8 @@
 //! * a bare number (no `k`, `pp` or coin) is a price only right after the item, its tier or its
 //!   count, or before `each`: "only have 1" and "- buying 100 10lb meatpies" are counts.
 //! * "paying 4k" or "offering 4k" after several items prices each of them, as `each` does; as the
-//!   message's first word it is a buy, and a price before "for" prices what follows
-//!   ("paying 15k for fleeting quiver").
+//!   message's first word it is a buy, and a price before "for" prices the one item after it
+//!   ("paying 15k for fleeting quiver"); an item after that one takes its own price or none.
 //! * an item right after "for" is what the offer is for ("Book of Scale for Fiery Avenger"), unless
 //!   a price stands before the "for" or the offer is a barter.
 //! * a bare number before a word that is no item and no price word counts ("6 left"), and one
@@ -152,6 +152,8 @@ struct Parser<'a> {
     starts: Vec<usize>,
     dir: Option<Dir>,
     lead_price: Option<f64>,
+    /// `lead_price` stood before "for", so it prices the one item after it ("5k for A, B 3k").
+    lead_once: bool,
     pending_qty: Option<u32>,
     /// Index into `out` of the offer the next tier, count or price belongs to.
     last: Option<usize>,
@@ -217,13 +219,17 @@ impl<'a> Parser<'a> {
             return Some(i + used);
         }
         self.priced_here = false;
+        let lead = self.lead_price;
+        if self.lead_once {
+            self.lead_price = None;
+        }
         self.out.push(Offer {
             dir,
             item,
             tier: 0,
             qty: self.pending_qty.take(),
-            price_pp: self.lead_price,
-            each: self.lead_price.is_some(),
+            price_pp: lead,
+            each: lead.is_some(),
             sure: true,
         });
         self.starts.push(i);
@@ -417,12 +423,14 @@ impl<'a> Parser<'a> {
             && self.item_at(at + used + 1).is_some();
         if for_item {
             self.lead_price = Some(pp);
+            self.lead_once = true;
             return;
         }
         let Some(last) = self.last else {
             // A price before any item: "3k each: A | B".
             if each {
                 self.lead_price = Some(pp);
+                self.lead_once = false;
             }
             return;
         };
@@ -481,6 +489,7 @@ fn parse_tokens(t: Vec<Tok>, ix: &ItemIndex) -> Vec<Offer> {
         starts: Vec::new(),
         dir: None,
         lead_price: None,
+        lead_once: false,
         pending_qty: None,
         last: None,
         fresh: true,
