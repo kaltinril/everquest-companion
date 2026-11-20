@@ -11,6 +11,8 @@
 // smaller, and the gaps join newest first under the engine's own cap of six. The agreed gap is
 // re-read over both logs' learned gaps (`withAgreed`, fork #8). The estimate is then re-read through
 // the same ladder (`resolveRespawn`). A candidate's kills add and its last kill takes the later.
+// A mob today's list marks "several mobs share this name" has each side's row read over the
+// ten-minute floor before the join (`aboveFloor`), since an archived row was numbered without it.
 //
 // WHAT BELONGS TO THE PRESENT, AND IS NOT: the zone, the watch list and every custom number come
 // from the live state only. An archived clock row is shown only for a mob the live watch list still
@@ -145,8 +147,8 @@ export function mergeRespawn(older: unknown, newer: unknown): RespawnSnap | null
   if (!isRespawnSnap(older) || !isRespawnSnap(newer) || older.v !== newer.v) return null
   const live = carryZone(newer, older.zone)
   const learned = mergeLearned(learnedOf(older), learnedOf(newer), older.zone)
-  const joined = mergeRows(older, live)
   const shared = sharedNames(live)
+  const joined = mergeRows(withFloor(older, shared), withFloor(live, shared))
   const rows = learned === null ? joined : joined.map((r) => withAgreed(r, learned, shared))
   return { ...live, rows, recent: mergeRecent(older, live), ...(learned === null ? {} : { learned }) }
 }
@@ -159,6 +161,39 @@ function sharedNames(snap: RespawnSnap): ReadonlySet<string> {
 
 /** A zone's places as the engine pools them (`respawn_places.rs zone_base`): no tier, no instance tag. */
 const zoneBase = (zone: string): string => zoneBaseName(zone).toLowerCase()
+
+/**
+ * THE SHARED-NAME FLOOR ACROSS THE CUT (owner 2026-11-09). The live engine numbers a shared-name
+ * watch from its gaps of ten minutes or more (`respawn_places.rs pooled_gaps_above`) and says so on
+ * the row. An archived row was numbered before the switch was set, or read with a bare watch (the
+ * history rows), so its bound is two spawns' short gap. Re-read here as the engine reads it: the
+ * lowest gap over the floor in the side's learned gaps (the mob, in every place of the row's zone)
+ * and the row's own, and how many there are. A log with no learned list has the row's six newest
+ * gaps only, so the clock can read longer for it, never under the floor.
+ */
+function aboveFloor(row: RespawnRow, learned: readonly Learned[]): RespawnRow {
+  if (row.sharedName === true) return row
+  const out: RespawnRow = { ...row, sharedName: true }
+  if (row.agreedMs !== undefined && row.agreedMs < RESPAWN_SHARED_NAME_FLOOR_MS) delete out.agreedMs
+  // The bound is the lowest gap of all: at or over the floor, no gap is under it.
+  if (row.observedMs === undefined || row.observedMs >= RESPAWN_SHARED_NAME_FLOOR_MS) return withEstimate(out)
+  const base = zoneBase(row.zone)
+  const over = (gaps: readonly number[]): number[] => gaps.filter((g) => g >= RESPAWN_SHARED_NAME_FLOOR_MS)
+  const pooled = over(learned.filter((l) => l.key === row.key && zoneBase(l.zone) === base).flatMap((l) => l.gapsMs))
+  const own = over(row.gapsMs ?? [])
+  // The learned list holds every gap the row does, so the count is the larger, never the sum.
+  out.samples = Math.max(pooled.length, own.length)
+  if (out.samples === 0) delete out.observedMs
+  else out.observedMs = Math.min(...pooled, ...own)
+  return withEstimate(out)
+}
+
+/** `snap` with the rows of today's shared-name watches read over the floor. */
+function withFloor(snap: RespawnSnap, shared: ReadonlySet<string>): RespawnSnap {
+  if (!snap.rows.some((r) => shared.has(r.key) && r.sharedName !== true)) return snap
+  const learned = learnedOf(snap) ?? []
+  return { ...snap, rows: snap.rows.map((r) => (shared.has(r.key) ? aboveFloor(r, learned) : r)) }
+}
 
 /**
  * AGREEMENT ACROSS THE CUT (fork #8). The engine reads a row's agreed gap off one log's gaps, so two
