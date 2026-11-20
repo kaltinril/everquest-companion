@@ -9,7 +9,10 @@ import {
   RETRY_DELAYS_MS,
   RETRY_MAX_TRIES,
   onStatusWords,
-  retryPlan
+  retryAfter,
+  retryPlan,
+  type RetryCount,
+  type RetryEvent
 } from '../src/shared/dataServer/retryPlan'
 
 test('THE WAITS ARE 4, 8, 16 AND 30 s, one after each failed try', () => {
@@ -41,7 +44,40 @@ test('a window that has not failed has nothing to wait for', () => {
   assert.deepEqual(retryPlan(0, false), { tries: 0, delayMs: null })
 })
 
-test('THE PROVIDER ASKS THE PLAN: no fixed interval is left, and a taken connection clears the count', () => {
+/** The waits a window sits out over `rounds` tries, each one ending as `events` say. */
+function waitsOver(rounds: number, events: readonly RetryEvent[]): (number | null)[] {
+  let held: RetryCount = { tries: 0, phase: 'trying' }
+  const waits: (number | null)[] = []
+  for (let i = 0; i < rounds; i += 1) {
+    for (const event of events) held = retryAfter(held, event)
+    waits.push(retryPlan(held.tries, false).delayMs)
+  }
+  return waits
+}
+
+test('A CONNECTION TAKEN AND THEN FAILED AT HELLO COUNTS: five tries, then no timer', () => {
+  // An engine that does not match this window, a refused token, a socket that closes at once:
+  // the connection is handed over every time and never proven. Each used to count as try 1.
+  assert.deepEqual(waitsOver(7, ['taken', 'failed']), [4_000, 8_000, 16_000, 30_000, null, null, null])
+  let held: RetryCount = { tries: 0, phase: 'trying' }
+  for (let i = 0; i < RETRY_MAX_TRIES; i += 1) held = retryAfter(retryAfter(held, 'taken'), 'failed')
+  assert.deepEqual(held, { tries: 5, phase: 'stopped' })
+  // A try that got no connection at all counts the same way.
+  assert.deepEqual(waitsOver(6, ['failed']), [4_000, 8_000, 16_000, 30_000, null, null])
+})
+
+test('ONLY A PROVEN CONNECTION STARTS THE COUNT AGAIN, and a taken one stops the words being read', () => {
+  const failing: RetryCount = { tries: 3, phase: 'waiting' }
+  // Taken: the count stands, and the status's words (which move all through a read) are ignored.
+  assert.deepEqual(retryAfter(failing, 'taken'), { tries: 3, phase: 'connected' })
+  // The hello was accepted: the next failure is the first of a new run.
+  assert.deepEqual(retryAfter(retryAfter(failing, 'taken'), 'ready'), { tries: 0, phase: 'connected' })
+  // A connection that worked and was then lost (a respawn) waits the first 4 s every time.
+  assert.deepEqual(waitsOver(6, ['taken', 'ready', 'failed']), [4_000, 4_000, 4_000, 4_000, 4_000, 4_000])
+  assert.deepEqual(retryAfter({ tries: 0, phase: 'connected' }, 'failed'), { tries: 1, phase: 'waiting' })
+})
+
+test('THE PROVIDER ASKS THE PLAN: no fixed interval is left, and only a proven connection clears the count', () => {
   // engineProvider.tsx is a React component over `window.eq` and cannot be run here, so its
   // wiring is read from source with the comments taken out (the instrument logReadPokes uses).
   const provider = readFileSync(new URL('../src/renderer/src/lib/engineProvider.tsx', import.meta.url), 'utf8')
@@ -51,9 +87,13 @@ test('THE PROVIDER ASKS THE PLAN: no fixed interval is left, and a taken connect
   assert.doesNotMatch(provider, /RETRY_MS/, 'the flat 4 s retry is back')
   const timers = provider.match(/setTimeout\(/g) ?? []
   assert.equal(timers.length, 1, 'a second timer could retry outside the plan')
-  assert.match(provider, /retry\.current\.tries \+= 1\s*const \{ delayMs \} = retryPlan\(retry\.current\.tries, false\)/)
+  assert.match(provider, /retry\.current = retryAfter\(retry\.current, 'failed'\)\s*const \{ delayMs \} = retryPlan\(retry\.current\.tries, false\)/)
   assert.match(provider, /if \(delayMs === null\) return\s*timer = setTimeout\(/, 'out of tries, a timer is still set')
-  assert.match(provider, /retry\.current = \{ tries: 0, phase: 'connected' \}/)
+  // The count is cleared by the hello's answer and by nothing sooner; `taken` is said before the
+  // attach, so a failure during it is not written over.
+  assert.match(provider, /if \(state === 'ready'\) retry\.current = retryAfter\(retry\.current, 'ready'\)/)
+  assert.match(provider, /retry\.current = retryAfter\(retry\.current, 'taken'\)\s*next\.attach\(/)
+  assert.doesNotMatch(provider, /tries: 0, phase: 'connected'/, 'a connection that was only taken clears the count')
   // The changed fact: the engine words of the pushed status, and nothing else.
   assert.match(provider, /const engineWords = useLogReadReport\(\)\?\.engine \?\? null/)
   assert.match(provider, /const what = onStatusWords\(retry\.current\.phase\)/)

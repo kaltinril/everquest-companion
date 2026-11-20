@@ -40,7 +40,7 @@ import { useEffect, useRef, useState, type JSX, type ReactNode } from 'react'
 import { createEngineClient, type EngineClient } from '../../../shared/dataServer/client'
 import { createNdjsonTransport } from '../../../shared/dataServer/ndjson'
 import type { ClientMessage, EngineMessage } from '../../../shared/dataServer/protocol.generated'
-import { onStatusWords, retryPlan, type RetryPhase } from '../../../shared/dataServer/retryPlan'
+import { onStatusWords, retryAfter, retryPlan, type RetryPhase } from '../../../shared/dataServer/retryPlan'
 import { useLogReadReport } from './logReadReportHud'
 import { EngineClientProvider } from './useView'
 
@@ -84,9 +84,8 @@ export function EngineProvider({ children }: { children: ReactNode }): JSX.Eleme
     retry.current.phase = 'trying'
     const askAgain = (): void => {
       if (!live || timer !== undefined) return
-      retry.current.tries += 1
+      retry.current = retryAfter(retry.current, 'failed')
       const { delayMs } = retryPlan(retry.current.tries, false)
-      retry.current.phase = delayMs === null ? 'stopped' : 'waiting'
       // Out of tries: no timer. The status changing is what starts the next one.
       if (delayMs === null) return
       timer = setTimeout(() => {
@@ -106,6 +105,8 @@ export function EngineProvider({ children }: { children: ReactNode }): JSX.Eleme
         const next = createEngineClient({ token: connection.token })
         created = next
         next.onState((state) => {
+          // The hello was accepted: only now is the next failure the first of a new run.
+          if (state === 'ready') retry.current = retryAfter(retry.current, 'ready')
           // A FAILED connection is dropped from the context immediately, which is what takes every
           // engine-backed surface off the screen rather than leaving one showing rows nobody is
           // still receiving. `closed` is this effect's own teardown and needs no reaction.
@@ -114,9 +115,10 @@ export function EngineProvider({ children }: { children: ReactNode }): JSX.Eleme
             askAgain()
           }
         })
+        // Taken, not proven: the count stands (retryPlan.ts). Said before the attach, so a failure
+        // during it is not written over.
+        retry.current = retryAfter(retry.current, 'taken')
         next.attach(createNdjsonTransport<ClientMessage, EngineMessage>(connection))
-        // A connection taken: the next failure is the first of a new run.
-        retry.current = { tries: 0, phase: 'connected' }
         setClient(next)
       },
       () => {

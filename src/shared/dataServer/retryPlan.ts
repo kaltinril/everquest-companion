@@ -40,6 +40,28 @@ export type RetryPhase =
   | 'stopped'
   | 'connected'
 
+/** The count and the phase the provider keeps between tries. */
+export interface RetryCount {
+  readonly tries: number
+  readonly phase: RetryPhase
+}
+
+/** What happened to a try: its connection was handed over, the engine accepted its hello, it failed. */
+export type RetryEvent = 'taken' | 'ready' | 'failed'
+
+/**
+ * The count after `event`. A connection that was only TAKEN has proven nothing, so its count
+ * stands: clearing it there made every failure at hello (a mismatched engine, a refused token, a
+ * socket that closes at once) the first of a new run, and the window asked every 4 s for ever.
+ * Only `ready` starts the count again.
+ */
+export function retryAfter(held: RetryCount, event: RetryEvent): RetryCount {
+  if (event === 'taken') return { tries: held.tries, phase: 'connected' }
+  if (event === 'ready') return { tries: 0, phase: 'connected' }
+  const tries = held.tries + 1
+  return { tries, phase: retryPlan(tries, false).delayMs === null ? 'stopped' : 'waiting' }
+}
+
 /**
  * What a change of the status's engine words does. A try that is already out is left to finish
  * (`recount`: only its count starts again); a connected window ignores the words, which change
