@@ -88,8 +88,9 @@ test('THE TURN IS RUN BY attachTurn.ts, with the host-s own turn, connection and
   assert.match(probe, /getAttached: \(\) => l\.attachedTo/)
   assert.match(probe, /stateDir: \(\) => attachStateDir\(\{ serving: true,/, 'the artifact handover left the attach')
   assert.match(probe, /saw: \(health\) => \{\s*sawHealth\(l, health\)/, 'the go-live edge is no longer fed')
-  // The bar and the archive are told by the callback the turn calls for an ACCEPTED attach only.
-  assert.match(probe, /const refolded = liveHistory\.engineAttaching\(\)\s*return \(\) => \{\s*noteEngineFolding\(\)\s*refolded\(\)/)
+  // The bar and the archive are told by the two callbacks the turn calls for an ACCEPTED attach only.
+  assert.match(probe, /attaching: \(\) => liveHistory\.engineAttaching\(\),/)
+  assert.match(probe, /folding: noteEngineFolding,/)
   // One sender of the attach, and it is not this file.
   assert.doesNotMatch(host.replace(/attach: \(params\) => l\.client\.request\('session\.attach', params\)/, ''), /'session\.attach'/)
   const turn = code(TURN)
@@ -97,7 +98,10 @@ test('THE TURN IS RUN BY attachTurn.ts, with the host-s own turn, connection and
   assert.match(turn, /const stateDir = deps\.stateDir\(\)\s*const clock = deps\.clock\(\)\s*const taken = deps\.attaching\(\)[\s\S]*?await deps\.attach\(/)
   assert.match(turn, /await deps\.defines\(\)\s*if \(!deps\.mine\(\)\) return[\s\S]*?sendAttach\(turn\)/)
   assert.match(turn, /if \(deps\.getAttached\(\) !== deps\.target && !\(await sendAttach\(turn\)\)\) return/)
-  assert.match(turn, /if \(result\.accepted && \(mine \|\| deps\.wanted\(\) === deps\.target\)\) taken\(\)/)
+  assert.match(
+    turn,
+    /if \(result\.accepted\) \{\s*if \(mine \|\| deps\.wanted\(\) === deps\.target\) deps\.folding\(\)\s*taken\(\)\s*\}/
+  )
   assert.match(probe, /wanted: attachTarget/)
 })
 

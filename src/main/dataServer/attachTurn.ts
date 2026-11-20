@@ -6,6 +6,10 @@
 // sends none. The artifact handover (`stateDir`) happens before the request object exists. The
 // catch-up bar and the archive are told only about an attach the engine accepted.
 //
+// WHO TELLS THEM changed with rule 1 below: a later turn may now find the engine on its log and
+// send nothing, so a replaced turn's accepted attach still tells the archive (it is true of every
+// accepted attach) and, when the app still wants that log, the bar.
+//
 // WHAT IS NEW, and each rule closes a way the app got stuck or showed the wrong character:
 //
 //   1. WHAT THE ENGINE WAS TOLD IS RECORDED EVEN WHEN THE TURN IS STALE. Switch A, B, A: B's
@@ -59,8 +63,11 @@ export interface AttachTurnDeps {
   readonly stateDir: () => string | undefined
   /** The host's clock hint, read fresh at each attach. */
   readonly clock: () => ParamsFor<'session.attach'>['clock']
-  /** An attach is about to be sent. Answers what to call once the engine has taken it. */
+  /** An attach is about to be sent. Answers what to call once the engine has taken it: the
+   *  archive's half (`liveHistory.engineAttaching`), true of every accepted attach, stale or not. */
   readonly attaching: () => () => void
+  /** A historical fold began that this app is waiting on: the catch-up bar's half. */
+  readonly folding: () => void
   /** Sleep, without ever being the reason this process stays alive. */
   readonly rest: (ms: number) => Promise<void>
   /** The dev log. */
@@ -109,9 +116,12 @@ function attached(turn: Turn, result: { readonly epoch: number; readonly accepte
   const mine = deps.mine()
   // RULE 1. `accepted: false` lost to a later attach, whose own reply records its own log.
   if (result.accepted || mine) deps.setAttached(deps.target)
-  // The bar and the archive are told by the turn that owns the fold. A turn replaced by a rebuild
-  // of the SAME log still tells them: the new turn finds the engine on its log and sends nothing.
-  if (result.accepted && (mine || deps.wanted() === deps.target)) taken()
+  if (result.accepted) {
+    // The bar is told by the turn that owns the fold. A turn replaced by a rebuild of the SAME
+    // log still tells it: the new turn finds the engine on its log and sends nothing.
+    if (mine || deps.wanted() === deps.target) deps.folding()
+    taken()
+  }
   if (!mine) return false
   deps.note(
     `data-server engine attached: ${deps.target} (epoch ${String(result.epoch)}, ` +
@@ -166,6 +176,7 @@ function sawHere(turn: Turn, health: FoldHealth): void {
     turn.unanswered = null
     deps.setAttached(deps.target)
     deps.note(`data-server engine attached: ${deps.target} (the attach went unanswered; the engine has it)`)
+    deps.folding()
     pending.taken()
   }
   deps.saw(health)

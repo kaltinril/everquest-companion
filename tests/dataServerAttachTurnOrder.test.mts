@@ -81,8 +81,10 @@ test('THE SAME WITH B-S REPLY ARRIVING BEFORE ANY OF A2-S DEFINE REPLIES: it als
   assert.equal(r.attached, LOG_A)
   assert.equal(r.engineLog, LOG_A)
   assert.deepEqual(r.errors, [])
-  // The stale turn did not claim the bar for B either: only the two attaches for A did.
-  assert.equal(r.order.filter((step) => step === 'taken').length, 2)
+  // The stale turn did not claim the bar for B: only the two attaches for A did. The archive is
+  // told of every attach the engine accepted, B's included: that is true whoever is asking.
+  assert.equal(r.order.filter((step) => step === 'folding').length, 2)
+  assert.equal(r.order.filter((step) => step === 'taken').length, 3)
 })
 
 test('B-S REPLY NEVER ARRIVING AT ALL is closed by the mark alone', async () => {
@@ -113,12 +115,32 @@ test('A REBUILD OF THE SAME LOG WHILE ITS ATTACH IS OUT: no second attach, and t
   await settle()
   reply.resolve({ epoch: 1, accepted: true })
   await settle()
-  assert.equal(r.order.filter((step) => step === 'taken').length, 1, 'the bar was never told the fold began')
+  assert.equal(r.order.filter((step) => step === 'folding').length, 1, 'the bar was never told the fold began')
   defines.resolve(undefined)
   await Promise.all([first, second])
   assert.equal(r.attaches.length, 1, 'the log is read once')
+  assert.equal(r.order.filter((step) => step === 'folding').length, 1)
   assert.equal(r.order.filter((step) => step === 'taken').length, 1)
   assert.deepEqual(r.liveOn, [LOG_A])
+})
+
+test('a replaced turn-s attach for a log the app has left tells the archive and not the bar', async () => {
+  const r = rig()
+  const reply = held<AttachAnswer>()
+  r.attachScripts.push({ reply })
+  const first = r.turn(LOG_A)
+  await settle()
+  const defines = held<undefined>()
+  r.definesGate = defines
+  const second = r.turn(LOG_B)
+  await settle()
+  reply.resolve({ epoch: 1, accepted: true })
+  await settle()
+  assert.deepEqual(r.order.filter((step) => step === 'folding' || step === 'taken'), ['taken'])
+  defines.resolve(undefined)
+  await Promise.all([first, second])
+  assert.deepEqual(r.attaches.map((a) => a.logPath), [LOG_A, LOG_B])
+  assert.deepEqual(r.order.filter((step) => step === 'folding' || step === 'taken'), ['taken', 'folding', 'taken'])
 })
 
 test('a stale reply that lost to a later attach records nothing: the winner-s own reply does', async () => {

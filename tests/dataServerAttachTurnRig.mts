@@ -79,7 +79,8 @@ export interface Rig {
   readonly failed: [string, string][]
   readonly notes: string[]
   readonly rests: number[]
-  /** What happened, in order: `defines`, `stateDir`, `attaching`, `attach <log>`, `taken`. */
+  /** What happened, in order: `defines`, `stateDir`, `attaching`, `attach <log>`, `folding` (the
+   *  bar is told a fold began), `taken` (the archive is told the attach was accepted). */
   readonly order: string[]
   /** The state directory the handover answers, or undefined for a launch that sends none. */
   stateDir: string | undefined
@@ -181,6 +182,7 @@ export function rig(): Rig {
           r.order.push('attaching')
           return () => r.order.push('taken')
         },
+        folding: () => r.order.push('folding'),
         rest: (ms) => {
           r.rests.push(ms)
           return Promise.resolve()

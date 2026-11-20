@@ -497,15 +497,10 @@ async function attachAndProbe(mine: number): Promise<void> {
     stateDir: () => attachStateDir({ serving: true, userData: () => app.getPath('userData'), note: debug }),
     // READ FRESH AT THE ATTACH (JOS-536): the offset is a function of the date.
     clock: () => hostClockHint(new Date(), resolvedTimeZone),
-    attaching: () => {
-      // An archive sealed before this attach is not in the fold it starts (eligible.ts rule 4).
-      const refolded = liveHistory.engineAttaching()
-      // A HISTORICAL FOLD HAS JUST STARTED (JOS-503): only for an attach the engine accepted.
-      return () => {
-        noteEngineFolding()
-        refolded()
-      }
-    },
+    // An archive sealed before this attach is not in the fold it starts (eligible.ts rule 4).
+    attaching: () => liveHistory.engineAttaching(),
+    // A HISTORICAL FOLD HAS JUST STARTED (JOS-503): only for an attach the engine accepted.
+    folding: noteEngineFolding,
     rest: delay,
     note: debug,
     // The code goes with it: an attach nobody answered is not an attach that was refused.

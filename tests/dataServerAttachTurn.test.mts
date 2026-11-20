@@ -19,7 +19,7 @@ import { LOG_A, LOG_B, held, rig, settle, timedOut, type AttachAnswer } from './
 test('THE DEFINES GO FIRST, THE HANDOVER BEFORE THE REQUEST, and the bar is told once the attach is accepted', async () => {
   const r = rig()
   await r.turn(LOG_A)
-  assert.deepEqual(r.order, ['defines', 'stateDir', 'attaching', `attach ${LOG_A}`, 'taken'])
+  assert.deepEqual(r.order, ['defines', 'stateDir', 'attaching', `attach ${LOG_A}`, 'folding', 'taken'])
   assert.deepEqual(r.attaches, [{ logPath: LOG_A, stateDir: 'C:\\Users\\tester\\AppData\\Roaming\\app' }])
   assert.equal(r.attached, LOG_A)
   assert.deepEqual(r.liveOn, [LOG_A])
@@ -59,7 +59,8 @@ test('AN ATTACH THAT LOST TO A LATER ONE does not claim the bar', async () => {
   const r = rig()
   r.attachScripts.push({ lost: true })
   await r.turn(LOG_A)
-  assert.ok(!r.order.includes('taken'), 'the winner-s own attach tells the bar')
+  assert.ok(!r.order.includes('folding'), 'the winner-s own attach tells the bar')
+  assert.ok(!r.order.includes('taken'), 'and the archive')
   assert.ok(r.notes.some((line) => line.includes('accepted false')))
 })
 
@@ -148,7 +149,7 @@ test('AN ATTACH THAT TIMED OUT, THEN A FOLDING MARK FOR THIS LOG: adopted, the b
   await r.turn(LOG_A)
   assert.equal(r.attaches.length, 1, 'an attach the engine took is not sent again')
   assert.equal(r.attached, LOG_A)
-  assert.deepEqual(r.order, ['defines', 'stateDir', 'attaching', `attach ${LOG_A}`, 'taken'])
+  assert.deepEqual(r.order, ['defines', 'stateDir', 'attaching', `attach ${LOG_A}`, 'folding', 'taken'])
   assert.deepEqual(r.errors, [], 'a slow attach is not a refusal')
   assert.equal(r.saw[0]?.status, 'folding')
   assert.deepEqual(r.liveOn, [LOG_A])
@@ -161,7 +162,7 @@ test('adopted on attaching and on live too, and on a read that ended at once', a
     r.healthScripts.push({ status, epoch: 1, mark: { log: LOG_A, offset: 0 } })
     await r.turn(LOG_A)
     assert.equal(r.attached, LOG_A, status)
-    assert.ok(r.order.includes('taken'), status)
+    assert.ok(r.order.includes('folding') && r.order.includes('taken'), status)
     assert.deepEqual(r.errors, [], status)
   }
   // The engine took it and its read ended: that is `ended`, with the attach on record as sent.
@@ -188,7 +189,7 @@ test('A TIMEOUT FOLLOWED BY IDLE WITH NO MARK RE-SENDS TWICE, 2 s AND 5 S APART,
   assert.deepEqual(r.failed, [], 'an idle engine that never took the attach has no read that ended')
   assert.deepEqual(r.saw, [], 'and its answers are not about this log')
   assert.equal(r.attached, null)
-  assert.ok(!r.order.includes('taken'))
+  assert.ok(!r.order.includes('taken') && !r.order.includes('folding'))
 })
 
 test('a re-send the engine takes ends the matter: no error, one read', async () => {
