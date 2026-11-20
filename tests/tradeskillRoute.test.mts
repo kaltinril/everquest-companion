@@ -7,7 +7,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { GUIDE_CREDITS, guideCreditLine } from '../src/shared/guideCredits'
 import { TRADESKILL_BOOK_VERSION, indexBook, type BookRecipe } from '../src/shared/tradeskillBook'
-import { GOAL_LABELS, ROUTE_GOALS, ROUTE_STEP_CAP, asGoal, buildRoute, moreStepsText, routeEndText, type Route, type RouteGoal } from '../src/shared/tradeskillRoute'
+import { BOOK_GOALS, GOAL_LABELS, ROUTE_GOALS, ROUTE_STEP_CAP, asGoal, buildRoute, isBookGoal, moreStepsText, routeEndText, type BookGoal, type Route } from '../src/shared/tradeskillRoute'
 import { EXPLORE_GROUP_CAP } from '../src/shared/tradeskillRouteExplore'
 import { recipeBuyable } from '../src/shared/tradeskillRouteLevel'
 import { recordText, type RouteCtx, type RouteFacts, type RouteStep } from '../src/shared/tradeskillRouteStep'
@@ -15,7 +15,7 @@ import { skillRecipes } from '../src/shared/tradeskillBook'
 import { bought, ing, item, recipe } from './tradeskillFixtures.mts'
 import { OWNER_LEVEL, ownerFacts, ownerHeld, ownerIndex, ownerRecipes, ownerSnap } from './tradeskillRouteFixtures.mts'
 
-const route = (goal: RouteGoal, facts: RouteFacts = ownerFacts(), level: number | null = OWNER_LEVEL): Route =>
+const route = (goal: BookGoal, facts: RouteFacts = ownerFacts(), level: number | null = OWNER_LEVEL): Route =>
   buildRoute(facts, { tradeskill: 'Jewelcrafting', level, goal })
 
 const allSteps = (r: Route): RouteStep[] => r.groups.flatMap((group) => group.steps)
@@ -32,11 +32,15 @@ const stepOf = (r: Route, name: string): RouteStep => {
 /** Everything a step puts on screen. */
 const words = (s: RouteStep): string => [s.range, s.name, s.why, s.aside, s.money, s.handText, s.record].join(' ')
 
-test('four goals are built, Cheapest is the default, and Faction is not one of them', () => {
-  assert.deepEqual([...ROUTE_GOALS], ['cheapest', 'fastest', 'explore', 'guide'])
-  assert.deepEqual(ROUTE_GOALS.map((g) => GOAL_LABELS[g]), ['Cheapest', 'Fastest', 'Explore', 'Community route'])
+test('the switch has five goals, Cheapest is the default, and Faction is the one this file does not build', () => {
+  assert.deepEqual([...ROUTE_GOALS], ['cheapest', 'fastest', 'explore', 'guide', 'faction'])
+  assert.deepEqual(ROUTE_GOALS.map((g) => GOAL_LABELS[g]), ['Cheapest', 'Fastest', 'Explore', 'Community route', 'Faction'])
+  // Faction is tradeskillRouteFaction.ts's (tests/tradeskillRouteFaction.test.mts).
+  assert.deepEqual(ROUTE_GOALS.filter(isBookGoal), [...BOOK_GOALS])
+  assert.deepEqual([...BOOK_GOALS], ['cheapest', 'fastest', 'explore', 'guide'])
   assert.equal(asGoal('fastest'), 'fastest')
-  assert.equal(asGoal('faction'), 'cheapest')
+  assert.equal(asGoal('faction'), 'faction')
+  assert.equal(asGoal('fun'), 'cheapest')
   assert.equal(asGoal(null), 'cheapest')
 })
 
@@ -282,7 +286,7 @@ test('NOTHING GUESSED: no step of any goal states a chance, an expected count or
   // The only prices the fixture can state: bar + gem at the four prices paid, and the ring's sale.
   const known = new Set(['105.06 pp', '141.75 pp', '236.25 pp'])
   const forecast = /%|percent|chance|odds|expect|estimat|\best\b|about \d|roughly|approx|probabl|likely|on average|per skill|per raise|per point|in total|altogether/i
-  for (const goal of ROUTE_GOALS) {
+  for (const goal of BOOK_GOALS) {
     const r = route(goal)
     for (const step of allSteps(r)) {
       const text = words(step)
@@ -326,7 +330,7 @@ test('the era setting is respected: a recipe the book index hides is on no route
   const shown = route('fastest', ownerFacts({ index: indexBook(payload) }))
   assert.equal(shown.next?.name, 'Velium Ruby Veil')
   const hidden = indexBook(payload, (r) => r.eraTag === 'Velious')
-  for (const goal of ROUTE_GOALS) {
+  for (const goal of BOOK_GOALS) {
     const r = route(goal, ownerFacts({ index: hidden }))
     assert.ok(!allSteps(r).some((s) => s.name === 'Velium Ruby Veil'), goal)
     assert.equal(r.top, 295)

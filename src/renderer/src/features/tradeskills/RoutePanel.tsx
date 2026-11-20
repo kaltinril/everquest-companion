@@ -5,12 +5,15 @@
 //
 // "Only use materials I have" sits beside the goals, remembered per tradeskill like the goal: on,
 // Cheapest and Fastest are built only from recipes the player holds every material for
-// (shared/tradeskillRouteHeld.ts). It is disabled, with the reason beside it, when nothing says
-// what is held, and on the two goals it does not change.
+// (shared/tradeskillRouteHeld.ts), and Faction lists only the turn-ins that can be made now. It
+// is disabled, with the reason beside it, when nothing says what is held, and on the two goals it
+// does not change.
 //
-// The route, its ranking and every word are shared/tradeskillRoute.ts; this file maps over what
-// it returns. No chance, no number of combines and no total is drawn: nobody has measured them,
-// and the route's own lines say so. A step opens its recipe on the Recipes tab.
+// Four goals are a route from the recipe book (`BookRoute` below): the route, its ranking and
+// every word are shared/tradeskillRoute.ts, and this file maps over what it returns. No chance,
+// no number of combines and no total is drawn: nobody has measured them, and the route's own
+// lines say so. A step opens its recipe on the Recipes tab. The fifth goal, Faction, is a
+// faction's turn-ins and not a climb: FactionRoute.tsx draws it, with the same shopping list.
 
 import { type JSX, useMemo } from 'react'
 import { Box, Chip, FormControlLabel, Paper, Stack, Switch, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
@@ -22,13 +25,15 @@ import {
   ROUTE_STEP_TIP,
   buildRoute,
   capTop,
+  heldOnlyApplies,
+  isBookGoal,
   moreStepsText,
   routeEndText,
+  type BookGoal,
   type Route,
   type RouteGoal,
   type RouteGroup
 } from '@shared/tradeskillRoute'
-import { isHeldGoal } from '@shared/tradeskillRouteHeld'
 import type { RouteFacts, RouteStep } from '@shared/tradeskillRouteStep'
 import { SKILLS_MODULE } from '@shared/skills'
 import type { Tradeskill } from '@shared/tradeskills'
@@ -37,6 +42,7 @@ import OutputKindLine from '../../components/OutputKindLine'
 import { Tooltip } from '../../lib/Tooltip'
 import { EraChip } from '../planner/PlannerChips'
 import { FactsProvider, type BenchFacts } from './benchFacts'
+import { FactionRoute } from './FactionRoute'
 import { useGoal, useHeldOnly } from './routeMemory'
 import { ShoppingPanel } from './ShoppingPanel'
 import { ItemLabel } from './tradeskillLinks'
@@ -263,6 +269,30 @@ function RouteList({ route, tradeskill, onOpenRecipe }: RouteListProps): JSX.Ele
   )
 }
 
+interface BookRouteProps {
+  tradeskill: Tradeskill
+  level: number | null
+  goal: BookGoal
+  heldOnly: boolean
+  facts: RouteFacts
+  eraOnly: boolean
+  onOpenRecipe: (id: string) => void
+}
+
+/** One of the four goals built from the recipe book: what it ranks on, its steps, and the shopping list for the next one. */
+function BookRoute({ tradeskill, level, goal, heldOnly, facts, eraOnly, onOpenRecipe }: BookRouteProps): JSX.Element {
+  const route = useMemo(() => buildRoute(facts, { tradeskill, level, goal, heldOnly }), [facts, tradeskill, level, goal, heldOnly])
+  return (
+    <>
+      <Basis route={route} />
+      <Box sx={PANES_SX}>
+        <RouteList route={route} tradeskill={tradeskill} onOpenRecipe={onOpenRecipe} />
+        <ShoppingPanel step={route.next} facts={facts} eraOnly={eraOnly} />
+      </Box>
+    </>
+  )
+}
+
 export interface RoutePanelProps {
   tradeskill: Tradeskill
   /** Null: the log has not shown the skill; the route then starts from 0. */
@@ -278,11 +308,11 @@ export function RoutePanel({ tradeskill, level, ready, facts, onOpenRecipe }: Ro
   const { index, craft, guides, money, held, eraOnly } = facts
   const [goal, setGoal] = useGoal(tradeskill)
   const [heldChoice, setHeldChoice] = useHeldOnly(tradeskill)
-  // The switch is the player's choice; it takes effect only where the held counts are known and the goal climbs.
-  const blocked = heldOnlyBlockedText(heldKnown(held, craft), isHeldGoal(goal))
+  // The switch is the player's choice; it takes effect only where the held counts are known and the goal reads it.
+  const blocked = heldOnlyBlockedText(heldKnown(held, craft), heldOnlyApplies(goal))
   const heldOnly = heldChoice && blocked === ''
   const routeFacts = useMemo((): RouteFacts => ({ index, craft, guides, money, have: haveLookup(held, craft) }), [index, craft, guides, money, held])
-  const route = useMemo(() => buildRoute(routeFacts, { tradeskill, level, goal, heldOnly }), [routeFacts, tradeskill, level, goal, heldOnly])
+  const shared = { tradeskill, level, heldOnly, facts: routeFacts, eraOnly, onOpenRecipe }
   return (
     <FactsProvider value={facts}>
       <Stack spacing={1} sx={{ flexGrow: 1, minHeight: 0 }} data-testid="tradeskill-route" data-goal={goal} data-held-only={heldOnly}>
@@ -293,13 +323,8 @@ export function RoutePanel({ tradeskill, level, ready, facts, onOpenRecipe }: Ro
         </Stack>
         {/* Until the engine serves the skills module the level is unknown, not 0: say what the app waits on. */}
         {!ready && <LogReadInline module={SKILLS_MODULE} served={false} />}
-        {ready && <Basis route={route} />}
-        {ready && (
-          <Box sx={PANES_SX}>
-            <RouteList route={route} tradeskill={tradeskill} onOpenRecipe={onOpenRecipe} />
-            <ShoppingPanel step={route.next} facts={routeFacts} eraOnly={eraOnly} />
-          </Box>
-        )}
+        {ready && isBookGoal(goal) && <BookRoute {...shared} goal={goal} />}
+        {ready && goal === 'faction' && <FactionRoute {...shared} />}
       </Stack>
     </FactsProvider>
   )

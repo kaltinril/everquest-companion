@@ -47,10 +47,17 @@ function wornOf(entry: ItemDbEntry): BookWorn | null {
  * it (a quest that only hands it out is no use of it) and its own stats and effects.
  */
 function madeItemFacts(entry: ItemDbEntry): Partial<BookRecipe> {
-  const quests = [...new Set((entry.questUses ?? []).filter((use) => use.role !== 'reward').map((use) => use.quest))]
+  const uses = (entry.questUses ?? []).filter((use) => use.role !== 'reward')
+  const quests = [...new Set(uses.map((use) => use.quest))]
+  // The Faction goal joins a use to its quest page by title (shared/tradeskillRouteFaction.ts).
+  const hosted = new Map<string, string>()
+  for (const use of uses) {
+    if (use.page !== undefined && use.page !== use.quest && !hosted.has(use.quest)) hosted.set(use.quest, use.page)
+  }
   const worn = wornOf(entry)
   return {
     ...(quests.length === 0 ? {} : { quests }),
+    ...(hosted.size === 0 ? {} : { questPages: Object.fromEntries(hosted) }),
     ...(worn === null ? {} : { worn })
   }
 }

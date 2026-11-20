@@ -50,6 +50,8 @@ export interface BookRecipe {
   wikiSources?: ItemDropSource[]
   /** The quests that take the made item (its page's quest uses; a quest that only hands it out is left out). */
   quests?: string[]
+  /** For a quest of `quests` the wiki hosts on a page of another title (a page of several quests): quest name to page title. */
+  questPages?: Record<string, string>
   /** The made item's own stats, saves and effects, as its window words them; absent when it has none. */
   worn?: BookWorn
 }
