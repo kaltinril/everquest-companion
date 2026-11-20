@@ -1,5 +1,5 @@
 import { app } from 'electron'
-import { cpSync, existsSync, mkdirSync, mkdtempSync, writeFileSync } from 'fs'
+import { mkdirSync, mkdtempSync } from 'fs'
 import { tmpdir } from 'os'
 import { join } from 'path'
 import { E2E } from './e2e'
@@ -8,6 +8,8 @@ import { E2E } from './e2e'
 // verbatim, resolve nothing, and have no module-scope side effects — so importing them here
 // cannot disturb the first-import law that puts channel.ts ahead of electron-store.
 import { logConsoleError, logInfo } from './errorLog'
+// fs and path only, no module-scope side effect: safe ahead of electron-store for the same reason.
+import { type SeedOptions, seedFromLegacy, topUpSeed } from './userDataSeed'
 
 /**
  * CHANNEL ISOLATION (Task #58) — the FIRST module index.ts imports.
@@ -66,67 +68,11 @@ const LEGACY_DIR_NAME = 'everquest-companion'
 
 /** electron-store file base name → `<userData>/everquest-companion-progress.json`. */
 export const STORE_NAME = 'everquest-companion-progress'
-/** The official install's store file — same base name; the seed keeps it unchanged. */
-const LEGACY_STORE_FILE = 'everquest-companion-progress.json'
-
-/**
- * State worth carrying across a rename, in copy order. Everything else in a userData dir
- * (Cache, GPUCache, Code Cache, Local/Session Storage, Preferences, lockfile, errors.log)
- * is regenerated on first launch and is intentionally NOT copied.
- */
-const SEED_ENTRIES = [
-  LEGACY_STORE_FILE, // → `${STORE_NAME}.json` (renamed with the product)
-  'message-overlay.json', // learned cast-message overlay (expensive to relearn)
-  'item-knowledge-cache.json', // wiki item cache (incl. negative caching)
-  'registry-cache.json', // sound-pack registry index
-  'soundpacks', // installed packs, incl. the provisioned alan-rickman default
-  // TEST BUILD: two more, so a player moving over from the official app keeps everything they
-  // set up. The resist ledger holds other characters' learned resists, which no log re-derives;
-  // Local Storage holds the renderer's own choices (hidden raid targets, picks and filters).
-  'resist-ledger.json',
-  'Local Storage'
-]
-
-/** Marker written into a seeded dir: what came from where, and when. */
-const SEED_STAMP = 'migrated-from.json'
 
 export const CHANNEL: AppChannel = E2E ? 'e2e' : app.isPackaged ? 'prod' : 'dev'
 
-/**
- * Copy the allowlisted state from `legacy` into `target`, exactly once (guard: `target`
- * must not exist yet — we create it here, and Electron would otherwise create it at ready).
- * Best-effort: a failure logs and startup continues with an empty dir rather than dying.
- * Returns the entries actually copied (empty ⇒ nothing to do).
- */
-function seedFromLegacy(target: string, legacy: string): string[] {
-  if (legacy === target || !existsSync(legacy) || existsSync(target)) return []
-  const copied: string[] = []
-  try {
-    mkdirSync(target, { recursive: true })
-    for (const entry of SEED_ENTRIES) {
-      const src = join(legacy, entry)
-      if (!existsSync(src)) continue
-      const destName = entry === LEGACY_STORE_FILE ? `${STORE_NAME}.json` : entry
-      // One entry at a time (TEST BUILD): Local Storage is a live database while the official app
-      // runs, and a locked file in it must cost that entry only, never the rest or the stamp.
-      try {
-        cpSync(src, join(target, destName), { recursive: true })
-        copied.push(destName)
-      } catch (err) {
-        logConsoleError(`[everquest-companion] userData seed: ${entry} was not copied:`, err)
-      }
-    }
-    writeFileSync(
-      join(target, SEED_STAMP),
-      JSON.stringify({ from: legacy, at: new Date().toISOString(), copied }, null, 2)
-    )
-  } catch (err) {
-    // errorLog.ts's FILE sink can't be used here (it resolves userData, which we're still
-    // deciding) — only its console passthrough.
-    logConsoleError(`[everquest-companion] userData seed from ${legacy} failed:`, err)
-  }
-  return copied
-}
+/** What the copy (userDataSeed.ts) needs from here: the store's new name and the console sink. */
+const SEED_OPTIONS: SeedOptions = { storeFile: `${STORE_NAME}.json`, onError: logConsoleError }
 
 /** Resolve this channel's userData dir, seeding it from the legacy dir on first launch. */
 function resolveUserData(): string {
@@ -143,11 +89,17 @@ function resolveUserData(): string {
   }
   const base = app.getPath('appData')
   const target = join(base, CHANNEL === 'prod' ? PROD_DIR_NAME : DEV_DIR_NAME)
-  const copied = seedFromLegacy(target, join(base, LEGACY_DIR_NAME))
+  const legacy = join(base, LEGACY_DIR_NAME)
+  const copied = seedFromLegacy(target, legacy, SEED_OPTIONS)
   if (copied.length > 0) {
     logInfo(
       `[everquest-companion] First launch on the '${CHANNEL}' channel: copied ${copied.length} state entries from ${LEGACY_DIR_NAME}\\ → ${target} (${copied.join(', ')}). The old dir is left untouched as a backup.`
     )
+  }
+  // A folder seeded by an earlier build is missing what the list gained since (the imported sounds).
+  const late = topUpSeed(target, legacy, SEED_OPTIONS)
+  if (late.length > 0) {
+    logInfo(`[everquest-companion] Copied ${late.join(', ')} from ${LEGACY_DIR_NAME}\\ → ${target}.`)
   }
   return target
 }

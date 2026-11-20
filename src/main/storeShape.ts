@@ -131,6 +131,8 @@ export interface StoreShape {
   updateLastCheckedAt?: number
   /** "Update automatically" switched OFF: no background checks, downloads or apply-on-quit. */
   autoUpdateOff?: boolean
+  /** The version a finished download left on disk, until it is installed or no longer offered. */
+  updateStagedVersion?: string
   /**
    * RETIRED flat overlay config (Task #52). Task #54 made the overlay per-kind; schema
    * migration 1→2 folds this into `overlays.fight` and deletes it. Declared, never read —
