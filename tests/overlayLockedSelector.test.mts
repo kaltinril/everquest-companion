@@ -286,9 +286,10 @@ test('JOS-158: the meters state their aggregate in the panel, not in the title b
   // prints it. Pinned as an ABSENCE so a later change cannot quietly re-import it.
   const healBars = src('../src/renderer/src/overlay/healBars.tsx')
   assert.doesNotMatch(healBars, /healTotalTitle\(/)
+  // The tab prints it over the figures its own header shows (scoped and drilled), not `seg.healing`.
   assert.match(
     src('../src/renderer/src/features/combat/SegmentHeader.tsx'),
-    /healTotalTitle\(seg\.healing\)/,
+    /healTotalTitle\(healing\)/,
     'the sentence has to still be printed SOMEWHERE — the tab is where it went'
   )
 })

@@ -15,6 +15,7 @@ import { fmtElapsed } from './copyText'
 import { formatNum as fmt, formatHealRate, formatRate } from '../../lib/formatRate'
 import type { MeterMode } from './dashboardData'
 import type { SegmentView } from '@shared/combat'
+import type { HealHeadline } from '@shared/healHeadline'
 import { Tooltip } from '../../lib/Tooltip'
 
 /** The Healing dimension's accent — the heal overlays' green, so the two read as one subject. */
@@ -128,10 +129,14 @@ export function SegmentHeader({
   total,
   dps,
   activeDps,
+  healing,
   copyView
 }: {
   seg: SegmentView
   mode: MeterMode
+  /** the Healing dimension's figures for the hover (`healRows.healHeadline`): the same scoped,
+   *  drilled ones `total` and `dps` print. Null in the two damage dimensions. */
+  healing: HealHeadline | null
   /**
    * WHAT THE PANEL BELOW IS SHOWING, never the raw segment (JOS-170): the scoped ranked list at
    * level 1, the drilled subject with its nested pets at level 2 — `petRows.panelTotals`. This
@@ -163,7 +168,7 @@ export function SegmentHeader({
         <Typography
           variant="body2"
           sx={{ color: heal ? HEAL_COLOR : mode === 'out' ? 'primary.main' : KIND_COLOR.enemy }}
-          title={heal ? healTotalTitle(seg.healing) : undefined}
+          title={healing ? healTotalTitle(healing) : undefined}
         >
           {heal ? formatHealRate(dps) : formatRate(dps)}{' '}
           <ActiveDpsNote seg={seg} mode={mode} dps={dps} activeDps={activeDps} clockSec={clockSec} />

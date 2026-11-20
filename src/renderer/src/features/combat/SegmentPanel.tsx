@@ -18,10 +18,11 @@ import { DeathRecapPanel } from './DeathRecapPanel'
 import { segmented } from './segmented'
 import { meterDrill, skillsForTarget, type Drill, type MeterMode, type TargetDetail } from './dashboardData'
 import { HealBody } from './HealPanel'
+import { healHeadline, healPanel } from './healRows'
 import { DrillCrumb, MeterRows, crumbOf } from './MeterRows'
 import { SegmentHeader } from './SegmentHeader'
 import { groupedPanel, meterPanel, panelRate, panelTotals, type MeterPanel } from './petRows'
-import { scopeRate, scopeSources, scopeTotals } from './meterScope'
+import { scopeHealing, scopeRate, scopeSources, scopeTotals } from './meterScope'
 import { usePetLayout } from './useCombatPrefs'
 import { useModule } from '../../lib/useModule'
 import { selfMeterLabel, withSelfLabel } from './selfMeterLabel'
@@ -29,7 +30,8 @@ import { useShowSelfName } from './useSelfMeterName'
 import type { CharacterSnap } from '@shared/types'
 import { formatEntityText, formatSegmentText, formatTargetText } from './copyText'
 import { formatNum as fmt } from '../../lib/formatRate'
-import type { SegmentView, SourceView, TimelineView } from '@shared/combat'
+import type { HealingView, SegmentView, SourceView, TimelineView } from '@shared/combat'
+import type { HealHeadline } from '@shared/healHeadline'
 import type { ProcSkillTag } from '@shared/procAnalytics'
 import type { MeterScope, RosterSnap } from '@shared/roster'
 
@@ -245,8 +247,9 @@ function SegmentContent({
 /**
  * WHAT THE SELECTED DIMENSION IS MADE OF: the rows it ranks and its headline figures.
  *
- * The healing pair is `HealingView`'s own total/hps: restored hit points + granted absorption,
- * exactly the figures the heal overlays headline (shared/combat.ts states what each includes).
+ * The healing pair is `HealingView`'s own total/hps: restored hit points + granted absorption
+ * (shared/combat.ts states what each includes). The Healing HEADER does not print this pair: it
+ * prints `healHead` below, which follows the scope and the healer drill.
  *
  * Healing ranks HEALERS, not damage sources, so `rows` is empty there rather than borrowed —
  * `meterPanel` over an empty list yields level 1 with nothing in it, the right no-op while
@@ -259,6 +262,8 @@ interface Dimension {
   /** the ACTIVE-time rate that rides beside the headline — printed in the outgoing dimension
    *  only (`ActiveDpsNote`), so the other two carry their own rate here rather than a fiction. */
   activeDps: number
+  /** the Healing dimension's SCOPED model (`meterScope.scopeHealing`); absent in the damage two. */
+  healing?: HealingView
 }
 
 function dimension(seg: SegmentView, mode: MeterMode): Dimension {
@@ -272,8 +277,9 @@ function dimension(seg: SegmentView, mode: MeterMode): Dimension {
 /**
  * …and the same things once the SCOPE has had its say (docs/plans/group-model.md §2).
  *
- * Only the OUTGOING dimension is scoped, because scope is a statement about whose damage — the
- * incoming list is always "what is hitting You", and no roster changes that. The headline figures
+ * Of the two DAMAGE dimensions only OUTGOING is scoped, because scope is a statement about whose
+ * damage — the incoming list is always "what is hitting You", and no roster changes that. (Healing
+ * is scoped too, by its own filter: see `healHead`.) The headline figures
  * are recomputed from the surviving rows rather than carried over: `outTotal` counts members, so
  * a You-scoped list under a group-scoped total would headline a number no visible row explains.
  *
@@ -283,6 +289,7 @@ function dimension(seg: SegmentView, mode: MeterMode): Dimension {
  */
 function scopedDimension(seg: SegmentView, mode: MeterMode, scope: MeterScope, roster: RosterSnap): Dimension {
   const base = dimension(seg, mode)
+  if (mode === 'heal') return { ...base, healing: scopeHealing(seg.healing, scope, roster) }
   if (mode !== 'out') return base
   const rows = scopeSources(base.rows, scope, roster)
   const share = scopeTotals(base.rows, rows, base.total, base.dps)
@@ -303,9 +310,25 @@ function scopedDimension(seg: SegmentView, mode: MeterMode, scope: MeterScope, r
  * Without it the header stated the fight while the rows stated the subject, and flipping the pet
  * preference under an open You drill moved the rows and left the number where it was.
  */
-function headline(panel: MeterPanel, dim: Dimension): { total: number; dps: number; activeDps: number } {
+function headline(
+  panel: MeterPanel,
+  dim: Dimension,
+  healing: HealHeadline | null
+): { total: number; dps: number; activeDps: number } {
+  if (healing) return { total: healing.total, dps: healing.hps, activeDps: healing.hps }
   const { total } = panelTotals(panel, dim.total, dim.dps)
   return { total, dps: panelRate(panel, dim.dps), activeDps: panelTotals(panel, dim.total, dim.activeDps).dps }
+}
+
+/**
+ * THE HEALING HEADER'S FIGURES, or null in the two damage dimensions: what the scoped, drilled
+ * healer list adds up to, through the same filter and builder `HealBody` draws its rows from. The
+ * header carries no label, so it may not count a healer the list hides, or state the whole fight
+ * over one healer's lanes.
+ */
+function healHead(seg: SegmentView, dim: Dimension, drill: Drill | null): HealHeadline | null {
+  if (!dim.healing) return null
+  return healHeadline(healPanel(dim.healing, meterDrill(drill)?.entityId ?? null), seg.healing)
 }
 
 export function SegmentBody({
@@ -356,7 +379,8 @@ export function SegmentBody({
   )
   // …and the SAME panel decides the header's figures, so the number over the rows can never
   // describe a different set of rows than the ones under it (JOS-170).
-  const head = headline(panel, dim)
+  const healing = healHead(seg, dim, drill)
+  const head = headline(panel, dim, healing)
   const d = useDrillState(panel, tl, drill)
   // The two conditions from `MeterTabs`, resolved ONCE: whether the card has tabs at all, and
   // therefore which tab the body is showing.
@@ -413,6 +437,7 @@ export function SegmentBody({
         total={head.total}
         dps={head.dps}
         activeDps={head.activeDps}
+        healing={healing}
         copyView={heal ? null : copyView}
       />
       {/* The damage crumb; the Healing dimension draws its own inside HealBody, because its one
