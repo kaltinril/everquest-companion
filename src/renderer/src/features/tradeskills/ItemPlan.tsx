@@ -23,6 +23,7 @@ import { FactsProvider, type BenchFacts } from './benchFacts'
 import { ItemPlanGather } from './ItemPlanGather'
 import { ItemPlanSkills, type OpenBench } from './ItemPlanSkills'
 import { ItemPlanTree } from './ItemPlanTree'
+import { RecipeWish } from './RecipeWish'
 import type { SkillLevels } from './tradeskillData'
 import { ItemLabel } from './tradeskillLinks'
 
@@ -115,6 +116,10 @@ export function ItemPlan({ recipe, recipes, deps, facts, levels, plan, setPlan, 
             <Typography variant="body2" color="text.secondary" data-testid="tradeskill-plan-facts">
               {recipeFacts(recipe, true)}
             </Typography>
+            {/* The app's one wish control: a wished item is listed on Home under Working towards. */}
+            <Box sx={{ ml: 'auto', minWidth: 0, display: 'flex' }}>
+              <RecipeWish recipe={recipe} testId="tradeskill-plan-wish" />
+            </Box>
           </Stack>
           <RecipePicker
             deps={deps}
