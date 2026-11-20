@@ -128,10 +128,31 @@ export function alertingWatch(list: BazaarWatchlist, o: LiveOffer): BazaarWatch 
   return list.entries.find((w) => w.tier === null && w.item.toLowerCase() === lower) ?? own
 }
 
-/** Any watch on this item, its tier's or not: the row's chip, when a row stands for every tier. */
+/**
+ * The watch a row that stands for EVERY tier shows and edits ("All tiers as one"): the item's
+ * every-tier watch when it has one, else its first tier watch. The every-tier watch comes first
+ * because it is the one that alerts on all the tiers the row stands for; taking the first in list
+ * order showed one tier's watch while the every-tier one fired (screen pass, 2026-11-19).
+ */
 export function watchOnItem(list: BazaarWatchlist, item: string): BazaarWatch | null {
   const lower = item.toLowerCase()
-  return list.entries.find((w) => w.item.toLowerCase() === lower) ?? null
+  const on = list.entries.filter((w) => w.item.toLowerCase() === lower)
+  return on.find((w) => w.tier === null) ?? on[0] ?? null
+}
+
+/**
+ * The row's watch chip: what alerts on it, or only that it is watched. Thresholds in full, as typed.
+ * A price and a share of the median are BOTH named, joined by "or": either one alerts (`wtsReason`),
+ * and the panel's own second field is labelled "or". Naming only the price hid the share.
+ */
+export function watchChipLabel(w: BazaarWatch): string {
+  const caps: string[] = []
+  if (w.wtsMax !== null) caps.push(formatPlatExact(w.wtsMax))
+  if (w.wtsShare !== null) caps.push(`${String(Math.round(w.wtsShare * 100))}% median`)
+  const wts = caps.length === 0 ? 'WTS' : `WTS ≤ ${caps.join(' or ')}`
+  const wtb = w.wtbMin !== null ? `WTB ≥ ${formatPlatExact(w.wtbMin)}` : 'WTB'
+  const on = [w.wts ? wts : '', w.wtb ? wtb : ''].filter((s) => s !== '')
+  return on.length === 0 ? 'Watch' : `Watch: ${on.join(' + ')}`
 }
 
 /** The list with `w` in place of the watch on the same item and tier, or added. */

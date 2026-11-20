@@ -12,6 +12,8 @@ import {
   setWatch,
   watchAlertCaptures,
   watchAlertReason,
+  watchChipLabel,
+  watchOnItem,
   weekMedianAsking,
   type BazaarWatch
 } from '../src/shared/bazaarWatch'
@@ -307,4 +309,31 @@ test('an edit made before the first load answers waits for it, so it lands on th
   assert.deepEqual(list, ['Fungus Covered Scale Tunic', 'Cloak of Flames'])
   run(() => (list = [...list, 'Robe of the Oracle']))
   assert.equal(list.length, 3, 'once loaded, an edit applies at once')
+})
+
+test('a row that stands for every tier shows the every-tier watch, whichever was written last', () => {
+  // Before 2026-11-20 it showed the first watch in list order: the +4 one, while the every-tier one alerted.
+  const tier4 = watch({ item: 'Fleeting Quiver', tier: 4, wtb: true })
+  const every = watch({ item: 'Fleeting Quiver', tier: null, wts: true, wtsMax: 31000, wtb: true, wtbMin: 9500 })
+  for (const order of [[tier4, every], [every, tier4]]) {
+    let list = normalizeBazaarWatchlist(undefined)
+    for (const w of order) list = setWatch(list, w)
+    assert.deepEqual(watchOnItem(list, 'fleeting quiver'), every)
+  }
+  // With no every-tier watch the row still shows a tier's, and with none at all nothing.
+  const only = setWatch(normalizeBazaarWatchlist(undefined), tier4)
+  assert.deepEqual(watchOnItem(only, 'Fleeting Quiver'), tier4)
+  assert.equal(watchOnItem(only, 'Cloak of Flames'), null)
+})
+
+test('the watch chip names every threshold that can alert: a price and a share of the median are joined by or', () => {
+  const q = { item: 'Fleeting Quiver' }
+  assert.equal(watchChipLabel(watch({ ...q, wts: true, wtsMax: 12500, wtsShare: 0.8 })), 'Watch: WTS ≤ 12.5k or 80% median')
+  assert.equal(watchChipLabel(watch({ ...q, wts: true, wtsMax: 12500 })), 'Watch: WTS ≤ 12.5k')
+  assert.equal(watchChipLabel(watch({ ...q, wts: true, wtsShare: 0.8 })), 'Watch: WTS ≤ 80% median')
+  assert.equal(watchChipLabel(watch({ ...q, wts: true })), 'Watch: WTS')
+  assert.equal(watchChipLabel(watch({ ...q, wts: true, wtsMax: 100, wtsShare: 0.8, wtb: true, wtbMin: 9500 })), 'Watch: WTS ≤ 100p or 80% median + WTB ≥ 9.5k')
+  assert.equal(watchChipLabel(watch({ ...q, wtb: true })), 'Watch: WTB')
+  // A side that is off is not named, whatever thresholds it still holds.
+  assert.equal(watchChipLabel(watch({ ...q, wtsMax: 12500, wtsShare: 0.8 })), 'Watch')
 })
