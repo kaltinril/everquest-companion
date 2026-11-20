@@ -139,3 +139,20 @@ export function quarantinePathFor(storePath: string): string {
   const stem = storePath.replace(/\.json$/i, '')
   return `${stem}.corrupt.json`
 }
+
+/** How many quarantined copies of one file are kept. Bounded, so a file that keeps tearing cannot
+ *  fill the disk. */
+const QUARANTINE_SLOTS = 5
+
+/**
+ * Every name a quarantined copy may take, oldest slot first: `x.corrupt.json`, then
+ * `x.corrupt.2.json` up to the cap. A caller that must not lose an earlier copy takes the first
+ * free one, and when all are taken reuses the LAST: the first is the copy most likely to hold the
+ * settings the player actually had.
+ */
+export function quarantineSlots(storePath: string): string[] {
+  const first = quarantinePathFor(storePath)
+  const stem = first.replace(/\.json$/i, '')
+  const rest = Array.from({ length: QUARANTINE_SLOTS - 1 }, (_, i) => `${stem}.${String(i + 2)}.json`)
+  return [first, ...rest]
+}

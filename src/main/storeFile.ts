@@ -9,7 +9,8 @@
 //
 // FAILURE POLICY (the whole of it — storeMigrations.ts's header states the rest of the contract):
 //   * unreadable file  → leave it alone, no stamp (electron-store will raise its own error)
-//   * unparseable file → QUARANTINE it to `<name>.corrupt.json`, then TRY TO SALVAGE it (below)
+//   * unparseable file → QUARANTINE it to `<name>.corrupt.json` (a later one to the next free
+//     `.corrupt.<n>.json`, never over the first copy: `quarantineSlots`), then TRY TO SALVAGE it (below)
 //     and only start fresh if nothing could be recovered. conf's `clearInvalidConfig` defaults to
 //     false, so a truncated write (power loss mid-save, an update's force-quit) otherwise throws on
 //     EVERY read forever — an app bricked by one bad byte.
@@ -66,7 +67,7 @@ import { writeFileDurable } from './telemetry/durableWrite'
 // de-padding, the balanced-prefix scan, the parse-if-acceptable wrapper, the `.corrupt.json` name —
 // moved to `tornJson.ts` verbatim and both callers read it from there. The POLICY (what counts as
 // this app's store, and the ladder that falls back to a backup) stayed here, where it belongs.
-import { quarantinePathFor, salvageJsonObject } from './tornJson'
+import { quarantinePathFor, quarantineSlots, salvageJsonObject } from './tornJson'
 import {
   CURRENT_SCHEMA_VERSION,
   SCHEMA_VERSION_KEY,
@@ -284,9 +285,13 @@ function writeStoreFile(path: string, data: StoreData): void {
 }
 
 /** Unparseable (or not an object): conf would throw on every single read from here on. Moves the
- *  file aside and answers where it went, or the finished (failed) outcome. */
+ *  file aside and answers where it went, or the finished (failed) outcome.
+ *
+ *  Onto the first FREE slot: a rename replaces an existing file, and with no backup to fall back
+ *  on an earlier quarantined copy is the only copy of the player's real settings. */
 function quarantineStore(storePath: string, hooks: MigrationHooks): string | StoreFileMigration {
-  const quarantine = quarantinePathFor(storePath)
+  const slots = quarantineSlots(storePath)
+  const quarantine = slots.find((slot) => !existsSync(slot)) ?? slots[slots.length - 1]
   try {
     renameSync(storePath, quarantine)
     return quarantine

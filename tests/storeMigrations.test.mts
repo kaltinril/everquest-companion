@@ -28,7 +28,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { existsSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -46,6 +46,7 @@ import {
 // ceiling and the salvage path had to go somewhere). Same functions, same behaviour, one import
 // line further down.
 import { backupPathFor, migrateStoreFile, quarantinePathFor } from '../src/main/storeFile'
+import { quarantineSlots } from '../src/main/tornJson'
 
 const FIXTURES = join(dirname(fileURLToPath(import.meta.url)), 'fixtures')
 
@@ -444,6 +445,45 @@ test('a CORRUPT store file is quarantined instead of bricking every launch', () 
       assert.equal(errors.length, 1)
     })
   }
+})
+
+test('a second corrupt store never replaces the first quarantined copy', () => {
+  // With no backup to fall back on, the first quarantined file is the only copy of the player's
+  // real settings. A rename onto the same name replaced it (Windows renames over an existing file).
+  const first = '{"byCharacter": {"a": 1'
+  const second = '{"alerts": ['
+  inTempDir({ [STORE]: first }, (dir) => {
+    const path = join(dir, STORE)
+    const quiet = { error: () => undefined }
+    assert.equal(migrateStoreFile(path, quiet).quarantinedPath, quarantinePathFor(path))
+
+    writeFileSync(path, second, 'utf8')
+    const again = migrateStoreFile(path, quiet)
+
+    assert.equal(readFileSync(quarantinePathFor(path), 'utf8'), first, 'the first copy is still there')
+    assert.notEqual(again.quarantinedPath, quarantinePathFor(path))
+    assert.equal(readFileSync(again.quarantinedPath!, 'utf8'), second, 'and the second has its own file')
+    assert.equal(existsSync(path), false)
+  })
+})
+
+test('quarantined copies are bounded, and the oldest one is the one that is never reused', () => {
+  inTempDir({}, (dir) => {
+    const path = join(dir, STORE)
+    const slots = quarantineSlots(path)
+    assert.equal(slots[0], quarantinePathFor(path), 'the first slot is the name it always had')
+    assert.equal(new Set(slots).size, slots.length)
+
+    const tears = slots.length + 2
+    for (let i = 1; i <= tears; i++) {
+      writeFileSync(path, `{"tear": ${String(i)}`, 'utf8')
+      migrateStoreFile(path, { error: () => undefined })
+    }
+    const kept = readdirSync(dir).filter((name) => name.includes('.corrupt'))
+    assert.equal(kept.length, slots.length, 'a store that keeps tearing cannot fill the disk')
+    assert.equal(readFileSync(slots[0], 'utf8'), '{"tear": 1', 'the oldest copy survives every later tear')
+    assert.equal(readFileSync(slots[slots.length - 1], 'utf8'), `{"tear": ${String(tears)}`, 'the last slot holds the newest')
+  })
 })
 
 test('a store restored from a backup says which copy it was and when that copy was saved', () => {
