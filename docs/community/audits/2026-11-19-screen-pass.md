@@ -530,7 +530,8 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   tested. Then look over the ... Test: Unit test (new or in tests/voidMotes.test.mts): 1. Build an
   index with buildItemDbIndex from a small item file: record key "djarns amethyst ring", page
   "Djarns Amethyst Ring", otherNames ["Djarn's Amethyst Ring"]. 2. ...
-- CONFIRMED [medium, cut-off] At 900 px with 125% text the order buttons run out of the panel and
+- FIXED 2026-11-19 (the header row wraps and the plan line takes a zero basis; `gearVoidMoteSteps.mts
+  stepGearVoidMotesNarrow` measures it) [medium, cut-off] At 900 px with 125% text the order buttons run out of the panel and
   the page scrolls sideways Seen: Header row scrollWidth 533 against clientWidth 454.
   [data-testid="gear-motes-order"] right edge 769.9; panel right edge 692; app-content right edge
   708. "Most hours saved" spans x663.6 to x767.9, so 44 of its 104 px are inside the content area;

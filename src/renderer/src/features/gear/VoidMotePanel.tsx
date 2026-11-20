@@ -225,12 +225,15 @@ export default function VoidMotePanel({ compare, indexReady, indexRefused, class
       data-testid="gear-motes"
       sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, minHeight: 0, border: 1, borderColor: 'divider', borderRadius: 1 }}
     >
-      <Stack direction="row" spacing={1.5} alignItems="center" sx={{ px: 1, py: 0.75, flexShrink: 0 }}>
+      {/* The row WRAPS: at the minimum window with larger text the two picks ran out of the panel and
+          the page scrolled sideways. The plan line takes what is left of the first line (basis 0),
+          so in a wide window nothing moves and the picks drop to a second line only when they must. */}
+      <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" useFlexGap sx={{ px: 1, py: 0.75, flexShrink: 0, rowGap: 0.75 }}>
         <Typography variant="subtitle2" sx={{ flexShrink: 0 }}>
           Void motes
         </Typography>
         {/* The week's answer first; the list under it is the working. */}
-        <Typography variant="body2" data-testid="gear-motes-plan" title={HINT} noWrap sx={{ flexGrow: 1, minWidth: 0 }}>
+        <Typography variant="body2" data-testid="gear-motes-plan" title={HINT} noWrap sx={{ flex: '1 1 0', minWidth: 160 }}>
           {list.length === 0 ? 'One lifts a worn item a full tier' : motePlanLine(plan)}
         </Typography>
         <MoteControls motes={motes} setMotes={setMotes} />
