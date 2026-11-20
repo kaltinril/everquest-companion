@@ -122,6 +122,18 @@ disagree, RULES.md wins; fix this file.
   tests and hand back commits; the coordinating session runs the one full gate and the app check over
   everything at the end (owner, 2026-10-23: "test at the end so we don't waste time waiting for
   agents to test").
+- **Said a third time** (owner, 2026-11-20: "don't waste time building and testing so often ...
+  find a way to do that less often, perhaps at the end of a feature or multiple features"). What
+  went wrong that day: three helper briefs each told the helper to run the full gate, and a trunk
+  whose tree was identical to the gated branch tree was run through the full suite twice more.
+  Apply it this way:
+  - A helper's brief says: focused test files only, one typecheck and one lint at the end, no full
+    `npm test`, no `cargo test --workspace`, no e2e. It names the tests it expects to be affected.
+  - Branches that ship together are merged into ONE candidate branch; the full gate (and cargo,
+    when `engine/` changed) runs once on that candidate; the candidate is merged into the trunk
+    and the trunk's tree is compared with the gated tree (`git rev-parse <ref>^{tree}`). An
+    identical tree is not gated again.
+  - A passed check is not rerun unless code it covers changed.
 - `npm run typecheck`, then restore tsbuildinfo; `rm -rf node_modules/.cache/eslint && npm run
   lint`; `npm test` (Node 24). On `main_community` use `bash scripts/community/known-reds.sh`
   (the unit suite where only names in `scripts/community/known-reds.txt` may fail).
