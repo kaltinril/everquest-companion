@@ -70,6 +70,7 @@ import {
 } from './supervisorHealth'
 import {
   ENGINE_ANNOUNCE_TIMEOUT_MS,
+  ENGINE_SAID_MAX,
   ENGINE_STOP_GRACE_MS,
   NEW_ENGINE_EXIT_TRAIL,
   NEW_ENGINE_SERVED_TRAIL,
@@ -211,7 +212,7 @@ export interface EngineSupervisorDeps extends HealthWatchDeps {
    * in — and the count lives in the entry the deps' `report` gets.
    */
   onServedExit?(): void
-  /** Each engine stderr line, token-redacted and bounded, for the log-read report (fork #9). */
+  /** Each engine stderr line, token-redacted and cut at 2 KB, for the log-read report (fork #9). */
   onEngineSaid?(line: string): void
   /**
    * THE MACHINE'S OWN SLEEP, seamed like the clock (`EnginePowerHandlers`): the composition root
@@ -463,7 +464,10 @@ export class EngineSupervisor {
       // `boundedDetail` states: it is text from outside our types heading for a log a person reads.
       const safe = redactToken(line, token)
       l.lastStderr = boundedDetail(safe)
-      if (l.lastStderr !== null) this.deps.onEngineSaid?.(l.lastStderr)
+      // The report scrubs paths and only then cuts to what it shows: a path cut here would no
+      // longer match. Still bounded, because one line can be megabytes.
+      const said = boundedDetail(safe, ENGINE_SAID_MAX)
+      if (said !== null) this.deps.onEngineSaid?.(said)
       this.deps.debug(`data-server engine: ${trim(safe)}`)
     })
     child.on('error', (err) => {

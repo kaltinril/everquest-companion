@@ -44,8 +44,10 @@ import { type JSX, useState } from 'react'
 import { Box, Button, Collapse, LinearProgress, Stack, Typography, useTheme } from '@mui/material'
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 import type { EngineFaultSay, FoldReadout } from '../../../shared/engineLaunch'
-import { NO_ENGINE_CONSEQUENCE, failureWords, reportPrefill } from '../../../shared/engineLaunch'
+import { NO_ENGINE_CONSEQUENCE, bannerFor, failureWords, reportPrefill } from '../../../shared/engineLaunch'
 import { useEngineLaunch } from '../lib/engineLaunchHud'
+import { useLogReadReport } from '../lib/logReadReportHud'
+import { LogReadBand } from './LogReadBand'
 
 export interface EngineLaunchBannerProps {
   /**
@@ -59,10 +61,21 @@ export interface EngineLaunchBannerProps {
   onReport: (prefill: { readonly type: 'bug'; readonly description: string }) => void
 }
 
+/**
+ * WHICH OF THEM IS DRAWN IS ONE DECISION (fork #9): `bannerFor`, from the log-read status every
+ * window is pushed and the launch state. The card used to follow the fault, the bar the launch
+ * phase and the box a third source, so a bar could sit frozen over a box that said the read had
+ * stopped. The band is the third thing this seam draws: the status, on every tab.
+ */
 export function EngineLaunchBanner({ onReport }: EngineLaunchBannerProps): JSX.Element | null {
   const { say, readout } = useEngineLaunch()
-  if (say.fault !== null) return <FailureCard fault={say.fault} onReport={onReport} />
-  if (say.phase === 'folding' && readout !== null) return <FoldBar readout={readout} />
+  const report = useLogReadReport()
+  const banner = bannerFor(report, say, readout !== null)
+  if (banner === 'card' && say.fault !== null) return <FailureCard fault={say.fault} onReport={onReport} />
+  if (banner === 'bar' && readout !== null) return <FoldBar readout={readout} />
+  if ((banner === 'band' || banner === 'notes') && report !== null) {
+    return <LogReadBand report={report} kind={banner} />
+  }
   return null
 }
 

@@ -448,8 +448,19 @@ test('EVERY STDERR LINE REACHES onEngineSaid, token-redacted and bounded (fork #
   assert.equal(h.said.length, 3, 'a blank line is not something the engine said')
   assert.equal(h.said[0], 'warming up')
   assert.equal(h.said[1], 'bad token <token>')
-  assert.ok(h.said[2].length < 300, `a 5,000 character line arrived whole (${String(h.said[2].length)})`)
+  // Cut at 2 KB, not at the 200 a failure detail gets: the report scrubs paths before it cuts.
+  assert.equal(h.said[2].length, 2049, `a 5,000 character line arrived as ${String(h.said[2].length)}`)
   assert.equal(h.said.join('\n').includes(token), false, 'the token reached the report')
+})
+
+test('a long stderr line reaches the report whole enough to scrub, and the failure detail keeps its 200', () => {
+  const h = harness()
+  h.supervisor.start()
+  const line = `the ingest of ${'d'.repeat(180)}\\Users\\Jane\\Logs\\eqlog_A_b.txt ended`
+  h.children[0].stderr.emit(`${line}\n`)
+  h.children[0].exit(1)
+  assert.equal(h.said[0], line, 'the path was cut before anything could scrub it')
+  assert.equal(h.reports[0].detail?.length, 201)
 })
 
 test('a supervisor built without onEngineSaid behaves as before', () => {

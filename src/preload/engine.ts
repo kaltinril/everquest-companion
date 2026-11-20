@@ -152,7 +152,21 @@ export const engineBridge = {
   /** The failure card's retry button. Resolves when main has taken the ask, not when it worked. */
   engineRetry: (): Promise<void> => ipcRenderer.invoke(IPC.engineRetry) as Promise<void>,
 
-  /** What the app is waiting on while a panel says "Reading log..." (fork #9). */
+  /** What the app is waiting on (fork #9). The one read a window makes, after subscribing below. */
   logReadReport: (): Promise<LogReadReport> =>
-    ipcRenderer.invoke(IPC.logReadReport) as Promise<LogReadReport>
+    ipcRenderer.invoke(IPC.logReadReport) as Promise<LogReadReport>,
+
+  /** Every change of what the app is waiting on. Returns the unsubscriber. */
+  onLogReadReport: (cb: (report: LogReadReport) => void): (() => void) => {
+    const listener = (_e: unknown, report: LogReadReport): void => {
+      cb(report)
+    }
+    ipcRenderer.on(IPC.onLogReadReport, listener)
+    return () => {
+      ipcRenderer.removeListener(IPC.onLogReadReport, listener)
+    }
+  },
+
+  /** The status's Try again button. Resolves when main has taken the ask, not when it worked. */
+  logReadTryAgain: (): Promise<void> => ipcRenderer.invoke(IPC.logReadTryAgain) as Promise<void>
 }

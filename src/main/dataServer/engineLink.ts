@@ -44,6 +44,8 @@ export interface EngineLinkDeps {
   readonly now: () => number
   /** The dev log. */
   readonly note: (line: string) => void
+  /** The keeper's facts changed (`linkKeeper.ts changed`): a retry was scheduled, or it gave up. */
+  readonly changed?: () => void
 }
 
 export interface EngineLink {
@@ -51,6 +53,8 @@ export interface EngineLink {
   start(): void
   /** A person asked for the connection to be tried again. */
   tryNow(): void
+  /** A person asked for a NEW connection: one that is up is dropped first, then `tryNow`. */
+  reopen(): void
   /** The launch is over: no more connects, and a connection that opens late is closed. */
   stop(): void
   facts(): LinkFacts
@@ -107,7 +111,8 @@ export function openEngineLink(deps: EngineLinkDeps): EngineLink {
     adopt,
     timer: deps.timer,
     now: deps.now,
-    note: deps.note
+    note: deps.note,
+    changed: deps.changed
   })
 
   // ONCE, for the life of the client: every connection it is given is one of this link's.
@@ -120,6 +125,13 @@ export function openEngineLink(deps: EngineLinkDeps): EngineLink {
       keeper.start()
     },
     tryNow: () => {
+      keeper.tryNow()
+    },
+    reopen: () => {
+      // The keeper opens a connection only when none is up, so one that is up and not answering
+      // is failed first. Its requests in flight are rejected as a lost link.
+      const up = channel !== null && (client.state === 'ready' || client.state === 'connecting')
+      if (up) client.fail(new EngineError('unavailable', 'a new connection was asked for'))
       keeper.tryNow()
     },
     stop: () => {

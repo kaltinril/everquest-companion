@@ -1245,25 +1245,22 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
   `scrubPaths` in `shared/logReadReport.ts`: log path to base name, home directory and any
   `<drive>:\Users\<name>` or `/Users/<name>` to `~`, em and en dashes to ` - `. A new field that
   carries outside text must go through it too.
-- The decision order in `composeLogReadReport` is the design (as of phase R1): no character, engine
-  missing, engine failing, engine starting, connecting / not connected, attach refused, read ended
-  (missing / unreadable / stopped), health unanswered, stalled (folding and no offset growth for
-  60 s), still reading, reply too large, combat read unserved, ok. Nine waits show the box at once;
-  the rest wait 15 s (`LOG_READ_SLOW_MS`). Phase R2 reorders it (engine missing and failing before
-  no character).
-- Main opens the log itself (`probeLog` in `main/logReadReport.ts`) only when the read has ended or
-  nothing has stated the size. It is a diagnostic on the failure path; the engine still owns
-  log-file facts everywhere else (ruling 21).
-- The renderer hook asks 5 s after a hydrating panel mounts and every 3 s after, so a healthy launch
-  asks nothing. The box is in `HydratingPanel` (CombatView) and `OverviewHydrating` only; overlays
-  are unchanged.
+- The decision order in `composeLogReadReport` is the design. It changed in phases R1 and R2: the
+  order now in force is in the R2 section below.
+- Main looks at the log file itself only on the failure path, through `main/logProbe.ts` (the R2
+  section below). It is a diagnostic; the engine still owns log-file facts everywhere else (ruling
+  21).
+- The status is PUSHED since phase R2 (it was polled: 5 s after a hydrating panel mounted, then
+  every 3 s). The box is in `HydratingPanel` (CombatView) and `OverviewHydrating`; the band is on
+  every tab; overlays have the status in their bridge and draw nothing from it yet (R3).
 - "Engine said" lines come only from the error's snapshot (the 4 newest stderr lines when the error
   was recorded). A slow or stalled read with no recorded error shows none.
-- Fixed by phase R1 (next section): main's one connection to the engine was never retried; the `gen`
-  guard in `openConnection` could discard a good connection during a world rebuild. Still open, each
-  with its phase in `plans/2026-11-19-reading-log-robustness.md`: a refused attach is never retried
-  (R4); an engine that dies after serving is relaunched forever with no card (R5); the old failure
-  card's "It last said" is not scrubbed (R2).
+- Fixed since: main's one connection to the engine was never retried and the `gen` guard in
+  `openConnection` could discard a good connection during a world rebuild (R1); the old failure
+  card's "It last said" was not scrubbed (R2: `scrubFault` in `engineHost.ts onFault`). Still open,
+  each with its phase in `plans/2026-11-19-reading-log-robustness.md`: a refused attach is never
+  retried and nothing retries a read by itself (R4); an engine that dies after serving is relaunched
+  for ever with no card (R5).
 - e2e: a run with no engine binary, or one that holds a fold or a hydrating panel past 5 s with a
   failure (15 s without), now finds `data-testid="log-read-report"` inside `combat-hydrating` /
   `overview-hydrating`.
@@ -1329,6 +1326,75 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
   (R3).
 - A module read is joined across `serve` and `serveShared` callers, so two projections can be
   handed the same reply object. A projection must never mutate the reply.
+
+## Reading log: one status on every tab (phase R2, plans/2026-11-19-reading-log-robustness.md)
+
+- ONE status. `composeLogReadReport` (`shared/logReadReport.ts`) decides; the words, the Try lines
+  and the Try again actions are three Records over `LogReadWait` in `shared/logReadWords.ts`. A new
+  wait does not compile until all three have a row.
+- Decision order: engine missing, engine failing, no character, engine starting, connecting / not
+  connected, attach error (code timeout = `notAnswering`, else `attachRefused`), read ended
+  (`logHung`, `logMissing`, `logUnreadable`, `readerStopped`), health unanswered, `logHung`, still
+  read (`finishing` / `stalled`), `opening`, `mismatch`, `reading`, then the meter's own read
+  (`replyTooLarge`, `notAnswering`, ok). Eleven waits show at once; the rest after 15 s; ok and
+  `noCharacter` never by themselves.
+- PUSH, not poll. `main/logReadStatus.ts` composes on every poke and sends the report to the main
+  window and every overlay when `statusChanged` (wait, show, tryLine, action, engine words,
+  lastError, logFile, notes). Numbers alone (offset, pct, events, engineSaid, waitingSince): at most
+  every 2 s and only while `show`. Never add a number to `statusChanged`.
+- A fact that moves without a poke leaves every window stale, silently. Pokes: every note in
+  `logReadState.ts`; `engineLaunchState.set()`; `client.onState` in `engineClientWiring.ts`; the
+  link keeper's `changed` (retry scheduled, gave up, tryNow); `engineHost` `onPid` and `onFault`;
+  `logProbe.onSettled`; the Try again handler. A new fact the report reads needs
+  `noteLogReadTouched()` at its edge. `tests/logReadPokes.test.mts` pins these from source.
+- The supervisor has no status callback: `starting` and `backoff` are seen by the 1 s tick
+  (`shouldTick`, the `CLOCKED` set) or the 10 s net. A new wait that changes with the clock goes in
+  `CLOCKED`.
+- `poke()` composes one microtask later, on purpose: several notes land in one synchronous step and
+  the middle states must not be pushed.
+- `waitingSince` restarts only on another log, or on the first turn or launch after the read went
+  live; not on a launch or a same-log rebuild (`noteLogReadTurn(at, logPath)` needs the path). It is
+  the instant the SHOWN wait is timed from; the window counts with its own clock
+  (`logReadLines(report, now)`). In the meter branch it is `lastCombatRead.since`.
+- The meter's last read is cleared on a turn and at the live edge and counts only for
+  `COMBAT_READ_FRESH_MS` = 30 s. It must stay above the idle meter poll (10 s, `combatPoll.ts`) or a
+  standing failure blinks.
+- Main never awaits the log file. `main/logProbe.ts`: one open in flight per path, two in all, an
+  answer kept 5 s, `last()` synchronous. Looked at only when `worthALook`: the read ended, opening
+  for 15 s, or no growth for 60 s. `pendingMs` of 15 s or more is `logHung`, except while the read
+  is moving or live. While a read is ended the net re-opens the file about every 10 s. `onSettled`
+  has ONE listener (the publisher).
+- A fold error's stderr lines are read when the report is composed (the reason arrives after the
+  idle answer). The ring is cleared on a new launch.
+- Scrub, then cut: the supervisor hands `onEngineSaid` up to 2 KB; the report scrubs and cuts to
+  200. The fault is scrubbed in `engineHost` `onFault` (`scrubFault`) before the card sees it.
+  `Users\Public`, `Default` and `All Users` are not turned into `~`.
+- `bannerFor` (`shared/engineLaunch.ts`) picks card / bar / band / notes / none. Card for any fault.
+  Bar only for the wait `reading` or `finishing` with a readout. Never draw from `say.phase` again.
+- `noteEngineReadEnded()` (phase `starting`, no fold) on `failed('ended')` and when the app has no
+  character. Where the read stopped is `lastOffset` in `logReadState`, printed as "Stopped at".
+- Try again carries no payload: main runs `LOG_READ_ACTION` of the wait it LAST PUSHED; a second
+  press inside 2 s is ignored. reconnect = `EngineLink.reopen()` (fails a connection that is up,
+  then `tryNow`). reattach = `reattachEngineLog()`: a new turn, `attachedTo = null`, the attach sent
+  again, the whole log re-read; with no ready connection it reconnects instead. `replyTooLarge` has
+  no button on purpose.
+- A stopping or stopped supervisor is the app closing: never shown as a wait.
+- Renderer: one store per window (`lib/logReadReportHud.ts`): subscribe, then one read; a read that
+  lands after a push is dropped. The band is `LogReadBand.tsx` (`data-testid="log-read-band"`,
+  `data-wait`): the sentence, the Try line, the button, and for `readerStopped` and `stalled` the
+  box's own position row (`bandPosition`; `log-read-band-position`). The box keeps `log-read-report`
+  and shows for any wait once its panel has been up 15 s.
+- A Try line is printed by the band on every tab, where there is no box. It may not say "box" or
+  name a row only the box has, and it may speak of where the read is only for a wait in
+  `POSITION_IN_BAND` (`tests/logReadWords.test.mts` fails otherwise). Only a wait whose position
+  stands still may be added there: the band is `role="status"` (atomic), so a moving number would be
+  read out again at every push.
+- Both preloads carry `onLogReadReport` and `logReadReport`; only the main window has
+  `logReadTryAgain` (pinned).
+- e2e: with a failure the box and the band are there at once (no 5 s). A wait of 15 s with no
+  failure shows the band on every tab, above the content (`log-read-band`), which moves the content
+  down while it shows. `engine-absent.e2e.mts` pins the card on a tab other than Overview and the
+  Try row and button in Overview's box.
 
 ## DPS chart: the pet drawn apart (upstream #91, requirements/meter-pet-split.md)
 

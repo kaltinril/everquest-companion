@@ -107,7 +107,7 @@ import { hostClockHint, resolvedTimeZone } from './hostClock'
 // THE LAUNCH BANNER'S THREE EDGES (JOS-503). This file is the only place that knows when a
 // historical fold BEGINS (an accepted attach), how far it has got (the engine's progress frames)
 // and when it LANDS (the go-live edge below) — so it feeds all three to the one state main pushes.
-import { noteEngineFolding, noteEngineLive } from './engineLaunchState'
+import { noteEngineFolding, noteEngineLive, noteEngineReadEnded } from './engineLaunchState'
 // THE WAIT ITSELF (JOS-518). A leaf with its request, its turn, its sleep and its log sink handed
 // in, so the shapes that matter — a fold past the old budget, a poll refused once and then answered,
 // a connection that dies mid-wait — are drivable in a unit test. Its header carries the owner ruling
@@ -118,6 +118,7 @@ import {
   noteLogReadConnection,
   noteLogReadError,
   noteLogReadHealth,
+  noteLogReadTouched,
   noteLogReadTurn
 } from './logReadState'
 import { SERVABLE, type Readiness } from './readShim'
@@ -221,7 +222,7 @@ function bumpGen(): number {
   resetMirrors()
   // What was known about reply sizes was known about the last read (replySizes.ts).
   replySizes.reset()
-  noteLogReadTurn(Date.now())
+  noteLogReadTurn(Date.now(), attachTarget())
   return gen
 }
 
@@ -339,7 +340,8 @@ export function onEngineReady(info: ReadyEngine | null): void {
     },
     timer: unrefTimer,
     now: () => Date.now(),
-    note: debug
+    note: debug,
+    changed: noteLogReadTouched
   })
   live = { engine: info, client, link, attachedTo: null }
   // ONCE PER CLIENT, not once per connect: the connection is reopened under this same client.
@@ -542,7 +544,9 @@ async function sendAttach(mine: number, l: LiveEngine, logPath: string): Promise
     // The connection went away under the attach: the engine refused nothing, and the reconnect
     // sends it again (`attachedTo` is still unset).
     if (isLinkLost(err)) return null
-    if (gen === mine) noteLogReadError('attach', describeErr(err), Date.now())
+    // The code goes with it: an attach nobody answered is not an attach that was refused.
+    const code = err instanceof EngineError ? err.code : null
+    if (gen === mine) noteLogReadError('attach', describeErr(err), Date.now(), code)
     return null
   }
 }
@@ -572,6 +576,8 @@ function onWorldRebuilt(character: CharacterRef | null): void {
     // app comes back to is the one the engine still has open, which after an interlude of not
     // watching is the safe direction.
     l.attachedTo = null
+    // …and a fold nobody is waiting on is not drawn over the no-logs screen.
+    noteEngineReadEnded()
     debug('data-server client: the app has no character; the engine keeps its last attach')
     return
   }
@@ -688,8 +694,12 @@ async function waitForFoldHere(mine: number, l: LiveEngine): Promise<FoldHealth 
     note: debug,
     logSize: () => lastFoldLogSize,
     failed: (why, detail) => {
-      // A dead read is forgotten, so a later rebuild of the same log attaches again (fork #9).
-      if (why === 'ended') l.attachedTo = null
+      // A dead read is forgotten, so a later rebuild of the same log attaches again (fork #9),
+      // and the catch-up bar is told there is no fold to draw.
+      if (why === 'ended') {
+        l.attachedTo = null
+        noteEngineReadEnded()
+      }
       noteLogReadError(why === 'ended' ? 'fold' : 'health', detail, Date.now())
     }
   })
@@ -711,9 +721,30 @@ export function engineClientFacts(): {
   }
 }
 
-/** A person asked for the connection to be tried again (`linkKeeper.ts tryNow`). */
+/** A person asked for a new connection (`engineLink.ts reopen`): one that is up and not answering
+ *  is dropped first. The engine keeps its world, so nothing is read again. */
 export function reconnectEngineClient(): void {
-  live?.link.tryNow()
+  live?.link.reopen()
+}
+
+/**
+ * A person asked for the log to be read again (the status's Try again, fork #9): a new turn, and
+ * an attach that is sent even though the engine was already pointed at this log. It re-reads the
+ * log from the start. With no connection to send it on, the connection is what is tried.
+ */
+export function reattachEngineLog(): void {
+  const l = live
+  if (l === null) return
+  if (l.client.state !== 'ready') {
+    l.link.reopen()
+    return
+  }
+  // The windows this engine was serving are told the world changed hands, as on a respawn.
+  const wasServing = engineLiveOn !== null
+  const mine = bumpGen()
+  if (wasServing) pushWorldChanged()
+  l.attachedTo = null
+  void attachAndProbe(mine)
 }
 
 // ── what the performance panel can ask this file (JOS-483) ─────────────────────────────────────

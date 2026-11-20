@@ -37,8 +37,10 @@
 // once (and fail when a new class arrives with no words), and the e2e asserts the same strings from
 // the DOM, so the spec and the product cannot drift into agreeing about different sentences.
 //
-// NOTHING HERE READS A CLOCK, TOUCHES A DOM, OR IMPORTS ANYTHING. It is arithmetic and prose, which
-// is what lets `tests/engineLaunch.test.mts` drive the whole matrix.
+// NOTHING HERE READS A CLOCK, TOUCHES A DOM, OR IMPORTS ANYTHING BUT A TYPE. It is arithmetic and
+// prose, which is what lets `tests/engineLaunch.test.mts` drive the whole matrix.
+
+import type { LogReadReport } from './logReadReport'
 
 // ── the pushed shape ───────────────────────────────────────────────────────────────────────────
 
@@ -160,6 +162,38 @@ export const ENGINE_LAUNCH_STARTING: EngineLaunchSay = { phase: 'starting', fold
  */
 export function foldFrameCounts(phase: EngineLaunchPhase, live: boolean | undefined): boolean {
   return live !== true && phase === 'folding'
+}
+
+// ── which of the shell's bands is drawn ────────────────────────────────────────────────────────
+
+/** What the seam under the title bar draws. */
+export type Banner =
+  /** The failure card: the engine is not going to start. */
+  | 'card'
+  /** The catch-up bar: the log is being read and a measurement exists. */
+  | 'bar'
+  /** The status band: what the app is waiting on, what to try, and Try again where it can act. */
+  | 'band'
+  /** The band with the report's notes only: the read is fine and there is something to add. */
+  | 'notes'
+  | 'none'
+
+/**
+ * THE ONE PLACE THAT PICKS (fork #9). The card was drawn from the launch fault, the bar from the
+ * launch phase and the box from the log-read report, three sources that could disagree: a bar
+ * frozen at 62% over a box that said the read had stopped. Now the report's wait decides, with
+ * two inputs from the launch state.
+ *
+ * THE CARD WINS WHATEVER THE WAIT, so a fresh install with a quarantined engine and no character
+ * picked still gets it. `report` is null before a window's first answer: nothing but the card.
+ */
+export function bannerFor(report: LogReadReport | null, say: EngineLaunchSay, hasReadout: boolean): Banner {
+  if (say.fault !== null) return 'card'
+  if (report === null) return 'none'
+  // Only a read that is running draws the bar: a read that stopped may still hold a measurement.
+  if ((report.wait === 'reading' || report.wait === 'finishing') && hasReadout) return 'bar'
+  if (report.show) return 'band'
+  return report.wait === 'ok' && report.notes.length > 0 ? 'notes' : 'none'
 }
 
 // ── the sample ring, and the rate it exists to measure ────────────────────────────────────────

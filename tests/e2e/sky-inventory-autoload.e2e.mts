@@ -269,7 +269,10 @@ async function stepDefaultCountsTheDump(page: Page): Promise<void> {
     source === 'Both (higher of the two)',
     source
   )
-  check('…so the freshness line is up without anyone touching the dropdown', (await countOf(page, FRESH)) === 1)
+  // Waited for, like its going below: the line is drawn once main has answered what it knows of
+  // the dump, and on a busy machine that answer lands after this step's first look (2026-11-19).
+  const up = await settle(() => countOf(page, FRESH), (n) => n === 1, { timeoutMs: 10_000 })
+  check('…so the freshness line is up without anyone touching the dropdown', up === 1, `lines=${String(up)}`)
   // CONSTRAINT 4, as one number. The control is not disabled, not hidden: it does not exist.
   check('…and the Reload inventory button is gone from the tab', (await countOf(page, RELOAD)) === 0)
 }

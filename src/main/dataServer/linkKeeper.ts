@@ -45,6 +45,9 @@ export interface LinkKeeperDeps<C extends { close(): void }> {
   readonly now: () => number
   /** The dev log. */
   readonly note: (line: string) => void
+  /** What `facts()` answers just changed with no connection opening or closing: a retry was
+   *  scheduled, or the keeper gave up. The log-read status is pushed from it. */
+  readonly changed?: () => void
 }
 
 export interface LinkKeeper {
@@ -111,6 +114,7 @@ export function createLinkKeeper<C extends { close(): void }>(deps: LinkKeeperDe
   const giveUp = (why: string): void => {
     s.phase = 'gaveUp'
     deps.note(`data-server link: not reconnecting (${why}): ${s.lastReason ?? 'no reason given'}`)
+    deps.changed?.()
   }
 
   /** The connection is not there, for `reason`: wait the next rung and try again, or give up. */
@@ -134,6 +138,7 @@ export function createLinkKeeper<C extends { close(): void }>(deps: LinkKeeperDe
         `(try ${String(s.tries)} of ${String(LINK_RETRY_DELAYS_MS.length)}): ${reason}`
     )
     s.cancelRetry = deps.timer(attempt, wait)
+    deps.changed?.()
   }
 
   const opened = (channel: C): void => {
@@ -185,6 +190,7 @@ export function createLinkKeeper<C extends { close(): void }>(deps: LinkKeeperDe
       if (s.phase !== 'waiting' && s.phase !== 'gaveUp') return
       s.tries = 0
       attempt()
+      deps.changed?.()
     },
     stop(): void {
       cancelTimers()

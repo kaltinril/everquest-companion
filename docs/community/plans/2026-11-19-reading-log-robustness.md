@@ -61,7 +61,7 @@ structured-clone size per window, and merged archive history over IPC (experimen
 | Phase | What | Where | Size | Depends on | Status |
 | --- | --- | --- | --- | --- | --- |
 | R1 | The cliff: no reply size, slow reply or socket fault ends the connection for good | typescript | L | - | built 2026-11-19 |
-| R2 | One status, pushed to every window, with a Try line and a Try again action | typescript | L | R1 | planned |
+| R2 | One status, pushed to every window, with a Try line and a Try again action | typescript | L | R1 | built 2026-11-19 |
 | R3 | Tabs, overlays, the title-bar dot and the no-logs screen follow the status | typescript | L | R2 | planned |
 | R4 | The read recovers by itself when a fact changes | typescript | L | R1, R2 | planned |
 | R5 | The engine process: no blind kill, no blind relaunch loop, right words for why it will not start | typescript | M | R2, R4 | planned |
@@ -109,6 +109,61 @@ know. The rules each phase left in force are in `agent/BRANCH_NOTES.md` ("Readin
 - Line budgets: `engineClientHost.ts` 390 of 440 code lines, `client.ts` 385,
   `tests/dataServerTransport.test.mts` 368. Source pins that break if the wiring moves:
   `tests/serveDeltaArm.test.mts` reads `engineClientWiring.ts` and `engineClientHost.ts`.
+
+### R2 (2026-11-19)
+
+- Built as designed, reviewed by two readers with different lenses (three findings: two were one
+  defect, corrected with tests that failed first; the third was the phase's e2e step, written by the
+  coordinator). Gated with the trunk merged in: 7,109 unit tests, the two known reds only. End to
+  end: the phase's own step in `engine-absent` passes (the card on a tab other than Overview, the
+  Try row and the button in Overview's box); the full suite was run before the merge and its numbers
+  are in the merge commit. No Rust change.
+- The meter's own read (the combat branch, which the plan leaves to R3) had to change here, because
+  the band puts its verdict on every tab: `lastCombatRead` is cleared on a new turn and at the live
+  edge and speaks for 30 s only (`COMBAT_READ_FRESH_MS`; it must stay above the idle meter's 10 s
+  poll or a standing failure blinks). R3's per-key version must keep a `since` per run of unserved
+  reads, that freshness window (its planned 10 s is too short) and both clears.
+- `reconnectEngineClient()` calls a new `EngineLink.reopen()`, which fails a connection that is up
+  before asking the keeper: R1's `tryNow` does nothing while a connection is up, so Try again for
+  `notAnswering` would have done nothing.
+- The publisher composes one microtask after a poke (several notes land in one synchronous step),
+  holds numbers to one push per 2 s with a trailing timer, and ticks every second while the verdict
+  can move with the clock (`CLOCKED` in `main/logReadStatus.ts`) or while main's open of the log is
+  out. A new wait that changes with the clock must be added to `CLOCKED` (R3's `panelSlow`).
+- `logHung` is also checked inside the ended waits; the probe allows two opens in all (not one per
+  path without limit); main also looks at the file when the read has not moved for a minute.
+  `logProbe.onSettled` has ONE listener and the publisher holds it: R4's watch must chain it, not
+  replace it.
+- `waitingSince` also restarts on the first turn or launch after a read went live, and is the
+  instant the SHOWN wait is timed from (the meter's `since` in the combat branch).
+- The Try line for `readerStopped` ends "send a screenshot of this window." (the plan said "this
+  box"): the band prints Try lines on every tab, where there is no box. No Try line may say "box" or
+  name a row only the box has (`tests/logReadWords.test.mts`); R5's planned line for `engineCycling`
+  must say "this window". For `readerStopped` and `stalled` the band also draws the box's position
+  row (`bandPosition`), the only two waits whose position stands still.
+- A stopping or stopped supervisor is the app closing and is never shown as a wait. A landed read
+  prints no offset.
+- The supervisor has no status callback: `starting` and `backoff` are seen by the 1 s tick or the 10
+  s net. No supervisor dep was added (398 of 440 code lines); R4 wants one there.
+- For the next phases: `useLogReadReport()` (`lib/logReadReportHud.ts`) picks `window.eq` or
+  `window.eqOverlay` itself, so overlays can call it as is; both preloads carry `logReadReport` and
+  `onLogReadReport`, only the main window has `logReadTryAgain`. R3 composes notes where
+  `composeLogReadReport` returns `notes: []`; `LogReadNote.button` is declared and NOT drawn.
+  `LOG_READ_SHORT` belongs beside the three tables in `shared/logReadWords.ts`. Anything new the
+  report reads needs `noteLogReadTouched()` at its edge. `reattachEngineLog()` and
+  `reconnectEngineClient()` are exported from `engineClientHost.ts` (410 of 440 code lines: R4's
+  `attachTurn.ts` must take weight before adding). `noteLogReadTurn(at, logPath)` and
+  `noteLogReadError(step, detail, at, code?)` changed signature; `LogReadFacts` gained `lastOffset`,
+  `health.since`, `error.code`, `probe.pendingMs`, `lastCombatRead.since`
+  (`tests/logReadFactsHarness.mts` builds a full literal).
+- Source pins that break if wiring moves: `tests/logReadPokes.test.mts` (the pokes, the Try again
+  binding, both preloads, the band's position row) and `tests/serveDeltaArm.test.mts` (three
+  `wasServing` edges).
+- Left open: a band screenshot from a tab other than Overview or Combat carries the sentence, the
+  Try line and Stopped at, but not Last error, Engine said or Version (those are only in the box).
+  The fault detail is still cut to 200 characters by the supervisor before it is scrubbed. When a
+  read ends, the first push says "stopped before the end" and the probe's answer (missing or locked)
+  follows as a second push, which a screen reader may announce twice.
 
 ## Defaults taken on the questions that are the owner's
 

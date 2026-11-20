@@ -22,6 +22,7 @@ import type { BuffAllowPrefs } from '../shared/buffAllow'
 import type { ToastPayload } from '../shared/toast'
 import type { AlertBannerPayload } from '../shared/alertBanner'
 import type { ConCardPayload } from '../shared/conCard'
+import type { LogReadReport } from '../shared/logReadReport'
 
 export type { CombatSnapshot, SnapshotOpts, OverlayConfig, OverlayDrill, OverlayKind, MobKnowledge }
 
@@ -428,6 +429,16 @@ const overlayApi = {
     const listener = (_e: Electron.IpcRendererEvent, shown: boolean | null): void => cb(shown)
     ipcRenderer.on(IPC.onGameMapShown, listener)
     return () => ipcRenderer.removeListener(IPC.onGameMapShown, listener)
+  },
+
+  /** What the app is waiting on (fork #9): the same status the main window is pushed, so an overlay
+   *  can say why its numbers are not there. Read once on mount, after subscribing below. No Try
+   *  again here: an overlay does not act on the engine. */
+  logReadReport: (): Promise<LogReadReport> => ipcRenderer.invoke(IPC.logReadReport),
+  onLogReadReport: (cb: (report: LogReadReport) => void): (() => void) => {
+    const listener = (_e: Electron.IpcRendererEvent, report: LogReadReport): void => cb(report)
+    ipcRenderer.on(IPC.onLogReadReport, listener)
+    return () => ipcRenderer.removeListener(IPC.onLogReadReport, listener)
   },
 
   /** Close this overlay from its own close button (interactive mode only). */

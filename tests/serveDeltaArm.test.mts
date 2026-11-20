@@ -307,9 +307,11 @@ test('both edges where the serving world changes hands are announced', () => {
   assert.match(host, /if \(first\) \{[\s\S]*?debug\(servingLine\(/)
   // Going away: a window holding a served snapshot is IGNORING module:delta because it was served,
   // so without this frame it would sit frozen until the next character rebuild.
+  // Three places let go: a respawn, the teardown, and (fork #9) the player asking for the log to
+  // be read again, which replaces a world that may have been answering.
   const edges = host.match(/const wasServing = engineLiveOn !== null/g) ?? []
-  assert.equal(edges.length, 2, 'the loss edge is asked in exactly the two places that let go')
-  assert.equal((host.match(/if \(wasServing\) pushWorldChanged\(\)/g) ?? []).length, 2)
+  assert.equal(edges.length, 3, 'the loss edge is asked in exactly the three places that let go')
+  assert.equal((host.match(/if \(wasServing\) pushWorldChanged\(\)/g) ?? []).length, 3)
 })
 
 // ── 3. the mark is still ONE instant ───────────────────────────────────────────────────
