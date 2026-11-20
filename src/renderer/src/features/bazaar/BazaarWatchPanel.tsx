@@ -6,7 +6,7 @@
 import { type JSX, useEffect, useState } from 'react'
 import { Checkbox, FormControlLabel, Stack, Switch, TextField, Typography } from '@mui/material'
 import { findWatch, watchOnItem } from '@shared/bazaarWatch'
-import { formatPlatExact, parsePlat, type BazaarItem } from '@shared/bazaar'
+import { formatPlatExact, platFieldCommit, type BazaarItem } from '@shared/bazaar'
 import { useBazaarWatch } from './useBazaarWatch'
 
 function PriceField({ label, value, onCommit, testId }: { label: string; value: number | null; onCommit: (v: number | null) => void; testId: string }): JSX.Element {
@@ -23,7 +23,11 @@ function PriceField({ label, value, onCommit, testId }: { label: string; value: 
       value={text}
       onChange={(ev) => setText(ev.target.value)}
       onBlur={() => {
-        if (text !== shown) onCommit(parsePlat(text))
+        if (text === shown) return
+        // Text that is not a price stores nothing: the field goes back to the price that alerts.
+        const next = platFieldCommit(text)
+        if (next === undefined || next === value) setText(shown)
+        else onCommit(next)
       }}
       sx={{ width: 150 }}
       slotProps={{ htmlInput: { 'data-testid': testId } }}

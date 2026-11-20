@@ -126,7 +126,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
 
 ## Timers: respawn pre-alert control and the edit dialog
 
-- CONFIRMED [high, broken] "Several mobs share this name" does nothing: the box never ticks and the
+- FIXED 2026-11-19 (branch `two-screen-bugs`) [high, broken] "Several mobs share this name" does nothing: the box never ticks and the
   estimate never changes Seen: Click on the label of [data-testid="respawn-edit-shared-name"]:
   window.eq.getRespawn() shows {key:"a wan ghoul knight", sharedName:true} within 300 ms, but the
   input's checked stays false at +300 ms, +1 s, +2 s, +4 s, +6 s, after Close and reopen, and after
@@ -613,7 +613,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
 
 ## Bazaar watches and Buffs captions
 
-- CONFIRMED [high, untrue-words] Bazaar: a watch price typed with a comma stays in the field but is
+- FIXED 2026-11-19 (branch `two-screen-bugs`; a typo now stores nothing and the field reverts) [high, untrue-words] Bazaar: a watch price typed with a comma stays in the field but is
   not stored, so every price alerts Seen: Field input[data-testid=bazaar-watch-wts-max] still reads
   "12,500"; row chip reads "Watch: WTS"; stored entry wtsMax null. A live "Mira auctions, 'WTS
   Fleeting Quiver 20k'" then alerts: "Mira WTS Fleeting Quiver 20k (on your watchlist)" while the

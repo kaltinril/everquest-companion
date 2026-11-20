@@ -1355,6 +1355,10 @@
         "customSec": {
           "description": "The user's own respawn, in SECONDS. Absent means `use what you learn`, which is a different statement from zero.",
           "type": "integer"
+        },
+        "sharedName": {
+          "description": "Several mobs share this name: estimate from gaps of ten minutes or more only. Absent means off.",
+          "type": "boolean"
         }
       },
       "required": [

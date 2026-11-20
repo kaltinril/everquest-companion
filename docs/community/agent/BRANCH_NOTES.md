@@ -641,6 +641,12 @@ where one exists.
   "your kills (N gaps over 10 min)". The switch writes on the click (`respawn:setSharedName`), not on
   Save, since Save is disabled while the row has no number. An unwatch drops the switch with the
   watch (the kept list holds typed numbers only); `respawnWithCustom` keeps it.
+- A property a define carries must be named in its schema type, or the engine drops it: `ops.rs`
+  hands the fold the TYPED params re-serialized, so `additionalProperties: true` does not carry an
+  unnamed property through. `sharedName` was missing from `RespawnWatch` until 2026-11-19 and the
+  switch did nothing in the running app while every fold test (raw JSON) passed. The crossing is
+  pinned by `engined/tests/live_surfaces.rs a_watchs_shared_name_switch_survives_the_wire`; a new
+  pref property needs its schema line, `npm run gen:protocol`, and a test at that level.
 - The archive merge takes a row's served fields from the NEWER side (`mergeGaps.ts mergeRow`,
   2026-11-05). A name on both sides joins its tallies; `itemsSold`, `greeting`, `role`,
   `questFacts`, `suggest` and the like are the live fold's current reading. Before, `...had` kept
@@ -2216,6 +2222,10 @@ what a later change must know. Each fix has a unit test that failed before it.
 - Prices the player typed (watch thresholds) and the alert's offer price go through
   `formatPlatExact`, the inverse of `parsePlat`; `formatPlat` rounds and is for tables, tiles and
   charts only. A new unit in `parsePlat` needs its line in `EXACT_UNITS`.
+- `parsePlat` reads thousands commas only where they group three digits (`12,500`; `1,50` is
+  unreadable). A price field's blur goes through `platFieldCommit`: blank clears the price, text
+  that is not a price stores nothing and the field goes back to the stored price (before
+  2026-11-19 a typo stored "any price" while the field kept the text, so every offer alerted).
 - Measure: a corpus for `BAZAAR_CORPUS` can be made by filtering trade-word lines from the live log
   plus `Logs/companion-archive/*.log.gz` (the live log alone has too little chat); 2026-11-19
   numbers: trade 1972, offers 2326, priced 1376, counted 1309.

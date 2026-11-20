@@ -3,7 +3,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { formatPlat, formatPlatExact, parsePlat, summarizeBazaar, type BazaarRow, type BazaarSnap, type LiveOffer } from '../src/shared/bazaar'
+import { formatPlat, formatPlatExact, parsePlat, platFieldCommit, summarizeBazaar, type BazaarRow, type BazaarSnap, type LiveOffer } from '../src/shared/bazaar'
 import {
   findWatch,
   freshWatchAlerts,
@@ -224,6 +224,24 @@ test('a watch price reads what the field shows it as, millions included, so a th
   assert.equal(parsePlat('500pp'), 500)
   assert.equal(parsePlat(''), null)
   for (const pp of [500, 2500, 15_000, 1_500_000, 12_000_000]) assert.equal(parsePlat(formatPlat(pp)), pp)
+})
+
+test('a price typed with thousands commas reads as that price, and a misplaced comma reads as nothing', () => {
+  assert.equal(parsePlat('12,500'), 12_500)
+  assert.equal(parsePlat('1,500pp'), 1500)
+  assert.equal(parsePlat('1,500,000'), 1_500_000)
+  assert.equal(parsePlat('2,500k'), 2_500_000)
+  assert.equal(parsePlat(' 12,500.5 p '), 12_500.5)
+  for (const bad of ['1,50', '12,5000', '1,,500', ',500', '1500,', '1234,567', '1 500', 'abc']) assert.equal(parsePlat(bad), null, bad)
+})
+
+test('leaving a price field: blank clears the price, a price is stored, and a typo stores nothing', () => {
+  assert.equal(platFieldCommit(''), null)
+  assert.equal(platFieldCommit('   '), null)
+  assert.equal(platFieldCommit('12,500'), 12_500)
+  assert.equal(platFieldCommit('12.5k'), 12_500)
+  // Before 2026-11-19 these stored "any price" while the field still showed the text, so every offer alerted.
+  for (const typo of ['abc', '1 500', '1,50', '0']) assert.equal(platFieldCommit(typo), undefined, typo)
 })
 
 test('a threshold is written in full, so typing what the field shows stores the same price', () => {

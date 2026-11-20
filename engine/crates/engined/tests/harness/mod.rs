@@ -701,6 +701,14 @@ pub fn buff_trust_define(id: i64, externals: &[&str]) -> ClientMessage {
 /// One `respawn.define` request carrying the whole watch list.
 #[must_use]
 pub fn respawn_define(id: i64, watches: &[(&str, &str)]) -> ClientMessage {
+    let plain: Vec<(&str, &str, bool)> = watches.iter().map(|(k, d)| (*k, *d, false)).collect();
+    respawn_define_shared(id, &plain)
+}
+
+/// The same request with each watch's "several mobs share this name" switch said: `true` rides the
+/// wire as `sharedName: true`, `false` leaves the property out, as the app writes it.
+#[must_use]
+pub fn respawn_define_shared(id: i64, watches: &[(&str, &str, bool)]) -> ClientMessage {
     ClientMessage::RespawnDefineRequest(protocol::generated::RespawnDefineRequest {
         id: RequestId(id),
         op: protocol::generated::RespawnDefineRequestOp::RespawnDefine,
@@ -708,10 +716,11 @@ pub fn respawn_define(id: i64, watches: &[(&str, &str)]) -> ClientMessage {
             prefs: protocol::generated::RespawnPrefs {
                 watches: watches
                     .iter()
-                    .map(|(key, display)| protocol::generated::RespawnWatch {
+                    .map(|(key, display, shared)| protocol::generated::RespawnWatch {
                         key: (*key).to_owned(),
                         display: (*display).to_owned(),
                         custom_sec: None,
+                        shared_name: shared.then_some(true),
                     })
                     .collect(),
             },

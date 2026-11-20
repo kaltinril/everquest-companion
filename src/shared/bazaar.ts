@@ -468,12 +468,26 @@ export function formatPlat(pp: number | null): string {
 
 const PLAT_SCALE: Record<string, number> = { k: 1000, m: 1_000_000 }
 
-/** `5k`, `2.5k`, `1.5M`, `500`, `500p`, `500pp` → platinum; blank or unreadable → null. */
+/**
+ * `5k`, `2.5k`, `1.5M`, `500`, `500p`, `500pp`, `12,500` → platinum; blank or unreadable → null.
+ * A comma is read only where it groups exactly three digits (`12,500`, `1,500,000`), so `1,50`
+ * and `12,5000` stay unreadable instead of being guessed at.
+ */
 export function parsePlat(s: string): number | null {
-  const m = /^\s*(\d+(?:\.\d+)?)\s*(k|m|pp|p)?\s*$/i.exec(s)
+  const m = /^\s*(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)\s*(k|m|pp|p)?\s*$/i.exec(s)
   if (m === null) return null
-  const n = Number(m[1]) * (PLAT_SCALE[m[2]?.toLowerCase() ?? ''] ?? 1)
+  const n = Number(m[1].replace(/,/g, '')) * (PLAT_SCALE[m[2]?.toLowerCase() ?? ''] ?? 1)
   return n > 0 ? n : null
+}
+
+/**
+ * What leaving a price field holding `text` stores: blank clears the price (null), text that reads
+ * as a price stores it, and text that does not read (`abc`, `1 500`) stores nothing (`undefined`),
+ * so a typo never silently turns a threshold into "any price".
+ */
+export function platFieldCommit(text: string): number | null | undefined {
+  if (text.trim() === '') return null
+  return parsePlat(text) ?? undefined
 }
 
 /** From, scale, unit and decimals of each way to write a price in full, shortest first. */
