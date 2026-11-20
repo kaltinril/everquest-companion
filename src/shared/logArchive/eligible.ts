@@ -94,6 +94,16 @@ function dedupe(candidates: Segment[], held: Held[]): Segment[] {
   return shown
 }
 
+/**
+ * The live log is one the player put back: it begins with an archive of this character whose
+ * record a Put back returned to `backed-up` (actions.ts restoreNow). Automatic archiving waits for
+ * such a log until Archive now (preflight.ts `autoArchiveDue`). Nothing extra is stored: archiving
+ * it again leaves a fresh log, which begins with no archive.
+ */
+export function putBackInLive(segments: readonly Segment[], character: string, live: LiveLog): boolean {
+  return segments.some((s) => s.character === character && s.state === 'backed-up' && live.headSha256(s.log.headBytes) === s.log.headSha256)
+}
+
 /** The segments to show for the attached character, and why each other sealed one is not. */
 export function eligibleSegments(input: EligibleInput): Eligible {
   const held: Held[] = []

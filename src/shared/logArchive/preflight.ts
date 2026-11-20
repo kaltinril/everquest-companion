@@ -7,6 +7,15 @@
  *  about 20 s at launch (measured ~5.4 MB/s). */
 export const AUTO_ARCHIVE_BYTES = 100 * 1024 ** 2
 
+/**
+ * Does the automatic check archive now? Never a log the player put back (eligible.ts
+ * `putBackInLive`): it is over the limit by construction, and the put back restarts the app, so
+ * the launch check would undo it within a minute. It waits for Archive now.
+ */
+export function autoArchiveDue(p: { on: boolean; liveBytes: number; putBack: boolean }): boolean {
+  return p.on && p.liveBytes >= AUTO_ARCHIVE_BYTES && !p.putBack
+}
+
 export interface PreflightInput {
   /** Summarize and archive log is on. */
   on: boolean

@@ -34,7 +34,7 @@
 
 import { createHash } from 'node:crypto'
 import { closeSync, openSync, readSync } from 'node:fs'
-import { eligibleSegments, type Held } from '../../shared/logArchive/eligible'
+import { eligibleSegments, putBackInLive, type Held } from '../../shared/logArchive/eligible'
 import { carryZoneIntoKills, firstZoneLine } from '../../shared/logArchive/carryZone'
 import type { SegmentSummary } from '../../shared/combat'
 import { archivedFightRows } from '../../shared/logArchive/mergeFights'
@@ -256,6 +256,15 @@ export function createHistoryMerge(deps: HistoryDeps): HistoryMerge {
       cache.clear()
     }
   }
+}
+
+/** The player put this log back (`putBackInLive`), read off the folder and the log's head. An
+ *  unreadable log decides nothing. */
+export function logWasPutBack(dir: string, character: string, logPath: string): boolean {
+  const head = readHeadBytes(logPath, HEAD_BYTES)
+  if (head === null) return false
+  const live = { headSha256: (n: number) => (head.length < n ? null : sha256(head.subarray(0, n))), firstStamp: firstStamp(head) }
+  return putBackInLive(listSegments(dir, character).segments, character, live)
 }
 
 /** Up to `n` bytes from the start of a file, read without holding it. Null when unreadable. */

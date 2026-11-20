@@ -22,6 +22,7 @@ import { capturedState } from '../../shared/logArchive/capturedShape'
 import { archiveName, backupLog, sweepTemp } from './backup'
 import { captureSegment, type CaptureDeps } from './capture'
 import { archiveBuckets, placeArchivedBuckets } from './engineBuckets'
+import { logWasPutBack } from './history'
 import { liveHistory, logArchiveDir } from './liveHistory'
 import { readLogPrefix } from './logPrefix'
 import { refoldWithApp } from './refoldActions'
@@ -227,6 +228,12 @@ function liveLog(a: { logPath: string } | null): LogArchiveStatus['live'] {
   return { path: a.logPath, bytes: st.size, modifiedMs: st.mtimeMs }
 }
 
+/** The attached log is one the player put back, so the automatic archive leaves it (autoArchive.ts). */
+export function attachedLogPutBack(): boolean {
+  const a = attached()
+  return a !== null && logWasPutBack(logArchiveDir(), a.character, a.logPath)
+}
+
 function newestSealed(rows: SegmentRow[]): string | null {
   const sealed = rows.filter((r) => r.state === 'sealed').sort((x, y) => x.lastStamp.localeCompare(y.lastStamp))
   return sealed.length > 0 ? sealed[sealed.length - 1].id : null
@@ -248,6 +255,7 @@ export function logArchiveStatus(): LogArchiveStatus {
     skipped: [],
     dumps: null,
     rotateBlockers: [],
+    autoPaused: false,
     busy
   }
   return on ? fillOn(base, dir, a) : base
@@ -262,6 +270,7 @@ function fillOn(base: LogArchiveStatus, dir: string, a: { character: string; log
   base.held = (ctx?.held ?? []).map((h) => ({ id: h.id, text: HELD_TEXT[h.reason] }))
   base.skipped = listing.skipped
   base.dumps = base.live !== null ? dumpAdvice(base.live.path, base.live.modifiedMs) : null
+  base.autoPaused = a !== null && logWasPutBack(dir, a.character, a.logPath)
   base.rotateBlockers = rotateBlockers({
     on: true,
     hasLog: base.live !== null,
