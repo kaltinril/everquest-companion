@@ -3,32 +3,41 @@
 // go"): a goal switch, the route for the open tradeskill from the player's level up, and beside
 // it the shopping list for the route's next step (ShoppingPanel.tsx).
 //
+// "Only use materials I have" sits beside the goals, remembered per tradeskill like the goal: on,
+// Cheapest and Fastest are built only from recipes the player holds every material for
+// (shared/tradeskillRouteHeld.ts). It is disabled, with the reason beside it, when nothing says
+// what is held, and on the two goals it does not change.
+//
 // The route, its ranking and every word are shared/tradeskillRoute.ts; this file maps over what
 // it returns. No chance, no number of combines and no total is drawn: nobody has measured them,
 // and the route's own lines say so. A step opens its recipe on the Recipes tab.
 
 import { type JSX, useMemo } from 'react'
-import { Box, Chip, Paper, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
+import { Box, Chip, FormControlLabel, Paper, Stack, Switch, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
+import { HELD_ONLY_LABEL, HELD_ONLY_TIP, heldKnown, heldOnlyBlockedText } from '@shared/tradeskillHeld'
 import { haveLookup } from '@shared/tradeskillMaterials'
 import {
   GOAL_LABELS,
   ROUTE_GOALS,
   ROUTE_STEP_TIP,
   buildRoute,
+  capTop,
   moreStepsText,
   routeEndText,
   type Route,
   type RouteGoal,
   type RouteGroup
 } from '@shared/tradeskillRoute'
+import { isHeldGoal } from '@shared/tradeskillRouteHeld'
 import type { RouteFacts, RouteStep } from '@shared/tradeskillRouteStep'
 import { SKILLS_MODULE } from '@shared/skills'
 import type { Tradeskill } from '@shared/tradeskills'
 import { LogReadInline } from '../../components/LogReadInline'
 import OutputKindLine from '../../components/OutputKindLine'
+import { Tooltip } from '../../lib/Tooltip'
 import { EraChip } from '../planner/PlannerChips'
 import { FactsProvider, type BenchFacts } from './benchFacts'
-import { useGoal } from './routeMemory'
+import { useGoal, useHeldOnly } from './routeMemory'
 import { ShoppingPanel } from './ShoppingPanel'
 import { ItemLabel } from './tradeskillLinks'
 
@@ -75,6 +84,42 @@ function GoalSwitch({ goal, onGoal }: { goal: RouteGoal; onGoal: (goal: RouteGoa
         </ToggleButton>
       ))}
     </ToggleButtonGroup>
+  )
+}
+
+interface HeldSwitchProps {
+  on: boolean
+  onChange: (on: boolean) => void
+  /** Why the switch cannot be used here; '' when it can. */
+  blocked: string
+}
+
+/** "Only use materials I have": disabled, with the reason beside it, where it cannot apply. */
+function HeldSwitch({ on, onChange, blocked }: HeldSwitchProps): JSX.Element {
+  return (
+    <Stack direction="row" spacing={1} alignItems="center">
+      <Tooltip title={HELD_ONLY_TIP}>
+        <FormControlLabel
+          control={
+            <Switch
+              size="small"
+              checked={on && blocked === ''}
+              disabled={blocked !== ''}
+              onChange={(_e, next) => {
+                onChange(next)
+              }}
+              data-testid="tradeskill-held-only"
+            />
+          }
+          label={HELD_ONLY_LABEL}
+        />
+      </Tooltip>
+      {blocked !== '' && (
+        <Typography variant="caption" color="text.secondary" data-testid="tradeskill-held-only-why">
+          {blocked}
+        </Typography>
+      )}
+    </Stack>
   )
 }
 
@@ -173,7 +218,7 @@ interface GroupProps {
 }
 
 function Group({ group, route, onOpenRecipe }: GroupProps): JSX.Element {
-  const more = moreStepsText(group, route.top)
+  const more = moreStepsText(group, capTop(route))
   return (
     <Box data-testid="tradeskill-route-group" data-group={group.id}>
       {group.heading !== '' && (
@@ -232,13 +277,18 @@ export interface RoutePanelProps {
 export function RoutePanel({ tradeskill, level, ready, facts, onOpenRecipe }: RoutePanelProps): JSX.Element {
   const { index, craft, guides, money, held, eraOnly } = facts
   const [goal, setGoal] = useGoal(tradeskill)
+  const [heldChoice, setHeldChoice] = useHeldOnly(tradeskill)
+  // The switch is the player's choice; it takes effect only where the held counts are known and the goal climbs.
+  const blocked = heldOnlyBlockedText(heldKnown(held, craft), isHeldGoal(goal))
+  const heldOnly = heldChoice && blocked === ''
   const routeFacts = useMemo((): RouteFacts => ({ index, craft, guides, money, have: haveLookup(held, craft) }), [index, craft, guides, money, held])
-  const route = useMemo(() => buildRoute(routeFacts, { tradeskill, level, goal }), [routeFacts, tradeskill, level, goal])
+  const route = useMemo(() => buildRoute(routeFacts, { tradeskill, level, goal, heldOnly }), [routeFacts, tradeskill, level, goal, heldOnly])
   return (
     <FactsProvider value={facts}>
-      <Stack spacing={1} sx={{ flexGrow: 1, minHeight: 0 }} data-testid="tradeskill-route" data-goal={goal}>
+      <Stack spacing={1} sx={{ flexGrow: 1, minHeight: 0 }} data-testid="tradeskill-route" data-goal={goal} data-held-only={heldOnly}>
         <Stack direction="row" spacing={2} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
           <GoalSwitch goal={goal} onGoal={setGoal} />
+          <HeldSwitch on={heldChoice} onChange={setHeldChoice} blocked={blocked} />
           <OutputKindLine kind="inventory" quiet loadedAt={held.readAt} testId="tradeskills-route-dump-line" />
         </Stack>
         {/* Until the engine serves the skills module the level is unknown, not 0: say what the app waits on. */}

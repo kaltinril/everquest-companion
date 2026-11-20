@@ -4,7 +4,9 @@
 // the zones it is foraged in, where the player last bought it, and the merchant, zone and loc the
 // recipe guide gives. A material that is itself made opens in place to its own recipe
 // (shared/tradeskillBook.ts `subRecipes`: depth-limited, loop-guarded). A recipe the wiki lists
-// no materials for shows the guide's, marked as the guide's.
+// no materials for shows the guide's, marked as the guide's. The wiki comes first (WikiGap.tsx):
+// what its page lacks is said with the page's link, and a guide that lists the recipe otherwise
+// than the wiki gets one quiet line under the wiki's own materials.
 //
 // "Plan this item" in the head opens the recipe in the section's Make an item screen (Planner.tsx)
 // through the section's doors, so the workbench threads nothing for it. `WhereCell` is exported:
@@ -33,7 +35,9 @@ import {
   recipeGuideCreditText,
   type GuideMaterialLine
 } from '@shared/tradeskillGuide'
+import { combinesHeld, heldKnown } from '@shared/tradeskillHeld'
 import { haveSourceText, logCountsInUse, recipeHistory } from '@shared/tradeskillHistory'
+import { haveLookup } from '@shared/tradeskillMaterials'
 import { formatDate } from '../../lib/formatDate'
 import { mergeItemSources, sourcesFor } from '../../lib/itemSources'
 import { Tooltip } from '../../lib/Tooltip'
@@ -41,9 +45,10 @@ import { useMetVersion } from '../../lib/useMetInLog'
 import { EraChip } from '../planner/PlannerChips'
 import { FactsProvider, useFacts, type BenchFacts } from './benchFacts'
 import { GuideSourceLine, Have, PaidLine } from './MaterialWhere'
-import { StateChip } from './RecipeTable'
+import { CanMakeChip, StateChip } from './RecipeTable'
 import { NoticeChip, RecipeYou } from './RecipeYou'
 import { ItemLabel, MobLink, ZoneList, useDoors } from './tradeskillLinks'
+import { GuideDifferences, WikiGapLine } from './WikiGap'
 
 /** Material, Need, Have, Where. Every nested recipe repeats the same columns. */
 const GRID_SX = {
@@ -247,6 +252,7 @@ function SubRecipe({ recipe, trail }: { recipe: BookRecipe; trail: readonly stri
       <Typography variant="caption" color="text.secondary">
         Made with: {recipeFacts(recipe, true)}
       </Typography>
+      <WikiGapLine recipe={recipe} />
       <MaterialList recipe={recipe} trail={trail} />
     </Box>
   )
@@ -290,8 +296,19 @@ function PanelFoot({ recipe }: { recipe: BookRecipe }): JSX.Element {
           {recipeGuideCreditText()}
         </Typography>
       )}
+      <GuideDifferences recipe={recipe} />
     </>
   )
+}
+
+/** "can make N" on the picked recipe, from the counts its own Have cells show. Nothing when nothing says what is held. */
+function PickedCanMake({ recipe }: { recipe: BookRecipe }): JSX.Element {
+  const { index, guides, held, craft } = useFacts()
+  const combines = useMemo(
+    () => (heldKnown(held, craft) ? combinesHeld({ index, guides, have: haveLookup(held, craft) }, recipe) : 0),
+    [index, guides, held, craft, recipe]
+  )
+  return <CanMakeChip combines={combines} />
 }
 
 const PLAN_TIP = 'Opens Make an item on this recipe: every material down to its leaves, the skills it takes and what to gather.'
@@ -332,6 +349,7 @@ export function RecipePanel({ recipe, state, facts, unlisted }: RecipePanelProps
         <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.5, mb: 0.5 }}>
           <ItemLabel name={recipe.item} bold />
           {state !== null && <StateChip state={state} />}
+          <PickedCanMake recipe={recipe} />
           <NoticeChip row={recipeHistory(facts.craft, recipe)} />
           <EraChip subject={recipe} />
           <Typography variant="body2" color="text.secondary" data-testid="tradeskill-picked-facts">
@@ -345,6 +363,7 @@ export function RecipePanel({ recipe, state, facts, unlisted }: RecipePanelProps
           <PlanThis recipe={recipe} />
         </Stack>
         <RecipeYou recipe={recipe} />
+        <WikiGapLine recipe={recipe} />
         <ColumnHeads dumpedAt={facts.held.dumpedAt} />
         {/* Keyed by recipe so a material opened under one recipe is not open under the next. */}
         <MaterialList key={recipe.id} recipe={recipe} trail={[recipe.key]} />

@@ -8,6 +8,9 @@
 //   Your history  the tradeskill's combines, pace and the item rows behind them
 //   From the guides  the leveling guide's route with the player's level placed on it
 //
+// The recipes tab's switches: Hide trivial here, "Can make now" and "Missing on the wiki" in
+// RecipeFilters.tsx.
+//
 // The ladder is shared/tradeskillBook.ts, the goal routes shared/tradeskillRoute.ts, the history
 // shared/tradeskillHistory.ts, the guide's route shared/tradeskillGuide.ts; this file holds the
 // controls and passes their values in.
@@ -38,6 +41,7 @@ import { SearchField } from '../../lib/SearchField'
 import type { BenchFacts } from './benchFacts'
 import { GuidePanel } from './GuidePanel'
 import { HistoryPanel } from './HistoryPanel'
+import { RecipeFilterSwitches, useRecipeFilters, type RecipeFilterState } from './RecipeFilters'
 import { RecipePanel } from './RecipePanel'
 import { RecipeTable, type RowLog } from './RecipeTable'
 import { RoutePanel } from './RoutePanel'
@@ -121,9 +125,11 @@ interface BarProps {
   ladder: Ladder
   /** How many of the tradeskill's listed recipes the log shows made. */
   made: number
+  /** "Can make now" and "Missing on the wiki". */
+  filters: RecipeFilterState
 }
 
-function BenchBar({ query, onQuery, hideTrivial, onHideTrivial, ladder, made }: BarProps): JSX.Element {
+function BenchBar({ query, onQuery, hideTrivial, onHideTrivial, ladder, made, filters }: BarProps): JSX.Element {
   const count = ladder.shown === ladder.total ? `${String(ladder.total)} wiki recipes` : `${String(ladder.shown)} of ${String(ladder.total)} wiki recipes`
   return (
     <Stack direction="row" spacing={2} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
@@ -150,6 +156,7 @@ function BenchBar({ query, onQuery, hideTrivial, onHideTrivial, ladder, made }: 
         }
         label="Hide trivial"
       />
+      <RecipeFilterSwitches state={filters} />
       <Box sx={{ flexGrow: 1 }} />
       <Typography variant="caption" color="text.secondary" data-testid="tradeskill-count">
         {count}
@@ -184,8 +191,9 @@ function RecipesTab({ tradeskill, level, ready, facts, memory, setMemory, restor
   const [hideTrivial, setHideTrivial] = useHideTrivial()
   // The search text is deferred, the Bazaar's way, so typing never waits on the list.
   const query = useDeferredValue(memory.query)
-  const ask = useMemo((): LadderAsk => ({ level, query, hideTrivial }), [level, query, hideTrivial])
   const recipes = skillRecipes(index, tradeskill)
+  const filters = useRecipeFilters(facts, recipes)
+  const ask = useMemo((): LadderAsk => ({ level, query, hideTrivial, only: filters.only }), [level, query, hideTrivial, filters.only])
   const ladder = useMemo(() => recipeLadder(recipes, ask), [recipes, ask])
   const made = useMemo(() => madeRecipes(craft, recipes), [craft, recipes])
   const log = useMemo((): RowLog => ({ craft, money }), [craft, money])
@@ -211,6 +219,7 @@ function RecipesTab({ tradeskill, level, ready, facts, memory, setMemory, restor
         onHideTrivial={setHideTrivial}
         ladder={ladder}
         made={made}
+        filters={filters}
       />
       {picked !== null && (
         <RecipePanel recipe={picked} state={stateOfPicked(ladder, picked.id)} facts={facts} unlisted={unlistedText(ladder, picked)} />
@@ -226,12 +235,13 @@ function RecipesTab({ tradeskill, level, ready, facts, memory, setMemory, restor
           pickedId={picked?.id ?? null}
           onPick={onPick}
           anchorLine={pickedLine >= 0 ? pickedLine : ladder.openLine}
-          resetKey={`${query}|${String(hideTrivial)}|${String(eraOnly)}`}
+          resetKey={`${query}|${String(hideTrivial)}|${String(eraOnly)}|${filters.key}`}
           ready={ready}
           restoreTop={restoreTop}
           parkAs={parkAs}
           parkOnLeave={parkOnLeave}
           log={log}
+          makeable={filters.makeable}
         />
       )}
     </>
