@@ -151,6 +151,7 @@ import {
   isNewerVersion,
   isStaleVersion,
   nextCheckDelayMs,
+  rescheduleAfterUpdateError,
   shouldRetryCheck
 } from '../shared/update'
 import { logError, logInfo, logWarn } from './errorLog'
@@ -356,6 +357,8 @@ interface StatusSinks {
    * about at the other end of the same wire.
    */
   retryOnResume: () => void
+  /** Re-arm the poll now, so a failure counted after the loop re-armed still gets its backoff. */
+  retrySoon: () => void
 }
 
 /**
@@ -456,7 +459,7 @@ function applyStagedUpdate(flushStore: () => void): void {
  */
 function registerUpdaterEvents(
   currentVersion: string,
-  { push, checkDone, retryOnResume }: StatusSinks
+  { push, checkDone, retryOnResume, retrySoon }: StatusSinks
 ): void {
   autoUpdater.on('checking-for-update', () => push({ state: 'checking' }))
 
@@ -558,7 +561,7 @@ function registerUpdaterEvents(
     // A download only runs when no valid file is cached, so its failure leaves nothing staged.
     if (step === 'download') rememberStaged(undefined)
     if (isInterruptedFailure(err)) {
-      noteInterrupted(step, err, { push, checkDone, retryOnResume })
+      noteInterrupted(step, err, { push, checkDone, retryOnResume, retrySoon })
       return
     }
     // JOS-211: an unreadable feed body is swallowed ONCE — no verdict, no telemetry, no
@@ -584,15 +587,20 @@ function registerUpdaterEvents(
     const kind = logUpdateFailure(step, 'final', err, LOG_SINKS)
     // A BLOCKED POWERSHELL IS NOT A REASON TO BACK OFF THE FEED (JOS-421). The check itself
     // succeeded — GitHub answered, the installer downloaded, and the failure happened afterwards in
-    // a child process on this PC. Walking `consecutiveFailures` out to four hours over it would
-    // punish the feed for the antivirus, and would slow the very re-check that is this failure's
-    // only automatic remedy. The download side stays bounded by `MAX_DOWNLOAD_ATTEMPTS`, which is
-    // what stops a hostile environment re-pulling the same installer forever; the sentence the user
-    // reads when that bound is reached names the cause (see `downloadBlocked` above).
+    // a child process on this PC. Counting it in `consecutiveFailures` would punish the feed for
+    // the antivirus, so the poll stays on its healthy spacing. The download side stays bounded by
+    // `MAX_DOWNLOAD_ATTEMPTS`, which is what stops a hostile environment re-pulling the same
+    // installer forever; the sentence the user reads when that bound is reached names the cause
+    // (see `downloadBlocked` above).
     if (kind === 'blocked') downloadBlocked = true
     else consecutiveFailures++
     noteUpdate(step, err ?? 'unknown error')
     checkDone({ state: 'error', message: describeUpdateFailure(err) })
+    // A FAILED DOWNLOAD RE-ARMS THE POLL ITSELF. The download runs after its check has returned,
+    // so the loop re-armed at the healthy spacing while `consecutiveFailures` was still 0, and the
+    // count above would never be read: the next check resets it before any delay is computed.
+    // Re-arming here, after the count, is what gives a failed download the 15 minute backoff.
+    if (rescheduleAfterUpdateError({ step, kind })) retrySoon()
   })
 }
 
@@ -722,11 +730,16 @@ export function initUpdater(
   applyChannel(getUpdateChannel())
 
   // THE SINKS, BUILT ONCE. Both the event handlers and `runCheck`'s rejection path route through
-  // the same three, which is what makes "one failure counts exactly once" checkable rather than
+  // the same four, which is what makes "one failure counts exactly once" checkable rather than
   // remembered. `schedule` is a `const` further down and is only ever REACHED from a timer, an IPC
   // call or an updater event — all of them after this function has finished running — so the arrow
   // closing over it can never observe the temporal dead zone.
-  const sinks: StatusSinks = { push, checkDone, retryOnResume: () => schedule('resume') }
+  const sinks: StatusSinks = {
+    push,
+    checkDone,
+    retryOnResume: () => schedule('resume'),
+    retrySoon: () => schedule('periodic')
+  }
   registerUpdaterEvents(currentVersion, sinks)
 
   // renderer -> main: apply the downloaded update NOW. Guarded on 'ready' because BaseUpdater

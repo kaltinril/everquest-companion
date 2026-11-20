@@ -95,6 +95,23 @@ export function nextCheckDelayMs(
   return jitter(backoff, rand)
 }
 
+/**
+ * Does this failure need the poll re-armed from the error handler?
+ *
+ * A failed CHECK does not: the poll loop re-arms itself when a check returns. A failed DOWNLOAD
+ * does. The download starts un-awaited after the check has returned, so the loop had already
+ * re-armed at the healthy spacing before the download died, and nothing else would look again for
+ * 3 to 5 hours. `MAX_DOWNLOAD_ATTEMPTS` bounds the retries this starts. A blocked signature check
+ * is left on the healthy spacing: it is this PC's security software, and each retry re-downloads
+ * the whole installer. An interruption has its own short retry and never reaches this.
+ */
+export function rescheduleAfterUpdateError(failure: {
+  step: 'check' | 'download'
+  kind: UpdateFailureKind
+}): boolean {
+  return failure.step === 'download' && failure.kind !== 'blocked' && failure.kind !== 'interrupted'
+}
+
 // ----------------------------------------------------- feed failure messages
 //
 // JOS-211. A 0.18.0 user pressed "Check for updates" and the app answered
