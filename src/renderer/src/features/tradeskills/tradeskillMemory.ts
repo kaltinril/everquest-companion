@@ -4,9 +4,10 @@
 //
 //   restart (localStorage)    the open workbench (absent: Home), the Hide trivial switch
 //   session (sessionStorage)  the search text, the picked recipe and the open tab (recipes, your
-//                             history, the guides), for the open workbench only (and whether a
-//                             link from another tab chose that recipe)
+//                             route, your history, the guides), for the open workbench only (and
+//                             whether a link from another tab chose that recipe)
 //
+// The route tab's own choices (the goal per tradeskill, the number of combines) are routeMemory.ts.
 // The era toggle is not here: it is the shared `eq.planner.era` (plannerData.useEraOnly).
 // A stored value degrades, never errors: anything unreadable is the default.
 
@@ -30,8 +31,8 @@ export function useHideTrivial(): [boolean, (next: boolean) => void] {
   return useBoolPref(HIDE_TRIVIAL_KEY, false)
 }
 
-/** The workbench's tabs: the recipe book, the player's own combines, the leveling guide. */
-export const BENCH_TABS = ['recipes', 'history', 'guides'] as const
+/** The workbench's tabs: the recipe book, the goal route, the player's own combines, the leveling guide. */
+export const BENCH_TABS = ['recipes', 'route', 'history', 'guides'] as const
 
 export type BenchTab = (typeof BENCH_TABS)[number]
 

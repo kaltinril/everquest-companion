@@ -455,6 +455,7 @@ async function main(): Promise<void> {
       await stepHistory(page, crafted)
       await stepGuides(page, LEVEL)
     }
+    await (await import('./tradeskillRouteSteps.mjs')).stepRoute(page)
     await (await import('./tradeskillPlanSteps.mjs')).stepPlanner(page) // Make an item and Maps at a merchant (written, not yet run)
 
     check('no renderer console errors', consoleErrors.length === 0, consoleErrors.slice(0, 3).join(' | '))
