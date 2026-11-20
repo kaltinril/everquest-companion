@@ -126,11 +126,15 @@ export const LOG_READ_SHORT: Readonly<Record<LogReadWait, string>> = {
 /** What a meter with no reply says when no wait explains it: the status is unknown, or is `ok`. */
 export const OVERLAY_LOADING = 'Loading…'
 
-/** The short label for the status, `Reading log 43%` while the log is read; empty for none. */
+/**
+ * The short label for the status, `Reading log 43%` while the log is read; empty for none.
+ * The number is printed only once the status shows: main sends numbers to a window only then
+ * (`main/logReadStatus.ts`), and before that the one a window holds would stand still.
+ */
 export function overlayLabel(report: LogReadReport | null): string {
   if (report === null) return ''
   const label = LOG_READ_SHORT[report.wait]
-  if (report.wait !== 'reading' || report.pct === null) return label
+  if (report.wait !== 'reading' || report.pct === null || !report.show) return label
   return `${label} ${String(Math.floor(report.pct))}%`
 }
 
