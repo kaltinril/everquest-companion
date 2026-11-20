@@ -558,6 +558,9 @@ pub struct EarlyWarnDue {
     /// number by construction, and adding the offset back is the honest expression of what this
     /// field means.
     pub due_at: i64,
+    /// The break watch this came from, so a warning that made no sound can hand the break back
+    /// ([`EarlyWarnings::release_break`]). `None` on the landing path, which keeps no watch.
+    pub break_key: Option<String>,
 }
 
 /// An arm that has found its row. `row_id` is the whole identity — its absence is the cancellation.
@@ -739,6 +742,7 @@ impl EarlyWarnings {
                 cooldown_key: a.arm.cooldown_key.clone(),
                 fired: a.arm.fired.clone(),
                 due_at: at + a.arm.sec * 1000,
+                break_key: None,
             });
         }
         for key in retire {
@@ -836,6 +840,9 @@ impl EarlyWarnings {
     /// The break warnings that have come due. A watch is NOT deleted when it fires — it stays,
     /// marked `spoken`, so the break line ending that same hold can be suppressed against it.
     /// [`Self::watch_breaks`] retires it the moment the row goes.
+    ///
+    /// `spoken` is set here, before anyone knows whether the warning sounds, so a watch never comes
+    /// due twice. A warning the cooldown then swallows is given back with [`Self::release_break`].
     fn advance_breaks(&mut self, rows: &[BuffTimerRow], now_ms: i64) -> Vec<EarlyWarnDue> {
         let mut due = Vec::new();
         for w in self.breaks.values_mut() {
@@ -855,9 +862,18 @@ impl EarlyWarnings {
                 cooldown_key: w.cooldown_key.clone(),
                 fired: w.fired.clone(),
                 due_at: at + w.sec * 1000,
+                break_key: Some(format!("{}{KEY_SEP}{}", w.alert_id, w.row_id)),
             });
         }
         due
+    }
+
+    /// Forget a break watch whose warning came due and made no sound (a cooldown swallowed it, or
+    /// the def has gone). Nothing was said about that hold, so its break line must fire on its own
+    /// trigger: AN EARLY BREAK IS NEVER SILENT. The watch is not filed again for this landing,
+    /// because its deadline is already past ([`Self::watch_row`]).
+    pub fn release_break(&mut self, key: &str) {
+        self.breaks.remove(key);
     }
 }
 
@@ -1312,6 +1328,32 @@ mod tests {
             !early.break_spoken("a1", &break_event_identity(&brk, &[])),
             "nothing spoke, so nothing is spent"
         );
+    }
+
+    /// A due warning names its watch, and releasing that watch hands the break back: the released
+    /// hold suppresses nothing, the other one still does, and neither comes due a second time.
+    #[test]
+    fn a_released_watch_no_longer_spends_its_break() {
+        let mut early = EarlyWarnings::default();
+        let rows = [
+            debuff_row("Dazzle", "a rat", 1_000, Some(24_000)),
+            debuff_row("Dazzle", "a bat", 1_000, Some(24_000)),
+        ];
+        let watchers = AlwaysWatching(10);
+        early.tick(2_000, &rows, &watchers);
+        let due = early.tick(15_000, &rows, &watchers);
+        assert_eq!(due.len(), 2);
+        early.release_break(due[1].break_key.as_deref().expect("a break watch"));
+
+        assert!(early.tick(16_000, &rows, &watchers).is_empty());
+        let brk = |mob: &str| {
+            Event::from_value(json!({
+                "kind": "cc", "seq": 1, "ts": 19_000, "raw": "b",
+                "mob": mob, "spell": "Dazzle", "refresh": true
+            }))
+        };
+        assert!(!early.break_spoken("a1", &break_event_identity(&brk("a bat"), &[])));
+        assert!(early.break_spoken("a1", &break_event_identity(&brk("a rat"), &[])));
     }
 
     /// A deadline already in the past never arms on the break path, unlike the landing path,

@@ -59,6 +59,7 @@ const MAX_HISTORY: usize = 800;
 /// How often a continuing sighting re-publishes. A fight prints several lines a second and every
 /// one names the mob, so recording a sighting is free but pushing it is not.
 const SEEN_REFRESH_MS: i64 = 5_000;
+/// Most rows published for zones other than the one you stand in (`collect`).
 const RESPAWN_MAX_ROWS: usize = 60;
 const RESPAWN_MAX_RECENT: usize = 40;
 /// The working the Running entry prints — the last six qualifying gaps.
@@ -697,9 +698,15 @@ impl RespawnModule {
         // and so is `Array.prototype.sort`, which keeps ties in LRU order on both sides.
         let mut entries: Vec<&MobHistory> = self.history.values().collect();
         entries.sort_by_key(|h| std::cmp::Reverse(h.last_ts));
+        // The cap is for the other zones. Every clock of the zone you stand in is published, each
+        // tier and instance of it: the overlay reads a missing row there as "none killed here yet".
+        let here = places::zone_base(&self.zone);
+        let mut elsewhere = 0;
         for h in entries {
             if let Some(row) = self.row_for(h) {
-                if rows.len() < RESPAWN_MAX_ROWS {
+                let standing = places::zone_base(&h.zone) == here;
+                if standing || elsewhere < RESPAWN_MAX_ROWS {
+                    elsewhere += usize::from(!standing);
                     rows.push(row);
                 }
             }

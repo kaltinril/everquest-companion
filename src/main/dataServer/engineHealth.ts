@@ -235,8 +235,10 @@ export async function engineHealthCheck(opts: HealthProbeOptions): Promise<Engin
  * with a race), and the transport rightly claims it. This forwards rather than competes: the
  * transport's handler runs first and unchanged, then ours. Everything else passes straight through,
  * so this adds no behaviour of its own and cannot become a second opinion about the wire.
+ *
+ * Exported for `engineClientHost.ts`, whose long-lived connection needs the same clean hang-up.
  */
-function watchClose(channel: ByteChannel, onEnd: () => void): ByteChannel {
+export function watchClose(channel: ByteChannel, onEnd: () => void): ByteChannel {
   return {
     write: (chunk) => channel.write(chunk),
     onData: (handler) => channel.onData(handler),

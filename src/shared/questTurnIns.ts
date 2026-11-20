@@ -250,7 +250,25 @@ export function takeBackTurnIn(
   const cut = instants[instants.length - 1]
   if (cut === undefined) return { instants: [] }
   const kept = instants.filter((ts) => ts !== cut)
-  return detected.includes(cut) ? { instants: kept, rejected: [...rejected, cut] } : { instants: kept }
+  return undoRejectsDetection(instants, detected) ? { instants: kept, rejected: [...rejected, cut] } : { instants: kept }
+}
+
+/**
+ * Would an undo take back a turn-in the LOG shows, and so reject it for good? The undo's own
+ * question, asked ahead of the click so the hover says what the click will do: it cuts the NEWEST
+ * instant whoever recorded it, so comparing counts answers wrongly when a hand-recorded turn-in is
+ * older than a log one.
+ */
+export function undoRejectsDetection(instants: readonly number[], detected: readonly number[]): boolean {
+  const newest = instants[instants.length - 1]
+  return newest !== undefined && detected.includes(newest)
+}
+
+/** `undoRejectsDetection` per quest key, over the merged ledger and the log's own list. */
+export function undoRejections(instants: TurnInInstants, detected: TurnInInstants): Record<string, boolean> {
+  const out: Record<string, boolean> = {}
+  for (const [key, list] of Object.entries(instants)) out[key] = undoRejectsDetection(list, detected[key] ?? [])
+  return out
 }
 
 /** THE RESET, per quest: nothing turned in, every detection the log shows today rejected. */

@@ -780,10 +780,10 @@ impl EngineState {
     }
 
     /// Freeze the live zone aggregate into the capped history, before the aggregate is reset, so the
-    /// just-left zone's overall meter stays selectable. A stay that saw no attributed damage is
-    /// dropped.
+    /// just-left zone's overall meter stays selectable. A stay that holds nothing of yours is
+    /// dropped: an empty one, and one where only other combatants fought while you passed through.
     pub fn finalize_zone_session(&mut self, closed_by: ZoneSessionClose) {
-        if self.zone_agg.is_empty() {
+        if self.zone_agg.nothing_of_ours() {
             return;
         }
         self.zone_seq += 1;

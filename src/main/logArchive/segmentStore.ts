@@ -122,6 +122,19 @@ export function listSegments(dir: string, character?: string): SegmentListing {
   return out
 }
 
+/**
+ * Where a segment's archive is now, or null when it cannot be found. The record stores the full
+ * path the archive was written to, and the archive folder sits in the game's Logs folder
+ * (liveHistory.ts `logArchiveDir`): once EverQuest is moved or reinstalled elsewhere that path is
+ * stale, while the archive is in `dir`, the folder the record itself was listed from.
+ */
+export function resolveArchivePath(dir: string, segment: Segment): string | null {
+  if (segment.archivePath === null) return null
+  if (existsSync(segment.archivePath)) return segment.archivePath
+  const name = segment.archivePath.split(/[\\/]/).pop() ?? ''
+  return name !== '' && existsSync(join(dir, name)) ? join(dir, name) : null
+}
+
 /** Write (or replace) one segment, durably. */
 export function writeSegment(dir: string, segment: Segment): void {
   writeFileDurable(dir, segmentPath(dir, segment.id), JSON.stringify(segment))

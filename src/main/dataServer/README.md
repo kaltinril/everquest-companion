@@ -119,7 +119,7 @@ serving sentence, and (JOS-501) drops an `engine:live` breadcrumb. That instant 
 `*.define` pushes are made from `attachAndProbe`, which RETURNS EARLY when this app has no character
 attached — "the engine is left idle". That early return is exactly the launch a served character list
 matters most on: a fresh install has nothing to attach to and a picker that has to draw one anyway.
-So the directory is pushed from `openConnection`, before anything can decide there is nothing to do.
+So the directory is pushed from `afterConnect`, before anything can decide there is nothing to do.
 It is also the one push that is not a fold input — the five change what folding a log produces and
 must precede a fold; a directory changes no fold at all, so its placement buys reachability rather
 than correctness.
@@ -393,6 +393,14 @@ the measurement that ruled it out is worth keeping because it will keep looking 
 A single frame that already sits three quarters of the way to a hard limit is not a design with
 headroom, it is a design with a date on it — and the failure when it arrives is a refused frame at
 the transport, not a graceful degradation.
+
+> **Since fork #9 (2026-11-19) the numbers above are history, and the ruling stands.** A whole-log
+> reply did reach that ceiling (the largest grows about 12.6 KB per MB of log), and passing it
+> closed main's one connection for good. An engine connection now reads one message up to **64 MiB**
+> (`ndjson.ts MAX_MESSAGE_CHARS`; `MAX_LINE_CHARS` is still 8 MiB and still guards the child's
+> stdout and stderr). A longer one is dropped and fails only the request it answered, and main hands
+> a window nothing over **32 MiB** (`replySizes.ts MAX_FORWARD_CHARS`). That is a failure with a
+> name instead of a dead connection. It is not headroom to design a bulk frame into.
 
 **THE DIRECTION, ruled:**
 

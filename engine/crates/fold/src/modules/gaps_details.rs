@@ -84,7 +84,8 @@ pub struct Details {
     killers: Tally,
     /// A spell: who cast it, player-shaped names kept as they are; `you` for the player's own.
     casters: Tally,
-    /// An item: what an instant sale on loot paid — a discounted floor, never the vendor price.
+    /// An item: what an instant sale on loot paid for ONE of it (`coin_each`) — a discounted floor,
+    /// never the vendor price.
     sales: Tally,
     /// An item: what a purchase line paid, the whole stack's price.
     paid: Tally,
@@ -122,6 +123,24 @@ pub(crate) fn coin_of(clause: &str) -> Option<(String, i64)> {
         words.push(format!("{amount} {}", &m[2]));
     }
     (!words.is_empty()).then(|| (words.join(" "), copper))
+}
+
+/// One item's coin out of a looted stack's: the sale line's coin covers the whole stack (`You looted
+/// 2 Spider Silk … sold it for 2 gold, 8 silver and 6 copper`, twice the single's 1 gold 4 silver 3
+/// copper), and the tab and a copied page read each `sales` entry as ONE item's price. Spelled as
+/// [`coin_of`] spells a line's, so a stack and a single land on one entry. `None` when the coin does
+/// not divide evenly: no price is guessed.
+fn coin_each(coin: &str, copper: i64, count: i64) -> Option<String> {
+    if count <= 1 {
+        return Some(coin.to_string());
+    }
+    if copper % count != 0 {
+        return None;
+    }
+    let each = copper / count;
+    let parts = [(each / 1000, "platinum"), (each / 100 % 10, "gold"), (each / 10 % 10, "silver"), (each % 10, "copper")];
+    let words: Vec<String> = parts.iter().filter(|(n, _)| *n > 0).map(|(n, w)| format!("{n} {w}")).collect();
+    Some(words.join(" "))
 }
 
 /// The coin a line printed after the last `marker`, up to the final full stop — see [`coin_of`].
@@ -205,7 +224,9 @@ impl Details {
                 self.sources.add(source.unwrap_or_default());
                 self.dispositions.add(ev.str("disposition").unwrap_or_default());
                 if let Some((coin, copper)) = price_of(ev.raw(), " and sold it for ") {
-                    self.sales.add(&coin);
+                    if let Some(each) = coin_each(&coin, copper, ev.int("count").unwrap_or(1)) {
+                        self.sales.add(&each);
+                    }
                     self.sales_copper += copper;
                 }
             }
@@ -273,8 +294,9 @@ impl Serialize for Details {
             }
         }
         // Every name past the cap: the tab's zone filter reads `zones`, a page's `|foraged` lists
-        // every forage zone.
-        for (name, tally) in [("zones", &self.zones), ("forageZones", &self.forage_zones)] {
+        // every forage zone, and a page's `level` is the lowest to the highest /con (the capped
+        // entries drop the readings seen least, which are the ends of the range).
+        for (name, tally) in [("zones", &self.zones), ("forageZones", &self.forage_zones), ("cons", &self.cons)] {
             if let Some(list) = out.get_mut(name) {
                 let mut all: Vec<&String> = tally.0.keys().collect();
                 all.sort();

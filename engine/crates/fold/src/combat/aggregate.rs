@@ -356,7 +356,8 @@ pub struct Agg {
     /// The minute-window ledger the Tier-B counterfactual is computed from. On the `Agg` for the
     /// same reason again: a finalized zone session inherits it frozen.
     pub windows: WindowAccum,
-    /// Your and your pets' attacking time taken together: the You scope's clock.
+    /// Your and your pets' attacking time taken together: the You scope's clock. Two writers: a row
+    /// door (`stamp_self`) and a claim that moves a recorded row to your pet (`rekey.rs move_out`).
     pub self_clock: OwnClock,
     /// The instant and the fight (encounter counter, 0 for none) of the line being folded, set by
     /// `at` (ownclock.rs) before a row is written so every row door stamps its clock the same way.
@@ -377,14 +378,21 @@ impl Agg {
         map.values().map(|t| t.amount).sum()
     }
 
-    /// True when this aggregate recorded nothing at all — the drop rule `finalize_current` and
-    /// `finalize_zone_session` are gated on, so a shell opened by a mez that somebody else killed
-    /// never reaches the history or the zone-session picker.
+    /// True when this aggregate recorded nothing at all — the drop rule `finalize_current` is gated
+    /// on, so a shell opened by a mez that somebody else killed never reaches the history.
     ///
     /// Map emptiness, not a total: a miss creates a source row with no damage, and that encounter is
     /// kept because the hit-rate is real even when the damage is zero.
     pub fn is_empty(&self) -> bool {
         self.out.is_empty() && self.inc.is_empty()
+    }
+
+    /// True when nothing here is yours: no damage you took, and no row but other combatants' and
+    /// their pets', which are booked with no fight of yours open. The drop rule
+    /// `finalize_zone_session` is gated on, so a zone you only passed through is not a session.
+    pub fn nothing_of_ours(&self) -> bool {
+        let theirs = |s: &SourceStat| matches!(s.kind, SourceKind::Other | SourceKind::AllyPet);
+        self.inc.is_empty() && self.out.values().all(theirs)
     }
 
     /// Re-state a row's identity from the ref that just arrived: latest display name wins, and the

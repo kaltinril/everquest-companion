@@ -48,6 +48,8 @@ export interface LogArchiveStatus {
   dumps: DumpAdvice | null
   /** Why archiving the log is not possible right now; empty when it is. */
   rotateBlockers: string[]
+  /** The player put this log back, so the automatic archive leaves it until Archive now. */
+  autoPaused: boolean
   /** An action in progress, if any. */
   busy: string | null
 }

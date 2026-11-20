@@ -379,21 +379,24 @@ test('SHARED READS STILL TIME OUT: joiners of a silent engine are handed back by
   assert.notEqual(got[0], got[1])
 })
 
-test('SHARING IS PER QUESTION: another module, an unshared call, and a later call each ask', async () => {
+test('SHARING IS PER QUESTION: another module and a later call each ask; a plain serve joins the wire', async () => {
   const r = rig({ kind: 'answering', result: snap('buffs', 4, ENGINE_STATE) })
   const calls = { n: 0 }
 
-  await Promise.all([
+  const got = await Promise.all([
     r.shim.serveShared(OP, { module: 'buffs' }, project('buffs'), freshShape(calls)),
     r.shim.serveShared(OP, { module: 'loot' }, project('loot'), freshShape(calls)),
-    // Plain `serve` is the old one-request-per-call path, unchanged.
-    r.shim.serve(OP, { module: 'buffs' }, project('buffs'), freshShape(calls))
+    // Plain `serve` keeps its OWN projection and its own wait, but not its own request (fork #9):
+    // what is joined on the wire is the engine's reply, before anybody projects it.
+    r.shim.serve(OP, { module: 'buffs' }, (reply) => ({ seq: reply.seq, state: 'projected apart' }), freshShape(calls))
   ])
-  assert.equal(r.sent.length, 3, 'two different questions, plus one plain `serve`')
+  assert.equal(r.sent.length, 2, 'two different questions; the plain `serve` asked one of them')
+  assert.deepEqual(got[0], { seq: 4, state: ENGINE_STATE })
+  assert.deepEqual(got[2], { seq: 4, state: 'projected apart' }, 'its own projection of the one reply')
 
   // Not a cache: the read settled, so the next caller asks again.
   await r.shim.serveShared(OP, { module: 'buffs' }, project('buffs'), freshShape(calls))
-  assert.equal(r.sent.length, 4)
+  assert.equal(r.sent.length, 3)
 })
 
 test('flushNotes on an empty tally says nothing at all — silence is the served state', async () => {

@@ -34,6 +34,7 @@ import type {
   KnowledgeMissMessage,
   ModuleChangedMessage
 } from './protocol.generated'
+import { callEach } from './listeners'
 
 /** One frame kind's listeners. */
 type Fanout<T> = Set<(message: T) => void>
@@ -87,23 +88,25 @@ export type Broadcast =
  */
 export function deliver(
   broadcasts: Broadcasts,
-  message: EngineMessage
+  message: EngineMessage,
+  debug: (note: string) => void
 ): message is Broadcast {
   switch (message.kind) {
     case 'fire':
-      return fan(broadcasts.fire, message)
+      return fan(broadcasts.fire, message, debug)
     case 'conCard':
-      return fan(broadcasts.conCard, message)
+      return fan(broadcasts.conCard, message, debug)
     case 'moduleChanged':
-      return fan(broadcasts.moduleChanged, message)
+      return fan(broadcasts.moduleChanged, message, debug)
     case 'knowledgeMiss':
-      return fan(broadcasts.knowledgeMiss, message)
+      return fan(broadcasts.knowledgeMiss, message, debug)
     default:
       return false
   }
 }
 
-function fan<T>(fanout: Fanout<T>, message: T): true {
-  for (const listener of fanout) listener(message)
+function fan<T>(fanout: Fanout<T>, message: T, debug: (note: string) => void): true {
+  // Guarded (listeners.ts): a listener that throws must not fail the connection.
+  callEach(fanout, message, debug, 'broadcast')
   return true
 }

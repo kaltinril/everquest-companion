@@ -5,7 +5,9 @@
 //! from the Corrupted Kedgespawn fight once it named Malkil its leader). Into a row already there it is
 //! summed. Apart from `state.rs` and `aggregate.rs`, which sit at their recorded sizes.
 
-use super::aggregate::{Agg, CategoryStat, ModifierTally, SkillStat, SourceRef, SourceStat};
+use super::aggregate::{
+    Agg, CategoryStat, ModifierTally, SkillStat, SourceKind, SourceRef, SourceStat,
+};
 use super::state::EngineState;
 use crate::jsmap::JsMap;
 
@@ -16,6 +18,12 @@ impl Agg {
         let Some(mut row) = self.out.take(from) else {
             return false;
         };
+        // A row a claim brings into the You scope brings its swing time too, or the You headline
+        // divides the pet's damage by your seconds alone (`self_clock`'s second writer).
+        let own = |k| matches!(k, SourceKind::You | SourceKind::Pet);
+        if own(to.kind) && !own(row.kind) {
+            self.self_clock.merge(row.clock.clone());
+        }
         match self.out.get_mut(&to.id) {
             Some(into) => merge_source(into, row),
             None => {

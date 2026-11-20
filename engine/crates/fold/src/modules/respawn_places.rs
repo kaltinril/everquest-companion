@@ -9,7 +9,7 @@ use crate::modules::respawn_learned::least;
 
 /// A zone line's base name, lowercase: the tier, any `- Solo`/`- Group` and a private instance's
 /// `[instance N]` tag stripped. `Lake Nerius 4 (Refined) [instance 17]` and `Lake Nerius` are one.
-fn zone_base(zone: &str) -> String {
+pub(super) fn zone_base(zone: &str) -> String {
     let bare = zone.split(" [instance ").next().unwrap_or(zone);
     crate::jsfn::zone_tier(bare).0.to_lowercase()
 }

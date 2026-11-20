@@ -111,7 +111,7 @@ function SegmentLine(props: { s: SegmentRow; newest: boolean; run: (p: Promise<L
           <ConfirmButton
             testId="log-archive-restore"
             label="Put back"
-            confirm="Join this archive back onto the front of your current log, oldest first, so nothing is lost. The app then restarts to read it."
+            confirm="Join this archive back onto the front of your current log, oldest first, so nothing is lost. The app then restarts to read it. The log then stays whole until you press Archive now."
             onGo={() => props.run(window.eq.logArchiveRestore(s.id))}
           />
         )}
@@ -169,6 +169,14 @@ function OnPanel(props: { st: LogArchiveStatus; run: (p: Promise<LogArchiveReply
   )
 }
 
+/** What the switch does right now. A log the player put back is left alone until Archive now. */
+function switchCaption(st: LogArchiveStatus): string {
+  const limit = fmtBytes(AUTO_ARCHIVE_BYTES)
+  if (!st.enabled) return `Off. Keeps your log small: past ${limit}, it is archived and a fresh one starts, and your kills, loot and levels keep showing.`
+  if (st.autoPaused) return 'On. You put this log back, so it stays whole until you press Archive now.'
+  return `On. Past ${limit}, your log is archived and a fresh one starts.`
+}
+
 export function LogArchiveSetting(): JSX.Element {
   const [st, setSt] = useState<LogArchiveStatus | null>(null)
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
@@ -204,9 +212,7 @@ export function LogArchiveSetting(): JSX.Element {
         label={<Typography variant="body2">Summarize and archive log</Typography>}
       />
       <Typography variant="caption" color="text.secondary">
-        {st.enabled
-          ? `On. Past ${fmtBytes(AUTO_ARCHIVE_BYTES)}, your log is archived and a fresh one starts.`
-          : `Off. Keeps your log small: past ${fmtBytes(AUTO_ARCHIVE_BYTES)}, it is archived and a fresh one starts, and your kills, loot and levels keep showing.`}
+        {switchCaption(st)}
       </Typography>
       {offAsking && (
         <Stack direction="row" spacing={1} alignItems="center">

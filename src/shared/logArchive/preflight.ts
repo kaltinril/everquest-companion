@@ -7,6 +7,15 @@
  *  about 20 s at launch (measured ~5.4 MB/s). */
 export const AUTO_ARCHIVE_BYTES = 100 * 1024 ** 2
 
+/**
+ * Does the automatic check archive now? Never a log the player put back (eligible.ts
+ * `putBackInLive`): it is over the limit by construction, and the put back restarts the app, so
+ * the launch check would undo it within a minute. It waits for Archive now.
+ */
+export function autoArchiveDue(p: { on: boolean; liveBytes: number; putBack: boolean }): boolean {
+  return p.on && p.liveBytes >= AUTO_ARCHIVE_BYTES && !p.putBack
+}
+
 export interface PreflightInput {
   /** Summarize and archive log is on. */
   on: boolean
@@ -21,11 +30,25 @@ export interface PreflightInput {
   logBytes: number
   /** An earlier archive was interrupted and is not yet finished. */
   interrupted: boolean
+  /** Why this run could not finish it (the launch recovery's answer, or the archive's own), with
+   *  where the old log is kept. Absent when the run that started it died: the next start has not
+   *  tried yet. Kept in memory, never in the journal: every start tries again and says again. */
+  interruptedReason?: string | null
   /** Another log-archive action is running. */
   busy: boolean
-  /** The log was already archived since the app started. The engine still holds the archived
-   *  lines until the next launch, so a second capture would count them twice. */
+  /** This character's log was already archived since the app started. The engine still holds the
+   *  archived lines until the next launch, so a second capture would count them twice. */
   archivedThisRun?: boolean
+  /** A put back of the newest archive stopped part-way. Its scratch files hold the lines since,
+   *  and only that archive's Put back joins them (rotate.ts restoreLog), so it must stay newest. */
+  putBackUnfinished?: boolean
+}
+
+/** A restart finishes an archive the last run died in. One this run already failed to finish
+ *  gets its reason instead: a restart may meet the same fault. */
+function interruptedText(reason: string | null): string {
+  if (reason === null) return 'An earlier archive was interrupted. Restart the app to finish it first.'
+  return `An earlier archive could not be finished: ${reason}. The app tries again each time it starts.`
 }
 
 export function rotateBlockers(p: PreflightInput): string[] {
@@ -35,9 +58,10 @@ export function rotateBlockers(p: PreflightInput): string[] {
   if (p.hasLog && !p.engineLive) out.push('The app is still reading your log. Try again when it has caught up.')
   if (!p.sameDrive) out.push('The archive folder is on a different drive from your log, so the log cannot be moved in one step.')
   if (p.freeBytes !== null && p.freeBytes < p.logBytes) out.push('There is not enough free space for the archive.')
-  if (p.interrupted) out.push('An earlier archive was interrupted. Restart the app to finish it first.')
+  if (p.interrupted) out.push(interruptedText(p.interruptedReason ?? null))
   if (p.busy) out.push('Another log archive action is running.')
   if (p.archivedThisRun === true) out.push('Your log was already archived since the app started. It can be archived again after a restart.')
+  if (p.putBackUnfinished === true) out.push('A put back did not finish. Press Put back on the newest archive to finish it first.')
   return out
 }
 

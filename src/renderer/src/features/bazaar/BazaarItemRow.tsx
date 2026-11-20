@@ -7,7 +7,7 @@
 
 import { type JSX, memo, useMemo } from 'react'
 import { Chip, Stack, TableCell, TableRow } from '@mui/material'
-import { formatPlat, sparkline, type BazaarItem } from '@shared/bazaar'
+import { formatPlat, formatPlatExact, sparkline, type BazaarItem } from '@shared/bazaar'
 import type { BazaarWatch } from '@shared/bazaarWatch'
 import { BazaarSparkline } from './BazaarChart'
 import { ItemIcon, ItemName, priceOf } from './BazaarItemCells'
@@ -28,10 +28,10 @@ export function BazaarPadRow({ height }: { height: number }): JSX.Element | null
   )
 }
 
-/** The row's watch chip: what alerts on it, or only that it is watched. */
+/** The row's watch chip: what alerts on it, or only that it is watched. Thresholds in full, as typed. */
 function watchChipLabel(w: BazaarWatch): string {
-  const wts = w.wtsMax !== null ? `WTS ≤ ${formatPlat(w.wtsMax)}` : w.wtsShare !== null ? `WTS ≤ ${Math.round(w.wtsShare * 100)}% median` : 'WTS'
-  const on = [w.wts ? wts : '', w.wtb ? (w.wtbMin !== null ? `WTB ≥ ${formatPlat(w.wtbMin)}` : 'WTB') : ''].filter((s) => s !== '')
+  const wts = w.wtsMax !== null ? `WTS ≤ ${formatPlatExact(w.wtsMax)}` : w.wtsShare !== null ? `WTS ≤ ${Math.round(w.wtsShare * 100)}% median` : 'WTS'
+  const on = [w.wts ? wts : '', w.wtb ? (w.wtbMin !== null ? `WTB ≥ ${formatPlatExact(w.wtbMin)}` : 'WTB') : ''].filter((s) => s !== '')
   return on.length === 0 ? 'Watch' : `Watch: ${on.join(' + ')}`
 }
 

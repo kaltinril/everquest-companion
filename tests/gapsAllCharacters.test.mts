@@ -20,6 +20,7 @@ import {
   nameFromId,
   otherCharacters,
   otherInputs,
+  othersGaps,
   ownSince,
   parseSavedGaps,
   seenByKey,
@@ -93,6 +94,28 @@ test('a saved file round-trips through the parser; a foreign or older one is ref
   assert.equal(parseSavedGaps(null), null)
 })
 
+test('a saved file whose module is missing its state is refused, not handed to the join', () => {
+  const s = saved('drywrought_oggok', 'head-D', { gaps: gaps([]), loot: [], kills: kills('rat', 1) })
+  assert.equal(parseSavedGaps({ ...s, modules: { ...s.modules, gaps: null } }), null)
+  assert.equal(parseSavedGaps({ ...s, modules: { ...s.modules, loot: 'x' } }), null)
+})
+
+test('one character whose saved state will not join is named unreadable and never hides the others', () => {
+  // A row from before details existed, on both the archive and the saved side: the merge throws on it.
+  const bare = { domain: 'item', name: 'Old Widget', kinds: ['looted'], count: 1, first: '', last: '' } as unknown as GapRow
+  const bad = saved('bad_oggok', 'head-B', { gaps: gaps([bare]), loot: [], kills: null })
+  const badArchive = segment({ id: 'b-old', character: 'bad_oggok', head: 'head-old', last: '2026-09-15 10:00:00' }, { gaps: { seq: 1, state: gaps([bare]) } })
+  const good = saved('drywrought_oggok', 'head-D', { gaps: gaps([row('item', 'Bat Wing', 2)]), loot: [], kills: null })
+  const failures: string[] = []
+  const others = othersGaps({ saved: [bad, good], segments: [badArchive] }, 'kaltinril_oggok', null, (id) => failures.push(id))
+  assert.deepEqual(others.map((c) => [c.character, c.name, c.unreadable === true]), [['bad_oggok', 'Bad', true], ['drywrought_oggok', 'Drywrought', false]])
+  assert.deepEqual(failures, ['bad_oggok'])
+  assert.deepEqual((others[1].gaps as GapsSnap).rows.map((r) => r.name), ['Bat Wing'])
+  // The unreadable one joins as nothing.
+  const j = joinCharacters([{ label: 'Live', gaps: gaps([]), loot: [], kills: null }, ...otherInputs(others, () => false)], null)
+  assert.deepEqual(j.gaps?.rows.map((r) => r.name), ['Bat Wing'])
+})
+
 test('a character id names its character', () => {
   assert.deepEqual(nameFromId('drywrought_oggok'), { name: 'Drywrought', server: 'oggok' })
   assert.deepEqual(nameFromId('kaltinril_freeport'), { name: 'Kaltinril', server: 'freeport' })
@@ -154,6 +177,45 @@ test('the join: rows add up across characters and each row names who saw it', ()
   assert.equal(j.kills?.mobs.gnoll.count, 2)
 })
 
+test("the join keeps the attached character's merchant stock, hail answer and quest facts over another character's", () => {
+  // inputs[0] is the attached character: its live reading stands, as it does over its own archive.
+  const with_ = (r: GapRow, extra: Record<string, unknown>): GapRow => ({ ...r, ...extra }) as GapRow
+  const live = gaps([
+    with_(row('merchant', 'Kogg', 20), { kinds: ['quoted', 'hailed'], itemsSold: [{ item: 'Ale' }, { item: 'Mead' }], greeting: 'Hi', role: 'Merchant' }),
+    with_(row('item', 'Plea to Freeport', 2), { questFacts: { turnedInTo: [{ npc: 'Sir Mollin', n: 2 }] } }),
+    row('item', 'Bat Wing', 1)
+  ])
+  const alt = gaps([
+    with_(row('merchant', 'Kogg', 1), { kinds: ['quoted'], itemsSold: [{ item: 'Ale' }] }),
+    with_(row('item', 'Plea to Freeport', 1), { questFacts: { turnedInTo: [{ npc: 'Other', n: 1 }] } }),
+    with_(row('item', 'bat wing', 4), { questFacts: { turnedInTo: [{ npc: 'Only The Alt Saw', n: 1 }] } })
+  ])
+  const third = gaps([with_(row('merchant', 'Kogg', 1), { kinds: ['sold'], greeting: 'Bye', itemsSold: [] })])
+  const inputs = [{ label: 'Live', gaps: live, loot: [], kills: null }, { label: 'Alt', gaps: alt, loot: [], kills: null }, { label: 'Third', gaps: third, loot: [], kills: null }]
+  const j = joinCharacters(inputs, null)
+  const of = (domain: string, name: string): Record<string, unknown> => j.gaps?.rows.find((r) => r.domain === domain && r.name === name) as unknown as Record<string, unknown>
+  const kogg = of('merchant', 'Kogg')
+  assert.deepEqual(kogg.itemsSold, [{ item: 'Ale' }, { item: 'Mead' }])
+  assert.equal(kogg.greeting, 'Hi')
+  assert.equal(kogg.role, 'Merchant')
+  assert.deepEqual(of('item', 'Plea to Freeport').questFacts, { turnedInTo: [{ npc: 'Sir Mollin', n: 2 }] })
+  // The tallies still add up once each, the attached character's spelling and kinds still lead.
+  assert.equal(kogg.count, 22)
+  assert.deepEqual(kogg.kinds, ['quoted', 'hailed', 'sold'])
+  assert.equal(of('item', 'Bat Wing').count, 5)
+  // What only another character saw is kept: the attached character's row says nothing against it.
+  assert.deepEqual(of('item', 'Bat Wing').questFacts, { turnedInTo: [{ npc: 'Only The Alt Saw', n: 1 }] })
+  assert.deepEqual(j.seenBy.get(seenByKey({ domain: 'merchant', name: 'Kogg' })), ['Live', 'Alt', 'Third'])
+  assert.deepEqual(j.gaps?.totals.merchant, 1)
+})
+
+test("the join never brings back an attached character's row that fell past a domain's cap", () => {
+  const many = gaps(Array.from({ length: 500 }, (_, i) => row('item', `Item ${String(i).padStart(4, '0')}`, 2)))
+  const j = joinCharacters([{ label: 'Live', gaps: gaps([row('item', 'Zed', 1)]), loot: [], kills: null }, { label: 'Alt', gaps: many, loot: [], kills: null }], null)
+  assert.equal(j.gaps?.rows.some((r) => r.name === 'Zed' || r.count === 0), false)
+  assert.equal(j.gaps?.rows.length, many.rows.length)
+})
+
 test("the join cuts every character's rows to the window; loot and kills join whole", () => {
   const cut = { stamp: '2026-10-01 00:00:00', ms: 2000 }
   const k = { label: 'K', gaps: gaps([row('item', 'New', 1, '2026-10-05 00:00:00'), row('item', 'Old', 1, '2026-09-05 00:00:00')]), loot: [...loot('New', 3000), ...loot('Old', 1000)], kills: kills('rat', 1000) }
@@ -174,6 +236,21 @@ test("another character's mob row the catalog now knows is dropped", () => {
   const o: CharacterGaps = { character: 'd_o', name: 'D', server: 'o', savedAt: null, archives: 0, gaps: gaps([row('mob', 'a rat', 1), row('mob', 'a zork', 1)]), loot: [], kills: null }
   const [inp] = otherInputs([o], (n) => n === 'a rat')
   assert.deepEqual((inp.gaps as GapsSnap).rows.map((r) => r.name), ['a zork'])
+})
+
+test("another character's quest-giver, redirect and zone-titled Mobs rows survive the catalog re-check: their names are known by design", () => {
+  // Each is a row about a name the wiki HAS a page for (add its quests; check its redirect; a page
+  // for this zone beside another zone's), so the catalog always knows the name. Only a plain
+  // unknown-name row closes when a page appears.
+  const giver = { ...row('mob', 'Lord Ollix Everling', 1), questGaps: { page: 'Lord Ollix Everling', quests: ['The Tragic Tale of House Everling'] } }
+  const redirect = { ...row('mob', 'Hoptor Thaggelum', 1), viaRedirect: 'The Ghoul Lord' }
+  const zoned = { ...row('mob', 'a kobold', 1), zoneTitled: true as const }
+  const o: CharacterGaps = { character: 'd_o', name: 'D', server: 'o', savedAt: null, archives: 0, gaps: gaps([giver, redirect, zoned, row('mob', 'a rat', 1)]), loot: [], kills: null }
+  const others = otherInputs([o], () => true)
+  assert.deepEqual((others[0].gaps as GapsSnap).rows.map((r) => r.name), ['Lord Ollix Everling', 'Hoptor Thaggelum', 'a kobold'])
+  const j = joinCharacters([{ label: 'Live', gaps: gaps([]), loot: [], kills: null }, ...others], null)
+  assert.deepEqual(j.gaps?.rows.find((r) => r.name === 'Lord Ollix Everling')?.questGaps?.quests, ['The Tragic Tale of House Everling'])
+  assert.deepEqual(j.seenBy.get(seenByKey({ domain: 'mob', name: 'Lord Ollix Everling' })), ['D'])
 })
 
 test('two characters of one name are told apart by server', () => {

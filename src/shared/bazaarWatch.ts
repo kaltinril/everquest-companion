@@ -12,7 +12,7 @@
 // One app-wide list, not per character: what an item sells for does not change with who asks.
 // Stored through the settings store (main/storeBazaarWatch.ts) and normalized on both sides.
 
-import { formatPlat, median, type BazaarRow, type BazaarSnap, type LiveOffer } from './bazaar'
+import { formatPlat, formatPlatExact, median, type BazaarRow, type BazaarSnap, type LiveOffer } from './bazaar'
 
 export interface BazaarWatch {
   /** The item page's spelling, as the bazaar rows carry it. */
@@ -104,11 +104,28 @@ export function watchKey(item: string, tier: number | null): string {
   return `${item.toLowerCase()}|${tier ?? '*'}`
 }
 
-/** The watch that covers this item and tier: its own tier's first, else the every-tier one. */
+/**
+ * The watch that covers this item and tier: its own tier's first, else the every-tier one. It is the
+ * watch the panel shows and edits; which watch an offer alerts under is `alertingWatch`.
+ */
 export function findWatch(list: BazaarWatchlist, item: string, tier: number): BazaarWatch | null {
   const lower = item.toLowerCase()
   const on = list.entries.filter((w) => w.item.toLowerCase() === lower)
   return on.find((w) => w.tier === tier) ?? on.find((w) => w.tier === null) ?? null
+}
+
+/**
+ * The watch that decides whether this live offer alerts. The tier's own watch decides the side it
+ * has on (its price wins over the every-tier one); a side it leaves off falls to the every-tier
+ * watch, so a WTB tick on +4 never silences "Every tier" WTS on +4.
+ */
+export function alertingWatch(list: BazaarWatchlist, o: LiveOffer): BazaarWatch | null {
+  const own = findWatch(list, o.item, o.tier)
+  if (own === null) return null
+  const sideOn = o.dir === 'sell' ? own.wts : own.wtb
+  if (own.tier === null || sideOn) return own
+  const lower = o.item.toLowerCase()
+  return list.entries.find((w) => w.tier === null && w.item.toLowerCase() === lower) ?? own
 }
 
 /** Any watch on this item, its tier's or not: the row's chip, when a row stands for every tier. */
@@ -152,7 +169,8 @@ export function watchAlertReason(w: BazaarWatch, o: LiveOffer, weekMedian: numbe
 function wtsReason(w: BazaarWatch, price: number | null, weekMedian: number | null): string | null {
   if (w.wtsMax === null && w.wtsShare === null) return 'on your watchlist'
   if (price === null) return null
-  if (w.wtsMax !== null && price <= w.wtsMax) return `at or under your ${formatPlat(w.wtsMax)}`
+  // The threshold as typed, never rounded: "your 13k" for a typed 12500 names a price never set.
+  if (w.wtsMax !== null && price <= w.wtsMax) return `at or under your ${formatPlatExact(w.wtsMax)}`
   const cap = w.wtsShare !== null && weekMedian !== null ? w.wtsShare * weekMedian : null
   if (cap !== null && price <= cap) return `${Math.round((price / (weekMedian ?? price)) * 100)}% of the 7-day median ${formatPlat(weekMedian)}`
   return null
@@ -161,14 +179,17 @@ function wtsReason(w: BazaarWatch, price: number | null, weekMedian: number | nu
 function wtbReason(w: BazaarWatch, price: number | null): string | null {
   if (w.wtbMin === null) return 'on your watchlist'
   if (price === null) return 'no price stated'
-  return price >= w.wtbMin ? `at or over your ${formatPlat(w.wtbMin)}` : null
+  return price >= w.wtbMin ? `at or over your ${formatPlatExact(w.wtbMin)}` : null
 }
 
-/** The offer as one line: `Leric WTS Fleeting Quiver +4 18k`. */
+/**
+ * The offer as one line: `Leric WTS Fleeting Quiver +4 18k`. Its price is in full, as the threshold
+ * beside it is, so an offer at the threshold never reads above it.
+ */
 export function watchAlertText(o: LiveOffer): string {
   const what = `${o.item}${o.tier > 0 ? ` +${o.tier}` : ''}`
   const verb = o.dir === 'sell' ? 'WTS' : 'WTB'
-  const price = o.price === null ? '' : ` ${formatPlat(o.price)}`
+  const price = o.price === null ? '' : ` ${formatPlatExact(o.price)}`
   return `${o.speaker} ${verb} ${what}${price}`.slice(0, 120)
 }
 
@@ -180,7 +201,7 @@ export function watchAlertCaptures(o: LiveOffer, reason: string): Record<string,
   return {
     item: `${o.item}${o.tier > 0 ? ` +${o.tier}` : ''}`,
     seller: o.speaker,
-    price: o.price === null ? 'no price' : formatPlat(o.price),
+    price: o.price === null ? 'no price' : formatPlatExact(o.price),
     what: o.dir === 'sell' ? 'for sale' : 'wanted',
     offer: watchAlertText(o),
     why: reason
@@ -204,7 +225,7 @@ export function freshWatchAlerts(snap: BazaarSnap, list: BazaarWatchlist, after:
   const alerts: WatchAlert[] = []
   for (const o of live) {
     if (o.seq <= after) continue
-    const w = findWatch(list, o.item, o.tier)
+    const w = alertingWatch(list, o)
     const reason = w === null ? null : watchAlertReason(w, o, weekMedianAsking(snap.rows, o.item, o.tier, o.at.slice(0, 10)))
     if (reason !== null) alerts.push({ offer: o, reason, text: `${watchAlertText(o)} (${reason})` })
   }

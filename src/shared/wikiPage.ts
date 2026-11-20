@@ -282,10 +282,14 @@ function madeAndForaged(row: GapRow, zoneName: ZoneNamer): Pick<ItemFacts, 'craf
   }
 }
 
-/** The levels a mob row's /con lines stated (`L12 indifferent`), lowest first. */
+/**
+ * The levels a mob row's /con lines stated (`L12 indifferent`), lowest first: every reading (`all`),
+ * since the eight served entries drop the ones seen least, which are the ends of the range.
+ */
 function conLevels(row: GapRow): number[] {
-  const levels = (row.details.cons?.entries ?? []).flatMap((e) => {
-    const m = /^L(\d+)/.exec(e.name)
+  const cons = row.details.cons
+  const levels = (cons?.all ?? cons?.entries.map((e) => e.name) ?? []).flatMap((name) => {
+    const m = /^L(\d+)/.exec(name)
     return m ? [Number(m[1])] : []
   })
   return [...new Set(levels)].sort((a, b) => a - b)

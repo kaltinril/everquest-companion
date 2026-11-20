@@ -384,3 +384,56 @@ fn gaps_learned_in_a_closed_private_instance_count_toward_the_agreed_gap() {
     assert_eq!(row.estimate_ms, Some(530_000), "no wiki time: the smallest gap, as before");
 }
 
+fn watching_mobs(n: usize) -> RespawnPrefs {
+    let watch = |i: usize| RespawnWatchPref { key: format!("mob {i}"), display: format!("mob {i}"), custom_sec: None, shared_name: false };
+    RespawnPrefs { watches: (0..n).map(watch).collect() }
+}
+
+/// Enter `zone` at `*ts` and kill `mob 0` .. `mob n-1` there, a second apart.
+fn kill_mobs_in(m: &mut RespawnModule, zone: &str, n: usize, ts: &mut i64) {
+    m.on_event(&ev(&zone_named(*ts, zone)), false);
+    for i in 0..n {
+        *ts += 1_000;
+        m.on_event(&ev(&death_of(&format!("mob {i}"), *ts)), false);
+    }
+    *ts += 1_000;
+}
+
+/// The row cap is for the other zones. A clock per place of the zone you stand in is the promise
+/// (owner, 2026-11-03), and a row cut by the cap read as "none killed here yet": 13 mobs across
+/// five tiers are 65 clocks, and the tier killed longest ago is the one you came back to.
+#[test]
+fn the_zone_you_stand_in_keeps_every_clock_past_the_cap() {
+    let mut m = RespawnModule::new(NOW, watching_mobs(13));
+    let mut ts = T_ZONE;
+    let tiers = ["Lake Nerius", "Lake Nerius 1 (Awakened)", "Lake Nerius 2 (Adaptive)", "Lake Nerius 3 (Fused)", "Lake Nerius 4 (Refined)"];
+    for tier in tiers {
+        kill_mobs_in(&mut m, tier, 13, &mut ts);
+    }
+    m.on_event(&ev(&zone_named(ts, "Lake Nerius")), false);
+    let rows = m.watch_rows(ts);
+    assert_eq!(rows.len(), 65, "every tier's clocks");
+    assert_eq!(rows.iter().filter(|r| r.zone == "Lake Nerius").count(), 13, "the tier killed first lost none");
+    // A private instance of the zone is one of its places too.
+    m.on_event(&ev(&instance_created(ts + 1_000, "Lake Nerius", 17)), false);
+    m.on_event(&ev(&zone_named(ts + 2_000, "Lake Nerius 4 (Refined)")), false);
+    assert_eq!(m.watch_rows(ts).len(), 65);
+}
+
+/// Kills in other zones never push out the zone you stand in, and the other zones stay capped.
+#[test]
+fn kills_in_other_zones_never_push_out_the_zone_you_stand_in() {
+    let mut m = RespawnModule::new(NOW, watching_mobs(70));
+    let mut ts = T_ZONE;
+    kill_mobs_in(&mut m, "Befallen", 2, &mut ts);
+    kill_mobs_in(&mut m, "The Ruins of Old Guk", 70, &mut ts);
+    m.on_event(&ev(&zone_named(ts, "Befallen")), false);
+    let rows = m.watch_rows(ts);
+    assert_eq!(rows.iter().filter(|r| r.zone == "Befallen").count(), 2, "both clocks of the zone you came back to");
+    assert_eq!(rows.iter().filter(|r| r.zone != "Befallen").count(), 60, "the other zones hold the cap");
+    // Standing elsewhere, Befallen's clocks are the oldest of the other zones and the cap cuts them.
+    m.on_event(&ev(&zone_named(ts + 1_000, "Najena")), false);
+    let away = m.watch_rows(ts);
+    assert_eq!((away.len(), away.iter().filter(|r| r.zone == "Befallen").count()), (60, 0));
+}
+

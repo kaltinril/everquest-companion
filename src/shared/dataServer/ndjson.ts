@@ -16,6 +16,11 @@
 // exactly where a text-mode stream would helpfully translate one into the other; a trailing `\r`
 // is stripped on decode rather than trusted, so a peer that framed with CRLF is still read
 // correctly.
+//
+// SIZE ALONE NEVER ENDS A CONNECTION (fork #9). An engine message may be up to `MAX_MESSAGE_CHARS`;
+// a longer one is dropped up to its delimiter and reported through `Transport.onOversize`, so only
+// the request it answered fails. A line is kept as the chunks it arrived in and joined once, at its
+// delimiter: re-joining and re-scanning the partial line on every chunk was quadratic in its length.
 
 import { TransportError, type Transport } from './transport'
 
@@ -31,6 +36,22 @@ export const DELIMITER = '\n'
  * near this number. It matches `MAX_LINE_BYTES` in the Rust codec.
  */
 export const MAX_LINE_CHARS = 8 * 1024 * 1024
+
+/**
+ * The largest single MESSAGE an engine connection will assemble, in characters.
+ *
+ * The 8 MiB guard above is about a peer that never sends a delimiter; it was never a budget for a
+ * reply, and a whole-log reply grows with the log (measured: about 12.6 KB of largest reply per MB
+ * of log, so 8 MiB is a log of roughly 650 MB). V8 holds 2^29 - 24 characters in one string, so
+ * 512 MiB is the hard ceiling; this is one eighth of it. The engine checks no size on send.
+ */
+export const MAX_MESSAGE_CHARS = 64 * 1024 * 1024
+
+/** A delivered message this long or longer is reported (`Transport.onOversize`, refused false). */
+export const LARGE_MESSAGE_CHARS = 16 * 1024 * 1024
+
+/** How much of a reported line is kept: enough to read its top-level `id`. */
+const HEAD_CHARS = 256
 
 /** Serialize one message into its wire form: the JSON, then the delimiter. */
 export function encodeLine(message: unknown): string {
@@ -69,29 +90,95 @@ export function decodeLine(line: string): unknown {
  * on a test double and fails on a socket.
  */
 export class LineDecoder {
-  private buffer = ''
+  /** The partial line, as the chunks it arrived in. Joined once, at its delimiter. */
+  private parts: string[] = []
+  /** How many characters `parts` holds. */
+  private held = 0
+  /** An over-limit line being dropped up to its delimiter (only with `watch`). */
+  private skip: { head: string; chars: number } | null = null
 
-  constructor(private readonly maxLineChars = MAX_LINE_CHARS) {}
+  /**
+   * WITHOUT `watch` a partial line past `maxLineChars` throws `frameTooLarge` (the child's stdout
+   * and stderr: `supervisorChild.ts`). WITH it nothing is thrown: an over-limit line is dropped up
+   * to its delimiter and reported with `refused` true, and the decoder carries on.
+   */
+  constructor(
+    private readonly maxLineChars = MAX_LINE_CHARS,
+    private readonly watch?: LineWatch
+  ) {}
 
   /** Feed a chunk; get back every whole line it completed, in order. */
   push(chunk: string): string[] {
-    this.buffer += chunk
     const lines: string[] = []
-    // One walk by offset and one slice of the remainder, not a re-slice of the whole buffer per
-    // line: a chunk carrying many frames was quadratic in the chunk (audit item 15).
+    // Only the new chunk is searched: the partial line held from earlier chunks has no delimiter.
     let start = 0
-    let at = this.buffer.indexOf(DELIMITER)
+    let at = chunk.indexOf(DELIMITER)
     while (at !== -1) {
-      lines.push(this.buffer.slice(start, at))
+      const line = this.finish(chunk.slice(start, at))
+      if (line !== null) lines.push(line)
       start = at + 1
-      at = this.buffer.indexOf(DELIMITER, start)
+      at = chunk.indexOf(DELIMITER, start)
     }
-    if (start > 0) this.buffer = this.buffer.slice(start)
-    if (this.buffer.length > this.maxLineChars) {
-      this.buffer = ''
-      throw new TransportError('frameTooLarge', `a frame exceeded ${String(this.maxLineChars)} characters`)
-    }
+    this.keep(start === 0 ? chunk : chunk.slice(start))
     return lines
+  }
+
+  /** A delimiter arrived: the whole line, or null when it was dropped as too long. */
+  private finish(tail: string): string | null {
+    const watch = this.watch
+    if (this.skip !== null) {
+      const { head, chars } = dropMore(this.skip, tail)
+      this.skip = null
+      watch?.onLine({ head, chars, refused: true })
+      return null
+    }
+    const chars = this.held + tail.length
+    if (watch !== undefined && chars > this.maxLineChars) {
+      const head = this.head(tail)
+      this.drop()
+      watch.onLine({ head, chars, refused: true })
+      return null
+    }
+    const line = this.parts.length === 0 ? tail : this.parts.join('') + tail
+    this.drop()
+    if (watch !== undefined && chars >= watch.noticeChars) {
+      watch.onLine({ head: line.slice(0, HEAD_CHARS), chars, refused: false })
+    }
+    return line
+  }
+
+  /** What follows the last delimiter of a chunk: held for the next one, counted, or refused. */
+  private keep(rest: string): void {
+    if (rest === '') return
+    if (this.skip !== null) {
+      dropMore(this.skip, rest)
+      return
+    }
+    this.parts.push(rest)
+    this.held += rest.length
+    if (this.held <= this.maxLineChars) return
+    const over = { head: this.head(''), chars: this.held }
+    this.drop()
+    if (this.watch !== undefined) {
+      this.skip = over
+      return
+    }
+    throw new TransportError('frameTooLarge', `a frame exceeded ${String(this.maxLineChars)} characters`)
+  }
+
+  /** The first `HEAD_CHARS` characters of the held line followed by `tail`. */
+  private head(tail: string): string {
+    let head = ''
+    for (const part of this.parts) {
+      if (head.length >= HEAD_CHARS) break
+      head += part
+    }
+    return (head.length >= HEAD_CHARS ? head : head + tail).slice(0, HEAD_CHARS)
+  }
+
+  private drop(): void {
+    this.parts = []
+    this.held = 0
   }
 
   /**
@@ -100,7 +187,90 @@ export class LineDecoder {
    * transport reports it rather than dropping it.
    */
   get pending(): string {
-    return this.buffer
+    return this.parts.join('')
+  }
+
+  /** True while an over-limit line is being dropped: a stream that ends here ended mid-frame too. */
+  get midFrame(): boolean {
+    return this.skip !== null
+  }
+}
+
+/** Count `text` into a line that is being dropped, keeping only its first characters. */
+function dropMore(skip: { head: string; chars: number }, text: string): { head: string; chars: number } {
+  if (skip.head.length < HEAD_CHARS) skip.head = (skip.head + text).slice(0, HEAD_CHARS)
+  skip.chars += text.length
+  return skip
+}
+
+/** What a decoder reports about a line that was too long or merely large. */
+export interface LineWatch {
+  /** A delivered line of this many characters or more is reported, with `refused` false. */
+  readonly noticeChars: number
+  /** `head` is the line's first characters; `chars` its whole length, delimiter excluded. */
+  onLine(seen: { head: string; chars: number; refused: boolean }): void
+}
+
+// ── the id of a message, read off its first characters ──────────────────────────────────────────
+
+/** The index after the JSON string that opens at `at`, or -1 when the head ends inside it. */
+function afterString(head: string, at: number): number {
+  for (let i = at + 1; i < head.length; i++) {
+    if (head[i] === '\\') i++
+    else if (head[i] === '"') return i + 1
+  }
+  return -1
+}
+
+function skipSpace(head: string, at: number): number {
+  let i = at
+  while (head[i] === ' ' || head[i] === '\t' || head[i] === '\r') i++
+  return i
+}
+
+/** The member key that opens at `at` and where its value starts, or null when the head ends first. */
+function keyAt(head: string, at: number): { key: string; value: number } | null {
+  if (head[at] !== '"') return null
+  const end = afterString(head, at)
+  if (end === -1) return null
+  const colon = skipSpace(head, end)
+  if (head[colon] !== ':') return null
+  return { key: head.slice(at + 1, end - 1), value: skipSpace(head, colon + 1) }
+}
+
+/** Where the scalar value at `at` ends (at its `,` or `}`); -1 for an object, an array, or a head
+ *  that ends first. */
+function scalarEnd(head: string, at: number): number {
+  if (head[at] === '{' || head[at] === '[') return -1
+  let end = head[at] === '"' ? afterString(head, at) : at
+  if (end === -1) return -1
+  while (end < head.length && head[end] !== ',' && head[end] !== '}') end++
+  return end < head.length ? end : -1
+}
+
+/**
+ * The top-level numeric `id` of the message whose first characters are `head`, or null.
+ *
+ * Only an `id` that appears BEFORE any nested object or array counts, so a row's own `id` inside a
+ * payload can never be taken for the request's. The engine writes a reply as
+ * `{"id":N,"kind":"reply",...` and a reset as `{"epoch":E,"id":N,...` (the generated Rust structs
+ * serialize their fields in declared order: engine/crates/protocol/src/generated.rs).
+ */
+export function messageIdOf(head: string): number | null {
+  let at = skipSpace(head, 0)
+  if (head[at] !== '{') return null
+  at = skipSpace(head, at + 1)
+  for (;;) {
+    const member = keyAt(head, at)
+    const end = member === null ? -1 : scalarEnd(head, member.value)
+    if (member === null || end === -1) return null
+    if (member.key === 'id') {
+      const text = head.slice(member.value, end).trim()
+      const id = text === '' ? Number.NaN : Number(text)
+      return Number.isInteger(id) ? id : null
+    }
+    if (head[end] !== ',') return null
+    at = skipSpace(head, end + 1)
   }
 }
 
@@ -124,10 +294,16 @@ export interface ByteChannel {
  * changing.
  */
 export function createNdjsonTransport<Out, In>(channel: ByteChannel): Transport<Out, In> {
-  const decoder = new LineDecoder()
   let onMessage: ((message: In) => void) | undefined
   let onError: ((error: TransportError) => void) | undefined
+  let onOversize: Parameters<NonNullable<Transport<Out, In>['onOversize']>>[0] | undefined
   let closed = false
+  const decoder = new LineDecoder(MAX_MESSAGE_CHARS, {
+    noticeChars: LARGE_MESSAGE_CHARS,
+    onLine: (seen) => {
+      onOversize?.({ id: messageIdOf(seen.head), size: seen.chars, refused: seen.refused })
+    }
+  })
 
   const fail = (error: TransportError): void => {
     if (closed) return
@@ -165,7 +341,7 @@ export function createNdjsonTransport<Out, In>(channel: ByteChannel): Transport<
 
   channel.onClose((error) => {
     if (closed) return
-    if (decoder.pending.trim() !== '') {
+    if (decoder.midFrame || decoder.pending.trim() !== '') {
       fail(new TransportError('decode', 'the stream ended mid-frame'))
       return
     }
@@ -183,6 +359,9 @@ export function createNdjsonTransport<Out, In>(channel: ByteChannel): Transport<
     },
     onError(handler) {
       onError = handler
+    },
+    onOversize(handler) {
+      onOversize = handler
     },
     close() {
       if (closed) return

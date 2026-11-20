@@ -23,8 +23,12 @@ import {
   EngineError,
   OPS_ARE_EXHAUSTIVE,
   RESULT_GUARDS,
+  isLinkLost,
+  isTooLarge,
   type RequestOp
 } from '../src/shared/dataServer/ops'
+import { createMemoryPair } from '../src/shared/dataServer/memoryTransport'
+import { TransportError } from '../src/shared/dataServer/transport'
 import { fixture, flush, rig, shakeHands } from './dataServerRig.mjs'
 import type {
   ClientMessage,
@@ -382,4 +386,69 @@ test('HEALTH’S NEW FIELDS ARE OPTIONAL, and absent is not zero', async () => {
   assert.equal(after.mark?.offset, 9185240)
   assert.equal(after.events, 139860)
   assert.equal(after.lastEventTs, 1787181707000)
+})
+
+// ---- the two predicates a caller branches on (fork #9) ------------------------------------------
+
+/** Whatever `promise` rejected with. */
+async function rejection(promise: Promise<unknown>): Promise<unknown> {
+  try {
+    await promise
+  } catch (error) {
+    return error
+  }
+  return assert.fail('the request was answered')
+}
+
+test('isTooLarge is the transport-s refusal of one reply, and nothing else', () => {
+  const cause = new TransportError('frameTooLarge', 'a message of 70000000 characters was refused')
+  assert.equal(isTooLarge(new EngineError('internal', 'the reply to module.snapshot was too large to read', 4, cause)), true)
+  assert.equal(isTooLarge(new EngineError('internal', 'the reply to echo carries another op’s result', 4)), false)
+  assert.equal(isTooLarge(new EngineError('unavailable', 'a truncated frame', undefined, new TransportError('decode', 'x'))), false)
+  assert.equal(isTooLarge(cause), false, 'the bare transport error is not what a caller is handed')
+  assert.equal(isTooLarge(null), false)
+})
+
+test('isLinkLost is the connection going away under a request', async (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] })
+
+  // `failConnection`: the transport died with a request in flight.
+  const dead = rig()
+  shakeHands(dead)
+  const inFlight = rejection(dead.client.request('session.health', {}))
+  dead.transport.close()
+  const refused = await rejection(dead.client.request('echo', { text: 'into the void' }))
+  assert.equal(isLinkLost(await inFlight), true)
+  assert.equal(isLinkLost(refused), true)
+  // …and every request made on the failed connection afterwards.
+  assert.equal(isLinkLost(await rejection(dead.client.request('echo', { text: 'later' }))), true)
+
+  // `attach`: the connection was replaced under a request.
+  const replaced = rig()
+  shakeHands(replaced)
+  const old = rejection(replaced.client.request('session.health', {}))
+  replaced.client.attach(createMemoryPair<ClientMessage, EngineMessage>().a)
+  const was = await old
+  assert.ok(was instanceof EngineError)
+  assert.equal(was.message, 'the connection was replaced')
+  assert.equal(isLinkLost(was), true)
+
+  // An engine that ANSWERS `unavailable` is talking, so the link is not lost: its reply names the id.
+  const busy = rig()
+  shakeHands(busy)
+  const asked = rejection(busy.client.request('module.snapshot', { module: 'loot' }))
+  busy.deliver({ kind: 'error', id: 1, ok: false, error: { code: 'unavailable', message: 'the fold is busy' } })
+  const answer = await asked
+  assert.ok(answer instanceof EngineError)
+  assert.equal(answer.code, 'unavailable')
+  assert.equal(isLinkLost(answer), false)
+
+  // A request nobody answered is a fact about one ask, not about the connection.
+  const silent = rejection(busy.client.request('session.health', {}))
+  t.mock.timers.tick(15_001)
+  const timedOut = await silent
+  assert.ok(timedOut instanceof EngineError)
+  assert.equal(timedOut.code, 'timeout')
+  assert.equal(isLinkLost(timedOut), false)
+  assert.equal(isLinkLost(new Error('unavailable')), false)
 })

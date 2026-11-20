@@ -19,3 +19,11 @@ export function takeMoved(ids: readonly string[]): boolean {
   for (const id of ids) if (moved.delete(id)) any = true
   return any
 }
+
+/**
+ * `ids` put back as moved: the save that took them did not land (the engine did not answer, the
+ * write failed), so it is owed again on the next tick even if no cursor moves in between.
+ */
+export function restoreMoved(ids: readonly string[]): void {
+  for (const id of ids) moved.add(id)
+}

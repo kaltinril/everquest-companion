@@ -73,6 +73,18 @@ pub struct AllyBind {
     pub ambiguous: bool,
     pub via: AllyVia,
     pub kind: AllyKind,
+    /// `Charm` only for want of evidence: a leader line bound it, no charm broadcast has named it
+    /// and its owner's summon was not seen. Cleared by a charm broadcast.
+    pub defaulted: bool,
+}
+
+impl AllyBind {
+    /// A summoned pet walks through a zone line with its owner, and so does a pet a leader line
+    /// bound that is named the way summoned pets are with no charm ever seen: its summon was cast
+    /// out of our sight. It keeps the charm clock and the break rule all the same.
+    fn crosses_a_zone(&self) -> bool {
+        self.kind == AllyKind::Summon || (self.defaulted && is_player_shaped_name(&self.display))
+    }
 }
 
 /// What a caster-less `<mob> has been charmed.` broadcast means for a third party.
@@ -199,6 +211,7 @@ impl AllyCharms {
         // wearing the summon lifecycle has just been contradicted. One direction only, and it is the
         // safe one — this can add the break rule and the hold clock, never remove them.
         if let Some(live) = self.binds.get_mut(name_key) {
+            live.defaulted = false;
             if live.kind == AllyKind::Summon {
                 live.kind = AllyKind::Charm;
                 live.window_ms = DEFAULT_CHARM_DURATION_MS + DURATION_SLACK_MS;
@@ -250,6 +263,7 @@ impl AllyCharms {
             via: AllyVia::Cast,
             // A charm broadcast made this bind, so the creature is a charmed mob by construction.
             kind: AllyKind::Charm,
+            defaulted: false,
         };
         self.binds.insert(name_key.to_string(), bind.clone());
         self.friendlies.insert(arm.charmer_key);
@@ -287,6 +301,7 @@ impl AllyCharms {
             },
             via: AllyVia::Leader,
             kind,
+            defaulted: kind == AllyKind::Charm && !l.ever_charmed,
         };
         self.binds.insert(l.pet_key.to_string(), bind.clone());
         self.friendlies.insert(l.owner_key.to_string());
@@ -391,16 +406,18 @@ impl AllyCharms {
 
     /// Charm cannot survive a zone, and neither can an arm. The friendly set and the summon sighting
     /// are kept: they are about people, and a summoned pet walks through the door with its owner, so
-    /// a `Summon` bind is kept too (as your own summoned pet is, `world.rs`).
-    pub fn zone(&mut self) {
+    /// a bind that `crosses_a_zone` is kept too (as your own summoned pet is, `world.rs`). The binds
+    /// that ended, for the caller's processing lines.
+    pub fn zone(&mut self) -> Vec<AllyBind> {
         self.arms.clear();
-        let charms: Vec<String> = (self.binds.values())
-            .filter(|b| b.kind != AllyKind::Summon)
-            .map(|b| b.name_key.clone())
+        let ended: Vec<AllyBind> = (self.binds.values())
+            .filter(|b| !b.crosses_a_zone())
+            .cloned()
             .collect();
-        for key in charms {
-            self.binds.remove(&key);
+        for b in &ended {
+            self.binds.remove(&b.name_key);
         }
+        ended
     }
 
     /// Binds whose pet has gone silent for a whole window as of `now`; removing them is this call's

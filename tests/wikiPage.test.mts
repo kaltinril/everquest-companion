@@ -158,6 +158,19 @@ test('drops are counted in corpses per zone and mob from the loot ledger; a mob 
   assert.match(wikiPageText(forager, loot, kills), /<li> \{\{:Black Lizard Talon\}\} <span class='drare'>\(Rare\)<\/span> <span class='ddb'>\[Overall: ~20%\]<\/span> <\/li>/)
 })
 
+test("a mob page's level range covers every /con, past the eight readings a row serves", () => {
+  // Four levels under two standings fill the served entries; the ends of the range, conned once
+  // each, are only in `all` (engine gaps_details.rs).
+  const standings = ['apprehensive', 'indifferent']
+  const entries = [29, 30, 31, 32].flatMap((l) => standings.map((s) => ({ name: `L${String(l)} ${s}`, n: 2 })))
+  const all = ['L28 apprehensive', ...entries.map((e) => e.name), 'L33 indifferent']
+  const conned = (cons: GapRow['details']['cons']): GapRow => ({ domain: 'mob', name: 'a nameless thing', kinds: ['considered'], count: 18, first: '', last: '', details: { samples: [], cons } })
+  assert.deepEqual(mobFacts(conned({ entries, distinct: 10, all }), [], {}).levels, [28, 29, 30, 31, 32, 33])
+  assert.match(wikiPageText(conned({ entries, distinct: 10, all }), [], {}), /\| level +?= 28-33\n/)
+  // A row saved before `all` was served states what its entries hold.
+  assert.deepEqual(mobFacts(conned({ entries, distinct: 8 }), [], {}).levels, [29, 30, 31, 32])
+})
+
 test('a mob page names its levels, zones and loot; an NPC-only spell says so', () => {
   const mob = mobPage({
     name: 'a scout from zanivar',

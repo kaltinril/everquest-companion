@@ -18,6 +18,8 @@ import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import { turnInBadgeLabel, type DerivedEvidence } from '@shared/questTurnIns'
 import type { QuestProgress } from './useProgress'
+import { useCountSource } from './useCountSource'
+import { recordTurnInTitle, turnedInHover } from '../inventory/countSource'
 
 /**
  * WHAT EACH DERIVED SOURCE SAYS FOR ITSELF (JOS-429). One sentence per rung of the ladder, in the
@@ -96,6 +98,8 @@ export function TurnInBadge({
   count: number
   evidence?: DerivedEvidence
 }): JSX.Element | null {
+  // The hover follows the count source: under "loot minus hand-ins" the badge moves no count.
+  const countSource = useCountSource()
   const derived = evidence === undefined ? null : EVIDENCE_BADGE[evidence]
   if (count <= 0 && derived === null) return null
   return (
@@ -107,13 +111,7 @@ export function TurnInBadge({
       data-count={count}
       data-inferred={evidence ? 'true' : undefined}
       data-evidence={evidence}
-      title={
-        evidence
-          ? EVIDENCE_HOVER[evidence]
-          : count > 1
-            ? `Turned in ${String(count)} times. Each turn-in spends the items it required, so the progress beside this is what you hold toward doing it again.`
-            : 'Turned in once. The items it required were spent, so the progress beside this is what you hold toward doing it again.'
-      }
+      title={evidence ? EVIDENCE_HOVER[evidence] : turnedInHover(countSource, count)}
       label={derived === null ? turnInBadgeLabel(count) : derived.label}
     />
   )
@@ -133,7 +131,8 @@ function UndoTurnIn({ q, onUndo }: { q: QuestProgress; onUndo?: () => void }): J
   // the hook remembers the rejection, so the next snapshot does not put it back.
   const canUndo = q.completionEvidence === undefined && q.turnIns > 0
   if (canUndo && onUndo === undefined) return <UndoButton title={UNDO_LOADING} />
-  const fromLog = q.turnIns <= q.logTurnIns
+  // What the click will do, not a count comparison: undo cuts the NEWEST turn-in whoever recorded it.
+  const fromLog = q.undoTakesLogTurnIn === true
   return (
     // The span outlives the tooltip that needed it, for the same reason: a DISABLED button
     // swallows no mouse events, and "why is this dead" is exactly the question the words answer.
@@ -142,7 +141,7 @@ function UndoTurnIn({ q, onUndo }: { q: QuestProgress; onUndo?: () => void }): J
         canUndo
           ? fromLog
             ? 'Take back the most recent turn-in. This one was read from your log; taking it back tells the app the trade did not count, and it stays taken back'
-            : 'Take back the most recent turn-in you recorded by hand'
+            : 'Take back the most recent turn-in, recorded by hand or read from an older log'
           : q.completionEvidence !== undefined
             ? EVIDENCE_UNDO[q.completionEvidence]
             : 'Nothing to take back'
@@ -170,10 +169,9 @@ function UndoButton({ title }: { title: string }): JSX.Element {
  * THE MANUAL COUNTER, which replaced a "Turned in / complete" checkbox: a turn-in is an event you
  * can have more than one of, and a checkbox can only ever say "at least one".
  *
- * "+1" records one, dated now. "-1" takes back the most recent turn-in THIS APP DID NOT READ OUT
- * OF THE LOG, and is disabled when there is no such turn-in — the log is evidence, and the next
- * snapshot would simply re-assert whatever the log still says. The hover text says that outright
- * rather than leaving a dead-looking button to be discovered.
+ * "+1" records one, dated now. "-1" takes back the most recent turn-in, whoever recorded it; one
+ * the log shows is also rejected, so the next snapshot does not put it back (upstream issue #72).
+ * The hover says which of the two the click will do.
  */
 export function TurnInCounter({
   q,
@@ -185,6 +183,7 @@ export function TurnInCounter({
   /** absent until the log's turn-ins have loaded */
   onUndoTurnIn?: () => void
 }): JSX.Element {
+  const countSource = useCountSource()
   return (
     <Stack direction="row" spacing={0.5} alignItems="center">
       <Typography variant="caption" color="text.secondary" data-testid="posky-turnin-count">
@@ -194,7 +193,7 @@ export function TurnInCounter({
       <IconButton
         size="small"
         data-testid="posky-record-turnin"
-        title="Record another turn-in. The items it required are subtracted, so the quest goes back to what you hold toward running it again."
+        title={recordTurnInTitle(countSource)}
         onClick={onRecordTurnIn}
       >
         <AddIcon fontSize="inherit" />

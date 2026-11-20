@@ -5,7 +5,8 @@
 
 import type { JSX } from 'react'
 import { Checkbox, CircularProgress, FormControlLabel, Stack, TextField, Typography } from '@mui/material'
-import { MAX_GAP_DAYS, isStale, type CharacterGaps } from '@shared/gapsAllCharacters'
+import { MAX_GAP_DAYS, type CharacterGaps } from '@shared/gapsAllCharacters'
+import { charactersLineEnd, savedWords } from '@shared/gapsOthersLine'
 import { Tooltip } from '../../lib/Tooltip'
 
 // Screen text is one short sentence (owner, 2026-10-21: "we just hit them with so much text to read").
@@ -65,19 +66,11 @@ export function AllCharactersBox({
   )
 }
 
-/** A character's few words on the line, and the one sentence behind them (its date, what to do). */
-function savedWords(c: CharacterGaps, now: Date): { text: string; tip: string; stale: boolean } {
-  const archives = `${c.archives} archived log${c.archives === 1 ? '' : 's'}`
-  if (c.savedAt === null) return { text: `${c.name} (archives only)`, tip: `Not logged in here since this was added: only its ${archives}.`, stale: false }
-  const date = c.savedAt.slice(0, 10)
-  // Over two months old, or an older build's save that lacks rows this one serves (a known item's forages).
-  if (isStale(c.savedAt, now)) return { text: `${c.name} (over 2 months old)`, tip: `Saved ${date}, over two months ago; log in on ${c.name} to refresh it.`, stale: true }
-  if (c.olderRows === true) return { text: `${c.name} (needs refresh)`, tip: `Saved ${date} by an older version; log in on ${c.name} to refresh it.`, stale: true }
-  return { text: c.name, tip: `${c.name}'s Gaps saved ${date}, plus ${archives}.`, stale: false }
-}
-
-/** Whose data the list holds: the attached character live, then each other one with its saved date. */
-export function CharactersLine({ live, others }: { live: string; others: readonly CharacterGaps[] | undefined }): JSX.Element {
+/**
+ * Whose data the list holds: the attached character live, then each other one with its saved date.
+ * The words are shared/gapsOthersLine.ts's; a read that failed says so, in the warning colour.
+ */
+export function CharactersLine({ live, others, failed = false }: { live: string; others: readonly CharacterGaps[] | undefined; failed?: boolean }): JSX.Element {
   if (others === undefined) {
     return (
       <Typography variant="caption" color="text.secondary" data-testid="gaps-characters">
@@ -86,6 +79,7 @@ export function CharactersLine({ live, others }: { live: string; others: readonl
     )
   }
   const now = new Date()
+  const end = charactersLineEnd(others.length, failed)
   return (
     <Typography variant="caption" color="text.secondary" data-testid="gaps-characters">
       Characters: {live} (live)
@@ -102,7 +96,13 @@ export function CharactersLine({ live, others }: { live: string; others: readonl
           </span>
         )
       })}
-      {others.length === 0 ? '. No other character saved yet: log each one in here once.' : '.'}
+      {end.warn ? (
+        <Typography component="span" variant="caption" color="warning.main" data-testid="gaps-characters-failed">
+          {end.text}
+        </Typography>
+      ) : (
+        end.text
+      )}
     </Typography>
   )
 }

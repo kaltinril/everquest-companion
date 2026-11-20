@@ -50,6 +50,7 @@ export async function buildLogReadReport(): Promise<LogReadReport> {
     supervisor: engineSupervisorStatus(),
     fault: say.fault,
     connection: client.connection,
+    link: client.link,
     readiness: client.readiness,
     fold: say.fold,
     logSize: client.logSize,

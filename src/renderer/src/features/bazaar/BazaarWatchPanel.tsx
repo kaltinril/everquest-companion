@@ -6,14 +6,15 @@
 import { type JSX, useEffect, useState } from 'react'
 import { Checkbox, FormControlLabel, Stack, Switch, TextField, Typography } from '@mui/material'
 import { findWatch, watchOnItem } from '@shared/bazaarWatch'
-import { formatPlat, parsePlat, type BazaarItem } from '@shared/bazaar'
+import { formatPlatExact, parsePlat, type BazaarItem } from '@shared/bazaar'
 import { useBazaarWatch } from './useBazaarWatch'
 
 function PriceField({ label, value, onCommit, testId }: { label: string; value: number | null; onCommit: (v: number | null) => void; testId: string }): JSX.Element {
-  const shown = value === null ? '' : formatPlat(value)
+  // The stored price in full (12,500 reads 12.5k, never 13k), so the field shows the threshold that alerts.
+  const shown = value === null ? '' : formatPlatExact(value)
   const [text, setText] = useState(shown)
   useEffect(() => setText(shown), [shown])
-  // The field shows the price rounded (12,345 reads 12k); leaving it untouched must not store the rounding.
+  // A price no short text says in full is still shown rounded; leaving the field untouched must not store that.
   return (
     <TextField
       size="small"

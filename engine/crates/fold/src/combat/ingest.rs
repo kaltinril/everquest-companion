@@ -52,6 +52,11 @@ pub fn ingest_event(st: &mut EngineState, ev: &Event) {
     // other three are display timers, this one mutates the fold, and a fold that advanced because
     // the UI polled would make a replay disagree with the live tail.
     sweep_coat_class(st, ev);
+    // Close a fight that has ended, on the log's own clock, BEFORE this line is booked anywhere. On
+    // every line and not only on damage: a replay has no meter read to close it, so a miss, a
+    // resist or a heal that opened the next pull was booked in the fight that had ended, and the
+    // same log read differently after a restart (tests/replay_matches_live.rs).
+    eval_closure(st, ev.ts());
     if ingest_world(st, ev) {
         return;
     }
@@ -139,7 +144,7 @@ fn ingest_world(st: &mut EngineState, ev: &Event) -> bool {
             st.charm.zone(&keys);
             // Somebody else's charm cannot survive a zone either, and neither can a cast in flight.
             // The friendly set survives — it is about people, not about the room.
-            st.ally.zone();
+            zone_ally_binds(st, ev.ts());
             st.log_lazy(ev.ts(), "zone", "info", || {
                 format!("▸ entered {}", ev.str(Key::Zone).unwrap_or_default())
             });
@@ -206,6 +211,19 @@ fn ingest_world(st: &mut EngineState, ev: &Event) -> bool {
             true
         }
         _ => false,
+    }
+}
+
+/// The ally binds a zone line ends, each said out loud: a pet's row that stops with no line to say
+/// why is a bug report nobody can write.
+fn zone_ally_binds(st: &mut EngineState, ts: i64) {
+    for gone in st.ally.zone() {
+        st.log_lazy(ts, "charm", "dropped", || {
+            format!(
+                "✕ {} - {}'s charm ended at the zone line",
+                gone.display, gone.charmer
+            )
+        });
     }
 }
 
@@ -396,9 +414,10 @@ fn ingest_ally_pet_leader(st: &mut EngineState, ev: &Event) -> Option<SourceRef>
     Some(routing::ally_pet_source(&bind))
 }
 
-/// Crowd control (mez/root, not charm). Evaluate any pending closure at this ts FIRST, so a CC on a
-/// fresh pull cannot attach to a stale fight, then mark the CC'd instance engaged and CC-held so the
-/// encounter stays open across the mez-and-wait gap. A CC'd instance counts as alive for closure.
+/// Crowd control (mez/root, not charm). `ingest_event` has already evaluated any pending closure at
+/// this ts, so a CC on a fresh pull cannot attach to a stale fight; mark the CC'd instance engaged
+/// and CC-held so the encounter stays open across the mez-and-wait gap. A CC'd instance counts as
+/// alive for closure.
 ///
 /// Ownership gate: `<mob> has been mesmerized.` is a broadcast with no caster, so an APPLICATION
 /// only counts when it resolved one of the owner's own CC casts. A foreign mez is fully inert — it
@@ -422,7 +441,6 @@ fn ingest_cc(st: &mut EngineState, ev: &Event) {
     let Some(mob) = ev.str(Key::Mob).map(str::to_string) else {
         return;
     };
-    eval_closure(st, ev.ts());
     let inst = st.resolve(&mob, ev.ts(), false);
     if inst.instance_id == "you" {
         return;
@@ -621,15 +639,15 @@ fn ingest_combat(st: &mut EngineState, ev: &Event) -> bool {
     }
 }
 
-/// One canonical `damage` line: close any pending encounter at this ts BEFORE routing, so attributed
-/// damage after a closure starts a fresh encounter rather than reviving the old one.
+/// One canonical `damage` line. `ingest_event` closed any pending encounter at this ts BEFORE
+/// routing, so attributed damage after a closure starts a fresh encounter rather than reviving the
+/// old one.
 fn ingest_damage(st: &mut EngineState, ev: &Event) {
     // Caster-less other-player DoTs (`attacker: null`) are not our fight, and the raw line is what
     // the ring keeps: there is nothing else to say about a line nobody owns.
     let Some(attacker) = ev.str(Key::Attacker) else {
         // …except a hit on YOU that names no source (lava, a fall): damage taken all the same.
         if id_key_ref(ev.str(Key::Target).unwrap_or_default()) == "you" {
-            eval_closure(st, ev.ts());
             let modifiers = ev.arr_str(Key::Modifiers);
             let dmg = to_damage_event(st, ev, routing::ENVIRONMENT, &modifiers);
             deathrecap::note_hit(st, &dmg);
@@ -639,7 +657,6 @@ fn ingest_damage(st: &mut EngineState, ev: &Event) {
         st.log_lazy(ev.ts(), "other", "dropped", || ev.raw().to_owned());
         return;
     };
-    eval_closure(st, ev.ts());
     // Built here rather than inside `to_damage_event` so the record can borrow it. The swing timer
     // reads it too: a line with no attacker is never your swing, so noting it after the gate above
     // is the same as noting it first.
