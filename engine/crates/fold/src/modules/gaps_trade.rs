@@ -14,6 +14,7 @@ use super::gaps_offers::offer_of;
 use crate::event::{Event, Kind};
 use crate::message_overlay::message_text_of;
 use serde_json::{json, Value};
+use std::cmp::Reverse;
 use std::collections::HashMap;
 
 /// The window the kills module also joins a kill's exp line by (`KILL_EXP_JOIN_MS`).
@@ -68,9 +69,11 @@ struct Pair {
 }
 
 impl Pair {
-    /// The amount most lines stated; a tie goes to the larger hit.
-    fn adjust(&self) -> Option<i64> {
-        self.adjusts.iter().max_by_key(|(a, n)| (**n, a.abs())).map(|(a, _)| *a)
+    /// Every stated amount with its count, the most stated first; a tie goes to the larger hit.
+    fn stated(&self) -> Vec<(i64, u32)> {
+        let mut all: Vec<(i64, u32)> = self.adjusts.iter().map(|(a, n)| (*a, *n)).collect();
+        all.sort_by_key(|(a, n)| (Reverse(*n), Reverse(a.abs()), Reverse(*a)));
+        all
     }
 }
 
@@ -122,7 +125,10 @@ impl KillFactions {
         any
     }
 
-    /// `[{mob, faction, n, zone, adjust?, raised?}]`, by mob then faction. No proof lines: they were
+    /// `[{mob, faction, n, zone, adjust?, raised?, adjusts?}]`, by mob then faction. `adjusts` is
+    /// every stated amount with its count (`[[amount, count]]`, `adjust` first): the join of two logs
+    /// (`mergeGaps.ts joinKillFaction`) adds them, so a one-off clipped hit in one log cannot outvote
+    /// the other log's kills. No proof lines: they were
     /// most of a Gaps fetch (perf review, 2026-10-20: 458 of 951 KB on the owner's October log), and
     /// only an open faction row or a Copy reads them, from `killFactionSamples` (`gaps_samples.rs`).
     pub fn serve(&self) -> Value {
@@ -130,9 +136,11 @@ impl KillFactions {
         pairs.sort_by(|a, b| a.mob.cmp(&b.mob).then_with(|| a.faction.cmp(&b.faction)));
         let rows = pairs.iter().map(|p| {
             let mut row = json!({ "mob": p.mob, "faction": p.faction, "n": p.n, "zone": p.zone });
-            if let Some(a) = p.adjust() {
+            let stated = p.stated();
+            if let Some((a, _)) = stated.first() {
                 row["adjust"] = json!(a);
-                row["raised"] = json!(a > 0);
+                row["raised"] = json!(*a > 0);
+                row["adjusts"] = json!(stated);
             } else if let Some(r) = p.raised {
                 row["raised"] = json!(r);
             }
@@ -226,5 +234,40 @@ mod tests {
         assert!(served[0].get("adjust").is_none(), "a capped line states none");
         assert_eq!(served[0]["raised"], true, "but a capped better is a raise");
         assert_eq!(served[1]["raised"], false);
+    }
+
+    #[test]
+    fn every_stated_amount_is_served_with_its_count_so_two_logs_can_be_weighed() {
+        let mut k = KillFactions::default();
+        let mut kill = |text: &str, ts: i64| {
+            k.line(&line(&format!("Your faction standing with Gem Choppers {text}"), ts));
+            k.death(&death("You have slain a guard!", ts), "a guard", Some("Ak'Anon"));
+        };
+        for i in 0..369 {
+            kill("has been adjusted by -5.", i * 10_000);
+        }
+        // One hit clipped at the floor, then the capped line, which states no amount.
+        kill("has been adjusted by -4.", 4_000_000);
+        kill("could not possibly get any worse.", 4_010_000);
+        let served = k.serve();
+        assert_eq!(served[0]["n"], 371);
+        assert_eq!(served[0]["adjust"], -5, "the amount most lines stated");
+        assert_eq!(served[0]["adjusts"], serde_json::json!([[-5, 369], [-4, 1]]));
+        assert_eq!(served[0]["raised"], false);
+    }
+
+    #[test]
+    fn a_pair_with_no_stated_amount_serves_no_counts_and_a_tie_goes_to_the_larger_hit() {
+        let mut k = KillFactions::default();
+        k.line(&line("Your faction standing with Pests could not possibly get any worse.", 1_000));
+        k.death(&death("You have slain a rat!", 1_000), "a rat", None);
+        for (by, ts) in [(-4, 20_000), (-5, 30_000)] {
+            k.line(&line(&format!("Your faction standing with Snakes has been adjusted by {by}."), ts));
+            k.death(&death("You have slain a snake!", ts), "a snake", None);
+        }
+        let served = k.serve();
+        assert!(served[0].get("adjusts").is_none(), "a capped line states none");
+        assert_eq!(served[1]["adjust"], -5);
+        assert_eq!(served[1]["adjusts"], serde_json::json!([[-5, 1], [-4, 1]]));
     }
 }

@@ -34,7 +34,8 @@ test('a kept state gets its lines back; a pair that carries lines keeps them; no
 test('the served state drops the lines an archive brought back, and is the same object when there are none', () => {
   assert.equal(withoutKillFactionSamples(slim), slim)
   const merged = mergeGaps({ ...slim, killFactions: [{ ...pair, samples: kill(1) }] }, slim) as typeof slim
-  assert.deepEqual(withoutKillFactionSamples(merged), { ...merged, killFactions: [{ ...pair, n: 2 }] })
+  // The amount's counts ride along (mergeGaps.ts joinKillFaction): only the lines are dropped.
+  assert.deepEqual(withoutKillFactionSamples(merged), { ...merged, killFactions: [{ ...pair, n: 2, adjusts: [[-1, 2]] }] })
   // The history merge serves one object per seq: it is stripped once, not copied on every serve.
   assert.equal(withoutKillFactionSamples(merged), withoutKillFactionSamples(merged))
   assert.equal(withoutKillFactionSamples(null), null)

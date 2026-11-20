@@ -59,10 +59,12 @@ interface KillFaction {
   faction: string
   n: number
   zone: string
-  /** the last amount a line stated */
+  /** the amount most lines stated */
   adjust?: number
-  /** the last direction a line stated: true raised, false lowered (a capped line has no amount) */
+  /** the amount's direction, or a capped line's (it states no amount): true raised, false lowered */
   raised?: boolean
+  /** every amount a line stated with how often, most stated first; absent on a state from before it was served */
+  adjusts?: [number, number][]
   /** the proof: the last kills' raw lines, oldest first, each the faction line then the death line */
   samples?: string[]
 }
@@ -290,10 +292,27 @@ function perDomain(older: Snap, newer: Snap, counted: Map<string, number>): Pick
   return { totals, seen }
 }
 
-/** One pair on both sides: counts added, the newer zone and amount kept, the proof lines joined newer last. */
+/** A side's stated amounts: its `adjusts`, or its one `adjust` weighed by its kills (a state from before the counts were served). */
+const statedOf = (p: KillFaction): [number, number][] => p.adjusts ?? (p.adjust === undefined ? [] : [[p.adjust, p.n]])
+
+/** Both sides' stated amounts added, most stated first, a tie to the larger hit (gaps_trade.rs `Pair::stated`). */
+function joinAdjusts(a: KillFaction, b: KillFaction): [number, number][] {
+  const n = new Map<number, number>()
+  for (const [amount, count] of [...statedOf(a), ...statedOf(b)]) n.set(amount, (n.get(amount) ?? 0) + count)
+  return [...n].sort((x, y) => y[1] - x[1] || Math.abs(y[0]) - Math.abs(x[0]) || y[0] - x[0])
+}
+
+/**
+ * One pair on both sides: counts added, the newer zone kept, the proof lines joined newer last. The
+ * amount is the one most lines stated over BOTH sides, as the fold picks it within one log: the newer
+ * side's amount used to win outright, so one hit clipped at the faction floor (-4) replaced the -5
+ * that hundreds of archived kills stated. With no amount on either side the newer direction stands.
+ */
 function joinKillFaction(had: KillFaction, p: KillFaction): KillFaction {
   const samples = [...(had.samples ?? []), ...(p.samples ?? [])].slice(-KILL_FACTION_SAMPLES)
-  return { ...had, n: had.n + p.n, zone: p.zone || had.zone, adjust: p.adjust ?? had.adjust, raised: p.raised ?? had.raised, ...(samples.length > 0 ? { samples } : {}) }
+  const adjusts = joinAdjusts(had, p)
+  const stated = adjusts.length > 0 ? { adjusts, adjust: adjusts[0][0], raised: adjusts[0][0] > 0 } : { raised: p.raised ?? had.raised }
+  return { ...had, n: had.n + p.n, zone: p.zone || had.zone, ...stated, ...(samples.length > 0 ? { samples } : {}) }
 }
 
 /** Both sides' kill-faction pairs, one per case-folded (mob, faction) (`joinKillFaction`). */

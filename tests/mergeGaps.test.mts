@@ -8,6 +8,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import { factionFix } from '../src/shared/gapFactions'
 import { mergeGaps } from '../src/shared/logArchive/mergeGaps'
 import { hasMergeRule, mergeModule } from '../src/shared/logArchive/mergeRules'
 import { CAPTURED_MODULES } from '../src/shared/logArchive/modules'
@@ -218,12 +219,65 @@ test('gaps: corpse coin joins per mob, the paying kills added and each coin wide
   ])
 })
 
-test('gaps: a kill-faction pair takes the newer side of its direction, as it takes the newer amount', () => {
+test('gaps: a kill-faction pair with no amount stated takes the newer side of its direction', () => {
   const older = { ...snap([]), killFactions: [{ mob: 'a troll slayer', faction: 'Grobb Merchants', n: 1, zone: 'Innothule Swamp', raised: false }] }
   const newer = { ...snap([]), killFactions: [{ mob: 'a troll slayer', faction: 'Grobb Merchants', n: 1, zone: 'Innothule Swamp', raised: true }] }
   const m = mergeGaps(older, newer) as Snap & { killFactions: { n: number; raised?: boolean }[] }
   assert.equal(m.killFactions[0]?.n, 2)
   assert.equal(m.killFactions[0]?.raised, true)
+})
+
+interface Pair {
+  mob: string
+  faction: string
+  n: number
+  zone: string
+  adjust?: number
+  raised?: boolean
+  adjusts?: [number, number][]
+}
+const choppers = (n: number, extra: Partial<Pair> = {}): Pair => ({ mob: 'a guard', faction: 'Gem Choppers', n, zone: 'Ak\'Anon', ...extra })
+const joinedPair = (...sides: Pair[]): Pair => {
+  const m = sides.map((p) => ({ ...snap([]), killFactions: [p] })).reduce((a, b) => mergeGaps(a, b) as typeof a)
+  return (m as unknown as { killFactions: Pair[] }).killFactions[0]
+}
+
+test('gaps: a kill-faction pair keeps the amount most lines stated across the join, not a one-off clipped hit on the newer side', () => {
+  // 369 archived kills said -5; the live log has one hit clipped at the floor (-4), then capped lines.
+  const older = choppers(369, { adjust: -5, raised: false, adjusts: [[-5, 369]] })
+  const newer = choppers(400, { adjust: -4, raised: false, adjusts: [[-4, 1]] })
+  const p = joinedPair(older, newer)
+  assert.equal(p.adjust, -5)
+  assert.equal(p.raised, false)
+  assert.equal(p.n, 769)
+  assert.deepEqual(p.adjusts, [[-5, 369], [-4, 1]], 'the counts are added, so the next join still weighs every side')
+  assert.equal(factionFix(['-5'], p), null, 'a page that says -5 is right: no Fix row')
+  // Either order, and through a third side (several archive segments, the All characters chain).
+  assert.equal(joinedPair(newer, older).adjust, -5)
+  assert.equal(joinedPair(newer, older, choppers(2, { adjust: -4, raised: false, adjusts: [[-4, 2]] })).adjust, -5)
+})
+
+test('gaps: a kill-faction side saved before the counts were served weighs its amount by its kills', () => {
+  const p = joinedPair(choppers(369, { adjust: -5, raised: false }), choppers(3, { adjust: -4, raised: false, adjusts: [[-4, 1]] }))
+  assert.equal(p.adjust, -5)
+  assert.deepEqual(p.adjusts, [[-5, 369], [-4, 1]])
+  // Two such sides: the one with more kills.
+  assert.equal(joinedPair(choppers(2, { adjust: -4, raised: false }), choppers(9, { adjust: -5, raised: false })).adjust, -5)
+  assert.equal(joinedPair(choppers(9, { adjust: -5, raised: false }), choppers(2, { adjust: -4, raised: false })).adjust, -5)
+})
+
+test('gaps: kill-faction amounts stated equally often go to the larger hit, as in the fold; the direction follows the amount', () => {
+  const tie = joinedPair(choppers(4, { adjust: -4, raised: false, adjusts: [[-4, 4]] }), choppers(4, { adjust: -5, raised: false, adjusts: [[-5, 4]] }))
+  assert.equal(tie.adjust, -5)
+  assert.equal(joinedPair(choppers(4, { adjust: -5, raised: false, adjusts: [[-5, 4]] }), choppers(4, { adjust: -4, raised: false, adjusts: [[-4, 4]] })).adjust, -5)
+  // A raise stated more often than the newer side's capped "worse" line: the amount's sign is the direction.
+  const up = joinedPair(choppers(6, { adjust: 10, raised: true, adjusts: [[10, 6]] }), choppers(1, { raised: false }))
+  assert.equal(up.adjust, 10)
+  assert.equal(up.raised, true)
+  // No side stated an amount: none is made up.
+  const capped = joinedPair(choppers(2, { raised: false }), choppers(1, { raised: false }))
+  assert.equal(capped.adjust, undefined)
+  assert.equal(capped.adjusts, undefined)
 })
 
 test('gaps: merchant offers survive the join, the same offer counted once (owner, 2026-10-20)', () => {
