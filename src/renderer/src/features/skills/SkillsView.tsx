@@ -17,7 +17,14 @@ import {
   TableRow,
   Typography
 } from '@mui/material'
-import { SKILLS_MODULE, skillRatePerHour, skillRows, type SkillRow, type SkillsSnap } from '@shared/skills'
+import {
+  SKILLS_MODULE,
+  SKILL_RATE_TIP,
+  skillRateCell,
+  skillRows,
+  type SkillRow,
+  type SkillsSnap
+} from '@shared/skills'
 import type { View } from '../../appViews'
 import { useModule } from '../../lib/useModule'
 import { formatDateTime } from '../../lib/formatDate'
@@ -28,18 +35,30 @@ import { useBoolPref } from '../combat/useCombatPrefs'
 const TRADESKILLS_ONLY_KEY = 'eq.skills.tradeskills'
 
 const LEVEL_TIP = 'The newest level your log stated for this skill.'
-const RATE_TIP = "Raises per hour between this session's first and latest raise of the skill."
 const NO_SKILLS = "No skill has gone up in this character's log yet."
 const NO_TRADESKILLS = "No tradeskill has gone up in this character's log yet."
 
+/** The pace, a dash with the reason on hover when it is withheld, or nothing with no raise this session. */
+function RateCell({ row }: { row: SkillRow }): JSX.Element | null {
+  const { rate, why } = skillRateCell(row)
+  if (rate !== null) return <>{formatSkillRate(rate)}</>
+  if (why === null) return null
+  return (
+    <Tooltip title={why}>
+      <span data-testid="skill-rate-withheld">-</span>
+    </Tooltip>
+  )
+}
+
 function SkillRowLine({ row }: { row: SkillRow }): JSX.Element {
-  const rate = skillRatePerHour(row)
   return (
     <TableRow hover data-testid="skill-row">
       <TableCell>{row.skill}</TableCell>
       <TableCell align="right">{row.value}</TableCell>
       <TableCell align="right">{row.sessionUps > 0 ? `+${String(row.sessionUps)}` : ''}</TableCell>
-      <TableCell align="right">{rate === null ? '' : formatSkillRate(rate)}</TableCell>
+      <TableCell align="right">
+        <RateCell row={row} />
+      </TableCell>
       <TableCell align="right" sx={{ opacity: 0.7 }}>
         {formatDateTime(row.lastTs)}
       </TableCell>
@@ -61,7 +80,7 @@ function SkillsTable({ rows }: { rows: SkillRow[] }): JSX.Element {
             </TableCell>
             <TableCell align="right">This session</TableCell>
             <TableCell align="right">
-              <Tooltip title={RATE_TIP}>
+              <Tooltip title={SKILL_RATE_TIP}>
                 <span>Per hour</span>
               </Tooltip>
             </TableCell>

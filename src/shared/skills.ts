@@ -3,7 +3,7 @@
 //
 // A skill that never went up in the log has no row: the log states a level only on a raise.
 
-import { rateMeasurable } from './rateBasis'
+import { RATE_MIN_MS, rateMeasurable } from './rateBasis'
 import { tradeskillOf } from './tradeskills'
 
 export const SKILLS_MODULE = 'skills'
@@ -40,6 +40,33 @@ export function skillRatePerHour(row: SkillRow): number | null {
   const span = row.lastTs - row.sessionFirstTs
   if (!rateMeasurable(span)) return null
   return ((row.sessionUps - 1) * 3_600_000) / span
+}
+
+const RATE_MIN_MINUTES = String(RATE_MIN_MS / 60_000)
+
+/** The Per hour heading's tooltip: what the number is and when it is shown. */
+export const SKILL_RATE_TIP =
+  "Raises per hour between this session's first and latest raise of the skill. " +
+  `Shown once two raises are at least ${RATE_MIN_MINUTES} minutes apart.`
+
+/** Why a row with one raise this session has no pace. */
+export const SKILL_RATE_NEEDS_SECOND = 'Needs a second raise this session. The first raise starts the clock.'
+
+/** Why a row with several raises this session has no pace yet. */
+export const SKILL_RATE_TOO_SHORT =
+  `This session's raises of this skill are under ${RATE_MIN_MINUTES} minutes apart, ` +
+  'too little to state as a rate per hour.'
+
+/**
+ * The Per hour cell: the pace, or `why` it is withheld. Both null when the skill has not gone up
+ * this session: the cell stays empty, like This session.
+ */
+export function skillRateCell(row: SkillRow): { rate: number | null; why: string | null } {
+  if (row.sessionUps <= 0) return { rate: null, why: null }
+  const rate = skillRatePerHour(row)
+  if (rate !== null) return { rate, why: null }
+  const one = row.sessionUps < 2 || row.sessionFirstTs === undefined
+  return { rate: null, why: one ? SKILL_RATE_NEEDS_SECOND : SKILL_RATE_TOO_SHORT }
 }
 
 /** The table's rows: newest raise first, ties by name. */

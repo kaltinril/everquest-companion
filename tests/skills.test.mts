@@ -3,7 +3,16 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { RATE_MIN_MS } from '../src/shared/rateBasis'
-import { isTradeskillRow, skillRatePerHour, skillRows, type SkillRow } from '../src/shared/skills'
+import {
+  SKILL_RATE_NEEDS_SECOND,
+  SKILL_RATE_TIP,
+  SKILL_RATE_TOO_SHORT,
+  isTradeskillRow,
+  skillRateCell,
+  skillRatePerHour,
+  skillRows,
+  type SkillRow
+} from '../src/shared/skills'
 
 const HOUR = 3_600_000
 
@@ -46,4 +55,29 @@ test('a span under the rate floor is no rate', () => {
 test('the rate is the raises after the first, per hour between the first and the latest', () => {
   const worked = row('Fishing', { sessionUps: 7, sessionFirstTs: 10_000, lastTs: 10_000 + 2 * HOUR })
   assert.equal(skillRatePerHour(worked), 3)
+})
+
+test('the Per hour cell: empty with no raise this session, and a reason whenever a pace is withheld', () => {
+  const minutes = String(RATE_MIN_MS / 60_000)
+  // No raise this session: nothing to explain, the cell stays empty like This session.
+  assert.deepEqual(skillRateCell(row('Fishing')), { rate: null, why: null })
+  // One raise: the player is told a second one is needed.
+  const one = row('Fishing', { sessionUps: 1, sessionFirstTs: 1_000 })
+  assert.deepEqual(skillRateCell(one), { rate: null, why: SKILL_RATE_NEEDS_SECOND })
+  assert.match(SKILL_RATE_NEEDS_SECOND, /second raise/)
+  // Several raises too close together: the player is told the floor, in minutes.
+  const short = row('Fishing', { sessionUps: 4, sessionFirstTs: 0, lastTs: RATE_MIN_MS - 1 })
+  assert.deepEqual(skillRateCell(short), { rate: null, why: SKILL_RATE_TOO_SHORT })
+  assert.ok(SKILL_RATE_TOO_SHORT.includes(`${minutes} minutes`), SKILL_RATE_TOO_SHORT)
+  assert.notEqual(SKILL_RATE_TOO_SHORT, SKILL_RATE_NEEDS_SECOND)
+  // At the floor the pace is stated and there is nothing to explain.
+  const enough = row('Fishing', { sessionUps: 2, sessionFirstTs: 0, lastTs: RATE_MIN_MS })
+  assert.deepEqual(skillRateCell(enough), { rate: HOUR / RATE_MIN_MS, why: null })
+  const worked = row('Fishing', { sessionUps: 7, sessionFirstTs: 10_000, lastTs: 10_000 + 2 * HOUR })
+  assert.deepEqual(skillRateCell(worked), { rate: 3, why: null })
+})
+
+test('the Per hour heading says when a pace is shown: two raises, the floor apart', () => {
+  assert.match(SKILL_RATE_TIP, /two raises/)
+  assert.ok(SKILL_RATE_TIP.includes(`${String(RATE_MIN_MS / 60_000)} minutes`), SKILL_RATE_TIP)
 })
