@@ -121,7 +121,9 @@ export function findWatch(list: BazaarWatchlist, item: string, tier: number): Ba
  */
 export function alertingWatch(list: BazaarWatchlist, o: LiveOffer): BazaarWatch | null {
   const own = findWatch(list, o.item, o.tier)
-  if (own === null || own.tier === null || (o.dir === 'sell' ? own.wts : own.wtb)) return own
+  if (own === null) return null
+  const sideOn = o.dir === 'sell' ? own.wts : own.wtb
+  if (own.tier === null || sideOn) return own
   const lower = o.item.toLowerCase()
   return list.entries.find((w) => w.tier === null && w.item.toLowerCase() === lower) ?? own
 }
