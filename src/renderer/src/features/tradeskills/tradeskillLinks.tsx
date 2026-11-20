@@ -7,6 +7,8 @@
 //   zone   `CellLink` to the Maps tab when `dropZoneTarget` resolves the spelling; plain text when
 //          it refuses (`Various`), never a nearest guess.
 //   merchant  the mob link too, when the mob catalog holds the name on one page; else plain text.
+//             Beside it, "Show on map" when the Maps tab would draw that mob's pin
+//             (maps/mapFocus.ts `pinTarget`): the Maps tab opens with the pin ringed and centred.
 //
 // The doors are the app router's own openers, handed down once through a context.
 
@@ -17,7 +19,10 @@ import type { ItemSource } from '@shared/itemSources'
 import { merchantEntry, merchantIndex, type MerchantIndex } from '@shared/tradeskillMerchant'
 import { CellLink } from '../../lib/CellLink'
 import { ItemIcon } from '../../lib/ItemIcon'
+import { Tooltip } from '../../lib/Tooltip'
 import { dropMobTarget, dropZoneTarget } from '../gear/dropLinks'
+import { pinTarget, type MapFocus } from '../maps/mapFocus'
+import { useTravelEra } from '../maps/useMapData'
 import { MOB_CATALOG } from '../mobs/mobSearch'
 import type { MobTarget } from '../mobs/mobTarget'
 import { DonorName } from '../planner/PlannerChips'
@@ -31,6 +36,10 @@ export interface TradeskillDoors {
   onOpenMapZone: (zone: ZoneShort) => void
   /** The Gear tab with its search box filled (App's `openGearSearch`). */
   onOpenGearSearch: (text: string) => void
+  /** The Maps tab at a mob's pin, with a Back to this section (App's `openMapAt`). */
+  onOpenMapAt: (focus: MapFocus) => void
+  /** The section's own "Make an item" screen on a recipe's item (TradeskillsView). */
+  onPlanRecipe: (recipe: { key: string; id: string }) => void
 }
 
 const DoorsContext = createContext<TradeskillDoors | null>(null)
@@ -111,6 +120,37 @@ export function MerchantLink({ name, zone }: { name: string; zone?: string }): J
         }}
       />
     </span>
+  )
+}
+
+const MAP_LINK_TIP = "Opens the Maps tab on this merchant's pin."
+
+/**
+ * " · Show on map" after a merchant's line: the Maps tab on that merchant's own pin. Drawn only
+ * when the catalog holds the merchant (`MerchantLink`'s rule) AND the Maps tab would pin it there
+ * under its own era switch; otherwise nothing, and the line's zone link is the way to the map.
+ */
+export function MerchantMapLink({ name, zone }: { name: string; zone?: string }): JSX.Element | null {
+  const doors = useContext(DoorsContext)
+  const eraOnly = useTravelEra()
+  MERCHANTS ??= merchantIndex(MOB_CATALOG)
+  const entry = doors === null ? null : merchantEntry(MERCHANTS, name, zone)
+  const target = entry === null ? null : pinTarget(entry, zone, eraOnly)
+  if (doors === null || target === null) return null
+  return (
+    <>
+      {' · '}
+      <Tooltip title={MAP_LINK_TIP}>
+        <span data-testid="tradeskill-map-link">
+          <CellLink
+            text="Show on map"
+            onOpen={() => {
+              doors.onOpenMapAt(target)
+            }}
+          />
+        </span>
+      </Tooltip>
+    </>
   )
 }
 

@@ -5,9 +5,13 @@
 // recipe guide gives. A material that is itself made opens in place to its own recipe
 // (shared/tradeskillBook.ts `subRecipes`: depth-limited, loop-guarded). A recipe the wiki lists
 // no materials for shows the guide's, marked as the guide's.
+//
+// "Plan this item" in the head opens the recipe in the section's Make an item screen (Planner.tsx)
+// through the section's doors, so the workbench threads nothing for it. `WhereCell` is exported:
+// the planner's tree and its gather list draw a material's sources with the same lines.
 
 import { type JSX, useMemo, useState } from 'react'
-import { Box, IconButton, Paper, Stack, Typography } from '@mui/material'
+import { Box, Button, IconButton, Paper, Stack, Typography } from '@mui/material'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import {
@@ -39,7 +43,7 @@ import { FactsProvider, useFacts, type BenchFacts } from './benchFacts'
 import { GuideSourceLine, Have, PaidLine } from './MaterialWhere'
 import { StateChip } from './RecipeTable'
 import { NoticeChip, RecipeYou } from './RecipeYou'
-import { ItemLabel, MobLink, ZoneList } from './tradeskillLinks'
+import { ItemLabel, MobLink, ZoneList, useDoors } from './tradeskillLinks'
 
 /** Material, Need, Have, Where. Every nested recipe repeats the same columns. */
 const GRID_SX = {
@@ -120,7 +124,7 @@ function OpenToggle({ open, name, onToggle }: { open: boolean; name: string; onT
  * and the recipe guide's merchant. `own` is the guide's line for this very recipe, when the
  * materials themselves are the guide's; otherwise the guide's merchant for the item, if it has one.
  */
-function WhereCell({ ingredient, own }: { ingredient: BookIngredient; own?: GuideMaterialLine }): JSX.Element {
+export function WhereCell({ ingredient, own }: { ingredient: BookIngredient; own?: GuideMaterialLine }): JSX.Element {
   const { guides } = useFacts()
   const words = sourceWords(ingredient)
   const guide = own?.source ?? locatedSource(guides, ingredient.key)
@@ -290,6 +294,28 @@ function PanelFoot({ recipe }: { recipe: BookRecipe }): JSX.Element {
   )
 }
 
+const PLAN_TIP = 'Opens Make an item on this recipe: every material down to its leaves, the skills it takes and what to gather.'
+
+/** The door to the section's Make an item screen; nothing outside the section's provider. */
+function PlanThis({ recipe }: { recipe: BookRecipe }): JSX.Element | null {
+  const doors = useDoors()
+  if (doors === null) return null
+  return (
+    <Tooltip title={PLAN_TIP}>
+      <Button
+        size="small"
+        onClick={() => {
+          doors.onPlanRecipe({ key: recipe.key, id: recipe.id })
+        }}
+        data-testid="tradeskill-plan-this"
+        sx={{ ml: 'auto', flexShrink: 0 }}
+      >
+        Plan this item
+      </Button>
+    </Tooltip>
+  )
+}
+
 export interface RecipePanelProps {
   recipe: BookRecipe
   /** Null for a recipe the table no longer lists. */
@@ -316,6 +342,7 @@ export function RecipePanel({ recipe, state, facts, unlisted }: RecipePanelProps
               {unlisted}
             </Typography>
           )}
+          <PlanThis recipe={recipe} />
         </Stack>
         <RecipeYou recipe={recipe} />
         <ColumnHeads dumpedAt={facts.held.dumpedAt} />

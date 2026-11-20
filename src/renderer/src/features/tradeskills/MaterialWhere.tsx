@@ -4,8 +4,9 @@
 // is newer than the inventory dump.
 //
 // Guide text is another player's: it is drawn as plain text. A merchant or a zone becomes a link
-// only when the app's own tables hold that name (tradeskillLinks.tsx); the loc stays text, since
-// the Maps tab has no opener that takes a position.
+// only when the app's own tables hold that name (tradeskillLinks.tsx). The loc stays text; a
+// merchant the Maps tab pins gets "Show on map" after its line (`MerchantMapLink`), which opens
+// the map on the mob's own pin, never on the guide's numbers.
 
 import { Fragment, type JSX } from 'react'
 import { Box, Chip, Typography } from '@mui/material'
@@ -16,7 +17,7 @@ import { lastPaid, ppText } from '@shared/tradeskillMoney'
 import { formatDate, formatDateTime } from '../../lib/formatDate'
 import { Tooltip } from '../../lib/Tooltip'
 import { useFacts } from './benchFacts'
-import { MerchantLink, ZoneLink } from './tradeskillLinks'
+import { MerchantLink, MerchantMapLink, ZoneLink } from './tradeskillLinks'
 
 const CHIP_SX = { height: 16, fontSize: 10, mr: 0.5 } as const
 
@@ -53,6 +54,7 @@ export function PaidLine({ ingredient }: { ingredient: BookIngredient }): JSX.El
         </>
       )}
       {` on ${formatDate(paid.ts)}`}
+      <MerchantMapLink name={paid.merchant} zone={paid.zone} />
     </Typography>
   )
 }
@@ -83,6 +85,7 @@ export function GuideSourceLine({ source }: { source: GuideSource }): JSX.Elemen
     <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-material-guide">
       <SourceChip kind="guide" />
       <SourceWords source={source} />
+      {source.merchant !== undefined && <MerchantMapLink name={source.merchant} zone={source.zone} />}
     </Typography>
   )
 }
