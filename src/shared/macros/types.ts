@@ -54,11 +54,14 @@ export interface CharacterFileMacros extends CharacterFile {
   mtimeMs: number
 }
 
+/** Why no game folder was read: no character log found yet, or the folder would not list. */
+export type GameFilesReason = 'no-log' | 'unreadable'
+
 /** The reply of the game-files read. `gameFolder` null: `reason` says why. */
 export interface GameMacroFiles {
   gameFolder: string | null
   files: CharacterFileMacros[]
-  reason?: string
+  reason?: GameFilesReason
 }
 
 /** Fresh ids and the clock, passed in so every library operation stays pure. */

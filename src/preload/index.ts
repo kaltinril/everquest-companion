@@ -99,6 +99,7 @@ import { graphicsBridge } from './graphics'
 import { buffTrustBridge } from './buffTrust'
 import { logArchiveBridge } from './logArchive'
 import { gapsCharactersBridge } from './gapsCharacters'
+import { macrosBridge } from './macros'
 import { presencePrefsBridge } from './presencePrefs'
 import { respawnBridge } from './respawn'
 import { updatesBridge } from './updates'
@@ -310,6 +311,7 @@ const api = {
   ...buffTrustBridge,
   ...logArchiveBridge,
   ...gapsCharactersBridge,
+  ...macrosBridge,
   ...respawnBridge,
   // …and the main window's text size (./uiScale.ts), likewise.
   ...uiScaleBridge,

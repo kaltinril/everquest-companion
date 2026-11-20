@@ -36,6 +36,7 @@ import { registerPerfIpc } from './perf'
 import { registerPlannerIpc } from './planner'
 // After planner.ts on purpose: it reads the item index and the era memo that module already loads.
 import { registerTradeskillsIpc } from './tradeskills'
+import { registerMacrosIpc } from './macros'
 import { registerPresenceIpc } from './presence'
 import { registerReleaseNotesIpc } from './releaseNotes'
 import { registerRosterIpc } from './roster'
@@ -103,6 +104,7 @@ export function registerIpc(): void {
   registerKnowledgeIpc()
   registerPlannerIpc()
   registerTradeskillsIpc()
+  registerMacrosIpc()
   // Gated on the review-gate door inside the register (ipc/achievements.ts).
   registerAchievementsIpc()
   registerMapsIpc()
