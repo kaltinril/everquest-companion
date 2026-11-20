@@ -11,6 +11,7 @@ import {
   noteLogReadConnection,
   noteLogReadError,
   noteLogReadHealth,
+  noteLogReadLanded,
   noteLogReadTouched,
   noteLogReadTurn,
   noteReplySize,
@@ -159,7 +160,9 @@ test('a new turn forgets the last health answer, the offset and the meter-s read
     error: null,
     combatReads: [],
     tooLarge: null,
-    large: null
+    large: null,
+    tooLargeModules: [],
+    nothingRecognised: null
   })
 })
 
@@ -179,7 +182,9 @@ test('a new launch clears everything except how long the app has waited', () => 
     error: null,
     combatReads: [],
     tooLarge: null,
-    large: null
+    large: null,
+    tooLargeModules: [],
+    nothingRecognised: null
   })
 })
 
@@ -326,6 +331,56 @@ test('GOING LIVE FORGETS WHAT THE METER WAS TOLD WHILE THE LOG WAS BEING READ', 
   assert.equal(logReadFacts().combatReads[0].why, 'refused')
 })
 
+// ---- 5b. the notes: facts of ONE read of the log -----------------------------------------------
+
+const KIB = 1024
+
+test('every module whose reply could not be shown is kept, once each, apart from a large one that was', () => {
+  fresh(1_000)
+  const refused = { op: 'module.snapshot', module: 'loot', chars: 70 * MIB, refused: true, limit: 64 * MIB }
+  noteReplySize(refused, 1_100)
+  noteReplySize({ ...refused, module: 'gaps', chars: 40 * MIB, refused: false, limit: 32 * MIB }, 1_200)
+  noteReplySize(refused, 1_300)
+  // A fight list is not a module, and a large reply that was shown is not one that was not.
+  noteReplySize({ op: 'combat.snapshot', module: null, chars: 70 * MIB, refused: true, limit: 64 * MIB }, 1_400)
+  noteReplySize({ op: 'module.snapshot', module: 'events', chars: 20 * MIB, refused: false, limit: null }, 1_500)
+  const facts = logReadFacts()
+  assert.deepEqual(facts.tooLargeModules, ['loot', 'gaps'])
+  assert.equal(facts.large?.module, 'events')
+})
+
+test('NOTHING RECOGNISED is noted at go-live only for a read of more than 64 KiB with no event', () => {
+  fresh(1_000)
+  noteLogReadLanded(0, 64 * KIB)
+  assert.equal(logReadFacts().nothingRecognised, null, 'a log of a few lines was called unrecognised')
+  noteLogReadLanded(12, 300 * MIB)
+  assert.equal(logReadFacts().nothingRecognised, null)
+  // The engine did not say how many: unknown is not zero.
+  noteLogReadLanded(undefined, 300 * MIB)
+  noteLogReadLanded(0, undefined)
+  assert.equal(logReadFacts().nothingRecognised, null)
+  noteLogReadLanded(0, 64 * KIB + 1)
+  assert.equal(logReadFacts().nothingRecognised, 64 * KIB + 1)
+})
+
+test('THE NOTES ARE PER TURN: a new turn and a new launch forget all three', () => {
+  for (const forget of ['turn', 'launch']) {
+    const path = fresh(1_000)
+    noteReplySize({ op: 'module.snapshot', module: 'loot', chars: 70 * MIB, refused: true, limit: 64 * MIB }, 1_100)
+    noteReplySize({ op: 'module.snapshot', module: 'events', chars: 20 * MIB, refused: false, limit: null }, 1_200)
+    noteLogReadLanded(0, 300 * MIB)
+    if (forget === 'turn') noteLogReadTurn(2_000, path)
+    else noteLogReadConnection(2_000)
+    const { tooLarge, large, tooLargeModules, nothingRecognised } = logReadFacts()
+    assert.deepEqual({ tooLarge, large, tooLargeModules, nothingRecognised }, {
+      tooLarge: null,
+      large: null,
+      tooLargeModules: [],
+      nothingRecognised: null
+    }, forget)
+  }
+})
+
 // ---- 6. the change listener --------------------------------------------------------------------
 
 test('EVERY NOTE CALLS THE CHANGE LISTENER ONCE', () => {
@@ -343,6 +398,7 @@ test('EVERY NOTE CALLS THE CHANGE LISTENER ONCE', () => {
     ['noteLogReadHealth live', () => noteLogReadHealth('live', 20, 2_400)],
     ['noteCombatRead', () => noteCombatRead({ key: 'fight' }, 2_500)],
     ['noteReplySize', () => noteReplySize({ op: 'combat.snapshot', module: null, chars: 1, refused: false, limit: null }, 2_600)],
+    ['noteLogReadLanded', () => noteLogReadLanded(0, 300 * MIB)],
     ['noteLogReadTouched', () => noteLogReadTouched()]
   ]
   for (const [name, note] of notes) {

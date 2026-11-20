@@ -118,6 +118,7 @@ import {
   noteLogReadConnection,
   noteLogReadError,
   noteLogReadHealth,
+  noteLogReadLanded,
   noteLogReadTouched,
   noteLogReadTurn
 } from './logReadState'
@@ -665,6 +666,8 @@ function sawHealth(l: LiveEngine, health: FoldHealth): void {
     // says the fold never landed, which is a completely different investigation from one whose
     // ring shows `engine:live` followed by module cursors.
     noteEngineEdge('engine:live')
+    // What the read made of the log, for the status's notes (logReadState.ts decides).
+    noteLogReadLanded(health.events, health.mark?.offset)
   }
   // THE BANNER RESOLVES HERE (JOS-503), and OUTSIDE the `first` test on purpose. `first` is
   // about this app's own read path changing hands, which happens once; this is about a window

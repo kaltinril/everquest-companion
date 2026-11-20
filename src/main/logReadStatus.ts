@@ -35,7 +35,8 @@ function sameNotes(a: readonly LogReadNote[], b: readonly LogReadNote[]): boolea
   return a.every((note, i) => {
     const other = b[i]
     const same = note.id === other.id && note.text === other.text
-    return same && note.tryLine === other.tryLine && note.button === other.button
+    const about = (note.modules ?? []).join() === (other.modules ?? []).join()
+    return same && about && note.tryLine === other.tryLine && note.button === other.button
   })
 }
 

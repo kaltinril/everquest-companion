@@ -6,7 +6,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { IPC } from '../src/shared/ipc'
 
 const code = (rel: string): string =>
@@ -70,6 +70,17 @@ test('A READ THAT ENDED, AND AN APP WITH NO CHARACTER, DROP THE BAR', () => {
   const ended = body(code(LAUNCH_STATE), /export function noteEngineReadEnded\(\): void \{/)
   assert.match(ended, /if \(say\.fault !== null\) return/, 'it must not take a standing failure card down')
   assert.match(ended, /set\(\{ phase: 'starting', fold: null, fault: null \}\)/)
+})
+
+test('THE GO-LIVE EDGE SAYS WHAT THE READ MADE OF THE LOG, once, wherever that edge lives', () => {
+  // The one call the recognised-no-lines note hangs on. The edge may move to another file of the
+  // attach turn: wherever it is, the call goes with it, inside the `first` test.
+  const files = [HOST, '../src/main/dataServer/attachTurn.ts'].filter((rel) => existsSync(new URL(rel, import.meta.url)))
+  const calls = files.map((rel) => code(rel).match(/noteLogReadLanded\(health\.events, health\.mark\?\.offset\)/g) ?? [])
+  assert.equal(calls.flat().length, 1, 'the go-live edge no longer records what the engine recognised')
+  const edge = files.map(code).find((source) => source.includes('noteLogReadLanded(')) ?? ''
+  assert.match(edge, /if \(first\) \{[\s\S]*?noteLogReadLanded\(health\.events, health\.mark\?\.offset\)\s*\}/)
+  assert.match(code(MAIN_REPORT), /archiveOn: logArchiveOn\(\)/, 'the notes no longer know whether the archive is on')
 })
 
 test('an attach error carries the engine-s code, so a timeout is not called a refusal', () => {

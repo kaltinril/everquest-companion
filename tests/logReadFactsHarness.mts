@@ -32,6 +32,10 @@ export function facts(over: Partial<LogReadFacts> = {}): LogReadFacts {
     combatReads: [],
     link: null,
     tooLarge: null,
+    large: null,
+    tooLargeModules: [],
+    nothingRecognised: null,
+    archiveOn: false,
     ...over
   }
 }

@@ -18,6 +18,7 @@ import { engineLaunchSay } from './dataServer/engineLaunchState'
 import { logReadFacts, onLogReadChange } from './dataServer/logReadState'
 import { createLogProbe, worthALook } from './logProbe'
 import { createLogReadStatus } from './logReadStatus'
+import { logArchiveOn } from './storeLogArchive'
 import { sendToEveryWindow } from './windows'
 import { IPC } from '../shared/ipc'
 import { composeLogReadReport, type LogReadReport } from '../shared/logReadReport'
@@ -101,6 +102,7 @@ export function buildLogReadReport(): LogReadReport {
     readiness: client.readiness,
     fold: say.fold,
     logSize: client.logSize,
-    probe: logPath === null ? null : logProbe.last(logPath)
+    probe: logPath === null ? null : logProbe.last(logPath),
+    archiveOn: logArchiveOn()
   })
 }

@@ -6,6 +6,7 @@
 // directory stop here; only the base name goes on.
 
 import { humanBytes, humanDuration } from './engineLaunch'
+import { logReadNotes } from './logReadNotes'
 import { LOG_READ_ACTION, LOG_READ_TRY, LOG_READ_WORDS, type LogReadAction } from './logReadWords'
 
 /** Where on the log-loading path an error was recorded. */
@@ -156,15 +157,25 @@ export interface LogReadFacts {
   readonly link: LogReadLink | null
   /** The newest reply of this read that could not be shown, or null. */
   readonly tooLarge: LogReadReplySize | null
+  /** The newest reply of this read that was 16 MiB or more and WAS shown, or null. */
+  readonly large: LogReadReplySize | null
+  /** Every module whose reply could not be shown in this read of the log. */
+  readonly tooLargeModules: readonly string[]
+  /** How many bytes the engine had read when it went live having recognised no line; else null. */
+  readonly nothingRecognised: number | null
+  /** Is Summarize and archive log on? A note must not tell the player to turn on what is on. */
+  readonly archiveOn: boolean
 }
 
-/** One more thing to tell the player while the read itself is fine. Nothing composes one yet. */
+/** One more thing to tell the player while the read itself is fine (`logReadNotes.ts`). */
 export interface LogReadNote {
   readonly id: string
   readonly text: string
   readonly tryLine?: string
   /** A button's label, when the note has one. */
   readonly button?: string
+  /** The modules the note is about: a tab that reads one says so in its own line. */
+  readonly modules?: readonly string[]
 }
 
 /** What crosses IPC. No full path, no home directory. */
@@ -496,14 +507,15 @@ function measured(f: LogReadFacts): Pick<LogReadReport, 'logBytes' | 'offset' | 
 export function composeLogReadReport(f: LogReadFacts): LogReadReport {
   const verdict = decide(f)
   const { wait } = verdict
+  const logFile = f.logPath === null ? null : baseName(f.logPath)
   return {
     wait,
     show: shows(verdict, f.now),
     tryLine: LOG_READ_TRY[wait],
     action: LOG_READ_ACTION[wait],
-    notes: [],
+    notes: logReadNotes(f, logFile),
     appVersion: f.appVersion,
-    logFile: f.logPath === null ? null : baseName(f.logPath),
+    logFile,
     ...measured(f),
     engine: engineWords(f),
     lastError: lastErrorText(f, wait),

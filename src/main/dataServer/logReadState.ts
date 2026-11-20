@@ -14,17 +14,27 @@ import {
   type LogReadReplySize,
   type LogReadStep
 } from '../../shared/logReadReport'
+import { NOTHING_RECOGNISED_BYTES } from '../../shared/logReadNotes'
 
 const SAID_KEPT = 8
 const SAID_WITH_ERROR = 4
 /** How many meter questions are remembered: the Combat tab, Overview and the meter overlays. */
 const COMBAT_KEYS_KEPT = 8
 
-/** The slice of `LogReadFacts` this file owns, plus the newest large reply that WAS shown. */
+/** The slice of `LogReadFacts` this file owns. */
 export type LogReadNotes = Pick<
   LogReadFacts,
-  'health' | 'lastOffset' | 'movedAt' | 'waitingSince' | 'error' | 'combatReads' | 'tooLarge'
-> & { readonly large: LogReadReplySize | null }
+  | 'health'
+  | 'lastOffset'
+  | 'movedAt'
+  | 'waitingSince'
+  | 'error'
+  | 'combatReads'
+  | 'tooLarge'
+  | 'large'
+  | 'tooLargeModules'
+  | 'nothingRecognised'
+>
 
 /** This launch's newest engine stderr lines, already token-redacted and bounded by the supervisor. */
 let said: string[] = []
@@ -41,6 +51,8 @@ let landed = false
 let combatReads: LogReadCombatRead[] = []
 let tooLarge: LogReadReplySize | null = null
 let large: LogReadReplySize | null = null
+let tooLargeModules: string[] = []
+let nothingRecognised: number | null = null
 let changed: (() => void) | null = null
 
 /** The one listener for "something the status is composed from moved" (main/logReadStatus.ts). */
@@ -59,6 +71,15 @@ export function noteEngineSaid(line: string): void {
   changed?.()
 }
 
+/** What is known about one read of the log (reply sizes, what it recognised) is not known of the
+ *  next: that one asks again (replySizes.ts). */
+function forgetReadNotes(): void {
+  tooLarge = null
+  large = null
+  tooLargeModules = []
+  nothingRecognised = null
+}
+
 /** A wait that is still running is not restarted: only a new log or a read that landed starts one. */
 function startWait(at: number, newLog: boolean): void {
   if (newLog || landed || waitingSince === null) waitingSince = at
@@ -74,8 +95,7 @@ export function noteLogReadConnection(at: number): void {
   lastOffset = null
   movedAt = null
   combatReads = []
-  tooLarge = null
-  large = null
+  forgetReadNotes()
   startWait(at, false)
   changed?.()
 }
@@ -90,9 +110,7 @@ export function noteLogReadTurn(at: number, logPath: string | null): void {
   movedAt = null
   // The meter's reads were of the world this turn replaces.
   combatReads = []
-  // A reply's size is a fact about one read of the log; the next one asks again (replySizes.ts).
-  tooLarge = null
-  large = null
+  forgetReadNotes()
   if (error !== null && error.step !== 'connect') error = null
   changed?.()
 }
@@ -160,6 +178,20 @@ export function noteCombatRead(read: CombatReadSeen, at: number): void {
 export function noteReplySize(reply: Omit<LogReadReplySize, 'at'>, at: number): void {
   if (reply.limit === null) large = { ...reply, at }
   else tooLarge = { ...reply, at }
+  // Every module that could not be shown, not only the newest: each one's tab says so.
+  const unshown = reply.limit === null ? null : reply.module
+  if (unshown !== null && !tooLargeModules.includes(unshown)) tooLargeModules = [...tooLargeModules, unshown]
+  changed?.()
+}
+
+/**
+ * The read went live (the go-live edge): what the engine said it had made of the log. More than
+ * `NOTHING_RECOGNISED_BYTES` read with no event at all is a log the engine could not read as an
+ * EverQuest log (another encoding, another program's file). Unknown is not zero: nothing is noted.
+ */
+export function noteLogReadLanded(events: number | undefined, offset: number | undefined): void {
+  const none = events === 0 && offset !== undefined && offset > NOTHING_RECOGNISED_BYTES
+  nothingRecognised = none ? offset : null
   changed?.()
 }
 
@@ -167,5 +199,6 @@ export function logReadFacts(): LogReadNotes {
   // A read that ended: the engine's reason travels on stderr, another pipe, and can arrive after
   // the idle answer that recorded the error. So its lines are read now, not then.
   const shown = error?.step === 'fold' ? { ...error, said: said.slice(-SAID_WITH_ERROR) } : error
-  return { health, lastOffset, movedAt, waitingSince, error: shown, combatReads, tooLarge, large }
+  const sizes = { tooLarge, large, tooLargeModules, nothingRecognised }
+  return { health, lastOffset, movedAt, waitingSince, error: shown, combatReads, ...sizes }
 }
