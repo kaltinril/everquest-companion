@@ -28,6 +28,7 @@ import {
   FOLD_POLL_MS,
   FOLD_REFUSAL_LIMIT,
   FOLD_REFUSAL_PAUSE_MS,
+  FOLD_UNANSWERED_PAUSE_MS,
   stillFolding,
   waitForFold,
   type FoldHealth,
@@ -44,7 +45,7 @@ const OLD_BUDGET_POLLS = OLD_BUDGET_MS / FOLD_POLL_MS
 const GB = 1024 * 1024 * 1024
 
 function folding(offset: number, events: number): FoldHealth {
-  return { status: 'folding', epoch: 2, events, mark: { logPath: 'eqlog_Primitive_freeport.txt', offset } }
+  return { status: 'folding', epoch: 2, events, mark: { log: 'eqlog_Primitive_freeport.txt', offset } }
 }
 
 function live(offset: number, events: number): FoldHealth {
@@ -154,20 +155,52 @@ test('a turn that has been superseded touches nothing', async () => {
 
 // ---- 2. the exits that are real events ----------------------------------------------------------
 
-test('A CONNECTION THAT DIES ENDS THE TURN, and does not hang', async () => {
-  const dead = new EngineError('unavailable', 'there is no open connection')
-  const r = rig([dead])
+test('THREE REFUSALS RUNNING ARE SAID ONCE AND THE WAIT KEEPS ASKING, slowly, while the turn is its own', async () => {
+  // It used to return here, and nothing ever asked again: an engine that was only slow (main's
+  // connection behind a large reply, a stall after wake) then went live with nobody looking, and
+  // the app sat on "Reading log..." for the rest of the session (fork #9, phase R4).
+  const dead = new EngineError('timeout', 'the engine did not answer session.health in time')
+  const failed: [string, string][] = []
+  const asksWanted = FOLD_REFUSAL_LIMIT + 40
+  const r = rig([dead], { failed: (why, detail) => failed.push([why, detail]) })
+  // A stand-in for the respawn or the switch that ends an unanswered wait in the field.
+  const deps: FoldWaitDeps = { ...r.deps, mine: () => r.asks < asksWanted }
 
-  assert.equal(await waitForFold(r.deps), null)
-  assert.equal(r.asks, FOLD_REFUSAL_LIMIT, 'it asked its bounded few times and then stopped')
+  assert.equal(await waitForFold(deps), null)
+  assert.equal(r.asks, asksWanted, 'driven far past the limit: it never stops asking by itself')
+  assert.deepEqual(failed, [['unanswered', 'timeout: the engine did not answer session.health in time']], 'said once')
   assert.equal(r.saw.length, 0)
-  assert.ok(
-    r.notes.some((line) => line.includes('times running')),
-    `the giving-up is unexplained: ${r.notes.join(' | ')}`
-  )
-  // The retries are SPACED, and by the refusal pause rather than the ordinary beat: a refusal is
-  // not a measurement that came back uninteresting.
-  assert.deepEqual(r.rests, [FOLD_REFUSAL_PAUSE_MS, FOLD_REFUSAL_PAUSE_MS])
+  // The first refusals are spaced by the refusal pause; from the limit on it is the slow cadence.
+  assert.deepEqual(r.rests.slice(0, FOLD_REFUSAL_LIMIT), [FOLD_REFUSAL_PAUSE_MS, FOLD_REFUSAL_PAUSE_MS, FOLD_UNANSWERED_PAUSE_MS])
+  assert.ok(r.rests.slice(FOLD_REFUSAL_LIMIT).every((ms) => ms === FOLD_UNANSWERED_PAUSE_MS))
+  assert.equal(FOLD_UNANSWERED_PAUSE_MS, 5_000)
+  // One line at the limit and none per slow ask: a dead connection must not write a line every 5 s.
+  assert.equal(r.notes.filter((line) => line.includes('times running')).length, 1, r.notes.join(' | '))
+  assert.equal(r.notes.length, FOLD_REFUSAL_LIMIT)
+})
+
+test('AN ENGINE THAT ANSWERS AGAIN AFTER GOING UNANSWERED IS SEEN, and its `live` is returned', async () => {
+  const slow = new EngineError('timeout', 'nobody answered')
+  const failed: string[] = []
+  const script: (FoldHealth | Error)[] = []
+  for (let i = 0; i < FOLD_REFUSAL_LIMIT + 5; i += 1) script.push(slow)
+  script.push(folding(2048, 20), live(4096, 40))
+  const r = rig(script, { failed: (why) => failed.push(why) })
+
+  const landed = await waitForFold(r.deps)
+  assert.equal(landed?.status, 'live')
+  assert.equal(r.saw.length, 2, 'both answered polls were passed on')
+  assert.deepEqual(failed, ['unanswered'])
+  assert.equal(r.rests[r.rests.length - 1], FOLD_POLL_MS, 'an answered poll goes back to the ordinary beat')
+})
+
+test('a second run of refusals after an answer is said again, once', async () => {
+  const slow = new EngineError('timeout', 'nobody answered')
+  const failed: string[] = []
+  const run = [slow, slow, slow, slow]
+  const r = rig([...run, folding(2048, 20), ...run, live(4096, 40)], { failed: (why) => failed.push(why) })
+  assert.equal((await waitForFold(r.deps))?.status, 'live')
+  assert.deepEqual(failed, ['unanswered', 'unanswered'])
 })
 
 test('A TRANSIENTLY REFUSED POLL RETRIES AND THEN ARMS', async () => {
@@ -250,10 +283,32 @@ test('ONLY idle ENDS IT: starting, attaching and folding are waited out', async 
   assert.deepEqual(failed, [], 'a read that landed did not fail')
 })
 
-test('three refusals running say `unanswered`, with the last refusal as the detail', async () => {
-  const { r, failed } = failing([new EngineError('timeout', 'nobody answered')])
+test('an engine that goes idle after going unanswered still ends the wait', async () => {
+  const slow = new EngineError('timeout', 'nobody answered')
+  const { r, failed } = failing([slow, slow, slow, slow, { status: 'idle', epoch: 2 }])
   assert.equal(await waitForFold(r.deps), null)
-  assert.deepEqual(failed, [['unanswered', 'timeout: nobody answered']])
+  assert.equal(r.asks, 5, 'the idle answer was the last poll')
+  assert.deepEqual(failed, [
+    ['unanswered', 'timeout: nobody answered'],
+    ['ended', 'the engine reports idle after an accepted attach']
+  ])
+})
+
+test('a turn superseded while it is unanswered ends silently', async () => {
+  let mine = true
+  const failed: string[] = []
+  const r = rig([new EngineError('timeout', 'nobody answered')], {
+    mine: () => mine,
+    rest: () => {
+      // The world is replaced during the first slow rest.
+      if (failed.length > 0) mine = false
+      return Promise.resolve()
+    },
+    failed: (why) => failed.push(why)
+  })
+  assert.equal(await waitForFold(r.deps), null)
+  assert.equal(r.asks, FOLD_REFUSAL_LIMIT)
+  assert.deepEqual(failed, ['unanswered'])
 })
 
 test('a superseded turn fails nothing, even on an idle answer', async () => {

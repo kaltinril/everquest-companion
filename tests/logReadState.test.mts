@@ -218,12 +218,30 @@ test('A NEW TURN FORGETS BOTH: a reply-s size is a fact about one read of the lo
 
 test('LIVE CLEARS THE ERROR: the read it was about has landed', () => {
   fresh(1_000)
-  noteLogReadError('health', 'timeout', 2_000)
+  noteLogReadError('attach', 'timeout', 2_000)
   noteLogReadHealth('folding', 10, 2_500)
-  assert.equal(logReadFacts().error?.step, 'health', 'a folding answer proves nothing yet')
+  assert.equal(logReadFacts().error?.step, 'attach', 'a folding answer proves nothing yet')
   noteLogReadHealth('live', 20, 3_000)
   assert.equal(logReadFacts().error, null)
   assert.deepEqual(logReadFacts().health, { status: 'live', at: 3_000, since: 3_000 })
+})
+
+test('AN ANSWERED POLL CLEARS A `health` ERROR, and leaves a `fold` error standing', () => {
+  // The wait keeps asking after three polls went unanswered (foldWait.ts). When the engine then
+  // answers, "not answering" is no longer true, whatever the answer says.
+  for (const status of ['starting', 'attaching', 'folding', 'idle', 'live']) {
+    fresh(1_000)
+    noteLogReadError('health', 'timeout: nobody answered', 2_000)
+    noteLogReadHealth(status, undefined, 2_500)
+    assert.equal(logReadFacts().error, null, status)
+  }
+  // A read that ended is not un-ended by a poll that says so again.
+  fresh(1_000)
+  noteLogReadError('fold', 'the engine reports idle after an accepted attach', 2_000)
+  noteLogReadHealth('idle', 10, 2_500)
+  assert.equal(logReadFacts().error?.step, 'fold')
+  noteLogReadHealth('folding', 20, 3_000)
+  assert.equal(logReadFacts().error?.step, 'fold', 'only live clears it')
 })
 
 test('movedAt advances only when the offset grows, and the offset outlives a read that ended', () => {

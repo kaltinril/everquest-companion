@@ -33,10 +33,13 @@
 //   * the engine says `live` — the fold landed, which is the answer the loop was waiting for;
 //   * the engine says `idle` — its read of the log ended (fork #9), so there is no fold to wait on;
 //   * the turn was superseded (`mine()` answers false) — a respawn, a character switch or a world
-//     rebuild replaced the world, and the fresh turn is already waiting on its own fold;
-//   * the connection refused the poll a bounded few times running — the engine is not answering AT
-//     ALL, which is the wedged-alive pathology, and the supervisor's own health watch is what
-//     handles a process in that state (a respawn is a launch, and the fresh turn re-arms).
+//     rebuild replaced the world, and the fresh turn is already waiting on its own fold.
+//
+// POLLS THAT GO UNANSWERED ARE NOT AN EXIT (fork #9). A bounded few refusals running are reported
+// once (`failed('unanswered')`) and the wait then asks at a slower beat for as long as the turn is
+// its own. It used to return, and nothing asked again: an engine that was only slow went live with
+// nobody looking. A process that is truly wedged is the supervisor's health watch's to end, and
+// the respawn replaces this turn.
 //
 // A log the size of the ones in those reports takes as long as it takes. The only thing this file
 // owes a person waiting on one is to SAY SO, which is the narration below.
@@ -61,7 +64,7 @@ import { humanBytes } from '../../shared/engineLaunch'
 export const FOLD_POLL_MS = 400
 
 /**
- * How many refusals IN A ROW end the turn.
+ * How many refusals IN A ROW are reported as `unanswered` (the wait goes on, see `refusedPause`).
  *
  * NOT ONE, WHICH IS WHAT IT USED TO BE. A single refusal ended the wait and therefore stranded the
  * session just as permanently as the budget did — and a refusal is the one failure here that is
@@ -74,6 +77,9 @@ export const FOLD_REFUSAL_LIMIT = 3
 /** The pause after a refused poll. Longer than the ordinary beat on purpose: a refusal is not a
  *  measurement that came back uninteresting, it is the engine failing to speak. */
 export const FOLD_REFUSAL_PAUSE_MS = 1_000
+
+/** The pause between asks once the polls have gone unanswered (`FOLD_REFUSAL_LIMIT` running). */
+export const FOLD_UNANSWERED_PAUSE_MS = 5_000
 
 /**
  * How many polls between two narration lines — thirty seconds' worth, counted rather than timed.
@@ -89,8 +95,8 @@ export interface FoldHealth {
   readonly status: string
   readonly epoch: number
   readonly events?: number
-  /** The engine's own (log identity, byte offset). Absent until it has folded something. */
-  readonly mark?: { readonly logPath?: string; readonly offset?: number }
+  /** The engine's own (log identity, byte offset): the wire's `LogMark`. Absent before any attach. */
+  readonly mark?: { readonly log?: string; readonly offset?: number }
   /** THE LOG FILE'S mtime, as the ENGINE stats it (owner ruling 21). Absent before an attach, and
    *  absent when the stat failed — never zero, which would claim 1970. */
   readonly logMtimeMs?: number
@@ -117,15 +123,15 @@ export interface FoldWaitDeps {
    *  narration's denominator, and the reason it is a callback: it moves while the fold runs
    *  (EverQuest is still appending), so a value captured at the start would go stale. */
   readonly logSize: () => number | null
-  /** The wait ended without going live: the engine's read `ended`, or the polls went `unanswered`. */
+  /** The engine's read `ended` (the wait is over), or the polls went `unanswered` (it goes on). */
   readonly failed?: (why: 'ended' | 'unanswered', detail: string) => void
 }
 
 /**
  * POLL UNTIL THE ENGINE IS LIVE. The health answer that said so, or null when the turn ended.
  *
- * Null means "say nothing": either somebody replaced this world, or the engine stopped answering
- * and the supervisor owns what happens next. Neither is a thing to report from here.
+ * Null means "say nothing more": somebody replaced this world, or the engine's read ended and
+ * `failed` has already said so.
  */
 export async function waitForFold(deps: FoldWaitDeps): Promise<FoldHealth | null> {
   let refusals = 0
@@ -137,19 +143,7 @@ export async function waitForFold(deps: FoldWaitDeps): Promise<FoldHealth | null
     } catch (err) {
       if (!deps.mine()) return null
       refusals += 1
-      if (refusals >= FOLD_REFUSAL_LIMIT) {
-        deps.note(
-          `data-server client: session.health was refused ${String(refusals)} times running — ` +
-            `this turn stops asking (${describeErr(err)})`
-        )
-        deps.failed?.('unanswered', describeErr(err))
-        return null
-      }
-      deps.note(
-        `data-server client: session.health was refused (${describeErr(err)}); ` +
-          `asking again (${String(refusals)} of ${String(FOLD_REFUSAL_LIMIT)})`
-      )
-      await deps.rest(FOLD_REFUSAL_PAUSE_MS)
+      await deps.rest(refusedPause(deps, refusals, err))
       if (!deps.mine()) return null
       continue
     }
@@ -174,6 +168,31 @@ export async function waitForFold(deps: FoldWaitDeps): Promise<FoldHealth | null
     await deps.rest(FOLD_POLL_MS)
     if (!deps.mine()) return null
   }
+}
+
+/**
+ * ONE REFUSED POLL: say so, and answer how long to rest before the next ask.
+ *
+ * AT THE LIMIT THE WAIT SAYS `unanswered` ONCE AND KEEPS ASKING (fork #9). It used to return there,
+ * and nothing asked again: an engine that was only slow then went live with nobody looking. The
+ * slow asks after the limit write no line, or a dead connection would write one every 5 s.
+ */
+function refusedPause(deps: FoldWaitDeps, refusals: number, err: unknown): number {
+  if (refusals < FOLD_REFUSAL_LIMIT) {
+    deps.note(
+      `data-server client: session.health was refused (${describeErr(err)}); ` +
+        `asking again (${String(refusals)} of ${String(FOLD_REFUSAL_LIMIT)})`
+    )
+    return FOLD_REFUSAL_PAUSE_MS
+  }
+  if (refusals === FOLD_REFUSAL_LIMIT) {
+    deps.note(
+      `data-server client: session.health was refused ${String(refusals)} times running; asking ` +
+        `every ${String(FOLD_UNANSWERED_PAUSE_MS)} ms from here (${describeErr(err)})`
+    )
+    deps.failed?.('unanswered', describeErr(err))
+  }
+  return FOLD_UNANSWERED_PAUSE_MS
 }
 
 /**

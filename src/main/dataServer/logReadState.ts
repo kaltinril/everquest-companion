@@ -107,6 +107,8 @@ export function noteLogReadHealth(status: string, offset: number | undefined, at
   const was = health
   const same = was !== null && (was.status === status || (opening(was.status) && opening(status)))
   health = { status, at, since: same ? was.since : at }
+  // The engine answered: "not answering" was about the polls before this one (foldWait.ts asks on).
+  if (error?.step === 'health') error = null
   if (offset !== undefined && (lastOffset === null || offset > lastOffset)) {
     lastOffset = offset
     movedAt = at
