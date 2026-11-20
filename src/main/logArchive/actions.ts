@@ -24,6 +24,7 @@ import { captureSegment, type CaptureDeps } from './capture'
 import { archiveBuckets, placeArchivedBuckets } from './engineBuckets'
 import { liveHistory, logArchiveDir } from './liveHistory'
 import { readLogPrefix } from './logPrefix'
+import { servedOrUnread } from './captureReads'
 import { refoldWithApp } from './refoldActions'
 import { historyKeys, readRespawnHistory } from './respawnHistory'
 import { writeFactionLedger, type LedgerSource } from './factionLedgerFile'
@@ -83,23 +84,18 @@ const captureDeps: CaptureDeps = {
   on: () => logArchiveOn(),
   attached,
   health: async () => engineRequest('session.health', {}),
+  // A READ THAT FAILS REJECTS (fork #9), here and in `fights`: captureReads.ts decides what a
+  // rejection means. Both used to swallow every failure into null, which reads as "the engine has
+  // none" and let a log be moved aside with a module missing.
   snapshot: async (module) => {
-    try {
-      const r = await engineRequest('module.snapshot', { module })
-      if (r.module !== module) return null
-      // A segment keeps what the engine serves apart (gaps' proof lines, buffs' overlay) in place.
-      return { seq: r.seq, state: await capturedState(module, r.state, engineState) }
-    } catch {
-      return null
-    }
+    const r = await engineRequest('module.snapshot', { module })
+    if (r.module !== module) throw new Error(`the engine answered about ${r.module}, not ${module}`)
+    // A segment keeps what the engine serves apart (gaps' proof lines, buffs' overlay) in place.
+    return { seq: r.seq, state: await capturedState(module, r.state, engineState) }
   },
   fights: async () => {
-    try {
-      const r = await engineRequest('combat.snapshot', { opts: { maxSegments: ALL_FIGHTS } })
-      return capturedFights((r.snapshot as { segments?: unknown }).segments)
-    } catch {
-      return null
-    }
+    const r = await engineRequest('combat.snapshot', { opts: { maxSegments: ALL_FIGHTS } })
+    return capturedFights((r.snapshot as { segments?: unknown }).segments)
   },
   respawnHistory: liveRespawnHistory,
   readPrefix: readLogPrefix,
@@ -171,7 +167,9 @@ function lacksExtras(s: Segment): boolean {
 
 /** Ask the engine which captured modules it serves. Once per run, after it has caught up. */
 export async function learnEngineModules(): Promise<void> {
-  const snaps = await Promise.all(CAPTURED_MODULES.map(async (m) => [m, await captureDeps.snapshot(m)] as const))
+  const snaps = await Promise.all(
+    CAPTURED_MODULES.map(async (m) => [m, await servedOrUnread(captureDeps.snapshot(m))] as const)
+  )
   engineModules = new Set(snaps.filter(([, snap]) => snap !== null).map(([m]) => m))
   const respawn = snaps.find(([m]) => m === 'respawn')?.[1]?.state as { learned?: unknown } | undefined
   engineLearnsRespawn = Array.isArray(respawn?.learned)
