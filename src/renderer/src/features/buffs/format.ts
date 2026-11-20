@@ -22,6 +22,26 @@ export function fmtPrecise(ms: number | null | undefined): string {
   return `${Math.round(ms / 100) / 10}s`
 }
 
+/** The measured numbers of one Durations row. */
+export interface StatSpread {
+  medianMs?: number | null
+  p25?: number | null
+  p75?: number | null
+  minMs?: number | null
+  maxMs?: number | null
+}
+
+/**
+ * The Durations table's median, middle-half and min-max cells. Written with `fmtPrecise`, the way
+ * the estimate beside them is: with whole seconds the row read "4.5s" for the estimate and "5s"
+ * for the median, which are the same 4500 ms.
+ */
+export function statCells(s: StatSpread): { median: string; middle: string; range: string } {
+  const span = (lo: number | null | undefined, hi: number | null | undefined): string =>
+    lo != null && hi != null ? `${fmtPrecise(lo)} - ${fmtPrecise(hi)}` : '-'
+  return { median: fmtPrecise(s.medianMs), middle: span(s.p25, s.p75), range: span(s.minMs, s.maxMs) }
+}
+
 /**
  * Fraction of the estimated window still remaining (1 = just landed, 0 = expired),
  * clamped to [0,1]. Used to drive the progress bar. `estimatedMs` must be > 0.

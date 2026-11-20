@@ -48,7 +48,7 @@ import EditIcon from '@mui/icons-material/EditOutlined'
 import type { BuffClass, BuffStat } from '@shared/types'
 import type { BuffDurationOverride } from '@shared/buffTrust'
 import { buffStatRows, type KeyedBuffStat } from '@shared/buffStatRows'
-import { fmtDuration, classAccent, estimateChipLabel, estimateText, estimatorSourceTitle } from './format'
+import { classAccent, estimateChipLabel, estimateText, estimatorSourceTitle, statCells } from './format'
 import { BuffDurationDialog } from './BuffDurationDialog'
 import { BuffAllowCheck } from './BuffAllowCheck'
 import { useBuffAllow } from './useBuffAllow'
@@ -114,6 +114,7 @@ const ROW_SX = { height: STAT_ROW_HEIGHT, '& td': { py: 0, whiteSpace: 'nowrap' 
  *  must not redraw every row it keeps. */
 const StatsRow = memo(function StatsRow({ k, s, withBoxes, onEdit }: { k: string; s: BuffStat; withBoxes: boolean; onEdit: OnEdit }): JSX.Element {
   const est = rowEstimate(s)
+  const cells = statCells(s)
   return (
     <TableRow hover data-testid="buff-stats-row" data-spell={s.spell} sx={ROW_SX}>
       {/* THE SECOND PLACE TO CHECK A SPELL (JOS-168) — the same box the active card carries, on
@@ -149,12 +150,12 @@ const StatsRow = memo(function StatsRow({ k, s, withBoxes, onEdit }: { k: string
           s.n
         )}
       </TableCell>
-      <TableCell align="right">{fmtDuration(s.medianMs)}</TableCell>
+      <TableCell align="right">{cells.median}</TableCell>
       <TableCell align="right" style={{ opacity: 0.8 }}>
-        {s.p25 != null && s.p75 != null ? `${fmtDuration(s.p25)} - ${fmtDuration(s.p75)}` : '-'}
+        {cells.middle}
       </TableCell>
       <TableCell align="right" style={{ opacity: 0.65 }}>
-        {s.minMs != null && s.maxMs != null ? `${fmtDuration(s.minMs)} - ${fmtDuration(s.maxMs)}` : '-'}
+        {cells.range}
       </TableCell>
     </TableRow>
   )
