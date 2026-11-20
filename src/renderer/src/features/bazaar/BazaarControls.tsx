@@ -6,7 +6,8 @@
 import { type JSX, useState } from 'react'
 import { Autocomplete, Box, Button, FormControlLabel, MenuItem, Slider, Stack, Switch, TextField, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material'
 import type { BazaarDir } from '@shared/bazaar'
-import { TRADESKILLS } from '@shared/tradeskills'
+import { TRADESKILLS, tradeskillOf } from '@shared/tradeskills'
+import { useTradeskillLink } from '../../lib/tradeskillLink'
 
 export type BazaarShow = 'all' | 'wish' | 'watched'
 
@@ -72,6 +73,24 @@ export type QuestOptions = () => readonly string[]
 
 const NO_QUESTS: readonly string[] = []
 
+/** Beside the Tradeskill picker once it names one: that tradeskill's workbench in the Tradeskills section. */
+function WorkbenchButton({ picked }: { picked: string }): JSX.Element | null {
+  const open = useTradeskillLink()
+  const tradeskill = tradeskillOf(picked === '' ? undefined : picked)
+  if (open === null || tradeskill === undefined) return null
+  return (
+    <Button
+      size="small"
+      onClick={() => {
+        open({ tradeskill })
+      }}
+      data-testid="bazaar-open-workbench"
+    >
+      {tradeskill} recipes
+    </Button>
+  )
+}
+
 /** What the item is for: the Tradeskill picker and the Quest search, off the wiki's recipes and quests. */
 function PurposeControls({ state, set, quests }: Props & { quests: QuestOptions }): JSX.Element {
   // THE CHOICES ARE ASKED FOR WHEN THE BOX OPENS (the 2026-11-06 renderer pass): they are every
@@ -96,6 +115,7 @@ function PurposeControls({ state, set, quests }: Props & { quests: QuestOptions 
           </MenuItem>
         ))}
       </TextField>
+      <WorkbenchButton picked={state.tradeskill} />
       <Autocomplete
         freeSolo
         size="small"

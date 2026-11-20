@@ -26,12 +26,15 @@ import {
   type SkillRow,
   type SkillsSnap
 } from '@shared/skills'
+import { tradeskillOf } from '@shared/tradeskills'
 import type { View } from '../../appViews'
 import { LogReadInline } from '../../components/LogReadInline'
 import { useModule } from '../../lib/useModule'
 import { formatDateTime } from '../../lib/formatDate'
 import { formatSkillRate } from '../../lib/formatRate'
+import { CellLink } from '../../lib/CellLink'
 import { Tooltip } from '../../lib/Tooltip'
+import { useTradeskillLink } from '../../lib/tradeskillLink'
 import { useBoolPref } from '../combat/useCombatPrefs'
 
 const TRADESKILLS_ONLY_KEY = 'eq.skills.tradeskills'
@@ -50,10 +53,29 @@ function RateCell({ row }: { row: SkillRow }): JSX.Element | null {
   )
 }
 
+/** The skill's name. A tradeskill's is a link to its workbench in the Tradeskills section. */
+function SkillName({ skill }: { skill: string }): JSX.Element {
+  const open = useTradeskillLink()
+  const tradeskill = tradeskillOf(skill)
+  if (open === null || tradeskill === undefined) return <>{skill}</>
+  return (
+    <span data-testid="skill-tradeskill-link">
+      <CellLink
+        text={skill}
+        onOpen={() => {
+          open({ tradeskill })
+        }}
+      />
+    </span>
+  )
+}
+
 function SkillRowLine({ row }: { row: SkillRow }): JSX.Element {
   return (
     <TableRow hover data-testid="skill-row">
-      <TableCell>{row.skill}</TableCell>
+      <TableCell>
+        <SkillName skill={row.skill} />
+      </TableCell>
       <TableCell align="right">{row.value}</TableCell>
       <TableCell align="right">{row.sessionUps > 0 ? `+${String(row.sessionUps)}` : ''}</TableCell>
       <TableCell align="right">
