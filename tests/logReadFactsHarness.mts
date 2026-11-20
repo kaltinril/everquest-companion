@@ -32,6 +32,7 @@ export function facts(over: Partial<LogReadFacts> = {}): LogReadFacts {
     lastCombatRead: null,
     link: null,
     tooLarge: null,
+    watchingFile: false,
     ...over
   }
 }

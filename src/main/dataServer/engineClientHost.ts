@@ -114,6 +114,9 @@ import { noteEngineFolding, noteEngineLive, noteEngineReadEnded } from './engine
 // the owner ruling that a folding engine is never given up on.
 import { runAttachTurn } from './attachTurn'
 import type { FoldHealth } from './foldWait'
+// THE LOOK AFTER LIVE, and the read's edges as the recovery hears them (fork #9, phase R4).
+import { createAfterLiveWatch } from './afterLive'
+import { noteReadEdge } from './readEdges'
 // What went wrong on the way to live, kept for the "Reading log..." report (fork #9).
 import {
   noteLogReadConnection,
@@ -224,6 +227,8 @@ function bumpGen(): number {
   // What was known about reply sizes was known about the last read (replySizes.ts).
   replySizes.reset()
   noteLogReadTurn(Date.now(), attachTarget())
+  // Whatever was armed to read the last world again must not fire into this one.
+  noteReadEdge('turn', null)
   return gen
 }
 
@@ -310,6 +315,7 @@ export function onEngineReady(info: ReadyEngine | null): void {
     return
   }
   noteLogReadConnection(Date.now())
+  noteReadEdge('launch', null)
   const client = createEngineClient({
     token: info.token,
     debug: (note) => {
@@ -508,6 +514,7 @@ async function attachAndProbe(mine: number): Promise<void> {
     },
     saw: (health) => {
       sawHealth(l, health)
+      if (health.status === 'live') noteReadEdge('live', target)
     },
     logSize: () => lastFoldLogSize,
     failed: (why, detail) => {
@@ -518,8 +525,45 @@ async function attachAndProbe(mine: number): Promise<void> {
         noteEngineReadEnded()
       }
       noteLogReadError(why === 'ended' ? 'fold' : 'health', detail, Date.now())
+      // AFTER the error is on record: the recovery may replace it with why it will not retry.
+      if (why === 'ended') noteReadEdge('ended', target)
     }
   })
+}
+
+// ── after live (fork #9, phase R4) ─────────────────────────────────────────────────────────────
+
+/** `afterLive.ts`: a probe answer that says not live is asked again here before it is believed. */
+const afterLive = createAfterLiveWatch({
+  liveOn: () => engineLiveOn,
+  turn: () => gen,
+  ask: () => engineRequest('session.health', {}),
+  ended: readStoppedAfterLive,
+  note: debug
+})
+
+/** Every healthy answer to the supervisor's 30 s probe (`engineHost.ts onHealth`). */
+export function noteSupervisorHealth(health: { readonly status: string }): void {
+  afterLive.probed(health.status)
+}
+
+/**
+ * THE ENGINE STOPPED READING A LOG IT HAD CAUGHT UP ON. A fourth edge that lets go of a served
+ * world, with the three `wasServing` ones: a new turn, the windows told (the engine WAS serving,
+ * or `afterLive` would not have asked), the attach forgotten so the next one is sent, and the
+ * reason on record. Whether it is read again is the recovery's call (`logReadRecovery.ts`).
+ */
+function readStoppedAfterLive(): void {
+  const l = live
+  const was = engineLiveOn
+  if (l === null || was === null) return
+  debug('data-server client: the engine stopped reading the log after it was live')
+  bumpGen()
+  pushWorldChanged()
+  l.attachedTo = null
+  noteEngineReadEnded()
+  noteLogReadError('fold', 'the engine stopped reading after it was live', Date.now())
+  noteReadEdge('endedAfterLive', was)
 }
 
 /**

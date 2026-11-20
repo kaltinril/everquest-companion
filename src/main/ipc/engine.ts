@@ -35,6 +35,7 @@ import { engineLaunchSay } from '../dataServer/engineLaunchState'
 import { retryEngineSupervisor } from '../dataServer/engineHost'
 import { reattachEngineLog, reconnectEngineClient } from '../dataServer/engineClientHost'
 import { noteLogReadTouched } from '../dataServer/logReadState'
+import { noteReadEdge } from '../dataServer/readEdges'
 import { createTryAgain } from '../logReadActions'
 import { buildLogReadReport, lastLogReadReport, startLogReadStatus } from '../logReadReport'
 
@@ -55,9 +56,12 @@ export function registerEngineLaunchIpc(): void {
   })
   ipcMain.handle(IPC.logReadReport, () => buildLogReadReport())
   ipcMain.handle(IPC.logReadTryAgain, () => {
+    if (tryLogReadAgain() === null) return
+    // A person asking is a changed fact: what the app has tried by itself starts over (readRetry.ts).
+    noteReadEdge('manual', null)
     // After an action the status is composed again, whatever the action poked by itself: the
     // press is answered by the status moving.
-    if (tryLogReadAgain() !== null) noteLogReadTouched()
+    noteLogReadTouched()
   })
   startLogReadStatus()
 }

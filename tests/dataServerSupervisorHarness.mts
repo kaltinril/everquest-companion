@@ -25,6 +25,8 @@ export function harness(
   const logs: string[] = []
   const pids: (number | null)[] = []
   const readies: (ReadyEngine | null)[] = []
+  /** The status of every healthy probe answer handed to `onHealth` (fork #9), in order. */
+  const healths: string[] = []
   /** THE PERSON'S EDGE (JOS-503) — every `onFault`, in order, `null`s included. */
   const faults: (EngineFaultCause | null)[] = []
   /** THE CYCLING EDGE (JOS-519) — one entry per launch that had SERVED and then died, stamped with
@@ -70,6 +72,7 @@ export function harness(
     report: (log) => reports.push(log),
     onPid: (pid) => pids.push(pid),
     onReady: (engine) => readies.push(engine),
+    onHealth: (health) => healths.push(health.status),
     onFault: (fault) => faults.push(fault),
     onServedExit: () => servedExits.push(clock.now()),
     ...(opts.deaf === true ? {} : { onEngineSaid: (line: string) => said.push(line) }),
@@ -82,6 +85,7 @@ export function harness(
     logs,
     pids,
     readies,
+    healths,
     faults,
     servedExits,
     said,

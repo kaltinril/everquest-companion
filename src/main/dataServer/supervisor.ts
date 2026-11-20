@@ -195,6 +195,9 @@ export interface EngineSupervisorDeps extends HealthWatchDeps {
    * consumer holding a socket to a dead engine is a consumer whose next request hangs.
    */
   onReady?(engine: ReadyEngine | null): void
+  /** EVERY healthy answer to the watchdog's probe, the first included and before `onReady`: the
+   *  only look at the engine's status once the read is live (fork #9, `afterLive.ts`). */
+  onHealth?(health: EngineHealth): void
   /**
    * THE PERSON'S EDGE (JOS-503) — see `EngineFaultCause`. Called with a cause when a launch is not
    * going to work and with `null` when one reaches READY. Never called for `shutdown-exit`, which
@@ -561,7 +564,7 @@ export class EngineSupervisor {
   private beginHealth(l: Launch, announce: EngineAnnounce): void {
     const target = { port: announce.port, token: l.token, protocolVersion: this.protocolVersion }
     l.health = createLaunchHealthWatch(this.deps, target, {
-      onHealthy: (health, first) => { if (first) this.reachedReady(l, announce, health) },
+      onHealthy: (health, first) => { this.deps.onHealth?.(health); if (first) this.reachedReady(l, announce, health) },
       onUnhealthy: (reasons, err) => { this.unhealthy(l, reasons, err) },
       onLocalSocket: (tries, err) => { this.localSocket(l, tries, err) }
     })

@@ -312,6 +312,12 @@ test('both edges where the serving world changes hands are announced', () => {
   const edges = host.match(/const wasServing = engineLiveOn !== null/g) ?? []
   assert.equal(edges.length, 3, 'the loss edge is asked in exactly the three places that let go')
   assert.equal((host.match(/if \(wasServing\) pushWorldChanged\(\)/g) ?? []).length, 3)
+  // A FOURTH lets go (fork #9, phase R4): the engine stopped reading after it was live. It asks no
+  // `wasServing`: that edge exists only for a turn that had recorded the engine as live.
+  const stopped = /function readStoppedAfterLive\(\): void \{([\s\S]*?)\n\}/.exec(host)
+  assert.ok(stopped, 'nothing lets go of a world whose reader stopped after live')
+  assert.match(stopped[1], /if \(l === null \|\| was === null\) return/)
+  assert.match(stopped[1], /bumpGen\(\)\s*pushWorldChanged\(\)/)
 })
 
 // ── 3. the mark is still ONE instant ───────────────────────────────────────────────────

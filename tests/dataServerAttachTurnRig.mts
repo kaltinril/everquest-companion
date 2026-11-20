@@ -83,6 +83,10 @@ export interface Rig {
   readonly order: string[]
   /** The state directory the handover answers, or undefined for a launch that sends none. */
   stateDir: string | undefined
+  /** Can the engine open the log? When it cannot, an attach is taken and its read ends at once. */
+  engineCanOpen: boolean
+  /** The read's edges, as the host says them (`readEdges.ts`). A case that wants them sets this. */
+  edges: ((edge: 'turn' | 'live' | 'ended', logPath: string | null) => void) | null
   /** Start a turn for `target`: the host's `bumpGen` and `attachAndProbe`. */
   turn(target: string): Promise<void>
 }
@@ -95,7 +99,7 @@ function answerFor(r: Rig): FoldHealth {
 function takeAttach(r: Rig, logPath: string): void {
   r.engineLog = logPath
   // Read to the end at once, unless a case says otherwise: a wait must be able to finish.
-  r.engineStatus = 'live'
+  r.engineStatus = r.engineCanOpen ? 'live' : 'idle'
 }
 
 function attachOf(r: Rig, params: { logPath: string; stateDir?: string }): Promise<AttachAnswer> {
@@ -145,9 +149,12 @@ export function rig(): Rig {
     rests: [],
     order: [],
     stateDir: 'C:\\Users\\tester\\AppData\\Roaming\\app',
+    engineCanOpen: true,
+    edges: null,
     turn(target) {
       gen += 1
       wanted = target
+      r.edges?.('turn', null)
       const mine = gen
       const gate = r.definesGate
       r.definesGate = null
@@ -184,9 +191,15 @@ export function rig(): Rig {
           r.saw.push(health)
           // The host's go-live edge: `engineLiveOn = l.attachedTo`.
           if (health.status === 'live') r.liveOn.push(r.attached)
+          if (health.status === 'live') r.edges?.('live', target)
         },
         logSize: () => null,
-        failed: (why, detail) => r.failed.push([why, detail])
+        failed: (why, detail) => {
+          // What the host does with a read that ended: it forgets the attach, then says the edge.
+          if (why === 'ended') r.attached = null
+          r.failed.push([why, detail])
+          if (why === 'ended') r.edges?.('ended', target)
+        }
       })
     }
   }

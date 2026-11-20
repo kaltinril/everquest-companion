@@ -11,12 +11,15 @@
 import { app } from 'electron'
 import { open } from 'node:fs/promises'
 import { homedir } from 'node:os'
+import { logInfo } from './errorLog'
 import { getActiveCharacter } from './session'
-import { engineClientFacts } from './dataServer/engineClientHost'
+import { engineClientFacts, reattachEngineLog } from './dataServer/engineClientHost'
 import { engineSupervisorStatus } from './dataServer/engineHost'
 import { engineLaunchSay } from './dataServer/engineLaunchState'
-import { logReadFacts, onLogReadChange } from './dataServer/logReadState'
+import { logReadFacts, noteLogReadError, onLogReadChange } from './dataServer/logReadState'
+import { onReadEdge } from './dataServer/readEdges'
 import { createLogProbe, worthALook } from './logProbe'
+import { createLogReadRecovery } from './logReadRecovery'
 import { createLogReadStatus } from './logReadStatus'
 import { sendToEveryWindow } from './windows'
 import { IPC } from '../shared/ipc'
@@ -62,16 +65,42 @@ const status = createLogReadStatus({
   pending: logProbePending
 })
 
+/** THE RECOVERY, bound (phase R4): what the app tries by itself when a read ends. */
+const recovery = createLogReadRecovery({
+  look: (path) => {
+    logProbe.look(path)
+  },
+  last: (path) => logProbe.last(path),
+  reattach: reattachEngineLog,
+  stopped: (line) => {
+    noteLogReadError('fold', line, Date.now())
+  },
+  timer: unrefTimer,
+  now: () => Date.now(),
+  note: (line) => {
+    logInfo(`[everquest-companion] ${line}`)
+  },
+  changed: () => {
+    status.poke()
+  }
+})
+
 /**
- * Start pushing the status. Once, from the IPC registration: before any window exists, so the
- * first thing a window reads is already the pushed state.
+ * Start pushing the status, and start hearing the read's edges. Once, from the IPC registration:
+ * before any window exists, so the first thing a window reads is already the pushed state, and
+ * before the engine is started, so no edge is missed.
  */
 export function startLogReadStatus(): void {
   onLogReadChange(() => {
     status.poke()
   })
+  // ONE listener on the probe, and both readers of it are told here.
   logProbe.onSettled(() => {
     status.poke()
+    recovery.probed()
+  })
+  onReadEdge((edge, logPath) => {
+    recovery.edge(edge, logPath)
   })
   status.start()
 }
@@ -101,6 +130,7 @@ export function buildLogReadReport(): LogReadReport {
     readiness: client.readiness,
     fold: say.fold,
     logSize: client.logSize,
-    probe: logPath === null ? null : logProbe.last(logPath)
+    probe: logPath === null ? null : logProbe.last(logPath),
+    watchingFile: recovery.watching()
   })
 }
