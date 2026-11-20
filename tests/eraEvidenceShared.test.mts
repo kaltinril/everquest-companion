@@ -41,8 +41,12 @@ test('the owner`s item: Mane Attraction is in era on the Exaltations list, for t
   const donor = donors.find((d) => d.name === 'Mane Attraction')
   const row = gearByKey.get('mane attraction')
   assert.ok(donor && row, 'Mane Attraction left an index')
-  assert.deepEqual(donor.eraDerived, { basis: 'quest', verdict: 'in-era', target: 'Rain Caller Quest', detail: 'Greater Faydark' })
+  // Until 2026-11-20 the evidence was layer 3 alone (its quest starts in Greater Faydark). The owner
+  // then put the Classic banner on the page, and the delta of that day brought it in: the banner is
+  // the evidence now. Either way both lists state the same thing.
+  assert.equal(donor.eraTag, row.eraTag)
   assert.deepEqual(donor.eraDerived, row.eraDerived)
+  assert.ok(donor.eraTag !== undefined || donor.eraDerived !== undefined, 'Mane Attraction states no era evidence at all')
   assert.equal(donorEra(donor).verdict, 'in-era')
   assert.equal(eraHides(donor, true), false)
   // In era needs no chip.
