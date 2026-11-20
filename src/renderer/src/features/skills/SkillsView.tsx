@@ -22,6 +22,7 @@ import {
   SKILL_RATE_TIP,
   skillRateCell,
   skillRows,
+  skillsEmptyText,
   type SkillRow,
   type SkillsSnap
 } from '@shared/skills'
@@ -35,8 +36,6 @@ import { useBoolPref } from '../combat/useCombatPrefs'
 const TRADESKILLS_ONLY_KEY = 'eq.skills.tradeskills'
 
 const LEVEL_TIP = 'The newest level your log stated for this skill.'
-const NO_SKILLS = "No skill has gone up in this character's log yet."
-const NO_TRADESKILLS = "No tradeskill has gone up in this character's log yet."
 
 /** The pace, a dash with the reason on hover when it is withheld, or nothing with no raise this session. */
 function RateCell({ row }: { row: SkillRow }): JSX.Element | null {
@@ -101,6 +100,7 @@ function SkillsView(): JSX.Element {
   const snap = useModule<SkillsSnap>(SKILLS_MODULE)
   const [tradeskillsOnly, setTradeskillsOnly] = useBoolPref(TRADESKILLS_ONLY_KEY, false)
   const rows = useMemo(() => skillRows(snap?.rows ?? [], tradeskillsOnly), [snap, tradeskillsOnly])
+  const empty = skillsEmptyText(snap, rows.length)
   return (
     <Box data-testid="skills-view" sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 2, minHeight: 0 }}>
       <Stack direction="row" alignItems="center" spacing={2}>
@@ -123,9 +123,9 @@ function SkillsView(): JSX.Element {
         Skills appear here once the log shows them going up.
       </Typography>
       {rows.length > 0 && <SkillsTable rows={rows} />}
-      {snap !== null && rows.length === 0 && (
+      {empty !== null && (
         <Typography variant="body2" color="text.secondary" data-testid="skills-empty" sx={{ py: 4, textAlign: 'center' }}>
-          {snap.rows.length === 0 ? NO_SKILLS : NO_TRADESKILLS}
+          {empty}
         </Typography>
       )}
     </Box>

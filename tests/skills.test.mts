@@ -11,6 +11,7 @@ import {
   skillRateCell,
   skillRatePerHour,
   skillRows,
+  skillsEmptyText,
   type SkillRow
 } from '../src/shared/skills'
 
@@ -75,6 +76,21 @@ test('the Per hour cell: empty with no raise this session, and a reason whenever
   assert.deepEqual(skillRateCell(enough), { rate: HOUR / RATE_MIN_MS, why: null })
   const worked = row('Fishing', { sessionUps: 7, sessionFirstTs: 10_000, lastTs: 10_000 + 2 * HOUR })
   assert.deepEqual(skillRateCell(worked), { rate: 3, why: null })
+})
+
+test('the empty line: nothing while loading, "no skill" for an empty log, "no tradeskill" when the switch hides every row', () => {
+  // Loading prints nothing: "no skill has gone up" would be untrue for raises still to arrive.
+  assert.equal(skillsEmptyText(null, 0), null)
+  const none = skillsEmptyText({ rows: [] }, 0)
+  assert.match(none ?? '', /^No skill has gone up/)
+  const hidden = skillsEmptyText({ rows: [row('Kick')] }, 0)
+  assert.match(hidden ?? '', /^No tradeskill has gone up/)
+  // Rows on screen: no empty line.
+  assert.equal(skillsEmptyText({ rows: [row('Kick')] }, 1), null)
+  // The view's own inputs, end to end: the switch on over a log with no tradeskill raise.
+  const snap = { rows: [row('Kick'), row('Taunt')] }
+  assert.equal(skillsEmptyText(snap, skillRows(snap.rows, true).length), hidden)
+  assert.equal(skillsEmptyText(snap, skillRows(snap.rows, false).length), null)
 })
 
 test('the Per hour heading says when a pace is shown: two raises, the floor apart', () => {

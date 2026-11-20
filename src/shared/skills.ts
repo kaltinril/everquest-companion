@@ -69,6 +69,18 @@ export function skillRateCell(row: SkillRow): { rate: number | null; why: string
   return { rate: null, why: one ? SKILL_RATE_NEEDS_SECOND : SKILL_RATE_TOO_SHORT }
 }
 
+export const NO_SKILLS_TEXT = "No skill has gone up in this character's log yet."
+export const NO_TRADESKILLS_TEXT = "No tradeskill has gone up in this character's log yet."
+
+/**
+ * The line in place of the table, given how many rows are `shown`: null while the snapshot is
+ * loading or rows are on screen.
+ */
+export function skillsEmptyText(snap: SkillsSnap | null, shown: number): string | null {
+  if (snap === null || shown > 0) return null
+  return snap.rows.length === 0 ? NO_SKILLS_TEXT : NO_TRADESKILLS_TEXT
+}
+
 /** The table's rows: newest raise first, ties by name. */
 export function skillRows(rows: readonly SkillRow[], tradeskillsOnly: boolean): SkillRow[] {
   const kept = tradeskillsOnly ? rows.filter(isTradeskillRow) : [...rows]
