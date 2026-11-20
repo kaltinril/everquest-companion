@@ -254,7 +254,7 @@ test('the slot axis lists a two-slot donor twice, in character-sheet order, slot
 
 test('the era axis reads the injected verdict, in release order, with the unplaced last', () => {
   const groups = groupDonors(FOCUS_ROWS, 'era', eraOf)
-  assert.deepEqual(labels(groups), ['Classic', 'Kunark', 'era?'])
+  assert.deepEqual(labels(groups), ['Classic', 'Kunark', 'Unknown Era'])
   assert.deepEqual(groups[1].donors, [RANGE_I])
   // "era?" is nothing states an era — never dressed up as out-of-era, and never sorted as if the
   // planner knew where it belonged.

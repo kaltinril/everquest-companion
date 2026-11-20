@@ -372,6 +372,9 @@ export interface EraChipInfo {
   tooltip: string
 }
 
+/** What a row reads when nothing states its era: the chip, and the era grouping's last bucket. */
+export const UNKNOWN_ERA_LABEL = 'Unknown Era'
+
 const UNKNOWN_TOOLTIP = 'Nothing in our data states an era for this donor.'
 
 /**
@@ -405,7 +408,7 @@ function derivedReason(d: EraDerivation | undefined): string {
 export function eraChip(subject: EraSubject): EraChipInfo | null {
   const { verdict, era, by } = donorEra(subject)
   if (verdict === 'in-era') return null
-  if (verdict === 'unknown') return { label: 'era?', unknown: true, tooltip: UNKNOWN_TOOLTIP }
+  if (verdict === 'unknown') return { label: UNKNOWN_ERA_LABEL, unknown: true, tooltip: UNKNOWN_TOOLTIP }
   const label = era === null ? 'out of era' : ERA_LABEL[era]
   return {
     label,
@@ -436,11 +439,17 @@ export function eraChip(subject: EraSubject): EraChipInfo | null {
  * era" is a leak, not a courtesy: the filter's promise is "what you can get", and "we cannot say"
  * fails that promise the same way "no" does. The chip still says era? on every surface the row IS
  * shown (filter off), so nothing is dressed up as a verdict — the row is hidden for lacking one.
+ *
+ * REVERSED 2026-11-20 (owner, on a quest reward the Exaltations list hid: "lets not hide it but put
+ * a chip showing Unknown Era", then "lets show items that we can't figure out the era"). ONE
+ * VERDICT HIDES NOW: a positive out-of-era. A row nothing states an era for is SHOWN under the
+ * filter, wearing the `Unknown Era` chip (`eraChip`), so the list never silently lacks an item
+ * the player can see on the wiki. The Recommended tab keeps its own stricter gate
+ * (`shared/planner/progressionPlan.ts eraLegal`): it tells the player what to go and farm.
  */
 export function eraHides(subject: EraSubject, eraOnly: boolean): boolean {
   if (!eraOnly) return false
-  const verdict = donorEra(subject).verdict
-  return verdict === 'out-of-era' || verdict === 'unknown'
+  return donorEra(subject).verdict === 'out-of-era'
 }
 
 const ERA_KEY = 'eq.planner.era'
