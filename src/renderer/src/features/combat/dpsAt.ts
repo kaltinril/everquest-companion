@@ -76,6 +76,26 @@ export function curveRows(series: DpsSeries, t: number, hidden: readonly ChartLi
   return rows
 }
 
+/** Which `KIND_COLOR` entry each rate row wears: the colour of the line it reads. */
+export const ROW_KIND: Record<DpsLineKey, string> = { out: 'you', pet: 'pet', group: 'member', inc: 'enemy' }
+
+/** A rate row as a tooltip draws it. */
+export interface RateRow {
+  label: string
+  value: string
+  color: string | undefined
+}
+
+/**
+ * The rate rows of EVERY combat tooltip, the DPS card's and the Timeline's: `curveRows` with each
+ * row's colour looked up in `palette` (`KIND_COLOR`, which lives in a file the node suite cannot
+ * load). One builder, so a row's name always says what its number sums: before 2026-11-19 the
+ * Timeline made its own rows and printed the group's damage under "you + pet".
+ */
+export function rateRows(series: DpsSeries, t: number, hidden: readonly ChartLineKey[], palette: Readonly<Record<string, string>>): RateRow[] {
+  return curveRows(series, t, hidden).map((r) => ({ label: r.label, value: r.value, color: palette[ROW_KIND[r.key]] }))
+}
+
 /**
  * The honesty footer both charts print: the series' own smoothing window, plus the `~` marker
  * when the ring behind it was downsampled and/or truncated (every rate is then a scaled

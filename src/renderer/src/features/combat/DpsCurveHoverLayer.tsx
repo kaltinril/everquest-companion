@@ -15,10 +15,10 @@ import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState,
 import type { TimelineMarker } from '@shared/combat'
 import { ChartTooltip, type TooltipRow } from '../../lib/ChartTooltip'
 import { rafThrottle } from '../../lib/rafThrottle'
-import type { ChartLineKey, DpsLineKey } from './combatPrefs'
+import type { ChartLineKey } from './combatPrefs'
 import { KIND_COLOR } from './combatShared'
 import type { DpsSeries } from './dashboardData'
-import { curveRows, rollingNote } from './dpsAt'
+import { rateRows, rollingNote } from './dpsAt'
 import {
   CHART_H,
   CHART_W,
@@ -82,18 +82,10 @@ function sameHit(a: Hit, b: Hit): boolean {
   return a.mk === b.mk && a.w === b.w && Math.abs(a.x - b.x) < 2 && Math.abs(a.y - b.y) < 2
 }
 
-/** Each rate row wears its line's colour. */
-const ROW_COLOR: Record<DpsLineKey, string> = {
-  out: KIND_COLOR.you,
-  pet: KIND_COLOR.pet,
-  group: KIND_COLOR.member,
-  inc: KIND_COLOR.enemy
-}
-
-/** The rolling-DPS block — `curveRows` (dpsAt.ts) decides the rows, their names and their numbers;
- *  this only adds the colour, which lives in an MUI-bound file the node suite cannot load. */
+/** The rolling-DPS block: `rateRows` (dpsAt.ts) decides the rows, their names, numbers and which
+ *  colour each wears; the palette lives in an MUI-bound file the node suite cannot load. */
 function dpsRows(series: DpsSeries, t: number, hidden: readonly ChartLineKey[]): TooltipRow[] {
-  return curveRows(series, t, hidden).map((r) => ({ label: r.label, value: r.value, color: ROW_COLOR[r.key] }))
+  return rateRows(series, t, hidden, KIND_COLOR)
 }
 
 /** A marker under the cursor becomes the tooltip's SUBJECT and the rates drop to secondary rows;

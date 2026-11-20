@@ -17,10 +17,9 @@ import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState,
 import type { StanceSpan, TimelineEvent, TimelineMarker, TimelineView } from '@shared/combat'
 import { ChartTooltip, type TooltipRow } from '../../lib/ChartTooltip'
 import { rafThrottle } from '../../lib/rafThrottle'
-import { formatRate } from '../../lib/formatRate'
 import { CAT_COLOR, KIND_COLOR, RESIST_COLOR } from './combatShared'
 import type { DpsSeries } from './dashboardData'
-import { dpsAt, rollingNote } from './dpsAt'
+import { rateRows, rollingNote } from './dpsAt'
 import { MARKER_COLOR, MARKER_WORD } from './markerStyle'
 import { laneAt, pickEventInLane, pickMarker, pickSpanAt } from './timelineHitTest'
 import {
@@ -101,15 +100,10 @@ function sameHit(a: Hit, b: Hit): boolean {
   return a.ev === b.ev && a.mk === b.mk && a.span === b.span && Math.abs(a.x - b.x) < 2 && Math.abs(a.y - b.y) < 2
 }
 
-/** The rolling-DPS block every timeline tooltip carries — sampled from the chart's own series
- *  (dpsAt), never recomputed, and `~`-prefixed when that series is inexact. */
+/** The rolling-DPS block every timeline tooltip carries: the DPS card's own rows (`rateRows`,
+ *  dpsAt.ts), so the first row is named for what it sums and a group fight gets its group row. */
 function dpsRows(series: DpsSeries, t: number): TooltipRow[] {
-  const p = dpsAt(series, t)
-  const a = series.estimated ? '~' : ''
-  const rows: TooltipRow[] = [{ label: 'you + pet', value: `${a}${formatRate(p.out)}`, color: KIND_COLOR.you }]
-  if (series.hasPet) rows.push({ label: 'pet', value: `${a}${formatRate(p.pet)}`, color: KIND_COLOR.pet })
-  if (series.hasInc) rows.push({ label: 'incoming', value: `${a}${formatRate(p.inc)}`, color: KIND_COLOR.enemy })
-  return rows
+  return rateRows(series, t, [], KIND_COLOR)
 }
 
 /**

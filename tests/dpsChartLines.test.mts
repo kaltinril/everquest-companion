@@ -28,6 +28,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import type { TimelineMarker, TimelineView } from '../src/shared/combat'
 import type { DpsSeries } from '../src/renderer/src/features/combat/dashboardData'
 import { PET_LAYOUTS, petDrawnApart, type ChartLineKey } from '../src/renderer/src/features/combat/combatPrefs'
@@ -43,7 +44,7 @@ import {
   yAt,
   type DpsChart
 } from '../src/renderer/src/features/combat/dpsChart'
-import { curveRows, outLabel, peakTitle, withPetApart } from '../src/renderer/src/features/combat/dpsAt'
+import { ROW_KIND, curveRows, outLabel, peakTitle, rateRows, withPetApart } from '../src/renderer/src/features/combat/dpsAt'
 import { formatRate } from '../src/renderer/src/lib/formatRate'
 
 const BUCKET = 1000
@@ -405,5 +406,29 @@ test('the pet layout decides the gold line: only Its own bar leaves the pet out'
       assert.equal(outLabel(drawn), 'you + pet + group')
       assert.deepEqual(mkChart([], drawn), plain, `${layout} draws what it drew before`)
     }
+  }
+})
+
+test('every combat tooltip gets its rate rows from one builder: a row is named for what its number sums', () => {
+  // Before 2026-11-19 the Timeline built its own rows: the first was always called "you + pet"
+  // while its number was the gold line's, group included, and a group fight had no group row.
+  const palette = { you: 'gold', pet: 'teal', member: 'blue', enemy: 'red' }
+  const rows = rateRows(mkSeries(), 1000, [], palette)
+  assert.deepEqual(rows, [
+    { label: 'you + pet + group', value: formatRate(OUT[1]), color: 'gold' },
+    { label: 'pet', value: formatRate(PET[1]), color: 'teal' },
+    { label: 'group', value: formatRate(GROUP[1]), color: 'blue' },
+    { label: 'incoming', value: formatRate(INC[1]), color: 'red' }
+  ])
+  const solo: DpsSeries = { ...mkSeries(), hasGroup: false, group: new Float64Array(2) }
+  assert.deepEqual(rateRows(solo, 1000, [], palette).map((r) => r.label), ['you + pet', 'pet', 'incoming'])
+  assert.deepEqual(rateRows(mkSeries(), 0, ['out', 'inc'], palette).map((r) => r.label), ['pet', 'group'])
+  assert.deepEqual(Object.keys(ROW_KIND), ['out', 'pet', 'group', 'inc'])
+
+  // Neither hover layer names a rate row itself any more.
+  for (const file of ['TimelineHoverLayer.tsx', 'DpsCurveHoverLayer.tsx']) {
+    const src = readFileSync(new URL(`../src/renderer/src/features/combat/${file}`, import.meta.url), 'utf8')
+    assert.match(src, /return rateRows\(series, t, (\[\]|hidden), KIND_COLOR\)/, file)
+    assert.doesNotMatch(src, /label: '(you|pet|group|incoming)/, file)
   }
 })
