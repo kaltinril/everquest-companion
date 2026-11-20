@@ -339,6 +339,23 @@ page's copy-pasted `|spellname = Greater Healing`). After a spell re-derive, the
 in `spellCorrectionsList.ts` and `engine/crates/eqlog/data/spell-overlay.json`
 (`npm run gen:engine-spell-overlay`) follow in the same change.
 
+The General AAs table (since 2026-11-20): `npx tsx scripts/gen-tradeskill-aas.mts` writes
+`src/shared/tradeskillAaTable.generated.ts`, the table the Tradeskills section reads (name, ranks,
+cost and description of every row) and the Tradeskills page's line that links to the AA page. It
+only parses: the cached `Alternate Advancement` page (`cache/classes/`) and the cached `Tradeskills`
+page (`cache/pages/`, found by title in `pages.json`), zero requests on every run, no date in the
+file, so a run over unchanged caches changes nothing.
+- The delta does NOT run it (`sources/deltaFollow.ts` has no entry for it). After a delta or a
+  class scrape that changed either cached page, `tests/tradeskillAaTable.test.mts` fails until the
+  script is run and the file is committed with the data. A row the parser could not read is
+  printed by the script and fails the same test: fix the parser (`sources/generalAas.ts`), never
+  the file.
+- It keeps every row of the General table and picks none: which rows bear on a tradeskill is
+  `src/shared/tradeskillAa.ts`. `tests/tradeskillAa.test.mts` holds today's eleven as present, so a
+  row the wiki removes or renames turns that test red for a look.
+- `classes.json` `aas` is a different read of the same page (group, classes, levels, cast) and
+  lacks the rows the wiki writes one cell per line; the two files are not kept in step.
+
 ## The ETL, as the owner wants it run (2026-10-10)
 
 1. **Extract**: a real run fetches changed pages into the committed caches. Owner's word, 1 req/s.

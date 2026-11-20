@@ -7,6 +7,7 @@
 import { type JSX, useMemo } from 'react'
 import {
   Box,
+  Button,
   FormControlLabel,
   Stack,
   Switch,
@@ -40,6 +41,32 @@ import { useBoolPref } from '../combat/useCombatPrefs'
 const TRADESKILLS_ONLY_KEY = 'eq.skills.tradeskills'
 
 const LEVEL_TIP = 'The newest level your log stated for this skill.'
+
+const OPEN_TRADESKILLS_TIP = 'Recipes, what to make next, materials, routes and your combines are in the Tradeskills section.'
+
+/**
+ * The door to the Tradeskills section, beside the title: someone who looks for tradeskills on
+ * this tab finds the section from here (owner, 2026-11-20). It opens the section where the
+ * player left it. Nothing where no app published the opener.
+ */
+function OpenTradeskills(): JSX.Element | null {
+  const open = useTradeskillLink()
+  if (open === null) return null
+  return (
+    <Tooltip title={OPEN_TRADESKILLS_TIP}>
+      <Button
+        size="small"
+        variant="outlined"
+        onClick={() => {
+          open()
+        }}
+        data-testid="skills-open-tradeskills"
+      >
+        Open Tradeskills
+      </Button>
+    </Tooltip>
+  )
+}
 
 /** The pace, a dash with the reason on hover when it is withheld, or nothing with no raise this session. */
 function RateCell({ row }: { row: SkillRow }): JSX.Element | null {
@@ -128,6 +155,7 @@ function SkillsView(): JSX.Element {
     <Box data-testid="skills-view" sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 2, minHeight: 0 }}>
       <Stack direction="row" alignItems="center" spacing={2}>
         <Typography variant="h6">Skills</Typography>
+        <OpenTradeskills />
         <FormControlLabel
           control={
             <Switch

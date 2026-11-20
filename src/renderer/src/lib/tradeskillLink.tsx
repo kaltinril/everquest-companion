@@ -22,7 +22,8 @@ export interface TradeskillFocus {
   item?: string
 }
 
-export type OpenTradeskills = (focus: TradeskillFocus) => void
+/** With no focus the section opens on the screen the player left it on (the Skills tab's "Open Tradeskills"). */
+export type OpenTradeskills = (focus?: TradeskillFocus) => void
 
 const TradeskillLinkContext = createContext<OpenTradeskills | null>(null)
 

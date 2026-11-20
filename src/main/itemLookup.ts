@@ -134,6 +134,11 @@ export function itemDb(): Map<string, ItemDbEntry> {
   return itemDbIndex
 }
 
+/** When the committed item data was scraped (the file's own `scrapedAt`): what a screen that names its sources states. */
+export function itemDbScrapedAt(): string {
+  return (itemsJson as unknown as ItemDbFile).scrapedAt
+}
+
 /**
  * THE HELD-CLICKY CATALOG (JOS-438), bound to the committed DB here because this module already
  * imports it and pipeline.ts already imports THIS — so the feature adds no module edge to the main

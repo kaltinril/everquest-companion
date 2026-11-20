@@ -4,6 +4,9 @@
 //
 // The totals, the rows and every word are shared/tradeskillHistory.ts. A row whose item the recipe
 // book makes in this tradeskill opens that recipe on the recipes tab.
+//
+// On the Fishing workbench the tab opens with GatherPanel.tsx: the log's casts, catches and what
+// was caught. Fishing has recipes too, so its combines follow as on any other workbench.
 
 import type { JSX } from 'react'
 import { Box, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
@@ -26,6 +29,7 @@ import { LogReadInline } from '../../components/LogReadInline'
 import { formatDate } from '../../lib/formatDate'
 import { Tooltip } from '../../lib/Tooltip'
 import type { BenchFacts } from './benchFacts'
+import { GatherPanel } from './GatherPanel'
 import { NoticeChip } from './RecipeYou'
 import { ItemLabel } from './tradeskillLinks'
 
@@ -124,6 +128,8 @@ export function HistoryPanel({ tradeskill, facts, history, onOpenRecipe }: Histo
   const unplaced = unplacedText(history.unplaced)
   return (
     <Stack spacing={1} sx={{ flexGrow: 1, minHeight: 0 }} data-testid="tradeskill-history">
+      {/* Fishing's own outcomes (casts, catches, what was caught) come before its combines. */}
+      {tradeskill === 'Fishing' && <GatherPanel />}
       {history.totals === null && (
         <Typography variant="body2" color="text.secondary" sx={{ py: 2 }} data-testid="tradeskill-history-empty">
           {noCombinesText(tradeskill)}

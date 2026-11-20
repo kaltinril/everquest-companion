@@ -1,5 +1,6 @@
-// tradeskills/Workbench.tsx — one tradeskill: the level the log last stated, and four tabs under
-// it (MapsTabs' arrangement: one at a time, so the screen never becomes a scroll of panels).
+// tradeskills/Workbench.tsx — one tradeskill: the level the log last stated, on a bar against the
+// skill's top with the wiki's "caps at 200" note when it applies (SkillBar.tsx), and four tabs
+// under it (MapsTabs' arrangement: one at a time, so the screen never becomes a scroll of panels).
 //
 //   Recipes       the picked recipe in full (the one to make next until the player picks another)
 //                 over the recipe book, with what the player's log says of each recipe
@@ -34,6 +35,7 @@ import {
   type LadderState
 } from '@shared/tradeskillBook'
 import { madeByYouText, madeRecipes, skillHistory, totalsLine } from '@shared/tradeskillHistory'
+import { levelBar, type LevelBar } from '@shared/tradeskillLevelBar'
 import type { Tradeskill } from '@shared/tradeskills'
 import { LogReadInline } from '../../components/LogReadInline'
 import OutputKindLine from '../../components/OutputKindLine'
@@ -44,7 +46,9 @@ import { HistoryPanel } from './HistoryPanel'
 import { RecipeFilterSwitches, useRecipeFilters, type RecipeFilterState } from './RecipeFilters'
 import { RecipePanel } from './RecipePanel'
 import { RecipeTable, type RowLog } from './RecipeTable'
+import { AaPanel } from './AaPanel'
 import { RoutePanel } from './RoutePanel'
+import { BarOf, CapNote, SkillBar } from './SkillBar'
 import { SkillGearPanel } from './SkillGearPanel'
 import { useCrafting, useGuides, useHeld, useSkillLevels, type SkillLevels } from './tradeskillData'
 import { useBenchMemory, useHideTrivial, type BenchMemory, type BenchTab } from './tradeskillMemory'
@@ -55,31 +59,45 @@ export interface BenchReturn {
   scrollTop: number
 }
 
-function LevelLine({ level }: { level: number | null }): JSX.Element {
-  if (level !== null) {
-    return (
-      <Typography variant="h6" color="primary" data-testid="tradeskill-level">
-        {level}
-      </Typography>
-    )
-  }
+/** How wide the head's level bar is drawn. */
+const HEAD_BAR_WIDTH = 180
+
+/**
+ * The level with "of 300" beside it, the bar, and the wiki's "caps at 200" note when it applies.
+ * A skill the log never showed keeps its own words, beside an empty bar.
+ */
+function LevelLine({ bar }: { bar: LevelBar }): JSX.Element {
   return (
-    <Typography variant="body2" color="text.secondary" data-testid="tradeskill-level-unseen">
-      {LEVEL_UNSEEN_TEXT}
-    </Typography>
+    <>
+      {bar.level !== null ? (
+        <Stack direction="row" spacing={0.5} alignItems="baseline">
+          <Typography variant="h6" color="primary" data-testid="tradeskill-level">
+            {bar.level}
+          </Typography>
+          <BarOf bar={bar} />
+        </Stack>
+      ) : (
+        <Typography variant="body2" color="text.secondary" data-testid="tradeskill-level-unseen">
+          {LEVEL_UNSEEN_TEXT}
+        </Typography>
+      )}
+      <Box sx={{ width: HEAD_BAR_WIDTH, flexShrink: 0 }} data-testid="tradeskill-level-bar">
+        <SkillBar bar={bar} />
+      </Box>
+      <CapNote bar={bar} />
+    </>
   )
 }
 
 interface HeadProps {
   tradeskill: Tradeskill
-  level: number | null
   levels: SkillLevels
   onHome: () => void
   /** The log's combines of the tradeskill in one line; '' when it shows none. */
   totals: string
 }
 
-function BenchHead({ tradeskill, level, levels, onHome, totals }: HeadProps): JSX.Element {
+function BenchHead({ tradeskill, levels, onHome, totals }: HeadProps): JSX.Element {
   return (
     <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
       <Button size="small" startIcon={<ArrowBackIcon />} onClick={onHome} data-testid="tradeskill-home">
@@ -89,7 +107,7 @@ function BenchHead({ tradeskill, level, levels, onHome, totals }: HeadProps): JS
         {tradeskill}
       </Typography>
       {/* Until the engine serves the skills module the level is unknown, not unseen: say what the app waits on. */}
-      {levels.served ? <LevelLine level={level} /> : <LogReadInline module={SKILLS_MODULE} served={false} />}
+      {levels.served ? <LevelLine bar={levelBar(levels.rows, tradeskill)} /> : <LogReadInline module={SKILLS_MODULE} served={false} />}
       <Box sx={{ flexGrow: 1 }} />
       {totals !== '' && (
         <Typography variant="body2" color="text.secondary" data-testid="tradeskill-totals">
@@ -282,8 +300,10 @@ export function Workbench({ tradeskill, index, eraOnly, onHome, restoreTop }: Wo
   }
   return (
     <Stack spacing={1} sx={{ flexGrow: 1, minHeight: 0 }} data-testid="tradeskill-workbench">
-      <BenchHead tradeskill={tradeskill} level={level} levels={levels} onHome={onHome} totals={totalsLine(history.totals)} />
+      <BenchHead tradeskill={tradeskill} levels={levels} onHome={onHome} totals={totalsLine(history.totals)} />
       <SkillGearPanel tradeskill={tradeskill} held={held} eraOnly={eraOnly} />
+      {/* The AAs that bear on this tradeskill, from the wiki's AA table (AaPanel.tsx). */}
+      <AaPanel tradeskill={tradeskill} />
       <BenchTabs
         tab={memory.tab}
         onTab={(tab) => {
