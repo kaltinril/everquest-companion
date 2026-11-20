@@ -6,8 +6,8 @@
     <li>Pet Type: Fire Elemental</li>
     <li>Pet Classes: [[Wizard]] / [[Warrior]]</li>
     <li>Pet Level: 23</li>
-    <li>Hit Points: 860 (+1/tick)</li>
-    <li>Mana: 920 (+46/tick)</li>
+    <li>Hit Points: 1010 (+1/tick)</li>
+    <li>Mana: 1006 (+46/tick)</li>
     </ul>
   </div>
   <div style="flex: 1;">
@@ -28,8 +28,6 @@
        <ul>
        <li>Offense: 141</li>
        <li>Accuracy: 159</li>
-       <li>Max Damage: 26</li>
-       <li>Dual Wield: 28%</li>
        </ul>
      </ul>
   </div>

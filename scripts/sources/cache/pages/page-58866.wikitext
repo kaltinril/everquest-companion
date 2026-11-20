@@ -6,7 +6,7 @@
     <li>Pet Type: Water Elemental</li>
     <li>Pet Classes: [[Rogue]] / [[Warrior]]</li>
     <li>Pet Level: 41</li>
-    <li>Hit Points: 5088 (+1/tick)</li>
+    <li>Hit Points: 4410 (+1/tick)</li>
     <li>Mana: 0 (+4/tick)</li>
     </ul>
   </div>
@@ -28,8 +28,6 @@
        <ul>
        <li>Offense: 274</li>
        <li>Accuracy: 268</li>
-       <li>Max Damage: 56</li>
-       <li>Dual Wield: 69%</li>
        </ul>
      </ul>
   </div>

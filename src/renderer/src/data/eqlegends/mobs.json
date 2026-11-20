@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-19T10:42:22.428Z",
+  "scrapedAt": "2026-11-20T10:12:58.967Z",
   "source": "eqlwiki.com — Category:NPCs/Named Mobs/Merchants/Raid Encounters ∪ embeddedin Template:Namedmobpage/MerchantPage, filtered to pages opening a mob template + recentchanges delta (scripts/scrape-delta.mts)",
   "mobs": [
     {
@@ -37529,7 +37529,8 @@
         "Ogreskin Chamois",
         "Large Cloth Armor",
         "Rusty Weapons",
-        "Words of Allure"
+        "Words of Allure",
+        "Lizardman Fang"
       ],
       "factions": [
         "Allize Taeew",
@@ -131787,8 +131788,7 @@
       "image": "npc_ghilanbiddle_nylwadil.png",
       "relatedQuests": [
         "Chalice of Conquest Quest"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Ghonic Erharn",
@@ -203270,8 +203270,7 @@
         "-30",
         "-30"
       ],
-      "image": "npc_nyrien_lyrdarniel.png",
-      "noImage": true
+      "image": "npc_nyrien_lyrdarniel.png"
     },
     {
       "page": "Nyuae the Cruel",
@@ -208567,11 +208566,10 @@
       "loc": [
         {
           "ns": -400,
-          "ew": 2666
+          "ew": 2670
         }
       ],
       "merchant": true,
-      "image": "npc_peron_threadspinner.png",
       "sells": [
         "Cloth Cap",
         "Cloth Cape",
@@ -208586,7 +208584,8 @@
         "Cloth Wristband",
         "How To Sew: Medium Sizes",
         "Small Sewing Kit"
-      ]
+      ],
+      "image": "npc_peron_threadspinner.png"
     },
     {
       "page": "Perrir Zexus",
@@ -216483,8 +216482,7 @@
         }
       ],
       "merchant": true,
-      "image": "npc_remon_zarga.png",
-      "noImage": true
+      "image": "npc_remon_zarga.png"
     },
     {
       "page": "Ren Pinemyer",
@@ -231610,8 +231608,7 @@
         "-30",
         "10"
       ],
-      "image": "npc_sigan_ilbirkun.png",
-      "noImage": true
+      "image": "npc_sigan_ilbirkun.png"
     },
     {
       "page": "Signus Boran",
@@ -232996,7 +232993,10 @@
         "10",
         "10"
       ],
-      "image": "npc_sir_mollin.png"
+      "image": "npc_sir_mollin.png",
+      "relatedQuests": [
+        "Call for Aid"
+      ]
     },
     {
       "page": "Sir Morgan",

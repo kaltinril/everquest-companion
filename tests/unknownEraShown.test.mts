@@ -27,13 +27,13 @@ test('the owner`s list: all 11 Mana Preservation donors show with the filter on'
   assert.equal(family.length, 11, family.map((d) => d.name).join(', '))
   const shown = family.filter((d) => !eraHides(d, true))
   assert.equal(shown.length, 11, 'the Current era filter still holds a Mana Preservation donor back')
-  // The two that were hidden are quest rewards with no dropper and no banner. Since the donor index
-  // carries layer 3 (tests/eraEvidenceShared.test.mts) each is IN era by its quest's starting zone,
-  // so neither wears a chip. An item nothing at all states an era for is the next test's subject.
+  // The two that were hidden are quest rewards with no dropper, and had no banner. Since the donor
+  // index carries layer 3 (tests/eraEvidenceShared.test.mts) each is IN era by its quest's starting
+  // zone, and Mane Attraction's page has stated Classic since the 2026-11-20 delta: neither wears a
+  // chip. An item nothing at all states an era for is the next test's subject.
   for (const name of ['Mane Attraction', 'Testament of Vanear']) {
     const row = family.find((d) => d.name === name)
     assert.ok(row, `${name} left the donor index`)
-    assert.equal(row.eraTag, undefined, `${name} carries a banner now: pick another subject`)
     assert.equal(donorEra(row).verdict, 'in-era', name)
     assert.equal(eraChip(row), null, name)
   }

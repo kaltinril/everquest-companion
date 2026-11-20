@@ -28,8 +28,6 @@
        <ul>
        <li>Offense: 158</li>
        <li>Accuracy: 208</li>
-       <li>Max Damage: 36?</li>
-       <li>Dual Wield Skill: High?</li>
        </ul>
      </ul>
   </div>
@@ -43,7 +41,19 @@
     <li>Charisma: 75</li></ul>
   </div>
 </div>
-
+==== Melee Attacks ====
+{| class="wikitable"
+!Damage
+!Delay
+!Bonus Damage
+!Dual Wield
+|-
+|?
+|?
+| +0
+| - 
+|-
+|}
 == Abilities ==
 '''Needs to be Verified'''
 * [[Skill_Bash|Bash]]
