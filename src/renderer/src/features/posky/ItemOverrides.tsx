@@ -28,6 +28,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import EditIcon from '@mui/icons-material/Edit'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import type { ItemCountOverride } from '@shared/types'
+import { parseHandCount } from '@shared/itemOverrides'
 import type { ItemProgress } from './useProgress'
 // The one caveat that belongs in this cell without being about a statement (JOS-409) — see below.
 import { DUMP_BLIND_ITEM_NOTE, isDumpBlindItem } from './dumpBlindItems'
@@ -47,17 +48,31 @@ function statedOn(o: ItemCountOverride): string {
  * Its delete affordance is the take-back, which is why the chip and the undo are one control: the
  * user's eye lands on the thing that looks unusual and the way out is attached to it. `data-count`
  * states the number a test can read without parsing a label.
+ *
+ * `label` and `testId` are for a chip drawn AWAY from its row (Cleanup's line of items a count
+ * took off the table): there the chip has to name the item, and a spec has to tell it from a
+ * row's chip.
  */
-function OverrideChip({ o, onClear }: { o: ItemCountOverride; onClear: () => void }): JSX.Element {
+export function OverrideChip({
+  o,
+  onClear,
+  label,
+  testId = 'posky-item-override'
+}: {
+  o: ItemCountOverride
+  onClear: () => void
+  label?: string
+  testId?: string
+}): JSX.Element {
   return (
     <Chip
       size="small"
       color="warning"
       variant="outlined"
-      data-testid="posky-item-override"
+      data-testid={testId}
       data-count={o.count}
       title={`You stated ${String(o.count)} of these on ${statedOn(o)}. Anything looted since then is counted on top, and any turn-in recorded since then is taken off. Remove this to go back to counting from the log and the export.`}
-      label={`By hand: ${String(o.count)}`}
+      label={label ?? `By hand: ${String(o.count)}`}
       onDelete={onClear}
       sx={{ height: 20, fontSize: 11 }}
     />
@@ -167,8 +182,8 @@ export function HandCountCell({
   const [editing, setEditing] = useState(false)
   const [text, setText] = useState('')
   const commit = (): void => {
-    const n = Number(text.trim())
-    if (text.trim() !== '' && Number.isFinite(n) && n >= 0) onSetItemCount?.(name, Math.floor(n))
+    const n = parseHandCount(text)
+    if (n !== null) onSetItemCount?.(name, n)
     setEditing(false)
   }
   if (editing && onSetItemCount) {
@@ -227,11 +242,16 @@ export function ItemHaveCell({
  * row that carries the take-back.
  *
  * Nothing at all when nothing is stated, which is every user who has never used the control.
+ *
+ * `hint` is where to change one, as seen from the tab the chip is on. The default is the quest
+ * row's; Cleanup has no quest row and passes its own.
  */
 export function OverrideSummaryChip({
-  overrides
+  overrides,
+  hint = 'Expand the quest that needs one and use the pencil beside its Have column to change or remove it.'
 }: {
   overrides: readonly ItemCountOverride[]
+  hint?: string
 }): JSX.Element | null {
   if (overrides.length === 0) return null
   return (
@@ -241,7 +261,7 @@ export function OverrideSummaryChip({
       variant="outlined"
       data-testid="posky-overrides-active"
       data-count={overrides.length}
-      title={`Counts you stated by hand: ${overrides.map((o) => `${o.name} = ${String(o.count)}`).join(', ')}. Expand the quest that needs one and use the pencil beside its Have column to change or remove it.`}
+      title={`Counts you stated by hand: ${overrides.map((o) => `${o.name} = ${String(o.count)}`).join(', ')}. ${hint}`}
       label={`${String(overrides.length)} count${overrides.length === 1 ? '' : 's'} set by hand`}
       sx={{ height: 18, fontSize: 11, ml: 1 }}
     />

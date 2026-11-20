@@ -11,8 +11,9 @@
 // un-turned-in quest still wants, and the turn-in each of them feeds if you keep them instead.
 //
 // PURE, and no React and no data bundle, exactly like `questCompletion.ts` and `sharedItems.ts`:
-// the rule below is the entire feature and it is pinned by a plain node test
-// (tests/skyCleanupOverride.test.mts) rather than by a browser. Everything the tab draws on a row is a
+// the rule below is the entire feature and it is pinned by plain node tests rather than by a
+// browser (tests/skyCleanup.test.mts for the rule and the words, tests/skyCleanupOverride.test.mts
+// for the rule under a hand-stated count). Everything the tab draws on a row is a
 // field or a sentence produced here, so the words a player reads are testable without a DOM.
 //
 // ---------------------------------------------------------------------------
@@ -59,6 +60,7 @@
 
 import type { CarryRow } from '../../../../shared/carryAll'
 import { SECTION_LANE_PREFIX, laneLabel } from '../../../../shared/carryAll'
+import type { ItemCountOverride } from '../../../../shared/itemOverrides'
 import { parsePlace, splitLocationPath, type ContainerKind } from '../../../../shared/outputs/inventory'
 import { itemCountKey, normalizeItemName } from '../../lib/itemName'
 import type { QuestProgress } from './useProgress'
@@ -246,6 +248,17 @@ export function cleanupRowsFor(
   quests: readonly QuestProgress[],
   dumpLocations: DumpLocations = {}
 ): CleanupRow[] {
+  const { shaped, progress, held } = shapedFrom(quests)
+  return cleanupRows(shaped, progress, held, dumpLocations)
+}
+
+/** The tab's quest list as the model's three inputs. One reading, so the rows and the
+ *  hand-hidden line below cannot disagree about a held count or a turn-in count. */
+function shapedFrom(quests: readonly QuestProgress[]): {
+  shaped: CleanupQuest[]
+  progress: Record<string, number>
+  held: Record<string, number>
+} {
   const held: Record<string, number> = {}
   const progress: Record<string, number> = {}
   const shaped: CleanupQuest[] = quests.map((q) => {
@@ -260,7 +273,54 @@ export function cleanupRowsFor(
       items: q.items.map((it) => ({ name: it.name, count: it.need }))
     }
   })
-  return cleanupRows(shaped, progress, held, dumpLocations)
+  return { shaped, progress, held }
+}
+
+// ---------------------------------------------------------------------------
+// WHAT A HAND-SET COUNT TOOK OFF THE LIST
+// ---------------------------------------------------------------------------
+
+/** An item the turn-in rule would list, held at 0 while a hand-set count speaks for it. */
+export interface CleanupHandHidden {
+  /** the counting key, as on a row */
+  key: string
+  /** the quest data's spelling, as on a row: what the take-back hands to the store */
+  name: string
+  override: ItemCountOverride
+}
+
+/**
+ * The items a hand-set count is keeping off the table, in name order.
+ *
+ * A row at 0 is not drawn, and the row is where the chip that takes a count back lives. So a 0
+ * typed on the wrong row would leave nothing on this tab to undo it with. These are drawn as
+ * chips above the table instead. Only an item every quest naming it has been turned in for: a 0
+ * on an item a quest still needs was never on this list, so it is not "off" it.
+ */
+export function cleanupHandHidden(
+  quests: readonly CleanupQuest[],
+  progress: TurnInCounts,
+  held: HeldByKey,
+  overrides: Readonly<Record<string, ItemCountOverride>>
+): CleanupHandHidden[] {
+  const hidden: CleanupHandHidden[] = []
+  for (const [key, claim] of indexClaims(quests)) {
+    // Read as a possibly-absent entry: most items have no statement.
+    const override = overrides[key] as ItemCountOverride | undefined
+    if (!override || (held[key] ?? 0) > 0) continue
+    if (claim.quests.some((entry) => (progress[entry.quest.key] ?? 0) < 1)) continue
+    hidden.push({ key, name: claim.name, override })
+  }
+  return hidden.sort((a, b) => a.name.localeCompare(b.name))
+}
+
+/** The tab's own quest list → the hand-hidden line, through the same reading as the rows. */
+export function cleanupHandHiddenFor(
+  quests: readonly QuestProgress[],
+  overrides: Readonly<Record<string, ItemCountOverride>>
+): CleanupHandHidden[] {
+  const { shaped, progress, held } = shapedFrom(quests)
+  return cleanupHandHidden(shaped, progress, held, overrides)
 }
 
 // ---------------------------------------------------------------------------
@@ -323,6 +383,19 @@ export function dumpLocationsFrom(rows: readonly CarryRow[] | null | undefined):
 /** The always-visible caveat, in the owner's own words. It is copy, so it is testable copy. */
 export const CLEANUP_CAVEAT =
   'Cleanup lists items you could destroy because every Sky quest that needs them has been turned in. Destroying is permanent and happens in the game, not here. If you delete something you wanted, that is on you.'
+
+/** What stands before the chips for items a hand-set count took off the table. */
+export const CLEANUP_HAND_HIDDEN_LEAD = 'Off this list by a count you set:'
+
+/** One such chip: the item and the count that was set. Its x is the take-back. */
+export function handHiddenLabel(h: CleanupHandHidden): string {
+  return `${h.name}: ${String(h.override.count)}`
+}
+
+/** How to change a hand-set count FROM THIS TAB, for the hover of its "counts set by hand" chip.
+ *  The Quests tab's wording points at a quest row and a Have column, and this tab has neither. */
+export const CLEANUP_HAND_HINT =
+  'Use the pencil in the Held column to change one, or the x on its chip to remove it. An item a count took off this list is shown under this chip. Any other is on its quest, on the Quests tab.'
 
 /**
  * What a row says about where its copies are, or that the dump has never seen them.

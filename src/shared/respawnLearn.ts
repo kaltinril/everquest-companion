@@ -141,6 +141,19 @@ export function constantRespawn(gapsMs: readonly number[]): RespawnVerdict | nul
 }
 
 /**
+ * The gap a mob's kills agree on, as the engine reads it under the clock (`respawn_learned.rs agreed`,
+ * fork #8): of the gaps of `floorMs` or more, the lowest with three inside 50 s; undefined while none
+ * agree, or when that gap is under two minutes. The archive join reads it over both logs' gaps
+ * (`mergeRespawn.ts`). The two-minute test is on the window's lowest gap where `constantRespawn`
+ * tests its peak, and a window that fails it ends the search: both as the engine has them.
+ */
+export function agreedGap(gapsMs: readonly number[], floorMs = 0): number | undefined {
+  const sorted = gapsMs.filter((g) => g >= floorMs).sort((a, b) => a - b)
+  const at = sorted.findIndex((g, i) => i + 2 < sorted.length && sorted[i + 2] - g <= 50_000)
+  return at >= 0 && sorted[at] >= SUSPECT_UNDER_MS ? sorted[at] : undefined
+}
+
+/**
  * The respawn as the wiki writes it: `8:48` under the hour (44 pages write `m:ss`), and from the
  * hour `1 hour 5 minutes` (`N hours`, 27 pages; `h:mm:ss` is not a shape `respawnWiki.ts` reads).
  */

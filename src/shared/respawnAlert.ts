@@ -2,6 +2,7 @@
 // (fork #7): its one setting, the seeded alert's phrases, and which clocks cross their lead
 // moment between two looks. Pure; tests/respawnAlert.test.mts.
 
+import type { AlertDef } from './alertTypes'
 import { respawnReading, type RespawnSnap } from './respawn'
 import { respawnTierView, respawnZoneTitle, type RespawnPlace, type RespawnTierEntry } from './respawnTiers'
 
@@ -20,17 +21,58 @@ export function respawnAlertLeadOk(sec: number): boolean {
   return Number.isInteger(sec) && sec >= RESPAWN_ALERT_MIN_SEC && sec <= RESPAWN_ALERT_MAX_SEC
 }
 
+/** Any number as a lead the setting may hold: rounded, then held to the bounds. */
+function heldLead(sec: number): number {
+  return Math.min(RESPAWN_ALERT_MAX_SEC, Math.max(RESPAWN_ALERT_MIN_SEC, Math.round(sec)))
+}
+
 export function normalizeRespawnAlert(raw: unknown): RespawnAlertSetting {
   if (typeof raw !== 'object' || raw === null) return DEFAULT_RESPAWN_ALERT
   const { on, leadSec } = raw as { on?: unknown; leadSec?: unknown }
-  const lead = typeof leadSec === 'number' && Number.isFinite(leadSec) ? Math.round(leadSec) : DEFAULT_RESPAWN_ALERT.leadSec
-  return { on: on === true, leadSec: Math.min(RESPAWN_ALERT_MAX_SEC, Math.max(RESPAWN_ALERT_MIN_SEC, lead)) }
+  const lead = typeof leadSec === 'number' && Number.isFinite(leadSec) ? leadSec : DEFAULT_RESPAWN_ALERT.leadSec
+  return { on: on === true, leadSec: heldLead(lead) }
+}
+
+/**
+ * The lead to store for what was typed in the seconds field, read once the typing is finished:
+ * 600 is 300 and 3 is 5. Null when nothing usable was typed, so the stored lead stays.
+ */
+export function respawnAlertLeadFromDraft(text: string): number | null {
+  const typed = text.trim()
+  if (typed === '') return null
+  const sec = Number(typed)
+  return Number.isFinite(sec) ? heldLead(sec) : null
 }
 
 // The seeded alert's phrases. A capture is cut at 48 characters, so the sentence is two tokens,
 // never one; an empty token is spoken as written, so every token always carries text.
 export const RESPAWN_ALERT_SPEECH = '{mob} {when}'
 export const RESPAWN_ALERT_BANNER = '{mob} in {seconds}s - {place}'
+
+/** Whether the Alerts tab holds an alert the box can be heard through. */
+export type RespawnAlertHeard = 'ok' | 'off' | 'missing'
+
+/**
+ * `ok` with an enabled alert on the `respawnSoon` signal, `off` when every such alert is switched
+ * off, `missing` when there is none. By signal, as the alert player matches, not by the seeded id:
+ * the player's own alert on the signal counts.
+ */
+export function respawnAlertHeard(alerts: readonly Pick<AlertDef, 'enabled' | 'trigger'>[]): RespawnAlertHeard {
+  let found = false
+  for (const a of alerts) {
+    if (a.trigger.type !== 'app' || a.trigger.signal !== 'respawnSoon') continue
+    if (a.enabled) return 'ok'
+    found = true
+  }
+  return found ? 'off' : 'missing'
+}
+
+/** The line under the Timers tab's box when it is ticked and nothing will play; null otherwise. */
+export function respawnAlertSilentNote(on: boolean, heard: RespawnAlertHeard): string | null {
+  if (!on || heard === 'ok') return null
+  if (heard === 'off') return 'No alert will play: "Respawn timer ending" is switched off on the Alerts tab.'
+  return 'No alert will play: the Alerts tab has no "Respawn timer ending" alert. Add one there (App signal: Respawn timer ending).'
+}
 
 export interface RespawnAlertDue {
   /** One per clock (`row.id@baseTs`): the caller fires each key once. */
@@ -88,4 +130,27 @@ export function respawnAlertsDue(
     }
   }
   return out
+}
+
+/**
+ * The watcher's memory between ticks: `step` returns the clocks to alert on now, each once. The
+ * first step is a baseline. A step with no snapshot (the log is being read) still moves the clock
+ * on, so nothing bursts when the snapshot arrives. A clock already returned is never returned
+ * again, though a longer estimate or a lowered lead puts its lead moment in a later window. A new
+ * stepper (the setting switched off and on) starts over.
+ */
+export function respawnAlertStepper(): {
+  step: (snap: Pick<RespawnSnap, 'rows' | 'zone' | 'prefs'> | null, leadSec: number, nowMs: number) => RespawnAlertDue[]
+} {
+  let prevMs: number | null = null
+  const fired = new Set<string>()
+  return {
+    step(snap, leadSec, nowMs) {
+      const due = snap === null ? [] : respawnAlertsDue(snap, leadSec, prevMs, nowMs)
+      prevMs = nowMs
+      const fresh = due.filter((d) => !fired.has(d.key))
+      for (const d of fresh) fired.add(d.key)
+      return fresh
+    }
+  }
 }

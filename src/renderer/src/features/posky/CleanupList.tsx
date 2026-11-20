@@ -50,7 +50,7 @@ import {
 } from '@mui/material'
 import type { CountSource, ItemCountOverride } from '@shared/types'
 import { itemOverridesByKey } from '@shared/itemOverrides'
-import { HandCountCell, OverrideSummaryChip, type SetItemCount } from './ItemOverrides'
+import { HandCountCell, OverrideChip, OverrideSummaryChip, type SetItemCount } from './ItemOverrides'
 import { InventorySource } from './QuestFilterBar'
 import { ItemNameLink } from './QuestItemsTable'
 import { useCharacterSheet } from '../character/useCharacterSheet'
@@ -58,14 +58,19 @@ import { observedTierOf, useItemTiers } from '../../lib/ObservedItemWindow'
 import type { QuestProgress } from './useProgress'
 import {
   CLEANUP_CAVEAT,
+  CLEANUP_HAND_HIDDEN_LEAD,
+  CLEANUP_HAND_HINT,
+  cleanupHandHiddenFor,
   cleanupRowsFor,
   decisionLine,
   dumpLocationsFrom,
+  handHiddenLabel,
   locationsLine,
   rewardTierLine,
   setsLine,
   timesLine,
   turnInHeading,
+  type CleanupHandHidden,
   type CleanupRow,
   type CleanupTurnIn,
   type DumpLocations
@@ -179,6 +184,46 @@ function CleanupItemRow({
 }
 
 /**
+ * THE ITEMS A HAND-SET COUNT TOOK OFF THE TABLE, each as the chip that takes the count back.
+ *
+ * A row at 0 is not drawn, and the row is where that chip lives, so without this line a 0 typed
+ * on the wrong row could not be undone from this tab. Which items are on it is `cleanup.ts`'s.
+ */
+function HandHiddenLine({
+  hidden,
+  onSetItemCount
+}: {
+  hidden: readonly CleanupHandHidden[]
+  onSetItemCount: SetItemCount
+}): JSX.Element | null {
+  if (hidden.length === 0) return null
+  return (
+    <Stack
+      direction="row"
+      spacing={1}
+      alignItems="center"
+      useFlexGap
+      flexWrap="wrap"
+      data-testid="posky-cleanup-hand-hidden"
+      sx={{ mb: 2 }}
+    >
+      <Typography variant="body2" color="text.secondary">
+        {CLEANUP_HAND_HIDDEN_LEAD}
+      </Typography>
+      {hidden.map((h) => (
+        <OverrideChip
+          key={h.key}
+          o={h.override}
+          label={handHiddenLabel(h)}
+          testId="posky-cleanup-hand-hidden-chip"
+          onClear={() => onSetItemCount(h.name, null)}
+        />
+      ))}
+    </Stack>
+  )
+}
+
+/**
  * THE TAB.
  *
  * The dump's locations are read HERE rather than in `PoskyView` on purpose: they decide nothing
@@ -208,6 +253,7 @@ export default function CleanupList({
 
   const locations = useMemo(() => dumpLocationsFrom(sheet?.carry.rows), [sheet])
   const rows = useMemo(() => cleanupRowsFor(quests, locations), [quests, locations])
+  const hidden = useMemo(() => cleanupHandHiddenFor(quests, overrides), [quests, overrides])
   const tierOf = useCallback(
     (reward: string | undefined) => (reward ? observedTierOf(tiers, reward) : undefined),
     [tiers]
@@ -223,7 +269,7 @@ export default function CleanupList({
       </Alert>
       <Stack direction="row" spacing={2} alignItems="center" useFlexGap sx={{ mb: 2 }}>
         {/* A row zeroed by hand is gone from the table; this is the trace it leaves on the tab. */}
-        <OverrideSummaryChip overrides={itemOverrides} />
+        <OverrideSummaryChip overrides={itemOverrides} hint={CLEANUP_HAND_HINT} />
         <Box sx={{ flexGrow: 1 }} />
         <InventorySource
           countSource={countSource}
@@ -231,6 +277,7 @@ export default function CleanupList({
           inventoryLoadedAt={inventoryLoadedAt}
         />
       </Stack>
+      <HandHiddenLine hidden={hidden} onSetItemCount={onSetItemCount} />
       <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
         {rows.length === 0 ? (
           <Typography color="text.secondary" data-testid="posky-cleanup-empty">

@@ -16,7 +16,8 @@
  * subject of steps 3 to 5 below: a destroy line arriving in the tailed log while the tab is open.
  *
  * WHY THIS NEEDS A REAL APP. The arithmetic is pure and pinned without a browser
- * (tests/skyCleanupOverride.test.mts drives the cases, tests/lootDispositionWindows.test.mts the fold on
+ * (tests/skyCleanup.test.mts and tests/skyCleanupOverride.test.mts drive the cases,
+ * tests/lootDispositionWindows.test.mts the fold on
  * real bytes, tests/skyItemOverrides.test.mts the witness discount per count source). What no unit
  * test can see is the WIRING: the log line → the parser → the LootModule's LIVE delta → the held
  * counts → `reconcile` → the cleanup model → a tab whose COUNT is computed above the pane it

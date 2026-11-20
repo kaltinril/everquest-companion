@@ -77,6 +77,20 @@ function whole(value: unknown): number | null {
   return Math.floor(value)
 }
 
+/**
+ * What the pencil's box commits for the text typed in it: a whole count, or null for "commit
+ * nothing". Blank is a changed mind and never a 0. A fraction is cut down to a whole number.
+ * Past MAX_OVERRIDE_COUNT it is null too: the store would drop that statement, so it is not sent.
+ */
+export function parseHandCount(text: string): number | null {
+  const t = text.trim()
+  if (t === '') return null
+  const n = Number(t)
+  if (!Number.isFinite(n) || n < 0) return null
+  const count = Math.floor(n)
+  return count > MAX_OVERRIDE_COUNT ? null : count
+}
+
 /** Clean one statement, or reject it. Anything unusable is dropped rather than thrown over — a
  *  hand-edited store must not take the character's whole progress record down with it. */
 export function sanitizeItemOverride(value: unknown): ItemCountOverride | null {
@@ -110,11 +124,15 @@ export function sanitizeItemOverrides(value: unknown): ItemCountOverride[] {
  * State a count for one key, REPLACING whatever that key said before. Replace rather than append
  * for the reason `setComboCorrection` gives: two statements about one item are one statement, the
  * later one.
+ *
+ * A statement that would not survive the sanitizer changes nothing: it must not erase the one it
+ * was meant to replace.
  */
 export function applyItemOverride(
   list: readonly ItemCountOverride[],
   next: ItemCountOverride
 ): ItemCountOverride[] {
+  if (!sanitizeItemOverride(next)) return sanitizeItemOverrides(list)
   return sanitizeItemOverrides([...list.filter((o) => o.key !== next.key), next])
 }
 
