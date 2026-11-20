@@ -48,7 +48,7 @@ import {
 import { playSound } from './soundCache'
 import { currentVoicePrefs, loadVoicePrefs, speak, speechPlan } from '../../lib/speech'
 import { audioIdentity, coalesceAudio, type AudioWindow } from './audioThrottle'
-import { previewDef } from './preview'
+import { previewDef, previewFiring } from './preview'
 
 // ---- shared, module-level alert state (so fireAppSignal works outside React) ----
 
@@ -193,7 +193,8 @@ export function playAlertNow(
  * nothing else — so what this does is pinned by tests/alertPreview.test.mts rather than by prose.
  */
 export function previewAlertNow(def: AlertDef): void {
-  playAlertNow(previewDef(def))
+  // An app-signal alert's tokens are filled from the signal's sample values (preview.ts).
+  playAlertNow(previewDef(def), previewFiring(def))
 }
 
 /**

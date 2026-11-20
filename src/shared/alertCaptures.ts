@@ -313,6 +313,34 @@ export const APP_SIGNAL_CAPTURES: Record<AppSignal, readonly string[]> = {
   respawnSoon: ['mob', 'seconds', 'place', 'zone', 'when']
 }
 
+/**
+ * One example value per token above, for the Alerts tab's Test button: a Test has no firing, and
+ * a phrase made only of tokens (`{mob} {when}`) would otherwise be read out as its braces.
+ */
+export const APP_SIGNAL_SAMPLE_CAPTURES: Record<AppSignal, Record<string, string>> = {
+  bossDefeat: {},
+  questComplete: {},
+  bazaarWatch: {
+    item: 'Fleeting Quiver +4',
+    seller: 'Leric',
+    price: '18k',
+    what: 'for sale',
+    offer: 'Leric WTS Fleeting Quiver +4 18k',
+    why: 'at or under your 20k'
+  },
+  respawnSoon: { mob: 'Enynti', seconds: '20', place: 'open +0', zone: 'Lake Nerius', when: 'in 20 seconds' }
+}
+
+/**
+ * The sample values a Test of this trigger fills its tokens with, or undefined when it has none.
+ * Only a plain app-signal trigger: that is the only shape `fireAppSignal` ever fires with tokens.
+ */
+export function sampleCapturesFor(trigger: AlertTrigger): Record<string, string> | undefined {
+  if (trigger.type !== 'app') return undefined
+  const sample = APP_SIGNAL_SAMPLE_CAPTURES[trigger.signal]
+  return Object.keys(sample).length > 0 ? sample : undefined
+}
+
 /** Every regex SOURCE one primitive condition carries: its raw pattern, or its `/regex/` matchers. */
 function conditionRegexSources(c: AlertTriggerPrimitive): string[] {
   if (c.type === 'raw') return [c.regex]
