@@ -7,8 +7,48 @@ skills work"; "re-review my log for jewelcrafting work i did".
 - Issue: [fork #6](https://github.com/kaltinril/everquest-companion/issues/6), reopened 2026-11-20
   (no comment posted; a reply draft is at the end).
 - Requirements: `requirements/skills-tab.md`. Feature notes: `agent/BRANCH_NOTES.md`, "Skills tab".
-- Nothing here is built. Each slice below is one work branch, one gate, one merge, then the owner
-  tries it in the app before the next one starts.
+- State: see "Where it stands" just below. The sections after it are the record of how the work
+  was planned.
+
+## Where it stands (end of 2026-11-20)
+
+On `main_community`, not pushed, not yet tried by the owner in a running app. Two batches, each
+gated once on a candidate branch (WORKFLOW.md, "Gate") and merged with the tree compared.
+
+- Built: the Gear tab's Skill mod column; the Tradeskills section under Research (Home tiles and a
+  "Make an item" search; a workbench per tradeskill with four tabs: Recipes, Your route, Your
+  history, From the guides); links in from Loot, Bazaar, Skills, the Wish list, Gear rows and the
+  interactive item card; "Gear that raises this skill"; the engine `crafting` module (combines,
+  money, depot stock); the two guides as data with the validated pull and its release step; guide
+  credits (Preferences > Thanks, README, beside guide data); goal routes (Cheapest, Fastest,
+  Explore, Community route) with a shopping list; the item planner; Maps opened at a merchant's
+  pin. Where each lives: BRANCH_NOTES.md, "Tradeskills section", "Crafting module", "Tradeskill
+  guides as data".
+- Checked: batch 1: typecheck, lint, unit suite (known reds only), `cargo test --workspace`, the
+  `tradeskills` e2e spec. Batch 2 (no engine change): typecheck, lint, unit suite (7,550 tests,
+  known reds only), the `tradeskills` e2e spec (154 checks) and the three `maps` specs.
+- Not checked by any test: the ring on a merchant's pin (the e2e machine has no map for that
+  zone); hover cards; how the screens look.
+- Not built: the Faction goal (no quest rewards in the data); fishing and forage outcome counts;
+  a "can make now" mark; links from the Character sheet's depot rows, Mobs drop rows and the
+  Recommended tab (reasons in BRANCH_NOTES.md).
+
+Waiting on the owner:
+
+1. Try it in the dev app (the installed build must be closed first).
+2. Cheapest: should a recipe whose materials are already held come before a cheaper one that has
+   to be bought? Today the cheaper one leads and the held one is an aside.
+3. In-app links to the two guide documents: needs two path-scoped entries on the external link
+   allowlist (`src/main/security.ts`). Credits are text until then.
+4. The old Skills tab: keep for non-tradeskill skills, or remove. The Spell Research tile: the
+   leveling guide says the skill is removed from this game.
+5. Quest rewards in the wiki scrape, for the Faction goal (RULES.md rule 15).
+6. Wiki Gaps reads `create alternate product`; the game prints `create an alternate product`. One
+   word; it changes what Wiki Gaps shows.
+7. The two guides disagree on Fleeting Quiver (five materials against four). The planner uses the
+   recipe guide's four.
+8. The `/outputfile recipes` dump lists only "notable" recipes: nothing more to do unless the
+   owner learns one.
 
 ## Direction from the owner, later on 2026-11-20 (this replaces the slice order below)
 
