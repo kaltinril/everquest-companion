@@ -427,9 +427,14 @@ Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`)
 **Left menu (fork #10)**
 
 - Measured in the hidden e2e app, fresh install, default window (inner 1280 x 860, 100%), every
-  group open: the drawer is 820 px tall. At 14 px text in 32 px rows the open menu is 841 px, so it
-  scrolls by 21 px: 20 destination rows of 32 px (Overview, seven under Stats/Data with Skills, nine
-  under Research, two under Config, Preferences), three group headings of 28 px, and the two-line
-  Send feedback row at 57.4 px (its second line, "Off in the community build", wraps to two).
-- The row heights read back exactly as set (32.0 px each), so the styling holds; only the total was
-  wrong. A paper estimate from the MUI sources had the feedback row at about 42 px and no Skills row.
+  group open: the drawer is 820 px tall. At 14 px text in 32 px rows the open menu was 841 px and
+  scrolled by 21 px: 20 destination rows of 32 px (Overview, seven under Stats/Data with Skills, nine
+  under Research, two under Config, Preferences), three group headings of 28 px, and the Send
+  feedback row at 57.4 px.
+- The Send feedback row is 41.8 px when the menu fits. It read 57.4 px only because the menu was
+  overflowing: the scrollbar narrows the text column and the row's second line ("Off in the
+  community build") wraps. So the true overflow at 32 px rows was about 5 px, the Skills row, and
+  the scrollbar it caused made it 21.
+- At 28 px rows (the default since): the menu is no taller than the 820 px drawer and every
+  destination row reads back 28.0 px. The row heights always read back exactly as set, so the
+  styling holds; only the total was wrong.
