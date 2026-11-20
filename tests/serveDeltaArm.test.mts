@@ -139,9 +139,11 @@ test('a cursor that raced the hydrate is remembered, not dropped', () => {
 test('a world change re-hydrates unconditionally — it is the one frame with no cursor to compare', () => {
   assert.match(
     code(OVERLAY_HOOK),
-    /if \(c\.moduleId === MODULE_WORLD_CHANGED\) \{\s*hydrate\(\)/,
+    /if \(c\.moduleId === MODULE_WORLD_CHANGED\) \{\s*rehydrate\(\)/,
     `${OVERLAY_HOOK}: a world change is filtered by moduleId like an ordinary cursor`
   )
+  // `rehydrate` is `hydrate` plus one fact: with no snapshot back, the rows held are dropped.
+  assert.match(code(OVERLAY_HOOK), /const rehydrate = \(\): void => \{\s*dropOnNull = true\s*hydrate\(\)\s*\}/)
   // The store answers the same frame for EVERY module it is holding rather than for the one it is
   // bound to, because it is bound to all of them — but the shape of the claim is unchanged: this
   // branch is taken BEFORE any moduleId comparison, and it re-asks rather than comparing a cursor.

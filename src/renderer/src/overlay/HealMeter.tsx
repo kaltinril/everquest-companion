@@ -15,6 +15,8 @@ import { MeterPane } from './scopeFloor'
 import { BgFooter } from './BgFooter'
 import { useOverlayChrome } from './useOverlayChrome'
 import { useOverlayCombat } from './useOverlayCombat'
+import { overlayTitle } from '@shared/logReadWords'
+import { useLogReadReport } from '../lib/logReadReportHud'
 import { OVERLAY_FONT } from '../../../shared/overlayFont'
 
 /**
@@ -58,6 +60,8 @@ const LIVE = '__live__'
 /** Everything the chrome renders, resolved from one snapshot in one place. */
 interface HealView {
   seg: SegmentView | undefined
+  /** No reply to draw yet: the title says why instead of naming a segment. */
+  hydrating: boolean
   live: boolean
   headerName: string
 }
@@ -84,13 +88,9 @@ function healView(snap: CombatSnapshot | null, isFight: boolean): HealView {
   // The RATE is not resolved here any more (JOS-158): the aggregate — and the restored/absorbed
   // sentence that used to ride its hover — are stated from the panel's own header row, off the
   // same segment, by overlay/healBars.tsx.
-  return { seg, live, headerName: headerNameFor(hydrating, seg, isFight) }
-}
-
-/** "Reading log…" during hydration, then the segment's name — never a borrowed one. */
-function headerNameFor(hydrating: boolean, seg: SegmentView | undefined, isFight: boolean): string {
-  if (hydrating) return 'Reading log…'
-  return seg?.name ?? (isFight ? 'No fight' : 'No zone')
+  // The segment's name, never a borrowed one. While hydrating the title is the log-read status's
+  // short label instead (`overlayTitle`).
+  return { seg, hydrating, live, headerName: seg?.name ?? (isFight ? 'No fight' : 'No zone') }
 }
 
 /**
@@ -139,7 +139,9 @@ export default function HealMeter(): JSX.Element {
   const [meterScope] = useMeterScope()
   const roster = snap?.roster ?? EMPTY_ROSTER
 
-  const { seg, live, headerName } = healView(snap, isFight)
+  const { seg, hydrating, live, headerName } = healView(snap, isFight)
+  // Why there is nothing to draw, or why the numbers held have stopped moving (fork #9).
+  const head = overlayTitle(useLogReadReport(), hydrating, headerName)
   const selectRows = useMemo(
     () => healSelectRows(snap, isFight, now),
     // Same deps as before the extraction: the two lists the rows are built from, plus the
@@ -182,7 +184,9 @@ export default function HealMeter(): JSX.Element {
       <OverlayHeader
         live={live}
         tag={isFight ? 'HEAL · FIGHT' : 'HEAL · ZONE'}
-        title={headerName}
+        title={head.title}
+        // Only while the status has a wait to name: a healthy meter's title bar is as it was.
+        tail={head.tail}
         titleColor={HEAL_GOLD}
         // The NAME alone. The fight clock went to the crumb row with JOS-35 and the aggregate
         // followed it with JOS-158 — same move, same row, same reasoning as the damage pair, and
