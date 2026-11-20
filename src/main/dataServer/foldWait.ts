@@ -222,6 +222,24 @@ export function stillFolding(health: FoldHealth, logSize: number | null): string
   return `data-server client: still folding — ${where}${events} (epoch ${String(health.epoch)})`
 }
 
+/**
+ * THE GO-LIVE SENTENCE (`engineClientHost.ts sawHealth` prints it once per turn; two e2e specs wait
+ * on it as their readiness precondition).
+ *
+ * The optional clauses are appended rather than interpolated because both are genuinely absent on a
+ * fresh attach — an engine that has folded nothing has no event count and no byte mark — and an
+ * empty interpolation would print a dangling comma rather than saying nothing.
+ */
+export function servingLine(logPath: string | null, health: FoldHealth): string {
+  const parts = [`epoch ${String(health.epoch)}`]
+  if (health.events !== undefined) parts.push(`${String(health.events)} events`)
+  if (health.mark?.offset !== undefined) parts.push(`at byte ${String(health.mark.offset)}`)
+  return (
+    `data-server serving: ${logPath ?? '(none)'} — the engine's fold is live and is now ` +
+    `answering this app's reads (${parts.join(', ')})`
+  )
+}
+
 /** The same two lines four other files in this directory spell for themselves. */
 function describeErr(err: unknown): string {
   if (err instanceof EngineError) return `${err.code}: ${err.message}`

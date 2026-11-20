@@ -113,7 +113,7 @@ import { noteEngineFolding, noteEngineLive, noteEngineReadEnded } from './engine
 // nobody answered, an answer about another log — are drivable in a unit test. `foldWait.ts` carries
 // the owner ruling that a folding engine is never given up on.
 import { runAttachTurn } from './attachTurn'
-import type { FoldHealth } from './foldWait'
+import { servingLine, type FoldHealth } from './foldWait'
 // THE LOOK AFTER LIVE, and the read's edges as the recovery hears them (fork #9, phase R4).
 import { createAfterLiveWatch } from './afterLive'
 import { noteReadEdge } from './readEdges'
@@ -616,22 +616,8 @@ function onWorldRebuilt(character: CharacterRef | null): void {
 // `EngineHealthSay` LIVED HERE AND IS `FoldHealth` IN `foldWait.ts` NOW (JOS-518) — the loop that
 // reads it moved, and the shape belongs beside its reader.
 
-/**
- * THE GO-LIVE SENTENCE, built out of line so `sawHealth` keeps its own shape.
- *
- * The optional clauses are appended rather than interpolated because both are genuinely absent on a
- * fresh attach — an engine that has folded nothing has no event count and no byte mark — and an
- * empty interpolation would print a dangling comma rather than saying nothing.
- */
-function servingLine(logPath: string | null, health: FoldHealth): string {
-  const parts = [`epoch ${String(health.epoch)}`]
-  if (health.events !== undefined) parts.push(`${String(health.events)} events`)
-  if (health.mark?.offset !== undefined) parts.push(`at byte ${String(health.mark.offset)}`)
-  return (
-    `data-server serving: ${logPath ?? '(none)'} — the engine's fold is live and is now ` +
-    `answering this app's reads (${parts.join(', ')})`
-  )
-}
+// THE GO-LIVE SENTENCE (`servingLine`) is built in `foldWait.ts`, beside the other line a fold
+// explains itself with, so `sawHealth` keeps its own shape and a test can read the sentence.
 
 /**
  * ONE HEALTH ANSWER, ON THE WAY PAST — and everything this app does about the engine going live.

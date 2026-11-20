@@ -29,6 +29,7 @@ import {
   FOLD_REFUSAL_LIMIT,
   FOLD_REFUSAL_PAUSE_MS,
   FOLD_UNANSWERED_PAUSE_MS,
+  servingLine,
   stillFolding,
   waitForFold,
   type FoldHealth,
@@ -352,6 +353,17 @@ test('it DEGRADES rather than guessing', () => {
   const noSize = stillFolding(folding(512 * 1024, 500), null)
   assert.match(noSize, /512\.0 KB/)
   assert.doesNotMatch(noSize, / of /)
+})
+
+test('THE GO-LIVE SENTENCE names the log, the epoch and what the engine can vouch for', () => {
+  // tests/e2e/engineSteps.mts waits on this line as the app's readiness: the words up to the
+  // epoch are what its pattern reads.
+  const line = servingLine('C:\\Logs\\eqlog_Primitive_freeport.txt', live(4_096, 40))
+  const read = /data-server serving: (.*?) . the engine's fold is live and is now answering this app's reads \(epoch (\d+)/.exec(line)
+  assert.deepEqual(read?.slice(1), ['C:\\Logs\\eqlog_Primitive_freeport.txt', '2'])
+  assert.match(line, /\(epoch 2, 40 events, at byte 4096\)$/)
+  // Nothing folded yet: no dangling comma, and no log is said as none.
+  assert.match(servingLine(null, { status: 'live', epoch: 7 }), /serving: \(none\) .* reads \(epoch 7\)$/)
 })
 
 test('a denominator the fold has already passed never reads backwards', () => {
