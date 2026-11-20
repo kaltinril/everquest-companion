@@ -318,10 +318,11 @@ where one exists.
   / `NAV_TEXT_SX`; no prop drilling. Group headings stay fixed (`GROUP_HEADING_SX`, 28px).
 - TRAP: the default row height is a measurement, not arithmetic. It was first 32px, sized on paper
   so the open menu fit the default window; the Skills row landed the same day and the menu ran 21px
-  over (MEASURED.md). A new nav row costs one row height, and the two-line Send feedback row is
-  57px, not the 42px a read of the styles gives, because its second line wraps. `stepNavMenu` in
-  `tests/e2e/text-size.e2e.mts` checks the open menu against the drawer on a fresh install: when a
-  new tab makes it fail, lower the default or shorten a row, do not delete the check.
+  over (MEASURED.md). A new nav row costs one row height, and an overflowing drawer grows further
+  by itself: its scrollbar narrows the text column and the two-line Send feedback row wraps to three
+  (42px becomes 57px). `stepNavMenu` in `tests/e2e/text-size.e2e.mts` checks the open menu against
+  the drawer on a fresh install: when a new tab makes it fail, lower the default or shorten a row,
+  do not delete the check.
 - Rows use `minHeight`, never `height`: a label that wraps grows its row. `tests/navMenu.test.mts`
   holds the fit rule: the shortest row must hold the largest text's line (x1.3) and icon (x1.5). A
   new stop on either ladder must keep it.

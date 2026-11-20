@@ -493,9 +493,9 @@ async function stepResponsive(app: ElectronApplication, page: Page): Promise<voi
   await checkHeader(page, 'min window width (900)', true)
 
   // 12. RESPONSIVE: below md the grid collapses to ONE column of comfortably tall panels and
-  //     the REGION scrolls (the page still must not). Unreachable through the UI today
-  //     (minWidth 900 === the md breakpoint), so the test lifts the minimum to exercise the
-  //     CSS — if the window minimum or the drawer ever changes, this path is already correct.
+  //     the REGION scrolls (the page still must not). No window can be DRAGGED this narrow
+  //     (minWidth 900 === the md breakpoint), but 125% text size on a 900px window lays out at
+  //     exactly this width — so the test lifts the minimum to reach the same CSS.
   await win.evaluate((w, b) => {
     w.setMinimumSize(400, 400)
     w.setBounds({ ...b, width: 720 })
@@ -576,7 +576,7 @@ async function main(): Promise<void> {
     //     so the assertions read a live meter. Nothing below it may assume a quiet log.
     await stepPetNeverAsked(page, log)
     // 15. …AND THE PET YOU ASK INSTEAD (JOS-52) — `/pet who leader` binds a successor that was
-    //     never ordered, forward only, and retires the pet it replaced. Straight after 14 because
+    //     never ordered, earlier swings and all, and retires the pet it replaced. Straight after 14 because
     //     it inherits that step's bound pet: the succession is half of what it proves.
     await stepPetAnswersWhoLeads(page, log)
     // 16. …AND THE LINE ABOVE THE ROWS ANSWERS THE PET PREFERENCE (JOS-170). It inherits 14 and 15

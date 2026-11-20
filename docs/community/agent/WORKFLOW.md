@@ -192,6 +192,19 @@ disagree, RULES.md wins; fix this file.
   (no `wmic` on this machine: `engineTable()` falls back to `tasklist`, and engines from specs
   running alongside count as new). Each worktree builds its own `engined.exe`: the engine embeds the
   data files, so a shared binary cannot serve two trees.
+  Measured 2026-11-19 (main_community after the issue sweep, 4 in parallel; the reds again one at a
+  time; then the same specs on that morning's trunk in a detached worktree): 61/66 green and no new
+  red. `engine-boots` flaked in parallel and passed alone; `voice-alerts` is red as before.
+  `combat-dashboard`, `copy` and `default-sound-pack` were red on both trees, each diagnosed and
+  fixed the same day: four checks had gone stale after deliberate app changes (MUI 7 icons carry no
+  `data-testid` in a production build; a spoken alert needs no sound pack, stale since the Bazaar
+  alert; a pet's swings before its claim move to its row since 2026-10-28) and one was a real bug
+  (the Combat header's second row was cut off at 125% text size in a narrow window, since the scope
+  buttons of 2026-11-17). On a LOCKED workstation the OS clipboard reads back empty even for the
+  spec's own write: `copy` now says so in a note and skips its two round-trip checks, so a green
+  `copy` on a locked machine proves less; rerun it unlocked. A baseline needs a worktree of its own
+  at the older commit with its own `engine/target` (release profile only: 0.6 GB, a few minutes
+  cold), so this clone's engine is not overwritten.
 - **Headless look at a tab:** every tab is in every build (the `UNRELEASED` gate was removed
   2026-10-29), so `electron-vite build --outDir=<worktree>/out-e2e` and a throwaway spec with
   `launchOnFixture(...)` reach any of them; no flag or env var is needed.
@@ -268,6 +281,10 @@ disagree, RULES.md wins; fix this file.
   about it, report those to me instead of attempting to fix them"). When a report's cause is a
   wrong or missing wiki page, give the owner the page, the field, what it says and what it should
   say. No code change and no data override for it, unless the owner asks for one on that issue.
+- **A player is never left guessing what is wrong** (owner, 2026-11-19, on fork #9: "The main point
+  is we don't want to have our users confused what is wrong."). A screen that is stuck, empty or
+  stale says why in plain words and, where the app can know it, what to try. A silent wait and a
+  wrong reason are both defects. Recovering by itself is welcome, and comes second to saying so.
 - **Scraping is wiki-only; the log is the truth** (owner, 2026-10-10). The game's own files may
   be parsed once, at dev time, to find wiki errors; nothing shipped or scraped depends on them.
   DATA_REFRESH.md, "The ETL".
