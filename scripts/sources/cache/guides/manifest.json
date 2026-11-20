@@ -1,0 +1,92 @@
+{
+  "pulledAt": "2026-11-20T18:45:13.000Z",
+  "sheet": {
+    "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTNj3GiLZ4nXBfLkGEB2iGkJy_WV4Mfkth5nwyg3pSfjJEiEreIsspJhIcSZAIS5hbSDwZbawzk4jEz/pubhtml",
+    "title": "EQ Legends Tradeskill Guide",
+    "tabs": [
+      {
+        "name": "Welcome",
+        "gid": "1848784077",
+        "file": "sheet/Welcome.csv",
+        "bytes": 893,
+        "sha256": "cf0ccdfb616e324ddbff1610ff2699f6c7b554074dff2c5ebf8795d9b2db267f"
+      },
+      {
+        "name": "Overview",
+        "gid": "0",
+        "file": "sheet/Overview.csv",
+        "bytes": 837,
+        "sha256": "dcffaeef749fa09461a6112a2f759802f9552665fd48bd189eca29d44fe6957e"
+      },
+      {
+        "name": "Alchemy",
+        "gid": "1909290481",
+        "file": "sheet/Alchemy.csv",
+        "bytes": 1297,
+        "sha256": "7d32ef48cdeb3997595e40a44571ca50d35f1df8d472725dd83ff1f2c90b91b5"
+      },
+      {
+        "name": "Baking",
+        "gid": "2126140250",
+        "file": "sheet/Baking.csv",
+        "bytes": 1692,
+        "sha256": "514e0271e4d745d3c5009e5d67af504dab86c2ce25dae6c217b068cb98f6ab75"
+      },
+      {
+        "name": "Blacksmithing",
+        "gid": "1131536115",
+        "file": "sheet/Blacksmithing.csv",
+        "bytes": 2588,
+        "sha256": "960b63569cc849eeded3fcd608ee1bddcc292f59df7df8f800410debcf37e155"
+      },
+      {
+        "name": "Brewing",
+        "gid": "554177470",
+        "file": "sheet/Brewing.csv",
+        "bytes": 921,
+        "sha256": "82fa8de1da573ce378df0f8753aa433040c5df615f5513d58007fce93f286f34"
+      },
+      {
+        "name": "Fletching",
+        "gid": "705688313",
+        "file": "sheet/Fletching.csv",
+        "bytes": 2556,
+        "sha256": "6b62aa4db170e09adf1a7e4726fe4753d2a8a1795a3b0d62af0c75d3b937b85b"
+      },
+      {
+        "name": "Jewelcrafting",
+        "gid": "1243487254",
+        "file": "sheet/Jewelcrafting.csv",
+        "bytes": 1088,
+        "sha256": "1954abe546eb9b3389362993404233c9a8600cf2e0ba3098a537cc9d556633a8"
+      },
+      {
+        "name": "Pottery",
+        "gid": "1240291122",
+        "file": "sheet/Pottery.csv",
+        "bytes": 1695,
+        "sha256": "2f19a6d3a9b0a7107b65b13ec0ea5f0e457e7293335b683b4ecf00025055409d"
+      },
+      {
+        "name": "Tailoring",
+        "gid": "789035462",
+        "file": "sheet/Tailoring.csv",
+        "bytes": 1599,
+        "sha256": "aa401829100cd417663e9075ddcbbcd31484e81e1afd5607cf921f9fa7e17904"
+      },
+      {
+        "name": "Tinkering",
+        "gid": "929336399",
+        "file": "sheet/Tinkering.csv",
+        "bytes": 2030,
+        "sha256": "0504c24dd83f0314c98546924bafb59a4fd431b7175b54ae0ffb266fce9fe345"
+      }
+    ]
+  },
+  "recipes": {
+    "url": "https://drive.google.com/file/d/1VcUmqXTclXafiMxQvCr2G5HvtgRc7ew5/view",
+    "file": "kornerstore.ods",
+    "bytes": 26825,
+    "sha256": "62c80ba47622fd3d31a7e7b202791a9b847dadf92c8b1b9ae4c8d09e62eeb7b1"
+  }
+}
