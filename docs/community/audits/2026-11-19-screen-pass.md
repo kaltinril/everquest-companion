@@ -240,7 +240,8 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   drifting apart. No wording change. Test: Only the running app can show this, because the fault is
   how CSS rules combine; a unit test of settingsRecoveryNotice() cannot catch it. Add an e2e spec
   (the catch_all row already notes there is none). Stage a cut-off ...
-- CONFIRMED [low, overlap] At 150% text in the minimum window the first-run notice is drawn over the
+- FIXED 2026-11-20 (the card is above the first-run strip and never taller than the window;
+  `settings-recovery-notice.e2e.mts` clicks OK at 150%) [low, overlap] At 150% text in the minimum window the first-run notice is drawn over the
   card's OK button and the end of the path Seen: Card rect y 24..341.8 (317.8 px of a 400 px tall
   viewport, 10 lines of text). First-run notice rect y 280..376, same x range 147..441: 61.8 px
   shared. OK button rect 197..261 x 297.7..327.8 lies wholly inside the first-run notice;
@@ -256,7 +257,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   32px))', or anchor the Snackbar with left/right 16 and ... Test: Only the running app can show
   this, so write an e2e spec, tests/e2e/settings-recovery-notice.e2e.mts. Stage a cut-off live store
   plus a v13 backup with no telemetry key (the probe's backupold staging) and a long ...
-- CONFIRMED [low, cosmetic] The card is only half the window wide, so it never reaches its 520 px in
+- FIXED 2026-11-20 (the card spans the content column, up to 520 px) [low, cosmetic] The card is only half the window wide, so it never reaches its 520 px in
   a window under 1040 CSS px and the path breaks over 3 to 4 lines Seen: Alert max-width is 520px,
   but the measured card width is the viewport's half minus the gutter: 444 at 900 px (card x
   222..666 while the content area runs to x 888), 354 at 125% (viewport 720), 294 at 150% (viewport
@@ -273,7 +274,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   Test: Only the running app can show this (it is CSS cascade), so add an e2e check to the notice's
   missing spec. Stage a cut-off everquest-companion-progress.json, launch, wait for
   [data-testid="settings-recovery-notice"], and ...
-- CONFIRMED [low, overlap] At 125% and 150% text in the minimum window the card is drawn over the
+- FIXED 2026-11-20 (the card starts at the menu's right edge; measured at 100, 125 and 150%) [low, overlap] At 125% and 150% text in the minimum window the card is drawn over the
   right edge of the left menu and hides the Stats group's arrow Seen: Left menu rect x 0..220. Card
   left edge is 177 at 125% (43 px over the menu) and 147 at 150% (73 px over). The expand arrow of
   [data-testid="nav-group-stats"] (svg box 179.2..199.2 x 84..104, 20x20) is fully under the card at
