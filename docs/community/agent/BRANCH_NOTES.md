@@ -72,6 +72,24 @@ where one exists.
   - Not modelled: spells (a mote lifts a spell rank too), banked progress, a piece about to be
     replaced, the player's own loot history, D0-D3 raid kills. Open questions for the owner are at
     the end of the plan.
+- **Skill mod column** (owner, 2026-11-20; `shared/planner/skillMod.ts`, tests in
+  `tests/gearSkillMod.test.mts`). `parseSkillMods(flags)` reads `Skill Mod: <skill> <N>% (<cap> Max)`
+  wherever it sits in a flag entry, for any skill name. Main's `gearIndex.pageRow` puts the answer
+  on the row once (`GearRow.skillMods`, absent when none; optional, so no `GEAR_INDEX_VERSION` bump).
+  - Column: `GearSortKey` `SKILL_MOD`, in `PICKABLE_COLUMNS` after `WEIGHT` and before `BIS`, so the
+    picker and the stored columns, sort and widths take it with no list of their own. `sortValue` is
+    the largest percent; the cell is words (`gearColumns.gearCellText`, hover `gearCellTitle`).
+  - Narrowing is the search box, as for a stat: the token `skillmod>0` (`THRESHOLD_KEYS`), and words
+    through the haystack (`gearData.toRow` adds `skill mod <skill>`: the name, never the number).
+  - Width: two numeric units (`gearColumns.columnUnits`). `gearTableLayout` is handed
+    `numericUnits(columns)`, not `columns.length`. The core four plus it is 6 units: pixel mode
+    while the drop trio is drawn. The derived seed (`visibleColumns`) never adds it, so the seed
+    stays in percentage mode; a sort on it with no columns picked falls to AC.
+  - Data, 2026-11-20: 7 pages state one, 6 parse (Fishing on four, Baking, Pick Lock) and all 6
+    have a slot, so all are rows. `Skill Mod: ?` (Singed Armature Rod) reads as none. Uliorn's
+    Fishing Pole is out of era by the era join.
+  - Not done: the plus-state does not scale it (no page states how a tier moves one); the compare
+    card and `benefitMismatch` do not read it; no toolbar control; not looked at in the running app.
 
 ## Maps (was map-improvements)
 
