@@ -48,8 +48,9 @@ test('a table that was missing is loaded once the folder is set', async () => {
 test('the same folder loads once, however often the table is asked for', async () => {
   const { memo, loads } = rig({ [OLD]: { odium: 1 } })
   const first = memo.table()
-  assert.equal(memo.table(), first, 'a second ask while loading shares the first load')
-  await first
+  const second = memo.table()
+  assert.deepEqual(loads, [OLD], 'a second ask while loading shares the first load')
+  assert.equal(await second, await first)
   assert.equal(memo.table(), first)
   assert.deepEqual(loads, [OLD])
 })
@@ -78,9 +79,42 @@ test('a folder change during a load waits for that load, then loads again', asyn
   const { memo, root, loads } = rig({ [NEW]: { odium: 1 } })
   const first = memo.table()
   root.path = NEW
-  assert.equal(memo.table(), first, 'never two loads at once')
+  const second = memo.table()
+  assert.deepEqual(loads, [OLD], 'never two loads at once')
   assert.equal(await first, null)
   assert.deepEqual(await memo.table(), { odium: 1 })
+  assert.deepEqual(loads, [OLD, NEW])
+  // The renderer re-pulls once per folder change: an ask made after the change gets the new folder.
+  assert.deepEqual(await second, { odium: 1 })
+})
+
+test('an ask made during a slow load of the old folder is answered from the new one', async () => {
+  // The first launch after a cache bump parses for seconds. The folder is changed meanwhile.
+  const root = { path: OLD }
+  const loads: string[] = []
+  const release: (() => void)[] = []
+  const files: Record<string, Table> = { [OLD]: { odium: 1 }, [NEW]: { odium: 2 } }
+  const load = (path: string): Promise<SpellTableLoad<Table>> => {
+    loads.push(path)
+    return new Promise((resolve) => {
+      release.push(() => resolve({ table: files[path], state: 'ok', mtimeMs: 7 }))
+    })
+  }
+  const memo = spellTableMemo<Table>(() => root.path, load)
+
+  void memo.table()
+  root.path = NEW
+  const repull = memo.table()
+  const other = memo.table()
+  assert.deepEqual(loads, [OLD])
+
+  release[0]()
+  await new Promise((resolve) => setImmediate(resolve))
+  assert.deepEqual(loads, [OLD, NEW], 'every waiter shares the one new load')
+  release[1]()
+  assert.deepEqual(await repull, { odium: 2 })
+  assert.deepEqual(await other, { odium: 2 })
+  assert.deepEqual(memo.status(), { state: 'ok', path: NEW })
   assert.deepEqual(loads, [OLD, NEW])
 })
 

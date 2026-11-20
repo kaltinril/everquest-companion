@@ -45,9 +45,16 @@ export function spellTableMemo<T>(
   let state: SpellTableState = 'loading'
   let loadedFrom: string | null = null
   const stale = (): boolean => spellTableIsStale(state, loadedFrom, currentPath())
-  return {
+  const memo: SpellTableMemo<T> = {
     table: () => {
-      if (pending && !stale()) return pending
+      // AN ASK DURING A LOAD WAITS FOR IT, THEN LOOKS AT THE PATH AGAIN. The renderer re-pulls once
+      // per folder change and is never signalled twice: handed the old folder's load, it kept the
+      // old install's figures all session. `pending !== mine` is the second waiter: the first one
+      // has already started the new load, so `stale()` reads false again.
+      const mine = pending
+      if (mine && !stale()) {
+        return state === 'loading' ? mine.then((t) => (pending !== mine || stale() ? memo.table() : t)) : mine
+      }
       const path = currentPath()
       state = 'loading'
       loadedFrom = path
@@ -73,4 +80,5 @@ export function spellTableMemo<T>(
       loadedFrom = null
     }
   }
+  return memo
 }
