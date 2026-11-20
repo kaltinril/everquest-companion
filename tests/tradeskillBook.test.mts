@@ -407,6 +407,38 @@ test('the words on screen: the facts of a recipe, its materials as text, and why
   assert.ok(LEVEL_UNSEEN_TEXT.includes('level 0'))
 })
 
+test("a recipe carries what the made item's own page states: the quests that take it, and its stats and effects", () => {
+  const block = { flags: ['Magic Item'], stats: [], saves: [], effects: [], exaltationSlots: [], extras: [] }
+  const pages = [
+    entry('Quest Ring', {
+      ...ring(100, 'Ruby'),
+      // The same quest from two sources is one quest; a quest that only hands the ring out is no use of it.
+      questUses: [
+        { quest: 'Cloak Quest', source: 'wiki' },
+        { quest: 'Cloak Quest', source: 'quests', role: 'required' },
+        { quest: 'Reward Quest', source: 'quests', role: 'reward' }
+      ],
+      stats: { ...block, ac: 4, stats: [{ key: 'STR', value: '+2' }], saves: [{ key: 'SV MAGIC', value: '+5' }], effects: [{ kind: 'worn', name: 'Haste' }] }
+    }),
+    entry('Plain Ring', ring(101, 'Ruby')),
+    // A stat block with flags and nothing else states no stat of the item's own.
+    entry('Bare Ring', { ...ring(102, 'Ruby'), stats: block, questUses: [{ quest: 'Reward Quest', source: 'quests', role: 'reward' }] })
+  ]
+  const file: ItemDbFile = { scrapedAt: '', source: 'fixture', count: pages.length, items: Object.fromEntries(pages.map((p) => [p.page.toLowerCase(), p])) }
+  const made = new Map(buildTradeskillBook(buildItemDbIndex(file), NO_ERA).recipes.map((r) => [r.item, r]))
+  assert.deepEqual(made.get('Quest Ring')?.quests, ['Cloak Quest'])
+  assert.deepEqual(made.get('Quest Ring')?.worn, { stats: ['AC 4', 'STR +2', 'SV MAGIC +5'], effects: ['Haste'] })
+  for (const name of ['Plain Ring', 'Bare Ring']) {
+    assert.equal(made.get(name)?.quests, undefined, name)
+    assert.equal(made.get(name)?.worn, undefined, name)
+  }
+  // Measured 2026-11-20 on the committed data: 319 recipes make an item a quest takes, 1,766 an item with stats or effects.
+  const book = buildTradeskillBook(buildItemDbIndex(itemsJson as unknown as ItemDbFile), NO_ERA)
+  assertCorpusFloor(book.recipes.filter((r) => r.quests !== undefined).length, 319, 'recipes whose item a quest takes')
+  assertCorpusFloor(book.recipes.filter((r) => r.worn !== undefined).length, 1766, 'recipes whose item has stats or effects')
+  assert.ok(book.recipes.every((r) => r.quests === undefined || r.quests.every((q) => q.trim() !== '')), 'an empty quest name')
+})
+
 // ---- the committed item database --------------------------------------------------------------
 
 test('the committed data builds a book: every tradeskill has recipes, in ladder order, with keyed materials', () => {

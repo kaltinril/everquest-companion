@@ -21,6 +21,12 @@ export interface BookIngredient extends ItemCraftIngredient {
   key: string
 }
 
+/** What a made item's own window states: `STR +3`, `SV MAGIC +5`, and the names of its effects. */
+export interface BookWorn {
+  stats: string[]
+  effects: string[]
+}
+
 /** One wiki recipe. `key`, `eraTag`, `eraDerived` and `wikiSources` are the era join's subject. */
 export interface BookRecipe {
   /** One recipe's own handle (`<page key>#<n>`): a page can state several, and pages can share a name. */
@@ -40,6 +46,10 @@ export interface BookRecipe {
   eraTag?: string
   eraDerived?: EraDerivation
   wikiSources?: ItemDropSource[]
+  /** The quests that take the made item (its page's quest uses; a quest that only hands it out is left out). */
+  quests?: string[]
+  /** The made item's own stats, saves and effects, as its window words them; absent when it has none. */
+  worn?: BookWorn
 }
 
 /** Where a material comes from, off its own item page. */
