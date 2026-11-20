@@ -19,9 +19,9 @@
 //
 // The game may be running throughout: it opens the log by name for every line (ruling 0.5).
 
-import { closeSync, existsSync, linkSync, openSync, readFileSync, readSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { appendFileSync, closeSync, existsSync, linkSync, openSync, readdirSync, readFileSync, readSync, renameSync, rmSync, statfsSync, statSync, truncateSync, writeFileSync } from 'node:fs'
 import { createReadStream, createWriteStream } from 'node:fs'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { pipeline } from 'node:stream/promises'
 import { createGunzip } from 'node:zlib'
 import { createHash } from 'node:crypto'
@@ -29,6 +29,8 @@ import type { Segment, SegmentLog } from '../../shared/logArchive/segment'
 import type { BackupRequest, BackupResult } from './backup'
 import { archiveName } from './backup'
 import { logNameOf, type LedgerSource } from './factionLedgerFile'
+import { readLogPrefix } from './logPrefix'
+import { resolveArchivePath } from './segmentStore'
 
 export const JOURNAL = 'rotation-journal.json'
 
@@ -161,7 +163,7 @@ export async function rotateLog(logPath: string, dir: string, captured: Segment,
     deps.crashAfter?.('moved')
     return { ok: true, segment: await finishFromMoved(dir, { ...j, step: 'moved' }, deps) }
   } catch (err) {
-    return { ok: false, reason: (err as Error).message, logTouched: true }
+    return { ok: false, reason: afterMove(err, j), logTouched: true }
   }
 }
 
@@ -180,22 +182,99 @@ export async function recoverRotation(dir: string, deps: RotateDeps): Promise<st
     const seg = await finishFromMoved(dir, { ...j, step: 'moved' }, deps)
     return `finished an interrupted archive: ${seg.id}`
   } catch (err) {
-    return `an interrupted archive could not be finished: ${(err as Error).message}`
+    return `${NOT_FINISHED}${afterMove(err, j)}`
   }
 }
 
+const NOT_FINISHED = 'an interrupted archive could not be finished: '
+
+/** Why the steps after the move stopped, always with where the old log is while it is there. */
+function afterMove(err: unknown, j: Journal): string {
+  const why = (err as Error).message
+  return why.includes(j.movedPath) || !existsSync(j.movedPath) ? why : `${why}; the old log is kept at ${j.movedPath}`
+}
+
+/** Why the recovery could not finish, from what `recoverRotation` answered; null when it did, or
+ *  had nothing to do. The card shows it (preflight.ts `interruptedReason`). */
+export function unfinishedReason(done: string | null): string | null {
+  return done?.startsWith(NOT_FINISHED) === true ? done.slice(NOT_FINISHED.length) : null
+}
+
+const RESTORING = '.restoring'
+const PART = '.part'
+
+/** The scratch files a put-back that stopped part-way left in `dir`. They hold log lines. */
+export function putBackLeftovers(dir: string): string[] {
+  if (!existsSync(dir)) return []
+  return readdirSync(dir).filter((f) => f.endsWith(RESTORING) || f.endsWith(PART))
+}
+
+/** Test seams: the two steps of a put-back that the disk can refuse. */
+export interface RestoreIo {
+  append?: (path: string, bytes: Buffer) => void
+  link?: (from: string, to: string) => void
+}
+
+/** A stretch of the live log set aside as `<id>.<at>.part`: `at` is how long the joined file was
+ *  before the piece was added, so a half-added copy can be cut off and the piece added again.
+ *  NaN for a name without it (an older version's `<id>.part`). */
+interface Piece {
+  path: string
+  at: number
+}
+
+function piecesOf(dir: string, id: string): Piece[] {
+  const mine = readdirSync(dir).filter((f) => f.startsWith(`${id}.`) && f.endsWith(PART))
+  return mine.map((f) => {
+    const at = f.slice(id.length + 1, -PART.length)
+    return { path: join(dir, f), at: /^\d+$/.test(at) ? Number(at) : NaN }
+  })
+}
+
+/** Two names of one file (a hard link). */
+function sameFile(a: string, b: string): boolean {
+  const fileOf = (path: string): string | null => {
+    const s = statSync(path, { bigint: true, throwIfNoEntry: false })
+    return s === undefined ? null : `${s.dev}:${s.ino}`
+  }
+  const x = fileOf(a)
+  return x !== null && x === fileOf(b)
+}
+
+/** Add a piece to the end of `joined`, first cutting off any half-added copy of it. */
+function addPiece(joined: string, p: Piece, io: RestoreIo): void {
+  truncateSync(joined, Math.min(p.at, statSync(joined).size))
+  ;(io.append ?? appendFileSync)(joined, readFileSync(p.path))
+  rmSync(p.path)
+}
+
 /** Move the live log aside and add its bytes to the end of `joined`. Nothing when there is none. */
-function absorbLive(logPath: string, part: string, joined: string): void {
+function absorbLive(logPath: string, joined: string, io: RestoreIo): void {
   if (!existsSync(logPath)) return
-  renameSync(logPath, part)
-  writeFileSync(joined, readFileSync(part), { flag: 'a' })
-  rmSync(part)
+  const at = statSync(joined).size
+  const piece: Piece = { path: `${joined.slice(0, -RESTORING.length)}.${at}${PART}`, at }
+  // A rename replaces what is at the new name, and a piece there would be the only copy of its lines.
+  if (existsSync(piece.path)) throw new Error(`an earlier try left ${piece.path}`)
+  renameSync(logPath, piece.path)
+  try {
+    addPiece(joined, piece, io)
+  } catch (err) {
+    // Undo the round: cut the half-added copy off and give the log its name back. When either
+    // fails the piece keeps its name, which says where it belongs, and the next put-back adds it.
+    try {
+      truncateSync(joined, at)
+      if (linkIfFree(piece.path, logPath)) rmSync(piece.path)
+    } catch {
+      // The piece stays.
+    }
+    throw err
+  }
 }
 
 /** Link `from` to the name `to`; false when the name is taken (the game recreated it). */
-function linkIfFree(from: string, to: string): boolean {
+function linkIfFree(from: string, to: string, link: (from: string, to: string) => void = linkSync): boolean {
   try {
-    linkSync(from, to)
+    link(from, to)
     return true
   } catch (err) {
     if ((err as NodeJS.ErrnoException).code === 'EEXIST') return false
@@ -205,10 +284,115 @@ function linkIfFree(from: string, to: string): boolean {
 
 async function unpack(archive: string, to: string): Promise<string> {
   const h = createHash('sha256')
-  const gun = createReadStream(archive).pipe(createGunzip())
+  const gun = createGunzip()
   gun.on('data', (c) => h.update(c as Buffer))
-  await pipeline(gun, createWriteStream(to))
+  // The archive's own stream is in the pipeline, so one that cannot be read ends the wait.
+  await pipeline(createReadStream(archive), gun, createWriteStream(to))
   return h.digest('hex')
+}
+
+function roomFor(dir: string, bytes: number): boolean {
+  try {
+    const s = statfsSync(dir)
+    return s.bavail * s.bsize >= bytes
+  } catch {
+    return true
+  }
+}
+
+/**
+ * `joined` holding the verified archive: the file an earlier try kept, or unpacked now under a
+ * `.partial` name (swept at launch, backup.ts) and named only once its bytes are checked. A file
+ * already there is never opened for writing: it may hold the only copy of the lines since.
+ */
+async function archiveBase(archive: string | null, joined: string, source: { bytes: number; sha256: string }, logPath: string): Promise<void> {
+  if (existsSync(joined)) {
+    const kept = statSync(joined).size >= source.bytes ? (await readLogPrefix(joined, source.bytes)).sha256 : null
+    if (kept === source.sha256) return
+    throw new Error(`an earlier try left ${joined}, which does not begin with this archive. Move it somewhere safe, then try again`)
+  }
+  if (archive === null) throw new Error(`its archive is missing from ${dirname(joined)}`)
+  const live = statSync(logPath, { throwIfNoEntry: false })?.size ?? 0
+  if (!roomFor(dirname(joined), source.bytes + live)) throw new Error('there is not enough free space to put the log back')
+  const tmp = `${joined}.partial`
+  try {
+    if ((await unpack(archive, tmp)) !== source.sha256) throw new Error('the archive did not unpack to the bytes it was made from')
+    renameSync(tmp, joined)
+  } catch (err) {
+    rmSync(tmp, { force: true })
+    throw err
+  }
+}
+
+/** The drive would not give a file a second name, so a put-back cannot finish on it as it is. */
+class NoLink extends Error {}
+
+/**
+ * Ask the drive for a second name of `joined` BEFORE any live line moves. exFAT and FAT32 have no
+ * hard links: there the join could never be given the log's name, and every try would only move
+ * more of the live log into it. The probe's `.partial` name is swept at launch (backup.ts).
+ */
+function probeLink(joined: string, io: RestoreIo): void {
+  const probe = `${joined}.link.partial`
+  try {
+    rmSync(probe, { force: true })
+    ;(io.link ?? linkSync)(joined, probe)
+  } catch (err) {
+    throw new NoLink(`this drive would not link a file (${(err as Error).message}), so the log cannot be put back in one piece`)
+  }
+  try {
+    rmSync(probe)
+  } catch {
+    // A spare name for the joined file; the launch sweep takes it.
+  }
+}
+
+/** The pieces of `id` an earlier try set aside. Throws, naming the file, when this version cannot
+ *  say where one belongs: a second piece, or a name without a length past the archive's. */
+function waitingPieces(dir: string, id: string, archiveBytes: number): Piece[] {
+  const waiting = piecesOf(dir, id)
+  const lost = waiting.length > 1 ? waiting[1] : waiting.find((p) => !(p.at >= archiveBytes))
+  if (lost === undefined) return waiting
+  throw new Error(`an earlier try left ${lost.path}, which holds lines from your log. Move it somewhere safe, then try again`)
+}
+
+/** Add what is waiting, then the live log, and give the result the live name. */
+function joinAndLink(logPath: string, joined: string, waiting: Piece[], io: RestoreIo): void {
+  for (const p of waiting) {
+    // A piece that is the live log's second name (the undo's link held, its delete did not) is in the log.
+    if (sameFile(p.path, logPath)) rmSync(p.path)
+    else addPiece(joined, p, io)
+  }
+  for (let round = 0; round < 50; round++) {
+    absorbLive(logPath, joined, io)
+    if (linkIfFree(joined, logPath, io.link)) {
+      // The log is whole under its own name from here, so nothing after the link is a failure.
+      try {
+        rmSync(joined)
+      } catch {
+        // A second name for the log is left; it costs nothing while the log is there.
+      }
+      return
+    }
+  }
+  throw new Error('the game kept recreating the log; try again in a quiet moment')
+}
+
+/** What a put-back that stopped has left, in the player's words. An unpacked copy holding nothing
+ *  but the archive is removed, so the folder is as it was. Pressing again is advised only when it
+ *  can finish, so never after `NoLink`. */
+function stopped(err: Error, dir: string, seg: Segment, joined: string): string {
+  const why = err.message
+  const held = [joined, ...piecesOf(dir, seg.id).map((p) => p.path)].filter((p) => existsSync(p))
+  const onlyArchive = held.length === 1 && held[0] === joined && statSync(joined).size === seg.archiveSource?.bytes
+  if (held.length === 0 || onlyArchive) {
+    rmSync(joined, { force: true })
+    return `${why}. Nothing has changed.`
+  }
+  const them = held.length > 1 ? 'them' : 'it'
+  const safe = `${why}. The lines since the archive are safe in ${held.join(' and ')}.`
+  if (err instanceof NoLink) return `${safe} Put back cannot finish until this drive links files. To use Archive now again, move ${them} somewhere safe first.`
+  return `${safe} Leave ${them} there and press Put back again to finish.`
 }
 
 /**
@@ -216,22 +400,38 @@ async function unpack(archive: string, to: string): Promise<string> {
  * verified, then joined with the live log the way ruling 0.5's test did by hand: move the live log
  * aside, add its bytes to the end, and link the result to the live name, which fails if the game
  * recreated the name meanwhile, in which case it goes round again. No line is removed or changed.
+ *
+ * A TRY THAT STOPS IS FINISHED BY THE NEXT ONE. Whatever stops it (a full disk, a refused link, the
+ * app killed), every line is then in the live log, in the joined file, or in a piece whose name
+ * says where it belongs, and the reply names the files. The next try starts from them: it never
+ * unpacks over the joined file and never renames over a piece.
  */
-export async function restoreLog(logPath: string, dir: string, seg: Segment): Promise<{ ok: boolean; reason: string }> {
+export async function restoreLog(logPath: string, dir: string, seg: Segment, io: RestoreIo = {}): Promise<{ ok: boolean; reason: string }> {
   if (seg.archivePath === null || seg.archiveSource === undefined) return { ok: false, reason: 'this history has no archive' }
-  const joined = join(dir, `${seg.id}.restoring`)
+  const joined = join(dir, `${seg.id}${RESTORING}`)
+  const source = seg.archiveSource
+  let based = false
   try {
-    const sha = await unpack(seg.archivePath, joined)
-    if (sha !== seg.archiveSource.sha256) throw new Error('the archive did not unpack to the bytes it was made from')
-    for (let round = 0; round < 50; round++) {
-      absorbLive(logPath, join(dir, `${seg.id}.part`), joined)
-      if (linkIfFree(joined, logPath)) {
-        rmSync(joined)
-        return { ok: true, reason: 'restored' }
-      }
+    // A try that died right after the link: the log is whole and `joined` is its second name.
+    if (sameFile(joined, logPath)) {
+      rmSync(joined)
+      return { ok: true, reason: 'restored' }
     }
-    throw new Error('the game kept recreating the log; try again in a quiet moment')
+    const waiting = waitingPieces(dir, seg.id, source.bytes)
+    await archiveBase(resolveArchivePath(dir, seg), joined, source, logPath)
+    based = true
+    probeLink(joined, io)
+    joinAndLink(logPath, joined, waiting, io)
+    return { ok: true, reason: 'restored' }
   } catch (err) {
-    return { ok: false, reason: `${(err as Error).message}. The unpacked log, if any, is at ${joined}` }
+    const why = (err as Error).message
+    if (!based) return { ok: false, reason: `${why}. Nothing has changed.` }
+    // As the archive does (step 4): the log keeps its name, empty, never truncating the game's own.
+    try {
+      ensureFile(logPath)
+    } catch {
+      // The game makes it on its next line.
+    }
+    return { ok: false, reason: stopped(err as Error, dir, seg, joined) }
   }
 }

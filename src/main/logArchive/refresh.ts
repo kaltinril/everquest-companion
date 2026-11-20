@@ -15,7 +15,9 @@
 //
 // ONLY THE TOTALS CHANGE. The log's identity, the archive and the state are kept, and so is the
 // path the character module names (the refold read a staged copy). A refold that lacks a module
-// the segment held is refused, so a refresh can never lose a module.
+// the segment held is refused, so a refresh can never lose a module. The one other field that can
+// move is where the archive is: a path gone stale is replaced by where the file is now
+// (segmentStore.ts `resolveArchivePath`).
 
 import { copyFileSync, existsSync, readdirSync, readFileSync, renameSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
@@ -25,7 +27,7 @@ import { writeFileDurable } from '../telemetry/durableWrite'
 import type { RefoldResult } from './refold'
 
 type RefoldOk = Extract<RefoldResult, { ok: true }>
-import { listSegments, segmentPath } from './segmentStore'
+import { listSegments, resolveArchivePath, segmentPath } from './segmentStore'
 
 const NEXT = '.next'
 const OLD = '.old'
@@ -105,9 +107,13 @@ function changedParts(old: Segment, next: Segment): string[] {
 
 /** Refold one segment's archive with this build and swap the new totals in. */
 export async function refreshSegment(dir: string, id: string, deps: RefreshDeps): Promise<RefreshResult> {
-  const old = listSegments(dir).segments.find((s) => s.id === id)
-  const problem = refreshProblem(old)
-  if (old === undefined || problem !== null) return { ok: false, reason: problem ?? 'not found' }
+  const listed = listSegments(dir).segments.find((s) => s.id === id)
+  const problem = refreshProblem(listed)
+  if (listed === undefined || problem !== null) return { ok: false, reason: problem ?? 'not found' }
+  // The stored path goes stale when the game folder moves; the new record keeps where it is now.
+  const archivePath = resolveArchivePath(dir, listed)
+  if (archivePath === null) return { ok: false, reason: `its archive is missing from ${dir}` }
+  const old: Segment = { ...listed, archivePath }
   const r = await deps.refold(old)
   if (!r.ok) return { ok: false, reason: r.reason }
   const missing = Object.keys(old.modules).filter((m) => r.fold.modules[m] === undefined)
