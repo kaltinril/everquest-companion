@@ -300,9 +300,16 @@ function engineWait(f: LogReadFacts): LogReadWait | null {
   return null
 }
 
-/** Main's own open of the log has been out long enough to say the drive is not answering. */
+/**
+ * Main's own open of the log has been out long enough to say the drive is not answering. Not
+ * while the engine is plainly getting bytes off it, or has finished: an open that never comes back
+ * must not outvote a read that is working.
+ */
 function hung(f: LogReadFacts): boolean {
-  return (f.probe?.pendingMs ?? 0) >= LOG_READ_HUNG_MS
+  if ((f.probe?.pendingMs ?? 0) < LOG_READ_HUNG_MS) return false
+  const status = f.health?.status
+  const moving = status === 'folding' && f.movedAt !== null && f.now - f.movedAt < LOG_READ_STALL_MS
+  return !moving && status !== 'live'
 }
 
 function endedWait(f: LogReadFacts): LogReadWait {

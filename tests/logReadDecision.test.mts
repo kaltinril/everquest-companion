@@ -150,6 +150,15 @@ test('a hung drive is the reason given for a read that ended, and for one that s
   assert.equal(waitOf({ ...still(200 * MB, LOG_READ_STALL_MS), probe: probe(LOG_READ_HUNG_MS) }), 'logHung')
 })
 
+test('AN OPEN THAT NEVER COMES BACK DOES NOT OUTVOTE A READ THAT IS WORKING', () => {
+  const hung = probe(LOG_READ_HUNG_MS * 40)
+  // The engine is getting bytes off the drive right now, or has finished and is being served.
+  assert.equal(waitOf({ probe: hung }), 'reading')
+  assert.equal(waitOf({ readiness: 'ok', health: health('live'), probe: hung }), 'ok')
+  // Once the read stops moving, the hanging open is the reason again.
+  assert.equal(waitOf({ movedAt: NOW - LOG_READ_STALL_MS, probe: hung }), 'logHung')
+})
+
 test('an engine or an attach that failed outright is still named before the drive', () => {
   const hung = probe(LOG_READ_HUNG_MS)
   assert.equal(waitOf({ supervisor: 'absent', probe: hung }), 'engineMissing')

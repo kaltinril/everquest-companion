@@ -1,6 +1,9 @@
-// logReadReport.ts (main) - gathers what main knows about the log read and answers
-// `engine:logReadReport` for the "Reading log..." panels (fork #9). The decision and the words are
-// shared/logReadReport.ts; this file only collects. The full log path never crosses IPC.
+// logReadReport.ts (main) - gathers what main knows about the log read (fork #9). The decision
+// and the words are shared/logReadReport.ts; this file only collects. The full log path never
+// crosses IPC.
+//
+// SYNCHRONOUS, AND IT NEVER WAITS ON THE DISK. It used to await an open of the log on every ask;
+// main's look at the file is `logProbe.ts` now, which is read here without waiting.
 
 import { app } from 'electron'
 import { open } from 'node:fs/promises'
@@ -10,40 +13,38 @@ import { engineClientFacts } from './dataServer/engineClientHost'
 import { engineSupervisorStatus } from './dataServer/engineHost'
 import { engineLaunchSay } from './dataServer/engineLaunchState'
 import { logReadFacts } from './dataServer/logReadState'
-import {
-  composeLogReadReport,
-  type LogReadFacts,
-  type LogReadReport
-} from '../shared/logReadReport'
+import { createLogProbe, worthALook } from './logProbe'
+import { composeLogReadReport, type LogReadReport } from '../shared/logReadReport'
 
-/** Can this process open the log, and how big is it? A diagnostic on the failure path only: the
- *  engine owns log-file facts everywhere else. */
-async function probeLog(path: string): Promise<NonNullable<LogReadFacts['probe']>> {
+/** The log's size in bytes, by opening it for reading: what the engine has to be able to do. */
+async function openedSize(path: string): Promise<number> {
+  const file = await open(path, 'r')
   try {
-    const file = await open(path, 'r')
-    try {
-      return { bytes: (await file.stat()).size, problem: null, pendingMs: null }
-    } finally {
-      await file.close()
-    }
-  } catch (err) {
-    const missing = (err as NodeJS.ErrnoException).code === 'ENOENT'
-    return { bytes: null, problem: missing ? 'missing' : 'unreadable', pendingMs: null }
+    return (await file.stat()).size
+  } finally {
+    await file.close()
   }
 }
 
-export async function buildLogReadReport(): Promise<LogReadReport> {
+/** Main's one look at the log file, shared by everything that asks. */
+export const logProbe = createLogProbe({ open: openedSize, now: () => Date.now() })
+
+/** Is main's own open of the active log out right now? Its answer will change the status. */
+export function logProbePending(): boolean {
+  const logPath = getActiveCharacter()?.logPath ?? null
+  return logPath !== null && logProbe.pending(logPath)
+}
+
+export function buildLogReadReport(): LogReadReport {
   const logPath = getActiveCharacter()?.logPath ?? null
   const say = engineLaunchSay()
   const client = engineClientFacts()
   const notes = logReadFacts()
-  // The file is opened here only when the read has ended or nothing has stated its size.
-  const ended = notes.error?.step === 'fold' || notes.health?.status === 'idle'
-  const unsized = say.fold === null && client.logSize === null
-  const probe = logPath !== null && (ended || unsized) ? await probeLog(logPath) : null
+  const now = Date.now()
+  if (logPath !== null && worthALook(notes, now)) logProbe.look(logPath)
   return composeLogReadReport({
     ...notes,
-    now: Date.now(),
+    now,
     appVersion: app.getVersion(),
     logPath,
     home: homedir(),
@@ -54,6 +55,6 @@ export async function buildLogReadReport(): Promise<LogReadReport> {
     readiness: client.readiness,
     fold: say.fold,
     logSize: client.logSize,
-    probe
+    probe: logPath === null ? null : logProbe.last(logPath)
   })
 }
