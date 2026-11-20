@@ -84,7 +84,8 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
 
 ## Skills tab
 
-- CONFIRMED [medium, missing] While the log is still being read, the Skills tab shows no rows and
+- FIXED 2026-11-19 (with the tab line every other tab uses, `LogReadInline`, not the constant proposed
+  below) [medium, missing] While the log is still being read, the Skills tab shows no rows and
   does not say it is reading Seen: From t+1.6 s to t+9.5 s after launch:
   window.eq.getModuleSnapshot('skills') === null; [data-testid="skills-view"] innerText is exactly
   "Skills/nTradeskills only/nSkills appear here once the log shows them going up."; no
