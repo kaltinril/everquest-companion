@@ -28,6 +28,160 @@ export interface CommunityRelease {
 
 export const COMMUNITY_RELEASE_NOTES: readonly CommunityRelease[] = [
   {
+    "version": "0.1.0-test.52",
+    "date": "2026-11-20",
+    "title": "a Skills tab, an alert before a respawn, a tighter left menu, and tabs that say what they are waiting on",
+    "groups": [
+      {
+        "heading": "Skills",
+        "items": [
+          {
+            "text": "New tab: every skill your log has seen go up, tradeskills included, with its level and its pace per hour."
+          }
+        ]
+      },
+      {
+        "heading": "Timers",
+        "items": [
+          {
+            "text": "Alert before respawn: tick the box and an alert plays a set number of seconds (5 to 300) before a tracked mob in your zone respawns. A note under the box says when no alert will play, and names the alert that is switched off."
+          },
+          {
+            "text": "Three kill gaps that agree now lower a longer wiki respawn time on the clock, and gaps split between an archived log and the live log count together."
+          },
+          {
+            "text": "Every respawn clock of the zone you stand in is shown, however many others are running."
+          },
+          {
+            "text": "Saving the edit dialog untouched no longer turns a learned timer into your own number."
+          }
+        ]
+      },
+      {
+        "heading": "Left menu",
+        "items": [
+          {
+            "text": "Its own text size and row height in Preferences, and tighter by default: the open menu fits the default window."
+          }
+        ]
+      },
+      {
+        "heading": "Reading log",
+        "items": [
+          {
+            "text": "A tab that would sit on \"Reading log\" now says what the app is waiting on, with Try again. A read that died is started again by itself, and the app reconnects to its engine by itself."
+          },
+          {
+            "text": "The no-logs screen names the folder it looked in and why it found nothing."
+          },
+          {
+            "text": "The app says when the settings file was damaged at launch and what it did about it. A settings write that fails no longer stops the log from being read."
+          },
+          {
+            "text": "Overlays say why they have nothing to show, and never keep the last character's rows."
+          }
+        ]
+      },
+      {
+        "heading": "Combat",
+        "items": [
+          {
+            "text": "A group mate's pet is credited to its leader even when its name is one your own pet once had, and keeps its row through a zone line."
+          },
+          {
+            "text": "Claiming a pet no longer inflates the You headline DPS. With the pet on its own bar, you and your pet are two separate lines on the DPS chart."
+          },
+          {
+            "text": "Copy pastes the rows and headline the meter is showing. The Healing header adds up to the healers listed under it."
+          }
+        ]
+      },
+      {
+        "heading": "Bazaar",
+        "items": [
+          {
+            "text": "A price written with a comma (1,500pp) is read as that price. A price before \"for\" goes to the one item after it. An offer with two prices back to back (4k - 5k) is listed but not counted."
+          },
+          {
+            "text": "An every-tier watch alerts on every tier, and two matches in the same moment are both spoken."
+          }
+        ]
+      },
+      {
+        "heading": "Plane of Sky",
+        "items": [
+          {
+            "text": "Cleanup: a row's held count can be set by hand, 0 takes the row off the list, and it can be put back. The pencil's box says why it will not take a count."
+          },
+          {
+            "text": "Turn-ins: two quick '-' clicks take back two, and the hovers say what a click really does."
+          },
+          {
+            "text": "The quest overlay says when its counts were made before the log's loot and turn-ins were in."
+          }
+        ]
+      },
+      {
+        "heading": "Gear",
+        "items": [
+          {
+            "text": "Exaltations: an item nothing states an era for is shown with an \"Unknown Era\" chip instead of being hidden by Current era, and a quest reward takes the era of its quest."
+          },
+          {
+            "text": "Void motes: a worn item the wiki spells differently is ranked, and the tab names the worn items it could not rank."
+          }
+        ]
+      },
+      {
+        "heading": "Achievements",
+        "items": [
+          {
+            "text": "Slayer: a mob named drake, wurm or wyvern is never listed as a true dragon."
+          }
+        ]
+      },
+      {
+        "heading": "Buffs",
+        "items": [
+          {
+            "text": "A saved duration choice moves buff bars that are already running. A card that outlives its estimate says \"past estimate\"."
+          }
+        ]
+      },
+      {
+        "heading": "Wiki Gaps",
+        "items": [
+          {
+            "text": "An item you have looted or hold whose wiki page has no icon id is an Items row, with the one line to add."
+          },
+          {
+            "text": "All characters shows another character's quest-giver, redirect and zone-titled rows, says when the other characters could not be read, and gives the time each was saved."
+          }
+        ]
+      },
+      {
+        "heading": "Updates and archives",
+        "items": [
+          {
+            "text": "A failed update download is tried again in about 15 minutes, not 3 to 5 hours. Turning automatic updates back on installs an already downloaded build on close."
+          },
+          {
+            "text": "A Put back that stops part-way keeps every line and is finished by pressing it again."
+          }
+        ]
+      },
+      {
+        "heading": "Data",
+        "items": [
+          {
+            "text": "Wiki pages refreshed to today (67 pages changed)."
+          }
+        ]
+      }
+    ],
+    "knownIssues": "A group mate's pet that reuses a name your own pet once had is credited only from its first \"My leader is\" line; its damage before that line is not counted. The Wiki Gaps icon rows read the wiki data this build shipped with, so a page fixed on the wiki stays a row until the next build or until it is marked Done. Plane of Sky runes moved to the currencies tab are not in the game's inventory export; set the count by hand or use the log count. The Void motes tab estimates a drop's chance from the size of the mob's loot list, because the wiki lists no drop rates; a row's hover says what it assumed. It does not count spells (a mote raises a spell rank too) or progress already banked toward a tier, and it assumes copies are farmed at Refined. The healing meters still divide by the whole fight's length. A buff's percent stats (haste, run speed) and regen are not raised with rank yet, and the Upgrades tab does not count bigger stats as a reason to upgrade a buff. Shorter pauses cannot change the spacing a Windows voice puts between words. A Copy page read is kept for half an hour, so a page made on the wiki within that time is not seen until it passes. A merchant page the wiki already has gets no \"items sold\" or \"location\" check. An item page the wiki already has gets no check that it lists a merchant you were quoted by. Joining another player's private instance is not told apart from the open world of that zone; only an instance you create yourself is. A pet summoned shortly before its first \"My leader is\" line can carry a \"(2)\" after its name in the meters until the next restart. Another player's spells never count toward a mob's resists: the game prints only your own resists to you. The con card does not list a mob's immunities yet (the mob page does). Saved characters read \"needs refresh\" on Wiki Gaps until logged in once with this build. A +0 worked back from a window often leaves Weight as ?. A groupmate's charmed pet can still lose its credit when a damage-over-time it cast before the charm ticks on a groupmate. A mob or item added to the wiki after this build shows no wiki details until the next build (or a Copy click in Wiki Gaps). Copy on a wiki page that still holds the template's placeholders keeps them. Capture finds the game window only when it is titled \"EverQuest Legends\" or \"EverQuest\". All characters needs each character logged in here once with this build. The screenshot reader reads English only. The installer is not code-signed, so Windows shows \"Windows protected your PC\" the first time (More info, then Run anyway). Builds before test.20 do not update themselves; install one by hand once."
+  },
+  {
     "version": "0.1.0-test.51",
     "date": "2026-11-19",
     "title": "a Void motes tab says where the week's three are best spent, item icons are found on windows with a wrapped class list",
