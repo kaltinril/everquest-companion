@@ -358,10 +358,7 @@ fn a_second_price_right_after_the_first_is_a_guess() {
         sure("WTS Mithril Champion Arrows +7 20k, +6 11k"),
         [true, true]
     );
-    assert_eq!(
-        sure("WTS Fleeting Quiver 5k, Rain Caller 6k"),
-        [true, true]
-    );
+    assert_eq!(sure("WTS Fleeting Quiver 5k, Rain Caller 6k"), [true, true]);
 }
 
 /// Found on the owner's log, 2026-11-19: "WTB Bone Chips 1k per 100 300 for white dragon hide"
