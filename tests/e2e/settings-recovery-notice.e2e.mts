@@ -67,6 +67,67 @@ async function stepClearOfTheTitleBar(app: ElectronApplication, page: Page, widt
   check(`${at}: …at the offset the component asks for`, got.cssTop === '56px', JSON.stringify(got))
 }
 
+interface Fit {
+  cardLeft: number
+  cardRight: number
+  cardWidth: number
+  cardBottom: number
+  menuRight: number
+  viewW: number
+  viewH: number
+  /** Is OK the thing under the mouse at its own middle? The first-run strip used to be. */
+  okHit: boolean
+}
+
+function fit(page: Page): Promise<Fit | null> {
+  return page.evaluate((sel) => {
+    const card = document.querySelector(`${sel} .MuiAlert-root`)
+    const menu = document.querySelector('.MuiDrawer-paper')
+    const ok = document.querySelector('[data-testid="settings-recovery-notice-close"]')
+    if (!card || !menu || !ok) return null
+    const c = card.getBoundingClientRect()
+    const b = ok.getBoundingClientRect()
+    const under = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2)
+    return {
+      cardLeft: c.left,
+      cardRight: c.right,
+      cardWidth: c.width,
+      cardBottom: c.bottom,
+      menuRight: menu.getBoundingClientRect().right,
+      viewW: window.innerWidth,
+      viewH: window.innerHeight,
+      okHit: under !== null && ok.contains(under)
+    }
+  }, CARD)
+}
+
+/**
+ * The card over the CONTENT, at one text size in the minimum window: not on the left menu, inside
+ * the window, and its OK button reachable although a reset has also brought the first-run strip
+ * back along the bottom edge.
+ */
+async function stepFitsBesideTheMenu(page: Page, scale: number, baseDpr: number): Promise<void> {
+  await page.evaluate((n) => (window as unknown as { eq: { setUiScale: (x: number) => Promise<number> } }).eq.setUiScale(n), scale)
+  await settle(
+    () => page.evaluate(() => window.devicePixelRatio),
+    (dpr) => Math.abs(dpr / baseDpr - scale) < 0.02,
+    { timeoutMs: 15_000 }
+  )
+  const at = `900x600 at ${String(Math.round(scale * 100))}% text`
+  const got = await settle(
+    () => fit(page),
+    (v) => v !== null && v.cardLeft >= v.menuRight && v.okHit,
+    { timeoutMs: 10_000 }
+  )
+  if (got === null) {
+    check(`${at}: the card, the menu and OK are on the page`, false)
+    return
+  }
+  check(`${at}: the card is beside the left menu, not over it`, got.cardLeft >= got.menuRight, JSON.stringify(got))
+  check(`${at}: …inside the window`, got.cardRight <= got.viewW && got.cardBottom <= got.viewH, JSON.stringify(got))
+  check(`${at}: …and its OK button can be clicked`, got.okHit, JSON.stringify(got))
+}
+
 async function run(): Promise<void> {
   buildIfStale()
   const userData = makeUserData()
@@ -81,7 +142,17 @@ async function run(): Promise<void> {
     const shown = await settle(() => countOf(page as Page, CARD), (n) => n === 1, { timeoutMs: 20_000 })
     if (check('a damaged settings file is said in a card, and the app still starts', shown === 1)) {
       await stepClearOfTheTitleBar(app, page, 1280, 860)
+      // Centred over the CONTENT (from the menu's right edge to the window's), not over the window,
+      // and never wider than its 520 px. The 16 px allows for the page's own scrollbar.
+      const wide = await fit(page)
+      const off = wide === null ? Infinity : Math.abs((wide.cardLeft + wide.cardRight) / 2 - (wide.menuRight + wide.viewW) / 2)
+      check('at 1280x860: the card is centred over the content, at most 520 px wide', wide !== null && off <= 16 && wide.cardWidth <= 521, JSON.stringify(wide))
       await stepClearOfTheTitleBar(app, page, 900, 600)
+      const baseDpr = await page.evaluate(() => window.devicePixelRatio)
+      await stepFitsBesideTheMenu(page, 1, baseDpr)
+      await stepFitsBesideTheMenu(page, 1.25, baseDpr)
+      await stepFitsBesideTheMenu(page, 1.5, baseDpr)
+      await page.evaluate(() => (window as unknown as { eq: { setUiScale: (x: number) => Promise<number> } }).eq.setUiScale(1))
       await page.click('[data-testid="settings-recovery-notice-close"]', { timeout: 10_000 })
       const gone = await settle(() => countOf(page as Page, CARD), (n) => n === 0, { timeoutMs: 10_000 })
       check('OK takes the card away', gone === 0)
