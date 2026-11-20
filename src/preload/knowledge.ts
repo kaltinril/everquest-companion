@@ -106,6 +106,8 @@ export const knowledgeBridge = {
   /** The forage rows' other side: what each item page states of foraging (src/main/gapItemForage.ts). */
   gapItemForage: (names: readonly string[]): Promise<Record<string, import('../shared/gapForage').ItemPageForage | null>> =>
     ipcRenderer.invoke(IPC.gapItemForage, [...names]),
+  /** The item pages the wiki data holds with no icon id (src/main/gapItemIcons.ts; shared/gapIcons.ts). */
+  gapIconlessItems: (): Promise<import('../shared/gapIcons').IconlessPage[]> => ipcRenderer.invoke(IPC.gapIconlessItems),
   /** A new merchant page's description: the tradeskills each item's recipes name (src/main/gapItemTrades.ts). */
   gapItemTrades: (names: readonly string[]): Promise<Record<string, string[]>> => ipcRenderer.invoke(IPC.gapItemTrades, [...names]),
   /** A faction row's proof lines, by pair key, asked when it is opened or copied (src/main/gapKillFactionSamples.ts). */

@@ -30,6 +30,7 @@ import type { HeldIndex } from '@shared/gapHeld'
 import { withExtraItemRows } from '@shared/gapExtraItems'
 import { withGapEdits } from '@shared/gapEdits'
 import { useExtraItemRows } from './useExtraItemRows'
+import { useIconRows } from './useIconRows'
 import { useExtraSpellRows } from './useExtraSpellRows'
 // Once: the `1 <name>` data a misread robe icon left behind moves to the real names (owner, 2026-10-24).
 import './iconTokenRepair'
@@ -144,8 +145,14 @@ export function useGapsList(opts: { background?: boolean } = {}): GapsList {
   const extraItems = useExtraItemRows(engineData.snap?.rows, holding, viewer)
   // And spells no log line names, from a pasted spell window (owner, 2026-10-23).
   const extraSpells = useExtraSpellRows(engineData.snap?.rows)
+  // And known items whose page states no icon id, of the ones this loot and these exports show
+  // (owner, 2026-11-20: Dark Ironbound Tome). After the extra items, so one of those keeps the name.
+  const icons = useIconRows(engineData.snap?.rows, extraItems, { loot: engineData.loot, held: holding })
   // Added after useGapsData applied the hand edits, so they take them here (a captured item's Edit name, 2026-10-24).
-  const extra = useMemo(() => withGapEdits(extraSpells.length === 0 ? extraItems : [...extraItems, ...extraSpells], engineData.edits), [extraItems, extraSpells, engineData.edits])
+  const extra = useMemo(
+    () => withGapEdits(extraSpells.length + icons.length === 0 ? extraItems : [...extraItems, ...extraSpells, ...icons], engineData.edits),
+    [extraItems, extraSpells, icons, engineData.edits]
+  )
   const data = useMemo(() => (engineData.snap && extra.length > 0 ? { ...engineData, snap: withExtraItemRows(engineData.snap, extra) } : engineData), [engineData, extra])
   const shownQuery = useGapsQuery()
   // "Zone I'm in" (owner ask, 2026-10-17): only what was named where you stand, every tier of it.

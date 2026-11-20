@@ -5,7 +5,8 @@
 import type { GapAction, GapDomain, GapRow } from './gaps'
 import { respawnAction } from './gapRespawns'
 import { questGiverAction } from './gapQuestGivers'
-import { wikiUploadUrl } from './gapUrls'
+import { wikiEditUrl, wikiUploadUrl } from './gapUrls'
+import { iconWhy } from './gapIcons'
 
 /** An image row's chip: upload the file; the page's imagefilename line added, or fixed when it names another file. */
 function imageAction(row: GapRow, file = row.image ?? ''): GapAction {
@@ -21,5 +22,7 @@ const FIELD_ACTION: Partial<Record<GapDomain, (row: GapRow) => GapAction>> = {
 /** The row's one chip when it is one field of a mob page; undefined otherwise. */
 export function fieldAction(row: GapRow): GapAction | undefined {
   if (row.questGaps !== undefined) return questGiverAction(row)
+  // An item page that states no icon id: the one field of an ITEM page this file words (gapIcons.ts).
+  if (row.iconUpdate !== undefined) return { kind: 'addToWiki', label: 'Add icon to item page', why: iconWhy(row.name), href: wikiEditUrl(row.iconUpdate.page) }
   return FIELD_ACTION[row.domain]?.(row)
 }

@@ -416,6 +416,12 @@ where one exists.
 
 ## Gaps tab (was gaps-tab, gaps-item-facts, gaps-all-characters, gaps-overlay)
 
+- 2026-11-20: an item page with no icon id is an Items UPDATE row (`shared/gapIcons.ts`,
+  `GapRow.iconUpdate`). Main answers which pages state no `lucy_img_ID` once per session
+  (`main/gapItemIcons.ts`, IPC `gaps:iconlessItems`); the renderer keeps only the ones the loot
+  or an inventory export shows (`useIconRows.ts`), and none for an item an Items row already
+  names. Copy is the one field line; the number comes only from a capture's icon match. The
+  data is the committed corpus: a page fixed on the wiki stays a row until the next delta.
 - 2026-11-10: a merchant's price quote (`X told you, 'That'll be 2 gold per Y.'`) files Y as an
   Items row of kind `quoted` with X as its source (`gaps_stock.rs quoted`, `Details::quoted_by`),
   as a purchase does; before, only the merchant's `items_sold` took it, and an unknown item was a

@@ -24,6 +24,7 @@ import { anyMobDrop, type DropGroups } from './gapDrops'
 import { isRewardChest, mobSourceOf } from './rewardChest'
 import { wikiZoneLink } from './gapWikiZone'
 import { forageAddText } from './gapForage'
+import { iconAddText } from './gapIcons'
 import { questGiverAddText } from './gapQuestGivers'
 import { catalogSellers, logSpot, type VendorFinder, type VendorPlacing } from './gapMobPage'
 import type { LootEvent } from './types'
@@ -649,7 +650,9 @@ function itemPageParts(row: GapRow, c: PageContext): Parameters<typeof itemPage>
  */
 const PAGE_OF: Record<GapDomain, (row: GapRow, c: PageContext) => string> = {
   // A page that exists and lacks a forage zone or the category: only the lines to add (gapForage.ts).
-  item: (row, c) => (row.forageUpdate ? forageAddText(row.forageUpdate) : itemPage(itemPageParts(row, c), c.itemShots?.[row.name])),
+  // A page that exists and states no icon id: only that line, with the icon a capture matched (gapIcons.ts).
+  item: (row, c) =>
+    row.iconUpdate ? iconAddText(c.itemShots?.[row.name]?.iconId) : row.forageUpdate ? forageAddText(row.forageUpdate) : itemPage(itemPageParts(row, c), c.itemShots?.[row.name]),
   // A known NPC's page lacking a quest it gives: only the related_quests lines to add (gapQuestGivers.ts).
   // A mob its target line calls a merchant takes the merchant layout before any trade (owner, 2026-10-22);
   // a new mob page takes its fight estimates in its blank fields (shared/gapFight.ts).
