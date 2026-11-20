@@ -26,6 +26,7 @@
 import type { JSX } from 'react'
 import { Link, Stack, Typography } from '@mui/material'
 import FavoriteIcon from '@mui/icons-material/Favorite'
+import { GUIDE_CREDITS, guideCreditLine } from '@shared/guideCredits'
 import type { PrefSection } from './PreferencesView'
 
 /** One credited source: who they are, what of theirs is in the app, and where to find them. */
@@ -128,6 +129,27 @@ export function ThanksSetting(): JSX.Element {
         neither is affiliated with this app. If you have ever looked something up mid-raid, you owe
         them one.
       </Typography>
+      {/* The two tradeskill guides (owner, 2026-11-20: "make sure we give credit to the guide
+          author"). Names only: neither guide's host is on the external link allowlist. */}
+      <Stack spacing={0.5} data-testid="prefs-thanks-guides">
+        <Typography variant="body2">
+          The Tradeskills section builds on two guides written by players, copied into the app when
+          it is built. They did the work of finding out what to make and where to buy it.
+        </Typography>
+        {GUIDE_CREDITS.map((g) => (
+          <Stack key={g.id} spacing={0.25}>
+            <Typography variant="body2" data-testid={`prefs-thanks-guide-${g.id}`}>
+              {guideCreditLine(g)}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {g.what}
+            </Typography>
+          </Stack>
+        ))}
+        <Typography variant="caption" color="text.secondary">
+          Neither author is affiliated with this app.
+        </Typography>
+      </Stack>
     </Stack>
   )
 }
@@ -147,7 +169,8 @@ export function thanksSection(): PrefSection {
         label: 'Where the art comes from',
         keywords:
           'thanks credit credits attribution wiki wikis eqlwiki project1999 p99 image images icon icons ' +
-          'art portrait portraits picture source sources license attribution offline bundled shipped',
+          'art portrait portraits picture source sources license attribution offline bundled shipped ' +
+          'tradeskill tradeskills guide guides author authors zakarsis myztikal kornerstore',
         content: <ThanksSetting />
       }
     ]

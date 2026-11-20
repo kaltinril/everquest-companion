@@ -184,6 +184,15 @@ The text of the **EverQuest Legends Wiki** (eqlwiki.com) is licensed
 [About page](https://eqlwiki.com/index.php?title=Project:About) states; the item, mob, spell
 and quest data this app builds from it is credited to that wiki.
 
+The **Tradeskills** section builds on two guides written by players, copied into the app at
+build time and checked again at every release (`scripts/community/guides-pull.mts`):
+the [**EQ Legends Tradeskill Guide**](https://docs.google.com/spreadsheets/d/e/2PACX-1vTNj3GiLZ4nXBfLkGEB2iGkJy_WV4Mfkth5nwyg3pSfjJEiEreIsspJhIcSZAIS5hbSDwZbawzk4jEz/pubhtml)
+by **Zakarsis Moonstalker** (Neriak), for its leveling routes, and
+[**EQL Myztikal's Kerran Kornerstore**](https://drive.google.com/file/d/1VcUmqXTclXafiMxQvCr2G5HvtgRc7ew5/view)
+by **Myztikal** (Halas), for its recipes with the merchant and location of each material. The
+work of finding those out is theirs. Neither author is affiliated with this app. The same credit
+is in the app under **Preferences**, then **Thanks**.
+
 The default **Alan Rickman** voice pack, which the app downloads on first launch, comes from
 [utensils/openpeon-alan-rickman-soundpack](https://github.com/utensils/openpeon-alan-rickman-soundpack)
 and is licensed CC-BY-4.0. Packs you install from the in-app browser carry their own
