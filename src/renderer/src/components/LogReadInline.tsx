@@ -13,30 +13,17 @@
 import type { JSX, ReactNode } from 'react'
 import { Typography } from '@mui/material'
 import type { SxProps, Theme } from '@mui/material/styles'
-import {
-  LOG_READ_INLINE_AFTER_MS,
-  emptyOrWaiting,
-  inlineDue,
-  tabLineText,
-  type TabLine
-} from '../../../shared/logReadWords'
-import { useHeldFor } from '../lib/useHeldFor'
+import { tabLineText, type TabLine } from '../../../shared/logReadWords'
 import { useLogReadReport } from '../lib/logReadReportHud'
-
-const EMPTY: TabLine = { kind: 'empty' }
+import { useTabLineOf } from '../lib/useTabLine'
 
 /**
  * What a tab draws where its empty text goes: its own words (`empty`) when `served`, the status
  * line (`waiting`) when its module has had no snapshot for a moment, or nothing yet (null).
+ * The rule is `lib/useTabLine.ts`; this hands it the window's status.
  */
 export function useTabLine(module: string, served: boolean): TabLine | null {
-  const report = useLogReadReport()
-  const waited = useHeldFor(!served, LOG_READ_INLINE_AFTER_MS)
-  // Before this window's first status the tab can only say what it knows itself.
-  if (report === null) return served ? EMPTY : null
-  const line = emptyOrWaiting(!served, report, module)
-  if (line.kind === 'empty') return line
-  return inlineDue(report, waited ? LOG_READ_INLINE_AFTER_MS : 0) ? line : null
+  return useTabLineOf(useLogReadReport(), module, served)
 }
 
 export interface LogReadInlineProps {
