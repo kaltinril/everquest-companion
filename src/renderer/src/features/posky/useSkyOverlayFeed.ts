@@ -1,6 +1,11 @@
 import { useEffect, useMemo } from 'react'
 import type { ItemMarks } from '@shared/itemKnowledge'
-import { SKY_OVERLAY_KEY, orderSkyOverlayRows, type SkyOverlayRow } from '@shared/skyQuestOverlay'
+import {
+  SKY_OVERLAY_KEY,
+  buildSkyOverlayPayload,
+  type SkyOverlayRow,
+  type SkyOverlayState
+} from '@shared/skyQuestOverlay'
 import { useQuestFavorites } from '../favorites/useQuestFlags'
 import { fetchItemMarks, useItemMarksReader } from '../../lib/itemMarks'
 import { hasEveryItem } from './questCompletion'
@@ -23,7 +28,8 @@ function toRow(q: QuestProgress, marksOf: (name: string) => ItemMarks | undefine
 }
 
 /** Keep the overlay's rows in step with `quests`; a write happens only when they change. */
-export function useSkyOverlayFeed(quests: readonly QuestProgress[], loaded: boolean): void {
+export function useSkyOverlayFeed(quests: readonly QuestProgress[], state: SkyOverlayState): void {
+  const { progress, loot, turnIns } = state
   const starred = useQuestFavorites()
   const marksOf = useItemMarksReader()
   const shown = useMemo(() => quests.filter((q) => starred.has(q.key)), [quests, starred])
@@ -33,9 +39,9 @@ export function useSkyOverlayFeed(quests: readonly QuestProgress[], loaded: bool
     if (names) void fetchItemMarks(names.split('\n'))
   }, [names])
   const raw = useMemo(() => {
-    const rows = orderSkyOverlayRows(shown.map((q) => toRow(q, marksOf)))
-    return JSON.stringify({ loaded, rows })
-  }, [shown, loaded, marksOf])
+    const rows = shown.map((q) => toRow(q, marksOf))
+    return JSON.stringify(buildSkyOverlayPayload({ progress, loot, turnIns }, rows))
+  }, [shown, progress, loot, turnIns, marksOf])
   useEffect(() => {
     try {
       if (localStorage.getItem(SKY_OVERLAY_KEY) !== raw) localStorage.setItem(SKY_OVERLAY_KEY, raw)
@@ -48,6 +54,6 @@ export function useSkyOverlayFeed(quests: readonly QuestProgress[], loaded: bool
 /** The feed's own reading of the Sky tab's counts; the app mounts it only while the overlay is open. */
 export function SkyOverlayFeed(): null {
   const sky = useProgress()
-  useSkyOverlayFeed(sky.quests, sky.progress !== null)
+  useSkyOverlayFeed(sky.quests, { progress: sky.progress !== null, loot: sky.lootReady, turnIns: sky.turnInsReady })
   return null
 }

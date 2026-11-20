@@ -19,7 +19,8 @@ import type { Segment } from '../../shared/logArchive/segment'
 import { CAPTURED_MODULES } from '../../shared/logArchive/modules'
 import { archiveName, backupLog, sweepTemp } from './backup'
 import { captureSegment, type CaptureDeps } from './capture'
-import { archiveBuckets, placeArchivedBuckets } from './engineBuckets'
+import { archiveBuckets, placeArchivedBuckets, wasMovedThisRun } from './engineBuckets'
+import { logWasPutBack } from './history'
 import { liveHistory, logArchiveDir } from './liveHistory'
 import { readLogPrefix } from './logPrefix'
 import { engineCaptureReads, servedOrUnread } from './captureReads'
@@ -34,12 +35,12 @@ import { pushAppKnowledge } from '../dataServer/definePush'
 import { pushWorldChanged } from '../dataServer/serveDeltas'
 import type { RespawnRow } from '../../shared/respawn'
 import { lacksLearned, refreshSegment, sweepRefreshLeftovers } from './refresh'
-import { readJournal, recoverRotation, restoreLog, rotateLog, type RotateDeps } from './rotate'
-import { listSegments, writeSegment } from './segmentStore'
+import { putBackLeftovers, readJournal, recoverRotation, restoreLog, rotateLog, unfinishedReason, type RotateDeps } from './rotate'
+import { listSegments, resolveArchivePath, writeSegment } from './segmentStore'
 
 let busy: string | null = null
-/** One archive per app run: see `archivedThisRun` in preflight.ts. */
-let archivedThisRun = false
+/** Why this run could not finish an interrupted archive, for the card (`interruptedReason`). */
+let notFinished: string | null = null
 /** The captured modules the running engine serves, learned once it has caught up; null before. */
 let engineModules: ReadonlySet<string> | null = null
 /** The engine's respawn snapshot carries `learned` (see `lacksLearned`). */
@@ -206,6 +207,12 @@ function liveLog(a: { logPath: string } | null): LogArchiveStatus['live'] {
   return { path: a.logPath, bytes: st.size, modifiedMs: st.mtimeMs }
 }
 
+/** The attached log is one the player put back, so the automatic archive leaves it (autoArchive.ts). */
+export function attachedLogPutBack(): boolean {
+  const a = attached()
+  return a !== null && logWasPutBack(logArchiveDir(), a.character, a.logPath)
+}
+
 function newestSealed(rows: SegmentRow[]): string | null {
   const sealed = rows.filter((r) => r.state === 'sealed').sort((x, y) => x.lastStamp.localeCompare(y.lastStamp))
   return sealed.length > 0 ? sealed[sealed.length - 1].id : null
@@ -227,6 +234,7 @@ export function logArchiveStatus(): LogArchiveStatus {
     skipped: [],
     dumps: null,
     rotateBlockers: [],
+    autoPaused: false,
     busy
   }
   return on ? fillOn(base, dir, a) : base
@@ -235,12 +243,14 @@ export function logArchiveStatus(): LogArchiveStatus {
 function fillOn(base: LogArchiveStatus, dir: string, a: { character: string; logPath: string } | null): LogArchiveStatus {
   const listing = listSegments(dir, a?.character)
   const ctx = liveHistory.status()
+  const journal = readJournal(dir)
   base.segments = listing.segments.map(row).sort((x, y) => x.firstStamp.localeCompare(y.firstStamp))
   base.archived = base.segments.filter((s) => s.state === 'sealed')
   base.newestSealedId = newestSealed(base.segments)
   base.held = (ctx?.held ?? []).map((h) => ({ id: h.id, text: HELD_TEXT[h.reason] }))
   base.skipped = listing.skipped
   base.dumps = base.live !== null ? dumpAdvice(base.live.path, base.live.modifiedMs) : null
+  base.autoPaused = a !== null && logWasPutBack(dir, a.character, a.logPath)
   base.rotateBlockers = rotateBlockers({
     on: true,
     hasLog: base.live !== null,
@@ -248,9 +258,12 @@ function fillOn(base: LogArchiveStatus, dir: string, a: { character: string; log
     sameDrive: a === null || driveOf(a.logPath) === driveOf(dir),
     freeBytes: freeBytes(dir),
     logBytes: base.live?.bytes ?? 0,
-    interrupted: readJournal(dir) !== null,
+    interrupted: journal !== null,
+    interruptedReason: journal === null ? null : notFinished,
     busy: busy !== null,
-    archivedThisRun
+    // One archive per run, per character (engineBuckets.ts): another character's log is a fresh fold.
+    archivedThisRun: a !== null && wasMovedThisRun(a.character),
+    putBackUnfinished: base.newestSealedId !== null && putBackLeftovers(dir).some((f) => f.startsWith(`${base.newestSealedId}.`))
   })
   return base
 }
@@ -337,15 +350,17 @@ export function rotateNow(): Promise<LogArchiveReply> {
     // Step 5.2: resist and message history is read between the capture and the move (engineBuckets.ts).
     const buckets = archiveBuckets(app.getPath('userData'), a.character)
     await buckets.settle()
-    const cap = await captureSegment(captureDeps)
+    // The wait can outlast a character switch: only `a`'s capture may stand behind a move of `a`'s log.
+    const cap = await captureSegment(captureDeps, a)
     if (!cap.ok) return reply(false, `Not archived: ${cap.reason}. Nothing has changed.`)
     const dir = logArchiveDir()
+    // No await from the capture's last check to the rename inside rotateLog: keep it that way.
     buckets.take()
     const r = await rotateLog(a.logPath, dir, cap.segment, rotateDeps)
     buckets.keep(dir, cap.segment.id, r.ok || r.logTouched)
+    if (!r.ok && r.logTouched) notFinished = r.reason
     if (!r.ok) return reply(false, r.logTouched ? `Interrupted: ${r.reason}` : `Not archived: ${r.reason}`)
     liveHistory.noteSealedThisAttach(r.segment.id)
-    archivedThisRun = true
     const gap = r.segment.gapLines ?? 0
     const extra = gap > 0 ? ` ${gap} line(s) written during the move are in the archive but not in the totals.` : ''
     return reply(true, `Archived to ${r.segment.archivePath ?? dir}. Your history is kept.${extra}`)
@@ -363,7 +378,7 @@ export function restoreNow(id: string): Promise<LogArchiveReply> {
     if (newest?.id !== id) return reply(false, 'Only the newest archived log can be put back.')
     const r = await restoreLog(a.logPath, dir, newest)
     if (!r.ok) return reply(false, `Not put back: ${r.reason}`)
-    writeSegment(dir, { ...newest, state: 'backed-up' })
+    writeSegment(dir, { ...newest, archivePath: resolveArchivePath(dir, newest) ?? newest.archivePath, state: 'backed-up' })
     // The engine is following a short log that just became a long one; only a fresh launch folds
     // it from the start. The card told the player the app restarts.
     setTimeout(() => {
@@ -402,7 +417,10 @@ export async function recoverLogArchiveAtLaunch(note: (line: string) => void): P
     sweepTemp(dir)
     sweepRefreshLeftovers(dir)
     const done = await recoverRotation(dir, rotateDeps)
+    notFinished = unfinishedReason(done)
     if (done !== null) note(`log archive: ${done}`)
+    // Never swept: they hold log lines until the same archive's Put back joins them.
+    for (const f of putBackLeftovers(dir)) note(`log archive: a put back did not finish; ${join(dir, f)} holds log lines and is kept`)
     // Step 5.2, after any interrupted archive is sealed and before the engine is told where its files are.
     placeArchivedBuckets({
       on: logArchiveOn,

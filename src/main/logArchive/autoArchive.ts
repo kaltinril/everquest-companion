@@ -4,7 +4,8 @@
 // back to the card. So the switch is the consent, and this archives the log whenever it passes
 // AUTO_ARCHIVE_BYTES. It does the same thing the card's button does (`rotateNow`), so every
 // preflight rule still holds: it waits while the engine is still reading the log, and it archives
-// at most once per app run.
+// at most once per app run. One log it leaves alone: the log the player put back, which waits for
+// Archive now (`autoArchiveDue`).
 //
 // When: once at launch, as soon as the engine has caught up on the log, then once a day. A month
 // of play wrote ~300 MB (owner, 2026-10-06), so anything more often buys nothing. The check is a
@@ -16,8 +17,8 @@ import { logInfo } from '../errorLog'
 import { getActiveCharacter } from '../session'
 import { logArchiveOn } from '../storeLogArchive'
 import type { LogArchiveReply } from '../../shared/logArchive/panel'
-import { AUTO_ARCHIVE_BYTES } from '../../shared/logArchive/preflight'
-import { learnEngineModules, refreshLackingHistories, rotateNow } from './actions'
+import { AUTO_ARCHIVE_BYTES, autoArchiveDue } from '../../shared/logArchive/preflight'
+import { attachedLogPutBack, learnEngineModules, refreshLackingHistories, rotateNow } from './actions'
 
 const WAIT_FOR_ENGINE_MS = 30_000
 const CHECK_EVERY_MS = 24 * 3600_000
@@ -36,7 +37,12 @@ function liveBytes(): number {
 
 /** Archive now if the switch is on and the log is over the limit; null when there was nothing to do. */
 export async function autoArchiveCheck(): Promise<LogArchiveReply | null> {
-  if (running || !logArchiveOn() || liveBytes() < AUTO_ARCHIVE_BYTES) return null
+  const on = logArchiveOn()
+  const bytes = liveBytes()
+  // The folder is read only once the log is over the limit.
+  const putBack = on && bytes >= AUTO_ARCHIVE_BYTES && attachedLogPutBack()
+  if (putBack) logInfo('[everquest-companion] log archive (automatic): this log was put back, so it is left until Archive now')
+  if (running || !autoArchiveDue({ on, liveBytes: bytes, putBack })) return null
   running = true
   try {
     const r = await rotateNow()

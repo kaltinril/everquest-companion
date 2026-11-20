@@ -161,6 +161,53 @@ test('capture: a log that never holds still gives up and says so', async () => {
   if (!r.ok) assert.match(r.reason, /kept growing/)
 })
 
+// The archive waits up to 65 s for the engine before it captures. A character picked in that wait
+// must stop it: the capture would describe the new character while the move takes the old one's log.
+function otherCharacter(f: { logs: string }): { character: string; logPath: string } {
+  const logPath = join(f.logs, 'eqlog_Alt_freeport.txt')
+  writeFileSync(logPath, '[Sun Aug 02 18:00:00 2026] You have entered Freeport.\r\n')
+  return { character: 'alt_freeport', logPath }
+}
+
+test('capture: a character changed since the archive started is refused', async () => {
+  const f = fixture()
+  const b = otherCharacter(f)
+  const deps = captureDeps(b.logPath, { attached: () => b })
+  const r = await captureSegment(deps, { character: 'primitive_freeport', logPath: f.logPath })
+  assert.equal(r.ok, false)
+  if (!r.ok) assert.match(r.reason, /character changed/)
+})
+
+test('capture: a character changed while the capture was being read is refused too', async () => {
+  const f = fixture()
+  const a = { character: 'primitive_freeport', logPath: f.logPath }
+  // The first two asks are the capture's own read and its check at the start; the switch comes after.
+  let asks = 0
+  let reads = 0
+  const base = captureDeps(f.logPath, { attached: () => (asks++ < 2 ? a : otherCharacter(f)) })
+  const health = async (): Promise<EngineHealth> => {
+    reads++
+    return base.health()
+  }
+  const r = await captureSegment({ ...base, health }, a)
+  assert.equal(r.ok, false)
+  if (!r.ok) assert.match(r.reason, /character changed/)
+  assert.ok(reads >= 2, 'the start check passed and the engine was read before the refusal')
+})
+
+test('archive: a character switch during the wait moves no log and leaves no journal', async () => {
+  const f = fixture()
+  const a = { character: 'primitive_freeport', logPath: f.logPath }
+  const b = otherCharacter(f)
+  // What rotateNow does: read the character, wait for the engine, capture, then move that log.
+  const started = a
+  const cap = await captureSegment(captureDeps(b.logPath, { attached: () => b }), started)
+  if (cap.ok) await rotateLog(started.logPath, f.dir, cap.segment, rotateDeps())
+  assert.equal(readFileSync(f.logPath, 'utf8'), LOG_TEXT, 'the first character’s log is where it was')
+  assert.equal(readJournal(f.dir), null)
+  assert.deepEqual(readdirSync(f.dir), [], 'no moved log and no record')
+})
+
 // ── backup ──────────────────────────────────────────────────────────────────────────────────────
 
 test('backup: a verified compressed copy, with a name log discovery can never read as a character', async () => {
@@ -345,6 +392,8 @@ test('restore: an archive that does not unpack to its recorded bytes is refused'
   assert.equal(back.ok, false)
   assert.equal(readFileSync(f.logPath).length, 0, 'the live log is left alone')
 })
+
+// A put back that stops part-way, and the try after it: logArchivePutBack.test.mts.
 
 // ── preflight ───────────────────────────────────────────────────────────────────────────────────
 

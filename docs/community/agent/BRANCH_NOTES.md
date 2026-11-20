@@ -1231,9 +1231,12 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
   step, the last health answer, when the offset last grew, the last combat read, and the engine's
   newest stderr lines.
 - State lifetimes: a new launch (`noteLogReadConnection`) clears everything except the stderr lines.
-  A new turn (`noteLogReadTurn`, called from `bumpGen`) clears health, movedAt and every error
-  except a connect error, because the connection is per launch, not per turn. A `live` health answer
-  clears the error.
+  A new turn (`noteLogReadTurn`, called from `bumpGen`) clears health, movedAt, the reply sizes
+  (`tooLarge`, `large`) and every error except a connect error, because the connection is per
+  launch, not per turn. A `live` health answer clears the error. A connect error is NOT cleared by a
+  successful reconnect; the report hides it while the connection is ready. `lastCombatRead` is not
+  cleared by a new turn (open: a panel that shows the box without polling the meter can read the
+  last turn's verdict).
 - Guards on the notes: the connect error uses the connection guard (`live?.client === client`), the
   attach error the turn guard (`gen === mine`). Using `gen` for the connect error would drop it on
   every world rebuild.
@@ -1242,11 +1245,12 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
   `scrubPaths` in `shared/logReadReport.ts`: log path to base name, home directory and any
   `<drive>:\Users\<name>` or `/Users/<name>` to `~`, em and en dashes to ` - `. A new field that
   carries outside text must go through it too.
-- The decision order in `composeLogReadReport` is the design: no character, engine missing, engine
-  failing, engine starting, not connected, attach refused, read ended (missing / unreadable /
-  stopped), health unanswered, stalled (folding and no offset growth for 60 s), still reading,
-  combat read unserved, ok. Seven waits show the box at once; the rest wait 15 s
-  (`LOG_READ_SLOW_MS`).
+- The decision order in `composeLogReadReport` is the design (as of phase R1): no character, engine
+  missing, engine failing, engine starting, connecting / not connected, attach refused, read ended
+  (missing / unreadable / stopped), health unanswered, stalled (folding and no offset growth for
+  60 s), still reading, reply too large, combat read unserved, ok. Nine waits show the box at once;
+  the rest wait 15 s (`LOG_READ_SLOW_MS`). Phase R2 reorders it (engine missing and failing before
+  no character).
 - Main opens the log itself (`probeLog` in `main/logReadReport.ts`) only when the read has ended or
   nothing has stated the size. It is a diagnostic on the failure path; the engine still owns
   log-file facts everywhere else (ruling 21).
@@ -1255,13 +1259,76 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
   are unchanged.
 - "Engine said" lines come only from the error's snapshot (the 4 newest stderr lines when the error
   was recorded). A slow or stalled read with no recorded error shows none.
-- Not fixed here, each a follow-up once a screenshot says which one players hit: main's one
-  connection to the engine is never retried; the `gen` guard in `openConnection` can discard a good
-  connection during a world rebuild; a refused attach is never retried; an engine that dies after
-  serving is relaunched forever with no card; the old failure card's "It last said" is not scrubbed.
+- Fixed by phase R1 (next section): main's one connection to the engine was never retried; the `gen`
+  guard in `openConnection` could discard a good connection during a world rebuild. Still open, each
+  with its phase in `plans/2026-11-19-reading-log-robustness.md`: a refused attach is never retried
+  (R4); an engine that dies after serving is relaunched forever with no card (R5); the old failure
+  card's "It last said" is not scrubbed (R2).
 - e2e: a run with no engine binary, or one that holds a fold or a hydrating panel past 5 s with a
   failure (15 s without), now finds `data-testid="log-read-report"` inside `combat-hydrating` /
   `overview-hydrating`.
+
+## Reading log: the connection and reply sizes (phase R1, plans/2026-11-19-reading-log-robustness.md)
+
+- Size never ends a connection. `ndjson.ts`: `MAX_LINE_CHARS` 8 MiB is only the decoder default
+  (the child's stdout and stderr, still throws). Engine transports use `MAX_MESSAGE_CHARS` 64 MiB
+  with a watch: an over-limit message is dropped to its delimiter and reported through
+  `Transport.onOversize({ id, size, refused })`. `LARGE_MESSAGE_CHARS` 16 MiB is reported with
+  `refused` false BEFORE the message is delivered. A line is kept as its chunks and joined once.
+- `messageIdOf` reads the id off the first 256 characters and depends on the engine writing `id`
+  before any nested value (reply `{"id":N,...`, reset `{"epoch":E,"id":N,...`). If that order
+  changed, a refused reply would end on its 15 s deadline instead (R7 pins the order in Rust).
+- `client.ts`: a refused reply rejects ONE request with `EngineError('internal', ..., cause
+  TransportError frameTooLarge)`; test with `ops.ts isTooLarge`. `isLinkLost` = code `unavailable`
+  and no `requestId` (the client speaking, never the engine). A refused frame for a subscription
+  sets its error AND drops its window (rows null), so later diffs are dropped until the next reset;
+  keeping the old rows let the next diff clear the error over a window that missed a frame.
+- Every listener the client calls goes through `listeners.ts callEach`. Protocol code is NOT
+  wrapped: a throw in `receive()` still fails the connection.
+- The windows and the epoch law's functions live in `clientStreams.ts` (a file-size split). Nothing
+  in it may sort, filter or derive (pinned in tests/dataServerClientFaults.test.mts).
+- One client per engine launch; its CONNECTION is reopened under it. `linkKeeper.ts` is the policy
+  (0.5/1/2/5/15 s, 5 retries in a row, 60 s held clears the count, 20 per launch,
+  `protocolMismatch` and `unauthorized` never retried, `tryNow` always gets one attempt).
+  `engineLink.ts` joins it to the client. A "try" is a retry: the first connect of a launch is 0.
+- Guards: everything about the connection uses `live?.client === client`. Never `gen`: it advances
+  on every world rebuild.
+- Listeners are registered ONCE per client in `engineClientWiring.ts`. Registering one per connect
+  would now mean once per reconnect per frame.
+- A reconnect takes a new turn (`bumpGen`) and keeps `attachedTo`: no second attach, no re-read. It
+  rests on the engine keeping its world when a connection drops (`conn.rs`: a connection's end only
+  calls `world.leave` for its own subscriptions).
+- A clean hang-up is not reported by the transport. `engineLink.ts` hears it through `watchClose`
+  and, one microtask later, fails the client with `EngineClient.fail()` (so the client stops saying
+  `ready` over a closed socket and rejects what is in flight); the client's own reason wins when it
+  has one. The `failed` state listener is the one place a loss is reported.
+- `replySizes.ts`: `MAX_FORWARD_CHARS` 32 MiB is what main hands a window; 64 MiB is what main
+  itself may read (the archive). A refused or unshowable key is `blocked` until `bumpGen`
+  (`replySizes.reset`). A key of 16 MiB or more is sent at most once per 5 s. Keys are
+  `<op> <stableKey(params)>`, the key `readShim` joins on.
+- `readShim.ts` has TWO in-flight maps: `inFlight` shares one caller-wait's outcome, `wires` holds
+  the real request until the client settles it. Do not merge them: that is what re-sent a timed-out
+  read. A caller's wait = `timeoutFor(op) ?? timeoutMs`, plus any size hold. Readiness is asked
+  again after a hold and after a reply (servable or not; it does not compare turns). `observe()`
+  gets the `FallbackReason` as its 4th argument; `lastCombatRead.why` carries it.
+- Report: `connecting` while the keeper has not given up (also with no keeper yet), `notConnected`
+  only once it has (shows at once). `replyTooLarge` needs the METER's own read to have failed as
+  `tooLarge` (`lastCombatRead.why`) and a too-large reply recorded in this turn; the archive asks
+  `combat.snapshot` under the same op, so the op name alone is not evidence.
+- Archive: the capture's reads REJECT on a failed read; only the engine's `notFound` means "none"
+  (`captureReads.ts`, `engineCaptureReads(request)`, tested without Electron). Never catch-to-null
+  there: that is what moved a log aside with a module missing. `secondEngine.ts` still skips a
+  failed module in a refold; `refreshSegment` already refuses a refold that gave a module back
+  missing.
+- Not covered by R1: a connection whose hello is never answered (the client stays `connecting`, no
+  loss is reported, requests end on their own 15 s deadline). A refused reset that is also the
+  first frame of a newer epoch is dropped before `noteEpoch` sees it. 64 MiB and 32 MiB are
+  reasoned, not measured (plan experiment 1); both are one-line constants.
+- The renderer's own engine client (`lib/engineProvider.tsx`) gets the same 64 MiB limit and the
+  same per-subscription error for a too-large reset; nothing in the renderer draws that error yet
+  (R3).
+- A module read is joined across `serve` and `serveShared` callers, so two projections can be
+  handed the same reply object. A projection must never mutate the reply.
 
 ## DPS chart: the pet drawn apart (upstream #91, requirements/meter-pet-split.md)
 
@@ -1620,3 +1687,338 @@ what a later change must know. Each fix has a unit test that failed before it.
   `useSyncExternalStore`, so `useItemMarks` itself cannot be mounted there.
 - The marks store is module-global and remembers every name for the run: each test uses item names
   no other test in the file touches.
+
+### Log archive
+
+- Capture: `captureSegment(deps, expected)` refuses when the attached character is not the one the
+  caller read before its wait, at the start and after its last read. TRAP: keep zero awaits between
+  the capture's return and `renameSync` inside `rotateLog` (rotateNow), or a switch can slip in
+  again.
+- Put back (rotate.ts `restoreLog`) is resumable; a try that stops is finished by the next. Scratch
+  names: `<id>.restoring.partial` (unverified unpack, swept at launch by `sweepTemp`),
+  `<id>.restoring` (verified archive plus joined pieces), `<id>.<length>.part` (a set-aside piece;
+  the number is the joined file's length before it, so a half-added copy is cut off and re-added).
+- TRAPS: never open an existing `.restoring` for writing and never rename onto a `.part` (each can
+  be the only copy of the lines since the archive). Never sweep `.restoring` or `.part` at launch: a
+  `.restoring` that is a second name (hard link) of the live log is how a try killed after the link
+  is recognised; without it a second Put back would join the archive twice. After the link succeeds
+  nothing may be reported as a failure.
+- An older version's `<id>.part` (no length) and a `.restoring` that does not begin with the archive
+  are refused by name and left alone.
+- `putBackUnfinished` (preflight) blocks a new archive while the NEWEST sealed archive has scratch
+  files: only that archive's Put back joins them, and it must stay newest to keep its button.
+- A put-back log is not auto-archived (`autoArchiveDue`). Nothing is stored for this: it is derived,
+  live log begins with an archive of this character in state `backed-up` (`putBackInLive`). TRAP:
+  anything else that leaves a `backed-up` record whose bytes head the live log (the trial-only Back
+  up) pauses the automatic archive the same way; a new state or a cleanup of `backed-up` records
+  must keep this rule working. Owner has not yet confirmed the pause.
+- The reason an interrupted archive could not be finished is kept in memory only (`notFinished` in
+  actions.ts), set by the launch recovery and by an archive that stops after the move. Not in the
+  journal: the journal format is unchanged.
+- `archivePath` in a record can be stale after the game folder moves. Read it through
+  segmentStore.ts `resolveArchivePath(dir, segment)`; refresh and put back write the corrected path.
+  `stageSegmentLog` still checks the path it is handed.
+- "One archive per run" is per character and has one source: engineBuckets.ts `movedThisRun` via
+  `wasMovedThisRun`. Do not clear an entry on re-attach unless the bucket rule (`settle`/`take`
+  skip) is changed with it.
+- Put back (rotate.ts restoreLog) probes the drive for hard links BEFORE any live line moves:
+  probeLink links the unpacked <id>.restoring to <id>.restoring.link.partial and removes it. Keep
+  the probe ahead of joinAndLink; exFAT and FAT32 refuse every link (libuv reports EISDIR, not
+  EEXIST), and without the probe each press moves the live log into a join that can never get the
+  log's name.
+- The probe goes through the RestoreIo.link test seam. A test that wants a stop AFTER the join must
+  refuse only the link whose target is the log path; link: refused(code) for every call now stops at
+  the probe with 'Nothing has changed'.
+- The probe's name ends .partial so the launch sweep (backup.ts sweepTemp) removes one left by a
+  kill. It is only ever a second name of the joined file. Never give a file that holds the only copy
+  of log lines a .partial name: the sweep deletes it.
+- stopped() advises 'press Put back again' only when a second press can finish. After NoLink (the
+  probe refused) it never does: it says nothing changed, or, where an earlier version left lines in
+  <id>.restoring or a .part, it names the files and says to move them somewhere safe before Archive
+  now. Those leftovers are never removed by the app.
+- The probe links inside the archive folder, not the game's Logs folder. That is enough while the
+  archive folder is <Logs>/companion-archive on the same volume; a refusal of the final link after a
+  passing probe is treated as passing and keeps the retry advice.
+- Capture test trap (tests/logArchiveRotate.test.mts): captureSegment asks attached() twice before
+  its first engine read (its own read, then the start check). A stub meant to switch character
+  during the reads must answer the first character for two asks, or the start check refuses and the
+  post-read check (capture.ts, after historyIfStill) is never exercised.
+
+### Engine: combat crediting
+
+- **Closure runs on every event.** `ingest_event` calls `eval_closure(st, ev.ts())` once, after the
+  three sweeps and before routing. Do not add per-arm calls again and do not gate it on kind: a
+  replay has no meter reads, so any line booked before closure lands in a fight that has ended and
+  the replay disagrees with the live tail. `engine/crates/fold/tests/replay_matches_live.rs` folds
+  the same lines live and replayed and compares the fight list, zone sessions and every scope; add a
+  case there for any new line kind that books into a fight.
+- Trap: an `other` or ally-pet row does not extend a fight. A fight whose only later swings are an
+  unbound pet's closes 20 s (PRESENCE_GONE_MS) after your last line; the pet's later swings are in
+  the zone stay only.
+- **`self_clock` has two writers:** a row door (`stamp_self`) and `Agg::move_out` when a row enters
+  the You scope (a pet claim). `OwnClock` keeps finished in-fight spans by fight (`done`) so `merge`
+  counts one fight's two clocks as their hull once, open or finished. Spans outside any fight (fight
+  0) are hulled only when within 60 s of each other, else added.
+- `rekey_other` still does not move rows inside past zone sessions (`zone_history`), only the live
+  stay, the open fight and the fight history.
+- **Zone stay drop rule:** `finalize_zone_session` drops a stay when `Agg::nothing_of_ours()` (no
+  incoming row, no outgoing row but `Other` / `AllyPet`). Do not gate on `zone_start_ts == 0`: a
+  fall-only or miss-only stay has start 0 and is kept, so a death recap stays with its own stay.
+- **Ally binds at a zone line:** a `Summon` bind crosses, and so does a `defaulted` bind (leader
+  line, no charm broadcast ever, no summon seen) whose pet name is player-shaped. It stays `Charm`:
+  hold clock and swing-at-a-friendly ending still apply, and a charm broadcast clears `defaulted`.
+  Every bind the zone line ends is logged ("charm ended at the zone line"). MEASURED.md's "a charm
+  bind drops on every zone line" is now true only for binds with charm evidence or a mob-shaped
+  name.
+- Open, owner to rule: (1) the zone overall Everyone headline divides bystanders' out-of-fight
+  damage by your own fight time; the renderer derives Group and Everyone rates as `dps * kept /
+  total`, so an engine-only change to the divisor or the numerator breaks another figure. (2) The
+  repeated hour of the autumn clock change: `Fold::last_ts()` is the maximum stamp, not the latest,
+  so a live `now` correction built on it holds a pre-change fight open. (3) `routing.rs both()`
+  still stamps the zone clock with the open fight's counter when that fight is stale; reachable only
+  under a refreshed mez with no damage for a minute.
+- Any replay golden recorded before this change (`oracle:rust-fold`; the fixtures are not in the
+  repo) will differ by design wherever a non-damage line followed a finished fight.
+- Housekeeping from this run: I used `git stash` once in the worktree to see a test fail without its
+  fix and popped it at once. The stash list is shared with the main clone; the owner's two entries
+  are intact.
+
+### Alerts
+
+- Early warning, break family: `advance_breaks` marks a watch `spoken` BEFORE anyone knows whether
+  the warning sounds. Whoever delivers a due warning must call
+  `EarlyWarnings::release_break(due.break_key)` when nothing fired (cooldown swallowed it, def
+  gone), or that hold's break line is suppressed as "already warned" and the mob gets neither sound.
+  Law: a warning that made no sound spends no break. The swallowed warning is dropped, not retried
+  later (the cooldown means drop, not defer).
+- `fireToFiring` resolves an engine fire by NAME among ENABLED defs only (the engine never compiles
+  a disabled def). Trap still open: two enabled alerts with one name and one sound resolve to the
+  first; phrase, banner, colour and volume all come off the resolved def. The fix is `alertId` on
+  the fire frame (protocol change), not a guess in the app.
+- Banner line ids come from `makeAlertBannerIds()` (`src/shared/alertBanner.ts`):
+  `<alertId>:<ts>:<count>`. The card queue REPLACES a line whose id repeats, so never build a banner
+  id from the alert and the clock alone: two firings in one synchronous loop share a millisecond.
+- A seeded app-signal alert that can fire for several things at once (Bazaar, respawn) seeds
+  `cooldownMs: 0`; the 2 s default drops the second firing before the voice AND the banner
+  (`fireAppSignal` gates before `playAlertNow`). The feature must then fire each thing once itself.
+- Bazaar seed: `withBazaarCooldown` runs on every `getAlerts()` read and sets 0 only where
+  'bazaar-watch' has NO cooldown key. It relies on the alert editor always writing `cooldownMs` on
+  save (`defFromForm`). If the editor ever omits the key at its default, this would overwrite a
+  player's choice: add a stamp first.
+- Cooldown is whole milliseconds everywhere: `src/shared/alertCooldown.ts` (`normalizeCooldownMs`,
+  `cooldownFromInput`, `sanitizeCooldownMs`, `cooldownOver`, `DEFAULT_COOLDOWN_MS`) and the engine's
+  `cooldown_ms_of` round the same way (half up, floor 0, default 2000 only when no finite number).
+  Change one, change the other. Do not read a stored number with `as_i64` in the engine: a float
+  reads as absent. No upper clamp on save (share import still clamps to 600000 in `shareSchema.ts`,
+  its own copy).
+- New test seams: `withBazaarAlert` / `seedBazaarAlertOnce` take the sound-ref step as a parameter,
+  like the respawn seed, so they test without Electron.
+
+### Respawn timers
+
+- Shared-name floor across the archive join. Law: `mergeRespawn.ts withFloor` reads BOTH sides' rows
+  of a mob today's list marks shared over `RESPAWN_SHARED_NAME_FLOOR_MS` before `mergeRows`
+  (`aboveFloor`). A row with `sharedName: true` is trusted as the engine's; any other is re-read
+  from that side's `learned` gaps (same key, same `zoneBase`) and its own `gapsMs`; samples = the
+  larger count, never the sum; an `agreedMs` under the floor is dropped; the row is flagged
+  `sharedName` so the next join in a several-archive fold trusts it. Trap: history rows
+  (`respawnHistory`) are read with bare watches and every segment older than 2026-11-09 is
+  unfloored, so never min() an archived bound into a shared-name row without this step. Trap:
+  `gapsMs` is left unfiltered on purpose, as the engine leaves it. Limit: a segment with no
+  `learned` list has only the row's six newest gaps, so its clock can read longer, never under the
+  floor.
+- Seen, not changed: a row captured while the switch was on stays floored and flagged after the
+  switch is turned off; as an archived-only row it still reads "over 10 min".
+- Edit dialog. Law: Save writes only what was typed (`shared/respawnEdit.ts
+  respawnDraftToSave(typed, inForce)`); `typed` is null until the field is typed in and on each
+  opening, and text equal to the number in force is not an edit. The same number typed another way
+  (`525` for `8m 45s`) is saved on purpose: that is how a player pins the calculated number. Trap:
+  do not go back to a draft prefilled into state; the untouched field must follow the row, because
+  the shared-name switch writes on the click and moves the estimate while the dialog is open. The
+  2026-11-09 sentence "Save is disabled while the row has no number" is now "Save is disabled until
+  a number is typed"; the button beside it reads Close (test id still `respawn-edit-cancel`).
+  `RESPAWN_INPUT_HELP` no longer mentions an empty field.
+- Row cap. Law: `RESPAWN_MAX_ROWS` (60) counts only rows of zones other than the one the player
+  stands in; every row of the standing zone (by `zone_base`, each tier and instance) is published
+  (`respawn.rs collect`) and kept by the join (`mergeRespawn.ts capRows`). So `rows` can be longer
+  than 60. Trap: `withHistoryRows` puts an in-memory `liveZone` on each archived state so an
+  archive-to-archive join keeps today's zone, not the zone that archive ended in; the final join
+  spreads the live state, so the field never reaches the renderer and is never written to a segment.
+  Trap: `main/logArchive/respawnHistory.ts readBatch` still splits a batch at 60 rows; that stays
+  sound (a cut read always has at least 60 rows) but its header's "60-row page" now means 60 rows of
+  other zones plus the standing zone's. Open: no count of other-zone rows left out (needs a snapshot
+  shape change); with a blank live zone and three or more archives an older archive's standing-zone
+  row can still be cut.
+
+### Wiki Gaps
+
+- 2026-11-19 (bug hunt, wiki-gaps). `mergeGaps.ts mergeRow` now has three rules, not one. (a) Served
+  fields (`itemsSold`, `greeting`, `role`, `questFacts`) take the newer side, and the newer side's
+  absence is not a removal. (b) `suggest`, `zoneTitled`, `viaRedirect` take the newer side even when
+  absent. (c) `maybePlayer` stands only when BOTH sides say it: a row without it is that log's
+  proof. Trap: a side folded before `maybePlayer` existed would clear a live flag; the running app
+  refolds, so not seen in practice.
+- Kill-faction amount across a join: the engine serves `adjusts: [[amount, count]]` (most stated
+  first, tie to the larger hit, `gaps_trade.rs Pair::stated`) and `joinKillFaction` adds the counts.
+  A side without `adjusts` (an older save or segment) weighs its one `adjust` by its kills `n`,
+  which counts capped lines too. Trap: an old save of many capped kills and one clipped hit can
+  outvote a new log until that character is attached again. Never go back to "newer side wins".
+- All characters join: `inputs[0]` is the attached character. It is joined FIRST (its spelling,
+  kinds order and first `/loc` point lead; `locFinder` reads `points[0]`) and its served fields are
+  joined once more at the END with emptied tallies (`servedOnly`), so its reading stands as the live
+  fold's does over its archive. Do not "simplify" this to folding it last: that changes the row's
+  name, kinds order and the loc a soldby row prints. Still open: between two other characters the
+  one joined last wins those fields.
+- `otherInputs` re-check: only a plain unknown-name Mobs row closes when the catalog knows the name
+  (`closedByCatalog`). A row with `questGaps`, `viaRedirect` or `zoneTitled` is about a name the
+  wiki already has, so the name test must never see it. Any new kind of Mobs row for a KNOWN name
+  has to be added to that exemption.
+- `details.sales` entries are ONE item's price: the loot line's coin covers the stack (fixtures
+  w21-stacked.log: Spider Silk 1 for 143c, 2 for 286c, 4 for 572c) and `coin_each` divides by the
+  event's `count`; a coin that does not divide adds no entry. `salesCopper` is still the total. A
+  save or segment folded before this still holds stack totals among its entries until refolded.
+  MEASURED.md "Instant sale on loot" should gain one line: stack total = quantity x the single
+  price. Not checked: whether `progression_ledger.rs` reads the same clause as one item.
+- `details.cons` carries `all` (every reading by name) like `zones`; a page's `level` reads it
+  (`wikiPage.ts conLevels`), with the entries as the fallback for an older save. `gaps_stock.rs
+  cons_of` serves it for a Merchants row too. `sources` has no `all`: an item's soldby rows can
+  still miss a ninth vendor.
+- All characters read: a failure is its own state (`shared/gapsOthersLine.ts otherAnswer`), never an
+  empty list. The words on the line and the count line's tail live there with their tests;
+  `AllCharactersControls.tsx` only prints them. `othersGaps` catches one character whose state will
+  not join and names it `unreadable`; a folder that cannot be listed still rejects the whole read,
+  and the tab says so.
+- Gaps saves: one attempt is `main/gapsCharacterSave.ts gapsSaver`, electron-free and unit tested.
+  `takeMoved` is taken first and `restoreMoved` puts it back when the attempt did not land. Do not
+  move `takeMoved` after the write: cursors that move during the save would be lost.
+- OPEN: no save on a character switch or on quit, and both timers count from launch. Another
+  character's rows can be up to ten minutes behind, and a character left before its first save is
+  absent until attached again. The fix needs a pre-switch hook in `session.ts tailCharacter` and a
+  bounded save in the quit path of `index.ts`. The tooltip's save time is the only sign for now.
+- `gaps_tests.rs` is at its factoring ceiling: new details tests go in `gaps_details_tests.rs`.
+- All characters, saved rows about a page the wiki HAS (quest giver `questGaps`, redirect
+  `viaRedirect`, zone-titled `zoneTitled`): the catalog knows their names by design, so no "is this
+  name known" test may close them. `gapsRecheckPages.ts aboutKnownPage` is the ONE predicate; main
+  (`gapsRecheck.ts withoutNowKnown`) and the tab (`gapsAllCharacters.ts otherInputs`) both use it.
+  Trap: main filters first, so a fix or a test at `otherInputs` alone proves nothing; test
+  `withoutNowKnown` with a `known()` that returns true.
+- The same name test in main covers Items too (`inItemDb` indexes `otherNames`), so an Items
+  redirect row needs the same exemption; it has it.
+- What these rows state is read off the wiki data, not the log, and a saved row is as old as its
+  save. `knownPageRowNow` serves one only as far as TODAY's catalogs still say it: quest giver =
+  saved quests still given by that NPC (quests.json `giver`) and still absent from the page's
+  `relatedQuests` (a TS port of `gap_index.rs mob_quest_gaps_of`: change one, change the other),
+  never adds a quest, none left closes the row; redirect = name still reaches the same page only
+  through `otherNames`; zone-titled = `zoneTitledPage(row)` still absent. Unconfirmed means left out
+  until that character's next attach. Copy on a quest-giver row is the bullets the page lacks, so
+  this check is what keeps Copy true.
+- Limit: a zone-titled row is NOT closed by a plain page added since (that needs the engine's loose
+  name and zone folds); it waits for the next attach.
+- `withoutNowKnown(gaps, known, pages)` takes today's catalogs as a required third argument;
+  `main/gapsToday.ts pagesToday` builds it and is electron-free so `tests/gapsToday.test.mts` runs
+  it on the committed catalogs (names picked from the data, no counts).
+- `main/gapsToday.ts` imports quests.json; `itemClickies.ts` records a JSON import edge once
+  breaking the inventory-watcher e2e. Not run in this pass: run that spec at the gate.
+- Not examined: whether the ATTACHED character's own archive-merged quest-giver rows can carry stale
+  `questGaps` (`mergeGaps.ts mergeRow` spreads the older row's field); main's re-check runs only on
+  other characters.
+
+### Bazaar
+
+- Commas: `bazaar_words.rs::join_thousands` takes the commas out of `1,500pp` BEFORE `tokens()` pads
+  separators. Trap: `tokens()` splits every comma, so a price rule that expects a comma inside a
+  token never fires (the `,` in `price_at`'s regex is dead). Not joined on purpose: a number after
+  `+` ("+4,500pp" is tier 4 at 500pp) and one glued to a letter.
+- `price_at` returns None for a price of 0: an offer is never counted at 0.
+- A price before "for" prices ONE item (`Parser.lead_once`); a leading "3k each: A | B" prices every
+  item. Open: after an each-lead, a later item's own price ("... | C 10k") is still dropped and C is
+  counted at the lead.
+- A lead price with no unit makes its offers a guess (`Parser.lead_bare`), the same law as a bare
+  price after an item.
+- Second price (`Parser::second_price`, `price_end`): a different price right after the first, with
+  only separators, "to" or "now" between, marks the offer unsure. A second price followed by "for"
+  or "if" does NOT ("2500pp, 2000pp for multiples": 24 correct offers on the owner's log; the rule
+  without that exemption uncounted all of them). Words between also leave it counted (the price of
+  an item no page names).
+- This guess rule lives in the parser, not in `mark_guesses`, because it needs token positions of
+  the prices.
+- `bazaar_parse.rs` is at 423 of 440 code lines and `apply_price` at complexity 12 of 13: the next
+  rule goes in its own function, or the file needs a split at a real seam.
+- Watch alerts: `alertingWatch` (per side: the tier's own watch if that side is on, else the
+  every-tier one) decides alerts; `findWatch` is only what the panel, chip and My watchlist filter
+  show. A tier watch with neither box ticked mutes nothing. Open: the per-tier row chip shows only
+  the tier's own watch.
+- Prices the player typed (watch thresholds) and the alert's offer price go through
+  `formatPlatExact`, the inverse of `parsePlat`; `formatPlat` rounds and is for tables, tiles and
+  charts only. A new unit in `parsePlat` needs its line in `EXACT_UNITS`.
+- Measure: a corpus for `BAZAAR_CORPUS` can be made by filtering trade-word lines from the live log
+  plus `Logs/companion-archive/*.log.gz` (the live log alone has too little chat); 2026-11-19
+  numbers: trade 1972, offers 2326, priced 1376, counted 1309.
+
+### Buffs
+
+- Replace the last bullet's first sentence with: A changed choice restates every live buff row in
+  the define itself (`BuffInstances::restat_all`, `buffs_restat.rs`) and then announces. An
+  `ActiveBuff` carries the numbers it was projected with, so anything new that changes
+  `estimate_for`'s answer without a log line must call `restat_all` too, or the table and the cards
+  disagree. The crowd-control hold sentence stays true.
+- `reproject_row` (`buffs_restat.rs`) is the one per-row re-projection for both a new sample and a
+  choice; it keeps the row's own `started_ts`, caster and count. `buffs_instances.rs` is near its
+  factoring ceiling: new re-projection code goes in `buffs_restat.rs`.
+- What the log LEARNS never reads a choice: `death_bound_span` judges against `automatic_estimate`.
+  Use `estimate_for` only for what is drawn (rows, timers, the stats table).
+- The Buffs card's overdue rule and captions are pure functions in `features/buffs/format.ts`
+  (`estimateState`, `leftCaption`, `estimateText`, `fmtPrecise`), tested in
+  `tests/buffsFormat.test.mts`. Past the estimate is overdue for every source; never print
+  `fmtDuration(0)` in a caption (it is a dash).
+- Open: for an `observed` estimate the all-time p75 can sit below the estimate, so the card can say
+  "past estimate" with time still on the bar. Not changed; needs an owner yes.
+- Tests over the committed catalog must not pin a wiki duration: `duration_choice.rs` reads the
+  row's own number and asserts the source.
+
+### Plane of Sky counts
+
+- `turnins.rs` `given`: an offer older than `TRADE_MS` (300 s) leaves `given` when the next offer to
+  the same NPC comes (the `gaps_quests.rs` `offered` rule). `items` still keeps every offer. Not
+  filtered at the trade line: a trade window left open over 5 minutes must still give its offers.
+- TRAP, still open: a re-offer within 5 minutes of a bounce ('You must turn in all quest items at
+  once ...', which no module reads) counts the bounced item twice. Reading that line as a hand-back
+  needs a check of the owner's log first, and the two gaps modules have the same gap.
+- TRAP, still open: a refusal hands back an offer only inside `REFUSE_MS` (10 s) of that offer, but
+  refusal lines print at trade completion, so a slow fully refused trade leaves earlier offers in
+  `given`. A partial hand-back (NPC keeps the quest items, returns an extra) removes the wrong
+  offer; fixing it needs a `back` list on the row, which is an archive format change.
+- A turn-in recorded with '+' lowers a count only through the log witness: always under `log`, under
+  `both` only where the log holds more than the export. Under `inventory`, `rebaseline` and
+  `handins` it moves no count (a click time never discounts a dump, JOS-409; `handins` never reads
+  the ledger). A count set by hand is the exception under every source. `countSource.ts`
+  `recordedTurnInMovesCounts`, `recordTurnInTitle`, `turnedInHover` hold the rule and the hovers;
+  `tests/skyRecordedTurnInCounts.test.mts` ties them to the real reconcile. Change the arithmetic
+  and that test tells you which sentence is now false.
+- Known inexact: under `rebaseline` with no dated export the app counts as `both`, and the '+' hover
+  still says counts stay the same.
+- `turnInActions.ts`: every click builds on `newestKnown` = the render's list, plus '+' stamps not
+  shown yet (`sent`), less take-backs still in flight (`cut`). Main REPLACES a quest's instants and,
+  when given, its rejected list, so undo restates the rejections of in-flight take-backs too.
+- `cut` lives only until its own reply (try/finally). Do not make it expire on 'the list stopped
+  showing it': a trade an archive shows again later would then be impossible to take back. This is
+  safe because the reply re-renders at once (progressStore is a useSyncExternalStore).
+- `sent` still expires only at the next '+' on that key. Unverified: if the Sky tab's hook survives
+  a character switch, an old stamp could be restated for the new character.
+- The undo hover reads `QuestProgress.undoTakesLogTurnIn` (`undoRejectsDetection`, which
+  `takeBackTurnIn` also uses). Never word it from `turnIns <= logTurnIns`: a hand turn-in older than
+  a log one makes that comparison lie. `logTurnIns` no longer decides anything on screen.
+- `useProgress.ts` cannot be imported by a node test (path aliases); put testable rules in
+  src/shared or countSource.ts. The file is about 2 code lines under its 440 ceiling: new code goes
+  in another module.
+- Payload: `loaded` = the main window holds the character's progress (it gates the empty-list text
+  only, and must not wait on the log, or an engine that never starts leaves 'Waiting' up for good).
+  `countsPending: true` is written only while progress is held and the loot or turn-ins module is
+  not loaded; the overlay then draws `skyOverlayNotice` above the rows and hides the ready tally. A
+  settled payload has no such key.
+- Every count source waits on both modules, `inventory` too: its dump is discounted by the log's
+  destroys and turn-ins.
+- The feed builds the payload with `buildSkyOverlayPayload` (shared/skyQuestOverlay.ts);
+  `useProgress` exposes `lootReady` beside `turnInsReady`.
+- Not changed: at launch the overlay first draws the last session's stored payload until the feed
+  writes.

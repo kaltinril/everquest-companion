@@ -75,6 +75,25 @@ fn expand(s: &str) -> String {
     .into_owned()
 }
 
+/// `1,500pp` and `12,500 pp` with the commas out, so [`tokens`] does not part the number at them
+/// and count 500pp. Left alone: a comma that groups no three digits ("580, 10p", "4, 1k"), and a
+/// number after `+` or a letter, whose first digits are a tier or a count ("+4,500pp").
+fn join_thousands(s: &str) -> String {
+    static THOUSANDS: OnceLock<Regex> = OnceLock::new();
+    re(&THOUSANDS, r"\b\d{1,3}(?:,\d{3})+")
+        .replace_all(s, |c: &regex::Captures| {
+            let m = c.get(0).expect("the whole match");
+            let tier = s[..m.start()].ends_with('+');
+            let longer = s[m.end()..].starts_with(|d: char| d.is_ascii_digit());
+            if tier || longer {
+                m.as_str().to_string()
+            } else {
+                m.as_str().replace(',', "")
+            }
+        })
+        .into_owned()
+}
+
 /// Split glued prices, tiers and counts off words, expand the shorthands, and pad separators.
 pub fn tokens(msg: &str, split_glued: bool) -> Vec<Tok> {
     static GLUED_PRICE: OnceLock<Regex> = OnceLock::new();
@@ -93,6 +112,7 @@ pub fn tokens(msg: &str, split_glued: bool) -> Vec<Tok> {
     let s = re(&GLUED_PRICE, r"(?i)([a-z])(\d+(?:\.\d+)?k)\b").replace_all(&s, "$1 $2");
     let s = re(&PRICE_WORD, r"(?i)(\d(?:k|pp))([a-z]{2,})").replace_all(&s, "$1 $2");
     let s = re(&GLUED_QTY, r"(?i)([a-z]{3,})(x\d+)\b").replace_all(&s, "$1 $2");
+    let s = join_thousands(&s);
     let s = re(&SEP, r"([|/,;:!?()]|\s-\s)").replace_all(&s, " $1 ");
     s.split_whitespace()
         .map(|raw| Tok {
@@ -147,7 +167,8 @@ pub fn price_at(t: &[Tok], i: usize) -> Option<(f64, usize)> {
             let unit = m
                 .get(3)
                 .map_or(1.0, |u| unit_of(&u.as_str().to_lowercase()));
-            if m.get(2).is_none() && m.get(3).is_none() && num < 1.0 {
+            // `0pp` is no price, and counting it would put a 0 in the day's low.
+            if num <= 0.0 || m.get(2).is_none() && m.get(3).is_none() && num < 1.0 {
                 return None;
             }
             Some((num * mult * unit, span))

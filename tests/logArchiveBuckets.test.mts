@@ -17,9 +17,11 @@ import {
   placeArchivedBuckets,
   resetArchiveBucketsForTests,
   waitForEngineWrite,
+  wasMovedThisRun,
   type PlaceDeps,
   type WaitDeps
 } from '../src/main/logArchive/engineBuckets'
+import { rotateBlockers } from '../src/shared/logArchive/preflight'
 import type { SegmentState } from '../src/shared/logArchive/segment'
 
 const ME = 'primitive_freeport'
@@ -213,6 +215,23 @@ test('buckets: nothing is kept when the log was not moved, or for a second archi
   second.take()
   second.keep(f.dir, 'primitive_freeport-20260803100000-99', true)
   assert.ok(!existsSync(join(f.dir, 'primitive_freeport-20260803100000-99.buckets.json')))
+})
+
+// "Already archived since the app started" is true of one character's log, not of the app: the
+// engine folds another character's log from its first byte, so it holds none of the archived lines.
+test('one archive per run is per character: another character’s log is not refused for it', async () => {
+  resetArchiveBucketsForTests()
+  const f = fixture()
+  const ok = { on: true, hasLog: true, engineLive: true, sameDrive: true, freeBytes: 10, logBytes: 5, interrupted: false, busy: false }
+  assert.equal(wasMovedThisRun(ME), false)
+  await archive(f, false)
+  assert.equal(wasMovedThisRun(ME), false, 'a log that was not moved is not archived')
+  await archive(f)
+  assert.equal(wasMovedThisRun(ME), true)
+  assert.equal(wasMovedThisRun('other_freeport'), false)
+  // The card's refusal, built as actions.ts builds it for whoever is attached.
+  assert.equal(rotateBlockers({ ...ok, archivedThisRun: wasMovedThisRun(ME) }).length, 1)
+  assert.deepEqual(rotateBlockers({ ...ok, archivedThisRun: wasMovedThisRun('other_freeport') }), [])
 })
 
 test('buckets: the wait ends at the engine write, or after its limit when nothing was written', async () => {

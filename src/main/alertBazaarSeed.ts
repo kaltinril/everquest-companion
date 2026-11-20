@@ -24,23 +24,44 @@ const BAZAAR_WATCH_ALERT: AlertDef = {
   audio: 'speech',
   speech: { mode: 'custom', phrase: '{item} {what}' },
   bannerText: '{offer} - {why}',
+  // Two offers in one trade-chat line must both be heard; the engine lists each offer once a day.
+  cooldownMs: 0,
   note: 'Seeded default - fires when a trade-chat offer matches your Bazaar watchlist (the WTS and WTB boxes on each watch).'
 }
 
-/** The list with the Bazaar alert added, when the list has none. */
-export function withBazaarAlert(alerts: AlertDef[], storedPrefs: unknown): AlertDef[] {
+/**
+ * The list with the Bazaar alert added, when the list has none. `seed` is the sound-ref step, a
+ * parameter for alertRespawnSeed.ts's reason: tests/alertBazaarSeed.test.mts runs without Electron.
+ */
+export function withBazaarAlert(alerts: AlertDef[], storedPrefs: unknown, seed: typeof seedAlertsWith = seedAlertsWith): AlertDef[] {
   if (alerts.some((a) => a.id === BAZAAR_WATCH_ALERT_ID)) return alerts
-  return [...alerts, ...seedAlertsWith([BAZAAR_WATCH_ALERT], storedPrefs)]
+  return [...alerts, ...seed([BAZAAR_WATCH_ALERT], storedPrefs)]
+}
+
+const lacksCooldown = (a: AlertDef): boolean => a.id === BAZAAR_WATCH_ALERT_ID && a.cooldownMs === undefined
+
+/**
+ * The list with the Bazaar alert's cooldown set to 0 where it has none: the alert as first seeded,
+ * which fell to the 2 s default. A save from the alert editor always writes a cooldown
+ * (alertForm.ts defFromForm), so a number the player chose is never written over.
+ */
+export function withBazaarCooldown(alerts: AlertDef[]): AlertDef[] {
+  if (!alerts.some(lacksCooldown)) return alerts
+  return alerts.map((a) => (lacksCooldown(a) ? { ...a, cooldownMs: 0 } : a))
 }
 
 /**
  * The stored list with the Bazaar alert added the first time only. Takes the store as an argument
  * for alertSeeds.ts's import-cycle reason.
  */
-export function seedBazaarAlertOnce(alerts: AlertDef[], store: Pick<CachedStore<StoreShape>, 'get' | 'set'>): AlertDef[] {
-  if (store.get('alertBazaarSeed') === true) return alerts
-  const next = withBazaarAlert(alerts, store.get('soundPacks'))
+export function seedBazaarAlertOnce(
+  alerts: AlertDef[],
+  store: Pick<CachedStore<StoreShape>, 'get' | 'set'>,
+  seed: typeof seedAlertsWith = seedAlertsWith
+): AlertDef[] {
+  const stamped = store.get('alertBazaarSeed') === true
+  const next = withBazaarCooldown(stamped ? alerts : withBazaarAlert(alerts, store.get('soundPacks'), seed))
   if (next !== alerts) store.set('alerts', next)
-  store.set('alertBazaarSeed', true)
+  if (!stamped) store.set('alertBazaarSeed', true)
   return next
 }

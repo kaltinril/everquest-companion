@@ -11,8 +11,8 @@
 //   * Set it myself — a typed duration, read by the same parser the spell data uses.
 //
 // The choice is saved per spell LINE through `setBuffDuration`, which merges on main, so this
-// dialog and the Preferences caster list never overwrite each other. Bars of new casts use it at
-// once; a crowd-control timer already running keeps the length it started with.
+// dialog and the Preferences caster list never overwrite each other. Buff bars use it at once,
+// running ones included; a crowd-control timer already running keeps the length it started with.
 
 import { type JSX, useEffect, useState } from 'react'
 import {
@@ -30,19 +30,13 @@ import {
 } from '@mui/material'
 import type { BuffStat } from '@shared/types'
 import { parseTypedDuration, type BuffDurationOverride } from '@shared/buffTrust'
-import { estimatorSourceTitle, fmtDuration } from './format'
+import { estimatorSourceTitle, fmtPrecise } from './format'
 
 type Mode = 'auto' | 'log' | 'fixed'
 
 /** Seconds as the field shows them: `7.5`, `90`. */
 function secondsText(ms: number | null | undefined): string {
   return ms == null ? '' : String(Math.round(ms / 100) / 10)
-}
-
-/** A duration with tenths under a minute (`7.5s`) — these spells are short and 7.5 is not 8. */
-function fmtPrecise(ms: number | null | undefined): string {
-  if (ms == null || ms <= 0 || ms >= 60_000) return fmtDuration(ms)
-  return `${Math.round(ms / 100) / 10}s`
 }
 
 /** The automatic figure: stated by the engine while overridden, otherwise it IS the estimate. */

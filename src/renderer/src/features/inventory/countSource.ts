@@ -152,6 +152,36 @@ export function countSourcePhrase(s: CountSource): string {
 export const countsFromInventory = (s: CountSource): boolean => s !== 'log' && s !== 'handins'
 
 /**
+ * DOES A TURN-IN RECORDED WITH '+' TAKE ITS ITEMS OFF A COUNT under this source?
+ *
+ * Only through the log witness, which `log` reads alone and `both` reads beside the dump (so under
+ * `both` the number moves only where the log holds more than the dump). `inventory` and `rebaseline`
+ * discount the dump by the turn-ins the LOG shows after it, never by a click time (JOS-409), and
+ * `handins` follows the log's hand-overs and never reads the turn-in ledger (fork issue #2). A
+ * count set by hand is the one exception everywhere: a turn-in recorded after it is taken off.
+ * tests/skyRecordedTurnInCounts.test.mts pins this against the reconcile.
+ */
+export const recordedTurnInMovesCounts = (s: CountSource): boolean => s === 'log' || s === 'both'
+
+/** The '+' hover: what recording a turn-in does to the counts under this source. */
+export function recordTurnInTitle(s: CountSource): string {
+  return recordedTurnInMovesCounts(s)
+    ? 'Record another turn-in. The items it required are subtracted, so the quest goes back to what you hold toward running it again.'
+    : 'Record another turn-in; item counts stay the same unless you set them by hand.'
+}
+
+/** The turned-in badge's hover. Under `handins` the counts follow the log's hand-overs, not the badge. */
+export function turnedInHover(s: CountSource, count: number): string {
+  if (s === 'handins') {
+    const times = count > 1 ? `${String(count)} times` : 'once'
+    return `Turned in ${times}; item counts follow the hand-overs your log shows, not this badge.`
+  }
+  return count > 1
+    ? `Turned in ${String(count)} times. Each turn-in spends the items it required, so the progress beside this is what you hold toward doing it again.`
+    : 'Turned in once. The items it required were spent, so the progress beside this is what you hold toward doing it again.'
+}
+
+/**
  * THE INSTANT A REBASELINE ANCHORS TO, or null when nothing can anchor one (JOS-186).
  *
  * `generatedAt` first — it is when the PLAYER dumped, which is the moment the file describes, and

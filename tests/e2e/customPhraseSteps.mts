@@ -306,10 +306,23 @@ async function editorRoundTrip(page: Page): Promise<void> {
   await settleGone(page, DIALOG, { timeoutMs: 10_000 })
 }
 
+/**
+ * Answer the analytics first-run notice (the alert-dialog-focus.e2e.mts idiom). A fresh `userData`
+ * always shows it along the bottom edge, and the say picker's menu opens under it for this row:
+ * the click on the menu's entry was intercepted and timed out (red since 2026-10-21).
+ */
+async function answerNotice(page: Page): Promise<void> {
+  const notice = '[data-testid="telemetry-notice"]'
+  if ((await countOf(page, notice)) === 0) return
+  await page.click('[data-testid="telemetry-notice-off"]')
+  check('the analytics first-run notice can be answered out of the way', await settleGone(page, notice, { timeoutMs: 8_000 }))
+}
+
 export async function stepCustomPhrase(
   page: Page,
   log: { appendAt: (at: Date, ...m: readonly string[]) => number }
 ): Promise<void> {
+  await answerNotice(page)
   const saved = await seedSuggestedDef(page)
   if (!check('a suggestion-shaped speaking def saves through the app’s own IPC', saved > 0, `${String(saved)} defs stored`)) {
     return

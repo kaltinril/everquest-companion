@@ -35,6 +35,8 @@ export interface KillFaction {
   adjust?: number
   /** whether the kill raised it: the amount's sign, or a capped line's "better" (true) / "worse" (false) */
   raised?: boolean
+  /** every stated amount with its count, `adjust` first: what a join of two logs weighs (mergeGaps.ts) */
+  adjusts?: [number, number][]
   /**
    * The proof (owner, 2026-10-20: "how do I know it has Grobb Merchants?"): the last kills' raw log
    * lines, oldest first, each kill its faction line then its death line, stamps kept. Absent when none,

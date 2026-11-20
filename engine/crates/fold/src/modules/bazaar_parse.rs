@@ -14,13 +14,14 @@
 //!   after the direction word, a separator, a price, a tier, a quantity or another item. A name
 //!   found after unmatched words is the tail of something else ("Mithril Champ arrows" is not
 //!   "Arrow"). Case and apostrophes never matter.
-//! * prices: `5k`, `2.5k`, `500pp`, `10 000pp`, `4 pp`, `150g`, `20 copper`, `5kpp`, and a price
-//!   glued to the name (`Cloak6k`). `3k each: A | B` prices both; so does `A, B 150g each`.
+//! * prices: `5k`, `2.5k`, `500pp`, `10 000pp`, `1,500pp`, `4 pp`, `150g`, `20 copper`, `5kpp`,
+//!   and a price glued to the name (`Cloak6k`). `3k each: A | B` prices both; so does
+//!   `A, B 150g each`.
 //! * a bare number (no `k`, `pp` or coin) is a price only right after the item, its tier or its
 //!   count, or before `each`: "only have 1" and "- buying 100 10lb meatpies" are counts.
 //! * "paying 4k" or "offering 4k" after several items prices each of them, as `each` does; as the
-//!   message's first word it is a buy, and a price before "for" prices what follows
-//!   ("paying 15k for fleeting quiver").
+//!   message's first word it is a buy, and a price before "for" prices the one item after it
+//!   ("paying 15k for fleeting quiver"); an item after that one takes its own price or none.
 //! * an item right after "for" is what the offer is for ("Book of Scale for Fiery Avenger"), unless
 //!   a price stands before the "for" or the offer is a barter.
 //! * a bare number before a word that is no item and no price word counts ("6 left"), and one
@@ -74,9 +75,9 @@ pub struct Offer {
     pub price_pp: Option<f64>,
     pub each: bool,
     /// False when reading it took a guess: the line offers another price or count after `or`, the
-    /// price has no unit, or a count over one and a price come with neither `each` nor `for` (the
-    /// lot, or each?). Such an offer is listed but never counted (owner, 2026-10-13: a wrong count
-    /// is worse than a missing one).
+    /// price has no unit, a second price stands right after the first ("4k - 5k"), or a count over
+    /// one and a price come with neither `each` nor `for` (the lot, or each?). Such an offer is
+    /// listed but never counted (owner, 2026-10-13: a wrong count is worse than a missing one).
     pub sure: bool,
 }
 
@@ -151,6 +152,10 @@ struct Parser<'a> {
     starts: Vec<usize>,
     dir: Option<Dir>,
     lead_price: Option<f64>,
+    /// `lead_price` stood before "for", so it prices the one item after it ("5k for A, B 3k").
+    lead_once: bool,
+    /// `lead_price` has no unit, so the offers it prices are a guess.
+    lead_bare: bool,
     pending_qty: Option<u32>,
     /// Index into `out` of the offer the next tier, count or price belongs to.
     last: Option<usize>,
@@ -158,6 +163,8 @@ struct Parser<'a> {
     fresh: bool,
     /// The price on `last` was stated after it, so a tier that follows starts the next tier's offer.
     priced_here: bool,
+    /// The offer in `out` a price was last stated on, and the token just past that price.
+    price_end: Option<(usize, usize)>,
 }
 
 impl<'a> Parser<'a> {
@@ -216,14 +223,18 @@ impl<'a> Parser<'a> {
             return Some(i + used);
         }
         self.priced_here = false;
+        let lead = self.lead_price;
+        if self.lead_once {
+            self.lead_price = None;
+        }
         self.out.push(Offer {
             dir,
             item,
             tier: 0,
             qty: self.pending_qty.take(),
-            price_pp: self.lead_price,
-            each: self.lead_price.is_some(),
-            sure: true,
+            price_pp: lead,
+            each: lead.is_some(),
+            sure: lead.is_none() || !self.lead_bare,
         });
         self.starts.push(i);
         self.last = Some(self.out.len() - 1);
@@ -416,16 +427,21 @@ impl<'a> Parser<'a> {
             && self.item_at(at + used + 1).is_some();
         if for_item {
             self.lead_price = Some(pp);
+            self.lead_once = true;
+            self.lead_bare = bare;
             return;
         }
         let Some(last) = self.last else {
             // A price before any item: "3k each: A | B".
             if each {
                 self.lead_price = Some(pp);
+                self.lead_once = false;
+                self.lead_bare = bare;
             }
             return;
         };
         if self.out[last].price_pp.is_some() {
+            self.second_price(last, pp, at, at + used);
             return;
         }
         for (k, o) in self.out.iter_mut().enumerate() {
@@ -436,6 +452,30 @@ impl<'a> Parser<'a> {
                 o.each |= each;
                 o.sure &= !bare;
             }
+        }
+        self.price_end = Some((last, at + used));
+    }
+
+    /// A second, different price right after the first, with nothing but a separator, "to" or
+    /// "now" between ("4k - 5k", "6k now 5k", "A / B 5k / 6k"): which one holds is a guess, so the
+    /// offer is listed, not counted. Any other word between leaves the offer as it was: that price
+    /// belongs to something else, often an item no page names ("A 5k, some other thing 6k"). So
+    /// does a second price that says what it is for ("2500pp, 2000pp for multiples", 24 offers on
+    /// the owner's log, 2026-11-19): the first is the price of one. `at..end` is the second price.
+    fn second_price(&mut self, last: usize, pp: f64, at: usize, end: usize) {
+        let right_after = self.price_end.is_some_and(|(k, first_end)| {
+            k == last
+                && first_end <= at
+                && self.t[first_end..at].iter().all(|x| {
+                    SEPARATORS.contains(&x.raw.as_str()) || matches!(x.n.as_str(), "to" | "now")
+                })
+        });
+        let conditional = self
+            .t
+            .get(end)
+            .is_some_and(|x| matches!(x.n.as_str(), "for" | "if"));
+        if right_after && !conditional && self.out[last].price_pp != Some(pp) {
+            self.out[last].sure = false;
         }
     }
 
@@ -480,10 +520,13 @@ fn parse_tokens(t: Vec<Tok>, ix: &ItemIndex) -> Vec<Offer> {
         starts: Vec::new(),
         dir: None,
         lead_price: None,
+        lead_once: false,
+        lead_bare: false,
         pending_qty: None,
         last: None,
         fresh: true,
         priced_here: false,
+        price_end: None,
     };
     let mut i = 0;
     while i < p.t.len() {

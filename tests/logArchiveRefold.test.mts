@@ -15,7 +15,7 @@ import { join } from 'node:path'
 import { gzipSync } from 'node:zlib'
 import { liveLogName, refoldSegment, stageSegmentLog, type RefoldResult } from '../src/main/logArchive/refold'
 import { lacksLearned, refreshSegment, sweepRefreshLeftovers } from '../src/main/logArchive/refresh'
-import { listSegments, segmentPath, writeSegment } from '../src/main/logArchive/segmentStore'
+import { listSegments, resolveArchivePath, segmentPath, writeSegment } from '../src/main/logArchive/segmentStore'
 import { compareModules, keepIdentity, stateDifference } from '../src/shared/logArchive/refoldCompare'
 import { SEGMENT_VERSION, type Segment } from '../src/shared/logArchive/segment'
 
@@ -214,6 +214,48 @@ test('refresh: this version may refresh its own segment when the segment lacks a
   const { dir, segment } = olderSegment()
   const r = await refreshSegment(dir, segment.id, { refold: refoldGiving(REFOLDED), producedBy: () => segment.producedBy })
   assert.equal(r.ok, true)
+})
+
+// The record stores the full path the archive was written to, and the archive folder sits in the
+// game's Logs folder. After EverQuest is moved or reinstalled elsewhere the stored path is stale,
+// while the archive is right there in the folder the record was listed from.
+
+test('archive path: the stored one while it exists, else the same file name in the archive folder', () => {
+  const { root, archive } = archiveFixture()
+  const name = 'eqlog_Primitive_freeport_2026-08-02_to_2026-08-02.log.gz'
+  assert.equal(resolveArchivePath(join(root, 'elsewhere'), segmentWith(archive)), archive)
+  assert.equal(resolveArchivePath(root, segmentWith(join(root, 'old', name))), archive)
+  assert.equal(resolveArchivePath(root, segmentWith(`D:\\Old\\EverQuest\\Logs\\companion-archive\\${name}`)), archive, 'a Windows path')
+  assert.equal(resolveArchivePath(root, segmentWith(join(root, 'old', 'gone.log.gz'))), null)
+  assert.equal(resolveArchivePath(root, segmentWith(`${join(root, 'old')}/`)), null, 'no file name')
+  assert.equal(resolveArchivePath(root, segmentWith(null)), null)
+})
+
+test('refresh: after the game folder moved, the archive is found by name and the record corrected', async () => {
+  const { root, archive } = archiveFixture()
+  const moved = segmentWith(join(root, 'old-install', 'Logs', 'companion-archive', 'eqlog_Primitive_freeport_2026-08-02_to_2026-08-02.log.gz'), {
+    producedBy: { app: '0.9.0', engine: '0.9.0' }
+  })
+  writeSegment(root, moved)
+  // The real staging, so the path the refold is handed must be one that opens.
+  const refold = async (s: Segment): Promise<RefoldResult> => {
+    const staged = await stageSegmentLog(s, join(root, 'stage'), null)
+    if ('reason' in staged) return { ok: false, reason: staged.reason }
+    return { ok: true, fold: { modules: {}, foldMs: 1, events: 2 }, stageMs: 1, tables: 0 }
+  }
+  const r = await refreshSegment(root, moved.id, { refold, producedBy: () => NOW })
+  assert.ok(r.ok, r.ok ? '' : r.reason)
+  const back = listSegments(root).segments[0]
+  assert.equal(back.archivePath, archive)
+  assert.deepEqual(back.producedBy, NOW)
+})
+
+test('refresh: an archive in neither place says which folder it looked in', async () => {
+  const { root } = archiveFixture()
+  const gone = segmentWith(join(root, 'old', 'gone.log.gz'))
+  writeSegment(root, gone)
+  const r = await refreshSegment(root, gone.id, { refold: refoldGiving(REFOLDED), producedBy: () => NOW })
+  assert.deepEqual(r, { ok: false, reason: `its archive is missing from ${root}` })
 })
 
 test('refresh: a refold that fails or loses a module leaves the segment as it was', async () => {

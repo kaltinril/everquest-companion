@@ -184,6 +184,9 @@ impl EqModule for AlertsModule {
                 // A warning spoken by the heartbeat writes history with no line behind it. One the
                 // def no longer wants, or a cooldown swallows, writes nothing and says nothing.
                 self.announce.changed(self.seq);
+            } else if let Some(key) = &due.break_key {
+                // Nothing sounded, so the break is not spent: the wear-off line fires as usual.
+                self.early.release_break(key);
             }
         }
     }
@@ -389,6 +392,63 @@ mod tests {
             "Your Shiftless Deeds spell has worn off of King Tranix."
         );
         assert_eq!(fires[0].at, 61_000, "a real line is stamped by the LOG");
+    }
+
+    /// A warning the cooldown swallowed made no sound, so it must not spend the break. An AE mez
+    /// lands on two mobs: both warnings come due on one beat, the first speaks and the second falls
+    /// inside the 3 s cooldown. The second mob breaking later is still announced.
+    #[test]
+    fn a_warning_the_cooldown_swallowed_leaves_the_break_to_fire() {
+        // `group:cc:broke` from `src/shared/alertGroups.ts`, with a 10 s offset.
+        let def = json!({
+            "id": "group:cc:broke",
+            "name": "Mez / root broke",
+            "enabled": true,
+            "cooldownMs": 3000,
+            "earlyWarnSec": 10,
+            "sound": { "packId": "classic", "soundId": "ding" },
+            "trigger": { "type": "event", "kind": "cc", "where": { "refresh": "true" } }
+        });
+        let mez = |mob: &str| BuffTimerRow {
+            id: format!("cc|{mob}|mesmerization"),
+            name: "Mesmerization".to_owned(),
+            target: Some(mob.to_owned()),
+            target_key: Some(mob.to_owned()),
+            ..slow_row(1_000, Some(24_000))
+        };
+        let mut m = AlertsModule::new();
+        m.define(&json!([def]));
+        let rows = [mez("a rat"), mez("a bat")];
+        m.on_tick(2_000, &rows);
+        assert!(m.take_fires().is_empty());
+
+        m.on_tick(15_000, &rows);
+        let fires = m.take_fires();
+        assert_eq!(fires.len(), 1, "one cooldown window, one warning");
+        assert_eq!(fires[0].message, "Mesmerization on a rat is about to end");
+
+        // The bat breaks 4 s later, past the cooldown. Nothing was said about it, so it sounds.
+        m.on_event(
+            &ev(
+                r#"{"kind":"cc","seq":7,"ts":19000,"raw":"Your Mesmerization spell has worn off of a bat.","mob":"a bat","spell":"Mesmerization","refresh":true}"#,
+            ),
+            true,
+        );
+        let fires = m.take_fires();
+        assert_eq!(fires.len(), 1, "a swallowed warning spends no break");
+        assert_eq!(
+            fires[0].message,
+            "Your Mesmerization spell has worn off of a bat."
+        );
+
+        // The rat WAS warned about, so its own break stays swallowed. One landing, one firing.
+        m.on_event(
+            &ev(
+                r#"{"kind":"cc","seq":8,"ts":25000,"raw":"Your Mesmerization spell has worn off of a rat.","mob":"a rat","spell":"Mesmerization","refresh":true}"#,
+            ),
+            true,
+        );
+        assert!(m.take_fires().is_empty());
     }
 
     /// The same def without an offset is untouched: a heartbeat arms nothing and the wear-off line

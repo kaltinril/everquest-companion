@@ -300,7 +300,7 @@ export default function GapsView(): JSX.Element {
       {domain === 'quest' && <UnsortedLine />}
       {domain === 'item' && <CaptureBar rows={itemNames} />}
       <ShownLine counts={{ visible: visible.length, held, served, hidden, uncertain: sure.hidden }} domain={domain} zone={zone} mine={mineWords(mine.pick, mine.active, allChars.on) + GAP_SHOW_WORDS[job.show]} tail={allChars.caption} />
-      {allChars.on && <CharactersLine live={allChars.liveLabel} others={allChars.others} />}
+      {allChars.on && <CharactersLine live={allChars.liveLabel} others={allChars.others} failed={allChars.failed} />}
       <GapsTable
         entries={group.entries}
         verdicts={verdicts}

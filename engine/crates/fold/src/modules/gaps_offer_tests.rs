@@ -82,7 +82,7 @@ fn a_merchants_row_carries_the_cons_of_its_name() {
     feed(&mut m, 3, line("Mindiinya N`Zar told you, 'That'll be 2 gold 9 copper per Cat's Eye Agate.'"));
     let served = m.snapshot()["state"]["rows"].clone();
     let row = |domain: &str| served.as_array().and_then(|r| r.iter().find(|r| r["domain"] == domain && r["name"] == "Mindiinya N`Zar")).cloned();
-    assert_eq!(row("merchant").map(|r| r["details"]["cons"].clone()), Some(json!({ "entries": [{ "name": "L50 ally", "n": 1 }], "distinct": 1 })));
+    assert_eq!(row("merchant").map(|r| r["details"]["cons"].clone()), Some(json!({ "entries": [{ "name": "L50 ally", "n": 1 }], "distinct": 1, "all": ["L50 ally"] })));
     assert_eq!(row("mob"), None, "a merchant is not served under Mobs (owner, 2026-10-23)");
 }
 

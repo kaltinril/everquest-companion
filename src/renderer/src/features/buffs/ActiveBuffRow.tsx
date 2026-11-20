@@ -9,14 +9,15 @@ import { memo } from 'react'
 import { Box, Chip, LinearProgress, Paper, Stack, Typography } from '@mui/material'
 import type { ActiveBuff } from '@shared/types'
 import { rowRankLabel } from '@shared/buffTimers'
+import type { EstimateState } from './format'
 import {
   fmtDuration,
   remainingFraction,
-  isOverdue,
   classAccent,
   estimateChipLabel,
-  estimatePrefix,
-  estimatorSourceTitle
+  estimateState,
+  estimatorSourceTitle,
+  leftCaption
 } from './format'
 import { Tooltip } from '../../lib/Tooltip'
 // The rich spell card (JOS-293). The row states what this INSTANCE is doing (elapsed, estimate,
@@ -26,35 +27,6 @@ import { SpellTooltip } from '../../lib/SpellCard'
 // THE TRACKING BOX (JOS-168) — one per card, on the SELF group and on every entity group, because
 // a debuff you cast lives on the mob's card and it is the same box as the one on your own.
 import { BuffAllowCheck } from './BuffAllowCheck'
-
-/** Everything the countdown bar needs, resolved once so nothing downstream re-derives it. */
-interface EstimateState {
-  /** the estimated duration when we HAVE one (>0), else null — the whole bar hinges on it */
-  est: number | null
-  /** ± spread from the p25/p75 IQR around the estimate */
-  spread: number | null
-  overdue: boolean
-}
-
-/**
- * Overdue (Task #30 + #34): run past the estimated window → show "past estimate" instead
- * of a bottomed-out countdown. For mined estimates this needs n≥2 past p75; for a DB
- * (authoritative) estimate, being past the DB duration itself is enough (expiry is now
- * message-driven, so a DB buff sits "past estimate" until its wear-off line lands).
- */
-function estimateState(buff: ActiveBuff, elapsed: number): EstimateState {
-  const est = buff.estimatedMs != null && buff.estimatedMs > 0 ? buff.estimatedMs : null
-  const spread = buff.p25 != null && buff.p75 != null ? (buff.p75 - buff.p25) / 2 : null
-  // A DEATH BOUND JOINS THE DB ARM (JOS-379) and not the mined one: like a database figure it is a
-  // number no cast of yours was ever seen ENDING at, so being past it is a statement about the
-  // model waiting for a line rather than about a distribution. It is a FLOOR, so "past estimate" is
-  // the literal truth — the spell has outlasted everything the log can prove.
-  // A duration the player typed (fork issue #4) is stated the same way: no distribution behind it.
-  const stated = buff.durationSource === 'db' || buff.durationSource === 'deathBound' || buff.durationSource === 'manual'
-  const overdue =
-    isOverdue(elapsed, buff.p75, buff.n) || (stated && buff.estimatedMs != null && elapsed > buff.estimatedMs)
-  return { est, spread, overdue }
-}
 
 /**
  * A buff that never fades: a full, steady bar and an explicit label — no countdown.
@@ -115,8 +87,7 @@ function EstimateBar({
   // "log" chip — the number came from the log either way — but they say different things about the
   // database, so the tooltip says which, and a bound wears a `≥` on the figure itself.
   const source = buff.durationSource
-  const boundPrefix = estimatePrefix(source)
-  const left = `${boundPrefix === '' ? '~' : boundPrefix}${fmtDuration(remaining)} left`
+  const left = leftCaption(source, remaining)
   return (
     <>
       <LinearProgress

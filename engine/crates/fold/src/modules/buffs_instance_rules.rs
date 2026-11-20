@@ -120,6 +120,9 @@ pub const DEATH_BOUND_MAX_DB_MULTIPLE: i64 = 3;
 ///
 /// An offline gap refuses it too: the wear-off sentence only exists while you are logged in, so
 /// across an absence "no wear-off printed" stops being a claim about the world at all.
+///
+/// Rails 4 and 5 judge against the AUTOMATIC estimate. A player's duration choice decides what is
+/// drawn, never what a corpse teaches, or the bound would outlive switching back to Automatic.
 pub fn death_bound_span(
     o: &OpenCast,
     entity_key: &str,
@@ -136,7 +139,7 @@ pub fn death_bound_span(
         return None;
     }
     let span = death_ts - o.group.oldest_ts();
-    let estimate_ms = stats.estimate_for(&o.spell_key, &o.caster).ms?;
+    let estimate_ms = stats.automatic_estimate(&o.spell_key, &o.caster).ms?;
     if span <= 0 || span <= estimate_ms {
         return None;
     }

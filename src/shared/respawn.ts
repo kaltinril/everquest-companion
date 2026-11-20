@@ -397,7 +397,12 @@ export const RESPAWN_SHAPE_VERSION = 4
  */
 export const RESPAWN_LINGER_MS = 30 * 60 * 1000
 
-/** Most rows the module will publish. Bounded because a dungeon prints a lot of death lines. */
+/**
+ * Most rows the module will publish for zones other than the one you stand in. Bounded because a
+ * dungeon prints a lot of death lines. The zone you stand in publishes every clock, each tier and
+ * instance of it (`respawn.rs collect`, `mergeRespawn.ts capRows`): the overlay reads a missing row
+ * there as "none killed here yet".
+ */
 export const RESPAWN_MAX_ROWS = 60
 
 /** Most recently-killed mobs offered as watch candidates in the view. */
@@ -735,7 +740,7 @@ export interface RespawnLearned {
 }
 
 /**
- * The delta is a WHOLE snapshot. Rows are bounded at RESPAWN_MAX_ROWS and change on nearly every
+ * The delta is a WHOLE snapshot. Rows are bounded (RESPAWN_MAX_ROWS) and change on nearly every
  * death anyway, so a per-row merge would buy nothing and cost a second definition of the state.
  */
 export type RespawnDelta = RespawnSnap
@@ -1352,11 +1357,12 @@ export function formatRespawnDuration(sec: number): string {
  * retired seconds box's limits and nothing else).
  *
  * The range is spelled from the constants rather than written out, so a change to either bound
- * cannot leave the sentence lying.
+ * cannot leave the sentence lying. It says nothing of an empty field: Save refuses one, and the way
+ * back to the calculated value is the modal's own button.
  */
 export const RESPAWN_INPUT_HELP = `Plain seconds, or 44m / 44m 30s / 1h 10m. ${String(
   RESPAWN_CUSTOM_MIN_SEC
-)}s to ${String(RESPAWN_CUSTOM_MAX_SEC / 86400)}d. Empty uses the calculated value.`
+)}s to ${String(RESPAWN_CUSTOM_MAX_SEC / 86400)}d.`
 
 /** What the modal says when the grammar refused what was typed. One spelling, pinned by test. */
 export const RESPAWN_INPUT_UNREADABLE = 'Not a duration. Try 2640, 44m, or 44m 30s.'

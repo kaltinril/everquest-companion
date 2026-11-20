@@ -27,6 +27,8 @@ import {
   sanitizeTurnInInstants,
   takeBackTurnIn,
   turnInsToPersist,
+  undoRejectsDetection,
+  undoRejections,
   withoutRejected
 } from '../src/shared/questTurnIns'
 import { questKey } from '../src/renderer/src/features/posky/keys'
@@ -113,6 +115,37 @@ test('THE UNDO STATEMENT: a hand-recorded instant is dropped, a log-detected one
   assert.deepEqual(takeBackTurnIn([1000, 2000], [2000], []), { instants: [1000], rejected: [2000] })
   assert.deepEqual(takeBackTurnIn([1000], [1000], [500]), { instants: [], rejected: [500, 1000] }, 'earlier rejections kept')
   assert.deepEqual(takeBackTurnIn([], [], []), { instants: [] }, 'nothing left: the legacy floor clears')
+})
+
+// WHAT THE UNDO HOVER MAY SAY. The hover used to compare counts (`turnIns <= logTurnIns`), which
+// said "recorded by hand" for a '+' on Monday followed by a log turn-in on Tuesday, while the click
+// rejected Tuesday's log turn-in for good. The hover now asks the statement's own question.
+
+const MON = 1_000
+const TUE = 2_000
+const WED = 3_000
+
+test('the undo rejects a log turn-in exactly when the NEWEST instant is one the log shows', () => {
+  assert.equal(undoRejectsDetection([MON, TUE], [TUE]), true, 'hand on Monday, log on Tuesday')
+  assert.equal(undoRejectsDetection([TUE, WED], [TUE]), false, 'log on Tuesday, hand on Wednesday')
+  assert.equal(undoRejectsDetection([TUE], []), false, 'the log that showed it is gone')
+  assert.equal(undoRejectsDetection([], []), false, 'a legacy completion has no instant')
+})
+
+test('…and it is the same answer the undo statement gives, over every small case', () => {
+  const lists = [[], [MON], [TUE], [MON, TUE], [MON, WED], [TUE, WED], [MON, TUE, WED]]
+  for (const instants of lists) {
+    for (const detected of lists) {
+      const rejects = takeBackTurnIn(instants, detected, []).rejected !== undefined
+      assert.equal(undoRejectsDetection(instants, detected), rejects, JSON.stringify({ instants, detected }))
+    }
+  }
+})
+
+test('per quest: the map the Sky tab reads to word the undo hover', () => {
+  // `a` is the case the count comparison got wrong: 2 turn-ins, 1 from the log, read as "by hand".
+  const map = undoRejections({ a: [MON, TUE], b: [TUE, WED], c: [MON] }, { a: [TUE], b: [TUE] })
+  assert.deepEqual(map, { a: true, b: false, c: false })
 })
 
 test('THE RESET STATEMENT: nothing turned in, every detection rejected, earlier rejections kept', () => {

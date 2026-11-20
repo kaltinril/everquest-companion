@@ -94,12 +94,13 @@ export function armVerdict(_defs: readonly AlertDef[]): ArmVerdict {
  *
  *   * NOTHING ANSWERS TO IT — a def deleted between the push and the fire. Null, and the caller
  *     says so. Playing "some alert" would be worse than the silence.
- *   * TWO THINGS ANSWER TO IT — nothing stops a user naming two alerts the same. The `sound` key
- *     (`<packId>/<soundId>`, the second fully-resolved field of the frame) narrows first, because
- *     it is a fact the ENGINE stated about the def it fired rather than a guess made here. If that
- *     still does not separate them the FIRST is taken: two defs answering to one name with one
- *     sound would make the same noise, so what is left to get wrong is a volume — and a sound at
- *     the wrong volume beats no sound at all.
+ *   * TWO THINGS ANSWER TO IT — nothing stops a user naming two alerts the same. A SWITCHED-OFF
+ *     def is dropped first: the engine never compiles one (`Rule::compile`), so a fire cannot be
+ *     its. The `sound` key (`<packId>/<soundId>`, the second fully-resolved field of the frame)
+ *     narrows next, because it is a fact the ENGINE stated about the def it fired rather than a
+ *     guess made here. If that still does not separate them the FIRST is taken, and that can be
+ *     the wrong twin: the phrase, the banner and the volume are all read off the resolved def.
+ *     Only an alert id on the frame closes that, and the frame carries none yet.
  *
  * MATCHING IS EXACT AND CASE-SENSITIVE. The label round-tripped through the engine verbatim (the
  * define pushes the store's own object and the fold republishes it), so any folding here would be
@@ -130,7 +131,7 @@ export function armVerdict(_defs: readonly AlertDef[]): ArmVerdict {
  * the three.
  */
 export function fireToFiring(fire: FireMessage, defs: readonly AlertDef[]): FiredAlert | null {
-  const named = defs.filter((d) => d.name === fire.rule)
+  const named = defs.filter((d) => d.enabled && d.name === fire.rule)
   if (named.length === 0) return null
   const narrowed =
     named.length === 1

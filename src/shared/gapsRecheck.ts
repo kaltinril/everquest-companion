@@ -14,6 +14,11 @@
 // lowered to match. Only an exact hit on the app's own lookup key drops a row: a name the data
 // still does not hold, or a domain this cannot check (spells, merchants, the derived ones, which
 // the renderer re-derives from today's catalog anyway), stays exactly as saved.
+//
+// A ROW ABOUT A PAGE THE WIKI HAS (a quest giver, a redirect, a zone-titled mob) is known by name
+// by design, so the name test is never asked of it: it has its own check (gapsRecheckPages.ts).
+
+import { aboutKnownPage, knownPageRowNow, type PagesNow } from './gapsRecheckPages'
 
 /** Whether today's committed data knows `name` in `domain`. */
 export type KnownNow = (domain: 'item' | 'mob', name: string) => boolean
@@ -27,21 +32,31 @@ function isRecheckable(domain: unknown): domain is 'item' | 'mob' {
   return domain === 'item' || domain === 'mob'
 }
 
+/** The saved row as today's data still has it, or null when today's data closes it. */
+function rowNow(r: SavedRow, known: KnownNow, pages: PagesNow): SavedRow | null {
+  if (!isRecheckable(r.domain) || typeof r.name !== 'string') return r
+  if (aboutKnownPage(r)) return knownPageRowNow(r, pages)
+  return known(r.domain, r.name) ? null : r
+}
+
 /**
  * The saved `gaps` snapshot less the rows today's data now knows, totals lowered by what went.
  * Anything that is not the snapshot's shape is handed back untouched: the join reads it as it did.
  */
-export function withoutNowKnown(gaps: unknown, known: KnownNow): unknown {
+export function withoutNowKnown(gaps: unknown, known: KnownNow, pages: PagesNow): unknown {
   if (typeof gaps !== 'object' || gaps === null) return gaps
   const snap = gaps as { rows?: unknown; totals?: unknown }
   if (!Array.isArray(snap.rows)) return gaps
   const dropped: Record<string, number> = {}
-  const rows = (snap.rows as SavedRow[]).filter((r) => {
-    if (!isRecheckable(r.domain) || typeof r.name !== 'string' || !known(r.domain, r.name)) return true
-    dropped[r.domain] = (dropped[r.domain] ?? 0) + 1
-    return false
-  })
-  if (rows.length === snap.rows.length) return gaps
+  const rows: SavedRow[] = []
+  let same = true
+  for (const r of snap.rows as SavedRow[]) {
+    const now = rowNow(r, known, pages)
+    same &&= now === r
+    if (now !== null) rows.push(now)
+    else if (typeof r.domain === 'string') dropped[r.domain] = (dropped[r.domain] ?? 0) + 1
+  }
+  if (same) return gaps
   return { ...snap, rows, totals: lowered(snap.totals, dropped) }
 }
 
