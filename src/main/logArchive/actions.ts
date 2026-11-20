@@ -35,7 +35,7 @@ import { pushAppKnowledge } from '../dataServer/definePush'
 import { pushWorldChanged } from '../dataServer/serveDeltas'
 import type { RespawnRow } from '../../shared/respawn'
 import { lacksLearned, refreshSegment, sweepRefreshLeftovers } from './refresh'
-import { readJournal, recoverRotation, restoreLog, rotateLog, type RotateDeps } from './rotate'
+import { putBackLeftovers, readJournal, recoverRotation, restoreLog, rotateLog, type RotateDeps } from './rotate'
 import { listSegments, writeSegment } from './segmentStore'
 
 let busy: string | null = null
@@ -271,7 +271,8 @@ function fillOn(base: LogArchiveStatus, dir: string, a: { character: string; log
     logBytes: base.live?.bytes ?? 0,
     interrupted: readJournal(dir) !== null,
     busy: busy !== null,
-    archivedThisRun
+    archivedThisRun,
+    putBackUnfinished: base.newestSealedId !== null && putBackLeftovers(dir).some((f) => f.startsWith(`${base.newestSealedId}.`))
   })
   return base
 }
@@ -426,6 +427,8 @@ export async function recoverLogArchiveAtLaunch(note: (line: string) => void): P
     sweepRefreshLeftovers(dir)
     const done = await recoverRotation(dir, rotateDeps)
     if (done !== null) note(`log archive: ${done}`)
+    // Never swept: they hold log lines until the same archive's Put back joins them.
+    for (const f of putBackLeftovers(dir)) note(`log archive: a put back did not finish; ${join(dir, f)} holds log lines and is kept`)
     // Step 5.2, after any interrupted archive is sealed and before the engine is told where its files are.
     placeArchivedBuckets({
       on: logArchiveOn,

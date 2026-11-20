@@ -26,6 +26,9 @@ export interface PreflightInput {
   /** The log was already archived since the app started. The engine still holds the archived
    *  lines until the next launch, so a second capture would count them twice. */
   archivedThisRun?: boolean
+  /** A put back of the newest archive stopped part-way. Its scratch files hold the lines since,
+   *  and only that archive's Put back joins them (rotate.ts restoreLog), so it must stay newest. */
+  putBackUnfinished?: boolean
 }
 
 export function rotateBlockers(p: PreflightInput): string[] {
@@ -38,6 +41,7 @@ export function rotateBlockers(p: PreflightInput): string[] {
   if (p.interrupted) out.push('An earlier archive was interrupted. Restart the app to finish it first.')
   if (p.busy) out.push('Another log archive action is running.')
   if (p.archivedThisRun === true) out.push('Your log was already archived since the app started. It can be archived again after a restart.')
+  if (p.putBackUnfinished === true) out.push('A put back did not finish. Press Put back on the newest archive to finish it first.')
   return out
 }
 

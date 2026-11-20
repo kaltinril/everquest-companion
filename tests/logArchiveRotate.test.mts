@@ -386,6 +386,8 @@ test('restore: an archive that does not unpack to its recorded bytes is refused'
   assert.equal(readFileSync(f.logPath).length, 0, 'the live log is left alone')
 })
 
+// A put back that stops part-way, and the try after it: logArchivePutBack.test.mts.
+
 // ── preflight ───────────────────────────────────────────────────────────────────────────────────
 
 test('preflight: every reason is stated, and none when all is well', () => {
