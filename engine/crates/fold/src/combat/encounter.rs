@@ -97,7 +97,8 @@ pub struct ZoneSession {
     pub zone: String,
     pub agg: Agg,
     pub closed_by: ZoneSessionClose,
-    /// First/last attributed-damage ts. 0 means the session saw none — and those are dropped.
+    /// First/last attributed-damage ts. 0 means the session saw none: it was kept for a fall or a
+    /// miss of yours alone (`Agg::nothing_of_ours` drops the rest).
     pub start_ts: i64,
     pub last_ts: i64,
     /// Sum of finalized-encounter wall durations (ms) — the DPS denominator.

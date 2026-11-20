@@ -149,7 +149,7 @@ fn hostile_presence(st: &EngineState, enc: &Encounter, now: i64) -> (usize, bool
 }
 
 /// Evaluate deferred closure of the current encounter as of `now`. Encounters can close purely from
-/// time passing, so this runs at the top of each damage/CC ingest AND (live only) from the snapshot.
+/// time passing, so this runs at the top of every ingested event AND (live only) from the snapshot.
 /// Finalization always stamps the encounter's own `last_ts` — a damage timestamp — never `now`, so
 /// startTs/lastTs/duration reflect the real fight rather than the eval moment.
 ///
