@@ -1823,6 +1823,30 @@ only: no engine, parser, protocol, network or dependency change.
   - Factions turn-ins: blocked on quest reward data. Maps merchant waypoints: blocked on
     merchant data (the guides, or the log's purchases).
 
+## Tradeskill guides as data (fork #6, requirements/skills-tab.md)
+
+- Two community guides are pulled at release time by `scripts/community/guides-pull.mts` and
+  committed as `src/main/data/tradeskillGuides.json` (types `src/shared/guideData.ts`). Procedure,
+  rules and thresholds: DATA_REFRESH.md, "The two tradeskill guides". The app never fetches them.
+- Not wired into any screen. A screen that shows this data shows the guide's `title`, `author` and
+  `sourceUrl` with it (owner, 2026-11-20: the app credits and links both).
+- `leveling.tradeskills.<Tradeskill>`: `steps` and `alternates` (`from`, `to`, `item`, `materials`
+  nested per sub-combine), `notes`, and `asides` (side tables as written). `recipes.tradeskills.
+  <Tradeskill>.recipes`: `trivial`, `item`, `materials` with `merchant` + `zone` + `loc` only when
+  the guide gives coordinates, else `sourceText`. Keys are `tradeskillOf` spellings.
+- Names are the guides' own, loose spellings (`Gold jade`, `HQ cat pelt`, `Fresh Fresh`): join to
+  `items.json` by a fold and expect misses; the pull lists them.
+- `returned: true` is a tool the combine gives back (the sheet writes `(returned)`, the recipe book
+  `(Reusable)`).
+- Trap: the leveling guide's ranges overlap and skip (`179 - 196` then `192 - 202`); a recipe-book
+  recipe may have no `trivial` (an item made inside another recipe's block) or a `tradeskill` other
+  than its tab's. A step's upper bound may be text (`range: "189 - see side"`, no `to`).
+- Trap: a remark sits at most 3 columns right of its name, a side table at least 4 (measured on the
+  2026-11-20 sheet; `NOTE_REACH` in `guides/sheetGuide.ts`). A sheet that narrows that gap turns a
+  side-table cell into a `note`: read the data diff after a pull.
+- The data file is never edited by hand: `guides-pull.mts --offline` rewrites it from the last good
+  copy, and `tests/guidesPull.test.mts` compares the two.
+
 ## Bug hunt 2026-11-19: the rules its fixes left in force
 
 From the multi-model hunt of that day (`audits/2026-11-19-bug-hunt.md`). One block per feature area:

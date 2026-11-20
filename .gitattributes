@@ -13,3 +13,10 @@
 # change (they were already LF); only the checkout does.
 scripts/sources/cache/** text eol=lf
 src/main/data/spells.json text eol=lf
+
+# The two community tradeskill guides (scripts/community/guides-pull.mts). The last good pull is kept
+# as the bytes Google sent (CRLF CSV, a zipped .ods) with a sha256 per file in its manifest, and the
+# test fixtures are a copy of one pull: no line-ending conversion, or the hashes stop matching.
+scripts/sources/cache/guides/** -text
+tests/fixtures/guides/** -text
+src/main/data/tradeskillGuides.json text eol=lf
