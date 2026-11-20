@@ -222,7 +222,8 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
 
 ## Settings recovery notice
 
-- CONFIRMED [medium, overlap] The card sits 24 px from the top, not the 56 the component asks for,
+- FIXED 2026-11-19 (the offset is said per breakpoint; measured by
+  `tests/e2e/settings-recovery-notice.e2e.mts`) [medium, overlap] The card sits 24 px from the top, not the 56 the component asks for,
   so it is drawn over the bottom 16 px of the title bar Seen: Computed top of
   [data-testid="settings-recovery-notice"] is 24px. Two rules match its class .css-1pbq11k: `top:
   56px` with no media, and `top: 24px` inside `@media (min-width: 600px)`; the media rule wins at

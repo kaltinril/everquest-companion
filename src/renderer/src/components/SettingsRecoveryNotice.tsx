@@ -29,7 +29,10 @@ export default function SettingsRecoveryNotice(): JSX.Element | null {
     <Snackbar
       open
       anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      sx={{ top: 56 }}
+      // 56 = the 40 px title bar (TitleBar BAR_HEIGHT) plus a 16 px gap. Said per breakpoint because
+      // MUI's own top-anchored rule is `top: 24` inside a min-width media query: a bare `top: 56`
+      // lost to it at every window size and the card covered the title bar's bottom 16 px.
+      sx={{ top: { xs: 56, sm: 56 } }}
       data-testid="settings-recovery-notice"
     >
       <Alert
