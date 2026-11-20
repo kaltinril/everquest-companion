@@ -32,7 +32,8 @@ export function parseTabList(html: string, what = 'the tab list page'): SheetTab
   for (const m of html.matchAll(ENTRY)) tabs.push({ name: unescapeJs(m[1]).trim(), gid: m[2] })
   if (tabs.length === 0) throw new PullRefusal('response', `${what}: no tab entry found (not the published sheet's page, or its layout changed)`)
   if (tabs.length > MAX_TABS) throw new PullRefusal('response', `${what}: ${String(tabs.length)} tabs listed, over the limit of ${String(MAX_TABS)}`)
-  const names = new Set(tabs.map((t) => t.name))
+  // Two names that fold to one file name would overwrite each other in the last good copy.
+  const names = new Set(tabs.map((t) => slugOf(t.name).toLowerCase()))
   if (names.size !== tabs.length) throw new PullRefusal('layout', `${what}: two tabs share one name`)
   return tabs
 }

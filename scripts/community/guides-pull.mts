@@ -117,7 +117,7 @@ async function main(): Promise<void> {
     return
   }
   const now = new Date().toISOString()
-  console.log(`Guide pull ${now} from ${a.from ?? 'Google (13 requests, 1 s apart)'}`)
+  console.log(`Guide pull ${now} from ${a.from ?? 'Google (one request per tab and two more, 1 s apart)'}`)
   console.log(`Limits: a tab may lose ${String(MAX_ROW_LOSS * 100)}% of its rows and have ${String(MAX_ROW_CHANGE * 100)}% changed; totals may drop ${String(MAX_TOTAL_LOSS * 100)}%; a cell holds at most ${String(MAX_CELL_CHARS)} characters of plain text.`)
   const last = readSnapshot(snapshotDir)
   const r = await runPull({

@@ -23,6 +23,9 @@ test('what the guides honestly hold is plain text', () => {
     'throw together some of the spreadsheets I was working on for eveyrone to use =) Send me a HQ Lion skin',
     'Tinkering is still gnome only.  You must unlock the gnome race to learn it.',
     'skill < 50 & level > 14',
+    '=) thanks for reading',
+    '- see the blacksmithing tab',
+    'Claude Ironbelly',
     '# of noodles',
     'EC - Katha Firespinner @ 167.64, -368.50, Next to 3rd Inn'
   ]
@@ -45,7 +48,8 @@ test('each thing a cell may not be is named', () => {
     ['  =1+1', /a spreadsheet formula/],
     ['+cmd|x', /a spreadsheet formula/],
     ['-SUM(1)', /a spreadsheet formula/],
-    ['@now', /a spreadsheet formula/],
+    ['@SUM(A1:A9)', /a spreadsheet formula/],
+    ['=P1', /a spreadsheet formula/],
     [`a${String.fromCharCode(0)}b`, /a control or invisible character/],
     ['two\nlines', /a control or invisible character/],
     ['tab\there', /a control or invisible character/],

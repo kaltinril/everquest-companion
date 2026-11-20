@@ -56,10 +56,13 @@ function mapChars(text: string, f: (ch: string, hidden: boolean) => string): str
 const hasHidden = (text: string): boolean => mapChars(text, (_, hidden) => (hidden ? '!' : '')) !== ''
 const URL = /http|www\.|:\/\/|\b[a-z0-9-]+\.(?:com|net|org|gg|io)\b/i
 const MARKUP = /<\/?[a-z!?][^>]*>|&(?:#\d+|#x[0-9a-f]+|[a-z]{2,8});|\[\[|\]\]|\{\{|\}\}|\]\(/i
-/** A leading `=` always; a leading `+`, `-` or `@` unless a number follows (a loc reads `-176, 207, 17`). */
-const FORMULA = /^\s*(?:=|[+\-@](?!\s*[\d.]))/
-/** Text of the shape RULES.md rule 6 names: addressed to an agent, not to a player. */
-const TO_AN_AGENT = /\b(?:ignore|disregard|forget)\s+(?:all\s+|any\s+|the\s+)?(?:previous|prior|above|earlier)\b|\bsystem\s+prompt\b|\b(?:note|message|instructions?)\s+(?:to|for)\s+(?:the\s+)?(?:assistant|ai|agent|model|llm)\b|\bas\s+an\s+ai\b|\b(?:chatgpt|claude|copilot|gemini|llm)\b/i
+/**
+ * A leading `=` (a smiley `=)` is no formula), or a leading `+`, `-` or `@` before a function call
+ * or a DDE pipe. A loc reads `-176, 207, 17` and a remark may read `- see below`: both are text.
+ */
+const FORMULA = /^\s*(?:=(?!\))|[+\-@]\s*(?:[a-z_][\w.]*\s*\(|\w+\|))/i
+/** Text of the shape RULES.md rule 6 names: addressed to an agent, not to a player. No bare names: an NPC may carry one. */
+const TO_AN_AGENT = /\b(?:ignore|disregard|forget)\s+(?:all\s+|any\s+|the\s+)?(?:previous|prior|above|earlier)\b|\bsystem\s+prompt\b|\b(?:note|message|instructions?)\s+(?:to|for)\s+(?:the\s+)?(?:assistant|ai|agent|model|llm)\b|\bas\s+an\s+ai\b/i
 
 /** What is wrong with one cell's text, in the order checked; undefined when it is short plain text. */
 export function cellFault(text: string): string | undefined {

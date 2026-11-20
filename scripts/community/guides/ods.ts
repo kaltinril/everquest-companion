@@ -212,6 +212,8 @@ export function parseOdsContent(xml: string): OdsBook {
       if (selfClosing === '/') closeTag(w, name)
     }
   }
+  const long = w.book.tables.find((t) => t.rows.length >= MAX_ROWS_PER_TABLE)
+  if (long !== undefined) throw new PullRefusal('response', `table "${long.name}": ${String(MAX_ROWS_PER_TABLE)} rows or more, not the recipe book we know`)
   return w.book
 }
 
