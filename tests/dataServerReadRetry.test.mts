@@ -15,6 +15,7 @@ import {
   afterLiveEnded,
   manualTry,
   onProbeChange,
+  plainRetrySent,
   probeSeen,
   recentAfterLiveEnds,
   stoppedLine,
@@ -114,6 +115,19 @@ test('LIVE, ENDED, RE-READ, LIVE, ENDED INSIDE 30 MINUTES: the second end is not
     assert.equal(next.verdict, 'stop', `end ${String(i + 2)}`)
     counts = next.counts
   }
+})
+
+test('THE RE-READ AFTER LIVE USES UP THE PLAIN RETRY: an end before live then stops', () => {
+  // Going live had just cleared the count, so without this the same line was read a third time.
+  const live = wentLive({ autoTries: 1, fileBackTries: 2, ends: 2, afterLiveEnds: [] })
+  assert.deepEqual(afterEnded({ ...live, probe: 'clean' }), { do: 'retryIn', ms: ENDED_RETRY_MS })
+  const reread = plainRetrySent(live)
+  assert.equal(reread.autoTries, 1)
+  assert.deepEqual(afterEnded({ ...reread, probe: 'clean' }), { do: 'stop' })
+  // A file that is gone is another fact: it is still watched.
+  assert.deepEqual(afterEnded({ ...reread, probe: 'missing' }), { do: 'watchFile' })
+  // A re-read that lands gives the retry back.
+  assert.deepEqual(afterEnded({ ...wentLive(reread), probe: 'clean' }), { do: 'retryIn', ms: ENDED_RETRY_MS })
 })
 
 test('the same two ends 31 minutes apart are both re-read', () => {

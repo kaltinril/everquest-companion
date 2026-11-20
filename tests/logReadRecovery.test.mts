@@ -382,7 +382,8 @@ test('A PERSON PRESSING TRY AGAIN CLEARS EVERY COUNT, the after-live window incl
   r.edge('endedAfterLive')
   r.advance(ENDED_RETRY_MS)
   assert.equal(r.reattaches, 2)
-  // And the plain retry is whole again as well.
+  // The re-read lands. And the plain retry is whole again as well.
+  r.edge('live')
   r.known(LOG, 'clean')
   r.edge('ended')
   r.advance(ENDED_RETRY_MS)
@@ -394,6 +395,56 @@ test('A PERSON PRESSING TRY AGAIN CLEARS EVERY COUNT, the after-live window incl
   r.edge('ended')
   r.advance(ENDED_RETRY_MS)
   assert.equal(r.reattaches, 4)
+})
+
+test('THE RE-READ AFTER LIVE IS THE ONE RETRY: when it ends before live, the log is not read a third time', () => {
+  const r = rig()
+  r.edge('live')
+  // The reader dies on a line the game wrote after live. The re-read reaches that line and dies there.
+  r.edge('endedAfterLive')
+  r.advance(ENDED_RETRY_MS)
+  assert.equal(r.reattaches, 1)
+  r.known(LOG, 'clean')
+  r.edge('ended')
+  assert.deepEqual(r.stopped, ['stopped twice; not trying again by itself'])
+  r.advance(10 * MIN)
+  assert.equal(r.reattaches, 1, 'one whole re-read after live, not two')
+  assert.equal(r.pending(), 0)
+})
+
+test('a re-read after live that lands gives the plain retry back', () => {
+  const r = rig()
+  r.edge('live')
+  r.edge('endedAfterLive')
+  r.advance(ENDED_RETRY_MS)
+  r.edge('live')
+  r.advance(AFTER_LIVE_WINDOW_MS + MIN)
+  r.known(LOG, 'clean')
+  r.edge('ended')
+  r.advance(ENDED_RETRY_MS)
+  assert.equal(r.reattaches, 2)
+  assert.deepEqual(r.stopped, [])
+})
+
+test('the end after live is counted, so the stopped line says how often the read really stopped', () => {
+  const r = rig()
+  r.edge('live')
+  r.edge('endedAfterLive')
+  r.advance(ENDED_RETRY_MS)
+  // The re-read ends on a file that is gone: the file watch is still whole.
+  r.advance(10_000)
+  r.edge('ended')
+  r.answer(LOG, 'missing')
+  assert.equal(r.recovery.watching(), true)
+  r.advance(FILE_WATCH_MS)
+  r.answer(LOG, 'clean')
+  assert.equal(r.reattaches, 2)
+  r.advance(10_000)
+  r.edge('ended')
+  r.answer(LOG, 'clean')
+  assert.deepEqual(r.stopped, ['stopped 3 times; not trying again by itself'])
+  assert.equal(r.reattaches, 2)
+  assert.equal(r.pending(), 0)
 })
 
 test('a new turn inside the beat cancels the after-live re-read too', () => {

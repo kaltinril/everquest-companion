@@ -29,6 +29,7 @@ import {
   afterLiveEnded,
   manualTry,
   onProbeChange,
+  plainRetrySent,
   probeSeen,
   recentAfterLiveEnds,
   stoppedLine,
@@ -140,7 +141,7 @@ export function createLogReadRecovery(deps: LogReadRecoveryDeps): LogReadRecover
     }
     disarm()
     if (next.do === 'stop') stop(stoppedLine(c.ends))
-    else retryIn(log, next.ms, (now) => ({ ...now, autoTries: now.autoTries + 1 }))
+    else retryIn(log, next.ms, plainRetrySent)
   }
 
   const ended = (log: string): void => {
@@ -156,10 +157,11 @@ export function createLogReadRecovery(deps: LogReadRecoveryDeps): LogReadRecover
     const c = of(log)
     const now = deps.now()
     const verdict = afterLiveEnded(c.afterLiveEnds, now)
-    counts.set(log, { ...c, afterLiveEnds: [...recentAfterLiveEnds(c.afterLiveEnds, now), now] })
+    counts.set(log, { ...c, ends: c.ends + 1, afterLiveEnds: [...recentAfterLiveEnds(c.afterLiveEnds, now), now] })
     if (verdict === 'stop') stop(STOPPED_AFTER_LIVE_LINE)
     // A beat later, so the status has said the read stopped before it says it is reading again.
-    else retryIn(log, ENDED_RETRY_MS, (same) => same)
+    // It uses up the plain retry: a re-read that ends before live must not be read a third time.
+    else retryIn(log, ENDED_RETRY_MS, plainRetrySent)
   }
 
   const probed = (): void => {

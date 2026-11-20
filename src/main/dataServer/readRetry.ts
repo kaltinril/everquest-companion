@@ -10,7 +10,8 @@
 //   * ONE PLAIN RETRY. The read ended and main can open the log: once, `ENDED_RETRY_MS` later. A
 //     read that ends twice is not tried a third time.
 //   * AFTER LIVE. The engine stopped reading a log it had caught up on: once, and not again while
-//     an earlier such end lies inside `AFTER_LIVE_WINDOW_MS`.
+//     an earlier such end lies inside `AFTER_LIVE_WINDOW_MS`. That re-read IS the plain retry: if
+//     it ends before it goes live, the log is not read a third time.
 //
 // GOING LIVE CLEARS THE FIRST TWO COUNTS AND NEVER THE THIRD. A reader that dies on a line the
 // game writes after live goes live again on every re-read; if going live reset its window, it
@@ -44,7 +45,7 @@ export interface RetryCounts {
   readonly autoTries: number
   /** Re-attaches because the file became openable again. */
   readonly fileBackTries: number
-  /** How many times the read has ended since it last went live. */
+  /** How many times the read has ended since it last went live, the end after live included. */
   readonly ends: number
   /** When the engine stopped reading after live. Nothing clears these but time and a person. */
   readonly afterLiveEnds: readonly number[]
@@ -55,6 +56,11 @@ export const NO_RETRIES: RetryCounts = { autoTries: 0, fileBackTries: 0, ends: 0
 /** The read went live, or a new engine was launched: the after-live window is kept. */
 export function wentLive(counts: RetryCounts): RetryCounts {
   return { ...NO_RETRIES, afterLiveEnds: counts.afterLiveEnds }
+}
+
+/** A retry of a read that ended was sent. The re-read after live is one: it meets the same line. */
+export function plainRetrySent(counts: RetryCounts): RetryCounts {
+  return { ...counts, autoTries: counts.autoTries + 1 }
 }
 
 /** A person pressed Try again: a changed fact, so every count starts over. */
