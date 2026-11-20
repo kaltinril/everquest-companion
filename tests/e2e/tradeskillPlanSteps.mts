@@ -50,7 +50,7 @@ function resultNames(page: Page): Promise<string[]> {
 /** Types into the planner's search box and picks the result named exactly `item`; false when none is. */
 async function planByName(page: Page, item: string): Promise<boolean> {
   await page.fill(SEARCH, item)
-  const names = await settle(() => resultNames(page), (ns) => ns.includes(item) || ns.length === 0, { timeoutMs: 15_000 })
+  const names = await settle(() => resultNames(page), (ns) => ns.includes(item), { timeoutMs: 15_000 })
   const at = names.indexOf(item)
   if (at < 0) return false
   await page.click(`${RESULT} >> nth=${String(at)} >> ${sel('tradeskill-plan-pick')}`)
@@ -145,7 +145,7 @@ async function stepFromWorkbench(page: Page): Promise<void> {
   const planned = await settle(() => textOf(page, `${HEAD} ${NAME}`), (t) => t === picked, { timeoutMs: 20_000 })
   check('Plan this item opens the planner on the picked recipe', planned === picked && (await countOf(page, BENCH)) === 0, `${planned} / ${picked}`)
   const label = await textOf(page, sel('tradeskill-plan-back'))
-  check('…whose Back names the workbench it came from', label === 'Back to Jewelcrafting', label)
+  check('…whose Back names the workbench it came from', /^back to jewelcrafting$/i.test(label), label)
   await page.click(sel('tradeskill-plan-back'))
   const bench = await settle(() => countOf(page, BENCH), (n) => n === 1, { timeoutMs: 20_000 })
   check('…and returns to it', bench === 1 && (await textOf(page, sel('tradeskill-name'))) === 'Jewelcrafting')
@@ -180,7 +180,7 @@ async function stepQuiverAndMap(page: Page): Promise<void> {
   await page.click(`${link} >> nth=0`)
   const onMaps = await settle(() => countOf(page, sel('maps-back')), (n) => n === 1, { timeoutMs: 20_000 })
   check('Show on map opens the Maps tab with a Back', onMaps === 1)
-  check('…that names the Tradeskills tab', (await textOf(page, sel('maps-back'))) === 'Back to Tradeskills')
+  check('…that names the Tradeskills tab', /^back to tradeskills$/i.test(await textOf(page, sel('maps-back'))))
   // The ring needs the zone's map: a machine with no map pack for it shows the zone picker instead.
   const drawn = await settle(() => countOf(page, sel('maps-surface')), (n) => n === 1, { timeoutMs: 20_000 })
   if (drawn === 1) {

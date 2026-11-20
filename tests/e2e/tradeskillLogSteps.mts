@@ -37,9 +37,13 @@ const TAB = (id: string): string => sel(`tradeskill-tab-${id}`)
 function pickedNames(page: Page): Promise<{ item: string; materials: string[] }> {
   return page.evaluate(
     ([panel, material]) => {
-      const name = (el: Element | null): string => el?.querySelector('[data-testid="planner-donor-name"]')?.textContent ?? ''
+      // No named helper in here: the runner's bundler wraps one in `__name`, which the page lacks.
       const box = document.querySelector(panel)
-      return { item: name(box), materials: [...(box?.querySelectorAll(material) ?? [])].map(name).filter((n) => n !== '') }
+      const donor = '[data-testid="planner-donor-name"]'
+      return {
+        item: box?.querySelector(donor)?.textContent ?? '',
+        materials: [...(box?.querySelectorAll(material) ?? [])].map((el) => el.querySelector(donor)?.textContent ?? '').filter((n) => n !== '')
+      }
     },
     [PICKED, sel('tradeskill-material')] as const
   )
