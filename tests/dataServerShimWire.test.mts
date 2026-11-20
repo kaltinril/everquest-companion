@@ -17,6 +17,7 @@ import {
   createReadShim,
   SERVABLE,
   type FallbackReason,
+  type ObservedRead,
   type Readiness,
   type ReadShim,
   type SizeGate
@@ -48,6 +49,8 @@ interface Rig {
   readonly wires: Wire[]
   /** Every finished read: `served`, or the reason it was not. */
   readonly seen: (FallbackReason | 'served')[]
+  /** The same reads, whole: what `observe` was told of each. */
+  readonly reads: ObservedRead[]
   now(): number
   /** Move the clock, waking every sleeper that came due, in order. */
   advance(ms: number): Promise<void>
@@ -64,6 +67,7 @@ function rig(opts: RigOptions = {}): Rig {
   const sleepers: { due: number; wake: () => void }[] = []
   const wires: Wire[] = []
   const seen: (FallbackReason | 'served')[] = []
+  const reads: ObservedRead[] = []
   const shim = createReadShim({
     readiness: () => SERVABLE,
     request: <O extends RequestOp>(op: O, params: ParamsFor<O>): Promise<ResultFor<O>> =>
@@ -89,13 +93,17 @@ function rig(opts: RigOptions = {}): Rig {
       new Promise<void>((resolve) => {
         sleepers.push({ due: at + ms, wake: resolve })
       }),
-    observe: (_op, _ms, _phrase, why) => seen.push(why ?? 'served'),
+    observe: (read) => {
+      seen.push(read.why ?? 'served')
+      reads.push(read)
+    },
     ...opts
   })
   return {
     shim,
     wires,
     seen,
+    reads,
     now: () => at,
     advance: async (ms) => {
       const until = at + ms
@@ -339,4 +347,52 @@ test('A REPLY THAT LANDS AFTER THE ENGINE STOPPED BEING SERVABLE IS NOT SERVED',
   assert.equal(await joiner, EMPTY, 'a reply from before a character switch was served as current')
   assert.equal(r.wires.length, 1)
   assert.deepEqual(r.seen, ['notAttached', 'notAttached'])
+})
+
+// ---- 6. what an observer is told (fork #9, phase R3) ---------------------------------------------
+
+test('EVERY FINISHED READ IS OBSERVED UNDER ITS QUESTION, the key its request is joined on', async () => {
+  const r = rig()
+  const fight = r.shim.serveShared(COMBAT, { opts: { selectedId: 'a' } }, (reply) => reply.now, () => -1)
+  const zone = r.shim.serveShared(COMBAT, { opts: { selectedId: 'b' } }, (reply) => reply.now, () => -1)
+  await settle()
+  await r.wires[0].answer({ now: 7, snapshot: {} })
+  await r.advance(2_000)
+  assert.equal(await fight, 7)
+  assert.equal(await zone, -1)
+
+  const [served, slow] = r.reads
+  assert.deepEqual(
+    { op: served.op, key: served.key, unserved: served.unserved, why: served.why, code: served.code },
+    { op: COMBAT, key: 'combat.snapshot {"opts":{"selectedId":"a"}}', unserved: undefined, why: undefined, code: undefined }
+  )
+  assert.equal(slow.key, 'combat.snapshot {"opts":{"selectedId":"b"}}', 'two questions were observed as one')
+  assert.equal(slow.why, 'timedOut')
+  assert.equal(slow.unserved, 'the engine did not answer in time')
+  assert.equal(slow.ms, 2_000)
+})
+
+test('A REFUSAL IS OBSERVED WITH THE ENGINE-S CODE, so a request that ran out its deadline can be told apart', async () => {
+  const r = rig({ timeoutFor: () => 20_000 })
+  const late = pollLoot(r)
+  await settle()
+  // The client's own 15 s deadline rejects with the code `timeout`.
+  await r.wires[0].refuse(new EngineError('timeout', 'the engine did not answer module.snapshot in time', 3))
+  assert.equal(await late, EMPTY)
+  const broken = pollLoot(r)
+  await settle()
+  await r.wires[1].refuse(new Error('socket hang up'))
+  assert.equal(await broken, EMPTY)
+
+  assert.deepEqual(r.reads.map((read) => [read.why, read.code]), [
+    ['refused', 'timeout'],
+    ['refused', undefined]
+  ])
+  assert.equal(r.reads[0].key, LOOT_KEY)
+})
+
+test('a read that was never sent is observed under its question too', async () => {
+  const r = rig({ readiness: () => ({ ok: false, why: 'notLive' }) })
+  assert.equal(await pollLoot(r), EMPTY)
+  assert.deepEqual(r.reads, [{ op: MODULE, key: LOOT_KEY, ms: 0, unserved: 'the engine is still folding', why: 'notLive', code: undefined }])
 })

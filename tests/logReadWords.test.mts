@@ -29,6 +29,7 @@ const WAITS: Record<LogReadWait, true> = {
   notAnswering: true,
   reading: true,
   replyTooLarge: true,
+  panelSlow: true,
   ok: true
 }
 const ALL = Object.keys(WAITS) as LogReadWait[]

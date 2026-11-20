@@ -39,7 +39,7 @@ function facts(over: Partial<LogReadFacts> = {}): LogReadFacts {
     waitingSince: NOW - 2_000,
     error: null,
     probe: null,
-    lastCombatRead: null,
+    combatReads: [],
     link: null,
     tooLarge: null,
     ...over
@@ -111,14 +111,13 @@ test('a fold whose offset has not grown for a minute is stalled, and not a secon
   )
 })
 
-test('a live engine whose last combat read went unserved is not answering', () => {
+test('a live engine that refused the meter-s read is not answering', () => {
   const live = { readiness: 'ok', health: { status: 'live', at: NOW, since: NOW } }
-  const r = composeLogReadReport(
-    facts({ ...live, lastCombatRead: { unserved: 'the engine did not answer in time', why: 'timedOut', at: NOW, since: NOW } })
-  )
+  const refused = { key: 'fight', unserved: 'the engine refused', why: 'refused', code: 'internal', at: NOW, since: NOW }
+  const r = composeLogReadReport(facts({ ...live, combatReads: [refused] }))
   assert.equal(r.wait, 'notAnswering')
-  assert.equal(r.lastError, 'the engine did not answer in time')
-  assert.equal(waitOf({ ...live, lastCombatRead: { unserved: null, why: null, at: NOW, since: null } }), 'ok')
+  assert.equal(r.lastError, 'the engine refused (internal)')
+  assert.equal(waitOf({ ...live, combatReads: [{ ...refused, unserved: null, why: null, code: null, since: null }] }), 'ok')
 })
 
 // ---- 1b. the connection is reopened, and a reply can be too large (fork #9) --------------------
@@ -192,12 +191,13 @@ test('with the connection up, an old connect error is not the last error any mor
 })
 
 const LIVE = { readiness: 'ok', health: { status: 'live', at: NOW, since: NOW } }
-const TOO_LARGE_PHRASE = { unserved: 'the reply was too large to show', why: 'tooLarge', at: NOW, since: NOW }
-const TIMED_OUT = { unserved: 'the engine did not answer in time', why: 'timedOut', at: NOW, since: NOW }
+const TOO_LARGE_PHRASE = { key: 'fight', unserved: 'the reply was too large to show', why: 'tooLarge', code: null, at: NOW, since: NOW }
+const TIMED_OUT = { key: 'fight', unserved: 'the engine did not answer in time', why: 'timedOut', code: null, at: NOW, since: NOW }
+const SERVED = { key: 'fight', unserved: null, why: null, code: null, at: NOW, since: null }
 
 test('A FIGHT LIST TOO LARGE TO SHOW IS NAMED, even though the last combat read also went unserved', () => {
   const refused = { op: 'combat.snapshot', module: null, chars: 71.2 * MB, refused: true, limit: 64 * MB, at: NOW }
-  const r = composeLogReadReport(facts({ ...LIVE, tooLarge: refused, lastCombatRead: TOO_LARGE_PHRASE, waitingSince: NOW }))
+  const r = composeLogReadReport(facts({ ...LIVE, tooLarge: refused, combatReads: [TOO_LARGE_PHRASE], waitingSince: NOW }))
   assert.equal(r.wait, 'replyTooLarge')
   assert.equal(LOG_READ_WORDS[r.wait], 'The fight list is too large for the app to show.')
   assert.equal(r.show, true, 'waiting longer will not change it')
@@ -205,7 +205,7 @@ test('A FIGHT LIST TOO LARGE TO SHOW IS NAMED, even though the last combat read 
 
   const unshown = { ...refused, chars: 40.1 * MB, refused: false, limit: 32 * MB }
   assert.equal(
-    composeLogReadReport(facts({ ...LIVE, tooLarge: unshown, lastCombatRead: TOO_LARGE_PHRASE })).lastError,
+    composeLogReadReport(facts({ ...LIVE, tooLarge: unshown, combatReads: [TOO_LARGE_PHRASE] })).lastError,
     'read: the reply was 40.1 MB, over the 32.0 MB the app can show'
   )
 })
@@ -214,34 +214,32 @@ test('a reply too large is not the wait when it is not what the meter is missing
   const fights = { op: 'combat.snapshot', module: null, chars: 71.2 * MB, refused: true, limit: 64 * MB, at: NOW }
   const loot = { ...fights, op: 'module.snapshot', module: 'loot' }
   // The meter was served: the too-large fight list was main-s own (the archive asks for every fight).
-  assert.equal(waitOf({ ...LIVE, tooLarge: fights, lastCombatRead: { unserved: null, why: null, at: NOW, since: null } }), 'ok')
+  assert.equal(waitOf({ ...LIVE, tooLarge: fights, combatReads: [SERVED] }), 'ok')
   assert.equal(waitOf({ ...LIVE, tooLarge: fights }), 'ok')
   // A module-s reply is too large and the meter went unserved for another reason.
-  const r = composeLogReadReport(facts({ ...LIVE, tooLarge: loot, lastCombatRead: TIMED_OUT }))
-  assert.equal(r.wait, 'notAnswering')
+  const r = composeLogReadReport(facts({ ...LIVE, tooLarge: loot, combatReads: [TIMED_OUT] }))
+  assert.equal(r.wait, 'panelSlow')
   // The size is still on the Last error row: it is the newest thing that went wrong.
   assert.equal(r.lastError, 'read: the reply was 71.2 MB, over the 64.0 MB limit')
   // While the log is still being read, the read is the wait.
-  assert.equal(waitOf({ tooLarge: fights, lastCombatRead: TOO_LARGE_PHRASE }), 'reading')
+  assert.equal(waitOf({ tooLarge: fights, combatReads: [TOO_LARGE_PHRASE] }), 'reading')
 })
 
 test('ANOTHER FIGHT LIST BEING TOO LARGE DOES NOT MAKE A SLOW METER READ `replyTooLarge`', () => {
   // The archive asks combat.snapshot for every fight: main reads its 40 MB reply, which is over
   // what a window may be handed, while the meter's own small read only missed its 2 s wait.
   const archive = { op: 'combat.snapshot', module: null, chars: 40.1 * MB, refused: false, limit: 32 * MB, at: NOW }
-  const r = composeLogReadReport(facts({ ...LIVE, tooLarge: archive, lastCombatRead: TIMED_OUT, waitingSince: NOW }))
-  assert.equal(r.wait, 'notAnswering', 'the meter was called too large because some other fight list was')
+  const r = composeLogReadReport(facts({ ...LIVE, tooLarge: archive, combatReads: [TIMED_OUT], waitingSince: NOW }))
+  assert.equal(r.wait, 'panelSlow', 'the meter was called too large because some other fight list was')
   assert.equal(r.show, false, 'a slow read is not shown at once')
   // Every other reason the meter can go unserved for is the same: only its own reply decides.
   for (const why of ['refused', 'guess', 'notLive', null]) {
-    const read = { unserved: 'some other reason', why, at: NOW, since: NOW }
-    assert.equal(waitOf({ ...LIVE, tooLarge: archive, lastCombatRead: read }), 'notAnswering')
+    const read = { ...TIMED_OUT, unserved: 'some other reason', why }
+    assert.notEqual(waitOf({ ...LIVE, tooLarge: archive, combatReads: [read] }), 'replyTooLarge')
   }
   // The meter-s own reply too large, with a module-s reply the newest one recorded since.
   const loot = { ...archive, op: 'module.snapshot', module: 'loot' }
-  assert.equal(waitOf({ ...LIVE, tooLarge: loot, lastCombatRead: TOO_LARGE_PHRASE }), 'replyTooLarge')
-  // A too-large verdict left over from the last read of the log is not this one-s.
-  assert.equal(waitOf({ ...LIVE, tooLarge: null, lastCombatRead: TOO_LARGE_PHRASE }), 'notAnswering')
+  assert.equal(waitOf({ ...LIVE, tooLarge: loot, combatReads: [TOO_LARGE_PHRASE] }), 'replyTooLarge')
 })
 
 // ---- 2. when the box shows ---------------------------------------------------------------------

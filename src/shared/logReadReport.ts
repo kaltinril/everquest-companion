@@ -31,6 +31,7 @@ export type LogReadWait =
   | 'notAnswering'
   | 'reading'
   | 'replyTooLarge'
+  | 'panelSlow'
   | 'ok'
 
 /** A wait this long shows the status even when nothing has failed. */
@@ -91,6 +92,21 @@ export interface LogReadReplySize {
   readonly at: number
 }
 
+/** The newest read of one meter question since the log went live (main/dataServer/logReadState.ts). */
+export interface LogReadCombatRead {
+  /** The question, as the read path joins requests on it. Never shown. */
+  readonly key: string
+  /** The fallback phrase, or null when it was served. */
+  readonly unserved: string | null
+  /** The read path's reason word (main/dataServer/readShim.ts `FallbackReason`); null when served. */
+  readonly why: string | null
+  /** The engine error's code when it refused with one (`timeout`, `internal`, ...). */
+  readonly code: string | null
+  readonly at: number
+  /** When this question's reads began going unserved in a row; null when it was served. */
+  readonly since: number | null
+}
+
 /** Main's own look at the log file (main/logProbe.ts). */
 export interface LogReadProbe {
   readonly bytes: number | null
@@ -133,15 +149,9 @@ export interface LogReadFacts {
   readonly error: LogReadError | null
   /** Main's own look at the file, or null when it has not looked. */
   readonly probe: LogReadProbe | null
-  /** The meter's last read since the log went live: `unserved` is the phrase and `why` the read
-   *  path's reason word (main/dataServer/readShim.ts `FallbackReason`), both null when it was
-   *  served. `since` is when its reads began going unserved in a row, null when it was served. */
-  readonly lastCombatRead: {
-    readonly unserved: string | null
-    readonly why: string | null
-    readonly at: number
-    readonly since: number | null
-  } | null
+  /** The meter's reads since the log went live: the newest outcome of each question asked. One
+   *  slot for all of them let an overlay's served read hide the Combat tab's failed one. */
+  readonly combatReads: readonly LogReadCombatRead[]
   /** The keeper of main's connection, or null when there is no client. */
   readonly link: LogReadLink | null
   /** The newest reply of this read that could not be shown, or null. */
@@ -371,16 +381,42 @@ function logWait(f: LogReadFacts): LogReadWait | null {
  * unserved, not from the log's wait: one slow read hours after going live is not a long wait.
  */
 function combatVerdict(f: LogReadFacts): Verdict {
-  const read = f.lastCombatRead
-  const served = typeof read?.unserved !== 'string'
-  if (read === null || served || f.now - read.at > COMBAT_READ_FRESH_MS) {
-    return { wait: 'ok', since: f.waitingSince }
+  const cause = combatCause(f)
+  if (cause === null) return { wait: 'ok', since: f.waitingSince }
+  return { wait: cause.wait, since: Math.min(...cause.reads.map((read) => read.since ?? read.at)) }
+}
+
+/**
+ * What one unserved meter read says, or null when it says nothing about now: a guess, or a reason
+ * that was about readiness (this branch is only reached with readiness ok). Decided from the
+ * read's OWN reason, never from `tooLarge.op`: the archive asks combat.snapshot for every fight.
+ */
+function combatWaitOf(read: LogReadCombatRead): LogReadWait | null {
+  if (read.why === 'tooLarge') return 'replyTooLarge'
+  // Out of the caller's wait, or out of the client's own deadline: the engine is building it.
+  if (read.why === 'timedOut' || (read.why === 'refused' && read.code === 'timeout')) return 'panelSlow'
+  return read.why === 'refused' ? 'notAnswering' : null
+}
+
+/** Most specific first: a too-large reply must never be offered the reconnect button. */
+const COMBAT_ORDER: readonly LogReadWait[] = ['replyTooLarge', 'panelSlow', 'notAnswering']
+
+/** The wait the meter's reads call for and the reads that call for it, newest first; or null. */
+function combatCause(f: LogReadFacts): { wait: LogReadWait; reads: LogReadCombatRead[] } | null {
+  const failed = f.combatReads.filter((read) => read.unserved !== null && f.now - read.at <= COMBAT_READ_FRESH_MS)
+  for (const wait of COMBAT_ORDER) {
+    const reads = failed.filter((read) => combatWaitOf(read) === wait).sort((a, b) => b.at - a.at)
+    if (reads.length > 0) return { wait, reads }
   }
-  // The meter's OWN read went unserved because its reply was too large, in this read of the log:
-  // that is the cause to name. Never decided from `tooLarge.op`: the archive asks combat.snapshot
-  // for every fight, and that reply being too large to show says nothing about the meter's.
-  const tooLarge = read.why === 'tooLarge' && f.tooLarge !== null
-  return { wait: tooLarge ? 'replyTooLarge' : 'notAnswering', since: read.since }
+  return null
+}
+
+/** `the engine refused (internal)`: the newest read behind a meter wait, as the Last error row. */
+function combatErrorText(f: LogReadFacts, wait: LogReadWait): string | null {
+  const cause = wait === 'notAnswering' || wait === 'panelSlow' ? combatCause(f) : null
+  if (cause?.wait !== wait) return null
+  const { unserved, code } = cause.reads[0]
+  return code === null ? unserved : `${unserved ?? ''} (${code})`
 }
 
 function decide(f: LogReadFacts): Verdict {
@@ -434,8 +470,7 @@ function lastErrorText(f: LogReadFacts, wait: LogReadWait): string | null {
   }
   if (typeof f.fault?.detail === 'string') return scrubPaths(f.fault.detail, f.logPath, f.home)
   if (f.tooLarge !== null) return tooLargeText(f.tooLarge)
-  if (wait === 'notAnswering') return f.lastCombatRead?.unserved ?? null
-  return null
+  return combatErrorText(f, wait)
 }
 
 function shows(verdict: Verdict, now: number): boolean {

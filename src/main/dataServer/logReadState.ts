@@ -6,20 +6,24 @@
 // change instead of polled. A leaf like engineLaunchState.ts: module-level state, no Electron
 // import, so a test can drive it.
 
-import type {
-  LogReadError,
-  LogReadFacts,
-  LogReadReplySize,
-  LogReadStep
+import {
+  COMBAT_READ_FRESH_MS,
+  type LogReadCombatRead,
+  type LogReadError,
+  type LogReadFacts,
+  type LogReadReplySize,
+  type LogReadStep
 } from '../../shared/logReadReport'
 
 const SAID_KEPT = 8
 const SAID_WITH_ERROR = 4
+/** How many meter questions are remembered: the Combat tab, Overview and the meter overlays. */
+const COMBAT_KEYS_KEPT = 8
 
 /** The slice of `LogReadFacts` this file owns, plus the newest large reply that WAS shown. */
 export type LogReadNotes = Pick<
   LogReadFacts,
-  'health' | 'lastOffset' | 'movedAt' | 'waitingSince' | 'error' | 'lastCombatRead' | 'tooLarge'
+  'health' | 'lastOffset' | 'movedAt' | 'waitingSince' | 'error' | 'combatReads' | 'tooLarge'
 > & { readonly large: LogReadReplySize | null }
 
 /** This launch's newest engine stderr lines, already token-redacted and bounded by the supervisor. */
@@ -33,7 +37,8 @@ let waitingSince: number | null = null
 let waitingOn: string | null = null
 /** The read of that log went live: the next turn or launch starts a new wait. */
 let landed = false
-let lastCombatRead: LogReadFacts['lastCombatRead'] = null
+/** The newest outcome of each meter question, newest first. */
+let combatReads: LogReadCombatRead[] = []
 let tooLarge: LogReadReplySize | null = null
 let large: LogReadReplySize | null = null
 let changed: (() => void) | null = null
@@ -68,7 +73,7 @@ export function noteLogReadConnection(at: number): void {
   health = null
   lastOffset = null
   movedAt = null
-  lastCombatRead = null
+  combatReads = []
   tooLarge = null
   large = null
   startWait(at, false)
@@ -83,8 +88,8 @@ export function noteLogReadTurn(at: number, logPath: string | null): void {
   health = null
   lastOffset = null
   movedAt = null
-  // The meter's last read was of the world this turn replaces.
-  lastCombatRead = null
+  // The meter's reads were of the world this turn replaces.
+  combatReads = []
   // A reply's size is a fact about one read of the log; the next one asks again (replySizes.ts).
   tooLarge = null
   large = null
@@ -117,17 +122,34 @@ export function noteLogReadHealth(status: string, offset: number | undefined, at
       // The wait for the log is over; what the meter was told while it ran is no longer true.
       waitingSince = at
       landed = true
-      lastCombatRead = null
+      combatReads = []
     }
   }
   changed?.()
 }
 
-/** One finished combat read: `unserved` is the fallback phrase and `why` its reason word
- *  (readShim.ts `FallbackReason`), both null when it was served. */
-export function noteCombatRead(unserved: string | null, why: string | null, at: number): void {
-  const since = unserved === null ? null : (lastCombatRead?.since ?? at)
-  lastCombatRead = { unserved, why, at, since }
+/** One finished read as the read path reports it (readShim.ts `ObservedRead`): `unserved` is the
+ *  fallback phrase and `why` its reason word, both absent when it was served; `code` is the
+ *  engine error's code when it refused with one. */
+export interface CombatReadSeen {
+  readonly key: string
+  readonly unserved?: string
+  readonly why?: string
+  readonly code?: string
+}
+
+/**
+ * One finished combat read, kept as the newest outcome of ITS question (`key`). A question nobody
+ * has asked for `COMBAT_READ_FRESH_MS` is dropped, and the newest `COMBAT_KEYS_KEPT` are kept.
+ */
+export function noteCombatRead(read: CombatReadSeen, at: number): void {
+  const unserved = read.unserved ?? null
+  const fresh = combatReads.filter((kept) => at - kept.at <= COMBAT_READ_FRESH_MS)
+  // A run of unserved reads of one question is timed from its first.
+  const before = fresh.find((kept) => kept.key === read.key)
+  const since = unserved === null ? null : (before?.since ?? at)
+  const next = { key: read.key, unserved, why: read.why ?? null, code: read.code ?? null, at, since }
+  combatReads = [next, ...fresh.filter((kept) => kept.key !== read.key)].slice(0, COMBAT_KEYS_KEPT)
   changed?.()
 }
 
@@ -145,5 +167,5 @@ export function logReadFacts(): LogReadNotes {
   // A read that ended: the engine's reason travels on stderr, another pipe, and can arrive after
   // the idle answer that recorded the error. So its lines are read now, not then.
   const shown = error?.step === 'fold' ? { ...error, said: said.slice(-SAID_WITH_ERROR) } : error
-  return { health, lastOffset, movedAt, waitingSince, error: shown, lastCombatRead, tooLarge, large }
+  return { health, lastOffset, movedAt, waitingSince, error: shown, combatReads, tooLarge, large }
 }

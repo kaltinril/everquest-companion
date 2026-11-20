@@ -74,8 +74,10 @@ const CLOCKED: ReadonlySet<LogReadWait> = new Set<LogReadWait>([
   'finishing',
   'stalled',
   'logHung',
-  // The meter's last read stops speaking after `COMBAT_READ_FRESH_MS`.
-  'notAnswering'
+  // The meter's reads stop speaking after `COMBAT_READ_FRESH_MS`, whichever of the three they said.
+  'notAnswering',
+  'panelSlow',
+  'replyTooLarge'
 ])
 
 /** Can this report's verdict change by the clock alone? Then it is composed again every second. */

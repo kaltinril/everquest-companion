@@ -35,6 +35,7 @@ export const LOG_READ_WORDS: Readonly<Record<LogReadWait, string>> = {
   notAnswering: 'The data engine is not answering.',
   reading: 'Still reading your log.',
   replyTooLarge: 'The fight list is too large for the app to show.',
+  panelSlow: 'Your log is read. This panel is taking too long to build.',
   ok: 'The data engine is answering; this panel has no reply yet.'
 }
 
@@ -61,6 +62,7 @@ export const LOG_READ_TRY: Readonly<Record<LogReadWait, string | null>> = {
   notAnswering: 'Press Try again.',
   reading: 'Nothing to do. Large logs take a while.',
   replyTooLarge: 'Turn on Summarize and archive log in Preferences, then restart the app.',
+  panelSlow: 'Wait a moment. If it stays, turn on Summarize and archive log in Preferences.',
   ok: null
 }
 
@@ -85,5 +87,7 @@ export const LOG_READ_ACTION: Readonly<Record<LogReadWait, LogReadAction | null>
   reading: null,
   // On purpose: no button can make the reply smaller.
   replyTooLarge: null,
+  // The engine is answering; a new connection would only make the panel start over.
+  panelSlow: null,
   ok: null
 }
