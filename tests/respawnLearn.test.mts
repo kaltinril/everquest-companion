@@ -53,6 +53,10 @@ test('UNDER TWO MINUTES IS TWO SPAWNS SHARING A NAME, NOT A RESPAWN, WHATEVER TH
   assert.equal(constantRespawn(s([90, 95, 100, 600, 601, 602])), null, 'the lowest cluster is under two minutes: nothing')
   assert.equal(constantRespawn(s([110, 112, 115, 118, 119, 105, 108, 111, 117, 116])), null, 'ten in all, their median under two minutes')
   assert.equal(constantRespawn(s([120, 121, 122]))?.ms, 121_000, 'two minutes is not under two minutes')
+  // The rule is on the PEAK here. The clock's copy (`agreedGap`, the engine's `agreed`) tests the lowest
+  // gap and says nothing for these two sets, on purpose: `respawnAgreed.test.mts`, `respawn_places_tests.rs`.
+  assert.equal(constantRespawn(s([119, 120, 121]))?.ms, 120_000)
+  assert.equal(constantRespawn(s([100, 121, 122, 123]))?.ms, 122_000)
 })
 
 test('THE LOWEST CLUSTER WINS: A GAP CAN ONLY RUN LONGER THAN THE RESPAWN (OWNER 2026-10-26)', () => {

@@ -275,6 +275,18 @@ fn three_gaps_inside_fifty_seconds_agree_on_the_lowest_of_them() {
     assert_eq!(agreed_of(&[60, 75, 90, 720, 730, 740], 600_000), Some(720_000), "a ten-minute floor leaves the short gaps out");
 }
 
+/// The two numbers that decide when the clock drops under the wiki time, each on its boundary. The
+/// same sets as `tests/respawnAgreed.test.mts` (`agreedGap`) and `tests/respawnLearn.test.mts`.
+#[test]
+fn the_fifty_second_window_and_the_two_minute_rule_sit_on_their_boundaries() {
+    assert_eq!(agreed_of(&[600, 625, 650], 0), Some(600_000), "exactly 50 s apart agree");
+    assert_eq!(agreed_of(&[600, 625, 651], 0), None, "51 s do not");
+    assert_eq!(agreed_of(&[120, 121, 122], 0), Some(120_000), "two minutes is not under two minutes");
+    // Stricter than the Gaps tab on purpose: it reads the peak (120 s here), this the lowest gap.
+    assert_eq!(agreed_of(&[119, 120, 121], 0), None, "tested on the lowest gap, not the peak");
+    assert_eq!(agreed_of(&[100, 121, 122, 123], 0), None, "a lowest window that starts under two minutes offers nothing");
+}
+
 /// The agreed gap lowers a longer wiki floor and does nothing else to the ladder (fork #8).
 #[test]
 fn an_agreed_gap_lowers_a_longer_wiki_floor_and_nothing_else() {
@@ -316,6 +328,39 @@ fn agreeing_kills_number_the_clock_under_a_longer_wiki_time() {
     assert_eq!((three.estimate_ms, three.source, three.samples), (Some(530_000), "observed", 3));
     assert_eq!(three.wiki_ms, Some(wiki_ms), "the row still states the page's own number");
     assert_eq!(m.snapshot()["state"]["rows"][0]["agreedMs"], 530_000);
+}
+
+/// A watch marked "several mobs share this name" keeps its ten-minute floor under the agreed gap:
+/// two spawns' short gaps agree with each other and must never lower the wiki time, while agreeing
+/// gaps of ten minutes or more still do.
+#[test]
+fn a_shared_names_short_gaps_never_lower_the_wiki_floor() {
+    // Any page stating more than fifteen minutes, picked at run time: never a named page.
+    let page = wiki()
+        .values()
+        .filter(|w| w.seconds.is_some_and(|s| s > 900) && id_key(&w.key) == w.key)
+        .min_by(|a, b| a.key.cmp(&b.key))
+        .expect("a page with a stated respawn over fifteen minutes");
+    let wiki_ms = page.seconds.unwrap_or_default() * 1000;
+    let watch = RespawnWatchPref { key: page.key.clone(), display: page.key.clone(), custom_sec: None, shared_name: true };
+    let mut m = RespawnModule::new(NOW, RespawnPrefs { watches: vec![watch] });
+    m.on_event(&ev(&zone(T_ZONE)), false);
+    // Three agreeing gaps of 130 s: over the two-minute rule, under the ten-minute floor.
+    for n in 0..4 {
+        m.on_event(&ev(&death_of(&page.key, T_DEATH + n * 130_000)), false);
+    }
+    let short = only_row(&m);
+    assert_eq!((short.agreed_ms, short.estimate_ms, short.source), (None, Some(wiki_ms), "wiki"));
+    assert_eq!((short.observed_ms, short.samples), (None, 0));
+    assert!(m.snapshot()["state"]["rows"][0].get("agreedMs").is_none(), "absent, never null");
+    // Three more of 720, 730 and 740 s: these agree above the floor, and the clock is theirs.
+    let t = T_DEATH + 3 * 130_000;
+    for after in [720_000, 1_450_000, 2_190_000] {
+        m.on_event(&ev(&death_of(&page.key, t + after)), false);
+    }
+    let long = only_row(&m);
+    assert_eq!((long.agreed_ms, long.estimate_ms, long.source, long.samples), (Some(720_000), Some(720_000), "observed", 3));
+    assert_eq!(long.wiki_ms, Some(wiki_ms), "the row still states the page's own number");
 }
 
 /// Gaps a closed private instance taught count toward the agreed gap, pooled as the estimate is.
