@@ -17,8 +17,10 @@ import {
   RESPAWN_ALERT_BANNER,
   RESPAWN_ALERT_SPEECH,
   normalizeRespawnAlert,
+  respawnAlertHeard,
   respawnAlertLeadFromDraft,
   respawnAlertLeadOk,
+  respawnAlertSilentNote,
   respawnAlertStepper,
   respawnAlertsDue
 } from '../src/shared/respawnAlert.ts'
@@ -119,6 +121,39 @@ test('a re-based clock is a new key; a moved estimate keeps the key', () => {
   assert.deepEqual(longer, first)
   const rebased = keys('Lake Nerius', [row('Lake Nerius', BASE + 5000, { basis: 'sighting' })], AT + 4500, AT + 5500)
   assert.deepEqual(rebased, [`lake nerius::enynti@${String(BASE + 5000)}`])
+})
+
+// ------------------------------------------------------------ will anything be heard?
+
+test('the box is only heard through an enabled alert on the signal: ok, switched off, or missing', () => {
+  const respawn = { type: 'app', signal: 'respawnSoon' } as const
+  const other = [
+    { enabled: true, trigger: { type: 'raw', regex: 'respawn' } as const },
+    { enabled: true, trigger: { type: 'app', signal: 'bazaarWatch' } as const },
+    // An app condition inside a composite is never fired, so it is not an alert on the signal.
+    { enabled: true, trigger: { type: 'any', conditions: [{ ...respawn }] } as const }
+  ]
+  assert.equal(respawnAlertHeard([]), 'missing')
+  assert.equal(respawnAlertHeard(other), 'missing')
+  assert.equal(respawnAlertHeard([...other, { enabled: false, trigger: respawn }]), 'off')
+  assert.equal(respawnAlertHeard([...other, { enabled: true, trigger: respawn }]), 'ok')
+  // By signal, not by the seeded id: the player's own alert on the signal counts.
+  assert.equal(respawnAlertHeard([{ enabled: false, trigger: respawn }, { enabled: true, trigger: respawn }]), 'ok')
+  assert.equal(respawnAlertHeard([{ enabled: false, trigger: respawn }, { enabled: false, trigger: respawn }]), 'off')
+})
+
+test('the Timers tab says why nothing will play, only while the box is ticked', () => {
+  assert.equal(respawnAlertSilentNote(false, 'missing'), null)
+  assert.equal(respawnAlertSilentNote(false, 'off'), null)
+  assert.equal(respawnAlertSilentNote(true, 'ok'), null)
+  const off = respawnAlertSilentNote(true, 'off')
+  const missing = respawnAlertSilentNote(true, 'missing')
+  assert.match(off ?? '', /switched off on the Alerts tab/)
+  assert.match(missing ?? '', /Alerts tab has no/)
+  for (const note of [off, missing]) {
+    assert.ok(note?.includes('Respawn timer ending'))
+    assert.doesNotMatch(note ?? '', /[–—]/)
+  }
 })
 
 // ------------------------------------------------------------ once per clock (the watcher's steps)

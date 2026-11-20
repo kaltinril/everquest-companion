@@ -2,6 +2,7 @@
 // (fork #7): its one setting, the seeded alert's phrases, and which clocks cross their lead
 // moment between two looks. Pure; tests/respawnAlert.test.mts.
 
+import type { AlertDef } from './alertTypes'
 import { respawnReading, type RespawnSnap } from './respawn'
 import { respawnTierView, respawnZoneTitle, type RespawnPlace, type RespawnTierEntry } from './respawnTiers'
 
@@ -47,6 +48,31 @@ export function respawnAlertLeadFromDraft(text: string): number | null {
 // never one; an empty token is spoken as written, so every token always carries text.
 export const RESPAWN_ALERT_SPEECH = '{mob} {when}'
 export const RESPAWN_ALERT_BANNER = '{mob} in {seconds}s - {place}'
+
+/** Whether the Alerts tab holds an alert the box can be heard through. */
+export type RespawnAlertHeard = 'ok' | 'off' | 'missing'
+
+/**
+ * `ok` with an enabled alert on the `respawnSoon` signal, `off` when every such alert is switched
+ * off, `missing` when there is none. By signal, as the alert player matches, not by the seeded id:
+ * the player's own alert on the signal counts.
+ */
+export function respawnAlertHeard(alerts: readonly Pick<AlertDef, 'enabled' | 'trigger'>[]): RespawnAlertHeard {
+  let found = false
+  for (const a of alerts) {
+    if (a.trigger.type !== 'app' || a.trigger.signal !== 'respawnSoon') continue
+    if (a.enabled) return 'ok'
+    found = true
+  }
+  return found ? 'off' : 'missing'
+}
+
+/** The line under the Timers tab's box when it is ticked and nothing will play; null otherwise. */
+export function respawnAlertSilentNote(on: boolean, heard: RespawnAlertHeard): string | null {
+  if (!on || heard === 'ok') return null
+  if (heard === 'off') return 'No alert will play: "Respawn timer ending" is switched off on the Alerts tab.'
+  return 'No alert will play: the Alerts tab has no "Respawn timer ending" alert. Add one there (App signal: Respawn timer ending).'
+}
 
 export interface RespawnAlertDue {
   /** One per clock (`row.id@baseTs`): the caller fires each key once. */
