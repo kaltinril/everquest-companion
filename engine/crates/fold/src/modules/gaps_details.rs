@@ -144,7 +144,7 @@ fn coin_each(coin: &str, copper: i64, count: i64) -> Option<String> {
 }
 
 /// The coin a line printed after the last `marker`, up to the final full stop — see [`coin_of`].
-fn price_of(raw: &str, marker: &str) -> Option<(String, i64)> {
+pub(crate) fn price_of(raw: &str, marker: &str) -> Option<(String, i64)> {
     let at = raw.rfind(marker)? + marker.len();
     coin_of(raw[at..].trim().trim_end_matches('.'))
 }

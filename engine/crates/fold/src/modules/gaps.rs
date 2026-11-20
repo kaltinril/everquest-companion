@@ -611,7 +611,7 @@ impl EqModule for GapsModule {
 
 /// A forage's zone and a combine's tradeskill: a child module, so it files onto the rows.
 #[path = "gaps_craft.rs"]
-mod craft;
+pub(crate) mod craft;
 #[path = "gaps_quests.rs"]
 pub(crate) mod quests;
 use quests::QuestFacts;
