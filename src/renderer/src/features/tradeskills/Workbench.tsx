@@ -1,13 +1,16 @@
-// tradeskills/Workbench.tsx — one tradeskill: the level the log last stated, and three tabs under
+// tradeskills/Workbench.tsx — one tradeskill: the level the log last stated, and four tabs under
 // it (MapsTabs' arrangement: one at a time, so the screen never becomes a scroll of panels).
 //
 //   Recipes       the picked recipe in full (the one to make next until the player picks another)
 //                 over the recipe book, with what the player's log says of each recipe
+//   Your route    a goal (cheapest, fastest, explore, the community route), the route it gives
+//                 from the player's level, and the shopping list for the route's next step
 //   Your history  the tradeskill's combines, pace and the item rows behind them
 //   From the guides  the leveling guide's route with the player's level placed on it
 //
-// The ladder is shared/tradeskillBook.ts, the history shared/tradeskillHistory.ts, the route
-// shared/tradeskillGuide.ts; this file holds the controls and passes their values in.
+// The ladder is shared/tradeskillBook.ts, the goal routes shared/tradeskillRoute.ts, the history
+// shared/tradeskillHistory.ts, the guide's route shared/tradeskillGuide.ts; this file holds the
+// controls and passes their values in.
 
 import { type JSX, useCallback, useDeferredValue, useMemo, useRef, useState } from 'react'
 import { Box, Button, FormControlLabel, Stack, Switch, Tab, Tabs, Typography } from '@mui/material'
@@ -37,6 +40,7 @@ import { GuidePanel } from './GuidePanel'
 import { HistoryPanel } from './HistoryPanel'
 import { RecipePanel } from './RecipePanel'
 import { RecipeTable, type RowLog } from './RecipeTable'
+import { RoutePanel } from './RoutePanel'
 import { SkillGearPanel } from './SkillGearPanel'
 import { useCrafting, useGuides, useHeld, useSkillLevels, type SkillLevels } from './tradeskillData'
 import { useBenchMemory, useHideTrivial, type BenchMemory, type BenchTab } from './tradeskillMemory'
@@ -102,6 +106,7 @@ function BenchTabs({ tab, onTab }: { tab: BenchTab; onTab: (tab: BenchTab) => vo
       sx={{ minHeight: 32, flexShrink: 0, '& .MuiTab-root': { minHeight: 32, py: 0.5 } }}
     >
       <Tab value="recipes" label="Recipes" data-testid="tradeskill-tab-recipes" />
+      <Tab value="route" label="Your route" data-testid="tradeskill-tab-route" />
       <Tab value="history" label="Your history" data-testid="tradeskill-tab-history" />
       <Tab value="guides" label="From the guides" data-testid="tradeskill-tab-guides" />
     </Tabs>
@@ -261,6 +266,10 @@ export function Workbench({ tradeskill, index, eraOnly, onHome, restoreTop }: Wo
     setRestore(null)
     setMemory(next)
   }
+  // A history row and a route step both open their recipe on the recipes tab, as a link in does.
+  const openRecipe = (id: string): void => {
+    show({ query: '', pick: id, linked: true, tab: 'recipes' })
+  }
   return (
     <Stack spacing={1} sx={{ flexGrow: 1, minHeight: 0 }} data-testid="tradeskill-workbench">
       <BenchHead tradeskill={tradeskill} level={level} levels={levels} onHome={onHome} totals={totalsLine(history.totals)} />
@@ -283,16 +292,8 @@ export function Workbench({ tradeskill, index, eraOnly, onHome, restoreTop }: Wo
           parkOnLeave={parkOnLeave}
         />
       )}
-      {memory.tab === 'history' && (
-        <HistoryPanel
-          tradeskill={tradeskill}
-          facts={facts}
-          history={history}
-          onOpenRecipe={(id) => {
-            show({ query: '', pick: id, linked: true, tab: 'recipes' })
-          }}
-        />
-      )}
+      {memory.tab === 'route' && <RoutePanel tradeskill={tradeskill} level={level} ready={levels.served} facts={facts} onOpenRecipe={openRecipe} />}
+      {memory.tab === 'history' && <HistoryPanel tradeskill={tradeskill} facts={facts} history={history} onOpenRecipe={openRecipe} />}
       {memory.tab === 'guides' && <GuidePanel tradeskill={tradeskill} level={level} facts={facts} />}
     </Stack>
   )
